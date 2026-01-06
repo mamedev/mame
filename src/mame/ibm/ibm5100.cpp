@@ -29,6 +29,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "ibm5110.lh"
+
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
 
@@ -356,6 +358,8 @@ void ibm5110_state::ibm5110(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);
 	GFXDECODE(config, "gfx", "palette", g2);
+
+	config.set_default_layout(layout_ibm5110);
 }
 
 u32 ibm5100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)

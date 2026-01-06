@@ -1,0 +1,1984 @@
+<?xml version="1.0"?><!-- license:CC0-1.0 -->
+<mamelayout version="2">
+
+<!-- IBM 5110 Portable/Desktop Personal Computer (1978)
+     Layout by Guru (https://gurudumps.otenko.com/)
+     Version: 1.0
+-->
+
+	<!-- Panel Texts -->
+	<element name="reverse"><text align="0" string="REVERSE  DISPLAY" /></element>
+	<element name="basic"><text align="0" string="BASIC" /></element>
+	<element name="apl"><text align="0" string="APL" /></element>
+	<element name="restart"><text align="0" string="RESTART" /></element>
+	<element name="displayregisters"><text align="0" string="DISPLAY  REGISTERS" /></element>
+	<element name="normal"><text align="0" string="NORMAL" /></element>
+	<element name="poweroff"><text align="0" string="POWER  OFF" /></element>
+	<element name="poweron"><text align="0" string="POWER  ON" /></element>
+	<element name="brightness"><text align="0" string="BRIGHTNESS" /></element>
+	<element name="l3264r32"><text align="0" string="L32  64  R32" /></element>
+	<element name="inprocess"><text align="0" string="IN  PROCESS" /></element>
+	<element name="processcheck"><text align="0" string="PROCESS  CHECK" /></element>
+	<!-- KB Row 1 -->
+	<element name="kb_1"><text align="0" string="1" /></element>
+	<element name="kb_1s"><text align="0" string="&#168;" /></element><!-- Diaeresis / Umlaut -->
+	<element name="kb_2"><text align="0" string="2" /></element>
+	<element name="kb_2s"><text align="0" string="&#713;" /></element><!-- Overbar -->
+	<element name="kb_3"><text align="0" string="3" /></element>
+	<element name="kb_3s"><text align="0" string="&lt;" /></element><!-- Less Than -->
+	<element name="kb_4"><text align="0" string="4" /></element>
+	<element name="kb_4s"><text align="0" string="&#8804;" /></element><!-- Less Than Equal To -->
+	<element name="kb_5"><text align="0" string="5" /></element>
+	<element name="kb_5s"><text align="0" string="=" /></element><!-- Equal -->
+	<element name="kb_6"><text align="0" string="6" /></element>
+	<element name="kb_6s"><text align="0" string="&#8805;" /></element><!-- Greater Than Equal To -->
+	<element name="kb_7"><text align="0" string="7" /></element>
+	<element name="kb_7s"><text align="0" string="&gt;" /></element><!-- Greater Than -->
+	<element name="kb_8"><text align="0" string="8" /></element>
+	<element name="kb_8s"><text align="0" string="&#8800;" /></element><!-- Not Equal. NOTE: The IBM 5110 will change <> to this symbol -->
+	<element name="kb_9"><text align="0" string="9" /></element>
+	<element name="kb_9s"><text align="0" string="&#94;" /></element><!-- Boolean AND (APL) -->
+	<element name="kb_0"><text align="0" string="0" /></element>
+	<element name="kb_0s"><text align="0" string="&#8964;" /></element><!-- Boolean OR (APL) -->
+	<element name="kb_plus"><text align="0" string="+" /></element>
+	<element name="kb_pluss"><text align="0" string="&#175;" /></element><!-- Minus (longer) -->
+	<element name="kb_mult"><text align="0" string="&#215;" /></element><!-- Multiply -->
+	<element name="kb_mults"><text align="0" string="&#247;" /></element><!-- Divide -->
+	<element name="kb_leftarrow"><text align="0" string="&#8592;" /></element><!-- Left Arrow -->
+	<element name="kb_rightarrow"><text align="0" string="&#8594;" /></element><!-- Right Arrow -->
+	<!-- KB Row 2 -->
+	<element name="kb_q"><text align="0" string="O" /></element><!-- Q tail is corrected with custom element below since there is no support for the correct font or a simple line at an angle -->
+	<element name="kb_qa"><image><data><![CDATA[<svg width="30" height="30" viewBox="0 0 30 30"><path d="M 0,0 L 30,30 Z" fill="white" stroke="white" stroke-width="10"/></svg>]]></data></image></element>
+	<element name="kb_qs"><text align="0" string="?" /></element>
+	<element name="kb_w"><text align="0" string="W" /></element>
+	<element name="kb_ws"><text align="0" string="&#969;" /></element><!-- Omega -->
+	<element name="kb_e"><text align="0" string="E" /></element>
+	<element name="kb_es"><text align="0" string="&#1013;" /></element><!-- Epsilon -->
+	<element name="kb_r"><text align="0" string="R" /></element>
+	<element name="kb_rs"><text align="0" string="&#961;" /></element><!-- Rho -->
+	<element name="kb_t"><text align="0" string="T" /></element>
+	<element name="kb_ts"><text align="0" string="&#732;" /></element><!-- Tilde -->
+	<element name="kb_y"><text align="0" string="Y" /></element>
+	<element name="kb_ys"><text align="0" string="&#8593;" /></element><!-- Up Arrow -->
+	<element name="kb_u"><text align="0" string="U" /></element>
+	<element name="kb_us"><text align="0" string="&#8595;" /></element><!-- Down Arrow -->
+	<element name="kb_i"><text align="0" string="I" /></element><!-- Rotated Tilde Above I key Custom Symbol (below) -->
+	<element name="kb_is"><image><data><![CDATA[<svg width="60" height="100" viewBox="0 0 20 100"><path d="M5,0 C15,30 5,70 15,100" stroke="white" stroke-width="4" fill="white" /></svg>]]></data></image></element><!-- Iota -->
+	<element name="kb_o"><text align="0" string="O" /></element>
+	<element name="kb_os"><text align="0" string="&#9675;" /></element><!-- Circle -->
+	<element name="kb_p"><text align="0" string="P" /></element>
+	<element name="kb_ps"><text align="0" string="*" /></element>
+	<element name="kb_larrow"><text align="0" string="&#8592;" /></element><!-- Left Arrow -->
+	<element name="kb_larrows"><text align="0" string="&#8594;" /></element><!-- Right Arrow -->
+	<element name="kb_equal"><text align="0" string="=" /></element>
+	<element name="kb_equals"><text align="0" string="&#172;" /></element><!-- Boolean NOT -->
+	<!-- KB Row 3 -->
+	<element name="kb_a"><text align="0" string="A" /></element>
+	<element name="kb_as"><text align="0" string="&#8733;" /></element><!-- Proportional To (almost looks like Alpha) -->
+	<element name="kb_s"><text align="0" string="S" /></element>
+	<element name="kb_ss"><text align="0" string="&#8968;" /></element><!-- Left Ceiling -->
+	<element name="kb_d"><text align="0" string="D" /></element>
+	<element name="kb_ds"><text align="0" string="&#8970;" /></element><!-- Left Floor -->
+	<element name="kb_f"><text align="0" string="F" /></element>
+	<element name="kb_fs"><text align="0" string="_" /></element><!-- Underscore -->
+	<element name="kb_g"><text align="0" string="G" /></element>
+	<element name="kb_gs"><text align="0" string="&#8711;" /></element><!-- Nabla (also known as Del) -->
+	<element name="kb_h"><text align="0" string="H" /></element>
+	<element name="kb_hs"><text align="0" string="&#916;" /></element><!-- Delta -->
+	<element name="kb_j"><text align="0" string="J" /></element>
+	<element name="kb_js"><text align="0" string="&#176;" /></element><!-- Null (named by IBM, looks like degrees) -->
+	<element name="kb_k"><text align="0" string="K" /></element>
+	<element name="kb_ks"><text align="0" string="&#8217;" /></element><!-- Ending Quote -->
+	<element name="kb_l"><text align="0" string="L" /></element>
+	<element name="kb_ls"><text align="0" string="&#9633;" /></element><!-- White Box -->
+	<element name="kb_sbrktl"><text align="0" string="[" /></element>
+	<element name="kb_sbrktls"><text align="0" string="(" /></element>
+	<element name="kb_sbrktr"><text align="0" string="]" /></element>
+	<element name="kb_sbrktrs"><text align="0" string=")" /></element>
+	<element name="kb_hash"><text align="0" string="#" /></element>
+	<element name="kb_hashs"><text align="0" string="@" /></element>
+	<!-- KB Row 4 -->
+	<element name="kb_z"><text align="0" string="Z" /></element>
+	<element name="kb_zs"><text align="0" string="&#8834;" /></element><!-- Subset Of -->
+	<element name="kb_x"><text align="0" string="X" /></element>
+	<element name="kb_xs"><text align="0" string="&#8835;" /></element><!-- Superset Of -->
+	<element name="kb_c"><text align="0" string="C" /></element>
+	<element name="kb_cs"><text align="0" string="&#8745;" /></element><!-- Intersection -->
+	<element name="kb_v"><text align="0" string="V" /></element>
+	<element name="kb_vs"><text align="0" string="&#8746;" /></element><!-- Union -->
+	<element name="kb_b"><text align="0" string="B" /></element>
+	<element name="kb_bs"><text align="0" string="&#8869;" /></element><!-- False -->
+	<element name="kb_n"><text align="0" string="N" /></element>
+	<element name="kb_ns"><text align="0" string="&#8868;" /></element><!-- True -->
+	<element name="kb_m"><text align="0" string="M" /></element>
+	<element name="kb_ms"><text align="0" string="&#124;" /></element><!-- Vertical Bar -->
+	<element name="kb_comma"><text align="0" string="," /></element>
+	<element name="kb_commas"><text align="0" string=";" /></element>
+	<element name="kb_dot"><text align="0" string="." /></element>
+	<element name="kb_dots"><text align="0" string=":" /></element>
+	<element name="kb_slash"><text align="0" string="/" /></element>
+	<element name="kb_slashs"><text align="0" string="\" /></element>
+	<element name="kb_dollar"><text align="0" string="$" /></element>
+	<element name="kb_dollars"><text align="0" string="&amp;" /></element><!-- Ampersand -->
+	<element name="kb_shiftup"><image><data><![CDATA[<svg viewBox="-5 -5 110 75" width="100" height="65"><path d="M 20 35   L 20 65 L 80 65 L 80 35 L 100 35 L 50 0 L 0 35 L 20 35" fill="none" stroke="white" stroke-width="8" /></svg>]]></data></image></element>
+	<element name="kb_shiftright"><image><data><![CDATA[<svg viewBox="35 0 65 100" width="65" height="100"><path d="M65,20 L35,20 L35,80 L65,80 L65,100 L100,50 L65,0 L65,20" fill="none" stroke="white" stroke-width="8" /></svg>]]></data></image></element>
+	<element name="kb_shiftleft"><image><data><![CDATA[<svg viewBox="0 0 105 105" width="65" height="100"><path d="M65,80 L95,80 L95,20 L65,20 L65,0 L30,50 L65,100 L65,80" fill="none" stroke="white" stroke-width="8" /></svg>]]></data></image></element>
+	<element name="kb_shiftdown"><image><data><![CDATA[<svg viewBox="-5 -5 110 85" width="100" height="65"><path d="M80,40 L80,10 L20,10 L20,40 L0,40 L50,75 L100,40 L80,40" fill="none" stroke="white" stroke-width="8" /></svg>]]></data></image></element>
+	<element name="kb_cmd"><text align="0" string="CMD" /></element>
+	<element name="kb_execute"><text align="0" string="EXECUTE" /></element>
+	<!-- Keypad Texts -->
+	<element name="kb_attn"><text align="0" string="ATTN" /></element>
+	<element name="kb_hold"><text align="0" string="HOLD" /></element>
+	<element name="kb_uparrow"><text align="0" string="&#8593;" /></element><!-- Up Arrow -->
+	<element name="kb_downarrow"><text align="0" string="&#8595;" /></element><!-- Down Arrow -->
+	<element name="kb_asterisk"><text align="0" string="&#10033;" /></element><!-- 6-point Asterisk -->
+	<element name="kb_minus"><text align="0" string="&#175;" /></element><!-- Minus -->
+	<!-- Keyboard Overlay Texts -->
+	<element name="kbo_comm"><text align="1" string="Comm" /></element>
+	<element name="kbo_basic"><text align="1" string="BASIC" /></element>
+	<element name="kbo_apl"><text align="1" string="APL" /></element>
+	<element name="kbo_cmdchar"><text align="0" string="Cmd Char" /></element>
+	<element name="kbo_load"><text align="0" string="LOAD" /></element>
+	<element name="kbo_)load"><text align="0" string=")LOAD" /></element>
+	<element name="kbo_edit"><text align="0" string="Edit" /></element>
+	<element name="kbo_save"><text align="0" string="SAVE" /></element>
+	<element name="kbo_)save"><text align="0" string=")SAVE" /></element>
+	<element name="kbo_linedelete"><text align="0" string="Line Delete" /></element>
+	<element name="kbo_run"><text align="0" string="RUN" /></element>
+	<element name="kbo_)cont"><text align="0" string=")CONT" /></element>
+	<element name="kbo_shiftchar"><text align="0" string="Shift Char" /></element>
+	<element name="kbo_go"><text align="0" string="GO" /></element>
+	<element name="kbo_)lib"><text align="0" string=")LIB" /></element>
+	<element name="kbo_tabset"><text align="0" string="Tab Set" /></element>
+	<element name="kbo_list"><text align="0" string="LIST" /></element>
+	<element name="kbo_)fns"><text align="0" string=")FNS" /></element>
+	<element name="kbo_tabreset"><text align="0" string="Tab Reset" /></element>
+	<element name="kbo_util"><text align="0" string="UTIL" /></element>
+	<element name="kbo_)vars"><text align="0" string=")VARS" /></element>
+	<element name="kbo_print"><text align="0" string="Print" /></element>
+	<element name="kbo_auto"><text align="0" string="AUTO" /></element>
+	<element name="kbo_)copy"><text align="0" string=")COPY" /></element>
+	<element name="kbo_home"><text align="0" string="Home" /></element>
+	<element name="kbo_renum"><text align="0" string="RENUM" /></element>
+	<element name="kbo_)wsid"><text align="0" string=")WSID" /></element>
+	<element name="kbo_write"><text align="0" string="Write" /></element>
+	<element name="kbo_calcresult"><text align="0" string="Calc Result" /></element>
+	<element name="kbo_)outsel"><text align="0" string=")OUTSEL" /></element>
+	<element name="kbo_mark"><text align="0" string="Mark" /></element>
+	<element name="kbo_)mark"><text align="0" string=")Mark" /></element>
+	<element name="kbo_copy"><text align="0" string="Copy" /></element>
+	<element name="kbo_display"><text align="0" string="Display" /></element>
+	<element name="kbo_delete"><text align="0" string="Delete" /></element>
+	<element name="kbo_insert"><text align="0" string="Insert" /></element>
+	<element name="kbo_operations"><text align="0" string="Operations" /></element>
+	<element name="kbo_tab"><text align="0" string="Tab" /></element>
+	<element name="kbo_move"><text align="0" string="Move" /></element>
+	<element name="kbo_lines"><text align="0" string="lines" /></element>
+	<element name="kbo_fast"><text align="0" string="Fast" /></element>
+	<element name="kbo_up"><text align="0" string="up" /></element>
+	<element name="kbo_down"><text align="0" string="down" /></element>
+	<element name="kbo_left"><text align="0" string="left" /></element>
+	<element name="kbo_right"><text align="0" string="right" /></element>
+	<!-- Texts On Front of Keys. To access these use CMD+key -->
+	<element name="kbf_chain"><text align="0" string="CHAIN" /></element>
+	<element name="kbf_close"><text align="0" string="CLOSE" /></element>
+	<element name="kbf_data"><text align="0" string="DATA" /></element>
+	<element name="kbf_def"><text align="0" string="DEF" /></element>
+	<element name="kbf_dim"><text align="0" string="DIM" /></element>
+	<element name="kbf_exit"><text align="0" string="EXIT" /></element>
+	<element name="kbf_file"><text align="0" string="FILE" /></element>
+	<element name="kbf_fnend"><text align="0" string="FNEND" /></element>
+	<element name="kbf_for"><text align="0" string="FOR" /></element>
+	<element name="kbf_form"><text align="0" string="FORM" /></element>
+	<element name="kbf_get"><text align="0" string="GET" /></element>
+	<element name="kbf_gosub"><text align="0" string="GOSUB" /></element>
+	<element name="kbf_goto"><text align="0" string="GOTO" /></element>
+	<element name="kbf_input"><text align="0" string="INPUT" /></element>
+	<element name="kbf_mat"><text align="0" string="MAT" /></element>
+	<element name="kbf_next"><text align="0" string="NEXT" /></element>
+	<element name="kbf_open"><text align="0" string="OPEN" /></element>
+	<element name="kbf_pause"><text align="0" string="PAUSE" /></element>
+	<element name="kbf_print"><text align="0" string="PRINT" /></element>
+	<element name="kbf_put"><text align="0" string="PUT" /></element>
+	<element name="kbf_read"><text align="0" string="READ" /></element>
+	<element name="kbf_reset"><text align="0" string="RESET" /></element>
+	<element name="kbf_restr"><text align="0" string="RESTR" /></element>
+	<element name="kbf_retrn"><text align="0" string="RETRN" /></element>
+	<element name="kbf_using"><text align="0" string="USING" /></element>
+	<element name="kbf_write"><text align="0" string="WRITE" /></element>
+
+	<!-- Basic Elements -->
+	<element name="line"><rect></rect></element>
+	<element name="vline"><rect></rect></element>
+	<element name="vline-overlay"><rect><color red="0.443" green="0.466" blue="0.533" /></rect></element>
+	<element name="rect"><rect></rect></element>
+	<element name="disk"><disk></disk></element>
+
+	<!-- Red Round LED -->
+	<element name="rled" defstate="0">
+		<disk state="0"><color red="0.4" green="0" blue="0" /></disk>
+		<disk state="1"><color red="1" green="0" blue="0" /></disk>
+	</element>
+
+	<!-- Panel Status LEDs -->
+	<group name="statusled">
+		<element ref="disk"><bounds x="0" y="0" width="130" height="130" /><color red="0.0" green="0.0" blue="0.0" /></element>
+		<element ref="disk"><bounds x="15" y="15" width="100" height="100" /><color red="0.5" green="0.5" blue="0.5" /></element>
+		<element ref="rled"><bounds x="32" y="32" width="70" height="70" /></element>
+	</group>
+
+	<!-- Knob Elements -->
+	<element name="knob"><disk></disk></element>
+	<element name="knob-position"><rect></rect></element>
+
+	<!-- Keyboard Key Component Layers -->
+	<element name="keybase">
+		<image><data><![CDATA[
+		<svg width="280" height="340" viewBox="0 0 280 340">
+			<g transform="scale(0.345 0.4048)">
+				<path d="M 52.6663 64.32523
+					L 93.465 46.84013
+					C 163.485 16.66433 240.643 0 321.667 0
+					L 489.368 0
+					C 570.392 0 647.549 16.66433 717.569 46.84013
+					L 758.368 64.32523
+					C 789.332 77.60903 811.034 108.38523 811.034 144.19623
+					L 811.034 753.10323
+					C 811.034 801.06823 772.102 840.00023 724.138 840.00023
+					L 86.8966 840.00023
+					C 38.9323 840.00023 0 801.06823 0 753.10323
+					L 0 144.19623
+					C 0 108.38523 21.702 77.60903 52.6663 64.32523
+					Z"
+					fill="#686e7d" stroke="#686e7d" stroke-width="1"/>
+			</g>
+			<line x1="75" y1="150" x2="10" y2="327" stroke="#737a8a" stroke-width="10"/>
+			<line x1="205" y1="150" x2="270" y2="327" stroke="#737a8a" stroke-width="10"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="keybasewide">
+		<image><data><![CDATA[
+		<svg width="530" height="340" viewBox="0 0 530 340" >
+			<g transform="scale(0.345 0.4048)">
+				<path d="m 52.6663 64.32523
+					l 40.7987 -17.4851
+					c 70.02 -30.1758 147.178 -46.84013 228.202 -46.84013
+					l 882.701 0
+					c 81.024 0 158.181 16.66433 228.201 46.84013
+					l 40.799 17.4851
+					c 30.964 13.2838 52.666 39.0599 52.666 74.8709
+					l 0 608.907
+					c 0 47.965 -38.932 86.897 -86.896 86.897
+					l -1352.242 0
+					c -47.964 0 -86.896 -38.932 -86.896 -86.897
+					l 0 -608.907
+					c 0 -35.811 21.702 -66.587 52.666 -79.8709
+					z"
+					fill="#686e7d" stroke="#686e7d" stroke-width="1"/>
+			</g>
+			<line x1="75" y1="150" x2="10" y2="327" stroke="#737a8a" stroke-width="10"/>
+			<line x1="450" y1="150" x2="515" y2="327" stroke="#737a8a" stroke-width="10"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="keybase-1">
+		<image><data><![CDATA[
+		<svg width="530" height="340" viewBox="0 0 530 340">
+			<g transform="scale(0.345 0.4048)">
+				<path d="M 60 65
+					H800
+					V0
+					L 1204.368 0
+					C 1285.392 0 1362.549 16.66433 1432.569 46.84013
+					L 1473.368 64.32523
+					C 1504.332 77.60903 1526.034 103.38513 1526.034 139.19613
+					L 1526.034 748.10313
+					C 1526.034 796.06813 1487.102 835 1439.138 835
+					L 86.896 835
+					C 38.932 835 0 796.068 0 748.103
+					V125
+					A 60 60 0 0 1 60 65
+					Z"
+					fill="#686e7d" stroke="#686e7d" stroke-width="1"/>
+			</g>
+			<line x1="75" y1="150" x2="10" y2="327" stroke="#737a8a" stroke-width="10"/>
+			<line x1="450" y1="150" x2="515" y2="327" stroke="#737a8a" stroke-width="10"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="keybase-1top">
+		<image><data><![CDATA[
+		<svg width="280" height="340" viewBox="0 0 280 340">
+			<g transform="scale(0.345 0.4048)">
+				<path d="M 52.6663 64.32523
+					L 93.465 46.84013
+					C 163.485 16.66433 240.643 0 321.667 0
+					L 489.368 0
+					C 570.392 0 647.549 16.66433 717.569 46.84013
+					L 758.368 64.32523
+					C 789.332 77.60903 811.034 108.38523 811.034 144.19623
+					L 811.034 753.10323
+					C 811.034 801.06823 772.102 840.00023 724.138 840.00023
+					L 86.8966 840.00023
+					C 38.9323 840.00023 0 801.06823 0 753.10323
+					L 0 144.19623
+					C 0 108.38523 21.702 77.60903 52.6663 64.32523
+					Z"
+					fill="#686e7d" stroke="#686e7d" stroke-width="1"/>
+			</g>
+			<line x1="90" y1="150" x2="10" y2="327" stroke="#737a8a" stroke-width="10"/>
+			<line x1="205" y1="150" x2="270" y2="327" stroke="#737a8a" stroke-width="10"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="keybase-space">
+		<image><data><![CDATA[
+		<svg width="4530" height="340" viewBox="0 0 2530 340" >
+			<g transform="scale(0.345 0.4048)">
+				<path d="m 52.6663 64.32523
+					l 40.7987 -17.4851
+					c 70.02 -30.1758 147.178 -46.84013 228.202 -46.84013
+					l 6682.701 0
+					c 81.024 0 158.181 16.66433 228.201 46.84013
+					l 40.799 17.4851
+					c 30.964 13.2838 52.666 39.0599 52.666 74.8709
+					l 0 608.907
+					c 0 47.965 -38.932 86.897 -86.896 86.897
+					l -7152.242 0
+					c -47.964 0 -86.896 -38.932 -86.896 -86.897
+					l 0 -608.907
+					c 0 -35.811 21.702 -66.587 52.666 -79.8709
+					z"
+					fill="#686e7d" stroke="#686e7d" stroke-width="1"/>
+			</g>
+			<line x1="75" y1="150" x2="10" y2="327" stroke="#737a8a" stroke-width="10"/>
+			<line x1="2450" y1="150" x2="2515" y2="327" stroke="#737a8a" stroke-width="10"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="keybase-blue">
+		<image><data><![CDATA[
+		<svg width="280" height="340" viewBox="0 0 280 340" preserveAspectRatio="xMidYMid meet">
+			<g transform="scale(0.345 0.4048)">
+				<path d="M 52.6663 64.32523
+					L 93.465 46.84013
+					C 163.485 16.66433 240.643 0 321.667 0
+					L 489.368 0
+					C 570.392 0 647.549 16.66433 717.569 46.84013
+					L 758.368 64.32523
+					C 789.332 77.60903 811.034 108.38523 811.034 144.19623
+					L 811.034 753.10323
+					C 811.034 801.06823 772.102 840.00023 724.138 840.00023
+					L 86.8966 840.00023
+					C 38.9323 840.00023 0 801.06823 0 753.10323
+					L 0 144.19623
+					C 0 108.38523 21.702 77.60903 52.6663 64.32523
+					Z"
+					fill="#40435a" stroke="#40435a" stroke-width="1"/>
+			</g>
+			<line x1="75" y1="150" x2="10" y2="327" stroke="#4c4f6b" stroke-width="10"/>
+			<line x1="205" y1="150" x2="270" y2="327" stroke="#4c4f6b" stroke-width="10"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="keybase-shift">
+		<image><data><![CDATA[
+		<svg width="530" height="340" viewBox="0 0 530 340" >
+			<g transform="scale(0.345 0.4048)">
+				<path d="M 60 65
+					H1466.034
+					A 60 60 0 0 1 1526.034 125
+					L 1526.034 748.10313
+					C 1526.034 796.06813 1487.102 835 1439.138 835
+					L 86.896 835
+					C 38.932 835 0 796.068 0 748.103
+					V125
+					A 60 60 0 0 1 60 65
+					Z"
+					fill="#40435a" stroke="#40435a" stroke-width="1"/>
+			</g>
+			<line x1="75" y1="150" x2="10" y2="327" stroke="#4c4f6b" stroke-width="10"/>
+			<line x1="450" y1="150" x2="515" y2="327" stroke="#4c4f6b" stroke-width="10"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="keybase-cmd">
+		<image><data><![CDATA[
+		<svg viewBox="0 0 351 526" width="339" height="524">
+			<path d="M40,0
+			H235
+			A40,40 0 0 1 280,40
+			V243
+			A30,30 0 0 0 310,273
+			H316
+			A30,30 0 0 1 346,303
+			V496
+			A30,30 0 0 1 316,526
+			H30
+			A30,30 0 0 1 0,496
+			V40
+			A40,40 0 0 1 40,0
+			Z"
+			fill="#40435a" stroke="#40435a" stroke-width="1"/>
+				<line x1="72" y1="340" x2="10" y2="517" stroke="#4c4f6b" stroke-width="10"/>
+				<line x1="270" y1="340" x2="335" y2="517" stroke="#4c4f6b" stroke-width="10"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="keybase-execute">
+		<image><data><![CDATA[
+		<svg viewBox="0 0 396 526" width="394" height="524">
+		<path d="M0,40
+				 V234
+				 A30,30 0 0 0 30,264
+				 H43
+				 A30,30 0 0 1 73,294
+				 V496
+				 A30,30 0 0 0 103,526
+				 H366
+				 A30,30 0 0 0 396,496
+				 V40
+				 A40,40 0 0 0 356,0
+				 H40
+				 A40,40 0 0 0 0,40
+				 Z"
+				 fill="#40435a" stroke="#40435a" stroke-width="1"/>
+				<line x1="152" y1="343" x2="87" y2="520" stroke="#4c4f6b" stroke-width="10"/>
+				<line x1="318" y1="343" x2="383" y2="520" stroke="#4c4f6b" stroke-width="10"/>
+				<line x1="80" y1="118" x2="8" y2="255" stroke="#4c4f6b" stroke-width="10"/>
+				<line x1="142" y1="120" x2="65" y2="267" stroke="#4c4f6b" stroke-width="10"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="keycap-grey">
+		<image state="0"><data><![CDATA[
+			<svg width="190" height="190" viewBox="0 0 195 195">
+				<rect x="0" y="0" width="190" height="190" rx="50.0" ry="50.0" fill="#717788" stroke="#717788" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="190" height="190" viewBox="0 0 195 195">
+				<rect x="0" y="0" width="190" height="190" rx="50.0" ry="50.0" fill="#747b8d" stroke="#747b8d" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="keycap-shift">
+		<image state="0"><data><![CDATA[
+			<svg width="400" height="190" viewBox="0 0 405 195">
+				<rect x="0" y="0" width="400" height="190" rx="50.0" ry="50.0" fill="#474a63" stroke="#474a63" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="400" height="190" viewBox="0 0 405 195">
+				<rect x="0" y="0" width="400" height="190" rx="50.0" ry="50.0" fill="#4d506c" stroke="#4d506c" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="keycap-keypadzero">
+		<image state="0"><data><![CDATA[
+			<svg width="460" height="190" viewBox="0 0 465 195">
+				<rect x="0" y="0" width="460" height="190" rx="50.0" ry="50.0" fill="#717788" stroke="#717788" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="460" height="190" viewBox="0 0 465 195">
+				<rect x="0" y="0" width="460" height="190" rx="50.0" ry="50.0" fill="#747b8d" stroke="#747b8d" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="keycap-darkblue">
+		<image state="0"><data><![CDATA[
+			<svg width="190" height="190" viewBox="0 0 195 195">
+				<rect x="0" y="0" width="190" height="190" rx="30.0" ry="30.0" fill="#474a63" stroke="#474a63" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="190" height="190" viewBox="0 0 195 195">
+				<rect x="0" y="0" width="190" height="190" rx="30.0" ry="30.0" fill="#4d506c" stroke="#4d506c" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="keycap-blueshift1">
+		<image state="0"><data><![CDATA[
+			<svg width="460" height="300" viewBox="0 0 465 305">
+				<rect x="0" y="0" width="460" height="300" rx="30.0" ry="30.0" fill="#474a63" stroke="#474a63" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="keycap-grey1">
+		<image state="0"><data><![CDATA[
+			<svg width="460" height="300" viewBox="0 0 465 305">
+				<rect x="0" y="0" width="460" height="300" rx="30.0" ry="30.0" fill="#717788" stroke="#717788" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="keycap-spacebar">
+		<image state="0"><data><![CDATA[
+			<svg width="2350" height="190" viewBox="0 0 2355 195">
+				<rect x="0" y="0" width="2350" height="190" rx="50.0" ry="50.0" fill="#717788" stroke="#717788" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="2350" height="190" viewBox="0 0 2355 195">
+				<rect x="0" y="0" width="2350" height="190" rx="50.0" ry="50.0" fill="#747b8d" stroke="#747b8d" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="keycap-cmd">
+		<image state="0"><data><![CDATA[
+		<svg viewBox="0 0 381 526" width="339" height="524">
+			<path d="M30,0
+			H245
+			A30,30 0 0 1 275,30
+			V293
+			A30,30 0 0 0 305,323
+			H346
+			A30,30 0 0 1 376,353
+			V496
+			A30,30 0 0 1 346,526
+			H30
+			A30,30 0 0 1 0,496
+			V30
+			A30,30 0 0 1 30,0
+			Z"
+			fill="#474a63" stroke="#474a63" stroke-width="1"/>
+		</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+		<svg viewBox="0 0 381 526" width="339" height="524">
+			<path d="M30,0
+			H245
+			A30,30 0 0 1 275,30
+			V293
+			A30,30 0 0 0 305,323
+			H346
+			A30,30 0 0 1 376,353
+			V496
+			A30,30 0 0 1 346,526
+			H30
+			A30,30 0 0 1 0,496
+			V30
+			A30,30 0 0 1 30,0
+			Z"
+			fill="#4d506c" stroke="#4d506c" stroke-width="1"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="keycap-execute">
+		<image state="0"><data><![CDATA[
+		<svg viewBox="0 0 396 526" width="394" height="524">
+		<path d="M0,30
+				 V194
+				 A30,30 0 0 0 30,224
+				 H66
+				 A30,30 0 0 1 96,264
+				 V476
+				 A50,50 0 0 0 146,526
+				 H346
+				 A50,50 0 0 0 376,496
+				 V30
+				 A30,30 0 0 0 366,0
+				 H30
+				 A30,30 0 0 0 0,30
+				 Z"
+				 fill="#474a63" stroke="#474a63" stroke-width="1"/>
+		</svg>
+		]]></data></image>
+		<image state="1"><data><![CDATA[
+		<svg viewBox="0 0 396 526" width="394" height="524">
+		<path d="M0,30
+				 V194
+				 A30,30 0 0 0 30,224
+				 H66
+				 A30,30 0 0 1 96,264
+				 V476
+				 A50,50 0 0 0 146,526
+				 H346
+				 A50,50 0 0 0 376,496
+				 V30
+				 A30,30 0 0 0 366,0
+				 H30
+				 A30,30 0 0 0 0,30
+				 Z"
+				 fill="#4d506c" stroke="#4d506c" stroke-width="1"/>
+		</svg>
+		]]></data></image>
+	</element>
+
+	<!-- Individual Clickable Keys with Keycap Symbols -->
+	<group name="kb-key1">
+		<bounds x="0" y="0" width="485" height="420"/>
+		<element ref="keybase-1"><bounds x="0" y="65" width="465" height="340"/></element>
+		<element ref="keycap-grey1"><bounds x="25" y="90" width="380" height="245"/></element>
+		<element ref="keybase-1top"><bounds x="175" y="55" width="270" height="290"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.d" inputmask="0x02" >
+		<bounds x="220" y="55" width="205" height="210"/></element>
+		<element ref="kb_1" ><bounds x="255" y="135" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_1s" ><bounds x="257" y="65" width="110" height="110"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-key2">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.f" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_2" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_2s" ><bounds x="79" y="80" width="120" height="100"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-key3">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.c" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_3" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_3s" ><bounds x="95" y="55" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-key4">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.a" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_4" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_4s" ><bounds x="95" y="55" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-key5">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.b" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_5" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_5s" ><bounds x="90" y="55" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-key6">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.8" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_6" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_6s" ><bounds x="95" y="55" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-key7">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.9" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_7" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_7s" ><bounds x="95" y="55" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-key8">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.1" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_8" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_8s" ><bounds x="90" y="55" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-key9">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.0" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_9" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_9s" ><bounds x="90" y="60" width="110" height="110"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-key0">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.e" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_0" ><bounds x="75" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_0s" ><bounds x="70" y="-10" width="150" height="150"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keyplus">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.3" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_plus" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_pluss" ><bounds x="78" y="85" width="130" height="130"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keymulti">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.2" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_mult" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_mults" ><bounds x="80" y="55" width="120" height="100"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-leftarrow">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase-blue"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-darkblue" inputtag="kbd:col.11" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_leftarrow" ><bounds x="65" y="75" width="155" height="160"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-rightarrow">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase-blue"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-darkblue" inputtag="kbd:col.10" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_rightarrow" ><bounds x="65" y="75" width="155" height="160"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keyq">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.f" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_q" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_qa" ><bounds x="140" y="225" width="30" height="30"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_qs" ><bounds x="90" y="65" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_chain" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyw">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.c" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_w" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_ws" ><bounds x="95" y="50" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_close" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keye">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.a" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_e" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_es" ><bounds x="95" y="50" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_data" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyr">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.b" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_r" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_rs" ><bounds x="95" y="50" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_def" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyt">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.8" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_t" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_ts" ><bounds x="65" y="65" width="155" height="150"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_dim" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyy">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.9" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_y" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_ys" ><bounds x="95" y="60" width="100" height="90"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_exit" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyu">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.1" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_u" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_us" ><bounds x="95" y="60" width="100" height="90"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_file" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyi">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.0" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_i" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_is" ><bounds x="110" y="85" width="60" height="60"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_fnend" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyo">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.e" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_o" ><bounds x="77" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_os" ><bounds x="95" y="50" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_for" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyp">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.3" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_p" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_ps" ><bounds x="95" y="65" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_form" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyleft">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.2" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_larrow" ><bounds x="79" y="150" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_larrows" ><bounds x="79" y="40" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keyequal">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.11" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_equal" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_equals" ><bounds x="93" y="40" width="110" height="110"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keya">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.f" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_a" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_as" ><bounds x="95" y="50" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_get" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keys">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.c" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_s" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_ss" ><bounds x="90" y="50" width="110" height="110"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_gosub" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyd">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.a" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_d" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_ds" ><bounds x="90" y="50" width="110" height="110"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_goto" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyf">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.b" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_f" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_fs" ><bounds x="90" y="50" width="110" height="110"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_input" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyg">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.8" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_g" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_gs" ><bounds x="98" y="50" width="110" height="110"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_mat" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyh">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.9" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_h" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_hs" ><bounds x="97" y="64" width="95" height="90"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_next" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyj">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.1" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_j" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_js" ><bounds x="97" y="65" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_open" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyk">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.0" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_k" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_ks" ><bounds x="90" y="65" width="120" height="120"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_pause" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyl">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.e" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_l" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_ls" ><bounds x="75" y="25" width="135" height="135"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_print" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keysbrktl">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.3" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_sbrktl" ><bounds x="85" y="145" width="115" height="105"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_sbrktls" ><bounds x="98" y="65" width="85" height="80"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keysbrktr">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.2" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_sbrktr" ><bounds x="85" y="145" width="115" height="105"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_sbrktrs" ><bounds x="102" y="65" width="85" height="80"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keyhash">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.11" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_hash" ><bounds x="82" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_hashs" ><bounds x="98" y="63" width="90" height="90"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keyz">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.f" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_z" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_zs" ><bounds x="97" y="55" width="95" height="95"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_put" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyx">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.c" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_x" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_xs" ><bounds x="95" y="55" width="95" height="95"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_read" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyc">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.a" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_c" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_cs" ><bounds x="92" y="65" width="100" height="90"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_reset" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyv">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.b" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_v" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_vs" ><bounds x="113" y="15" width="105" height="170"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_restr" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyb">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.8" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_b" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_bs" ><bounds x="90" y="30" width="140" height="140"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_retrn" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keyn">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.9" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_n" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_ns" ><bounds x="72" y="30" width="140" height="155"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_using" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keym">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.1" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_m" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_ms" ><bounds x="95" y="70" width="100" height="90"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kbf_write" ><bounds x="50" y="270" width="180" height="70"/><color red="0" green="0" blue="0" /></element>
+	</group>
+	<group name="kb-keycomma">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.0" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_comma" ><bounds x="79" y="130" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_commas" ><bounds x="95" y="50" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keydot">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.e" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_dot" ><bounds x="80" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_dots" ><bounds x="93" y="50" width="100" height="100"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keyslash">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.2" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_slash" ><bounds x="79" y="155" width="120" height="100"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_slashs" ><bounds x="85" y="65" width="120" height="100"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keydollar">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.d" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_dollar" ><bounds x="79" y="145" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+		<element ref="kb_dollars" ><bounds x="100" y="65" width="95" height="95"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-shift">
+		<bounds x="0" y="0" width="485" height="420"/>
+		<element ref="keybase-shift"><bounds x="0" y="65" width="485" height="340"/></element>
+		<element ref="keycap-blueshift1"><bounds x="25" y="95" width="435" height="230"/></element>
+		<element ref="keybase-blue"><bounds x="95" y="60" width="290" height="265"/></element>
+		<element ref="keycap-shift" inputtag="kbd:modifiers" inputmask="0x01" >
+		<bounds x="130" y="60" width="222" height="190"/></element>
+		<element ref="kb_shiftup" ><bounds x="185" y="115" width="105" height="65"/></element>
+	</group>
+	<group name="kb-spacebar">
+		<bounds x="0" y="0" width="2445" height="420"/>
+		<element ref="keybase-space"><bounds x="0" y="65" width="2445" height="340"/></element>
+		<element ref="keycap-spacebar" inputtag="kbd:col.3" inputmask="0x08" >
+		<bounds x="45" y="65" width="2363" height="210"/></element>
+	</group>
+	<group name="kb-attn">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase-blue"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-darkblue" inputtag="kbd:col.10" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_attn" ><bounds x="52" y="125" width="183" height="81"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-uparrow">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase-blue"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-darkblue" inputtag="kbd:col.4" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_uparrow" ><bounds x="65" y="65" width="155" height="160"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-downarrow">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase-blue"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-darkblue" inputtag="kbd:col.d" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_downarrow" ><bounds x="65" y="65" width="155" height="160"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-hold">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase-blue"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-darkblue" inputtag="kbd:col.11" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_hold" ><bounds x="55" y="125" width="174" height="81"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypad7">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.5" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_7" ><bounds x="78" y="105" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypad8">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.4" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_8" ><bounds x="78" y="105" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypad9">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.7" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_9" ><bounds x="78" y="105" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypadslash">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.6" inputmask="0x01" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_slashs" ><bounds x="90" y="105" width="105" height="105"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypad4">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.5" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_4" ><bounds x="78" y="105" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypad5">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.4" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_5" ><bounds x="78" y="105" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypad6">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.7" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_6" ><bounds x="78" y="105" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypadasterisk">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.6" inputmask="0x02" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_asterisk" ><bounds x="98" y="93" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypad1">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.5" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_1" ><bounds x="78" y="105" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypad2">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.4" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_2" ><bounds x="78" y="105" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypad3">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.7" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_3" ><bounds x="78" y="105" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypadminus">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.6" inputmask="0x04" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_minus" ><bounds x="80" y="155" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypad0">
+		<bounds x="0" y="0" width="530" height="420"/>
+		<element ref="keybasewide"><bounds x="0" y="65" width="530" height="340"/></element>
+		<element ref="keycap-keypadzero" inputtag="kbd:col.5" inputmask="0x08" >
+		<bounds x="45" y="65" width="445" height="210"/></element>
+		<element ref="kb_0" ><bounds x="205" y="105" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypaddot">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.7" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_dot" ><bounds x="75" y="60" width="145" height="145"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-keypadplus">
+		<bounds x="0" y="0" width="280" height="420"/>
+		<element ref="keybase"><bounds x="0" y="65" width="280" height="340"/></element>
+		<element ref="keycap-grey" inputtag="kbd:col.6" inputmask="0x08" >
+		<bounds x="45" y="65" width="195" height="210"/></element>
+		<element ref="kb_plus" ><bounds x="80" y="100" width="125" height="125"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-command">
+		<bounds x="0" y="0" width="328" height="586"/>
+		<element ref="keybase-cmd"><bounds x="0" y="65" width="328" height="521" /></element>
+		<element ref="keycap-cmd" inputtag="kbd:modifiers" inputmask="0x02" >
+		<bounds x="40" y="65" width="251" height="415"/></element>
+		<element ref="kb_cmd" ><bounds x="93" y="358" width="150" height="81"/><color red="1" green="1" blue="1" /></element>
+	</group>
+	<group name="kb-execute">
+		<bounds x="0" y="0" width="389" height="586"/>
+		<element ref="keybase-execute"><bounds x="0" y="65" width="389" height="521" /></element>
+		<element ref="keycap-execute" inputtag="kbd:col.10" inputmask="0x04" >
+		<bounds x="45" y="65" width="320" height="415"/></element>
+		<element ref="kb_execute" ><bounds x="70" y="115" width="250" height="81"/><color red="1" green="1" blue="1" /></element>
+	</group>
+
+	<!-- Panel and Case Components -->
+	<element name="screen-bezel-edge">
+		<image><data><![CDATA[
+			<svg width="1693" height="1280" viewBox="-8 -8 1701 1288">
+				<rect x="0" y="0" width="1691" height="1278" rx="50.0" ry="50.0" fill="#1b1b1b" stroke="#555555" stroke-width="8"/>
+			</svg>
+			]]></data></image>
+	</element>
+	<element name="screen-bezel-edge-lower">
+		<image><data><![CDATA[
+		<svg width="1673" height="130" viewBox="-15 -20 1713 160">
+		<path d="
+			M10,110
+			A10 10 0 0 1 0,100
+			L75.37,-18
+			A20 20 0 0 0 95.37,-3
+			H1582.63
+			A20 20 0 0 0 1602.63,-18
+			L1673,100
+			A10 10 0 0 1 1663,110
+			H10 Z"
+			fill="#232323" stroke="#555555" stroke-width="5"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="screen-bezel-edge-upper">
+		<image><data><![CDATA[
+		<svg width="1679" height="100" viewBox="-15 0 1713 130">
+		<path d="
+			M0,65
+			L85.37,92
+			M1592.63,92
+			L1679,65 Z"
+			fill="none" stroke="#555555" stroke-width="5"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="screen-mask">
+		<image><data><![CDATA[
+			<svg width="1620" height="1165" viewBox="-8 -8 1640 1205">
+				<rect x="0" y="0" width="1620" height="1165" rx="40.0" ry="40.0" fill="none" stroke="#555555" stroke-width="10"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="box-rounded-bottom">
+		<image><data><![CDATA[
+		<svg width="1450" height="1280" viewBox="-8 -8 1466 1296">
+			<path d="
+			M 7.5 7.5
+			H 1442.5
+			V 1230
+			A 50 50 0 0 1 1392.5 1280
+			H 57.5
+			A 50 50 0 0 1 7.5 1230
+			V 7.5
+			Z" fill="none" stroke="#555555" stroke-width="5"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="tape-box-rounded-bottom">
+		<image><data><![CDATA[
+		<svg width="2335" height="700" viewBox="-8 -8 2351 716">
+			<path d="
+			M 7.5 7.5
+			H 2327.5
+			V 650
+			A 50 50 0 0 1 2277.5 700
+			H 57.5
+			A 50 50 0 0 1 7.5 650
+			V 7.5
+			Z" fill="none" stroke="#555555" stroke-width="5"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="tape-angle-left">
+		<image><data><![CDATA[
+			<svg width="200" height="200" viewBox="0 0 200 200">
+				<path d="M 40,0 L 5,210 Z" fill="none" stroke="#555555" stroke-width="5"/>
+			</svg>
+			]]></data></image>
+	</element>
+	<element name="tape-angle-right">
+		<image><data><![CDATA[
+			<svg width="200" height="200" viewBox="0 0 200 200">
+				<path d="M 160,0 L 195,210 Z" fill="none" stroke="#555555" stroke-width="5"/>
+			</svg>
+			]]></data></image>
+	</element>
+	<element name="tape-anglesmall-tl">
+		<image><data><![CDATA[
+			<svg width="200" height="200" viewBox="0 0 200 200">
+				<path d="M 5,0 L 50,200 Z" fill="none" stroke="#555555" stroke-width="5"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="tape-anglesmall-tr">
+		<image><data><![CDATA[
+			<svg width="200" height="200" viewBox="0 0 200 200">
+				<path d="M 50,0 L 5,200 Z" fill="none" stroke="#555555" stroke-width="5"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="box-angled-left-top">
+		<image><data><![CDATA[
+			<svg width="230" height="1545" viewBox="0 0 230 1545">
+				<path d="M134.5 0
+				H230
+				V1535
+				L0 1535
+				L106 0
+				Z"
+				fill="#42434b"
+				stroke="#42434b"
+				stroke-width="5"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="box-angled-right-top">
+		<image><data><![CDATA[
+			<svg width="230" height="1545" viewBox="0 0 230 1545">
+				<path d="M95.5 0
+				H0
+				V1535
+				L230 1535
+				L124 0
+				Z"
+				fill="#42434b"
+				stroke="#42434b"
+				stroke-width="5"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="box-angled-left-bottom">
+		<image><data><![CDATA[
+			<svg width="230" height="1693" viewBox="0 0 230 1698">
+				<path d="M0,0
+				L116.9,1693
+				L230,1693
+				V0
+				Z"
+				fill="#303243"
+				stroke="#303243"
+				stroke-width="5"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="box-angled-right-bottom">
+		<image><data><![CDATA[
+			<svg width="230" height="1693" viewBox="0 0 230 1698">
+				<path d="M0,0
+				V1693
+				H116.9
+				L230,0
+				Z"
+				fill="#303243"
+				stroke="#303243"
+				stroke-width="5"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="white_switch-l32r32">
+		<image state="1"><data><![CDATA[
+			<svg width="300" height="160" viewBox="0 0 300 160">
+				<path d="M50,5
+				L50,155
+				L150,140
+				L150,20
+				L50,5
+				Z"
+				fill="#eeeeee" stroke="#eeeeee" stroke-width="1"/>
+				<path d="M50,5
+				L10,10
+				L10,150
+				L50,155
+				L50,5
+				Z"
+				fill="#cccccc" stroke="#cccccc" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="0"><data><![CDATA[
+			<svg width="300" height="160" viewBox="0 0 300 160">
+				<path d="M150,20
+				L150,140
+				L250,155
+				L250,5
+				L150,20
+				Z"
+				fill="#eeeeee" stroke="#eeeeee" stroke-width="1"/>
+				<path d="M250,155
+				L290,150
+				L290,10
+				L250,5
+				L250,155
+				Z"
+				fill="#cccccc" stroke="#cccccc" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="white_switch-64">
+		<image state="0"><data><![CDATA[
+			<svg width="300" height="160" viewBox="0 0 300 160">
+				<path d="M0,0
+				V160
+				H300
+				V0
+				Z"
+				fill="#000000" stroke="#000000" stroke-width="1"/>
+				<path d="M25,10
+				L25,150
+				L150,140
+				L150,20
+				L25,10
+				Z"
+				fill="#eeeeee" stroke="#eeeeee" stroke-width="1"/>
+				<path d="M25,10
+				L10,15
+				L10,145
+				L25,150
+				L25,10
+				Z"
+				fill="#cccccc" stroke="#cccccc" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="0"><data><![CDATA[
+			<svg width="300" height="160" viewBox="0 0 300 160">
+				<path d="M150,20
+				L150,140
+				L275,150
+				L275,10
+				L150,20
+				Z"
+				fill="#eeeeee" stroke="#eeeeee" stroke-width="1"/>
+				<path d="M275,150
+				L290,145
+				L290,15
+				L275,10
+				L275,150
+				Z"
+				fill="#cccccc" stroke="#cccccc" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="white_switch">
+		<image state="1"><data><![CDATA[
+			<svg width="160" height="300" viewBox="0 0 160 300">
+				<path d="M10,55
+				L20,150
+				L140,150
+				L150,55
+				L10,50
+				Z"
+				fill="#eeeeee" stroke="#eeeeee" stroke-width="1"/>
+				<path d="M10,55
+				L150,55
+				L145,15
+				L15,15
+				L10,55
+				Z"
+				fill="#cccccc" stroke="#cccccc" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="0"><data><![CDATA[
+			<svg width="160" height="300" viewBox="0 0 160 300">
+				<path d="M20,150
+				L10,245
+				L150,245
+				L140,150
+				L20,150
+				Z"
+				fill="#eeeeee" stroke="#eeeeee" stroke-width="1"/>
+				<path d="M10,245
+				L15,285
+				L145,285
+				L150,245
+				L10,245
+				Z"
+				fill="#cccccc" stroke="#cccccc" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="white_switch-reverselogic">
+		<image state="0"><data><![CDATA[
+			<svg width="160" height="300" viewBox="0 0 160 300">
+				<path d="M10,55
+				L20,150
+				L140,150
+				L150,55
+				L10,50
+				Z"
+				fill="#eeeeee" stroke="#eeeeee" stroke-width="1"/>
+				<path d="M10,55
+				L150,55
+				L145,15
+				L15,15
+				L10,55
+				Z"
+				fill="#cccccc" stroke="#cccccc" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+		<image state="1"><data><![CDATA[
+			<svg width="160" height="300" viewBox="0 0 160 300">
+				<path d="M20,150
+				L10,245
+				L150,245
+				L140,150
+				L20,150
+				Z"
+				fill="#eeeeee" stroke="#eeeeee" stroke-width="1"/>
+				<path d="M10,245
+				L15,285
+				L145,285
+				L150,245
+				L10,245
+				Z"
+				fill="#cccccc" stroke="#cccccc" stroke-width="1"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="switch-bottom">
+		<rect>
+			<bounds x="0" y="0" width="160" height="300"/>
+			<color red="0" green="0" blue="0"/>
+		</rect>
+		<rect>
+			<bounds x="20" y="15" width="120" height="270"/>
+			<color red="1" green="1" blue="1"/>
+		</rect>
+	</element>
+
+		<!-- Switch Assembly -->
+	<group name="switches">
+		<bounds width="1550" height="300"/>
+		<!-- Black / White -->
+		<element ref="switch-bottom"><bounds x="0" y="0" width="170" height="300" /></element>
+		<element ref="white_switch" inputtag="DISP" inputmask="0x01">
+			<bounds x="0" y="0" width="170" height="300"/></element>
+		<element ref="line">
+			<bounds x="20" y="150" width="125" height="10"/>
+			<color red=".75" green="0.75" blue="0.75"/>
+		</element>
+		<!-- BASIC / APL -->
+		<element ref="switch-bottom"><bounds x="460" y="0" width="170" height="300" /></element>
+		<element ref="white_switch" inputtag="LANG" inputmask="0x40">
+			<bounds x="460" y="0" width="170" height="300"/></element>
+		<element ref="line">
+			<bounds x="482" y="150" width="125" height="10"/>
+			<color red=".75" green="0.75" blue="0.75"/>
+		</element>
+		<!-- Spring-Loaded Self-Returning Restart Button. Bottom of switch is
+		     always in. Top is pressed to activate reset. Used when changing BASIC/APL
+		     or when a reset is needed by the user.
+		     TODO: Non-functional placeholder. Waiting for it to be hooked up in the driver.
+		     Suggested inputtag ="RESTART" -->
+		<element ref="switch-bottom"><bounds x="915" y="0" width="170" height="300" /></element>
+		<element ref="white_switch-reverselogic" inputtag="RESTART" inputmask="0x01">
+			<bounds x="915" y="0" width="170" height="300"/></element>
+		<element ref="line">
+			<bounds x="935" y="150" width="125" height="10"/>
+			<color red=".75" green="0.75" blue="0.75"/>
+		</element>
+		<!-- Display Registers / Normal. This was apparently for IBM Service and should
+		     always be in the 'Normal' position for operation. It isn't implemented in the
+		     driver anyway so moving this switch does nothing. -->
+		<element ref="switch-bottom"><bounds x="1380" y="0" width="170" height="300" /></element>
+		<element ref="white_switch-reverselogic" inputtag="DISP" inputmask="0x02">
+			<bounds x="1380" y="0" width="170" height="300"/></element>
+		<element ref="line">
+			<bounds x="1402" y="150" width="125" height="10"/>
+			<color red=".75" green="0.75" blue="0.75"/>
+		</element>
+	</group>
+	<!-- When clicked this cycles L32->64->R32->L32 because the lay system is designed that way.
+	     There doesn't seem to be a way to make it cycle like the real thing using the mouse?
+	     However it cycles correctly using the keyboard left/right arrows in the machine configuration
+	     menu i.e. L32->64->R32->64->L32 -->
+	<group name="3264switch">
+		<bounds width="300" height="160"/>
+		<element ref="rect">
+			<bounds x="0" y="0" width="300" height="160"/>
+			<color red="0" green="0" blue="0"/>
+		</element>
+		<element ref="rect">
+			<bounds x="10" y="20" width="275" height="122"/>
+			<color red="1" green="1" blue="1"/>
+		</element>
+		<element ref="white_switch-l32r32" inputtag="DISP" inputmask="0x08" inputraw="yes">
+			<bounds x="0" y="0" width="300" height="160"/></element>
+		<element ref="white_switch-64" inputtag="DISP" inputmask="0x04" inputraw="yes">
+			<bounds x="0" y="0" width="300" height="160"/></element>
+		<element ref="line">
+			<bounds x="145" y="20" width="10" height="122"/>
+			<color red=".75" green="0.75" blue="0.75"/>
+		</element>
+	</group>
+	<element name="powerswitch">
+		<image><data><![CDATA[
+		<svg width="215" height="250" viewBox="0 0 225 250">
+			<path d="M25,25
+					 L55,225
+					 L185,225
+					 L215,25
+					 L25,25 Z"
+					 fill="#dc1510" stroke="#dc1510" stroke-width="8"/>
+			<path d="M25,0
+					 V25
+					 H215
+					 V0 Z"
+					 fill="#Ff4530" stroke="#df4530" stroke-width="8"/>
+			<path d="M50,200
+					 H190
+					 A15,15 0 0 1 205,215
+					 A15,15 0 0 1 190,230
+					 H50
+					 A15,15 0 0 1 35,215
+					 A15,15 0 0 1 50,200 Z"
+					 fill="#ac0400" stroke="#ac0400" stroke-width="8"/>
+		</svg>
+		]]></data></image>
+	</element>
+	<element name="powerbox-internal">
+		<image><data><![CDATA[
+		<svg viewBox="0 0 260 468" width="260" height="468">
+			<path d="M0,0
+				L65,169
+				V299
+				L0,468
+				Z">fill="#202120" stroke="#202120" stroke-width="8"/>
+			<path d="M260,468
+				L195,299
+				V169
+				L260,0
+				M65,169
+				H195
+				M65,299
+				H195
+				M0,468
+				L65,299
+				V169
+				L0,0
+				V468
+				M260,468
+				L195,299
+				V169
+				L260,0
+				V468
+				Z"
+				fill="#212221" stroke="#262745" stroke-width="8"/>
+			<path d="M65,299
+				L5,468
+				H255
+				L195,299
+				Z"
+				fill="#34353e" stroke="#34353e" stroke-width="8"/>
+			<path d="M0,0
+				V468 H260 V0 H0 Z"
+				fill="none" stroke="#555555" stroke-width="12"/>
+		</svg>
+		]]></data>
+		</image>
+	</element>
+	<group name="brightnessknob">
+		<element ref="knob"><bounds x="0" y="0" width="220" height="220" /><color red="0" green="0" blue="0" /></element>
+		<element ref="knob"><bounds x="16" y="14" width="190" height="190" /><color red="1" green="1" blue="1"/></element>
+		<element ref="knob-position"><bounds x="20" y="95" width="185" height="10" /><color red="0.8" green="0.8" blue="0.8" /></element>
+		<element ref="knob-position"><bounds x="20" y="115" width="185" height="10" /><color red="0.8" green="0.8" blue="0.8" /></element>
+	</group>
+
+	<!-- Screen and Bezel -->
+	<group name="screen-bezel" clickthrough="no">
+		<element ref="rect" inputtag="DISP" inputmask="0x01">
+			<bounds x="80" y="110" width="1550" height="1140"/>
+			<color state="1" red="0" green="0" blue="0" />
+			<color state="0" red="1" green="1" blue="1" /></element>
+		<element ref="screen-bezel-edge"><bounds x="0" y="40" width="1693" height="1280" /></element>
+	</group>
+	<group name="group-screen" clickthrough="no"><screen index="0"><bounds x="0" y="0" width="1483" height="1100" /></screen>
+	</group>
+
+	<!-- Keyboard Overlay Components -->
+	<element name="kb_overlay">
+		<image><data><![CDATA[
+			<svg width="5000" height="400" viewBox="-5 -5 5505 405">
+				<rect x="0" y="0" width="5490" height="395" rx="50.0" ry="50.0" fill="#303243" stroke="black" stroke-width="10"/>
+			</svg>
+			]]></data></image>
+	</element>
+	<element name="overlay-rounded-text-box">
+		<image><data><![CDATA[
+			<svg width="250" height="90" viewBox="-5 -5 255 95">
+				<rect x="0" y="0" width="245" height="85" rx="20.0" ry="20.0" fill="none" stroke="rgb(113,119,136)" stroke-width="8"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+	<element name="overlay-rounded-text-box-square">
+		<image><data><![CDATA[
+			<svg width="245" height="308" viewBox="-10 -10 255 318">
+				<rect x="0" y="0" width="241" height="304" rx="20.0" ry="20.0" fill="none" stroke="rgb(113,119,136)" stroke-width="8"/>
+			</svg>
+			]]></data>
+		</image>
+	</element>
+
+	<!-- Show Everything -->
+	<view name="Default Layout">
+
+		<!-- Case Upper -->
+		<element ref="rect"><bounds x="143" y="0" width="5690" height="1575" /><color red="0.260" green="0.264" blue="0.296" /></element>
+		<element ref="box-angled-left-top"><bounds x="0" y="40" width="230" height="1530" /></element>
+		<element ref="disk"><bounds x="110" y="0" width="80" height="80" /><color red="0.260" green="0.264" blue="0.296" /></element>
+		<element ref="box-angled-right-top"><bounds x="5743" y="40" width="230" height="1530" /></element>
+		<element ref="disk"><bounds x="5790" y="0" width="80" height="80" /><color red="0.260" green="0.264" blue="0.296" /></element>
+		<group ref="screen-bezel"><bounds x="240" y="86" width="1693" height="1280" /></group>
+		<group ref="group-screen"><bounds x="350" y="155" width="1480" height="1100" /></group>
+		<element ref="screen-mask"><bounds x="334" y="135" width="1516" height="1156" /></element>
+		<element ref="screen-bezel-edge-lower"><bounds x="260" y="1245" width="1663" height="145" /></element>
+		<element ref="screen-bezel-edge-upper"><bounds x="250" y="3" width="1685" height="215" /></element>
+		<element ref="box-rounded-bottom"><bounds x="1953" y="77" width="1450" height="1293" /></element>
+		<!-- Case Lower -->
+		<element ref="box-angled-left-bottom"><bounds x="0" y="1570" width="230" height="1693" /></element>
+		<element ref="disk"><bounds x="115" y="3223" width="80" height="80" /><color red="0.187" green="0.196" blue="0.261" /></element>
+		<element ref="box-angled-right-bottom"><bounds x="5745" y="1570" width="230" height="1693" /></element>
+		<element ref="disk"><bounds x="5788" y="3223" width="80" height="80" /><color red="0.187" green="0.196" blue="0.261" /></element>
+		<element ref="rect"><bounds x="156" y="1570" width="5671" height="1733" /><color red="0.187" green="0.196" blue="0.261" /></element>
+		<element ref="line"><bounds x="0" y="1565" width="6000" height="10" /><color red="0" green="0" blue="0" /></element>
+
+		<!-- Keyboard Overlay -->
+		<element ref="kb_overlay"><bounds x="245" y="1400" width="5495" height="395" /></element>
+		<repeat count="10">
+			<param name="overlay_x" start="585" increment="270"/>
+			<repeat count="3">
+				<param name="overlay_y" start="1445" increment="105" />
+				<repeat count="1">
+					<element ref="overlay-rounded-text-box">
+					<bounds x="~overlay_x~" y ="~overlay_y~" width="250" height="98"/>
+					</element>
+				</repeat>
+			</repeat>
+		</repeat>
+		<repeat count="4">
+			<param name="overlay_x" start="3280" increment="269"/>
+				<repeat count="1">
+					<element ref="overlay-rounded-text-box-square">
+					<bounds x="~overlay_x~" y ="1445" width="250" height="308"/></element>
+				</repeat>
+		</repeat>
+		<repeat count="2">
+			<param name="overlay_x" start="4690" increment="279"/>
+			<param name="vline_x" start="4790" increment="279"/>
+			<repeat count="3">
+				<param name="row" start="0" increment="1" />
+				<param name="overlay_y" start="1429" increment="117" />
+				<param name="vline_y" start="1433" increment="117" />
+				<repeat count="1">
+					<element ref="overlay-rounded-text-box">
+					<bounds x="~overlay_x~" y ="~overlay_y~" width="265" height="108"/></element>
+					<element ref="vline-overlay">
+					<bounds x="~vline_x~" y ="~vline_y~" width="10" height="100"/></element>
+				</repeat>
+			</repeat>
+		</repeat>
+		<element ref="overlay-rounded-text-box"><bounds x="4410" y="1665" width="265" height="108"/></element>
+		<element ref="vline-overlay"><bounds x="4510" y="1672" width="10" height="96"/></element>
+		<element ref="kbo_comm"><bounds x="320" y="1459" width="265" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_basic"><bounds x="320" y="1564" width="265" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_apl"><bounds x="320" y="1669" width="265" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_cmdchar"><bounds x="600" y="1459" width="225" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_load"><bounds x="585" y="1564" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_)load"><bounds x="585" y="1668" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_edit"><bounds x="870" y="1459" width="225" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_save"><bounds x="855" y="1564" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_)save"><bounds x="855" y="1668" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_linedelete"><bounds x="1135" y="1459" width="230" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_run"><bounds x="1125" y="1564" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_)cont"><bounds x="1125" y="1668" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_shiftchar"><bounds x="1407" y="1459" width="225" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_go"><bounds x="1395" y="1564" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_)lib"><bounds x="1390" y="1668" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_tabset"><bounds x="1675" y="1459" width="225" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_list"><bounds x="1662" y="1564" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_)fns"><bounds x="1660" y="1668" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_tabreset"><bounds x="1943" y="1459" width="235" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_util"><bounds x="1935" y="1564" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_)vars"><bounds x="1930" y="1668" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_print"><bounds x="2220" y="1459" width="225" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_auto"><bounds x="2200" y="1564" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_)copy"><bounds x="2205" y="1668" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_home"><bounds x="2490" y="1459" width="225" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_renum"><bounds x="2475" y="1564" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_)wsid"><bounds x="2470" y="1668" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_write"><bounds x="2760" y="1459" width="225" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_calcresult"><bounds x="2757" y="1564" width="230" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_)outsel"><bounds x="2745" y="1668" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_mark"><bounds x="3012" y="1564" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_)mark"><bounds x="3009" y="1668" width="255" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_o"><bounds x="3280" y="1554" width="255" height="90"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_t"><bounds x="3278" y="1554" width="255" height="90"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_copy"><bounds x="3527" y="1529" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_display"><bounds x="3527" y="1600" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_delete"><bounds x="3800" y="1560" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_insert"><bounds x="4065" y="1560" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_comm"><bounds x="4420" y="1439" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_cmd"><bounds x="4330" y="1510" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_operations"><bounds x="4415" y="1580" width="265" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_0"><bounds x="4320" y="1682" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_tab"><bounds x="4440" y="1682" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_2"><bounds x="4583" y="1682" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_fast"><bounds x="4715" y="1667" width="300" height="58"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_left"><bounds x="4705" y="1707" width="300" height="58"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_shiftleft"><bounds x="4740" y="1687" width="58" height="65"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_3"><bounds x="4893" y="1683" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_fast"><bounds x="4995" y="1667" width="300" height="58"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_right"><bounds x="5002" y="1707" width="300" height="58"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_shiftright"><bounds x="4970" y="1687" width="45" height="65"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_5"><bounds x="4697" y="1545" width="100" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_fast"><bounds x="4710" y="1549" width="300" height="58"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_up"><bounds x="4697" y="1589" width="300" height="58"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_shiftup"><bounds x="4715" y="1605" width="65" height="45"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_6"><bounds x="4878" y="1583" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_fast"><bounds x="4995" y="1549" width="300" height="58"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_down"><bounds x="5010" y="1589" width="300" height="58"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_shiftdown"><bounds x="4990" y="1540" width="65" height="55"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_8"><bounds x="4583" y="1447" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_move"><bounds x="4722" y="1433" width="300" height="55"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_lines"><bounds x="4717" y="1477" width="300" height="55"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_shiftleft"><bounds x="4740" y="1450" width="58" height="65"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_9"><bounds x="4893" y="1447" width="300" height="70"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_move"><bounds x="5003" y="1433" width="300" height="55"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kbo_lines"><bounds x="5000" y="1477" width="300" height="55"/><color red="0.443" green="0.466" blue="0.533" /></element>
+		<element ref="kb_shiftright"><bounds x="4970" y="1450" width="45" height="65"/><color red="0.443" green="0.466" blue="0.533" /></element>
+
+		<!-- Tape Recess -->
+		<element ref="tape-box-rounded-bottom"><bounds x="3418" y="659" width="2325" height="710" /></element>
+		<element ref="tape-angle-left"><bounds x="3435" y="1130" width="200" height="200" /></element>
+		<element ref="tape-angle-right"><bounds x="5530" y="1130" width="200" height="200" /></element>
+		<element ref="tape-anglesmall-tl"><bounds x="3500" y="740" width="200" height="90" /></element>
+		<element ref="tape-anglesmall-tr"><bounds x="5610" y="740" width="200" height="90" /></element>
+		<element ref="tape-anglesmall-tr"><bounds x="3500" y="1010" width="200" height="90" /></element>
+		<element ref="tape-anglesmall-tl"><bounds x="5610" y="1010" width="200" height="90" /></element>
+		<element ref="line"><bounds x="3470" y="705" width="2228" height="5" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="vline"><bounds x="3470" y="705" width="5" height="435" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="vline"><bounds x="5688" y="705" width="5" height="435" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="line"><bounds x="3470" y="1130" width="2228" height="5" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="line"><bounds x="3500" y="735" width="2168" height="5" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="vline"><bounds x="3500" y="735" width="5" height="375" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="vline"><bounds x="5658" y="735" width="5" height="375" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="line"><bounds x="3500" y="1100" width="2168" height="5" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="line"><bounds x="3470" y="915" width="30" height="5" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="line"><bounds x="5658" y="915" width="30" height="5" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="rect"><bounds x="3540" y="815" width="2090" height="215" /><color red="0.1" green="0.1" blue="0.1" /></element>
+
+		<!-- Panel / Switches / LEDs. TODO: Waiting for LEDs to be hooked up in driver -->
+		<element ref="line"><bounds x="3390" y="85" width="2343" height="5" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="line"><bounds x="3390" y="630" width="2343" height="5" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="vline"><bounds x="5725" y="85" width="5" height="545" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="vline"><bounds x="5248" y="85" width="5" height="545" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="vline"><bounds x="4788" y="85" width="5" height="545" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="vline"><bounds x="4325" y="85" width="5" height="545" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<element ref="vline"><bounds x="3852" y="85" width="5" height="545" /><color red="0.333" green="0.333" blue="0.333" /></element>
+		<group ref="switches"><bounds x="4020" y="220" width="1550" height="290" /></group>
+		<group ref="statusled"><bounds x="3093" y="210" width="130" height="130" /><!--<animate name="led0" />--></group>
+		<group ref="statusled"><bounds x="3093" y="355" width="130" height="130" /><!--<animate name="led1" />--></group>
+		<group ref="3264switch"><bounds x="2570" y="270" width="300" height="160" /></group>
+		<element ref="rect"><bounds x="2585" y="667" width="260" height="468" /><color red="0" green="0" blue="0" /></element>
+		<element ref="powerbox-internal"><bounds x="2585" y="667" width="260" height="468" /></element>
+		<element ref="powerswitch"><bounds x="2610" y="770" width="200" height="185" /></element>
+		<element ref="reverse"><bounds x="3923" y="155" width="350" height="50" /><color red="1" green="1" blue="1" /></element>
+		<element ref="basic"><bounds x="4393" y="155" width="350" height="50" /><color red="1" green="1" blue="1" /></element>
+		<element ref="apl"><bounds x="4393" y="520" width="350" height="50" /><color red="1" green="1" blue="1" /></element>
+		<element ref="restart"><bounds x="4850" y="155" width="350" height="50" /><color red="1" green="1" blue="1" /></element>
+		<element ref="displayregisters"><bounds x="5270" y="155" width="450" height="50" /><color red="1" green="1" blue="1" /></element>
+		<element ref="normal"><bounds x="5315" y="520" width="350" height="50" /><color red="1" green="1" blue="1" /></element>
+		<element ref="poweron"><bounds x="2540" y="600" width="350" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="poweroff"><bounds x="2540" y="1150" width="350" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="l3264r32"><bounds x="2550" y="150" width="350" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="inprocess"><bounds x="2985" y="150" width="350" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="processcheck"><bounds x="2910" y="490" width="500" height="60" /><color red="1" green="1" blue="1" /></element>
+		<element ref="brightness"><bounds x="2120" y="150" width="350" height="60" /><color red="1" green="1" blue="1" /></element>
+		<group ref="brightnessknob"><bounds x="2200" y="270" width="175" height="175" /><color red="1" green="1" blue="1" /></group>
+
+		<!-- Keyboard -->
+		<!-- Row 1 -->
+		<element ref="rect"><bounds x="405" y="1850" width="3955" height="1086" /><color red="0.1" green="0.1" blue="0.1" /></element>
+		<element ref="rect"><bounds x="1035" y="2890" width="2470" height="315" /><color red="0.1" green="0.1" blue="0.1" /></element>
+		<group ref="kb-key1"><bounds x="419" y="1780" width="439" height="350" /></group>
+		<group ref="kb-key2"><bounds x="850" y="1770" width="260" height="355" /></group>
+		<group ref="kb-key3"><bounds x="1120" y="1770" width="260" height="355" /></group>
+		<group ref="kb-key4"><bounds x="1390" y="1770" width="260" height="355" /></group>
+		<group ref="kb-key5"><bounds x="1660" y="1770" width="260" height="355" /></group>
+		<group ref="kb-key6"><bounds x="1930" y="1770" width="260" height="355" /></group>
+		<group ref="kb-key7"><bounds x="2200" y="1770" width="260" height="355" /></group>
+		<group ref="kb-key8"><bounds x="2470" y="1770" width="260" height="355" /></group>
+		<group ref="kb-key9"><bounds x="2740" y="1770" width="260" height="355" /></group>
+		<group ref="kb-key0"><bounds x="3010" y="1770" width="260" height="355" /></group>
+		<group ref="kb-keyplus"><bounds x="3280" y="1770" width="260" height="355" /></group>
+		<group ref="kb-keymulti"><bounds x="3550" y="1770" width="260" height="355" /></group>
+		<group ref="kb-leftarrow"><bounds x="3820" y="1770" width="260" height="355" /></group>
+		<group ref="kb-rightarrow"><bounds x="4090" y="1770" width="260" height="355" /></group>
+		<!-- Row 2 -->
+		<group ref="kb-keyq"><bounds x="712" y="2040" width="260" height="355" /></group>
+		<group ref="kb-command"><bounds x="419" y="2030" width="355" height="620" /></group>
+		<group ref="kb-keyw"><bounds x="982" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keye"><bounds x="1252" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keyr"><bounds x="1522" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keyt"><bounds x="1792" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keyy"><bounds x="2062" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keyu"><bounds x="2332" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keyi"><bounds x="2602" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keyo"><bounds x="2872" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keyp"><bounds x="3142" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keyleft"><bounds x="3412" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keyequal"><bounds x="3682" y="2040" width="260" height="355" /></group>
+		<group ref="kb-execute"><bounds x="3949" y="2030" width="399" height="620" /></group>
+		<!-- Row 3 -->
+		<group ref="kb-keya"><bounds x="782" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keys"><bounds x="1052" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keyd"><bounds x="1322" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keyf"><bounds x="1592" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keyg"><bounds x="1862" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keyh"><bounds x="2132" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keyj"><bounds x="2402" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keyk"><bounds x="2672" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keyl"><bounds x="2942" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keysbrktl"><bounds x="3212" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keysbrktr"><bounds x="3482" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keyhash"><bounds x="3752" y="2310" width="260" height="355" /></group>
+		<!-- Row 4 -->
+		<group ref="kb-keyz"><bounds x="914" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keyx"><bounds x="1184" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keyc"><bounds x="1454" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keyv"><bounds x="1724" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keyb"><bounds x="1994" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keyn"><bounds x="2264" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keym"><bounds x="2534" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keycomma"><bounds x="2804" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keydot"><bounds x="3074" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keyslash"><bounds x="3344" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keydollar"><bounds x="3614" y="2580" width="260" height="355" /></group>
+		<group ref="kb-shift"><bounds x="419" y="2580" width="485" height="355" /></group>
+		<group ref="kb-shift"><bounds x="3880" y="2580" width="473" height="355" /></group>
+		<group ref="kb-spacebar"><bounds x="1046" y="2850" width="2445" height="355" /></group>
+		<!-- Keypad / Right Side -->
+		<element ref="rect"><bounds x="4403" y="1850" width="825" height="1356" /><color red="0.1" green="0.1" blue="0.1" /></element>
+		<element ref="rect"><bounds x="5274" y="1850" width="284" height="1356" /><color red="0.1" green="0.1" blue="0.1" /></element>
+		<group ref="kb-attn"><bounds x="4415" y="1770" width="260" height="355" /></group>
+		<group ref="kb-uparrow"><bounds x="4685" y="1770" width="260" height="355" /></group>
+		<group ref="kb-downarrow"><bounds x="4955" y="1770" width="260" height="355" /></group>
+		<group ref="kb-hold"><bounds x="5288" y="1770" width="260" height="355" /></group>
+		<group ref="kb-keypad7"><bounds x="4415" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keypad8"><bounds x="4685" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keypad9"><bounds x="4955" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keypadslash"><bounds x="5288" y="2040" width="260" height="355" /></group>
+		<group ref="kb-keypad4"><bounds x="4415" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keypad5"><bounds x="4685" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keypad6"><bounds x="4955" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keypadasterisk"><bounds x="5288" y="2310" width="260" height="355" /></group>
+		<group ref="kb-keypad1"><bounds x="4415" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keypad2"><bounds x="4685" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keypad3"><bounds x="4955" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keypadminus"><bounds x="5288" y="2580" width="260" height="355" /></group>
+		<group ref="kb-keypad0"><bounds x="4415" y="2850" width="530" height="355" /></group>
+		<group ref="kb-keypaddot"><bounds x="4955" y="2850" width="260" height="355" /></group>
+		<group ref="kb-keypadplus"><bounds x="5288" y="2850" width="260" height="355" /></group>
+
+	</view>
+</mamelayout>
