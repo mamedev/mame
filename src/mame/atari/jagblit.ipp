@@ -397,7 +397,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 					if (srczdata > dstzdata) inhibit = 1;
 
 				// apply bit comparator (BCOMPEN)
-				// - missil3d, clubdriv, avsp score/automap
+				// - missil3d, clubdriv, avsp score/automap, trevmcfr
 				if (COMMAND & 0x04000000)
 				{
 					if (srcdata == 0)
