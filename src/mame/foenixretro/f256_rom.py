@@ -18,7 +18,7 @@ def file_info(path):
     return f"{len(data):#0x}", f"{crc32:08x}", sha1
 
 def main(*, rom_path: Path, rom_mapping: str, header_name: str):
-    print(f"Generating '{header_name}' using firmware in '{rom_path}' and '{rom_mapping}'... ", end="")
+    print(f"Generating '{header_name}' using firmware in '{rom_path}' and mapping in '{rom_mapping}'... ", end="")
 
     rom_table_prefix = header_name.split(".")[0].upper()
     with open(SCRIPT_DIR / header_name, "w") as out:

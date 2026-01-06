@@ -2,10 +2,10 @@
 
 #define F256K_ROM_TABLE(ROM_BLOCK) \
     ROM_BLOCK(0x01, "xdev.bin",                  0x2000, CRC(5cee0cb0), SHA1(a5fb10ad914069f506847150bdd387371e73f1de)) \
-    ROM_BLOCK(0x02, "sb01.bin",                  0x2000, CRC(21f06e73), SHA1(bbeefb52d4b126b61367169c21599180f3358af7)) \
-    ROM_BLOCK(0x03, "sb02.bin",                  0x2000, CRC(6ed611b9), SHA1(4a03aa286f6274e6974a3cecdedad651a58f5fb1)) \
-    ROM_BLOCK(0x04, "sb03.bin",                  0x2000, CRC(653f849d), SHA1(65942d98f26b86499e6359170aa2d0c6e16124ff)) \
-    ROM_BLOCK(0x05, "sb04.bin",                  0x2000, CRC(f4aa6049), SHA1(11f02fee6ec412f0c96b27b0b149f72cf1770d15)) \
+    ROM_BLOCK(0x02, "sb01.bin",                  0x2000, CRC(e5f30955), SHA1(0ed770d08e529f97522758cd503306adb4c40c69)) \
+    ROM_BLOCK(0x03, "sb02.bin",                  0x2000, CRC(d7eb1d1a), SHA1(d851323315853f7f786c292351213bdce9108f2d)) \
+    ROM_BLOCK(0x04, "sb03.bin",                  0x2000, CRC(27af39e7), SHA1(bbbaff01fe61b6dad2292ad5be2e5c8950b1d7d9)) \
+    ROM_BLOCK(0x05, "sb04.bin",                  0x2000, CRC(9bfa28ab), SHA1(9c0504978f2b93917f9735a5b3b79dd04b14ec6b)) \
     ROM_BLOCK(0x06, "dos.bin",                   0x2000, CRC(f3673c4e), SHA1(9c6b70067d7195d4a6bbd7f379b8e5382bf8cc1b)) \
     ROM_BLOCK(0x07, "pexec.bin",                 0x2000, CRC(937c1374), SHA1(40566a51d2ef7321a42fe926b03dee3571c78202)) \
     ROM_BLOCK(0x08, "fcartld.bin",               0x2000, CRC(267a489c), SHA1(3e15cedc501d37570c3e6bf19a269704c12a9d5e)) \
@@ -27,9 +27,9 @@
     ROM_BLOCK(0x19, "mless02.bin",               0x2000, CRC(8ebccc33), SHA1(bbc6cca10a56ba4d5ff129cfa6a2286d574841ed)) \
     ROM_BLOCK(0x1a, "mless03.bin",               0x2000, CRC(08d6c61d), SHA1(c67477c9a10d43f220f88c4554fc3fc368eba1be)) \
     ROM_BLOCK(0x1b, "mless04.bin",               0x2000, CRC(a3c85025), SHA1(87f1f756d872b6d520364577f873439071e8dff9)) \
-    ROM_BLOCK(0x3b, "3b.bin",                    0x2000, CRC(7c5d2f27), SHA1(bd1ece74b02a210cfe5a1ed15a0febefc39a1861)) \
-    ROM_BLOCK(0x3c, "3c.bin",                    0x2000, CRC(2e2295d1), SHA1(9049b83d4506b49701669c335ded2879c7992751)) \
+    ROM_BLOCK(0x3b, "3b.bin",                    0x2000, CRC(9ae22a17), SHA1(7277f9bc6e5637079847936d345a5cb74c8b5982)) \
+    ROM_BLOCK(0x3c, "3c.bin",                    0x2000, CRC(7b52259b), SHA1(1667147a213a5dd1f26140d686f826a0ce219069)) \
     ROM_BLOCK(0x3d, "3d.bin",                    0x2000, CRC(97743cb7), SHA1(693fa7762528eca6a75c9ea30a603dadc4d55cf9)) \
     ROM_BLOCK(0x3e, "3e.bin",                    0x2000, CRC(9012398f), SHA1(4ae1e37aa3ad4c2b498bf1797d591d7fa25a9d43)) \
-    ROM_BLOCK(0x3f, "3f.bin",                    0x2000, CRC(b9ddda5e), SHA1(2f21ef84a269cc2ed25c6441c9451f61dbb5b285)) \
+    ROM_BLOCK(0x3f, "3f.bin",                    0x2000, CRC(2f046417), SHA1(283426420bb521d42e1296e6f1d6a8eb1b2ba172)) \
 /**/

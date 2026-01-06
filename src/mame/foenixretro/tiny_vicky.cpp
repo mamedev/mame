@@ -346,7 +346,7 @@ void tiny_vicky_video_device::draw_bitmap(uint32_t *row, bool enable_gamma, uint
 
     for (int col = borderXSize; col < width - borderXSize; col += 2)
     {
-        pix_val = m_videoram_ptr[offsetAddress + col/2 + 1];
+        pix_val = m_videoram_ptr[offsetAddress + col/2];
         if (pix_val != 0)
         {
             color_val = get_lut_value(lut_index, pix_val, enable_gamma);
