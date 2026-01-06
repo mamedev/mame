@@ -1920,7 +1920,7 @@ static const uint32_t m4cfinln_keys[2] = { 0x10, 0x213623 };
 #define M4CFINLN_EXTRA_ROMS \
 	ROM_REGION( 0x200000, "okicard:msm6376", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "cupfinal2.bin", 0x000000, 0x080000, CRC(280375ec) SHA1(3bc12545662ba521a2cdea0e8826888195908e29) ) \
-	ROM_LOAD( "cupfinal3.bin", 0x080000, 0x080000, CRC(43d1bf82) SHA1(01291d2a0bfad14d12107fe293dce14048ef85b0) ) \
+	ROM_LOAD( "cupfinal3.bin", 0x080000, 0x080000, CRC(43d1bf82) SHA1(01291d2a0bfad14d12107fe293dce14048ef85b0) )
 
 #undef GAME_CUSTOM
 #define GAME_CUSTOM(year, setname,parent,name,offset,length,hash,company,title) \

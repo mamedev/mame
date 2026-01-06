@@ -139,8 +139,8 @@ float ca3280_vca_device::distorted(float s) const
 }
 
 
-ca3280_lin_vca_device::ca3280_lin_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, float i_d)
-	: va_vca_device(mconfig, CA3280_LIN_VCA, tag, owner, 0)
+ca3280_vca_lin_device::ca3280_vca_lin_device(const machine_config &mconfig, const char *tag, device_t *owner, float i_d)
+	: va_vca_device(mconfig, CA3280_VCA_LIN, tag, owner, 0)
 	, m_i_d_inv(1.0F / i_d)
 	, m_input_scale(1)
 	, m_output_scale(1)
@@ -149,24 +149,24 @@ ca3280_lin_vca_device::ca3280_lin_vca_device(const machine_config &mconfig, cons
 	update_cv_scale();
 }
 
-ca3280_lin_vca_device::ca3280_lin_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, float r, float v_r, float v_minus)
-	: ca3280_lin_vca_device(mconfig, tag, owner, i_d(r, v_r, v_minus))
+ca3280_vca_lin_device::ca3280_vca_lin_device(const machine_config &mconfig, const char *tag, device_t *owner, float r, float v_r, float v_minus)
+	: ca3280_vca_lin_device(mconfig, tag, owner, i_d(r, v_r, v_minus))
 {
 }
 
-ca3280_lin_vca_device::ca3280_lin_vca_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ca3280_lin_vca_device(mconfig, tag, owner, 1.0F)
+ca3280_vca_lin_device::ca3280_vca_lin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ca3280_vca_lin_device(mconfig, tag, owner, 1.0F)
 {
 }
 
-ca3280_lin_vca_device &ca3280_lin_vca_device::configure_voltage_input(float r_in)
+ca3280_vca_lin_device &ca3280_vca_lin_device::configure_voltage_input(float r_in)
 {
 	m_input_scale = 1.0F / r_in;
 	update_cv_scale();
 	return *this;
 }
 
-ca3280_lin_vca_device &ca3280_lin_vca_device::configure_voltage_output(float r_out)
+ca3280_vca_lin_device &ca3280_vca_lin_device::configure_voltage_output(float r_out)
 {
 	// output voltage = output_current * R, where R is the resistor to ground
 	// at the output.
@@ -185,7 +185,7 @@ ca3280_lin_vca_device &ca3280_lin_vca_device::configure_voltage_output(float r_o
 //         resistor).
 //   Id ~ diode current. The current supplied to the Id pin.
 
-float ca3280_lin_vca_device::cv_to_gain(float cv) const
+float ca3280_vca_lin_device::cv_to_gain(float cv) const
 {
 	// cv = Iabc.
 	// m_cv_scale incorporates 1 / Id, along with the optional factors to
@@ -194,12 +194,12 @@ float ca3280_lin_vca_device::cv_to_gain(float cv) const
 	return cv * m_cv_scale;
 }
 
-void ca3280_lin_vca_device::update_cv_scale()
+void ca3280_vca_lin_device::update_cv_scale()
 {
 	m_cv_scale = CA3280_IOUT_MAX_SCALE * m_input_scale * m_i_d_inv * m_output_scale;
 }
 
-float ca3280_lin_vca_device::i_d(float r, float v_r, float v_minus)
+float ca3280_vca_lin_device::i_d(float r, float v_r, float v_minus)
 {
 	// Voltage at the Id input changes with current. So VD is just an
 	// approximation. Not sure if this is 1 or 2 diode drops for the CA3280.
@@ -222,7 +222,7 @@ float cem3360_vca_device::cv_to_gain(float cv) const
 }
 
 
-DEFINE_DEVICE_TYPE(VA_VCA, va_vca_device, "va_vca", "Voltage-controlled amplifier")
-DEFINE_DEVICE_TYPE(CA3280_VCA, ca3280_vca_device, "ca3280_vca", "CA3280-based VCA")
-DEFINE_DEVICE_TYPE(CA3280_LIN_VCA, ca3280_lin_vca_device, "ca3280_lin_vca", "Linearized CA3280-based VCA")
-DEFINE_DEVICE_TYPE(CEM3360_VCA, cem3360_vca_device, "cem3360_vca", "CEM3360-based VCA")
+DEFINE_DEVICE_TYPE(VA_VCA,         va_vca_device,         "va_vca",         "Voltage-controlled amplifier")
+DEFINE_DEVICE_TYPE(CA3280_VCA,     ca3280_vca_device,     "ca3280_vca",     "CA3280-based VCA")
+DEFINE_DEVICE_TYPE(CA3280_VCA_LIN, ca3280_vca_lin_device, "ca3280_vca_lin", "Linearized CA3280-based VCA")
+DEFINE_DEVICE_TYPE(CEM3360_VCA,    cem3360_vca_device,    "cem3360_vca",    "CEM3360-based VCA")
