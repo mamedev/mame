@@ -207,7 +207,7 @@ private:
 };
 
 /**
- *  The F256K2 is nearly identical to the F256K but it addes the following:
+ *  The F256K2 is nearly identical to the F256K but it adds the following:
  *  $DD20 - $DD3F - SDCARD1 *** This one has moved ***
  *  $DD40 - $DD5F - SPLASH LCD (SPI Port)
  *  $DD60 - $DD7F - Wiznet Copper SPI Interface
