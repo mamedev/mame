@@ -1817,11 +1817,10 @@ void model1_state::swa(machine_config &config)
 	ioboard.output_callback().set(FUNC(model1_state::swa_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
-	SPEAKER(config, "dleft").front_left();
-	SPEAKER(config, "dright").front_right();
+	SPEAKER(config, "mpeg", 2).front();
 	DSBZ80(config, m_dsbz80, 0);
-	m_dsbz80->add_route(0, "dleft", 1.0);
-	m_dsbz80->add_route(1, "dright", 1.0);
+	m_dsbz80->add_route(0, "mpeg", 1.0, 0);
+	m_dsbz80->add_route(1, "mpeg", 1.0, 1);
 
 	// Apparently m1audio has to filter out commands the DSB shouldn't see
 	m_m1audio->rxd_handler().append(m_dsbz80, FUNC(dsbz80_device::write_txd));
