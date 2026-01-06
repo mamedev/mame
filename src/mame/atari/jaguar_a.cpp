@@ -248,6 +248,7 @@ uint16_t jaguar_state::jerry_regs_r(offs_t offset)
 			return m_dsp_irq_state;
 		case ASICTRL:
 			// HACK: assume fifo empty
+			// Why this is a thing to begin with? Is there UART debugging for CoJag games?
 			return (m_dsp_regs[offset] & 0xfeff) | 0x100;
 		case 0x36/2:
 		case 0x38/2:
