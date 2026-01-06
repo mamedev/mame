@@ -43,6 +43,7 @@ private:
 	uint8_t m_control_reg;
 	uint8_t m_address_reg;
 	uint32_t m_data_latch;
+	uint8_t m_interrupt_latch;  // Slot/word that triggered WM WSP interrupt
 
 	// Helpers
 	void execute_cycle(int slot_idx, uint16_t inst);

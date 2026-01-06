@@ -25,12 +25,14 @@ void sam8905_device::device_start()
 	save_pointer(NAME(m_dram), 256);
 	save_item(NAME(m_control_reg));
 	save_item(NAME(m_address_reg));
+	save_item(NAME(m_interrupt_latch));
 }
 
 void sam8905_device::device_reset()
 {
 	memset(m_slots, 0, sizeof(m_slots));
 	m_control_reg = 0;
+	m_interrupt_latch = 0;
 }
 
 // ---------------------------------------------------------
@@ -157,15 +159,15 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 			// WM WSP Truth Table (Section 8-4)
 			if (!slot.clear_rqst) write_enable = false;
 			else if (carry) write_enable = false;
-			// Interrupt logic would trigger here based on slot.int_mod
+			// Interrupt triggers when int_mod is set (from WA WSP)
+			// Check interrupt mask in word 15 bit 7 (M bit)
+			uint32_t param15 = m_dram[(slot_idx << 4) | 15];
+			bool int_masked = BIT(param15, 7);
+			if (slot.int_mod && !int_masked) {
+				m_interrupt_latch = (slot_idx << 4) | mad;
+			}
 		}
 		if (write_enable) m_dram[dram_addr] = bus;
-
-		// Debug: trace WM WSP for amplitude words (word 6 or 7)
-		if (wsp && (mad == 6 || mad == 7) && slot_idx == 0) {
-			logerror("WM WSP slot%d word%d: A=%05X B=%05X result=%05X carry=%d clrq=%d write=%d bus=%05X\n",
-				slot_idx, mad, slot.a, slot.b, result, carry, slot.clear_rqst, write_enable, bus);
-		}
 	}
 
 	// WPHI (Write Phase)
@@ -273,7 +275,11 @@ void sam8905_device::write(offs_t offset, uint8_t data)
 			m_control_reg = data;
 			if (BIT(data, 0)) { // WR=1: Write Request
 				if (BIT(data, 1)) m_aram[m_address_reg] = m_data_latch & 0x7FFF;
-				else m_dram[m_address_reg] = m_data_latch & MASK19;
+				else {
+					m_dram[m_address_reg] = m_data_latch & MASK19;
+					// Temporary debug: log all D-RAM writes
+					logerror("D-RAM[%02X] = 0x%05X (slot %d, word %d)\n", m_address_reg, m_data_latch & MASK19, (m_address_reg >> 4) & 0xF, m_address_reg & 0xF);
+				}
 			} else { // WR=0: Read Request - latch RAM data
 				if (BIT(data, 1)) {
 					// A-RAM selected (15-bit)
@@ -289,16 +295,12 @@ void sam8905_device::write(offs_t offset, uint8_t data)
 
 uint8_t sam8905_device::read(offs_t offset)
 {
-	uint8_t result = 0;
 	switch (offset & 7) {
-		case 0: result = m_address_reg; break;
-		case 1: result = m_data_latch & 0xFF; break;         // LSB
-		case 2: result = (m_data_latch >> 8) & 0xFF; break;  // NSB
-		case 3: result = (m_data_latch >> 16) & 0x07; break; // MSB (3 bits for D-RAM)
-		case 4: result = m_control_reg; break;
+		case 0: return m_interrupt_latch;  // Interrupt source: (slot << 4) | word
+		case 1: return m_data_latch & 0xFF;         // LSB
+		case 2: return (m_data_latch >> 8) & 0xFF;  // NSB
+		case 3: return (m_data_latch >> 16) & 0x07; // MSB (3 bits for D-RAM)
+		case 4: return m_control_reg;
+		default: return 0;
 	}
-	if (offset == 4 || (offset >= 1 && offset <= 3 && result != 0))
-		logerror("SAM read[%d]: ctrl=%02X addr=%02X latch=%05X -> %02X\n",
-			offset, m_control_reg, m_address_reg, m_data_latch, result);
-	return result;
 }
