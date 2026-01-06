@@ -380,6 +380,8 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 				}
 
 				/* handle clipping (CLIP_A1) */
+				// TODO: shouldn't this apply to A1 only?
+				// - will cause glitches in atarikrt gameplay, maybe an HW bug is in effect?
 				if (COMMAND & 0x00000040)
 				{
 					if (adest_x < 0 || adest_y < 0 ||

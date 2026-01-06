@@ -339,6 +339,8 @@ void jaguar_cpu_device::check_irqs()
 	/* dispatch */
 	m_pc = m_internal_ram_start;
 	m_pc += which * 0x10;
+	// update R30 (kasumi)
+	m_r[30] = m_pc;
 }
 
 
@@ -1194,7 +1196,10 @@ void jaguar_cpu_device::sharq_n_rn(u16 op)
 void jaguar_cpu_device::shlq_n_rn(u16 op)
 {
 	const u8 dreg = op & 31;
-	const s32 r1 = convert_zero[(op >> 5) & 31];
+	// NOTE: convert_zero doesn't seem right here, 32 - convert_zero[0] = 0
+	// wolfn3d, nbajamte
+	const s32 r1 = (op >> 5) & 31;
+	// 	const s32 r1 = convert_zero[(op >> 5) & 31];
 	const u32 r2 = m_r[dreg];
 	const u32 res = r2 << (32 - r1);
 	m_r[dreg] = res;

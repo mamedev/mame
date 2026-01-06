@@ -745,9 +745,9 @@ Access [cart] EEPROM
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen, [GPU] reads bad pointer in irq 0 stack bp f030f0,1,{r30=0;g} ([blitter]?)
+Black screen, [GPU] reads bad pointer in irq 0 stack bp f030f0,1,{r30=0;g} (fixed)
 BGM doesn't work in some stages
-Cutoff gameplay area
+Cutoff gameplay area on bottom
 Reads back [object] processor data during gameplay
 Access [cart] EEPROM
 Uses [GPU] irqs 0,4
@@ -899,7 +899,7 @@ Uses [GPU] irq 3
 		<year>1999</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-[GPU] Black screen, does an unaligned write to border color regs
+[GPU] Black screen, does an unaligned write to border color regs (fixed)
 [GPU] Enables bus hog
 No sound (fixed, DSP JPIT irqs)
 ]]></notes>
@@ -917,7 +917,7 @@ No sound (fixed, DSP JPIT irqs)
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-[GPU] Black screen, does an unaligned write to border color regs
+[GPU] Black screen, does an unaligned write to border color regs (fixed)
 [GPU] Enables bus hog
 No sound (fixed, DSP JPIT irqs)
 ]]></notes>
@@ -1418,6 +1418,7 @@ No sound (fixed, [DSP] irq priority)
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
+Black screen with buzz, regression regarding [DSP] serial irqs
 Sound buzz when selecting new game, can eventually black screen or throw an exception
 Access [cart] EEPROM
 ]]></notes>
@@ -1844,9 +1845,9 @@ Not extensively tested
 		<publisher>&lt;homebrew&gt;</publisher>
 		<notes><![CDATA[
 Not extensively tested
-4 players game, requires [multitap] emulation
 ]]></notes>
 		<info name="developer" value="Reboot" />
+		<info name="usage" value="4 players game, p2 and p4 uses buttons A and C of p1 and p3" />
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="0x200000" width="32" endianness="big">
 				<rom name="expressway.j64" size="0x200000" crc="499429b2" sha1="21b1f1cea213291e841c0b4cf6c88d8cf9a5488a" />
