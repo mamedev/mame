@@ -77,8 +77,11 @@
 
 #include "emu.h"
 #include "dsp16.h"
+
 #include "dsp16core.ipp"
 #include "dsp16rc.h"
+
+#include "emuopts.h"
 
 #include <functional>
 #include <limits>
@@ -184,7 +187,7 @@ dsp16_device_base::dsp16_device_base(
 			{ "exm", ENDIANNESS_BIG, 16, 16, -1 } }
 	, m_yaau_bits(yaau_bits)
 	, m_workram(*this, "workram"), m_spaces{ nullptr, nullptr, nullptr }, m_workram_mask(0U)
-	, m_drc_cache(CACHE_SIZE), m_core(nullptr, [] (core_state *core) { core->~core_state(); }), m_recompiler()
+	, m_drc_cache(CACHE_SIZE), m_core(), m_recompiler()
 	, m_cache_mode(cache::NONE), m_phase(phase::PURGE), m_int_enable{ 0U, 0U }, m_flags(FLAGS_NONE), m_cache_ptr(0U), m_cache_limit(0U), m_cache_iterations(0U)
 	, m_exm_in(1U), m_int_in(CLEAR_LINE), m_iack_out(1U)
 	, m_ick_in(1U), m_ild_in(CLEAR_LINE), m_do_out(1U), m_ock_in(1U), m_old_in(CLEAR_LINE), m_ose_out(1U)
@@ -202,8 +205,8 @@ dsp16_device_base::dsp16_device_base(
 
 void dsp16_device_base::device_start()
 {
-	m_core.reset(reinterpret_cast<core_state *>(m_drc_cache.alloc_near(sizeof(core_state))));
-	new (m_core.get()) core_state(m_yaau_bits);
+	m_drc_cache.allocate_cache(mconfig().options().drc_rwx());
+	m_core.reset(m_drc_cache.alloc_near<core_state>(m_yaau_bits));
 	set_icountptr(m_core->icount);
 
 	m_spaces[AS_PROGRAM] = &space(AS_PROGRAM);

@@ -113,9 +113,12 @@ void a2_video_device::txt_w(int state)
 
 void a2_video_device::mix_w(int state)
 {
-	// select mixed mode or nomix
-	screen().update_now();
-	m_mix = state;
+	if (m_mix != state)
+	{
+		// select mixed or full mode
+		screen().update_now();
+		m_mix = state;
+	}
 }
 
 void a2_video_device::scr_w(int state)
@@ -128,14 +131,22 @@ void a2_video_device::scr_w(int state)
 
 void a2_video_device::res_w(int state)
 {
-	// select lo-res or hi-res
-	screen().update_now();
-	m_hires = state;
+	if (m_hires != state)
+	{
+		// select lo-res or hi-res
+		screen().update_now();
+		m_hires = state;
+	}
 }
 
 void a2_video_device::an2_w(int state)
 {
-	m_an2 = state;
+	if (m_an2 != state)
+	{
+		// select katakana on II_J_PLUS
+		screen().update_now();
+		m_an2 = state;
+	}
 }
 
 void a2_video_device::an3_w(int state)
@@ -155,8 +166,30 @@ void a2_video_device::an3_w(int state)
 
 void a2_video_device::a80col_w(bool b80Col)
 {
-	screen().update_now();
-	m_80col = b80Col;
+	if (m_80col != b80Col)
+	{
+		// select 80 or 40 columns
+		screen().update_now();
+		m_80col = b80Col;
+	}
+}
+
+void a2_video_device::altcharset_w(bool altch)
+{
+	if (m_altcharset != altch)
+	{
+		// select primary or alternate (MouseText) character set
+		screen().update_now();
+		m_altcharset = altch;
+	}
+}
+
+void a2_video_device::set_GS_langsel(u8 langsel)
+{
+	// select primary language character set
+	if ((langsel & 0xe8) != (m_GS_langsel & 0xe8))
+		screen().update_now();
+	m_GS_langsel = langsel;
 }
 
 // 4-bit left rotate. Bits 4-6 of n must be a copy of bits 0-2.
@@ -400,10 +433,20 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 		{
 			code |= get_iie_langsw() * 0x100;
 		}
-		else if (Model == model::IIGS)
+		else if ((Model == model::IIGS) && BIT(m_GS_langsel, 3))
 		{
-			code |= get_GS_language() * 0x100;
+			code |= (m_GS_langsel >> 5) * 0x100;
 		}
+	}
+	else if (Model == model::IVEL_ULTRA)
+	{
+		// this model doesn't seem to support flashing characters
+		if (code < 0x80)
+			invert_mask ^= 0x7f;
+
+		// YU/ASCII select
+		if (m_an2)
+			code |= 0x100;
 	}
 	else    // original II and II Plus
 	{
@@ -418,7 +461,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 				invert_mask ^= 0x7f;
 			}
 		}
-		else if (code < 0x40 && Model != model::IVEL_ULTRA) // inverse: flip FG and BG
+		else if (code < 0x40) // inverse: flip FG and BG
 		{
 			invert_mask ^= 0x7f;
 		}
@@ -431,7 +474,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 
 	/* look up the character data */
 	unsigned bits = m_char_ptr[code * 8 + row];
-	bits = (Model == model::IVEL_ULTRA) ? (bits >> 1) : (bits & 0x7f);
+	bits = (Invert && !Flip) ? (bits >> 1) : (bits & 0x7f);
 	bits ^= invert_mask;
 	return Flip ? reverse_7_bits[bits] : bits;
 }
@@ -577,6 +620,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	}
 }
 
+// explicit instantiations
 template void a2_video_device::text_update<a2_video_device::model::II, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::II, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::II, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
@@ -588,6 +632,7 @@ template void a2_video_device::text_update<a2_video_device::model::IIE, false, f
 template void a2_video_device::text_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
+template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
@@ -912,7 +957,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 			screen_update<model::IIGS, false, false>(screen, *m_8bit_graphics, new_cliprect);
 		}
 
-		if ((beamy < (BORDER_TOP+4)) || (beamy >= (192+4+BORDER_TOP)))
+		if ((beamy < BORDER_TOP) || (beamy >= (192 + BORDER_TOP)))
 		{
 			if (beamy >= (231+BORDER_TOP))
 			{
@@ -936,7 +981,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 				scanline[col+BORDER_LEFT+600] = m_GSborder_colors[m_GSborder];
 			}
 
-			uint16_t *a2pixel = &m_8bit_graphics->pix(beamy-(BORDER_TOP+4));
+			uint16_t *a2pixel = &m_8bit_graphics->pix(beamy - BORDER_TOP);
 			for (int x = 0; x < 560; x++)
 			{
 				scanline[40 + BORDER_LEFT + x] = m_GSborder_colors[*a2pixel++];
@@ -955,7 +1000,16 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	// always update the flash timer here so it's smooth regardless of mode switches
-	m_flash = ((machine().time() * 4).seconds() & 1) ? true : false;
+	if (Model == model::IIE || Model == model::IIGS)
+	{
+		// video scanner overflow flash timer every 16 frames, ~1.87 Hz (NTSC)
+		m_flash = screen.frame_number() & 0x10;
+	}
+	else
+	{
+		// approximate 555 flash timer, ~2 Hz cycle
+		m_flash = (machine().time() * 4).seconds() & 1;
+	}
 
 	int text_start_row = 0;
 
@@ -995,6 +1049,7 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
+// explicit instantiations
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1006,6 +1061,7 @@ template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, fa
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 static INPUT_PORTS_START( a2_vidconfig_composite );
 	PORT_START("a2_video_config")

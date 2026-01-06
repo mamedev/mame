@@ -796,6 +796,25 @@ ROM_START( hyleyuan )
 	ROM_LOAD( "gfx.u4", 0xc000000, 0x4000000, CRC(39f2cdfe) SHA1(73ba10eebd2efb0e153033d23f572cf489ea8db1) ) // "
 ROM_END
 
+// 小丑嘉年华 (Xiǎochǒu Jiāniánhuá) - PCB-1014-00-KF-1
+ROM_START( xcjnh )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "igs036", 0x0000, 0x4000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x800000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "xcjnh_s100cn_prog.bin", 0x000000, 0x800000, CRC(81f87896) SHA1(7a4d91050bd25021e8afb60054030928a9f69274) )
+
+	ROM_REGION( 0x800000, "oki", 0 ) // samples
+	ROM_LOAD( "xcjnh_s100cn-sp.u29", 0x000000, 0x800000, CRC(957275cd) SHA1(45a6c271a24db47d0401f97d201c71302fd44545) )
+
+	ROM_REGION( 0x8000000, "gfx", 0 )
+	ROM_LOAD( "xcjnh_s100cn_cg.u1", 0x0000000, 0x2000000, CRC(0256c055) SHA1(72c8d84781679d1b1f4f5f0a1a23bd8012ac9f35) )
+	ROM_LOAD( "xcjnh_s100cn_cg.u2", 0x2000000, 0x2000000, CRC(094ba5e1) SHA1(f71b0f8f6ffe90bc7a0773636cc5812245eb33a5) )
+	ROM_LOAD( "xcjnh_s100cn_cg.u3", 0x4000000, 0x2000000, CRC(f479a413) SHA1(ca7436ea4ba39f1fe27cc246ebebda3c818ed368) )
+	ROM_LOAD( "xcjnh_s100cn_cg.u4", 0x6000000, 0x2000000, CRC(b94e2565) SHA1(24168183c84012c3ef12e82ae076ee8ca2e4d4e6) )
+ROM_END
+
 
 void igs_m036_state::pgm_create_dummy_internal_arm_region()
 {
@@ -915,5 +934,7 @@ GAME( 2010, zjddz,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<zjd
 GAME( 2010, lhzbgqb,  0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 201?, hyleyuan, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<hyleyuan_key>, ROT0, "IGS",           "Hou Ye Leyuan (S103CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+GAME( 201?, xcjnh,    0,     igs_m036_tt, igs_m036, igs_m036_state, init_key<xcjnh_key>,    ROT0, "IGS",           "Xiaochou Jianianhua (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2015, mghammer, 0,     igs_m036_tt, igs_m036, igs_m036_state, init_mghammer,          ROT0, "IGS / Enheart", "Medal Get Hammer (V100JP)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // but has S033CN strings?

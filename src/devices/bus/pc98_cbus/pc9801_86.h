@@ -25,6 +25,7 @@
 // ======================> pc9801_86_device
 
 class pc9801_86_device : public device_t
+					   , public device_pc98_cbus_slot_interface
 {
 public:
 	// construction/destruction
@@ -53,7 +54,6 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(dac_tick);
 
-	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<ym2608_device>  m_opna;
 	required_device<input_merger_device> m_irqs;
 
@@ -64,17 +64,19 @@ protected:
 
 	u8 m_mask;
 	virtual void io_map(address_map &map) ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 private:
 	int queue_count();
 	u8 queue_pop();
 
 	u8 m_pcm_mode, m_vol[7], m_pcm_ctrl, m_pcm_mute;
-	uint16_t m_head, m_tail, m_count, m_irq_rate;
+	u16 m_head, m_tail, m_count, m_irq_rate;
 	bool m_pcmirq, m_pcm_clk, m_init;
 	required_device<dac_16bit_r2r_twos_complement_device> m_ldac;
 	required_device<dac_16bit_r2r_twos_complement_device> m_rdac;
 	std::vector<u8> m_queue;
+	optional_memory_region m_bios;
 	required_device<msx_general_purpose_port_device> m_joy;
 
 	emu_timer *m_dac_timer;
@@ -82,25 +84,6 @@ private:
 	void dac_transfer();
 
 	u8 m_joy_sel;
-};
-
-class pc9801_speakboard_device : public pc9801_86_device
-{
-public:
-	// construction/destruction
-	pc9801_speakboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	static constexpr feature_type imperfect_features() { return feature::SOUND; }
-
-protected:
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-
-	virtual void io_map(address_map &map) override ATTR_COLD;
-private:
-	required_device<ym2608_device>  m_opna_slave;
 };
 
 class otomichan_kai_device : public pc9801_86_device
@@ -126,7 +109,6 @@ private:
 
 // device type definition
 DECLARE_DEVICE_TYPE(PC9801_86, pc9801_86_device)
-DECLARE_DEVICE_TYPE(PC9801_SPEAKBOARD, pc9801_speakboard_device)
 DECLARE_DEVICE_TYPE(OTOMICHAN_KAI, otomichan_kai_device)
 
 

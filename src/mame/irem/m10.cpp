@@ -94,7 +94,8 @@ Notes (couriersud)
 
     From http://www.crazykong.com/tech/IremBoardList.txt
 
-    ipminvad:       M-10L + M-10S (also exists on M-11 hw)
+    ipminvad:       M-10L + M-10S
+    ipminvad2:      M-11L + M-11S-1
     andromed:       M-11L + M-11S + M-29S
     skychut:        M-11 (?)
     spacbeam:       not listed
@@ -102,16 +103,6 @@ Notes (couriersud)
     greenber:       M-15T, M-24S
 
     M10-Board: Has SN76477
-
-    ipminvad1
-    ========
-
-    This is from an incomplete dump without documentation.
-    The filename contained m10 and with a hack to work
-    around the missing ROM you get some action.
-
-    The files are all different from ipminvad. Either this has
-    been a prototype or possibly the famous "Capsule Invader".
 
 ***************************************************************************/
 
@@ -220,8 +211,8 @@ public:
 		m_ic8j2(*this, "ic8j2")
 	{ }
 
-	void m10(machine_config &config);
-	void m11(machine_config &config);
+	void m10(machine_config &config) ATTR_COLD;
+	void m11(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(set_vr1) { m_ic8j2->set_resistor_value(RES_K(10 + newval / 5.0)); }
 
@@ -259,7 +250,7 @@ public:
 		m1x_state(mconfig, type, tag)
 	{ }
 
-	void m15(machine_config &config);
+	void m15(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -1176,6 +1167,18 @@ ROM_START( ipminvad1 )
 	ROM_LOAD( "b10.h3", 0x0400, 0x0400, CRC(63672cd2) SHA1(3d9fa15509a363e1a32e58a2242b266b1162e9a6) )
 ROM_END
 
+ROM_START( ipminvad2 ) // Uses TMM334P mask ROMs (2716 compatible) instead of 2708, all soldered in
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4610.f8",         0x1000, 0x0800, CRC(6cc19f10) SHA1(e43780fd0a00a884d3021f9149d3d120974d806f) )
+	ROM_LOAD( "4611.h8",         0x1800, 0x0800, CRC(fc9de345) SHA1(b2630c8100339124a5f590d15f2d62d2d784bbe5) )
+	ROM_LOAD( "4612.e8",         0x2000, 0x0800, CRC(9c7adf92) SHA1(a2720757c29863c42b2a63879ccc234bfaa3c5c8) )
+	ROM_LOAD( "4613.c8",         0x2800, 0x0800, CRC(0d592485) SHA1(dc54ac86a9010da1211f067d8235e7ae01db4f04) ) // 1xxxxxxxxxx = 0xFF
+	ROM_COPY( "maincpu", 0x1c00, 0xfc00, 0x0400 ) // for the reset and interrupt vectors
+
+	ROM_REGION( 0x0800, "tiles", 0 )
+	ROM_LOAD( "4614.c6",  0x0000, 0x0800, CRC(d48d622d) SHA1(ad463bbc12d67136f3b5891e39b2a113c84181e4) )
+ROM_END
+
 ROM_START( andromed )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "am1",  0x1000, 0x0400, CRC(53df0152) SHA1(d27113740094d219b0e05a930d8daa4c22129183) )
@@ -1250,8 +1253,9 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT    MACHINE INPUT     CLASS      INIT        ROT     COMPANY FULLNAME                         FLAGS
-GAME( 1979, ipminvad,  0,        m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 1)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad1, ipminvad, m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (set 2)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad,  0,        m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (M10, set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad1, ipminvad, m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (M10, set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad2, ipminvad, m11,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (M11)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1980, andromed,  0,        m11,    andromed, m10_state, empty_init, ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
 GAME( 1980, skychut,   0,        m11,    skychut,  m10_state, empty_init, ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

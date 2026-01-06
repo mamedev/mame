@@ -100,6 +100,7 @@
 #define OPTION_ARTWORK_CROP         "artwork_crop"
 #define OPTION_FALLBACK_ARTWORK     "fallback_artwork"
 #define OPTION_OVERRIDE_ARTWORK     "override_artwork"
+#define OPTION_ARTWORK_FONT         "artwork_font"
 
 // core screen options
 #define OPTION_BRIGHTNESS           "brightness"
@@ -160,6 +161,7 @@
 
 // core misc options
 #define OPTION_DRC                  "drc"
+#define OPTION_DRC_RWX              "drc_rwx"
 #define OPTION_DRC_USE_C            "drc_use_c"
 #define OPTION_DRC_LOG_UML          "drc_log_uml"
 #define OPTION_DRC_LOG_NATIVE       "drc_log_native"
@@ -384,6 +386,7 @@ public:
 	bool artwork_crop() const { return bool_value(OPTION_ARTWORK_CROP); }
 	const char *fallback_artwork() const { return value(OPTION_FALLBACK_ARTWORK); }
 	const char *override_artwork() const { return value(OPTION_OVERRIDE_ARTWORK); }
+	const char *artwork_font() const { return value(OPTION_ARTWORK_FONT); }
 
 	// core screen options
 	float brightness() const { return float_value(OPTION_BRIGHTNESS); }
@@ -442,6 +445,7 @@ public:
 
 	// core misc options
 	bool drc() const { return bool_value(OPTION_DRC); }
+	bool drc_rwx() const { return bool_value(OPTION_DRC_RWX); }
 	bool drc_use_c() const { return bool_value(OPTION_DRC_USE_C); }
 	bool drc_log_uml() const { return bool_value(OPTION_DRC_LOG_UML); }
 	bool drc_log_native() const { return bool_value(OPTION_DRC_LOG_NATIVE); }
@@ -459,7 +463,6 @@ public:
 	const char *comm_remotehost() const { return value(OPTION_COMM_REMOTE_HOST); }
 	const char *comm_remoteport() const { return value(OPTION_COMM_REMOTE_PORT); }
 	bool comm_framesync() const { return bool_value(OPTION_COMM_FRAME_SYNC); }
-
 
 	bool confirm_quit() const { return bool_value(OPTION_CONFIRM_QUIT); }
 	bool ui_mouse() const { return bool_value(OPTION_UI_MOUSE); }

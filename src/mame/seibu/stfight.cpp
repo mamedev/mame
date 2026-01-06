@@ -305,11 +305,13 @@ public:
 	{
 	}
 
-	void stfight_base(machine_config &config);
-	void stfight(machine_config &config);
-	void cshooter(machine_config &config);
+	void stfight_base(machine_config &config) ATTR_COLD;
+	void stfight(machine_config &config) ATTR_COLD;
+	void cshooter(machine_config &config) ATTR_COLD;
+	void empcityubl(machine_config &config) ATTR_COLD;
 
-	void init_stfight();
+	void init_stfight() ATTR_COLD;
+	void init_ymhack() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -788,6 +790,13 @@ void stfight_state::stfight(machine_config &config)
 	STFIGHT_VIDEO(config, "stfight_vid", 0);
 }
 
+void stfight_state::empcityubl(machine_config &config)
+{
+	stfight(config);
+
+	m_maincpu->set_addrmap(AS_OPCODES, address_map_constructor());
+}
+
 void stfight_state::cshooter(machine_config &config)
 {
 	stfight_base(config);
@@ -860,8 +869,8 @@ ROM_START( empcity )
 	ROM_LOAD_NIB_HIGH( "82s129.052", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )
 	ROM_LOAD_NIB_LOW(  "82s129.066", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 
-	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  // timing? (not used)
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.015", 0x0000, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  // timing? (not used)
 
 	ROM_REGION( 0x08000, "adpcm", 0 )
 	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
@@ -923,8 +932,8 @@ ROM_START( empcityu )
 	ROM_LOAD_NIB_HIGH( "82s129.052", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )
 	ROM_LOAD_NIB_LOW(  "82s129.066", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 
-	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  // timing? (not used)
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.015", 0x0000, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  // timing? (not used)
 
 	ROM_REGION( 0x08000, "adpcm", 0 )
 	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
@@ -988,11 +997,81 @@ ROM_START( empcityj )
 	ROM_LOAD_NIB_HIGH( "82s129.052", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )
 	ROM_LOAD_NIB_LOW(  "82s129.066", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
 
-	ROM_REGION( 0x0800, "proms", 0 )
-	ROM_LOAD( "82s129.015", 0x0700, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  // timing? (not used)
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "82s129.015", 0x0000, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  // timing? (not used)
 
 	ROM_REGION( 0x08000, "adpcm", 0 )
 	ROM_LOAD( "5j",   0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
+ROM_END
+
+// this is a very weird set: original S-0086-002-B0 + S-0086-002A-A0 PCB set with unpopulated M68705 (however the game code expects it,
+// so probably just removed - PCB is not working). The program ROMs are pre-decrypted. Like the current parent, it only shows Seibu at start,
+// every other copyright is removed. Marking it as a bootleg, but not sure. Marking it as US as it checks for the US code in the MCU and because
+// the PCB was found in the USA, but not sure.
+ROM_START( empcityubl )
+	ROM_REGION( 2*0x18000, "maincpu", 0 ) // on top board
+	ROM_LOAD( "1.4u", 0x00000, 0x8000, CRC(57109a70) SHA1(dfe96ad724e3135443565dbfd3a4608a1e0abba2) )
+	ROM_LOAD( "2.2u", 0x10000, 0x8000, CRC(cec3beb8) SHA1(6867f035352ff489fbf5ab9330f597df06d22c5e) )    // bank switched
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // on top board
+	ROM_LOAD( "4.5c", 0x0000, 0x8000, CRC(6a8cb7a6) SHA1(dc123cc48d3623752b78e7c23dd8d2f5adf84f92) )
+
+	ROM_REGION( 0x0800, "mcu", 0 ) // on top board
+	ROM_LOAD( "empcityu_68705.3j", 0x0000, 0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
+
+	ROM_REGION( 0x02000, "stfight_vid:tx_gfx", 0 ) // on bottom board
+	ROM_LOAD( "21.2p", 0x0000, 0x2000, CRC(1d130987) SHA1(8d5ae3d8302bee4b0b234b2778d9b7baa7fab68e) )
+
+	ROM_REGION( 0x20000, "stfight_vid:fg_gfx", 0 ) // on bottom board
+	ROM_LOAD( "15.2c", 0x00000, 0x8000, CRC(0c099a31) SHA1(dabaf8edc59e4954941cd8176031a358f45a1956) )
+	ROM_LOAD( "16.3c", 0x08000, 0x8000, CRC(3cc77c31) SHA1(13d2324df5a322d499c9959a6bb3a844edaefb45) )
+	ROM_LOAD( "17.4c", 0x10000, 0x8000, CRC(2c6caa5f) SHA1(f6893cb87004979ead331897c684f995f850447e) )
+	ROM_LOAD( "18.5c", 0x18000, 0x8000, CRC(e11ded31) SHA1(e3e634ad324d51e52d79dd79e5e6e5697cb8d21f) )
+
+	ROM_REGION( 0x20000, "stfight_vid:bg_gfx", 0 ) // on bottom board
+	ROM_LOAD( "9.2j",  0x00000, 0x8000, CRC(8261ecfe) SHA1(5817f4a0458a949298414fe09c86bbcf50be52f3) )
+	ROM_LOAD( "10.3j", 0x08000, 0x8000, CRC(71137301) SHA1(087a9f401939bc30f1dafa9916e8d8c564595a57) )
+	ROM_LOAD( "11.4j", 0x10000, 0x8000, CRC(0ae48dd3) SHA1(ca3d9aeb9f4343c379cef9282e408fbf8aa67d99) )
+	ROM_LOAD( "12.5j", 0x18000, 0x8000, CRC(debf5d76) SHA1(eb18c35166eb5f93be98b3c30c7d909c0a68eada) )
+
+	ROM_REGION( 0x20000, "stfight_vid:spr_gfx", 0 ) // on bottom board
+	ROM_LOAD( "5.6w", 0x00000, 0x8000, CRC(68acd627) SHA1(f98ff9ccb0913711079a2988e8dd08695fb5e107) )
+	ROM_LOAD( "6.7w", 0x08000, 0x8000, CRC(5170a057) SHA1(9222f9febc222fa0c2eead258ad77c857f6d40c8) )
+	ROM_LOAD( "7.8w", 0x10000, 0x8000, CRC(8299f247) SHA1(71891f7b1fbfaed14c3854b7f6e10a3ddb4bd479) )
+	ROM_LOAD( "8.9w", 0x18000, 0x8000, CRC(b57dc037) SHA1(69ac79a95ba9ace7c9ca7af480a4a10176be5ace) )
+
+	ROM_REGION( 0x10000, "stfight_vid:fg_map", 0 ) // on bottom board
+	ROM_LOAD( "19.7c", 0x00000, 0x8000, CRC(8ceaf4fe) SHA1(5698f2ff44c109825b8d9d0b6dd2426624df668b) )
+	ROM_LOAD( "20.8c", 0x08000, 0x8000, CRC(5a1a227a) SHA1(24928ab218824ae1f5380398ceb90dcad525cc08) )
+
+	ROM_REGION( 0x10000, "stfight_vid:bg_map", 0 ) // on bottom board
+	ROM_LOAD( "13.7j", 0x00000, 0x8000, CRC(27a310bc) SHA1(dd30d72bc33b0bf7ddaf3ab730e028f51b20152a) )
+	ROM_LOAD( "14.8j", 0x08000, 0x8000, CRC(3d19ce18) SHA1(38f691a23c96ef672637965c1a13f6d1595f9d51) )
+
+	ROM_REGION( 0x0100, "stfight_vid:tx_clut", 0 ) // on bottom board
+	ROM_LOAD( "82s129.006.1j", 0x0000, 0x0100, CRC(f9424b5b) SHA1(e3bc23213406d35d54f1221f17f25d433df273a2) )
+
+	ROM_REGION( 0x0100, "stfight_vid:fg_clut", 0 ) // on bottom board
+	ROM_LOAD_NIB_HIGH( "82s129.002.1b", 0x0000, 0x0100, CRC(c883d49b) SHA1(e84900ccf6f27e5043e43c0d85ea1e4eee7e52d3) )
+	ROM_LOAD_NIB_LOW(  "82s129.003.1c", 0x0000, 0x0100, CRC(af81882a) SHA1(b1008c991bd8d1157b3479e465ab286c70418b58) )
+
+	ROM_REGION( 0x0100, "stfight_vid:bg_clut", 0 ) // on bottom board
+	ROM_LOAD_NIB_HIGH( "82s129.004.1d", 0x0000, 0x0100, CRC(1831ce7c) SHA1(57afbee9225f0efd63895a5f522e96dc87ca2616) )
+	ROM_LOAD_NIB_LOW(  "82s129.005.1e", 0x0000, 0x0100, CRC(96cb6293) SHA1(1dcdeaa995e6ffa3753b742842c5ffe0f68ef8cd) )
+
+	ROM_REGION( 0x0100, "stfight_vid:spr_clut", 0 ) // on bottom board
+	ROM_LOAD_NIB_HIGH( "82s129.052.3y", 0x0000, 0x0100, CRC(3d915ffc) SHA1(921be6d5e5fc0fdee9c9f545c1c4a0c334e9844c) )
+	ROM_LOAD_NIB_LOW(  "82s129.066.4y", 0x0000, 0x0100, CRC(51e8832f) SHA1(ed8c00559e7a02bb8c11861d747c8c64c01b7437) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s129.9s",     0x0000, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // on top board
+	ROM_LOAD( "82s129.015.1t", 0x0100, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // on bottom board
+
+	ROM_REGION( 0x08000, "adpcm", 0 ) // on top board
+	ROM_LOAD( "3.5j", 0x00000, 0x8000, CRC(1b8d0c07) SHA1(c163ccd2b7ed6c84facc075eb1564ca399f3ba17) )
+
+	ROM_REGION( 0x020, "user1", 0 ) // on top board
+	ROM_LOAD( "82s123.7a", 0x0000, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) )   // ?
 ROM_END
 
 ROM_START( stfight )
@@ -1365,10 +1444,10 @@ ROM_START( cshootert )
 	ROM_REGION( 0x0800, "mcu", 0 )
 	ROM_LOAD( "crshooter.3j", 0x0000, 0x0800, CRC(aae61ce7) SHA1(bb2b9887ec73a5b82604b9b64c533c2242d20d0f) )
 
-	ROM_REGION( 0x820, "proms", 0 )
-	ROM_LOAD( "82s129.9s",  0x0500, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
-	ROM_LOAD( "82s129.4e",  0x0600, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
-	ROM_LOAD( "82s123.7a",  0x0800, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // ? (not used)
+	ROM_REGION( 0x220, "proms", 0 )
+	ROM_LOAD( "82s129.9s",  0x0000, 0x0100, CRC(cf14ba30) SHA1(3284b6809075756b3c8e07d9705fc7eacb7556f1) ) // timing? (not used)
+	ROM_LOAD( "82s129.4e",  0x0100, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // timing? (not used)
+	ROM_LOAD( "82s123.7a",  0x0200, 0x0020, CRC(93e2d292) SHA1(af8edd0cfe85f28ede9604cfaf4516d54e5277c9) ) // ? (not used)
 
 	// below are from the video board
 
@@ -1426,6 +1505,12 @@ Encryption PAL 16R4 on CPU board
 
 */
 
+void stfight_state::init_ymhack()
+{
+// Set clock prescaler FM:1/2 PSG:1/1
+	m_ym[0]->write(0, 0x2f);
+	m_ym[1]->write(0, 0x2f);
+}
 
 void stfight_state::init_stfight()
 {
@@ -1452,23 +1537,22 @@ void stfight_state::init_stfight()
 				( ~( ( src >> 6 ) ^ A ) & 0x01 );
 	}
 
-	// Set clock prescaler FM:1/2 PSG:1/1
-	m_ym[0]->write(0, 0x2f);
-	m_ym[1]->write(0, 0x2f);
+	init_ymhack();
 }
 
 } // anonymous namespace
 
 
 // Note: Marked MACHINE_IMPERFECT_SOUND due to YM2203 clock issue
-GAME( 1986, empcity,   0,       stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, empcityu,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different title logo
-GAME( 1986, empcityj,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, empcityi,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, empcityfr, empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Norad license)",           "Empire City: 1931 (France)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfight,   empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfighta,  empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1986, stfightgb, empcity, stfight,  stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcity,    0,       stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (bootleg?)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityu,   empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito / Romstar license)", "Empire City: 1931 (US)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // different title logo
+GAME( 1986, empcityj,   empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Taito license)",           "Empire City: 1931 (Japan)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityi,   empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Eurobed license)",         "Empire City: 1931 (Italy)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityfr,  empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Norad license)",           "Empire City: 1931 (France)",       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, empcityubl, empcity, empcityubl, stfight,  stfight_state, init_ymhack,   ROT0,   "Seibu Kaihatsu",                           "Empire City: 1931 (US, bootleg)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfight,    empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfighta,   empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu",                           "Street Fight (bootleg?)",          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, stfightgb,  empcity, stfight,    stfight,  stfight_state, init_stfight,  ROT0,   "Seibu Kaihatsu (Tuning license)",          "Street Fight (Germany - Benelux)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 // Cross Shooter uses the same base board, but different video board
-GAME( 1987, cshootert, airraid, cshooter, cshooter, stfight_state, empty_init,    ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1987, cshootert,  airraid, cshooter,   cshooter, stfight_state, empty_init,    ROT270, "Seibu Kaihatsu (Taito license)",           "Cross Shooter (2 PCB Stack)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

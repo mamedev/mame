@@ -42,12 +42,13 @@ u32 tc_manhattan_state::eprom_r(offs_t offset)
 void tc_manhattan_state::p_map(address_map &map)
 {
 	map(0x000c00, 0x0013ff).ram(); // FIXME: actually a configurable extension of internal RAM
-	map(0x020000, 0x03ffff).ram(); // 3x KM68V1002BJ-10
+	map(0x020000, 0x03ffff).ram().share("sram"); // 3x KM68V1002BJ-10
 	map(0xd00000, 0xd3ffff).r(FUNC(tc_manhattan_state::eprom_r));
 }
 
 void tc_manhattan_state::x_map(address_map &map)
 {
+	map(0x020000, 0x03ffff).ram().share("sram");
 	map(0x040000, 0x07ffff).r(FUNC(tc_manhattan_state::eprom_r));
 }
 

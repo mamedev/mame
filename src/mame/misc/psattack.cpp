@@ -150,53 +150,54 @@ public:
 
 
 	void init_psattack();
-	void psattack(machine_config &config);
+	void psattack(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-
 	/* memory pointers */
-	required_shared_ptr<uint32_t> m_workram;
+	required_shared_ptr<u32> m_workram;
 
 	/* devices */
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<ata_interface_device> m_ata;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	void psattack_mem(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 
-	uint16_t cfcard_data_r();
-	uint8_t cfcard_regs_r(offs_t offset);
-	void cfcard_regs_w(offs_t offset, uint8_t data);
-	void output_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	u16 cfcard_data_r();
+	u8 cfcard_regs_r(offs_t offset);
+	void cfcard_regs_w(offs_t offset, u8 data);
+	void output_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 };
 
 // TODO: wrong, likely PIC protected too
-uint8_t psattack_state::cfcard_regs_r(offs_t offset)
+u8 psattack_state::cfcard_regs_r(offs_t offset)
 {
 	return m_ata->cs0_r(offset & 7, 0x000000ff);
 }
 
-void psattack_state::cfcard_regs_w(offs_t offset, uint8_t data)
+void psattack_state::cfcard_regs_w(offs_t offset, u8 data)
 {
 	m_ata->cs0_w(offset & 7, 0x000000ff);
 }
 
-uint16_t psattack_state::cfcard_data_r()
+u16 psattack_state::cfcard_data_r()
 {
 	// TODO: may not be it (pushes data into stack then never read it other than a comparison check from +0xfc)
 	return m_ata->cs0_r(0, 0x0000ffff);
 }
 
-void psattack_state::output_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void psattack_state::output_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// suppress logging for now
 	if (data)
-		logerror("output_w: %08x & %08x\n",data,mem_mask);
+		logerror("%s: output_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 }
 
-void psattack_state::psattack_mem(address_map &map)
+void psattack_state::main_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).rom().nopw();
 
@@ -214,7 +215,7 @@ void psattack_state::psattack_mem(address_map &map)
 	map(0x01800000, 0x01ffffff).m(m_vr0soc, FUNC(vrender0soc_device::regs_map));
 //  map(0x01802410, 0x01802413) peripheral chip select for cf?
 
-	map(0x02000000, 0x027fffff).ram().share("workram");
+	map(0x02000000, 0x027fffff).ram().share(m_workram);
 
 	map(0x03000000, 0x04ffffff).m(m_vr0soc, FUNC(vrender0soc_device::audiovideo_map));
 }
@@ -243,14 +244,14 @@ void psattack_state::machine_reset()
 void psattack_state::psattack(machine_config &config)
 {
 	SE3208(config, m_maincpu, 14318180 * 3); // TODO : dynamic via PLL
-	m_maincpu->set_addrmap(AS_PROGRAM, &psattack_state::psattack_mem);
+	m_maincpu->set_addrmap(AS_PROGRAM, &psattack_state::main_map);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
 	// PIC16C711
 
 	VRENDER0_SOC(config, m_vr0soc, 14318180 * 6); // TODO : dynamic via PLL
 	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
-	m_vr0soc->int_callback().set_inputline(m_maincpu, SE3208_INT);
+	m_vr0soc->int_callback().set_inputline(m_maincpu, se3208_device::SE3208_INT);
 	m_vr0soc->set_external_vclk(XTAL(25'175'000)); // assumed from the only available XTal on PCB
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);

@@ -15,7 +15,7 @@ Known modules:
 - other: ?
 
 2nd series:
-- Spelling 1 (Expansion Module 1): VSM: 16KB CM6????
+- Spelling 1 (Expansion Module 1): VSM: 16KB CM62214
 - Spelling 2 (Expansion Module 2): VSM: 16KB CM62216
 - Spelling 3 (Expansion Module 3): VSM: 16KB CM62215
 - Spelling 4 (Expansion Module 4): VSM: 16KB CM62217
@@ -27,7 +27,7 @@ For the 2nd series, the first 4 are (C) Tiger Electronics, modules 5 and 6 are
 "Expansion Module x" where x = 1-6.
 
 It is assumed that the 1st series Spelling modules are the same as the Expansion
-modules. CM62215 was confirmed to be the same as CM62087.
+modules. CM62215 and CM62087 were confirmed same, CM62214 and CM62086 too.
 
 -->
 
@@ -40,7 +40,7 @@ modules. CM62215 was confirmed to be the same as CM62087.
 		<info name="serial" value="8111"/>
 		<part name="cart" interface="k28">
 			<dataarea name="rom" size="0x4000">
-				<rom name="cm62086" size="0x4000" crc="0349798b" sha1="afdad242f9c7dec0c5fd83670e3d8f1637140e76" />
+				<rom name="cm62214" size="0x4000" crc="0349798b" sha1="afdad242f9c7dec0c5fd83670e3d8f1637140e76" />
 			</dataarea>
 		</part>
 	</software>

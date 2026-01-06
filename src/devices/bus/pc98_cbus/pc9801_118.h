@@ -22,6 +22,7 @@
 // ======================> pc9801_118_device
 
 class pc9801_118_device : public device_t
+						, public device_pc98_cbus_slot_interface
 {
 public:
 	// construction/destruction
@@ -29,26 +30,23 @@ public:
 
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
-	uint8_t opn3_r(offs_t offset);
-	void opn3_w(offs_t offset, uint8_t data);
-	uint8_t id_r(offs_t offset);
-	void ext_w(offs_t offset, uint8_t data);
+	u8 opn3_r(offs_t offset);
+	void opn3_w(offs_t offset, u8 data);
+	u8 id_r(offs_t offset);
+	void ext_w(offs_t offset, u8 data);
 
 protected:
 	pc9801_118_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
-	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	virtual void io_map(address_map &map) ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
-	required_device<pc98_cbus_slot_device> m_bus;
 	required_device<ym2608_device> m_opn3;
 private:
 

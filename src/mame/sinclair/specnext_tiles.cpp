@@ -8,6 +8,7 @@
 #include "specnext_tiles.h"
 
 #include "screen.h"
+#include "tilemap.h"
 
 
 static const gfx_layout gfx_8x8x4 =
@@ -64,25 +65,35 @@ specnext_tiles_device &specnext_tiles_device::set_palette(const char *tag, u16 b
 
 TILE_GET_INFO_MEMBER(specnext_tiles_device::get_tile_info)
 {
-	const bool attr_in_map = BIT(~m_control, 5);
-	const u8 *data = &m_tiles_info[tile_index << (attr_in_map ? 1 : 0)];
-	u8 attr = attr_in_map ? *(data + attr_in_map) : m_default_flags;
-	u16 code = *data;
+	const bool strip_flags_n = BIT(~m_control, 5);
+	const u8 *data = &m_tiles_info[tile_index << (strip_flags_n ? 1 : 0)];
+	u8 attr = strip_flags_n ? data[strip_flags_n] : m_default_flags;
+	u16 code = data[0];
+	u32 category = 1;
 
-	u32 category;
 	if (BIT(m_control, 1))
-	{
 		code |= BIT(attr, 0) << 8;
-		category = BIT(m_control, 0) ? 2 : 1;
-	}
 	else
-	{
 		category = BIT(attr, 0) ? 1 : 2;
-	}
-	tileinfo.category = category;
+
+	const bool tm_on_top = BIT(m_control, 0); // tilemap always on top of ula
+	tileinfo.category = tm_on_top ? 2 : category;
 
 	if (BIT(m_control, 3)) // textmode
-		tileinfo.set(4 | BIT(m_control, 6), code, BIT(attr, 1, 7), 0);
+	{
+		const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
+		const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
+		const u8 pal_offset = BIT(attr, 1, 7);
+		const rgb_t bg = palette().pen(m_tilemap[1]->palette_offset() + (pal_offset << 1));
+		const rgb_t fg = palette().pen(m_tilemap[1]->palette_offset() + (pal_offset << 1) + 1);
+
+		u8 group = 0;
+		if (bg == gt0 || bg == gt1) group |= 2;
+		if (fg == gt0 || fg == gt1) group |= 1;
+
+		tileinfo.set(4 | BIT(m_control, 6), code, pal_offset, 0);
+		tileinfo.group = group;
+	}
 	else
 		tileinfo.set((BIT(attr, 1) << 1) | BIT(m_control, 6), code, BIT(attr, 4, 4), (TILE_FLIPY * BIT(attr, 2) | (TILE_FLIPX * BIT(attr, 3))));
 }
@@ -100,14 +111,33 @@ void specnext_tiles_device::tilemap_update()
 	for (auto i = 0; i < 2; ++i)
 	{
 		m_tilemap[i]->set_palette_offset(BIT(m_control, 4) ? m_palette_alt_offset : m_palette_base_offset);
-		m_tilemap[i]->set_transparent_pen(m_transp_colour);
-		m_tilemap[i]->set_scrollx(-m_offset_h + (m_tm_scroll_x << 1));
+		m_tilemap[i]->set_scrollx(-m_offset_h + (m_tm_scroll_x << (1 - i)));
 		m_tilemap[i]->set_scrolly(-m_offset_v + m_tm_scroll_y);
 		m_tilemap[i]->mark_mapping_dirty();
 		m_tilemap[i]->mark_all_dirty();
+
+		if (BIT(m_control, 3))
+		{
+			m_tilemap[i]->map_pen_to_layer(0, 0, TILEMAP_PIXEL_LAYER0);
+			m_tilemap[i]->map_pen_to_layer(0, 1, TILEMAP_PIXEL_LAYER0);
+			m_tilemap[i]->map_pen_to_layer(1, 0, TILEMAP_PIXEL_LAYER0);
+			m_tilemap[i]->map_pen_to_layer(1, 1, TILEMAP_PIXEL_TRANSPARENT);
+			m_tilemap[i]->map_pen_to_layer(2, 0, TILEMAP_PIXEL_TRANSPARENT);
+			m_tilemap[i]->map_pen_to_layer(2, 1, TILEMAP_PIXEL_LAYER0);
+			m_tilemap[i]->map_pen_to_layer(3, 0, TILEMAP_PIXEL_TRANSPARENT);
+			m_tilemap[i]->map_pen_to_layer(3, 1, TILEMAP_PIXEL_TRANSPARENT);
+		}
+		else
+		{
+			m_tilemap[i]->set_transparent_pen(m_transp_colour);
+		}
 	}
 
-	m_tiles_info = m_host_ram_ptr + ((BIT(m_tm_map_base, 6) ? 7 : 5) << 14) + ((m_tm_map_base & 0x3f) << 8);
+	m_tiles_info = m_host_ram_ptr;
+	if (BIT(m_tm_map_base, 6))
+		m_tiles_info += (7 << 14) + ((m_tm_map_base & 0x1f) << 8);
+	else
+		m_tiles_info += (5 << 14) + ((m_tm_map_base & 0x3f) << 8);
 }
 
 void specnext_tiles_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u8 pcode, u8 priority_mask)
@@ -126,6 +156,7 @@ void specnext_tiles_device::device_add_mconfig(machine_config &config)
 {
 	m_offset_h = 0;
 	m_offset_v = 0;
+	m_global_transparent = 0xaa;
 }
 
 void specnext_tiles_device::device_start()
@@ -137,6 +168,9 @@ void specnext_tiles_device::device_start()
 		, tilemap_get_info_delegate(*this, FUNC(specnext_tiles_device::get_tile_info))
 		, TILEMAP_SCAN_ROWS, 8, 8, 80, 32);
 
+	save_item(NAME(m_offset_h));
+	save_item(NAME(m_offset_v));
+	save_item(NAME(m_global_transparent));
 	save_item(NAME(m_tm_palette_select));
 	save_item(NAME(m_control));
 	save_item(NAME(m_default_flags));

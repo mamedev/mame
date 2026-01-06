@@ -39,7 +39,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ftpa">
-		<description>Famous Things &amp; Places Alt</description>
+		<description>Famous Things &amp; Places (alt)</description>
 		<year>1992</year>
 		<publisher>VTech</publisher>
 		<part name="rom" interface="genius_cart">

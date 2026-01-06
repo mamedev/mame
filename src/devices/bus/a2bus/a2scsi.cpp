@@ -132,8 +132,15 @@ void a2bus_scsi_device::device_start()
 
 void a2bus_scsi_device::device_reset()
 {
+	reset_from_bus();
+}
+
+void a2bus_scsi_device::reset_from_bus()
+{
 	m_rambank = m_rombank = 0;      // CLR on 74LS273 at U3E is connected to RES, so these clear on reset
 	m_816block = false;
+
+	m_ncr5380->reset();
 }
 
 

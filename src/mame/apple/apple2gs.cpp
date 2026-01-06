@@ -93,7 +93,8 @@ namespace {
 #define A2GS_MASTER_CLOCK (XTAL(28'636'363))
 #define A2GS_14M    (A2GS_MASTER_CLOCK/2)
 #define A2GS_7M     (A2GS_MASTER_CLOCK/4)
-#define A2GS_1M     (A2GS_MASTER_CLOCK/28)
+#define A2GS_2_8M   (A2GS_MASTER_CLOCK/10)
+#define A2GS_1M     (XTAL(1021800))
 
 #define A2GS_UPPERBANK_TAG "inhbank"
 #define A2GS_AUXUPPER_TAG "inhaux"
@@ -472,7 +473,7 @@ private:
 
 	// clock/BRAM
 	u8 m_clkdata = 0, m_clock_control = 0;
-	u8 m_clock_frame = 0;
+	void rtc_vgc(int cko);
 
 	void lcrom_update();
 	void do_io(int offset);
@@ -519,7 +520,7 @@ private:
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(1021800);
+			m_maincpu->set_unscaled_clock(A2GS_1M);
 		}
 	}
 
@@ -539,11 +540,11 @@ private:
 
 		if (isfast)
 		{
-			m_maincpu->set_unscaled_clock(A2GS_14M/5);
+			m_maincpu->set_unscaled_clock(A2GS_2_8M);
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(1021800);
+			m_maincpu->set_unscaled_clock(A2GS_1M);
 		}
 	}
 
@@ -655,7 +656,10 @@ u8 apple2gs_state::apple2gs_read_vector(offs_t offset)
 	// regardless of the language card config.
 	if (!(m_shadow & SHAD_IOLC))
 	{
-		return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
+		if (m_inh_slot != -1 && (m_slotdevice[m_inh_slot]->inh_type() & INH_READ) == INH_READ)
+			return m_slotdevice[m_inh_slot]->read_inh_rom(offset | 0xFFE0);
+		else
+			return m_maincpu->space(AS_PROGRAM).read_byte(offset | 0xFFFFE0);
 	}
 	else    // else vector fetches from bank 0 RAM
 	{
@@ -768,7 +772,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_textcol));
 	save_item(NAME(m_clock_control));
 	save_item(NAME(m_clkdata));
-	save_item(NAME(m_clock_frame));
 	save_item(NAME(m_motors_active));
 	save_item(NAME(m_slotromsel));
 	save_item(NAME(m_diskreg));
@@ -829,7 +832,6 @@ void apple2gs_state::machine_reset()
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_video->set_newvideo(0x01); // verified on ROM03 hardware
-	m_clock_frame = 0;
 	m_slot_irq = false;
 	m_clkdata = 0;
 	m_clock_control = 0;
@@ -847,7 +849,7 @@ void apple2gs_state::machine_reset()
 	m_slow_counter = 0;
 
 	// always assert full speed on reset
-	m_maincpu->set_unscaled_clock(A2GS_14M/5);
+	m_maincpu->set_unscaled_clock(A2GS_2_8M);
 	m_last_speed = true;
 
 	m_sndglu_ctrl = 0;
@@ -881,9 +883,6 @@ void apple2gs_state::machine_reset()
 	// RESEARCH: how does RESET affect LC state and aux banking states?
 	auxbank_update();
 	update_slotrom_banks();
-
-	// reset the slots
-	m_a2bus->reset_bus();
 
 	// Apple-specific initial state
 	m_scc->ctsa_w(0);
@@ -971,7 +970,7 @@ void apple2gs_state::update_speed()
 		}
 		else
 		{
-			m_maincpu->set_unscaled_clock(isfast ? A2GS_14M / 5 : A2GS_1M);
+			m_maincpu->set_unscaled_clock(isfast ? A2GS_2_8M : A2GS_1M);
 		}
 		m_last_speed = isfast;
 	}
@@ -1052,18 +1051,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 
 		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, ASSERT_LINE);
 
-		m_clock_frame++;
-
-		// quarter second?
-		if ((m_clock_frame % 15) == 0)
-		{
-			m_intflag |= INTFLAG_QUARTER;
-			if (m_inten & 0x10)
-			{
-				raise_irq(IRQS_QTRSEC);
-			}
-		}
-
 		// 3.5 motor off timeout
 		if (m_motoroff_time > 0)
 		{
@@ -1074,24 +1061,37 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 				if (m_floppy[3]->get_device()) m_floppy[3]->get_device()->tfsel_w(0);
 			}
 		}
-
-		// one second
-		if (m_clock_frame >= 60)
-		{
-			//printf("one sec, vgcint = %02x\n", m_vgcint);
-			m_clock_frame = 0;
-
-			m_vgcint |= VGCINT_SECOND;
-			if (m_vgcint & VGCINT_SECONDENABLE)
-			{
-				m_vgcint |= VGCINT_ANYVGCINT;
-				raise_irq(IRQS_SECOND);
-			}
-		}
 	}
 	else if (scanline == (192+BORDER_TOP+1))
 	{
 		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, CLEAR_LINE);
+	}
+	else if (scanline == ((256+BORDER_TOP) % m_screen->height()))
+	{
+		// TODO: latch LANGSEL here to toggle NTSC/PAL
+
+		// "quarter" second IRQ occurs every 16 frames, ~3.75 Hz (NTSC)
+		if ((m_screen->frame_number() & 0xf) == 0)
+		{
+			m_intflag |= INTFLAG_QUARTER;
+			if (m_inten & 0x10)
+			{
+				raise_irq(IRQS_QTRSEC);
+			}
+		}
+	}
+}
+
+void apple2gs_state::rtc_vgc(int cko)
+{
+	if (cko) // one second IRQ
+	{
+		m_vgcint |= VGCINT_SECOND;
+		if (m_vgcint & VGCINT_SECONDENABLE)
+		{
+			m_vgcint |= VGCINT_ANYVGCINT;
+			raise_irq(IRQS_SECOND);
+		}
 	}
 }
 
@@ -1462,16 +1462,17 @@ void apple2gs_state::do_io(int offset)
 	}
 }
 
-// apple2gs_get_vpos - return the correct vertical counter value for the current scanline.
+// return the correct vertical counter per IIgs Tech Note #39
 int apple2gs_state::get_vpos()
 {
-	// as per IIgs Tech Note #39, this is simply scanline + 250 on NTSC (262 lines),
-	// or scanline + 200 on PAL (312 lines)
-	int vpos = m_screen->vpos() + (511 - BORDER_TOP + 6);
+	int vpos = m_screen->vpos();
+
+	if (vpos < BORDER_TOP)
+		vpos += m_screen->height(); // remap top border to bottom of VBL
+	vpos += 256 - BORDER_TOP;
 	if (vpos > 511)
-	{
-		vpos -= (511 - 250);
-	}
+		vpos -= m_screen->height(); // reset scanline 256 to 250 (NTSC) or 200 (PAL)
+
 	return vpos;
 }
 
@@ -1523,9 +1524,10 @@ u8 apple2gs_state::c000_r(offs_t offset)
 	}
 
 	slow_cycle();
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
-	u8 uKeyboard = keyglu_816_read(GLU_C000);
-	u8 uKeyboardC010 = keyglu_816_read(GLU_C010);
+	const u8 uFloatingBus = read_floatingbus(); // video side-effects latch after reading
+	const u8 uFloatingBus7 = uFloatingBus & 0x7f;
+	const u8 uKeyboard = keyglu_816_read(GLU_C000);
+	const u8 uKeyboardC010 = keyglu_816_read(GLU_C010);
 
 	switch (offset)
 	{
@@ -1637,7 +1639,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_diskreg;
 
 		case 0x32: // VGCINTCLEAR
-			return read_floatingbus();
+			return uFloatingBus;
 
 		case 0x33: // CLOCKDATA
 			return m_clkdata;
@@ -1692,6 +1694,10 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x41:  // INTEN
 			return m_inten;
+
+		case 0x44: // MMDELTAX
+		case 0x45: // MMDELTAY
+			return 0; // read by AppleTalk to detect SCC activity
 
 		case 0x46:  // INTFLAG
 			return (m_an3 ? INTFLAG_AN3 : 0x00) | m_intflag;
@@ -1781,7 +1787,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 		return uKeyboard;
 	}
 
-	return read_floatingbus();
+	return uFloatingBus;
 }
 
 void apple2gs_state::c000_w(offs_t offset, u8 data)
@@ -1929,7 +1935,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 		case 0x2d:  // SLOTROMSEL
 			m_slotromsel = data;
 			break;
-		case 0x31:  //
+
+		case 0x31:  // DISKREG
 			if (!BIT(data, DISKREG_35SEL))
 			{
 				m_motoroff_time = 30;
@@ -3743,7 +3750,7 @@ INPUT_PORTS_END
 void apple2gs_state::apple2gs(machine_config &config)
 {
 	/* basic machine hardware */
-	G65816(config, m_maincpu, A2GS_MASTER_CLOCK/10);
+	G65816(config, m_maincpu, A2GS_2_8M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2gs_state::apple2gs_map);
 	m_maincpu->set_addrmap(g65816_device::AS_VECTORS, &apple2gs_state::vectors_map);
 	m_maincpu->set_dasm_override(FUNC(apple2gs_state::dasm_trampoline));
@@ -3770,6 +3777,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_macadb->adb_data_callback().set(FUNC(apple2gs_state::set_adb_line));
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
+	m_rtc->cko_cb().set(FUNC(apple2gs_state::rtc_vgc));
 
 	APPLE2_VIDEO(config, m_video, A2GS_14M).set_screen(m_screen);
 
@@ -3811,7 +3819,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	ADDRESS_MAP_BANK(config, A2GS_C300_TAG).set_map(&apple2gs_state::c300bank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x100);
 
 	/* serial */
-	SCC85C30(config, m_scc, A2GS_14M / 2);
+	SCC85C30(config, m_scc, A2GS_7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(apple2gs_state::scc_irq_w));
 	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
@@ -3842,7 +3850,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	A2BUS_SLOT(config, "sl6", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
 	A2BUS_SLOT(config, "sl7", A2GS_7M, m_a2bus, apple2gs_cards, nullptr);
 
-	IWM(config, m_iwm, A2GS_7M, A2GS_MASTER_CLOCK/14);
+	IWM(config, m_iwm, A2GS_7M, A2GS_1M*2);
 	m_iwm->phases_cb().set(FUNC(apple2gs_state::phases_w));
 	m_iwm->sel35_cb().set(FUNC(apple2gs_state::sel35_w));
 	m_iwm->devsel_cb().set(FUNC(apple2gs_state::devsel_w));
