@@ -112,12 +112,11 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 	}
 
 	// Carry calculation (Section 8-1)
-	bool b_neg = BIT(slot.b, 18);
-	bool carry;
-	if (!b_neg)
-		carry = ((uint64_t)slot.a + slot.b) > MASK19;
-	else
-		carry = !BIT((slot.a + slot.b) & MASK19, 18);
+	// From truth table: CARRY = 1 when result is negative, 0 when positive
+	// This allows envelope to update while amplitude stays positive,
+	// and stop when it goes negative (reached target/limit)
+	uint32_t result = (slot.a + slot.b) & MASK19;
+	bool carry = BIT(result, 18);
 
 	// Receivers (Active Low except WSP)
 	// WA (Write A)
@@ -161,6 +160,12 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 			// Interrupt logic would trigger here based on slot.int_mod
 		}
 		if (write_enable) m_dram[dram_addr] = bus;
+
+		// Debug: trace WM WSP for amplitude words (word 6 or 7)
+		if (wsp && (mad == 6 || mad == 7) && slot_idx == 0) {
+			logerror("WM WSP slot%d word%d: A=%05X B=%05X result=%05X carry=%d clrq=%d write=%d bus=%05X\n",
+				slot_idx, mad, slot.a, slot.b, result, carry, slot.clear_rqst, write_enable, bus);
+		}
 	}
 
 	// WPHI (Write Phase)
@@ -266,9 +271,17 @@ void sam8905_device::write(offs_t offset, uint8_t data)
 		case 3: m_data_latch = (m_data_latch & 0x0FFFF) | ((data & 0x7) << 16); break;
 		case 4: // Control Reg
 			m_control_reg = data;
-			if (BIT(data, 0)) { // Write Request
+			if (BIT(data, 0)) { // WR=1: Write Request
 				if (BIT(data, 1)) m_aram[m_address_reg] = m_data_latch & 0x7FFF;
 				else m_dram[m_address_reg] = m_data_latch & MASK19;
+			} else { // WR=0: Read Request - latch RAM data
+				if (BIT(data, 1)) {
+					// A-RAM selected (15-bit)
+					m_data_latch = m_aram[m_address_reg] & 0x7FFF;
+				} else {
+					// D-RAM selected (19-bit)
+					m_data_latch = m_dram[m_address_reg] & MASK19;
+				}
 			}
 			break;
 	}
@@ -276,6 +289,16 @@ void sam8905_device::write(offs_t offset, uint8_t data)
 
 uint8_t sam8905_device::read(offs_t offset)
 {
-	// Similar logic to write for reading D-RAM/A-RAM via data latch
-	return 0;
+	uint8_t result = 0;
+	switch (offset & 7) {
+		case 0: result = m_address_reg; break;
+		case 1: result = m_data_latch & 0xFF; break;         // LSB
+		case 2: result = (m_data_latch >> 8) & 0xFF; break;  // NSB
+		case 3: result = (m_data_latch >> 16) & 0x07; break; // MSB (3 bits for D-RAM)
+		case 4: result = m_control_reg; break;
+	}
+	if (offset == 4 || (offset >= 1 && offset <= 3 && result != 0))
+		logerror("SAM read[%d]: ctrl=%02X addr=%02X latch=%05X -> %02X\n",
+			offset, m_control_reg, m_address_reg, m_data_latch, result);
+	return result;
 }
