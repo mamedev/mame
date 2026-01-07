@@ -111,6 +111,7 @@ inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v)
 {
 	// protect/protctse wants proper alignment for Tom writes at PC=f03004
 	// (wants to reprogram border color registers, would otherwise hit VMODE)
+
 	// Other stuff tries to do unaligned R/Ws which contradicts this, namely:
 	// - atarikrt $06bf 0x0000'0007 (?)
 	// - barkley/bretth/chekflag DSP

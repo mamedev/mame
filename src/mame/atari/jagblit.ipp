@@ -296,6 +296,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 	gouraud_inten[1] = m_blitter_regs[B_I2] & 0xffffff;
 	gouraud_inten[0] = m_blitter_regs[B_I3] & 0xffffff;
 
+	// TODO: gouraud color increments (bits 31-24, battlesp only?)
 	int gouraud_iinc = m_blitter_regs[B_IINC] & 0xffffff;
 	if (gouraud_iinc & 0x800000)
 		gouraud_iinc |= 0xff000000;
@@ -429,16 +430,31 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 				if (!inhibit)
 				{
 					/* handle patterns/additive/LFU */
+					// (PATDSEL)
 					if (COMMAND & 0x00010000)
 						writedata = READ_RDATA(B_PATD_H, adest, adestflags, adest_phrase_mode);
-					else if (COMMAND & 0x00020000)
+					else if (COMMAND & 0x00020000) // (ADDDSEL)
 					{
 						writedata = (srcdata & 0xff) + (dstdata & 0xff);
-						if (!(COMMAND & 0x00004000) && writedata > 0xff)
-							writedata = 0xff;
+
+						// !(TOPBEN)
+						// - battlesp/battlesg main menu
+						// - hstrike difficulty select (dim in background)
+						if (!(COMMAND & 0x00004000))
+						{
+							s16 s = util::sext(srcdata & 0xff, 8);
+							s16 d = dstdata & 0xff;
+							s16 sum = s + d;
+
+							writedata = (u32)std::clamp(sum, (s16)0, (s16)0xff);
+						}
 						writedata |= (srcdata & 0xf00) + (dstdata & 0xf00);
+
+						// !(TOPNEN)
 						if (!(COMMAND & 0x00008000) && writedata > 0xfff)
-							writedata = 0xfff;
+						{
+							writedata &= 0xfff;
+						}
 						writedata |= (srcdata & 0xf000) + (dstdata & 0xf000);
 					}
 					else
@@ -471,6 +487,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 						int p = asrc_phrase_mode ? (asrc_x & 3) : 3;
 						writedata = ((gouraud_inten[p] >> 16) & 0xff) | gouraud_color[p];
 
+						// TODO: this may not be the right place for the increment
 						int intensity = gouraud_inten[p];
 						intensity += gouraud_iinc;
 						if (intensity < 0) intensity = 0;

@@ -679,8 +679,11 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			// TODO: INT2 bus mechanism
 
 			case VMODE:
+				// TODO: verify if bit 0 also suspend the object timer until next frame
 				if (reg_store != m_gpu_regs[offset])
+				{
 					set_palette(m_gpu_regs[VMODE]);
+				}
 				break;
 
 			case OBF:   /* clear GPU interrupt */

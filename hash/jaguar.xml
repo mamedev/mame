@@ -264,7 +264,9 @@ Title screen has black dots of garbage on top (btanb)
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
 4 Play logo has [blitter] SRCSHADE bug on rolling section (red-ish, should be same-ish color as logo)
-Heavy GFX corruptions after 4 Play logo ([object] pitch = 3 16bpp)
+Heavy GFX corruptions after 4 Play logo ([object] pitch = 3 16bpp) (fixed)
+Has CRY color bugs on main menu (uses [blitter] !TOPBEN)
+Some chars have [blitter] pitch width issues (similar to cybermor)
 Black screen after selecting a mode, both 68k and [GPU] stalls on sharedram
 No sound (fixed, 68k JPIT irqs)
 Access [cart] EEPROM
@@ -656,7 +658,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Bad background RMW colors on difficulty select screen (press A after title)
+Bad background RMW colors on difficulty select screen (press A after title) (fixed, [blitter] !TOPBEN)
 Huge GFX issues on gameplay ([object] pitch = 0 4bpp and pitch = 3 16bpp)
 Text is solid squares [blitter] BCOMPEN?
 No sound (fixed)
