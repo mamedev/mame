@@ -50,6 +50,7 @@ protected:
 	std::optional<std::pair<unsigned, offs_t>> translate(offs_t const address, unsigned const mode);
 	template <bool Execute> u16 mmu_read(offs_t logical, u16 mem_mask);
 	void mmu_write(offs_t logical, u16 data, u16 mem_mask);
+	virtual bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 private:
 	required_address_space m_space[4];

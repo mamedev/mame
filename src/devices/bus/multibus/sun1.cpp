@@ -94,6 +94,10 @@ protected:
 	virtual void write_data(offs_t logical, u16 data, u16 mem_mask) override { m_cpu_mem.write_word(logical, data, mem_mask); }
 	virtual u16 read_cpu(offs_t logical, u16 mem_mask) override { return m_cpu_spc.read_word(logical, mem_mask); }
 	virtual void set_super(bool super) override {}
+	virtual bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override {
+		target_space = &m_cpu->space(spacenum);
+		return true;
+	}
 
 	bool boot() const { return m_boot.entry().has_value(); }
 
