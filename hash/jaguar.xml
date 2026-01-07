@@ -1337,8 +1337,8 @@ GFXs missing on gameplay and title screen
 		<publisher>Williams Entertainment</publisher>
 		<notes><![CDATA[
 No sound (fixed, serial clock)
-Has minor GFX pitch issue when action summary message pops up after a play
-[DSP] randomly crashes on main menu
+Has minor GFX pitch issue when action summary message pops up after a play (fixed)
+[DSP] randomly crashes on main menu or in gameplay
 Overscan bug with sprites
 Access [cart] EEPROM
 ]]></notes>
