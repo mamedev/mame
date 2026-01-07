@@ -878,7 +878,7 @@ void atarisy1_state::reliefs1(machine_config &config)
 {
 	atarisy1(config);
 	add_speech(config);
-	//add_adc(config); // does this exist?
+	add_adc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy1_state::main_map_noslapstic);
 }
 
