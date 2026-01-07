@@ -934,23 +934,28 @@ void jaguar_cpu_device::mmult_rn_rn(u16 op)
 	const u8 dreg = op & 31;
 	u32 addr = m_mtxaddr;
 	s64 accum = 0;
+	// m_maddw == false:
+	// - ATARI letters on BIOS logo
+	// - superx3d
+	// - ironsol2 DSP (which specifically wants m_b1 rather than m_a, otherwise sound
+	//   overdrive will occur)
+	// - hstrike 3d gameplay renders
+	// TODO: anything that actually uses m_addw == true?
+	u32 address_inc = m_maddw == true ? 4 * count : 4;
 
-	if (m_maddw == false)
+	for (int i = 0; i < count; i++)
 	{
-		for (int i = 0; i < count; i++)
-		{
-			accum += (int16_t)(m_b1[sreg + i/2] >> (16 * ((i & 1) ^ 1))) * (int16_t)READWORD(addr);
-			addr += 2;
-		}
+		s16 a;
+		if (i & 1)
+			a = (s16)(m_b1[sreg + (i >> 1)] >> 16);
+		else
+			a = (s16)(m_b1[sreg + (i >> 1)] & 0xffff);
+		s16 b = (s16)READWORD(addr + 2);
+
+		accum += a * b;
+		addr += address_inc;
 	}
-	else
-	{
-		for (int i = 0; i < count; i++)
-		{
-			accum += (int16_t)(m_b1[sreg + i/2] >> (16 * ((i & 1) ^ 1))) * (int16_t)READWORD(addr);
-			addr += 2 * count;
-		}
-	}
+
 	const u32 res = (u32)accum;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
