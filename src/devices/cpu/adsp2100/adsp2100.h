@@ -359,62 +359,62 @@ protected:
 	// configuration
 	const address_space_config      m_program_config;
 	const address_space_config      m_data_config;
-	uint32_t                          m_chip_type;
+	uint32_t                        m_chip_type;
 
 	// other CPU registers
-	uint32_t              m_pc;
-	uint32_t              m_ppc;
-	uint32_t              m_loop;
-	uint32_t              m_loop_condition;
-	uint32_t              m_cntr;
+	uint32_t            m_pc;
+	uint32_t            m_ppc;
+	uint32_t            m_loop;
+	uint32_t            m_loop_condition;
+	uint32_t            m_cntr;
 
 	// status registers
-	uint32_t              m_astat;
-	uint32_t              m_sstat;
-	uint32_t              m_mstat;
-	uint32_t              m_mstat_prev;
-	uint32_t              m_astat_clear;
-	uint32_t              m_idle;
+	uint32_t            m_astat;
+	uint32_t            m_sstat;
+	uint32_t            m_mstat;
+	uint32_t            m_mstat_prev;
+	uint32_t            m_astat_clear;
+	uint32_t            m_idle;
 
 	// live set of core registers
 	adsp_core           m_core;
 
 	// memory addressing registers
-	uint32_t              m_i[8];
-	int32_t               m_m[8];
-	uint32_t              m_l[8];
-	uint32_t              m_lmask[8];
-	uint32_t              m_base[8];
-	uint8_t               m_px;
-	uint32_t              m_pmovlay; // External Program Space overlay
-	uint32_t              m_dmovlay; // External Data Space overlay
+	uint32_t            m_i[8];
+	int32_t             m_m[8];
+	uint32_t            m_l[8];
+	uint32_t            m_lmask[8];
+	uint32_t            m_base[8];
+	uint8_t             m_px;
+	uint32_t            m_pmovlay; // External Program Space overlay
+	uint32_t            m_dmovlay; // External Data Space overlay
 
 	// stacks
-	uint32_t              m_loop_stack[LOOP_STACK_DEPTH];
-	uint32_t              m_cntr_stack[CNTR_STACK_DEPTH];
-	uint32_t              m_pc_stack[PC_STACK_DEPTH];
-	uint16_t              m_stat_stack[STAT_STACK_DEPTH][3];
-	int32_t               m_pc_sp;
-	int32_t               m_cntr_sp;
-	int32_t               m_stat_sp;
-	int32_t               m_loop_sp;
+	uint32_t            m_loop_stack[LOOP_STACK_DEPTH];
+	uint32_t            m_cntr_stack[CNTR_STACK_DEPTH];
+	uint32_t            m_pc_stack[PC_STACK_DEPTH];
+	uint16_t            m_stat_stack[STAT_STACK_DEPTH][3];
+	int32_t             m_pc_sp;
+	int32_t             m_cntr_sp;
+	int32_t             m_stat_sp;
+	int32_t             m_loop_sp;
 
 	// external I/O
-	uint8_t               m_flagout;
-	uint8_t               m_flagin;
-	uint8_t               m_fl0;
-	uint8_t               m_fl1;
-	uint8_t               m_fl2;
-	uint16_t              m_idma_addr;
-	uint16_t              m_idma_cache;
-	uint8_t               m_idma_offs;
+	uint8_t             m_flagout;
+	uint8_t             m_flagin;
+	uint8_t             m_fl0;
+	uint8_t             m_fl1;
+	uint8_t             m_fl2;
+	uint16_t            m_idma_addr;
+	uint16_t            m_idma_cache;
+	uint8_t             m_idma_offs;
 
 	// interrupt handling
-	uint16_t              m_imask;
-	uint8_t               m_icntl;
-	uint16_t              m_ifc;
-	uint8_t               m_irq_state[10];
-	uint8_t               m_irq_latch[10];
+	uint16_t            m_imask;
+	uint8_t             m_icntl;
+	uint16_t            m_ifc;
+	uint8_t             m_irq_state[10];
+	uint8_t             m_irq_latch[10];
 
 	// other internal states
 	int                 m_icount;
@@ -422,9 +422,9 @@ protected:
 	int                 m_imask_mask;
 
 	// register maps
-	int16_t *             m_read0_ptr[16];
-	uint32_t *            m_read1_ptr[16];
-	uint32_t *            m_read2_ptr[16];
+	int16_t *           m_read0_ptr[16];
+	uint32_t *          m_read1_ptr[16];
+	uint32_t *          m_read2_ptr[16];
 	void *              m_alu_xregs[8];
 	void *              m_alu_yregs[4];
 	void *              m_mac_xregs[8];
@@ -445,10 +445,10 @@ protected:
 	uint16_t              m_mask_table[0x4000];
 	uint16_t              m_reverse_table[0x4000];
 
-	devcb_read32            m_sport_rx_cb;    // callback for serial receive
-	devcb_write32           m_sport_tx_cb;    // callback for serial transmit
-	devcb_write_line        m_timer_fired_cb; // callback for timer fired
-	devcb_write32           m_dmovlay_cb;     // callback for DMOVLAY instruction
+	devcb_read32          m_sport_rx_cb;    // callback for serial receive
+	devcb_write32         m_sport_tx_cb;    // callback for serial transmit
+	devcb_write_line      m_timer_fired_cb; // callback for timer fired
+	devcb_write32         m_dmovlay_cb;     // callback for DMOVLAY instruction
 
 	// debugging
 #if ADSP_TRACK_HOTSPOTS
@@ -513,6 +513,12 @@ public:
 	// construction/destruction
 	adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// public interfaces
+	void idma_addr_w(uint16_t data);
+	uint16_t idma_addr_r();
+	void idma_data_w(uint16_t data);
+	uint16_t idma_data_r();
+
 protected:
 	// device_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
@@ -523,13 +529,6 @@ protected:
 
 	// address spaces
 	const address_space_config      m_io_config;
-
-public:
-	// public interfaces
-	void idma_addr_w(uint16_t data);
-	uint16_t idma_addr_r();
-	void idma_data_w(uint16_t data);
-	uint16_t idma_data_r();
 };
 
 

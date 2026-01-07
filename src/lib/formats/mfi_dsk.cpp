@@ -3,15 +3,17 @@
 #include "mfi_dsk.h"
 
 #include "ioprocs.h"
+#include "strformat.h"
 
 #include <zlib.h>
 
 #include <cstring>
 #include <functional>
+#include <iostream>
+#include <map>
+#include <sstream>
 #include <tuple>
 
-#include <map>
-#include "strformat.h"
 
 /*
   Mess floppy image structure:
@@ -223,10 +225,10 @@ bool mfi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				lengths[p-cpos] ++;
 				cpos = p;
 			}
-			std::string s;
+			std::ostringstream s;
 			for(const auto &e : lengths)
-				s += util::string_format(" %d:%d", e.first, e.second);
-			fprintf(stderr, "%d.%2d:%s\n", side, track, s.c_str());
+				util::stream_format(s, " %d:%d", e.first, e.second);
+			util::stream_format(std::cerr, "%d.%2d:%s\n", side, track, std::move(s).str());
 		}
 	return true;
 }

@@ -32,8 +32,8 @@ protected:
 
 	lisa_base_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void device_start() override;
-	void device_reset() override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
 
 	void mt0_0();
 	void mt0_1();
@@ -55,8 +55,8 @@ protected:
 class lisa_original_fdc_device : public lisa_base_fdc_device {
 protected:
 	lisa_original_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
-	void device_add_mconfig(machine_config &config) override;
-	void map(address_map &map);
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
 
 	void ph0_0();
 	void ph0_1();
@@ -77,8 +77,8 @@ public:
 	lisa_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	void device_add_mconfig(machine_config &config) override;
-	const tiny_rom_entry *device_rom_region() const override;
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 class lisa2_fdc_device : public lisa_original_fdc_device {
@@ -86,8 +86,8 @@ public:
 	lisa2_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
-	void device_add_mconfig(machine_config &config) override;
-	const tiny_rom_entry *device_rom_region() const override;
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 class macxl_fdc_device : public lisa_base_fdc_device {
@@ -100,11 +100,11 @@ protected:
 	required_device<iwm_device> m_iwm;
 	u8 m_pwm;
 
-	void device_start() override;
-	void device_reset() override;
-	void device_add_mconfig(machine_config &config) override;
-	const tiny_rom_entry *device_rom_region() const override;
-	void map(address_map &map);
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
 
 	void stop_0();
 	void stop_1();

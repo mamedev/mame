@@ -12,14 +12,14 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "emupal.h"
-#include "softlist_dev.h"
-#include "speaker.h"
+
+#include "lisafdc.h"
+#include "lisammu.h"
+#include "lisavideo.h"
 
 #include "bus/applepp/applepp.h"
 #include "cpu/cop400/cop400.h"
 #include "cpu/m68000/m68000.h"
-#include "formats/ap_dsk35.h"
 #include "machine/6522via.h"
 #include "machine/74259.h"
 #include "machine/input_merger.h"
@@ -27,9 +27,14 @@
 #include "machine/z80scc.h"
 #include "sound/spkrdev.h"
 
-#include "lisafdc.h"
-#include "lisammu.h"
-#include "lisavideo.h"
+#include "emupal.h"
+#include "softlist_dev.h"
+#include "speaker.h"
+
+#include "formats/ap_dsk35.h"
+
+
+namespace {
 
 class lisa_state : public driver_device
 {
@@ -54,10 +59,10 @@ public:
 		m_keyboard(*this, "k%02x", 0U)
 	{ }
 
-	void lisa(machine_config &config);
-	void lisa2(machine_config &config);
-	void lisa210(machine_config &config);
-	void macxl(machine_config &config);
+	void lisa(machine_config &config) ATTR_COLD;
+	void lisa2(machine_config &config) ATTR_COLD;
+	void lisa210(machine_config &config) ATTR_COLD;
+	void macxl(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<m68000_device> m_maincpu;
@@ -86,12 +91,12 @@ private:
 	bool m_kbd, m_iocop_kbd, m_kbcop_kbd, m_kbcop_so;
 	u8 m_iocop_select, m_kbcop_d;
 	
-	void lisa_ram_map(address_map &map);
-	void lisa_io_map(address_map &map);
-	void lisa_special_io_map(address_map &map);
+	void lisa_ram_map(address_map &map) ATTR_COLD;
+	void lisa_io_map(address_map &map) ATTR_COLD;
+	void lisa_special_io_map(address_map &map) ATTR_COLD;
 
-	void machine_start() override;
-	void machine_reset() override;
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(power_button_release);
 	TIMER_CALLBACK_MEMBER(iocop_g3_freed);
@@ -814,6 +819,8 @@ ROM_START( macxl )
 	ROM_REGION(0x100,"gfx1", 0)     // video ROM (includes S/N)
 	ROM_LOAD("341-0348a_mb7118e.u6c", 0x00, 0x100, CRC(778fc5d9) SHA1(ec2533a6bd9e75d02fa69754fb82c7c28f0366ab))
 ROM_END
+
+} // anonymous namespace
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY           FULLNAME */
 COMP( 1983, lisa,    0,      0,      lisa,    lisa,  lisa_state, empty_init,   "Apple Computer", "Lisa",         0 )

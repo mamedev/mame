@@ -122,7 +122,7 @@ std::string running_machine::describe_context() const
 			address_space *tspace;
 			offs_t address = cpu->pc();
 			bool ok = cpu->translate(AS_PROGRAM, device_memory_interface::TR_READ, address, tspace);
-			return string_format(ok && tspace->is_octal() ? "'%s' (%0*o)" :  "'%s' (%0*X)", cpu->tag(), (ok ? tspace->logaddrchars() : 1), cpu->pc());
+			return string_format((ok && tspace->is_octal()) ? "'%s' (%0*o)" :  "'%s' (%0*X)", cpu->tag(), ok ? tspace->logaddrchars() : 1, cpu->pc());
 		}
 	}
 
