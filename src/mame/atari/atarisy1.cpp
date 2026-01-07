@@ -2655,4 +2655,4 @@ GAME( 1987, roadblstc1, roadblst, roadb109, roadblst, atarisy1r_state, init_road
 GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1r_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )
 
 // not a clone of relief because it needs to be a clone of atarisy1 BIOS and it's more like an unreleased prequel than a version of the released title
-GAME( 1985, reliefs1,   atarisy1, reliefs1, roadrunn, atarisy1_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )
+GAME( 1986, reliefs1,   atarisy1, reliefs1, roadrunn, atarisy1_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )
