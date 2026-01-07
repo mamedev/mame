@@ -1340,9 +1340,9 @@ void jaguar_state::r3000_rom_map(address_map &map)
 	r3000_map(map);
 	map(0x04800000, 0x04bfffff).bankr("maingfxbank");
 	map(0x04c00000, 0x04dfffff).bankr("mainsndbank");
-	// TODO: fishfren access latter when entering service mode (overlay from somewhere or btanb?)
-	// map(0x04d001f0, 0x04d001f7).rw(m_ide, FUNC(vt83c461_device::cs0_r), FUNC(vt83c461_device::cs0_w));
-	// map(0x04d003f0, 0x04d003f7).rw(m_ide, FUNC(vt83c461_device::cs1_r), FUNC(vt83c461_device::cs1_w));
+	// TODO: fishfren access latter when entering service mode (writeonly mirror or btanb?)
+	// map(0x04d001f0, 0x04d001f7).w(m_ide, FUNC(vt83c461_device::cs0_w));
+	// map(0x04d003f0, 0x04d003f7).w(m_ide, FUNC(vt83c461_device::cs1_w));
 }
 
 
