@@ -277,7 +277,11 @@ void jaguar_state::update_jpit_timer(unsigned which)
 		m_jpit_timer[which]->adjust(sample_period);
 	}
 	else
+	{
 		m_jpit_timer[which]->adjust(attotime::never);
+		m_dsp->set_input_line(2 + which, CLEAR_LINE);
+
+	}
 
 }
 
@@ -406,6 +410,8 @@ void jaguar_state::update_serial_timer()
 	{
 		case 0x00:
 			m_serial_timer->adjust(attotime::never);
+			// pdrive seems incredibly fuzzy on having this disabled when SMODE is off
+			m_dsp->set_input_line(1, CLEAR_LINE);
 			break;
 		// TODO: atarikrt uses SMODE 0x05 but still expects an irq?
 		case 0x05:
