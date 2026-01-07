@@ -2549,8 +2549,8 @@ ROM_START( reliefs1 ) // LSI CART 2
 	ROM_LOAD( "rp-p3-6.c24.bin",  0x2b0000, 0x008000, CRC(f15426d3) SHA1(21e564973efde7e814a74aec8bfc56fd19492575) )  /* bank 6, plane 3 */
 
 	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
-	ROM_LOAD( "mem.a7", 0x000000, 0x000200, NO_DUMP )
-	ROM_LOAD( "pal.a5", 0x000200, 0x000200, NO_DUMP )
+	ROM_LOAD( "brlf24k_bs.a7", 0x000, 0x200, CRC(62b8ff72) SHA1(83fdf2b554a10787598bcdaebd45765bb8842013) )
+	ROM_LOAD( "brlf24k_ps.a5", 0x200, 0x200, CRC(eaee166e) SHA1(c958b65d8bca08eeebef589e03e04024100534e4) )
 
 	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
 	MOTHERBOARD_PROMS
@@ -2654,5 +2654,5 @@ GAME( 1987, roadblstcg, roadblst, roadb109, roadblst, atarisy1r_state, init_road
 GAME( 1987, roadblstc1, roadblst, roadb109, roadblst, atarisy1r_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, rev 1)", 0 )
 GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1r_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )
 
-// not a clone of relief because it needs to be a clone of atarisy1 BIOS
-GAME( 1985, reliefs1,   atarisy1, reliefs1, indytemp, atarisy1_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )
+// not a clone of relief because it needs to be a clone of atarisy1 BIOS and it's more like an unreleased prequel than a version of the released title
+GAME( 1985, reliefs1,   atarisy1, reliefs1, roadrunn, atarisy1_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )
