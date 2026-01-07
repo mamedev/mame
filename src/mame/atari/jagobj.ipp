@@ -932,6 +932,11 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 	/* fetch the object pointer */
 	u32 object_pointer = ((m_gpu_regs[OLP_H] << 16) | m_gpu_regs[OLP_L]);
 
+	// HACK: avoid a potential crash in raiden after Atari logo
+	// Where it's clearly not expecting the object processor running, sets $0 minus 8 = $ffff'fff8
+	if (BIT(object_pointer, 31))
+		return;
+
 	// TODO: count == 200 is wrong juju, particularly with branches
 	// - raiden hits 115 ~ 137 objects on ranking screen
 	// - ttoonadv hits 140 objects
