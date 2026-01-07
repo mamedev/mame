@@ -800,3 +800,33 @@ All Wxx and clearB are active 0 except WSP
 
 ---
 
+## Appendix IV - Implementation Notes
+
+### Carry Calculation
+
+The carry logic described in Section 8-1 is critical for envelope processing. The key insight is that the "complement" when B is negative must be implemented correctly:
+
+```cpp
+bool b_neg = BIT(slot.b, 18);
+uint32_t result = (slot.a + slot.b) & MASK19;
+bool carry;
+if (!b_neg)
+    carry = ((uint64_t)slot.a + slot.b) > MASK19;  // bit 19 overflow
+else
+    carry = !BIT(result, 18);  // COMPLEMENT of bit 18
+```
+
+**Why this matters for envelopes:**
+
+When B contains a negative delta (for amplitude decay):
+- `carry = 1` while the result (A+B) is still positive
+- `carry = 0` when the result goes negative (crossed zero)
+
+The WM WSP truth table shows that writes are blocked when `carry = 1`. So during decay:
+- While amplitude > 0: carry=1, WM WSP blocks the write, envelope keeps decaying
+- When amplitude crosses 0: carry=0, WM WSP allows the final write, stopping the decay
+
+**Common bug:** Implementing carry as simply `BIT(result, 18)` without the complement when B is negative will break note release - notes will cut off abruptly instead of decaying smoothly.
+
+---
+
