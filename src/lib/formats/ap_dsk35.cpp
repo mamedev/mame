@@ -143,7 +143,7 @@ int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std
 
 	uint8_t h[0x54];
 	auto const [err, actual] = read_at(io, 0, h, 0x54);
-	if (err || (0x54 != actual))
+	if(err || (0x54 != actual))
 		return 0;
 
 	uint32_t const dsize = get_u32be(&h[0x40]);
@@ -152,7 +152,7 @@ int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std
 	uint8_t const encoding = h[0x50];
 	uint8_t const format = h[0x51];
 	// if it's a 1.44MB DC42 image, reject it so the generic PC MFM handler picks it up
-	if ((encoding == 0x03) && (format == 0x02))
+	if((encoding == 0x03) && (format == 0x02))
 		return 0;
 
 	// Twiggy.  Images out there are slightly broken, size-wise
@@ -443,21 +443,15 @@ int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, cons
 {
 	uint8_t signature[4];
 	auto const [err, actual] = read_at(io, 0, signature, 4);
-	if (err || (4 != actual))
-	{
+	if(err || (4 != actual))
 		return 0;
-	}
 
-	if (!memcmp(signature, "2IMG", 4))
-	{
+	if(!memcmp(signature, "2IMG", 4))
 		return FIFID_SIGN;
-	}
 
 	// Bernie ][ The Rescue wrote 2MGs with the signature byte-flipped, other fields are valid
-	if (!memcmp(signature, "GMI2", 4))
-	{
+	if(!memcmp(signature, "GMI2", 4))
 		return FIFID_SIGN;
-	}
 
 	return 0;
 }

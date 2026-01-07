@@ -7,8 +7,10 @@
 
 #pragma once
 
-#include "cpu/m68000/m68000.h"
 #include "lisavideo.h"
+
+#include "cpu/m68000/m68000.h"
+
 
 class lisa_mmu_device : public device_t, public device_memory_interface {
 public:
@@ -48,9 +50,9 @@ public:
 	void herr_1();
 
 protected:
-	void device_start() override;
-	void device_reset() override;
-	space_config_vector memory_space_config() const override;
+	void device_start() override ATTR_COLD;
+	void device_reset() override ATTR_COLD;
+	space_config_vector memory_space_config() const override ATTR_COLD;
 
 private:
 	enum : u8 {

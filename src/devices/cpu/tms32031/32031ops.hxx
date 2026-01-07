@@ -25,22 +25,22 @@
 #define FREGEXP(rnum)       (m_r[rnum].exponent())
 #define FREGMAN(rnum)       (m_r[rnum].mantissa())
 
-#define FP2LONG(rnum)       ((FREGEXP(rnum) << 24) | ((uint32_t)FREGMAN(rnum) >> 8))
-#define LONG2FP(rnum,v)     do { m_r[rnum].set_mantissa((v) << 8); m_r[rnum].set_exponent((int32_t)(v) >> 24); } while (0)
+#define FP2LONG(rnum)       ((FREGEXP(rnum) << 24) | (uint32_t(FREGMAN(rnum)) >> 8))
+#define LONG2FP(rnum,v)     do { m_r[rnum].set_mantissa((v) << 8); m_r[rnum].set_exponent(int32_t(v) >> 24); } while (0)
 #define SHORT2FP(rnum,v)    do { \
-								if ((uint16_t)(v) == 0x8000) { m_r[rnum].set_mantissa(0); m_r[rnum].set_exponent(-128); } \
-								else { m_r[rnum].set_mantissa((v) << 20); m_r[rnum].set_exponent((int16_t)(v) >> 12); } \
+								if (uint16_t(v) == 0x8000) { m_r[rnum].set_mantissa(0); m_r[rnum].set_exponent(-128); } \
+								else { m_r[rnum].set_mantissa((v) << 20); m_r[rnum].set_exponent(int16_t(v) >> 12); } \
 							} while (0)
 
-#define DIRECT(op)              (((IREG(TMR_DP) & 0xff) << 16) | ((uint16_t)op))
+#define DIRECT(op)              (((IREG(TMR_DP) & 0xff) << 16) | uint16_t(op))
 #define INDIRECT_D(op,o)        ((this->*s_indirect_d[((o) >> 3) & 31])(op,o))
 #define INDIRECT_1(op,o)        ((this->*s_indirect_1[((o) >> 3) & 31])(op,o))
 #define INDIRECT_1_DEF(op,o)    ((this->*s_indirect_1_def[((o) >> 3) & 31])(op,o,defptr))
 
 #define SIGN(val)           ((val) & 0x80000000)
 
-#define OVERFLOW_SUB(a,b,r) ((int32_t)(((a) ^ (b)) & ((a) ^ (r))) < 0)
-#define OVERFLOW_ADD(a,b,r) ((int32_t)(((a) ^ (r)) & ((b) ^ (r))) < 0)
+#define OVERFLOW_SUB(a,b,r) (int32_t(((a) ^ (b)) & ((a) ^ (r))) < 0)
+#define OVERFLOW_ADD(a,b,r) (int32_t(((a) ^ (r)) & ((b) ^ (r))) < 0)
 
 #define CLR_FLAGS(f)        do { IREG(TMR_ST) &= ~(f); } while (0)
 #define CLR_NVUF()          CLR_FLAGS(NFLAG | VFLAG | UFFLAG)
@@ -53,10 +53,10 @@
 #define OR_NUF(reg)         do { int temp = (reg.exponent() == -128) << 4; IREG(TMR_ST) |= ((reg.mantissa() >> 28) & NFLAG) | (temp) | (temp << 2); } while (0)
 #define OR_V_SUB(a,b,r)     do { uint32_t temp = ((((a) ^ (b)) & ((a) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
 #define OR_V_ADD(a,b,r)     do { uint32_t temp = ((((a) ^ (r)) & ((b) ^ (r))) >> 30) & VFLAG; IREG(TMR_ST) |= temp | (temp << 4); } while (0)
-#define OR_C_SUB(a,b,r)     do { IREG(TMR_ST) |= ((uint32_t)(b) > (uint32_t)(a)); } while (0)
-#define OR_C_ADD(a,b,r)     do { IREG(TMR_ST) |= ((uint32_t)(a) > (uint32_t)(r)); } while (0)
-#define OR_C_SBB(a,b,c)     do { int64_t temp = (int64_t)(a) - (uint32_t)(b) - (uint32_t)(c); IREG(TMR_ST) |= (temp < 0); } while (0)
-#define OR_C_ADC(a,b,c)     do { uint64_t temp = (uint64_t)(a) + (uint32_t)(b) + (uint32_t)(c); IREG(TMR_ST) |= (temp > 0xffffffff); } while (0)
+#define OR_C_SUB(a,b,r)     do { IREG(TMR_ST) |= (uint32_t(b) > uint32_t(a)); } while (0)
+#define OR_C_ADD(a,b,r)     do { IREG(TMR_ST) |= (uint32_t(a) > uint32_t(r)); } while (0)
+#define OR_C_SBB(a,b,c)     do { int64_t temp = int64_t(a) - uint32_t(b) - uint32_t(c); IREG(TMR_ST) |= (temp < 0); } while (0)
+#define OR_C_ADC(a,b,c)     do { uint64_t temp = uint64_t(a) + uint32_t(b) + uint32_t(c); IREG(TMR_ST) |= (temp > 0xffffffff); } while (0)
 
 #define OVM()               (IREG(TMR_ST) & OVMFLAG)
 
