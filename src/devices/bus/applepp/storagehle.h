@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef MAME_BUS_APPLEPP_STORAGE_H
-#define MAME_BUS_APPLEPP_STORAGE_H
+#ifndef MAME_BUS_APPLEPP_STORAGEHLE_H
+#define MAME_BUS_APPLEPP_STORAGEHLE_H
 
 #pragma once
 
@@ -55,4 +55,4 @@ public:
 DECLARE_DEVICE_TYPE(APPLEPP_PROFILE, applepp_profile_device)
 DECLARE_DEVICE_TYPE(APPLEPP_WIDGET,  applepp_widget_device)
 
-#endif // MAME_BUS_APPLEPP_STORAGE_H
+#endif // MAME_BUS_APPLEPP_STORAGEHLE_H
