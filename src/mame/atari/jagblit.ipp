@@ -301,6 +301,13 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 	if (gouraud_iinc & 0x800000)
 		gouraud_iinc |= 0xff000000;
 
+	u32 z_index[4];
+	z_index[3] = m_blitter_regs[B_Z0];
+	z_index[2] = m_blitter_regs[B_Z1];
+	z_index[1] = m_blitter_regs[B_Z2];
+	z_index[0] = m_blitter_regs[B_Z3];
+	s32 z_inc = m_blitter_regs[B_ZINC];
+
 	LOGMASKED(LOG_BLITS, "%s:Blit!\n", machine().describe_context());
 	LOGMASKED(LOG_BLITS, "  a1_base  = %08X\n", a1_base);
 	LOGMASKED(LOG_BLITS, "  a1_pitch = %d\n", a1_pitch);
@@ -394,18 +401,28 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 						inhibit = 1;
 				}
 
-				/* apply Z comparator */
-				if (COMMAND & 0x00040000)
-					if (srczdata < dstzdata) inhibit = 1;
-				if (COMMAND & 0x00080000)
-					if (srczdata == dstzdata) inhibit = 1;
-				if (COMMAND & 0x00100000)
-					if (srczdata > dstzdata) inhibit = 1;
+				// (GOURZ)
+				// cybermor and others
+				// TODO: iwar still cuts badly (just in a different way compared to before)
+				if (COMMAND & 0x00001000)
+				{
+					int p = asrc_phrase_mode ? (asrc_x & 3) : 3;
+					srczdata = z_index[p] >> 16;
+				}
+
+				/* apply Z comparator (ZMODE) */
+				if (COMMAND & 0x00040000 && srczdata < dstzdata)
+					inhibit = 1;
+				if (COMMAND & 0x00080000 && srczdata == dstzdata)
+					inhibit = 1;
+				if (COMMAND & 0x00100000 && srczdata > dstzdata)
+					inhibit = 1;
 
 				// apply bit comparator (BCOMPEN)
 				// - missil3d, clubdriv, avsp score/automap, trevmcfr
 				if (COMMAND & 0x04000000)
 				{
+					// TODO: should really shift by 1bpp
 					if (srcdata == 0)
 						inhibit = 1;
 				}
@@ -499,7 +516,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 				{
 					writedata = dstdata;
 					// TODO: verify me
-					//srczdata = dstzdata;
+					srczdata = dstzdata;
 				}
 
 			// (BKGWREN)
@@ -517,6 +534,13 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 			asrc_y = (asrc_y + asrc_yadd) & asrc_ymask;
 			adest_x = (adest_x + adest_xadd) & adest_xmask;
 			adest_y = (adest_y + adest_yadd) & adest_ymask;
+
+			// GOURZ increments
+			if (COMMAND & 0x00001000)
+			{
+				int p = asrc_phrase_mode ? (asrc_x & 3) : 3;
+				z_index[p] += z_inc;
+			}
 		}
 
 		/* adjust for phrase mode */
