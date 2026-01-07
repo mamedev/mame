@@ -90,7 +90,7 @@ VTech V.Smile Baby cartridges
 
 <softwarelist name="vsmileb_cart" description="VTech V.Smile Baby cartridges">
 
-	<software name="babyeins" supported="partial">
+	<software name="babyeins" supported="no">
 		<description>Baby Einstein - World of Discoveries (USA)</description>
 		<year>200?</year>
 		<publisher>VTech</publisher>
@@ -103,7 +103,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="babyeinsa" cloneof="babyeins" supported="partial">
+	<software name="babyeinsa" cloneof="babyeins" supported="no">
 		<description>Baby Einstein - World of Discoveries (USA, alt)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -116,7 +116,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="babyeinsfr" cloneof="babyeins" supported="partial">
+	<software name="babyeinsfr" cloneof="babyeins" supported="no">
 		<description>Baby Einstein - Un monde de découvertes (France)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -129,7 +129,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="backyardi" supported="partial">
+	<software name="backyardi" supported="no">
 		<description>Nickelodeon The Backyardigans - Big Backyard Adventure (USA)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -142,7 +142,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="barney" supported="partial">
+	<software name="barney" supported="no">
 		<description>Barney - Let's Go to a Party (USA)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -155,7 +155,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="carebear" supported="partial">
+	<software name="carebear" supported="no">
 		<description>Care Bears - Play Day (USA)</description>
 		<year>2008</year>
 		<publisher>VTech</publisher>
@@ -168,7 +168,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarm" supported="partial">
+	<software name="dayfarm" supported="no">
 		<description>A Day on the Farm (USA)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -181,7 +181,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarmge" cloneof="dayfarm" supported="partial">
+	<software name="dayfarmge" cloneof="dayfarm" supported="no">
 		<description>Mein erster Bauernhof (Germany)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -196,7 +196,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarmfr" cloneof="dayfarm" supported="partial">
+	<software name="dayfarmfr" cloneof="dayfarm" supported="no">
 		<description>Un jour à la ferme (France)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -209,7 +209,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dayfarmsp" cloneof="dayfarm" supported="partial">
+	<software name="dayfarmsp" cloneof="dayfarm" supported="no">
 		<description>Un Día en la Granja (Spain)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -224,7 +224,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dbabymi" supported="partial">
+	<software name="dbabymi" supported="no">
 		<description>Discovery with Baby Mickey &amp; Friends (USA)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -237,7 +237,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="dbabymifr" cloneof="dbabymi" supported="partial">
+	<software name="dbabymifr" cloneof="dbabymi" supported="no">
 		<description>Les découvertes de Mickey et ses amis (France)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -251,7 +251,7 @@ VTech V.Smile Baby cartridges
 	</software>
 
 	<!-- "Learn and Discover Home" -->
-	<software name="learndhnl" supported="partial">
+	<software name="learndhnl" supported="no">
 		<description>Dierenhuis (Netherlands)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -265,7 +265,7 @@ VTech V.Smile Baby cartridges
 	</software>
 
 	<!-- "Learn and Discover Home" -->
-	<software name="learndhge" cloneof="learndhnl" supported="partial">
+	<software name="learndhge" cloneof="learndhnl" supported="no">
 		<description>Meine kleinen Tierfreunde (Germany)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -281,7 +281,7 @@ VTech V.Smile Baby cartridges
 	</software>
 
 	<!-- "Learn and Discover Home" -->
-	<software name="learndhfr" cloneof="learndhnl" supported="partial">
+	<software name="learndhfr" cloneof="learndhnl" supported="no">
 		<description>La Maison Des Animaux (France)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -294,7 +294,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="mothergoo" supported="partial">
+	<software name="mothergoo" supported="no">
 		<description>Mother Goose (USA)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -307,7 +307,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="noahark" supported="partial">
+	<software name="noahark" supported="no">
 		<description>Noah's Ark - Animal Adventures (USA)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -320,7 +320,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="noaharkfr" cloneof="noahark" supported="partial">
+	<software name="noaharkfr" cloneof="noahark" supported="no">
 		<description>L'arche de Noé - L'aventure des animaux (France)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -333,7 +333,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="poohhawa" supported="partial">
+	<software name="poohhawa" supported="no">
 		<description>Pooh's Hundred Acre Wood Adventure (USA)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -345,7 +345,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="poohhawase" cloneof="poohhawa" supported="partial">
+	<software name="poohhawase" cloneof="poohhawa" supported="no">
 		<description>Nalle Puhs Äventyr i Sjumilaskogen (Sweden)</description>
 		<year>2006</year>
 		<publisher>VTech</publisher>
@@ -360,7 +360,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="teletub" supported="partial">
+	<software name="teletub" supported="no">
 		<description>Teletubbies - Time for Teletubbies (USA)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -372,7 +372,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="teletubfr" cloneof="teletub" supported="partial">
+	<software name="teletubfr" cloneof="teletub" supported="no">
 		<description>Teletubbies - C'est l'heure des Teletubbies (France)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
@@ -384,7 +384,7 @@ VTech V.Smile Baby cartridges
 		</part>
 	</software>
 
-	<software name="teletubsp" cloneof="teletub" supported="partial">
+	<software name="teletubsp" cloneof="teletub" supported="no">
 		<description>Teletubbies - ¡Es la hora de los Teletubbies! (Spain)</description>
 		<year>2007</year>
 		<publisher>VTech</publisher>
