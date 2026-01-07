@@ -14,10 +14,8 @@
 
 #include "bus/midi/midioutport.h"
 #include "cpu/upd7810/upd7810.h"
-#include "sound/bbd.h"
 #include "sound/flt_biquad.h"
 #include "sound/flt_rc.h"
-#include "sound/mixer.h"
 #include "sound/upd931.h"
 
 #include "speaker.h"
