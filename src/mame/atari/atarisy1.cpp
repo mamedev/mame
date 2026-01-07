@@ -596,6 +596,39 @@ static INPUT_PORTS_START( indytemc )
 	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( reliefs1 )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("F60000")    // F60000
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // 68KBUF
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("1820")  // 1820 (sound)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // 68KBUF
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", FUNC(generic_latch_8_device::pending_r)) // SNDBUF
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( roadrunn )
 	PORT_START("IN0")   // F40000
@@ -880,6 +913,13 @@ void atarisy1_state::reliefs1(machine_config &config)
 	add_speech(config);
 	add_adc(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy1_state::main_map_noslapstic);
+
+	// Hall-effect analog joysticks
+	m_adc->in_callback<4>().set_ioport("IN2"); // not having this mapped shows more service mode tests 
+	m_adc->in_callback<5>().set_ioport("IN3"); // but is correct according to the joystick test?
+
+	m_adc->in_callback<6>().set_ioport("IN0");
+	m_adc->in_callback<7>().set_ioport("IN1");
 }
 
 /*************************************
@@ -2655,4 +2695,4 @@ GAME( 1987, roadblstc1, roadblst, roadb109, roadblst, atarisy1r_state, init_road
 GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1r_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )
 
 // not a clone of relief because it needs to be a clone of atarisy1 BIOS and it's more like an unreleased prequel than a version of the released title
-GAME( 1986, reliefs1,   atarisy1, reliefs1, roadrunn, atarisy1_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )
+GAME( 1986, reliefs1,   atarisy1, reliefs1, reliefs1, atarisy1_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )
