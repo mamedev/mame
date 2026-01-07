@@ -28,6 +28,17 @@
 #include "formats/ap_dsk35.h"
 
 
+/*
+    lisa model identification
+*/
+enum lisa_model_t
+{
+	lisa1,      /* twiggy floppy drive - currently unsupported */
+	lisa2,      /* 3.5'' Sony floppy drive */
+	lisa_210,   /* modified I/O board, and internal 10Meg drive */
+	mac_xl      /* same as above with modified video */
+};
+
 /* lisa MMU segment regs */
 struct real_mmu_entry
 {
@@ -189,9 +200,9 @@ private:
 	int m_KBIR = 0;
 	int m_FDIR = 0;
 	int m_DISK_DIAG = 0;
-	int m_MT1 = 0;
-	int m_PWM_floppy_motor_speed = 0;
-	int m_model = 0;
+	/*int m_MT1 = 0;*/                      /* currently unused */
+	/*int m_PWM_floppy_motor_speed = 0;*/   /* currently unused */
+	lisa_model_t m_model = lisa2;
 	lisa_features_t m_features;
 	int m_COPS_Ready = 0;
 	int m_COPS_command = 0;
