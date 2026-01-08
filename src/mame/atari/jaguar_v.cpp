@@ -566,6 +566,8 @@ uint32_t jaguar_state::blitter_r(offs_t offset, uint32_t mem_mask)
 		case B_CMD:
 		{
 			// handle normal idle + inner/outer idle
+			// TODO: other values, which depends on blitter being in async thread
+			// JTRM claims all of them as "for diagnostic only"
 			const u32 is_idle = (m_blitter_status & 1) * 0x805;
 			return is_idle | (m_blitter_status & 2);
 		}

@@ -397,6 +397,16 @@ void jaguar_state::machine_start()
 		m_mainsndbank->configure_entries(0, 8, romboard + 0x000000, 0x200000);
 		m_dspsndbank->configure_entries(0, 8, romboard + 0x000000, 0x200000);
 	}
+
+	// HACK: for battlesp/battlesg after main menu
+	// GPU reads the blitter status then translates the result as a pointer
+	// i.e. looping at $805 expecting bit 0 to be on.
+	// This depends on what shared RAM contains at power on and what's the actual blitter status
+	// when going idle ...
+	if (m_is_cojag == false)
+	{
+		m_shared_ram[0x804 / 4] = 0xffffffff;
+	}
 }
 
 void jaguar_state::machine_reset()
