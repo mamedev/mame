@@ -641,7 +641,9 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-"Another Great Game" then black screen. Known to require tight [GPU] pipeline timings
+"Another Great Game" then black screen. bp 11eeb4,1,{curpc+=2;g} 68k illegal opcode (???)
+Known to require tight [GPU] pipeline timings (?)
+Can crash during gameplay
 ]]></notes>
 
 		<info name="serial" value="J9040E 700740-002"/>
@@ -1175,9 +1177,9 @@ Plays [DSP] sound on right speaker only (?)
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-[GPU] in-flight PC write (fatalerror)
+[GPU] in-flight PC write (ignored)
 [DSP] jump off the weeds at PC=F1B898, also reads $fffffc (?)
-Gets to title screen (with wrong GFX width) then hangs ([GPU] core bug?)
+Gets to title screen then hangs ([GPU] core bug?), can actually do more with [GPU] overclock and 68k downclock
 Access [cart] EEPROM
 ]]></notes>
 
