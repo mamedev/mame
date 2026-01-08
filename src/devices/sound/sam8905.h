@@ -31,6 +31,7 @@ private:
 		uint32_t l_acc, r_acc;
 		uint8_t mix_l, mix_r;
 		bool clear_rqst, int_mod;
+		bool carry;  // Carry from RADD, persists for WSP operations
 		uint32_t mul_result; // Multiplier pipeline latch
 	};
 

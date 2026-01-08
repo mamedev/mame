@@ -114,17 +114,19 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 		case 3: bus = 0; break; // RSP (NOP)
 	}
 
-	// Carry calculation (Section 8-1)
+	// Carry calculation (Section 8-1) - only updated by RADD, persists for WSP
 	// When B positive: carry=1 if A+B overflows 19 bits
 	// When B negative: carry=1 if result is positive, carry=0 if result went negative
 	// This allows envelope to decay while positive, and stop when it goes negative
-	bool b_neg = BIT(slot.b, 18);
-	uint32_t result = (slot.a + slot.b) & MASK19;
-	bool carry;
-	if (!b_neg)
-		carry = ((uint64_t)slot.a + slot.b) > MASK19;
-	else
-		carry = !BIT(result, 18);
+	if (emitter_sel == 1) {  // RADD - update carry
+		bool b_neg = BIT(slot.b, 18);
+		uint32_t result = (slot.a + slot.b) & MASK19;
+		if (!b_neg)
+			slot.carry = ((uint64_t)slot.a + slot.b) > MASK19;
+		else
+			slot.carry = !BIT(result, 18);
+	}
+	// Use slot.carry for all WSP operations (persists from last RADD)
 
 	// Receivers (Active Low except WSP)
 	// WA (Write A)
@@ -152,7 +154,17 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 			bool end_bit = BIT(bus, 18);
 			bool wf_match = (wave == final_wave);
 
-			if (!carry) {
+			// Debug: trace when wave reaches finalWave for external sample slots
+			if (wf_match && slot.carry && alg == 2) {
+				static int match_count = 0;
+				if (match_count < 20) {
+					logerror("WA_WSP S%d: WAVE REACHED FINAL! wave=%03X final=%03X E=%d clrq->%d\n",
+						slot_idx, wave, final_wave, end_bit, end_bit);
+					match_count++;
+				}
+			}
+
+			if (!slot.carry) {
 				slot.a = 0; slot.clear_rqst = false; slot.int_mod = true;
 			} else if (!wf_match) {
 				slot.a = 0x200; slot.clear_rqst = false; slot.int_mod = true;
@@ -178,15 +190,15 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 		if (wsp) {
 			// WM WSP Truth Table (Section 8-4)
 			if (!slot.clear_rqst) write_enable = false;
-			else if (carry) write_enable = false;
+			else if (slot.carry) write_enable = false;
 
 			// Interrupt latch: set when CLEARRQST=1 AND (INTMOD=1 OR CARRY=1)
-			bool irq_condition = slot.clear_rqst && (slot.int_mod || carry);
+			bool irq_condition = slot.clear_rqst && (slot.int_mod || slot.carry);
 			if (irq_condition) {
 				uint8_t new_latch = (slot_idx << 4) | mad;
 				if (m_interrupt_latch != new_latch)
 					logerror("SAM IRQ latch SET: slot %d word %d (latch %02X -> %02X) intmod=%d carry=%d\n",
-						slot_idx, mad, m_interrupt_latch, new_latch, slot.int_mod, carry);
+						slot_idx, mad, m_interrupt_latch, new_latch, slot.int_mod, slot.carry);
 				m_interrupt_latch = new_latch;
 			}
 
@@ -195,7 +207,7 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 				static int debug_count = 0;
 				if (debug_count < 5) {
 					logerror("WM_WSP S2W2: IRQ blocked - clrq=%d intmod=%d carry=%d (needs intmod=1 or carry=1)\n",
-						slot.clear_rqst, slot.int_mod, carry);
+						slot.clear_rqst, slot.int_mod, slot.carry);
 					debug_count++;
 				}
 			}
@@ -207,8 +219,8 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 					static int trace_count = 0;
 					if (trace_count < 40) {
 						logerror("WM_WSP S%dW2: ALG=%d A=0x%05X B=0x%05X bus=0x%05X b_neg=%d carry=%d clrq=%d intmod=%d IRQ=%d\n",
-							slot_idx, alg, slot.a, slot.b, bus, BIT(slot.b, 18), carry, slot.clear_rqst, slot.int_mod,
-							slot.clear_rqst && (slot.int_mod || carry));
+							slot_idx, alg, slot.a, slot.b, bus, BIT(slot.b, 18), slot.carry, slot.clear_rqst, slot.int_mod,
+							slot.clear_rqst && (slot.int_mod || slot.carry));
 						trace_count++;
 					}
 				}
