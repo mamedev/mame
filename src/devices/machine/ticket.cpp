@@ -63,6 +63,12 @@ ticket_dispenser_device::ticket_dispenser_device(const machine_config &mconfig, 
 	m_hopper_type = false;
 }
 
+hopper_device::hopper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: ticket_dispenser_device(mconfig, type, tag, owner, clock)
+{
+	m_hopper_type = true;
+}
+
 hopper_device::hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ticket_dispenser_device(mconfig, HOPPER, tag, owner, clock)
 {

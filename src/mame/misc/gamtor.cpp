@@ -147,7 +147,7 @@ const tiny_rom_entry *gamtor_vga_device::device_rom_region() const
 
 // Money Controls Universal Hopper model MK4, standard on the Gaminator cabinet.
 // TODO: Needs to be moved to own file
-class mc_mk4_hopper_device : public ticket_dispenser_device
+class mc_mk4_hopper_device : public hopper_device
 {
 public:
 	mc_mk4_hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -159,7 +159,7 @@ protected:
 DEFINE_DEVICE_TYPE(MC_MK4_HOPPER, mc_mk4_hopper_device, "mc_mk4_hopper", "Money Controls Universal Hopper model MK4")
 
 mc_mk4_hopper_device::mc_mk4_hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: ticket_dispenser_device(mconfig, MC_MK4_HOPPER, tag, owner, clock)
+	: hopper_device(mconfig, MC_MK4_HOPPER, tag, owner, clock)
 {
 }
 
@@ -1709,15 +1709,15 @@ GAME( 2002?, gamt1b,      gamt1,    gaminator, gaminator, gaminator_state, init_
 GAME( 2002?, gamt1lotc,   gamt1,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 1 (bootleg, C-Loto)", GAME_FLAGS )
 GAME( 2002?, gamt1ent,    gamt1,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 1 (bootleg, Ent)",    GAME_FLAGS )
 
-GAME( 2002?, gamt4,       0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 1)", GAME_FLAGS )
-GAME( 2002?, gamt4a,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 2)", GAME_FLAGS )
-GAME( 2002?, gamt4b,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 3)", GAME_FLAGS )
-GAME( 2002?, gamt4c,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 4)", GAME_FLAGS )
-GAME( 2002?, gamt4d,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 5)", GAME_FLAGS )
-GAME( 2002?, gamt4e,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 6)", GAME_FLAGS )
-GAME( 2002?, gamt4f,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 7)", GAME_FLAGS )
-GAME( 2002?, gamt4g,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 8)", GAME_FLAGS )
-GAME( 2002?, gamt4h,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 9)", GAME_FLAGS )
+GAME( 2002?, gamt4,       0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 1)",  GAME_FLAGS )
+GAME( 2002?, gamt4a,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 2)",  GAME_FLAGS )
+GAME( 2002?, gamt4b,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 3)",  GAME_FLAGS )
+GAME( 2002?, gamt4c,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 4)",  GAME_FLAGS )
+GAME( 2002?, gamt4d,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 5)",  GAME_FLAGS )
+GAME( 2002?, gamt4e,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 6)",  GAME_FLAGS )
+GAME( 2002?, gamt4f,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 7)",  GAME_FLAGS )
+GAME( 2002?, gamt4g,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 8)",  GAME_FLAGS )
+GAME( 2002?, gamt4h,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 9)",  GAME_FLAGS )
 GAME( 2002?, gamt4i,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 10)", GAME_FLAGS )
 GAME( 2002?, gamt4j,      gamt4,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 4 (set 11)", GAME_FLAGS )
 
@@ -1767,15 +1767,15 @@ GAME( 2002?, gamt9a,      gamt9,    gaminator, gaminator, gaminator_state, init_
 
 GAME( 2002?, gamt9lotc,   gamt9,    gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "bootleg",  "Gaminator 9 (bootleg, C-Loto)", GAME_FLAGS )
 
-GAME( 2002?, gamt10,      0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 1)", GAME_FLAGS )
-GAME( 2002?, gamt10a,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 2)", GAME_FLAGS )
-GAME( 2002?, gamt10b,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 3)", GAME_FLAGS )
-GAME( 2002?, gamt10c,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 4)", GAME_FLAGS )
-GAME( 2002?, gamt10d,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 5)", GAME_FLAGS )
-GAME( 2002?, gamt10e,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 6)", GAME_FLAGS )
-GAME( 2002?, gamt10f,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 7)", GAME_FLAGS )
-GAME( 2002?, gamt10g,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 8)", GAME_FLAGS )
-GAME( 2002?, gamt10h,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 9)", GAME_FLAGS )
+GAME( 2002?, gamt10,      0,        gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 1)",  GAME_FLAGS )
+GAME( 2002?, gamt10a,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 2)",  GAME_FLAGS )
+GAME( 2002?, gamt10b,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 3)",  GAME_FLAGS )
+GAME( 2002?, gamt10c,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 4)",  GAME_FLAGS )
+GAME( 2002?, gamt10d,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 5)",  GAME_FLAGS )
+GAME( 2002?, gamt10e,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 6)",  GAME_FLAGS )
+GAME( 2002?, gamt10f,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 7)",  GAME_FLAGS )
+GAME( 2002?, gamt10g,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 8)",  GAME_FLAGS )
+GAME( 2002?, gamt10h,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 9)",  GAME_FLAGS )
 GAME( 2002?, gamt10i,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 10)", GAME_FLAGS )
 GAME( 2002?, gamt10j,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 11)", GAME_FLAGS )
 GAME( 2002?, gamt10k,     gamt10,   gaminator, gaminator, gaminator_state, init_gaminator, ROT0, "Novotech", "Gaminator 10 (set 12)", GAME_FLAGS )

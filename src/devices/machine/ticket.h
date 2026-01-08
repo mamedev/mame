@@ -66,6 +66,7 @@ class hopper_device : public ticket_dispenser_device
 {
 public:
 	// construction/destruction
+	hopper_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 	hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, const attotime &period)
 		: hopper_device(mconfig, tag, owner)
 	{
