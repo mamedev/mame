@@ -402,10 +402,9 @@ void atarisy1_state::coin_counter_left_w(int state)
  *
  *************************************/
 
-void atarisy1_state::main_map(address_map &map)
+void atarisy1_state::main_map_noslapstic(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x080000, 0x081fff).mirror(0x6000).bankr(m_slapstic_bank); // slapstic maps here
 	map(0x2e0000, 0x2e0001).r(FUNC(atarisy1_state::int3state_r));
 	map(0x400000, 0x401fff).ram();
 	map(0x800000, 0x800001).w(FUNC(atarisy1_state::xscroll_w)).share(m_xscroll);
@@ -429,7 +428,11 @@ void atarisy1_state::main_map(address_map &map)
 	map(0xfe0001, 0xfe0001).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 }
 
-
+void atarisy1_state::main_map(address_map &map)
+{
+	main_map_noslapstic(map);
+	map(0x080000, 0x081fff).mirror(0x6000).bankr(m_slapstic_bank); // slapstic maps here
+}
 
 /*************************************
  *
@@ -591,6 +594,41 @@ static INPUT_PORTS_START( indytemc )
 	PORT_CONFNAME( 0x0200, 0x0000, DEF_STR( Flip_Screen ) ) // P103-21
 	PORT_CONFSETTING(      0x0200, DEF_STR( On ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( reliefs1 )
+	PORT_START("IN0")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
+
+	PORT_START("IN1")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("IN2")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(2)
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
+
+	PORT_START("F60000")    // F60000
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // 68KBUF
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("1820")  // 1820 (sound)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch", FUNC(generic_latch_8_device::pending_r)) // 68KBUF
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("mainlatch", FUNC(generic_latch_8_device::pending_r)) // SNDBUF
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
 
 
@@ -871,6 +909,20 @@ void atarisy1_state::roadb110(machine_config &config)
 	m_adc->in_callback<2>().set_ioport("IN1");
 }
 
+void atarisy1_state::reliefs1(machine_config &config)
+{
+	atarisy1(config);
+	add_speech(config);
+	add_adc(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy1_state::main_map_noslapstic);
+
+	// Hall-effect analog joysticks
+	m_adc->in_callback<4>().set_ioport("IN2"); // not having this mapped shows more service mode tests 
+	m_adc->in_callback<5>().set_ioport("IN3"); // but is correct according to the joystick test?
+
+	m_adc->in_callback<6>().set_ioport("IN0");
+	m_adc->in_callback<7>().set_ioport("IN1");
+}
 
 
 /*************************************
@@ -2488,6 +2540,64 @@ ROM_START( roadblstc1 )
 ROM_END
 
 
+ROM_START( reliefs1 ) // LSI CART 2
+	ROM_REGION( 0x88000, "maincpu", 0 )
+	MOTHERBOARD_BIOS
+	ROM_DEFAULT_BIOS("lsi") // only works with LSI BIOS
+
+	ROM_LOAD16_BYTE( "rp-pgm-10k-hi-c45.bin", 0x010000, 0x008000, CRC(548c0276) SHA1(1bb10b398b5396a7ff8cb02841f03fcdedece7d8) )
+	ROM_LOAD16_BYTE( "rp-pgm-10k-lo-c44.bin", 0x010001, 0x008000, CRC(ca37684a) SHA1(a89f0b7efe331deecc5d0fdf3a1d6fb11ce17b95) )
+	ROM_LOAD16_BYTE( "rp-pgm-20k-hi-c58.bin", 0x020000, 0x008000, CRC(dd5c53c7) SHA1(1ca05339b3be009712abdc90528108ae0ef49fd6) )
+	ROM_LOAD16_BYTE( "rp-pgm-20k-lo-c57.bin", 0x020001, 0x008000, CRC(f064da9f) SHA1(1ac57b27d2c93f924a1e6c29532db5a47110f859) )
+	ROM_LOAD16_BYTE( "rp-pgm-30k-hi-c72.bin", 0x030000, 0x008000, CRC(da0d7a9c) SHA1(4dd5829a9d4f4946d1d71c0b06bf9b7daf84133a) )
+	ROM_LOAD16_BYTE( "rp-pgm-30k-lo-c71.bin", 0x030001, 0x008000, CRC(247faea5) SHA1(96bf19fd57522b28dbcb421321bdc3404aeb2673) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
+	ROM_LOAD( "rp-snd-4k-c68.bin", 0x4000, 0x4000, CRC(f6ff3d90) SHA1(ea93ea4331d6f38d67665b6b4c788a0d24309f56) )
+	ROM_LOAD( "rp-snd-8k-c73.bin", 0x8000, 0x4000, CRC(932b3ca0) SHA1(d1b8a2137a889cc4df5336a050f509f4edc23917) )
+	ROM_LOAD( "rp-snd-ck-c78.bin", 0xc000, 0x4000, CRC(7c5819db) SHA1(dc11d1a26cb98c8a90e2f220af66fddec228cf05) )
+
+	ROM_REGION( 0x2000, "alpha", 0 )
+	MOTHERBOARD_ALPHA
+
+  	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
+	ROM_LOAD( "rp-p0-1.c14.bin",  0x000000, 0x008000, CRC(fe82b82d) SHA1(56319cc7df1ac368443335a4ce9ef97b3585c6a9) )  /* bank 1, plane 0 */
+	ROM_LOAD( "rp-p1-1.c36.bin",  0x010000, 0x008000, CRC(8ebbbd7b) SHA1(d8c3a438d0416e81ce74dc870e1519ade858ae86) )  /* bank 1, plane 1 */
+	ROM_LOAD( "rp-p2-1.c16.bin",  0x020000, 0x008000, CRC(bdffa7ea) SHA1(33d8de21d0b8a1eddfce97bf7304ec2a416f2816) )  /* bank 1, plane 2 */
+	ROM_LOAD( "rp-p3-1.c38.bin",  0x030000, 0x008000, CRC(fb8866bc) SHA1(58dc64a49c75bcae80a3c508e1f34fd7a57f81e0) )  /* bank 1, plane 3 */
+
+	ROM_LOAD( "rp-p0-2.c10.bin",  0x080000, 0x008000, CRC(d2b0d119) SHA1(12531f8916321f0504f2efd2144c7d2f1b05a63c) )  /* bank 2, plane 0 */
+	ROM_LOAD( "rp-p1-2.c32.bin",  0x090000, 0x008000, CRC(0aa69c1e) SHA1(7a3b0dbed48893011b9fbcbd5e85efa86f37b246) )  /* bank 2, plane 1 */
+	ROM_LOAD( "rp-p2-2.c12.bin",  0x0a0000, 0x008000, CRC(27f6000a) SHA1(dd0174bc07d420b8daebd1abcfd3ed7e4d9c1d13) )  /* bank 2, plane 2 */
+	ROM_LOAD( "rp-p3-2.c34.bin",  0x0b0000, 0x008000, CRC(621f28f5) SHA1(e3b7076539ea49ac60869e579f3270dec46f43ec) )  /* bank 2, plane 3 */
+
+	ROM_LOAD( "rp-p0-3.c5.bin",   0x100000, 0x008000, CRC(6f05880e) SHA1(f77cd00b3040e46699eaad49787e8392ef072e0d) )  /* bank 3, plane 0 */
+	ROM_LOAD( "rp-p1-3.c27.bin",  0x110000, 0x008000, CRC(9b5a8f6b) SHA1(f3db5544c822a34ac969be319c2a79a1f8e1feb2) )  /* bank 3, plane 1 */
+	ROM_LOAD( "rp-p2-3.c7.bin",   0x120000, 0x008000, CRC(acc1586d) SHA1(d5fe9a094b97646848f81b535e7dc440ec6a83ee) )  /* bank 3, plane 2 */
+	ROM_LOAD( "rp-p3-3.c29.bin",  0x130000, 0x008000, CRC(ffc1b0f7) SHA1(75ea72029c5cf753d6dc7b3fda1b24a9f87ec104) )  /* bank 3, plane 3 */
+
+	ROM_LOAD( "rp-p0-4.c1.bin",   0x180000, 0x008000, CRC(a933d798) SHA1(6a04412977df418f87165b0632a72d4b82e1c0de) )  /* bank 4, plane 0 */
+	ROM_LOAD( "rp-p1-4.c23.bin",  0x190000, 0x008000, CRC(6946f9e5) SHA1(18e60bed9946a8960c13d2457cf14f9f7f11a82d) )  /* bank 4, plane 1 */
+	ROM_LOAD( "rp-p2-4.c3.bin",   0x1a0000, 0x008000, CRC(34141ef7) SHA1(25682c8d338bf0eb55d6375935097ad14ad35bb5) )  /* bank 4, plane 2 */
+	ROM_LOAD( "rp-p3-4.c25.bin",  0x1b0000, 0x008000, CRC(3f94cd0a) SHA1(75abd5b986a3d3ca7585124d4c07c2fcfa20123d) )  /* bank 4, plane 3 */
+
+	ROM_LOAD( "rp-p0-5.c15.bin",  0x200000, 0x008000, CRC(5e7e1f00) SHA1(7de8b9e45ac50c6c106dab1cc766ab73fb76c778) )  /* bank 5, plane 0 */
+	ROM_LOAD( "rp-p1-5.c37.bin",  0x210000, 0x008000, CRC(52ed4c87) SHA1(8ee8561bf1fd26a24bd64576ec231ed1075078a9) )  /* bank 5, plane 1 */
+	ROM_LOAD( "rp-p2-5.c6.bin",   0x220000, 0x008000, CRC(09c7608c) SHA1(9ddf8f2b706b4a9fe892b5af0f2197690bf79060) )  /* bank 5, plane 2 */
+	ROM_LOAD( "rp-p3-5.c28.bin",  0x230000, 0x008000, CRC(b87580ae) SHA1(83021e26f17b0ab2ad285fab5d7440e816e908dd) )  /* bank 5, plane 3 */
+
+	ROM_LOAD( "rp-p0-6.c11.bin",  0x280000, 0x008000, CRC(cb5b2352) SHA1(3225ed1c9258142ae741cc3c91eeef42c65d9eb3) )  /* bank 6, plane 0 */
+	ROM_LOAD( "rp-p1-6.c33.bin",  0x290000, 0x008000, CRC(bd16718f) SHA1(9f60c7442377e5380a72d160332a5dbe89e0f164) )  /* bank 6, plane 1 */
+	ROM_LOAD( "rp-p2-6.c2.bin",   0x2a0000, 0x008000, CRC(7a4f1469) SHA1(169db315d42fca7de1de1f84e54f018a5a54ca4c) )  /* bank 6, plane 2 */
+	ROM_LOAD( "rp-p3-6.c24.bin",  0x2b0000, 0x008000, CRC(f15426d3) SHA1(21e564973efde7e814a74aec8bfc56fd19492575) )  /* bank 6, plane 3 */
+
+	ROM_REGION( 0x400, "proms", 0 ) /* graphics mapping PROMs */
+	ROM_LOAD( "brlf24k_bs.a7", 0x000, 0x200, CRC(62b8ff72) SHA1(83fdf2b554a10787598bcdaebd45765bb8842013) )
+	ROM_LOAD( "brlf24k_ps.a5", 0x200, 0x200, CRC(eaee166e) SHA1(c958b65d8bca08eeebef589e03e04024100534e4) )
+
+	ROM_REGION( 0x201, "motherbrd_proms", 0) /* Motherboard PROM's (Only used by TTL version.) */
+	MOTHERBOARD_PROMS
+ROM_END
 
 
 
@@ -2542,6 +2652,11 @@ void atarisy1_state::init_roadblst()
 	m_trackball_type = 2;   /* steering wheel */
 }
 
+void atarisy1_state::init_reliefs1()
+{
+	m_trackball_type = 0;   /* none */
+}
+
 
 
 /*************************************
@@ -2582,3 +2697,6 @@ GAME( 1987, roadblstc,  roadblst, roadb110, roadblst, atarisy1r_state, init_road
 GAME( 1987, roadblstcg, roadblst, roadb109, roadblst, atarisy1r_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, German, rev 1)", 0 )
 GAME( 1987, roadblstc1, roadblst, roadb109, roadblst, atarisy1r_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (cockpit, rev 1)", 0 )
 GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1r_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )
+
+// not a clone of relief because it needs to be a clone of atarisy1 BIOS and it's more like an unreleased prequel than a version of the released title
+GAME( 1986, reliefs1,   atarisy1, reliefs1, reliefs1, atarisy1_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )
