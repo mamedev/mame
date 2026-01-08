@@ -628,14 +628,22 @@ void jaguardsp_cpu_device::execute_run()
 void jaguar_cpu_device::abs_rn(u16 op)
 {
 	const u8 dreg = op & 31;
-	u32 res = m_r[dreg];
-	CLR_ZNC();
-	if (res & 0x80000000)
+	s32 res = (s32)m_r[dreg];
+
+	// "does not work for value 800'0000h", assume missing zero typo.
+	// towers2 and chekflag will hit this, unknown purpose
+	if (res == 0x80000000)
 	{
-		m_r[dreg] = res = -res;
-		m_flags |= CFLAG;
+		m_flags |= NFLAG;
 	}
-	SET_Z(res);
+	else
+	{
+		CLR_ZNC();
+		const bool carry_flag = BIT(res, 31);
+		m_flags |= carry_flag << 1;
+		m_r[dreg] = std::abs(res);
+		SET_Z(res);
+	}
 }
 
 void jaguar_cpu_device::add_rn_rn(u16 op)
@@ -1579,7 +1587,8 @@ void jaguardsp_cpu_device::modulo_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 jaguardsp_cpu_device::high_accum_r()
 {
-	logerror("%s: high 16-bit accumulator read\n", this->tag());
+	if (!machine().side_effects_disabled())
+		logerror("%s: high 16-bit accumulator read\n", this->tag());
 	return (m_accum >> 32) & 0xff;
 }
 
