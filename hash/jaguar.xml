@@ -641,18 +641,20 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-"Another Great Game" then black screen. bp 11eeb4,1,{curpc+=2;g} 68k illegal opcode (???)
+"Another Great Game" then black screen. (fixed, see below)
 Known to require tight [GPU] pipeline timings (?)
 Can crash during gameplay
 ]]></notes>
 
 		<info name="serial" value="J9040E 700740-002"/>
 		<part name="cart" interface="jaguar_cart">
-			<dataarea name="rom" size="2097152" width="32" endianness="big">
+			<dataarea name="rom" size="0x400000" width="32" endianness="big">
 				<!-- below dump was mirrored
 				<rom name="flip out (world).j64" size="4194304" crc="fae31dd0" sha1="61d4db841c090ae3104eb20b6087160ff80e7a12" offset="000000" />
 				-->
-				<rom name="flip out (world).j64" size="2097152" crc="892bc67c" sha1="886cbbaa434d6e1e7fc4401bb6d176c2788c4d19" offset="000000" />
+				<rom name="flip out (world).j64" size="0x200000" crc="892bc67c" sha1="886cbbaa434d6e1e7fc4401bb6d176c2788c4d19" offset="000000" />
+				<!-- assert program flow against $a02000 pointer at PC=11eeaa, needs mirror -->
+				<rom offset="0x200000" size="0x200000" loadflag="reload" />
 			</dataarea>
 		</part>
 	</software>
