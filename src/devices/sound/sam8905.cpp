@@ -102,6 +102,7 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 	uint8_t emitter_sel = (inst >> 9) & 0x3;
 	bool wsp = BIT(inst, 8);
 
+
 	uint32_t bus = 0;
 	uint32_t dram_addr = (slot_idx << 4) | mad;
 
@@ -129,6 +130,19 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 	// WA (Write A)
 	if (!BIT(inst, 7)) {
 		bool wphi_active = !BIT(inst, 4);
+
+		// Debug: trace WA/WA_WSP for slot 2 when active
+		uint32_t p15 = m_dram[(slot_idx << 4) | 15];
+		uint8_t alg = (p15 >> 8) & 0x7;
+		if (slot_idx == 2 && alg == 2) {
+			static int wa_trace = 0;
+			if (wa_trace < 60) {
+				logerror("WA S2: inst=0x%04X mad=%d bus=0x%05X wsp=%d wphi=%d -> %s\n",
+					inst, mad, bus, wsp, wphi_active,
+					(wsp && !wphi_active) ? "WA_WSP" : "normalWA");
+				wa_trace++;
+			}
+		}
 
 		// "WPHI WSP takes priority over WA WSP giving a normal WA" (Section 8-3)
 		if (wsp && !wphi_active) {
@@ -165,21 +179,39 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 			// WM WSP Truth Table (Section 8-4)
 			if (!slot.clear_rqst) write_enable = false;
 			else if (carry) write_enable = false;
-			// Debug: trace WM WSP for envelope words
-			if (mad == 2 || mad == 8 || mad == 10 || mad == 12) {
-				logerror("WM WSP slot%d word%d: clrq=%d carry=%d int_mod=%d A=%05X B=%05X -> write=%d bus=%05X\n",
-					slot_idx, mad, slot.clear_rqst, carry, slot.int_mod, slot.a, slot.b, write_enable, bus);
-			}
-			// Interrupt generation per Section 8-4 WM WSP Truth Table:
-			// IRQ fires when CLEARRQST=1 AND (INTMOD=1 OR CARRY=1)
-			// The latch is ALWAYS updated (CPU polls it), but M bit masks the actual interrupt signal
-			bool request_irq = slot.clear_rqst && (slot.int_mod || carry);
-			if (request_irq) {
+
+			// Interrupt latch: set when CLEARRQST=1 AND (INTMOD=1 OR CARRY=1)
+			bool irq_condition = slot.clear_rqst && (slot.int_mod || carry);
+			if (irq_condition) {
 				uint8_t new_latch = (slot_idx << 4) | mad;
 				if (m_interrupt_latch != new_latch)
-					logerror("SAM IRQ latch: slot %d word %d (latch %02X -> %02X)\n", slot_idx, mad, m_interrupt_latch, new_latch);
+					logerror("SAM IRQ latch SET: slot %d word %d (latch %02X -> %02X) intmod=%d carry=%d\n",
+						slot_idx, mad, m_interrupt_latch, new_latch, slot.int_mod, carry);
 				m_interrupt_latch = new_latch;
-				// TODO: If M=0, also assert interrupt line (not implemented yet)
+			}
+
+			// Debug: trace when IRQ WOULD fire if intmod wasn't cleared
+			if (slot_idx == 2 && mad == 2 && slot.clear_rqst && !irq_condition) {
+				static int debug_count = 0;
+				if (debug_count < 5) {
+					logerror("WM_WSP S2W2: IRQ blocked - clrq=%d intmod=%d carry=%d (needs intmod=1 or carry=1)\n",
+						slot.clear_rqst, slot.int_mod, carry);
+					debug_count++;
+				}
+			}
+			// Debug: trace WM WSP for slots 0,1,2 when word 2 (amplitude)
+			if (mad == 2 && slot_idx <= 2) {
+				uint32_t p15 = m_dram[(slot_idx << 4) | 15];
+				uint8_t alg = (p15 >> 8) & 0x7;
+				if (alg > 0) { // only when slot is active
+					static int trace_count = 0;
+					if (trace_count < 40) {
+						logerror("WM_WSP S%dW2: ALG=%d A=0x%05X B=0x%05X bus=0x%05X b_neg=%d carry=%d clrq=%d intmod=%d IRQ=%d\n",
+							slot_idx, alg, slot.a, slot.b, bus, BIT(slot.b, 18), carry, slot.clear_rqst, slot.int_mod,
+							slot.clear_rqst && (slot.int_mod || carry));
+						trace_count++;
+					}
+				}
 			}
 		}
 		if (write_enable) m_dram[dram_addr] = bus;
@@ -270,6 +302,12 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 				static uint32_t last_p15[16] = {0};
 				if (param15 != last_p15[s]) {
 					logerror("Slot %d active: ALG=%d param15=0x%05X\n", s, alg, param15);
+					// Dump ALG microcode when slot becomes active
+					if ((s <= 2 && alg == 1) || (s == 2 && alg == 2)) {
+						for (int i = 0; i < 30; i++) {
+							logerror("ALG%d[%02d]: 0x%04X\n", alg, i, m_aram[pc_start + i]);
+						}
+					}
 					last_p15[s] = param15;
 				}
 			}
@@ -319,8 +357,13 @@ void sam8905_device::write(offs_t offset, uint8_t data)
 					logerror("A-RAM[%02X] = 0x%04X\n", m_address_reg, m_data_latch & 0x7FFF);
 				} else {
 					m_dram[m_address_reg] = m_data_latch & MASK19;
-					// Temporary debug: log all D-RAM writes
-					logerror("D-RAM[%02X] = 0x%05X (slot %d, word %d)\n", m_address_reg, m_data_latch & MASK19, (m_address_reg >> 4) & 0xF, m_address_reg & 0xF);
+					// Debug: log D-RAM writes for envelope words (2,3) on slots 0,1,2
+					int slot = (m_address_reg >> 4) & 0xF;
+					int word = m_address_reg & 0xF;
+					if ((slot <= 2) && (word == 2 || word == 3 || word == 15)) {
+						logerror("CPU D-RAM[%02X] = 0x%05X (slot %d, word %d)\n",
+							m_address_reg, m_data_latch & MASK19, slot, word);
+					}
 				}
 			} else { // WR=0: Read Request - latch RAM data
 				if (BIT(data, 1)) {
@@ -345,7 +388,8 @@ uint8_t sam8905_device::read(offs_t offset)
 		case 3: result = (m_data_latch >> 16) & 0x07; break; // MSB (3 bits for D-RAM)
 		case 4: result = m_control_reg; break;
 	}
-	if (offset == 0)
+	if (offset == 0) {
 		logerror("SAM read IRQ latch: %02X\n", result);
+	}
 	return result;
 }

@@ -355,7 +355,7 @@ u8 keyfox10_state::sam8905_r(int chip, offs_t offset)
 
     // Pass through to actual SAM8905 device
     u8 data = sam_dev.read(offset);
-    LOGMASKED(LOG_SAM, "SAM[%s] read [%d] = 0x%02X\n", chip_name, offset, data);
+    LOGMASKED(LOG_SAM, "SAM[%s] read [%d] = 0x%02X PC=%04X\n", chip_name, offset, data, m_maincpu->pc());
 
     return data;
 }
@@ -378,12 +378,13 @@ void keyfox10_state::sam8905_w(int chip, offs_t offset, u8 data)
     {
         // A2=1: Write control byte
         sam.ctrl = data;
-        LOGMASKED(LOG_SAM, "SAM[%s] ctrl = 0x%02X (SSR=%d IDL=%d SEL=%s WR=%s)\n",
+        LOGMASKED(LOG_SAM, "SAM[%s] ctrl = 0x%02X (SSR=%d IDL=%d SEL=%s WR=%s) PC=%04X\n",
             chip_name, data,
             BIT(data, 3),  // SSR
             BIT(data, 2),  // IDL
             BIT(data, 1) ? "A-RAM" : "D-RAM",  // SEL
-            BIT(data, 0) ? "write" : "read");  // WR
+            BIT(data, 0) ? "write" : "read",  // WR
+            m_maincpu->pc());
         return;
     }
 
@@ -391,7 +392,7 @@ void keyfox10_state::sam8905_w(int chip, offs_t offset, u8 data)
     {
         // A2=0, A1=0, A0=0: Write address selection byte
         sam.addr = data;
-        LOGMASKED(LOG_SAM, "SAM[%s] addr = 0x%02X\n", chip_name, data);
+        LOGMASKED(LOG_SAM, "SAM[%s] addr = 0x%02X PC=%04X\n", chip_name, data, m_maincpu->pc());
         return;
     }
 
@@ -441,8 +442,8 @@ void keyfox10_state::sam8905_w(int chip, offs_t offset, u8 data)
         {
             // MSB (5 high bits undefined, mask to 3 bits)
             sam.dram[sam.addr % 256] = (sam.dram[sam.addr % 256] & 0x00ffff) | ((data & 0x07) << 16);
-            LOGMASKED(LOG_SAM, "SAM[%s] D-RAM[0x%02X] write MSB = 0x%02X -> word = 0x%05X\n",
-                chip_name, sam.addr, data, sam.dram[sam.addr % 256]);
+            LOGMASKED(LOG_SAM, "SAM[%s] D-RAM[0x%02X] write MSB = 0x%02X -> word = 0x%05X PC=%04X\n",
+                chip_name, sam.addr, data, sam.dram[sam.addr % 256], m_maincpu->pc());
             // Watch check
             if (m_sam_watch_dram >= 0) // && (sam.addr % 256) == u8(m_sam_watch_dram))
             {
@@ -508,6 +509,9 @@ void keyfox10_state::machine_start()
         fprintf(m_gal_log, "# Format: ~RD ~WR ~PSEN A15 A14 A13 T0 T1 | hex | access\n");
         fprintf(m_gal_log, "# 0=active, 1=inactive for active-low signals\n");
     }
+
+    // Memory tap for slot state not working with shared RAM
+    // Will monitor slot state via D-RAM watch instead
 
     // Install memory taps to capture all accesses
     m_maincpu->space(AS_PROGRAM).install_read_tap(0x0000, 0xffff, "gal_psen",
@@ -614,15 +618,31 @@ void keyfox10_state::dump_sam_memory() const
 
 // SAM8905 external waveform ROM read handlers
 // Address format: WA[19:0] = { WAVE[7:0], PHI[11:0] }
-// ROM address: WA[18:2] (17 bits → 128KB ROM)
+// Per SAM8905 programmer's guide: "8 bits + 12 upper phase bits" = 20-bit address
+// Hardware mapping: WA19=ROM select (WAVE[7]), WA0-WA1=skipped (fractional)
+// Testing 1024 samples/wave: ROM = (WAVE[6:0] << 10) | PHI[11:2]
 // Data: 8-bit ROM → sign-extended to 12-bit
 u16 keyfox10_state::sam_snd_waveform_r(offs_t offset)
 {
-    // offset = 20-bit address from SAM8905
-    // ROM address = offset >> 2 (skip lower 2 fractional bits)
-    // Upper bit (WA19) selects ROM: 0 = Samples (IC17), 1 = Rhythms (IC14)
-    uint32_t rom_addr = (offset >> 2) & 0x1FFFF;  // 17-bit ROM address
-    bool use_rhythm = BIT(offset, 19);  // WA19 selects ROM
+    // offset = 20-bit address from SAM8905: { WAVE[7:0], PHI[11:0] }
+    // Per programmer's guide: 8 bits WAVE + 12 bits PHI = 20 bits
+    // After skipping WA[1:0] (fractional): 17 bits for ROM
+    // Option A (512 samples/wave): ROM = (WAVE[7:0] << 9) | PHI[10:2]
+    // Option B (1024 samples/wave): ROM = (WAVE[6:0] << 10) | PHI[11:2]
+    // Testing Option B based on "12 upper phase bits" = 10 bits after skipping 2
+    uint32_t wave = (offset >> 12) & 0x7F;   // WAVE[6:0] - 7 bits (128 wave slots)
+    uint32_t phi = offset & 0xFFF;           // PHI[11:0]
+    uint32_t phi_int = (phi >> 2) & 0x3FF;   // PHI[11:2] - 10 bits (1024 samples/wave)
+    uint32_t rom_addr = (wave << 10) | phi_int;  // 17-bit ROM address
+    bool use_rhythm = BIT(offset, 19);  // WA19 = WAVE[7] selects ROM
+
+    static int log_count = 0;
+    // Only log when WAVE is non-zero (actual waveform being played)
+    if (wave != 0 && log_count < 200) {
+        LOGMASKED(LOG_SAM, "SAM waveform: offset=%05X WAVE=%02X PHI=%03X phi_int=%03X rom=%05X\n",
+                  offset, wave, phi, phi_int, rom_addr);
+        log_count++;
+    }
 
     u8 sample;
     if (use_rhythm)
@@ -636,8 +656,10 @@ u16 keyfox10_state::sam_snd_waveform_r(offs_t offset)
 
 u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
 {
-    // FX chip uses same ROM mapping
-    uint32_t rom_addr = (offset >> 2) & 0x1FFFF;
+    // FX chip uses same ROM mapping as SND: (WAVE[6:0] << 10) | PHI[11:2]
+    uint32_t wave = (offset >> 12) & 0x7F;   // WAVE[6:0] - 7 bits
+    uint32_t phi_int = ((offset & 0xFFF) >> 2) & 0x3FF;  // PHI[11:2] - 10 bits
+    uint32_t rom_addr = (wave << 10) | phi_int;
     bool use_rhythm = BIT(offset, 19);
 
     u8 sample;

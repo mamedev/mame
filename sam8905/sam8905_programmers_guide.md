@@ -736,7 +736,7 @@ The constants are derived from the MAD part of the micro-instruction, as defined
 | Receiver | Modification                                                                                                        |
 |----------|---------------------------------------------------------------------------------------------------------------------|
 | **WPHI** | WSP: PHI loaded but WF forced to 1 (select internal sinus). WPHI WSP takes priority other WA WSP giving a normal WA |
-| **WXY**  | XSP (probably 'WSP'): Y and MIX loaded                                                                              |
+| **WXY**  | WSP: Y and MIX loaded                                                                                               |
 | **WA**   | WSP: expects an E\|WAVE\|finalWAVE format on the bus (see §4)                                                       |
 
 ### WA WSP Truth Table:
