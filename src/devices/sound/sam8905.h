@@ -48,7 +48,7 @@ private:
 
 	// Helpers
 	void execute_cycle(int slot_idx, uint16_t inst);
-	int32_t get_waveform(uint32_t wf, uint32_t phi, uint8_t mad);
+	int32_t get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int slot_idx);
 	uint32_t get_constant(uint8_t mad);
 
 	// External waveform memory callback

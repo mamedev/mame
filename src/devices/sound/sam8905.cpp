@@ -49,7 +49,7 @@ uint32_t sam8905_device::get_constant(uint8_t mad)
 	return constants[mad & 0xf];
 }
 
-int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad)
+int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int slot_idx)
 {
 	phi &= 0xFFF; // 12-bit phase
 	bool internal = (wf & 0x100);
@@ -79,6 +79,13 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad)
 		if (!m_waveform_read.isunset()) {
 			// Build 20-bit address: WAVE[7:0] | PHI[11:0]
 			uint32_t addr = ((wf & 0xFF) << 12) | phi;
+
+			// Debug: trace waveform addresses for slot 2
+			static int wf_trace = 0;
+			if (slot_idx == 2 && wf_trace < 30) {
+				logerror("EXT_WF S2: wf=0x%03X phi=0x%03X addr=0x%05X\n", wf, phi, addr);
+				wf_trace++;
+			}
 
 			// Read 12-bit sample from external ROM
 			int16_t sample = m_waveform_read(addr);
@@ -114,19 +121,21 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 		case 3: bus = 0; break; // RSP (NOP)
 	}
 
-	// Carry calculation (Section 8-1) - only updated by RADD, persists for WSP
-	// When B positive: carry=1 if A+B overflows 19 bits
-	// When B negative: carry=1 if result is positive, carry=0 if result went negative
-	// This allows envelope to decay while positive, and stop when it goes negative
-	if (emitter_sel == 1) {  // RADD - update carry
+	// Helper lambda to update carry - called after any change to A or B
+	// Carry calculation per Table 3:
+	// - B positive (bit 18=0): carry = 19-bit overflow from addition
+	// - B negative (bit 18=1): carry = result is positive (sign bit = 0)
+	auto update_carry = [&slot]() {
 		bool b_neg = BIT(slot.b, 18);
-		uint32_t result = (slot.a + slot.b) & MASK19;
+		uint32_t sum = slot.a + slot.b;
 		if (!b_neg)
-			slot.carry = ((uint64_t)slot.a + slot.b) > MASK19;
+			slot.carry = (sum > MASK19);  // 19-bit overflow
 		else
-			slot.carry = !BIT(result, 18);
-	}
-	// Use slot.carry for all WSP operations (persists from last RADD)
+			slot.carry = !BIT(sum & MASK19, 18);  // For envelope: positive result
+	};
+
+	// Initial carry state from current A,B
+	update_carry();
 
 	// Receivers (Active Low except WSP)
 	// WA (Write A)
@@ -154,6 +163,16 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 			bool end_bit = BIT(bus, 18);
 			bool wf_match = (wave == final_wave);
 
+			// Debug: trace WA_WSP carry state for slot 2
+			if (slot_idx == 2 && alg == 2) {
+				static int wsp_trace = 0;
+				if (wsp_trace < 30) {
+					logerror("WA_WSP S2: A=0x%05X B=0x%05X wave=%03X final=%03X carry=%d\n",
+						slot.a, slot.b, wave, final_wave, slot.carry);
+					wsp_trace++;
+				}
+			}
+
 			// Debug: trace when wave reaches finalWave for external sample slots
 			if (wf_match && slot.carry && alg == 2) {
 				static int match_count = 0;
@@ -172,17 +191,22 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 				slot.a = 0; slot.int_mod = true;
 				slot.clear_rqst = end_bit;
 			}
+			update_carry();  // A changed
 		} else {
 			// Normal WA: load A from bus
 			// Per Section 8-3: "WA (without WSP) always sets CLEARRQST and clears INTMOD"
 			slot.a = bus;
 			slot.clear_rqst = true;
 			slot.int_mod = false;
+			update_carry();  // A changed
 		}
 	}
 
 	// WB (Write B)
-	if (!BIT(inst, 6)) slot.b = bus;
+	if (!BIT(inst, 6)) {
+		slot.b = bus;
+		update_carry();  // B changed
+	}
 
 	// WM (Write Memory)
 	if (!BIT(inst, 5)) {
@@ -230,15 +254,27 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 	}
 
 	// WPHI (Write Phase)
+	// PHI register is 12 bits, extracted from bits 18:7 of the 19-bit bus
+	// Lower 7 bits are fractional precision in D-RAM, upper 12 bits are the actual phase
 	if (!BIT(inst, 4)) {
-		slot.phi = (bus >> 7) & 0xFFF;
+		slot.phi = (bus >> 7) & 0xFFF;  // Upper 12 bits for waveform address
 		if (wsp) slot.wf = 0x100; // Force Internal Sinus
 	}
 
 	// WXY (Write Multiplier)
 	if (!BIT(inst, 3)) {
 		slot.y = (bus >> 7) & 0xFFF;
-		slot.x = get_waveform(slot.wf, slot.phi, mad) & 0xFFF;
+		// Debug: trace waveform call for slot 2 when active
+		uint32_t p15_wxy = m_dram[(slot_idx << 4) | 15];
+		uint8_t alg_wxy = (p15_wxy >> 8) & 0x7;
+		if (slot_idx == 2 && alg_wxy == 2) {
+			static int wxy_trace = 0;
+			if (wxy_trace < 30) {
+				logerror("WXY S2: slot.wf=0x%03X slot.phi=0x%03X\n", slot.wf, slot.phi);
+				wxy_trace++;
+			}
+		}
+		slot.x = get_waveform(slot.wf, slot.phi, mad, slot_idx) & 0xFFF;
 		if (wsp) {
 			slot.mix_l = (bus >> 3) & 0x7;
 			slot.mix_r = bus & 0x7;
@@ -249,7 +285,10 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 	}
 
 	// clearB
-	if (!BIT(inst, 2)) slot.b = 0;
+	if (!BIT(inst, 2)) {
+		slot.b = 0;
+		update_carry();  // B changed
+	}
 
 	// WWF (Write Waveform)
 	if (!BIT(inst, 1)) slot.wf = (bus >> 9) & 0x1FF;
@@ -384,6 +423,13 @@ void sam8905_device::write(offs_t offset, uint8_t data)
 				} else {
 					// D-RAM selected (19-bit)
 					m_data_latch = m_dram[m_address_reg] & MASK19;
+					// Log D-RAM reads for slot 2
+					int slot = (m_address_reg >> 4) & 0xF;
+					int word = m_address_reg & 0xF;
+					if (slot == 2) {
+						logerror("CPU D-RAM READ[%02X] = 0x%05X (slot %d, word %d)\n",
+							m_address_reg, m_data_latch, slot, word);
+					}
 				}
 			}
 			break;
