@@ -35,9 +35,16 @@ public:
 		, m_frets(*this, "GC%u", 0)
 	{ }
 
-	void dg10(machine_config &config);
-	void dg20(machine_config &config);
+	void dg10(machine_config &config) ATTR_COLD;
+	void dg20(machine_config &config) ATTR_COLD;
 
+	DECLARE_INPUT_CHANGED_MEMBER(string_set_w);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
 	void keys_w(offs_t offset, u8) { m_key_sel = offset; }
 	u8 keys_r();
 
@@ -46,16 +53,10 @@ public:
 
 	u8 strings_r() { return m_strings; }
 	void strings_clr_w(offs_t offset, u8) { m_strings &= offset; }
-	DECLARE_INPUT_CHANGED_MEMBER(string_set_w);
 
 	void filter_w(u8 data);
 	void effects_w(u8 data);
 
-protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
-private:
 	void maincpu_map(address_map &map) ATTR_COLD;
 
 	required_device<upd78c10_device> m_maincpu;
