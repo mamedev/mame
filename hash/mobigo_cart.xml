@@ -6,9 +6,120 @@ license:CC0-1.0
 <softwarelist name="mobigo_cart" description="VTech MobiGo cartridges">
 
 	<!-- This list is ordered by game description -->
-	<!-- Dummy carts (just a jumper PCB, without ROM) that enable internal games in the BIOS:
-	    80-250700 - Touch & Learn - Game Pack (US)
-	    80-250704 - MobiGo 2 (GE) -->
+	<!--
+	Language:
+********0 = US                (White labels on back)
+********1 = Italy             Apparently distributed by company 'Giochi Preziosi'
+********2 = Netherlands       (Red or White labels on back)
+********3 = UK                (Red labels on back)
+********4 = Germany           (Blue labels on back)
+********5 = France            (Yellow labels on back, also for NTSC French-Canadian)
+********6 = Portugal          Apparently distributed by company 'Concentra' (White labels on back)
+********7 = Spain             (Green labels on back)
+********8 = China
+*******10 = Korea
+*******13 = Denmark           Distributed by the company 'Top Toy A/S'
+*******14 = Sweden            Distributed by the company 'Top Toy A/S'
+*******15 = Norway
+*******?? = Finland
+	
++========+===================+============================================================================+
+| Dumped |      Serial       |                                    Name                                    |
++========+===================+============================================================================+
+|   XX   | 80-250000(US)     | Shrek Forever After                                                        |
+|   XX   | 80-250004(GE)     | Für immer Shrek                                                            |
+|        | 80-250023(NL)     | Shrek voor eeuwig en altijd                                                |
++========+===================+============================================================================+
+|   XX   | 80-250100(US)     | Toy Story 3                                                                |
+|   XX   | 80-250104(GE)     | Toy Story 3                                                                |
+|        | 80-250123(NL)     | Toy Story 3                                                                |
++========+===================+============================================================================+
+|   XX   | 80-250300(US)     | The Penguins of Madagascar: Mission Madness                                |
+|   XX   | 80-250304(GE)     | Die Pinguine aus Madagascar: Operation Krone                               |
+|        | 80-250323(NL)     | De Pinguïns van Madagascar: Operatie Tik en Ga!                            |
++========+===================+============================================================================+
+|   XX   | 80-250403(UK)     | Super Hero Squad: Sport Heroes                                             |
+|   XX   | 80-250404(GE)     | Super Hero Squad: Super Sportler                                           |
++========+===================+============================================================================+
+|   XX   | 80-250500(US)     | Mickey Mouse Clubhouse                                                     |
+|        | 80-250503(UK)     | Mickey Mouse Clubhouse                                                     |
+|   XX   | 80-250504(GE)     | Micky Maus Wunderhaus                                                      |
+|        | 80-250505(FR)     | La Maison de Mickey                                                        |
+|   XX   | 80-250522(SP)     | La Casa de Mickey Mouse                                                    |
+|        | 80-250523(NL)     | Mickey Mouse Clubhouse                                                     |
++========+===================+============================================================================+
+|   XX   | 80-250604(GE)     | Ben 10: Ultimate Alien: Mine der Gedanken                                  |
+|        | 80-250623(NL)     | Ben 10: Ultimate Alien                                                     |
++========+===================+============================================================================+
+|   NA   | 80-250700(US)     | Touch & Learn - Game Pack (No Rom Cart)                                    |
+|   NA   | 80-250704(GE)     | MobiGo 2 (No Rom Cart)                                                     |
++========+===================+============================================================================+
+|   XX   | 80-250804(GE)     | Dora: Tag des Zwillings                                                    |
+|        | 80-250823(NL)     | Dora: Tweelingendag                                                        |
++========+===================+============================================================================+
+|   XX   | 80-250900(US)     | Disney Fairies: Explore Your Talents                                       |
+|   XX   | 80-250904(GE)     | Disney Fairies Tinkerbell: Tal der Feen                                    |
+|        | 80-250923(NL)     | Disney Fairies: Ontdek Jouw Talenten                                       |
++========+===================+============================================================================+
+|        | 80-251005(FR)     | Monsieur Madame                                                            |
++========+===================+============================================================================+
+|   XX   | 80-251100(US)     | Disney Princess                                                            |
+|   XX   | 80-251104(GE)     | Disney Princess                                                            |
+|        | 80-251123(NL)     | Disney Princess                                                            |
++========+===================+============================================================================+
+|   XX   | 80-251204(GE)     | Cars Toon: Hooks unglaubliche Geschichten                                  |
++========+===================+============================================================================+
+|   XX   | 80-251400(US)     | Sesame Street: Elmo and Abby: Nature Explorers                             |
++========+===================+============================================================================+
+|   XX   | 80-251500(US)     | SpongeBob SquarePants: Defending the Secret Formula                        |
+|   XX   | 80-251504(GE)     | SpongeBob Schwammkopf: Rette das Geheimrezept                              |
+|   XX   | 80-251522(SP)     | Bob Esponja: Defendiendo la Fórmula Secreta                                |
++========+===================+============================================================================+
+|   XX   | 80-251603(UK)     | Scooby-Doo!: Mystery Town                                                  |
++========+===================+============================================================================+
+|   XX   | 80-251700(US)     | Tangled                                                                    |
+|   XX   | 80-251704(GE)     | Rapunzel: Neu verföhnt                                                     |
++========+===================+============================================================================+
+|   XX   | 80-251804(GE)     | Chuggington                                                                |
++========+===================+============================================================================+
+|   XX   | 80-251900(US)     | Cars 2                                                                     |
+|   XX   | 80-251904(GE)     | Cars 2                                                                     |
+|   XX   | 80-251923(NL)     | Cars 2                                                                     |
++========+===================+============================================================================+
+|   XX   | 80-252004(GE)     | Kung Fu Panda 2                                                            |
++========+===================+============================================================================+
+|        | 80-252123(NL)     | Madagascar 3 op reis naar Europa                                           |
++========+===================+============================================================================+
+|   XX   | 80-252304(GE)     | Dino-Zug: Erforsche die Welt                                               |
+|        | 80-252305(FR)     | Le Dino Train A La Decouvre de la Monde!                                   |
++========+===================+============================================================================+
+|        | 80-252404(GE)     | Hello Kitty: Hello Kitty feiert Geburtstag!                                |
+|        | 80-252423(NL)     | Hello Kitty viert verjaardag!                                              |
++========+===================+============================================================================+
+|   XX   | 80-252504(GE)     | Team Umizoomi: Die große Umiauto Rettung                                   |
++========+===================+============================================================================+
+|   XX   | 80-252600(US)     | Brave                                                                      |
+|   XX   | 80-252604(GE)     | Merida: Legende der Highlands                                              |
+|        | 80-252623(NL)     | Brave                                                                      |
++========+===================+============================================================================+
+|   XX   | 80-252700(US)     | Thomas & Friends: Really Useful Engines                                    |
+|   XX   | 80-252704(GE)     | Thomas & seine Freunde: Wirklich Nützliche Loks                            |
++========+===================+============================================================================+
+|   XX   | 80-252800(US)     | Jake and the Neverland Pirates                                             |
+|   XX   | 80-252804(GE)     | Jake Und Die Nimmerland Piraten                                            |
++========+===================+============================================================================+
+|   XX   | 80-252904(GE)     | Minnie                                                                     |
++========+===================+============================================================================+
+|   XX   | 80-253004(GE)     | Disney Planes                                                              |
++========+===================+============================================================================+
+|   XX   | 80-253204(GE)     | Disney Sofia die Erste                                                     |
++========+===================+============================================================================+
+|   XX   | 80-253304(GE)     | Disney Doc McStuffins: Spielzeugarztin                                     |
++========+===================+============================================================================+
+|   XX   | 80-253604(GE)     | Marvel Der Ultimative Spider-Man                                           |
+|        | 80-253605(FR)     | Marvel Ultimate Spider-Man                                                 |
++========+===================+============================================================================+
+	-->
 
 	<software name="ben10g" supported="no"> <!-- Will be clone of "ben10" once found and dumped. -->
 		<description>Ben 10 - UltimateAlien - Mine der Gedanken (Germany)</description>
