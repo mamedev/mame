@@ -7,9 +7,9 @@ authors:David Haywood, hap
 
 <!-- define elements -->
 
-	<element name="blue"><rect><color red="0" green="0.13333" blue="0.86666" /></rect></element>
-	<element name="yellow"><rect><color red="1" green="0.86666" blue="0" /></rect></element>
-	<element name="pink"><rect><color red="0.73333" green="0.33333" blue="0.33333" /></rect></element>
+	<element name="blue"><rect><color red="0.1" green="0.25" blue="0.85" /></rect></element>
+	<element name="yellow"><rect><color red="1" green="0.85" blue="0.1" /></rect></element>
+	<element name="pink"><rect><color red="0.7" green="0.3" blue="0.4" /></rect></element>
 	<element name="white"><rect><color red="0.92" green="0.92" blue="0.92" /></rect></element>
 	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
 	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
@@ -19,7 +19,7 @@ authors:David Haywood, hap
 			<color red="0.2" green="0.0" blue="0.0" />
 		</rect>
 		<rect state="1">
-			<color red="1.0" green="0.2" blue="0.2" />
+			<color red="1.0" green="0.1" blue="0.1" />
 		</rect>
 	</element>
 
@@ -33,10 +33,10 @@ authors:David Haywood, hap
 	</element>
 
 	<element name="text_level_l">
-		<text string="LEVEL GAUGE" align="2"><color red="1" green="0.86666" blue="0" /></text>
+		<text string="LEVEL GAUGE" align="2"><color red="1" green="0.85" blue="0.1" /></text>
 	</element>
 	<element name="text_level_r">
-		<text string="LEVEL GAUGE" align="1"><color red="1" green="0.86666" blue="0" /></text>
+		<text string="LEVEL GAUGE" align="1"><color red="1" green="0.85" blue="0.1" /></text>
 	</element>
 	<element name="text_ryu">
 		<text string="Ryu"><color red="0" green="0" blue="0" /></text>
@@ -49,13 +49,13 @@ authors:David Haywood, hap
 	</element>
 
 	<element name="mole_sim_red" defstate="0">
-		<disk state="0"><color blue="0.05" green="0.05" red="0.20" /></disk>
-		<disk state="1"><color blue="0.20" green="0.20" red="1.00" /></disk>
+		<disk state="0"><color blue="0.3" green="0.2" red="1.0" alpha="0.2" /></disk>
+		<disk state="1"><color blue="0.3" green="0.2" red="1.0" /></disk>
 	</element>
 
 	<element name="mole_sim_blue" defstate="0">
-		<disk state="0"><color red="0.05" green="0.05" blue="0.20" /></disk>
-		<disk state="1"><color red="0.20" green="0.20" blue="1.00" /></disk>
+		<disk state="0"><color red="0.1" green="0.65" blue="1.0" alpha="0.2" /></disk>
+		<disk state="1"><color red="0.1" green="0.65" blue="1.0" /></disk>
 	</element>
 
 
