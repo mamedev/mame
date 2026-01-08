@@ -596,6 +596,7 @@ static INPUT_PORTS_START( indytemc )
 	PORT_CONFSETTING(      0x0000, DEF_STR( Off ) )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( reliefs1 )
 	PORT_START("IN0")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -629,6 +630,7 @@ static INPUT_PORTS_START( reliefs1 )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( roadrunn )
 	PORT_START("IN0")   // F40000
@@ -921,6 +923,7 @@ void atarisy1_state::reliefs1(machine_config &config)
 	m_adc->in_callback<6>().set_ioport("IN0");
 	m_adc->in_callback<7>().set_ioport("IN1");
 }
+
 
 /*************************************
  *
@@ -2653,6 +2656,7 @@ void atarisy1_state::init_reliefs1()
 {
 	m_trackball_type = 0;   /* none */
 }
+
 
 
 /*************************************
