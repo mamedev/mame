@@ -40,6 +40,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(string_set_w);
 
+	DECLARE_INPUT_CHANGED_MEMBER(effects_w);
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -55,7 +57,6 @@ private:
 	void strings_clr_w(offs_t offset, u8) { m_strings &= offset; }
 
 	void filter_w(u8 data);
-	void effects_w(u8 data);
 
 	void maincpu_map(address_map &map) ATTR_COLD;
 
@@ -90,7 +91,7 @@ static INPUT_PORTS_START(dg10)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) // low = DG-10
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_MEMBER(FUNC(dg20_state::effects_w))
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dg20_state::effects_w), 0)
 
 	PORT_START("STRINGS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("String 1") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dg20_state::string_set_w), 0)
@@ -413,7 +414,7 @@ void dg20_state::filter_w(u8 data)
 }
 
 /**************************************************************************/
-void dg20_state::effects_w(u8 data)
+INPUT_CHANGED_MEMBER(dg20_state::effects_w)
 {
 	/* TODO:
 	bit 0 low:  enable chorus, reduce non-chorus volume
@@ -423,7 +424,7 @@ void dg20_state::effects_w(u8 data)
 	bit 4 high: distortion
 	see the service manual (section "Preset Effects in Each Tone") for a table of which tones use which effects.
 	*/
-	logerror("effects_w: %02x\n", data);
+	logerror("effects_w: %02x\n", newval);
 }
 
 /**************************************************************************/

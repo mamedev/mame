@@ -24,12 +24,14 @@
     PR-6265.0M (82S129N)
     PR-6266.0B (82S129N)
 
+    Developed by Sanritsu and published by Kiwako.
+
 **********************************************************/
 
 #include "emu.h"
 
-#include "machine/segacrpt_device.h"
 #include "cpu/z80/z80.h"
+#include "machine/segacrpt_device.h"
 #include "sound/ay8910.h"
 
 #include "emupal.h"
