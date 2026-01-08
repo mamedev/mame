@@ -325,18 +325,27 @@ u8 keyfox10_state::sam_fx_r(offs_t offset)
         }
         return m_rom[rom_offset];
     }
+#ifdef ENABLE_SAM_FX
     // T1=1: SAM chip (only first 8 bytes decoded)
     if (offset < 8)
         return sam8905_r(1, offset);
     return 0xff;  // Unmapped
+#else
+    return 0;
+#endif
 }
 
 void keyfox10_state::sam_fx_w(offs_t offset, u8 data)
 {
+#ifdef ENABLE_SAM_FX
     // T1=0: ROM (writes ignored)
     // T1=1: SAM FX chip access
     if (BIT(m_port3, 5) && offset < 8)
         sam8905_w(1, offset, data);
+#else
+    (void)offset;
+    (void)data;
+#endif
 }
 
 u8 keyfox10_state::sam8905_r(int chip, offs_t offset)
