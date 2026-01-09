@@ -201,7 +201,8 @@ Runs too fast?
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Gameplay graphics have clipping/alignment issues, black strip on left side
+Gameplay graphics have clipping/alignment issues (fixed, [blitter] CLIP_A1)
+Black strip on left side ([Tom] pixel width?)
 Playfield on any track has garbage GFXs on borders
 No sound (fixed, DSP JPIT)
 BGMs are a bit out of octaves
@@ -396,7 +397,7 @@ Access [cart] EEPROM
 Has serious 3D GFX pitch issues ([object] pitch = 2 16bpp) (fixed)
 No sound (fixed, serial clock)
 [blitter] needs GOURZ (noticeable with main default car)
-Missing map display during gameplay
+Missing map display during gameplay (fixed, [blitter] CLIP_A1)
 Randomly crashes in [DSP] during gameplay (particularly when crashing a bit too much)
 Access [cart] EEPROM
 ]]></notes>
@@ -440,7 +441,7 @@ Access [cart] EEPROM
 Huge GFX issues ([object] pitch = 4 16bpp) (fixed)
 Corrupted text chars
 Offset HUD elements in gameplay
-Submerged 3d elements in playfield, wants [blitter] GOURZ?
+Submerged 3d elements in playfield, wants [blitter] GOURZ? (fixed, mostly)
 No sound (fixed, DSP JPIT irqs)
 ]]></notes>
 
@@ -643,6 +644,7 @@ Access [cart] EEPROM
 		<notes><![CDATA[
 "Another Great Game" then black screen. (fixed, see below)
 Known to require tight [GPU] pipeline timings (?)
+Dots at left side of screen, [object] processor?
 Can crash during gameplay
 ]]></notes>
 
@@ -843,7 +845,7 @@ Uses [GPU] irqs 0 and 4
 "Enter Network" causes a black screen after loading (JagLink), 68k trash DSP memory at PC=73CCC
 Reads error bit 15 in [Jerry] ASISTAT
 Sometimes hangs on main menu
-Main menu background is cutoff to the right
+Main menu background is cutoff to the right (fixed, [blitter] CLIP_A1)
 Unemulated [object] scaled blend mode (pillar in the center) (fixed)
 BGM randomly don't work on title and main menu
 Uses [GPU] irq 0
@@ -1107,7 +1109,7 @@ RSoD on Jaguar logo
 		<publisher>B&amp;C Computervisions</publisher>
 		<notes><![CDATA[
 Gets to title screen (with [object] pitch = 2 16bpp) (fixed)
-Corrupted limits on rotating attract logo
+Corrupted limits on rotating attract logo (fixed, [blitter] CLIP_A1)
 [object] or 68k crashes after a bit of attract ([blitter]? waitstates?)
 No sound (fixed, serial clock)
 Access [cart] EEPROM
@@ -1417,7 +1419,8 @@ Uses [GPU] irq 3
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Triggers [object] pitch = 2 8bpp at Trimark logo
-Heavy GFX glitches in gameplay, [object] timings?
+Heavy GFX glitches in gameplay (fixed, [blitter] CLIP_A1)
+Has [blitter] phrase mode alignment issues
 No sound (fixed, [DSP] irq priority)
 ]]></notes>
 
@@ -1469,7 +1472,7 @@ Layers are slightly cut off
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
-Minor GFX pitch issues
+Minor [blitter] phrase mode alignment issues (verify)
 Access [cart] EEPROM
 ]]></notes>
 
