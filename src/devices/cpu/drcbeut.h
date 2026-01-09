@@ -60,22 +60,30 @@ public:
 	bool code_exists(uint32_t mode, uint32_t pc) const noexcept { return get_codeptr(mode, pc) != m_nocodeptr; }
 
 private:
+	static constexpr unsigned L1_ALLOCATION = 2;
+	static constexpr unsigned L2_ALLOCATION = 4;
+
+	std::vector<drccodeptr **> m_l1blocks;
+	std::vector<drccodeptr *> m_l2blocks;
+	size_t m_next_l1_block;
+	size_t m_next_l2_block;
+
 	// internal state
 	drc_cache &     m_cache;                // cache where allocations come from
-	uint32_t        m_modes;                // number of modes supported
+	uint32_t const  m_modes;                // number of modes supported
 
 	drccodeptr      m_nocodeptr;            // pointer to code which will handle missing entries
 
-	uint8_t         m_l1bits;               // bits worth of entries in l1 hash tables
-	uint8_t         m_l2bits;               // bits worth of entries in l2 hash tables
-	uint8_t         m_l1shift;              // shift to apply to the PC to get the l1 hash entry
-	uint8_t         m_l2shift;              // shift to apply to the PC to get the l2 hash entry
-	offs_t          m_l1mask;               // mask to apply after shifting
-	offs_t          m_l2mask;               // mask to apply after shifting
+	uint8_t const   m_l1bits;               // bits worth of entries in L1 hash tables
+	uint8_t const   m_l2bits;               // bits worth of entries in L2 hash tables
+	uint8_t const   m_l1shift;              // shift to apply to the PC to get the L1 hash entry
+	uint8_t const   m_l2shift;              // shift to apply to the PC to get the L2 hash entry
+	offs_t const    m_l1mask;               // mask to apply after shifting
+	offs_t const    m_l2mask;               // mask to apply after shifting
 
-	drccodeptr ***  m_base;                 // pointer to the l1 table for each mode
-	drccodeptr **   m_emptyl1;              // pointer to empty l1 hash table
-	drccodeptr *    m_emptyl2;              // pointer to empty l2 hash table
+	drccodeptr ***  m_base;                 // pointer to the L1 table for each mode
+	drccodeptr **   m_emptyl1;              // pointer to empty L1 hash table
+	drccodeptr *    m_emptyl2;              // pointer to empty L2 hash table
 };
 
 

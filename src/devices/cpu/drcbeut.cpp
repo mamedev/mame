@@ -34,6 +34,8 @@ using namespace uml;
 //-------------------------------------------------
 
 drc_hash_table::drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbits, uint8_t ignorebits) :
+	m_next_l1_block(0),
+	m_next_l2_block(0),
 	m_cache(cache),
 	m_modes(modes),
 	m_nocodeptr(nullptr),
@@ -44,9 +46,18 @@ drc_hash_table::drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbit
 	m_l1mask((1 << m_l1bits) - 1),
 	m_l2mask((1 << m_l2bits) - 1),
 	m_base(reinterpret_cast<drccodeptr ***>(cache.alloc(modes * sizeof(**m_base), std::align_val_t(alignof(drccodeptr *))))),
-	m_emptyl1(nullptr),
-	m_emptyl2(nullptr)
+	m_emptyl1(reinterpret_cast<drccodeptr **>(m_cache.alloc(sizeof(drccodeptr *) << m_l1bits, std::align_val_t(alignof(drccodeptr *))))),
+	m_emptyl2(reinterpret_cast<drccodeptr *>(m_cache.alloc(sizeof(drccodeptr) << m_l2bits, std::align_val_t(alignof(drccodeptr)))))
 {
+	m_l1blocks.reserve(L1_ALLOCATION);
+	m_l2blocks.reserve(L2_ALLOCATION);
+
+	if (m_emptyl1)
+		std::fill_n(m_emptyl1, 1 << m_l1bits, m_emptyl2);
+
+	if (m_emptyl2)
+		std::fill_n(m_emptyl2, 1 << m_l2bits, m_nocodeptr);
+
 	reset();
 }
 
@@ -58,27 +69,15 @@ drc_hash_table::drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbit
 
 bool drc_hash_table::reset()
 {
-	// allocate an empty l2 hash table
-	m_emptyl2 = reinterpret_cast<drccodeptr *>(m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits, std::align_val_t(alignof(drccodeptr))));
-	if (!m_emptyl2)
+	// start from the beginning of the allocated blocks
+	m_next_l1_block = 0;
+	m_next_l2_block = 0;
+
+	if (!m_base || !m_emptyl1 || !m_emptyl2)
 		return false;
 
-	// populate it with pointers to the recompile_exit code
-	for (int entry = 0; entry < (1 << m_l2bits); entry++)
-		m_emptyl2[entry] = m_nocodeptr;
-
-	// allocate an empty l1 hash table
-	m_emptyl1 = reinterpret_cast<drccodeptr **>(m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits, std::align_val_t(alignof(drccodeptr *))));
-	if (!m_emptyl1)
-		return false;
-
-	// populate it with pointers to the empty l2 table
-	for (int entry = 0; entry < (1 << m_l1bits); entry++)
-		m_emptyl1[entry] = m_emptyl2;
-
-	// reset the hash tables
-	for (int modenum = 0; modenum < m_modes; modenum++)
-		m_base[modenum] = m_emptyl1;
+	// reset the top-level table
+	std::fill_n(m_base, m_modes, m_emptyl1);
 
 	return true;
 }
@@ -135,23 +134,23 @@ void drc_hash_table::block_end(drcuml_block &block)
 void drc_hash_table::set_default_codeptr(drccodeptr nocodeptr)
 {
 	// nothing to do if the same
-	drccodeptr old = m_nocodeptr;
+	drccodeptr const old = m_nocodeptr;
 	if (old == nocodeptr)
 		return;
 	m_nocodeptr = nocodeptr;
 
 	// update the empty L2 table first
-	for (int l2entry = 0; l2entry < (1 << m_l2bits); l2entry++)
-		m_emptyl2[l2entry] = nocodeptr;
+	std::fill_n(m_emptyl2, 1 << m_l2bits, nocodeptr);
 
-	// now scan all existing hashtables for entries
-	for (int modenum = 0; modenum < m_modes; modenum++)
-		if (m_base[modenum] != m_emptyl1)
-			for (int l1entry = 0; l1entry < (1 << m_l1bits); l1entry++)
-				if (m_base[modenum][l1entry] != m_emptyl2)
-					for (int l2entry = 0; l2entry < (1 << m_l2bits); l2entry++)
-						if (m_base[modenum][l1entry][l2entry] == old)
-							m_base[modenum][l1entry][l2entry] = nocodeptr;
+	// now scan all existing L2 tables for entries
+	for (size_t i = 0; m_next_l2_block > i; ++i)
+	{
+		for (uint32_t l2entry = 0; (1 << m_l2bits > l2entry); ++l2entry)
+		{
+			if (m_l2blocks[i][l2entry] == old)
+				m_l2blocks[i][l2entry] = nocodeptr;
+		}
+	}
 }
 
 
@@ -162,30 +161,44 @@ void drc_hash_table::set_default_codeptr(drccodeptr nocodeptr)
 
 bool drc_hash_table::set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code)
 {
-	// copy-on-write for the l1 hash table
+	// copy-on-write for the L1 hash table
 	assert(mode < m_modes);
 	if (m_base[mode] == m_emptyl1)
 	{
-		drccodeptr **newtable = (drccodeptr **)m_cache.alloc_temporary(sizeof(drccodeptr *) << m_l1bits, std::align_val_t(alignof(drccodeptr *)));
-		if (!newtable)
-			return false;
-		std::copy_n(m_emptyl1, 1U << m_l1bits, newtable);
-		m_base[mode] = newtable;
+		if (m_l1blocks.size() == m_next_l1_block)
+		{
+			drccodeptr **const l1block = reinterpret_cast<drccodeptr **>(m_cache.alloc((L1_ALLOCATION * sizeof(drccodeptr *)) << m_l1bits, std::align_val_t(alignof(drccodeptr *))));
+			if (!l1block)
+				return false;
+
+			for (unsigned i = 0; L1_ALLOCATION > i; ++i)
+				m_l1blocks.emplace_back(l1block + (i << m_l1bits));
+		}
+
+		m_base[mode] = m_l1blocks[m_next_l1_block++];
+		std::fill_n(m_base[mode], 1 << m_l1bits, m_emptyl2);
 	}
 
-	// copy-on-write for the l2 hash table
-	uint32_t l1 = (pc >> m_l1shift) & m_l1mask;
+	// copy-on-write for the L2 hash table
+	uint32_t const l1 = (pc >> m_l1shift) & m_l1mask;
 	if (m_base[mode][l1] == m_emptyl2)
 	{
-		drccodeptr *newtable = (drccodeptr *)m_cache.alloc_temporary(sizeof(drccodeptr) << m_l2bits, std::align_val_t(alignof(drccodeptr)));
-		if (!newtable)
-			return false;
-		std::copy_n(m_emptyl2, 1U << m_l2bits, newtable);
-		m_base[mode][l1] = newtable;
+		if (m_l2blocks.size() == m_next_l2_block)
+		{
+			drccodeptr *const l2block = reinterpret_cast<drccodeptr *>(m_cache.alloc((L2_ALLOCATION * sizeof(drccodeptr)) << m_l2bits, std::align_val_t(alignof(drccodeptr))));
+			if (!l2block)
+				return false;
+
+			for (unsigned i = 0; L2_ALLOCATION > i; ++i)
+				m_l2blocks.emplace_back(l2block + (i << m_l2bits));
+		}
+
+		m_base[mode][l1] = m_l2blocks[m_next_l2_block++];
+		std::fill_n(m_base[mode][l1], 1 << m_l2bits, m_nocodeptr);
 	}
 
 	// set the new entry
-	uint32_t l2 = (pc >> m_l2shift) & m_l2mask;
+	uint32_t const l2 = (pc >> m_l2shift) & m_l2mask;
 	m_base[mode][l1][l2] = code;
 	return true;
 }
