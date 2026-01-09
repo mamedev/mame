@@ -785,8 +785,6 @@ void jaguar_cpu_device::imacn_rn_rn(u16 op)
 	const u32 r1 = m_r[(op >> 5) & 31];
 	const u32 r2 = m_r[op & 31];
 	m_accum += (s64)((int16_t)r1 * (int16_t)r2);
-	// TODO: what's really "unexpected"?
-	logerror("Unexpected IMACN instruction!\n");
 }
 
 void jaguar_cpu_device::imult_rn_rn(u16 op)
@@ -807,22 +805,6 @@ void jaguar_cpu_device::imultn_rn_rn(u16 op)
 	const u32 res = (int16_t)r1 * (int16_t)r2;
 	m_accum = (s32)res;
 	CLR_ZN(); SET_ZN(res);
-
-	// FIXME: this is incredibly goofy, and shouldn't really belong here.
-	op = ROPCODE(m_pc);
-	while ((op >> 10) == 20)
-	{
-		r1 = m_r[(op >> 5) & 31];
-		r2 = m_r[op & 31];
-		m_accum += (s64)((int16_t)r1 * (int16_t)r2);
-		m_pc += 2;
-		op = ROPCODE(m_pc);
-	}
-	if ((op >> 10) == 19)
-	{
-		m_pc += 2;
-		m_r[op & 31] = (u32)m_accum;
-	}
 }
 
 void jaguar_cpu_device::jr_cc_n(u16 op)
@@ -847,7 +829,7 @@ void jaguar_cpu_device::jump_cc_rn(u16 op)
 		const u8 reg = (op >> 5) & 31;
 
 		// HACK: kludge for risky code in the cojag DSP interrupt handlers
-		// also note: using m_r[reg] only fix wolfn3d current regression (with no sound tho)
+		// also note: using m_r[reg] only fix wolfn3d and gorf2k current regression (with no sound tho)
 		const u32 newpc = (m_icount == m_bankswitch_icount) ? m_a[reg] : m_r[reg];
 		debugger_instruction_hook(m_pc);
 		op = ROPCODE(m_pc);

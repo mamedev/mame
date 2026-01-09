@@ -243,7 +243,7 @@ Uses [GPU] irq 3
 		<publisher>B&amp;C Computervision</publisher>
 		<notes><![CDATA[
 No sound (fixed, [DSP] irq priority)
-Bad BGM on title screen
+Bad BGM on title screen (fixed, depends on wave ROM)
 Runs at extremely fast speed
 Can randomly black screen after loading a stage/during gameplay
 Access [cart] EEPROM
@@ -668,7 +668,7 @@ Bad background RMW colors on difficulty select screen (press A after title) (fix
 Huge GFX issues on gameplay ([object] pitch = 0 4bpp and pitch = 3 16bpp)
 Text is solid squares [blitter] BCOMPEN?
 No sound (fixed)
-No SFXs during gameplay
+No SFXs during gameplay (fixed, depends on wave ROM)
 Missing objects during gameplay, [blitter] GOURZ?
 ]]></notes>
 
@@ -724,7 +724,7 @@ Has Z clipping issues during gameplay [blitter]
 		<notes><![CDATA[
 No sound (fixed, serial clock)
 Bad pitch GFXs on attract mode, after title ([object] pitch = 4 24bpp) (fixed)
-Black screen after briefing, or by selecting demo mode
+Black screen after briefing, or by selecting demo mode, sometimes forgets to change BGM too
 ]]></notes>
 
 		<info name="serial" value="J9026E 700726-002"/>
@@ -763,7 +763,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Black screen, [GPU] reads bad pointer in irq 0 stack bp f030f0,1,{r30=0;g} (fixed)
-BGM doesn't work in some stages
+BGM doesn't work in some stages (fixed, depends on wave ROM)
 Cutoff gameplay area on bottom
 Reads back [object] processor data during gameplay
 Access [cart] EEPROM
@@ -784,7 +784,7 @@ Uses [GPU] irqs 0,4
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Jaguar CD cartridge for saving, requires its own [cart] scheme (with atmel_29c010_device or unknown AMD intelfsh)
-Uses [blitter] BCOMPEN
+Uses [blitter] BCOMPEN, missing text
 Draws an incorrect pitch GFX, doesn't do much else ([object] pitch = 2 16bpp)
 ]]></notes>
 
@@ -989,7 +989,7 @@ Access [cart] EEPROM
 		<notes><![CDATA[
 No sound (fixed, serial clock)
 Transitions reads the currently selected line buffer in [Tom]
-No SFXs
+No SFXs (fixed, depends on wave ROM)
 Saves reports error, access [cart] EEPROM (verify, should be fixed)
 ]]></notes>
 
@@ -1024,7 +1024,7 @@ Black screen, 68k reads [GPU] PC
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
 No sound (fixed, serial clock)
-No ball touch SFXs
+No ball touch SFXs (fixed, depends on wave ROM)
 [DSP] sound crashes during gameplay (3rd match at 28 minute on clear EEPROM)
 Access [cart] EEPROM
 ]]></notes>
@@ -1146,7 +1146,7 @@ Same as spacewar
 		<publisher>Carousel Entertainment</publisher>
 		<notes><![CDATA[
 Does a [DSP] in-flight PC change (btanb?)
-No engine sound (serial sampled?)
+No engine sound (fixed, depends on wave ROM)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1182,6 +1182,7 @@ Plays [DSP] sound on right speaker only (?)
 [GPU] in-flight PC write (ignored)
 [DSP] jump off the weeds at PC=F1B898, also reads $fffffc (?)
 Gets to title screen then hangs ([GPU] core bug?), can actually do more with [GPU] overclock and 68k downclock
+No sound (fixed, depends on wave ROM)
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1199,7 +1200,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-OSD full of pitch imperfections (name entry chars)
+OSD full of pitch imperfections (name entry chars) needs proper [blitter] phrase mode rounding
 ]]></notes>
 
 		<info name="serial" value="L8002-SYNJAG"/>
@@ -1232,7 +1233,7 @@ Access [cart] EEPROM
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<notes><![CDATA[
-Background has pitch glitch
+Background has pitch glitch, needs proper [blitter] phrase mode rounding
 Access [cart] EEPROM
 ]]></notes>
 
@@ -1266,8 +1267,8 @@ no sound (btanb)
 		<year>2005</year>
 		<publisher>Songbird Productions</publisher>
 		<notes><![CDATA[
-Heavy GFX issues, [blitter]?
-black screen if left on title screen ("Invalid branch!")
+Heavy GFX issues, needs proper [blitter] phrase mode rounding
+black screen if left on title screen ("Invalid branch!"), as above
 Hangs after few seconds of gameplay
 ]]></notes>
 
@@ -1305,7 +1306,7 @@ Gameplay screen flickers
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [GPU] in-flight PC write (fatalerror)
-No sound (?)
+No sound (fixed, depends on wave ROM)
 GFXs missing on gameplay and title screen, uses [blitter] BCOMPEN extensively
 Randomly has more or less severe GFX glitches
 ]]></notes>
@@ -1323,10 +1324,7 @@ Randomly has more or less severe GFX glitches
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-[GPU] in-flight PC write (fatalerror)
-Hang after BIOS after fixing PIT frequency (regression)
-No sound (?)
-GFXs missing on gameplay and title screen
+Same as trevmcfr
 ]]></notes>
 
 		<info name="serial" value="J9001E 700701"/>
@@ -1606,7 +1604,7 @@ Same(-ish) as parent set
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen, [GPU] crashes
+Crashes after putting in
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1621,7 +1619,7 @@ Black screen, [GPU] crashes
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen, [GPU] crashes
+Not extensively tested (just a PoC?)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
@@ -1636,7 +1634,7 @@ Black screen, [GPU] crashes
 		<year>199?</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Black screen, [GPU] crashes
+Not extensively tested (just a PoC?)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
