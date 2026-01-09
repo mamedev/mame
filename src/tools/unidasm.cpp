@@ -88,6 +88,7 @@ using util::BIT;
 #include "cpu/ks0164/ks0164d.h"
 #include "cpu/lc57/lc57d.h"
 #include "cpu/lc58/lc58d.h"
+#include "cpu/lc6500/lc6500_dasm.h"
 #include "cpu/lc8670/lc8670dsm.h"
 #include "cpu/lh5801/5801dasm.h"
 #include "cpu/lr35902/lr35902d.h"
@@ -518,6 +519,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "kl1839vm1",       be,  0, []() -> util::disasm_interface * { return new kl1839vm1_disassembler; } },
 	{ "lc57",            be,  0, []() -> util::disasm_interface * { return new lc57_disassembler; } },
 	{ "lc58",            be, -1, []() -> util::disasm_interface * { return new lc58_disassembler; } },
+	{ "lc6500",          be,  0, []() -> util::disasm_interface * { return new lc6500_disassembler; } },
 	{ "lc8670",          be,  0, []() -> util::disasm_interface * { return new lc8670_disassembler; } },
 	{ "lh5801",          le,  0, []() -> util::disasm_interface * { return new lh5801_disassembler; } },
 	{ "lr35902",         le,  0, []() -> util::disasm_interface * { return new lr35902_disassembler; } },

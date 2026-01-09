@@ -4308,3 +4308,13 @@ if opt_tool(CPUS, "DSP563XX") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd.h")
 end
+
+--------------------------------------------------
+-- LC6500, disassembler only
+--@src/devices/cpu/lc6500/lc6500.h,CPUS["LC6500"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "LC6500") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc6500/lc6500_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc6500/lc6500_dasm.h")
+end
