@@ -1024,7 +1024,9 @@ void jaguar_state::joystick_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
 uint32_t jaguar_state::shared_ram_r(offs_t offset){ return m_shared_ram[offset]; }
 void jaguar_state::shared_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_shared_ram[offset]); }
 uint32_t jaguar_state::rom_base_r(offs_t offset){ return m_rom_base[offset*2+1] << 16 | m_rom_base[offset*2]; }
-uint32_t jaguar_state::wave_rom_r(offs_t offset){ return m_wave_rom[offset*2+1] << 16 | m_wave_rom[offset*2]; }
+// NOTE: BIOS ATARI SFX notes at startup depends on the correct endianness of this
+// - also cfr. several games (rayman, superx3d, ironsold)
+uint32_t jaguar_state::wave_rom_r(offs_t offset){ return m_wave_rom[offset*2+1] | m_wave_rom[offset*2] << 16; }
 uint32_t jaguarcd_state::cd_bios_r(offs_t offset){ return m_cd_bios[offset*2+1] << 16 | m_cd_bios[offset*2]; }
 uint32_t jaguar_state::dsp_ram_r(offs_t offset){ return m_dsp_ram[offset]; }
 void jaguar_state::dsp_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_dsp_ram[offset]); }
