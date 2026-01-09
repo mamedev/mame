@@ -782,7 +782,9 @@ uint32_t jaguar_state::process_scaled_bitmap(uint16_t *scanline, uint32_t *objda
 						while (xleft > 0)
 						{
 							if (xpos >= 0 && xpos < 760 && (pix || !(flags & 4)))
+							{
 								scanline[xpos] = clut[BYTE_XOR_BE(pix)];
+							}
 							xpos += dxpos;
 							xleft -= 0x20;
 						}
@@ -964,12 +966,13 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 			case 2:
 				LOGMASKED(LOG_OBJECTS, "%08x: GPU irq = %08X-%08X\n", object_pointer, objdata[0], objdata[1]);
 
-				m_gpu_regs[OB_HH] = (objdata[1] & 0xffff0000) >> 16;
-				m_gpu_regs[OB_HL] = objdata[1] & 0xffff;
-				m_gpu_regs[OB_LH] = (objdata[0] & 0xffff0000) >> 16;
-				m_gpu_regs[OB_LL] = objdata[0] & 0xffff;
-
-				// TODO: trigger timing
+				// kasumi wants the format to be like this (cfr. GPU lv3 irq service, with the rorq $10)
+				// Object processor seems to run with swapped endianness
+				m_gpu_regs[OB_HL] = (objdata[1] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_HH] = objdata[1] & 0xffff;
+				m_gpu_regs[OB_LL] = (objdata[0] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_LH] = objdata[0] & 0xffff;
+				// TODO: trigger timing, should also suspend processing thru OBF
 				m_gpu->set_input_line(3, ASSERT_LINE);
 				done = 1;
 				// mutntpng, atarikrt VPOS = 0
@@ -986,10 +989,10 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 			/* stop */
 			case 4:
 			{
-				m_gpu_regs[OB_HH] = (objdata[1] & 0xffff0000) >> 16;
-				m_gpu_regs[OB_HL] = objdata[1] & 0xffff;
-				m_gpu_regs[OB_LH] = (objdata[0] & 0xffff0000) >> 16;
-				m_gpu_regs[OB_LL] = objdata[0] & 0xffff;
+				m_gpu_regs[OB_HL] = (objdata[1] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_HH] = objdata[1] & 0xffff;
+				m_gpu_regs[OB_LL] = (objdata[0] & 0xffff0000) >> 16;
+				m_gpu_regs[OB_LH] = objdata[0] & 0xffff;
 
 				int interrupt = (objdata[1] >> 3) & 1;
 				done = 1;
