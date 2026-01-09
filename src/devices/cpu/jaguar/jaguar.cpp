@@ -1585,11 +1585,13 @@ void jaguardsp_cpu_device::modulo_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_modulo);
 }
 
+// top 8-bit of accumulator, sign extended
 u32 jaguardsp_cpu_device::high_accum_r()
 {
 	if (!machine().side_effects_disabled())
-		logerror("%s: high 16-bit accumulator read\n", this->tag());
-	return (m_accum >> 32) & 0xff;
+		logerror("%s: high 8-bit accumulator read\n", this->tag());
+
+	return util::sext((m_accum >> 32) & 0xff, 8);
 }
 
 u32 jaguar_cpu_device::iobus_r(offs_t offset, u32 mem_mask)
