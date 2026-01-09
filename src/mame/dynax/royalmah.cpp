@@ -3148,6 +3148,134 @@ static INPUT_PORTS_START( mjtensin )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+static INPUT_PORTS_START(majrjh )
+	PORT_INCLUDE( mjctrl1 )
+PORT_START("DSW4")  // IN11//DSW1
+	PORT_DIPNAME( 0x07, 0x07, "Pay Out Rate" )
+	PORT_DIPSETTING(    0x0f, "96%" )
+	PORT_DIPSETTING(    0x0e, "93%" )
+	PORT_DIPSETTING(    0x0d, "90%" )
+	PORT_DIPSETTING(    0x0c, "87%" )
+	PORT_DIPSETTING(    0x0b, "84%" )
+	PORT_DIPSETTING(    0x0a, "81%" )
+	PORT_DIPSETTING(    0x09, "78%" )
+	PORT_DIPSETTING(    0x08, "75%" )
+	PORT_DIPSETTING(    0x07, "71%" )
+	PORT_DIPSETTING(    0x06, "68%" )
+	PORT_DIPSETTING(    0x05, "65%" )
+	PORT_DIPSETTING(    0x04, "62%" )
+	PORT_DIPSETTING(    0x03, "59%" )
+	PORT_DIPSETTING(    0x02, "56%" )
+	PORT_DIPSETTING(    0x01, "53%" )
+	PORT_DIPSETTING(    0x00, "50%" )
+	PORT_DIPNAME( 0x00, 0x00, "Odds Rate" )
+	PORT_DIPSETTING(    0x30, "1 2 4 8 12 16 24 32" )
+	PORT_DIPSETTING(    0x00, "1 2 3 5 8 15 30 50" )
+	PORT_DIPSETTING(    0x20, "2 3 6 8 12 15 30 50" )
+	PORT_DIPSETTING(    0x10, "1 2 3 5 10 25 50 100" )
+	PORT_DIPNAME( 0x40, 0x40, "Bet-Max" )
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "5" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+
+	PORT_START("DSW3")  // IN12//DSW2
+	PORT_DIPNAME( 0x03, 0x03, "Coin Rate" )
+	PORT_DIPSETTING(    0x03, "1-1")
+	PORT_DIPSETTING(    0x02, "1-2" )
+	PORT_DIPSETTING(    0x01, "1-5")
+	PORT_DIPSETTING(    0x00, "1-10" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" ) //Min Credits To Start//ゲーム·スタート時の最低レート枚数
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x00, 0x00, "Credit  Coin Limit" ) //クレッット·コイン リミット
+	PORT_DIPSETTING(    0x30, "300" )
+	PORT_DIPSETTING(    0x20, "500" )
+	PORT_DIPSETTING(    0x10, "700" )
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPNAME( 0x00, 0x00, "W-BET" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00, 0x00, "Renso Rate" )  //連荘レート
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")  // IN13//DSW3
+    PORT_DIPNAME( 0x00, 0x00, "YAKUMAN Bonus" ) //DSW3-1,2,3,no"1500""2000"
+	PORT_DIPSETTING(    0x05, "Cut" )
+	PORT_DIPSETTING(    0x04, "1 T" )
+	PORT_DIPSETTING(    0x03, "300" )
+	PORT_DIPSETTING(    0x02, "500" )
+	PORT_DIPSETTING(    0x01, "700" )
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPNAME( 0x00, 0x00, "YAKUMAN Times" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPNAME( 0x20, 0x20, "Digital Slot Bonus Limit" ) //デジタル·スロットボーナスのリミットSW3-5,6
+	PORT_DIPSETTING(    0x30, "100" ) //OFF OFF
+	PORT_DIPSETTING(    0x20, "60" ) //ON OFF
+	PORT_DIPSETTING(    0x10, "30" ) //OFF ON
+	PORT_DIPSETTING(    0x00, "20" ) //ON  ON
+	PORT_DIPNAME( 0x00, 0x00, "Digital Slot Bonus Payout Rate" ) //デジタル·スロットボーナスの出率(OUT率)
+	PORT_DIPSETTING(    0x40, "Normal" ) //通常
+	PORT_DIPSETTING(    0x00, "Few" ) //やや少ない
+	PORT_DIPNAME( 0x80, 0x80, "Super Time Trial Rate" ) //スーバー·タイム·トライアルの出率
+	PORT_DIPSETTING(    0x80, "Normal") //通常
+	PORT_DIPSETTING(    0x00, "Many" ) //やや多い
+
+    PORT_START("DSW1") // IN13//DSW4
+	PORT_DIPNAME( 0x01, 0x00, "Demo_Sounds" ) // デモ・サウンド 
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )   
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )    
+	PORT_DIPNAME( 0x02, 0x00, "In-Game Music" )  // ゲーム・サウンド 
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )    
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )    
+	PORT_DIPNAME( 0x04, 0x00, "Renso Girls" )   // 連荘ギャル
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )   
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )    
+	PORT_DIPNAME( 0x08, 0x00, "Renso Girls Show" )  // 連荘ギャルの表示方法
+	PORT_DIPSETTING(    0x08, "very Win" )        //勝つ毎                                        
+	PORT_DIPSETTING(    0x00, "After 3 Renso")     //3連荘後                                                 
+	PORT_DIPNAME( 0x10, 0x00, "Auto Reach" ) //オート·リーチ
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )                                                 
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                      
+	PORT_DIPNAME( 0x20, 0x00, "DonDen" )   
+	PORT_DIPSETTING(    0x00, "Flip Flop" )                                                   
+	PORT_DIPSETTING(    0x20, "Start Button" )                                                 
+	PORT_DIPNAME( 0x40, 0x40, "Last Chance" )                
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )                                                     
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                     
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "Last Chance Mode" )                                              
+	PORT_DIPSETTING(    0x40, "3/8" )        //8間中3牌セレクト方式                                         
+	PORT_DIPSETTING(    0x00, "Ghost Leg" )  //あみだ方式
+
+    PORT_START("DSWTOP")    // IN15
+	PORT_DIPNAME( 0x01, 0x01, "Credits Per Note" ) //Note Rate SW1-9
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0x02, 0x02, "Flip_Screen" )//SW1-10
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0c, 0x0c, "Computer Strength" ) //コンピューターの強さSW2-9,10
+  	PORT_DIPSETTING(    0x0c, "Weak" )
+	PORT_DIPSETTING(    0x08, "Normal")
+	PORT_DIPSETTING(    0x04, "Strong" )
+	PORT_DIPSETTING(    0x00, "Very Strong" )
+	PORT_DIPNAME( 0x10, 0x10, "Game Style" ) //ゲームスタイルSW3-9
+	PORT_DIPSETTING(    0x10, "Credit" ) //クレジット式
+	PORT_DIPSETTING(    0x00, "Credit Timer" ) //クレジットタイマー式
+	PORT_DIPNAME( 0x20, 0x20, "Start Mode" ) //クレジットタイマー時のスタート方式SW3-10
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) ) //通常
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) ) //最低RATEに固定
+	PORT_DIPNAME( 0x40, 0x40, "Show Clock" ) //時計表示SW4-9
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Mat Color" ) //マットの色SW4-10
+	PORT_DIPSETTING(    0x80, "Color" )
+	PORT_DIPSETTING(    0x00, "Black " )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( cafetime ) // dips definitions and defaults taken from MT05580, this uses 10 switch dip banks
 	// The manual provides two sets of standard settings:
