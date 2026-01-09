@@ -10,12 +10,12 @@ license:CC0-1.0
 	Language:
 ********0 = US                (White labels on back)
 ********1 = Italy             Apparently distributed by company 'Giochi Preziosi'
-********2 = Netherlands       (Red or White labels on back)
-********3 = UK                (Red labels on back)
-********4 = Germany           (Blue labels on back)
-********5 = France            (Yellow labels on back, also for NTSC French-Canadian)
-********6 = Portugal          Apparently distributed by company 'Concentra' (White labels on back)
-********7 = Spain             (Green labels on back)
+*******23 = Netherlands       
+********3 = UK                
+********4 = Germany           
+********5 = France            (also for French-Canadian)
+********6 = Portugal          Apparently distributed by company 'Concentra'
+*******22 = Spain             
 ********8 = China
 *******10 = Korea
 *******13 = Denmark           Distributed by the company 'Top Toy A/S'
@@ -36,8 +36,10 @@ license:CC0-1.0
 +========+===================+============================================================================+
 |   XX   | 80-250300(US)     | The Penguins of Madagascar: Mission Madness                                |
 |   XX   | 80-250304(GE)     | Die Pinguine aus Madagascar: Operation Krone                               |
+|        | 80-250305(FR)     | Les Pingouins de Madagascar: Mission Adventure                             |
 |        | 80-250323(NL)     | De Pinguïns van Madagascar: Operatie Tik en Ga!                            |
 +========+===================+============================================================================+
+|        | 80-250400(US)     | Super Hero Squad: Sport Heroes                                             |
 |   XX   | 80-250403(UK)     | Super Hero Squad: Sport Heroes                                             |
 |   XX   | 80-250404(GE)     | Super Hero Squad: Super Sportler                                           |
 +========+===================+============================================================================+
@@ -48,54 +50,77 @@ license:CC0-1.0
 |   XX   | 80-250522(SP)     | La Casa de Mickey Mouse                                                    |
 |        | 80-250523(NL)     | Mickey Mouse Clubhouse                                                     |
 +========+===================+============================================================================+
+|        | 80-250623(US)     | Ben 10: Ultimate Alien: Mind Mine                                          |
+|        | 80-250603(UK)     | Ben 10: Ultimate Alien: Mind Mine                                          |
 |   XX   | 80-250604(GE)     | Ben 10: Ultimate Alien: Mine der Gedanken                                  |
 |        | 80-250623(NL)     | Ben 10: Ultimate Alien                                                     |
 +========+===================+============================================================================+
 |   NA   | 80-250700(US)     | Touch & Learn - Game Pack (No Rom Cart)                                    |
 |   NA   | 80-250704(GE)     | MobiGo 2 (No Rom Cart)                                                     |
 +========+===================+============================================================================+
+|   XX   | 80-250800(US)     | Dora the Explorer: Twins' Day                                              |
 |   XX   | 80-250804(GE)     | Dora: Tag des Zwillings                                                    |
 |        | 80-250823(NL)     | Dora: Tweelingendag                                                        |
 +========+===================+============================================================================+
 |   XX   | 80-250900(US)     | Disney Fairies: Explore Your Talents                                       |
 |   XX   | 80-250904(GE)     | Disney Fairies Tinkerbell: Tal der Feen                                    |
+|        | 80-250905(FR)     | Les Fees Disney                                                            |
 |        | 80-250923(NL)     | Disney Fairies: Ontdek Jouw Talenten                                       |
 +========+===================+============================================================================+
+|        | 80-251000(US)     | Mr. Men Little Miss: Adventures in Dillydale                               |
 |        | 80-251005(FR)     | Monsieur Madame                                                            |
 +========+===================+============================================================================+
 |   XX   | 80-251100(US)     | Disney Princess                                                            |
 |   XX   | 80-251104(GE)     | Disney Princess                                                            |
 |        | 80-251123(NL)     | Disney Princess                                                            |
 +========+===================+============================================================================+
+|        | 80-251200(US)     | Cars Toon: Mater's Tall Tales                                              |
 |   XX   | 80-251204(GE)     | Cars Toon: Hooks unglaubliche Geschichten                                  |
+|        | 80-251205(FR)     | Cars Toon                                                                  |
 +========+===================+============================================================================+
 |   XX   | 80-251400(US)     | Sesame Street: Elmo and Abby: Nature Explorers                             |
 +========+===================+============================================================================+
 |   XX   | 80-251500(US)     | SpongeBob SquarePants: Defending the Secret Formula                        |
 |   XX   | 80-251504(GE)     | SpongeBob Schwammkopf: Rette das Geheimrezept                              |
+|        | 80-251505(FR)     | SpongeBob: Proteger la Formule Secrete                                     |
 |   XX   | 80-251522(SP)     | Bob Esponja: Defendiendo la Fórmula Secreta                                |
 +========+===================+============================================================================+
+|        | 80-251600(US)     | Scooby-Doo!: Mystery Town                                                  |
 |   XX   | 80-251603(UK)     | Scooby-Doo!: Mystery Town                                                  |
 +========+===================+============================================================================+
 |   XX   | 80-251700(US)     | Tangled                                                                    |
+|        | 80-251703(UK)     | Tangled                                                                    |
 |   XX   | 80-251704(GE)     | Rapunzel: Neu verföhnt                                                     |
 +========+===================+============================================================================+
+|        | 80-251800(US)     | Chuggington                                                                |
+|        | 80-251803(UK)     | Chuggington                                                                |
 |   XX   | 80-251804(GE)     | Chuggington                                                                |
+|        | 80-251805(FR)     | Chuggington                                                                |
 +========+===================+============================================================================+
 |   XX   | 80-251900(US)     | Cars 2                                                                     |
 |   XX   | 80-251904(GE)     | Cars 2                                                                     |
-|   XX   | 80-251923(NL)     | Cars 2                                                                     |
+|        | 80-251923(NL)     | Cars 2                                                                     |
 +========+===================+============================================================================+
+|        | 80-252000(US)     | Kung Fu Panda 2                                                            |
+|        | 80-252003(UK)     | Kung Fu Panda 2                                                            |
 |   XX   | 80-252004(GE)     | Kung Fu Panda 2                                                            |
+|        | 80-252005(FR)     | Kung Fu Panda 2                                                            |
 +========+===================+============================================================================+
+|        | 80-252100(US)     | Madagascar 3                                                               |
+|        | 80-252103(UK)     | Madagascar 3                                                               |
+|        | 80-252105(FR)     | Madagascar 3                                                               |
+|        | 80-252122(SP)     | Madagascar 3: De Marcha por Europa                                         |
 |        | 80-252123(NL)     | Madagascar 3 op reis naar Europa                                           |
 +========+===================+============================================================================+
+|        | 80-252300(US)     | Dinosaur Train: Explore the World                                          |
 |   XX   | 80-252304(GE)     | Dino-Zug: Erforsche die Welt                                               |
 |        | 80-252305(FR)     | Le Dino Train A La Decouvre de la Monde!                                   |
 +========+===================+============================================================================+
+|        | 80-252400(US)     | Hello Kitty: Hello Kitty's Birthday                                        |
 |        | 80-252404(GE)     | Hello Kitty: Hello Kitty feiert Geburtstag!                                |
 |        | 80-252423(NL)     | Hello Kitty viert verjaardag!                                              |
 +========+===================+============================================================================+
+|        | 80-252500(US)     | Team Umizoomi: The Big Umicar Rescue                                       |
 |   XX   | 80-252504(GE)     | Team Umizoomi: Die große Umiauto Rettung                                   |
 +========+===================+============================================================================+
 |   XX   | 80-252600(US)     | Brave                                                                      |
@@ -108,7 +133,12 @@ license:CC0-1.0
 |   XX   | 80-252800(US)     | Jake and the Neverland Pirates                                             |
 |   XX   | 80-252804(GE)     | Jake Und Die Nimmerland Piraten                                            |
 +========+===================+============================================================================+
-|   XX   | 80-252904(GE)     | Minnie                                                                     |
+|        | 80-252900(US)     | Disney Minnie                                                              |
+|        | 80-252903(UK)     | Disney Minnie                                                              |
+|   XX   | 80-252904(GE)     | Disney Minnie                                                              |
+|        | 80-252905(FR)     | Disney Minnie                                                              |
+|        | 80-252922(SP)     | Disney Minnie                                                              |
+|        | 80-252923(NL)     | Disney Minnie                                                              |
 +========+===================+============================================================================+
 |   XX   | 80-253004(GE)     | Disney Planes                                                              |
 +========+===================+============================================================================+
@@ -121,6 +151,10 @@ license:CC0-1.0
 +========+===================+============================================================================+
 	-->
 
+
+	<!-- ben10xx - Ben 10 Ultimate Alien Mind Mine
+	Demo Video: https://www.vtechkids.com/assets/data/brands/mobigo2/videos/Mobigo_Ben10_V2.flv
+	-->
 	<software name="ben10g" supported="no"> <!-- Will be clone of "ben10" once found and dumped. -->
 		<description>Ben 10 - UltimateAlien - Mine der Gedanken (Germany)</description>
 		<year>2011</year>
@@ -157,9 +191,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- offset 0x12 is '0x02' is this a version number? cartridge was still only marked as 80-251900(US) -->
+	<!-- cars2xx - Cars 2
+	Demo Video: https://www.vtechkids.com/assets/data/brands/mobigo2/videos/MobiGo_Cars2.flv
+	-->
 	<software name="cars2" supported="no">
-		<description>Disney/Pixar Cars 2 (USA, rev 2?)</description>
+		<description>Disney/Pixar Cars 2 (USA, rev 2)</description>
 		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-251900(US)"/>
@@ -181,7 +217,9 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	<!-- carstoonxx - Cars Toon
+	Demo Video: https://www.vtechkids.com/assets/data/brands/mobigo2/videos/Mobigo_CarsToon_V2.flv
+	-->	
 	<software name="carstoong" supported="no"> <!-- Will be clone of "carstoon" once found and dumped. -->
 		<description>Disney/Pixar Cars Toon - Hooks unglaubliche Geschichten (Germany)</description>
 		<year>2011</year>
@@ -193,10 +231,12 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	<!-- chuggxx - Chuggington
+	Demo Video: https://www.vtechkids.com/assets/data/brands/mobigo2/videos/MobiGo_Chuggington.flv
+	-->	
 	<software name="chuggg" supported="no"> <!-- Will be clone of "chugg" once found and dumped. -->
 		<description>Chuggington (Germany)</description>
-		<year>201?</year>
+		<year>2011</year> <!-- 2011 Ludorum -->
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-251804(GER)"/>
 		<part name="cart" interface="mobigo_cart">
@@ -217,7 +257,9 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	<!-- elmoabby - Sesame Street
+	Demo Video: https://www.vtechkids.com/assets/data/brands/mobigo2/videos/Mobigo_Sesame_Street_V2.flv
+	-->	
 	<software name="elmoabby" supported="no">
 		<description>Sesame Street - Elmo and Abby - Nature Explorers (USA)</description>
 		<year>2011</year>
@@ -241,7 +283,9 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	<!-- dprincesxx - Disney Princess
+	Demo Video: https://www.vtechkids.com/assets/data/brands/mobigo2/videos/Mobigo_Princess_V3.flv
+	-->	
 	<software name="dprinces" supported="no">
 		<description>Disney Princess (USA)</description>
 		<year>2010</year>
@@ -265,8 +309,10 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
-	<software name="dorag" supported="no"> <!-- Will be clone of "dora" once found and dumped. -->
+	<!-- doratdxx - Dora the Explorer
+	Demo Video: https://www.vtechkids.com/assets/data/brands/mobigo2/videos/Mobigo_Dora_V3.flv
+	-->		
+	<software name="doratdg" supported="no"> <!-- Will be clone of "dora" once found and dumped. -->
 		<description>Nickelodeon Dora - Tag des Zwillings (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -278,7 +324,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hkittyg" supported="no"> <!-- Will be clone of "hkitty" once found and dumped. -->
+	<software name="hkittybdg" supported="no"> <!-- Will be clone of "hkitty" once found and dumped. -->
 		<description>Hello Kitty - Hello Kitty feiert Geburtstag! (Germany)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
@@ -313,7 +359,9 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	<!-- kfpand2xx - Kung Fu Panda 2
+	Demo Video: https://www.vtechkids.com/assets/data/brands/mobigo2/videos/MobiGo_KFP2.flv
+	-->	
 	<software name="kfpand2g" supported="no">
 		<description>DreamWorks Kung Fu Panda 2 (Germany)</description>
 		<year>201?</year>
@@ -325,10 +373,12 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	<!-- mickeychxx - Mickey Mouse
+	Demo Video: https://www.vtechkids.com/assets/data/brands/mobigo2/videos/Mobigo_MMCH_V3.flv
+	-->	
 	<software name="mickeych" supported="no">
 		<description>Mickey Mouse Clubhouse (USA)</description>
-		<year>201?</year>
+		<year>2010</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -372,7 +422,9 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	<!-- penmadxx - Penguins
+	Demo Video: https://www.vtechkids.com/assets/data/brands/mobigo2/videos/Mobigo_Penguins_V2.flv
+	-->	
 	<software name="penmad" supported="no">
 		<description>DreamWorks/Nickelodeon The Penguins of Madagascar - Mission Madness (USA)</description>
 		<year>2010</year>
@@ -408,7 +460,9 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-
+	<!-- tangledxx - Tangled
+	Demo Video: https://www.vtechkids.com/assets/data/brands/mobigo2/videos/Mobigo_Tangled_V1.flv
+	-->	
 	<software name="tangledg" cloneof="tangled" supported="no">
 		<description>Disney Rapunzel - Neu verföhnt (Germany)</description>
 		<year>2011</year>
@@ -531,7 +585,7 @@ license:CC0-1.0
 
 	<software name="tangled" supported="no">
 		<description>Tangled (USA)</description>
-		<year>201?</year>
+		<year>2010</year>
 		<publisher>VTech</publisher>
 		<part name="cart" interface="mobigo_cart">
 			<dataarea name="rom" size="0x1000000">
@@ -552,7 +606,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="thomas" supported="no">
+	<software name="thomasrue" supported="no">
 		<description>Thomas &amp; Friends - Really Useful Engines (USA, rev 1)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
@@ -564,7 +618,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="thomasa" cloneof="thomas" supported="no">
+	<software name="thomasruea" cloneof="thomasrue" supported="no">
 		<description>Thomas &amp; Friends - Really Useful Engines (USA, rev 2)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
@@ -576,7 +630,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="thomasg" cloneof="thomas" supported="no">
+	<software name="thomasrueg" cloneof="thomasrue" supported="no">
 		<description>Thomas &amp; seine Freunde - Wirklich Nützliche Loks (Germany)</description>
 		<year>2012</year>
 		<publisher>VTech</publisher>
@@ -588,7 +642,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tbell" supported="no">
+	<software name="dfairyeyt" supported="no">
 		<description>Disney Fairies Explore Your Talents (USA)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -600,7 +654,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tbellg" cloneof="tbell" supported="no">
+	<software name="dfairyeytg" cloneof="dfairyeyt" supported="no">
 		<description>Disney Fairies Tinkerbell - Tal der Feen (Germany)</description>
 		<year>2010</year>
 		<publisher>VTech</publisher>
@@ -626,7 +680,7 @@ license:CC0-1.0
 
 	<software name="tstory3g" cloneof="tstory3" supported="no">
 		<description>Disney/Pixar Toy Story 3 (Germany)</description>
-		<year>201?</year>
+		<year>2011</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-250104(GER)"/>
 		<part name="cart" interface="mobigo_cart">
@@ -638,7 +692,7 @@ license:CC0-1.0
 
 	<software name="uspidg" supported="no"> <!-- Will be clone of "uspid" once found and dumped. -->
 		<description>Marvel Ultimate Spider-Man (Germany)</description>
-		<year>201?</year>
+		<year>2013</year>
 		<publisher>VTech</publisher>
 		<info name="serial" value="80-253604(GER)"/>
 		<part name="cart" interface="mobigo_cart">
