@@ -539,9 +539,9 @@ void chloe_state::map_io(address_map &map)
 	map(0x00df, 0x00df).mirror(0xff00).lrw8(NAME([this]() -> u8 { return m_io_joy2->read() & 0x1f; })  // Kempston 2
 		, NAME([this](u8 data) { m_covox->data_w(data); }));
 	map(0x00b3, 0x00b3).mirror(0xff00).lw8(NAME([this](u8 data) { m_covox->data_w(data); }));
-	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
-	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return  m_io_mouse[0]->read(); }));
-	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
+	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return m_io_mouse[2]->read(); }));
+	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));
+	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return m_io_mouse[1]->read(); }));
 
 	map(0x00f7, 0x00f7).mirror(0xff00).nopw(); // Audio Mixer. No support for now, using default ACB
 	map(0x8e3b, 0x8e3b).nopw(); // PRISMSPEEDCTRL used by software compatible with Prism
@@ -798,12 +798,14 @@ INPUT_PORTS_START(chloe)
 	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
 
 	PORT_START("mouse_input2")
-	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_REVERSE PORT_SENSITIVITY(30)
 
 	PORT_START("mouse_input3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0xf0, 0, IPT_DIAL_V) PORT_REVERSE PORT_SENSITIVITY(1) PORT_CODE(MOUSECODE_Z)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 INPUT_PORTS_END
 
