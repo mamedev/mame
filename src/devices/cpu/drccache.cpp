@@ -46,11 +46,11 @@ drc_cache::drc_cache(std::size_t bytes) noexcept
 	, m_neartop(nullptr)
 	, m_base(nullptr)
 	, m_top(nullptr)
+	, m_rwbase(nullptr)
 	, m_limit(nullptr)
 	, m_end(nullptr)
 	, m_codegen(nullptr)
 	, m_size(bytes)
-	, m_executable(false)
 	, m_rwx(false)
 	, m_max_temporary(0)
 	, m_flush_count(0)
@@ -78,6 +78,7 @@ drc_cache::~drc_cache()
 	{
 		try
 		{
+			m_max_temporary = std::max<std::size_t>(m_max_temporary, m_top - m_base);
 			osd_printf_verbose("drc_cache: Statistics:\nFlush count %u, near cache use %u, permanent cache use %u/%u, maximum temporary cache use %u\n",
 					m_flush_count,
 					m_neartop - m_near,
@@ -131,6 +132,7 @@ void drc_cache::allocate_cache(bool rwx)
 	m_top = m_base;
 	m_limit = m_near + m_cache->size();
 	m_end = m_limit;
+	m_rwbase = m_base;
 	m_size = m_cache->size();
 	m_rwx = false;
 
@@ -164,7 +166,7 @@ void drc_cache::allocate_cache(bool rwx)
 //  flush - flush the cache contents
 //-------------------------------------------------
 
-void drc_cache::flush()
+void drc_cache::flush() noexcept
 {
 	// can't flush in the middle of codegen
 	assert(!m_codegen);
@@ -173,7 +175,6 @@ void drc_cache::flush()
 	m_max_temporary = std::max<std::size_t>(m_max_temporary, m_top - m_base);
 	++m_flush_count;
 	m_top = m_base;
-	codegen_init();
 }
 
 
@@ -288,8 +289,8 @@ void *drc_cache::alloc_temporary(std::size_t bytes, std::align_val_t align) noex
 		return nullptr;
 
 	// otherwise, update the cache top
-	codegen_init();
 	m_top = ALIGN_PTR_UP(ptr + bytes, std::lcm(std::size_t(align), CACHE_ALIGNMENT));
+	ensure_writable(ptr);
 	return ptr;
 }
 
@@ -318,28 +319,6 @@ void drc_cache::dealloc(void *memory, std::size_t bytes) noexcept
 }
 
 
-void drc_cache::codegen_init() noexcept
-{
-	if (m_executable)
-	{
-		if (!m_rwx)
-			m_cache->set_access(0, m_size, osd::virtual_memory_allocation::READ_WRITE);
-		m_executable = false;
-	}
-}
-
-
-void drc_cache::codegen_complete() noexcept
-{
-	if (!m_executable)
-	{
-		if (!m_rwx)
-			m_cache->set_access(m_base - m_near, ALIGN_PTR_UP(m_top, m_cache->page_size()) - m_base, osd::virtual_memory_allocation::READ_EXECUTE);
-		m_executable = true;
-	}
-}
-
-
 //-------------------------------------------------
 //  begin_codegen - begin code generation
 //-------------------------------------------------
@@ -356,6 +335,7 @@ drccodeptr *drc_cache::begin_codegen(uint32_t reserve_bytes) noexcept
 
 	// otherwise, return a pointer to the cache top
 	m_codegen = m_top;
+	ensure_writable(m_top);
 	return &m_top;
 }
 
@@ -413,4 +393,25 @@ void drc_cache::request_oob_codegen(drc_oob_delegate &&callback, void *param1, v
 	oob->m_callback = std::move(callback);
 	oob->m_param1 = param1;
 	oob->m_param2 = param2;
+}
+
+
+inline void drc_cache::ensure_writable(drccodeptr ptr) noexcept
+{
+	if (!m_rwx && (ptr < m_rwbase))
+	{
+		drccodeptr const top = ALIGN_PTR_DOWN(ptr, m_cache->page_size());
+		assert(top >= m_base);
+		m_cache->set_access(top - m_near, m_rwbase - top, osd::virtual_memory_allocation::READ_WRITE);
+		m_rwbase = top;
+	}
+}
+
+
+void drc_cache::make_executable() noexcept
+{
+	drccodeptr const top = ALIGN_PTR_UP(m_top, m_cache->page_size());
+	assert(top <= m_limit);
+	m_cache->set_access(m_rwbase - m_near, top - m_rwbase, osd::virtual_memory_allocation::READ_EXECUTE);
+	m_rwbase = top;
 }
