@@ -923,10 +923,9 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 {
 	int done = 0, count = 0;
 	uint32_t *objdata;
-	int x;
 
 	/* erase the scanline first */
-	for (x = 0; x < 760; x++)
+	for (int x = 0; x < 760; x++)
 		scanline[x] = m_gpu_regs[BG];
 
 	/* fetch the object pointer */

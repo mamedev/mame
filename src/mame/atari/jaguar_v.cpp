@@ -819,8 +819,9 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 	int hdb = param >> 16;
 	const rectangle &visarea = m_screen->visible_area();
 
-	/* only run if video is enabled and we are past the "display begin" */
-	if ((m_gpu_regs[VMODE] & 1) && vc >= (m_gpu_regs[VDB] & 0x7ff))
+	/* only run if video is enabled and we are inside the display range */
+	// - valdiser depends on not drawing at display end ...
+	if ((m_gpu_regs[VMODE] & 1) && vc >= (m_gpu_regs[VDB] & 0x7ff) && vc < (m_gpu_regs[VDE] & 0x7ff))
 	{
 		// TODO: why "760"?
 		// Using this as workaround for stack overflows, investigate.

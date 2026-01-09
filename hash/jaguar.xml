@@ -1397,8 +1397,10 @@ RSoD on Jaguar logo
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Sound farts (fixed?)
-Missing/wrong GFXs on menus
-Heavy flickering on gameplay
+Missing/wrong GFXs on menus (fixed)
+Heavy flickering on gameplay (fixed)
+Overstretched pixel width
+Submerged objects during gameplay, [blitter]?
 Triggers [object] pitch = 0 8bpp at start of gameplay
 Reads back [object] processor data during gameplay
 Access [cart] EEPROM
@@ -1544,7 +1546,7 @@ Same as parent set
 		<year>1994</year>
 		<publisher>Accolade</publisher>
 		<notes><![CDATA[
-Cutoff ball sprite on main menu
+Cutoff ball sprite on main menu (fixed)
 No sound
 Either crashes or returns to player selection after stage select
 Has timing sensitive color bugs
@@ -1729,7 +1731,7 @@ GFXs are cut off during gameplay
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
 		<notes><![CDATA[
-All sprites are cutoff, wants prototype [Tom] semantics?
+All sprites are cutoff, wants prototype [Tom] semantics? (fixed)
 ]]></notes>
 
 		<part name="cart" interface="jaguar_cart">
