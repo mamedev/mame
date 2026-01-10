@@ -43219,10 +43219,8 @@ indigo
 indigo_r4000
 indigo_r4400
 
-@source:sgi/iris1400.cpp
+@source:sgi/iris.cpp
 iris1400
-
-@source:sgi/iris3130.cpp
 iris3130
 
 @source:sgi/iris_power.cpp
