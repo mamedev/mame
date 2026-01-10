@@ -16,6 +16,7 @@
 #include "emu.h"
 #include "dsd5217.h"
 
+#include "bus/qic02/qic02.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/floppy.h"
 #include "machine/am2910.h"
@@ -77,11 +78,13 @@ public:
 		, m_rio(*this, "rio")
 		, m_dma(*this, "dma")
 		, m_fdc(*this, "fdc%u", 0U)
+		, m_qic(*this, "qic")
 		, m_w6(*this, "W6")
 		, m_w7(*this, "W7")
 		, m_w9(*this, "W9")
 		, m_w10(*this, "W10")
 		, m_led(*this, "CR%u", 1U)
+		, m_port70(0)
 		, m_buf(nullptr)
 		, m_crc(nullptr)
 		, m_interrupt(false)
@@ -111,6 +114,7 @@ protected:
 	void mua_w(u8 data);
 	u8 port20_r();
 	void port78_w(u8 data);
+	void port7c_w(u8 data);
 
 	// helpers
 	void append_crc();
@@ -123,6 +127,7 @@ private:
 	required_device<am9517a_device> m_dma;
 
 	required_device_array<floppy_connector, 2> m_fdc;
+	required_device<qic02_connector_device> m_qic;
 
 	required_ioport m_w6;
 	required_ioport m_w7;
@@ -132,7 +137,9 @@ private:
 
 	u16 m_wua; // wake-up address latch
 	u8 m_mua;  // Multibus upper address
+	u8 m_port70;
 	u8 m_port78;
+	u8 m_port7c;
 	u8 m_scratch[4];
 
 	u8 m_pa; // i8155 port A
@@ -197,6 +204,7 @@ void multibus_dsd5217_device::device_reset()
 	m_wua = 0;
 	m_mua = 0;
 	m_port78 = 0;
+	m_port7c = 0;
 	m_pa = 0;
 	m_pb = 0;
 	m_pc = 0;
@@ -221,13 +229,15 @@ void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
 	m_rio->out_pa_callback().set(
 		[this](u8 data)
 		{
-			LOG("%s: port A 0x%02x\n", machine().describe_context(), data);
+			if (m_pa ^ data)
+				LOG("%s: port A 0x%02x\n", machine().describe_context(), data);
 			m_pa = data;
 		});
 	m_rio->out_pb_callback().set(
 		[this](u8 data)
 		{
-			LOG("%s: port B 0x%02x\n", machine().describe_context(), data);
+			if (m_pb ^ data)
+				LOG("%s: port B 0x%02x\n", machine().describe_context(), data);
 
 			if (floppy_image_device *f = m_fdc[0]->get_device())
 			{
@@ -243,7 +253,8 @@ void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
 	m_rio->out_pc_callback().set(
 		[this](u8 data)
 		{
-			LOG("%s: port C 0x%02x\n", machine().describe_context(), data);
+			if (m_pc ^ data)
+				LOG("%s: port C 0x%02x\n", machine().describe_context(), data);
 
 			if (BIT(data, PC_WUA))
 			{
@@ -276,6 +287,10 @@ void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
 	// floppy: 250Kbps MFM, 80 tracks, 2 sides, 8 sectors/track, 512 byte sectors,
 	FLOPPY_CONNECTOR(config, m_fdc[0], "525qd", FLOPPY_525_QD, true,  floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_fdc[1], "525qd", FLOPPY_525_QD, false, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+
+	QIC02_CONNECTOR(config, m_qic);
+	m_qic->rdy().set([this](int state) { if (!state) m_port70 |= 0x80; else m_port70 &= ~0x80; });
+	m_qic->exc().set_inputline(m_cpu, I8085_RST65_LINE).invert();
 }
 
 void multibus_dsd5217_device::append_crc()
@@ -329,6 +344,7 @@ void multibus_dsd5217_device::cpu_mem(address_map &map)
 			}
 		}, "crc_w");
 
+	map(0x7000, 0x7000).lrw8([this]() { return ~m_qic->data_r(); }, "qic_r", [this](u8 data) { m_qic->data_w(~data); }, "qic_w");
 	map(0x8000, 0xffff).rw(FUNC(multibus_dsd5217_device::bus_r), FUNC(multibus_dsd5217_device::bus_w));
 }
 
@@ -343,9 +359,10 @@ void multibus_dsd5217_device::cpu_pio(address_map &map)
 	map(0x68, 0x68).lw8([this](u8 data) { multibus_dsd5217_device::ctr_w<false>(0, data); }, "ctr0l_w");
 	map(0x6c, 0x6c).lw8([this](u8 data) { multibus_dsd5217_device::ctr_w<true>(1, data); }, "ctr1h_w");
 	map(0x70, 0x70).lw8([this](u8 data) { multibus_dsd5217_device::ctr_w<false>(1, data); }, "ctr1l_w");
-	map(0x70, 0x70).lr8([this]() { return u8(m_w6->read()) | 0x80; }, "w6_r");
+	map(0x70, 0x70).lr8([this]() { return u8(m_w6->read()) | m_port70; }, "w6_r");
 	map(0x74, 0x74).w(FUNC(multibus_dsd5217_device::mua_w));
 	map(0x78, 0x78).w(FUNC(multibus_dsd5217_device::port78_w));
+	map(0x7c, 0x7c).w(FUNC(multibus_dsd5217_device::port7c_w));
 }
 
 void multibus_dsd5217_device::cmd_w(u8 data)
@@ -411,7 +428,8 @@ template <unsigned Port> void multibus_dsd5217_device::buf_w(u8 data)
 
 void multibus_dsd5217_device::mua_w(u8 data)
 {
-	LOG("%s: mua_w 0x%02x\n", machine().describe_context(), data);
+	if (m_mua ^ data)
+		LOG("%s: mua_w 0x%02x\n", machine().describe_context(), data);
 	m_mua = data;
 }
 
@@ -435,7 +453,8 @@ u8 multibus_dsd5217_device::port20_r()
 
 void multibus_dsd5217_device::port78_w(u8 data)
 {
-	LOG("%s: port78_w 0x%02x\n", machine().describe_context(), data);
+	if (m_port78 ^ data)
+		LOG("%s: port78_w 0x%02x\n", machine().describe_context(), data);
 
 	m_led[0] = BIT(data, P78_CR1);
 	m_led[1] = BIT(data, P78_CR2);
@@ -443,6 +462,23 @@ void multibus_dsd5217_device::port78_w(u8 data)
 	interrupt(BIT(data, P78_MBINT));
 
 	m_port78 = data;
+}
+
+void multibus_dsd5217_device::port7c_w(u8 data)
+{
+	if (m_port7c ^ data)
+		LOG("%s: port7c_w 0x%02x\n", machine().describe_context(), data);
+
+	if (BIT(m_port7c ^ data, 7))
+		m_qic->onl_w(!BIT(data, 7));
+	if (BIT(m_port7c ^ data, 6))
+		m_qic->req_w(!BIT(data, 6));
+	if (BIT(m_port7c ^ data, 5))
+		m_qic->rst_w(!BIT(data, 5));
+	if (BIT(m_port7c ^ data, 0))
+		m_qic->xfr_w(!BIT(data, 0));
+
+	m_port7c = data;
 }
 
 void multibus_dsd5217_device::interrupt(bool state)
@@ -468,11 +504,20 @@ void multibus_dsd5217_device::interrupt(bool state)
 }
 
 ROM_START(dsd5217)
-	ROM_SYSTEM_BIOS(0, "a", "080448-02 Rev A")
-
 	ROM_REGION(0x4000, "cpu", 0)
-	ROMX_LOAD("80448_01.bin", 0x0000, 0x2000, CRC(371cb3d0) SHA1(a9a64c75ac622bae3fbecb116e0445df9cb53205), ROM_BIOS(0))
-	ROMX_LOAD("80448_02.bin", 0x2000, 0x2000, CRC(edb2ad5d) SHA1(8b3dca21eea8d3b912572480f20fc1e53610ea04), ROM_BIOS(0))
+	ROM_DEFAULT_BIOS("5217")
+
+	ROM_SYSTEM_BIOS(0, "5215", "080341 Rev C")
+	ROMX_LOAD("080341_5.bin", 0x0000, 0x2000, CRC(3d774f14) SHA1(cb21936d2b9de9d0167e0e6f0bb122e11b182bcf), ROM_BIOS(0))
+	ROMX_LOAD("080341_6.bin", 0x2000, 0x2000, CRC(40b02f18) SHA1(7303d35aba6f3e394949126bf115fdd19a33ec7a), ROM_BIOS(0))
+
+	ROM_SYSTEM_BIOS(1, "5217", "080448 Rev A")
+	ROMX_LOAD("080448_01.bin", 0x0000, 0x2000, CRC(371cb3d0) SHA1(a9a64c75ac622bae3fbecb116e0445df9cb53205), ROM_BIOS(1))
+	ROMX_LOAD("080448_02.bin", 0x2000, 0x2000, CRC(edb2ad5d) SHA1(8b3dca21eea8d3b912572480f20fc1e53610ea04), ROM_BIOS(1))
+
+	ROM_REGION(0x802, "seq", 0)
+	ROM_LOAD("080202_1.bin", 0x000, 0x401, CRC(9287dbf5) SHA1(4293cde7ddbedf02814d144d77dba67387677004)) // AM27S35 including "initialize word"
+	ROM_LOAD("080202_2.bin", 0x401, 0x401, CRC(896c5aaf) SHA1(5fe589a79806451abcbfbcff28eca39e925df264)) // AM27S35 including "initialize word"
 ROM_END
 
 const tiny_rom_entry *multibus_dsd5217_device::device_rom_region() const
