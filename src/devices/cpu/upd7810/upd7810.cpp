@@ -1854,7 +1854,7 @@ void upd7801_device::device_start()
 	state_add( UPD7810_TM0,  "TM0",  m_tm.b.l).formatstr("%02X");
 	state_add( UPD7810_TM1,  "TM1",  m_tm.b.h).formatstr("%02X");
 	state_add( UPD7810_MB,   "MB",   m_mb).formatstr("%02X");
-	state_add( UPD7810_MB,   "MC",   m_mc).formatstr("%02X");
+	state_add( UPD7810_MC,   "MC",   m_mc).formatstr("%02X");
 	state_add( UPD7810_MKL,  "MKL",  m_mkl).formatstr("%02X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc.w.l ).formatstr("%04X").noshow();
