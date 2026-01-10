@@ -53,6 +53,7 @@
 #include "screen.h"
 
 #include "vt100.lh"
+#include "vt102.lh"
 
 
 namespace {
@@ -468,6 +469,7 @@ void vt100_state::vt102(machine_config &config)
 {
 	vt101(config);
 
+	config.set_default_layout(layout_vt102);
 	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt102_io);
 
 	ins8250_device &printuart(INS8250(config, "printuart", XTAL(24'073'400) / 16));
