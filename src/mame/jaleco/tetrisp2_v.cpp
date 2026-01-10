@@ -646,6 +646,8 @@ u32 stepstag_state::screen_update_stepstag_left(screen_device &screen, bitmap_rg
 			bitmap, screen.priority(), cliprect, nullptr,
 			m_spriteram1_data.get(), 0x400, m_vj_sprite_l);
 
+	m_jaleco_vj_pc->render_video_frame<0>(bitmap);
+
 	return 0;
 }
 
@@ -660,6 +662,8 @@ u32 stepstag_state::screen_update_stepstag_mid(screen_device &screen, bitmap_rgb
 	tetrisp2_draw_sprites(
 			bitmap, screen.priority(), cliprect, nullptr,
 			m_spriteram2_data.get(), 0x400, m_vj_sprite_m);
+
+	m_jaleco_vj_pc->render_video_frame<1>(bitmap);
 
 	m_tilemap_bg->set_scrollx(0, (((m_scroll_bg[0] + 0x0014) + m_scroll_bg[2]) & 0xffff));
 	m_tilemap_bg->set_scrolly(0, (((m_scroll_bg[3] + 0x0000) + m_scroll_bg[5]) & 0xffff));
@@ -723,6 +727,8 @@ u32 stepstag_state::screen_update_stepstag_right(screen_device &screen, bitmap_r
 	tetrisp2_draw_sprites(
 			bitmap, screen.priority(), cliprect, nullptr,
 			m_spriteram3_data.get(), 0x400, m_vj_sprite_r);
+
+	m_jaleco_vj_pc->render_video_frame<2>(bitmap);
 
 	return 0;
 }
@@ -835,6 +841,8 @@ u32 stepstag_state::screen_update_vjdash_left(screen_device &screen, bitmap_rgb3
 			bitmap, screen.priority(), cliprect, nullptr,
 			m_spriteram1_data.get(), 0x400, m_vj_sprite_l);
 
+	m_jaleco_vj_pc->render_video_frame<0>(bitmap);
+
 	return 0;
 }
 
@@ -847,6 +855,8 @@ u32 stepstag_state::screen_update_vjdash_mid(screen_device &screen, bitmap_rgb32
 			bitmap, screen.priority(), cliprect, nullptr,
 			m_spriteram2_data.get(), 0x400, m_vj_sprite_m);
 
+	m_jaleco_vj_pc->render_video_frame<1>(bitmap);
+
 	return 0;
 }
 
@@ -858,6 +868,8 @@ u32 stepstag_state::screen_update_vjdash_right(screen_device &screen, bitmap_rgb
 	tetrisp2_draw_sprites(
 			bitmap, screen.priority(), cliprect, nullptr,
 			m_spriteram3_data.get(), 0x400, m_vj_sprite_r);
+
+	m_jaleco_vj_pc->render_video_frame<2>(bitmap);
 
 	return 0;
 }
