@@ -244,6 +244,10 @@ void video_manager::frame_update(bool from_debugger)
 		machine().osd().update(!from_debugger && skipped_it);
 	}
 
+	// prepare screens for next frame
+	if (update_screens)
+		post_screen_updates();
+
 	// we synchronize after rendering instead of before, if low latency mode is enabled
 	if (!from_debugger && phase > machine_phase::INIT && m_low_latency && effective_throttle())
 		update_throttle(current_time);
@@ -654,6 +658,19 @@ bool video_manager::finish_screen_updates()
 	return anything_changed;
 }
 
+
+//-------------------------------------------------
+//  post_screen_updates - prepare screens for next
+//  frame
+//-------------------------------------------------
+
+void video_manager::post_screen_updates()
+{
+	screen_device_enumerator iter(machine().root_device());
+
+	for (screen_device &screen : iter)
+		screen.switch_current_bitmap();
+}
 
 
 //-------------------------------------------------
