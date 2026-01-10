@@ -840,7 +840,7 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 		uint32_t *dest = &m_screen_bitmap.pix(vc >> 1);
 		int maxx = visarea.right();
 		int hde = effective_hvalue(m_gpu_regs[HDE]) >> 1;
-		uint16_t x, scanline[line_size];
+		uint16_t x;
 		uint8_t xx, pixel_width = ((m_gpu_regs[VMODE]>>10)&3)+1;
 
 		/* if we are first on this scanline, clear to the border color */
@@ -852,7 +852,8 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 		}
 
 		/* process the object list for this counter value */
-		process_object_list(vc, scanline);
+		// NOTE: line buffer is still a parameter because there are two of them (alternating display and draw)
+		process_object_list(vc, m_line_buffer);
 
 		/* copy the data to the target, clipping */
 		if ((m_gpu_regs[VMODE] & 0x106) == 0x002)   /* RGB24 */
@@ -861,9 +862,9 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 			{
 				for (xx = 0; xx < pixel_width; xx++)
 				{
-					uint8_t r = m_pen_table[(scanline[x % line_size]&0xff)|256];
-					uint8_t g = m_pen_table[(scanline[x % line_size]>>8)|512];
-					uint8_t b = m_pen_table[scanline[(x+1) % line_size]&0xff];
+					uint8_t r = m_pen_table[(m_line_buffer[x % line_size]&0xff)|256];
+					uint8_t g = m_pen_table[(m_line_buffer[x % line_size]>>8)|512];
+					uint8_t b = m_pen_table[m_line_buffer[(x+1) % line_size]&0xff];
 					dest[hdb % line_size] = rgb_t(r, g, b);
 					hdb++;
 				}
@@ -875,7 +876,7 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 			{
 				for (xx = 0; xx < pixel_width; xx++)
 				{
-					dest[hdb % line_size] = m_pen_table[scanline[x % line_size]];
+					dest[hdb % line_size] = m_pen_table[m_line_buffer[x % line_size]];
 					hdb++;
 				}
 			}
@@ -883,7 +884,9 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 	}
 	// punt if we are in suspend state (next timer at $f00026)
 	if (m_suspend_object_pointer)
+	{
 		return;
+	}
 
 	/* adjust the timer in a loop, to handle missed cases */
 	do
@@ -924,6 +927,7 @@ void jaguar_state::video_start()
 void jaguar_state::video_reset()
 {
 	m_suspend_object_pointer = 0;
+	m_blitter_status = 1;
 	//m_gpu_regs[OBF] = 0;
 
 	m_blitter_done_timer->adjust(attotime::never);
