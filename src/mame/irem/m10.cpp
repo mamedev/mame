@@ -165,28 +165,6 @@ protected:
 
 	required_ioport m_cab;
 
-	static constexpr XTAL IREMM10_MASTER_CLOCK = 12.5_MHz_XTAL;
-
-	static constexpr XTAL IREMM10_CPU_CLOCK = IREMM10_MASTER_CLOCK / 16;
-	static constexpr XTAL IREMM10_PIXEL_CLOCK = IREMM10_MASTER_CLOCK / 2;
-	static constexpr int IREMM10_HTOTAL = 360; // (0x100-0xd3) * 8
-	static constexpr int IREMM10_HBSTART = 248;
-	static constexpr int IREMM10_HBEND = 8;
-	static constexpr int IREMM10_VTOTAL = 281; // (0x200-0xe7)
-	static constexpr int IREMM10_VBSTART = 240;
-	static constexpr int IREMM10_VBEND = 16;
-
-	static constexpr XTAL IREMM11_MASTER_CLOCK = 11.73_MHz_XTAL;
-
-	static constexpr XTAL IREMM11_CPU_CLOCK = IREMM11_MASTER_CLOCK / 16;
-	static constexpr XTAL IREMM11_PIXEL_CLOCK = IREMM11_MASTER_CLOCK / 2;
-	static constexpr int IREMM11_HTOTAL = 372;
-	static constexpr int IREMM11_HBSTART = 256;
-	static constexpr int IREMM11_HBEND = 0;
-	static constexpr int IREMM11_VTOTAL = 262;
-	static constexpr int IREMM11_VBSTART = 240;
-	static constexpr int IREMM11_VBEND = 16;
-
 	// video-related
 	tilemap_t *m_tx_tilemap;
 
@@ -237,7 +215,6 @@ private:
 	uint8_t clear_74123_r();
 	void chargen_w(offs_t offset, uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	inline void plot_pixel(bitmap_ind16 &bm, int x, int y, int col);
 
 	void m10_main(address_map &map) ATTR_COLD;
 	void m11_main(address_map &map) ATTR_COLD;
@@ -336,15 +313,6 @@ void m15_state::chargen_w(offs_t offset, uint8_t data)
 }
 
 
-inline void m10_state::plot_pixel(bitmap_ind16 &bm, int x, int y, int col)
-{
-	if (!m_flip)
-		bm.pix(y, x) = col;
-	else
-		bm.pix((IREMM10_VBSTART - 1) - (y - IREMM10_VBEND),
-				(IREMM10_HBSTART - 1) - (x - IREMM10_HBEND)) = col; // only when flip_screen(?)
-}
-
 void m10_state::video_start()
 {
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m10_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(m10_state::tilemap_scan)), 8, 8, 32, 32);
@@ -361,6 +329,7 @@ void m15_state::video_start()
 	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(m15_state::get_tile_info)), tilemap_mapper_delegate(*this, FUNC(m15_state::tilemap_scan)), 8, 8, 32, 32);
 }
 
+
 /***************************************************************************
 
   Draw the game screen in the given bitmap_ind16.
@@ -373,14 +342,21 @@ uint32_t m10_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	for (int i = 0; i < 4; i++)
 		if (m_flip)
-				m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 1, 1, 31 * 8 - m_back_xpos[i], 0);
+			m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 1, 1, 31 * 8 - m_back_xpos[i], 0);
 		else
-				m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 0, 0, m_back_xpos[i], 0);
+			m_back_gfx->opaque(bitmap,cliprect, i, m_back_color[i], 0, 0, m_back_xpos[i], 0);
 
 	if (m_bottomline)
 	{
-		for (int y = IREMM10_VBEND; y < IREMM10_VBSTART; y++)
-			plot_pixel(bitmap, 16, y, 1);
+		int x = 16;
+		if (m_flip)
+			x = screen.visible_area().right() - (x - screen.visible_area().left());
+
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		{
+			if (cliprect.contains(x, y))
+				bitmap.pix(y, x) = 1;
+		}
 	}
 
 	for (int offs = m_videoram.bytes() - 1; offs >= 0; offs--)
@@ -530,7 +506,6 @@ void m10_state::m10_ctrl_w(uint8_t data)
 		m_samples->stop(4);
 	else
 		m_samples->start(4, 9, true);
-
 }
 
 /*
@@ -641,7 +616,6 @@ void m10_state::m11_a100_w(uint8_t data)
 		m_samples->start(4, 9, true);
 	else
 		m_samples->stop(4);
-
 }
 
 void m15_state::a100_w(uint8_t data)
@@ -725,7 +699,7 @@ INPUT_CHANGED_MEMBER(m1x_state::coin_inserted)
 
 INTERRUPT_GEN_MEMBER(m15_state::interrupt)
 {
-	device.execute().pulse_input_line(0, m_screen->time_until_pos(IREMM11_VBSTART + 1, 80));
+	device.execute().pulse_input_line(0, m_screen->time_until_pos(m_screen->visible_area().bottom() + 1, 80));
 }
 
 
@@ -1008,10 +982,10 @@ INPUT_PORTS_END
  *
  *************************************/
 
-
 static GFXDECODE_START( gfx_m10 )
 	GFXDECODE_ENTRY( "tiles", 0x0000, charlayout, 0, 8 )
 GFXDECODE_END
+
 
 /*************************************
  *
@@ -1045,12 +1019,12 @@ static const char *const m10_sample_names[] =
 void m10_state::m10(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, IREMM10_CPU_CLOCK);
+	M6502(config, m_maincpu, 12.5_MHz_XTAL / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m10_main);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(IREMM10_PIXEL_CLOCK, IREMM10_HTOTAL, IREMM10_HBEND, IREMM10_HBSTART, IREMM10_VTOTAL, IREMM10_VBEND, IREMM10_VBSTART);
+	m_screen->set_raw(12.5_MHz_XTAL / 2, 360 /* (0x100-0xd3) * 8 */, 8, 248, 281 /* (0x200-0xe7) */, 16, 240);
 	m_screen->set_screen_update(FUNC(m10_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -1093,8 +1067,9 @@ void m10_state::m11(machine_config &config)
 {
 	m10(config);
 
-	m_maincpu->set_clock(IREMM11_CPU_CLOCK);
-	m_screen->set_raw(IREMM11_PIXEL_CLOCK, IREMM11_HTOTAL, IREMM11_HBEND, IREMM11_HBSTART, IREMM11_VTOTAL, IREMM11_VBEND, IREMM11_VBSTART);
+	// video hardware
+	m_maincpu->set_clock(11.73_MHz_XTAL / 16);
+	m_screen->set_raw(11.73_MHz_XTAL / 2, 372, 0, 256, 262, 16, 240);
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m11_main);
@@ -1106,13 +1081,13 @@ void m10_state::m11(machine_config &config)
 void m15_state::m15(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, IREMM11_CPU_CLOCK);
+	M6502(config, m_maincpu, 11.73_MHz_XTAL / 16);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m15_state::main);
 	m_maincpu->set_vblank_int("screen", FUNC(m15_state::interrupt));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(IREMM11_PIXEL_CLOCK, IREMM11_HTOTAL, IREMM11_HBEND, IREMM11_HBSTART, IREMM11_VTOTAL, IREMM11_VBEND, IREMM11_VBSTART);
+	m_screen->set_raw(11.73_MHz_XTAL / 2, 372, 0, 256, 262, 16, 240);
 	m_screen->set_screen_update(FUNC(m15_state::screen_update));
 	m_screen->set_palette(m_palette);
 
