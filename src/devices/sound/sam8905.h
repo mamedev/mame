@@ -17,6 +17,9 @@ public:
 	// External waveform memory callback (address 20-bit → data 12-bit signed)
 	auto waveform_read_callback() { return m_waveform_read.bind(); }
 
+	// Sample output callback for inter-chip audio (L/R packed as upper/lower 16 bits)
+	auto sample_output_callback() { return m_sample_output.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -53,6 +56,9 @@ private:
 
 	// External waveform memory callback
 	devcb_read16 m_waveform_read;
+
+	// Sample output callback for inter-chip audio
+	devcb_write32 m_sample_output;
 
 	static constexpr uint32_t MASK19 = 0x7FFFF;
 };

@@ -85,6 +85,9 @@ private:
     u16 sam_snd_waveform_r(offs_t offset);
     u16 sam_fx_waveform_r(offs_t offset);
 
+    // SAM8905 inter-chip audio callback (sound SAM -> FX SAM)
+    void sam_snd_sample_out(uint32_t data);
+
     void midi_rxd_w(int state) { m_midi_rxd = state; }
 
     required_device<i80c32_device> m_maincpu;
@@ -99,6 +102,10 @@ private:
     u8 m_port2 = 0xff;
     u8 m_port3 = 0xff;
     u8 m_midi_rxd = 1;  // MIDI RX bit (idle high)
+
+    // FX SAM input samples (from sound SAM via 74HC595 shift registers)
+    int16_t m_fx_input_l = 0;
+    int16_t m_fx_input_r = 0;
 
     // SAM8905 DSP - two chips selected via T1 (P3.5)
     // T1=1: Sound generation SAM (index 0)
@@ -325,27 +332,18 @@ u8 keyfox10_state::sam_fx_r(offs_t offset)
         }
         return m_rom[rom_offset];
     }
-#ifdef ENABLE_SAM_FX
     // T1=1: SAM chip (only first 8 bytes decoded)
     if (offset < 8)
         return sam8905_r(1, offset);
     return 0xff;  // Unmapped
-#else
-    return 0;
-#endif
 }
 
 void keyfox10_state::sam_fx_w(offs_t offset, u8 data)
 {
-#ifdef ENABLE_SAM_FX
     // T1=0: ROM (writes ignored)
     // T1=1: SAM FX chip access
     if (BIT(m_port3, 5) && offset < 8)
         sam8905_w(1, offset, data);
-#else
-    (void)offset;
-    (void)data;
-#endif
 }
 
 u8 keyfox10_state::sam8905_r(int chip, offs_t offset)
@@ -536,6 +534,8 @@ void keyfox10_state::machine_start()
     save_item(NAME(m_port3));
     save_item(NAME(m_midi_rxd));
     save_item(NAME(m_disp_sr));
+    save_item(NAME(m_fx_input_l));
+    save_item(NAME(m_fx_input_r));
 }
 
 void keyfox10_state::dump_sam_memory() const
@@ -654,20 +654,34 @@ u16 keyfox10_state::sam_snd_waveform_r(offs_t offset)
     return (int16_t)(int8_t)sample << 4;
 }
 
+// Callback from sound SAM: captures L/R samples for FX SAM input
+void keyfox10_state::sam_snd_sample_out(uint32_t data)
+{
+    // Unpack L/R from 32-bit value: upper 16 = L, lower 16 = R
+    m_fx_input_l = int16_t(data >> 16);
+    m_fx_input_r = int16_t(data & 0xFFFF);
+}
+
 u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
 {
-    // FX chip uses same ROM mapping as SND: (WAVE[6:0] << 10) | PHI[11:2]
+    // Check WA19 (bit 19) - if set, return input from sound SAM via 74HC595 shift registers
+    // WA[19:0] = { WAVE[7:0], PHI[11:0] }
+    // When WA19=1 (WAVE[7]=1, i.e., WF >= 0x80), reads from shift registers
+    // WA0 (PHI[0]) selects channel: 0=Left, 1=Right
+    if (offset & 0x80000)  // WA19 set - read input sample
+    {
+        // Return sound SAM output sample for FX processing
+        int16_t sample = (offset & 1) ? m_fx_input_r : m_fx_input_l;
+        // Convert 16-bit sample to 12-bit (SAM8905 waveform data is 12-bit signed)
+        return sample >> 4;
+    }
+
+    // Normal ROM access: (WAVE[6:0] << 10) | PHI[11:2]
     uint32_t wave = (offset >> 12) & 0x7F;   // WAVE[6:0] - 7 bits
     uint32_t phi_int = ((offset & 0xFFF) >> 2) & 0x3FF;  // PHI[11:2] - 10 bits
     uint32_t rom_addr = (wave << 10) | phi_int;
-    bool use_rhythm = BIT(offset, 19);
 
-    u8 sample;
-    if (use_rhythm)
-        sample = m_rhythms_rom[rom_addr];
-    else
-        sample = m_samples_rom[rom_addr];
-
+    u8 sample = m_samples_rom[rom_addr];
     return (int16_t)(int8_t)sample << 4;
 }
 
@@ -701,8 +715,9 @@ void keyfox10_state::keyfox10(machine_config &config)
     // Clock: 22.5792 MHz / 1024 = 22.05 kHz sample rate
     SAM8905(config, m_sam_snd, 22'579'200);
     m_sam_snd->waveform_read_callback().set(FUNC(keyfox10_state::sam_snd_waveform_r));
-    m_sam_snd->add_route(0, "lspeaker", 1.0);
-    m_sam_snd->add_route(1, "rspeaker", 1.0);
+    m_sam_snd->sample_output_callback().set(FUNC(keyfox10_state::sam_snd_sample_out));
+    m_sam_snd->add_route(0, "lspeaker", 1.0);  // Dry L
+    m_sam_snd->add_route(1, "rspeaker", 1.0);  // Dry R
 
     // SAM8905 FX - effects processor (at 0xE000 when T1=1)
     SAM8905(config, m_sam_fx, 22'579'200);

@@ -11,6 +11,7 @@ sam8905_device::sam8905_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_waveform_read(*this, 0)
+	, m_sample_output(*this)
 {
 }
 
@@ -386,6 +387,13 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 
 		stream.put_int_clamp(0, samp, out_l, 32768);
 		stream.put_int_clamp(1, samp, out_r, 32768);
+
+		// Fire sample output callback for inter-chip audio (FX processing)
+		if (!m_sample_output.isunset()) {
+			// Pack L/R as 32-bit value: upper 16 = L, lower 16 = R
+			uint32_t packed = ((out_l & 0xFFFF) << 16) | (out_r & 0xFFFF);
+			m_sample_output(packed);
+		}
 	}
 }
 
