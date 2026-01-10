@@ -706,11 +706,9 @@ private:
 	void cps2_gfx_decode();
 	virtual void find_last_sprite() override;
 	void cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks);
-	void cps2_set_sprite_priorities();
 	void cps2_objram_latch(int state);
 	uint16_t *cps2_objbase();
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	uint32_t screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void cps2_map(address_map &map) ATTR_COLD;
 	void cps2_comm_map(address_map &map) ATTR_COLD;
@@ -898,7 +896,7 @@ void cps2_state::find_last_sprite()    /* Find the offset of last sprite */
 	m_cps2_last_sprite_offset = m_cps2_obj_size / 2 - 4;
 }
 
-void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks )
+void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks)
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                                    \
 {                                                                                   \
@@ -919,8 +917,8 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 }
 
 	uint16_t *base = m_cps2_buffered_obj.get();
-	int xoffs = 64 - m_output[CPS2_OBJ_XOFFS /2];
-	int yoffs = 16 - m_output[CPS2_OBJ_YOFFS /2];
+	int xoffs = 64 - m_output[CPS2_OBJ_XOFFS / 2];
+	int yoffs = 16 - m_output[CPS2_OBJ_YOFFS / 2];
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed(KEYCODE_Z) && machine().input().code_pressed(KEYCODE_R))
@@ -940,8 +938,8 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 
 		if (colour & 0x80)
 		{
-			x += m_output[CPS2_OBJ_XOFFS /2];  /* fix the offset of some games */
-			y += m_output[CPS2_OBJ_YOFFS /2];  /* like Marvel vs. Capcom ending credits */
+			x += m_output[CPS2_OBJ_XOFFS / 2]; /* fix the offset of some games */
+			y += m_output[CPS2_OBJ_YOFFS / 2]; /* like Marvel vs. Capcom ending credits */
 		}
 
 		if (colour & 0xff00)
@@ -1052,23 +1050,25 @@ void cps2_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, cons
 	int l3 = (layercontrol >> 0x0c) & 0x03;
 	screen.priority().fill(0, cliprect);
 
-	int primasks[8], i;
+	int primasks[8];
 	int l0pri = (m_pri_ctrl >> 4 * l0) & 0x0f;
 	int l1pri = (m_pri_ctrl >> 4 * l1) & 0x0f;
 	int l2pri = (m_pri_ctrl >> 4 * l2) & 0x0f;
 	int l3pri = (m_pri_ctrl >> 4 * l3) & 0x0f;
 
 #if 0
-if (    (m_output[CPS2_OBJ_BASE /2] != 0x7080 && m_output[CPS2_OBJ_BASE /2] != 0x7000) ||
-		m_output[CPS2_OBJ_UK1 /2] != 0x807d ||
-		(m_output[CPS2_OBJ_UK2 /2] != 0x0000 && m_output[CPS2_OBJ_UK2 /2] != 0x1101 && m_output[CPS2_OBJ_UK2 /2] != 0x0001))
-	popmessage("base %04x uk1 %04x uk2 %04x",
-			m_output[CPS2_OBJ_BASE /2],
-			m_output[CPS2_OBJ_UK1 /2],
-			m_output[CPS2_OBJ_UK2 /2]);
+	if ((m_output[CPS2_OBJ_BASE / 2] != 0x7080 && m_output[CPS2_OBJ_BASE / 2] != 0x7000) ||
+			m_output[CPS2_OBJ_UK1 / 2] != 0x807d ||
+			(m_output[CPS2_OBJ_UK2 / 2] != 0x0000 && m_output[CPS2_OBJ_UK2 / 2] != 0x1101 && m_output[CPS2_OBJ_UK2 / 2] != 0x0001))
+	{
+		popmessage("base %04x uk1 %04x uk2 %04x",
+				m_output[CPS2_OBJ_BASE / 2],
+				m_output[CPS2_OBJ_UK1 / 2],
+				m_output[CPS2_OBJ_UK2 / 2]);
+	}
 
-if (0 && machine().input().code_pressed(KEYCODE_Z))
-	popmessage("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
+	if (0 && machine().input().code_pressed(KEYCODE_Z))
+		popmessage("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
 #endif
 
 	/* take out the CPS1 sprites layer */
@@ -1084,7 +1084,7 @@ if (0 && machine().input().code_pressed(KEYCODE_Z))
 		if (l1pri > l2pri) mask1 &= ~0xc0;
 
 		primasks[0] = 0xff;
-		for (i = 1; i < 8; i++)
+		for (int i = 1; i < 8; i++)
 		{
 			if (i <= l0pri && i <= l1pri && i <= l2pri)
 			{
@@ -1105,22 +1105,11 @@ if (0 && machine().input().code_pressed(KEYCODE_Z))
 }
 
 
-uint32_t cps2_state::screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	cps2_set_sprite_priorities();
-	return screen_update_cps1(screen, bitmap, cliprect);
-}
-
-void cps2_state::cps2_set_sprite_priorities()
-{
-	m_pri_ctrl = m_output[CPS2_OBJ_PRI /2];
-}
-
 void cps2_state::cps2_objram_latch(int state)
 {
 	if (state)
 	{
-		cps2_set_sprite_priorities();
+		m_pri_ctrl = m_output[CPS2_OBJ_PRI / 2];
 		memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);
 	}
 }
@@ -1835,9 +1824,8 @@ void cps2_state::cps2(machine_config &config)
 
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
-	m_screen->set_screen_update(FUNC(cps2_state::screen_update_cps2));
+	m_screen->set_screen_update(FUNC(cps2_state::screen_update_cps1));
 	m_screen->screen_vblank().set(FUNC(cps2_state::screen_vblank_cps1));
 	m_screen->screen_vblank().append(FUNC(cps2_state::cps2_objram_latch));
 	m_screen->set_palette(m_palette);
