@@ -189,6 +189,9 @@ public:
 		m_ic8j2(*this, "ic8j2")
 	{ }
 
+	void init_ipminvad();
+	void init_andromed();
+
 	void m10(machine_config &config) ATTR_COLD;
 	void m11(machine_config &config) ATTR_COLD;
 
@@ -413,6 +416,19 @@ void m10_state::machine_start()
 {
 	m1x_state::machine_start();
 	save_item(NAME(m_bottomline));
+}
+
+void m10_state::init_ipminvad()
+{
+	m_back_color[0] = 3; m_back_color[1] = 3; m_back_color[2] = 5; m_back_color[3] = 5;
+	m_back_xpos[0] = 4 * 8; m_back_xpos[1] = 26 * 8; m_back_xpos[2] = 7 * 8; m_back_xpos[3] = 6 * 8;
+}
+
+void m10_state::init_andromed()
+{
+	// chargen is unused by skychut?
+	m_back_color[0] = 3; m_back_color[1] = 0; m_back_color[2] = 3; m_back_color[3] = 3;
+	m_back_xpos[0] = 4 * 8; m_back_xpos[1] = 26 * 8; m_back_xpos[2] = 2 * 8; m_back_xpos[3] = 3 * 8;
 }
 
 void m1x_state::machine_reset()
@@ -1058,9 +1074,6 @@ void m10_state::m10(machine_config &config)
 	m_samples->set_channels(6);
 	m_samples->set_samples_names(m10_sample_names);
 	m_samples->add_route(ALL_OUTPUTS, "mono", 1.0);
-
-	m_back_color[0] = 3; m_back_color[1] = 3; m_back_color[2] = 5; m_back_color[3] = 5;
-	m_back_xpos[0] = 4 * 8; m_back_xpos[1] = 26 * 8; m_back_xpos[2] = 7 * 8; m_back_xpos[3] = 6 * 8;
 }
 
 void m10_state::m11(machine_config &config)
@@ -1073,9 +1086,6 @@ void m10_state::m11(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &m10_state::m11_main);
-
-	m_back_color[0] = 3; m_back_color[1] = 0; m_back_color[2] = 3; m_back_color[3] = 3;
-	m_back_xpos[0] = 4 * 8; m_back_xpos[1] = 26 * 8; m_back_xpos[2] = 2 * 8; m_back_xpos[3] = 3 * 8;
 }
 
 void m15_state::m15(machine_config &config)
@@ -1227,14 +1237,14 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT    MACHINE INPUT     CLASS      INIT        ROT     COMPANY FULLNAME                         FLAGS
-GAME( 1979, ipminvad,  0,        m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (M10, set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad1, ipminvad, m10,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (M10, set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ipminvad2, ipminvad, m11,    ipminvad, m10_state, empty_init, ROT270, "IPM",  "IPM Invader (M11)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT    MACHINE INPUT     CLASS      INIT           ROT     COMPANY FULLNAME                         FLAGS
+GAME( 1979, ipminvad,  0,        m10,    ipminvad, m10_state, init_ipminvad, ROT270, "IPM",  "IPM Invader (M10, set 1)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad1, ipminvad, m10,    ipminvad, m10_state, init_ipminvad, ROT270, "IPM",  "IPM Invader (M10, set 2)",      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ipminvad2, ipminvad, m11,    ipminvad, m10_state, init_ipminvad, ROT270, "IPM",  "IPM Invader (M11)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1980, andromed,  0,        m11,    andromed, m10_state, empty_init, ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
-GAME( 1980, skychut,   0,        m11,    skychut,  m10_state, empty_init, ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, andromed,  0,        m11,    andromed, m10_state, init_andromed, ROT270, "Irem", "Andromeda SS (Japan?)",         MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // export version known as simply "Andromeda"
+GAME( 1980, skychut,   0,        m11,    skychut,  m10_state, init_andromed, ROT270, "Irem", "Sky Chuter",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, headoni,   0,        m15,    headoni,  m15_state, empty_init, ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, spacbeam,  0,        m15,    spacbeam, m15_state, empty_init, ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
-GAME( 1980, greenber,  0,        m15,    greenber, m15_state, empty_init, ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, headoni,   0,        m15,    headoni,  m15_state, empty_init,    ROT270, "Irem", "Head On (Irem, M-15 Hardware)", MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, spacbeam,  0,        m15,    spacbeam, m15_state, empty_init,    ROT270, "Irem", "Space Beam",                    MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // IPM or Irem?
+GAME( 1980, greenber,  0,        m15,    greenber, m15_state, empty_init,    ROT270, "Irem", "Green Beret (Irem)",            MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
