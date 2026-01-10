@@ -11,6 +11,7 @@ sam8905_device::sam8905_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_waveform_read(*this, 0)
+	, m_waveform_write(*this)
 	, m_sample_output(*this)
 {
 }
@@ -290,6 +291,32 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 	if (!BIT(inst, 2)) {
 		slot.b = 0;
 		update_carry();  // B changed
+
+		// WWE (Write Waveform Enable) - triggered by RSP + clearB + WSP
+		// RSP = emitter_sel==3, clearB = bit 2 active, WSP = bit 8 active
+		// Writes waveform data to external RAM at WF+PHI address
+		if (emitter_sel == 3 && wsp && !m_waveform_write.isunset()) {
+			// Only write externally when WF indicates external memory (WF < 0x80)
+			// WF >= 0x80 is input sample address space, WF >= 0x100 is internal waveform
+			if ((slot.wf & 0x1FF) < 0x80) {
+				// Build 15-bit address from WF[6:0] and PHI[11:4]
+				// 32KB = 15 bits: WF[6:0] << 8 | PHI[7:0]
+				uint32_t ext_addr = ((slot.wf & 0x7F) << 8) | ((slot.phi >> 4) & 0xFF);
+				// Write data is from A register, converted to 12-bit
+				int16_t ext_data = (slot.a >> 7) & 0xFFF;
+				// Sign extend to 16-bit for callback
+				if (ext_data & 0x800) ext_data |= 0xF000;
+				m_waveform_write(ext_addr, ext_data);
+
+				// Debug: trace external writes (limited)
+				static int ext_write_trace = 0;
+				if (ext_write_trace < 50) {
+					logerror("WWE S%d: wf=0x%03X phi=0x%03X addr=0x%04X data=%d\n",
+						slot_idx, slot.wf, slot.phi, ext_addr, ext_data);
+					ext_write_trace++;
+				}
+			}
+		}
 	}
 
 	// WWF (Write Waveform)

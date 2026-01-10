@@ -88,6 +88,9 @@ private:
     // SAM8905 inter-chip audio callback (sound SAM -> FX SAM)
     void sam_snd_sample_out(uint32_t data);
 
+    // FX SAM external SRAM write callback
+    void sam_fx_waveform_w(offs_t offset, u16 data);
+
     void midi_rxd_w(int state) { m_midi_rxd = state; }
 
     required_device<i80c32_device> m_maincpu;
@@ -106,6 +109,10 @@ private:
     // FX SAM input samples (from sound SAM via 74HC595 shift registers)
     int16_t m_fx_input_l = 0;
     int16_t m_fx_input_r = 0;
+
+    // FX SAM 32KB SRAM for delay/reverb buffers
+    std::unique_ptr<int16_t[]> m_fx_sram;
+    static constexpr size_t FX_SRAM_SIZE = 32768;  // 32KB = 32768 12-bit words
 
     // SAM8905 DSP - two chips selected via T1 (P3.5)
     // T1=1: Sound generation SAM (index 0)
@@ -527,6 +534,10 @@ void keyfox10_state::machine_start()
             log_gal_inputs(true, false, true, offset);  // WR active
         });
 
+    // Initialize FX SRAM (32KB for delay/reverb buffers)
+    m_fx_sram = std::make_unique<int16_t[]>(FX_SRAM_SIZE);
+    std::fill_n(m_fx_sram.get(), FX_SRAM_SIZE, 0);
+
     // Save state
     save_item(NAME(m_port0));
     save_item(NAME(m_port1));
@@ -536,6 +547,7 @@ void keyfox10_state::machine_start()
     save_item(NAME(m_disp_sr));
     save_item(NAME(m_fx_input_l));
     save_item(NAME(m_fx_input_r));
+    save_pointer(NAME(m_fx_sram), FX_SRAM_SIZE);
 }
 
 void keyfox10_state::dump_sam_memory() const
@@ -662,6 +674,22 @@ void keyfox10_state::sam_snd_sample_out(uint32_t data)
     m_fx_input_r = int16_t(data & 0xFFFF);
 }
 
+// FX SAM external SRAM write callback
+void keyfox10_state::sam_fx_waveform_w(offs_t offset, u16 data)
+{
+    // offset is 15-bit address (0-32767)
+    if (offset < FX_SRAM_SIZE) {
+        m_fx_sram[offset] = data;
+
+        // Debug: trace SRAM writes (limited)
+        static int sram_write_trace = 0;
+        if (sram_write_trace < 30) {
+            logerror("FX SRAM write: addr=%04X data=%d\n", offset, (int16_t)data);
+            sram_write_trace++;
+        }
+    }
+}
+
 u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
 {
     // Check WA19 (bit 19) - if set, return input from sound SAM via 74HC595 shift registers
@@ -672,14 +700,39 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
     {
         // Return sound SAM output sample for FX processing
         int16_t sample = (offset & 1) ? m_fx_input_r : m_fx_input_l;
+
+        // Debug: log input sample reads (limited)
+        static int fx_input_log_count = 0;
+        if (fx_input_log_count < 50 || (sample != 0 && fx_input_log_count < 200)) {
+            logerror("FX input read: WA=%05X ch=%c sample=%d\n",
+                offset, (offset & 1) ? 'R' : 'L', sample);
+            fx_input_log_count++;
+        }
+
         // Convert 16-bit sample to 12-bit (SAM8905 waveform data is 12-bit signed)
         return sample >> 4;
     }
 
-    // Normal ROM access: (WAVE[6:0] << 10) | PHI[11:2]
-    uint32_t wave = (offset >> 12) & 0x7F;   // WAVE[6:0] - 7 bits
+    // Check for SRAM access: WA[18:15] = 0 means SRAM address space (32KB)
+    // SRAM address: WF[6:0] << 8 | PHI[11:4] = 15 bits
+    uint32_t wave = (offset >> 12) & 0xFF;   // WAVE[7:0]
+    if (wave < 0x80) {
+        // SRAM access: build 15-bit address
+        uint32_t sram_addr = ((wave & 0x7F) << 8) | ((offset >> 4) & 0xFF);
+        if (sram_addr < FX_SRAM_SIZE && m_fx_sram) {
+            // Debug: trace SRAM reads (limited)
+            static int sram_read_trace = 0;
+            if (sram_read_trace < 30) {
+                logerror("FX SRAM read: addr=%04X data=%d\n", sram_addr, m_fx_sram[sram_addr]);
+                sram_read_trace++;
+            }
+            return m_fx_sram[sram_addr];
+        }
+    }
+
+    // ROM access fallback: (WAVE[6:0] << 10) | PHI[11:2]
     uint32_t phi_int = ((offset & 0xFFF) >> 2) & 0x3FF;  // PHI[11:2] - 10 bits
-    uint32_t rom_addr = (wave << 10) | phi_int;
+    uint32_t rom_addr = ((wave & 0x7F) << 10) | phi_int;
 
     u8 sample = m_samples_rom[rom_addr];
     return (int16_t)(int8_t)sample << 4;
@@ -720,10 +773,12 @@ void keyfox10_state::keyfox10(machine_config &config)
     m_sam_snd->add_route(1, "rspeaker", 1.0);  // Dry R
 
     // SAM8905 FX - effects processor (at 0xE000 when T1=1)
+    // FX chip has 32KB SRAM for delay/reverb buffers
     SAM8905(config, m_sam_fx, 22'579'200);
     m_sam_fx->waveform_read_callback().set(FUNC(keyfox10_state::sam_fx_waveform_r));
-    m_sam_fx->add_route(0, "lspeaker", 1.0);
-    m_sam_fx->add_route(1, "rspeaker", 1.0);
+    m_sam_fx->waveform_write_callback().set(FUNC(keyfox10_state::sam_fx_waveform_w));
+    m_sam_fx->add_route(0, "lspeaker", 1.0);  // Wet L
+    m_sam_fx->add_route(1, "rspeaker", 1.0);  // Wet R
 }
 
 ROM_START(keyfox10)

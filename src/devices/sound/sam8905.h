@@ -17,6 +17,10 @@ public:
 	// External waveform memory callback (address 20-bit → data 12-bit signed)
 	auto waveform_read_callback() { return m_waveform_read.bind(); }
 
+	// External waveform memory write callback (address 15-bit, data 12-bit signed)
+	// Used by FX chip to write to delay/reverb RAM
+	auto waveform_write_callback() { return m_waveform_write.bind(); }
+
 	// Sample output callback for inter-chip audio (L/R packed as upper/lower 16 bits)
 	auto sample_output_callback() { return m_sample_output.bind(); }
 
@@ -54,8 +58,9 @@ private:
 	int32_t get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int slot_idx);
 	uint32_t get_constant(uint8_t mad);
 
-	// External waveform memory callback
+	// External waveform memory callbacks
 	devcb_read16 m_waveform_read;
+	devcb_write16 m_waveform_write;
 
 	// Sample output callback for inter-chip audio
 	devcb_write32 m_sample_output;
