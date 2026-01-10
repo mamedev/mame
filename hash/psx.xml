@@ -35427,9 +35427,10 @@ Corrupted music during gameplay
 		<rom name="PSone - Wherever, Whenever, Forever. (USA) (No EDC) (Track 2).bin" size="23992752" crc="957803ce" sha1="a863d4134e1ca3730a2938d2ff0238c4d7e92eeb"/>
 		<rom name="PSone - Wherever, Whenever, Forever. (USA) (No EDC) (Track 3).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>PSone - Wherever, Whenever, Forever. (USA, No EDC)</description>
+		<description>PSone - Wherever, Whenever, Forever. (USA, no EDC)</description>
 		<year>2001</year>
 		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="copy_protection" value="Anti-modchip"/>
 		<info name="serial" value="SCUS-94799"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -35446,9 +35447,11 @@ Corrupted music during gameplay
 		<rom name="PSone - Wherever, Whenever, Forever. (USA) (EDC) (Track 2).bin" size="23992752" crc="957803ce" sha1="a863d4134e1ca3730a2938d2ff0238c4d7e92eeb"/>
 		<rom name="PSone - Wherever, Whenever, Forever. (USA) (EDC) (Track 3).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>PSone - Wherever, Whenever, Forever. (USA, EDC)</description>
+		<description>PSone - Wherever, Whenever, Forever. (USA, with EDC)</description>
 		<year>2001</year>
 		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="copy_protection" value="Anti-modchip"/>
 		<info name="serial" value="SCUS-94799"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
