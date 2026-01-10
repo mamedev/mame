@@ -200,6 +200,7 @@ private:
 	uint8_t m_blend_y[65536]{};
 	uint8_t m_blend_cc[65536]{};
 	u32 m_suspend_object_pointer;
+	u16 m_line_buffer[760];
 
 	static void (jaguar_state::*const bitmap4[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
 	static void (jaguar_state::*const bitmap8[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
