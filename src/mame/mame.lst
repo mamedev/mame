@@ -20570,6 +20570,9 @@ rtpc020
 rtpc025
 rtpca25
 
+@source:ibm/system23.cpp		// IBM System/23 Datamaster
+system23
+
 @source:ibm/thinkpad600.cpp
 tpad600
 tpad600e
