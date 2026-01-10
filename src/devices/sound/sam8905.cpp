@@ -264,17 +264,18 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 	// WXY (Write Multiplier)
 	if (!BIT(inst, 3)) {
 		slot.y = (bus >> 7) & 0xFFF;
-		// Debug: trace waveform call for slot 2 when active
+		slot.x = get_waveform(slot.wf, slot.phi, mad, slot_idx) & 0xFFF;
+		// Debug: trace WXY for slot 0 ALG=1
 		uint32_t p15_wxy = m_dram[(slot_idx << 4) | 15];
 		uint8_t alg_wxy = (p15_wxy >> 8) & 0x7;
-		if (slot_idx == 2 && alg_wxy == 2) {
+		if (slot_idx == 0 && alg_wxy == 1) {
 			static int wxy_trace = 0;
-			if (wxy_trace < 30) {
-				logerror("WXY S2: slot.wf=0x%03X slot.phi=0x%03X\n", slot.wf, slot.phi);
+			if (wxy_trace < 20) {
+				logerror("WXY S0: wf=0x%03X phi=0x%03X x=%d y=%d\n",
+					slot.wf, slot.phi, (int16_t)(slot.x << 4) >> 4, (int16_t)(slot.y << 4) >> 4);
 				wxy_trace++;
 			}
 		}
-		slot.x = get_waveform(slot.wf, slot.phi, mad, slot_idx) & 0xFFF;
 		if (wsp) {
 			slot.mix_l = (bus >> 3) & 0x7;
 			slot.mix_r = bus & 0x7;
