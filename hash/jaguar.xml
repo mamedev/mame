@@ -766,8 +766,9 @@ Access [cart] EEPROM
 		<notes><![CDATA[
 Black screen, [GPU] reads bad pointer in irq 0 stack bp f030f0,1,{r30=0;g} (fixed)
 BGM doesn't work in some stages (fixed, depends on wave ROM)
-Cutoff gameplay area on bottom
-Reads back [object] processor data during gameplay
+Cutoff gameplay area on bottom (fixed, [object] processor suspend state)
+Reads back [object] processor data during gameplay (fixed)
+Randomly crashes
 Access [cart] EEPROM
 Uses [GPU] irqs 0,4
 ]]></notes>
@@ -1110,7 +1111,7 @@ RSoD on Jaguar logo
 		<notes><![CDATA[
 Gets to title screen (with [object] pitch = 2 16bpp) (fixed)
 Corrupted limits on rotating attract logo (fixed, [blitter] CLIP_A1)
-[object] or 68k crashes after a bit of attract ([blitter]? waitstates?)
+68k throws an illegal address exception after a bit of attract (waitstates? PC=806678)
 No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
@@ -1440,6 +1441,7 @@ No sound (fixed, [DSP] irq priority)
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 Black screen with buzz, regression regarding [DSP] serial irqs triggers
+Also cfr. delay slot hack note in CPU core
 Playfield fills with black stripes, probably missing [object] pitch drawing
 Access [cart] EEPROM
 ]]></notes>

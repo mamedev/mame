@@ -119,6 +119,7 @@ protected:
 	virtual void sound_start() override ATTR_COLD;
 	virtual void sound_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+	virtual void video_reset() override ATTR_COLD;
 	virtual void device_postload();
 
 	void video_config(machine_config &config, const XTAL clock);
@@ -198,6 +199,7 @@ private:
 	pen_t m_pen_table[65536]{};
 	uint8_t m_blend_y[65536]{};
 	uint8_t m_blend_cc[65536]{};
+	u32 m_suspend_object_pointer;
 
 	static void (jaguar_state::*const bitmap4[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
 	static void (jaguar_state::*const bitmap8[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
