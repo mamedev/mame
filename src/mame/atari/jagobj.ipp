@@ -927,16 +927,27 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 	uint32_t *objdata;
 
 	/* erase the scanline first */
-	for (int x = 0; x < 760; x++)
-		scanline[x] = m_gpu_regs[BG];
+//	if (!m_suspend_object_pointer)
+	{
+		for (int x = 0; x < 760; x++)
+			scanline[x] = m_gpu_regs[BG];
+	}
 
 	/* fetch the object pointer */
 	u32 object_pointer = ((m_gpu_regs[OLP_H] << 16) | m_gpu_regs[OLP_L]);
+
+	if (m_suspend_object_pointer)
+	{
+		object_pointer = m_suspend_object_pointer;
+		m_suspend_object_pointer = 0;
+	}
 
 	// HACK: avoid a potential crash in raiden after Atari logo
 	// Where it's clearly not expecting the object processor running, sets $0 minus 8 = $ffff'fff8
 	if (BIT(object_pointer, 31))
 		return;
+
+	bool gpu_suspend = false;
 
 	// TODO: count == 200 is wrong juju, particularly with branches
 	// - raiden hits 115 ~ 137 objects on ranking screen
@@ -964,7 +975,14 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 
 			/* GPU interrupt */
 			case 2:
-				LOGMASKED(LOG_OBJECTS, "%08x: GPU irq = %08X-%08X\n", object_pointer, objdata[0], objdata[1]);
+			{
+				// mutntpng, atarikrt YPOS = 0
+				// kasumi YPOS = 0x7ff
+				// valdiser variable, depends on raster split
+				// TODO: is YPOS really used?
+				uint16_t ypos = (objdata[1] >> 3) & 0x7ff;
+
+				LOGMASKED(LOG_OBJECTS, "%08x: GPU irq = %08X-%08X (YPOS=%d)\n", object_pointer, objdata[0], objdata[1], ypos);
 
 				// kasumi wants the format to be like this (cfr. GPU lv3 irq service, with the rorq $10)
 				// Object processor seems to run with swapped endianness
@@ -972,13 +990,13 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 				m_gpu_regs[OB_HH] = objdata[1] & 0xffff;
 				m_gpu_regs[OB_LL] = (objdata[0] & 0xffff0000) >> 16;
 				m_gpu_regs[OB_LH] = objdata[0] & 0xffff;
-				// TODO: trigger timing, should also suspend processing thru OBF
+				// TODO: trigger timing
+				gpu_suspend = true;
 				m_gpu->set_input_line(3, ASSERT_LINE);
 				done = 1;
-				// mutntpng, atarikrt VPOS = 0
-				// TODO: what the VPOS is actually for?
-				//printf("GPU irq VPOS = %04x\n",(objdata[1] >> 3) & 0x7ff);
+
 				break;
+			}
 
 			/* branch */
 			case 3:
@@ -1010,18 +1028,23 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 			case 5:
 				// bretth: FF000020 0000FEE5
 				LOGMASKED(LOG_OBJECTS, "%08x: <illegal 5> %08X-%08X!\n", object_pointer, objdata[0], objdata[1]);
+				done = 1;
 				object_pointer += 8;
 				break;
 
 			case 6:
 				// kasumi: F7000000 00F0311E (nop? bad align?)
 				LOGMASKED(LOG_OBJECTS, "%08x: <illegal 6> %08X-%08X!\n", object_pointer, objdata[0], objdata[1]);
+				done = 1;
+
 				object_pointer += 8;
 				break;
 
 			case 7:
 				// ttoonadv: F5F104DE 05E706EF
 				LOGMASKED(LOG_OBJECTS, "%08x: <illegal 7> %08X-%08X!\n", object_pointer, objdata[0], objdata[1]);
+				done = 1;
+
 				object_pointer += 8;
 				break;
 
@@ -1034,10 +1057,12 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 		}
 	}
 
-	// saving our current pointer partially fixes valdiser flickering at the expense of ttoonadv ...
-	//if (!done)
-	//{
-	//  m_gpu_regs[OLP_H] = object_pointer >> 16;
-	//  m_gpu_regs[OLP_L] = object_pointer & 0xffff;
-	//}
+	// save the current pointer in case we found a GPU irq
+	// kasumi and valdiser depends on this
+	if (gpu_suspend)
+	{
+		m_suspend_object_pointer = object_pointer + 8;
+		//m_gpu_regs[OLP_H] = object_pointer >> 16;
+		//m_gpu_regs[OLP_L] = object_pointer & 0xffff;
+	}
 }

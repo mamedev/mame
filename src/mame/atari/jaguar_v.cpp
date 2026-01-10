@@ -689,8 +689,19 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				break;
 
 			case OBF:   /* clear GPU interrupt */
+			{
 				m_gpu->set_input_line(3, CLEAR_LINE);
+				//m_gpu_regs[OBF] &= ~1;
+
+				// kasumi and valdiser resumes the object processor after the GPU receives an irq
+				// TODO: this is a stopgap setup
+				// needs a proper async object processor to make it right, particularly for valdiser
+				const u16 hdb1 = ((m_gpu_regs[HDB1] & 0x7ff) / 2);
+
+				m_object_timer->adjust(attotime::zero, m_screen->vpos() * 2 | (hdb1 << 16));
+
 				break;
+			}
 
 			case HP:
 			case HBB:
@@ -870,6 +881,9 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 			}
 		}
 	}
+	// punt if we are in suspend state (next timer at $f00026)
+	if (m_suspend_object_pointer)
+		return;
 
 	/* adjust the timer in a loop, to handle missed cases */
 	do
@@ -896,11 +910,6 @@ void jaguar_state::video_start()
 	m_pit_timer = timer_alloc(FUNC(jaguar_state::pit_update), this);
 	m_gpu_sync_timer = timer_alloc(FUNC(jaguar_state::gpu_sync), this);
 
-	adjust_object_timer(0);
-	m_blitter_done_timer->adjust(attotime::never);
-	m_pit_timer->adjust(attotime::never);
-	m_gpu_sync_timer->adjust(attotime::never);
-
 	m_screen_bitmap.allocate(760, 512);
 
 	jagobj_init();
@@ -912,6 +921,17 @@ void jaguar_state::video_start()
 	m_pixel_clock = m_is_cojag ? COJAG_PIXEL_CLOCK.value() : JAGUAR_CLOCK.value();
 }
 
+void jaguar_state::video_reset()
+{
+	m_suspend_object_pointer = 0;
+	//m_gpu_regs[OBF] = 0;
+
+	m_blitter_done_timer->adjust(attotime::never);
+	m_pit_timer->adjust(attotime::never);
+	m_gpu_sync_timer->adjust(attotime::never);
+
+	adjust_object_timer(0);
+}
 
 void jaguar_state::device_postload()
 {
