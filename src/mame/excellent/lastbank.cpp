@@ -49,7 +49,7 @@ public:
 		, m_key{ { *this, "P1_KEY%u", 0U }, { *this, "P2_KEY%u", 0U } }
 	{ }
 
-	void lastbank(machine_config &config);
+	void lastbank(machine_config &config) ATTR_COLD;
 
 	ioport_value sound_status_r();
 
@@ -796,6 +796,15 @@ static INPUT_PORTS_START( goldstrk )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sparkle )
+	PORT_INCLUDE( goldstrk )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x20, 0x20, "Vendor" ) PORT_DIPLOCATION("DSW4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::scanline_cb)
 {
@@ -1003,6 +1012,25 @@ ROM_START( goldstrk )
 ROM_END
 
 // ES-9402 PCB
+ROM_START( sparkle )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "7.gsoh.u9", 0x00000, 0x40000, CRC(9185fe0a) SHA1(5ac85cd5ab5b612261551c74a79edcd9e12fb28f) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	// this is almost empty and thus gives no sound? probably bad chip, because the reads are consistent
+	ROM_LOAD( "3.u48", 0x00000, 0x10000, CRC(ac28168b) SHA1(b33334bac178cdbcc92a407ebbb7c91973994395) BAD_DUMP  ) // 111111xxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x200000, "maincpu:gfx", ROMREGION_ERASEFF )
+	ROM_LOAD( "1.gschr.u11", 0x000000, 0x080000, CRC(e054cf39) SHA1(74bdbf80413e381fda688bda8942df8981d96755) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "epr4.u55", 0x00000, 0x40000, CRC(0eb850ba) SHA1(0b9a704188e3b8a50e54fc29fc8e4dad2e3e8397) ) // same as goldstrk
+
+	ROM_REGION( 0x80000, "essnd", 0 ) // Samples
+	ROM_LOAD( "epr5.u60", 0x00000, 0x80000, CRC(04952e51) SHA1(272283306d9ec951baa85cb8e2d8952da7a98894) ) // same as goldstrk
+ROM_END
+
+// ES-9402 PCB
 ROM_START( lpierrot )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "6.u9", 0x00000, 0x40000, CRC(13565453) SHA1(3b0e9b1435ae6cbcb93874c14d3c9413878188d7) )
@@ -1026,11 +1054,12 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1994, lastbank, 0,       lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fever13,  0,       lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                              MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1995, ukiyobox, fever13, lastbank, ukiyobox, fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, mir7hg,   0,       lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1996, mir7hgt,  0,       lastbank, mir7hgt,  fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate Turbo (Japan, v2.0.0)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, wcircus,  0,       lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Wonder Circus (Japan, v1.1.1)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, lpierrot, 0,       lastbank, lpierrot, wcircus_state,  empty_init, ROT0, "Cobra",            "Lucky Pierrot (Japan, v1.1.0B)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 199?, goldstrk, 0,       lastbank, goldstrk, wcircus_state,  empty_init, ROT0, "Cobra",            "Gold Strike (Japan, v1.1.1 - location test)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1994, lastbank, 0,        lastbank, lastbank, lastbank_state, empty_init, ROT0, "Excellent System", "Last Bank (v1.16)",                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fever13,  0,        lastbank, fever13,  fever13_state,  empty_init, ROT0, "Excellent System", "Fever 13 (Japan, v1.3)",                              MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1995, ukiyobox, fever13,  lastbank, ukiyobox, fever13_state,  empty_init, ROT0, "Excellent System", "Ukiyo Box (Japan, v1.3.7)",                           MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hg,   0,        lastbank, mir7hg,   fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate (Japan, v1.0.2)",       MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1996, mir7hgt,  0,        lastbank, mir7hgt,  fever13_state,  empty_init, ROT0, "Excellent System", "Miracle Seven - Heaven's Gate Turbo (Japan, v2.0.0)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, wcircus,  0,        lastbank, wcircus,  wcircus_state,  empty_init, ROT0, "Cobra",            "Wonder Circus (Japan, v1.1.1)",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, lpierrot, 0,        lastbank, lpierrot, wcircus_state,  empty_init, ROT0, "Cobra",            "Lucky Pierrot (Japan, v1.1.0B)",                      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, goldstrk, 0,        lastbank, goldstrk, wcircus_state,  empty_init, ROT0, "Cobra",            "Gold Strike (Japan, v1.1.1 - location test)",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 199?, sparkle,  goldstrk, lastbank, sparkle,  fever13_state,  empty_init, ROT0, "Cobra",            "Sparkle (v1.1.3)",                                    MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

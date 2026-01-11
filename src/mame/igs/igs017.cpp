@@ -2328,6 +2328,11 @@ void igs017_state::init_jking302us()
 		rom[i] = x;
 	}
 
+	// IGS029 send command
+	//rom[0x5f32/2] = 0x6010;
+	//rom[0x5f7e/2] = 0x4e75;
+	//rom[0x5fa6/2] = 0x6006;
+
 	m_igs017_igs031->tarzan_decrypt_tiles(1); // TODO: verify once it works
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0); // TODO: verify once it works
 
@@ -3055,7 +3060,7 @@ void igs017_state::sdmg2p_map(address_map &map)
 	map(0xb10001, 0xb10001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
-void igs017_state::sdmg2p_mux_map(address_map &map) // TODO: hopper motor w
+void igs017_state::sdmg2p_mux_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00, 0x00).r(NAME((&igs017_state::keys_ipt_r<u8, 2, 2>))).w(FUNC(igs017_state::sdmg2p_counter_w));
