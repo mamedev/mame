@@ -228,6 +228,9 @@ void jaguar_state::sound_reset()
 	m_serial_frequency = 0;
 	m_serial_smode = 0;
 	m_dsp_irq_state = 0;
+
+	m_dsp_regs[JPIT1] = m_dsp_regs[DSP0] = 0;
+	m_dsp_regs[JPIT2] = m_dsp_regs[DSP1] = 0;
 }
 
 
@@ -280,9 +283,7 @@ void jaguar_state::update_jpit_timer(unsigned which)
 	{
 		m_jpit_timer[which]->adjust(attotime::never);
 		m_dsp->set_input_line(2 + which, CLEAR_LINE);
-
 	}
-
 }
 
 template <unsigned which> TIMER_CALLBACK_MEMBER(jaguar_state::jpit_update)
@@ -307,12 +308,12 @@ void jaguar_state::jerry_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		case JPIT1:
 		case DSP0:
-			//printf("Primary sound %04x %04x\n", m_dsp_regs[JPIT1], m_dsp_regs[DSP0]);
+			//printf("Primary sound %04x %04x %08x\n", m_dsp_regs[JPIT1], m_dsp_regs[DSP0], mem_mask);
 			update_jpit_timer(0);
 			break;
 		case JPIT2:
 		case DSP1:
-			//printf("Secondary sound %04x %04x\n", m_dsp_regs[JPIT2], m_dsp_regs[DSP1]);
+			//printf("Secondary sound %04x %04x %08x\n", m_dsp_regs[JPIT2], m_dsp_regs[DSP1], mem_mask);
 			update_jpit_timer(1);
 			break;
 		case JINTCTRL:
@@ -430,7 +431,8 @@ void jaguar_state::update_serial_timer()
 
 uint32_t jaguar_state::serial_r(offs_t offset)
 {
-	logerror("%s:jaguar_serial_r(%X)\n", machine().describe_context(), offset);
+	if (!machine().side_effects_disabled())
+		logerror("%s:jaguar_serial_r(%X)\n", machine().describe_context(), offset);
 	return 0;
 }
 

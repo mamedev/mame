@@ -607,6 +607,12 @@ void jaguar_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 
 	// TODO: B_STOP (for collision detection, assuming anything ever used this)
+	if (offset == B_STOP && ACCESSING_BITS_0_15 && BIT(data, 1))
+	{
+		m_blitter_status = 1;
+		m_blitter_done_timer->adjust(attotime::never);
+	}
+
 
 	LOGMASKED(LOG_BLITTER_WRITE, "%s:Blitter write register @ F022%02X = %08X\n", machine().describe_context(), offset * 4, data);
 #else
@@ -883,12 +889,13 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 		}
 	}
 	// punt if we are in suspend state (next timer at $f00026)
-	// TODO: ignore for now (will stall in valdiser at "out of time")
-	// GPU r/w the current line buffer for a zoom-in/-out effect ...
-	//if (m_suspend_object_pointer)
-	//{
-	//	return;
-	//}
+	// TODO: this causes a stall in valdiser at "out of time"
+	// GPU r/w the current line buffer for a zoom-in/-out effect.
+	// Removing this check causes double framerate in mutntpng
+	if (m_suspend_object_pointer)
+	{
+		return;
+	}
 
 	/* adjust the timer in a loop, to handle missed cases */
 	do

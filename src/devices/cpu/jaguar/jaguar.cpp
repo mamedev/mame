@@ -353,6 +353,7 @@ void jaguar_cpu_device::execute_set_input(int irqline, int state)
 	// Ignore irq if masked
 	// - barkley, breakout, clubdriv, ironsol2, skyhamm, ultravor all wants to not read a pending
 	//   DSP serial irq *before* JPIT
+	// TODO: should really ack cycle when flipping imask in flags_w
 	if (state != CLEAR_LINE && BIT(m_int_mask, irqline))
 	{
 		m_int_latch |= mask;

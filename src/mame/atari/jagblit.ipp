@@ -339,7 +339,8 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 
 	/* check for unhandled command bits */
 	// NOTE: disabled check for GOURZ (it's pretty obvious everywhere is used)
-	if (COMMAND & 0x24000000)
+	// NOTE: SRCENX also unhandled (command & 4)
+	if (COMMAND & 0x24000080)
 		LOGMASKED(LOG_UNHANDLED_BLITS, "Blitter unhandled: these command bits: %08X\n", COMMAND & 0x24000000);
 
 	/* top of the outer loop */
@@ -484,6 +485,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 					}
 					else
 					{
+						// (LFUFUNC), default mode
 						if (COMMAND & 0x00200000)
 							writedata |= ~srcdata & ~dstdata;
 						if (COMMAND & 0x00400000)
@@ -552,6 +554,7 @@ void jaguar_state::FUNCNAME(uint32_t command, uint32_t a1flags, uint32_t a2flags
 		}
 
 		/* adjust for phrase mode */
+		// TODO: clearly wrong in places (depends on current pixel mode)
 		if (asrc_phrase_mode)
 		{
 			if (asrc_xadd > 0)
