@@ -13,7 +13,7 @@ public:
 	prav8ckb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0U);
 
 	// output callback configuration
-	auto b_callback() { return m_b_callback.bind(); }
+	auto kbdata_callback() { return m_kbdata_callback.bind(); }
 	auto akd_callback() { return m_akd_callback.bind(); }
 	auto strobe_callback() { return m_strobe_callback.bind(); }
 	auto reset_callback() { return m_reset_callback.bind(); }
@@ -41,7 +41,7 @@ private:
 	void key_select_w(u8 data);
 
 	// callback objects
-	devcb_write8 m_b_callback;
+	devcb_write8 m_kbdata_callback;
 	devcb_write_line m_akd_callback;
 	devcb_write_line m_strobe_callback;
 	devcb_write_line m_reset_callback;
