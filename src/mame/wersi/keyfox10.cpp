@@ -13,8 +13,8 @@
 #define LOG_SERIAL (1U << 1)
 #define LOG_PORT   (1U << 2)
 #define LOG_SAM    (1U << 3)
-#define LOG_IO     (1U << 4)
-//#define LOG_IO     0
+//#define LOG_IO     (1U << 4)
+#define LOG_IO     0
 #define VERBOSE (LOG_SERIAL | LOG_SAM | LOG_IO)
 #include "logmacro.h"
 
@@ -50,6 +50,7 @@ public:
         , m_kbd_io(*this, "KBDMTX%u", 0U)
         , m_digits(*this, "digit%u", 0U)
         , m_digit_dp(*this, "dp%u", 0U)
+        , m_beat_leds(*this, "beat%u", 0U)
     { }
 
     ~keyfox10_state()
@@ -110,6 +111,7 @@ private:
     required_ioport_array<2> m_kbd_io;      // 2x 8-bit keyboard matrix (IC4, IC11)
     output_finder<3> m_digits;              // 7-segment display outputs (digit0-digit2)
     output_finder<3> m_digit_dp;            // Decimal point outputs (dp0-dp2)
+    output_finder<8> m_beat_leds;           // Beat position LEDs (beat0-beat7)
     u8 m_port0 = 0xff;
     u8 m_port1 = 0xff;
     u8 m_port2 = 0xff;
@@ -390,14 +392,20 @@ void keyfox10_state::disp_shift_clock()
 
 void keyfox10_state::update_display()
 {
-    // Convert active-low shift register values to MAME 7-segment format
-    // Hardware: 0 = segment ON, 1 = segment OFF
-    // MAME: bit set = segment ON
+    // Convert shift register values to MAME 7-segment format
+    // SE67F is common-cathode: 1 = segment ON, 0 = segment OFF
+    // MAME led7seg: bit set = segment ON (same convention)
     for (int i = 0; i < 3; i++)
     {
-        u8 segs = ~m_disp_sr[i];      // Invert for active-high
+        u8 segs = m_disp_sr[i];       // No inversion needed for common-cathode
         m_digits[i] = segs & 0x7f;    // bits 0-6 = segments a-g
         m_digit_dp[i] = BIT(segs, 7); // bit 7 = decimal point
+    }
+
+    // Update beat LEDs from beat shift register
+    for (int i = 0; i < 8; i++)
+    {
+        m_beat_leds[i] = BIT(m_beat_sr, i);
     }
 }
 
@@ -466,6 +474,9 @@ void keyfox10_state::beat_shift_clock()
     m_beat_sr = (m_beat_sr << 1) | data_in;
 
     LOGMASKED(LOG_IO, "Beat shift: DATA=%d -> SR=0x%02X\n", data_in, m_beat_sr);
+
+    // Update beat LED outputs
+    update_display();
 }
 
 u8 keyfox10_state::sam_snd_r(offs_t offset)
@@ -732,6 +743,7 @@ void keyfox10_state::machine_start()
     // Resolve display outputs and initialize
     m_digits.resolve();
     m_digit_dp.resolve();
+    m_beat_leds.resolve();
     update_display();
 }
 
@@ -1032,14 +1044,14 @@ static INPUT_PORTS_START(keyfox10)
     // Scanned via CLK_SW, read via SENSE (P1.7)
 
     PORT_START("KBDMTX0")  // IC4 - Level controls 1
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM-")   PORT_CODE(KEYCODE_F1)
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM+")   PORT_CODE(KEYCODE_F2)
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC+")      PORT_CODE(KEYCODE_F3)
-    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC-")      PORT_CODE(KEYCODE_F4)
-    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO+")    PORT_CODE(KEYCODE_A)
-    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO-")    PORT_CODE(KEYCODE_S)
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("START/S")   PORT_CODE(KEYCODE_2)
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)  // D7 unused
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)  // D0 unused
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM-")   PORT_CODE(KEYCODE_F1)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM+")   PORT_CODE(KEYCODE_F2)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC+")      PORT_CODE(KEYCODE_F3)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC-")      PORT_CODE(KEYCODE_F4)
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO+")    PORT_CODE(KEYCODE_A)
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO-")    PORT_CODE(KEYCODE_S)
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("START/S")   PORT_CODE(KEYCODE_2)
 
     PORT_START("KBDMTX1")  // IC11 - Level controls 2
     PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("UPPER+")    PORT_CODE(KEYCODE_F8)

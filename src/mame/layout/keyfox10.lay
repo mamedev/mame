@@ -3,8 +3,8 @@
 license:BSD-3-Clause
 copyright-holders:Draft
 
-Wersi Keyfox 10 - 3-digit 7-segment display layout
-Hardware: 3x 74HC164 shift registers driving SE67F displays
+Wersi Keyfox 10 - 3-digit 7-segment display and beat LEDs layout
+Hardware: 3x 74HC164 shift registers for display, 1x 74HC164 for beat LEDs
 -->
 <mamelayout version="2">
 	<!-- 7-segment LED display element (red/orange LED color) -->
@@ -24,6 +24,16 @@ Hardware: 3x 74HC164 shift registers driving SE67F displays
 		</disk>
 	</element>
 
+	<!-- Beat LED element (green) -->
+	<element name="beat_led" defstate="0">
+		<disk state="1">
+			<color red="0.2" green="1.0" blue="0.1" />
+		</disk>
+		<disk state="0">
+			<color red="0.03" green="0.15" blue="0.015" />
+		</disk>
+	</element>
+
 	<!-- Background panel -->
 	<element name="background">
 		<rect>
@@ -31,34 +41,83 @@ Hardware: 3x 74HC164 shift registers driving SE67F displays
 		</rect>
 	</element>
 
+	<!-- Label text -->
+	<element name="label_tempo">
+		<text string="TEMPO">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+
+	<element name="label_beat">
+		<text string="BEAT">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+
 	<view name="Display">
 		<!-- Dark background -->
 		<element ref="background">
-			<bounds x="0" y="0" width="160" height="70" />
+			<bounds x="0" y="0" width="200" height="100" />
+		</element>
+
+		<!-- TEMPO label -->
+		<element ref="label_tempo">
+			<bounds x="55" y="2" width="50" height="10" />
 		</element>
 
 		<!-- DISPLAY1 (left) - IC7 -->
 		<element name="digit0" ref="digit">
-			<bounds x="15" y="12" width="35" height="46" />
+			<bounds x="15" y="15" width="35" height="46" />
 		</element>
 		<element name="dp0" ref="dp">
-			<bounds x="52" y="52" width="6" height="6" />
+			<bounds x="52" y="55" width="6" height="6" />
 		</element>
 
 		<!-- DISPLAY2 (middle) - IC6 -->
 		<element name="digit1" ref="digit">
-			<bounds x="62" y="12" width="35" height="46" />
+			<bounds x="62" y="15" width="35" height="46" />
 		</element>
 		<element name="dp1" ref="dp">
-			<bounds x="99" y="52" width="6" height="6" />
+			<bounds x="99" y="55" width="6" height="6" />
 		</element>
 
 		<!-- DISPLAY3 (right) - IC10 -->
 		<element name="digit2" ref="digit">
-			<bounds x="109" y="12" width="35" height="46" />
+			<bounds x="109" y="15" width="35" height="46" />
 		</element>
 		<element name="dp2" ref="dp">
-			<bounds x="146" y="52" width="6" height="6" />
+			<bounds x="146" y="55" width="6" height="6" />
+		</element>
+
+		<!-- BEAT label -->
+		<element ref="label_beat">
+			<bounds x="75" y="68" width="50" height="10" />
+		</element>
+
+		<!-- Beat LEDs (8 LEDs in a row) - IC9 -->
+		<element name="beat0" ref="beat_led">
+			<bounds x="15" y="82" width="12" height="12" />
+		</element>
+		<element name="beat1" ref="beat_led">
+			<bounds x="35" y="82" width="12" height="12" />
+		</element>
+		<element name="beat2" ref="beat_led">
+			<bounds x="55" y="82" width="12" height="12" />
+		</element>
+		<element name="beat3" ref="beat_led">
+			<bounds x="75" y="82" width="12" height="12" />
+		</element>
+		<element name="beat4" ref="beat_led">
+			<bounds x="95" y="82" width="12" height="12" />
+		</element>
+		<element name="beat5" ref="beat_led">
+			<bounds x="115" y="82" width="12" height="12" />
+		</element>
+		<element name="beat6" ref="beat_led">
+			<bounds x="135" y="82" width="12" height="12" />
+		</element>
+		<element name="beat7" ref="beat_led">
+			<bounds x="155" y="82" width="12" height="12" />
 		</element>
 	</view>
 </mamelayout>
