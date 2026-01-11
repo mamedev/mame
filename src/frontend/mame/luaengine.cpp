@@ -1357,17 +1357,17 @@ void lua_engine::initialize()
 			else
 				e.set_value(val ? "1" : "0", OPTION_PRIORITY_CMDLINE);
 		},
+		[this](core_options::entry &e, int val) {
+			if(e.type() != core_options::option_type::INTEGER && e.type() != core_options::option_type::FLOAT)
+				luaL_error(m_lua_state, "Cannot set option to wrong type");
+			else
+				e.set_value(string_format("%d", val), OPTION_PRIORITY_CMDLINE);
+		},
 		[this](core_options::entry &e, float val) {
 			if(e.type() != core_options::option_type::FLOAT)
 				luaL_error(m_lua_state, "Cannot set option to wrong type");
 			else
 				e.set_value(string_format("%f", val), OPTION_PRIORITY_CMDLINE);
-		},
-		[this](core_options::entry &e, int val) {
-			if(e.type() != core_options::option_type::INTEGER)
-				luaL_error(m_lua_state, "Cannot set option to wrong type");
-			else
-				e.set_value(string_format("%d", val), OPTION_PRIORITY_CMDLINE);
 		},
 		[this](core_options::entry &e, const char *val) {
 			if(e.type() != core_options::option_type::STRING && e.type() != core_options::option_type::PATH && e.type() != core_options::option_type::MULTIPATH)
