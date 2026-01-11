@@ -45,6 +45,7 @@ public:
         , m_samples_rom(*this, "samples")
         , m_rhythms_rom(*this, "rhythms")
         , m_panel_io(*this, "PANEL%u", 0U)
+        , m_kbd_io(*this, "KBDMTX%u", 0U)
     { }
 
     ~keyfox10_state()
@@ -102,6 +103,7 @@ private:
     required_region_ptr<u8> m_samples_rom;  // IC17 "Samples" 128KB
     required_region_ptr<u8> m_rhythms_rom;  // IC14 "Rhythmen" 128KB
     required_ioport_array<10> m_panel_io;   // 10x 8-bit button panels
+    required_ioport_array<2> m_kbd_io;      // 2x 8-bit keyboard matrix (IC4, IC11)
     u8 m_port0 = 0xff;
     u8 m_port1 = 0xff;
     u8 m_port2 = 0xff;
@@ -164,9 +166,22 @@ private:
 
     void panel_shift_clock(); // CLK_LED rising edge handler for button panel
 
-    // CLK_SW shift register for keyboard matrix (separate from button panel)
-    // To be implemented later
-    u8 m_kbd_sr[10] = {};     // Keyboard matrix shift register
+    // CLK_SW keyboard matrix: 4x 74HC175 + 2x 74HC251 multiplexers
+    // 74HC175 shift register chain provides select address for 74HC251 muxes
+    // IC4 (74HC251): RHYTHM-/+, ACC+/-, TEMPO+/-, START/S
+    // IC11 (74HC251): UPPER+/-, LOWER-/+, BASS-/+
+    u16 m_kbd_sr = 0;           // 4x 74HC175 = 16-bit shift register
+    u8 m_kbd_state[2] = {};     // Current keyboard matrix button states (IC4, IC11)
+
+    void kbd_shift_clock();     // CLK_SW rising edge handler
+    u8 read_kbd_mux() const;    // Read selected switch via 74HC251 multiplexers
+
+    // CLK_BEAT beat LED: IC9 - 74HC164 shift register
+    // 8-bit shift register for beat position indicator LEDs
+    // Outputs QA-QH drive LEDs via diodes D1-D7
+    u8 m_beat_sr = 0;           // Beat LED shift register (8 bits)
+
+    void beat_shift_clock();    // CLK_BEAT rising edge handler
 
     // GAL16V8 input logger - captures inputs for hardware replay
     // Inputs: ~RD, ~WR, ~PSEN, A13, A14, A15, T0, T1
@@ -209,34 +224,46 @@ u8 keyfox10_state::port0_r()
 u8 keyfox10_state::port1_r()
 {
     // P1.7 (SENSE) is input - returns button state during scan mode
-    // In button sense mode: shift registers output floating, single '1' bit shifted through
+    // Used for both panel buttons (CLK_LED) and keyboard matrix (CLK_SW)
     // SENSE returns 1 if button at current scan position is pressed
 
     u8 data = m_port1 & 0x7f;  // Clear SENSE bit
 
-    // Read current button state from input ports
+    // Read current button state from panel input ports
     for (int i = 0; i < 10; i++)
     {
         m_btn_state[i] = m_panel_io[i]->read();
     }
 
-    // Check if any button at current scan position is pressed
-    // The panel shift register has a '1' at the position being scanned
-    // If button state AND scan position both have a '1', button is pressed
-    bool sense = false;
+    // Read current keyboard matrix state from input ports
+    for (int i = 0; i < 2; i++)
+    {
+        m_kbd_state[i] = m_kbd_io[i]->read();
+    }
+
+    // Check panel buttons - shift register has '1' at position being scanned
+    bool panel_sense = false;
     for (int i = 0; i < 10; i++)
     {
         if (m_panel_sr[i] & m_btn_state[i])
         {
-            sense = true;
+            panel_sense = true;
             break;
         }
     }
 
+    // Check keyboard matrix - mux selects button based on shift register address
+    bool kbd_sense = read_kbd_mux();
+
+    // SENSE is OR of both panel and keyboard matrix
+    // (firmware scans them at different times via CLK_LED vs CLK_SW)
+    bool sense = panel_sense || kbd_sense;
+
     if (sense)
         data |= P1_SENSE;
 
-    LOGMASKED(LOG_IO, "P1 read: 0x%02X (SENSE=%d)\n", data, sense ? 1 : 0);
+    LOGMASKED(LOG_IO, "P1 read: 0x%02X (SENSE=%d panel=%d kbd=%d)\n",
+        data, sense ? 1 : 0, panel_sense ? 1 : 0, kbd_sense ? 1 : 0);
     return data;
 }
 
@@ -292,8 +319,19 @@ void keyfox10_state::port1_w(u8 data)
         panel_shift_clock();
     }
 
-    // CLK_SW rising edge: keyboard matrix (to be implemented)
-    // This is a separate input section from the button panel
+    // CLK_SW rising edge: keyboard matrix address shift register
+    // 4x 74HC175 chain provides address for 74HC251 multiplexers
+    if (rising & P1_CLK_SW)
+    {
+        kbd_shift_clock();
+    }
+
+    // CLK_BEAT rising edge: beat LED indicator shift register
+    // IC9 - 74HC164 provides beat position for rhythm display
+    if (rising & P1_CLK_BEAT)
+    {
+        beat_shift_clock();
+    }
 
     m_port1 = data;
 }
@@ -357,6 +395,54 @@ void keyfox10_state::panel_shift_clock()
     m_panel_sr[0] = (m_panel_sr[0] << 1) | data_in;
 
     LOGMASKED(LOG_IO, "Panel shift: DATA=%d -> SR[0]=0x%02X\n", data_in, m_panel_sr[0]);
+}
+
+void keyfox10_state::kbd_shift_clock()
+{
+    // 4x 74HC175 quad D-flip-flops for keyboard matrix address generation
+    // DATA -> IC5[0] -> IC5[1] -> IC5[2] -> IC5[3]
+    // On rising CLK_SW edge, shift DATA into 16-bit chain
+    // Outputs provide SELA, SELB, SELC (3-bit address) for 74HC251 muxes
+
+    u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;
+
+    // Shift left, insert new bit at LSB
+    m_kbd_sr = (m_kbd_sr << 1) | data_in;
+
+    LOGMASKED(LOG_IO, "Kbd shift: DATA=%d -> SR=0x%04X (addr=%d)\n",
+        data_in, m_kbd_sr, m_kbd_sr & 0x07);
+}
+
+u8 keyfox10_state::read_kbd_mux() const
+{
+    // 74HC251 8:1 multiplexers select button based on address from shift register
+    // Address = low 3 bits of shift register (SELA, SELB, SELC)
+    // IC4: RHYTHM-/+, ACC+/-, TEMPO+/-, START/S (D0-D6)
+    // IC11: UPPER+/-, LOWER-/+, BASS-/+ (D0-D5)
+    // Returns 1 if any selected button is pressed
+
+    u8 addr = m_kbd_sr & 0x07;  // 3-bit mux address
+
+    // Read button state at selected address from both muxes
+    bool ic4_out = BIT(m_kbd_state[0], addr);   // IC4 output
+    bool ic11_out = BIT(m_kbd_state[1], addr);  // IC11 output
+
+    // Mux outputs are likely OR'd together for single SWSENSE line
+    return (ic4_out || ic11_out) ? 1 : 0;
+}
+
+void keyfox10_state::beat_shift_clock()
+{
+    // IC9 - 74HC164 8-bit shift register for beat indicator LEDs
+    // On rising CLK_BEAT edge, shift DATA into register
+    // Outputs QA-QH drive beat position LEDs
+
+    u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;
+
+    // Shift left, insert new bit at LSB
+    m_beat_sr = (m_beat_sr << 1) | data_in;
+
+    LOGMASKED(LOG_IO, "Beat shift: DATA=%d -> SR=0x%02X\n", data_in, m_beat_sr);
 }
 
 u8 keyfox10_state::sam_snd_r(offs_t offset)
@@ -617,6 +703,8 @@ void keyfox10_state::machine_start()
     save_item(NAME(m_panel_sr));
     save_item(NAME(m_btn_state));
     save_item(NAME(m_kbd_sr));
+    save_item(NAME(m_kbd_state));
+    save_item(NAME(m_beat_sr));
 }
 
 void keyfox10_state::dump_sam_memory() const
@@ -812,8 +900,8 @@ static INPUT_PORTS_START(keyfox10)
     // Chain order: IC8 -> IC12 -> IC13 -> IC15 -> IC14 -> IC16 -> IC17 -> IC1 -> IC3 -> IC2
 
     PORT_START("PANEL0")  // IC8 - Status
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TUNE")      PORT_CODE(KEYCODE_1)
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TRANSP.")   PORT_CODE(KEYCODE_2)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TUNE")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TRANSP.")
     PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PRES2")     PORT_CODE(KEYCODE_3)
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PRES1")     PORT_CODE(KEYCODE_4)
     PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MIDI")      PORT_CODE(KEYCODE_5)
@@ -882,7 +970,7 @@ static INPUT_PORTS_START(keyfox10)
     PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DRUMS")
 
     PORT_START("PANEL7")  // IC1 - Rhythm 1
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DISCO")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DISCO")      PORT_CODE(KEYCODE_0)
     PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ROCK&ROLL")
     PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BEAT 8")
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("FOXTROTT")
@@ -909,7 +997,31 @@ static INPUT_PORTS_START(keyfox10)
     PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC. 1")
     PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS M")
     PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM M")
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("REV.MODE")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("REV.MODE")      PORT_CODE(KEYCODE_1)
+
+    // Keyboard matrix: 4x 74HC175 + 2x 74HC251 multiplexers
+    // Increment/decrement buttons for level controls
+    // Scanned via CLK_SW, read via SENSE (P1.7)
+
+    PORT_START("KBDMTX0")  // IC4 - Level controls 1
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM-")   PORT_CODE(KEYCODE_F1)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM+")   PORT_CODE(KEYCODE_F2)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC+")      PORT_CODE(KEYCODE_F3)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC-")      PORT_CODE(KEYCODE_F4)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO+")    PORT_CODE(KEYCODE_F5)
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO-")    PORT_CODE(KEYCODE_F6)
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("START/S")   PORT_CODE(KEYCODE_2)
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)  // D7 unused
+
+    PORT_START("KBDMTX1")  // IC11 - Level controls 2
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("UPPER+")    PORT_CODE(KEYCODE_F8)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("UPPER-")    PORT_CODE(KEYCODE_F9)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("LOWER-")    PORT_CODE(KEYCODE_F10)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("LOWER+")    PORT_CODE(KEYCODE_F11)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS-")     PORT_CODE(KEYCODE_F12)
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS+")     PORT_CODE(KEYCODE_EQUALS)
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)  // D6 unused
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)  // D7 unused
 INPUT_PORTS_END
 
 void keyfox10_state::keyfox10(machine_config &config)

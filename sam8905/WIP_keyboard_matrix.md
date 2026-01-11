@@ -4,7 +4,9 @@
 
 The CLK_SW section handles increment/decrement style buttons for level controls using a shift register + multiplexer architecture.
 
-## Status: NOT IMPLEMENTED
+## Status: IMPLEMENTED
+
+Started: 2026-01-11
 
 ## Hardware Architecture
 
@@ -125,28 +127,31 @@ Total: 13 buttons (7 on IC4, 6 on IC11)
 ## Implementation Tasks
 
 ### 1. Add State Variables
-- [ ] 74HC175 shift register state (16 bits = 2 bytes)
-- [ ] Current multiplexer select address
+- [x] 74HC175 shift register state (16 bits = u16 m_kbd_sr)
+- [x] Keyboard matrix button state (2x u8 m_kbd_state for IC4, IC11)
 
 ### 2. Implement CLK_SW Handler
-- [ ] Shift DATA into 74HC175 chain on CLK_SW rising edge
-- [ ] Extract SELA, SELB, SELC from shift register
+- [x] kbd_shift_clock() - Shift DATA into 74HC175 chain on CLK_SW rising edge
+- [x] Low 3 bits of shift register provide SELA, SELB, SELC
 
 ### 3. Implement SWSENSE Input
-- [ ] Determine which port bit SWSENSE uses
-- [ ] Return selected switch state based on address
+- [x] SWSENSE shares P1.7 (SENSE) with panel buttons
+- [x] read_kbd_mux() returns selected switch state based on 3-bit address
+- [x] IC4 and IC11 outputs OR'd together
 
 ### 4. Define Input Ports
-- [ ] 13 increment/decrement buttons
-- [ ] Map to keyboard keys for testing
+- [x] KBDMTX0 (IC4): RHYTHM-/+, ACC+/-, TEMPO+/-, START/S (7 buttons)
+- [x] KBDMTX1 (IC11): UPPER+/-, LOWER-/+, BASS-/+ (6 buttons)
+- [x] Mapped to F1-F12 and EQUALS keys for testing
 
 ### 5. Implement Beat LED (CLK_BEAT)
-- [ ] 74HC164 shift register for beat position
-- [ ] 8 beat position outputs
+- [x] IC9 - 74HC164 shift register for beat position (m_beat_sr)
+- [x] beat_shift_clock() - CLK_BEAT rising edge handler
+- [x] 8-bit shift register drives beat position LEDs via outputs QA-QH
 
-## Open Questions
+## Open Questions (Resolved)
 
-- [ ] Which port bit is SWSENSE connected to?
+- [x] Which port bit is SWSENSE connected to? → Shares P1.7 (SENSE) with panel
 - [ ] What are PEST and PESUS signals?
-- [ ] How are the two 74HC251 outputs combined into SWSENSE?
-- [ ] Exact bit mapping of SELA/SELB/SELC from shift register
+- [x] How are the two 74HC251 outputs combined into SWSENSE? → OR'd together
+- [x] Exact bit mapping of SELA/SELB/SELC from shift register → Low 3 bits of m_kbd_sr
