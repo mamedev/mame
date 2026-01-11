@@ -8,11 +8,13 @@
 #include "speaker.h"
 #include "debugger.h"
 
+#include "keyfox10.lh"
+
 #define LOG_SERIAL (1U << 1)
 #define LOG_PORT   (1U << 2)
 #define LOG_SAM    (1U << 3)
-//#define LOG_IO     (1U << 4)
-#define LOG_IO     0
+#define LOG_IO     (1U << 4)
+//#define LOG_IO     0
 #define VERBOSE (LOG_SERIAL | LOG_SAM | LOG_IO)
 #include "logmacro.h"
 
@@ -46,6 +48,8 @@ public:
         , m_rhythms_rom(*this, "rhythms")
         , m_panel_io(*this, "PANEL%u", 0U)
         , m_kbd_io(*this, "KBDMTX%u", 0U)
+        , m_digits(*this, "digit%u", 0U)
+        , m_digit_dp(*this, "dp%u", 0U)
     { }
 
     ~keyfox10_state()
@@ -104,6 +108,8 @@ private:
     required_region_ptr<u8> m_rhythms_rom;  // IC14 "Rhythmen" 128KB
     required_ioport_array<10> m_panel_io;   // 10x 8-bit button panels
     required_ioport_array<2> m_kbd_io;      // 2x 8-bit keyboard matrix (IC4, IC11)
+    output_finder<3> m_digits;              // 7-segment display outputs (digit0-digit2)
+    output_finder<3> m_digit_dp;            // Decimal point outputs (dp0-dp2)
     u8 m_port0 = 0xff;
     u8 m_port1 = 0xff;
     u8 m_port2 = 0xff;
@@ -157,6 +163,7 @@ private:
     u8 m_disp_sr[3] = {0xff, 0xff, 0xff};  // Shift registers (active low, init to all off)
 
     void disp_shift_clock();
+    void update_display();    // Update MAME display outputs from shift registers
 
     // 10x 74HC574 shift registers for button panel (80 buttons with LEDs)
     // Chain: IC8 -> IC12 -> IC13 -> IC15 -> IC14 -> IC16 -> IC17 -> IC1 -> IC3 -> IC2
@@ -376,6 +383,22 @@ void keyfox10_state::disp_shift_clock()
 
     LOGMASKED(LOG_IO, "DISP shift: DATA=%d -> IC7=0x%02X IC6=0x%02X IC10=0x%02X\n",
         data_in, m_disp_sr[0], m_disp_sr[1], m_disp_sr[2]);
+
+    // Update visual display outputs
+    update_display();
+}
+
+void keyfox10_state::update_display()
+{
+    // Convert active-low shift register values to MAME 7-segment format
+    // Hardware: 0 = segment ON, 1 = segment OFF
+    // MAME: bit set = segment ON
+    for (int i = 0; i < 3; i++)
+    {
+        u8 segs = ~m_disp_sr[i];      // Invert for active-high
+        m_digits[i] = segs & 0x7f;    // bits 0-6 = segments a-g
+        m_digit_dp[i] = BIT(segs, 7); // bit 7 = decimal point
+    }
 }
 
 void keyfox10_state::panel_shift_clock()
@@ -705,6 +728,11 @@ void keyfox10_state::machine_start()
     save_item(NAME(m_kbd_sr));
     save_item(NAME(m_kbd_state));
     save_item(NAME(m_beat_sr));
+
+    // Resolve display outputs and initialize
+    m_digits.resolve();
+    m_digit_dp.resolve();
+    update_display();
 }
 
 void keyfox10_state::dump_sam_memory() const
@@ -970,7 +998,7 @@ static INPUT_PORTS_START(keyfox10)
     PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DRUMS")
 
     PORT_START("PANEL7")  // IC1 - Rhythm 1
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DISCO")      PORT_CODE(KEYCODE_0)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DISCO")      PORT_CODE(KEYCODE_D)
     PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ROCK&ROLL")
     PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BEAT 8")
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("FOXTROTT")
@@ -996,7 +1024,7 @@ static INPUT_PORTS_START(keyfox10)
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC. 2")
     PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC. 1")
     PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS M")
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM M")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM M")      PORT_CODE(KEYCODE_0)
     PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("REV.MODE")      PORT_CODE(KEYCODE_1)
 
     // Keyboard matrix: 4x 74HC175 + 2x 74HC251 multiplexers
@@ -1008,8 +1036,8 @@ static INPUT_PORTS_START(keyfox10)
     PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM+")   PORT_CODE(KEYCODE_F2)
     PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC+")      PORT_CODE(KEYCODE_F3)
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC-")      PORT_CODE(KEYCODE_F4)
-    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO+")    PORT_CODE(KEYCODE_F5)
-    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO-")    PORT_CODE(KEYCODE_F6)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO+")    PORT_CODE(KEYCODE_A)
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO-")    PORT_CODE(KEYCODE_S)
     PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("START/S")   PORT_CODE(KEYCODE_2)
     PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)  // D7 unused
 
@@ -1062,6 +1090,9 @@ void keyfox10_state::keyfox10(machine_config &config)
     m_sam_fx->waveform_write_callback().set(FUNC(keyfox10_state::sam_fx_waveform_w));
     m_sam_fx->add_route(0, "lspeaker", 1.0);  // Wet L
     m_sam_fx->add_route(1, "rspeaker", 1.0);  // Wet R
+
+    // 7-segment display layout
+    config.set_default_layout(layout_keyfox10);
 }
 
 ROM_START(keyfox10)

@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!--
+license:BSD-3-Clause
+copyright-holders:Draft
+
+Wersi Keyfox 10 - 3-digit 7-segment display layout
+Hardware: 3x 74HC164 shift registers driving SE67F displays
+-->
+<mamelayout version="2">
+	<!-- 7-segment LED display element (red/orange LED color) -->
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.0" green="0.2" blue="0.1" />
+		</led7seg>
+	</element>
+
+	<!-- Decimal point element -->
+	<element name="dp" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.2" blue="0.1" />
+		</disk>
+		<disk state="0">
+			<color red="0.15" green="0.03" blue="0.015" />
+		</disk>
+	</element>
+
+	<!-- Background panel -->
+	<element name="background">
+		<rect>
+			<color red="0.1" green="0.1" blue="0.1" />
+		</rect>
+	</element>
+
+	<view name="Display">
+		<!-- Dark background -->
+		<element ref="background">
+			<bounds x="0" y="0" width="160" height="70" />
+		</element>
+
+		<!-- DISPLAY1 (left) - IC7 -->
+		<element name="digit0" ref="digit">
+			<bounds x="15" y="12" width="35" height="46" />
+		</element>
+		<element name="dp0" ref="dp">
+			<bounds x="52" y="52" width="6" height="6" />
+		</element>
+
+		<!-- DISPLAY2 (middle) - IC6 -->
+		<element name="digit1" ref="digit">
+			<bounds x="62" y="12" width="35" height="46" />
+		</element>
+		<element name="dp1" ref="dp">
+			<bounds x="99" y="52" width="6" height="6" />
+		</element>
+
+		<!-- DISPLAY3 (right) - IC10 -->
+		<element name="digit2" ref="digit">
+			<bounds x="109" y="12" width="35" height="46" />
+		</element>
+		<element name="dp2" ref="dp">
+			<bounds x="146" y="52" width="6" height="6" />
+		</element>
+	</view>
+</mamelayout>
