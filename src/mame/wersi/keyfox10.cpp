@@ -507,7 +507,7 @@ void keyfox10_state::log_gal_inputs(bool rd, bool wr, bool psen, u16 addr)
 void keyfox10_state::machine_start()
 {
     // Open GAL log file
-    m_gal_log = fopen("gal_inputs.log", "w");
+    //m_gal_log = fopen("gal_inputs.log", "w");
     if (m_gal_log)
     {
         fprintf(m_gal_log, "# Keyfox10 GAL16V8 input capture\n");
