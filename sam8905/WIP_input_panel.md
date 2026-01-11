@@ -4,65 +4,77 @@
 
 Implement button/LED panel emulation for the Keyfox10 using 74HC574 octal D-flip-flop shift registers in dual-mode operation (LED display and button sensing).
 
-## Status: IN PROGRESS
+## Status: IMPLEMENTED
 
 Started: 2026-01-11
 
 ## Hardware Architecture
 
-### Shift Register Chain (74HC574)
+### Shift Register Chain (10x 74HC574)
 
-The panel uses 9x 74HC574 octal D-flip-flops in a cascaded chain:
+The panel uses 10x 74HC574 octal D-flip-flops in a cascaded chain:
 
 ```
-CPU ──SH/DATA──▶ IC12 ──▶ IC13 ──▶ IC15 ──▶ IC14 ──▶ IC16 ──▶ IC17 ──▶ IC1 ──▶ IC3 ──▶ IC2
-                  │        │        │        │        │        │       │       │       │
-                  ▼        ▼        ▼        ▼        ▼        ▼       ▼       ▼       ▼
-               8 LEDs   8 LEDs   8 LEDs   8 LEDs   8 LEDs   8 LEDs  8 LEDs  8 LEDs  8 LEDs
-               8 btns   8 btns   8 btns   8 btns   8 btns   8 btns  8 btns  8 btns  8 btns
+CPU ──DATA──▶ IC8 ──▶ IC12 ──▶ IC13 ──▶ IC15 ──▶ IC14 ──▶ IC16 ──▶ IC17 ──▶ IC1 ──▶ IC3 ──▶ IC2
+               │       │        │        │        │        │        │       │       │       │
+               ▼       ▼        ▼        ▼        ▼        ▼        ▼       ▼       ▼       ▼
+            8 btn/LED  8 btn/LED ... (80 buttons with LEDs total)
 ```
 
-Total: 72 buttons with corresponding LEDs
+Total: 80 buttons with corresponding LEDs
 
-### Control Signals
+### Control Signals (from Port 1)
 
-| Signal    | Description                                           |
-|-----------|-------------------------------------------------------|
-| SH/DATA   | Serial data input to first shift register             |
-| CLKLED    | Clock signal - shifts data through chain              |
-| ENABLE    | Latch enable - transfers shift register to outputs    |
-| OC        | Output Control - when HIGH, outputs float (tri-state) |
-| CP        | Clock pulse for shift register                        |
-| LEDSENSE  | Input to detect button press when outputs float       |
+| Signal    | Pin  | Direction | Description                                    |
+|-----------|------|-----------|------------------------------------------------|
+| DATA      | P1.6 | Out       | Serial data input to first shift register      |
+| CLK_LED   | P1.2 | Out       | Clock signal - shifts data through chain       |
+| ENABLE    | P1.4 | Out       | Latch enable - transfers shift register to outputs |
+| MODE      | P1.5 | Out       | Mode control (HIGH = sense mode)               |
+| SENSE     | P1.7 | In        | Input to detect button press when outputs float |
+
+**Note:** CLK_SW (P1.0) is used for a different input section (keyboard matrix - to be documented separately).
 
 ### Dual-Mode Operation
 
-**LED Mode (OC = LOW):**
+**LED Mode (MODE = LOW):**
 - Shift register outputs drive LEDs directly
-- 72-bit pattern shifted in via SH/DATA + CLKLED
+- 80-bit pattern shifted in via DATA + CLK_LED
 - ENABLE latches pattern to outputs
 
-**Button Sense Mode (OC = HIGH):**
+**Button Sense Mode (MODE = HIGH):**
 - Outputs float (tri-state), LEDs off
-- Single '1' bit shifted through chain
-- If button pressed, LEDSENSE sees the '1'
+- Single '1' bit shifted through chain via DATA + CLK_LED
+- If button pressed, SENSE sees the '1'
 - Position of '1' identifies which button
 
 ```
 Sense Sequence:
-1. OC = HIGH (outputs float)
-2. Shift single '1' into chain
+1. MODE = HIGH (outputs float)
+2. Shift single '1' into chain via CLK_LED
 3. For each bit position:
-   a. Clock the '1' to next position
-   b. Read LEDSENSE
+   a. Clock the '1' to next position (CLK_LED rising edge)
+   b. Read SENSE (P1.7)
    c. If HIGH, button at this position is pressed
-4. After 72 clocks, all buttons scanned
-5. OC = LOW, restore LED pattern
+4. After 80 clocks, all buttons scanned
+5. MODE = LOW, restore LED pattern
 ```
 
-## Button Names by IC (Top-Down, Left-Right)
+## Button Names by IC
 
-### IC12 - Upper Drawbars Section
+### IC8 - Status (First in chain)
+| Bit | Button Name |
+|-----|-------------|
+| 0   | TUNE        |
+| 1   | TRANSP.     |
+| 2   | PRES2       |
+| 3   | PRES1       |
+| 4   | MIDI        |
+| 5   | RHYTHM      |
+| 6   | LOWER       |
+| 7   | UPPER       |
+
+### IC12 - Upper Drawbars
 | Bit | Button Name |
 |-----|-------------|
 | 0   | JAZZ1       |
@@ -86,7 +98,7 @@ Sense Sequence:
 | 6   | SAXOPHON    |
 | 7   | VIBES       |
 
-### IC15 - Upper Solo Section
+### IC15 - Upper Solo
 | Bit | Button Name |
 |-----|-------------|
 | 0   | STRINGS     |
@@ -158,7 +170,7 @@ Sense Sequence:
 | 6   | FILL        |
 | 7   | SYNC-ST     |
 
-### IC2 - Mode Controls
+### IC2 - Mode Controls (Last in chain)
 | Bit | Button Name |
 |-----|-------------|
 | 0   | SPLIT       |
@@ -172,58 +184,43 @@ Sense Sequence:
 
 ## Implementation Tasks
 
-### 1. Identify CPU I/O Addresses
-- [ ] Find memory-mapped addresses for panel control signals
-- [ ] Determine which port bits map to SH/DATA, CLKLED, ENABLE, OC
-- [ ] Find LEDSENSE input address
+### 1. Add State Variables
+- [x] 80-bit LED shift register state (10 bytes)
+- [x] 80-bit button scan shift register (10 bytes)
+- [x] 80-bit button state from inputs (10 bytes)
 
-### 2. Add State Variables
-- [ ] 72-bit shift register state (9 bytes)
-- [ ] 72-bit LED latch state (9 bytes)
-- [ ] 72-bit button state (9 bytes)
-- [ ] OC (output control) state
-- [ ] Current scan position
+### 2. Implement Shift Register Logic
+- [x] DATA + CLK_LED: Shift data into chain (led_shift_clock())
+- [ ] ENABLE: Latch shift register to LED outputs (not yet needed)
 
-### 3. Implement Shift Register Logic
-- [ ] SH/DATA + CLKLED: Shift data into chain
-- [ ] ENABLE: Latch shift register to LED outputs
-- [ ] OC control: Switch between LED and sense modes
+### 3. Implement Button Sensing
+- [x] SENSE read: Return button state at current scan position
+- [x] Support for multiple simultaneous button presses
 
-### 4. Implement Button Sensing
-- [ ] LEDSENSE read: Return button state at current scan position
-- [ ] Support for multiple simultaneous button presses
+### 4. Create MAME Input Definitions
+- [x] Define input ports for all 80 buttons (PANEL0-PANEL9)
+- [x] Map first 8 buttons to keyboard keys 1-8 for testing
+- [x] Group by panel section for organization
 
-### 5. Create MAME Input Definitions
-- [ ] Define input ports for all 72 buttons
-- [ ] Map to keyboard keys for testing
-- [ ] Group by panel section for organization
+## Files Modified
 
-### 6. Add LED Output Visualization
-- [ ] Create layout file for button panel display
-- [ ] Map LED states to layout elements
+1. `src/mame/wersi/keyfox10.cpp` - Added panel I/O handlers and state
 
-## Files to Modify
+## Testing Results
 
-1. `src/mame/wersi/keyfox10.cpp` - Add panel I/O handlers and state
-2. Create layout file if visual representation needed
-
-## Testing Plan
-
-1. Verify shift register clocking works
-2. Test LED pattern updates
-3. Test button scanning detects presses
-4. Test multiple simultaneous buttons
-5. Compare with real hardware behavior if possible
+Firmware activity observed:
+- CLK_LED pulses detected - LED pattern being shifted
+- Both SW shift and LED shift occurring (need to remove SW shift for this panel)
 
 ## Notes
 
 - The 74HC574 is edge-triggered (data latched on rising clock edge)
-- OC is active-low for output enable on real chip, but schematic shows logic
 - Button matrix uses the shift register outputs as column select
-- LEDSENSE is likely active-high when button pressed
+- SENSE is active-high when button pressed
+- CLK_SW is NOT used for this panel - it's for a separate keyboard matrix
 
 ## Open Questions
 
+- [x] Which clock is used? → CLK_LED only for this panel
 - [ ] Exact timing requirements for scan cycle
 - [ ] How often does firmware scan buttons vs update LEDs?
-- [ ] Are there any buttons outside this shift register chain?

@@ -44,6 +44,7 @@ public:
         , m_rom(*this, "program")
         , m_samples_rom(*this, "samples")
         , m_rhythms_rom(*this, "rhythms")
+        , m_panel_io(*this, "PANEL%u", 0U)
     { }
 
     ~keyfox10_state()
@@ -100,6 +101,7 @@ private:
     required_region_ptr<u8> m_rom;
     required_region_ptr<u8> m_samples_rom;  // IC17 "Samples" 128KB
     required_region_ptr<u8> m_rhythms_rom;  // IC14 "Rhythmen" 128KB
+    required_ioport_array<10> m_panel_io;   // 10x 8-bit button panels
     u8 m_port0 = 0xff;
     u8 m_port1 = 0xff;
     u8 m_port2 = 0xff;
@@ -154,6 +156,18 @@ private:
 
     void disp_shift_clock();
 
+    // 10x 74HC574 shift registers for button panel (80 buttons with LEDs)
+    // Chain: IC8 -> IC12 -> IC13 -> IC15 -> IC14 -> IC16 -> IC17 -> IC1 -> IC3 -> IC2
+    // Uses CLK_LED for both LED display and button scanning
+    u8 m_panel_sr[10] = {};   // Panel shift register chain (80 bits) - LED and scan
+    u8 m_btn_state[10] = {};  // Current button states from inputs (80 buttons)
+
+    void panel_shift_clock(); // CLK_LED rising edge handler for button panel
+
+    // CLK_SW shift register for keyboard matrix (separate from button panel)
+    // To be implemented later
+    u8 m_kbd_sr[10] = {};     // Keyboard matrix shift register
+
     // GAL16V8 input logger - captures inputs for hardware replay
     // Inputs: ~RD, ~WR, ~PSEN, A13, A14, A15, T0, T1
     virtual void machine_start() override ATTR_COLD;
@@ -194,12 +208,35 @@ u8 keyfox10_state::port0_r()
 
 u8 keyfox10_state::port1_r()
 {
-    // P1.7 (SENSE) is input - directly driven low based on MODE
-    // When MODE=0, SENSE should be low to indicate "data ready"
+    // P1.7 (SENSE) is input - returns button state during scan mode
+    // In button sense mode: shift registers output floating, single '1' bit shifted through
+    // SENSE returns 1 if button at current scan position is pressed
+
     u8 data = m_port1 & 0x7f;  // Clear SENSE bit
-    // Return SENSE low (0) to prevent stuck in scanning loop
-    // TODO: implement proper switch matrix scanning
-    LOGMASKED(LOG_PORT, "P1 read: 0x%02X (SENSE=%d)\n", data, 0);
+
+    // Read current button state from input ports
+    for (int i = 0; i < 10; i++)
+    {
+        m_btn_state[i] = m_panel_io[i]->read();
+    }
+
+    // Check if any button at current scan position is pressed
+    // The panel shift register has a '1' at the position being scanned
+    // If button state AND scan position both have a '1', button is pressed
+    bool sense = false;
+    for (int i = 0; i < 10; i++)
+    {
+        if (m_panel_sr[i] & m_btn_state[i])
+        {
+            sense = true;
+            break;
+        }
+    }
+
+    if (sense)
+        data |= P1_SENSE;
+
+    LOGMASKED(LOG_IO, "P1 read: 0x%02X (SENSE=%d)\n", data, sense ? 1 : 0);
     return data;
 }
 
@@ -248,6 +285,16 @@ void keyfox10_state::port1_w(u8 data)
         disp_shift_clock();
     }
 
+    // CLK_LED rising edge: shift DATA bit into button panel shift registers
+    // Used for both LED display and button scanning
+    if (rising & P1_CLK_LED)
+    {
+        panel_shift_clock();
+    }
+
+    // CLK_SW rising edge: keyboard matrix (to be implemented)
+    // This is a separate input section from the button panel
+
     m_port1 = data;
 }
 
@@ -291,6 +338,25 @@ void keyfox10_state::disp_shift_clock()
 
     LOGMASKED(LOG_IO, "DISP shift: DATA=%d -> IC7=0x%02X IC6=0x%02X IC10=0x%02X\n",
         data_in, m_disp_sr[0], m_disp_sr[1], m_disp_sr[2]);
+}
+
+void keyfox10_state::panel_shift_clock()
+{
+    // 10x 74HC574 shift registers for button panel:
+    // DATA -> IC8 -> IC12 -> IC13 -> IC15 -> IC14 -> IC16 -> IC17 -> IC1 -> IC3 -> IC2
+    // On rising CLK_LED edge, shift all registers left by 1 bit
+    // Same shift register used for both LED display and button scanning
+
+    u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;
+
+    // Shift chain: bit 7 of each feeds bit 0 of next
+    for (int i = 9; i > 0; i--)
+    {
+        m_panel_sr[i] = (m_panel_sr[i] << 1) | BIT(m_panel_sr[i-1], 7);
+    }
+    m_panel_sr[0] = (m_panel_sr[0] << 1) | data_in;
+
+    LOGMASKED(LOG_IO, "Panel shift: DATA=%d -> SR[0]=0x%02X\n", data_in, m_panel_sr[0]);
 }
 
 u8 keyfox10_state::sam_snd_r(offs_t offset)
@@ -548,6 +614,9 @@ void keyfox10_state::machine_start()
     save_item(NAME(m_fx_input_l));
     save_item(NAME(m_fx_input_r));
     save_pointer(NAME(m_fx_sram), FX_SRAM_SIZE);
+    save_item(NAME(m_panel_sr));
+    save_item(NAME(m_btn_state));
+    save_item(NAME(m_kbd_sr));
 }
 
 void keyfox10_state::dump_sam_memory() const
@@ -739,6 +808,108 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
 }
 
 static INPUT_PORTS_START(keyfox10)
+    // 10x 74HC574 shift registers for button panel (80 buttons)
+    // Chain order: IC8 -> IC12 -> IC13 -> IC15 -> IC14 -> IC16 -> IC17 -> IC1 -> IC3 -> IC2
+
+    PORT_START("PANEL0")  // IC8 - Status
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TUNE")      PORT_CODE(KEYCODE_1)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TRANSP.")   PORT_CODE(KEYCODE_2)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PRES2")     PORT_CODE(KEYCODE_3)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PRES1")     PORT_CODE(KEYCODE_4)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MIDI")      PORT_CODE(KEYCODE_5)
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM")    PORT_CODE(KEYCODE_6)
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("LOWER")     PORT_CODE(KEYCODE_7)
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("UPPER")     PORT_CODE(KEYCODE_8)
+
+    PORT_START("PANEL1")  // IC12 - Upper Drawbars
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("JAZZ1")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("FLUTE 16")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("JAZZ2")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("FLUTE 8")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ORGAN")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("FLUTE 4")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("CHURCH")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PERC2 2/3")
+
+    PORT_START("PANEL2")  // IC13 - Upper Voices 1
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TROMBONE")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PIANO")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TRUMPET")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("E-PIANO")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("CLARINET")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("HONKYTONK")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SAXOPHON")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("VIBES")
+
+    PORT_START("PANEL3")  // IC15 - Upper Solo
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("STRINGS")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("HAW.GUIT")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("VOCAL")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("JAZZ.GUIT")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SYNTHE")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("J.FLUTE")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MUSETTE")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SYN.BRASS")
+
+    PORT_START("PANEL4")  // IC14 - Upper Controls
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("WV.SLOW")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("WV.FAST")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ENSEMBLE")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SUSTAIN U")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PORTAMEN.")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SOLO")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("WERSICHORD")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DYNAMIC")
+
+    PORT_START("PANEL5")  // IC16 - Bass Section
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS1")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS2")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SYN.BASS")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SLAP.BASS")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("FLUTE 8 B")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("FLUTE 4 B")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SUSTAIN B")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("AUTO. B.")
+
+    PORT_START("PANEL6")  // IC17 - Lower Section
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("FLUTE 2")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PIANO L")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("E-PIANO L")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("STRINGS L")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SYN.STR6")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("GUITAR")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SUSTAIN L")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DRUMS")
+
+    PORT_START("PANEL7")  // IC1 - Rhythm 1
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DISCO")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ROCK&ROLL")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BEAT 8")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("FOXTROTT")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("J.ROCK")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BIG BAND")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BALLAD")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SAMBA")
+
+    PORT_START("PANEL8")  // IC3 - Rhythm 2
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BOSA")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("WALTZ")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BEGUIN")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("MARCH")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("2nd BANK")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("INTRO")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("FILL")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SYNC-ST")
+
+    PORT_START("PANEL9")  // IC2 - Mode Controls
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SPLIT")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SONG")
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC. 3")
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC. 2")
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC. 1")
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS M")
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM M")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("REV.MODE")
 INPUT_PORTS_END
 
 void keyfox10_state::keyfox10(machine_config &config)
