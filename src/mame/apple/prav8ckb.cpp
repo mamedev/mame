@@ -13,7 +13,8 @@
     (Cyrillic/Latin) Lock key.
 
     The Caps Lock setting is overridable by a soft switch in the
-    main unit (whose state can be set by writing to bit 0 of $C060).
+    main unit (whose state can be set by writing to bit 0 of $C060),
+    which forces output to use a 7-bit code (namely KOI-7).
 
     The MCU program does not automatically repeat keys, since the
     IOU ASIC on IIe and clones normally implements this feature.
@@ -38,7 +39,7 @@
 
 prav8ckb_device::prav8ckb_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PRAV8C_KEYBOARD, tag, owner, clock)
-	, m_b_callback(*this)
+	, m_kbdata_callback(*this)
 	, m_akd_callback(*this)
 	, m_strobe_callback(*this)
 	, m_reset_callback(*this)
@@ -73,7 +74,7 @@ u8 prav8ckb_device::key_r()
 void prav8ckb_device::key_w(u8 data)
 {
 	// Keycodes are scrambled
-	m_b_callback(bitswap<8>(data, 7, 0, 2, 1, 4, 3, 6, 5));
+	m_kbdata_callback(bitswap<8>(data, 7, 0, 2, 1, 4, 3, 6, 5));
 }
 
 u8 prav8ckb_device::misc_r()
