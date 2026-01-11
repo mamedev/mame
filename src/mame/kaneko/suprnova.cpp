@@ -2089,7 +2089,7 @@ GAME( 1998, puzzloope,   puzzloop, sknse, puzzloop, skns_state, init_puzzloope, 
 GAME( 1998, puzzloopj,   puzzloop, sknsj, puzzloop, skns_state, init_puzzloopj, ROT0,  "Mitchell", "Puzz Loop (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, puzzloopa,   puzzloop, sknsa, puzzloop, skns_state, init_puzzloopa, ROT0,  "Mitchell", "Puzz Loop (Asia)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, puzzloopk,   puzzloop, sknsk, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
-GAME( 1998, puzzloopkbl, puzzloop, sknsk, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Korea, bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloopkbl, puzzloop, sknsk, puzzloop, skns_state, init_puzzloopu, ROT0,  "Bootleg",  "Puzz Loop (Korea, bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1998, puzzloopu,   puzzloop, sknsu, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (USA)", MACHINE_IMPERFECT_GRAPHICS )
 
 GAME( 1998, ryouran,     skns,     sknsj, skns_1p,  skns_state, init_ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (revision 2)", MACHINE_IMPERFECT_GRAPHICS )
