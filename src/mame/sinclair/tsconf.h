@@ -226,7 +226,7 @@ private:
 	u16 m_cache_line_addr; // u13
 
 	required_device<at_keyboard_device> m_keyboard;
-	required_ioport_array<3> m_io_mouse;
+	required_ioport_array<4> m_io_mouse;
 
 	required_device<tsconf_beta_device> m_beta;
 	required_device<tsconfdma_device> m_dma;
