@@ -77,6 +77,10 @@ SWEET LAND III (1998) main PCB layout
 |             -----     ------   ------             1632960101              |
 |  1  2        3            4  5  6      7    8        9   10 11  12        |
  ---------------------------------------------------------------------------
+
+<SWEETLANDIII>
+SWS1 MPR0: Data including FM sound contained in 128KB EPROM (M27C1001) but only 16KB area is actual data. Other space filled with FF.
+SWS1 SPR0: Extermal Rom data contained in 32KB EPROM (M27C256B). SWEETLAND III ROM uses same II data.
 */
 
 #include "emu.h"
