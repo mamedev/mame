@@ -184,23 +184,27 @@ private:
 	uint8_t m_serial_smode = 0;
 	uint8_t m_dsp_irq_state = 0;
 	emu_timer *m_serial_timer = nullptr;
-
-	// blitter variables
-	uint32_t m_blitter_regs[0x40]{};
-	uint16_t m_gpu_regs[0x100/2]{};
-	emu_timer *m_object_timer = nullptr;
-	emu_timer *m_blitter_done_timer = nullptr;
-	emu_timer *m_pit_timer = nullptr;
-	emu_timer *m_gpu_sync_timer = nullptr;
 	emu_timer *m_jpit_timer[2] = {};
+
+	// Tom
+	uint16_t m_gpu_regs[0x100/2]{};
+	emu_timer *m_pit_timer = nullptr;
 	uint8_t m_cpu_irq_state = 0;
-	bitmap_rgb32 m_screen_bitmap;
-	uint8_t m_blitter_status = 0;
 	pen_t m_pen_table[65536]{};
 	uint8_t m_blend_y[65536]{};
 	uint8_t m_blend_cc[65536]{};
-	u32 m_suspend_object_pointer;
+	bitmap_rgb32 m_screen_bitmap;
 	u16 m_line_buffer[760];
+
+	// Object processor
+	emu_timer *m_object_timer = nullptr;
+	emu_timer *m_gpu_sync_timer = nullptr;
+	u32 m_suspend_object_pointer;
+
+	// Blitter
+	uint32_t m_blitter_regs[0x40]{};
+	emu_timer *m_blitter_done_timer = nullptr;
+	uint8_t m_blitter_status = 0;
 
 	static void (jaguar_state::*const bitmap4[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
 	static void (jaguar_state::*const bitmap8[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);

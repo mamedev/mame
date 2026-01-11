@@ -1797,6 +1797,8 @@ void jaguar_state::cojagr3k(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jaguar_state::r3000_map);
 
 	video_config(config, COJAG_CLOCK/2);
+	m_gpu->set_branch_hack(true);
+	m_dsp->set_branch_hack(true);
 	m_gpu->set_addrmap(AS_PROGRAM, &jaguar_state::gpu_map);
 	m_dsp->set_addrmap(AS_PROGRAM, &jaguar_state::dsp_map);
 
