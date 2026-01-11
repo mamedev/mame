@@ -1438,7 +1438,8 @@ void jaguar_state::dsp_rom_map(address_map &map)
 	map(0xc00000, 0xdfffff).bankr("dspsndbank");
 }
 
-/* ToDo, these maps SHOULD be merged with the ones above */
+// Handle mapping separately for console for the time being, for waitstates et al.
+// TODO: .mirror(0x008000) isn't one, but 32-bit path for GPU (and DSP?)
 
 void jaguar_state::console_base_gpu_map(address_map &map)
 {
@@ -1447,6 +1448,9 @@ void jaguar_state::console_base_gpu_map(address_map &map)
 	map(0xe00000, 0xe1ffff).r(FUNC(jaguar_state::rom_base_r));
 	map(0xf00000, 0xf003ff).rw(FUNC(jaguar_state::tom_regs_r), FUNC(jaguar_state::tom_regs_w));
 	map(0xf00400, 0xf005ff).mirror(0x000200).ram().share("gpuclut");
+//  map(0xf00800, 0xf00d9f).mirror(0x008000) line buffer A "for diagnostic only"
+//  map(0xf01000, 0xf0159f).mirror(0x008000) line buffer B ^
+//  map(0xf01800, 0xf01d9f).mirror(0x008000) current line buffer
 	map(0xf02100, 0xf021ff).rw(FUNC(jaguar_state::gpuctrl_r), FUNC(jaguar_state::gpuctrl_w));
 	map(0xf02200, 0xf022ff).mirror(0x008000).rw(FUNC(jaguar_state::blitter_r), FUNC(jaguar_state::blitter_w));
 	map(0xf03000, 0xf03fff).mirror(0x008000).ram().share("gpuram");

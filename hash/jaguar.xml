@@ -1402,7 +1402,7 @@ Missing/wrong GFXs on menus (fixed)
 Heavy flickering on gameplay (fixed)
 Overstretched pixel width
 Submerged objects during gameplay, depends on [object] suspend behaviour (fixed)
-Hangs at "out of time" during gameplay, reads the line buffer for a zoom effect while keeping [object] stalled
+Garbage effect at "out of time" during gameplay, reads the line buffer for a zoom effect while keeping [object] stalled
 Triggers [object] pitch = 0 8bpp at start of gameplay
 Reads back [object] processor data during gameplay
 Access [cart] EEPROM
