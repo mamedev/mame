@@ -846,7 +846,7 @@ ROM_START( fp1000 )
 	ROM_LOAD( "jkc_fp1000.e8", 0x0000, 0x1000, CRC(67a668a9) SHA1(37fb9308505b47db36f8c341144ca3fe3fec64af))
 
 	ROM_REGION( 0x1000, "chargen", ROMREGION_ERASEFF )
-	// Spain chargen ROM
+	// Spain chargen ROM (GKA really?)
 	ROM_LOAD( "jka_fp1000.e21", 0x0000, 0x1000, CRC(2aefa4e4) SHA1(b3cc5484426c19a7266d17ea5c4d55441b4e3be8))
 ROM_END
 
