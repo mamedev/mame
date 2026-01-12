@@ -396,7 +396,7 @@ uint8_t i8256_device::read(offs_t offset)
 		case I8256_REG_STATUS:
 			return m_status;
 		default:
-			LOG("I8256 Read unmapped register: %u\n", reg);
+			logerror("I8256 Read unmapped register: %u\n", reg);
 			return 0xff;
 	}
 }
