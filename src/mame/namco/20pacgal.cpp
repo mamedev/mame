@@ -41,6 +41,8 @@
 
     Known issues/to-do's:
         * Starfield is not 100% accurate
+        * Verify screen refresh rate, maybe same as original pacman/galaga?
+        * Music speed is slightly slower than the real thing (internal Z180 timer?)
         * Check the ASCI interface, there probably is fully working debug code.
         * Galaga attract mode isn't correct; reference: https://youtu.be/OQyWaN9fTgw?t=2m33s
 
