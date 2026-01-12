@@ -463,8 +463,6 @@ void jaguarcd_state::machine_reset()
 {
 	jaguar_state::machine_reset();
 
-	m_shared_ram[0x4/4] = 0x00802000; /* hack until I understand */
-
 	m_butch_cmd_index = 0;
 	m_butch_cmd_size = 1;
 }
@@ -1023,11 +1021,11 @@ void jaguar_state::joystick_w16(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint32_t jaguar_state::shared_ram_r(offs_t offset){ return m_shared_ram[offset]; }
 void jaguar_state::shared_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_shared_ram[offset]); }
+// TODO: as below?
 uint32_t jaguar_state::rom_base_r(offs_t offset){ return m_rom_base[offset*2+1] << 16 | m_rom_base[offset*2]; }
 // NOTE: BIOS ATARI SFX notes at startup depends on the correct endianness of this
 // - also cfr. several games (rayman, superx3d, ironsold)
 uint32_t jaguar_state::wave_rom_r(offs_t offset){ return m_wave_rom[offset*2+1] | m_wave_rom[offset*2] << 16; }
-uint32_t jaguarcd_state::cd_bios_r(offs_t offset){ return m_cd_bios[offset*2+1] << 16 | m_cd_bios[offset*2]; }
 uint32_t jaguar_state::dsp_ram_r(offs_t offset){ return m_dsp_ram[offset]; }
 void jaguar_state::dsp_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask){ COMBINE_DATA(&m_dsp_ram[offset]); }
 uint32_t jaguar_state::gpu_clut_r(offs_t offset){ return m_gpu_clut[offset]; }
@@ -1116,201 +1114,6 @@ void jaguar_state::cpu_space_map(address_map &map)
 	map(0xfffff0, 0xffffff).m(m_maincpu, FUNC(m68000_base_device::autovectors_map));
 	map(0xfffff5, 0xfffff5).lr8([] () -> u8 { return 0x40; }, "level2");
 }
-
-/*
-CD-Rom emulation, chip codename Butch (the HW engineer was definitely obsessed with T&J somehow ...)
-TODO: this needs to be device-ized, of course ...
-
-[0x00]: irq register
-(R)
--x-- ---- ---- ---- CD uncorrectable data error pending
---x- ---- ---- ---- Response from CD drive pending
----x ---- ---- ---- Command to CD drive pending
----- x--- ---- ---- Subcode data pending
----- -x-- ---- ---- Frame pending
----- --x- ---- ---- CD data FIFO half-full flag pending
-(W)
----- ---- -x-- ---- CIRC failure irq
----- ---- --x- ---- CD module command RX buffer full irq
----- ---- ---x ---- CD module command TX buffer empty irq
----- ---- ---- x--- Enable pre-set subcode time-match found irq
----- ---- ---- -x-- Enable CD subcode frame-time irq
----- ---- ---- --x- Enable CD data FIFO half full irq
----- ---- ---- ---x set to enable irq
-[0x04]: DSA control register
-[0x0a]: DSA TX/RX data (sends commands with this)
-    0x01 Play Title (?)
-    0x02 Stop
-    0x03 Read TOC
-    0x04 Pause
-    0x05 Unpause
-    0x09 Get Title Len
-    0x0a Open Tray
-    0x0b Close Tray
-    0x0d Get Comp Time
-    0x10 Goto ABS Min
-    0x11 Goto ABS Sec
-    0x12 Goto ABS Frame
-    0x14 Read Long TOC
-    0x15 Set Mode
-    0x16 Get Error
-    0x17 Clear Error
-    0x18 Spin Up
-    0x20 Play AB Min
-    0x21 Play AB Sec
-    0x22 Play AB Frame
-    0x23 Stop AB Min
-    0x24 Stop AB Sec
-    0x25 Stop AB Frame
-    0x26 AB Release
-    0x50 Get Disc Status
-    0x51 Set Volume
-    0x54 Get Maxsession
-    0x70 Set DAC mode (?)
-    0xa0-0xaf User Define (???)
-    0xf0 Service
-    0xf1 Sledge
-    0xf2 Focus
-    0xf3 Turntable
-    0xf4 Radial
-
-[0x10]: I2S bus control register
-[0x14]: CD subcode control register
-[0x18]: Subcode data register A
-[0x1C]: Subcode data register B
-[0x20]: Subcode time and compare enable
-[0x24]: I2S FIFO data
-[0x28]: I2S FIFO data (old)
-[0x2c]: ? (used at start-up)
-
-*/
-
-uint16_t jaguarcd_state::butch_regs_r16(offs_t offset){ if (!(offset&1)) { return butch_regs_r(offset>>1) >> 16;  } else { return butch_regs_r(offset>>1); } }
-void jaguarcd_state::butch_regs_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { butch_regs_w(offset>>1, data << 16, mem_mask << 16); } else { butch_regs_w(offset>>1, data, mem_mask); } }
-
-uint32_t jaguarcd_state::butch_regs_r(offs_t offset)
-{
-	switch(offset*4)
-	{
-		case 8: //DS DATA
-			//m_butch_regs[0] &= ~0x2000;
-			return m_butch_cmd_response[(m_butch_cmd_index++) % m_butch_cmd_size];
-	}
-
-	return m_butch_regs[offset];
-}
-
-void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	COMBINE_DATA(&m_butch_regs[offset]);
-
-	switch(offset*4)
-	{
-		case 8: //DS DATA
-			switch((m_butch_regs[offset] & 0xff00) >> 8)
-			{
-				case 0x03: // Read TOC
-				{
-					if(!m_cdrom->exists()) // No disc
-					{
-						m_butch_cmd_response[0] = 0x400;
-						m_butch_regs[0] |= 0x2000;
-						m_butch_cmd_index = 0;
-						m_butch_cmd_size = 1;
-						return;
-					}
-					if(m_butch_regs[offset] & 0xff) // Multi Session CD, TODO
-					{
-						m_butch_cmd_response[0] = 0x0029; // illegal value
-						m_butch_regs[0] |= 0x2000;
-						m_butch_cmd_index = 0;
-						m_butch_cmd_size = 1;
-						return;
-					}
-
-					uint32_t msf = m_cdrom->get_track_start(0) + 150;
-
-					/* first track number */
-					m_butch_cmd_response[0] = 0x2000 | 1;
-					/* last track number */
-					m_butch_cmd_response[1] = 0x2100 | m_cdrom->get_last_track();
-
-					/* start of first track minutes */
-					m_butch_cmd_response[2] = 0x2200 | ((msf / 60) / 60);
-					/* start of first track seconds */
-					m_butch_cmd_response[3] = 0x2300 | (msf / 60) % 60;
-					/* start of first track frame */
-					m_butch_cmd_response[4] = 0x2400 | (msf % 75);
-					m_butch_regs[0] |= 0x2000;
-					m_butch_cmd_index = 0;
-					m_butch_cmd_size = 5;
-					break;
-				}
-
-				case 0x14: // Read Long TOC
-				{
-					if(!m_cdrom->exists()) // No disc
-					{
-						m_butch_cmd_response[0] = 0x400;
-						m_butch_regs[0] |= 0x2000;
-						m_butch_cmd_index = 0;
-						m_butch_cmd_size = 1;
-						return;
-					}
-
-					int ntrks = m_cdrom->get_last_track();
-
-					for(int i=0;i<ntrks;i++)
-					{
-						uint32_t msf = m_cdrom->get_track_start(i) + 150;
-
-						/* track number */
-						m_butch_cmd_response[i*5+0] = 0x6000 | (i+1);
-						/* attributes (?) */
-						m_butch_cmd_response[i*5+1] = 0x6100 | 0x00;
-
-						/* start of track minutes */
-						m_butch_cmd_response[i*5+2] = 0x6200 | ((msf / 60) / 60);
-						/* start of track seconds */
-						m_butch_cmd_response[i*5+3] = 0x6300 | (msf / 60) % 60;
-						/* start of track frame */
-						m_butch_cmd_response[i*5+4] = 0x6400 | (msf % 75);
-					}
-					m_butch_regs[0] |= 0x2000;
-					m_butch_cmd_index = 0;
-					m_butch_cmd_size = 5*ntrks;
-					break;
-				}
-
-				case 0x15: // Set Mode
-					m_butch_regs[0] |= 0x2000;
-					m_butch_cmd_response[0] = 0x1700 | (m_butch_regs[offset] & 0xff);
-					m_butch_cmd_index = 0;
-					m_butch_cmd_size = 1;
-					break;
-
-				case 0x70: // Set DAC Mode
-					m_butch_regs[0] |= 0x2000;
-					m_butch_cmd_response[0] = 0x7000 | (m_butch_regs[offset] & 0xff);
-					m_butch_cmd_index = 0;
-					m_butch_cmd_size = 1;
-					break;
-
-				default:
-					logerror("%04x CMD\n", m_butch_regs[offset]);
-					break;
-			}
-			break;
-	}
-}
-
-void jaguarcd_state::jaguarcd_map(address_map &map)
-{
-	console_base_map(map);
-	map(0x800000, 0x83ffff).rom().region("cdbios", 0);
-	map(0xdfff00, 0xdfff3f).rw(FUNC(jaguarcd_state::butch_regs_r16), FUNC(jaguarcd_state::butch_regs_w16));
-}
-
 
 /*************************************
  *
@@ -1467,6 +1270,227 @@ void jaguar_state::jag_gpu_dsp_map(address_map &map)
 	console_base_gpu_map(map);
 	map(0x800000, 0xdfffff).rom().region("cart", 0);
 }
+
+/*
+CD-Rom emulation, chip codename Butch (the HW engineer was definitely obsessed with T&J somehow ...)
+TODO: this needs to be device-ized, of course ...
+
+[0x00]: irq register
+(R)
+-x-- ---- ---- ---- CD uncorrectable data error pending
+--x- ---- ---- ---- Response from CD drive pending
+---x ---- ---- ---- Command to CD drive pending
+---- x--- ---- ---- Subcode data pending
+---- -x-- ---- ---- Frame pending
+---- --x- ---- ---- CD data FIFO half-full flag pending
+(W)
+---- ---- -x-- ---- CIRC failure irq
+---- ---- --x- ---- CD module command RX buffer full irq
+---- ---- ---x ---- CD module command TX buffer empty irq
+---- ---- ---- x--- Enable pre-set subcode time-match found irq
+---- ---- ---- -x-- Enable CD subcode frame-time irq
+---- ---- ---- --x- Enable CD data FIFO half full irq
+---- ---- ---- ---x set to enable irq
+[0x04]: DSA control register
+[0x0a]: DSA TX/RX data (sends commands with this)
+    0x01 Play Title (?)
+    0x02 Stop
+    0x03 Read TOC
+    0x04 Pause
+    0x05 Unpause
+    0x09 Get Title Len
+    0x0a Open Tray
+    0x0b Close Tray
+    0x0d Get Comp Time
+    0x10 Goto ABS Min
+    0x11 Goto ABS Sec
+    0x12 Goto ABS Frame
+    0x14 Read Long TOC
+    0x15 Set Mode
+    0x16 Get Error
+    0x17 Clear Error
+    0x18 Spin Up
+    0x20 Play AB Min
+    0x21 Play AB Sec
+    0x22 Play AB Frame
+    0x23 Stop AB Min
+    0x24 Stop AB Sec
+    0x25 Stop AB Frame
+    0x26 AB Release
+    0x50 Get Disc Status
+    0x51 Set Volume
+    0x54 Get Maxsession
+    0x70 Set DAC mode (?)
+    0xa0-0xaf User Define (???)
+    0xf0 Service
+    0xf1 Sledge
+    0xf2 Focus
+    0xf3 Turntable
+    0xf4 Radial
+
+[0x10]: I2S bus control register
+[0x14]: CD subcode control register
+[0x18]: Subcode data register A
+[0x1C]: Subcode data register B
+[0x20]: Subcode time and compare enable
+[0x24]: I2S FIFO data
+[0x28]: I2S FIFO data (old)
+[0x2c]: EEPROM access, splash screen changes depending on what's there
+
+*/
+
+uint16_t jaguarcd_state::butch_regs_r16(offs_t offset){ if (!(offset&1)) { return butch_regs_r(offset>>1) >> 16;  } else { return butch_regs_r(offset>>1); } }
+void jaguarcd_state::butch_regs_w16(offs_t offset, uint16_t data, uint16_t mem_mask){ if (!(offset&1)) { butch_regs_w(offset>>1, data << 16, mem_mask << 16); } else { butch_regs_w(offset>>1, data, mem_mask); } }
+
+uint32_t jaguarcd_state::butch_regs_r(offs_t offset, uint32_t mem_mask)
+{
+	switch(offset*4)
+	{
+		case 8: //DS DATA
+			//m_butch_regs[0] &= ~0x2000;
+			return m_butch_cmd_response[(m_butch_cmd_index++) % m_butch_cmd_size];
+		case 0x2c:
+		{
+			return m_eeprom->do_read() << 3;
+		}
+	}
+
+	return m_butch_regs[offset];
+}
+
+void jaguarcd_state::butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	COMBINE_DATA(&m_butch_regs[offset]);
+
+	switch(offset*4)
+	{
+		case 8: //DS DATA
+			switch((m_butch_regs[offset] & 0xff00) >> 8)
+			{
+				case 0x03: // Read TOC
+				{
+					if(!m_cdrom->exists()) // No disc
+					{
+						m_butch_cmd_response[0] = 0x400;
+						m_butch_regs[0] |= 0x2000;
+						m_butch_cmd_index = 0;
+						m_butch_cmd_size = 1;
+						return;
+					}
+					if(m_butch_regs[offset] & 0xff) // Multi Session CD, TODO
+					{
+						m_butch_cmd_response[0] = 0x0029; // illegal value
+						m_butch_regs[0] |= 0x2000;
+						m_butch_cmd_index = 0;
+						m_butch_cmd_size = 1;
+						return;
+					}
+
+					uint32_t msf = m_cdrom->get_track_start(0) + 150;
+
+					/* first track number */
+					m_butch_cmd_response[0] = 0x2000 | 1;
+					/* last track number */
+					m_butch_cmd_response[1] = 0x2100 | m_cdrom->get_last_track();
+
+					/* start of first track minutes */
+					m_butch_cmd_response[2] = 0x2200 | ((msf / 60) / 60);
+					/* start of first track seconds */
+					m_butch_cmd_response[3] = 0x2300 | (msf / 60) % 60;
+					/* start of first track frame */
+					m_butch_cmd_response[4] = 0x2400 | (msf % 75);
+					m_butch_regs[0] |= 0x2000;
+					m_butch_cmd_index = 0;
+					m_butch_cmd_size = 5;
+					break;
+				}
+
+				case 0x14: // Read Long TOC
+				{
+					if(!m_cdrom->exists()) // No disc
+					{
+						m_butch_cmd_response[0] = 0x400;
+						m_butch_regs[0] |= 0x2000;
+						m_butch_cmd_index = 0;
+						m_butch_cmd_size = 1;
+						return;
+					}
+
+					int ntrks = m_cdrom->get_last_track();
+
+					for(int i=0;i<ntrks;i++)
+					{
+						uint32_t msf = m_cdrom->get_track_start(i) + 150;
+
+						/* track number */
+						m_butch_cmd_response[i*5+0] = 0x6000 | (i+1);
+						/* attributes (?) */
+						m_butch_cmd_response[i*5+1] = 0x6100 | 0x00;
+
+						/* start of track minutes */
+						m_butch_cmd_response[i*5+2] = 0x6200 | ((msf / 60) / 60);
+						/* start of track seconds */
+						m_butch_cmd_response[i*5+3] = 0x6300 | (msf / 60) % 60;
+						/* start of track frame */
+						m_butch_cmd_response[i*5+4] = 0x6400 | (msf % 75);
+					}
+					m_butch_regs[0] |= 0x2000;
+					m_butch_cmd_index = 0;
+					m_butch_cmd_size = 5*ntrks;
+					break;
+				}
+
+				case 0x15: // Set Mode
+					m_butch_regs[0] |= 0x2000;
+					m_butch_cmd_response[0] = 0x1700 | (m_butch_regs[offset] & 0xff);
+					m_butch_cmd_index = 0;
+					m_butch_cmd_size = 1;
+					break;
+
+				case 0x70: // Set DAC Mode
+					m_butch_regs[0] |= 0x2000;
+					m_butch_cmd_response[0] = 0x7000 | (m_butch_regs[offset] & 0xff);
+					m_butch_cmd_index = 0;
+					m_butch_cmd_size = 1;
+					break;
+
+				default:
+					logerror("%04x CMD\n", m_butch_regs[offset]);
+					break;
+			}
+			break;
+		case 0x2c:
+			if (ACCESSING_BITS_0_7)
+			{
+				m_eeprom->di_write(BIT(data, 2));
+				m_eeprom->clk_write(BIT(data, 1));
+				m_eeprom->cs_write(BIT(data, 0));
+			}
+			break;
+		default:
+			break;
+	}
+}
+
+uint32_t jaguarcd_state::cd_bios_r(address_space &space, offs_t offset)
+{
+	// HACK: keeps resetting otherwise
+	// From BIOS, 68k should see a 0x03d0dead from GPU, but then DSP will ROM checksum the entire
+	// area, will throw a 0x03d0dead on its own and cause a system reset (more bus priority shenanigans?)
+	if (offset * 4 == 0x408 && &space.device() == m_dsp)
+	{
+		return 5;
+	}
+	return m_cd_bios[offset*2+1] | m_cd_bios[offset*2] << 16;
+}
+
+void jaguarcd_state::jaguarcd_map(address_map &map)
+{
+	console_base_map(map);
+	map(0x800000, 0x83ffff).rom().region("cdbios", 0);
+	map(0xdfff00, 0xdfff3f).rw(FUNC(jaguarcd_state::butch_regs_r16), FUNC(jaguarcd_state::butch_regs_w16));
+}
+
 
 void jaguarcd_state::jagcd_gpu_dsp_map(address_map &map)
 {
@@ -1861,8 +1885,8 @@ void jaguar_state::jaguar(machine_config &config)
 	/* video hardware */
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	// TODO: vestigial (sets 222 Hz), dynamically changed in jaguar_v anyway
-	m_screen->set_raw(JAGUAR_CLOCK, 456, 42, 402, 262, 17, 257);
+	// TODO: vestigial, dynamically changed in jaguar_v anyway
+	m_screen->set_raw(JAGUAR_CLOCK / 2, 845, 101, 741, 262, 19, 248);
 	m_screen->set_screen_update(FUNC(jaguar_state::screen_update));
 
 	PALETTE(config, m_palette, FUNC(jaguar_state::jagpal_ycc), 65536);
@@ -2072,6 +2096,8 @@ ROM_START( jaguarcd )
 	ROM_REGION16_BE(0x40000, "cdbios", 0 )
 	ROM_SYSTEM_BIOS( 0, "default", "Jaguar CD" )
 	ROMX_LOAD( "jag_cd.bin", 0x00000, 0x040000, CRC(687068d5) SHA1(73883e7a6e9b132452436f7ab1aeaeb0776428e5), ROM_GROUPWORD | ROM_BIOS(0) )
+	// TODO: can't boot on its own, needs a Stubulator BIOS mounted
+	// $800000-$801fff is empty, won't pass retail BIOS checks
 	ROM_SYSTEM_BIOS( 1, "dev", "Jaguar Developer CD" )
 	ROMX_LOAD( "jagdevcd.bin", 0x00000, 0x040000, CRC(55a0669c) SHA1(d61b7b5912118f114ef00cf44966a5ef62e455a5), ROM_GROUPWORD | ROM_BIOS(1) )
 
