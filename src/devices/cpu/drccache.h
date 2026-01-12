@@ -15,6 +15,7 @@
 #include "modules/lib/osdlib.h"
 
 #include <algorithm>
+#include <array>
 #include <cstdlib>
 #include <list>
 #include <optional>
@@ -139,15 +140,19 @@ private:
 		void *              m_param2;       // 2nd pointer parameter
 	};
 
-	void ensure_writable(drccodeptr ptr) noexcept;
-	void make_executable() noexcept;
-
-	std::optional<osd::virtual_memory_allocation> m_cache;
-
 	struct free_link
 	{
 		free_link *         m_next;         // pointer to the next guy
 	};
+
+	using free_link_array = std::array<free_link *, MAX_PERMANENT_ALLOC / CACHE_ALIGNMENT>;
+
+	static std::size_t free_link_bucket(std::size_t bytes) noexcept;
+
+	void ensure_writable(drccodeptr ptr) noexcept;
+	void make_executable() noexcept;
+
+	std::optional<osd::virtual_memory_allocation> m_cache;
 
 	// core parameters
 	drccodeptr  m_near;             // pointer to the near part of the cache
@@ -162,22 +167,24 @@ private:
 	bool        m_rwx;              // whether pages can be simultaneously writable and executable
 
 	// oob management
-	std::list<oob_handler> m_oob_list;      // list of active oob handlers
-	std::list<oob_handler> m_oob_free;      // list of recyclable oob handlers
+	std::list<oob_handler>  m_oob_list;      // list of active oob handlers
+	std::list<oob_handler>  m_oob_free;      // list of recyclable oob handlers
 
 	// free lists
-	free_link *         m_free[MAX_PERMANENT_ALLOC / CACHE_ALIGNMENT];
-	free_link *         m_nearfree[MAX_PERMANENT_ALLOC / CACHE_ALIGNMENT];
+	free_link_array         m_free;
+	free_link_array         m_nearfree;
 
 	// stats
 	std::size_t m_max_temporary;
 	uint32_t    m_flush_count;
 #if defined(MAME_DEBUG)
 	uint32_t    m_near_allocated;
+	uint32_t    m_near_padding;
 	uint32_t    m_near_oversize;
 	uint32_t    m_near_freed;
-	uint32_t	m_near_reused;
+	uint32_t    m_near_reused;
 	uint32_t    m_cache_allocated;
+	uint32_t    m_cache_padding;
 	uint32_t    m_cache_oversize;
 	uint32_t    m_cache_freed;
 	uint32_t    m_cache_reused;

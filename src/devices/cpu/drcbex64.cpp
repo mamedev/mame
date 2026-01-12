@@ -2044,7 +2044,7 @@ void drcbe_x64::op_hashjmp(Assembler &a, const instruction &inst)
 	a.mov(rsp, MABS(&m_near.stacksave));                                            // mov   rsp,[stacksave]
 
 	// fixed mode cases
-	if (modep.is_immediate() && m_hash.is_mode_populated(modep.immediate()))
+	if (modep.is_immediate() && m_hash.populate_mode(modep.immediate()))
 	{
 		if (pcp.is_immediate())
 		{

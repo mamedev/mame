@@ -1540,7 +1540,7 @@ inline void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, cons
 
 drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
 	: drcbe_interface(drcuml, cache, device)
-	, m_hash(cache, modes, addrbits, ignorebits)
+	, m_hash(cache, modes, addrbits, ignorebits, std::align_val_t(1 << 12), std::align_val_t(1 << 12))
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_carry_state(carry_state::POISON)
@@ -1965,9 +1965,15 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 	const parameter &exp = inst.param(2);
 	assert(exp.is_code_handle());
 
-	a.mov(a64::sp, a64::x29);
+	// load non-immediate mode and PC as early as possible
+	const a64::Gp mode = modep.select_register(TEMP_REG1, 8);
+	const a64::Gp pc = pcp.select_register(TEMP_REG2, 8);
+	if (!modep.is_immediate())
+		mov_reg_param(a, 4, mode, modep);
+	if (!pcp.is_immediate())
+		mov_reg_param(a, 4, pc, pcp);
 
-	if (modep.is_immediate() && m_hash.is_mode_populated(modep.immediate()))
+	if (modep.is_immediate() && m_hash.populate_mode(modep.immediate()))
 	{
 		if (pcp.is_immediate())
 		{
@@ -1977,71 +1983,51 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 		}
 		else
 		{
-			mov_reg_param(a, 4, TEMP_REG2, pcp);
-
-			get_imm_relative(a, TEMP_REG1, (uintptr_t)&m_hash.base()[modep.immediate()][0]); // TEMP_REG1 = m_base[mode]
-
-			a.ubfx(TEMP_REG3, TEMP_REG2, m_hash.l1shift(), m_hash.l1bits());
-			a.ldr(TEMP_REG3, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3))); // TEMP_REG3 = m_base[mode][(pc >> m_l1shift) & m_l1mask]
-
-			a.ubfx(TEMP_REG2, TEMP_REG2, m_hash.l2shift(), m_hash.l2bits());
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, TEMP_REG2, a64::lsl(3))); // TEMP_REG1 = m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]
+			get_imm_relative(a, TEMP_REG1, uintptr_t(m_hash.base()[modep.immediate()])); // TEMP_REG1 = m_base[mode]
 		}
 	}
 	else
 	{
-		get_imm_relative(a, TEMP_REG2, (uintptr_t)m_hash.base());
+		get_imm_relative(a, TEMP_REG3, uintptr_t(m_hash.base()));
 
 		if (modep.is_immediate())
-		{
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG2, modep.immediate() * 8)); // TEMP_REG1 = m_base[modep]
-		}
+			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, modep.immediate() << 3)); // TEMP_REG1 = m_base[modep]
 		else
-		{
-			const a64::Gp mode = modep.select_register(TEMP_REG1, 8);
-			mov_reg_param(a, 4, mode, modep);
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG2, mode, a64::lsl(3))); // TEMP_REG1 = m_base[modep]
-		}
+			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, mode, a64::lsl(3))); // TEMP_REG1 = m_base[modep]
 
 		if (pcp.is_immediate())
 		{
-			const uint32_t l1val = ((pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask()) * 8;
-			const uint32_t l2val = ((pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask()) * 8;
+			const uint32_t l1val = ((pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask());
+			const uint32_t l2val = ((pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask());
 
-			if (is_valid_immediate(l1val, 15))
-			{
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l1val));
-			}
+			if (!is_valid_immediate(l1val, 12))
+				a.mov(TEMP_REG2, l1val);
+			if (!is_valid_immediate(l2val, 12))
+				a.mov(TEMP_REG3, l2val);
+
+			if (is_valid_immediate(l1val, 12))
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l1val << 3));
 			else
-			{
-				a.mov(SCRATCH_REG1, l1val >> 3);
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, SCRATCH_REG1, a64::lsl(3)));
-			}
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, TEMP_REG2, a64::lsl(3)));
 
-			if (is_valid_immediate(l2val, 15))
-			{
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l2val));
-			}
+			if (is_valid_immediate(l2val, 12))
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l2val << 3));
 			else
-			{
-				a.mov(SCRATCH_REG1, l2val >> 3);
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, SCRATCH_REG1, a64::lsl(3)));
-			}
-		}
-		else
-		{
-			const a64::Gp pc = pcp.select_register(TEMP_REG2, 8);
-			mov_reg_param(a, 4, pc, pcp);
-
-			a.ubfx(TEMP_REG3, pc, m_hash.l1shift(), m_hash.l1bits()); // (pc >> m_l1shift) & m_l1mask
-			a.ldr(TEMP_REG3, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3))); // TEMP_REG3 = m_base[mode][(pc >> m_l1shift) & m_l1mask]
-
-			a.ubfx(TEMP_REG2, pc, m_hash.l2shift(), m_hash.l2bits()); // (pc >> m_l2shift) & m_l2mask
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, TEMP_REG2, a64::lsl(3))); // x25 = m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3)));
 		}
 	}
 
+	if (!pcp.is_immediate())
+	{
+		a.ubfx(TEMP_REG3, pc, m_hash.l1shift(), m_hash.l1bits()); // (pc >> m_l1shift) & m_l1mask
+		a.ubfx(TEMP_REG2, pc, m_hash.l2shift(), m_hash.l2bits()); // (pc >> m_l2shift) & m_l2mask
+
+		a.ldr(TEMP_REG3, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3))); // TEMP_REG3 = m_base[mode][(pc >> m_l1shift) & m_l1mask]
+		a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, TEMP_REG2, a64::lsl(3))); // TEMP_REG1 = m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]
+	}
+
 	Label lab = a.new_label();
+	a.mov(a64::sp, a64::x29);
 	a.adr(REG_PARAM1, lab);
 	a.br(TEMP_REG1);
 
