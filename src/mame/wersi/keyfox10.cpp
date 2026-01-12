@@ -367,11 +367,18 @@ void keyfox10_state::port1_w(u8 data)
         beat_shift_clock();
     }
 
+    // ENABLE rising edge: latch panel shift register to output latches
+    // Must happen before m_port1 update so we check 'rising' correctly
+    if (rising & P1_ENABLE)
+    {
+        panel_latch();
+    }
+
     // Update m_port1 before checking MODE-dependent updates
     m_port1 = data;
 
-    // ENABLE rising edge: latch panel shift register to LED outputs
-    // Also update when MODE changes (LEDs only light when MODE=0)
+    // Update LED display when ENABLE latches new data or MODE changes
+    // (LEDs only light when MODE=0)
     if ((rising & P1_ENABLE) || (changed & P1_MODE))
     {
         update_panel_leds();
@@ -442,14 +449,31 @@ void keyfox10_state::update_display()
     }
 }
 
+void keyfox10_state::panel_latch()
+{
+    // 74HC574 ENABLE rising edge: latch shift register to outputs
+    // This captures the current shift register state for LED display
+    for (int i = 0; i < 10; i++)
+    {
+        m_panel_latch[i] = m_panel_sr[i];
+    }
+    LOGMASKED(LOG_IO, "Panel latch: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n",
+        m_panel_latch[0], m_panel_latch[1], m_panel_latch[2], m_panel_latch[3], m_panel_latch[4],
+        m_panel_latch[5], m_panel_latch[6], m_panel_latch[7], m_panel_latch[8], m_panel_latch[9]);
+}
+
 void keyfox10_state::update_panel_leds()
 {
-    // Update panel LEDs from shift register chain (active-high)
+    // Update panel LEDs from LATCHED outputs (not shift register)
     // 10 ICs × 8 bits = 80 LEDs
     //
     // Hardware: LEDs only physically light when MODE=0 (Q2 PNP powers LEDs)
     // MODE toggles rapidly for button scanning. Only update LED outputs when
     // MODE=0 to avoid flickering - keeps previous state during sense mode.
+    //
+    // Position mapping: Due to shift direction, firmware LED bit N ends up at
+    // physical position (79-N). Button scan position matches physical position.
+    // Invert the output mapping so button position matches displayed LED position.
     bool mode = (m_port1 & P1_MODE) != 0;
 
     if (mode)
@@ -459,7 +483,9 @@ void keyfox10_state::update_panel_leds()
     {
         for (int bit = 0; bit < 8; bit++)
         {
-            m_panel_leds[ic][bit] = BIT(m_panel_sr[ic], bit);
+            // Invert: m_panel_latch[0] bit 0 (shift position 79) → display position 79
+            // m_panel_latch[ic] bit b → display position (79 - (ic*8 + bit)) = (9-ic)*8 + (7-bit)
+            m_panel_leds[9 - ic][7 - bit] = BIT(m_panel_latch[ic], bit);
         }
     }
 }
@@ -805,6 +831,7 @@ void keyfox10_state::machine_start()
     save_item(NAME(m_fx_input_r));
     save_pointer(NAME(m_fx_sram), FX_SRAM_SIZE);
     save_item(NAME(m_panel_sr));
+    save_item(NAME(m_panel_latch));
     save_item(NAME(m_btn_state));
     save_item(NAME(m_kbd_sr));
     save_item(NAME(m_kbd_state));
