@@ -51,6 +51,7 @@ public:
         , m_digits(*this, "digit%u", 0U)
         , m_digit_dp(*this, "dp%u", 0U)
         , m_beat_leds(*this, "beat%u", 0U)
+        , m_panel_leds(*this, "panel%u_%u", 0U, 0U)
     { }
 
     ~keyfox10_state()
@@ -112,6 +113,7 @@ private:
     output_finder<3> m_digits;              // 7-segment display outputs (digit0-digit2)
     output_finder<3> m_digit_dp;            // Decimal point outputs (dp0-dp2)
     output_finder<8> m_beat_leds;           // Beat position LEDs (beat0-beat7)
+    output_finder<10, 8> m_panel_leds;      // Panel button LEDs (10 ICs x 8 bits = 80 LEDs)
     u8 m_port0 = 0xff;
     u8 m_port1 = 0xff;
     u8 m_port2 = 0xff;
@@ -232,11 +234,23 @@ u8 keyfox10_state::port0_r()
 
 u8 keyfox10_state::port1_r()
 {
-    // P1.7 (SENSE) is input - returns button state during scan mode
-    // Used for both panel buttons (CLK_LED) and keyboard matrix (CLK_SW)
-    // SENSE returns 1 if button at current scan position is pressed
+    // P1.7 (SENSE) combines LED panel sense and keyboard matrix sense via NAND gates:
+    //   SENSE = NAND(NAND(MODE, LED_SENSE), SW_SENSE)
+    //         = (MODE & LED_SENSE) | ~SW_SENSE
+    //
+    // Hardware behavior:
+    // - MODE (P1.5) controls Q2 (BC640 PNP): MODE=0 -> LEDs powered, MODE=1 -> LEDs off
+    // - ~MODE goes to IC5 (74HC175) ~CLR: MODE=0 -> kbd matrix enabled, MODE=1 -> cleared
+    // - LED_SENSE is active-high (button pressed connects shift reg output to sense line)
+    // - SW_SENSE is active-low (button pressed pulls mux output low)
+    //
+    // So:
+    // - MODE=0 (LED display mode): SENSE = kbd_sense only (panel LEDs on, not sensing)
+    // - MODE=1 (button sense mode): SENSE = panel_sense || kbd_sense (LEDs off for sensing)
 
     u8 data = m_port1 & 0x7f;  // Clear SENSE bit
+
+    bool mode = (m_port1 & P1_MODE) != 0;
 
     // Read current button state from panel input ports
     for (int i = 0; i < 10; i++)
@@ -250,29 +264,33 @@ u8 keyfox10_state::port1_r()
         m_kbd_state[i] = m_kbd_io[i]->read();
     }
 
-    // Check panel buttons - shift register has '1' at position being scanned
-    bool panel_sense = false;
+    // LED_SENSE: Check panel buttons (only valid when MODE=1, LEDs off)
+    // Shift register has '1' at position being scanned; if button pressed, sense sees it
+    bool led_sense = false;
     for (int i = 0; i < 10; i++)
     {
         if (m_panel_sr[i] & m_btn_state[i])
         {
-            panel_sense = true;
+            led_sense = true;
             break;
         }
     }
 
-    // Check keyboard matrix - mux selects button based on shift register address
-    bool kbd_sense = read_kbd_mux();
+    // SW_SENSE: Check keyboard matrix via 74HC251 muxes
+    // read_kbd_mux() returns active-low: 0 = button pressed, 1 = no button
+    // Note: When MODE=1, IC5 is cleared so mux address = 0
+    u8 sw_sense = read_kbd_mux();  // Active-low hardware signal
 
-    // SENSE is OR of both panel and keyboard matrix
-    // (firmware scans them at different times via CLK_LED vs CLK_SW)
-    bool sense = panel_sense || kbd_sense;
+    // SENSE = NAND(NAND(MODE, LED_SENSE), SW_SENSE)
+    //       = (MODE & LED_SENSE) | ~SW_SENSE
+    // ~SW_SENSE: invert the active-low signal (0->1 when button pressed)
+    bool sense = (mode && led_sense) || !sw_sense;
 
     if (sense)
         data |= P1_SENSE;
 
-    LOGMASKED(LOG_IO, "P1 read: 0x%02X (SENSE=%d panel=%d kbd=%d)\n",
-        data, sense ? 1 : 0, panel_sense ? 1 : 0, kbd_sense ? 1 : 0);
+    LOGMASKED(LOG_IO, "P1 read: 0x%02X (SENSE=%d MODE=%d led=%d sw=%d)\n",
+        data, sense ? 1 : 0, mode ? 1 : 0, led_sense ? 1 : 0, !sw_sense ? 1 : 0);
     return data;
 }
 
@@ -325,7 +343,8 @@ void keyfox10_state::port1_w(u8 data)
     // Used for both LED display and button scanning
     if (rising & P1_CLK_LED)
     {
-        panel_shift_clock();
+        //if (0)
+            panel_shift_clock();
     }
 
     // CLK_SW rising edge: keyboard matrix address shift register
@@ -447,19 +466,34 @@ void keyfox10_state::kbd_shift_clock()
 u8 keyfox10_state::read_kbd_mux() const
 {
     // 74HC251 8:1 multiplexers select button based on address from shift register
-    // Address = low 3 bits of shift register (SELA, SELB, SELC)
+    // Bits 0-2 (SELA, SELB, SELC): Select which of 8 inputs on the mux
+    // Bit 3 -> STRB (~OE): Select which mux is enabled
+    //   Bit 3 = 0: IC4 enabled (STRB=0), IC11 disabled (STRB=1)
+    //   Bit 3 = 1: IC4 disabled (STRB=1), IC11 enabled (STRB=0)
+    //
     // IC4: RHYTHM-/+, ACC+/-, TEMPO+/-, START/S (D0-D6)
     // IC11: UPPER+/-, LOWER-/+, BASS-/+ (D0-D5)
-    // Returns 1 if any selected button is pressed
+    //
+    // Returns active-low: 0 = button pressed, 1 = no button
+    // (buttons have 10K pull-ups, pressing pulls to GND)
 
-    u8 addr = m_kbd_sr & 0x07;  // 3-bit mux address
+    u8 addr = m_kbd_sr & 0x07;        // 3-bit mux address (SELA, SELB, SELC)
+    bool ic11_sel = BIT(m_kbd_sr, 3); // Bit 3 selects mux (0=IC4, 1=IC11)
 
-    // Read button state at selected address from both muxes
-    bool ic4_out = BIT(m_kbd_state[0], addr);   // IC4 output
-    bool ic11_out = BIT(m_kbd_state[1], addr);  // IC11 output
+    bool button_pressed;
+    if (ic11_sel)
+    {
+        // IC11 enabled: UPPER+/-, LOWER-/+, BASS-/+
+        button_pressed = BIT(m_kbd_state[1], addr);
+    }
+    else
+    {
+        // IC4 enabled: RHYTHM-/+, ACC+/-, TEMPO+/-, START/S
+        button_pressed = BIT(m_kbd_state[0], addr);
+    }
 
-    // Mux outputs are likely OR'd together for single SWSENSE line
-    return (ic4_out || ic11_out) ? 1 : 0;
+    // Return active-low (0 = pressed, 1 = not pressed)
+    return button_pressed ? 0 : 1;
 }
 
 void keyfox10_state::beat_shift_clock()
@@ -940,7 +974,7 @@ static INPUT_PORTS_START(keyfox10)
     // Chain order: IC8 -> IC12 -> IC13 -> IC15 -> IC14 -> IC16 -> IC17 -> IC1 -> IC3 -> IC2
 
     PORT_START("PANEL0")  // IC8 - Status
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TUNE")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TUNE")         PORT_CODE(KEYCODE_V)
     PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TRANSP.")
     PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PRES2")     PORT_CODE(KEYCODE_3)
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PRES1")     PORT_CODE(KEYCODE_4)
@@ -961,7 +995,7 @@ static INPUT_PORTS_START(keyfox10)
 
     PORT_START("PANEL2")  // IC13 - Upper Voices 1
     PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TROMBONE")
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PIANO")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("PIANO")      PORT_CODE(KEYCODE_B)
     PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TRUMPET")
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("E-PIANO")
     PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("CLARINET")
@@ -970,7 +1004,7 @@ static INPUT_PORTS_START(keyfox10)
     PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("VIBES")
 
     PORT_START("PANEL3")  // IC15 - Upper Solo
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("STRINGS")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("STRINGS")   PORT_CODE(KEYCODE_N)
     PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("HAW.GUIT")
     PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("VOCAL")
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("JAZZ.GUIT")
@@ -1010,7 +1044,7 @@ static INPUT_PORTS_START(keyfox10)
     PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DRUMS")
 
     PORT_START("PANEL7")  // IC1 - Rhythm 1
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DISCO")      PORT_CODE(KEYCODE_D)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("DISCO")      PORT_CODE(KEYCODE_2)
     PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ROCK&ROLL")
     PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BEAT 8")
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("FOXTROTT")
@@ -1044,22 +1078,23 @@ static INPUT_PORTS_START(keyfox10)
     // Scanned via CLK_SW, read via SENSE (P1.7)
 
     PORT_START("KBDMTX0")  // IC4 - Level controls 1
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)  // D0 unused
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM-")   PORT_CODE(KEYCODE_F1)
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM+")   PORT_CODE(KEYCODE_F2)
-    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC+")      PORT_CODE(KEYCODE_F3)
-    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC-")      PORT_CODE(KEYCODE_F4)
+    //PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)  // D0 unused
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("UNKNWON")
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM-")   PORT_CODE(KEYCODE_Q)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RHYTHM+")   PORT_CODE(KEYCODE_W)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC+")      PORT_CODE(KEYCODE_E)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("ACC-")      PORT_CODE(KEYCODE_R)
     PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO+")    PORT_CODE(KEYCODE_A)
     PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TEMPO-")    PORT_CODE(KEYCODE_S)
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("START/S")   PORT_CODE(KEYCODE_2)
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("START/S")   PORT_CODE(KEYCODE_D)
 
     PORT_START("KBDMTX1")  // IC11 - Level controls 2
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("UPPER+")    PORT_CODE(KEYCODE_F8)
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("UPPER-")    PORT_CODE(KEYCODE_F9)
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("LOWER-")    PORT_CODE(KEYCODE_F10)
-    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("LOWER+")    PORT_CODE(KEYCODE_F11)
-    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS-")     PORT_CODE(KEYCODE_F12)
-    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS+")     PORT_CODE(KEYCODE_EQUALS)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("UPPER+")    PORT_CODE(KEYCODE_H)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("UPPER-")    PORT_CODE(KEYCODE_J)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("LOWER-")    PORT_CODE(KEYCODE_K)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("LOWER+")    PORT_CODE(KEYCODE_L)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS-")     PORT_CODE(KEYCODE_F)
+    PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS+")     PORT_CODE(KEYCODE_G)
     PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)  // D6 unused
     PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)  // D7 unused
 INPUT_PORTS_END
