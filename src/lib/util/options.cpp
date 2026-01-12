@@ -1155,14 +1155,14 @@ float core_options::float_value(std::string_view option) const
 {
 	char const *const data = value(option);
 	if (!data)
-		return 0.0f;
+		return 0.0F;
 	std::istringstream str(data);
 	str.imbue(std::locale::classic());
 	float fval;
 	if (str >> fval)
 		return fval;
 	else
-		return 0.0f;
+		return 0.0F;
 }
 
 
