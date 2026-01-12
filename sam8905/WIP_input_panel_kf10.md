@@ -16,18 +16,21 @@ The 74HC299 is an 8-bit bidirectional shift register with parallel load capabili
 
 **Pin configuration:**
 - S1 tied HIGH
-- S0 connected to ~MODE
+- S0 connected directly to MODE (schematic label "~MODE" is misleading)
 
-| MODE | ~MODE (S0) | S1,S0 | Operation |
-|------|------------|-------|-----------|
-| 0    | 1          | 1,1   | Parallel load (from HI inputs -> all 1s) |
-| 1    | 0          | 1,0   | Shift right |
+| MODE | S0 | S1,S0 | Operation |
+|------|-----|-------|-----------|
+| 0    | 0   | 1,0   | Shift right |
+| 1    | 1   | 1,1   | Parallel load (from HI inputs -> all 1s) |
+
+**Note:** Firmware analysis confirmed: MODE=0 causes shift, MODE=1 causes parallel load.
+The schematic label "~MODE" does NOT indicate an inverter - S0 is directly connected to MODE.
 
 ### Sensing Sequence
 
-1. **MODE=0**: Parallel load all 1s from tied-high inputs
-2. **Switch to MODE=1**: Enter shift right mode
-3. **Shift a 0 through the chain**: DATA=0, clock pulses
+1. **MODE=1 + CLK**: Parallel load all 1s from tied-high inputs
+2. **Switch to MODE=0**: Enter shift right mode
+3. **Shift 0s through the chain**: DATA=0, clock pulses while MODE=0
 4. **Read SENSE**: When the 0 reaches a pressed button position, SENSE goes low
 5. **Count clocks**: Position of detected button = clock count when SENSE went low
 
@@ -46,7 +49,7 @@ Total: 80 bits (10 ICs x 8 bits)
 |----------|------|-----------|-----------------------------------|
 | DATA     | P1.6 | Out       | Serial data input to first SR     |
 | CLK_LED  | P1.2 | Out       | Clock (shifts on rising edge)     |
-| MODE     | P1.5 | Out       | 0=parallel load, 1=shift right    |
+| MODE     | P1.5 | Out       | 0=shift right, 1=parallel load    |
 | SENSE    | P1.7 | In        | Output of last SR in chain        |
 
 ## Button Mapping
@@ -186,56 +189,59 @@ Total: 80 bits (10 ICs x 8 bits)
 | Aspect | KF1 (74HC574) | KF10 (74HC299) |
 |--------|---------------|----------------|
 | Chip type | 74HC574 octal D-FF | 74HC299 bidirectional SR |
-| LED latch | Separate latch (ENABLE) | No latch, direct output |
+| LED latch | Separate latch (ENABLE) | Uses 74HC574 latch after SR |
 | Shift direction | Left (into LSB) | Right (into MSB) |
-| Sense method | Shift 1, detect AND | Parallel load 1s, shift 0, detect output |
-| MODE function | LED power only | Controls S0 (shift vs parallel load) |
-| ENABLE signal | Latches to output | Not used for panel |
+| Sense method | Shift 1, detect AND | Parallel load 1s (MODE=1), shift 0 (MODE=0), detect |
+| MODE function | LED power only | MODE=0: shift, MODE=1: parallel load |
+| ENABLE signal | Latches to output | Latches SR to output for LEDs |
 
 ## Implementation Notes
 
 ### Shift Register Logic
 
 ```cpp
-// 74HC299 shift right: MSB receives DATA, each bit shifts to next lower position
+// 74HC299 behavior on CLK rising edge:
+// - MODE=0: Shift right (DATA enters MSB of first IC)
+// - MODE=1: Parallel load (all 1s from tied-high inputs)
 void keyfox10_state::panel_shift_clock()
 {
-    // Only shift when MODE=1 (shift right mode)
-    if (!(m_port1 & P1_MODE))
-        return;  // MODE=0 means parallel load mode, no shift on clock
+    if (m_port1 & P1_MODE)
+    {
+        // MODE=1: Parallel load from H inputs (tied high -> all 1s)
+        for (int i = 0; i < 10; i++)
+            m_panel_sr[i] = 0xff;
+        return;
+    }
 
+    // MODE=0: Shift right - DATA enters MSB of first IC
     u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;
 
-    // Shift right through all 10 ICs
-    // Carry from IC[n] bit 0 goes to IC[n+1] bit 7
-    u8 carry = data_in;
-    for (int i = 0; i < 10; i++)
+    // Shift chain right: bit 0 of IC[i] feeds bit 7 of IC[i+1]
+    for (int i = 9; i > 0; i--)
     {
-        u8 next_carry = m_panel_sr[i] & 0x01;  // Save LSB before shift
-        m_panel_sr[i] = (m_panel_sr[i] >> 1) | (carry << 7);  // Shift right, carry into MSB
-        carry = next_carry;
+        m_panel_sr[i] = (m_panel_sr[i] >> 1) | (BIT(m_panel_sr[i-1], 0) << 7);
     }
-}
-
-// Parallel load when MODE changes to 0
-void keyfox10_state::panel_parallel_load()
-{
-    // When MODE=0 (~MODE=1), S1=1, S0=1 = parallel load
-    // Parallel inputs are tied high, so load all 1s
-    for (int i = 0; i < 10; i++)
-        m_panel_sr[i] = 0xff;
+    m_panel_sr[0] = (m_panel_sr[0] >> 1) | (data_in << 7);
 }
 ```
 
 ### SENSE Logic
 
 ```cpp
-// SENSE is the output of the last shift register (IC9 bit 0)
-// When a 0 reaches a pressed button position, SENSE goes low
-u8 sense_bit = m_panel_sr[9] & 0x01;
+// SENSE detection: (shift_register has 0) AND (button pressed)
+// When scanning, a 0 is shifted through. When it reaches a pressed button, SENSE activates.
+bool led_sense = false;
+for (int i = 0; i < 10; i++)
+{
+    if ((~m_panel_sr[i]) & m_btn_state[i])
+    {
+        led_sense = true;
+        break;
+    }
+}
 
-// If button is pressed at this position, output is pulled low
-// (This is simplified - actual hardware may have different logic)
+// SENSE gated by MODE: only active during MODE=0 (shift/sense mode)
+bool sense = (!mode && led_sense) || !sw_sense;
 ```
 
 ## Files to Modify

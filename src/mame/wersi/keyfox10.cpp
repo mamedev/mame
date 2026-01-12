@@ -241,8 +241,8 @@ u8 keyfox10_state::port0_r()
 u8 keyfox10_state::port1_r()
 {
     // P1.7 (SENSE) combines LED panel sense and keyboard matrix sense via NAND gates:
-    //   SENSE = NAND(NAND(MODE, LED_SENSE), SW_SENSE)
-    //         = (MODE & LED_SENSE) | ~SW_SENSE
+    //   SENSE = NAND(NAND(~MODE, LED_SENSE), SW_SENSE)
+    //         = (~MODE & LED_SENSE) | ~SW_SENSE
     //
     // Hardware behavior:
     // - MODE (P1.5) controls Q2 (BC640 PNP): MODE=0 -> LEDs powered, MODE=1 -> LEDs off
@@ -250,9 +250,9 @@ u8 keyfox10_state::port1_r()
     // - LED_SENSE is active-high (button pressed connects shift reg output to sense line)
     // - SW_SENSE is active-low (button pressed pulls mux output low)
     //
-    // So:
-    // - MODE=0 (LED display mode): SENSE = kbd_sense only (panel LEDs on, not sensing)
-    // - MODE=1 (button sense mode): SENSE = panel_sense || kbd_sense (LEDs off for sensing)
+    // With 74HC299 MODE polarity (MODE=0 = shift, MODE=1 = parallel load):
+    // - MODE=0 (shift mode): SENSE = panel_sense || kbd_sense (button scanning active)
+    // - MODE=1 (parallel load): SENSE = kbd_sense only
 
     u8 data = m_port1 & 0x7f;  // Clear SENSE bit
 
@@ -289,10 +289,11 @@ u8 keyfox10_state::port1_r()
     // Note: When MODE=1, IC5 is cleared so mux address = 0
     u8 sw_sense = read_kbd_mux();  // Active-low hardware signal
 
-    // SENSE = NAND(NAND(MODE, LED_SENSE), SW_SENSE)
-    //       = (MODE & LED_SENSE) | ~SW_SENSE
+    // SENSE = NAND(NAND(~MODE, LED_SENSE), SW_SENSE)
+    //       = (~MODE & LED_SENSE) | ~SW_SENSE
     // ~SW_SENSE: invert the active-low signal (0->1 when button pressed)
-    bool sense = (mode && led_sense) || !sw_sense;
+    // With MODE polarity swap: MODE=0 means shift/sense mode
+    bool sense = (!mode && led_sense) || !sw_sense;
 
     if (sense)
         data |= P1_SENSE;
@@ -374,17 +375,6 @@ void keyfox10_state::port1_w(u8 data)
     if (rising & P1_ENABLE)
     {
         panel_latch();
-    }
-
-    // 74HC299: When MODE falls (goes to 0), parallel load all 1s
-    // This is S1=1, S0=1 mode - parallel inputs are tied high
-    u8 falling = changed & ~data;
-    if (falling & P1_MODE)
-    {
-        // Parallel load: all shift registers loaded with 0xFF (all 1s)
-        for (int i = 0; i < 10; i++)
-            m_panel_sr[i] = 0xff;
-        LOGMASKED(LOG_IO, "Panel parallel load: all 0xFF\n");
     }
 
     // Update m_port1 before checking MODE-dependent updates
@@ -508,16 +498,23 @@ void keyfox10_state::panel_shift_clock()
     // 10x 74HC299 bidirectional shift registers for button panel:
     // DATA -> KF2:4 -> KF2:3 -> KF2:2 -> KF2:1 -> KF1:12 -> KF1:11 -> KF1:10 -> KF1:2 -> KF1:1 -> KF3:1
     //
-    // 74HC299 with S1=HIGH, S0=~MODE:
-    // - MODE=0 (~MODE=1): S1=1, S0=1 -> Parallel load (handled in port1_w on MODE falling edge)
-    // - MODE=1 (~MODE=0): S1=1, S0=0 -> Shift right
+    // 74HC299 with S1=HIGH, S0 directly connected to MODE pin:
+    // - MODE=0: S1=1, S0=0 -> Shift right on CLK edge
+    // - MODE=1: S1=1, S0=1 -> Parallel load on CLK edge (H inputs tied high -> 0xFF)
     //
-    // Shift right: DATA enters MSB of first IC, LSB of each IC feeds MSB of next
+    // Note: Schematic labels this as "~MODE" but firmware behavior shows MODE=0 = shift
+    // All 74HC299 operations are triggered on CLK rising edge
 
-    // Only shift in shift-right mode (MODE=1)
-    if (!(m_port1 & P1_MODE))
+    if (m_port1 & P1_MODE)
+    {
+        // MODE=1: Parallel load from H inputs (tied high -> all 1s)
+        for (int i = 0; i < 10; i++)
+            m_panel_sr[i] = 0xff;
+        LOGMASKED(LOG_IO, "Panel parallel load: all 0xFF\n");
         return;
+    }
 
+    // MODE=0: Shift right - DATA enters MSB of first IC, LSB of each IC feeds MSB of next
     u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;
 
     // Shift chain right: bit 0 of IC[i] feeds bit 7 of IC[i+1]
