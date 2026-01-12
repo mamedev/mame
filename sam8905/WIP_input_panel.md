@@ -1,4 +1,4 @@
-# Keyfox10 Input Panel Implementation Plan
+# Keyfox1 Rack Input Panel Implementation Plan
 
 ## Overview
 

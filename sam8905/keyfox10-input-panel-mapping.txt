@@ -2,95 +2,105 @@
 
 [platine:ic]
 KF2:4 (upper solo)
-- 28 mem-card
-- 29 sustain (upper solo+drawbars)
-- 30 wersi-chord
-- 32 portamento
-- 31 solo
-- KF4/3 reverb mode
-- KF4/2 preset 2
 - KF4/1 preset 1
+- KF4/2 preset 2
+- KF4/3 reverb mode
+- 31 solo
+- 32 portamento
+- 30 wersi-chord
+- 29 sustain (upper solo+drawbars)
+- 28 mem-card
+
 KF2:3 (upper solo)
-- 20 strings
-- 21 hawai-guit
-- 22 vocal
-- 23 jazz-guit
-- 24 synthe
-- 25 jaff-flute
-- 26 musette
 - 27 synthe-bass
+- 26 musette
+- 25 jaff-flute
+- 24 synthe
+- 23 jazz-guit
+- 22 vocal
+- 21 hawai-guit
+- 20 strings
+
 KF2:2 (upper solo)
-- 12 trombone
-- 13 piano
-- 14 trumpet
-- 15 e-piano
-- 16 clarinet
-- 17 honky-tonk
-- 18 saxophon
 - 19 vibes
+- 18 saxophon
+- 17 honky-tonk
+- 16 clarinet
+- 15 e-piano
+- 14 trumpet
+- 13 piano
+- 12 trombone
+
 KF2:1
-- 2 jazz 2
-- 8 flute 4
-- 3 full organ
-- 9 perc 2 2/3
-- 4 church
-- 11 wersivoice fast
-- 5 ensemble
 - 10 wersivoice slow
+- 5 ensemble
+- 11 wersivoice fast
+- 4 church
+- 9 perc 2 2/3
+- 3 full organ
+- 8 flute 4
+- 2 jazz 2
+
 KF1:12
-- 45 mem-card (bass+lower)
-- 44 drums
-- 47 split
-- 46 sustain (lower)
-- KF2/1 jazz 1
-- 48 dynamic
-- KF2/7 flute 8
 - KF2/6 flute 16
+- KF2/7 flute 8
+- 48 dynamic
+- KF2/1 jazz 1
+- 46 sustain (lower)
+- 47 split
+- 44 drums
+- 45 mem-card (bass+lower)
+
 KF1:11
-- 36 piano
-- 37 flute 8
-- 38 e-piano
-- 39 flute 4
-- 40 strings
-- 41 flute 2
-- 42 synthe strings
 - 43 guitar
+- 42 synthe strings
+- 41 flute 2
+- 40 strings
+- 39 flute 4
+- 38 e-piano
+- 37 flute 8
+- 36 piano
+
 KF1:10
-- 23 midi
-- 22 transpose
-- 30 bass 1
-- 32 synthe bass
-- 31 bass 2
-- 33 slap bass
-- 34 auto bass
 - 35 sustain (bass)
+- 34 auto bass
+- 33 slap bass
+- 31 bass 2
+- 32 synthe bass
+- 30 bass 1
+- 22 transpose
+- 23 midi
+
 KF1:2
-- 9 bossa/tango
-- 8 samba/salsa
-- 11 bengui/chacha
-- 10 waltz/slowwaltz
-- 13 mem-card rhythm
-- 12 march/country
-- 21 tune
 - 14 2nd bank
+- 21 tune
+- 12 march/country
+- 13 mem-card rhythm
+- 10 waltz/slowwaltz
+- 11 benguin/chacha
+- 8 samba/salsa
+- 9 bossa/tango
+
 KF1:1
-- 1 disco1/disco2
-- 2 rocknroll/dixie
-- 3 8beat/16beat
-- 4 foxtrott/shuffle
-- 5 jazzrock/rock
-- 6 bigband/jazz
-- 7 ballad/slowrock
 - KF3/1 rhythm
+- 7 ballad/slowrock
+- 6 bigband/jazz
+- 5 jazzrock/rock
+- 4 foxtrott/shuffle
+- 3 8beat/16beat
+- 2 rocknroll/dixie
+- 1 disco1/disco2
+
 KF3:1
-- 6 intro/ending
-- 2 acc. bass
-- 7 fill
-- 3 acc. 1
-- 8 sync start
-- 4 acc. 2
-- 9 mem-card song
 - 5 acc. 3
+- 9 mem-card song
+- 4 acc. 2
+- 8 sync start
+- 3 acc. 1
+- 7 fill
+- 2 acc. bass
+- 6 intro/ending
+
 
 * PLATINE KF1
 ** CONTROL DISPLAY

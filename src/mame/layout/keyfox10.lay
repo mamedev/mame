@@ -39,105 +39,105 @@ Wersi Keyfox 10 - Full panel layout with interactive buttons
 	<element name="background"><rect><color red="0.1" green="0.1" blue="0.1" /></rect></element>
 	<element name="section_bg"><rect><color red="0.15" green="0.15" blue="0.15" /></rect></element>
 
-	<!-- Button label elements - PANEL0 (IC8) -->
-	<element name="txt_tune"><text string="TUNE"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_transp"><text string="TRANSP"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_pres2"><text string="PRES2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<!-- Button label elements - PANEL0 (KF2:4 - Upper Solo Controls) -->
 	<element name="txt_pres1"><text string="PRES1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_midi"><text string="MIDI"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_rhythm"><text string="RHYTHM"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_lower"><text string="LOWER"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_upper"><text string="UPPER"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-
-	<!-- PANEL1 (IC12) -->
-	<element name="txt_jazz1"><text string="JAZZ1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_flute16"><text string="FLT16"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_jazz2"><text string="JAZZ2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_flute8"><text string="FLT8"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_organ"><text string="ORGAN"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_flute4"><text string="FLT4"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_church"><text string="CHRCH"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_perc"><text string="PERC"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-
-	<!-- PANEL2 (IC13) -->
-	<element name="txt_tromb"><text string="TROMB"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_piano"><text string="PIANO"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_trump"><text string="TRUMP"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_epiano"><text string="EPIAN"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_clar"><text string="CLAR"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_honky"><text string="HONKY"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_sax"><text string="SAX"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_vibes"><text string="VIBES"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-
-	<!-- PANEL3 (IC15) -->
-	<element name="txt_string"><text string="STRNG"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_hawgui"><text string="HAWGU"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_vocal"><text string="VOCAL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_jzguit"><text string="JZGUI"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_synth"><text string="SYNTH"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_jflute"><text string="JFLUT"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_muset"><text string="MUSET"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_synbr"><text string="SYNBR"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-
-	<!-- PANEL4 (IC14) -->
-	<element name="txt_wvslo"><text string="WVSLO"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_wvfst"><text string="WVFST"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_ensem"><text string="ENSEM"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_sustu"><text string="SUSTU"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_porta"><text string="PORTA"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_pres2"><text string="PRES2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_revm"><text string="REVM"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="txt_solo"><text string="SOLO"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_porta"><text string="PORTA"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="txt_wersi"><text string="WERSI"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_dynam"><text string="DYNAM"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_sustu"><text string="SUSTU"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_memcu"><text string="MEMCU"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
-	<!-- PANEL5 (IC16) -->
-	<element name="txt_bass1"><text string="BASS1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_bass2"><text string="BASS2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_synbs"><text string="SYNBS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_slapb"><text string="SLAPB"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_flt8b"><text string="FLT8B"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_flt4b"><text string="FLT4B"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<!-- PANEL1 (KF2:3 - Upper Solo Voices 2) -->
+	<element name="txt_synbr"><text string="SYNBR"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_muset"><text string="MUSET"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_jflut"><text string="JFLUT"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_synth"><text string="SYNTH"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_jzgui"><text string="JZGUI"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_vocal"><text string="VOCAL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_hawgu"><text string="HAWGU"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_strng"><text string="STRNG"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<!-- PANEL2 (KF2:2 - Upper Solo Voices 1) -->
+	<element name="txt_vibes"><text string="VIBES"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_sax"><text string="SAX"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_honky"><text string="HONKY"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_clar"><text string="CLAR"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_epian"><text string="EPIAN"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_trump"><text string="TRUMP"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_piano"><text string="PIANO"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_tromb"><text string="TROMB"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<!-- PANEL3 (KF2:1 - Upper Drawbars) -->
+	<element name="txt_wvslo"><text string="WVSLO"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_ensem"><text string="ENSEM"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_wvfst"><text string="WVFST"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_chrch"><text string="CHRCH"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_perc"><text string="PERC"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_organ"><text string="ORGAN"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_flt4u"><text string="FLT4U"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_jazz2"><text string="JAZZ2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<!-- PANEL4 (KF1:12 - Mixed Upper + Lower) -->
+	<element name="txt_flt16"><text string="FLT16"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_flt8u"><text string="FLT8U"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_dynam"><text string="DYNAM"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_jazz1"><text string="JAZZ1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_sustl"><text string="SUSTL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_split"><text string="SPLIT"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_drums"><text string="DRUMS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_memcbl"><text string="MEMBL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<!-- PANEL5 (KF1:11 - Lower Section) -->
+	<element name="txt_guitr"><text string="GUITR"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_synst"><text string="SYNST"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_flt2"><text string="FLT2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_strl"><text string="STRL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_flt4l"><text string="FLT4L"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_epnol"><text string="EPNOL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_flt8l"><text string="FLT8L"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_pnol"><text string="PNOL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<!-- PANEL6 (KF1:10 - Bass Section) -->
 	<element name="txt_sustb"><text string="SUSTB"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="txt_autob"><text string="AUTOB"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_slapb"><text string="SLAPB"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_bass2"><text string="BASS2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_synbs"><text string="SYNBS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_bass1"><text string="BASS1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_transp"><text string="TRANS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_midi"><text string="MIDI"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
-	<!-- PANEL6 (IC17) -->
-	<element name="txt_flt2"><text string="FLT2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_pnol"><text string="PNOL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_epnol"><text string="EPNOL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_strl"><text string="STRL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_synst"><text string="SYNST"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_guitr"><text string="GUITR"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_sustl"><text string="SUSTL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_drums"><text string="DRUMS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-
-	<!-- PANEL7 (IC1) -->
-	<element name="txt_disco"><text string="DISCO"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_rock"><text string="ROCK"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_beat8"><text string="BEAT8"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_foxtr"><text string="FOXTR"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_jrock"><text string="JROCK"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_bigbd"><text string="BIGBD"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_balld"><text string="BALLD"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_samba"><text string="SAMBA"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-
-	<!-- PANEL8 (IC3) -->
-	<element name="txt_bosa"><text string="BOSA"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<!-- PANEL7 (KF1:2 - Rhythm Section 2) -->
+	<element name="txt_2bank"><text string="2BANK"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_tune"><text string="TUNE"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_march"><text string="MARCH"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_memcr"><text string="MEMCR"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="txt_waltz"><text string="WALTZ"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="txt_begin"><text string="BEGIN"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_march"><text string="MARCH"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_2bank"><text string="2BANK"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_intro"><text string="INTRO"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_fill"><text string="FILL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_syncst"><text string="SYNC"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_samba"><text string="SAMBA"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_bosa"><text string="BOSA"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
-	<!-- PANEL9 (IC2) -->
-	<element name="txt_split"><text string="SPLIT"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_song"><text string="SONG"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<!-- PANEL8 (KF1:1 - Rhythm Section 1) -->
+	<element name="txt_rhythm"><text string="RHYTH"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_balld"><text string="BALLD"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_bigbd"><text string="BIGBD"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_jrock"><text string="JROCK"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_foxtr"><text string="FOXTR"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_beat8"><text string="BEAT8"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_rock"><text string="ROCK"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_disco"><text string="DISCO"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<!-- PANEL9 (KF3:1 - Accompaniment Controls) -->
 	<element name="txt_acc3"><text string="ACC3"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_memcs"><text string="MEMCS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="txt_acc2"><text string="ACC2"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_syncst"><text string="SYNC"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="txt_acc1"><text string="ACC1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_bassm"><text string="BASSM"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_rythm"><text string="RYTHM"><color red="0.9" green="0.9" blue="0.9" /></text></element>
-	<element name="txt_revm"><text string="REVM"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_fill"><text string="FILL"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_accbs"><text string="ACCBS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_intro"><text string="INTRO"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
 	<!-- Labels -->
 	<element name="label_tempo"><text string="TEMPO"><color red="0.8" green="0.8" blue="0.8" /></text></element>
@@ -204,96 +204,96 @@ Wersi Keyfox 10 - Full panel layout with interactive buttons
 		<!-- PANEL BUTTONS WITH LEDs - 10 columns x 8 rows -->
 		<element ref="section_bg"><bounds x="5" y="75" width="610" height="130" /></element>
 
-		<!-- Column 0 - PANEL0/IC8 -->
+		<!-- Column 0 - PANEL0/KF2:4 (Upper Solo Controls) -->
 		<element name="panel0_0" ref="panel_led"><bounds x="10" y="80" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL0" inputmask="0x01"><bounds x="22" y="80" width="36" height="10" /></element>
-		<element ref="txt_tune"><bounds x="22" y="80" width="36" height="10" /></element>
+		<element ref="txt_pres1"><bounds x="22" y="80" width="36" height="10" /></element>
 
 		<element name="panel0_1" ref="panel_led"><bounds x="10" y="93" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL0" inputmask="0x02"><bounds x="22" y="93" width="36" height="10" /></element>
-		<element ref="txt_transp"><bounds x="22" y="93" width="36" height="10" /></element>
+		<element ref="txt_pres2"><bounds x="22" y="93" width="36" height="10" /></element>
 
 		<element name="panel0_2" ref="panel_led"><bounds x="10" y="106" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL0" inputmask="0x04"><bounds x="22" y="106" width="36" height="10" /></element>
-		<element ref="txt_pres2"><bounds x="22" y="106" width="36" height="10" /></element>
+		<element ref="txt_revm"><bounds x="22" y="106" width="36" height="10" /></element>
 
 		<element name="panel0_3" ref="panel_led"><bounds x="10" y="119" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL0" inputmask="0x08"><bounds x="22" y="119" width="36" height="10" /></element>
-		<element ref="txt_pres1"><bounds x="22" y="119" width="36" height="10" /></element>
+		<element ref="txt_solo"><bounds x="22" y="119" width="36" height="10" /></element>
 
 		<element name="panel0_4" ref="panel_led"><bounds x="10" y="132" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL0" inputmask="0x10"><bounds x="22" y="132" width="36" height="10" /></element>
-		<element ref="txt_midi"><bounds x="22" y="132" width="36" height="10" /></element>
+		<element ref="txt_porta"><bounds x="22" y="132" width="36" height="10" /></element>
 
 		<element name="panel0_5" ref="panel_led"><bounds x="10" y="145" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL0" inputmask="0x20"><bounds x="22" y="145" width="36" height="10" /></element>
-		<element ref="txt_rhythm"><bounds x="22" y="145" width="36" height="10" /></element>
+		<element ref="txt_wersi"><bounds x="22" y="145" width="36" height="10" /></element>
 
 		<element name="panel0_6" ref="panel_led"><bounds x="10" y="158" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL0" inputmask="0x40"><bounds x="22" y="158" width="36" height="10" /></element>
-		<element ref="txt_lower"><bounds x="22" y="158" width="36" height="10" /></element>
+		<element ref="txt_sustu"><bounds x="22" y="158" width="36" height="10" /></element>
 
 		<element name="panel0_7" ref="panel_led"><bounds x="10" y="171" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL0" inputmask="0x80"><bounds x="22" y="171" width="36" height="10" /></element>
-		<element ref="txt_upper"><bounds x="22" y="171" width="36" height="10" /></element>
+		<element ref="txt_memcu"><bounds x="22" y="171" width="36" height="10" /></element>
 
-		<!-- Column 1 - PANEL1/IC12 -->
+		<!-- Column 1 - PANEL1/KF2:3 (Upper Solo Voices 2) -->
 		<element name="panel1_0" ref="panel_led"><bounds x="70" y="80" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL1" inputmask="0x01"><bounds x="82" y="80" width="36" height="10" /></element>
-		<element ref="txt_jazz1"><bounds x="82" y="80" width="36" height="10" /></element>
+		<element ref="txt_synbr"><bounds x="82" y="80" width="36" height="10" /></element>
 
 		<element name="panel1_1" ref="panel_led"><bounds x="70" y="93" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL1" inputmask="0x02"><bounds x="82" y="93" width="36" height="10" /></element>
-		<element ref="txt_flute16"><bounds x="82" y="93" width="36" height="10" /></element>
+		<element ref="txt_muset"><bounds x="82" y="93" width="36" height="10" /></element>
 
 		<element name="panel1_2" ref="panel_led"><bounds x="70" y="106" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL1" inputmask="0x04"><bounds x="82" y="106" width="36" height="10" /></element>
-		<element ref="txt_jazz2"><bounds x="82" y="106" width="36" height="10" /></element>
+		<element ref="txt_jflut"><bounds x="82" y="106" width="36" height="10" /></element>
 
 		<element name="panel1_3" ref="panel_led"><bounds x="70" y="119" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL1" inputmask="0x08"><bounds x="82" y="119" width="36" height="10" /></element>
-		<element ref="txt_flute8"><bounds x="82" y="119" width="36" height="10" /></element>
+		<element ref="txt_synth"><bounds x="82" y="119" width="36" height="10" /></element>
 
 		<element name="panel1_4" ref="panel_led"><bounds x="70" y="132" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL1" inputmask="0x10"><bounds x="82" y="132" width="36" height="10" /></element>
-		<element ref="txt_organ"><bounds x="82" y="132" width="36" height="10" /></element>
+		<element ref="txt_jzgui"><bounds x="82" y="132" width="36" height="10" /></element>
 
 		<element name="panel1_5" ref="panel_led"><bounds x="70" y="145" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL1" inputmask="0x20"><bounds x="82" y="145" width="36" height="10" /></element>
-		<element ref="txt_flute4"><bounds x="82" y="145" width="36" height="10" /></element>
+		<element ref="txt_vocal"><bounds x="82" y="145" width="36" height="10" /></element>
 
 		<element name="panel1_6" ref="panel_led"><bounds x="70" y="158" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL1" inputmask="0x40"><bounds x="82" y="158" width="36" height="10" /></element>
-		<element ref="txt_church"><bounds x="82" y="158" width="36" height="10" /></element>
+		<element ref="txt_hawgu"><bounds x="82" y="158" width="36" height="10" /></element>
 
 		<element name="panel1_7" ref="panel_led"><bounds x="70" y="171" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL1" inputmask="0x80"><bounds x="82" y="171" width="36" height="10" /></element>
-		<element ref="txt_perc"><bounds x="82" y="171" width="36" height="10" /></element>
+		<element ref="txt_strng"><bounds x="82" y="171" width="36" height="10" /></element>
 
-		<!-- Column 2 - PANEL2/IC13 -->
+		<!-- Column 2 - PANEL2/KF2:2 (Upper Solo Voices 1) -->
 		<element name="panel2_0" ref="panel_led"><bounds x="130" y="80" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL2" inputmask="0x01"><bounds x="142" y="80" width="36" height="10" /></element>
-		<element ref="txt_tromb"><bounds x="142" y="80" width="36" height="10" /></element>
+		<element ref="txt_vibes"><bounds x="142" y="80" width="36" height="10" /></element>
 
 		<element name="panel2_1" ref="panel_led"><bounds x="130" y="93" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL2" inputmask="0x02"><bounds x="142" y="93" width="36" height="10" /></element>
-		<element ref="txt_piano"><bounds x="142" y="93" width="36" height="10" /></element>
+		<element ref="txt_sax"><bounds x="142" y="93" width="36" height="10" /></element>
 
 		<element name="panel2_2" ref="panel_led"><bounds x="130" y="106" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL2" inputmask="0x04"><bounds x="142" y="106" width="36" height="10" /></element>
-		<element ref="txt_trump"><bounds x="142" y="106" width="36" height="10" /></element>
+		<element ref="txt_honky"><bounds x="142" y="106" width="36" height="10" /></element>
 
 		<element name="panel2_3" ref="panel_led"><bounds x="130" y="119" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL2" inputmask="0x08"><bounds x="142" y="119" width="36" height="10" /></element>
-		<element ref="txt_epiano"><bounds x="142" y="119" width="36" height="10" /></element>
+		<element ref="txt_clar"><bounds x="142" y="119" width="36" height="10" /></element>
 
 		<element name="panel2_4" ref="panel_led"><bounds x="130" y="132" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL2" inputmask="0x10"><bounds x="142" y="132" width="36" height="10" /></element>
-		<element ref="txt_clar"><bounds x="142" y="132" width="36" height="10" /></element>
+		<element ref="txt_epian"><bounds x="142" y="132" width="36" height="10" /></element>
 
 		<element name="panel2_5" ref="panel_led"><bounds x="130" y="145" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL2" inputmask="0x20"><bounds x="142" y="145" width="36" height="10" /></element>
-		<element ref="txt_honky"><bounds x="142" y="145" width="36" height="10" /></element>
+		<element ref="txt_trump"><bounds x="142" y="145" width="36" height="10" /></element>
 
 		<element name="panel2_6" ref="panel_led"><bounds x="130" y="158" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL2" inputmask="0x40"><bounds x="142" y="158" width="36" height="10" /></element>
@@ -303,220 +303,220 @@ Wersi Keyfox 10 - Full panel layout with interactive buttons
 		<element ref="btn" inputtag="PANEL2" inputmask="0x80"><bounds x="142" y="171" width="36" height="10" /></element>
 		<element ref="txt_vibes"><bounds x="142" y="171" width="36" height="10" /></element>
 
-		<!-- Column 3 - PANEL3/IC15 -->
+		<!-- Column 3 - PANEL3/KF2:1 (Upper Drawbars) -->
 		<element name="panel3_0" ref="panel_led"><bounds x="190" y="80" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL3" inputmask="0x01"><bounds x="202" y="80" width="36" height="10" /></element>
-		<element ref="txt_string"><bounds x="202" y="80" width="36" height="10" /></element>
+		<element ref="txt_wvslo"><bounds x="202" y="80" width="36" height="10" /></element>
 
 		<element name="panel3_1" ref="panel_led"><bounds x="190" y="93" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL3" inputmask="0x02"><bounds x="202" y="93" width="36" height="10" /></element>
-		<element ref="txt_hawgui"><bounds x="202" y="93" width="36" height="10" /></element>
+		<element ref="txt_ensem"><bounds x="202" y="93" width="36" height="10" /></element>
 
 		<element name="panel3_2" ref="panel_led"><bounds x="190" y="106" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL3" inputmask="0x04"><bounds x="202" y="106" width="36" height="10" /></element>
-		<element ref="txt_vocal"><bounds x="202" y="106" width="36" height="10" /></element>
+		<element ref="txt_wvfst"><bounds x="202" y="106" width="36" height="10" /></element>
 
 		<element name="panel3_3" ref="panel_led"><bounds x="190" y="119" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL3" inputmask="0x08"><bounds x="202" y="119" width="36" height="10" /></element>
-		<element ref="txt_jzguit"><bounds x="202" y="119" width="36" height="10" /></element>
+		<element ref="txt_chrch"><bounds x="202" y="119" width="36" height="10" /></element>
 
 		<element name="panel3_4" ref="panel_led"><bounds x="190" y="132" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL3" inputmask="0x10"><bounds x="202" y="132" width="36" height="10" /></element>
-		<element ref="txt_synth"><bounds x="202" y="132" width="36" height="10" /></element>
+		<element ref="txt_perc"><bounds x="202" y="132" width="36" height="10" /></element>
 
 		<element name="panel3_5" ref="panel_led"><bounds x="190" y="145" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL3" inputmask="0x20"><bounds x="202" y="145" width="36" height="10" /></element>
-		<element ref="txt_jflute"><bounds x="202" y="145" width="36" height="10" /></element>
+		<element ref="txt_organ"><bounds x="202" y="145" width="36" height="10" /></element>
 
 		<element name="panel3_6" ref="panel_led"><bounds x="190" y="158" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL3" inputmask="0x40"><bounds x="202" y="158" width="36" height="10" /></element>
-		<element ref="txt_muset"><bounds x="202" y="158" width="36" height="10" /></element>
+		<element ref="txt_flt4u"><bounds x="202" y="158" width="36" height="10" /></element>
 
 		<element name="panel3_7" ref="panel_led"><bounds x="190" y="171" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL3" inputmask="0x80"><bounds x="202" y="171" width="36" height="10" /></element>
-		<element ref="txt_synbr"><bounds x="202" y="171" width="36" height="10" /></element>
+		<element ref="txt_jazz2"><bounds x="202" y="171" width="36" height="10" /></element>
 
-		<!-- Column 4 - PANEL4/IC14 -->
+		<!-- Column 4 - PANEL4/KF1:12 (Mixed Upper + Lower) -->
 		<element name="panel4_0" ref="panel_led"><bounds x="250" y="80" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL4" inputmask="0x01"><bounds x="262" y="80" width="36" height="10" /></element>
-		<element ref="txt_wvslo"><bounds x="262" y="80" width="36" height="10" /></element>
+		<element ref="txt_flt16"><bounds x="262" y="80" width="36" height="10" /></element>
 
 		<element name="panel4_1" ref="panel_led"><bounds x="250" y="93" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL4" inputmask="0x02"><bounds x="262" y="93" width="36" height="10" /></element>
-		<element ref="txt_wvfst"><bounds x="262" y="93" width="36" height="10" /></element>
+		<element ref="txt_flt8u"><bounds x="262" y="93" width="36" height="10" /></element>
 
 		<element name="panel4_2" ref="panel_led"><bounds x="250" y="106" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL4" inputmask="0x04"><bounds x="262" y="106" width="36" height="10" /></element>
-		<element ref="txt_ensem"><bounds x="262" y="106" width="36" height="10" /></element>
+		<element ref="txt_dynam"><bounds x="262" y="106" width="36" height="10" /></element>
 
 		<element name="panel4_3" ref="panel_led"><bounds x="250" y="119" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL4" inputmask="0x08"><bounds x="262" y="119" width="36" height="10" /></element>
-		<element ref="txt_sustu"><bounds x="262" y="119" width="36" height="10" /></element>
+		<element ref="txt_jazz1"><bounds x="262" y="119" width="36" height="10" /></element>
 
 		<element name="panel4_4" ref="panel_led"><bounds x="250" y="132" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL4" inputmask="0x10"><bounds x="262" y="132" width="36" height="10" /></element>
-		<element ref="txt_porta"><bounds x="262" y="132" width="36" height="10" /></element>
+		<element ref="txt_sustl"><bounds x="262" y="132" width="36" height="10" /></element>
 
 		<element name="panel4_5" ref="panel_led"><bounds x="250" y="145" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL4" inputmask="0x20"><bounds x="262" y="145" width="36" height="10" /></element>
-		<element ref="txt_solo"><bounds x="262" y="145" width="36" height="10" /></element>
+		<element ref="txt_split"><bounds x="262" y="145" width="36" height="10" /></element>
 
 		<element name="panel4_6" ref="panel_led"><bounds x="250" y="158" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL4" inputmask="0x40"><bounds x="262" y="158" width="36" height="10" /></element>
-		<element ref="txt_wersi"><bounds x="262" y="158" width="36" height="10" /></element>
+		<element ref="txt_drums"><bounds x="262" y="158" width="36" height="10" /></element>
 
 		<element name="panel4_7" ref="panel_led"><bounds x="250" y="171" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL4" inputmask="0x80"><bounds x="262" y="171" width="36" height="10" /></element>
-		<element ref="txt_dynam"><bounds x="262" y="171" width="36" height="10" /></element>
+		<element ref="txt_memcbl"><bounds x="262" y="171" width="36" height="10" /></element>
 
-		<!-- Column 5 - PANEL5/IC16 -->
+		<!-- Column 5 - PANEL5/KF1:11 (Lower Section) -->
 		<element name="panel5_0" ref="panel_led"><bounds x="310" y="80" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL5" inputmask="0x01"><bounds x="322" y="80" width="36" height="10" /></element>
-		<element ref="txt_bass1"><bounds x="322" y="80" width="36" height="10" /></element>
+		<element ref="txt_guitr"><bounds x="322" y="80" width="36" height="10" /></element>
 
 		<element name="panel5_1" ref="panel_led"><bounds x="310" y="93" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL5" inputmask="0x02"><bounds x="322" y="93" width="36" height="10" /></element>
-		<element ref="txt_bass2"><bounds x="322" y="93" width="36" height="10" /></element>
+		<element ref="txt_synst"><bounds x="322" y="93" width="36" height="10" /></element>
 
 		<element name="panel5_2" ref="panel_led"><bounds x="310" y="106" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL5" inputmask="0x04"><bounds x="322" y="106" width="36" height="10" /></element>
-		<element ref="txt_synbs"><bounds x="322" y="106" width="36" height="10" /></element>
+		<element ref="txt_flt2"><bounds x="322" y="106" width="36" height="10" /></element>
 
 		<element name="panel5_3" ref="panel_led"><bounds x="310" y="119" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL5" inputmask="0x08"><bounds x="322" y="119" width="36" height="10" /></element>
-		<element ref="txt_slapb"><bounds x="322" y="119" width="36" height="10" /></element>
+		<element ref="txt_strl"><bounds x="322" y="119" width="36" height="10" /></element>
 
 		<element name="panel5_4" ref="panel_led"><bounds x="310" y="132" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL5" inputmask="0x10"><bounds x="322" y="132" width="36" height="10" /></element>
-		<element ref="txt_flt8b"><bounds x="322" y="132" width="36" height="10" /></element>
+		<element ref="txt_flt4l"><bounds x="322" y="132" width="36" height="10" /></element>
 
 		<element name="panel5_5" ref="panel_led"><bounds x="310" y="145" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL5" inputmask="0x20"><bounds x="322" y="145" width="36" height="10" /></element>
-		<element ref="txt_flt4b"><bounds x="322" y="145" width="36" height="10" /></element>
+		<element ref="txt_epnol"><bounds x="322" y="145" width="36" height="10" /></element>
 
 		<element name="panel5_6" ref="panel_led"><bounds x="310" y="158" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL5" inputmask="0x40"><bounds x="322" y="158" width="36" height="10" /></element>
-		<element ref="txt_sustb"><bounds x="322" y="158" width="36" height="10" /></element>
+		<element ref="txt_flt8l"><bounds x="322" y="158" width="36" height="10" /></element>
 
 		<element name="panel5_7" ref="panel_led"><bounds x="310" y="171" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL5" inputmask="0x80"><bounds x="322" y="171" width="36" height="10" /></element>
-		<element ref="txt_autob"><bounds x="322" y="171" width="36" height="10" /></element>
+		<element ref="txt_pnol"><bounds x="322" y="171" width="36" height="10" /></element>
 
-		<!-- Column 6 - PANEL6/IC17 -->
+		<!-- Column 6 - PANEL6/KF1:10 (Bass Section) -->
 		<element name="panel6_0" ref="panel_led"><bounds x="370" y="80" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL6" inputmask="0x01"><bounds x="382" y="80" width="36" height="10" /></element>
-		<element ref="txt_flt2"><bounds x="382" y="80" width="36" height="10" /></element>
+		<element ref="txt_sustb"><bounds x="382" y="80" width="36" height="10" /></element>
 
 		<element name="panel6_1" ref="panel_led"><bounds x="370" y="93" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL6" inputmask="0x02"><bounds x="382" y="93" width="36" height="10" /></element>
-		<element ref="txt_pnol"><bounds x="382" y="93" width="36" height="10" /></element>
+		<element ref="txt_autob"><bounds x="382" y="93" width="36" height="10" /></element>
 
 		<element name="panel6_2" ref="panel_led"><bounds x="370" y="106" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL6" inputmask="0x04"><bounds x="382" y="106" width="36" height="10" /></element>
-		<element ref="txt_epnol"><bounds x="382" y="106" width="36" height="10" /></element>
+		<element ref="txt_slapb"><bounds x="382" y="106" width="36" height="10" /></element>
 
 		<element name="panel6_3" ref="panel_led"><bounds x="370" y="119" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL6" inputmask="0x08"><bounds x="382" y="119" width="36" height="10" /></element>
-		<element ref="txt_strl"><bounds x="382" y="119" width="36" height="10" /></element>
+		<element ref="txt_bass2"><bounds x="382" y="119" width="36" height="10" /></element>
 
 		<element name="panel6_4" ref="panel_led"><bounds x="370" y="132" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL6" inputmask="0x10"><bounds x="382" y="132" width="36" height="10" /></element>
-		<element ref="txt_synst"><bounds x="382" y="132" width="36" height="10" /></element>
+		<element ref="txt_synbs"><bounds x="382" y="132" width="36" height="10" /></element>
 
 		<element name="panel6_5" ref="panel_led"><bounds x="370" y="145" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL6" inputmask="0x20"><bounds x="382" y="145" width="36" height="10" /></element>
-		<element ref="txt_guitr"><bounds x="382" y="145" width="36" height="10" /></element>
+		<element ref="txt_bass1"><bounds x="382" y="145" width="36" height="10" /></element>
 
 		<element name="panel6_6" ref="panel_led"><bounds x="370" y="158" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL6" inputmask="0x40"><bounds x="382" y="158" width="36" height="10" /></element>
-		<element ref="txt_sustl"><bounds x="382" y="158" width="36" height="10" /></element>
+		<element ref="txt_transp"><bounds x="382" y="158" width="36" height="10" /></element>
 
 		<element name="panel6_7" ref="panel_led"><bounds x="370" y="171" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL6" inputmask="0x80"><bounds x="382" y="171" width="36" height="10" /></element>
-		<element ref="txt_drums"><bounds x="382" y="171" width="36" height="10" /></element>
+		<element ref="txt_midi"><bounds x="382" y="171" width="36" height="10" /></element>
 
-		<!-- Column 7 - PANEL7/IC1 -->
+		<!-- Column 7 - PANEL7/KF1:2 (Rhythm Section 2) -->
 		<element name="panel7_0" ref="panel_led"><bounds x="430" y="80" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL7" inputmask="0x01"><bounds x="442" y="80" width="36" height="10" /></element>
-		<element ref="txt_disco"><bounds x="442" y="80" width="36" height="10" /></element>
+		<element ref="txt_2bank"><bounds x="442" y="80" width="36" height="10" /></element>
 
 		<element name="panel7_1" ref="panel_led"><bounds x="430" y="93" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL7" inputmask="0x02"><bounds x="442" y="93" width="36" height="10" /></element>
-		<element ref="txt_rock"><bounds x="442" y="93" width="36" height="10" /></element>
+		<element ref="txt_tune"><bounds x="442" y="93" width="36" height="10" /></element>
 
 		<element name="panel7_2" ref="panel_led"><bounds x="430" y="106" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL7" inputmask="0x04"><bounds x="442" y="106" width="36" height="10" /></element>
-		<element ref="txt_beat8"><bounds x="442" y="106" width="36" height="10" /></element>
+		<element ref="txt_march"><bounds x="442" y="106" width="36" height="10" /></element>
 
 		<element name="panel7_3" ref="panel_led"><bounds x="430" y="119" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL7" inputmask="0x08"><bounds x="442" y="119" width="36" height="10" /></element>
-		<element ref="txt_foxtr"><bounds x="442" y="119" width="36" height="10" /></element>
+		<element ref="txt_memcr"><bounds x="442" y="119" width="36" height="10" /></element>
 
 		<element name="panel7_4" ref="panel_led"><bounds x="430" y="132" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL7" inputmask="0x10"><bounds x="442" y="132" width="36" height="10" /></element>
-		<element ref="txt_jrock"><bounds x="442" y="132" width="36" height="10" /></element>
+		<element ref="txt_waltz"><bounds x="442" y="132" width="36" height="10" /></element>
 
 		<element name="panel7_5" ref="panel_led"><bounds x="430" y="145" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL7" inputmask="0x20"><bounds x="442" y="145" width="36" height="10" /></element>
-		<element ref="txt_bigbd"><bounds x="442" y="145" width="36" height="10" /></element>
+		<element ref="txt_begin"><bounds x="442" y="145" width="36" height="10" /></element>
 
 		<element name="panel7_6" ref="panel_led"><bounds x="430" y="158" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL7" inputmask="0x40"><bounds x="442" y="158" width="36" height="10" /></element>
-		<element ref="txt_balld"><bounds x="442" y="158" width="36" height="10" /></element>
+		<element ref="txt_samba"><bounds x="442" y="158" width="36" height="10" /></element>
 
 		<element name="panel7_7" ref="panel_led"><bounds x="430" y="171" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL7" inputmask="0x80"><bounds x="442" y="171" width="36" height="10" /></element>
-		<element ref="txt_samba"><bounds x="442" y="171" width="36" height="10" /></element>
+		<element ref="txt_bosa"><bounds x="442" y="171" width="36" height="10" /></element>
 
-		<!-- Column 8 - PANEL8/IC3 -->
+		<!-- Column 8 - PANEL8/KF1:1 (Rhythm Section 1) -->
 		<element name="panel8_0" ref="panel_led"><bounds x="490" y="80" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL8" inputmask="0x01"><bounds x="502" y="80" width="36" height="10" /></element>
-		<element ref="txt_bosa"><bounds x="502" y="80" width="36" height="10" /></element>
+		<element ref="txt_rhythm"><bounds x="502" y="80" width="36" height="10" /></element>
 
 		<element name="panel8_1" ref="panel_led"><bounds x="490" y="93" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL8" inputmask="0x02"><bounds x="502" y="93" width="36" height="10" /></element>
-		<element ref="txt_waltz"><bounds x="502" y="93" width="36" height="10" /></element>
+		<element ref="txt_balld"><bounds x="502" y="93" width="36" height="10" /></element>
 
 		<element name="panel8_2" ref="panel_led"><bounds x="490" y="106" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL8" inputmask="0x04"><bounds x="502" y="106" width="36" height="10" /></element>
-		<element ref="txt_begin"><bounds x="502" y="106" width="36" height="10" /></element>
+		<element ref="txt_bigbd"><bounds x="502" y="106" width="36" height="10" /></element>
 
 		<element name="panel8_3" ref="panel_led"><bounds x="490" y="119" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL8" inputmask="0x08"><bounds x="502" y="119" width="36" height="10" /></element>
-		<element ref="txt_march"><bounds x="502" y="119" width="36" height="10" /></element>
+		<element ref="txt_jrock"><bounds x="502" y="119" width="36" height="10" /></element>
 
 		<element name="panel8_4" ref="panel_led"><bounds x="490" y="132" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL8" inputmask="0x10"><bounds x="502" y="132" width="36" height="10" /></element>
-		<element ref="txt_2bank"><bounds x="502" y="132" width="36" height="10" /></element>
+		<element ref="txt_foxtr"><bounds x="502" y="132" width="36" height="10" /></element>
 
 		<element name="panel8_5" ref="panel_led"><bounds x="490" y="145" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL8" inputmask="0x20"><bounds x="502" y="145" width="36" height="10" /></element>
-		<element ref="txt_intro"><bounds x="502" y="145" width="36" height="10" /></element>
+		<element ref="txt_beat8"><bounds x="502" y="145" width="36" height="10" /></element>
 
 		<element name="panel8_6" ref="panel_led"><bounds x="490" y="158" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL8" inputmask="0x40"><bounds x="502" y="158" width="36" height="10" /></element>
-		<element ref="txt_fill"><bounds x="502" y="158" width="36" height="10" /></element>
+		<element ref="txt_rock"><bounds x="502" y="158" width="36" height="10" /></element>
 
 		<element name="panel8_7" ref="panel_led"><bounds x="490" y="171" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL8" inputmask="0x80"><bounds x="502" y="171" width="36" height="10" /></element>
-		<element ref="txt_syncst"><bounds x="502" y="171" width="36" height="10" /></element>
+		<element ref="txt_disco"><bounds x="502" y="171" width="36" height="10" /></element>
 
-		<!-- Column 9 - PANEL9/IC2 -->
+		<!-- Column 9 - PANEL9/KF3:1 (Accompaniment Controls) -->
 		<element name="panel9_0" ref="panel_led"><bounds x="550" y="80" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL9" inputmask="0x01"><bounds x="562" y="80" width="36" height="10" /></element>
-		<element ref="txt_split"><bounds x="562" y="80" width="36" height="10" /></element>
+		<element ref="txt_acc3"><bounds x="562" y="80" width="36" height="10" /></element>
 
 		<element name="panel9_1" ref="panel_led"><bounds x="550" y="93" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL9" inputmask="0x02"><bounds x="562" y="93" width="36" height="10" /></element>
-		<element ref="txt_song"><bounds x="562" y="93" width="36" height="10" /></element>
+		<element ref="txt_memcs"><bounds x="562" y="93" width="36" height="10" /></element>
 
 		<element name="panel9_2" ref="panel_led"><bounds x="550" y="106" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL9" inputmask="0x04"><bounds x="562" y="106" width="36" height="10" /></element>
-		<element ref="txt_acc3"><bounds x="562" y="106" width="36" height="10" /></element>
+		<element ref="txt_acc2"><bounds x="562" y="106" width="36" height="10" /></element>
 
 		<element name="panel9_3" ref="panel_led"><bounds x="550" y="119" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL9" inputmask="0x08"><bounds x="562" y="119" width="36" height="10" /></element>
-		<element ref="txt_acc2"><bounds x="562" y="119" width="36" height="10" /></element>
+		<element ref="txt_syncst"><bounds x="562" y="119" width="36" height="10" /></element>
 
 		<element name="panel9_4" ref="panel_led"><bounds x="550" y="132" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL9" inputmask="0x10"><bounds x="562" y="132" width="36" height="10" /></element>
@@ -524,15 +524,15 @@ Wersi Keyfox 10 - Full panel layout with interactive buttons
 
 		<element name="panel9_5" ref="panel_led"><bounds x="550" y="145" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL9" inputmask="0x20"><bounds x="562" y="145" width="36" height="10" /></element>
-		<element ref="txt_bassm"><bounds x="562" y="145" width="36" height="10" /></element>
+		<element ref="txt_fill"><bounds x="562" y="145" width="36" height="10" /></element>
 
 		<element name="panel9_6" ref="panel_led"><bounds x="550" y="158" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL9" inputmask="0x40"><bounds x="562" y="158" width="36" height="10" /></element>
-		<element ref="txt_rythm"><bounds x="562" y="158" width="36" height="10" /></element>
+		<element ref="txt_accbs"><bounds x="562" y="158" width="36" height="10" /></element>
 
 		<element name="panel9_7" ref="panel_led"><bounds x="550" y="171" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL9" inputmask="0x80"><bounds x="562" y="171" width="36" height="10" /></element>
-		<element ref="txt_revm"><bounds x="562" y="171" width="36" height="10" /></element>
+		<element ref="txt_intro"><bounds x="562" y="171" width="36" height="10" /></element>
 
 		<!-- Row labels -->
 		<element ref="txt_row0"><bounds x="600" y="80" width="10" height="10" /></element>
