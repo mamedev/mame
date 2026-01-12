@@ -95,8 +95,7 @@ protected:
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x,
-						uint8_t code, uint8_t color, int flip_y, int flip_x);
+	void draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x, uint8_t code, uint8_t color, int flip_y, int flip_x);
 	void common_save_state();
 
 	void _20pacgal_io_map(address_map &map) ATTR_COLD;

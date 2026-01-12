@@ -42,9 +42,7 @@
     Known issues/to-do's:
         * Starfield is not 100% accurate
         * Check the ASCI interface, there probably is fully working debug code.
-        * The timed interrupt is a kludge; it is supposed to be generated internally by
-          the Z180, but the cpu core doesn't support that yet.
-        * Galaga attract mode isn't correct; reference : https://youtu.be/OQyWaN9fTgw?t=2m33s
+        * Galaga attract mode isn't correct; reference: https://youtu.be/OQyWaN9fTgw?t=2m33s
 
 +-------------------------------------------------------+
 |                        +-------------+                |
@@ -99,7 +97,7 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
 
 #define MASTER_CLOCK        (XTAL(73'728'000))
 #define MAIN_CPU_CLOCK      (MASTER_CLOCK / 4)
-#define NAMCO_AUDIO_CLOCK   (MASTER_CLOCK / 4 /  6 / 32)
+#define NAMCO_AUDIO_CLOCK   (MASTER_CLOCK / 4 / 6 / 32)
 
 
 
@@ -121,6 +119,7 @@ void _20pacgal_state::timer_pulse_w(uint8_t data)
 {
 	//printf("timer pulse %02x\n", data);
 }
+
 
 /*************************************
  *
@@ -162,6 +161,7 @@ void _20pacgal_state::ram_48000_w(offs_t offset, uint8_t data)
 	}
 }
 
+
 /*************************************
  *
  *  Memory handlers
@@ -189,7 +189,7 @@ void _20pacgal_state::sprite_lookup_w(offs_t offset, uint8_t data)
 // we also need the palette data because there is only a single rom on this pcb?
 void _25pacman_state::_25pacman_map(address_map &map)
 {
-	map(0x00000, 0x3ffff).rw("flash", FUNC(amd_29lv200t_device::read), FUNC(amd_29lv200t_device::write));  // (always fall through if nothing else is mapped?)
+	map(0x00000, 0x3ffff).rw("flash", FUNC(amd_29lv200t_device::read), FUNC(amd_29lv200t_device::write)); // (always fall through if nothing else is mapped?)
 
 	map(0x04000, 0x047ff).ram().share("video_ram");
 	map(0x04800, 0x05fff).ram();
@@ -215,8 +215,8 @@ void _20pacgal_state::_20pacgal_map(address_map &map)
 	map(0x45040, 0x4505f).w("namco", FUNC(namco_cus30_device::pacman_sound_w));
 	map(0x45f00, 0x45fff).w("namco", FUNC(namco_cus30_device::namcos1_cus30_w));
 	map(0x46000, 0x46fff).writeonly().share("char_gfx_ram");
-	map(0x47100, 0x47100).ram();   /* leftover from original Galaga code */
-	map(0x48000, 0x49fff).bankr("mainbank").w(FUNC(_20pacgal_state::ram_48000_w));  /* this should be a mirror of 08000-09fff */
+	map(0x47100, 0x47100).ram(); // leftover from original Galaga code
+	map(0x48000, 0x49fff).bankr("mainbank").w(FUNC(_20pacgal_state::ram_48000_w)); // this should be a mirror of 08000-09fff
 	map(0x4c000, 0x4dfff).w(FUNC(_20pacgal_state::sprite_gfx_w));
 	map(0x4e000, 0x4e17f).w(FUNC(_20pacgal_state::sprite_ram_w));
 	map(0x4e180, 0x4feff).nopw();
@@ -238,21 +238,21 @@ uint8_t _25pacman_state::_25pacman_io_87_r()
 void _25pacman_state::_25pacman_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x3f).noprw(); /* Z180 internal registers */
-	map(0x40, 0x7f).noprw(); /* Z180 internal registers */
+	map(0x00, 0x3f).noprw(); // Z180 internal registers
+	map(0x40, 0x7f).noprw(); // Z180 internal registers
 	map(0x80, 0x80).portr("P1");
 	map(0x81, 0x81).portr("P2");
 	map(0x82, 0x82).portr("SERVICE");
 	map(0x80, 0x80).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x81, 0x81).w(FUNC(_25pacman_state::timer_pulse_w));        /* ??? pulsed by the timer irq */
+	map(0x81, 0x81).w(FUNC(_25pacman_state::timer_pulse_w)); // ??? pulsed by the timer irq
 	map(0x82, 0x82).w(FUNC(_25pacman_state::irqack_w));
-//  map(0x84, 0x84).noprw(); /* ?? */
-	map(0x85, 0x86).writeonly().share("stars_seed");    /* stars: rng seed (lo/hi) */
+//  map(0x84, 0x84).noprw(); // ??
+	map(0x85, 0x86).writeonly().share("stars_seed"); // stars: rng seed (lo/hi)
 	map(0x87, 0x87).r(FUNC(_25pacman_state::_25pacman_io_87_r)); // not eeprom on this
 	map(0x87, 0x87).nopw();
 //  map(0x88, 0x88).w(FUNC(_25pacman_state::ram_bank_select_w));
 	map(0x89, 0x89).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0x8a, 0x8a).writeonly().share("stars_ctrl");    /* stars: bits 3-4 = active set; bit 5 = enable */
+	map(0x8a, 0x8a).writeonly().share("stars_ctrl"); // stars: bits 3-4 = active set; bit 5 = enable
 	map(0x8b, 0x8b).writeonly().share("flip");
 	map(0x8c, 0x8c).nopw();
 	map(0x8f, 0x8f).w(FUNC(_25pacman_state::_20pacgal_coin_counter_w));
@@ -261,20 +261,20 @@ void _25pacman_state::_25pacman_io_map(address_map &map)
 void _20pacgal_state::_20pacgal_io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x3f).noprw(); /* Z180 internal registers */
-	map(0x40, 0x7f).noprw(); /* Z180 internal registers */
+	map(0x00, 0x3f).noprw(); // Z180 internal registers
+	map(0x40, 0x7f).noprw(); // Z180 internal registers
 	map(0x80, 0x80).portr("P1");
 	map(0x81, 0x81).portr("P2");
 	map(0x82, 0x82).portr("SERVICE");
 	map(0x80, 0x80).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x81, 0x81).w(FUNC(_20pacgal_state::timer_pulse_w));        /* ??? pulsed by the timer irq */
+	map(0x81, 0x81).w(FUNC(_20pacgal_state::timer_pulse_w)); // ??? pulsed by the timer irq
 	map(0x82, 0x82).w(FUNC(_20pacgal_state::irqack_w));
-	map(0x84, 0x84).noprw(); /* ?? */
-	map(0x85, 0x86).writeonly().share("stars_seed");    /* stars: rng seed (lo/hi) */
+	map(0x84, 0x84).noprw(); // ??
+	map(0x85, 0x86).writeonly().share("stars_seed"); // stars: rng seed (lo/hi)
 	map(0x87, 0x87).portr("EEPROMIN").portw("EEPROMOUT");
 	map(0x88, 0x88).w(FUNC(_20pacgal_state::ram_bank_select_w));
 	map(0x89, 0x89).w("dac", FUNC(dac_byte_interface::data_w));
-	map(0x8a, 0x8a).writeonly().share("stars_ctrl");    /* stars: bits 3-4 = active set; bit 5 = enable */
+	map(0x8a, 0x8a).writeonly().share("stars_ctrl"); // stars: bits 3-4 = active set; bit 5 = enable
 	map(0x8b, 0x8b).writeonly().share("flip");
 	map(0x8f, 0x8f).w(FUNC(_20pacgal_state::_20pacgal_coin_counter_w));
 }
@@ -335,7 +335,7 @@ static INPUT_PORTS_START( 20pacgal )
 INPUT_PORTS_END
 
 
-/* Note: 25pacman Control Panel functions the same as 20pacgal, even if Right P1/P2 start are not shown during Switch Test */
+// Note: 25pacman Control Panel functions the same as 20pacgal, even if Right P1/P2 start are not shown during Switch Test
 static INPUT_PORTS_START( 25pacman )
 	PORT_INCLUDE(20pacgal)
 
@@ -358,6 +358,7 @@ static INPUT_PORTS_START( 25pacmano )
 	PORT_MODIFY("EEPROMIN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -411,7 +412,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void _20pacgal_state::_20pacgal(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	Z8S180(config, m_maincpu, MAIN_CPU_CLOCK); // 18.432MHz verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &_20pacgal_state::_20pacgal_map);
 	m_maincpu->set_addrmap(AS_IO, &_20pacgal_state::_20pacgal_io_map);
@@ -427,10 +428,10 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	_20pacgal_video(config);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
 	namco_cus30_device &namco(NAMCO_CUS30(config, "namco", NAMCO_AUDIO_CLOCK));
@@ -452,7 +453,7 @@ void _25pacman_state::_25pacman(machine_config &config)
 {
 	_20pacgal(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &_25pacman_state::_25pacman_map);
 	m_maincpu->set_addrmap(AS_IO, &_25pacman_state::_25pacman_io_map);
 
@@ -470,18 +471,9 @@ void _25pacman_state::_25pacman(machine_config &config)
  *
  *************************************/
 
-
 /*
      Pacman - 25th Anniversary Edition
 */
-
-ROM_START( 25pacmano ) /* Revision 2.00 */
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "pacman_25th_rev2.0.u13", 0x00000, 0x40000, CRC(99a52784) SHA1(6222c2eb686e65ba23ca376ff4392be1bc826a03) ) /* Label printed Rev 2.0, program says Rev 2.00 */
-
-	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
-	ROM_LOAD( "pacman_25th.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) ) /* Same as the MS. Pacman / Galaga graphics rom */
-ROM_END
 
 // guzuta v2.2 PCB
 // this uses the main FLASH rom to save things instead of eeprom (type is AM29LV200)
@@ -495,6 +487,15 @@ ROM_START( 25pacman ) /* Revision 3.00 */
 	// shouldn't be loading this! must be uploaded somewhere
 	ROM_LOAD( "pacman_25th.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) )
 ROM_END
+
+ROM_START( 25pacmano ) /* Revision 2.00 */
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "pacman_25th_rev2.0.u13", 0x00000, 0x40000, CRC(99a52784) SHA1(6222c2eb686e65ba23ca376ff4392be1bc826a03) ) /* Label printed Rev 2.0, program says Rev 2.00 */
+
+	ROM_REGION( 0x8000, "proms", 0 )    /* palette */
+	ROM_LOAD( "pacman_25th.u14", 0x0000, 0x8000, CRC(c19d9ad0) SHA1(002581fbc2c32cdf7cfb0b0f64061591a462ec14) ) /* Same as the MS. Pacman / Galaga graphics rom */
+ROM_END
+
 
 /*
      Ms. Pac-Man/Galaga - 20th Anniversary Class of 1981 Reunion
@@ -550,15 +551,14 @@ ROM_END
 
 
 
-
 void _20pacgal_state::init_20pacgal()
 {
-	m_sprite_pal_base = 0x00<<2;
+	m_sprite_pal_base = 0x00 << 2;
 }
 
 void _20pacgal_state::init_25pacman()
 {
-	m_sprite_pal_base = 0x20<<2;
+	m_sprite_pal_base = 0x20 << 2;
 }
 
 
