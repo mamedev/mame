@@ -175,6 +175,7 @@ void _3do_state::nvarea_w(offs_t offset, uint8_t data) { m_nvmem[offset] = data;
 
 
 
+// TODO: this connects to Z85C30, with Mac LF-to-CR newline conversion
 /*
     I have no idea what piece of hardware this is. Possibly some kind of communication hardware using shift registers.
 
@@ -190,7 +191,7 @@ void _3do_state::nvarea_w(offs_t offset, uint8_t data) { m_nvmem[offset] = data;
     - write 0x0002 to shift register bit#1
     - dummy write to 03180000
     - read from shift register bits #0 and #1.
-    - check if data read equals 0x44696167 (=Diag)   If so, jump 302196c in default bios
+    - check if data read equals 0x44696167 (=Diag) PC=3021948  If so, jump 302196c in default bios
     - dummy read from shift register
     - write 0x0300 to shift register bit #0
     - dummy write to shift register
@@ -473,6 +474,7 @@ void _3do_state::madam_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 		logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", m_maincpu->pc(), offset*4, data, mem_mask );
 
 	switch( offset ) {
+	// echo for terminal?
 	case 0x0000/4:
 		if(data == 0x0a)
 			printf("\n");
@@ -501,6 +503,8 @@ void _3do_state::madam_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 		m_madam.diag = 1;
 		break;
 
+	// 0x0044: Anvil "feature"
+
 	/* CEL */
 	case 0x0100/4:  /* 03300100 - SPRSTRT - Start the CEL engine (W) */
 	case 0x0104/4:  /* 03300104 - SPRSTOP - Stop the CEL engine (W) */
@@ -516,17 +520,22 @@ void _3do_state::madam_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 
 	/* Regis */
 	case 0x0130/4:
+		// Regis control word
 		m_madam.regctl0 = data;
 		break;
 	case 0x0134/4:
+		// X and Y clip values
 		m_madam.regctl1 = data;
 		break;
 	case 0x0138/4:
+		// Read base address
 		m_madam.regctl2 = data;
 		break;
 	case 0x013c/4:
+		// write base address
 		m_madam.regctl3 = data;
 		break;
+	// Regis shape
 	case 0x0140/4:
 		m_madam.xyposh = data;
 		break;
@@ -552,7 +561,7 @@ void _3do_state::madam_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 		m_madam.ddxyl = data;
 		break;
 
-	/* Pip */
+	/* PIP: Pen Index Palette (or PLT: Palette Look-up Table) */
 	case 0x0180/4: case 0x0184/4: case 0x0188/4: case 0x018c/4:
 	case 0x0190/4: case 0x0194/4: case 0x0198/4: case 0x019c/4:
 	case 0x01a0/4: case 0x01a4/4: case 0x01a8/4: case 0x01ac/4:
@@ -560,11 +569,12 @@ void _3do_state::madam_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 		m_madam.pip[offset & 0x0f] = data;
 		break;
 
-	/* Fence */
+	/* Fence FIFO */
 	case 0x0200/4: case 0x0204/4: case 0x0208/4: case 0x020c/4:
 	case 0x0210/4: case 0x0214/4: case 0x0218/4: case 0x021c/4:
 	case 0x0220/4: case 0x0224/4: case 0x0228/4: case 0x022c/4:
 	case 0x0230/4: case 0x0234/4: case 0x0238/4: case 0x023c/4:
+		// TODO: 0x20 values
 		m_madam.fence[offset & 0x0f] = data;
 		break;
 
@@ -766,6 +776,7 @@ uint32_t _3do_state::clio_r(offs_t offset)
 	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
 		return m_clio.poll;
 
+	// TODO: different device, split
 	case 0xc000/4:
 		return m_clio.unclerev;
 	case 0xc004/4:
@@ -1014,6 +1025,7 @@ void _3do_state::clio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		//printf("%08x\n",data);
 		break;
 
+	// TODO: different device, split
 	case 0xc000/4:
 	case 0xc004/4:
 	case 0xc00c/4:

@@ -14,7 +14,7 @@ Processors:
 - Super Fast BUS Speed (50 Megabytes per second)
 - Math Co-Processor custom designed by NTG for accelerating fixed-point
   matrix operations (_not_ the ARM FPA)
-- Multitaking 32-bit operating system
+- Multitasking 32-bit operating system
 
 Resolution:
 - 640x480 pixel resolution
@@ -111,12 +111,20 @@ void _3do_state::main_mem(address_map &map)
 	map(0x00000000, 0x001FFFFF).bankrw(m_bank1);                                       /* DRAM */
 	map(0x00200000, 0x003FFFFF).ram().share(m_vram);                                   /* VRAM */
 	map(0x03000000, 0x030FFFFF).rom().region("bios", 0);                               /* BIOS */
+	// slow bus
 	map(0x03100000, 0x0313FFFF).ram();                                                 /* Brooktree? */
 	map(0x03140000, 0x0315FFFF).rw(FUNC(_3do_state::nvarea_r), FUNC(_3do_state::nvarea_w)).umask32(0x000000ff);                /* NVRAM */
 	map(0x03180000, 0x031BFFFF).rw(FUNC(_3do_state::slow2_r), FUNC(_3do_state::slow2_w));               /* Slow bus - additional expansion */
+	// Sport
 	map(0x03200000, 0x0320FFFF).rw(FUNC(_3do_state::svf_r), FUNC(_3do_state::svf_w));                   /* special vram access1 */
 	map(0x03300000, 0x033FFFFF).rw(FUNC(_3do_state::madam_r), FUNC(_3do_state::madam_w));               /* address decoder */
-	map(0x03400000, 0x034FFFFF).rw(FUNC(_3do_state::clio_r), FUNC(_3do_state::clio_w));                 /* io controller */
+	map(0x03400000, 0x0340FFFF).rw(FUNC(_3do_state::clio_r), FUNC(_3do_state::clio_w));                 /* io controller */
+//  map(0x0340c000, 0x0340ffff) Uncle
+//  map(0x03600000, 0x037fffff) trace
+//      map(0x03700000, 0x037effff) SRAM
+//      map(0x037fff00, 0x037fff0b) link data/address/FIFO
+//      map(0x037fff0c, 0x037fff0f) joysticks
+//  map(0x03800000, 0x03??????) trace big RAM
 }
 
 
@@ -157,7 +165,7 @@ void _3do_state::machine_reset()
 void _3do_state::_3do(machine_config &config)
 {
 	/* Basic machine hardware */
-	ARM7_BE(config, m_maincpu, XTAL(50'000'000)/4);
+	ARM7_BE(config, m_maincpu, XTAL(50'000'000)/4); // DA86C06020XV
 	m_maincpu->set_addrmap(AS_PROGRAM, &_3do_state::main_mem);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
