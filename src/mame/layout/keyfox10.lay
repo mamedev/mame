@@ -3,8 +3,11 @@
 license:BSD-3-Clause
 copyright-holders:Draft
 
-Wersi Keyfox 10 - 3-digit 7-segment display and beat LEDs layout
-Hardware: 3x 74HC164 shift registers for display, 1x 74HC164 for beat LEDs
+Wersi Keyfox 10 - Full panel layout
+- 3-digit 7-segment display (IC7, IC6, IC10)
+- 8 beat LEDs (IC9)
+- 80 panel button LEDs (10x 74HC574: IC8, IC12, IC13, IC15, IC14, IC16, IC17, IC1, IC3, IC2)
+- 16 keyboard matrix buttons (2x 74HC251: IC4, IC11)
 -->
 <mamelayout version="2">
 	<!-- 7-segment LED display element (red/orange LED color) -->
@@ -34,6 +37,26 @@ Hardware: 3x 74HC164 shift registers for display, 1x 74HC164 for beat LEDs
 		</disk>
 	</element>
 
+	<!-- Panel LED element (red) -->
+	<element name="panel_led" defstate="0">
+		<disk state="1">
+			<color red="1.0" green="0.1" blue="0.1" />
+		</disk>
+		<disk state="0">
+			<color red="0.15" green="0.015" blue="0.015" />
+		</disk>
+	</element>
+
+	<!-- Button indicator (blue, for keyboard matrix) -->
+	<element name="button" defstate="0">
+		<rect state="1">
+			<color red="0.2" green="0.4" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.05" green="0.1" blue="0.2" />
+		</rect>
+	</element>
+
 	<!-- Background panel -->
 	<element name="background">
 		<rect>
@@ -41,83 +64,240 @@ Hardware: 3x 74HC164 shift registers for display, 1x 74HC164 for beat LEDs
 		</rect>
 	</element>
 
-	<!-- Label text -->
-	<element name="label_tempo">
-		<text string="TEMPO">
-			<color red="0.8" green="0.8" blue="0.8" />
-		</text>
+	<!-- Section background -->
+	<element name="section_bg">
+		<rect>
+			<color red="0.15" green="0.15" blue="0.15" />
+		</rect>
 	</element>
 
-	<element name="label_beat">
-		<text string="BEAT">
-			<color red="0.8" green="0.8" blue="0.8" />
-		</text>
-	</element>
+	<!-- Label text elements -->
+	<element name="label_tempo"><text string="TEMPO"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="label_beat"><text string="BEAT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="label_panel"><text string="PANEL (10x8)"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="label_kbd"><text string="KBD"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 
-	<view name="Display">
+	<!-- IC labels for panel -->
+	<element name="label_ic8"><text string="IC8"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="label_ic12"><text string="IC12"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="label_ic13"><text string="IC13"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="label_ic15"><text string="IC15"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="label_ic14"><text string="IC14"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="label_ic16"><text string="IC16"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="label_ic17"><text string="IC17"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="label_ic1"><text string="IC1"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="label_ic3"><text string="IC3"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="label_ic2"><text string="IC2"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="label_ic4"><text string="IC4"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="label_ic11"><text string="IC11"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+
+	<view name="Full Panel">
 		<!-- Dark background -->
 		<element ref="background">
-			<bounds x="0" y="0" width="200" height="100" />
+			<bounds x="0" y="0" width="400" height="220" />
 		</element>
 
-		<!-- TEMPO label -->
+		<!-- === 7-SEGMENT DISPLAY SECTION === -->
+		<element ref="section_bg">
+			<bounds x="5" y="5" width="150" height="70" />
+		</element>
 		<element ref="label_tempo">
-			<bounds x="55" y="2" width="50" height="10" />
+			<bounds x="50" y="8" width="50" height="10" />
 		</element>
 
 		<!-- DISPLAY1 (left) - IC7 -->
 		<element name="digit0" ref="digit">
-			<bounds x="15" y="15" width="35" height="46" />
+			<bounds x="15" y="20" width="30" height="40" />
 		</element>
 		<element name="dp0" ref="dp">
-			<bounds x="52" y="55" width="6" height="6" />
+			<bounds x="47" y="55" width="5" height="5" />
 		</element>
 
 		<!-- DISPLAY2 (middle) - IC6 -->
 		<element name="digit1" ref="digit">
-			<bounds x="62" y="15" width="35" height="46" />
+			<bounds x="58" y="20" width="30" height="40" />
 		</element>
 		<element name="dp1" ref="dp">
-			<bounds x="99" y="55" width="6" height="6" />
+			<bounds x="90" y="55" width="5" height="5" />
 		</element>
 
 		<!-- DISPLAY3 (right) - IC10 -->
 		<element name="digit2" ref="digit">
-			<bounds x="109" y="15" width="35" height="46" />
+			<bounds x="101" y="20" width="30" height="40" />
 		</element>
 		<element name="dp2" ref="dp">
-			<bounds x="146" y="55" width="6" height="6" />
+			<bounds x="133" y="55" width="5" height="5" />
 		</element>
 
-		<!-- BEAT label -->
+		<!-- === BEAT LED SECTION === -->
+		<element ref="section_bg">
+			<bounds x="160" y="5" width="235" height="70" />
+		</element>
 		<element ref="label_beat">
-			<bounds x="75" y="68" width="50" height="10" />
+			<bounds x="255" y="8" width="40" height="10" />
 		</element>
 
 		<!-- Beat LEDs (8 LEDs in a row) - IC9 -->
-		<element name="beat0" ref="beat_led">
-			<bounds x="15" y="82" width="12" height="12" />
+		<element name="beat0" ref="beat_led"><bounds x="170" y="30" width="20" height="20" /></element>
+		<element name="beat1" ref="beat_led"><bounds x="195" y="30" width="20" height="20" /></element>
+		<element name="beat2" ref="beat_led"><bounds x="220" y="30" width="20" height="20" /></element>
+		<element name="beat3" ref="beat_led"><bounds x="245" y="30" width="20" height="20" /></element>
+		<element name="beat4" ref="beat_led"><bounds x="270" y="30" width="20" height="20" /></element>
+		<element name="beat5" ref="beat_led"><bounds x="295" y="30" width="20" height="20" /></element>
+		<element name="beat6" ref="beat_led"><bounds x="320" y="30" width="20" height="20" /></element>
+		<element name="beat7" ref="beat_led"><bounds x="345" y="30" width="20" height="20" /></element>
+
+		<!-- === PANEL LED SECTION (10 columns x 8 rows) === -->
+		<element ref="section_bg">
+			<bounds x="5" y="80" width="330" height="135" />
 		</element>
-		<element name="beat1" ref="beat_led">
-			<bounds x="35" y="82" width="12" height="12" />
+		<element ref="label_panel">
+			<bounds x="130" y="83" width="80" height="10" />
 		</element>
-		<element name="beat2" ref="beat_led">
-			<bounds x="55" y="82" width="12" height="12" />
+
+		<!-- IC labels (columns) -->
+		<element ref="label_ic8"><bounds x="12" y="95" width="25" height="8" /></element>
+		<element ref="label_ic12"><bounds x="42" y="95" width="25" height="8" /></element>
+		<element ref="label_ic13"><bounds x="72" y="95" width="25" height="8" /></element>
+		<element ref="label_ic15"><bounds x="102" y="95" width="25" height="8" /></element>
+		<element ref="label_ic14"><bounds x="132" y="95" width="25" height="8" /></element>
+		<element ref="label_ic16"><bounds x="162" y="95" width="25" height="8" /></element>
+		<element ref="label_ic17"><bounds x="192" y="95" width="25" height="8" /></element>
+		<element ref="label_ic1"><bounds x="222" y="95" width="25" height="8" /></element>
+		<element ref="label_ic3"><bounds x="252" y="95" width="25" height="8" /></element>
+		<element ref="label_ic2"><bounds x="282" y="95" width="25" height="8" /></element>
+
+		<!-- Panel LEDs: 10 columns (IC8-IC2) x 8 rows (bits 0-7) -->
+		<!-- Column 0 (IC8) -->
+		<element name="panel0_0" ref="panel_led"><bounds x="15" y="105" width="12" height="12" /></element>
+		<element name="panel0_1" ref="panel_led"><bounds x="15" y="118" width="12" height="12" /></element>
+		<element name="panel0_2" ref="panel_led"><bounds x="15" y="131" width="12" height="12" /></element>
+		<element name="panel0_3" ref="panel_led"><bounds x="15" y="144" width="12" height="12" /></element>
+		<element name="panel0_4" ref="panel_led"><bounds x="15" y="157" width="12" height="12" /></element>
+		<element name="panel0_5" ref="panel_led"><bounds x="15" y="170" width="12" height="12" /></element>
+		<element name="panel0_6" ref="panel_led"><bounds x="15" y="183" width="12" height="12" /></element>
+		<element name="panel0_7" ref="panel_led"><bounds x="15" y="196" width="12" height="12" /></element>
+
+		<!-- Column 1 (IC12) -->
+		<element name="panel1_0" ref="panel_led"><bounds x="45" y="105" width="12" height="12" /></element>
+		<element name="panel1_1" ref="panel_led"><bounds x="45" y="118" width="12" height="12" /></element>
+		<element name="panel1_2" ref="panel_led"><bounds x="45" y="131" width="12" height="12" /></element>
+		<element name="panel1_3" ref="panel_led"><bounds x="45" y="144" width="12" height="12" /></element>
+		<element name="panel1_4" ref="panel_led"><bounds x="45" y="157" width="12" height="12" /></element>
+		<element name="panel1_5" ref="panel_led"><bounds x="45" y="170" width="12" height="12" /></element>
+		<element name="panel1_6" ref="panel_led"><bounds x="45" y="183" width="12" height="12" /></element>
+		<element name="panel1_7" ref="panel_led"><bounds x="45" y="196" width="12" height="12" /></element>
+
+		<!-- Column 2 (IC13) -->
+		<element name="panel2_0" ref="panel_led"><bounds x="75" y="105" width="12" height="12" /></element>
+		<element name="panel2_1" ref="panel_led"><bounds x="75" y="118" width="12" height="12" /></element>
+		<element name="panel2_2" ref="panel_led"><bounds x="75" y="131" width="12" height="12" /></element>
+		<element name="panel2_3" ref="panel_led"><bounds x="75" y="144" width="12" height="12" /></element>
+		<element name="panel2_4" ref="panel_led"><bounds x="75" y="157" width="12" height="12" /></element>
+		<element name="panel2_5" ref="panel_led"><bounds x="75" y="170" width="12" height="12" /></element>
+		<element name="panel2_6" ref="panel_led"><bounds x="75" y="183" width="12" height="12" /></element>
+		<element name="panel2_7" ref="panel_led"><bounds x="75" y="196" width="12" height="12" /></element>
+
+		<!-- Column 3 (IC15) -->
+		<element name="panel3_0" ref="panel_led"><bounds x="105" y="105" width="12" height="12" /></element>
+		<element name="panel3_1" ref="panel_led"><bounds x="105" y="118" width="12" height="12" /></element>
+		<element name="panel3_2" ref="panel_led"><bounds x="105" y="131" width="12" height="12" /></element>
+		<element name="panel3_3" ref="panel_led"><bounds x="105" y="144" width="12" height="12" /></element>
+		<element name="panel3_4" ref="panel_led"><bounds x="105" y="157" width="12" height="12" /></element>
+		<element name="panel3_5" ref="panel_led"><bounds x="105" y="170" width="12" height="12" /></element>
+		<element name="panel3_6" ref="panel_led"><bounds x="105" y="183" width="12" height="12" /></element>
+		<element name="panel3_7" ref="panel_led"><bounds x="105" y="196" width="12" height="12" /></element>
+
+		<!-- Column 4 (IC14) -->
+		<element name="panel4_0" ref="panel_led"><bounds x="135" y="105" width="12" height="12" /></element>
+		<element name="panel4_1" ref="panel_led"><bounds x="135" y="118" width="12" height="12" /></element>
+		<element name="panel4_2" ref="panel_led"><bounds x="135" y="131" width="12" height="12" /></element>
+		<element name="panel4_3" ref="panel_led"><bounds x="135" y="144" width="12" height="12" /></element>
+		<element name="panel4_4" ref="panel_led"><bounds x="135" y="157" width="12" height="12" /></element>
+		<element name="panel4_5" ref="panel_led"><bounds x="135" y="170" width="12" height="12" /></element>
+		<element name="panel4_6" ref="panel_led"><bounds x="135" y="183" width="12" height="12" /></element>
+		<element name="panel4_7" ref="panel_led"><bounds x="135" y="196" width="12" height="12" /></element>
+
+		<!-- Column 5 (IC16) -->
+		<element name="panel5_0" ref="panel_led"><bounds x="165" y="105" width="12" height="12" /></element>
+		<element name="panel5_1" ref="panel_led"><bounds x="165" y="118" width="12" height="12" /></element>
+		<element name="panel5_2" ref="panel_led"><bounds x="165" y="131" width="12" height="12" /></element>
+		<element name="panel5_3" ref="panel_led"><bounds x="165" y="144" width="12" height="12" /></element>
+		<element name="panel5_4" ref="panel_led"><bounds x="165" y="157" width="12" height="12" /></element>
+		<element name="panel5_5" ref="panel_led"><bounds x="165" y="170" width="12" height="12" /></element>
+		<element name="panel5_6" ref="panel_led"><bounds x="165" y="183" width="12" height="12" /></element>
+		<element name="panel5_7" ref="panel_led"><bounds x="165" y="196" width="12" height="12" /></element>
+
+		<!-- Column 6 (IC17) -->
+		<element name="panel6_0" ref="panel_led"><bounds x="195" y="105" width="12" height="12" /></element>
+		<element name="panel6_1" ref="panel_led"><bounds x="195" y="118" width="12" height="12" /></element>
+		<element name="panel6_2" ref="panel_led"><bounds x="195" y="131" width="12" height="12" /></element>
+		<element name="panel6_3" ref="panel_led"><bounds x="195" y="144" width="12" height="12" /></element>
+		<element name="panel6_4" ref="panel_led"><bounds x="195" y="157" width="12" height="12" /></element>
+		<element name="panel6_5" ref="panel_led"><bounds x="195" y="170" width="12" height="12" /></element>
+		<element name="panel6_6" ref="panel_led"><bounds x="195" y="183" width="12" height="12" /></element>
+		<element name="panel6_7" ref="panel_led"><bounds x="195" y="196" width="12" height="12" /></element>
+
+		<!-- Column 7 (IC1) -->
+		<element name="panel7_0" ref="panel_led"><bounds x="225" y="105" width="12" height="12" /></element>
+		<element name="panel7_1" ref="panel_led"><bounds x="225" y="118" width="12" height="12" /></element>
+		<element name="panel7_2" ref="panel_led"><bounds x="225" y="131" width="12" height="12" /></element>
+		<element name="panel7_3" ref="panel_led"><bounds x="225" y="144" width="12" height="12" /></element>
+		<element name="panel7_4" ref="panel_led"><bounds x="225" y="157" width="12" height="12" /></element>
+		<element name="panel7_5" ref="panel_led"><bounds x="225" y="170" width="12" height="12" /></element>
+		<element name="panel7_6" ref="panel_led"><bounds x="225" y="183" width="12" height="12" /></element>
+		<element name="panel7_7" ref="panel_led"><bounds x="225" y="196" width="12" height="12" /></element>
+
+		<!-- Column 8 (IC3) -->
+		<element name="panel8_0" ref="panel_led"><bounds x="255" y="105" width="12" height="12" /></element>
+		<element name="panel8_1" ref="panel_led"><bounds x="255" y="118" width="12" height="12" /></element>
+		<element name="panel8_2" ref="panel_led"><bounds x="255" y="131" width="12" height="12" /></element>
+		<element name="panel8_3" ref="panel_led"><bounds x="255" y="144" width="12" height="12" /></element>
+		<element name="panel8_4" ref="panel_led"><bounds x="255" y="157" width="12" height="12" /></element>
+		<element name="panel8_5" ref="panel_led"><bounds x="255" y="170" width="12" height="12" /></element>
+		<element name="panel8_6" ref="panel_led"><bounds x="255" y="183" width="12" height="12" /></element>
+		<element name="panel8_7" ref="panel_led"><bounds x="255" y="196" width="12" height="12" /></element>
+
+		<!-- Column 9 (IC2) -->
+		<element name="panel9_0" ref="panel_led"><bounds x="285" y="105" width="12" height="12" /></element>
+		<element name="panel9_1" ref="panel_led"><bounds x="285" y="118" width="12" height="12" /></element>
+		<element name="panel9_2" ref="panel_led"><bounds x="285" y="131" width="12" height="12" /></element>
+		<element name="panel9_3" ref="panel_led"><bounds x="285" y="144" width="12" height="12" /></element>
+		<element name="panel9_4" ref="panel_led"><bounds x="285" y="157" width="12" height="12" /></element>
+		<element name="panel9_5" ref="panel_led"><bounds x="285" y="170" width="12" height="12" /></element>
+		<element name="panel9_6" ref="panel_led"><bounds x="285" y="183" width="12" height="12" /></element>
+		<element name="panel9_7" ref="panel_led"><bounds x="285" y="196" width="12" height="12" /></element>
+
+		<!-- === KEYBOARD MATRIX SECTION (2 columns x 8 rows) === -->
+		<element ref="section_bg">
+			<bounds x="340" y="80" width="55" height="135" />
 		</element>
-		<element name="beat3" ref="beat_led">
-			<bounds x="75" y="82" width="12" height="12" />
+		<element ref="label_kbd">
+			<bounds x="355" y="83" width="25" height="10" />
 		</element>
-		<element name="beat4" ref="beat_led">
-			<bounds x="95" y="82" width="12" height="12" />
-		</element>
-		<element name="beat5" ref="beat_led">
-			<bounds x="115" y="82" width="12" height="12" />
-		</element>
-		<element name="beat6" ref="beat_led">
-			<bounds x="135" y="82" width="12" height="12" />
-		</element>
-		<element name="beat7" ref="beat_led">
-			<bounds x="155" y="82" width="12" height="12" />
-		</element>
+
+		<!-- IC labels -->
+		<element ref="label_ic4"><bounds x="342" y="95" width="25" height="8" /></element>
+		<element ref="label_ic11"><bounds x="367" y="95" width="25" height="8" /></element>
+
+		<!-- Column IC4 (keyboard matrix buttons - visual only, no outputs) -->
+		<element ref="button"><bounds x="345" y="105" width="12" height="12" /></element>
+		<element ref="button"><bounds x="345" y="118" width="12" height="12" /></element>
+		<element ref="button"><bounds x="345" y="131" width="12" height="12" /></element>
+		<element ref="button"><bounds x="345" y="144" width="12" height="12" /></element>
+		<element ref="button"><bounds x="345" y="157" width="12" height="12" /></element>
+		<element ref="button"><bounds x="345" y="170" width="12" height="12" /></element>
+		<element ref="button"><bounds x="345" y="183" width="12" height="12" /></element>
+		<element ref="button"><bounds x="345" y="196" width="12" height="12" /></element>
+
+		<!-- Column IC11 (keyboard matrix buttons - visual only, no outputs) -->
+		<element ref="button"><bounds x="370" y="105" width="12" height="12" /></element>
+		<element ref="button"><bounds x="370" y="118" width="12" height="12" /></element>
+		<element ref="button"><bounds x="370" y="131" width="12" height="12" /></element>
+		<element ref="button"><bounds x="370" y="144" width="12" height="12" /></element>
+		<element ref="button"><bounds x="370" y="157" width="12" height="12" /></element>
+		<element ref="button"><bounds x="370" y="170" width="12" height="12" /></element>
+		<element ref="button"><bounds x="370" y="183" width="12" height="12" /></element>
+		<element ref="button"><bounds x="370" y="196" width="12" height="12" /></element>
 	</view>
 </mamelayout>

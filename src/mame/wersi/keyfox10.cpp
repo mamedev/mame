@@ -172,10 +172,16 @@ private:
     // 10x 74HC574 shift registers for button panel (80 buttons with LEDs)
     // Chain: IC8 -> IC12 -> IC13 -> IC15 -> IC14 -> IC16 -> IC17 -> IC1 -> IC3 -> IC2
     // Uses CLK_LED for both LED display and button scanning
-    u8 m_panel_sr[10] = {};   // Panel shift register chain (80 bits) - LED and scan
-    u8 m_btn_state[10] = {};  // Current button states from inputs (80 buttons)
+    // 74HC574 has separate shift register and latched outputs:
+    // - Shift register: continuously shifted via CLK_LED
+    // - Latched outputs: captured from shift register on ENABLE rising edge
+    u8 m_panel_sr[10] = {};        // Shift register chain (80 bits) - for shifting
+    u8 m_panel_latch[10] = {};     // Latched outputs (80 bits) - drives LEDs
+    u8 m_btn_state[10] = {};       // Current button states from inputs (80 buttons)
 
-    void panel_shift_clock(); // CLK_LED rising edge handler for button panel
+    void panel_shift_clock();      // CLK_LED rising edge handler
+    void panel_latch();            // ENABLE rising edge - latch shift reg to outputs
+    void update_panel_leds();      // Update MAME panel LED outputs from latched state
 
     // CLK_SW keyboard matrix: 4x 74HC175 + 2x 74HC251 multiplexers
     // 74HC175 shift register chain provides select address for 74HC251 muxes
@@ -361,7 +367,15 @@ void keyfox10_state::port1_w(u8 data)
         beat_shift_clock();
     }
 
+    // Update m_port1 before checking MODE-dependent updates
     m_port1 = data;
+
+    // ENABLE rising edge: latch panel shift register to LED outputs
+    // Also update when MODE changes (LEDs only light when MODE=0)
+    if ((rising & P1_ENABLE) || (changed & P1_MODE))
+    {
+        update_panel_leds();
+    }
 }
 
 void keyfox10_state::port2_w(u8 data)
@@ -425,6 +439,28 @@ void keyfox10_state::update_display()
     for (int i = 0; i < 8; i++)
     {
         m_beat_leds[i] = BIT(m_beat_sr, i);
+    }
+}
+
+void keyfox10_state::update_panel_leds()
+{
+    // Update panel LEDs from shift register chain (active-high)
+    // 10 ICs × 8 bits = 80 LEDs
+    //
+    // Hardware: LEDs only physically light when MODE=0 (Q2 PNP powers LEDs)
+    // MODE toggles rapidly for button scanning. Only update LED outputs when
+    // MODE=0 to avoid flickering - keeps previous state during sense mode.
+    bool mode = (m_port1 & P1_MODE) != 0;
+
+    if (mode)
+        return;  // Don't update during sense mode - keep previous LED state
+
+    for (int ic = 0; ic < 10; ic++)
+    {
+        for (int bit = 0; bit < 8; bit++)
+        {
+            m_panel_leds[ic][bit] = BIT(m_panel_sr[ic], bit);
+        }
     }
 }
 
@@ -778,7 +814,9 @@ void keyfox10_state::machine_start()
     m_digits.resolve();
     m_digit_dp.resolve();
     m_beat_leds.resolve();
+    m_panel_leds.resolve();
     update_display();
+    update_panel_leds();
 }
 
 void keyfox10_state::dump_sam_memory() const
