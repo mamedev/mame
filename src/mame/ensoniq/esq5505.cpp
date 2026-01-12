@@ -836,8 +836,8 @@ void esq5505_state::eps(machine_config &config)
 	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
 	m_dmac->irq_callback().set_inputline(m_maincpu, M68K_IRQ_2);
-	m_dmac->dma_read<0>().set(m_fdc, FUNC(wd1772_device::data_r));  // ch 0 = fdc, ch 1 = 340001 (ADC?)
-	m_dmac->dma_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
+	m_dmac->dma8_read<0>().set(m_fdc, FUNC(wd1772_device::data_r));  // ch 0 = fdc, ch 1 = 340001 (ADC?)
+	m_dmac->dma8_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
 }
 
 void esq5505_state::vfxsd(machine_config &config, int panel_type)
