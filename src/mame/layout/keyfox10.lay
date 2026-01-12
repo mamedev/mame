@@ -143,6 +143,16 @@ Wersi Keyfox 10 - Full panel layout with interactive buttons
 	<element name="label_tempo"><text string="TEMPO"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="label_beat"><text string="BEAT"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 
+	<!-- Row labels -->
+	<element name="txt_row0"><text string="0"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="txt_row1"><text string="1"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="txt_row2"><text string="2"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="txt_row3"><text string="3"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="txt_row4"><text string="4"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="txt_row5"><text string="5"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="txt_row6"><text string="6"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+	<element name="txt_row7"><text string="7"><color red="0.5" green="0.5" blue="0.5" /></text></element>
+
 	<view name="Full Panel">
 		<element ref="background"><bounds x="0" y="0" width="620" height="210" /></element>
 
@@ -502,21 +512,13 @@ Wersi Keyfox 10 - Full panel layout with interactive buttons
 		<element ref="txt_revm"><bounds x="562" y="171" width="36" height="10" /></element>
 
 		<!-- Row labels -->
-		<element name="txt_row0"><text string="0"><color red="0.5" green="0.5" blue="0.5" /></text></element>
 		<element ref="txt_row0"><bounds x="600" y="80" width="10" height="10" /></element>
-		<element name="txt_row1"><text string="1"><color red="0.5" green="0.5" blue="0.5" /></text></element>
 		<element ref="txt_row1"><bounds x="600" y="93" width="10" height="10" /></element>
-		<element name="txt_row2"><text string="2"><color red="0.5" green="0.5" blue="0.5" /></text></element>
 		<element ref="txt_row2"><bounds x="600" y="106" width="10" height="10" /></element>
-		<element name="txt_row3"><text string="3"><color red="0.5" green="0.5" blue="0.5" /></text></element>
 		<element ref="txt_row3"><bounds x="600" y="119" width="10" height="10" /></element>
-		<element name="txt_row4"><text string="4"><color red="0.5" green="0.5" blue="0.5" /></text></element>
 		<element ref="txt_row4"><bounds x="600" y="132" width="10" height="10" /></element>
-		<element name="txt_row5"><text string="5"><color red="0.5" green="0.5" blue="0.5" /></text></element>
 		<element ref="txt_row5"><bounds x="600" y="145" width="10" height="10" /></element>
-		<element name="txt_row6"><text string="6"><color red="0.5" green="0.5" blue="0.5" /></text></element>
 		<element ref="txt_row6"><bounds x="600" y="158" width="10" height="10" /></element>
-		<element name="txt_row7"><text string="7"><color red="0.5" green="0.5" blue="0.5" /></text></element>
 		<element ref="txt_row7"><bounds x="600" y="171" width="10" height="10" /></element>
 	</view>
 </mamelayout>

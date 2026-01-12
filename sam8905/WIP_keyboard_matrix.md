@@ -14,20 +14,22 @@ Started: 2026-01-11
 
 ```
 DATA ──▶ IC5 ──▶ IC5 ──▶ IC5 ──▶ IC5    (4x 74HC175 quad D-flip-flops)
-         │       │       │       │
-         └───────┴───────┴───────┘
-                 │
-         SELA, SELB, SELC (3-bit select)
-                 │
-         ┌───────┴───────┐
-         ▼               ▼
-        IC4             IC11
-     74HC251          74HC251
-   (8:1 mux)        (8:1 mux)
-         │               │
-         └───────┬───────┘
-                 ▼
-             SWSENSE
+  │      │       │       │       │       ~CLR ◀── ~MODE
+  │      └───────┴───────┴───────┘
+  │              │
+  │      Bits 0-2: SELA, SELB, SELC (3-bit input select)
+  │      Bit 3: STRB select (0=IC4, 1=IC11)
+  │              │
+  │      ┌───────┴───────┐
+  │      ▼               ▼
+  │     IC4             IC11
+  │  74HC251          74HC251
+  │  (8:1 mux)        (8:1 mux)
+  │   STRB=~bit3       STRB=bit3
+  │      │               │
+  │      └───────┬───────┘
+  │              ▼
+  └─────────▶ SWSENSE (active-low)
 ```
 
 ### Shift Register Chain (4x 74HC175)
@@ -35,34 +37,39 @@ DATA ──▶ IC5 ──▶ IC5 ──▶ IC5 ──▶ IC5    (4x 74HC175 quad
 - **IC5** (x4) - 74HC175 Quad D-type flip-flops
 - Clocked by **CLK_SW** (P1.0)
 - DATA input from **P1.6**
+- **~CLR** receives ~MODE (MODE=1 clears registers, MODE=0 enables)
 - Forms a 16-bit shift register (4 chips × 4 bits each)
-- Outputs provide SELA, SELB, SELC select lines for multiplexers
+- Output bit mapping:
+  - **Bits 0-2** (SELA, SELB, SELC): Select which of 8 inputs on the mux
+  - **Bit 3** → STRB (~OE): Select which mux is enabled
+    - Bit 3 = 0: IC4 enabled, IC11 disabled
+    - Bit 3 = 1: IC4 disabled, IC11 enabled
 
 ### Multiplexers (74HC251)
 
-**IC4 - 74HC251** (8-to-1 multiplexer):
-| Input | Switch | Function    |
-|-------|--------|-------------|
-| D0    | T9     | RHYTHM-     |
-| D1    | T10    | RHYTHM+     |
-| D2    | T33    | ACC+        |
-| D3    | T32    | ACC-        |
-| D4    | T55    | TEMPO+      |
-| D5    | T54    | TEMPO-      |
-| D6    | T73    | START/S     |
-| D7    | -      | (unused?)   |
+**IC4 - 74HC251** (8-to-1 multiplexer) - STRB = ~bit3:
+| Input | Switch | Function    | Key   |
+|-------|--------|-------------|-------|
+| D0    | -      | (unused)    |       |
+| D1    | T9     | RHYTHM-     | Q     |
+| D2    | T10    | RHYTHM+     | W     |
+| D3    | T33    | ACC+        | E     |
+| D4    | T32    | ACC-        | R     |
+| D5    | T55    | TEMPO+      | A     |
+| D6    | T54    | TEMPO-      | S     |
+| D7    | T73    | START/S     | D     |
 
-**IC11 - 74HC251** (8-to-1 multiplexer):
-| Input | Switch | Function    |
-|-------|--------|-------------|
-| D0    | T12    | UPPER+      |
-| D1    | T11    | UPPER-      |
-| D2    | T34    | LOWER-      |
-| D3    | T35    | LOWER+      |
-| D4    | T59    | BASS-       |
-| D5    | T60    | BASS+       |
-| D6    | -      | (unused?)   |
-| D7    | -      | (unused?)   |
+**IC11 - 74HC251** (8-to-1 multiplexer) - STRB = bit3:
+| Input | Switch | Function    | Key   |
+|-------|--------|-------------|-------|
+| D0    | T12    | UPPER+      | H     |
+| D1    | T11    | UPPER-      | J     |
+| D2    | T34    | LOWER-      | K     |
+| D3    | T35    | LOWER+      | L     |
+| D4    | T59    | BASS-       | F     |
+| D5    | T60    | BASS+       | G     |
+| D6    | -      | (unused)    |       |
+| D7    | -      | (unused)    |       |
 
 ### Control Signals
 

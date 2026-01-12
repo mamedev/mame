@@ -31,9 +31,37 @@ Total: 80 buttons with corresponding LEDs
 | CLK_LED   | P1.2 | Out       | Clock signal - shifts data through chain       |
 | ENABLE    | P1.4 | Out       | Latch enable - transfers shift register to outputs |
 | MODE      | P1.5 | Out       | Mode control (HIGH = sense mode)               |
-| SENSE     | P1.7 | In        | Input to detect button press when outputs float |
+| SENSE     | P1.7 | In        | Combined sense input (NAND gate logic)          |
 
 **Note:** CLK_SW (P1.0) is used for a different input section (keyboard matrix - to be documented separately).
+
+### SENSE Signal Logic
+
+The SENSE signal combines LED panel sense and keyboard matrix sense via NAND gates:
+
+```
+SENSE = NAND(NAND(MODE, LED_SENSE), SW_SENSE)
+      = (MODE & LED_SENSE) | ~SW_SENSE
+```
+
+**Hardware details:**
+- **Q2 (BC640 PNP)**: MODE controls transistor that powers LEDs
+  - MODE=0: Q2 ON, +LED powered, LEDs can light
+  - MODE=1: Q2 OFF, LEDs unpowered (required for sensing)
+- **IC5 (74HC175) ~CLR**: Receives ~MODE
+  - MODE=0: ~CLR=1, keyboard matrix shift registers enabled
+  - MODE=1: ~CLR=0, keyboard matrix cleared (address = 0)
+- **LED_SENSE**: Active-high (button connects shift register output to sense)
+- **SW_SENSE**: Active-low (button pulls mux output low)
+
+**Truth table:**
+| MODE | LED_SENSE | SW_SENSE | SENSE |
+|------|-----------|----------|-------|
+| 0    | X         | HIGH     | 0     |
+| 0    | X         | LOW      | 1     |
+| 1    | 0         | HIGH     | 0     |
+| 1    | 0         | LOW      | 1     |
+| 1    | 1         | X        | 1     |
 
 ### Dual-Mode Operation
 

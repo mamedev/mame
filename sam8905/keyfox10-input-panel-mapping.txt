@@ -1,0 +1,191 @@
+* SERIAL DATA
+
+[platine:ic]
+KF2:4 (upper solo)
+- 28 mem-card
+- 29 sustain (upper solo+drawbars)
+- 30 wersi-chord
+- 32 portamento
+- 31 solo
+- KF4/3 reverb mode
+- KF4/2 preset 2
+- KF4/1 preset 1
+KF2:3 (upper solo)
+- 20 strings
+- 21 hawai-guit
+- 22 vocal
+- 23 jazz-guit
+- 24 synthe
+- 25 jaff-flute
+- 26 musette
+- 27 synthe-bass
+KF2:2 (upper solo)
+- 12 trombone
+- 13 piano
+- 14 trumpet
+- 15 e-piano
+- 16 clarinet
+- 17 honky-tonk
+- 18 saxophon
+- 19 vibes
+KF2:1
+- 2 jazz 2
+- 8 flute 4
+- 3 full organ
+- 9 perc 2 2/3
+- 4 church
+- 11 wersivoice fast
+- 5 ensemble
+- 10 wersivoice slow
+KF1:12
+- 45 mem-card (bass+lower)
+- 44 drums
+- 47 split
+- 46 sustain (lower)
+- KF2/1 jazz 1
+- 48 dynamic
+- KF2/7 flute 8
+- KF2/6 flute 16
+KF1:11
+- 36 piano
+- 37 flute 8
+- 38 e-piano
+- 39 flute 4
+- 40 strings
+- 41 flute 2
+- 42 synthe strings
+- 43 guitar
+KF1:10
+- 23 midi
+- 22 transpose
+- 30 bass 1
+- 32 synthe bass
+- 31 bass 2
+- 33 slap bass
+- 34 auto bass
+- 35 sustain (bass)
+KF1:2
+- 9 bossa/tango
+- 8 samba/salsa
+- 11 bengui/chacha
+- 10 waltz/slowwaltz
+- 13 mem-card rhythm
+- 12 march/country
+- 21 tune
+- 14 2nd bank
+KF1:1
+- 1 disco1/disco2
+- 2 rocknroll/dixie
+- 3 8beat/16beat
+- 4 foxtrott/shuffle
+- 5 jazzrock/rock
+- 6 bigband/jazz
+- 7 ballad/slowrock
+- KF3/1 rhythm
+KF3:1
+- 6 intro/ending
+- 2 acc. bass
+- 7 fill
+- 3 acc. 1
+- 8 sync start
+- 4 acc. 2
+- 9 mem-card song
+- 5 acc. 3
+
+* PLATINE KF1
+** CONTROL DISPLAY
+15/16 rhythm vol
+17/18 acc 1-3 vol
+19/20 tempo
+21 tune
+22 transpose
+23 midi
+24/25 upper vol
+26/27 lower vol
+28/29 bass vol
+
+** BASS SECTION
+30 bass 1
+31 bass 2
+32 synthe bass
+33 slap bass
+34 auto bass
+35 sustain
+
+** LOWER SECTION
+36 piano
+37 flute 8
+38 e-piano
+39 flute 4
+40 strings
+41 flute 2
+42 synthe strings
+43 guitar
+44 drums
+45 mem-card (bass+lower)
+46 sustain
+
+** SPLIT
+47 split
+
+** DYNAMIC
+48 dynamic
+
+* PLATINE KF2
+** UPPER DRAWBARS / SOLO
+1 jazz 1
+2 jazz 2
+3 full organ
+4 church
+5 ensemble
+6 flute 16
+7 flute 8
+8 flute 4
+9 perc 2 2/3
+10 wersivoice slow
+11 wersivoice fast
+
+** UPPER SOLO
+12 trombone
+13 piano
+14 trumpet
+15 e-piano
+16 clarinet
+17 honky-tonk
+18 saxophone
+19 vibes
+20 strings
+21 hawai-guit
+22 vocal
+23 jazz-guit
+24 synthe
+25 jazz-flute
+26 musette
+27 synthe brass
+28 mem-card
+29 sustain (upper solo+drawbars)
+30 wersi-chord
+31 solo
+32 portamento
+
+* PLATINE KF3
+
+** ACC. SELECT
+1 KF1:1/H rhythm
+2 1/B bass
+3 1/D acc. 1
+4 1/F acc. 2
+5 1/H acc. 3
+
+** WERSIMATIC RHYTHM CONTROLS
+6 1/A intro/ending
+7 1/C fill
+8 1/E sync start
+9 1/G mem-card song
+(S1 start/stop)
+
+* PLATINE KF4
+1 KF2:4/H reverb mode
+2 KF2:4/G preset 2
+3 KF2:4/F preset 1
+
