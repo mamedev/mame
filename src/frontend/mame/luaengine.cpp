@@ -1358,21 +1358,21 @@ void lua_engine::initialize()
 			if (e.type() != core_options::option_type::BOOLEAN)
 				luaL_error(s, "Cannot set option to wrong type");
 			else
-				e.set_value(val ? "1" : "0", OPTION_PRIORITY_CMDLINE);
+				e.set_value(val ? 1 : 0, OPTION_PRIORITY_CMDLINE);
 		},
 		[] (core_options::entry &e, sol::this_state s, int val)
 		{
 			if (e.type() != core_options::option_type::INTEGER)
 				luaL_error(s, "Cannot set option to wrong type");
 			else
-				e.set_value(string_format(std::locale::classic(), "%d", val), OPTION_PRIORITY_CMDLINE);
+				e.set_value(val, OPTION_PRIORITY_CMDLINE);
 		},
 		[] (core_options::entry &e, sol::this_state s, float val)
 		{
 			if (e.type() != core_options::option_type::FLOAT)
 				luaL_error(s, "Cannot set option to wrong type");
 			else
-				e.set_value(string_format(std::locale::classic(), "%f", val), OPTION_PRIORITY_CMDLINE);
+				e.set_value(val, OPTION_PRIORITY_CMDLINE);
 		},
 		[] (core_options::entry &e, sol::this_state s, const char *val)
 		{
@@ -1388,35 +1388,11 @@ void lua_engine::initialize()
 			switch (e.type())
 			{
 				case core_options::option_type::BOOLEAN:
-					{
-						std::istringstream str(e.value());
-						str.imbue(std::locale::classic());
-						int ival;
-						if (str >> ival)
-							return sol::make_object(s, ival != 0);
-						else
-							return sol::make_object(s, false);
-					}
+					return sol::make_object(s, e.bool_value());
 				case core_options::option_type::INTEGER:
-					{
-						std::istringstream str(e.value());
-						str.imbue(std::locale::classic());
-						int ival;
-						if (str >> ival)
-							return sol::make_object(s, ival);
-						else
-							return sol::make_object(s, 0);
-					}
+					return sol::make_object(s, e.int_value());
 				case core_options::option_type::FLOAT:
-					{
-						std::istringstream str(e.value());
-						str.imbue(std::locale::classic());
-						float fval;
-						if (str >> fval)
-							return sol::make_object(s, fval);
-						else
-							return sol::make_object(s, 0.0F);
-					}
+					return sol::make_object(s, e.float_value());
 				default:
 					return sol::make_object(s, e.value());
 			}
