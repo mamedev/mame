@@ -307,7 +307,7 @@ void _3do_state::madam_map(address_map &map)
 	map(0x0000, 0x0003).lrw32(
 		NAME([this] () { return m_madam.revision; }),
 		// echo for terminal?
-		NAME([this] (u32 data) {
+		NAME([] (u32 data) {
 			if(data == 0x0a)
 				printf("\n");
 			else
