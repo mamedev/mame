@@ -4,6 +4,7 @@
 #ifndef MAME_MISC_3DO_MADAM_H
 #define MAME_MISC_3DO_MADAM_H
 
+#pragma once
 
 class madam_device : public device_t
 {

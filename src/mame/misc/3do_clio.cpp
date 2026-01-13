@@ -9,6 +9,7 @@ DEFINE_DEVICE_TYPE(CLIO, clio_device, "clio", "3DO MN7A02IUDB \"Clio\" I/O contr
 clio_device::clio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, CLIO, tag, owner, clock)
 	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_dspp(*this, "dspp")
 	, m_firq_cb(*this)
 {
 }
@@ -17,6 +18,11 @@ void clio_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: convert to emu_timer(s), fix timing
 	TIMER(config, "timer_x16").configure_periodic(FUNC(clio_device::timer_x16_cb), attotime::from_hz(12000));
+
+	DSPP(config, m_dspp, DERIVED_CLOCK(1, 1));
+//	m_dspp->int_handler().set([this] (int state) { printf("%d\n", state); });
+//	m_dspp->dma_read_handler().set(FUNC(m2_bda_device::read_bus8));
+//	m_dspp->dma_write_handler().set(FUNC(m2_bda_device::write_bus8));
 }
 
 void clio_device::device_start()
@@ -25,13 +31,13 @@ void clio_device::device_start()
 	// 0x04000000 for Anvil
 	m_revision = 0x02022000 /* 0x04000000 */;
 	m_expctl = 0x80;    /* ARM has the expansion bus */
-	m_dspp.N = make_unique_clear<uint16_t[]>(0x800);
-	m_dspp.EI = make_unique_clear<uint16_t[]>(0x400);
-	m_dspp.EO = make_unique_clear<uint16_t[]>(0x400);
+//	m_dspp.N = make_unique_clear<uint16_t[]>(0x800);
+//	m_dspp.EI = make_unique_clear<uint16_t[]>(0x400);
+//	m_dspp.EO = make_unique_clear<uint16_t[]>(0x400);
 
-	save_pointer(NAME(m_dspp.N), 0x800);
-	save_pointer(NAME(m_dspp.EI), 0x400);
-	save_pointer(NAME(m_dspp.EO), 0x400);
+//	save_pointer(NAME(m_dspp.N), 0x800);
+//	save_pointer(NAME(m_dspp.EI), 0x400);
+//	save_pointer(NAME(m_dspp.EO), 0x400);
 }
 
 void clio_device::device_reset()
@@ -284,6 +290,13 @@ void clio_device::map(address_map &map)
 //	map(0x17d0, 0x17d3) Semaphore
 //	map(0x17d4, 0x17d7) Semaphore ACK
 //	map(0x17e0, 0x17ff) DSPP DMA and state
+	map(0x17e8, 0x17eb).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			// reset?
+			//m_dspp->write(0x6074 >> 2, 1);
+			//m_dspp->write(0x6074 >> 2, 0);
+		})
+	);
 	/*
 	---- x--- DSPPError
 	---- -x-- DSPPReset
@@ -298,49 +311,54 @@ void clio_device::map(address_map &map)
 	*/
 	map(0x17fc, 0x17ff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			m_dspp->write(0x6070 >> 2, data);
 			if (data & 1)
 				machine().debug_break();
 		})
 	);
+	// DSPP N paths (code)
 	map(0x1800, 0x1fff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_16_31)
-				m_dspp.N[(offset<<1)+0] = data >> 16;
+				m_dspp->write((offset << 1) + 0, data >> 16);
 			if (ACCESSING_BITS_0_15)
-				m_dspp.N[(offset<<1)+1] = data & 0xffff;
+				m_dspp->write((offset << 1) + 1, data & 0xffff);
 		})
 	);
 	map(0x2000, 0x2fff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			// code path
 			if (ACCESSING_BITS_0_15)
-				m_dspp.N[offset] = data & 0xffff;
+				m_dspp->write(offset, data);
 		})
 	);
+	// EI paths (data writes)
 	map(0x3000, 0x31ff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_16_31)
-				m_dspp.EI[(offset<<1)+0] = data >> 16;
+				m_dspp->write(((offset<<1) + 0) | 0x400, data);
 			if (ACCESSING_BITS_0_15)
-				m_dspp.EI[(offset<<1)+1] = data & 0xffff;
+				m_dspp->write(((offset<<1) + 1) | 0x400, data);
 		})
 	);
 	map(0x3400, 0x37ff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_0_15)
-				m_dspp.EI[offset] = data & 0xffff;
+				m_dspp->write(offset | 0x400, data);
 		})
 	);
+	// EO paths (data reads)
 	map(0x3800, 0x39ff).lr32(
 		NAME([this] (offs_t offset) {
 			uint32_t res = 0;
-			res = (m_dspp.EO[(offset << 1) + 0] << 16);
-			res |= (m_dspp.EO[(offset << 1) + 1] & 0xffff);
+			res =  m_dspp->read(((offset << 1) + 0) | 0x400) << 16;
+			res |= m_dspp->read(((offset << 1) + 1) | 0x400);
 			return res;
 		})
 	);
 	map(0x3c00, 0x3fff).lr32(
 		NAME([this] (offs_t offset) {
-			return m_dspp.EO[offset] & 0xffff;
+			return m_dspp->read(offset | 0x400);
 		})
 	);
 }

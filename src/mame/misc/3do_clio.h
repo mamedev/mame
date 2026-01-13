@@ -4,6 +4,9 @@
 #ifndef MAME_MISC_3DO_CLIO_H
 #define MAME_MISC_3DO_CLIO_H
 
+#pragma once
+
+#include "cpu/dspp/dspp.h"
 #include "machine/timer.h"
 #include "screen.h"
 
@@ -27,6 +30,7 @@ protected:
 
 private:
 	required_device<screen_device> m_screen;
+	required_device<dspp_device> m_dspp;
 	devcb_write_line    m_firq_cb;
 
 	uint32_t  m_revision = 0;       /* 03400000 */
@@ -63,21 +67,21 @@ private:
 	uint32_t  m_dipir1 = 0;         /* 03400410 */
 	uint32_t  m_dipir2 = 0;         /* 03400414 */
 							/* Bus signals */
-	uint32_t  m_avdisel = 0;            /* 03400500 - 0340053f */
-	uint32_t  m_avdipoll = 0;           /* 03400540 - 0340057f */
-	uint32_t  m_avdicmdstat = 0;        /* 03400580 - 034005bf */
-	uint32_t  m_avdidata = 0;           /* 034005c0 - 034005ff */
+//	uint32_t  m_avdisel = 0;            /* 03400500 - 0340053f */
+//	uint32_t  m_avdipoll = 0;           /* 03400540 - 0340057f */
+//	uint32_t  m_avdicmdstat = 0;        /* 03400580 - 034005bf */
+//	uint32_t  m_avdidata = 0;           /* 034005c0 - 034005ff */
 	uint32_t  m_sel;
 	uint32_t  m_poll;
 							/* DSPP */
-	uint32_t  m_semaphore = 0;      /* 034017d0 */
-	uint32_t  m_semaack = 0;        /* 034017d4 */
-	uint32_t  m_dsppdma = 0;        /* 034017e0 */
-	uint32_t  m_dspprst0 = 0;       /* 034017e4 */
-	uint32_t  m_dspprst1 = 0;       /* 034017e8 */
-	uint32_t  m_dspppc = 0;         /* 034017f4 */
-	uint32_t  m_dsppnr = 0;         /* 034017f8 */
-	uint32_t  m_dsppgw = 0;         /* 034017fc */
+//	uint32_t  m_semaphore = 0;      /* 034017d0 */
+//	uint32_t  m_semaack = 0;        /* 034017d4 */
+//	uint32_t  m_dsppdma = 0;        /* 034017e0 */
+//	uint32_t  m_dspprst0 = 0;       /* 034017e4 */
+//	uint32_t  m_dspprst1 = 0;       /* 034017e8 */
+//	uint32_t  m_dspppc = 0;         /* 034017f4 */
+//	uint32_t  m_dsppnr = 0;         /* 034017f8 */
+//	uint32_t  m_dsppgw = 0;         /* 034017fc */
 //	uint32_t  m_dsppn[0x400]{};   /* 03401800 - 03401bff DSPP N stack (32bit writes) */
 							/* 03402000 - 034027ff DSPP N stack (16bit writes) */
 //	uint32_t  m_dsppei[0x100]{};  /* 03403000 - 034030ff DSPP EI stack (32bit writes) */
@@ -85,14 +89,6 @@ private:
 //	uint32_t  m_dsppeo[0x1f]{};   /* 03403800 - 0340381f DSPP EO stack (32bit reads) */
 							/* 03403c00 - 03403c3f DSPP EO stack (16bit reads) */
 //	uint32_t  m_dsppclkreload = 0;  /* 034039dc / 03403fbc */
-
-	struct DSPP {
-		std::unique_ptr<uint16_t[]> N;
-		std::unique_ptr<uint16_t[]> EI;
-		std::unique_ptr<uint16_t[]> EO;
-	};
-
-	DSPP m_dspp;
 
 	void request_fiq(uint32_t irq_req, uint8_t type);
 
