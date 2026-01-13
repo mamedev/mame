@@ -2,9 +2,14 @@
 // copyright-holders:Angelo Salese, Wilbert Pol
 /***************************************************************************
 
-  3do.cpp
+3do.cpp
 
-  Driver file to handle emulation of the 3DO systems
+Driver file to handle emulation of the 3DO systems
+
+References:
+- https://3dodev.com/documentation/hardware
+- https://wiki.console5.com/wiki/Panasonic_3DO_FZ-1
+- https://github.com/trapexit/portfolio_os
 
 Hardware descriptions:
 
@@ -108,23 +113,23 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 void _3do_state::main_mem(address_map &map)
 {
-	map(0x00000000, 0x001FFFFF).bankrw(m_bank1);                                       /* DRAM */
-	map(0x00200000, 0x003FFFFF).ram().share(m_vram);                                   /* VRAM */
-	map(0x03000000, 0x030FFFFF).rom().region("bios", 0);                               /* BIOS */
+	map(0x0000'0000, 0x001F'FFFF).bankrw(m_bank1);                                       /* DRAM */
+	map(0x0020'0000, 0x003F'FFFF).ram().share(m_vram);                                   /* VRAM */
+	map(0x0300'0000, 0x030F'FFFF).rom().region("bios", 0);                               /* BIOS */
 	// slow bus
-	map(0x03100000, 0x0313FFFF).ram();                                                 /* Brooktree? */
-	map(0x03140000, 0x0315FFFF).rw(FUNC(_3do_state::nvarea_r), FUNC(_3do_state::nvarea_w)).umask32(0x000000ff);                /* NVRAM */
-	map(0x03180000, 0x031BFFFF).rw(FUNC(_3do_state::slow2_r), FUNC(_3do_state::slow2_w));               /* Slow bus - additional expansion */
+	map(0x0310'0000, 0x0313'FFFF).ram();                                                 /* Brooktree? */
+	map(0x0314'0000, 0x0315'FFFF).mirror(0x20000).rw(FUNC(_3do_state::nvarea_r), FUNC(_3do_state::nvarea_w)).umask32(0x000000ff);                /* NVRAM */
+	map(0x0318'0000, 0x031B'FFFF).rw(FUNC(_3do_state::slow2_r), FUNC(_3do_state::slow2_w));               /* Slow bus - additional expansion */
 	// Sport
-	map(0x03200000, 0x0320FFFF).rw(FUNC(_3do_state::svf_r), FUNC(_3do_state::svf_w));                   /* special vram access1 */
-	map(0x03300000, 0x033FFFFF).rw(FUNC(_3do_state::madam_r), FUNC(_3do_state::madam_w));               /* address decoder */
-	map(0x03400000, 0x03403FFF).rw(FUNC(_3do_state::clio_r), FUNC(_3do_state::clio_w));                 /* io controller */
-	map(0x0340c000, 0x0340FFFF).m(*this, FUNC(_3do_state::uncle_map));
-//  map(0x03600000, 0x037fffff) trace
-//      map(0x03700000, 0x037effff) SRAM
-//      map(0x037fff00, 0x037fff0b) link data/address/FIFO
-//      map(0x037fff0c, 0x037fff0f) joysticks
-//  map(0x03800000, 0x03??????) trace big RAM
+	map(0x0320'0000, 0x0320'FFFF).rw(FUNC(_3do_state::svf_r), FUNC(_3do_state::svf_w));                   /* special vram access1 */
+	map(0x0330'0000, 0x0330'07FF).m(*this, FUNC(_3do_state::madam_map));               /* address decoder */
+	map(0x0340'0000, 0x0340'3FFF).m(*this, FUNC(_3do_state::clio_map));                /* io controller */
+	map(0x0340'C000, 0x0340'FFFF).m(*this, FUNC(_3do_state::uncle_map));
+//  map(0x0360'0000, 0X037F'FFFF) trace
+//      map(0x0370'0000, 0X037E'FFFF) SRAM
+//      map(0X037F'FF00, 0X037F'FF0B) link data/address/FIFO
+//      map(0X037F'FF0C, 0X037F'FF0F) joysticks
+//  map(0x0380'0000, 0x03??'????) trace big RAM
 }
 
 

@@ -301,705 +301,441 @@ void _3do_state::svf_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
+// $0330'0000 base
+void _3do_state::madam_map(address_map &map)
+{
+	map(0x0000, 0x0003).lrw32(
+		NAME([this] () { return m_madam.revision; }),
+		// echo for terminal?
+		NAME([this] (u32 data) {
+			if(data == 0x0a)
+				printf("\n");
+			else
+				printf("%c",data & 0xff);
+		})
+	);
 
-
-uint32_t _3do_state::madam_r(offs_t offset){
-	logerror( "%08X: MADAM read offset = %08X\n", m_maincpu->pc(), offset*4 );
-
-	switch( offset ) {
-	case 0x0000/4:      /* 03300000 - Revision */
-		return m_madam.revision;
-	case 0x0004/4:
-		return m_madam.msysbits;
-	case 0x0008/4:
-		return m_madam.mctl;
-	case 0x000c/4:
-		return m_madam.sltime;
-	case 0x0020/4:
-		return m_madam.abortbits;
-	case 0x0024/4:
-		return m_madam.privbits;
-	case 0x0028/4:
-		return m_madam.statbits;
-	case 0x0040/4:
-		return m_madam.diag;
-	case 0x0110/4:
-		return m_madam.ccobctl0;
-	case 0x0120/4:
-		return m_madam.ppmpc;
-	case 0x0130/4:
-		return m_madam.regctl0;
-	case 0x0134/4:
-		return m_madam.regctl1;
-	case 0x0138/4:
-		return m_madam.regctl2;
-	case 0x013c/4:
-		return m_madam.regctl3;
-	case 0x0140/4:
-		return m_madam.xyposh;
-	case 0x0144/4:
-		return m_madam.xyposl;
-	case 0x0148/4:
-		return m_madam.linedxyh;
-	case 0x014c/4:
-		return m_madam.linedxyl;
-	case 0x0150/4:
-		return m_madam.dxyh;
-	case 0x0154/4:
-		return m_madam.dxyl;
-	case 0x0158/4:
-		return m_madam.ddxyh;
-	case 0x015c/4:
-		return m_madam.ddxyl;
-	case 0x0180/4: case 0x0188/4:
-	case 0x0190/4: case 0x0198/4:
-	case 0x01a0/4: case 0x01a8/4:
-	case 0x01b0/4: case 0x01b8/4:
-	case 0x01c0/4: case 0x01c8/4:
-	case 0x01d0/4: case 0x01d8/4:
-	case 0x01e0/4: case 0x01e8/4:
-	case 0x01f0/4: case 0x01f8/4:
-		return m_madam.pip[(offset/2) & 0x0f] & 0xffff;
-	case 0x0184/4: case 0x018c/4:
-	case 0x0194/4: case 0x019c/4:
-	case 0x01a4/4: case 0x01ac/4:
-	case 0x01b4/4: case 0x01bc/4:
-	case 0x01c4/4: case 0x01cc/4:
-	case 0x01d4/4: case 0x01dc/4:
-	case 0x01e4/4: case 0x01ec/4:
-	case 0x01f4/4: case 0x01fc/4:
-		return m_madam.pip[(offset/2) & 0x0f] >> 16;
-	case 0x0200/4: case 0x0208/4:
-	case 0x0210/4: case 0x0218/4:
-	case 0x0220/4: case 0x0228/4:
-	case 0x0230/4: case 0x0238/4:
-	case 0x0240/4: case 0x0248/4:
-	case 0x0250/4: case 0x0258/4:
-	case 0x0260/4: case 0x0268/4:
-	case 0x0270/4: case 0x0278/4:
-		return m_madam.fence[(offset/2) & 0x0f] & 0xffff;
-	case 0x0204/4: case 0x020c/4:
-	case 0x0214/4: case 0x021c/4:
-	case 0x0224/4: case 0x022c/4:
-	case 0x0234/4: case 0x023c/4:
-	case 0x0244/4: case 0x024c/4:
-	case 0x0254/4: case 0x025c/4:
-	case 0x0264/4: case 0x026c/4:
-	case 0x0274/4: case 0x027c/4:
-		return m_madam.fence[(offset/2) & 0x0f] >> 16;
-	case 0x0300/4: case 0x0304/4: case 0x0308/4: case 0x030c/4:
-	case 0x0310/4: case 0x0314/4: case 0x0318/4: case 0x031c/4:
-	case 0x0320/4: case 0x0324/4: case 0x0328/4: case 0x032c/4:
-	case 0x0330/4: case 0x0334/4: case 0x0338/4: case 0x033c/4:
-	case 0x0340/4: case 0x0344/4: case 0x0348/4: case 0x034c/4:
-	case 0x0350/4: case 0x0354/4: case 0x0358/4: case 0x035c/4:
-	case 0x0360/4: case 0x0364/4: case 0x0368/4: case 0x036c/4:
-	case 0x0370/4: case 0x0374/4: case 0x0378/4: case 0x037c/4:
-	case 0x0380/4: case 0x0384/4: case 0x0388/4: case 0x038c/4:
-	case 0x0390/4: case 0x0394/4: case 0x0398/4: case 0x039c/4:
-	case 0x03a0/4: case 0x03a4/4: case 0x03a8/4: case 0x03ac/4:
-	case 0x03b0/4: case 0x03b4/4: case 0x03b8/4: case 0x03bc/4:
-	case 0x03c0/4: case 0x03c4/4: case 0x03c8/4: case 0x03cc/4:
-	case 0x03d0/4: case 0x03d4/4: case 0x03d8/4: case 0x03dc/4:
-	case 0x03e0/4: case 0x03e4/4: case 0x03e8/4: case 0x03ec/4:
-	case 0x03f0/4: case 0x03f4/4: case 0x03f8/4: case 0x03fc/4:
-		return m_madam.mmu[offset&0x3f];
-	case 0x0400/4: case 0x0404/4: case 0x0408/4: case 0x040c/4:
-	case 0x0410/4: case 0x0414/4: case 0x0418/4: case 0x041c/4:
-	case 0x0420/4: case 0x0424/4: case 0x0428/4: case 0x042c/4:
-	case 0x0430/4: case 0x0434/4: case 0x0438/4: case 0x043c/4:
-	case 0x0440/4: case 0x0444/4: case 0x0448/4: case 0x044c/4:
-	case 0x0450/4: case 0x0454/4: case 0x0458/4: case 0x045c/4:
-	case 0x0460/4: case 0x0464/4: case 0x0468/4: case 0x046c/4:
-	case 0x0470/4: case 0x0474/4: case 0x0478/4: case 0x047c/4:
-	case 0x0480/4: case 0x0484/4: case 0x0488/4: case 0x048c/4:
-	case 0x0490/4: case 0x0494/4: case 0x0498/4: case 0x049c/4:
-	case 0x04a0/4: case 0x04a4/4: case 0x04a8/4: case 0x04ac/4:
-	case 0x04b0/4: case 0x04b4/4: case 0x04b8/4: case 0x04bc/4:
-	case 0x04c0/4: case 0x04c4/4: case 0x04c8/4: case 0x04cc/4:
-	case 0x04d0/4: case 0x04d4/4: case 0x04d8/4: case 0x04dc/4:
-	case 0x04e0/4: case 0x04e4/4: case 0x04e8/4: case 0x04ec/4:
-	case 0x04f0/4: case 0x04f4/4: case 0x04f8/4: case 0x04fc/4:
-	case 0x0500/4: case 0x0504/4: case 0x0508/4: case 0x050c/4:
-	case 0x0510/4: case 0x0514/4: case 0x0518/4: case 0x051c/4:
-	case 0x0520/4: case 0x0524/4: case 0x0528/4: case 0x052c/4:
-	case 0x0530/4: case 0x0534/4: case 0x0538/4: case 0x053c/4:
-	case 0x0540/4: case 0x0544/4: case 0x0548/4: case 0x054c/4:
-	case 0x0550/4: case 0x0554/4: case 0x0558/4: case 0x055c/4:
-	case 0x0560/4: case 0x0564/4: case 0x0568/4: case 0x056c/4:
-	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
-	case 0x0580/4: case 0x0584/4: case 0x0588/4: case 0x058c/4:
-	case 0x0590/4: case 0x0594/4: case 0x0598/4: case 0x059c/4:
-	case 0x05a0/4: case 0x05a4/4: case 0x05a8/4: case 0x05ac/4:
-	case 0x05b0/4: case 0x05b4/4: case 0x05b8/4: case 0x05bc/4:
-	case 0x05c0/4: case 0x05c4/4: case 0x05c8/4: case 0x05cc/4:
-	case 0x05d0/4: case 0x05d4/4: case 0x05d8/4: case 0x05dc/4:
-	case 0x05e0/4: case 0x05e4/4: case 0x05e8/4: case 0x05ec/4:
-	case 0x05f0/4: case 0x05f4/4: case 0x05f8/4: case 0x05fc/4:
-		return m_madam.dma[(offset/4) & 0x1f][offset & 0x03];
-
-	/* Hardware multiplier */
-	case 0x0600/4: case 0x0604/4: case 0x0608/4: case 0x060c/4:
-	case 0x0610/4: case 0x0614/4: case 0x0618/4: case 0x061c/4:
-	case 0x0620/4: case 0x0624/4: case 0x0628/4: case 0x062c/4:
-	case 0x0630/4: case 0x0634/4: case 0x0638/4: case 0x063c/4:
-	case 0x0640/4: case 0x0644/4: case 0x0648/4: case 0x064c/4:
-	case 0x0650/4: case 0x0654/4: case 0x0658/4: case 0x065c/4:
-	case 0x0660/4: case 0x0664/4: case 0x0668/4: case 0x066c/4:
-	case 0x0670/4: case 0x0674/4: case 0x0678/4: case 0x067c/4:
-	case 0x0680/4: case 0x0684/4: case 0x0688/4: case 0x068c/4:
-	case 0x0690/4: case 0x0694/4: case 0x0698/4: case 0x069c/4:
-		return m_madam.mult[offset & 0x3f];
-	case 0x07f0/4:
-		return m_madam.mult_control;
-	case 0x07f8/4:
-		return m_madam.mult_status;
-	default:
-		logerror( "%08X: unhandled MADAM read offset = %08X\n", m_maincpu->pc(), offset*4 );
-		break;
-	}
-	return 0;
-}
-
-
-void _3do_state::madam_w(offs_t offset, uint32_t data, uint32_t mem_mask){
-	if(offset == 0)
-	{
-		if(data == 0x0a)
-			logerror( "%08X: MADAM write offset = %08X, data = %08X (\\n), mask = %08X\n", m_maincpu->pc(), offset*4, data, mem_mask );
-		else
-			logerror( "%08X: MADAM write offset = %08X, data = %08X (%c), mask = %08X\n", m_maincpu->pc(), offset*4, data, data, mem_mask );
-	}
-	else
-		logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", m_maincpu->pc(), offset*4, data, mem_mask );
-
-	switch( offset ) {
-	// echo for terminal?
-	case 0x0000/4:
-		if(data == 0x0a)
-			printf("\n");
-		else
-			printf("%c",data);
-		break;
-	case 0x0004/4:  /* 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM */
-		m_madam.msysbits = data;
-		break;
-	case 0x0008/4:
-		m_madam.mctl = data;
-		break;
-	case 0x000c/4:
-		m_madam.sltime = data;
-		break;
-	case 0x0020/4:
-		m_madam.abortbits = data;
-		break;
-	case 0x0024/4:
-		m_madam.privbits = data;
-		break;
-	case 0x0028/4:
-		m_madam.statbits = data;
-		break; // <- this was a fall-through?
-	case 0x0040/4:
-		m_madam.diag = 1;
-		break;
-
+	// 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM
+	map(0x0004, 0x0007).lrw32(
+		NAME([this] () { return m_madam.msysbits; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.msysbits); })
+	);
+	map(0x0008, 0x000b).lrw32(
+		NAME([this] () { return m_madam.mctl; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.mctl); })
+	);
+	map(0x000c, 0x000f).lrw32(
+		NAME([this] () { return m_madam.sltime; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.sltime); })
+	);
+	map(0x0020, 0x0023).lrw32(
+		NAME([this] () { return m_madam.abortbits; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.abortbits); })
+	);
+	map(0x0024, 0x0027).lrw32(
+		NAME([this] () { return m_madam.privbits; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.privbits); })
+	);
+	map(0x0028, 0x002b).lrw32(
+		NAME([this] () { return m_madam.statbits; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.statbits); })
+	);
+	// 0x0040, 0x0047 madam diag 0/1
+	map(0x0040, 0x0043).lrw32(
+		NAME([this] () { return m_madam.diag; }),
+		// TODO: correct?
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_madam.diag = 1; })
+	);
 	// 0x0044: Anvil "feature"
 
-	/* CEL */
-	case 0x0100/4:  /* 03300100 - SPRSTRT - Start the CEL engine (W) */
-	case 0x0104/4:  /* 03300104 - SPRSTOP - Stop the CEL engine (W) */
-	case 0x0108/4:  /* 03300108 - SPRCNTU - Continue the CEL engine (W) */
-	case 0x010c/4:  /* 0330010c - SPRPAUS - Pause the CEL engine (W) */
-		break;
-	case 0x0110/4:  /* 03300110 - CCOBCTL0 - CCoB control (RW) */
-		m_madam.ccobctl0 = data;
-		break;
-	case 0x0129/4:  /* 03300120 - PPMPC (RW) */
-		m_madam.ppmpc = data;
-		break;
+	// CEL engine
+//	map(0x0100, 0x0103)  SPRSTRT - Start the CEL engine (W)
+//	map(0x0104, 0x0107)  SPRSTOP - Stop the CEL engine (W)
+//	map(0x0108, 0x010b)  SPRCNTU - Continue the CEL engine (W)
+//	map(0x010c, 0x010f)  SPRPAUS - Pause the CEL engine (W)
+	map(0x0110, 0x0113).lrw32(
+		NAME([this] () { return m_madam.ccobctl0; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.ccobctl0); })
+	);
+	// TODO: writes were 0x0129/4, typing mistake?
+	map(0x0120, 0x0123).lrw32(
+		NAME([this] () { return m_madam.ppmpc; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.ppmpc); })
+	);
 
-	/* Regis */
-	case 0x0130/4:
-		// Regis control word
-		m_madam.regctl0 = data;
-		break;
-	case 0x0134/4:
-		// X and Y clip values
-		m_madam.regctl1 = data;
-		break;
-	case 0x0138/4:
-		// Read base address
-		m_madam.regctl2 = data;
-		break;
-	case 0x013c/4:
-		// write base address
-		m_madam.regctl3 = data;
-		break;
-	// Regis shape
-	case 0x0140/4:
-		m_madam.xyposh = data;
-		break;
-	case 0x0144/4:
-		m_madam.xyposl = data;
-		break;
-	case 0x0148/4:
-		m_madam.linedxyh = data;
-		break;
-	case 0x014c/4:
-		m_madam.linedxyl = data;
-		break;
-	case 0x0150/4:
-		m_madam.dxyh = data;
-		break;
-	case 0x0154/4:
-		m_madam.dxyl = data;
-		break;
-	case 0x0158/4:
-		m_madam.ddxyh = data;
-		break;
-	case 0x015c/4:
-		m_madam.ddxyl = data;
-		break;
+	// Regis
+	// Regis control word
+	map(0x0130, 0x0133).lrw32(
+		NAME([this] () { return m_madam.regctl0; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.regctl0); })
+	);
+	// X and Y clip values
+	map(0x0134, 0x0137).lrw32(
+		NAME([this] () { return m_madam.regctl1; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.regctl1); })
+	);
+	// Read base address
+	map(0x0138, 0x013b).lrw32(
+		NAME([this] () { return m_madam.regctl2; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.regctl2); })
+	);
+	// Write base address
+	map(0x013c, 0x013f).lrw32(
+		NAME([this] () { return m_madam.regctl3; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.regctl3); })
+	);
+	map(0x0140, 0x0143).lrw32(
+		NAME([this] () { return m_madam.xyposh; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.xyposh); })
+	);
+	map(0x0144, 0x0147).lrw32(
+		NAME([this] () { return m_madam.xyposl; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.xyposl); })
+	);
+	map(0x0148, 0x014b).lrw32(
+		NAME([this] () { return m_madam.linedxyh; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.linedxyh); })
+	);
+	map(0x014c, 0x014f).lrw32(
+		NAME([this] () { return m_madam.linedxyl; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.linedxyl); })
+	);
+	map(0x0150, 0x0153).lrw32(
+		NAME([this] () { return m_madam.dxyh; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.dxyh); })
+	);
+	map(0x0154, 0x0157).lrw32(
+		NAME([this] () { return m_madam.dxyl; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.dxyl); })
+	);
+	map(0x0158, 0x015b).lrw32(
+		NAME([this] () { return m_madam.ddxyh; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.ddxyh); })
+	);
+	map(0x015c, 0x015f).lrw32(
+		NAME([this] () { return m_madam.ddxyl; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.ddxyl); })
+	);
+	// PIP: Pen Index Palette (or PLT: Palette Look-up Table)
+	// Reads are split in words, but writes are dword (cutting at 0x1bf)
+	// TODO: does writing to 0x1c0-0x1ff go to mirror or they are just ignored
+	map(0x0180, 0x01ff).lrw32(
+		NAME([this] (offs_t offset) {
+			const u16 reg = offset >> 1;
+			if (offset & 1)
+				return m_madam.pip[reg & 0x0f] >> 16;
 
-	/* PIP: Pen Index Palette (or PLT: Palette Look-up Table) */
-	case 0x0180/4: case 0x0184/4: case 0x0188/4: case 0x018c/4:
-	case 0x0190/4: case 0x0194/4: case 0x0198/4: case 0x019c/4:
-	case 0x01a0/4: case 0x01a4/4: case 0x01a8/4: case 0x01ac/4:
-	case 0x01b0/4: case 0x01b4/4: case 0x01b8/4: case 0x01bc/4:
-		m_madam.pip[offset & 0x0f] = data;
-		break;
+			return m_madam.pip[reg & 0x0f] & 0xffff;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_madam.pip[offset & 0xf]);
+		})
+	);
+	// part 1 of fence
+	map(0x0218, 0x021f).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.fence[offset]); })
+	);
+	map(0x0230, 0x023f).lr32(
+		NAME([this] (offs_t offset) {
+			const u16 reg = offset >> 1;
+			if (offset & 1)
+				return m_madam.fence[reg] >> 16;
 
-	/* Fence FIFO */
-	case 0x0200/4: case 0x0204/4: case 0x0208/4: case 0x020c/4:
-	case 0x0210/4: case 0x0214/4: case 0x0218/4: case 0x021c/4:
-	case 0x0220/4: case 0x0224/4: case 0x0228/4: case 0x022c/4:
-	case 0x0230/4: case 0x0234/4: case 0x0238/4: case 0x023c/4:
-		// TODO: 0x20 values
-		m_madam.fence[offset & 0x0f] = data;
-		break;
+			return m_madam.fence[reg] & 0xffff;
+		})
+	);
+	// part 2 of fence
+	map(0x0238, 0x023f).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.fence[offset | 2]); })
+	);
+	map(0x0270, 0x027f).lr32(
+		NAME([this] (offs_t offset) {
+			const u16 reg = offset >> 1;
+			if (offset & 1)
+				return m_madam.fence[reg | 2] >> 16;
 
-	/* MMU */
-	case 0x0300/4: case 0x0304/4: case 0x0308/4: case 0x030c/4:
-	case 0x0310/4: case 0x0314/4: case 0x0318/4: case 0x031c/4:
-	case 0x0320/4: case 0x0324/4: case 0x0328/4: case 0x032c/4:
-	case 0x0330/4: case 0x0334/4: case 0x0338/4: case 0x033c/4:
-	case 0x0340/4: case 0x0344/4: case 0x0348/4: case 0x034c/4:
-	case 0x0350/4: case 0x0354/4: case 0x0358/4: case 0x035c/4:
-	case 0x0360/4: case 0x0364/4: case 0x0368/4: case 0x036c/4:
-	case 0x0370/4: case 0x0374/4: case 0x0378/4: case 0x037c/4:
-	case 0x0380/4: case 0x0384/4: case 0x0388/4: case 0x038c/4:
-	case 0x0390/4: case 0x0394/4: case 0x0398/4: case 0x039c/4:
-	case 0x03a0/4: case 0x03a4/4: case 0x03a8/4: case 0x03ac/4:
-	case 0x03b0/4: case 0x03b4/4: case 0x03b8/4: case 0x03bc/4:
-	case 0x03c0/4: case 0x03c4/4: case 0x03c8/4: case 0x03cc/4:
-	case 0x03d0/4: case 0x03d4/4: case 0x03d8/4: case 0x03dc/4:
-	case 0x03e0/4: case 0x03e4/4: case 0x03e8/4: case 0x03ec/4:
-	case 0x03f0/4: case 0x03f4/4: case 0x03f8/4: case 0x03fc/4:
-		m_madam.mmu[offset&0x3f] = data;
-		break;
-
-	/* DMA */
-	case 0x0400/4: case 0x0404/4: case 0x0408/4: case 0x040c/4:
-	case 0x0410/4: case 0x0414/4: case 0x0418/4: case 0x041c/4:
-	case 0x0420/4: case 0x0424/4: case 0x0428/4: case 0x042c/4:
-	case 0x0430/4: case 0x0434/4: case 0x0438/4: case 0x043c/4:
-	case 0x0440/4: case 0x0444/4: case 0x0448/4: case 0x044c/4:
-	case 0x0450/4: case 0x0454/4: case 0x0458/4: case 0x045c/4:
-	case 0x0460/4: case 0x0464/4: case 0x0468/4: case 0x046c/4:
-	case 0x0470/4: case 0x0474/4: case 0x0478/4: case 0x047c/4:
-	case 0x0480/4: case 0x0484/4: case 0x0488/4: case 0x048c/4:
-	case 0x0490/4: case 0x0494/4: case 0x0498/4: case 0x049c/4:
-	case 0x04a0/4: case 0x04a4/4: case 0x04a8/4: case 0x04ac/4:
-	case 0x04b0/4: case 0x04b4/4: case 0x04b8/4: case 0x04bc/4:
-	case 0x04c0/4: case 0x04c4/4: case 0x04c8/4: case 0x04cc/4:
-	case 0x04d0/4: case 0x04d4/4: case 0x04d8/4: case 0x04dc/4:
-	case 0x04e0/4: case 0x04e4/4: case 0x04e8/4: case 0x04ec/4:
-	case 0x04f0/4: case 0x04f4/4: case 0x04f8/4: case 0x04fc/4:
-	case 0x0500/4: case 0x0504/4: case 0x0508/4: case 0x050c/4:
-	case 0x0510/4: case 0x0514/4: case 0x0518/4: case 0x051c/4:
-	case 0x0520/4: case 0x0524/4: case 0x0528/4: case 0x052c/4:
-	case 0x0530/4: case 0x0534/4: case 0x0538/4: case 0x053c/4:
-	case 0x0540/4: case 0x0544/4: case 0x0548/4: case 0x054c/4:
-	case 0x0550/4: case 0x0554/4: case 0x0558/4: case 0x055c/4:
-	case 0x0560/4: case 0x0564/4: case 0x0568/4: case 0x056c/4:
-	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
-	case 0x0580/4: case 0x0584/4: case 0x0588/4: case 0x058c/4:
-	case 0x0590/4: case 0x0594/4: case 0x0598/4: case 0x059c/4:
-	case 0x05a0/4: case 0x05a4/4: case 0x05a8/4: case 0x05ac/4:
-	case 0x05b0/4: case 0x05b4/4: case 0x05b8/4: case 0x05bc/4:
-	case 0x05c0/4: case 0x05c4/4: case 0x05c8/4: case 0x05cc/4:
-	case 0x05d0/4: case 0x05d4/4: case 0x05d8/4: case 0x05dc/4:
-	case 0x05e0/4: case 0x05e4/4: case 0x05e8/4: case 0x05ec/4:
-	case 0x05f0/4: case 0x05f4/4: case 0x05f8/4: case 0x05fc/4:
-		// printf("%08x %08x\n",offset*4,data);
-		m_madam.dma[(offset/4) & 0x1f][offset & 0x03] = data;
-		return;
-
+			return m_madam.fence[reg | 2] & 0xffff;
+		})
+	);
+	map(0x0300, 0x03ff).lrw32(
+		NAME([this] (offs_t offset) { return m_madam.mmu[offset & 0x3f]; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_madam.mmu[offset & 0x3f]); })
+	);
+	map(0x0400, 0x05ff).lrw32(
+		NAME([this] (offs_t offset) {
+			const u16 channel = offset >> 2;
+			return m_madam.dma[channel & 0x1f][offset & 0x03];
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			const u16 channel = offset >> 2;
+			COMBINE_DATA(&m_madam.dma[channel & 0x1f][offset & 0x03]);
+		})
+	);
 	/* Hardware multiplier */
-	case 0x0600/4: case 0x0604/4: case 0x0608/4: case 0x060c/4:
-	case 0x0610/4: case 0x0614/4: case 0x0618/4: case 0x061c/4:
-	case 0x0620/4: case 0x0624/4: case 0x0628/4: case 0x062c/4:
-	case 0x0630/4: case 0x0634/4: case 0x0638/4: case 0x063c/4:
-	case 0x0640/4: case 0x0644/4: case 0x0648/4: case 0x064c/4:
-	case 0x0650/4: case 0x0654/4: case 0x0658/4: case 0x065c/4:
-	case 0x0660/4: case 0x0664/4: case 0x0668/4: case 0x066c/4:
-	case 0x0670/4: case 0x0674/4: case 0x0678/4: case 0x067c/4:
-	case 0x0680/4: case 0x0684/4: case 0x0688/4: case 0x068c/4:
-	case 0x0690/4: case 0x0694/4: case 0x0698/4: case 0x069c/4:
-		m_madam.mult[offset & 0x3f] = data;
-		break;
-	case 0x07f0/4:
-		m_madam.mult_control |= data;
-		break;
-	case 0x07f4/4:
-		m_madam.mult_control &= ~data;
-		break;
-	case 0x07fc/4:  /* Start process */
-		break;
-
-	default:
-		logerror( "%08X: unhandled MADAM write offset = %08X, data = %08X, mask = %08X\n", m_maincpu->pc(), offset*4, data, mem_mask );
-		break;
-	}
+	map(0x0600, 0x069f).lrw32(
+		NAME([this] (offs_t offset) {
+			return m_madam.mult[offset & 0x3f];
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_madam.mult[offset & 0x3f]);
+		})
+	);
+	map(0x07f0, 0x07f3).lrw32(
+		NAME([this] () { return m_madam.mult_control; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_madam.mult_control |= data; })
+	);
+	map(0x07f4, 0x07f7).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_madam.mult_control &= ~data; })
+	);
+	map(0x07f8, 0x07fb).lr32(NAME([this] () { return m_madam.mult_status; }));
+//	map(0x07fc, 0x07ff) start process
 }
 
-
-
-
-uint32_t _3do_state::clio_r(offs_t offset)
+// $0340'0000 base
+void _3do_state::clio_map(address_map &map)
 {
-	if (!machine().side_effects_disabled())
-	{
-		if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
-			offset != 0x118/4 && offset != 0x11c/4)
-		logerror( "%08X: CLIO read offset = %08X\n", m_maincpu->pc(), offset * 4 );
-	}
+	map(0x0000, 0x0003).lr32(NAME([this] () { return m_clio.revision; }));
+	map(0x0004, 0x0007).lrw32(
+		NAME([this] () { return m_clio.csysbits; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.csysbits); })
+	);
+	map(0x0008, 0x000b).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.vint0); })
+	);
+	map(0x000c, 0x000f).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.vint1); })
+	);
+	map(0x0020, 0x0023).lrw32(
+		NAME([this] () { return m_clio.audin; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.audin); })
+	);
+	map(0x0024, 0x0027).lrw32(
+		NAME([this] () { return m_clio.audout; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			// c0020f0f is written here during boot
+			COMBINE_DATA(&m_clio.audout);
+		})
+	);
+	map(0x0028, 0x002b).lrw32(
+		NAME([this] () { return m_clio.cstatbits; }),
+		// bits 0,1, and 6 are tested (reset source)
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.cstatbits); })
+	);
+	map(0x002c, 0x002f).lw32(
+		// during boot 0000000B is written here, counter reload related?
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.wdog); })
+	);
+	// writes probably for test purposes only
+	map(0x0030, 0x0033).lrw32(
+		NAME([this] () { return m_clio.screen->hpos(); }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.hcnt); })
+	);
+	// TODO: needs to moved to a proper timer callback function
+	// (or use frame_number for fake interlace readback)
+	map(0x0034, 0x0037).lrw32(
+		NAME([this] () {
+			if ( m_clio.screen->vpos() == 0 && !machine().side_effects_disabled() )
+			{
+				m_clio.vcnt ^= 0x800;
+			}
+			return ( m_clio.vcnt & 0x800 ) | m_clio.screen->vpos();
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.vcnt); })
+	);
+	map(0x0038, 0x003b).lrw32(
+		NAME([this] () { return m_clio.seed; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_clio.seed);
+			m_clio.seed &= 0x0fff0fff;
+		})
+	);
+	// TODO: should likely follow seed number, and be truly RNG
+	map(0x003c, 0x003f).lr32(NAME([this] () { return m_clio.random; }));
 
-	/* TODO: for debug, to be removed once that we write the CPU core */
-	if(offset >= 0x3800/4 && offset <= 0x39ff/4)
-	{
-		uint32_t res = 0;
-		offset &= (0x1ff/4);
-		res = (m_dspp.EO[(offset<<1)+0] << 16);
-		res |= (m_dspp.EO[(offset<<1)+1] & 0xffff);
-		return res;
-	}
+	// interrupt control
+	map(0x0040, 0x0047).lrw32(
+		NAME([this] () { return m_clio.irq0; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (offset)
+				m_clio.irq0 &= ~data;
+			else
+				m_clio.irq0 |= data;
 
-	if(offset >= 0x3c00/4 && offset <= 0x3fff/4)
-	{
-		uint16_t res;
-		offset &= (0x3ff/4);
-		res = m_dspp.EO[offset] & 0xffff;
-		return res;
-	}
+			m_request_fiq(0, 0);
+		})
+	);
+	map(0x0048, 0x004f).lrw32(
+		NAME([this] () { return m_clio.irq0_enable; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (offset)
+				m_clio.irq0_enable &= ~data;
+			else
+				m_clio.irq0_enable |= data;
 
-	switch( offset )
-	{
-	case 0x0000/4:
-		return m_clio.revision;
-	case 0x0020/4:
-		return m_clio.audin;
-	case 0x0024/4:
-		return m_clio.audout;
-	case 0x0028/4:
-		return m_clio.cstatbits;
-	case 0x0030/4:
-		return m_clio.screen->hpos();
-	case 0x0034/4:
-		/* This needs to moved to a proper timer callback function */
-		if ( m_clio.screen->vpos() == 0 )
-		{
-			m_clio.vcnt ^= 0x800;
-		}
-		return ( m_clio.vcnt & 0x800 ) | m_clio.screen->vpos();
-	case 0x0038/4:
-		return m_clio.seed;
-	case 0x003c/4:
-		return m_clio.random;
-	case 0x0040/4:
-	case 0x0044/4:
-		return m_clio.irq0;
-	case 0x0048/4:
-	case 0x004c/4:
-		return m_clio.irq0_enable;
-	case 0x0060/4:
-	case 0x0064/4:
-		return m_clio.irq1;
-	case 0x0068/4:
-	case 0x006c/4:
-		return m_clio.irq1_enable;
-	case 0x0080/4:
-		return m_clio.hdelay;
-	case 0x0084/4:
-		return m_clio.adbio;
-	case 0x0088/4:
-		return m_clio.adbctl;
+			m_request_fiq(0, 0);
+		})
+	);
+	map(0x0050, 0x0057).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (offset)
+				m_clio.mode &= ~data;
+			else
+				m_clio.mode |= data;
+		})
+	);
+	map(0x0058, 0x005b).lw32(NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.badbits); }));
+//	map(0x005c, 0x005f) unknown if used at all
+	map(0x0060, 0x0067).lrw32(
+		NAME([this] () { return m_clio.irq1; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (offset)
+				m_clio.irq1 &= ~data;
+			else
+				m_clio.irq1 |= data;
 
-	case 0x0100/4:  case 0x0108/4:  case 0x0110/4:  case 0x0118/4:
-	case 0x0120/4:  case 0x0128/4:  case 0x0130/4:  case 0x0138/4:
-	case 0x0140/4:  case 0x0148/4:  case 0x0150/4:  case 0x0158/4:
-	case 0x0160/4:  case 0x0168/4:  case 0x0170/4:  case 0x0178/4:
-		return m_clio.timer_count[((offset & 0x3f) >> 1)+0];
-	case 0x0104/4:  case 0x010c/4:  case 0x0114/4:  case 0x011c/4:
-	case 0x0124/4:  case 0x012c/4:  case 0x0134/4:  case 0x013c/4:
-	case 0x0144/4:  case 0x014c/4:  case 0x0154/4:  case 0x015c/4:
-	case 0x0164/4:  case 0x016c/4:  case 0x0174/4:  case 0x017c/4:
-		return m_clio.timer_backup[((offset & 0x3f) >> 1)];
+			m_request_fiq(0, 1);
+		})
+	);
+	map(0x0068, 0x006f).lrw32(
+		NAME([this] () { return m_clio.irq1_enable; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (offset)
+				m_clio.irq1_enable &= ~data;
+			else
+				m_clio.irq1_enable |= data;
 
-	case 0x0200/4:
-	case 0x0204/4:
-		return m_clio.timer_ctrl;
-	case 0x0208/4:
-	case 0x020c/4:
-		return m_clio.timer_ctrl >> 32;
+			m_request_fiq(0, 1);
+		})
+	);
 
-	case 0x0220/4:
-		return m_clio.slack;
-
-	case 0x0400/4:
-	case 0x0404/4:
-		return m_clio.expctl;
-	case 0x0410/4:
-		return m_clio.dipir1;
-	case 0x0414/4:
-		return m_clio.dipir2;
-
-	case 0x0500/4: case 0x0504/4: case 0x0508/4: case 0x050c/4:
-	case 0x0510/4: case 0x0514/4: case 0x0518/4: case 0x051c/4:
-	case 0x0520/4: case 0x0524/4: case 0x0528/4: case 0x052c/4:
-	case 0x0530/4: case 0x0534/4: case 0x0538/4: case 0x053c/4:
-		return m_clio.sel;
-
-	case 0x0540/4: case 0x0544/4: case 0x0548/4: case 0x054c/4:
-	case 0x0550/4: case 0x0554/4: case 0x0558/4: case 0x055c/4:
-	case 0x0560/4: case 0x0564/4: case 0x0568/4: case 0x056c/4:
-	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
-		return m_clio.poll;
-
-	default:
-		if (!machine().side_effects_disabled())
-			logerror( "%08X: unhandled CLIO read offset = %08X\n", m_maincpu->pc(), offset * 4 );
-		break;
-	}
-	return 0;
-}
-
-void _3do_state::clio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if(offset != 0x200/4 && offset != 0x40/4 && offset != 0x44/4 && offset != 0x48/4 && offset != 0x4c/4 &&
-		offset != 0x118/4 && offset != 0x11c/4)
-		logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", m_maincpu->pc(), offset*4, data, mem_mask );
-
-	/* TODO: for debug, to be removed once that we write the CPU core */
-	if(offset >= 0x1800/4 && offset <= 0x1fff/4)
-	{
-		offset &= (0x3ff/4);
-		m_dspp.N[(offset<<1)+0] = data >> 16;
-		m_dspp.N[(offset<<1)+1] = data & 0xffff;
-		return;
-	}
-
-	if(offset >= 0x2000/4 && offset <= 0x2fff/4)
-	{
-		offset &= (0x7ff/4);
-		m_dspp.N[offset] = data & 0xffff;
-		return;
-	}
-
-	if(offset >= 0x3000/4 && offset <= 0x31ff/4)
-	{
-		offset &= (0x1ff/4);
-		m_dspp.EI[(offset<<1)+0] = data >> 16;
-		m_dspp.EI[(offset<<1)+1] = data & 0xffff;
-		return;
-	}
-
-	if(offset >= 0x3400/4 && offset <= 0x37ff/4)
-	{
-		offset &= (0x3ff/4);
-		m_dspp.EI[offset] = data & 0xffff;
-		return;
-	}
-
-	switch( offset )
-	{
-	case 0x0000/4:
-		break;
-	case 0x0004/4:
-		m_clio.csysbits = data;
-		break;
-	case 0x0008/4:
-		m_clio.vint0 = data;
-		break;
-	case 0x000c/4:
-		m_clio.vint1 = data;
-		break;
-	case 0x0020/4:
-		m_clio.audin = data;
-		break;
-	case 0x0024/4:  /* 03400024 - c0020f0f is written here during boot */
-		m_clio.audout = data;
-		break;
-	case 0x0028/4:  /* 03400028 - bits 0,1, and 6 are tested (reset source) */
-		m_clio.cstatbits = data;
-		break;
-	case 0x002c/4:  /* 0340002C - ?? during boot 0000000B is written here counter reload related?? */
-		m_clio.wdog = data;
-		break;
-	case 0x0030/4:
-		m_clio.hcnt = data;
-		break;
-	case 0x0034/4:
-		m_clio.vcnt = data;
-		break;
-	case 0x0038/4:
-		m_clio.seed = data;
-		break;
-	case 0x0040/4:
-		LOG(("%08x PEND0\n",data));
-		m_clio.irq0 |= data;
-		m_request_fiq(0,0);
-		break;
-	case 0x0044/4:
-		//LOG(("%08x PEND0 CLEAR\n",data));
-		m_clio.irq0 &= ~data;
-		m_request_fiq(0,0);
-		break;
-	case 0x0048/4:
-		//LOG(("%08x MASK0\n",data));
-		m_clio.irq0_enable |= data;
-		m_request_fiq(0,0);
-		break;
-	case 0x004c/4:
-		//LOG(("%08x MASK0 CLEAR\n",data));
-		m_clio.irq0_enable &= ~data;
-		m_request_fiq(0,0);
-		break;
-	case 0x0050/4:
-		m_clio.mode |= data;
-		break;
-	case 0x0054/4:
-		m_clio.mode &= ~data;
-		break;
-	case 0x0058/4:
-		m_clio.badbits = data;
-		break;
-	case 0x005c/4:
-		m_clio.spare = data;
-		break;
-	case 0x0060/4:
-		LOG(("%08x PEND1\n",data));
-		m_clio.irq1 |= data;
-		m_request_fiq(0,1);
-		break;
-	case 0x0064/4:
-		LOG(("%08x PEND1 CLEAR\n",data));
-		m_clio.irq1 &= ~data;
-		m_request_fiq(0,1);
-		break;
-	case 0x0068/4:
-		//LOG(("%08x MASK1\n",data));
-		m_clio.irq1_enable |= data;
-		m_request_fiq(0,1);
-		break;
-	case 0x006c/4:
-		//LOG(("%08x MASK1 CLEAR\n",data));
-		m_clio.irq1_enable &= ~data;
-		m_request_fiq(0,1);
-		break;
-	case 0x0080/4:
-		m_clio.hdelay = data;
-		break;
+	// expansion control
+	map(0x0080, 0x0083).lrw32(
+		NAME([this] () { return m_clio.hdelay; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.hdelay); })
+	);
 	// xxxx ---- DDR for below
 	// ---- x--- Watchdog reset output
 	// ---- -x-- Alternate ROM bank select (kanji ROM at $300'0000)
 	// ---- --x- Audio mute output
 	// ---- ---x <unused>
-	case 0x0084/4:
-		m_clio.adbio = data;
-		break;
-	case 0x0088/4:
-		m_clio.adbctl = data;
-		break;
+	map(0x0084, 0x0087).lrw32(
+		NAME([this] () { return m_clio.adbio; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_clio.adbio);
+			m_clio.adbio &= 0xff;
+		})
+	);
+	map(0x0088, 0x008b).lrw32(
+		NAME([this] () { return m_clio.adbctl; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.adbctl); })
+	);
 
-	/* only lower 16-bits can be written */
-	case 0x0100/4:  case 0x0108/4:  case 0x0110/4:  case 0x0118/4:
-	case 0x0120/4:  case 0x0128/4:  case 0x0130/4:  case 0x0138/4:
-	case 0x0140/4:  case 0x0148/4:  case 0x0150/4:  case 0x0158/4:
-	case 0x0160/4:  case 0x0168/4:  case 0x0170/4:  case 0x0178/4:
-		m_clio.timer_count[((offset & 0x3f) >> 1)] = data & 0xffff;
-		break;
-	case 0x0104/4:  case 0x010c/4:  case 0x0114/4:  case 0x011c/4:
-	case 0x0124/4:  case 0x012c/4:  case 0x0134/4:  case 0x013c/4:
-	case 0x0144/4:  case 0x014c/4:  case 0x0154/4:  case 0x015c/4:
-	case 0x0164/4:  case 0x016c/4:  case 0x0174/4:  case 0x017c/4:
-		m_clio.timer_backup[((offset & 0x3f) >> 1)] = data & 0xffff;
-		break;
+	// Timer section
+	map(0x0100, 0x017f).lrw32(
+		NAME([this] (offs_t offset) {
+			if (offset & 1)
+				return m_clio.timer_backup[(offset & 0x3f) >> 1];
+			return m_clio.timer_count[(offset & 0x3f) >> 1];
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			// only lower 16 bits can be written to
+			const u8 which = (offset & 0x3f) >> 1;
+			if (offset & 1)
+			{
+				COMBINE_DATA(&m_clio.timer_backup[which]);
+				m_clio.timer_backup[which] &= 0xffff;
+			}
+			else
+			{
+				COMBINE_DATA(&m_clio.timer_count[which]);
+				m_clio.timer_count[which] &= 0xffff;
+			}
+		})
+	);
+	map(0x0200, 0x020f).lrw32(
+		NAME([this] (offs_t offset) {
+			const u8 shift = (offset & 2) * 32;
+			return m_clio.timer_ctrl >> shift;
+		}),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			const u8 shift = (offset & 2) * 32;
+			const u64 mask = ((u64)data << shift);
+			if (offset & 1)
+				m_clio.timer_ctrl &= ~mask;
+			else
+				m_clio.timer_ctrl |= mask;
+		})
+	);
+	map(0x0220, 0x0223).lrw32(
+		NAME([this] () { return m_clio.slack; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.slack); })
+	);
 
-	case 0x0200/4:
-		m_clio.timer_ctrl |= (uint64_t)data;
-		break;
-	case 0x0204/4:
-		m_clio.timer_ctrl &= ~(uint64_t)data;
-		break;
-	case 0x0208/4:
-		m_clio.timer_ctrl |= ((uint64_t)data << 32);
-		break;
-	case 0x020c/4:
-		m_clio.timer_ctrl &= ~((uint64_t)data << 32);
-		break;
+//	map(0x0300, 0x0303) FIFO init
+//	map(0x0304, 0x0307) DMA request enable
+	// TODO: likely set/clear like above
+	map(0x0308, 0x030b).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.dmareqdis); })
+	);
+//	map(0x0380, 0x0383) FIFO status
 
-	case 0x0220/4:
-		m_clio.slack = data & 0x000003ff;
-		break;
+	// XBus
+	map(0x0400, 0x0407).lrw32(
+		NAME([this] () { return m_clio.expctl; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_8_15)
+			{
+				if (offset)
+					m_clio.expctl |= data & 0xca00;
+				else
+					m_clio.expctl &= ~(data & 0xca00);
+			}
+		})
+	);
+	map(0x0408, 0x040b).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_clio.type0_4); })
+	);
+	// TODO: these are identification bits
+	// x--- ---- ---- ---- active
+	// -x-- ---- ---- ---- "happened before reset"
+	// ---- ---- xxxx xxxx device number
+	map(0x0410, 0x0413).lr32(NAME([this] () { return m_clio.dipir1; }));
+	map(0x0414, 0x0417).lr32(NAME([this] () { return m_clio.dipir2; }));
 
-	case 0x0304/4:
-		//if(data)
-		//	printf("DMA %08x\n",data);
+	map(0x0500, 0x053f).lrw32(
+		NAME([this] () { return m_clio.sel; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_clio.sel);
+			m_clio.sel &= 0xff;
+			/* Start WRSEL cycle */
 
-		break;
+			/* Detection of too many devices on the bus */
+			switch ( data & 0xff )
+			{
+			case 0x8f:
+				/* Everything is fine, there are not too many devices in the system */
+				m_clio.poll = ( m_clio.poll & 0x0f );
+				break;
+			default:
+				m_clio.poll = ( m_clio.poll & 0x0f ) | 0x90;
+			}
+		})
+	);
+	map(0x0540, 0x057f).lrw32(
+		NAME([this] () { return m_clio.poll; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_clio.poll);
+			m_clio.poll &= 0xf8;
+			m_clio.poll |= data & 7;
+		})
+	);
+//	map(0x0580, 0x05bf) Command Stat
+//	map(0x05c0, 0x05ff) Data
 
-	case 0x0308/4:
-		m_clio.dmareqdis = data;
-		break;
-
-	case 0x0400/4:
-		m_clio.expctl = m_clio.expctl | ( data & 0xca00 );
-		break;
-	case 0x0404/4:
-		m_clio.expctl = m_clio.expctl & ~( data & 0xca00 );
-		break;
-	case 0x0408/4:
-		m_clio.type0_4 = data;
-		break;
-
-	case 0x0500/4: case 0x0504/4: case 0x0508/4: case 0x050c/4:
-	case 0x0510/4: case 0x0514/4: case 0x0518/4: case 0x051c/4:
-	case 0x0520/4: case 0x0524/4: case 0x0528/4: case 0x052c/4:
-	case 0x0530/4: case 0x0534/4: case 0x0538/4: case 0x053c/4:
-		m_clio.sel = data & 0xff;
-		/* Start WRSEL cycle */
-
-		/* Detection of too many devices on the bus */
-		switch ( data & 0xff )
-		{
-		case 0x8f:
-			/* Everything is fine, there are not too many devices in the system */
-			m_clio.poll = ( m_clio.poll & 0x0f );
-			break;
-		default:
-			m_clio.poll = ( m_clio.poll & 0x0f ) | 0x90;
-		}
-		break;
-
-	case 0x0540/4: case 0x0544/4: case 0x0548/4: case 0x054c/4:
-	case 0x0550/4: case 0x0554/4: case 0x0558/4: case 0x055c/4:
-	case 0x0560/4: case 0x0564/4: case 0x0568/4: case 0x056c/4:
-	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
-		m_clio.poll = ( m_clio.poll & 0xf8 ) | ( data & 0x07 );
-		break;
-
-	// DSPP operation
+	// TODO: for debug, to be removed once that we hookup the CPU core
+//	map(0x17d0, 0x17d3) Semaphore
+//	map(0x17d4, 0x17d7) Semaphore ACK
+//	map(0x17e0, 0x17ff) DSPP DMA and state
 	/*
 	---- x--- DSPPError
 	---- -x-- DSPPReset
@@ -1012,19 +748,56 @@ void _3do_state::clio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	---- --x- DSPPGW-Step
 	---- ---x DSPPGW
 	*/
-	case 0x17fc/4:
-		/* TODO: DSPP enabled just before enabling DSPP irq! */
-		if(data & 1)
-			machine().debug_break();
-
-		//printf("%08x\n",data);
-		break;
-
-	default:
-		logerror( "%08X: unhandled CLIO write offset = %08X, data = %08X, mask = %08X\n", m_maincpu->pc(), offset*4, data, mem_mask );
-		break;
-	}
+	map(0x17fc, 0x17ff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (data & 1)
+				machine().debug_break();
+		})
+	);
+	map(0x1800, 0x1fff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_16_31)
+				m_dspp.N[(offset<<1)+0] = data >> 16;
+			if (ACCESSING_BITS_0_15)
+				m_dspp.N[(offset<<1)+1] = data & 0xffff;
+		})
+	);
+	map(0x2000, 0x2fff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_0_15)
+				m_dspp.N[offset] = data & 0xffff;
+		})
+	);
+	map(0x3000, 0x31ff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_16_31)
+				m_dspp.EI[(offset<<1)+0] = data >> 16;
+			if (ACCESSING_BITS_0_15)
+				m_dspp.EI[(offset<<1)+1] = data & 0xffff;
+		})
+	);
+	map(0x3400, 0x37ff).lw32(
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_0_15)
+				m_dspp.EI[offset] = data & 0xffff;
+		})
+	);
+	map(0x3800, 0x39ff).lr32(
+		NAME([this] (offs_t offset) {
+			uint32_t res = 0;
+			res = (m_dspp.EO[(offset << 1) + 0] << 16);
+			res |= (m_dspp.EO[(offset << 1) + 1] & 0xffff);
+			return res;
+		})
+	);
+	map(0x3c00, 0x3fff).lr32(
+		NAME([this] (offs_t offset) {
+			return m_dspp.EO[offset] & 0xffff;
+		})
+	);
 }
+
+
 
 // $0340'c000 base
 // Uncle/Woody is the FMV expansion bus (with it's own ROM)

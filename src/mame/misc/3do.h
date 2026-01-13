@@ -73,7 +73,7 @@ private:
 		uint32_t  ddxyl = 0;          /* 0330015c */
 
 		uint32_t  pip[16]{};        /* 03300180-033001bc (W); 03300180-033001fc (R) */
-		uint32_t  fence[16]{};      /* 03300200-0330023c (W); 03300200-0330027c (R) */
+		uint32_t  fence[4]{};      /* 03300200-0330023c (W); 03300200-0330027c (R) */
 		uint32_t  mmu[64]{};        /* 03300300-033003fc */
 		uint32_t  dma[32][4]{};     /* 03300400-033005fc */
 		uint32_t  mult[40]{};       /* 03300600-0330069c */
@@ -81,6 +81,7 @@ private:
 		uint32_t  mult_status = 0;    /* 033007f8 */
 	};
 
+	void madam_map(address_map &map);
 
 	struct CLIO {
 		screen_device *screen = nullptr;
@@ -101,7 +102,6 @@ private:
 		uint32_t  irq0_enable = 0;    /* 03400048 / 0340004c */
 		uint32_t  mode = 0;           /* 03400050 / 03400054 */
 		uint32_t  badbits = 0;        /* 03400058 */
-		uint32_t  spare = 0;          /* 0340005c */
 		uint32_t  irq1 = 0;           /* 03400060 / 03400064 */
 		uint32_t  irq1_enable = 0;    /* 03400068 / 0340006c */
 		uint32_t  hdelay = 0;         /* 03400080 */
@@ -141,6 +141,8 @@ private:
 								/* 03403c00 - 03403c3f DSPP EO stack (32bit reads) */
 		uint32_t  dsppclkreload = 0;  /* 034039dc / 03403fbc */
 	};
+
+	void clio_map(address_map &map);
 
 	struct UNCLE {
 		uint32_t  rev = 0;       /* 0340c000 */
@@ -183,8 +185,6 @@ private:
 	void slow2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t svf_r(offs_t offset);
 	void svf_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t madam_r(offs_t offset);
-	void madam_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t clio_r(offs_t offset);
 	void clio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
