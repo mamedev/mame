@@ -251,10 +251,8 @@ void stella8085_state::kbd_bd_w(uint8_t data)
 uint8_t stella8085_state::kbd_rl_r()
 {
 	uint8_t ret = 0xff;
-	if (m_kbd_sl < 8)
-		ret = m_tz[m_kbd_sl]->read();
-	else
-		LOG("read unmapped line %02x\n", m_kbd_sl);
+	uint8_t rl = m_kbd_sl & 0x07;
+	ret = m_tz[rl]->read();
 	return ret;
 }
 
