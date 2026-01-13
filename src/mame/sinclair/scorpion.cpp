@@ -81,7 +81,7 @@ private:
 	u8 beta_disable_r(offs_t offset);
 	INTERRUPT_GEN_MEMBER(scorpion_interrupt);
 
-	required_ioport_array<3> m_io_mouse;
+	required_ioport_array<4> m_io_mouse;
 };
 
 class scorpiontb_state : public scorpion_state
@@ -339,9 +339,9 @@ void scorpion_state::scorpion_io(address_map &map)
 		.rw(FUNC(scorpion_state::spectrum_ula_r), FUNC(scorpion_state::spectrum_ula_w));
 	m_io_shadow_view[0](0x0023, 0x0023).mirror(0xffdc) // FF | xxxxxxxxxx1xxx11
 		.r(FUNC(scorpion_state::port_ff_r));
-	m_io_shadow_view[0](0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
+	m_io_shadow_view[0](0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return (m_io_mouse[3]->read() << 4) | m_io_mouse[2]->read(); }));
 	m_io_shadow_view[0](0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));
-	m_io_shadow_view[0](0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
+	m_io_shadow_view[0](0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return m_io_mouse[1]->read(); }));
 	m_io_shadow_view[0](0x0003, 0x0003) // 1F | xxxxxxxx0x0xxx11
 		.select(0xff5c).lr8(NAME([this]() -> u8 { return (m_beta->state_r() & 0xc0) | 0x00; })); // TODO Kepmston Joystick
 
@@ -465,12 +465,17 @@ INPUT_PORTS_START( scorpion )
 	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
 
 	PORT_START("mouse_input2")
-	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_REVERSE PORT_SENSITIVITY(30)
 
 	PORT_START("mouse_input3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Mouse Button Left") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Mouse Button Right") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Mouse Button Middle") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("mouse_input4")
+	PORT_BIT(0x0f, 0, IPT_DIAL_V) PORT_REVERSE PORT_NAME("Mouse Scroll V") PORT_SENSITIVITY(1) PORT_CODE(MOUSECODE_Z)
+
 INPUT_PORTS_END
 
 void scorpion_state::scorpion(machine_config &config)

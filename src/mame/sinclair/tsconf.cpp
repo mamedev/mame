@@ -98,9 +98,9 @@ void tsconf_state::tsconf_io(address_map &map)
 
 	map(0x00fe, 0x00fe).select(0xff00).rw(FUNC(tsconf_state::spectrum_ula_r), FUNC(tsconf_state::tsconf_ula_w));
 	map(0x00af, 0x00af).select(0xff00).rw(FUNC(tsconf_state::tsconf_port_xxaf_r), FUNC(tsconf_state::tsconf_port_xxaf_w));
-	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
-	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return  m_io_mouse[0]->read(); }));
-	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
+	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return (m_io_mouse[3]->read() << 4) | m_io_mouse[2]->read(); }));
+	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));
+	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return m_io_mouse[1]->read(); }));
 	map(0x8ff7, 0x8ff7).select(0x7000).w(FUNC(tsconf_state::tsconf_port_f7_w)); // 3:bff7 5:dff7 6:eff7
 	map(0xbff7, 0xbff7).r(FUNC(tsconf_state::tsconf_port_f7_r));
 	map(0x00fb, 0x00fb).mirror(0xff00).w(m_dac, FUNC(dac_byte_interface::data_w));
@@ -261,12 +261,17 @@ INPUT_PORTS_START( tsconf )
 	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
 
 	PORT_START("mouse_input2")
-	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_REVERSE PORT_SENSITIVITY(30)
 
 	PORT_START("mouse_input3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Mouse Button Left") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Mouse Button Right") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Mouse Button Middle") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("mouse_input4")
+	PORT_BIT(0x0f, 0, IPT_DIAL_V) PORT_REVERSE PORT_NAME("Mouse Scroll V") PORT_SENSITIVITY(1) PORT_CODE(MOUSECODE_Z)
+
 INPUT_PORTS_END
 
 void tsconf_state::tsconf(machine_config &config)
