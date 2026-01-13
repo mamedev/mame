@@ -41,10 +41,12 @@
 
     Known issues/to-do's:
         * Starfield is not 100% accurate
-        * Verify screen refresh rate, maybe same as original pacman/galaga?
-        * Music speed is slightly slower than the real thing (internal Z180 timer?)
+        * Music tempo is slightly slower than the real thing (internal Z180 timer?)
         * Check the ASCI interface, there probably is fully working debug code.
-        * Galaga attract mode isn't correct; reference: https://youtu.be/OQyWaN9fTgw?t=2m33s
+        * Galaga attract mode isn't correct. At the score information screen, enemies are
+          supposed to dive down like on the original Galaga. CPU opcode bug?
+          Reference: https://youtu.be/OQyWaN9fTgw?t=2m33s
+
 
 +-------------------------------------------------------+
 |                        +-------------+                |
@@ -81,6 +83,9 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
       D4: Diode - Status light
       J1: 10 pin JTAG interface for programming the CY37256P160 CPLDs
 
+   HSync: 15.5174kHz
+   VSync: 60.60175Hz
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -89,18 +94,6 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
 #include "machine/eepromser.h"
 #include "machine/watchdog.h"
 #include "speaker.h"
-
-
-/*************************************
- *
- *  Clocks
- *
- *************************************/
-
-#define MASTER_CLOCK        (XTAL(73'728'000))
-#define MAIN_CPU_CLOCK      (MASTER_CLOCK / 4)
-#define NAMCO_AUDIO_CLOCK   (MASTER_CLOCK / 4 / 6 / 32)
-
 
 
 /*************************************
@@ -415,7 +408,7 @@ DEVICE_INPUT_DEFAULTS_END
 void _20pacgal_state::_20pacgal(machine_config &config)
 {
 	// basic machine hardware
-	Z8S180(config, m_maincpu, MAIN_CPU_CLOCK); // 18.432MHz verified on PCB
+	Z8S180(config, m_maincpu, 73.728_MHz_XTAL / 4); // 18.432MHz verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &_20pacgal_state::_20pacgal_map);
 	m_maincpu->set_addrmap(AS_IO, &_20pacgal_state::_20pacgal_io_map);
 	m_maincpu->txa0_wr_callback().set("rs232", FUNC(rs232_port_device::write_txd));
@@ -431,16 +424,21 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	_20pacgal_video(config);
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(73.728_MHz_XTAL / 4 / 3, 396, 0, 288, 256, 0, 224);
+	screen.set_screen_update(FUNC(_20pacgal_state::screen_update_20pacgal));
+	screen.screen_vblank().set(FUNC(_20pacgal_state::vblank_irq));
+
+	PALETTE(config, m_palette, FUNC(_20pacgal_state::starpal_init), 0x1000 + 64);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 
-	namco_cus30_device &namco(NAMCO_CUS30(config, "namco", NAMCO_AUDIO_CLOCK));
+	namco_cus30_device &namco(NAMCO_CUS30(config, "namco", 73.728_MHz_XTAL / 4 / 6 / 32));
 	namco.set_voices(3);
-	namco.add_route(ALL_OUTPUTS, "speaker", 1.0);
+	namco.add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 1.0); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
 }
 
 static DEVICE_INPUT_DEFAULTS_START( null_modem_57600 )

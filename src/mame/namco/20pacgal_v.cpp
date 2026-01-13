@@ -10,13 +10,6 @@
 
 #include "emu.h"
 #include "20pacgal.h"
-#include "screen.h"
-
-
-#define SCREEN_HEIGHT   (224)
-#define SCREEN_WIDTH    (288)
-#define NUM_PENS        (0x1000)
-#define NUM_STAR_PENS   (64)
 
 
 /*************************************
@@ -28,9 +21,9 @@
 void _20pacgal_state::get_pens()
 {
 	// TODO: Accurate palette when prom doesn't exist
-	uint8_t const *color_prom = m_proms->base() + (NUM_PENS * m_game_selected);
+	uint8_t const *color_prom = m_proms->base() + (0x1000 * m_game_selected);
 
-	for (offs_t offs = 0; offs < NUM_PENS; offs++)
+	for (offs_t offs = 0; offs < 0x1000; offs++)
 	{
 		int bit0, bit1, bit2;
 
@@ -69,7 +62,7 @@ void _20pacgal_state::starpal_init(palette_device &palette) const
 		int const g = map[(offs >> 2) & 0x03];
 		int const b = map[(offs >> 4) & 0x03];
 
-		palette.set_pen_color(NUM_PENS + offs, rgb_t(r, g, b));
+		palette.set_pen_color(0x1000 + offs, rgb_t(r, g, b));
 	}
 }
 
@@ -244,8 +237,8 @@ void _20pacgal_state::draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect
 
 		if (flip)
 		{
-			y = SCREEN_HEIGHT - 1 - y;
-			x = SCREEN_WIDTH - 1 - x;
+			y = 224 - 1 - y;
+			x = 288 - 1 - x;
 		}
 
 		// for each row in the character
@@ -381,7 +374,7 @@ void _20pacgal_state::draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect
 			if (((lfsr & 0xffc0) == star_seta) || ((lfsr & 0xffc0) == star_setb))
 			{
 				if (y >= cliprect.min_y && y <= cliprect.max_y)
-					bitmap.pix(y, x) = NUM_PENS + (lfsr & 0x3f);
+					bitmap.pix(y, x) = 0x1000 + (lfsr & 0x3f);
 			}
 		}
 	}
@@ -418,24 +411,4 @@ void _20pacgal_state::video_start()
 
 	if (m_proms != nullptr)
 		get_pens();
-}
-
-
-/*************************************
- *
- *  Machine driver
- *
- *************************************/
-
-void _20pacgal_state::_20pacgal_video(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(SCREEN_WIDTH, SCREEN_HEIGHT);
-	screen.set_visarea(0, SCREEN_WIDTH - 1, 0, SCREEN_HEIGHT - 1);
-	screen.set_screen_update(FUNC(_20pacgal_state::screen_update_20pacgal));
-	screen.screen_vblank().set(FUNC(_20pacgal_state::vblank_irq));
-
-	PALETTE(config, m_palette, FUNC(_20pacgal_state::starpal_init), NUM_PENS + NUM_PENS);
 }

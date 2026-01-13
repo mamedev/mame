@@ -12,13 +12,15 @@
 
 #pragma once
 
+#include "bus/rs232/rs232.h"
 #include "cpu/z180/z180.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
-#include "bus/rs232/rs232.h"
+
 #include "emupal.h"
+#include "screen.h"
 
 class _20pacgal_state : public driver_device
 {
@@ -40,7 +42,6 @@ public:
 	{ }
 
 	void _20pacgal(machine_config &config);
-	void _20pacgal_video(machine_config &config);
 
 	void init_25pacman();
 	void init_20pacgal();
