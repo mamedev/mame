@@ -45,7 +45,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- Found on a Comelta DRAC-1 machine. -->
-	<software name="basic11a">
+	<software name="basic11a" cloneof="basic11">
 		<description>AIM 65 BASIC v1.1 (alt)</description>
 		<year>1978</year>
 		<publisher>Rockwell/Microsoft</publisher>

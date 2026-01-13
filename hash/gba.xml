@@ -16406,7 +16406,7 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 	</software>
 
 	<software name="jchan">
-		<description>Jackie Chan Adventures - Legend of the Darkhand (Europe, USA)</description>
+		<description>Jackie Chan Adventures - Legend of the Dark Hand (Europe, USA)</description>
 		<year>2001</year>
 		<publisher>Activision</publisher>
 		<info name="serial" value="AGB-AJCE-USA, AGB-AJCP"/>
@@ -23515,7 +23515,7 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		</part>
 	</software>
 
-	<software name="mkau">
+	<software name="mkau" cloneof="mka">
 		<description>Mortal Kombat Advance (USA)</description>
 		<year>2001</year>
 		<publisher>Midway</publisher>
