@@ -4,7 +4,7 @@
 #include "emu.h"
 #include "3do_clio.h"
 
-DEFINE_DEVICE_TYPE(CLIO, clio_device, "clio_device", "3DO MN7A02IUDB \"Clio\" I/O controller")
+DEFINE_DEVICE_TYPE(CLIO, clio_device, "clio", "3DO MN7A02IUDB \"Clio\" I/O controller")
 
 clio_device::clio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, CLIO, tag, owner, clock)

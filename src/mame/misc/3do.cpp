@@ -122,7 +122,7 @@ void _3do_state::main_mem(address_map &map)
 	map(0x0318'0000, 0x031B'FFFF).rw(FUNC(_3do_state::slow2_r), FUNC(_3do_state::slow2_w));               /* Slow bus - additional expansion */
 	// Sport
 	map(0x0320'0000, 0x0320'FFFF).rw(FUNC(_3do_state::svf_r), FUNC(_3do_state::svf_w));                   /* special vram access1 */
-	map(0x0330'0000, 0x0330'07FF).m(*this, FUNC(_3do_state::madam_map));               /* address decoder */
+	map(0x0330'0000, 0x0330'07FF).m(m_madam, FUNC(madam_device::map));              /* address decoder */
 	map(0x0340'0000, 0x0340'3FFF).m(m_clio, FUNC(clio_device::map));                /* io controller */
 	map(0x0340'C000, 0x0340'FFFF).m(*this, FUNC(_3do_state::uncle_map));
 //  map(0x0360'0000, 0X037F'FFFF) trace
@@ -155,7 +155,6 @@ void _3do_state::machine_start()
 	m_bank1->configure_entry(1, memregion("overlay")->base());
 
 	m_slow2_init();
-	m_madam_init();
 	m_uncle.rev = 0x03800000;
 }
 
@@ -172,6 +171,8 @@ void _3do_state::_3do(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &_3do_state::main_mem);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	MADAM(config, m_madam, XTAL(50'000'000)/4);
 
 	CLIO(config, m_clio, XTAL(50'000'000)/4);
 	m_clio->firq_cb().set([this] (int state) {
@@ -195,6 +196,8 @@ void _3do_state::_3do_pal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &_3do_state::main_mem);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	MADAM(config, m_madam, XTAL(50'000'000)/4);
 
 	CLIO(config, m_clio, XTAL(50'000'000)/4);
 	m_clio->firq_cb().set([this] (int state) {
