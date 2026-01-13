@@ -123,7 +123,7 @@ void _3do_state::main_mem(address_map &map)
 	// Sport
 	map(0x0320'0000, 0x0320'FFFF).rw(FUNC(_3do_state::svf_r), FUNC(_3do_state::svf_w));                   /* special vram access1 */
 	map(0x0330'0000, 0x0330'07FF).m(*this, FUNC(_3do_state::madam_map));               /* address decoder */
-	map(0x0340'0000, 0x0340'3FFF).m(*this, FUNC(_3do_state::clio_map));                /* io controller */
+	map(0x0340'0000, 0x0340'3FFF).m(m_clio, FUNC(clio_device::map));                /* io controller */
 	map(0x0340'C000, 0x0340'FFFF).m(*this, FUNC(_3do_state::uncle_map));
 //  map(0x0360'0000, 0X037F'FFFF) trace
 //      map(0x0370'0000, 0X037E'FFFF) SRAM
@@ -156,15 +156,13 @@ void _3do_state::machine_start()
 
 	m_slow2_init();
 	m_madam_init();
-	m_clio_init();
+	m_uncle.rev = 0x03800000;
 }
 
 void _3do_state::machine_reset()
 {
 	/* start with overlay enabled */
 	m_bank1->set_entry(1);
-
-	m_clio.cstatbits = 0x01; /* bit 0 = reset of clio caused by power on */
 }
 
 void _3do_state::_3do(machine_config &config)
@@ -175,7 +173,12 @@ void _3do_state::_3do(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TIMER(config, "timer_x16").configure_periodic(FUNC(_3do_state::timer_x16_cb), attotime::from_hz(12000)); // TODO: timing
+	CLIO(config, m_clio, XTAL(50'000'000)/4);
+	m_clio->firq_cb().set([this] (int state) {
+		if (state)
+			m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+	});
+	m_clio->set_screen_tag("screen");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262);
@@ -193,7 +196,12 @@ void _3do_state::_3do_pal(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TIMER(config, "timer_x16").configure_periodic(FUNC(_3do_state::timer_x16_cb), attotime::from_hz(12000)); // TODO: timing
+	CLIO(config, m_clio, XTAL(50'000'000)/4);
+	m_clio->firq_cb().set([this] (int state) {
+		if (state)
+			m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+	});
+	m_clio->set_screen_tag("screen");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(X2_CLOCK_PAL / 2, 1592, 254, 1534, 263, 22, 262); // TODO: proper params

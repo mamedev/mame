@@ -13,6 +13,7 @@
 #include "machine/timer.h"
 #include "screen.h"
 
+#include "3do_clio.h"
 
 class _3do_state : public driver_device
 {
@@ -24,6 +25,7 @@ public:
 		m_vram(*this, "vram"),
 		m_nvram(*this, "nvram"),
 		m_screen(*this, "screen"),
+		m_clio(*this, "clio"),
 		m_bank1(*this, "bank1") { }
 
 	void _3do(machine_config &config);
@@ -83,66 +85,6 @@ private:
 
 	void madam_map(address_map &map);
 
-	struct CLIO {
-		screen_device *screen = nullptr;
-
-		uint32_t  revision = 0;       /* 03400000 */
-		uint32_t  csysbits = 0;       /* 03400004 */
-		uint32_t  vint0 = 0;          /* 03400008 */
-		uint32_t  vint1 = 0;          /* 0340000c */
-		uint32_t  audin = 0;          /* 03400020 */
-		uint32_t  audout = 0;         /* 03400024 */
-		uint32_t  cstatbits = 0;      /* 03400028 */
-		uint32_t  wdog = 0;           /* 0340002c */
-		uint32_t  hcnt = 0;           /* 03400030 */
-		uint32_t  vcnt = 0;           /* 03400034 */
-		uint32_t  seed = 0;           /* 03400038 */
-		uint32_t  random = 0;         /* 0340004c */
-		uint32_t  irq0 = 0;           /* 03400040 / 03400044 */
-		uint32_t  irq0_enable = 0;    /* 03400048 / 0340004c */
-		uint32_t  mode = 0;           /* 03400050 / 03400054 */
-		uint32_t  badbits = 0;        /* 03400058 */
-		uint32_t  irq1 = 0;           /* 03400060 / 03400064 */
-		uint32_t  irq1_enable = 0;    /* 03400068 / 0340006c */
-		uint32_t  hdelay = 0;         /* 03400080 */
-		uint32_t  adbio = 0;          /* 03400084 */
-		uint32_t  adbctl = 0;         /* 03400088 */
-								/* Timers */
-		uint32_t  timer_count[16]{};/* 034001** & 8 */
-		uint32_t  timer_backup[16]{};   /* 034001**+4 & 8 */
-		uint64_t  timer_ctrl = 0;     /* 03400200 */
-		uint32_t  slack = 0;          /* 03400220 */
-								/* DMA */
-		uint32_t  dmareqdis = 0;      /* 03400308 */
-								/* Expansion bus */
-		uint32_t  expctl = 0;         /* 03400400/03400404 */
-		uint32_t  type0_4 = 0;        /* 03400408 */
-		uint32_t  dipir1 = 0;         /* 03400410 */
-		uint32_t  dipir2 = 0;         /* 03400414 */
-								/* Bus signals */
-		uint32_t  sel = 0;            /* 03400500 - 0340053f */
-		uint32_t  poll = 0;           /* 03400540 - 0340057f */
-		uint32_t  cmdstat = 0;        /* 03400580 - 034005bf */
-		uint32_t  data = 0;           /* 034005c0 - 034005ff */
-								/* DSPP */
-		uint32_t  semaphore = 0;      /* 034017d0 */
-		uint32_t  semaack = 0;        /* 034017d4 */
-		uint32_t  dsppdma = 0;        /* 034017e0 */
-		uint32_t  dspprst0 = 0;       /* 034017e4 */
-		uint32_t  dspprst1 = 0;       /* 034017e8 */
-		uint32_t  dspppc = 0;         /* 034017f4 */
-		uint32_t  dsppnr = 0;         /* 034017f8 */
-		uint32_t  dsppgw = 0;         /* 034017fc */
-		uint32_t  dsppn[0x400]{};   /* 03401800 - 03401bff DSPP N stack (32bit writes) */
-								/* 03402000 - 034027ff DSPP N stack (16bit writes) */
-		uint32_t  dsppei[0x100]{};  /* 03403000 - 034030ff DSPP EI stack (32bit writes) */
-								/* 03403400 - 034035ff DSPP EI stack (16bit writes) */
-		uint32_t  dsppeo[0x1f]{};   /* 03403800 - 0340381f DSPP EO stack (32bit reads) */
-								/* 03403c00 - 03403c3f DSPP EO stack (32bit reads) */
-		uint32_t  dsppclkreload = 0;  /* 034039dc / 03403fbc */
-	};
-
-	void clio_map(address_map &map);
 
 	struct UNCLE {
 		uint32_t  rev = 0;       /* 0340c000 */
@@ -168,11 +110,11 @@ private:
 	required_shared_ptr<uint32_t> m_vram;
 	required_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
+	required_device<clio_device> m_clio;
 	required_memory_bank m_bank1;
 
 	SLOW2 m_slow2;
 	MADAM m_madam;
-	CLIO m_clio;
 	UNCLE m_uncle;
 	SVF m_svf;
 	DSPP m_dspp;
@@ -185,19 +127,13 @@ private:
 	void slow2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t svf_r(offs_t offset);
 	void svf_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t clio_r(offs_t offset);
-	void clio_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );
 
 	void main_mem(address_map &map) ATTR_COLD;
 
 	void m_slow2_init( void );
 	void m_madam_init( void );
 	void m_clio_init( void );
-
-	void m_request_fiq(uint32_t irq_req, uint8_t type);
 };
 
 
