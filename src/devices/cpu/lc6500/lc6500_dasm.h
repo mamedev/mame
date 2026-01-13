@@ -21,12 +21,8 @@ public:
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
 
 private:
-	struct instruction {
-		uint8_t value;
-		uint8_t mask;
-		uint32_t (*cb)(std::ostream &, uint32_t, const data_buffer &, uint32_t);
-	};
-	static const instruction instructions[];
+	struct instruction;
+	static const instruction s_instructions[];
 };
 
 #endif // MAME_CPU_LC6500_LC6500_DASM_H
