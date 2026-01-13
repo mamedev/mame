@@ -20,6 +20,7 @@
 
 #include "pm2.h"
 #include "pm2_mmu.h"
+#include "iris_kbd.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
@@ -68,7 +69,7 @@ public:
 		, m_cpu(*this, "cpu")
 		, m_mmu(*this, "mmu")
 		, m_duart(*this, "duart%u", 0U)
-		, m_port(*this, "port%u", 0U)
+		, m_port(*this, "port%u", 1U)
 		, m_ram(*this, "ram")
 		, m_config(*this, "CONFIG")
 		, m_led(*this, "led")
@@ -147,8 +148,13 @@ void sgi_pm2_device::device_reset()
 		m_installed = true;
 	}
 
-	m_status = 0;
+	m_status = STATUS_EN0 | STATUS_EN1;
 	m_exception = 0x0f;
+}
+
+void keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("kbd", IRIS_KBD);
 }
 
 void sgi_pm2_device::device_add_mconfig(machine_config &config)
@@ -186,7 +192,7 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	MC68681(config, m_duart[0], 3.6864_MHz_XTAL).irq_cb().set(irq6, FUNC(input_merger_any_high_device::in_w<0>));
 	MC68681(config, m_duart[1], 3.6864_MHz_XTAL).irq_cb().set(irq6, FUNC(input_merger_any_high_device::in_w<1>));
 
-	RS232_PORT(config, m_port[0], default_rs232_devices, nullptr); // TODO: keyboard
+	RS232_PORT(config, m_port[0], keyboard_devices, nullptr);
 	RS232_PORT(config, m_port[1], default_rs232_devices, "terminal");
 	RS232_PORT(config, m_port[2], default_rs232_devices, nullptr);
 	RS232_PORT(config, m_port[3], default_rs232_devices, nullptr);

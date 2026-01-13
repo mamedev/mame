@@ -61,6 +61,7 @@
  */
 #include "emu.h"
 #include "ip2.h"
+#include "iris_kbd.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68020.h"
@@ -90,7 +91,7 @@ public:
 		, m_cpu(*this, "cpu")
 		, m_ram(*this, "ram")
 		, m_duart(*this, "duart%u", 0U)
-		, m_port(*this, "port%u", 0U)
+		, m_port(*this, "port%u", 1U)
 		, m_tod(*this, "tod")
 		, m_nvram(*this, "nvram")
 		, m_default_space(*this, "default")
@@ -552,6 +553,11 @@ void sgi_ip2_device::mem_map(address_map &map)
 	map(0xf000'0000, 0xffff'ffff).noprw(); // floating point accelerator
 }
 
+void keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("kbd", IRIS_KBD);
+}
+
 void sgi_ip2_device::device_add_mconfig(machine_config &config)
 {
 	M68020(config, m_cpu, 32_MHz_XTAL / 2);
@@ -570,7 +576,7 @@ void sgi_ip2_device::device_add_mconfig(machine_config &config)
 	MC68681(config, m_duart[1], 3.6864_MHz_XTAL);
 	m_duart[1]->irq_cb().set(irq6, FUNC(input_merger_any_high_device::in_w<1>));
 
-	RS232_PORT(config, m_port[0], default_rs232_devices, nullptr); // TODO: keyboard
+	RS232_PORT(config, m_port[0], keyboard_devices, nullptr);
 	RS232_PORT(config, m_port[1], default_rs232_devices, "terminal");
 	RS232_PORT(config, m_port[2], default_rs232_devices, nullptr);
 	RS232_PORT(config, m_port[3], default_rs232_devices, nullptr);
