@@ -41,7 +41,7 @@
 
     Known issues/to-do's:
         * Starfield is not 100% accurate
-        * Music tempo is slightly slower than the real thing (internal Z180 timer?)
+        * Music tempo of 20pacgalr4 and newer is is slightly slower, or is this normal?
         * Check the ASCI interface, there probably is fully working debug code.
         * Galaga attract mode isn't correct. At the score information screen, enemies are
           supposed to dive down like on the original Galaga. CPU opcode bug?
@@ -85,6 +85,10 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
 
    HSync: 15.5174kHz
    VSync: 60.60175Hz
+
+    The DAC (of the Namco sound chip, apparently combined with the generic DAC)
+    is the same as on the old Pac-Man hardware, digital output is 8 lines from
+    a CPLD.
 
 ***************************************************************************/
 
@@ -439,7 +443,7 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 	namco.set_voices(3);
 	namco.add_route(ALL_OUTPUTS, "speaker", 0.5);
 
-	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5); // unknown DAC
+	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 static DEVICE_INPUT_DEFAULTS_START( null_modem_57600 )
