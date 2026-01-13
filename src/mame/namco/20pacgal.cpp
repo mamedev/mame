@@ -427,6 +427,7 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(73.728_MHz_XTAL / 4 / 3, 396, 0, 288, 256, 0, 224);
 	screen.set_screen_update(FUNC(_20pacgal_state::screen_update_20pacgal));
+	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(_20pacgal_state::vblank_irq));
 
 	PALETTE(config, m_palette, FUNC(_20pacgal_state::starpal_init), 0x1000 + 64);

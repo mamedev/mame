@@ -67,24 +67,13 @@ void _20pacgal_state::starpal_init(palette_device &palette) const
 }
 
 
-void _20pacgal_state::do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	const pen_t *pen = m_palette->pens();
-
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			bitmap.pix(y, x) = pen[bitmap.pix(y, x)];
-}
-
-
-
 /*************************************
  *
  *  Sprite drawing
  *
  *************************************/
 
-void _20pacgal_state::draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x,
+void _20pacgal_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x,
 		uint8_t code, uint8_t color, int flip_y, int flip_x)
 {
 	offs_t pen_base = (color & 0x1f) << 2;
@@ -149,7 +138,7 @@ void _20pacgal_state::draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprec
 }
 
 
-void _20pacgal_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void _20pacgal_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0x80 - 2; offs >= 0; offs -= 2)
 	{
@@ -199,7 +188,7 @@ void _20pacgal_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &clipre
  *
  *************************************/
 
-void _20pacgal_state::draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void _20pacgal_state::draw_chars(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int flip = m_flip[0] & 0x01;
 
@@ -337,7 +326,7 @@ void _20pacgal_state::draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect
  *
  */
 
-void _20pacgal_state::draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect )
+void _20pacgal_state::draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	if (BIT(m_stars_ctrl[0], 5))
 	{
@@ -387,13 +376,12 @@ void _20pacgal_state::draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect
  *
  *************************************/
 
-uint32_t _20pacgal_state::screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t _20pacgal_state::screen_update_20pacgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 	draw_stars(bitmap, cliprect);
 	draw_chars(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);
-	do_pen_lookup(bitmap, cliprect);
 
 	return 0;
 }

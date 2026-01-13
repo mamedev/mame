@@ -88,15 +88,14 @@ protected:
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void starpal_init(palette_device &palette) const;
 	void get_pens();
-	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x, uint8_t code, uint8_t color, int flip_y, int flip_x);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_chars(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint8_t code, uint8_t color, int flip_y, int flip_x);
 	void common_save_state();
 
 	void _20pacgal_io_map(address_map &map) ATTR_COLD;
