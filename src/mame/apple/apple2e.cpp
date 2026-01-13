@@ -5077,7 +5077,7 @@ void apple2e_state::tk3000(machine_config &config)
 
 void apple2e_state::prav8c(machine_config &config)
 {
-	apple2e(config);
+	apple2epal(config);
 
 	config.device_remove("ay3600");
 	config.device_remove("tape");
