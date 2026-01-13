@@ -362,6 +362,7 @@ void keyfox10_state::port0_w(u8 data)
 
 void keyfox10_state::port1_w(u8 data)
 {
+    //data ^= (P1_CLK_LED | P1_CLK_SW);
     u8 changed = m_port1 ^ data;
     u8 rising = changed & data;
 
@@ -496,7 +497,7 @@ void keyfox10_state::panel_latch()
     // This captures the current shift register state for LED display
     for (int i = 0; i < 10; i++)
     {
-        m_panel_latch[i] = m_panel_sr[i];
+        m_panel_latch[i] = ~m_panel_sr[i]; // FIX
     }
     LOGMASKED(LOG_IO, "Panel latch: %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X\n",
         m_panel_latch[0], m_panel_latch[1], m_panel_latch[2], m_panel_latch[3], m_panel_latch[4],
@@ -526,7 +527,8 @@ void keyfox10_state::update_panel_leds()
         {
             // Invert: m_panel_latch[0] bit 0 (shift position 79) → display position 79
             // m_panel_latch[ic] bit b → display position (79 - (ic*8 + bit)) = (9-ic)*8 + (7-bit)
-            m_panel_leds[9 - ic][7 - bit] = BIT(m_panel_latch[ic], bit);
+            //m_panel_leds[9 - ic][7 - bit] = BIT(m_panel_latch[ic], bit);
+            m_panel_leds[ic][bit] = BIT(m_panel_latch[ic], bit);
         }
     }
 }
@@ -554,8 +556,8 @@ void keyfox10_state::panel_shift_clock()
     }
 
     // MODE=0: Shift right - DATA enters MSB of first IC, LSB of each IC feeds MSB of next
-    //u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;
-    u8 data_in = (m_port1 & P1_DATA) ? 0 : 1;
+    u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;
+    //u8 data_in = (m_port1 & P1_DATA) ? 0 : 1;
 
     // Shift chain right: bit 0 of IC[i] feeds bit 7 of IC[i+1]
     for (int i = 9; i > 0; i--)
@@ -1221,8 +1223,10 @@ static INPUT_PORTS_START(keyfox10)
     PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("LOWER+")    PORT_CODE(KEYCODE_L)
     PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS-")     PORT_CODE(KEYCODE_F)
     PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BASS+")     PORT_CODE(KEYCODE_G)
-    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)  // D6 unused
-    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)  // D7 unused
+    PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SWELL0")
+    PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("SWELL1")
+    //PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)  // D6 unused
+    //PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)  // D7 unused
 INPUT_PORTS_END
 
 void keyfox10_state::keyfox10(machine_config &config)

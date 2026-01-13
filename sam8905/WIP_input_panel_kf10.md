@@ -228,12 +228,18 @@ void keyfox10_state::panel_shift_clock()
 ### SENSE Logic
 
 ```cpp
-// SENSE detection: (shift_register has 0) AND (button pressed)
-// When scanning, a 0 is shifted through. When it reaches a pressed button, SENSE activates.
+// LEDSENSE: Wired-OR through diodes of all (Q output AND button pressed)
+// - When shift_reg bit = 1 AND button pressed: diode conducts, LEDSENSE high
+// - When shift_reg bit = 0 OR button not pressed: no current, LEDSENSE low
+//
+// Scanning sequence:
+// 1. Parallel load all 1s (MODE=1) - if any button pressed, SENSE = high (detection)
+// 2. Shift 0 through (MODE=0, DATA=0) - SENSE stays high until 0 reaches pressed button
+// 3. When 0 reaches pressed button, SENSE goes low (position identified)
 bool led_sense = false;
 for (int i = 0; i < 10; i++)
 {
-    if ((~m_panel_sr[i]) & m_btn_state[i])
+    if (m_panel_sr[i] & m_btn_state[i])  // wired-OR: any 1-bit at pressed button
     {
         led_sense = true;
         break;

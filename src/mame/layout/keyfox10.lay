@@ -297,11 +297,11 @@ Wersi Keyfox 10 - Full panel layout with interactive buttons
 
 		<element name="panel2_6" ref="panel_led"><bounds x="130" y="158" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL2" inputmask="0x40"><bounds x="142" y="158" width="36" height="10" /></element>
-		<element ref="txt_sax"><bounds x="142" y="158" width="36" height="10" /></element>
+		<element ref="txt_piano"><bounds x="142" y="158" width="36" height="10" /></element>
 
 		<element name="panel2_7" ref="panel_led"><bounds x="130" y="171" width="10" height="10" /></element>
 		<element ref="btn" inputtag="PANEL2" inputmask="0x80"><bounds x="142" y="171" width="36" height="10" /></element>
-		<element ref="txt_vibes"><bounds x="142" y="171" width="36" height="10" /></element>
+		<element ref="txt_tromb"><bounds x="142" y="171" width="36" height="10" /></element>
 
 		<!-- Column 3 - PANEL3/KF2:1 (Upper Drawbars) -->
 		<element name="panel3_0" ref="panel_led"><bounds x="190" y="80" width="10" height="10" /></element>
