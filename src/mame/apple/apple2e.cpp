@@ -6192,7 +6192,7 @@ COMP( 1984, apple2cse,  apple2c, 0,      apple2cpal,      apple2cse,  apple2e_st
 COMP( 1984, apple2cfr,  apple2c, 0,      apple2cpal,      apple2cfr,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (France)" , MACHINE_SUPPORTS_SAVE )
 COMP( 1985?,spectred,   apple2e, 0,      spectred,        spectred,   apple2e_state, empty_init,    "Scopus/Spectrum",                   "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
 COMP( 1986, tk3000,     apple2c, 0,      tk3000,          tk3000,     apple2e_state, empty_init,    "Microdigital",                      "TK3000//e" , MACHINE_SUPPORTS_SAVE )
-COMP( 1989, prav8c,     apple2e, 0,      prav8c,          prav8c,     apple2e_state, empty_init,    "Pravetz",                           "Pravetz 8C", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1989, prav8c,     apple2e, 0,      prav8c,          prav8c,     apple2e_state, empty_init,    "Pravetz",                           "Pravetz 8C", MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
 COMP( 1987, laser128,   apple2c, 0,      laser128,        laser128,   apple2e_state, init_laser128, "Video Technology",                  "Laser 128", MACHINE_SUPPORTS_SAVE )
 COMP( 1987, laser128o,  apple2c, 0,      laser128o,       laser128,   apple2e_state, init_laser128, "Video Technology",                  "Laser 128 (original hardware)", MACHINE_SUPPORTS_SAVE )
 COMP( 1988, las128ex,   apple2c, 0,      laser128,        laser128,   apple2e_state, init_128ex,    "Video Technology",                  "Laser 128ex (version 4.5)", MACHINE_SUPPORTS_SAVE )

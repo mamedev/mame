@@ -45,9 +45,9 @@ prav8ckb_device::prav8ckb_device(const machine_config &mconfig, const char *tag,
 	, m_reset_callback(*this)
 	, m_keys(*this, "KEY%u", 0U)
 	, m_fn(*this, "FN")
-	, m_power_led(*this, "power")
-	, m_caps_led(*this, "caps")
-	, m_cl_led(*this, "cl")
+	, m_power_led(*this, "power_led")
+	, m_caps_led(*this, "caps_led")
+	, m_cl_led(*this, "cl_led")
 	, m_key_select(0)
 	, m_softsw(false)
 {
