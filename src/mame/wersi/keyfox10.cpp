@@ -12,9 +12,10 @@
 
 #define LOG_SERIAL (1U << 1)
 #define LOG_PORT   (1U << 2)
-#define LOG_SAM    (1U << 3)
-//#define LOG_IO     (1U << 4)
-#define LOG_IO     0
+//#define LOG_SAM    (1U << 3)
+#define LOG_SAM    0
+#define LOG_IO     (1U << 4)
+//#define LOG_IO     0
 #define VERBOSE (LOG_SERIAL | LOG_SAM | LOG_IO)
 #include "logmacro.h"
 
@@ -270,36 +271,71 @@ u8 keyfox10_state::port1_r()
         m_kbd_state[i] = m_kbd_io[i]->read();
     }
 
-    // LED_SENSE: Check panel buttons (only valid when MODE=1, LEDs off)
-    // 74HC299: Shift register loaded with 1s, then 0 shifts through
-    // When 0 reaches a pressed button position, SENSE goes low (active)
-    // Detection: (shift_register has 0) AND (button pressed) = sense active
+    // LED_SENSE: Wired-OR of all (Q output AND button pressed) through diodes
+    // - When shift_reg bit = 1 AND button pressed: diode conducts, LEDSENSE goes high
+    // - When shift_reg bit = 0 OR button not pressed: no current, LEDSENSE stays low
+    //
+    // Scanning sequence:
+    // 1. Parallel load all 1s (MODE=1 + CLK) - if any button pressed, SENSE = high
+    // 2. Shift 0 through (MODE=0, DATA=0, CLK) - SENSE stays high until 0 reaches pressed button
+    // 3. When 0 reaches pressed button position, that bit no longer contributes to SENSE
+    // 4. If only one button pressed, SENSE goes low when 0 reaches it
+    //bool led_sense = false;
     bool led_sense = false;
-    for (int i = 0; i < 10; i++)
-    {
-        if ((~m_panel_sr[i]) & m_btn_state[i])
+    static int cnt_btn;
+
+    if ((m_port1 & P1_ENABLE)) {
+        // compare with panel_sr
+        for (int i = 0; i < 10; i++)
         {
-            led_sense = true;
-            break;
+            //if (m_panel_sr[i] & m_btn_state[i] == 0)
+            if ((m_panel_sr[i]) & m_btn_state[i])
+            {
+                led_sense = true;
+                break;
+            }
+        }
+        //LOGMASKED(LOG_IO, "CHECK %d - %d\n", led_sense, cnt_btn);
+        cnt_btn++;
+    } else {
+        // floating - check if any button is pressed
+        for (int i = 0; i < 10; i++)
+        {
+            if (m_btn_state[i])
+            {
+                led_sense = true;
+                cnt_btn = 0;
+                LOGMASKED(LOG_IO, "DETECTED %d, %u\n", i, m_btn_state[i], mode);
+                break;
+            }
         }
     }
 
     // SW_SENSE: Check keyboard matrix via 74HC251 muxes
     // read_kbd_mux() returns active-low: 0 = button pressed, 1 = no button
     // Note: When MODE=1, IC5 is cleared so mux address = 0
+    //u8 sw_sense = read_kbd_mux();  // Active-low hardware signal
     u8 sw_sense = read_kbd_mux();  // Active-low hardware signal
 
     // SENSE = NAND(NAND(~MODE, LED_SENSE), SW_SENSE)
     //       = (~MODE & LED_SENSE) | ~SW_SENSE
     // ~SW_SENSE: invert the active-low signal (0->1 when button pressed)
     // With MODE polarity swap: MODE=0 means shift/sense mode
-    bool sense = (!mode && led_sense) || !sw_sense;
+    //bool sense = (!mode && led_sense) || (mode && !sw_sense);
+
+    bool sense = (mode && led_sense) || (!mode && !sw_sense);
+
+    //bool sense = (! (!(mode && led_sense)) && (sw_sense));
 
     if (sense)
         data |= P1_SENSE;
 
-    LOGMASKED(LOG_IO, "P1 read: 0x%02X (SENSE=%d MODE=%d led=%d sw=%d)\n",
-        data, sense ? 1 : 0, mode ? 1 : 0, led_sense ? 1 : 0, !sw_sense ? 1 : 0);
+    LOGMASKED(LOG_IO, "P1 read: 0x%02X (SENSE=%d MODE=%d led=%d sw=%d) %d\n",
+        data, sense ? 1 : 0,
+              mode ? 1 : 0,
+              led_sense ? 1 : 0,
+              sw_sense ? 1 : 0, cnt_btn);
+
     return data;
 }
 
@@ -329,18 +365,18 @@ void keyfox10_state::port1_w(u8 data)
     u8 changed = m_port1 ^ data;
     u8 rising = changed & data;
 
-    if (changed)
-    {
-        LOGMASKED(LOG_IO, "P1 write: 0x%02X [%s%s%s%s%s%s%s]\n",
-            data,
-            (changed & P1_CLK_SW)   ? ((data & P1_CLK_SW)   ? "CLK_SW↑ "   : "CLK_SW↓ ")   : "",
-            (changed & P1_CLK_BEAT) ? ((data & P1_CLK_BEAT) ? "CLK_BEAT↑ " : "CLK_BEAT↓ ") : "",
-            (changed & P1_CLK_LED)  ? ((data & P1_CLK_LED)  ? "CLK_LED↑ "  : "CLK_LED↓ ")  : "",
-            (changed & P1_CLK_DISP) ? ((data & P1_CLK_DISP) ? "CLK_DISP↑ " : "CLK_DISP↓ ") : "",
-            (changed & P1_ENABLE)   ? ((data & P1_ENABLE)   ? "ENABLE↑ "   : "ENABLE↓ ")   : "",
-            (changed & P1_MODE)     ? ((data & P1_MODE)     ? "MODE↑ "     : "MODE↓ ")     : "",
-            (changed & P1_DATA)     ? ((data & P1_DATA)     ? "DATA↑ "     : "DATA↓ ")     : "");
-    }
+    // if (changed)
+    // {
+    //     LOGMASKED(LOG_IO, "P1 write: 0x%02X [%s%s%s%s%s%s%s]\n",
+    //         data,
+    //         (changed & P1_CLK_SW)   ? ((data & P1_CLK_SW)   ? "CLK_SW↑ "   : "CLK_SW↓ ")   : "",
+    //         (changed & P1_CLK_BEAT) ? ((data & P1_CLK_BEAT) ? "CLK_BEAT↑ " : "CLK_BEAT↓ ") : "",
+    //         (changed & P1_CLK_LED)  ? ((data & P1_CLK_LED)  ? "CLK_LED↑ "  : "CLK_LED↓ ")  : "",
+    //         (changed & P1_CLK_DISP) ? ((data & P1_CLK_DISP) ? "CLK_DISP↑ " : "CLK_DISP↓ ") : "",
+    //         (changed & P1_ENABLE)   ? ((data & P1_ENABLE)   ? "ENABLE↑ "   : "ENABLE↓ ")   : "",
+    //         (changed & P1_MODE)     ? ((data & P1_MODE)     ? "MODE↑ "     : "MODE↓ ")     : "",
+    //         (changed & P1_DATA)     ? ((data & P1_DATA)     ? "DATA↑ "     : "DATA↓ ")     : "");
+    // }
 
     // CLK_DISP rising edge: shift DATA bit into display shift registers
     if (rising & P1_CLK_DISP)
@@ -371,8 +407,9 @@ void keyfox10_state::port1_w(u8 data)
     }
 
     // ENABLE rising edge: latch panel shift register to output latches
-    // Must happen before m_port1 update so we check 'rising' correctly
-    if (rising & P1_ENABLE)
+    //lib/ Must happen before m_port1 update so we check 'rising' correctly
+    //if (rising & P1_ENABLE)
+    if (rising && (data & P1_ENABLE) == 0 && (data & P1_MODE) == 0)
     {
         panel_latch();
     }
@@ -416,6 +453,7 @@ void keyfox10_state::disp_shift_clock()
     // On rising CLK_DISP edge, shift all registers left by 1 bit
 
     u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;  // DATA bit to shift in
+    //u8 data_in = (m_port1 & P1_DATA) ? 0 : 1;  // DATA bit to shift in
 
     // Get carry bits from each register before shifting
     u8 ic7_carry = BIT(m_disp_sr[0], 7);
@@ -480,7 +518,7 @@ void keyfox10_state::update_panel_leds()
     bool mode = (m_port1 & P1_MODE) != 0;
 
     if (mode)
-        return;  // Don't update during sense mode - keep previous LED state
+         return;  // Don't update during sense mode - keep previous LED state
 
     for (int ic = 0; ic < 10; ic++)
     {
@@ -505,17 +543,19 @@ void keyfox10_state::panel_shift_clock()
     // Note: Schematic labels this as "~MODE" but firmware behavior shows MODE=0 = shift
     // All 74HC299 operations are triggered on CLK rising edge
 
-    if (m_port1 & P1_MODE)
+    if ((m_port1 & P1_ENABLE) == 0 && (m_port1 & P1_MODE))
     {
         // MODE=1: Parallel load from H inputs (tied high -> all 1s)
         for (int i = 0; i < 10; i++)
             m_panel_sr[i] = 0xff;
-        LOGMASKED(LOG_IO, "Panel parallel load: all 0xFF\n");
+
+        LOGMASKED(LOG_IO, "P1 Panel parallel load: all 0xFF\n");
         return;
     }
 
     // MODE=0: Shift right - DATA enters MSB of first IC, LSB of each IC feeds MSB of next
-    u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;
+    //u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;
+    u8 data_in = (m_port1 & P1_DATA) ? 0 : 1;
 
     // Shift chain right: bit 0 of IC[i] feeds bit 7 of IC[i+1]
     for (int i = 9; i > 0; i--)
@@ -524,7 +564,7 @@ void keyfox10_state::panel_shift_clock()
     }
     m_panel_sr[0] = (m_panel_sr[0] >> 1) | (data_in << 7);
 
-    LOGMASKED(LOG_IO, "Panel shift right: DATA=%d -> SR[0]=0x%02X SR[9]=0x%02X\n",
+    LOGMASKED(LOG_IO, "P1 Panel shift right: DATA=%d -> SR[0]=0x%02X SR[9]=0x%02X\n",
         data_in, m_panel_sr[0], m_panel_sr[9]);
 }
 
@@ -536,6 +576,7 @@ void keyfox10_state::kbd_shift_clock()
     // Outputs provide SELA, SELB, SELC (3-bit address) for 74HC251 muxes
 
     u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;
+    //u8 data_in = (m_port1 & P1_DATA) ? 0 : 1;
 
     // Shift left, insert new bit at LSB
     m_kbd_sr = (m_kbd_sr << 1) | data_in;
@@ -584,6 +625,7 @@ void keyfox10_state::beat_shift_clock()
     // Outputs QA-QH drive beat position LEDs
 
     u8 data_in = (m_port1 & P1_DATA) ? 1 : 0;
+    //u8 data_in = (m_port1 & P1_DATA) ? 0 : 1;
 
     // Shift left, insert new bit at LSB
     m_beat_sr = (m_beat_sr << 1) | data_in;
