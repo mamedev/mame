@@ -291,7 +291,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="1943" supported="no">
+	<software name="1943">
 		<description>1943 (UK)</description>
 		<year>1988</year>
 		<publisher>Go!</publisher>
@@ -1377,7 +1377,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="aburner" supported="no">
+	<software name="aburner">
 		<description>After Burner (UK)</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
@@ -1406,7 +1406,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="afterwar" supported="no">
+	<software name="afterwar">
 		<description>After the War (UK)</description>
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
@@ -1817,7 +1817,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="aliensyn" supported="no">
+	<software name="aliensyn">
 		<description>Alien Syndrome (UK)</description>
 		<year>1987</year>
 		<publisher>Ace</publisher>
@@ -1901,7 +1901,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="altbeast" supported="no">
+	<software name="altbeast">
 		<description>Altered Beast (UK)</description>
 		<year>1989</year>
 		<publisher>Activision</publisher>
@@ -4111,7 +4111,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="barbpal" supported="no">
+	<software name="barbpal">
 		<description>Barbarian (UK, Palace Software)</description>
 		<year>1987</year>
 		<publisher>Palace Software</publisher>
@@ -5928,7 +5928,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="brucelee" supported="no">
+	<software name="brucelee">
 		<description>Bruce Lee (UK)</description>
 		<year>1984</year>
 		<publisher>U.S. Gold</publisher>
@@ -8970,7 +8970,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="cosmicsh" supported="no">
+	<software name="cosmicsh">
 		<description>Cosmic Sheriff (Spain)</description>
 		<year>1989</year>
 		<publisher>Dinamic Software</publisher>
@@ -9894,7 +9894,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="dandare3" supported="no">
+	<software name="dandare3">
 		<description>Dan Dare III - The Escape (UK)</description>
 		<year>1990</year>
 		<publisher>Virgin Games</publisher>
@@ -13379,7 +13379,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="exolon" supported="no">
+	<software name="exolon">
 		<description>Exolon (UK)</description>
 		<year>1987</year>
 		<publisher>Hewson Consultants</publisher>
@@ -13392,7 +13392,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="exolons" cloneof="exolon" supported="no">
+	<software name="exolons" cloneof="exolon">
 		<description>Exolon (Spain)</description>
 		<year>1987</year>
 		<publisher>Hewson Consultants / Erbe Software</publisher>
@@ -20159,7 +20159,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="joeblade" supported="no">
+	<software name="joeblade">
 		<description>Joe Blade (UK)</description>
 		<year>1987</year>
 		<publisher>Players</publisher>
@@ -30383,7 +30383,7 @@ Please stick to using the floppy versions for the time being...
 		</part>
 	</software>
 
-	<software name="robocop" supported="no">
+	<software name="robocop">
 		<description>Robocop (UK)</description>
 		<year>1989</year>
 		<publisher>Ocean Software</publisher>
