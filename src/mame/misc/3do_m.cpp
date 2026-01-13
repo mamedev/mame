@@ -56,6 +56,8 @@ Expansion bus stuff:
 (11-jan-2013)
 "Error, could not open cdrom device"
 - ARM finally uploads a program to DSPP, wants something back out of it (reads EO 0xee and unmasks DSPP irq).
+ETA: it already stuck earlier, keeps trying a 0x83 "Read identification" with the CR-560-B on XBus.
+The CD-Rom is MKE-style, akin to CDTV CR-511B and Creative Soundblaster a.k.a. SBCD.SYS/sbpcd
 
 */
 
@@ -68,8 +70,6 @@ Expansion bus stuff:
 #include "screen.h"
 
 
-#define VERBOSE         1
-#define LOG(x) do { if (VERBOSE) printf x; } while (0)
 
 
 uint8_t _3do_state::nvarea_r(offs_t offset) { return m_nvmem[offset]; }
