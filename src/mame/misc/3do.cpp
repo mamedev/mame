@@ -118,8 +118,8 @@ void _3do_state::main_mem(address_map &map)
 	// Sport
 	map(0x03200000, 0x0320FFFF).rw(FUNC(_3do_state::svf_r), FUNC(_3do_state::svf_w));                   /* special vram access1 */
 	map(0x03300000, 0x033FFFFF).rw(FUNC(_3do_state::madam_r), FUNC(_3do_state::madam_w));               /* address decoder */
-	map(0x03400000, 0x0340FFFF).rw(FUNC(_3do_state::clio_r), FUNC(_3do_state::clio_w));                 /* io controller */
-//  map(0x0340c000, 0x0340ffff) Uncle
+	map(0x03400000, 0x03403FFF).rw(FUNC(_3do_state::clio_r), FUNC(_3do_state::clio_w));                 /* io controller */
+	map(0x0340c000, 0x0340FFFF).m(*this, FUNC(_3do_state::uncle_map));
 //  map(0x03600000, 0x037fffff) trace
 //      map(0x03700000, 0x037effff) SRAM
 //      map(0x037fff00, 0x037fff0b) link data/address/FIFO
@@ -197,6 +197,8 @@ void _3do_state::_3do_pal(machine_config &config)
 	CDROM(config, "cdrom");
 }
 
+// TODO: split into separate CONS drivers
+// later models merges Clio + Madam into one fat chip named Anvil
 #if 0
 #define NTSC_BIOS \
 	ROM_REGION32_BE( 0x200000, "bios", 0 ) \

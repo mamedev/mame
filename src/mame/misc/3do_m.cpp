@@ -631,7 +631,7 @@ void _3do_state::madam_w(offs_t offset, uint32_t data, uint32_t mem_mask){
 	case 0x05d0/4: case 0x05d4/4: case 0x05d8/4: case 0x05dc/4:
 	case 0x05e0/4: case 0x05e4/4: case 0x05e8/4: case 0x05ec/4:
 	case 0x05f0/4: case 0x05f4/4: case 0x05f8/4: case 0x05fc/4:
-		printf("%08x %08x\n",offset*4,data);
+		// printf("%08x %08x\n",offset*4,data);
 		m_madam.dma[(offset/4) & 0x1f][offset & 0x03] = data;
 		return;
 
@@ -776,16 +776,6 @@ uint32_t _3do_state::clio_r(offs_t offset)
 	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
 		return m_clio.poll;
 
-	// TODO: different device, split
-	case 0xc000/4:
-		return m_clio.unclerev;
-	case 0xc004/4:
-		return m_clio.uncle_soft_rev;
-	case 0xc008/4:
-		return m_clio.uncle_addr;
-	case 0xc00c/4:
-		return m_clio.uncle_rom;
-
 	default:
 		if (!machine().side_effects_disabled())
 			logerror( "%08X: unhandled CLIO read offset = %08X\n", m_maincpu->pc(), offset * 4 );
@@ -876,12 +866,12 @@ void _3do_state::clio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_request_fiq(0,0);
 		break;
 	case 0x0048/4:
-		LOG(("%08x MASK0\n",data));
+		//LOG(("%08x MASK0\n",data));
 		m_clio.irq0_enable |= data;
 		m_request_fiq(0,0);
 		break;
 	case 0x004c/4:
-		LOG(("%08x MASK0 CLEAR\n",data));
+		//LOG(("%08x MASK0 CLEAR\n",data));
 		m_clio.irq0_enable &= ~data;
 		m_request_fiq(0,0);
 		break;
@@ -908,18 +898,23 @@ void _3do_state::clio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		m_request_fiq(0,1);
 		break;
 	case 0x0068/4:
-		LOG(("%08x MASK1\n",data));
+		//LOG(("%08x MASK1\n",data));
 		m_clio.irq1_enable |= data;
 		m_request_fiq(0,1);
 		break;
 	case 0x006c/4:
-		LOG(("%08x MASK1 CLEAR\n",data));
+		//LOG(("%08x MASK1 CLEAR\n",data));
 		m_clio.irq1_enable &= ~data;
 		m_request_fiq(0,1);
 		break;
 	case 0x0080/4:
 		m_clio.hdelay = data;
 		break;
+	// xxxx ---- DDR for below
+	// ---- x--- Watchdog reset output
+	// ---- -x-- Alternate ROM bank select (kanji ROM at $300'0000)
+	// ---- --x- Audio mute output
+	// ---- ---x <unused>
 	case 0x0084/4:
 		m_clio.adbio = data;
 		break;
@@ -959,8 +954,8 @@ void _3do_state::clio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		break;
 
 	case 0x0304/4:
-		if(data)
-			printf("DMA %08x\n",data);
+		//if(data)
+		//	printf("DMA %08x\n",data);
 
 		break;
 
@@ -1025,21 +1020,25 @@ void _3do_state::clio_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		//printf("%08x\n",data);
 		break;
 
-	// TODO: different device, split
-	case 0xc000/4:
-	case 0xc004/4:
-	case 0xc00c/4:
-		break;
-	case 0xc008/4:
-		m_clio.uncle_addr = data;
-		break;
-
 	default:
 		logerror( "%08X: unhandled CLIO write offset = %08X, data = %08X, mask = %08X\n", m_maincpu->pc(), offset*4, data, mem_mask );
 		break;
 	}
 }
 
+// $0340'c000 base
+// Uncle/Woody is the FMV expansion bus (with it's own ROM)
+void _3do_state::uncle_map(address_map &map)
+{
+	map(0x0000, 0x0003).lr32(NAME([this] () { return m_uncle.rev; }));
+	map(0x0004, 0x0007).lr32(NAME([this] () { return m_uncle.soft_rev; }));
+	map(0x0008, 0x000b).lrw32(
+		NAME([this] () { return m_uncle.addr; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_uncle.addr); })
+	);
+	// ROM readback
+	map(0x000c, 0x000f).lr32(NAME([this] () { return 0; }));
+}
 
 /* 9 -> 5 bits translation */
 
@@ -1112,7 +1111,11 @@ uint32_t _3do_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 void _3do_state::m_madam_init( void )
 {
 	m_madam = MADAM();
-	m_madam.revision = 0x01020000;
+	// bit 31-16 Green Madam (0x0102)
+	// bit 23 Internal ARM
+	// bit 15-8 manufacturer ID (0x02: MEC -> Panasonic, 0x09: Sanyo, 0x0b: Goldstar)
+	// bit 0 wirewrap system
+	m_madam.revision = 0x01020200;
 	m_madam.msysbits = 0x51;
 }
 
@@ -1126,8 +1129,10 @@ void _3do_state::m_clio_init()
 {
 	m_clio = CLIO();
 	m_clio.screen = m_screen;
+	// Clio Preen (Toshiba/MEC)
+	// 0x04000000 for Anvil
 	m_clio.revision = 0x02022000 /* 0x04000000 */;
-	m_clio.unclerev = 0x03800000;
+	m_uncle.rev = 0x03800000;
 	m_clio.expctl = 0x80;    /* ARM has the expansion bus */
 	m_dspp.N = make_unique_clear<uint16_t[]>(0x800);
 	m_dspp.EI = make_unique_clear<uint16_t[]>(0x400);

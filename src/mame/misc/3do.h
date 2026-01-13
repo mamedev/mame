@@ -140,13 +140,15 @@ private:
 		uint32_t  dsppeo[0x1f]{};   /* 03403800 - 0340381f DSPP EO stack (32bit reads) */
 								/* 03403c00 - 03403c3f DSPP EO stack (32bit reads) */
 		uint32_t  dsppclkreload = 0;  /* 034039dc / 03403fbc */
-								/* UNCLE */
-		uint32_t  unclerev = 0;       /* 0340c000 */
-		uint32_t  uncle_soft_rev = 0; /* 0340c004 */
-		uint32_t  uncle_addr = 0;     /* 0340c008 */
-		uint32_t  uncle_rom = 0;      /* 0340c00c */
 	};
 
+	struct UNCLE {
+		uint32_t  rev = 0;       /* 0340c000 */
+		uint32_t  soft_rev = 0; /* 0340c004 */
+		uint32_t  addr = 0;     /* 0340c008 */
+	};
+
+	void uncle_map(address_map &map);
 
 	struct SVF {
 		uint32_t  sport[512]{};
@@ -169,6 +171,7 @@ private:
 	SLOW2 m_slow2;
 	MADAM m_madam;
 	CLIO m_clio;
+	UNCLE m_uncle;
 	SVF m_svf;
 	DSPP m_dspp;
 	uint8_t m_nvmem[0x8000]{};
