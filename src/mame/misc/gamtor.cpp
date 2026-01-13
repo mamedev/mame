@@ -147,20 +147,36 @@ const tiny_rom_entry *gamtor_vga_device::device_rom_region() const
 
 // Money Controls Universal Hopper model MK4, standard on the Gaminator cabinet.
 // TODO: Needs to be moved to own file
-class mc_mk4_hopper_device : public hopper_device
+class mc_mk4_hopper_device : public device_t
 {
 public:
 	mc_mk4_hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void mc_mk4_hopper(machine_config &mconfig) ATTR_COLD;
 
 protected:
-	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &mconfig) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+private:
+	required_device<hopper_device> m_hopper;
 };
 
 DEFINE_DEVICE_TYPE(MC_MK4_HOPPER, mc_mk4_hopper_device, "mc_mk4_hopper", "Money Controls Universal Hopper model MK4")
 
-mc_mk4_hopper_device::mc_mk4_hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: hopper_device(mconfig, MC_MK4_HOPPER, tag, owner, clock)
+mc_mk4_hopper_device::mc_mk4_hopper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MC_MK4_HOPPER, tag, owner, clock),
+	m_hopper(*this, "hopper")
 {
+}
+
+void mc_mk4_hopper_device::device_start()
+{
+}
+
+void mc_mk4_hopper_device::device_add_mconfig(machine_config &config)
+{
+	HOPPER(config, m_hopper, 0);
 }
 
 ROM_START(mc_mk4_hopper)
