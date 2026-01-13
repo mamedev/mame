@@ -1037,7 +1037,7 @@ void _3do_state::uncle_map(address_map &map)
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_uncle.addr); })
 	);
 	// ROM readback
-	map(0x000c, 0x000f).lr32(NAME([this] () { return 0; }));
+	map(0x000c, 0x000f).lr32(NAME([] () { return 0; }));
 }
 
 /* 9 -> 5 bits translation */
