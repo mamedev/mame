@@ -32,6 +32,7 @@ TODO:
  - denseib,2: fix gfx glitches, missing texts
  - venom    : gfx glitches on second level
  - wldgunsb : remove hack for continue counter (values at 0x781010 and 0x781012 are expected to be initialized on reset/boot)
+ - piratdwb : is coinage supposed to be configurable?
 
 ***************************************************************************
 
@@ -360,8 +361,7 @@ INPUT_CHANGED_MEMBER(snesb_state::piratdwb_coin_w)
 {
 	// 68k program expects two NMIs per coin
 	// (TODO: is this really supposed to be 2 coins/credit then?)
-	if (oldval != newval)
-		m_68k->set_input_line(INPUT_LINE_NMI, m_prot_nmi = 1);
+	m_68k->set_input_line(INPUT_LINE_NMI, m_prot_nmi = 1);
 }
 
 
@@ -502,7 +502,7 @@ void snesb_state::piratdwb_68k_map(address_map &map)
 	map(0x100000, 0x100001).portr("COIN");
 //	map(0x140000, 0x140000).w // ?
 	map(0x180000, 0x180000).lw8(
-		NAME([=](offs_t, u8) { m_68k->set_input_line(INPUT_LINE_NMI, m_prot_nmi = 0); })
+		NAME([this](offs_t, u8) { m_68k->set_input_line(INPUT_LINE_NMI, m_prot_nmi = 0); })
 	);
 }
 
@@ -1058,7 +1058,7 @@ static INPUT_PORTS_START( piratdwb )
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW ) //
 	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW ) // supposed to be for coinage (table at 83F69F), but not actually used
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW ) //
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x38, 0x30, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x38, "1 (Easiest)" )
 	PORT_DIPSETTING(    0x30, "2" ) // "Normal" (default) on SNES
 	PORT_DIPSETTING(    0x28, "3" ) // "Hard" on SNES
@@ -1198,7 +1198,7 @@ void snesb_state::piratdwb(machine_config &config)
 	base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::piratdwb_map);
 
-	GENERIC_LATCH_8(config, "latch");
+	GENERIC_LATCH_8(config, "latch").set_separate_acknowledge(true);
 
 	M68000(config, m_68k, 16_MHz_XTAL / 2);
 	m_68k->set_addrmap(AS_PROGRAM, &snesb_state::piratdwb_68k_map);
