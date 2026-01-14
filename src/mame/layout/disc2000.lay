@@ -75,7 +75,7 @@ license:CC0-1.0
 			<bounds left="0" right="470" top="0" bottom="540" />
 		</element>
 
-<!-- debug display 
+<!-- debug display
 		<element name="digit15" ref="digit">
 			<bounds x="0" y="0" width="10" height="15" />
 		</element>

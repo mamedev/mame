@@ -228,7 +228,7 @@ void i8256_device::device_start()
 	save_item(NAME(m_parity));
 	save_item(NAME(m_stop_bits));
 	save_item(NAME(m_br_factor));
-	
+
 	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
 
 	memset(m_timers, 0, sizeof(m_timers));
