@@ -80,12 +80,22 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 		} else {
 			// Ramps based on SEL bits
 			int sel = (wf >> 2) & 3;
+			int32_t result;
 			switch(sel) {
-				case 0: return (phi < 1024) ? phi * 2 : (phi < 3072) ? (phi * 2) - 4096 : (phi * 2) - 8192; // 2x PHI
-				case 1: return get_constant(mad); // Constant from micro-instruction
-				case 2: return (phi < 2048) ? phi : phi - 4096; // PHI ramp
-				case 3: return (phi < 2048) ? phi / 2 : (phi / 2) - 2048; // PHI/2 ramp
+				case 0: result = (phi < 1024) ? phi * 2 : (phi < 3072) ? (phi * 2) - 4096 : (phi * 2) - 8192; break; // 2x PHI
+				case 1: result = get_constant(mad); break; // Constant from micro-instruction
+				case 2: result = (phi < 2048) ? phi : phi - 4096; break; // PHI ramp
+				case 3: result = (phi < 2048) ? phi / 2 : (phi / 2) - 2048; break; // PHI/2 ramp
+				default: result = 0; break;
 			}
+			// Debug: trace unexpected ramp values
+			static int ramp_trace = 0;
+			if (m_slave_mode && slot_idx == 4 && ramp_trace < 10) {
+				logerror("RAMP S%d: wf=0x%03X sel=%d phi=0x%03X result=%d\n",
+					slot_idx, wf, sel, phi, result);
+				ramp_trace++;
+			}
+			return result;
 		}
 	} else {
 		// External memory access
@@ -286,25 +296,38 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 	if (!BIT(inst, 3)) {
 		slot.y = (bus >> 7) & 0xFFF;
 		slot.x = get_waveform(slot.wf, slot.phi, mad, slot_idx) & 0xFFF;
-		// Debug: trace WXY for slot 0 ALG=1
-		uint32_t p15_wxy = m_dram[(slot_idx << 4) | 15];
-		uint8_t alg_wxy = (p15_wxy >> 8) & 0x7;
-		if (slot_idx == 0 && alg_wxy == 1) {
-			static int wxy_trace = 0;
-			if (wxy_trace < 20) {
-				logerror("WXY S0: wf=0x%03X phi=0x%03X x=%d y=%d\n",
-					slot.wf, slot.phi, (int16_t)(slot.x << 4) >> 4, (int16_t)(slot.y << 4) >> 4);
-				wxy_trace++;
+		// Calculate multiplication result (12x12 fractional)
+		int32_t product = (int32_t)((int16_t)(slot.x << 4) >> 4) * (int32_t)((int16_t)(slot.y << 4) >> 4);
+		slot.mul_result = (uint32_t)(product >> 5) & MASK19;
+		// Debug: trace WXY for FX slots (after mul computed)
+		if (m_slave_mode && slot_idx >= 4 && slot_idx <= 11) {
+			static int fx_wxy_trace = 0;
+			int32_t signed_x = (int16_t)(slot.x << 4) >> 4;
+			int32_t signed_y = (int16_t)(slot.y << 4) >> 4;
+			int32_t signed_mul = (slot.mul_result & MASK19);
+			if (signed_mul & 0x40000) signed_mul |= 0xFFF80000;
+			if (signed_mul != 0 && fx_wxy_trace < 50) {
+				logerror("WXY S%d: wf=0x%03X phi=0x%03X x=%d y=%d mul=%d\n",
+					slot_idx, slot.wf, slot.phi, signed_x, signed_y, signed_mul);
+				fx_wxy_trace++;
 			}
 		}
 		// WSP inside WXY - sets mix_l/mix_r from bus value
 		if (wsp) {
+			uint8_t old_mix_l = slot.mix_l;
+			uint8_t old_mix_r = slot.mix_r;
 			slot.mix_l = (bus >> 3) & 0x7;
 			slot.mix_r = bus & 0x7;
+			// Trace mix changes in FX slots
+			if (m_slave_mode && slot_idx >= 4 && slot_idx <= 11) {
+				static int mix_trace = 0;
+				if ((slot.mix_l != old_mix_l || slot.mix_r != old_mix_r) && mix_trace < 30) {
+					logerror("WSP S%d: bus=0x%05X mix_l=%d->%d mix_r=%d->%d\n",
+						slot_idx, bus, old_mix_l, slot.mix_l, old_mix_r, slot.mix_r);
+					mix_trace++;
+				}
+			}
 		}
-		// Calculate multiplication result (12x12 fractional)
-		int32_t product = (int32_t)((int16_t)(slot.x << 4) >> 4) * (int32_t)((int16_t)(slot.y << 4) >> 4);
-		slot.mul_result = (uint32_t)(product >> 5) & MASK19;
 	}
 
 	// clearB
@@ -314,7 +337,8 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 
 		// WWE (Write Waveform Enable) - triggered by RSP + clearB + WSP
 		// RSP = emitter_sel==3, clearB = bit 2 active, WSP = bit 8 active
-		// Writes waveform data to external RAM at WF+PHI address
+		// Per SAM8905 datasheet Section 9: Data to write is loaded into Y register
+		// via WXY instruction before WWE fires. WWE outputs Y to WD pins.
 		if (emitter_sel == 3 && wsp && !m_waveform_write.isunset()) {
 			// Only write externally when WF indicates external memory (WF < 0x80)
 			// WF >= 0x80 is input sample address space, WF >= 0x100 is internal waveform
@@ -322,17 +346,18 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 				// Build 15-bit address from WF[6:0] and PHI[11:4]
 				// 32KB = 15 bits: WF[6:0] << 8 | PHI[7:0]
 				uint32_t ext_addr = ((slot.wf & 0x7F) << 8) | ((slot.phi >> 4) & 0xFF);
-				// Write data is from A register, converted to 12-bit
-				int16_t ext_data = (slot.a >> 7) & 0xFFF;
+				// Write data is from Y register (12-bit signed)
+				// Y is loaded by WXY instruction: Y = (bus >> 7) & 0xFFF
+				int16_t ext_data = slot.y & 0xFFF;
 				// Sign extend to 16-bit for callback
 				if (ext_data & 0x800) ext_data |= 0xF000;
 				m_waveform_write(ext_addr, ext_data);
 
-				// Debug: trace external writes (limited)
+				// Debug: trace external writes - show both X and Y for analysis
 				static int ext_write_trace = 0;
-				if (ext_write_trace < 50) {
-					logerror("WWE S%d: wf=0x%03X phi=0x%03X addr=0x%04X data=%d\n",
-						slot_idx, slot.wf, slot.phi, ext_addr, ext_data);
+				if (m_slave_mode && ext_write_trace < 100) {
+					logerror("WWE S%d: wf=0x%03X phi=0x%03X addr=0x%04X X=0x%03X Y=0x%03X data=%d\n",
+						slot_idx, slot.wf, slot.phi, ext_addr, slot.x, slot.y, ext_data);
 					ext_write_trace++;
 				}
 			}
@@ -358,18 +383,14 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 		slot.l_acc += l_contrib;
 		slot.r_acc += r_contrib;
 
-		// Debug: trace WACC in slave mode for slots with proper algorithms
-		// Only log when slot 7 has proper ALG=4 (p15=0x3C480), meaning FX is fully initialized
-		static int wacc_trace = 0;
-		static bool fx_init_done = false;
-		if (m_slave_mode && !fx_init_done) {
-			uint32_t slot7_p15 = m_dram[(7 << 4) | 15];
-			if (slot7_p15 == 0x3C480) fx_init_done = true;
-		}
-		if (m_slave_mode && fx_init_done && slot_idx >= 4 && slot_idx <= 11 && wacc_trace < 100) {
-			logerror("WACC S%d: mul=%d mix_l=%d mix_r=%d l_c=%d r_c=%d\n",
-				slot_idx, signed_mul, slot.mix_l, slot.mix_r, l_contrib, r_contrib);
-			wacc_trace++;
+		// Debug: trace WACC in slave mode when contributions are significant
+		if (m_slave_mode && slot_idx >= 4 && slot_idx <= 11) {
+			static int wacc_trace = 0;
+			if ((l_contrib > 1000 || l_contrib < -1000) && wacc_trace < 50) {
+				logerror("WACC S%d: mul=%d mix_l=%d mix_r=%d l_c=%d r_c=%d acc=%d\n",
+					slot_idx, signed_mul, slot.mix_l, slot.mix_r, l_contrib, r_contrib, slot.l_acc);
+				wacc_trace++;
+			}
 		}
 	}
 }
@@ -423,9 +444,33 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 					logerror("  PC%02d: 0x%04X%s\n", i, inst, wsp_flag ? " [WSP]" : "");
 				}
 			}
-			// Dump ALG=2 A-RAM when slot 5 first gets ALG=2 (stays ALG=2 in 22kHz mode)
+			// Dump ALG=1 A-RAM for slot 5 (22kHz ALG = (0x3C280>>9)&3 = 1, base=0x40)
 			if (s == 5 && param15 == 0x3C280) {
-				logerror("ALG=2 A-RAM (22kHz mode, base=0x80) for slot 5:\n");
+				logerror("ALG=1 A-RAM (22kHz mode, base=0x40) for slot 5:\n");
+				for (int i = 0; i < 64; i++) {
+					uint16_t inst = m_aram[0x40 + i];
+					bool wsp_flag = (inst >> 8) & 1;
+					bool wxy_flag = !((inst >> 3) & 1);
+					bool wacc_flag = !(inst & 1);
+					logerror("  PC%02d: 0x%04X%s%s%s\n", i, inst,
+						wsp_flag ? " [WSP]" : "", wxy_flag ? " [WXY]" : "", wacc_flag ? " [WACC]" : "");
+				}
+			}
+			// Dump ALG=3 A-RAM for slot 6 (22kHz ALG = (0x00680>>9)&3 = 3, base=0xC0)
+			if (s == 6 && param15 == 0x00680) {
+				logerror("ALG=3 A-RAM (22kHz mode, base=0xC0) for slot 6:\n");
+				for (int i = 0; i < 64; i++) {
+					uint16_t inst = m_aram[0xC0 + i];
+					bool wsp_flag = (inst >> 8) & 1;
+					bool wxy_flag = !((inst >> 3) & 1);
+					bool wacc_flag = !(inst & 1);
+					logerror("  PC%02d: 0x%04X%s%s%s\n", i, inst,
+						wsp_flag ? " [WSP]" : "", wxy_flag ? " [WXY]" : "", wacc_flag ? " [WACC]" : "");
+				}
+			}
+			// Dump ALG=2 A-RAM for slots 7-11 (22kHz ALG = (0x3C480>>9)&3 = 2, base=0x80)
+			if (s == 7 && param15 == 0x3C480) {
+				logerror("ALG=2 A-RAM (22kHz mode, base=0x80) for slot 7:\n");
 				for (int i = 0; i < 64; i++) {
 					uint16_t inst = m_aram[0x80 + i];
 					bool wsp_flag = (inst >> 8) & 1;
@@ -490,6 +535,8 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 	}
 
 	// Store for slave mode stream output
+	// NOTE: Scaling temporarily disabled to debug FX output levels
+	// Original HACK: Scale down by 16 (>> 4) to prevent clipping
 	m_last_out_l = out_l;
 	m_last_out_r = out_r;
 

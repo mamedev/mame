@@ -74,6 +74,77 @@ ALG 2 (A-RAM 0x80) has the reverb output code with proper WXY WSP and WACC instr
 - [ ] Verify FX produces actual audio with input signal from SND chip
 - [ ] Check if FX input routing is working correctly
 
+## Critical: External SRAM Write Mechanism (from Programmer's Guide Section 9)
+
+The SAM8905 programmer's guide documents exactly how to write to external SRAM:
+
+```
+PHI=0                      ;lower part of memory address (upper 9 bits)
+WF=1                       ;0(2)|WF(8)|X(9) upper part of memory address
+DATA=2                     ;data to be written in memory
+
+RM      WF,     <WWF>              ;activate memory chip select (WCS/)
+RM      PHI,    <WPHI>             ;PHIreg=PHI
+RM      DATA,   <WXY>              ;prepare to output data on WD pins
+RSP             <ClearB,WSP>       ;WOE/=1 (disable outputs from external mem)
+RSP             <ClearB,WSP>       ;WOE/=1, apply data to WD pins
+RSP             <ClearB>           ;WOE/=0 (write pulse)
+RSP             <ClearB,WSP>       ;WOE/=1
+RSP             <ClearB,WSP>       ;WOE/=1 data still applied
+                                   ;data removed
+                                   ;WOE/=0 (back to normal operation)
+```
+
+**Key insight:** The WXY instruction loads Y from bus bits [18:7]. The bus can be driven by:
+- **RM** - D-RAM value (as shown in the example)
+- **RP** - Product register (mul_result)
+- **RADD** - A+B sum
+- **RSP** - Zero
+
+The programmer's guide example uses D-RAM, but any bus source works. Common patterns:
+1. `RM D[x], <WXY>` → Y = D-RAM[x][18:7]
+2. `RP x, <WXY>` → Y = product[18:7]
+3. `RADD x, <WXY>` → Y = (A+B)[18:7]
+
+**Therefore:** WWE writing Y is CORRECT. Y is loaded from whatever is on the bus
+when WXY executes - this can be D-RAM, product, or A+B directly.
+
+### Keyfox10 ALG 0 SRAM Write Analysis
+
+ALG 0 has TWO separate WWE sequences with different data sources:
+
+**WWE #1 (PC16-19) - From D-RAM feedback:**
+```
+PC16: 68F7  RM   13, <WXY>              ; Y = D[13][18:7] - from D-RAM
+PC17: 38FD  RM    7, <WWF>              ; WWF = D[7] (SRAM bank select)
+PC18: 7FFB  RP   15, <clrB> [WSP]       ; WWE - writes Y (D[13] value)
+PC19: 7FFB  RP   15, <clrB> [WSP]       ; WWE - second pulse
+```
+D[13] is written at PC61 (end of frame), read at PC16 (next frame) = **one-frame delay feedback**
+
+**WWE #2 (PC34-36) - From A+B computation:**
+```
+PC34: 7AF7  RADD 15, <WXY>              ; Y = (A+B)[18:7] - DIRECT from adder!
+PC35: 7FFB  RP   15, <clrB> [WSP]       ; WWE - writes Y (A+B result)
+PC36: 7FFB  RP   15, <clrB> [WSP]       ; WWE - second pulse
+```
+This writes the **current computation result** directly to SRAM, no D-RAM involved.
+
+### Current Issue Analysis
+
+The problem is that BOTH WWE sequences write zero/near-zero values:
+
+1. **WWE #1:** D[13] = 0 because:
+   - D[13] initialized to 0
+   - PC61 writes D[13] = A+B, but A+B is small/zero at that point
+
+2. **WWE #2:** (A+B)[18:7] = 0 because:
+   - A and B accumulate values but result doesn't have significant bits in [18:7]
+   - Or the computation path doesn't reach meaningful audio levels
+
+Need to trace what values A and B actually contain at PC34 to understand why
+the RADD result has zero in bits [18:7].
+
 ## Hardware Notes: FX SRAM Connection
 
 From the schematic (IC21 FX SAM → IC19 SRAM256):
@@ -533,11 +604,45 @@ if (result & 0x400)
 - [ ] Reverb time/decay control mechanism
 - [ ] Actual L/R channel handling - SND outputs L=0, R=audio; FX reads both via PHI[0]
 
+## Testing
+
+### Test MIDI File with Reverb
+
+To test FX reverb with a MIDI file that enables reverb mode:
+
+```bash
+./mamemuse keyfox10 -rompath /home/jeff/bastel/roms/hohner \
+  -midiin sam8905/mid/test_piano.mid \
+  -seconds_to_run 4 \
+  -wavwrite /tmp/fx_test_piano.wav
+```
+
+The `test_piano.mid` file contains:
+- CC80 = 1 (reverb mode on)
+- CC91 = 64 (reverb level)
+- Note C4 velocity 100
+
+Check output with:
+```bash
+sox /tmp/fx_test_piano.wav -n stat
+```
+
+**HACK applied:** FX output scaled down by 16 (>> 4) to prevent clipping.
+
+The issue is that FX algorithms use multiple WACC instructions per slot:
+- Slot 5 (ALG 1): 12 WACC instructions
+- Slots 7-11 (ALG 2): 3 WACC each = 15 total
+- Total: 27 WACC per frame, all at mix=7 (0dB)
+
+This causes accumulated output to exceed 16-bit DAC range (±32K). The >> 4 scaling
+brings output within range. Real hardware may have implicit output attenuation.
+
 ## Files
 
 - `sam8905/sam8905_aram_decoder.py` - Instruction decoder
 - `sam8905/WIP_fx_reverb_analysis.md` - This file
 - `sam8905/sam8905_programmers_guide.md` - SAM8905 documentation
+- `sam8905/mid/test_piano.mid` - Test MIDI with reverb enabled
 
 ## Tasks
 

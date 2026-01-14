@@ -988,6 +988,54 @@ void keyfox10_state::dump_sam_memory() const
             fclose(f);
         }
     }
+
+    // Dump FX SRAM as WAV file (32KB of 8-bit signed samples at 22kHz)
+    if (m_fx_sram)
+    {
+        FILE *f = fopen("fx_sram_dump.wav", "wb");
+        if (f)
+        {
+            // WAV header for mono 16-bit 22050Hz
+            uint32_t sample_rate = 22050;
+            uint16_t num_channels = 1;
+            uint16_t bits_per_sample = 16;
+            uint32_t byte_rate = sample_rate * num_channels * bits_per_sample / 8;
+            uint16_t block_align = num_channels * bits_per_sample / 8;
+            uint32_t data_size = FX_SRAM_SIZE * 2;  // 16-bit samples
+            uint32_t chunk_size = 36 + data_size;
+
+            // RIFF header
+            fwrite("RIFF", 1, 4, f);
+            fwrite(&chunk_size, 4, 1, f);
+            fwrite("WAVE", 1, 4, f);
+
+            // fmt chunk
+            fwrite("fmt ", 1, 4, f);
+            uint32_t fmt_size = 16;
+            fwrite(&fmt_size, 4, 1, f);
+            uint16_t audio_format = 1;  // PCM
+            fwrite(&audio_format, 2, 1, f);
+            fwrite(&num_channels, 2, 1, f);
+            fwrite(&sample_rate, 4, 1, f);
+            fwrite(&byte_rate, 4, 1, f);
+            fwrite(&block_align, 2, 1, f);
+            fwrite(&bits_per_sample, 2, 1, f);
+
+            // data chunk
+            fwrite("data", 1, 4, f);
+            fwrite(&data_size, 4, 1, f);
+
+            // Write SRAM data as 16-bit samples (8-bit stored << 8)
+            for (size_t i = 0; i < FX_SRAM_SIZE; i++)
+            {
+                int16_t sample = m_fx_sram[i] << 8;  // 8-bit to 16-bit
+                fwrite(&sample, 2, 1, f);
+            }
+
+            fclose(f);
+            printf("Wrote FX SRAM dump to fx_sram_dump.wav (%zu samples)\n", FX_SRAM_SIZE);
+        }
+    }
 }
 
 // SAM8905 external waveform ROM read handlers
@@ -1063,9 +1111,9 @@ void keyfox10_state::sam_fx_waveform_w(offs_t offset, u16 data)
         int8_t data_8bit = (data >> 3) & 0xFF;
         m_fx_sram[offset] = data_8bit;
 
-        // Debug: trace SRAM writes (limited)
+        // Debug: trace significant SRAM writes (values > threshold)
         static int sram_write_trace = 0;
-        if (sram_write_trace < 30) {
+        if (data_8bit != 0 && (data_8bit > 10 || data_8bit < -10) && sram_write_trace < 100) {
             logerror("FX SRAM write: addr=%04X 12bit=%d 8bit=%d\n",
                 offset, (int16_t)data, data_8bit);
             sram_write_trace++;
@@ -1319,8 +1367,8 @@ void keyfox10_state::keyfox10(machine_config &config)
     SAM8905(config, m_sam_snd, 22'579'200);
     m_sam_snd->waveform_read_callback().set(FUNC(keyfox10_state::sam_snd_waveform_r));
     m_sam_snd->sample_output_callback().set(FUNC(keyfox10_state::sam_snd_sample_out));
-    m_sam_snd->add_route(0, "lspeaker", 1.0);  // Dry L
-    m_sam_snd->add_route(1, "rspeaker", 1.0);  // Dry R
+    m_sam_snd->add_route(0, "lspeaker", 0.0);  // Dry L - SILENCED FOR DEBUG
+    m_sam_snd->add_route(1, "rspeaker", 0.0);  // Dry R - SILENCED FOR DEBUG
 
     // SAM8905 FX - effects processor (at 0xE000 when T1=1)
     // FX chip has 32KB SRAM for delay/reverb buffers

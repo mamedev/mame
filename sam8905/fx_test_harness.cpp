@@ -257,9 +257,11 @@ struct SAM8905_FX {
             update_carry();
 
             // WWE (Write Waveform Enable) - triggered by RSP + clearB + WSP
+            // Per SAM8905 datasheet Section 9: WWE writes Y register, not A
             if (emitter_sel == 3 && wsp) {
                 if ((slot.wf & 0x1FF) < 0x80) {
-                    int16_t write_data = (slot.a >> 7) & 0xFFF;
+                    // Write Y register (12-bit) to SRAM
+                    int16_t write_data = slot.y & 0xFFF;
                     if (write_data & 0x800) write_data |= 0xF000;
                     write_sram(slot.wf, slot.phi, write_data);
                 }
