@@ -79,7 +79,7 @@ protected:
 	uint8_t m_irq_mask = 0;
 	void irqack_w(uint8_t data);
 	void timer_pulse_w(uint8_t data);
-	void _20pacgal_coin_counter_w(uint8_t data);
+	void coin_counter_w(uint8_t data);
 	void ram_bank_select_w(uint8_t data);
 	void ram_48000_w(offs_t offset, uint8_t data);
 	void sprite_gfx_w(offs_t offset, uint8_t data);
@@ -113,8 +113,6 @@ public:
 	void _25pacman(machine_config &config);
 
 private:
-	uint8_t _25pacman_io_87_r();
-
 	virtual void machine_start() override ATTR_COLD;
 
 	void _25pacman_io_map(address_map &map) ATTR_COLD;

@@ -87,8 +87,8 @@ Graphics: CY37256P160-83AC x 2 (Ultra37000 CPLD family - 160 pin TQFP, 256 Macro
    VSync: 60.60175Hz
 
     The DAC (of the Namco sound chip, apparently combined with the generic DAC)
-    is the same as on the old Pac-Man hardware, digital output is 8 lines from
-    a CPLD.
+    is the same as on the old Pac-Man hardware, controlled by 8 lines from a
+    CPLD (4 for sound, 4 for volume).
 
 ***************************************************************************/
 
@@ -126,7 +126,7 @@ void _20pacgal_state::timer_pulse_w(uint8_t data)
  *
  *************************************/
 
-void _20pacgal_state::_20pacgal_coin_counter_w(uint8_t data)
+void _20pacgal_state::coin_counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, data & 1);
 }
@@ -229,11 +229,6 @@ void _20pacgal_state::_20pacgal_map(address_map &map)
  *
  *************************************/
 
-uint8_t _25pacman_state::_25pacman_io_87_r()
-{
-	return 0xff;
-}
-
 void _25pacman_state::_25pacman_io_map(address_map &map)
 {
 	map.global_mask(0xff);
@@ -247,14 +242,13 @@ void _25pacman_state::_25pacman_io_map(address_map &map)
 	map(0x82, 0x82).w(FUNC(_25pacman_state::irqack_w));
 //  map(0x84, 0x84).noprw(); // ??
 	map(0x85, 0x86).writeonly().share("stars_seed"); // stars: rng seed (lo/hi)
-	map(0x87, 0x87).r(FUNC(_25pacman_state::_25pacman_io_87_r)); // not eeprom on this
-	map(0x87, 0x87).nopw();
+	map(0x87, 0x87).lr8(NAME([] () { return 0xff; })).nopw(); // not eeprom on this
 //  map(0x88, 0x88).w(FUNC(_25pacman_state::ram_bank_select_w));
 	map(0x89, 0x89).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x8a, 0x8a).writeonly().share("stars_ctrl"); // stars: bits 3-4 = active set; bit 5 = enable
 	map(0x8b, 0x8b).writeonly().share("flip");
 	map(0x8c, 0x8c).nopw();
-	map(0x8f, 0x8f).w(FUNC(_25pacman_state::_20pacgal_coin_counter_w));
+	map(0x8f, 0x8f).w(FUNC(_25pacman_state::coin_counter_w));
 }
 
 void _20pacgal_state::_20pacgal_io_map(address_map &map)
@@ -275,7 +269,7 @@ void _20pacgal_state::_20pacgal_io_map(address_map &map)
 	map(0x89, 0x89).w("dac", FUNC(dac_byte_interface::data_w));
 	map(0x8a, 0x8a).writeonly().share("stars_ctrl"); // stars: bits 3-4 = active set; bit 5 = enable
 	map(0x8b, 0x8b).writeonly().share("flip");
-	map(0x8f, 0x8f).w(FUNC(_20pacgal_state::_20pacgal_coin_counter_w));
+	map(0x8f, 0x8f).w(FUNC(_20pacgal_state::coin_counter_w));
 }
 
 
