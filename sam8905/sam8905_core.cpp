@@ -272,7 +272,8 @@ void SAM8905Core::generate_samples(int16_t* buffer, size_t num_samples)
 
 			if (m_ssr_mode) {
 				// 22.05kHz mode: 4 algorithms x 64 instructions
-				uint8_t alg = (param15 >> 8) & 0x3;  // Only 2 bits
+				// Per Table 6: A-RAM address uses AL2,AL1 (bits 10-9) not AL1,AL0 (bits 9-8)
+				uint8_t alg = (param15 >> 9) & 0x3;
 				pc_start = alg << 6;  // 64 instructions per block
 				inst_count = 64;
 			} else {

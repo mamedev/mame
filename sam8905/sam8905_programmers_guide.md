@@ -512,6 +512,29 @@ A write to the chip with A2=A1=A0=0 selects the internal RAM address
 | **AL:** | algorithm number |
 | **PC:** | micro-instruction location counter inside algorithm |
 
+**Important note on 22kHz mode (SSR=1):**
+In D-RAM word 15, the ALG field occupies bits 10-8 (AL2=bit10, AL1=bit9, AL0=bit8).
+When SSR=1, only AL2 and AL1 (bits 10-9) select the algorithm. AL0 becomes part of the
+instruction counter (PC5). This means:
+
+| D-RAM ALG (bits 10-8) | 22kHz A-RAM ALG | A-RAM Base Address |
+|-----------------------|-----------------|-------------------|
+| 0 (000), 1 (001)      | 0               | 0x00              |
+| 2 (010), 3 (011)      | 1               | 0x40              |
+| 4 (100), 5 (101)      | 2               | 0x80              |
+| 6 (110), 7 (111)      | 3               | 0xC0              |
+
+To calculate A-RAM base address in code:
+```cpp
+// SSR=0 (44.1kHz): 8 algorithms × 32 instructions
+uint8_t alg = (param15 >> 8) & 0x7;
+uint16_t pc_start = alg << 5;
+
+// SSR=1 (22.05kHz): 4 algorithms × 64 instructions
+uint8_t alg = (param15 >> 9) & 0x3;  // Use bits 10-9, not 9-8!
+uint16_t pc_start = alg << 6;
+```
+
 Write or read to the chip with A2=0 and A1A0 <> 00 allows to write/read data td/from the internal RAMs as follows:
 
 ```

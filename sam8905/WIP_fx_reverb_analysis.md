@@ -9,49 +9,70 @@ Updated: 2026-01-14
 
 The Keyfox10 uses a dedicated SAM8905 chip ("SAM[FX]") for reverb/effects processing. This document analyzes the algorithms and D-RAM configuration programmed by the firmware.
 
-## CRITICAL BUG FOUND (2026-01-14)
+## BUG FOUND AND FIXED (2026-01-14)
 
 ### Problem: FX produces no audio output
 
-**Root cause:** The FX SAM chip runs in **22kHz mode** (SSR=1), which:
-1. Uses only 4 algorithms (ALG 0-3) instead of 8
-2. ALG field in param15 is masked to 2 bits: `ALG & 0x3`
-3. Each algorithm has 64 instructions instead of 32
+**Root cause:** Emulator bug in 22kHz mode A-RAM address calculation.
 
-**Result of 22kHz ALG wrapping:**
-| param15 ALG | 22kHz ALG | A-RAM Base |
-|-------------|-----------|------------|
-| 0           | 0         | 0x00       |
-| 2           | 2         | 0x80       |
-| 4           | 0         | 0x00 (WRAPPED!) |
-| 6           | 2         | 0x80 (WRAPPED!) |
+### SAM8905 A-RAM Address Format (Table 6 from datasheet)
 
-So slots 4, 7-11 (which have param15 ALG=0 or ALG=4) all run the **same** ALG=0 program!
-And slots 5, 6 (ALG=2 or ALG=6) both run ALG=2 program.
+| Bit 7 | Bit 6 | Bit 5 | Bit 4 | Bit 3 | Bit 2 | Bit 1 | Bit 0 | Mode |
+|-------|-------|-------|-------|-------|-------|-------|-------|------|
+| AL2   | AL1   | AL0   | PC4   | PC3   | PC2   | PC1   | PC0   | SSR=0 (44.1kHz) |
+| AL2   | AL1   | PC5   | PC4   | PC3   | PC2   | PC1   | PC0   | SSR=1 (22.05kHz) |
 
-### Missing WXY WSP Instructions
+**Key insight:** In 22kHz mode, only **AL2 and AL1** (2 bits) select the algorithm.
+AL0 becomes PC5 (part of the instruction counter).
 
-Per the SAM8905 programming guide, MIX values (MIXL/MIXR attenuation for output) are ONLY updated when both:
-- WXY is active (bit 3 = 0)
-- WSP is active (bit 8 = 1)
+### The Bug
 
-**Analysis of actual A-RAM programs:**
+The D-RAM word 15 ALG field is at bits 10-8: `AL2=bit10, AL1=bit9, AL0=bit8`
 
-| Algorithm | WXY WSP Instructions | MIX Update? |
-|-----------|---------------------|-------------|
-| ALG=0     | **ZERO**            | **NO!**     |
-| ALG=2     | 1 (PC07: 0x29B7)    | Yes (from D[5]) |
+**Wrong code (was using bits 9-8):**
+```cpp
+uint8_t alg = (param15 >> 8) & 0x3;  // WRONG: extracts AL1,AL0 (bits 9-8)
+```
 
-**ALG=0 has ZERO WXY WSP instructions!** Slots 4, 7-11 running this algorithm can NEVER produce audio output because their MIX attenuators stay at 0.
+**Fixed code (now using bits 10-9):**
+```cpp
+uint8_t alg = (param15 >> 9) & 0x3;  // CORRECT: extracts AL2,AL1 (bits 10-9)
+```
 
-ALG=2 has one WXY WSP at PC07 (`RM 5, <WB WXY WSP>`) which reads D-RAM[5] for MIX. But the D[5] values for slots 5,6 don't have proper MIX settings - they contain bus=0x00100 which gives mix_l=0, mix_r=0.
+### Verification
 
-### Next Steps to Debug
+For slots 7-11 with param15 = 0x3C480 (ALG=4 in D-RAM field):
+- Bits 10-8 = 100 binary (AL2=1, AL1=0, AL0=0)
+- **Wrong:** (0x3C480 >> 8) & 0x3 = 0 → ran ALG 0 code at A-RAM 0x00
+- **Fixed:** (0x3C480 >> 9) & 0x3 = 2 → runs ALG 2 code at A-RAM 0x80
 
-1. [ ] Verify 22kHz mode is correct (check real hardware behavior)
-2. [ ] Check if there's a different A-RAM program that should be loaded
-3. [ ] Compare with other SAM8905-based products to understand expected behavior
-4. [ ] Investigate if firmware has separate FX A-RAM that isn't being loaded
+### Result After Fix
+
+| param15 ALG | 22kHz ALG (AL2,AL1) | A-RAM Base |
+|-------------|---------------------|------------|
+| 0 (000)     | 0 (00)              | 0x00       |
+| 2 (010)     | 1 (01)              | 0x40       |
+| 4 (100)     | 2 (10)              | 0x80       |
+| 6 (110)     | 3 (11)              | 0xC0       |
+
+Now slots 7-11 (ALG=4) correctly run A-RAM 0x80-0xBF which has WXY WSP at PC07!
+
+### A-RAM Content Analysis (Correct Mapping)
+
+| 22kHz ALG | A-RAM Range | WXY WSP Instructions | WACC Instructions |
+|-----------|-------------|---------------------|-------------------|
+| 0         | 0x00-0x3F   | 0                   | 0                 |
+| 1         | 0x40-0x7F   | (not used)          | (not used)        |
+| 2         | 0x80-0xBF   | 1 (PC07: 0x29B7)    | 3 (PC10,11,29)    |
+| 3         | 0xC0-0xFF   | (not used)          | (not used)        |
+
+ALG 2 (A-RAM 0x80) has the reverb output code with proper WXY WSP and WACC instructions.
+
+### Remaining Investigation
+
+- [x] Fixed ALG bit selection for 22kHz mode
+- [ ] Verify FX produces actual audio with input signal from SND chip
+- [ ] Check if FX input routing is working correctly
 
 ## Active Configuration
 

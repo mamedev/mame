@@ -214,7 +214,8 @@ struct SAM8905 {
         int pc_start, inst_count;
 
         if (ssr_mode) {
-            alg &= 0x3;  // Only 2 bits in 22kHz mode
+            // Per Table 6: Use AL2,AL1 (bits 10-9), not AL1,AL0 (bits 9-8)
+            alg = (param15 >> 9) & 0x3;
             pc_start = alg << 6;
             inst_count = 64;
         } else {
