@@ -106,7 +106,7 @@ void dcchk_state::md_68k_map(address_map &map)
 			// TODO: enough for all edge cases but timekill
 			u16 open_bus = space.read_word(m_md68kcpu->pc() - 2) & 0xfefe;
 			// printf("%06x -> %04x\n", m_md68kcpu->pc() - 2, open_bus);
-			u16 res = (!m_z80_busrq || m_z80_reset) ^ 1;
+			u16 res = (m_mdz80cpu->busack_r() && !m_z80_reset) ^ 1;
 			return (res << 8) | (res) | open_bus;
 		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
