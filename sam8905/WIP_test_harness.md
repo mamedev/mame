@@ -79,7 +79,8 @@ mame/sam8905/
 ### 22.05kHz Mode (Keyfox10)
 ```cpp
 // 4 algorithms × 64 instructions
-uint8_t alg = (param15 >> 8) & 0x3;  // 2 bits
+// Per Table 6: Use AL2,AL1 (bits 10-9), not AL1,AL0 (bits 9-8)
+uint8_t alg = (param15 >> 9) & 0x3;  // Use upper 2 bits of ALG field
 uint16_t pc_start = alg << 6;        // 64 instructions
 for (int pc = 0; pc < 64; ++pc) { ... }
 ```
