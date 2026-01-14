@@ -117,15 +117,6 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 
 void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, int pc)
 {
-	// Debug: trace slot 7 PC 5-7 at start of execute_cycle
-	if (m_slave_mode && slot_idx == 7 && pc >= 5 && pc <= 7) {
-		static int s7_early_trace = 0;
-		if (s7_early_trace < 10) {
-			logerror("Slot7 early PC%02d: inst=0x%04X wsp_bit=%d\n", pc, inst, BIT(inst, 8));
-			s7_early_trace++;
-		}
-	}
-
 	slot_t &slot = m_slots[slot_idx];
 	uint8_t mad = (inst >> 11) & 0xF;
 	uint8_t emitter_sel = (inst >> 9) & 0x3;
@@ -306,23 +297,14 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 				wxy_trace++;
 			}
 		}
+		// WSP inside WXY - sets mix_l/mix_r from bus value
+		if (wsp) {
+			slot.mix_l = (bus >> 3) & 0x7;
+			slot.mix_r = bus & 0x7;
+		}
 		// Calculate multiplication result (12x12 fractional)
 		int32_t product = (int32_t)((int16_t)(slot.x << 4) >> 4) * (int32_t)((int16_t)(slot.y << 4) >> 4);
 		slot.mul_result = (uint32_t)(product >> 5) & MASK19;
-	}
-
-	// WSP (Write Special) - INDEPENDENT of WXY, executes when bit 8 = 1
-	// Sets mix_l/mix_r from bus value for WACC accumulation
-	if (wsp) {
-		// Debug: trace WSP for FX chip slots 4-11
-		static int wsp_trace = 0;
-		if (m_slave_mode && slot_idx >= 4 && slot_idx <= 11 && wsp_trace < 50) {
-			logerror("WSP slot%d pc=%d: bus=0x%05X -> mix_l=%d mix_r=%d\n",
-				slot_idx, pc, bus, (bus >> 3) & 0x7, bus & 0x7);
-			wsp_trace++;
-		}
-		slot.mix_l = (bus >> 3) & 0x7;
-		slot.mix_r = bus & 0x7;
 	}
 
 	// clearB
