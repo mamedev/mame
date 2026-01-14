@@ -12,6 +12,8 @@ public:
 	// construction/destruction
 	madam_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	auto diag_cb() { return m_diag_cb.bind(); }
+
 	void map(address_map &map);
 
 protected:
@@ -21,6 +23,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
+	devcb_write8 m_diag_cb;
+
 	uint32_t  m_revision = 0;       /* 03300000 */
 	uint32_t  m_msysbits = 0;       /* 03300004 */
 	uint32_t  m_mctl = 0;           /* 03300008 */

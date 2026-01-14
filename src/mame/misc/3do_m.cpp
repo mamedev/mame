@@ -2,6 +2,8 @@
 // copyright-holders:Angelo Salese, Wilbert Pol
 /*
 
+Miscellaneous not yet device-ified stuff
+
 Reset boot sequence:
 - jump to ROM address space 03000028)
 - determine source of reset from cstatbits (03000068)
@@ -204,7 +206,7 @@ void _3do_state::svf_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 }
 
 // $0340'c000 base
-// Uncle/Woody is the FMV expansion bus (with it's own ROM)
+// Uncle handling, Woody is the FMV expansion bus (with it's own ROM)
 void _3do_state::uncle_map(address_map &map)
 {
 	map(0x0000, 0x0003).lr32(NAME([this] () { return m_uncle.rev; }));

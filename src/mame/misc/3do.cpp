@@ -106,6 +106,8 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "imagedev/cdromimg.h"
 
 
+#define DIAG_ENABLE     0
+
 #define X2_CLOCK_PAL    59000000
 #define X2_CLOCK_NTSC   49090000
 #define X601_CLOCK      XTAL(16'934'400)
@@ -173,6 +175,17 @@ void _3do_state::_3do(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MADAM(config, m_madam, XTAL(50'000'000)/4);
+	m_madam->diag_cb().set([this] (u8 data) {
+		// TODO: how this really connects?
+		// is it expecting a Mac terminal on the other end, where the baud is set there?
+		if (DIAG_ENABLE)
+		{
+			if(data == 0x0a)
+				printf("\n");
+			else
+				printf("%c", data & 0xff);
+		}
+	});
 
 	CLIO(config, m_clio, XTAL(50'000'000)/4);
 	m_clio->firq_cb().set([this] (int state) {
@@ -198,6 +211,15 @@ void _3do_state::_3do_pal(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MADAM(config, m_madam, XTAL(50'000'000)/4);
+	m_madam->diag_cb().set([this] (u8 data) {
+		if (DIAG_ENABLE)
+		{
+			if(data == 0x0a)
+				printf("\n");
+			else
+				printf("%c",data & 0xff);
+		}
+	});
 
 	CLIO(config, m_clio, XTAL(50'000'000)/4);
 	m_clio->firq_cb().set([this] (int state) {

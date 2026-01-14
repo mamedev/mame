@@ -8,6 +8,7 @@ DEFINE_DEVICE_TYPE(MADAM, madam_device, "madam", "3DO MN7A020UDA \"Madam\" Addre
 
 madam_device::madam_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MADAM, tag, owner, clock)
+	, m_diag_cb(*this)
 {
 }
 
@@ -35,11 +36,8 @@ void madam_device::map(address_map &map)
 	map(0x0000, 0x0003).lrw32(
 		NAME([this] () { return m_revision; }),
 		// echo for terminal?
-		NAME([] (u32 data) {
-			if(data == 0x0a)
-				printf("\n");
-			else
-				printf("%c",data & 0xff);
+		NAME([this] (u32 data) {
+			m_diag_cb(data & 0xff);
 		})
 	);
 
