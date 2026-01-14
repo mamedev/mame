@@ -1058,13 +1058,16 @@ void keyfox10_state::sam_fx_waveform_w(offs_t offset, u16 data)
 {
     // offset is 15-bit address (0-32767)
     if (offset < FX_SRAM_SIZE) {
-        // Real hardware: m_fx_sram[offset] = (data >> 3) & 0xFF; (8-bit only)
-        m_fx_sram[offset] = data;
+        // Hardware: SRAM stores only 8 bits (bits 10:3 of 12-bit SAM data)
+        // SAM outputs 12-bit data, SRAM captures D7:D0 from WDH10:WDH3
+        int8_t data_8bit = (data >> 3) & 0xFF;
+        m_fx_sram[offset] = data_8bit;
 
         // Debug: trace SRAM writes (limited)
         static int sram_write_trace = 0;
         if (sram_write_trace < 30) {
-            logerror("FX SRAM write: addr=%04X data=%d\n", offset, (int16_t)data);
+            logerror("FX SRAM write: addr=%04X 12bit=%d 8bit=%d\n",
+                offset, (int16_t)data, data_8bit);
             sram_write_trace++;
         }
     }
@@ -1079,34 +1082,72 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
     if (offset & 0x80000)  // WA19 set - read input sample
     {
         // Return sound SAM output sample for FX processing
-        int16_t sample = (offset & 1) ? m_fx_input_r : m_fx_input_l;
+        // Hardware: Two 74HC595 shift registers (IC22, IC23) - 16 bits total
+        // The shift registers hold one sample (either L or R from SND at 44kHz)
+        // FX reads at 22kHz, getting the current sample in the registers
+        //
+        // For now: PHI[0] (WA0) selects which stored value to read
+        // TODO: verify actual L/R timing relationship between SND and FX
+        bool is_right = (offset & 1);
+        int16_t sample = is_right ? m_fx_input_r : m_fx_input_l;
 
-        // Debug: log input sample reads (limited)
+        // Hardware emulation: shift registers provide 8 bits at WDH10:WDH3
+        // Take upper 8 bits of 16-bit sample (same as SRAM: only 8 bits stored)
+        int8_t sample_8bit = sample >> 8;
+
+        // Place 8-bit value at bits 10:3, bits 2:0 are grounded (always 0)
+        int16_t result = ((int16_t)sample_8bit) << 3;
+
+        // Sign extend bit 10 to bit 11 (for proper signed audio)
+        // NOTE: Hardware may have asymmetric sign extension for L vs R,
+        // but that would break audio. Applying symmetric extension for now.
+        if (result & 0x400)
+            result |= 0x800;
+
+        // Debug: log non-zero input sample reads
         static int fx_input_log_count = 0;
-        if (fx_input_log_count < 50 || (sample != 0 && fx_input_log_count < 200)) {
-            logerror("FX input read: WA=%05X ch=%c sample=%d\n",
-                offset, (offset & 1) ? 'R' : 'L', sample);
+        if (sample != 0 && fx_input_log_count < 100) {
+            logerror("FX input read: WA=%05X ch=%c raw=%d 8bit=%d result=%d\n",
+                offset, is_right ? 'R' : 'L', sample, sample_8bit, (int16_t)result);
             fx_input_log_count++;
         }
 
-        // Convert 16-bit sample to 12-bit (SAM8905 waveform data is 12-bit signed)
-        return sample >> 4;
+        return result & 0xFFF;
     }
 
     // Check for SRAM access: WA[18:15] = 0 means SRAM address space (32KB)
     // SRAM address: WF[6:0] << 8 | PHI[11:4] = 15 bits
+    // WAH0 = PHI[4] for sign extension control
     uint32_t wave = (offset >> 12) & 0xFF;   // WAVE[7:0]
     if (wave < 0x80) {
         // SRAM access: build 15-bit address
         uint32_t sram_addr = ((wave & 0x7F) << 8) | ((offset >> 4) & 0xFF);
         if (sram_addr < FX_SRAM_SIZE && m_fx_sram) {
+            // Hardware: SRAM stores 8 bits, mapped to WDH10:WDH3
+            // WDH0-2 are grounded (always 0)
+            // WDH11 sign extension depends on WAH0 (=PHI[4])
+            int8_t sram_8bit = m_fx_sram[sram_addr] & 0xFF;
+            int16_t result = ((int16_t)sram_8bit) << 3;  // Place at bits 10:3
+
+            // WAH0 = PHI[4] = (offset >> 4) & 1
+            bool wah0 = (offset >> 4) & 1;
+            if (!wah0) {
+                // WAH0=0: WDH11 = WDH10 (sign extension)
+                if (result & 0x400)
+                    result |= 0x800;
+            } else {
+                // WAH0=1: WDH11 = 0
+                result &= 0x7FF;
+            }
+
             // Debug: trace SRAM reads (limited)
             static int sram_read_trace = 0;
             if (sram_read_trace < 30) {
-                logerror("FX SRAM read: addr=%04X data=%d\n", sram_addr, m_fx_sram[sram_addr]);
+                logerror("FX SRAM read: addr=%04X wah0=%d raw=%d result=%d\n",
+                    sram_addr, wah0, sram_8bit, (int16_t)result);
                 sram_read_trace++;
             }
-            return m_fx_sram[sram_addr];
+            return result & 0xFFF;
         }
     }
 

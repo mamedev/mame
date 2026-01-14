@@ -502,12 +502,36 @@ Input -> Slot 4 (ALG 0, conditioning) -> SRAM write
 - Slot 4 - input conditioning
 - Slot 6 - all-pass diffusion (muted, feeds other slots via SRAM)
 
+## Fixed Issues (2026-01-14)
+
+### FX Input Sign Extension Bug
+
+**Problem:** FX reads input samples with 8-bit resolution (via 74HC595 shift registers).
+The sign extension logic `WDH11 = (~WAH0) AND WDH10` suggested asymmetric handling
+where RIGHT channel (WAH0=1) would have bit 11 forced to 0.
+
+**Impact:** This would turn negative right-channel samples positive, breaking audio.
+
+**Solution:** Apply symmetric sign extension for both channels when reading input samples.
+The hardware quirk may exist but the algorithm uses both even and odd PHI addresses,
+so proper sign extension is required for correct audio.
+
+**Code change:** In `sam_fx_waveform_r()`, always sign-extend input samples:
+```cpp
+// Sign extend bit 10 to bit 11 (for proper signed audio)
+if (result & 0x400)
+    result |= 0x800;
+```
+
+**Result:** FX now produces oscillating audio output instead of accumulating DC offset.
+
 ## Open Questions
 
 - [ ] Exact SRAM address mapping (bits 18-10 of WWF?)
 - [ ] Feedback path routing between slots
 - [x] ~~How do idle slots (0-3, 12-15) contribute to SRAM buffer management?~~ They don't - truly inactive
 - [ ] Reverb time/decay control mechanism
+- [ ] Actual L/R channel handling - SND outputs L=0, R=audio; FX reads both via PHI[0]
 
 ## Files
 
