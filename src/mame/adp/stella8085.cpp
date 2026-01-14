@@ -234,7 +234,7 @@ void stella8085_state::machine2_w(uint8_t data)
 
 void stella8085_state::kbd_sl_w(uint8_t data)
 {
-	m_kbd_sl = data;
+	m_kbd_sl = data & 0x0f; //SL0-SL3
 
 	// SL3 connected through CD4093 NAND to DIP switch connected to RST75
 	if (BIT(m_dsw->read(), 0))
@@ -251,8 +251,8 @@ void stella8085_state::kbd_bd_w(uint8_t data)
 uint8_t stella8085_state::kbd_rl_r()
 {
 	uint8_t ret = 0xff;
-	uint8_t rl = m_kbd_sl & 0x07;
-	ret = m_tz[rl]->read();
+	const uint8_t RL = m_kbd_sl & 0x07; // only SL0-2 connected
+	ret = m_tz[RL]->read();
 	return ret;
 }
 
@@ -422,9 +422,9 @@ void stella8085_state::io71w(uint8_t data)
 void stella8085_state::sounddev(uint8_t data)
 {
 	m_sounddata = data;
-	uint8_t tone = (data & 0x0f);
-	uint8_t octave = (data & 0xc0) >> 6;
-	setsound(tone, octave);
+	const uint8_t TONE = (data & 0x0f);
+	const uint8_t OCTAVE = (data & 0xc0) >> 6;
+	setsound(TONE, OCTAVE);
 }
 
 void stella8085_state::setsound(uint8_t tone, uint8_t octave)
