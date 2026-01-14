@@ -423,6 +423,18 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 					logerror("  PC%02d: 0x%04X%s\n", i, inst, wsp_flag ? " [WSP]" : "");
 				}
 			}
+			// Dump ALG=2 A-RAM when slot 5 first gets ALG=2 (stays ALG=2 in 22kHz mode)
+			if (s == 5 && param15 == 0x3C280) {
+				logerror("ALG=2 A-RAM (22kHz mode, base=0x80) for slot 5:\n");
+				for (int i = 0; i < 64; i++) {
+					uint16_t inst = m_aram[0x80 + i];
+					bool wsp_flag = (inst >> 8) & 1;
+					bool wxy_flag = !((inst >> 3) & 1);
+					bool wacc_flag = !(inst & 1);
+					logerror("  PC%02d: 0x%04X%s%s%s\n", i, inst,
+						wsp_flag ? " [WSP]" : "", wxy_flag ? " [WXY]" : "", wacc_flag ? " [WACC]" : "");
+				}
+			}
 			last_p15[s] = param15;
 		}
 
@@ -436,7 +448,8 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 
 		if (ssr_mode) {
 			// 22.05kHz mode: 4 algorithms × 64 instructions
-			uint8_t alg = (param15 >> 8) & 0x3;
+			// Per programmer's guide: A-RAM address uses AL2,AL1 (bits 10-9) not AL1,AL0 (bits 9-8)
+			uint8_t alg = (param15 >> 9) & 0x3;
 			pc_start = alg << 6;
 			inst_count = 64;
 		} else {
@@ -528,7 +541,8 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 
 			if (ssr_mode) {
 				// 22.05kHz mode: 4 algorithms × 64 instructions
-				uint8_t alg = (param15 >> 8) & 0x3;  // Only 2 bits
+				// Per programmer's guide: A-RAM address uses AL2,AL1 (bits 10-9) not AL1,AL0 (bits 9-8)
+				uint8_t alg = (param15 >> 9) & 0x3;
 				pc_start = alg << 6;  // 64 instructions per block
 				inst_count = 64;
 			} else {
