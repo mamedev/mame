@@ -143,6 +143,7 @@ private:
 	uint8_t grid_modem_r(offs_t offset);
 	void grid_keyb_w(offs_t offset, uint16_t data);
 	void grid_modem_w(offs_t offset, uint8_t data);
+	void grid_sound_w(offs_t offset, uint8_t data);
 
 	void grid_dma_w(offs_t offset, uint8_t data);
 	uint8_t grid_dma_r(offs_t offset);
@@ -230,6 +231,17 @@ void gridcomp_state::grid_modem_w(offs_t offset, uint8_t data)
 	LOG("MDM %02x <- %02x\n", 0xdfec0 + (offset << 1), data);
 }
 
+void gridcomp_state::grid_sound_w(offs_t offset, uint8_t data)
+{
+	if (offset & 0b01) {
+		LOG("VOLUME DAC <- %02x\n", data);
+	}
+	if (offset & 0b10) {
+		LOG("SOUND DAC <- %02x\n", data);
+		m_speaker->level_w(data);
+	}
+}
+
 void gridcomp_state::grid_dma_w(offs_t offset, uint8_t data)
 {
 	m_tms9914->write(7, data);
@@ -298,6 +310,7 @@ IRQ_CALLBACK_MEMBER(gridcomp_state::irq_callback)
 void gridcomp_state::grid1101_map(address_map &map)
 {
 	map.unmap_value_high();
+	map(0xdfe40, 0xdfe42).w(FUNC(gridcomp_state::grid_sound_w));
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
