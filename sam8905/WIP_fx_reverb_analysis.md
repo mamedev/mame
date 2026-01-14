@@ -3,24 +3,104 @@
 ## Status: IN PROGRESS
 
 Started: 2026-01-13
+Updated: 2026-01-14
 
 ## Overview
 
 The Keyfox10 uses a dedicated SAM8905 chip ("SAM[FX]") for reverb/effects processing. This document analyzes the algorithms and D-RAM configuration programmed by the firmware.
 
+## CRITICAL BUG FOUND (2026-01-14)
+
+### Problem: FX produces no audio output
+
+**Root cause:** The FX SAM chip runs in **22kHz mode** (SSR=1), which:
+1. Uses only 4 algorithms (ALG 0-3) instead of 8
+2. ALG field in param15 is masked to 2 bits: `ALG & 0x3`
+3. Each algorithm has 64 instructions instead of 32
+
+**Result of 22kHz ALG wrapping:**
+| param15 ALG | 22kHz ALG | A-RAM Base |
+|-------------|-----------|------------|
+| 0           | 0         | 0x00       |
+| 2           | 2         | 0x80       |
+| 4           | 0         | 0x00 (WRAPPED!) |
+| 6           | 2         | 0x80 (WRAPPED!) |
+
+So slots 4, 7-11 (which have param15 ALG=0 or ALG=4) all run the **same** ALG=0 program!
+And slots 5, 6 (ALG=2 or ALG=6) both run ALG=2 program.
+
+### Missing WXY WSP Instructions
+
+Per the SAM8905 programming guide, MIX values (MIXL/MIXR attenuation for output) are ONLY updated when both:
+- WXY is active (bit 3 = 0)
+- WSP is active (bit 8 = 1)
+
+**Analysis of actual A-RAM programs:**
+
+| Algorithm | WXY WSP Instructions | MIX Update? |
+|-----------|---------------------|-------------|
+| ALG=0     | **ZERO**            | **NO!**     |
+| ALG=2     | 1 (PC07: 0x29B7)    | Yes (from D[5]) |
+
+**ALG=0 has ZERO WXY WSP instructions!** Slots 4, 7-11 running this algorithm can NEVER produce audio output because their MIX attenuators stay at 0.
+
+ALG=2 has one WXY WSP at PC07 (`RM 5, <WB WXY WSP>`) which reads D-RAM[5] for MIX. But the D[5] values for slots 5,6 don't have proper MIX settings - they contain bus=0x00100 which gives mix_l=0, mix_r=0.
+
+### Next Steps to Debug
+
+1. [ ] Verify 22kHz mode is correct (check real hardware behavior)
+2. [ ] Check if there's a different A-RAM program that should be loaded
+3. [ ] Compare with other SAM8905-based products to understand expected behavior
+4. [ ] Investigate if firmware has separate FX A-RAM that isn't being loaded
+
 ## Active Configuration
 
+**FX SAM Mode:** 22kHz (SSR=1)
 **Active slots:** 4, 5, 6, 7, 8, 9, 10, 11 (8 slots)
-**Active algorithms:** 0, 2, 4, 6 (4 algorithms)
+**param15 ALG values:** 0, 2, 4, 6 (but wrapped to 0, 2 in 22kHz mode)
 
 | Slot | IDLE | ALG | Description |
 |------|------|-----|-------------|
-| 0-3  | 1    | -   | Idle (likely SRAM tap buffer writes) |
+| 0-3  | 1    | -   | Idle (NOP - no processing) |
 | 4    | 0    | 0   | Active - Algorithm 0 |
 | 5    | 0    | 2   | Active - Algorithm 2 |
 | 6    | 0    | 6   | Active - Algorithm 6 |
 | 7-11 | 0    | 4   | Active - Algorithm 4 (5 instances!) |
-| 12-15| 1    | -   | Idle (likely SRAM tap buffer writes) |
+| 12-15| 1    | -   | Idle (NOP - no processing) |
+
+## Audio Output Configuration
+
+### WACC (Accumulator to DAC) Usage
+
+| Slot | Algorithm | WACC Instructions | Notes |
+|------|-----------|-------------------|-------|
+| 4    | ALG 0     | PC00 only         | Init instruction, minimal output |
+| 5    | ALG 2     | PC04,07,09,13,14,19,20,30,31 | Heavy output (9 instructions) |
+| 6    | ALG 6     | PC11 only         | Single output but **MUTED** |
+| 7-11 | ALG 4     | PC10,11,29        | 3 outputs each |
+
+### MIXL/MIXR Settings (Stereo Panning)
+
+MIX is updated by `WXY WSP` instruction. Format: `| AMP (12 bits) | X | MIXL (3) | MIXR (3) | X |`
+
+| Slot | D-RAM Word | AMP    | MIXL   | MIXR  | Notes |
+|------|------------|--------|--------|-------|-------|
+| 6    | word[7]    | 0xA58  | **mute** | **mute** | All-pass processes but doesn't output! |
+| 7    | word[5]    | 0xCCC  | 0dB    | 0dB   | Full stereo |
+| 8    | word[5]    | 0xCD4  | 0dB    | 0dB   | Full stereo |
+| 9    | word[5]    | 0xCDD  | -24dB  | 0dB   | Right-biased |
+| 10   | word[5]    | 0xCE9  | -24dB  | 0dB   | Right-biased |
+| 11   | word[5]    | 0xCEF  | 0dB    | 0dB   | Full stereo |
+
+**Key insight:** Slot 6 (all-pass filter) is **muted** - it processes audio internally (SRAM read/write) but contributes nothing to the output. The other slots read from its delay buffers.
+
+### IDLE Slots Analysis
+
+IDLE slots (0-3, 12-15) execute **NOP** regardless of their ALG setting. They:
+- Do NOT write to SRAM
+- Do NOT contribute to audio output
+- Have minimal D-RAM initialization (internal wave configs only)
+- Are truly inactive placeholders
 
 ## A-RAM Algorithms
 
@@ -275,27 +355,35 @@ The external SRAM appears to be used for delay line storage:
 - Multiple tap points reading from different SRAM locations
 - WWF fields contain SRAM bank/address configurations
 
-### Signal Flow (Hypothesis)
+### Signal Flow (Revised)
 
 ```
-Input -> Slot 4 (conditioning) -> SRAM write
-                                     |
-         +---------------------------+
-         |
-         v
-    Slot 5 (diffusion) <- SRAM read
-         |
-         v
-    Slot 6 (all-pass) <- SRAM read/write
-         |
-         +-> Slots 7-11 (parallel delay taps) -> Mix to output
+Input -> Slot 4 (ALG 0, conditioning) -> SRAM write
+                |
+                v
+         Slot 5 (ALG 2, diffusion) -----> DAC output (heavy WACC)
+                |
+                v
+         Slot 6 (ALG 6, all-pass) -> SRAM buffers only (MUTED)
+                |
+                +---> Slots 7-11 (ALG 4, delay taps) -> DAC output
+                      - 5 parallel taps at different delays
+                      - Stereo mix: 7,8,11 center; 9,10 right-biased
 ```
+
+**Audio output sources:**
+1. Slot 5 (diffusion) - primary reverb output
+2. Slots 7-11 (delay taps) - early reflections
+
+**Internal processing only:**
+- Slot 4 - input conditioning
+- Slot 6 - all-pass diffusion (muted, feeds other slots via SRAM)
 
 ## Open Questions
 
 - [ ] Exact SRAM address mapping (bits 18-10 of WWF?)
 - [ ] Feedback path routing between slots
-- [ ] How do idle slots (0-3, 12-15) contribute to SRAM buffer management?
+- [x] ~~How do idle slots (0-3, 12-15) contribute to SRAM buffer management?~~ They don't - truly inactive
 - [ ] Reverb time/decay control mechanism
 
 ## Files
@@ -309,7 +397,9 @@ Input -> Slot 4 (conditioning) -> SRAM write
 - [x] Extract A-RAM and D-RAM data from emulator
 - [x] Decode all used algorithms (0, 2, 4, 6)
 - [x] Document slot configurations
+- [x] Analyze WACC output usage per slot
+- [x] Analyze MIXL/MIXR stereo panning settings
+- [x] Understand idle slot behavior (they do nothing)
 - [ ] Analyze SRAM addressing scheme
 - [ ] Trace signal flow through all slots
 - [ ] Identify feedback coefficients
-- [ ] Understand idle slot buffer write patterns
