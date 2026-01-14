@@ -9,6 +9,8 @@
 #include <cstring>
 #include <cmath>
 #include <vector>
+#include <map>
+#include <algorithm>
 
 constexpr uint32_t MASK19 = 0x7FFFF;
 constexpr size_t FX_SRAM_SIZE = 32768;
@@ -21,6 +23,10 @@ struct SAM8905_FX {
     uint16_t aram[256];     // 256 x 15-bit instructions
     uint32_t dram[256];     // 256 x 19-bit parameters
     int8_t sram[FX_SRAM_SIZE];  // 32KB SRAM (8-bit per location)
+
+    // SRAM access tracking
+    std::vector<std::pair<uint32_t, int16_t>> sram_writes;  // addr, data
+    std::vector<std::pair<uint32_t, int16_t>> sram_reads;   // addr, data
 
     // Per-slot state
     struct Slot {
@@ -55,6 +61,8 @@ struct SAM8905_FX {
         out_l = out_r = 0;
         verbose = false;
         frame_count = 0;
+        sram_writes.clear();
+        sram_reads.clear();
     }
 
     // Get waveform sample - includes SRAM and input sample access
@@ -99,6 +107,9 @@ struct SAM8905_FX {
                     result &= 0x7FF;
                 }
 
+                // Track read for analysis
+                sram_reads.push_back({sram_addr, result});
+
                 if (verbose && sram_8bit != 0 && frame_count < 5) {
                     printf("  [waveform: SRAM[%04X]=%d -> %d wah0=%d]\n",
                            sram_addr, sram_8bit, result, wah0);
@@ -126,6 +137,9 @@ struct SAM8905_FX {
                 // Store only 8 bits (bits 10:3 of 12-bit data)
                 int8_t data_8bit = (data >> 3) & 0xFF;
                 sram[sram_addr] = data_8bit;
+
+                // Track write for analysis
+                sram_writes.push_back({sram_addr, data});
 
                 if (verbose && frame_count < 5) {
                     printf("  [SRAM WRITE: addr=%04X data12=%d data8=%d]\n",
@@ -245,8 +259,8 @@ struct SAM8905_FX {
             slot.mul_result = (uint32_t)(product >> 5) & MASK19;
 
             if (verbose && slot.x != 0 && frame_count < 5) {
-                printf("  [PC%02d WXY: wf=0x%03X phi=0x%03X x=%d y=%d mul=%d]\n",
-                       pc, slot.wf, slot.phi, slot.x, slot.y,
+                printf("  [PC%02d WXY: inst=0x%04X mad=%d emit=%d bus=0x%05X wf=0x%03X phi=0x%03X x=%d y=%d mul=%d]\n",
+                       pc, inst, mad, emitter_sel, bus, slot.wf, slot.phi, slot.x, slot.y,
                        (int32_t)(slot.mul_result << 13) >> 13);
             }
         }
@@ -335,6 +349,12 @@ struct SAM8905_FX {
             out_l += slots[s].l_acc;
             out_r += slots[s].r_acc;
         }
+
+        // Saturate output to 16-bit range (like real hardware)
+        if (out_l > 32767) out_l = 32767;
+        if (out_l < -32768) out_l = -32768;
+        if (out_r > 32767) out_r = 32767;
+        if (out_r < -32768) out_r = -32768;
 
         frame_count++;
     }
@@ -489,6 +509,162 @@ void load_alg2_aram(SAM8905_FX &sam) {
     }
 }
 
+// WAV file writer
+void write_wav(const char* filename, const std::vector<int16_t>& samples, int sample_rate) {
+    FILE* f = fopen(filename, "wb");
+    if (!f) {
+        printf("Error: Cannot open %s for writing\n", filename);
+        return;
+    }
+
+    // WAV header
+    uint32_t data_size = samples.size() * 2;
+    uint32_t file_size = 36 + data_size;
+
+    fwrite("RIFF", 1, 4, f);
+    fwrite(&file_size, 4, 1, f);
+    fwrite("WAVE", 1, 4, f);
+    fwrite("fmt ", 1, 4, f);
+    uint32_t fmt_size = 16;
+    fwrite(&fmt_size, 4, 1, f);
+    uint16_t audio_format = 1;  // PCM
+    fwrite(&audio_format, 2, 1, f);
+    uint16_t num_channels = 1;
+    fwrite(&num_channels, 2, 1, f);
+    uint32_t sr = sample_rate;
+    fwrite(&sr, 4, 1, f);
+    uint32_t byte_rate = sample_rate * 2;
+    fwrite(&byte_rate, 4, 1, f);
+    uint16_t block_align = 2;
+    fwrite(&block_align, 2, 1, f);
+    uint16_t bits_per_sample = 16;
+    fwrite(&bits_per_sample, 2, 1, f);
+    fwrite("data", 1, 4, f);
+    fwrite(&data_size, 4, 1, f);
+    fwrite(samples.data(), 2, samples.size(), f);
+
+    fclose(f);
+    printf("Wrote %s (%zu samples)\n", filename, samples.size());
+}
+
+void test_with_sine_and_wav(SAM8905_FX &sam, int num_frames, int freq_hz) {
+    printf("\n=== Testing with %d Hz sine input, %d frames ===\n", freq_hz, num_frames);
+    printf("=== Generating WAV files for inspection ===\n");
+
+    double sample_rate = 22050.0;
+    double phase_inc = 2.0 * M_PI * freq_hz / sample_rate;
+    double phase = 0;
+
+    std::vector<int16_t> input_wav;
+    std::vector<int16_t> output_l_wav;
+    std::vector<int16_t> output_r_wav;
+
+    // Track SRAM usage
+    uint32_t sram_write_min = UINT32_MAX, sram_write_max = 0;
+    uint32_t sram_read_min = UINT32_MAX, sram_read_max = 0;
+    int sram_write_count = 0;
+
+    int32_t max_out = 0, min_out = 0;
+
+    for (int f = 0; f < num_frames; f++) {
+        // Generate sine input (16-bit)
+        int16_t sine_sample = (int16_t)(sin(phase) * 16000);
+        phase += phase_inc;
+
+        // SND outputs L=0, R=audio (like real keyfox10)
+        sam.input_l = 0;
+        sam.input_r = sine_sample;
+
+        // Track SRAM before frame
+        sam.process_frame();
+
+        // Track output
+        if (sam.out_l > max_out) max_out = sam.out_l;
+        if (sam.out_l < min_out) min_out = sam.out_l;
+
+        // Store for WAV
+        input_wav.push_back(sine_sample);
+        output_l_wav.push_back(std::clamp(sam.out_l, -32768, 32767));
+        output_r_wav.push_back(std::clamp(sam.out_r, -32768, 32767));
+
+        if (f < 10 || f == num_frames - 1) {
+            printf("Frame %3d: in_r=%6d -> out_l=%8d out_r=%8d\n",
+                   f, sine_sample, sam.out_l, sam.out_r);
+        } else if (f == 10) {
+            printf("...\n");
+        }
+    }
+
+    // Analyze SRAM usage
+    printf("\n=== SRAM Usage Analysis ===\n");
+    for (size_t i = 0; i < FX_SRAM_SIZE; i++) {
+        if (sam.sram[i] != 0) {
+            if (i < sram_write_min) sram_write_min = i;
+            if (i > sram_write_max) sram_write_max = i;
+            sram_write_count++;
+        }
+    }
+    if (sram_write_count > 0) {
+        printf("Non-zero SRAM: %d locations, range [0x%04X - 0x%04X]\n",
+               sram_write_count, sram_write_min, sram_write_max);
+    } else {
+        printf("SRAM is all zeros!\n");
+    }
+
+    printf("\nOutput range: [%d, %d]\n", min_out, max_out);
+
+    // Write WAV files
+    write_wav("fx_input.wav", input_wav, 22050);
+    write_wav("fx_output_l.wav", output_l_wav, 22050);
+    write_wav("fx_output_r.wav", output_r_wav, 22050);
+
+    // Also dump SRAM content as WAV (treating 8-bit samples as 16-bit)
+    std::vector<int16_t> sram_wav;
+    for (size_t i = 0; i < std::min(FX_SRAM_SIZE, (size_t)22050); i++) {
+        sram_wav.push_back(sam.sram[i] * 256);  // Scale 8-bit to 16-bit
+    }
+    write_wav("fx_sram_dump.wav", sram_wav, 22050);
+
+    // Create WAV from SRAM write sequence (data written over time)
+    std::vector<int16_t> sram_write_data;
+    for (const auto& w : sam.sram_writes) {
+        sram_write_data.push_back(w.second);  // Already 12-bit, scale to 16
+    }
+    if (!sram_write_data.empty()) {
+        write_wav("fx_sram_writes.wav", sram_write_data, 22050);
+        printf("SRAM writes: %zu total\n", sam.sram_writes.size());
+
+        // Analyze write addresses
+        std::map<uint32_t, int> write_addr_counts;
+        for (const auto& w : sam.sram_writes) {
+            write_addr_counts[w.first]++;
+        }
+        printf("Unique SRAM write addresses: %zu\n", write_addr_counts.size());
+        if (write_addr_counts.size() <= 20) {
+            for (const auto& [addr, count] : write_addr_counts) {
+                printf("  0x%04X: %d writes\n", addr, count);
+            }
+        } else {
+            // Just show first and last few
+            auto it = write_addr_counts.begin();
+            printf("  First 5 addresses:\n");
+            for (int i = 0; i < 5 && it != write_addr_counts.end(); ++i, ++it) {
+                printf("    0x%04X: %d writes\n", it->first, it->second);
+            }
+        }
+    }
+
+    // Create WAV from SRAM read sequence
+    std::vector<int16_t> sram_read_data;
+    for (const auto& r : sam.sram_reads) {
+        sram_read_data.push_back(r.second);
+    }
+    if (!sram_read_data.empty()) {
+        write_wav("fx_sram_reads.wav", sram_read_data, 22050);
+        printf("SRAM reads: %zu total\n", sam.sram_reads.size());
+    }
+}
+
 void test_with_sine_input(SAM8905_FX &sam, int num_frames, int freq_hz) {
     printf("\n=== Testing with %d Hz sine input, %d frames ===\n", freq_hz, num_frames);
 
@@ -637,6 +813,15 @@ int main(int argc, char** argv) {
     load_fx_dram(sam);
 
     test_with_sine_input(sam, 100, 440);
+
+    // Reset and test with WAV output (longer test)
+    sam.reset();
+    sam.control_reg = 0x08;
+    load_alg0_aram(sam);
+    load_alg2_aram(sam);
+    load_fx_dram(sam);
+
+    test_with_sine_and_wav(sam, 22050, 440);  // 1 second of audio
 
     return 0;
 }

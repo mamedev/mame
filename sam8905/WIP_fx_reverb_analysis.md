@@ -117,16 +117,16 @@ ALG 0 has TWO separate WWE sequences with different data sources:
 ```
 PC16: 68F7  RM   13, <WXY>              ; Y = D[13][18:7] - from D-RAM
 PC17: 38FD  RM    7, <WWF>              ; WWF = D[7] (SRAM bank select)
-PC18: 7FFB  RP   15, <clrB> [WSP]       ; WWE - writes Y (D[13] value)
-PC19: 7FFB  RP   15, <clrB> [WSP]       ; WWE - second pulse
+PC18: 7FFB  RSP  15, <clrB> [WSP]       ; WWE - writes Y (D[13] value)
+PC19: 7FFB  RSP  15, <clrB> [WSP]       ; WWE - second pulse
 ```
 D[13] is written at PC61 (end of frame), read at PC16 (next frame) = **one-frame delay feedback**
 
 **WWE #2 (PC34-36) - From A+B computation:**
 ```
 PC34: 7AF7  RADD 15, <WXY>              ; Y = (A+B)[18:7] - DIRECT from adder!
-PC35: 7FFB  RP   15, <clrB> [WSP]       ; WWE - writes Y (A+B result)
-PC36: 7FFB  RP   15, <clrB> [WSP]       ; WWE - second pulse
+PC35: 7FFB  RSP  15, <clrB> [WSP]       ; WWE - writes Y (A+B result)
+PC36: 7FFB  RSP  15, <clrB> [WSP]       ; WWE - second pulse
 ```
 This writes the **current computation result** directly to SRAM, no D-RAM involved.
 
@@ -281,11 +281,11 @@ PC16: 68F7  RM   13, <WXY>                    ; Load XY from D[13]
 
 ; === SRAM WRITE SEQUENCE (PC17-PC22) ===
 PC17: 38FD  RM    7, <WWF>                    ; WWF = D[7] (SRAM bank select)
-PC18: 7FFB  RP   15, <clrB> [WSP]             ; Clear B, trigger SRAM write (RSP+clrB+WSP=WWE)
-PC19: 7FFB  RP   15, <clrB> [WSP]             ; Second SRAM write (2-byte storage?)
-PC20: 7EFB  RP   15, <clrB>                   ; Clear B (settling time)
-PC21: 7EFB  RP   15, <clrB>                   ; Clear B (settling time)
-PC22: 7FFF  RP   15, <-> [WSP]                ; NOP with WSP (sync)
+PC18: 7FFB  RSP  15, <clrB> [WSP]             ; Clear B, trigger SRAM write (RSP+clrB+WSP=WWE)
+PC19: 7FFB  RSP  15, <clrB> [WSP]             ; WWE trigger (timing/settling)
+PC20: 7EFB  RSP  15, <clrB>                   ; Clear B (settling time)
+PC21: 7EFB  RSP  15, <clrB>                   ; Clear B (settling time)
+PC22: 7FFF  RSP  15, <-> [WSP]                ; NOP with WSP (sync)
 
 ; === DELAY TAP 2 (PC23-PC31) ===
 PC23: 406F  RM    8, <WA, WPHI>               ; A = PHI = D[8]
@@ -302,34 +302,34 @@ PC31: 7A3F  RADD 15, <WA, WB>                 ; A = B = A+B (32x) - amplitude ra
 PC32: 7A3F  RADD 15, <WA, WB>                 ; Continue amplitude ramp (64x)
 PC33: 7A3F  RADD 15, <WA, WB>                 ; (128x)
 PC34: 7AF7  RADD 15, <WXY>                    ; XY = A+B result - SRAM READ via WXY
-PC35: 7FFB  RP   15, <clrB> [WSP]             ; WWE - write back to SRAM
-PC36: 7FFB  RP   15, <clrB> [WSP]             ; Second write
-PC37: 7EFB  RP   15, <clrB>                   ; Settling
-PC38: 7EFB  RP   15, <clrB>                   ; Settling
-PC39: 7FFF  RP   15, <-> [WSP]                ; Sync
+PC35: 7FFB  RSP  15, <clrB> [WSP]             ; WWE - write back to SRAM
+PC36: 7FFB  RSP  15, <clrB> [WSP]             ; Second write
+PC37: 7EFB  RSP  15, <clrB>                   ; Settling
+PC38: 7EFB  RSP  15, <clrB>                   ; Settling
+PC39: 7FFF  RSP  15, <-> [WSP]                ; Sync
 PC40: 78FD  RM   15, <WWF>                    ; WWF = D[15] (another SRAM bank)
 PC41: 18EF  RM    3, <WPHI>                   ; PHI = D[3]
 PC42: 58F7  RM   11, <WXY>                    ; XY = D[11] - SRAM READ
-PC43: 7FFF  RP   15, <-> [WSP]                ; Sync
+PC43: 7FFF  RSP  15, <-> [WSP]                ; Sync
 PC44: 50EF  RM   10, <WPHI>                   ; PHI = D[10]
 PC45: 08FD  RM    1, <WWF>                    ; WWF = D[1]
 PC46: 24DF  RSP   4, <WM>                     ; D[4] = 0 (RSP emits 0)
-PC47: 7FFF  RP   15, <-> [WSP]                ; Sync
+PC47: 7FFF  RSP  15, <-> [WSP]                ; Sync
 
 ; === FINAL PROCESSING (PC48-PC61) ===
 PC48: 20F7  RM    4, <WXY>                    ; XY = D[4] - READ for output mix
 PC49: 287F  RM    5, <WA>                     ; A = D[5]
 PC50: 00EF  RM    0, <WPHI>                   ; PHI = D[0]
-PC51: 7CBF  RSP  15, <WB>                     ; B = 0 (RSP)
+PC51: 7CBF  RP   15, <WB>                     ; B = product
 PC52: 2ADF  RADD  5, <WM>                     ; D[5] = A+B
 PC53: 20F7  RM    4, <WXY>                    ; XY = D[4]
 PC54: 707F  RM   14, <WA>                     ; A = D[14]
-PC55: 7CBF  RSP  15, <WB>                     ; B = 0
+PC55: 7CBF  RP   15, <WB>                     ; B = product
 PC56: 28EF  RM    5, <WPHI>                   ; PHI = D[5]
 PC57: 78FD  RM   15, <WWF>                    ; WWF = D[15]
 PC58: 10F7  RM    2, <WXY>                    ; XY = D[2] - FINAL READ
 PC59: 7A7F  RADD 15, <WA>                     ; A = A+B
-PC60: 7CBF  RSP  15, <WB>                     ; B = 0
+PC60: 7CBF  RP   15, <WB>                     ; B = product
 PC61: 6A5B  RADD 13, <WA, WM, clrB>           ; D[13] = A+B, clear B (output to buffer)
 ; PC62-63: Reserved
 ```
@@ -396,17 +396,17 @@ PC32: 7AEF  RADD 15, <WPHI>                   ; PHI = A+B (compute write address
 PC33: 78FD  RM   15, <WWF>                    ; WWF = D[15] (SRAM bank)
 PC34: 60F7  RM   12, <WXY>                    ; XY = D[12] - READ for write-back
 PC35: 70BF  RM   14, <WB>                     ; B = D[14]
-PC36: 7C7F  RSP  15, <WA>                     ; A = 0
+PC36: 7C7F  RP   15, <WA>                     ; A = product
 PC37: 72D7  RADD 14, <WM, WXY>                ; D[14] = A+B, trigger WXY (write-back read)
 PC38: 10FD  RM    2, <WWF>                    ; WWF = D[2]
 PC39: 086F  RM    1, <WA, WPHI>               ; A = PHI = D[1]
 
 ; === SRAM WRITE SEQUENCE (PC40-PC47) ===
-PC40: 7FFB  RP   15, <clrB> [WSP]             ; WWE - write to SRAM
-PC41: 7FFB  RP   15, <clrB> [WSP]             ; Second write
-PC42: 7EFB  RP   15, <clrB>                   ; Settling
-PC43: 7EFB  RP   15, <clrB>                   ; Settling
-PC44: 7FFF  RP   15, <-> [WSP]                ; Sync
+PC40: 7FFB  RSP  15, <clrB> [WSP]             ; WWE - write to SRAM
+PC41: 7FFB  RSP  15, <clrB> [WSP]             ; Second write
+PC42: 7EFB  RSP  15, <clrB>                   ; Settling
+PC43: 7EFB  RSP  15, <clrB>                   ; Settling
+PC44: 7FFF  RSP  15, <-> [WSP]                ; Sync
 PC45: 18BF  RM    3, <WB>                     ; B = D[3]
 PC46: 0ACF  RADD  1, <WM, WPHI>               ; D[1] = A+B, PHI = A+B
 PC47: 703F  RM   14, <WA, WB>                 ; A = B = D[14]
@@ -422,11 +422,11 @@ PC54: 7A3F  RADD 15, <WA, WB>                 ;
 PC55: 7AF7  RADD 15, <WXY>                    ; Final SRAM read via WXY
 
 ; === FINAL WRITE-BACK (PC56-PC61) ===
-PC56: 7FFB  RP   15, <clrB> [WSP]             ; WWE
-PC57: 7FFB  RP   15, <clrB> [WSP]             ; Second write
-PC58: 7EFB  RP   15, <clrB>                   ; Settling
-PC59: 7EFB  RP   15, <clrB>                   ; Settling
-PC60: 7FFF  RP   15, <-> [WSP]                ; Sync
+PC56: 7FFB  RSP  15, <clrB> [WSP]             ; WWE
+PC57: 7FFB  RSP  15, <clrB> [WSP]             ; Second write
+PC58: 7EFB  RSP  15, <clrB>                   ; Settling
+PC59: 7EFB  RSP  15, <clrB>                   ; Settling
+PC60: 7FFF  RSP  15, <-> [WSP]                ; Sync
 PC61: 587B  RM   11, <WA, clrB>               ; A = D[11], clear B (prepare next frame)
 ; PC62-63: Reserved
 ```
@@ -637,12 +637,66 @@ The issue is that FX algorithms use multiple WACC instructions per slot:
 This causes accumulated output to exceed 16-bit DAC range (±32K). The >> 4 scaling
 brings output within range. Real hardware may have implicit output attenuation.
 
+## Test Harness Analysis (2026-01-14)
+
+### SRAM Write/Read Patterns
+
+Ran `fx_test_harness` with 440 Hz sine input for 22050 frames (1 second):
+
+- **SRAM usage:** 235 locations in range 0x0200-0x02FF (256-byte buffer)
+- **Total writes:** 529,200 (24 per frame = 4 WWE × 6 active slots)
+- **Total reads:** 1,830,152 (83 per frame from waveform lookups)
+
+### Gain Structure Issue
+
+All 5 delay tap slots (7-11) have MIX=7 (0dB = full volume):
+- Each slot contributes full multiplication result to output
+- Sum of 5 slots = +14dB gain before any signal processing
+- Combined with multiple WACCs per slot = severe clipping
+
+**D[5] values for slots 7-11:**
+| Slot | D[5] Value | Y coefficient | mix_l | mix_r |
+|------|------------|---------------|-------|-------|
+| 7    | 0x6667F    | 0xCCC (3276)  | 7     | 7     |
+| 8    | 0x66A7F    | 0xCD4 (3284)  | 7     | 7     |
+| 9    | 0x66EBF    | 0xCDD (3293)  | 7     | 7     |
+| 10   | 0x674BF    | 0xCE9 (3305)  | 7     | 7     |
+| 11   | 0x677FF    | 0xCEF (3311)  | 7     | 7     |
+
+All at 0dB causes constant clipping without the >> 4 output hack.
+
+### WAV Output Analysis
+
+With 440 Hz sine input (amplitude ±16000):
+- **Input:** Mean norm 0.31, RMS 0.35
+- **Output (saturated):** Constant ±32767 clip, unusable
+- **Output (with >> 4 hack):** Would be reasonable reverb
+
+### Algorithm Dynamics
+
+ALG 0 modifies D[11] dynamically:
+- Initial D[11] = 0x0007C
+- PC03 writes D[11] ← 0x0007C (A+B from RADD)
+- PC08 writes D[11] ← 0x0027C (A+B with A=0x200)
+- Result: Y = (0x0027C >> 7) & 0xFFF = 4 (tiny coefficient)
+
+The algorithm computes feedback coefficients at runtime, not statically loaded.
+
+### Files Generated
+
+- `fx_input.wav` - Input sine wave
+- `fx_output_l.wav`, `fx_output_r.wav` - FX output (clipped)
+- `fx_sram_dump.wav` - SRAM buffer contents
+- `fx_sram_writes.wav` - All data written to SRAM
+- `fx_sram_reads.wav` - All data read from SRAM
+
 ## Files
 
 - `sam8905/sam8905_aram_decoder.py` - Instruction decoder
 - `sam8905/WIP_fx_reverb_analysis.md` - This file
 - `sam8905/sam8905_programmers_guide.md` - SAM8905 documentation
 - `sam8905/mid/test_piano.mid` - Test MIDI with reverb enabled
+- `sam8905/fx_test_harness.cpp` - Standalone FX test harness
 
 ## Tasks
 
@@ -652,6 +706,7 @@ brings output within range. Real hardware may have implicit output attenuation.
 - [x] Analyze WACC output usage per slot
 - [x] Analyze MIXL/MIXR stereo panning settings
 - [x] Understand idle slot behavior (they do nothing)
-- [ ] Analyze SRAM addressing scheme
-- [ ] Trace signal flow through all slots
-- [ ] Identify feedback coefficients
+- [x] Analyze SRAM addressing scheme (0x0200-0x02FF, 256-byte buffer)
+- [x] Trace signal flow through test harness
+- [x] Identify feedback coefficients (dynamic computation via RADD)
+- [ ] Investigate why real hardware doesn't clip (different MIX values? output stage?)
