@@ -28171,6 +28171,7 @@ rivierad
 rivierae
 tictac
 tictaca
+tictacb
 tictacuk
 tictacv
 trvwz
@@ -44005,6 +44006,10 @@ dbzscout
 
 @source:skeleton/kron.cpp
 kron180
+
+
+@source:skeleton/lanmao.cpp
+lanmao
 
 @source:skeleton/leadsinger2.cpp
 leadsng2
