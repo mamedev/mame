@@ -59,7 +59,7 @@ private:
 	uint8_t m_interrupt_latch;  // Slot/word that triggered WM WSP interrupt
 
 	// Helpers
-	void execute_cycle(int slot_idx, uint16_t inst);
+	void execute_cycle(int slot_idx, uint16_t inst, int pc_start = -1, int pc = -1);
 	int32_t get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int slot_idx);
 	uint32_t get_constant(uint8_t mad);
 

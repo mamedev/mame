@@ -1036,6 +1036,13 @@ void keyfox10_state::sam_snd_sample_out(uint32_t data)
     m_fx_input_l = int16_t(data >> 16);
     m_fx_input_r = int16_t(data & 0xFFFF);
 
+    // Debug: trace non-zero input samples
+    static int snd_out_trace = 0;
+    if ((m_fx_input_l != 0 || m_fx_input_r != 0) && snd_out_trace < 50) {
+        logerror("SND sample_out: L=%d R=%d\n", m_fx_input_l, m_fx_input_r);
+        snd_out_trace++;
+    }
+
     // Trigger FX chip to process one frame synchronously
     // FX chip reads m_fx_input_l/r via waveform_read callback when WA19=1
     int32_t fx_out_l, fx_out_r;

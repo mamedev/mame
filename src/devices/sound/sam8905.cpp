@@ -4,6 +4,9 @@
 #include "emu.h"
 #include "sam8905.h"
 
+// Global debug sequence counter
+static int g_debug_seq = 0;
+
 DEFINE_DEVICE_TYPE(SAM8905, sam8905_device, "sam8905", "Dream SAM8905")
 
 sam8905_device::sam8905_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -112,8 +115,17 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 // Core Interpreter
 // ---------------------------------------------------------
 
-void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
+void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, int pc)
 {
+	// Debug: trace slot 7 PC 5-7 at start of execute_cycle
+	if (m_slave_mode && slot_idx == 7 && pc >= 5 && pc <= 7) {
+		static int s7_early_trace = 0;
+		if (s7_early_trace < 10) {
+			logerror("Slot7 early PC%02d: inst=0x%04X wsp_bit=%d\n", pc, inst, BIT(inst, 8));
+			s7_early_trace++;
+		}
+	}
+
 	slot_t &slot = m_slots[slot_idx];
 	uint8_t mad = (inst >> 11) & 0xF;
 	uint8_t emitter_sel = (inst >> 9) & 0x3;
@@ -260,7 +272,15 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 				}
 			}
 		}
-		if (write_enable) m_dram[dram_addr] = bus;
+		if (write_enable) {
+		// Debug: catch any write to D-RAM[0x75]
+		if (m_slave_mode && dram_addr == 0x75) {
+			uint32_t p15 = m_dram[(slot_idx << 4) | 15];
+			logerror("SEQ%06d ALG-WRITE D[75]=0x%05X (was 0x%05X) inst=0x%04X slot=%d ALG=%d pc_start=0x%02X pc=%d\n",
+				++g_debug_seq, bus, m_dram[dram_addr], inst, slot_idx, (p15 >> 8) & 7, pc_start, pc);
+		}
+		m_dram[dram_addr] = bus;
+	}
 	}
 
 	// WPHI (Write Phase)
@@ -271,7 +291,7 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 		if (wsp) slot.wf = 0x100; // Force Internal Sinus
 	}
 
-	// WXY (Write Multiplier)
+	// WXY (Write Multiplier) - executes when bit 3 = 0
 	if (!BIT(inst, 3)) {
 		slot.y = (bus >> 7) & 0xFFF;
 		slot.x = get_waveform(slot.wf, slot.phi, mad, slot_idx) & 0xFFF;
@@ -286,13 +306,23 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 				wxy_trace++;
 			}
 		}
-		if (wsp) {
-			slot.mix_l = (bus >> 3) & 0x7;
-			slot.mix_r = bus & 0x7;
-		}
 		// Calculate multiplication result (12x12 fractional)
 		int32_t product = (int32_t)((int16_t)(slot.x << 4) >> 4) * (int32_t)((int16_t)(slot.y << 4) >> 4);
 		slot.mul_result = (uint32_t)(product >> 5) & MASK19;
+	}
+
+	// WSP (Write Special) - INDEPENDENT of WXY, executes when bit 8 = 1
+	// Sets mix_l/mix_r from bus value for WACC accumulation
+	if (wsp) {
+		// Debug: trace WSP for FX chip slots 4-11
+		static int wsp_trace = 0;
+		if (m_slave_mode && slot_idx >= 4 && slot_idx <= 11 && wsp_trace < 50) {
+			logerror("WSP slot%d pc=%d: bus=0x%05X -> mix_l=%d mix_r=%d\n",
+				slot_idx, pc, bus, (bus >> 3) & 0x7, bus & 0x7);
+			wsp_trace++;
+		}
+		slot.mix_l = (bus >> 3) & 0x7;
+		slot.mix_r = bus & 0x7;
 	}
 
 	// clearB
@@ -345,12 +375,42 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 		int32_t r_contrib = (signed_mul * MIX_ATTEN[slot.mix_r]) >> 10;
 		slot.l_acc += l_contrib;
 		slot.r_acc += r_contrib;
+
+		// Debug: trace WACC in slave mode for slots with proper algorithms
+		// Only log when slot 7 has proper ALG=4 (p15=0x3C480), meaning FX is fully initialized
+		static int wacc_trace = 0;
+		static bool fx_init_done = false;
+		if (m_slave_mode && !fx_init_done) {
+			uint32_t slot7_p15 = m_dram[(7 << 4) | 15];
+			if (slot7_p15 == 0x3C480) fx_init_done = true;
+		}
+		if (m_slave_mode && fx_init_done && slot_idx >= 4 && slot_idx <= 11 && wacc_trace < 100) {
+			logerror("WACC S%d: mul=%d mix_l=%d mix_r=%d l_c=%d r_c=%d\n",
+				slot_idx, signed_mul, slot.mix_l, slot.mix_r, l_contrib, r_contrib);
+			wacc_trace++;
+		}
 	}
 }
 
 // Process a single audio frame (16 slots) - used for master-slave synchronization
 void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 {
+	// FX chip: wait for initialization to complete before processing
+	// The firmware programs A-RAM before setting final slot configurations
+	// Use slot 7's p15=0x3C480 as initialization complete marker
+	static bool fx_init_complete = false;
+	if (m_slave_mode && !fx_init_complete) {
+		uint32_t slot7_p15 = m_dram[(7 << 4) | 15];
+		if (slot7_p15 == 0x3C480) {
+			fx_init_complete = true;
+			logerror("FX init complete - starting audio processing\n");
+		} else {
+			out_l = 0;
+			out_r = 0;
+			return;  // Skip processing until initialized
+		}
+	}
+
 	// SSR bit (bit 3): 0 = 44.1kHz, 1 = 22.05kHz
 	bool ssr_mode = BIT(m_control_reg, 3);
 
@@ -364,6 +424,26 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 		// Fetch algorithm block from address 15 of D-RAM block
 		// Word 15 format: | 18-12 (unused) | 11 (I) | 10-8 (ALG) | 7 (M) | 6-0 (unused) |
 		uint32_t param15 = m_dram[(s << 4) | 15];
+
+		// Debug: trace param15 changes in slave mode
+		static uint32_t last_p15[16] = {0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+			0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,
+			0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF,0xFFFFFFFF};
+		if (m_slave_mode && param15 != last_p15[s]) {
+			logerror("FX slot %d: p15=0x%05X %s ALG=%d\n", s, param15,
+				BIT(param15, 11) ? "IDLE" : "ACTIVE", (param15 >> 8) & 0x7);
+			// Dump ALG=0 A-RAM when slot 7 first gets ALG=4 (which becomes ALG=0 in 22kHz mode)
+			if (s == 7 && param15 == 0x3C480) {
+				logerror("ALG=0 A-RAM (22kHz mode, base=0x00) for slot 7:\n");
+				for (int i = 0; i < 64; i++) {
+					uint16_t inst = m_aram[i];
+					bool wsp_flag = (inst >> 8) & 1;
+					logerror("  PC%02d: 0x%04X%s\n", i, inst, wsp_flag ? " [WSP]" : "");
+				}
+			}
+			last_p15[s] = param15;
+		}
+
 		if (BIT(param15, 11)) {
 			// I (Idle) bit - slot produces no sound
 			continue;
@@ -386,7 +466,28 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 
 		// Skip reserved instructions (last 2)
 		for (int pc = 0; pc < inst_count - 2; ++pc) {
-			execute_cycle(s, m_aram[pc_start + pc]);
+			execute_cycle(s, m_aram[pc_start + pc], pc_start, pc);
+		}
+
+		// Debug: count and trace slot 7 with ALG=4
+		static int s7_trace = 0;
+		if (m_slave_mode && s == 7 && ((param15 >> 8) & 0x7) == 4) {
+			int addr = (7 << 4) | 5;  // 0x75
+			uint32_t word5 = m_dram[addr];
+			if (s7_trace < 5) {
+				logerror("SEQ%06d READ this=%p addr=%02X val=0x%05X mix_l=%d mix_r=%d\n",
+					++g_debug_seq, (void*)this, addr, word5, m_slots[s].mix_l, m_slots[s].mix_r);
+				s7_trace++;
+			}
+		}
+
+		// Debug: trace slot execution in slave mode
+		static int slot_exec_trace = 0;
+		if (m_slave_mode && (m_slots[s].l_acc != 0 || m_slots[s].r_acc != 0) && slot_exec_trace < 50) {
+			logerror("FX slot %d: p15=0x%05X ALG=%d mix_l=%d mix_r=%d l_acc=%d r_acc=%d\n",
+				s, param15, (param15 >> 8) & 0x7, m_slots[s].mix_l, m_slots[s].mix_r,
+				(int32_t)m_slots[s].l_acc, (int32_t)m_slots[s].r_acc);
+			slot_exec_trace++;
 		}
 
 		out_l += (int32_t)m_slots[s].l_acc;
@@ -396,6 +497,13 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 	// Store for slave mode stream output
 	m_last_out_l = out_l;
 	m_last_out_r = out_r;
+
+	// Debug: trace non-zero output in slave mode
+	static int fx_out_trace = 0;
+	if ((out_l != 0 || out_r != 0) && fx_out_trace < 50) {
+		logerror("process_frame output: L=%d R=%d\n", out_l, out_r);
+		fx_out_trace++;
+	}
 }
 
 void sam8905_device::sound_stream_update(sound_stream &stream)
@@ -462,7 +570,7 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 
 			// Skip reserved instructions (last 2)
 			for (int pc = 0; pc < inst_count - 2; ++pc) {
-				execute_cycle(s, m_aram[pc_start + pc]);
+				execute_cycle(s, m_aram[pc_start + pc], pc_start, pc);
 			}
 
 			out_l += (int32_t)m_slots[s].l_acc;
@@ -512,9 +620,13 @@ void sam8905_device::write(offs_t offset, uint8_t data)
 					logerror("A-RAM[%02X] = 0x%04X\n", m_address_reg, m_data_latch & 0x7FFF);
 				} else {
 					m_dram[m_address_reg] = m_data_latch & MASK19;
-					// Debug: log D-RAM writes for envelope words (2,3) on slots 0,1,2
+					// Debug: log D-RAM writes for slot 7 (all words initially, then filter)
 					int slot = (m_address_reg >> 4) & 0xF;
 					int word = m_address_reg & 0xF;
+					if (m_slave_mode && slot == 7) {
+						logerror("FX D-RAM[%02X] = 0x%05X (slot %d, word %d)\n",
+							m_address_reg, m_data_latch & MASK19, slot, word);
+					}
 					if ((slot <= 2) && (word == 2 || word == 3 || word == 15)) {
 						logerror("CPU D-RAM[%02X] = 0x%05X (slot %d, word %d)\n",
 							m_address_reg, m_data_latch & MASK19, slot, word);
