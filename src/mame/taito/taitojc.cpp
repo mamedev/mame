@@ -739,10 +739,16 @@ void taitojc_state::hc11_output_w(uint8_t data)
     unused?
 
     sidebs/sidebs2:
-    ?
+    d0:
+    d1:
+    d2:
+    d3: Wheel motor direction
+    d4 - d7: Wheel motor torque
 */
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
+
+	m_wheel_motor = (data >> 3) & 0x1f;
 }
 
 template <int Ch>
@@ -757,8 +763,6 @@ void taitojc_state::hc11_pgm_map(address_map &map)
 	map(0x4000, 0x5fff).ram();
 	map(0x8000, 0xffff).rom();
 }
-
-
 
 
 /***************************************************************************
@@ -1072,6 +1076,7 @@ void taitojc_state::machine_start()
 
 	m_lamps.resolve();
 	m_counters.resolve();
+	m_wheel_motor.resolve();
 }
 
 void dendego_state::machine_start()
