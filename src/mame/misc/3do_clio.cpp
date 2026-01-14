@@ -201,13 +201,10 @@ void clio_device::map(address_map &map)
 		NAME([this] () { return m_irq1_enable; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (offset)
-			{
 				m_irq1_enable &= ~data;
-			}
 			else
-			{
 				m_irq1_enable |= data;
-			}
+
 			LOGIRQ("irq1 enable %s: %08x & %08x -> %08x\n", offset ? "clear" : "set", data, mem_mask, m_irq1_enable);
 			request_fiq(0, 1);
 		})
@@ -290,9 +287,17 @@ void clio_device::map(address_map &map)
 
 //	map(0x0300, 0x0303) FIFO init
 //	map(0x0304, 0x0307) DMA request enable
-	// TODO: likely set/clear like above
-	map(0x0308, 0x030b).lw32(
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_dmareqdis); })
+//	map(0x0308, 0x030b) DMA request disable
+	// NOTE: not readable on Red revision apparently
+	map(0x0304, 0x030b).lrw32(
+		NAME([this] () { return m_dma_enable; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (offset)
+				m_dma_enable &= ~data;
+			else
+				m_dma_enable |= data;
+			LOG("DMA request %s: %08x & %08x\n", offset ? "clear" : "set", data, mem_mask);
+		})
 	);
 //	map(0x0380, 0x0383) FIFO status
 

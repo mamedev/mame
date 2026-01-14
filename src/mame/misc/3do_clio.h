@@ -60,7 +60,7 @@ private:
 	uint64_t  m_timer_ctrl = 0;     /* 03400200 */
 	uint32_t  m_slack = 0;          /* 03400220 */
 							/* DMA */
-	uint32_t  m_dmareqdis = 0;      /* 03400308 */
+	uint32_t  m_dma_enable = 0;      /* 03400308 */
 							/* Expansion bus */
 	uint32_t  m_expctl = 0;         /* 03400400/03400404 */
 	uint32_t  m_type0_4 = 0;        /* 03400408 */
