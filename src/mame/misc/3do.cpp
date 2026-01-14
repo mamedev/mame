@@ -175,7 +175,7 @@ void _3do_state::_3do(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MADAM(config, m_madam, XTAL(50'000'000)/4);
-	m_madam->diag_cb().set([this] (u8 data) {
+	m_madam->diag_cb().set([] (u8 data) {
 		// TODO: how this really connects?
 		// is it expecting a Mac terminal on the other end, where the baud is set there?
 		if (DIAG_ENABLE)
@@ -211,7 +211,7 @@ void _3do_state::_3do_pal(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	MADAM(config, m_madam, XTAL(50'000'000)/4);
-	m_madam->diag_cb().set([this] (u8 data) {
+	m_madam->diag_cb().set([] (u8 data) {
 		if (DIAG_ENABLE)
 		{
 			if(data == 0x0a)
