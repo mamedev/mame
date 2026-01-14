@@ -24,6 +24,11 @@ public:
 	// Sample output callback for inter-chip audio (L/R packed as upper/lower 16 bits)
 	auto sample_output_callback() { return m_sample_output.bind(); }
 
+	// Master-slave synchronization for chained SAM chips
+	// In slave mode, the chip doesn't generate samples on its own - it's triggered by master
+	void set_slave_mode(bool slave) { m_slave_mode = slave; }
+	void process_frame(int32_t &out_l, int32_t &out_r);  // Process one frame, return L/R output
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -64,6 +69,10 @@ private:
 
 	// Sample output callback for inter-chip audio
 	devcb_write32 m_sample_output;
+
+	// Master-slave mode for chained chips
+	bool m_slave_mode;
+	int32_t m_last_out_l, m_last_out_r;  // Last output for slave mode stream
 
 	static constexpr uint32_t MASK19 = 0x7FFFF;
 };

@@ -23,11 +23,19 @@ void sam8905_device::device_start()
 
 	m_stream = stream_alloc(0, 2, clock() / 1024); // Placeholder sample rate logic
 
+	// Initialize master-slave mode
+	m_slave_mode = false;
+	m_last_out_l = 0;
+	m_last_out_r = 0;
+
 	save_pointer(NAME(m_aram), 256);
 	save_pointer(NAME(m_dram), 256);
 	save_item(NAME(m_control_reg));
 	save_item(NAME(m_address_reg));
 	save_item(NAME(m_interrupt_latch));
+	save_item(NAME(m_slave_mode));
+	save_item(NAME(m_last_out_l));
+	save_item(NAME(m_last_out_r));
 }
 
 void sam8905_device::device_reset()
@@ -340,8 +348,68 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst)
 	}
 }
 
+// Process a single audio frame (16 slots) - used for master-slave synchronization
+void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
+{
+	// SSR bit (bit 3): 0 = 44.1kHz, 1 = 22.05kHz
+	bool ssr_mode = BIT(m_control_reg, 3);
+
+	out_l = 0;
+	out_r = 0;
+
+	for (int s = 0; s < 16; ++s) {
+		m_slots[s].l_acc = 0;
+		m_slots[s].r_acc = 0;
+
+		// Fetch algorithm block from address 15 of D-RAM block
+		// Word 15 format: | 18-12 (unused) | 11 (I) | 10-8 (ALG) | 7 (M) | 6-0 (unused) |
+		uint32_t param15 = m_dram[(s << 4) | 15];
+		if (BIT(param15, 11)) {
+			// I (Idle) bit - slot produces no sound
+			continue;
+		}
+
+		uint16_t pc_start;
+		int inst_count;
+
+		if (ssr_mode) {
+			// 22.05kHz mode: 4 algorithms × 64 instructions
+			uint8_t alg = (param15 >> 8) & 0x3;
+			pc_start = alg << 6;
+			inst_count = 64;
+		} else {
+			// 44.1kHz mode: 8 algorithms × 32 instructions
+			uint8_t alg = (param15 >> 8) & 0x7;
+			pc_start = alg << 5;
+			inst_count = 32;
+		}
+
+		// Skip reserved instructions (last 2)
+		for (int pc = 0; pc < inst_count - 2; ++pc) {
+			execute_cycle(s, m_aram[pc_start + pc]);
+		}
+
+		out_l += (int32_t)m_slots[s].l_acc;
+		out_r += (int32_t)m_slots[s].r_acc;
+	}
+
+	// Store for slave mode stream output
+	m_last_out_l = out_l;
+	m_last_out_r = out_r;
+}
+
 void sam8905_device::sound_stream_update(sound_stream &stream)
 {
+	// In slave mode, just output the last computed values (set by process_frame)
+	if (m_slave_mode) {
+		for (int samp = 0; samp < stream.samples(); ++samp) {
+			stream.put_int_clamp(0, samp, m_last_out_l, 32768);
+			stream.put_int_clamp(1, samp, m_last_out_r, 32768);
+		}
+		return;
+	}
+
+	// Master mode: process frames independently
 	// SSR bit (bit 3): 0 = 44.1kHz, 1 = 22.05kHz
 	bool ssr_mode = BIT(m_control_reg, 3);
 

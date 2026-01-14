@@ -12,10 +12,10 @@
 
 #define LOG_SERIAL (1U << 1)
 #define LOG_PORT   (1U << 2)
-//#define LOG_SAM    (1U << 3)
-#define LOG_SAM    0
-#define LOG_IO     (1U << 4)
-//#define LOG_IO     0
+#define LOG_SAM    (1U << 3)
+//#define LOG_SAM    0
+//#define LOG_IO     (1U << 4)
+#define LOG_IO     0
 #define VERBOSE (LOG_SERIAL | LOG_SAM | LOG_IO)
 #include "logmacro.h"
 
@@ -883,6 +883,9 @@ void keyfox10_state::machine_start()
     m_fx_sram = std::make_unique<int16_t[]>(FX_SRAM_SIZE);
     std::fill_n(m_fx_sram.get(), FX_SRAM_SIZE, 0);
 
+    // Set FX chip to slave mode - it runs synchronized with SND chip
+    m_sam_fx->set_slave_mode(true);
+
     // Save state
     save_item(NAME(m_port0));
     save_item(NAME(m_port1));
@@ -1026,11 +1029,17 @@ u16 keyfox10_state::sam_snd_waveform_r(offs_t offset)
 }
 
 // Callback from sound SAM: captures L/R samples for FX SAM input
+// Master-slave sync: SND chip triggers FX chip to process one frame
 void keyfox10_state::sam_snd_sample_out(uint32_t data)
 {
     // Unpack L/R from 32-bit value: upper 16 = L, lower 16 = R
     m_fx_input_l = int16_t(data >> 16);
     m_fx_input_r = int16_t(data & 0xFFFF);
+
+    // Trigger FX chip to process one frame synchronously
+    // FX chip reads m_fx_input_l/r via waveform_read callback when WA19=1
+    int32_t fx_out_l, fx_out_r;
+    m_sam_fx->process_frame(fx_out_l, fx_out_r);
 }
 
 // FX SAM external SRAM write callback
@@ -1262,6 +1271,7 @@ void keyfox10_state::keyfox10(machine_config &config)
 
     // SAM8905 FX - effects processor (at 0xE000 when T1=1)
     // FX chip has 32KB SRAM for delay/reverb buffers
+    // Runs in slave mode - triggered by SND chip after each frame (set in machine_start)
     SAM8905(config, m_sam_fx, 22'579'200);
     m_sam_fx->waveform_read_callback().set(FUNC(keyfox10_state::sam_fx_waveform_r));
     m_sam_fx->waveform_write_callback().set(FUNC(keyfox10_state::sam_fx_waveform_w));
