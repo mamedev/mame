@@ -33,6 +33,16 @@
 #define SPD     REGD(6)
 #define PCD     REGD(7)
 #define PSW     m_psw.b.l
+#define EPSW    m_psw.w.l
+
+/* shadow PC and PSW registers on K1801VM2 */
+#define CPC     m_cpc.w.l
+#define CPSW    m_cpsw.w.l
+#define COPY_TO_SHADOW   ((EPSW & 0600) != 0600)
+#define SET_CPC(x) \
+	do { PC = (x); if (COPY_TO_SHADOW) CPC = PC; } while (0)
+#define SET_CPSW(x) \
+	do { EPSW = (x); if (COPY_TO_SHADOW) CPSW = EPSW; } while (0)
 
 
 DEFINE_DEVICE_TYPE(T11,      t11_device,      "t11",      "DEC T11")
@@ -73,7 +83,8 @@ k1801vm1_device::k1801vm1_device(const machine_config &mconfig, const char *tag,
  * Not implemented:
  *
  * instruction timing (+ memory timing), bug compatibility (@PC addressing mode),
- * HALT mode, traps: double bus error and bus error on vector fetch.
+ * HALT mode internals (C030 insn, shadow copy special cases, FIS emulation),
+ * traps: double bus error and bus error on vector fetch.
  */
 k1801vm2_device::k1801vm2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: t11_device(mconfig, K1801VM2, tag, owner, clock)
@@ -93,6 +104,8 @@ t11_device::t11_device(const machine_config &mconfig, device_type type, const ch
 	, m_hlt_active(false)
 	, m_out_reset_func(*this)
 	, m_in_iack_func(*this, 0) // default vector (T-11 User's Guide, p. A-11)
+	, m_out_bankswitch_func(*this)
+	, m_in_sel1_func(*this, 0)
 {
 	m_program_config.m_is_octal = true;
 	for (auto &reg : m_reg)
@@ -214,6 +227,8 @@ int t11_device::POP()
 #define VFLAG 2
 #define ZFLAG 4
 #define NFLAG 8
+#define TFLAG 16
+#define HFLAG 256
 
 /* extracts flags */
 #define GET_C (PSW & CFLAG)
@@ -222,6 +237,7 @@ int t11_device::POP()
 #define GET_N (PSW & NFLAG)
 #define GET_T (PSW & (1 << 4))
 #define GET_I (PSW & (1 << 7))
+#define GET_H (EPSW & (1 << 8))
 
 /* clears flags */
 #define CLR_C (PSW &= ~CFLAG)
@@ -553,13 +569,21 @@ void k1801vm2_device::t11_check_irqs()
 	else if (m_bus_error)
 	{
 		m_bus_error = false;
-		mcir = MCIR_IRQ;
-		vsel = T11_TIMEOUT;
+		if (GET_H)
+		{
+			mcir = MCIR_HALT;
+			vsel = T11_TIMEOUT;
+		}
+		else
+		{
+			mcir = MCIR_IRQ;
+			vsel = T11_TIMEOUT;
+		}
 	}
 	// 2. illegal insn; nm
 	else if (m_mcir == MCIR_ILL)
 	{
-		take_interrupt(vsel);
+		take_interrupt_user(vsel);
 	}
 	// 3. trace trap; WCPU
 	else if (m_trace_trap)
@@ -577,16 +601,15 @@ void k1801vm2_device::t11_check_irqs()
 		m_trace_trap = true;
 	}
 	// 4. power fail; PSW7, PSW8
-	else if (m_power_fail)
+	else if (m_power_fail && !GET_I && !GET_H)
 	{
 		m_power_fail = false;
 		mcir = MCIR_IRQ;
 		vsel = T11_PWRFAIL;
 	}
 	// 5. external HALT (nHALT pin); PSW8
-	else if (m_hlt_active)
+	else if (m_hlt_active && !GET_H)
 	{
-		m_hlt_active = false;
 		mcir = MCIR_HALT;
 		vsel = VM2_HALT;
 	}
@@ -607,18 +630,70 @@ void k1801vm2_device::t11_check_irqs()
 			m_vec_active = 0;
 			return;
 		}
-		mcir = MCIR_IRQ;
+		if (vec == VM2_VECERR)
+		{
+			PUSH(CPSW);
+			PUSH(CPC);
+			m_vec_active = 0;
+			m_icount -= 64;
+			mcir = MCIR_HALT;
+		}
+		else
+			mcir = MCIR_IRQ;
 		vsel = vec;
 	}
 
 	switch (mcir)
 	{
 	case MCIR_IRQ:
-		take_interrupt(vsel);
+		take_interrupt_user(vsel);
+		break;
+
+	case MCIR_HALT:
+		if (vsel == VM2_HALT) m_hlt_active = false;
+		take_interrupt_halt(vsel);
 		break;
 	}
 
 	m_mcir = MCIR_NONE;
+}
+
+void k1801vm2_device::take_interrupt_user(uint16_t vector)
+{
+	assert((vector & 3) == 0);
+
+	// enter USER mode
+	m_out_bankswitch_func(0);
+
+	uint16_t new_pc = RWORD(vector);
+	uint16_t new_psw = RWORD(vector + 2) & ~HFLAG;
+
+	// push the old state, set the new one
+	PUSH(CPSW);
+	PUSH(CPC);
+	SET_CPC(new_pc);
+	SET_CPSW(new_psw);
+
+	// count cycles and clear the WAIT flag
+	m_icount -= 114;
+	m_wait_state = 0;
+}
+
+void k1801vm2_device::take_interrupt_halt(uint16_t vector)
+{
+	assert((vector & 3) == 0);
+
+	// enter HALT mode
+	m_out_bankswitch_func(1);
+
+	// set new state (old state is kept in shadow PC and PSW)
+	PC = RWORD(c_initial_mode + vector);
+	EPSW = RWORD(c_initial_mode + vector + 2);
+	m_out_bankswitch_func(BIT(EPSW, 8));
+
+	// count cycles and clear the WAIT flag
+	m_icount -= 114;
+	m_wait_state = 0;
 }
 
 
@@ -664,6 +739,8 @@ void t11_device::device_start()
 	save_item(NAME(m_reg[6].w.l));
 	save_item(NAME(m_reg[7].w.l));
 	save_item(NAME(m_psw.w.l));
+	save_item(NAME(m_cpc.w.l));
+	save_item(NAME(m_cpsw.w.l));
 	save_item(NAME(m_initial_pc));
 	save_item(NAME(m_wait_state));
 	save_item(NAME(m_cp_state));
@@ -680,7 +757,7 @@ void t11_device::device_start()
 	// Register debugger state
 	state_add( T11_PC,  "PC",  m_reg[7].w.l).formatstr("%06O");
 	state_add( T11_SP,  "SP",  m_reg[6].w.l).formatstr("%06O");
-	state_add( T11_PSW, "PSW", m_psw.b.l).formatstr("%03O");
+	state_add( T11_PSW, "PSW", m_psw.w.l).formatstr("%06O");
 	state_add( T11_R0,  "R0",  m_reg[0].w.l).formatstr("%06O");
 	state_add( T11_R1,  "R1",  m_reg[1].w.l).formatstr("%06O");
 	state_add( T11_R2,  "R2",  m_reg[2].w.l).formatstr("%06O");
@@ -690,7 +767,7 @@ void t11_device::device_start()
 
 	state_add(STATE_GENPC, "GENPC", m_reg[7].w.l).formatstr("%06O").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_ppc.w.l).formatstr("%06O").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_psw.b.l).formatstr("%8s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_psw.w.l).formatstr("%9s").noshow();
 
 	set_icountptr(m_icount);
 }
@@ -701,7 +778,7 @@ void t11_device::state_string_export(const device_state_entry &entry, std::strin
 	{
 		case STATE_GENFLAGS:
 			str = string_format("%c%c%c%c%c%c%c%c",
-				m_psw.b.l & 0x80 ? '?':'.',
+				m_psw.b.l & 0x80 ? 'I':'.',
 				m_psw.b.l & 0x40 ? 'I':'.',
 				m_psw.b.l & 0x20 ? 'I':'.',
 				m_psw.b.l & 0x10 ? 'T':'.',
@@ -739,15 +816,15 @@ void k1801vm2_device::state_string_export(const device_state_entry &entry, std::
 	{
 		case STATE_GENFLAGS:
 			str = string_format("%c%c%c%c%c%c%c%c%c",
-				m_psw.b.l & 0x100 ? 'H':'.',
-				m_psw.b.l & 0x80 ? 'P':'.',
-				m_psw.b.l & 0x40 ? '?':'.',
-				m_psw.b.l & 0x20 ? '?':'.',
-				m_psw.b.l & 0x10 ? 'T':'.',
-				m_psw.b.l & 0x08 ? 'N':'.',
-				m_psw.b.l & 0x04 ? 'Z':'.',
-				m_psw.b.l & 0x02 ? 'V':'.',
-				m_psw.b.l & 0x01 ? 'C':'.'
+				m_psw.w.l & 0x100? 'H':'.',
+				m_psw.w.l & 0x80 ? 'I':'.',
+				m_psw.w.l & 0x40 ? '?':'.',
+				m_psw.w.l & 0x20 ? '?':'.',
+				m_psw.w.l & 0x10 ? 'T':'.',
+				m_psw.w.l & 0x08 ? 'N':'.',
+				m_psw.w.l & 0x04 ? 'Z':'.',
+				m_psw.w.l & 0x02 ? 'V':'.',
+				m_psw.w.l & 0x01 ? 'C':'.'
 			);
 			break;
 	}
@@ -794,11 +871,22 @@ void k1801vm2_device::device_reset()
 {
 	t11_device::device_reset();
 
-	PC = RWORD(c_initial_mode);
-	PSW = RWORD(c_initial_mode+2);
+	// start in HALT mode
+	m_out_bankswitch_func(0);
+	m_out_bankswitch_func(1);
 
-	m_mcir = MCIR_NONE;
+	c_initial_mode &= 0xff00;
+
+	CPC  = PC   = RWORD(c_initial_mode);
+	CPSW = EPSW = RWORD(c_initial_mode + 2);
+
+	m_mcir = suspended(SUSPEND_REASON_DISABLE) ? MCIR_WAIT : MCIR_NONE;
 	m_vsel = 0;
+
+	logerror("CPU: device_reset(), initial_mode %06o, PC %06o PSW %06o disabled %d\n", c_initial_mode, PC, PSW,
+		suspended(SUSPEND_REASON_DISABLE));
+
+	m_out_bankswitch_func(BIT(EPSW, 8));
 }
 
 
@@ -860,6 +948,10 @@ void t11_device::execute_set_input(int irqline, int state)
 
 void t11_device::execute_run()
 {
+	// power on?
+	if ((c_insn_set & IS_VM2) && (m_mcir == MCIR_WAIT))
+		device_reset();
+
 	t11_check_irqs();
 
 	if (m_wait_state)
@@ -879,6 +971,12 @@ void t11_device::execute_run()
 
 		op = ROPCODE();
 		(this->*s_opcode_table[op >> 3])(op);
+
+		if ((c_insn_set & IS_VM2) && COPY_TO_SHADOW)
+		{
+			m_cpc = m_reg[7];
+			m_cpsw = m_psw;
+		}
 
 		if (m_check_irqs || m_trace_trap || GET_T)
 		{
