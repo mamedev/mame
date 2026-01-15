@@ -45,10 +45,10 @@ void madam_device::device_start()
 	m_revision = 0x01020200;
 	m_msysbits = 0x51;
 
-	save_pointer(NAME(m_pip), 16);
-	save_pointer(NAME(m_fence), 4);
-	save_pointer(NAME(m_mmu), 64);
-	save_pointer(NAME(m_mult), 40);
+	save_item(NAME(m_pip));
+	save_item(NAME(m_fence));
+	save_item(NAME(m_mmu));
+	save_item(NAME(m_mult));
 }
 
 void madam_device::device_reset()

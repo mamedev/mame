@@ -29,6 +29,8 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 	, m_firq_cb(*this)
 	, m_xbus_read_cb(*this, 0xff)
 	, m_xbus_write_cb(*this)
+	, m_dac_l(*this)
+	, m_dac_r(*this)
 {
 }
 
@@ -55,6 +57,9 @@ void clio_device::device_start()
 
 	save_item(NAME(m_irq0_enable));
 	save_item(NAME(m_irq1_enable));
+
+	m_dac_timer = timer_alloc(FUNC(clio_device::dac_update), this);
+	m_dac_timer->adjust(attotime::from_hz(16.9345));
 }
 
 void clio_device::device_reset()
@@ -418,8 +423,10 @@ void clio_device::map(address_map &map)
 	map(0x17e8, 0x17eb).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			// reset?
-			//m_dspp->write(0x6074 >> 2, 1);
-			//m_dspp->write(0x6074 >> 2, 0);
+			m_dspp->write(0x6074 >> 2, 1);
+			m_dspp->write(0x6074 >> 2, 0);
+			//m_dspp->write((0x1300 + 8) >> 2, 568);
+			//m_dspp->write((0x1340 + 8) >> 2, 568);
 			LOGDSPP("DSPP $17e8 %08x & %08x\n", data, mem_mask);
 		})
 	);
@@ -587,5 +594,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( clio_device::timer_x16_cb )
 				carry_val = 0;
 		}
 	}
+}
+
+TIMER_CALLBACK_MEMBER(clio_device::dac_update)
+{
+	m_dac_l(m_dspp->read_output_fifo());
+	m_dac_r(m_dspp->read_output_fifo());
+	m_dac_timer->adjust(attotime::from_hz(44100));
 }
 

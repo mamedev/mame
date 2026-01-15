@@ -12,6 +12,8 @@
 #include "machine/cr560b.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
+#include "sound/dac.h"
+
 #include "screen.h"
 
 #include "3do_clio.h"
@@ -30,6 +32,7 @@ public:
 		m_clio(*this, "clio"),
 		m_cdrom(*this, "cdrom"),
 		m_screen(*this, "screen"),
+		m_dac(*this, "dac%u", 0U),
 		m_bank1(*this, "bank1") { }
 
 	void _3do(machine_config &config);
@@ -75,6 +78,7 @@ private:
 	required_device<clio_device> m_clio;
 	required_device<cr560b_device> m_cdrom;
 	required_device<screen_device> m_screen;
+	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac;
 	required_memory_bank m_bank1;
 
 	SLOW2 m_slow2;

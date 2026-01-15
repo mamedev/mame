@@ -7,7 +7,6 @@
 Driver file to handle emulation of the 3DO systems
 
 References:
-- https://3dodev.com/documentation/hardware
 - https://wiki.console5.com/wiki/Panasonic_3DO_FZ-1
 - https://github.com/trapexit/portfolio_os
 
@@ -220,6 +219,12 @@ void _3do_state::green_config(machine_config &config)
 //	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus...));
 	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_rdy_w)).invert();
 //	m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus...));
+
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+
+	m_clio->dacl_cb().set(m_dac[0], FUNC(dac_16bit_r2r_twos_complement_device::write));
+	m_clio->dacr_cb().set(m_dac[1], FUNC(dac_16bit_r2r_twos_complement_device::write));
 }
 
 void _3do_state::_3do(machine_config &config)

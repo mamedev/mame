@@ -23,6 +23,8 @@ public:
 	auto firq_cb() { return m_firq_cb.bind(); }
 	auto xbus_read_cb() { return m_xbus_read_cb.bind(); }
 	auto xbus_write_cb() { return m_xbus_write_cb.bind(); }
+	auto dacl_cb() { return m_dac_l.bind(); }
+	auto dacr_cb() { return m_dac_r.bind(); }
 
 	void xbus_rdy_w(int state);
 
@@ -40,6 +42,8 @@ private:
 	devcb_write_line    m_firq_cb;
 	devcb_read8         m_xbus_read_cb;
 	devcb_write8        m_xbus_write_cb;
+	devcb_write16       m_dac_l;
+	devcb_write16       m_dac_r;
 
 	uint32_t  m_revision = 0;       /* 03400000 */
 	uint32_t  m_csysbits = 0;       /* 03400004 */
@@ -101,6 +105,8 @@ private:
 	void request_fiq(uint32_t irq_req, uint8_t type);
 
 	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );
+	TIMER_CALLBACK_MEMBER( dac_update );
+	emu_timer *m_dac_timer;
 };
 
 DECLARE_DEVICE_TYPE(CLIO, clio_device)
