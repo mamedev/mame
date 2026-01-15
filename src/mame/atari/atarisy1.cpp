@@ -611,10 +611,10 @@ static INPUT_PORTS_START( reliefs1 )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("F60000")    // F60000
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
@@ -917,11 +917,11 @@ void atarisy1_state::reliefs1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy1_state::main_map_noslapstic);
 
 	// Hall-effect analog joysticks
-	m_adc->in_callback<4>().set_ioport("IN2"); // not having this mapped shows more service mode tests 
-	m_adc->in_callback<5>().set_ioport("IN3"); // but is correct according to the joystick test?
+	m_adc->in_callback<4>().set_ioport("IN0");
+	m_adc->in_callback<5>().set_ioport("IN1");
 
-	m_adc->in_callback<6>().set_ioport("IN0");
-	m_adc->in_callback<7>().set_ioport("IN1");
+	m_adc->in_callback<6>().set_ioport("IN2");
+	m_adc->in_callback<7>().set_ioport("IN3");
 }
 
 
@@ -2552,6 +2552,7 @@ ROM_START( reliefs1 ) // LSI CART 2
 	ROM_LOAD16_BYTE( "rp-pgm-30k-hi-c72.bin", 0x030000, 0x008000, CRC(da0d7a9c) SHA1(4dd5829a9d4f4946d1d71c0b06bf9b7daf84133a) )
 	ROM_LOAD16_BYTE( "rp-pgm-30k-lo-c71.bin", 0x030001, 0x008000, CRC(247faea5) SHA1(96bf19fd57522b28dbcb421321bdc3404aeb2673) )
 
+	// Service mode says these ROMs are bad but this is a false positive.  The error also appears on original hardware.
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "rp-snd-4k-c68.bin", 0x4000, 0x4000, CRC(f6ff3d90) SHA1(ea93ea4331d6f38d67665b6b4c788a0d24309f56) )
 	ROM_LOAD( "rp-snd-8k-c73.bin", 0x8000, 0x4000, CRC(932b3ca0) SHA1(d1b8a2137a889cc4df5336a050f509f4edc23917) )
