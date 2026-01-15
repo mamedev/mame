@@ -269,6 +269,8 @@
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
 #include "sound/ymopl.h"
+#include "sound/ymopn.h"
+
 #include "video/ramdac.h"
 #include "video/resnet.h"
 
@@ -670,6 +672,7 @@ public:
 	void luckybar(machine_config &config) ATTR_COLD;
 	void luckylad(machine_config &config) ATTR_COLD;
 	void magodds(machine_config &config) ATTR_COLD;
+	void mtonic2(machine_config &config) ATTR_COLD;
 	void mbstar(machine_config &config) ATTR_COLD;
 	void megaline(machine_config &config) ATTR_COLD;
 	void nd8lines(machine_config &config) ATTR_COLD;
@@ -799,6 +802,8 @@ private:
 	void lucky8tet_ioport(address_map &map) ATTR_COLD;
 	void luckybar_map(address_map &map) ATTR_COLD;
 	void magodds_map(address_map &map) ATTR_COLD;
+	void mtonic2_map(address_map &map) ATTR_COLD;
+	void mtonic2_portmap(address_map &map) ATTR_COLD;
 	void mbstar_map(address_map &map) ATTR_COLD;
 	void megaline_map(address_map &map) ATTR_COLD;
 	void megaline_portmap(address_map &map) ATTR_COLD;
@@ -4837,6 +4842,32 @@ void wingco_state::magodds_map(address_map &map)
 	map(0xb860, 0xb860).w(FUNC(wingco_state::magodds_outb860_w));    // watchdog
 	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));     // sound
 	map(0xc000, 0xffff).rom().region("maincpu", 0xc000);
+}
+void wingco_state::mtonic2_map(address_map &map)
+{
+	// Memory maps from magodds
+	map(0x0000, 0x7fff).rom();
+	map(0x8000, 0x87ff).ram().share("nvram");
+	map(0x8800, 0x8fff).ram().w(FUNC(wingco_state::fg_vidram_w)).share(m_fg_vidram);
+	map(0x9000, 0x97ff).ram().w(FUNC(wingco_state::fg_atrram_w)).share(m_fg_atrram);
+	map(0x9800, 0x99ff).ram().w(FUNC(wingco_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0xa000, 0xa1ff).ram().w(FUNC(wingco_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0xa900, 0xaaff).ram().w(FUNC(wingco_state::reel_ram_w<2>)).share(m_reel_ram[2]);  // +0x100 compared to lucky8
+	map(0xb040, 0xb07f).ram().share(m_reel_scroll[0]);
+	map(0xb080, 0xb0bf).ram().share(m_reel_scroll[1]);
+	map(0xb100, 0xb17f).ram().share(m_reel_scroll[2]);
+
+	map(0xb800, 0xb803).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
+	map(0xb810, 0xb813).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input Ports
+	map(0xb820, 0xb823).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));  // Input/Output Ports
+	map(0xb850, 0xb850).w(FUNC(wingco_state::magodds_outb850_w));    // lamps
+	map(0xb860, 0xb860).w(FUNC(wingco_state::magodds_outb860_w));    // watchdog
+	map(0xc000, 0xffff).rom().region("maincpu", 0xc000);
+}
+
+void wingco_state::mtonic2_portmap(address_map &map)
+{
+	map.global_mask(0xff);
 }
 
 void goldstar_state::kkotnoli_map(address_map &map)
@@ -16515,6 +16546,56 @@ void wingco_state::magodds(machine_config &config)
 	aysnd.port_a_write_callback().set(FUNC(wingco_state::ay8910_outputa_w));
 	aysnd.port_b_write_callback().set(FUNC(wingco_state::ay8910_outputb_w));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.80);
+
+	// payout hardware
+	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
+
+}
+
+void wingco_state::mtonic2(machine_config &config)
+{
+	// basic machine hardware
+	Z80(config, m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::mtonic2_map);
+    m_maincpu->set_addrmap(AS_IO, &wingco_state::mtonic2_portmap);
+
+	I8255A(config, m_ppi[0]);
+	m_ppi[0]->in_pa_callback().set_ioport("IN0");
+	m_ppi[0]->in_pb_callback().set_ioport("IN1");
+	m_ppi[0]->in_pc_callback().set_ioport("IN2");
+
+	I8255A(config, m_ppi[1]);
+	m_ppi[1]->in_pa_callback().set_ioport("IN3");
+	m_ppi[1]->in_pb_callback().set_ioport("IN4");
+	m_ppi[1]->in_pc_callback().set_ioport("DSW1");
+
+	I8255A(config, m_ppi[2]);
+	m_ppi[2]->in_pa_callback().set_ioport("DSW2");
+	m_ppi[2]->out_pa_callback().set(FUNC(wingco_state::system_outputa_w));
+	m_ppi[2]->out_pb_callback().set(FUNC(wingco_state::system_outputb_w));
+	m_ppi[2]->out_pc_callback().set(FUNC(wingco_state::system_outputc_w));
+
+	// video hardware
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_refresh_hz(60);
+	screen.set_size(64*8, 32*8);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
+	screen.set_screen_update(FUNC(wingco_state::screen_update_magical));
+	screen.screen_vblank().set(FUNC(wingco_state::masked_irq));
+
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_magodds);
+	PALETTE(config, m_palette, FUNC(wingco_state::magodds_palette), 512);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	MCFG_VIDEO_START_OVERRIDE(wingco_state, magical)
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+    ym2203_device &ym(YM2203(config, "ym", 3.579545_MHz_XTAL));
+	ym.add_route(0, "mono", 0.50);
+	ym.add_route(1, "mono", 0.50);
+	ym.add_route(2, "mono", 0.50);
+	ym.add_route(3, "mono", 0.80);
 
 	// payout hardware
 	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
@@ -34013,7 +34094,7 @@ GAME(  1992, magoddsa,   magodds,  magodds,  magodds,  wingco_state,   empty_ini
 GAME(  1992, magoddsb,   magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             0 )
 GAME(  1991, magoddsc,   magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME(  1991, magoddsd,   magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(  199?, mtonic2,    0,        magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Tonic Part 2",                             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(  199?, mtonic2,    0,        mtonic2,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Tonic Part 2",                             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // --- Amcoe games ---
