@@ -76,7 +76,8 @@ void madam_device::map(address_map &map)
 	map(0x0008, 0x000b).lrw32(
 		NAME([this] () { return m_mctl; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOG("mctl: %08x & %08x\n", data, mem_mask);
+			if (data != 0x0001e000)
+				LOG("mctl: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_mctl);
 		})
 	);

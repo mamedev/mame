@@ -21,6 +21,12 @@ public:
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	auto firq_cb() { return m_firq_cb.bind(); }
+	auto xbus_read_cb() { return m_xbus_read_cb.bind(); }
+	auto xbus_write_cb() { return m_xbus_write_cb.bind(); }
+
+	void xbus_rdy_w(int state);
+
+	void vint1_w(int state);
 
 protected:
 	// device-level overrides
@@ -32,6 +38,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<dspp_device> m_dspp;
 	devcb_write_line    m_firq_cb;
+	devcb_read8         m_xbus_read_cb;
+	devcb_write8        m_xbus_write_cb;
 
 	uint32_t  m_revision = 0;       /* 03400000 */
 	uint32_t  m_csysbits = 0;       /* 03400004 */

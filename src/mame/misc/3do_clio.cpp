@@ -4,12 +4,12 @@
 #include "emu.h"
 #include "3do_clio.h"
 
-#define LOG_IRQ   (1U << 1)
+#define LOG_IRQ   (1U << 1) // enable bits (verbose)
 #define LOG_TIMER (1U << 2)
 #define LOG_XBUS  (1U << 3)
 #define LOG_DSPP  (1U << 4)
 
-#define VERBOSE (LOG_GENERAL | LOG_IRQ | LOG_XBUS | LOG_DSPP)
+#define VERBOSE (LOG_GENERAL | LOG_XBUS | LOG_DSPP)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
@@ -27,6 +27,8 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_dspp(*this, "dspp")
 	, m_firq_cb(*this)
+	, m_xbus_read_cb(*this, 0xff)
+	, m_xbus_write_cb(*this)
 {
 }
 
@@ -43,15 +45,43 @@ void clio_device::device_add_mconfig(machine_config &config)
 
 void clio_device::device_start()
 {
-	// Clio Preen (Toshiba/MEC)
-	// 0x04000000 for Anvil
-	m_revision = 0x02022000 /* 0x04000000 */;
+	// Clio Green (Toshiba/MEC)
+	m_revision = 0x02020000;
+	// Clio Preen
+//  m_revision = 0x02022000;
+	// Anvil
+//  m_revision = 0x04000000;
 	m_expctl = 0x80;    /* ARM has the expansion bus */
+
+	save_item(NAME(m_irq0_enable));
+	save_item(NAME(m_irq1_enable));
 }
 
 void clio_device::device_reset()
 {
 	m_cstatbits = 0x01; /* bit 0 = reset of clio caused by power on */
+
+	m_irq0_enable = m_irq1_enable = 0;
+}
+
+void clio_device::vint1_w(int state)
+{
+	// currently used by the BIOS to set periodic stuff up (namely watchdog)
+	if (state && m_screen->frame_number() & 1)
+	{
+		request_fiq(1 << 1, 0);
+	}
+}
+
+void clio_device::xbus_rdy_w(int state)
+{
+	//if ((m_sel & 0x0f) == 0)
+	//{
+	//	if (state)
+	//		m_poll |= 0x10;
+	//	else
+	//		m_poll &= ~0x10;
+	//}
 }
 
 // $0340'0000 base
@@ -101,9 +131,10 @@ void clio_device::map(address_map &map)
 		})
 	);
 	map(0x002c, 0x002f).lw32(
-		// during boot 0000000B is written here, counter reload related?
+		// during boot and vblanks 0000000B is written here, counter reload related?
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOG("watchdog: %08x & %08x\n", data, mem_mask);
+			if (data != 0xb)
+				LOG("watchdog: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_wdog);
 		})
 	);
@@ -133,7 +164,8 @@ void clio_device::map(address_map &map)
 	map(0x0038, 0x003b).lrw32(
 		NAME([this] () { return m_seed; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOG("seed: %08x & %08x\n", data, mem_mask);
+			if (data != 0xc693b70f)
+				LOG("seed: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_seed);
 			m_seed &= 0x0fff0fff;
 		})
@@ -226,7 +258,8 @@ void clio_device::map(address_map &map)
 	map(0x0084, 0x0087).lrw32(
 		NAME([this] () { return m_adbio; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOG("adbio %08x & %08x\n", data, mem_mask);
+			if (data != 0x62)
+				LOG("adbio %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_adbio);
 			m_adbio &= 0xff;
 		})
@@ -359,7 +392,12 @@ void clio_device::map(address_map &map)
 		})
 	);
 	map(0x0540, 0x057f).lrw32(
-		NAME([this] () { return m_poll; }),
+		NAME([this] () {
+			// HACK: until I understand semantics
+			if (m_sel == 0)
+				return (m_poll & 0xef) | (machine().rand() & 0x10);
+			return m_poll;
+		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGXBUS("xbus poll: %02x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_poll);
@@ -367,10 +405,13 @@ void clio_device::map(address_map &map)
 			m_poll |= data & 7;
 		})
 	);
-//	map(0x0580, 0x05bf) (w) CD Command/(r) CD status return
+	map(0x0580, 0x05bf).lrw32(
+		NAME([this] () { return m_xbus_read_cb(m_sel & 0xf); }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_xbus_write_cb(m_sel & 0xf, data & 0xff); })
+	);
 //	map(0x05c0, 0x05ff) Data
 
-	// TODO: for debug, to be removed once that we hookup the CPU core
+	// TODO: should really map these directly in DSPP core
 //	map(0x17d0, 0x17d3) Semaphore
 //	map(0x17d4, 0x17d7) Semaphore ACK
 //	map(0x17e0, 0x17ff) DSPP DMA and state

@@ -205,6 +205,19 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/cr560b.h,MACHINES["CR560B"] = true
+---------------------------------------------------
+
+if MACHINES["CR560B"] then
+	files {
+		MAME_DIR .. "src/devices/machine/cr560b.cpp",
+		MAME_DIR .. "src/devices/machine/cr560b.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/machine/dmac.h,MACHINES["DMAC"] = true
 ---------------------------------------------------
 

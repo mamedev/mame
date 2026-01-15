@@ -9,6 +9,7 @@
 #ifndef MAME_MISC_3DO_H
 #define MAME_MISC_3DO_H
 
+#include "machine/cr560b.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "screen.h"
@@ -27,16 +28,20 @@ public:
 		m_nvram(*this, "nvram"),
 		m_madam(*this, "madam"),
 		m_clio(*this, "clio"),
+		m_cdrom(*this, "cdrom"),
 		m_screen(*this, "screen"),
 		m_bank1(*this, "bank1") { }
 
 	void _3do(machine_config &config);
 	void _3do_pal(machine_config &config);
+	void arcade_ntsc(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
+
+	void green_config(machine_config &config);
 
 private:
 	struct SLOW2 {
@@ -68,6 +73,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<madam_device> m_madam;
 	required_device<clio_device> m_clio;
+	required_device<cr560b_device> m_cdrom;
 	required_device<screen_device> m_screen;
 	required_memory_bank m_bank1;
 
