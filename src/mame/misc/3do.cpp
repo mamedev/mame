@@ -73,9 +73,10 @@ Models:
 - Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer (Japan, North America, Europe)
 - Goldstar 3DO Interactive Multiplayer (South Korea, North America, Europe)
 - Goldstar 3DO ALIVE II (South Korea)
+- Samsung DMB-800 (South Korea)
 - Sanyo TRY 3DO Interactive Multiplayer (Japan)
 - Creative 3DO Blaster - PC Card (ISA)
-- Panasonic Robo 3DO (Japan), based on FZ-1 with 5x CD media changer and VCD adapter built-in
+- Panasonic N-1005 "Robo" 3DO (Japan), based on FZ-1 with 5x CD media changer and VCD adapter built-in
 - a Scientific Atlanta STT, with a Nicky device in BIGTRACE space
 
 ===========================================================================
@@ -271,22 +272,160 @@ void _3do_state::arcade_ntsc(machine_config &config)
 	m_cdrom->add_region("cdimage");
 }
 
-// TODO: split into separate CONS drivers
-// later models merges Clio + Madam into one fat chip named Anvil
-#if 0
-#define NTSC_BIOS \
-	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
-	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" ) \
-	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(0) ) \
-	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" ) \
-	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(1) ) \
-	ROM_SYSTEM_BIOS( 2, "panafz1", "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer" ) \
-	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(2) ) \
-	ROM_SYSTEM_BIOS( 3, "gsalive2", "Goldstar 3DO Alive II" ) \
-	ROMX_LOAD( "gsalive2.bin", 0x000000, 0x100000, NO_DUMP, ROM_BIOS(3) ) \
-	ROM_SYSTEM_BIOS( 4, "sanyotry", "Sanyo TRY 3DO Interactive Multiplayer" ) \
-	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(4) )
-#else
+
+
+ROM_START(3do_fz1)
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "retail", "Retail FZ-1 USA" )
+	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "dev", "Development FZ-1 USA (v0.9)" )
+	ROMX_LOAD( "panafz1_dev_0.9.bin", 0x000000, 0x100000, CRC(b5a5d0a8) SHA1(de3c55490733e6c69724d87e149b52ed955638ed), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "deva", "Development FZ-1 USA (later)" )
+	ROMX_LOAD( "panafz1_dev.bin", 0x000000, 0x100000, CRC(e8eba9dd) SHA1(4cb4ee36e0f5bc0995d34992b4f241c420d49b2e), ROM_BIOS(2) )
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+ROM_END
+
+//	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" )
+//	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(1) )
+
+ROM_START(3do_fz1e)
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "retail", "Retail FZ-1 Europe" )
+	ROMX_LOAD( "panafz1e.bin", 0x000000, 0x100000, CRC(a191e1aa) SHA1(1d0db81e171ebc1d07cefc8ce8ab082306186e56), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "unencrypted", "Unencrypted FZ-1 Europe" )
+	ROMX_LOAD( "panafz1e-unencrypted.bin", 0x000000, 0x100000, CRC(d3d345df) SHA1(4696951e492e5526772a860ea2c0f35411a80927), ROM_BIOS(1) )
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START(3do_fz1j)
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "retail", "Retail FZ-1 Japan" )
+	ROMX_LOAD( "panafz1j.bin", 0x000000, 0x100000, CRC(d9493adc) SHA1(ec7ec62d60ec0459a14ed56ebc66761ef3c80efc), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-1 Japan with disabled RSA" )
+	ROMX_LOAD( "panafz1j-norsa.bin", 0x000000, 0x100000, CRC(82ce67c6) SHA1(a417587ae3b0b8ef00c830920c21af8bee88e419), ROM_BIOS(1) )
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_LOAD( "panafz1j-kanji.bin", 0x000000, 0x100000, CRC(45f478b1) SHA1(884515605ee243577ab20767ef8c1a7368e4e407) )
+ROM_END
+
+ROM_START(3do_fz10)
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "retail", "Retail FZ-10 USA" )
+	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-10 USA with disabled RSA" )
+	ROMX_LOAD( "panafz10-norsa.bin", 0x000000, 0x100000, CRC(230e6feb) SHA1(f05e642322c03694f06a809c0b90fc27ac73c002), ROM_BIOS(1) )
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START(3do_fz10e)
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "retail", "Retail FZ-10 Europe" )
+	ROMX_LOAD( "panafz10e-anvil.bin", 0x000000, 0x100000, CRC(2495c500) SHA1(a900371f0cdcdc03f79557f11d406fd71251a5fd), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-10 Europe with disabled RSA" )
+	ROMX_LOAD( "panafz10e-anvil-norsa.bin", 0x000000, 0x100000, CRC(9a186221) SHA1(2765c7b4557cc838b32567d2428d088980295159), ROM_BIOS(1) )
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+ROM_END
+
+// TODO: supposedly this is a pre-Anvil model (kanji ROM may not fit)
+ROM_START(3do_fz10j)
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "retail", "Retail FZ-10 Japan" )
+	ROMX_LOAD( "panafz10j.bin", 0x000000, 0x100000, CRC(07b50015) SHA1(fe7f9c9c6a98910013bf13f2cf798de9fea52acd), ROM_BIOS(0) )
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_LOAD( "panafz10ja-anvil-kanji.bin", 0x000000, 0x100000, CRC(ff7393de) SHA1(2e857b957803d0331fd229328df01f3ffab69eee) )
+ROM_END
+
+// TODO: was labeled "GDO-101P", mistake or it's the PAL version?
+// TODO: may need renaming when the "Alive" South Korean version ever surfaces
+ROM_START(3do_gdo101)
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "gdo101m", "Retail GDO-101M" )
+	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(0) )
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+ROM_END
+
+// NOTE: prints an extra "goldstar-fc1 encrypted" on screen, doesn't ping the logic analyzer
+// Launch BIOS
+ROM_START(3do_fc1)
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "fc1", "FC-1 (encrypted, retail?)" )
+	ROMX_LOAD( "goldstar_fc1_enc.bin", 0x000000, 0x100000, CRC(5c5b4f98) SHA1(8ef7503c948314d242da47b7fdc272f68dac2aee), ROM_BIOS(0) )
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+ROM_END
+
+// devstation unit, prints "3DO-NTSC-1.0fc2 encrypted" and Logic Analyzer stuff directly OSD.
+// "they're labeled as `3DO Station` units, or if has ethernet capability it'd be `3DO Network Station`
+//  they're very large motherboards housed inside a standard PC case"
+ROM_START(3do_fc2)
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "fc2", "FC-2 (1.0 dev kit)" )
+	ROMX_LOAD( "3do_devkit_1.0fc2.bin", 0x000000, 0x100000, CRC(cdb23167) SHA1(bd325c869e1dde8a3872fc21565e0646a3d5b525), ROM_BIOS(0) )
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+ROM_END
+
+
+ROM_START(3do_try)
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "retail", "Retail IMP-21J TRY Japan" )
+	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(0) )
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+ROM_END
+
+ROM_START(3do_hc21)
+	ROM_REGION32_BE( 0x200000, "bios", 0 )
+	ROM_SYSTEM_BIOS( 0, "alpha", "alpha 21 March 94" )
+	ROMX_LOAD( "sanyo_hc21_alpha.bin", 0x000000, 0x100000, CRC(a9f2f749) SHA1(29c40515dc1174ff13975baa59eb532083e4a3d3), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "b3", "b3 unencrypted" )
+	ROMX_LOAD( "sanyo_hc21_b3_unenc.bin", 0x000000, 0x100000, CRC(c4c3db01) SHA1(c389af32bcadf0d86826927dc3d20b7072f90069), ROM_BIOS(1) )
+
+	ROM_REGION32_BE( 0x200000, "overlay", 0 )
+	ROM_COPY( "bios", 0, 0, 0x200000 )
+
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+ROM_END
+
+
+// Arcade section
+// TODO: still using the old BIOS scheme
 #define NTSC_BIOS \
 	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" ) \
@@ -298,29 +437,14 @@ void _3do_state::arcade_ntsc(machine_config &config)
 	ROM_SYSTEM_BIOS( 3, "sanyotry", "Sanyo TRY 3DO Interactive Multiplayer" ) \
 	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(3) ) \
 	ROM_REGION32_BE( 0x200000, "overlay", 0 ) \
-	ROM_COPY( "bios", 0, 0, 0x200000 )
-#endif
+	ROM_COPY( "bios", 0, 0, 0x200000 ) \
+	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 
-ROM_START(3do)
-	NTSC_BIOS
-ROM_END
 
 ROM_START(3dobios)
 	NTSC_BIOS
 ROM_END
 
-ROM_START(3do_pal)
-	ROM_REGION32_BE( 0x200000, "bios", 0 )
-	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" )
-	ROMX_LOAD( "panafz10.bin", 0x000000, 0x100000, CRC(58242cee) SHA1(3c912300775d1ad730dc35757e279c274c0acaad), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" )
-	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "panafz1", "Panasonic FZ-1 R.E.A.L. 3DO Interactive Multiplayer" )
-	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(2) )
-
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
-ROM_END
 
 ROM_START(orbatak)
 	NTSC_BIOS
@@ -363,13 +487,24 @@ ROM_END
 
 ***************************************************************************/
 
-/*    YEAR  NAME     PARENT  COMPAT  MACHINE     INPUT   STATE       INIT        COMPANY            FULLNAME      FLAGS */
 // console section
-CONS( 1993, 3do,     0,      0,      _3do,       3do,    _3do_state, empty_init, "The 3DO Company", "3DO (NTSC)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1993, 3do_pal, 3do,    0,      _3do_pal,   3do,    _3do_state, empty_init, "The 3DO Company", "3DO (PAL)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// Panasonic
+CONS( 1993, 3do_fz1,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (USA)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1993, 3do_fz1e,   3do_fz1,    0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Europe)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1994, 3do_fz1j,   3do_fz1,    0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Japan)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1994, 3do_fz10,   0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (USA)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1994, 3do_fz10e,  3do_fz10,   0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Europe, Anvil chipset)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1994, 3do_fz10j,  3do_fz10,   0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Japan)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// Goldstar
+CONS( 1994, 3do_gdo101, 0,          0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO GDO-101M Interactive Multiplayer (USA?)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1994?,3do_fc1,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO FC-1 Interactive Multiplayer (USA)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1994?,3do_fc2,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar?", "3DO FC-2 Interactive Multiplayer (dev kit)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// Sanyo
+CONS( 1995, 3do_try,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO IMP-21J Try Interactive Multiplayer (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO HC-21 Interactive Multiplayer (Japan, prototype)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
-/*    YEAR  NAME     PARENT   MACHINE  INPUT  STATE       INIT        MONITOR   COMPANY                 FULLNAME               FLAGS */
-// Misc 3do Arcade games
+
+// Arcade section
 GAME( 1993, 3dobios, 0,       arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
 
 GAME( 1995, orbatak, 3dobios, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
