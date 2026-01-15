@@ -35,24 +35,21 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
-	// Internal structures
-	struct slot_t {
-		uint32_t a, b;
-		uint32_t x, y;
-		uint32_t phi, wf;
-		uint32_t l_acc, r_acc;
-		uint8_t mix_l, mix_r;
-		bool clear_rqst, int_mod;
-		bool carry;  // Carry from RADD, persists for WSP operations
-		uint32_t mul_result; // Multiplier pipeline latch
-	};
+	// Chip-level working registers (shared across all slots)
+	uint32_t m_a, m_b;          // Working registers
+	uint32_t m_x, m_y;          // Waveform/multiplier registers
+	uint32_t m_phi, m_wf;       // Phase and waveform select
+	uint32_t m_mul_result;      // Multiplier pipeline latch
+	bool m_carry;               // Adder carry flag
+	bool m_clear_rqst;          // Clear request flag
+	bool m_int_mod;             // Internal modulation flag
+	uint32_t m_l_acc, m_r_acc;  // Output accumulators
+	uint8_t m_mix_l, m_mix_r;   // Output attenuation
 
 	// State
 	sound_stream *m_stream;
 	std::unique_ptr<uint16_t[]> m_aram; // 256 x 15-bit micro-instructions
 	std::unique_ptr<uint32_t[]> m_dram; // 256 x 19-bit parameters
-
-	slot_t m_slots[16];
 	uint8_t m_control_reg;
 	uint8_t m_address_reg;
 	uint32_t m_data_latch;
