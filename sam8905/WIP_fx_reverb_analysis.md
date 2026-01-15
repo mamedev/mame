@@ -3,7 +3,7 @@
 ## Status: IN PROGRESS
 
 Started: 2026-01-13
-Updated: 2026-01-14
+Updated: 2026-01-15
 
 ## Overview
 
@@ -62,11 +62,14 @@ Now slots 7-11 (ALG=4) correctly run A-RAM 0x80-0xBF which has WXY WSP at PC07!
 | 22kHz ALG | A-RAM Range | WXY WSP Instructions | WACC Instructions |
 |-----------|-------------|---------------------|-------------------|
 | 0         | 0x00-0x3F   | 0                   | 0                 |
-| 1         | 0x40-0x7F   | (not used)          | (not used)        |
+| 1         | 0x40-0x7F   | 0                   | 13                |
 | 2         | 0x80-0xBF   | 1 (PC07: 0x29B7)    | 3 (PC10,11,29)    |
-| 3         | 0xC0-0xFF   | (not used)          | (not used)        |
+| 3         | 0xC0-0xFF   | 1 (PC05: 0x39F7)    | 2 (PC11,33)       |
 
-ALG 2 (A-RAM 0x80) has the reverb output code with proper WXY WSP and WACC instructions.
+- ALG 0: Input conditioning, no direct output
+- ALG 1: Heavy diffusion output (13 WACC spread throughout)
+- ALG 2: Main reverb output with stereo panning (WXY+WSP at PC07)
+- ALG 3: All-pass filter, MUTED (mix_l=mix_r=0) - processes SRAM for feedback network
 
 ### Remaining Investigation
 
@@ -257,14 +260,35 @@ PC62-PC63 are reserved system instructions (not executed by algorithm).
 
 **Purpose:** Initial signal conditioning and phase accumulation for input processing.
 
+```python
+dram_slot4 = [
+    0x00000,  # word 0: 
+    0x50080,  # word 1: DPHI/config
+    0x00400,  # word 2: WWF config
+    0x40000,  # word 3: Config
+    0x00080,  # word 4: Config
+    0x00000,  # word 5: Accumulator
+    0x7FFFF,  # word 6: (Max amplitude - says claude ???) [val=-1]
+    0x40402,  # word 7: WWF/address
+    0x00100,  # word 8: PHI increment
+    0x00080,  # word 9: Config
+    0x00180,  # word 10: Config
+    0x0007C,  # word 11: Feedback coef [val=124]
+    0x00000,  # word 12: accumulator state???
+    0x00000,  # word 13
+    0x00000,  # word 14
+    0x34080,  # word 15: IDLE=0, ALG=0
+]
+```
+
 ```
 ; === INITIALIZATION PHASE (PC00-PC09) ===
-PC00: 00F7  RM    0, <WXY>                    ; X,Y = waveform at D[0] address - READ INPUT SAMPLE
+PC00: 00F7  RM    0, <WXY>                    ; Y = D[0] = 0 ?, X = last rom value ???
 PC01: 607F  RM   12, <WA>                     ; A = D[12] (accumulator state)
 PC02: 58BF  RM   11, <WB>                     ; B = D[11] (feedback coefficient)
-PC03: 5A5F  RADD 11, <WA, WM>                 ; D[11] = A+B, A = result (accumulate feedback)
-PC04: 30BF  RM    6, <WB>                     ; B = D[6] (amplitude)
-PC05: 5DDF  RP   11, <WM> [WSP]               ; D[11] = X*Y product (amplitude scaling)
+PC03: 5A5F  RADD 11, <WA, WM>                 ; D[11] = A+B, A = result (accumulate feedback), WA without WSP sets CLEARRQST
+PC04: 30BF  RM    6, <WB>                     ; B = D[6] -> add -1
+PC05: 5DDF  RP   11, <WM> [WSP]               ; D[11] = X*Y IF CLEARRQST AND NOT CARRY
 PC06: 082D  RM    1, <WA, WB, WPHI, WWF>      ; Load PHI,WF from D[1] (SRAM address config)
 PC07: 593F  RM   11, <WA, WB> [WSP]           ; A=B=D[11] (scaled sample)
 PC08: 5ADF  RADD 11, <WM>                     ; D[11] = A+B (double for mixing)
@@ -307,7 +331,7 @@ PC36: 7FFB  RSP  15, <clrB> [WSP]             ; Second write
 PC37: 7EFB  RSP  15, <clrB>                   ; Settling
 PC38: 7EFB  RSP  15, <clrB>                   ; Settling
 PC39: 7FFF  RSP  15, <-> [WSP]                ; Sync
-PC40: 78FD  RM   15, <WWF>                    ; WWF = D[15] (another SRAM bank)
+PC40: 78FD  RM   15, <WWF>                    ; WWF = D[15] (another SRAM bank)            
 PC41: 18EF  RM    3, <WPHI>                   ; PHI = D[3]
 PC42: 58F7  RM   11, <WXY>                    ; XY = D[11] - SRAM READ
 PC43: 7FFF  RSP  15, <-> [WSP]                ; Sync
@@ -338,6 +362,98 @@ PC61: 6A5B  RADD 13, <WA, WM, clrB>           ; D[13] = A+B, clear B (output to 
 No WACC instructions = no direct DAC output. Output goes to SRAM for other slots to read.
 
 **D-RAM usage:** Reads D[0-15], Writes D[4,5,8,11,13,14]
+
+---
+
+### A-RAM 0x40-0x7F: 22kHz ALG 1 (D-RAM ALG=2, Used by Slot 5 - Diffusion)
+
+**Purpose:** Diffusion/scatter processing. Heavy DAC output (13 WACC instructions).
+No WXY+WSP (MIX register update) - uses MIX values set by previous slot.
+
+```
+; === INITIAL SETUP (PC00-PC04) ===
+PC00: 30EF  RM    6, <WPHI>                     ; PHI = D[6] (phase setup)
+PC01: 48FD  RM    9, <WWF>                      ; WWF = D[9] (waveform config)
+PC02: 6ADF  RADD 13, <WM>                       ; D[13] = A+B (accumulate)
+PC03: 703F  RM   14, <WA, WB>                   ; A=B=D[14]
+PC04: 0000  RM    0, <WA,WB,WM,WPHI,WXY,clrB,WWF,WACC>  ; WACC - DAC output
+
+; === FIRST PROCESSING BLOCK (PC05-PC15) ===
+PC05: 6BDF  RADD 13, <WM> [WSP]                 ; D[13] = A+B, WSP active
+PC06: 38EF  RM    7, <WPHI>                     ; PHI = D[7]
+PC07: 50FC  RM   10, <WWF,WACC>                 ; WWF=D[10], WACC - DAC output
+PC08: 687F  RM   13, <WA>                       ; A = D[13]
+PC09: 7CBE  RP   15, <WB,WACC>                  ; B = product, WACC - DAC output
+PC10: 18F7  RM    3, <WXY>                      ; WXY - waveform read
+PC11: 7A7F  RADD 15, <WA>                       ; A = A+B
+PC12: 40EF  RM    8, <WPHI>                     ; PHI = D[8]
+PC13: 58FC  RM   11, <WWF,WACC>                 ; WWF=D[11], WACC - DAC output
+PC14: 7CBE  RP   15, <WB,WACC>                  ; B = product, WACC - DAC output
+PC15: 6ADF  RADD 13, <WM>                       ; D[13] = A+B
+
+; === SECOND PROCESSING BLOCK (PC16-PC25) ===
+PC16: 18F7  RM    3, <WXY>                      ; WXY - waveform read
+PC17: 00BF  RM    0, <WB>                       ; B = D[0]
+PC18: 307F  RM    6, <WA>                       ; A = D[6]
+PC19: 32CE  RADD  6, <WM,WPHI,WACC>             ; D[6]=A+B, PHI=bus, WACC - DAC output
+PC20: 48FC  RM    9, <WWF,WACC>                 ; WWF=D[9], WACC - DAC output
+PC21: 387F  RM    7, <WA>                       ; A = D[7]
+PC22: 3ADF  RADD  7, <WM>                       ; D[7] = A+B
+PC23: 407F  RM    8, <WA>                       ; A = D[8]
+PC24: 42DF  RADD  8, <WM>                       ; D[8] = A+B
+PC25: 7CBF  RP   15, <WB>                       ; B = product
+
+; === THIRD PROCESSING BLOCK (PC26-PC37) ===
+PC26: 20F7  RM    4, <WXY>                      ; WXY - waveform read
+PC27: 687F  RM   13, <WA>                       ; A = D[13]
+PC28: 38EF  RM    7, <WPHI>                     ; PHI = D[7]
+PC29: 50FD  RM   10, <WWF>                      ; WWF = D[10]
+PC30: 7A7E  RADD 15, <WA,WACC>                  ; A=A+B, WACC - DAC output
+PC31: 7CBE  RP   15, <WB,WACC>                  ; B = product, WACC - DAC output
+PC32: 28F7  RM    5, <WXY>                      ; WXY - waveform read
+PC33: 7A7F  RADD 15, <WA>                       ; A = A+B
+PC34: 40EF  RM    8, <WPHI>                     ; PHI = D[8]
+PC35: 58FD  RM   11, <WWF>                      ; WWF = D[11]
+PC36: 7CBE  RP   15, <WB,WACC>                  ; B = product, WACC - DAC output
+PC37: 6ADE  RADD 13, <WM,WACC>                  ; D[13]=A+B, WACC - DAC output
+
+; === ACCUMULATION CHAIN (PC38-PC59) ===
+PC38: 28F7  RM    5, <WXY>                      ; WXY - waveform read
+PC39: 08BF  RM    1, <WB>                       ; B = D[1]
+PC40: 307F  RM    6, <WA>                       ; A = D[6]
+PC41: 32DF  RADD  6, <WM>                       ; D[6] = A+B
+PC42: 493F  RM    9, <WA,WB> [WSP]              ; A=B=D[9], WSP active
+PC43: 4ADF  RADD  9, <WM>                       ; D[9] = A+B
+PC44: 60BF  RM   12, <WB>                       ; B = D[12]
+PC45: 4BDF  RADD  9, <WM> [WSP]                 ; D[9]=A+B, WSP active
+PC46: 08BF  RM    1, <WB>                       ; B = D[1]
+PC47: 387F  RM    7, <WA>                       ; A = D[7]
+PC48: 3ADF  RADD  7, <WM>                       ; D[7] = A+B
+PC49: 513F  RM   10, <WA,WB> [WSP]              ; A=B=D[10], WSP active
+PC50: 52DF  RADD 10, <WM>                       ; D[10] = A+B
+PC51: 60BF  RM   12, <WB>                       ; B = D[12]
+PC52: 53DF  RADD 10, <WM> [WSP]                 ; D[10]=A+B, WSP active
+PC53: 08BF  RM    1, <WB>                       ; B = D[1]
+PC54: 407F  RM    8, <WA>                       ; A = D[8]
+PC55: 42DF  RADD  8, <WM>                       ; D[8] = A+B
+PC56: 593F  RM   11, <WA,WB> [WSP]              ; A=B=D[11], WSP active
+PC57: 5ADF  RADD 11, <WM>                       ; D[11] = A+B
+PC58: 60BF  RM   12, <WB>                       ; B = D[12]
+PC59: 5BDF  RADD 11, <WM> [WSP]                 ; D[11]=A+B, WSP active
+
+; === FINAL OUTPUT (PC60-PC63) ===
+PC60: 7CBE  RP   15, <WB,WACC>                  ; B = product, WACC - DAC output
+PC61: 687E  RM   13, <WA,WACC>                  ; A = D[13], WACC - DAC output
+PC62: 7FFF  RSP  15, <WSP>                      ; NOP with WSP
+PC63: 7FFF  RSP  15, <WSP>                      ; NOP with WSP
+```
+
+**Analysis:** This algorithm has heavy DAC output (13 WACC instructions) spread throughout.
+It reads from D-RAM and does extensive multiply-accumulate operations.
+Multiple WSP markers (PC05,42,45,49,52,56,59,62,63) but no WXY+WSP combo - these WSP flags
+don't update MIX registers (no simultaneous WXY).
+
+**D-RAM usage:** Reads D[0-13], Writes D[6,7,8,9,10,11,13]
 
 ---
 
@@ -441,39 +557,114 @@ PC61: 587B  RM   11, <WA, clrB>               ; A = D[11], clear B (prepare next
 
 ---
 
+### A-RAM 0xC0-0xFF: 22kHz ALG 3 (D-RAM ALG=6, Used by Slot 6 - All-pass, MUTED)
+
+**Purpose:** All-pass filter processing. This slot is MUTED (mix_l=0, mix_r=0) so it
+contributes no direct audio output. However, it still processes audio data through SRAM
+which other slots can read.
+
+```
+; === INITIAL SETUP (PC00-PC04) ===
+PC00: 2ADF  RADD  5, <WM>                       ; D[5] = A+B (from previous slot)
+PC01: 10FD  RM    2, <WWF>                      ; WWF = D[2] (waveform config)
+PC02: 006F  RM    0, <WA, WPHI>                 ; A = PHI = D[0]
+PC03: 18BF  RM    3, <WB>                       ; B = D[3]
+PC04: 02DF  RADD  0, <WM>                       ; D[0] = A+B
+
+; === MIX UPDATE + PROCESSING (PC05-PC11) ===
+PC05: 39F7  RM    7, <WXY> [WSP]                ; ** WXY+WSP - MIX UPDATE from D[7] **
+PC06: 287F  RM    5, <WA>                       ; A = D[5]
+PC07: 7CBF  RP   15, <WB>                       ; B = product
+PC08: 40F7  RM    8, <WXY>                      ; WXY - waveform read
+PC09: 32DF  RADD  6, <WM>                       ; D[6] = A+B
+PC10: 7C3F  RP   15, <WA, WB>                   ; A = B = product
+PC11: 6ADE  RADD 13, <WM,WACC>                  ; D[13]=A+B, WACC - DAC output (but MUTED!)
+
+; === SECOND PROCESSING BLOCK (PC12-PC24) ===
+PC12: 006F  RM    0, <WA, WPHI>                 ; A = PHI = D[0]
+PC13: 20BF  RM    4, <WB>                       ; B = D[4]
+PC14: 02DF  RADD  0, <WM>                       ; D[0] = A+B
+PC15: 087F  RM    1, <WA>                       ; A = D[1]
+PC16: 40F7  RM    8, <WXY>                      ; WXY - waveform read
+PC17: 0ADF  RADD  1, <WM>                       ; D[1] = A+B
+PC18: 74DF  RP   14, <WM>                       ; D[14] = product
+PC19: 38F7  RM    7, <WXY>                      ; WXY - waveform read
+PC20: 307F  RM    6, <WA>                       ; A = D[6]
+PC21: 7CEF  RP   15, <WPHI>                     ; PHI = product
+PC22: 60FD  RM   12, <WWF>                      ; WWF = D[12]
+PC23: 48F7  RM    9, <WXY>                      ; WXY - waveform read
+PC24: 7FFF  RSP  15, <-> [WSP]                  ; Sync with WSP
+
+; === THIRD PROCESSING BLOCK (PC25-PC41) ===
+PC25: 7CBF  RP   15, <WB>                       ; B = product
+PC26: 70EF  RM   14, <WPHI>                     ; PHI = D[14]
+PC27: 48F7  RM    9, <WXY>                      ; WXY - waveform read
+PC28: 325F  RADD  6, <WA, WM>                   ; D[6]=A+B, A=bus
+PC29: 68BF  RM   13, <WB>                       ; B = D[13]
+PC30: 7A7F  RADD 15, <WA>                       ; A = A+B
+PC31: 7CBF  RP   15, <WB>                       ; B = product
+PC32: 7A7F  RADD 15, <WA>                       ; A = A+B
+PC33: 6ADE  RADD 13, <WM,WACC>                  ; D[13]=A+B, WACC - DAC output (but MUTED!)
+PC34: 30F7  RM    6, <WXY>                      ; WXY - waveform read
+PC35: 10FD  RM    2, <WWF>                      ; WWF = D[2]
+PC36: 086F  RM    1, <WA, WPHI>                 ; A = PHI = D[1]
+
+; === SETTLING SEQUENCE (PC37-PC41) ===
+PC37: 7FFB  RSP  15, <clrB> [WSP]               ; Clear B, sync
+PC38: 7FFB  RSP  15, <clrB> [WSP]               ; Clear B, sync
+PC39: 7EFB  RSP  15, <clrB>                     ; Clear B
+PC40: 7EFB  RSP  15, <clrB>                     ; Clear B
+PC41: 7FFF  RSP  15, <-> [WSP]                  ; Sync
+
+; === ACCUMULATION CHAIN (PC42-PC53) ===
+PC42: 18BF  RM    3, <WB>                       ; B = D[3]
+PC43: 0ADF  RADD  1, <WM>                       ; D[1] = A+B
+PC44: 303F  RM    6, <WA, WB>                   ; A = B = D[6]
+PC45: 7A3F  RADD 15, <WA, WB>                   ; A = B = A+B (multiply chain)
+PC46: 7A3F  RADD 15, <WA, WB>                   ; A = B = A+B
+PC47: 7A3F  RADD 15, <WA, WB>                   ; A = B = A+B
+PC48: 7A3F  RADD 15, <WA, WB>                   ; A = B = A+B
+PC49: 7A3F  RADD 15, <WA, WB>                   ; A = B = A+B
+PC50: 7A3F  RADD 15, <WA, WB>                   ; A = B = A+B
+PC51: 7A3F  RADD 15, <WA, WB>                   ; A = B = A+B
+PC52: 08EF  RM    1, <WPHI>                     ; PHI = D[1]
+PC53: 7AF7  RADD 15, <WXY>                      ; WXY - waveform read
+
+; === FINAL SETTLING (PC54-PC63) ===
+PC54: 7FFB  RSP  15, <clrB> [WSP]               ; Clear B, sync
+PC55: 7FFB  RSP  15, <clrB> [WSP]               ; Clear B, sync
+PC56: 7EFB  RSP  15, <clrB>                     ; Clear B
+PC57: 7EFB  RSP  15, <clrB>                     ; Clear B
+PC58: 7FFF  RSP  15, <-> [WSP]                  ; Sync
+PC59: 687B  RM   13, <WA, clrB>                 ; A = D[13], clear B (prepare next)
+PC60: 7FFF  RSP  15, <-> [WSP]                  ; Sync
+PC61: 7FFF  RSP  15, <-> [WSP]                  ; Sync
+PC62: 7FFF  RSP  15, <-> [WSP]                  ; Sync
+PC63: 7FFF  RSP  15, <-> [WSP]                  ; Sync (extra padding)
+```
+
+**Analysis:** This algorithm is MUTED (slot 6 has mix_l=0, mix_r=0 in D-RAM word 5).
+Despite having 2 WACC instructions (PC11, PC33), these produce zero output because
+the MIX attenuation is maximum. The algorithm still processes audio through SRAM
+for other slots to read as part of the reverb feedback network.
+
+The WXY+WSP at PC05 updates MIX from D[7], but since slot 6 is configured as muted,
+this sets mix_l=mix_r=0.
+
+**D-RAM usage:** Reads D[0-9,12-14], Writes D[0,1,5,6,13,14]
+
+---
+
 ### Algorithm Mappings (Summary)
 
 | Slot | D-RAM ALG | 22kHz ALG | A-RAM Base | WACC Count | WXY+WSP | Purpose |
 |------|-----------|-----------|------------|------------|---------|---------|
 | 4    | 0         | 0         | 0x00       | 0          | 0       | Input conditioning |
-| 5    | 2         | 1         | 0x40       | (TBD)      | (TBD)   | Diffusion |
-| 6    | 6         | 3         | 0xC0       | (TBD)      | (TBD)   | All-pass (muted) |
+| 5    | 2         | 1         | 0x40       | 13         | 0       | Diffusion |
+| 6    | 6         | 3         | 0xC0       | 2          | 1       | All-pass (muted) |
 | 7-11 | 4         | 2         | 0x80       | 3          | 1       | Delay taps + output |
 
 ## D-RAM Slot Configuration
-
-### Slot 4 (ALG 0) - Initial Processing
-
-```python
-dram_slot4 = [
-    0x00000,  # word 0: PHI
-    0x50080,  # word 1: DPHI/config
-    0x00400,  # word 2: WWF config
-    0x40000,  # word 3: Config
-    0x00080,  # word 4: Config
-    0x00000,  # word 5: Accumulator
-    0x7FFFF,  # word 6: Max amplitude
-    0x40402,  # word 7: WWF/address
-    0x00100,  # word 8: PHI increment
-    0x00080,  # word 9: Config
-    0x00180,  # word 10: Config
-    0x0007C,  # word 11: Feedback coef
-    0x00000,  # word 12
-    0x00000,  # word 13
-    0x00000,  # word 14
-    0x34080,  # word 15: IDLE=0, ALG=0
-]
-```
 
 ### Slot 5 (ALG 2) - Diffusion
 
@@ -555,12 +746,12 @@ The external SRAM appears to be used for delay line storage:
 Input -> Slot 4 (ALG 0, conditioning) -> SRAM write
                 |
                 v
-         Slot 5 (ALG 2, diffusion) -----> DAC output (heavy WACC)
+         Slot 5 (ALG 1, diffusion) -----> DAC output (heavy WACC)
                 |
                 v
-         Slot 6 (ALG 6, all-pass) -> SRAM buffers only (MUTED)
+         Slot 6 (ALG 3, all-pass) -> SRAM buffers only (MUTED)
                 |
-                +---> Slots 7-11 (ALG 4, delay taps) -> DAC output
+                +---> Slots 7-11 (ALG 2, delay taps) -> DAC output
                       - 5 parallel taps at different delays
                       - Stereo mix: 7,8,11 center; 9,10 right-biased
 ```
