@@ -65,9 +65,9 @@
 namespace {
 
 static constexpr int DEFAULT_WIDTH = 320;
-static constexpr int DEFAULT_HEIGHT = 240;
+static constexpr int DEFAULT_HEIGHT = 241;
 static constexpr int VERT_FRONT_PORCH = 25;
-static constexpr int VERT_BACK_PORCH = 1+72-VERT_FRONT_PORCH;
+static constexpr int VERT_BACK_PORCH = 72-VERT_FRONT_PORCH;
 static constexpr int HORIZ_FRONT_PORCH = 8*8;
 static constexpr int HORIZ_BACK_PORCH = 24*8-HORIZ_FRONT_PORCH;
 
@@ -448,7 +448,7 @@ void juku_state::screen_vblank_period(uint8_t data)
 	if (m_vblank_period_lsb == -1) {
 		m_vblank_period_lsb = (int)data;
 	} else {
-		m_height = m_screen->height()-bcd_value(((uint16_t)data<<8) + (uint8_t)m_vblank_period_lsb) - 1;
+		m_height = m_screen->height()-bcd_value(((uint16_t)data<<8) + (uint8_t)m_vblank_period_lsb);
 		m_vblank_period_lsb = -1;
 		adjust_monitor_params(0b0001'0000);
 	}
