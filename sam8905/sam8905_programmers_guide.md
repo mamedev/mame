@@ -60,9 +60,9 @@ A micro-program accumulates results of computations into a left channel and a ri
 Any of the 16 x 19 bits words of a D-RAM block can be addressed during a slot by the micro-program. Only address 15 of a D-RAM should hold a specific information, as follows:
 
 ```
-| 18 |    |    |    | 7  |    |    |    |    |    |    |    |    | 0  |
-|----|----|----|----|----|----|----|----|----|----|----|----|----|----|
-| X  | X  | X  | X  | I  | ALG     | X  | X  | X  | X  | X  | X  | X  |
+| 18 - 12 | 11 | 10 - 8  | 7  | 6 - 0  |
+|---------|----|---------|----|--------|
+| X       | I  | ALG     | M  |        |
 ```
 
 - **X:** free for other information
@@ -74,13 +74,13 @@ Any of the 16 x 19 bits words of a D-RAM block can be addressed during a slot by
 ```
 | 7  |    |    |    |    | 0  |
 |----|----|----|----|----|----| 
-|ALG |    |    | 0  |    |    |     44.1 kHz sampling
+|ALG |ALG |ALG | 0  | 0  | 0  |     44.1 kHz sampling
 ```
 
 ```
 | 7  |    |    |    |    | 0  |
 |----|----|----|----|----|----| 
-|ALG |    | 0  |    |    |    |     22.05 kHz sampling
+|ALG |ALG | 0  | 0  | 0  | 0  |     22.05 kHz sampling
 ```
 
 **Note:** For 22.05 kHz sampling, only the 2 upper ALG bits are used to select the algorithm.
@@ -156,9 +156,9 @@ See appendix I for more informations about sinus, ramps and constants.
 When the upper bit of wave is 1, the remaining 8 bits, together with the 12 upper phase bits define the external sampling memory address.
 
 ```
-| 18 |    |    |    |    |    | 7  |    |    |    | 0  |
-|----|----|----|----|----|----|----|----|----|----|----|
-|           AMP            | X |MIXL|MIXR|              |
+| 18 - 7 | 6 | 5 - 3 | 2 - 0 |
+|--------|---|-------|-------|
+| AMP    | X | MIXL  | MIXR  |
 ```
 
 **Typical micro-instructions: WXY, WXY WSP, WA, WB**
@@ -338,12 +338,14 @@ The carry of the adder has a different meaning depending on the sign of the data
 
 ### Examples
 
-| A | B | CARRY | A+B (RADD) |
-|---|---|-------|------------|
-| 1000H | 2000H | 0 | 3000H |
-| 7FFFFH | 1 | 1 | 0 |
-| 7FFFFH | 7FFFFH | 0 | 7FFFEH (-2) |
-| 40000H | 7FFFFH | 1 | 3FFFFM |
+| A      | B      | CARRY | A+B (RADD)  |
+|--------|--------|-------|-------------|
+| 1000H  | 2000H  | 0     | 3000H       |
+| 7FFFFH | 1      | 1     | 0           |
+| 7FFFFH | 7FFFFH | 0     | 7FFFEH (-2) |
+| 40000H | 7FFFFH | 1     | 3FFFFM      | 
+
+NB: 0x40000 = -262144 (most negative), 0x3FFFF = +262143 (most positive)
 
 This carry mechanism allows to deal with one half of a signal period.
 
@@ -761,6 +763,7 @@ The constants are derived from the MAD part of the micro-instruction, as defined
 | **WPHI** | WSP: PHI loaded but WF forced to 1 (select internal sinus). WPHI WSP takes priority other WA WSP giving a normal WA |
 | **WXY**  | WSP: Y and MIX loaded                                                                                               |
 | **WA**   | WSP: expects an E\|WAVE\|finalWAVE format on the bus (see §4)                                                       |
+| **WM**   | ???                                                                                                                 |
 
 ### WA WSP Truth Table:
 
