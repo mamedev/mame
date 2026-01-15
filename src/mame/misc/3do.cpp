@@ -410,6 +410,8 @@ ROM_START(3do_try)
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
+
+// model number "MPHC2100USA"
 ROM_START(3do_hc21)
 	ROM_REGION32_BE( 0x200000, "bios", 0 )
 	ROM_SYSTEM_BIOS( 0, "alpha", "alpha 21 March 94" )
@@ -501,7 +503,7 @@ CONS( 1994?,3do_fc1,    3do_gdo101, 0,       _3do,       3do,    _3do_state, emp
 CONS( 1994?,3do_fc2,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar?", "3DO FC-2 Interactive Multiplayer (dev kit)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // Sanyo
 CONS( 1995, 3do_try,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO IMP-21J Try Interactive Multiplayer (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO HC-21 Interactive Multiplayer (Japan, prototype)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO HC-21 Interactive Multiplayer (USA, prototype)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // Arcade section
