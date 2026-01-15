@@ -50,6 +50,9 @@ protected:
 class mach32_device : public ati_vga_device
 {
 public:
+	// BitBlt interface needs testing, mach64 don't even draw BIOS properly
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	// construction/destruction
 	mach32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;

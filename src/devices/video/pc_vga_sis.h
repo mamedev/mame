@@ -11,6 +11,9 @@
 class sis6236_vga_device : public svga_device
 {
 public:
+	// Chipset for AGP card, enough for BIOS checks and nothing else (cfr. SDD tests)
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	sis6236_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint8_t mem_r(offs_t offset) override;
