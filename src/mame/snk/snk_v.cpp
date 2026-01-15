@@ -192,6 +192,10 @@ void snk_state::register_save_state()
 	save_item(NAME(m_sp32_scrollx));
 	save_item(NAME(m_sp32_scrolly));
 	save_item(NAME(m_sprite_split_point));
+	save_item(NAME(m_num_sprites));
+	save_item(NAME(m_yscroll_mask));
+	save_item(NAME(m_bg_tile_offset));
+	save_item(NAME(m_tx_tile_offset));
 }
 
 VIDEO_START_MEMBER(snk_state,_3bpp_shadow)
