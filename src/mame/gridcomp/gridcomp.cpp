@@ -109,6 +109,7 @@ public:
 		, m_modem(*this, "modem")
 		, m_uart8274(*this, "uart8274")
 		, m_speaker(*this, "speaker")
+		, m_speaker_levels(new double[256])
 		, m_ram(*this, RAM_TAG)
 		, m_tms9914(*this, "hpib")
 	{ }
@@ -133,6 +134,7 @@ private:
 	required_device<i8255_device> m_modem;
 	optional_device<i8274_device> m_uart8274;
 	required_device<speaker_sound_device> m_speaker;
+	std::unique_ptr<double[]> m_speaker_levels;
 	required_device<ram_device> m_ram;
 	required_device<tms9914_device> m_tms9914;
 
@@ -143,6 +145,8 @@ private:
 	uint8_t grid_modem_r(offs_t offset);
 	void grid_keyb_w(offs_t offset, uint16_t data);
 	void grid_modem_w(offs_t offset, uint8_t data);
+
+	void setup_speaker_levels();
 	void grid_sound_w(offs_t offset, uint8_t data);
 
 	void grid_dma_w(offs_t offset, uint8_t data);
@@ -231,10 +235,20 @@ void gridcomp_state::grid_modem_w(offs_t offset, uint8_t data)
 	LOG("MDM %02x <- %02x\n", 0xdfec0 + (offset << 1), data);
 }
 
+void gridcomp_state::setup_speaker_levels()
+{
+	for (double i = 0; i < 256; i++)
+	{
+		m_speaker_levels[i] = i / (256 - 1);
+	}
+	m_speaker->set_levels(256, m_speaker_levels.get());
+}
+
 void gridcomp_state::grid_sound_w(offs_t offset, uint8_t data)
 {
 	if (offset & 0b01) {
 		LOG("VOLUME DAC <- %02x\n", data);
+		// Not supported.
 	}
 	if (offset & 0b10) {
 		LOG("SOUND DAC <- %02x\n", data);
@@ -372,6 +386,7 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	setup_speaker_levels();
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // actually a kind of EL display
 	screen.set_color(rgb_t::amber());
