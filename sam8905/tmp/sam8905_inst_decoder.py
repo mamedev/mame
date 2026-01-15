@@ -172,33 +172,45 @@ FX_ALG3_ARAM = [
 ]
 
 
+def analyze_algorithm(name, data, base_addr):
+    """Analyze and print statistics for an algorithm"""
+    alg = [decode_inst(inst) for inst in data]
+    for i, d in enumerate(alg):
+        d['pc'] = i
+        d['addr'] = base_addr + i
+
+    wxy_wsp = analyze_wxy_wsp(alg)
+    wacc = analyze_wacc(alg)
+
+    print(f"=== {name} ===")
+    print(f"WXY+WSP (MIX update): {len(wxy_wsp)}")
+    for d in wxy_wsp:
+        print(f"  PC{d['pc']:02d} [0x{d['addr']:02X}]: 0x{d['inst']:04X} - MAD={d['mad']}")
+    print(f"WACC (DAC output): {len(wacc)}")
+    for d in wacc:
+        print(f"  PC{d['pc']:02d} [0x{d['addr']:02X}]: 0x{d['inst']:04X}")
+    print()
+    return alg
+
+
 if __name__ == "__main__":
+    import sys
+
     print("SAM8905 Instruction Decoder\n")
 
-    # Analyze FX ALG 0
-    alg0 = [decode_inst(inst) for inst in FX_ALG0_ARAM]
-    for i, d in enumerate(alg0):
-        d['pc'] = i
-        d['addr'] = i
+    # Analyze all four FX algorithms
+    alg0 = analyze_algorithm("FX ALG 0 (A-RAM 0x00-0x3F, Slot 4 - Input conditioning)", FX_ALG0_ARAM, 0x00)
+    alg1 = analyze_algorithm("FX ALG 1 (A-RAM 0x40-0x7F, Slot 5 - Diffusion)", FX_ALG1_ARAM, 0x40)
+    alg2 = analyze_algorithm("FX ALG 2 (A-RAM 0x80-0xBF, Slots 7-11 - Delay taps)", FX_ALG2_ARAM, 0x80)
+    alg3 = analyze_algorithm("FX ALG 3 (A-RAM 0xC0-0xFF, Slot 6 - All-pass, MUTED)", FX_ALG3_ARAM, 0xC0)
 
-    print("=== FX ALG 0 (22kHz, A-RAM 0x00-0x3F) ===")
-    wxy_wsp = analyze_wxy_wsp(alg0)
-    wacc = analyze_wacc(alg0)
-    print(f"WXY+WSP instructions: {len(wxy_wsp)}")
-    print(f"WACC instructions: {len(wacc)}")
-
-    print("\n=== FX ALG 2 (22kHz, A-RAM 0x80-0xBF) ===")
-    alg2 = [decode_inst(inst) for inst in FX_ALG2_ARAM]
-    for i, d in enumerate(alg2):
-        d['pc'] = i
-        d['addr'] = 0x80 + i
-
-    wxy_wsp = analyze_wxy_wsp(alg2)
-    wacc = analyze_wacc(alg2)
-    print(f"WXY+WSP instructions: {len(wxy_wsp)}")
-    for d in wxy_wsp:
-        print(f"  PC{d['pc']:02d}: 0x{d['inst']:04X} - MAD={d['mad']}")
-
-    print(f"WACC instructions: {len(wacc)}")
-    for d in wacc:
-        print(f"  PC{d['pc']:02d}: 0x{d['inst']:04X}")
+    # Print full disassembly if requested
+    if len(sys.argv) > 1 and sys.argv[1] == '-v':
+        print("\n" + "="*60)
+        print_algorithm(alg0, "ALG 0 Full Disassembly")
+        print("\n" + "="*60)
+        print_algorithm(alg1, "ALG 1 Full Disassembly")
+        print("\n" + "="*60)
+        print_algorithm(alg2, "ALG 2 Full Disassembly")
+        print("\n" + "="*60)
+        print_algorithm(alg3, "ALG 3 Full Disassembly")
