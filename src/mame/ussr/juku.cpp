@@ -819,15 +819,15 @@ ROM_START( juku )
 
 	ROM_REGION(0x8000, "expcart", 0)
 
-	// EKTA JBASIC cartridge (buggy) seems similar to v1.1 from 14.09.1987.
+	// EKTA JBASIC cartridge seems similar to v1.1 from 14.09.1987.
 	// There is also a version with additional HEX$ directive for EKDOS.
 	// Initial E5101 had JBASIC onboard with early RomBios/Monitor versions.
-	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(1))
-	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(2))
-	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(3))
-	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(4))
-	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(5))
-	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(6))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(1))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(2))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(3))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(4))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(5))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(078259dc) SHA1(27e40395e8b49e2f9febf2b23773fbfe251befcf), ROM_BIOS(6))
 ROM_END
 
 } // anonymous namespace
