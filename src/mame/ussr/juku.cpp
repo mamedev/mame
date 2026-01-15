@@ -794,12 +794,12 @@ ROM_START( juku )
 
 	// RomBios 3.43m with with Janet 1.2/Bootstrap 4.1
 	// Id: "EktaSoft '88  Serial #0031"
-	ROM_SYSTEM_BIOS(2, "3.43m_31", "Disk/Net (3.43 #0031)")
+	ROM_SYSTEM_BIOS(2, "3.43_31", "Disk/Net (3.43 #0031)")
 	ROMX_LOAD("ekta31.bin", 0x0000, 0x4000, CRC(761cfa16) SHA1(73d62c032be1de06c0dd5618f4abccd4d0f3a329), ROM_BIOS(2))
 
 	// RomBios 2.43m with TapeBios/Bootstrap 4.1, screen 53x24 (true E5101?)
 	// Id: "EktaSoft '88  Serial #0032"
-	ROM_SYSTEM_BIOS(3, "2.43m_32", "Tape/Disk (2.43m #0032)")
+	ROM_SYSTEM_BIOS(3, "2.43_32", "Tape/Disk (2.43 #0032)")
 	ROMX_LOAD("ekta32.bin", 0x0000, 0x4000, CRC(72c0da53) SHA1(57311d53f6fe1e87e0755990f400253caccd4795), ROM_BIOS(3))
 
 	// RomBios 3.43m with Janet 1.2/Bootstrap 4.1, screen 53x24 from Juss prototype (E5103?)
