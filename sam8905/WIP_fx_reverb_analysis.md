@@ -347,7 +347,7 @@ No WACC instructions = no direct DAC output. Output goes to SRAM for other slots
 
 ```
 ; === FEEDBACK ACCUMULATION (PC00-PC06) ===
-PC00: 5ADF  RADD 11, <WM>                     ; D[11] = A+B (accumulate from previous frame)
+PC00: 5ADF  RADD 11, <WM>                     ; D[11] = A+B (from PREVIOUS SLOT's final state)
 PC01: 68BF  RM   13, <WB>                     ; B = D[13] (feedback state)
 PC02: 72DF  RADD 14, <WM>                     ; D[14] = A+B (accumulate output)
 PC03: 10FD  RM    2, <WWF>                    ; WWF = D[2] (SRAM config for delay read)
