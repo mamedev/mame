@@ -2682,6 +2682,7 @@ GAME( 1985, indytemp4,  indytemp, indytemp, indytemp, atarisy1_state, init_indyt
 GAME( 1985, indytempd,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", MACHINE_IMPERFECT_SOUND )
 GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL)
 
+// atarisy1r_state is used because hardware to generate interrupt 3 only exists on LSI Cart 2, 3, 4 & cockpit boards, it is missing on TTL, LSI
 GAME( 1985, roadrunn,   atarisy1, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
 GAME( 1985, roadrunn2,  roadrunn, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )
 GAME( 1985, roadrunn1,  roadrunn, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 1)", 0 )
@@ -2699,4 +2700,5 @@ GAME( 1987, roadblstc1, roadblst, roadb109, roadblst, atarisy1r_state, init_road
 GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1r_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )
 
 // not a clone of relief because it needs to be a clone of atarisy1 BIOS and it's more like an unreleased prequel than a version of the released title
-GAME( 1986, reliefs1,   atarisy1, reliefs1, reliefs1, atarisy1_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )
+// joystick inputs don't work in test mode if service mode is accessed from ingame, only if the emulation is started with the test switch on (is real hardware the same?)
+GAME( 1986, reliefs1,   atarisy1, reliefs1, reliefs1, atarisy1r_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )
