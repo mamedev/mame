@@ -438,7 +438,6 @@ int stella8085_state::soundfreq(uint8_t tone, uint8_t octave)
 	const int BUS_CLOCK = (m_maincpu->clock() / 2);
 	const int SOUND_CLOCK = BUS_CLOCK >> 2; //74LS290
 	const int INT_CLOCK = SOUND_CLOCK >> (1 + octave); //CD4040
-	popmessage("octave %d tone %d clk %d", octave, tone, INT_CLOCK);
 
 	//                             C9   B8   A8#  A8   G8#  G8   F8#  F8   E8   D8#  D8   C8#
 	const int FREQOUT[16] = { 478, 239, 253, 268, 284, 301, 319, 338, 358, 379, 402, 426, 451, 478, 478, 478 };
@@ -571,12 +570,18 @@ void stella8085_state::dicemstr(machine_config &config)
 	I8085A(config, m_maincpu, 10.240_MHz_XTAL / 2); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4109_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4087_map);
+	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
 
 	I8256(config, m_uart, 10.240_MHz_XTAL / 2); // divider not verified
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
+	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
 
 	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
+	m_kdc->out_bd_callback().set(FUNC(stella8085_state::kbd_bd_w));
 	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
 	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
 	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
