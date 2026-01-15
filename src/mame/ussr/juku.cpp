@@ -792,25 +792,30 @@ ROM_START( juku )
 	ROM_SYSTEM_BIOS(1, "3.42_24", "Disk/Net \\w JUSS keyb (3.42 #0024)")
 	ROMX_LOAD("ekta24.bin", 0x0000, 0x4000, CRC(6ce7ee3b) SHA1(a7185d747c94cd519868692ed3d10fade90dd6d5), ROM_BIOS(1))
 
+	// RomBios 3.43m with with Janet 1.2/Bootstrap 4.1
+	// Id: "EktaSoft '88  Serial #0031"
+	ROM_SYSTEM_BIOS(2, "3.43m_31", "Disk/Net (3.43 #0031)")
+	ROMX_LOAD("ekta31.bin", 0x0000, 0x4000, CRC(761cfa16) SHA1(73d62c032be1de06c0dd5618f4abccd4d0f3a329), ROM_BIOS(2))
+
 	// RomBios 2.43m with TapeBios/Bootstrap 4.1, screen 53x24 (true E5101?)
 	// Id: "EktaSoft '88  Serial #0032"
-	ROM_SYSTEM_BIOS(2, "2.43m_32", "Tape/Disk (2.43m #0032)")
-	ROMX_LOAD("ekta32.bin", 0x0000, 0x4000, CRC(72c0da53) SHA1(57311d53f6fe1e87e0755990f400253caccd4795), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "2.43m_32", "Tape/Disk (2.43m #0032)")
+	ROMX_LOAD("ekta32.bin", 0x0000, 0x4000, CRC(72c0da53) SHA1(57311d53f6fe1e87e0755990f400253caccd4795), ROM_BIOS(3))
 
 	// RomBios 3.43m with Janet 1.2/Bootstrap 4.1, screen 53x24 from Juss prototype (E5103?)
 	// Id: "EktaSoft '88  Serial #0035"
-	ROM_SYSTEM_BIOS(3, "3.43m_35", "Disk/Net \\w JUSS keyb (3.43m #0035)")
-	ROMX_LOAD("ekta35.bin", 0x0000, 0x4000, CRC(85a017bc) SHA1(7aa03497d88cfab9315aa3987765bc06ecb70013), ROM_BIOS(3))
+	ROM_SYSTEM_BIOS(4, "3.43m_35", "Disk/Net \\w JUSS keyb (3.43m #0035)")
+	ROMX_LOAD("ekta35.bin", 0x0000, 0x4000, CRC(85a017bc) SHA1(7aa03497d88cfab9315aa3987765bc06ecb70013), ROM_BIOS(4))
 
 	// RomBios 3.43m with Janet 1.2/Bootstrap 4.1 from widespread Baltijets batch (E5104)
 	// Id: "EktaSoft '88  Serial #0037"
-	ROM_SYSTEM_BIOS(4, "3.43m_37", "Disk/Net (3.43m #0037)")
-	ROMX_LOAD("ekta37.bin", 0x0000, 0x4000, CRC(2c1c9cad) SHA1(29366d74c0e27129f2484a973f7a6de659b90cf4), ROM_BIOS(4))
+	ROM_SYSTEM_BIOS(5, "3.43m_37", "Disk/Net (3.43m #0037)")
+	ROMX_LOAD("ekta37.bin", 0x0000, 0x4000, CRC(2c1c9cad) SHA1(29366d74c0e27129f2484a973f7a6de659b90cf4), ROM_BIOS(5))
 
 	// RomBios 2.43m with TapeBios/Bootstrap 4.1, screen 53x24, modified for IBM AT keyboard (homebrew)
 	// Id: "EktaSoft '90  Serial #0043"
-	ROM_SYSTEM_BIOS(5, "2.43m_43", "Tape/Disk \\w AT keyb (2.43m #0043)")
-	ROMX_LOAD("ekta43.bin", 0x0000, 0x4000, CRC(05678f9f) SHA1(a7419bfd8249871cc7dbf5c6ea85022d6963fc9a), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "2.43m_43", "Tape/Disk \\w AT keyb (2.43m #0043)")
+	ROMX_LOAD("ekta43.bin", 0x0000, 0x4000, CRC(05678f9f) SHA1(a7419bfd8249871cc7dbf5c6ea85022d6963fc9a), ROM_BIOS(6))
 
 	ROM_REGION(0x8000, "expcart", 0)
 
@@ -822,6 +827,7 @@ ROM_START( juku )
 	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(3))
 	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(4))
 	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(5))
+	ROMX_LOAD("jbasic11.bin", 0x0000, 0x2000, CRC(bdc471ca) SHA1(3d96ba589aa21d44412efb099a144fbe23a2f52f), ROM_BIOS(6))
 ROM_END
 
 } // anonymous namespace
