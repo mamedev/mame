@@ -3,7 +3,7 @@
 ## Status: IN PROGRESS
 
 Started: 2026-01-13
-Updated: 2026-01-16
+Updated: 2026-01-16 (SRAM format fix)
 
 ## Overview
 
@@ -967,8 +967,14 @@ print_state(sam.state, slot=7)
 #### ALG 1 (Diffusion)
 - **13 WACC instructions** - heaviest DAC contribution
 - **No WXY+WSP:** Relies on MIX values from previous slot (ALG 0)
-- **4 SRAM reads per frame**
+- **4 SRAM reads per frame** (WF=0x02 bank only)
 - Output clips heavily without attenuation
+
+**SRAM Format Fix (2026-01-16):** Initial implementation incorrectly treated SRAM as
+16-bit high/low byte pairs (like direct input). Fixed to use proper 8-bit format:
+- **SRAM storage:** `(12-bit >> 3) & 0xFF` (8-bit)
+- **SRAM read:** `sign_extend_8(sram_byte) << 3` (back to 12-bit)
+- The high/low byte split is ONLY for direct input (WF >= 0x80), not SRAM delay buffers
 
 #### ALG 2 (Delay Taps)
 - **3 WACC instructions** per slot (PC10, PC11, PC29)
