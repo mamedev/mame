@@ -29,16 +29,14 @@
 
 #include "emu.h"
 #include "spec_snqk.h"
-#include "spec_snqk_hrust.h"
 
+#include "bus/spectrum/ay/slot.h"
+#include "cpu/z80/z80.h"
+#include "hrust.h"
 #include "specpls3.h"
 #include "spec128.h"
 #include "spectrum.h"
 #include "timex.h"
-
-#include "bus/spectrum/ay/slot.h"
-#include "cpu/z80/z80.h"
-
 #include "ui/uimain.h"
 
 #include "corestr.h"
@@ -2557,6 +2555,7 @@ void spectrum_state::setup_spg(const u8 *snapdata, u32 snapsize)
 {
 	u16 data;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
+	hrust_decoder hrust;
 
 	data = snapdata[SPG_OFFSET + 0x2c];
 	if (BIT(data, 4, 4) != 1 || BIT(data, 0, 4) != 0) // just v1.0 for now
@@ -2612,7 +2611,7 @@ void spectrum_state::setup_spg(const u8 *snapdata, u32 snapsize)
 				break;
 
 			case 0x02:
-				hrust_decompress_block(space, &snapdata[data_offset], 0xc000 + offs, size);
+				hrust.decode(space, &snapdata[data_offset], 0xc000 + offs, size);
 				break;
 
 			default:

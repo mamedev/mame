@@ -1,69 +1,63 @@
 // license:BSD-3-Clause
 // copyright-holders:HalfElf, Andrei I. Holub
 
-#include "emu.h"
-#include "spec_snqk_hrust.h"
+#include "hrust.h"
 
-#include "spectrum.h"
 
-void spectrum_state::hrust_decompress_block(address_space &space, const u8 *source, u16 dest, u16 size)
+bb_stream::bb_stream(const u8 *src, int src_length)
 {
-	class bb_stream
+	m_base = m_read = src;
+
+	m_length = src_length;
+	m_offset = 0;
+	m_eof = false;
+
+	m_buffer = get_byte();
+	m_buffer += get_byte() << 8;
+}
+
+u8 bb_stream::get_byte()
+{
+	m_eof |= ((m_read - m_base) == m_length);
+	return m_eof ? 0 : *m_read++;
+}
+
+u8 bb_stream::get_bit()
+{
+	u8 bit = BIT(m_buffer, 15 - m_offset);
+	if (m_offset == 15)
 	{
-	private:
-		const u8 *m_base;
-		const u8 *m_read;
-		int m_offset;
-		int m_length;
-		bool m_eof;
-		u16 m_buffer;
+		m_buffer = get_byte();
+		m_buffer += get_byte() << 8;
+	}
+	m_offset = (m_offset + 1) & 0xf;
 
-	public:
-		bb_stream(const u8 *src, int src_length)
-		{
-			m_base = m_read = src;
+	return bit;
+}
 
-			m_length = src_length;
-			m_offset = 0;
-			m_eof = false;
+u8 bb_stream::get_bits(u8 n)
+{
+	u8 r = 0;
+	do
+	{
+		r = (r << 1) + get_bit();
+	} while (--n);
 
-			m_buffer = get_byte();
-			m_buffer += get_byte() << 8;
-		}
+	return r;
+}
 
-		u8 get_byte()
-		{
-			m_eof |= ((m_read - m_base) == m_length);
-			return m_eof ? 0 : *m_read++;
-		}
+bool bb_stream::overflow()
+{
+	return m_eof;
+}
 
-		u8 get_bit()
-		{
-			u8 bit = BIT(m_buffer, 15 - m_offset);
-			if (m_offset == 15)
-			{
-				m_buffer = get_byte();
-				m_buffer += get_byte() << 8;
-			}
-			m_offset = (m_offset + 1) & 0xf;
 
-			return bit;
-		}
+hrust_decoder::hrust_decoder()
+{
+}
 
-		u8 get_bits(u8 n)
-		{
-			u8 r = 0;
-			do
-			{
-				r = (r << 1) + get_bit();
-			} while (--n);
-
-			return r;
-		}
-
-		bool overflow() { return m_eof; }
-	};
-
+void hrust_decoder::decode(address_space &space, const u8 *source, u16 dest, u16 size)
+{
 	constexpr u8 mask[] = { 0, 0, 0xfc, 0xf8, 0xf0, 0xe0, 0xc0, 0x80, 0 };
 	u8 no_bits = 2;
 	bb_stream bitbuf(source, size);

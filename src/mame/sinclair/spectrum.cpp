@@ -782,7 +782,6 @@ void spectrum_state::spectrum_common(machine_config &config)
 	dma.in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
 	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 
-	/* devices */
 	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,spg,z80,zx"));
 	snapshot.set_load_callback(FUNC(spectrum_state::snapshot_cb));
 	snapshot.set_interface("spectrum_snapshot");
