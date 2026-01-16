@@ -172,6 +172,8 @@ void _3do_state::machine_start()
 
 	m_slow2_init();
 	m_uncle.rev = 0x03800000;
+
+	save_item(NAME(m_svf.sport));
 }
 
 void _3do_state::machine_reset()

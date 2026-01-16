@@ -36,9 +36,6 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 
 void clio_device::device_add_mconfig(machine_config &config)
 {
-	// TODO: convert to emu_timer(s), fix timing
-	TIMER(config, "timer_x16").configure_periodic(FUNC(clio_device::timer_x16_cb), attotime::from_hz(12000));
-
 	DSPP(config, m_dspp, DERIVED_CLOCK(1, 1));
 //	m_dspp->int_handler().set([this] (int state) { printf("%d\n", state); });
 //	m_dspp->dma_read_handler().set(FUNC(m2_bda_device::read_bus8));
@@ -55,11 +52,15 @@ void clio_device::device_start()
 //  m_revision = 0x04000000;
 	m_expctl = 0x80;    /* ARM has the expansion bus */
 
+	m_system_timer = timer_alloc(FUNC(clio_device::system_timer_cb), this);
+	m_dac_timer = timer_alloc(FUNC(clio_device::dac_update_cb), this);
+	m_dac_timer->adjust(attotime::from_hz(16.9345));
+
+	save_item(NAME(m_irq0));
+	save_item(NAME(m_irq1));
 	save_item(NAME(m_irq0_enable));
 	save_item(NAME(m_irq1_enable));
-
-	m_dac_timer = timer_alloc(FUNC(clio_device::dac_update), this);
-	m_dac_timer->adjust(attotime::from_hz(16.9345));
+	save_item(NAME(m_timer_ctrl));
 }
 
 void clio_device::device_reset()
@@ -67,6 +68,9 @@ void clio_device::device_reset()
 	m_cstatbits = 0x01; /* bit 0 = reset of clio caused by power on */
 
 	m_irq0_enable = m_irq1_enable = 0;
+	m_irq0 = m_irq1 = 0;
+	m_timer_ctrl = 0;
+	m_system_timer->adjust(attotime::never);
 }
 
 void clio_device::vint1_w(int state)
@@ -314,6 +318,7 @@ void clio_device::map(address_map &map)
 	map(0x0200, 0x020f).lrw32(
 		NAME([this] (offs_t offset) {
 			const u8 shift = (offset & 2) * 32;
+			// TODO: reading clears timer?
 			return m_timer_ctrl >> shift;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -324,6 +329,7 @@ void clio_device::map(address_map &map)
 			else
 				m_timer_ctrl |= mask;
 			LOGTIMER("timer control %s: %08x & %08x (shift=%d)\n", offset & 1 ? "clear" : "set", data, mem_mask, shift);
+			m_system_timer->adjust(m_timer_ctrl ? attotime::from_ticks(64, this->clock()) : attotime::never);
 		})
 	);
 	map(0x0220, 0x0223).lrw32(
@@ -565,51 +571,59 @@ void clio_device::request_fiq(uint32_t irq_req, uint8_t type)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( clio_device::timer_x16_cb )
+/*
+ * x--- "flablode" flag (unknown, is it even implemented?)
+ * -x-- cascade flag
+ * --x- reload flag
+ * ---x decrement flag (enable timer)
+ */
+TIMER_CALLBACK_MEMBER( clio_device::system_timer_cb )
 {
-	/*
-	    x--- fablode flag (wtf?)
-	    -x-- cascade flag
-	    --x- reload flag
-	    ---x decrement flag (enable)
-	*/
-	uint8_t timer_flag;
-	uint8_t carry_val;
+	u8 timer_flag;
+	u8 carry_val;
 
+	// TODO: carry behaviour on first timer with cascade enable
 	carry_val = 1;
 
 	for(int i = 0; i < 16; i++)
 	{
 		timer_flag = (m_timer_ctrl >> (i * 4)) & 0xf;
 
-		if(timer_flag & 1)
+		// TODO: confirm carry on non-sequential cascading
+		if(BIT(timer_flag, 0))
 		{
-			if(timer_flag & 4)
+			if(BIT(timer_flag, 2))
 				m_timer_count[i]-= carry_val;
 			else
 				m_timer_count[i]--;
 
-			if(m_timer_count[i] == 0xffffffff) // timer hit
+			// timer hit on underflows
+			if(BIT(m_timer_count[i], 31))
 			{
-				if(i & 1) // odd timer irq fires
+				// only odd numbered timers causes irqs
+				if(i & 1)
 					request_fiq(8 << (7 - (i >> 1)), 0);
 
 				carry_val = 1;
 
-				if(timer_flag & 2)
-				{
+				if(BIT(timer_flag, 1))
 					m_timer_count[i] = m_timer_backup[i];
-				}
 				else
+				{
+					m_timer_count[i] = 0xffff;
 					m_timer_ctrl &= ~(1 << (i * 4));
+				}
 			}
 			else
 				carry_val = 0;
 		}
 	}
+
+	// TODO: 64 or from spare register?
+	m_system_timer->adjust(m_timer_ctrl ? attotime::from_ticks(64, this->clock()) : attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(clio_device::dac_update)
+TIMER_CALLBACK_MEMBER(clio_device::dac_update_cb)
 {
 	m_dac_l(m_dspp->read_output_fifo());
 	m_dac_r(m_dspp->read_output_fifo());

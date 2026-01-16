@@ -7,7 +7,6 @@
 #pragma once
 
 #include "cpu/dspp/dspp.h"
-#include "machine/timer.h"
 #include "screen.h"
 
 class clio_device : public device_t
@@ -107,9 +106,10 @@ private:
 
 	void request_fiq(uint32_t irq_req, uint8_t type);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );
-	TIMER_CALLBACK_MEMBER( dac_update );
+	TIMER_CALLBACK_MEMBER( system_timer_cb );
+	TIMER_CALLBACK_MEMBER( dac_update_cb );
 	emu_timer *m_dac_timer;
+	emu_timer *m_system_timer;
 };
 
 DECLARE_DEVICE_TYPE(CLIO, clio_device)
