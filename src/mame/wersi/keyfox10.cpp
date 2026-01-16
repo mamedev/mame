@@ -1164,18 +1164,18 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
         return result & 0xFFF;
     }
 
-    // Check for SRAM access: WA[18:15] = 0 means SRAM address space (32KB)
-    // SRAM address: WF[6:0] << 8 | PHI[11:4] = 15 bits
-    // WAH0 = PHI[4] for sign extension control
+    // Check for SRAM access: WF < 0x80 means external SRAM (not input shift registers)
+    // SRAM WA0-WA14 connects to lower 15 bits of SAM's 20-bit address bus
+    // 15-bit SRAM address = (WF[2:0] << 12) | PHI[11:0]
+    // WAH0 = PHI[0] for sign extension control
     uint32_t wave = (offset >> 12) & 0xFF;   // WAVE[7:0]
     if (wave < 0x80) {
-        // SRAM access: build 15-bit address
-        uint32_t sram_addr = ((wave & 0x7F) << 8) | ((offset >> 4) & 0xFF);
-        //uint32_t sram_addr = ((wave & 0x7F) << 12) | (offset & 0xFFF);
+        // SRAM access: lower 15 bits of (WF << 12 | PHI)
+        uint32_t sram_addr = ((wave & 0x7) << 12) | (offset & 0xFFF);
         if (sram_addr < FX_SRAM_SIZE && m_fx_sram) {
             // Hardware: SRAM stores 8 bits, mapped to WDH10:WDH3
             // WDH0-2 are grounded (always 0)
-            // WDH11 sign extension depends on WAH0 (=PHI[4])
+            // WDH11 sign extension depends on WAH0 (=PHI[0])
             // IMPORTANT: Read as UNSIGNED to preserve bit pattern
             uint8_t sram_8bit = m_fx_sram[sram_addr] & 0xFF;
             int16_t result = ((int16_t)sram_8bit) << 3;  // Place at bits 10:3 (result is 0-2040)

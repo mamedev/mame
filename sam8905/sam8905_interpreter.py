@@ -345,8 +345,9 @@ class SAM8905Interpreter:
                 # Only write externally when WF indicates external memory (WF < 0x80)
                 # WF >= 0x80 is input sample address space, WF >= 0x100 is internal
                 if (s.wf & 0x1FF) < 0x80:
-                    # Build 15-bit address: WF[6:0] << 8 | PHI[11:4]
-                    ext_addr = ((s.wf & 0x7F) << 8) | ((s.phi >> 4) & 0xFF)
+                    # Build 15-bit SRAM address: lower 15 bits of (WF << 12 | PHI)
+                    # SRAM WA0-WA14 connects to SAM address bus bits 0-14
+                    ext_addr = ((s.wf & 0x7) << 12) | (s.phi & 0xFFF)
                     # Write data is Y register (12-bit signed)
                     ext_data = sign_extend_12(s.y)
                     # Pass phi for byte select tracking and pc for sequence identification

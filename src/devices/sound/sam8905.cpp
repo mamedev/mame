@@ -258,9 +258,10 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 			// Only write externally when WF indicates external memory (WF < 0x80)
 			// WF >= 0x80 is input sample address space, WF >= 0x100 is internal waveform
 			if ((m_wf & 0x1FF) < 0x80) {
-				// Build 15-bit address from WF[6:0] and PHI[11:4]
-				// 32KB = 15 bits: WF[6:0] << 8 | PHI[7:0]
-				uint32_t ext_addr = ((m_wf & 0x7F) << 8) | ((m_phi >> 4) & 0xFF);
+				// Build 15-bit SRAM address: lower 15 bits of (WF << 12 | PHI)
+				// SRAM WA0-WA14 connects to SAM address bus bits 0-14
+				// 32KB = 15 bits: WF[2:0] << 12 | PHI[11:0]
+				uint32_t ext_addr = ((m_wf & 0x7) << 12) | (m_phi & 0xFFF);
 				// Write data is from Y register (12-bit signed)
 				int16_t ext_data = m_y & 0xFFF;
 				// Sign extend to 16-bit for callback
