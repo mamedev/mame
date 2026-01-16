@@ -29115,8 +29115,17 @@ pokrwild
 rodent
 
 @source:misc/3do.cpp
-3do
-3do_pal
+3do_fc1
+3do_fc2
+3do_fz1
+3do_fz1e
+3do_fz1j
+3do_fz10
+3do_fz10e
+3do_fz10j
+3do_gdo101
+3do_hc21
+3do_try
 3dobios
 alg3do
 md23do
