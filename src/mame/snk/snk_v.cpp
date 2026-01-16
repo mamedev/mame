@@ -192,8 +192,6 @@ void snk_state::register_save_state()
 	save_item(NAME(m_sp32_scrollx));
 	save_item(NAME(m_sp32_scrolly));
 	save_item(NAME(m_sprite_split_point));
-	save_item(NAME(m_num_sprites));
-	save_item(NAME(m_yscroll_mask));
 	save_item(NAME(m_bg_tile_offset));
 	save_item(NAME(m_tx_tile_offset));
 	save_item(NAME(m_drawmode_table));
@@ -253,7 +251,6 @@ void marvins_state::video_start()
 
 	m_tx_tile_offset = 0;
 
-	save_item(NAME(m_fg_videoram));
 	save_item(NAME(m_fg_scrollx));
 	save_item(NAME(m_fg_scrolly));
 }
