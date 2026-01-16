@@ -100,10 +100,11 @@ class SAM8905Interpreter:
         # External waveform callback: (address) -> 12-bit sample
         self.waveform_read: Optional[Callable[[int], int]] = None
 
-        # External waveform write callback: (address, data, phi) -> None
+        # External waveform write callback: (address, data, phi, pc) -> None
         # Used for SRAM writes via WWE (Waveform Write Enable)
         # phi[0] indicates byte select: 0=high byte, 1=low byte
-        self.waveform_write: Optional[Callable[[int, int, int], None]] = None
+        # pc is the program counter (instruction index) that triggered the write
+        self.waveform_write: Optional[Callable[[int, int, int, int], None]] = None
 
     def reset(self):
         """Reset interpreter state."""
@@ -348,9 +349,9 @@ class SAM8905Interpreter:
                     ext_addr = ((s.wf & 0x7F) << 8) | ((s.phi >> 4) & 0xFF)
                     # Write data is Y register (12-bit signed)
                     ext_data = sign_extend_12(s.y)
-                    # Pass phi for byte select tracking (phi[0] = byte select)
-                    self.waveform_write(ext_addr, ext_data, s.phi)
-                    changes['wwe'] = {'addr': ext_addr, 'data': ext_data, 'phi': s.phi}
+                    # Pass phi for byte select tracking and pc for sequence identification
+                    self.waveform_write(ext_addr, ext_data, s.phi, pc)
+                    changes['wwe'] = {'addr': ext_addr, 'data': ext_data, 'phi': s.phi, 'pc': pc}
 
         # WWF (bit 1)
         if not (inst & 0x02):
