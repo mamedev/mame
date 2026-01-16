@@ -262,33 +262,33 @@ PC62-PC63 are reserved system instructions (not executed by algorithm).
 
 ```python
 dram_slot4 = [
-    0x00000,  # word 0: 
-    0x50080,  # word 1: DPHI/config
-    0x00400,  # word 2: WWF config
-    0x40000,  # word 3: Config
-    0x00080,  # word 4: Config
-    0x00000,  # word 5: Accumulator
-    0x7FFFF,  # word 6: (Max amplitude - says claude ???) [val=-1]
-    0x40402,  # word 7: WWF/address
-    0x00100,  # word 8: PHI increment
-    0x00080,  # word 9: Config
-    0x00180,  # word 10: Config
-    0x0007C,  # word 11: Feedback coef [val=124]
-    0x00000,  # word 12: accumulator state???
-    0x00000,  # word 13
-    0x00000,  # word 14
-    0x34080,  # word 15: IDLE=0, ALG=0
+    0x00000,  # word 0: Zero constant (Y init, PHI reset)
+    0x50080,  # word 1: SRAM address config (WF=0x50, PHI base)
+    0x00400,  # word 2: SRAM read address for final output
+    0x40000,  # word 3: Phase offset = -262144 (most negative 19-bit)
+    0x00080,  # word 4: Working register (gets cleared at PC46)
+    0x00000,  # word 5: Delayed sample accumulator
+    0x7FFFF,  # word 6: -1 constant [val=-1, for saturation check]
+    0x40402,  # word 7: SRAM bank select config
+    0x00100,  # word 8: Delay line base pointer
+    0x00080,  # word 9: Delay increment 1
+    0x00180,  # word 10: Delay increment 2 / phase offset
+    0x0007C,  # word 11: Signal amplitude state [val=124, doubles to 248]
+    0x00000,  # word 12: Initial A value (added to D[11])
+    0x00000,  # word 13: Working buffer / final output destination
+    0x00000,  # word 14: Product storage
+    0x34080,  # word 15: 011 0100 0000 1000 0000  SRAM config + IDLE=0, ALG=0
 ]
 ```
 
 ```
 ; === INITIALIZATION PHASE (PC00-PC09) ===
 PC00: 00F7  RM    0, <WXY>                    ; Y = D[0] = 0 ?, X = last rom value ???
-PC01: 607F  RM   12, <WA>                     ; A = D[12] (accumulator state)
-PC02: 58BF  RM   11, <WB>                     ; B = D[11] (feedback coefficient)
-PC03: 5A5F  RADD 11, <WA, WM>                 ; D[11] = A+B, A = result (accumulate feedback), WA without WSP sets CLEARRQST
-PC04: 30BF  RM    6, <WB>                     ; B = D[6] -> add -1
-PC05: 5DDF  RP   11, <WM> [WSP]               ; D[11] = X*Y IF CLEARRQST AND NOT CARRY
+PC01: 607F  RM   12, <WA>                     ; A = D[12] = 0 (initial value for D[11] calc)
+PC02: 58BF  RM   11, <WB>                     ; B = D[11] = 124 (amplitude state)
+PC03: 5A5F  RADD 11, <WA, WM>                 ; D[11] = A+B = 124, sets CLEARRQST (WA without WSP)
+PC04: 30BF  RM    6, <WB>                     ; B = D[6] = -1 (for saturation check)
+PC05: 5DDF  RP   11, <WM> [WSP]               ; D[11] = X*Y IF CLEARRQST=1 AND CARRY=0 (saturate when result≤0)
 PC06: 082D  RM    1, <WA, WB, WPHI, WWF>      ; Load PHI,WF from D[1] (SRAM address config)
 PC07: 593F  RM   11, <WA, WB> [WSP]           ; A=B=D[11] (scaled sample)
 PC08: 5ADF  RADD 11, <WM>                     ; D[11] = A+B (double for mixing)
@@ -301,7 +301,7 @@ PC12: 48BF  RM    9, <WB>                     ; B = D[9] (delay increment)
 PC13: 58F7  RM   11, <WXY>                    ; Reload XY from D[11]
 PC14: 42DF  RADD  8, <WM>                     ; D[8] = A+B (advance delay pointer)
 PC15: 749F  RP   14, <WB, WM>                 ; D[14] = product, B = product
-PC16: 68F7  RM   13, <WXY>                    ; Load XY from D[13]
+PC16: 68F7  RM   13, <WXY>                    ; Load XY from D[13]               --- this writes Y to sram I guess
 
 ; === SRAM WRITE SEQUENCE (PC17-PC22) ===
 PC17: 38FD  RM    7, <WWF>                    ; WWF = D[7] (SRAM bank select)
@@ -325,7 +325,7 @@ PC31: 7A3F  RADD 15, <WA, WB>                 ; A = B = A+B (32x) - amplitude ra
 ; === SRAM READ AND OUTPUT (PC32-PC47) ===
 PC32: 7A3F  RADD 15, <WA, WB>                 ; Continue amplitude ramp (64x)
 PC33: 7A3F  RADD 15, <WA, WB>                 ; (128x)
-PC34: 7AF7  RADD 15, <WXY>                    ; XY = A+B result - SRAM READ via WXY
+PC34: 7AF7  RADD 15, <WXY>                    ; XY = A+B result - SRAM READ via WXY  --- this writes Y to sram I guess
 PC35: 7FFB  RSP  15, <clrB> [WSP]             ; WWE - write back to SRAM
 PC36: 7FFB  RSP  15, <clrB> [WSP]             ; Second write
 PC37: 7EFB  RSP  15, <clrB>                   ; Settling
@@ -335,25 +335,27 @@ PC40: 78FD  RM   15, <WWF>                    ; WWF = D[15] (another SRAM bank)
 PC41: 18EF  RM    3, <WPHI>                   ; PHI = D[3]
 PC42: 58F7  RM   11, <WXY>                    ; XY = D[11] - SRAM READ
 PC43: 7FFF  RSP  15, <-> [WSP]                ; Sync
-PC44: 50EF  RM   10, <WPHI>                   ; PHI = D[10]
+
+PC44: 50EF  RM   10, <WPHI>                   ; PHI = D[10]  - updates X if external waveform?
 PC45: 08FD  RM    1, <WWF>                    ; WWF = D[1]
 PC46: 24DF  RSP   4, <WM>                     ; D[4] = 0 (RSP emits 0)
 PC47: 7FFF  RSP  15, <-> [WSP]                ; Sync
 
 ; === FINAL PROCESSING (PC48-PC61) ===
-PC48: 20F7  RM    4, <WXY>                    ; XY = D[4] - READ for output mix
+PC48: 20F7  RM    4, <WXY>                    ; Y = D[4], X = ??? 
 PC49: 287F  RM    5, <WA>                     ; A = D[5]
-PC50: 00EF  RM    0, <WPHI>                   ; PHI = D[0]
-PC51: 7CBF  RP   15, <WB>                     ; B = product
+PC50: 00EF  RM    0, <WPHI>                   ; PHI = D[0]  --- updates X if external waveform?
+PC51: 7CBF  RP   15, <WB>                     ; B = product --- put input sample (byte 1) on bus and B?
 PC52: 2ADF  RADD  5, <WM>                     ; D[5] = A+B
-PC53: 20F7  RM    4, <WXY>                    ; XY = D[4]
+PC53: 20F7  RM    4, <WXY>                    ; Y = D[4], X = ???
 PC54: 707F  RM   14, <WA>                     ; A = D[14]
 PC55: 7CBF  RP   15, <WB>                     ; B = product
+
 PC56: 28EF  RM    5, <WPHI>                   ; PHI = D[5]
 PC57: 78FD  RM   15, <WWF>                    ; WWF = D[15]
 PC58: 10F7  RM    2, <WXY>                    ; XY = D[2] - FINAL READ
-PC59: 7A7F  RADD 15, <WA>                     ; A = A+B
-PC60: 7CBF  RP   15, <WB>                     ; B = product
+PC59: 7A7F  RADD 15, <WA>                     ; A = A+B     --- store B in A
+PC60: 7CBF  RP   15, <WB>                     ; B = product --- put input sample (byte) on bus and B? 
 PC61: 6A5B  RADD 13, <WA, WM, clrB>           ; D[13] = A+B, clear B (output to buffer)
 ; PC62-63: Reserved
 ```
