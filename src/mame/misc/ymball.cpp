@@ -116,5 +116,5 @@ ROM_START( ymball )
 } // anonymous namespace
 
 
-//    YEAR  NAME        PARENT   MACHINE   INPUT      STATE          INIT        ROT   COMPANY  FULLNAME              FLAGS
+//    YEAR  NAME        PARENT   MACHINE     INPUT    STATE             INIT        ROT   COMPANY       FULLNAME                       FLAGS
 GAME( 2003, ymball,     0,       ymball,     ymball,  ymball_state,     empty_init, ROT0, "Feitalin",   "Feitalin Game Square",        MACHINE_NOT_WORKING | MACHINE_NO_SOUND  | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK  )
