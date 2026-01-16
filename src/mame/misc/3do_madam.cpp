@@ -28,6 +28,9 @@ DEFINE_DEVICE_TYPE(MADAM, madam_device, "madam", "3DO MN7A020UDA \"Madam\" Addre
 madam_device::madam_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MADAM, tag, owner, clock)
 	, m_diag_cb(*this)
+	, m_dma_read_cb(*this, 0)
+	, m_dma_write_cb(*this)
+	, m_irq_dply_cb(*this)
 {
 }
 
@@ -45,6 +48,8 @@ void madam_device::device_start()
 	m_revision = 0x01020200;
 	m_msysbits = 0x51;
 
+	m_dma_playerbus_timer = timer_alloc(FUNC(madam_device::dma_playerbus_cb), this);
+
 	save_item(NAME(m_pip));
 	save_item(NAME(m_fence));
 	save_item(NAME(m_mmu));
@@ -53,6 +58,8 @@ void madam_device::device_start()
 
 void madam_device::device_reset()
 {
+	m_mctl = 0;
+	m_dma_playerbus_timer->adjust(attotime::never);
 }
 
 // $0330'0000 base
@@ -73,14 +80,7 @@ void madam_device::map(address_map &map)
 			COMBINE_DATA(&m_msysbits);
 		})
 	);
-	map(0x0008, 0x000b).lrw32(
-		NAME([this] () { return m_mctl; }),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			if (data != 0x0001e000)
-				LOG("mctl: %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_mctl);
-		})
-	);
+	map(0x0008, 0x000b).rw(FUNC(madam_device::mctl_r), FUNC(madam_device::mctl_w));
 	map(0x000c, 0x000f).lrw32(
 		NAME([this] () { return m_sltime; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -287,14 +287,16 @@ void madam_device::map(address_map &map)
 	);
 	map(0x0400, 0x05ff).lrw32(
 		NAME([this] (offs_t offset) {
-			const u16 channel = offset >> 2;
-			// TODO: only bits 23 to 2 are settable, returns 0 on reads
-			return m_dma[channel & 0x1f][offset & 0x03];
+			const u16 channel = (offset >> 2) & 0x1f;
+			const u8 reg = offset & 3;
+			return m_dma[channel][reg] & 0x1f'fffc;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			const u16 channel = offset >> 2;
-			LOGDMA("DMA [%d] reg [%02x]: %08x & %08x\n", channel, offset & 3, data, mem_mask);
-			COMBINE_DATA(&m_dma[channel & 0x1f][offset & 0x03]);
+			const u16 channel = (offset >> 2) & 0x1f;
+			const u8 reg = offset & 3;
+			LOGDMA("DMA [%d] reg [%02x]: %08x & %08x\n", channel, reg, data, mem_mask);
+			COMBINE_DATA(&m_dma[channel][reg]);
+			m_dma[channel][reg] &= 0x1f'fffc;
 		})
 	);
 	/* Hardware multiplier */
@@ -323,5 +325,72 @@ void madam_device::map(address_map &map)
 	);
 	map(0x07f8, 0x07fb).lr32(NAME([this] () { return m_mult_status; }));
 //	map(0x07fc, 0x07ff) start process
+}
+
+u32 madam_device::mctl_r()
+{
+	return m_mctl;
+}
+
+/*
+ * $0330'0008 MCTL (Green)
+ * ---- ---- --x- ---- ---- ---- ---- ---- CPUVEN
+ * ---- ---- ---P ---- ---- ---- ---- ---- NTSC/PAL (on Preen chipset, unused on Green)
+ * ---- ---- ---- x--- ---- ---- ---- ---- FENCOP
+ * ---- ---- ---- --x- ---- ---- ---- ---- SLIPXEN
+ * ---- ---- ---- ---x ---- ---- ---- ---- FENCEEN
+ * ---- ---- ---- ---- x--- ---- ---- ---- PLAYXEN
+ * ---- ---- ---- ---- -x-- ---- ---- ---- VSCTXEN
+ * ---- ---- ---- ---- --x- ---- ---- ---- CLUTXEN
+ */
+void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		if (!BIT(m_mctl, 15) && BIT(data, 15))
+			m_dma_playerbus_timer->adjust(attotime::from_ticks(2, this->clock()));
+		if (BIT(m_mctl, 15) && !BIT(data, 15))
+		{
+			LOG("mctl: Player bus DMA abort?\n");
+			m_dma_playerbus_timer->adjust(attotime::never);
+		}
+	}
+
+	if (data != 0x0001e000)
+		LOG("mctl: %08x & %08x\n", data, mem_mask);
+	COMBINE_DATA(&m_mctl);
+}
+
+TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
+{
+	if (!BIT(m_mctl, 15))
+		return;
+
+	u32 count = m_dma[23][1];
+
+	if (BIT(count, 31))
+	{
+		m_mctl &= ~0x8000;
+		m_irq_dply_cb(1);
+		m_dma_playerbus_timer->adjust(attotime::never);
+		return;
+	}
+
+	// TODO: from RAM should likely first obtain the serial data from the controller(s)
+	// TODO: should cause a privbits exception if mask outside bounds
+	u32 src = m_dma[23][2];
+	u32 dst = m_dma[23][0];
+
+	const u32 data = m_dma_read_cb(src);
+	m_dma_write_cb(dst, data);
+
+	count -= 4;
+	src += 4;
+	dst += 4;
+	m_dma[23][0] = dst;
+	m_dma[23][1] = count;
+	m_dma[23][2] = src;
+
+	m_dma_playerbus_timer->adjust(attotime::from_ticks(2, this->clock()));
 }
 

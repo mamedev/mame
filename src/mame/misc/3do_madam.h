@@ -12,7 +12,10 @@ public:
 	// construction/destruction
 	madam_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	auto diag_cb() { return m_diag_cb.bind(); }
+	auto diag_cb()            { return m_diag_cb.bind(); }
+	auto dma_read_cb()        { return m_dma_read_cb.bind(); }
+	auto dma_write_cb()       { return m_dma_write_cb.bind(); }
+	auto irq_dply_cb()        { return m_irq_dply_cb.bind(); }
 
 	void map(address_map &map);
 
@@ -23,7 +26,10 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	devcb_write8 m_diag_cb;
+	devcb_write8     m_diag_cb;
+	devcb_read32     m_dma_read_cb;
+	devcb_write32    m_dma_write_cb;
+	devcb_write_line m_irq_dply_cb;
 
 	uint32_t  m_revision = 0;       /* 03300000 */
 	uint32_t  m_msysbits = 0;       /* 03300004 */
@@ -57,6 +63,12 @@ private:
 	uint32_t  m_mult[40]{};         /* 03300600-0330069c */
 	uint32_t  m_mult_control = 0;   /* 033007f0-033007f4 */
 	uint32_t  m_mult_status = 0;    /* 033007f8 */
+
+	u32 mctl_r();
+	void mctl_w(offs_t offset, u32 data, u32 mem_mask);
+
+	TIMER_CALLBACK_MEMBER(dma_playerbus_cb);
+	emu_timer *m_dma_playerbus_timer;
 };
 
 DECLARE_DEVICE_TYPE(MADAM, madam_device)

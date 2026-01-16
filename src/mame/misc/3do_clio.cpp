@@ -78,6 +78,12 @@ void clio_device::vint1_w(int state)
 	}
 }
 
+void clio_device::dply_w(int state)
+{
+	if (state)
+		request_fiq(1 << 0, 1);
+}
+
 void clio_device::xbus_rdy_w(int state)
 {
 	//if ((m_sel & 0x0f) == 0)
@@ -565,9 +571,9 @@ TIMER_DEVICE_CALLBACK_MEMBER( clio_device::timer_x16_cb )
 
 	carry_val = 1;
 
-	for(int i = 0;i < 16; i++)
+	for(int i = 0; i < 16; i++)
 	{
-		timer_flag = (m_timer_ctrl >> i*4) & 0xf;
+		timer_flag = (m_timer_ctrl >> i * 4) & 0xf;
 
 		if(timer_flag & 1)
 		{
@@ -579,7 +585,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( clio_device::timer_x16_cb )
 			if(m_timer_count[i] == 0xffffffff) // timer hit
 			{
 				if(i & 1) // odd timer irq fires
-					request_fiq(8 << (7-(i >> 1)), 0);
+					request_fiq(8 << (7 - (i >> 1)), 0);
 
 				carry_val = 1;
 
@@ -588,7 +594,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( clio_device::timer_x16_cb )
 					m_timer_count[i] = m_timer_backup[i];
 				}
 				else
-					m_timer_ctrl &= ~(1 << i*4);
+					m_timer_ctrl &= ~(1 << (i * 4));
 			}
 			else
 				carry_val = 0;

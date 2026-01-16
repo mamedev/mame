@@ -184,6 +184,16 @@ void _3do_state::green_config(machine_config &config)
 				printf("%c", data & 0xff);
 		}
 	});
+	m_madam->dma_read_cb().set([this] (offs_t offset) {
+		address_space &space = m_maincpu->space();
+		u32 ret = space.read_dword(offset, 0xffff'ffff);
+		return ret;
+	});
+	m_madam->dma_write_cb().set([this] (offs_t offset, u32 data) {
+		address_space &space = m_maincpu->space();
+		space.write_dword(offset, data, 0xffff'ffff);
+	});
+	m_madam->irq_dply_cb().set(m_clio, FUNC(clio_device::dply_w));
 
 	CLIO(config, m_clio, XTAL(50'000'000)/4);
 	m_clio->firq_cb().set([this] (int state) {
