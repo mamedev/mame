@@ -18,7 +18,7 @@ X2 10.738M - mcu
 X3 3.57mhz - OPLL 
 
 Todo:
-Seem to be stuck at 378 ljmp loop - waiting for timer?. 
+Loop at 378 ljmp loop. waiting for timer?. 
 
 */
 
@@ -96,7 +96,7 @@ void ymball_state::ymball(machine_config &config)
    	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	
-	ym2413_device &opll(YM2413(config, "opll", 3.579545_MHz_XTAL)); // X3 3.57mhz
+	ym2413_device &opll(YM2413(config, "opll", 3.579545_MHz_XTAL)); // Actual cpu is W78E052C40DL. X3 3.57mhz
 	opll.add_route(ALL_OUTPUTS, "mono", 1.0);
 	OKIM6295(config, m_oki,  XTAL(10'738'635) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.00);  // Clock frequency & pin 7 not verified
 
