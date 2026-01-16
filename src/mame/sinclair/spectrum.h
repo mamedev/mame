@@ -207,8 +207,6 @@ protected:
 	void setup_frz(const uint8_t *snapdata, uint32_t snapsize);
 	void z80_decompress_block(address_space &space, const uint8_t *source, uint16_t dest, uint16_t size);
 	void setup_z80(const uint8_t *snapdata, uint32_t snapsize);
-	void hrust_decompress_block(address_space &space, const u8 *source, u16 dest, u16 size);
-	void mlz_decompress_block(address_space &space, const u8 *source, u16 dest, u16 size);
 	void setup_spg(const u8 *snapdata, u32 snapsize);
 	// quickload helpers
 	void log_quickload(const char *type, uint32_t start, uint32_t length, uint32_t exec, const char *exec_format);

@@ -2404,146 +2404,6 @@ void spectrum_state::setup_z80(const uint8_t *snapdata, uint32_t snapsize)
 	}
 }
 
-void spectrum_state::mlz_decompress_block(address_space &space, const u8 *source, u16 dest, u16 size)
-{
-	class de_mlz
-	{
-	private:
-		address_space &m_space;
-		const u8 *m_src;
-		u16 m_to;
-		u8 m_buffer;
-		int m_buffer_size;
-
-	public:
-		de_mlz(address_space &space, const u8 *src, u16 dst) : m_space(space)
-		{
-			m_src = src;
-			m_to = dst;
-		}
-
-		void init_bitstream()
-		{
-			m_buffer = get_byte();
-			m_buffer_size = 8;
-		}
-
-		u8 get_byte()
-		{
-			return *m_src++;
-		}
-
-		void put_byte(u8 val)
-		{
-			m_space.write_byte(m_to++, val);
-		}
-
-		void repeat(u32 disp, int num)
-		{
-			for (int i = 0; i < num; i++)
-			{
-				u8 val = m_space.read_byte(m_to - disp);
-				put_byte(val);
-			}
-		}
-
-		// gets specified number of bits from bitstream
-		// returns them LSB-aligned
-		u32 get_bits(int count)
-		{
-			u32 bits = 0;
-			while (count--)
-			{
-				if (m_buffer_size--)
-				{
-					bits <<= 1;
-					bits |= 1 & (m_buffer >> 7);
-					m_buffer <<= 1;
-				}
-				else
-				{
-					init_bitstream();
-					count++; // repeat loop once more
-				}
-			}
-
-			return bits;
-		}
-
-		int get_bigdisp()
-		{
-			u32 bits;
-
-			// inter displacement
-			if (get_bits(1))
-			{
-				bits = get_bits(4);
-				return 0x1100 - (bits << 8) - get_byte();
-			}
-
-			// shorter displacement
-			else
-				return 256 - get_byte();
-		}
-	};
-
-	de_mlz s(space, source, dest);
-	u32 done = 0;
-	int i;
-
-	// get first byte of packed file and write to output
-	s.put_byte(s.get_byte());
-
-	// second byte goes to bitstream
-	s.init_bitstream();
-
-	// actual depacking loop!
-	do
-	{
-		// get 1st bit - either OUTBYTE or beginning of LZ code
-		// OUTBYTE
-		if (s.get_bits(1))
-			s.put_byte(s.get_byte());
-
-		// LZ code
-		else
-		{
-			switch (s.get_bits(2))
-			{
-			case 0: // 000
-				s.repeat(8 - s.get_bits(3), 1);
-				break;
-
-			case 1: // 001
-				s.repeat(256 - s.get_byte(), 2);
-				break;
-
-			case 2: // 010
-				s.repeat(s.get_bigdisp(), 3);
-				break;
-
-			case 3: // 011
-				// extract num of length bits
-				for (i = 1; !s.get_bits(1); i++)
-					;
-
-				// check for exit code
-				if (i == 9)
-				{
-					done = 1;
-				}
-				else if (i <= 7)
-				{
-					// get length bits itself
-					int bits = s.get_bits(i);
-					s.repeat(s.get_bigdisp(), 2 + (1 << i) + bits);
-				}
-				break;
-			}
-		}
-	} while (!done);
-}
-
 /*
 	Load a .SPG (Spectrum Prog) file.
 
@@ -2607,7 +2467,8 @@ void spectrum_state::setup_spg(const u8 *snapdata, u32 snapsize)
 				break;
 
 			case 0x01:
-				mlz_decompress_block(space, &snapdata[data_offset], 0xc000 + offs, size);
+				logerror("Unsupported MegaLZ compressed");
+				return;
 				break;
 
 			case 0x02:
