@@ -194,7 +194,6 @@ void snk_state::register_save_state()
 	save_item(NAME(m_sprite_split_point));
 	save_item(NAME(m_bg_tile_offset));
 	save_item(NAME(m_tx_tile_offset));
-	save_item(NAME(m_drawmode_table));
 }
 
 VIDEO_START_MEMBER(snk_state,_3bpp_shadow)
