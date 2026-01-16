@@ -397,8 +397,11 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 
 		// Fire sample output callback for inter-chip audio (FX processing)
 		if (!m_sample_output.isunset()) {
+			// Clamp accumulator values to 16-bit signed range (same as DAC output)
+			int32_t l_clamped = std::clamp((int32_t)m_l_acc, -32768, 32767);
+			int32_t r_clamped = std::clamp((int32_t)m_r_acc, -32768, 32767);
 			// Pack L/R as 32-bit value: upper 16 = L, lower 16 = R
-			uint32_t packed = ((m_l_acc & 0xFFFF) << 16) | (m_r_acc & 0xFFFF);
+			uint32_t packed = ((l_clamped & 0xFFFF) << 16) | (r_clamped & 0xFFFF);
 			m_sample_output(packed);
 		}
 	}

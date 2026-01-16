@@ -1108,13 +1108,14 @@ void keyfox10_state::sam_fx_waveform_w(offs_t offset, u16 data)
     if (offset < FX_SRAM_SIZE) {
         // Hardware: SRAM stores only 8 bits (bits 10:3 of 12-bit SAM data)
         // SAM outputs 12-bit data, SRAM captures D7:D0 from WDH10:WDH3
-        int8_t data_8bit = (data >> 3) & 0xFF;
+        // IMPORTANT: Store as UNSIGNED to preserve bit pattern (0xFF = 255, not -1)
+        uint8_t data_8bit = (data >> 3) & 0xFF;
         m_fx_sram[offset] = data_8bit;
 
         // Debug: trace significant SRAM writes (values > threshold)
         static int sram_write_trace = 0;
-        if (data_8bit != 0 && (data_8bit > 10 || data_8bit < -10) && sram_write_trace < 100) {
-            logerror("FX SRAM write: addr=%04X 12bit=%d 8bit=%d\n",
+        if (data_8bit != 0 && data_8bit > 10 && sram_write_trace < 100) {
+            logerror("FX SRAM write: addr=%04X 12bit=%d 8bit=%u\n",
                 offset, (int16_t)data, data_8bit);
             sram_write_trace++;
         }
@@ -1174,24 +1175,24 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
             // Hardware: SRAM stores 8 bits, mapped to WDH10:WDH3
             // WDH0-2 are grounded (always 0)
             // WDH11 sign extension depends on WAH0 (=PHI[4])
-            int8_t sram_8bit = m_fx_sram[sram_addr] & 0xFF;
-            int16_t result = ((int16_t)sram_8bit) << 3;  // Place at bits 10:3
+            // IMPORTANT: Read as UNSIGNED to preserve bit pattern
+            uint8_t sram_8bit = m_fx_sram[sram_addr] & 0xFF;
+            int16_t result = ((int16_t)sram_8bit) << 3;  // Place at bits 10:3 (result is 0-2040)
 
             // WAH0 = PHI[4] = (offset >> 4) & 1
             bool wah0 = (offset >> 4) & 1;
             if (!wah0) {
-                // WAH0=0: WDH11 = WDH10 (sign extension)
-                if (result & 0x400)
+                // WAH0=0: WDH11 = WDH10 (sign extension from bit 10)
+                // Bit 10 of result = bit 7 of sram_8bit
+                if (sram_8bit & 0x80)
                     result |= 0x800;
-            } else {
-                // WAH0=1: WDH11 = 0
-                result &= 0x7FF;
             }
+            // WAH0=1: WDH11 = 0 (already 0 from unsigned shift)
 
             // Debug: trace SRAM reads (limited)
             static int sram_read_trace = 0;
             if (sram_read_trace < 30) {
-                logerror("FX SRAM read: addr=%04X wah0=%d raw=%d result=%d\n",
+                logerror("FX SRAM read: addr=%04X wah0=%d raw=%u result=%d\n",
                     sram_addr, wah0, sram_8bit, (int16_t)result);
                 sram_read_trace++;
             }
@@ -1367,8 +1368,8 @@ void keyfox10_state::keyfox10(machine_config &config)
     SAM8905(config, m_sam_snd, 22'579'200);
     m_sam_snd->waveform_read_callback().set(FUNC(keyfox10_state::sam_snd_waveform_r));
     m_sam_snd->sample_output_callback().set(FUNC(keyfox10_state::sam_snd_sample_out));
-    m_sam_snd->add_route(0, "lspeaker", 0.0);  // Dry L - SILENCED FOR DEBUG
-    m_sam_snd->add_route(1, "rspeaker", 0.0);  // Dry R - SILENCED FOR DEBUG
+    m_sam_snd->add_route(0, "lspeaker", 1.0);  // Dry L - SILENCED FOR DEBUG
+    m_sam_snd->add_route(1, "rspeaker", 1.0);  // Dry R - SILENCED FOR DEBUG
 
     // SAM8905 FX - effects processor (at 0xE000 when T1=1)
     // FX chip has 32KB SRAM for delay/reverb buffers
