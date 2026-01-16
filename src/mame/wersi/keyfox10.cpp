@@ -1150,7 +1150,7 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
         // Sign extend bit 10 to bit 11 (for proper signed audio)
         // NOTE: Hardware may have asymmetric sign extension for L vs R,
         // but that would break audio. Applying symmetric extension for now.
-        if (result & 0x400)
+        if ((offset & 1) == 0 && (result & 0x400))
             result |= 0x800;
 
         // Debug: log non-zero input sample reads
@@ -1171,6 +1171,7 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
     if (wave < 0x80) {
         // SRAM access: build 15-bit address
         uint32_t sram_addr = ((wave & 0x7F) << 8) | ((offset >> 4) & 0xFF);
+        //uint32_t sram_addr = ((wave & 0x7F) << 12) | (offset & 0xFFF);
         if (sram_addr < FX_SRAM_SIZE && m_fx_sram) {
             // Hardware: SRAM stores 8 bits, mapped to WDH10:WDH3
             // WDH0-2 are grounded (always 0)
@@ -1180,7 +1181,9 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
             int16_t result = ((int16_t)sram_8bit) << 3;  // Place at bits 10:3 (result is 0-2040)
 
             // WAH0 = PHI[4] = (offset >> 4) & 1
-            bool wah0 = (offset >> 4) & 1;
+            //bool wah0 = (offset >> 4) & 1;
+            bool wah0 = (offset & 1);
+
             if (!wah0) {
                 // WAH0=0: WDH11 = WDH10 (sign extension from bit 10)
                 // Bit 10 of result = bit 7 of sram_8bit
