@@ -3,7 +3,7 @@
 ## Status: IN PROGRESS
 
 Started: 2026-01-13
-Updated: 2026-01-15
+Updated: 2026-01-16
 
 ## Overview
 
@@ -903,3 +903,150 @@ The algorithm computes feedback coefficients at runtime, not statically loaded.
 - [x] Trace signal flow through test harness
 - [x] Identify feedback coefficients (dynamic computation via RADD)
 - [ ] Investigate why real hardware doesn't clip (different MIX values? output stage?)
+
+## Jupyter Interpreter Testing
+
+### Overview
+
+The SAM8905 Python interpreter (`sam8905_interpreter.py`) can be used in Jupyter notebooks
+to analyze and debug individual algorithms without running the full MAME emulator.
+
+### Setup
+
+```bash
+cd sam8905
+jupyter notebook
+# Open notebooks/reverb_fx_alg*.ipynb
+```
+
+### Available Notebooks
+
+| Notebook | Algorithm | Slot | Purpose |
+|----------|-----------|------|---------|
+| `reverb_fx_alg0.ipynb` | ALG 0 (22kHz) | 4 | Input conditioning, SRAM writes |
+| `reverb_fx_alg1.ipynb` | ALG 1 (22kHz) | 5 | Diffusion, heavy DAC output |
+| `reverb_fx_alg2.ipynb` | ALG 2 (22kHz) | 7-11 | Delay taps, main reverb output |
+| `reverb_fx_alg3.ipynb` | ALG 3 (22kHz) | 6 | All-pass filter (muted) |
+
+### Basic Usage Pattern
+
+```python
+from sam8905_interpreter import SAM8905Interpreter, plot_waveform, print_state
+
+# Create interpreter
+sam = SAM8905Interpreter()
+
+# Load algorithm at correct A-RAM offset
+sam.load_aram(aram_alg2, offset=0x80)  # ALG 2 at 0x80
+
+# Load D-RAM for slot
+sam.load_dram(slot=7, words=dram_slot7)
+
+# Set external waveform callback for SRAM reads
+def waveform_read(addr):
+    # addr = (WF[7:0] << 12) | PHI[11:0]
+    return sram_buffer.get(addr, 0)
+
+sam.waveform_read = waveform_read
+
+# Run N frames
+samples = sam.run(500, active_slots=[7])
+
+# Visualize
+plot_waveform(samples)
+print_state(sam.state, slot=7)
+```
+
+### Key Findings from Notebook Analysis
+
+#### ALG 0 (Input Handler)
+- **SRAM writes:** 2 per frame (HIGH byte, LOW byte of 16-bit input)
+- **Address pattern:** PHI[0] selects byte (0=high, 1=low)
+- **No DAC output:** Purely writes to delay buffers
+
+#### ALG 1 (Diffusion)
+- **13 WACC instructions** - heaviest DAC contribution
+- **No WXY+WSP:** Relies on MIX values from previous slot (ALG 0)
+- **4 SRAM reads per frame**
+- Output clips heavily without attenuation
+
+#### ALG 2 (Delay Taps)
+- **3 WACC instructions** per slot (PC10, PC11, PC29)
+- **WXY+WSP at PC07:** Updates MIX_L/MIX_R from D[5]
+- **D[5] format:** `| Y_coef[11:0] | x | mix_l[2:0] | mix_r[2:0] |`
+- **3 SRAM reads per frame** - delay buffer access
+- 5 instances (slots 7-11) with different delay addresses in D[0]
+
+#### ALG 3 (All-Pass Filter)
+- **MUTED:** D[7] sets mix_l=0, mix_r=0
+- **2 WACC instructions** but produce zero output
+- **4 SRAM reads per frame**
+- Processes feedback internally, other slots read its SRAM output
+
+### Reverb Signal Flow (Verified)
+
+```
+Audio Input
+    ↓
+Slot 4 (ALG 0) ──→ SRAM delay buffer (16-bit samples)
+    ↓
+Slot 5 (ALG 1) ──→ DAC output (13 WACC, diffusion)
+    ↓
+Slot 6 (ALG 3) ──→ SRAM feedback (muted, all-pass)
+    ↓
+Slots 7-11 (ALG 2) ──→ DAC output (3 WACC each, early reflections)
+```
+
+### SRAM Address Ranges (from notebooks)
+
+| Algorithm | Address Range | Reads/Frame | Notes |
+|-----------|---------------|-------------|-------|
+| ALG 0     | 0x2001-0x2FB1 | 0 (writes only) | Input buffer |
+| ALG 1     | 0x2001-0x2FB1 | 4 | Diffusion reads |
+| ALG 2     | 0x2005-0x2FFE | 3 | Delay tap reads |
+| ALG 3     | 0x03000-0x03FF9 | 4 | All-pass buffer |
+
+### Clipping Issue
+
+All algorithms produce output that clips to ±32767 due to:
+- Multiple WACC accumulations: ALG 1 (13) + ALG 2 (3×5=15) = 28 per frame
+- All at 0dB (mix=7)
+- No output attenuation
+
+The `>>4` scaling hack in MAME compensates for this. Real hardware may have
+implicit output stage attenuation or different MIX register programming.
+
+### Running Individual Algorithms
+
+To test a single algorithm in isolation:
+
+```python
+# Reset and configure
+sam.reset()
+sam.load_aram(aram_alg1, offset=0x40)
+sam.load_dram(slot=5, words=dram_slot5)
+
+# ALG 1 has no WXY+WSP, so manually set MIX
+sam.state.mix_l = 7
+sam.state.mix_r = 7
+
+# Seed initial A register (simulates input from previous slot)
+sam.state.a = 0x1000
+
+# Run and observe
+samples = sam.run(100, active_slots=[5])
+```
+
+### Tracing Execution
+
+Enable instruction tracing for debugging:
+
+```python
+sam.trace_enabled = True
+sam.trace_output = []
+
+samples = sam.run(3, active_slots=[7])
+
+for line in sam.trace_output:
+    print(line)
+```
