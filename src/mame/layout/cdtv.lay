@@ -1,0 +1,259 @@
+<?xml version="1.0"?>
+<!--
+license: CC0-1.0
+copyright-holders: Dirk Best
+
+Commodore CDTV Front Panel
+-->
+
+<mamelayout version="2">
+
+	<!-- VFD elements -->
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="0.3529" green="0.9412" blue="1.0000" />
+		</led7seg>
+	</element>
+
+	<element name="colon_dot" defstate="0">
+		<disk state="0">
+			<color red="0.1549" green="0.1706" blue="0.1863" />
+		</disk>
+		<disk state="1">
+			<color red="0.3529" green="0.9412" blue="1.0000" />
+		</disk>
+	</element>
+
+	<element name="vol_segment" defstate="0">
+		<rect state="0">
+			<color red="0.1549" green="0.1706" blue="0.1863" />
+		</rect>
+		<rect state="1">
+			<color red="0.3529" green="0.9412" blue="1.0000" />
+		</rect>
+	</element>
+
+	<element name="text_am">
+		<text string="AM" state="0">
+			<color red="0.1549" green="0.1706" blue="0.1863" />
+		</text>
+		<text string="AM" state="1">
+			<color red="0.3529" green="0.9412" blue="1.0000" />
+		</text>
+	</element>
+
+	<element name="text_pm">
+		<text string="PM" state="0">
+			<color red="0.1549" green="0.1706" blue="0.1863" />
+		</text>
+		<text string="PM" state="1">
+			<color red="0.3529" green="0.9412" blue="1.0000" />
+		</text>
+	</element>
+
+	<element name="text_vol">
+		<text string="VOL" state="0">
+			<color red="0.1549" green="0.1706" blue="0.1863" />
+		</text>
+		<text string="VOL" state="1">
+			<color red="0.3529" green="0.9412" blue="1.0000" />
+		</text>
+	</element>
+
+	<!-- Buttons -->
+
+	<element name="button_nostate">
+		<rect>
+			<color red="0.125" green="0.125" blue="0.125" />
+		</rect>
+	</element>
+
+	<element name="button">
+		<rect state="0">
+			<color red="0.125" green="0.125" blue="0.125" />
+		</rect>
+	</element>
+
+	<!-- LEDs -->
+
+	<element name="led_green">
+		<rect state="0">
+			<color red="0.0" green="0.2" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.0" green="0.8" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="led_yellow">
+		<rect state="0">
+			<color red="0.2" green="0.2" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<color red="0.8" green="0.8" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="text_power"><text string="POWER"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_cd"><text string="CD"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_playpause"><text string="PLAY/PAUSE"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_stop"><text string="STOP"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_bw"><text string="&lt;&lt;"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_fw"><text string="&gt;&gt;"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_voldown"><text string="VOL-"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_volup"><text string="VOL+"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_cdtv"><text string="CD/TV"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_reset"><text string="RESET"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+
+	<view name="Front Panel">
+
+		<bounds left="0" top="0" right="800" bottom="700" />
+
+		<collection name="Front Panel" visible="yes">
+
+			<!-- Power -->
+
+			<element ref="button_nostate" inputtag="frontpanel_power" inputmask="0x01">
+				<bounds left="20" top="610" right="98" bottom="632" />
+			</element>
+			<element ref="text_power">
+				<bounds left="25" top="615" right="93" bottom="627" />
+			</element>
+			<element ref="led_green" inputtag="frontpanel_power" inputmask="0x01" inputraw="yes">
+				<bounds left="103" top="610" right="108" bottom="632" />
+			</element>
+
+			<!-- VFD -->
+
+			<element name="ampm0" ref="text_am">
+				<bounds left="210" top="632" right="232" bottom="643" />
+			</element>
+			<element name="ampm1" ref="text_pm">
+				<bounds left="210" top="649" right="232" bottom="660" />
+			</element>
+
+			<element name="vol7" ref="text_vol">
+				<bounds left="209" top="671" right="233" bottom="679" />
+			</element>
+
+			<repeat count="7">
+				<param name="seg" start="6" increment="-1" />
+				<param name="xbase" start="245" increment="35" />
+				<repeat count="4">
+					<param name="x" start="~xbase~" increment="5" />
+					<repeat count="2">
+						<param name="y" start="671" increment="5" />
+						<element name="vol~seg~" ref="vol_segment">
+							<bounds x="~x~" y="~y~" width="3" height="3" />
+						</element>
+					</repeat>
+				</repeat>
+			</repeat>
+
+			<element name="digit5" ref="digit">
+				<bounds left="244" top="624" right="274" bottom="660" />
+			</element>
+			<element name="digit4" ref="digit">
+				<bounds left="281" top="624" right="311" bottom="660" />
+			</element>
+
+			<element name="colon0" ref="colon_dot">
+				<bounds left="326" top="632" right="330" bottom="636" />
+			</element>
+			<element name="colon1" ref="colon_dot">
+				<bounds left="322" top="650" right="326" bottom="654" />
+			</element>
+
+			<element name="digit3" ref="digit">
+				<bounds left="341" top="624" right="371" bottom="660" />
+			</element>
+			<element name="digit2" ref="digit">
+				<bounds left="379" top="624" right="409" bottom="660" />
+			</element>
+
+			<element name="digit1" ref="digit">
+				<bounds left="421" top="626" right="444" bottom="658" />
+			</element>
+			<element name="digit0" ref="digit">
+				<bounds left="454" top="626" right="477" bottom="658" />
+			</element>
+
+			<!-- CD LED -->
+
+			<element ref="button_nostate">
+				<bounds left="520" top="639" right="565" bottom="661" />
+			</element>
+			<element ref="text_cd">
+				<bounds left="525" top="644" right="540" bottom="656" />
+			</element>
+			<element name="cd_led" ref="led_yellow">
+				<bounds left="545" top="648" right="560" bottom="653" />
+			</element>
+
+			<!-- Buttons -->
+
+			<element ref="button" inputtag="frontpanel_kst0" inputmask="0x01">
+				<bounds left="612" top="610" right="690" bottom="632" />
+			</element>
+			<element ref="text_playpause">
+				<bounds left="617" top="615" right="685" bottom="627" />
+			</element>
+
+			<element ref="button" inputtag="frontpanel_kst1" inputmask="0x01">
+				<bounds left="612" top="639" right="690" bottom="661" />
+			</element>
+			<element ref="text_stop">
+				<bounds left="617" top="644" right="685" bottom="656" />
+			</element>
+
+			<element ref="button" inputtag="frontpanel_kst2" inputmask="0x02">
+				<bounds left="700" top="610" right="735" bottom="661" />
+			</element>
+			<element ref="text_voldown">
+				<bounds left="705" top="615" right="730" bottom="627" />
+			</element>
+
+			<element ref="button" inputtag="frontpanel_kst1" inputmask="0x02">
+				<bounds left="743" top="610" right="778" bottom="661" />
+			</element>
+			<element ref="text_volup">
+				<bounds left="748" top="615" right="773" bottom="627" />
+			</element>
+
+			<element ref="button" inputtag="frontpanel_kst2" inputmask="0x01">
+				<bounds left="612" top="668" right="647" bottom="690" />
+			</element>
+			<element ref="text_bw">
+				<bounds left="617" top="673" right="642" bottom="685" />
+			</element>
+
+			<element ref="button" inputtag="frontpanel_kst3" inputmask="0x01">
+				<bounds left="655" top="668" right="690" bottom="690" />
+			</element>
+			<element ref="text_fw">
+				<bounds left="660" top="673" right="685" bottom="685" />
+			</element>
+
+			<element ref="button" inputtag="frontpanel_kst3" inputmask="0x02">
+				<bounds left="700" top="668" right="735" bottom="690" />
+			</element>
+			<element ref="text_cdtv">
+				<bounds left="705" top="673" right="730" bottom="685" />
+			</element>
+
+			<element ref="button" inputtag="frontpanel_kst0" inputmask="0x02">
+				<bounds left="743" top="668" right="778" bottom="690" />
+			</element>
+			<element ref="text_reset">
+				<bounds left="748" top="673" right="773" bottom="685" />
+			</element>
+
+		</collection>
+
+		<screen tag="screen">
+			<bounds left="0" top="0" right="800" bottom="600" />
+		</screen>
+	</view>
+
+</mamelayout>
