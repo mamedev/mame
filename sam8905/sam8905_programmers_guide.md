@@ -2,6 +2,38 @@
 
 ---
 
+## Fixed-Point Arithmetic Notation
+
+The SAM8905 uses fixed-point arithmetic throughout. This document uses **Q notation** to describe number formats:
+
+- **Qm.n** = m integer bits + n fractional bits (plus sign bit for signed values)
+- **Q0.11** = 12-bit signed: 1 sign bit, 0 integer bits, 11 fractional bits
+  - Range: -1.0 to +1.0 - 2⁻¹¹ (approximately -1.0 to +0.9995)
+  - Resolution: 2⁻¹¹ ≈ 0.000488
+- **Q0.18** = 19-bit signed: 1 sign bit, 0 integer bits, 18 fractional bits
+  - Range: -1.0 to +1.0 - 2⁻¹⁸
+  - Resolution: 2⁻¹⁸ ≈ 0.0000038
+
+The multiplier takes two Q0.11 inputs (12-bit), producing a Q0.22 intermediate result (24-bit), which is then rounded to Q0.18 (19-bit) for the result bus.
+
+---
+
+## General Description
+
+The SAM8905 is organized around an internal 19-bit data bus. Following elements are connected to this bus:
+
+**Adder block:** A register (19 bits), B register (19 bits) and 19-bit two's complement adder. Specific micro-instructions allow to write the bus to the A and/or B register and read the result of the A+B addition back to the bus. It is also possible to conditionally write to the A register.
+
+**D_RAM:** This 256 × 19 RAM is divided into 16 blocks of 16 words. A block is selected by a slot number, while a word inside a block is defined in the micro-instruction. The D_RAM holds algorithm parameters, like frequency, phase, amplitudes, sampling memory address. The D_RAM can be accessed (read/write) by the external micro-processor and it can be read, written, and conditionally written under control of the micro-program. Word 15 of each D_RAM block also holds specific information concerning the algorithm number associated to the slot and its status.
+
+**WF (9 bits) and PHI (12 bits) registers:** WF together with PHI specifies a full 20-bit address for sampling. Specific WF values allow to select the internal sinus ramp or constant.
+
+**Multiplier block:** X register (12 bits), Y register (12 bits) and 12 × 12 two's complement multiplier. X holds the sample data and Y receives from the bus a coefficient (normally an amplitude) to be applied to this sample. The 12 × 12 multiplier gives a 23-bit signed result which is rounded into 19 bits. The result X × Y can be read back to bus by the "gate", or accumulated into the left and right 24-bit accumulators (ACCL, ACCR), after attenuation through the BL and BR barrel shifters. Every frame of synthesis (typ. 22.68 µs), the content of the accumulators is transferred to a 32-bit shift register and the accumulators are cleared. The accumulators also include a clipping circuitry to prevent digital overflow.
+
+**A_RAM:** This 256 × 15 RAM is divided into 8 blocks of 32 words or 4 blocks of 64 words. Each block holds a specific algorithm, which is a sequence of micro-instructions. The A_RAM can be accessed (read/write) by the external processor. A new micro-instruction (INSTR) is processed every cycle (typ. 44.3 ns).
+
+---
+
 ## 1. Purpose
 
 This section describes how to use the SAM chip from a software programmer point of view.

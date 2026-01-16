@@ -75,9 +75,11 @@ void sam8905_device::device_reset()
 uint32_t sam8905_device::get_constant(uint8_t mad)
 {
 	// From Appendix I - Constants derived from MAD
+	// X is fractional Q0.11 format: value = constant / 2048
+	// MAD=0: 0.0004883, MAD=1: 0.06299, ... MAD=15: 0.93799
 	static const uint32_t constants[16] = {
-		0x00040, 0x02000, 0x04000, 0x06000, 0x08000, 0x0A000, 0x0C000, 0x0E000,
-		0x10000, 0x12000, 0x14000, 0x16000, 0x18000, 0x1A000, 0x1C000, 0x1E000
+		0x001, 0x081, 0x101, 0x181, 0x201, 0x281, 0x301, 0x381,
+		0x401, 0x481, 0x501, 0x581, 0x601, 0x681, 0x701, 0x781
 	};
 	return constants[mad & 0xf];
 }
@@ -229,9 +231,13 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 	if (!BIT(inst, 3)) {
 		m_y = (bus >> 7) & 0xFFF;
 		m_x = get_waveform(m_wf, m_phi, mad, slot_idx) & 0xFFF;
-		// Calculate multiplication result (12x12 fractional)
-		int32_t product = (int32_t)((int16_t)(m_x << 4) >> 4) * (int32_t)((int16_t)(m_y << 4) >> 4);
-		m_mul_result = (uint32_t)(product >> 5) & MASK19;
+		// Calculate multiplication result (12x12 fractional Q0.11 inputs)
+		// Sign-extend 12-bit to 16-bit for signed multiplication
+		int32_t x_signed = (int32_t)((int16_t)(m_x << 4) >> 4);
+		int32_t y_signed = (int32_t)((int16_t)(m_y << 4) >> 4);
+		// Q0.11 * Q0.11 = Q0.22 (24-bit), round to 19-bit Q0.18: shift right by 4
+		int32_t product = x_signed * y_signed;
+		m_mul_result = (uint32_t)((product + 8) >> 4) & MASK19;
 		// WSP inside WXY - sets mix_l/mix_r from bus value
 		if (wsp) {
 			m_mix_l = (bus >> 3) & 0x7;
