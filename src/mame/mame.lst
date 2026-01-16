@@ -31088,6 +31088,9 @@ rmontecarlo
 fi6845
 fi8275
 
+@source:misc/ymball.cpp
+ymball
+
 @source:misc/fireball.cpp
 fireball
 
