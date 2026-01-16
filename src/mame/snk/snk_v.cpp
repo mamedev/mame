@@ -253,6 +253,7 @@ void marvins_state::video_start()
 
 	m_tx_tile_offset = 0;
 
+	save_item(NAME(m_fg_videoram));
 	save_item(NAME(m_fg_scrollx));
 	save_item(NAME(m_fg_scrolly));
 }
