@@ -100,6 +100,10 @@ class SAM8905Interpreter:
         # External waveform callback: (address) -> 12-bit sample
         self.waveform_read: Optional[Callable[[int], int]] = None
 
+        # External waveform write callback: (address, data) -> None
+        # Used for SRAM writes via WWE (Waveform Write Enable)
+        self.waveform_write: Optional[Callable[[int, int], None]] = None
+
     def reset(self):
         """Reset interpreter state."""
         self.state = SAM8905State()
@@ -332,6 +336,19 @@ class SAM8905Interpreter:
             s.b = 0
             changes['b'] = 0
             self.update_carry()
+
+            # WWE (Write Waveform Enable) - triggered by RSP + clearB + WSP
+            # Per SAM8905 datasheet Section 9: Data to write is Y register
+            if emitter_sel == 3 and wsp and self.waveform_write is not None:
+                # Only write externally when WF indicates external memory (WF < 0x80)
+                # WF >= 0x80 is input sample address space, WF >= 0x100 is internal
+                if (s.wf & 0x1FF) < 0x80:
+                    # Build 15-bit address: WF[6:0] << 8 | PHI[11:4]
+                    ext_addr = ((s.wf & 0x7F) << 8) | ((s.phi >> 4) & 0xFF)
+                    # Write data is Y register (12-bit signed)
+                    ext_data = sign_extend_12(s.y)
+                    self.waveform_write(ext_addr, ext_data)
+                    changes['wwe'] = {'addr': ext_addr, 'data': ext_data}
 
         # WWF (bit 1)
         if not (inst & 0x02):
