@@ -26,7 +26,7 @@ public:
 	auto dacl_cb() { return m_dac_l.bind(); }
 	auto dacr_cb() { return m_dac_r.bind(); }
 
-	void xbus_rdy_w(int state);
+	void xbus_int_w(int state);
 
 //	void vint0_w(int state); // hblank?
 	void vint1_w(int state);

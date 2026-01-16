@@ -84,8 +84,13 @@ void clio_device::dply_w(int state)
 		request_fiq(1 << 0, 1);
 }
 
-void clio_device::xbus_rdy_w(int state)
+void clio_device::xbus_int_w(int state)
 {
+	if (state && m_poll & 7)
+	{
+		request_fiq(1 << 2, 0);
+	}
+
 	//if ((m_sel & 0x0f) == 0)
 	//{
 	//	if (state)
@@ -416,9 +421,11 @@ void clio_device::map(address_map &map)
 			m_poll |= data & 7;
 		})
 	);
+	// 1--- 1111 external device
+	// 0--- xxxx internal device
 	map(0x0580, 0x05bf).lrw32(
-		NAME([this] () { return m_xbus_read_cb(m_sel & 0xf); }),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_xbus_write_cb(m_sel & 0xf, data & 0xff); })
+		NAME([this] () { return m_xbus_read_cb(m_sel & 0x8f); }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_xbus_write_cb(m_sel & 0x8f, data & 0xff); })
 	);
 //	map(0x05c0, 0x05ff) Data
 
@@ -452,8 +459,8 @@ void clio_device::map(address_map &map)
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGDSPP("DSPP $17fc %08x & %08x\n", data, mem_mask);
 			m_dspp->write(0x6070 >> 2, data);
-			if (data & 1)
-				machine().debug_break();
+			//if (data & 1)
+			//	machine().debug_break();
 		})
 	);
 	// DSPP N paths (code)
@@ -573,12 +580,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( clio_device::timer_x16_cb )
 
 	for(int i = 0; i < 16; i++)
 	{
-		timer_flag = (m_timer_ctrl >> i * 4) & 0xf;
+		timer_flag = (m_timer_ctrl >> (i * 4)) & 0xf;
 
 		if(timer_flag & 1)
 		{
 			if(timer_flag & 4)
-				m_timer_count[i]-=carry_val;
+				m_timer_count[i]-= carry_val;
 			else
 				m_timer_count[i]--;
 

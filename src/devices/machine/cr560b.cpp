@@ -252,7 +252,7 @@ void cr560b_device::status_enable(uint8_t output_length)
 			LOGMASKED(LOG_CMD, "-> Output: %02x %02x %02x %02x  %02x %02x %02x %02x  %02x %02x %02x %02x\n", m_output_fifo[0], m_output_fifo[1], m_output_fifo[2], m_output_fifo[3], m_output_fifo[4], m_output_fifo[5], m_output_fifo[6], m_output_fifo[7], m_output_fifo[8], m_output_fifo[9], m_output_fifo[10], m_output_fifo[11]);
 
 		//m_sten_timer->adjust(attotime::from_usec(64 * 4)); // TODO
-		m_sten_timer->adjust(attotime::zero);
+		m_sten_timer->adjust(attotime::from_usec(2));
 	}
 }
 

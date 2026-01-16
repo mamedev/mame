@@ -1,10 +1,19 @@
 // license:LGPL-2.1+
 // copyright-holders:Angelo Salese, Wilbert Pol
-/***************************************************************************
+/**************************************************************************************************
 
 3do.cpp
 
 Driver file to handle emulation of the 3DO systems
+
+TODO:
+- Fix Xbus directions in Clio (takes forever for everything below);
+- Fix DSPP mapping (incompatible with later M2, consider an "opera_host_map" instead);
+- 3do_fz1: draws a tray open CD at top of VRAM space once it throws an error from GetCDType;
+- 3do_hc21: as above plus "Directory /remote not found";
+- 3do_fz10: as above but black screen;
+- 3do_gdo101: errors on DSPP semaphore, if skipped allocates GFX resources but draws in dots;
+- 3do_try: throws "QueueSport error on cmd 4: xfer across 1M boundary"
 
 References:
 - https://wiki.console5.com/wiki/Panasonic_3DO_FZ-1
@@ -76,10 +85,11 @@ Models:
 - Samsung DMB-800 (South Korea)
 - Sanyo TRY 3DO Interactive Multiplayer (Japan)
 - Creative 3DO Blaster - PC Card (ISA)
-- Panasonic N-1005 "Robo" 3DO (Japan), based on FZ-1 with 5x CD media changer and VCD adapter built-in
+- Panasonic N-1005 "Robo" 3DO (Japan), based on FZ-1 with 5x CD media changer and VCD adapter
+  built-in
 - a Scientific Atlanta STT, with a Nicky device in BIGTRACE space
 
-===========================================================================
+===================================================================================================
 
 Part list of Goldstar 3DO Interactive Multiplayer
 
@@ -98,7 +108,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 - IC6 = Philips 74HCT14D 974230Q - 14 pins
 - IC301 u-COM = MC68HSC 705C8ACFB 3E20T HLAH9446 - 44 pins
 
-***************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 #include "3do.h"
@@ -228,7 +238,7 @@ void _3do_state::green_config(machine_config &config)
 //	m_cdrom->scor_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
 //	m_cdrom->stch_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
 //	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus...));
-	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_rdy_w)).invert();
+	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_int_w)).invert();
 //	m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus...));
 
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
