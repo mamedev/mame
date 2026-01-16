@@ -425,7 +425,8 @@ class SAM8905Interpreter:
                 inst = s.aram[pc_start + pc]
                 self.execute_instruction(slot, inst, pc)
 
-        return s.l_acc, s.r_acc
+        # Accumulators are 24-bit, output upper 16 bits (per SAM8905 datasheet)
+        return s.l_acc >> 8, s.r_acc >> 8
 
     def run(self, num_frames: int, active_slots: Optional[List[int]] = None) -> np.ndarray:
         """Run for multiple frames and collect output.

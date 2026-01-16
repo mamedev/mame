@@ -334,8 +334,9 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 	}
 
 	// Output accumulated values
-	out_l = (int32_t)m_l_acc;
-	out_r = (int32_t)m_r_acc;
+	// Accumulators are 24-bit, output upper 16 bits (per SAM8905 datasheet)
+	out_l = (int32_t)m_l_acc >> 8;
+	out_r = (int32_t)m_r_acc >> 8;
 
 	// Store for slave mode stream output
 	m_last_out_l = out_l;
@@ -392,16 +393,17 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 			}
 		}
 
-		stream.put_int_clamp(0, samp, (int32_t)m_l_acc, 32768);
-		stream.put_int_clamp(1, samp, (int32_t)m_r_acc, 32768);
+		// Accumulators are 24-bit, output upper 16 bits (per SAM8905 datasheet)
+		stream.put_int_clamp(0, samp, (int32_t)m_l_acc >> 8, 32768);
+		stream.put_int_clamp(1, samp, (int32_t)m_r_acc >> 8, 32768);
 
 		// Fire sample output callback for inter-chip audio (FX processing)
 		if (!m_sample_output.isunset()) {
-			// Clamp accumulator values to 16-bit signed range (same as DAC output)
-			int32_t l_clamped = std::clamp((int32_t)m_l_acc, -32768, 32767);
-			int32_t r_clamped = std::clamp((int32_t)m_r_acc, -32768, 32767);
+			// Output upper 16 bits of 24-bit accumulator, clamped to 16-bit range
+			int32_t l_out = std::clamp((int32_t)m_l_acc >> 8, -32768, 32767);
+			int32_t r_out = std::clamp((int32_t)m_r_acc >> 8, -32768, 32767);
 			// Pack L/R as 32-bit value: upper 16 = L, lower 16 = R
-			uint32_t packed = ((l_clamped & 0xFFFF) << 16) | (r_clamped & 0xFFFF);
+			uint32_t packed = ((l_out & 0xFFFF) << 16) | (r_out & 0xFFFF);
 			m_sample_output(packed);
 		}
 	}

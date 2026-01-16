@@ -676,8 +676,8 @@ dram_slot5 = [
     0x00180,  # word 1
     0x1003F,  # word 2: WWF config
     0x10000,  # word 3: Amplitude
-    0x00100,  # word 4
-    0x00100,  # word 5
+    0x00100,  # word 4  Amplitude
+    0x00100,  # word 5  Amplitude
     0x3FF00,  # word 6: Large delay address
     0x6DF00,  # word 7: Delay address
     0x5A100,  # word 8: Delay address
@@ -789,6 +789,43 @@ if (result & 0x400)
 
 **Result:** FX now produces oscillating audio output instead of accumulating DC offset.
 
+### 24-bit Accumulator Output Scaling (FIXED 2026-01-16)
+
+**Problem:** FX output clips to ±32767 constantly despite reasonable intermediate values.
+
+**Root cause:** SAM8905 accumulators are 24-bit, but output is the upper 16 bits. Both MAME
+emulator and Python interpreter were outputting raw accumulator values without the >> 8 shift.
+
+**From SAM8905 datasheet:**
+> The 12 × 12 multiplier gives a 23-bit signed result which is rounded into 19 bits.
+> The result X × Y can be accumulated into the left and right **24-bit accumulators** (ACCL, ACCR).
+> Every frame of synthesis, the content of the accumulators is transferred to a **32-bit shift register**
+> and the accumulators are cleared.
+
+The 32-bit shift register outputs the upper 16 bits of the 24-bit accumulator value.
+
+**Code changes:**
+
+1. **sam8905.cpp** - Output upper 16 bits of 24-bit accumulator:
+```cpp
+// Accumulators are 24-bit, output upper 16 bits (per SAM8905 datasheet)
+out_l = (int32_t)m_l_acc >> 8;
+out_r = (int32_t)m_r_acc >> 8;
+```
+
+2. **sam8905_interpreter.py** - Same fix in `execute_frame()`:
+```python
+# Accumulators are 24-bit, output upper 16 bits (per SAM8905 datasheet)
+return s.l_acc >> 8, s.r_acc >> 8
+```
+
+**Verification in Jupyter:**
+- Raw 24-bit accumulator: range [-229481, +116747] → CLIPS to ±32767
+- With >> 8 shift: range [-897, +456] → NO CLIPPING
+- Full reverb chain (ALG 0 → SRAM → ALG 1): output range [-976, +936] → NO CLIPPING
+
+**Result:** The >> 4 output hack is no longer needed. Output produces clean reverb without clipping.
+
 ## Open Questions
 
 - [ ] Exact SRAM address mapping (bits 18-10 of WWF?)
@@ -820,15 +857,8 @@ Check output with:
 sox /tmp/fx_test_piano.wav -n stat
 ```
 
-**HACK applied:** FX output scaled down by 16 (>> 4) to prevent clipping.
-
-The issue is that FX algorithms use multiple WACC instructions per slot:
-- Slot 5 (ALG 1): 12 WACC instructions
-- Slots 7-11 (ALG 2): 3 WACC each = 15 total
-- Total: 27 WACC per frame, all at mix=7 (0dB)
-
-This causes accumulated output to exceed 16-bit DAC range (±32K). The >> 4 scaling
-brings output within range. Real hardware may have implicit output attenuation.
+**NOTE:** The previous >> 4 hack has been removed. The fix was that SAM8905 accumulators
+are 24-bit and output the upper 16 bits (>> 8 shift). See "24-bit Accumulator Output Scaling" fix.
 
 ## Test Harness Analysis (2026-01-14)
 
@@ -1012,15 +1042,14 @@ Slots 7-11 (ALG 2) ──→ DAC output (3 WACC each, early reflections)
 | ALG 2     | 0x2005-0x2FFE | 3 | Delay tap reads |
 | ALG 3     | 0x03000-0x03FF9 | 4 | All-pass buffer |
 
-### Clipping Issue
+### Clipping Issue (RESOLVED)
 
-All algorithms produce output that clips to ±32767 due to:
-- Multiple WACC accumulations: ALG 1 (13) + ALG 2 (3×5=15) = 28 per frame
-- All at 0dB (mix=7)
-- No output attenuation
+**Original problem:** Output clipped to ±32767 due to 28 WACC per frame at 0dB.
 
-The `>>4` scaling hack in MAME compensates for this. Real hardware may have
-implicit output stage attenuation or different MIX register programming.
+**Fix:** SAM8905 accumulators are 24-bit, output is upper 16 bits (>> 8 shift).
+The >> 4 hack was a symptom of missing the >> 8 accumulator scaling.
+
+See "24-bit Accumulator Output Scaling" fix in Fixed Issues section.
 
 ### Running Individual Algorithms
 
