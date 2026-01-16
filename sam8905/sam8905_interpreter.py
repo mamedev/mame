@@ -575,49 +575,58 @@ def print_dram_changes(history: List[Dict[str, Any]], slot: int):
 
 if __name__ == "__main__":
     # Quick self-test with internal sine wave
+    # Example from programmer's guide:
+    #
+    # PHI=0    ; phase in D[0]
+    # DPHI=1   ; phase increment in D[1]
+    # AMP=2    ; amplitude and mix in D[2]
+    #
+    # RM   PHI,  <WA,WPHI,WSP>   ; A=PHI, PHI reg=D[0], WF=0x100 (sinus)
+    # RM   DPHI, <WB>            ; B=D[1] (phase increment)
+    # RM   AMP,  <WXY,WSP>       ; X=sin(PHI), Y=AMP, mix updated
+    # RADD PHI,  <WM>            ; D[0]=A+B (PHI+DPHI)
+    # RSP                        ; NOP (wait for multiplier)
+    # RSP       ,<WACC>          ; accumulate AMP x sin(PHI)
+    # FIN
+
     print("SAM8905 Interpreter Self-Test")
     print("=" * 50)
+    print("Sinus Oscillator from Programmer's Guide")
+    print()
 
     sam = SAM8905Interpreter()
 
-    # Simple algorithm: generate sine wave
-    # PC00: RM 0, <WXY, WPHI, WSP>  - Load phase, force internal sine, set mix
-    # PC01: RP 0, <WACC>            - Accumulate product
-    # PC02-29: NOP
-
-    # Build minimal A-RAM program for ALG 0
-    aram = [0] * 32
-
-    # PC00: RM D[0], WPHI+WXY+WSP (0x100 | ~0x18 & 0xFF)
-    # Emitter=RM(0), MAD=0, WSP=1, WPHI=0, WXY=0 (active low)
-    # inst = (0<<11) | (0<<9) | 0x100 | 0xE7 = 0x01E7
-    aram[0] = 0x01E7  # RM 0, <WPHI, WXY, WSP>
-
-    # PC01: RP, WACC
-    # Emitter=RP(2), WACC=0 (active)
-    # inst = (0<<11) | (2<<9) | 0xFE = 0x04FE
-    aram[1] = 0x04FE  # RP, <WACC>
-
-    # Rest are NOPs (all receivers inactive)
-    for i in range(2, 32):
-        aram[i] = 0x7FFF
+    # Build A-RAM program for ALG 0
+    aram = [
+        0x016F,  # PC00: RM 0, <WA, WPHI, WSP>  - A=PHI, set internal sine
+        0x08BF,  # PC01: RM 1, <WB>             - B=DPHI
+        0x11F7,  # PC02: RM 2, <WXY, WSP>       - X=sin(PHI), Y=AMP, set mix
+        0x02DF,  # PC03: RADD 0, <WM>           - D[0]=A+B (update phase)
+        0x06FF,  # PC04: RSP                    - NOP (wait for multiplier)
+        0x06FE,  # PC05: RSP, <WACC>            - accumulate result
+    ] + [0x7FFF] * 26  # Fill rest with NOPs
 
     sam.load_aram(aram, offset=0)
 
     # D-RAM for slot 0:
-    # D[0] = phase increment (for 440Hz at 44.1kHz: 4096 * 440 / 44100 ≈ 41)
-    #        Also contains mix values in lower bits: (mix_l << 3) | mix_r
-    # D[15] = ALG 0, not idle
-    dram_slot0 = [0] * 16
-    phase_inc = 41
+    # D[0] = PHI (phase) - starts at 0
+    # D[1] = DPHI (phase increment) - for 440Hz: 4096 * 440 / 44100 ≈ 41
+    # D[2] = AMP with mix bits - amplitude in upper bits, mix in lower
+    # D[15] = ALG=0, IDLE=0
+    phase_inc = int(4096 * 440 / 44100)  # ~41 for 440Hz
+    amplitude = 0x400  # Half amplitude (Q0.11)
     mix_l = 7  # Full volume
     mix_r = 7
-    dram_slot0[0] = (phase_inc << 7) | (mix_l << 3) | mix_r
+
+    dram_slot0 = [0] * 16
+    dram_slot0[0] = 0  # PHI starts at 0
+    dram_slot0[1] = phase_inc << 7  # DPHI in upper bits (bus[18:7] -> Y)
+    dram_slot0[2] = (amplitude << 7) | (mix_l << 3) | mix_r  # AMP + mix
     dram_slot0[15] = 0x00000  # ALG=0, IDLE=0
 
     sam.load_dram(0, dram_slot0)
 
-    # Run a few frames
+    # Run 100 frames
     sam.trace_enabled = True
     samples = sam.run(100, active_slots=[0])
 
