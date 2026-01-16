@@ -4665,7 +4665,8 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_SHR(block, REG(rn), REG(rx), I0);
 						UML_JMP(block, fext_end);
 						UML_LABEL(block, fext_zero);
-						UML_AND(block, I0, I0, 0x3f);   // i0 = bit6 (cheaper to repeat this than add an extra TEST)
+						if (SV_CALC_REQUIRED)
+							UML_AND(block, I0, I0, 0x3f);   // i0 = bit6 (cheaper to repeat this than add an extra TEST)
 						UML_AND(block, REG(rn), REG(rx), 0);
 						UML_LABEL(block, fext_end);
 						if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
@@ -4691,8 +4692,8 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_JMPc(block, COND_Z, fext_zero);
 						UML_AND(block, I0, I0, 0x3f);   // i0 = bit6
 						UML_JMPc(block, COND_NZ, fext_shifted);
-						UML_CMP(block, 32, I1);
-						UML_JMPc(block, COND_BE, fext_offscale);
+						UML_CMP(block, I1, 32);
+						UML_JMPc(block, COND_AE, fext_offscale);
 						UML_LABEL(block, fext_shifted);
 						UML_SUB(block, I3, 32, I0);
 						UML_JMPc(block, COND_BE, fext_zero);
@@ -4704,7 +4705,8 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_SHR(block, REG(rn), REG(rx), I0);
 						UML_JMP(block, fext_end);
 						UML_LABEL(block, fext_zero);
-						UML_AND(block, I0, I0, 0x3f);   // i0 = bit6 (cheaper to repeat this than add an extra TEST)
+						if (SV_CALC_REQUIRED)
+							UML_AND(block, I0, I0, 0x3f);   // i0 = bit6 (cheaper to repeat this than add an extra TEST)
 						UML_AND(block, REG(rn), REG(rx), 0);
 						UML_LABEL(block, fext_end);
 						if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
@@ -4719,12 +4721,32 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 					}
 
 					case 0x64:      // Rn = Rn OR FDEP Rx BY Ry | <bit6>:<len6>
+					{
+						uml::code_label const fdep_nomask = compiler.labelnum++;
+						uml::code_label const fdep_zero = compiler.labelnum++;
+						uml::code_label const fdep_end = compiler.labelnum++;
+
 						UML_MOV(block, I0, REG(ry));
 						UML_BFXU(block, I1, I0, 6, 6);  // i1 = len6
+						UML_JMPc(block, COND_Z, fdep_zero);
 						UML_AND(block, I0, I0, 0x3f);   // i0 = bit6
+						UML_CMP(block, I0, 32);
+						UML_JMPc(block, COND_AE, fdep_zero);
+						UML_CMP(block, I1, 32);
+						UML_JMPc(block, COND_AE, fdep_nomask);
 						UML_BFXU(block, I3, REG(rx), 0, I1);
 						UML_SHL(block, I3, I3, I0);
 						UML_OR(block, REG(rn), REG(rn), I3);
+						UML_JMP(block, fdep_end);
+						UML_LABEL(block, fdep_nomask);
+						UML_SHL(block, I3, REG(rx), I0);
+						UML_OR(block, REG(rn), REG(rn), I3);
+						UML_JMP(block, fdep_end);
+						UML_LABEL(block, fdep_zero);
+						if (SV_CALC_REQUIRED)
+							UML_AND(block, I0, I0, 0x3f);   // i0 = bit6 (cheaper to repeat this than add an extra TEST)
+						UML_OR(block, REG(rn), REG(rn), 0);
+						UML_LABEL(block, fdep_end);
 						if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
 						if (SV_CALC_REQUIRED)
 						{
@@ -4734,6 +4756,7 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						}
 						if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
 						return;
+					}
 
 					case 0xc0:      // Rn = BSET Rx BY Ry | <data8>
 					{
@@ -5211,11 +5234,19 @@ void adsp21062_device::generate_shift_imm(drcuml_block &block, compiler_state &c
 			return;
 
 		case 0x19:      // Rn = Rn OR FDEP Rx BY <bit6>:<len6>
-			UML_AND(block, I0, REG(rx), util::make_bitmask<uint32_t>(len));
-			if (bit > 0)
-				UML_SHL(block, I0, I0, bit);
-			UML_OR(block, REG(rn), REG(rn), I0);
-
+			if (len == 0 || bit >= 32)
+			{
+				UML_OR(block, REG(rn), REG(rn), 0);
+			}
+			else if (len >= 32 && bit == 0)
+			{
+				UML_OR(block, REG(rn), REG(rn), REG(rx));
+			}
+			else
+			{
+				UML_ROLAND(block, I0, REG(rx), bit, util::make_bitmask<uint32_t>(len) << bit);
+				UML_OR(block, REG(rn), REG(rn), I0);
+			}
 			if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
 			if (SV_CALC_REQUIRED && (bit + len) > 32) UML_MOV(block, ASTAT_SV, 1);
 			if (SV_CALC_REQUIRED && (bit + len) <= 32) UML_MOV(block, ASTAT_SV, 0);
