@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:HalfElf, Andrei I. Holub
 
-#ifndef SINCLAIR_HRUST_H
-#define SINCLAIR_HRUST_H
+#ifndef MAME_SINCLAIR_HRUST_H
+#define MAME_SINCLAIR_HRUST_H
 
 #pragma once
 
@@ -37,4 +37,4 @@ public:
 	void decode(address_space &space, const u8 *source, u16 dest, u16 size);
 };
 
-#endif // SINCLAIR_HRUST_H
+#endif // MAME_SINCLAIR_HRUST_H
