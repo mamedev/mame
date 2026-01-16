@@ -3874,9 +3874,11 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						return;
 
 					case 0x61:      // Rn = MIN(Rx, Ry)
-						UML_MOV(block, REG(rn), REG(rx));
 						UML_CMP(block, REG(rx), REG(ry));
-						UML_MOVc(block, COND_G, REG(rn), REG(ry));
+						if (rn != rx)
+							UML_MOVc(block, (rn != ry) ? COND_LE : COND_L, REG(rn), REG(rx));
+						if (rn != ry)
+							UML_MOVc(block, COND_G, REG(rn), REG(ry));
 						if (AZ_CALC_REQUIRED || AN_CALC_REQUIRED)
 							UML_CMP(block, REG(rn), 0);
 						if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
@@ -3888,9 +3890,11 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						return;
 
 					case 0x62:      // Rn = MAX(Rx, Ry)
-						UML_MOV(block, REG(rn), REG(rx));
 						UML_CMP(block, REG(rx), REG(ry));
-						UML_MOVc(block, COND_L, REG(rn), REG(ry));
+						if (rn != rx)
+							UML_MOVc(block, (rn != ry) ? COND_GE : COND_G, REG(rn), REG(rx));
+						if (rn != ry)
+							UML_MOVc(block, COND_L, REG(rn), REG(ry));
 						if (AZ_CALC_REQUIRED || AN_CALC_REQUIRED)
 							UML_CMP(block, REG(rn), 0);
 						if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
