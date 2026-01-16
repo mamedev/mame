@@ -215,15 +215,15 @@ MIX_ATTEN = [0, 16, 32, 64, 128, 256, 512, 1024]
 
 ## Implementation Tasks
 
-- [ ] Create `SAM8905State` dataclass with all registers
-- [ ] Implement `execute_instruction()` - port execute_cycle from C++
-- [ ] Implement internal waveform generation (sin, ramps)
-- [ ] Implement `execute_frame()` - iterate slots, accumulate output
-- [ ] Implement `run()` - generate sample array
-- [ ] Add visualization: `plot_waveform()`, `export_wav()`
-- [ ] Add state inspection: `print_state()`, `get_state_snapshot()`
-- [ ] Add D-RAM change tracking
-- [ ] Create example Jupyter notebook
+- [x] Create `SAM8905State` dataclass with all registers
+- [x] Implement `execute_instruction()` - port execute_cycle from C++
+- [x] Implement internal waveform generation (sin, ramps)
+- [x] Implement `execute_frame()` - iterate slots, accumulate output
+- [x] Implement `run()` - generate sample array
+- [x] Add visualization: `plot_waveform()`, `export_wav()`
+- [x] Add state inspection: `print_state()`, `get_state_snapshot()`
+- [x] Add D-RAM change tracking
+- [x] Create example Jupyter notebook
 - [ ] Test against MAME output traces
 
 ## Dependencies
