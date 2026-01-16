@@ -2,9 +2,13 @@
 // copyright-holders:Angelo Salese, Wilbert Pol
 /***************************************************************************
 
-  3do.cpp
+3do.cpp
 
-  Driver file to handle emulation of the 3DO systems
+Driver file to handle emulation of the 3DO systems
+
+References:
+- https://wiki.console5.com/wiki/Panasonic_3DO_FZ-1
+- https://github.com/trapexit/portfolio_os
 
 Hardware descriptions:
 
@@ -14,7 +18,7 @@ Processors:
 - Super Fast BUS Speed (50 Megabytes per second)
 - Math Co-Processor custom designed by NTG for accelerating fixed-point
   matrix operations (_not_ the ARM FPA)
-- Multitaking 32-bit operating system
+- Multitasking 32-bit operating system
 
 Resolution:
 - 640x480 pixel resolution
@@ -71,6 +75,8 @@ Models:
 - Goldstar 3DO ALIVE II (South Korea)
 - Sanyo TRY 3DO Interactive Multiplayer (Japan)
 - Creative 3DO Blaster - PC Card (ISA)
+- Panasonic Robo 3DO (Japan), based on FZ-1 with 5x CD media changer and VCD adapter built-in
+- a Scientific Atlanta STT, with a Nicky device in BIGTRACE space
 
 ===========================================================================
 
@@ -100,6 +106,10 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "cpu/arm7/arm7.h"
 #include "imagedev/cdromimg.h"
 
+#include "speaker.h"
+
+
+#define DIAG_ENABLE     0
 
 #define X2_CLOCK_PAL    59000000
 #define X2_CLOCK_NTSC   49090000
@@ -108,15 +118,23 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 void _3do_state::main_mem(address_map &map)
 {
-	map(0x00000000, 0x001FFFFF).bankrw(m_bank1);                                       /* DRAM */
-	map(0x00200000, 0x003FFFFF).ram().share(m_vram);                                   /* VRAM */
-	map(0x03000000, 0x030FFFFF).rom().region("bios", 0);                               /* BIOS */
-	map(0x03100000, 0x0313FFFF).ram();                                                 /* Brooktree? */
-	map(0x03140000, 0x0315FFFF).rw(FUNC(_3do_state::nvarea_r), FUNC(_3do_state::nvarea_w)).umask32(0x000000ff);                /* NVRAM */
-	map(0x03180000, 0x031BFFFF).rw(FUNC(_3do_state::slow2_r), FUNC(_3do_state::slow2_w));               /* Slow bus - additional expansion */
-	map(0x03200000, 0x0320FFFF).rw(FUNC(_3do_state::svf_r), FUNC(_3do_state::svf_w));                   /* special vram access1 */
-	map(0x03300000, 0x033FFFFF).rw(FUNC(_3do_state::madam_r), FUNC(_3do_state::madam_w));               /* address decoder */
-	map(0x03400000, 0x034FFFFF).rw(FUNC(_3do_state::clio_r), FUNC(_3do_state::clio_w));                 /* io controller */
+	map(0x0000'0000, 0x001F'FFFF).bankrw(m_bank1);                                       /* DRAM */
+	map(0x0020'0000, 0x003F'FFFF).ram().share(m_vram);                                   /* VRAM */
+	map(0x0300'0000, 0x030F'FFFF).rom().region("bios", 0);                               /* BIOS */
+	// slow bus
+	map(0x0310'0000, 0x0313'FFFF).ram();                                                 /* Brooktree? */
+	map(0x0314'0000, 0x0315'FFFF).mirror(0x20000).rw(FUNC(_3do_state::nvarea_r), FUNC(_3do_state::nvarea_w)).umask32(0x000000ff);                /* NVRAM */
+	map(0x0318'0000, 0x031B'FFFF).rw(FUNC(_3do_state::slow2_r), FUNC(_3do_state::slow2_w));               /* Slow bus - additional expansion */
+	// Sport
+	map(0x0320'0000, 0x0320'FFFF).rw(FUNC(_3do_state::svf_r), FUNC(_3do_state::svf_w));                   /* special vram access1 */
+	map(0x0330'0000, 0x0330'07FF).m(m_madam, FUNC(madam_device::map));              /* address decoder */
+	map(0x0340'0000, 0x0340'3FFF).m(m_clio, FUNC(clio_device::map));                /* io controller */
+	map(0x0340'C000, 0x0340'FFFF).m(*this, FUNC(_3do_state::uncle_map));
+//  map(0x0360'0000, 0X037F'FFFF) trace
+//      map(0x0370'0000, 0X037E'FFFF) SRAM
+//      map(0X037F'FF00, 0X037F'FF0B) link data/address/FIFO
+//      map(0X037F'FF0C, 0X037F'FF0F) joysticks
+//  map(0x0380'0000, 0x03??'????) trace big RAM
 }
 
 
@@ -142,35 +160,91 @@ void _3do_state::machine_start()
 	m_bank1->configure_entry(1, memregion("overlay")->base());
 
 	m_slow2_init();
-	m_madam_init();
-	m_clio_init();
+	m_uncle.rev = 0x03800000;
 }
 
 void _3do_state::machine_reset()
 {
 	/* start with overlay enabled */
 	m_bank1->set_entry(1);
+}
 
-	m_clio.cstatbits = 0x01; /* bit 0 = reset of clio caused by power on */
+// TODO: clocks (doubled vs. ARM?)
+void _3do_state::green_config(machine_config &config)
+{
+	MADAM(config, m_madam, XTAL(50'000'000)/4);
+	m_madam->diag_cb().set([] (u8 data) {
+		// Logic Analyser (sic) ping, supposedly repeated in ZSIO debug port
+		if (DIAG_ENABLE)
+		{
+			if(data == 0x0a)
+				printf("\n");
+			else
+				printf("%c", data & 0xff);
+		}
+	});
+
+	CLIO(config, m_clio, XTAL(50'000'000)/4);
+	m_clio->firq_cb().set([this] (int state) {
+		if (state)
+			m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+	});
+	m_clio->set_screen_tag("screen");
+	m_clio->xbus_read_cb().set([this] (offs_t offset) -> u8 {
+		if (offset == 0)
+		{
+			return m_cdrom->read();
+		}
+
+		return 0;
+	});
+	m_clio->xbus_write_cb().set([this] (offs_t offset, u8 data) {
+		if (offset == 0)
+		{
+			m_cdrom->enable_w(0);
+			m_cdrom->cmd_w(0);
+			m_cdrom->write(data);
+			return;
+		}
+		m_cdrom->enable_w(1);
+		m_cdrom->cmd_w(1);
+	});
+
+	CR560B(config, m_cdrom, 0);
+	m_cdrom->add_route(0, "speaker", 1.0, 0);
+	m_cdrom->add_route(1, "speaker", 1.0, 1);
+	m_cdrom->set_interface("cdrom");
+//	m_cdrom->scor_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
+//	m_cdrom->stch_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
+//	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus...));
+	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_rdy_w)).invert();
+//	m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus...));
+
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+
+	m_clio->dacl_cb().set(m_dac[0], FUNC(dac_16bit_r2r_twos_complement_device::write));
+	m_clio->dacr_cb().set(m_dac[1], FUNC(dac_16bit_r2r_twos_complement_device::write));
 }
 
 void _3do_state::_3do(machine_config &config)
 {
 	/* Basic machine hardware */
-	ARM7_BE(config, m_maincpu, XTAL(50'000'000)/4);
+	ARM7_BE(config, m_maincpu, XTAL(50'000'000)/4); // DA86C06020XV
 	m_maincpu->set_addrmap(AS_PROGRAM, &_3do_state::main_mem);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TIMER(config, "timer_x16").configure_periodic(FUNC(_3do_state::timer_x16_cb), attotime::from_hz(12000)); // TODO: timing
+	green_config(config);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	// TODO: proper params (mostly running in interlace mode)
 	m_screen->set_raw(X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262);
 	m_screen->set_screen_update(FUNC(_3do_state::screen_update));
+	m_screen->screen_vblank().set(m_clio, FUNC(clio_device::vint1_w));
 
-	CDROM(config, "cdrom");
+	SPEAKER(config, "speaker", 2).front();
 }
-
 
 void _3do_state::_3do_pal(machine_config &config)
 {
@@ -180,15 +254,25 @@ void _3do_state::_3do_pal(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	TIMER(config, "timer_x16").configure_periodic(FUNC(_3do_state::timer_x16_cb), attotime::from_hz(12000)); // TODO: timing
+	green_config(config);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(X2_CLOCK_PAL / 2, 1592, 254, 1534, 263, 22, 262); // TODO: proper params
+	// TODO: proper params
+	m_screen->set_raw(X2_CLOCK_PAL / 2, 1592, 254, 1534, 263, 22, 262);
 	m_screen->set_screen_update(FUNC(_3do_state::screen_update));
+	m_screen->screen_vblank().set(m_clio, FUNC(clio_device::vint1_w));
 
-	CDROM(config, "cdrom");
+	SPEAKER(config, "speaker", 2).front();
 }
 
+void _3do_state::arcade_ntsc(machine_config &config)
+{
+	_3do(config);
+	m_cdrom->add_region("cdimage");
+}
+
+// TODO: split into separate CONS drivers
+// later models merges Clio + Madam into one fat chip named Anvil
 #if 0
 #define NTSC_BIOS \
 	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
@@ -241,7 +325,7 @@ ROM_END
 ROM_START(orbatak)
 	NTSC_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "cdimage" )
 	DISK_IMAGE_READONLY( "orbatak", 0, SHA1(25cb3b889cf09dbe5faf2b0ca4aae5e03453da00) )
 ROM_END
 
@@ -261,14 +345,14 @@ ROM_END
 ROM_START(md23do)
 	ALG_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "cdimage" )
 	DISK_IMAGE_READONLY( "mad dog ii", 0, SHA1(0117c1fd279f42e942648ca55fa75dd45da37a4f) )
 ROM_END
 
 ROM_START(sht3do)
 	ALG_BIOS
 
-	DISK_REGION( "cdrom" )
+	DISK_REGION( "cdimage" )
 	DISK_IMAGE_READONLY( "shootout at old tucson", 0, SHA1(bd42213c6b460b5b6153a8b2b41d0a114171e86e) )
 ROM_END
 
@@ -286,15 +370,15 @@ CONS( 1993, 3do_pal, 3do,    0,      _3do_pal,   3do,    _3do_state, empty_init,
 
 /*    YEAR  NAME     PARENT   MACHINE  INPUT  STATE       INIT        MONITOR   COMPANY                 FULLNAME               FLAGS */
 // Misc 3do Arcade games
-GAME( 1993, 3dobios, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 1993, 3dobios, 0,       arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
 
-GAME( 1995, orbatak, 3dobios, _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// Beavis and Butthead (prototype)
+GAME( 1995, orbatak, 3dobios, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+// Beavis and Butthead (prototype), different CD drive, Jaguar CD derived?
 
 
-// American Laser Games uses its own BIOS (with additional protection according to serial output?)
-GAME( 1993, alg3do, 0,       _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+// American Laser Games uses its own BIOS (with additional "FKr-Severe-System-extended-RSA failed in CreateTask")
+GAME( 1993, alg3do, 0,       arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
 
-GAME( 199?, md23do,  alg3do, _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME( 1994, sht3do,  alg3do, _3do,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 199?, md23do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
+GAME( 1994, sht3do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
 

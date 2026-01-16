@@ -398,6 +398,24 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	/* default to standard cmos interfacing */
 	for (auto & elem : m_forced_inputs)
 		elem = 0;
+
+	for(int i=0; i != 8; i++) {
+		m_port_in_cb[i].bind().set([this, i]() { return port_default_r(i); });
+		m_port_out_cb[i].bind().set([this, i](u8 data) { port_default_w(i, data); });
+	}
+}
+
+
+u8 mcs51_cpu_device::port_default_r(int port)
+{
+	if(!machine().side_effects_disabled())
+		logerror("read of un-hooked port %d (PC=%X)\n", port, m_ppc);
+	return 0xff;
+}
+
+void mcs51_cpu_device::port_default_w(int port, u8 data)
+{
+	logerror("write of un-hooked port %d %02x\n", port, data);
 }
 
 i8031_device::i8031_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -1234,10 +1252,10 @@ void mcs51_cpu_device::device_start()
 	state_add( MCS51_DPTR, "DPTR", m_dptr).formatstr("%04X");
 	state_add( MCS51_IE,   "IE",   m_ie  ).formatstr("%02X");
 	state_add( MCS51_IP,   "IP",   m_ip  ).formatstr("%02X");
-	state_add<u8>( MCS51_P0,  "P0", [this](){ return p0_r(); }, [this](u8 p){ p0_w(p); }).formatstr("%02X");
-	state_add<u8>( MCS51_P1,  "P1", [this](){ return p1_r(); }, [this](u8 p){ p1_w(p); }).formatstr("%02X");
-	state_add<u8>( MCS51_P2,  "P2", [this](){ return p2_r(); }, [this](u8 p){ p2_w(p); }).formatstr("%02X");
-	state_add<u8>( MCS51_P3,  "P3", [this](){ return p3_r(); }, [this](u8 p){ p3_w(p); }).formatstr("%02X");
+	state_add<u8>( MCS51_P0,  "P0", [this](){ auto dis = machine().disable_side_effects(); return p0_r(); }, [this](u8 p){ p0_w(p); }).formatstr("%02X");
+	state_add<u8>( MCS51_P1,  "P1", [this](){ auto dis = machine().disable_side_effects(); return p1_r(); }, [this](u8 p){ p1_w(p); }).formatstr("%02X");
+	state_add<u8>( MCS51_P2,  "P2", [this](){ auto dis = machine().disable_side_effects(); return p2_r(); }, [this](u8 p){ p2_w(p); }).formatstr("%02X");
+	state_add<u8>( MCS51_P3,  "P3", [this](){ auto dis = machine().disable_side_effects(); return p3_r(); }, [this](u8 p){ p3_w(p); }).formatstr("%02X");
 	state_add<u8>( MCS51_R0,  "R0", [this](){ return r_reg(0); }, [this](u8 r){ set_reg(0, r); }).formatstr("%02X");
 	state_add<u8>( MCS51_R1,  "R1", [this](){ return r_reg(1); }, [this](u8 r){ set_reg(1, r); }).formatstr("%02X");
 	state_add<u8>( MCS51_R2,  "R2", [this](){ return r_reg(2); }, [this](u8 r){ set_reg(2, r); }).formatstr("%02X");

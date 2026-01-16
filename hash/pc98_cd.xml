@@ -118,7 +118,7 @@ Booting with load rootdsk from (fd1) fails (verify, GRUB has issues specifically
 		</part>
 	</software>
 
-	<software name="plamo33"  supported="partial">
+	<software name="plamo33" cloneof="plamo3x" supported="partial">
 		<!--
 		Origin: Plamo Linux ring.gr.jp
 		plamo-3.3.iso         sha1=80012a39c4567ac649fd3ba94c3e51e1e8a29e8d md5=ace1849cbf2cdfc6b657e2e2254f0821
@@ -361,7 +361,7 @@ Slackware-based distro, cfr. plamo3x
 	</software>
 
 	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
-	<software name="winnt40w">
+	<software name="winnt40w" supported="partial">
 		<!--
 		Origin: Unknown
 		<rom name="disc2.ISO" size="434356224" crc="ffffffff" sha1="e2db9d9e3aab1401979d103d2d6109bfe3eff3ed"/>
@@ -374,6 +374,13 @@ Slackware-based distro, cfr. plamo3x
 		<description>Windows NT 4.0 Workstation</description>
 		<year>1996</year>
 		<publisher>Microsoft</publisher>
+		<notes><![CDATA[
+Triggers [pc98_kbd] 0x96 command at install startup
+Triggers tons of [DMA] 32-bit space registers at install startup
+3d Space Cadet has unresponsive inputs, wants the [pc98_kbd] autoconversion and maybe a Pentium class?
+]]></notes>
+		<!-- NOTE: Win NT will ask disks in inverse order, so disk #3 first then #2, finally #1 -->
+		<info name="usage" value="From an HDD installed DOS, format three floppies then run WINNT.EXE in PC98 folder. Requires +32MB RAM, and at least 256MB of HDD space." />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="windows nt 4.0 workstation (disc 1)" sha1="32fb5639983ba8c3e726ce9b3291a9a14b37facd" />
@@ -837,9 +844,8 @@ Media for undumped pc9821xa12
 		</part>
 	</software>
 
-	<!-- Fails with "can't find the CD-ROM drive" error -->
 	<!-- PC-9821 / FM Towns hybrid -->
-	<software name="angel" supported="no">
+	<software name="angel" supported="yes">
 		<!--
 		Origin: redump.org (CD) / Neo Kobe Collection (floppy)
 		<rom name="Angel (Japan) (Track 01).bin" size="31399200" crc="0668e2cc" sha1="9ab95afe28a1a6fb129b454ebc13b29bd08d0173"/>
@@ -975,8 +981,7 @@ Media for undumped pc9821xa12
 		</part>
 	</software>
 
-	<!-- Garbled text -->
-	<software name="ayumi" supported="no">
+	<software name="ayumi" supported="yes">
 		<!--
 		Origin: redump.org
 		<rom name="Ayumi-chan Monogatari (Japan).bin" size="74995872" crc="b18a149a" sha1="eff54a6ef1fd038670de5eebb84078127586b833"/>
@@ -1406,7 +1411,7 @@ Media for undumped pc9821xa12
 		<year>1997</year>
 		<publisher>フォアナイン (Fournine)</publisher>
 		<info name="serial" value="FNN-003"/>
-		<info name="alt_title" value="カナン　～約束の地～" />
+		<info name="alt_title" value="カナン ～約束の地～" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="canaan - yakusoku no chi (japan)" sha1="5044b38ae088af496427f5a6d3a832b443bbb937" />
@@ -1415,8 +1420,7 @@ Media for undumped pc9821xa12
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
-	<!-- After installing the system files, it fails to boot with "CD-ROM ドライブが見つかりません" (CD-ROM drive not found) -->
-	<software name="chiemi" supported="no">
+	<software name="chiemi" supported="yes">
 		<!--
 		Origin: redump.org / wiggy2k
 		<rom name="Chiemi &amp; Naomi (Japan) (Track 01).bin" size="31399200" crc="286527ae" sha1="546c782bf12f9d2d64c92204e3b53f19a12fd1c5"/>
@@ -1491,7 +1495,7 @@ Media for undumped pc9821xa12
 		<description>Chuushaki - Hirasawa Nurse School</description>
 		<year>1996</year>
 		<publisher>アーヴォリオ (Aypio)</publisher>
-		<info name="alt_title" value="注射器　Ｈｉｒａｓａｗａ　Ｎｕｒｓｅ　Ｓｃｈｏｏｌ" />
+		<info name="alt_title" value="注射器 Ｈｉｒａｓａｗａ Ｎｕｒｓｅ Ｓｃｈｏｏｌ" />
 		<info name="release" value="19960726" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1560,9 +1564,9 @@ Media for undumped pc9821xa12
 		</part>
 	</software>
 
-	<!-- Severe graphics glitches in 256-color mode. 16-color mode works. -->
-	<software name="crystadx" supported="partial">
+	<software name="crystadx" supported="yes">
 		<!--
+		http://redump.org/disc/92502/
 		Origin: redump.org
 		<rom name="Shin-ou Densetsu Crystania DX (Japan).bin" size="13660416" crc="26579922" sha1="6f29396429e3db3a9e1d0ec7414646981c2d5c0d"/>
 		<rom name="Shin-ou Densetsu Crystania DX (Japan).cue" size="103" crc="fff9e02c" sha1="5842591dceb26171658fc7b25640b7dca54ef9e7"/>
@@ -1572,7 +1576,7 @@ Media for undumped pc9821xa12
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="serial" value="001J291TA"/>
 		<info name="alt_title" value="神王伝説クリスタニアＤＸ" />
-		<info name="usage" value="Requires serial number printed on registration card"/>
+		<info name="usage" value="Requires serial number printed on registration card, and a prepared format /s floppy disk before install"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shin-ou densetsu crystania dx (japan)" sha1="aea3b20805282c2832c64a4366e6afec95c6a1e9" />
@@ -1785,7 +1789,6 @@ Media for undumped pc9821xa12
 		</part>
 	</software>
 
-	<!-- Severe graphics glitches -->
 	<software name="demoevo" supported="no">
 		<!--
 		Origin: redump.org
@@ -1821,7 +1824,12 @@ Media for undumped pc9821xa12
 		<description>NEC Demonstration CD-ROM - Evolution and Dinosaurs</description>
 		<year>1992</year>
 		<publisher>NEC</publisher>
-		<info name="usage" value="Requires AVGDRV.SYS or AVSDRV.SYS CD driver" />
+		<notes><![CDATA[
+DINOSAUR.EXE works
+CHKDEMO.EXE and AQUARIUM.EXE have issues detecting CD drive
+CDPLAYER.EXE black screen looping on [PC9801-86] FIFO empty flag, skipping that won't sense any disc
+]]></notes>
+		<info name="usage" value="Requires AVGDRV.SYS and AVSDRV.SYS CD driver" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="nec demonstration cd-rom - evolution and dinosaurs (japan)" sha1="b07a302de9f90b5eb958a35381cdda1f050ed37e" />
@@ -1996,7 +2004,7 @@ Not extensively tested
 		<year>1994</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="serial" value="HMF-130 / 2TD-3012"/>
-		<info name="alt_title" value="どきどきディスクＣＤ版　第１巻　クラブＤ．Ｏ．事務局" />
+		<info name="alt_title" value="どきどきディスクＣＤ版 第１巻 クラブＤ．Ｏ．事務局" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doki doki disk cd-ban vol. 1 (japan)" sha1="8bf3875f21ba28d30b7e837344d5560b15fe32e3" />
@@ -2104,6 +2112,7 @@ Not extensively tested
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="alt_title" value="DOR ベストセレクション 上巻" />
 		<info name="release" value="19930427" />
+		<info name="usage" value="Prepare a format /s DOS 5.0A floppy, then run FD.COM and follow instructions" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="dor best selection vol. 1 (joukan) (cd boot disk) [original].hdm" size="1261568" crc="42ee3c3c" sha1="d278c712f993ea7944509d9d6b583544c6cd8983" />
@@ -2207,11 +2216,12 @@ Not extensively tested
 		<rom name="Yumeutsutsu - Dreamy (Japan).bin" size="29056608" crc="616488db" sha1="c578eb8d274954d89ec7c6d71cd556e8848dc01d"/>
 		<rom name="Yumeutsutsu - Dreamy (Japan).cue" size="117" crc="c007b161" sha1="b6b95b651e8d55344e263bcda591ea1960a98c2a"/>
 		-->
-		<description>Yumeutsutsu - Dreamy</description>
+		<description>Yume Utsutsu - Dreamy</description>
 		<year>1992</year>
-		<publisher>Megami</publisher>
+		<publisher>megami</publisher>
 		<info name="serial" value="2TD-3017"/>
-		<info name="alt_title" value="夢現　－Ｄｒｅａｍｙ－" />
+		<info name="alt_title" value="夢現 Ｄｒｅａｍｙ －ゆめうつつ－" />
+		<!-- TODO: 1992 vs. '94 of floppy release? '-->
 		<info name="release" value="199205xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2310,8 +2320,7 @@ Not extensively tested
 	</software>
 
 	<!-- Even though it runs on Windows, this only works correctly on PC-98 computers due to differences in keyboard layouts with IBM compatibles -->
-	<!-- Music plays too fast -->
-	<software name="doom2w95" supported="partial">
+	<software name="doom2w95" supported="yes">
 		<!--
 		Origin: redump.org
 		<rom name="Doom II (Japan) (PC-98 Sen'you) (for Windows 95).bin" size="112225680" crc="bce00cf2" sha1="18a024985de65dc4c963b7ccfb66aa996beabec3"/>
@@ -2614,7 +2623,7 @@ Not extensively tested
 		<description>Etemible - Tenjou Mukyuu</description>
 		<year>1995</year>
 		<publisher>グローディア (Glodia)</publisher>
-		<info name="alt_title" value="エテミブル　～天壌無窮～" />
+		<info name="alt_title" value="エテミブル ～天壌無窮～" />
 		<info name="release" value="19950203" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk" />
@@ -2900,8 +2909,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Garbled text -->
-	<software name="ginga4" supported="no">
+	<software name="ginga4" supported="yes">
 		<!--
 		Origin: redump.org
 		<rom name="Ginga Eiyuu Densetsu IV (Japan) (Track 01).bin" size="31352160" crc="35daa08f" sha1="da814ab5ef05a54aa45fb29296d28c3283616f8b"/>
@@ -2931,6 +2939,7 @@ Not extensively tested
 		<info name="serial" value="UR-9460"/>
 		<info name="alt_title" value="銀河英雄伝説Ⅳ" />
 		<info name="release" value="19941223" />
+		<info name="usage" value="Prepare a format /s DOS floppy before install" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ginga eiyuu densetsu iv (japan)" sha1="e9f9644dcb26bed7863de9024618a3449332218a" />
@@ -2990,7 +2999,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		-->
 		<description>Gokichi-kun Series - Igo Kinenban CD</description>
 		<year>1995</year>
-		<publisher>ジーエーエム　(GAM)</publisher>
+		<publisher>ジーエーエム (GAM)</publisher>
 		<info name="alt_title" value="碁キチくんシリーズ 囲碁記念版CD" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3175,7 +3184,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<year>1997</year>
 		<publisher>フォスター (Foster)</publisher>
 		<info name="serial" value="CBF-0007"/>
-		<info name="alt_title" value="花の記憶　～第ニ章～" />
+		<info name="alt_title" value="花の記憶 ～第ニ章～" />
 		<info name="release" value="199702xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3366,7 +3375,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<year>1993</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="serial" value="HME-152 / MTC-1051"/>
-		<info name="alt_title" value="イフ　Ｉｎｖｉｔａｔｉｏｎｓ　ｆｒｏｍ　Ｆａｎｔａｓｔｉｃ　Ｓｔｏｒｉｅｓ" />
+		<info name="alt_title" value="イフ Ｉｎｖｉｔａｔｉｏｎｓ ｆｒｏｍ Ｆａｎｔａｓｔｉｃ Ｓｔｏｒｉｅｓ" />
 		<info name="release" value="199306xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3405,7 +3414,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<year>1993</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="serial" value="HMF-228 / 2TD-3003"/>
-		<info name="alt_title" value="イフ２　Ｉｎｖｉｔａｔｉｏｎｓ　ｆｒｏｍ　Ｆａｎｔａｓｔｉｃ　Ｓｔｏｒｉｅｓ" />
+		<info name="alt_title" value="イフ２ Ｉｎｖｉｔａｔｉｏｎｓ ｆｒｏｍ Ｆａｎｔａｓｔｉｃ Ｓｔｏｒｉｅｓ" />
 		<info name="release" value="19931119" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3425,7 +3434,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<year>1995</year>
 		<publisher>アクティブ (Active)</publisher>
 		<info name="serial" value="2TD-3021"/>
-		<info name="alt_title" value="イフ３　Ｉｎｖｉｔａｔｉｏｎｓ　ｆｒｏｍ　Ｆａｎｔａｓｔｉｃ　Ｓｔｏｒｉｅｓ" />
+		<info name="alt_title" value="イフ３ Ｉｎｖｉｔａｔｉｏｎｓ ｆｒｏｍ Ｆａｎｔａｓｔｉｃ Ｓｔｏｒｉｅｓ" />
 		<info name="release" value="199504xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3624,6 +3633,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<info name="serial" value="OSL-010A"/>
 		<info name="alt_title" value="漢字ランド３年" />
 		<info name="release" value="199507xx" />
+		<info name="usage" value="Requires AVSDRV.SYS" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="kanji land 3-nen (japan)" sha1="fb7b3684231bde65a285fe528b6c42f0be6f74cd" />
@@ -3799,7 +3809,6 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
-	<!-- Fails with "can't find the CD-ROM drive" error -->
 	<software name="lemoncc" supported="no">
 		<!--
 		Origin: redump.org
@@ -3827,9 +3836,13 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<description>Lemon Cocktail Collection</description>
 		<year>1993</year>
 		<publisher>カクテル・ソフト (Cocktail Soft)</publisher>
+		<notes><![CDATA[
+Fails on "Can't find the CD-ROM", loads NECCD.SYS
+]]></notes>
 		<info name="alt_title" value="レモン・カクテル・コレクション" />
 		<info name="serial" value="HME-101"/>
 		<info name="release" value="199303xx" />
+		<info name="usage" value="Prepare a formatted floppy, run INST98.EXE from CD, requires several MS-DOS files from floppy distribution" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="lemon cocktail collection (japan)" sha1="a17512ebc210b781310d79a35cf8da325ed1374a" />
@@ -3982,7 +3995,7 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<description>Record of Lodoss War II - Goshiki no Maryuu</description>
 		<year>1994</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
-		<info name="alt_title" value="ロードス島戦記Ⅱ　～五色の魔竜～" />
+		<info name="alt_title" value="ロードス島戦記Ⅱ ～五色の魔竜～" />
 		<info name="release" value="19940527" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Hozon-you Kidou Disk" />
@@ -4054,7 +4067,6 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		</part>
 	</software>
 
-	<!-- Mouse doesn't work -->
 	<software name="macrslcp" supported="no">
 		<!--
 		Origin: redump.org
@@ -4063,9 +4075,13 @@ Fussy with HIMEM.SYS and EMM386.EXE as suggested by manual, use VEM486 instead.
 		<rom name="Chou Jikuu Yousai Macross - SkullLeader Complete Pack (Japan) (Track 2).bin" size="21518448" crc="d8642621" md5="9e36b834adb077051b96c02120b12e41" sha1="345be6b9afa27a2381f25236a347de7e31f16af4"/>
 		<rom name="Chou Jikuu Yousai Macross - SkullLeader Complete Pack (Japan) (Track 3).bin" size="35985600" crc="ba94c502" md5="654be3fc65aa773df951856003f3e3b2" sha1="bee8a5ab076d10c9d6d85803316ba32d9bc30b5a"/>
 		-->
-		<description>Chou Jikuu Yousai Macross - SkullLeader Complete Pack</description>
+		<description>Choujikuu Yousai Macross - SkullLeader Complete Pack</description>
 		<year>1995</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<notes><![CDATA[
+Data disk for pc98:macroscp? No install option or a readme available
+Launching MAC4 asks for a save directory (with [EGC] bugs), then system hangs
+]]></notes>
 		<info name="alt_title" value="超時空要塞マクロス スカル・リーダー コンプリートパック ＨＤ専用" />
 		<info name="release" value="19950714" />
 		<part name="cdrom" interface="cdrom">
@@ -4417,7 +4433,6 @@ Fussy with HIMEM.SYS and EMM386.EXE provided by boot disk, tbd VEM486 use.
 		</part>
 	</software>
 
-	<!-- Missing a floppy disk -->
 	<software name="moonchan" supported="no">
 		<!--
 		Origin: redump.org
@@ -4495,6 +4510,9 @@ Fussy with HIMEM.SYS and EMM386.EXE provided by boot disk, tbd VEM486 use.
 		<description>Moonlight-chan Rinshan</description>
 		<year>1993</year>
 		<publisher>ディー・オー (D.O.)</publisher>
+		<notes><![CDATA[
+Missing boot floppy
+]]></notes>
 		<info name="serial" value="2TD-3001"/>
 		<info name="alt_title" value="Ｍゥーンライトちゃんリンしゃん" />
 		<part name="cdrom" interface="cdrom">
@@ -4521,7 +4539,7 @@ Fussy with HIMEM.SYS and EMM386.EXE provided by boot disk, tbd VEM486 use.
 		<description>Ms. Detective File #1 - Iwami Ginzan Satsujin Jiken</description>
 		<year>1993</year>
 		<publisher>データウエスト (Data West)</publisher>
-		<info name="alt_title" value="ミス・ディテクティヴ　ファイル#1　石見銀山殺人事件" />
+		<info name="alt_title" value="ミス・ディテクティヴ ファイル#1 石見銀山殺人事件" />
 		<info name="release" value="19930417" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -4547,7 +4565,7 @@ Fussy with HIMEM.SYS and EMM386.EXE provided by boot disk, tbd VEM486 use.
 		<description>Ms. Detective File #2 - Sugata-naki Irainin</description>
 		<year>1993</year>
 		<publisher>データウエスト (Data West)</publisher>
-		<info name="alt_title" value="ミス・ディテクティヴ　ファイル#2　姿なき依頼人" />
+		<info name="alt_title" value="ミス・ディテクティヴ ファイル#2 姿なき依頼人" />
 		<info name="release" value="19931029" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
@@ -5289,7 +5307,6 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 	</software>
 
 	<!-- DOS/V / PC-9821 / FM Towns hybrid. Each version requires a different floppy disk, but the CD is shared between them. -->
-	<!-- Missing the floppy disk for the PC-98 version -->
 	<software name="psydet4" supported="no">
 		<!--
 		Origin: redump.org
@@ -5305,8 +5322,11 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<description>Psychic Detective Series Vol. 4 - Orgel</description>
 		<year>1994</year>
 		<publisher>データウエスト (Data West)</publisher>
+		<notes><![CDATA[
+Missing boot floppy
+]]></notes>
 		<info name="serial" value="DWDC4023"/>
-		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ　Vol.4　オルゴール" />
+		<info name="alt_title" value="サイキック・ディテクティヴ・シリーズ Vol.4 オルゴール" />
 		<info name="release" value="199412xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5999,7 +6019,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<year>1995</year>
 		<publisher>工画堂 (Kogado)</publisher>
 		<info name="serial" value="9214-55HM10" />
-		<info name="alt_title" value="シュヴァルツシルトEX　鉄鎖の星群" />
+		<info name="alt_title" value="シュヴァルツシルトEX 鉄鎖の星群" />
 		<info name="release" value="19950718" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6187,7 +6207,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		-->
 		<description>The Silent Service - Chinmoku no Kantai</description>
 		<year>1993</year>
-		<publisher>ジーエーエム　(GAM)</publisher>
+		<publisher>ジーエーエム (GAM)</publisher>
 		<info name="serial" value="DWPC3808" />
 		<info name="alt_title" value="沈黙の艦隊" />
 		<info name="release" value="19930410" />
@@ -6220,8 +6240,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 	</software>
 
 	<!-- PC-9801 / DOS/V hybrid -->
-	<!-- Garbled text -->
-	<software name="sorcerk" supported="no">
+	<software name="sorcerk" supported="yes">
 		<!--
 		Origin: redump.org
 		<rom name="Sorcer Kingdom (Japan).bin" size="64515360" crc="fb7ee734" sha1="7b6eb41617c59cde7aae19d284a3cb96c7bc21a9"/>
@@ -6277,8 +6296,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		</part>
 	</software>
 
-	<!-- Severe graphics glitches -->
-	<software name="strike" supported="no">
+	<software name="strike" supported="partial">
 		<!--
 		Origin: redump.org
 		<rom name="Strike Commander (Japan).bin" size="112860720" crc="b7b1433f" sha1="ac1d1a38a16c0c5fadfcc66327e2ef5680c0316d"/>
@@ -6287,6 +6305,11 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<description>Strike Commander</description>
 		<year>1994</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
+		<notes><![CDATA[
+Optional [WAB] graphic cards not yet emulated
+Attempts to read [SB16] joystick port at $4d2 even with a [PC9801-86]
+[PC9801-86] OPNA sound very quiet, writes reg 0 = 0x00 (max FM volume) and (undocumented) reg 5 = 0x0b
+]]></notes>
 		<info name="serial" value="ENP-7010" />
 		<info name="alt_title" value="ストライク・コマンダー" />
 		<info name="release" value="19940826" />
@@ -6334,7 +6357,6 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		</part>
 	</software>
 
-	<!-- Missing a floppy disk -->
 	<software name="syndicat" supported="no">
 		<!--
 		Origin: redump.org
@@ -6344,6 +6366,9 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<description>Syndicate</description>
 		<year>1994</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
+		<notes><![CDATA[
+Missing install floppy
+]]></notes>
 		<info name="serial" value="ENP-7009"/>
 		<info name="alt_title" value="シンジケート" />
 		<info name="release" value="19940728" />
@@ -6446,7 +6471,6 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		</part>
 	</software>
 
-	<!-- Missing a floppy disk -->
 	<software name="teikets3" supported="no">
 		<!--
 		Origin: redump.org
@@ -6479,6 +6503,9 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<description>Teitoku no Ketsudan III</description>
 		<year>1996</year>
 		<publisher>光栄 (Koei)</publisher>
+		<notes><![CDATA[
+Missing install floppy
+]]></notes>
 		<info name="serial" value="KN11-14103"/>
 		<info name="alt_title" value="提督の決断Ⅲ" />
 		<part name="cdrom" interface="cdrom">
@@ -6542,7 +6569,6 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		</part>
 	</software>
 
-	<!-- Severe screen positioning issues -->
 	<!-- PC-9821 / DOS/V / FM Towns hybrid -->
 	<software name="thehorde" supported="no">
 		<!--
@@ -6565,6 +6591,9 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<description>The Horde</description>
 		<year>1995</year>
 		<publisher>アローマイクロテックス (Arrow Micro-Techs)</publisher>
+		<notes><![CDATA[
+[EGC] shift (?) issues during battle phases
+]]></notes>
 		<info name="alt_title" value="ザ ホード" />
 		<info name="release" value="19950428" />
 		<part name="cdrom" interface="cdrom">
@@ -6805,19 +6834,22 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 	</software>
 
 	<!-- PC-9821 / DOS/V hybrid -->
-	<!-- Severe graphics glitches -->
 	<software name="ultima8" supported="no">
 		<!--
 		Origin: redump.org
 		<rom name="Ultima VIII - Pagan (Japan).bin" size="32323536" crc="454bf37f" sha1="1463121d6a5f0f71f24e491813071d530fa18735"/>
 		<rom name="Ultima VIII - Pagan (Japan).cue" size="116" crc="fefe7b3a" sha1="10090b0bcc7a21f9ccb8772eb735fa0a3cde39e7"/>
 		-->
-		<description>Ultima VIII - Pagan</description>
+		<description>Ultima VIII - Pagan (v1.07J)</description>
 		<year>1995</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
+		<notes><![CDATA[
+[PC9801-86] no sound, keeps pushing IRQ clears with FIFO control at $a468
+]]></notes>
 		<info name="serial" value="ENP-7020" />
-		<info name="alt_title" value="ウルティマⅧ　～ペイガン～" />
+		<info name="alt_title" value="ウルティマⅧ ～ペイガン～" />
 		<info name="release" value="19951122" />
+		<info name="usage" value="Sports The Chronicle of Pagan copy protection (initials)" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultima viii - pagan (japan)" sha1="5219d6ab0b85a3bcb3068740a6898e350ecd1eff" />
@@ -6834,6 +6866,11 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<description>U.S. Navy Fighters Gold</description>
 		<year>1996</year>
 		<publisher>エレクトロニック・アーツ・ビクター (Electronic Arts Victor)</publisher>
+		<notes><![CDATA[
+Requires 16MB minimum on Windows 95, and a DOS env
+Runs too sluggish on pc9821ap2, requires better HW
+No sound with [PC9801-86] on intro and main menu (verify)
+]]></notes>
 		<info name="alt_title" value="Ｕ．Ｓ．ネイビーファイターズ ゴールド" />
 		<info name="release" value="19960426" />
 		<part name="cdrom" interface="cdrom">
@@ -6862,8 +6899,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		</part>
 	</software>
 
-	<!-- Garbled text -->
-	<software name="umanari2" supported="no">
+	<software name="umanari2" supported="yes">
 		<!--
 		Origin: redump.org
 		<rom name="Umanari 1 Furlong Theater 2 (Japan).bin" size="9781968" crc="d352a37f" sha1="043617b7f2dca879d4ab379a12c380800c275055"/>
@@ -6881,7 +6917,6 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 	</software>
 
 	<!-- PC-98x1 / FM Towns hybrid, also included in fmtowns_cd.xml -->
-	<!-- Hangs at the text / voice selection screen -->
 	<software name="vastness" supported="no">
 		<!--
 		Origin: redump.org
@@ -6895,6 +6930,10 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<description>Vastness - Kuukyo no Ikenie-tachi</description>
 		<year>1995</year>
 		<publisher>CD Bros.</publisher>
+		<notes><![CDATA[
+EMS issues once installed
+Old note: Hangs at the text / voice selection screen (verify)
+]]></notes>
 		<info name="serial" value="HMF-132 / CB-001"/>
 		<info name="alt_title" value="ヴアーストニス 空虚の生贄達" />
 		<info name="release" value="199502xx" />
@@ -6905,8 +6944,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		</part>
 	</software>
 
-	<!-- Sounds play but nothing shows up on screen -->
-	<software name="venus" supported="no">
+	<software name="venus" supported="yes">
 		<!--
 		Origin: Neo Kobe Collection
 		CCD converted to CUE with GNU ccd2cue
@@ -6918,6 +6956,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<description>Venus &amp; Mug-R</description>
 		<year>1994</year>
 		<publisher>ソフトウェアハウスぱせり (Software House Parsley)</publisher>
+		<info name="usage" value="Prepare a floppy /s, run INST.EXE to install, needs GDC 2.5 MHz setting in gameplay" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="venus &amp; mug-r" sha1="e5baf67106a20b95a6eb7ee40ba0ed01eb3084cc" />
@@ -7218,8 +7257,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		</part>
 	</software>
 
-	<!-- Garbled text -->
-	<software name="yumemi" supported="no">
+	<software name="yumemi" supported="yes">
 		<!--
 		Origin: redump.org
 		<rom name="Yumemizaka (Japan).bin" size="178062864" crc="c7f5ef68" sha1="d86e9185d5372efc5404dada1d01be250d8a1d7a"/>
@@ -7228,6 +7266,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<description>Yumemizaka</description>
 		<year>1995</year>
 		<publisher>ユーミソフト (U-me Soft)</publisher>
+		<!-- uses exact same installer as venus -->
 		<info name="alt_title" value="夢見坂" />
 		<info name="release" value="19950714" />
 		<part name="cdrom" interface="cdrom">
@@ -7324,7 +7363,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<year>1996</year>
 		<publisher>ディー・オー (D.O.)</publisher>
 		<info name="serial" value="MCD-008"/>
-		<info name="alt_title" value="ＣＤ‐ＲＯＭ美少女戦士コレクション　～遊ディスクスペシャル～" />
+		<info name="alt_title" value="ＣＤ‐ＲＯＭ美少女戦士コレクション ～遊ディスクスペシャル～" />
 		<info name="release" value="199604xx" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7353,7 +7392,7 @@ With .fdi disk, will either black screen or respond to user presses, eventually 
 		<description>Yuurou - Transient Sands</description>
 		<year>1996</year>
 		<publisher>ハーベスト (Hervest)</publisher>
-		<info name="alt_title" value="憂楼 　－Ｔｒａｎｓｉｅｎｔ　Ｓａｎｄｓ－" />
+		<info name="alt_title" value="憂楼  －Ｔｒａｎｓｉｅｎｔ Ｓａｎｄｓ－" />
 		<info name="release" value="19960802" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

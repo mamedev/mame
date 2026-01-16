@@ -162,37 +162,45 @@
 
 #include "emu.h"
 
-#include "bus/midi/midi.h"
-#include "cpu/es5510/es5510.h"
-#include "cpu/m68000/m68000.h"
-#include "formats/esq16_dsk.h"
-#include "imagedev/floppy.h"
 #include "esqlcd.h"
 #include "esqpanel.h"
 #include "esqvfd.h"
+#include "vfxcart.h"
+
+#include "bus/midi/midi.h"
+#include "cpu/es5510/es5510.h"
+#include "cpu/m68000/m68000.h"
+#include "imagedev/floppy.h"
 #include "machine/hd63450.h"    // compatible with MC68450, which is what these really have
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "machine/wd_fdc.h"
 #include "sound/es5506.h"
 #include "sound/esqpump.h"
+
 #include "emupal.h"
+#include "softlist_dev.h"
 #include "speaker.h"
-#include "vfxcart.h"
+
+#include "formats/esq16_dsk.h"
+#include "formats/hxchfe_dsk.h"
 
 #include <cstdarg>
 #include <cstdio>
 
-// #define VERBOSE 1
-#define VERBOSE 0
+
+//#define VERBOSE 1
 #include "logmacro.h"
+
 
 namespace {
 
-#define GENERIC (0)
-#define EPS     (1)
-#define SQ1     (2)
-#define VFX     (3)
+enum esq5505_system_type : int {
+	GENERIC = 0,
+	EPS,
+	SQ1,
+	VFX
+};
 
 #define KEYBOARD_HACK (1)   // turn on to play the SQ-1, SD-1, and SD-1 32-voice: Z and X are program up/down, A/S/D/F/G/H/J/K/L and Q/W/E/R/T/Y/U play notes
 
@@ -222,7 +230,7 @@ public:
 		, m_pump(*this, "pump")
 		, m_fdc(*this, "wd1772")
 		, m_floppy_connector(*this, "wd1772:0")
-		, m_cartslot(*this, "cartslot")
+		, m_cart(*this, "cart")
 		, m_panel(*this, "panel")
 		, m_dmac(*this, "mc68450")
 		, m_mdout(*this, "mdout")
@@ -232,19 +240,18 @@ public:
 		, m_seqram_nvram(*this, "seqram")
 	{ }
 
-	void common(machine_config &config);
-	void vfx(machine_config &config);
-	void sq1(machine_config &config);
-	void vfxsd(machine_config &config);
-	void sd132(machine_config &config);
-	void eps(machine_config &config);
-	void common32(machine_config &config);
-	void ks32(machine_config &config);
+	void vfx(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX) ATTR_COLD;
+	void vfxsd(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::VFX_SD) ATTR_COLD;
+	void sd1(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1) ATTR_COLD;
+	void sd132(machine_config &config, int vfx_panel_type = esqpanel2x40_vfx_device::SD_1_32) ATTR_COLD;
+	void eps(machine_config &config) ATTR_COLD;
+	void sq1(machine_config &config) ATTR_COLD;
+	void ks32(machine_config &config) ATTR_COLD;
 
-	void init_eps();
-	void init_common();
-	void init_sq1();
-	void init_denib();
+	void init_eps() ATTR_COLD;
+	void init_sq1() ATTR_COLD;
+	void init_denib() ATTR_COLD;
+
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
 
 protected:
@@ -259,7 +266,7 @@ private:
 	required_device<esq_5505_5510_pump_device> m_pump;
 	optional_device<wd1772_device> m_fdc;
 	optional_device<floppy_connector> m_floppy_connector;
-	optional_device<ensoniq_vfx_cartslot> m_cartslot;
+	optional_device<ensoniq_vfx_cartridge> m_cart;
 	required_device<esqpanel_device> m_panel;
 	optional_device<hd63450_device> m_dmac;
 	required_device<midi_port_device> m_mdout;
@@ -267,6 +274,11 @@ private:
 	required_shared_ptr<uint16_t> m_ram;
 	optional_device<nvram_device> m_osram_nvram;
 	optional_device<nvram_device> m_seqram_nvram;
+
+	void common(machine_config &config) ATTR_COLD;
+	void common32(machine_config &config) ATTR_COLD;
+
+	void init_common() ATTR_COLD;
 
 	uint16_t lower_r(offs_t offset);
 	void lower_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -318,30 +330,21 @@ private:
 
 void esq5505_state::cartridge_loaded(bool loaded)
 {
-	if (m_cartslot)
-	{
-		LOG("Cartridge %s\n", loaded ? "Inserted" : "Ejected");
-		int state = loaded ? CLEAR_LINE : ASSERT_LINE;
+	LOG("Cartridge %s\n", loaded ? "Inserted" : "Ejected");
+	int state = loaded ? CLEAR_LINE : ASSERT_LINE;
 
-		// On VFX and later, DUART input bit 1 is 0 for cartridge present.
-		LOG("ip1 -> %d\n", state);
-		m_duart->ip1_w(state);
-	}
-	else
-	{
-		LOG("<No Cartridge slot for loaded=%d>\n", loaded);
-	}
+	// On VFX and later, DUART input bit 1 is 0 for cartridge present.
+	LOG("ip1 -> %d\n", state);
+	m_duart->ip1_w(state);
 }
 
 void esq5505_state::cartridge_load(ensoniq_vfx_cartridge *cart)
 {
-	(void) cart;
 	cartridge_loaded(true);
 }
 
 void esq5505_state::cartridge_unload(ensoniq_vfx_cartridge *cart)
 {
-	(void) cart;
 	cartridge_loaded(false);
 }
 
@@ -354,6 +357,7 @@ void esq5505_state::floppy_formats(format_registration &fr)
 {
 	fr.add_mfm_containers();
 	fr.add(FLOPPY_ESQIMG_FORMAT);
+	fr.add(FLOPPY_HFE_FORMAT);
 }
 
 TIMER_CALLBACK_MEMBER(esq5505_state::floppy_motor_on)
@@ -363,7 +367,10 @@ TIMER_CALLBACK_MEMBER(esq5505_state::floppy_motor_on)
 	{
 		floppy_image_device *floppy = m_floppy_connector->get_device();
 		if (floppy)
-			floppy->mon_w(motor_on ? CLEAR_LINE : ASSERT_LINE);  // active low
+		{
+			floppy->mon_w(!motor_on);  // active low
+			m_panel->set_floppy_active(motor_on);
+		}
 	}
 }
 
@@ -377,13 +384,7 @@ TIMER_CALLBACK_MEMBER(esq5505_state::floppy_dskchg_reset)
 void esq5505_state::update_floppy_inputs()
 {
 	// update the "Disk Ready" input
-	int state = (m_floppy_is_active && m_floppy_is_loaded) ? ASSERT_LINE : CLEAR_LINE;
-#if VERBOSE
-	static int prev_state = 0;
-	if (prev_state != state) LOG("ip0 -> %d\n", state);
-	prev_state = state;
-#endif
-	m_duart->ip0_w(state);
+	m_duart->ip0_w(m_floppy_is_active && m_floppy_is_loaded);
 
 	// Also update the DOC IRQ in case there's a pending disk change to handle.
 	update_docirq_to_maincpu();
@@ -412,20 +413,19 @@ void esq5505_state::floppy_loaded(bool loaded)
 
 void esq5505_state::floppy_load(floppy_image_device *floppy)
 {
-	(void) floppy;
 	floppy_loaded(true);
 }
 
 void esq5505_state::floppy_unload(floppy_image_device *floppy)
 {
-	(void) floppy;
 	floppy_loaded(false);
 }
 
 void esq5505_state::update_docirq_to_maincpu()
 {
 	bool floppy_dskchg_irq = m_floppy_is_active && m_floppy_dskchg;
-	if (floppy_dskchg_irq) LOG("docirq (m68k_irq1) due to disk change = %d\n", floppy_dskchg_irq);
+	if (floppy_dskchg_irq)
+		LOG("docirq (m68k_irq1) due to disk change = %d\n", floppy_dskchg_irq);
 	if (floppy_dskchg_irq && m_floppy_is_loaded)
 	{
 		// The drives that Ensoniq use only _pulse_ DSKCHG for a brief time, when a disk is in the drive.
@@ -433,16 +433,12 @@ void esq5505_state::update_docirq_to_maincpu()
 		LOG("Scheduling DSKCHG reset\n");
 		m_dskchg_reset_timer->adjust(attotime::from_nsec(500));
 	}
-	bool v = m_otis_irq || floppy_dskchg_irq;
-	if (v != m_docirq)
+	bool updated_irq = m_otis_irq || floppy_dskchg_irq;
+	if (updated_irq != m_docirq)
 	{
-		LOG("docirq (m68k_irq1) -> %d\n", v);
-		m_maincpu->set_input_line(M68K_IRQ_1, v);
-		m_docirq = v;
-	}
-	else
-	{
-		// LOG("m68k irq1 -- %d\n", v);
+		LOG("docirq (m68k_irq1) -> %d\n", updated_irq);
+		m_maincpu->set_input_line(M68K_IRQ_1, updated_irq);
+		m_docirq = updated_irq;
 	}
 }
 
@@ -450,13 +446,8 @@ void esq5505_state::otis_irq(int irq)
 {
 	if (irq != m_otis_irq)
 	{
-		// LOG("otis_irq -> %d\n", irq);
 		m_otis_irq = irq;
 		update_docirq_to_maincpu();
-	}
-	else
-	{
-		// LOG("otis_irq -- %d\n", irq);
 	}
 }
 
@@ -475,9 +466,11 @@ void esq5505_state::eps_cpu_space_map(address_map &map)
 void esq5505_state::machine_start()
 {
 	LOG("machine_start()\n");
-	if (m_floppy_connector) {
+	if (m_floppy_connector)
+	{
 		floppy_image_device *floppy = m_floppy_connector->get_device();
-		if (floppy) {
+		if (floppy)
+		{
 			floppy->setup_load_cb(floppy_image_device::load_cb(&esq5505_state::floppy_load, this));
 			floppy->setup_unload_cb(floppy_image_device::unload_cb(&esq5505_state::floppy_unload, this));
 
@@ -485,62 +478,58 @@ void esq5505_state::machine_start()
 			m_dskchg_reset_timer = timer_alloc(FUNC(esq5505_state::floppy_dskchg_reset), this);
 
 			// Set DSKCHG according to whether there is a floppy in the drive.
-			if (floppy->exists()) {
-				LOG("\nFloppy Drive has Floppy '%s'\n", floppy->filename());
+			if (floppy->exists())
+			{
+				LOG("Floppy Drive has Floppy '%s'\n", floppy->filename());
 				m_floppy_dskchg = false;
-			} else {
-				LOG("\nFloppy Drive has No Floppy\n");
+			}
+			else
+			{
+				LOG("Floppy Drive has No Floppy\n");
 				m_floppy_dskchg = true;
 			}
-		} else {
-			LOG("\nFloppy Drive has No Image Device!\n");
 		}
-	} else {
-			LOG("\nNo Floppy Drive\n");
-	}
-
-	if (m_cartslot) {
-		ensoniq_vfx_cartridge *cart = m_cartslot->get_card_device();
-
-		if (cart) {
-			cart->setup_load_cb(ensoniq_vfx_cartridge::load_cb(&esq5505_state::cartridge_load, this));
-			cart->setup_unload_cb(ensoniq_vfx_cartridge::unload_cb(&esq5505_state::cartridge_unload, this));
-
-			if (cart->exists()) {
-				LOG("\nCartridge Slot has Cartridge '%s'\n", cart->filename());
-			} else {
-				LOG("\nCartridge Slot has No Cartridge\n");
-			}
-		} else {
-			LOG("\nCartridge Slot has No Image Device!\n");
+		else
+		{
+			LOG("Floppy Drive has No Image Device!\n");
 		}
-	} else {
-		LOG("\nNo Cartridge Slot\n");
 	}
+	else
+	{
+		LOG("No Floppy Drive\n");
+	}
+	if (m_cart)
+	{
+		m_cart->setup_load_cb(ensoniq_vfx_cartridge::load_cb(&esq5505_state::cartridge_load, this));
+		m_cart->setup_unload_cb(ensoniq_vfx_cartridge::unload_cb(&esq5505_state::cartridge_unload, this));
 
-	// Set up the load / unload callbacks for floppy and cartridge here
+		if (m_cart->exists())
+		{
+			LOG("Cartridge Slot has Cartridge '%s'\n", m_cart->filename());
+		}
+		else
+		{
+			LOG("Cartridge Slot has No Cartridge\n");
+		}
+	}
 }
 
 void esq5505_state::machine_reset()
 {
 	// Check our image devices for load status.
-	if (m_floppy_connector) {
+	if (m_floppy_connector)
+	{
 		floppy_image_device *floppy = m_floppy_connector->get_device();
-		if (floppy && floppy->exists()) {
+		if (floppy && floppy->exists())
 			floppy_load(floppy);
-		} else {
+		else
 			floppy_unload(floppy);
-		}
 	}
 
-	if (m_cartslot) {
-		ensoniq_vfx_cartridge *cart = m_cartslot->get_card_device();
-		if (cart && cart->exists()) {
-			cartridge_load(cart);
-		} else {
-			cartridge_unload(cart);
-		}
-	}
+	if (m_cart && m_cart->exists())
+		cartridge_load(m_cart);
+	else
+		cartridge_unload(m_cart);
 
 	// Default analog values: all values are 10 bits, left-justified within 16 bits.
 	m_analog_values[0] = 0x7fc0; // pitch mod: start in the center
@@ -558,13 +547,9 @@ uint16_t esq5505_state::lower_r(offs_t offset)
 	offset &= 0x7fff;
 
 	if (!machine().side_effects_disabled() && m_maincpu->get_fc() == 0x6)  // supervisor mode = ROM
-	{
 		return m_rom[offset];
-	}
 	else
-	{
 		return m_ram[offset];
-	}
 }
 
 void esq5505_state::lower_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -574,13 +559,9 @@ void esq5505_state::lower_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (offset < 0x4000)
 	{
 		if (m_maincpu->get_fc() != 0x6)  // if not supervisor mode, RAM
-		{
 			COMBINE_DATA(&m_ram[offset]);
-		}
 		else
-		{
 			LOG("Write to ROM: %x @ %x (fc=%x)\n", data, offset, m_maincpu->get_fc());
-		}
 	}
 	else
 	{
@@ -594,7 +575,7 @@ void esq5505_state::vfx_map(address_map &map)
 	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
 	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
-	map(0x2e0000, 0x2fffff).rw(m_cartslot, FUNC(ensoniq_vfx_cartslot::read), FUNC(ensoniq_vfx_cartslot::write)).umask16(0x00ff);
+	map(0x2e0000, 0x2fffff).rw(m_cart, FUNC(ensoniq_vfx_cartridge::read), FUNC(ensoniq_vfx_cartridge::write)).umask16(0x00ff);
 	map(0xc00000, 0xc1ffff).rom().region("osrom", 0);
 	map(0xff0000, 0xffffff).ram().share("osram");
 }
@@ -606,7 +587,7 @@ void esq5505_state::vfxsd_map(address_map &map)
 	map(0x280000, 0x28001f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0x260000, 0x2601ff).rw(m_esp, FUNC(es5510_device::host_r), FUNC(es5510_device::host_w)).umask16(0x00ff);
 	map(0x2c0000, 0x2c0007).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
-	map(0x2e0000, 0x2fffff).rw(m_cartslot, FUNC(ensoniq_vfx_cartslot::read), FUNC(ensoniq_vfx_cartslot::write)).umask16(0x00ff);
+	map(0x2e0000, 0x2fffff).rw(m_cart, FUNC(ensoniq_vfx_cartridge::read), FUNC(ensoniq_vfx_cartridge::write)).umask16(0x00ff);
 	map(0x330000, 0x37ffff).ram().share("seqram");
 	map(0xc00000, 0xc3ffff).rom().region("osrom", 0);
 	map(0xff0000, 0xffffff).ram().share("osram");
@@ -669,7 +650,7 @@ void esq5505_state::duart_output(uint8_t data)
 	    VFX-SD & SD-1 (32):
 	    bits 0/1/2 = analog sel
 	    bit 3 = SSEL (disk side)
-	    bit 4 = DSEL (Drive Delect and floppy Motor On)
+	    bit 4 = DSEL (Drive Select and floppy Motor On)
 	    bit 6 = ESPHALT
 	    bit 7 = SACK (?)
 	*/
@@ -699,8 +680,8 @@ void esq5505_state::duart_output(uint8_t data)
 		}
 		else
 		{
-			floppy->ss_w(((data & 8) >> 3) ^ 1); // bit 3, inverted -> floppy
-			m_floppy_is_active = (data & 16) != 0; // bit 4 is used to activate the floppy:
+			floppy->ss_w(!BIT(data, 3)); // bit 3, inverted -> floppy
+			m_floppy_is_active = BIT(data, 4); // bit 4 is used to activate the floppy:
 			if (m_floppy_is_active)
 			{
 				// immediately assert DISK SELECT (active low)
@@ -785,21 +766,12 @@ void esq5505_state::common(machine_config &config)
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
 
-	ENSONIQ_VFX_CARTRIDGE_SLOT(config, m_cartslot);
-	m_cartslot->option_add_internal("cart", ENSONIQ_VFX_CARTRIDGE);
-	m_cartslot->set_default_option("cart");
-	m_cartslot->set_fixed(true);
-
-	ESQPANEL2X40_VFX(config, m_panel);
-	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
-	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
-
-	MC68681(config, m_duart, 4000000);
+	MC68681(config, m_duart, 5'000'000);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
 	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel_device::rx_w));
 	m_duart->outport_cb().set(FUNC(esq5505_state::duart_output));
-	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
+	m_duart->set_clocks(500'000, 500'000, 1'000'000, 1'000'000);
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
@@ -831,9 +803,16 @@ void esq5505_state::common(machine_config &config)
 	m_otis->add_route(7, "pump", 1.0, 7);
 }
 
-void esq5505_state::vfx(machine_config &config)
+void esq5505_state::vfx(machine_config &config, int panel_type)
 {
 	common(config);
+
+	ENSONIQ_VFX_CARTRIDGE(config, m_cart);
+
+	ESQPANEL2X40_VFX(config, m_panel, panel_type);
+	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
+	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
+
 	NVRAM(config, m_osram_nvram, nvram_device::DEFAULT_NONE);
 }
 
@@ -845,7 +824,7 @@ void esq5505_state::eps(machine_config &config)
 
 	m_duart->set_clock(10_MHz_XTAL / 2);
 
-	ESQPANEL1X22(config.replace(), m_panel);
+	ESQPANEL1X22(config, m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 
@@ -857,15 +836,13 @@ void esq5505_state::eps(machine_config &config)
 	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
 	m_dmac->irq_callback().set_inputline(m_maincpu, M68K_IRQ_2);
-	m_dmac->dma_read<0>().set(m_fdc, FUNC(wd1772_device::data_r));  // ch 0 = fdc, ch 1 = 340001 (ADC?)
-	m_dmac->dma_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
+	m_dmac->dma8_read<0>().set(m_fdc, FUNC(wd1772_device::data_r));  // ch 0 = fdc, ch 1 = 340001 (ADC?)
+	m_dmac->dma8_write<0>().set(m_fdc, FUNC(wd1772_device::data_w));
 }
 
-void esq5505_state::vfxsd(machine_config &config)
+void esq5505_state::vfxsd(machine_config &config, int panel_type)
 {
-	// Like the VFX
-	vfx(config);
-	// but with an updated memory map that includes FDC and sequence RAM
+	vfx(config, panel_type);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::vfxsd_map);
 	// and nvram for the sequencer RAM as well
 	NVRAM(config, m_seqram_nvram, nvram_device::DEFAULT_NONE);
@@ -874,9 +851,37 @@ void esq5505_state::vfxsd(machine_config &config)
 	m_pump->add_route(2, "aux", 1.0, 0);
 	m_pump->add_route(3, "aux", 1.0, 1);
 
-	// On the VFX-SD, the floppy connector always has exactly one 3.5inch DD floppy drive.
-	WD1772(config, m_fdc, 8000000);
+	WD1772(config, m_fdc, 8'000'000);
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true).enable_sound(true);
+
+	// software list
+	SOFTWARE_LIST(config, "vfxsd_flop").set_original("vfxsd_flop");
+}
+
+void esq5505_state::sd1(machine_config &config, int panel_type)
+{
+	// Like the VFX-SD but with its own panel type
+	vfxsd(config, panel_type);
+
+	// software list
+	SOFTWARE_LIST(config, "sd1_flop").set_original("sd1_flop");
+}
+
+// Like the sd1, but with some clock speeds faster.
+void esq5505_state::sd132(machine_config &config, int panel_type)
+{
+	auto clock = 30.47618_MHz_XTAL / 2;
+
+	// Like the SD-1 but with its own panel type
+	sd1(config, panel_type);
+	m_duart->set_clock(4'000'000);
+
+	m_maincpu->set_clock(clock);
+	m_otis->set_clock(clock);
+	m_pump->set_clock(clock);
+
+	// software list
+	SOFTWARE_LIST(config, "sd132_flop").set_original("sd132_flop");
 }
 
 // 32-voice machines with the VFX-SD type config
@@ -889,21 +894,16 @@ void esq5505_state::common32(machine_config &config)
 	ES5510(config, m_esp, 10_MHz_XTAL);
 	m_esp->set_disable();
 
-	ENSONIQ_VFX_CARTRIDGE_SLOT(config, m_cartslot);
-	m_cartslot->option_add_internal("cart", ENSONIQ_VFX_CARTRIDGE);
-	m_cartslot->set_default_option("cart");
-	m_cartslot->set_fixed(true);
-
 	ESQPANEL2X40_VFX(config, m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 
-	MC68681(config, m_duart,  4000000);
+	MC68681(config, m_duart,  4'000'000);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_duart->a_tx_cb().set(m_mdout, FUNC(midi_port_device::write_txd));
 	m_duart->b_tx_cb().set(m_panel, FUNC(esqpanel_device::rx_w));
 	m_duart->outport_cb().set(FUNC(esq5505_state::duart_output));
-	m_duart->set_clocks(500000, 500000, 1000000, 1000000);
+	m_duart->set_clocks(500'000, 500'000, 1'000'000, 1'000'000);
 
 	auto &mdin(MIDI_PORT(config, "mdin"));
 	midiin_slot(mdin);
@@ -938,19 +938,8 @@ void esq5505_state::common32(machine_config &config)
 	m_otis->add_route(6, "pump", 1.0, 6);
 	m_otis->add_route(7, "pump", 1.0, 7);
 
-	WD1772(config, m_fdc, 8000000);
-	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true).enable_sound(true);
-}
-
-// Like the VFX-SD config, but with some clock speeds faster.
-void esq5505_state::sd132(machine_config &config)
-{
-	auto clock = 30.47618_MHz_XTAL / 2;
-
-	vfxsd(config);
-	m_maincpu->set_clock(clock);
-	m_otis->set_clock(clock);
-	m_pump->set_clock(clock);
+	WD1772(config, m_fdc, 8'000'000);
+	FLOPPY_CONNECTOR(config, m_floppy_connector, "35dd", FLOPPY_35_DD, true, floppy_formats);
 }
 
 void esq5505_state::sq1(machine_config &config)
@@ -958,7 +947,7 @@ void esq5505_state::sq1(machine_config &config)
 	common(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::sq1_map);
 
-	ESQPANEL2X16_SQ1(config.replace(), m_panel);
+	ESQPANEL2X16_SQ1(config, m_panel);
 	m_panel->write_tx().set(m_duart, FUNC(mc68681_device::rx_b_w));
 	m_panel->write_analog().set(FUNC(esq5505_state::analog_w));
 }
@@ -974,6 +963,9 @@ void esq5505_state::ks32(machine_config &config)
 }
 
 static INPUT_PORTS_START( vfx )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( eps )
 #if KEYBOARD_HACK
 	PORT_START("KEY0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq5505_state::key_stroke), 0x80)
@@ -1273,13 +1265,13 @@ void esq5505_state::init_denib()
 } // Anonymous namespace
 
 
-CONS( 1988, eps,    0,   0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1989, vfx,    0,   0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1989, vfxsd,  0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1990, eps16p, eps, 0, eps,   vfx, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )  // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1990, sd1,    0,   0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1990, sq1,    0,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1990, sqrack, sq1, 0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1991, sq2,    0,   0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )  // 2x16 LCD
-CONS( 1991, sd132,  sd1, 0, sd132, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
-CONS( 1992, ks32,   sq2, 0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "KS-32",           MACHINE_NOT_WORKING)                       // 2x16 LCD
+CONS( 1988, eps,    0,     0, eps,   eps, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )       // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1989, vfx,    0,     0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_IMPERFECT_SOUND )  // 2x40 VFD
+CONS( 1989, vfxsd,  0,     0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_IMPERFECT_SOUND )  // 2x40 VFD
+CONS( 1990, eps16p, eps,   0, eps,   eps, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )       // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1990, sd1,    sd132, 0, sd1,   vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_IMPERFECT_SOUND )  // 2x40 VFD
+CONS( 1990, sq1,    0,     0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )       // 2x16 LCD
+CONS( 1990, sqrack, sq1,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )       // 2x16 LCD
+CONS( 1991, sq2,    0,     0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-2",            MACHINE_NOT_WORKING )       // 2x16 LCD
+CONS( 1991, sd132,  0,     0, sd132, vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_IMPERFECT_SOUND )                         // 2x40 VFD
+CONS( 1992, ks32,   sq2,   0, ks32,  sq1, esq5505_state, init_sq1,    "Ensoniq", "KS-32",           MACHINE_NOT_WORKING)        // 2x16 LCD

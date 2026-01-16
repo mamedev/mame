@@ -229,6 +229,7 @@ public:
 
 	void ppc_set_dcstore_callback(write32sm_delegate callback);
 
+	void set_drc_cache_size(size_t bytes) { m_cache.set_size(bytes); }
 	void ppcdrc_set_options(uint32_t options);
 	void ppcdrc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 	void ppcdrc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
@@ -259,7 +260,7 @@ public:
 	void ppccom_get_dsisr();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;

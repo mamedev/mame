@@ -2443,7 +2443,12 @@ void dc_state::naomi_aw_base(machine_config &config)
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
 
 	POWERVR2(config, m_powervr2, 0);
-	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
+	m_powervr2->set_cpu(m_maincpu);
+	m_powervr2->set_texture_ram(dc_texture_ram);
+	m_powervr2->set_framebuffer_ram(dc_framebuffer_ram);
+	m_powervr2->set_cpu_space(m_maincpu, AS_PROGRAM);
+	m_powervr2->maple_trigger_callback().set(FUNC(naomi_state::maple_trigger));
+	m_powervr2->irq_callback().set(FUNC(naomi_state::pvr_irq));
 
 	SPEAKER(config, "speaker", 2).front();
 
@@ -2611,7 +2616,12 @@ void naomi2_state::naomi2(machine_config &config)
 void naomi2_state::naomi2_base(machine_config &config)
 {
 	POWERVR2(config, m_powervr2_slave, 0);
-	m_powervr2_slave->irq_callback().set(FUNC(dc_state::pvr_irq));
+	m_powervr2_slave->set_cpu(m_maincpu);
+	m_powervr2_slave->set_texture_ram(dc_texture_ram);
+	m_powervr2_slave->set_framebuffer_ram(dc_framebuffer_ram);
+	m_powervr2_slave->set_cpu_space(m_maincpu, AS_PROGRAM);
+	m_powervr2->maple_trigger_callback().set(FUNC(naomi2_state::maple_trigger));
+	m_powervr2_slave->irq_callback().set(FUNC(naomi2_state::pvr_irq));
 
 	// TODO: ELAN device
 }

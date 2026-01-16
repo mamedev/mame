@@ -427,7 +427,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="marsa" cloneof="mars">
-		<description>MARS (Alt)</description>
+		<description>MARS (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="I, Play, G" />

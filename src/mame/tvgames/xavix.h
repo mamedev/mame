@@ -3,159 +3,34 @@
 #ifndef MAME_TVGAMES_XAVIX_H
 #define MAME_TVGAMES_XAVIX_H
 
+#pragma once
+
+#include "xavix_adc.h"
+#include "xavix_anport.h"
+#include "xavix_io.h"
+#include "xavix_madfb_ball.h"
+#include "xavix_math.h"
+#include "xavix_mtrk_wheel.h"
+#include "xavix_sound.h"
+#include "xavix2002_io.h"
+
+#include "bus/ekara/slot.h"
+#include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
 #include "cpu/m6502/xavix.h"
 #include "cpu/m6502/xavix2000.h"
+#include "machine/i2cmem.h"
+#include "machine/nvram.h"
 #include "machine/timer.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "machine/i2cmem.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
-#include "bus/ekara/slot.h"
-#include "machine/nvram.h"
-
-#include "xavix_mtrk_wheel.h"
-#include "xavix_madfb_ball.h"
-#include "xavix2002_io.h"
-#include "xavix_io.h"
-#include "xavix_adc.h"
-#include "xavix_anport.h"
-#include "xavix_math.h"
 
 // NTSC clock for regular XaviX?
 #define MAIN_CLOCK XTAL(21'477'272)
 // some games (eg Radica Opus) run off a 3.579545MHz XTAL ( same as the above /6 ) so presumably there is a divider / multiplier circuit on some PCBs?
 // TODO: what's the PAL clock?
-
-class xavix_state;
-
-
-class xavix_sound_device : public device_t, public device_sound_interface
-{
-public:
-	xavix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	auto read_regs_callback() { return m_readregs_cb.bind(); }
-	auto write_regs_callback() { return m_writeregs_cb.bind(); }   // <-- for vm1 LA/RA mirroring
-	auto read_samples_callback() { return m_readsamples_cb.bind(); }
-
-	// control API
-	void enable_voice(int voice, bool update_only);
-	void disable_voice(int voice);
-	bool is_voice_enabled(int voice);
-	uint32_t sample_ram_read(uint32_t page, uint16_t offset) const;
-
-	// rate handling
-	void set_tempo(int index, uint8_t value);
-	void set_cyclerate(uint8_t value);
-
-	// register handlers (from the CPU map)
-	uint8_t sound_volume_r();
-	void sound_volume_w(uint8_t data);
-	uint8_t sound_mixer_r();
-	void sound_mixer_w(uint8_t data);
-	uint8_t dac_control_r();
-	void dac_control_w(uint8_t data);
-
-	// helpers
-	void set_dac_gain(uint8_t amp_data);
-	void set_output_mode(bool mono);
-	void set_mastervol(uint8_t data);
-	attotime tempo_period(uint8_t tempo) const;
-	double tempo_frequency(uint8_t tempo) const;
-	double tempo_tick_hz(uint8_t tempo) const;
-	uint32_t  phase_step_per_tick(uint32_t rate) const;
-	uint32_t envelope_period_ticks(uint8_t tp) const;
-
-
-protected:
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-	// sound stream update
-	virtual void sound_stream_update(sound_stream &stream) override;
-
-private:
-	// stream
-	sound_stream* m_stream = nullptr;
-
-	// global timing
-	uint8_t m_tempo_div[4] = { 0, 0, 0, 0 };
-	uint8_t m_cyclerate_div = 1;
-	uint32_t m_sequencer_rate_hz;
-
-	// callbacks
-	devcb_read8  m_readregs_cb;
-	devcb_write8 m_writeregs_cb;     // used to mirror vm1 phase to LA/RA
-	devcb_read8  m_readsamples_cb;
-
-	// voice state
-	struct xavix_voice {
-		uint8_t   enabled = 0;
-		uint32_t  position = 0;
-		uint32_t  loop_position = 0;
-		uint32_t  start_position = 0;
-
-		uint32_t  env_pos_left = 0;
-		uint32_t  env_pos_right = 0;
-		uint8_t   env_bank = 0;
-		uint8_t   env_mode = 0;
-
-		uint8_t   bank = 0;
-		uint32_t  rate = 0;
-		uint8_t   type = 0;
-		uint8_t   vol = 0;
-
-		uint16_t  env_rom_base_left = 0;
-		uint16_t  env_rom_base_right = 0;
-
-		uint8_t   env_vol_left = 0xff;
-		uint8_t   env_vol_right = 0xff;
-
-		uint32_t  env_period_samples = 0;
-		uint32_t  env_countdown = 0;
-		uint8_t   env_active_left = 1;
-		uint8_t   env_active_right = 1;
-
-		// misc (vm1/vm2 helpers, tickers)
-		bool      log_env_started = false;
-		bool      log_env_stopped = false;
-		bool      log_env_paused = false;
-
-		uint16_t noise_state = 0;
-	};
-
-	// mixer state
-	struct xavix_mixer
-	{
-		uint8_t monaural = 0;
-		uint8_t capacity = 0;
-		uint8_t amp = 2;
-
-		uint8_t dac = 0;
-		uint8_t gap = 0;
-		uint8_t lead = 0;
-		uint8_t lag = 0;
-
-		uint8_t mastervol = 0xff;
-		int32_t gain = 2;
-	};
-
-	xavix_mixer m_mix;
-	xavix_voice m_voice[16];
-
-	// helpers
-	uint32_t tempo_to_period_ticks(uint8_t tp) const;
-	uint8_t decay(uint8_t x);
-	void step_pitch(int voice);
-	void step_envelope(int voice);
-	uint8_t fetch_env_byte(int voice, int channel, uint32_t idx);
-	uint8_t fetch_env_byte_direct(int voice, int channel, uint16_t addr);
-};
-
-DECLARE_DEVICE_TYPE(XAVIX_SOUND, xavix_sound_device)
 
 
 class xavix_state : public driver_device
@@ -194,7 +69,8 @@ public:
 		m_sound(*this, "xavix_sound"),
 		m_adc(*this, "adc"),
 		m_anport(*this, "anport"),
-		m_math(*this, "math")
+		m_math(*this, "math"),
+		m_default_audio_tempo_override(0x80)
 	{
 		m_video_hres_multiplier = 1;
 	}
@@ -223,7 +99,7 @@ public:
 	void xavix_43mhz(machine_config &config);
 
 	void init_xavix();
-	void init_no_timer() { init_xavix(); m_disable_timer_irq_hack = true; }
+	void init_xavix_slowenv();
 
 	uint8_t sound_current_page() const;
 
@@ -314,8 +190,6 @@ protected:
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
 	address_space* m_cpuspace = nullptr;
-
-	bool m_disable_timer_irq_hack = false; // hack for epo_mini which floods timer IRQs to the point it won't do anything else
 
 	virtual void xavix_extbus_map(address_map &map) ATTR_COLD;
 
@@ -517,8 +391,10 @@ protected:
 	uint8_t timer_freq_r();
 	void timer_freq_w(uint8_t data);
 	uint8_t timer_curval_r();
+	void timer_start();
 	uint8_t m_timer_control = 0;
 	uint8_t m_timer_freq = 0;
+	uint8_t m_timer_currentval = 0;
 	TIMER_CALLBACK_MEMBER(freq_timer_done);
 	emu_timer *m_freq_timer = nullptr;
 
@@ -535,6 +411,7 @@ protected:
 	uint8_t tmap1_regs_r(offs_t offset);
 	uint8_t tmap2_regs_r(offs_t offset);
 
+	uint8_t spriteregs_r();
 	void spriteregs_w(uint8_t data);
 
 	uint8_t pal_ntsc_r();
@@ -592,7 +469,7 @@ protected:
 	void update_irqs();
 	void refresh_sound_irq_state();
 	void reprogram_sound_timer(int index);
-	
+
 	uint8_t m_irqsource = 0;
 
 	uint8_t m_vectorenable = 0;
@@ -702,8 +579,10 @@ protected:
 
 	bool m_disable_memory_bypass = false;
 	bool m_disable_sprite_yflip = false;
+	bool m_disable_sprite_xflip = false;
 	bool m_disable_tile_regs_flip = false;
 	int m_video_hres_multiplier;
+	uint8_t m_default_audio_tempo_override; // hack, used to init the sound hardware tempo registers
 };
 
 class xavix_guru_state : public xavix_state
@@ -727,7 +606,6 @@ public:
 	superxavix_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_state(mconfig, type, tag)
 		, m_xavix2002io(*this, "xavix2002io")
-		, m_allow_superxavix_extra_rom_sprites(true)
 		, m_sx_crtc_1(*this, "sx_crtc_1")
 		, m_sx_crtc_2(*this, "sx_crtc_2")
 		, m_sx_plt_loc(*this, "sx_plt_loc")
@@ -756,8 +634,6 @@ protected:
 	required_device<xavix2002_io_device> m_xavix2002io;
 
 	virtual void get_tile_pixel_dat(uint8_t &dat, int bpp) override;
-
-	bool m_allow_superxavix_extra_rom_sprites; // config does not need saving
 
 	uint8_t superxavix_read_extended_io0(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io0 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[0]->read(); }
 	uint8_t superxavix_read_extended_io1(offs_t offset, uint8_t mem_mask) { logerror("%s: superxavix_read_extended_io1 (mask %02x)\n", machine().describe_context(), mem_mask); return m_exio[1]->read(); }
@@ -838,8 +714,6 @@ private:
 
 	optional_region_ptr<uint8_t> m_extra;
 	required_ioport_array<3> m_exio;
-
-	bool m_use_superxavix_extra; // does not need saving
 };
 
 

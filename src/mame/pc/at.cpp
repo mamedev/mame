@@ -5564,6 +5564,34 @@ ROM_START( pg750eisa )
 	ROM_LOAD( "pg_pg750_486_eisa.bin", 0x10000, 0x10000, CRC(2e6149a9) SHA1(9fcf29a6169efa1359c7c3eff09326dd3e4001dc))
 ROM_END
 
+// Compal TS30A/TS30AS/TS30AT (ODM, sold under various names, for example Epson ActionNote 650/660)
+// Chipset: 486, 28F010, 82C206F-LV, "THE EVERGREEN 2  PICOPOWER", W83767F
+// RAM: 4 MB on board and expansion slot for a maximum of 20 MB
+// Video: F65540 A with 512k or 1024k VRAM
+// Sound (optional): ESS488Y, YM3014, YM3812
+// Storage: 2,5" IDE HDD, 3,5" Floppy
+// PCMCIA: 2 slots with CL-PD6720-QC-B controller
+// Keyboard: KU88C51SL near 16 MHz XTAL
+
+// Greyscale panel, 640x480
+ROM_START( ts30a )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD("ts30mlmq.rom", 0x00000, 0x20000, CRC(d434dbeb) SHA1(ec5246313f1f202a7bf3d837b4f29e50121c69df))
+ROM_END
+
+// STN panel, 640x480
+ROM_START( ts30as )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD("ts30mlsc.rom", 0x00000, 0x20000, CRC(9776554f) SHA1(31d4b466e7063c4ec072063c9041530e45c470d3))
+ROM_END
+
+// TFT panel, 640x480
+ROM_START( ts30at )
+	ROM_REGION32_LE(0x20000, "bios", 0)
+	ROM_LOAD("ts30mlte.rom", 0x00000, 0x20000, CRC(f500fcc1) SHA1(4fa0303928758b5d4ff95b2c464e4e5adf5452cb))
+ROM_END
+
+
 } // anonymous namespace
 
 
@@ -5745,7 +5773,7 @@ COMP( 199?, ecsfx3000, ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 1992, ecsum386,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Elitegroup Computer Systems",      "UM386 (Rev 1.1)", MACHINE_NOT_WORKING )
 COMP( 199?, fic4386vchd,ibm5170,0,       at486,     0,     at_state,     init_at,        "First International Computer", "4386-VC-HD", MACHINE_NOT_WORKING )
 COMP( 199?, frx386c,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Micro-Express Inc.", "Forex 386 Cache", MACHINE_NOT_WORKING )
-COMP( 199?, frxc402,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>", "386 motherboards with a FOREX FRX46C402/FRX36C300/SIS85C206 chipset", MACHINE_NOT_WORKING )
+COMP( 199?, frxc402,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Modula Tech", "FRX/386DX Cache System", MACHINE_NOT_WORKING )
 COMP( 1991, fu340,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Abit",        "FU340", MACHINE_NOT_WORKING )
 COMP( 199?, ges9051n,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "GES 9051N-386C VER -0.01", MACHINE_NOT_WORKING )
 COMP( 198?, gs611606a, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Goldstar",    "GOLDSTAR P/N 611-606A Rev 1.0A", MACHINE_NOT_WORKING )
@@ -5782,7 +5810,7 @@ COMP( 199?, qdu386dx,  ibm5170, 0,       at386,     0,     at_state,     init_at
 COMP( 1988, qi600,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "Apricot",     "Apricot Qi 600 (Neptune Motherboard)", MACHINE_NOT_WORKING )
 COMP( 199?, sisrabb,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "386 motherboards using the SiS Rabbit chipset", MACHINE_NOT_WORKING )
 COMP( 199?, sm38640f,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "SM 386-40F", MACHINE_NOT_WORKING )
-COMP( 19??, smih0107,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "Forex Computer Company", "unknown 386 AT clone with Forex chipset", MACHINE_NOT_WORKING )
+COMP( 1991, smih0107,  ibm5170, 0,       at386,     0,     at_state,     init_at,        "AVT Industrial", "unknown 386 AT clone with Forex chipset", MACHINE_NOT_WORKING ) // a.k.a Delta 186-2.1-0392 or Informtech IT386SM-P
 COMP( 199?, sy012,     ibm5170, 0,       at386,     0,     at_state,     init_at,        "<unknown>",   "SY-012 16/25 386MB VER: 5.2", MACHINE_NOT_WORKING )
 COMP( 199?, sy019hi,   ibm5170, 0,       at386,     0,     at_state,     init_at,        "Soyo", "SY-019H and SY-019I", MACHINE_NOT_WORKING )
 COMP( 199?, sybaby386, ibm5170, 0,       at386,     0,     at_state,     init_at,        "Soyo", "Baby AT 386", MACHINE_NOT_WORKING )
@@ -5923,6 +5951,9 @@ COMP( 199?, sto486wb,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, td4ipaio,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "TD-4IP-UMC-AIO", MACHINE_NOT_WORKING )
 COMP( 199?, tmpat48pg4,ibm5170, 0,       at486,     0,     at_state,     init_at,        "TMC", "PAT48PG4", MACHINE_NOT_WORKING )
 COMP( 199?, tmpat48av, ibm5170, 0,       at486,     0,     at_state,     init_at,        "TMC", "PAT48AV", MACHINE_NOT_WORKING )
+COMP( 1994, ts30a,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Compal", "TS30A", MACHINE_NOT_WORKING )
+COMP( 1994, ts30as,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Compal", "TS30AS", MACHINE_NOT_WORKING )
+COMP( 1994, ts30at,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Compal", "TS30AT", MACHINE_NOT_WORKING )
 COMP( 199?, ts34t25,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Highscreen",  "486-25", MACHINE_NOT_WORKING )
 COMP( 199?, um486,     ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM486/UM486sx", MACHINE_NOT_WORKING )
 COMP( 199?, um486v,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM486V-AIO", MACHINE_NOT_WORKING )

@@ -106,7 +106,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-//	bool check_rom(std::string &message) ATTR_COLD;
+//  bool check_rom(std::string &message) ATTR_COLD;
 	memory_bank_creator m_rom;
 	std::vector<u8> m_decrypted_rom;
 };

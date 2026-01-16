@@ -341,7 +341,7 @@ memory_region *memory_manager::region_alloc(std::string name, u32 length, u8 wid
 		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name);
 
 	// allocate the region
-	return m_regionlist.emplace(name, std::make_unique<memory_region>(machine(), name, length, width, endian)).first->second.get();
+	return m_regionlist.emplace(name, std::make_unique<memory_region>(name, length, width, endian)).first->second.get();
 }
 
 
@@ -1097,15 +1097,18 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 //  memory_region - constructor
 //-------------------------------------------------
 
-memory_region::memory_region(running_machine &machine, std::string name, u32 length, u8 width, endianness_t endian)
-	: m_machine(machine),
-		m_name(std::move(name)),
-		m_buffer(length),
-		m_endianness(endian),
-		m_bitwidth(width * 8),
-		m_bytewidth(width)
+memory_region::memory_region(std::string name, u32 length, u8 width, endianness_t endian) :
+	m_name(std::move(name)),
+	m_buffer(length ? std::malloc(length) : nullptr),
+	m_length(length),
+	m_endianness(endian),
+	m_bitwidth(width * 8),
+	m_bytewidth(width)
 {
-	assert(width == 1 || width == 2 || width == 4 || width == 8);
+	assert((width == 1) || (width == 2) || (width == 4) || (width == 8));
+	assert(!(length % width));
+	if (length && !m_buffer)
+		throw std::bad_alloc();
 }
 
 std::string memory_share::compare(u8 width, size_t bytes, endianness_t endianness) const

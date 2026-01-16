@@ -145,6 +145,88 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="neoplasm2">
+		<description>Aliens: Neoplasma 2 (demo v1.6, 60Hz)</description>
+		<year>2024</year>
+		<publisher>Sinc Lair</publisher>
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
+		<info name="language" value="Belarussian" />
+		<info name="language" value="English" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Russian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Ukrainian" />
+		<info name="version" value="demo 1.6" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="ANP2_DEMO_1.6_60hz.trd" size="655360" crc="bf20b65b" sha1="4eed8514d562517f754c9124ec9a1f6297752fef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neoplasm2d_16_50" cloneof="neoplasm2">
+		<description>Aliens: Neoplasma 2 (demo v1.6, 50Hz)</description>
+		<year>2024</year>
+		<publisher>Sinc Lair</publisher>
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
+		<info name="language" value="Belarussian" />
+		<info name="language" value="English" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Russian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Ukrainian" />
+		<info name="version" value="demo 1.6" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="ANP2_DEMO_1.6_50hz.trd" size="655360" crc="6ea0d068" sha1="36b115a46044a699d75b166e84fcc056a9b7487e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neoplasm2d_11_60" cloneof="neoplasm2">
+		<description>Aliens: Neoplasma 2 (demo v1.1, 60Hz)</description>
+		<year>2024</year>
+		<publisher>Sinc Lair</publisher>
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
+		<info name="language" value="Belarussian" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Ukrainian" />
+		<info name="version" value="demo 1.1" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="ANP2_DEMO_1.1_60hz.trd" size="655360" crc="d6c11c16" sha1="c221e10383bc71a66b4ebc8e2dbc21aaa6175d5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neoplasm2d_11_50" cloneof="neoplasm2">
+		<description>Aliens: Neoplasma 2 (demo v1.1, 50Hz)</description>
+		<year>2024</year>
+		<publisher>Sinc Lair</publisher>
+		<info name="developer" value="Aleksander Udotov" />
+		<info name="developer" value="Oleg Nikitin" />
+		<info name="developer" value="Eugene Rogulin" />
+		<info name="language" value="Belarussian" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
+		<info name="language" value="Spanish" />
+		<info name="language" value="Ukrainian" />
+		<info name="version" value="demo 1.1" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="ANP2_DEMO_1.1_50hz.trd" size="655360" crc="93e1dc57" sha1="1e440aadd39abdb020d38799b5e64caee3e78c43"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ammytris">
 		<description>Ammytris</description>
 		<year>1995</year>
@@ -155,6 +237,36 @@ license:CC0-1.0
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="ammytris.trd" size="655360" crc="013f5b1f" sha1="05dc65273870c3e7f19fe9f9ea973f81f133ce96"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ataka">
+		<description>Attack (v1.1)</description>
+		<year>2025</year>
+		<publisher>YRGB</publisher>
+		<info name="alt_title" value="Атака" />
+		<info name="developer" value="Макурин Борис Васильевич" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="ATAKA1_1.trd" size="655360" crc="49ec7b5d" sha1="50597e79ba0f8a9344bed0689ece3f9d1d692848"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ataka_10" cloneof="ataka">
+		<description>Attack (v1.0, Party Version)</description>
+		<year>2025</year>
+		<publisher>YRGB</publisher>
+		<info name="alt_title" value="Атака" />
+		<info name="developer" value="Макурин Борис Васильевич" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="ATAKA1_0.trd" size="655360" crc="5f63b01e" sha1="806ec3dfdf91fe70aa6dfdf2c7f2cceaf2f610a0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -195,6 +307,36 @@ license:CC0-1.0
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="Carlos Michelis - Demo.trd" size="655360" crc="5295622a" sha1="6be8fb78a6d81a4e8a435ab2fabea760447e812a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cindy">
+		<description>Cindy Block (v1.1)</description>
+		<year>2025</year>
+		<publisher>YRGB</publisher>
+		<info name="developer" value="Grongy" />
+		<info name="developer" value="Art-top" />
+		<info name="developer" value="n1k-o" />
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="cindy_11.trd" size="655360" crc="897869b4" sha1="241b59f47e7635d3699babf8ae0b61f44d153cef"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cindy_10" cloneof="cindy">
+		<description>Cindy Block (v1.0, Party Version)</description>
+		<year>2025</year>
+		<publisher>YRGB</publisher>
+		<info name="developer" value="Grongy" />
+		<info name="developer" value="Art-top" />
+		<info name="developer" value="n1k-o" />
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="cindy.trd" size="655360" crc="836d9878" sha1="02a9c985d13c8a7bf27428109cea6a3284ad7aea"/>
 			</dataarea>
 		</part>
 	</software>
@@ -499,6 +641,34 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="dizzy2xt23">
+		<description>Dizzy II - Treasure Island Dizzy - Extended Edition 2023</description>
+		<year>2024</year>
+		<publisher>Titus</publisher>
+		<info name="developer" value="Andrei Titov" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DIZZY2TT.trd" size="655360" crc="186ff56f" sha1="437f8995bc49ae0d921694d15ea0c5d04dd8149b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dizzy3xt24">
+		<description>Dizzy III - Fantasy World Dizzy - Extended Edition 2024</description>
+		<year>2024</year>
+		<publisher>Titus</publisher>
+		<info name="developer" value="Andrei Titov" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="DIZ3+4TT.trd" size="655360" crc="be0a327d" sha1="1c6264d202badfcca19ec490a607fa0149d0ae13"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="doompit">
 		<description>Doom Pit</description>
 		<year>2018</year>
@@ -595,6 +765,20 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="eswat">
+		<description>E-SWAT (mod)</description>
+		<year>2024</year>
+		<publisher>Tiboh</publisher>
+		<info name="alt_title" value="E-SWAT - Elite Special Weapons And Tactics" />
+		<info name="developer" value="Tiboh" />
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="E-SWAT.trd" size="655360" crc="b259c044" sha1="5a015792d53d1cee28ec0e5273abf3b2ef72440d"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="eliteleg">
 		<description>Elite Legend (English) (mod of Elite)</description>
 		<year>2021</year>
@@ -619,6 +803,51 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="Elite_Legend_128K_Rus.trd" size="655360" crc="75125927" sha1="cbd788f3b53537b0c9f7dd3d01966ea04717ae23"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ffight">
+		<description>Final Fight (mod)</description>
+		<year>2024</year>
+		<publisher>Tiboh</publisher>
+		<info name="developer" value="Tiboh" />
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="FINFIGHT.trd" size="655360" crc="f58e8ff3" sha1="3513eeaf6e7ca9a592e35aa64ec3205f64b335df"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="generaly">
+		<description>Generals (v1.1)</description>
+		<year>2025</year>
+		<publisher>YRGB</publisher>
+		<info name="alt_title" value="Генералы" />
+		<info name="developer" value="Макурин Борис Васильеви" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
+		<info name="usage" value="128K" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="GENERALS1_1.trd" size="655360" crc="120705d4" sha1="2c6813c3f1685a8b71b5ea5731721ef9e59aba80"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="generaly_10" cloneof="generaly">
+		<description>Generals (v1.0, Party Version)</description>
+		<year>2025</year>
+		<publisher>YRGB</publisher>
+		<info name="alt_title" value="Генералы" />
+		<info name="developer" value="Макурин Борис Васильеви" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
+		<info name="usage" value="128K" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="generals.trd" size="655360" crc="b3a5114f" sha1="dcdeaa580985d05bc3d5fbdb5cc7d0f90d331ac6"/>
 			</dataarea>
 		</part>
 	</software>
@@ -665,6 +894,64 @@ license:CC0-1.0
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="gravibots.trd" size="655360" crc="9d6d8e1b" sha1="edd0eb9a663783b5efc16e6512ad14efc418031f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gremlins2">
+		<description>Gremlins 2: The New Batch (mod)</description>
+		<year>2023</year>
+		<publisher>Tiboh</publisher>
+		<info name="developer" value="SG-Team" />
+		<info name="developer" value="Slider" />
+		<info name="developer" value="Tiboh" />
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="GREMLIN2.trd" size="655360" crc="d3c9bb22" sha1="e756213ee200bdabc76bca918a3811d483d31e2e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gunrunner">
+		<description>Gunrunner (mod)</description>
+		<year>2023</year>
+		<publisher>Tiboh</publisher>
+		<info name="developer" value="SG-Team" />
+		<info name="developer" value="Slider" />
+		<info name="developer" value="Tiboh" />
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="24_gunrunnr.trd" size="655360" crc="a9547cb4" sha1="a10cddac58e1fe16d67ced1f1f36e344c83826ea"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kubanoid">
+		<description>Kubanoid (v1.1)</description>
+		<year>2025</year>
+		<publisher>YRGB</publisher>
+		<info name="developer" value="Stardust" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="kubanoid_1.1.trd" size="655360" crc="22f52981" sha1="06876c0e9f05361b85fcb4db8b04326d21476165"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kubanoid_10" cloneof="kubanoid">
+		<description>Kubanoid (v1.0, Party Version)</description>
+		<year>2025</year>
+		<publisher>YRGB</publisher>
+		<info name="developer" value="Stardust" />
+		<info name="language" value="English" />
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="kubanoid_1.0.trd" size="655360" crc="4d179faf" sha1="bb36b61fbf94006785f0eda510d034aba767136e"/>
 			</dataarea>
 		</part>
 	</software>
@@ -759,6 +1046,17 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="min">
+		<description>Min!</description>
+		<year>2024</year>
+		<publisher>Zebra Games</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="min.trd" size="655360" crc="43f82e49" sha1="9bcdf7715cb182af05aee455078fa9d58d939870" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="multidud">
 		<description>MultiDude</description>
 		<year>2014</year>
@@ -777,6 +1075,34 @@ license:CC0-1.0
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="MysteriousDimensions128.trd" size="655360" crc="8f37e776" sha1="1aa1fa49d68b47bcb84aaf64539bf8fe981bd40c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pedro123">
+		<description>Pedro 1 + 2 + 3 (mod)</description>
+		<year>2024</year>
+		<publisher>Tiboh</publisher>
+		<info name="developer" value="Slider" />
+		<info name="developer" value="Tiboh" />
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="10_Pedro1-3.trd" size="655360" crc="dacfd245" sha1="b9c624cfc4afcd0011bb635ba3226f6ca416f29a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pprince">
+		<description>Prince of Persia (mod)</description>
+		<year>2024</year>
+		<publisher>Nicodim</publisher>
+		<info name="developer" value="Nicodim" />
+		<info name="developer" value="Oleg Moskalenko" />
+		<info name="language" value="Russian" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="PRINCEOM.trd" size="655360" crc="1f28e929" sha1="97c9e1aaac3954633eddff6ade4a144b2d19e216"/>
 			</dataarea>
 		</part>
 	</software>
@@ -827,6 +1153,21 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="regulus.trd" size="655360" crc="f55073b2" sha1="e4b3bcc7d00d8e3a1df4fa806bad2647522b1ccd" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rick12">
+		<description>Rick Dangerous 1 + 2 (mod)</description>
+		<year>2024</year>
+		<publisher>Tiboh</publisher>
+		<info name="developer" value="SG-Team'10" />
+		<info name="developer" value="Slider" />
+		<info name="developer" value="Tiboh" />
+		<info name="language" value="English" />
+		<part name="flop" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="05_RickDang.trd" size="655360" crc="607f0214" sha1="003817185dd91ef76499812bffb4675976117c63"/>
 			</dataarea>
 		</part>
 	</software>
@@ -990,6 +1331,22 @@ license:CC0-1.0
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
 				<rom name="twinlight.trd" size="655360" crc="db941a5c" sha1="51300fc042515d68a5e0b68df997bbdca612e2db"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yrgb2025">
+		<description>Yandex Retro Games Battle 2025</description>
+		<year>2025</year>
+		<publisher>YRGB</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="YRGB25_1.trd" size="655360" crc="5f07af8c" sha1="a08853d17566d8bebed3f5541bccee486605836d"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="655360">
+				<rom name="YRGB25_2.trd" size="655360" crc="ba4a11eb" sha1="e6b3a602f2e7ffe5ec81a9e3dfc06b122ba55c32"/>
 			</dataarea>
 		</part>
 	</software>

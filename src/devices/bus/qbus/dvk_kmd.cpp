@@ -22,22 +22,22 @@
 
     Commands:
 
-    0	read
-    1	write
-    2	read dd
-    3	write dd
-    4	read track
-    5	read id
-    6	format iso
-    7	seek
-    8	set
-    9	read error state
+    0   read
+    1   write
+    2   read dd
+    3   write dd
+    4   read track
+    5   read id
+    6   format iso
+    7   seek
+    8   set
+    9   read error state
     A*
-    B*	format & write
-    C*	format ibm
-    D*	block move
-    E*	run user code
-    F	boot
+    B*  format & write
+    C*  format ibm
+    D*  block move
+    E*  run user code
+    F   boot
 
 ***************************************************************************/
 

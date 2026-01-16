@@ -13,7 +13,7 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-DRC_CPUS = { "E1", "SH", "MIPS3", "POWERPC", "ARM7", "ADSP21062", "MB86235", "DSP16", "UNSP" }
+DRC_CPUS = { "E1", "SH", "MIPS3", "POWERPC", "ADSP21062", "MB86235", "DSP16", "UNSP", "SWP30", "DSPP" }
 CPU_INCLUDE_DRC = false
 for i, v in ipairs(DRC_CPUS) do
 	if (CPUS[v]~=null) then
@@ -3364,6 +3364,36 @@ if opt_tool(CPUS, "HD61700") then
 end
 
 --------------------------------------------------
+-- Sanyo LC57 - Disassembler only
+--@src/devices/cpu/lc57/lc57.h,CPUS["LC57"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "LC57") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc57/lc57d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc57/lc57d.h")
+end
+
+--------------------------------------------------
+-- Sanyo LC58 - Disassembler only
+--@src/devices/cpu/lc58/lc58.h,CPUS["LC58"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "LC58") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc58/lc58d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc58/lc58d.h")
+end
+
+--------------------------------------------------
+-- Sanyo LC6500, disassembler only
+--@src/devices/cpu/lc6500/lc6500.h,CPUS["LC6500"] = true
+--------------------------------------------------
+
+if opt_tool(CPUS, "LC6500") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc6500/lc6500_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc6500/lc6500_dasm.h")
+end
+
+--------------------------------------------------
 -- Sanyo LC8670
 --@src/devices/cpu/lc8670/lc8670.h,CPUS["LC8670"] = true
 --------------------------------------------------
@@ -3992,16 +4022,6 @@ if opt_tool(CPUS, "UPD177X") then
 end
 
 --------------------------------------------------
--- Sanyo LC58 - Disassembler only
---@src/devices/cpu/lc58/lc58.h,CPUS["LC58"] = true
---------------------------------------------------
-
-if opt_tool(CPUS, "LC58") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc58/lc58d.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc58/lc58d.h")
-end
-
---------------------------------------------------
 -- OKI MSM6502/6512 - Disassembler only
 --@src/devices/cpu/msm65x2/msm65x2.h,CPUS["MSM65X2"] = true
 --------------------------------------------------
@@ -4009,16 +4029,6 @@ end
 if opt_tool(CPUS, "MSM65X2") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/msm65x2/msm65x2d.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/msm65x2/msm65x2d.h")
-end
-
---------------------------------------------------
--- Sanyo LC57 - Disassembler only
---@src/devices/cpu/lc57/lc57.h,CPUS["LC57"] = true
---------------------------------------------------
-
-if opt_tool(CPUS, "LC57") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc57/lc57d.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/lc57/lc57d.h")
 end
 
 --------------------------------------------------
@@ -4141,20 +4151,20 @@ if opt_tool(CPUS, "DDP516") then
 end
 
 --------------------------------------------------
--- Whatever is in the Evolution
---@src/devices/cpu/evolution/evo.h,CPUS["EVOLUTION"] = true
+-- Sonix 16-bit DSP
+--@src/devices/cpu/sonix16/sonix16.h,CPUS["SONIX16"] = true
 --------------------------------------------------
 
-if CPUS["EVOLUTION"] then
+if CPUS["SONIX16"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/evolution/evo.cpp",
-		MAME_DIR .. "src/devices/cpu/evolution/evo.h",
+		MAME_DIR .. "src/devices/cpu/sonix16/sonix16.cpp",
+		MAME_DIR .. "src/devices/cpu/sonix16/sonix16.h",
 	}
 end
 
-if opt_tool(CPUS, "EVOLUTION") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/evolution/evod.h")
+if opt_tool(CPUS, "SONIX16") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sonix16/sonix16d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sonix16/sonix16d.h")
 end
 
 --------------------------------------------------
@@ -4275,4 +4285,36 @@ end
 if opt_tool(CPUS, "MN10300") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn10300/mn103dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mn10300/mn103dasm.h")
+end
+
+--------------------------------------------------
+-- Motorola DSP563xx
+--@src/devices/cpu/dsp563xx/dsp563xx.h,CPUS["DSP563XX"] = true
+--------------------------------------------------
+
+if CPUS["DSP563XX"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx-tables.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx-interp.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xx.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56303.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56303.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56311.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56311.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56362.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56362.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56364.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/dsp56364.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/hi08.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/hi08.h",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/shi.cpp",
+		MAME_DIR .. "src/devices/cpu/dsp563xx/shi.h",
+	}
+end
+
+if opt_tool(CPUS, "DSP563XX") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd-tables.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/dsp563xx/dsp563xxd.h")
 end

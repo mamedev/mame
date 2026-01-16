@@ -7,9 +7,32 @@ authors:hap
 
 <!-- define elements -->
 
-	<element name="white"><rect><color red="0.85" green="0.85" blue="0.85" /></rect></element>
-	<element name="text_l"><text string="("><color red="0.85" green="0.85" blue="0.85" /></text></element>
-	<element name="text_r"><text string=")"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="sight">
+		<rect>
+			<bounds xc="0" yc="0" width="1" height="1" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="1" height="0.03" />
+			<color red="0.85" green="0.85" blue="0.85" />
+		</rect>
+		<disk>
+			<bounds xc="0" yc="0" width="0.8" height="0.95" />
+			<color red="0.85" green="0.85" blue="0.85" />
+		</disk>
+		<disk>
+			<bounds xc="0" yc="0" width="0.74" height="0.89" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+		<rect>
+			<bounds xc="0" y="-0.5" width="1" height="0.2" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<rect>
+			<bounds xc="0" y="0.3" width="1" height="0.2" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+	</element>
 
 
 <!-- build screen -->
@@ -17,9 +40,6 @@ authors:hap
 	<view name="Internal Layout">
 		<screen index="0"><bounds x="0" y="0" width="100" height="36.25" /></screen>
 
-		<element ref="text_l"><bounds x="38.2" y="14.5" width="1.35" height="6.5" /></element>
-		<element ref="text_r"><bounds x="45.3" y="14.5" width="1.35" height="6.5" /></element>
-		<element ref="white"><bounds x="37.45" y="18.25" width="1.1" height="0.35" /></element>
-		<element ref="white"><bounds x="46.2" y="18.25" width="1.1" height="0.35" /></element>
+		<element ref="sight" blend="add"><bounds xc="42.35" yc="18.4" width="10" height="10" /></element>
 	</view>
 </mamelayout>

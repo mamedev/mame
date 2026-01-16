@@ -351,7 +351,7 @@ void fatman_state::update_vca_eg()
 	}
 
 	LOGMASKED(LOG_EG, "VCA EG decay: %d, release: %d, attacked: %d, trip dt: %g\n",
-	          m_vca_eg_decay, m_vca_eg_release, attacked, comp_trip_dt.as_double());
+			  m_vca_eg_decay, m_vca_eg_release, attacked, comp_trip_dt.as_double());
 }
 
 // `param` specifies whether the VCA EG voltage has exceeded the EG reference.

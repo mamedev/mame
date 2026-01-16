@@ -553,6 +553,8 @@ private:
 	void op_set(a64::Assembler &a, const uml::instruction &inst);
 	void op_mov(a64::Assembler &a, const uml::instruction &inst);
 	void op_sext(a64::Assembler &a, const uml::instruction &inst);
+	void op_bfxu(a64::Assembler &a, const uml::instruction &inst);
+	void op_bfxs(a64::Assembler &a, const uml::instruction &inst);
 	void op_roland(a64::Assembler &a, const uml::instruction &inst);
 	void op_rolins(a64::Assembler &a, const uml::instruction &inst);
 	template <bool CarryIn> void op_add(a64::Assembler &a, const uml::instruction &inst);
@@ -710,8 +712,10 @@ inline void drcbe_arm64::generate_one(a64::Assembler &a, const uml::instruction 
 	case uml::OP_SET:     op_set(a, inst);                      break; // SET     dst,c
 	case uml::OP_MOV:     op_mov(a, inst);                      break; // MOV     dst,src[,c]
 	case uml::OP_SEXT:    op_sext(a, inst);                     break; // SEXT    dst,src
-	case uml::OP_ROLAND:  op_roland(a, inst);                   break; // ROLAND  dst,src1,src2,src3
-	case uml::OP_ROLINS:  op_rolins(a, inst);                   break; // ROLINS  dst,src1,src2,src3
+	case uml::OP_BFXU:    op_bfxu(a, inst);                     break; // BFXU    dst,src,shift,width
+	case uml::OP_BFXS:    op_bfxs(a, inst);                     break; // BFXS    dst,src,shift,width
+	case uml::OP_ROLAND:  op_roland(a, inst);                   break; // ROLAND  dst,src,count,mask
+	case uml::OP_ROLINS:  op_rolins(a, inst);                   break; // ROLINS  dst,src,count,mask
 	case uml::OP_ADD:     op_add<false>(a, inst);               break; // ADD     dst,src1,src2[,f]
 	case uml::OP_ADDC:    op_add<true>(a, inst);                break; // ADDC    dst,src1,src2[,f]
 	case uml::OP_SUB:     op_sub<false>(a, inst);               break; // SUB     dst,src1,src2[,f]
@@ -1536,7 +1540,7 @@ inline void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, cons
 
 drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
 	: drcbe_interface(drcuml, cache, device)
-	, m_hash(cache, modes, addrbits, ignorebits)
+	, m_hash(cache, modes, addrbits, ignorebits, std::align_val_t(1 << 12), std::align_val_t(1 << 12))
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_carry_state(carry_state::POISON)
@@ -1545,7 +1549,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	, m_nocode(nullptr)
 	, m_endofblock(nullptr)
 	, m_baseptr(cache.near() + 0x100)
-	, m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
+	, m_near(*cache.alloc_near<near_state>())
 {
 	// create the log
 	if (device.machine().options().drc_log_native())
@@ -1961,9 +1965,15 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 	const parameter &exp = inst.param(2);
 	assert(exp.is_code_handle());
 
-	a.mov(a64::sp, a64::x29);
+	// load non-immediate mode and PC as early as possible
+	const a64::Gp mode = modep.select_register(TEMP_REG1, 8);
+	const a64::Gp pc = pcp.select_register(TEMP_REG2, 8);
+	if (!modep.is_immediate())
+		mov_reg_param(a, 4, mode, modep);
+	if (!pcp.is_immediate())
+		mov_reg_param(a, 4, pc, pcp);
 
-	if (modep.is_immediate() && m_hash.is_mode_populated(modep.immediate()))
+	if (modep.is_immediate() && m_hash.populate_mode(modep.immediate()))
 	{
 		if (pcp.is_immediate())
 		{
@@ -1973,71 +1983,51 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 		}
 		else
 		{
-			mov_reg_param(a, 4, TEMP_REG2, pcp);
-
-			get_imm_relative(a, TEMP_REG1, (uintptr_t)&m_hash.base()[modep.immediate()][0]); // TEMP_REG1 = m_base[mode]
-
-			a.ubfx(TEMP_REG3, TEMP_REG2, m_hash.l1shift(), m_hash.l1bits());
-			a.ldr(TEMP_REG3, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3))); // TEMP_REG3 = m_base[mode][(pc >> m_l1shift) & m_l1mask]
-
-			a.ubfx(TEMP_REG2, TEMP_REG2, m_hash.l2shift(), m_hash.l2bits());
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, TEMP_REG2, a64::lsl(3))); // TEMP_REG1 = m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]
+			get_imm_relative(a, TEMP_REG1, uintptr_t(m_hash.base()[modep.immediate()])); // TEMP_REG1 = m_base[mode]
 		}
 	}
 	else
 	{
-		get_imm_relative(a, TEMP_REG2, (uintptr_t)m_hash.base());
+		get_imm_relative(a, TEMP_REG3, uintptr_t(m_hash.base()));
 
 		if (modep.is_immediate())
-		{
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG2, modep.immediate() * 8)); // TEMP_REG1 = m_base[modep]
-		}
+			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, modep.immediate() << 3)); // TEMP_REG1 = m_base[modep]
 		else
-		{
-			const a64::Gp mode = modep.select_register(TEMP_REG1, 8);
-			mov_reg_param(a, 4, mode, modep);
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG2, mode, a64::lsl(3))); // TEMP_REG1 = m_base[modep]
-		}
+			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, mode, a64::lsl(3))); // TEMP_REG1 = m_base[modep]
 
 		if (pcp.is_immediate())
 		{
-			const uint32_t l1val = ((pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask()) * 8;
-			const uint32_t l2val = ((pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask()) * 8;
+			const uint32_t l1val = ((pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask());
+			const uint32_t l2val = ((pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask());
 
-			if (is_valid_immediate(l1val, 15))
-			{
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l1val));
-			}
+			if (!is_valid_immediate(l1val, 12))
+				a.mov(TEMP_REG2, l1val);
+			if (!is_valid_immediate(l2val, 12))
+				a.mov(TEMP_REG3, l2val);
+
+			if (is_valid_immediate(l1val, 12))
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l1val << 3));
 			else
-			{
-				a.mov(SCRATCH_REG1, l1val >> 3);
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, SCRATCH_REG1, a64::lsl(3)));
-			}
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, TEMP_REG2, a64::lsl(3)));
 
-			if (is_valid_immediate(l2val, 15))
-			{
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l2val));
-			}
+			if (is_valid_immediate(l2val, 12))
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l2val << 3));
 			else
-			{
-				a.mov(SCRATCH_REG1, l2val >> 3);
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, SCRATCH_REG1, a64::lsl(3)));
-			}
-		}
-		else
-		{
-			const a64::Gp pc = pcp.select_register(TEMP_REG2, 8);
-			mov_reg_param(a, 4, pc, pcp);
-
-			a.ubfx(TEMP_REG3, pc, m_hash.l1shift(), m_hash.l1bits()); // (pc >> m_l1shift) & m_l1mask
-			a.ldr(TEMP_REG3, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3))); // TEMP_REG3 = m_base[mode][(pc >> m_l1shift) & m_l1mask]
-
-			a.ubfx(TEMP_REG2, pc, m_hash.l2shift(), m_hash.l2bits()); // (pc >> m_l2shift) & m_l2mask
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, TEMP_REG2, a64::lsl(3))); // x25 = m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3)));
 		}
 	}
 
+	if (!pcp.is_immediate())
+	{
+		a.ubfx(TEMP_REG3, pc, m_hash.l1shift(), m_hash.l1bits()); // (pc >> m_l1shift) & m_l1mask
+		a.ubfx(TEMP_REG2, pc, m_hash.l2shift(), m_hash.l2bits()); // (pc >> m_l2shift) & m_l2mask
+
+		a.ldr(TEMP_REG3, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3))); // TEMP_REG3 = m_base[mode][(pc >> m_l1shift) & m_l1mask]
+		a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, TEMP_REG2, a64::lsl(3))); // TEMP_REG1 = m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]
+	}
+
 	Label lab = a.new_label();
+	a.mov(a64::sp, a64::x29);
 	a.adr(REG_PARAM1, lab);
 	a.br(TEMP_REG1);
 
@@ -3223,6 +3213,173 @@ void drcbe_arm64::op_sext(a64::Assembler &a, const uml::instruction &inst)
 	}
 }
 
+void drcbe_arm64::op_bfxu(a64::Assembler &a, const uml::instruction &inst)
+{
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_flags(inst, FLAG_S | FLAG_Z);
+
+	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
+	be_parameter shiftp(*this, inst.param(2), PTYPE_MRI);
+	be_parameter widthp(*this, inst.param(3), PTYPE_MRI);
+
+	const a64::Gp output = dstp.select_register(TEMP_REG1, inst.size());
+	const a64::Gp src = srcp.select_register(TEMP_REG2, inst.size());
+	const a64::Inst::Id maskop = inst.flags() ? a64::Inst::kIdAnds : a64::Inst::kIdAnd;
+	const uint64_t instbits = inst.size() * 8;
+
+	if (widthp.is_immediate_value(0))
+	{
+		// undefined behaviour - do something
+		const a64::Gp zero = select_register(a64::xzr, inst.size());
+
+		if (inst.flags())
+			a.ands(output, zero, zero);
+		else
+			a.mov(output, zero);
+	}
+	else if (widthp.is_immediate())
+	{
+		const auto width(widthp.immediate() & (instbits - 1));
+		const auto mask(util::make_bitmask<uint64_t>(width));
+
+		mov_reg_param(a, inst.size(), src, srcp);
+
+		if (shiftp.is_immediate())
+		{
+			const auto shift(shiftp.immediate() & (instbits - 1));
+
+			if ((shift + width) <= instbits)
+			{
+				// contiguous bit field
+				a.ubfx(output, src, shift, width);
+				if (inst.flags())
+					a.tst(output, output);
+			}
+			else
+			{
+				// bit field wraps from LSB to MSB
+				a.ror(output, src, shift);
+				a.emit(maskop, output, output, mask);
+			}
+		}
+		else
+		{
+			const a64::Gp shift = shiftp.select_register(TEMP_REG3, inst.size());
+
+			mov_reg_param(a, inst.size(), shift, shiftp);
+
+			a.ror(output, src, shift);
+			a.emit(maskop, output, output, mask);
+		}
+	}
+	else
+	{
+		const a64::Gp width = (widthp != dstp) ? widthp.select_register(TEMP_REG3, inst.size()) : select_register(TEMP_REG3, inst.size());
+		const a64::Gp temp = select_register(FUNC_SCRATCH_REG, inst.size());
+
+		mov_reg_param(a, inst.size(), width, widthp);
+		if (!shiftp.is_immediate())
+			mov_reg_param(a, inst.size(), temp, shiftp);
+		mov_reg_param(a, inst.size(), src, srcp);
+
+		if (shiftp.is_immediate())
+			a.add(temp, width, shiftp.immediate() & (instbits - 1));
+		else
+			a.add(temp, width, temp);
+		a.ror(output, src, temp);
+		a.neg(temp, width);
+		a.lsr(output, output, temp);
+		if (inst.flags())
+			a.tst(output, output);
+	}
+
+	mov_param_reg(a, inst.size(), dstp, output);
+}
+
+void drcbe_arm64::op_bfxs(a64::Assembler &a, const uml::instruction &inst)
+{
+	assert(inst.size() == 4 || inst.size() == 8);
+	assert_no_condition(inst);
+	assert_flags(inst, FLAG_S | FLAG_Z);
+
+	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
+	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
+	be_parameter shiftp(*this, inst.param(2), PTYPE_MRI);
+	be_parameter widthp(*this, inst.param(3), PTYPE_MRI);
+
+	const a64::Gp output = dstp.select_register(TEMP_REG1, inst.size());
+	const a64::Gp src = srcp.select_register(TEMP_REG2, inst.size());
+	const uint64_t instbits = inst.size() * 8;
+
+	if (widthp.is_immediate_value(0))
+	{
+		// undefined behaviour - do something
+		const a64::Gp zero = select_register(a64::xzr, inst.size());
+
+		if (inst.flags())
+			a.ands(output, zero, zero);
+		else
+			a.mov(output, zero);
+	}
+	else if (widthp.is_immediate())
+	{
+		const auto width(widthp.immediate() & (instbits - 1));
+
+		mov_reg_param(a, inst.size(), src, srcp);
+
+		if (shiftp.is_immediate())
+		{
+			const auto shift(shiftp.immediate() & (instbits - 1));
+
+			if ((shift + width) <= instbits)
+			{
+				// contiguous bit field
+				a.sbfx(output, src, shift, width);
+			}
+			else
+			{
+				// bit field wraps from LSB to MSB
+				a.ror(output, src, shift);
+				a.sbfx(output, output, 0, width);
+			}
+		}
+		else
+		{
+			const a64::Gp shift = shiftp.select_register(TEMP_REG3, inst.size());
+
+			mov_reg_param(a, inst.size(), shift, shiftp);
+
+			a.ror(output, src, shift);
+			a.sbfx(output, output, 0, width);
+		}
+	}
+	else
+	{
+		const a64::Gp width = (widthp != dstp) ? widthp.select_register(TEMP_REG3, inst.size()) : select_register(TEMP_REG3, inst.size());
+		const a64::Gp temp = select_register(FUNC_SCRATCH_REG, inst.size());
+
+		mov_reg_param(a, inst.size(), src, srcp);
+		if (!shiftp.is_immediate())
+			mov_reg_param(a, inst.size(), temp, shiftp);
+		mov_reg_param(a, inst.size(), width, widthp);
+
+		if (shiftp.is_immediate())
+			a.add(temp, width, shiftp.immediate() & (instbits - 1));
+		else
+			a.add(temp, width, temp);
+		a.ror(output, src, temp);
+		a.neg(temp, width);
+		a.asr(output, output, temp);
+	}
+
+	mov_param_reg(a, inst.size(), dstp, output);
+
+	if (inst.flags())
+		a.tst(output, output);
+}
+
 void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 {
 	assert(inst.size() == 4 || inst.size() == 8);
@@ -3246,11 +3403,10 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		const auto pop = population_count_64(maskp.immediate());
 		const auto lz = count_leading_zeros_64(maskp.immediate()) & (instbits - 1);
 		const auto invlamask = ~(maskp.immediate() << lz) & instmask;
-		const bool is_right_aligned = (maskp.immediate() & (maskp.immediate() + 1)) == 0;
 		const bool is_contiguous = (invlamask & (invlamask + 1)) == 0;
 		const auto s = shiftp.immediate() & (instbits - 1);
 
-		if (is_right_aligned || is_contiguous)
+		if (is_contiguous)
 		{
 			mov_reg_param(a, inst.size(), src, srcp);
 			optimized = true;
@@ -3259,25 +3415,6 @@ void drcbe_arm64::op_roland(a64::Assembler &a, const uml::instruction &inst)
 		if (maskp.is_immediate_value(0))
 		{
 			a.mov(output, select_register(a64::xzr, inst.size()));
-		}
-		else if (is_right_aligned)
-		{
-			// Optimize a contiguous right-aligned mask
-			const auto s2 = -int(s) & (instbits - 1);
-
-			if (s >= pop)
-			{
-				a.ubfx(output, src, s2, pop);
-			}
-			else if (s2 > 0)
-			{
-				a.ror(output, src, s2);
-				a.bfc(output, pop, instbits - pop);
-			}
-			else
-			{
-				a.and_(output, src, ~maskp.immediate() & instmask);
-			}
 		}
 		else if (is_contiguous)
 		{

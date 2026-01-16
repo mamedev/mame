@@ -14,7 +14,6 @@
     Lower 32K of VRAM are not used to store pixel data.
 
     To do:
-    - K1801VM2 CPU core (interrupts and EVNT pin, full EIS set, other insns)
     - verify hsync/vsync frequencies
     - mouse
     - mono/color CRT
@@ -34,12 +33,14 @@
 #include "emu.h"
 
 #include "1801vp033.h"
+
+#include "ms7004.h"
+
 #include "bus/generic/slot.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/t11/t11.h"
 #include "machine/dl11.h"
 #include "machine/timer.h"
-#include "ms7004.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -324,8 +325,8 @@ uint16_t kcgd_state::vram_mmap_r(offs_t offset)
  *
  * 167774:
  *
- * 0-2	R	mouse coordinate data
- * 3	R	mouse button state
+ * 0-2  R   mouse coordinate data
+ * 3    R   mouse button state
  */
 
 void kcgd_state::palette_control(offs_t offset, uint16_t data, uint16_t mem_mask)

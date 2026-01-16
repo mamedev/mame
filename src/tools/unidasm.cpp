@@ -48,12 +48,12 @@ using util::BIT;
 #include "cpu/dsp32/dsp32dis.h"
 #include "cpu/dsp56000/dsp56000d.h"
 #include "cpu/dsp56156/dsp56dsm.h"
+#include "cpu/dsp563xx/dsp563xxd.h"
 #include "cpu/dspp/dsppdasm.h"
 #include "cpu/e0c6200/e0c6200d.h"
 #include "cpu/e132xs/32xsdasm.h"
 #include "cpu/es5510/es5510d.h"
 #include "cpu/esrip/esripdsm.h"
-#include "cpu/evolution/evod.h"
 #include "cpu/f2mc16/f2mc16d.h"
 #include "cpu/f8/f8dasm.h"
 #include "cpu/fr/frdasm.h"
@@ -88,6 +88,7 @@ using util::BIT;
 #include "cpu/ks0164/ks0164d.h"
 #include "cpu/lc57/lc57d.h"
 #include "cpu/lc58/lc58d.h"
+#include "cpu/lc6500/lc6500_dasm.h"
 #include "cpu/lc8670/lc8670dsm.h"
 #include "cpu/lh5801/5801dasm.h"
 #include "cpu/lr35902/lr35902d.h"
@@ -172,6 +173,7 @@ using util::BIT;
 #include "cpu/sigma2/sigma2d.h"
 #include "cpu/sm510/sm510d.h"
 #include "cpu/sm8500/sm8500d.h"
+#include "cpu/sonix16/sonix16d.h"
 #include "cpu/sparc/sparcdasm.h"
 #include "cpu/spc700/spc700ds.h"
 #include "cpu/ssem/ssemdasm.h"
@@ -453,12 +455,12 @@ static const dasm_table_entry dasm_table[] =
 	{ "dsp32c",          le,  0, []() -> util::disasm_interface * { return new dsp32c_disassembler; } },
 	{ "dsp56000",        be, -2, []() -> util::disasm_interface * { return new dsp56000_disassembler; } },
 	{ "dsp56156",        le, -1, []() -> util::disasm_interface * { return new dsp56156_disassembler; } },
+	{ "dsp563xx",        le, -2, []() -> util::disasm_interface * { return new dsp563xx_disassembler; } },
 	{ "dspp",            be, -1, []() -> util::disasm_interface * { return new dspp_disassembler; } },
 	{ "e0c6200",         be, -1, []() -> util::disasm_interface * { return new e0c6200_disassembler; } },
 	{ "epg3231",         le, -1, []() -> util::disasm_interface * { return new epg3231_disassembler; } },
 //  { "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } }, // Currently does nothing
 	{ "esrip",           be,  0, []() -> util::disasm_interface * { return new esrip_disassembler; } },
-	{ "evo",             le, -1, []() -> util::disasm_interface * { return new evolution_disassembler; } },
 	{ "f2mc16",          le,  0, []() -> util::disasm_interface * { return new f2mc16_disassembler; } },
 	{ "f8",              be,  0, []() -> util::disasm_interface * { return new f8_disassembler; } },
 	{ "fr",              be,  0, []() -> util::disasm_interface * { return new fr_disassembler; } },
@@ -517,6 +519,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "kl1839vm1",       be,  0, []() -> util::disasm_interface * { return new kl1839vm1_disassembler; } },
 	{ "lc57",            be,  0, []() -> util::disasm_interface * { return new lc57_disassembler; } },
 	{ "lc58",            be, -1, []() -> util::disasm_interface * { return new lc58_disassembler; } },
+	{ "lc6500",          be,  0, []() -> util::disasm_interface * { return new lc6500_disassembler; } },
 	{ "lc8670",          be,  0, []() -> util::disasm_interface * { return new lc8670_disassembler; } },
 	{ "lh5801",          le,  0, []() -> util::disasm_interface * { return new lh5801_disassembler; } },
 	{ "lr35902",         le,  0, []() -> util::disasm_interface * { return new lr35902_disassembler; } },
@@ -628,6 +631,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "sm5a",            le,  0, []() -> util::disasm_interface * { return new sm5a_disassembler; } },
 	{ "sm8500",          le,  0, []() -> util::disasm_interface * { return new sm8500_disassembler; } },
 	{ "smc1102",         le,  0, []() -> util::disasm_interface * { return new smc1102_disassembler; } },
+	{ "sonix16",         le, -1, []() -> util::disasm_interface * { return new sonix16_disassembler; } },
 	{ "sparclite",       be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::sparclite); } },
 	{ "sparcv7",         be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v7); } },
 	{ "sparcv8",         be,  0, []() -> util::disasm_interface * { return new sparc_disassembler(nullptr, sparc_disassembler::v8); } },
@@ -1174,7 +1178,7 @@ void unidasm_data_buffer::decrypt(const unidasm_data_buffer &buffer, bool opcode
 static int parse_number(const char *curarg, const char *default_format, u32 *value)
 {
 	int result;
-	if(curarg[0] == '0') {
+	if(curarg[0] == '0' && curarg[1] != '\0') {
 		if(tolower((uint8_t)curarg[1]) == 'x')
 			result = sscanf(&curarg[2], "%x", value);
 		else if(tolower((uint8_t)curarg[1]) == 'o')

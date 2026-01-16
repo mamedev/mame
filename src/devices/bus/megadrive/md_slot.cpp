@@ -694,7 +694,7 @@ int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 	kof98_sig[]     = { 0x9b, 0xfc, 0x00, 0x00, 0x4a, 0x00 },
 	s15in1_sig[]    = { 0x22, 0x3c, 0x00, 0xa1, 0x30, 0x00 },
 	kof99_sig[]     = { 0x20, 0x3c, 0x30, 0x00, 0x00, 0xa1 }, // move.l  #$300000A1,d0
-//	radica_sig[]    = { 0x4e, 0xd0, 0x30, 0x39, 0x00, 0xa1 }, // jmp (a0) move.w ($a130xx),d0
+//  radica_sig[]    = { 0x4e, 0xd0, 0x30, 0x39, 0x00, 0xa1 }, // jmp (a0) move.w ($a130xx),d0
 	soulb_sig[]     = { 0x33, 0xfc, 0x00, 0x0c, 0x00, 0xff }, // move.w  #$C,($FF020A).l (what happens if check fails)
 	s19in1_sig[]    = { 0x13, 0xc0, 0x00, 0xa1, 0x30, 0x38 },
 	rockman_sig[]   = { 0xea, 0x80 };
@@ -834,8 +834,8 @@ int base_md_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
 
 		case 0x400000:
 			//if (!memcmp(&ROM[0x3c031c], radica_sig, sizeof(radica_sig)) ||
-			//	!memcmp(&ROM[0x3f031c], radica_sig, sizeof(radica_sig))) // ssf+gng + radica vol1
-			//	type = RADICA;
+			//  !memcmp(&ROM[0x3f031c], radica_sig, sizeof(radica_sig))) // ssf+gng + radica vol1
+			//  type = RADICA;
 
 			if (!memcmp(&ROM[0x028460], soulb_sig, sizeof(soulb_sig)))
 				type = SOULBLAD;

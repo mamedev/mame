@@ -353,7 +353,7 @@ void _8080bw_state::lrescue_sh_port_2_w(uint8_t data)
 /*                                                     */
 /*******************************************************/
 
-void _8080bw_state::cosmo_sh_port_2_w(uint8_t data)
+void cosmo_state::sh_port_2_w(uint8_t data)
 {
 	/* inverted flip screen bit */
 	invadpt2_sh_port_2_w(data ^ 0x20);
@@ -1212,6 +1212,11 @@ void rollingc_state::rollingc_sh_port_w(uint8_t data)
 	if (BIT(rising_bits, 4)) m_samples->start(1, 8); // Computer car is starting to move
 
 	m_port_3_last = data;
+}
+
+void rollingc_state::mraker_sh_port1_w(uint8_t data)
+{
+	m_flip_screen = BIT(data, 0);
 }
 
 

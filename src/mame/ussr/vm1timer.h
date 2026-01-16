@@ -30,9 +30,9 @@ public:
 	void init_w();
 
 protected:
-	// device-level overrides
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	static constexpr uint16_t TMRCSR_SP      = 0001;
@@ -57,7 +57,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(K1801VM1_TIMER, k1801vm1_timer_device)
 
 #endif // MAME_USSR_VM1TIMER_H

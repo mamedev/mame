@@ -10,7 +10,7 @@
 #define LOG_DATA        (1U << 2)
 #define LOG_UNSUPPORTED (1U << 3)
 
-#define VERBOSE 0
+#define VERBOSE 3
 
 #include "logmacro.h"
 
@@ -24,6 +24,15 @@ nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, cons
 nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	nscsi_full_device(mconfig, type, tag, owner, clock), image(*this, "image"), lba(0), cur_lba(0), blocks(0), bytes_per_sector(0)
 {
+	m_default_model_name =
+		" SEAGATE"
+        "          ST225N"
+		"1.00";
+}
+
+void nscsi_harddisk_device::set_default_model_name(const std::string_view &model)
+{
+	m_default_model_name = model;
 }
 
 void nscsi_harddisk_device::device_start()
@@ -171,9 +180,11 @@ void nscsi_harddisk_device::scsi_command()
 				LOG("IDNT tag not found in chd metadata, using default inquiry data\n");
 
 				// Apple HD SC setup utility needs to see this
-				strcpy((char *)&scsi_cmdbuf[8], " SEAGATE");
-				strcpy((char *)&scsi_cmdbuf[16], "          ST225N");
-				strcpy((char *)&scsi_cmdbuf[32], "1.00");
+				memset(scsi_cmdbuf+8, ' ', 28);
+				int len = m_default_model_name.size();
+				if(len > 28)
+					len = 28;
+				memcpy(scsi_cmdbuf+8, m_default_model_name.data(), len);
 				scsi_cmdbuf[36] = 0x00; // # of extents high
 				scsi_cmdbuf[37] = 0x08; // # of extents low
 				scsi_cmdbuf[38] = 0x00; // group 0 commands 0-1f

@@ -100,10 +100,10 @@ authors:hap
 		<element ref="static_black"><bounds x="92" y="0" width="10" height="49" /></element>
 
 		<element ref="text_ship"><bounds x="0" y="5" width="20" height="7" /></element>
-		<element ref="text_speed"><bounds x="21" y="5" width="20" height="7" /></element>
+		<element ref="text_speed"><bounds x="21.5" y="5" width="19" height="7" /></element>
 		<element ref="text_north"><bounds x="47" y="5" width="19" height="7" /></element>
 		<element ref="text_east"><bounds x="69" y="5" width="19" height="7" /></element>
-		<element ref="text_depth"><bounds x="21" y="37" width="20" height="7" /></element>
+		<element ref="text_depth"><bounds x="21.5" y="37" width="19" height="7" /></element>
 		<element ref="text_range"><bounds x="57" y="37" width="20" height="7" /></element>
 
 		<element name="digit5" ref="digit"><bounds x="5" y="17" width="10" height="15" /></element>

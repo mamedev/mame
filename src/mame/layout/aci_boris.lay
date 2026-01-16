@@ -150,8 +150,8 @@ authors:hap
 		<element ref="text_l01b"><bounds x="0" y="32.6" width="4" height="1.8" /></element>
 		<element ref="text_l02a"><bounds x="6" y="32.6" width="4" height="1.8" /></element>
 		<element ref="text_l02b"><bounds x="6" y="32.6" width="4" height="1.8" /></element>
-		<element ref="text_l03"><bounds x="11.3" y="32.6" width="6" height="1.8" /></element>
-		<element ref="text_l04"><bounds x="17" y="32.6" width="6" height="1.8" /></element>
+		<element ref="text_l03"><bounds xc="14" y="32.6" width="5" height="1.8" /></element>
+		<element ref="text_l04"><bounds xc="20" y="32.6" width="5" height="1.8" /></element>
 
 		<element ref="text_l05a"><bounds x="0" y="38.6" width="4" height="1.8" /></element>
 		<element ref="text_l05b"><bounds x="0" y="38.6" width="4" height="1.8" /></element>
@@ -159,7 +159,7 @@ authors:hap
 		<element ref="text_l06b"><bounds x="6" y="38.6" width="4" height="1.8" /></element>
 		<element ref="text_l07a"><bounds x="12" y="38.6" width="4" height="1.8" /></element>
 		<element ref="text_l07b"><bounds x="12" y="38.6" width="4" height="1.8" /></element>
-		<element ref="text_l08"><bounds x="17" y="38.6" width="6" height="1.8" /></element>
+		<element ref="text_l08"><bounds xc="20" y="38.6" width="5" height="1.8" /></element>
 
 		<element ref="text_l09a"><bounds x="0" y="44.6" width="4" height="1.8" /></element>
 		<element ref="text_l09b"><bounds x="0" y="44.6" width="4" height="1.8" /></element>
@@ -167,12 +167,12 @@ authors:hap
 		<element ref="text_l10b"><bounds x="6" y="44.6" width="4" height="1.8" /></element>
 		<element ref="text_l11a"><bounds x="12" y="44.6" width="4" height="1.8" /></element>
 		<element ref="text_l11b"><bounds x="12" y="44.6" width="4" height="1.8" /></element>
-		<element ref="text_l12"><bounds x="17" y="44.6" width="6" height="1.8" /></element>
+		<element ref="text_l12"><bounds xc="20" y="44.6" width="5" height="1.8" /></element>
 
-		<element ref="text_l13"><bounds x="-1" y="50.6" width="6" height="1.8" /></element>
-		<element ref="text_l14"><bounds x="5" y="50.3" width="6" height="2.2" /></element>
-		<element ref="text_l15"><bounds x="11" y="50.6" width="6" height="1.8" /></element>
-		<element ref="text_l16"><bounds x="17.1" y="50.6" width="6" height="1.8" /></element>
+		<element ref="text_l13"><bounds xc="2" y="50.6" width="5" height="1.8" /></element>
+		<element ref="text_l14"><bounds xc="8" y="50.3" width="5" height="2.2" /></element>
+		<element ref="text_l15"><bounds xc="14" y="50.6" width="5" height="1.8" /></element>
+		<element ref="text_l16"><bounds xc="20" y="50.6" width="5" height="1.8" /></element>
 
 	</view>
 </mamelayout>

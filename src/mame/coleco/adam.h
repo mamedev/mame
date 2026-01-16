@@ -51,6 +51,9 @@ public:
 
 	void adam(machine_config &config);
 
+	void computer_reset_w(int state);
+	void game_reset_w(int state);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<m6801_cpu_device> m_netcpu;
@@ -85,12 +88,12 @@ private:
 	void m6801_p3_w(uint8_t data);
 	void m6801_p4_w(uint8_t data);
 
-	void vdc_int_w(int state);
-
 	void os3_w(int state);
 
 	void joy1_irq_w(int state);
 	void joy2_irq_w(int state);
+
+	void mioc_reset(bool game);
 
 	// memory state
 	uint8_t m_mioc;
@@ -110,7 +113,6 @@ private:
 	int m_spindis;
 
 	// video state
-	int m_vdp_nmi = 0;
 	void adam_io(address_map &map) ATTR_COLD;
 	void adam_mem(address_map &map) ATTR_COLD;
 };

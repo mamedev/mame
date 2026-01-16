@@ -294,8 +294,8 @@ protected:
 	memory_access< 8, 0, 0, ENDIANNESS_LITTLE>::specific m_intd;
 	memory_access< 8, 0, 0, ENDIANNESS_LITTLE>::specific m_inti;
 
-	devcb_read8::array<4> m_port_in_cb;
-	devcb_write8::array<4> m_port_out_cb;
+	devcb_read8::array<8> m_port_in_cb;
+	devcb_write8::array<8> m_port_out_cb;
 
 	// for the debugger
 	u8 m_rtemp;
@@ -310,6 +310,10 @@ protected:
 	virtual void handle_ta_window();
 	virtual bool manage_idle_on_interrupt(u8 ints);
 	virtual void handle_irq(int irqline, int state, u32 new_state, u32 tr_state);
+
+
+	u8 port_default_r(int port);
+	void port_default_w(int port, u8 data);
 
 	u8 iram_r(offs_t offset);
 	void iram_w(offs_t offset, u8 data);

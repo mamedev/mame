@@ -54,10 +54,10 @@ ROM_START( everdrive_md )
 	ROM_REGION16_BE(0x800000, "flash", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP("v35.bin", 0x00000, 0x20000, CRC(161b4d2e) SHA1(fe71de7dd1f2117409b158ccd45c68b1d6781a9c) )
 
-//	ROM_LOAD16_WORD_SWAP("game.bin", 0x400000, 0x3e0000, CRC(1) SHA1(1) )
-//	ROM_LOAD16_WORD_SWAP("mdos_v2.bin", 0x10000, 0x20000, CRC(b777ef96) SHA1(8efe2ec873fa4fcaddf08a2c156e540ba4a05b57) )
-//	ROM_LOAD16_WORD_SWAP("os-v36.bin", 0x10000, 0x10000, CRC(ff915066) SHA1(977a8cca44ce9fa0765001f535f19390a7d8ff16) )
-//	ROM_LOAD16_WORD_SWAP("os-v22.bin", 0x10000, 0x10000, CRC(22bcd1c7) SHA1(a23916e6bc1e8d8681704b774a3cbc745065d21e) )
+//  ROM_LOAD16_WORD_SWAP("game.bin", 0x400000, 0x3e0000, CRC(1) SHA1(1) )
+//  ROM_LOAD16_WORD_SWAP("mdos_v2.bin", 0x10000, 0x20000, CRC(b777ef96) SHA1(8efe2ec873fa4fcaddf08a2c156e540ba4a05b57) )
+//  ROM_LOAD16_WORD_SWAP("os-v36.bin", 0x10000, 0x10000, CRC(ff915066) SHA1(977a8cca44ce9fa0765001f535f19390a7d8ff16) )
+//  ROM_LOAD16_WORD_SWAP("os-v22.bin", 0x10000, 0x10000, CRC(22bcd1c7) SHA1(a23916e6bc1e8d8681704b774a3cbc745065d21e) )
 ROM_END
 
 
@@ -112,8 +112,8 @@ void megadrive_hb_everdrive_device::cart_map(address_map &map)
 	);
 
 	// vblank redirection (for cheating), in OS mode (so at copy time)
-//	m_vbl_catch[0](0x00'0078, 0x00'0079).lr16(NAME([] () { return 0xff; }));
-//	m_vbl_catch[0](0x00'007a, 0x00'007b).lr16(NAME([this] () { return m_vblv; }));
+//  m_vbl_catch[0](0x00'0078, 0x00'0079).lr16(NAME([] () { return 0xff; }));
+//  m_vbl_catch[0](0x00'007a, 0x00'007b).lr16(NAME([this] () { return m_vblv; }));
 }
 
 // TODO: OS range /TIME inaccessible when in game_mode

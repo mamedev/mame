@@ -8,16 +8,31 @@
 
 /*
 
-    TODO:
+    Note: the 3.5" controllers are not compatible with 5.25" drives,
+    and vice versa, due to differences in disk geometry and sector
+    interleaving.
 
-    - 320KB DSDD 5.25"
-    - 720KB DSDD 3.5"
-    - 1.44MB DSHD 3.5"
+    640KB DSQD 5.25" disks are rumored to have also been used on the
+    Adam, but no images of these are confirmed to exist and they are
+    not supported by any extant FDC variant.
+
+
+                              5.25"                   3.5"
+                        160KB       320KB       720KB       1.44MB
+    Device shortname    (SSDD)      (DSDD)      (DSDD)      (DSHD)
+
+    adam_fdc            Yes         No          No          No
+    adam_fdc_320kb      Yes         Yes         No          No
+    adam_fdc_a720dipi   No          No          Yes         No
+    adam_fdc_fp720at    No          No          Yes         No
+    adam_fdc_mihddd     No          No          Yes         Yes
 
 */
 
 #include "emu.h"
 #include "fdc.h"
+
+#include "machine/clock.h"
 
 #include "formats/adam_dsk.h"
 
@@ -37,6 +52,10 @@
 //**************************************************************************
 
 DEFINE_DEVICE_TYPE(ADAM_FDC, adam_fdc_device, "adam_fdc", "Adam FDC")
+DEFINE_DEVICE_TYPE(ADAM_FDC_320KB, adam_fdc_320kb_device, "adam_fdc_320kb", "Adam FDC (320KB DSDD modification)")
+DEFINE_DEVICE_TYPE(ADAM_FDC_A720DIPI, adam_fdc_a720dipi_device, "adam_fdc_a720dipi", "Adam FDC (720KB 3.5\" A720DIPI)")
+DEFINE_DEVICE_TYPE(ADAM_FDC_FP720AT, adam_fdc_fp720at_device, "adam_fdc_fp720at", "Adam FDC (720KB 3.5\" FastPack 720A(T))")
+DEFINE_DEVICE_TYPE(ADAM_FDC_MIHDDD, adam_fdc_mihddd_device, "adam_fdc_mihddd", "Adam FDC (1.44MB 3.5\" Micro Innovations HD-DD)")
 
 
 //-------------------------------------------------
@@ -45,23 +64,56 @@ DEFINE_DEVICE_TYPE(ADAM_FDC, adam_fdc_device, "adam_fdc", "Adam FDC")
 
 ROM_START( adam_fdc )
 	ROM_REGION( 0x1000, M6801_TAG, 0 )
-	ROM_DEFAULT_BIOS("ssdd")
-	ROM_SYSTEM_BIOS( 0, "ssdd", "Coleco 160KB SSDD" )
-	ROMX_LOAD( "adam disk u10 ad 31 rev a 09-27-84.u10", 0x0000, 0x1000, CRC(4b0b7143) SHA1(1cb68891c3af80e99efad7e309136ca37244f060), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "320ta", "320KB DSDD (Minh Ta?)" )
-	ROMX_LOAD( "320ta.u10", 0x0000, 0x1000, CRC(dcd865b3) SHA1(dde583e0d18ce4406e9ea44ab34d083e73ee30e2), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "dbl24", "320KB DSDD (DBL)" )
-	ROMX_LOAD( "dbl2-4.u10", 0x0000, 0x1000, CRC(5df49f15) SHA1(43d5710e4fb05f520e813869a049585b41ada86b), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 3, "320doug", "320KB DSDD (Doug Slopsema)" )
-	ROMX_LOAD( "doug.u10", 0x0000, 0x1000, CRC(2b2a9c6d) SHA1(e40304cbb6b9f174d9f5762d920983c79c899b3e), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 4, "a720dipi", "720KB 3.5\" A720DIPI 7607 MMSG" )
-	ROMX_LOAD( "a720dipi 7607 mmsg =c= 1988.u10", 0x0000, 0x1000, CRC(5f248557) SHA1(15b3aaebba38af84f6a1a6ccdf840ca3d58635da), ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 5, "fp720at", "720KB 3.5\" FastPack 720A(T)" )
-	ROMX_LOAD( "fastpack 720a,t.u10", 0x0000, 0x1000, CRC(8f952c88) SHA1(e593a89d7c6e7ea99e7ce376ffa2732d7b646d49), ROM_BIOS(5) )
-	ROM_SYSTEM_BIOS( 6, "mihddd", "1.44MB 3.5\" Micro Innovations HD-DD" )
-	ROMX_LOAD( "1440k micro innovations hd-dd.u10", 0x0000, 0x1000, CRC(2efec8c0) SHA1(f6df22339c93dca938b65d0cbe23abcad89ec230), ROM_BIOS(6) )
-	ROM_SYSTEM_BIOS( 7, "pmhd", "1.44MB 3.5\" Powermate High Density" )
-	ROMX_LOAD( "pmhdfdc.u10", 0x0000, 0x1000, CRC(fed4006c) SHA1(bc8dd00dd5cde9500a4cd7dc1e4d74330184472a), ROM_BIOS(7) )
+	//ROM_SYSTEM_BIOS( n, "ssdd", "Coleco 160KB SSDD" )
+	ROM_LOAD( "adam disk u10 ad 31 rev a 09-27-84.u10", 0x0000, 0x1000, CRC(4b0b7143) SHA1(1cb68891c3af80e99efad7e309136ca37244f060) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( adam_fdc_320kb )
+//-------------------------------------------------
+
+ROM_START( adam_fdc_320kb )
+	ROM_REGION( 0x1000, M6801_TAG, 0 )
+	ROM_DEFAULT_BIOS( "320ta" )
+	ROM_SYSTEM_BIOS( 0, "320ta", "Minh Ta?" )
+	ROMX_LOAD( "320ta.u10", 0x0000, 0x1000, CRC(dcd865b3) SHA1(dde583e0d18ce4406e9ea44ab34d083e73ee30e2), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "dbl24", "DBL" )
+	ROMX_LOAD( "dbl2-4.u10", 0x0000, 0x1000, CRC(5df49f15) SHA1(43d5710e4fb05f520e813869a049585b41ada86b), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "pmhd", "PMHD" ) // formerly listed as 1.44MB 3.5" Powermate High Density but actually a bugfixed version of "dbl24"
+	ROMX_LOAD( "pmhdfdc.u10", 0x0000, 0x1000, CRC(fed4006c) SHA1(bc8dd00dd5cde9500a4cd7dc1e4d74330184472a), ROM_BIOS(2) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( adam_fdc_a720dipi )
+//-------------------------------------------------
+
+ROM_START( adam_fdc_a720dipi )
+	ROM_REGION( 0x1000, M6801_TAG, 0 )
+	//ROM_SYSTEM_BIOS( n, "a720dipi", "720KB 3.5\" A720DIPI 7607 MMSG" )
+	ROM_LOAD( "a720dipi 7607 mmsg =c= 1988.u10", 0x0000, 0x1000, CRC(5f248557) SHA1(15b3aaebba38af84f6a1a6ccdf840ca3d58635da) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( adam_fdc_fp720at )
+//-------------------------------------------------
+
+ROM_START( adam_fdc_fp720at )
+	ROM_REGION( 0x1000, M6801_TAG, 0 )
+	//ROM_SYSTEM_BIOS( n, "fp720at", "720KB 3.5\" FastPack 720A(T)" )
+	ROM_LOAD( "fastpack 720a,t.u10", 0x0000, 0x1000, CRC(8f952c88) SHA1(e593a89d7c6e7ea99e7ce376ffa2732d7b646d49) )
+ROM_END
+
+
+//-------------------------------------------------
+//  ROM( adam_fdc_mihddd )
+//-------------------------------------------------
+
+ROM_START( adam_fdc_mihddd )
+	ROM_REGION( 0x1000, M6801_TAG, 0 )
+	ROM_LOAD( "1440k micro innovations hd-dd.u10", 0x0000, 0x1000, CRC(2efec8c0) SHA1(f6df22339c93dca938b65d0cbe23abcad89ec230) )
 ROM_END
 
 
@@ -72,6 +124,26 @@ ROM_END
 const tiny_rom_entry *adam_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( adam_fdc );
+}
+
+const tiny_rom_entry *adam_fdc_320kb_device::device_rom_region() const
+{
+	return ROM_NAME( adam_fdc_320kb );
+}
+
+const tiny_rom_entry *adam_fdc_a720dipi_device::device_rom_region() const
+{
+	return ROM_NAME( adam_fdc_a720dipi );
+}
+
+const tiny_rom_entry *adam_fdc_fp720at_device::device_rom_region() const
+{
+	return ROM_NAME( adam_fdc_fp720at );
+}
+
+const tiny_rom_entry *adam_fdc_mihddd_device::device_rom_region() const
+{
+	return ROM_NAME( adam_fdc_mihddd );
 }
 
 
@@ -107,10 +179,26 @@ void adam_fdc_device::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_ADAM_FORMAT);
 }
 
-static void adam_fdc_floppies(device_slot_interface &device)
+static void adam_160kb_floppies(device_slot_interface &device)
+{
+	device.option_add("525ssdd", FLOPPY_525_SSDD);
+}
+
+static void adam_320kb_floppies(device_slot_interface &device)
 {
 	device.option_add("525ssdd", FLOPPY_525_SSDD);
 	device.option_add("525dsdd", FLOPPY_525_DD);
+}
+
+static void adam_720kb_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+}
+
+static void adam_1440kb_floppies(device_slot_interface &device)
+{
+	device.option_add("35dd", FLOPPY_35_DD);
+	device.option_add("35hd", FLOPPY_35_HD);
 }
 
 
@@ -120,7 +208,7 @@ static void adam_fdc_floppies(device_slot_interface &device)
 
 void adam_fdc_device::device_add_mconfig(machine_config &config)
 {
-	M6803(config, m_maincpu, 4_MHz_XTAL),
+	M6803(config, m_maincpu, 4_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &adam_fdc_device::adam_fdc_mem);
 	m_maincpu->in_p1_cb().set(FUNC(adam_fdc_device::p1_r));
 	m_maincpu->out_p1_cb().set(FUNC(adam_fdc_device::p1_w));
@@ -130,7 +218,42 @@ void adam_fdc_device::device_add_mconfig(machine_config &config)
 	WD2793(config, m_fdc, 4_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
-	FLOPPY_CONNECTOR(config, m_connector, adam_fdc_floppies, "525ssdd", adam_fdc_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_connector, adam_160kb_floppies, "525ssdd", adam_fdc_device::floppy_formats).enable_sound(true);
+}
+
+void adam_fdc_320kb_device::device_add_mconfig(machine_config &config)
+{
+	adam_fdc_device::device_add_mconfig(config);
+
+	FLOPPY_CONNECTOR(config.replace(), m_connector, adam_320kb_floppies, "525dsdd", adam_fdc_320kb_device::floppy_formats).enable_sound(true);
+}
+
+void adam_fdc_a720dipi_device::device_add_mconfig(machine_config &config)
+{
+	adam_fdc_device::device_add_mconfig(config);
+
+	FLOPPY_CONNECTOR(config.replace(), m_connector, adam_720kb_floppies, "35dd", adam_fdc_a720dipi_device::floppy_formats).enable_sound(true);
+}
+
+void adam_fdc_fp720at_device::device_add_mconfig(machine_config &config)
+{
+	adam_fdc_device::device_add_mconfig(config);
+
+	FLOPPY_CONNECTOR(config.replace(), m_connector, adam_720kb_floppies, "35dd", adam_fdc_fp720at_device::floppy_formats).enable_sound(true);
+}
+
+void adam_fdc_mihddd_device::device_add_mconfig(machine_config &config)
+{
+	adam_fdc_device::device_add_mconfig(config);
+
+	// clocks are increased to keep up with 500 Kbps data rate of HD floppy disks
+	m_maincpu->set_clock(8000000);
+	m_fdc->set_clock(2000000);
+
+	// external serial clock used to maintain ADAMnet rate
+	CLOCK(config, "clock", 500000).signal_handler().set([this] (int state) { if (state) { m_maincpu->clock_serial(); } });
+
+	FLOPPY_CONNECTOR(config.replace(), m_connector, adam_1440kb_floppies, "35hd", adam_fdc_mihddd_device::floppy_formats).enable_sound(true);
 }
 
 
@@ -165,8 +288,8 @@ ioport_constructor adam_fdc_device::device_input_ports() const
 //  adam_fdc_device - constructor
 //-------------------------------------------------
 
-adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ADAM_FDC, tag, owner, clock),
+adam_fdc_device::adam_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG),
 		m_fdc(*this, WD2793_TAG),
@@ -174,6 +297,56 @@ adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag,
 		m_floppy(nullptr),
 		m_ram(*this, "ram"),
 		m_sw3(*this, "SW3")
+{
+}
+
+adam_fdc_device::adam_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: adam_fdc_device(mconfig, ADAM_FDC, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  adam_fdc_320kb_device - constructor
+//-------------------------------------------------
+
+adam_fdc_320kb_device::adam_fdc_320kb_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: adam_fdc_device(mconfig, type, tag, owner, clock)
+{
+}
+
+adam_fdc_320kb_device::adam_fdc_320kb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: adam_fdc_320kb_device(mconfig, ADAM_FDC_320KB, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  adam_fdc_a720dipi_device - constructor
+//-------------------------------------------------
+
+adam_fdc_a720dipi_device::adam_fdc_a720dipi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: adam_fdc_320kb_device(mconfig, ADAM_FDC_A720DIPI, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  adam_fdc_fp720at_device - constructor
+//-------------------------------------------------
+
+adam_fdc_fp720at_device::adam_fdc_fp720at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: adam_fdc_320kb_device(mconfig, ADAM_FDC_FP720AT, tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  adam_fdc_mihddd_device - constructor
+//-------------------------------------------------
+
+adam_fdc_mihddd_device::adam_fdc_mihddd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: adam_fdc_320kb_device(mconfig, ADAM_FDC_MIHDDD, tag, owner, clock)
 {
 }
 
@@ -265,6 +438,12 @@ uint8_t adam_fdc_device::p1_r()
 	return data;
 }
 
+uint8_t adam_fdc_a720dipi_device::p1_r()
+{
+	// signal inverted here because drive outputs it that way?
+	return adam_fdc_device::p1_r() ^ 0x01;
+}
+
 
 //-------------------------------------------------
 //  p1_w -
@@ -303,11 +482,25 @@ void adam_fdc_device::p1_w(uint8_t data)
 
 	m_fdc->set_floppy(m_floppy);
 
-	// side select (320KB)
-	if (m_floppy) m_floppy->ss_w(!BIT(data, 4));
-
 	// motor enable
 	if (m_floppy) m_floppy->mon_w(!BIT(data, 6));
+}
+
+void adam_fdc_320kb_device::p1_w(uint8_t data)
+{
+	adam_fdc_device::p1_w(data);
+
+	// side select
+	if (m_floppy) m_floppy->ss_w(!BIT(data, 4));
+}
+
+void adam_fdc_mihddd_device::p1_w(uint8_t data)
+{
+	// keep DDEN low here
+	adam_fdc_320kb_device::p1_w(data & 0xf7);
+
+	// DD/HD select
+	m_fdc->enmf_w(BIT(data, 3));
 }
 
 

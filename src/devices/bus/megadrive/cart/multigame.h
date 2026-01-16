@@ -10,7 +10,7 @@
 #include "slot.h"
 
 class megadrive_tectoy_sports_device : public device_t,
-						               public device_megadrive_cart_interface
+									   public device_megadrive_cart_interface
 {
 public:
 	megadrive_tectoy_sports_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -26,7 +26,7 @@ protected:
 };
 
 class megadrive_cm2in1_device : public device_t,
-						        public device_megadrive_cart_interface
+								public device_megadrive_cart_interface
 {
 public:
 	megadrive_cm2in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

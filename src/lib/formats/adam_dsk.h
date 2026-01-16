@@ -1,20 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:Curt Coder
-/*********************************************************************
+// copyright-holders:AJR
 
-    formats/adam_dsk.h
-
-    Coleco Adam disk image format
-
-*********************************************************************/
 #ifndef MAME_FORMATS_ADAM_DSK_H
 #define MAME_FORMATS_ADAM_DSK_H
 
 #pragma once
 
-#include "wd177x_dsk.h"
+#include "flopimg.h"
 
-class adam_format : public wd177x_format
+class adam_format : public floppy_image_format_t
 {
 public:
 	adam_format();
@@ -22,11 +16,11 @@ public:
 	virtual const char *name() const noexcept override;
 	virtual const char *description() const noexcept override;
 	virtual const char *extensions() const noexcept override;
+	virtual bool supports_save() const noexcept override;
 
-	virtual int get_image_offset(const format &f, int head, int track) const override;
-
-private:
-	static const format formats[];
+	virtual int identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const override;
+	virtual bool load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const override;
+	virtual bool save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const override;
 };
 
 extern const adam_format FLOPPY_ADAM_FORMAT;

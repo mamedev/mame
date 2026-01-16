@@ -5599,7 +5599,7 @@ void cave_z80_state::init_pwrinst2a()
 
 #if 1       //ROM PATCH
 	{
-		u16 *rom = (u16 *)memregion("maincpu")->base();
+		u16 *const rom = &memregion("maincpu")->as_u16();
 		rom[0xd46c / 2] = 0xd482;           // kurara dash fix  0xd400 -> 0xd482
 	}
 #endif
