@@ -289,9 +289,6 @@ ROM_START(3do_fz1)
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
-//	ROM_SYSTEM_BIOS( 1, "goldstar", "Goldstar 3DO Interactive Multiplayer v1.01m" )
-//	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(1) )
-
 ROM_START(3do_fz1e)
 	ROM_REGION32_BE( 0x200000, "bios", 0 )
 	ROM_SYSTEM_BIOS( 0, "retail", "Retail FZ-1 Europe" )
@@ -398,7 +395,6 @@ ROM_START(3do_fc2)
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
-
 ROM_START(3do_try)
 	ROM_REGION32_BE( 0x200000, "bios", 0 )
 	ROM_SYSTEM_BIOS( 0, "retail", "Retail IMP-21J TRY Japan" )
@@ -409,7 +405,6 @@ ROM_START(3do_try)
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
-
 
 // model number "MPHC2100USA"
 ROM_START(3do_hc21)
@@ -427,7 +422,7 @@ ROM_END
 
 
 // Arcade section
-// TODO: still using the old BIOS scheme
+// TODO: still using the old BIOS scheme, determine what they actually used for Orbatak
 #define NTSC_BIOS \
 	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "panafz10", "Panasonic FZ-10 R.E.A.L. 3DO Interactive Multiplayer" ) \
@@ -502,19 +497,19 @@ CONS( 1994, 3do_gdo101, 0,          0,       _3do,       3do,    _3do_state, emp
 CONS( 1994?,3do_fc1,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO FC-1 Interactive Multiplayer (USA)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 1994?,3do_fc2,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar?", "3DO FC-2 Interactive Multiplayer (dev kit)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // Sanyo
-CONS( 1995, 3do_try,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO IMP-21J Try Interactive Multiplayer (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1995, 3do_try,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO IMP-21J TRY Interactive Multiplayer (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO HC-21 Interactive Multiplayer (USA, prototype)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // Arcade section
-GAME( 1993, 3dobios, 0,       arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 1993, 3dobios, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
 
 GAME( 1995, orbatak, 3dobios, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 // Beavis and Butthead (prototype), different CD drive, Jaguar CD derived?
 
 
 // American Laser Games uses its own BIOS (with additional "FKr-Severe-System-extended-RSA failed in CreateTask")
-GAME( 1993, alg3do, 0,       arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
 
 GAME( 199?, md23do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
 GAME( 1994, sht3do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
