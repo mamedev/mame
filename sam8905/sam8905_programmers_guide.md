@@ -217,7 +217,7 @@ MIXL and MIXR define the amount of signal to be send resp. to the left and right
 | 110  | -6 dB |
 | 111  | 0 dB |
 
-**Note:** As the Mix is only updated by a UXY USP, it can be handled in a very flexible way. The minimum requirement is to initialize this information.
+**Note:** As the Mix is only updated by a WXY+WSP, it can be handled in a very flexible way. The minimum requirement is to initialize this information.
 
 ### Micro-Instruction Philosophy
 
