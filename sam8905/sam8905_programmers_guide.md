@@ -157,29 +157,41 @@ Negative values of DPHI are mainly used for envelope applications (see later)
 ### Wave Format
 
 ```
-| 18 |    |    | 9  |    |    |    |    |    |    | 0  |
-|----|----|----|----|----|----|----|----|----|----|----|
-| E  |     WAVE      |        FINAL WAVE             |
-| 0  | ext mem wave  |                               |
-| I  |I |R |I |SEL|Z |              X                |
+| 18 | 17 | 16 | 15 | 14 | 13 | 12 | 11 | 10 | 9  | 8 - 0      |
+|----|----|----|----|----|----|----|----|----|----|------------|
+| E  |     WAVE                                   | FINAL_WAVE |
+|    | 0  | EXT_MEM_WAVE                          |    "       |
+|    | 1  | R  | I  | SEL     | Z  |       X      |            |
 ```
+
+@CLAUDE:
+FIXME check if this is correct in the implementation  
+- E [18]
+- WAVE [17:9]
+  - INT/EXT [17]
+  - EXT_MEM_WAVE [16:9]
+  - R [16]
+  - I [15]
+  - SEL [14:13]
+  - Z [12]
+- FINAL_WAVE [8:0]
 
 **Typical micro-instructions: WA WSP, WWF**
 
-This format is mostly used in sampling applications, involving an external wave-form memory. Specific micro-instructions allow to selectively increment WAVE at the end of a period and to check if WAVE reaches FINALWAVE. Subsequent actions can be taken depending on the state of the E bit (END), like looping on a period or stopping the sampling process.
+This format is mostly used in sampling applications, involving an external wave-form memory. Specific micro-instructions allow to selectively increment WAVE at the end of a period and to check if WAVE reaches FINAL_WAVE. Subsequent actions can be taken depending on the state of the E bit (END), like looping on a period or stopping the sampling process.
 
 The upper bit of WAVE indicates an external (0) or internal (1) wave. For internal waves, the remaining bits have the following meaning:
 
-| Field | Description |
-|-------|-------------|
-| **R:** | 0- Select sinus wave (internal 4k x 12 sinus). In this case the other bits should be zero. |
-|        | 1- Select ramp or constant |
-| **I:** | 0- direct, 1- two's complement |
-| **SEL:** | 00- 2 x PHI ramp |
-|          | 01- Constant from micro-instruction |
-|          | 10- PHI ramp |
-|          | 11- PHI/2 ramp |
-| **Z:** | 1- select constant zero as waveform |
+| Field    | Description                                                                                 |
+|----------|---------------------------------------------------------------------------------------------|
+| **R:**   | 0 - Select sinus wave (internal 4k x 12 sinus). In this case the other bits should be zero. |
+|          | 1 - Select ramp or constant                                                                 |
+| **I:**   | 0 - direct, 1 - two's complement                                                            |
+| **SEL:** | 00- 2 x PHI ramp                                                                            |
+|          | 01- Constant from micro-instruction                                                         |
+|          | 10- PHI ramp                                                                                |
+|          | 11- PHI/2 ramp                                                                              |
+| **Z:**   | 1- select constant zero as waveform                                                         |
 
 See appendix I for more informations about sinus, ramps and constants.
 
@@ -206,16 +218,16 @@ MIXL and MIXR define the amount of signal to be send resp. to the left and right
 
 ### MIXL/MIXR Output Attenuation
 
-| Code | Attenuation |
-|------|-------------|
+| Code | Attenuation         |
+|------|---------------------|
 | 000  | no signal to output |
-| 001  | -36 dB |
-| 010  | -30 dB |
-| 011  | -24 dB |
-| 100  | -18 dB |
-| 101  | -12 dB |
-| 110  | -6 dB |
-| 111  | 0 dB |
+| 001  | -36 dB              |
+| 010  | -30 dB              |
+| 011  | -24 dB              |
+| 100  | -18 dB              |
+| 101  | -12 dB              |
+| 110  | -6 dB               |
+| 111  | 0 dB                |
 
 **Note:** As the Mix is only updated by a WXY+WSP, it can be handled in a very flexible way. The minimum requirement is to initialize this information.
 
