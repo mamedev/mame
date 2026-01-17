@@ -121,12 +121,8 @@ private:
     u8 m_port3 = 0xff;
     u8 m_midi_rxd = 1;  // MIDI RX bit (idle high)
 
-    // FX SAM input ring buffer (from sound SAM via 74HC595 shift registers)
-    // SND chip writes at 44kHz, FX chip reads at 22kHz
-    static constexpr size_t FX_INPUT_RING_SIZE = 512; //32768; //8192;
-    std::unique_ptr<int16_t[]> m_fx_input_ring;
-    size_t m_fx_input_write_pos = 0;
-    size_t m_fx_input_read_pos = 0;
+    // Current input sample for FX chip (from SND chip via 74HC595 shift registers)
+    int16_t m_fx_input_sample = 0;
 
     // FX SAM 32KB SRAM for delay/reverb buffers
     std::unique_ptr<uint8_t[]> m_fx_sram;
@@ -886,14 +882,11 @@ void keyfox10_state::machine_start()
     m_fx_sram = std::make_unique<uint8_t[]>(FX_SRAM_SIZE);
     std::fill_n(m_fx_sram.get(), FX_SRAM_SIZE, 0);
 
-    // Initialize FX input ring buffer (SND -> FX sample transfer)
-    m_fx_input_ring = std::make_unique<int16_t[]>(FX_INPUT_RING_SIZE);
-    std::fill_n(m_fx_input_ring.get(), FX_INPUT_RING_SIZE, 0);
-    m_fx_input_write_pos = 0;
-    m_fx_input_read_pos = 0;
+    // Initialize FX input sample (SND -> FX sample transfer)
+    m_fx_input_sample = 0;
 
     // Set FX chip to slave mode - it runs synchronized with SND chip
-    // m_sam_fx->set_slave_mode(true);
+    m_sam_fx->set_slave_mode(true);
 
     // Save state
     save_item(NAME(m_port0));
@@ -902,9 +895,7 @@ void keyfox10_state::machine_start()
     save_item(NAME(m_port3));
     save_item(NAME(m_midi_rxd));
     save_item(NAME(m_disp_sr));
-    save_pointer(NAME(m_fx_input_ring), FX_INPUT_RING_SIZE);
-    save_item(NAME(m_fx_input_write_pos));
-    save_item(NAME(m_fx_input_read_pos));
+    save_item(NAME(m_fx_input_sample));
     save_pointer(NAME(m_fx_sram), FX_SRAM_SIZE);
     save_item(NAME(m_panel_sr));
     save_item(NAME(m_panel_latch));
@@ -1093,57 +1084,24 @@ u16 keyfox10_state::sam_snd_waveform_r(offs_t offset)
 }
 
 // Callback from sound SAM: captures L/R samples for FX SAM input
-// Writes samples to ring buffer for FX chip to read via waveform callback
+// Stores current sample for FX chip to read via waveform callback
 void keyfox10_state::sam_snd_sample_out(uint32_t data)
 {
-    // HACK FX CHIP TAKES TWICE AS LONG TO PROCESS ONE FRAME
-    // static int snd_even_odd = 0;
-    // if ((snd_even_odd++ & 1) == 1) {
-    //     return;
-    // }
-
     // Unpack L/R from 32-bit value: upper 16 = L, lower 16 = R
     // For now we only use R channel (mono reverb input)
-    int16_t sample_r = int16_t(data & 0xFFFF);
+    uint16_t sample_r = int16_t(data & 0xFFFF);
 
-    sample_r = ((sample_r >> 8) | ((sample_r << 8) & 0xFF00));
+    // Byte swap for proper endianness
+    int16_t sample = ((sample_r >> 8) & 0xFF) | ((sample_r << 8) & 0xFF00);
 
-    // Push sample to ring buffer
-    m_fx_input_ring[m_fx_input_write_pos] = sample_r;
-    m_fx_input_write_pos = (m_fx_input_write_pos + 1) % FX_INPUT_RING_SIZE;
+    // Store current sample for FX chip waveform reads
+    m_fx_input_sample = sample;
 
-    m_fx_input_ring[m_fx_input_write_pos] = sample_r;
-    m_fx_input_write_pos = (m_fx_input_write_pos + 1) % FX_INPUT_RING_SIZE;
-
-    // m_fx_input_ring[m_fx_input_write_pos] = sample_r;
-    // m_fx_input_write_pos = (m_fx_input_write_pos + 1) % FX_INPUT_RING_SIZE;
-
-    // m_fx_input_ring[m_fx_input_write_pos] = sample_r;
-    // m_fx_input_write_pos = (m_fx_input_write_pos + 1) % FX_INPUT_RING_SIZE;
-
-    // Debug: trace non-zero input samples
-    static int snd_out_trace = 0;
-    if (sample_r != 0 && snd_out_trace < 50) {
-        logerror("SND sample_out: R=%d write_pos=%zu\n", sample_r, m_fx_input_write_pos);
-        snd_out_trace++;
-    }
-
-    // Check ring buffer divergence - warn if read/write positions are too far apart
-    size_t distance = (m_fx_input_write_pos >= m_fx_input_read_pos)
-        ? (m_fx_input_write_pos - m_fx_input_read_pos)
-        : (FX_INPUT_RING_SIZE - m_fx_input_read_pos + m_fx_input_write_pos);
-    if (distance > 1024) {
-        static int diverge_warn = 0;
-        if (diverge_warn < 2000) {
-            printf("FX ring buffer divergence: write=%zu read=%zu distance=%zu\n",
-                m_fx_input_write_pos, m_fx_input_read_pos, distance);
-            diverge_warn++;
-        }
-        if (m_fx_input_read_pos > 0) {
-            printf("FX ring buffer divergence: write=%zu read=%zu distance=%zu\n",
-                m_fx_input_write_pos, m_fx_input_read_pos, distance);
-            diverge_warn++;
-        }
+    // FX chip runs at 22kHz, SND at 44kHz - call process_frame every other sample
+    static int snd_sample_count = 0;
+    if ((snd_sample_count++ & 1) == 0) {
+        int32_t fx_l, fx_r;
+        m_sam_fx->process_frame(fx_l, fx_r);
     }
 }
 
@@ -1176,47 +1134,33 @@ void keyfox10_state::sam_fx_waveform_w(offs_t offset, u16 data)
 
 u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
 {
-    // Check WA19 (bit 19) - if set, return input from sound SAM via ring buffer
+    // Check WA19 (bit 19) - if set, return input from sound SAM
     // WA[19:0] = { WAVE[7:0], PHI[11:0] }
-    // When WA19=1 (WAVE[7]=1, i.e., WF >= 0x80), reads from input buffer
+    // When WA19=1 (WAVE[7]=1, i.e., WF >= 0x80), reads from input sample
     // PHI[0] selects byte: 0=high byte, 1=low byte of 16-bit sample
     if (offset & 0x80000)  // WA19 set - read input sample
     {
-        // Read current sample from ring buffer
-        int16_t sample = m_fx_input_ring[m_fx_input_read_pos];
+        // Read current input sample (synchronized via process_frame)
+        int16_t sample = m_fx_input_sample;
 
         // PHI[0] selects byte: 0=high byte, 1=low byte
         uint8_t sample_8bit;
         if (offset & 1) {
-            // Low byte - also advance to next sample after reading
+            // Low byte
             sample_8bit = sample & 0xFF;
-            //sample_8bit = (sample >> 8) & 0xFF;
-            m_fx_input_read_pos = (m_fx_input_read_pos + 1) % FX_INPUT_RING_SIZE;
         }
         else
         {
             // High byte
             sample_8bit = (sample >> 8) & 0xFF;
-            //sample_8bit = sample & 0xFF;
-            //m_fx_input_read_pos = (m_fx_input_read_pos + 1) % FX_INPUT_RING_SIZE;
         }
 
         // Place 8-bit value at bits 10:3, bits 2:0 are grounded (always 0)
         int16_t result = ((int16_t)(int8_t)sample_8bit) << 3;
 
+        // Sign extension for high byte read
         if ((offset & 1) == 0 && (sample_8bit & 0x80)) {
             result |= 0x800;
-        }
-        // if ((offset & 1) == 1 && (sample_8bit & 0x80)) {
-        //     result |= 0x800;
-        // }
-
-        // Debug: log non-zero input sample reads
-        static int fx_input_log_count = 0;
-        if (sample != 0 && fx_input_log_count < 100) {
-            logerror("FX input read: WA=%05X raw=%d 8bit=%d result=%d read_pos=%zu\n",
-                offset, sample, (int8_t)sample_8bit, (int16_t)result, m_fx_input_read_pos);
-            fx_input_log_count++;
         }
 
         return result & 0xFFF;
@@ -1438,11 +1382,11 @@ void keyfox10_state::keyfox10(machine_config &config)
     // SAM8905 FX - effects processor (at 0xE000 when T1=1)
     // FX chip has 32KB SRAM for delay/reverb buffers
     // Runs in slave mode - triggered by SND chip after each frame (set in machine_start)
-    SAM8905(config, m_sam_fx, 22'579'200, 512);
+    SAM8905(config, m_sam_fx, 22'579'200, 1024);
     m_sam_fx->waveform_read_callback().set(FUNC(keyfox10_state::sam_fx_waveform_r));
     m_sam_fx->waveform_write_callback().set(FUNC(keyfox10_state::sam_fx_waveform_w));
-    m_sam_fx->add_route(0, "lspeaker", 0.8);  // Wet L
-    m_sam_fx->add_route(1, "rspeaker", 0.8);  // Wet R
+    m_sam_fx->add_route(0, "lspeaker", 0.5);  // Wet L
+    m_sam_fx->add_route(1, "rspeaker", 0.5);  // Wet R
 
     // 7-segment display layout
     config.set_default_layout(layout_keyfox10);

@@ -29,6 +29,15 @@ void sam8905_device::device_start()
 	m_last_out_l = 0;
 	m_last_out_r = 0;
 
+	// Initialize slave mode ring buffer (1024 samples should be plenty)
+	m_slave_ring_size = clock() / m_buffer_size; //1024;
+	m_slave_ring_l = std::make_unique<int32_t[]>(m_slave_ring_size);
+	m_slave_ring_r = std::make_unique<int32_t[]>(m_slave_ring_size);
+	m_slave_ring_write_pos = 0;
+	m_slave_ring_read_pos = 0;
+	std::fill_n(m_slave_ring_l.get(), m_slave_ring_size, 0);
+	std::fill_n(m_slave_ring_r.get(), m_slave_ring_size, 0);
+
 	save_pointer(NAME(m_aram), 256);
 	save_pointer(NAME(m_dram), 256);
 	save_item(NAME(m_control_reg));
@@ -37,6 +46,10 @@ void sam8905_device::device_start()
 	save_item(NAME(m_slave_mode));
 	save_item(NAME(m_last_out_l));
 	save_item(NAME(m_last_out_r));
+	save_pointer(NAME(m_slave_ring_l), m_slave_ring_size);
+	save_pointer(NAME(m_slave_ring_r), m_slave_ring_size);
+	save_item(NAME(m_slave_ring_write_pos));
+	save_item(NAME(m_slave_ring_read_pos));
 	// Chip-level registers
 	save_item(NAME(m_a));
 	save_item(NAME(m_b));
@@ -343,22 +356,47 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 	// Store for slave mode stream output
 	m_last_out_l = out_l;
 	m_last_out_r = out_r;
+
+	// Push to slave mode ring buffer
+	m_slave_ring_l[m_slave_ring_write_pos] = out_l;
+	m_slave_ring_r[m_slave_ring_write_pos] = out_r;
+	m_slave_ring_write_pos = (m_slave_ring_write_pos + 1) % m_slave_ring_size;
 }
 
 void sam8905_device::sound_stream_update(sound_stream &stream)
 {
-	// In slave mode, just output the last computed values (set by process_frame)
+    //lib/ Master mode: process frames independently
+	// SSR bit (bit 3): 0 = 44.1kHz, 1 = 22.05kHz
+	bool ssr_mode = BIT(m_control_reg, 3);
+
+    // In slave mode, read from ring buffer filled by process_frame calls
 	if (m_slave_mode) {
 		for (int samp = 0; samp < stream.samples(); ++samp) {
+			// Read from ring buffer if data available, otherwise use last value
+			if (m_slave_ring_read_pos != m_slave_ring_write_pos) {
+				m_last_out_l = m_slave_ring_l[m_slave_ring_read_pos];
+				m_last_out_r = m_slave_ring_r[m_slave_ring_read_pos];
+				m_slave_ring_read_pos = (m_slave_ring_read_pos + 1) % m_slave_ring_size;
+			}
 			stream.put_int_clamp(0, samp, m_last_out_l, 32768);
 			stream.put_int_clamp(1, samp, m_last_out_r, 32768);
 		}
+
+		// Debug: check for ring buffer divergence
+		size_t distance = (m_slave_ring_write_pos >= m_slave_ring_read_pos)
+			? (m_slave_ring_write_pos - m_slave_ring_read_pos)
+			: (m_slave_ring_size - m_slave_ring_read_pos + m_slave_ring_write_pos);
+		if (distance > 1024) {
+			static int diverge_warn = 0;
+			//if (diverge_warn < 2000) {
+				printf("SAM8905 slave ring divergence: write=%zu read=%zu distance=%zu, MODE: %u\n",
+					m_slave_ring_write_pos, m_slave_ring_read_pos, distance, ssr_mode);
+				diverge_warn++;
+			//}
+		}
+        //m_slave_ring_write_pos = m_slave_ring_read_pos;
 		return;
 	}
-
-	// Master mode: process frames independently
-	// SSR bit (bit 3): 0 = 44.1kHz, 1 = 22.05kHz
-	bool ssr_mode = BIT(m_control_reg, 3);
 
 	for (int samp = 0; samp < stream.samples(); ++samp) {
 		// Clear chip-level accumulators at start of frame

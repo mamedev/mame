@@ -72,6 +72,13 @@ private:
 	bool m_slave_mode;
 	int32_t m_last_out_l, m_last_out_r;  // Last output for slave mode stream
 
+	// Slave mode ring buffer - stores samples from process_frame for stream output
+	std::unique_ptr<int32_t[]> m_slave_ring_l;
+	std::unique_ptr<int32_t[]> m_slave_ring_r;
+	size_t m_slave_ring_size;
+	size_t m_slave_ring_write_pos;
+	size_t m_slave_ring_read_pos;
+
 	static constexpr uint32_t MASK19 = 0x7FFFF;
 };
 
