@@ -105,32 +105,31 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 	bool internal = (wf & 0x100);  // WF[8] = INT/EXT
 
 	if (internal) {
-#if 1
+#if 0
         // CORRECTED FROM MANUAL
 		// WF[8]=1: Internal waveform
 		// WF bit layout: [8]=INT/EXT, [7]=R, [6]=I, [5:4]=SEL, [3]=Z, [2:0]=unused
 		bool z_bit = (wf & 0x08);      // WF[3] = Z (zero select)
-		bool invert = (wf & 0x40);     // WF[6] = I (0=direct, 1=two's complement)
-
-		bool ramp_mode = (wf & 0x80);  // WF[7] = R (0=sinus, 1=ramp/constant)
 		int sel = (wf >> 4) & 3;       // WF[5:4] = SEL (ramp type)
-// #elseif 0
-//         // OLD
-// 		bool z_bit = (wf & 0x01);      // WF[3] = Z (zero select)
-// 		bool invert = false; //(wf & 0x40);     // WF[6] = I (0=direct, 1=two's complement)
-//                                        //
-// 		bool ramp_mode = (wf & 0x40);  // WF[7] = R (0=sinus, 1=ramp/constant)
-// 		int sel = (wf >> 2) & 3;       // WF[5:4] = SEL (ramp type)
+		bool invert = (wf & 0x40);     // WF[6] = I (0=one's complement, 1=direct)
+		bool ramp_mode = (wf & 0x80);  // WF[7] = R (0=sinus, 1=ramp/constant)
 #else
         // MIX - WORKING FX
 		bool z_bit = (wf & 0x08);      // WF[3] = Z (zero select)
-		bool invert = (wf & 0x80);     // WF[7] = I (0=direct, 1=two's complement)
-                                       //
-		bool ramp_mode = (wf & 0x40);  // WF[6] = R (0=sinus, 1=ramp/constant)
 		int sel = (wf >> 4) & 3;       // WF[5:4] = SEL (ramp type)
+		bool invert = (wf & 0x80);     // WF[7] = I (0=direct, 1=two's complement)
+		bool ramp_mode = (wf & 0x40);  // WF[6] = R (0=sinus, 1=ramp/constant)
 #endif
 
-        if (z_bit) return 0;
+        if (z_bit) {
+            return 0;
+        }
+
+        // if (wf & 3) {
+        //     //printf("unused 0x%x\n", wf);
+		//     invert = (wf & 0x80);     // WF[7] = I (0=direct, 1=two's complement)
+		//     ramp_mode = (wf & 0x40);  // WF[6] = R (0=sinus, 1=ramp/constant)
+        // }
 
 		int32_t result;
 		if (!ramp_mode) {
@@ -159,30 +158,32 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 			}
 		}
 
-		// Apply I bit: two's complement inversion
-		// if (invert) {
-        //     //printf("INVERT\n");
-		//  	//result = -result;
-		//  	result = -result; ;
-		// }
         // Option 1: Mask to 12-bit (wraps)
-        // if (invert) {
-        //     result = (-result) & 0xFFF;
-        //     if (result & 0x800) result |= ~0xFFF; // sign extend
-        // }
+        if (invert) {
+            result = (-result) & 0xFFF;
+            if (result & 0x800) result |= ~0xFFF; // sign extend
+        }
 
-        // // Option 2: Saturate
+        // Option 2: Saturate
         // if (invert) {
         //     result = -result;
         //     if (result > 2047) result = 2047;
         //     if (result < -2048) result = -2048;
         // }
+        // EXPERIMENTING
+		// 
+		// Apply I bit: one's complement inversion with INVERTED semantics
+		// Manual says "I (0=direct, 1=two's complement)" but testing shows:
+		// I=0 means apply one's complement (XOR 0xFFF), I=1 means direct
+		// This is consistent with old hardware where ~0 = -1 (not 0)
+		// if (invert) {
+		// 	// One's complement: bit inversion (XOR with 0xFFF)
+		// 	result = result ^ 0xFFF;
+		// 	// Sign extend from 12-bit
+		// 	if (result & 0x800) result |= ~0xFFF;
+		// }
+		result &= 0xFFF;
 
-        if (invert) {
-            result = -result;
-            // Mask to 12-bit signed (wraps +2048 to -2048)
-            result = ((result + 2048) & 0xFFF) - 2048;
-        }
         return result;
 	} else {
 		// External memory access
