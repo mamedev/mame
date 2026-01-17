@@ -36,6 +36,7 @@ protected:
 
 private:
 	// Chip-level working registers (shared across all slots)
+	uint32_t m_bus;
 	uint32_t m_a, m_b;          // Working registers
 	uint32_t m_x, m_y;          // Waveform/multiplier registers
 	uint32_t m_phi, m_wf;       // Phase and waveform select

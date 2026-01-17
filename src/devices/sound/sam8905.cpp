@@ -69,6 +69,7 @@ void sam8905_device::device_start()
 
 void sam8905_device::device_reset()
 {
+	m_bus = 0;
 	m_a = m_b = 0;
 	m_x = m_y = 0;
 	m_phi = m_wf = 0;
@@ -101,29 +102,70 @@ uint32_t sam8905_device::get_constant(uint8_t mad)
 int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int slot_idx)
 {
 	phi &= 0xFFF; // 12-bit phase
-	bool internal = (wf & 0x100);
+	bool internal = (wf & 0x100);  // WF[8] = INT/EXT
 
 	if (internal) {
-		// Bit 8=1: Internal. Check fields R, I, SEL, Z
-		bool z_bit = (wf & 0x1);
-		if (z_bit) return 0;
+#if 0
+        // CORRECTED FROM MANUAL
+		// WF[8]=1: Internal waveform
+		// WF bit layout: [8]=INT/EXT, [7]=R, [6]=I, [5:4]=SEL, [3]=Z, [2:0]=unused
+		bool z_bit = (wf & 0x08);      // WF[3] = Z (zero select)
+		bool invert = (wf & 0x40);     // WF[6] = I (0=direct, 1=two's complement)
 
-		bool ramp_mode = (wf & 0x40); // R bit
+		bool ramp_mode = (wf & 0x80);  // WF[7] = R (0=sinus, 1=ramp/constant)
+		int sel = (wf >> 4) & 3;       // WF[5:4] = SEL (ramp type)
+#elseif 0
+        // OLD
+		bool z_bit = (wf & 0x01);      // WF[3] = Z (zero select)
+		bool invert = false; //(wf & 0x40);     // WF[6] = I (0=direct, 1=two's complement)
+                                       //
+		bool ramp_mode = (wf & 0x40);  // WF[7] = R (0=sinus, 1=ramp/constant)
+		int sel = (wf >> 2) & 3;       // WF[5:4] = SEL (ramp type)
+#else
+        // MIX - WORKING FX
+		bool z_bit = (wf & 0x08);      // WF[3] = Z (zero select)
+		bool invert = (wf & 0x80);     // WF[7] = I (0=direct, 1=two's complement)
+                                       //
+		bool ramp_mode = (wf & 0x40);  // WF[6] = R (0=sinus, 1=ramp/constant)
+		int sel = (wf >> 4) & 3;       // WF[5:4] = SEL (ramp type)
+#endif
+
+        if (z_bit) return 0;
+
+		int32_t result;
 		if (!ramp_mode) {
-			// Sinus: X = .71875 sin ( (PI/2048) * PHI + PI/4096 )
+			// R=0: Sinus wave
+			// X = .71875 sin ( (PI/2048) * PHI + PI/4096 )
 			double angle = (M_PI / 2048.0) * (double)phi + (M_PI / 4096.0);
-			return (int32_t)(0.71875 * sin(angle) * 2048.0);
+			result = (int32_t)(0.71875 * sin(angle) * 2048.0);
 		} else {
-			// Ramps based on SEL bits
-			int sel = (wf >> 2) & 3;
+			// R=1: Ramps based on SEL bits
 			switch(sel) {
-				case 0: return (phi < 1024) ? phi * 2 : (phi < 3072) ? (phi * 2) - 4096 : (phi * 2) - 8192; // 2x PHI
-				case 1: return get_constant(mad); // Constant from micro-instruction
-				case 2: return (phi < 2048) ? phi : phi - 4096; // PHI ramp
-				case 3: return (phi < 2048) ? phi / 2 : (phi / 2) - 2048; // PHI/2 ramp
-				default: return 0;
+				case 0: // 2x PHI ramp
+					result = (phi < 1024) ? phi * 2 :
+					         (phi < 3072) ? (phi * 2) - 4096 : (phi * 2) - 8192;
+					break;
+				case 1: // Constant from micro-instruction
+					result = get_constant(mad);
+					break;
+				case 2: // PHI ramp
+					result = (phi < 2048) ? phi : phi - 4096;
+					break;
+				case 3: // PHI/2 ramp
+					result = (phi < 2048) ? phi / 2 : (phi / 2) - 2048;
+					break;
+				default:
+					result = 0;
 			}
 		}
+
+		// Apply I bit: two's complement inversion
+		if (invert) {
+            //printf("INVERT\n");
+		 	//result = -result;
+		 	result = -result; ;
+		}
+		return result;
 	} else {
 		// External memory access
 		if (!m_waveform_read.isunset()) {
@@ -149,7 +191,8 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 	uint8_t emitter_sel = (inst >> 9) & 0x3;
 	bool wsp = BIT(inst, 8);
 
-	uint32_t bus = 0;
+    // JUST in case RSP is used with writes
+	uint32_t bus = m_bus;
 	uint32_t dram_addr = (slot_idx << 4) | mad;
 
 	// Emitters
@@ -157,8 +200,9 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 		case 0: bus = m_dram[dram_addr]; break; // RM
 		case 1: bus = (m_a + m_b) & MASK19; break; // RADD
 		case 2: bus = m_mul_result; break; // RP
-		case 3: bus = 0; break; // RSP (NOP)
+		case 3: break; //bus = 0; break; // RSP (NOP)
 	}
+    m_bus = bus;
 
 	// Helper lambda to update carry - called after any change to A or B
 	// Carry calculation per Table 3:
@@ -190,11 +234,16 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 			bool wf_match = (wave == final_wave);
 
 			if (!m_carry) {
-				m_a = 0; m_clear_rqst = false; m_int_mod = true;
+				m_a = 0;
+                m_clear_rqst = false;
+                m_int_mod = true;
 			} else if (!wf_match) {
-				m_a = 0x200; m_clear_rqst = false; m_int_mod = true;
+				m_a = 0x200;
+                m_clear_rqst = false;
+                m_int_mod = true;
 			} else {
-				m_a = 0; m_int_mod = true;
+				m_a = 0;
+                m_int_mod = true;
 				m_clear_rqst = end_bit;
 			}
 			update_carry();  // A changed
@@ -219,13 +268,16 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 		bool write_enable = true;
 		if (wsp) {
 			// WM WSP Truth Table (Section 8-4)
-			if (!m_clear_rqst) write_enable = false;
-			else if (m_carry) write_enable = false;
-
+			if (!m_clear_rqst) {
+                write_enable = false;
+            }
+			else if (m_carry) {
+                write_enable = false;
+            }
 			// Interrupt latch: set when CLEARRQST=1 AND (INTMOD=1 OR CARRY=1)
 			bool irq_condition = m_clear_rqst && (m_int_mod || m_carry);
 			if (irq_condition) {
-				m_interrupt_latch = (slot_idx << 4) | mad;
+				m_interrupt_latch = (slot_idx << 4) | mad; // NB: Use MAD to identify interrupt reason?
 			}
 		}
 		if (write_enable) {
@@ -352,6 +404,8 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 	// Accumulators are 24-bit, output upper 16 bits (per SAM8905 datasheet)
 	out_l = (int32_t)m_l_acc >> 8;
 	out_r = (int32_t)m_r_acc >> 8;
+	// out_l = (int32_t)m_l_acc >> 4;
+	// out_r = (int32_t)m_r_acc >> 4;
 
 	// Store for slave mode stream output
 	// m_last_out_l = out_l;
@@ -437,12 +491,16 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 		// Accumulators are 24-bit, output upper 16 bits (per SAM8905 datasheet)
 		stream.put_int_clamp(0, samp, (int32_t)m_l_acc >> 8, 32768);
 		stream.put_int_clamp(1, samp, (int32_t)m_r_acc >> 8, 32768);
+		// stream.put_int_clamp(0, samp, (int32_t)m_l_acc >> 4, 32768);
+		// stream.put_int_clamp(1, samp, (int32_t)m_r_acc >> 4, 32768);
 
 		// Fire sample output callback for inter-chip audio (FX processing)
 		if (!m_sample_output.isunset()) {
 			// Output upper 16 bits of 24-bit accumulator, clamped to 16-bit range
 			int32_t l_out = std::clamp((int32_t)m_l_acc >> 8, -32768, 32767);
 			int32_t r_out = std::clamp((int32_t)m_r_acc >> 8, -32768, 32767);
+			// int32_t l_out = std::clamp((int32_t)m_l_acc >> 4, -32768, 32767);
+			// int32_t r_out = std::clamp((int32_t)m_r_acc >> 4, -32768, 32767);
 			// Pack L/R as 32-bit value: upper 16 = L, lower 16 = R
 			uint32_t packed = ((l_out & 0xFFFF) << 16) | (r_out & 0xFFFF);
 			m_sample_output(packed);
