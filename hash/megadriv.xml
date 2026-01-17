@@ -21997,10 +21997,10 @@ Black screen
 		<description>Galahad (Europe, USA)</description>
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="alt_title" value="The Legend of Galahad"/> <!-- European box title -->
 		<notes><![CDATA[
 Intro/tile has wrong graphics
 ]]></notes>
+		<info name="alt_title" value="The Legend of Galahad"/> <!-- European box title -->
 		<part name="cart" interface="megadriv_cart">
 			<!-- Dump To Be Confirmed -->
 			<feature name="pcb" value="?? (Electronic Arts)"/>
