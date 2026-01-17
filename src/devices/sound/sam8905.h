@@ -70,7 +70,7 @@ private:
 
 	// Master-slave mode for chained chips
 	bool m_slave_mode;
-	int32_t m_last_out_l, m_last_out_r;  // Last output for slave mode stream
+	//int32_t m_last_out_l, m_last_out_r;  // Last output for slave mode stream
 
 	// Slave mode ring buffer - stores samples from process_frame for stream output
 	std::unique_ptr<int32_t[]> m_slave_ring_l;

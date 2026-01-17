@@ -26,8 +26,8 @@ void sam8905_device::device_start()
 
 	// Initialize master-slave mode
 	m_slave_mode = false;
-	m_last_out_l = 0;
-	m_last_out_r = 0;
+	// m_last_out_l = 0;
+	// m_last_out_r = 0;
 
 	// Initialize slave mode ring buffer (1024 samples should be plenty)
 	m_slave_ring_size = clock() / m_buffer_size; //1024;
@@ -44,8 +44,8 @@ void sam8905_device::device_start()
 	save_item(NAME(m_address_reg));
 	save_item(NAME(m_interrupt_latch));
 	save_item(NAME(m_slave_mode));
-	save_item(NAME(m_last_out_l));
-	save_item(NAME(m_last_out_r));
+	// save_item(NAME(m_last_out_l));
+	// save_item(NAME(m_last_out_r));
 	save_pointer(NAME(m_slave_ring_l), m_slave_ring_size);
 	save_pointer(NAME(m_slave_ring_r), m_slave_ring_size);
 	save_item(NAME(m_slave_ring_write_pos));
@@ -354,8 +354,8 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 	out_r = (int32_t)m_r_acc >> 8;
 
 	// Store for slave mode stream output
-	m_last_out_l = out_l;
-	m_last_out_r = out_r;
+	// m_last_out_l = out_l;
+	// m_last_out_r = out_r;
 
 	// Push to slave mode ring buffer
 	m_slave_ring_l[m_slave_ring_write_pos] = out_l;
@@ -373,13 +373,14 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 	if (m_slave_mode) {
 		for (int samp = 0; samp < stream.samples(); ++samp) {
 			// Read from ring buffer if data available, otherwise use last value
+            int32_t last_out_l = m_slave_ring_l[m_slave_ring_read_pos];
+            int32_t last_out_r = m_slave_ring_r[m_slave_ring_read_pos];
+
 			if (m_slave_ring_read_pos != m_slave_ring_write_pos) {
-				m_last_out_l = m_slave_ring_l[m_slave_ring_read_pos];
-				m_last_out_r = m_slave_ring_r[m_slave_ring_read_pos];
 				m_slave_ring_read_pos = (m_slave_ring_read_pos + 1) % m_slave_ring_size;
 			}
-			stream.put_int_clamp(0, samp, m_last_out_l, 32768);
-			stream.put_int_clamp(1, samp, m_last_out_r, 32768);
+			stream.put_int_clamp(0, samp, last_out_l, 32768);
+			stream.put_int_clamp(1, samp, last_out_r, 32768);
 		}
 
 		// Debug: check for ring buffer divergence

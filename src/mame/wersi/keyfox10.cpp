@@ -10,10 +10,12 @@
 
 #include "keyfox10.lh"
 
-#define LOG_SERIAL (1U << 1)
-#define LOG_PORT   (1U << 2)
-#define LOG_SAM    (1U << 3)
-//#define LOG_SAM    0
+//#define LOG_SERIAL (1U << 1)
+#define LOG_SERIAL 0
+//#define LOG_PORT   (1U << 2)
+#define LOG_PORT   0
+//#define LOG_SAM    (1U << 3)
+#define LOG_SAM    0
 //#define LOG_IO     (1U << 4)
 #define LOG_IO     0
 #define VERBOSE (LOG_SERIAL | LOG_SAM | LOG_IO)
@@ -122,7 +124,7 @@ private:
     u8 m_midi_rxd = 1;  // MIDI RX bit (idle high)
 
     // Current input sample for FX chip (from SND chip via 74HC595 shift registers)
-    int16_t m_fx_input_sample = 0;
+    uint16_t m_fx_input_sample = 0;
 
     // FX SAM 32KB SRAM for delay/reverb buffers
     std::unique_ptr<uint8_t[]> m_fx_sram;
@@ -1089,10 +1091,12 @@ void keyfox10_state::sam_snd_sample_out(uint32_t data)
 {
     // Unpack L/R from 32-bit value: upper 16 = L, lower 16 = R
     // For now we only use R channel (mono reverb input)
-    uint16_t sample_r = int16_t(data & 0xFFFF);
+    uint16_t sample_r = uint16_t(data & 0xFFFF);
+    //uint16_t sample_l = int16_t(data >> 16);
 
     // Byte swap for proper endianness
-    int16_t sample = ((sample_r >> 8) & 0xFF) | ((sample_r << 8) & 0xFF00);
+    //int16_t sample = ((sample_l >> 8) & 0xFF) | ((sample_l << 8) & 0xFF00);
+    uint16_t sample = ((sample_r >> 8) & 0xFF) | ((sample_r << 8) & 0xFF00);
 
     // Store current sample for FX chip waveform reads
     m_fx_input_sample = sample;
@@ -1141,7 +1145,7 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
     if (offset & 0x80000)  // WA19 set - read input sample
     {
         // Read current input sample (synchronized via process_frame)
-        int16_t sample = m_fx_input_sample;
+        uint16_t sample = m_fx_input_sample;
 
         // PHI[0] selects byte: 0=high byte, 1=low byte
         uint8_t sample_8bit;
@@ -1156,7 +1160,7 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
         }
 
         // Place 8-bit value at bits 10:3, bits 2:0 are grounded (always 0)
-        int16_t result = ((int16_t)(int8_t)sample_8bit) << 3;
+        uint16_t result = ((uint16_t)sample_8bit) << 3;
 
         // Sign extension for high byte read
         if ((offset & 1) == 0 && (sample_8bit & 0x80)) {
@@ -1180,7 +1184,7 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
             // WDH11 sign extension depends on WAH0 (=PHI[0])
             // IMPORTANT: Read as UNSIGNED to preserve bit pattern
             uint8_t sram_8bit = m_fx_sram[sram_addr] & 0xFF;
-            int16_t result = ((int16_t)sram_8bit) << 3;  // Place at bits 10:3 (result is 0-2040)
+            uint16_t result = ((uint16_t)sram_8bit) << 3;  // Place at bits 10:3 (result is 0-2040)
 
             // WAH0 = PHI[4] = (offset >> 4) & 1
             //bool wah0 = (offset >> 4) & 1;
