@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Wilbert Pol
 
 #include "emu.h"
@@ -370,7 +370,7 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 
 	if (BIT(count, 31))
 	{
-		m_mctl &= ~0x8000;
+		m_mctl &= ~(1 << 15);
 		m_irq_dply_cb(1);
 		m_dma_playerbus_timer->adjust(attotime::never);
 		return;
