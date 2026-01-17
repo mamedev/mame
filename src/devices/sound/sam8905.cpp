@@ -105,7 +105,7 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 	bool internal = (wf & 0x100);  // WF[8] = INT/EXT
 
 	if (internal) {
-#if 0
+#if 1
         // CORRECTED FROM MANUAL
 		// WF[8]=1: Internal waveform
 		// WF bit layout: [8]=INT/EXT, [7]=R, [6]=I, [5:4]=SEL, [3]=Z, [2:0]=unused
@@ -114,13 +114,13 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 
 		bool ramp_mode = (wf & 0x80);  // WF[7] = R (0=sinus, 1=ramp/constant)
 		int sel = (wf >> 4) & 3;       // WF[5:4] = SEL (ramp type)
-#elseif 0
-        // OLD
-		bool z_bit = (wf & 0x01);      // WF[3] = Z (zero select)
-		bool invert = false; //(wf & 0x40);     // WF[6] = I (0=direct, 1=two's complement)
-                                       //
-		bool ramp_mode = (wf & 0x40);  // WF[7] = R (0=sinus, 1=ramp/constant)
-		int sel = (wf >> 2) & 3;       // WF[5:4] = SEL (ramp type)
+// #elseif 0
+//         // OLD
+// 		bool z_bit = (wf & 0x01);      // WF[3] = Z (zero select)
+// 		bool invert = false; //(wf & 0x40);     // WF[6] = I (0=direct, 1=two's complement)
+//                                        //
+// 		bool ramp_mode = (wf & 0x40);  // WF[7] = R (0=sinus, 1=ramp/constant)
+// 		int sel = (wf >> 2) & 3;       // WF[5:4] = SEL (ramp type)
 #else
         // MIX - WORKING FX
 		bool z_bit = (wf & 0x08);      // WF[3] = Z (zero select)
@@ -160,12 +160,30 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 		}
 
 		// Apply I bit: two's complement inversion
-		if (invert) {
-            //printf("INVERT\n");
-		 	//result = -result;
-		 	result = -result; ;
-		}
-		return result;
+		// if (invert) {
+        //     //printf("INVERT\n");
+		//  	//result = -result;
+		//  	result = -result; ;
+		// }
+        // Option 1: Mask to 12-bit (wraps)
+        // if (invert) {
+        //     result = (-result) & 0xFFF;
+        //     if (result & 0x800) result |= ~0xFFF; // sign extend
+        // }
+
+        // // Option 2: Saturate
+        // if (invert) {
+        //     result = -result;
+        //     if (result > 2047) result = 2047;
+        //     if (result < -2048) result = -2048;
+        // }
+
+        if (invert) {
+            result = -result;
+            // Mask to 12-bit signed (wraps +2048 to -2048)
+            result = ((result + 2048) & 0xFFF) - 2048;
+        }
+        return result;
 	} else {
 		// External memory access
 		if (!m_waveform_read.isunset()) {
