@@ -11914,7 +11914,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		</part>
 	</software>
 
-	<software name="arkagis_r00" cloneof="arkagis">>
+	<software name="arkagis_r00" cloneof="arkagis">
 		<description>Arkagis Revolution (rev. 00, digital release)</description>
 		<year>2020</year>
 		<publisher>Mega Cat Studios</publisher>
