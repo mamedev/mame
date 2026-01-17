@@ -1,17 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-#ifndef MAME_CPU_TMS32082_TMS32082_H
-#define MAME_CPU_TMS32082_TMS32082_H
+#ifndef MAME_CPU_TMS320C82_TMS320C82_H
+#define MAME_CPU_TMS320C82_TMS320C82_H
 
 #pragma once
 
 // Master Processor class
-class tms32082_mp_device : public cpu_device
+class tms320c82_mp_device : public cpu_device
 {
 public:
-	// construction/destruction
-	tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
 	enum
 	{
 		MP_PC=1,
@@ -68,14 +65,16 @@ public:
 		INPUT_X4        = 4
 	};
 
-	uint32_t mp_param_r(offs_t offset, uint32_t mem_mask = ~0);
-	void mp_param_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	// construction/destruction
+	tms320c82_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template <typename... T> void set_command_callback(T &&... args) { m_cmd_callback.set(std::forward<T>(args)...); }
 
-	void mp_internal_map(address_map &map) ATTR_COLD;
+	uint32_t mp_param_r(offs_t offset, uint32_t mem_mask = ~0);
+	void mp_param_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+
 protected:
-	// device level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -93,6 +92,8 @@ protected:
 
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	void mp_internal_map(address_map &map) ATTR_COLD;
 
 	address_space_config m_program_config;
 
@@ -152,20 +153,19 @@ protected:
 
 
 // Parallel Processor class
-class tms32082_pp_device : public cpu_device
+class tms320c82_pp_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms320c82_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	enum
 	{
 		PP_PC = 1
 	};
 
-	void pp_internal_map(address_map &map) ATTR_COLD;
 protected:
-	// device level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -183,6 +183,8 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	void pp_internal_map(address_map &map) ATTR_COLD;
+
 	address_space_config m_program_config;
 
 	uint32_t m_pc;
@@ -195,8 +197,8 @@ protected:
 };
 
 
-DECLARE_DEVICE_TYPE(TMS32082_MP, tms32082_mp_device)
-DECLARE_DEVICE_TYPE(TMS32082_PP, tms32082_pp_device)
+DECLARE_DEVICE_TYPE(TMS320C82_MP, tms320c82_mp_device)
+DECLARE_DEVICE_TYPE(TMS320C82_PP, tms320c82_pp_device)
 
 
-#endif // MAME_CPU_TMS32082_TMS32082_H
+#endif // MAME_CPU_TMS320C82_TMS320C82_H

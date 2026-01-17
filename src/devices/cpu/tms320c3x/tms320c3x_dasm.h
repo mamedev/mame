@@ -2,22 +2,22 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    dis32031.h
+    tms320c3x_dasm.h
     Disassembler for the portable TMS320C3x emulator.
     Written by Aaron Giles
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_TMS32031_DIS32031_H
-#define MAME_CPU_TMS32031_DIS32031_H
+#ifndef MAME_CPU_TMS320C3X_TMS320C3X_DASM_H
+#define MAME_CPU_TMS320C3X_TMS320C3X_DASM_H
 
 #pragma once
 
-class tms32031_disassembler : public util::disasm_interface
+class tms320c3x_disassembler : public util::disasm_interface
 {
 public:
-	tms32031_disassembler() = default;
-	virtual ~tms32031_disassembler() = default;
+	tms320c3x_disassembler() = default;
+	virtual ~tms320c3x_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
@@ -48,4 +48,4 @@ private:
 	void disasm_parallel_storestore(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream);
 };
 
-#endif
+#endif // MAME_CPU_TMS320C3X_TMS320C3X_DASM_H

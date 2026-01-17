@@ -1,16 +1,15 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-
-#ifndef MAME_CPU_TMS32051_DIS32051_H
-#define MAME_CPU_TMS32051_DIS32051_H
+#ifndef MAME_CPU_TMS320C5X_TMS320C5X_DASM_H
+#define MAME_CPU_TMS320C5X_TMS320C5X_DASM_H
 
 #pragma once
 
-class tms32051_disassembler : public util::disasm_interface
+class tms320c5x_disassembler : public util::disasm_interface
 {
 public:
-	tms32051_disassembler() = default;
-	virtual ~tms32051_disassembler() = default;
+	tms320c5x_disassembler() = default;
+	virtual ~tms320c5x_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;
@@ -19,6 +18,7 @@ private:
 	static const char *const zl_condition_codes[];
 	static const char *const cv_condition_codes[16];
 	static const char *const tp_condition_codes[4];
+
 	uint16_t FETCH(offs_t &npc, const data_buffer &opcodes);
 	std::string GET_ADDRESS(int addr_mode, int address);
 	std::string GET_SHIFT(int shift);
@@ -29,4 +29,4 @@ private:
 	std::ostream *output;
 };
 
-#endif
+#endif // MAME_CPU_TMS320C5X_TMS320C5X_DASM_H

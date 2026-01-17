@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-// TMS32082 MP Disassembler
+// TMS320C82 Master Processor Disassembler
 
 #include "emu.h"
-#include "dis_mp.h"
+#include "mp_dasm.h"
 
 #define SIMM15(v) (int32_t)((v & 0x4000) ? (v | 0xffffe000) : (v))
 #define UIMM15(v) (v)
 
-char const *const tms32082_mp_disassembler::BCND_CONDITION[32] =
+char const *const tms320c82_mp_disassembler::BCND_CONDITION[32] =
 {
 	"nev.b",    "gt0.b",    "eq0.b",    "ge0.b",    "lt0.b",    "ne0.b",    "le0.b",    "alw.b",
 	"nev.h",    "gt0.h",    "eq0.h",    "ge0.h",    "lt0.h",    "ne0.h",    "le0.h",    "alw.h",
@@ -16,7 +16,7 @@ char const *const tms32082_mp_disassembler::BCND_CONDITION[32] =
 	"nev.d",    "gt0.d",    "eq0.d",    "ge0.d",    "lt0.d",    "ne0.d",    "le0.d",    "alw.d",
 };
 
-char const *const tms32082_mp_disassembler::BITNUM_CONDITION[32] =
+char const *const tms320c82_mp_disassembler::BITNUM_CONDITION[32] =
 {
 	"eq.b",     "ne.b",     "gt.b",     "le.b",     "lt.b",     "ge.b",     "hi.b",     "ls.b",
 	"lo.b",     "hs.b",     "eq.h",     "ne.h",     "gt.h",     "le.h",     "lt.h",     "ge.h",
@@ -24,39 +24,39 @@ char const *const tms32082_mp_disassembler::BITNUM_CONDITION[32] =
 	"lt.w",     "ge.w",     "hi.w",     "ls.w",     "lo.w",     "hs.w",     "?",        "?",
 };
 
-char const *const tms32082_mp_disassembler::MEMOP_S[2] =
+char const *const tms320c82_mp_disassembler::MEMOP_S[2] =
 {
 	":s", ""
 };
 
-char const *const tms32082_mp_disassembler::MEMOP_M[2] =
+char const *const tms320c82_mp_disassembler::MEMOP_M[2] =
 {
 	":m", ""
 };
 
-char const *const tms32082_mp_disassembler::FLOATOP_PRECISION[4] =
+char const *const tms320c82_mp_disassembler::FLOATOP_PRECISION[4] =
 {
 	"s", "d", "i", "u"
 };
 
-char const *const tms32082_mp_disassembler::ACC_SEL[4] =
+char const *const tms320c82_mp_disassembler::ACC_SEL[4] =
 {
 	"A0", "A1", "A2", "A3"
 };
 
-char const *const tms32082_mp_disassembler::FLOATOP_ROUND[4] =
+char const *const tms320c82_mp_disassembler::FLOATOP_ROUND[4] =
 {
 	"n", "z", "p", "m"
 };
 
-uint32_t tms32082_mp_disassembler::fetch(offs_t &pos, const data_buffer &opcodes)
+uint32_t tms320c82_mp_disassembler::fetch(offs_t &pos, const data_buffer &opcodes)
 {
 	uint32_t d = opcodes.r32(pos);
 	pos += 4;
 	return d;
 }
 
-std::string tms32082_mp_disassembler::get_creg_name(uint32_t reg)
+std::string tms320c82_mp_disassembler::get_creg_name(uint32_t reg)
 {
 	switch (reg)
 	{
@@ -90,7 +90,7 @@ std::string tms32082_mp_disassembler::get_creg_name(uint32_t reg)
 	}
 }
 
-std::string tms32082_mp_disassembler::format_vector_op(uint32_t op, uint32_t imm32)
+std::string tms320c82_mp_disassembler::format_vector_op(uint32_t op, uint32_t imm32)
 {
 	std::string result;
 	int rd = (op >> 27) & 0x1f;
@@ -178,12 +178,12 @@ std::string tms32082_mp_disassembler::format_vector_op(uint32_t op, uint32_t imm
 }
 
 
-u32 tms32082_mp_disassembler::opcode_alignment() const
+u32 tms320c82_mp_disassembler::opcode_alignment() const
 {
 	return 4;
 }
 
-offs_t tms32082_mp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t tms320c82_mp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	output = &stream;
 	offs_t pos = pc;

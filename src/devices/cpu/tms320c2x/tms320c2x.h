@@ -1,24 +1,24 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
-	/**************************************************************************\
-	*                Texas Instruments TMS320x25 DSP Emulator                  *
-	*                                                                          *
-	*                 Copyright Tony La Porta                                  *
-	*                      Written for the MAME project.                       *
-	*                                                                          *
-	*      Note :  This is a word based microcontroller, with addressing       *
-	*              architecture based on the Harvard addressing scheme.        *
-	*                                                                          *
-	*  Three versions of the chip are available, and they are:                 *
-	*  TMS320C25   Internal ROM one time programmed at TI                      *
-	*  TMS320E25   Internal ROM programmable as a normal EPROM                 *
-	*  TMS320P25   Internal ROM programmable once as a normal EPROM only       *
-	*  These devices can also be used as a MicroController with external ROM   *
-	*                                                                          *
-	\***************************************************************************/
+/**************************************************************************\
+* Texas Instruments TMS320C2x DSP Emulator
+*
+* Copyright Tony La Porta
+* Written for the MAME project.
+*
+* Note: This is a word based microcontroller, with addressing
+*       architecture based on the Harvard addressing scheme.
+*
+*  Three versions of the chip are available, and they are:
+*  TMS320C25   Internal ROM one time programmed at TI
+*  TMS320E25   Internal ROM programmable as a normal EPROM
+*  TMS320P25   Internal ROM programmable once as a normal EPROM only
+*  These devices can also be used as a MicroController with external ROM
+*
+\***************************************************************************/
 
-#ifndef MAME_CPU_TMS32025_TMS32025_H
-#define MAME_CPU_TMS32025_TMS32025_H
+#ifndef MAME_CPU_TMS320C2X_TMS320C2X_H
+#define MAME_CPU_TMS320C2X_TMS320C2X_H
 
 #pragma once
 
@@ -27,29 +27,29 @@
  *  Interrupt constants
  */
 
-#define TMS32025_INT0             0         /* External INT0 */
-#define TMS32025_INT1             1         /* External INT1 */
-#define TMS32025_INT2             2         /* External INT2 */
-#define TMS32025_TINT             3         /* Internal Timer interrupt */
-#define TMS32025_RINT             4         /* Serial Port receive  interrupt */
-#define TMS32025_XINT             5         /* Serial Port transmit interrupt */
-#define TMS32025_TRAP             6         /* Trap instruction */
-#define TMS32025_INT_NONE         -1
+#define TMS320C2X_INT0            0         /* External INT0 */
+#define TMS320C2X_INT1            1         /* External INT1 */
+#define TMS320C2X_INT2            2         /* External INT2 */
+#define TMS320C2X_TINT            3         /* Internal Timer interrupt */
+#define TMS320C2X_RINT            4         /* Serial Port receive  interrupt */
+#define TMS320C2X_XINT            5         /* Serial Port transmit interrupt */
+#define TMS320C2X_TRAP            6         /* Trap instruction */
+#define TMS320C2X_INT_NONE        -1
 
-/* Non-irq line */
-#define TMS32025_FSX              7         /* Frame synchronisation */
+/* Non-IRQ line */
+#define TMS320C2X_FSX             7         /* Frame synchronisation */
 
 enum
 {
-	TMS32025_PC=1,
-	TMS32025_PFC,  TMS32025_STR0, TMS32025_STR1, TMS32025_IFR,
-	TMS32025_RPTC, TMS32025_ACC,  TMS32025_PREG, TMS32025_TREG,
-	TMS32025_AR0,  TMS32025_AR1,  TMS32025_AR2,  TMS32025_AR3,
-	TMS32025_AR4,  TMS32025_AR5,  TMS32025_AR6,  TMS32025_AR7,
-	TMS32025_STK0, TMS32025_STK1, TMS32025_STK2, TMS32025_STK3,
-	TMS32025_STK4, TMS32025_STK5, TMS32025_STK6, TMS32025_STK7,
-	TMS32025_DRR,  TMS32025_DXR,  TMS32025_TIM,  TMS32025_PRD,
-	TMS32025_IMR,  TMS32025_GREG
+	TMS320C2X_PC=1,
+	TMS320C2X_PFC,  TMS320C2X_STR0, TMS320C2X_STR1, TMS320C2X_IFR,
+	TMS320C2X_RPTC, TMS320C2X_ACC,  TMS320C2X_PREG, TMS320C2X_TREG,
+	TMS320C2X_AR0,  TMS320C2X_AR1,  TMS320C2X_AR2,  TMS320C2X_AR3,
+	TMS320C2X_AR4,  TMS320C2X_AR5,  TMS320C2X_AR6,  TMS320C2X_AR7,
+	TMS320C2X_STK0, TMS320C2X_STK1, TMS320C2X_STK2, TMS320C2X_STK3,
+	TMS320C2X_STK4, TMS320C2X_STK5, TMS320C2X_STK6, TMS320C2X_STK7,
+	TMS320C2X_DRR,  TMS320C2X_DXR,  TMS320C2X_TIM,  TMS320C2X_PRD,
+	TMS320C2X_IMR,  TMS320C2X_GREG
 };
 
 
@@ -58,7 +58,7 @@ enum
  */
 
 
-class tms3202x_device : public cpu_device
+class tms320c2x_device : public cpu_device
 {
 public:
 	// configuration helpers
@@ -69,13 +69,13 @@ public:
 	auto dr_in_cb() { return m_dr_in.bind(); }
 	auto dx_out_cb() { return m_dx_out.bind(); }
 
-	//void tms32025_program(address_map &map) ATTR_COLD;
-	void tms3202x_data(address_map &map) ATTR_COLD;
-	void tms32026_data(address_map &map) ATTR_COLD;
+	//void tms320c25_program(address_map &map) ATTR_COLD;
+	void tms320c2x_data(address_map &map) ATTR_COLD;
+	void tms320c26_data(address_map &map) ATTR_COLD;
 
 protected:
 	// construction/destruction
-	tms3202x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned stack_depth, address_map_constructor prgmap, address_map_constructor datamap);
+	tms320c2x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, unsigned stack_depth, address_map_constructor prgmap, address_map_constructor datamap);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -112,15 +112,15 @@ protected:
 	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_data;
 	memory_access<16, 1, -1, ENDIANNESS_BIG>::specific m_io;
 
-	typedef void ( tms3202x_device::*opcode_func ) ();
-	struct tms32025_opcode
+	using opcode_func = void (tms320c2x_device::*)();
+	struct tms320c2x_opcode
 	{
 		uint8_t       cycles;
 		opcode_func function;
 	};
-	static const tms32025_opcode s_opcode_main[256];
-	static const tms32025_opcode s_opcode_CE_subset[256];
-	static const tms32025_opcode s_opcode_Dx_subset[8];
+	static const tms320c2x_opcode s_opcode_main[256];
+	static const tms320c2x_opcode s_opcode_CE_subset[256];
+	static const tms320c2x_opcode s_opcode_Dx_subset[8];
 
 	devcb_read16 m_bio_in;
 	devcb_read16 m_hold_in;
@@ -157,8 +157,8 @@ protected:
 	int     m_hold;
 	int     m_external_mem_access;    /** required for hold mode. Implement it ! */
 	int     m_init_load_addr;         /* 0=No, 1=Yes, 2=Once for repeat mode */
-	int     m_tms32025_irq_cycles;
-	int     m_tms32025_dec_cycles;
+	int     m_tms320c2x_irq_cycles;
+	int     m_tms320c2x_dec_cycles;
 
 	PAIR    m_oldacc;
 	uint32_t  m_memaccess;
@@ -358,26 +358,26 @@ protected:
 };
 
 
-class tms32020_device : public tms3202x_device
+class tms32020_device : public tms320c2x_device
 {
 public:
 	// construction/destruction
 	tms32020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
-class tms32025_device : public tms3202x_device
+class tms320c25_device : public tms320c2x_device
 {
 public:
 	// construction/destruction
-	tms32025_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms320c25_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// configuration helpers
 	void set_mp_mc(bool state) { m_mp_mc = state; }
 
 protected:
 	// construction/destruction
-	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-	tms32025_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap);
+	tms320c25_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	tms320c25_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor prgmap, address_map_constructor datamap);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -387,11 +387,11 @@ protected:
 	bool    m_mp_mc;
 };
 
-class tms32026_device : public tms32025_device
+class tms320c26_device : public tms320c25_device
 {
 public:
 	// construction/destruction
-	tms32026_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms320c26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_reset() override ATTR_COLD;
@@ -400,8 +400,8 @@ protected:
 	virtual void conf() override;
 };
 
-DECLARE_DEVICE_TYPE(TMS32020, tms32020_device)
-DECLARE_DEVICE_TYPE(TMS32025, tms32025_device)
-DECLARE_DEVICE_TYPE(TMS32026, tms32026_device)
+DECLARE_DEVICE_TYPE(TMS32020,  tms32020_device)
+DECLARE_DEVICE_TYPE(TMS320C25, tms320c25_device)
+DECLARE_DEVICE_TYPE(TMS320C26, tms320c26_device)
 
-#endif // MAME_CPU_TMS32025_TMS32025_H
+#endif // MAME_CPU_TMS320C2X_TMS320C2X_H

@@ -2,25 +2,22 @@
 // copyright-holders:Tony La Porta
 /**************************************************************************
 
-    Texas Instruments TMS32010 DSP Emulator
+    Texas Instruments TMS320C1x DSP Emulator
 
     Copyright Tony La Porta
 
 **************************************************************************/
 
-#ifndef MAME_CPU_TMS32010_TMS32010_H
-#define MAME_CPU_TMS32010_TMS32010_H
+#ifndef MAME_CPU_TMS320C1X_TMS320C1X_H
+#define MAME_CPU_TMS320C1X_TMS320C1X_H
 
 #pragma once
 
-#define TMS32010_INT_PENDING    0x80000000
-#define TMS32010_INT_NONE       0
-
 enum
 {
-	TMS32010_PC=1, TMS32010_SP,   TMS32010_STR,  TMS32010_ACC,
-	TMS32010_PREG, TMS32010_TREG, TMS32010_AR0,  TMS32010_AR1,
-	TMS32010_STK0, TMS32010_STK1, TMS32010_STK2, TMS32010_STK3
+	TMS320C1X_PC=1, TMS320C1X_SP,   TMS320C1X_STR,  TMS320C1X_ACC,
+	TMS320C1X_PREG, TMS320C1X_TREG, TMS320C1X_AR0,  TMS320C1X_AR1,
+	TMS320C1X_STK0, TMS320C1X_STK1, TMS320C1X_STK2, TMS320C1X_STK3
 };
 
 
@@ -29,14 +26,17 @@ enum
  */
 
 template <int HighBits>
-class tms3201x_base_device : public cpu_device
+class tms320c1x_device_base : public cpu_device
 {
 public:
 	// configuration helpers
 	auto bio() { return m_bio_in.bind(); }
 
 protected:
-	tms3201x_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map);
+	static inline constexpr uint32_t TMS320C1X_INT_PENDING    = 0x80000000;
+	static inline constexpr uint32_t TMS320C1X_INT_NONE       = 0;
+
+	tms320c1x_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor data_map);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -59,8 +59,8 @@ protected:
 	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	void tms32010_ram(address_map &map) ATTR_COLD;
-	void tms32015_ram(address_map &map) ATTR_COLD;
+	void tms320c10_ram(address_map &map) ATTR_COLD;
+	void tms320c15_ram(address_map &map) ATTR_COLD;
 
 private:
 	address_space_config m_program_config;
@@ -69,14 +69,14 @@ private:
 
 	devcb_read_line m_bio_in;
 
-	using opcode_func = void (tms3201x_base_device::*)();
-	struct tms32010_opcode
+	using opcode_func = void (tms320c1x_device_base::*)();
+	struct tms320c1x_opcode
 	{
 		uint8_t       cycles;
 		opcode_func function;
 	};
-	static const tms32010_opcode s_opcode_main[256];
-	static const tms32010_opcode s_opcode_7F[32];
+	static const tms320c1x_opcode s_opcode_main[256];
+	static const tms320c1x_opcode s_opcode_7F[32];
 
 	/******************** CPU Internal Registers *******************/
 	uint16_t  m_PC;
@@ -182,32 +182,32 @@ private:
 };
 
 
-class tms32010_device : public tms3201x_base_device<12>
+class tms320c10_device : public tms320c1x_device_base<12>
 {
 public:
 	// construction/destruction
-	tms32010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms320c10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-class tms32015_device : public tms3201x_base_device<12>
+class tms320c15_device : public tms320c1x_device_base<12>
 {
 public:
 	// construction/destruction
-	tms32015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms320c15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-class tms32016_device : public tms3201x_base_device<16>
+class tms320c16_device : public tms320c1x_device_base<16>
 {
 public:
 	// construction/destruction
-	tms32016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms320c16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
-DECLARE_DEVICE_TYPE(TMS32010, tms32010_device)
-DECLARE_DEVICE_TYPE(TMS32015, tms32015_device)
-DECLARE_DEVICE_TYPE(TMS32016, tms32016_device)
+DECLARE_DEVICE_TYPE(TMS320C10, tms320c10_device)
+DECLARE_DEVICE_TYPE(TMS320C15, tms320c15_device)
+DECLARE_DEVICE_TYPE(TMS320C16, tms320c16_device)
 
-#endif // MAME_CPU_TMS32010_TMS32010_H
+#endif // MAME_CPU_TMS320C1X_TMS320C1X_H

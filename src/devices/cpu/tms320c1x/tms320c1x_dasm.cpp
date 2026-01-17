@@ -1,41 +1,40 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
-	/**************************************************************************\
-	*                Texas Instruments TMS32010 DSP Disassembler               *
-	*                                                                          *
-	*                  Copyright Tony La Porta                                 *
-	*               To be used with TMS32010 DSP Emulator engine.              *
-	*                                                                          *
-	*         Many thanks to those involved in the i8039 Disassembler          *
-	*                        as this was based on it.                          *
-	*                                                                          *
-	*                                                                          *
-	*                                                                          *
-	* A Memory address                                                         *
-	* B Branch Address for Branch instructions (Requires next opcode read)     *
-	* D Immediate byte load                                                    *
-	* K Immediate bit  load                                                    *
-	* W Immediate word load (Actually 13 bit)                                  *
-	* M AR[x] register modification type (for indirect addressing)             *
-	* N ARP register to change ARP pointer to (for indirect addressing)        *
-	* P I/O port address number                                                *
-	* R AR[R] register to use                                                  *
-	* S Shift ALU left                                                         *
-	*                                                                          *
-	\**************************************************************************/
+/**************************************************************************\
+* Texas Instruments TMS320C1x DSP Disassembler
+*
+* Copyright Tony La Porta
+* To be used with TMS320C1x DSP Emulator engine.
+*
+* Many thanks to those involved in the i8039 Disassembler
+* as this was based on it.
+*
+*
+* A Memory address
+* B Branch Address for Branch instructions (Requires next opcode read)
+* D Immediate byte load
+* K Immediate bit  load
+* W Immediate word load (Actually 13 bit)
+* M AR[x] register modification type (for indirect addressing)
+* N ARP register to change ARP pointer to (for indirect addressing)
+* P I/O port address number
+* R AR[R] register to use
+* S Shift ALU left
+*
+\**************************************************************************/
 
 #include "emu.h"
-#include "32010dsm.h"
+#include "tms320c1x_dasm.h"
 
 #include <cctype>
 #include <stdexcept>
 
 
-const char *const tms32010_disassembler::arith[4] = { "*" , "*-" , "*+" , "??" } ;
-const char *const tms32010_disassembler::nextar[4] = { ",AR0" , ",AR1" , "" , "" } ;
+const char *const tms320c1x_disassembler::arith[4] = { "*" , "*-" , "*+" , "??" } ;
+const char *const tms320c1x_disassembler::nextar[4] = { ",AR0" , ",AR1" , "" , "" } ;
 
 
-const char *const tms32010_disassembler::TMS32010Formats[] = {
+const char *const tms320c1x_disassembler::TMS320C1xFormats[] = {
 	"0000ssss0aaaaaaa", "add  %A%S",
 	"0000ssss10mmn00n", "add  %M%S%N",
 	"0001ssss0aaaaaaa", "sub  %A%S",
@@ -147,14 +146,14 @@ const char *const tms32010_disassembler::TMS32010Formats[] = {
 	nullptr
 };
 
-tms32010_disassembler::tms32010_disassembler()
+tms320c1x_disassembler::tms320c1x_disassembler()
 {
 	const char *p;
 	const char *const *ops;
 	u16 mask, bits;
 	int bit;
 
-	ops = TMS32010Formats;
+	ops = TMS320C1xFormats;
 	while (*ops)
 	{
 		p = *ops;
@@ -193,7 +192,7 @@ tms32010_disassembler::tms32010_disassembler()
 	}
 }
 
-offs_t tms32010_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t tms320c1x_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
 	int a, b, d, k, m, n, p, r, s, w;   /* these can all be filled in by parsing an instruction */
@@ -304,8 +303,7 @@ offs_t tms32010_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	return cnt | flags | SUPPORTED;
 }
 
-u32 tms32010_disassembler::opcode_alignment() const
+u32 tms320c1x_disassembler::opcode_alignment() const
 {
 	return 1;
 }
-

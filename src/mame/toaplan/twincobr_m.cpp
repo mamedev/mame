@@ -6,9 +6,9 @@
  ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/tms32010/tms32010.h"
 #include "twincobr.h"
+
+#include "cpu/m68000/m68000.h"
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -213,14 +213,14 @@ void twincobr_state::dsp_int_w(int state)
 		// assert the INT line to the DSP
 		LOG("Turning DSP on and main CPU off\n");
 		m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_dsp->set_input_line(0, ASSERT_LINE); // TMS32010 INT
+		m_dsp->set_input_line(0, ASSERT_LINE); // TMS320C10 INT
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else
 	{
 		// inhibit the INT line to the DSP
 		LOG("Turning DSP off\n");
-		m_dsp->set_input_line(0, CLEAR_LINE); // TMS32010 INT
+		m_dsp->set_input_line(0, CLEAR_LINE); // TMS320C10 INT
 		m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }

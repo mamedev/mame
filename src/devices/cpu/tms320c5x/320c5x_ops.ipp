@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
 // stack is LIFO and is 8 levels deep, there is no stackpointer on the real chip
-void tms32051_device::PUSH_STACK(uint16_t pc)
+void tms320c51_device::PUSH_STACK(uint16_t pc)
 {
 	m_pcstack_ptr = (m_pcstack_ptr - 1) & 7;
 	m_pcstack[m_pcstack_ptr] = pc;
 }
 
-uint16_t tms32051_device::POP_STACK()
+uint16_t tms320c51_device::POP_STACK()
 {
 	uint16_t pc = m_pcstack[m_pcstack_ptr];
 	m_pcstack_ptr = (m_pcstack_ptr + 1) & 7;
@@ -15,7 +15,7 @@ uint16_t tms32051_device::POP_STACK()
 	return pc;
 }
 
-int32_t tms32051_device::SUB(uint32_t a, uint32_t b, bool shift16)
+int32_t tms320c51_device::SUB(uint32_t a, uint32_t b, bool shift16)
 {
 	uint32_t res = a - b;
 
@@ -35,7 +35,7 @@ int32_t tms32051_device::SUB(uint32_t a, uint32_t b, bool shift16)
 	{
 		if (m_st0.ovm)  // overflow saturation mode
 		{
-			res = ((int32_t)(res) < 0) ? 0x7fffffff : 0x80000000;
+			res = (int32_t(res) < 0) ? 0x7fffffff : 0x80000000;
 		}
 
 		// set OV, this is a sticky flag
@@ -45,7 +45,7 @@ int32_t tms32051_device::SUB(uint32_t a, uint32_t b, bool shift16)
 	return (int32_t)(res);
 }
 
-int32_t tms32051_device::ADD(uint32_t a, uint32_t b, bool shift16)
+int32_t tms320c51_device::ADD(uint32_t a, uint32_t b, bool shift16)
 {
 	uint32_t res = a + b;
 
@@ -76,7 +76,7 @@ int32_t tms32051_device::ADD(uint32_t a, uint32_t b, bool shift16)
 }
 
 
-void tms32051_device::UPDATE_AR(int ar, int step)
+void tms320c51_device::UPDATE_AR(int ar, int step)
 {
 	int cenb1 = (m_cbcr >> 3) & 0x1;
 	int car1 = m_cbcr & 0x7;
@@ -113,13 +113,13 @@ void tms32051_device::UPDATE_AR(int ar, int step)
 	}
 }
 
-void tms32051_device::UPDATE_ARP(int nar)
+void tms320c51_device::UPDATE_ARP(int nar)
 {
 	m_st1.arb = m_st0.arp;
 	m_st0.arp = nar;
 }
 
-uint16_t tms32051_device::GET_ADDRESS()
+uint16_t tms320c51_device::GET_ADDRESS()
 {
 	if (m_op & 0x80)        // Indirect Addressing
 	{
@@ -185,7 +185,7 @@ uint16_t tms32051_device::GET_ADDRESS()
 				break;
 			}
 
-			default:    fatalerror("32051: GET_ADDRESS: unimplemented indirect addressing mode %d at %04X (%04X)\n", (m_op >> 3) & 0xf, m_pc, m_op);
+			default:    fatalerror("TMS320C5x: GET_ADDRESS: unimplemented indirect addressing mode %d at %04X (%04X)\n", (m_op >> 3) & 0xf, m_pc, m_op);
 		}
 
 		return ea;
@@ -196,7 +196,7 @@ uint16_t tms32051_device::GET_ADDRESS()
 	}
 }
 
-bool tms32051_device::GET_ZLVC_CONDITION(int zlvc, int zlvc_mask)
+bool tms320c51_device::GET_ZLVC_CONDITION(int zlvc, int zlvc_mask)
 {
 	if (zlvc_mask & 0x2)            // OV-bit
 	{
@@ -235,7 +235,7 @@ bool tms32051_device::GET_ZLVC_CONDITION(int zlvc, int zlvc_mask)
 	return true;
 }
 
-bool tms32051_device::GET_TP_CONDITION(int tp)
+bool tms320c51_device::GET_TP_CONDITION(int tp)
 {
 	switch (tp)
 	{
@@ -255,7 +255,7 @@ bool tms32051_device::GET_TP_CONDITION(int tp)
 	return true;
 }
 
-int32_t tms32051_device::PREG_PSCALER(int32_t preg)
+int32_t tms320c51_device::PREG_PSCALER(int32_t preg)
 {
 	switch (m_st1.pm & 3)
 	{
@@ -281,24 +281,24 @@ int32_t tms32051_device::PREG_PSCALER(int32_t preg)
 
 
 
-void tms32051_device::op_invalid()
+void tms320c51_device::op_invalid()
 {
-	fatalerror("32051: invalid op at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: invalid op at %08X\n", m_pc-1);
 }
 
 /*****************************************************************************/
 
-void tms32051_device::op_abs()
+void tms320c51_device::op_abs()
 {
-	fatalerror("32051: unimplemented op abs at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op abs at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_adcb()
+void tms320c51_device::op_adcb()
 {
-	fatalerror("32051: unimplemented op adcb at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op adcb at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_add_mem()
+void tms320c51_device::op_add_mem()
 {
 	int32_t d;
 	uint16_t ea = GET_ADDRESS();
@@ -319,7 +319,7 @@ void tms32051_device::op_add_mem()
 	CYCLES(1);
 }
 
-void tms32051_device::op_add_simm()
+void tms320c51_device::op_add_simm()
 {
 	uint16_t imm = m_op & 0xff;
 
@@ -328,7 +328,7 @@ void tms32051_device::op_add_simm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_add_limm()
+void tms320c51_device::op_add_limm()
 {
 	int32_t d;
 	uint16_t imm = ROPCODE();
@@ -348,7 +348,7 @@ void tms32051_device::op_add_limm()
 	CYCLES(2);
 }
 
-void tms32051_device::op_add_s16_mem()
+void tms320c51_device::op_add_s16_mem()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint32_t data = DM_READ16(ea) << 16;
@@ -358,29 +358,29 @@ void tms32051_device::op_add_s16_mem()
 	CYCLES(1);
 }
 
-void tms32051_device::op_addb()
+void tms320c51_device::op_addb()
 {
 	m_acc = ADD(m_acc, m_accb, false);
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_addc()
+void tms320c51_device::op_addc()
 {
-	fatalerror("32051: unimplemented op addc at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op addc at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_adds()
+void tms320c51_device::op_adds()
 {
-	fatalerror("32051: unimplemented op adds at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op adds at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_addt()
+void tms320c51_device::op_addt()
 {
-	fatalerror("32051: unimplemented op addt at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op addt at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_and_mem()
+void tms320c51_device::op_and_mem()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t data = DM_READ16(ea);
@@ -390,7 +390,7 @@ void tms32051_device::op_and_mem()
 	CYCLES(1);
 }
 
-void tms32051_device::op_and_limm()
+void tms320c51_device::op_and_limm()
 {
 	uint32_t imm = ROPCODE();
 	int shift = m_op & 0xf;
@@ -400,17 +400,17 @@ void tms32051_device::op_and_limm()
 	CYCLES(2);
 }
 
-void tms32051_device::op_and_s16_limm()
+void tms320c51_device::op_and_s16_limm()
 {
-	fatalerror("32051: unimplemented op and s16 limm at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op and s16 limm at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_andb()
+void tms320c51_device::op_andb()
 {
-	fatalerror("32051: unimplemented op andb at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op andb at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_bsar()
+void tms320c51_device::op_bsar()
 {
 	int shift = (m_op & 0xf) + 1;
 
@@ -426,14 +426,14 @@ void tms32051_device::op_bsar()
 	CYCLES(1);
 }
 
-void tms32051_device::op_cmpl()
+void tms320c51_device::op_cmpl()
 {
 	m_acc = ~(uint32_t)(m_acc);
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_crgt()
+void tms320c51_device::op_crgt()
 {
 	if (m_acc >= m_accb)
 	{
@@ -449,7 +449,7 @@ void tms32051_device::op_crgt()
 	CYCLES(1);
 }
 
-void tms32051_device::op_crlt()
+void tms320c51_device::op_crlt()
 {
 	if (m_acc >= m_accb)
 	{
@@ -465,7 +465,7 @@ void tms32051_device::op_crlt()
 	CYCLES(1);
 }
 
-void tms32051_device::op_exar()
+void tms320c51_device::op_exar()
 {
 	int32_t tmp = m_acc;
 	m_acc = m_accb;
@@ -474,14 +474,14 @@ void tms32051_device::op_exar()
 	CYCLES(1);
 }
 
-void tms32051_device::op_lacb()
+void tms320c51_device::op_lacb()
 {
 	m_acc = m_accb;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_lacc_mem()
+void tms320c51_device::op_lacc_mem()
 {
 	int shift = (m_op >> 8) & 0xf;
 	uint16_t ea = GET_ADDRESS();
@@ -499,7 +499,7 @@ void tms32051_device::op_lacc_mem()
 	CYCLES(1);
 }
 
-void tms32051_device::op_lacc_limm()
+void tms320c51_device::op_lacc_limm()
 {
 	uint16_t imm = ROPCODE();
 	int shift = m_op & 0xf;
@@ -516,7 +516,7 @@ void tms32051_device::op_lacc_limm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_lacc_s16_mem()
+void tms320c51_device::op_lacc_s16_mem()
 {
 	uint16_t ea = GET_ADDRESS();
 	m_acc = DM_READ16(ea) << 16;
@@ -524,14 +524,14 @@ void tms32051_device::op_lacc_s16_mem()
 	CYCLES(1);
 }
 
-void tms32051_device::op_lacl_simm()
+void tms320c51_device::op_lacl_simm()
 {
 	m_acc = m_op & 0xff;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_lacl_mem()
+void tms320c51_device::op_lacl_mem()
 {
 	uint16_t ea = GET_ADDRESS();
 	m_acc = DM_READ16(ea) & 0xffff;
@@ -539,12 +539,12 @@ void tms32051_device::op_lacl_mem()
 	CYCLES(1);
 }
 
-void tms32051_device::op_lact()
+void tms320c51_device::op_lact()
 {
-	fatalerror("32051: unimplemented op lact at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op lact at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_lamm()
+void tms320c51_device::op_lamm()
 {
 	uint16_t ea = GET_ADDRESS() & 0x7f;
 	m_acc = DM_READ16(ea) & 0xffff;
@@ -552,7 +552,7 @@ void tms32051_device::op_lamm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_neg()
+void tms320c51_device::op_neg()
 {
 	if ((uint32_t)(m_acc) == 0x80000000)
 	{
@@ -569,12 +569,12 @@ void tms32051_device::op_neg()
 	CYCLES(1);
 }
 
-void tms32051_device::op_norm()
+void tms320c51_device::op_norm()
 {
-	fatalerror("32051: unimplemented op norm at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op norm at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_or_mem()
+void tms320c51_device::op_or_mem()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t data = DM_READ16(ea);
@@ -584,7 +584,7 @@ void tms32051_device::op_or_mem()
 	CYCLES(1);
 }
 
-void tms32051_device::op_or_limm()
+void tms320c51_device::op_or_limm()
 {
 	uint32_t imm = ROPCODE();
 	int shift = m_op & 0xf;
@@ -594,24 +594,24 @@ void tms32051_device::op_or_limm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_or_s16_limm()
+void tms320c51_device::op_or_s16_limm()
 {
-	fatalerror("32051: unimplemented op or s16 limm at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op or s16 limm at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_orb()
+void tms320c51_device::op_orb()
 {
 	m_acc |= m_accb;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_rol()
+void tms320c51_device::op_rol()
 {
-	fatalerror("32051: unimplemented op rol at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op rol at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_rolb()
+void tms320c51_device::op_rolb()
 {
 	uint32_t acc = m_acc;
 	uint32_t accb = m_accb;
@@ -624,24 +624,24 @@ void tms32051_device::op_rolb()
 	CYCLES(1);
 }
 
-void tms32051_device::op_ror()
+void tms320c51_device::op_ror()
 {
-	fatalerror("32051: unimplemented op ror at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op ror at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_rorb()
+void tms320c51_device::op_rorb()
 {
-	fatalerror("32051: unimplemented op rorb at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op rorb at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_sacb()
+void tms320c51_device::op_sacb()
 {
 	m_accb = m_acc;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_sach()
+void tms320c51_device::op_sach()
 {
 	uint16_t ea = GET_ADDRESS();
 	int shift = (m_op >> 8) & 0x7;
@@ -650,7 +650,7 @@ void tms32051_device::op_sach()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sacl()
+void tms320c51_device::op_sacl()
 {
 	uint16_t ea = GET_ADDRESS();
 	int shift = (m_op >> 8) & 0x7;
@@ -659,7 +659,7 @@ void tms32051_device::op_sacl()
 	CYCLES(1);
 }
 
-void tms32051_device::op_samm()
+void tms320c51_device::op_samm()
 {
 	uint16_t ea = GET_ADDRESS();
 	ea &= 0x7f;
@@ -668,12 +668,12 @@ void tms32051_device::op_samm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sath()
+void tms320c51_device::op_sath()
 {
-	fatalerror("32051: unimplemented op sath at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op sath at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_satl()
+void tms320c51_device::op_satl()
 {
 	int count = m_treg1 & 0xf;
 	if (m_st1.sxm)
@@ -688,7 +688,7 @@ void tms32051_device::op_satl()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sbb()
+void tms320c51_device::op_sbb()
 {
 	uint32_t res = m_acc - m_accb;
 
@@ -700,12 +700,12 @@ void tms32051_device::op_sbb()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sbbb()
+void tms320c51_device::op_sbbb()
 {
-	fatalerror("32051: unimplemented op sbbb at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op sbbb at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_sfl()
+void tms320c51_device::op_sfl()
 {
 	m_st1.c = (m_acc >> 31) & 1;
 	m_acc = m_acc << 1;
@@ -713,7 +713,7 @@ void tms32051_device::op_sfl()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sflb()
+void tms320c51_device::op_sflb()
 {
 	uint32_t acc = m_acc;
 	uint32_t accb = m_accb;
@@ -725,7 +725,7 @@ void tms32051_device::op_sflb()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sfr()
+void tms320c51_device::op_sfr()
 {
 	m_st1.c = m_acc & 1;
 
@@ -741,12 +741,12 @@ void tms32051_device::op_sfr()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sfrb()
+void tms320c51_device::op_sfrb()
 {
-	fatalerror("32051: unimplemented op sfrb at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op sfrb at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_sub_mem()
+void tms320c51_device::op_sub_mem()
 {
 	int32_t d;
 	uint16_t ea = GET_ADDRESS();
@@ -767,12 +767,12 @@ void tms32051_device::op_sub_mem()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sub_s16_mem()
+void tms320c51_device::op_sub_s16_mem()
 {
-	fatalerror("32051: unimplemented op sub s16 mem at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op sub s16 mem at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_sub_simm()
+void tms320c51_device::op_sub_simm()
 {
 	uint16_t imm = m_op & 0xff;
 
@@ -781,7 +781,7 @@ void tms32051_device::op_sub_simm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sub_limm()
+void tms320c51_device::op_sub_limm()
 {
 	int32_t d;
 	uint16_t imm = ROPCODE();
@@ -801,27 +801,27 @@ void tms32051_device::op_sub_limm()
 	CYCLES(2);
 }
 
-void tms32051_device::op_subb()
+void tms320c51_device::op_subb()
 {
-	fatalerror("32051: unimplemented op subb at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op subb at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_subc()
+void tms320c51_device::op_subc()
 {
-	fatalerror("32051: unimplemented op subc at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op subc at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_subs()
+void tms320c51_device::op_subs()
 {
-	fatalerror("32051: unimplemented op subs at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op subs at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_subt()
+void tms320c51_device::op_subt()
 {
-	fatalerror("32051: unimplemented op subt at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op subt at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_xor_mem()
+void tms320c51_device::op_xor_mem()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t data = DM_READ16(ea);
@@ -831,7 +831,7 @@ void tms32051_device::op_xor_mem()
 	CYCLES(1);
 }
 
-void tms32051_device::op_xor_limm()
+void tms320c51_device::op_xor_limm()
 {
 	uint32_t imm = ROPCODE();
 	int shift = m_op & 0xf;
@@ -841,22 +841,22 @@ void tms32051_device::op_xor_limm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_xor_s16_limm()
+void tms320c51_device::op_xor_s16_limm()
 {
-	fatalerror("32051: unimplemented op xor s16 limm at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op xor s16 limm at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_xorb()
+void tms320c51_device::op_xorb()
 {
-	fatalerror("32051: unimplemented op xorb at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op xorb at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_zalr()
+void tms320c51_device::op_zalr()
 {
-	fatalerror("32051: unimplemented op zalr at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op zalr at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_zap()
+void tms320c51_device::op_zap()
 {
 	m_acc = 0;
 	m_preg = 0;
@@ -866,7 +866,7 @@ void tms32051_device::op_zap()
 
 /*****************************************************************************/
 
-void tms32051_device::op_adrk()
+void tms320c51_device::op_adrk()
 {
 	uint16_t imm = m_op & 0xff;
 	UPDATE_AR(m_st0.arp, imm);
@@ -874,7 +874,7 @@ void tms32051_device::op_adrk()
 	CYCLES(1);
 }
 
-void tms32051_device::op_cmpr()
+void tms320c51_device::op_cmpr()
 {
 	m_st1.tc = 0;
 
@@ -917,7 +917,7 @@ void tms32051_device::op_cmpr()
 	CYCLES(1);
 }
 
-void tms32051_device::op_lar_mem()
+void tms320c51_device::op_lar_mem()
 {
 	int arx = (m_op >> 8) & 0x7;
 	uint16_t ea = GET_ADDRESS();
@@ -928,7 +928,7 @@ void tms32051_device::op_lar_mem()
 	CYCLES(2);
 }
 
-void tms32051_device::op_lar_simm()
+void tms320c51_device::op_lar_simm()
 {
 	int arx = (m_op >> 8) & 0x7;
 	m_ar[arx] = m_op & 0xff;
@@ -936,7 +936,7 @@ void tms32051_device::op_lar_simm()
 	CYCLES(2);
 }
 
-void tms32051_device::op_lar_limm()
+void tms320c51_device::op_lar_limm()
 {
 	int arx = m_op & 0x7;
 	uint16_t imm = ROPCODE();
@@ -945,18 +945,18 @@ void tms32051_device::op_lar_limm()
 	CYCLES(2);
 }
 
-void tms32051_device::op_ldp_mem()
+void tms320c51_device::op_ldp_mem()
 {
-	fatalerror("32051: unimplemented op ldp mem at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op ldp mem at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_ldp_imm()
+void tms320c51_device::op_ldp_imm()
 {
 	m_st0.dp = (m_op & 0x1ff) << 7;
 	CYCLES(2);
 }
 
-void tms32051_device::op_mar()
+void tms320c51_device::op_mar()
 {
 	// direct addressing is NOP
 	if (m_op & 0x80)
@@ -966,7 +966,7 @@ void tms32051_device::op_mar()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sar()
+void tms320c51_device::op_sar()
 {
 	int arx = (m_op >> 8) & 0x7;
 	uint16_t ar = m_ar[arx];
@@ -976,7 +976,7 @@ void tms32051_device::op_sar()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sbrk()
+void tms320c51_device::op_sbrk()
 {
 	uint16_t imm = m_op & 0xff;
 	UPDATE_AR(m_st0.arp, -imm);
@@ -986,7 +986,7 @@ void tms32051_device::op_sbrk()
 
 /*****************************************************************************/
 
-void tms32051_device::op_b()
+void tms320c51_device::op_b()
 {
 	uint16_t pma = ROPCODE();
 	GET_ADDRESS();      // update AR/ARP
@@ -995,14 +995,14 @@ void tms32051_device::op_b()
 	CYCLES(4);
 }
 
-void tms32051_device::op_bacc()
+void tms320c51_device::op_bacc()
 {
 	CHANGE_PC((uint16_t)(m_acc));
 
 	CYCLES(4);
 }
 
-void tms32051_device::op_baccd()
+void tms320c51_device::op_baccd()
 {
 	uint16_t pc = (uint16_t)(m_acc);
 
@@ -1012,7 +1012,7 @@ void tms32051_device::op_baccd()
 	CYCLES(2);
 }
 
-void tms32051_device::op_banz()
+void tms320c51_device::op_banz()
 {
 	uint16_t pma = ROPCODE();
 
@@ -1029,12 +1029,12 @@ void tms32051_device::op_banz()
 	GET_ADDRESS();      // modify AR/ARP
 }
 
-void tms32051_device::op_banzd()
+void tms320c51_device::op_banzd()
 {
-	fatalerror("32051: unimplemented op banzd at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op banzd at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_bcnd()
+void tms320c51_device::op_bcnd()
 {
 	uint16_t pma = ROPCODE();
 
@@ -1053,7 +1053,7 @@ void tms32051_device::op_bcnd()
 	}
 }
 
-void tms32051_device::op_bcndd()
+void tms320c51_device::op_bcndd()
 {
 	uint16_t pma = ROPCODE();
 
@@ -1073,7 +1073,7 @@ void tms32051_device::op_bcndd()
 	}
 }
 
-void tms32051_device::op_bd()
+void tms320c51_device::op_bd()
 {
 	uint16_t pma = ROPCODE();
 	GET_ADDRESS();      // update AR/ARP
@@ -1083,7 +1083,7 @@ void tms32051_device::op_bd()
 	CYCLES(2);
 }
 
-void tms32051_device::op_cala()
+void tms320c51_device::op_cala()
 {
 	PUSH_STACK(m_pc);
 
@@ -1092,7 +1092,7 @@ void tms32051_device::op_cala()
 	CYCLES(4);
 }
 
-void tms32051_device::op_calad()
+void tms320c51_device::op_calad()
 {
 	uint16_t pma = m_acc;
 	PUSH_STACK(m_pc+2);
@@ -1103,7 +1103,7 @@ void tms32051_device::op_calad()
 	CYCLES(4);
 }
 
-void tms32051_device::op_call()
+void tms320c51_device::op_call()
 {
 	uint16_t pma = ROPCODE();
 	GET_ADDRESS();      // update AR/ARP
@@ -1114,7 +1114,7 @@ void tms32051_device::op_call()
 	CYCLES(4);
 }
 
-void tms32051_device::op_calld()
+void tms320c51_device::op_calld()
 {
 	uint16_t pma = ROPCODE();
 	GET_ADDRESS();      // update AR/ARP
@@ -1126,7 +1126,7 @@ void tms32051_device::op_calld()
 	CYCLES(4);
 }
 
-void tms32051_device::op_cc()
+void tms320c51_device::op_cc()
 {
 	uint16_t pma = ROPCODE();
 
@@ -1147,7 +1147,7 @@ void tms32051_device::op_cc()
 	}
 }
 
-void tms32051_device::op_ccd()
+void tms320c51_device::op_ccd()
 {
 	uint16_t pma = ROPCODE();
 
@@ -1166,17 +1166,17 @@ void tms32051_device::op_ccd()
 	CYCLES(2);
 }
 
-void tms32051_device::op_intr()
+void tms320c51_device::op_intr()
 {
-	fatalerror("32051: unimplemented op intr at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op intr at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_nmi()
+void tms320c51_device::op_nmi()
 {
-	fatalerror("32051: unimplemented op nmi at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op nmi at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_retc()
+void tms320c51_device::op_retc()
 {
 	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
@@ -1190,7 +1190,7 @@ void tms32051_device::op_retc()
 	}
 }
 
-void tms32051_device::op_retcd()
+void tms320c51_device::op_retcd()
 {
 	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
@@ -1205,7 +1205,7 @@ void tms32051_device::op_retcd()
 	}
 }
 
-void tms32051_device::op_rete()
+void tms320c51_device::op_rete()
 {
 	uint16_t pc = POP_STACK();
 	CHANGE_PC(pc);
@@ -1217,17 +1217,17 @@ void tms32051_device::op_rete()
 	CYCLES(4);
 }
 
-void tms32051_device::op_reti()
+void tms320c51_device::op_reti()
 {
-	fatalerror("32051: unimplemented op reti at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op reti at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_trap()
+void tms320c51_device::op_trap()
 {
-	fatalerror("32051: unimplemented op trap at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op trap at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_xc()
+void tms320c51_device::op_xc()
 {
 	if (GET_ZLVC_CONDITION((m_op >> 4) & 0xf, m_op & 0xf) && GET_TP_CONDITION((m_op >> 8) & 0x3))
 	{
@@ -1243,7 +1243,7 @@ void tms32051_device::op_xc()
 
 /*****************************************************************************/
 
-void tms32051_device::op_bldd_slimm()
+void tms320c51_device::op_bldd_slimm()
 {
 	uint16_t pfc = ROPCODE();
 
@@ -1259,7 +1259,7 @@ void tms32051_device::op_bldd_slimm()
 	};
 }
 
-void tms32051_device::op_bldd_dlimm()
+void tms320c51_device::op_bldd_dlimm()
 {
 	uint16_t pfc = ROPCODE();
 
@@ -1275,7 +1275,7 @@ void tms32051_device::op_bldd_dlimm()
 	};
 }
 
-void tms32051_device::op_bldd_sbmar()
+void tms320c51_device::op_bldd_sbmar()
 {
 	uint16_t pfc = m_bmar;
 
@@ -1291,7 +1291,7 @@ void tms32051_device::op_bldd_sbmar()
 	};
 }
 
-void tms32051_device::op_bldd_dbmar()
+void tms320c51_device::op_bldd_dbmar()
 {
 	uint16_t pfc = m_bmar;
 
@@ -1307,7 +1307,7 @@ void tms32051_device::op_bldd_dbmar()
 	};
 }
 
-void tms32051_device::op_bldp()
+void tms320c51_device::op_bldp()
 {
 	uint16_t pfc = m_bmar;
 
@@ -1323,12 +1323,12 @@ void tms32051_device::op_bldp()
 	};
 }
 
-void tms32051_device::op_blpd_bmar()
+void tms320c51_device::op_blpd_bmar()
 {
-	fatalerror("32051: unimplemented op bpld bmar at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op bpld bmar at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_blpd_imm()
+void tms320c51_device::op_blpd_imm()
 {
 	uint16_t pfc = ROPCODE();
 
@@ -1346,17 +1346,17 @@ void tms32051_device::op_blpd_imm()
 
 /*****************************************************************************/
 
-void tms32051_device::op_dmov()
+void tms320c51_device::op_dmov()
 {
-	fatalerror("32051: unimplemented op dmov at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op dmov at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_in()
+void tms320c51_device::op_in()
 {
-	fatalerror("32051: unimplemented op in at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op in at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_lmmr()
+void tms320c51_device::op_lmmr()
 {
 	uint16_t pfc = ROPCODE();
 
@@ -1372,7 +1372,7 @@ void tms32051_device::op_lmmr()
 	};
 }
 
-void tms32051_device::op_out()
+void tms320c51_device::op_out()
 {
 	uint16_t port = ROPCODE();
 	uint16_t ea = GET_ADDRESS();
@@ -1384,7 +1384,7 @@ void tms32051_device::op_out()
 	CYCLES(3);
 }
 
-void tms32051_device::op_smmr()
+void tms320c51_device::op_smmr()
 {
 	uint16_t pfc = ROPCODE();
 
@@ -1400,7 +1400,7 @@ void tms32051_device::op_smmr()
 	};
 }
 
-void tms32051_device::op_tblr()
+void tms320c51_device::op_tblr()
 {
 	uint16_t pfc = (uint16_t)(m_acc);
 
@@ -1416,7 +1416,7 @@ void tms32051_device::op_tblr()
 	};
 }
 
-void tms32051_device::op_tblw()
+void tms320c51_device::op_tblw()
 {
 	uint16_t pfc = (uint16_t)(m_acc);
 
@@ -1434,7 +1434,7 @@ void tms32051_device::op_tblw()
 
 /*****************************************************************************/
 
-void tms32051_device::op_apl_dbmr()
+void tms320c51_device::op_apl_dbmr()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t data = DM_READ16(ea);
@@ -1447,7 +1447,7 @@ void tms32051_device::op_apl_dbmr()
 	CYCLES(1);
 }
 
-void tms32051_device::op_apl_imm()
+void tms320c51_device::op_apl_imm()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t imm = ROPCODE();
@@ -1461,12 +1461,12 @@ void tms32051_device::op_apl_imm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_cpl_dbmr()
+void tms320c51_device::op_cpl_dbmr()
 {
-	fatalerror("32051: unimplemented op cpl dbmr at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op cpl dbmr at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_cpl_imm()
+void tms320c51_device::op_cpl_imm()
 {
 	uint16_t imm = ROPCODE();
 	uint16_t ea = GET_ADDRESS();
@@ -1477,7 +1477,7 @@ void tms32051_device::op_cpl_imm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_opl_dbmr()
+void tms320c51_device::op_opl_dbmr()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t data = DM_READ16(ea);
@@ -1489,7 +1489,7 @@ void tms32051_device::op_opl_dbmr()
 	CYCLES(1);
 }
 
-void tms32051_device::op_opl_imm()
+void tms320c51_device::op_opl_imm()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t imm = ROPCODE();
@@ -1502,7 +1502,7 @@ void tms32051_device::op_opl_imm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_splk()
+void tms320c51_device::op_splk()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t imm = ROPCODE();
@@ -1512,17 +1512,17 @@ void tms32051_device::op_splk()
 	CYCLES(2);
 }
 
-void tms32051_device::op_xpl_dbmr()
+void tms320c51_device::op_xpl_dbmr()
 {
-	fatalerror("32051: unimplemented op xpl dbmr at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op xpl dbmr at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_xpl_imm()
+void tms320c51_device::op_xpl_imm()
 {
-	fatalerror("32051: unimplemented op xpl imm at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op xpl imm at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_apac()
+void tms320c51_device::op_apac()
 {
 	int32_t spreg = PREG_PSCALER(m_preg);
 	m_acc = ADD(m_acc, spreg, false);
@@ -1530,12 +1530,12 @@ void tms32051_device::op_apac()
 	CYCLES(1);
 }
 
-void tms32051_device::op_lph()
+void tms320c51_device::op_lph()
 {
-	fatalerror("32051: unimplemented op lph at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op lph at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_lt()
+void tms320c51_device::op_lt()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t data = DM_READ16(ea);
@@ -1550,7 +1550,7 @@ void tms32051_device::op_lt()
 	CYCLES(1);
 }
 
-void tms32051_device::op_lta()
+void tms320c51_device::op_lta()
 {
 	int32_t spreg;
 	uint16_t ea = GET_ADDRESS();
@@ -1568,42 +1568,42 @@ void tms32051_device::op_lta()
 	CYCLES(1);
 }
 
-void tms32051_device::op_ltd()
+void tms320c51_device::op_ltd()
 {
-	fatalerror("32051: unimplemented op ltd at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op ltd at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_ltp()
+void tms320c51_device::op_ltp()
 {
-	fatalerror("32051: unimplemented op ltp at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op ltp at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_lts()
+void tms320c51_device::op_lts()
 {
-	fatalerror("32051: unimplemented op lts at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op lts at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_mac()
+void tms320c51_device::op_mac()
 {
-	fatalerror("32051: unimplemented op mac at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op mac at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_macd()
+void tms320c51_device::op_macd()
 {
-	fatalerror("32051: unimplemented op macd at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op macd at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_madd()
+void tms320c51_device::op_madd()
 {
-	fatalerror("32051: unimplemented op madd at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op madd at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_mads()
+void tms320c51_device::op_mads()
 {
-	fatalerror("32051: unimplemented op mads at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op mads at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_mpy_mem()
+void tms320c51_device::op_mpy_mem()
 {
 	uint16_t ea = GET_ADDRESS();
 	int16_t data = DM_READ16(ea);
@@ -1613,42 +1613,42 @@ void tms32051_device::op_mpy_mem()
 	CYCLES(1);
 }
 
-void tms32051_device::op_mpy_simm()
+void tms320c51_device::op_mpy_simm()
 {
-	fatalerror("32051: unimplemented op mpy simm at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op mpy simm at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_mpy_limm()
+void tms320c51_device::op_mpy_limm()
 {
-	fatalerror("32051: unimplemented op mpy limm at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op mpy limm at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_mpya()
+void tms320c51_device::op_mpya()
 {
-	fatalerror("32051: unimplemented op mpya at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op mpya at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_mpys()
+void tms320c51_device::op_mpys()
 {
-	fatalerror("32051: unimplemented op mpys at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op mpys at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_mpyu()
+void tms320c51_device::op_mpyu()
 {
-	fatalerror("32051: unimplemented op mpyu at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op mpyu at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_pac()
+void tms320c51_device::op_pac()
 {
-	fatalerror("32051: unimplemented op pac at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op pac at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_spac()
+void tms320c51_device::op_spac()
 {
-	fatalerror("32051: unimplemented op spac at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op spac at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_sph()
+void tms320c51_device::op_sph()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t spreg = (uint16_t)(PREG_PSCALER(m_preg) >> 16);
@@ -1657,7 +1657,7 @@ void tms32051_device::op_sph()
 	CYCLES(1);
 }
 
-void tms32051_device::op_spl()
+void tms320c51_device::op_spl()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t spreg = (uint16_t)(PREG_PSCALER(m_preg));
@@ -1666,29 +1666,29 @@ void tms32051_device::op_spl()
 	CYCLES(1);
 }
 
-void tms32051_device::op_spm()
+void tms320c51_device::op_spm()
 {
 	m_st1.pm = m_op & 0x3;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_sqra()
+void tms320c51_device::op_sqra()
 {
-	fatalerror("32051: unimplemented op sqra at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op sqra at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_sqrs()
+void tms320c51_device::op_sqrs()
 {
-	fatalerror("32051: unimplemented op sqrs at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op sqrs at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_zpr()
+void tms320c51_device::op_zpr()
 {
-	fatalerror("32051: unimplemented op zpr at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op zpr at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_bit()
+void tms320c51_device::op_bit()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t data = DM_READ16(ea);
@@ -1698,7 +1698,7 @@ void tms32051_device::op_bit()
 	CYCLES(1);
 }
 
-void tms32051_device::op_bitt()
+void tms320c51_device::op_bitt()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t data = DM_READ16(ea);
@@ -1708,43 +1708,43 @@ void tms32051_device::op_bitt()
 	CYCLES(1);
 }
 
-void tms32051_device::op_clrc_ov()
+void tms320c51_device::op_clrc_ov()
 {
 	m_st0.ovm = 0;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_clrc_ext()
+void tms320c51_device::op_clrc_ext()
 {
 	m_st1.sxm = 0;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_clrc_hold()
+void tms320c51_device::op_clrc_hold()
 {
-	fatalerror("32051: unimplemented op clrc hold at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op clrc hold at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_clrc_tc()
+void tms320c51_device::op_clrc_tc()
 {
-	fatalerror("32051: unimplemented op clrc tc at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op clrc tc at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_clrc_carry()
+void tms320c51_device::op_clrc_carry()
 {
-	fatalerror("32051: unimplemented op clrc carry at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op clrc carry at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_clrc_cnf()
+void tms320c51_device::op_clrc_cnf()
 {
 	m_st1.cnf = 0;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_clrc_intm()
+void tms320c51_device::op_clrc_intm()
 {
 	m_st0.intm = 0;
 
@@ -1753,56 +1753,56 @@ void tms32051_device::op_clrc_intm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_clrc_xf()
+void tms320c51_device::op_clrc_xf()
 {
 	m_st1.xf = 0;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_idle()
+void tms320c51_device::op_idle()
 {
 	m_idle = true;
 }
 
-void tms32051_device::op_idle2()
+void tms320c51_device::op_idle2()
 {
-	fatalerror("32051: unimplemented op idle2 at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op idle2 at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_lst_st0()
+void tms320c51_device::op_lst_st0()
 {
-	fatalerror("32051: unimplemented op lst st0 at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op lst st0 at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_lst_st1()
+void tms320c51_device::op_lst_st1()
 {
-	fatalerror("32051: unimplemented op lst st1 at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op lst st1 at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_pop()
+void tms320c51_device::op_pop()
 {
 	m_acc = POP_STACK();
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_popd()
+void tms320c51_device::op_popd()
 {
-	fatalerror("32051: unimplemented op popd at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op popd at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_pshd()
+void tms320c51_device::op_pshd()
 {
-	fatalerror("32051: unimplemented op pshd at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op pshd at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_push()
+void tms320c51_device::op_push()
 {
-	fatalerror("32051: unimplemented op push at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op push at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_rpt_mem()
+void tms320c51_device::op_rpt_mem()
 {
 	uint16_t ea = GET_ADDRESS();
 	uint16_t data = DM_READ16(ea);
@@ -1813,7 +1813,7 @@ void tms32051_device::op_rpt_mem()
 	CYCLES(1);
 }
 
-void tms32051_device::op_rpt_limm()
+void tms320c51_device::op_rpt_limm()
 {
 	m_rptc = (uint16_t)ROPCODE();
 	m_rpt_start = m_pc;
@@ -1822,7 +1822,7 @@ void tms32051_device::op_rpt_limm()
 	CYCLES(2);
 }
 
-void tms32051_device::op_rpt_simm()
+void tms320c51_device::op_rpt_simm()
 {
 	m_rptc = (m_op & 0xff);
 	m_rpt_start = m_pc;
@@ -1831,7 +1831,7 @@ void tms32051_device::op_rpt_simm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_rptb()
+void tms320c51_device::op_rptb()
 {
 	uint16_t pma = ROPCODE();
 	m_pmst.braf = 1;
@@ -1841,57 +1841,57 @@ void tms32051_device::op_rptb()
 	CYCLES(2);
 }
 
-void tms32051_device::op_rptz()
+void tms320c51_device::op_rptz()
 {
-	fatalerror("32051: unimplemented op rptz at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op rptz at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_setc_ov()
+void tms320c51_device::op_setc_ov()
 {
 	m_st0.ovm = 1;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_setc_ext()
+void tms320c51_device::op_setc_ext()
 {
 	m_st1.sxm = 1;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_setc_hold()
+void tms320c51_device::op_setc_hold()
 {
-	fatalerror("32051: unimplemented op setc hold at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op setc hold at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_setc_tc()
+void tms320c51_device::op_setc_tc()
 {
 	m_st1.tc = 1;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_setc_carry()
+void tms320c51_device::op_setc_carry()
 {
-	fatalerror("32051: unimplemented op setc carry at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op setc carry at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_setc_xf()
+void tms320c51_device::op_setc_xf()
 {
 	m_st1.xf = 1;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_setc_cnf()
+void tms320c51_device::op_setc_cnf()
 {
 	m_st1.cnf = 1;
 
 	CYCLES(1);
 }
 
-void tms32051_device::op_setc_intm()
+void tms320c51_device::op_setc_intm()
 {
 	m_st0.intm = 1;
 
@@ -1900,12 +1900,12 @@ void tms32051_device::op_setc_intm()
 	CYCLES(1);
 }
 
-void tms32051_device::op_sst_st0()
+void tms320c51_device::op_sst_st0()
 {
-	fatalerror("32051: unimplemented op sst st0 at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op sst st0 at %08X\n", m_pc-1);
 }
 
-void tms32051_device::op_sst_st1()
+void tms320c51_device::op_sst_st1()
 {
-	fatalerror("32051: unimplemented op sst st1 at %08X\n", m_pc-1);
+	fatalerror("TMS320C5x: unimplemented op sst st1 at %08X\n", m_pc-1);
 }

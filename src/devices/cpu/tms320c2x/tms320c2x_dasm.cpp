@@ -1,48 +1,48 @@
 // license:BSD-3-Clause
 // copyright-holders:Tony La Porta
-	/**************************************************************************\
-	*              Texas Instruments TMS320x25 DSP Disassembler                *
-	*                                                                          *
-	*                 Copyright Tony La Porta                                  *
-	*              To be used with TMS320x25 DSP Emulator engine.              *
-	*                      Written for the MAME project.                       *
-	*                                                                          *
-	*         Many thanks to those involved in the i8039 Disassembler          *
-	*               as the structure here was borrowed from it.                *
-	*                                                                          *
-	*      Note :  This is a word based microcontroller, with addressing       *
-	*              architecture based on the Harvard addressing scheme.        *
-	*                                                                          *
-	*                                                                          *
-	* A Memory Address                                                         *
-	* B Opcode Address Argument (Requires next opcode read)                    *
-	* C Compare mode                                                           *
-	* D Immediate byte load                                                    *
-	* K Immediate bit load                                                     *
-	* W Immediate word load                                                    *
-	* M AR[x] register modification type (for indirect addressing)             *
-	* N ARP register to change ARP pointer to (for indirect addressing)        *
-	* P I/O port address number                                                *
-	* R AR[R] register to use                                                  *
-	* S Shift ALU left                                                         *
-	* T Shift ALU left (Hex) / Nibble data                                     *
-	* X Don't care bit                                                         *
-	*                                                                          *
-	\**************************************************************************/
+/**************************************************************************\
+* Texas Instruments TMS320C2x DSP Disassembler
+*
+* Copyright Tony La Porta
+* To be used with TMS320C2x DSP Emulator engine.
+* Written for the MAME project.
+*
+* Many thanks to those involved in the i8039 Disassembler
+* as the structure here was borrowed from it.
+*
+* Note: This is a word based microcontroller, with addressing
+* architecture based on the Harvard addressing scheme.
+*
+*
+* A Memory Address
+* B Opcode Address Argument (Requires next opcode read)
+* C Compare mode
+* D Immediate byte load
+* K Immediate bit load
+* W Immediate word load
+* M AR[x] register modification type (for indirect addressing)
+* N ARP register to change ARP pointer to (for indirect addressing)
+* P I/O port address number
+* R AR[R] register to use
+* S Shift ALU left
+* T Shift ALU left (Hex) / Nibble data
+* X Don't care bit
+*
+\**************************************************************************/
 
 #include "emu.h"
-#include "32025dsm.h"
+#include "tms320c2x_dasm.h"
 
 #include <cctype>
 #include <stdexcept>
 
 
-const char *const tms32025_disassembler::arith[8] = { "*", "*-", "*+", "??", "BR0-", "*0-", "*0+", "*BR0+" };
-const char *const tms32025_disassembler::nextar[16] = { "", "", "", "", "", "", "", "", ",AR0", ",AR1", ",AR2", ",AR3", ",AR4", ",AR5", ",AR6", ",AR7" };
-const char *const tms32025_disassembler::cmpmode[4] = { "0 (ARx = AR0)" , "1 (ARx < AR0)" , "2 (ARx > AR0)" , "3 (ARx <> AR0)" };
+const char *const tms320c2x_disassembler::arith[8] = { "*", "*-", "*+", "??", "BR0-", "*0-", "*0+", "*BR0+" };
+const char *const tms320c2x_disassembler::nextar[16] = { "", "", "", "", "", "", "", "", ",AR0", ",AR1", ",AR2", ",AR3", ",AR4", ",AR5", ",AR6", ",AR7" };
+const char *const tms320c2x_disassembler::cmpmode[4] = { "0 (ARx = AR0)" , "1 (ARx < AR0)" , "2 (ARx > AR0)" , "3 (ARx <> AR0)" };
 
 
-const char *const tms32025_disassembler::TMS32025Formats[] = {
+const char *const tms320c2x_disassembler::TMS320C2xFormats[] = {
 	"0000tttt0aaaaaaa", "add  %A,%T",  /* 0xxx */
 	"0000tttt1mmmnnnn", "add  %M,%T%N",
 	"0001tttt0aaaaaaa", "sub  %A,%T",  /* 1xxx */
@@ -309,14 +309,14 @@ const char *const tms32025_disassembler::TMS32025Formats[] = {
 	nullptr
 };
 
-tms32025_disassembler::tms32025_disassembler()
+tms320c2x_disassembler::tms320c2x_disassembler()
 {
 	const char *p;
 	const char *const *ops;
 	u16 mask, bits;
 	int bit;
 
-	ops = TMS32025Formats;
+	ops = TMS320C2xFormats;
 	while (*ops)
 	{
 		p = *ops;
@@ -358,7 +358,7 @@ tms32025_disassembler::tms32025_disassembler()
 	}
 }
 
-offs_t tms32025_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t tms320c2x_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
 	int a, b, c, d, k, m, n, p, r, s, t, w; /* these can all be filled in by parsing an instruction */
@@ -473,7 +473,7 @@ offs_t tms32025_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	return cnt | flags | SUPPORTED;
 }
 
-u32 tms32025_disassembler::opcode_alignment() const
+u32 tms320c2x_disassembler::opcode_alignment() const
 {
 	return 1;
 }

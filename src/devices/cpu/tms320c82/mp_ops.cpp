@@ -3,7 +3,7 @@
 // TMS320C82 Master Processor core execution
 
 #include "emu.h"
-#include "tms32082.h"
+#include "tms320c82.h"
 
 
 #define OP_LINK() ((m_ir >> 27) & 0x1f)
@@ -23,7 +23,7 @@
 
 
 
-bool tms32082_mp_device::test_condition(int condition, uint32_t value)
+bool tms320c82_mp_device::test_condition(int condition, uint32_t value)
 {
 	switch (condition)
 	{
@@ -55,7 +55,7 @@ bool tms32082_mp_device::test_condition(int condition, uint32_t value)
 	}
 }
 
-uint32_t tms32082_mp_device::calculate_cmp(uint32_t src1, uint32_t src2)
+uint32_t tms320c82_mp_device::calculate_cmp(uint32_t src1, uint32_t src2)
 {
 	int32_t a32 = (uint32_t)(src1);
 	int16_t a16 = (uint16_t)(src1);
@@ -119,7 +119,7 @@ uint32_t tms32082_mp_device::calculate_cmp(uint32_t src1, uint32_t src2)
 	return flags;
 }
 
-void tms32082_mp_device::vector_loadstore()
+void tms320c82_mp_device::vector_loadstore()
 {
 	int rd = OP_RD();
 	int vector_ls_bits = (((m_ir >> 9) & 0x3) << 1) | ((m_ir >> 6) & 1);
@@ -165,11 +165,11 @@ void tms32082_mp_device::vector_loadstore()
 		}
 
 		default:
-			fatalerror("vector_loadstore(): ls bits = %02X\n", vector_ls_bits);
+			fatalerror("tms320c82_mp_device::vector_loadstore(): ls bits = %02X\n", vector_ls_bits);
 	}
 }
 
-void tms32082_mp_device::execute_short_imm()
+void tms320c82_mp_device::execute_short_imm()
 {
 	switch ((m_ir >> 15) & 0x7f)
 	{
@@ -846,11 +846,11 @@ void tms32082_mp_device::execute_short_imm()
 		}
 
 		default:
-			fatalerror("execute_short_imm(): %08X: opcode %08X (%02X)", m_pc, m_ir, (m_ir >> 15) & 0x7f);
+			fatalerror("tms320c82_mp_device::execute_short_imm(): %08X: opcode %08X (%02X)", m_pc, m_ir, (m_ir >> 15) & 0x7f);
 	}
 }
 
-void tms32082_mp_device::execute_reg_long_imm()
+void tms320c82_mp_device::execute_reg_long_imm()
 {
 	uint32_t imm32 = 0;
 
@@ -1359,7 +1359,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 			{
 				// destination accumulator
 				if (pd != 1)
-					fatalerror("vrnd pd = %d at %08X\n", pd, m_pc);
+					fatalerror("tms320c82_mp_device: vrnd pd = %d at %08X\n", pd, m_pc);
 
 				m_facc[acc] = source;
 			}
@@ -1504,7 +1504,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 						break;
 					}
 					default:
-						fatalerror("fadd: invalid precision combination %02X\n", precision);
+						fatalerror("tms320c82_mp_device: fadd: invalid precision combination %02X\n", precision);
 				}
 			}
 			break;
@@ -1562,7 +1562,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 						break;
 					}
 					default:
-						fatalerror("fsub: invalid precision combination %02X\n", precision);
+						fatalerror("tms320c82_mp_device: fsub: invalid precision combination %02X\n", precision);
 				}
 			}
 			break;
@@ -1630,7 +1630,7 @@ void tms32082_mp_device::execute_reg_long_imm()
 						break;
 					}
 					default:
-						fatalerror("fmpy: invalid precision combination %02X\n", precision);
+						fatalerror("tms320c82_mp_device: fmpy: invalid precision combination %02X\n", precision);
 				}
 			}
 			break;
@@ -1795,12 +1795,12 @@ void tms32082_mp_device::execute_reg_long_imm()
 		}
 
 		default:
-			fatalerror("execute_reg_long_imm(): %08X: opcode %08X (%02X)", m_pc, m_ir, (m_ir >> 12) & 0xff);
+			fatalerror("tms320c82_mp_device::execute_reg_long_imm(): %08X: opcode %08X (%02X)", m_pc, m_ir, (m_ir >> 12) & 0xff);
 	}
 }
 
 
-void tms32082_mp_device::execute()
+void tms320c82_mp_device::execute()
 {
 	switch ((m_ir >> 20) & 3)
 	{

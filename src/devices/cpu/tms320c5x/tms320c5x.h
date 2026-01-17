@@ -1,73 +1,68 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-#ifndef MAME_CPU_TMS32051_TMS32051_H
-#define MAME_CPU_TMS32051_TMS32051_H
+#ifndef MAME_CPU_TMS320C5X_TMS320C5X_H
+#define MAME_CPU_TMS320C5X_TMS320C5X_H
 
 #pragma once
 
 
 enum
 {
-	TMS32051_INT1 = 0,
-	TMS32051_INT2,
-	TMS32051_INT3,
-	TMS32051_TINT,
-	TMS32051_RINT,
-	TMS32051_XINT,
-	TMS32051_TRNT,
-	TMS32051_TXNT,
-	TMS32051_INT4
+	TMS320C5X_INT1 = 0,
+	TMS320C5X_INT2,
+	TMS320C5X_INT3,
+	TMS320C5X_TINT,
+	TMS320C5X_RINT,
+	TMS320C5X_XINT,
+	TMS320C5X_TRNT,
+	TMS320C5X_TXNT,
+	TMS320C5X_INT4
 };
 
-struct TMS32051_PMST
-{
-	uint16_t iptr;
-	uint16_t avis;
-	uint16_t ovly;
-	uint16_t ram;
-	uint16_t mpmc;
-	uint16_t ndx;
-	uint16_t trm;
-	uint16_t braf;
-};
-
-struct TMS32051_ST0
-{
-	uint16_t dp;
-	uint16_t intm;
-	uint16_t ovm;
-	uint16_t ov;
-	uint16_t arp;
-};
-
-struct TMS32051_ST1
-{
-	uint16_t arb;
-	uint16_t cnf;
-	uint16_t tc;
-	uint16_t sxm;
-	uint16_t c;
-	uint16_t hm;
-	uint16_t xf;
-	uint16_t pm;
-};
-
-
-class tms32051_device : public cpu_device
+class tms320c51_device : public cpu_device
 {
 public:
 	// construction/destruction
-	tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms320c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint16_t cpuregs_r(offs_t offset);
-	void cpuregs_w(offs_t offset, uint16_t data);
-
-	void tms32051_internal_data(address_map &map) ATTR_COLD;
-	void tms32051_internal_pgm(address_map &map) ATTR_COLD;
 protected:
-	tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data);
+	struct tms320c5x_pmst
+	{
+		uint16_t iptr;
+		uint16_t avis;
+		uint16_t ovly;
+		uint16_t ram;
+		uint16_t mpmc;
+		uint16_t ndx;
+		uint16_t trm;
+		uint16_t braf;
+	};
 
-	// device-level overrides
+	struct tms320c5x_st0
+	{
+		uint16_t dp;
+		uint16_t intm;
+		uint16_t ovm;
+		uint16_t ov;
+		uint16_t arp;
+	};
+
+	struct tms320c5x_st1
+	{
+		uint16_t arb;
+		uint16_t cnf;
+		uint16_t tc;
+		uint16_t sxm;
+		uint16_t c;
+		uint16_t hm;
+		uint16_t xf;
+		uint16_t pm;
+	};
+
+
+	tms320c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data);
+
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -83,11 +78,17 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	uint16_t cpuregs_r(offs_t offset);
+	void cpuregs_w(offs_t offset, uint16_t data);
+
+	void tms320c51_internal_data(address_map &map) ATTR_COLD;
+	void tms320c51_internal_pgm(address_map &map) ATTR_COLD;
+
 	address_space_config m_program_config;
 	address_space_config m_data_config;
 	address_space_config m_io_config;
 
-	typedef void ( tms32051_device::*opcode_func )();
+	using opcode_func = void (tms320c51_device::*)();
 	static const opcode_func s_opcode_table[256];
 	static const opcode_func s_opcode_table_be[256];
 	static const opcode_func s_opcode_table_bf[256];
@@ -111,9 +112,9 @@ protected:
 	uint16_t m_dbmr;
 	uint16_t m_arcr;
 
-	TMS32051_ST0 m_st0;
-	TMS32051_ST1 m_st1;
-	TMS32051_PMST m_pmst;
+	tms320c5x_st0 m_st0;
+	tms320c5x_st1 m_st1;
+	tms320c5x_pmst m_pmst;
 
 	uint16_t m_ifr;
 	uint16_t m_imr;
@@ -150,10 +151,10 @@ protected:
 		int32_t accb;
 		uint16_t arcr;
 		uint16_t indx;
-		TMS32051_PMST pmst;
+		tms320c5x_pmst pmst;
 		int32_t preg;
-		TMS32051_ST0 st0;
-		TMS32051_ST1 st1;
+		tms320c5x_st0 st0;
+		tms320c5x_st1 st1;
 		int32_t treg0;
 		int32_t treg1;
 		int32_t treg2;
@@ -368,20 +369,21 @@ protected:
 };
 
 
-class tms32053_device : public tms32051_device
+class tms320c53_device : public tms320c51_device
 {
 public:
 	// construction/destruction
-	tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms320c53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void tms32053_internal_data(address_map &map) ATTR_COLD;
-	void tms32053_internal_pgm(address_map &map) ATTR_COLD;
 protected:
 	virtual void device_reset() override ATTR_COLD;
+
+	void tms320c53_internal_data(address_map &map) ATTR_COLD;
+	void tms320c53_internal_pgm(address_map &map) ATTR_COLD;
 };
 
 
-DECLARE_DEVICE_TYPE(TMS32051, tms32051_device)
-DECLARE_DEVICE_TYPE(TMS32053, tms32053_device)
+DECLARE_DEVICE_TYPE(TMS320C51, tms320c51_device)
+DECLARE_DEVICE_TYPE(TMS320C53, tms320c53_device)
 
-#endif // MAME_CPU_TMS32051_TMS32051_H
+#endif // MAME_CPU_TMS320C5X_TMS320C5X_H

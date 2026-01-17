@@ -8,12 +8,14 @@
 */
 
 #include "emu.h"
-#include "tms32082.h"
-#include "dis_pp.h"
-#include "dis_mp.h"
+#include "tms320c82.h"
 
-DEFINE_DEVICE_TYPE(TMS32082_MP, tms32082_mp_device, "tms32082_mp", "Texas Instruments TMS32082 MP")
-DEFINE_DEVICE_TYPE(TMS32082_PP, tms32082_pp_device, "tms32082_pp", "Texas Instruments TMS32082 PP")
+#include "mp_dasm.h"
+#include "pp_dasm.h"
+
+
+DEFINE_DEVICE_TYPE(TMS320C82_MP, tms320c82_mp_device, "tms320c82_mp", "Texas Instruments TMS320C82 MP")
+DEFINE_DEVICE_TYPE(TMS320C82_PP, tms320c82_pp_device, "tms320c82_pp", "Texas Instruments TMS320C82 PP")
 
 
 
@@ -21,7 +23,7 @@ DEFINE_DEVICE_TYPE(TMS32082_PP, tms32082_pp_device, "tms32082_pp", "Texas Instru
 // Master Processor
 
 // internal memory map
-void tms32082_mp_device::mp_internal_map(address_map &map)
+void tms320c82_mp_device::mp_internal_map(address_map &map)
 {
 	map(0x00000000, 0x00000fff).ram().share("pp0_data0");
 	map(0x00001000, 0x00001fff).ram().share("pp1_data0");
@@ -29,10 +31,10 @@ void tms32082_mp_device::mp_internal_map(address_map &map)
 	map(0x00009000, 0x00009fff).ram().share("pp1_data1");
 	map(0x01000000, 0x01000fff).ram().share("pp0_param");
 	map(0x01001000, 0x01001fff).ram().share("pp1_param");
-	map(0x01010000, 0x010107ff).rw(FUNC(tms32082_mp_device::mp_param_r), FUNC(tms32082_mp_device::mp_param_w));
+	map(0x01010000, 0x010107ff).rw(FUNC(tms320c82_mp_device::mp_param_r), FUNC(tms320c82_mp_device::mp_param_w));
 }
 
-const uint32_t tms32082_mp_device::SHIFT_MASK[] =
+const uint32_t tms320c82_mp_device::SHIFT_MASK[] =
 {
 	0x00000000, 0x00000001, 0x00000003, 0x00000007, 0x0000000f, 0x0000001f, 0x0000003f, 0x0000007f,
 	0x000000ff, 0x000001ff, 0x000003ff, 0x000007ff, 0x00000fff, 0x00001fff, 0x00003fff, 0x00007fff,
@@ -43,21 +45,21 @@ const uint32_t tms32082_mp_device::SHIFT_MASK[] =
 
 
 
-tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS32082_MP, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(tms32082_mp_device::mp_internal_map), this))
+tms320c82_mp_device::tms320c82_mp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, TMS320C82_MP, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(tms320c82_mp_device::mp_internal_map), this))
 	, m_cmd_callback(*this)
 {
 }
 
-device_memory_interface::space_config_vector tms32082_mp_device::memory_space_config() const
+device_memory_interface::space_config_vector tms320c82_mp_device::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
 	};
 }
 
-device_memory_interface::space_config_vector tms32082_pp_device::memory_space_config() const
+device_memory_interface::space_config_vector tms320c82_pp_device::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config)
@@ -65,13 +67,13 @@ device_memory_interface::space_config_vector tms32082_pp_device::memory_space_co
 }
 
 
-std::unique_ptr<util::disasm_interface> tms32082_mp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms320c82_mp_device::create_disassembler()
 {
-	return std::make_unique<tms32082_mp_disassembler>();
+	return std::make_unique<tms320c82_mp_disassembler>();
 }
 
 
-void tms32082_mp_device::tc_command_execute(int channel, uint32_t entrypoint)
+void tms320c82_mp_device::tc_command_execute(int channel, uint32_t entrypoint)
 {
 	[[maybe_unused]] static const char* CHANNEL_NAME[16] = {
 		"XPT15", "XPT14", "XPT13", "XPT12", "XPT11", "XPT10", "XPT9", "XPT8",
@@ -177,13 +179,13 @@ void tms32082_mp_device::tc_command_execute(int channel, uint32_t entrypoint)
 }
 
 
-uint32_t tms32082_mp_device::mp_param_r(offs_t offset, uint32_t mem_mask)
+uint32_t tms320c82_mp_device::mp_param_r(offs_t offset, uint32_t mem_mask)
 {
 	//printf("mp_param_w: %08X, %08X\n", offset, mem_mask);
 	return m_param_ram[offset];
 }
 
-void tms32082_mp_device::mp_param_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void tms320c82_mp_device::mp_param_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//printf("mp_param_w: %08X, %08X, %08X\n", offset, data, mem_mask);
 
@@ -197,7 +199,7 @@ void tms32082_mp_device::mp_param_w(offs_t offset, uint32_t data, uint32_t mem_m
 
 
 
-void tms32082_mp_device::device_start()
+void tms320c82_mp_device::device_start()
 {
 	space(AS_PROGRAM).specific(m_program);
 	m_cmd_callback.resolve();
@@ -272,7 +274,7 @@ void tms32082_mp_device::device_start()
 	set_icountptr(m_icount);
 }
 
-void tms32082_mp_device::state_string_export(const device_state_entry &entry, std::string &str) const
+void tms320c82_mp_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -282,7 +284,7 @@ void tms32082_mp_device::state_string_export(const device_state_entry &entry, st
 	}
 }
 
-void tms32082_mp_device::device_reset()
+void tms320c82_mp_device::device_reset()
 {
 	m_pc = 0;
 	m_fetchpc = 0xfffffff8;
@@ -307,7 +309,7 @@ void tms32082_mp_device::device_reset()
 	m_pp_status = 0xf0000;      // start with all PPs halted
 }
 
-void tms32082_mp_device::processor_command(uint32_t command)
+void tms320c82_mp_device::processor_command(uint32_t command)
 {
 	// unhalt PPs
 	if (command & 0x20000000)
@@ -331,7 +333,7 @@ void tms32082_mp_device::processor_command(uint32_t command)
 		m_cmd_callback(space(AS_PROGRAM), command);
 }
 
-uint32_t tms32082_mp_device::read_creg(int reg)
+uint32_t tms320c82_mp_device::read_creg(int reg)
 {
 	switch (reg)
 	{
@@ -374,7 +376,7 @@ uint32_t tms32082_mp_device::read_creg(int reg)
 	return 0;
 }
 
-void tms32082_mp_device::write_creg(int reg, uint32_t data)
+void tms320c82_mp_device::write_creg(int reg, uint32_t data)
 {
 	switch (reg)
 	{
@@ -422,7 +424,7 @@ void tms32082_mp_device::write_creg(int reg, uint32_t data)
 	}
 }
 
-void tms32082_mp_device::check_interrupts()
+void tms320c82_mp_device::check_interrupts()
 {
 	if (m_ie & 1)       // global interrupt mask
 	{
@@ -446,7 +448,7 @@ void tms32082_mp_device::check_interrupts()
 	}
 }
 
-void tms32082_mp_device::execute_set_input(int inputnum, int state)
+void tms320c82_mp_device::execute_set_input(int inputnum, int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -470,14 +472,14 @@ void tms32082_mp_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-uint32_t tms32082_mp_device::fetch()
+uint32_t tms320c82_mp_device::fetch()
 {
 	uint32_t w = m_cache.read_dword(m_fetchpc);
 	m_fetchpc += 4;
 	return w;
 }
 
-void tms32082_mp_device::delay_slot()
+void tms320c82_mp_device::delay_slot()
 {
 	debugger_instruction_hook(m_pc);
 	m_ir = fetch();
@@ -486,7 +488,7 @@ void tms32082_mp_device::delay_slot()
 	m_icount--;
 }
 
-void tms32082_mp_device::execute_run()
+void tms320c82_mp_device::execute_run()
 {
 	while (m_icount > 0)
 	{
@@ -518,7 +520,7 @@ void tms32082_mp_device::execute_run()
 // Parallel Processor
 
 // internal memory map
-void tms32082_pp_device::pp_internal_map(address_map &map)
+void tms320c82_pp_device::pp_internal_map(address_map &map)
 {
 	map(0x00000000, 0x00000fff).ram().share("pp0_data0");
 	map(0x00001000, 0x00001fff).ram().share("pp1_data0");
@@ -528,19 +530,19 @@ void tms32082_pp_device::pp_internal_map(address_map &map)
 	map(0x01001000, 0x01001fff).ram().share("pp1_param");
 }
 
-tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cpu_device(mconfig, TMS32082_PP, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(tms32082_pp_device::pp_internal_map), this))
+tms320c82_pp_device::tms320c82_pp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cpu_device(mconfig, TMS320C82_PP, tag, owner, clock)
+	, m_program_config("program", ENDIANNESS_BIG, 32, 32, 0, address_map_constructor(FUNC(tms320c82_pp_device::pp_internal_map), this))
 {
 }
 
 
-std::unique_ptr<util::disasm_interface> tms32082_pp_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms320c82_pp_device::create_disassembler()
 {
-	return std::make_unique<tms32082_pp_disassembler>();
+	return std::make_unique<tms320c82_pp_disassembler>();
 }
 
-void tms32082_pp_device::device_start()
+void tms320c82_pp_device::device_start()
 {
 	space(AS_PROGRAM).specific(m_program);
 
@@ -559,7 +561,7 @@ void tms32082_pp_device::device_start()
 	set_icountptr(m_icount);
 }
 
-void tms32082_pp_device::state_string_export(const device_state_entry &entry, std::string &str) const
+void tms320c82_pp_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
@@ -569,13 +571,13 @@ void tms32082_pp_device::state_string_export(const device_state_entry &entry, st
 	}
 }
 
-void tms32082_pp_device::device_reset()
+void tms320c82_pp_device::device_reset()
 {
 	m_pc = 0;
 	m_fetchpc = 0x400010a0;
 }
 
-void tms32082_pp_device::execute_run()
+void tms320c82_pp_device::execute_run()
 {
 	m_pc = m_fetchpc;
 	debugger_instruction_hook(m_pc);

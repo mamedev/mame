@@ -2,20 +2,20 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    dis32031.cpp
+    tms320c3x_dasm.cpp
     Disassembler for the portable TMS320C3x emulator.
     Written by Aaron Giles
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "dis32031.h"
+#include "tms320c3x_dasm.h"
 
 /***************************************************************************
     CODE CODE
 ***************************************************************************/
 
-const char *const tms32031_disassembler::regname[32] =
+const char *const tms320c3x_disassembler::regname[32] =
 {
 	"R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7",
 	"AR0", "AR1", "AR2", "AR3", "AR4", "AR5", "AR6", "AR7",
@@ -23,7 +23,7 @@ const char *const tms32031_disassembler::regname[32] =
 	"IOF", "RS", "RE", "RC", "??", "??", "??", "??"
 };
 
-const char *const tms32031_disassembler::condition[32] =
+const char *const tms320c3x_disassembler::condition[32] =
 {
 	"U", "LO", "LS", "HI", "HS", "EQ", "NE", "LT",
 	"LE", "GT", "GE", "??", "NV", "V", "NUF", "UF",
@@ -95,7 +95,7 @@ const char *const tms32031_disassembler::condition[32] =
 //  19 = LUF (LUF)
 //  20 = ZUF (Z | UF)
 
-void tms32031_disassembler::append_indirect(uint8_t ma, int8_t disp, std::ostream &stream)
+void tms320c3x_disassembler::append_indirect(uint8_t ma, int8_t disp, std::ostream &stream)
 {
 	std::string dispstr;
 	int mode = (ma >> 3) & 0x1f;
@@ -145,14 +145,14 @@ void tms32031_disassembler::append_indirect(uint8_t ma, int8_t disp, std::ostrea
 	}
 }
 
-std::string tms32031_disassembler::get_indirect(uint8_t ma, int8_t disp)
+std::string tms320c3x_disassembler::get_indirect(uint8_t ma, int8_t disp)
 {
 	std::ostringstream stream;
 	append_indirect(ma, disp, stream);
 	return stream.str();
 }
 
-void tms32031_disassembler::append_immediate(uint16_t data, int is_float, int is_unsigned, std::ostream &stream)
+void tms320c3x_disassembler::append_immediate(uint16_t data, int is_float, int is_unsigned, std::ostream &stream)
 {
 	if (is_float)
 	{
@@ -176,7 +176,7 @@ void tms32031_disassembler::append_immediate(uint16_t data, int is_float, int is
 		util::stream_format(stream, "$%04X", data);
 }
 
-void tms32031_disassembler::disasm_general(const char *opstring, uint32_t op, int flags, std::ostream &stream)
+void tms320c3x_disassembler::disasm_general(const char *opstring, uint32_t op, int flags, std::ostream &stream)
 {
 	util::stream_format(stream, "%-6s", opstring);
 
@@ -217,7 +217,7 @@ void tms32031_disassembler::disasm_general(const char *opstring, uint32_t op, in
 	}
 }
 
-void tms32031_disassembler::disasm_3op(const char *opstring, uint32_t op, int flags, std::ostream &stream)
+void tms320c3x_disassembler::disasm_3op(const char *opstring, uint32_t op, int flags, std::ostream &stream)
 {
 	util::stream_format(stream, "%-6s", opstring);
 
@@ -262,7 +262,7 @@ void tms32031_disassembler::disasm_3op(const char *opstring, uint32_t op, int fl
 	}
 }
 
-void tms32031_disassembler::disasm_conditional(const char *opstring, uint32_t op, int flags, std::ostream &stream)
+void tms320c3x_disassembler::disasm_conditional(const char *opstring, uint32_t op, int flags, std::ostream &stream)
 {
 	char temp[10];
 	sprintf(temp, "%s%s", opstring, condition[(op >> 23) & 31]);
@@ -270,7 +270,7 @@ void tms32031_disassembler::disasm_conditional(const char *opstring, uint32_t op
 }
 
 
-void tms32031_disassembler::disasm_parallel_3op3op(const char *opstring1, const char *opstring2, uint32_t op, int flags, const uint8_t *srctable, std::ostream &stream)
+void tms320c3x_disassembler::disasm_parallel_3op3op(const char *opstring1, const char *opstring2, uint32_t op, int flags, const uint8_t *srctable, std::ostream &stream)
 {
 	const uint8_t *s = &srctable[((op >> 24) & 3) * 4];
 	int d1 = (op >> 23) & 1;
@@ -288,7 +288,7 @@ void tms32031_disassembler::disasm_parallel_3op3op(const char *opstring1, const 
 }
 
 
-void tms32031_disassembler::disasm_parallel_3opstore(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
+void tms320c3x_disassembler::disasm_parallel_3opstore(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
 {
 	int d1 = (op >> 22) & 7;
 	int s1 = (op >> 19) & 7;
@@ -308,7 +308,7 @@ void tms32031_disassembler::disasm_parallel_3opstore(const char *opstring1, cons
 }
 
 
-void tms32031_disassembler::disasm_parallel_loadload(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
+void tms320c3x_disassembler::disasm_parallel_loadload(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
 {
 	int d2 = (op >> 22) & 7;
 	int d1 = (op >> 19) & 7;
@@ -322,7 +322,7 @@ void tms32031_disassembler::disasm_parallel_loadload(const char *opstring1, cons
 }
 
 
-void tms32031_disassembler::disasm_parallel_storestore(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
+void tms320c3x_disassembler::disasm_parallel_storestore(const char *opstring1, const char *opstring2, uint32_t op, int flags, std::ostream &stream)
 {
 	int s2 = (op >> 22) & 7;
 	int s1 = (op >> 16) & 7;
@@ -337,7 +337,7 @@ void tms32031_disassembler::disasm_parallel_storestore(const char *opstring1, co
 
 
 
-offs_t tms32031_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t tms320c3x_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
 	uint32_t op = opcodes.r32(pc);
@@ -703,8 +703,7 @@ offs_t tms32031_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	return 1 | flags | SUPPORTED;
 }
 
-u32 tms32031_disassembler::opcode_alignment() const
+u32 tms320c3x_disassembler::opcode_alignment() const
 {
 	return 1;
 }
-

@@ -1,17 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-// TMS32082 PP Disassembler
+// TMS320C82 Parallel Processor Disassembler
 
-#ifndef MAME_CPU_TMS32082_DIS_PP_H
-#define MAME_CPU_TMS32082_DIS_PP_H
+#ifndef MAME_CPU_TMS320C82_PP_DASM_H
+#define MAME_CPU_TMS320C82_PP_DASM_H
 
 #pragma once
 
-class tms32082_pp_disassembler : public util::disasm_interface
+class tms320c82_pp_disassembler : public util::disasm_interface
 {
 public:
-	tms32082_pp_disassembler() = default;
-	virtual ~tms32082_pp_disassembler() = default;
+	tms320c82_pp_disassembler() = default;
+	virtual ~tms320c82_pp_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params) override;

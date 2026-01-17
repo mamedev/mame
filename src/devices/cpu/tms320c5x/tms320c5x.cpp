@@ -1,69 +1,70 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
 /*
-   Texas Instruments TMS320C51 DSP Emulator
+   Texas Instruments TMS320C5x DSP Emulator
 
    Written by Ville Linde
 */
 
 #include "emu.h"
-#include "tms32051.h"
-#include "dis32051.h"
+#include "tms320c5x.h"
+
+#include "tms320c5x_dasm.h"
 
 enum
 {
-	TMS32051_PC = 1,
-	TMS32051_ACC,
-	TMS32051_ACCB,
-	TMS32051_PREG,
-	TMS32051_TREG0,
-	TMS32051_TREG1,
-	TMS32051_TREG2,
-	TMS32051_BMAR,
-	TMS32051_RPTC,
-	TMS32051_BRCR,
-	TMS32051_INDX,
-	TMS32051_DBMR,
-	TMS32051_ARCR,
-	TMS32051_DP,
-	TMS32051_ARP,
-	TMS32051_ARB,
-	TMS32051_AR0,
-	TMS32051_AR1,
-	TMS32051_AR2,
-	TMS32051_AR3,
-	TMS32051_AR4,
-	TMS32051_AR5,
-	TMS32051_AR6,
-	TMS32051_AR7,
-	TMS32051_IFR,
-	TMS32051_IMR,
-	TMS32051_ST0_INTM,
-	TMS32051_ST1_ARB,
-	TMS32051_ST1_TC,
-	TMS32051_TIM,
-	TMS32051_PSC
+	TMS320C5X_PC = 1,
+	TMS320C5X_ACC,
+	TMS320C5X_ACCB,
+	TMS320C5X_PREG,
+	TMS320C5X_TREG0,
+	TMS320C5X_TREG1,
+	TMS320C5X_TREG2,
+	TMS320C5X_BMAR,
+	TMS320C5X_RPTC,
+	TMS320C5X_BRCR,
+	TMS320C5X_INDX,
+	TMS320C5X_DBMR,
+	TMS320C5X_ARCR,
+	TMS320C5X_DP,
+	TMS320C5X_ARP,
+	TMS320C5X_ARB,
+	TMS320C5X_AR0,
+	TMS320C5X_AR1,
+	TMS320C5X_AR2,
+	TMS320C5X_AR3,
+	TMS320C5X_AR4,
+	TMS320C5X_AR5,
+	TMS320C5X_AR6,
+	TMS320C5X_AR7,
+	TMS320C5X_IFR,
+	TMS320C5X_IMR,
+	TMS320C5X_ST0_INTM,
+	TMS320C5X_ST1_ARB,
+	TMS320C5X_ST1_TC,
+	TMS320C5X_TIM,
+	TMS320C5X_PSC
 };
 
 
-DEFINE_DEVICE_TYPE(TMS32051, tms32051_device, "tms32051", "Texas Instruments TMS32051")
-DEFINE_DEVICE_TYPE(TMS32053, tms32053_device, "tms32053", "Texas Instruments TMS32053")
+DEFINE_DEVICE_TYPE(TMS320C51, tms320c51_device, "tms320c51", "Texas Instruments TMS320C51")
+DEFINE_DEVICE_TYPE(TMS320C53, tms320c53_device, "tms320c53", "Texas Instruments TMS320C53")
 
 
 /**************************************************************************
- * TMS32051 Internal memory map
+ * TMS320C51 Internal memory map
  **************************************************************************/
 
-void tms32051_device::tms32051_internal_pgm(address_map &map)
+void tms320c51_device::tms320c51_internal_pgm(address_map &map)
 {
 //  map(0x0000, 0x1fff).rom();                       // ROM          TODO: is off-chip if MP/_MC = 0
 	map(0x2000, 0x23ff).ram().share("saram");       // SARAM        TODO: is off-chip if RAM bit = 0
 	map(0xfe00, 0xffff).ram().share("daram_b0");    // DARAM B0     TODO: is off-chip if CNF = 0
 }
 
-void tms32051_device::tms32051_internal_data(address_map &map)
+void tms320c51_device::tms320c51_internal_data(address_map &map)
 {
-	map(0x0000, 0x005f).rw(FUNC(tms32051_device::cpuregs_r), FUNC(tms32051_device::cpuregs_w));
+	map(0x0000, 0x005f).rw(FUNC(tms320c51_device::cpuregs_r), FUNC(tms320c51_device::cpuregs_w));
 	map(0x0060, 0x007f).ram();                         // DARAM B2
 	map(0x0100, 0x02ff).ram().share("daram_b0");    // DARAM B0     TODO: is unconnected if CNF = 1
 	map(0x0300, 0x04ff).ram();                         // DARAM B1
@@ -71,7 +72,7 @@ void tms32051_device::tms32051_internal_data(address_map &map)
 }
 
 
-tms32051_device::tms32051_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data)
+tms320c51_device::tms320c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_pgm, address_map_constructor internal_data)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 16, -1, internal_pgm)
 	, m_data_config("data", ENDIANNESS_LITTLE, 16, 16, -1, internal_data)
@@ -79,12 +80,12 @@ tms32051_device::tms32051_device(const machine_config &mconfig, device_type type
 {
 }
 
-tms32051_device::tms32051_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32051_device(mconfig, TMS32051, tag, owner, clock, address_map_constructor(FUNC(tms32051_device::tms32051_internal_pgm), this), address_map_constructor(FUNC(tms32051_device::tms32051_internal_data), this))
+tms320c51_device::tms320c51_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms320c51_device(mconfig, TMS320C51, tag, owner, clock, address_map_constructor(FUNC(tms320c51_device::tms320c51_internal_pgm), this), address_map_constructor(FUNC(tms320c51_device::tms320c51_internal_data), this))
 {
 }
 
-device_memory_interface::space_config_vector tms32051_device::memory_space_config() const
+device_memory_interface::space_config_vector tms320c51_device::memory_space_config() const
 {
 	return space_config_vector {
 		std::make_pair(AS_PROGRAM, &m_program_config),
@@ -95,19 +96,19 @@ device_memory_interface::space_config_vector tms32051_device::memory_space_confi
 
 
 /**************************************************************************
- * TMS32053 Internal memory map
+ * TMS320C53 Internal memory map
  **************************************************************************/
 
-void tms32053_device::tms32053_internal_pgm(address_map &map)
+void tms320c53_device::tms320c53_internal_pgm(address_map &map)
 {
 //  map(0x0000, 0x3fff).rom();                       // ROM          TODO: is off-chip if MP/_MC = 0
 	map(0x4000, 0x4bff).ram().share("saram");       // SARAM        TODO: is off-chip if RAM bit = 0
 	map(0xfe00, 0xffff).ram().share("daram_b0");    // DARAM B0     TODO: is off-chip if CNF = 0
 }
 
-void tms32053_device::tms32053_internal_data(address_map &map)
+void tms320c53_device::tms320c53_internal_data(address_map &map)
 {
-	map(0x0000, 0x005f).rw(FUNC(tms32053_device::cpuregs_r), FUNC(tms32053_device::cpuregs_w));
+	map(0x0000, 0x005f).rw(FUNC(tms320c53_device::cpuregs_r), FUNC(tms320c53_device::cpuregs_w));
 	map(0x0060, 0x007f).ram();                         // DARAM B2
 	map(0x0100, 0x02ff).ram().share("daram_b0");    // DARAM B0     TODO: is unconnected if CNF = 1
 	map(0x0300, 0x04ff).ram();                         // DARAM B1
@@ -115,15 +116,15 @@ void tms32053_device::tms32053_internal_data(address_map &map)
 }
 
 
-tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tms32051_device(mconfig, TMS32053, tag, owner, clock, address_map_constructor(FUNC(tms32053_device::tms32053_internal_pgm), this), address_map_constructor(FUNC(tms32053_device::tms32053_internal_data), this))
+tms320c53_device::tms320c53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: tms320c51_device(mconfig, TMS320C53, tag, owner, clock, address_map_constructor(FUNC(tms320c53_device::tms320c53_internal_pgm), this), address_map_constructor(FUNC(tms320c53_device::tms320c53_internal_data), this))
 {
 }
 
 
-std::unique_ptr<util::disasm_interface> tms32051_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> tms320c51_device::create_disassembler()
 {
-	return std::make_unique<tms32051_disassembler>();
+	return std::make_unique<tms320c5x_disassembler>();
 }
 
 
@@ -131,45 +132,44 @@ std::unique_ptr<util::disasm_interface> tms32051_device::create_disassembler()
 
 #define ROPCODE()       m_cache.read_word(m_pc++)
 
-void tms32051_device::CHANGE_PC(uint16_t new_pc)
+void tms320c51_device::CHANGE_PC(uint16_t new_pc)
 {
 	m_pc = new_pc;
 }
 
-uint16_t tms32051_device::PM_READ16(uint16_t address)
+uint16_t tms320c51_device::PM_READ16(uint16_t address)
 {
 	return m_program.read_word(address);
 }
 
-void tms32051_device::PM_WRITE16(uint16_t address, uint16_t data)
+void tms320c51_device::PM_WRITE16(uint16_t address, uint16_t data)
 {
 	m_program.write_word(address, data);
 }
 
-uint16_t tms32051_device::DM_READ16(uint16_t address)
+uint16_t tms320c51_device::DM_READ16(uint16_t address)
 {
 	return m_data.read_word(address);
 }
 
-void tms32051_device::DM_WRITE16(uint16_t address, uint16_t data)
+void tms320c51_device::DM_WRITE16(uint16_t address, uint16_t data)
 {
 	m_data.write_word(address, data);
 }
 
-#include "32051ops.hxx"
-#include "32051ops.h"
+#include "320c5x_ops.ipp"
 
-void tms32051_device::op_group_be()
+void tms320c51_device::op_group_be()
 {
 	(this->*s_opcode_table_be[m_op & 0xff])();
 }
 
-void tms32051_device::op_group_bf()
+void tms320c51_device::op_group_bf()
 {
 	(this->*s_opcode_table_bf[m_op & 0xff])();
 }
 
-void tms32051_device::delay_slot(uint16_t startpc)
+void tms320c51_device::delay_slot(uint16_t startpc)
 {
 	m_op = ROPCODE();
 	(this->*s_opcode_table[m_op >> 8])();
@@ -183,7 +183,7 @@ void tms32051_device::delay_slot(uint16_t startpc)
 
 /*****************************************************************************/
 
-void tms32051_device::device_start()
+void tms320c51_device::device_start()
 {
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
@@ -281,68 +281,68 @@ void tms32051_device::device_start()
 	save_item(STRUCT_MEMBER(m_serial, dxr));
 	save_item(STRUCT_MEMBER(m_serial, spc));
 
-	save_item(STRUCT_MEMBER(m_shadow, acc));
-	save_item(STRUCT_MEMBER(m_shadow, accb));
-	save_item(STRUCT_MEMBER(m_shadow, arcr));
-	save_item(STRUCT_MEMBER(m_shadow, indx));
-	save_item(STRUCT_MEMBER(m_shadow.pmst, iptr));
-	save_item(STRUCT_MEMBER(m_shadow.pmst, avis));
-	save_item(STRUCT_MEMBER(m_shadow.pmst, ovly));
-	save_item(STRUCT_MEMBER(m_shadow.pmst, ram));
-	save_item(STRUCT_MEMBER(m_shadow.pmst, mpmc));
-	save_item(STRUCT_MEMBER(m_shadow.pmst, ndx));
-	save_item(STRUCT_MEMBER(m_shadow.pmst, trm));
-	save_item(STRUCT_MEMBER(m_shadow.pmst, braf));
-	save_item(STRUCT_MEMBER(m_shadow.st0, dp));
-	save_item(STRUCT_MEMBER(m_shadow.st0, intm));
-	save_item(STRUCT_MEMBER(m_shadow.st0, ovm));
-	save_item(STRUCT_MEMBER(m_shadow.st0, ov));
-	save_item(STRUCT_MEMBER(m_shadow.st0, arp));
-	save_item(STRUCT_MEMBER(m_shadow.st1, arb));
-	save_item(STRUCT_MEMBER(m_shadow.st1, cnf));
-	save_item(STRUCT_MEMBER(m_shadow.st1, tc));
-	save_item(STRUCT_MEMBER(m_shadow.st1, sxm));
-	save_item(STRUCT_MEMBER(m_shadow.st1, c));
-	save_item(STRUCT_MEMBER(m_shadow.st1, hm));
-	save_item(STRUCT_MEMBER(m_shadow.st1, xf));
-	save_item(STRUCT_MEMBER(m_shadow.st1, pm));
-	save_item(STRUCT_MEMBER(m_shadow, preg));
-	save_item(STRUCT_MEMBER(m_shadow, treg0));
-	save_item(STRUCT_MEMBER(m_shadow, treg1));
-	save_item(STRUCT_MEMBER(m_shadow, treg2));
+	save_item(NAME(m_shadow.acc));
+	save_item(NAME(m_shadow.accb));
+	save_item(NAME(m_shadow.arcr));
+	save_item(NAME(m_shadow.indx));
+	save_item(NAME(m_shadow.pmst.iptr));
+	save_item(NAME(m_shadow.pmst.avis));
+	save_item(NAME(m_shadow.pmst.ovly));
+	save_item(NAME(m_shadow.pmst.ram));
+	save_item(NAME(m_shadow.pmst.mpmc));
+	save_item(NAME(m_shadow.pmst.ndx));
+	save_item(NAME(m_shadow.pmst.trm));
+	save_item(NAME(m_shadow.pmst.braf));
+	save_item(NAME(m_shadow.st0.dp));
+	save_item(NAME(m_shadow.st0.intm));
+	save_item(NAME(m_shadow.st0.ovm));
+	save_item(NAME(m_shadow.st0.ov));
+	save_item(NAME(m_shadow.st0.arp));
+	save_item(NAME(m_shadow.st1.arb));
+	save_item(NAME(m_shadow.st1.cnf));
+	save_item(NAME(m_shadow.st1.tc));
+	save_item(NAME(m_shadow.st1.sxm));
+	save_item(NAME(m_shadow.st1.c));
+	save_item(NAME(m_shadow.st1.hm));
+	save_item(NAME(m_shadow.st1.xf));
+	save_item(NAME(m_shadow.st1.pm));
+	save_item(NAME(m_shadow.preg));
+	save_item(NAME(m_shadow.treg0));
+	save_item(NAME(m_shadow.treg1));
+	save_item(NAME(m_shadow.treg2));
 
-	state_add( TMS32051_PC,    "PC", m_pc).formatstr("%04X");
-	state_add( TMS32051_ACC,   "ACC", m_acc).formatstr("%08X");
-	state_add( TMS32051_ACCB,  "ACCB", m_accb).formatstr("%08X");
-	state_add( TMS32051_PREG,  "PREG", m_preg).formatstr("%08X");
-	state_add( TMS32051_TREG0, "TREG0", m_treg0).formatstr("%04X");
-	state_add( TMS32051_TREG1, "TREG1", m_treg1).formatstr("%04X");
-	state_add( TMS32051_TREG2, "TREG2", m_treg2).formatstr("%04X");
-	state_add( TMS32051_BMAR,  "BMAR", m_bmar).formatstr("%08X");
-	state_add( TMS32051_RPTC,  "RPTC", m_rptc).formatstr("%08X");
-	state_add( TMS32051_BRCR,  "BRCR", m_brcr).formatstr("%08X");
-	state_add( TMS32051_INDX,  "INDX", m_indx).formatstr("%04X");
-	state_add( TMS32051_DBMR,  "DBMR", m_dbmr).formatstr("%04X");
-	state_add( TMS32051_ARCR,  "ARCR", m_arcr).formatstr("%04X");
-	state_add( TMS32051_DP,    "DP", m_st0.dp).formatstr("%04X");
-	state_add( TMS32051_ARP,   "ARP", m_st0.arp).formatstr("%04X");
-	state_add( TMS32051_ARB,   "ARB", m_st1.arb).formatstr("%04X");
-	state_add( TMS32051_AR0,   "AR0", m_ar[0]).formatstr("%04X");
-	state_add( TMS32051_AR1,   "AR1", m_ar[1]).formatstr("%04X");
-	state_add( TMS32051_AR2,   "AR2", m_ar[2]).formatstr("%04X");
-	state_add( TMS32051_AR3,   "AR3", m_ar[3]).formatstr("%04X");
-	state_add( TMS32051_AR4,   "AR4", m_ar[4]).formatstr("%04X");
-	state_add( TMS32051_AR5,   "AR5", m_ar[5]).formatstr("%04X");
-	state_add( TMS32051_AR6,   "AR6", m_ar[6]).formatstr("%04X");
-	state_add( TMS32051_AR7,   "AR7", m_ar[7]).formatstr("%04X");
+	state_add( TMS320C5X_PC,    "PC", m_pc).formatstr("%04X");
+	state_add( TMS320C5X_ACC,   "ACC", m_acc).formatstr("%08X");
+	state_add( TMS320C5X_ACCB,  "ACCB", m_accb).formatstr("%08X");
+	state_add( TMS320C5X_PREG,  "PREG", m_preg).formatstr("%08X");
+	state_add( TMS320C5X_TREG0, "TREG0", m_treg0).formatstr("%04X");
+	state_add( TMS320C5X_TREG1, "TREG1", m_treg1).formatstr("%04X");
+	state_add( TMS320C5X_TREG2, "TREG2", m_treg2).formatstr("%04X");
+	state_add( TMS320C5X_BMAR,  "BMAR", m_bmar).formatstr("%08X");
+	state_add( TMS320C5X_RPTC,  "RPTC", m_rptc).formatstr("%08X");
+	state_add( TMS320C5X_BRCR,  "BRCR", m_brcr).formatstr("%08X");
+	state_add( TMS320C5X_INDX,  "INDX", m_indx).formatstr("%04X");
+	state_add( TMS320C5X_DBMR,  "DBMR", m_dbmr).formatstr("%04X");
+	state_add( TMS320C5X_ARCR,  "ARCR", m_arcr).formatstr("%04X");
+	state_add( TMS320C5X_DP,    "DP", m_st0.dp).formatstr("%04X");
+	state_add( TMS320C5X_ARP,   "ARP", m_st0.arp).formatstr("%04X");
+	state_add( TMS320C5X_ARB,   "ARB", m_st1.arb).formatstr("%04X");
+	state_add( TMS320C5X_AR0,   "AR0", m_ar[0]).formatstr("%04X");
+	state_add( TMS320C5X_AR1,   "AR1", m_ar[1]).formatstr("%04X");
+	state_add( TMS320C5X_AR2,   "AR2", m_ar[2]).formatstr("%04X");
+	state_add( TMS320C5X_AR3,   "AR3", m_ar[3]).formatstr("%04X");
+	state_add( TMS320C5X_AR4,   "AR4", m_ar[4]).formatstr("%04X");
+	state_add( TMS320C5X_AR5,   "AR5", m_ar[5]).formatstr("%04X");
+	state_add( TMS320C5X_AR6,   "AR6", m_ar[6]).formatstr("%04X");
+	state_add( TMS320C5X_AR7,   "AR7", m_ar[7]).formatstr("%04X");
 
-	state_add( TMS32051_IFR,      "IFR", m_ifr).formatstr("%04X");
-	state_add( TMS32051_IMR,      "IMR", m_imr).formatstr("%04X");
-	state_add( TMS32051_ST0_INTM, "ST0_INTM", m_st0.intm).formatstr("%1d");
-	state_add( TMS32051_ST1_ARB,  "ST1_ARB", m_st1.arb).formatstr("%04X");
-	state_add( TMS32051_ST1_TC,   "ST1_TC", m_st1.tc).formatstr("%1d");
-	state_add( TMS32051_TIM,      "TIM", m_timer.tim).formatstr("%04X");
-	state_add( TMS32051_PSC,      "PSC", m_timer.psc).formatstr("%04X");
+	state_add( TMS320C5X_IFR,      "IFR", m_ifr).formatstr("%04X");
+	state_add( TMS320C5X_IMR,      "IMR", m_imr).formatstr("%04X");
+	state_add( TMS320C5X_ST0_INTM, "ST0_INTM", m_st0.intm).formatstr("%1d");
+	state_add( TMS320C5X_ST1_ARB,  "ST1_ARB", m_st1.arb).formatstr("%04X");
+	state_add( TMS320C5X_ST1_TC,   "ST1_TC", m_st1.tc).formatstr("%1d");
+	state_add( TMS320C5X_TIM,      "TIM", m_timer.tim).formatstr("%04X");
+	state_add( TMS320C5X_PSC,      "PSC", m_timer.psc).formatstr("%04X");
 
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
@@ -350,7 +350,7 @@ void tms32051_device::device_start()
 	set_icountptr(m_icount);
 }
 
-void tms32051_device::device_reset()
+void tms320c51_device::device_reset()
 {
 	// reset registers
 	m_st0.intm  = 1;
@@ -398,7 +398,7 @@ void tms32051_device::device_reset()
 	}
 }
 
-void tms32051_device::check_interrupts()
+void tms320c51_device::check_interrupts()
 {
 	if (m_st0.intm == 0 && m_ifr != 0)
 	{
@@ -421,7 +421,7 @@ void tms32051_device::check_interrupts()
 	}
 }
 
-void tms32051_device::save_interrupt_context()
+void tms320c51_device::save_interrupt_context()
 {
 	m_shadow.acc = m_acc;
 	m_shadow.accb = m_accb;
@@ -431,12 +431,12 @@ void tms32051_device::save_interrupt_context()
 	m_shadow.treg0 = m_treg0;
 	m_shadow.treg1 = m_treg1;
 	m_shadow.treg2 = m_treg2;
-	memcpy(&m_shadow.pmst, &m_pmst, sizeof(TMS32051_PMST));
-	memcpy(&m_shadow.st0, &m_st0, sizeof(TMS32051_ST0));
-	memcpy(&m_shadow.st1, &m_st1, sizeof(TMS32051_ST1));
+	m_shadow.pmst = m_pmst;
+	m_shadow.st0 = m_st0;
+	m_shadow.st1 = m_st1;
 }
 
-void tms32051_device::restore_interrupt_context()
+void tms320c51_device::restore_interrupt_context()
 {
 	m_acc = m_shadow.acc;
 	m_accb = m_shadow.accb;
@@ -446,12 +446,12 @@ void tms32051_device::restore_interrupt_context()
 	m_treg0 = m_shadow.treg0;
 	m_treg1 = m_shadow.treg1;
 	m_treg2 = m_shadow.treg2;
-	memcpy(&m_pmst, &m_shadow.pmst, sizeof(TMS32051_PMST));
-	memcpy(&m_st0, &m_shadow.st0, sizeof(TMS32051_ST0));
-	memcpy(&m_st1, &m_shadow.st1, sizeof(TMS32051_ST1));
+	m_pmst = m_shadow.pmst;
+	m_st0 = m_shadow.st0;
+	m_st1 = m_shadow.st1;
 }
 
-void tms32051_device::execute_set_input(int irq, int state)
+void tms320c51_device::execute_set_input(int irq, int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -465,7 +465,7 @@ void tms32051_device::execute_set_input(int irq, int state)
 }
 
 
-void tms32051_device::execute_run()
+void tms320c51_device::execute_run()
 {
 	while (m_icount > 0)
 	{
@@ -527,7 +527,7 @@ void tms32051_device::execute_run()
 				// reset timer
 				m_timer.tim = m_timer.prd;
 
-				execute_set_input(TMS32051_TINT, ASSERT_LINE);
+				execute_set_input(TMS320C5X_TINT, ASSERT_LINE);
 			}
 		}
 	}
@@ -536,7 +536,7 @@ void tms32051_device::execute_run()
 
 /*****************************************************************************/
 
-uint16_t tms32051_device::cpuregs_r(offs_t offset)
+uint16_t tms320c51_device::cpuregs_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -615,13 +615,13 @@ uint16_t tms32051_device::cpuregs_r(offs_t offset)
 
 		default:
 			if (!machine().side_effects_disabled())
-				fatalerror("32051: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, m_pc-1);
+				fatalerror("TMS320C5x: cpuregs_r: unimplemented memory-mapped register %02X at %04X\n", offset, m_pc-1);
 	}
 
 	return 0;
 }
 
-void tms32051_device::cpuregs_w(offs_t offset, uint16_t data)
+void tms320c51_device::cpuregs_w(offs_t offset, uint16_t data)
 {
 	switch (offset)
 	{
@@ -727,12 +727,12 @@ void tms32051_device::cpuregs_w(offs_t offset, uint16_t data)
 
 		default:
 			if (!machine().side_effects_disabled())
-				fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, m_pc-1);
+				fatalerror("TMS320C5x: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, m_pc-1);
 	}
 }
 
 
-void tms32053_device::device_reset()
+void tms320c53_device::device_reset()
 {
 	// reset registers
 	m_st0.intm  = 1;

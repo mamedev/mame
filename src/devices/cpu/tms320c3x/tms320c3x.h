@@ -2,14 +2,14 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    tms32031.h
+    tms320c3x.h
 
     TMS320C3x family 32-bit floating point DSP emulator
 
 ***************************************************************************/
 
-#ifndef MAME_CPU_TMS32031_TMS32031_H
-#define MAME_CPU_TMS32031_TMS32031_H
+#ifndef MAME_CPU_TMS320C3X_TMS320C3X_H
+#define MAME_CPU_TMS320C3X_TMS320C3X_H
 
 #pragma once
 
@@ -18,7 +18,7 @@
 //  DEBUGGING
 //**************************************************************************
 
-#define TMS_3203X_LOG_OPCODE_USAGE  (0)
+#define TMS320C3X_LOG_OPCODE_USAGE  (0)
 
 
 
@@ -27,61 +27,61 @@
 //**************************************************************************
 
 // interrupts
-const int TMS3203X_IRQ0     = 0;        // IRQ0
-const int TMS3203X_IRQ1     = 1;        // IRQ1
-const int TMS3203X_IRQ2     = 2;        // IRQ2
-const int TMS3203X_IRQ3     = 3;        // IRQ3
-const int TMS3203X_XINT0    = 4;        // serial (0) transmit interrupt
-const int TMS3203X_RINT0    = 5;        // serial (0) receive interrupt
-const int TMS3203X_XINT1    = 6;        // serial 1 transmit interrupt (TMS320C30 only)
-const int TMS3203X_RINT1    = 7;        // serial 1 receive interrupt  (TMS320C30 only)
-const int TMS3203X_TINT0    = 8;        // timer 0 interrupt
-const int TMS3203X_TINT1    = 9;        // timer 1 interrupt
-const int TMS3203X_DINT0    = 10;       // DMA (0) interrupt
-const int TMS3203X_DINT1    = 11;       // DMA 1 interrupt (TMS320C32 only)
-const int TMS3203X_MCBL     = 12;       // Microcomputer/boot loader mode
-const int TMS3203X_HOLD     = 13;       // Primary bus interface hold signal
+const int TMS320C3X_IRQ0    = 0;        // IRQ0
+const int TMS320C3X_IRQ1    = 1;        // IRQ1
+const int TMS320C3X_IRQ2    = 2;        // IRQ2
+const int TMS320C3X_IRQ3    = 3;        // IRQ3
+const int TMS320C3X_XINT0   = 4;        // serial (0) transmit interrupt
+const int TMS320C3X_RINT0   = 5;        // serial (0) receive interrupt
+const int TMS320C3X_XINT1   = 6;        // serial 1 transmit interrupt (TMS320C30 only)
+const int TMS320C3X_RINT1   = 7;        // serial 1 receive interrupt  (TMS320C30 only)
+const int TMS320C3X_TINT0   = 8;        // timer 0 interrupt
+const int TMS320C3X_TINT1   = 9;        // timer 1 interrupt
+const int TMS320C3X_DINT0   = 10;       // DMA (0) interrupt
+const int TMS320C3X_DINT1   = 11;       // DMA 1 interrupt (TMS320C32 only)
+const int TMS320C3X_MCBL    = 12;       // Microcomputer/boot loader mode
+const int TMS320C3X_HOLD    = 13;       // Primary bus interface hold signal
 
 // register enumeration
 enum
 {
-	TMS3203X_PC=1,
-	TMS3203X_R0,
-	TMS3203X_R1,
-	TMS3203X_R2,
-	TMS3203X_R3,
-	TMS3203X_R4,
-	TMS3203X_R5,
-	TMS3203X_R6,
-	TMS3203X_R7,
-	TMS3203X_R0F,
-	TMS3203X_R1F,
-	TMS3203X_R2F,
-	TMS3203X_R3F,
-	TMS3203X_R4F,
-	TMS3203X_R5F,
-	TMS3203X_R6F,
-	TMS3203X_R7F,
-	TMS3203X_AR0,
-	TMS3203X_AR1,
-	TMS3203X_AR2,
-	TMS3203X_AR3,
-	TMS3203X_AR4,
-	TMS3203X_AR5,
-	TMS3203X_AR6,
-	TMS3203X_AR7,
-	TMS3203X_DP,
-	TMS3203X_IR0,
-	TMS3203X_IR1,
-	TMS3203X_BK,
-	TMS3203X_SP,
-	TMS3203X_ST,
-	TMS3203X_IE,
-	TMS3203X_IF,
-	TMS3203X_IOF,
-	TMS3203X_RS,
-	TMS3203X_RE,
-	TMS3203X_RC
+	TMS320C3X_PC=1,
+	TMS320C3X_R0,
+	TMS320C3X_R1,
+	TMS320C3X_R2,
+	TMS320C3X_R3,
+	TMS320C3X_R4,
+	TMS320C3X_R5,
+	TMS320C3X_R6,
+	TMS320C3X_R7,
+	TMS320C3X_R0F,
+	TMS320C3X_R1F,
+	TMS320C3X_R2F,
+	TMS320C3X_R3F,
+	TMS320C3X_R4F,
+	TMS320C3X_R5F,
+	TMS320C3X_R6F,
+	TMS320C3X_R7F,
+	TMS320C3X_AR0,
+	TMS320C3X_AR1,
+	TMS320C3X_AR2,
+	TMS320C3X_AR3,
+	TMS320C3X_AR4,
+	TMS320C3X_AR5,
+	TMS320C3X_AR6,
+	TMS320C3X_AR7,
+	TMS320C3X_DP,
+	TMS320C3X_IR0,
+	TMS320C3X_IR1,
+	TMS320C3X_BK,
+	TMS320C3X_SP,
+	TMS320C3X_ST,
+	TMS320C3X_IE,
+	TMS320C3X_IF,
+	TMS320C3X_IOF,
+	TMS320C3X_RS,
+	TMS320C3X_RE,
+	TMS320C3X_RC
 };
 
 
@@ -90,9 +90,7 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> tms3203x_device
-
-class tms3203x_device : public cpu_device
+class tms320c3x_device : public cpu_device
 {
 	struct tmsreg
 	{
@@ -119,7 +117,7 @@ class tms3203x_device : public cpu_device
 	};
 
 public:
-	virtual ~tms3203x_device();
+	virtual ~tms320c3x_device();
 
 	// inline configuration helpers
 	void set_mcbl_mode(bool mode) { m_mcbl_mode = mode; }
@@ -137,20 +135,18 @@ public:
 protected:
 	enum
 	{
-		CHIP_TYPE_TMS32030, // 'C30
-		CHIP_TYPE_TMS32031, // 'C31/'VC33
-		CHIP_TYPE_TMS32032  // 'C32
+		CHIP_TYPE_TMS320C30, // 'C30
+		CHIP_TYPE_TMS320C31, // 'C31/'VC33
+		CHIP_TYPE_TMS320C32  // 'C32
 	};
 
 	// construction/destruction
-	tms3203x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, int clock_per_inst, address_map_constructor internal_map);
-	void common_3203x(address_map &map) ATTR_COLD;
+	tms320c3x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, int clock_per_inst, address_map_constructor internal_map);
+	void common_320c3x(address_map &map) ATTR_COLD;
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override;
@@ -785,65 +781,73 @@ protected:
 	devcb_write_line    m_holda_cb;
 
 	// tables
-	static void (tms3203x_device::*const s_tms32031ops[])(uint32_t op);
-	static uint32_t (tms3203x_device::*const s_indirect_d[0x20])(uint32_t, uint8_t);
-	static uint32_t (tms3203x_device::*const s_indirect_1[0x20])(uint32_t, uint8_t);
-	static uint32_t (tms3203x_device::*const s_indirect_1_def[0x20])(uint32_t, uint8_t, uint32_t *&);
+	static void (tms320c3x_device::*const s_tms320c3x_ops[])(uint32_t op);
+	static uint32_t (tms320c3x_device::*const s_indirect_d[0x20])(uint32_t, uint8_t);
+	static uint32_t (tms320c3x_device::*const s_indirect_1[0x20])(uint32_t, uint8_t);
+	static uint32_t (tms320c3x_device::*const s_indirect_1_def[0x20])(uint32_t, uint8_t, uint32_t *&);
 
-#if (TMS_3203X_LOG_OPCODE_USAGE)
+#if TMS320C3X_LOG_OPCODE_USAGE
 	uint32_t              m_hits[0x200*4];
 #endif
 };
 
 
-// ======================> tms32030_device
-
-class tms32030_device : public tms3203x_device
+class tms320c30_device : public tms320c3x_device
 {
 public:
 	// construction/destruction
-	tms32030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void internal_32030(address_map &map) ATTR_COLD;
+	tms320c30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	void internal_320c30(address_map &map) ATTR_COLD;
 };
 
 
-// ======================> tms32031_device
-
-class tms32031_device : public tms3203x_device
+class tms320c31_device : public tms320c3x_device
 {
 public:
 	// construction/destruction
-	tms32031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void internal_32031(address_map &map) ATTR_COLD;
+	tms320c31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	void internal_320c31(address_map &map) ATTR_COLD;
 };
 
 
-// ======================> tms32032_device
-
-class tms32032_device : public tms3203x_device
+class tms320c32_device : public tms320c3x_device
 {
 public:
 	// construction/destruction
-	tms32032_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void internal_32032(address_map &map) ATTR_COLD;
+	tms320c32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	void internal_320c32(address_map &map) ATTR_COLD;
 };
 
 
-// ======================> tms32033_device
-
-class tms32033_device : public tms3203x_device
+class tms320vc33_device : public tms320c3x_device
 {
 public:
 	// construction/destruction
-	tms32033_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void internal_32033(address_map &map) ATTR_COLD;
+	tms320vc33_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	void internal_320vc33(address_map &map) ATTR_COLD;
 };
 
 
 // device type definition
-DECLARE_DEVICE_TYPE(TMS32030, tms32030_device)
-DECLARE_DEVICE_TYPE(TMS32031, tms32031_device)
-DECLARE_DEVICE_TYPE(TMS32032, tms32032_device)
-DECLARE_DEVICE_TYPE(TMS32033, tms32033_device)
+DECLARE_DEVICE_TYPE(TMS320C30,  tms320c30_device)
+DECLARE_DEVICE_TYPE(TMS320C31,  tms320c31_device)
+DECLARE_DEVICE_TYPE(TMS320C32,  tms320c32_device)
+DECLARE_DEVICE_TYPE(TMS320VC33, tms320vc33_device)
 
-#endif // MAME_CPU_TMS32031_TMS32031_H
+#endif // MAME_CPU_TMS320C3X_TMS320C3X_H

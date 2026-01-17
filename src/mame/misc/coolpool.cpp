@@ -11,7 +11,7 @@
 
     The main CPU is a TMS34010; it is encrypted in 9 Ball Shootout.
 
-    The second CPU in Ameri Darts is a TMS32015; it controls sound and
+    The second CPU in Ameri Darts is a TMS320C15; it controls sound and
     the trackball inputs.
 
     The second CPU in Cool Pool and 9 Ball Shootout is a TMS320C26; the code
@@ -29,8 +29,8 @@
 
 #include "emu.h"
 
-#include "cpu/tms32010/tms32010.h"
-#include "cpu/tms32025/tms32025.h"
+#include "cpu/tms320c1x/tms320c1x.h"
+#include "cpu/tms320c2x/tms320c2x.h"
 #include "cpu/tms34010/tms34010.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
@@ -537,7 +537,7 @@ uint16_t amerdart_state::amerdart_trackball_r(offs_t offset)
 /*
     Trackballs seem to be handled as though they're rotated 45 degrees anti-clockwise.
 
-    Sensor data as shown on Input test screen and associated bits read by TMS32015 DSP port:
+    Sensor data as shown on Input test screen and associated bits read by TMS320C15 DSP port:
     xxyy xxyy ???? ????
     |||| |||| |||| ||||
     |||| |||| ++++-++++-- Unused
@@ -784,7 +784,7 @@ void amerdart_state::dsp_pgm_map(address_map &map)
 {
 	map(0x000, 0x0fff).rom();
 }
-	// 000 - 0FF  TMS32015 Internal Data RAM (256 words) in Data Address Space
+	// 000 - 0FF  TMS320C15 Internal Data RAM (256 words) in Data Address Space
 
 
 void amerdart_state::dsp_io_map(address_map &map)
@@ -940,7 +940,7 @@ void amerdart_state::amerdart(machine_config &config)
 	m_maincpu->set_shiftreg_in_callback(FUNC(amerdart_state::to_shiftreg));
 	m_maincpu->set_shiftreg_out_callback(FUNC(amerdart_state::from_shiftreg));
 
-	tms32015_device &dsp(TMS32015(config, m_dsp, XTAL(40'000'000)/2));
+	tms320c15_device &dsp(TMS320C15(config, m_dsp, XTAL(40'000'000)/2));
 	dsp.set_addrmap(AS_PROGRAM, &amerdart_state::dsp_pgm_map);
 	// Data Map is internal to the CPU
 	dsp.set_addrmap(AS_IO, &amerdart_state::dsp_io_map);
@@ -981,7 +981,7 @@ void _9ballsht_state::_9ballsht(machine_config &config)
 	m_maincpu->set_shiftreg_in_callback(FUNC(_9ballsht_state::to_shiftreg));
 	m_maincpu->set_shiftreg_out_callback(FUNC(_9ballsht_state::from_shiftreg));
 
-	tms32026_device& dsp(TMS32026(config, m_dsp, XTAL(40'000'000)));
+	tms320c26_device& dsp(TMS320C26(config, m_dsp, XTAL(40'000'000)));
 	dsp.set_addrmap(AS_PROGRAM, &_9ballsht_state::dsp_pgm_map);
 	dsp.set_addrmap(AS_IO, &_9ballsht_state::nballsht_dsp_io_map);
 	dsp.bio_in_cb().set(FUNC(_9ballsht_state::dsp_bio_line_r));
@@ -1041,10 +1041,10 @@ ROM_START( amerdart ) // You need to check the sum16 values listed on the labels
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u57 6016", 0x080001, 0x10000, CRC(f620f935) SHA1(bf891fce1f04f3ad5b8b72d43d041ceacb0b65bc) ) // Different then set 2 or 3
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 48af", 0x080000, 0x10000, CRC(f1b3d7c4) SHA1(7b897230d110be7a5eb05eda927d00561ebb9ce3) ) // Different then set 2 or 3
 
-	ROM_REGION( 0x10000, "dsp", 0 ) // TMS32015 code
+	ROM_REGION( 0x10000, "dsp", 0 ) // TMS320C15 code
 	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) // Passes internal checksum routine
 
-	ROM_REGION( 0x100000, "dspdata", 0 )              // TMS32015 audio sample data
+	ROM_REGION( 0x100000, "dspdata", 0 )              // TMS320C15 audio sample data
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 4461",  0x000000, 0x10000, CRC(3f459482) SHA1(d9d489efd0d9217fceb3bf1a3b37a78d6823b4d9) ) // Different then set 2 or 3
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u16 abd6", 0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u2 cae4",  0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
@@ -1076,10 +1076,10 @@ ROM_START( amerdart2 ) // You need to check the sum16 values listed on the label
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u57 1a0c", 0x080001, 0x10000, CRC(8a70f849) SHA1(dfd4cf90de2ab8cbeff458f0fd20110c1ed009e9) ) // Different then set 1 or 3
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 0d81", 0x080000, 0x10000, CRC(8bb81975) SHA1(b7666572ab543991c7deaa0ebefb8b4526a7e386) ) // Different then set 1 or 3
 
-	ROM_REGION( 0x10000, "dsp", 0 ) // TMS32015 code
+	ROM_REGION( 0x10000, "dsp", 0 ) // TMS320C15 code
 	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) // Passes internal checksum routine
 
-	ROM_REGION( 0x100000, "dspdata", 0 )              // TMS32015 audio sample data
+	ROM_REGION( 0x100000, "dspdata", 0 )              // TMS320C15 audio sample data
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 222f",  0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) ) // Different then set 1
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u16 abd6", 0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u2 cae4",  0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
@@ -1111,10 +1111,10 @@ ROM_START( amerdart3 ) // You need to check the sum16 values listed on the label
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u57 4cac", 0x080001, 0x10000, CRC(2d653c7b) SHA1(0feebe6440aabe844049013aa063ed0259b7bec4) ) // Different then set 2 or 3
 	ROM_LOAD16_BYTE( "ameri corp copyright 1989 u58 729e", 0x080000, 0x10000, CRC(8cef479a) SHA1(80002e215416a11ff071523ee67218a1aabe155b) ) // Different then set 2 or 3
 
-	ROM_REGION( 0x10000, "dsp", 0 ) // TMS32015 code
+	ROM_REGION( 0x10000, "dsp", 0 ) // TMS320C15 code
 	ROM_LOAD16_WORD( "tms320e15.bin", 0x0000, 0x2000, CRC(375db4ea) SHA1(11689c89ce62f44f43cb8973b4ec6e6b0024ed14) ) // Passes internal checksum routine
 
-	ROM_REGION( 0x100000, "dspdata", 0 )              // TMS32015 audio sample data
+	ROM_REGION( 0x100000, "dspdata", 0 )              // TMS320C15 audio sample data
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u1 222f",  0x000000, 0x10000, CRC(e2bb7f54) SHA1(39eeb61a852b93331f445cc1c993727e52959660) ) // Same as set 2
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u16 abd6", 0x010000, 0x10000, CRC(7437e8bf) SHA1(754be4822cd586590f09e706d7eb48e5ba8c8817) )
 	ROM_LOAD16_WORD( "ameri corp copyright 1989 u2 cae4",  0x020000, 0x10000, CRC(a587fffd) SHA1(f33f511d1bf1d6eb3c42535593a9718571174c4b) )
@@ -1161,7 +1161,7 @@ ROM_START( coolpool )
 	ROM_LOAD16_BYTE( "u34",          0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "u35",          0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x200000, "dspdata", 0 )  // TMS32026 data
+	ROM_REGION( 0x200000, "dspdata", 0 )  // TMS320C26 data
 	ROM_LOAD( "u17c",         0x000000, 0x40000, CRC(ea3cc41d) SHA1(e703e789dfbcfaec878a990031ce839164c51253) )
 	ROM_LOAD( "u16c",         0x040000, 0x40000, CRC(2e6680ea) SHA1(cb30dc789039aab491428d075fee9e0bc04fd2ce) )
 	ROM_LOAD( "u15c",         0x080000, 0x40000, CRC(8e5f248e) SHA1(a954d3c20dc0b70f83c4c238db30a33285fcb353) )
@@ -1186,7 +1186,7 @@ ROM_START( 9ballsht )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x100000, "dspdata", 0 )  // TMS32026 data
+	ROM_REGION( 0x100000, "dspdata", 0 )  // TMS320C26 data
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
 	ROM_LOAD( "u53",          0x80000, 0x80000, CRC(d401805d) SHA1(f4bcb2bdc45c3bc5ca423e518cdea8b3a7e8d60e) )
 ROM_END
@@ -1208,7 +1208,7 @@ ROM_START( 9ballsht2 )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x100000, "dspdata", 0 )  // TMS32026 data
+	ROM_REGION( 0x100000, "dspdata", 0 )  // TMS320C26 data
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
 	ROM_LOAD( "u53",          0x80000, 0x80000, CRC(d401805d) SHA1(f4bcb2bdc45c3bc5ca423e518cdea8b3a7e8d60e) )
 ROM_END
@@ -1226,7 +1226,7 @@ ROM_START( 9ballsht3 )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x100000, "dspdata", 0 )  // TMS32026 data
+	ROM_REGION( 0x100000, "dspdata", 0 )  // TMS320C26 data
 	ROM_LOAD( "u54",          0x00000, 0x80000, CRC(1be5819c) SHA1(308b5b1fe05634419d03956ae1b2e5a61206900f) )
 	ROM_LOAD( "u53",          0x80000, 0x80000, CRC(d401805d) SHA1(f4bcb2bdc45c3bc5ca423e518cdea8b3a7e8d60e) )
 ROM_END
@@ -1246,7 +1246,7 @@ ROM_START( 9ballshtc )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 89bc.u34", 0x00000, 0x08000, CRC(dc1df70b) SHA1(e42fa7e34e50e0bd2aaeea5c55d750ed3286610d) )
 	ROM_LOAD16_BYTE( "e-scape =c=1994 af4a.u35", 0x00001, 0x08000, CRC(ac999431) SHA1(7e4c2dcaedcb7e7c67072a179e4b8488d2bbdac7) )
 
-	ROM_REGION( 0x100000, "dspdata", 0 )  // TMS32026 data
+	ROM_REGION( 0x100000, "dspdata", 0 )  // TMS320C26 data
 	ROM_LOAD( "e-scape =c=1994 0000.u54", 0x00000, 0x80000, CRC(04b509a0) SHA1(093343741a3d8d0786fd443e68dd85b414c6cf9e) )
 	ROM_LOAD( "e-scape =c=1994 2df8.u53", 0x80000, 0x80000, CRC(c8a7b576) SHA1(7eb71dd791fdcbfe71764a454f0a1d3130d8a57e) )
 ROM_END

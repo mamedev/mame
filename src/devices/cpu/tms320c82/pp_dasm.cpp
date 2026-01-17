@@ -1,13 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
-// TMS32082 PP Disassembler
+// TMS320C82 Parallel Processor Disassembler
 
 #include "emu.h"
-#include "dis_pp.h"
+#include "pp_dasm.h"
 
-#define ROTATE_L(x, r) ((x << r) | (x >> (32-r)))
 
-std::string tms32082_pp_disassembler::get_reg_name(int reg, bool read)
+std::string tms320c82_pp_disassembler::get_reg_name(int reg, bool read)
 {
 	switch (reg)
 	{
@@ -85,7 +84,7 @@ std::string tms32082_pp_disassembler::get_reg_name(int reg, bool read)
 	}
 }
 
-char const *const tms32082_pp_disassembler::CONDITION_CODES[16] =
+char const *const tms320c82_pp_disassembler::CONDITION_CODES[16] =
 {
 	"u",     "p",     "ls",    "hi",
 	"lt",    "le",    "ge",    "gt",
@@ -93,12 +92,12 @@ char const *const tms32082_pp_disassembler::CONDITION_CODES[16] =
 	"v",     "nv",    "n",     "nn"
 };
 
-char const *const tms32082_pp_disassembler::TRANSFER_SIZE[4] =
+char const *const tms320c82_pp_disassembler::TRANSFER_SIZE[4] =
 {
 	"b:", "h:", "w:", ""
 };
 
-std::string tms32082_pp_disassembler::make_ea(int mode, int areg, bool scale, int size, int offset, int xreg)
+std::string tms320c82_pp_disassembler::make_ea(int mode, int areg, bool scale, int size, int offset, int xreg)
 {
 	std::string offset_text;
 	if (scale)
@@ -130,7 +129,7 @@ std::string tms32082_pp_disassembler::make_ea(int mode, int areg, bool scale, in
 	return "";
 }
 
-std::string tms32082_pp_disassembler::make_mem_transfer(int mode, int dst, int a, bool scale, int size, int le, int imm, int x)
+std::string tms320c82_pp_disassembler::make_mem_transfer(int mode, int dst, int a, bool scale, int size, int le, int imm, int x)
 {
 	std::string transfer_text;
 
@@ -153,7 +152,7 @@ std::string tms32082_pp_disassembler::make_mem_transfer(int mode, int dst, int a
 	return transfer_text;
 }
 
-std::string tms32082_pp_disassembler::make_condition(int cond, int ncvz)
+std::string tms320c82_pp_disassembler::make_condition(int cond, int ncvz)
 {
 	std::string condition;
 
@@ -185,7 +184,7 @@ std::string tms32082_pp_disassembler::make_condition(int cond, int ncvz)
 }
 
 
-std::string tms32082_pp_disassembler::make_field_move(bool d, bool e, int size, int itm)
+std::string tms320c82_pp_disassembler::make_field_move(bool d, bool e, int size, int itm)
 {
 	std::string field;
 	if (d)
@@ -212,7 +211,7 @@ std::string tms32082_pp_disassembler::make_field_move(bool d, bool e, int size, 
 }
 
 
-void tms32082_pp_disassembler::parallel_transfer(uint64_t op)
+void tms320c82_pp_disassembler::parallel_transfer(uint64_t op)
 {
 	int lbits = (op >> 37) & 3;
 	int gbits = (op >> 15) & 3;
@@ -454,7 +453,7 @@ void tms32082_pp_disassembler::parallel_transfer(uint64_t op)
 	}
 }
 
-std::string tms32082_pp_disassembler::format_alu_op(int aluop, int a, const std::string& dst_text, std::string& a_text, std::string& b_text, std::string& c_text)
+std::string tms320c82_pp_disassembler::format_alu_op(int aluop, int a, const std::string& dst_text, std::string& a_text, std::string& b_text, std::string& c_text)
 {
 	if (a)      // arithmetic
 	{
@@ -554,12 +553,12 @@ std::string tms32082_pp_disassembler::format_alu_op(int aluop, int a, const std:
 	return std::string("");
 }
 
-u32 tms32082_pp_disassembler::opcode_alignment() const
+u32 tms320c82_pp_disassembler::opcode_alignment() const
 {
 	return 8;
 }
 
-offs_t tms32082_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t tms320c82_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
 
@@ -723,7 +722,7 @@ offs_t tms32082_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, co
 							case 7:
 								a_text = util::string_format("%s", get_reg_name(s1reg, true));
 								//b_text = util::string_format("1\\\\0x%02X", src2imm);
-								b_text = util::string_format("0x%08X", ROTATE_L(1, src2imm));
+								b_text = util::string_format("0x%08X", rotl_32(1, src2imm));
 								c_text = util::string_format("0x%02X", src2imm);
 								break;
 						}
@@ -854,7 +853,7 @@ offs_t tms32082_pp_disassembler::disassemble(std::ostream &stream, offs_t pc, co
 							case 7:
 								a_text = util::string_format("%s", get_reg_name(s1reg, true));
 								//b_text = util::string_format("1\\\\0x%08X", imm32);
-								b_text = util::string_format("%08X", ROTATE_L(1, imm32));
+								b_text = util::string_format("%08X", rotl_32(1, imm32));
 								c_text = util::string_format("0x%08X", imm32);
 								break;
 						}

@@ -2,10 +2,10 @@
 // copyright-holders:Ville Linde
 
 #include "emu.h"
-#include "dis32051.h"
+#include "tms320c5x_dasm.h"
 
 
-const char *const tms32051_disassembler::zl_condition_codes[] =
+const char *const tms320c5x_disassembler::zl_condition_codes[] =
 {
 	// bit 3, 2 (ZL), bit 1, 0 (MASK)
 	"",             // Z=0, L=0, ZM=0, ZL=0
@@ -26,7 +26,7 @@ const char *const tms32051_disassembler::zl_condition_codes[] =
 	"leq",          // Z=1, L=1, ZM=1, ZL=1
 };
 
-const char *const tms32051_disassembler::cv_condition_codes[16] =
+const char *const tms320c5x_disassembler::cv_condition_codes[16] =
 {
 	"",             // V=0, C=0, VM=0, CM=0
 	"nc",           // V=0, C=0, VM=0, CM=1
@@ -46,7 +46,7 @@ const char *const tms32051_disassembler::cv_condition_codes[16] =
 	"c ov",         // V=1, C=1, VM=1, CM=1
 };
 
-const char *const tms32051_disassembler::tp_condition_codes[4] =
+const char *const tms320c5x_disassembler::tp_condition_codes[4] =
 {
 	"bio",
 	"tc",
@@ -54,12 +54,12 @@ const char *const tms32051_disassembler::tp_condition_codes[4] =
 	""
 };
 
-uint16_t tms32051_disassembler::FETCH(offs_t &npc, const data_buffer &opcodes)
+uint16_t tms320c5x_disassembler::FETCH(offs_t &npc, const data_buffer &opcodes)
 {
 	return opcodes.r16(npc++);
 }
 
-std::string tms32051_disassembler::GET_ADDRESS(int addr_mode, int address)
+std::string tms320c5x_disassembler::GET_ADDRESS(int addr_mode, int address)
 {
 	if (addr_mode)      // Indirect addressing
 	{
@@ -92,7 +92,7 @@ std::string tms32051_disassembler::GET_ADDRESS(int addr_mode, int address)
 	}
 }
 
-std::string tms32051_disassembler::GET_SHIFT(int shift)
+std::string tms320c5x_disassembler::GET_SHIFT(int shift)
 {
 	if (shift > 0)
 	{
@@ -104,7 +104,7 @@ std::string tms32051_disassembler::GET_SHIFT(int shift)
 	}
 }
 
-void tms32051_disassembler::print_condition_codes(bool pp, int zl, int cv, int tp)
+void tms320c5x_disassembler::print_condition_codes(bool pp, int zl, int cv, int tp)
 {
 	if (*(zl_condition_codes[zl]) != 0)
 	{
@@ -128,7 +128,7 @@ void tms32051_disassembler::print_condition_codes(bool pp, int zl, int cv, int t
 	}
 }
 
-uint32_t tms32051_disassembler::dasm_group_be(uint16_t opcode, offs_t &npc, const data_buffer &opcodes)
+uint32_t tms320c5x_disassembler::dasm_group_be(uint16_t opcode, offs_t &npc, const data_buffer &opcodes)
 {
 	int subop = opcode & 0xff;
 	uint32_t flags = 0;
@@ -216,7 +216,7 @@ uint32_t tms32051_disassembler::dasm_group_be(uint16_t opcode, offs_t &npc, cons
 	return flags;
 }
 
-void tms32051_disassembler::dasm_group_bf(uint16_t opcode, offs_t &npc, const data_buffer &opcodes)
+void tms320c5x_disassembler::dasm_group_bf(uint16_t opcode, offs_t &npc, const data_buffer &opcodes)
 {
 	int subop = (opcode >>  4) & 0xf;
 	int shift = opcode & 0xf;
@@ -260,12 +260,12 @@ void tms32051_disassembler::dasm_group_bf(uint16_t opcode, offs_t &npc, const da
 	}
 }
 
-u32 tms32051_disassembler::opcode_alignment() const
+u32 tms320c5x_disassembler::opcode_alignment() const
 {
 	return 1;
 }
 
-offs_t tms32051_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t tms320c5x_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	uint32_t flags = 0;
 	uint16_t opcode;
