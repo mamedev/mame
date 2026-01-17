@@ -200,6 +200,38 @@ float core_options::entry::float_value() const
 
 
 //-------------------------------------------------
+//  entry::int_default_value
+//-------------------------------------------------
+
+int core_options::entry::int_default_value() const
+{
+	std::istringstream str(default_value());
+	str.imbue(std::locale::classic());
+	int ival;
+	if (str >> ival)
+		return ival;
+	else
+		return 0;
+}
+
+
+//-------------------------------------------------
+//  entry::float_default_value
+//-------------------------------------------------
+
+float core_options::entry::float_default_value() const
+{
+	std::istringstream str(default_value());
+	str.imbue(std::locale::classic());
+	float fval;
+	if (str >> fval)
+		return fval;
+	else
+		return 0.0F;
+}
+
+
+//-------------------------------------------------
 //  entry::copy_from
 //-------------------------------------------------
 
