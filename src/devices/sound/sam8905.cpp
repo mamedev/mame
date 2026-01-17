@@ -6,10 +6,11 @@
 
 DEFINE_DEVICE_TYPE(SAM8905, sam8905_device, "sam8905", "Dream SAM8905")
 
-sam8905_device::sam8905_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+sam8905_device::sam8905_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t buffer_size)
 	: device_t(mconfig, SAM8905, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
+	, m_buffer_size(buffer_size)
 	, m_waveform_read(*this, 0)
 	, m_waveform_write(*this)
 	, m_sample_output(*this)
@@ -21,7 +22,7 @@ void sam8905_device::device_start()
 	m_aram = std::make_unique<uint16_t[]>(256);
 	m_dram = std::make_unique<uint32_t[]>(256);
 
-	m_stream = stream_alloc(0, 2, clock() / 1024); // Placeholder sample rate logic
+	m_stream = stream_alloc(0, 2, clock() / m_buffer_size); // Placeholder sample rate logic
 
 	// Initialize master-slave mode
 	m_slave_mode = false;

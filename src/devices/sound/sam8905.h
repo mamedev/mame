@@ -8,7 +8,7 @@
 class sam8905_device : public device_t, public device_sound_interface
 {
 public:
-	sam8905_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sam8905_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t buffer_size = 1024);
 
 	// CPU interface
 	void write(offs_t offset, uint8_t data);
@@ -48,6 +48,7 @@ private:
 
 	// State
 	sound_stream *m_stream;
+	uint32_t m_buffer_size;
 	std::unique_ptr<uint16_t[]> m_aram; // 256 x 15-bit micro-instructions
 	std::unique_ptr<uint32_t[]> m_dram; // 256 x 19-bit parameters
 	uint8_t m_control_reg;
