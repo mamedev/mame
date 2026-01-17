@@ -73,9 +73,7 @@ void ymball_state::data_map(address_map &map)
 // void ymball_state::ymball_adpcm_bank(uint8_t data)
 // {
 // m_oki->set_rom_bank(data & 0x03);
-/ }
-
-
+// }
 
 void ymball_state::machine_start()
 {
