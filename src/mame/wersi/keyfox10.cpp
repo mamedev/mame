@@ -121,9 +121,12 @@ private:
     u8 m_port3 = 0xff;
     u8 m_midi_rxd = 1;  // MIDI RX bit (idle high)
 
-    // FX SAM input samples (from sound SAM via 74HC595 shift registers)
-    int16_t m_fx_input_l = 0;
-    int16_t m_fx_input_r = 0;
+    // FX SAM input ring buffer (from sound SAM via 74HC595 shift registers)
+    // SND chip writes at 44kHz, FX chip reads at 22kHz
+    static constexpr size_t FX_INPUT_RING_SIZE = 4096;
+    std::unique_ptr<int16_t[]> m_fx_input_ring;
+    size_t m_fx_input_write_pos = 0;
+    size_t m_fx_input_read_pos = 0;
 
     // FX SAM 32KB SRAM for delay/reverb buffers
     std::unique_ptr<uint8_t[]> m_fx_sram;
@@ -883,8 +886,14 @@ void keyfox10_state::machine_start()
     m_fx_sram = std::make_unique<uint8_t[]>(FX_SRAM_SIZE);
     std::fill_n(m_fx_sram.get(), FX_SRAM_SIZE, 0);
 
+    // Initialize FX input ring buffer (SND -> FX sample transfer)
+    m_fx_input_ring = std::make_unique<int16_t[]>(FX_INPUT_RING_SIZE);
+    std::fill_n(m_fx_input_ring.get(), FX_INPUT_RING_SIZE, 0);
+    m_fx_input_write_pos = 0;
+    m_fx_input_read_pos = 0;
+
     // Set FX chip to slave mode - it runs synchronized with SND chip
-    m_sam_fx->set_slave_mode(true);
+    // m_sam_fx->set_slave_mode(true);
 
     // Save state
     save_item(NAME(m_port0));
@@ -893,8 +902,9 @@ void keyfox10_state::machine_start()
     save_item(NAME(m_port3));
     save_item(NAME(m_midi_rxd));
     save_item(NAME(m_disp_sr));
-    save_item(NAME(m_fx_input_l));
-    save_item(NAME(m_fx_input_r));
+    save_pointer(NAME(m_fx_input_ring), FX_INPUT_RING_SIZE);
+    save_item(NAME(m_fx_input_write_pos));
+    save_item(NAME(m_fx_input_read_pos));
     save_pointer(NAME(m_fx_sram), FX_SRAM_SIZE);
     save_item(NAME(m_panel_sr));
     save_item(NAME(m_panel_latch));
@@ -1083,30 +1093,32 @@ u16 keyfox10_state::sam_snd_waveform_r(offs_t offset)
 }
 
 // Callback from sound SAM: captures L/R samples for FX SAM input
-// Master-slave sync: SND chip triggers FX chip to process one frame
+// Writes samples to ring buffer for FX chip to read via waveform callback
 void keyfox10_state::sam_snd_sample_out(uint32_t data)
 {
-    // Unpack L/R from 32-bit value: upper 16 = L, lower 16 = R
-    m_fx_input_l = int16_t(data >> 16);
-    m_fx_input_r = int16_t(data & 0xFFFF);
-
     // HACK FX CHIP TAKES TWICE AS LONG TO PROCESS ONE FRAME
-    static int snd_even_odd = 0;
-    if ((snd_even_odd++ & 1) == 1) {
-        return;
-    }
+    // static int snd_even_odd = 0;
+    // if ((snd_even_odd++ & 1) == 1) {
+    //     return;
+    // }
+
+    // Unpack L/R from 32-bit value: upper 16 = L, lower 16 = R
+    // For now we only use R channel (mono reverb input)
+    int16_t sample_r = int16_t(data & 0xFFFF);
+
+    // Push sample to ring buffer
+    m_fx_input_ring[m_fx_input_write_pos] = sample_r;
+    m_fx_input_write_pos = (m_fx_input_write_pos + 1) % FX_INPUT_RING_SIZE;
+
+    m_fx_input_ring[m_fx_input_write_pos] = sample_r;
+    m_fx_input_write_pos = (m_fx_input_write_pos + 1) % FX_INPUT_RING_SIZE;
 
     // Debug: trace non-zero input samples
     static int snd_out_trace = 0;
-    if ((m_fx_input_l != 0 || m_fx_input_r != 0) && snd_out_trace < 50) {
-        logerror("SND sample_out: L=%d R=%d\n", m_fx_input_l, m_fx_input_r);
+    if (sample_r != 0 && snd_out_trace < 50) {
+        logerror("SND sample_out: R=%d write_pos=%zu\n", sample_r, m_fx_input_write_pos);
         snd_out_trace++;
     }
-
-    // Trigger FX chip to process one frame synchronously
-    // FX chip reads m_fx_input_l/r via waveform_read callback when WA19=1
-    int32_t fx_out_l, fx_out_r;
-    m_sam_fx->process_frame(fx_out_l, fx_out_r);
 }
 
 // FX SAM external SRAM write callback
@@ -1138,59 +1150,45 @@ void keyfox10_state::sam_fx_waveform_w(offs_t offset, u16 data)
 
 u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
 {
-    // Check WA19 (bit 19) - if set, return input from sound SAM via 74HC595 shift registers
+    // Check WA19 (bit 19) - if set, return input from sound SAM via ring buffer
     // WA[19:0] = { WAVE[7:0], PHI[11:0] }
-    // When WA19=1 (WAVE[7]=1, i.e., WF >= 0x80), reads from shift registers
-    // WA0 (PHI[0]) selects channel: 0=Left, 1=Right
+    // When WA19=1 (WAVE[7]=1, i.e., WF >= 0x80), reads from input buffer
+    // PHI[0] selects byte: 0=high byte, 1=low byte of 16-bit sample
     if (offset & 0x80000)  // WA19 set - read input sample
     {
-#if 0 // WRONG!
-        // Return sound SAM output sample for FX processing
-        // Hardware: Two 74HC595 shift registers (IC22, IC23) - 16 bits total
-        // The shift registers hold one sample (either L or R from SND at 44kHz)
-        // FX reads at 22kHz, getting the current sample in the registers
-        //
-        // For now: PHI[0] (WA0) selects which stored value to read
-        // TODO: verify actual L/R timing relationship between SND and FX
-        bool is_right = (offset & 1);
-        int16_t sample = is_right ? m_fx_input_r : m_fx_input_l;
+        // Read current sample from ring buffer
+        int16_t sample = m_fx_input_ring[m_fx_input_read_pos];
 
-        // Hardware emulation: shift registers provide 8 bits at WDH10:WDH3
-        // Take upper 8 bits of 16-bit sample (same as SRAM: only 8 bits stored)
-        int8_t sample_8bit = sample >> 8;
-#endif
-        int16_t sample = m_fx_input_r;
+        // PHI[0] selects byte: 0=high byte, 1=low byte
         uint8_t sample_8bit;
         if (offset & 1) {
+            // Low byte - also advance to next sample after reading
             //sample_8bit = sample & 0xFF;
             sample_8bit = (sample >> 8) & 0xFF;
+            m_fx_input_read_pos = (m_fx_input_read_pos + 1) % FX_INPUT_RING_SIZE;
         }
         else
         {
-            // High byte (sign-extended)
+            // High byte
             //sample_8bit = (sample >> 8) & 0xFF;
             sample_8bit = sample & 0xFF;
-
-            // Sign-extend 8-bit to 12-bit
-            // if (sample_8bit & 0x80)
-            //     sample_8bit |= 0xF00;
         }
-        // Place 8-bit value at bits 10:3, bits 2:0 are grounded (always 0)
-        int16_t result = ((int16_t)sample_8bit) << 3;
 
-        // Sign extend bit 10 to bit 11 (for proper signed audio)
-        // NOTE: Hardware may have asymmetric sign extension for L vs R,
-        // but that would break audio. Applying symmetric extension for now.
-        // if ((offset & 1) == 0 && (result & 0x400))
-        //      result |= 0x800;
-        if ((offset & 1) == 1 && (sample_8bit & 0x80))
-             result |= 0x800;
+        // Place 8-bit value at bits 10:3, bits 2:0 are grounded (always 0)
+        int16_t result = ((int16_t)(int8_t)sample_8bit) << 3;
+
+        // if ((offset & 1) == 0 && (sample_8bit & 0x80)) {
+        //     result |= 0x800;
+        // }
+        if ((offset & 1) == 1 && (sample_8bit & 0x80)) {
+            result |= 0x800;
+        }
 
         // Debug: log non-zero input sample reads
         static int fx_input_log_count = 0;
         if (sample != 0 && fx_input_log_count < 100) {
-            logerror("FX input read: WA=%05X raw=%d 8bit=%d result=%d\n",
-                offset, sample, sample_8bit, (int16_t)result);
+            logerror("FX input read: WA=%05X raw=%d 8bit=%d result=%d read_pos=%zu\n",
+                offset, sample, (int8_t)sample_8bit, (int16_t)result, m_fx_input_read_pos);
             fx_input_log_count++;
         }
 
@@ -1413,8 +1411,8 @@ void keyfox10_state::keyfox10(machine_config &config)
     SAM8905(config, m_sam_fx, 22'579'200);
     m_sam_fx->waveform_read_callback().set(FUNC(keyfox10_state::sam_fx_waveform_r));
     m_sam_fx->waveform_write_callback().set(FUNC(keyfox10_state::sam_fx_waveform_w));
-    m_sam_fx->add_route(0, "lspeaker", 1.0);  // Wet L
-    m_sam_fx->add_route(1, "rspeaker", 1.0);  // Wet R
+    m_sam_fx->add_route(0, "lspeaker", 0.3);  // Wet L
+    m_sam_fx->add_route(1, "rspeaker", 0.3);  // Wet R
 
     // 7-segment display layout
     config.set_default_layout(layout_keyfox10);
