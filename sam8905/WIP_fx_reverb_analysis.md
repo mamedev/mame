@@ -826,9 +826,37 @@ return s.l_acc >> 8, s.r_acc >> 8
 
 **Result:** The >> 4 output hack is no longer needed. Output produces clean reverb without clipping.
 
+### SRAM Address Mapping Fix (FIXED 2026-01-17)
+
+**Problem:** SRAM addresses were calculated incorrectly, losing PHI resolution.
+
+**Old formula (wrong):**
+```cpp
+sram_addr = ((WF & 0x7F) << 8) | ((PHI >> 4) & 0xFF);  // 7+8 = 15 bits, but loses PHI[3:0]
+```
+
+**Root cause:** The formula used a right-shifted PHI, losing the lower 4 bits. This gave only
+256 unique delay positions instead of the full 32KB SRAM capacity.
+
+**Fix:** SRAM WA0-WA14 connects directly to the lower 15 bits of SAM's 20-bit address bus.
+```cpp
+// Correct: lower 15 bits of (WF << 12 | PHI)
+sram_addr = ((WF & 0x7) << 12) | (PHI & 0xFFF);  // 3+12 = 15 bits, full PHI resolution
+```
+
+**Code changes:**
+- `sam8905.cpp`: WWE write address calculation
+- `keyfox10.cpp`: SRAM read address calculation
+- `sam8905_interpreter.py`: WWE write address calculation
+
+**Verification:**
+- Before: 256 SRAM entries, address range 0x0200-0x02FF
+- After: 2048 SRAM entries, address range 0x2002-0x2FFF
+- Output level changed from [-470, +953] to [-52, +54] (correct diffusion spreading)
+
 ## Open Questions
 
-- [ ] Exact SRAM address mapping (bits 18-10 of WWF?)
+- [x] ~~Exact SRAM address mapping~~ Fixed: (WF[2:0] << 12) | PHI[11:0]
 - [ ] Feedback path routing between slots
 - [x] ~~How do idle slots (0-3, 12-15) contribute to SRAM buffer management?~~ They don't - truly inactive
 - [ ] Reverb time/decay control mechanism
@@ -943,10 +971,40 @@ to analyze and debug individual algorithms without running the full MAME emulato
 
 ### Setup
 
+**Start Jupyter server:**
 ```bash
 cd sam8905
-jupyter notebook
-# Open notebooks/reverb_fx_alg*.ipynb
+jupyter lab --port=8889 --IdentityProvider.token=MY_TOKEN
+```
+
+**Open notebooks manually:**
+Navigate to http://localhost:8889 and open `notebooks/reverb_fx_alg*.ipynb`
+
+**Claude Code MCP integration:**
+Add to `.claude.json` or MCP config:
+```json
+{
+  "mcpServers": {
+    "jupyter": {
+      "command": "uvx",
+      "args": ["jupyter-mcp-server@latest"],
+      "env": {
+        "JUPYTER_URL": "http://localhost:8889",
+        "JUPYTER_TOKEN": "MY_TOKEN",
+        "ALLOW_IMG_OUTPUT": "true"
+      }
+    }
+  }
+}
+```
+
+Then use MCP tools to interact with notebooks:
+```
+mcp__jupyter__use_notebook - Connect to a notebook
+mcp__jupyter__read_notebook - List cells
+mcp__jupyter__read_cell - Read specific cell
+mcp__jupyter__execute_cell - Run a cell
+mcp__jupyter__overwrite_cell_source - Edit cell content
 ```
 
 ### Available Notebooks

@@ -173,12 +173,12 @@ std::pair<std::error_condition, std::string> midiin_device::call_load()
 	if (!err)
 	{
 		// if the parsing succeeds, schedule the start to happen at least
-		// 10 seconds after starting to allow the keyboards to initialize
+		// 2 seconds after starting to allow the keyboards to initialize
 		// TODO: this should perhaps be a driver-configurable parameter?
 		err = m_sequence.parse(image_core_file(), length());
 		if (!err)
 		{
-			m_sequence_start = std::max(machine().time(), attotime(10, 0));
+			m_sequence_start = std::max(machine().time(), attotime(2, 0));
 			m_timer->adjust(attotime::zero);
 		}
 		return std::make_pair(err, std::string());

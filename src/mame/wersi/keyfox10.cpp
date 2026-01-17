@@ -1389,8 +1389,8 @@ void keyfox10_state::keyfox10(machine_config &config)
     SAM8905(config, m_sam_fx, 22'579'200, 1024);
     m_sam_fx->waveform_read_callback().set(FUNC(keyfox10_state::sam_fx_waveform_r));
     m_sam_fx->waveform_write_callback().set(FUNC(keyfox10_state::sam_fx_waveform_w));
-    m_sam_fx->add_route(0, "lspeaker", 0.5);  // Wet L
-    m_sam_fx->add_route(1, "rspeaker", 0.5);  // Wet R
+    m_sam_fx->add_route(0, "lspeaker", 1.0);  // Wet L
+    m_sam_fx->add_route(1, "rspeaker", 1.0);  // Wet R
 
     // 7-segment display layout
     config.set_default_layout(layout_keyfox10);

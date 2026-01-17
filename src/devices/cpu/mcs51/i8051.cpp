@@ -59,7 +59,8 @@
 #include <tuple>
 
 #define LOG_RX (1U << 1)
-#define LOG_TX (1U << 2)
+#define LOG_TX 0
+//(1U << 2)
 
 #define VERBOSE (LOG_TX)
 

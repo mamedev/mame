@@ -169,7 +169,7 @@ FIXME check if this is correct in the implementation
 - E [18]
 - WAVE [17:9]
   - INT/EXT [17]
-  - EXT_MEM_WAVE [16:9]
+  - EXT_MEM_WAVE [16:9] 8bit - (does this mean one can select only 256 wave periods???)
   - R [16]
   - I [15]
   - SEL [14:13]

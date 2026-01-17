@@ -9,6 +9,8 @@
 *.S68
 .DS_Store
 
+.ipynb_checkpoints/
+
 /*
 /*/
 !/.github/
@@ -49,3 +51,6 @@ regtests/chdman/temp
 regtests/jedutil/output
 /CMakeLists.txt
 /samples
+
+!/sam8905/
+!/*.py
