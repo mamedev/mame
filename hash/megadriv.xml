@@ -10741,7 +10741,7 @@ https://tcrf.net/World_Championship_Soccer_(Genesis)
 
 <!-- Partially documented: confirmed dumps, missing additional info (a PCB pic would be of help to fill missing details) -->
 
-	<software name="10sjogos">
+	<software name="10sjogos" cloneof="megaga10">
 		<description>10 Super Jogos (Brazil)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
