@@ -126,8 +126,8 @@ private:
     int16_t m_fx_input_r = 0;
 
     // FX SAM 32KB SRAM for delay/reverb buffers
-    std::unique_ptr<int16_t[]> m_fx_sram;
-    static constexpr size_t FX_SRAM_SIZE = 32768;  // 32KB = 32768 12-bit words
+    std::unique_ptr<uint8_t[]> m_fx_sram;
+    static constexpr size_t FX_SRAM_SIZE = 32768;  // 32KB = 32768 8-bit words
 
     // SAM8905 DSP - two chips selected via T1 (P3.5)
     // T1=1: Sound generation SAM (index 0)
@@ -880,7 +880,7 @@ void keyfox10_state::machine_start()
         });
 
     // Initialize FX SRAM (32KB for delay/reverb buffers)
-    m_fx_sram = std::make_unique<int16_t[]>(FX_SRAM_SIZE);
+    m_fx_sram = std::make_unique<uint8_t[]>(FX_SRAM_SIZE);
     std::fill_n(m_fx_sram.get(), FX_SRAM_SIZE, 0);
 
     // Set FX chip to slave mode - it runs synchronized with SND chip
@@ -989,19 +989,23 @@ void keyfox10_state::dump_sam_memory() const
         }
     }
 
-    // Dump FX SRAM as WAV file (32KB of 8-bit signed samples at 22kHz)
+    // Dump entire FX SRAM as WAV file (32KB as 16-bit samples)
+    // Raw dump - each consecutive byte pair forms a 16-bit sample (high, low)
     if (m_fx_sram)
     {
         FILE *f = fopen("fx_sram_dump.wav", "wb");
         if (f)
         {
+            // 32KB SRAM = 16K 16-bit samples (consecutive byte pairs)
+            uint32_t num_samples = FX_SRAM_SIZE / 2;
+
             // WAV header for mono 16-bit 22050Hz
             uint32_t sample_rate = 22050;
             uint16_t num_channels = 1;
             uint16_t bits_per_sample = 16;
             uint32_t byte_rate = sample_rate * num_channels * bits_per_sample / 8;
             uint16_t block_align = num_channels * bits_per_sample / 8;
-            uint32_t data_size = FX_SRAM_SIZE * 2;  // 16-bit samples
+            uint32_t data_size = num_samples * 2;
             uint32_t chunk_size = 36 + data_size;
 
             // RIFF header
@@ -1025,15 +1029,17 @@ void keyfox10_state::dump_sam_memory() const
             fwrite("data", 1, 4, f);
             fwrite(&data_size, 4, 1, f);
 
-            // Write SRAM data as 16-bit samples (8-bit stored << 8)
-            for (size_t i = 0; i < FX_SRAM_SIZE; i++)
+            // Write SRAM as 16-bit samples (consecutive byte pairs: high, low)
+            for (size_t i = 0; i < FX_SRAM_SIZE; i += 2)
             {
-                int16_t sample = m_fx_sram[i] << 8;  // 8-bit to 16-bit
+                int8_t hi_byte = static_cast<int8_t>(m_fx_sram[i]);
+                uint8_t lo_byte = m_fx_sram[i + 1];
+                int16_t sample = (static_cast<int16_t>(hi_byte) << 8) | lo_byte;
                 fwrite(&sample, 2, 1, f);
             }
 
             fclose(f);
-            printf("Wrote FX SRAM dump to fx_sram_dump.wav (%zu samples)\n", FX_SRAM_SIZE);
+            printf("Wrote FX SRAM dump to fx_sram_dump.wav (%u 16-bit samples, 32KB)\n", num_samples);
         }
     }
 }
@@ -1084,6 +1090,12 @@ void keyfox10_state::sam_snd_sample_out(uint32_t data)
     m_fx_input_l = int16_t(data >> 16);
     m_fx_input_r = int16_t(data & 0xFFFF);
 
+    // HACK FX CHIP TAKES TWICE AS LONG TO PROCESS ONE FRAME
+    static int snd_even_odd = 0;
+    if ((snd_even_odd++ & 1) == 1) {
+        return;
+    }
+
     // Debug: trace non-zero input samples
     static int snd_out_trace = 0;
     if ((m_fx_input_l != 0 || m_fx_input_r != 0) && snd_out_trace < 50) {
@@ -1119,6 +1131,8 @@ void keyfox10_state::sam_fx_waveform_w(offs_t offset, u16 data)
                 offset, (int16_t)data, data_8bit);
             sram_write_trace++;
         }
+    } else {
+        abort();
     }
 }
 
@@ -1130,6 +1144,7 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
     // WA0 (PHI[0]) selects channel: 0=Left, 1=Right
     if (offset & 0x80000)  // WA19 set - read input sample
     {
+#if 0 // WRONG!
         // Return sound SAM output sample for FX processing
         // Hardware: Two 74HC595 shift registers (IC22, IC23) - 16 bits total
         // The shift registers hold one sample (either L or R from SND at 44kHz)
@@ -1143,21 +1158,39 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
         // Hardware emulation: shift registers provide 8 bits at WDH10:WDH3
         // Take upper 8 bits of 16-bit sample (same as SRAM: only 8 bits stored)
         int8_t sample_8bit = sample >> 8;
+#endif
+        int16_t sample = m_fx_input_r;
+        uint8_t sample_8bit;
+        if (offset & 1) {
+            //sample_8bit = sample & 0xFF;
+            sample_8bit = (sample >> 8) & 0xFF;
+        }
+        else
+        {
+            // High byte (sign-extended)
+            //sample_8bit = (sample >> 8) & 0xFF;
+            sample_8bit = sample & 0xFF;
 
+            // Sign-extend 8-bit to 12-bit
+            // if (sample_8bit & 0x80)
+            //     sample_8bit |= 0xF00;
+        }
         // Place 8-bit value at bits 10:3, bits 2:0 are grounded (always 0)
         int16_t result = ((int16_t)sample_8bit) << 3;
 
         // Sign extend bit 10 to bit 11 (for proper signed audio)
         // NOTE: Hardware may have asymmetric sign extension for L vs R,
         // but that would break audio. Applying symmetric extension for now.
-        if ((offset & 1) == 0 && (result & 0x400))
-            result |= 0x800;
+        // if ((offset & 1) == 0 && (result & 0x400))
+        //      result |= 0x800;
+        if ((offset & 1) == 1 && (sample_8bit & 0x80))
+             result |= 0x800;
 
         // Debug: log non-zero input sample reads
         static int fx_input_log_count = 0;
         if (sample != 0 && fx_input_log_count < 100) {
-            logerror("FX input read: WA=%05X ch=%c raw=%d 8bit=%d result=%d\n",
-                offset, is_right ? 'R' : 'L', sample, sample_8bit, (int16_t)result);
+            logerror("FX input read: WA=%05X raw=%d 8bit=%d result=%d\n",
+                offset, sample, sample_8bit, (int16_t)result);
             fx_input_log_count++;
         }
 
