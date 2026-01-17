@@ -42,7 +42,6 @@ public:
 	{ }
 
 	void ymball(machine_config &config) ATTR_COLD;
-//	void ymball_adpcm_bank(uint8_t data) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -69,11 +68,6 @@ void ymball_state::data_map(address_map &map)
 {
 	
 }
-//
-// void ymball_state::ymball_adpcm_bank(uint8_t data)
-// {
-// m_oki->set_rom_bank(data & 0x03);
-// }
 
 void ymball_state::machine_start()
 {
