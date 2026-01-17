@@ -26392,7 +26392,7 @@ Unemulated HeartBeat peripheral
 			<feature name="u2" value="AT28C16E 20PC 9350"/>
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="Pele! (USA, Europe) (sample).bin" size="1048576" crc="d2bbb00e" sha1="9b4ed13c6a89f0ca7187a2641916d03752da4d07"/>
+				<rom name="Pele (USA, Europe) (sample).bin" size="1048576" crc="d2bbb00e" sha1="9b4ed13c6a89f0ca7187a2641916d03752da4d07"/>
 			</dataarea>
 			<dataarea name="sram" size="4096">
 			</dataarea>
@@ -28955,8 +28955,8 @@ Unsupported [Sega Mega Modem] features, local multiplayer supported only.
 
 	<software name="segatop">
 		<description>Sega Top Five (Brazil)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1997</year>
+		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="2097152">
 				<rom name="sega top five (bra).bin" size="2097152" crc="61069069" sha1="b13ba8e49fb9e8b41835e3d4af86ad25f27c804c"/>
