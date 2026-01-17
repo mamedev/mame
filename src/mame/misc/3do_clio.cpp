@@ -27,6 +27,8 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_dspp(*this, "dspp")
 	, m_firq_cb(*this)
+	, m_vsync_cb(*this)
+	, m_hsync_cb(*this)
 	, m_xbus_read_cb(*this, 0xff)
 	, m_xbus_write_cb(*this)
 	, m_dac_l(*this)
@@ -52,6 +54,7 @@ void clio_device::device_start()
 //  m_revision = 0x04000000;
 	m_expctl = 0x80;    /* ARM has the expansion bus */
 
+	m_scan_timer = timer_alloc(FUNC(clio_device::scan_timer_cb), this);
 	m_system_timer = timer_alloc(FUNC(clio_device::system_timer_cb), this);
 	m_dac_timer = timer_alloc(FUNC(clio_device::dac_update_cb), this);
 	m_dac_timer->adjust(attotime::from_hz(16.9345));
@@ -70,16 +73,9 @@ void clio_device::device_reset()
 	m_irq0_enable = m_irq1_enable = 0;
 	m_irq0 = m_irq1 = 0;
 	m_timer_ctrl = 0;
+	m_vint0 = m_vint1 = 0xffff'ffff;
 	m_system_timer->adjust(attotime::never);
-}
-
-void clio_device::vint1_w(int state)
-{
-	// currently used by the BIOS to set periodic stuff up (namely watchdog)
-	if (state && m_screen->frame_number() & 1)
-	{
-		request_fiq(1 << 1, 0);
-	}
+	m_scan_timer->adjust(m_screen->time_until_pos(0), 0);
 }
 
 void clio_device::dply_w(int state)
@@ -570,6 +566,38 @@ void clio_device::request_fiq(uint32_t irq_req, uint8_t type)
 		//m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	}
 }
+
+TIMER_CALLBACK_MEMBER(clio_device::scan_timer_cb)
+{
+	int scanline = param;
+
+	// TODO: does it triggers on odd fields only?
+	if (scanline == m_vint1 && m_screen->frame_number() & 1)
+	{
+		request_fiq(1 << 1, 0);
+	}
+
+	// 22, 262
+	if (scanline == 0)
+	{
+		m_vsync_cb(1);
+	}
+	else if (scanline == 21)
+	{
+		m_vsync_cb(0);
+	}
+	else if (scanline >= 22)
+	{
+		m_hsync_cb(1);
+		m_hsync_cb(0);
+	}
+
+	scanline ++;
+	scanline %= m_screen->height();
+
+	m_scan_timer->adjust(m_screen->time_until_pos(scanline), scanline);
+}
+
 
 /*
  * x--- "flablode" flag (unknown, is it even implemented?)

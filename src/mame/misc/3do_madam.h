@@ -6,11 +6,15 @@
 
 #pragma once
 
+#include "3do_amy.h"
+
 class madam_device : public device_t
 {
 public:
 	// construction/destruction
 	madam_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	template <typename T> void set_amy_tag(T &&tag) { m_amy.set_tag(std::forward<T>(tag)); }
 
 	auto diag_cb()            { return m_diag_cb.bind(); }
 	auto dma_read_cb()        { return m_dma_read_cb.bind(); }
@@ -19,6 +23,9 @@ public:
 
 	void map(address_map &map);
 
+	void vdlp_start_w(int state);
+	void vdlp_continue_w(int state);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -26,6 +33,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
+	required_device<amy_device> m_amy;
 	devcb_write8     m_diag_cb;
 	devcb_read32     m_dma_read_cb;
 	devcb_write32    m_dma_write_cb;
@@ -63,6 +71,19 @@ private:
 	uint32_t  m_mult[40]{};         /* 03300600-0330069c */
 	uint32_t  m_mult_control = 0;   /* 033007f0-033007f4 */
 	uint32_t  m_mult_status = 0;    /* 033007f8 */
+
+	struct {
+		u32 address;
+		u16 scanlines;
+		u16 clut_words;
+		u16 modulo;
+		u32 fb_address;
+		bool fetch;
+		u16 y_dest;
+		u16 y_src;
+		u32 link;
+		bool video_dma;
+	} m_vdlp;
 
 	u32 mctl_r();
 	void mctl_w(offs_t offset, u32 data, u32 mem_mask);

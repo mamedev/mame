@@ -206,6 +206,7 @@ void _3do_state::green_config(machine_config &config)
 		space.write_dword(offset, data, 0xffff'ffff);
 	});
 	m_madam->irq_dply_cb().set(m_clio, FUNC(clio_device::dply_w));
+	m_madam->set_amy_tag("amy");
 
 	CLIO(config, m_clio, XTAL(50'000'000)/4);
 	m_clio->firq_cb().set([this] (int state) {
@@ -232,6 +233,11 @@ void _3do_state::green_config(machine_config &config)
 		m_cdrom->enable_w(1);
 		m_cdrom->cmd_w(1);
 	});
+	m_clio->vsync_cb().set(m_madam, FUNC(madam_device::vdlp_start_w));
+	m_clio->hsync_cb().set(m_madam, FUNC(madam_device::vdlp_continue_w));
+
+	AMY(config, m_amy, XTAL(50'000'000)/4);
+	m_amy->set_screen("screen");
 
 	CR560B(config, m_cdrom, 0);
 	m_cdrom->add_route(0, "speaker", 1.0, 0);
@@ -264,7 +270,6 @@ void _3do_state::_3do(machine_config &config)
 	// TODO: proper params (mostly running in interlace mode)
 	m_screen->set_raw(X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262);
 	m_screen->set_screen_update(FUNC(_3do_state::screen_update));
-	m_screen->screen_vblank().set(m_clio, FUNC(clio_device::vint1_w));
 
 	SPEAKER(config, "speaker", 2).front();
 }
@@ -283,7 +288,6 @@ void _3do_state::_3do_pal(machine_config &config)
 	// TODO: proper params
 	m_screen->set_raw(X2_CLOCK_PAL / 2, 1592, 254, 1534, 263, 22, 262);
 	m_screen->set_screen_update(FUNC(_3do_state::screen_update));
-	m_screen->screen_vblank().set(m_clio, FUNC(clio_device::vint1_w));
 
 	SPEAKER(config, "speaker", 2).front();
 }
