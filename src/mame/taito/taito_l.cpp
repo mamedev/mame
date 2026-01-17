@@ -71,6 +71,7 @@ puzznici note
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
 
 void taitol_state::machine_start()
 {
@@ -102,10 +103,18 @@ void champwr_state::machine_start()
 	save_item(NAME(m_adpcm_data));
 }
 
-
 void taitol_state::machine_reset()
 {
 	m_last_irq_level = 0;
+}
+
+void taitol_state::screen_vblank_taitol(int state)
+{
+	// rising edge
+	if (state)
+	{
+		m_main_cpu->screen_eof();
+	}
 }
 
 void fhawk_state::machine_reset()
@@ -1468,6 +1477,21 @@ void horshoes_state::machine_reset()
 	taitol_1cpu_state::machine_reset();
 
 	m_horshoes_gfxbank = 0;
+}
+
+void horshoes_state::horshoes_tile_cb(u32 &code)
+{
+	code |= m_horshoes_gfxbank << 12;
+}
+
+void horshoes_state::bankg_w(u8 data)
+{
+	if (m_horshoes_gfxbank != data)
+	{
+		m_horshoes_gfxbank = data;
+
+		m_main_cpu->mark_all_layer_dirty();
+	}
 }
 
 void horshoes_state::horshoes(machine_config &config)
