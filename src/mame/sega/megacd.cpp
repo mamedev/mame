@@ -1758,6 +1758,9 @@ void sega_segacd_device::device_start()
 	segacd_stampmap[3] = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(sega_segacd_device::get_stampmap_32x32_16x16_tile_info)), TILEMAP_SCAN_ROWS, 32, 32, 128, 128); // 32kb!
 
 	// todo register save state stuff
+	save_item(NAME(m_font_color));
+	save_item(NAME(scd_rammode));
+	save_item(NAME(scd_mode_dmna_ret_flags));
 }
 
 uint16_t sega_segacd_device::segacd_dmaaddr_r()
