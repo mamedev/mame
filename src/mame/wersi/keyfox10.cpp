@@ -1227,13 +1227,6 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
         }
     }
 
-    // ROM access fallback: (WAVE[6:0] << 10) | PHI[11:2]
-    //uint32_t phi_int = ((offset & 0xFFF) >> 2) & 0x3FF;  // PHI[11:2] - 10 bits
-    //uint32_t rom_addr = ((wave & 0x7F) << 10) | phi_int;
-
-    //u8 sample = m_samples_rom[rom_addr];
-    //return (int16_t)(int8_t)sample << 4;
-
     printf("ERRR 2!\n");
     exit(1);
 
@@ -1405,11 +1398,11 @@ void keyfox10_state::keyfox10(machine_config &config)
     // Using MFB lowpass configuration with gain boost to compensate for 15-bit internal range
     FILTER_BIQUAD(config, m_output_filter_l);
     m_output_filter_l->opamp_mfb_lowpass_setup(RES_K(6.8), 0, RES_K(6.8), 0, CAP_N(2.2));
-    m_output_filter_l->add_route(0, "lspeaker", 8.0);  // 4x gain: 2x for 15-bit, 2x for headroom
+    m_output_filter_l->add_route(0, "lspeaker", 32.0);  // 4x gain: 2x for 15-bit, 2x for headroom
 
     FILTER_BIQUAD(config, m_output_filter_r);
     m_output_filter_r->opamp_mfb_lowpass_setup(RES_K(6.8), 0, RES_K(6.8), 0, CAP_N(2.2));
-    m_output_filter_r->add_route(0, "rspeaker", 8.0);
+    m_output_filter_r->add_route(0, "rspeaker", 32.0);
 
     // Route mixers through output filters
     m_lmixer->add_route(0, m_output_filter_l, 1.0);
@@ -1429,8 +1422,8 @@ void keyfox10_state::keyfox10(machine_config &config)
     SAM8905(config, m_sam_fx, 22'579'200, 1024);
     m_sam_fx->waveform_read_callback().set(FUNC(keyfox10_state::sam_fx_waveform_r));
     m_sam_fx->waveform_write_callback().set(FUNC(keyfox10_state::sam_fx_waveform_w));
-    m_sam_fx->add_route(0, m_lmixer, 0.5);  // Wet L (lower gain - reverb is usually quieter)
-    m_sam_fx->add_route(1, m_rmixer, 0.5);  // Wet R
+    m_sam_fx->add_route(0, m_lmixer, 0.2);  // Wet L (lower gain - reverb is usually quieter)
+    m_sam_fx->add_route(1, m_rmixer, 0.2);  // Wet R
 
     // 7-segment display layout
     config.set_default_layout(layout_keyfox10);
@@ -1450,4 +1443,5 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME      FLAGS
-SYST( 1990, keyfox10, 0,      0,      keyfox10, keyfox10, keyfox10_state, empty_init, "Wersi", "Keyfox 10",  MACHINE_NOT_WORKING )
+//SYST( 1990, keyfox10, 0,      0,      keyfox10, keyfox10, keyfox10_state, empty_init, "Wersi", "Keyfox 10",  MACHINE_IMPERFECT_SOUND )
+SYST( 1990, keyfox10, 0,      0,      keyfox10, keyfox10, keyfox10_state, empty_init, "Wersi", "Keyfox 10",  0 )
