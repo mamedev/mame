@@ -19,6 +19,7 @@
 
 #include "notifier.h"
 
+#include <cstdlib>
 #include <optional>
 #include <set>
 #include <type_traits>
@@ -608,6 +609,7 @@ public:
 	inline u32 f_get_pt() const { return (m_flags >> F_PT_BITS) & 15; }
 
 	virtual void dump_map(std::vector<memory_entry> &map) const;
+	bool is_handler_in_map(std::vector<memory_entry> &map, offs_t begin, offs_t end, handler_entry *handler) const;
 
 	virtual std::string name() const = 0;
 	virtual void enumerate_references(handler_entry::reflist &refs) const;
@@ -2061,6 +2063,10 @@ public:
 	int logaddr_width() const { return m_logaddr_width; }
 	int page_shift() const { return m_page_shift; }
 	bool is_octal() const { return m_is_octal; }
+	offs_t addrmask() const { return make_bitmask<offs_t>(m_addr_width); }
+	u8 addrchars() const { return m_is_octal ? (m_addr_width + 2) / 3 : (m_addr_width + 3) / 4; }
+	offs_t logaddrmask() const { return make_bitmask<offs_t>(m_logaddr_width); }
+	u8 logaddrchars() const { return m_is_octal ? (m_logaddr_width + 2) / 3 : (m_logaddr_width + 3) / 4; }
 
 	// Actual alignment of the bus addresses
 	int alignment() const { int bytes = m_data_width / 8; return m_addr_shift < 0 ? bytes >> -m_addr_shift : bytes << m_addr_shift; }
@@ -2099,17 +2105,16 @@ public:
 	endianness_t endianness() const { return m_config.endianness(); }
 	int addr_shift() const { return m_config.addr_shift(); }
 	bool is_octal() const { return m_config.is_octal(); }
+	offs_t addrmask() const { return m_addrmask; }
+	u8 addrchars() const { return m_addrchars; }
+	offs_t logaddrmask() const { return m_logaddrmask; }
+	u8 logaddrchars() const { return m_logaddrchars; }
 
 	// address-to-byte conversion helpers
 	offs_t address_to_byte(offs_t address) const { return m_config.addr2byte(address); }
 	offs_t address_to_byte_end(offs_t address) const { return m_config.addr2byte_end(address); }
 	offs_t byte_to_address(offs_t address) const { return m_config.byte2addr(address); }
 	offs_t byte_to_address_end(offs_t address) const { return m_config.byte2addr_end(address); }
-
-	offs_t addrmask() const { return m_addrmask; }
-	u8 addrchars() const { return m_addrchars; }
-	offs_t logaddrmask() const { return m_logaddrmask; }
-	u8 logaddrchars() const { return m_logaddrchars; }
 
 	// unmap ranges (short form)
 	void unmap_read(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0, u16 flags = 0) { unmap_generic(addrstart, addrend, addrmirror, flags, read_or_write::READ, false); }
@@ -2305,13 +2310,13 @@ protected:
 	void check_optimize_mirror(const char *function, offs_t addrstart, offs_t addrend, offs_t addrmirror, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror);
 	void check_address(const char *function, offs_t addrstart, offs_t addrend);
 
-	address_space_installer(const address_space_config &config, memory_manager &manager) :
-		m_config(config),
-		m_manager(manager),
-		m_addrmask(make_bitmask<offs_t>(m_config.addr_width())),
-		m_logaddrmask(make_bitmask<offs_t>(m_config.logaddr_width())),
-		m_addrchars((m_config.addr_width() + 3) / 4),
-		m_logaddrchars((m_config.logaddr_width() + 3) / 4)
+	address_space_installer(const address_space_config &config, memory_manager &manager)
+		: m_config(config),
+		  m_manager(manager),
+		  m_addrmask(make_bitmask<offs_t>(m_config.addr_width())),
+		  m_logaddrmask(make_bitmask<offs_t>(m_config.logaddr_width())),
+		  m_addrchars(m_config.m_is_octal ? (m_config.addr_width() + 2) / 3 : (m_config.addr_width() + 3) / 4),
+		  m_logaddrchars(m_config.m_is_octal ? (m_config.logaddr_width() + 2) / 3 : (m_config.logaddr_width() + 3) / 4)
 	{}
 
 	const address_space_config &m_config;       // configuration of this space
@@ -2577,13 +2582,13 @@ class memory_region
 	DISABLE_COPYING(memory_region);
 public:
 	// construction/destruction
-	memory_region(running_machine &machine, std::string name, u32 length, u8 width, endianness_t endian);
+	memory_region(std::string name, u32 length, u8 width, endianness_t endian);
 
 	// getters
-	running_machine &machine() const { return m_machine; }
-	u8 *base() { return (m_buffer.size() > 0) ? &m_buffer[0] : nullptr; }
-	u8 *end() { return base() + m_buffer.size(); }
-	u32 bytes() const { return m_buffer.size(); }
+	u8 *base() { return reinterpret_cast<u8 *>(m_buffer.get()); }
+	u8 *end() { return base() + m_length; }
+	u32 bytes() const { return m_length; }
+	u32 length() const { return m_length / m_bytewidth; }
 	const std::string &name() const { return m_name; }
 
 	// flag expansion
@@ -2592,19 +2597,21 @@ public:
 	u8 bytewidth() const { return m_bytewidth; }
 
 	// data access
-	u8 &as_u8(offs_t offset = 0) { return m_buffer[offset]; }
-	u16 &as_u16(offs_t offset = 0) { return reinterpret_cast<u16 *>(base())[offset]; }
-	u32 &as_u32(offs_t offset = 0) { return reinterpret_cast<u32 *>(base())[offset]; }
-	u64 &as_u64(offs_t offset = 0) { return reinterpret_cast<u64 *>(base())[offset]; }
+	u8 &as_u8(offs_t offset = 0) { return reinterpret_cast<u8 *>(m_buffer.get())[offset]; }
+	u16 &as_u16(offs_t offset = 0) { return reinterpret_cast<u16 *>(m_buffer.get())[offset]; }
+	u32 &as_u32(offs_t offset = 0) { return reinterpret_cast<u32 *>(m_buffer.get())[offset]; }
+	u64 &as_u64(offs_t offset = 0) { return reinterpret_cast<u64 *>(m_buffer.get())[offset]; }
 
 private:
+	struct stdlib_deleter { void operator()(void *p) const { std::free(p); } };
+
 	// internal data
-	running_machine &       m_machine;
-	std::string             m_name;
-	std::vector<u8>         m_buffer;
-	endianness_t            m_endianness;
-	u8                      m_bitwidth;
-	u8                      m_bytewidth;
+	std::string                             m_name;
+	std::unique_ptr<void, stdlib_deleter>   m_buffer;
+	u32                                     m_length;
+	endianness_t                            m_endianness;
+	u8                                      m_bitwidth;
+	u8                                      m_bytewidth;
 };
 
 
@@ -2728,7 +2735,7 @@ public:
 	void region_free(std::string name);
 
 private:
-	struct stdlib_deleter { void operator()(void *p) const { free(p); } };
+	struct stdlib_deleter { void operator()(void *p) const { std::free(p); } };
 
 	// internal state
 	running_machine &           m_machine;              // reference to the machine

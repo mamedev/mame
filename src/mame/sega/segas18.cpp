@@ -679,7 +679,7 @@ void segas18_state::pcm_map(address_map &map)
  *
  *************************************/
 
-void segas18_state::mcu_io_map(address_map &map)
+void segas18_state::mcu_data_map(address_map &map)
 {
 	map.unmap_value_high();
 	map.global_mask(0xff); // port 2 not used for high order address byte
@@ -1393,8 +1393,8 @@ void segas18_state::system18(machine_config &config)
 	SEGA315_5313(config, m_vdp, 15000000, m_maincpu); // ??? Frequency is a complete guess
 	m_vdp->set_is_pal(false);
 	m_vdp->snd_irq().set(FUNC(segas18_state::vdp_sndirqline_callback_s18));
-	m_vdp->lv6_irq().set(FUNC(segas18_state::vdp_lv6irqline_callback_s18));
-	m_vdp->lv4_irq().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
+	m_vdp->vint_cb().set(FUNC(segas18_state::vdp_lv6irqline_callback_s18));
+	m_vdp->hint_cb().set(FUNC(segas18_state::vdp_lv4irqline_callback_s18));
 	m_vdp->set_alt_timing(1);
 	m_vdp->set_pal_write_base(0x1000);
 	m_vdp->set_ext_palette(m_palette);
@@ -1512,7 +1512,7 @@ void segas18_state::system18_i8751(machine_config &config)
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
 	I8751(config, m_mcu, 8000000);
-	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &segas18_state::mcu_data_map);
 	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
 }
 
@@ -1526,7 +1526,7 @@ void segas18_state::system18_fd1094_i8751(machine_config &config)
 	m_mapper->mcu_int().set_inputline(m_mcu, INPUT_LINE_IRQ1);
 
 	I8751(config, m_mcu, 8000000);
-	m_mcu->set_addrmap(AS_IO, &segas18_state::mcu_io_map);
+	m_mcu->set_addrmap(AS_DATA, &segas18_state::mcu_data_map);
 	m_mcu->set_vblank_int("screen", FUNC(segas18_state::irq0_line_hold));
 }
 
@@ -3165,10 +3165,11 @@ ROM_END
  **************************************************************************************************************************
     Wally wo Sagase! (Where's Wally?), Sega System 18
     CPU: FD1094 317-0197B
+    I/O board: 834-6180-01
     ROM Board: 171-5873B
-   Main board: 837-8777-01
-      Game BD: 833-8775-01 WALLY
-    ROM Board: 834-8776-01
+   Main board: 837-8777
+      Game BD: 833-8775 WALLY
+    ROM Board: 834-8776  (with REV. B sticker)
 */
 ROM_START( wwallyj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0197B
@@ -3227,7 +3228,11 @@ ROM_END
 /**************************************************************************************************************************
     Wally wo Sagase! (Where's Wally?), Sega System 18
     CPU: FD1094 317-0197A
+    I/O board: 834-6180-01
     ROM Board: 171-5873B
+   Main board: 837-8777
+      Game BD: 833-8775 WALLY
+    ROM Board: 834-8776  (with REV. A sticker)
 */
 ROM_START( wwallyja )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0197A
@@ -3286,13 +3291,17 @@ ROM_END
 /**************************************************************************************************************************
     Wally wo Sagase! (Where's Wally?) - 3 players, Sega System 18
     CPU: FD1094 317-0198A
-    GAME BD: 833-8775-01 WALLY 3P
+    I/O board: 834-6180-01
+    ROM Board: 171-5873B
+   Main board: 837-8777-01
+      Game BD: 833-8775-01 WALLY
+    ROM Board: 834-8776-01  (with REV. A sticker)
 */
 
 ROM_START( wwallyja3p )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0198A
-	ROM_LOAD16_BYTE( "epr-14730a.a4", 0x000000, 0x40000, CRC(d897bcc6) SHA1(15f0b602eb3ac870241f53246a4251c07b27fb27) )
-	ROM_LOAD16_BYTE( "epr-14731a.a6", 0x000001, 0x40000, CRC(64328385) SHA1(7220d285762ec9d3656cb958cc71b43094aa4052) )
+	ROM_LOAD16_BYTE( "epr-14736a.a4", 0x000000, 0x40000, CRC(d897bcc6) SHA1(15f0b602eb3ac870241f53246a4251c07b27fb27) )
+	ROM_LOAD16_BYTE( "epr-14737a.a6", 0x000001, 0x40000, CRC(64328385) SHA1(7220d285762ec9d3656cb958cc71b43094aa4052) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0198a.key", 0x0000, 0x2000, CRC(32d313a4) SHA1(bb7a651c34a9e925d5a9928fabb77ca8724009f2) )

@@ -10,17 +10,47 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "beebspch.h"
+
+#include "sound/sp0256.h"
+
 #include "speaker.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(BBC_BEEBSPCH, bbc_beebspch_device, "bbc_beebspch", "Beeb Speech Synthesiser")
+class bbc_beebspch_device : public device_t, public device_bbc_userport_interface
+{
+public:
+	bbc_beebspch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: device_t(mconfig, BBC_BEEBSPCH, tag, owner, clock)
+		, device_bbc_userport_interface(mconfig, *this)
+		, m_nsp(*this, "sp0256")
+	{
+	}
+
+	void cb1_w(int state);
+	void cb2_w(int state);
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD { }
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual void pb_w(uint8_t data) override;
+
+private:
+	required_device<sp0256_device> m_nsp;
+};
+
+
+//-------------------------------------------------
+//  rom_region - device-specific ROM region
+//-------------------------------------------------
 
 ROM_START(beebspch)
 	ROM_REGION(0x4000, "exp_rom", 0)
@@ -31,14 +61,11 @@ ROM_START(beebspch)
 	ROM_LOAD("sp0256a-al2.bin", 0x1000, 0x0800, CRC(b504ac15) SHA1(e60fcb5fa16ff3f3b69d36c7a6e955744d3feafc))
 ROM_END
 
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
 const tiny_rom_entry *bbc_beebspch_device::device_rom_region() const
 {
 	return ROM_NAME(beebspch);
 }
+
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -53,30 +80,6 @@ void bbc_beebspch_device::device_add_mconfig(machine_config &config)
 	m_nsp->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  bbc_beebspch_device - constructor
-//-------------------------------------------------
-
-bbc_beebspch_device::bbc_beebspch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BBC_BEEBSPCH, tag, owner, clock)
-	, device_bbc_userport_interface(mconfig, *this)
-	, m_nsp(*this, "sp0256")
-{
-}
-
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void bbc_beebspch_device::device_start()
-{
-}
 
 //**************************************************************************
 //  IMPLEMENTATION
@@ -109,3 +112,8 @@ void bbc_beebspch_device::cb2_w(int state)
 {
 	m_slot->cb2_w(state);
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(BBC_BEEBSPCH, device_bbc_userport_interface, bbc_beebspch_device, "bbc_beebspch", "Beeb Speech Synthesiser")

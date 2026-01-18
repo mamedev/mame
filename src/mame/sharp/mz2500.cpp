@@ -10,7 +10,9 @@ Keyboard is separate, and the key layout is very similar to the fm7.
 TODO:
 - Kanji text is cutted in half when font_size is 1 / interlace is disabled, different ROM used?
   (check Back to the Future);
-- Add remaining missing peripherals, SIO, HDD and w1300a network;
+- Add remaining missing peripherals, SIO, HDD;
+- WIZnet W3100A/W5100 ethernet boards
+  cfr. https://cwaweb.bai.ne.jp/~ohishi/zakki/mzlan_final.htm
 - reverse / blanking tvram attributes;
 - Implement backward compatibility with MZ-2000/MZ-80B;
 - Implement expansion box unit;
@@ -479,7 +481,7 @@ void mz2500_state::draw_cg_screen(bitmap_ind16 &bitmap,const rectangle &cliprect
 			draw_cg16_screen(bitmap,cliprect,2,640,pri);
 			break;
 		default:
-			popmessage("Unsupported CG mode %02x, contact MAME dev",m_cg_reg[0x0e]);
+			popmessage("Unsupported CG mode %02x",m_cg_reg[0x0e]);
 			break;
 	}
 }
@@ -1201,8 +1203,7 @@ void mz2500_state::bank_window_map(address_map &map)
 void mz2500_state::z80_io(address_map &map)
 {
 	map.unmap_value_high();
-//  map(0x60, 0x63).mirror(0xff00).w(FUNC(mz2500_state::w3100a_w));
-//  map(0x63, 0x63).mirror(0xff00).r(FUNC(mz2500_state::w3100a_r));
+//  map(0x6x, 0x6x) WIZnet W3100A ethernet (DIY)
 //  map(0x98, 0x99) MZ-1E35 ADPCM
 	map(0xa0, 0xa3).mirror(0xff00).rw(FUNC(mz2500_state::sio_access_r<0>), FUNC(mz2500_state::sio_access_w<0>));
 	map(0xb0, 0xb3).mirror(0xff00).rw(FUNC(mz2500_state::sio_access_r<1>), FUNC(mz2500_state::sio_access_w<1>));
@@ -1813,10 +1814,6 @@ void mz2500_state::mz2500(machine_config &config)
 
 	Z80SIO(config, m_sio, 24_MHz_XTAL / 4);
 
-	rs232_port_device &mouse(RS232_PORT(config, "mouse_port", mouse_devices, "x68k"));
-	mouse.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
-	m_sio->out_dtrb_callback().set(mouse, FUNC(rs232_port_device::write_rts));
-
 	RP5C15(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->alarm().set(FUNC(mz2500_state::rtc_alarm_irq));
 
@@ -1830,6 +1827,10 @@ void mz2500_state::mz2500(machine_config &config)
 
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[0], msx_general_purpose_port_devices, "joystick");
 	MSX_GENERAL_PURPOSE_PORT(config, m_joy[1], msx_general_purpose_port_devices, "joystick");
+
+	rs232_port_device &mouse(RS232_PORT(config, "mouse_port", mouse_devices, "x68k"));
+	mouse.rxd_handler().set(m_sio, FUNC(z80sio_device::rxb_w));
+	m_sio->out_dtrb_callback().set(mouse, FUNC(rs232_port_device::write_rts));
 
 	FLOPPY_CONNECTOR(config, "fdc:0", mz2500_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", mz2500_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);

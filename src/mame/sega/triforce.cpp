@@ -63,6 +63,7 @@ GD build date
 |*| 20040608 | The Key Of Avalon 1.30: Chaotic Sabbat (client, Rev C)               | Sega / Hitmaker                     | GDROM | GDT-0010C      | 317-0355-JPN | 253-5508-0355J|
 |*| 20031110 | Firmware Update                                                      | Sega                                | GDROM | GDT-0011       | 317-0371-JPN |               |
 |*| 20040315 | Virtua Striker 2002 (Type 3)                                         | Sega                                | GDROM | GDT-0012       | 317-0337-EXP |               |
+| | 200?     | Virtua Striker 2002                                                  | Sega                                | GDROM | MDA-G0014      | 317-0337-??? |               |
 | | 2004     | Virtua Striker 4 (Japan)                                             | Sega                                | GDROM | GDT-0013       | 317-0391-JPN |               |
 | | 2004     | Virtua Striker 4 (Japan, Rev A)                                      | Sega                                | GDROM | GDT-0013A      | 317-0391-JPN |               |
 | | 2004     | Virtua Striker 4 (Japan, Rev B)                                      | Sega                                | GDROM | GDT-0013B      | 317-0391-JPN |               |

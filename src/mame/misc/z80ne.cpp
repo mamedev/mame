@@ -1417,7 +1417,7 @@ void z80net_state::z80net(machine_config &config)
 	/* video hardware */
 	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
 
-	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");
 	m_vdg->input_callback().set(FUNC(z80net_state::lx388_mc6847_videoram_r));
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
@@ -1458,7 +1458,7 @@ void z80netb_state::z80netb(machine_config &config)
 	/* video hardware */
 	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
 
-	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");
 	m_vdg->input_callback().set(FUNC(z80netb_state::lx388_mc6847_videoram_r));
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND
@@ -1500,7 +1500,7 @@ void z80netf_state::z80netf(machine_config &config)
 	/* video hardware */
 	SCREEN(config, "lx388", SCREEN_TYPE_RASTER);
 
-	MC6847_PAL(config, m_vdg, 4.433619_MHz_XTAL);
+	MC6847(config, m_vdg, 4.433619_MHz_XTAL, true);
 	m_vdg->set_screen("lx388");
 	m_vdg->input_callback().set(FUNC(z80netf_state::lx388_mc6847_videoram_r));
 	// AG = GND, GM2 = GND, GM1 = GND, GM0 = GND, CSS = GND

@@ -17,7 +17,6 @@
 DEFINE_DEVICE_TYPE(BBC_MODEM_SLOT, bbc_modem_slot_device, "bbc_modem_slot", "BBC Master Internal Modem port")
 
 
-
 //**************************************************************************
 //  DEVICE BBC_MODEM PORT INTERFACE
 //**************************************************************************
@@ -26,10 +25,10 @@ DEFINE_DEVICE_TYPE(BBC_MODEM_SLOT, bbc_modem_slot_device, "bbc_modem_slot", "BBC
 //  device_bbc_modem_interface - constructor
 //-------------------------------------------------
 
-device_bbc_modem_interface::device_bbc_modem_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "bbcmodem")
+device_bbc_modem_interface::device_bbc_modem_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "bbcmodem")
+	, m_slot(dynamic_cast<bbc_modem_slot_device*>(device.owner()))
 {
-	m_slot = dynamic_cast<bbc_modem_slot_device *>(device.owner());
 }
 
 
@@ -88,14 +87,15 @@ void bbc_modem_slot_device::write(offs_t offset, uint8_t data)
 
 
 // slot devices
+//#include "master_modem.h"
 #include "meup.h"
 #include "scsiaiv.h"
 
 
 void bbcm_modem_devices(device_slot_interface &device)
 {
-	device.option_add("meup",       BBC_MEUP);            /* Master Extra User Ports */
-	//device.option_add("modem",      BBC_MODEM);           /* Beebug Master Modem */
-	device.option_add("scsiaiv",    BBC_SCSIAIV);         /* Acorn AIV SCSI Host Adaptor */
-	//device.option_add("vp415",      BBC_VP415);           /* Philips VP415 */
+	device.option_add("meup",         BBC_MEUP);            // Master Extra User Ports
+	//device.option_add("modem",        BBC_MASTER_MODEM);    // Beebug Master Modem
+	device.option_add("scsiaiv",      BBC_SCSIAIV);         // Acorn AIV SCSI Host Adaptor
+	//device.option_add("vp415",        BBC_VP415);           // Philips VP415
 }

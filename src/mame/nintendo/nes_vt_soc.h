@@ -7,10 +7,8 @@
 
 #include "cpu/m6502/rp2a03.h"
 #include "sound/nes_apu_vt.h"
-#include "m6502_swap_op_d5_d6.h"
 #include "video/ppu2c0x_vt.h"
 #include "screen.h"
-#include "speaker.h"
 
 class nes_vt02_vt03_soc_device : public device_t, public device_memory_interface
 {
@@ -63,8 +61,9 @@ protected:
 	void nes_vt_map(address_map &map) ATTR_COLD;
 	virtual void nes_vt_2012_to_2017_regs(address_map &map);
 
-	u32 get_banks(u8 bnk);
-	void update_banks();
+	u32 get_banks(u8 bnk) const;
+	virtual void update_banks();
+	void set_bankaddr(u8 bnk, u32 addr) { m_bankaddr[bnk] = addr; }
 	u16 decode_nt_addr(u16 addr);
 	void vt03_410x_w(offs_t offset, u8 data);
 	u8 vt03_410x_r(offs_t offset);

@@ -88,10 +88,11 @@ protected:
 	{
 		CURCNT_COLOR         = 0x00000f,    // Cursor color
 		CURCNT_CUW           = 0x008000,    // Cursor width
-		CURCNT_COF           = 0x070000,    // Cursor off time
 		CURCNT_COF_SHIFT     = 16,
-		CURCNT_CON           = 0x280000,    // Cursor on time
+		CURCNT_COF           = 0b111 << CURCNT_COF_SHIFT,    // Cursor off time
 		CURCNT_CON_SHIFT     = 19,
+		CURCNT_CON           = 0b111 << CURCNT_CON_SHIFT,    // Cursor on time
+		CURCNT_BLKC_SHIFT    = 22,
 		CURCNT_BLKC          = 0x400000,    // Blink type
 		CURCNT_EN            = 0x800000,    // Cursor enable
 
@@ -100,9 +101,11 @@ protected:
 		ICM_MODE2            = 0x000f00,    // Plane 2
 		ICM_MODE2_SHIFT      = 8,
 		ICM_EV               = 0x040000,    // External video
+		ICM_EV_BIT           = 18,
 		ICM_NM               = 0x080000,    // Number of Matte flags
 		ICM_NM_BIT           = 19,
 		ICM_CS               = 0x400000,    // CLUT select
+		ICM_CS_BIT           = 22,
 
 		TCR_TA               = 0x00000f,    // Plane A
 		TCR_TB               = 0x000f00,    // Plane B
@@ -136,6 +139,7 @@ protected:
 		MC_OP_SHIFT          = 20,
 
 		CSR1R_PA             = 0x20,        // Parity
+		CSR1R_PA_BIT         = 5,
 		CSR1R_DA             = 0x80,        // Display Active
 
 		CSR1W_BE             = 0x0001,      // Bus Error
@@ -228,12 +232,18 @@ protected:
 	required_shared_ptr<uint16_t> m_planea;
 	required_shared_ptr<uint16_t> m_planeb;
 
+	uint32_t m_interlace_field[312][768];
+
 	// internal state
 	bool m_matte_flag[2][768]{};
 	int m_ica_height = 0;
 	int m_total_height = 0;
 	emu_timer *m_ica_timer = nullptr;
 	emu_timer *m_dca_timer = nullptr;
+
+	// Cursor State
+	uint16_t m_blink_time; // Counter that tracks how long since the last m_blink_active last changed.
+	bool m_blink_active = false;
 
 	static const uint32_t s_4bpp_color[16];
 
@@ -243,6 +253,7 @@ protected:
 
 	int get_screen_width();
 	int get_border_width();
+	uint32_t get_backdrop_plane();
 
 	template <int Path> void set_vsr(uint32_t value);
 	template <int Path> uint32_t get_vsr();

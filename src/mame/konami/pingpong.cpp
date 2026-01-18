@@ -1,10 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders: Jarek Parchanski
-
 /***************************************************************************
 
 Ping Pong (c) 1985 Konami
-GX555
+
+PCB: GX555 - PWB 200222A
+
+Z80 (surface scratched), 18432.00kHz XTAL
+2 small PWB 400322 daughterboards (2*LS194, 1*LS157)
+Several Konami customs, but surface scratched like the Z80: 28-pin DIP @ 5D,
+28-pin DIP @ 13H, 40-pin DIP @ 12A
+
+TODO:
+- correct video timing, probably 60.6Hz?
+- verify CPU/sound freq for the Zilec games, there's a PCB photo of merlinmm
+  with a 14MHz XTAL, but it's on Coinmaster hardware (Z80, 3 PIAs, AY8912)
 
 ***************************************************************************/
 
@@ -203,7 +213,7 @@ void pingpong_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	   the characters at the top and bottom of the screen. */
 	const rectangle spritevisiblearea(0*8, 32*8-1, 4*8, 29*8-1);
 
-	for (int offs = m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
+	for (int offs = m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int const sx = m_spriteram[offs + 3];
 		int const sy = 241 - m_spriteram[offs + 1];
@@ -232,7 +242,6 @@ uint32_t pingpong_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void cashquiz_state::machine_start()
 {
-
 	// configure banks and setup defaults
 	for (int i = 0; i < 8; i++)
 	{
@@ -286,11 +295,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::pingpong_interrupt)
 
 	if (scanline == 240)
 	{
-		if (m_int_enable & 0x04) m_maincpu->set_input_line(0, HOLD_LINE);
+		if (m_int_enable & 0x04)
+			m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else if ((scanline % 32) == 0)
 	{
-		if (m_int_enable & 0x08) m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		if (m_int_enable & 0x08)
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -300,11 +311,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::merlinmm_interrupt)
 
 	if (scanline == 240)
 	{
-		if (m_int_enable & 0x04) m_maincpu->set_input_line(0, HOLD_LINE);
+		if (m_int_enable & 0x04)
+			m_maincpu->set_input_line(0, HOLD_LINE);
 	}
 	else if (scanline == 0)
 	{
-		if (m_int_enable & 0x08) m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+		if (m_int_enable & 0x08)
+			m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 	}
 }
 
@@ -379,47 +392,47 @@ static INPUT_PORTS_START( pingpong )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0F, 0x0F, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:8,7,6,5")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:8,7,6,5")
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x0A, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x0F, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x0C, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x0E, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0x0B, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0D, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xF0, 0xF0, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:4,3,2,1")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:4,3,2,1")
 	PORT_DIPSETTING(    0x40, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0xA0, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0xF0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0xC0, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0xE0, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 2C_5C ) )
-	PORT_DIPSETTING(    0xB0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xD0, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
@@ -687,9 +700,10 @@ GFXDECODE_END
 void pingpong_state::pingpong(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu,18'432'000 / 6);      // 3.072 MHz (probably)
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // 3.072 MHz (probably)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::pingpong_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(pingpong_state::pingpong_interrupt), "screen", 0, 1);
+
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
@@ -707,17 +721,20 @@ void pingpong_state::pingpong(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	SN76489A(config, "snsnd", 18'432'000 / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	SN76489A(config, "snsnd", 18.432_MHz_XTAL / 6).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 // too fast!
 void pingpong_state::merlinmm(machine_config &config)
 {
 	pingpong(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &pingpong_state::merlinmm_map);
 	subdevice<timer_device>("scantimer")->set_callback(FUNC(pingpong_state::merlinmm_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	subdevice<sn76489a_device>("snsnd")->set_clock(18.432_MHz_XTAL / 8); // assumption
 }
 
 void cashquiz_state::cashquiz(machine_config &config)
@@ -733,7 +750,7 @@ void cashquiz_state::cashquiz(machine_config &config)
 
 ***************************************************************************/
 
-ROM_START( pingpong ) // GX555 - PWB200222A
+ROM_START( pingpong )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "555_e04.7a",   0x0000, 0x4000, CRC(18552f8f) SHA1(cb03659b5e8a68003e72182a20979384d829280f) )
 	ROM_LOAD( "555_e03.6a",   0x4000, 0x4000, CRC(ae5f01e8) SHA1(f0d6a2c64822f2662fed3f601e279db18246f894) )
@@ -828,5 +845,6 @@ void cashquiz_state::init_cashquiz()
 
 
 GAME( 1985, pingpong, 0, pingpong, pingpong, pingpong_state, empty_init,    ROT0,  "Konami",         "Konami's Ping-Pong",            MACHINE_SUPPORTS_SAVE )
-GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, init_merlinmm, ROT90, "Zilec-Zenitone", "Merlins Money Maze",            MACHINE_SUPPORTS_SAVE )
+
+GAME( 1986, merlinmm, 0, merlinmm, merlinmm, pingpong_state, init_merlinmm, ROT90, "Zilec-Zenitone", "Merlin's Money Maze",           MACHINE_SUPPORTS_SAVE )
 GAME( 1986, cashquiz, 0, cashquiz, cashquiz, cashquiz_state, init_cashquiz, ROT0,  "Zilec-Zenitone", "Cash Quiz (Type B, Version 5)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

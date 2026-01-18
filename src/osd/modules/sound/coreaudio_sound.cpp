@@ -25,7 +25,7 @@
 #include <new>
 #include <cstring>
 
-#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1200
+#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 120000
 #define PROPERTY_ELEMENT_MASTER kAudioObjectPropertyElementMain
 #else
 #define PROPERTY_ELEMENT_MASTER kAudioObjectPropertyElementMaster
@@ -1062,9 +1062,17 @@ void sound_coreaudio::build_device_list()
 
 						if ((chDesc.mChannelLabel == 0xffffffff) || (chDesc.mChannelLabel >= sMacChannelCount))
 						{
-							std::string chLabel = "Channel " + std::to_string(desc + 1);
-							node.m_port_names.push_back(chLabel);
-							node.m_port_positions.emplace_back(osd::channel_position::FC());
+							if (chanLayout->mNumberChannelDescriptions > 1)
+							{
+								node.m_port_names.push_back(sMacChannelLabels[desc + 1]);
+								node.m_port_positions.emplace_back(sChannelPositions[desc + 1]);
+							}
+							else
+							{
+								std::string chLabel = "Channel " + std::to_string(desc + 1);
+								node.m_port_names.push_back(chLabel);
+								node.m_port_positions.emplace_back(osd::channel_position::FC());
+							}
 						}
 						else
 						{

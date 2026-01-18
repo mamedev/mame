@@ -24,7 +24,7 @@ public:
 	mb63h114_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// write16 callback.
-	// - offset: Output pins DCBA. Pins CBA hold the current counter.
+	// - offset: Output pins DCBA. Pins CBA hold the index of the current counter.
 	// - data: The current counter's 13-bit value.
 	auto counter_cb() { return m_counter_func.bind(); }
 
@@ -40,10 +40,10 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	TIMER_CALLBACK_MEMBER(timer_tick);
+	static inline constexpr int COUNTERS = 8;
+	static inline constexpr int MAX_COUNT = 0x1fff;
 
-	static constexpr const int COUNTERS = 8;
-	static constexpr const int MAX_COUNT = 0x1fff;
+	TIMER_CALLBACK_MEMBER(timer_tick);
 
 	devcb_write16 m_counter_func;
 	emu_timer *m_timer;

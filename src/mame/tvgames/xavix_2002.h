@@ -31,6 +31,21 @@ private:
 	void write_extended_io2(offs_t offset, uint8_t data, uint8_t mem_mask);
 };
 
+
+class superxavix_i2c_ndpmj_state : public superxavix_i2c_state
+{
+public:
+	superxavix_i2c_ndpmj_state(const machine_config &mconfig, device_type type, const char *tag)
+		: superxavix_i2c_state(mconfig, type, tag)
+	{ }
+
+	void superxavix_i2c_ndpmj(machine_config &config);
+
+private:
+	uint8_t read_extended_io1(offs_t offset, uint8_t mem_mask);
+	void write_extended_io1(offs_t offset, uint8_t data, uint8_t mem_mask);
+};
+
 class superxavix_super_tv_pc_state : public superxavix_state
 {
 public:

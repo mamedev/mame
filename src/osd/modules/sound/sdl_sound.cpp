@@ -106,6 +106,10 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 		const char *const name = SDL_GetAudioDeviceName(i, 0);
 #if SDL_VERSION_ATLEAST(2, 0, 16)
 		const int err = SDL_GetAudioDeviceSpec(i, 0, &spec);
+		// the ALSA backend in SDL2 doesn't return the number of channels, just fall back to a safe value
+		if (spec.channels == 0) {
+			spec.channels = 2;
+		}
 #else
 		// seems to be no way to get the device's native format before SDL 2.0.16, just fall back to 48kHz stereo
 		const int err = 0;

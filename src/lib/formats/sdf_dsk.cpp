@@ -187,10 +187,4 @@ bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 }
 
 
-bool sdf_format::supports_save() const noexcept
-{
-	return false;
-}
-
-
 const sdf_format FLOPPY_SDF_FORMAT;

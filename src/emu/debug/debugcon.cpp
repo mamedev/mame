@@ -24,6 +24,7 @@
 #include <cctype>
 #include <fstream>
 #include <iterator>
+#include <regex>
 
 
 /***************************************************************************
@@ -656,6 +657,14 @@ bool debugger_console::validate_number_parameter(std::string_view param, u64 &re
 	}
 }
 
+bool debugger_console::validate_number_parameter(std::string_view param, offs_t &result)
+{
+	u64 res;
+	bool ret = validate_number_parameter(param, res);
+	result = res;
+	return ret;
+}
+
 
 /// \brief Validate parameter as a device
 ///
@@ -763,14 +772,14 @@ bool debugger_console::validate_cpu_parameter(std::string_view param, device_t *
 /// default address space number is negative, the first address space
 /// exposed by the device will be used as the default.
 /// \param [in] The parameter string.
-/// \param [in] spacenum The default address space index.  If negative,
+/// \param [inout] spacenum The default address space index.  If negative,
 ///   the first address space exposed by the device (i.e. the address
-///   space with the lowest index) will be used as the default.
-/// \param [out] result The addresfs space on success, or unchanged on
-///   failure.
+///   space with the lowest index) will be used as the default and
+///   returned
+/// \param [out] mintf Memory interface of the device when found
 /// \return true if the parameter refers to an address space in the
 ///   current system, or false otherwise.
-bool debugger_console::validate_device_space_parameter(std::string_view param, int spacenum, address_space *&result)
+bool debugger_console::validate_device_space_parameter(std::string_view param, int &spacenum, device_memory_interface *&mintf)
 {
 	device_t *device;
 	std::string spacename;
@@ -836,8 +845,7 @@ bool debugger_console::validate_device_space_parameter(std::string_view param, i
 	}
 
 	// ensure the device implements the memory interface
-	device_memory_interface *memory;
-	if (!device->interface(memory))
+	if (!device->interface(mintf))
 	{
 		printf("No memory interface found for device %s\n", device->name());
 		return false;
@@ -846,11 +854,8 @@ bool debugger_console::validate_device_space_parameter(std::string_view param, i
 	// fall back to supplied default space if appropriate
 	if (spacename.empty() && (0 <= spacenum))
 	{
-		if (memory->has_space(spacenum))
-		{
-			result = &memory->space(spacenum);
+		if (mintf->has_logical_space(spacenum))
 			return true;
-		}
 		else
 		{
 			printf("No matching memory space found for device '%s'\n", device->tag());
@@ -859,11 +864,11 @@ bool debugger_console::validate_device_space_parameter(std::string_view param, i
 	}
 
 	// otherwise find the specified space or fall back to the first populated space
-	for (int i = 0; memory->max_space_count() > i; ++i)
+	for (int i = 0; mintf->max_space_count() > i; ++i)
 	{
-		if (memory->has_space(i) && (spacename.empty() || (memory->space(i).name() == spacename)))
+		if (mintf->has_logical_space(i) && (spacename.empty() || (mintf->logical_space_config(i)->name() == spacename)))
 		{
-			result = &memory->space(i);
+			spacenum = i;
 			return true;
 		}
 	}
@@ -883,7 +888,7 @@ bool debugger_console::validate_device_space_parameter(std::string_view param, i
 /// optionally followed by a colon and a device identifier.  If the
 /// device identifier is not presnt, the current CPU with debugger focus
 /// is assumed.  See #validate_device_parameter for information on how
-/// device parametersare interpreted.
+/// device parameters are interpreted.
 /// \param [in] The parameter string.
 /// \param [in] spacenum The default address space index.  If negative,
 ///   the first address space exposed by the device (i.e. the address
@@ -893,7 +898,7 @@ bool debugger_console::validate_device_space_parameter(std::string_view param, i
 /// \param [out] addr The address on success, or unchanged on failure.
 /// \return true if the address is a valid expression evaluating to a
 ///   number and the address space is found, or false otherwise.
-bool debugger_console::validate_target_address_parameter(std::string_view param, int spacenum, address_space *&space, u64 &addr)
+bool debugger_console::validate_target_address_parameter(std::string_view param, int &spacenum, device_memory_interface *&mintf, u64 &addr)
 {
 	// check for the device delimiter
 	std::string_view::size_type const devdelim = find_delimiter(param, [] (char ch) { return ':' == ch; });
@@ -902,17 +907,51 @@ bool debugger_console::validate_target_address_parameter(std::string_view param,
 		device = param.substr(devdelim + 1);
 
 	// parse the address first
-	u64 addrval;
+	offs_t addrval;
 	if (!validate_number_parameter(param.substr(0, devdelim), addrval))
 		return false;
 
-	// find the address space
-	if (!validate_device_space_parameter(device, spacenum, space))
+	// find the logical space
+	if (!validate_device_space_parameter(device, spacenum, mintf))
 		return false;
 
-	// set the address now that we have the space
+	// set the address now that we have the interface
 	addr = addrval;
 	return true;
+}
+
+
+/// \brief Validate a parameter as an address in a memory region or share
+///
+/// Validates a parameter as a address with memory region or share tag.
+/// \param [in] The parameter string.
+/// \param [out] addr The address on success, or unchanged on failure.
+/// \param [out] region The region if the parameter refers to a memory
+///   region, or unchanged otherwise.
+/// \param [out] share The share if the parameter refers to a share, or
+///   unchanged otherwise.
+/// \return true if the parameter refers to an address in a memory
+///   region or share in the current system, or false otherwise.
+bool debugger_console::validate_address_with_memory_parameter(std::string_view param, u64 &addr, memory_region *&region, memory_share *&share)
+{
+	std::string str(param);
+	std::regex re("^([^:]+)(:.+)\\.([ms])$");
+	std::smatch m;
+	if (std::regex_match(str, m, re))
+	{
+		if ('m' == m[3])
+			validate_memory_region_parameter(m.str(2), region);
+		else if ('s' == m[3])
+			validate_memory_share_parameter(m.str(2), share);
+		else
+			return false;
+
+		validate_number_parameter(m.str(1), addr);
+
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -939,6 +978,34 @@ bool debugger_console::validate_memory_region_parameter(std::string_view param, 
 	else
 	{
 		printf("No matching memory region found for '%s'\n", param);
+		return false;
+	}
+}
+
+
+/// \brief Validate a parameter as a memory share
+///
+/// Validates a parameter as a memory share tag and retrieves the
+/// specified memory share.
+/// \param [in] The parameter string.
+/// \param [out] result The memory share on success, or unchanged on
+///   failure.
+/// \return true if the parameter refers to a memory share in the
+///   current system, or false otherwise.
+bool debugger_console::validate_memory_share_parameter(std::string_view param, memory_share *&result)
+{
+	auto const &shares = m_machine.memory().shares();
+	std::string_view relative = param;
+	device_t &base = get_device_search_base(relative);
+	auto const iter = shares.find(base.subtag(strmakelower(relative)));
+	if (shares.end() != iter)
+	{
+		result = iter->second.get();
+		return true;
+	}
+	else
+	{
+		printf("No matching memory share found for '%s'\n", param);
 		return false;
 	}
 }

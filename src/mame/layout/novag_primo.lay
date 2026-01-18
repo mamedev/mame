@@ -378,86 +378,86 @@ authors:hap
 		<element name="1.7" ref="led"><bounds x="78.25" y="84.5" width="1.5" height="1.5" /></element>
 
 		<!-- right side buttons -->
-		<element ref="text_rb00"><bounds x="84" y="4.2"  width="14" height="1.5" /></element>
-		<element ref="text_rb01"><bounds x="84" y="14.2" width="14" height="1.5" /></element>
-		<element ref="text_rb02"><bounds x="84" y="24.2" width="14" height="1.5" /></element>
-		<element ref="text_rb03"><bounds x="84" y="34.2" width="14" height="1.5" /></element>
-		<element ref="text_rb04"><bounds x="84" y="44.2" width="14" height="1.5" /></element>
-		<element ref="text_rb05"><bounds x="84" y="54.2" width="14" height="1.5" /></element>
-		<element ref="text_rb06"><bounds x="84" y="64.2" width="14" height="1.5" /></element>
-		<element ref="text_rb07"><bounds x="84" y="70.3" width="14" height="1.5" /></element>
-		<element ref="text_rb08"><bounds x="84" y="74.2" width="14" height="1.5" /></element>
-		<element ref="text_rb09"><bounds x="84" y="80.3" width="14" height="1.5" /></element>
+		<element ref="text_rb00"><bounds xc="91" y="4.2"  width="9" height="1.5" /></element>
+		<element ref="text_rb01"><bounds xc="91" y="14.2" width="9" height="1.5" /></element>
+		<element ref="text_rb02"><bounds xc="91" y="24.2" width="9" height="1.5" /></element>
+		<element ref="text_rb03"><bounds xc="91" y="34.2" width="9" height="1.5" /></element>
+		<element ref="text_rb04"><bounds xc="91" y="44.2" width="9" height="1.5" /></element>
+		<element ref="text_rb05"><bounds xc="91" y="54.2" width="9" height="1.5" /></element>
+		<element ref="text_rb06"><bounds xc="91" y="64.2" width="9" height="1.5" /></element>
+		<element ref="text_rb07"><bounds xc="91" y="70.3" width="9" height="1.5" /></element>
+		<element ref="text_rb08"><bounds xc="91" y="74.2" width="9" height="1.5" /></element>
+		<element ref="text_rb09"><bounds xc="91" y="80.3" width="9" height="1.5" /></element>
 
-		<element ref="text_rb10"><bounds x="93" y="4.2"  width="14" height="1.5" /></element>
-		<element ref="text_rb11"><bounds x="93" y="14.2" width="14" height="1.5" /></element>
-		<element ref="text_rb12"><bounds x="93" y="24.2" width="14" height="1.5" /></element>
-		<element ref="text_rb13"><bounds x="93" y="30.3" width="14" height="1.5" /></element>
-		<element ref="text_rb14"><bounds x="93" y="34.2" width="14" height="1.5" /></element>
-		<element ref="text_rb15"><bounds x="93" y="44.2" width="14" height="1.5" /></element>
-		<element ref="text_rb16"><bounds x="93" y="50.3" width="14" height="1.5" /></element>
-		<element ref="text_rb17"><bounds x="93" y="54.2" width="14" height="1.5" /></element>
-		<element ref="text_rb18"><bounds x="93" y="64.2" width="14" height="1.5" /></element>
-		<element ref="text_rb19"><bounds x="93" y="74.2" width="14" height="1.5" /></element>
+		<element ref="text_rb10"><bounds xc="100" y="4.2"  width="9" height="1.5" /></element>
+		<element ref="text_rb11"><bounds xc="100" y="14.2" width="9" height="1.5" /></element>
+		<element ref="text_rb12"><bounds xc="100" y="24.2" width="9" height="1.5" /></element>
+		<element ref="text_rb13"><bounds xc="100" y="30.3" width="9" height="1.5" /></element>
+		<element ref="text_rb14"><bounds xc="100" y="34.2" width="9" height="1.5" /></element>
+		<element ref="text_rb15"><bounds xc="100" y="44.2" width="9" height="1.5" /></element>
+		<element ref="text_rb16"><bounds xc="100" y="50.3" width="9" height="1.5" /></element>
+		<element ref="text_rb17"><bounds xc="100" y="54.2" width="9" height="1.5" /></element>
+		<element ref="text_rb18"><bounds xc="100" y="64.2" width="9" height="1.5" /></element>
+		<element ref="text_rb19"><bounds xc="100" y="74.2" width="9" height="1.5" /></element>
 
-		<element ref="red"><bounds x="88" y="6"  width="6" height="4" /></element>
-		<element ref="red"><bounds x="88" y="16" width="6" height="4" /></element>
-		<element ref="red"><bounds x="88" y="26" width="6" height="4" /></element>
-		<element ref="red"><bounds x="88" y="36" width="6" height="4" /></element>
-		<element ref="red"><bounds x="88" y="46" width="6" height="4" /></element>
-		<element ref="red"><bounds x="88" y="56" width="6" height="4" /></element>
-		<element ref="red"><bounds x="88" y="66" width="6" height="4" /></element>
-		<element ref="red"><bounds x="88" y="76" width="6" height="4" /></element>
-		<element ref="white"><bounds x="88.15" y="6.15"  width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="88.15" y="16.15" width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="88.15" y="26.15" width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="88.15" y="36.15" width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="88.15" y="46.15" width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="88.15" y="56.15" width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="88.15" y="66.15" width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="88.15" y="76.15" width="5.7" height="3.7" /></element>
+		<element ref="red"><bounds xc="91" y="6"  width="6" height="4" /></element>
+		<element ref="red"><bounds xc="91" y="16" width="6" height="4" /></element>
+		<element ref="red"><bounds xc="91" y="26" width="6" height="4" /></element>
+		<element ref="red"><bounds xc="91" y="36" width="6" height="4" /></element>
+		<element ref="red"><bounds xc="91" y="46" width="6" height="4" /></element>
+		<element ref="red"><bounds xc="91" y="56" width="6" height="4" /></element>
+		<element ref="red"><bounds xc="91" y="66" width="6" height="4" /></element>
+		<element ref="red"><bounds xc="91" y="76" width="6" height="4" /></element>
+		<element ref="white"><bounds xc="91" y="6.15"  width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="91" y="16.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="91" y="26.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="91" y="36.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="91" y="46.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="91" y="56.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="91" y="66.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="91" y="76.15" width="5.7" height="3.7" /></element>
 
-		<element ref="text_p1" blend="multiply"><bounds x="89.55" y="6.45"  width="2.9" height="2.9" /></element>
-		<element ref="text_p2" blend="multiply"><bounds x="89.55" y="16.45" width="2.9" height="2.9" /></element>
-		<element ref="text_p3" blend="multiply"><bounds x="89.55" y="26.45" width="2.9" height="2.9" /></element>
-		<element ref="text_p4" blend="multiply"><bounds x="89.55" y="36.45" width="2.9" height="2.9" /></element>
-		<element ref="text_p5" blend="multiply"><bounds x="89.55" y="46.45" width="2.9" height="2.9" /></element>
-		<element ref="text_p6" blend="multiply"><bounds x="89.55" y="56.45" width="2.9" height="2.9" /></element>
+		<element ref="text_p1" blend="multiply"><bounds xc="91" y="6.45"  width="2.9" height="2.9" /></element>
+		<element ref="text_p2" blend="multiply"><bounds xc="91" y="16.45" width="2.9" height="2.9" /></element>
+		<element ref="text_p3" blend="multiply"><bounds xc="91" y="26.45" width="2.9" height="2.9" /></element>
+		<element ref="text_p4" blend="multiply"><bounds xc="91" y="36.45" width="2.9" height="2.9" /></element>
+		<element ref="text_p5" blend="multiply"><bounds xc="91" y="46.45" width="2.9" height="2.9" /></element>
+		<element ref="text_p6" blend="multiply"><bounds xc="91" y="56.45" width="2.9" height="2.9" /></element>
 
-		<element ref="hlb" inputtag="IN.0" inputmask="0x80"><bounds x="88" y="6"  width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x40"><bounds x="88" y="16" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x20"><bounds x="88" y="26" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x10"><bounds x="88" y="36" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x08"><bounds x="88" y="46" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x04"><bounds x="88" y="56" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds x="88" y="66" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds x="88" y="76" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x80"><bounds xc="91" y="6"  width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x40"><bounds xc="91" y="16" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x20"><bounds xc="91" y="26" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x10"><bounds xc="91" y="36" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x08"><bounds xc="91" y="46" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x04"><bounds xc="91" y="56" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x02"><bounds xc="91" y="66" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.0" inputmask="0x01"><bounds xc="91" y="76" width="6" height="4" /><color alpha="0.15" /></element>
 
-		<element ref="white"><bounds x="97" y="6"  width="6" height="4" /></element>
-		<element ref="red"><bounds x="97" y="16" width="6" height="4" /></element>
-		<element ref="red"><bounds x="97" y="26" width="6" height="4" /></element>
-		<element ref="red"><bounds x="97" y="36" width="6" height="4" /></element>
-		<element ref="red"><bounds x="97" y="46" width="6" height="4" /></element>
-		<element ref="red"><bounds x="97" y="56" width="6" height="4" /></element>
-		<element ref="red"><bounds x="97" y="66" width="6" height="4" /></element>
-		<element ref="white"><bounds x="97" y="76" width="6" height="4" /></element>
-		<element ref="red"><bounds x="97.15" y="6.15"  width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="97.15" y="16.15" width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="97.15" y="26.15" width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="97.15" y="36.15" width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="97.15" y="46.15" width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="97.15" y="56.15" width="5.7" height="3.7" /></element>
-		<element ref="white"><bounds x="97.15" y="66.15" width="5.7" height="3.7" /></element>
-		<element ref="red"><bounds x="97.15" y="76.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="100" y="6"  width="6" height="4" /></element>
+		<element ref="red">  <bounds xc="100" y="16" width="6" height="4" /></element>
+		<element ref="red">  <bounds xc="100" y="26" width="6" height="4" /></element>
+		<element ref="red">  <bounds xc="100" y="36" width="6" height="4" /></element>
+		<element ref="red">  <bounds xc="100" y="46" width="6" height="4" /></element>
+		<element ref="red">  <bounds xc="100" y="56" width="6" height="4" /></element>
+		<element ref="red">  <bounds xc="100" y="66" width="6" height="4" /></element>
+		<element ref="white"><bounds xc="100" y="76" width="6" height="4" /></element>
+		<element ref="red">  <bounds xc="100" y="6.15"  width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="100" y="16.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="100" y="26.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="100" y="36.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="100" y="46.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="100" y="56.15" width="5.7" height="3.7" /></element>
+		<element ref="white"><bounds xc="100" y="66.15" width="5.7" height="3.7" /></element>
+		<element ref="red">  <bounds xc="100" y="76.15" width="5.7" height="3.7" /></element>
 
-		<element ref="hlb" inputtag="IN.1" inputmask="0x80"><bounds x="97" y="6"  width="6" height="4" /><color alpha="0.20" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x40"><bounds x="97" y="16" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x20"><bounds x="97" y="26" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x10"><bounds x="97" y="36" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x08"><bounds x="97" y="46" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x04"><bounds x="97" y="56" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds x="97" y="66" width="6" height="4" /><color alpha="0.15" /></element>
-		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds x="97" y="76" width="6" height="4" /><color alpha="0.20" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x80"><bounds xc="100" y="6"  width="6" height="4" /><color alpha="0.20" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x40"><bounds xc="100" y="16" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x20"><bounds xc="100" y="26" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x10"><bounds xc="100" y="36" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x08"><bounds xc="100" y="46" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x04"><bounds xc="100" y="56" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x02"><bounds xc="100" y="66" width="6" height="4" /><color alpha="0.15" /></element>
+		<element ref="hlb" inputtag="IN.1" inputmask="0x01"><bounds xc="100" y="76" width="6" height="4" /><color alpha="0.20" /></element>
 
 		<repeat count="7">
 			<param name="y" start="13" increment="10" />

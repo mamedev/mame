@@ -1,3 +1,6 @@
+// license:CC0-1.0
+// copyright-holders:m1macrophage
+
 #include "netlist/devices/net_lib.h"
 
 NETLIST_START(moogsource)

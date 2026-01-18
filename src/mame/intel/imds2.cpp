@@ -96,9 +96,6 @@ namespace {
 // CPU oscillator of IPC board: 8 MHz
 #define IPC_XTAL_Y2     8_MHz_XTAL
 
-// Y1 oscillator of IPC board: 19.6608 MHz
-static constexpr auto IPC_XTAL_Y1 = 19.6608_MHz_XTAL;
-
 class imds2_state : public driver_device
 {
 public:
@@ -256,6 +253,9 @@ static void imds2_cards(device_slot_interface &device)
 
 void imds2_state::imds2(machine_config &config)
 {
+	// Y1 oscillator of IPC board: 19.6608 MHz
+	constexpr auto IPC_XTAL_Y1 = 19.6608_MHz_XTAL;
+
 	I8085A(config, m_ipccpu, IPC_XTAL_Y2);  // CLK OUT = 4 MHz
 	m_ipccpu->set_addrmap(AS_PROGRAM, &imds2_state::ipc_mem_map);
 	m_ipccpu->set_addrmap(AS_IO, &imds2_state::ipc_io_map);

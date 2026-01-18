@@ -28,6 +28,7 @@
 #include "softlist.h"
 
 #include "corestr.h"
+#include "multibyte.h"
 
 #include <algorithm>
 #include <cctype>
@@ -460,7 +461,11 @@ void debugger_commands::execute_print(const std::vector<std::string_view> &param
 
 	// then print each one
 	for (int i = 0; i < params.size(); i++)
+	{
+		if (i)
+			m_console.printf(" ");
 		m_console.printf("%X", values[i]);
+	}
 	m_console.printf("\n");
 }
 
@@ -601,13 +606,14 @@ bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std:
 
 				case 's':
 					{
-						address_space *space;
-						if (param < params.size() && m_console.validate_target_address_parameter(params[param++], -1, space, number))
+						device_memory_interface *mintf;
+						int spacenum = -1;
+						if (param < params.size() && m_console.validate_target_address_parameter(params[param++], spacenum, mintf, number))
 						{
 							address_space *tspace;
 							std::string s;
 
-							for (u32 address = u32(number), taddress; space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, taddress = address, tspace); address++)
+							for (u32 address = u32(number), taddress; mintf->translate(spacenum, device_memory_interface::TR_READ, taddress = address, tspace); address++)
 							{
 								u8 const data = tspace->read_byte(taddress);
 
@@ -1353,23 +1359,18 @@ void debugger_commands::execute_bpset(const std::vector<std::string_view> &param
 {
 	// param 1 is the address/CPU
 	u64 address;
-	address_space *space;
-	if (!m_console.validate_target_address_parameter(params[0], AS_PROGRAM, space, address))
+	device_memory_interface *mintf;
+	int spacenum = AS_PROGRAM;
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, address))
 		return;
 
 	device_execute_interface const *execute;
-	if (!space->device().interface(execute))
+	if (!mintf->device().interface(execute))
 	{
-		m_console.printf("Device %s is not a CPU\n", space->device().name());
+		m_console.printf("Device %s is not a CPU\n", mintf->device().name());
 		return;
 	}
-	device_debug *const debug = space->device().debug();
-
-	if (space->spacenum() != AS_PROGRAM)
-	{
-		m_console.printf("Only program space breakpoints are supported\n");
-		return;
-	}
+	device_debug *const debug = mintf->device().debug();
 
 	// param 2 is the condition
 	parsed_expression condition(debug->symtable());
@@ -1504,19 +1505,19 @@ void debugger_commands::execute_bplist(const std::vector<std::string_view> &para
 void debugger_commands::execute_wpset(int spacenum, const std::vector<std::string_view> &params)
 {
 	u64 address, length;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// param 1 is the address/CPU
-	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, address))
 		return;
 
 	device_execute_interface const *execute;
-	if (!space->device().interface(execute))
+	if (!mintf->device().interface(execute))
 	{
-		m_console.printf("Device %s is not a CPU\n", space->device().name());
+		m_console.printf("Device %s is not a CPU\n", mintf->device().name());
 		return;
 	}
-	device_debug *const debug = space->device().debug();
+	device_debug *const debug = mintf->device().debug();
 
 	// param 2 is the length
 	if (!m_console.validate_number_parameter(params[1], length))
@@ -1540,6 +1541,14 @@ void debugger_commands::execute_wpset(int spacenum, const std::vector<std::strin
 		}
 	}
 
+	address_space *tspace;
+	offs_t taddress = address;
+	if (!mintf->translate(spacenum, type == read_or_write::READ ? device_memory_interface::TR_READ : device_memory_interface::TR_WRITE, taddress, tspace))
+	{
+		m_console.printf("Address %x in logical space %s does not map to anything\n", address, mintf->logical_space_config(spacenum)->name());
+		return;
+	}
+
 	// param 4 is the condition
 	parsed_expression condition(debug->symtable());
 	if (params.size() > 3 && !m_console.validate_expression_parameter(params[3], condition))
@@ -1551,7 +1560,7 @@ void debugger_commands::execute_wpset(int spacenum, const std::vector<std::strin
 		return;
 
 	// set the watchpoint
-	int const wpnum = debug->watchpoint_set(*space, type, address, length, (condition.is_empty()) ? nullptr : condition.original_string(), action);
+	int const wpnum = debug->watchpoint_set(*tspace, type, taddress, length, (condition.is_empty()) ? nullptr : condition.original_string(), action);
 	m_console.printf("Watchpoint %X set\n", wpnum);
 }
 
@@ -2007,18 +2016,22 @@ void debugger_commands::execute_rewind(const std::vector<std::string_view> &para
 
 void debugger_commands::execute_save(int spacenum, const std::vector<std::string_view> &params)
 {
+	if (execute_save_try_memory(params))
+		return;
+
 	u64 offset, endoffset, length;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// validate parameters
-	if (!m_console.validate_target_address_parameter(params[1], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[1], spacenum, mintf, offset))
 		return;
 	if (!m_console.validate_number_parameter(params[2], length))
 		return;
 
 	// determine the addresses to write
-	endoffset = (offset + length - 1) & space->addrmask();
-	offset = offset & space->addrmask();
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+	endoffset = (offset + length - 1) & config->addrmask();
+	offset = offset & config->addrmask();
 	endoffset++;
 
 	// open the file
@@ -2031,16 +2044,16 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 	}
 
 	// now write the data out
-	auto dis = space->device().machine().disable_side_effects();
-	switch (space->addr_shift())
+	auto dis = mintf->device().machine().disable_side_effects();
+	switch (config->addr_shift())
 	{
 	case -3:
 		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			address_space *tspace;
-			u64 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_qword(curaddr) : space->unmap();
+			u64 data = mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace) ?
+				tspace->read_qword(curaddr) : 0;
 			fwrite(&data, 8, 1, f);
 		}
 		break;
@@ -2049,8 +2062,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		{
 			offs_t curaddr = i;
 			address_space *tspace;
-			u32 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_dword(curaddr) : space->unmap();
+			u32 data = mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace) ?
+				tspace->read_dword(curaddr) : 0;
 			fwrite(&data, 4, 1, f);
 		}
 		break;
@@ -2059,8 +2072,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		{
 			offs_t curaddr = i;
 			address_space *tspace;
-			u16 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_word(curaddr) : space->unmap();
+			u16 data = mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace) ?
+				tspace->read_word(curaddr) : 0;
 			fwrite(&data, 2, 1, f);
 		}
 		break;
@@ -2069,8 +2082,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		{
 			offs_t curaddr = i;
 			address_space *tspace;
-			u8 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_byte(curaddr) : space->unmap();
+			u8 data = mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace) ?
+				tspace->read_byte(curaddr) : 0;
 			fwrite(&data, 1, 1, f);
 		}
 		break;
@@ -2081,8 +2094,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		{
 			offs_t curaddr = i;
 			address_space *tspace;
-			u16 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_word(curaddr) : space->unmap();
+			u16 data = mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace) ?
+				tspace->read_word(curaddr) : 0;
 			fwrite(&data, 2, 1, f);
 		}
 		break;
@@ -2093,31 +2106,42 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 	m_console.printf("Data saved successfully\n");
 }
 
-
 /*-------------------------------------------------
-    execute_saveregion - execute the save command on region memory
+    execute_savememory - execute the save command on memory
 -------------------------------------------------*/
 
-void debugger_commands::execute_saveregion(const std::vector<std::string_view> &params)
+bool debugger_commands::execute_save_try_memory(const std::vector<std::string_view> &params)
 {
-	u64 offset, length;
-	memory_region *region;
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[1], offset, region, share))
+		return false; // not memory case
 
-	// validate parameters
-	if (!m_console.validate_number_parameter(params[1], offset))
-		return;
-	if (!m_console.validate_number_parameter(params[2], length))
-		return;
-	if (!m_console.validate_memory_region_parameter(params[3], region))
-		return;
+	u64 length;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[2], length) || (region == nullptr && share == nullptr))
+		return true;
 
-	if (offset >= region->bytes())
+	u32 msize;
+	u8 *base;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+	}
+
+	if (offset >= msize)
 	{
 		m_console.printf("Invalid offset\n");
-		return;
+		return true;
 	}
-	if ((length <= 0) || ((length + offset) >= region->bytes()))
-		length = region->bytes() - offset;
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
 
 	// open the file
 	std::string const filename(params[0]);
@@ -2125,12 +2149,24 @@ void debugger_commands::execute_saveregion(const std::vector<std::string_view> &
 	if (!f)
 	{
 		m_console.printf("Error opening file '%s'\n", params[0]);
-		return;
+		return true;
 	}
-	fwrite(region->base() + offset, 1, length, f);
+	fwrite(base + offset, 1, length, f);
 
 	fclose(f);
 	m_console.printf("Data saved successfully\n");
+
+	return true;
+}
+
+
+/*-------------------------------------------------
+    execute_saveregion - execute the save command on region memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_saveregion(const std::vector<std::string_view> &params)
+{
+	execute_save(-1, std::vector<std::string_view>{ params[0], std::string(params[1]) + std::string(params[3]) + ".m", params[2] });
 }
 
 
@@ -2140,11 +2176,14 @@ void debugger_commands::execute_saveregion(const std::vector<std::string_view> &
 
 void debugger_commands::execute_load(int spacenum, const std::vector<std::string_view> &params)
 {
+	if (execute_load_try_memory(params))
+		return;
+
 	u64 offset, endoffset, length = 0;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// validate parameters
-	if (!m_console.validate_target_address_parameter(params[1], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[1], spacenum, mintf, offset))
 		return;
 	if (params.size() > 2 && !m_console.validate_number_parameter(params[2], length))
 		return;
@@ -2160,25 +2199,26 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 	}
 
 	// determine the file size, if not specified
+	const address_space_config *config = mintf->logical_space_config(spacenum);
 	if (params.size() <= 2)
 	{
 		f.seekg(0, std::ios::end);
 		length = f.tellg();
 		f.seekg(0);
-		if (space->addr_shift() < 0)
-			length >>= -space->addr_shift();
-		else if (space->addr_shift() > 0)
-			length <<= space->addr_shift();
+		if (config->addr_shift() < 0)
+			length >>= -config->addr_shift();
+		else if (config->addr_shift() > 0)
+			length <<= config->addr_shift();
 	}
 
 	// determine the addresses to read
-	endoffset = (offset + length - 1) & space->addrmask();
-	offset = offset & space->addrmask();
+	endoffset = (offset + length - 1) & config->addrmask();
+	offset = offset & config->addrmask();
 	u64 i = 0;
 
 	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
-	auto dis = space->device().machine().disable_side_effects();
-	switch (space->addr_shift())
+	auto dis = mintf->device().machine().disable_side_effects();
+	switch (config->addr_shift())
 	{
 	case -3:
 		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
@@ -2187,7 +2227,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			u64 data;
 			f.read((char *)&data, 8);
 			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
+			if (f && mintf->translate(spacenum, device_memory_interface::TR_WRITE, curaddr, tspace))
 				tspace->write_qword(curaddr, data);
 		}
 		break;
@@ -2198,7 +2238,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			u32 data;
 			f.read((char *)&data, 4);
 			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
+			if (f && mintf->translate(spacenum, device_memory_interface::TR_WRITE, curaddr, tspace))
 				tspace->write_dword(curaddr, data);
 		}
 		break;
@@ -2209,7 +2249,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			u16 data;
 			f.read((char *)&data, 2);
 			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
+			if (f && mintf->translate(spacenum, device_memory_interface::TR_WRITE, curaddr, tspace))
 				tspace->write_word(curaddr, data);
 		}
 		break;
@@ -2220,7 +2260,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			u8 data;
 			f.read((char *)&data, 1);
 			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
+			if (f && mintf->translate(spacenum, device_memory_interface::TR_WRITE, curaddr, tspace))
 				tspace->write_byte(curaddr, data);
 		}
 		break;
@@ -2233,7 +2273,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			u16 data;
 			f.read((char *)&data, 2);
 			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
+			if (f && mintf->translate(spacenum, device_memory_interface::TR_WRITE, curaddr, tspace))
 				tspace->write_word(curaddr, data);
 		}
 		break;
@@ -2247,31 +2287,43 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 		m_console.printf("Data loaded successfully to memory : 0x%X to 0x%X\n", offset, i-1);
 }
 
-
 /*-------------------------------------------------
-    execute_loadregion - execute the load command on region memory
+    execute_loadmemory - execute the load command on memory
 -------------------------------------------------*/
 
-void debugger_commands::execute_loadregion(const std::vector<std::string_view> &params)
+bool debugger_commands::execute_load_try_memory(const std::vector<std::string_view> &params)
 {
-	u64 offset, length;
-	memory_region *region;
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[1], offset, region, share))
+		return false; // not memory case
 
+	u64 length;
 	// validate parameters
-	if (!m_console.validate_number_parameter(params[1], offset))
-		return;
-	if (!m_console.validate_number_parameter(params[2], length))
-		return;
-	if (!m_console.validate_memory_region_parameter(params[3], region))
-		return;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[2], length) || (region == nullptr && share == nullptr))
+		return true;
 
-	if (offset >= region->bytes())
+	u32 msize;
+	u8 *base;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+	}
+
+	if (offset >= msize)
 	{
 		m_console.printf("Invalid offset\n");
-		return;
+		return true;
 	}
-	if ((length <= 0) || ((length + offset) >= region->bytes()))
-		length = region->bytes() - offset;
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
 
 	// open the file
 	std::string filename(params[0]);
@@ -2279,7 +2331,7 @@ void debugger_commands::execute_loadregion(const std::vector<std::string_view> &
 	if (!f)
 	{
 		m_console.printf("Error opening file '%s'\n", params[0]);
-		return;
+		return true;
 	}
 
 	fseek(f, 0L, SEEK_END);
@@ -2290,10 +2342,22 @@ void debugger_commands::execute_loadregion(const std::vector<std::string_view> &
 	if (length >= size)
 		length = size;
 
-	fread(region->base() + offset, 1, length, f);
+	fread(base + offset, 1, length, f);
 
 	fclose(f);
 	m_console.printf("Data loaded successfully to memory : 0x%X to 0x%X\n", offset, offset + length - 1);
+
+	return true;
+}
+
+
+/*-------------------------------------------------
+    execute_loadregion - execute the load command on region memory
+-------------------------------------------------*/
+
+void debugger_commands::execute_loadregion(const std::vector<std::string_view> &params)
+{
+	execute_load(-1, std::vector<std::string_view>{ params[0], std::string(params[1]) + std::string(params[3]) + ".m", params[2] });
 }
 
 
@@ -2303,11 +2367,16 @@ void debugger_commands::execute_loadregion(const std::vector<std::string_view> &
 
 void debugger_commands::execute_dump(int spacenum, const std::vector<std::string_view> &params)
 {
-	// validate parameters
-	address_space *space;
-	u64 offset;
-	if (!m_console.validate_target_address_parameter(params[1], spacenum, space, offset))
+	if (execute_dump_try_memory(params))
 		return;
+
+	// validate parameters
+	device_memory_interface *mintf;
+	u64 offset;
+	if (!m_console.validate_target_address_parameter(params[1], spacenum, mintf, offset))
+		return;
+
+	const address_space_config *config = mintf->logical_space_config(spacenum);
 
 	u64 length;
 	if (!m_console.validate_number_parameter(params[2], length))
@@ -2321,18 +2390,18 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 	if (params.size() > 4 && !m_console.validate_boolean_parameter(params[4], ascii))
 		return;
 
-	u64 rowsize = space->byte_to_address(16);
+	u64 rowsize = config->byte2addr(16);
 	if (params.size() > 5 && !m_console.validate_number_parameter(params[5], rowsize))
 		return;
 
-	int shift = space->addr_shift();
+	int shift = config->addr_shift();
 	u64 granularity = shift >= 0 ? 1 : 1 << -shift;
 
 	// further validation
 	if (width == 0)
-		width = space->data_width() / 8;
-	if (width < space->address_to_byte(1))
-		width = space->address_to_byte(1);
+		width = config->data_width() / 8;
+	if (width < config->addr2byte(1))
+		width = config->addr2byte(1);
 	if (width != 1 && width != 2 && width != 4 && width != 8)
 	{
 		m_console.printf("Invalid width! (must be 1,2,4 or 8)\n");
@@ -2343,14 +2412,14 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 		m_console.printf("Invalid width! (must be at least %d)\n", granularity);
 		return;
 	}
-	if (rowsize == 0 || (rowsize % space->byte_to_address(width)) != 0)
+	if (rowsize == 0 || (rowsize % config->byte2addr(width)) != 0)
 	{
-		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", space->byte_to_address(width));
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", config->byte2addr(width));
 		return;
 	}
 
-	u64 endoffset = (offset + length - 1) & space->addrmask();
-	offset = offset & space->addrmask();
+	u64 endoffset = (offset + length - 1) & config->addrmask();
+	offset = offset & config->addrmask();
 
 	// open the file
 	std::string filename(params[0]);
@@ -2367,8 +2436,8 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 
 	const unsigned delta = (shift >= 0) ? (width << shift) : (width >> -shift);
 
-	auto dis = space->device().machine().disable_side_effects();
-	bool be = space->endianness() == ENDIANNESS_BIG;
+	auto dis = mintf->device().machine().disable_side_effects();
+	bool be = config->endianness() == ENDIANNESS_BIG;
 
 	for (u64 i = offset; i <= endoffset; i += rowsize)
 	{
@@ -2376,7 +2445,7 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 		output.rdbuf()->clear();
 
 		// print the address
-		util::stream_format(output, "%0*X: ", space->logaddrchars(), i);
+		util::stream_format(output, "%0*X: ", config->logaddrchars(), i);
 
 		// print the bytes
 		for (u64 j = 0; j < rowsize; j += delta)
@@ -2385,7 +2454,7 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 			{
 				offs_t curaddr = i + j;
 				address_space *tspace;
-				if (space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace))
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace))
 				{
 					switch (width)
 					{
@@ -2420,7 +2489,7 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 			{
 				offs_t curaddr = i + j;
 				address_space *tspace;
-				if (space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace))
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace))
 				{
 					u64 data = 0;
 					switch (width)
@@ -2460,6 +2529,172 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 	m_console.printf("Data dumped successfully\n");
 }
 
+/*-------------------------------------------------
+    execute_dumpmemory - execute the dump command on memory
+-------------------------------------------------*/
+
+bool debugger_commands::execute_dump_try_memory(const std::vector<std::string_view> &params)
+{
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[1], offset, region, share))
+		return false; // not memory case
+
+	u64 length;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[2], length) || (region == nullptr && share == nullptr))
+		return true;
+
+	u64 width = 0;
+	if (params.size() > 3 && !m_console.validate_number_parameter(params[3], width))
+		return true;
+
+	bool ascii = true;
+	if (params.size() > 4 && !m_console.validate_boolean_parameter(params[4], ascii))
+		return true;
+
+	u64 rowsize = 16;
+	if (params.size() > 5 && !m_console.validate_number_parameter(params[5], rowsize))
+		return true;
+
+	int shift = 0;
+	u64 granularity = shift >= 0 ? 1 : 1 << -shift;
+
+	u32 msize;
+	u8 *base;
+	bool be;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+		be = region->endianness() == ENDIANNESS_BIG;
+		if (width == 0)
+			width = region->bytewidth();
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+		be = share->endianness() == ENDIANNESS_BIG;
+		if (width == 0)
+			width = share->bytewidth();
+	}
+
+	if (offset >= msize)
+	{
+		m_console.printf("Invalid offset\n");
+		return true;
+	}
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
+
+	// further validation
+	if (width != 1 && width != 2 && width != 4 && width != 8)
+	{
+		m_console.printf("Invalid width! (must be 1,2,4 or 8)\n");
+		return true;
+	}
+	if (width < granularity)
+	{
+		m_console.printf("Invalid width! (must be at least %d)\n", granularity);
+		return true;
+	}
+	if (rowsize == 0 || (rowsize % width) != 0)
+	{
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", width);
+		return true;
+	}
+
+	u64 endoffset = offset + length - 1;
+
+	// open the file
+	std::string filename(params[0]);
+	FILE *const f = fopen(filename.c_str(), "w");
+	if (!f)
+	{
+		m_console.printf("Error opening file '%s'\n", params[0]);
+		return true;
+	}
+
+	// now write the data out
+	util::ovectorstream output;
+	output.reserve(200);
+
+	const unsigned delta = (shift >= 0) ? (width << shift) : (width >> -shift);
+
+	for (u64 i = offset; i <= endoffset; i += rowsize)
+	{
+		output.clear();
+		output.rdbuf()->clear();
+
+		// print the address
+		util::stream_format(output, "%0*X: ", 8, i);
+
+		// print the bytes
+		for (u64 j = 0; j < rowsize; j += delta)
+		{
+			if (i + j <= endoffset)
+			{
+				switch (width)
+				{
+				case 8:
+					util::stream_format(output, " %016X", get_u64be(&base[i+j]));
+					break;
+				case 4:
+					util::stream_format(output, " %08X", get_u32be(&base[i+j]));
+					break;
+				case 2:
+					util::stream_format(output, " %04X", get_u16be(&base[i+j]));
+					break;
+				case 1:
+					util::stream_format(output, " %02X", base[i+j]);
+					break;
+				}
+			}
+			else
+				util::stream_format(output, " %*s", width * 2, "");
+		}
+
+		// print the ASCII
+		if (ascii)
+		{
+			util::stream_format(output, "  ");
+			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j += delta)
+			{
+				u64 data = 0;
+				switch (width)
+				{
+				case 8:
+					data = get_u64be(&base[i+j]);
+					break;
+				case 4:
+					data = get_u32be(&base[i+j]);
+					break;
+				case 2:
+					data = get_u16be(&base[i+j]);
+					break;
+				case 1:
+					data = base[i+j];
+					break;
+				}
+				for (unsigned int b = 0; b != width; b++) {
+					u8 byte = data >> (8 * (be ? (width-1-b) : b));
+					util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
+				}
+			}
+		}
+
+		// output the result
+		auto const &text = output.vec();
+		fprintf(f, "%.*s\n", int(unsigned(text.size())), &text[0]);
+	}
+
+	// close the file
+	fclose(f);
+	m_console.printf("Data dumped successfully\n");
+
+	return true;
+}
 
 //-------------------------------------------------
 //  execute_strdump - execute the strdump command
@@ -2467,6 +2702,9 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 
 void debugger_commands::execute_strdump(int spacenum, const std::vector<std::string_view> &params)
 {
+	if (execute_strdump_try_memory(params))
+		return;
+
 	// validate parameters
 	u64 offset;
 	if (!m_console.validate_number_parameter(params[1], offset))
@@ -2480,8 +2718,8 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 	if (params.size() > 3 && !m_console.validate_number_parameter(params[3], term))
 		return;
 
-	address_space *space;
-	if (!m_console.validate_device_space_parameter((params.size() > 4) ? params[4] : std::string_view(), spacenum, space))
+	device_memory_interface *mintf;
+	if (!m_console.validate_device_space_parameter((params.size() > 4) ? params[4] : std::string_view(), spacenum, mintf))
 		return;
 
 	// further validation
@@ -2500,12 +2738,14 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 		return;
 	}
 
-	const int shift = space->addr_shift();
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+
+	const int shift = config->addr_shift();
 	const unsigned delta = (shift >= 0) ? (1 << shift) : 1;
 	const unsigned width = (shift >= 0) ? 1 : (1 << -shift);
-	const bool be = space->endianness() == ENDIANNESS_BIG;
+	const bool be = config->endianness() == ENDIANNESS_BIG;
 
-	offset = offset & space->addrmask();
+	offset = offset & config->addrmask();
 	if (shift > 0)
 		length >>= shift;
 
@@ -2513,7 +2753,7 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 	util::ovectorstream output;
 	output.reserve(200);
 
-	auto dis = space->device().machine().disable_side_effects();
+	auto dis = mintf->device().machine().disable_side_effects();
 
 	bool terminated = true;
 	while (length-- != 0)
@@ -2525,14 +2765,14 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 			output.rdbuf()->clear();
 
 			// print the address
-			util::stream_format(output, "%0*X: \"", space->logaddrchars(), offset);
+			util::stream_format(output, "%0*X: \"", config->logaddrchars(), offset);
 		}
 
 		// get the character data
 		u64 data = 0;
 		offs_t curaddr = offset;
 		address_space *tspace;
-		if (space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace))
+		if (mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace))
 		{
 			switch (width)
 			{
@@ -2575,7 +2815,7 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 				output.rdbuf()->clear();
 
 				// print the address
-				util::stream_format(output, "%0*X.%d: \"", space->logaddrchars(), offset, n);
+				util::stream_format(output, "%0*X.%d: \"", config->logaddrchars(), offset, n);
 			}
 
 			u8 ch = data & 0xff;
@@ -2635,6 +2875,187 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 	// close the file
 	fclose(f);
 	m_console.printf("Data dumped successfully\n");
+}
+
+/*-------------------------------------------------
+    execute_strdumpmemory - execute the strdump command on memory
+-------------------------------------------------*/
+
+bool debugger_commands::execute_strdump_try_memory(const std::vector<std::string_view> &params)
+{
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[1], offset, region, share))
+		return false; // not memory case
+
+	u64 length;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[2], length) || (region == nullptr && share == nullptr))
+		return true;
+
+	u64 term = 0;
+	if (params.size() > 3 && !m_console.validate_number_parameter(params[3], term))
+		return true;
+
+	// further validation
+	if (term >= 0x100 && term != u64(-0x80))
+	{
+		m_console.printf("Invalid termination character\n");
+		return true;
+	}
+
+	// open the file
+	std::string filename(params[0]);
+	FILE *f = fopen(filename.c_str(), "w");
+	if (!f)
+	{
+		m_console.printf("Error opening file '%s'\n", params[0]);
+		return true;
+	}
+
+	u32 msize;
+	u8 *base;
+	bool be;
+	u64 width;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+		be = region->endianness() == ENDIANNESS_BIG;
+		width = region->bytewidth();
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+		be = share->endianness() == ENDIANNESS_BIG;
+		width = share->bytewidth();
+	}
+
+	if (offset >= msize)
+	{
+		m_console.printf("Invalid offset\n");
+		return true;
+	}
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
+
+	// now write the data out
+	util::ovectorstream output;
+	output.reserve(200);
+
+	bool terminated = true;
+	while (length-- != 0)
+	{
+		if (terminated)
+		{
+			terminated = false;
+			output.clear();
+			output.rdbuf()->clear();
+
+			// print the address
+			util::stream_format(output, "%0*X: \"", 8, offset);
+		}
+
+		// get the character data
+		u64 data = 0;
+		offs_t curaddr = offset;
+		switch (width)
+		{
+		case 1:
+			data = base[curaddr];
+			break;
+
+		case 2:
+			data = be ? get_u16be(&base[curaddr]) : get_u16le(&base[curaddr]);
+			break;
+
+		case 4:
+			data = be ? get_u32be(&base[curaddr]) : get_u32le(&base[curaddr]);
+			break;
+
+		case 8:
+			data = be ? get_u64be(&base[curaddr]) : get_u64le(&base[curaddr]);
+			break;
+		}
+
+		// print the characters
+		for (int n = 0; n < width; n++)
+		{
+			// check for termination within word
+			if (terminated)
+			{
+				terminated = false;
+
+				// output the result
+				auto const &text = output.vec();
+				fprintf(f, "%.*s\"\n", int(unsigned(text.size())), &text[0]);
+				output.clear();
+				output.rdbuf()->clear();
+
+				// print the address
+				util::stream_format(output, "%0*X.%d: \"", 8, offset, n);
+			}
+
+			u8 ch = data & 0xff;
+			data >>= 8;
+
+			// check for termination
+			if (term == u64(-0x80))
+			{
+				if (BIT(ch, 7))
+				{
+					terminated = true;
+					ch &= 0x7f;
+				}
+			}
+			else if (ch == term)
+			{
+				terminated = true;
+				continue;
+			}
+
+			// check for non-ASCII characters
+			if (ch < 0x20 || ch >= 0x7f)
+			{
+				// use special or octal escape
+				if (ch >= 0x07 && ch <= 0x0d)
+					util::stream_format(output, "\\%c", "abtnvfr"[ch - 0x07]);
+				else
+					util::stream_format(output, "\\%03o", ch);
+			}
+			else
+			{
+				if (ch == '"' || ch == '\\')
+					output << '\\';
+				output << char(ch);
+			}
+		}
+
+		if (terminated)
+		{
+			// output the result
+			auto const &text = output.vec();
+			fprintf(f, "%.*s\"\n", int(unsigned(text.size())), &text[0]);
+			output.clear();
+			output.rdbuf()->clear();
+		}
+
+		offset += width;
+	}
+
+	if (!terminated)
+	{
+		// output the result
+		auto const &text = output.vec();
+		fprintf(f, "%.*s\"\\\n", int(unsigned(text.size())), &text[0]);
+	}
+
+	// close the file
+	fclose(f);
+	m_console.printf("Data dumped successfully\n");
+
+	return true;
 }
 
 
@@ -2713,8 +3134,15 @@ void debugger_commands::execute_cheatrange(bool init, const std::vector<std::str
 		}
 
 		// fourth argument is device/space
-		if (!m_console.validate_device_space_parameter((params.size() > 3) ? params[3] : std::string_view(), -1, space))
+		int spacenum = -1;
+		device_memory_interface *mintf;
+		if (!m_console.validate_device_space_parameter((params.size() > 3) ? params[3] : std::string_view(), spacenum, mintf))
 			return;
+
+		// cheats only really work on directly physically-backed logical spaces
+		if (!mintf->has_space(spacenum))
+			return;
+		space = &mintf->space(spacenum);
 	}
 
 	cheat_region_map cheat_region[100]; // FIXME: magic number
@@ -3139,19 +3567,23 @@ void debugger_commands::execute_cheatundo(const std::vector<std::string_view> &p
 
 void debugger_commands::execute_find(int spacenum, const std::vector<std::string_view> &params)
 {
+	if (execute_find_try_memory(params))
+		return;
+
 	u64 offset, length;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// validate parameters
-	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, offset))
 		return;
 	if (!m_console.validate_number_parameter(params[1], length))
 		return;
 
 	// further validation
-	u64 const endoffset = space->address_to_byte_end((offset + length - 1) & space->addrmask());
-	offset = space->address_to_byte(offset & space->addrmask());
-	int cur_data_size = (space->addr_shift() > 0) ? 2 : (1 << -space->addr_shift());
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+	u64 const endoffset = config->addr2byte_end((offset + length - 1) & config->addrmask());
+	offset = config->addr2byte(offset & config->addrmask());
+	int cur_data_size = (config->addr_shift() > 0) ? 2 : (1 << -config->addr_shift());
 	if (cur_data_size == 0)
 		cur_data_size = 1;
 
@@ -3195,8 +3627,7 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 	}
 
 	// now search
-	device_memory_interface &memory = space->device().memory();
-	auto dis = space->device().machine().disable_side_effects();
+	auto dis = mintf->device().machine().disable_side_effects();
 	int found = 0;
 	for (u64 i = offset; i <= endoffset; i += data_size[0])
 	{
@@ -3206,37 +3637,37 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 		// find the entire string
 		for (int j = 0; j < data_count && match; j++)
 		{
-			offs_t address = space->byte_to_address(i + suboffset);
+			offs_t address = config->byte2addr(i + suboffset);
 			address_space *tspace;
 			switch (data_size[j])
 			{
 			case 1:
-				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
+				address &= config->logaddrmask();
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, address, tspace))
 					match = tspace->read_byte(address) == u8(data_to_find[j]);
 				else
 					match = false;
 				break;
 
 			case 2:
-				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
+				address &= config->logaddrmask();
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, address, tspace))
 					match = tspace->read_word_unaligned(address) == u16(data_to_find[j]);
 				else
 					match = false;
 				break;
 
 			case 4:
-				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
+				address &= config->logaddrmask();
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, address, tspace))
 					match = tspace->read_dword_unaligned(address) == u32(data_to_find[j]);
 				else
 					match = false;
 				break;
 
 			case 8:
-				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
+				address &= config->logaddrmask();
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, address, tspace))
 					match = tspace->read_qword_unaligned(address) == u64(data_to_find[j]);
 				else
 					match = false;
@@ -3253,13 +3684,147 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 		if (match)
 		{
 			found++;
-			m_console.printf("Found at %0*X\n", space->addrchars(), u32(space->byte_to_address(i)));
+			m_console.printf("Found at %0*X\n", config->addrchars(), u32(config->byte2addr(i)));
 		}
 	}
 
 	// print something if not found
 	if (found == 0)
 		m_console.printf("Not found\n");
+}
+
+/*-------------------------------------------------
+    execute_findmemory - execute the find command on memory
+-------------------------------------------------*/
+
+bool debugger_commands::execute_find_try_memory(const std::vector<std::string_view> &params)
+{
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[0], offset, region, share))
+		return false; // not memory case
+
+	u64 length;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[1], length) || (region == nullptr && share == nullptr))
+		return true;
+
+	u32 msize;
+	u8 *base;
+	bool be;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+		be = region->endianness() == ENDIANNESS_BIG;
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+		be = share->endianness() == ENDIANNESS_BIG;
+	}
+
+	if (offset >= msize)
+	{
+		m_console.printf("Invalid offset\n");
+		return true;
+	}
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
+
+	// further validation
+	u64 const endoffset = offset + length - 1;
+	int cur_data_size = 1;
+
+	// parse the data parameters
+	u64 data_to_find[256];
+	u8 data_size[256];
+	int data_count = 0;
+	for (int i = 2; i < params.size(); i++)
+	{
+		std::string_view pdata = params[i];
+
+		if (!pdata.empty() && pdata.front() == '"' && pdata.back() == '"') // check for a string
+		{
+			auto const pdatalen = params[i].length() - 1;
+			for (int j = 1; j < pdatalen; j++)
+			{
+				data_to_find[data_count] = pdata[j];
+				data_size[data_count++] = 1;
+			}
+		}
+		else // otherwise, validate as a number
+		{
+			// check for a 'b','w','d',or 'q' prefix
+			data_size[data_count] = cur_data_size;
+			if (pdata.length() >= 2)
+			{
+				if (tolower(u8(pdata[0])) == 'b' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 1; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'w' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 2; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'd' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 4; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'q' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 8; pdata.remove_prefix(2); }
+			}
+
+			// look for a wildcard
+			if (pdata == "?")
+				data_size[data_count++] |= 0x10;
+
+			// otherwise, validate as a number
+			else if (!m_console.validate_number_parameter(pdata, data_to_find[data_count++]))
+				return true;
+		}
+	}
+
+	// now search
+	int found = 0;
+	for (u64 i = offset; i <= endoffset; i += data_size[0])
+	{
+		int suboffset = 0;
+		bool match = true;
+
+		// find the entire string
+		for (int j = 0; j < data_count && match; j++)
+		{
+			offs_t address = i + suboffset;
+			switch (data_size[j])
+			{
+			case 1:
+				match = u8(data_to_find[j]) == base[address];
+				break;
+
+			case 2:
+				match = u16(data_to_find[j]) == (be ? get_u16be(&base[address]) : get_u16le(&base[address]));
+				break;
+
+			case 4:
+				match = u32(data_to_find[j]) == (be ? get_u32be(&base[address]) : get_u32le(&base[address]));
+				break;
+
+			case 8:
+				match = u64(data_to_find[j]) == (be ? get_u64be(&base[address]) : get_u64le(&base[address]));
+				break;
+
+			default:
+				// all other cases are wildcards
+				break;
+			}
+			suboffset += data_size[j] & 0x0f;
+		}
+
+		// did we find it?
+		if (match)
+		{
+			found++;
+			m_console.printf("Found at %04X\n", i);
+		}
+	}
+
+	// print something if not found
+	if (found == 0)
+		m_console.printf("Not found\n");
+
+	return true;
 }
 
 
@@ -3269,18 +3834,22 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 
 void debugger_commands::execute_fill(int spacenum, const std::vector<std::string_view> &params)
 {
+	if (execute_fill_try_memory(params))
+		return;
+
 	u64 offset, length;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// validate parameters
-	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, offset))
 		return;
 	if (!m_console.validate_number_parameter(params[1], length))
 		return;
 
 	// further validation
-	offset = space->address_to_byte(offset & space->addrmask());
-	int cur_data_size = (space->addr_shift() > 0) ? 2 : (1 << -space->addr_shift());
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+	offset = config->addr2byte(offset & config->addrmask());
+	int cur_data_size = (config->addr_shift() > 0) ? 2 : (1 << -config->addr_shift());
 	if (cur_data_size == 0)
 		cur_data_size = 1;
 
@@ -3325,19 +3894,18 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 		return;
 
 	// now fill memory
-	device_memory_interface &memory = space->device().memory();
-	auto dis = space->device().machine().disable_side_effects();
-	u64 count = space->address_to_byte(length);
+	auto dis = mintf->device().machine().disable_side_effects();
+	u64 count = config->addr2byte(length);
 	while (count != 0)
 	{
 		// write the entire string
 		for (int j = 0; j < data_count; j++)
 		{
-			offs_t address = space->byte_to_address(offset) & space->logaddrmask();
+			offs_t address = config->byte2addr(offset) & config->logaddrmask();
 			address_space *tspace;
-			if (!memory.translate(space->spacenum(), device_memory_interface::TR_WRITE, address, tspace))
+			if (!mintf->translate(spacenum, device_memory_interface::TR_WRITE, address, tspace))
 			{
-				m_console.printf("Fill aborted due to page fault at %0*X\n", space->logaddrchars(), space->byte_to_address(offset) & space->logaddrmask());
+				m_console.printf("Fill aborted due to page fault at %0*X\n", config->logaddrchars(), config->byte2addr(offset) & config->logaddrmask());
 				length = 0;
 				break;
 			}
@@ -3356,7 +3924,7 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 				break;
 
 			case 8:
-				tspace->read_qword_unaligned(address, fill_data[j]);
+				tspace->write_qword_unaligned(address, fill_data[j]);
 				break;
 			}
 			offset += fill_data_size[j];
@@ -3371,6 +3939,139 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 	}
 }
 
+/*-------------------------------------------------
+    execute_fillmemory - execute the fill command on memory
+-------------------------------------------------*/
+
+bool debugger_commands::execute_fill_try_memory(const std::vector<std::string_view> &params)
+{
+	u64 offset = u64(-1);
+	memory_region *region = nullptr;
+	memory_share *share = nullptr;
+	if (!m_console.validate_address_with_memory_parameter(params[0], offset, region, share))
+		return false; // not memory case
+
+	u64 length;
+	if (offset == u64(-1) || !m_console.validate_number_parameter(params[1], length) || (region == nullptr && share == nullptr))
+		return true;
+
+	u32 msize;
+	u8 *base;
+	bool be;
+	if (region != nullptr)
+	{
+		msize = region->bytes();
+		base = region->base();
+		be = region->endianness() == ENDIANNESS_BIG;
+	}
+	else // if (share != nullptr)
+	{
+		msize = share->bytes();
+		base = reinterpret_cast<u8 *>(share->ptr());
+		be = share->endianness() == ENDIANNESS_BIG;
+	}
+
+	if (offset >= msize)
+	{
+		m_console.printf("Invalid offset\n");
+		return true;
+	}
+	if ((length <= 0) || ((length + offset) >= msize))
+		length = msize - offset;
+
+	// further validation
+	int cur_data_size = 1;
+
+	// parse the data parameters
+	u64 fill_data[256];
+	u8 fill_data_size[256];
+	int data_count = 0;
+	for (int i = 2; i < params.size(); i++)
+	{
+		std::string_view pdata = params[i];
+
+		// check for a string
+		if (!pdata.empty() && pdata.front() == '"' && pdata.back() == '"')
+		{
+			auto const pdatalen = pdata.length() - 1;
+			for (int j = 1; j < pdatalen; j++)
+			{
+				fill_data[data_count] = pdata[j];
+				fill_data_size[data_count++] = 1;
+			}
+		}
+
+		// otherwise, validate as a number
+		else
+		{
+			// check for a 'b','w','d',or 'q' prefix
+			fill_data_size[data_count] = cur_data_size;
+			if (pdata.length() >= 2)
+			{
+				if (tolower(u8(pdata[0])) == 'b' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 1; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'w' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 2; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'd' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 4; pdata.remove_prefix(2); }
+				if (tolower(u8(pdata[0])) == 'q' && pdata[1] == '.') { fill_data_size[data_count] = cur_data_size = 8; pdata.remove_prefix(2); }
+			}
+
+			// validate as a number
+			if (!m_console.validate_number_parameter(pdata, fill_data[data_count++]))
+				return true;
+		}
+	}
+	if (data_count == 0)
+		return true;
+
+	// now fill memory
+	u64 count = length;
+	while (count != 0)
+	{
+		// write the entire string
+		for (int j = 0; j < data_count; j++)
+		{
+			offs_t address = offset;
+			switch (fill_data_size[j])
+			{
+			case 1:
+				base[address] = u8(fill_data[j]);
+				break;
+
+			case 2:
+				if (be)
+					put_u16be(&base[address], u16(fill_data[j]));
+				else
+					put_u16le(&base[address], u16(fill_data[j]));
+				break;
+
+			case 4:
+				if (be)
+					put_u32be(&base[address], u32(fill_data[j]));
+				else
+					put_u32le(&base[address], u32(fill_data[j]));
+				break;
+
+			case 8:
+				if (be)
+					put_u64be(&base[address], u64(fill_data[j]));
+				else
+					put_u64le(&base[address], u64(fill_data[j]));
+				break;
+			}
+
+			offset += fill_data_size[j];
+			if (count <= fill_data_size[j])
+			{
+				count = 0;
+				break;
+			}
+			else
+				count -= fill_data_size[j];
+		}
+	}
+
+	return true;
+}
+
 
 /*-------------------------------------------------
     execute_dasm - execute the dasm command
@@ -3380,7 +4081,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 {
 	u64 offset, length;
 	bool bytes = true;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// validate parameters
 	if (!m_console.validate_number_parameter(params[1], offset))
@@ -3389,14 +4090,15 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 		return;
 	if (params.size() > 3 && !m_console.validate_boolean_parameter(params[3], bytes))
 		return;
-	if (!m_console.validate_device_space_parameter(params.size() > 4 ? params[4] : std::string_view(), AS_PROGRAM, space))
+	int spacenum = AS_PROGRAM;
+	if (!m_console.validate_device_space_parameter(params.size() > 4 ? params[4] : std::string_view(), spacenum, mintf))
 		return;
 
 	// determine the width of the bytes
 	device_disasm_interface *dasmintf;
-	if (!space->device().interface(dasmintf))
+	if (!mintf->device().interface(dasmintf))
 	{
-		m_console.printf("No disassembler available for %s\n", space->device().name());
+		m_console.printf("No disassembler available for %s\n", mintf->device().name());
 		return;
 	}
 
@@ -3408,7 +4110,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 	int max_opcodes_size = 0;
 	int max_disasm_size = 0;
 
-	debug_disasm_buffer buffer(space->device());
+	debug_disasm_buffer buffer(mintf->device());
 
 	for (u64 i = 0; i < length; )
 	{
@@ -3447,7 +4149,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 	{
 		for (unsigned int i=0; i != pcs.size(); i++)
 		{
-			const char *comment = space->device().debug()->comment_text(pcs[i]);
+			const char *comment = mintf->device().debug()->comment_text(pcs[i]);
 			if (comment)
 				util::stream_format(f, "%s: %-*s %-*s // %s\n", tpc[i], max_opcodes_size, topcodes[i], max_disasm_size, instructions[i], comment);
 			else
@@ -3458,7 +4160,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 	{
 		for (unsigned int i=0; i != pcs.size(); i++)
 		{
-			const char *comment = space->device().debug()->comment_text(pcs[i]);
+			const char *comment = mintf->device().debug()->comment_text(pcs[i]);
 			if (comment)
 				util::stream_format(f, "%s: %-*s // %s\n", tpc[i], max_disasm_size, instructions[i], comment);
 			else
@@ -3677,17 +4379,12 @@ void debugger_commands::execute_trackmem(const std::vector<std::string_view> &pa
 	if (params.size() > 2 && !m_console.validate_boolean_parameter(params[2], clear))
 		return;
 
-	// Get the address space for the given cpu
-	address_space *space;
-	if (!m_console.validate_device_space_parameter(cpuparam, AS_PROGRAM, space))
-		return;
-
 	// Inform the CPU it's time to start tracking memory writes
 	cpu->debug()->set_track_mem(turnOn);
 
 	// Clear out the existing data if requested
 	if (clear)
-		space->device().debug()->track_mem_data_clear();
+		cpu->debug()->track_mem_data_clear();
 }
 
 
@@ -3699,23 +4396,25 @@ void debugger_commands::execute_pcatmem(int spacenum, const std::vector<std::str
 {
 	// Gather the required target address/space parameter
 	u64 address;
-	address_space *space;
-	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
+	device_memory_interface *mintf;
+
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, address))
 		return;
 
 	// Translate the address
-	offs_t a = address & space->logaddrmask();
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+	offs_t a = address & config->logaddrmask();
 	address_space *tspace;
-	if (!space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, a, tspace))
+	if (!mintf->translate(spacenum, device_memory_interface::TR_READ, a, tspace))
 	{
 		m_console.printf("Address translation failed\n");
 		return;
 	}
 
 	// Get the value of memory at the address
-	u64 data = space->unmap();
-	auto dis = space->device().machine().disable_side_effects();
-	switch (space->data_width())
+	u64 data = 0;
+	auto dis = mintf->device().machine().disable_side_effects();
+	switch (config->data_width())
 	{
 	case 8:
 		data = tspace->read_byte(a);
@@ -3735,7 +4434,7 @@ void debugger_commands::execute_pcatmem(int spacenum, const std::vector<std::str
 	}
 
 	// Recover the pc & print
-	const offs_t result = space->device().debug()->track_mem_pc_from_space_address_data(space->spacenum(), address, data);
+	const offs_t result = mintf->device().debug()->track_mem_pc_from_space_address_data(spacenum, address, data);
 	if (result != (offs_t)(-1))
 		m_console.printf("%02x\n", result);
 	else
@@ -3809,10 +4508,12 @@ void debugger_commands::execute_map(int spacenum, const std::vector<std::string_
 {
 	// validate parameters
 	u64 address;
-	address_space *space;
-	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
+	device_memory_interface *mintf;
+
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, address))
 		return;
-	address &= space->logaddrmask();
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+	address &= config->logaddrmask();
 
 	// do the translation first
 	for (int intention = device_memory_interface::TR_READ; intention <= device_memory_interface::TR_FETCH; intention++)
@@ -3820,18 +4521,18 @@ void debugger_commands::execute_map(int spacenum, const std::vector<std::string_
 		static const char *const intnames[] = { "Read", "Write", "Fetch" };
 		offs_t taddress = address;
 		address_space *tspace;
-		if (space->device().memory().translate(space->spacenum(), intention, taddress, tspace))
+		if (mintf->translate(spacenum, intention, taddress, tspace))
 		{
 			std::string mapname = tspace->get_handler_string((intention == device_memory_interface::TR_WRITE) ? read_or_write::WRITE : read_or_write::READ, taddress);
 			m_console.printf(
 					"%7s: %0*X logical %s == %0*X physical %s -> %s\n",
 					intnames[intention & 3],
-					space->logaddrchars(), address, space->name(),
+					config->logaddrchars(), address, config->name(),
 					tspace->addrchars(), taddress, tspace->name(),
 					mapname);
 		}
 		else
-			m_console.printf("%7s: %0*X logical is unmapped\n", intnames[intention & 3], space->logaddrchars(), address);
+			m_console.printf("%7s: %0*X logical is unmapped\n", intnames[intention & 3], config->logaddrchars(), address);
 	}
 }
 
@@ -3909,33 +4610,20 @@ void debugger_commands::execute_memdump(const std::vector<std::string_view> &par
 
 void debugger_commands::execute_symlist(const std::vector<std::string_view> &params)
 {
+	// get the specified CPU or default to the visible CPU
 	device_t *cpu = nullptr;
-	symbol_table *symtable;
-
-	// default to CPU "0" if none specified
-	if (!m_console.validate_cpu_parameter(params.empty() ? "0" : params[0], cpu))
-	{
-		if (!params.empty())
-			return; // explicitly specified CPU is invalid
-
-		// somehow CPU "0" is invalid, so just stick with global symbol table
-		symtable = &m_machine.debugger().cpu().global_symtable();
-	}
-	else
-	{
-		symtable = &cpu->debug()->symtable();
-	}
+	if (params.empty())
+		cpu = m_console.get_visible_cpu();
+	else if (!m_console.validate_cpu_parameter(params[0], cpu))
+		return;
 
 	// unknown tag if CPU is invalid
 	const char *cpu_tag = cpu ? cpu->tag() : ":?";
 
 	// traverse symbol_table parent chain, printing each table's symbols in its own block
-	for (; symtable != nullptr; symtable = symtable->parent())
+	auto *symtable = cpu ? &cpu->debug()->symtable() : &m_console.visible_symtable();
+	for ( ; symtable; symtable = params.empty() ? symtable->parent() : nullptr)
 	{
-		// skip globals if user explicitly requested CPU
-		if (symtable->type() == symbol_table::BUILTIN_GLOBALS && !params.empty())
-			continue;
-
 		if (symtable->entries().size() == 0)
 			continue;
 
@@ -3971,7 +4659,7 @@ void debugger_commands::execute_symlist(const std::vector<std::string_view> &par
 				[] (const char *item1, const char *item2) { return strcmp(item1, item2) < 0; });
 
 		// iterate over symbols and print them
-		for (const char * symname : namelist)
+		for (const char *symname : namelist)
 		{
 			symbol_entry const *const entry = symtable->find(symname);
 			assert(entry != nullptr);
@@ -3980,12 +4668,6 @@ void debugger_commands::execute_symlist(const std::vector<std::string_view> &par
 				m_console.printf("  (read-only)");
 			m_console.printf("\n");
 		}
-	}
-	if (params.empty())
-	{
-		m_console.printf(
-			"\nTo view the symbols for a particular CPU, try symlist <cpu>,\n"
-			"where <cpu> is the ID number or tag for a CPU.\n");
 	}
 }
 

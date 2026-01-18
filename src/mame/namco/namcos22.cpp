@@ -1094,7 +1094,8 @@ Notes:
 #include "namco_dsp.h"
 
 #include "cpu/m68000/m68020.h"
-#include "cpu/tms32025/tms32025.h"
+#include "cpu/tms320c2x/tms320c2x.h"
+
 #include "speaker.h"
 
 // 51.2MHz XTAL on video board, pixel clock of 12.8MHz (doubled in MAME because of unemulated interlacing)
@@ -1627,8 +1628,8 @@ void namcos22_state::namcos22_portbit_w(offs_t offset, u16 data)
 
 void namcos22_state::namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	// 8 leds on cpu board, 0=on 1=off
-	// on System22: two rows of 4 red leds
+	// 8 LEDs on cpu board, 0=on 1=off
+	// on System22: two rows of 4 red LEDs
 	// on SS22: GYRGYRGY green/yellow/red
 	COMBINE_DATA(&m_cpuled_data);
 	for (int i = 0; i < 8; i++)
@@ -2363,7 +2364,7 @@ u16 namcos22_state::master_serial_io_r()
 INTERRUPT_GEN_MEMBER(namcos22_state::dsp_vblank_irq)
 {
 	if (m_dsp_irq_enabled)
-		device.execute().set_input_line(TMS32025_INT0, HOLD_LINE);
+		device.execute().set_input_line(TMS320C2X_INT0, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_serial_pulse)
@@ -2372,10 +2373,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_serial_pulse)
 	{
 		m_SerialDataSlaveToMasterCurrent = m_SerialDataSlaveToMasterNext;
 
-		m_master->set_input_line(TMS32025_RINT, HOLD_LINE);
-		m_master->set_input_line(TMS32025_XINT, HOLD_LINE);
-		m_slave->set_input_line(TMS32025_RINT, HOLD_LINE);
-		m_slave->set_input_line(TMS32025_XINT, HOLD_LINE);
+		m_master->set_input_line(TMS320C2X_RINT, HOLD_LINE);
+		m_master->set_input_line(TMS320C2X_XINT, HOLD_LINE);
+		m_slave->set_input_line(TMS320C2X_RINT, HOLD_LINE);
+		m_slave->set_input_line(TMS320C2X_XINT, HOLD_LINE);
 	}
 }
 
@@ -2816,6 +2817,14 @@ void namcos22_state::handle_driving_io()
 		m_shareram[0x034/2] = gas;
 		m_shareram[0x036/2] = brake;
 		handle_coinage(flags);
+
+		// lamps, coin counters, and also LEDs for acedrive and victlap
+		const u16 outputs = (m_shareram[0x42 / 2] << 8) | (m_shareram[0x20 / 2] & 0xff);
+		for (int i = 0; i < 16; i++)
+			m_mcu_out[i] = BIT(outputs, i);
+
+		// drive commands (raverace, acedrive, victlap)
+		m_wheel_motor = m_shareram[0x40 / 2] & 0xff;
 	}
 }
 
@@ -3323,13 +3332,13 @@ static INPUT_PORTS_START( cybrcycc )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("ADC.0")
-	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x004, 0x3fc) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Steering Wheel")
+	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x004, 0x3fc) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Bike Bank")
 
 	PORT_START("ADC.1")
-	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Gas Pedal")
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Throttle Grip")
 
 	PORT_START("ADC.2")
-	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Brake Pedal")
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_NAME("Brake Lever")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x00010000, 0x00010000, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
@@ -3400,10 +3409,10 @@ static INPUT_PORTS_START( tokyowar )
 	PORT_BIT( 0x3ff, 0x200, IPT_PADDLE ) PORT_MINMAX(0x100, 0x300) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Steering Wheel")
 
 	PORT_START("ADC.2")
-	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Gas Pedal")
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL )  PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Forward Pedal")
 
 	PORT_START("ADC.3")
-	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Brake Pedal")
+	PORT_BIT( 0x3ff, 0x000, IPT_PEDAL2 ) PORT_MINMAX(0x000, 0x100) PORT_SENSITIVITY(100) PORT_KEYDELTA(20) PORT_NAME("Backward Pedal")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x00010000, 0x00010000, "Test Mode" ) PORT_DIPLOCATION("SW4:1")
@@ -3625,6 +3634,8 @@ void namcos22_state::machine_start()
 {
 	m_mcu_out.resolve();
 	m_cpuled_out.resolve();
+	m_wheel_motor.resolve();
+
 	m_portbits[0] = 0xffff;
 	m_portbits[1] = 0xffff;
 	m_dsp_upload_state = NAMCOS22_DSP_UPLOAD_READY;
@@ -5247,42 +5258,6 @@ ROM_START( alpines )
 	ROM_LOAD( "af1wavea.2l",  0x000000, 0x400000, CRC(28cca494) SHA1(4ff87ab85fd17bf8dbee5b03d99cc5c31dd6349a) )
 ROM_END
 
-ROM_START( alpinesa ) // only 4 different DWORDs at 0x700, it's either a serial number, or a log from when Namco serviced the cabinet
-	ROM_REGION( 0x800000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_BYTE( "af2ver-a_ll.ic2", 0x000003, 0x200000, CRC(d8025e98) SHA1(e1c08557e70d632bf1e99356d6c6f76b5f407b8f) )
-	ROM_LOAD32_BYTE( "af2ver-a_lm.ic3", 0x000002, 0x200000, CRC(5f805d51) SHA1(b7fa9028deeaf1c549e9c2d6099925a0d0ad1598) )
-	ROM_LOAD32_BYTE( "af2ver-a_um.ic4", 0x000001, 0x200000, CRC(e7e057e3) SHA1(436e4645ba0e8734c0e25c7c22489bf97066944d) )
-	ROM_LOAD32_BYTE( "af2ver-a_uu.ic5", 0x000000, 0x200000, CRC(3eee10a2) SHA1(6e52c5132581e7fe69a257195af5bc9f3a3efe25) )
-
-	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
-	ROM_LOAD( "af1data.8k",   0x000000, 0x080000, CRC(ef13ebe8) SHA1(5d3f697994d4b5b19ee7fea1e2aef8e39449b68e) )
-
-	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
-	ROM_LOAD( "af1scg0b.12f", 0x000000, 0x200000, CRC(46a6222a) SHA1(5322ef60690625b9b8dbe1cfe0c49dcd9c8b1a4c) )
-
-	ROM_REGION( 0x200000*5, "textile", 0) /* 16x16x8bpp texture tiles */
-	ROM_LOAD( "af1cg0.8d",    0x200000*0, 0x200000, CRC(7423f3ff) SHA1(6a2fd44823ef46111deb57d328b1b75cc355d413) )
-	ROM_LOAD( "af1cg1.10d",   0x200000*1, 0x200000, CRC(ea76689a) SHA1(73dd3af737a3e9903abe5ed9c9ae7eded51d8350) )
-	ROM_LOAD( "af1cg2.12d",   0x200000*2, 0x200000, CRC(2a38943a) SHA1(15d737996f49bf6374ef6191bbfbe0298d398378) )
-	ROM_LOAD( "af1cg3.13d",   0x200000*3, 0x200000, CRC(7f5a3e0f) SHA1(241f9995323b28df23d20a75e1f43ce6e05434cd) )
-	ROM_LOAD( "af1cg4.14d",   0x200000*4, 0x200000, CRC(a5ee13e2) SHA1(48fd3c912690f21cbbc2a39bed0a82be41a0d011) )
-
-	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
-	ROM_LOAD( "af1ccrl.3d",   0x000000, 0x200000, CRC(6c054698) SHA1(8537607646b183883c5aa4060fb0af640da4af87) )
-	ROM_LOAD( "af1ccrh.1d",   0x200000, 0x080000, CRC(95a02a27) SHA1(32ee87b76ae9fcec6d825e3cf4d5cbb97db39544) )
-
-	ROM_REGION( 0x80000*6, "pointrom", 0 ) /* 3d model data */
-	ROM_LOAD( "af1ptrl0.18k", 0x80000*0, 0x80000, CRC(31ce46d3) SHA1(568fb9ee9ac14e613a4fd7668cb38315c10be62b) )
-	ROM_LOAD( "af1ptrl1.16k", 0x80000*1, 0x80000, CRC(e869bf00) SHA1(b3c3026891ae3958d1774c905e97c3b57a414ea7) )
-	ROM_LOAD( "af1ptrm0.18j", 0x80000*2, 0x80000, CRC(ef7f4d8a) SHA1(02f77c68004b7dccc99b61126e7d07960eb15028) )
-	ROM_LOAD( "af1ptrm1.16j", 0x80000*3, 0x80000, CRC(7dd01d52) SHA1(adc1087435d31ed6163ad046466955f01517450f) )
-	ROM_LOAD( "af1ptru0.18f", 0x80000*4, 0x80000, CRC(177f1591) SHA1(3969e780e5603eca0a65f65c1ad14d1cef918b39) )
-	ROM_LOAD( "af1ptru1.16f", 0x80000*5, 0x80000, CRC(7521d18e) SHA1(dc03ef369db16f59c138ff4e22260d1c04782d1f) )
-
-	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
-	ROM_LOAD( "af1wavea.2l",  0x000000, 0x400000, CRC(28cca494) SHA1(4ff87ab85fd17bf8dbee5b03d99cc5c31dd6349a) )
-ROM_END
-
 
 ROM_START( timecris )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
@@ -5481,11 +5456,55 @@ ROM_END
 
 
 ROM_START( dirtdash )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
+	ROM_LOAD32_BYTE( "dt2verc.rom1", 0x000003, 0x100000, CRC(b2d7916c) SHA1(4f4cb75ef12b57bdc12b6aba59678f09b22bcfce) )
+	ROM_LOAD32_BYTE( "dt2verc.rom2", 0x000002, 0x100000, CRC(5dc040d1) SHA1(4b285d146adb0cff146b79d7471597148b3c4a97) )
+	ROM_LOAD32_BYTE( "dt2verc.rom3", 0x000001, 0x100000, CRC(a55157e1) SHA1(ede052ad55430418905987b8bcba4aa229ac037c) )
+	ROM_LOAD32_BYTE( "dt2verc.rom4", 0x000000, 0x100000, CRC(f3a9bedb) SHA1(71366108dec0803b585d409095f126cc55ec3e4d) )
+
+	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
+	ROM_LOAD( "dt1dataa.8k",  0x000000, 0x080000, CRC(9bcdea21) SHA1(26ae025cf746d3a703a82495eb2bb515b828a650) )
+
+	ROM_REGION( 0x200000*8, "sprite", ROMREGION_ERASEFF ) /* 32x32x8bpp sprite tiles */
+	ROM_LOAD( "dt1scg0.12f",  0x000000, 0x200000, CRC(a09b5760) SHA1(3dd54ebebf9da1de76874a1adf491ed15849e1b1) )
+	ROM_LOAD( "dt1scg1.10f",  0x200000, 0x200000, CRC(f9ac8111) SHA1(814074ae8cc81c6c1201d764a84dd95fe914f19c) )
+
+	ROM_REGION( 0x200000*8, "textile", 0) /* 16x16x8bpp texture tiles */
+	ROM_LOAD( "dt1cg0.8d",    0x000000, 0x200000, CRC(10ab95e0) SHA1(ffde1f00ac3e82a36fbcfa060c6b97c92dfcfc8b) )
+	ROM_LOAD( "dt1cg1.10d",   0x200000, 0x200000, CRC(d9f1ba53) SHA1(5a1095b726c55001cc1d4c695adc38097e6a0201) )
+	ROM_LOAD( "dt1cg2.12d",   0x400000, 0x200000, CRC(bd8b1e0b) SHA1(fcd94e33a0cbd17c9308cb8952e3c618ab56f9fc) )
+	ROM_LOAD( "dt1cg3.13d",   0x600000, 0x200000, CRC(ba960663) SHA1(e98149bc4652ea7933ac47d760a6f7e6489f15e2) )
+	ROM_LOAD( "dt1cg4.14d",   0x800000, 0x200000, CRC(424b9652) SHA1(fa8865110db03559740c4e633e123d1a009782c4) )
+	ROM_LOAD( "dt1cg5.16d",   0xa00000, 0x200000, CRC(29516626) SHA1(1f12c5dc3975b88dc60d87d0409bf311837e9fa4) )
+	ROM_LOAD( "dt1cg6.18d",   0xc00000, 0x200000, CRC(e6fa7180) SHA1(85316cde282cff1f913cf9f155cfa36adcc1108e) )
+	ROM_LOAD( "dt1cg7.19d",   0xe00000, 0x200000, CRC(2ca19153) SHA1(c82403c8b40bf85daedf610b1bc7bfea9dfc6206) )
+
+	ROM_REGION16_LE( 0x280000, "textilemap", 0 ) /* texture tilemap */
+	ROM_LOAD( "dt1ccrl.3d",   0x000000, 0x200000, CRC(e536b313) SHA1(7357da993d2bb3fcc8c1c2feb53689ad368cd80a) )
+	ROM_LOAD( "dt1ccrh.1d",   0x200000, 0x080000, CRC(af257064) SHA1(0da561d9f8824618c00209ccef6146e9f3ad72bb) )
+
+	ROM_REGION( 0x480000, "pointrom", 0 ) /* 3d model data */
+	ROM_LOAD( "dt1ptrl0.18k", 0x000000, 0x080000, CRC(4e0cac3a) SHA1(c2778e9e93be2de729c6f118caf62ac9f48efbb0) )
+	ROM_LOAD( "dt1ptrl1.16k", 0x080000, 0x080000, CRC(59ba9dba) SHA1(a2e9488cf0ff255284c06a1ef653ae86c0d98adc) )
+	ROM_LOAD( "dt1ptrl2.15k", 0x100000, 0x080000, CRC(cfe80c67) SHA1(ba3bc48aa39712e63c915070a76974fbd560dee6) )
+	ROM_LOAD( "dt1ptrm0.18j", 0x180000, 0x080000, CRC(41f34337) SHA1(7e624e7b6fdefe156168b1c9cc5e919db3b2fbaa) )
+	ROM_LOAD( "dt1ptrm1.16j", 0x200000, 0x080000, CRC(f620fd41) SHA1(18cf6e11eb68da1b7f7fcc32562dc952c247de65) )
+	ROM_LOAD( "dt1ptrm2.15j", 0x280000, 0x080000, CRC(71e6714d) SHA1(6aad6db3be5020213d7add61c7d927ae9c4fea4e) )
+	ROM_LOAD( "dt1ptru0.18f", 0x300000, 0x080000, CRC(4909bd7d) SHA1(0e4ef3987c43ef0438331b82b50dcc97363a45d0) )
+	ROM_LOAD( "dt1ptru1.16f", 0x380000, 0x080000, CRC(4a5097df) SHA1(a9c814b0ed4bd92accd0e57be8e3d887114b06a5) )
+	ROM_LOAD( "dt1ptru2.15f", 0x400000, 0x080000, CRC(1171eaf5) SHA1(168365ea619386f218585c49025cdd7fd1224082) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* sound samples */
+	ROM_LOAD( "dt1wavea.2l",  0x000000, 0x400000, CRC(cbd52e40) SHA1(dc995dd919548c96a90efb0375e5b5f1055e05cb) )
+	ROM_LOAD( "dt1waveb.1l",  0x800000, 0x400000, CRC(6b736f94) SHA1(ac3715480aa9a9c2dec099607f89859bb3b73a6a) )
+ROM_END
+
+ROM_START( dirtdashb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 ) /* main program */
-	ROM_LOAD32_BYTE( "dt2verb.rom1",    0x000003, 0x100000, CRC(d133c6d7) SHA1(6fbdb823771826ba8c62d8d85223eeda38c081e7) )
-	ROM_LOAD32_BYTE( "dt2verb.rom2",    0x000002, 0x100000, CRC(ba4d7626) SHA1(c48b724a454b97c47122548c77793599e9d8f92c) )
-	ROM_LOAD32_BYTE( "dt2verb.rom3",    0x000001, 0x100000, NO_DUMP ) // has failed internally, reads always 0x00 filled
-	ROM_LOAD32_BYTE( "dt2verb.rom4",    0x000000, 0x100000, CRC(9a80fc82) SHA1(81a14749a39d213db58527f7a98d48dbfca1c153) )
+	ROM_LOAD32_BYTE( "dt2verb.rom1", 0x000003, 0x100000, CRC(d133c6d7) SHA1(6fbdb823771826ba8c62d8d85223eeda38c081e7) )
+	ROM_LOAD32_BYTE( "dt2verb.rom2", 0x000002, 0x100000, CRC(ba4d7626) SHA1(c48b724a454b97c47122548c77793599e9d8f92c) )
+	ROM_LOAD32_BYTE( "dt2verb.rom3", 0x000001, 0x100000, NO_DUMP ) // has failed internally, reads always 0x00 filled
+	ROM_LOAD32_BYTE( "dt2verb.rom4", 0x000000, 0x100000, CRC(9a80fc82) SHA1(81a14749a39d213db58527f7a98d48dbfca1c153) )
 
 	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
 	ROM_LOAD( "dt1dataa.8k",  0x000000, 0x080000, CRC(9bcdea21) SHA1(26ae025cf746d3a703a82495eb2bb515b828a650) )
@@ -5526,8 +5545,8 @@ ROM_END
 
 ROM_START( dirtdasha )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* main program */
-	ROM_LOAD32_WORD_SWAP( "dt2vera.1",    0x000002, 0x200000, CRC(402a3d73) SHA1(009b57ed0ea228ccedb139d945b9eaf2a36e2502) )
-	ROM_LOAD32_WORD_SWAP( "dt2vera.2",    0x000000, 0x200000, CRC(66ed140d) SHA1(a472fdc7b6aaeb4b3643ecdafd32fa665e7c7aa2) )
+	ROM_LOAD32_WORD_SWAP( "dt2vera.1", 0x000002, 0x200000, CRC(402a3d73) SHA1(009b57ed0ea228ccedb139d945b9eaf2a36e2502) )
+	ROM_LOAD32_WORD_SWAP( "dt2vera.2", 0x000000, 0x200000, CRC(66ed140d) SHA1(a472fdc7b6aaeb4b3643ecdafd32fa665e7c7aa2) )
 
 	ROM_REGION16_LE( 0x080000, "mcu", 0 ) /* S22-BIOS ver1.41 */
 	ROM_LOAD( "dt1dataa.8k",  0x000000, 0x080000, CRC(9bcdea21) SHA1(26ae025cf746d3a703a82495eb2bb515b828a650) )
@@ -6024,15 +6043,15 @@ GAME( 1994, alpinerjc,  alpinerd, alpine,    alpiner,   alpine_state,    init_al
 GAME( 1995, airco22b,   0,        airco22b,  airco22,   namcos22s_state, init_airco22,   ROT0, "Namco", "Air Combat 22 (Japan, ACS1 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, cybrcycc,   0,        cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcycc,  ROT0, "Namco", "Cyber Cycles (World, CB2 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
 GAME( 1995, cybrcyccj,  cybrcycc, cybrcycc,  cybrcycc,  namcos22s_state, init_cybrcycc,  ROT0, "Namco", "Cyber Cycles (Japan, CB1 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 95/04/04
-GAME( 1995, dirtdash,   0,        dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (World, DT2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/?1/0? 21:03:?6, one ROM is bad
+GAME( 1995, dirtdash,   0,        dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (World, DT2 Ver.C)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/02/29 12:08:19
 GAME( 1995, dirtdasha,  dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (World, DT2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:01:56
+GAME( 1995, dirtdashb,  dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (World, DT2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 96/?1/0? 21:03:?6, one ROM is bad
 GAME( 1995, dirtdashj,  dirtdash, dirtdash,  dirtdash,  namcos22s_state, init_dirtdash,  ROT0, "Namco", "Dirt Dash (Japan, DT1 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 95/12/20 20:06:45
 GAME( 1996, timecris,   0,        timecris,  timecris,  timecris_state,  init_timecris,  ROT0, "Namco", "Time Crisis (World, TS2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/04/02 18:48:00
 GAME( 1996, timecrisa,  timecris, timecris,  timecris,  timecris_state,  init_timecris,  ROT0, "Namco", "Time Crisis (World, TS2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/01/08 18:56:09
 GAME( 1996, propcycl,   0,        propcycl,  propcycl,  propcycl_state,  init_propcycl,  ROT0, "Namco", "Prop Cycle (World, PR2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:22:13
 GAME( 1996, propcyclj,  propcycl, propcycl,  propcycl,  propcycl_state,  init_propcyclj, ROT0, "Namco", "Prop Cycle (Japan, PR1 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/06/18 21:06:03
-GAME( 1996, alpines,    0,        alpines,   alpines,   alpines_state,   init_alpines,   ROT0, "Namco", "Alpine Surfer (World, AF2 Ver.A, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/07/01 15:19:23
-GAME( 1996, alpinesa,   alpines,  alpines,   alpines,   alpines_state,   init_alpines,   ROT0, "Namco", "Alpine Surfer (World, AF2 Ver.A, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/07/01 15:19:23
+GAME( 1996, alpines,    0,        alpines,   alpines,   alpines_state,   init_alpines,   ROT0, "Namco", "Alpine Surfer (World, AF2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/07/01 15:19:23
 GAME( 1996, tokyowar,   0,        tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (World, TW2 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:08:47
 GAME( 1996, tokyowarj,  tokyowar, tokyowar,  tokyowar,  namcos22s_state, init_tokyowar,  ROT0, "Namco", "Tokyo Wars (Japan, TW1 Ver.A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN ) // 96/09/03 14:16:29
 GAME( 1996, aquajet,    0,        cybrcycc,  aquajet,   namcos22s_state, init_aquajet,   ROT0, "Namco", "Aqua Jet (World, AJ2 Ver.B)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // 96/09/20 14:28:30

@@ -40,8 +40,8 @@ Notes:
       CN1       - Flat cable joining to main board
       CN2       - 2-pin power connector for +5V/GND
       DSW1/2    - 8-position DIP switches
-      Note: On most original boards the Z80, VLM and 76489AN have their part numbers scratched off. 
-	        The schematics say '76489AN'
+      Note: On most original boards the Z80, VLM and 76489AN have their part numbers scratched off.
+            The schematics say '76489AN'
 
       Measurements
       ------------

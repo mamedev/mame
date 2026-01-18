@@ -282,19 +282,21 @@ bool image_handler::floppy_save(const floppy_format_info &format) const
 	return !format.m_format->save(*io, variants, m_floppy_image);
 }
 
-void image_handler::floppy_create(const floppy_create_info &format, fs::meta_data meta)
+bool image_handler::floppy_create(const floppy_create_info &format, fs::meta_data meta)
 {
 	if(format.m_type) {
 		std::vector<uint32_t> variants;
 		std::vector<u8> img(format.m_image_size);
 		fs::fsblk_vec_t blockdev(img);
 		auto fs = format.m_manager->mount(blockdev);
-		fs->format(meta);
+		if(!fs || fs->format(meta))
+			return true;
 
 		auto io = util::ram_read(img.data(), img.size(), 0xff);
-		format.m_type->load(*io, floppy_image::FF_UNKNOWN, variants, m_floppy_image);
+		return !format.m_type->load(*io, floppy_image::FF_UNKNOWN, variants, m_floppy_image);
 	} else {
 		fs::unformatted_image::format(format.m_key, &m_floppy_image);
+		return false;
 	}
 }
 
@@ -327,6 +329,11 @@ bool image_handler::floppy_mount_fs(const filesystem_format &format)
 	m_fsblk.reset(new fs::fsblk_vec_t(m_sector_image));
 	m_fsm = format.m_manager;
 	m_fs = m_fsm->mount(*m_fsblk);
+	if(!m_fs) {
+		m_fsblk.reset();
+		m_sector_image.clear();
+		return true;
+	}
 	return false;
 }
 
@@ -338,6 +345,11 @@ bool image_handler::hd_mount_fs(const filesystem_format &format)
 	m_fsblk.reset(new fs::fsblk_vec_t(m_sector_image));
 	m_fsm = format.m_manager;
 	m_fs = m_fsm->mount(*m_fsblk);
+	if(!m_fs) {
+		m_fsblk.reset();
+		m_sector_image.clear();
+		return true;
+	}
 	return false;
 }
 

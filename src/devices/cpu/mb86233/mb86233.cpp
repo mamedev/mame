@@ -41,6 +41,13 @@
   It's unclear whether some register-file linked functionality is
   internal or external though (fifos, banking in model2/86234), so
   there may lie the actual differences.
+
+  Note: in the event of two writes occurring at the same register in a
+  single instruction, priority appears to vary depending on the ALU
+  operation. Transfers appear to take precedence over integer ops, while
+  floating point ops take precedence over transfers. This may be a result
+  of the ALU unit taking more than one cycle to execute floating point ops
+  (86232 datasheet), hence the register is updated after the transfer.
 */
 
 
@@ -490,40 +497,57 @@ void mb86233_device::alu_update_st()
 	m_st = (m_st & ~m_alu_stmask) | m_alu_stset;
 }
 
-void mb86233_device::alu_post(u32 alu)
+void mb86233_device::alu_post_1(u32 alu)
 {
+	// integer alu post ops
 	switch(alu) {
-	case 0x00: break; // no alu
-
-	case 0x05:
-		// flags only
-		alu_update_st();
-		break;
-
 	case 0x01: case 0x02: case 0x03: case 0x04:
-	case 0x06: case 0x07: case 0x0b: case 0x0c:
-	case 0x0e: case 0x0f: case 0x10: case 0x11:
-	case 0x13: case 0x14: case 0x16: case 0x17:
+	case 0x0e: case 0x0f: case 0x16: case 0x17:
 	case 0x18: case 0x19: case 0x1a: case 0x1b:
 		// d update
 		m_d = m_alu_r1;
 		alu_update_st();
 		break;
 
+	default:
+		break;
+	}
+}
+
+void mb86233_device::alu_post_2(u32 alu)
+{
+	// floating point alu post ops
+	// assume each one takes 2 cycles
+	switch (alu) {
+	case 0x05:
+		// flags only
+		alu_update_st();
+		m_icount--;
+		break;
+
+	case 0x06: case 0x07: case 0x0b: case 0x0c:
+	case 0x10: case 0x11: case 0x13: case 0x14:
+		// d update
+		m_d = m_alu_r1;
+		alu_update_st();
+		m_icount--;
+		break;
+
 	case 0x08:
 		// p update
 		m_p = m_alu_r1;
+		m_icount--;
 		break;
 
-	case 0x09: case 0x0a: case 0xd:
+	case 0x09: case 0x0a: case 0x0d:
 		// d, p update
 		m_d = m_alu_r1;
 		m_p = m_alu_r2;
 		alu_update_st();
+		m_icount--;
 		break;
 
 	default:
-		logerror("unhandled alu post %02x\n", alu);
 		break;
 	}
 }
@@ -779,7 +803,8 @@ void mb86233_device::execute_run()
 
 			}
 
-			alu_post(alu);
+			alu_post_1(alu);
+			alu_post_2(alu);
 			break;
 		}
 
@@ -800,7 +825,7 @@ void mb86233_device::execute_run()
 				u32 v = m_data.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
-				alu_post(alu);
+				alu_post_1(alu);
 				write_mem_io_1(r2, v);
 				break;
 			}
@@ -811,7 +836,7 @@ void mb86233_device::execute_run()
 				u32 v = m_data.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
-				alu_post(alu);
+				alu_post_1(alu);
 				write_mem_io_1(r2, v);
 				break;
 			}
@@ -822,7 +847,7 @@ void mb86233_device::execute_run()
 				u32 v = m_io.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
-				alu_post(alu);
+				alu_post_1(alu);
 				write_mem_internal_1(r2, v, false);
 				break;
 			}
@@ -833,7 +858,7 @@ void mb86233_device::execute_run()
 				u32 v = m_data.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
-				alu_post(alu);
+				alu_post_1(alu);
 				write_mem_internal_1(r2, v, true);
 				break;
 			}
@@ -844,7 +869,7 @@ void mb86233_device::execute_run()
 				u32 v = m_data.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
-				alu_post(alu);
+				alu_post_1(alu);
 				write_mem_internal_1(r2, v, false);
 				break;
 			}
@@ -855,7 +880,7 @@ void mb86233_device::execute_run()
 				u32 v = m_program.read_dword(ea);
 				if(m_stall) goto do_stall;
 				ea_post_0(r1);
-				alu_post(alu);
+				alu_post_1(alu);
 				write_mem_internal_1(r2, v, false);
 				break;
 			}
@@ -866,7 +891,7 @@ void mb86233_device::execute_run()
 					// mov reg, mem
 					u32 v = read_reg(r2);
 					if(m_stall) goto do_stall;
-					alu_post(alu);
+					alu_post_1(alu);
 					write_mem_internal_1(r1, v, false);
 					break;
 				}
@@ -875,7 +900,7 @@ void mb86233_device::execute_run()
 					// mov reg, mem (e)
 					u32 v = read_reg(r2);
 					if(m_stall) goto do_stall;
-					alu_post(alu);
+					alu_post_1(alu);
 					write_mem_io_1(r1, v);
 					break;
 				}
@@ -886,7 +911,7 @@ void mb86233_device::execute_run()
 					u32 v = m_data.read_dword(ea);
 					if(m_stall) goto do_stall;
 					ea_post_1(r1);
-					alu_post(alu);
+					alu_post_1(alu);
 					write_reg(r2, v);
 					break;
 				}
@@ -897,7 +922,7 @@ void mb86233_device::execute_run()
 					u32 v = m_data.read_dword(ea);
 					if(m_stall) goto do_stall;
 					ea_post_1(r1);
-					alu_post(alu);
+					alu_post_1(alu);
 					write_reg(r2, v);
 					break;
 				}
@@ -908,7 +933,7 @@ void mb86233_device::execute_run()
 					u32 v = m_io.read_dword(ea);
 					if(m_stall) goto do_stall;
 					ea_post_1(r1);
-					alu_post(alu);
+					alu_post_1(alu);
 					write_reg(r2, v);
 					break;
 				}
@@ -919,7 +944,7 @@ void mb86233_device::execute_run()
 					u32 v = m_program.read_dword(ea);
 					if(m_stall) goto do_stall;
 					ea_post_0(r1);
-					alu_post(alu);
+					alu_post_1(alu);
 					write_reg(r2, v);
 					break;
 				}
@@ -928,13 +953,13 @@ void mb86233_device::execute_run()
 					// mov reg, reg
 					u32 v = read_reg(r1);
 					if(m_stall) goto do_stall;
-					alu_post(alu);
+					alu_post_1(alu);
 					write_reg(r2, v);
 					break;
 				}
 
 				default:
-					alu_post(alu);
+					alu_post_1(alu);
 					logerror("unhandled ld/mov subop 7/%x (%x)\n", r2 >> 6, m_ppc);
 					break;
 				}
@@ -942,11 +967,13 @@ void mb86233_device::execute_run()
 			}
 
 			default:
-				alu_post(alu);
+				alu_post_1(alu);
 				logerror("unhandled ld/mov subop %x (%x)\n", op, m_ppc);
 				break;
 			}
 
+			// For floating point ops, registers are updated after transfer
+			alu_post_2(alu);
 			break;
 		}
 
@@ -1027,7 +1054,7 @@ void mb86233_device::execute_run()
 				break;
 			}
 
-			alu_post(alu);
+			alu_post_1(alu);
 			break;
 		}
 

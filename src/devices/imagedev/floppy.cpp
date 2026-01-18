@@ -152,6 +152,9 @@ DEFINE_DEVICE_TYPE(OAD34V, oa_d34v_device, "oa_d34v", "Apple/Sony 3.5 SD (400K G
 DEFINE_DEVICE_TYPE(MFD51W, mfd51w_device,  "mfd51w",  "Apple/Sony 3.5 DD (400/800K GCR)")
 DEFINE_DEVICE_TYPE(MFD75W, mfd75w_device,  "mfd75w",  "Apple/Sony 3.5 HD (Superdrive)")
 
+// Apple Twiggy 5.25" drive
+DEFINE_DEVICE_TYPE(FLOPPY_TWIGGY, floppy_twiggy, "floppy_twiggy", "5.25\" twiggy drive")
+
 
 format_registration::format_registration()
 {
@@ -248,33 +251,33 @@ floppy_image_device *floppy_connector::get_device()
 //  floppy_image_device - constructor
 //-------------------------------------------------
 
-floppy_image_device::floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_image_interface(mconfig, *this),
-		m_input_format(nullptr),
-		m_output_format(nullptr),
-		m_image(),
-		m_index_timer(nullptr),
-		m_tracks(0),
-		m_sides(0),
-		m_form_factor(0),
-		m_sectoring_type(floppy_image::SOFT),
-		m_motor_always_on(false),
-		m_dskchg_writable(false),
-		m_has_trk00_sensor(true),
-		m_dir(0), m_stp(0), m_wtg(0), m_mon(0), m_ss(0), m_ds(-1), m_idx(0), m_wpt(0), m_rdy(0), m_dskchg(0),
-		m_ready(false),
-		m_rpm(0),
-		m_angular_speed(0),
-		m_revolution_count(0),
-		m_cyl(0),
-		m_subcyl(0),
-		m_amplifier_freakout_time(attotime::from_usec(16)),
-		m_image_dirty(false),
-		m_track_dirty(false),
-		m_ready_counter(0),
-		m_make_sound(false),
-		m_sound_out(nullptr)
+floppy_image_device::floppy_image_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_image_interface(mconfig, *this),
+	m_input_format(nullptr),
+	m_output_format(nullptr),
+	m_image(),
+	m_index_timer(nullptr),
+	m_tracks(0),
+	m_sides(0),
+	m_form_factor(0),
+	m_sectoring_type(floppy_image::SOFT),
+	m_motor_always_on(false),
+	m_dskchg_writable(false),
+	m_has_trk00_sensor(true),
+	m_dir(0), m_stp(0), m_wtg(0), m_mon(1), m_ss(0), m_ds(-1), m_idx(0), m_wpt(0), m_rdy(0), m_dskchg(0),
+	m_ready(false),
+	m_rpm(0),
+	m_angular_speed(0),
+	m_revolution_count(0),
+	m_cyl(0),
+	m_subcyl(0),
+	m_amplifier_freakout_time(attotime::from_usec(16)),
+	m_image_dirty(false),
+	m_track_dirty(false),
+	m_ready_counter(0),
+	m_make_sound(false),
+	m_sound_out(nullptr)
 {
 	m_extension_list[0] = '\0';
 }
@@ -528,7 +531,7 @@ void floppy_image_device::device_start()
 
 	m_cyl = 0;
 	m_subcyl = 0;
-	m_ss  = 0;
+	m_ss = 0;
 	m_actual_ss = 0;
 	m_ds = -1;
 	m_stp = 1;
@@ -539,7 +542,6 @@ void floppy_image_device::device_start()
 	m_ready = true;
 	m_ready_counter = 0;
 	m_phases = 0;
-
 
 	if (m_make_sound) m_sound_out = subdevice<floppy_sound_device>(FLOPSND_TAG);
 
@@ -656,9 +658,9 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 	const floppy_image_format_t *best_format = nullptr;
 	for (const floppy_image_format_t *format : m_fif_list) {
 		int score = format->identify(*io, m_form_factor, m_variants);
-		if(score && format->extension_matches(filename()))
+		if (score && format->extension_matches(filename()))
 			score |= floppy_image_format_t::FIFID_EXT;
-		if(score > best) {
+		if (score > best) {
 			best = score;
 			best_format = format;
 		}
@@ -672,6 +674,11 @@ std::pair<std::error_condition, std::string> floppy_image_device::call_load()
 		m_image.reset();
 		return std::make_pair(image_error::INVALIDIMAGE, "Incompatible image file format or corrupted data");
 	}
+
+	char const *const wp = get_feature("write_protected");
+	if (wp && !std::strcmp(wp, "true"))
+		make_readonly();
+
 	m_output_format = is_readonly() ? nullptr : best_format;
 
 	m_image_dirty = false;
@@ -2900,12 +2907,12 @@ bool mac_floppy_device::wpt_r()
 	case 0xa: // Not on track 0?
 		return m_cyl != 0;
 
-	case 0xb:{// Tachometer, 60 pulses/rotation
+	case 0xb:{// Tachometer, 120 inversions/rotation
 		if(m_image.get() != nullptr && !m_mon) {
 			attotime base;
 			uint32_t pos = find_position(base, machine().time());
 			uint32_t subpos = pos % 3333334;
-			return subpos < 20000;
+			return subpos < 3333334/2;
 		} else
 			return false;
 	}
@@ -3110,4 +3117,27 @@ bool mfd75w_device::is_2m() const
 		return true;
 
 	return false;
+}
+
+//-------------------------------------------------
+//  5.25" twiggy drive
+//-------------------------------------------------
+
+floppy_twiggy::floppy_twiggy(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_TWIGGY, tag, owner, clock)
+{
+}
+
+floppy_twiggy::~floppy_twiggy()
+{
+}
+
+void floppy_twiggy::setup_characteristics()
+{
+	m_form_factor = floppy_image::FF_TWIG;
+	m_tracks = 46;
+	m_sides = 2;
+	set_rpm(218); // Variable between 218 and 320
+
+	add_variant(floppy_image::DSHD);
 }

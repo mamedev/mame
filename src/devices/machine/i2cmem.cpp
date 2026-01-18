@@ -25,8 +25,6 @@ there are two standard values.
 #include "emu.h"
 #include "i2cmem.h"
 
-#include <cstdarg>
-
 constexpr int STATE_IDLE(0);
 constexpr int STATE_DEVSEL(1);
 constexpr int STATE_ADDRESSHIGH(2);
@@ -43,20 +41,12 @@ constexpr int DEVSEL_ADDRESS(0xfe);
 //  DEBUGGING
 //**************************************************************************
 
-#define VERBOSE_LEVEL ( 0 )
+#define LOG_STATE     (1U << 1)
+#define LOG_READLINE  (1U << 2)
+#define LOG_WRITELINE (1U << 3)
 
-static inline void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level, const char *s_fmt, ... )
-{
-	if( VERBOSE_LEVEL >= n_level )
-	{
-		va_list v;
-		char buf[ 32768 ];
-		va_start( v, s_fmt );
-		vsnprintf( buf, 32768, s_fmt, v );
-		va_end( v );
-		device->logerror( "%s: I2CMEM %s", device->machine().describe_context(), buf );
-	}
-}
+#define VERBOSE       (0)
+#include "logmacro.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -75,6 +65,7 @@ DEFINE_DEVICE_TYPE(I2C_X2404P,  i2c_x2404p_device,  "x2404p",  "X2404P I2C Memor
 DEFINE_DEVICE_TYPE(I2C_24C08,   i2c_24c08_device,   "24c08",   "24C08 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C16,   i2c_24c16_device,   "24c16",   "24C16 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C64,   i2c_24c64_device,   "24c64",   "24C64 I2C Memory")
+DEFINE_DEVICE_TYPE(I2C_24C65,   i2c_24c65_device,   "24c65",   "24C65 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C128,  i2c_24c128_device,  "24c128",  "24C128 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C256,  i2c_24c256_device,  "24c256",  "24C256 I2C Memory")
 DEFINE_DEVICE_TYPE(I2C_24C512,  i2c_24c512_device,  "24c512",  "24C512 I2C Memory")
@@ -182,6 +173,12 @@ i2c_24c16_device::i2c_24c16_device(const machine_config &mconfig, const char *ta
 
 i2c_24c64_device::i2c_24c64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	i2cmem_device(mconfig, I2C_24C64, tag, owner, clock, 0, 32, 0x2000)
+{
+}
+
+// TODO: write protection differs too compared to '64
+i2c_24c65_device::i2c_24c65_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	i2cmem_device(mconfig, I2C_24C65, tag, owner, clock, 0, 64, 0x2000)
 {
 }
 
@@ -293,7 +290,7 @@ void i2cmem_device::write_e0(int state)
 	state &= 1;
 	if( m_e0 != state )
 	{
-		verboselog( this, 2, "set e0 %d\n", state );
+		LOGMASKED( LOG_WRITELINE, "%s: E0 = %d\n", machine().describe_context(), state );
 		m_e0 = state;
 	}
 }
@@ -304,7 +301,7 @@ void i2cmem_device::write_e1(int state)
 	state &= 1;
 	if( m_e1 != state )
 	{
-		verboselog( this, 2, "set e1 %d\n", state );
+		LOGMASKED( LOG_WRITELINE, "%s: E1 = %d\n", machine().describe_context(), state );
 		m_e1 = state;
 	}
 }
@@ -315,7 +312,7 @@ void i2cmem_device::write_e2(int state)
 	state &= 1;
 	if( m_e2 != state )
 	{
-		verboselog( this, 2, "set e2 %d\n", state );
+		LOGMASKED( LOG_WRITELINE, "%s: E2 = %d\n", machine().describe_context(), state );
 		m_e2 = state;
 	}
 }
@@ -326,10 +323,11 @@ void i2cmem_device::write_sda(int state)
 	state &= 1;
 	if( m_sdaw != state )
 	{
-		verboselog( this, 2, "set sda %d\n", state );
+		LOGMASKED( LOG_WRITELINE, "%s: SDA = %d @ %s (%d)\n", machine().describe_context(), state, machine().time().to_string(), state );
 		m_sdaw = state;
 
-		if( m_scl )
+		// Ignore transitions on SDA while device is driving it low
+		if( m_scl && m_sdar )
 		{
 			if( m_sdaw )
 			{
@@ -339,21 +337,19 @@ void i2cmem_device::write_sda(int state)
 					int root = base & ~( m_write_page_size - 1 );
 					for( int i = 0; i < m_page_written_size; i++ )
 						m_data[root | ((base + i) & (m_write_page_size - 1))] = m_page[i];
-					verboselog( this, 1, "data[ %04x to %04x ] = %x bytes\n", base, root | ((base + m_page_written_size - 1) & (m_write_page_size - 1)), m_page_written_size );
+					LOGMASKED( LOG_STATE, "EEPROM data[ %04x to %04x ] = %x bytes\n", base, root | ((base + m_page_written_size - 1) & (m_write_page_size - 1)), m_page_written_size );
 
 					m_page_written_size = 0;
 				}
-				verboselog( this, 1, "stop\n" );
+				LOGMASKED( LOG_STATE, "%s: I2C stop\n", machine().describe_context() );
 				m_state = STATE_IDLE;
 			}
-			else if( m_state == STATE_IDLE )
+			else
 			{
-				verboselog( this, 1, "start\n" );
+				LOGMASKED( LOG_STATE, "%s: I2C start\n", machine().describe_context() );
 				m_state = STATE_DEVSEL;
 				m_bits = 0;
 			}
-
-			m_sdar = 1;
 		}
 	}
 }
@@ -363,7 +359,7 @@ void i2cmem_device::write_scl(int state)
 	if( m_scl != state )
 	{
 		m_scl = state;
-		verboselog( this, 2, "set_scl_line %d\n", m_scl );
+		LOGMASKED( LOG_WRITELINE, "%s: SCL = %d @ %s (%d)\n", machine().describe_context(), m_scl, machine().time().to_string(), m_state );
 
 		switch( m_state )
 		{
@@ -398,19 +394,19 @@ void i2cmem_device::write_scl(int state)
 							{
 								// TODO: Atmel datasheets document 2-wire software reset, but doesn't mention it will lower sda only that it will release it.
 								// ltv_naru however requires it to be lowered, but we don't currently know the manufacturer of the chip used.
-								verboselog( this, 1, "software reset\n" );
+								LOGMASKED( LOG_STATE, "I2C software reset\n" );
 								m_state = STATE_RESET;
 							}
 							else if( !select_device() )
 							{
-								verboselog( this, 1, "devsel %02x: not this device\n", m_devsel );
+								LOGMASKED( LOG_STATE, "I2C devsel %02x: not this device\n", m_devsel );
 								m_state = STATE_IDLE;
 							}
 							else if( ( m_devsel & DEVSEL_RW ) == 0 )
 							{
 								if (m_devsel_address_low)
 								{
-									verboselog( this, 1, "devsel %02x: write (Xicor special, address %02x)\n", m_devsel, m_devsel >> 1);
+									LOGMASKED( LOG_STATE, "I2C devsel %02x: write (Xicor special, address %02x)\n", m_devsel, m_devsel >> 1);
 									m_byteaddr = (m_devsel & DEVSEL_ADDRESS) >> 1;
 									m_page_offset = 0;
 									m_page_written_size = 0;
@@ -418,7 +414,7 @@ void i2cmem_device::write_scl(int state)
 								}
 								else
 								{
-									verboselog( this, 1, "devsel %02x: write\n", m_devsel );
+									LOGMASKED( LOG_STATE, "I2C devsel %02x: write\n", m_devsel );
 									m_state = skip_addresshigh() ? STATE_ADDRESSLOW : STATE_ADDRESSHIGH;
 								}
 							}
@@ -426,12 +422,12 @@ void i2cmem_device::write_scl(int state)
 							{
 								if (m_devsel_address_low)
 								{
-									verboselog( this, 1, "devsel %02x: read (Xicor special, address %02x)\n", m_devsel, m_devsel >> 1);
+									LOGMASKED( LOG_STATE, "I2C devsel %02x: read (Xicor special, address %02x)\n", m_devsel, m_devsel >> 1);
 									m_byteaddr = (m_devsel & DEVSEL_ADDRESS) >> 1;
 								}
 								else
 								{
-									verboselog( this, 1, "devsel %02x: read\n", m_devsel );
+									LOGMASKED( LOG_STATE, "I2C devsel %02x: read\n", m_devsel );
 								}
 								m_state = STATE_READSELACK;
 							}
@@ -440,7 +436,7 @@ void i2cmem_device::write_scl(int state)
 						case STATE_ADDRESSHIGH:
 							m_addresshigh = m_shift;
 
-							verboselog(this, 1, "addresshigh %02x\n", m_addresshigh);
+							LOGMASKED( LOG_STATE, "EEPROM addresshigh %02x\n", m_addresshigh);
 
 							m_state = STATE_ADDRESSLOW;
 							break;
@@ -450,7 +446,7 @@ void i2cmem_device::write_scl(int state)
 							m_page_offset = 0;
 							m_page_written_size = 0;
 
-							verboselog( this, 1, "addresslow %02x (byteaddr %04x)\n", m_shift, m_byteaddr );
+							LOGMASKED( LOG_STATE, "EEPROM addresslow %02x (byteaddr %04x)\n", m_shift, m_byteaddr );
 
 							m_state = STATE_DATAIN;
 							break;
@@ -458,13 +454,13 @@ void i2cmem_device::write_scl(int state)
 						case STATE_DATAIN:
 							if( m_wc )
 							{
-								verboselog( this, 0, "write not enabled\n" );
+								logerror( "write not enabled\n" );
 								m_state = STATE_IDLE;
 							}
 							else if( m_write_page_size > 0 )
 							{
 								m_page[ m_page_offset ] = m_shift;
-								verboselog( this, 1, "page[ %04x ] <- %02x\n", m_page_offset, m_page[ m_page_offset ] );
+								LOGMASKED( LOG_STATE, "EEPROM page[ %04x ] <- %02x\n", m_page_offset, m_page[ m_page_offset ] );
 
 								m_page_offset++;
 								if( m_page_offset == m_write_page_size )
@@ -477,7 +473,7 @@ void i2cmem_device::write_scl(int state)
 							{
 								int offset = data_offset();
 
-								verboselog( this, 1, "data[ %04x ] <- %02x\n", offset, m_shift );
+								LOGMASKED( LOG_STATE, "EEPROM data[ %04x ] <- %02x\n", offset, m_shift );
 								m_data[ offset ] = m_shift;
 
 								m_byteaddr++;
@@ -487,7 +483,8 @@ void i2cmem_device::write_scl(int state)
 
 						if( m_state != STATE_IDLE )
 						{
-							m_sdar = 0 ;
+							// I2C acknowledge
+							m_sdar = 0;
 						}
 					}
 					else
@@ -518,7 +515,7 @@ void i2cmem_device::write_scl(int state)
 						int offset = data_offset();
 
 						m_shift = m_data[offset];
-						verboselog( this, 1, "data[ %04x ] -> %02x\n", offset, m_shift );
+						LOGMASKED( LOG_STATE, "EEPROM data[ %04x ] -> %02x\n", offset, m_shift );
 						m_byteaddr = (m_byteaddr & ~(m_read_page_size - 1)) | ((m_byteaddr + 1) & (m_read_page_size - 1));
 					}
 
@@ -533,7 +530,7 @@ void i2cmem_device::write_scl(int state)
 				{
 					if( m_sdaw )
 					{
-						verboselog( this, 1, "nack\n" );
+						LOGMASKED( LOG_STATE, "%s: I2C nack\n", machine().describe_context() );
 						m_state = STATE_IDLE;
 					}
 
@@ -551,7 +548,7 @@ void i2cmem_device::write_scl(int state)
 			{
 				if( m_bits > 8 )
 				{
-					verboselog(this, 1, "software reset ack\n");
+					LOGMASKED( LOG_STATE, "%s: I2C software reset ack\n", machine().describe_context() );
 					m_state = STATE_IDLE;
 					m_sdar = 1;
 				}
@@ -568,7 +565,7 @@ void i2cmem_device::write_wc(int state)
 	state &= 1;
 	if( m_wc != state )
 	{
-		verboselog( this, 2, "set wc %d\n", state );
+		LOGMASKED( LOG_WRITELINE, "%s: WC = %d\n", machine().describe_context(), state );
 		m_wc = state;
 	}
 }
@@ -577,7 +574,12 @@ void i2cmem_device::write_wc(int state)
 int i2cmem_device::read_sda()
 {
 	int res = m_sdar & 1;
-	verboselog( this, 2, "read sda %d\n", res );
+	// https://github.com/mamedev/mame/issues/13998
+	// pullup write value if reading doesn't belong to this device
+	if (m_state == STATE_IDLE)
+		res = m_sdaw & 1;
+	if( !machine().side_effects_disabled() )
+		LOGMASKED( LOG_READLINE, "%s: SDA = %d (%d)\n", machine().describe_context(), res, m_state );
 
 	return res;
 }

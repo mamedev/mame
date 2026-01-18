@@ -303,11 +303,6 @@ const char *dsk_format::extensions() const noexcept
 	return "dsk";
 }
 
-bool dsk_format::supports_save() const noexcept
-{
-	return false;
-}
-
 int dsk_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
 	uint8_t header[16];
@@ -478,7 +473,8 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					sects[j].actual_size = 128 << tr.sector_size_code;
 
 				sects[j].deleted = (sector.fdc_status_reg2 & 0x40);
-				sects[j].bad_crc = ((sector.fdc_status_reg1 & 0x20) || (sector.fdc_status_reg2 & 0x20));
+				sects[j].bad_data_crc = ((sector.fdc_status_reg1 & 0x20) || (sector.fdc_status_reg2 & 0x20));
+				sects[j].bad_addr_crc = false;
 
 				if(!(sector.fdc_status_reg1 & 0x04)) {
 					sects[j].data = sect_data + sdatapos;

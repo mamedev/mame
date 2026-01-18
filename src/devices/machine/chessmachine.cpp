@@ -138,7 +138,7 @@ void chessmachine_device::main_map(address_map &map)
 	map(0x00000000, 0x0000007f).view(m_boot_view);
 	m_boot_view[0](0x00000000, 0x0000007f).rom().region("bootrom", 0);
 
-	map(0x00400000, 0x00400003).mirror(0x003ffffc).rw(FUNC(chessmachine_device::internal_r), FUNC(chessmachine_device::internal_w)).umask32(0x000000ff);
+	map(0x00400000, 0x00400000).mirror(0x003ffffc).rw(FUNC(chessmachine_device::internal_r), FUNC(chessmachine_device::internal_w));
 	map(0x01800000, 0x01800003).r(FUNC(chessmachine_device::disable_bootrom_r));
 }
 

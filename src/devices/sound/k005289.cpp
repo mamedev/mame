@@ -38,7 +38,7 @@
 #include "k005289.h"
 
 // device type definition
-DEFINE_DEVICE_TYPE(K005289, k005289_device, "k005289", "K005289 SCC")
+DEFINE_DEVICE_TYPE(K005289, k005289_device, "k005289", "Konami 005289 SCC")
 
 
 //**************************************************************************

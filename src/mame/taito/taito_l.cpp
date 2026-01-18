@@ -2190,7 +2190,7 @@ GAME( 1988, kurikint,  0,        kurikint,  kurikint,  taitol_2cpu_state, empty_
 GAME( 1988, kurikintw, kurikint, kurikint,  kurikintj, taitol_2cpu_state, empty_init,     ROT0,   "Taito Corporation (World Games, Inc. license)", "Kuri Kinton (US, World Games license)", 0 )
 GAME( 1988, kurikintu, kurikint, kurikint,  kurikintj, taitol_2cpu_state, empty_init,     ROT0,   "Taito America Corporation", "Kuri Kinton (US)", 0 )
 GAME( 1988, kurikintj, kurikint, kurikint,  kurikintj, taitol_2cpu_state, empty_init,     ROT0,   "Taito Corporation", "Kuri Kinton (Japan)", 0 )
-GAME( 1988, kurikinta, kurikint, kurikint,  kurikinta, taitol_2cpu_state, empty_init,     ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype?)", 0 )
+GAME( 1988, kurikinta, kurikint, kurikint,  kurikinta, taitol_2cpu_state, empty_init,     ROT0,   "Taito Corporation Japan", "Kuri Kinton (World, prototype)", 0 )
 
 GAME( 1989, plotting,  0,        plotting,  plotting,  taitol_1cpu_state, empty_init,     ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
 GAME( 1989, plottinga, plotting, plotting,  plotting,  taitol_1cpu_state, init_plottinga, ROT0,   "Taito Corporation Japan", "Plotting (World set 2, protected)", 0 )

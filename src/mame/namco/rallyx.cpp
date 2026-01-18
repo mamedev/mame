@@ -1085,6 +1085,35 @@ ROM_START( rallyxeg )
 	ROM_LOAD( "r4_82s129.2m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
 ROM_END
 
+ROM_START( rallyxtd )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6101_2716.1b", 0x0000, 0x0800, CRC(921699dc) SHA1(5d242c0f0b2a041dc7e7c2aaa07fcf1edbac02af) )
+	ROM_LOAD( "2_2716.1c",    0x0800, 0x0800, BAD_DUMP CRC(7cbeb656) SHA1(ff6e669f7d3e91c1cc835106cccefcd81aa28bb8) )
+	ROM_LOAD( "6103_2716.1e", 0x1000, 0x0800, BAD_DUMP CRC(36e9918f) SHA1(2fe6c9f672d3dcaefa13f2035a2cd2f838e609f7) )
+	ROM_LOAD( "4_2716.1f",    0x1800, 0x0800, CRC(85d52586) SHA1(f8747a9a91f7e66c06b7f5a3a55462128cda66d0) )
+	ROM_LOAD( "5_2716.1h",    0x2000, 0x0800, CRC(fd78ba1a) SHA1(5fcbfab40b5a0f0d2ec70b8b52f19b02bf3d1317) )
+	ROM_LOAD( "6106_2716.1j", 0x2800, 0x0800, CRC(d72ee519) SHA1(81f4743b6a72e59900851462d643ffdc7dd2dd64) )
+	ROM_LOAD( "7_2716.1k",    0x3000, 0x0800, BAD_DUMP CRC(843109f2) SHA1(7241d1025f249d23a0d15b5e31fdb2f5297ffbf4) )
+	ROM_LOAD( "8_2716.1m",    0x3800, 0x0800, CRC(8ab078ef) SHA1(3aab0f898d76724362a793ef2d130f2b8d4ed936) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "6110_2716.8e", 0x0000, 0x0800, CRC(836fb24f) SHA1(bf09d6c428541e2098f3ec1ca72882f8ad8391bb) )
+	ROM_LOAD( "6109_2716.8d", 0x0800, 0x0800, CRC(22d7113b) SHA1(a9e0bc9761613645160f4cbcc7b72252641f4f57) )
+
+	ROM_REGION( 0x0100, "gfx2", 0 )
+	ROM_LOAD( "r6_82s129.8m", 0x0000, 0x0100, CRC(3c16f62c) SHA1(7a3800be410e306cf85753b9953ffc5575afbcd6) )
+
+	ROM_REGION( 0x0160, "proms", 0 )
+	ROM_LOAD( "r1_82s123.1n", 0x0000, 0x0020, CRC(c7865434) SHA1(70c1c9610ba6f1ead77f347e7132958958bccb31) )
+	ROM_LOAD( "r7_82s129.8p", 0x0020, 0x0100, CRC(834d4fda) SHA1(617864d3df0917a513e8255ad8d96ae7a04da5a1) )
+	ROM_LOAD( "r2_82s123.4n", 0x0120, 0x0020, CRC(659c3f5d) SHA1(1d668fb00148ce526c978fefb344262cf2a7271c) )
+	ROM_LOAD( "r3_82s123.7k", 0x0140, 0x0020, CRC(bdef006f) SHA1(9bcac4637a9c1638c18c11fd93c697a0fc514c97) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) // sound PROMs
+	ROM_LOAD( "r5_82s129.3p", 0x0000, 0x0100, CRC(4bad7017) SHA1(3e6da9d798f5e07fa18d6ce7d0b148be98c766d5) )
+	ROM_LOAD( "r4_82s129.2m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )
+ROM_END
+
 ROM_START( dngrtrck )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1b-2716.bin",  0x0000, 0x0800, CRC(b6180a12) SHA1(f442fe81f7fac6e915944640c763d7016a6577f6) )
@@ -1514,6 +1543,7 @@ GAME( 1980, rallyxa,   rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, R
 GAME( 1980, rallyxm,   rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "Namco (Midway license)",             "Rally X (Midway)",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, rallyxmr,  rallyx,   rallyx,   rallyx,   rallyx_state, empty_init, ROT0,  "bootleg (Model Racing)",             "Rally X (Model Racing bootleg)",    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, rallyxeg,  rallyx,   rallyx,   rallyxeg, rallyx_state, empty_init, ROT90, "bootleg (Video Game / Electrogame)", "Rally X (Video Game bootleg)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, rallyxtd,  rallyx,   rallyx,   rallyxeg, rallyx_state, empty_init, ROT90, "bootleg (Tecnidiver)",               "Rally X (Tecnidiver bootleg)",      MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, dngrtrck,  rallyx,   rallyx,   dngrtrck, rallyx_state, empty_init, ROT0,  "bootleg (Petaco)",                   "Danger Track (bootleg of Rally X)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, nrallyx,   0,        rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco",                              "New Rally X",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, nrallyxb,  nrallyx,  rallyx,   nrallyx,  rallyx_state, empty_init, ROT0,  "Namco",                              "New Rally X (bootleg?)",            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

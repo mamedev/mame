@@ -213,6 +213,11 @@ newoption {
 }
 
 newoption {
+	trigger = "PDB_SYMBOLS",
+	description = "Generate CodeView PDB symbols.",
+}
+
+newoption {
 	trigger = "PROFILER",
 	description = "Include the internal profiler.",
 }
@@ -718,9 +723,12 @@ local version = str_to_version(_OPTIONS["gcc_version"])
 if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	buildoptions {
 		"-g" .. _OPTIONS["SYMLEVEL"],
-		"-fno-omit-frame-pointer",
-		"-fno-optimize-sibling-calls",
 	}
+	if _OPTIONS["PDB_SYMBOLS"]~=nil and _OPTIONS["PDB_SYMBOLS"]~=0 then
+		buildoptions {
+			"-gcodeview",
+		}
+	end
 end
 
 --# we need to disable some additional implicit optimizations for profiling
@@ -1106,7 +1114,6 @@ configuration { "asmjs" }
 	}
 	linkoptions {
 		"-Wl,--start-group",
-		"-O" .. _OPTIONS["OPTIMIZE"],
 		"-s USE_SDL=2",
 		"-s USE_SDL_TTF=2",
 		"-s DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=\"['\\$$ERRNO_CODES']\"",
@@ -1124,6 +1131,19 @@ configuration { "asmjs" }
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/lut-default.png@artwork/lut-default.png",
 		"--embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png",
 	}
+	if _OPTIONS["OPTIMIZE"]~=nil then
+		if _OPTIONS["OPTIMIZE"]=="3" then
+			-- emcc's link-time -O3 is very slow, max out at -O2 for now
+			-- we should still be getting the benefit of -O3 on the individual object files
+			linkoptions {
+				"-O2",
+			}
+		else
+			linkoptions {
+				"-O" .. _OPTIONS["OPTIMIZE"],
+			}
+		end
+	end
 	if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 		linkoptions {
 			"-g" .. _OPTIONS["SYMLEVEL"],

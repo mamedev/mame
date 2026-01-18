@@ -545,12 +545,6 @@ Notes:
 
 Known problems with this driver.
 
-  - Rasters are not correctly emulated in places where more than one split happens
-    per frame. A known place where this problem happens is during Shuma-Gorath's
-    Chaos Dimension super move in both MSH and MSHVSF. The screen should split into
-    around 6 or more strips and then scroll the gfx inside those strips up and down
-    alternatly (as one stip moves gfx up the next strip moves the gfx down).
-
   - The network adapter used in Super Street Fighter II: The Tournament Battle is
     not currently emulated though the ports it uses are setup in the memory map.
 
@@ -562,10 +556,10 @@ Known problems with this driver.
     hardware when timing is not based on Vsync (ssf2 and ssf2t for example). It is
     possible that what is slowing the cpu is read/write wait states when accessing
     RAM areas. This would mean that in places where lots of opcodes are being used
-    in connetion with data registers only the code would end up running to slow.
+    in connection with data registers only the code would end up running to slow.
 
   - Giga Wing's sprites are 1 frame out when compared to background scrolling. See
-    the explanation above for the most likley cause of this problem.
+    the explanation above for the most likely cause of this problem.
 
   - Progear slows down more than it should when compared to real hardware. See
     the explanation above for the most likely cause of this problem.
@@ -674,18 +668,22 @@ public:
 		, m_ecofghtr_dial_last1(0)
 	{ }
 
-	void cps2(machine_config &config);
-	void cps2comm(machine_config &config);
-	void gigaman2(machine_config &config);
-	void dead_cps2(machine_config &config);
-	void dead_cps2comm(machine_config &config);
+	void cps2(machine_config &config) ATTR_COLD;
+	void cps2comm(machine_config &config) ATTR_COLD;
+	void gigaman2(machine_config &config) ATTR_COLD;
+	void dead_cps2(machine_config &config) ATTR_COLD;
+	void dead_cps2comm(machine_config &config) ATTR_COLD;
 
-	void init_cps2();
-	void init_cps2nc();
-	void init_gigaman2();
-	void init_pzloop2();
-	void init_singbrd();
-	void init_ecofghtr();
+	void init_cps2() ATTR_COLD;
+	void init_cps2nc() ATTR_COLD;
+	void init_gigaman2() ATTR_COLD;
+	void init_pzloop2() ATTR_COLD;
+	void init_singbrd() ATTR_COLD;
+	void init_ecofghtr() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	void init_digital_volume();
@@ -696,7 +694,6 @@ private:
 	uint16_t cps2_qsound_volume_r();
 	uint16_t joy_or_paddle_r();
 	uint16_t joy_or_paddle_ecofghtr_r();
-	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
 	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
 
 	void cps2_objram_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -709,14 +706,9 @@ private:
 	void cps2_gfx_decode();
 	virtual void find_last_sprite() override;
 	void cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks);
-	void cps2_set_sprite_priorities();
-	void cps2_objram_latch();
+	void cps2_objram_latch(int state);
 	uint16_t *cps2_objbase();
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) override;
-	uint32_t screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
-	DECLARE_MACHINE_START(cps2);
-	virtual void video_start() override ATTR_COLD;
 
 	void cps2_map(address_map &map) ATTR_COLD;
 	void cps2_comm_map(address_map &map) ATTR_COLD;
@@ -904,7 +896,7 @@ void cps2_state::find_last_sprite()    /* Find the offset of last sprite */
 	m_cps2_last_sprite_offset = m_cps2_obj_size / 2 - 4;
 }
 
-void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks )
+void cps2_state::cps2_render_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks)
 {
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)                                    \
 {                                                                                   \
@@ -924,10 +916,9 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 				SX,SY, screen.priority(),primasks[priority],15);                 \
 }
 
-	int i;
 	uint16_t *base = m_cps2_buffered_obj.get();
-	int xoffs = 64 - m_output[CPS2_OBJ_XOFFS /2];
-	int yoffs = 16 - m_output[CPS2_OBJ_YOFFS /2];
+	int xoffs = 64 - m_output[CPS2_OBJ_XOFFS / 2];
+	int yoffs = 16 - m_output[CPS2_OBJ_YOFFS / 2];
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed(KEYCODE_Z) && machine().input().code_pressed(KEYCODE_R))
@@ -936,7 +927,7 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 	}
 #endif
 
-	for (i = m_cps2_last_sprite_offset; i >= 0; i -= 4)
+	for (int i = m_cps2_last_sprite_offset; i >= 0; i -= 4)
 	{
 		int x = base[i + 0];
 		int y = base[i + 1];
@@ -947,8 +938,8 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 
 		if (colour & 0x80)
 		{
-			x += m_output[CPS2_OBJ_XOFFS /2];  /* fix the offset of some games */
-			y += m_output[CPS2_OBJ_YOFFS /2];  /* like Marvel vs. Capcom ending credits */
+			x += m_output[CPS2_OBJ_XOFFS / 2]; /* fix the offset of some games */
+			y += m_output[CPS2_OBJ_YOFFS / 2]; /* like Marvel vs. Capcom ending credits */
 		}
 
 		if (colour & 0xff00)
@@ -1026,8 +1017,8 @@ void cps2_state::cps2_render_sprites( screen_device &screen, bitmap_ind16 &bitma
 							sy = (y + nys * 16 + yoffs) & 0x3ff;
 
 							DRAWSPRITE(
-//                                      code + nxs + 0x10 * nys,
-									(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys,  //  pgear fix
+									//code + nxs + 0x10 * nys,
+									(code & ~0xf) + ((code + nxs) & 0xf) + 0x10 * nys, // pgear fix
 									(col & 0x1f),
 									0,0,
 									sx,sy);
@@ -1059,23 +1050,25 @@ void cps2_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, cons
 	int l3 = (layercontrol >> 0x0c) & 0x03;
 	screen.priority().fill(0, cliprect);
 
-	int primasks[8], i;
+	int primasks[8];
 	int l0pri = (m_pri_ctrl >> 4 * l0) & 0x0f;
 	int l1pri = (m_pri_ctrl >> 4 * l1) & 0x0f;
 	int l2pri = (m_pri_ctrl >> 4 * l2) & 0x0f;
 	int l3pri = (m_pri_ctrl >> 4 * l3) & 0x0f;
 
 #if 0
-if (    (m_output[CPS2_OBJ_BASE /2] != 0x7080 && m_output[CPS2_OBJ_BASE /2] != 0x7000) ||
-		m_output[CPS2_OBJ_UK1 /2] != 0x807d ||
-		(m_output[CPS2_OBJ_UK2 /2] != 0x0000 && m_output[CPS2_OBJ_UK2 /2] != 0x1101 && m_output[CPS2_OBJ_UK2 /2] != 0x0001))
-	popmessage("base %04x uk1 %04x uk2 %04x",
-			m_output[CPS2_OBJ_BASE /2],
-			m_output[CPS2_OBJ_UK1 /2],
-			m_output[CPS2_OBJ_UK2 /2]);
+	if ((m_output[CPS2_OBJ_BASE / 2] != 0x7080 && m_output[CPS2_OBJ_BASE / 2] != 0x7000) ||
+			m_output[CPS2_OBJ_UK1 / 2] != 0x807d ||
+			(m_output[CPS2_OBJ_UK2 / 2] != 0x0000 && m_output[CPS2_OBJ_UK2 / 2] != 0x1101 && m_output[CPS2_OBJ_UK2 / 2] != 0x0001))
+	{
+		popmessage("base %04x uk1 %04x uk2 %04x",
+				m_output[CPS2_OBJ_BASE / 2],
+				m_output[CPS2_OBJ_UK1 / 2],
+				m_output[CPS2_OBJ_UK2 / 2]);
+	}
 
-if (0 && machine().input().code_pressed(KEYCODE_Z))
-	popmessage("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
+	if (0 && machine().input().code_pressed(KEYCODE_Z))
+		popmessage("order: %d (%d) %d (%d) %d (%d) %d (%d)",l0,l0pri,l1,l1pri,l2,l2pri,l3,l3pri);
 #endif
 
 	/* take out the CPS1 sprites layer */
@@ -1091,7 +1084,7 @@ if (0 && machine().input().code_pressed(KEYCODE_Z))
 		if (l1pri > l2pri) mask1 &= ~0xc0;
 
 		primasks[0] = 0xff;
-		for (i = 1; i < 8; i++)
+		for (int i = 1; i < 8; i++)
 		{
 			if (i <= l0pri && i <= l1pri && i <= l2pri)
 			{
@@ -1112,73 +1105,13 @@ if (0 && machine().input().code_pressed(KEYCODE_Z))
 }
 
 
-uint32_t cps2_state::screen_update_cps2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void cps2_state::cps2_objram_latch(int state)
 {
-	cps2_set_sprite_priorities();
-	return screen_update_cps1(screen, bitmap, cliprect);
-}
-
-void cps2_state::cps2_set_sprite_priorities()
-{
-	m_pri_ctrl = m_output[CPS2_OBJ_PRI /2];
-}
-
-void cps2_state::cps2_objram_latch()
-{
-	cps2_set_sprite_priorities();
-	memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);
-}
-
-
-
-/*************************************
- *
- *  Interrupt generation
- *
- *************************************/
-
-TIMER_DEVICE_CALLBACK_MEMBER(cps2_state::cps2_interrupt)
-{
-	// Direct irq line connection, IPL1 is vblank, IPL2 is some sort of scanline interrupt.
-	if (param == 0)
-		m_scancalls = 0;
-
-	if (m_cps_b_regs[0x10 / 2] & 0x8000)
-		m_cps_b_regs[0x10 / 2] &= 0x1ff;
-
-	if (m_cps_b_regs[0x12 / 2] & 0x8000)
-		m_cps_b_regs[0x12 / 2] &= 0x1ff;
-
-//  popmessage("%04x %04x - %04x %04x",m_scanline1,m_scanline2,m_cps_b_regs[0x10/2],m_cps_b_regs[0x12/2]);
-
-	// Raster effects
-	if (m_scanline1 == param || (m_scanline1 < param && !m_scancalls))
+	if (state)
 	{
-		m_cps_b_regs[0x10/2] = 0;
-		m_maincpu->set_input_line(2, HOLD_LINE);
-		m_screen->update_partial(param);
-		m_scancalls++;
-//      popmessage("IRQ4 scancounter = %04i", param);
+		m_pri_ctrl = m_output[CPS2_OBJ_PRI / 2];
+		memcpy(m_cps2_buffered_obj.get(), cps2_objbase(), m_cps2_obj_size);
 	}
-
-	// Raster effects
-	if(m_scanline2 == param || (m_scanline2 < param && !m_scancalls))
-	{
-		m_cps_b_regs[0x12 / 2] = 0;
-		m_maincpu->set_input_line(2, HOLD_LINE);
-		m_screen->update_partial(param);
-		m_scancalls++;
-//      popmessage("IRQ4 scancounter = %04i", param);
-	}
-
-	if (param == 240)  // VBlank
-	{
-		m_cps_b_regs[0x10 / 2] = m_scanline1;
-		m_cps_b_regs[0x12 / 2] = m_scanline2;
-		m_maincpu->set_input_line(1, HOLD_LINE);
-		cps2_objram_latch();
-	}
-//  popmessage("Raster calls = %i", m_scancalls);
 }
 
 
@@ -1299,11 +1232,10 @@ uint16_t cps2_state::cps2_qsound_volume_r()
 
 	if (m_comm && m_comm->comm_enabled())
 		return 0x2021; // SSF2TB doesn't have a digital slider in the test screen
+	else if (m_cps2disabledigitalvolume)
+		return 0xd000; // Digital display isn't shown in test mode
 	else
-		if (m_cps2disabledigitalvolume)
-			return 0xd000; // Digital display isn't shown in test mode
-		else
-			return result;
+		return result;
 }
 
 
@@ -1864,7 +1796,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-MACHINE_START_MEMBER(cps2_state,cps2)
+void cps2_state::machine_start()
 {
 	if (m_audiocpu != nullptr) // gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 		membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, memregion("audiocpu")->base() + 0x10000, 0x4000);
@@ -1874,27 +1806,28 @@ MACHINE_START_MEMBER(cps2_state,cps2)
 void cps2_state::cps2(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(16'000'000));
+	M68000(config, m_maincpu, 16_MHz_XTAL);
+	m_maincpu->set_interrupt_mixer(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps2_state::cps2_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cps2_state::decrypted_opcodes_map);
-	m_maincpu->set_interrupt_mixer(false);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &cps2_state::cpu_space_map);
 
-	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::cps2_interrupt), "screen", 0, 1);
+	TIMER(config, "scantimer").configure_scanline(FUNC(cps2_state::raster_scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, XTAL(8'000'000));
+	Z80(config, m_audiocpu, 8_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps2_state::qsound_sub_map);
-	m_audiocpu->set_periodic_int(FUNC(cps2_state::irq0_line_hold), attotime::from_hz(250)); // measured
 
-	MCFG_MACHINE_START_OVERRIDE(cps2_state, cps2)
+	const attotime audio_irq_period = attotime::from_hz(8_MHz_XTAL / 32000); // measured
+	m_audiocpu->set_periodic_int(FUNC(cps2_state::irq0_line_hold), audio_irq_period);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// Video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(CPS_PIXEL_CLOCK, CPS_HTOTAL, CPS_HBEND, CPS_HBSTART, CPS_VTOTAL, CPS_VBEND, CPS_VBSTART);
-	m_screen->set_screen_update(FUNC(cps2_state::screen_update_cps2));
+	m_screen->set_screen_update(FUNC(cps2_state::screen_update_cps1));
 	m_screen->screen_vblank().set(FUNC(cps2_state::screen_vblank_cps1));
+	m_screen->screen_vblank().append(FUNC(cps2_state::cps2_objram_latch));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
@@ -1941,7 +1874,7 @@ void cps2_state::gigaman2(machine_config &config)
 	// gigaman2 has an AT89C4051 (8051) MCU as an audio cpu, no qsound.
 	config.device_remove("qsound");
 
-	OKIM6295(config, m_oki, XTAL(32'000'000)/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
+	OKIM6295(config, m_oki, 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 }
@@ -6541,6 +6474,36 @@ ROM_END
 
 ROM_START( progear )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "pgae.03", 0x000000, 0x80000, CRC(8577bc86) SHA1(474ed45d3b84cd38de166b101aa122123c886882) )
+	ROM_LOAD16_WORD_SWAP( "pgae.04", 0x080000, 0x80000, CRC(d850da04) SHA1(b768b34bda8802b645a4c1e1a4429b68d370558f) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD64_BYTE( "pga-simm.01c",   0x0000000, 0x200000,  CRC(452f98b0) SHA1(a10e615c32098f6d25becd466da8faa967523a7b) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.01d",   0x0000001, 0x200000,  CRC(9e672092) SHA1(fce0b8b43a1c069262f4e3e81c1a04621e232c88) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.01a",   0x0000002, 0x200000,  CRC(ae9ddafe) SHA1(afbb26fed6cd0cb5c0099a10d35aeb453318c14d) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.01b",   0x0000003, 0x200000,  CRC(94d72d94) SHA1(df6a3fe49c008f73b160eb6f2a44dc371ff73cba) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.03c",   0x0000004, 0x200000,  CRC(48a1886d) SHA1(ebf44b42d784924e08a832a7e5f66a887bab244b) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.03d",   0x0000005, 0x200000,  CRC(172d7e37) SHA1(0eaedd24cd3fa87b6f35fbd63078d40c493c92d0) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.03a",   0x0000006, 0x200000,  CRC(9ee33d98) SHA1(85d1bd31940e35ac8c732165020881a2d65cd6b1) ) // ROM on a SIMM
+	ROM_LOAD64_BYTE( "pga-simm.03b",   0x0000007, 0x200000,  CRC(848dee32) SHA1(c591288e86ad1624d0fe66563808af9fac786e64) ) // ROM on a SIMM
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) // 64k for the audio CPU (+banks)
+	ROM_LOAD( "pga.01",   0x00000, 0x08000, CRC(bdbfa992) SHA1(7c5496c1daaea6a7ab95c0b25625d325ec3427cc) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+
+	ROM_REGION( 0x800000, "qsound", 0 ) // QSound samples
+	ROM_LOAD16_WORD_SWAP( "pga-simm.05a",   0x000000, 0x200000, CRC(c0aac80c) SHA1(91784d35d4f7e113529bb5be6081b67094b150ea) ) // ROM on a SIMM
+	ROM_LOAD16_WORD_SWAP( "pga-simm.05b",   0x200000, 0x200000, CRC(37a65d86) SHA1(374d562a4648734f82aa2ddb6d258e870896dd45) ) // ROM on a SIMM
+	ROM_LOAD16_WORD_SWAP( "pga-simm.06a",   0x400000, 0x200000, CRC(d3f1e934) SHA1(5dcea28c873d0d472f5b94e07d97cd77ace2b252) ) // ROM on a SIMM
+	ROM_LOAD16_WORD_SWAP( "pga-simm.06b",   0x600000, 0x200000, CRC(8b39489a) SHA1(fd790efaf37dc2c4c16f657941044e3e2d3c2711) ) // ROM on a SIMM
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "progear.key",  0x000000, 0x000014, CRC(eee6b2a8) SHA1(d97e2da6b48f0ebdfdf54a10614b6fd505b75def) )
+ROM_END
+
+
+ROM_START( progearu )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
 	ROM_LOAD16_WORD_SWAP( "pgau.03", 0x000000, 0x80000, CRC(343a783e) SHA1(7ba8ae041b062767bf64328adf22ef100c38cdfd) )
 	ROM_LOAD16_WORD_SWAP( "pgau.04", 0x080000, 0x80000, CRC(16208d79) SHA1(c477de7f31df44144a60d10dc4d933f3a7c20722) )
 
@@ -6565,7 +6528,7 @@ ROM_START( progear )
 	ROM_LOAD16_WORD_SWAP( "pga-simm.06b",   0x600000, 0x200000, CRC(8b39489a) SHA1(fd790efaf37dc2c4c16f657941044e3e2d3c2711) ) // ROM on a SIMM
 
 	ROM_REGION( 0x20, "key", 0 )
-	ROM_LOAD( "progear.key",  0x000000, 0x000014, CRC(46736b17) SHA1(3fd0cc78fad80210a7cf8b1150cba1e6121998dd) )
+	ROM_LOAD( "progearu.key",  0x000000, 0x000014, CRC(46736b17) SHA1(3fd0cc78fad80210a7cf8b1150cba1e6121998dd) )
 ROM_END
 
 ROM_START( progearj )
@@ -10956,14 +10919,7 @@ void cps2_state::init_digital_volume()
 void cps2_state::init_cps2_video()
 {
 	cps2_gfx_decode();
-
-	m_scanline1 = 262;
-	m_scanline2 = 262;
-	m_scancalls = 0;
-	m_last_sprite_offset = 0;
-	m_cps2_last_sprite_offset = 0;
-	m_pri_ctrl = 0;
-	m_objram_bank = 0;
+	init_rasters(); // cps1.cpp
 }
 
 
@@ -12914,7 +12870,8 @@ GAME( 2000, 1944u,      1944,     cps2, cps2_2p2b, cps2_state, init_cps2,     RO
 
 // Games released on CPS-2 hardware by Cave
 
-GAME( 2001, progear,    0,        cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Cave (Capcom license)", "Progear (USA 010117)",             MACHINE_SUPPORTS_SAVE )
+GAME( 2001, progear,    0,        cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Cave (Capcom license)", "Progear (Europe 010117)",          MACHINE_SUPPORTS_SAVE )
+GAME( 2001, progearu,   progear,  cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Cave (Capcom license)", "Progear (USA 010117)",             MACHINE_SUPPORTS_SAVE )
 GAME( 2001, progearj,   progear,  cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Cave (Capcom license)", "Progear no Arashi (Japan 010117)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, progeara,   progear,  cps2, cps2_2p3b, cps2_state, init_cps2,     ROT0,   "Cave (Capcom license)", "Progear (Asia 010117)",            MACHINE_SUPPORTS_SAVE )
 

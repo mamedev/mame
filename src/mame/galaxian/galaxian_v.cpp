@@ -467,11 +467,11 @@ uint32_t galaxian_state::screen_update_galaxian(screen_device &screen, bitmap_rg
 
 	/* render the sprites next. Some custom pcbs (eg. zigzag, fantastc) have more than one sprite generator (ideally, this should be rendered in parallel) */
 	for (int i = 0; i < m_numspritegens; i++)
-		sprites_draw(bitmap, cliprect, &m_spriteram[m_sprites_base + i * 0x20]);
+		sprites_draw(screen, bitmap, cliprect, &m_spriteram[m_sprites_base + i * 0x20]);
 
 	/* if we have bullets to draw, render them following */
 	if (!m_draw_bullet_ptr.isnull())
-		bullets_draw(bitmap, cliprect, &m_spriteram[m_bullets_base]);
+		bullets_draw(screen, bitmap, cliprect, &m_spriteram[m_bullets_base]);
 
 	return 0;
 }
@@ -502,11 +502,10 @@ TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
 
 void galaxian_state::galaxian_videoram_w(offs_t offset, uint8_t data)
 {
-	/* update any video up to the current scanline */
-//  m_screen->update_now();
+	// update any video up to the current scanline
 	m_screen->update_partial(m_screen->vpos());
 
-	/* store the data and mark the corresponding tile dirty */
+	// store the data and mark the corresponding tile dirty
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
@@ -514,20 +513,19 @@ void galaxian_state::galaxian_videoram_w(offs_t offset, uint8_t data)
 
 void galaxian_state::galaxian_objram_w(offs_t offset, uint8_t data)
 {
-	/* update any video up to the current scanline */
-//  m_screen->update_now();
+	// update any video up to the current scanline
 	m_screen->update_partial(m_screen->vpos());
 
-	/* store the data */
+	// store the data
 	m_spriteram[offset] = data;
 
-	/* the first $40 bytes affect the tilemap */
+	// the first $40 bytes affect the tilemap
 	if (offset < 0x40)
 	{
-		/* even entries control the scroll position */
+		// even entries control the scroll position
 		if ((offset & 0x01) == 0)
 		{
-			/* Frogger: top and bottom 4 bits swapped entering the adder */
+			// Frogger: top and bottom 4 bits swapped entering the adder
 			if (m_frogger_adjust)
 				data = (data >> 4) | (data << 4);
 			if (!m_sfx_adjust)
@@ -536,7 +534,7 @@ void galaxian_state::galaxian_objram_w(offs_t offset, uint8_t data)
 				m_bg_tilemap->set_scrollx(offset >> 1, m_x_scale*data);
 		}
 
-		/* odd entries control the color base for the row */
+		// odd entries control the color base for the row
 		else
 		{
 			for (offset >>= 1; offset < 0x0400; offset += 32)
@@ -553,61 +551,70 @@ void galaxian_state::galaxian_objram_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spritebase)
+void galaxian_state::sprites_clip(screen_device &screen, rectangle &cliprect)
+{
+	// 16 of the 256 pixels of the sprites are hard-clipped at the line buffer.
+	// According to the schematics, it should be the first 16 pixels.
+	// See sprites_draw for an explanation of the +1.
+	rectangle clip = screen.visible_area();
+	if (m_flipscreen_x)
+		clip.max_x = (256 - (16 + 1)) * m_x_scale - 1;
+	else
+		clip.min_x = ((16 + 1) * m_x_scale);
+
+	cliprect &= clip;
+}
+
+void galaxian_state::sprites_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spritebase)
 {
 	rectangle clip = cliprect;
-	int sprnum;
+	sprites_clip(screen, clip);
 
-	/* the existence of +1 (sprite vs tile layer) is supported by a LOT of games */
-	const int hoffset = 1;
-
-	/* 16 of the 256 pixels of the sprites are hard-clipped at the line buffer */
-	/* according to the schematics, it should be the first 16 pixels */
-	clip.min_x = std::max(clip.min_x, (!m_flipscreen_x) * (m_leftspriteclip + hoffset) * m_x_scale);
-	clip.max_x = std::min(clip.max_x, (256 - m_flipscreen_x * (16 + hoffset)) * m_x_scale - 1);
-
-	/* The line buffer is only written if it contains a '0' currently; */
-	/* it is cleared during the visible area, and populated during HBLANK */
-	/* To simulate this, we render backwards so that lower numbered sprites */
-	/* have priority over higher numbered sprites. */
-	for (sprnum = 7; sprnum >= 0; sprnum--)
+	// The line buffer is only written if it contains a '0' currently;
+	// it is cleared during the visible area, and populated during HBLANK
+	// To simulate this, we render backwards so that lower numbered sprites
+	// have priority over higher numbered sprites.
+	for (int sprnum = 7; sprnum >= 0; sprnum--)
 	{
 		const uint8_t *base = &spritebase[sprnum * 4];
 
-		/* Frogger: top and bottom 4 bits swapped entering the adder */
+		// Frogger: top and bottom 4 bits swapped entering the adder
 		uint8_t base0 = m_frogger_adjust ? ((base[0] >> 4) | (base[0] << 4)) : base[0];
 
-		/* the first three sprites match against y-1 (seems other way around for sfx/monsterz) */
+		// the first three sprites match against y-1 (seems other way around for sfx/monsterz)
 		uint8_t sy = 240 - (base0 - (m_sfx_adjust ? (sprnum >= 3) : (sprnum < 3)));
 
 		uint16_t code = base[1] & 0x3f;
 		uint8_t flipx = base[1] & 0x40;
 		uint8_t flipy = base[1] & 0x80;
 		uint8_t color = base[2] & 7;
+
+		// the existence of +1 (sprite vs tile layer) is supported by a LOT of games
+		const int hoffset = 1;
 		uint8_t sx = base[3] + hoffset;
 
-		/* extend the sprite information */
+		// extend the sprite information
 		m_extend_sprite_info_ptr(base, &sx, &sy, &flipx, &flipy, &code, &color);
 
-		/* apply flipscreen in X direction */
+		// apply flipscreen in X direction
 		if (m_flipscreen_x)
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
 
-		/* apply flipscreen in Y direction */
+		// apply flipscreen in Y direction
 		if (m_flipscreen_y)
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
 		}
 
-		/* draw */
+		// draw
 		m_gfxdecode->gfx(1)->transpen(bitmap,clip,
-		code, color,
-		flipx, flipy,
-		m_h0_start + m_x_scale * sx, sy, 0);
+				code, color,
+				flipx, flipy,
+				m_h0_start + m_x_scale * sx, sy, 0);
 	}
 }
 
@@ -619,21 +626,21 @@ void galaxian_state::sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
  *
  *************************************/
 
-void galaxian_state::bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *base)
+void galaxian_state::bullets_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *base)
 {
-	/* iterate over scanlines */
+	// iterate over scanlines
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		uint8_t shell = 0xff, missile = 0xff;
 		uint8_t effy;
 
-		/* the first 3 entries match Y-1 */
+		// the first 3 entries match Y-1
 		effy = m_flipscreen_y ? ((y - 1) ^ 255) : (y - 1);
 		for (int which = 0; which < 3; which++)
 			if (uint8_t(base[which*4+1] + effy) == 0xff)
 				shell = which;
 
-		/* remaining entries match Y */
+		// remaining entries match Y
 		effy = m_flipscreen_y ? (y ^ 255) : y;
 		for (int which = 3; which < 8; which++)
 			if (uint8_t(base[which*4+1] + effy) == 0xff)
@@ -644,7 +651,7 @@ void galaxian_state::bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprec
 					missile = which;
 			}
 
-		/* draw the shell */
+		// draw the shell
 		if (shell != 0xff)
 			m_draw_bullet_ptr(bitmap, cliprect, shell, 255 - base[shell*4+3], y);
 		if (missile != 0xff)
@@ -664,7 +671,6 @@ void galaxian_state::galaxian_flip_screen_x_w(uint8_t data)
 {
 	if (m_flipscreen_x != (data & 0x01))
 	{
-//      m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 
 		/* when the direction changes, we count a different number of clocks */
@@ -681,7 +687,6 @@ void galaxian_state::galaxian_flip_screen_y_w(uint8_t data)
 {
 	if (m_flipscreen_y != (data & 0x01))
 	{
-//      m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 
 		m_flipscreen_y = data & 0x01;
@@ -706,10 +711,7 @@ void galaxian_state::galaxian_flip_screen_xy_w(uint8_t data)
 void galaxian_state::galaxian_stars_enable_w(uint8_t data)
 {
 	if ((m_stars_enabled ^ data) & 0x01)
-	{
-//      m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
-	}
 
 	if (!m_stars_enabled && (data & 0x01))
 	{
@@ -726,10 +728,7 @@ void galaxian_state::galaxian_stars_enable_w(uint8_t data)
 void galaxian_state::scramble_background_enable_w(uint8_t data)
 {
 	if ((m_background_enable ^ data) & 0x01)
-	{
-	//  m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
-	}
 
 	m_background_enable = data & 0x01;
 }
@@ -738,10 +737,7 @@ void galaxian_state::scramble_background_enable_w(uint8_t data)
 void galaxian_state::scramble_background_red_w(uint8_t data)
 {
 	if ((m_background_red ^ data) & 0x01)
-	{
-	//  m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
-	}
 
 	m_background_red = data & 0x01;
 }
@@ -750,10 +746,7 @@ void galaxian_state::scramble_background_red_w(uint8_t data)
 void galaxian_state::scramble_background_green_w(uint8_t data)
 {
 	if ((m_background_green ^ data) & 0x01)
-	{
-	//  m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
-	}
 
 	m_background_green = data & 0x01;
 }
@@ -762,10 +755,7 @@ void galaxian_state::scramble_background_green_w(uint8_t data)
 void galaxian_state::scramble_background_blue_w(uint8_t data)
 {
 	if ((m_background_blue ^ data) & 0x01)
-	{
-	//  m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
-	}
 
 	m_background_blue = data & 0x01;
 }
@@ -782,7 +772,6 @@ void galaxian_state::galaxian_gfxbank_w(offs_t offset, uint8_t data)
 {
 	if (m_gfxbank[offset] != data)
 	{
-		//m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 		m_gfxbank[offset] = data;
 		m_bg_tilemap->mark_all_dirty();
@@ -799,17 +788,14 @@ void galaxian_state::galaxian_gfxbank_w(offs_t offset, uint8_t data)
 
 void galaxian_state::stars_init()
 {
-	uint32_t shiftreg;
-	int i;
-
 	/* reset the blink and enabled states */
 	m_stars_enabled = false;
 	m_stars_blink_state = 0;
 
 	/* precalculate the RNG */
 	m_stars = std::make_unique<uint8_t[]>(STAR_RNG_PERIOD);
-	shiftreg = 0;
-	for (i = 0; i < STAR_RNG_PERIOD; i++)
+	uint32_t shiftreg = 0;
+	for (int i = 0; i < STAR_RNG_PERIOD; i++)
 	{
 		/* stars are enabled if the upper 8 bits are 1 and the low bit is 0 */
 		int enabled = ((shiftreg & 0x1fe01) == 0x1fe00);
@@ -882,13 +868,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::scramble_stars_blink_timer)
 
 void galaxian_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint32_t star_offs, uint8_t starmask)
 {
-	int x;
-
 	/* ensure our star offset is valid */
 	star_offs %= STAR_RNG_PERIOD;
 
 	/* iterate over the specified number of 6MHz pixels */
-	for (x = 0; x < maxx; x++)
+	for (int x = 0; x < maxx; x++)
 	{
 		/* stars are suppressed unless V1 ^ H8 == 1 */
 		int enable_star = (y ^ (x >> 3)) & 1;
@@ -953,10 +937,8 @@ void galaxian_state::galaxian_draw_stars(bitmap_rgb32 &bitmap, const rectangle &
 	/* render stars if enabled */
 	if (m_stars_enabled)
 	{
-		int y;
-
 		/* iterate over scanlines */
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			uint32_t star_offs = m_star_rng_origin + y * 512;
 			stars_draw_row(bitmap, maxx, y, star_offs, 0xff);
@@ -1013,10 +995,9 @@ void galaxian_state::scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &
 	if (m_stars_enabled)
 	{
 		int blink_state = m_stars_blink_state & 3;
-		int y;
 
 		/* iterate over scanlines */
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			/* blink state 2 suppressed stars when 2V == 0 */
 			if (blink_state != 2 || (y & 2) != 0)
@@ -1061,10 +1042,8 @@ void galaxian_state::jumpbug_draw_background(bitmap_rgb32 &bitmap, const rectang
 	/* render stars if enabled */
 	if (m_stars_enabled)
 	{
-		int y;
-
 		/* iterate over scanlines */
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
 			uint32_t star_offs = m_star_rng_origin + y * 512;
 			stars_draw_row(bitmap, 232, y, star_offs, 0xff); // verified on a real PCB
@@ -1124,9 +1103,8 @@ void galaxian_state::amidar_draw_background(bitmap_rgb32 &bitmap, const rectangl
 {
 	const uint8_t *prom = memregion("user1")->base();
 	rectangle draw;
-	int x;
 
-	for (x = 0; x < 32; x++)
+	for (int x = 0; x < 32; x++)
 		if (flip_and_clip(&draw, x * 8, x * 8 + 7, cliprect))
 		{
 			/*

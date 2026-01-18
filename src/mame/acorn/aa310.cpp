@@ -109,7 +109,6 @@
 
 #include "bus/archimedes/econet/slot.h"
 #include "bus/archimedes/podule/slot.h"
-//#include "bus/archimedes/test/slot.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/centronics/spjoy.h"
 #include "bus/econet/econet.h"
@@ -118,10 +117,6 @@
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/arm/arm.h"
-#include "formats/acorn_dsk.h"
-#include "formats/apd_dsk.h"
-#include "formats/jfd_dsk.h"
-#include "formats/st_dsk.h"
 #include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
 #include "machine/acorn_bmu.h"
@@ -143,6 +138,12 @@
 #include "machine/wd_fdc.h"
 #include "machine/wd33c9x.h"
 #include "machine/z80scc.h"
+
+#include "formats/acorn_dsk.h"
+#include "formats/apd_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/jfd_dsk.h"
+#include "formats/st_dsk.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -253,7 +254,6 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0U)
 		//, m_hdc(*this, "hdc")
-		//, m_test(*this, "test")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
 	{ }
@@ -281,7 +281,6 @@ private:
 	required_device<wd1772_device> m_fdc;
 	optional_device_array<floppy_connector, 4> m_floppy;
 	//optional_device<hd63463_device> m_hdc;
-	//optional_device<archimedes_test_slot_device> m_test;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 };
@@ -333,7 +332,6 @@ public:
 		: aabase_state(mconfig, type, tag)
 		, m_i2cmem(*this,"i2cmem")
 		, m_floppy(*this, "upc:fdc:%u", 0U)
-		//, m_test(*this, "test")
 		, m_ioeb_control(0)
 	{ }
 
@@ -352,7 +350,6 @@ protected:
 	void ioeb_w(offs_t offset, u8 data);
 
 	optional_device_array<floppy_connector, 4> m_floppy;
-	//required_device<archimedes_test_slot_device> m_test;
 
 	u8 m_ioeb_control;
 
@@ -1028,6 +1025,8 @@ INPUT_PORTS_END
 void aabase_state::floppy_formats(format_registration &fr)
 {
 	fr.add_pc_formats();
+	fr.add(FLOPPY_HFE_FORMAT);
+	//fr.add(FLOPPY_HFE3_FORMAT);
 	// Archimedes formats
 	fr.add(FLOPPY_ACORN_ADFS_NEW_FORMAT);
 	fr.add(FLOPPY_APD_FORMAT);
@@ -1114,14 +1113,14 @@ void aa500_state::aa500(machine_config &config)
 	//m_ioc->gpio_r<2>().set("rtc", FUNC(pcf8573_device::min_r));
 	//m_ioc->gpio_r<3>().set("rtc", FUNC(pcf8573_device::sec_r));
 	m_ioc->gpio_r<4>().set([this] { return m_selected_floppy ? m_selected_floppy->dskchg_r() : 1; });
-	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %d", machine().describe_context(), state); });
+	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %d\n", machine().describe_context(), state); });
 
 	ACORN_VIDC1(config.replace(), m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
 
-	// TODO: implement A500 keyboard, uses M6500/11 MCU
+	// TODO: implement A500 keyboard, uses M6500/1 MCU
 
 	m_ram->set_default_size("4M");
 
@@ -1208,9 +1207,9 @@ void aa310_state::aa310(machine_config &config)
 	m_ioc->gpio_w<0>().set("i2cmem", FUNC(pcf8583_device::sda_w));
 	m_ioc->gpio_w<1>().set("i2cmem", FUNC(pcf8583_device::scl_w));
 	m_ioc->gpio_r<2>().set([this] { return m_selected_floppy ? !m_selected_floppy->ready_r() : 0; });
-	//m_ioc->gpio_r<3>().set([this] () { logerror("%s: Reserved", machine().describe_context()); return 0; });
-	//m_ioc->gpio_r<4>().set([this] () { logerror("%s: Aux IO connector", machine().describe_context()); return 0; });
-	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %s", machine().describe_context(), state); });
+	//m_ioc->gpio_r<3>().set([this] () { logerror("%s: Reserved\n", machine().describe_context()); return 0; });
+	//m_ioc->gpio_r<4>().set([this] () { logerror("%s: Aux IO connector\n", machine().describe_context()); return 0; });
+	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %s\n", machine().describe_context(), state); });
 
 	m_ram->set_default_size("1M");
 
@@ -1444,6 +1443,7 @@ void aa310_state::ar140(machine_config &config)
 void aa310_state::aa540(machine_config &config)
 {
 	aa310(config);
+
 	m_maincpu->set_clock(52_MHz_XTAL / 2); // ARM3
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
@@ -1452,8 +1452,6 @@ void aa310_state::aa540(machine_config &config)
 	// expansion slots - 4-card backplane
 	ARCHIMEDES_PODULE_SLOT(config, m_podule[1], m_exp, archimedes_exp_devices, nullptr); // Acorn AKA31 SCSI 100MB HDD
 	ARCHIMEDES_PODULE_SLOT(config, m_podule[3], m_exp, archimedes_exp_devices, nullptr);
-
-	//ARCHIMEDES_TEST_SLOT(config, m_test, archimedes_test_devices, nullptr);
 }
 
 void aa310_state::ar225(machine_config &config)
@@ -1509,15 +1507,17 @@ void aa310_state::av20dev(machine_config &config)
 void aa4000_state::aa3010(machine_config &config)
 {
 	aabase(config);
+
 	m_maincpu->set_clock(72_MHz_XTAL / 6); // ARM250
+	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
 	m_ioc->baud_w().set("upc:serial1", FUNC(ns16450_device::clock_w));
-	m_ioc->peripheral_r<1>().set([this] () { logerror("%s: IOC: Peripheral Select 1 R", machine().describe_context()); return 0; });
-	m_ioc->peripheral_w<1>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 1 W %d", machine().describe_context(), state); });
+	m_ioc->peripheral_r<1>().set([this] () { logerror("%s: IOC: Peripheral Select 1 R\n", machine().describe_context()); return 0; });
+	m_ioc->peripheral_w<1>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 1 W %d\n", machine().describe_context(), state); });
 	m_ioc->peripheral_r<2>().set("econet", FUNC(archimedes_econet_slot_device::read));
 	m_ioc->peripheral_w<2>().set("econet", FUNC(archimedes_econet_slot_device::write));
-	m_ioc->peripheral_r<3>().set([this] () { logerror("%s: IOC: Peripheral Select 3 R", machine().describe_context()); return 0; });
-	m_ioc->peripheral_w<3>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 3 W %d", machine().describe_context(), state); });
+	m_ioc->peripheral_r<3>().set([this] () { logerror("%s: IOC: Peripheral Select 3 R\n", machine().describe_context()); return 0; });
+	m_ioc->peripheral_w<3>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 3 W %d\n", machine().describe_context(), state); });
 	m_ioc->peripheral_r<5>().set(FUNC(aa4000_state::ioeb_r));
 	m_ioc->peripheral_w<5>().set(FUNC(aa4000_state::ioeb_w));
 	m_ioc->gpio_r<0>().set(m_i2cmem, FUNC(pcf8583_device::sda_r));
@@ -1527,7 +1527,7 @@ void aa4000_state::aa3010(machine_config &config)
 	m_ioc->gpio_r<3>().set("idrom", FUNC(ds2401_device::read));
 	m_ioc->gpio_w<3>().set("idrom", FUNC(ds2401_device::write));
 	m_ioc->gpio_r<4>().set_constant(1); // Sintr
-	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %d", machine().describe_context(), state); });
+	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %d\n", machine().describe_context(), state); });
 
 	m_ram->set_default_size("1M").set_extra_options("2M");
 
@@ -1563,8 +1563,6 @@ void aa4000_state::aa3010(machine_config &config)
 
 	archimedes_econet_slot_device &econet(ARCHIMEDES_ECONET_SLOT(config, "econet", archimedes_econet_devices, nullptr));
 	econet.efiq_handler().set(m_ioc, FUNC(acorn_ioc_device::fl_w));
-
-	//ARCHIMEDES_TEST_SLOT(config, m_test, archimedes_test_devices, nullptr);
 }
 
 void aa4000_state::aa3020(machine_config &config)
@@ -1592,16 +1590,17 @@ void aa4000_state::aa4000(machine_config &config)
 void aa5000_state::aa5000(machine_config &config)
 {
 	aabase(config);
+
 	m_maincpu->set_clock(50_MHz_XTAL / 2); // ARM3
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
 	m_ioc->baud_w().set("upc:serial", FUNC(ns16450_device::clock_w));
-	m_ioc->peripheral_r<1>().set([this] () { logerror("%s: IOC: Peripheral Select 1 R", machine().describe_context()); return 0; });
-	m_ioc->peripheral_w<1>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 1 W %d", machine().describe_context(), state); });
+	m_ioc->peripheral_r<1>().set([this] () { logerror("%s: IOC: Peripheral Select 1 R\n", machine().describe_context()); return 0; });
+	m_ioc->peripheral_w<1>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 1 W %d\n", machine().describe_context(), state); });
 	m_ioc->peripheral_r<2>().set("econet", FUNC(archimedes_econet_slot_device::read));
 	m_ioc->peripheral_w<2>().set("econet", FUNC(archimedes_econet_slot_device::write));
-	m_ioc->peripheral_r<3>().set([this] () { logerror("%s: IOC: Peripheral Select 3 R", machine().describe_context()); return 0; });
-	m_ioc->peripheral_w<3>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 3 W %d", machine().describe_context(), state); });
+	m_ioc->peripheral_r<3>().set([this] () { logerror("%s: IOC: Peripheral Select 3 R\n", machine().describe_context()); return 0; });
+	m_ioc->peripheral_w<3>().set([this] (int state) { logerror("%s: IOC: Peripheral Select 3 W %d\n", machine().describe_context(), state); });
 	m_ioc->peripheral_r<5>().set(FUNC(aa5000_state::ioeb_r));
 	m_ioc->peripheral_w<5>().set(FUNC(aa5000_state::ioeb_w));
 	m_ioc->gpio_r<0>().set("i2cmem", FUNC(pcf8583_device::sda_r));
@@ -1611,7 +1610,7 @@ void aa5000_state::aa5000(machine_config &config)
 	m_ioc->gpio_r<3>().set("idrom", FUNC(ds2401_device::read));
 	m_ioc->gpio_w<3>().set("idrom", FUNC(ds2401_device::write));
 	m_ioc->gpio_r<4>().set_constant(1); // Sintr
-	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %d", machine().describe_context(), state); });
+	//m_ioc->gpio_w<5>().set([this] (int state) { logerror("%s: Sound Mute %d\n", machine().describe_context(), state); });
 
 	m_ram->set_default_size("2M").set_extra_options("4M");
 
@@ -1655,8 +1654,6 @@ void aa5000_state::aa5000(machine_config &config)
 	archimedes_econet_slot_device &econet(ARCHIMEDES_ECONET_SLOT(config, "econet", archimedes_econet_devices, nullptr));
 	econet.efiq_handler().set(m_ioc, FUNC(acorn_ioc_device::fl_w));
 
-	//ARCHIMEDES_TEST_SLOT(config, m_test, archimedes_test_devices, nullptr);
-
 	// extension rom
 	GENERIC_SOCKET(config, m_ext_rom, generic_linear_slot, "ext_rom", "bin,rom");
 	subdevice<software_list_device>("rom_list")->set_filter("A5000,ARC");
@@ -1665,6 +1662,7 @@ void aa5000_state::aa5000(machine_config &config)
 void aa4_state::aa4(machine_config &config)
 {
 	aa3010(config);
+
 	m_maincpu->set_clock(24_MHz_XTAL); // ARM3
 	m_maincpu->set_copro_type(arm_cpu_device::copro_type::VL86C020);
 
@@ -1725,11 +1723,17 @@ ROM_START( aa500 )
 	ROMX_LOAD( "a500_ros310_rom1.ic25", 0x000001, 0x80000, CRC(0be31dfc) SHA1(c2a7aa6737931171507950025c3bc1008800e0f7), ROM_BIOS(2) | ROM_SKIP(3) )
 	ROMX_LOAD( "a500_ros310_rom2.ic26", 0x000002, 0x80000, CRC(081c5825) SHA1(e42a356bfaa77a81ee9e7e2a8d58ff0f301583c2), ROM_BIOS(2) | ROM_SKIP(3) )
 	ROMX_LOAD( "a500_ros310_rom3.ic27", 0x000003, 0x80000, CRC(c9bd793b) SHA1(534428a338b10d49b4fc2d9d6ab4c2463e3c3db5), ROM_BIOS(2) | ROM_SKIP(3) )
+	ROM_SYSTEM_BIOS( 3, "sn63", "#63: RISC OS 2.00 (12 Oct 1988)" )
+	ROMX_LOAD( "a500_ros200_rom0.ic24", 0x000000, 0x10000, CRC(e69849a6) SHA1(80a0c849025a24d626804f57fe6ca992088d96e2), ROM_BIOS(3) | ROM_SKIP(3) )
+	ROMX_LOAD( "a500_ros200_rom1.ic25", 0x000001, 0x10000, CRC(3ad7e1c0) SHA1(427560f567fa5f8a118db64c8e4bc2756cb2a457), ROM_BIOS(3) | ROM_SKIP(3) )
+	ROMX_LOAD( "a500_ros200_rom2.ic26", 0x000002, 0x10000, CRC(e0f9466c) SHA1(017b658057e608b490f7e09ad5ef021687d9a79e), ROM_BIOS(3) | ROM_SKIP(3) )
+	ROMX_LOAD( "a500_ros200_rom3.ic27", 0x000003, 0x10000, CRC(7876cc6c) SHA1(99c008aa1eae1977545ab0cebf2d8b2f09879818), ROM_BIOS(3) | ROM_SKIP(3) )
 
 	ROM_REGION( 0x100, "i2cmem", ROMREGION_ERASE00 )
 	ROMX_LOAD( "cmos_riscos2.bin", 0x0000, 0x0100, CRC(1ecf3369) SHA1(96163285797e0d54017d8d4ae87835328a4658bd), ROM_BIOS(0) )
 	ROMX_LOAD( "cmos_riscos2.bin", 0x0000, 0x0100, CRC(1ecf3369) SHA1(96163285797e0d54017d8d4ae87835328a4658bd), ROM_BIOS(1) )
 	ROMX_LOAD( "cmos_riscos3.bin", 0x0000, 0x0100, CRC(96ed59b2) SHA1(9dab30b4c3305e1142819687889fca334b532679), ROM_BIOS(2) )
+	ROMX_LOAD( "cmos_riscos2.bin", 0x0000, 0x0100, CRC(1ecf3369) SHA1(96163285797e0d54017d8d4ae87835328a4658bd), ROM_BIOS(3) )
 ROM_END
 
 ROM_START( aa500d )

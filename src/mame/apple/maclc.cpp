@@ -25,6 +25,7 @@
 
 #include "cuda.h"
 #include "dfac.h"
+#include "dfac2.h"
 #include "egret.h"
 #include "macadb.h"
 #include "macscsi.h"
@@ -66,6 +67,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_v8(*this, "v8"),
 		m_dfac(*this, "dfac"),
+		m_dfac2(*this, "dfac2"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_scsibus1(*this, "scsi"),
@@ -95,6 +97,7 @@ private:
 	required_device<ram_device> m_ram;
 	required_device<v8_device> m_v8;
 	optional_device<dfac_device> m_dfac;
+	optional_device<dfac2_device> m_dfac2;
 	optional_device<applefdintf_device> m_fdc;
 	optional_device_array<floppy_connector, 2> m_floppy;
 	required_device<nscsi_bus_device> m_scsibus1;
@@ -157,7 +160,7 @@ private:
 
 void maclc_state::machine_start()
 {
-	m_v8->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
+	m_v8->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 
 	save_item(NAME(m_hdsel));
 }
@@ -278,6 +281,9 @@ void maclc_state::swim_w(offs_t offset, u16 data, u16 mem_mask)
 		m_fdc->write((offset >> 8) & 0xf, data & 0xff);
 	else
 		m_fdc->write((offset >> 8) & 0xf, data >> 8);
+
+	if (!machine().side_effects_disabled())
+		m_maincpu->adjust_icount(-5);
 }
 
 void maclc_state::phases_w(uint8_t phases)
@@ -497,6 +503,10 @@ void maclc_state::maccclas(machine_config &config)
 	m_v8->add_route(1, "speaker", 1.0, 1);
 
 	config.device_remove("dfac");
+	APPLE_DFAC2(config, m_dfac2, 22257);
+	m_dfac2->sda_callback().set(m_cuda, FUNC(cuda_device::set_iic_sda));
+	m_cuda->iic_scl_callback().set(m_dfac2, FUNC(dfac2_device::scl_write));
+	m_cuda->iic_sda_callback().set(m_dfac2, FUNC(dfac2_device::sda_write));
 
 	NUBUS_SLOT(config, "lcpds", "pds", mac_pdslc_cards, nullptr);
 

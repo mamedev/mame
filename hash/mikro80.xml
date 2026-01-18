@@ -21,7 +21,7 @@ The general method of loading a tape is to type I, press Return, select Play. Wh
 	</software>
 
 	<software name="basica" cloneof="basic">
-		<description>Mikro-80 BASIC (Alt)</description>
+		<description>Mikro-80 BASIC (alt)</description>
 		<!-- This loads ok, and signs on as RADIO86-RK basic, then immediately exits back to the monitor -->
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>

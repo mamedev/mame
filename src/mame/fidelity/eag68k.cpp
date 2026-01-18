@@ -976,6 +976,12 @@ ROM_START( feagv4a ) // dumped from a V2 - checksum FD5C 49AC
 	ROM_LOAD16_BYTE("6114_o5_green.u19",  0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
 ROM_END
 
+ROM_START( feagv4b ) // dumped from a V2 - checksum 0DCC 5536
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("6114_e_yellow.u22", 0x00000, 0x10000, CRC(70f66709) SHA1(ad78b251d852930b3c79582e913bfc68527e3791) ) // 27c512
+	ROM_LOAD16_BYTE("6114_o1_green.u19", 0x00001, 0x10000, CRC(bd9258ac) SHA1(6cdecdf841312cfc9daa25dba27b9005dcfcd679) ) // "
+ROM_END
+
 
 ROM_START( feagv5 )
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 ) // PCB label 510.1136A01 - checksum 0140 9CF2
@@ -1064,6 +1070,7 @@ SYST( 1989, fex68km4a, fex68k,  0,      fex68km4, excel68k, excel68k_state, empt
 
 SYST( 1989, feagv4,    0,       0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2265 (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, feagv4a,   feagv4,  0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2265 (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, feagv4b,   feagv4,  0,      eagv4,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2265 (model 6114-2/3/4, set 3)", MACHINE_SUPPORTS_SAVE )
 SYST( 1989, feagv5,    feagv4,  0,      eagv5,    eag,      eagv5_state,    init_eag,   "Fidelity International", "Elite Avant Garde 2265 (model 6114-5)", MACHINE_SUPPORTS_SAVE )
 
 SYST( 1989, feagv7,    feagv4,  0,      eagv7,    eag,      eag_state,      init_eag,   "Fidelity International", "Elite Avant Garde 2325 (model 6117-6/7, set 1)", MACHINE_SUPPORTS_SAVE )

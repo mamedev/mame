@@ -2,7 +2,7 @@
 // copyright-holders:Juergen Buchmueller
 /****************************************************************************
  *
- * Sound hardware for Pleiades, Naughty Boy and Pop Flamer.
+ * Sound hardware for Pleiads, Naughty Boy and Pop Flamer.
  *
  * If you find errors or have suggestions, please mail me.
  * Juergen Buchmueller <pullmoll@t-online.de>
@@ -17,31 +17,33 @@
 #define VMIN    0
 #define VMAX    32767
 
+#define PC4_MIN (int)(VMAX * 7 / 50)
+
 /* fixed 8kHz clock */
 #define TONE1_CLOCK  8000
 
 
 DEFINE_DEVICE_TYPE(PLEIADS_SOUND, pleiads_sound_device, "pleiads_sound", "Pleiads Custom Sound")
 
-pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pleiads_sound_device(mconfig, PLEIADS_SOUND, tag, owner, clock)
+pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pleiads_sound_device(mconfig, PLEIADS_SOUND, tag, owner, clock)
 {
 }
 
-pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, type, tag, owner, clock),
-		device_sound_interface(mconfig, *this),
-		m_tms(*this, ":tms"),
-		m_channel(nullptr),
-		m_sound_latch_a(0),
-		m_sound_latch_b(0),
-		m_sound_latch_c(0),
-		m_poly18(nullptr),
-		m_polybit(0),
-		m_pa5_resistor(0),
-		m_pc5_resistor(0),
-		m_polybit_resistor(0),
-		m_opamp_resistor(0)
+pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
+	device_sound_interface(mconfig, *this),
+	m_tms(*this, ":tms"),
+	m_channel(nullptr),
+	m_sound_latch_a(0),
+	m_sound_latch_b(0),
+	m_sound_latch_c(0),
+	m_poly18(nullptr),
+	m_polybit(0),
+	m_pa5_resistor(0),
+	m_pc5_resistor(0),
+	m_polybit_resistor(0),
+	m_opamp_resistor(0)
 {
 }
 
@@ -112,8 +114,8 @@ void pleiads_sound_device::device_start()
 
 DEFINE_DEVICE_TYPE(NAUGHTYB_SOUND, naughtyb_sound_device, "naughtyb_sound", "Naughty Boy Custom Sound")
 
-naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pleiads_sound_device(mconfig, NAUGHTYB_SOUND, tag, owner, clock)
+naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pleiads_sound_device(mconfig, NAUGHTYB_SOUND, tag, owner, clock)
 {
 }
 
@@ -123,7 +125,7 @@ naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, cons
 
 void naughtyb_sound_device::device_start()
 {
-		/* charge 10u??? through 330K (R??) -> 3.3s */
+	/* charge 10u??? through 330K (R??) -> 3.3s */
 	m_pa5.charge_time = 3.3;
 
 	/* discharge 10u through 220k (R??) -> 2.1s */
@@ -180,8 +182,8 @@ void naughtyb_sound_device::device_start()
 
 DEFINE_DEVICE_TYPE(POPFLAME_SOUND, popflame_sound_device, "popflame_sound", "Pop Flamer Custom Sound")
 
-popflame_sound_device::popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pleiads_sound_device(mconfig, POPFLAME_SOUND, tag, owner, clock)
+popflame_sound_device::popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pleiads_sound_device(mconfig, POPFLAME_SOUND, tag, owner, clock)
 {
 }
 
@@ -191,7 +193,7 @@ popflame_sound_device::popflame_sound_device(const machine_config &mconfig, cons
 
 void popflame_sound_device::device_start()
 {
-		/* charge 10u (C63 in Pop Flamer) through 330K -> 3.3s */
+	/* charge 10u (C63 in Pop Flamer) through 330K -> 3.3s */
 	m_pa5.charge_time = 3.3;
 
 	/* discharge 10u (C63 in Pop Flamer) through 220k -> 2.2s */
@@ -350,8 +352,6 @@ inline int pleiads_sound_device::tone23(int samplerate)
  *****************************************************************************/
 inline int pleiads_sound_device::update_c_pc4(int samplerate)
 {
-	#define PC4_MIN (int)(VMAX * 7 / 50)
-
 	/* bit 4 of latch C: (part of videoreg_w) hi? */
 	if (m_sound_latch_c & 0x10)
 	{
@@ -621,17 +621,14 @@ void pleiads_sound_device::control_c_w(uint8_t data)
 
 void pleiads_sound_device::common_start()
 {
-	int i, j;
-	uint32_t shiftreg;
-
 	m_pc4.level = PC4_MIN;
 	m_poly18 = make_unique_clear<uint32_t[]>(1ul << (18-5));
 
-	shiftreg = 0;
-	for( i = 0; i < (1ul << (18-5)); i++ )
+	uint32_t shiftreg = 0;
+	for( int i = 0; i < (1ul << (18-5)); i++ )
 	{
 		uint32_t bits = 0;
-		for( j = 0; j < 32; j++ )
+		for( int j = 0; j < 32; j++ )
 		{
 			bits = (bits >> 1) | (shiftreg << 31);
 			if( ((shiftreg >> 16) & 1) == ((shiftreg >> 17) & 1) )
@@ -687,7 +684,6 @@ void pleiads_sound_device::common_start()
 	save_item(NAME(m_noise.counter));
 	save_item(NAME(m_noise.polyoffs));
 	save_item(NAME(m_noise.freq));
-	save_pointer(NAME(m_poly18), (1ul << (18-5)));
 }
 
 //-------------------------------------------------

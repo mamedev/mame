@@ -262,7 +262,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	type = t;
 	machine = &m;
 	view = machine->debug_view().alloc_view((debug_view_type)type, debugwin_view_update, self);
-	if (view == nil) {
+	if (view == nil)
+	{
 		[self release];
 		return nil;
 	}
@@ -478,7 +479,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)viewFrameDidChange:(NSNotification *)notification {
-	if (ignoreNextFrameUpdate) {
+	if (ignoreNextFrameUpdate)
+	{
 		ignoreNextFrameUpdate = NO;
 		return;
 	}
@@ -912,9 +914,11 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 		string = [string string];
 	for (len = [string length], found = NSMakeRange(0, 0);
 		 found.location < len;
-		 found.location += found.length) {
+		 found.location += found.length)
+	{
 		found = [string rangeOfComposedCharacterSequenceAtIndex:found.location];
-		if (found.length == 1) {
+		if (found.length == 1)
+		{
 			unichar ch = [string characterAtIndex:found.location];
 			if ((ch >= 32) && (ch < 127))
 				[self typeCharacterAndScrollToCursor:ch];

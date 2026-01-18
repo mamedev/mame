@@ -158,7 +158,7 @@ protected:
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
 
-	int m_version_hi_nibble;
+	uint8_t m_version_hi_nibble;
 
 	uint8_t m_page_register;
 

@@ -82,10 +82,10 @@ void generalplus_gp327902_game_state::arm_map(address_map &map)
 {
 	map(0x00000000, 0x001fffff).ram(); // 16M-bit internal SDRAM
 
-	map(0xc0020070, 0xc0020073).r(FUNC(generalplus_gp327902_game_state::c0020070_unk_r));
-	map(0xc0060000, 0xc0060003).w(FUNC(generalplus_gp327902_game_state::c0060000_unk_w));
-	map(0xc008000c, 0xc008000f).r(FUNC(generalplus_gp327902_game_state::c008000c_unk_r));
-	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gp327902_game_state::d000003c_unk_r));
+	map(0xc0020070, 0xc0020073).r(FUNC(generalplus_gp327902_game_state::c0020070_unk_r)); // P_TIMERD_UPCOUNT
+	map(0xc0060000, 0xc0060003).w(FUNC(generalplus_gp327902_game_state::c0060000_unk_w)); // P_UART_DATA
+	map(0xc008000c, 0xc008000f).r(FUNC(generalplus_gp327902_game_state::c008000c_unk_r)); // P_SPI_RX_STATUS
+	map(0xd000003c, 0xd000003f).r(FUNC(generalplus_gp327902_game_state::d000003c_unk_r)); // P_SYSTEM_POWER_STATE
 
 	map(0xf8000000, 0xf80003ff).ram(); // writes pointers used by exceptions (including IRQs) here
 }
@@ -152,26 +152,42 @@ void generalplus_gp327902_game_state::init_spi()
 	}
 	else
 	{
-		// sanxpet has the main block here, which is likely copied to RAM by previous parts of the bootloader above
+		// smksagas has the main block here, which is likely copied to RAM by previous parts of the bootloader above
 		m_copybase = 0x16000;
 		m_copydest = 0x0;
 		m_copylength = 0x200000;
 	}
 }
 
-ROM_START( sanxpet )
+ROM_START( smksagas )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25l64.u1", 0x0000, 0x800000, CRC(f28b9fd3) SHA1(8ed4668f271cbe01065bc0836e49ce70faf10834) )
 ROM_END
 
-ROM_START( sanxpeta )
+ROM_START( smksagasa ) // code is the same, some data area differs, could be different factory defaults, or user data, remove later if redundant
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u1", 0x0000, 0x800000, CRC(5dee73ea) SHA1(ff0302a479f0a1a0a6dc605e18f6389f6244922f) )
+ROM_END
+
+ROM_START( smkmikke ) // DX version
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "gpr25l6403f.u1", 0x0000, 0x800000, CRC(cb5dc7b6) SHA1(425c4d01b56784278b77824a354d9efa46e1a74e) )
 ROM_END
 
+ROM_START( smkmikkea ) // different code revision (non-DX)
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l64.u1", 0x0000, 0x800000, CRC(af900ab7) SHA1(c2cb0d37acf94edd150e6ef4f987f66b2306b97e) )
+ROM_END
+
+
 ROM_START( tomyegg )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "gpr25l6403f.u1", 0x0000, 0x800000, CRC(2acd6752) SHA1(85e59546a1af4618c75c275cead7ef0f5e3faa44) )
+ROM_END
+
+ROM_START( chikawac )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "xm25qh64c.u1", 0x0000, 0x800000, CRC(88c984aa) SHA1(6e176960b64fc3576efaa40dfe2ff0a6dcea3c3f) )
 ROM_END
 
 } // anonymous namespace
@@ -181,18 +197,19 @@ ROM_END
 // dates for each of these taken from back of case, are the DX versions different software or just different accessories?
 
 // 2018 version is a square device - Sumikko Gurashi - Sumikko Atsume (すみっコぐらし すみっコあつめ)
+// see evolution_handheld.cpp
 
 // 2019 version is house shaped device - すみっコぐらし すみっコさがし
-CONS( 2019, sanxpet,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, smksagas,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan, set 1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a standard unit
+CONS( 2019, smksagasa,        smksagas, 0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Sagashi (Japan, set 2)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a 'Deluxe' unit
 // or Sumikko Gurashi - Sumikko Sagashi DX (すみっコぐらし すみっコさがしDX "Sumikko Gurashi the movie" alt version)
 
-// 2020 version is a cloud shaped device - Sumikko Gurashi - Sumikko Catch (すみっコぐらし すみっコキャッチ)
-// or Sumikko Gurashi - Sumikko Catch DX (すみっコぐらし すみっコキャッチDX) = Sumikko Catch with pouch and strap
+// 2020 version - Sumikko Gurashi - Sumikko Catch, see generalplus_gpl16250_spi_direct.cpp
 
 // 2021 version is a square device with a tiny 'mole' figure on top - すみっコぐらし すみっコみっけDX
 // or Sumikko Gurashi - Sumikko Mikke (すみっコぐらし すみっコみっけ)
-CONS( 2021, sanxpeta,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke DX (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
+CONS( 2021, smkmikke,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke DX (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a 'Deluxe' unit
+CONS( 2021, smkmikkea,       smkmikke, 0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "San-X / Tomy",        "Sumikko Gurashi - Sumikko Mikke (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // from a standard unit
 
 // other devices on the same Soc
 
@@ -201,3 +218,5 @@ CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_g
 // these also exist, are they the same software or different versions?
 // Powder Pink (パウダーピンク)
 // Mint Blue (ミントブルー).
+
+CONS( 2021, chikawac,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Chiikawa Camera De Ya-! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

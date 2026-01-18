@@ -15,7 +15,6 @@
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
-#include "cpu/drcumlsh.h"
 
 
 //**************************************************************************
@@ -243,7 +242,9 @@ private:
 
 		// External control registers
 		uint32_t    m_dspx_control;
-	} * m_core;
+	};
+	dspp_internal_state* m_core;
+	dspp_internal_state m_local_core; // for non-DRC mode
 
 	// DMA
 	struct fifo_dma
@@ -319,7 +320,7 @@ private:
 	};
 
 public: // TODO
-	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
+	void alloc_handle(uml::code_handle **handleptr, const char *name);
 	void load_fast_iregs(drcuml_block &block);
 	void save_fast_iregs(drcuml_block &block);
 //  void arm7_drc_init();

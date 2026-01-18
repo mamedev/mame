@@ -4,6 +4,7 @@
 
   Bingo Roll / Bell Star
 
+   TODO: Hook up i8256
 
 ************************************************************************
 
@@ -507,9 +508,10 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/gen_latch.h"
+#include "machine/i8256.h"
 #include "machine/intelfsh.h"
 #include "machine/msm6242.h"
 #include "sound/ay8910.h"
@@ -552,7 +554,7 @@ private:
 	void bingor2_map(address_map &map) ATTR_COLD;
 	void bingor_io(address_map &map) ATTR_COLD;
 	void bingor_map(address_map &map) ATTR_COLD;
-	void slave_io(address_map &map) ATTR_COLD;
+	void slave_data(address_map &map) ATTR_COLD;
 	void slave_map(address_map &map) ATTR_COLD;
 	void vip2000_io(address_map &map) ATTR_COLD;
 	void vip2000_map(address_map &map) ATTR_COLD;
@@ -653,7 +655,7 @@ void bingor_state::slave_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-void bingor_state::slave_io(address_map &map)
+void bingor_state::slave_data(address_map &map)
 {
 	map(0x0000, 0x0000).r("toslave", FUNC(generic_latch_8_device::read)).w("fromslave", FUNC(generic_latch_8_device::write));
 	map(0xc000, 0xcfff).ram();
@@ -797,7 +799,7 @@ void bingor_state::vip2000(machine_config &config)
 
 	I80C31(config, m_slavecpu, XTAL(11'059'200));
 	m_slavecpu->set_addrmap(AS_PROGRAM, &bingor_state::slave_map);
-	m_slavecpu->set_addrmap(AS_IO, &bingor_state::slave_io);
+	m_slavecpu->set_addrmap(AS_DATA, &bingor_state::slave_data);
 
 	MSM6242(config, "rtc", XTAL(32'768));
 

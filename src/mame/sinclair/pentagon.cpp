@@ -167,7 +167,6 @@ void pentagon_state::machine_reset()
 void pentagon_state::video_start()
 {
 	spectrum_128_state::video_start();
-	m_contention_pattern = {};
 }
 
 static const gfx_layout spectrum_charlayout =
@@ -195,14 +194,16 @@ void pentagon_state::pentagon(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pentagon_state::pentagon_io);
 	m_maincpu->set_addrmap(AS_OPCODES, &pentagon_state::pentagon_switch);
 	m_maincpu->set_vblank_int("screen", FUNC(pentagon_state::pentagon_interrupt));
+	m_maincpu->refresh_cb().remove();
 	m_maincpu->nomreq_cb().remove();
 
 	m_screen->set_raw(14_MHz_XTAL / 2, 448, 320, {get_screen_area().left() - 48, get_screen_area().right() + 48, get_screen_area().top() - 48, get_screen_area().bottom() + 48});
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_pentagon);
+	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
 	BETA_DISK(config, m_beta, 0);
 
-	SPEAKER(config, "speakers", 2).front();
+	SPEAKER(config.replace(), "speakers", 2).front();
 
 	AY_SLOT(config.replace(), "ay_slot", 14_MHz_XTAL / 8, default_ay_slot_devices, "ay_ay8912")
 		.add_route(0, "speakers", 0.50, 0)
@@ -328,6 +329,6 @@ ROM_END
 } // Anonymous namespace
 
 
-//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT      CLASS           INIT        COMPANY             FULLNAME           FLAGS
-COMP( 1991, pentagon, spec128, 0,      pentagon, spec_plus, pentagon_state, empty_init, "Vladimir Drozdov", "Pentagon 128K",   0 )
-COMP( 2005, pent1024, spec128, 0,      pent1024, spec_plus, pent1024_state, empty_init, "Alex Zhabin",      "Pentagon 1024SL", 0 )
+//    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT        CLASS           INIT        COMPANY             FULLNAME           FLAGS
+COMP( 1991, pentagon, spec128, 0,      pentagon, spec_plus2a, pentagon_state, empty_init, "Vladimir Drozdov", "Pentagon 128K",   0 )
+COMP( 2005, pent1024, spec128, 0,      pent1024, spec_plus2a, pent1024_state, empty_init, "Alex Zhabin",      "Pentagon 1024SL", 0 )

@@ -56,6 +56,10 @@
 #include "emu.h"
 #include "nes_vt_soc.h"
 
+#include "m6502_swap_op_d5_d6.h"
+
+#include "speaker.h"
+
 
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC,              nes_vt02_vt03_soc_device,              "nes_vt02_vt03_soc",             "VT02/03 series System on a Chip (NTSC)")
 DEFINE_DEVICE_TYPE(NES_VT02_VT03_SOC_PAL,          nes_vt02_vt03_soc_pal_device,          "nes_vt02_vt03_soc_pal",         "VT02/03 series System on a Chip (PAL)")
@@ -247,7 +251,7 @@ void nes_vt02_vt03_soc_device::device_reset()
 
 }
 
-u32 nes_vt02_vt03_soc_device::get_banks(u8 bnk)
+u32 nes_vt02_vt03_soc_device::get_banks(u8 bnk) const
 {
 	switch (m_410x[0xb] & 0x07)
 	{

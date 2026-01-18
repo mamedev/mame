@@ -474,11 +474,6 @@ ROM_START( cybar120 )
 	ROM_LOAD( "m2500p-vt09-epson,20091222ver05,_30r-sx1067-01_pcb,_12r0cob128m_12001-3d05_fw.bin", 0x00000, 0x1000000, CRC(f7138980) SHA1(de31264ee3a5a5c77a86733b2e2d6845fee91ea5) )
 ROM_END
 
-ROM_START( jl2050 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "jl2050.u5", 0x00000, 0x1000000, CRC(f96c5c02) SHA1(c7d0b57c2622b5213d3c7e6532495d9da74d4b01) )
-ROM_END
-
 ROM_START( vsmaxtx2 )
 	ROM_REGION( 0x400000, "mainrom", 0 )
 	ROM_LOAD( "tx2.bin", 0x00000, 0x400000, CRC(eddf0ca8) SHA1(b87c5c3e945d1efdcb953325425d4ddb0fded00a) )
@@ -537,6 +532,31 @@ ROM_START( wfmotor )
 	ROM_LOAD( "motorcycle.bin", 0x00000, 0x400000, CRC(978f12f0) SHA1(a0230cfe4398d3971d487ff5d4b7107341799424) )
 ROM_END
 
+ROM_START( gujtv108 )
+	ROM_REGION( 0x400000, "mainrom", 0 )
+	ROM_LOAD( "29lv320.u1", 0x00000, 0x400000, CRC(56df0a09) SHA1(03aa6ad71ab283c99608a6dfa55c96148841bd10) )
+ROM_END
+
+ROM_START( mc_dcat8 )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "100-in-1, d-cat8 8bit console, v5.01.11-frd, bl 20041217.prg", 0x00000, 0x800000, CRC(97d20611) SHA1(d49796e66d7b1dff0ee2781cb0e48b777969d83f) )
+ROM_END
+
+ROM_START( mc_dcat8a )
+	ROM_REGION( 0x800000, "mainrom", 0 )
+	ROM_LOAD( "s29gl064.u6", 0x00000, 0x800000, CRC(e28b1ef8) SHA1(4a6f107d2189cbe1bb0b86b3738d0af58e24e0f7) )
+ROM_END
+
+ROM_START( pumpactv )
+	ROM_REGION( 0x100000, "mainrom", 0 )
+	ROM_LOAD( "pumpactive.bin", 0x00000, 0x100000, CRC(e3c07561) SHA1(2bfff426d72d481ba0647e9110f942d142a4625f) )
+ROM_END
+
+ROM_START( techni4 )
+	ROM_REGION( 0x200000, "mainrom", 0 )
+	ROM_LOAD( "technigame.bin", 0x00000, 0x200000, CRC(3c96b1b1) SHA1(1acc81b26e740327bd6d9faa5a96ab027a48dd77) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -580,6 +600,15 @@ CONS( 200?, vgpmini,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_ini
 CONS( 2006, vgtablet,  0, 0,  nes_vt09_4mb_rasterhack,  nes_vt09, nes_vt09_state, empty_init, "Performance Designed Products (licensed by Konami) / JungleTac", "VG Pocket Tablet (VG-4000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // raster timing for Frogger needs a hack
 // VG Pocket Caplet is SunPlus hardware instead, see spg2xx_lexibook.cpp
 
-CONS( 200?, jl2050,  0,  0,  nes_vt09_16mb,nes_vt09, nes_vt09_state, empty_init, "LexiBook / JungleTac / NiceCode",  "Cyber Console Center 200-in-1 (JL2050)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-
 CONS( 200?, timetp25,   0,  0,  nes_vt09_cart, nes_vt09, nes_vt09_cart_state, empty_init, "Timetop", "Super Game 25-in-1 (GM-228)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 200?, gujtv108,   0,  0,  nes_vt09_4mb, nes_vt09, nes_vt09_state, empty_init, "YSN", "GameU Joint TV Bank 108-in-1 (model AH9069)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+CONS( 2004, mc_dcat8,   0,        0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 1) (v5.01.11-frd, BL 20041217)", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2004, mc_dcat8a,  mc_dcat8, 0,  nes_vt09_8mb, nes_vt09, nes_vt09_state, empty_init, "<unknown>", "100 in 1 (D-CAT8 8bit Console, set 2)", MACHINE_IMPERFECT_GRAPHICS )
+
+// probably VT09 or similar, 'pump' control is mapped on extra IO address that I don't think is present on 02/03
+CONS( 200?, pumpactv,  0,  0,  nes_vt09_1mb, nes_vt09, nes_vt09_state, empty_init, "Giggle", "TV Pump Active", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+
+// die is marked as VH2009, like various sets in nes_vt02_vt03.cpp, but no scrambled opcodes here and also some VT09 register usage
+CONS( 201?, techni4,   0,  0,  nes_vt09_2mb, nes_vt09, nes_vt09_state, empty_init, "Technigame", "Technigame Super 4-in-1 Sports (PAL)", MACHINE_IMPERFECT_GRAPHICS )

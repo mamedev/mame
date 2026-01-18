@@ -45,12 +45,6 @@ Known Non-Issues (confirmed on Real Genesis)
 
 void md_base_state::megadriv_z80_bank_w(uint16_t data)
 {
-	// TODO: menghu crashes here
-	// Tries to setup a bank of 0xff0000 from z80 side (PC=1131) after you talk with the cashier twice.
-	// Without a guard over it game will trash 68k memory causing a crash, works on real HW with everdrive
-	// so not coming from a cart copy protection.
-	// Update: it breaks cfodder BGM on character select at least, therefore we current don't guard against it
-	// Apparently reading 68k RAM from z80 is not recommended by Sega, so *writing* isn't possible lacking bus grant?
 	m_genz80.z80_bank_addr = ((m_genz80.z80_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
@@ -245,9 +239,8 @@ uint16_t md_base_state::m68k_version_read()
 	  D0 : Bit 0 of version number
 	*/
 	LOG("%s: read version register\n", machine().describe_context());
-	// Version number contained in bits 3-0
-	// TODO: non-TMSS BIOSes must return 0 here
-	uint16_t const retdata = m_version_hi_nibble | 0x01;
+	// Version number contained in bits 3-0 (TMSS)
+	uint16_t const retdata = m_version_hi_nibble | m_version_lo_nibble;
 
 	return retdata | (retdata << 8);
 }
@@ -311,11 +304,13 @@ void md_base_state::m68k_ioport_s_ctrl_write(uint16_t data)
 
 void md_base_state::megadriv_68k_base_map(address_map &map)
 {
-	map(0xa00000, 0xa01fff).rw(FUNC(md_base_state::megadriv_68k_read_z80_ram), FUNC(md_base_state::megadriv_68k_write_z80_ram));
-	map(0xa02000, 0xa03fff).w(FUNC(md_base_state::megadriv_68k_write_z80_ram));
-	map(0xa04000, 0xa04003).rw(FUNC(md_base_state::megadriv_68k_YM2612_read), FUNC(md_base_state::megadriv_68k_YM2612_write));
+	// before_delay required by pacman2 intro
+	// TODO: unverified if 68k doesn't have bus grant
+	map(0xa00000, 0xa01fff).before_delay(NAME([](offs_t) { return 1; })).rw(FUNC(md_base_state::megadriv_68k_read_z80_ram), FUNC(md_base_state::megadriv_68k_write_z80_ram));
+	map(0xa02000, 0xa03fff).before_delay(NAME([](offs_t) { return 1; })).w(FUNC(md_base_state::megadriv_68k_write_z80_ram));
+	map(0xa04000, 0xa04003).before_delay(NAME([](offs_t) { return 1; })).rw(FUNC(md_base_state::megadriv_68k_YM2612_read), FUNC(md_base_state::megadriv_68k_YM2612_write));
 
-	map(0xa06000, 0xa06001).w(FUNC(md_base_state::megadriv_68k_z80_bank_write));
+	map(0xa06000, 0xa06001).before_delay(NAME([](offs_t) { return 1; })).w(FUNC(md_base_state::megadriv_68k_z80_bank_write));
 
 	map(0xa10000, 0xa10001).r(FUNC(md_base_state::m68k_version_read));
 	map(0xa10002, 0xa10007).rw(FUNC(md_base_state::m68k_ioport_data_read), FUNC(md_base_state::m68k_ioport_data_write));
@@ -616,10 +611,13 @@ uint8_t md_base_state::megadriv_z80_unmapped_read()
 void md_base_state::megadriv_z80_map(address_map &map)
 {
 	map(0x0000, 0x1fff).bankrw("bank1").mirror(0x2000); // RAM can be accessed by the 68k
-	map(0x4000, 0x4003).rw(m_ymsnd, FUNC(ym_generic_device::read), FUNC(ym_generic_device::write));
+	// mirror required by d_titov2
+	map(0x4000, 0x4003).mirror(0x1ffc).rw(m_ymsnd, FUNC(ym_generic_device::read), FUNC(ym_generic_device::write));
 
-	map(0x6000, 0x6000).w(FUNC(md_base_state::megadriv_z80_z80_bank_w));
-	map(0x6001, 0x6001).w(FUNC(md_base_state::megadriv_z80_z80_bank_w)); // wacky races uses this address
+	// wackyrac uses $6001
+	// d_titov2 uses the full range
+	// TODO: are reads just open bus or ...?
+	map(0x6000, 0x60ff).w(FUNC(md_base_state::megadriv_z80_z80_bank_w));
 
 	map(0x6100, 0x7eff).r(FUNC(md_base_state::megadriv_z80_unmapped_read));
 
@@ -719,55 +717,35 @@ void md_base_state::megadriv_stop_scanline_timer()
 }
 
 
-
-// this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
-void md_base_state::vdp_sndirqline_callback_genesis_z80(int state)
+// this comes from the vdp, and is connected to 68k irq level 6 (IPL2, main vbl interrupt)
+void md_core_state::vdp_vint_cb(int state)
 {
-	if (state == ASSERT_LINE)
-	{
-		if ((m_genz80.z80_has_bus == 1) && (m_genz80.z80_is_reset == 0))
-			m_z80snd->set_input_line(0, HOLD_LINE);
-	}
-	else if (state == CLEAR_LINE)
-	{
-		m_z80snd->set_input_line(0, CLEAR_LINE);
-	}
+	m_maincpu->set_input_line(6, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-// this comes from the vdp, and is connected to 68k irq level 6 (main vbl interrupt)
-void md_core_state::vdp_lv6irqline_callback_genesis_68k(int state)
+// this comes from the vdp, and is connected to 68k irq level 4 (IPL1, raster interrupt)
+void md_core_state::vdp_hint_cb(int state)
 {
-	if (state == ASSERT_LINE)
-		m_maincpu->set_input_line(6, HOLD_LINE);
-	else
-		m_maincpu->set_input_line(6, CLEAR_LINE);
+	m_maincpu->set_input_line(4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-// this comes from the vdp, and is connected to 68k irq level 4 (raster interrupt)
-void md_core_state::vdp_lv4irqline_callback_genesis_68k(int state)
+void md_core_state::cpu_space_map(address_map &map)
 {
-	if (state == ASSERT_LINE)
-		m_maincpu->set_input_line(4, HOLD_LINE);
-	else
-		m_maincpu->set_input_line(4, CLEAR_LINE);
+	map(0xfffff3, 0xfffff3).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 25; }));
+	// TODO: IPL0 (external irq tied to VDP IE2)
+	map(0xfffff5, 0xfffff5).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 26; }));
+	map(0xfffff7, 0xfffff7).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 27; }));
+	map(0xfffff9, 0xfffff9).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 {
+		m_vdp->irq_ack();
+		return 28;
+	}));
+	map(0xfffffb, 0xfffffb).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 29; }));
+	map(0xfffffd, 0xfffffd).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([this] () -> u8 {
+		m_vdp->irq_ack();
+		return 30;
+	}));
+	map(0xffffff, 0xffffff).before_time(m_maincpu, FUNC(m68000_device::vpa_sync)).after_delay(m_maincpu, FUNC(m68000_device::vpa_after)).lr8(NAME([] () -> u8 { return 31; }));
 }
-
-/* Callback when the 68k takes an IRQ */
-IRQ_CALLBACK_MEMBER(md_core_state::genesis_int_callback)
-{
-	if (irqline==4)
-	{
-		m_vdp->vdp_clear_irq4_pending();
-	}
-
-	if (irqline==6)
-	{
-		m_vdp->vdp_clear_irq6_pending();
-	}
-
-	return (0x60+irqline*4)/4; // vector address
-}
-
 
 void md_core_state::megadriv_timers(machine_config &config)
 {
@@ -777,15 +755,15 @@ void md_core_state::megadriv_timers(machine_config &config)
 void md_core_state::md_core_ntsc(machine_config &config)
 {
 	M68000(config, m_maincpu, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
-	m_maincpu->set_irq_acknowledge_callback(FUNC(md_core_state::genesis_int_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &md_core_state::cpu_space_map);
 	// IRQs are handled via the timers
 
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
 	m_vdp->set_is_pal(false);
-	m_vdp->lv6_irq().set(FUNC(md_core_state::vdp_lv6irqline_callback_genesis_68k));
-	m_vdp->lv4_irq().set(FUNC(md_core_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp->vint_cb().set(FUNC(md_core_state::vdp_vint_cb));
+	m_vdp->hint_cb().set(FUNC(md_core_state::vdp_hint_cb));
 	m_vdp->set_screen("megadriv");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -801,15 +779,15 @@ void md_core_state::md_core_ntsc(machine_config &config)
 void md_core_state::md_core_pal(machine_config &config)
 {
 	M68000(config, m_maincpu, MASTER_CLOCK_PAL / 7); // 7.67 MHz
-	m_maincpu->set_irq_acknowledge_callback(FUNC(md_core_state::genesis_int_callback));
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &md_core_state::cpu_space_map);
 	// IRQs are handled via the timers
 
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_PAL, m_maincpu);
 	m_vdp->set_is_pal(true);
-	m_vdp->lv6_irq().set(FUNC(md_core_state::vdp_lv6irqline_callback_genesis_68k));
-	m_vdp->lv4_irq().set(FUNC(md_core_state::vdp_lv4irqline_callback_genesis_68k));
+	m_vdp->vint_cb().set(FUNC(md_core_state::vdp_vint_cb));
+	m_vdp->hint_cb().set(FUNC(md_core_state::vdp_hint_cb));
 	m_vdp->set_screen("megadriv");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -825,7 +803,7 @@ void md_core_state::md_core_pal(machine_config &config)
 
 void md_base_state::megadriv_ioports(machine_config &config)
 {
-	// TODO: this latches video counters as well as setting interrupt level 2
+	// TODO: this latches video counters as well as setting interrupt level 2 (thru VDP)
 	auto &hl(INPUT_MERGER_ANY_HIGH(config, "hl"));
 	hl.output_handler().set_inputline(m_maincpu, 2);
 
@@ -879,7 +857,8 @@ void md_base_state::md_ntsc(machine_config &config)
 	// I/O port controllers
 	megadriv_ioports(config);
 
-	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
+	// this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
+	m_vdp->snd_irq().set_inputline(m_z80snd, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
@@ -917,7 +896,7 @@ void md_base_state::md_pal(machine_config &config)
 	// I/O port controllers
 	megadriv_ioports(config);
 
-	m_vdp->snd_irq().set(FUNC(md_base_state::vdp_sndirqline_callback_genesis_z80));
+	m_vdp->snd_irq().set_inputline(m_z80snd, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
@@ -956,6 +935,8 @@ void md_base_state::megadriv_init_common()
 	save_pointer(NAME(m_genz80.z80_prgram), 0x2000);
 
 	m_maincpu->set_tas_write_callback(*this, FUNC(md_base_state::megadriv_tas_callback));
+
+	m_version_lo_nibble = 0;
 }
 
 void md_base_state::init_megadriv()

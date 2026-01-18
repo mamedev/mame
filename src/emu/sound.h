@@ -206,26 +206,26 @@ public:
 	attotime sample_period() const { return attotime::from_hz(m_sample_rate); }
 
 	// sample id and timing of the first and last sample of the current update block, and first of the next sample block
-	u64 start_index() const      { return m_output_buffer.write_sample(); }
-	u64 end_index() const        { return m_output_buffer.write_sample() + samples(); }
-	attotime start_time() const  { return sample_to_time(start_index()); }
-	attotime end_time() const    { return sample_to_time(end_index()); }
+	u64 start_index() const     { return m_output_buffer.write_sample(); }
+	u64 end_index() const       { return m_output_buffer.write_sample() + samples(); }
+	attotime start_time() const { return sample_to_time(start_index()); }
+	attotime end_time() const   { return sample_to_time(end_index()); }
 
 	// convert from absolute sample index to time
 	attotime sample_to_time(u64 index) const;
 
 	// gain management
-	float user_output_gain() const                    { return m_user_output_gain; }
-	void set_user_output_gain(float gain)             { update(); m_user_output_gain = gain; }
-	float user_output_gain(s32 output) const          { return m_user_output_channel_gain[output]; }
-	void set_user_output_gain(s32 output, float gain) { update(); m_user_output_channel_gain[output] = gain; }
+	float user_output_gain() const           { return m_user_output_gain; }
+	float user_output_gain(s32 output) const { return m_user_output_channel_gain[output]; }
+	float input_gain(s32 input) const        { return m_input_channel_gain[input]; }
+	float output_gain(s32 output) const      { return m_output_channel_gain[output]; }
 
-	float input_gain(s32 input) const                 { return m_input_channel_gain[input]; }
-	void set_input_gain(s32 input, float gain)        { update(); m_input_channel_gain[input] = gain; }
-	void apply_input_gain(s32 input, float gain)      { update(); m_input_channel_gain[input] *= gain; }
-	float output_gain(s32 output) const               { return m_output_channel_gain[output]; }
-	void set_output_gain(s32 output, float gain)      { update(); m_output_channel_gain[output] = gain; }
-	void apply_output_gain(s32 output, float gain)    { update(); m_output_channel_gain[output] *= gain; }
+	void set_user_output_gain(float gain);
+	void set_user_output_gain(s32 output, float gain);
+	void set_input_gain(s32 input, float gain);
+	void apply_input_gain(s32 input, float gain);
+	void set_output_gain(s32 output, float gain);
+	void apply_output_gain(s32 output, float gain);
 
 	// set the sample rate of the stream
 	void set_sample_rate(u32 sample_rate);
@@ -423,14 +423,14 @@ public:
 	u32 outputs_count() const { return m_outputs_count; }
 
 	// manage the sound_io mapping and volume configuration
-	void config_add_sound_io_connection_node(sound_io_device *dev, std::string_view name, float db);
-	void config_add_sound_io_connection_default(sound_io_device *dev, float db);
+	void config_add_sound_io_connection_node(sound_io_device *dev, std::string_view name, float db, u32 index = ~0);
+	void config_add_sound_io_connection_default(sound_io_device *dev, float db, u32 index = ~0);
 	void config_remove_sound_io_connection_node(sound_io_device *dev, std::string_view name);
 	void config_remove_sound_io_connection_default(sound_io_device *dev);
 	void config_set_volume_sound_io_connection_node(sound_io_device *dev, std::string_view name, float db);
 	void config_set_volume_sound_io_connection_default(sound_io_device *dev, float db);
-	void config_add_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel, float db);
-	void config_add_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel, float db);
+	void config_add_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel, float db, u32 index = ~0);
+	void config_add_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel, float db, u32 index = ~0);
 	void config_remove_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel);
 	void config_remove_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel);
 	void config_set_volume_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel, float db);
@@ -468,12 +468,17 @@ public:
 	const char *resampler_type_names(u32 type) const;
 
 	u32 resampler_type() const { return m_resampler_type; }
-	double resampler_hq_latency() const { return m_resampler_hq_latency; }
+	float resampler_hq_latency() const { return m_resampler_hq_latency; }
 	u32 resampler_hq_length() const { return m_resampler_hq_length; }
 	u32 resampler_hq_phases() const { return m_resampler_hq_phases; }
 
+	u32 default_resampler_type() const;
+	float default_resampler_hq_latency() const;
+	u32 default_resampler_hq_length() const;
+	u32 default_resampler_hq_phases() const;
+
 	void set_resampler_type(u32 type);
-	void set_resampler_hq_latency(double latency);
+	void set_resampler_hq_latency(float latency);
 	void set_resampler_hq_length(u32 length);
 	void set_resampler_hq_phases(u32 phases);
 
@@ -606,16 +611,15 @@ private:
 
 	// manage the sound_io mapping and volume configuration,
 	// but don't change generation because we're in the update process
-
 	config_mapping &config_get_sound_io(sound_io_device *dev);
-	void internal_config_add_sound_io_connection_node(sound_io_device *dev, std::string_view name, float db);
-	void internal_config_add_sound_io_connection_default(sound_io_device *dev, float db);
+	void internal_config_add_sound_io_connection_node(sound_io_device *dev, std::string_view name, float db, u32 index = ~0);
+	void internal_config_add_sound_io_connection_default(sound_io_device *dev, float db, u32 index = ~0);
 	void internal_config_remove_sound_io_connection_node(sound_io_device *dev, std::string_view name);
 	void internal_config_remove_sound_io_connection_default(sound_io_device *dev);
 	void internal_config_set_volume_sound_io_connection_node(sound_io_device *dev, std::string_view name, float db);
 	void internal_config_set_volume_sound_io_connection_default(sound_io_device *dev, float db);
-	void internal_config_add_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel, float db);
-	void internal_config_add_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel, float db);
+	void internal_config_add_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel, float db, u32 index = ~0);
+	void internal_config_add_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel, float db, u32 index = ~0);
 	void internal_config_remove_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel);
 	void internal_config_remove_sound_io_channel_connection_default(sound_io_device *dev, u32 guest_channel, u32 node_channel);
 	void internal_config_set_volume_sound_io_channel_connection_node(sound_io_device *dev, u32 guest_channel, std::string_view name, u32 node_channel, float db);
@@ -664,7 +668,7 @@ private:
 
 	// resampler data
 	u32 m_resampler_type;
-	double m_resampler_hq_latency;
+	float m_resampler_hq_latency;
 	u32 m_resampler_hq_length, m_resampler_hq_phases;
 };
 

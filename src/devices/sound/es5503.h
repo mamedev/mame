@@ -18,7 +18,7 @@ public:
 	es5503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// channels must be a power of two
-	void set_channels(int channels) { output_channels = channels; }
+	void set_channels(int channels) { m_output_channels = channels; }
 
 	auto irq_func() { return m_irq_func.bind(); }
 	auto adc_func() { return m_adc_func.bind(); }
@@ -73,15 +73,15 @@ private:
 		uint8_t  irqpend;
 	};
 
-	ES5503Osc oscillators[32];
+	ES5503Osc m_oscillators[32];
 
-	int8_t  oscsenabled;      // # of oscillators enabled
-	int   rege0;            // contents of register 0xe0
+	int8_t  m_oscsenabled;      // # of oscillators enabled
+	int m_rege0;            // contents of register 0xe0
 
 	uint8_t m_channel_strobe;
 
-	int output_channels;
-	uint32_t output_rate;
+	int m_output_channels;
+	uint32_t m_output_rate;
 
 	emu_timer *m_timer;
 

@@ -3,8 +3,7 @@
 /* Raiden 2 Sprite Decryption */
 
 #include "emu.h"
-#include "raiden2.h"
-#include "seibuspi_m.h"
+#include "seibu_helper.h"
 
 
 /*
@@ -193,12 +192,12 @@ static const uint16_t x11_zt[512] = {
 
 static uint16_t gm(int i4)
 {
-	uint16_t x=0;
+	uint16_t x = 0;
 
-	for (int i=0; i<4; ++i)
+	for (int i = 0; i < 4; ++i)
 	{
-		if (BIT(i4,i))
-			x ^= 0xf << (i<<2);
+		if (BIT(i4, i))
+			x ^= 0xf << (i << 2);
 	}
 
 	return x;
@@ -207,24 +206,23 @@ static uint16_t gm(int i4)
 static uint32_t core_decrypt(uint32_t ciphertext, int i1, int i2, int i3, int i4,
 							const uint8_t *rotate, const uint8_t *x5, const uint16_t *x11, uint32_t preXor, uint32_t carryMask, uint32_t postXor)
 {
-	uint32_t v1 = bitswap<32>(rotl_32(ciphertext, rotate[i1]), 25,28,15,19, 6,0,3,24, 11,1,2,30, 16,7,22,17, 31,14,23,9, 27,18,4,10, 13,20,5,12, 8,29,26,21);
+	const uint32_t v1 = bitswap<32>(rotl_32(ciphertext, rotate[i1]), 25,28,15,19, 6,0,3,24, 11,1,2,30, 16,7,22,17, 31,14,23,9, 27,18,4,10, 13,20,5,12, 8,29,26,21);
 
-	uint16_t x1Low = (x5[i2]<<11) ^ x11[i3] ^ gm(i4);
-	uint32_t x1 = x1Low | (bitswap<16>(x1Low, 0,8,1,9, 2,10,3,11, 4,12,5,13, 6,14,7,15)<<16);
+	const uint16_t x1Low = (x5[i2]<<11) ^ x11[i3] ^ gm(i4);
+	const uint32_t x1 = x1Low | (bitswap<16>(x1Low, 0,8,1,9, 2,10,3,11, 4,12,5,13, 6,14,7,15)<<16);
 
-	return partial_carry_sum32(v1, x1^preXor, carryMask) ^ postXor;
+	return seibu_partial_carry_sum32(v1, x1 ^ preXor, carryMask) ^ postXor;
 }
 
-void raiden2_decrypt_sprites(running_machine &machine)
+void raiden2_decrypt_sprites(uint32_t *data, uint32_t size)
 {
-	uint32_t *data = (uint32_t *)machine.root_device().memregion("gfx3")->base();
-	for(int i=0; i<0x800000/4; i++)
+	for (uint32_t i = 0; i < size; i++)
 	{
 		data[i] = core_decrypt(data[i],
-			(i&0xff) ^ BIT(i,15) ^ (BIT(i,20)<<8),
-			(i&0xff) ^ BIT(i,15),
-			(i>>8) & 0xff,
-			(i>>16) & 0xf,
+			(i & 0xff) ^ BIT(i, 15) ^ (BIT(i, 20) << 8),
+			(i & 0xff) ^ BIT(i, 15),
+			(i >> 8) & 0xff,
+			(i >> 16) & 0xf,
 			rotate_r2,
 			x5_r2,
 			x11_r2,
@@ -235,16 +233,15 @@ void raiden2_decrypt_sprites(running_machine &machine)
 	}
 }
 
-void zeroteam_decrypt_sprites(running_machine &machine)
+void zeroteam_decrypt_sprites(uint32_t *data, uint32_t size)
 {
-	uint32_t *data = (uint32_t *)machine.root_device().memregion("gfx3")->base();
-	for(int i=0; i<0x400000/4; i++)
+	for (uint32_t i = 0; i < size; i++)
 	{
 		data[i] = core_decrypt(data[i],
 			i & 0xff,
 			i & 0xff,
-			(i>>7) & 0x1ff,
-			(i>>16) & 0xf,
+			(i >> 7) & 0x1ff,
+			(i >> 16) & 0xf,
 			rotate_zt,
 			x5_zt,
 			x11_zt,

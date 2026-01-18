@@ -19,6 +19,8 @@
 #define LOG_LINES (1U << 2)  // Show control lines
 #define LOG_DRIVE (1U << 3)  // Show drive select
 #define LOG_FUNC (1U << 4)   // Function calls
+#define LOG_ERR (1U << 5)    // log errors
+#define LOG_SETUP (1U << 6)  // setup
 
 #define VERBOSE (0)
 
@@ -28,6 +30,8 @@
 #define LOGLINES(...)      LOGMASKED(LOG_LINES, __VA_ARGS__)
 #define LOGDRIVE(...)      LOGMASKED(LOG_DRIVE, __VA_ARGS__)
 #define LOGFUNC(...)       LOGMASKED(LOG_FUNC, __VA_ARGS__)
+#define LOGERR(...)        LOGMASKED(LOG_ERR, __VA_ARGS__)
+#define LOGSETUP(...)      LOGMASKED(LOG_SETUP, __VA_ARGS__)
 
 #ifdef _MSC_VER
 #define FUNCNAME __func__
@@ -36,12 +40,12 @@
 #endif
 
 
-h89bus_z37_device::h89bus_z37_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock):
-	device_t(mconfig, H89BUS_Z37, tag, owner, 0),
-	device_h89bus_right_card_interface(mconfig, *this),
-	m_fdc(*this, "z37_fdc"),
-	m_floppies(*this, "z37_fdc:%u", 0U),
-	m_intr_cntrl(*this, finder_base::DUMMY_TAG)
+h89bus_z37_device::h89bus_z37_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, H89BUS_Z37, tag, owner, 0)
+	, device_h89bus_right_card_interface(mconfig, *this)
+	, m_fdc(*this, "z37_fdc")
+	, m_floppies(*this, "z37_fdc:%u", 0U)
+	, m_intr_cntrl(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -129,54 +133,44 @@ u8 h89bus_z37_device::data_r()
 	return m_access_track_sector ? m_fdc->track_r() : m_fdc->data_r();
 }
 
-void h89bus_z37_device::write(u8 select_lines, u8 offset, u8 data)
+void h89bus_z37_device::write(offs_t offset, u8 data)
 {
-	if (!(select_lines & h89bus_device::H89_CASS))
-	{
-		return;
-	}
-
 	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, offset, data);
 
 	switch (offset)
 	{
-	case 0:
-		ctrl_w(data);
-		break;
-	case 1:
-		intf_w(data);
-		break;
-	case 2:
-		cmd_w(data);
-		break;
-	case 3:
-		data_w(data);
-		break;
+		case 0:
+			ctrl_w(data);
+			break;
+		case 1:
+			intf_w(data);
+			break;
+		case 2:
+			cmd_w(data);
+			break;
+		case 3:
+			data_w(data);
+			break;
 	}
 }
 
-u8 h89bus_z37_device::read(u8 select_lines, u8 offset)
+u8 h89bus_z37_device::read(offs_t offset)
 {
-	if (!(select_lines & h89bus_device::H89_CASS))
-	{
-		return 0;
-	}
-
 	// default return for the h89
 	u8 value = 0xff;
 
 	switch (offset)
 	{
-	case 0:
-	case 1:
-		// read not supported on these addresses
-		break;
-	case 2:
-		value = stat_r();
-		break;
-	case 3:
-		value = data_r();
-		break;
+		case 0:
+		case 1:
+			// read not supported on these addresses
+			break;
+		case 2:
+			value = stat_r();
+			break;
+		case 3:
+			value = data_r();
+			break;
 	}
 
 	LOGFUNC("%s: reg: %d val: 0x%02x\n", FUNCNAME, offset, value);
@@ -186,6 +180,9 @@ u8 h89bus_z37_device::read(u8 select_lines, u8 offset)
 
 void h89bus_z37_device::device_start()
 {
+	m_installed = false;
+
+	save_item(NAME(m_installed));
 	save_item(NAME(m_irq_allowed));
 	save_item(NAME(m_drq_allowed));
 	save_item(NAME(m_access_track_sector));
@@ -193,6 +190,28 @@ void h89bus_z37_device::device_start()
 
 void h89bus_z37_device::device_reset()
 {
+	if (!m_installed)
+	{
+		h89bus::addr_ranges  addr_ranges = h89bus().get_address_ranges(h89bus::IO_CASS);
+
+		if (addr_ranges.size() == 1)
+		{
+			h89bus::addr_range range = addr_ranges.front();
+
+			LOGSETUP("%s: addr: 0x%04x-0x%04x\n", FUNCNAME, range.first, range.second);
+
+			h89bus().install_io_device(range.first, range.second,
+				read8sm_delegate(*this, FUNC(h89bus_z37_device::read)),
+				write8sm_delegate(*this, FUNC(h89bus_z37_device::write)));
+		}
+		else
+		{
+			LOGERR("%s: no address provided for device\n", FUNCNAME);
+		}
+
+		m_installed = true;
+	}
+
 	m_irq_allowed         = false;
 	m_drq_allowed         = false;
 	m_access_track_sector = false;

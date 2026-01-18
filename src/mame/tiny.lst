@@ -53,12 +53,6 @@ gridlee
 @source:midway/williams.cpp
 alienar
 
-@source:venture/looping.cpp
-looping
-
-@source:misc/supertnk.cpp
-supertnk
-
 @source:misc/goldnpkr.cpp
 witchgme
 witchjol
@@ -93,3 +87,9 @@ wstrikea
 wtchjack
 wtchjacka
 wtchjackb
+
+@source:videogames/looping.cpp
+looping
+
+@source:videogames/supertnk.cpp
+supertnk

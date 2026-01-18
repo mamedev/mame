@@ -70,6 +70,7 @@
 #include "cpu/i86/i86.h"
 #include "gridkeyb.h"
 #include "machine/i7220.h"
+#include "machine/i8087.h"
 #include "machine/i80130.h"
 #include "machine/i8255.h"
 #include "machine/mm58174.h"
@@ -127,7 +128,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i80130_device> m_osp;
 	required_device<mm58174_device> m_rtc;
 	required_device<i8255_device> m_modem;
@@ -351,6 +352,12 @@ void gridcomp_state::grid1101(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gridcomp_state::grid1101_map);
 	m_maincpu->set_addrmap(AS_IO, &gridcomp_state::grid1101_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(gridcomp_state::irq_callback));
+	m_maincpu->esc_opcode_handler().set("i8087", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
+
+	i8087_device &i8087(I8087(config, "i8087", XTAL(15'000'000) / 3));
+	i8087.set_space_86(m_maincpu, AS_PROGRAM);
+	i8087.busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
 	I80130(config, m_osp, XTAL(15'000'000)/3);
 	m_osp->irq().set_inputline("maincpu", 0);
@@ -444,7 +451,7 @@ void gridcomp_state::grid1131(machine_config &config)
 {
 	grid1121(config);
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update_113x));
-	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 240); // XXX
+	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 256);
 }
 
 void gridcomp_state::grid1139(machine_config &config)

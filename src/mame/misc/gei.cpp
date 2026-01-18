@@ -1471,15 +1471,6 @@ ROM_START( gepoker1 ) // v50.02 with ROMs for ICB dated 9-30-86
 	ROM_LOAD( "instantbingo_t24_10-07-86", 0x18000, 0x2000, CRC(de87ed0a) SHA1(4a26d93368c1a39dd38aabe450c34203101f0ef7) ) // Found with this set, is it compatible or an operator swap?
 ROM_END
 
-ROM_START( gepoker2 ) // v50.02 with control dated 9-30-84
-	ROM_REGION( 0x1b000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "control_icb_9-30",  0x00000, 0x2000, CRC(08b996f2) SHA1(5f5efb5015ec9571cc94734c18debfadaa28f585) )
-	ROM_LOAD( "high_icb_6-25a",    0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
-	// Banked ROMs
-	ROM_LOAD( "jokerpoker_cb_10-19-88",    0x10000, 0x2000, CRC(a590af75) SHA1(63bc64fbc9ac0c489b1f4894d77a4be13d7251e7) )
-	ROM_LOAD( "horserace_icb_1-1-87",      0x12000, 0x2000, CRC(6d5092e3) SHA1(ef99d1b858aef3c438c61c2b17e371dc6aca6623) )
-ROM_END
-
 /*
   GREYHOUND ELECTRONICS INC.
   PCB: UV-1B
@@ -1517,17 +1508,19 @@ ROM_END
 
   PLD:  PAL10L8xx
 
+NOTE: All EPROMs are 2764 type
+
 */
-ROM_START( gepoker2a )  // v50.02 with control dated 9-30-84, 5 games.
+ROM_START( gepoker2 )  // v50.02 with control dated 9-30-84, 5 games.
 	ROM_REGION( 0x1b000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "control_cont_9-30_m105_pts_2764.bin",  0x00000, 0x2000, CRC(08b996f2) SHA1(5f5efb5015ec9571cc94734c18debfadaa28f585) )
-	ROM_LOAD( "high_hrom_6-25_m105_pts_2764.bin",     0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
+	ROM_LOAD( "control_cont_9-30_m105_pts",  0x00000, 0x2000, CRC(08b996f2) SHA1(5f5efb5015ec9571cc94734c18debfadaa28f585) )
+	ROM_LOAD( "high_hrom_6-25_m105_pts",     0x0e000, 0x2000, CRC(6ddc1750) SHA1(ee19206b7f4a98e3e7647414127f4e09b3e9134f) )
 	// Banked ROMs
-	ROM_LOAD( "rom1_pokr_w-r_1019_m105_pts_2764.bin", 0x10000, 0x2000, CRC(a590af75) SHA1(63bc64fbc9ac0c489b1f4894d77a4be13d7251e7) )
-	ROM_LOAD( "rom2_bljk_9-30_m105_pts_2764.bin",     0x12000, 0x2000, CRC(82804184) SHA1(2e2e6a80c99c8eb226dc54c1d32d0bf24de300a4) )
-	ROM_LOAD( "rom3_bone_8-16_m105_pts_2764.bin",     0x14000, 0x2000, CRC(52d66cb6) SHA1(57db34906fcafd37f3a361df209dafe080aeac16) )
-	ROM_LOAD( "rom4_slot_9-30_m105_pts_2764.bin",     0x16000, 0x2000, CRC(713c3963) SHA1(a9297c04fc44522ca6891516a2c744712132896a) )
-	ROM_LOAD( "rom5_hrse_1-1_87_m105_pts_2764.bin",   0x18000, 0x2000, CRC(6d5092e3) SHA1(ef99d1b858aef3c438c61c2b17e371dc6aca6623) )
+	ROM_LOAD( "rom1_pokr_w-r_1019_m105_pts", 0x10000, 0x2000, CRC(a590af75) SHA1(63bc64fbc9ac0c489b1f4894d77a4be13d7251e7) )
+	ROM_LOAD( "rom2_bljk_9-30_m105_pts",     0x12000, 0x2000, CRC(82804184) SHA1(2e2e6a80c99c8eb226dc54c1d32d0bf24de300a4) )
+	ROM_LOAD( "rom3_bone_8-16_m105_pts",     0x14000, 0x2000, CRC(52d66cb6) SHA1(57db34906fcafd37f3a361df209dafe080aeac16) )
+	ROM_LOAD( "rom4_slot_9-30_m105_pts",     0x16000, 0x2000, CRC(713c3963) SHA1(a9297c04fc44522ca6891516a2c744712132896a) )
+	ROM_LOAD( "rom5_hrse_1-1_87_m105_pts",   0x18000, 0x2000, CRC(6d5092e3) SHA1(ef99d1b858aef3c438c61c2b17e371dc6aca6623) )
 ROM_END
 
 
@@ -1991,7 +1984,7 @@ ROM_START( quizvid )
 	ROM_LOAD( "pal16l8cn.pal5", 0x0000, 0x0104, NO_DUMP )
 ROM_END
 
-ROM_START( quiz211 )
+ROM_START( quiz211 ) // code-wise, it's just a year hack of the set below. Different question ROMs, though.
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "1a.bin",         0x000000, 0x4000, CRC(116de0ea) SHA1(9af97b100aa2c79a58de055abe726d6e2e00aab4) )
 	ROM_CONTINUE(               0x000000, 0x4000 ) // halves identical
@@ -2012,6 +2005,16 @@ ROM_START( quiz211 )
 
 	ROM_REGION( 0x0100, "plds", 0 )
 	ROM_LOAD( "pal10l8cn.bin",   0x0000, 0x002c, CRC(86095226) SHA1(e7496efbd5ca240f0df2dfa5627402342c7f5384) )
+ROM_END
+
+ROM_START( quiz211a )
+	ROM_REGION( 0x38000, "maincpu", 0 )
+	ROM_LOAD( "k1.01", 0x00000, 0x4000, CRC(19a7b1d0) SHA1(6fe0e7094c660a91534e2bcaee5c26bb7f0e1d1a) )
+	ROM_LOAD( "k1.02", 0x10000, 0x8000, CRC(ad50a89c) SHA1(96fb52871bcc4379060fe174044b19a19ff82867) ) // 'VARIE', 1xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "k1.03", 0x18000, 0x8000, CRC(f8eafe92) SHA1(5a8da108720b8aaad68d294b4b5cc5d1073545e0) ) // 'GUINNESS', 1xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "k1.04", 0x20000, 0x8000, CRC(2b39801c) SHA1(4265d981458bfb10137848f7aac17c78e956bcb4) ) // 'MUSICA II', 1xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "k1.05", 0x28000, 0x8000, CRC(56d62074) SHA1(979205b4098eb8fd5c8488072a3ce4efabf8a6a4) ) // 'OLIMPIADI', 1xxxxxxxxxxxxxx = 0xFF
+	ROM_LOAD( "k1.06", 0x30000, 0x8000, CRC(796b9474) SHA1(fbebb79a4b0dd4e3a69c0426e976cc075cb777de) ) // 'MONDIALI 1', 1xxxxxxxxxxxxxx = 0xFF
 ROM_END
 
 ROM_START( bigjoke ) // TRIV3D PCB, stickered THE JOKE 11/87
@@ -2208,7 +2211,6 @@ GAME( 1983, amuse1a,   amuse,    amuse1,    gepoker,  gei_state, init_bank2k,   
 GAME( 1984, gepoker,   0,        gepoker,   gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 1)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gepoker1,  gepoker,  gepoker,   gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 2)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gepoker2,  gepoker,  gepoker,   gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 3)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, gepoker2a, gepoker,  gepoker,   gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 3 alt)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1984, gepoker3,  gepoker,  gepoker,   gepoker,  gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Poker (Version 50.02 ICB, set 4)",        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, gtsers1,   0,        getrivia,  getrivia, gei_state, init_bank2k,   ROT0, "Greyhound Electronics", "Trivia (Questions Series 1)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -2261,6 +2263,7 @@ GAME( 1986, suprpokrb, suprpokr, suprpokr,  suprpokr, gei_state, empty_init,    
 GAME( 1987, bigjoke,   0,        findout,   bigjoke,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "The Big Joke (Version 0.00)",            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, quiz211,   0,        findout,   quiz,     gei_state, init_bank8k,   ROT0, "Elettronolo",            "Quiz (Revision 2.11)",                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, quiz211a,  quiz211,  findout,   quiz,     gei_state, init_bank8k,   ROT0, "Elettronolo",            "Quiz (Revision 2.11, alt questions)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1992, sexappl,   0,        findout,   sexappl,  gei_state, init_bank8k,   ROT0, "Grayhound Electronics",  "Sex Appeal (Version 6.02)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 

@@ -128,11 +128,13 @@
 ==================================================================================*/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -141,23 +143,19 @@
 
 namespace {
 
-#define MASTER_CLOCK    XTAL(14'000'000)
-#define CPU_CLOCK      (MASTER_CLOCK/4)
-#define SND_CLOCK      (MASTER_CLOCK/8)
-
-
 class coinmstr_state : public driver_device
 {
 public:
-	coinmstr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	coinmstr_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_attr_ram1(*this, "attr_ram1"),
 		m_attr_ram2(*this, "attr_ram2"),
 		m_attr_ram3(*this, "attr_ram3"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette")
+	{ }
 
 	void coinmstr(machine_config &config);
 	void pokeroul(machine_config &config);
@@ -185,10 +183,11 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 	uint8_t m_question_adr[4]{};
 
-	void quizmstr_bg_w(offs_t offset, uint8_t data);
+	void coinmstr_set_pal(uint32_t paldat, int col);
 	void quizmstr_attr1_w(offs_t offset, uint8_t data);
 	void quizmstr_attr2_w(offs_t offset, uint8_t data);
 	void quizmstr_attr3_w(offs_t offset, uint8_t data);
+	void quizmstr_bg_w(offs_t offset, uint8_t data);
 	uint8_t question_r();
 	void question_w(offs_t offset, uint8_t data);
 	uint8_t ff_r();
@@ -206,45 +205,26 @@ private:
 };
 
 
-void coinmstr_state::quizmstr_bg_w(offs_t offset, uint8_t data)
+void coinmstr_state::coinmstr_set_pal(uint32_t paldat, int col)
 {
-	m_videoram[offset] = data;
+	int r0 = BIT(paldat, 12);
+	int g0 = BIT(paldat, 11);
+	int b0 = BIT(paldat, 10);
+	int r1 = BIT(paldat, 9);
+	int g1 = BIT(paldat, 8);
+	int b1 = BIT(paldat, 7);
 
-	if(offset >= 0x0240)
-		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
-}
+	int r2 = BIT(paldat, 5);
+	int g2 = BIT(paldat, 4);
+	int b2 = BIT(paldat, 3);
+	int r3 = BIT(paldat, 2);
+	int g3 = BIT(paldat, 1);
+	int b3 = BIT(paldat, 0);
 
-
-static void coinmstr_set_pal(palette_device &palette, uint32_t paldat, int col)
-{
-	col = col *4;
-
-	{
-		int r0, r1, r2, r3;
-		int g0, g1, g2, g3;
-		int b0, b1, b2, b3;
-
-		r0 = (paldat & 0x1000) >> 12 ;
-		g0 = (paldat & 0x0800) >> 11 ;
-		b0 = (paldat & 0x0400) >> 10 ;
-		r1 = (paldat & 0x0200) >> 9 ;
-		g1 = (paldat & 0x0100) >> 8 ;
-		b1 = (paldat & 0x0080) >> 7 ;
-
-		r2 = (paldat & 0x0020) >> 5 ;
-		g2 = (paldat & 0x0010) >> 4 ;
-		b2 = (paldat & 0x0008) >> 3 ;
-		r3 = (paldat & 0x0004) >> 2 ;
-		g3 = (paldat & 0x0002) >> 1 ;
-		b3 = (paldat & 0x0001) >> 0 ;
-
-
-		palette.set_pen_color(col+0, (b0 * 255) << 5, (g0 * 255) << 5, (r0 * 255) << 5);
-		palette.set_pen_color(col+2, (b1 * 255) << 5, (g1 * 255) << 5, (r1 * 255) << 5);
-		palette.set_pen_color(col+1, (b2 * 255) << 5, (g2 * 255) << 5, (r2 * 255) << 5);
-		palette.set_pen_color(col+3, (b3 * 255) << 5, (g3 * 255) << 5, (r3 * 255) << 5);
-
-	}
+	m_palette->set_pen_color(col * 4 + 0, (b0 * 255) << 5, (g0 * 255) << 5, (r0 * 255) << 5);
+	m_palette->set_pen_color(col * 4 + 2, (b1 * 255) << 5, (g1 * 255) << 5, (r1 * 255) << 5);
+	m_palette->set_pen_color(col * 4 + 1, (b2 * 255) << 5, (g2 * 255) << 5, (r2 * 255) << 5);
+	m_palette->set_pen_color(col * 4 + 3, (b3 * 255) << 5, (g3 * 255) << 5, (r3 * 255) << 5);
 }
 
 
@@ -255,11 +235,10 @@ void coinmstr_state::quizmstr_attr1_w(offs_t offset, uint8_t data)
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		uint32_t  paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
+		uint32_t paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
-		coinmstr_set_pal(*m_palette, paldata, offset - 0x240);
-
+		coinmstr_set_pal(paldata, offset - 0x240);
 	}
 }
 
@@ -270,11 +249,10 @@ void coinmstr_state::quizmstr_attr2_w(offs_t offset, uint8_t data)
 	if(offset >= 0x0240)
 	{
 		// the later games also use attr3 for something..
-		uint32_t  paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
+		uint32_t paldata = (m_attr_ram1[offset] & 0x7f) | ((m_attr_ram2[offset] & 0x7f) << 7);
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 
-		coinmstr_set_pal(*m_palette, paldata, offset - 0x240);
-
+		coinmstr_set_pal(paldata, offset - 0x240);
 	}
 }
 
@@ -284,7 +262,14 @@ void coinmstr_state::quizmstr_attr3_w(offs_t offset, uint8_t data)
 
 	if(offset >= 0x0240)
 		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
+}
 
+void coinmstr_state::quizmstr_bg_w(offs_t offset, uint8_t data)
+{
+	m_videoram[offset] = data;
+
+	if(offset >= 0x0240)
+		m_bg_tilemap->mark_tile_dirty(offset - 0x0240);
 }
 
 
@@ -327,7 +312,6 @@ uint8_t coinmstr_state::question_r()
         (m_question_adr[0] & 0x5f) == 0x0f ||
         (m_question_adr[0] & 0x5f) == 0x56 )
 */
-
 
 //  don't know...
 //  address |= ((m_question_adr[0] & 0x7f) << 8) | m_question_adr[1];
@@ -849,7 +833,7 @@ static INPUT_PORTS_START( trailblz )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( supnudg2 )    /* need to find the button 'B' to be playable */
-		PORT_INCLUDE ( trailblz )
+	PORT_INCLUDE ( trailblz )
 
 	PORT_MODIFY("PIA0.A")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )  PORT_NAME("1 Pound (5 credits)")    // coin x 5
@@ -1234,7 +1218,6 @@ static INPUT_PORTS_START( jpcoin )
 	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -1281,7 +1264,7 @@ uint32_t coinmstr_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void coinmstr_state::coinmstr(machine_config &config)
 {
-	Z80(config, m_maincpu, CPU_CLOCK); // 7 MHz.
+	Z80(config, m_maincpu, 14_MHz_XTAL / 4); // 3.5 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &coinmstr_state::coinmstr_map);
 	m_maincpu->set_vblank_int("screen", FUNC(coinmstr_state::irq0_line_hold));
 
@@ -1309,7 +1292,7 @@ void coinmstr_state::coinmstr(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_coinmstr);
 	PALETTE(config, m_palette).set_entries(46*32*4);
 
-	mc6845_device &crtc(MC6845(config, "crtc", 14000000 / 16));
+	mc6845_device &crtc(MC6845(config, "crtc", 14_MHz_XTAL / 16));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);
@@ -1317,7 +1300,7 @@ void coinmstr_state::coinmstr(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", SND_CLOCK));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 14_MHz_XTAL / 8));
 	aysnd.port_a_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -1613,7 +1596,7 @@ void coinmstr_state::init_coinmstr()
 
 	memcpy(&buf[0],rom,length);
 
-	for (int i = 0; i < length; i++)
+	for(int i = 0; i < length; i++)
 	{
 		int adr = bitswap<24>(i, 23,22,21,20,19,18,17,16,15, 14,8,7,2,5,12,10,9,11,13,3,6,0,1,4);
 		rom[i] = bitswap<8>(buf[adr],3,2,4,1,5,0,6,7);
@@ -1627,11 +1610,11 @@ void coinmstr_state::init_coinmstr()
 *      Game Drivers      *
 *************************/
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT     STATE           INIT           ROT   COMPANY                   FULLNAME                                    FLAGS
-GAME( 1985, quizmstr, 0,        quizmstr, quizmstr, coinmstr_state, init_coinmstr, ROT0, u8"Löwen Spielautomaten", "Quizmaster (German)",                      MACHINE_UNEMULATED_PROTECTION )
-GAME( 1987, trailblz, 0,        trailblz, trailblz, coinmstr_state, init_coinmstr, ROT0, "Coinmaster",             "Trail Blazer",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // or Trail Blazer 2 ?
-GAME( 1989, supnudg2, 0,        supnudg2, supnudg2, coinmstr_state, init_coinmstr, ROT0, "Coinmaster",             "Super Nudger II - P173 (Version 5.21)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAME( 1990, pokeroul, 0,        pokeroul, pokeroul, coinmstr_state, empty_init,    ROT0, "Coinmaster",             "Poker Roulette (Version 8.22)",            MACHINE_NOT_WORKING )
-GAME( 1985, jpcoin,   0,        jpcoin,   jpcoin,   coinmstr_state, empty_init,    ROT0, "Coinmaster",             "Joker Poker (Coinmaster set 1)",           0 )
-GAME( 1990, jpcoin2,  0,        jpcoin,   jpcoin,   coinmstr_state, empty_init,    ROT0, "Coinmaster",             "Joker Poker (Coinmaster, Amusement Only)", 0 )
-GAME( 1988, jpjcoin, 0,         jpjcoin,  jpcoin,   coinmstr_state, empty_init,    ROT0, "<unknown>",              "Jackpot Joker Poker (Version 88V 01)",     0 )
+//    YEAR  NAME      PARENT  MACHINE   INPUT     STATE           INIT           ROT   COMPANY                   FULLNAME                                    FLAGS
+GAME( 1985, quizmstr, 0,      quizmstr, quizmstr, coinmstr_state, init_coinmstr, ROT0, u8"Löwen Spielautomaten", "Quizmaster (German)",                      MACHINE_UNEMULATED_PROTECTION )
+GAME( 1987, trailblz, 0,      trailblz, trailblz, coinmstr_state, init_coinmstr, ROT0, "Coinmaster",             "Trail Blazer",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // or Trail Blazer 2 ?
+GAME( 1989, supnudg2, 0,      supnudg2, supnudg2, coinmstr_state, init_coinmstr, ROT0, "Coinmaster",             "Super Nudger II - P173 (Version 5.21)",    MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1990, pokeroul, 0,      pokeroul, pokeroul, coinmstr_state, empty_init,    ROT0, "Coinmaster",             "Poker Roulette (Version 8.22)",            MACHINE_NOT_WORKING )
+GAME( 1985, jpcoin,   0,      jpcoin,   jpcoin,   coinmstr_state, empty_init,    ROT0, "Coinmaster",             "Joker Poker (Coinmaster set 1)",           0 )
+GAME( 1990, jpcoin2,  0,      jpcoin,   jpcoin,   coinmstr_state, empty_init,    ROT0, "Coinmaster",             "Joker Poker (Coinmaster, Amusement Only)", 0 )
+GAME( 1988, jpjcoin,  0,      jpjcoin,  jpcoin,   coinmstr_state, empty_init,    ROT0, "<unknown>",              "Jackpot Joker Poker (Version 88V 01)",     0 )

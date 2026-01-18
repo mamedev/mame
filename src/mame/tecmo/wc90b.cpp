@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi
+
 /*
 World Cup 90 bootleg driver
 ---------------------------
@@ -545,7 +546,7 @@ static INPUT_PORTS_START( wc90b )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 10C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 7C_1C ) )
@@ -1015,8 +1016,8 @@ ROM_START( eurogael )
 	ROM_LOAD( "r2_p0403_pal16r8a.ic29",    0x000, 0x104, CRC(506156cc) SHA1(5560671fc2c9872ed28620491af5dc486909fc6e) )
 	ROM_LOAD( "r3_p0403_pal16r8a.ic29",    0x000, 0x104, CRC(d8c6ac25) SHA1(d6184e491313ff8da5b1ce60ffe8ef517716807c) )
 	ROM_LOAD( "r4_p0503_pal16r6.ic46",     0x000, 0x104, CRC(07eb86d2) SHA1(482eb325df5bc60353bac85412cf45429cd03c6d) )
-	ROM_LOAD( "3z-1_3138_gal16v8.ic22",    0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "3z-1_3238_gal16v8.ic24",    0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "3z-1_3138_gal16v8.ic22",    0x000, 0x117, CRC(909dab7b) SHA1(e9f4bb239fa7843743e85e236ae0c744784a3b3f) ) // Same as Gaelco Goldart ?
+	ROM_LOAD( "3z-1_3238_gal16v8.ic24",    0x000, 0x117, CRC(e9e538d9) SHA1(9ea73a903a06111843fe64ae55cb29ee88803334) ) // Same as Gaelco Goldart ?
 	ROM_LOAD( "r1_403_gal16v8.ic29",       0x000, 0x117, CRC(c136de93) SHA1(116f6d3b456d20621ab07a005c1421f57569915c) )
 	ROM_LOAD( "system2_9138_gal16v8.ic42", 0x000, 0x117, CRC(bd9ad8c3) SHA1(50e00b0cf7d075f9daed0338bc336a74caa3b66b) )
 	ROM_LOAD( "system2_9238_gal20v8.ic18", 0x000, 0x157, CRC(dd571a59) SHA1(ef2c7b33922dd79513a4fbe6f04a2f2c2c795ada) )

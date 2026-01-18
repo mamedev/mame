@@ -40,7 +40,7 @@ authors:hap
 		<element ref="text_r1"><bounds x="9.75" y="3.75" width="5" height="0.75" /></element>
 		<element ref="text_r2"><bounds x="9.75" y="4.5" width="5" height="1" /></element>
 
-		<element ref="text_title"><bounds x="3" y="5.5" width="10" height="1.75" /></element>
+		<element ref="text_title"><bounds x="3.5" y="5.5" width="9" height="1.75" /></element>
 
 		<element ref="disk_yellow"><bounds x="1.75" y="5.75" width="1.5" height="1.5" /></element>
 		<element ref="disk_yellow"><bounds x="12.75" y="5.75" width="1.5" height="1.5" /></element>

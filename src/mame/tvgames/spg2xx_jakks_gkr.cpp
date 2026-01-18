@@ -89,10 +89,8 @@ void jakks_gkr_state::gkr_portc_w(offs_t offset, uint16_t data, uint16_t mem_mas
 	{
 		if (m_i2cmem)
 		{
-			if (BIT(mem_mask, 1))
-				m_i2cmem->write_scl(BIT(data, 1));
-			if (BIT(mem_mask, 0))
-				m_i2cmem->write_sda(BIT(data, 0));
+			m_i2cmem->write_scl(BIT(data | ~mem_mask, 1));
+			m_i2cmem->write_sda(BIT(data | ~mem_mask, 0));
 		}
 	}
 }
@@ -355,7 +353,7 @@ static INPUT_PORTS_START( jak_sdoo_i2c ) // GameKeyReady units had 2 main button
 	PORT_BIT( 0x001f, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P3")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jakks_gkr_state::i2c_gkr_r)) // is this correct? doesn't seem to work
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(jakks_gkr_state::i2c_gkr_r))
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -704,7 +702,7 @@ CONS( 2005, jak_dora,  0,        0, jakks_gkr_nk,     jak_gkr,      jakks_gkr_st
 CONS( 2005, jak_dorr,  0,        0, jakks_gkr_nk_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",          "Dora the Explorer - Race to Play Park (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys (same as Nicktoons & Spongebob) (3 released) - The upper part of this one is blue
 CONS( 2004, jak_nick,  0,        0, jakks_gkr_nk_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Handheld Games",          "Nicktoons (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys
 CONS( 2005, jak_sbfc,  0,        0, jakks_gkr_nk_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "SpongeBob SquarePants - The Fry Cook Games (JAKKS Pacific TV Game, Game-Key Ready) (AUG 18 2005 21:31:56)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses NK keys
-CONS( 2005, jak_sdoo,  0,        0, jakks_gkr_2m_i2c, jak_sdoo_i2c, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Jolliford Management",    "Scooby-Doo! and the Mystery of the Castle (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  SD (no game-keys released)  (was dumped from a later unit with GameKey port missing, but internal PCB still supported it, code likely the same)
+CONS( 2005, jak_sdoo,  0,        0, jakks_gkr_2m_i2c, jak_sdoo_i2c, jakks_gkr_state, empty_init, "JAKKS Pacific Inc / Jolliford Management",    "Scooby-Doo! and the Mystery of the Castle (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) //  SD (no game-keys released)  (was dumped from a later unit with GameKey port missing, but internal PCB still supported it, code likely the same)
 CONS( 2005, jak_disn,  0,        0, jakks_gkr_dy,     jak_gkr,      jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "Disney (JAKKS Pacific TV Game, Game-Key Ready) (08 FEB 2005 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
 CONS( 2005, jak_disf,  0,        0, jakks_gkr_dy_i2c, jak_gkr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / HotGen Ltd",              "Disney Friends (JAKKS Pacific TV Game, Game-Key Ready) (17 MAY 2005 A)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DY keys (3 released)
 CONS( 2005, jak_dpr,   0,        0, jakks_gkr_dp_i2c, jak_dpr_i2c,  jakks_gkr_state, empty_init, "JAKKS Pacific Inc / 5000ft, Inc",             "Disney Princess (JAKKS Pacific TV Game, Game-Key Ready)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // uses DP keys (1 key released)

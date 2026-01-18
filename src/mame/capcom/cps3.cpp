@@ -616,10 +616,6 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 		int transparency,int transparent_color,
 		int scalex, int scaley)
 {
-//  u8 al;
-
-//  al = (pdrawgfx_shadow_lowpri) ? 0 : 0x80;
-
 	if (!scalex || !scaley) return;
 
 // todo: reimplement this optimization!!
@@ -635,7 +631,6 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 	1<<16 : uniform scale
 	1<<17 : double to 200%
 	*/
-
 
 	/* force clip to bitmap boundary */
 	rectangle myclip = clip;
@@ -856,18 +851,6 @@ void cps3_state::decrypt_bios()
 		u32 dword = coderegion[i/4];
 		u32 xormask = cps3_mask(i, m_key1, m_key2);
 		coderegion[i/4] = dword ^ xormask;
-	}
-
-	// Dump to file
-	if (0)
-	{
-		auto filename = std::string(machine().system().name) + "_bios.dump";
-		auto fp = fopen(filename.c_str(), "w+b");
-		if (fp)
-		{
-			fwrite(coderegion, codelength, 1, fp);
-			fclose(fp);
-		}
 	}
 }
 

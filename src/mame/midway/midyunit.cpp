@@ -666,7 +666,7 @@ static INPUT_PORTS_START( strkforc )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Fire") PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Weapon") PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Weapon Select") PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Weapon Select") PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -739,6 +739,110 @@ static INPUT_PORTS_START( strkforc )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_6C ))
 	PORT_DIPSETTING(      0x0100, "U.K. Elect." )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ))
+
+	PORT_START("UNK0")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("UNK1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( saurnfrnt )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Fire") PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Weapon") PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Weapon Select") PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Fire") PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 Weapon") PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Weapon Select") PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start / Transform")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_TILT ) // Slam Switch
+	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("P2 Start / Transform")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Difficulty ))      PORT_DIPLOCATION("DS1:3,2,1")
+	PORT_DIPSETTING(      0x0060, "Level 0" )
+	PORT_DIPSETTING(      0x0020, "Level 1" )
+	PORT_DIPSETTING(      0x0040, "Level 2" )
+	PORT_DIPSETTING(      0x0000, "Level 3" )
+	PORT_DIPSETTING(      0x0080, "Level 4" )
+	PORT_DIPSETTING(      0x00a0, "Level 5" )
+	PORT_DIPSETTING(      0x00c0, "Level 6" )
+	PORT_DIPSETTING(      0x00e0, "Level 7" )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Lives ))           PORT_DIPLOCATION("DS1:4")
+	PORT_DIPSETTING(      0x0000, "3" )
+	PORT_DIPSETTING(      0x0010, "4" )
+	PORT_DIPNAME( 0x000c, 0x000c, "Points for Extra Ship" )   PORT_DIPLOCATION("DS1:6,5")
+	PORT_DIPSETTING(      0x0004, "40000" )
+	PORT_DIPSETTING(      0x0000, "50000" )
+	PORT_DIPSETTING(      0x0008, "750000" )
+	PORT_DIPSETTING(      0x000c, "100000" )
+	PORT_DIPNAME( 0x0002, 0x0002, "Credits to Start" )        PORT_DIPLOCATION("DS1:7")
+	PORT_DIPSETTING(      0x0002, "1" )
+	PORT_DIPSETTING(      0x0000, "2" )
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Meter" )              PORT_DIPLOCATION("DS1:8")
+	PORT_DIPSETTING(      0x0001, "Shared" )
+	PORT_DIPSETTING(      0x0000, "Independent" )
+
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Free_Play ))             PORT_DIPLOCATION("DS2:1")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ))
+	PORT_DIPNAME( 0x4000, 0x0000, "Test Switch")             PORT_DIPLOCATION("DS2:2")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ))
+	PORT_DIPNAME( 0x3f00, 0x3600, DEF_STR( Coinage ))         PORT_DIPLOCATION("DS2:8,7,6,5,4,3")
+	PORT_DIPSETTING(      0x3600, "USA 1" )
+	PORT_DIPSETTING(      0x3700, "USA 2" )
+	PORT_DIPSETTING(      0x3800, "USA 3" )
+	PORT_DIPSETTING(      0x2a00, "Australia 1" )
+	PORT_DIPSETTING(      0x2d00, "Austria" )
+	PORT_DIPSETTING(      0x2e00, "Belgium 1" )
+	PORT_DIPSETTING(      0x2f00, "Belgium 2" )
+	PORT_DIPSETTING(      0x3500, "Denmark" )
+	PORT_DIPSETTING(      0x3c00, "France 1" )
+	PORT_DIPSETTING(      0x3d00, "France 2" )
+	PORT_DIPSETTING(      0x3e00, "France 3" )
+	PORT_DIPSETTING(      0x3300, "Findland" )
+	PORT_DIPSETTING(      0x3900, "German 1" )
+	PORT_DIPSETTING(      0x3a00, "German 2" )
+	PORT_DIPSETTING(      0x3b00, "German 3" )
+	PORT_DIPSETTING(      0x2500, "Italy 1" )
+	PORT_DIPSETTING(      0x2b00, "Japan 1" )
+	PORT_DIPSETTING(      0x2c00, "Japan 2" )
+	PORT_DIPSETTING(      0x3200, "Netherlands" )
+	PORT_DIPSETTING(      0x3100, "New Zealand" )
+	PORT_DIPSETTING(      0x3400, "Norway" )
+	PORT_DIPSETTING(      0x2900, "Spain 1" )
+	PORT_DIPSETTING(      0x3000, "Sweden 1" )
+	PORT_DIPSETTING(      0x3f00, "Swiss 1" )
+	PORT_DIPSETTING(      0x2600, "U.K. 1" )
+	PORT_DIPSETTING(      0x2700, "U.K. 2" )
+	PORT_DIPSETTING(      0x2800, "U.K. 3" )
+	PORT_DIPSETTING(      0x2400, "Swiss 1" )
 
 	PORT_START("UNK0")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1070,6 +1174,59 @@ static INPUT_PORTS_START( totcarn )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( yunittst )
+	PORT_INCLUDE(hiimpact)
+	PORT_MODIFY("DSW")
+
+	PORT_DIPNAME( 0x80, 0x80, "RAM Test" )                    PORT_DIPLOCATION("DS1:1")
+	PORT_DIPSETTING(      0x80, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x40, "CMOS Test" )                   PORT_DIPLOCATION("DS1:2")
+	PORT_DIPSETTING(      0x40, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x20, "Quick DMA Test" )              PORT_DIPLOCATION("DS1:3")
+	PORT_DIPSETTING(      0x20, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x10, "Harsh DMA Test" )              PORT_DIPLOCATION("DS1:4")
+	PORT_DIPSETTING(      0x10, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x08, "ROM Checksums" )               PORT_DIPLOCATION("DS1:5")
+	PORT_DIPSETTING(      0x08, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x04, "Switch Input Test" )           PORT_DIPLOCATION("DS1:6")
+	PORT_DIPSETTING(      0x04, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x02, "Coin Counter Test" )           PORT_DIPLOCATION("DS1:7")
+	PORT_DIPSETTING(      0x02, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x01, 0x01, "Sound Port Test" )             PORT_DIPLOCATION("DS1:8")
+	PORT_DIPSETTING(      0x01, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x00, DEF_STR( On ))
+
+
+	PORT_DIPNAME( 0xc000, 0xc000, "Display Type" )            PORT_DIPLOCATION("DS2:1,2")
+	PORT_DIPSETTING(      0xc000, "Auto Sense")
+	PORT_DIPSETTING(      0x4000, "4 Bit Y-Unit")
+	PORT_DIPSETTING(      0x8000, "6 Bit Y-Unit")
+	PORT_DIPSETTING(      0x0000, "8 Bit Y-Unit")
+	PORT_DIPNAME( 0x2000, 0x2000, "Screen Alignment" )        PORT_DIPLOCATION("DS2:3")
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x1800, 0x1800, "Screen Fills" )            PORT_DIPLOCATION("DS2:4,5")
+	PORT_DIPSETTING(      0x1800, "Nothing")
+	PORT_DIPSETTING(      0x0800, "Red")
+	PORT_DIPSETTING(      0x1000, "Green")
+	PORT_DIPSETTING(      0x0000, "Blue")
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unused ))          PORT_DIPLOCATION("DS2:6")
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unused ))          PORT_DIPLOCATION("DS2:7")
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x0100, 0x0100, "Williams Logo" )           PORT_DIPLOCATION("DS2:8")
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -2199,6 +2356,12 @@ ROM_START( smashtv )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 ) // all EP600
+	ROM_LOAD ( "a_5346_3044_1.u8",  0x000, 0x32f, CRC(2ef0c217) SHA1(547d264fb5e80685f0bdccb7fec9fda4db7ad540) )
+	ROM_LOAD ( "a_5346_3044_5.u52", 0x400, 0x32f, CRC(e13d6403) SHA1(3ab6e5d75fb9b91775be47f5f0d7bf56c5553fd9) )
+	ROM_LOAD ( "a_5346_3044_6.u53", 0x800, 0x32f, CRC(b165a4f9) SHA1(a25f77841770e1a357390476e40849e940fad877) )
+	ROM_LOAD ( "a_5346_3044_7.u65", 0xc00, 0x32f, CRC(ecbd3bf2) SHA1(004e9e9e8c634c94209be52582a49fccb9358990) )
 ROM_END
 
 
@@ -2227,6 +2390,12 @@ ROM_START( smashtv6 )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 ) // all EP600
+	ROM_LOAD ( "a_5346_3044_1.u8",  0x000, 0x32f, CRC(2ef0c217) SHA1(547d264fb5e80685f0bdccb7fec9fda4db7ad540) )
+	ROM_LOAD ( "a_5346_3044_5.u52", 0x400, 0x32f, CRC(e13d6403) SHA1(3ab6e5d75fb9b91775be47f5f0d7bf56c5553fd9) )
+	ROM_LOAD ( "a_5346_3044_6.u53", 0x800, 0x32f, CRC(b165a4f9) SHA1(a25f77841770e1a357390476e40849e940fad877) )
+	ROM_LOAD ( "a_5346_3044_7.u65", 0xc00, 0x32f, CRC(ecbd3bf2) SHA1(004e9e9e8c634c94209be52582a49fccb9358990) )
 ROM_END
 
 
@@ -2255,6 +2424,12 @@ ROM_START( smashtv5 )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 ) // all EP600
+	ROM_LOAD ( "a_5346_3044_1.u8",  0x000, 0x32f, CRC(2ef0c217) SHA1(547d264fb5e80685f0bdccb7fec9fda4db7ad540) )
+	ROM_LOAD ( "a_5346_3044_5.u52", 0x400, 0x32f, CRC(e13d6403) SHA1(3ab6e5d75fb9b91775be47f5f0d7bf56c5553fd9) )
+	ROM_LOAD ( "a_5346_3044_6.u53", 0x800, 0x32f, CRC(b165a4f9) SHA1(a25f77841770e1a357390476e40849e940fad877) )
+	ROM_LOAD ( "a_5346_3044_7.u65", 0xc00, 0x32f, CRC(ecbd3bf2) SHA1(004e9e9e8c634c94209be52582a49fccb9358990) )
 ROM_END
 
 
@@ -2283,6 +2458,12 @@ ROM_START( smashtv4 )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 ) // all EP600
+	ROM_LOAD ( "a_5346_3044_1.u8",  0x000, 0x32f, CRC(2ef0c217) SHA1(547d264fb5e80685f0bdccb7fec9fda4db7ad540) )
+	ROM_LOAD ( "a_5346_3044_5.u52", 0x400, 0x32f, CRC(e13d6403) SHA1(3ab6e5d75fb9b91775be47f5f0d7bf56c5553fd9) )
+	ROM_LOAD ( "a_5346_3044_6.u53", 0x800, 0x32f, CRC(b165a4f9) SHA1(a25f77841770e1a357390476e40849e940fad877) )
+	ROM_LOAD ( "a_5346_3044_7.u65", 0xc00, 0x32f, CRC(ecbd3bf2) SHA1(004e9e9e8c634c94209be52582a49fccb9358990) )
 ROM_END
 
 
@@ -2311,6 +2492,12 @@ ROM_START( smashtv3 )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u106.u106",  0x400000, 0x20000, CRC(5c718361) SHA1(6178b1d53411f24d5a5a01559727e300cd27d587) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u107.u107",  0x420000, 0x20000, CRC(0fba1e36) SHA1(17038cf35a72678bba149a632f1ad1b80cc3a38c) )
 	ROM_LOAD ( "la1_smash_tv_game_rom_u108.u108",  0x440000, 0x20000, CRC(cb0a092f) SHA1(33cbb87b4be1eadb1f3624ef5e218e65109fa3eb) )
+
+	ROM_REGION( 0x1000, "plds", ROMREGION_ERASE00 ) // all EP600
+	ROM_LOAD ( "a_5346_3044_1.u8",  0x000, 0x32f, CRC(2ef0c217) SHA1(547d264fb5e80685f0bdccb7fec9fda4db7ad540) )
+	ROM_LOAD ( "a_5346_3044_5.u52", 0x400, 0x32f, CRC(e13d6403) SHA1(3ab6e5d75fb9b91775be47f5f0d7bf56c5553fd9) )
+	ROM_LOAD ( "a_5346_3044_6.u53", 0x800, 0x32f, CRC(b165a4f9) SHA1(a25f77841770e1a357390476e40849e940fad877) )
+	ROM_LOAD ( "a_5346_3044_7.u65", 0xc00, 0x32f, CRC(ecbd3bf2) SHA1(004e9e9e8c634c94209be52582a49fccb9358990) )
 ROM_END
 
 
@@ -2665,6 +2852,38 @@ ROM_START( strkforc )
 
 	ROM_LOAD ( "la1_strike_force_game_rom_u90.u90",   0x280000, 0x20000, CRC(607bcdc0) SHA1(f174a549ade75df2f86142150a1e4c3554907602) )
 	ROM_LOAD ( "la1_strike_force_game_rom_u91.u91",   0x2a0000, 0x20000, CRC(da02547e) SHA1(d29c071bd9deab2414ac0733d9a18fcf8c68b4d9) )
+ROM_END
+
+
+ROM_START( saurnfrnt )
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    // sound CPU
+	ROM_LOAD ( "pa1_saurian_front_sound_rom_u4.u4",   0x10000, 0x10000, CRC(f22a09b8) SHA1(bf8d627b07c76365cff2ba36cb87ac55bbd6e9d1) )
+	ROM_RELOAD(                                       0x20000, 0x10000 )
+	ROM_LOAD ( "pa1_saurian_front_sound_rom_u19.u19", 0x30000, 0x10000, CRC(a2dfce0f) SHA1(d3956e3a5dece19f71fc716b8ca1e74f1953992b) )
+	ROM_RELOAD(                                       0x40000, 0x10000 )
+	ROM_LOAD ( "pa1_saurian_front_sound_rom_u20.u20", 0x50000, 0x10000, CRC(b0e8f6fd) SHA1(a6129428539d0aa5583009ef526bb6f05cab6af4) )
+	ROM_RELOAD(                                       0x60000, 0x10000 )
+
+	ROM_REGION16_LE( 0x100000, "maindata", 0 ) // 34010 code
+	ROM_LOAD16_BYTE( "pa1_saurian_front_game_rom_u105.u105", 0xc0000, 0x20000, CRC(6cd469f3) SHA1(31cacb172edcc3c956ca799d69d695d8741e7029) ) // v5.0 8/07/90 @ 0x32161 of combined ROMs
+	ROM_LOAD16_BYTE( "pa1_saurian_front_game_rom_u89.u89",   0xc0001, 0x20000, CRC(bf5188df) SHA1(1b874adb41ceb1e1cce65fb3796b9532eeb0e817) )
+
+	ROM_REGION( 0x800000, "gfx", 0 )
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u111.u111", 0x000000, 0x20000, CRC(ee7a733d) SHA1(90ce8f063e22e91f1493a7403875834be359fc89) )
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u112.u112", 0x020000, 0x20000, CRC(3a1a0656) SHA1(76faea73ed95a33461cf09359ba3af507988a42f) )
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u113.u113", 0x040000, 0x20000, CRC(0cba3a22) SHA1(fd9f6b673d01f3895dc4cf304a6c3abfc05788b0) )
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u114.u114", 0x060000, 0x20000, CRC(1cce75a8) SHA1(31cb260b64fc832e04812b12c3078fa1c5d38744) )
+
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u106.u106", 0x080000, 0x20000, CRC(5d6a6c39) SHA1(683e2fd1c2e1f453273c21b6ed77475a5c176359) )
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u107.u107", 0x0a0000, 0x20000, CRC(5d178b62) SHA1(9abfed38ec3629dd1a1b99dba372689d203ebdc4) )
+
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u95.u95",   0x200000, 0x20000, CRC(8918d0c3) SHA1(c4c84e97556996b7453eb331401f90d9d7a9ea52) )
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u96.u96",   0x220000, 0x20000, CRC(6de6e648) SHA1(9d839295c4c5145ed000ee200b5d6029f3be544d) )
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u97.u97",   0x240000, 0x20000, CRC(6fba9290) SHA1(a7fbfe971431924797f3eba0496359501d642828) )
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u98.u98",   0x260000, 0x20000, CRC(298939f9) SHA1(d47c0baa36f943976a00dd1866b79cb02bf91665) )
+
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u90.u90",   0x280000, 0x20000, CRC(ff87ab13) SHA1(f51ba3d7879dfe934e4ac872937463bb972f8ac2) )
+	ROM_LOAD ( "pa1_saurian_front_game_rom_u91.u91",   0x2a0000, 0x20000, CRC(67bd128a) SHA1(ceca5cec261c5c82d0c9e56b777077fdd5977097) )
 ROM_END
 
 
@@ -3579,6 +3798,19 @@ ROM_START( totcarnp1 )
 ROM_END
 
 
+
+ROM_START( yunittst )
+	ROM_REGION( 0x90000, "cvsd:cpu", 0 )    // sound CPU
+	ROM_LOAD ( "y_unit_test_snd",  0x000000, 0x90000,   NO_DUMP )
+
+	ROM_REGION16_LE( 0x100000, "maindata", 0 ) // 34010 code
+	ROM_LOAD16_BYTE( "y_unit_test_u105.u105", 0xc0000, 0x20000, CRC(bd29a7d1) SHA1(211905c16874a23840652555757b9d2f2712facb) )
+	ROM_LOAD16_BYTE( "y_unit_test_u89.u89",   0xc0001, 0x20000, CRC(6db6e0cd) SHA1(3f4c7cd48d6606c03195ed9209f7cedbc9efd42d) )
+
+	ROM_REGION( 0x800000, "gfx", 0 )
+	ROM_LOAD ( "y_unit_test_gfx",  0x000000, 0x800000,  NO_DUMP )
+ROM_END
+
 /*************************************
  *
  *  Game drivers
@@ -3620,6 +3852,7 @@ GAME( 1991, shimpactp5, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_cv
 GAME( 1991, shimpactp4, shimpact, yunit_cvsd_6bit_slow,    shimpact, midyunit_cvsd_state,  init_shimpact, ROT0,               "Midway",           "Super High Impact (prototype, proto 4.0 09/10/91)", MACHINE_SUPPORTS_SAVE ) // See notes about factory restore above
 
 GAME( 1991, strkforc,   0,        yunit_cvsd_4bit_fast,    strkforc, midyunit_cvsd_state,  init_strkforc, ROT0,               "Midway",           "Strike Force (rev 1 02/25/91)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, saurnfrnt,  strkforc, yunit_cvsd_4bit_fast,    saurnfrnt,midyunit_cvsd_state,  init_strkforc, ROT0,               "Williams",         "Saurian Front (proto v5.0 8/07/90)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, term2,      0,        term2,                   term2,    term2_state,          init_term2,    ORIENTATION_FLIP_X, "Midway",           "Terminator 2 - Judgment Day (rev LA4 08/03/92)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, term2la3,   term2,    term2,                   term2,    term2_state,          init_term2la3, ORIENTATION_FLIP_X, "Midway",           "Terminator 2 - Judgment Day (rev LA3 03/27/92)", MACHINE_SUPPORTS_SAVE )
@@ -3639,7 +3872,7 @@ GAME( 1992, mkyturbo,   mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_ad
 GAME( 1992, mkyturboe,  mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_adpcm_state, init_mkyturbo,  ROT0,              "hack",             "Mortal Kombat (Turbo 3.0 08/31/92, hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, mknifty,    mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_adpcm_state, init_mkyturbo,  ROT0,              "hack",             "Mortal Kombat (Nifty Kombo, hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, mknifty666, mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_adpcm_state, init_mkyturbo,  ROT0,              "hack",             "Mortal Kombat (Nifty Kombo 666, hack)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, mkrep,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_adpcm_state, init_mkyturbo,  ROT0,              "hack",             "Mortal Kombat (Reptile Man hack)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, mkrep,      mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_adpcm_state, init_mkrep,     ROT0,              "hack",             "Mortal Kombat (Reptile Man hack)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1992, mkyawdim,   mk,       mkyawdim,                mkyawdim, mkyawdim_state,       init_mkyawdim,  ROT0,              "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, mkyawdim2,  mk,       mkyawdim2,               mkyawdim, mkyawdim_state,       init_mkyawdim,  ROT0,              "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 2)", MACHINE_SUPPORTS_SAVE ) // some sound effects are missing on real pcb
 GAME( 1992, mkyawdim3,  mk,       mkyawdim,                mkyawdim, mkyawdim_state,       init_mkyawdim,  ROT0,              "bootleg (Yawdim)", "Mortal Kombat (Yawdim bootleg, set 3)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND) // are some sound effects missing/wrong?
@@ -3649,3 +3882,6 @@ GAME( 1992, mkla3bl,    mk,       yunit_adpcm_6bit_fast,   mkla4,    midyunit_ad
 GAME( 1992, totcarn,    0,        yunit_adpcm_6bit_fast,   totcarn,  midyunit_adpcm_state, init_totcarn,   ROT0,              "Midway",           "Total Carnage (rev LA1 03/10/92)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, totcarnp2,  totcarn,  yunit_adpcm_6bit_fast,   totcarn,  midyunit_adpcm_state, init_totcarn,   ROT0,              "Midway",           "Total Carnage (prototype, proto v 2.0 02/10/92)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, totcarnp1,  totcarn,  yunit_adpcm_6bit_fast,   totcarn,  midyunit_adpcm_state, init_totcarn,   ROT0,              "Midway",           "Total Carnage (prototype, proto v 1.0 01/25/92)", MACHINE_SUPPORTS_SAVE )
+
+//Configuring as a generic CVSD, can run on any board
+GAME( 199?, yunittst,   0,        yunit_cvsd_6bit_slow,    yunittst, midyunit_cvsd_state,  init_shimpact, ROT0,               "Midway",           "Y-Unit Test ROM (v1.40)", MACHINE_SUPPORTS_SAVE )

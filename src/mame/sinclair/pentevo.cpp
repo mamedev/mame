@@ -120,7 +120,7 @@ private:
 	required_device<glukrs_device> m_glukrs;
 	required_device<spi_sdcard_device> m_sdcard;
 	required_device<at_keyboard_device> m_keyboard;
-	required_ioport_array<3> m_io_mouse;
+	required_ioport_array<4> m_io_mouse;
 
 	u8 m_port_bf_data;
 	u8 m_port_eff7_data;
@@ -151,7 +151,7 @@ void pentevo_state::atm_update_io()
 {
 	if (BIT(m_port_bf_data, 0) || is_dos_active())
 	{
-		m_io_view.select(0);
+		m_io_view.select(1);
 		if (m_beta_drive_selected && m_beta_drive_virtual == m_beta_drive_selected)
 			m_io_dos_view.disable();
 		else
@@ -161,7 +161,7 @@ void pentevo_state::atm_update_io()
 	}
 	else
 	{
-		m_io_view.disable();
+		m_io_view.select(0);
 		if (BIT(m_port_eff7_data, 7))
 			m_glukrs->enable();
 		else
@@ -515,19 +515,9 @@ void pentevo_state::spi_miso_w(u8 data)
 
 u8 pentevo_state::gluk_data_r(offs_t offset)
 {
-	if (m_glukrs->is_active())
-	{
-		if (m_gluk_ext == 2)
-			return m_keyboard->read();
-		else if (m_glukrs->address_r() == 0x0a)
-			return 0x20 | (m_glukrs->data_r() & 0x0f);
-		else if (m_glukrs->address_r() == 0x0b)
-			return 0x02 | (m_glukrs->data_r() & 0x04);
-		else if (m_glukrs->address_r() == 0x0c)
-			return 0x10;
-		else if (m_glukrs->address_r() == 0x0d)
-			return 0x80;
-	}
+	if (m_glukrs->is_active() && (m_gluk_ext == 2))
+		return m_keyboard->read();
+
 	return m_glukrs->data_r(); // returns 0xff if inactive
 }
 
@@ -536,26 +526,24 @@ void pentevo_state::gluk_data_w(offs_t offset, u8 data)
 	if (!m_glukrs->is_active())
 		return;
 
-	u8 addr = m_glukrs->address_r();
+	const u8 addr = m_glukrs->address_r();
 	if (addr >= 0xf0 && addr <= 0xf0)
 	{
 		m_gluk_ext = data;
 		u8 m_fx[0xf] = {0x00};
 		if (data == 0 || data == 1) // BASECONF_VERSION + BOOTLOADER_VERSION
 		{
-			strcpy((char *)m_fx, "M.A.M.E.");
+			strcpy((char *)m_fx, "MAME");
 			PAIR16 m_ver;
-			m_ver.w = ((22 << 9) | (9 << 5) | 3); // y.m.d
+			m_ver.w = ((25 << 9) | (7 << 5) | 31); // y.m.d
 			m_fx[0x0c] = m_ver.b.l;
 			m_fx[0x0d] = m_ver.b.h;
 		}
 
 		for (u8 i = 0; i < 0xf; i++)
 		{
-			m_glukrs->address_w(0xf0 + i);
-			m_glukrs->data_w(m_fx[i]);
+			m_glukrs->write_direct(0xf0 + i, m_fx[i]);
 		}
-		m_glukrs->address_w(addr);
 	}
 	else
 	{
@@ -602,33 +590,37 @@ void pentevo_state::pentevo_io(address_map &map)
 	map(0x0057, 0x0057).select(0xff00).rw(FUNC(pentevo_state::spi_port_57_r), FUNC(pentevo_state::spi_port_57_w));
 
 	// Mouse
-	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); }));
-	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return  m_io_mouse[0]->read(); }));
-	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));
+	map(0xfadf, 0xfadf).lr8(NAME([this]() -> u8 { return (m_io_mouse[3]->read() << 4) | m_io_mouse[2]->read(); }));
+	map(0xfbdf, 0xfbdf).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));
+	map(0xffdf, 0xffdf).lr8(NAME([this]() -> u8 { return m_io_mouse[1]->read(); }));
 	map(0x001f, 0x001f).mirror(0xff00).lr8(NAME([]() -> u8 { return 0x00; })); // TODO Kepmston Joystick
 
-	// PORTS: Shadow
 	map(0x0000, 0xffff).view(m_io_view);
-	m_io_view[0](0x0000, 0xffff).view(m_io_dos_view);
+	m_io_view[0];
+
+	// PORTS: Shadow
+	m_io_view[1](0x0000, 0xffff).view(m_io_dos_view);
 	m_io_dos_view[0](0x001f, 0x001f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::status_r), FUNC(beta_disk_device::command_w));
 	m_io_dos_view[0](0x003f, 0x003f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::track_r), FUNC(beta_disk_device::track_w));
 	m_io_dos_view[0](0x005f, 0x005f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::sector_r), FUNC(beta_disk_device::sector_w));
 	m_io_dos_view[0](0x007f, 0x007f).mirror(0xff00).rw(m_beta, FUNC(beta_disk_device::data_r), FUNC(beta_disk_device::data_w));
 	m_io_dos_view[0](0x00ff, 0x00ff).select(0xff00).r(m_beta, FUNC(beta_disk_device::state_r));
 
-	m_io_view[0](0x00ff, 0x00ff).select(0xff00).w(FUNC(pentevo_state::atm_port_ff_w));
-	m_io_view[0](0x0077, 0x0077).select(0xff00).lr8(NAME([]() { return 0xff; })).w(FUNC(pentevo_state::atm_port_77_w));
-	m_io_view[0](0x3ff7, 0x3ff7).select(0xc000).w(FUNC(pentevo_state::atm_port_f7_w));      // ATM
-	m_io_view[0](0x37f7, 0x37f7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_7f7_w)); // PENTEVO
-	m_io_view[0](0x3bf7, 0x3bf7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_bf7_w)); // RO
+	m_io_view[1](0x00ff, 0x00ff).select(0xff00).w(FUNC(pentevo_state::atm_port_ff_w));
+	m_io_view[1](0x0077, 0x0077).select(0xff00).lr8(NAME([]() { return 0xff; })).w(FUNC(pentevo_state::atm_port_77_w));
+	m_io_view[1](0x3ff7, 0x3ff7).select(0xc000).w(FUNC(pentevo_state::atm_port_f7_w));      // ATM
+	m_io_view[1](0x37f7, 0x37f7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_7f7_w)); // PENTEVO
+	m_io_view[1](0x3bf7, 0x3bf7).select(0xc000).w(FUNC(pentevo_state::pentevo_port_bf7_w)); // RO
 
 	// SPI
-	m_io_view[0](0x0057, 0x0057).select(0xff00)
+	m_io_view[1](0x0057, 0x0057).select(0xff00)
 		.lw8(NAME([this](offs_t offset, u8 data) { if (BIT(offset, 15)) spi_port_77_w(offset, data); else spi_port_57_w(offset, data); }));
 
 	// Gluk
-	m_io_view[0](0xdef7, 0xdef7).lw8(NAME([this](offs_t offset, u8 data) { m_glukrs->address_w(data); } ));
-	m_io_view[0](0xbef7, 0xbef7).rw(FUNC(pentevo_state::gluk_data_r), FUNC(pentevo_state::gluk_data_w));
+	m_io_view[1](0xdef7, 0xdef7).lw8(NAME([this](offs_t offset, u8 data) { m_glukrs->address_w(data); } ));
+	m_io_view[1](0xbef7, 0xbef7).rw(FUNC(pentevo_state::gluk_data_r), FUNC(pentevo_state::gluk_data_w));
+
+	subdevice<zxbus_device>("zxbus")->set_io_space(m_io_view[0], m_io_view[1]);
 }
 
 void pentevo_state::init_mem_write()
@@ -720,12 +712,17 @@ INPUT_PORTS_START( pentevo )
 	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
 
 	PORT_START("mouse_input2")
-	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(30)
+	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_REVERSE PORT_SENSITIVITY(30)
 
 	PORT_START("mouse_input3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Mouse Button Left") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Mouse Button Right") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Mouse Button Middle") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("mouse_input4")
+	PORT_BIT(0x0f, 0, IPT_DIAL_V) PORT_REVERSE PORT_NAME("Mouse Scroll V") PORT_SENSITIVITY(1) PORT_CODE(MOUSECODE_Z)
+
 INPUT_PORTS_END
 
 void pentevo_state::pentevo(machine_config &config)
@@ -740,12 +737,12 @@ void pentevo_state::pentevo(machine_config &config)
 	m_ram->set_default_size("4M");
 	RAM(config, m_char_ram).set_default_size("2048").set_default_value(0);
 
-	GLUKRS(config, m_glukrs);
+	GLUKRS(config, m_glukrs, 32.768_kHz_XTAL);
 	SPI_SDCARD(config, m_sdcard, 0);
 	m_sdcard->set_prefer_sdhc();
 	m_sdcard->spi_miso_callback().set(FUNC(pentevo_state::spi_miso_w));
 
-	SPEAKER(config, "speakers", 2).front();
+	SPEAKER(config.replace(), "speakers", 2).front();
 
 	AY_SLOT(config.replace(), "ay_slot", 14_MHz_XTAL / 8, default_ay_slot_devices, "ay_ym2149")
 		.add_route(0, "speakers", 0.50, 0)
@@ -756,14 +753,13 @@ void pentevo_state::pentevo(machine_config &config)
 	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
 
 	zxbus_device &zxbus(ZXBUS(config, "zxbus", 0));
-	zxbus.set_iospace("maincpu", AS_IO);
-	ZXBUS_SLOT(config, "zxbus1", 0, "zxbus", zxbus_cards, nullptr);
+	ZXBUS_SLOT(config, "zxbus1", 0, zxbus, zxbus_cards, nullptr);
 }
 
 
 ROM_START( pentevo )
 	ROM_REGION(0x090000, "maincpu", ROMREGION_ERASEFF)
-	ROM_DEFAULT_BIOS("v0.59.13")
+	ROM_DEFAULT_BIOS("v0.60.02")
 
 	// http://svn.zxevo.ru/revision.php?repname=pentevo&path=%2From%2Fzxevo_fe.rom
 	ROM_SYSTEM_BIOS(0, "v0.59.02fe", "ERS v0.59.02 (FE), NEO-DOS v0.53")
@@ -778,6 +774,10 @@ ROM_START( pentevo )
 	ROMX_LOAD( "zxevo_05913.rom", 0x010000, 0x80000, CRC(b75bf957) SHA1(6880493ee248cad1f82683f8b9cc69fb78fe5682), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(5, "v0.59.13fe", "ERS v0.59.13 (FE), NEO-DOS v0.58")
 	ROMX_LOAD( "zxevo_05913fe.rom", 0x010000, 0x80000, CRC(a4de8eb8) SHA1(508667d5ef42a1d0353866f3a1de4e61a230fc86), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(6, "v0.60.02", "ERS v0.60.02, NEO-DOS v0.60")
+	ROMX_LOAD( "zxevo_06002.rom", 0x010000, 0x80000, CRC(0c828b6c) SHA1(c70361b98f2d42d4ab60a63139bb1de4eecd6dd1), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(7, "v0.60.02fe", "ERS v0.60.02 (FE), NEO-DOS v0.60")
+	ROMX_LOAD( "zxevo_06002fe.rom", 0x010000, 0x80000, CRC(b7ac7a2d) SHA1(5a86046d12d4aad52947caec8550db605b37ca29), ROM_BIOS(7))
 
 	// http://svn.zxevo.ru/revision.php?repname=pentevo&path=%2Fcfgs%2Fstandalone_base_trdemu%2Ftrunk%2Fzxevo_fw.bin&rev=994&peg=1021
 	ROM_REGION(0x0C280, "fw", ROMREGION_ERASEFF)

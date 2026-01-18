@@ -147,7 +147,6 @@ public:
 	void varthb2(machine_config &config);
 	void varthb3(machine_config &config);
 
-	void init_cps1();
 	void init_cps1mult();
 	void init_sf2ee();
 	void init_wof();
@@ -155,6 +154,7 @@ public:
 	void init_punisher();
 	void init_slammast();
 	void init_pang3();
+	void init_rasters();
 	void init_ganbare();
 	void init_pang3b();
 	void init_pang3b4();
@@ -218,17 +218,20 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(cps1_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(raster_scanline);
+	TIMER_CALLBACK_MEMBER(raster_irq);
+	uint16_t irqack_r(offs_t offset);
 
 	virtual void render_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank_cps1(int state);
+	void cps1_objram_latch(int state);
 
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
 
 	/* maps */
-	void cpu_space_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
+	void cpu_space_map(address_map &map) ATTR_COLD;
 	void forgottn_map(address_map &map) ATTR_COLD;
 	void qsound_main_map(address_map &map) ATTR_COLD;
 	void qsound_decrypted_opcodes_map(address_map &map) ATTR_COLD;
@@ -246,9 +249,9 @@ protected:
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap[3]{};
-	int m_scanline1 = 0;
-	int m_scanline2 = 0;
-	int m_scancalls = 0;
+	uint16_t m_raster_counter[3]{};
+	uint16_t m_raster_reload[3]{};
+	emu_timer *m_raster_irq = nullptr;
 
 	int m_scroll1x = 0;
 	int m_scroll1y = 0;

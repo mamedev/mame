@@ -64,9 +64,6 @@ license:CC0-1.0
 		<element ref="black">
 			<bounds x="640" y="0" width="100" height="480" />
 		</element>
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="606" y="414" width="32" height="64" />
-		</element>
 		<element ref="shifter" inputtag="IN.2" inputmask="0x02">
 			<bounds x="606" y="414" width="32" height="64" />
 			<color alpha="0.6" />
@@ -76,6 +73,9 @@ license:CC0-1.0
 				<bounds x="606" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="606" y="414" width="32" height="64" />
+		</element>
 	</view>
 	<view name="Shifter-R Off-Screen" showpointers="no">
 		<bounds left="0" right="682" top="0" bottom="480" />
@@ -84,9 +84,6 @@ license:CC0-1.0
 		</screen>
 		<element ref="black">
 			<bounds x="640" y="0" width="100" height="480" />
-		</element>
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="648" y="414" width="32" height="64" />
 		</element>
 		<element ref="shifter" inputtag="IN.2" inputmask="0x02">
 			<bounds x="648" y="414" width="32" height="64" />
@@ -97,6 +94,9 @@ license:CC0-1.0
 				<bounds x="648" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="648" y="414" width="32" height="64" />
+		</element>
 	</view>
 	<view name="Shifter-L Overlay" showpointers="no">
 		<bounds left="0" right="640" top="0" bottom="480" />
@@ -105,9 +105,6 @@ license:CC0-1.0
 		</screen>
 		<element ref="black">
 			<bounds x="640" y="0" width="100" height="480" />
-		</element>
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="2" y="414" width="32" height="64" />
 		</element>
 		<element ref="shifter" inputtag="IN.2" inputmask="0x02">
 			<bounds x="2" y="414" width="32" height="64" />
@@ -118,6 +115,9 @@ license:CC0-1.0
 				<bounds x="2" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="2" y="414" width="32" height="64" />
+		</element>
 	</view>
 	<view name="Shifter-L Off-Screen" showpointers="no">
 		<bounds left="-42" right="640" top="0" bottom="480" />
@@ -126,9 +126,6 @@ license:CC0-1.0
 		</screen>
 		<element ref="black">
 			<bounds x="640" y="0" width="100" height="480" />
-		</element>
-		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
-			<bounds x="-40" y="414" width="32" height="64" />
 		</element>
 		<element ref="shifter" inputtag="IN.2" inputmask="0x02">
 			<bounds x="-40" y="414" width="32" height="64" />
@@ -139,5 +136,8 @@ license:CC0-1.0
 				<bounds x="-40" y="414" width="32" height="64" />
 			</element>
 		</collection>
+		<element ref="nothing" clickthrough="no"> <!-- block clickable input -->
+			<bounds x="-40" y="414" width="32" height="64" />
+		</element>
 	</view>
 </mamelayout>

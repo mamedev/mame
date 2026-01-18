@@ -21,7 +21,7 @@
 ***********************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "sound/okim6295.h"
 #include "video/mc6845.h"
 #include "emupal.h"
@@ -73,7 +73,7 @@ private:
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	void mem_io(address_map &map) ATTR_COLD;
+	void mem_data(address_map &map) ATTR_COLD;
 	void mem_prg(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -97,7 +97,7 @@ void cardline_state::machine_start()
 	m_hsync_q = 1;
 
 	for (int i = 0; i < 0x2000; i++)
-		m_maincpu.target()->space(AS_IO).write_byte(i, 0x73);
+		m_maincpu.target()->space(AS_DATA).write_byte(i, 0x73);
 
 	save_item(NAME(m_video));
 	save_item(NAME(m_hsync_q));
@@ -220,7 +220,7 @@ void cardline_state::mem_prg(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void cardline_state::mem_io(address_map &map)
+void cardline_state::mem_data(address_map &map)
 {
 	map(0x0000, 0x1fff).ram();
 	map(0x2003, 0x2003).portr("IN0");
@@ -320,7 +320,7 @@ void cardline_state::cardline(machine_config &config)
 	I80C32(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_port_forced_input(1, 0x10);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cardline_state::mem_prg);
-	m_maincpu->set_addrmap(AS_IO, &cardline_state::mem_io);
+	m_maincpu->set_addrmap(AS_DATA, &cardline_state::mem_data);
 	m_maincpu->port_in_cb<1>().set(FUNC(cardline_state::hsync_r));
 	m_maincpu->port_out_cb<1>().set(FUNC(cardline_state::video_w));
 	//m_maincpu->set_vblank_int("screen", FUNC(cardline_state::irq1_line_hold));

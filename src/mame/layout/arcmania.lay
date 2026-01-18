@@ -77,20 +77,20 @@ authors:hap
 		<element ref="yellow"><bounds x="6.1" y="30.6" width="5.8" height="5" /></element>
 		<element ref="purple"><bounds x="13.2" y="30.6" width="5.8" height="5" /></element>
 
-		<element ref="text_1"><bounds x="-0.9" y="18.5" width="5.6" height="4" /></element>
-		<element ref="text_2"><bounds x="6.2" y="18.5" width="5.6" height="4" /></element>
-		<element ref="text_3"><bounds x="13.3" y="18.5" width="5.6" height="4" /></element>
+		<element ref="text_1"><bounds x="-0.8" y="18.5" width="5.4" height="4" /></element>
+		<element ref="text_2"><bounds x="6.3" y="18.5" width="5.4" height="4" /></element>
+		<element ref="text_3"><bounds x="13.4" y="18.5" width="5.4" height="4" /></element>
 
-		<element ref="text_run"><bounds x="-0.9" y="25.2" width="5.6" height="1.6" /></element>
-		<element ref="text_amuk"><bounds x="-0.9" y="26.8" width="5.6" height="1.6" /></element>
+		<element ref="text_run"><bounds x="-0.8" y="25.2" width="5.4" height="1.6" /></element>
+		<element ref="text_amuk"><bounds x="-0.8" y="26.8" width="5.4" height="1.6" /></element>
 
-		<element ref="text_sneak"><bounds x="13.3" y="25.2" width="5.6" height="1.6" /></element>
-		<element ref="text_attack"><bounds x="13.3" y="26.8" width="5.6" height="1.6" /></element>
+		<element ref="text_sneak"><bounds x="13.4" y="25.2" width="5.4" height="1.6" /></element>
+		<element ref="text_attack"><bounds x="13.4" y="26.8" width="5.4" height="1.6" /></element>
 
-		<element ref="text_alien"><bounds x="-0.9" y="31.5" width="5.6" height="1.6" /></element>
-		<element ref="text_raiders"><bounds x="-0.9" y="33.1" width="5.6" height="1.6" /></element>
+		<element ref="text_alien"><bounds x="-0.8" y="31.5" width="5.4" height="1.6" /></element>
+		<element ref="text_raiders"><bounds x="-0.8" y="33.1" width="5.4" height="1.6" /></element>
 
-		<element ref="text_rattler"><bounds x="13.3" y="32.3" width="5.6" height="1.6" /></element>
+		<element ref="text_rattler"><bounds x="13.4" y="32.3" width="5.4" height="1.6" /></element>
 
 		<element ref="hl" inputtag="IN.2" inputmask="0x01"><bounds x="-1" y="18" width="5.8" height="5" /><color alpha="0.2" /></element>
 		<element ref="hl" inputtag="IN.2" inputmask="0x02"><bounds x="6.1" y="18" width="5.8" height="5" /><color alpha="0.2" /></element>

@@ -362,10 +362,8 @@ This is an example opening tag for a top-level ``mamelayout`` element:
     <mamelayout version="2">
 
 In general, children of the top-level ``mamelayout`` element are processed in
-reading order from top to bottom.  The exception is that, for historical
-reasons, views are processed last.  This means views see the final values of all
-parameters at the end of the ``mamelayout`` element, and may refer to elements
-and groups that appear after them.
+reading order from top to bottom.  Elements and groups must be defined before
+they can be used.
 
 The following elements are allowed inside the top-level ``mamelayout`` element:
 
@@ -511,12 +509,13 @@ image
     layout file.  Image file formats are detected by examining the content of
     the files, file name extensions are ignored.
 text
-    Draws text in using the UI font in the specified colour.  The text to draw
-    must be supplied using a ``string`` attribute.  An ``align`` attribute may
-    be supplied to set text alignment.  If present, the ``align`` attribute must
-    be an integer, where 0 (zero) means centred, 1 (one) means left-aligned, and
-    2 (two) means right-aligned.  If the ``align`` attribute is absent, the text
-    will be centred.
+    Draws text in the specified colour, using the artwork font.  The text to
+    draw must be supplied using a ``string`` attribute.  An ``align`` attribute
+    may be supplied to set text alignment.  If present, the ``align`` attribute
+    must be an integer, where 0 (zero) means centred, 1 (one) means
+    left-aligned, 2 (two) means right-aligned, and 3 (three) means that the text
+    will be stretched horizontally to fill its bounds.  If the ``align``
+    attribute is absent, the text will be centred.
 led7seg
     Draws a standard seven-segment (plus decimal point) digital LED/fluorescent
     display in the specified colour.  The low eight bits of the element’s state
@@ -557,17 +556,18 @@ led16segsc
     additional bits correspond to the decimal point and comma tail.  Unlit
     segments are drawn at low intensity (0x20/0xff).
 simplecounter
-    Displays the numeric value of the element’s state using the system font in
-    the specified colour.  The value is formatted in decimal notation.  A
+    Displays the numeric value of the element’s state in the specified colour,
+    using the artwork font.  The value is formatted in decimal notation.  A
     ``digits`` attribute may be supplied to specify the minimum number of digits
     to display.  If present, the ``digits`` attribute must be a positive
     integer; if absent, a minimum of two digits will be displayed.  A
     ``maxstate`` attribute may be supplied to specify the maximum state value to
     display.  If present, the ``maxstate`` attribute must be a non-negative
-    number; if absent it defaults to 999.  An ``align`` attribute may be supplied
-    to set text alignment.  If present, the ``align`` attribute must be an
-    integer, where 0 (zero) means centred, 1 (one) means left-aligned, and 2
-    (two) means right-aligned; if absent, the text will be centred.
+    number; if absent it defaults to 999.  An ``align`` attribute may be
+    supplied to set text alignment.  If present, the ``align`` attribute must be
+    an integer, where 0 (zero) means centred, 1 (one) means left-aligned, and 3
+    (three) means that the text will be stretched horizontally to fill its
+    bounds.  If the ``align`` attribute is absent, the text will be centred.
 
 An example element that draws a static left-aligned text string:
 
@@ -684,11 +684,7 @@ This is an example of a valid opening tag for a ``view`` element:
     <view name="Control panel">
 
 A view creates a nested parameter scope inside the parameter scope of the
-top-level ``mamelayout`` element.  For historical reasons, ``view`` elements are
-processed *after* all other child elements of the top-level ``mamelayout``
-element.  This means a view can reference elements and groups that appear after
-it in the file, and parameters from the enclosing scope will have their final
-values from the end of the ``mamelayout`` element.
+top-level ``mamelayout`` element.
 
 A ``view`` element may have a ``showpointers`` attribute to set whether mouse
 and pen pointers should be shown for the view.  If present, the value must be
@@ -1203,7 +1199,7 @@ must be an integer specifying the bits of the I/O port field that the item
 should activate.  This sample shows instantiation of clickable buttons:
 
 The ``clickthrough`` attribute controls whether clicks can pass through the view
-item to other view items drawn above it.  The ``clickthrough`` attribute must be
+item to other view items drawn below it.  The ``clickthrough`` attribute must be
 ``yes`` or ``no`` if present.  The default is ``no`` (clicks do not pass
 through) for view items with ``inputtag`` and ``inputmask`` attributes, and
 ``yes`` (clicks pass through) for other view items.
@@ -1502,5 +1498,5 @@ internal layouts included in MAME.
     Effectively using groups as a procedural programming language to build up an
     image of a trainer board.
 `beena.lay <https://git.redump.net/mame/tree/src/mame/layout/beena.lay?h=mame0261>`_
-    Using event-based scripting to dynamically position elements and draw elemnt
+    Using event-based scripting to dynamically position elements and draw element
     content programmatically.

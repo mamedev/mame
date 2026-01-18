@@ -618,17 +618,6 @@ uint8_t mz800_state::mz800_crtc_r()
 }
 
 
-/* port EA */
-uint8_t mz800_state::mz800_ramdisk_r()
-{
-	uint8_t *mem = memregion("user1")->base();
-	uint8_t data = mem[m_mz800_ramaddr];
-	LOG(2,"mz800_ramdisk_r",("[%04X] -> %02X\n", m_mz800_ramaddr, data),machine());
-	if (m_mz800_ramaddr++ == 0)
-		LOG(1,"mz800_ramdisk_r",("address wrap 0000\n"),machine());
-	return data;
-}
-
 /* port CC */
 void mz800_state::mz800_write_format_w(uint8_t data)
 {
@@ -666,23 +655,6 @@ void mz800_state::mz800_display_mode_w(uint8_t data)
 void mz800_state::mz800_scroll_border_w(uint8_t data)
 {
 	LOG(1,"mz800_scroll_border_w",("%02X\n", data),machine());
-}
-
-/* port EA */
-void mz800_state::mz800_ramdisk_w(uint8_t data)
-{
-	uint8_t *mem = memregion("user1")->base();
-	LOG(2,"mz800_ramdisk_w",("[%04X] <- %02X\n", m_mz800_ramaddr, data),machine());
-	mem[m_mz800_ramaddr] = data;
-	if (m_mz800_ramaddr++ == 0)
-		LOG(1,"mz800_ramdisk_w",("address wrap 0000\n"),machine());
-}
-
-/* port EB */
-void mz800_state::mz800_ramaddr_w(uint8_t data)
-{
-	m_mz800_ramaddr = (m_maincpu->state_int(Z80_BC) & 0xff00) | (data & 0xff);
-	LOG(1,"mz800_ramaddr_w",("%04X\n", m_mz800_ramaddr),machine());
 }
 
 /* port F0 */

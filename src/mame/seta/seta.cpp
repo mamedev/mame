@@ -4650,7 +4650,7 @@ static INPUT_PORTS_START( setaroul )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_10C ) )
 	PORT_DIPNAME( 0x10, 0x10, "Menu 1:Time 2:Payout" ) PORT_DIPLOCATION("SW3:4") // dsw3 4 (enable menus 1 & 2 in stats screen)
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
@@ -6975,7 +6975,7 @@ static INPUT_PORTS_START( jockeyc )
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0000, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_10C ) )
 
 	PORT_DIPUNKNOWN_DIPLOC(0x0100, 0x0100, "SW3:1")
 	PORT_DIPUNKNOWN_DIPLOC(0x0200, 0x0200, "SW3:2")
@@ -7071,9 +7071,9 @@ static INPUT_PORTS_START( inttoote )
 	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )
-	PORT_DIPSETTING(    0x04, "1 Coin/20 Credits" )
-	PORT_DIPSETTING(    0x00, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_20C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_50C ) )
 	PORT_DIPNAME( 0x20, 0x20, "Unknown SW1:6" )           PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -7805,7 +7805,7 @@ void setaroul_state::setaroul(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0, -0x1);
 	m_spritegen->set_bg_xoffsets(0, 0x2);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// devices
 	UPD4992(config, m_rtc, 32'768); // ! Actually D4911C !
@@ -9097,7 +9097,7 @@ void jockeyc_state::jockeyc(machine_config &config)
 	m_spritegen->set_fg_yoffsets(-0x12+8, 0x0e);
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_RANDOM);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	MCFG_MACHINE_START_OVERRIDE(jockeyc_state, jockeyc)
 	// devices

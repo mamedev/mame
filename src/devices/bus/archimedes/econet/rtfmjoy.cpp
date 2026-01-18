@@ -10,15 +10,50 @@
 #include "rtfmjoy.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
+namespace {
 
-DEFINE_DEVICE_TYPE(ARC_RTFM_JOY, arc_rtfm_joystick_device, "arc_rtfmjoy", "Acorn Archimedes RTFM Joystick Interface");
+class arc_rtfm_joystick_device : public device_t, public device_archimedes_econet_interface
+{
+public:
+	// construction/destruction
+	arc_rtfm_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+		: device_t(mconfig, ARC_RTFM_JOY, tag, owner, clock)
+		, device_archimedes_econet_interface(mconfig, *this)
+		, m_joy(*this, "JOY%u", 0U)
+	{
+	}
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD { }
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual u8 read(offs_t offset) override
+	{
+		u8 data = 0xff;
+
+		switch (offset & 0x03)
+		{
+		case 0x01:
+			data = ~m_joy[0]->read() & 0x1f;
+			break;
+		case 0x02:
+			data = ~m_joy[1]->read() & 0x1f;
+			break;
+		}
+
+		return data;
+	}
+
+private:
+	required_ioport_array<2> m_joy;
+};
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( rtfm_joystick )
+//  input_ports - device-specific input ports
 //-------------------------------------------------
 
 static INPUT_PORTS_START( rtfm_joystick )
@@ -37,58 +72,12 @@ static INPUT_PORTS_START( rtfm_joystick )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Fire") PORT_PLAYER(2)
 INPUT_PORTS_END
 
-
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
 ioport_constructor arc_rtfm_joystick_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( rtfm_joystick );
 }
 
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  archimedes_rtfm_joystick_device - constructor
-//-------------------------------------------------
-
-arc_rtfm_joystick_device::arc_rtfm_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, ARC_RTFM_JOY, tag, owner, clock)
-	, device_archimedes_econet_interface(mconfig, *this)
-	, m_joy(*this, "JOY%u", 0U)
-{
-}
+} // anonymous namespace
 
 
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void arc_rtfm_joystick_device::device_start()
-{
-}
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
-
-u8 arc_rtfm_joystick_device::read(offs_t offset)
-{
-	u8 data = 0xff;
-
-	switch (offset & 0x03)
-	{
-	case 0x01:
-		data = ~m_joy[0]->read() & 0x1f;
-		break;
-	case 0x02:
-		data = ~m_joy[1]->read() & 0x1f;
-		break;
-	}
-
-	return data;
-}
+DEFINE_DEVICE_TYPE_PRIVATE(ARC_RTFM_JOY, device_archimedes_econet_interface, arc_rtfm_joystick_device, "arc_rtfmjoy", "Acorn Archimedes RTFM Joystick Interface");

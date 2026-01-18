@@ -48,6 +48,14 @@ private:
 		DEVOPTION_MAX
 	};
 
+	enum
+	{
+		VIEW_IDX_DISASM,
+		VIEW_IDX_STATE,
+		VIEW_IDX_CONSOLE,
+		MAX_VIEWS
+	};
+
 	virtual void process_string(std::string const &string) override;
 
 	void open_image_file(device_image_interface &device);

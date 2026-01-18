@@ -405,8 +405,8 @@ function qtdebuggerbuild()
 			MOC = "moc"
 		else
 			if _OPTIONS["QT_HOME"]~=nil then
-				MOCTST = backtick(_OPTIONS["QT_HOME"] .. "/bin/moc --version 2>/dev/null")
-				if (MOCTST=='') then
+				local MOCTST = backtick(_OPTIONS["QT_HOME"] .. "/bin/moc --version 2>/dev/null")
+				if MOCTST=='' then
 					local qt_host_libexecs = backtick(_OPTIONS["QT_HOME"] .. "/bin/qmake -query QT_HOST_LIBEXECS")
 					if not string.starts(qt_host_libexecs,"/") then
 						qt_host_libexecs = _OPTIONS["QT_HOME"] .. "/libexec"
@@ -422,8 +422,8 @@ function qtdebuggerbuild()
 					MOC = _OPTIONS["QT_HOME"] .. "/bin/moc"
 				end
 			else
-				MOCTST = backtick("which moc-qt5 2>/dev/null")
-				if (MOCTST=='') then
+				local MOCTST = backtick("which moc-qt5 2>/dev/null")
+				if MOCTST=='' then
 					MOCTST = backtick("which moc 2>/dev/null")
 				end
 				if MOCTST=='' then

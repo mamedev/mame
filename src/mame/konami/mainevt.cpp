@@ -31,6 +31,7 @@ Both games run on Konami's PWB351024A PCB
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
+#include "machine/watchdog.h"
 #include "sound/k007232.h"
 #include "sound/upd7759.h"
 #include "sound/ymopm.h"
@@ -152,12 +153,12 @@ K052109_CB_MEMBER(mainevt_state::tile_callback)
 {
 	static const int layer_colorbase[] = { 0 / 16, 128 / 16, 64 / 16 };
 
-	*flags = (*color & 0x02) ? TILE_FLIPX : 0;
+	flags = (color & 0x02) ? TILE_FLIPX : 0;
 
 	// priority relative to HALF priority sprites
-	*priority = (layer == 2) ? (*color & 0x20) >> 5 : 0;
-	*code |= ((*color & 0x01) << 8) | ((*color & 0x1c) << 7);
-	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	priority = (layer == 2) ? (color & 0x20) >> 5 : 0;
+	code |= ((color & 0x01) << 8) | ((color & 0x1c) << 7);
+	color = layer_colorbase[layer] + ((color & 0xc0) >> 6);
 }
 
 K052109_CB_MEMBER(devstors_state::tile_callback)
@@ -165,8 +166,8 @@ K052109_CB_MEMBER(devstors_state::tile_callback)
 	static const int layer_colorbase[] = { 0 / 16, 0 / 16, 64 / 16 };
 
 	// (color & 0x02) is flip y handled internally by the 052109
-	*code |= ((*color & 0x01) << 8) | ((*color & 0x3c) << 7);
-	*color = layer_colorbase[layer] + ((*color & 0xc0) >> 6);
+	code |= ((color & 0x01) << 8) | ((color & 0x3c) << 7);
+	color = layer_colorbase[layer] + ((color & 0xc0) >> 6);
 }
 
 
@@ -182,15 +183,15 @@ K051960_CB_MEMBER(mainevt_state::sprite_callback)
 
 	// bit 5 = priority over layer B (has precedence)
 	// bit 6 = HALF priority over layer B (used for crowd when you get out of the ring)
-	if (*color & 0x20)
-		*priority = 0xff00;
-	else if (*color & 0x40)
-		*priority = 0xff00 | 0xf0f0;
+	if (color & 0x20)
+		priority = 0xff00;
+	else if (color & 0x40)
+		priority = 0xff00 | 0xf0f0;
 	else
-		*priority = 0xff00 | 0xf0f0 | 0xcccc;
+		priority = 0xff00 | 0xf0f0 | 0xcccc;
 	// bit 7 is shadow, not used
 
-	*color = sprite_colorbase + (*color & 0x03);
+	color = sprite_colorbase + (color & 0x03);
 }
 
 K051960_CB_MEMBER(devstors_state::sprite_callback)
@@ -198,7 +199,7 @@ K051960_CB_MEMBER(devstors_state::sprite_callback)
 	enum { sprite_colorbase = 128 / 16 };
 
 	// TODO: the priority/shadow handling (bits 5-7) seems to be quite complex (see PROM)
-	*color = sprite_colorbase + (*color & 0x07);
+	color = sprite_colorbase + (color & 0x07);
 }
 
 
@@ -206,8 +207,6 @@ K051960_CB_MEMBER(devstors_state::sprite_callback)
 
 uint32_t mainevt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	screen.priority().fill(0, cliprect);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 1);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 1, 2); // low priority part of layer
@@ -220,8 +219,6 @@ uint32_t mainevt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 uint32_t devstors_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	m_k052109->tilemap_update();
-
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 1, TILEMAP_DRAW_OPAQUE, 0);
 	m_k052109->tilemap_draw(screen, bitmap, cliprect, 2, 0, 0);
 	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), 0, 0);
@@ -335,7 +332,7 @@ void mainevt_state::main_map(address_map &map)
 	map(0x1f80, 0x1f80).w(FUNC(mainevt_state::bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); // probably
 	map(0x1f88, 0x1f88).w(FUNC(mainevt_state::sh_irqtrigger_w)); // probably
-	map(0x1f8c, 0x1f8d).nopw(); // ???
+	map(0x1f8c, 0x1f8c).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0x1f90, 0x1f90).w(FUNC(mainevt_state::coin_w)); // coin counters + lamps
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
@@ -361,6 +358,7 @@ void devstors_state::main_map(address_map &map)
 	map(0x1f80, 0x1f80).w(FUNC(devstors_state::bankswitch_w));
 	map(0x1f84, 0x1f84).w("soundlatch", FUNC(generic_latch_8_device::write)); // probably
 	map(0x1f88, 0x1f88).w(FUNC(devstors_state::sh_irqtrigger_w)); // probably
+	map(0x1f8c, 0x1f8c).rw("watchdog", FUNC(watchdog_timer_device::reset_r), FUNC(watchdog_timer_device::reset_w));
 	map(0x1f90, 0x1f90).w(FUNC(devstors_state::coin_w)); // coin counters + lamps
 
 	map(0x1f94, 0x1f94).portr("SYSTEM");
@@ -600,6 +598,8 @@ void mainevt_state::mainevt(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mainevt_state::sound_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(mainevt_state::sound_timer_irq), "screen", 0, 1);
 
+	WATCHDOG_TIMER(config, "watchdog");
+
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+16, 320-16, 264, 16, 240); // same hardware as Devastators so assume 59.17
@@ -643,6 +643,8 @@ void devstors_state::devstors(machine_config &config)
 	Z80(config, m_audiocpu, 3.579545_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &devstors_state::sound_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(devstors_state::sound_timer_irq), "screen", 0, 1);
+
+	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

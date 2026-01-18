@@ -74,7 +74,7 @@ memory map:
 #include "logmacro.h"
 
 
-DEFINE_DEVICE_TYPE(K051960, k051960_device, "k051960", "K051960 Sprite Generator")
+DEFINE_DEVICE_TYPE(K051960, k051960_device, "k051960", "Konami 051960 Sprite Generator")
 
 const gfx_layout k051960_device::spritelayout =
 {
@@ -141,16 +141,17 @@ k051960_device::k051960_device(const machine_config &mconfig, const char *tag, d
 	, device_gfx_interface(mconfig, *this, gfxinfo)
 	, device_video_interface(mconfig, *this)
 	, m_sprite_rom(*this, DEVICE_SELF)
-	, m_scanline_timer(nullptr)
 	, m_k051960_cb(*this)
 	, m_shadow_config_cb(*this)
 	, m_irq_handler(*this)
 	, m_firq_handler(*this)
 	, m_nmi_handler(*this)
+	, m_firq_scanline(nullptr)
+	, m_nmi_scanline(nullptr)
 	, m_romoffset(0)
 	, m_control(0)
-	, m_nmi_count(0)
 	, m_shadow_config(0)
+	, m_priority_shadows(false)
 {
 }
 
@@ -190,12 +191,24 @@ void k051960_device::device_start()
 	if (!palette().device().started())
 		throw device_missing_dependencies();
 
+	// and register a callback for vblank state
+	screen().register_vblank_callback(vblank_state_delegate(&k051960_device::vblank_callback, this));
+
 	// bind callbacks
 	m_k051960_cb.resolve();
 
-	// allocate scanline timer and start at first scanline
-	m_scanline_timer = timer_alloc(FUNC(k051960_device::scanline_callback), this);
-	m_scanline_timer->adjust(screen().time_until_pos(0), 0);
+	// allocate scanline timers and start at first scanline
+	if (!m_firq_handler.isunset())
+	{
+		m_firq_scanline = timer_alloc(FUNC(k051960_device::firq_scanline), this);
+		m_firq_scanline->adjust(screen().time_until_pos(0), 0);
+	}
+
+	if (!m_nmi_handler.isunset())
+	{
+		m_nmi_scanline = timer_alloc(FUNC(k051960_device::nmi_scanline), this);
+		m_nmi_scanline->adjust(screen().time_until_pos(0), 0);
+	}
 
 	m_sprites_busy = timer_alloc(timer_expired_delegate());
 
@@ -211,7 +224,6 @@ void k051960_device::device_start()
 	// register for save states
 	save_item(NAME(m_romoffset));
 	save_item(NAME(m_control));
-	save_item(NAME(m_nmi_count));
 	save_item(NAME(m_shadow_config));
 	save_item(NAME(m_spriterombank));
 	save_item(NAME(m_ram));
@@ -235,58 +247,59 @@ void k051960_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-TIMER_CALLBACK_MEMBER(k051960_device::scanline_callback)
+void k051960_device::vblank_callback(screen_device &screen, bool state)
 {
-	int scanline = param;
+	if (!state)
+		return;
 
+	// vblank interrupt
+	if (BIT(m_control, 0))
+		m_irq_handler(ASSERT_LINE);
+
+	// do the sprite dma, unless sprite processing was disabled
+	if (!BIT(m_control, 4))
+	{
+		memcpy(m_buffer, m_ram, sizeof(m_buffer));
+
+		// count number of active sprites in the buffer
+		int active = 0;
+		for (int i = 0; i < sizeof(m_buffer); i += 8)
+			active += BIT(m_buffer[i], 7);
+
+		// 32 clocks per active sprite, around 18 clocks per inactive sprite
+		const u32 ticks = (active * 32) + (128 - active) * 18;
+		m_sprites_busy->adjust(attotime::from_ticks(ticks * 4, clock()));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(k051960_device::firq_scanline)
+{
+	// FIRQ every other scanline
+	if (BIT(m_control, 1))
+		m_firq_handler(ASSERT_LINE);
+
+	m_firq_scanline->adjust(screen().time_until_pos(screen().vpos() + 2));
+}
+
+TIMER_CALLBACK_MEMBER(k051960_device::nmi_scanline)
+{
 	// NMI every 32 scanlines (not on 16V)
-	if ((++m_nmi_count & 3) == 3 && BIT(m_control, 2))
+	if (BIT(m_control, 2))
 		m_nmi_handler(ASSERT_LINE);
 
-	// FIRQ is when?
-
-	// vblank
-	if (scanline == 240)
-	{
-		if (BIT(m_control, 0))
-			m_irq_handler(ASSERT_LINE);
-
-		// do the sprite dma, unless sprite processing was disabled
-		if (!BIT(m_control, 4))
-		{
-			memcpy(m_buffer, m_ram, sizeof(m_buffer));
-
-			// count number of active sprites in the buffer
-			int active = 0;
-			for (int i = 0; i < sizeof(m_buffer); i += 8)
-				active += BIT(m_buffer[i], 7);
-
-			// 32 clocks per active sprite, around 18 clocks per inactive sprite
-			const u32 ticks = (active * 32) + (128 - active) * 18;
-			m_sprites_busy->adjust(attotime::from_ticks(ticks * 4, clock()));
-		}
-	}
-
-	// wait for next line
-	scanline += 8;
-	if (scanline >= screen().height())
-		scanline = 0;
-
-	m_scanline_timer->adjust(screen().time_until_pos(scanline), scanline);
+	m_nmi_scanline->adjust(screen().time_until_pos(screen().vpos() + 32));
 }
 
 u8 k051960_device::k051960_fetchromdata(offs_t offset)
 {
-	int code, color, pri, off1, addr;
-	bool shadow;
+	int addr = m_romoffset + (m_spriterombank[0] << 8) + ((m_spriterombank[1] & 0x03) << 16);
+	int code = (addr & 0x3ffe0) >> 5;
+	int off1 = addr & 0x1f;
+	int color = ((m_spriterombank[1] & 0xfc) >> 2) + ((m_spriterombank[2] & 0x03) << 6);
+	int pri = 0;
+	bool shadow = false;
 
-	addr = m_romoffset + (m_spriterombank[0] << 8) + ((m_spriterombank[1] & 0x03) << 16);
-	code = (addr & 0x3ffe0) >> 5;
-	off1 = addr & 0x1f;
-	color = ((m_spriterombank[1] & 0xfc) >> 2) + ((m_spriterombank[2] & 0x03) << 6);
-	pri = 0;
-	shadow = false;
-	m_k051960_cb(&code, &color, &pri, &shadow);
+	m_k051960_cb(code, color, pri, shadow);
 
 	addr = (code << 7) | (off1 << 2) | offset;
 	addr &= m_sprite_rom.length() - 1;
@@ -413,6 +426,8 @@ void k051960_device::k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle 
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;
 
+	const u32 shadow_mode = (m_priority_shadows || palette().shadow_mode()) ? DRAWMODE_SHADOW_PRI : DRAWMODE_SHADOW;
+
 	for (offs = 0; offs < NUM_SPRITES; offs++)
 		sortedlist[offs] = -1;
 
@@ -431,8 +446,7 @@ void k051960_device::k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle 
 
 	for (pri_code = 0; pri_code < NUM_SPRITES; pri_code++)
 	{
-		int ox, oy, code, color, pri, size, w, h, x, y, flipx, flipy, zoomx, zoomy;
-		bool shadow;
+		int ox, oy, size, w, h, x, y, flipx, flipy, zoomx, zoomy;
 		/* sprites can be grouped up to 8x8. The draw order is
 		     0  1  4  5 16 17 20 21
 		     2  3  6  7 18 19 22 23
@@ -452,11 +466,12 @@ void k051960_device::k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle 
 		if (offs == -1)
 			continue;
 
-		code = m_buffer[offs + 2] + ((m_buffer[offs + 1] & 0x1f) << 8);
-		color = m_buffer[offs + 3] & 0xff;
-		pri = 0;
-		shadow = !BIT(m_shadow_config, 2) && (BIT(m_shadow_config, 1) || BIT(color, 7));
-		m_k051960_cb(&code, &color, &pri, &shadow);
+		int code = m_buffer[offs + 2] + ((m_buffer[offs + 1] & 0x1f) << 8);
+		int color = m_buffer[offs + 3] & 0xff;
+		int pri = 0;
+		bool shadow = !BIT(m_shadow_config, 2) && (BIT(m_shadow_config, 1) || BIT(color, 7));
+
+		m_k051960_cb(code, color, pri, shadow);
 
 		if (max_priority != -1)
 			if (pri < min_priority || pri > max_priority)
@@ -515,7 +530,7 @@ void k051960_device::k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle 
 			flipy = !flipy;
 		}
 
-		drawmode_table[gfx(0)->granularity() - 1] = shadow ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+		drawmode_table[gfx(0)->granularity() - 1] = shadow ? shadow_mode : DRAWMODE_SOURCE;
 
 		if (zoomx == 0x10000 && zoomy == 0x10000)
 		{

@@ -143,6 +143,8 @@ public:
 	virtual void device_start() override ATTR_COLD;
 
 protected:
+	nscsi_cdrom_apple_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void scsi_command() override;
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
@@ -151,6 +153,15 @@ protected:
 private:
 	bool m_stopped;
 	uint32_t m_stop_position;
+};
+
+class nscsi_cdrom_apple_ext_device : public nscsi_cdrom_apple_device
+{
+public:
+	nscsi_cdrom_apple_ext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_CDROM, nscsi_cdrom_device)
@@ -164,5 +175,6 @@ DECLARE_DEVICE_TYPE(NSCSI_XM5401SUN, nscsi_toshiba_xm5401_sun_device)
 DECLARE_DEVICE_TYPE(NSCSI_XM5701, nscsi_toshiba_xm5701_device)
 DECLARE_DEVICE_TYPE(NSCSI_XM5701SUN, nscsi_toshiba_xm5701_sun_device)
 DECLARE_DEVICE_TYPE(NSCSI_CDROM_APPLE, nscsi_cdrom_apple_device)
+DECLARE_DEVICE_TYPE(NSCSI_CDROM_APPLE_EXT, nscsi_cdrom_apple_ext_device)
 
 #endif // MAME_BUS_NSCSI_CD_H

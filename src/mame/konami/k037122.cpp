@@ -77,7 +77,7 @@ TODO:
 
 #define K037122_NUM_TILES       16384
 
-DEFINE_DEVICE_TYPE(K037122, k037122_device, "k037122", "K037122 2D Tilemap")
+DEFINE_DEVICE_TYPE(K037122, k037122_device, "k037122", "Konami 037122 2D Tilemap")
 
 k037122_device::k037122_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, K037122, tag, owner, clock),

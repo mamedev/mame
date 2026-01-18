@@ -113,7 +113,8 @@ private:
 
 	void alu_update_st();
 	void alu_pre(u32 alu);
-	void alu_post(u32 alu);
+	void alu_post_1(u32 alu);
+	void alu_post_2(u32 alu);
 	u16 ea_pre_0(u32 r);
 	void ea_post_0(u32 r);
 	u16 ea_pre_1(u32 r);

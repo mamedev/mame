@@ -22,28 +22,32 @@ There are 2 Phoenix board families:
   manufactured more cheaply thanks to some reengineering of the circuits.
 
 Notes:
-- Discrete sound emulation is in audio/phoenix.cpp,
-  pleiads is using another sound driver, audio/pleiads.cpp
+
+Discrete sound emulation is in audio/phoenix.cpp,
+pleiads is using another sound driver, audio/pleiads.cpp
+
+Official versions of Pleiads (Tehkan, Centuri, Irecsa) have an Epson 7910E
+Multi-Melody IC for the BGM.
+
+Pleiads protection and palette banking is via 3 custom labled chips T-X, T-Y
+and T-Z. These 3 chips are actually equivalent to 74LS669, 74LS83, 74LS74,
+just with a modified pinout.
 
 
-To Do:
+TODO:
 
 Phoenix:
 - Emulate the different sound system used at least by phoenixc2, griffono,
-   and nextfase.
+  and nextfase.
 - Some of the bootlegs use MN6221AB instead of MN6221AA.
 - Better documentation of the bootlegs.
 
 Survival:
-
 - Check background visible area.  When the background scrolls up, it
   currently shows below the top and bottom of the border of the play area.
 
-
 Pleiads:
-
-- Palette banking.  Controlled by 3 custom chips marked T-X, T-Y and T-Z.
-  These chips are responsible for the protection as well.
+- Add Epson melody IC.
 
 ***************************************************************************/
 
@@ -451,7 +455,7 @@ GFXDECODE_END
 void phoenix_state::phoenix(machine_config &config)
 {
 	// basic machine hardware
-	I8085A(config, m_maincpu, CPU_CLOCK);  // 2.75 MHz
+	I8085A(config, m_maincpu, CPU_CLOCK); // 2.75 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &phoenix_state::phoenix_memory_map);
 
 	// video hardware
@@ -510,7 +514,7 @@ void phoenix_state::pleiads(machine_config &config)
 void phoenix_state::survival(machine_config &config)
 {
 	// basic machine hardware
-	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, CPU_CLOCK));  // 5.50 MHz
+	i8085a_cpu_device &maincpu(I8085A(config, m_maincpu, CPU_CLOCK)); // 5.50 MHz
 	maincpu.in_sid_func().set(FUNC(phoenix_state::survival_sid_callback));
 	maincpu.set_addrmap(AS_PROGRAM, &phoenix_state::survival_memory_map);
 
@@ -543,8 +547,8 @@ void phoenix_state::condor(machine_config &config)
 	phoenix(config);
 
 	// basic machine hardware
-	// FIXME: Verify clock. This is most likely 11MHz/2
-	Z80(config.replace(), m_maincpu, 11000000/4);    // 2.75 MHz???
+	// FIXME: Verify clock. This is more likely 11MHz/2, which would be a Z80B?
+	Z80(config.replace(), m_maincpu, 11'000'000/4); // 2.75 MHz???
 	m_maincpu->set_addrmap(AS_PROGRAM, &phoenix_state::phoenix_memory_map);
 }
 
@@ -575,8 +579,8 @@ ROM_START( phoenix )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenix2 )
@@ -599,8 +603,8 @@ ROM_START( phoenix2 )
 	ROM_LOAD( "ic40-cg4.4b",  0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenixa )
@@ -623,8 +627,8 @@ ROM_START( phoenixa )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenixb )
@@ -647,32 +651,32 @@ ROM_START( phoenixb )
 	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenixdal )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dal.a1",         0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
-	ROM_LOAD( "dal.a2",         0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
-	ROM_LOAD( "dal.a3",         0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
-	ROM_LOAD( "dal.a4",         0x1800, 0x0800, CRC(228b76ad) SHA1(e1677b3f69ef842e27b2d74fd4e6f3520c4b6593) )
-	ROM_LOAD( "d2716,dal.a5",         0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "dal.a1",       0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
+	ROM_LOAD( "dal.a2",       0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
+	ROM_LOAD( "dal.a3",       0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "dal.a4",       0x1800, 0x0800, CRC(228b76ad) SHA1(e1677b3f69ef842e27b2d74fd4e6f3520c4b6593) )
+	ROM_LOAD( "d2716,dal.a5", 0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
 	ROM_LOAD( "h6-ic50.6a",   0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) ) // dal.a6
 	ROM_LOAD( "h7-ic51.7a",   0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) ) // dal.a7
-	ROM_LOAD( "dal.a8",   0x3800, 0x0800, CRC(0a0f92c0) SHA1(d28ce84ef86f852e1f10f5ea1e370dfd1751f477) )
+	ROM_LOAD( "dal.a8",       0x3800, 0x0800, CRC(0a0f92c0) SHA1(d28ce84ef86f852e1f10f5ea1e370dfd1751f477) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
 	ROM_LOAD( "ic23.3d",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) ) // dal.d3
 	ROM_LOAD( "ic24.4d",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) ) // dal.d4
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "dal.b3",   0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
-	ROM_LOAD( "dal.b4",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
+	ROM_LOAD( "dal.b3",       0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "dal.b4",       0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenixt )
@@ -695,8 +699,8 @@ ROM_START( phoenixt )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenixj )
@@ -711,16 +715,16 @@ ROM_START( phoenixj )
 	ROM_LOAD( "pn08.52",   0x3800, 0x0800, CRC(b9915263) SHA1(f61396077b23364b5b26f62c6923394d23a37eb3) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "pn11.23",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "pn12.24",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "pn11.23",   0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "pn12.24",   0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
 	ROM_LOAD( "pn09.39",   0x0000, 0x0800, CRC(53413e8f) SHA1(d772358505b973b10da840d204afb210c0c746ec) )
 	ROM_LOAD( "pn10.40",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "pn14.40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "pn13.41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "pn14.40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "pn13.41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenix3 )
@@ -743,8 +747,8 @@ ROM_START( phoenix3 )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenixc )
@@ -767,8 +771,8 @@ ROM_START( phoenixc )
 	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 /*
@@ -799,13 +803,13 @@ ROM_START( phoenixc2 ) // verified main and ROMs PCBs and 2 PROMs
 	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) ) // 01.ic40
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits - 01.ic40
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits - 01.ic41
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits - 01.ic40
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits - 01.ic41
 
 	ROM_REGION( 0x0300, "plds", 0 )
-	ROM_LOAD( "tbp24sa10n.183.bin",   0x0000, 0x0100, CRC(47f5e887) SHA1(786d5a599b919ce6f06fe5c568ab6fa6c87b1002) )
-	ROM_LOAD( "tbp24sa10n.184.bin",   0x0100, 0x0100, CRC(931f3292) SHA1(94b0d65e909389a2c0c0aac2e16a55e60b14f3bc) )
-	ROM_LOAD( "tbp24sa10n.185.bin",   0x0200, 0x0100, CRC(0a06bd1b) SHA1(8c5debc5502e88af8019266fedcbe4bad1e2e214) )
+	ROM_LOAD( "tbp24sa10n.183.bin", 0x0000, 0x0100, CRC(47f5e887) SHA1(786d5a599b919ce6f06fe5c568ab6fa6c87b1002) )
+	ROM_LOAD( "tbp24sa10n.184.bin", 0x0100, 0x0100, CRC(931f3292) SHA1(94b0d65e909389a2c0c0aac2e16a55e60b14f3bc) )
+	ROM_LOAD( "tbp24sa10n.185.bin", 0x0200, 0x0100, CRC(0a06bd1b) SHA1(8c5debc5502e88af8019266fedcbe4bad1e2e214) )
 ROM_END
 
 ROM_START( phoenixc3 ) // verified main and ROMs PCBs and 2 PROMs
@@ -828,8 +832,8 @@ ROM_START( phoenixc3 ) // verified main and ROMs PCBs and 2 PROMs
 	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 /*
@@ -858,7 +862,7 @@ ROM_START( phoenixc4 ) // verified main and ROMs PCBs and 2 PROMs
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )
-	ROM_RELOAD(               0x0000, 0x0100 )  // the dump had 2 identical proms with different names
+	ROM_RELOAD(               0x0000, 0x0100 ) // the dump had 2 identical proms with different names
 ROM_END
 
 ROM_START( phoenixgu ) // verified 2 PCBs, 2 PROMs
@@ -881,79 +885,79 @@ ROM_START( phoenixgu ) // verified 2 PCBs, 2 PROMs
 	ROM_LOAD( "phoenixc.40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenixha ) // verified 2 PROMs, number of boards unknown (probably 2)
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ic45",  0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) ) // sldh
-	ROM_LOAD( "ic46",  0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) ) // sldh
-	ROM_LOAD( "ic47",  0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) ) // sldh
-	ROM_LOAD( "ic48",  0x1800, 0x0800, CRC(b2672265) SHA1(dfc635f2089b521c61b3b493e7c3aefcef65c8d0) ) // sldh
-	ROM_LOAD( "ic49",  0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
-	ROM_LOAD( "ic50",  0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
-	ROM_LOAD( "ic51",  0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
-	ROM_LOAD( "ic52",  0x3800, 0x0800, CRC(f3f10ac5) SHA1(aebf35ea59197fff511096dbba7320a4e79216a7) )
+	ROM_LOAD( "ic45",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) ) // sldh
+	ROM_LOAD( "ic46",   0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) ) // sldh
+	ROM_LOAD( "ic47",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) ) // sldh
+	ROM_LOAD( "ic48",   0x1800, 0x0800, CRC(b2672265) SHA1(dfc635f2089b521c61b3b493e7c3aefcef65c8d0) ) // sldh
+	ROM_LOAD( "ic49",   0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "ic50",   0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "ic51",   0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "ic52",   0x3800, 0x0800, CRC(f3f10ac5) SHA1(aebf35ea59197fff511096dbba7320a4e79216a7) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "ic23",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "ic24",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "ic23",   0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "ic24",   0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "ic39",  0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
-	ROM_LOAD( "ic40",  0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
+	ROM_LOAD( "ic39",   0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "ic40",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "ic40_b",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "ic41_a",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "ic40_b", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "ic41_a", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenixi ) // verified single PCB, single PROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "0201.bin",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
-	ROM_LOAD( "0202.bin",  0x0800, 0x0800, CRC(440d56e8) SHA1(b3147d5416cec8c00c7df40b878b826434121737) )
-	ROM_LOAD( "0203.bin",  0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )
-	ROM_LOAD( "0204.bin",  0x1800, 0x0800, CRC(e2d3271f) SHA1(4bf01aa5104bdc84066f8267766d397a39af7b3e) )
-	ROM_LOAD( "0205.bin",  0x2000, 0x0800, CRC(1ff3a982) SHA1(66fb39e7abdf7a9c6e2eb01d41cfe9429781d6aa) )
-	ROM_LOAD( "0206.bin",  0x2800, 0x0800, CRC(8c83bff7) SHA1(3dfb090d7e3a9ae8da882b06e166c48555eaf77c) )
-	ROM_LOAD( "0207.bin",  0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )
-	ROM_LOAD( "cond08c.bin",  0x3800, 0x0800, BAD_DUMP CRC(1edebb45) SHA1(2fdf061ee600e27a6ed512ea61a8d78307a7fb8a) ) // 0208.bin wasn't readable, but very probably matches the one from condor
+	ROM_LOAD( "0201.bin",      0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
+	ROM_LOAD( "0202.bin",      0x0800, 0x0800, CRC(440d56e8) SHA1(b3147d5416cec8c00c7df40b878b826434121737) )
+	ROM_LOAD( "0203.bin",      0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )
+	ROM_LOAD( "0204.bin",      0x1800, 0x0800, CRC(e2d3271f) SHA1(4bf01aa5104bdc84066f8267766d397a39af7b3e) )
+	ROM_LOAD( "0205.bin",      0x2000, 0x0800, CRC(1ff3a982) SHA1(66fb39e7abdf7a9c6e2eb01d41cfe9429781d6aa) )
+	ROM_LOAD( "0206.bin",      0x2800, 0x0800, CRC(8c83bff7) SHA1(3dfb090d7e3a9ae8da882b06e166c48555eaf77c) )
+	ROM_LOAD( "0207.bin",      0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )
+	ROM_LOAD( "cond08c.bin",   0x3800, 0x0800, BAD_DUMP CRC(1edebb45) SHA1(2fdf061ee600e27a6ed512ea61a8d78307a7fb8a) ) // 0208.bin wasn't readable, but very probably matches the one from condor
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "0209.bin",  0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "0210.bin",  0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "0209.bin",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "0210.bin",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "0211.bin",  0x0000, 0x0800, CRC(53c52eb0) SHA1(19624ca359996b77d3c65ef78a7af90eeb092377) )
-	ROM_LOAD( "0212.bin",  0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
+	ROM_LOAD( "0211.bin",      0x0000, 0x0800, CRC(53c52eb0) SHA1(19624ca359996b77d3c65ef78a7af90eeb092377) )
+	ROM_LOAD( "0212.bin",      0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "sn74s471n.bin",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
+	ROM_LOAD( "sn74s471n.bin", 0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
 ROM_START( fenixn ) // Fenix, bootleg from the Spanish company Niemer
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "2201.bin", 0x0000, 0x0800, CRC(2afa8e2c) SHA1(e9cd02b730912365aae4172da881bddb7c7b16aa) )
-	ROM_LOAD( "1202.bin", 0x0800, 0x0800, CRC(6527395e) SHA1(13799da4b5c4118b3fafe7b6145b0ebca89b9f00) )
-	ROM_LOAD( "1203.bin", 0x1000, 0x0800, CRC(868e69ba) SHA1(bef3173f1c978a9b9d1597439d272186b466e069) )
-	ROM_LOAD( "1204.bin", 0x1800, 0x0800, CRC(85d96d7c) SHA1(19bb1d0a6764b6982d3cb29e2681dee8648d5fda) )
-	ROM_LOAD( "1205.bin", 0x2000, 0x0800, CRC(a105e4e7) SHA1(b35142a91b6b7fdf7535202671793393c9f4685f) )
-	ROM_LOAD( "1206.bin", 0x2800, 0x0800, CRC(249a6f21) SHA1(1c83d9883120796cf3bf775ab6620c4850f52d3c) )
-	ROM_LOAD( "1207.bin", 0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
-	ROM_LOAD( "1208.bin", 0x3800, 0x0800, CRC(b90efc28) SHA1(61956880f64ae50c4796d4cf60a49c44a81aaa31) )
+	ROM_LOAD( "2201.bin",  0x0000, 0x0800, CRC(2afa8e2c) SHA1(e9cd02b730912365aae4172da881bddb7c7b16aa) )
+	ROM_LOAD( "1202.bin",  0x0800, 0x0800, CRC(6527395e) SHA1(13799da4b5c4118b3fafe7b6145b0ebca89b9f00) )
+	ROM_LOAD( "1203.bin",  0x1000, 0x0800, CRC(868e69ba) SHA1(bef3173f1c978a9b9d1597439d272186b466e069) )
+	ROM_LOAD( "1204.bin",  0x1800, 0x0800, CRC(85d96d7c) SHA1(19bb1d0a6764b6982d3cb29e2681dee8648d5fda) )
+	ROM_LOAD( "1205.bin",  0x2000, 0x0800, CRC(a105e4e7) SHA1(b35142a91b6b7fdf7535202671793393c9f4685f) )
+	ROM_LOAD( "1206.bin",  0x2800, 0x0800, CRC(249a6f21) SHA1(1c83d9883120796cf3bf775ab6620c4850f52d3c) )
+	ROM_LOAD( "1207.bin",  0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "1208.bin",  0x3800, 0x0800, CRC(b90efc28) SHA1(61956880f64ae50c4796d4cf60a49c44a81aaa31) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "1211.bin", 0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "1212.bin", 0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "1211.bin",  0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "1212.bin",  0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "1209.bin", 0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
-	ROM_LOAD( "1210.bin", 0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
+	ROM_LOAD( "1209.bin",  0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "1210.bin",  0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "prom1.bin", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "prom2.bin", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "prom1.bin", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "prom2.bin", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( condor )
@@ -976,8 +980,8 @@ ROM_START( condor )
 	ROM_LOAD( "cond12c.bin",  0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 // PCB is marked: "NOVARMATIC" and "13200"
@@ -1002,20 +1006,20 @@ ROM_START( condorn ) // verified single PCB, single PROM
 	ROM_LOAD( "b.bin",  0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "sn74s471n.bin",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
+	ROM_LOAD( "sn74s471n.bin", 0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
 // PCB marked "VA 250.291"
-ROM_START( condorva )  // Single PCB, single PROM
+ROM_START( condorva ) // Single PCB, single PROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.1i", 0x0000, 0x0800, CRC(351984b6) SHA1(c46f988001dd3c4e5c8bc8d472558993ec33384e) )
-	ROM_LOAD( "2.1h", 0x0800, 0x0800, CRC(cbf2d29e) SHA1(0897fd69cf7d4e15321b4b7bc8766ebb89b3385c) )
-	ROM_LOAD( "3.1f", 0x1000, 0x0800, CRC(b6f3e6ec) SHA1(d1c71da30b00fdc3be7060bb41f37e0f59e01061) )
-	ROM_LOAD( "4.1e", 0x1800, 0x0800, CRC(104cb55c) SHA1(b044b339e8908b3a8f45410f63a1a771fbb4a68c) )
-	ROM_LOAD( "5.1d", 0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
-	ROM_LOAD( "6.1c", 0x2800, 0x0800, CRC(0de92138) SHA1(d6eba691d1da453cfd00f01a86d1421794df44e4) )
-	ROM_LOAD( "7.1b", 0x3000, 0x0800, CRC(bbf12d54) SHA1(3c8ac7dd1abe22fd0469e0f374edc0fbd189019e) )
-	ROM_LOAD( "7.1a", 0x3800, 0x0800, CRC(e9816604) SHA1(b8576fa0405db202dba203e97d853b14da1c6749) )
+	ROM_LOAD( "1.1i",  0x0000, 0x0800, CRC(351984b6) SHA1(c46f988001dd3c4e5c8bc8d472558993ec33384e) )
+	ROM_LOAD( "2.1h",  0x0800, 0x0800, CRC(cbf2d29e) SHA1(0897fd69cf7d4e15321b4b7bc8766ebb89b3385c) )
+	ROM_LOAD( "3.1f",  0x1000, 0x0800, CRC(b6f3e6ec) SHA1(d1c71da30b00fdc3be7060bb41f37e0f59e01061) )
+	ROM_LOAD( "4.1e",  0x1800, 0x0800, CRC(104cb55c) SHA1(b044b339e8908b3a8f45410f63a1a771fbb4a68c) )
+	ROM_LOAD( "5.1d",  0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "6.1c",  0x2800, 0x0800, CRC(0de92138) SHA1(d6eba691d1da453cfd00f01a86d1421794df44e4) )
+	ROM_LOAD( "7.1b",  0x3000, 0x0800, CRC(bbf12d54) SHA1(3c8ac7dd1abe22fd0469e0f374edc0fbd189019e) )
+	ROM_LOAD( "7.1a",  0x3800, 0x0800, CRC(e9816604) SHA1(b8576fa0405db202dba203e97d853b14da1c6749) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
 	ROM_LOAD( "0a.2f", 0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
@@ -1049,8 +1053,8 @@ ROM_START( falcon )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( vautour )
@@ -1073,31 +1077,31 @@ ROM_START( vautour )
 	ROM_LOAD( "vautor11.2j",  0x0800, 0x0800, CRC(369e7476) SHA1(599d2fc3b298060d746e95c20a089ad37f685d5b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( vautourza )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.e1",  0x0000, 0x0800, CRC(cd2807ee) SHA1(79b9769f212d25b9ccb5124e2aa632c964c14a0b) )
-	ROM_LOAD( "2.f1",  0x0800, 0x0800, CRC(3699b11a) SHA1(7122685cbfcd75898eaa68f8c5bf87c11df59a3b) )
-	ROM_LOAD( "3.h1",  0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
-	ROM_LOAD( "4.j1",  0x1800, 0x0800, CRC(106262eb) SHA1(1e52ca66ea3542d86f2604f5aadc854ffe22fd89) )
-	ROM_LOAD( "5.k1",  0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
-	ROM_LOAD( "6.h1",  0x2800, 0x0800, CRC(1fcac707) SHA1(ea10a1c94d8cf49391a4d393ccef56ae3b9458b1) )
-	ROM_LOAD( "7.m1",  0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )
-	ROM_LOAD( "8.n1",  0x3800, 0x0800, CRC(1edebb45) SHA1(2fdf061ee600e27a6ed512ea61a8d78307a7fb8a) )
+	ROM_LOAD( "1.e1",      0x0000, 0x0800, CRC(cd2807ee) SHA1(79b9769f212d25b9ccb5124e2aa632c964c14a0b) )
+	ROM_LOAD( "2.f1",      0x0800, 0x0800, CRC(3699b11a) SHA1(7122685cbfcd75898eaa68f8c5bf87c11df59a3b) )
+	ROM_LOAD( "3.h1",      0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "4.j1",      0x1800, 0x0800, CRC(106262eb) SHA1(1e52ca66ea3542d86f2604f5aadc854ffe22fd89) )
+	ROM_LOAD( "5.k1",      0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "6.h1",      0x2800, 0x0800, CRC(1fcac707) SHA1(ea10a1c94d8cf49391a4d393ccef56ae3b9458b1) )
+	ROM_LOAD( "7.m1",      0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )
+	ROM_LOAD( "8.n1",      0x3800, 0x0800, CRC(1edebb45) SHA1(2fdf061ee600e27a6ed512ea61a8d78307a7fb8a) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
 	ROM_LOAD( "10.h2",     0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
 	ROM_LOAD( "9.j2",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "12.h4",  0x0000, 0x0800, CRC(8eff75c9) SHA1(d38a0e0c02ba680984dd8748a3c45ac55f81f127) )
-	ROM_LOAD( "11.j4",  0x0800, 0x0800, CRC(369e7476) SHA1(599d2fc3b298060d746e95c20a089ad37f685d5b) )
+	ROM_LOAD( "12.h4",     0x0000, 0x0800, CRC(8eff75c9) SHA1(d38a0e0c02ba680984dd8748a3c45ac55f81f127) )
+	ROM_LOAD( "11.j4",     0x0800, 0x0800, CRC(369e7476) SHA1(599d2fc3b298060d746e95c20a089ad37f685d5b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "82s135.m9",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )  // expanded in init (upper nibbles are the ic40 data, lower nibbles ic41 data)
+	ROM_LOAD( "82s135.m9", 0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) ) // expanded in init (upper nibbles are the ic40 data, lower nibbles ic41 data)
 ROM_END
 
 ROM_START( falconz )
@@ -1120,8 +1124,8 @@ ROM_START( falconz )
 	ROM_LOAD( "f40.bin",      0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( vautourz )
@@ -1144,8 +1148,8 @@ ROM_START( vautourz )
 	ROM_LOAD( "vautor11.2j",  0x0800, 0x0800, CRC(369e7476) SHA1(599d2fc3b298060d746e95c20a089ad37f685d5b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 /*
@@ -1156,51 +1160,51 @@ PCB is labeled: "FONECHIS"
 ROM_START( fenix ) // verified single PCB, single PROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "0.1e",         0x0000, 0x0800, NO_DUMP ) // socket at location '1e' is empty.
-	ROM_LOAD( "1.1f",         0x0800, 0x0800, CRC(3699b11a) SHA1(7122685cbfcd75898eaa68f8c5bf87c11df59a3b) )    // 1.1f
-	ROM_LOAD( "2.1h",         0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )    // 2.1h
-	ROM_LOAD( "3.1j",         0x1800, 0x0800, CRC(61b8a41b) SHA1(6dc7b23cee607042183ac13a0ecf408d88057513) )    //          96.386719%
-	ROM_LOAD( "4.1k",         0x2000, 0x0800, CRC(1ff3a982) SHA1(66fb39e7abdf7a9c6e2eb01d41cfe9429781d6aa) )    // 4.1k
-	ROM_LOAD( "5.1l",         0x2800, 0x0800, CRC(a210fe51) SHA1(0487d5bc835549cf2bfb8f26f665019490f643b7) )    //          82.812500%
-	ROM_LOAD( "6.1m",         0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )    // 6.1m
-	ROM_LOAD( "7.1n",         0x3800, 0x0800, CRC(1edebb45) SHA1(2fdf061ee600e27a6ed512ea61a8d78307a7fb8a) )    // 7.1n
+	ROM_LOAD( "1.1f",         0x0800, 0x0800, CRC(3699b11a) SHA1(7122685cbfcd75898eaa68f8c5bf87c11df59a3b) ) // 1.1f
+	ROM_LOAD( "2.1h",         0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) ) // 2.1h
+	ROM_LOAD( "3.1j",         0x1800, 0x0800, CRC(61b8a41b) SHA1(6dc7b23cee607042183ac13a0ecf408d88057513) ) // 96.386719%
+	ROM_LOAD( "4.1k",         0x2000, 0x0800, CRC(1ff3a982) SHA1(66fb39e7abdf7a9c6e2eb01d41cfe9429781d6aa) ) // 4.1k
+	ROM_LOAD( "5.1l",         0x2800, 0x0800, CRC(a210fe51) SHA1(0487d5bc835549cf2bfb8f26f665019490f643b7) ) // 82.812500%
+	ROM_LOAD( "6.1m",         0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) ) // 6.1m
+	ROM_LOAD( "7.1n",         0x3800, 0x0800, CRC(1edebb45) SHA1(2fdf061ee600e27a6ed512ea61a8d78307a7fb8a) ) // 7.1n
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "9.2h",         0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )    // 9.2h
-	ROM_LOAD( "8.2j",         0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )    // 8.2j
+	ROM_LOAD( "9.2h",         0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) ) // 9.2h
+	ROM_LOAD( "8.2j",         0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) ) // 8.2j
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "11.3h",        0x0000, 0x0800, CRC(8eff75c9) SHA1(d38a0e0c02ba680984dd8748a3c45ac55f81f127) )    // 11.3h
-	ROM_LOAD( "10.3j",        0x0800, 0x0800, CRC(369e7476) SHA1(599d2fc3b298060d746e95c20a089ad37f685d5b) )    // 10.3j
+	ROM_LOAD( "11.3h",        0x0000, 0x0800, CRC(8eff75c9) SHA1(d38a0e0c02ba680984dd8748a3c45ac55f81f127) ) // 11.3h
+	ROM_LOAD( "10.3j",        0x0800, 0x0800, CRC(369e7476) SHA1(599d2fc3b298060d746e95c20a089ad37f685d5b) ) // 10.3j
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 
 
 ROM_START( avefenix )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "4101-8516.rom",   0x0000, 0x0800, CRC(5bc2e2fe) SHA1(4d625a3bd423cc1329a6311b87683cb7c0a9374f) )
-	ROM_LOAD( "4102-2716.rom",   0x0800, 0x0800, CRC(dcf2cc3e) SHA1(adffb23ffab4f23d9da40a23e92aa08446d3dc7d) )
-	ROM_LOAD( "4103-8516.rom",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
-	ROM_LOAD( "4104-8516.rom",   0x1800, 0x0800, CRC(8380a581) SHA1(1b56f3e44de93d12008a049c2c71fc23627299e0) )
-	ROM_LOAD( "4105-8516.rom",   0x2000, 0x0800, CRC(cfa8cb51) SHA1(79a7de61927a602bd06d87a1314276929e613cd3) )
-	ROM_LOAD( "4106-8516.rom",   0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
-	ROM_LOAD( "4107-8516.rom",   0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
-	ROM_LOAD( "4108-8516.rom",   0x3800, 0x0800, CRC(f15c439d) SHA1(6b80276b4ddc9989adb2981f018d5c9c55b06430) )
+	ROM_LOAD( "4101-8516.rom",  0x0000, 0x0800, CRC(5bc2e2fe) SHA1(4d625a3bd423cc1329a6311b87683cb7c0a9374f) )
+	ROM_LOAD( "4102-2716.rom",  0x0800, 0x0800, CRC(dcf2cc3e) SHA1(adffb23ffab4f23d9da40a23e92aa08446d3dc7d) )
+	ROM_LOAD( "4103-8516.rom",  0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "4104-8516.rom",  0x1800, 0x0800, CRC(8380a581) SHA1(1b56f3e44de93d12008a049c2c71fc23627299e0) )
+	ROM_LOAD( "4105-8516.rom",  0x2000, 0x0800, CRC(cfa8cb51) SHA1(79a7de61927a602bd06d87a1314276929e613cd3) )
+	ROM_LOAD( "4106-8516.rom",  0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "4107-8516.rom",  0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "4108-8516.rom",  0x3800, 0x0800, CRC(f15c439d) SHA1(6b80276b4ddc9989adb2981f018d5c9c55b06430) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "41011-8516.rom",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "41012-8516.rom",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "41011-8516.rom", 0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "41012-8516.rom", 0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "4109-8516.rom",   0x0000, 0x0800, CRC(53413e8f) SHA1(d772358505b973b10da840d204afb210c0c746ec) )
-	ROM_LOAD( "41010-8516.rom",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
+	ROM_LOAD( "4109-8516.rom",  0x0000, 0x0800, CRC(53413e8f) SHA1(d772358505b973b10da840d204afb210c0c746ec) )
+	ROM_LOAD( "41010-8516.rom", 0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // NOT verified on this set
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( avefenixrf )
@@ -1215,16 +1219,16 @@ ROM_START( avefenixrf )
 	ROM_LOAD( "f008-ic52.a8",   0x3800, 0x0800, CRC(3719fc84) SHA1(70691d55a86cdad21938a8af2a84ab9cfdc8d76a) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "0011-ic23.d3",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "0012-ic24.d4",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "0011-ic23.d3",   0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "0012-ic24.d4",   0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
 	ROM_LOAD( "0009-ic39.b3",   0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
 	ROM_LOAD( "0010-ic40.b4",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 
@@ -1240,16 +1244,16 @@ ROM_START( avefenixl )
 	ROM_LOAD( "08_ic52.a8",   0x3800, 0x0800, CRC(f15c439d) SHA1(6b80276b4ddc9989adb2981f018d5c9c55b06430) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "11_ic23.d3",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "12_ic24.d4",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "11_ic23.d3",   0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "12_ic24.d4",   0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
 	ROM_LOAD( "09_ic39.b3",   0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
 	ROM_LOAD( "10_ic40.b4",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( fenixexpl )
@@ -1272,38 +1276,38 @@ ROM_START( fenixexpl )
 	ROM_LOAD( "ic40.b4",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 // PCB is marked: "003 LATO A" on component side and "003 LATO B" on solder side. (In Italian "lato" means "side")
-ROM_START( griffon )  // verified single PCB, single PROM
+ROM_START( griffon ) // verified single PCB, single PROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "griffon0.a5",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
-	ROM_LOAD( "griffon1.a6",  0x0800, 0x0800, CRC(3cc33e4a) SHA1(45d16334f245cc185e18f63062e08627e9bd06bb) )
-	ROM_LOAD( "griffon2.a7",  0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )
-	// ROM_LOAD( "griffon3.a8",  0x1800, 0x0800, CRC(3a6188eb) SHA1(f343d7a6dc836d118621e9a143799e33658a3005) ) // suspected bitrot, new dump has been confirmed on 2 different PCBs
-	ROM_LOAD( "griffon3.a8",  0x1800, 0x0800, CRC(5e49f5b5) SHA1(288314d24b3e8f507c43db6c64a7777e97215ed1) )
-	ROM_LOAD( "griffon4.a9",  0x2000, 0x0800, CRC(87a45ceb) SHA1(0788dd57eac3047e34a50e730df37059616abc1a) )
-	ROM_LOAD( "griffon5.a10", 0x2800, 0x0800, CRC(8c83bff7) SHA1(3dfb090d7e3a9ae8da882b06e166c48555eaf77c) )
-	ROM_LOAD( "griffon6.a11", 0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )
-	ROM_LOAD( "griffon7.a12", 0x3800, 0x0800, CRC(55e68cb1) SHA1(b19de884fb3c988599772a76c0c5229e76241e6d) )
+	ROM_LOAD( "griffon0.a5",   0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
+	ROM_LOAD( "griffon1.a6",   0x0800, 0x0800, CRC(3cc33e4a) SHA1(45d16334f245cc185e18f63062e08627e9bd06bb) )
+	ROM_LOAD( "griffon2.a7",   0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )
+//  ROM_LOAD( "griffon3.a8",   0x1800, 0x0800, CRC(3a6188eb) SHA1(f343d7a6dc836d118621e9a143799e33658a3005) ) // suspected bitrot, new dump has been confirmed on 2 different PCBs
+	ROM_LOAD( "griffon3.a8",   0x1800, 0x0800, CRC(5e49f5b5) SHA1(288314d24b3e8f507c43db6c64a7777e97215ed1) )
+	ROM_LOAD( "griffon4.a9",   0x2000, 0x0800, CRC(87a45ceb) SHA1(0788dd57eac3047e34a50e730df37059616abc1a) )
+	ROM_LOAD( "griffon5.a10",  0x2800, 0x0800, CRC(8c83bff7) SHA1(3dfb090d7e3a9ae8da882b06e166c48555eaf77c) )
+	ROM_LOAD( "griffon6.a11",  0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )
+	ROM_LOAD( "griffon7.a12",  0x3800, 0x0800, CRC(55e68cb1) SHA1(b19de884fb3c988599772a76c0c5229e76241e6d) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "ic23.3d",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "ic24.4d",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "ic23.3d",       0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "ic24.4d",       0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "griffon.d7",   0x0000, 0x0800, CRC(53c52eb0) SHA1(19624ca359996b77d3c65ef78a7af90eeb092377) )
-	ROM_LOAD( "griffon.d8",   0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
+	ROM_LOAD( "griffon.d7",    0x0000, 0x0800, CRC(53c52eb0) SHA1(19624ca359996b77d3c65ef78a7af90eeb092377) )
+	ROM_LOAD( "griffon.d8",    0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "sn74s471n.bin",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
+	ROM_LOAD( "sn74s471n.bin", 0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
 ROM_END
 
 /* There is no MN6221AA Melody-Alarm Generator, it is substituted by a small piggyback sound PCB with some 74xx logic
    and 2x PROM 63S140N main PCB is marked: "003 LATO A" and "003 LATO B" sound PCB is marked: "LC" and "NW" */
-ROM_START( griffono )  // verified single PCB with piggyback sound PCB instead of MM6221AA, single PROM
+ROM_START( griffono ) // verified single PCB with piggyback sound PCB instead of MM6221AA, single PROM
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "griffon00.5a",    0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
 	ROM_LOAD( "griffon01.6a",    0x0800, 0x0800, CRC(22ec3403) SHA1(528a0ee3e78a43e57cc7666818cb300144d410ae) )
@@ -1323,8 +1327,8 @@ ROM_START( griffono )  // verified single PCB with piggyback sound PCB instead o
 	ROM_LOAD( "griffond8.8d",    0x0800, 0x0800, CRC(bee48e0c) SHA1(a129510a6bddafe3de3f921fca34ecda03a1c283) )
 
 	ROM_REGION( 0x0200, "soundproms", 0 ) // currently not used by the emulation
-	ROM_LOAD( "63s140n.1",   0x0000, 0x0100, CRC(73d5f0c2) SHA1(5ca482ab68ffd52d16c532c72c1a2ed693648995) )
-	ROM_LOAD( "63s140n.2",   0x0100, 0x0100, CRC(c790b283) SHA1(50b14ffbf69851995ab9fe54d0ea58dc7a30a9ba) )
+	ROM_LOAD( "63s140n.1",       0x0000, 0x0100, CRC(73d5f0c2) SHA1(5ca482ab68ffd52d16c532c72c1a2ed693648995) )
+	ROM_LOAD( "63s140n.2",       0x0100, 0x0100, CRC(c790b283) SHA1(50b14ffbf69851995ab9fe54d0ea58dc7a30a9ba) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "sn74s471n.11k",   0x0100, 0x0100, CRC(c68a49bc) SHA1(1a015b89ac0622e73bcebd76cf5132830fe0bfc1) )
@@ -1346,7 +1350,7 @@ ROM_START( nextfase )
 	ROM_LOAD( "nf08.bin",   0x3800, 0x0800, CRC(04c2323f) SHA1(4d820464f57e4f59acc46ea3264dba3cb9c501a1) )
 
 	ROM_REGION( 0x800, "melody", 0 ) // Epson 7910CG Multi-Melody IC
-	ROM_LOAD( "7910cg", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
+	ROM_LOAD( "7910cg",     0x0000, 0x0800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
 	ROM_LOAD( "nf11.bin",   0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
@@ -1357,32 +1361,32 @@ ROM_START( nextfase )
 	ROM_LOAD( "nf10.bin",   0x0800, 0x0800, CRC(3143a9ee) SHA1(371bb314dc9e4ec6ed469eb81391061296c547ec) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "nf.ic40",    0x0000, 0x0100, CRC(725747be) SHA1(c8a4cc47149230ac859c19a24d2860d7d58885f2) )  // palette low bits
-	ROM_LOAD( "nf.ic41",    0x0100, 0x0100, CRC(a91055ab) SHA1(14273bde9e05b7e2e14e77cac400ffda0ce7e71f) )  // palette high bits
+	ROM_LOAD( "nf.ic40",    0x0000, 0x0100, CRC(725747be) SHA1(c8a4cc47149230ac859c19a24d2860d7d58885f2) ) // palette low bits
+	ROM_LOAD( "nf.ic41",    0x0100, 0x0100, CRC(a91055ab) SHA1(14273bde9e05b7e2e14e77cac400ffda0ce7e71f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenixs )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ic45.1_a1",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
-	ROM_LOAD( "ic46.2_a2",   0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
-	ROM_LOAD( "ic47.3_a3",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
-	ROM_LOAD( "ic48.4_a4",   0x1800, 0x0800, CRC(25c8b83f) SHA1(1c47b6ad14560927ffd50217d489ff00f8276f23) )
-	ROM_LOAD( "ic49.5_a5",   0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
-	ROM_LOAD( "ic50.6_a6",   0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
-	ROM_LOAD( "ic51.7_a7",   0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
-	ROM_LOAD( "ic52.8_a8",   0x3800, 0x0800, CRC(3657f69b) SHA1(2251efa057ad312d270016236a01932d2bb3a1be) )
+	ROM_LOAD( "ic45.1_a1",    0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
+	ROM_LOAD( "ic46.2_a2",    0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
+	ROM_LOAD( "ic47.3_a3",    0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "ic48.4_a4",    0x1800, 0x0800, CRC(25c8b83f) SHA1(1c47b6ad14560927ffd50217d489ff00f8276f23) )
+	ROM_LOAD( "ic49.5_a5",    0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "ic50.6_a6",    0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "ic51.7_a7",    0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "ic52.8_a8",    0x3800, 0x0800, CRC(3657f69b) SHA1(2251efa057ad312d270016236a01932d2bb3a1be) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "ic23.11_d3",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "ic24.12_d4",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "ic23.11_d3",   0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "ic24.12_d4",   0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "ic39.9_b3",   0x0000, 0x0800, CRC(14ccdf63) SHA1(42827f2150fae82523475428eaa9db3c824b94dd) )
-	ROM_LOAD( "ic40.10_b4",  0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
+	ROM_LOAD( "ic39.9_b3",    0x0000, 0x0800, CRC(14ccdf63) SHA1(42827f2150fae82523475428eaa9db3c824b94dd) )
+	ROM_LOAD( "ic40.10_b4",   0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // palette low bits
-	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // palette low bits
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 ROM_START( phoenixbl )
@@ -1405,32 +1409,32 @@ ROM_START( phoenixbl )
 	ROM_LOAD( "10-2716.b4",   0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, BAD_DUMP CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  // not dumped on this set
-	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, BAD_DUMP CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // not dumped on this set
+	ROM_LOAD( "mmi6301.ic40", 0x0000, 0x0100, BAD_DUMP CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) ) // not dumped on this set
+	ROM_LOAD( "mmi6301.ic41", 0x0100, 0x0100, BAD_DUMP CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // not dumped on this set
 ROM_END
 
 ROM_START( phoenixass ) // Uses MN6221AB melody chip (Greensleeves) instead of MN6221AA
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "00-811.ic45",   0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
-	ROM_LOAD( "01-811.ic46",   0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
-	ROM_LOAD( "02-811.ic47",   0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
-	ROM_LOAD( "03-811.ic48",   0x1800, 0x0800, CRC(1e2e2fc7) SHA1(b181411d1f7c11ee27e4410d20bd509b21dd7242) ) // a second PCB was found with the only difference being the copyright being changed from 'Assa' to 'Matto'
-	ROM_LOAD( "04-811.ic49",   0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
-	ROM_LOAD( "05-811.ic50",   0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
-	ROM_LOAD( "06-811.ic51",   0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
-	ROM_LOAD( "07-811.ic52",   0x3800, 0x0800, CRC(15a02d87) SHA1(df69d99747dd8b42187e4a4258edfae8e89663d0) )
+	ROM_LOAD( "00-811.ic45",    0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
+	ROM_LOAD( "01-811.ic46",    0x0800, 0x0800, CRC(dbc942fa) SHA1(9fe224e6ced407289dfa571468259a021d942b7d) )
+	ROM_LOAD( "02-811.ic47",    0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "03-811.ic48",    0x1800, 0x0800, CRC(1e2e2fc7) SHA1(b181411d1f7c11ee27e4410d20bd509b21dd7242) ) // a second PCB was found with the only difference being the copyright being changed from 'Assa' to 'Matto'
+	ROM_LOAD( "04-811.ic49",    0x2000, 0x0800, CRC(1a1ce0d0) SHA1(c2825eef5d461e16ca2172daff94b3751be2f4dc) )
+	ROM_LOAD( "05-811.ic50",    0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "06-811.ic51",    0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "07-811.ic52",    0x3800, 0x0800, CRC(15a02d87) SHA1(df69d99747dd8b42187e4a4258edfae8e89663d0) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "10-811.ic23",      0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
-	ROM_LOAD( "11-811.ic24",      0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+	ROM_LOAD( "10-811.ic23",    0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "11-811.ic24",    0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "08-811.ic39",   0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
-	ROM_LOAD( "09-811.ic40",   0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
+	ROM_LOAD( "08-811.ic39",    0x0000, 0x0800, CRC(bb0525ed) SHA1(86db1c7584fb3846bfd47535e1585eeb7fbbb1fe) )
+	ROM_LOAD( "09-811.ic40",    0x0800, 0x0800, CRC(4178aa4f) SHA1(5350f8f62cc7c223c38008bc83140b7a19147d81) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "dm74s287n.ic41",   0x0000, 0x0100, CRC(7c9f2e00) SHA1(372293748b0d4254d2884bafe4f9f33fbf0c03a6) )  // palette low bits // slightly different to other sets (note IC positions reversed)
-	ROM_LOAD( "dm74s287n.ic40",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  // palette high bits
+	ROM_LOAD( "dm74s287n.ic41", 0x0000, 0x0100, CRC(7c9f2e00) SHA1(372293748b0d4254d2884bafe4f9f33fbf0c03a6) ) // palette low bits // slightly different to other sets (note IC positions reversed)
+	ROM_LOAD( "dm74s287n.ic40", 0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) ) // palette high bits
 ROM_END
 
 
@@ -1454,59 +1458,11 @@ ROM_START( pleiads )
 	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) ) // IC 26 on real board
 
 	ROM_REGION( 0x800, "melody", 0 ) // Epson 7910E Multi-Melody IC (according to Centuri version manual)
-	ROM_LOAD( "7910e", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
+	ROM_LOAD( "7910e",        0x0000, 0x0800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette low bits
-	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette high bits
-ROM_END
-
-ROM_START( pleiadsb2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ic47.r1",      0x0000, 0x0800, CRC(fa98cb73) SHA1(d01138536e90a0a92d3e356fe354648e431a106c) ) // sldh
-	ROM_LOAD( "ic48.r2",      0x0800, 0x0800, CRC(b254217c) SHA1(312a33cca09d5d2d18992f28eb051230a90db6e3) )
-	ROM_LOAD( "ic47.bin",     0x1000, 0x0800, CRC(0951829e) SHA1(03c0598dfe248ce14683ff18e59adb2e72731336) ) // sldh
-	ROM_LOAD( "ic48.bin",     0x1800, 0x0800, CRC(4972f5ce) SHA1(9175cc924c335d01ee47f3771276cdc90028fcc5) ) // sldh
-	ROM_LOAD( "ic51.r5",      0x2000, 0x0800, CRC(49c629bc) SHA1(fd7937d0c114c8d9c1efaa9918ae3df2af41f032) )
-	ROM_LOAD( "ic50.bin",     0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
-	ROM_LOAD( "ic53.r7",      0x3000, 0x0800, CRC(037b319c) SHA1(2ff7a7777a63326e2abca2d1881df33a8e3f8561) ) // sldh
-	ROM_LOAD( "ic52.bin",     0x3800, 0x0800, CRC(b3db08c2) SHA1(d5b1b77dcf2d76498f30d5f880635f5acfac7dfd) ) // sldh
-
-	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "ic23.bin",     0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
-	ROM_LOAD( "ic24.bin",     0x0800, 0x0800, CRC(5188fc29) SHA1(421dedc674c6dde7abf01412df035a8eb8e6db9b) )
-
-	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "ic39.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
-	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "7611-5.26",    0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette low bits
-	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette high bits
-ROM_END
-
-ROM_START( pleiadbl )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ic45.bin",     0x0000, 0x0800, CRC(93fc2958) SHA1(d8723c4f4376e035e655f69352c1765fdbf4a602) )
-	ROM_LOAD( "ic46.bin",     0x0800, 0x0800, CRC(e2b5b8cd) SHA1(514ab2b24fc1d6d1fd64e74470b601ba9a11f36f) )
-	ROM_LOAD( "ic47.bin",     0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
-	ROM_LOAD( "ic48.bin",     0x1800, 0x0800, CRC(2d5198d0) SHA1(6bfdc6c965199c5d4d687fe35dda057ec38cd8e0) )
-	ROM_LOAD( "ic49.bin",     0x2000, 0x0800, CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )
-	ROM_LOAD( "ic50.bin",     0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
-	ROM_LOAD( "ic51.bin",     0x3000, 0x0800, CRC(6f56f317) SHA1(d7e6b0b1c58b741de3504640bcc23e86d1a134a0) )
-	ROM_LOAD( "ic52.bin",     0x3800, 0x0800, CRC(b1b5a8a6) SHA1(7e4ef298c8ddefc7dc0cbf94a9c9f36a4b807ba0) )
-
-	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "ic23.bin",     0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
-	ROM_LOAD( "ic24.bin",     0x0800, 0x0800, CRC(5188fc29) SHA1(421dedc674c6dde7abf01412df035a8eb8e6db9b) )
-
-	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "ic39.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
-	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette low bits
-	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette high bits
+	ROM_LOAD( "7611-5.26",    0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
 ROM_END
 
 ROM_START( pleiadce )
@@ -1528,37 +1484,12 @@ ROM_START( pleiadce )
 	ROM_LOAD( "ic39.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
 	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
 
-	ROM_REGION( 0x800, "melody", 0 )  // Epson 7910E Multi-Melody IC (according to manual)
-	ROM_LOAD( "7910e", 0x000, 0x800, NO_DUMP ) // actual size unknown, needs decapping
+	ROM_REGION( 0x800, "melody", 0 ) // Epson 7910E Multi-Melody IC (according to manual)
+	ROM_LOAD( "7910e",        0x0000, 0x0800, NO_DUMP ) // actual size unknown, needs decapping
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "7611-5.33",    0x0000, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette low bits
-	ROM_LOAD( "7611-5.26",    0x0100, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette high bits
-ROM_END
-
-// TIM-8001 + TIM-8002 PCBs. Sound section seems more similar to Phoenix (MM6221AA instead of TMS3615, etc)
-ROM_START( pleiadsgmp )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ic45",   0x0000, 0x0800, CRC(6a6dcabf) SHA1(cec3669674feb1ea86248d181f83f60a6affe68d) )
-	ROM_LOAD( "0.ic46", 0x0800, 0x0800, CRC(c82557b4) SHA1(d3ed8c5282bd75a65f8f6ecc096ab9668a8cdedd) )
-	ROM_LOAD( "3.ic47", 0x1000, 0x0800, CRC(3b29aec5) SHA1(b90b55fdc799db672558e2f7c6b05a958bf33a2c) )
-	ROM_LOAD( "4.ic48", 0x1800, 0x0800, CRC(10df5159) SHA1(73fc143c19d5ee5de8db5e6135ebeb7b43f1da05) )
-	ROM_LOAD( "1.ic49", 0x2000, 0x0800, CRC(263576e7) SHA1(4c8f4ef413e96f3ce11e0eefdc41dbc11d8e5d20) )
-	ROM_LOAD( "2.ic50", 0x2800, 0x0800, CRC(aa4d93ec) SHA1(1cd09a485c863ea8885a90f012c350310477fa0b) )
-	ROM_LOAD( "ic51",   0x3000, 0x0800, CRC(b5f07fbc) SHA1(2ae687c84732942e69ad4dfb7a4ac1b97b77487a) )
-	ROM_LOAD( "8.ic52", 0x3800, 0x0800, CRC(b3db08c2) SHA1(d5b1b77dcf2d76498f30d5f880635f5acfac7dfd) )
-
-	ROM_REGION( 0x1000, "bgtiles", 0 )
-	ROM_LOAD( "ic24.bin", 0x0000, 0x0800, CRC(5188fc29) SHA1(421dedc674c6dde7abf01412df035a8eb8e6db9b) )
-	ROM_LOAD( "ic23.bin", 0x0800, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
-
-	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "ic39.bin", 0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
-	ROM_LOAD( "ic40.bin", 0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "cpu41.bin", 0x0000, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )
-	ROM_LOAD( "cpu40.bin", 0x0100, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )
+	ROM_LOAD( "7611-5.26",    0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
 ROM_END
 
 ROM_START( pleiadsi )
@@ -1580,9 +1511,12 @@ ROM_START( pleiadsi )
 	ROM_LOAD( "9 2716.bin",    0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
 	ROM_LOAD( "10 2716.bin",   0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
 
+	ROM_REGION( 0x800, "melody", 0 )
+	ROM_LOAD( "7910e",         0x0000, 0x0800, NO_DUMP ) // actual size unknown, needs decapping
+
 	ROM_REGION( 0x0200, "proms", 0 ) // not present in dump, assuming to be the same, matches screenshots, note reverse order to most sets, same as pleiadsb2.
-	ROM_LOAD( "7611-5.26",     0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette low bits
-	ROM_LOAD( "7611-5.33",     0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette high bits
+	ROM_LOAD( "7611-5.26",     0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "7611-5.33",     0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
 ROM_END
 
 // This set shows an Irecsa patent number on the title screen.
@@ -1605,33 +1539,109 @@ ROM_START( pleiadsia )
 	ROM_LOAD( "r10.c26",       0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
 	ROM_LOAD( "r9.ic27",       0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
 
+	ROM_REGION( 0x800, "melody", 0 )
+	ROM_LOAD( "7910e",         0x0000, 0x0800, NO_DUMP ) // actual size unknown, needs decapping
+
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "a_hm7611.ic26", 0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette low bits
-	ROM_LOAD( "b_hm7611.ic33", 0x0100, 0x0100, CRC(304cf3f1) SHA1(2821577b792a9a9b0ddded4ba8046a2cef1e7d1f) )   // palette high bits
+	ROM_LOAD( "a_hm7611.ic26", 0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "b_hm7611.ic33", 0x0100, 0x0100, CRC(304cf3f1) SHA1(2821577b792a9a9b0ddded4ba8046a2cef1e7d1f) ) // palette high bits
+ROM_END
+
+ROM_START( pleiadbl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic45.bin",     0x0000, 0x0800, CRC(93fc2958) SHA1(d8723c4f4376e035e655f69352c1765fdbf4a602) )
+	ROM_LOAD( "ic46.bin",     0x0800, 0x0800, CRC(e2b5b8cd) SHA1(514ab2b24fc1d6d1fd64e74470b601ba9a11f36f) )
+	ROM_LOAD( "ic47.bin",     0x1000, 0x0800, CRC(87e700bb) SHA1(0f352b5461da957c564920fd1da83bc81f41ffb9) )
+	ROM_LOAD( "ic48.bin",     0x1800, 0x0800, CRC(2d5198d0) SHA1(6bfdc6c965199c5d4d687fe35dda057ec38cd8e0) )
+	ROM_LOAD( "ic49.bin",     0x2000, 0x0800, CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )
+	ROM_LOAD( "ic50.bin",     0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
+	ROM_LOAD( "ic51.bin",     0x3000, 0x0800, CRC(6f56f317) SHA1(d7e6b0b1c58b741de3504640bcc23e86d1a134a0) )
+	ROM_LOAD( "ic52.bin",     0x3800, 0x0800, CRC(b1b5a8a6) SHA1(7e4ef298c8ddefc7dc0cbf94a9c9f36a4b807ba0) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "ic23.bin",     0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
+	ROM_LOAD( "ic24.bin",     0x0800, 0x0800, CRC(5188fc29) SHA1(421dedc674c6dde7abf01412df035a8eb8e6db9b) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "ic39.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "7611-5.26",    0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
+ROM_END
+
+ROM_START( pleiadsb2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic47.r1",      0x0000, 0x0800, CRC(fa98cb73) SHA1(d01138536e90a0a92d3e356fe354648e431a106c) ) // sldh
+	ROM_LOAD( "ic48.r2",      0x0800, 0x0800, CRC(b254217c) SHA1(312a33cca09d5d2d18992f28eb051230a90db6e3) )
+	ROM_LOAD( "ic47.bin",     0x1000, 0x0800, CRC(0951829e) SHA1(03c0598dfe248ce14683ff18e59adb2e72731336) ) // sldh
+	ROM_LOAD( "ic48.bin",     0x1800, 0x0800, CRC(4972f5ce) SHA1(9175cc924c335d01ee47f3771276cdc90028fcc5) ) // sldh
+	ROM_LOAD( "ic51.r5",      0x2000, 0x0800, CRC(49c629bc) SHA1(fd7937d0c114c8d9c1efaa9918ae3df2af41f032) )
+	ROM_LOAD( "ic50.bin",     0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
+	ROM_LOAD( "ic53.r7",      0x3000, 0x0800, CRC(037b319c) SHA1(2ff7a7777a63326e2abca2d1881df33a8e3f8561) ) // sldh
+	ROM_LOAD( "ic52.bin",     0x3800, 0x0800, CRC(b3db08c2) SHA1(d5b1b77dcf2d76498f30d5f880635f5acfac7dfd) ) // sldh
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "ic23.bin",     0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
+	ROM_LOAD( "ic24.bin",     0x0800, 0x0800, CRC(5188fc29) SHA1(421dedc674c6dde7abf01412df035a8eb8e6db9b) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "ic39.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "ic40.bin",     0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "7611-5.26",    0x0000, 0x0100, CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
 ROM_END
 
 ROM_START( pleiadsn )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1.bin",     0x0000, 0x0800, CRC(c013515f) SHA1(c44db1c615c11ace997c0065762020827bf9ef7e) )
-	ROM_LOAD( "2.bin",     0x0800, 0x0800, CRC(b254217c) SHA1(312a33cca09d5d2d18992f28eb051230a90db6e3) )
-	ROM_LOAD( "3.bin",     0x1000, 0x0800, CRC(3b29aec5) SHA1(b90b55fdc799db672558e2f7c6b05a958bf33a2c) )
-	ROM_LOAD( "4.bin",     0x1800, 0x0800, CRC(1fbde4d7) SHA1(b358649288108159a426dba3940c627c2d2aeb01) )
-	ROM_LOAD( "5.bin",     0x2000, 0x0800, BAD_DUMP CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )  // the best of 50 different dumps. the device is clearly damaged.
-	ROM_LOAD( "6.bin",     0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
-	ROM_LOAD( "7.bin",     0x3000, 0x0800, CRC(b5f07fbc) SHA1(2ae687c84732942e69ad4dfb7a4ac1b97b77487a) )
-	ROM_LOAD( "8.bin",     0x3800, 0x0800, CRC(b3db08c2) SHA1(d5b1b77dcf2d76498f30d5f880635f5acfac7dfd) )
+	ROM_LOAD( "1.bin",        0x0000, 0x0800, CRC(c013515f) SHA1(c44db1c615c11ace997c0065762020827bf9ef7e) )
+	ROM_LOAD( "2.bin",        0x0800, 0x0800, CRC(b254217c) SHA1(312a33cca09d5d2d18992f28eb051230a90db6e3) )
+	ROM_LOAD( "3.bin",        0x1000, 0x0800, CRC(3b29aec5) SHA1(b90b55fdc799db672558e2f7c6b05a958bf33a2c) )
+	ROM_LOAD( "4.bin",        0x1800, 0x0800, CRC(1fbde4d7) SHA1(b358649288108159a426dba3940c627c2d2aeb01) )
+	ROM_LOAD( "5.bin",        0x2000, 0x0800, BAD_DUMP CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) ) // the best of 50 different dumps. the device is clearly damaged.
+	ROM_LOAD( "6.bin",        0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
+	ROM_LOAD( "7.bin",        0x3000, 0x0800, CRC(b5f07fbc) SHA1(2ae687c84732942e69ad4dfb7a4ac1b97b77487a) )
+	ROM_LOAD( "8.bin",        0x3800, 0x0800, CRC(b3db08c2) SHA1(d5b1b77dcf2d76498f30d5f880635f5acfac7dfd) )
 
 	ROM_REGION( 0x1000, "bgtiles", 0 ) // these are straight (colors match the real machine)
-	ROM_LOAD( "11.bin",    0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
-	ROM_LOAD( "12.bin",    0x0800, 0x0800, CRC(72d511fc) SHA1(a12485698ad35ba3a8c72bb9401c0cf522ffc73c) )
+	ROM_LOAD( "11.bin",       0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
+	ROM_LOAD( "12.bin",       0x0800, 0x0800, CRC(72d511fc) SHA1(a12485698ad35ba3a8c72bb9401c0cf522ffc73c) )
 
 	ROM_REGION( 0x1000, "fgtiles", 0 )
-	ROM_LOAD( "9.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
-	ROM_LOAD( "10.bin",    0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+	ROM_LOAD( "9.bin",        0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "10.bin",       0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
 
-	ROM_REGION( 0x0200, "proms", 0 ) // proms borrowed from phoenix, reverse order.
-	ROM_LOAD( "hm3-7611.bin", 0x0000, 0x0100, BAD_DUMP CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   // palette low bits
-	ROM_LOAD( "mb7052.ic41",  0x0100, 0x0100, BAD_DUMP CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   // palette high bits
+	ROM_REGION( 0x0200, "proms", 0 ) // proms borrowed from pleiads
+	ROM_LOAD( "mb7052.ic41",  0x0000, 0x0100, BAD_DUMP CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) ) // palette low bits
+	ROM_LOAD( "hm3-7611.bin", 0x0100, 0x0100, BAD_DUMP CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) ) // palette high bits
+ROM_END
+
+// TIM-8001 + TIM-8002 PCBs. Sound section seems more similar to Phoenix (MM6221AA instead of TMS3615, etc)
+ROM_START( pleiadsgmp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic45",      0x0000, 0x0800, CRC(6a6dcabf) SHA1(cec3669674feb1ea86248d181f83f60a6affe68d) )
+	ROM_LOAD( "0.ic46",    0x0800, 0x0800, CRC(c82557b4) SHA1(d3ed8c5282bd75a65f8f6ecc096ab9668a8cdedd) )
+	ROM_LOAD( "3.ic47",    0x1000, 0x0800, CRC(3b29aec5) SHA1(b90b55fdc799db672558e2f7c6b05a958bf33a2c) )
+	ROM_LOAD( "4.ic48",    0x1800, 0x0800, CRC(10df5159) SHA1(73fc143c19d5ee5de8db5e6135ebeb7b43f1da05) )
+	ROM_LOAD( "1.ic49",    0x2000, 0x0800, CRC(263576e7) SHA1(4c8f4ef413e96f3ce11e0eefdc41dbc11d8e5d20) )
+	ROM_LOAD( "2.ic50",    0x2800, 0x0800, CRC(aa4d93ec) SHA1(1cd09a485c863ea8885a90f012c350310477fa0b) )
+	ROM_LOAD( "ic51",      0x3000, 0x0800, CRC(b5f07fbc) SHA1(2ae687c84732942e69ad4dfb7a4ac1b97b77487a) )
+	ROM_LOAD( "8.ic52",    0x3800, 0x0800, CRC(b3db08c2) SHA1(d5b1b77dcf2d76498f30d5f880635f5acfac7dfd) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "ic24.bin",  0x0000, 0x0800, CRC(5188fc29) SHA1(421dedc674c6dde7abf01412df035a8eb8e6db9b) )
+	ROM_LOAD( "ic23.bin",  0x0800, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "ic39.bin",  0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "ic40.bin",  0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "cpu41.bin", 0x0000, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )
+	ROM_LOAD( "cpu40.bin", 0x0100, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )
 ROM_END
 
 // Famaresa "580" PCB set (580-001 and 580-002).
@@ -1729,8 +1739,8 @@ ROM_START( survival )
 	ROM_LOAD( "g959-41-40.u40",  0x0800, 0x0800, CRC(a255d6dc) SHA1(1b2f635f4392d0df1cbd527dcf6cf662b2a1014e) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "n82s129n.u40",  0x0000, 0x0100, CRC(b3e20669) SHA1(4f01c5d74fc8abe748dd88e4513edf52b977ee32) )   // palette low bits
-	ROM_LOAD( "n82s129n.u41",  0x0100, 0x0100, CRC(abddf69a) SHA1(e22c380a94fb491bec95c4f4c2d4f072839c09cf) )   // palette high bits
+	ROM_LOAD( "n82s129n.u40",    0x0000, 0x0100, CRC(b3e20669) SHA1(4f01c5d74fc8abe748dd88e4513edf52b977ee32) ) // palette low bits
+	ROM_LOAD( "n82s129n.u41",    0x0100, 0x0100, CRC(abddf69a) SHA1(e22c380a94fb491bec95c4f4c2d4f072839c09cf) ) // palette high bits
 ROM_END
 
 
@@ -1755,12 +1765,11 @@ void phoenix_state::init_oneprom()
 void phoenix_state::init_oneprom_coindsw()
 {
 	init_coindsw();
-
 	init_oneprom();
 }
 
 
-  /*** Phoenix (& clones) ***/
+/*** Phoenix (& clones) ***/
 GAME( 1980, phoenix,    0,       phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "Amstar",                                 "Phoenix (Amstar, set 1)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1980, phoenix2,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "Amstar",                                 "Phoenix (Amstar, set 2)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1980, phoenixa,   phoenix, phoenix,  phoenixa, phoenix_state, empty_init,           ROT90, "Amstar (Centuri license)",               "Phoenix (Centuri, set 1)",                                   MACHINE_SUPPORTS_SAVE )
@@ -1795,7 +1804,7 @@ GAME( 1980, griffon,    phoenix, condor,   condor,   phoenix_state, init_oneprom
 GAME( 1980, griffono,   phoenix, condor,   condor,   phoenix_state, init_oneprom_coindsw, ROT90, "bootleg (Olympia)",                      "Griffon (Olympia bootleg of Phoenix)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 // nextfase is a Spanish bootleg
 GAME( 1981, nextfase,   phoenix, phoenix,  nextfase, phoenix_state, empty_init,           ROT90, "bootleg (Petaco S.A.)",                  "Next Fase (bootleg of Phoenix)",                             MACHINE_SUPPORTS_SAVE )
-  // as is this
+// as is this
 GAME( 1981, phoenixs,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Sonic)",                        "Phoenix (Sonic, Spanish bootleg)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixbl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg",                                "Phoenix (bootleg)",                                          MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixass, phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Assa)",                         "Phoenix (Assa, Spanish bootleg)",                            MACHINE_SUPPORTS_SAVE )
@@ -1804,18 +1813,18 @@ GAME( 1980, avefenixrf, phoenix, phoenix,  phoenix,  phoenix_state, empty_init, 
 GAME( 1980, avefenixl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Laguna)",                       "Ave Fenix (Laguna, Spanish bootleg of Phoenix)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1980, fenixexpl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Explomatic)",                   "Fenix (Explomatic, Spanish bootleg of Phoenix)",             MACHINE_SUPPORTS_SAVE )
 
-  /*** Pleiads (& clones) ***/
-GAME( 1981, pleiads,    0,       pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "Tehkan",                                 "Pleiads (Tehkan)",                                           MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+/*** Pleiads (& clones) ***/
+GAME( 1981, pleiads,    0,       pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "Tehkan",                                 "Pleiads (Tehkan)",                                           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadce,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Centuri license)",               "Pleiads (Centuri)",                                          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // "Pleiades" in manual and on cabinet
+GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Irecsa license)",                "Pleiads (Irecsa, set 1)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadsia,  pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Irecsa license)",                "Pleiads (Irecsa, set 2)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, empty_init,           ROT90, "bootleg",                                "Pleiads (bootleg set 1)",                                    MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsb2,  pleiads, pleiads,  pleiads,  phoenix_state, empty_init,           ROT90, "bootleg (ESG)",                          "Pleiads (bootleg set 2)",                                    MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadbl,   pleiads, pleiads,  pleiadbl, phoenix_state, empty_init,           ROT90, "bootleg",                                "Pleiads (bootleg set 1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadce,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "Tehkan (Centuri license)",               "Pleiads (Centuri)",                                          MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadsgmp, pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (GMP Games)",                    "Pleiads (GMP Games)",                                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadsi,   pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Irecsa)",                       "Pleiads (Irecsa, set 1)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, pleiadsia,  pleiads, pleiads,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Irecsa)",                       "Pleiads (Irecsa, set 2)",                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadsn,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Niemer S.A.)",                  "Pleiads (Niemer S.A.)",                                      MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, pleiadsgmp, pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (GMP Games)",                    "Pleiads (GMP Games)",                                        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, pleiadss,   pleiads, phoenix,  pleiadce, phoenix_state, empty_init,           ROT90, "bootleg (Famaresa)",                     "Pleiads (Famaresa, Spanish bootleg)",                        MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
 GAME( 1981, cityatta,   pleiads, pleiads,  cityatta, phoenix_state, empty_init,           ROT90, "bootleg (Petaco S.A.)",                  "City Attack (Petaco S.A., bootleg of Pleiads)",              MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE ) // Colors are bad, as seen on the screenshot from https://www.recreativas.org/city-attack-454-petaco
 GAME( 1981, capitol,    pleiads, phoenix,  capitol,  phoenix_state, empty_init,           ROT90, "bootleg? (Universal Video Spiel)",       "Capitol",                                                    MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-  /*** Others ***/
+/*** Others ***/
 GAME( 1982, survival,   0,       survival, survival, phoenix_state, empty_init,           ROT90, "Rock-Ola",                               "Survival",                                                   MACHINE_SUPPORTS_SAVE ) // colors match PCB

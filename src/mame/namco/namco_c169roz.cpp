@@ -138,7 +138,7 @@ void namco_c169roz_device::unpack_params(const uint16_t *source, roz_parameters 
 	params.incyy <<= 8;
 }
 
-void namco_c169roz_device::draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params)
+void namco_c169roz_device::draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params, uint8_t prival, uint8_t primask)
 {
 	if (!m_is_namcofl)
 //  if (m_gametype != NAMCOFL_FINAL_LAP_R) // Fix speedrcr some title animations, but broke at road scene
@@ -156,16 +156,21 @@ void namco_c169roz_device::draw_helper(screen_device &screen, bitmap_ind16 &bitm
 			uint32_t cx = startx;
 			uint32_t cy = starty;
 			uint16_t *dest = &bitmap.pix(sy, sx);
+			uint8_t *destpri = &screen.priority().pix(sy, sx);
 			while (x <= clip.max_x)
 			{ // TODO : Wraparound disable isn't implemented
 				const uint32_t xpos = (((cx >> 16) & size_mask) + params.left) & 0xfff;
 				const uint32_t ypos = (((cy >> 16) & size_mask) + params.top) & 0xfff;
 				if (flagsbitmap.pix(ypos, xpos) & TILEMAP_PIXEL_LAYER0)
+				{
 					*dest = srcbitmap.pix(ypos, xpos) + params.color + m_color_base;
+					*destpri = (*destpri & primask) | prival;
+				}
 				cx += params.incxx;
 				cy += params.incxy;
 				x++;
 				dest++;
+				destpri++;
 			}
 			startx += params.incyx;
 			starty += params.incyy;
@@ -182,11 +187,11 @@ void namco_c169roz_device::draw_helper(screen_device &screen, bitmap_ind16 &bitm
 			params.startx, params.starty,
 			params.incxx, params.incxy,
 			params.incyx, params.incyy,
-			params.wrap,0,0); // wrap, flags, pri
+			params.wrap, 0, prival, primask); // wrap, flags, pri
 	}
 }
 
-void namco_c169roz_device::draw_scanline(screen_device &screen, bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect)
+void namco_c169roz_device::draw_scanline(screen_device &screen, bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect, uint8_t prival, uint8_t primask)
 {
 	if (line >= cliprect.min_y && line <= cliprect.max_y)
 	{
@@ -205,13 +210,13 @@ void namco_c169roz_device::draw_scanline(screen_device &screen, bitmap_ind16 &bi
 			{
 				rectangle clip(0, bitmap.width() - 1, line, line);
 				clip &= cliprect;
-				draw_helper(screen, bitmap, *m_tilemap[which], clip, params);
+				draw_helper(screen, bitmap, *m_tilemap[which], clip, params, prival, primask);
 			}
 		}
 	}
 }
 
-void namco_c169roz_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri)
+void namco_c169roz_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, uint8_t prival, uint8_t primask)
 {
 	const int special = (m_is_namcofl) ? 0 : 1;
 	const int mode = m_control[0]; // 0x8000 or 0x1000
@@ -228,14 +233,14 @@ void namco_c169roz_device::draw(screen_device &screen, bitmap_ind16 &bitmap, con
 			if (which == special && mode == 0x8000)
 			{
 				for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
-					draw_scanline(screen, bitmap, line, which, pri, cliprect);
+					draw_scanline(screen, bitmap, line, which, pri, cliprect, prival, primask);
 			}
 			else
 			{
 				roz_parameters params;
 				unpack_params(source, params);
 				if (params.priority == pri)
-					draw_helper(screen, bitmap, *m_tilemap[which], cliprect, params);
+					draw_helper(screen, bitmap, *m_tilemap[which], cliprect, params, prival, primask);
 			}
 		}
 	}

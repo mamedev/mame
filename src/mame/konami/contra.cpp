@@ -205,10 +205,10 @@ private:
 	template <uint8_t Which> void vram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void cram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void flipscreen_w(int state);
-	template <uint8_t Which> void dirtytiles();
 
 	template <uint8_t Which> void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void sprite_callback(int &code, int &color, int colbank);
 
 	void bankswitch_w(uint8_t data);
 	void sh_irqtrigger_w(uint8_t data);
@@ -321,15 +321,18 @@ TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
 
 void contra_state::video_start()
 {
-	m_k007121[0]->set_spriteram(m_spriteram[0]);
-	m_k007121[1]->set_spriteram(m_spriteram[1]);
-
 	m_tilemap[0] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap[1] = &machine().tilemap().create(*m_k007121[1], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_tilemap[2] = &machine().tilemap().create(*m_k007121[0], tilemap_get_info_delegate(*this, FUNC(contra_state::get_tx_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_tilemap[0]->set_transparent_pen(0);
 	m_tilemap[2]->set_transparent_pen(0);
+
+	m_k007121[0]->register_tilemap(m_tilemap[0]);
+	m_k007121[1]->register_tilemap(m_tilemap[1]);
+	m_k007121[0]->register_tilemap(m_tilemap[2]);
+	m_k007121[0]->set_spriteram(m_spriteram[0]);
+	m_k007121[1]->set_spriteram(m_spriteram[1]);
 }
 
 
@@ -359,14 +362,6 @@ void contra_state::flipscreen_w(int state)
 	m_tilemap[Which]->set_flip(state ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 }
 
-template <uint8_t Which>
-void contra_state::dirtytiles()
-{
-	m_tilemap[Which]->mark_all_dirty();
-	if (Which == 0)
-		m_tilemap[2]->mark_all_dirty();
-}
-
 
 /***************************************************************************
 
@@ -374,13 +369,15 @@ void contra_state::dirtytiles()
 
 ***************************************************************************/
 
+void contra_state::sprite_callback(int &code, int &color, int colbank)
+{
+	color += colbank;
+}
+
 template <uint8_t Which>
 void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap)
 {
-	int base_color = (m_k007121[Which]->ctrl_r(6) & 0x30) * 2;
-	int global_x_offset = m_k007121[Which]->flipscreen() ? 16 : 40;
-
-	m_k007121[Which]->sprites_draw(bitmap, cliprect, base_color, global_x_offset, 0, priority_bitmap, (uint32_t)-1);
+	m_k007121[Which]->sprites_draw(bitmap, cliprect, priority_bitmap, (uint32_t)-1);
 }
 
 uint32_t contra_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -616,14 +613,16 @@ void contra_state::contra(machine_config &config)
 	m_palette->set_endianness(ENDIANNESS_LITTLE);
 
 	K007121(config, m_k007121[0], 0, gfx_contra_1, m_palette, m_screen);
+	m_k007121[0]->set_sprite_offsets(40, 16);
 	m_k007121[0]->set_irq_cb().set_inputline(m_maincpu, HD6309_IRQ_LINE);
 	m_k007121[0]->set_flipscreen_cb().set(FUNC(contra_state::flipscreen_w<0>));
 	m_k007121[0]->set_flipscreen_cb().append(FUNC(contra_state::flipscreen_w<2>));
-	m_k007121[0]->set_dirtytiles_cb(FUNC(contra_state::dirtytiles<0>));
+	m_k007121[0]->set_sprite_callback(FUNC(contra_state::sprite_callback));
 
 	K007121(config, m_k007121[1], 0, gfx_contra_2, m_palette, m_screen);
+	m_k007121[1]->set_sprite_offsets(40, 16);
 	m_k007121[1]->set_flipscreen_cb().set(FUNC(contra_state::flipscreen_w<1>));
-	m_k007121[1]->set_dirtytiles_cb(FUNC(contra_state::dirtytiles<1>));
+	m_k007121[1]->set_sprite_callback(FUNC(contra_state::sprite_callback));
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -901,7 +900,6 @@ ROM_START( contrabj )
 	ROM_LOAD( "a13.14p",     0x60000, 0x10000, CRC(2b513d12) SHA1(152ebd849751cc2e95513134ce773a6b2eeb320e) )
 	// This last section, 0x70000-0x7ffff is empty
 
-
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    // 007121 #0 sprite lookup table
 	ROM_LOAD( "633e09.12g",   0x0100, 0x0100, CRC(14ca5e19) SHA1(eeee2f8b3d1e4acf47de1e74c4e507ff924591e7) )    // 007121 #0 char lookup table
@@ -938,7 +936,6 @@ ROM_START( contrabj1 )
 	ROM_LOAD( "a12.14n",     0x50000, 0x10000, CRC(d0be7ec2) SHA1(5aa829b8ffbe3f5f92ba672b1c24bfb7836ba1a3) )
 	ROM_LOAD( "a13.14p",     0x60000, 0x10000, CRC(2b513d12) SHA1(152ebd849751cc2e95513134ce773a6b2eeb320e) )
 	// This last section, 0x70000-0x7ffff is empty
-
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "633e08.10g",   0x0000, 0x0100, CRC(9f0949fa) SHA1(7c8fefdcae4523d008a7d39062194c7a80aa3500) )    // 007121 #0 sprite lookup table

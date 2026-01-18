@@ -119,8 +119,8 @@ void modena_state::io_w(u8 data)
 	m_io_ctrl = data;
 	update_display();
 
-	// d4: lcd strobe
-	m_display->strobe_w(BIT(data, 4));
+	// d4: lcd common
+	m_display->common_w(BIT(data, 4));
 
 	// d6: speaker out
 	m_dac->write(BIT(data, 6));

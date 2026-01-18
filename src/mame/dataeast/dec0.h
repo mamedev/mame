@@ -6,7 +6,7 @@
 #pragma once
 
 #include "cpu/h6280/h6280.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"

@@ -78,13 +78,18 @@ void specnext_sprites_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	for (auto i = 0; i < m_sprites_cache.size(); i++ )
 	{
-		const u8 x = m_zero_on_top ? i : (m_sprites_cache.size() - 1) - i;
-		const sprite_data &spr = m_sprites_cache[x];
+		const u8 n = m_zero_on_top ? i : (m_sprites_cache.size() - 1) - i;
+		const sprite_data &spr = m_sprites_cache[n];
+
+		s32 destx = m_offset_h + ((spr.x & 0x1ff) << 1);
+		if (destx > (m_offset_h + ((SCREEN_AREA.right() << 1) | 1))) destx -= 512 << 1;
+		s32 desty = m_offset_v + (spr.y & 0x1ff);
+		if (desty > (m_offset_v + SCREEN_AREA.bottom())) desty -= 512;
 
 		gfx((spr.rotate << 1) | spr.h)->prio_zoom_transpen(bitmap, clipped
 			, spr.pattern >> (1 - spr.h), spr.paloff
 			, spr.xmirror, spr.ymirror
-			, ((spr.x & 0x1ff) << 1) + m_offset_h, (spr.y & 0x1ff) + m_offset_v
+			, destx, desty
 			, 0x20000 << spr.xscale, 0x10000 << spr.yscale
 			, screen.priority(), pmask
 			, m_transp_colour & (spr.h ? 0x0f : 0xff));
@@ -154,22 +159,23 @@ void specnext_sprites_device::update_sprites_cache()
 				anchor_pattern = anchor->pattern;
 			}
 
-			bool y8 = BIT(sprite_attr[3], 6) ? BIT(spr_cur_attr[4], 0) : 0;
-			spr_cur.y = (y8 << 8) | spr_cur_attr[1];
+			const u8 attr_ext = BIT(sprite_attr[3], 6) ? spr_cur_attr[4] : 0x00;
+
+			spr_cur.y = (BIT(attr_ext, 0) << 8) | spr_cur_attr[1];
 			spr_cur.x = (BIT(spr_cur_attr[2], 0) << 8) | spr_cur_attr[0];
 			spr_cur.rotate = BIT(spr_cur_attr[2], 1);
 			spr_cur.ymirror = BIT(spr_cur_attr[2], 2);
 			spr_cur.xmirror = BIT(spr_cur_attr[2], 3);
 			spr_cur.paloff = BIT(spr_cur_attr[2], 4, 4);
 
-			spr_cur.h = BIT(spr_cur_attr[4], 7) && BIT(sprite_attr[3], 6);
-			bool spr_cur_n6 = BIT(spr_cur_attr[4], 6) && spr_cur.h;
+			spr_cur.h = BIT(attr_ext, 7) && BIT(sprite_attr[3], 6);
+			bool spr_cur_n6 = BIT(attr_ext, 6) && spr_cur.h;
 			spr_cur.pattern = (BIT(spr_cur_attr[3], 0, TOTAL_PATTERN_BITS) << 1) | spr_cur_n6;
 			if (spr_relative && BIT(sprite_attr[4], 0))
 				spr_cur.pattern = (spr_cur.pattern + anchor_pattern) & 0x7f;
 
-			spr_cur.yscale = BIT(spr_cur_attr[4], 1, 2);
-			spr_cur.xscale = BIT(spr_cur_attr[4], 3, 2);
+			spr_cur.yscale = BIT(attr_ext, 1, 2);
+			spr_cur.xscale = BIT(attr_ext, 3, 2);
 			spr_cur.rel_type = BIT(sprite_attr[4], 5) && BIT(sprite_attr[3], 6);
 
 			m_sprites_cache.push_back(spr_cur);
@@ -196,6 +202,60 @@ void specnext_sprites_device::update_config()
 		m_clip_window = rectangle { m_clip_x1 << 1, (m_clip_x2 << 1) | 1, m_clip_y1, m_clip_y2 };
 	m_clip_window.setx(m_clip_window.left() << 1, (m_clip_window.right() << 1) | 1);
 	m_clip_window.offset(m_offset_h, m_offset_v);
+}
+
+u8 specnext_sprites_device::status_r()
+{
+	if (m_sprites_cache.empty()) update_sprites_cache();
+
+	bool max_sprites = 0; // TODO line reached max count allowed
+	bool collision = 0;
+	for (auto s1 = begin(m_sprites_cache); !collision && s1 != end(m_sprites_cache); ++s1)
+	{
+		const u8 t_pen1 = m_transp_colour & (s1->h ? 0x0f : 0xff);
+		const u16 x1 = s1->x & 0x1ff;
+		const u16 y1 = s1->y & 0x1ff;
+		const rectangle rec1 = {
+			x1, x1 + (16 << ((s1->rotate & 1) ? s1->yscale : s1->xscale)) - 1,
+			y1, y1 + (16 << ((s1->rotate & 1) ? s1->xscale : s1->yscale)) - 1
+		};
+		for (auto s2 = s1 + 1; !collision && s2 != end(m_sprites_cache); ++s2)
+		{
+			const u16 x2 = s2->x & 0x1ff;
+			const u16 y2 = s2->y & 0x1ff;
+			rectangle over = rec1 & rectangle {
+				x2, x2 + (16 << ((s2->rotate & 1) ? s2->yscale : s2->xscale)) - 1,
+				y2, y2 + (16 << ((s2->rotate & 1) ? s2->xscale : s2->yscale)) - 1
+			};
+			if (!over.empty()) // sprites overlapped
+			{
+				const u8 t_pen2 = m_transp_colour & (s2->h ? 0x0f : 0xff);
+				bitmap_ind16 b1 = bitmap_ind16(16 << 3, 1);
+				bitmap_ind16 b2 = bitmap_ind16(16 << 3, 1);
+				for (u16 y = over.top(); y <= over.bottom(); ++y) // draw one line of the time in the overlap area
+				{
+					gfx((s1->rotate << 1) | s1->h)->zoom_opaque(b1, { 0, over.width() - 1, 0, 0 }
+						, s1->pattern >> (1 - s1->h), 0
+						, s1->xmirror, s1->ymirror
+						, x1 - over.left(), y1 - y
+						, 0x10000 << s1->xscale, 0x10000 << s1->yscale);
+					gfx((s2->rotate << 1) | s2->h)->zoom_opaque(b2, { 0, over.width() - 1, 0, 0 }
+						, s2->pattern >> (1 - s2->h), 0
+						, s2->xmirror, s2->ymirror
+						, x2 - over.left(), y2 - y
+						, 0x10000 << s2->xscale, 0x10000 << s2->yscale);
+
+					for (u8 x = 0; !collision && (x < over.width()); ++x)
+						collision = (b1.pix(0, x) & 0xff) != t_pen1 && (b2.pix(0, x) & 0xff) != t_pen2;
+
+					if (collision)
+						break;
+				}
+			}
+		}
+	}
+
+	return (max_sprites << 1) | collision;
 }
 
 void specnext_sprites_device::io_w(offs_t addr, u8 data)
@@ -262,8 +322,7 @@ void specnext_sprites_device::mirror_data_w(u8 mirror_data)
 	}
 	else if (m_mirror_inc)
 	{
-		m_mirror_sprite_q &= ~0xff;
-		m_mirror_sprite_q |= (BIT(m_mirror_sprite_q, 0, TOTAL_SPRITES_BITS) + 1) & 0x7f;
+		m_mirror_sprite_q = (BIT(m_mirror_sprite_q, 0, TOTAL_SPRITES_BITS) + 1) & 0x7f;
 		m_mirror_sprite_q |= m_pattern_index & 0x80;
 		mirror_num_change = 1;
 	}
@@ -284,6 +343,8 @@ void specnext_sprites_device::device_add_mconfig(machine_config &config)
 
 void specnext_sprites_device::device_start()
 {
+	save_item(NAME(m_offset_h));
+	save_item(NAME(m_offset_v));
 	save_item(NAME(m_sprite_palette_select));
 
 	save_item(NAME(m_zero_on_top));

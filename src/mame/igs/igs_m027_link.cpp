@@ -351,7 +351,7 @@ void extension_state::cjsll(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 22_MHz_XTAL / 22, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5);
+	OKIM6295(config, "oki", 22_MHz_XTAL / 22, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void extension_state::mgcs2l(machine_config &config)

@@ -167,7 +167,6 @@ static const uint32_t tile_offset[32*32] = {
  ********************************************/
 void decocass_state::decocass_video_state_save_init()
 {
-	save_item(NAME(m_watchdog_count));
 	save_item(NAME(m_watchdog_flip));
 	save_item(NAME(m_color_missiles));
 	save_item(NAME(m_color_center_bot));
@@ -389,12 +388,14 @@ void decocass_state::decocass_bgvideoram_w(offs_t offset, uint8_t data)
 void decocass_state::decocass_watchdog_count_w(uint8_t data)
 {
 	LOG(1,("decocass_watchdog_count_w: $%02x\n", data));
-	m_watchdog_count = data & 0x0f;
+	m_watchdog->set_vblank_count(m_screen, (data & 0x0f) + 1);
+	m_watchdog->watchdog_reset();
 }
 
 void decocass_state::decocass_watchdog_flip_w(uint8_t data)
 {
 	LOG(1,("decocass_watchdog_flip_w: $%02x\n", data));
+	m_watchdog->watchdog_enable(BIT(data, 3));
 	m_watchdog_flip = data;
 }
 
@@ -521,8 +522,8 @@ void decocass_state::decocass_center_v_shift_w(uint8_t data)
  ********************************************/
 
 void decocass_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect, int color,
-						int sprite_y_adjust, int sprite_y_adjust_flip_screen,
-						uint8_t *sprite_ram, int interleave)
+		int sprite_y_adjust, int sprite_y_adjust_flip_screen,
+		uint8_t *sprite_ram, int interleave)
 {
 	/* Draw the sprites */
 	int offs = 28 * interleave;
@@ -569,8 +570,8 @@ void decocass_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority, c
 
 
 void decocass_state::draw_missiles(bitmap_ind16 &bitmap, bitmap_ind8 &priority, const rectangle &cliprect,
-						int missile_y_adjust, int missile_y_adjust_flip_screen,
-						uint8_t *missile_ram, int interleave)
+		int missile_y_adjust, int missile_y_adjust_flip_screen,
+		uint8_t *missile_ram, int interleave)
 {
 	/* Draw the missiles (16 of them) seemingly with alternating colors
 	 * from the E302 latch (color_missiles) */
@@ -653,17 +654,17 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 		srcbitmap = &m_bg_tilemap_r->pixmap();
 	}
 
-//  printf("m_mode_set %d\n", m_mode_set & 0x3);
+	//printf("m_mode_set %d\n", m_mode_set & 0x3);
 
 	// technically our y drawing probably shouldn't wrap / mask, but simply draw the 128pixel high 'edge' at the requested position
 	//  see note above this funciton
-	for (int y=clip.top(); y<=clip.bottom(); y++)
+	for (int y = clip.top(); y <= clip.bottom(); y++)
 	{
 		int srcline = (y + scrolly) & 0x1ff;
 		uint16_t const *const src = &srcbitmap->pix(srcline);
 		uint16_t *const dst = &bitmap.pix(y);
 
-		for (int x=clip.left(); x<=clip.right(); x++)
+		for (int x = clip.left(); x <= clip.right(); x++)
 		{
 			int srccol = 0;
 
@@ -683,7 +684,6 @@ void decocass_state::draw_edge(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 				dst[x] = pix;
 		}
 	}
-
 }
 
 
@@ -718,19 +718,6 @@ void decocass_state::video_start()
 
 uint32_t decocass_state::screen_update_decocass(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	/* THIS CODE SHOULD NOT BE IN SCREEN UPDATE !! */
-
-	if (0xc0 != (ioport("IN2")->read() & 0xc0))  /* coin slots assert an NMI */
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-
-	if (0 == (m_watchdog_flip & 0x04))
-		m_watchdog->watchdog_reset();
-	else if (m_watchdog_count-- > 0)
-		m_watchdog->watchdog_reset();
-
-	/* (end) THIS CODE SHOULD NOT BE IN SCREEN UPDATE !! */
-
-
 #ifdef MAME_DEBUG
 	{
 		if (machine().input().code_pressed_once(KEYCODE_I))
@@ -749,6 +736,9 @@ uint32_t decocass_state::screen_update_decocass(screen_device &screen, bitmap_in
 				m_center_v_shift);
 	}
 #endif
+
+	// flip screen flag only has effect if cocktail dsw is on
+	flip_screen_set(m_watchdog_flip & BIT(m_dsw[0]->read(), 6));
 
 	bitmap_ind8 &priority = screen.priority();
 	bitmap.fill(8, cliprect);

@@ -212,8 +212,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(scramble_stars_blink_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(timefgtr_scanline);
 	void state_save_register();
-	void sprites_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spritebase);
-	void bullets_draw(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *base);
+	void sprites_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *spritebase);
+	void bullets_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint8_t *base);
 	void stars_init();
 	void stars_update_origin();
 	void stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint32_t star_offs, uint8_t starmask);
@@ -337,7 +337,6 @@ protected:
 	void set_num_spritegens(int num) { m_numspritegens = num; }
 	void set_x_scale(uint8_t scale) { m_x_scale = scale; }
 	void set_h0_start(uint8_t start) { m_h0_start = start; }
-	void set_left_sprite_clip(uint8_t clip) { m_leftspriteclip = clip; }
 
 	void amigo2_map(address_map &map) ATTR_COLD;
 	void anteaterg_map(address_map &map) ATTR_COLD;
@@ -403,10 +402,10 @@ protected:
 	virtual void machine_start() override
 	{
 		m_lamps.resolve();
-
 		m_irq_enabled = 0;
 	}
 	virtual void video_start() override ATTR_COLD;
+	virtual void sprites_clip(screen_device &screen, rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -459,7 +458,6 @@ protected:
 	uint8_t m_stars_blink_state = 0;
 	rgb_t m_bullet_color[8];
 	uint8_t m_gfxbank[5]{};
-	uint8_t m_leftspriteclip = 16;
 };
 
 
@@ -643,6 +641,9 @@ public:
 
 	void namenayo(machine_config &config) ATTR_COLD;
 	void init_namenayo() ATTR_COLD;
+
+protected:
+	virtual void sprites_clip(screen_device &screen, rectangle &cliprect) override { }
 
 private:
 	void namenayo_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect);

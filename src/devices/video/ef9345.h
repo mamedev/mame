@@ -40,10 +40,20 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-
 	enum class EF9345_MODE {
 		TYPE_EF9345    = 0x001,
 		TYPE_TS9347    = 0x002
+	};
+
+	enum class char_mode_t : uint8_t {
+		// 40 column modes:
+		MODE24x40, // long codes
+		MODEVAR40, // variable codes
+		MODE16x40, // short codes
+
+		// 80 column modes:
+		MODE8x80,  // long codes
+		MODE12x80, // variable codes
 	};
 
 	// pass-through constructor
@@ -56,47 +66,65 @@ protected:
 	// device_config_memory_interface overrides
 	virtual space_config_vector memory_space_config() const override;
 
-	// address space configurations
-	const address_space_config      m_space_config;
-
 	// inline helpers
-	inline uint16_t indexram(uint8_t r);
-	inline uint16_t indexrom(uint8_t r);
-	inline void inc_x(uint8_t r);
-	inline void inc_y(uint8_t r);
+	uint16_t indexram(uint8_t r);
+	void inc_x(uint8_t r);
+	void inc_y(uint8_t r);
 
 	TIMER_CALLBACK_MEMBER(clear_busy_flag);
 	TIMER_CALLBACK_MEMBER(blink_tick);
 
-private:
 	void set_busy_flag(int period);
-	void draw_char_40(uint8_t *c, uint16_t x, uint16_t y);
-	void draw_char_80(uint8_t *c, uint16_t x, uint16_t y);
-	void set_video_mode(void);
-	void init_accented_chars(void);
+	void set_video_mode();
+	void init_accented_chars();
 	uint8_t read_char(uint8_t index, uint16_t addr);
 	uint8_t get_dial(uint8_t x, uint8_t attrib);
 	void zoom(uint8_t *pix, uint16_t n);
 	uint16_t indexblock(uint16_t x, uint16_t y);
 	std::tuple<uint8_t, uint8_t, bool> makecolors(uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool cursor);
-	void bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool underline);
-	void quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, uint16_t y);
-	void bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, bool cursor);
+
+	virtual char_mode_t parse_video_mode() const;
+
+	// Computes the index of the memory row containing data for the y-th
+	// screen row.
+	virtual uint16_t indexrow(uint16_t y);
+
+	// Dispatch rendering of character (x, y) to one of the specialized
+	// drawing functions (bichrome40/quadrichrome40/bichrome80).
 	void makechar(uint16_t x, uint16_t y);
-	void draw_border(uint16_t line);
 	void makechar_16x40(uint16_t x, uint16_t y);
 	void makechar_24x40(uint16_t x, uint16_t y);
 	void makechar_12x80(uint16_t x, uint16_t y);
+
+	// Call draw_char_40/80 to draw the given character ** at (x + 1, y + 1) **.
+	// Why at (x + 1, y + 1) and not just at (x, y)? Because we need to leave
+	// some blank space at the top and at the left of the text area for the
+	// margin.
+	void bichrome40(uint8_t type, uint16_t address, uint8_t dial, uint16_t iblock, uint16_t x, uint16_t y, uint8_t c0, uint8_t c1, bool insert, bool flash, bool conceal, bool negative, bool underline);
+	void quadrichrome40(uint8_t c, uint8_t b, uint8_t a, uint16_t x, uint16_t y);
+	void bichrome80(uint8_t c, uint8_t a, uint16_t x, uint16_t y, bool cursor);
+
+	void draw_char_40(uint8_t *c, uint16_t x, uint16_t y);
+	void draw_char_80(uint8_t *c, uint16_t x, uint16_t y);
+	void draw_border(uint16_t line);
+
 	void ef9345_exec(uint8_t cmd);
 
 	void ef9345(address_map &map) ATTR_COLD;
 
-	// internal state
+	// address space configurations
+	const address_space_config m_space_config;
+
+	required_device<palette_device> m_palette;
+
 	required_region_ptr<uint8_t> m_charset;
 	address_space *m_videoram;
 
+	const EF9345_MODE m_variant;
+
+	// internal state
 	uint8_t m_bf;                             //busy flag
-	uint8_t m_char_mode;                      //40 or 80 chars for line
+	char_mode_t m_char_mode;                  //40 or 80 chars for line
 	uint8_t m_acc_char[0x2000];               //accented chars
 	uint8_t m_registers[8];                   //registers R0-R7
 	uint8_t m_state;                          //status register
@@ -116,19 +144,19 @@ private:
 	// timers
 	emu_timer *m_busy_timer;
 	emu_timer *m_blink_timer;
-
-	const EF9345_MODE m_variant;
-
-	required_device<palette_device> m_palette;
 };
 
 class ts9347_device : public ef9345_device
 {
 public:
 	ts9347_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual char_mode_t parse_video_mode() const override;
+	virtual uint16_t indexrow(uint16_t y) override;
 };
 
-// device type definition
+// device type declarations
 DECLARE_DEVICE_TYPE(EF9345, ef9345_device)
 DECLARE_DEVICE_TYPE(TS9347, ts9347_device)
 

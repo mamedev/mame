@@ -6,6 +6,72 @@ license:CC0-1.0
 
 <softwarelist name="pc100_flop" description="NEC PC-100 disk images">
 
+<!-- !Operating Systems -->
+
+	<software name="msdos201" supported="no">
+		<description>MS-DOS v2.01</description>
+		<year>1983</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="380848">
+				<rom name="ms-dos 2.01.d88" size="380848" crc="f0f84c22" sha1="b4f220c274504cfd0db3305a7fafaf16b326e97d"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n100bas" supported="no">
+		<description>N-100 Basic (Ver 1.0)</description>
+		<year>1983</year>
+		<publisher>Microsoft / NEC</publisher>
+		<notes><![CDATA[
+LODERUN.EXE: Doesn't clear title layer on demonstration text, easy to get stuck keys with [keyboard]
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="389952">
+				<rom name="n100-basic.d88" size="389952" crc="dd09c5f3" sha1="d86c175e375a8a62826f19e2e886662023823e48"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n100bas2" cloneof="n100bas" supported="no">
+		<description>N-100 Basic (Ver 1.0, alt)</description>
+		<year>1983</year>
+		<publisher>Microsoft / NEC</publisher>
+		<notes><![CDATA[
+Has more .bas files compared to n100bas
+LODERUN.EXE: (same as n100bas)
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="385200">
+				<rom name="n100-basic_2.d88" size="385200" crc="9e8aefe2" sha1="b001c31c73a97db98a4c7a56012ec07f0f8424c2"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Applications -->
+
+	<software name="dynapix" supported="no">
+		<description>Dynapix</description>
+		<year>1984</year>
+		<publisher>Dynaware</publisher>
+		<notes><![CDATA[
+Fails gathering data from disk B at startup
+Glitchy chars during loading countdown
+Seems to require a [mouse]
+]]></notes>
+		<info name="usage" value="Requires monitor in Tate position"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="380848">
+				<rom name="pc100-dyna-pix_system.d88" size="380848" crc="b8752f62" sha1="57f74c32773ba8e411bc84a94f18bd3fb464cbe5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="380848">
+				<rom name="pc100-dyna-pix_data.d88" size="380848" crc="97c0fb4d" sha1="f455149ecd63b31642e57a52c2cd97883470e649"/>
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Inufuto -->
 
 	<software name="aerial" supported="no">

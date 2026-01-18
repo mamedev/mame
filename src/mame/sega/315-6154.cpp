@@ -17,13 +17,13 @@
 
     registers:
      00   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx bridge ID, 0 = main, otherwise slave
-     04   ---M---- -------- ---Dssss ssmmmmmm m - main bridge bus errors, s - same for slave, D - DMA done status (all prev bits cleared by writing 1), M - presumable DMA done interrupt mask
-     10   33333333 22222222 11111111 00000000 Aperture 0 page 0,1,2,3 addresses(*)
-     14   33333333 22222222 11111111 00000000 Aperture 1 page 0,1,2,3 addresses(*)
-     18   33333333 22222222 11111111 00000000 Aperture 2 page 0,1,2,3 addresses(*)
+     04   ---M---- -------- ---Dmmmm mmssssss s/m - slave/main bridge bus errors, D - DMA done status (all prev bits cleared by writing 1), M - presumable DMA done interrupt mask
+     10   33333333 22222222 11111111 00000000 Aperture 0 page 0/1/2/3 addresses(*)
+     14   33333333 22222222 11111111 00000000 Aperture 1 page 0/1/2/3 addresses(*)
+     18   33333333 22222222 11111111 00000000 Aperture 2 page 0/1/2/3 addresses(*)
      1C   -------- -------3 2222---- ------10 0/1 - switch aperture 0/1 to PCI Config space access mode, 2 - unknown (may be writen by DIMM), 3 - unknown always 1
      20   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx unknown configuration-related, always 0x00fe00fe
-     24   hhhhgggg ffffeeee ddddcccc bbbbaaaa pages config, e - aperture 2 page 2, f - aperture 2 page 3, g/h - DMA source/destination(**)
+     24   hhhhgggg ffffeeee ddddcccc bbbbaaaa pages config(**), e - aperture 2 page 2, f - aperture 2 page 3, g/h - DMA source/destination, other is unknown
      28   -------- -------- -------- -------x unknown, 1 writen by DIMM firmware
      30   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx DMA source address(*)
      34   xxxxxxxx xxxxxxxx xxxxxxxx xxxxxxxx DMA destination address(*)
@@ -141,7 +141,6 @@ void sega_315_6154_device::registers_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	if (offset == 0x04 / 4)
 	{
-		// status register, bits 0-11 - slave/master bus errors, bit 12 - DMA done, upper 16 bits seems interrupt mask
 		m_registers[1] &= ~(data & mem_mask & 0xffff);
 		mem_mask &= 0xffff0000;
 		COMBINE_DATA(m_registers + 1);

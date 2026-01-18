@@ -487,6 +487,7 @@ bool menu_analog::handle(event const *ev)
 	{
 		item_data &data(*reinterpret_cast<item_data *>(ev->itemref));
 		int newval(data.cur);
+		bool const alt_pressed = machine().input().code_pressed(KEYCODE_LALT) || machine().input().code_pressed(KEYCODE_RALT);
 		bool const ctrl_pressed = machine().input().code_pressed(KEYCODE_LCONTROL) || machine().input().code_pressed(KEYCODE_RCONTROL);
 
 		switch (ev->iptkey)
@@ -504,12 +505,12 @@ bool menu_analog::handle(event const *ev)
 
 		// left decrements
 		case IPT_UI_LEFT:
-			newval -= ctrl_pressed ? 10 : 1;
+			newval -= alt_pressed ? 100 : ctrl_pressed ? 10 : 1;
 			break;
 
 		// right increments
 		case IPT_UI_RIGHT:
-			newval += ctrl_pressed ? 10 : 1;
+			newval += alt_pressed ? 100 : ctrl_pressed ? 10 : 1;
 			break;
 
 		// move to first item for previous device

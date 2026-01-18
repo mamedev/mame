@@ -380,7 +380,7 @@ private:
 	DECLARE_MACHINE_RESET(model3_21);
 	TIMER_CALLBACK_MEMBER(model3_sound_timer_tick);
 	TIMER_CALLBACK_MEMBER(real3d_dma_timer_callback);
-	TIMER_CALLBACK_MEMBER(model3_scan_timer_tick);
+	TIMER_CALLBACK_MEMBER(scan_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
 	void scsp_irq(offs_t offset, uint8_t data);

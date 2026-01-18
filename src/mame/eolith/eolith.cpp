@@ -104,8 +104,8 @@
 #include "eolith_speedup.h"
 
 #include "cpu/e132xs/e132xs.h"
-#include "cpu/mcs51/mcs51.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "sound/qs1000.h"
@@ -160,7 +160,7 @@ private:
 
 	uint32_t screen_update_eolith(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void sound_io_map(address_map &map) ATTR_COLD;
+	void sound_data_map(address_map &map) ATTR_COLD;
 	void sound_prg_map(address_map &map) ATTR_COLD;
 
 	void patch_mcu_protection(uint32_t address) ATTR_COLD;
@@ -407,7 +407,7 @@ void eolith_state::sound_prg_map(address_map &map)
 	map(0x0000, 0x7fff).rom();
 }
 
-void eolith_state::sound_io_map(address_map &map)
+void eolith_state::sound_data_map(address_map &map)
 {
 	map(0x0000, 0x7fff).bankr("sound_bank");
 	map(0x8000, 0x8000).r("soundlatch", FUNC(generic_latch_8_device::read));
@@ -698,7 +698,7 @@ void eolith_state::eolith45(machine_config &config)
 	/* Sound CPU */
 	I8032(config, m_soundcpu, XTAL(12'000'000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &eolith_state::sound_prg_map);
-	m_soundcpu->set_addrmap(AS_IO, &eolith_state::sound_io_map);
+	m_soundcpu->set_addrmap(AS_DATA, &eolith_state::sound_data_map);
 	m_soundcpu->port_out_cb<1>().set(FUNC(eolith_state::sound_p1_w));
 	m_soundcpu->port_out_cb<3>().set(FUNC(eolith_state::sound_p3_w));
 	config.set_perfect_quantum(m_soundcpu); // HACK: ensure serial sync between Sound CPU and QS1000

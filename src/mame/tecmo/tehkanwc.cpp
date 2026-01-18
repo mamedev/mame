@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Roberto Fresca
+// copyright-holders: Ernesto Corvi, Roberto Fresca
+
 /***************************************************************************
 
 Tehkan World Cup - (c) Tehkan 1985
@@ -116,8 +117,8 @@ public:
 		m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void tehkanwcb(machine_config &config);
-	void tehkanwc(machine_config &config);
+	void tehkanwcb(machine_config &config) ATTR_COLD;
+	void tehkanwc(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -1077,6 +1078,35 @@ ROM_START( gridiron )
 	ROM_LOAD( "gfight6.bin",  0x0000, 0x4000, CRC(d05d463d) SHA1(30f2bce0ad75c4a7d8344cff16bce27f5e3a3f5d) )
 ROM_END
 
+ROM_START( aafootb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.3a", 0x0000, 0x4000, CRC(ef88d54b) SHA1(ed8e279226fc044803655469b51420ac46c6e15b) )
+	ROM_LOAD( "2.3b", 0x4000, 0x4000, CRC(80c72ab4) SHA1(4a659d9c731190a9b3d6443f808507ea3fda9d93) )
+	ROM_LOAD( "3.3c", 0x8000, 0x4000, CRC(e19b8779) SHA1(15b3431830825c55a5831c1ecab89d53e67c9d92) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "4.9c", 0x0000, 0x8000, CRC(e4d6522e) SHA1(2df28374f3c067f28c90a42586be18806949a22d) ) // 1xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "6.9p", 0x0000, 0x4000, CRC(92ca3c07) SHA1(580077ca8cf01996b29497187e41a54242de7f50) )
+
+	ROM_REGION( 0x4000, "gfx1", 0 )
+	ROM_LOAD( "10.8t", 0x0000, 0x4000, CRC(04390cca) SHA1(ff010c0c18ddd1f793b581f0a70bc1b98ef7d21d) )   /* fg tiles */
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "8.5h", 0x0000, 0x8000, CRC(39d6f81e) SHA1(70095b5e5c96a4b03f14a79a4624abc89bf2ffe6) )   /* sprites */
+	ROM_LOAD( "7.5d", 0x8000, 0x4000, CRC(9afaed21) SHA1(d66840990c903660a67fae487709de1b8d71ffdd) )
+	ROM_IGNORE(               0x4000 ) // 1xxxxxxxxxxxxxx = 0xFF
+	/* 0c000-0ffff empty */
+
+	ROM_REGION( 0x10000, "gfx3", 0 )
+	ROM_LOAD( "9.8m", 0x0000, 0x8000, CRC(7f62eafa) SHA1(4d66fd90df45d761f93819748ce233aff56d62a1) )   /* bg tiles */
+	/* 08000-0ffff empty */
+
+	ROM_REGION( 0x8000, "adpcm", 0 )    /* ADPCM samples */
+	ROM_LOAD( "5.4p", 0x0000, 0x4000, CRC(d05d463d) SHA1(30f2bce0ad75c4a7d8344cff16bce27f5e3a3f5d) )
+ROM_END
+
 ROM_START( teedoff )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1_m5m27c128_dip28.4a",  0x0000, 0x4000, CRC(0e18f6ee) SHA1(7e78b97ca343b6bdc7ee24e99063fbe9bc86e7a2) )
@@ -1134,13 +1164,14 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
-GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tehkanwch, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "hack",    "Tehkan World Cup (1986 year hack)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwc,  0,        tehkanwc, tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 1)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcb, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 2, bootleg?)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tehkanwcc, tehkanwc, tehkanwcb,tehkanwc, tehkanwc_state, empty_init,   ROT0,  "bootleg", "Tehkan World Cup (set 3, bootleg)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // aka 'World Cup 85', different inputs?
+GAME( 1985, tehkanwcd, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Tehkan World Cup (set 4, earlier)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tehkanwch, tehkanwc, tehkanwc, tehkanwcd,tehkanwc_state, empty_init,   ROT0,  "hack",    "Tehkan World Cup (1986 year hack)",    MACHINE_SUPPORTS_SAVE )
 
-GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight",                     MACHINE_SUPPORTS_SAVE, layout_gridiron )
+GAMEL(1985, gridiron,  0,        tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tehkan",  "Gridiron Fight (World)",               MACHINE_SUPPORTS_SAVE, layout_gridiron )
+GAMEL(1987, aafootb,   gridiron, tehkanwc, gridiron, tehkanwc_state, empty_init,   ROT0,  "Tecmo",   "All American Football (Tecmo, Japan)", MACHINE_SUPPORTS_SAVE, layout_gridiron )
 
-GAME( 1987, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (World)",                  MACHINE_SUPPORTS_SAVE ) // found in US, but no region warning
-GAME( 1986, teedoffj,  teedoff,  tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (Japan)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1987, teedoff,   0,        tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (World)",                    MACHINE_SUPPORTS_SAVE ) // found in US, but no region warning
+GAME( 1986, teedoffj,  teedoff,  tehkanwc, teedoff,  tehkanwc_state, empty_init,   ROT90, "Tecmo",   "Tee'd Off (Japan)",                    MACHINE_SUPPORTS_SAVE )

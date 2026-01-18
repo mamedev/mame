@@ -180,8 +180,8 @@ void glasgow_state::control_w(u8 data)
 	// d0: speaker out
 	m_dac->write(BIT(data, 0));
 
-	// d7: lcd strobe
-	m_display->strobe_w(BIT(data, 7));
+	// d7: lcd common
+	m_display->common_w(BIT(data, 7));
 }
 
 u8 glasgow_state::keys_r()

@@ -62,6 +62,7 @@ rtc3430042_device::rtc3430042_device(const machine_config &mconfig, device_type 
 	device_t(mconfig, type, tag, owner, clock),
 	device_rtc_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
+	macseconds_interface(),
 	m_is_big_PRAM(hasBigPRAM),
 	m_time_was_set(false),
 	m_cko_cb(*this)
@@ -146,7 +147,6 @@ TIMER_CALLBACK_MEMBER(rtc3430042_device::half_seconds_tick)
 
 void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	struct tm cur_time, macref;
 	uint32_t seconds;
 
 	if (m_time_was_set)
@@ -156,24 +156,7 @@ void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_
 	}
 	else
 	{
-		cur_time.tm_sec = second;
-		cur_time.tm_min = minute;
-		cur_time.tm_hour = hour;
-		cur_time.tm_mday = day;
-		cur_time.tm_mon = month-1;
-		cur_time.tm_year = year+100;    // assumes post-2000 current system time
-		cur_time.tm_isdst = 0;
-
-		macref.tm_sec = 0;
-		macref.tm_min = 0;
-		macref.tm_hour = 0;
-		macref.tm_mday = 1;
-		macref.tm_mon = 0;
-		macref.tm_year = 4;
-		macref.tm_isdst = 0;
-		uint32_t ref = (uint32_t)mktime(&macref);
-
-		seconds = (uint32_t)((uint32_t)mktime(&cur_time) - ref);
+		seconds = get_seconds(year, month, day, day_of_week, hour, minute, second);
 	}
 
 	LOG("second count 0x%lX\n", (unsigned long) seconds);

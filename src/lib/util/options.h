@@ -131,6 +131,9 @@ public:
 		const std::string &name() const noexcept { return m_names[0]; }
 		virtual const char *value() const noexcept;
 		virtual const char *value_unsubstituted() const noexcept;
+		bool bool_value() const { return int_value() != 0; }
+		int int_value() const;
+		float float_value() const;
 		int priority() const noexcept { return m_priority; }
 		void set_priority(int priority) noexcept { m_priority = priority; }
 		option_type type() const noexcept { return m_type; }
@@ -143,6 +146,8 @@ public:
 		// mutators
 		void copy_from(const entry &that, bool always_override);
 		void set_value(std::string &&newvalue, int priority, bool always_override = false, bool perform_substitutions = false);
+		void set_value(int newvalue, int priority);
+		void set_value(float newvalue, int priority);
 		virtual void set_default_value(std::string &&newvalue);
 		void set_description(const char *description) { m_description = description; }
 		void set_value_changed_handler(std::function<void(const char *)> &&handler) { m_value_changed_handler = std::move(handler); }

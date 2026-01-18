@@ -154,6 +154,7 @@ resulting mess can be seen in the F4 viewer display.
 #include "spec128.h"
 
 #include "bus/spectrum/ay/slot.h"
+#include "bus/spectrum/dma/slot.h"
 #include "cpu/z80/z80.h"
 
 #include "screen.h"
@@ -168,12 +169,11 @@ void spectrum_128_state::video_start()
 {
 	spectrum_state::video_start();
 	m_screen_location = m_ram->pointer() + (5 << 14);
-	m_border4t_render_at = 3;
 }
 
 uint8_t spectrum_128_state::spectrum_128_pre_opcode_fetch_r(offs_t offset)
 {
-	if (is_contended(offset)) content_early();
+	m_ula->m1(offset);
 
 	/* this allows expansion devices to act upon opcode fetches from MEM addresses
 	   for example, interface1 detection fetches requires fetches at 0008 / 0708 to
@@ -200,7 +200,7 @@ u8 spectrum_128_state::spectrum_128_rom_r(offs_t offset)
 template <u8 Bank> void spectrum_128_state::spectrum_128_ram_w(offs_t offset, u8 data)
 {
 	u16 addr = 0x4000 * Bank + offset;
-	if (is_contended(addr)) content_early();
+	m_ula->data_w(addr);
 	if (is_vram_write(addr)) m_screen->update_now();
 
 	((u8*)m_bank_ram[Bank]->base())[offset] = data;
@@ -212,7 +212,7 @@ template void spectrum_128_state::spectrum_128_ram_w<0>(offs_t offset, u8 data);
 template <u8 Bank> u8 spectrum_128_state::spectrum_128_ram_r(offs_t offset)
 {
 	u16 addr = 0x4000 * Bank + offset;
-	if (is_contended(addr)) content_early();
+	m_ula->data_r(addr);
 
 	return ((u8*)m_bank_ram[Bank]->base())[offset];
 }
@@ -223,8 +223,7 @@ template <u8 Bank> u8 spectrum_128_state::spectrum_128_ram_r(offs_t offset)
 //    D5: Disable paging
 void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 {
-	if (is_contended(offset)) content_early();
-	content_early(1);
+	m_ula->ula_w(offset);
 
 	// disable paging?
 	if (m_port_7ffd_data & 0x20) return;
@@ -243,21 +242,18 @@ void spectrum_128_state::spectrum_128_update_memory()
 	m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
 	// select ram at 0x0c000-0x0ffff
 	m_bank_ram[3]->set_entry(m_port_7ffd_data & 0x07);
+	m_ula->bank3_pg_w(m_port_7ffd_data & 0x07);
 
 	m_screen->update_now();
 	if (BIT(m_port_7ffd_data, 3))
-		m_screen_location = m_ram->pointer() + (7<<14);
+		m_screen_location = m_ram->pointer() + (7 << 14);
 	else
-		m_screen_location = m_ram->pointer() + (5<<14);
+		m_screen_location = m_ram->pointer() + (5 << 14);
 }
 
 uint8_t spectrum_128_state::spectrum_port_r(offs_t offset)
 {
-	if (is_contended(offset))
-	{
-		content_early();
-		content_late();
-	}
+	m_ula->io_r(offset);
 
 	// Pass through to expansion device if present
 	if (m_exp->get_card_device())
@@ -352,9 +348,6 @@ void spectrum_128_state::machine_start()
 
 	save_item(NAME(m_port_7ffd_data));
 
-	m_maincpu->space(AS_PROGRAM).specific(m_program);
-	m_maincpu->space(AS_IO).specific(m_io);
-
 	// rom 0 is 128K rom, rom 1 is 48 BASIC
 	memory_region *rom = memregion("maincpu");
 	m_bank_rom[0]->configure_entries(0, 2, rom->base() + 0x10000, 0x4000);
@@ -382,10 +375,13 @@ bool spectrum_128_state::is_vram_write(offs_t offset) {
 		: spectrum_state::is_vram_write(offset);
 }
 
-bool spectrum_128_state::is_contended(offs_t offset) {
-	u8 bank = m_bank_ram[3]->entry();
-	return spectrum_state::is_contended(offset)
-		|| ((offset >= 0xc000 && offset <= 0xffff) && (bank & 1)); // Memory banks 1,3,5 and 7 are contended
+u8 *spectrum_128_state::snow_pattern1_base(u8 i_reg)
+{
+	const bool is_alt_scr_selected = BIT(m_port_7ffd_data, 3);
+	const bool is_alt_scr = i_reg & 0x80;
+	const u8 i_pg = is_alt_scr ? (m_bank_ram[3]->entry() & 0b101) : 5;
+
+	return m_ram->pointer() + ((i_pg | (is_alt_scr_selected << 1)) << 14);
 }
 
 static const gfx_layout spectrum_charlayout =
@@ -418,7 +414,9 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 	m_maincpu->set_io_map(&spectrum_128_state::spectrum_128_io);
 	m_maincpu->set_m1_map(&spectrum_128_state::spectrum_128_fetch);
 	m_maincpu->set_vblank_int("screen", FUNC(spectrum_128_state::spec_interrupt));
-	m_maincpu->nomreq_cb().set(FUNC(spectrum_128_state::spectrum_nomreq));
+	m_maincpu->refresh_cb().set(FUNC(spectrum_128_state::spectrum_refresh_w));
+	m_maincpu->nomreq_cb().set("ula", FUNC(spectrum_ula_device::nomem_rq));
+	m_maincpu->busack_cb().set("dma", FUNC(dma_slot_device::bai_w));
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -429,15 +427,28 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 
 	subdevice<gfxdecode_device>("gfxdecode")->set_info(spec128);
 
+	SPECTRUM_ULA_128K(config.replace(), m_ula);
+	m_ula->set_z80(m_maincpu);
+	m_ula->set_screen(m_screen, get_screen_area());
+
 	// sound hardware
 	AY_SLOT(config, "ay_slot", X1_128_SINCLAIR / 20, default_ay_slot_devices, "ay_ay8912")
-		.add_route(ALL_OUTPUTS, "mono", 0.25);
+		.add_route(ALL_OUTPUTS, "speakers", 0.25);
 
 	// expansion port
 	SPECTRUM_EXPANSION_SLOT(config.replace(), m_exp, spec128_expansion_devices, nullptr);
 	m_exp->irq_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->fb_r_handler().set(FUNC(spectrum_128_state::floating_bus_r));
+
+	dma_slot_device &dma(DMA_SLOT(config.replace(), "dma", X1_128_SINCLAIR / 10, default_dma_slot_devices, nullptr));
+	dma.set_io_space(m_maincpu, AS_IO);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	dma.in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
+	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
+	dma.in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
+	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 
 	// internal ram
 	m_ram->set_default_size("128K");

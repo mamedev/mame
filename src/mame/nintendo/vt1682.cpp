@@ -6252,6 +6252,8 @@ void vt1682_anpncpc_state::anpncpc(machine_config& config)
 	m_io->portf_in().set(FUNC(vt1682_anpncpc_state::iof_i2c_r));
 	m_io->portf_out().set(FUNC(vt1682_anpncpc_state::iof_i2c_w));
 
+	// has a GPBA02A-HL011 I/O extender on the keyboard PCB
+
 	I2C_24C64(config, m_seeprom);
 }
 

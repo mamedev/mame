@@ -5,6 +5,7 @@
 
 #include "gp9001.h"
 #include "toaplan_coincounter.h"
+#include "toaplan_txtilemap.h"
 #include "toaplipt.h"
 
 #include "cpu/m68000/m68000.h"
@@ -14,7 +15,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
 
 //#define TRUXTON2_STEREO       /* Uncomment to hear truxton2 music in stereo */
 
@@ -39,14 +39,11 @@ class truxton2_state : public driver_device
 public:
 	truxton2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_tx_videoram(*this, "tx_videoram")
-		, m_tx_lineselect(*this, "tx_lineselect")
-		, m_tx_linescroll(*this, "tx_linescroll")
 		, m_tx_gfxram(*this, "tx_gfxram")
 		, m_maincpu(*this, "maincpu")
 		, m_vdp(*this, "gp9001")
 		, m_oki(*this, "oki")
-		, m_gfxdecode(*this, "gfxdecode")
+		, m_tx_tilemap(*this, "tx_tilemap")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 	{ }
@@ -57,74 +54,22 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 
 	void screen_vblank(int state);
 	void tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void truxton2_68k_mem(address_map &map) ATTR_COLD;
 
-	void tx_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
-
 private:
-	tilemap_t *m_tx_tilemap = nullptr;    /* Tilemap for extra-text-layer */
-	required_shared_ptr<u16> m_tx_videoram;
-	required_shared_ptr<u16> m_tx_lineselect;
-	required_shared_ptr<u16> m_tx_linescroll;
 	required_shared_ptr<u16> m_tx_gfxram;
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<gp9001vdp_device> m_vdp;
 	required_device<okim6295_device> m_oki;
-	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<toaplan_txtilemap_device> m_tx_tilemap;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	bitmap_ind8 m_custom_priority_bitmap;
 };
-
-/*
- Extra-text RAM format
-
- Truxton 2 (and Fixeight + Raizing games have an extra-text layer)
-
-  Text RAM format      $0000-1FFF (actually its probably $0000-0FFF)
-  ---- --xx xxxx xxxx = Tile number
-  xxxx xx-- ---- ---- = Color (0 - 3Fh) + 40h
-
-  Line select / flip   $0000-01EF (some games go to $01FF (excess?))
-  ---x xxxx xxxx xxxx = Line select for each line
-  x--- ---- ---- ---- = X flip for each line ???
-
-  Line scroll          $0000-01EF (some games go to $01FF (excess?))
-  ---- ---x xxxx xxxx = X scroll for each line
-*/
-
-TILE_GET_INFO_MEMBER(truxton2_state::get_text_tile_info)
-{
-	const u16 attrib = m_tx_videoram[tile_index];
-	const u32 tile_number = attrib & 0x3ff;
-	const u32 color = attrib >> 10;
-	tileinfo.set(0,
-			tile_number,
-			color,
-			0);
-}
-
-void truxton2_state::tx_videoram_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	COMBINE_DATA(&m_tx_videoram[offset]);
-	if (offset < 64*32)
-		m_tx_tilemap->mark_tile_dirty(offset);
-}
-
-void truxton2_state::tx_linescroll_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	/*** Line-Scroll RAM for Text Layer ***/
-	COMBINE_DATA(&m_tx_linescroll[offset]);
-
-	m_tx_tilemap->set_scrollx(offset, m_tx_linescroll[offset]);
-}
 
 
 
@@ -143,31 +88,8 @@ u32 truxton2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	bitmap.fill(0, cliprect);
 	m_custom_priority_bitmap.fill(0, cliprect);
 	m_vdp->render_vdp(bitmap, cliprect);
-	rectangle clip = cliprect;
-
-	/* it seems likely that flipx can be set per line! */
-	/* however, none of the games does it, and emulating it in the */
-	/* MAME tilemap system without being ultra slow would be tricky */
-	m_tx_tilemap->set_flip(m_tx_lineselect[0] & 0x8000 ? 0 : TILEMAP_FLIPX);
-
-	/* line select is used for 'for use in' and '8ing' screen on bbakraid, 'Raizing' logo on batrider */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		clip.min_y = clip.max_y = y;
-		m_tx_tilemap->set_scrolly(0, m_tx_lineselect[y] - y);
-		m_tx_tilemap->draw(screen, bitmap, clip, 0);
-	}
+	m_tx_tilemap->draw_tilemap(screen, bitmap, cliprect);
 	return 0;
-}
-
-void truxton2_state::create_tx_tilemap(int dx, int dx_flipped)
-{
-	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(truxton2_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-
-	m_tx_tilemap->set_scroll_rows(8*32); /* line scrolling */
-	m_tx_tilemap->set_scroll_cols(1);
-	m_tx_tilemap->set_scrolldx(dx, dx_flipped);
-	m_tx_tilemap->set_transparent_pen(0);
 }
 
 void truxton2_state::tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
@@ -176,7 +98,7 @@ void truxton2_state::tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 	if (oldword != data)
 	{
 		COMBINE_DATA(&m_tx_gfxram[offset]);
-		m_gfxdecode->gfx(0)->mark_dirty(offset/32);
+		m_tx_tilemap->gfx(0)->mark_dirty(offset/32);
 	}
 }
 
@@ -185,8 +107,7 @@ void truxton2_state::video_start()
 	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
 	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
 
-	m_gfxdecode->gfx(0)->set_source(reinterpret_cast<u8 *>(m_tx_gfxram.target()));
-	create_tx_tilemap(0x1d5, 0x16a);
+	m_tx_tilemap->gfx(0)->set_source(reinterpret_cast<u8 *>(m_tx_gfxram.target()));
 }
 
 
@@ -277,9 +198,9 @@ void truxton2_state::truxton2_68k_mem(address_map &map)
 	map(0x100000, 0x10ffff).ram();
 	map(0x200000, 0x20000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x300000, 0x300fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x400000, 0x401fff).ram().w(FUNC(truxton2_state::tx_videoram_w)).share(m_tx_videoram);
-	map(0x402000, 0x402fff).ram().share(m_tx_lineselect);
-	map(0x403000, 0x4031ff).ram().w(FUNC(truxton2_state::tx_linescroll_w)).share(m_tx_linescroll);
+	map(0x400000, 0x401fff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::videoram_r), FUNC(toaplan_txtilemap_device::videoram_w));
+	map(0x402000, 0x402fff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::lineselect_r), FUNC(toaplan_txtilemap_device::lineselect_w));
+	map(0x403000, 0x4031ff).rw(m_tx_tilemap, FUNC(toaplan_txtilemap_device::linescroll_r), FUNC(toaplan_txtilemap_device::linescroll_w));
 	map(0x403200, 0x403fff).ram();
 	map(0x500000, 0x50ffff).ram().w(FUNC(truxton2_state::tx_gfxram_w)).share(m_tx_gfxram);
 	map(0x600000, 0x600001).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
@@ -330,12 +251,14 @@ void truxton2_state::truxton2(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(truxton2_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, gp9001vdp_device::VDP_PALETTE_LENGTH);
 
 	GP9001_VDP(config, m_vdp, 27_MHz_XTAL);
 	m_vdp->set_palette(m_palette);
 	m_vdp->vint_out_cb().set_inputline(m_maincpu, M68K_IRQ_2);
+
+	TOAPLAN_TXTILEMAP(config, m_tx_tilemap, 27_MHz_XTAL, m_palette, gfx);
+	m_tx_tilemap->set_offset(0x1d5, 0, 0x16a, 0);
 
 	/* sound hardware */
 #ifdef TRUXTON2_STEREO  // music data is stereo...

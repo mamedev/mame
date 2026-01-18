@@ -12,8 +12,8 @@
 
 #define NORMAL_PLANE_ORDER 4
 
-#define K053246_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
-#define K055673_CB_MEMBER(_name)   void _name(int *code, int *color, int *priority_mask)
+#define K053246_CB_MEMBER(_name)   void _name(int &code, int &color, int &priority_mask)
+#define K055673_CB_MEMBER(_name)   void _name(int &code, int &color, int &priority_mask)
 
 
 /**  Konami 053246 / 053247 / 055673  **/
@@ -51,7 +51,7 @@ class k053247_device : public device_t,
 						public device_gfx_interface
 {
 public:
-	using sprite_delegate = device_delegate<void (int *code, int *color, int *priority_mask)>;
+	using sprite_delegate = device_delegate<void (int &code, int &color, int &priority_mask)>;
 
 	k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -63,8 +63,6 @@ public:
 		m_dx = dx;
 		m_dy = dy;
 	}
-
-	void clear_all();
 
 	u16 k055673_rom_word_r(offs_t offset);
 	u16 k055673_ps_rom_word_r(offs_t offset);
@@ -80,7 +78,7 @@ public:
 	void k053247_sprites_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void k053247_sprites_draw(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	u16 k053247_read_register(offs_t offset);
-	void k053247_set_z_rejection(int zcode); // common to k053246/7
+	void k053247_set_z_rejection(s32 zcode); // common to k053246/7
 	void k053247_get_ram(u16 **ram);
 	int k053247_get_dx(void);
 	int k053247_get_dy(void);
@@ -98,15 +96,15 @@ public:
 
 	u8    m_kx46_regs[8];
 	u16   m_kx47_regs[16];
-	int   m_dx = 0, m_dy = 0;
+	s32   m_dx, m_dy;
 	u8    m_objcha_line;
-	int   m_z_rejection;
+	s32   m_z_rejection;
 
 	sprite_delegate m_k053247_cb;
 
 	required_region_ptr<u8> m_gfxrom;
 	int m_gfx_num;
-	int m_bpp = 0;
+	int m_bpp;
 
 	/* alt implementation - to be collapsed */
 	void zdrawgfxzoom32GP(
@@ -225,10 +223,11 @@ public:
 			oy -= m_dy;
 		}
 
+		// the coordinates given are for the *center* of the sprite
 		ox -= (zoomx * width) >> 13;
 		oy -= (zoomy * height) >> 13;
 
-		if (gx_objzbuf && gx_shdzbuf) /* GX  */
+		if (gx_objzbuf && gx_shdzbuf) // GX
 		{
 			k053247_draw_yxloop_gx(bitmap, cliprect,
 				code,
@@ -242,11 +241,9 @@ public:
 				pri,
 				zcode, alpha, drawmode,
 				gx_objzbuf, gx_shdzbuf,
-				0,nullptr
-				);
-
+				0, nullptr);
 		}
-		else /* non-GX */
+		else // non-GX
 		{
 			u8* whichtable = drawmode_table;
 			if (color == -1)
@@ -285,10 +282,7 @@ public:
 				0,
 				0, 0, 0,
 				nullptr, nullptr,
-				primask,whichtable
-				);
-
-
+				primask,whichtable);
 		}
 	}
 
@@ -314,7 +308,7 @@ public:
 		static const int xoffset[8] = { 0, 1, 4, 5, 16, 17, 20, 21 };
 		static const int yoffset[8] = { 0, 2, 8, 10, 32, 34, 40, 42 };
 		int zw,zh;
-		int  fx, fy, sx, sy;
+		int fx, fy, sx, sy;
 		int tempcode;
 
 		for (int y=0; y<height; y++)
@@ -404,7 +398,7 @@ public:
 								color,
 								fx,fy,
 								sx,sy,
-								(zw << 16) >> 4,(zh << 16) >> 4,
+								zw << 12,zh << 12,
 								screen().priority(),primask,
 								whichtable);
 					}
@@ -428,7 +422,7 @@ public:
 									color,
 									fx,!fy,
 									sx,sy,
-									(zw << 16) >> 4,(zh << 16) >> 4,
+									zw << 12,zh << 12,
 									screen().priority(),primask,
 									whichtable);
 						}

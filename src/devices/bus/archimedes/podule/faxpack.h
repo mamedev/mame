@@ -12,7 +12,7 @@
 #pragma once
 
 #include "slot.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 // device type definition
 DECLARE_DEVICE_TYPE(ARC_FAXPACK, device_archimedes_podule_interface)

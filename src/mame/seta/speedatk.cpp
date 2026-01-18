@@ -13,7 +13,8 @@ TODO:
  - daifugo: Improve IOX device (many hardwired reads);
  - It's possible that there is only one coin chute and not two, needs a real board to know
    more about it.
- - hanaren2, harashi: Everything. They seem to run on similar hardware, similar address maps, etc.
+ - hanaren2, harashi, unkalba: Everything. They seem to run on similar hardware, similar
+   address maps, etc.
 
 How to play:
  - A to D select a card.
@@ -551,7 +552,7 @@ static INPUT_PORTS_START( speedatk )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_10C ) )
 
 	PORT_START("P1_ROW0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -764,6 +765,26 @@ ROM_START( harashi )
 	ROM_LOAD( "tbp24s10.6k",   0x0020, 0x0100, BAD_DUMP CRC(6bd28c7a) SHA1(6840481a9b496cb37a45895b73d3270e49212a3e) )  // lookup table
 ROM_END
 
+// AAA-51 PCB with original Alba sticker
+// NEC D780C-1, LH5164-12, HD46505SP, D8255AC-2, AY-3-8910A, X1-019B and X2-001C, 11 MHz XTAL, 2 banks of 8 switches and 1 bank of 4 switches
+// strangely has Bonanza and Black Jack strings at the end of the program ROM
+ROM_START( unkalba )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "zb002.001.h1", 0x0000, 0x8000, CRC(65eda973) SHA1(493e0a86209bc53157fa061aecd2cff3bb7bb993) ) // M27C256
+
+	ROM_REGION( 0x6000, "gfx1", ROMREGION_ERASE00 )
+	// unused?
+
+	ROM_REGION( 0x4000, "gfx2", 0 )
+	ROM_LOAD( "zb0.004.c7", 0x0000, 0x1000, CRC(bd800379) SHA1(3db8930e2a1cac38169c31566ff000f28c0f8a4a) )
+	ROM_LOAD( "zb0.005.e7", 0x1000, 0x1000, CRC(5526ce20) SHA1(01c4b364ed43824044a14b0d469018dfe14fdd26) )
+	ROM_LOAD( "zb0.006.f7", 0x2000, 0x2000, CRC(4da4cb11) SHA1(101846ff103423f3be8eff4f5493c6e6ee41e8a8) )
+
+	ROM_REGION( 0x40, "proms", 0 )
+	ROM_LOAD( "zb-1", 0x00, 0x20, CRC(6c511ba4) SHA1(a9190b7fc3c4af3a7f9941e49dde3b4b69a05aa1) )
+	ROM_LOAD( "zb-2", 0x20, 0x20, CRC(e2357591) SHA1(197c94dc03e7f4e5873b226ebf11462ab1e59905) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -771,3 +792,4 @@ GAME( 1983, daifugo,  0, daifugo,  daifugo,  speedatk_state, empty_init, ROT90, 
 GAME( 1984, speedatk, 0, speedatk, speedatk, speedatk_state, empty_init, ROT0,  "Seta Kikaku",                                  "Speed Attack! (Japan)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1985, hanaren2, 0, harashi,  speedatk, speedatk_state, empty_init, ROT0,  "K & K Electron",                               "Hana no Ren-Chan II (Japan)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1993, harashi,  0, harashi,  speedatk, speedatk_state, empty_init, ROT0,  "Asahi Bussan",                                 "Hana Arashi (Japan)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1982, unkalba,  0, harashi,  speedatk, speedatk_state, empty_init, ROT90, "Alba",                                         "unknown Alba game",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

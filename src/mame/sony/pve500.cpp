@@ -2,7 +2,7 @@
 // copyright-holders: Felipe Sanches
 /***************************************************************************
 
-  SONY PVE-500 Editing Control Unit
+  Sony PVE-500 Editing Control Unit
   "A/B roll edit controller for professional video editing applications"
 
   Driver by Felipe Correa da Silva Sanches <juca@members.fsf.org>
@@ -472,4 +472,4 @@ ROM_END
 
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT         COMPANY  FULLNAME   FLAGS
-COMP( 1995, pve500, 0,      0,      pve500,  pve500, pve500_state, init_pve500, "SONY",  "PVE-500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1995, pve500, 0,      0,      pve500,  pve500, pve500_state, init_pve500, "Sony",  "PVE-500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS)

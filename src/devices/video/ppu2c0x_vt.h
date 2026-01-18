@@ -34,34 +34,34 @@ public:
 
 	void set_palette_mode(vtxx_pal_mode pmode) { m_pal_mode = pmode; }
 
-	u8 extended_modes_enable_r(offs_t offset);
-	u8 extended_modes2_enable_r(offs_t offset);
-	u8 videobank0_0_r(offs_t offset);
-	u8 videobank0_1_r(offs_t offset);
-	u8 videobank0_2_r(offs_t offset);
-	u8 videobank0_3_r(offs_t offset);
-	u8 videobank0_4_r(offs_t offset);
-	u8 videobank0_5_r(offs_t offset);
-	u8 videobank1_r(offs_t offset);
-	u8 unk_2019_r(offs_t offset);
-	u8 videobank0_extra_r(offs_t offset);
-	u8 unk_201b_r(offs_t offset);
-	u8 gun_x_r(offs_t offset);
-	u8 gun_y_r(offs_t offset);
-	u8 gun2_x_r(offs_t offset);
-	u8 gun2_y_r(offs_t offset);
+	u8 extended_modes_enable_r();
+	u8 extended_modes2_enable_r();
+	u8 videobank0_0_r();
+	u8 videobank0_1_r();
+	u8 videobank0_2_r();
+	u8 videobank0_3_r();
+	u8 videobank0_4_r();
+	u8 videobank0_5_r();
+	u8 videobank1_r();
+	u8 unk_2019_r();
+	u8 videobank0_extra_r();
+	u8 unk_201b_r();
+	u8 gun_x_r();
+	u8 gun_y_r();
+	u8 gun2_x_r();
+	u8 gun2_y_r();
 
-	void extended_modes_enable_w(offs_t offset, u8 data);
-	void extended_modes2_enable_w(offs_t offset, u8 data);
-	void videobank0_0_w(offs_t offset, u8 data);
-	void videobank0_1_w(offs_t offset, u8 data);
-	void videobank0_2_w(offs_t offset, u8 data);
-	void videobank0_3_w(offs_t offset, u8 data);
-	void videobank0_4_w(offs_t offset, u8 data);
-	void videobank0_5_w(offs_t offset, u8 data);
-	void videobank1_w(offs_t offset, u8 data);
-	void gun_reset_w(offs_t offset, u8 data);
-	void videobank0_extra_w(offs_t offset, u8 data);
+	void extended_modes_enable_w(u8 data);
+	void extended_modes2_enable_w(u8 data);
+	void videobank0_0_w(u8 data);
+	void videobank0_1_w(u8 data);
+	void videobank0_2_w(u8 data);
+	void videobank0_3_w(u8 data);
+	void videobank0_4_w(u8 data);
+	void videobank0_5_w(u8 data);
+	void videobank1_w(u8 data);
+	void gun_reset_w(u8 data);
+	void videobank0_extra_w(u8 data);
 
 	virtual u8 palette_read(offs_t offset) override;
 	virtual void palette_write(offs_t offset, u8 data) override;
@@ -98,7 +98,7 @@ protected:
 	virtual void shift_tile_plane_data(u8 &pix) override;
 	virtual void draw_tile_pixel(u8 pix, int color, u32 back_pen, u32 *&dest) override;
 	inline void draw_tile_pixel_inner(u8 pen, u32 *dest);
-	virtual void draw_back_pen(u32* dst, int back_pen) override;
+	virtual void draw_back_pen(u32 *dst, int back_pen) override;
 
 	virtual void read_sprite_plane_data(int address) override;
 	virtual void make_sprite_pixel_data(u8 &pixel_data, bool flipx) override;
@@ -149,12 +149,12 @@ private:
 
 class ppu_vt03pal_device : public ppu_vt03_device {
 public:
-	ppu_vt03pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	ppu_vt03pal_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 class ppu_vt32_device : public ppu_vt03_device {
 public:
-	ppu_vt32_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	ppu_vt32_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	ppu_vt32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	void m_newvid_1b_w(u8 data);
@@ -167,13 +167,13 @@ private:
 
 class ppu_vt32pal_device : public ppu_vt32_device {
 public:
-	ppu_vt32pal_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	ppu_vt32pal_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
 
 class ppu_vt3xx_device : public ppu_vt03_device {
 public:
-	ppu_vt3xx_device(const machine_config& mconfig, const char* tag, device_t* owner, u32 clock);
+	ppu_vt3xx_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	u8 extvidreg_201c_r(offs_t offset);
 	u8 extvidreg_201d_r(offs_t offset);
@@ -195,23 +195,23 @@ protected:
 
 private:
 	virtual void read_tile_plane_data(int address, int color) override;
-	virtual void shift_tile_plane_data(u8& pix) override;
+	virtual void shift_tile_plane_data(u8 &pix) override;
 	virtual void draw_sprites(u8 *line_priority) override;
 	u8 vt3xx_palette_r(offs_t offset);
 	void vt3xx_palette_w(offs_t offset, u8 data);
 	virtual void write_to_spriteram_with_increment(u8 data) override;
-	u8 get_pixel_data(u8* spritepatternbuf, int bpp, int pixel);
+	u8 get_pixel_data(u8 *spritepatternbuf, int bpp, int pixel);
 	rgb_t get_pen_value(int pixel_data, int bpp, int pal);
 
 	offs_t recalculate_offsets_8x8x4packed_tile(int address, int va34);
 	offs_t recalculate_offsets_8x8x8packed_tile(int address, int va34);
 	offs_t recalculate_offsets_16x16x8packed_hires_tile(int address, int va34);
 
-	void draw_sprites_standard_res(u8* line_priority);
-	void draw_sprites_high_res(u8* line_priority);
+	void draw_sprites_standard_res(u8 *line_priority);
+	void draw_sprites_high_res(u8 *line_priority);
 
-	void draw_extended_sprite_pixel_low(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority);
-	void draw_extended_sprite_pixel_high(bitmap_rgb32& bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8* line_priority);
+	void draw_extended_sprite_pixel_low(bitmap_rgb32 &bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8 *line_priority);
+	void draw_extended_sprite_pixel_high(bitmap_rgb32 &bitmap, int pixel_data, int pixel, int xpos, int pal, int bpp, u8 *line_priority);
 
 	u8 m_204x_screenregs[0xa];
 	u8 m_2008_spritehigh;

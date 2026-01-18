@@ -32,9 +32,9 @@ The Grid         v1.2   10/18/2000
 
 #include "dcs.h"
 
-#include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "machine/ibm21s850.h"
 #include "machine/nvram.h"
 #include "machine/tsb12lv01a.h"
@@ -51,7 +51,7 @@ static constexpr int BEAM_XOFFS = 40; // table in the code indicates an offset o
 #define LOG_FIREWIRE    (1U << 1)
 #define LOG_DISK        (1U << 2)
 #define LOG_DISK_JR     (1U << 3)
-#define LOG_TMS32032    (1U << 4)
+#define LOG_TMS320C32   (1U << 4)
 #define LOG_INPUT       (1U << 5)
 #define LOG_CMOS        (1U << 6)
 #define LOG_UNKNOWN     (1U << 7)
@@ -255,18 +255,18 @@ void midzeus_state::machine_reset()
 
 TIMER_CALLBACK_MEMBER(midzeus_state::display_irq_off)
 {
-	m_maincpu->set_input_line(TMS3203X_IRQ0, CLEAR_LINE);
+	m_maincpu->set_input_line(TMS320C3X_IRQ0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
 {
-	m_maincpu->set_input_line(TMS3203X_IRQ0, ASSERT_LINE);
+	m_maincpu->set_input_line(TMS320C3X_IRQ0, ASSERT_LINE);
 	m_display_irq_off_timer->adjust(attotime::from_hz(30000000));
 }
 
 void midzeus2_state::zeus_irq(int state)
 {
-	m_maincpu->set_input_line(TMS3203X_IRQ2, ASSERT_LINE);
+	m_maincpu->set_input_line(TMS320C3X_IRQ2, ASSERT_LINE);
 }
 
 
@@ -610,16 +610,16 @@ void midzeus2_state::firewire_irq(int state)
 void midzeus2_state::update_firewire_irq()
 {
 	LOGMASKED(LOG_FIREWIRE, "%ssserting FW IRQ\n", (m_fw_int_enable && m_fw_int) ? "A" : "Dea");
-	m_maincpu->set_input_line(TMS3203X_IRQ3, (m_fw_int_enable && m_fw_int) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(TMS320C3X_IRQ3, (m_fw_int_enable && m_fw_int) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*************************************
  *
- *  TMS32031 I/O accesses
+ *  TMS320C31 I/O accesses
  *
  *************************************/
 
-uint32_t midzeus_state::tms32032_control_r(offs_t offset)
+uint32_t midzeus_state::tms320c32_control_r(offs_t offset)
 {
 	// watch for accesses to the timers
 	if (offset == 0x24 || offset == 0x34)
@@ -634,16 +634,16 @@ uint32_t midzeus_state::tms32032_control_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 	{
 		if (offset != 0x64)
-			LOGMASKED(LOG_TMS32032, "%06X:tms32032_control_r(%02X)\n", m_maincpu->pc(), offset);
+			LOGMASKED(LOG_TMS320C32, "%06X:tms320c32_control_r(%02X)\n", m_maincpu->pc(), offset);
 	}
 
-	return m_tms32032_control[offset];
+	return m_tms320c32_control[offset];
 }
 
 
-void midzeus_state::tms32032_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void midzeus_state::tms320c32_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_tms32032_control[offset]);
+	COMBINE_DATA(&m_tms320c32_control[offset]);
 
 	// ignore changes to the memory control register
 	if (offset == 0x64)
@@ -657,7 +657,7 @@ void midzeus_state::tms32032_control_w(offs_t offset, uint32_t data, uint32_t me
 			m_timer[which]->adjust(attotime::never);
 	}
 	else
-		LOGMASKED(LOG_TMS32032, "%06X:tms32032_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
+		LOGMASKED(LOG_TMS320C32, "%06X:tms320c32_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -744,9 +744,9 @@ void invasnab_state::update_gun_irq()
 {
 	// low 2 bits of gun_control seem to enable IRQs
 	if (m_gun_irq_state & m_gun_control & 0x03)
-		m_maincpu->set_input_line(TMS3203X_IRQ3, ASSERT_LINE);
+		m_maincpu->set_input_line(TMS320C3X_IRQ3, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(TMS3203X_IRQ3, CLEAR_LINE);
+		m_maincpu->set_input_line(TMS320C3X_IRQ3, CLEAR_LINE);
 }
 
 
@@ -820,7 +820,7 @@ void midzeus_state::zeus_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).ram().share(m_ram_base);
 	map(0x400000, 0x41ffff).ram();
-	map(0x808000, 0x80807f).rw(FUNC(midzeus_state::tms32032_control_r), FUNC(midzeus_state::tms32032_control_w)).share(m_tms32032_control);
+	map(0x808000, 0x80807f).rw(FUNC(midzeus_state::tms320c32_control_r), FUNC(midzeus_state::tms320c32_control_w)).share(m_tms320c32_control);
 	map(0x880000, 0x8803ff).rw(FUNC(midzeus_state::zeus_r), FUNC(midzeus_state::zeus_w)).share(m_zeusbase);
 	map(0x8d0000, 0x8d0009).rw(FUNC(midzeus_state::disk_asic_jr_r), FUNC(midzeus_state::disk_asic_jr_w));
 	map(0x990000, 0x99000f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
@@ -842,7 +842,7 @@ void midzeus2_state::zeus2_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).ram().share(m_ram_base);
 	map(0x400000, 0x43ffff).ram();
-	map(0x808000, 0x80807f).rw(FUNC(midzeus2_state::tms32032_control_r), FUNC(midzeus2_state::tms32032_control_w)).share(m_tms32032_control);
+	map(0x808000, 0x80807f).rw(FUNC(midzeus2_state::tms320c32_control_r), FUNC(midzeus2_state::tms320c32_control_w)).share(m_tms320c32_control);
 	map(0x880000, 0x88007f).rw(m_zeus, FUNC(zeus2_device::zeus2_r), FUNC(zeus2_device::zeus2_w));
 	map(0x8a0000, 0x8a00cf).rw(m_fw_link, FUNC(tsb12lv01a_device::read), FUNC(tsb12lv01a_device::write));
 	//map(0x8a0000, 0x8a00cf).rw(FUNC(midzeus2_state::firewire_r), FUNC(midzeus2_state::firewire_w)).share("firewire");
@@ -1370,7 +1370,7 @@ static constexpr XTAL CPU_CLOCK = XTAL(60'000'000);
 void midzeus_state::midzeus(machine_config &config)
 {
 	// basic machine hardware
-	TMS32032(config, m_maincpu, CPU_CLOCK);
+	TMS320C32(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus_state::zeus_map);
 	m_maincpu->set_vblank_int("screen", FUNC(midzeus_state::display_irq));
 
@@ -1421,7 +1421,7 @@ void invasnab_state::invasn(machine_config &config)
 void midzeus2_state::midzeus2(machine_config &config)
 {
 	// basic machine hardware
-	TMS32032(config, m_maincpu, CPU_CLOCK);
+	TMS320C32(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus2_state::zeus2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(midzeus2_state::display_irq));
 
@@ -1562,7 +1562,7 @@ ROM_START( invasnab ) // Version 5.0 Program ROMs, v4.0 Graphics ROMs, v2.0 Soun
 	ROM_LOAD16_BYTE( "invasion2.u5", 0xc00000, 0x200000, CRC(e42805c9) SHA1(e5b71eb1852809a649ac43a82168b3bdaf4b1526) )
 
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16c57 Code
-	ROM_LOAD( "pic16c57.u76", 0x00000, 0x2000, BAD_DUMP CRC(f62729c9) SHA1(9642c53dd7eceeb7eb178497d367691c44abc5c5) ) // is this even a valid dump?
+	ROM_LOAD( "468_invasion_25_u76.u76", 0x00000, 0x2000, CRC(eca69715) SHA1(b49787faf9d034ade65828ddbcd3197170a48123) ) // decapped but not hooked up
 
 	ROM_REGION32_LE( 0x1800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "invasion5.u10", 0x0000000, 0x200000, CRC(8c7785d9) SHA1(701602314cd4eba4215c47ea0ae75fd4eddad43b) ) // ROMs U10 & U11 were labeled as v5.0
@@ -1585,7 +1585,7 @@ ROM_START( invasnab4 ) // Version 4.0 Program ROMs & Graphics ROMs, v2.0 Sound R
 	ROM_LOAD16_BYTE( "invasion2.u5", 0xc00000, 0x200000, CRC(e42805c9) SHA1(e5b71eb1852809a649ac43a82168b3bdaf4b1526) )
 
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16c57 Code
-	ROM_LOAD( "pic16c57.u76", 0x00000, 0x2000, BAD_DUMP CRC(f62729c9) SHA1(9642c53dd7eceeb7eb178497d367691c44abc5c5) ) // is this even a valid dump?
+	ROM_LOAD( "468_invasion_25_u76.u76", 0x00000, 0x2000, CRC(eca69715) SHA1(b49787faf9d034ade65828ddbcd3197170a48123) ) // decapped but not hooked up
 
 	ROM_REGION32_LE( 0x1800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "invasion4.u10", 0x0000000, 0x200000, CRC(b3ce958b) SHA1(ed51c167d85bc5f6155b8046ec056a4f4ad5cf9d) ) // These ROM were all labeled as v4.0
@@ -1608,7 +1608,7 @@ ROM_START( invasnab3 ) // Version 3.0 Program ROMs & v2.0 Graphics ROMs, v2.0 So
 	ROM_LOAD16_BYTE( "invasion2.u5", 0xc00000, 0x200000, CRC(e42805c9) SHA1(e5b71eb1852809a649ac43a82168b3bdaf4b1526) )
 
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16c57 Code
-	ROM_LOAD( "pic16c57.u76", 0x00000, 0x2000, BAD_DUMP CRC(f62729c9) SHA1(9642c53dd7eceeb7eb178497d367691c44abc5c5) ) // is this even a valid dump?
+	ROM_LOAD( "468_invasion_25_u76.u76", 0x00000, 0x2000, CRC(eca69715) SHA1(b49787faf9d034ade65828ddbcd3197170a48123) ) // decapped but not hooked up
 
 	ROM_REGION32_LE( 0x1800000, "maindata", 0 )
 	ROM_LOAD32_WORD( "invasion3.u10", 0x0000000, 0x200000, CRC(8404830e) SHA1(808fea45fb09fb7bf60f9f1e195a51d39e9966f5) ) // ROMs U10 through U13 were labeled as v3.0 Dated 8/30

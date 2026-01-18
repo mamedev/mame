@@ -15,7 +15,7 @@
 
 enum
 {
-	UPD7810_PC=1, UPD7810_SP, UPD7810_PSW,
+	UPD7810_PC=1, UPD7810_SP, UPD7810_PSW, UPD7810_IFF,
 	UPD7810_EA, UPD7810_V, UPD7810_A, UPD7810_VA,
 	UPD7810_BC, UPD7810_B, UPD7810_C, UPD7810_DE, UPD7810_D, UPD7810_E, UPD7810_HL, UPD7810_H, UPD7810_L,
 	UPD7810_EA2, UPD7810_V2, UPD7810_A2, UPD7810_VA2,
@@ -202,6 +202,7 @@ protected:
 	virtual void configure_ops();
 	virtual uint8_t read_pc();
 	virtual void write_pc(uint8_t data);
+	void write_smh(uint8_t data);
 
 	static const struct opcode_s s_op48[256];
 	static const struct opcode_s s_op4C[256];

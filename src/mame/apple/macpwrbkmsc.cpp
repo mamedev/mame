@@ -216,7 +216,7 @@ private:
 
 void macpbmsc_state::machine_start()
 {
-	m_msc->set_ram_info((u32 *)m_ram->pointer(), m_ram->size());
+	m_msc->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 
 	m_ca1_data = 0;
 
@@ -499,11 +499,11 @@ void macpbmsc_state::pmu_portf_w(u8 data)
 {
 	if (!BIT(data, 2) && BIT(m_last_portf, 2))
 	{
-		m_msc->cb1_int_hack(ASSERT_LINE);
+		m_msc->pmu_int(ASSERT_LINE);
 	}
 	else if (BIT(data, 2) && !BIT(m_last_portf, 2))
 	{
-		m_msc->cb1_int_hack(CLEAR_LINE);
+		m_msc->pmu_int(CLEAR_LINE);
 	}
 
 	m_last_portf = data;

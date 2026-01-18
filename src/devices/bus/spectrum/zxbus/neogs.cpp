@@ -85,14 +85,14 @@ public:
 		, m_neogs_led(*this, "neogs_led")
 	{ }
 
+	virtual void io_map(address_map &map) override ATTR_COLD;
+
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-
-	void neogsmap(address_map &map) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(irq0_line_assert);
 
@@ -437,7 +437,7 @@ const tiny_rom_entry *neogs_device::device_rom_region() const
 	return ROM_NAME( neogs );
 }
 
-void neogs_device::neogsmap(address_map &map)
+void neogs_device::io_map(address_map &map)
 {
 	map(0x00bb, 0x00bb).mirror(0xff00).rw(FUNC(neogs_device::neogs_status_r), FUNC(neogs_device::neogs_command_w));
 	map(0x00b3, 0x00b3).mirror(0xff00).rw(FUNC(neogs_device::neogs_data_r), FUNC(neogs_device::neogs_data_w));
@@ -464,8 +464,6 @@ void neogs_device::device_start()
 					m_sample[chanel] = data;
 				}
 			});
-
-	m_zxbus->install_device(0x0000, 0xffff, *this, &neogs_device::neogsmap);
 
 	m_neogs_led.resolve();
 

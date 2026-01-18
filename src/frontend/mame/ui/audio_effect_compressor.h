@@ -59,8 +59,12 @@ private:
 	static std::string format_db(float val);
 	static std::string format_ms(float val);
 	static std::string format_ratio(float val);
+	static std::string format_release(float val);
+
 	u32 flag_mode() const;
 	static u32 flag_lim(float value, float min, float max, bool isset);
+	static u32 flag_lim_special(float value, float min, bool isset);
+
 	static float max(float a, float b) { return a > b ? a : b; }
 	static float min(float a, float b) { return a < b ? a : b; }
 };

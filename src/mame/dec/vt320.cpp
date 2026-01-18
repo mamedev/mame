@@ -9,7 +9,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/ram.h"
 #include "emupal.h"
 #include "screen.h"
@@ -35,7 +35,7 @@ private:
 	uint32_t screen_update_vt320(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
-	void vt320_io(address_map &map) ATTR_COLD;
+	void vt320_data(address_map &map) ATTR_COLD;
 	void vt320_mem(address_map &map) ATTR_COLD;
 };
 
@@ -71,7 +71,7 @@ void vt320_state::vt320_mem(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void vt320_state::vt320_io(address_map &map)
+void vt320_state::vt320_data(address_map &map)
 {
 }
 
@@ -99,7 +99,7 @@ void vt320_state::vt320(machine_config &config)
 	/* basic machine hardware */
 	I8051(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt320_state::vt320_mem);
-	m_maincpu->set_addrmap(AS_IO, &vt320_state::vt320_io);
+	m_maincpu->set_addrmap(AS_DATA, &vt320_state::vt320_data);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

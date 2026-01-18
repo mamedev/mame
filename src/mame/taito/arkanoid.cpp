@@ -2040,6 +2040,22 @@ ROM_START( arktayt2 )
 	ROM_LOAD( "ic75.13e",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) ) // blue component
 ROM_END
 
+ROM_START( arkaboot ) // most similar to arkanoidjb, with hacked out MCU protection
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1", 0x0000, 0x8000, CRC(3234917c) SHA1(2cff8b618588a57becb76f91fc37d86e2d5e15ea) )
+	ROM_LOAD( "2", 0x8000, 0x8000, CRC(d57c6bff) SHA1(0845510ad957e891bcd3c0e46eb19a9222cb5c8e) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "3", 0x00000, 0x8000, CRC(038b74ba) SHA1(ac053cc4908b4075f918748b89570e07a0ba5116) )
+	ROM_LOAD( "4", 0x08000, 0x8000, CRC(71fae199) SHA1(5d253c46ccf4cd2976a5fb8b8713f0f345443d06) )
+	ROM_LOAD( "5", 0x10000, 0x8000, CRC(c76374e2) SHA1(7520dd48de20db60a2038f134dcaa454988e7874) )
+
+	ROM_REGION( 0x0600, "proms", 0 ) // not dumped for this set, but GFX match, so safe to assume these are the same, too
+	ROM_LOAD( "ic73.11e",    0x0000, 0x0200, CRC(0af8b289) SHA1(6bc589e8a609b4cf450aebedc8ce02d5d45c970f) ) // red component
+	ROM_LOAD( "ic74.12e",    0x0200, 0x0200, CRC(abb002fb) SHA1(c14f56b8ef103600862e7930709d293b0aa97a73) ) // green component
+	ROM_LOAD( "ic75.13e",    0x0400, 0x0200, CRC(a7c6c277) SHA1(adaa003dcd981576ea1cc5f697d709b2d6b2ea29) ) // blue component
+ROM_END
+
 
 ROM_START( tetrsark )
 	ROM_REGION( 0x18000, "maincpu", 0 )
@@ -2333,6 +2349,7 @@ GAME( 1986, arkgcbla,     arkanoid, aysnd,    arkgcbl,   arkanoid_state, init_ar
 GAME( 1988, paddle2,      arkanoid, bootleg,  paddle2,   arkanoid_state, init_paddle2,   ROT90, "bootleg",                                             "Paddle 2 (bootleg on Block hardware)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkatayt,     arkanoid, aysnd,    arkatayt,  arkanoid_state, empty_init,     ROT90, "bootleg (Tayto)",                                     "Arkanoid (Tayto bootleg)",                    MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arktayt2,     arkanoid, aysnd,    arktayt2,  arkanoid_state, empty_init,     ROT90, "bootleg (Tayto)",                                     "Arkanoid (Tayto bootleg, harder)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, arkaboot,     arkanoid, bootleg,  arkangc,   arkanoid_state, init_arkangc,   ROT90, "bootleg",                                             "Arkanoid (bootleg of version Japan, older)",  MACHINE_SUPPORTS_SAVE )
 
 // Other games
 GAME( 1987, arkatour,     0,        arkanoid, arkanoid,  arkanoid_state, empty_init,     ROT90, "Taito America Corporation (Romstar license)",         "Tournament Arkanoid (US, older)",             MACHINE_SUPPORTS_SAVE )

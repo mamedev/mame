@@ -21,11 +21,6 @@ class m5074x_device :  public m740_device
 
 	enum
 	{
-		M5074X_INT1_LINE = INPUT_LINE_IRQ0
-	};
-
-	enum
-	{
 		TIMER_1 = 0,
 		TIMER_2,
 		TIMER_X,
@@ -36,6 +31,11 @@ class m5074x_device :  public m740_device
 	};
 
 public:
+	enum
+	{
+		M5074X_INT1_LINE = INPUT_LINE_IRQ0
+	};
+
 	const address_space_config m_program_config;
 
 	template <std::size_t Bit> auto read_p() { return m_read_p[Bit].bind(); }

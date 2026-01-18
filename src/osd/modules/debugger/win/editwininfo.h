@@ -36,6 +36,8 @@ protected:
 	constexpr static DWORD  COMBO_BOX_STYLE     = WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL;
 	constexpr static DWORD  COMBO_BOX_STYLE_EX  = 0;
 
+	int expression_view_index() const { return m_viewidx; }
+
 	void set_editwnd_bounds(RECT const &bounds);
 	void set_editwnd_text(char const *text);
 	void editwnd_select_all();

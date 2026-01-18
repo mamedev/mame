@@ -162,6 +162,44 @@ const char *core_options::entry::value_unsubstituted() const noexcept
 
 
 //-------------------------------------------------
+//  entry::int_value
+//-------------------------------------------------
+
+int core_options::entry::int_value() const
+{
+	char const *const data = value();
+	if (!data)
+		return 0;
+	std::istringstream str(data);
+	str.imbue(std::locale::classic());
+	int ival;
+	if (str >> ival)
+		return ival;
+	else
+		return 0;
+}
+
+
+//-------------------------------------------------
+//  entry::float_value
+//-------------------------------------------------
+
+float core_options::entry::float_value() const
+{
+	char const *const data = value();
+	if (!data)
+		return 0.0F;
+	std::istringstream str(data);
+	str.imbue(std::locale::classic());
+	float fval;
+	if (str >> fval)
+		return fval;
+	else
+		return 0.0F;
+}
+
+
+//-------------------------------------------------
 //  entry::copy_from
 //-------------------------------------------------
 
@@ -206,6 +244,16 @@ void core_options::entry::set_value(std::string &&newvalue, int priority_value, 
 		if (m_value_changed_handler)
 			m_value_changed_handler(value());
 	}
+}
+
+void core_options::entry::set_value(int value, int priority)
+{
+	set_value(util::string_format(std::locale::classic(), "%d", value), priority, false, false);
+}
+
+void core_options::entry::set_value(float value, int priority)
+{
+	set_value(util::string_format(std::locale::classic(), "%f", value), priority, false, false);
 }
 
 
@@ -1134,16 +1182,8 @@ const char *core_options::description(std::string_view option) const noexcept
 
 int core_options::int_value(std::string_view option) const
 {
-	char const *const data = value(option);
-	if (!data)
-		return 0;
-	std::istringstream str(data);
-	str.imbue(std::locale::classic());
-	int ival;
-	if (str >> ival)
-		return ival;
-	else
-		return 0;
+	auto const entry = get_entry(option);
+	return entry ? entry->int_value() : 0;
 }
 
 
@@ -1153,16 +1193,8 @@ int core_options::int_value(std::string_view option) const
 
 float core_options::float_value(std::string_view option) const
 {
-	char const *const data = value(option);
-	if (!data)
-		return 0.0f;
-	std::istringstream str(data);
-	str.imbue(std::locale::classic());
-	float fval;
-	if (str >> fval)
-		return fval;
-	else
-		return 0.0f;
+	auto const entry = get_entry(option);
+	return entry ? entry->float_value() : 0.0F;
 }
 
 
@@ -1187,18 +1219,22 @@ void core_options::set_value(std::string_view name, const char *value, int prior
 void core_options::set_value(std::string_view name, std::string &&value, int priority)
 {
 	auto entry = get_entry(name);
-	assert(entry != nullptr);
+	assert(entry);
 	entry->set_value(std::move(value), priority, false, false);
 }
 
 void core_options::set_value(std::string_view name, int value, int priority)
 {
-	set_value(name, util::string_format("%d", value), priority);
+	auto entry = get_entry(name);
+	assert(entry);
+	entry->set_value(value, priority);
 }
 
 void core_options::set_value(std::string_view name, float value, int priority)
 {
-	set_value(name, util::string_format("%f", value), priority);
+	auto entry = get_entry(name);
+	assert(entry);
+	entry->set_value(value, priority);
 }
 
 

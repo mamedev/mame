@@ -134,6 +134,7 @@ const double XTAL::known_xtals[] = {
 	  5'659'200, // 5.6592_MHz_XTAL        Digilog 320 dot clock
 	  5'670'000, // 5.67_MHz_XTAL          RCA CDP1869 NTSC dot clock
 	  5'714'300, // 5.7143_MHz_XTAL        Cidelsa Destroyer, TeleVideo serial keyboards
+	  5'760'000, // 5.760_MHz_XTAL         ADI unknown keyboard
 	  5'856'000, // 5.856_MHz_XTAL         HP 3478A Multimeter
 	  5'911'000, // 5.911_MHz_XTAL         Philips Videopac Plus G7400
 	  5'990'400, // 5.9904_MHz_XTAL        Luxor ABC 800 keyboard (Keytronic custom part #48-300-008 is equivalent)
@@ -244,6 +245,7 @@ const double XTAL::known_xtals[] = {
 	 14'112'000, // 14.112_MHz_XTAL        Timex/Sinclair TS2068
 	 14'192'640, // 14.19264_MHz_XTAL      Central Data 2650
 	 14'218'000, // 14.218_MHz_XTAL        Dragon
+	 14'250'000, // 14.250_MHz_XTAL        Hector HRX
 	 14'250'450, // 14.25045_MHz_XTAL      Apple II Europlus
 	 14'300'000, // 14.3_MHz_XTAL          Agat-7
 	 14'314'000, // 14.314_MHz_XTAL        Taito TTL Board
@@ -267,6 +269,7 @@ const double XTAL::known_xtals[] = {
 	 15'300'720, // 15.30072_MHz_XTAL      Microterm 420
 	 15'360'000, // 15.36_MHz_XTAL         Visual 1050
 	 15'400'000, // 15.4_MHz_XTAL          DVK KSM
+	 15'468'000, // 15.468_MHz_XTAL        Koi Koi
 	 15'468'480, // 15.46848_MHz_XTAL      Bank Panic h/w, Sega G80
 	 15'582'000, // 15.582_MHz_XTAL        Zentec Zephyr
 	 15'625'000, // 15.625_MHz_XTAL        Zaccaria The Invaders
@@ -291,6 +294,7 @@ const double XTAL::known_xtals[] = {
 	 16'588'800, // 16.5888_MHz_XTAL       SM 7238
 	 16'666'600, // 16.6666_MHz_XTAL       Firebeat GCU
 	 16'667'000, // 16.667_MHz_XTAL        Visual XDS-19P
+	 16'668'000, // 16.668_MHz_XTAL        Hoei Future Flash
 	 16'669'800, // 16.6698_MHz_XTAL       Qume QVT-102
 	 16'670'000, // 16.67_MHz_XTAL         -
 	 16'777'216, // 16.777216_MHz_XTAL     Nintendo Game Boy Advance
@@ -310,6 +314,7 @@ const double XTAL::known_xtals[] = {
 	 17'734'475, // 17.734475_MHz_XTAL     4x PAL subcarrier - "
 	 17'734'476, // 17.734476_MHz_XTAL     4x PAL subcarrier - "
 	 17'812'000, // 17.812_MHz_XTAL        Videopac C52
+	 17'820'000, // 17.82_MHz_XTAL         Convergent AWS-2xx
 	 17'971'200, // 17.9712_MHz_XTAL       Compucolor II, Hazeltine Esprit III
 	 18'000'000, // 18_MHz_XTAL            S.A.R, Ikari Warriors 3
 	 18'414'000, // 18.414_MHz_XTAL        Ann Arbor Ambassador
@@ -366,6 +371,7 @@ const double XTAL::known_xtals[] = {
 	 24'000'000, // 24_MHz_XTAL            Mario, 80's Data East games, 80's Konami games
 	 24'073'400, // 24.0734_MHz_XTAL       DEC Rainbow 100
 	 24'167'829, // 24.167829_MHz_XTAL     Neo Geo AES rev. 3-3 and later (~1536x NTSC line rate)
+	 24'180'000, // 24.18_MHz_XTAL         Gemini Wing bootleg
 	 24'270'000, // 24.27_MHz_XTAL         CIT-101XL
 	 24'300'000, // 24.3_MHz_XTAL          ADM 36 132-column display clock
 	 24'576'000, // 24.576_MHz_XTAL        Pole Position h/w, Model 3 CPU board
@@ -411,6 +417,7 @@ const double XTAL::known_xtals[] = {
 	 28'636'363, // 28.636363_MHz_XTAL     Later Leland games and Atari GT, Amiga NTSC, Raiden2 h/w (8x NTSC subcarrier), NEC PC-88xx
 	 28'640'000, // 28.64_MHz_XTAL         Fuuki FG-1c AI AM-2 PCB
 	 28'700'000, // 28.7_MHz_XTAL          -
+	 28'759'500, // 28.7595_MHz_XTAL       Videx UltraTerm
 	 29'376'000, // 29.376_MHz_XTAL        Qume QVT-103
 	 29'491'200, // 29.4912_MHz_XTAL       Xerox Alto-II system clock (tagged 29.4MHz in the schematics)
 	 30'000'000, // 30_MHz_XTAL            Impera Magic Card
@@ -473,6 +480,7 @@ const double XTAL::known_xtals[] = {
 	 45'830'400, // 45.8304_MHz_XTAL       Microterm 5510
 	 46'615'120, // 46.61512_MHz_XTAL      Soundblaster 16 PCM base clock
 	 47'736'000, // 47.736_MHz_XTAL        Visual 100
+	 47'843'000, // 47.843_MHz_XTAL        Sord Future 32a
 	 48'000'000, // 48_MHz_XTAL            Williams/Midway Y/Z-unit system / SSV board
 	 48'384'000, // 48.384_MHz_XTAL        Namco NB-1
 	 48'556'800, // 48.5568_MHz_XTAL       Wyse WY-85
@@ -503,7 +511,7 @@ const double XTAL::known_xtals[] = {
 	 61'440'000, // 61.44_MHz_XTAL         Donkey Kong
 	 64'000'000, // 64_MHz_XTAL            BattleToads
 	 64'108'800, // 64.1088_MHz_XTAL       HP Topcat high-res
-	 66'000'000, // 66_MHz_XTAL            -
+	 66'000'000, // 66_MHz_XTAL            Access Virus A
 	 66'666'700, // 66.6667_MHz_XTAL       Later Midway games
 	 67'737'600, // 67.7376_MHz_XTAL       PSX-based h/w, Sony ZN1-2-based
 	 68'850'000, // 68.85_MHz_XTAL         Wyse WY-50
@@ -522,8 +530,10 @@ const double XTAL::known_xtals[] = {
 	100'000'000, // 100_MHz_XTAL           PSX-based Namco System 12, Vegas, Sony ZN1-2-based
 	101'491'200, // 101.4912_MHz_XTAL      PSX-based Namco System 10
 	105'561'000, // 105.561_MHz_XTAL       Sun cgsix
+	108'000'000, // 108_MHz_XTAL           Access Virus B
 	108'108'000, // 108.108_MHz_XTAL       HP 98550 high-res color card
 	120'000'000, // 120_MHz_XTAL           Astro Corp.'s Stone Age
+	136'000'000, // 136_MHz_XTAL           Access Virus C
 	200'000'000  // 200_MHz_XTAL           Base SH4 CPU (Naomi, Hikaru etc.)
 };
 

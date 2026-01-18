@@ -9,14 +9,17 @@
 
 #pragma once
 
+#include "toaplan_scu.h"
+
 #include "cpu/m68000/m68000.h"
-#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms320c1x/tms320c1x.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopl.h"
-#include "toaplan_scu.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class toaplan1_state : public driver_device
 {
@@ -129,7 +132,6 @@ protected:
 
 	template<unsigned Layer> TILE_GET_INFO_MEMBER(get_tile_info);
 
-	DECLARE_MACHINE_RESET(zerowing);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void screen_vblank(int state);
@@ -207,7 +209,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<tms32010_device> m_dsp;
+	required_device<tms320c10_device> m_dsp;
 
 	/* Demon world */
 	s32 m_dsp_on = 0;

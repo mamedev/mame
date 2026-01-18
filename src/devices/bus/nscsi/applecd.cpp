@@ -38,7 +38,7 @@
 #include "emu.h"
 #include "applecd.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/m6502/m3745x.h"
 #include "machine/ncr5380.h"
 
@@ -68,7 +68,7 @@ void applecd150_device::device_add_mconfig(machine_config &config)
 {
 	i80c31_device &mcu1(I80C31(config, "mcu1", 12_MHz_XTAL));
 	mcu1.set_addrmap(AS_PROGRAM, &applecd150_device::prog_map);
-	mcu1.set_addrmap(AS_IO, &applecd150_device::ext_map);
+	mcu1.set_addrmap(AS_DATA, &applecd150_device::ext_map);
 
 	M37450(config, "mcu2", 16.9344_MHz_XTAL / 2).set_disable();
 

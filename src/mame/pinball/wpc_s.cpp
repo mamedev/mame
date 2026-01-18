@@ -2385,6 +2385,8 @@ ROM_START(rs_l6)
 	ROM_LOAD16_BYTE("rs_u6_s.l1", 0x800000, 0x080000, CRC(eee00add) SHA1(96d664ca73ac896e918d7011c1cda3e55e3731b7))
 	ROM_LOAD16_BYTE("rs_u7_s.l1", 0xa00000, 0x080000, CRC(3a222a54) SHA1(2a788e4ac573bf1d128e5bef9357e62c805014b9))
 	ROM_LOAD16_BYTE("rs_u8_s.l1", 0xc00000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("524_road_show.u22", 0x0000, 0x2000, CRC(e78ea6a0) SHA1(bf0200177c9d4764b3164cbee37e9a5a35ab996f))
 ROM_END
 
 ROM_START(rs_la5)
@@ -2398,6 +2400,8 @@ ROM_START(rs_la5)
 	ROM_LOAD16_BYTE("rs_u6_s.l1", 0x800000, 0x080000, CRC(eee00add) SHA1(96d664ca73ac896e918d7011c1cda3e55e3731b7))
 	ROM_LOAD16_BYTE("rs_u7_s.l1", 0xa00000, 0x080000, CRC(3a222a54) SHA1(2a788e4ac573bf1d128e5bef9357e62c805014b9))
 	ROM_LOAD16_BYTE("rs_u8_s.l1", 0xc00000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("524_road_show.u22", 0x0000, 0x2000, CRC(e78ea6a0) SHA1(bf0200177c9d4764b3164cbee37e9a5a35ab996f))
 ROM_END
 
 ROM_START(rs_lx5)
@@ -2411,6 +2415,8 @@ ROM_START(rs_lx5)
 	ROM_LOAD16_BYTE("rs_u6_s.l1", 0x800000, 0x080000, CRC(eee00add) SHA1(96d664ca73ac896e918d7011c1cda3e55e3731b7))
 	ROM_LOAD16_BYTE("rs_u7_s.l1", 0xa00000, 0x080000, CRC(3a222a54) SHA1(2a788e4ac573bf1d128e5bef9357e62c805014b9))
 	ROM_LOAD16_BYTE("rs_u8_s.l1", 0xc00000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("524_road_show.u22", 0x0000, 0x2000, CRC(e78ea6a0) SHA1(bf0200177c9d4764b3164cbee37e9a5a35ab996f))
 ROM_END
 
 ROM_START(rs_la4)
@@ -2424,6 +2430,8 @@ ROM_START(rs_la4)
 	ROM_LOAD16_BYTE("rs_u6_s.l1", 0x800000, 0x080000, CRC(eee00add) SHA1(96d664ca73ac896e918d7011c1cda3e55e3731b7))
 	ROM_LOAD16_BYTE("rs_u7_s.l1", 0xa00000, 0x080000, CRC(3a222a54) SHA1(2a788e4ac573bf1d128e5bef9357e62c805014b9))
 	ROM_LOAD16_BYTE("rs_u8_s.l1", 0xc00000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("524_road_show.u22", 0x0000, 0x2000, CRC(e78ea6a0) SHA1(bf0200177c9d4764b3164cbee37e9a5a35ab996f))
 ROM_END
 
 ROM_START(rs_lx4)
@@ -2437,6 +2445,8 @@ ROM_START(rs_lx4)
 	ROM_LOAD16_BYTE("rs_u6_s.l1", 0x800000, 0x080000, CRC(eee00add) SHA1(96d664ca73ac896e918d7011c1cda3e55e3731b7))
 	ROM_LOAD16_BYTE("rs_u7_s.l1", 0xa00000, 0x080000, CRC(3a222a54) SHA1(2a788e4ac573bf1d128e5bef9357e62c805014b9))
 	ROM_LOAD16_BYTE("rs_u8_s.l1", 0xc00000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("524_road_show.u22", 0x0000, 0x2000, CRC(e78ea6a0) SHA1(bf0200177c9d4764b3164cbee37e9a5a35ab996f))
 ROM_END
 
 ROM_START(rs_lx3)
@@ -2450,6 +2460,8 @@ ROM_START(rs_lx3)
 	ROM_LOAD16_BYTE("rs_u6_s.l1", 0x800000, 0x080000, CRC(eee00add) SHA1(96d664ca73ac896e918d7011c1cda3e55e3731b7))
 	ROM_LOAD16_BYTE("rs_u7_s.l1", 0xa00000, 0x080000, CRC(3a222a54) SHA1(2a788e4ac573bf1d128e5bef9357e62c805014b9))
 	ROM_LOAD16_BYTE("rs_u8_s.l1", 0xc00000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("524_road_show.u22", 0x0000, 0x2000, CRC(e78ea6a0) SHA1(bf0200177c9d4764b3164cbee37e9a5a35ab996f))
 ROM_END
 
 ROM_START(rs_lx2)
@@ -2463,6 +2475,8 @@ ROM_START(rs_lx2)
 	ROM_LOAD16_BYTE("rs_u6_s.l1", 0x800000, 0x080000, CRC(eee00add) SHA1(96d664ca73ac896e918d7011c1cda3e55e3731b7))
 	ROM_LOAD16_BYTE("rs_u7_s.l1", 0xa00000, 0x080000, CRC(3a222a54) SHA1(2a788e4ac573bf1d128e5bef9357e62c805014b9))
 	ROM_LOAD16_BYTE("rs_u8_s.l1", 0xc00000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("524_road_show.u22", 0x0000, 0x2000, CRC(e78ea6a0) SHA1(bf0200177c9d4764b3164cbee37e9a5a35ab996f))
 ROM_END
 
 ROM_START(rs_pa2)
@@ -2476,6 +2490,8 @@ ROM_START(rs_pa2)
 	ROM_LOAD16_BYTE("rs_u6_s.l1", 0x800000, 0x080000, CRC(eee00add) SHA1(96d664ca73ac896e918d7011c1cda3e55e3731b7))
 	ROM_LOAD16_BYTE("rs_u7_s.l1", 0xa00000, 0x080000, CRC(3a222a54) SHA1(2a788e4ac573bf1d128e5bef9357e62c805014b9))
 	ROM_LOAD16_BYTE("rs_u8_s.l1", 0xc00000, 0x080000, CRC(c70f2210) SHA1(9be9f271d81d15a4eb123f1377b0c077eef97774))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("524_road_show.u22", 0x0000, 0x2000, CRC(e78ea6a0) SHA1(bf0200177c9d4764b3164cbee37e9a5a35ab996f))
 ROM_END
 
 /*------------------------
@@ -2582,6 +2598,8 @@ ROM_START(ts_lh6)
 	ROM_LOAD16_BYTE("ts_u5_s.l1", 0x600000, 0x080000, CRC(ab8cf435) SHA1(86d7f9eca3e49e184700a0ac0f672349fc1241bb))
 	ROM_LOAD16_BYTE("ts_u6_s.l1", 0x800000, 0x080000, CRC(63b8d2db) SHA1(a662a3280a377ac91fdf55d98d2204e024668706))
 	ROM_LOAD16_BYTE("ts_u7_s.l1", 0xa00000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("532_the_shadow.u22", 0x0000, 0x2000, CRC(3d47e89f) SHA1(fdefa59cd8d569dd2700899fb46a55faf76b04dc))
 ROM_END
 
 ROM_START(ts_la2)
@@ -2594,6 +2612,8 @@ ROM_START(ts_la2)
 	ROM_LOAD16_BYTE("ts_u5_s.l1", 0x600000, 0x080000, CRC(ab8cf435) SHA1(86d7f9eca3e49e184700a0ac0f672349fc1241bb))
 	ROM_LOAD16_BYTE("ts_u6_s.l1", 0x800000, 0x080000, CRC(63b8d2db) SHA1(a662a3280a377ac91fdf55d98d2204e024668706))
 	ROM_LOAD16_BYTE("ts_u7_s.l1", 0xa00000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("532_the_shadow.u22", 0x0000, 0x2000, CRC(3d47e89f) SHA1(fdefa59cd8d569dd2700899fb46a55faf76b04dc))
 ROM_END
 
 ROM_START(ts_la4)
@@ -2606,6 +2626,8 @@ ROM_START(ts_la4)
 	ROM_LOAD16_BYTE("ts_u5_s.l1", 0x600000, 0x080000, CRC(ab8cf435) SHA1(86d7f9eca3e49e184700a0ac0f672349fc1241bb))
 	ROM_LOAD16_BYTE("ts_u6_s.l1", 0x800000, 0x080000, CRC(63b8d2db) SHA1(a662a3280a377ac91fdf55d98d2204e024668706))
 	ROM_LOAD16_BYTE("ts_u7_s.l1", 0xa00000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("532_the_shadow.u22", 0x0000, 0x2000, CRC(3d47e89f) SHA1(fdefa59cd8d569dd2700899fb46a55faf76b04dc))
 ROM_END
 
 ROM_START(ts_lx4)
@@ -2618,6 +2640,8 @@ ROM_START(ts_lx4)
 	ROM_LOAD16_BYTE("ts_u5_s.l1", 0x600000, 0x080000, CRC(ab8cf435) SHA1(86d7f9eca3e49e184700a0ac0f672349fc1241bb))
 	ROM_LOAD16_BYTE("ts_u6_s.l1", 0x800000, 0x080000, CRC(63b8d2db) SHA1(a662a3280a377ac91fdf55d98d2204e024668706))
 	ROM_LOAD16_BYTE("ts_u7_s.l1", 0xa00000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("532_the_shadow.u22", 0x0000, 0x2000, CRC(3d47e89f) SHA1(fdefa59cd8d569dd2700899fb46a55faf76b04dc))
 ROM_END
 
 ROM_START(ts_lx5)
@@ -2630,6 +2654,8 @@ ROM_START(ts_lx5)
 	ROM_LOAD16_BYTE("ts_u5_s.l1", 0x600000, 0x080000, CRC(ab8cf435) SHA1(86d7f9eca3e49e184700a0ac0f672349fc1241bb))
 	ROM_LOAD16_BYTE("ts_u6_s.l1", 0x800000, 0x080000, CRC(63b8d2db) SHA1(a662a3280a377ac91fdf55d98d2204e024668706))
 	ROM_LOAD16_BYTE("ts_u7_s.l1", 0xa00000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("532_the_shadow.u22", 0x0000, 0x2000, CRC(3d47e89f) SHA1(fdefa59cd8d569dd2700899fb46a55faf76b04dc))
 ROM_END
 
 ROM_START(ts_pa1)
@@ -2642,6 +2668,8 @@ ROM_START(ts_pa1)
 	ROM_LOAD16_BYTE("ts_u5_s.l1", 0x600000, 0x080000, CRC(ab8cf435) SHA1(86d7f9eca3e49e184700a0ac0f672349fc1241bb))
 	ROM_LOAD16_BYTE("ts_u6_s.l1", 0x800000, 0x080000, CRC(63b8d2db) SHA1(a662a3280a377ac91fdf55d98d2204e024668706))
 	ROM_LOAD16_BYTE("ts_u7_s.l1", 0xa00000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("532_the_shadow.u22", 0x0000, 0x2000, CRC(3d47e89f) SHA1(fdefa59cd8d569dd2700899fb46a55faf76b04dc))
 ROM_END
 
 ROM_START(ts_lf6)
@@ -2654,6 +2682,8 @@ ROM_START(ts_lf6)
 	ROM_LOAD16_BYTE("ts_u5_s.l1", 0x600000, 0x080000, CRC(ab8cf435) SHA1(86d7f9eca3e49e184700a0ac0f672349fc1241bb))
 	ROM_LOAD16_BYTE("ts_u6_s.l1", 0x800000, 0x080000, CRC(63b8d2db) SHA1(a662a3280a377ac91fdf55d98d2204e024668706))
 	ROM_LOAD16_BYTE("ts_u7_s.l1", 0xa00000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("532_the_shadow.u22", 0x0000, 0x2000, CRC(3d47e89f) SHA1(fdefa59cd8d569dd2700899fb46a55faf76b04dc))
 ROM_END
 
 ROM_START(ts_lf4)
@@ -2666,6 +2696,8 @@ ROM_START(ts_lf4)
 	ROM_LOAD16_BYTE("ts_u5_s.l1", 0x600000, 0x080000, CRC(ab8cf435) SHA1(86d7f9eca3e49e184700a0ac0f672349fc1241bb))
 	ROM_LOAD16_BYTE("ts_u6_s.l1", 0x800000, 0x080000, CRC(63b8d2db) SHA1(a662a3280a377ac91fdf55d98d2204e024668706))
 	ROM_LOAD16_BYTE("ts_u7_s.l1", 0xa00000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("532_the_shadow.u22", 0x0000, 0x2000, CRC(3d47e89f) SHA1(fdefa59cd8d569dd2700899fb46a55faf76b04dc))
 ROM_END
 
 ROM_START(ts_lm6)
@@ -2678,6 +2710,8 @@ ROM_START(ts_lm6)
 	ROM_LOAD16_BYTE("ts_u5_s.l1", 0x600000, 0x080000, CRC(ab8cf435) SHA1(86d7f9eca3e49e184700a0ac0f672349fc1241bb))
 	ROM_LOAD16_BYTE("ts_u6_s.l1", 0x800000, 0x080000, CRC(63b8d2db) SHA1(a662a3280a377ac91fdf55d98d2204e024668706))
 	ROM_LOAD16_BYTE("ts_u7_s.l1", 0xa00000, 0x080000, CRC(62b5db14) SHA1(13832c8573623f9d541de8b814aa10cfb527be99))
+	ROM_REGION(0x2000, "serial_security_pic", 0) // provides game ID code and serial number
+	ROM_LOAD("532_the_shadow.u22", 0x0000, 0x2000, CRC(3d47e89f) SHA1(fdefa59cd8d569dd2700899fb46a55faf76b04dc))
 ROM_END
 
 /*-------------------------
