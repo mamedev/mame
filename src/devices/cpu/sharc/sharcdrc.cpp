@@ -4581,7 +4581,7 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_MOV(block, I0, REG(ry));
 						UML_CMP(block, I0, 0);
 						if (SV_CALC_REQUIRED)
-							UML_SETc(block, COND_G, ASTAT_AV);
+							UML_SETc(block, COND_G, ASTAT_SV);
 						UML_JMPc(block, COND_L, shift_neg);
 						UML_SHL(block, I1, REG(rx), I0);
 						UML_JMP(block, shift_end);
@@ -4624,7 +4624,7 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_MOV(block, I0, REG(ry));
 						UML_CMP(block, I0, 0);
 						if (SV_CALC_REQUIRED)
-							UML_SETc(block, COND_G, ASTAT_AV);
+							UML_SETc(block, COND_G, ASTAT_SV);
 						UML_JMPc(block, COND_L, shift_neg);
 						UML_SHL(block, I1, REG(rx), I0);
 						UML_JMP(block, shift_end);
