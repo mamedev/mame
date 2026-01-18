@@ -27,6 +27,8 @@ public:
 	u16 read(offs_t offset);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_changed);
 
+	void map(address_map &map);
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

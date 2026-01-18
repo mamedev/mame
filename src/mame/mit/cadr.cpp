@@ -94,7 +94,7 @@ void cadr_state::mem_map(address_map &map)
 {
 	// Xbus memory 0 - 16777777 / 000000 - 3bffff
 
-	// The system 100 boot program cannot handle more memory?
+	// The system 100 boot program cannot handle more memory than 2M 32 bit words?
 	map(0x000000, 0x1fffff).ram(); // 128KB - ~4MB
 
 	// Xbus I/O 17000000 - 17377777 / 3c0000 - 3dffff
@@ -117,10 +117,9 @@ void cadr_state::mem_map(address_map &map)
 	map(0x3c0000, 0x3c7fff).rw(m_tv_control, FUNC(cadr_tv_control_device::video_ram_read), FUNC(cadr_tv_control_device::video_ram_write));
 
 	// 3dfff0-3dfff7 - TV control
-	map(0x3dfff0, 0x3dfff7).rw(m_tv_control, FUNC(cadr_tv_control_device::tv_control_r), FUNC(cadr_tv_control_device::tv_control_w));
+	map(0x3dfff0, 0x3dfff7).m(m_tv_control, FUNC(cadr_tv_control_device::map));
 
-	map(0x3dfff8, 0x3dffff).rw(m_disk_controller, FUNC(cadr_disk_device::read), FUNC(cadr_disk_device::write));
-
+	map(0x3dfff8, 0x3dffff).m(m_disk_controller, FUNC(cadr_disk_device::map));
 
 	// Unibus - 16 bit bus - 17400000 - 17777777 / 3e0000 - 3fffff
 
@@ -134,10 +133,10 @@ void cadr_state::mem_map(address_map &map)
 		})
 
 	);
-	map(0x3ff420, 0x3ff43f).rw(m_iob, FUNC(cadr_iob_device::read), FUNC(cadr_iob_device::write)).umask32(0x0000ffff);
+	map(0x3ff420, 0x3ff43f).m(m_iob, FUNC(cadr_iob_device::map));
 
 	// 766000 - 766017 - diagnostic interface
-	map(0x3ff600, 0x3ff60f).rw(m_maincpu, FUNC(cadr_cpu_device::diag_r), FUNC(cadr_cpu_device::diag_w)).umask32(0x0000ffff);
+	map(0x3ff600, 0x3ff60f).m(m_maincpu, FUNC(cadr_cpu_device::diag_map));
 
 	// 3ff610/3ff611 - 766040/766042 - interrupt status
 	map(0x3ff610, 0x3ff610).lrw16(

@@ -170,38 +170,36 @@ void cadr_cpu_device::program_map(address_map &map)
 }
 
 
-u16 cadr_cpu_device::diag_r(offs_t offset)
-{
-	LOGMASKED(LOG_TRACE, "diag_r %02x\n", offset);
-	return 0;
-}
+void cadr_cpu_device::diag_map(address_map &map) {
+	// 0x00 - debug ir 15-0
+	// 0x01 - debug ir 31-16
+	// 0x02 - debug ir 47-32
+	// 0x03 - clock control register
+	// 0x04 - OPC control register
 
-
-void cadr_cpu_device::diag_w(offs_t offset, u16 data)
-{
-	LOGMASKED(LOG_TRACE, "daig_w: %02x, %04x\n", offset, data);
-
-	switch (offset)
-	{
-	// x------- PROG.BOOT
-	// -x------ PROG.RESET
-	// --x----- PROMDISABLE
-	// ---x---- TRAPENB
-	// ----x--- STATHENB
-	// -----x-- ERRSTOP
-	// ------xx SPEED 00 - extra slow, 01 - slow, 10 - normal, 11 - fast
-	case 0x05: // mode register
+	// When installing through a map these must be byte addresses
+	map(0x00, 0x3f).lrw16(NAME([this] (offs_t offset) {
+		LOGMASKED(LOG_TRACE, "diag register read %02x\n", offset);
+		return 0;
+	}), NAME([this] (offs_t offset, u16 data) {
+		LOGMASKED(LOG_TRACE, "diag register write: %02x, %04x\n", offset, data);
+		if (offset < 0x05) {
+			fatalerror("%x(%o): diag register write: write to %02x not implemented", m_prev_pc, m_prev_pc, offset);
+		}
+	}));
+	map(0x05 << 2, 0x05 << 2).lw16(NAME([this] (u16 data) {
+		LOGMASKED(LOG_TRACE, "diag mode register write: %04x\n", data);
+		// mode register
+		// x------- PROG.BOOT
+		// -x------ PROG.RESET
+		// --x----- PROMDISABLE
+		// ---x---- TRAPENB
+		// ----x--- STATHENB
+		// -----x-- ERRSTOP
+		// ------xx SPEED 00 - extra slow, 01 - slow, 10 - normal, 11 - fast
 		m_diag_mode = data;
 		m_inst_view.select(BIT(m_diag_mode, 5));
-		break;
-	case 0x00: // debug ir 15-0
-	case 0x01: // debug ir 31-16
-	case 0x02: // debug ir 47-32
-	case 0x03: // clock control register
-	case 0x04: // OPC control register
-	default:
-		fatalerror("%x(%o): diag_w: write to %02x not implemented", m_prev_pc, m_prev_pc, offset);
-	}
+	}));
 }
 
 

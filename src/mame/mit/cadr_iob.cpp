@@ -484,6 +484,150 @@ TIMER_CALLBACK_MEMBER(cadr_iob_device::transmit_callback)
 }
 
 
+void cadr_iob_device::map(address_map &map)
+{
+	// When installing through a map these must be byte addresses
+	map(0x00, (0x20 << 2) - 1).lr16(NAME([] () { return 0xffff; }));
+	map(0x00 << 2, 0x00 << 2).lr16(NAME([this] {
+		// keyboard low
+		m_csr &= ~CSR_KEYBOARD_READY;
+		return m_keyboard_data & 0xffff;
+	}));
+	map(0x01 << 2, 0x01 << 2).lr16(NAME([this] {
+		// keyboard high
+		return m_keyboard_data >> 16;
+	}));
+	map(0x02 << 2, 0x02 << 2).lr16(NAME([this] {
+		// mouse y
+		// 0------- --------
+		// -x------ -------- - head switch
+		// --x----- -------- - middle switch
+		// ---x---- -------- - tail switch
+		// ----xxxx xxxxxxxx - Y position of the mouse
+		m_csr &= ~CSR_MOUSE_READY;
+		return ((m_mouse_buttons->read() & 0x07) << 12) | (m_mouse_y->read() & 0xfff);
+	}));
+	map(0x03 << 2, 0x03 << 2).lr16(NAME([this] {
+		// mouse x
+		// xx------ -------- - raw Y encoder inputs
+		// --xx---- -------- - raw X encoder inputs
+		// ----xxxx xxxxxxxx - X position of the mouse
+		return m_mouse_x->read() & 0xfff;
+	}));
+	map(0x04 << 2, 0x04 << 2).lrw16(NAME([this] {
+		m_speaker_data ^= 1;
+		m_speaker->level_w(m_speaker_data);
+		return u16(0xffff);
+	}), NAME([this] (u16 data) {
+		m_speaker_data ^= 1;
+		m_speaker->level_w(m_speaker_data);
+	}));
+	map(0x05 << 2, 0x05 << 2).lrw16(NAME([this] {
+		return m_csr;
+	}), NAME([this] (u16 data) {
+		m_csr = (m_csr & 0xf0) | (data & 0x0f);
+	}));
+	map(0x08 << 2, 0x08 << 2).lr16(NAME([this] {
+		// microsecond counter low
+		m_microsecond_clock_buffer = machine().time().as_ticks(1e6);
+		return m_microsecond_clock_buffer & 0xffff;
+	}));
+	map(0x09 << 2, 0x09 << 2).lr16(NAME([this] {
+		// microsecond counter high
+		return m_microsecond_clock_buffer >> 16;
+	}));
+	map(0x0a << 2, 0x0a << 2).lrw16(NAME([this] {
+		// 60hz clock
+		return machine().time().as_ticks(60) & 0xffff;
+	}),NAME([this] (u16 data) {
+		m_csr &= ~CSR_CLOCK_READY;
+		m_clock = data;
+		m_clock_timer->adjust(attotime::from_msec(m_clock << 4));
+	}));
+	// 0x0b - general purpose I/O
+	// chaosnet csr 764140
+	map(0x10 << 2, 0x10 << 2).lrw16(NAME([this] {
+		// x------- -------- Receive done
+		// -x------ -------- CRC error
+		// ---xxxx- -------- Lost count
+		// -------- x------- Transmit done
+		// -------- -x------ Transmit aborted
+		// -------- --x----- Transmit interrupt enable
+		// -------- ---x---- Receive interrupt enable
+		// -------- -----x-- Match any destination
+		// -------- ------x- Loopback
+		// -------- -------x Timer interrupt enable (not implemented)
+		return m_chaos_csr;
+	}),NAME([this] (u16 data) {
+		// --x----- -------- Reset receiver, transmitter and interrupt
+		// -------x -------- Clear transmitter
+		// -------- --x----- Transmit interrupt enable
+		// -------- ---x---- Receive interrupt enable
+		// -------- ----x--- Clear receiver
+		// -------- -----x-- Match any destination
+		// -------- ------x- Loopback
+		// -------- -------x Timer interrupt enable (not implemented)
+		{
+			const u16 bits_to_store = CHAOSNET_RECEIVE_IRQ_ENABLE | CHAOSNET_TRANSMIT_IRQ_ENABLE |
+				CHAOSNET_ANY_DESTINATION | CHAOSNET_LOOKBACK | CHAOSNET_TIMER_IRQ_ENABLE;
+			m_chaos_csr = (m_chaos_csr & ~bits_to_store) | (data & bits_to_store);
+		}
+		if (BIT(data, CHAOSNET_RESET_RECEIVE_BIT))
+		{
+			m_chaos_receive_pointer = 0;
+			m_chaos_receive_size = 0;
+			m_chaos_csr = (m_chaos_csr & ~CHAOSNET_RECEIVE_DONE);
+			m_chaos_csr = (m_chaos_csr & ~CHAOSNET_LOST_COUNT);
+		}
+		if (BIT(data, CHAOSNET_TRANSMIT_IRQ_ENABLE_BIT))
+		{
+			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
+		}
+		if (BIT(data, CHAOSNET_RESET_TRANSMIT_BIT))
+		{
+			m_transmit_timer->adjust(attotime::never);
+			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
+		}
+		if (BIT(data, CHAOSNET_RESET_BIT))
+		{
+			m_chaos_receive_pointer = 0;
+			m_chaos_receive_size = 0;
+			m_transmit_timer->adjust(attotime::never);
+			m_chaos_csr |= CHAOSNET_TRANSMIT_DONE;
+			m_chaos_csr = m_chaos_csr & ~(CHAOSNET_RESET | CHAOSNET_RECEIVE_DONE | CHAOSNET_RECEIVE_IRQ_ENABLE | CHAOSNET_TRANSMIT_IRQ_ENABLE);
+		}
+	}));
+	map(0x11 << 2, 0x11 << 2).lrw16(NAME([this] {
+		// chaos net my address
+		return m_my_chaos_address->read();
+	}),NAME([this] (u16 data) {
+		// store word in transmit buffer
+		m_chaos_transmit_buffer[m_chaos_transmit_pointer] = data;
+		m_chaos_transmit_pointer = (m_chaos_transmit_pointer + 1) % CHAOS_BUFFER_SIZE;
+		m_chaos_csr &= ~CHAOSNET_TRANSMIT_DONE;
+	}));
+	map(0x12 << 2, 0x12 << 2).lr16(NAME([this] {
+		// next word from receive buffer
+		const u16 data = m_chaos_receive_buffer[m_chaos_receive_pointer];
+		m_chaos_receive_pointer = (m_chaos_receive_pointer + 1) % CHAOS_BUFFER_SIZE;
+		return data;
+	}));
+	map(0x13 << 2, 0x13 << 2).lr16(NAME([this] {
+		// count of bits remaining in the receive buffer
+		if (m_chaos_receive_pointer < m_chaos_receive_size)
+		{
+			return m_chaos_receive_bit_count;
+		}
+		return u16(0xffff);
+	}));
+	map(0x15 << 2, 0x15 << 2).lr16(NAME([this] {
+		 // host number of this interface
+		chaos_transmit_start();
+		return m_my_chaos_address->read();
+	}));
+}
+
+
 void cadr_iob_device::write(offs_t offset, u16 data)
 {
 	switch (offset)

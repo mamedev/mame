@@ -22,7 +22,7 @@ Implementation based on description of the operation, not schematics.
 
 TODO:
 - Disk access times.
-- THe disk controller reads/writes directly to memory, implications on cpu slowdown unknown.
+- The disk controller reads/writes directly to memory, implications on cpu slowdown unknown.
 
 **********************************************************************************/
 
@@ -81,6 +81,17 @@ TIMER_CALLBACK_MEMBER(cadr_disk_device::disk_done_callback)
 		m_status |= 0x08;
 		m_irq_cb(ASSERT_LINE);
 	}
+}
+
+
+void cadr_disk_device::map(address_map &map)
+{
+	// When installing through a map these must be byte addresses
+	map(0x00,      0x1f).lr32(NAME([] () { return 0xffffffff; }));
+	map(0x04 << 2, 0x04 << 2).rw(FUNC(cadr_disk_device::status_r), FUNC(cadr_disk_device::command_w));
+	map(0x05 << 2, 0x05 << 2).rw(FUNC(cadr_disk_device::command_list_r), FUNC(cadr_disk_device::command_list_w));
+	map(0x06 << 2, 0x06 << 2).rw(FUNC(cadr_disk_device::disk_address_r), FUNC(cadr_disk_device::disk_address_w));
+	map(0x07 << 2, 0x07 << 2).rw(FUNC(cadr_disk_device::error_correction_r), FUNC(cadr_disk_device::start_w));
 }
 
 
@@ -324,43 +335,6 @@ void cadr_disk_device::start_w(u32 data)
 	case 0x004: // 0004 - Seek
 	default:
 		fatalerror("Unknown disk controller command %03x initiated\n", m_command & 0x3ff);
-		break;
-	}
-}
-
-
-u32 cadr_disk_device::read(offs_t offset)
-{
-	switch (offset)
-	{
-	case 0x04:
-		return status_r();
-	case 0x05:
-		return command_list_r();
-	case 0x06:
-		return disk_address_r();
-	case 0x07:
-		return error_correction_r();
-	}
-	return 0xffffffff;
-}
-
-
-void cadr_disk_device::write(offs_t offset, u32 data)
-{
-	switch (offset)
-	{
-	case 0x04:
-		command_w(data);
-		break;
-	case 0x05:
-		command_list_w(data);
-		break;
-	case 0x06:
-		disk_address_w(data);
-		break;
-	case 0x07:
-		start_w(data);
 		break;
 	}
 }

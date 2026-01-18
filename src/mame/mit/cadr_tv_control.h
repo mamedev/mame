@@ -22,8 +22,8 @@ public:
 
 	u32 video_ram_read(offs_t offset);
 	void video_ram_write(offs_t offset, u32 data);
-	u32 tv_control_r(offs_t offset);
-	void tv_control_w(offs_t offset, u32 data);
+
+	void map(address_map &map);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
