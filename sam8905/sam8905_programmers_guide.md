@@ -99,9 +99,9 @@ Any of the 16 x 19 bits words of a D-RAM block can be addressed during a slot by
 
 - **X:** free for other information
 
-- **M:** Interrupt mask, when set, this slot will not generate interrupts.
-- **I:** Idle, when set, this slot will execute a no-op algorithm, independently of the selected algorithm.
-- **ALG:** selected algorithm, will select the block in the A-RAM. Execution of the corresponding algorithm will start at address:
+- **M:** [7]Interrupt mask, when set, this slot will not generate interrupts.
+- **I:** [11] Idle, when set, this slot will execute a no-op algorithm, independently of the selected algorithm.
+- **ALG:** [10:8] (or [10:9] for SSR=1)selected algorithm, will select the block in the A-RAM. Execution of the corresponding algorithm will start at address:
 
 ```
 | 7  |    |    |    |    | 0  |
@@ -122,16 +122,16 @@ The other addresses of the D-RAM are not assigned to any specific information. H
 ```
 | 18 |    |    | 10 |    | 7  |    |    |    |    | 0  |
 |----|----|----|----|----|----|----|----|----|----|----|
-|         PHI          |              X               |
+|         PHI                                          |
 |       PHIWF          |              X               |
 |       PHIREG         |              X               |
 ```
 
 **Typical micro-instructions: WA, WB, WPHI**
 
-- **PHI:** full phase of a period of a given waveform (unsigned integer)
-- **PHIWF:** Portion of phase recommended to access external waveforms (512 samples/period). Up to 12 bits can be used (4096 samples/period with the same frequency definition as the built-in sinus)
-- **PHIREG:** Portion of phase loaded at WPHI time, allows to address the internal 4096 samples/period sinus/ramp.
+- **PHI:** [18:0] full phase of a period of a given waveform (unsigned integer)
+- **PHIWF:** [18:10] Portion of phase recommended to access external waveforms (512 samples/period). Up to 12 bits can be used (4096 samples/period with the same frequency definition as the built-in sinus)
+- **PHIREG:** [18:7] Portion of phase loaded at WPHI time, allows to address the internal 4096 samples/period sinus/ramp.
 
 ---
 
@@ -145,7 +145,7 @@ The other addresses of the D-RAM are not assigned to any specific information. H
 
 **Typical micro-instructions: WA, WB**
 
-**DPHI:** Phase interval, signed integer, determines the basic frequency of a signal as follows (standardized to the built-in sinus):
+**DPHI:** [18:0] Phase interval, signed integer, determines the basic frequency of a signal as follows (standardized to the built-in sinus):
 
 ```
 f = 0.084114 x DPHI  (Hz)
@@ -304,6 +304,32 @@ The result of the addition A+B being available one cycle after the A and B opera
    - 1- Internal ramp or constant: 1 cycle
    - 2- Internal sinus: 2 cycles
    - 3- External wave memory: (t_acc + 44.2)/44.2 cycles, t_acc being the access time of the external memory. For example, assume a 250ns access time, then 7 cycles are needed.
+
+### Waveform Unit Timing (External Memory)
+
+For **external waveforms** (WF[8]=0), the hardware timing differs from internal waveforms:
+
+```
+WPHI or WWF → Address output (WA0-19) → External ROM read → Data (WD0-11) → X register
+```
+
+The block diagram shows the waveform unit has dedicated control signals:
+- **WCS** (Waveform Chip Select)
+- **WOE** (Waveform Output Enable)
+- **WWE** (Waveform Write Enable)
+
+These signals go to the control logic ("zu Steuerlogik"), suggesting that for external waveforms:
+1. **WPHI** or **WWF** updates the address output to external memory
+2. The external ROM read cycle is initiated (WOE/WCS)
+3. Read data (WD0-11) is latched into the X register
+
+This means that for external waveforms, the X register may be updated by WPHI/WWF independently of WXY activation. The WXY receiver loads Y from the bus, but X may already contain the waveform sample from the earlier WPHI/WWF.
+
+**Note on multiplication:** The multiplier is combinational - it continuously computes X × Y. There is no "trigger" for multiplication. Whatever values are present in X and Y registers will produce a valid product that can be read by RP or accumulated by WACC (after the appropriate pipeline delay).
+
+**For internal waveforms** (WF[8]=1), the sinus/ramp/constant computation is triggered by WXY, so X is always computed at WXY time.
+
+**Note:** Existing algorithms are structured to ensure correct timing by placing sufficient NOP cycles between WPHI and WXY. The 7-cycle delay in Example 2 (External Memory Wave Oscillator) accommodates both external memory access time and this address-to-X timing.
 
 ---
 
@@ -519,6 +545,43 @@ The complete write cycle takes 443 ns. This algorithm can be improved to transfe
 
 **ON CHIP SYSTEMS**
 
+### 10-0. Register Map
+
+The SAM8905 is accessed via 8 registers selected by address lines A2, A1, A0. The WR/ and RD/ signals are active low.
+
+| Offset | A2 | A1 | A0 | Function |
+|--------|----|----|-----|----------|
+| 0x00   | 0  | 0  | 0   | Address register (write) / Interrupt status (read) |
+| 0x01   | 0  | 0  | 1   | Data LSB (bits 7:0) |
+| 0x02   | 0  | 1  | 0   | Data NSB (bits 15:8) |
+| 0x03   | 0  | 1  | 1   | Data MSB (bits 18:16 for D-RAM, bits 14:8 for A-RAM) |
+| 0x04   | 1  | 0  | 0   | Control register (triggers read/write operation) |
+
+**Notes:**
+- Data registers 0x01-0x03 are shared for both A-RAM and D-RAM access (selected by SEL bit)
+- A-RAM is 15-bit: only LSB (0x01) and lower 7 bits of NSB (0x02) are used
+- D-RAM is 19-bit: uses LSB (0x01), NSB (0x02), and lower 3 bits of MSB (0x03)
+- Upper bits beyond the word width are undefined on read
+
+**Write Sequence to D-RAM or A-RAM:**
+1. Write address to internal address 0x00
+2. Write data to internal addresses 0x01, 0x02, 0x03
+3. Write control byte with WR='1' to internal address 0x04 (triggers the write)
+4. Wait 1.5 µs (or 3.0 µs at 22kHz)
+
+Step 4 can be skipped if SAM is in idle state (IDL=1).
+To fill multiple locations with the same data, step 2 only needs to be executed once.
+
+**Read Sequence from D-RAM or A-RAM:**
+1. Write address to internal address 0x00
+2. Write control byte with WR='0' to internal address 0x04 (latches RAM data)
+3. Wait 1.5 µs (or 3.0 µs at 22kHz)
+4. Read the three data bytes from addresses 0x01, 0x02, 0x03
+
+Step 3 can be skipped if SAM is in idle state (IDL=1).
+
+**Important:** The corresponding slot in D-RAM must be set to IDLE when writing to A-RAM.
+
 ### 10-1. Control Byte
 
 The control byte is write only. It is updated when a computer write occurs to the chip with A2=1.
@@ -526,37 +589,70 @@ The control byte is write only. It is updated when a computer write occurs to th
 **Control byte format:**
 
 ```
-| X | X | X | X | SSR | IDL | SEL | WR |
+| bit7 | bit6 | bit5 | bit4 | bit3 | bit2 | bit1 | bit0 |
+|------|------|------|------|------|------|------|------|
+|  X   |  X   |  X   |  X   | SSR  | IDL  | SEL  |  WR  |
+```
+
+| Field | Bit | Description |
+|-------|-----|-------------|
+| **SSR** | 3 | 0 = 44.1 kHz sampling rate |
+|         |   | 1 = 22.05 kHz sampling rate |
+| **IDL** | 2 | 0 = Normal operation |
+|         |   | 1 = Force all 16 slots to idle (all 16 slots output silence) |
+| **SEL** | 1 | 0 = Select D-RAM access |
+|         |   | 1 = Select A-RAM access |
+| **WR**  | 0 | 0 = Request read from selected RAM |
+|         |   | 1 = Request write to selected RAM |
+
+**Common control byte values:**
+- `0x01` = Write to D-RAM (SEL=0, WR=1)
+- `0x03` = Write to A-RAM (SEL=1, WR=1)
+- `0x00` = Read from D-RAM (SEL=0, WR=0)
+- `0x02` = Read from A-RAM (SEL=1, WR=0)
+- `0x08` = 22kHz mode, D-RAM access (SSR=1)
+- `0x04` = Idle all slots (IDL=1)
+
+**Note:** When writing to A-RAM, the corresponding slot should be set to IDLE in D-RAM to prevent the DSP from executing partially-written instructions.
+
+**Note:** When IDL is changed from 0 to 1, it takes up to 1.5 µs [3 µs] for the SAM to actually go into an idle state.
+
+### 10-2. Address Byte
+
+A write to the chip with A2=A1=A0=0 selects the internal RAM address. The address byte format depends on whether D-RAM or A-RAM is being accessed (selected by SEL bit in control byte):
+
+**Address byte format:**
+
+```
+| bit7 | bit6 | bit5 | bit4 | bit3 | bit2 | bit1 | bit0 |
+|------|------|------|------|------|------|------|------|
+|  V3  |  V2  |  V1  |  V0  | MAD3 | MAD2 | MAD1 | MAD0 |  → D-RAM (SEL=0)
+| AL2  | AL1  | AL0  | PC4  | PC3  | PC2  | PC1  | PC0  |  → A-RAM (SEL=0, SSR=0)
+| AL2  | AL1  | PC5  | PC4  | PC3  | PC2  | PC1  | PC0  |  → A-RAM (SEL=1, SSR=1)
 ```
 
 | Field | Description |
 |-------|-------------|
-| **SSR** | 0- Select 44.1 kHz sampling rate |
-|         | 1- Select 22.05 kHz sampling rate |
-| **IDL** | 0- Normal operation |
-|         | 1- Force all 16 slots to idle algorithm |
-| **SEL** | 0- Select access to D-RAM |
-|         | 1- Select access to A-RAM |
-| **WR**  | 0- Request a read from D-RAM or A-RAM |
-|         | 1- Request a write to D-RAM or A-RAM |
+| **V** | Slot number (0-15), also called "tone number" |
+| **MAD** | D-RAM word address within slot (0-15, from MAD field in micro-instruction) |
+| **AL** | Algorithm number (0-7 for 44kHz, 0-3 for 22kHz) |
+| **PC** | Program counter / instruction address within algorithm |
 
-**Note:** When IDL is changed from 0 to 1, it takes up to 1.5 /us [3 /us] for the SAM to actually go into an idle state.
+**D-RAM addressing:**
+- Full address = (V × 16) + MAD
+- 16 slots × 16 words = 256 words total
+- Example: Slot 2, word 15 → address = (2 × 16) + 15 = 0x2F
 
-### 10-2. Address, Data and Interrupt Bytes
+**A-RAM addressing (44.1kHz, SSR=0):**
+- 8 algorithms × 32 instructions = 256 instructions
+- Full address = (AL × 32) + PC
+- PC range: 0-31 (5 bits: PC4-PC0)
 
-A write to the chip with A2=A1=A0=0 selects the internal RAM address
-
-| V3 | V2 | V1 | V0 | MAD3 | MAD2 | MAD1 | MAD0 | → D-RAM |
-|----|----|----|----|----|----|----|----|----|
-| AL2 | AL1 | AL0 | PC4 | PC3 | PC2 | PC1 | PC0 | → A-RAM with SSR=0 |
-| AL2 | AL1 | PC5 | PC4 | PC3 | PC2 | PC1 | PC0 | → A-RAM with SSR=1 |
-
-| Field | Description |
-|-------|-------------|
-| **V:** | slot number |
-| **MAD:** | D-RAM address inside slot (MAD from micro-instruction) |
-| **AL:** | algorithm number |
-| **PC:** | micro-instruction location counter inside algorithm |
+**A-RAM addressing (22.05kHz, SSR=1):**
+- 4 algorithms × 64 instructions = 256 instructions
+- Full address = (AL × 64) + PC
+- PC range: 0-63 (6 bits: PC5-PC0)
+- Note: AL0 bit becomes PC5 in this mode
 
 **Important note on 22kHz mode (SSR=1):**
 In D-RAM word 15, the ALG field occupies bits 10-8 (AL2=bit10, AL1=bit9, AL0=bit8).
