@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders: Tomasz Slanina
+
 /***************************************************************************
 
     Unidesa/Cirsa "960606-5" hardware.
@@ -163,6 +164,8 @@ connected to P8:
 #include "emu.h"
 
 #include "cpu/i86/i186.h"
+#include "machine/i2cmem.h"
+#include "machine/pcf8583.h"
 #include "sound/okim6376.h"
 
 #include "emupal.h"
@@ -321,6 +324,10 @@ void neptunp2_state::no_video(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &neptunp2_state::no_video_program_map);
 	m_maincpu->set_addrmap(AS_IO, &neptunp2_state::io_map);
 
+	PCF8583(config, "rtc", 32.768_kHz_XTAL);
+
+	I2C_24C16(config, "i2cmem");
+
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
 
@@ -332,7 +339,7 @@ void neptunp2_video_state::video(machine_config &config)
 	no_video(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &neptunp2_video_state::video_program_map);
-	m_maincpu->set_vblank_int("screen", FUNC(neptunp2_video_state::nmi_line_pulse)); // TODO: find origina
+	m_maincpu->set_vblank_int("screen", FUNC(neptunp2_video_state::nmi_line_pulse)); // TODO: find origin
 
 	// Video hardware (probably wrong values, as the video board outputs VGA resolution)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));

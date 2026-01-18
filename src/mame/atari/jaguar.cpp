@@ -150,7 +150,7 @@ ATARI GAMES (C) 1994
 Notes:
       JAGUAR CPU - Atari Jaguar CPU (QFP208)
       JAGUAR DSP - Atari Jaguar DSP (QFP160)
-      45160      - TMS45160DZ-70 512K x16 DRAM (SOJ40)
+      45160      - TMS45160DZ-70 256kB x16-bit DRAM. Compatible with Toshiba TC514260, NEC 424260 etc (SOJ40)
                    Note: This RAM is in banks. There are 4 banks, each bank is 2MBytes x 64bit
                    Only banks 0 and 1 are populated.
       *          - Unpopulated DRAM positions (banks 2 and 3)

@@ -23,12 +23,14 @@ Oki M6295 (or clone, not readable)
 3x switch
 
 TODO:
-- most everything
-- stuck at error 5 (永久记忆部分数据出倍)
+- remaing inputs / switches;
+- Oki ROM bank;
+- hopper;
+- SVG?
 
 Schematics and manual with list of error codes are available.
 
-Initialization (currently doesn't work due to preliminary emulation):
+Initialization (not necessary in MAME due to pre-initalized NVRAM, unless coinage DIPs are changed):
 On first power-up the machine must be zeroed:
 - Hold K0 + K3 while switching on
 - Press the Start button once
@@ -42,6 +44,7 @@ After this sequence it will run normally.
 #include "cpu/mcs51/i80c52.h"
 #include "machine/i2cmem.h"
 #include "machine/i8279.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
@@ -71,6 +74,7 @@ public:
 	lanmao_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_i2cmem(*this, "i2cmem"),
 		m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" }),
 		m_digits(*this, "digit%u", 0U),
 		m_leds(*this, "led%u", 0U)
@@ -83,6 +87,7 @@ protected:
 
 private:
 	required_device<i8052_device> m_maincpu;
+	required_device<i2cmem_device> m_i2cmem;
 
 	required_ioport_array<4> m_inputs;
 	output_finder<32> m_digits;
@@ -92,6 +97,8 @@ private:
 
 	template <uint8_t Which> void leds_w(uint8_t data);
 	void display_w(uint8_t data);
+	uint8_t keyboard_r();
+	void port1_w(uint8_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
@@ -124,6 +131,29 @@ void lanmao_state::display_w(uint8_t data)
 	m_digits[2 * m_kbd_line + 1] = patterns[data >> 4];
 }
 
+uint8_t lanmao_state::keyboard_r()
+{
+	switch (m_kbd_line & 0x07)
+	{
+		case 0:
+		case 1:
+		case 2:
+		case 3:
+			return m_inputs[m_kbd_line & 0x07]->read();
+		default:
+			return 0x00;
+	}
+}
+
+void lanmao_state::port1_w(uint8_t data)
+{
+	m_i2cmem->write_sda(BIT(data, 1));
+	m_i2cmem->write_scl(BIT(data, 2));
+
+	if ((data & 0xf1) != 0xf1)
+		logerror("unknown port1 write: %02x\n", data);
+}
+
 
 void lanmao_state::program_map(address_map &map)
 {
@@ -132,7 +162,7 @@ void lanmao_state::program_map(address_map &map)
 
 void lanmao_state::data_map(address_map &map)
 {
-	map(0x8000, 0x87ff).ram();
+	map(0x8000, 0x87ff).ram().share("nvram");
 	map(0x9000, 0x9001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x9002, 0x9003).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0xb000, 0xb001).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
@@ -141,60 +171,75 @@ void lanmao_state::data_map(address_map &map)
 }
 
 
-// TODO apart from DSW, the other are inputs that are only set as DIPs for easier testing)
 static INPUT_PORTS_START( lanmao )
 	PORT_START("KEYS1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "KEYS1:1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "KEYS1:2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "KEYS1:3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "KEYS1:4")
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "KEYS1:5")
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "KEYS1:6")
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "KEYS1:7")
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "KEYS1:8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 1" ) PORT_CODE( KEYCODE_1_PAD )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 2" ) PORT_CODE( KEYCODE_2_PAD )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 3" ) PORT_CODE( KEYCODE_3_PAD )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 4" ) PORT_CODE( KEYCODE_4_PAD )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 5" ) PORT_CODE( KEYCODE_5_PAD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 6" ) PORT_CODE( KEYCODE_6_PAD )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 7" ) PORT_CODE( KEYCODE_7_PAD )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME( "Bet 8" ) PORT_CODE( KEYCODE_8_PAD )
 
 	PORT_START("KEYS2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "KEYS2:1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "KEYS2:2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "KEYS2:3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "KEYS2:4")
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "KEYS2:5")
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "KEYS2:6")
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "KEYS2:7")
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "KEYS2:8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Unidentified button 2" ) PORT_CODE( KEYCODE_A )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Unidentified button 3" ) PORT_CODE( KEYCODE_S )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Unidentified button 4" ) PORT_CODE( KEYCODE_D )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Unidentified button 5" ) PORT_CODE( KEYCODE_F )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Unidentified button 6" ) PORT_CODE( KEYCODE_G )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Unidentified button 7" ) PORT_CODE( KEYCODE_H )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME( "Unidentified button 8" ) PORT_CODE( KEYCODE_I )
 
 	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW:1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW:2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW:3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW:4")
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW:5")
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW:6")
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:7")
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:8")
+	PORT_DIPNAME( 0x03, 0x03, "Running Lights Difficulty" )  PORT_DIPLOCATION("DSW:1,2")
+	PORT_DIPSETTING(    0x03, "3" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x02, "2" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x01, "1" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x00, "0" ) // Manual doesn't list the settings
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSW:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Difficulty" )  PORT_DIPLOCATION("DSW:4")
+	PORT_DIPSETTING(    0x08, "1" ) // Manual doesn't list the settings
+	PORT_DIPSETTING(    0x00, "0" ) // Manual doesn't list the settings
+	PORT_DIPNAME( 0x10, 0x10, "Bet Ratio" )  PORT_DIPLOCATION("DSW:5")
+	PORT_DIPSETTING(    0x10, "1/1" )
+	PORT_DIPSETTING(    0x00, "1/5" )
+	// the following will give error 21 (coin ratio changed) and machine will need to be reinitialized
+	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Coinage ) )  PORT_DIPLOCATION("DSW:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_100C ) )
+	PORT_DIPNAME( 0x80, 0x80, "Maximum Bet" )  PORT_DIPLOCATION("DSW:8")
+	PORT_DIPSETTING(    0x80, "60" )
+	PORT_DIPSETTING(    0x00, "95" )
 
 	PORT_START("PUSHBUTTONS")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "PB:1") // should be K0
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "PB:2") // should be K1
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "PB:3") // should be K2
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "PB:4") // should be K3
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "PB:5")
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "PB:6")
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "PB:7")
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "PB:8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) // K0
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) // K1
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) // K2
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // K3
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	// what's marked as DIP hereunder is actually something else, but left as DIP for easier testing
 	PORT_START("P1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P1:1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P1:2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P1:3")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) // scl
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P1:4")
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P1:5")
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P1:6")
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "P1:7") // hopper sensor, gives error 31 if high
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "P1:8") // reset switch
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // hopper sensor, gives error 31 if high
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 
 	PORT_START("P3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P3:1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P3:2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P3:3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "P3:4") // needs to be low to avoid error 30 (coin acceptor)
@@ -212,7 +257,7 @@ void lanmao_state::lanmao(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &lanmao_state::data_map);
 	m_maincpu->port_in_cb<1>().set_ioport("P1");
 	m_maincpu->port_in_cb<3>().set_ioport("P3");
-	m_maincpu->port_out_cb<1>().set([this] (uint8_t data) { LOGPORTS8052("%s I8052 port 1 write: %02x\n", machine().describe_context(), data); });
+	m_maincpu->port_out_cb<1>().set(FUNC(lanmao_state::port1_w));
 	m_maincpu->port_out_cb<3>().set([this] (uint8_t data) { LOGPORTS8052("%s I8052 port 3 write: %02x\n", machine().describe_context(), data); });
 
 	i8279_device &kdc(I8279(config, "kdc", 11_MHz_XTAL / 6 )); // TODO: divider
@@ -220,9 +265,11 @@ void lanmao_state::lanmao(machine_config &config)
 	kdc.out_sl_callback().set([this] (uint8_t data) { m_kbd_line = data; }); // 4 bit port
 	kdc.out_disp_callback().set(FUNC(lanmao_state::display_w)); // to 7-seg LEDs through to 2 CD4511 according to schematics
 	kdc.out_bd_callback().set([this] (int state) { LOGPORTS8279("%s I8279 bd write: %01x\n", machine().describe_context(), state); }); // not connected according to schematics
-	kdc.in_rl_callback().set_ioport(m_inputs[m_kbd_line & 0x0f]);
+	kdc.in_rl_callback().set(FUNC(lanmao_state::keyboard_r));
 	kdc.in_shift_callback().set([this] () { LOGPORTS8279("%s I8279 shift read\n", machine().describe_context()); return 1; }); // not connected according to schematics
 	kdc.in_ctrl_callback().set([this] () { LOGPORTS8279("%s I8279 ctrl read\n", machine().describe_context()); return 1; }); // not connected according to schematics
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	I2C_24C02(config, "i2cmem");
 
@@ -254,10 +301,13 @@ ROM_START( lanmao )
 	ROM_LOAD( "w27e040-12", 0x00000, 0x80000, CRC(4481a891) SHA1(09448bdca052b27828a4797243eee96b98f3d924) )
 
 	ROM_REGION( 0x100, "i2cmem", 0 )
-	ROM_LOAD( "24c02", 0x000, 0x100, CRC(1b95e93a) SHA1(c2697dc5f7ee1e3d73f98ea4ae3a1b71eeacbf07) )
+	ROM_LOAD( "24c02", 0x000, 0x100, CRC(daf84e5e) SHA1(7aa6ba2a7e74e0f59efc8d9f67d06bf41f2e3d6d) )
+
+	ROM_REGION( 0x800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x000, 0x800, CRC(5d051021) SHA1(06c1c78f7d2d53b98a2f010c4372d9c7135c1e62) ) // pre-initialized
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 2003, lanmao, 0, lanmao, lanmao, lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Lan Mao", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2003, lanmao, 0, lanmao, lanmao, lanmao_state, empty_init, ROT0, "Changsheng Electric Company", "Lan Mao", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
