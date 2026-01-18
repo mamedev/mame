@@ -57,6 +57,7 @@ void amy_device::clut_write(u32 data)
 	else
 	{
 		// TODO: background color (0xe0) & control word (0xc0)
+		// 0xe1: NULLOP
 	}
 }
 

@@ -74,7 +74,8 @@ void clio_device::device_reset()
 	m_irq0 = m_irq1 = 0;
 	m_timer_ctrl = 0;
 	m_vint0 = m_vint1 = 0xffff'ffff;
-	m_system_timer->adjust(attotime::never);
+	m_slack = 336;
+	m_system_timer->adjust(attotime::from_ticks(m_slack, this->clock()));
 	m_scan_timer->adjust(m_screen->time_until_pos(0), 0);
 }
 
@@ -325,7 +326,7 @@ void clio_device::map(address_map &map)
 			else
 				m_timer_ctrl |= mask;
 			LOGTIMER("timer control %s: %08x & %08x (shift=%d)\n", offset & 1 ? "clear" : "set", data, mem_mask, shift);
-			m_system_timer->adjust(m_timer_ctrl ? attotime::from_ticks(64, this->clock()) : attotime::never);
+			//m_system_timer->adjust(m_timer_ctrl ? attotime::from_ticks(64, this->clock()) : attotime::never);
 		})
 	);
 	map(0x0220, 0x0223).lrw32(
@@ -333,6 +334,11 @@ void clio_device::map(address_map &map)
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOG("slack: %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_slack);
+			m_slack &= 0x7ff;
+			// NOTE: Kernel forbids slack times less than 64 anyway
+			// TODO: is it really +64?
+			m_slack = std::max<unsigned>(m_slack, 64);
+			m_system_timer->adjust(attotime::from_ticks(m_slack, this->clock()));
 		})
 	);
 
@@ -433,6 +439,8 @@ void clio_device::map(address_map &map)
 
 	// TODO: should really map these directly in DSPP core
 //	map(0x17d0, 0x17d3) Semaphore
+	// HACK: for 3do_gdo101
+	map(0x17d0, 0x17d3).lr32(NAME([] () { return 0x0004'0000; }));
 //	map(0x17d4, 0x17d7) Semaphore ACK
 //	map(0x17e0, 0x17ff) DSPP DMA and state
 	map(0x17e8, 0x17eb).lw32(
@@ -647,8 +655,9 @@ TIMER_CALLBACK_MEMBER( clio_device::system_timer_cb )
 		}
 	}
 
-	// TODO: 64 or from spare register?
-	m_system_timer->adjust(m_timer_ctrl ? attotime::from_ticks(64, this->clock()) : attotime::never);
+	// Opera specification goes this lengthy explaination about "64" being the unit of time
+	// but 3do_fc2 and 3do_gdo101 won't boot with a timer tick this small ...
+	m_system_timer->adjust(attotime::from_ticks(m_slack, this->clock()));
 }
 
 TIMER_CALLBACK_MEMBER(clio_device::dac_update_cb)

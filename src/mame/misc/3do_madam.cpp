@@ -344,14 +344,14 @@ u32 madam_device::mctl_r()
 
 /*
  * $0330'0008 MCTL (Green)
- * ---- ---- --x- ---- ---- ---- ---- ---- CPUVEN
+ * ---- ---- --x- ---- ---- ---- ---- ---- CPUVEN enable CPU write to H counter
  * ---- ---- ---P ---- ---- ---- ---- ---- NTSC/PAL (on Preen chipset, unused on Green)
- * ---- ---- ---- x--- ---- ---- ---- ---- FENCOP
- * ---- ---- ---- --x- ---- ---- ---- ---- SLIPXEN
- * ---- ---- ---- ---x ---- ---- ---- ---- FENCEEN
- * ---- ---- ---- ---- x--- ---- ---- ---- PLAYXEN
- * ---- ---- ---- ---- -x-- ---- ---- ---- VSCTXEN
- * ---- ---- ---- ---- --x- ---- ---- ---- CLUTXEN
+ * ---- ---- ---- x--- ---- ---- ---- ---- FENCOP non-system option in fence
+ * ---- ---- ---- --x- ---- ---- ---- ---- SLIPXEN SlipStream enable
+ * ---- ---- ---- ---x ---- ---- ---- ---- FENCEEN Fence enable
+ * ---- ---- ---- ---- x--- ---- ---- ---- PLAYXEN enable Player DMA
+ * ---- ---- ---- ---- -x-- ---- ---- ---- VSCTXEN enable video transfers
+ * ---- ---- ---- ---- --x- ---- ---- ---- CLUTXEN enable Clut transfers
  */
 void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
 {
@@ -368,7 +368,7 @@ void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
 		m_amy->dac_enable(!!BIT(data, 13));
 	}
 
-	if (data != 0x0001e000)
+	if (data & 0xffee'1fff)
 		LOG("mctl: %08x & %08x\n", data, mem_mask);
 	COMBINE_DATA(&m_mctl);
 }
