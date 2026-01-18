@@ -91,11 +91,21 @@ class SAM8905State:
 class SAM8905Interpreter:
     """SAM8905 DSP interpreter for debugging and visualization."""
 
-    def __init__(self):
+    # Waveform bit interpretation modes
+    MODE_WORKING = 'working'  # R=bit6, I=bit7 (swapped, current "working" code)
+    MODE_MANUAL = 'manual'    # R=bit7, I=bit6 (as documented in programmer's guide)
+
+    # Inversion modes
+    INVERT_TWOS = 'twos'      # Two's complement: -val (standard)
+    INVERT_ONES = 'ones'      # One's complement: ~val (bit invert)
+
+    def __init__(self, wf_mode: str = 'working', invert_mode: str = 'twos'):
         self.state = SAM8905State()
         self.history: List[Dict[str, Any]] = []
         self.trace_enabled = False
         self.trace_output: List[str] = []
+        self.wf_mode = wf_mode  # 'working' or 'manual'
+        self.invert_mode = invert_mode  # 'twos' or 'ones'
 
         # External waveform callback: (address) -> 12-bit sample
         self.waveform_read: Optional[Callable[[int], int]] = None
@@ -155,41 +165,76 @@ class SAM8905Interpreter:
 
         if internal:
             # Bit 8=1: Internal waveform
-            z_bit = wf & 0x1
+            # Z bit is always at bit 3
+            z_bit = (wf & 0x08) != 0
             if z_bit:
                 return 0
 
-            ramp_mode = (wf & 0x40) != 0
-            if not ramp_mode:
-                # Sinus: X = 0.71875 * sin((PI/2048) * PHI + PI/4096)
-                angle = (math.pi / 2048.0) * phi + (math.pi / 4096.0)
-                return int(0.71875 * math.sin(angle) * 2048.0)
+            # SEL bits are always at bits 5:4
+            sel = (wf >> 4) & 3
+
+            # R and I bit positions depend on mode
+            if self.wf_mode == 'manual':
+                # MANUAL: R=bit7, I=bit6 (as documented in programmer's guide)
+                ramp_mode = (wf & 0x80) != 0
+                invert = (wf & 0x40) != 0
             else:
-                # Ramps based on SEL bits
-                sel = (wf >> 2) & 3
+                # WORKING: R=bit6, I=bit7 (swapped, current "working" code)
+                ramp_mode = (wf & 0x40) != 0
+                invert = (wf & 0x80) != 0
+
+            if not ramp_mode:
+                # R=0: Sinus wave
+                # X = 0.71875 * sin((PI/2048) * PHI + PI/4096)
+                angle = (math.pi / 2048.0) * phi + (math.pi / 4096.0)
+                result = int(0.71875 * math.sin(angle) * 2048.0)
+            else:
+                # R=1: Ramps based on SEL bits
                 if sel == 0:
                     # 2x PHI triangle
                     if phi < 1024:
-                        return phi * 2
+                        result = phi * 2
                     elif phi < 3072:
-                        return (phi * 2) - 4096
+                        result = (phi * 2) - 4096
                     else:
-                        return (phi * 2) - 8192
+                        result = (phi * 2) - 8192
                 elif sel == 1:
                     # Constant from MAD
-                    return self.get_constant(mad)
+                    result = self.get_constant(mad)
                 elif sel == 2:
                     # PHI ramp
                     if phi < 2048:
-                        return phi
+                        result = phi
                     else:
-                        return phi - 4096
+                        result = phi - 4096
                 elif sel == 3:
                     # PHI/2 ramp
                     if phi < 2048:
-                        return phi // 2
+                        result = phi // 2
                     else:
-                        return (phi // 2) - 2048
+                        result = (phi // 2) - 2048
+                else:
+                    result = 0
+
+            # Apply I bit: inversion
+            if invert:
+                if self.invert_mode == 'ones':
+                    # One's complement: invert all bits (XOR with 0xFFF)
+                    # Convert to unsigned 12-bit first
+                    if result < 0:
+                        result = result & 0xFFF
+                    result = result ^ 0xFFF
+                    # Convert back to signed
+                    if result >= 2048:
+                        result -= 4096
+                else:
+                    # Two's complement: negate
+                    # Note: must mask to 12-bit after invert, as -(-2048) = +2048 overflows
+                    result = -result
+                    # Mask to 12-bit signed range [-2048, +2047]
+                    result = ((result + 2048) & 0xFFF) - 2048
+
+            return result
         else:
             # External memory access
             if self.waveform_read is not None:
