@@ -157,17 +157,17 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 		}
 
         // Option 1: Mask to 12-bit (wraps)
-        if (invert) {
-            result = (-result) & 0xFFF;
-            if (result & 0x800) result |= ~0xFFF; // sign extend
-        }
+        // if (invert) {
+        //     result = (-result) & 0xFFF;
+        //     if (result & 0x800) result |= ~0xFFF; // sign extend
+        // }
 
         // Option 2: Saturate
-        // if (invert) {
-        //     result = -result;
-        //     if (result > 2047) result = 2047;
-        //     if (result < -2048) result = -2048;
-        // }
+        if (invert) {
+            result = -result;
+            if (result > 2047) result = 2047;
+            if (result < -2048) result = -2048;
+        }
         // EXPERIMENTING
 		// 
 		// Apply I bit: one's complement inversion with INVERTED semantics
@@ -528,8 +528,10 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 		// Fire sample output callback for inter-chip audio (FX processing)
 		if (!m_sample_output.isunset()) {
 			// Output upper 16 bits of 24-bit accumulator, clamped to 16-bit range
-			int32_t l_out = std::clamp((int32_t)m_l_acc >> 8, -32768, 32767);
-			int32_t r_out = std::clamp((int32_t)m_r_acc >> 8, -32768, 32767);
+			int32_t l_out = std::clamp((int32_t)m_l_acc >> 9, -32768, 32767);
+			int32_t r_out = std::clamp((int32_t)m_r_acc >> 9, -32768, 32767);
+			// int32_t l_out = std::clamp((int32_t)(m_l_acc >> 8), -32768, 32767);
+			// int32_t r_out = std::clamp((int32_t)(m_r_acc >> 8), -32768, 32767);
 			// int32_t l_out = std::clamp((int32_t)m_l_acc >> 4, -32768, 32767);
 			// int32_t r_out = std::clamp((int32_t)m_r_acc >> 4, -32768, 32767);
 			// Pack L/R as 32-bit value: upper 16 = L, lower 16 = R
