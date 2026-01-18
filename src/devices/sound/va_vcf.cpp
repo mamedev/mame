@@ -16,6 +16,7 @@ va_lpf4_device::va_lpf4_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
+	, m_input_gain(1)
 	, m_fc(0)
 	, m_res(0)
 {
@@ -23,6 +24,12 @@ va_lpf4_device::va_lpf4_device(const machine_config &mconfig, device_type type, 
 	std::fill(m_b.begin(), m_b.end(), 0);
 	std::fill(m_x.begin(), m_x.end(), 0);
 	std::fill(m_y.begin(), m_y.end(), 0);
+}
+
+va_lpf4_device& va_lpf4_device::configure_input_gain(float gain)
+{
+	m_input_gain = gain;
+	return *this;
 }
 
 void va_lpf4_device::set_fixed_freq_cv(float freq_cv)
@@ -55,6 +62,20 @@ void va_lpf4_device::set_fixed_res_cv(float res_cv)
 	m_stream->update();
 	m_res = res;
 	recalc_filter();
+}
+
+float va_lpf4_device::get_freq()
+{
+	if (BIT(get_sound_requested_inputs_mask(), INPUT_FREQ))
+		m_stream->update();
+	return m_fc;
+}
+
+float va_lpf4_device::get_res()
+{
+	if (BIT(get_sound_requested_inputs_mask(), INPUT_RES))
+		m_stream->update();
+	return m_res;
 }
 
 float va_lpf4_device::cv_to_freq(float freq_cv) const
@@ -140,7 +161,7 @@ void va_lpf4_device::sound_stream_update(sound_stream &stream)
 				recalc_filter();
 		}
 
-		const float x = stream.get(INPUT_AUDIO, i);
+		const float x = stream.get(INPUT_AUDIO, i) * m_input_gain;
 		const float y = (x * m_a[0]
 						+ m_x[0] * m_a[1] + m_x[1] * m_a[2] + m_x[2] * m_a[3] + m_x[3] * m_a[4]
 						- m_y[0] * m_b[1] - m_y[1] * m_b[2] - m_y[2] * m_b[3] - m_y[3] * m_b[4]) / m_b[0];
@@ -208,10 +229,13 @@ void va_lpf4_device::recalc_filter()
 	m_b[4] =      r1 - 4 * gzc + 6 * gzc2 - 4 * gzc3 + gzc4;
 }
 
+// Parallel combination of the external feedback resistor (recommended value is
+// 100K) and impedance of each gain cell. This affects a lot of calculations.
+// See datasheet.
+const float cem3320_lpf4_device::R_EQ = RES_2_PARALLEL(RES_K(100), RES_M(1));
 
-cem3320_lpf4_device::cem3320_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, float c_p, float r_f)
+cem3320_lpf4_device::cem3320_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, double c_p)
 	: va_lpf4_device(mconfig, CEM3320_LPF4, tag, owner, 0)
-	, m_r_eq(1)
 	, m_cv2freq(1)
 	, m_res_enabled(false)
 	, m_r_rc(1)
@@ -219,13 +243,19 @@ cem3320_lpf4_device::cem3320_lpf4_device(const machine_config &mconfig, const ch
 {
 	// See cem3320_lpf4_device::cv_to_freq() for info on these equations.
 	constexpr float AI0 = 0.9F;  // From the datasheet.
-	m_r_eq = RES_2_PARALLEL(r_f, RES_M(1));
-	m_cv2freq = AI0 / (2 * float(M_PI) * m_r_eq * c_p);
+	m_cv2freq = AI0 / (2 * float(M_PI) * R_EQ * float(c_p));
+	configure_input_gain(R_EQ);
 }
 
 cem3320_lpf4_device::cem3320_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cem3320_lpf4_device(mconfig, tag, owner, CAP_P(300), RES_K(100))  // Arbitrarily choosing the example values in the datasheet.
+	: cem3320_lpf4_device(mconfig, tag, owner, CAP_P(300))  // Arbitrarily choosing the example value in the datasheet.
 {
+}
+
+cem3320_lpf4_device &cem3320_lpf4_device::configure_voltage_input(float r_i)
+{
+	configure_input_gain((1.0 / r_i) * R_EQ);
+	return *this;
 }
 
 cem3320_lpf4_device &cem3320_lpf4_device::configure_resonance(float r_rc, float r_ri)
@@ -316,7 +346,7 @@ float cem3320_lpf4_device::cv_to_res(float res_cv) const
 
 	// The (EXTERNAL_GAIN * INPUT_Z / R_RI) factor is computed in
 	// configure_resonance() and stored in m_res_a.
-	const float gain = m_res_a * (g_m * m_r_eq - 1.0F);
+	const float gain = m_res_a * (g_m * R_EQ - 1.0F);
 
 	// The equations in the datasheet can result in slightly negative gain
 	// values. Clamp those to 0.
