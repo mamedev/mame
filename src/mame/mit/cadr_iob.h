@@ -23,8 +23,6 @@ public:
 	// configuration
 	auto irq_vector_callback() { return m_irq_vector_cb.bind(); }
 
-	void write(offs_t offset, u16 data);
-	u16 read(offs_t offset);
 	DECLARE_INPUT_CHANGED_MEMBER(mouse_changed);
 
 	void map(address_map &map);
