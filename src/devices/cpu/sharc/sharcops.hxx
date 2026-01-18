@@ -483,7 +483,7 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 		{
 			if (shift < 0)
 			{
-				REG(rn) = (shift > -32) ? ((int32_t)REG(rx) >> -shift) : ((REG(rx) & 0x80000000) ? 0xffffffff : 0);
+				REG(rn) = (int32_t)REG(rx) >> ((shift > -32) ? -shift : 31);
 			}
 			else
 			{
@@ -557,6 +557,8 @@ void adsp21062_device::SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx
 		{
 			if (len == 0 || bit >= 32)
 				REG(rn) = 0;
+			else if (bit+len > 32)
+				REG(rn) = (uint32_t)REG(rx) >> bit;
 			else
 				REG(rn) = util::sext(REG(rx) >> bit, std::min(len, 32));
 
@@ -945,6 +947,8 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 						int len = (REG(ry) >> 6) & 0x3f;
 						if (len == 0 || bit >= 32)
 							REG(rn) = 0;
+						else if (bit+len > 32)
+							REG(rn) = (uint32_t)REG(rx) >> bit;
 						else
 							REG(rn) = util::sext(REG(rx) >> bit, std::min(len, 32));
 
