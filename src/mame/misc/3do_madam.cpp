@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Wilbert Pol
 
 #include "emu.h"
@@ -10,8 +10,10 @@
 #define LOG_MMU     (1U << 4)
 #define LOG_DMA     (1U << 5)
 #define LOG_MULT    (1U << 6)
+#define LOG_VDLP    (1U << 7)
 
 #define VERBOSE (LOG_GENERAL | LOG_CEL | LOG_REGIS | LOG_MMU | LOG_MULT)
+//#define VERBOSE (LOG_VDLP)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
@@ -22,11 +24,13 @@
 #define LOGMMU(...)     LOGMASKED(LOG_MMU,     __VA_ARGS__)
 #define LOGDMA(...)     LOGMASKED(LOG_DMA,     __VA_ARGS__)
 #define LOGMULT(...)    LOGMASKED(LOG_MULT,    __VA_ARGS__)
+#define LOGVDLP(...)    LOGMASKED(LOG_VDLP,    __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(MADAM, madam_device, "madam", "3DO MN7A020UDA \"Madam\" Address Decoder")
 
 madam_device::madam_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MADAM, tag, owner, clock)
+	, m_amy(*this, finder_base::DUMMY_TAG)
 	, m_diag_cb(*this)
 	, m_dma_read_cb(*this, 0)
 	, m_dma_write_cb(*this)
@@ -54,10 +58,14 @@ void madam_device::device_start()
 	save_item(NAME(m_fence));
 	save_item(NAME(m_mmu));
 	save_item(NAME(m_mult));
+	save_item(STRUCT_MEMBER(m_vdlp, address));
+
 }
 
 void madam_device::device_reset()
 {
+	m_vdlp.address = 0x20'0000;
+
 	m_mctl = 0;
 	m_dma_playerbus_timer->adjust(attotime::never);
 }
@@ -121,10 +129,10 @@ void madam_device::map(address_map &map)
 	// 0x0044: Anvil "feature"
 
 	// CEL engine
-//	map(0x0100, 0x0103)  SPRSTRT - Start the CEL engine (W)
-//	map(0x0104, 0x0107)  SPRSTOP - Stop the CEL engine (W)
-//	map(0x0108, 0x010b)  SPRCNTU - Continue the CEL engine (W)
-//	map(0x010c, 0x010f)  SPRPAUS - Pause the CEL engine (W)
+//  map(0x0100, 0x0103)  SPRSTRT - Start the CEL engine (W)
+//  map(0x0104, 0x0107)  SPRSTOP - Stop the CEL engine (W)
+//  map(0x0108, 0x010b)  SPRCNTU - Continue the CEL engine (W)
+//  map(0x010c, 0x010f)  SPRPAUS - Pause the CEL engine (W)
 	map(0x0110, 0x0113).lrw32(
 		NAME([this] () { return m_ccobctl0; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -289,14 +297,16 @@ void madam_device::map(address_map &map)
 		NAME([this] (offs_t offset) {
 			const u16 channel = (offset >> 2) & 0x1f;
 			const u8 reg = offset & 3;
-			return m_dma[channel][reg] & 0x1f'fffc;
+			return m_dma[channel][reg] & 0x3f'fffc;
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			const u16 channel = (offset >> 2) & 0x1f;
 			const u8 reg = offset & 3;
 			LOGDMA("DMA [%d] reg [%02x]: %08x & %08x\n", channel, reg, data, mem_mask);
 			COMBINE_DATA(&m_dma[channel][reg]);
-			m_dma[channel][reg] &= 0x1f'fffc;
+			// TODO: despite documentation mask really depends on what channel is
+			// (video DMA definitely sets it with 0x20'0000 high)
+			m_dma[channel][reg] &= 0x3f'fffc;
 		})
 	);
 	/* Hardware multiplier */
@@ -324,7 +334,7 @@ void madam_device::map(address_map &map)
 		})
 	);
 	map(0x07f8, 0x07fb).lr32(NAME([this] () { return m_mult_status; }));
-//	map(0x07fc, 0x07ff) start process
+//  map(0x07fc, 0x07ff) start process
 }
 
 u32 madam_device::mctl_r()
@@ -334,14 +344,14 @@ u32 madam_device::mctl_r()
 
 /*
  * $0330'0008 MCTL (Green)
- * ---- ---- --x- ---- ---- ---- ---- ---- CPUVEN
+ * ---- ---- --x- ---- ---- ---- ---- ---- CPUVEN enable CPU write to H counter
  * ---- ---- ---P ---- ---- ---- ---- ---- NTSC/PAL (on Preen chipset, unused on Green)
- * ---- ---- ---- x--- ---- ---- ---- ---- FENCOP
- * ---- ---- ---- --x- ---- ---- ---- ---- SLIPXEN
- * ---- ---- ---- ---x ---- ---- ---- ---- FENCEEN
- * ---- ---- ---- ---- x--- ---- ---- ---- PLAYXEN
- * ---- ---- ---- ---- -x-- ---- ---- ---- VSCTXEN
- * ---- ---- ---- ---- --x- ---- ---- ---- CLUTXEN
+ * ---- ---- ---- x--- ---- ---- ---- ---- FENCOP non-system option in fence
+ * ---- ---- ---- --x- ---- ---- ---- ---- SLIPXEN SlipStream enable
+ * ---- ---- ---- ---x ---- ---- ---- ---- FENCEEN Fence enable
+ * ---- ---- ---- ---- x--- ---- ---- ---- PLAYXEN enable Player DMA
+ * ---- ---- ---- ---- -x-- ---- ---- ---- VSCTXEN enable video transfers
+ * ---- ---- ---- ---- --x- ---- ---- ---- CLUTXEN enable Clut transfers
  */
 void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
 {
@@ -354,9 +364,11 @@ void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
 			LOG("mctl: Player bus DMA abort?\n");
 			m_dma_playerbus_timer->adjust(attotime::never);
 		}
+
+		m_amy->dac_enable(!!BIT(data, 13));
 	}
 
-	if (data != 0x0001e000)
+	if (data & 0xffee'1fff)
 		LOG("mctl: %08x & %08x\n", data, mem_mask);
 	COMBINE_DATA(&m_mctl);
 }
@@ -370,7 +382,7 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 
 	if (BIT(count, 31))
 	{
-		m_mctl &= ~0x8000;
+		m_mctl &= ~(1 << 15);
 		m_irq_dply_cb(1);
 		m_dma_playerbus_timer->adjust(attotime::never);
 		return;
@@ -394,3 +406,117 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 	m_dma_playerbus_timer->adjust(attotime::from_ticks(2, this->clock()));
 }
 
+void madam_device::vdlp_start_w(int state)
+{
+	// PLAYXEN
+	if (state || !BIT(m_mctl, 14))
+	{
+		m_vdlp.fetch = false;
+		return;
+	}
+
+//	if (m_vdlp.address == m_dma[24][0])
+//	{
+//		m_vdlp.fetch = false;
+//		return;
+//	}
+
+	m_vdlp.address = m_dma[24][0];
+	m_vdlp.scanlines = 0;
+	m_vdlp.fetch = true;
+	m_vdlp.y_dest = 6;
+
+	LOGVDLP("VDLP start %08x\n", m_vdlp.address);
+}
+
+void madam_device::vdlp_continue_w(int state)
+{
+	if (!state || !BIT(m_mctl, 14) || !m_vdlp.fetch)
+		return;
+
+	if (m_vdlp.scanlines == 0)
+	{
+		// abort if we are out of VRAM space
+		if (!(m_vdlp.address & 0x20'0000))
+		{
+			m_vdlp.fetch = false;
+			LOGVDLP("line=%d abort with address %08x\n", m_vdlp.address);
+			return;
+		}
+
+		const u32 control_word = m_dma_read_cb(m_vdlp.address);
+
+		m_vdlp.scanlines = (control_word & 0x1ff);
+
+		if (m_vdlp.scanlines == 0)
+		{
+			m_vdlp.fetch = false;
+			return;
+		}
+
+		// upper limit of 34 due of hblank
+		const u16 clut_words = std::min<u16>((control_word >> 9) & 0x3f, 34) << 2;
+		static const u16 modulo_values[8] = { 320, 384, 512, 640, 1024, 1, 1, 1 };
+		m_vdlp.modulo = modulo_values[(control_word >> 23) & 7] >> 1;
+		if (m_vdlp.modulo == 0)
+		{
+			m_vdlp.fetch = false;
+			popmessage("3do_madam.cpp: undocumented modulo fetch %08x", (control_word >> 23) & 7);
+			return;
+		}
+
+		const bool current_fb = !!BIT(control_word, 16);
+		m_vdlp.video_dma = !!BIT(control_word, 21);
+
+		LOGVDLP("%08x: line=%d Control word %08x\n", m_vdlp.address, m_vdlp.y_dest, control_word);
+		LOGVDLP("    scanline length %d mode=%d| CLUT words %02x FB mode %d|%d|%d|%d video DMA %d| modulo %d\n"
+			, m_vdlp.scanlines
+			, BIT(control_word, 19) ? 480 : 240
+			, clut_words
+			, !!BIT(control_word, 15) // previous FB
+			, current_fb
+			, !!BIT(control_word, 17) // previous modulo
+			, !!BIT(control_word, 18) // type of address
+			// 20: reserved
+			, m_vdlp.video_dma
+			// 22: reserved
+			, m_vdlp.modulo
+		);
+
+		if (current_fb)
+		{
+			m_vdlp.fb_address = m_dma_read_cb(m_vdlp.address + 0x04);
+			LOGVDLP("Current fb %08x\n", m_vdlp.fb_address);
+		}
+
+		// TODO: previous fb handling
+
+		// CLUT transfers
+		for (int c = 0; c < clut_words; c+= 4)
+			m_amy->clut_write(m_dma_read_cb(m_vdlp.address + 0x10 + c));
+
+		m_vdlp.link = m_dma_read_cb(m_vdlp.address + 0x0c);
+		m_vdlp.y_src = 0;
+	}
+
+	if (m_vdlp.video_dma)
+	{
+		u32 y_base = (m_vdlp.y_src & ~1) * (m_vdlp.modulo);
+		u8 shift = ((m_vdlp.y_src & 1) ^ 1) * 16;
+		for (int x = 0; x < 320; x++)
+		{
+			const u32 dot = m_dma_read_cb(m_vdlp.fb_address + ((x + y_base) << 2));
+			m_amy->pixel_xfer(x, m_vdlp.y_dest, dot >> shift);
+		}
+	}
+	else
+		m_amy->blank_line(m_vdlp.y_dest);
+
+	m_vdlp.scanlines --;
+	m_vdlp.y_dest ++;
+	m_vdlp.y_src ++;
+	if (m_vdlp.scanlines == 0)
+	{
+		m_vdlp.address = m_vdlp.link;
+	}
+}

@@ -383,13 +383,14 @@ Notes:
 
 #include "emu.h"
 #include "taitojc.h"
+
 #include "taito_en.h"
+#include "taitoio.h"
 
 #include "cpu/m68000/m68040.h"
 #include "cpu/mc68hc11/mc68hc11.h"
-#include "cpu/tms32051/tms32051.h"
+#include "cpu/tms320c5x/tms320c5x.h"
 #include "machine/eepromser.h"
-#include "taitoio.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
 
@@ -1108,7 +1109,7 @@ void taitojc_state::taitojc(machine_config &config)
 	sub.in_an6_callback().set(FUNC(taitojc_state::hc11_analog_r<6>));
 	sub.in_an7_callback().set(FUNC(taitojc_state::hc11_analog_r<7>));
 
-	TMS32051(config, m_dsp, XTAL(10'000'000)*4); // 40MHz, clock source = CY7C991
+	TMS320C51(config, m_dsp, XTAL(10'000'000)*4); // 40MHz, clock source = CY7C991
 	m_dsp->set_addrmap(AS_PROGRAM, &taitojc_state::tms_program_map);
 	m_dsp->set_addrmap(AS_DATA, &taitojc_state::tms_data_map);
 

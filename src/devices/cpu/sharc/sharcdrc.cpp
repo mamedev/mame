@@ -4580,6 +4580,8 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 
 						UML_MOV(block, I0, REG(ry));
 						UML_CMP(block, I0, 0);
+						if (SV_CALC_REQUIRED)
+							UML_SETc(block, COND_G, ASTAT_SV);
 						UML_JMPc(block, COND_L, shift_neg);
 						UML_SHL(block, I1, REG(rx), I0);
 						UML_JMP(block, shift_end);
@@ -4588,11 +4590,6 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_SHR(block, I1, REG(rx), I2);
 						UML_LABEL(block, shift_end);
 						if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
-						if (SV_CALC_REQUIRED)
-						{
-							UML_CMP(block, I0, 0);
-							UML_SETc(block, COND_NE, ASTAT_AV);
-						}
 						if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
 						UML_MOV(block, REG(rn), I1);
 						return;
@@ -4626,6 +4623,8 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 
 						UML_MOV(block, I0, REG(ry));
 						UML_CMP(block, I0, 0);
+						if (SV_CALC_REQUIRED)
+							UML_SETc(block, COND_G, ASTAT_SV);
 						UML_JMPc(block, COND_L, shift_neg);
 						UML_SHL(block, I1, REG(rx), I0);
 						UML_JMP(block, shift_end);
@@ -4634,11 +4633,6 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_SHR(block, I1, REG(rx), I2);
 						UML_LABEL(block, shift_end);
 						if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
-						if (SV_CALC_REQUIRED)
-						{
-							UML_CMP(block, I0, 0);
-							UML_SETc(block, COND_NZ, ASTAT_SV);
-						}
 						if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
 						UML_OR(block, REG(rn), REG(rn), I1);
 
@@ -4647,7 +4641,6 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 
 					case 0x40:      // Rn = FEXT Rx BY Ry | <bit6>:<len6>
 					{
-						uml::code_label const fext_offscale = compiler.labelnum++;
 						uml::code_label const fext_zero = compiler.labelnum++;
 						uml::code_label const fext_end = compiler.labelnum++;
 
@@ -4655,14 +4648,12 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_BFXU(block, I1, I0, 6, 6);  // i1 = len6
 						UML_JMPc(block, COND_Z, fext_zero);
 						UML_AND(block, I0, I0, 0x3f);   // i0 = bit6
-						UML_SUB(block, I3, 32, I0);
-						UML_JMPc(block, COND_BE, fext_zero);
+						UML_SUB(block, I3, 63, I0);
 						UML_CMP(block, I3, I1);
-						UML_JMPc(block, COND_BE, fext_offscale);
-						UML_BFXU(block, REG(rn), REG(rx), I0, I1);
-						UML_JMP(block, fext_end);
-						UML_LABEL(block, fext_offscale);
-						UML_SHR(block, REG(rn), REG(rx), I0);
+						UML_MOVc(block, COND_B, I1, I3);
+						UML_MOV(block, I3, REG(rx));    // implicitly clears upper half of I3
+						UML_DBFXU(block, I3, I3, I0, I1);
+						UML_MOV(block, REG(rn), I3);
 						UML_JMP(block, fext_end);
 						UML_LABEL(block, fext_zero);
 						if (SV_CALC_REQUIRED)
@@ -4682,8 +4673,6 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 
 					case 0x48:      // Rn = FEXT Rx BY Ry | <bit6>:<len6> (SE)
 					{
-						uml::code_label const fext_shifted = compiler.labelnum++;
-						uml::code_label const fext_offscale = compiler.labelnum++;
 						uml::code_label const fext_zero = compiler.labelnum++;
 						uml::code_label const fext_end = compiler.labelnum++;
 
@@ -4691,18 +4680,12 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_BFXU(block, I1, I0, 6, 6);  // i1 = len6
 						UML_JMPc(block, COND_Z, fext_zero);
 						UML_AND(block, I0, I0, 0x3f);   // i0 = bit6
-						UML_JMPc(block, COND_NZ, fext_shifted);
-						UML_CMP(block, I1, 32);
-						UML_JMPc(block, COND_AE, fext_offscale);
-						UML_LABEL(block, fext_shifted);
-						UML_SUB(block, I3, 32, I0);
-						UML_JMPc(block, COND_BE, fext_zero);
+						UML_SUB(block, I3, 63, I0);
 						UML_CMP(block, I3, I1);
-						UML_JMPc(block, COND_B, fext_offscale);
-						UML_BFXS(block, REG(rn), REG(rx), I0, I1);
-						UML_JMP(block, fext_end);
-						UML_LABEL(block, fext_offscale);
-						UML_SHR(block, REG(rn), REG(rx), I0);
+						UML_MOVc(block, COND_B, I1, I3);
+						UML_MOV(block, I3, REG(rx));    // implicitly clears upper half of I3
+						UML_DBFXS(block, I3, I3, I0, I1);
+						UML_MOV(block, REG(rn), I3);
 						UML_JMP(block, fext_end);
 						UML_LABEL(block, fext_zero);
 						if (SV_CALC_REQUIRED)
@@ -5135,7 +5118,7 @@ void adsp21062_device::generate_shift_imm(drcuml_block &block, compiler_state &c
 			{
 				UML_MOV(block, REG(rn), 0);
 				if (SZ_CALC_REQUIRED) UML_MOV(block, ASTAT_SZ, 1);
-				if (SV_CALC_REQUIRED) UML_MOV(block, ASTAT_SV, 1);
+				if (SV_CALC_REQUIRED) UML_MOV(block, ASTAT_SV, (shift > 0) ? 1 : 0);
 				if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
 			}
 			else
@@ -5145,20 +5128,24 @@ void adsp21062_device::generate_shift_imm(drcuml_block &block, compiler_state &c
 				else
 					UML_SHL(block, REG(rn), REG(rx), shift);
 				if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
-				if (SV_CALC_REQUIRED && shift != 0) UML_MOV(block, ASTAT_SV, 1);
-				if (SV_CALC_REQUIRED && shift == 0) UML_MOV(block, ASTAT_SV, 0);
+				if (SV_CALC_REQUIRED) UML_MOV(block, ASTAT_SV, (shift > 0) ? 1 : 0);
 				if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
 			}
 			return;
 
 		case 0x01:      // ASHIFT Rx BY <data8>
-			if (abs(shift) >= 32)
+			if (shift >= 32)
 			{
 				UML_MOV(block, REG(rn), 0);
-				UML_TEST(block, REG(rn), 0x80000000);
-				UML_MOVc(block, COND_NZ, REG(rn), 0xffffffff);
 				if (SZ_CALC_REQUIRED) UML_MOV(block, ASTAT_SZ, 1);
 				if (SV_CALC_REQUIRED) UML_MOV(block, ASTAT_SV, 1);
+				if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
+			}
+			else if (shift <= -32)
+			{
+				UML_SHR(block, REG(rn), REG(rx), 31);
+				if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
+				if (SV_CALC_REQUIRED) UML_MOV(block, ASTAT_SV, 0);
 				if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
 			}
 			else
@@ -5168,8 +5155,7 @@ void adsp21062_device::generate_shift_imm(drcuml_block &block, compiler_state &c
 				else
 					UML_SHL(block, REG(rn), REG(rx), shift);
 				if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
-				if (SV_CALC_REQUIRED && shift != 0) UML_MOV(block, ASTAT_SV, 1);
-				if (SV_CALC_REQUIRED && shift == 0) UML_MOV(block, ASTAT_SV, 0);
+				if (SV_CALC_REQUIRED) UML_MOV(block, ASTAT_SV, (shift > 0) ? 1 : 0);
 				if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
 			}
 			return;
@@ -5189,7 +5175,7 @@ void adsp21062_device::generate_shift_imm(drcuml_block &block, compiler_state &c
 			{
 				UML_MOV(block, I0, 0);
 				if (SZ_CALC_REQUIRED) UML_MOV(block, ASTAT_SZ, 1);
-				if (SV_CALC_REQUIRED) UML_MOV(block, ASTAT_SV, 1);
+				if (SV_CALC_REQUIRED) UML_MOV(block, ASTAT_SV, (shift > 0) ? 1 : 0);
 				if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
 				UML_OR(block, REG(rn), REG(rn), I0);
 			}
@@ -5200,8 +5186,7 @@ void adsp21062_device::generate_shift_imm(drcuml_block &block, compiler_state &c
 				else
 					UML_SHL(block, I0, REG(rx), shift);
 				if (SZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_SZ);
-				if (SV_CALC_REQUIRED && shift != 0) UML_MOV(block, ASTAT_SV, 1);
-				if (SV_CALC_REQUIRED && shift == 0) UML_MOV(block, ASTAT_SV, 0);
+				if (SV_CALC_REQUIRED) UML_MOV(block, ASTAT_SV, (shift > 0) ? 1 : 0);
 				if (SS_CALC_REQUIRED) UML_MOV(block, ASTAT_SS, 0);
 				UML_OR(block, REG(rn), REG(rn), I0);
 			}

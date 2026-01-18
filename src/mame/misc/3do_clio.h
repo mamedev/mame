@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Wilbert Pol
 
 #ifndef MAME_MISC_3DO_CLIO_H
@@ -24,11 +24,11 @@ public:
 	auto xbus_write_cb() { return m_xbus_write_cb.bind(); }
 	auto dacl_cb() { return m_dac_l.bind(); }
 	auto dacr_cb() { return m_dac_r.bind(); }
+	auto hsync_cb() { return m_hsync_cb.bind(); }
+	auto vsync_cb() { return m_vsync_cb.bind(); }
 
 	void xbus_int_w(int state);
 
-//	void vint0_w(int state); // hblank?
-	void vint1_w(int state);
 //	void expansion_w(int state);
 	void dply_w(int state);
 
@@ -42,6 +42,8 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<dspp_device> m_dspp;
 	devcb_write_line    m_firq_cb;
+	devcb_write_line    m_vsync_cb;
+	devcb_write_line    m_hsync_cb;
 	devcb_read8         m_xbus_read_cb;
 	devcb_write8        m_xbus_write_cb;
 	devcb_write16       m_dac_l;
@@ -106,8 +108,10 @@ private:
 
 	void request_fiq(uint32_t irq_req, uint8_t type);
 
+	TIMER_CALLBACK_MEMBER( scan_timer_cb );
 	TIMER_CALLBACK_MEMBER( system_timer_cb );
 	TIMER_CALLBACK_MEMBER( dac_update_cb );
+	emu_timer *m_scan_timer;
 	emu_timer *m_dac_timer;
 	emu_timer *m_system_timer;
 };

@@ -2839,94 +2839,94 @@ if opt_tool(CPUS, "TMS340X0") then
 end
 
 --------------------------------------------------
--- Texas Instruments TMS3201x DSP
---@src/devices/cpu/tms32010/tms32010.h,CPUS["TMS32010"] = true
+-- Texas Instruments TMS320C1x DSP
+--@src/devices/cpu/tms320c1x/tms320c1x.h,CPUS["TMS320C1X"] = true
 --------------------------------------------------
 
-if CPUS["TMS32010"] then
+if CPUS["TMS320C1X"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/tms32010/tms32010.cpp",
-		MAME_DIR .. "src/devices/cpu/tms32010/tms32010.h",
+		MAME_DIR .. "src/devices/cpu/tms320c1x/tms320c1x.cpp",
+		MAME_DIR .. "src/devices/cpu/tms320c1x/tms320c1x.h",
 	}
 end
 
-if opt_tool(CPUS, "TMS32010") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32010/32010dsm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32010/32010dsm.h")
+if opt_tool(CPUS, "TMS320C1X") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c1x/tms320c1x_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c1x/tms320c1x_dasm.h")
 end
 
 --------------------------------------------------
--- Texas Instruments TMS3202x DSP
---@src/devices/cpu/tms32025/tms32025.h,CPUS["TMS32025"] = true
+-- Texas Instruments TMS320C2x DSP
+--@src/devices/cpu/tms320c2x/tms320c2x.h,CPUS["TMS320C2X"] = true
 --------------------------------------------------
 
-if CPUS["TMS32025"] then
+if CPUS["TMS320C2X"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/tms32025/tms32025.cpp",
-		MAME_DIR .. "src/devices/cpu/tms32025/tms32025.h",
+		MAME_DIR .. "src/devices/cpu/tms320c2x/tms320c2x.cpp",
+		MAME_DIR .. "src/devices/cpu/tms320c2x/tms320c2x.h",
 	}
 end
 
-if opt_tool(CPUS, "TMS32025") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32025/32025dsm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32025/32025dsm.h")
+if opt_tool(CPUS, "TMS320C2X") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c2x/tms320c2x_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c2x/tms320c2x_dasm.h")
 end
 
 --------------------------------------------------
--- Texas Instruments TMS3203x DSP
---@src/devices/cpu/tms32031/tms32031.h,CPUS["TMS32031"] = true
+-- Texas Instruments TMS320C3x DSP
+--@src/devices/cpu/tms320c3x/tms320c3x.h,CPUS["TMS320C3X"] = true
 --------------------------------------------------
 
-if CPUS["TMS32031"] then
+if CPUS["TMS320C3X"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/tms32031/tms32031.cpp",
-		MAME_DIR .. "src/devices/cpu/tms32031/tms32031.h",
-		MAME_DIR .. "src/devices/cpu/tms32031/32031ops.hxx",
+		MAME_DIR .. "src/devices/cpu/tms320c3x/tms320c3x.cpp",
+		MAME_DIR .. "src/devices/cpu/tms320c3x/tms320c3x.h",
+		MAME_DIR .. "src/devices/cpu/tms320c3x/320c3x_ops.ipp",
 	}
 end
 
-if opt_tool(CPUS, "TMS32031") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32031/dis32031.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32031/dis32031.h")
+if opt_tool(CPUS, "TMS320C3X") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c3x/tms320c3x_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c3x/tms320c3x_dasm.h")
 end
 
 --------------------------------------------------
--- Texas Instruments TMS3205x DSP
---@src/devices/cpu/tms32051/tms32051.h,CPUS["TMS32051"] = true
+-- Texas Instruments TMS320C5x DSP
+--@src/devices/cpu/tms320c5x/tms320c5x.h,CPUS["TMS320C5X"] = true
 --------------------------------------------------
 
-if CPUS["TMS32051"] then
+if CPUS["TMS320C5X"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/tms32051/tms32051.cpp",
-		MAME_DIR .. "src/devices/cpu/tms32051/tms32051.h",
-		MAME_DIR .. "src/devices/cpu/tms32051/32051ops.h",
-		MAME_DIR .. "src/devices/cpu/tms32051/32051ops.hxx",
+		MAME_DIR .. "src/devices/cpu/tms320c5x/tms320c5x.cpp",
+		MAME_DIR .. "src/devices/cpu/tms320c5x/tms320c5x.h",
+		MAME_DIR .. "src/devices/cpu/tms320c5x/320c5x_ops.ipp",
+		MAME_DIR .. "src/devices/cpu/tms320c5x/320c5x_optable.cpp",
 	}
 end
 
-if opt_tool(CPUS, "TMS32051") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32051/dis32051.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32051/dis32051.h")
+if opt_tool(CPUS, "TMS320C5X") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c5x/tms320c5x_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c5x/tms320c5x_dasm.h")
 end
 
 --------------------------------------------------
--- Texas Instruments TMS3208x DSP
---@src/devices/cpu/tms32082/tms32082.h,CPUS["TMS32082"] = true
+-- Texas Instruments TMS320C82 DSP
+--@src/devices/cpu/tms320c82/tms320c82.h,CPUS["TMS320C82"] = true
 --------------------------------------------------
 
-if CPUS["TMS32082"] then
+if CPUS["TMS320C82"] then
 	files {
-		MAME_DIR .. "src/devices/cpu/tms32082/tms32082.cpp",
-		MAME_DIR .. "src/devices/cpu/tms32082/tms32082.h",
-		MAME_DIR .. "src/devices/cpu/tms32082/mp_ops.cpp",
+		MAME_DIR .. "src/devices/cpu/tms320c82/tms320c82.cpp",
+		MAME_DIR .. "src/devices/cpu/tms320c82/tms320c82.h",
+		MAME_DIR .. "src/devices/cpu/tms320c82/mp_ops.cpp",
 	}
 end
 
-if opt_tool(CPUS, "TMS32082") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32082/dis_mp.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32082/dis_mp.h")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32082/dis_pp.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms32082/dis_pp.h")
+if opt_tool(CPUS, "TMS320C82") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c82/mp_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c82/mp_dasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c82/pp_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/tms320c82/pp_dasm.h")
 end
 
 --------------------------------------------------

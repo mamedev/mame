@@ -2522,7 +2522,7 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 				m_aux_bank_ptr = m_auxslotdevice->get_auxbank_ptr();
 			}
 
-			if (m_isiic)  // CLRIOUDIS does not exist on IIe
+			if ((m_isiic) || (m_isace500))  // CLRIOUDIS does not exist on IIe
 			{
 				switch (offset)
 				{

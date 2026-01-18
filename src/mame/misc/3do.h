@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Wilbert Pol
 /*****************************************************************************
  *
@@ -16,6 +16,7 @@
 
 #include "screen.h"
 
+#include "3do_amy.h"
 #include "3do_clio.h"
 #include "3do_madam.h"
 
@@ -30,6 +31,7 @@ public:
 		m_nvram(*this, "nvram"),
 		m_madam(*this, "madam"),
 		m_clio(*this, "clio"),
+		m_amy(*this, "amy"),
 		m_cdrom(*this, "cdrom"),
 		m_screen(*this, "screen"),
 		m_dac(*this, "dac%u", 0U),
@@ -76,6 +78,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<madam_device> m_madam;
 	required_device<clio_device> m_clio;
+	required_device<amy_device> m_amy;
 	required_device<cr560b_device> m_cdrom;
 	required_device<screen_device> m_screen;
 	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac;
@@ -93,7 +96,6 @@ private:
 	void slow2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t svf_r(offs_t offset);
 	void svf_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void main_mem(address_map &map) ATTR_COLD;
 
