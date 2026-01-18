@@ -129,10 +129,10 @@ void madam_device::map(address_map &map)
 	// 0x0044: Anvil "feature"
 
 	// CEL engine
-//	map(0x0100, 0x0103)  SPRSTRT - Start the CEL engine (W)
-//	map(0x0104, 0x0107)  SPRSTOP - Stop the CEL engine (W)
-//	map(0x0108, 0x010b)  SPRCNTU - Continue the CEL engine (W)
-//	map(0x010c, 0x010f)  SPRPAUS - Pause the CEL engine (W)
+//  map(0x0100, 0x0103)  SPRSTRT - Start the CEL engine (W)
+//  map(0x0104, 0x0107)  SPRSTOP - Stop the CEL engine (W)
+//  map(0x0108, 0x010b)  SPRCNTU - Continue the CEL engine (W)
+//  map(0x010c, 0x010f)  SPRPAUS - Pause the CEL engine (W)
 	map(0x0110, 0x0113).lrw32(
 		NAME([this] () { return m_ccobctl0; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -334,7 +334,7 @@ void madam_device::map(address_map &map)
 		})
 	);
 	map(0x07f8, 0x07fb).lr32(NAME([this] () { return m_mult_status; }));
-//	map(0x07fc, 0x07ff) start process
+//  map(0x07fc, 0x07ff) start process
 }
 
 u32 madam_device::mctl_r()
@@ -364,6 +364,8 @@ void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
 			LOG("mctl: Player bus DMA abort?\n");
 			m_dma_playerbus_timer->adjust(attotime::never);
 		}
+
+		m_amy->dac_enable(!!BIT(data, 13));
 	}
 
 	if (data != 0x0001e000)
@@ -407,13 +409,22 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 void madam_device::vdlp_start_w(int state)
 {
 	// PLAYXEN
-	if (!state || !BIT(m_mctl, 14))
+	if (state || !BIT(m_mctl, 14))
+	{
+		m_vdlp.fetch = false;
 		return;
+	}
+
+//	if (m_vdlp.address == m_dma[24][0])
+//	{
+//		m_vdlp.fetch = false;
+//		return;
+//	}
 
 	m_vdlp.address = m_dma[24][0];
 	m_vdlp.scanlines = 0;
 	m_vdlp.fetch = true;
-	m_vdlp.y_dest = 0;
+	m_vdlp.y_dest = 6;
 
 	LOGVDLP("VDLP start %08x\n", m_vdlp.address);
 }
@@ -443,11 +454,11 @@ void madam_device::vdlp_continue_w(int state)
 			return;
 		}
 
-		// TODO: upper limit of 34 due of hblank
-		m_vdlp.clut_words = (control_word >> 9) & 0x1f;
+		// upper limit of 34 due of hblank
+		const u16 clut_words = std::min<u16>((control_word >> 9) & 0x3f, 34) << 2;
 		static const u16 modulo_values[8] = { 320, 384, 512, 640, 1024, 1, 1, 1 };
-		m_vdlp.modulo = modulo_values[(control_word >> 23) & 7];
-		if (m_vdlp.modulo == 1)
+		m_vdlp.modulo = modulo_values[(control_word >> 23) & 7] >> 1;
+		if (m_vdlp.modulo == 0)
 		{
 			m_vdlp.fetch = false;
 			popmessage("3do_madam.cpp: undocumented modulo fetch %08x", (control_word >> 23) & 7);
@@ -457,11 +468,11 @@ void madam_device::vdlp_continue_w(int state)
 		const bool current_fb = !!BIT(control_word, 16);
 		m_vdlp.video_dma = !!BIT(control_word, 21);
 
-		LOGVDLP("line=%d Control word %08x\n", m_vdlp.y_dest, control_word);
+		LOGVDLP("%08x: line=%d Control word %08x\n", m_vdlp.address, m_vdlp.y_dest, control_word);
 		LOGVDLP("    scanline length %d mode=%d| CLUT words %02x FB mode %d|%d|%d|%d video DMA %d| modulo %d\n"
 			, m_vdlp.scanlines
 			, BIT(control_word, 19) ? 480 : 240
-			, m_vdlp.clut_words
+			, clut_words
 			, !!BIT(control_word, 15) // previous FB
 			, current_fb
 			, !!BIT(control_word, 17) // previous modulo
@@ -479,26 +490,33 @@ void madam_device::vdlp_continue_w(int state)
 		}
 
 		// TODO: previous fb handling
-		// TODO: CLUT transfer to AMY
+
+		// CLUT transfers
+		for (int c = 0; c < clut_words; c+= 4)
+			m_amy->clut_write(m_dma_read_cb(m_vdlp.address + 0x10 + c));
 
 		m_vdlp.link = m_dma_read_cb(m_vdlp.address + 0x0c);
 		m_vdlp.y_src = 0;
 	}
 
-	// TODO: FB transfers to AMY here
-	// if (m_vdlp.video_dma)
-	// {
-	//     u32 y_base = (m_vdlp.y_src & ~1) * m_vdlp.modulo;
-	//     u8 shift = (m_vdlp.y_src & 1) * 16;
-	//     for (int x = 0; x < 320; x++)
-	//     {
-	//         const u32 dot = m_dma_read_cb(m_vdlp.fb_address + ((x + y_base) << 2));
-	//         m_amy->pixel_xfer(x, m_vdlp.y_dest, dot >> shift);
-	//     }
-	// }
+	if (m_vdlp.video_dma)
+	{
+		u32 y_base = (m_vdlp.y_src & ~1) * (m_vdlp.modulo);
+		u8 shift = ((m_vdlp.y_src & 1) ^ 1) * 16;
+		for (int x = 0; x < 320; x++)
+		{
+			const u32 dot = m_dma_read_cb(m_vdlp.fb_address + ((x + y_base) << 2));
+			m_amy->pixel_xfer(x, m_vdlp.y_dest, dot >> shift);
+		}
+	}
+	else
+		m_amy->blank_line(m_vdlp.y_dest);
+
 	m_vdlp.scanlines --;
 	m_vdlp.y_dest ++;
 	m_vdlp.y_src ++;
 	if (m_vdlp.scanlines == 0)
+	{
 		m_vdlp.address = m_vdlp.link;
+	}
 }

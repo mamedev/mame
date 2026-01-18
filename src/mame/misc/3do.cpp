@@ -269,7 +269,7 @@ void _3do_state::_3do(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: proper params (mostly running in interlace mode)
 	m_screen->set_raw(X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262);
-	m_screen->set_screen_update(FUNC(_3do_state::screen_update));
+	m_screen->set_screen_update(m_amy, FUNC(amy_device::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
 }
@@ -286,8 +286,8 @@ void _3do_state::_3do_pal(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: proper params
-	m_screen->set_raw(X2_CLOCK_PAL / 2, 1592, 254, 1534, 263, 22, 262);
-	m_screen->set_screen_update(FUNC(_3do_state::screen_update));
+	m_screen->set_raw(X2_CLOCK_PAL / 2, 1592, 254, 1534, 313, 22, 312);
+	m_screen->set_screen_update(m_amy, FUNC(amy_device::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
 }

@@ -231,56 +231,6 @@ void _3do_state::video_start()
 }
 
 
-// TODO: move to madam
-uint32_t _3do_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	uint32_t *source_p = m_vram + 0x1c0000 / 4;
-
-	for ( int y = 0; y < 120; y++ )
-	{
-		uint32_t  *dest_p0 = &bitmap.pix(22 + y * 2, 254 );
-		uint32_t  *dest_p1 = &bitmap.pix(22 + y * 2 + 1, 254 );
-
-		for ( int x = 0; x < 320; x++ )
-		{
-			/* Every dword contains two pixels, upper word is top pixel, lower is bottom. */
-			uint32_t lower = *source_p & 0xffff;
-			uint32_t upper = ( *source_p >> 16 ) & 0xffff;
-			int r, g, b;
-
-			/* Format is RGB555 */
-			r = (upper & 0x7c00) >> 10;
-			g = (upper & 0x03e0) >> 5;
-			b = (upper & 0x001f) >> 0;
-			r = (r << 3) | (r & 7);
-			g = (g << 3) | (g & 7);
-			b = (b << 3) | (b & 7);
-
-			dest_p0[0] = r << 16 | g << 8 | b;
-			dest_p0[1] = r << 16 | g << 8 | b;
-			dest_p0[2] = r << 16 | g << 8 | b;
-			dest_p0[3] = r << 16 | g << 8 | b;
-
-			r = (lower & 0x7c00) >> 10;
-			g = (lower & 0x03e0) >> 5;
-			b = (lower & 0x001f) >> 0;
-			r = (r << 3) | (r & 7);
-			g = (g << 3) | (g & 7);
-			b = (b << 3) | (b & 7);
-
-			dest_p1[0] = r << 16 | g << 8 | b;
-			dest_p1[1] = r << 16 | g << 8 | b;
-			dest_p1[2] = r << 16 | g << 8 | b;
-			dest_p1[3] = r << 16 | g << 8 | b;
-
-			source_p++;
-			dest_p0 += 4;
-			dest_p1 += 4;
-		}
-	}
-
-	return 0;
-}
 
 /*
  *

@@ -582,11 +582,11 @@ TIMER_CALLBACK_MEMBER(clio_device::scan_timer_cb)
 	{
 		m_vsync_cb(1);
 	}
-	else if (scanline == 21)
+	else if (scanline == 22 - 6)
 	{
 		m_vsync_cb(0);
 	}
-	else if (scanline >= 22)
+	else if (scanline > 22 - 6)
 	{
 		m_hsync_cb(1);
 		m_hsync_cb(0);

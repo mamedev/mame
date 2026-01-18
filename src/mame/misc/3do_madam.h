@@ -75,7 +75,6 @@ private:
 	struct {
 		u32 address;
 		u16 scanlines;
-		u16 clut_words;
 		u16 modulo;
 		u32 fb_address;
 		bool fetch;

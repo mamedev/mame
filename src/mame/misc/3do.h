@@ -96,7 +96,6 @@ private:
 	void slow2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t svf_r(offs_t offset);
 	void svf_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void main_mem(address_map &map) ATTR_COLD;
 
