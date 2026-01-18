@@ -88,10 +88,10 @@ Commodore CDTV Front Panel
 
 	<element name="led_yellow">
 		<rect state="0">
-			<color red="0.2" green="0.2" blue="0.0" />
+			<color red="0.2" green="0.1" blue="0.0" />
 		</rect>
 		<rect state="1">
-			<color red="0.8" green="0.8" blue="0.0" />
+			<color red="1.0" green="0.5" blue="0.0" />
 		</rect>
 	</element>
 
@@ -140,7 +140,7 @@ Commodore CDTV Front Panel
 			<repeat count="7">
 				<param name="seg" start="6" increment="-1" />
 				<param name="xbase" start="245" increment="35" />
-				<repeat count="4">
+				<repeat count="5">
 					<param name="x" start="~xbase~" increment="5" />
 					<repeat count="2">
 						<param name="y" start="671" increment="5" />
