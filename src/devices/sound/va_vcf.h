@@ -42,11 +42,15 @@ public:
 	};
 
 	va_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
+	va_lpf4_device& configure_input_gain(float gain) ATTR_COLD;
 
 	// The meaning of "CV" depends on the class being instantiated. See the
 	// overview at the top of the file.
 	void set_fixed_freq_cv(float freq_cv);
 	void set_fixed_res_cv(float res_cv);
+
+	float get_freq();  // Returns the cutoff frequency, in Hz.
+	float get_res();  // Returns the feedback gain (0-4).
 
 protected:
 	va_lpf4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
@@ -62,6 +66,7 @@ private:
 
 	sound_stream *m_stream;
 
+	float m_input_gain;  // Configuration, not needed in save state.
 	float m_fc;  // Cutoff frequency in Hz.
 	float m_res;  // Feedback gain.
 	std::array<float, 5> m_a;
@@ -83,14 +88,19 @@ private:
 // - The resonance CV response was eyeballed from a graph on the datasheet, and
 //   is approximate. Furthermore, that graph only goes up to a control current
 //   of 300 uA. The implementation here extrapolates linearly beyond that.
+// - The output of the CEM3320 has a DC offset, which is not modeled here.
 class cem3320_lpf4_device : public va_lpf4_device
 {
 public:
 	// c_p: pole capacitor. The value of the capacitors connected to pins 4, 5, 11, 16.
-	// r_f: feedback resistor. The value of the resistors connecting pins 1 and 7,
-	//      2 and 6, 17 and 15, and 18 and 10.
-	cem3320_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, float c_p, float r_f) ATTR_COLD;
+	cem3320_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, double c_p) ATTR_COLD;
 	cem3320_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
+
+	// Pin 1 (audio input) on the real device is a current input. But a voltage
+	// can be provided via a resistor to pin 1 (R_I in the schematic).
+	// Similarly, this implementation expects a current in the audio input steam,
+	// by default. This method converts the input stream to a voltage input.
+	cem3320_lpf4_device &configure_voltage_input(float r_i) ATTR_COLD;
 
 	// Enable resonance (pin 10 connected to pin 8, via passive components)
 	// using the configuration in the datasheet.
@@ -114,8 +124,9 @@ protected:
 	float cv_to_res(float res_cv) const override;
 
 private:
+	static const float R_EQ;  // R_EQ in the datasheet.
+
 	// Configuration, not needed in save state.
-	float m_r_eq;  // R_EQ in the datasheet.
 	float m_cv2freq;  // Cached computation for frequency calculations.
 	bool m_res_enabled;
 	float m_r_rc;  // R_RC in the datasheet.
