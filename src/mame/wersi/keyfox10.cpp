@@ -5,6 +5,9 @@
 #include "cpu/mcs51/i80c52.h"
 #include "bus/midi/midi.h"
 #include "sound/sam8905.h"
+#include "sound/flt_biquad.h"
+#include "sound/mixer.h"
+#include "machine/rescap.h"
 #include "speaker.h"
 #include "debugger.h"
 
@@ -46,6 +49,10 @@ public:
         , m_sam_snd(*this, "sam_snd")
         , m_sam_fx(*this, "sam_fx")
         , m_midi_out(*this, "mdout")
+        , m_lmixer(*this, "lmixer")
+        , m_rmixer(*this, "rmixer")
+        , m_output_filter_l(*this, "outfilt_l")
+        , m_output_filter_r(*this, "outfilt_r")
         , m_rom(*this, "program")
         , m_samples_rom(*this, "samples")
         , m_rhythms_rom(*this, "rhythms")
@@ -108,6 +115,10 @@ private:
     required_device<sam8905_device> m_sam_snd;
     required_device<sam8905_device> m_sam_fx;
     required_device<midi_port_device> m_midi_out;
+    required_device<mixer_device> m_lmixer;
+    required_device<mixer_device> m_rmixer;
+    required_device<filter_biquad_device> m_output_filter_l;
+    required_device<filter_biquad_device> m_output_filter_r;
     required_region_ptr<u8> m_rom;
     required_region_ptr<u8> m_samples_rom;  // IC17 "Samples" 128KB
     required_region_ptr<u8> m_rhythms_rom;  // IC14 "Rhythmen" 128KB
@@ -1097,6 +1108,7 @@ void keyfox10_state::sam_snd_sample_out(uint32_t data)
     // Byte swap for proper endianness
     //int16_t sample = ((sample_l >> 8) & 0xFF) | ((sample_l << 8) & 0xFF00);
     uint16_t sample = ((sample_r >> 8) & 0xFF) | ((sample_r << 8) & 0xFF00);
+    //uint16_t sample = sample_r;
 
     // Store current sample for FX chip waveform reads
     m_fx_input_sample = sample;
@@ -1132,7 +1144,8 @@ void keyfox10_state::sam_fx_waveform_w(offs_t offset, u16 data)
             sram_write_trace++;
         }
     } else {
-        abort();
+        printf("ERRR!\n");
+        exit(1);
     }
 }
 
@@ -1195,14 +1208,11 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
             uint16_t result = ((uint16_t)sram_8bit) << 3;  // Place at bits 10:3 (result is 0-2040)
 
             // WAH0 = PHI[4] = (offset >> 4) & 1
-            //bool wah0 = (offset >> 4) & 1;
-            bool wah0 = (offset & 1);
 
-            if (!wah0) {
+            if ((offset & 1) == 0 && (sram_8bit & 0x80)) {
                 // WAH0=0: WDH11 = WDH10 (sign extension from bit 10)
                 // Bit 10 of result = bit 7 of sram_8bit
-                if (sram_8bit & 0x80)
-                    result |= 0x800;
+                result |= 0x800;
             }
             // WAH0=1: WDH11 = 0 (already 0 from unsigned shift)
 
@@ -1210,7 +1220,7 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
             static int sram_read_trace = 0;
             if (sram_read_trace < 30) {
                 logerror("FX SRAM read: addr=%04X wah0=%d raw=%u result=%d\n",
-                    sram_addr, wah0, sram_8bit, (int16_t)result);
+                    sram_addr, (offset & 1), sram_8bit, (int16_t)result);
                 sram_read_trace++;
             }
             return result & 0xFFF;
@@ -1224,7 +1234,9 @@ u16 keyfox10_state::sam_fx_waveform_r(offs_t offset)
     //u8 sample = m_samples_rom[rom_addr];
     //return (int16_t)(int8_t)sample << 4;
 
-    abort();
+    printf("ERRR 2!\n");
+    exit(1);
+
     return 0;
 }
 
@@ -1379,17 +1391,37 @@ void keyfox10_state::keyfox10(machine_config &config)
     mdin.rxd_handler().set(FUNC(keyfox10_state::midi_rxd_w));
     MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-    // Sound - two SAM8905 DSP chips
+    // Sound - two SAM8905 DSP chips with analog output stage emulation
+    // Output chain: SAM -> Mixer -> TL082 lowpass (IC34) -> HC33079 (IC35) -> TDA1074 VCA -> Speaker
     SPEAKER(config, "lspeaker").front_left();
     SPEAKER(config, "rspeaker").front_right();
+
+    // Mixers to combine SND (dry) and FX (wet) signals
+    MIXER(config, m_lmixer);
+    MIXER(config, m_rmixer);
+
+    // Output filter - emulates TL082 (IC34) unity gain buffer with C39=2.2nF lowpass
+    // Cutoff ~10.6kHz with R39=6.8k feedback
+    // Using MFB lowpass configuration with gain boost to compensate for 15-bit internal range
+    FILTER_BIQUAD(config, m_output_filter_l);
+    m_output_filter_l->opamp_mfb_lowpass_setup(RES_K(6.8), 0, RES_K(6.8), 0, CAP_N(2.2));
+    m_output_filter_l->add_route(0, "lspeaker", 8.0);  // 4x gain: 2x for 15-bit, 2x for headroom
+
+    FILTER_BIQUAD(config, m_output_filter_r);
+    m_output_filter_r->opamp_mfb_lowpass_setup(RES_K(6.8), 0, RES_K(6.8), 0, CAP_N(2.2));
+    m_output_filter_r->add_route(0, "rspeaker", 8.0);
+
+    // Route mixers through output filters
+    m_lmixer->add_route(0, m_output_filter_l, 1.0);
+    m_rmixer->add_route(0, m_output_filter_r, 1.0);
 
     // SAM8905 SND - sound generation (at 0x8000 when T1=1)
     // Clock: 22.5792 MHz / 1024 = 22.05 kHz sample rate
     SAM8905(config, m_sam_snd, 22'579'200 * 2, 1024);
     m_sam_snd->waveform_read_callback().set(FUNC(keyfox10_state::sam_snd_waveform_r));
     m_sam_snd->sample_output_callback().set(FUNC(keyfox10_state::sam_snd_sample_out));
-    m_sam_snd->add_route(0, "lspeaker", 1.0);  // Dry L - SILENCED FOR DEBUG
-    m_sam_snd->add_route(1, "rspeaker", 1.0);  // Dry R - SILENCED FOR DEBUG
+    m_sam_snd->add_route(0, m_lmixer, 1.0);  // Dry L
+    m_sam_snd->add_route(1, m_rmixer, 1.0);  // Dry R
 
     // SAM8905 FX - effects processor (at 0xE000 when T1=1)
     // FX chip has 32KB SRAM for delay/reverb buffers
@@ -1397,8 +1429,8 @@ void keyfox10_state::keyfox10(machine_config &config)
     SAM8905(config, m_sam_fx, 22'579'200, 1024);
     m_sam_fx->waveform_read_callback().set(FUNC(keyfox10_state::sam_fx_waveform_r));
     m_sam_fx->waveform_write_callback().set(FUNC(keyfox10_state::sam_fx_waveform_w));
-    m_sam_fx->add_route(0, "lspeaker", 1.0);  // Wet L
-    m_sam_fx->add_route(1, "rspeaker", 1.0);  // Wet R
+    m_sam_fx->add_route(0, m_lmixer, 0.5);  // Wet L (lower gain - reverb is usually quieter)
+    m_sam_fx->add_route(1, m_rmixer, 0.5);  // Wet R
 
     // 7-segment display layout
     config.set_default_layout(layout_keyfox10);
