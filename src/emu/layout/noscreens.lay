@@ -3,11 +3,26 @@
 license:CC0-1.0
 -->
 <mamelayout version="2">
+
 	<element name="warning"><text string="No default view."></text></element>
+
+	<element name="background">
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="10" />
+			<color red="1" green="1" blue="1" />
+		</rect>
+		<rect>
+			<bounds xc="0" yc="0" width="10" height="9" />
+			<color red="0.5" green="0.05" blue="0.05" />
+		</rect>
+	</element>
+
 	<view name="None">
 		<bounds left="0" top="0" right="400" bottom="300" />
 		<collection name="Warning Message">
+			<element ref="background"><bounds xc="200" yc="150" width="2000" height="32" /></element>
 			<element ref="warning"><bounds xc="200" yc="150" width="390" height="25" /></element>
 		</collection>
 	</view>
+
 </mamelayout>
