@@ -1767,6 +1767,9 @@ void sega_segacd_device::device_start()
 	save_item(NAME(segacd_memory_priority_mode));
 	save_item(NAME(segacd_stampsize));
 	save_item(NAME(segacd_hint_register));
+	save_item(NAME(segacd_imagebuffer_vdot_size));
+	save_item(NAME(segacd_imagebuffer_vcell_size));
+	save_item(NAME(segacd_imagebuffer_hdot_size));
 }
 
 uint16_t sega_segacd_device::segacd_dmaaddr_r()
