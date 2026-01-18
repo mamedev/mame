@@ -105,7 +105,7 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 	bool internal = (wf & 0x100);  // WF[8] = INT/EXT
 
 	if (internal) {
-#if 0
+#if 1
         // CORRECTED FROM MANUAL
 		// WF[8]=1: Internal waveform
 		// WF bit layout: [8]=INT/EXT, [7]=R, [6]=I, [5:4]=SEL, [3]=Z, [2:0]=unused
@@ -159,17 +159,17 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 		}
 
         // Option 1: Mask to 12-bit (wraps)
-        if (invert) {
-            result = (-result) & 0xFFF;
-            if (result & 0x800) result |= ~0xFFF; // sign extend
-        }
+        // if (invert) {
+        //     result = (-result) & 0xFFF;
+        //     if (result & 0x800) result |= ~0xFFF; // sign extend
+        // }
 
         // Option 2: Saturate
-        // if (invert) {
-        //     result = -result;
-        //     if (result > 2047) result = 2047;
-        //     if (result < -2048) result = -2048;
-        // }
+        if (invert) {
+            result = -result;
+            if (result > 2047) result = 2047;
+            if (result < -2048) result = -2048;
+        }
         // EXPERIMENTING
 		// 
 		// Apply I bit: one's complement inversion with INVERTED semantics
@@ -309,20 +309,18 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 	// Lower 7 bits are fractional precision in D-RAM, upper 12 bits are the actual phase
 	if (!BIT(inst, 4)) {
 		m_phi = (bus >> 7) & 0xFFF;  // Upper 12 bits for waveform address
-		if (wsp) m_wf = 0x100; // Force Internal Sinus
+		if (wsp) {
+			m_wf = 0x100; // Force Internal Sinus
+		} else if (!(m_wf & 0x100)) {
+			// External waveform: WPHI updates address, triggers ROM read, updates X
+			m_x = get_waveform(m_wf, m_phi, mad, slot_idx) & 0xFFF;
+		}
 	}
 
-	// WXY (Write Multiplier) - executes when bit 3 = 0
+	// WXY (Write X and Y registers) - executes when bit 3 = 0
 	if (!BIT(inst, 3)) {
 		m_y = (bus >> 7) & 0xFFF;
 		m_x = get_waveform(m_wf, m_phi, mad, slot_idx) & 0xFFF;
-		// Calculate multiplication result (12x12 fractional Q0.11 inputs)
-		// Sign-extend 12-bit to 16-bit for signed multiplication
-		int32_t x_signed = (int32_t)((int16_t)(m_x << 4) >> 4);
-		int32_t y_signed = (int32_t)((int16_t)(m_y << 4) >> 4);
-		// Q0.11 * Q0.11 = Q0.22 (24-bit), round to 19-bit Q0.18: shift right by 4
-		int32_t product = x_signed * y_signed;
-		m_mul_result = (uint32_t)((product + 8) >> 4) & MASK19;
 		// WSP inside WXY - sets mix_l/mix_r from bus value
 		if (wsp) {
 			m_mix_l = (bus >> 3) & 0x7;
@@ -357,7 +355,13 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 	}
 
 	// WWF (Write Waveform)
-	if (!BIT(inst, 1)) m_wf = (bus >> 9) & 0x1FF;
+	if (!BIT(inst, 1)) {
+		m_wf = (bus >> 9) & 0x1FF;
+		// External waveform: WWF updates address, triggers ROM read, updates X
+		// if (!(m_wf & 0x100)) {
+		// 	m_x = get_waveform(m_wf, m_phi, mad, slot_idx) & 0xFFF;
+		// }
+	}
 
 	// WACC (Accumulate) - with proper dB attenuation
 	if (!BIT(inst, 0)) {
@@ -374,6 +378,18 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 		int32_t r_contrib = (signed_mul * MIX_ATTEN[m_mix_r]) >> 10;
 		m_l_acc += l_contrib;
 		m_r_acc += r_contrib;
+	}
+
+	// Multiplier is combinational - continuously computes X * Y
+	// Update mul_result at end of cycle based on current X and Y values
+	{
+		int32_t x_signed = (int32_t)((int16_t)(m_x << 4) >> 4);
+		int32_t y_signed = (int32_t)((int16_t)(m_y << 4) >> 4);
+		// Q0.11 * Q0.11 = Q0.22 (24-bit), round to 19-bit Q0.18: shift right by 4
+		//
+		// FIXME what's the + 8 is for?
+		int32_t product = x_signed * y_signed;
+		m_mul_result = (uint32_t)((product + 8) >> 4) & MASK19;
 	}
 }
 
