@@ -439,6 +439,10 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 	}
 
 	// Output accumulated values
+	// Accumulators are 24-bit, output upper 15 bits
+	out_l = (int32_t)m_l_acc >> DAC_SHIFT;
+	out_r = (int32_t)m_r_acc >> DAC_SHIFT;
+
 	// Push to slave mode ring buffer
 	m_slave_ring_l[m_slave_ring_write_pos] = (int32_t)m_l_acc;
 	m_slave_ring_r[m_slave_ring_write_pos] = (int32_t)m_r_acc;
@@ -461,8 +465,6 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 			if (m_slave_ring_read_pos != m_slave_ring_write_pos) {
 				m_slave_ring_read_pos = (m_slave_ring_read_pos + 1) % m_slave_ring_size;
 			}
-			// stream.put_int_clamp(0, samp, last_out_l, 32768);
-			// stream.put_int_clamp(1, samp, last_out_r, 32768);
 			stream.put_int_clamp(0, samp, last_out_l >> DAC_SHIFT, 16384);
 			stream.put_int_clamp(1, samp, last_out_r >> DAC_SHIFT, 16384);
 		}
@@ -530,8 +532,6 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 			// 15-bit constraint required for FX SRAM delay lines: SRAM stores only 8 bits
 			// (WD10:WD3), with WD11 sign-extended from WD10. Values outside 11-bit range
 			// after >> 4 scaling would corrupt on SRAM roundtrip.
-			// int32_t l_out = std::clamp((int32_t)m_l_acc >> 9, -16384, 16383);
-			// int32_t r_out = std::clamp((int32_t)m_r_acc >> 9, -16384, 16383);
 			int32_t l_out = std::clamp((int32_t)m_l_acc >> DAC_SHIFT, -16384, 16383);
 			int32_t r_out = std::clamp((int32_t)m_r_acc >> DAC_SHIFT, -16384, 16383);
 			// Pack L/R as 32-bit value: upper 16 = L, lower 16 = R
