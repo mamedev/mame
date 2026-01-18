@@ -1761,6 +1761,12 @@ void sega_segacd_device::device_start()
 	save_item(NAME(m_font_color));
 	save_item(NAME(scd_rammode));
 	save_item(NAME(scd_mode_dmna_ret_flags));
+	save_item(NAME(segacd_ram_writeprotect_bits));
+	save_item(NAME(m_write_boundary));
+	save_item(NAME(segacd_4meg_prgbank));
+	save_item(NAME(segacd_memory_priority_mode));
+	save_item(NAME(segacd_stampsize));
+	save_item(NAME(segacd_hint_register));
 }
 
 uint16_t sega_segacd_device::segacd_dmaaddr_r()
