@@ -92,10 +92,10 @@ private:
 
 void cadr_state::mem_map(address_map &map)
 {
-	// Xbus memory 0 - 16777777 / 000000 - 3bffff
+	// Xbus memory 0 - 16777777 / 000000 - 3bffff (~4M words)
 
 	// The system 100 boot program cannot handle more memory than 2M 32 bit words?
-	map(0x000000, 0x1fffff).ram(); // 128KB - ~4MB
+	map(00000000, 07777777).ram(); // 128K up to 4M words
 
 	// Xbus I/O 17000000 - 17377777 / 3c0000 - 3dffff
 	//
@@ -114,29 +114,30 @@ void cadr_state::mem_map(address_map &map)
 	// 17377774 - 17377777 / 3dfffc - 3dffff - first disk control
 
 	// 3c0000 - main tv
-	map(0x3c0000, 0x3c7fff).rw(m_tv_control, FUNC(cadr_tv_control_device::video_ram_read), FUNC(cadr_tv_control_device::video_ram_write));
+	map(017000000, 017077777).rw(m_tv_control, FUNC(cadr_tv_control_device::video_ram_read), FUNC(cadr_tv_control_device::video_ram_write));
 
 	// 3dfff0-3dfff7 - TV control
-	map(0x3dfff0, 0x3dfff7).m(m_tv_control, FUNC(cadr_tv_control_device::map));
+	map(017377760, 017377767).m(m_tv_control, FUNC(cadr_tv_control_device::map));
 
-	map(0x3dfff8, 0x3dffff).m(m_disk_controller, FUNC(cadr_disk_device::map));
+	// Disk controllers
+	map(017377770, 017377777).m(m_disk_controller, FUNC(cadr_disk_device::map));
 
 	// Unibus - 16 bit bus - 17400000 - 17777777 / 3e0000 - 3fffff
 
-	map(0x3e0000, 0x3fffff).lrw16(
+	map(017400000, 017777777).lrw16(
 		NAME([] (offs_t offset) {
-			printf("Read unibus %08x\n", 0x3e0000 + offset);
+			printf("Read unibus %08x\n", 017400000 + offset);
 			return 0xffff;
 		}),
 		NAME([] (offs_t offset, u16 data) {
-			printf("Write unibus %08x %04x\n", 0x3e0000 + offset, data);
+			printf("Write unibus %08x %04x\n", 017400000 + offset, data);
 		})
 
 	);
 	map(0x3ff420, 0x3ff43f).m(m_iob, FUNC(cadr_iob_device::map));
 
 	// 766000 - 766017 - diagnostic interface
-	map(0x3ff600, 0x3ff60f).m(m_maincpu, FUNC(cadr_cpu_device::diag_map));
+	map(0x3ff600, 0x3ff607).m(m_maincpu, FUNC(cadr_cpu_device::diag_map));
 
 	// 3ff610/3ff611 - 766040/766042 - interrupt status
 	map(0x3ff610, 0x3ff610).lrw16(

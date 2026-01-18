@@ -517,7 +517,7 @@ void cadr_iob_device::map(address_map &map)
 	map(0x04 << 2, 0x04 << 2).lrw16(NAME([this] {
 		m_speaker_data ^= 1;
 		m_speaker->level_w(m_speaker_data);
-		return u16(0xffff);
+		return 0xffff;
 	}), NAME([this] (u16 data) {
 		m_speaker_data ^= 1;
 		m_speaker->level_w(m_speaker_data);
