@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "sam8905.h"
 
+#define DAC_SHIFT 9
+
 DEFINE_DEVICE_TYPE(SAM8905, sam8905_device, "sam8905", "Dream SAM8905")
 
 sam8905_device::sam8905_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t buffer_size)
@@ -110,11 +112,11 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 		bool z_bit = (wf & 0x08);      // WF[3] = Z (zero select)
 		int sel = (wf >> 4) & 3;       // WF[5:4] = SEL (ramp type)
 #if 0
-        // CORRECTED FROM MANUAL
+        // CORRECT ACCORDING TO MANUAL
 		bool invert = (wf & 0x40);     // WF[6] = I (0=direct, 1=two's complement)
 		bool ramp_mode = (wf & 0x80);  // WF[7] = R (0=sinus, 1=ramp/constant)
 #else
-        // MIX - WORKING FX
+        // WORKING FX
 		bool invert = (wf & 0x80);     // WF[7] = I (0=direct, 1=two's complement)
 		bool ramp_mode = (wf & 0x40);  // WF[6] = R (0=sinus, 1=ramp/constant)
 #endif
@@ -136,7 +138,8 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 			double angle = (M_PI / 2048.0) * (double)phi + (M_PI / 4096.0);
 			result = (int32_t)(0.71875 * sin(angle) * 2048.0);
 		} else {
-			// R=1: Ramps based on SEL bits
+			// Ramps based on SEL bits
+			int sel = (wf >> 4) & 3;
 			switch(sel) {
 				case 0: // 2x PHI ramp
 					result = (phi < 1024) ? phi * 2 :
@@ -157,17 +160,18 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 		}
 
         // Option 1: Mask to 12-bit (wraps)
-        // if (invert) {
-        //     result = (-result) & 0xFFF;
-        //     if (result & 0x800) result |= ~0xFFF; // sign extend
-        // }
+        if (invert) {
+            result = (-result) & 0xFFF;
+            if (result & 0x800) result |= ~0xFFF; // sign extend
+        }
 
         // Option 2: Saturate
-        if (invert) {
-            result = -result;
-            if (result > 2047) result = 2047;
-            if (result < -2048) result = -2048;
-        }
+        // if (invert) {
+        //     result = -result;
+        //     if (result > 2047) result = 2047;
+        //     if (result < -2048) result = -2048;
+        // }
+
         // EXPERIMENTING
 		// 
 		// Apply I bit: one's complement inversion with INVERTED semantics
@@ -191,7 +195,7 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 			// Read 12-bit sample from external ROM
 			int16_t sample = m_waveform_read(addr);
 			// Sign-extend to 32-bit (sample is already in 12-bit signed format)
-			return (int32_t)(int16_t)(sample << 4) >> 4;
+			return sample; //(int32_t)(int16_t)(sample << 4) >> 4;
 		}
 		return 0;
 	}
@@ -346,7 +350,7 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 				// Write data is from Y register (12-bit signed)
 				int16_t ext_data = m_y & 0xFFF;
 				// Sign extend to 16-bit for callback
-				if (ext_data & 0x800) ext_data |= 0xF000;
+				//if (ext_data & 0x800) ext_data |= 0xF000;
 				m_waveform_write(ext_addr, ext_data);
 			}
 		}
@@ -374,8 +378,11 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 		// Apply dB attenuation lookup
 		int32_t l_contrib = (signed_mul * MIX_ATTEN[m_mix_l]) >> 10;
 		int32_t r_contrib = (signed_mul * MIX_ATTEN[m_mix_r]) >> 10;
-		m_l_acc += l_contrib;
-		m_r_acc += r_contrib;
+		// m_l_acc += l_contrib;
+		// m_r_acc += r_contrib;
+
+        m_l_acc = std::clamp((int32_t)m_l_acc + l_contrib, -(1 << 24), (1 << 24) - 1);
+        m_r_acc = std::clamp((int32_t)m_r_acc + r_contrib, -(1 << 24), (1 << 24) - 1);
 	}
 
 	// Multiplier is combinational - continuously computes X * Y
@@ -432,19 +439,9 @@ void sam8905_device::process_frame(int32_t &out_l, int32_t &out_r)
 	}
 
 	// Output accumulated values
-	// Accumulators are 24-bit, output upper 16 bits (per SAM8905 datasheet)
-	out_l = (int32_t)m_l_acc >> 8;
-	out_r = (int32_t)m_r_acc >> 8;
-	// out_l = (int32_t)m_l_acc >> 4;
-	// out_r = (int32_t)m_r_acc >> 4;
-
-	// Store for slave mode stream output
-	// m_last_out_l = out_l;
-	// m_last_out_r = out_r;
-
 	// Push to slave mode ring buffer
-	m_slave_ring_l[m_slave_ring_write_pos] = out_l;
-	m_slave_ring_r[m_slave_ring_write_pos] = out_r;
+	m_slave_ring_l[m_slave_ring_write_pos] = (int32_t)m_l_acc;
+	m_slave_ring_r[m_slave_ring_write_pos] = (int32_t)m_r_acc;
 	m_slave_ring_write_pos = (m_slave_ring_write_pos + 1) % m_slave_ring_size;
 }
 
@@ -464,8 +461,10 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 			if (m_slave_ring_read_pos != m_slave_ring_write_pos) {
 				m_slave_ring_read_pos = (m_slave_ring_read_pos + 1) % m_slave_ring_size;
 			}
-			stream.put_int_clamp(0, samp, last_out_l, 32768);
-			stream.put_int_clamp(1, samp, last_out_r, 32768);
+			// stream.put_int_clamp(0, samp, last_out_l, 32768);
+			// stream.put_int_clamp(1, samp, last_out_r, 32768);
+			stream.put_int_clamp(0, samp, last_out_l >> DAC_SHIFT, 16384);
+			stream.put_int_clamp(1, samp, last_out_r >> DAC_SHIFT, 16384);
 		}
 
 		// Debug: check for ring buffer divergence
@@ -520,20 +519,21 @@ void sam8905_device::sound_stream_update(sound_stream &stream)
 		}
 
 		// Accumulators are 24-bit, output upper 16 bits (per SAM8905 datasheet)
-		stream.put_int_clamp(0, samp, (int32_t)m_l_acc >> 8, 32768);
-		stream.put_int_clamp(1, samp, (int32_t)m_r_acc >> 8, 32768);
-		// stream.put_int_clamp(0, samp, (int32_t)m_l_acc >> 4, 32768);
-		// stream.put_int_clamp(1, samp, (int32_t)m_r_acc >> 4, 32768);
+		// stream.put_int_clamp(0, samp, (int32_t)m_l_acc >> 8, 32768);
+		// stream.put_int_clamp(1, samp, (int32_t)m_r_acc >> 8, 32768);
+		stream.put_int_clamp(0, samp, (int32_t)m_l_acc >> DAC_SHIFT, 16384);
+		stream.put_int_clamp(1, samp, (int32_t)m_r_acc >> DAC_SHIFT, 16384);
 
 		// Fire sample output callback for inter-chip audio (FX processing)
 		if (!m_sample_output.isunset()) {
-			// Output upper 16 bits of 24-bit accumulator, clamped to 16-bit range
-			int32_t l_out = std::clamp((int32_t)m_l_acc >> 9, -32768, 32767);
-			int32_t r_out = std::clamp((int32_t)m_r_acc >> 9, -32768, 32767);
-			// int32_t l_out = std::clamp((int32_t)(m_l_acc >> 8), -32768, 32767);
-			// int32_t r_out = std::clamp((int32_t)(m_r_acc >> 8), -32768, 32767);
-			// int32_t l_out = std::clamp((int32_t)m_l_acc >> 4, -32768, 32767);
-			// int32_t r_out = std::clamp((int32_t)m_r_acc >> 4, -32768, 32767);
+			// Output upper 16 bits of 24-bit accumulator, clamped to 15-bit signed range
+			// 15-bit constraint required for FX SRAM delay lines: SRAM stores only 8 bits
+			// (WD10:WD3), with WD11 sign-extended from WD10. Values outside 11-bit range
+			// after >> 4 scaling would corrupt on SRAM roundtrip.
+			// int32_t l_out = std::clamp((int32_t)m_l_acc >> 9, -16384, 16383);
+			// int32_t r_out = std::clamp((int32_t)m_r_acc >> 9, -16384, 16383);
+			int32_t l_out = std::clamp((int32_t)m_l_acc >> DAC_SHIFT, -16384, 16383);
+			int32_t r_out = std::clamp((int32_t)m_r_acc >> DAC_SHIFT, -16384, 16383);
 			// Pack L/R as 32-bit value: upper 16 = L, lower 16 = R
 			uint32_t packed = ((l_out & 0xFFFF) << 16) | (r_out & 0xFFFF);
 			m_sample_output(packed);

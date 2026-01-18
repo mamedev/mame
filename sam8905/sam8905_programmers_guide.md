@@ -305,6 +305,25 @@ The result of the addition A+B being available one cycle after the A and B opera
    - 2- Internal sinus: 2 cycles
    - 3- External wave memory: (t_acc + 44.2)/44.2 cycles, t_acc being the access time of the external memory. For example, assume a 250ns access time, then 7 cycles are needed.
 
+### External SRAM Data Width Constraint
+
+When using external SRAM for delay lines (e.g., reverb), there is an important constraint on data range:
+
+**Hardware wiring:**
+- SRAM data pins connect to SAM WD10:WD3 (8 bits)
+- WD2:WD0 are grounded (always read as 0)
+- WD11 is sign-extended from WD10 based on WAH0 (address bit 0):
+  - WAH0=0 (high byte): WD11 = WD10 (sign extension)
+  - WAH0=1 (low byte): WD11 = 0
+
+**Constraint:** Since bit 11 of the 12-bit value is lost on SRAM write and reconstructed via sign extension from bit 10 on read, values must stay within **11-bit signed range** (-1024 to +1023) for correct roundtrip.
+
+If a value outside this range is written:
+- +1500 (bit11=0, bit10=1): reads back as negative (sign-extended to bit11=1)
+- -1500 (bit11=1, bit10=0): reads back as positive (sign-extended to bit11=0)
+
+**Implication for inter-chip audio:** When SND SAM output feeds FX SAM input via shift registers, the 16-bit accumulator output should stay within **15-bit signed range** (-16384 to +16383). After the >> 4 scaling to 12-bit, this ensures values stay within 11-bit range for SRAM delay line storage.
+
 ### Waveform Unit Timing (External Memory)
 
 For **external waveforms** (WF[8]=0), the hardware timing differs from internal waveforms:
