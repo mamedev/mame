@@ -105,18 +105,16 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 	bool internal = (wf & 0x100);  // WF[8] = INT/EXT
 
 	if (internal) {
-#if 1
-        // CORRECTED FROM MANUAL
 		// WF[8]=1: Internal waveform
 		// WF bit layout: [8]=INT/EXT, [7]=R, [6]=I, [5:4]=SEL, [3]=Z, [2:0]=unused
 		bool z_bit = (wf & 0x08);      // WF[3] = Z (zero select)
 		int sel = (wf >> 4) & 3;       // WF[5:4] = SEL (ramp type)
-		bool invert = (wf & 0x40);     // WF[6] = I (0=one's complement, 1=direct)
+#if 0
+        // CORRECTED FROM MANUAL
+		bool invert = (wf & 0x40);     // WF[6] = I (0=direct, 1=two's complement)
 		bool ramp_mode = (wf & 0x80);  // WF[7] = R (0=sinus, 1=ramp/constant)
 #else
         // MIX - WORKING FX
-		bool z_bit = (wf & 0x08);      // WF[3] = Z (zero select)
-		int sel = (wf >> 4) & 3;       // WF[5:4] = SEL (ramp type)
 		bool invert = (wf & 0x80);     // WF[7] = I (0=direct, 1=two's complement)
 		bool ramp_mode = (wf & 0x40);  // WF[6] = R (0=sinus, 1=ramp/constant)
 #endif
@@ -159,17 +157,17 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 		}
 
         // Option 1: Mask to 12-bit (wraps)
-        // if (invert) {
-        //     result = (-result) & 0xFFF;
-        //     if (result & 0x800) result |= ~0xFFF; // sign extend
-        // }
+        if (invert) {
+            result = (-result) & 0xFFF;
+            if (result & 0x800) result |= ~0xFFF; // sign extend
+        }
 
         // Option 2: Saturate
-        if (invert) {
-            result = -result;
-            if (result > 2047) result = 2047;
-            if (result < -2048) result = -2048;
-        }
+        // if (invert) {
+        //     result = -result;
+        //     if (result > 2047) result = 2047;
+        //     if (result < -2048) result = -2048;
+        // }
         // EXPERIMENTING
 		// 
 		// Apply I bit: one's complement inversion with INVERTED semantics
@@ -265,21 +263,21 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
                 m_int_mod = true;
 				m_clear_rqst = end_bit;
 			}
-			update_carry();  // A changed
+			//update_carry();  // A changed
 		} else {
 			// Normal WA: load A from bus
 			// Per Section 8-3: "WA (without WSP) always sets CLEARRQST and clears INTMOD"
 			m_a = bus;
 			m_clear_rqst = true;
 			m_int_mod = false;
-			update_carry();  // A changed
+			//update_carry();  // A changed
 		}
 	}
 
 	// WB (Write B)
 	if (!BIT(inst, 6)) {
 		m_b = bus;
-		update_carry();  // B changed
+		//update_carry();  // B changed
 	}
 
 	// WM (Write Memory)
@@ -313,7 +311,7 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 			m_wf = 0x100; // Force Internal Sinus
 		} else if (!(m_wf & 0x100)) {
 			// External waveform: WPHI updates address, triggers ROM read, updates X
-			m_x = get_waveform(m_wf, m_phi, mad, slot_idx) & 0xFFF;
+			//m_x = get_waveform(m_wf, m_phi, mad, slot_idx) & 0xFFF;
 		}
 	}
 
@@ -331,7 +329,7 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 	// clearB
 	if (!BIT(inst, 2)) {
 		m_b = 0;
-		update_carry();  // B changed
+		//update_carry();  // B changed
 
 		// WWE (Write Waveform Enable) - triggered by RSP + clearB + WSP
 		// RSP = emitter_sel==3, clearB = bit 2 active, WSP = bit 8 active
@@ -386,8 +384,6 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 		int32_t x_signed = (int32_t)((int16_t)(m_x << 4) >> 4);
 		int32_t y_signed = (int32_t)((int16_t)(m_y << 4) >> 4);
 		// Q0.11 * Q0.11 = Q0.22 (24-bit), round to 19-bit Q0.18: shift right by 4
-		//
-		// FIXME what's the + 8 is for?
 		int32_t product = x_signed * y_signed;
 		m_mul_result = (uint32_t)((product + 8) >> 4) & MASK19;
 	}
