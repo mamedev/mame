@@ -5,6 +5,7 @@ license:CC0-1.0
 <mamelayout version="2">
 
 	<element name="warning"><text string="No default view."></text></element>
+	<element name="footnote"><text string="No available internal or external artwork, and/or no screens attached to the system."><color red="0.8" green="0.8" blue="0.8" /></text></element>
 
 	<element name="background">
 		<rect>
@@ -22,6 +23,7 @@ license:CC0-1.0
 		<collection name="Warning Message">
 			<element ref="background"><bounds xc="200" yc="150" width="2000" height="32" /></element>
 			<element ref="warning"><bounds xc="200" yc="150" width="390" height="25" /></element>
+			<element ref="footnote"><bounds xc="200" y="280" width="390" height="10" /></element>
 		</collection>
 	</view>
 
