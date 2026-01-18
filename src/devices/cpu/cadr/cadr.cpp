@@ -178,7 +178,7 @@ void cadr_cpu_device::diag_map(address_map &map) {
 	// 0x04 - OPC control register
 
 	// When installing through a map these must be byte addresses
-	map(0x00, 0x3f).lrw16(NAME([this] (offs_t offset) {
+	map(0x00 << 4, 0x07 << 4).lrw16(NAME([this] (offs_t offset) {
 		LOGMASKED(LOG_TRACE, "diag register read %02x\n", offset);
 		return 0;
 	}), NAME([this] (offs_t offset, u16 data) {
@@ -186,8 +186,8 @@ void cadr_cpu_device::diag_map(address_map &map) {
 		if (offset < 0x05) {
 			fatalerror("%x(%o): diag register write: write to %02x not implemented", m_prev_pc, m_prev_pc, offset);
 		}
-	}));
-	map(0x05 << 2, 0x05 << 2).lw16(NAME([this] (u16 data) {
+	})).umask32(0xffff);
+	map(0x05 << 4, 0x05 << 4).lw16(NAME([this] (u16 data) {
 		LOGMASKED(LOG_TRACE, "diag mode register write: %04x\n", data);
 		// mode register
 		// x------- PROG.BOOT
@@ -199,7 +199,7 @@ void cadr_cpu_device::diag_map(address_map &map) {
 		// ------xx SPEED 00 - extra slow, 01 - slow, 10 - normal, 11 - fast
 		m_diag_mode = data;
 		m_inst_view.select(BIT(m_diag_mode, 5));
-	}));
+	})).umask32(0xffff);
 }
 
 

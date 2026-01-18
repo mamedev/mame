@@ -87,7 +87,6 @@ TIMER_CALLBACK_MEMBER(cadr_disk_device::disk_done_callback)
 void cadr_disk_device::map(address_map &map)
 {
 	// When installing through a map these must be byte addresses
-	map(0x00,      0x1f).lr32(NAME([] () { return 0xffffffff; }));
 	map(0x04 << 2, 0x04 << 2).rw(FUNC(cadr_disk_device::status_r), FUNC(cadr_disk_device::command_w));
 	map(0x05 << 2, 0x05 << 2).rw(FUNC(cadr_disk_device::command_list_r), FUNC(cadr_disk_device::command_list_w));
 	map(0x06 << 2, 0x06 << 2).rw(FUNC(cadr_disk_device::disk_address_r), FUNC(cadr_disk_device::disk_address_w));

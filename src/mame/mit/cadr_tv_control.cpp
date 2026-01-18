@@ -134,8 +134,7 @@ void cadr_tv_control_device::video_ram_write(offs_t offset, u32 data)
 void cadr_tv_control_device::map(address_map &map)
 {
 	// When installing through a map these address must be byte addresses
-	map(0x00, 0x1f).lr32(NAME([] () { return 0xffffffff; }));
-	map(0x00, 0x03).lrw32(NAME([this] () {
+	map(0x00 << 2, 0x00 << 2).lrw32(NAME([this] () {
 		// -------- --x----- 0 = vertical retrace
 		return (m_status & ~0x20) | (m_screen->vblank() ? 0 : 0x20);
 	}), NAME([this] (u32 data) {
@@ -144,17 +143,17 @@ void cadr_tv_control_device::map(address_map &map)
 		m_irq_cb(CLEAR_LINE);
 	}));
 	// DATA
-	map(0x04, 0x07).lrw32(NAME([this] () {
+	map(0x01 << 2, 0x01 << 2).lrw32(NAME([this] () {
 		return m_sync_ram[m_sync_address & SYNC_RAM_MASK];
 	}), NAME([this] (u32 data) {
 		m_sync_ram[m_sync_address & SYNC_RAM_MASK] = data;
 	}));
 	// ADR
-	map(0x08, 0x0b).lw32(NAME([this] (u32 data) {
+	map(0x02 << 2, 0x02 << 2).lw32(NAME([this] (u32 data) {
 		m_sync_address = data;
 	}));
 	// Sync control/status
-	map(0x0c, 0x0f).lw32(NAME([this] (u32 data) {
+	map(0x03 << 2, 0x03 << 2).lw32(NAME([this] (u32 data) {
 		// 200 is written to enable Sync RAM, disable SYNC, and/or enable SYNC.
 		m_sync_csr = data;
 	}));

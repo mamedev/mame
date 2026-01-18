@@ -57,10 +57,8 @@ private:
 	static constexpr u8 IRQ_SOURCE_XBUS = 4;
 	
 	void mem_map(address_map &map);
+	void unibus_map(address_map &map);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; }
-	u32 disk_controller_r(offs_t offset);
-	void disk_controller_w(offs_t offset, u32 data);
-	TIMER_CALLBACK_MEMBER(tv_60hz_callback);
 	void unibus_irq_and_vector(u16 vector);
 
 	required_device<cadr_disk_device> m_disk_controller;
@@ -92,6 +90,8 @@ private:
 
 void cadr_state::mem_map(address_map &map)
 {
+	map.unmap_value_high();
+
 	// Xbus memory 0 - 16777777 / 000000 - 3bffff (~4M words)
 
 	// The system 100 boot program cannot handle more memory than 2M 32 bit words?
@@ -120,35 +120,41 @@ void cadr_state::mem_map(address_map &map)
 	map(017377760, 017377767).m(m_tv_control, FUNC(cadr_tv_control_device::map));
 
 	// Disk controllers
-	map(017377770, 017377777).m(m_disk_controller, FUNC(cadr_disk_device::map));
+	map(017377770, 017377777).m(m_disk_controller, FUNC(cadr_disk_device::map)).umask32(0xffffffff).cswidth(32);
 
 	// Unibus - 16 bit bus - 17400000 - 17777777 / 3e0000 - 3fffff
+	map(017400000, 017777777).m(FUNC(cadr_state::unibus_map));
+}
 
-	map(017400000, 017777777).lrw16(
+
+void cadr_state::unibus_map(address_map &map)
+{
+	// For debugging
+	map(0000000, 0377777).lrw16(
 		NAME([] (offs_t offset) {
-			printf("Read unibus %08x\n", 017400000 + offset);
+			printf("Read unibus %08x\n", offset);
 			return 0xffff;
 		}),
 		NAME([] (offs_t offset, u16 data) {
-			printf("Write unibus %08x %04x\n", 017400000 + offset, data);
+			printf("Write unibus %08x %04x\n", offset, data);
 		})
-
 	);
-	map(0x3ff420, 0x3ff43f).m(m_iob, FUNC(cadr_iob_device::map));
+
+	map(0764100 << 1, 0764176 << 1).m(m_iob, FUNC(cadr_iob_device::map));
 
 	// 766000 - 766017 - diagnostic interface
-	map(0x3ff600, 0x3ff607).m(m_maincpu, FUNC(cadr_cpu_device::diag_map));
+	map(0766000 << 1, 766016 << 1).m(m_maincpu, FUNC(cadr_cpu_device::diag_map)).cswidth(32);
 
 	// 3ff610/3ff611 - 766040/766042 - interrupt status
-	map(0x3ff610, 0x3ff610).lrw16(
+	map(0766040 << 1, 0766040 << 1).lrw16(
 		NAME([this] () {
 			return m_interrupt_status;
 		}),
 		NAME([this] (u16 data) {
 			m_interrupt_status = (m_interrupt_status & ~0x3c01) | (data & 0x3c01);
 		})
-	).umask32(0x0000ffff);
-	map(0x3ff611, 0x3ff611).lrw16(
+	).umask32(0xffff);
+	map(0766042 << 1, 0766042 << 1).lrw16(
 		NAME([this] () {
 			return m_interrupt_status;
 		}),
@@ -157,17 +163,17 @@ void cadr_state::mem_map(address_map &map)
 			if (!BIT(m_interrupt_status, 15))
 				m_mainirq->in_w<IRQ_SOURCE_UNIBUS>(CLEAR_LINE);
 		})
-	).umask32(0x0000ffff);
+	).umask32(0xffff);
 
 	// 3ff612 - 766044 - (clear) bus error status
-	map(0x3ff612, 0x3ff612).lrw16(
+	map(0766044 << 1, 0766044 << 1).lrw16(
 		NAME([this] () {
 			return m_bus_error_status;
 		}),
 		NAME([this] (u16 data) {
 			m_bus_error_status = 0;
 		})
-	).umask32(0x0000ffff);
+	).umask32(0xffff);
 
 	// This diagnostics interface is not described in AI Memo 528, but it
 	// is used by the CC-TEST_MACHINE program to test another machine.
@@ -181,7 +187,6 @@ void cadr_state::mem_map(address_map &map)
 	// 3ff626 / 766114 - Debuggee Unibus address to access (bits 1-16)
 	//
 }
-
 
 static INPUT_PORTS_START(cadr)
 INPUT_PORTS_END
