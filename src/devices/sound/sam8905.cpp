@@ -113,6 +113,7 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 		int sel = (wf >> 4) & 3;       // WF[5:4] = SEL (ramp type)
 #if 0
         // CORRECT ACCORDING TO MANUAL
+		bool z_bit = (wf & 0x08);      // WF[3] = Z (zero select)
 		bool invert = (wf & 0x40);     // WF[6] = I (0=direct, 1=two's complement)
 		bool ramp_mode = (wf & 0x80);  // WF[7] = R (0=sinus, 1=ramp/constant)
 #else
@@ -121,7 +122,13 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 		bool ramp_mode = (wf & 0x40);  // WF[6] = R (0=sinus, 1=ramp/constant)
 #endif
 
+        // FIXME CHECK WHERE THIS IS SET AND WHAT IT MIGHT BE SUPPOSED TO DO
+        // if (wf & 0x02) {
+        //     return 0;
+        // }
+
         if (z_bit) {
+            //printf("zbit\n");
             return 0;
         }
 
@@ -139,7 +146,6 @@ int32_t sam8905_device::get_waveform(uint32_t wf, uint32_t phi, uint8_t mad, int
 			result = (int32_t)(0.71875 * sin(angle) * 2048.0);
 		} else {
 			// Ramps based on SEL bits
-			int sel = (wf >> 4) & 3;
 			switch(sel) {
 				case 0: // 2x PHI ramp
 					result = (phi < 1024) ? phi * 2 :
