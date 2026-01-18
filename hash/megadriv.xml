@@ -33047,6 +33047,10 @@ No BGMs
 		<description>Telebradesco Residência (Brazil)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
+				<notes><![CDATA[
+Unemulated expansion bus modem.
+https://segaretro.org/TeleBradesco_Resid%C3%AAncia
+]]></notes>
 		<info name="language" value="Portuguese (Brazil)"/>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="262144">
