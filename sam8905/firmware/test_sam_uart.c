@@ -4,7 +4,7 @@
 // Based on analysis of original Keyfox10 firmware UART IRQ handler.
 // Receives MIDI data via serial interrupt and stores in circular buffer.
 
-#include <8051.h>
+#include <8052.h>
 #include <stdint.h>
 
 // ============================================================
@@ -52,6 +52,10 @@ __bit tx_ready;       // TX complete flag
 // Based on original firmware at 0xC1E3
 // ============================================================
 
+// Debug: last received byte for display (in internal RAM for fast access)
+__data volatile uint8_t debug_last_rx = 0;
+__data volatile uint8_t debug_rx_count = 0;
+
 void uart_isr(void) __interrupt(4) __using(3)
 {
     // Original firmware saves T1 state - we do the same
@@ -62,6 +66,10 @@ void uart_isr(void) __interrupt(4) __using(3)
     if (RI) {
         RI = 0;
         uart_temp = SBUF;
+
+        // Debug: save for display
+        debug_last_rx = uart_temp;
+        debug_rx_count++;
 
         // Check for buffer space
         if (rx_count < 0xFF) {
@@ -98,31 +106,20 @@ void uart_init(void)
     rx_overflow = 0;
     tx_ready = 1;
 
-    // Configure Timer 1 for baud rate generation
-    // 16MHz crystal, MIDI baud rate 31250
-    // Mode 2 (8-bit auto-reload), SMOD=1
-    // TH1 = 256 - (16000000 / (16 * 12 * 31250)) = 256 - 2.67 ≈ 253 (0xFD)
-    // This gives approximately 31250 baud
+    // Use Timer 2 for baud rate generation (80C32/8052 feature)
+    // 16MHz crystal, MIDI 31250 baud
+    // Baud = Fosc / (32 * (65536 - RCAP2))
+    // 31250 = 16000000 / (32 * 16) → RCAP2 = 0xFFF0
+    RCAP2H = 0xFF;
+    RCAP2L = 0xF0;
+    TH2 = 0xFF;
+    TL2 = 0xF0;
+    T2CON = 0x34;   // RCLK=1, TCLK=1, TR2=1 (Timer 2 as baud rate generator)
 
-    TMOD = (TMOD & 0x0F) | 0x20;  // Timer 1: Mode 2 (8-bit auto-reload)
-    TH1 = 0xFD;                   // Reload value for ~31250 baud
-    TL1 = 0xFD;
+    SCON = 0x50;    // Mode 1, REN=1
 
-    // Enable double baud rate for better accuracy
-    PCON |= 0x80;  // SMOD = 1
-
-    // Configure serial port
-    // Mode 1: 8-bit UART, variable baud rate
-    // REN: Receive enable
-    SCON = 0x50;  // Mode 1, REN=1
-
-    // Start Timer 1
-    TR1 = 1;
-
-    // Enable serial interrupt
+    // Enable interrupts: EA=1, ES=1
     ES = 1;
-
-    // Enable global interrupts
     EA = 1;
 }
 
@@ -386,6 +383,11 @@ uint16_t note_to_phase_inc(uint8_t note) {
 
 void process_midi_byte(uint8_t byte) {
     // Real-time messages - ignore
+    //byte = ~byte;
+
+    /* disp_hex(byte); */
+    /* return; */
+
     if (byte >= 0xF8) {
         return;
     }
@@ -400,11 +402,14 @@ void process_midi_byte(uint8_t byte) {
             case MIDI_NOTE_OFF:
             case MIDI_NOTE_ON:
                 midi_expect = 2;
+                //disp_hex(byte);
                 break;
             case MIDI_PROGRAM:
                 midi_expect = 1;
+                disp_hex(0);
                 break;
             default:
+                ///disp_hex(1);
                 midi_status = 0;  // Unsupported, ignore
                 break;
         }
@@ -417,30 +422,50 @@ void process_midi_byte(uint8_t byte) {
     if (midi_expect == 2) {
         midi_data1 = byte;
         midi_expect = 1;
+        disp_hex(0xB);
     } else if (midi_expect == 1) {
+        //disp_hex(0xC);
         // Complete message
         uint8_t cmd = midi_status & 0xF0;
-        uint8_t velocity = byte;
+        uint8_t velocity = 127; //byte;
 
         if (cmd == MIDI_NOTE_ON && velocity > 0) {
-            // Note on - set frequency and display note
+            // Note on - display note number first for debug
+            //disp_number(midi_data1);  // Show MIDI note number (decimal)
+            disp_hex(0xD);
+
+            // Then set frequency
             uint16_t phase_inc = note_to_phase_inc(midi_data1);
             load_sinus_oscillator(phase_inc);
-            disp_number(midi_data1);  // Show MIDI note number
         } else if (cmd == MIDI_NOTE_OFF || (cmd == MIDI_NOTE_ON && velocity == 0)) {
+            disp_hex(0xE);
             // Note off - silence
             sam_write_dram(0x0F, 0x00800);  // Set IDLE
-            disp_number(0);  // Clear display
+            //disp_number(0);  // Clear display
         }
 
         // Reset for running status
         if ((midi_status & 0xF0) == MIDI_NOTE_OFF ||
             (midi_status & 0xF0) == MIDI_NOTE_ON) {
             midi_expect = 2;
+            //midi_expect = 0;
         } else {
             midi_expect = 1;
+            //midi_expect = 0;
         }
     }
+}
+
+// ============================================================
+// Display 3-digit hex (count in left digit, last byte in right 2)
+// ============================================================
+void disp_debug(uint8_t count, uint8_t last_byte) {
+    // Left digit: count (0-F)
+    disp_buffer[2] = seg7_digits[count & 0x0F];
+    // Right 2 digits: last received byte in hex
+    disp_buffer[1] = seg7_digits[(last_byte >> 4) & 0x0F];
+    disp_buffer[0] = seg7_digits[last_byte & 0x0F];
+    disp_update();
 }
 
 // ============================================================
@@ -456,11 +481,14 @@ void main(void) {
     // Initialize UART for MIDI
     uart_init();
 
-    // Initialize display - show "A4" indicator (note 69)
-    disp_number(69);
+    // Initialize display - show "---" to indicate waiting
+    disp_buffer[2] = SEG7_MINUS;
+    disp_buffer[1] = SEG7_MINUS;
+    disp_buffer[0] = SEG7_MINUS;
+    disp_update();
 
     // Load default sound (A4 = 440Hz, phase_inc=41)
-    load_sinus_oscillator(41);
+    //load_sinus_oscillator(41);
 
     // Start SAM
     sam_start();
@@ -471,7 +499,5 @@ void main(void) {
             uint8_t byte = uart_read();
             process_midi_byte(byte);
         }
-
-        // Could add other processing here
     }
 }
