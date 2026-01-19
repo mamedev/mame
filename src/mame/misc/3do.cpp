@@ -145,6 +145,7 @@ void _3do_state::main_mem(address_map &map)
 //      map(0x0370'0000, 0X037E'FFFF) SRAM
 //      map(0X037F'FF00, 0X037F'FF0B) link data/address/FIFO
 //      map(0X037F'FF0C, 0X037F'FF0F) joysticks
+//      map(0x037F'0000, 0x0373'FFFF) debug ROM
 //  map(0x0380'0000, 0x03??'????) trace big RAM
 }
 

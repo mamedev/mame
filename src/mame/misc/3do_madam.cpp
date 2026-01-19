@@ -12,8 +12,9 @@
 #define LOG_CEL     (1U << 6)
 #define LOG_REGIS   (1U << 7)
 
-#define VERBOSE (LOG_GENERAL | LOG_CEL | LOG_REGIS | LOG_MMU | LOG_MULT)
-//#define VERBOSE (LOG_VDLP | LOG_CEL | LOG_REGIS)
+#define VERBOSE (LOG_GENERAL | LOG_MMU | LOG_MULT)
+//#define VERBOSE (LOG_VDLP)
+//#define VERBOSE (LOG_CEL | LOG_REGIS)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
@@ -48,6 +49,7 @@ void madam_device::device_start()
 	m_msysbits = 0x51;
 
 	m_dma_playerbus_timer = timer_alloc(FUNC(madam_device::dma_playerbus_cb), this);
+	m_cel_timer = timer_alloc(FUNC(madam_device::cel_tick_cb), this);
 
 	save_item(NAME(m_pip));
 	save_item(NAME(m_fence));
@@ -62,7 +64,9 @@ void madam_device::device_reset()
 	m_vdlp.address = 0x20'0000;
 
 	m_mctl = 0;
+	m_cel.state = IDLE;
 	m_dma_playerbus_timer->adjust(attotime::never);
+	m_cel_timer->adjust(attotime::never);
 }
 
 // $0330'0000 base
@@ -124,8 +128,10 @@ void madam_device::map(address_map &map)
 	// 0x0044: Anvil "feature"
 
 	// CEL engine
-//  map(0x0100, 0x0103)  SPRSTRT - Start the CEL engine (W)
-//  map(0x0104, 0x0107)  SPRSTOP - Stop the CEL engine (W)
+	// SPRSTRT - Start the CEL engine (W)
+	map(0x0100, 0x0103).w(FUNC(madam_device::cel_start_w));
+	// SPRSTOP - Stop the CEL engine (W)
+	map(0x0104, 0x0107).w(FUNC(madam_device::cel_stop_w));
 //  map(0x0108, 0x010b)  SPRCNTU - Continue the CEL engine (W)
 //  map(0x010c, 0x010f)  SPRPAUS - Pause the CEL engine (W)
 	map(0x0110, 0x0113).lrw32(
@@ -401,6 +407,12 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 	m_dma_playerbus_timer->adjust(attotime::from_ticks(2, this->clock()));
 }
 
+/******************
+ *
+ * VDLP engine
+ *
+ ******************/
+
 void madam_device::vdlp_start_w(int state)
 {
 	// PLAYXEN
@@ -515,3 +527,260 @@ void madam_device::vdlp_continue_w(int state)
 		m_vdlp.address = m_vdlp.link;
 	}
 }
+
+/******************
+ *
+ * CEL engine
+ *
+ *****************/
+
+void madam_device::cel_start_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	LOGCEL("Start CEL engine\n");
+	m_cel.state = FETCH_PARAMS;
+	m_cel.address = m_dma[26][1];
+	m_cel_timer->adjust(attotime::from_ticks(2, this->clock()));
+}
+
+void madam_device::cel_stop_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	LOGCEL("Stop CEL engine\n");
+	m_cel.state = IDLE;
+	m_cel_timer->adjust(attotime::never);
+}
+
+// TODO: is all of this madness burst, cycle steal or a mix of the two?
+TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
+{
+	u16 tick_time;
+
+	switch(m_cel.state)
+	{
+		case IDLE:
+			break;
+		case FETCH_PARAMS:
+		{
+			tick_time = 1;
+
+			m_cel.current_ccb = m_dma_read_cb(m_cel.address);
+			LOGCEL("CEL fetch params [%08x] flags=%08x\n", m_cel.address, m_cel.current_ccb);
+			m_cel.skip = !!BIT(m_cel.current_ccb, 31);
+			m_cel.last = !!BIT(m_cel.current_ccb, 30);
+			m_cel.next_ptr = m_dma_read_cb(m_cel.address + 0x04);
+
+			if (m_cel.skip && m_cel.last)
+			{
+				LOGCEL("Skip + Last, done\n");
+				m_cel.state = IDLE;
+				m_cel_timer->adjust(attotime::never);
+				return;
+			}
+			else if (m_cel.skip)
+			{
+				LOGCEL("Skip, move to next CCB\n");
+				m_cel.state = FETCH_PARAMS;
+				m_cel.address = m_cel.next_ptr;
+				m_cel_timer->adjust(attotime::from_ticks(2 * 2, this->clock()));
+				return;
+			}
+			else if (!m_cel.last)
+			{
+				// add an extra tick for actually fetching next ptr
+				tick_time += 1;
+			}
+
+			const bool npabs = !!BIT(m_cel.current_ccb, 29);
+			const bool spabs = !!BIT(m_cel.current_ccb, 28);
+			const bool ppabs = !!BIT(m_cel.current_ccb, 27);
+			const bool ldsize = !!BIT(m_cel.current_ccb, 26);
+			const bool ldprs = !!BIT(m_cel.current_ccb, 25);
+			const bool ldpixc = !!BIT(m_cel.current_ccb, 24);
+			LOGCEL("    CCB skip=%d last=%d npabs=%d spabs=%d ppabs=%d ldsize=%d ldprs=%d ldpixc=%d\n"
+				, m_cel.skip
+				, m_cel.last
+				, npabs
+				, spabs
+				, ppabs
+				, ldsize
+				, ldprs
+				, ldpixc
+			);
+			const bool ldplut = !!BIT(m_cel.current_ccb, 23);
+			m_cel.ccbpre = !!BIT(m_cel.current_ccb, 22);
+			const bool yoxy = !!BIT(m_cel.current_ccb, 21);
+			LOGCEL("        ldplut=%d ccbpre=%d yoxy=%d acsc=%d alsc=%d acw=%d accw=%d twd=%d\n"
+				, ldplut
+				, m_cel.ccbpre
+				, yoxy
+				, BIT(m_cel.current_ccb, 20)
+				, BIT(m_cel.current_ccb, 19)
+				, BIT(m_cel.current_ccb, 18)
+				, BIT(m_cel.current_ccb, 17)
+				, BIT(m_cel.current_ccb, 16)
+			);
+			LOGCEL("        lce=%d ace=%d maria=%d pxor=%d useav=%d packed=%d\n"
+				, BIT(m_cel.current_ccb, 15)
+				, BIT(m_cel.current_ccb, 14)
+				//, BIT(m_cel.current_ccb, 13) spare
+				, BIT(m_cel.current_ccb, 12)
+				, BIT(m_cel.current_ccb, 11)
+				, BIT(m_cel.current_ccb, 10)
+				, BIT(m_cel.current_ccb, 9)
+			);
+			LOGCEL("        pover=%d plutpos=%d bgnd=%d noblk=%d pluta=%d\n"
+				, (m_cel.current_ccb & 0x180) >> 7
+				, BIT(m_cel.current_ccb, 6)
+				, BIT(m_cel.current_ccb, 5)
+				, BIT(m_cel.current_ccb, 4)
+				, (m_cel.current_ccb & 0xe) >> 1
+			);
+			// FIXME: relative to what?
+			if (!npabs || !spabs || !ppabs)
+			{
+				popmessage("CEL relative address use at %08x %d|%d|%d", m_cel.address, npabs, spabs, ppabs);
+				return;
+			}
+			m_cel.source_ptr = m_dma_read_cb(m_cel.address + 0x08);
+			m_cel.plut_ptr = m_dma_read_cb(m_cel.address + 0x0c);
+			tick_time += 2;
+			LOGCEL("    NEXTPTR %08x SOURCEPTR %08x PLUTPTR %08x\n", m_cel.next_ptr, m_cel.source_ptr, m_cel.plut_ptr);
+			if (!ldsize || !ldprs || !yoxy || !ldpixc)
+			{
+				popmessage("CEL using existing values at %08x %d|%d|%d|%d", m_cel.address, ldsize, ldprs, yoxy, ldpixc);
+				return;
+			}
+			m_cel.xpos = m_dma_read_cb(m_cel.address + 0x10);
+			m_cel.ypos = m_dma_read_cb(m_cel.address + 0x14);
+			tick_time += 2;
+			// TODO: can be in 17.15 format (?)
+			LOGCEL("    xpos=%f ypos=%f\n",  (double)m_cel.xpos / 65536.0, (double)m_cel.ypos / 65536.0);
+
+			m_cel.hdx = m_dma_read_cb(m_cel.address + 0x18);
+			m_cel.hdy = m_dma_read_cb(m_cel.address + 0x1c);
+			m_cel.vdx = m_dma_read_cb(m_cel.address + 0x20);
+			m_cel.vdy = m_dma_read_cb(m_cel.address + 0x24);
+			tick_time += 4;
+			LOGCEL("    hdx=%f hdy=%f vdx=%f vdy=%f\n"
+				, (double)m_cel.hdx / 1048576.0, (double)m_cel.hdy / 1048576.0
+				, (double)m_cel.vdx / 65536.0, (double)m_cel.vdy / 65536.0
+			);
+
+			m_cel.hddx = m_dma_read_cb(m_cel.address + 0x28);
+			m_cel.hddy = m_dma_read_cb(m_cel.address + 0x2c);
+			tick_time += 2;
+			LOGCEL("    hddx=%f hddy=%f\n", (double)m_cel.hddx / 1048576.0, (double)m_cel.hddy / 1048576.0);
+
+			m_cel.pixc = m_dma_read_cb(m_cel.address + 0x30);
+			tick_time += 1;
+			LOGCEL("    pixc=%08x\n", m_cel.pixc);
+
+			if (m_cel.ccbpre)
+			{
+				m_cel.pre0 = m_dma_read_cb(m_cel.address + 0x34);
+				m_cel.pre1 = m_dma_read_cb(m_cel.address + 0x38);
+				tick_time += 2;
+				LOGCEL("    pre0=%08x pre1=%08x\n", m_cel.pre0, m_cel.pre1);
+			}
+
+			m_cel.state = DRAW;
+			m_cel_timer->adjust(attotime::from_ticks(2 * tick_time, this->clock()));
+
+			break;
+		}
+		case DRAW:
+		{
+			tick_time = 1;
+			u32 source_ptr = m_cel.source_ptr;
+
+			if (!m_cel.ccbpre)
+			{
+				m_cel.pre0 = m_dma_read_cb(source_ptr + 0x00);
+				m_cel.pre1 = m_dma_read_cb(source_ptr + 0x04);
+				source_ptr += 8;
+				tick_time += 2;
+				LOGCEL("    pre0=%08x pre1=%08x\n", m_cel.pre0, m_cel.pre1);
+			}
+
+			const u16 vcnt = ((m_cel.pre0 >> 6) & 0xfff) + 1;
+			const bool uncoded = !!BIT(m_cel.pre0, 4);
+			const u8 bpp = (m_cel.pre0 >> 0) & 0x7;
+
+			LOGCEL("    skipx=%d vcnt=%d uncoded=%d rep8=%d bpp=%d\n"
+				, (m_cel.pre0 >> 24) & 0xf
+				, vcnt
+				, uncoded
+				, BIT(m_cel.pre0, 3)
+				, bpp
+			);
+			const u16 woffset10 = ((m_cel.pre1 >> 16) & 0x3ff) + 2;
+			const bool lrform = !!BIT(m_cel.pre1, 11);
+			const u16 tlhpcnt = ((m_cel.pre1 >> 0) & 0x7ff) + 1;
+			LOGCEL("    woffset(8)=%d woffset(10)=%d noswap=%d unclsb=%d lrform=%d tlhpcnt=%d\n"
+				, ((m_cel.pre1 >> 24) & 0x7f) + 2
+				, woffset10
+				, BIT(m_cel.pre1, 14)
+				, (m_cel.pre1 >> 12) & 3
+				, lrform
+				, tlhpcnt
+			);
+
+			// 3do_gdo101 uses mostly this, with lrform enabled on several elements (the 3DO logo)
+			// 3do_fz1 uses uncoded=0 + bpp=4
+			if (uncoded && bpp == 6 && !lrform)
+			{
+				const u16 xclip = m_regctl1 & 0xffff;
+				const u16 yclip = m_regctl1 >> 16;
+
+				for (int y = 0; y < vcnt; y++)
+				{
+					int ypos = (m_cel.ypos >> 16) + y;
+
+					if (ypos != std::clamp<unsigned>(ypos, 0, yclip))
+						continue;
+
+					for (int x = 0; x < tlhpcnt; x++)
+					{
+						int xpos = (m_cel.xpos >> 16) + x;
+						if (xpos != std::clamp<unsigned>(xpos, 0, xclip))
+							continue;
+
+						u32 cel_address = source_ptr;
+						cel_address += ((y & ~1) * woffset10) << 2;
+						cel_address += ((x) << 1);
+						const u32 src_data = m_dma_read_cb(cel_address);
+						u8 src_shift = ((y & 1) ^ 0) * 16;
+
+						u32 dst_address = m_regctl3;
+						dst_address += ((ypos & ~1) * 160) << 2;
+						dst_address += (xpos << 2);
+
+						u32 dst_data = m_dma_read_cb(dst_address);
+						dst_data &= (ypos & 1) ? 0xffff : 0xffff0000;
+
+						m_dma_write_cb(dst_address, (src_data << src_shift) | dst_data);
+
+						tick_time += 2;
+					}
+				}
+
+			}
+
+			if (m_cel.last)
+			{
+				m_cel.state = IDLE;
+				m_cel_timer->adjust(attotime::never);
+			}
+			else
+			{
+				m_cel.state = FETCH_PARAMS;
+				m_cel.address = m_cel.next_ptr;
+				m_cel_timer->adjust(attotime::from_ticks(2 * tick_time, this->clock()));
+			}
+
+			break;
+		}
+	}
+
+}
+
+

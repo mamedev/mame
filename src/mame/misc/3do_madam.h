@@ -83,11 +83,36 @@ private:
 		bool video_dma;
 	} m_vdlp;
 
+	enum cel_state_t : u8 {
+		IDLE,
+		FETCH_PARAMS,
+		DRAW
+	};
+
+	struct {
+		cel_state_t state;
+		u32 address;
+		u32 current_ccb;
+		bool skip, last, ccbpre;
+		u32 next_ptr;
+		u32 source_ptr;
+		u32 plut_ptr;
+		u32 xpos, ypos;
+		u32 hdx, hdy, vdx, vdy;
+		u32 hddx, hddy;
+		u32 pixc, pre0, pre1;
+	} m_cel;
+
 	u32 mctl_r();
 	void mctl_w(offs_t offset, u32 data, u32 mem_mask);
 
+	void cel_start_w(offs_t offset, u32 data, u32 mem_mask);
+	void cel_stop_w(offs_t offset, u32 data, u32 mem_mask);
+
 	TIMER_CALLBACK_MEMBER(dma_playerbus_cb);
+	TIMER_CALLBACK_MEMBER(cel_tick_cb);
 	emu_timer *m_dma_playerbus_timer;
+	emu_timer *m_cel_timer;
 };
 
 DECLARE_DEVICE_TYPE(MADAM, madam_device)
