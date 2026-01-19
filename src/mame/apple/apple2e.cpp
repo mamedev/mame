@@ -106,10 +106,6 @@
 
 ----------------------------------
 
-TK3000 keyboard matrix:
-Data bus D0-D7 is X0-X7
-Address bus A0-A11 is Y0-Y11
-
 IIc Plus CGGA speed control:
 Fast: Store $08 to $C05B (Zip compatible)
 Normal: Store $08 to $C05A (Zip compatible)
@@ -140,6 +136,7 @@ To enable mixed-case input and display on prav8c, enter the command "SETMOD 1" i
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "machine/74259.h"
 #include "machine/applefdintf.h"
 #include "machine/ds1215.h"
 #include "machine/iwm.h"
@@ -232,6 +229,7 @@ public:
 		m_mousex(*this, MOUSE_XAXIS_TAG),
 		m_mousey(*this, MOUSE_YAXIS_TAG),
 		m_kbdrom(*this, "keyboard"),
+		m_kbdmatrix(*this, "X%u", 0U),
 		m_kbspecial(*this, "keyb_special"),
 		m_kbd_lang_sel(*this, "kbd_lang_select"),
 		m_sysconfig(*this, "a2_config"),
@@ -256,7 +254,9 @@ public:
 		m_floppy(*this, "fdc:%d", 0U),
 		m_ds1315(*this, "nsc"),
 		m_printer_conn(*this, "parallel"),
-		m_printer_out(*this, "laserprnout")
+		m_printer_out(*this, "laserprnout"),
+		m_kbdcpu(*this, "kbdcpu"),
+		m_kbdlatch(*this, "kbdlatch")
 	{
 		m_isiic = false;
 		m_isiicplus = false;
@@ -291,6 +291,7 @@ public:
 	required_device<apple2_gameio_device> m_gameio;
 	optional_ioport m_mouseb, m_mousex, m_mousey;
 	optional_memory_region m_kbdrom;
+	optional_ioport_array<9> m_kbdmatrix;
 	optional_ioport m_kbspecial;
 	optional_ioport m_kbd_lang_sel; // high-order nibble: keyboard selection offset - low-order nibble: character ROM area selection offset (including lo-res patterns)
 	optional_ioport m_sysconfig;
@@ -306,6 +307,8 @@ public:
 	required_device<ds1216e_device> m_ds1315;
 	optional_device<centronics_device>      m_printer_conn;
 	optional_device<output_latch_device>    m_printer_out;
+	optional_device<cpu_device> m_kbdcpu;
+	optional_device<ls259_device> m_kbdlatch;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
@@ -400,6 +403,10 @@ public:
 	void memexp_w(offs_t offset, u8 data);
 	u8 ace500_c0bx_r(offs_t offset);
 	void ace500_c0bx_w(offs_t offset, u8 data);
+	u8 tk3000_kbdflags_r();
+	u8 tk3000_kbdmatrix_r(offs_t offset);
+	void tk3000_kbdlatch_w(offs_t offset, u8 data);
+	void tk3000_kstrb_w(int state);
 
 	void apple2cp(machine_config &config);
 	void spectred(machine_config &config);
@@ -431,11 +438,14 @@ public:
 	void ace500_map(address_map &map) ATTR_COLD;
 	void ace2200_map(address_map &map) ATTR_COLD;
 	void spectred_keyb_map(address_map &map) ATTR_COLD;
-	void init_laser128();
-	void init_128ex();
-	void init_pal();
-	void init_ace500();
-	void init_ace2200();
+	void tk3000_keyb_map(address_map &map) ATTR_COLD;
+	void tk3000_keybio_map(address_map &map) ATTR_COLD;
+	void init_laser128() ATTR_COLD;
+	void init_128ex() ATTR_COLD;
+	void init_pal() ATTR_COLD;
+	void init_ace500() ATTR_COLD;
+	void init_ace2200() ATTR_COLD;
+	void init_tk3000() ATTR_COLD;
 
 	bool m_35sel, m_hdsel, m_intdrive;
 
@@ -2039,7 +2049,11 @@ u8 apple2e_state::c000_r(offs_t offset)
 			{
 				const u8 rv = m_transchar | (m_anykeydown ? 0x80 : 0x00);
 				if (!machine().side_effects_disabled())
+				{
 					m_strobe = 0;
+					if (m_kbdcpu.found())
+						m_kbdcpu->set_input_line(0, HOLD_LINE);
+				}
 				return rv;
 			}
 
@@ -2351,6 +2365,8 @@ void apple2e_state::c000_w(offs_t offset, u8 data)
 	if ((offset & 0xf0) == 0x10) // clear keyboard latch, $C010 is really 10-1F
 	{
 		m_strobe = 0;
+		if (offset == 0x10 && m_kbdcpu.found())
+			m_kbdcpu->set_input_line(0, HOLD_LINE);
 		return;
 	}
 	else if ((offset & 0xf0) == 0x60 && m_prav8c_kbd.found())
@@ -4587,10 +4603,40 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tk3000 )
 	PORT_INCLUDE( apple2e )
 
-	PORT_START("kbd_lang_select")
-	PORT_CONFNAME(0xff, 0x00, "Character Set")
-	PORT_CONFSETTING(0x00, "Portuguese")
-	PORT_CONFSETTING(0x01, "US English")
+	PORT_MODIFY("X0")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Mode") PORT_CODE(KEYCODE_SLASH_PAD)
+
+	PORT_MODIFY("X1")
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Prog") PORT_CODE(KEYCODE_NUMLOCK)
+
+	PORT_MODIFY("X2")
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(';') PORT_CHAR(':')
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_00_PAD)  PORT_CHAR(UCHAR_MAMEKEY(00_PAD))
+
+	PORT_MODIFY("X4")
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD)   PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD)   PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD)   PORT_CHAR(UCHAR_MAMEKEY(2_PAD))
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD)   PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON)   PORT_CHAR('\\') PORT_CHAR('|')
+
+	PORT_MODIFY("X5")
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD)   PORT_CHAR(UCHAR_MAMEKEY(4_PAD))
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD)   PORT_CHAR(UCHAR_MAMEKEY(5_PAD))
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD)   PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD)   PORT_CHAR(UCHAR_MAMEKEY(7_PAD))
+
+	PORT_MODIFY("X6")
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD)       PORT_CHAR(UCHAR_MAMEKEY(8_PAD))
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD)       PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)     PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
+
+	PORT_MODIFY("keyb_special")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) // no toggle
+	// NOTE: "kbd_lang_select" port is not used by this system since character set is soft-switched from keyboard
+	PORT_CONFNAME(0x40, 0x00, "Keyboard")
+	PORT_CONFSETTING(0x00, "QWERTY")
+	PORT_CONFSETTING(0x40, "DVORAK")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( spectred )
@@ -5065,14 +5111,74 @@ void apple2e_state::spectred(machine_config &config)
 	//       and then remove the keyb CPU inherited from apple2e
 }
 
+void apple2e_state::tk3000_keyb_map(address_map &map)
+{
+	map(0x0000, 0x1fff).rom();
+	map(0x2000, 0x23ff).ram();
+}
+
+void apple2e_state::tk3000_keybio_map(address_map &map)
+{
+	map(0x0000, 0x0000).r(FUNC(apple2e_state::tk3000_kbdflags_r));
+	map(0x8000, 0xffff).rw(FUNC(apple2e_state::tk3000_kbdmatrix_r), FUNC(apple2e_state::tk3000_kbdlatch_w));
+}
+
+u8 apple2e_state::tk3000_kbdflags_r()
+{
+	auto kbspecial = m_kbspecial->read();
+	return (m_screen->vblank() || m_screen->hblank() ? 0x20 : 0)
+		| (kbspecial & 0x40) >> 2
+		| (m_an1 ? 0x08 : 0)
+		| (kbspecial & 0x01) << 2
+		| (kbspecial & 0x06 ? 0 : 0x02)
+		| (~kbspecial & 0x08) >> 3;
+}
+
+u8 apple2e_state::tk3000_kbdmatrix_r(offs_t offset)
+{
+	// TK3000 keyboard matrix:
+	// Data bus D0-D7 is X0-X7
+	// Address bus A0-A11 is Y0-Y11
+	u8 result = 0;
+	for (int i = 0; i < 8; i++)
+		if (m_kbdmatrix[i]->read() & offset)
+			result |= 1 << i;
+	return result;
+}
+
+void apple2e_state::tk3000_kbdlatch_w(offs_t offset, u8 data)
+{
+	m_transchar = offset & 0x7f;
+	m_kbdlatch->write_bit(BIT(offset, 9, 3), BIT(offset, 8));
+}
+
+void apple2e_state::tk3000_kstrb_w(int state)
+{
+	// rising edge active
+	if (state)
+		m_strobe = 0x80;
+}
+
 void apple2e_state::tk3000(machine_config &config)
 {
 	apple2e(config);
 	W65C02(config.replace(), m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2e_state::base_map);
 
-//  z80_device &subcpu(Z80(config, "subcpu", 1021800));    // schematics are illegible on where the clock comes from, but it *seems* to be the same as the 65C02 clock
-//  subcpu.set_addrmap(AS_PROGRAM, &apple2e_state::tk3000_kbd_map);
+	config.device_remove("ay3600");
+
+	z80_device &kbdcpu(Z80(config, "kbdcpu", A2BUS_7M_CLOCK / 2));
+	kbdcpu.set_addrmap(AS_PROGRAM, &apple2e_state::tk3000_keyb_map);
+	kbdcpu.set_addrmap(AS_IO, &apple2e_state::tk3000_keybio_map);
+
+	LS259(config, m_kbdlatch); // H12
+	m_kbdlatch->q_out_cb<0>().set(FUNC(apple2e_state::tk3000_kstrb_w));
+	m_kbdlatch->q_out_cb<1>().set(FUNC(apple2e_state::ay3600_ako_w));
+	m_kbdlatch->q_out_cb<2>().set_output("accent_led").invert();
+	m_kbdlatch->q_out_cb<3>().set_output("mode_led").invert();
+	m_kbdlatch->q_out_cb<3>().append(m_video, FUNC(a2_video_device::set_iie_langsw));
+	m_kbdlatch->q_out_cb<4>().set_output("prog_led").invert();
+	m_kbdlatch->q_out_cb<5>().set_output("caps_led").invert();
 }
 
 void apple2e_state::prav8c(machine_config &config)
@@ -5718,10 +5824,9 @@ ROM_START(tk3000)
 	ROM_LOAD( "tk3000.f4f6",  0x000000, 0x004000, CRC(5b1e8ab2) SHA1(f163e5753c18ff0e812a448e8da406f102600edf) )
 
 	ROM_REGION(0x2000, "kbdcpu", 0)
-	ROM_LOAD( "tk3000.e13",   0x000000, 0x002000, BAD_DUMP CRC(f9b860d3) SHA1(6a127f1458f43a00199d3dde94569b8928f05a53) ) // seems underdumped; PCB photos show a 16Kx8 ROM here (27128)
-
-	ROM_REGION(0x800, "keyboard", ROMREGION_ERASE00)
-	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, BAD_DUMP CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // probably not this machine's actual ROM
+	ROM_LOAD( "tk3000.e13",   0x000000, 0x002000, BAD_DUMP CRC(f9b860d3) SHA1(6a127f1458f43a00199d3dde94569b8928f05a53) )
+	// PCB photos show a 16Kx8 ROM here (27128), but the extra 8K may be irrelevant since much of the Z80 code in this dump is unused anyway
+	ROM_FILL( 0x0000, 1, 0xf3 ) // patch for first instruction, also needed to pass checksum test
 ROM_END
 
 // CM630 = 6502 CPU
@@ -6164,6 +6269,29 @@ ROM_START(ace500)
 	ROM_LOAD( "342-0132-c.e12", 0x000, 0x800, CRC(e47045f4) SHA1(12a2e718f5f4acd69b6c33a45a4a940b1440a481) ) // 1983 US-Dvorak
 ROM_END
 
+void apple2e_state::init_tk3000()
+{
+	// address line swaps can be annoying
+	u8 *rom = memregion("kbdcpu")->base();
+	unsigned len = memregion("kbdcpu")->bytes();
+
+	for (unsigned j = 0; j < len; j += 0x400)
+	{
+		if ((j & 0xc00) == 0x400)
+			std::swap_ranges(&rom[j], &rom[j + 0x400], &rom[j + 0x400]);
+
+		std::vector<u8> temp1(&rom[j + 0x80], &rom[j + 0x100]);
+		std::copy(&rom[j + 0x200], &rom[j + 0x280], &rom[j + 0x80]);
+		std::copy(&rom[j + 0x100], &rom[j + 0x180], &rom[j + 0x200]);
+		std::copy(temp1.begin(), temp1.end(), &rom[j + 0x100]);
+
+		std::vector<u8> temp2(&rom[j + 0x180], &rom[j + 0x200]);
+		std::copy(&rom[j + 0x280], &rom[j + 0x300], &rom[j + 0x180]);
+		std::copy(&rom[j + 0x300], &rom[j + 0x380], &rom[j + 0x280]);
+		std::copy(temp2.begin(), temp2.end(), &rom[j + 0x300]);
+	}
+}
+
 } // anonymous namespace
 
 
@@ -6191,7 +6319,7 @@ COMP( 1984, apple2cde,  apple2c, 0,      apple2cpal,      apple2cde,  apple2e_st
 COMP( 1984, apple2cse,  apple2c, 0,      apple2cpal,      apple2cse,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (Sweden)" , MACHINE_SUPPORTS_SAVE )
 COMP( 1984, apple2cfr,  apple2c, 0,      apple2cpal,      apple2cfr,  apple2e_state, init_pal,      "Apple Computer",                    "Apple //c (France)" , MACHINE_SUPPORTS_SAVE )
 COMP( 1985?,spectred,   apple2e, 0,      spectred,        spectred,   apple2e_state, empty_init,    "Scopus/Spectrum",                   "Spectrum ED" , MACHINE_SUPPORTS_SAVE )
-COMP( 1986, tk3000,     apple2c, 0,      tk3000,          tk3000,     apple2e_state, empty_init,    "Microdigital",                      "TK3000//e" , MACHINE_SUPPORTS_SAVE )
+COMP( 1986, tk3000,     apple2c, 0,      tk3000,          tk3000,     apple2e_state, init_tk3000,   "Microdigital",                      "TK3000 //e" , MACHINE_SUPPORTS_SAVE )
 COMP( 1989, prav8c,     apple2e, 0,      prav8c,          prav8c,     apple2e_state, empty_init,    "Pravetz",                           "Pravetz 8C", MACHINE_NODEVICE_PRINTER | MACHINE_SUPPORTS_SAVE )
 COMP( 1987, laser128,   apple2c, 0,      laser128,        laser128,   apple2e_state, init_laser128, "Video Technology",                  "Laser 128", MACHINE_SUPPORTS_SAVE )
 COMP( 1987, laser128o,  apple2c, 0,      laser128o,       laser128,   apple2e_state, init_laser128, "Video Technology",                  "Laser 128 (original hardware)", MACHINE_SUPPORTS_SAVE )
