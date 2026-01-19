@@ -8,6 +8,20 @@ Run minimal test firmware on original Keyfox10 hardware to verify SAM8905 wavefo
 2. **I bit semantics**: Does I=0 mean direct or apply transformation?
 3. **Invert operation**: Two's complement (-x), one's complement (~x), or something else?
 
+## Additional Test: Multiplier Pipeline Timing
+
+**Question:** Is WXY required to trigger multiplication, or is the multiplier purely combinational?
+
+From algorithm analysis (see `notebooks/multiplier_timing_analysis.ipynb`), the Keyfox10 reverb algorithms appear to use a ~4-cycle pipeline:
+- 2 cycles for SRAM waveform fetch (X register update)
+- 2 cycles for multiplication result availability
+
+However, it's unclear whether:
+- WXY is required to "trigger" a new multiplication
+- Or the multiplier continuously computes X*Y and the result is always available
+
+**Test approach:** Create test programs that read mul_result (via RP) at different cycle counts after WPHI/WWF (without WXY) to determine when the new X*Y value becomes available.
+
 ## Background
 
 The emulator works with swapped R/I bits (R=bit6, I=bit7) but the programmer's guide says R=bit7, I=bit6. Testing on real hardware will resolve this ambiguity.
@@ -16,8 +30,16 @@ The emulator works with swapped R/I bits (R=bit6, I=bit7) but the programmer's g
 
 - [ ] Keyfox10 with working SAM8905 FX chip
 - [ ] EPROM programmer (for 27C256 or similar)
-- [ ] Logic analyzer or oscilloscope for output capture
+- [x] Logic analyzer for DAC output capture (Philips I2S predecessor protocol)
 - [ ] Audio recording setup (line out → audio interface)
+
+### DAC Capture Capability
+
+The SAM8905 outputs to an older Philips DAC using a serial protocol that predates I2S. With a logic analyzer, we can:
+1. Capture raw digital samples directly from the SAM8905→DAC interface
+2. Verify exact sample values without DAC analog conversion artifacts
+3. Correlate sample timing with algorithm execution
+4. Debug pipeline timing by observing when samples change after algorithm modifications
 
 ## Test Strategy
 
