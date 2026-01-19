@@ -4,27 +4,27 @@
 #include "emu.h"
 #include "3do_madam.h"
 
-#define LOG_CEL     (1U << 1)
-#define LOG_REGIS   (1U << 2)
-#define LOG_FENCE   (1U << 3)
-#define LOG_MMU     (1U << 4)
-#define LOG_DMA     (1U << 5)
-#define LOG_MULT    (1U << 6)
-#define LOG_VDLP    (1U << 7)
+#define LOG_FENCE   (1U << 1)
+#define LOG_MMU     (1U << 2)
+#define LOG_DMA     (1U << 3)
+#define LOG_MULT    (1U << 4)
+#define LOG_VDLP    (1U << 5)
+#define LOG_CEL     (1U << 6)
+#define LOG_REGIS   (1U << 7)
 
 #define VERBOSE (LOG_GENERAL | LOG_CEL | LOG_REGIS | LOG_MMU | LOG_MULT)
-//#define VERBOSE (LOG_VDLP)
+//#define VERBOSE (LOG_VDLP | LOG_CEL | LOG_REGIS)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
 
-#define LOGCEL(...)     LOGMASKED(LOG_CEL,     __VA_ARGS__)
-#define LOGREGIS(...)   LOGMASKED(LOG_REGIS,   __VA_ARGS__)
 #define LOGFENCE(...)   LOGMASKED(LOG_FENCE,   __VA_ARGS__)
 #define LOGMMU(...)     LOGMASKED(LOG_MMU,     __VA_ARGS__)
 #define LOGDMA(...)     LOGMASKED(LOG_DMA,     __VA_ARGS__)
 #define LOGMULT(...)    LOGMASKED(LOG_MULT,    __VA_ARGS__)
 #define LOGVDLP(...)    LOGMASKED(LOG_VDLP,    __VA_ARGS__)
+#define LOGCEL(...)     LOGMASKED(LOG_CEL,     __VA_ARGS__)
+#define LOGREGIS(...)   LOGMASKED(LOG_REGIS,   __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(MADAM, madam_device, "madam", "3DO MN7A020UDA \"Madam\" Address Decoder")
 
@@ -36,11 +36,6 @@ madam_device::madam_device(const machine_config &mconfig, const char *tag, devic
 	, m_dma_write_cb(*this)
 	, m_irq_dply_cb(*this)
 {
-}
-
-void madam_device::device_add_mconfig(machine_config &config)
-{
-	// TODO: at least CEL engine
 }
 
 void madam_device::device_start()
@@ -415,11 +410,11 @@ void madam_device::vdlp_start_w(int state)
 		return;
 	}
 
-//	if (m_vdlp.address == m_dma[24][0])
-//	{
-//		m_vdlp.fetch = false;
-//		return;
-//	}
+//  if (m_vdlp.address == m_dma[24][0])
+//  {
+//      m_vdlp.fetch = false;
+//      return;
+//  }
 
 	m_vdlp.address = m_dma[24][0];
 	m_vdlp.scanlines = 0;

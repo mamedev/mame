@@ -243,11 +243,11 @@ void _3do_state::green_config(machine_config &config)
 	m_cdrom->add_route(0, "speaker", 1.0, 0);
 	m_cdrom->add_route(1, "speaker", 1.0, 1);
 	m_cdrom->set_interface("cdrom");
-//	m_cdrom->scor_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
-//	m_cdrom->stch_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
-//	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus...));
+//  m_cdrom->scor_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
+//  m_cdrom->stch_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
+//  m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus...));
 	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_int_w)).invert();
-//	m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus...));
+//  m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus...));
 
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
@@ -261,6 +261,7 @@ void _3do_state::_3do(machine_config &config)
 	/* Basic machine hardware */
 	ARM7_BE(config, m_maincpu, XTAL(50'000'000)/4); // DA86C06020XV
 	m_maincpu->set_addrmap(AS_PROGRAM, &_3do_state::main_mem);
+	m_maincpu->set_dasm_override(std::function(&portfolio_dasm_override), "portfolio_dasm_override");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -279,6 +280,7 @@ void _3do_state::_3do_pal(machine_config &config)
 	/* Basic machine hardware */
 	ARM7_BE(config, m_maincpu, XTAL(50'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &_3do_state::main_mem);
+	m_maincpu->set_dasm_override(std::function(&portfolio_dasm_override), "portfolio_dasm_override");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
