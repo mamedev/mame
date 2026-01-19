@@ -239,8 +239,9 @@ __sbit __at(0x94) P1_ENABLE;
 __sbit __at(0x95) P1_MODE;
 __sbit __at(0x96) P1_DATA;
 
-// 7-segment patterns (active HIGH, bit 7 = DP)
-// Segment mapping: bit0=a, bit1=b, bit2=c, bit3=d, bit4=e, bit5=f, bit6=g, bit7=dp
+// 7-segment patterns - MAME standard format
+// bit0=a, bit1=b, bit2=c, bit3=d, bit4=e, bit5=f, bit6=g, bit7=dp
+// Active HIGH for shift register value (DATA line inverts: pattern bit 1 -> DATA 0)
 __code uint8_t seg7_digits[16] = {
     0x3F,  // 0: abcdef
     0x06,  // 1: bc
@@ -261,23 +262,21 @@ __code uint8_t seg7_digits[16] = {
 };
 
 // Special patterns
-#define SEG7_BLANK  0x00
+#define SEG7_BLANK  0x00  // all segments OFF
 #define SEG7_MINUS  0x40  // g only
-#define SEG7_DP     0x80  // decimal point
+#define SEG7_DP     0x80  // decimal point only
 
 // Display buffer (3 digits: digit0=rightmost, digit2=leftmost)
 __xdata __at(0x1CDA) uint8_t disp_buffer[3];
 
 // Shift out one byte to display, MSB first
+// MAME shift register: (sr << 1) | data_in, so first bit shifted goes to MSB position
+// DATA line directly maps to shift register (no inversion for MAME compatibility)
 void disp_shift_byte(uint8_t data) {
     uint8_t i;
     for (i = 0; i < 8; i++) {
-        // Set DATA based on MSB
-        if (data & 0x80) {
-            P1_DATA = 0;  // Active low for 74HC164
-        } else {
-            P1_DATA = 1;
-        }
+        // Set DATA based on MSB (direct: bit=1 -> DATA=1)
+        P1_DATA = (data & 0x80) ? 1 : 0;
         // Clock pulse
         P1_CLK_DISP = 1;
         P1_CLK_DISP = 0;
@@ -300,10 +299,10 @@ void disp_update(void) {
     P1_MODE = 1;
 
     // Shift out 3 bytes (24 bits total)
-    // Order: digit2 (leftmost) -> digit1 -> digit0 (rightmost)
-    disp_shift_byte(disp_buffer[2]);
-    disp_shift_byte(disp_buffer[1]);
+    // Order matches original firmware: digit0 -> digit1 -> digit2
     disp_shift_byte(disp_buffer[0]);
+    disp_shift_byte(disp_buffer[1]);
+    disp_shift_byte(disp_buffer[2]);
 
     // Latch: ENABLE=1
     P1_ENABLE = 1;
