@@ -9997,9 +9997,7 @@ void segas16b_state::init_generic(segas16b_rom_board rom_board)
 	// save state
 	save_item(NAME(m_custom_io_r));
 	save_item(NAME(m_custom_io_w));
-	save_item(NAME(m_atomicp_sound_count));
-	save_item(NAME(m_mj_input_num));
-	save_item(NAME(m_mj_last_val));
+	save_item(NAME(m_atomicp_sound_count)); //stays here just for lines economy
 }
 
 
@@ -10148,6 +10146,9 @@ void segas16b_state::init_sjryuko_5358_small()
 	m_custom_io_r = read16_delegate(*this, FUNC(segas16b_state::sjryuko_custom_io_r));
 	m_custom_io_w = write16_delegate(*this, FUNC(segas16b_state::sjryuko_custom_io_w));
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
+
+	save_item(NAME(m_mj_input_num));
+	save_item(NAME(m_mj_last_val));
 }
 
 void segas16b_state::init_timescan_5358_small()
