@@ -2702,4 +2702,4 @@ GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1r_state, init_road
 
 // not a clone of relief because it needs to be a clone of atarisy1 BIOS and it's more like an unreleased prequel than a version of the released title
 // joystick inputs don't work in test mode if service mode is accessed from ingame, only if the emulation is started with the test switch on (is real hardware the same?)
-GAME( 1986, reliefs1,   atarisy1, reliefs1, reliefs1, atarisy1r_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )
+GAME( 1986, reliefs1,   atarisy1, reliefs1, reliefs1, atarisy1r_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", 0 )
