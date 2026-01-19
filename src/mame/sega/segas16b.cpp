@@ -9995,6 +9995,8 @@ void segas16b_state::init_generic(segas16b_rom_board rom_board)
 	m_custom_io_w = write16_delegate(*this, FUNC(segas16b_state::standard_io_w));
 
 	// save state
+	save_item(NAME(m_custom_io_r));
+	save_item(NAME(m_custom_io_w));
 	save_item(NAME(m_atomicp_sound_count));
 	save_item(NAME(m_mj_input_num));
 	save_item(NAME(m_mj_last_val));
