@@ -1409,8 +1409,8 @@ void keyfox10_state::keyfox10(machine_config &config)
     m_rmixer->add_route(0, m_output_filter_r, 1.0);
 
     // SAM8905 SND - sound generation (at 0x8000 when T1=1)
-    // Clock: 22.5792 MHz / 1024 = 22.05 kHz sample rate
-    SAM8905(config, m_sam_snd, 22'579'200 * 2, 1024);
+    // Clock: 44.1584 MHz / 1024 = 44.1 kHz sample rate
+    SAM8905(config, m_sam_snd, 45'158'400, 1024);
     m_sam_snd->waveform_read_callback().set(FUNC(keyfox10_state::sam_snd_waveform_r));
     m_sam_snd->sample_output_callback().set(FUNC(keyfox10_state::sam_snd_sample_out));
     m_sam_snd->add_route(0, m_lmixer, 1.0);  // Dry L
@@ -1419,7 +1419,7 @@ void keyfox10_state::keyfox10(machine_config &config)
     // SAM8905 FX - effects processor (at 0xE000 when T1=1)
     // FX chip has 32KB SRAM for delay/reverb buffers
     // Runs in slave mode - triggered by SND chip after each frame (set in machine_start)
-    SAM8905(config, m_sam_fx, 22'579'200, 1024);
+    SAM8905(config, m_sam_fx, 45'158'400, 2048); // NB: double the buffer size makes it work in 22khz mode..
     m_sam_fx->waveform_read_callback().set(FUNC(keyfox10_state::sam_fx_waveform_r));
     m_sam_fx->waveform_write_callback().set(FUNC(keyfox10_state::sam_fx_waveform_w));
     m_sam_fx->add_route(0, m_lmixer, 0.2);  // Wet L (lower gain - reverb is usually quieter)
