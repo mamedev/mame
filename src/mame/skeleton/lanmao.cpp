@@ -23,8 +23,7 @@ Oki M6295 (or clone, not readable)
 3x switch
 
 TODO:
-- remaing inputs / switches;
-- Oki ROM bank;
+- remaining inputs / switches;
 - hopper;
 - SVG?
 
@@ -75,14 +74,13 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i2cmem(*this, "i2cmem"),
-	    m_oki(*this, "oki"),
+		m_oki(*this, "oki"),
 		m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" }),
 		m_digits(*this, "digit%u", 0U),
 		m_leds(*this, "led%u", 0U)
 	{ }
 
 	void lanmao(machine_config &config) ATTR_COLD;
-	void port3_w(uint8_t data) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -102,6 +100,7 @@ private:
 	void display_w(uint8_t data);
 	uint8_t keyboard_r();
 	void port1_w(uint8_t data);
+	void port3_w(uint8_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
@@ -158,8 +157,10 @@ void lanmao_state::port1_w(uint8_t data)
 }
 
 void lanmao_state::port3_w(uint8_t data)
-{	
-	logerror("P3 Write to %02x\n", data);
+{
+	if ((data & 0xdf) != 0xdf)
+		logerror("unknown port3 write: %02x\n", data);
+
 	m_oki->set_rom_bank(BIT(data, 5));
 }
 
