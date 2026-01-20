@@ -285,7 +285,7 @@ void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx
 
 void _1943_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const u8 *spriteram = m_spriteram->live();
+	const u8 *spriteram = m_spriteram->buffer();
 	for (int offs = 0; offs < m_spriteram->bytes(); offs += 32)
 	{
 		const u8 attr = spriteram[offs + 1];
