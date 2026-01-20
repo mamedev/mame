@@ -1209,6 +1209,7 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_rwm));
+	save_item(NAME(m_inst_cycles));
 	save_item(NAME(m_last_line_state));
 	save_item(NAME(m_t0_cnt));
 	save_item(NAME(m_t1_cnt));
@@ -1219,6 +1220,7 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_irq_prio));
 	save_item(NAME(m_last_op));
 	save_item(NAME(m_last_bit));
+	save_item(NAME(m_icount));
 
 	save_item(NAME(m_dptr));
 	save_item(NAME(m_acc));
