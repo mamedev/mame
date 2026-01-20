@@ -23,8 +23,7 @@ Oki M6295 (or clone, not readable)
 3x switch
 
 TODO:
-- remaing inputs / switches;
-- Oki ROM bank;
+- remaining inputs / switches;
 - hopper;
 - SVG?
 
@@ -75,6 +74,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_i2cmem(*this, "i2cmem"),
+		m_oki(*this, "oki"),
 		m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" }),
 		m_digits(*this, "digit%u", 0U),
 		m_leds(*this, "led%u", 0U)
@@ -88,6 +88,7 @@ protected:
 private:
 	required_device<i8052_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
+	required_device<okim6295_device> m_oki;
 
 	required_ioport_array<4> m_inputs;
 	output_finder<32> m_digits;
@@ -99,6 +100,7 @@ private:
 	void display_w(uint8_t data);
 	uint8_t keyboard_r();
 	void port1_w(uint8_t data);
+	void port3_w(uint8_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
@@ -154,6 +156,13 @@ void lanmao_state::port1_w(uint8_t data)
 		logerror("unknown port1 write: %02x\n", data);
 }
 
+void lanmao_state::port3_w(uint8_t data)
+{
+	if ((data & 0xdf) != 0xdf)
+		logerror("unknown port3 write: %02x\n", data);
+
+	m_oki->set_rom_bank(BIT(data, 5));
+}
 
 void lanmao_state::program_map(address_map &map)
 {
@@ -258,7 +267,7 @@ void lanmao_state::lanmao(machine_config &config)
 	m_maincpu->port_in_cb<1>().set_ioport("P1");
 	m_maincpu->port_in_cb<3>().set_ioport("P3");
 	m_maincpu->port_out_cb<1>().set(FUNC(lanmao_state::port1_w));
-	m_maincpu->port_out_cb<3>().set([this] (uint8_t data) { LOGPORTS8052("%s I8052 port 3 write: %02x\n", machine().describe_context(), data); });
+	m_maincpu->port_out_cb<3>().set(FUNC(lanmao_state::port3_w));
 
 	i8279_device &kdc(I8279(config, "kdc", 11_MHz_XTAL / 6 )); // TODO: divider
 	kdc.out_irq_callback().set([this] (int state) { LOGPORTS8279("%s I8279 irq write: %02x\n", machine().describe_context(), state); }); // not connected according to schematics
@@ -289,7 +298,7 @@ void lanmao_state::lanmao(machine_config &config)
 	ay2.port_b_write_callback().set(FUNC(lanmao_state::leds_w<3>));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, "oki", 11_MHz_XTAL / 10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // TODO: divider, pin 7
+	OKIM6295(config, m_oki, 11_MHz_XTAL / 10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // TODO: divider, pin 7
 }
 
 
