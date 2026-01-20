@@ -6,7 +6,13 @@ license:CC0-1.0
 
 <!-- These contain FAT32 filesystems -->
 
-<!-- Grey coloured 'pack-in' cartridge contains no ROM, only 2 pins bridged -->
+<!-- Grey coloured 'pack-in' cartridge contains no ROM, only 2 pins bridged 
+
+Undumped International Versions:
+(80-274105 France) - PAW Patrol
+(80-274505 France) - Frozen
+(80-274905 France) - Finding Dory
+-->
 
 <softwarelist name="vtech_innotv_cart" description="VTech InnoTV / InnoTAB MAX cartridges">
 
