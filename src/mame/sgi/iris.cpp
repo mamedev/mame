@@ -4,31 +4,34 @@
 /*
  * Silicon Graphics IRIS systems.
  *
- *  Model  Type         CPU  Graphics      Disk    Chassis
- *  -----  -----------  ---  -------------  ------  -------
- *  1400   Workstation  PM2  IRIS           ST-506  20-slot
- *  1500   Workstation  PM2  IRIS           SMD     rack
+ *  Model  Type         CPU  Graphics       Disk    Chassis  Miscellaneous
+ *  -----  -----------  ---  -------------  ------  -------  -------------
+ *  1400   Workstation  PM2  IRIS           ST-506  20-slot  Vertex V170, Atasi 3046, Excelan EXOS/101 (slot 2)
+ *  1500   Workstation  PM2  IRIS           SMD     rack     Interphase 2190, Fujitsu 2351A (eagle), Fujitsu 2312
  *  2000   Terminal     PM2  IRIS           none    10-slot
  *  2200   Terminal     PM2  IRIS           none    10-slot
  *  2300   Workstation  PM2  IRIS           ST-506  20-slot
  *  2400   Workstation  PM2  IRIS           ST-506  20-slot
  *  2500   Workstation  PM2  IRIS           SMD     rack
  *
- *  2300T  Workstation  IP2  IRIS           ST-506  20-slot
+ *  2300T  Workstation  IP2  IRIS           ST-506  20-slot  IM1+FP1 local bus
  *  2400T  Workstation  IP2  IRIS           ST-506  20-slot
  *  2500T  Workstation  IP2  IRIS           SMD     rack
  *  3010   Terminal     IP2  Enhanced IRIS  ST-506
  *  3020   Workstation  IP2  Enhanced IRIS  ST-506
  *  3030   Workstation  IP2  Enhanced IRIS  ESDI
- *  3110   Workstation  IP2  Enhanced IRIS  ST-506  20-slot
+ *  3110   Workstation  IP2  Enhanced IRIS  ST-506  20-slot  3010 with 10 MHz GEs and Z clipping
  *  3115   Workstation  IP2  Enhanced IRIS  ST-506  20-slot
- *  3120   Workstation  IP2  Enhanced IRIS  ESDI    20-slot
- *  3130   Workstation  IP2  Enhanced IRIS  ESDI    20-slot
+ *  3120   Workstation  IP2  Enhanced IRIS  ESDI    20-slot  3020 with 10 MHz GEs and Z clipping
+ *  3130   Workstation  IP2  Enhanced IRIS  ESDI    20-slot  10 MHz GEs, Z clipping, 32 bitplanes, 2 IM1s (8 MB), FP1, and QIC
  *
+ * IRIS Graphics (GL1): GF1, UC3, DC3, BP2
+ * Enhanced IRIS Graphics (GL2): GF2, UC4, DC4, BP3
+ * 
  * TODO:
  *  - storage cards (Data Systems Design DSD-5217)
  *  - network cards (Excelan EXOS/101 "nx")
- *  - graphics cards (GF1+UC3+DC3+BP2?)
+ *  - graphics cards
  *  - Sky floating-point card
  *
  */
@@ -37,6 +40,7 @@
 
 #include "bus/multibus/multibus.h"
 #include "bus/multibus/dsd5217.h"
+#include "bus/multibus/exos201.h"
 
 #include "ip2.h"
 #include "pm2.h"
@@ -99,6 +103,29 @@ static DEVICE_INPUT_DEFAULTS_START(dsd)
 	DEVICE_INPUT_DEFAULTS("W10", 0xff, 0xfd)
 DEVICE_INPUT_DEFAULTS_END
 
+static DEVICE_INPUT_DEFAULTS_START(nex)
+	// i/o port address 0x7ffc
+	DEVICE_INPUT_DEFAULTS("J52", 0x01, 0x01)
+	DEVICE_INPUT_DEFAULTS("J52", 0x02, 0x00)
+	DEVICE_INPUT_DEFAULTS("J52", 0x04, 0x00)
+	DEVICE_INPUT_DEFAULTS("J52", 0x08, 0x00)
+	DEVICE_INPUT_DEFAULTS("J52", 0x10, 0x00)
+	DEVICE_INPUT_DEFAULTS("J52", 0x20, 0x00)
+	DEVICE_INPUT_DEFAULTS("J52", 0x40, 0x00)
+
+	DEVICE_INPUT_DEFAULTS("J53", 0x01, 0x00)
+	DEVICE_INPUT_DEFAULTS("J53", 0x02, 0x00)
+	DEVICE_INPUT_DEFAULTS("J53", 0x04, 0x00)
+	DEVICE_INPUT_DEFAULTS("J53", 0x08, 0x00)
+	DEVICE_INPUT_DEFAULTS("J53", 0x10, 0x00)
+	DEVICE_INPUT_DEFAULTS("J53", 0x20, 0x00)
+	DEVICE_INPUT_DEFAULTS("J53", 0x40, 0x00)
+	DEVICE_INPUT_DEFAULTS("J53", 0x80, 0x80)
+
+	// interrupt level 2
+	DEVICE_INPUT_DEFAULTS("J54", 0xff, 0x04)
+DEVICE_INPUT_DEFAULTS_END
+
 static void iris_p_cards(device_slot_interface &device)
 {
 	// processor side cards
@@ -106,6 +133,7 @@ static void iris_p_cards(device_slot_interface &device)
 	device.option_add("pm2", SGI_PM2);
 
 	device.option_add("dsd", MULTIBUS_DSD5217).input_device_defaults(DEVICE_INPUT_DEFAULTS_NAME(dsd));
+	device.option_add("nex", MULTIBUS_EXOS201).input_device_defaults(DEVICE_INPUT_DEFAULTS_NAME(nex));
 }
 static void iris_g_cards(device_slot_interface &device)
 {

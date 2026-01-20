@@ -3563,6 +3563,8 @@ if BUSES["MULTIBUS"] then
 	files {
 		MAME_DIR .. "src/devices/bus/multibus/multibus.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/multibus.h",
+		MAME_DIR .. "src/devices/bus/multibus/exos201.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/exos201.h",
 		MAME_DIR .. "src/devices/bus/multibus/dsd5217.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/dsd5217.h",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.cpp",
