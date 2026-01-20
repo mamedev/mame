@@ -59,11 +59,41 @@ void clio_device::device_start()
 	m_dac_timer = timer_alloc(FUNC(clio_device::dac_update_cb), this);
 	m_dac_timer->adjust(attotime::from_hz(16.9345));
 
+	save_item(NAME(m_csysbits));
+	save_item(NAME(m_vint0));
+	save_item(NAME(m_vint1));
+	save_item(NAME(m_audin));
+	save_item(NAME(m_audout));
+	save_item(NAME(m_cstatbits));
+	save_item(NAME(m_wdog));
+	save_item(NAME(m_hcnt));
+	save_item(NAME(m_vcnt));
+	save_item(NAME(m_seed));
+	save_item(NAME(m_random));
 	save_item(NAME(m_irq0));
-	save_item(NAME(m_irq1));
 	save_item(NAME(m_irq0_enable));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_badbits));
+	save_item(NAME(m_irq1));
 	save_item(NAME(m_irq1_enable));
+	save_item(NAME(m_hdelay));
+	save_item(NAME(m_adbio));
+	save_item(NAME(m_adbctl));
+
+	save_item(NAME(m_timer_count));
+	save_item(NAME(m_timer_backup));
 	save_item(NAME(m_timer_ctrl));
+	save_item(NAME(m_slack));
+
+	save_item(NAME(m_dma_enable));
+
+	save_item(NAME(m_expctl));
+	save_item(NAME(m_type0_4));
+	save_item(NAME(m_dipir1));
+	save_item(NAME(m_dipir2));
+
+	save_item(NAME(m_sel));
+	save_item(NAME(m_poll));
 }
 
 void clio_device::device_reset()

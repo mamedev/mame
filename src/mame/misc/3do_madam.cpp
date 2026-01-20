@@ -55,8 +55,41 @@ void madam_device::device_start()
 	save_item(NAME(m_fence));
 	save_item(NAME(m_mmu));
 	save_item(NAME(m_mult));
-	save_item(STRUCT_MEMBER(m_vdlp, address));
+	save_item(NAME(m_dma));
 
+	save_item(NAME(m_msysbits));
+	save_item(NAME(m_mctl));
+	save_item(NAME(m_sltime));
+	save_item(NAME(m_abortbits));
+	save_item(NAME(m_privbits));
+	save_item(NAME(m_statbits));
+	save_item(NAME(m_diag));
+	save_item(NAME(m_ccobctl0));
+	save_item(NAME(m_ppmpc));
+	save_item(NAME(m_regctl0));
+	save_item(NAME(m_regctl1));
+	save_item(NAME(m_regctl2));
+	save_item(NAME(m_regctl3));
+	save_item(NAME(m_xyposh));
+	save_item(NAME(m_xyposl));
+	save_item(NAME(m_linedxyh));
+	save_item(NAME(m_linedxyl));
+	save_item(NAME(m_dxyh));
+	save_item(NAME(m_dxyl));
+	save_item(NAME(m_ddxyh));
+	save_item(NAME(m_ddxyl));
+	save_item(NAME(m_mult_control));
+	save_item(NAME(m_mult_status));
+
+	save_item(STRUCT_MEMBER(m_vdlp, address));
+	save_item(STRUCT_MEMBER(m_vdlp, scanlines));
+	save_item(STRUCT_MEMBER(m_vdlp, modulo));
+	save_item(STRUCT_MEMBER(m_vdlp, fb_address));
+	save_item(STRUCT_MEMBER(m_vdlp, fetch));
+	save_item(STRUCT_MEMBER(m_vdlp, y_dest));
+	save_item(STRUCT_MEMBER(m_vdlp, y_src));
+	save_item(STRUCT_MEMBER(m_vdlp, link));
+	save_item(STRUCT_MEMBER(m_vdlp, video_dma));
 }
 
 void madam_device::device_reset()
@@ -65,6 +98,7 @@ void madam_device::device_reset()
 
 	m_mctl = 0;
 	m_cel.state = IDLE;
+	m_statbits = 0;
 	m_dma_playerbus_timer->adjust(attotime::never);
 	m_cel_timer->adjust(attotime::never);
 }
@@ -539,6 +573,8 @@ void madam_device::cel_start_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGCEL("Start CEL engine\n");
 	m_cel.state = FETCH_PARAMS;
 	m_cel.address = m_dma[26][1];
+	m_statbits |= 1 << 4;
+	m_statbits &= ~(1 << 6);
 	m_cel_timer->adjust(attotime::from_ticks(2, this->clock()));
 }
 
@@ -546,13 +582,15 @@ void madam_device::cel_stop_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGCEL("Stop CEL engine\n");
 	m_cel.state = IDLE;
+	m_statbits &= ~(1 << 4);
 	m_cel_timer->adjust(attotime::never);
 }
 
 // TODO: is all of this madness burst, cycle steal or a mix of the two?
+// 3do_try alternating Sanyo/3do logos spinning seems that some bus hog is ought to happen ...
 TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 {
-	u16 tick_time;
+	u32 tick_time;
 
 	switch(m_cel.state)
 	{
@@ -571,8 +609,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			if (m_cel.skip && m_cel.last)
 			{
 				LOGCEL("Skip + Last, done\n");
-				m_cel.state = IDLE;
-				m_cel_timer->adjust(attotime::never);
+				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
 			else if (m_cel.skip)
@@ -618,6 +655,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, BIT(m_cel.current_ccb, 17)
 				, BIT(m_cel.current_ccb, 16)
 			);
+			m_cel.packed = !!BIT(m_cel.current_ccb, 9);
 			LOGCEL("        lce=%d ace=%d maria=%d pxor=%d useav=%d packed=%d\n"
 				, BIT(m_cel.current_ccb, 15)
 				, BIT(m_cel.current_ccb, 14)
@@ -625,7 +663,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, BIT(m_cel.current_ccb, 12)
 				, BIT(m_cel.current_ccb, 11)
 				, BIT(m_cel.current_ccb, 10)
-				, BIT(m_cel.current_ccb, 9)
+				, m_cel.packed
 			);
 			LOGCEL("        pover=%d plutpos=%d bgnd=%d noblk=%d pluta=%d\n"
 				, (m_cel.current_ccb & 0x180) >> 7
@@ -638,6 +676,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			if (!npabs || !spabs || !ppabs)
 			{
 				popmessage("CEL relative address use at %08x %d|%d|%d", m_cel.address, npabs, spabs, ppabs);
+				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
 			m_cel.source_ptr = m_dma_read_cb(m_cel.address + 0x08);
@@ -647,6 +686,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			if (!ldsize || !ldprs || !yoxy || !ldpixc)
 			{
 				popmessage("CEL using existing values at %08x %d|%d|%d|%d", m_cel.address, ldsize, ldprs, yoxy, ldpixc);
+				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
 			m_cel.xpos = m_dma_read_cb(m_cel.address + 0x10);
@@ -677,9 +717,15 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			if (m_cel.ccbpre)
 			{
 				m_cel.pre0 = m_dma_read_cb(m_cel.address + 0x34);
-				m_cel.pre1 = m_dma_read_cb(m_cel.address + 0x38);
-				tick_time += 2;
-				LOGCEL("    pre0=%08x pre1=%08x\n", m_cel.pre0, m_cel.pre1);
+				tick_time ++;
+				LOGCEL("    pre0=%08x ", m_cel.pre0);
+				if (!m_cel.packed)
+				{
+					m_cel.pre1 = m_dma_read_cb(m_cel.address + 0x38);
+					LOGCEL("pre1=%08x", m_cel.pre1);
+					tick_time ++;
+				}
+				LOGCEL("\n");
 			}
 
 			m_cel.state = DRAW;
@@ -695,22 +741,32 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			if (!m_cel.ccbpre)
 			{
 				m_cel.pre0 = m_dma_read_cb(source_ptr + 0x00);
-				m_cel.pre1 = m_dma_read_cb(source_ptr + 0x04);
-				source_ptr += 8;
-				tick_time += 2;
-				LOGCEL("    pre0=%08x pre1=%08x\n", m_cel.pre0, m_cel.pre1);
+				source_ptr += 4;
+				tick_time ++;
+				LOGCEL("    pre0=%08x ", m_cel.pre0);
+				if (!m_cel.packed)
+				{
+					m_cel.pre1 = m_dma_read_cb(source_ptr + 0x00);
+					source_ptr += 4;
+					tick_time ++;
+					LOGCEL("pre1=%08x", m_cel.pre1);
+				}
+				LOGCEL("\n");
 			}
 
+			// TODO: doubled with lrform = 1 (?)
 			const u16 vcnt = ((m_cel.pre0 >> 6) & 0xfff) + 1;
 			const bool uncoded = !!BIT(m_cel.pre0, 4);
 			const u8 bpp = (m_cel.pre0 >> 0) & 0x7;
+			static const char *const BPP_VALUES[8] = { "<0 reserved>", "1bpp", "2bpp", "4bpp", "6bpp", "8bpp", "16bpp", "<7 reserved>" };
 
-			LOGCEL("    skipx=%d vcnt=%d uncoded=%d rep8=%d bpp=%d\n"
+			LOGCEL("    skipx=%d vcnt=%d uncoded=%d rep8=%d bpp=%d (%s)\n"
 				, (m_cel.pre0 >> 24) & 0xf
 				, vcnt
 				, uncoded
 				, BIT(m_cel.pre0, 3)
 				, bpp
+				, BPP_VALUES[bpp]
 			);
 			const u16 woffset10 = ((m_cel.pre1 >> 16) & 0x3ff) + 2;
 			const bool lrform = !!BIT(m_cel.pre1, 11);
@@ -724,13 +780,14 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, tlhpcnt
 			);
 
-			// 3do_gdo101 uses mostly this, with lrform enabled on several elements (the 3DO logo)
-			// 3do_fz1 uses uncoded=0 + bpp=4
-			if (uncoded && bpp == 6 && !lrform)
-			{
-				const u16 xclip = m_regctl1 & 0xffff;
-				const u16 yclip = m_regctl1 >> 16;
+			const u16 xclip = m_regctl1 & 0xffff;
+			const u16 yclip = m_regctl1 >> 16;
 
+			// - 3do_gdo101 uses mostly this, with lrform + packed enabled on several elements
+			//   (the 3DO logo)
+			// - 3do_fz1 uses uncoded=0 + bpp=4
+			if (uncoded && bpp == 6)
+			{
 				for (int y = 0; y < vcnt; y++)
 				{
 					int ypos = (m_cel.ypos >> 16) + y;
@@ -745,30 +802,44 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 							continue;
 
 						u32 cel_address = source_ptr;
-						cel_address += ((y & ~1) * woffset10) << 2;
-						cel_address += ((x) << 1);
-						const u32 src_data = m_dma_read_cb(cel_address);
-						u8 src_shift = ((y & 1) ^ 0) * 16;
+						u8 src_shift;
+						u32 src_data; //, src_mask;
+						if (!lrform)
+						{
+							cel_address += ((y) * woffset10) << 2;
+							cel_address += ((x & ~1) << 1);
+							src_shift = (x & 1) ^ 1;
+						}
+						else
+						{
+							cel_address += ((y & ~1) * (woffset10)) << 2;
+							cel_address += ((x) << 2);
+							src_shift = (y & 1) ^ 1;
+						}
+						src_data = m_dma_read_cb(cel_address) >> (src_shift * 16);
+						src_data &= 0xffff;
 
 						u32 dst_address = m_regctl3;
 						dst_address += ((ypos & ~1) * 160) << 2;
 						dst_address += (xpos << 2);
 
 						u32 dst_data = m_dma_read_cb(dst_address);
-						dst_data &= (ypos & 1) ? 0xffff : 0xffff0000;
+						u8 dst_shift = ((ypos ^ 1) & 1) * 16;
+						dst_data &= dst_shift ? 0xffff : 0xffff0000;
 
-						m_dma_write_cb(dst_address, (src_data << src_shift) | dst_data);
+						m_dma_write_cb(dst_address, (src_data << dst_shift) | dst_data);
 
-						tick_time += 2;
+						tick_time += 3;
 					}
 				}
 
+				LOGCEL("CEL Time drawing %d\n", tick_time);
 			}
 
 			if (m_cel.last)
 			{
-				m_cel.state = IDLE;
-				m_cel_timer->adjust(attotime::never);
+				m_statbits |= (1 << 6);
+				cel_stop_w(0, 0, 0xffffffff);
 			}
 			else
 			{

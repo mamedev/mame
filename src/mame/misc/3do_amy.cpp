@@ -1,5 +1,21 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
+/**************************************************************************************************
+
+3DO Amy a.k.a. Brooktree Bt9103
+
+TODO:
+- fixed CLUT;
+- Bump bitmap output to 2x2 pixels (interlace);
+- HV bits;
+- CLUT bypass;
+- cornerstone interpolation;
+- background pen replacement;
+- Move scan timers from Clio to here;
+- Is this chip PAL and NTSC compatible? The schematics shows the same chip reused in both
+  FZ-1 USA / Europe variants;
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "3do_amy.h"
@@ -18,6 +34,9 @@ void amy_device::device_start()
 	screen().register_screen_bitmap(m_bitmap);
 
 	save_item(NAME(m_is_dac_enabled));
+	save_item(STRUCT_MEMBER(m_custom_clut, r));
+	save_item(STRUCT_MEMBER(m_custom_clut, g));
+	save_item(STRUCT_MEMBER(m_custom_clut, b));
 }
 
 void amy_device::device_reset()

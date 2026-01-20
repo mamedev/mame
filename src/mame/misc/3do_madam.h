@@ -93,7 +93,7 @@ private:
 		cel_state_t state;
 		u32 address;
 		u32 current_ccb;
-		bool skip, last, ccbpre;
+		bool skip, last, ccbpre, packed;
 		u32 next_ptr;
 		u32 source_ptr;
 		u32 plut_ptr;
