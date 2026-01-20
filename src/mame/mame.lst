@@ -44065,6 +44065,9 @@ mes
 mfabfz
 mfabfz85
 
+@source:skeleton/mgt_multigame.cpp
+mgtmg9
+
 @source:skeleton/mice.cpp
 mice_6502
 mice2_z80
