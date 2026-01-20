@@ -6,15 +6,15 @@ license:CC0-1.0
 <softwarelist name="jazz" description="Jazz software">
 
 	<software name="winnt31">
-	    <description>Windows NT 3.1</description>
-	    <year>1994</year>
-	    <publisher>Microsoft</publisher>
+		<description>Windows NT 3.1</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
 
-	    <part name="hdd" interface="scsi_hdd">
-	        <diskarea name="harddriv">
-	            <disk name="winnt31" sha1="efaf73e45eca35e45f447d41d12bbd091c298d8e" writeable="yes" />
-	        </diskarea>
-	    </part>
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="jazz_winnt31" sha1="efaf73e45eca35e45f447d41d12bbd091c298d8e" writeable="yes" />
+			</diskarea>
+		</part>
 	</software>
 
 	<software name="winnt35">
@@ -36,7 +36,7 @@ license:CC0-1.0
 
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
-				<disk name="winnt351" sha1="5df584a05972371d2133b03809066b2cdc4a5438" writeable="yes" />
+				<disk name="jazz_winnt351" sha1="5df584a05972371d2133b03809066b2cdc4a5438" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>
@@ -48,7 +48,7 @@ license:CC0-1.0
 
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
-				<disk name="winnt40" sha1="e8241ac72bb61e8fb2ca4b5b3827edb06e8b4595" writeable="yes" />
+				<disk name="jazz_winnt40" sha1="e8241ac72bb61e8fb2ca4b5b3827edb06e8b4595" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>
