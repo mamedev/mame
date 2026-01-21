@@ -33,8 +33,9 @@ madam_device::madam_device(const machine_config &mconfig, const char *tag, devic
 	: device_t(mconfig, MADAM, tag, owner, clock)
 	, m_amy(*this, finder_base::DUMMY_TAG)
 	, m_diag_cb(*this)
-	, m_dma_read_cb(*this, 0)
-	, m_dma_write_cb(*this)
+	, m_dma8_read_cb(*this, 0)
+	, m_dma32_read_cb(*this, 0)
+	, m_dma32_write_cb(*this)
 	, m_irq_dply_cb(*this)
 {
 }
@@ -50,6 +51,12 @@ void madam_device::device_start()
 
 	m_dma_playerbus_timer = timer_alloc(FUNC(madam_device::dma_playerbus_cb), this);
 	m_cel_timer = timer_alloc(FUNC(madam_device::cel_tick_cb), this);
+
+	// max vcnt x max tlhpcnt, for Packed stuff
+	// TODO: reduce footprint
+	// - a possible Cel this big should tank the system a lot
+	// - there's just not enough work RAM in base system
+	m_cel.buffer.resize(0x1000*0x800);
 
 	save_item(NAME(m_pip));
 	save_item(NAME(m_fence));
@@ -428,8 +435,8 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 	u32 src = m_dma[23][2];
 	u32 dst = m_dma[23][0];
 
-	const u32 data = m_dma_read_cb(src);
-	m_dma_write_cb(dst, data);
+	const u32 data = m_dma32_read_cb(src);
+	m_dma32_write_cb(dst, data);
 
 	count -= 4;
 	src += 4;
@@ -485,7 +492,7 @@ void madam_device::vdlp_continue_w(int state)
 			return;
 		}
 
-		const u32 control_word = m_dma_read_cb(m_vdlp.address);
+		const u32 control_word = m_dma32_read_cb(m_vdlp.address);
 
 		m_vdlp.scanlines = (control_word & 0x1ff);
 
@@ -526,7 +533,7 @@ void madam_device::vdlp_continue_w(int state)
 
 		if (current_fb)
 		{
-			m_vdlp.fb_address = m_dma_read_cb(m_vdlp.address + 0x04);
+			m_vdlp.fb_address = m_dma32_read_cb(m_vdlp.address + 0x04);
 			LOGVDLP("Current fb %08x\n", m_vdlp.fb_address);
 		}
 
@@ -534,9 +541,9 @@ void madam_device::vdlp_continue_w(int state)
 
 		// CLUT transfers
 		for (int c = 0; c < clut_words; c+= 4)
-			m_amy->clut_write(m_dma_read_cb(m_vdlp.address + 0x10 + c));
+			m_amy->clut_write(m_dma32_read_cb(m_vdlp.address + 0x10 + c));
 
-		m_vdlp.link = m_dma_read_cb(m_vdlp.address + 0x0c);
+		m_vdlp.link = m_dma32_read_cb(m_vdlp.address + 0x0c);
 		m_vdlp.y_src = 0;
 	}
 
@@ -546,7 +553,7 @@ void madam_device::vdlp_continue_w(int state)
 		u8 shift = ((m_vdlp.y_src & 1) ^ 1) * 16;
 		for (int x = 0; x < 320; x++)
 		{
-			const u32 dot = m_dma_read_cb(m_vdlp.fb_address + ((x + y_base) << 2));
+			const u32 dot = m_dma32_read_cb(m_vdlp.fb_address + ((x + y_base) << 2));
 			m_amy->pixel_xfer(x, m_vdlp.y_dest, dot >> shift);
 		}
 	}
@@ -600,11 +607,11 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 		{
 			tick_time = 1;
 
-			m_cel.current_ccb = m_dma_read_cb(m_cel.address);
+			m_cel.current_ccb = m_dma32_read_cb(m_cel.address);
 			LOGCEL("CEL fetch params [%08x] flags=%08x\n", m_cel.address, m_cel.current_ccb);
 			m_cel.skip = !!BIT(m_cel.current_ccb, 31);
 			m_cel.last = !!BIT(m_cel.current_ccb, 30);
-			m_cel.next_ptr = m_dma_read_cb(m_cel.address + 0x04);
+			m_cel.next_ptr = m_dma32_read_cb(m_cel.address + 0x04);
 
 			if (m_cel.skip && m_cel.last)
 			{
@@ -679,8 +686,8 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
-			m_cel.source_ptr = m_dma_read_cb(m_cel.address + 0x08);
-			m_cel.plut_ptr = m_dma_read_cb(m_cel.address + 0x0c);
+			m_cel.source_ptr = m_dma32_read_cb(m_cel.address + 0x08);
+			m_cel.plut_ptr = m_dma32_read_cb(m_cel.address + 0x0c);
 			tick_time += 2;
 			LOGCEL("    NEXTPTR %08x SOURCEPTR %08x PLUTPTR %08x\n", m_cel.next_ptr, m_cel.source_ptr, m_cel.plut_ptr);
 			if (!ldsize || !ldprs || !yoxy || !ldpixc)
@@ -689,70 +696,81 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
-			m_cel.xpos = m_dma_read_cb(m_cel.address + 0x10);
-			m_cel.ypos = m_dma_read_cb(m_cel.address + 0x14);
+			m_cel.xpos = m_dma32_read_cb(m_cel.address + 0x10);
+			m_cel.ypos = m_dma32_read_cb(m_cel.address + 0x14);
 			tick_time += 2;
 			// TODO: can be in 17.15 format (?)
 			LOGCEL("    xpos=%f ypos=%f\n",  (double)m_cel.xpos / 65536.0, (double)m_cel.ypos / 65536.0);
 
-			m_cel.hdx = m_dma_read_cb(m_cel.address + 0x18);
-			m_cel.hdy = m_dma_read_cb(m_cel.address + 0x1c);
-			m_cel.vdx = m_dma_read_cb(m_cel.address + 0x20);
-			m_cel.vdy = m_dma_read_cb(m_cel.address + 0x24);
+			m_cel.hdx = m_dma32_read_cb(m_cel.address + 0x18);
+			m_cel.hdy = m_dma32_read_cb(m_cel.address + 0x1c);
+			m_cel.vdx = m_dma32_read_cb(m_cel.address + 0x20);
+			m_cel.vdy = m_dma32_read_cb(m_cel.address + 0x24);
 			tick_time += 4;
 			LOGCEL("    hdx=%f hdy=%f vdx=%f vdy=%f\n"
 				, (double)m_cel.hdx / 1048576.0, (double)m_cel.hdy / 1048576.0
 				, (double)m_cel.vdx / 65536.0, (double)m_cel.vdy / 65536.0
 			);
 
-			m_cel.hddx = m_dma_read_cb(m_cel.address + 0x28);
-			m_cel.hddy = m_dma_read_cb(m_cel.address + 0x2c);
+			m_cel.hddx = m_dma32_read_cb(m_cel.address + 0x28);
+			m_cel.hddy = m_dma32_read_cb(m_cel.address + 0x2c);
 			tick_time += 2;
 			LOGCEL("    hddx=%f hddy=%f\n", (double)m_cel.hddx / 1048576.0, (double)m_cel.hddy / 1048576.0);
 
-			m_cel.pixc = m_dma_read_cb(m_cel.address + 0x30);
+			m_cel.pixc = m_dma32_read_cb(m_cel.address + 0x30);
 			tick_time += 1;
 			LOGCEL("    pixc=%08x\n", m_cel.pixc);
 
+			// fetch the Preamble words
+			// May as well do it here because ...
 			if (m_cel.ccbpre)
 			{
-				m_cel.pre0 = m_dma_read_cb(m_cel.address + 0x34);
+				m_cel.pre0 = m_dma32_read_cb(m_cel.address + 0x34);
 				tick_time ++;
 				LOGCEL("    pre0=%08x ", m_cel.pre0);
 				if (!m_cel.packed)
 				{
-					m_cel.pre1 = m_dma_read_cb(m_cel.address + 0x38);
+					m_cel.pre1 = m_dma32_read_cb(m_cel.address + 0x38);
 					LOGCEL("pre1=%08x", m_cel.pre1);
 					tick_time ++;
 				}
 				LOGCEL("\n");
 			}
+			else
+			{
+				m_cel.pre0 = m_dma32_read_cb(m_cel.source_ptr + 0x00);
+				m_cel.source_ptr += 4;
+				tick_time ++;
+				LOGCEL("    pre0=%08x ", m_cel.pre0);
+				if (!m_cel.packed)
+				{
+					m_cel.pre1 = m_dma32_read_cb(m_cel.source_ptr + 0x00);
+					m_cel.source_ptr += 4;
+					tick_time ++;
+					LOGCEL("pre1=%08x", m_cel.pre1);
+				}
+				LOGCEL("\n");
+			}
 
-			m_cel.state = DRAW;
+			// ... we have to take an intermediate step in case the CEL is compressed (TBD)
+			m_cel.state = m_cel.packed ? DECOMPRESS : DRAW;
 			m_cel_timer->adjust(attotime::from_ticks(2 * tick_time, this->clock()));
 
+			break;
+		}
+		case DECOMPRESS:
+		{
+			tick_time = cel_decompress();
+			if (tick_time)
+			{
+				m_cel.state = DRAW;
+				m_cel_timer->adjust(attotime::from_ticks(2 * tick_time, this->clock()));
+			}
 			break;
 		}
 		case DRAW:
 		{
 			tick_time = 1;
-			u32 source_ptr = m_cel.source_ptr;
-
-			if (!m_cel.ccbpre)
-			{
-				m_cel.pre0 = m_dma_read_cb(source_ptr + 0x00);
-				source_ptr += 4;
-				tick_time ++;
-				LOGCEL("    pre0=%08x ", m_cel.pre0);
-				if (!m_cel.packed)
-				{
-					m_cel.pre1 = m_dma_read_cb(source_ptr + 0x00);
-					source_ptr += 4;
-					tick_time ++;
-					LOGCEL("pre1=%08x", m_cel.pre1);
-				}
-				LOGCEL("\n");
-			}
 
 			// TODO: doubled with lrform = 1 (?)
 			const u16 vcnt = ((m_cel.pre0 >> 6) & 0xfff) + 1;
@@ -783,6 +801,9 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			const u16 xclip = m_regctl1 & 0xffff;
 			const u16 yclip = m_regctl1 >> 16;
 
+			// encode source addressing in an easy to digest inner loop form
+			const u8 actual_src_mode = (m_cel.packed << 1) | lrform;
+
 			// - 3do_gdo101 uses mostly this, with lrform + packed enabled on several elements
 			//   (the 3DO logo)
 			// - 3do_fz1 uses uncoded=0 + bpp=4
@@ -801,33 +822,17 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 						if (xpos != std::clamp<unsigned>(xpos, 0, xclip))
 							continue;
 
-						u32 cel_address = source_ptr;
-						u8 src_shift;
-						u32 src_data; //, src_mask;
-						if (!lrform)
-						{
-							cel_address += ((y) * woffset10) << 2;
-							cel_address += ((x & ~1) << 1);
-							src_shift = (x & 1) ^ 1;
-						}
-						else
-						{
-							cel_address += ((y & ~1) * (woffset10)) << 2;
-							cel_address += ((x) << 2);
-							src_shift = (y & 1) ^ 1;
-						}
-						src_data = m_dma_read_cb(cel_address) >> (src_shift * 16);
-						src_data &= 0xffff;
+						u16 src_data = (this->*get_pixel_table[actual_src_mode])(x, y, woffset10);
 
 						u32 dst_address = m_regctl3;
 						dst_address += ((ypos & ~1) * 160) << 2;
 						dst_address += (xpos << 2);
 
-						u32 dst_data = m_dma_read_cb(dst_address);
+						u32 dst_data = m_dma32_read_cb(dst_address);
 						u8 dst_shift = ((ypos ^ 1) & 1) * 16;
 						dst_data &= dst_shift ? 0xffff : 0xffff0000;
 
-						m_dma_write_cb(dst_address, (src_data << dst_shift) | dst_data);
+						m_dma32_write_cb(dst_address, (src_data << dst_shift) | dst_data);
 
 						tick_time += 3;
 					}
@@ -851,7 +856,138 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			break;
 		}
 	}
-
 }
 
+// LZ77 / LZSS alike
+u32 madam_device::cel_decompress()
+{
+	u32 tick_time = 1;
+	u32 source_ptr = m_cel.source_ptr;
 
+	const u16 vcnt = ((m_cel.pre0 >> 6) & 0xfff) + 1;
+	//const bool uncoded = !!BIT(m_cel.pre0, 4);
+	const u8 bpp = (m_cel.pre0 >> 0) & 0x7;
+
+	if (bpp != 6)
+	{
+		popmessage("3do_madam.cpp: unsupported Packed CEL %d %08x", bpp, source_ptr);
+		m_statbits |= (1 << 6);
+		cel_stop_w(0, 0, 0xffffffff);
+		return 0;
+	}
+
+	u16 tlhpcnt = 1;
+	const u16 pitch = 0x1000;
+
+	for (u16 yline = 0; yline < vcnt; yline ++)
+	{
+		u32 line_ptr = source_ptr;
+		u16 woffset = ((m_dma8_read_cb(line_ptr) << 8) | (m_dma8_read_cb(line_ptr + 1))) + 2;
+		u32 next_ptr = line_ptr + woffset * 4;
+		line_ptr += 2;
+		tick_time += 2;
+		u16 xpos = 0;
+		while (line_ptr < next_ptr)
+		{
+			const u8 header = m_dma8_read_cb(line_ptr);
+			const u8 packet_type = header >> 6;
+			const u8 num_bytes = (header & 0x3f) + 1;
+			u8 src;
+
+			line_ptr ++;
+			tick_time ++;
+			u16 pixel_data;
+			switch (packet_type)
+			{
+				// PACK_TRANSPARENT
+				// TODO: untested
+				case 2:
+					for (src = 0; src < num_bytes; src++)
+						m_cel.buffer[yline * pitch + ((src + xpos) % pitch)] = 0;
+
+					tick_time ++;
+					xpos += num_bytes;
+					line_ptr += 2;
+					break;
+				// PACK_REPEAT
+				case 3:
+					pixel_data = (m_dma8_read_cb(line_ptr) << 8) | m_dma8_read_cb(line_ptr + 1);
+					for (src = 0; src < num_bytes; src++)
+						m_cel.buffer[yline * pitch + ((src + xpos) % pitch)] = pixel_data;
+
+					tick_time += 2;
+					xpos += num_bytes;
+					line_ptr += 2;
+					break;
+				// PACK_LITERAL
+				case 1:
+					for (src = 0; src < num_bytes; src++)
+					{
+						pixel_data = (m_dma8_read_cb(line_ptr) << 8) | m_dma8_read_cb(line_ptr + 1);
+						tick_time += 2;
+						m_cel.buffer[yline * pitch + ((src + xpos) % pitch)] = pixel_data;
+
+						line_ptr += 2;
+					}
+
+					xpos += num_bytes;
+					break;
+				// PACK_EOL
+				case 0:
+					line_ptr = next_ptr;
+					break;
+			}
+		}
+
+		// TODO: it is unclear what happens if the source data is uneven
+		// Documentation claims "not necessarily rectangle" ...
+		tlhpcnt = std::max<unsigned>(tlhpcnt, xpos);
+		source_ptr = next_ptr;
+	}
+
+	// setup the preamble so that DRAW state knows what to do
+	m_cel.pre1 = (tlhpcnt - 1);
+	return tick_time;
+}
+
+const madam_device::get_pixel_func madam_device::get_pixel_table[4] =
+{
+	&madam_device::get_uncompressed_16bpp_lrform0,
+	&madam_device::get_uncompressed_16bpp_lrform1,
+	&madam_device::get_compressed_16bpp,
+	&madam_device::get_compressed_16bpp
+};
+
+u16 madam_device::get_uncompressed_16bpp_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	cel_address += ((x & ~1) << 1);
+	u8 src_shift = (x & 1) ^ 1;
+
+	u16 src_data = m_dma32_read_cb(cel_address) >> (src_shift * 16);
+
+	return src_data;
+}
+
+u16 madam_device::get_uncompressed_16bpp_lrform1(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+
+	cel_address += ((y & ~1) * (woffset)) << 2;
+	cel_address += ((x) << 2);
+	u8 src_shift = (y & 1) ^ 1;
+
+	u16 src_data = m_dma32_read_cb(cel_address) >> (src_shift * 16);
+
+	return src_data;
+}
+
+u16 madam_device::get_compressed_16bpp(int x, int y, u16 woffset)
+{
+	const u16 pitch = 0x1000;
+
+	u16 src_data = m_cel.buffer[x + (y * pitch)];
+	return src_data;
+}
