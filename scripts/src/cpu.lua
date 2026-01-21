@@ -269,16 +269,16 @@ end
 
 if CPUS["ADSP21062"] then
 	files {
+		MAME_DIR .. "src/devices/cpu/sharc/compute.hxx",
 		MAME_DIR .. "src/devices/cpu/sharc/sharc.cpp",
 		MAME_DIR .. "src/devices/cpu/sharc/sharc.h",
-		MAME_DIR .. "src/devices/cpu/sharc/compute.hxx",
 		MAME_DIR .. "src/devices/cpu/sharc/sharcdma.hxx",
-		MAME_DIR .. "src/devices/cpu/sharc/sharcmem.hxx",
-		MAME_DIR .. "src/devices/cpu/sharc/sharcops.h",
-		MAME_DIR .. "src/devices/cpu/sharc/sharcops.hxx",
 		MAME_DIR .. "src/devices/cpu/sharc/sharcdrc.cpp",
 		MAME_DIR .. "src/devices/cpu/sharc/sharcfe.cpp",
 		MAME_DIR .. "src/devices/cpu/sharc/sharcfe.h",
+		MAME_DIR .. "src/devices/cpu/sharc/sharcmem.hxx",
+		MAME_DIR .. "src/devices/cpu/sharc/sharcops.hxx",
+		MAME_DIR .. "src/devices/cpu/sharc/sharcops_table.cpp",
 	}
 end
 

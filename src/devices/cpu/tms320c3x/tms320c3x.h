@@ -85,6 +85,13 @@ enum
 };
 
 
+// device type declaration
+DECLARE_DEVICE_TYPE(TMS320C30,  tms320c30_device)
+DECLARE_DEVICE_TYPE(TMS320C31,  tms320c31_device)
+DECLARE_DEVICE_TYPE(TMS320C32,  tms320c32_device)
+DECLARE_DEVICE_TYPE(TMS320VC33, tms320vc33_device)
+
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -834,6 +841,8 @@ protected:
 class tms320vc33_device : public tms320c3x_device
 {
 public:
+	static auto parent_rom_device_type() { return &TMS320C31; }
+
 	// construction/destruction
 	tms320vc33_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -842,12 +851,5 @@ protected:
 
 	void internal_320vc33(address_map &map) ATTR_COLD;
 };
-
-
-// device type definition
-DECLARE_DEVICE_TYPE(TMS320C30,  tms320c30_device)
-DECLARE_DEVICE_TYPE(TMS320C31,  tms320c31_device)
-DECLARE_DEVICE_TYPE(TMS320C32,  tms320c32_device)
-DECLARE_DEVICE_TYPE(TMS320VC33, tms320vc33_device)
 
 #endif // MAME_CPU_TMS320C3X_TMS320C3X_H
