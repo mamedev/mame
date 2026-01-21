@@ -44,6 +44,7 @@ After this sequence it will run normally.
 #include "machine/i2cmem.h"
 #include "machine/i8279.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
@@ -75,7 +76,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_i2cmem(*this, "i2cmem"),
 		m_oki(*this, "oki"),
-		m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" }),
+		m_hopper(*this, "hopper"),
+        m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" }),
 		m_digits(*this, "digit%u", 0U),
 		m_leds(*this, "led%u", 0U)
 	{ }
@@ -89,6 +91,7 @@ private:
 	required_device<i8052_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<okim6295_device> m_oki;
+	required_device<hopper_device> m_hopper;
 
 	required_ioport_array<4> m_inputs;
 	output_finder<32> m_digits;
@@ -151,6 +154,7 @@ void lanmao_state::port1_w(uint8_t data)
 {
 	m_i2cmem->write_sda(BIT(data, 1));
 	m_i2cmem->write_scl(BIT(data, 2));
+    m_hopper->motor_w(BIT(data, 3));
 
 	if ((data & 0xf1) != 0xf1)
 		logerror("unknown port1 write: %02x\n", data);
@@ -278,6 +282,7 @@ void lanmao_state::lanmao(machine_config &config)
 	kdc.in_shift_callback().set([this] () { LOGPORTS8279("%s I8279 shift read\n", machine().describe_context()); return 1; }); // not connected according to schematics
 	kdc.in_ctrl_callback().set([this] () { LOGPORTS8279("%s I8279 ctrl read\n", machine().describe_context()); return 1; }); // not connected according to schematics
 
+	HOPPER(config, m_hopper, attotime::from_msec(100)); // Guessed
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	I2C_24C02(config, "i2cmem");
