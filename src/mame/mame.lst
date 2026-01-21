@@ -16496,10 +16496,6 @@ cncchess2
 @source:chess/conic_cchess3.cpp
 cncchess3
 
-@source:chess/krypton_challenge.cpp
-kchal
-kchala
-
 @source:chess/regence.cpp
 regence
 
@@ -35260,6 +35256,10 @@ sdtora
 sgalaxy
 sgalaxya
 sgalaxyb
+
+@source:newcrest/legend.cpp
+kchal
+kchala
 
 @source:newcrest/pchess.cpp
 pchess

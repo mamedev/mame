@@ -62,7 +62,7 @@ H8/3256 A26 MCU is used in:
 #include "speaker.h"
 
 // internal artwork
-#include "krypton_challenge.lh"
+#include "kchal.lh"
 
 
 namespace {
@@ -343,7 +343,7 @@ void legend_state::shared(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
-	config.set_default_layout(layout_krypton_challenge);
+	config.set_default_layout(layout_kchal);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
