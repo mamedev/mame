@@ -36,12 +36,12 @@ k033906_device::k033906_device(const machine_config &mconfig, const char *tag, d
 void k033906_device::device_start()
 {
 	m_reg_set = 0;
-	m_reg = make_unique_clear<u32[]>(256);
-	m_ram = make_unique_clear<u32[]>(32768);
+	m_reg = make_unique_clear<u32[]>(0x100);
+	m_ram = make_unique_clear<u32[]>(0x8000);
 
 	save_item(NAME(m_reg_set));
-	save_pointer(NAME(m_reg), 256);
-	save_pointer(NAME(m_ram), 32768);
+	save_pointer(NAME(m_reg), 0x100);
+	save_pointer(NAME(m_ram), 0x8000);
 }
 
 

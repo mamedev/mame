@@ -45,10 +45,8 @@ private:
 	std::unique_ptr<u32[]> m_reg;
 	std::unique_ptr<u32[]> m_ram;
 
-	// I/O lines
-
-	uint8_t      m_reg_set; // 1 = access reg / 0 = access ram
-	uint32_t     m_voodoo_pciid;
+	uint8_t m_reg_set; // 1 = access reg / 0 = access ram
+	uint32_t m_voodoo_pciid;
 };
 
 DECLARE_DEVICE_TYPE(K033906, k033906_device)
