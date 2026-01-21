@@ -248,7 +248,7 @@ static INPUT_PORTS_START( lanmao )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P1:4")
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P1:5")
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P1:6")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // hopper sensor, gives error 31 if high
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // hopper sensor, gives error 31 if high
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 
 	PORT_START("P3")
