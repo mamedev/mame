@@ -23,9 +23,9 @@ DEFINE_DEVICE_TYPE(K033906, k033906_device, "k033906", "Konami 033906 PCI bridge
 
 k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K033906, tag, owner, clock)
-	, m_voodoo_pciid(0x0001121a) // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0001 = Voodoo 1)
 	, m_voodoo(*this, finder_base::DUMMY_TAG)
 	, m_reg_set(0)
+	, m_voodoo_pciid(0x0001121a) // PCI Vendor ID (0x121a = 3dfx), Device ID (0x0001 = Voodoo 1)
 {
 }
 
