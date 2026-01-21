@@ -390,6 +390,8 @@ Ultra Chess - [K085] Al Alamiah
 		<publisher>Nihon Telenet</publisher>
 		<info name="alt_title" value="デジタルデビル物語 女神転生" />
 		<info name="gtin" value="04988624920019"/>
+		<info name="usage" value="Controls:
+ESC - current floor map"/>
 		<part name="cart" interface="msx_cart">
 			<feature name="pcb" value="TA-1M" />
 			<feature name="slot" value="ascii8" />
