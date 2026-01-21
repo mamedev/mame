@@ -141,7 +141,7 @@ Notes:
                              * pin 71 - INT (I): erratic, active during qsound writes
                    DL-0921 \
                    DL-0311 / CPS-A/B Graphics Processors (QFP160)
-                   DL-1625 - Custom 68000 CPU, running at 16.000MHz (QFP128)
+                   DL-1625 - DRAM interface (QFP128)
                    DL-2227 - DRAM Refresh Controller (QFP64)
                    DL-1123 - I/O Controller (QFP136)
 
@@ -275,11 +275,12 @@ Notes:
                   board)
 
       Custom IC's -
-                   DL-1827 CIF (QFP160)
-                   DL-1525 SPA (QFP208)
-                   DL-1727 MIF (QFP120)
-                   DL-2027 CGD (QFP120)
-                   DL-1927 CGA (QFP120)
+                   DL-1827 CIF - Fujitsu CG24 series gate array (QFP160)
+                   DL-1525 SPA - Motorola H4C series model 057 gate array with 68000 CPU,
+                                 Running at 16MHz. (QFP208)
+                   DL-1727 MIF - Fujitsu CG24 series gate array (QFP120)
+                   DL-2027 CGD - Fujitsu CG24 series gate array (QFP120)
+                   DL-1927 CGA - Fujitsu CG24 series gate array (QFP120)
 
       ROMs -
             Note, the ROM names shown on the above layout are generic. Each EPROM on every game has
