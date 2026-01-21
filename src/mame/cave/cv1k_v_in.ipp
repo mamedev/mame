@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 /* blitter function */
 
-void ep1c12_device::FUNCNAME(BLIT_PARAMS)
+void cv1k_blitter_device::FUNCNAME(BLIT_PARAMS)
 {
 	int yf;
 
@@ -50,11 +50,11 @@ void ep1c12_device::FUNCNAME(BLIT_PARAMS)
 	int starty = 0;
 	const int dst_y_end = dst_y_start + dimy;
 
-	if (dst_y_start < clip->min_y)
-		starty = clip->min_y - dst_y_start;
+	if (dst_y_start < clip.min_y)
+		starty = clip.min_y - dst_y_start;
 
-	if (dst_y_end > clip->max_y)
-		dimy -= (dst_y_end-1) - clip->max_y;
+	if (dst_y_end > clip.max_y)
+		dimy -= (dst_y_end-1) - clip.max_y;
 
 	// check things are safe to draw (note, if the source would wrap round an edge of the 0x2000*0x1000 vram we don't draw.. not sure what the hw does anyway)
 	// ddpdfk triggers this on boss explosions so it needs fixing
@@ -75,11 +75,11 @@ void ep1c12_device::FUNCNAME(BLIT_PARAMS)
 	int startx = 0;
 	const int dst_x_end = dst_x_start + dimx;
 
-	if (dst_x_start < clip->min_x)
-		startx = clip->min_x - dst_x_start;
+	if (dst_x_start < clip.min_x)
+		startx = clip.min_x - dst_x_start;
 
-	if (dst_x_end > clip->max_x)
-		dimx -= (dst_x_end-1) - clip->max_x;
+	if (dst_x_end > clip.max_x)
+		dimx -= (dst_x_end-1) - clip.max_x;
 
 #if BLENDED == 1
 #if _SMODE == 0
@@ -106,7 +106,7 @@ void ep1c12_device::FUNCNAME(BLIT_PARAMS)
 
 	for (int y = starty; y < dimy; y++)
 	{
-		bmp = &bitmap->pix(dst_y_start + y, dst_x_start+startx);
+		bmp = &bitmap.pix(dst_y_start + y, dst_x_start + startx);
 		const int ysrc_index = ((src_y + yf * y) & 0x0fff) * 0x2000;
 		u32* gfx2 = gfx + ysrc_index;
 
@@ -130,21 +130,21 @@ void ep1c12_device::FUNCNAME(BLIT_PARAMS)
 
 		while (bigblocks)
 		{
-			#include "ep1c12pixel.ipp"
-			#include "ep1c12pixel.ipp"
-			#include "ep1c12pixel.ipp"
-			#include "ep1c12pixel.ipp"
-			#include "ep1c12pixel.ipp"
-			#include "ep1c12pixel.ipp"
-			#include "ep1c12pixel.ipp"
-			#include "ep1c12pixel.ipp"
+			#include "cv1k_v_pixel.ipp"
+			#include "cv1k_v_pixel.ipp"
+			#include "cv1k_v_pixel.ipp"
+			#include "cv1k_v_pixel.ipp"
+			#include "cv1k_v_pixel.ipp"
+			#include "cv1k_v_pixel.ipp"
+			#include "cv1k_v_pixel.ipp"
+			#include "cv1k_v_pixel.ipp"
 
 			bigblocks--;
 		}
 #endif
 		while (bmp < end)
 		{
-			#include "ep1c12pixel.ipp"
+			#include "cv1k_v_pixel.ipp"
 		}
 
 	}
