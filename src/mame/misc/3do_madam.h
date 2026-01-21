@@ -96,11 +96,11 @@ private:
 		cel_state_t state;
 		u32 address;
 		u32 current_ccb;
-		bool skip, last, ccbpre, packed;
+		bool skip, last, ccbpre, packed, bgnd;
 		u32 next_ptr;
 		u32 source_ptr;
 		u32 plut_ptr;
-		u32 xpos, ypos;
+		s32 xpos, ypos;
 		u32 hdx, hdy, vdx, vdy;
 		u32 hddx, hddy;
 		u32 pixc, pre0, pre1;

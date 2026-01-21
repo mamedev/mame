@@ -672,10 +672,11 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, BIT(m_cel.current_ccb, 10)
 				, m_cel.packed
 			);
+			m_cel.bgnd = !!BIT(m_cel.current_ccb, 5);
 			LOGCEL("        pover=%d plutpos=%d bgnd=%d noblk=%d pluta=%d\n"
 				, (m_cel.current_ccb & 0x180) >> 7
 				, BIT(m_cel.current_ccb, 6)
-				, BIT(m_cel.current_ccb, 5)
+				, m_cel.bgnd
 				, BIT(m_cel.current_ccb, 4)
 				, (m_cel.current_ccb & 0xe) >> 1
 			);
@@ -696,8 +697,8 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
-			m_cel.xpos = m_dma32_read_cb(m_cel.address + 0x10);
-			m_cel.ypos = m_dma32_read_cb(m_cel.address + 0x14);
+			m_cel.xpos = util::sext(m_dma32_read_cb(m_cel.address + 0x10), 32);
+			m_cel.ypos = util::sext(m_dma32_read_cb(m_cel.address + 0x14), 32);
 			tick_time += 2;
 			// TODO: can be in 17.15 format (?)
 			LOGCEL("    xpos=%f ypos=%f\n",  (double)m_cel.xpos / 65536.0, (double)m_cel.ypos / 65536.0);
@@ -823,6 +824,10 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 							continue;
 
 						u16 src_data = (this->*get_pixel_table[actual_src_mode])(x, y, woffset10);
+
+						// opaque check
+						if (!src_data && !m_cel.bgnd)
+							continue;
 
 						u32 dst_address = m_regctl3;
 						dst_address += ((ypos & ~1) * 160) << 2;

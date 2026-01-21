@@ -265,7 +265,7 @@ void mga2064w_device::dwgreg_map(address_map &map)
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			// alternative way to access YDST (bits 31-16) and LEN (15-0) with a single dword
 			m_dwgreg.len = data & 0xffff;
-			// TODO: YDST bits 31-16 with signed conversion
+			// TODO: YDST bits 31-16 with signed conversion (should it be 16 not 15?)
 			m_dwgreg.ydst = util::sext(data >> 16, 15);
 			LOGDRAW("dwgreg: YDSTLEN %08x & %08x (YDST %d|LEN %d)\n"
 				, data, mem_mask
@@ -536,6 +536,7 @@ void mga2064w_device::draw_trigger()
 					return;
 
 				const u32 source_base = m_dwgreg.ar[3] & 0xffffff;
+				// TODO: verify me, may be 18
 				const s32 source_pitch = util::sext(m_dwgreg.ar[5], 17);
 				int src_x = 0;
 				int src_y = 0;
@@ -559,6 +560,7 @@ void mga2064w_device::draw_trigger()
 			else
 			{
 				const u32 source_base = m_dwgreg.ar[3] & 0xffffff;
+				// TODO: verify me, may be 18
 				const s32 source_pitch = util::sext(m_dwgreg.ar[5], 17);
 				int src_x = 0;
 				int src_y = 0;
