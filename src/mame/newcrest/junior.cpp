@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-CXG Sphinx Junior (model 237)
+Newcrest CXG Sphinx Junior (model 237)
 
 NOTE: Before exiting MAME, press the OFF button to turn the power off. Otherwise,
 NVRAM won't save properly.
@@ -28,7 +28,7 @@ Fidelity Micro Chess Challenger (16 buttons):
 - PCB label: CXG 249 600-001
 - rest is similar to Sphinx Junior
 
-CXG didn't sell a handheld version of their own, CXG model 249 does not exist.
+Newcrest didn't sell a handheld version of their own, CXG model 249 doesn't exist.
 Fidelity MCC 12-button version has a HD44820 MCU instead (see pchess.cpp).
 
 HD614140HA27 MCU is used in:
@@ -247,4 +247,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, sjunior, 0,      0,      junior,  junior, junior_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Sphinx Junior", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sjunior, 0,      0,      junior,  junior, junior_state, empty_init, "Newcrest Technology / CXG Systems / Intelligent Chess Software", "Sphinx Junior", MACHINE_SUPPORTS_SAVE )

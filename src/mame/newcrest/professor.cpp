@@ -3,7 +3,7 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-CXG Sphinx Chess Professor (CXG-243)
+Newcrest CXG Sphinx Chess Professor (CXG-243)
 
 NOTE: Before exiting MAME, press the OFF button to turn the power off. Otherwise,
 NVRAM won't save properly.
@@ -252,4 +252,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1989, scprof, 0,      0,      professor, professor, professor_state, empty_init, "CXG Systems / Newcrest Technology", "Sphinx Chess Professor", MACHINE_SUPPORTS_SAVE )
+SYST( 1989, scprof, 0,      0,      professor, professor, professor_state, empty_init, "Newcrest Technology / CXG Systems", "Sphinx Chess Professor", MACHINE_SUPPORTS_SAVE )
