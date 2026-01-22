@@ -169,6 +169,22 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- this one has some songs programmed into it:
+	 
+	 ...
+	 
+	-->		
+	<software name="user10b" cloneof="user10" supported="no">
+		<description>Hi-kara 10-song capacity user cartridge (used, with 9 songs) (Japan)</description>
+		<year>2008</year>
+		<publisher>Takara Tomy</publisher>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="usercart10.bin" size="0x200000" crc="48bac1fc" sha1="87c26fe1ada9940bf2712ae86dffa207dbeb2123"/>
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="user20" supported="no">
 		<description>Hi-kara 20-song capacity user cartridge (blank) (Japan)</description>
