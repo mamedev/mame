@@ -191,7 +191,7 @@ Pin #11(+) | | R               |
 #define VIDEO_CLOCK             XTAL(11'289'600)
 #define VIDEO_CLOCK_LETHALJ     XTAL(11'059'200)
 
-void lethalj_state::machine_start
+void lethalj_state::machine_start()
 {
 	m_lamps.resolve();
 
