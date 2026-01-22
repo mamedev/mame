@@ -53,8 +53,10 @@ drc_hash_table::drc_hash_table(
 		std::align_val_t modealign,
 		std::align_val_t l1align,
 		std::align_val_t l2align) :
+	m_invariant_modes(modes, false),
 	m_next_l1_block(0),
 	m_next_l2_block(0),
+	m_invariant_mode_count(0),
 	m_cache(cache),
 	m_modealign(std::align_val_t(std::lcm(std::size_t(modealign), alignof(drccodeptr **)))),
 	m_l1align(std::align_val_t(std::lcm(std::size_t(l1align), alignof(drccodeptr *)))),
@@ -106,14 +108,20 @@ drc_hash_table::drc_hash_table(
 bool drc_hash_table::reset() noexcept
 {
 	// start from the beginning of the allocated blocks
-	m_next_l1_block = 0;
+	m_next_l1_block = m_invariant_mode_count;
 	m_next_l2_block = 0;
 
 	if (!m_base || !m_emptyl1 || !m_emptyl2)
 		return false;
 
 	// reset the top-level table
-	std::fill_n(m_base, m_modes, m_emptyl1);
+	for (uint32_t i = 0; m_modes > i; ++i)
+	{
+		if (!m_invariant_modes[i])
+			m_base[i] = m_emptyl1;
+		else
+			std::fill_n(m_base[i], 1 << m_l1bits, m_emptyl2);
+	}
 
 	return true;
 }
@@ -165,23 +173,40 @@ void drc_hash_table::block_begin(drcuml_block &block, const uml::instruction *in
 	{
 		const uml::instruction &inst = instlist[inum];
 
-		// if the opcode is a hash, verify that it makes sense and then set a nullptr entry
 		if (inst.opcode() == OP_HASH)
 		{
-			assert(inst.numparams() == 2);
+			// if the opcode is a hash, verify that it makes sense and then set a nullptr entry
+			if (UNEXPECTED(block.invariant()))
+				throw emu_fatalerror("UML HASH is not permitted in invariant blocks.\n");
 
 			// if we fail to allocate, we must abort the block
 			if (!set_codeptr(inst.param(0).immediate(), inst.param(1).immediate(), nullptr))
 				block.abort();
 		}
-
-		// if the opcode is a hashjmp to a fixed location, make sure we preallocate the tables
-		if (inst.opcode() == OP_HASHJMP && inst.param(0).is_immediate() && inst.param(1).is_immediate())
+		else if (inst.opcode() == OP_HASHJMP)
 		{
-			// if we fail to allocate, we must abort the block
-			drccodeptr code = get_codeptr(inst.param(0).immediate(), inst.param(1).immediate());
-			if (!set_codeptr(inst.param(0).immediate(), inst.param(1).immediate(), code))
-				block.abort();
+			if (inst.param(0).is_immediate())
+			{
+				const uint32_t mode = inst.param(0).immediate();
+				if (block.invariant())
+				{
+					// mark mode as used in invariant code
+					assert(m_next_l1_block == m_invariant_mode_count);
+
+					if (!populate_mode(mode))
+						block.abort();
+
+					m_invariant_modes[mode] = true;
+					m_invariant_mode_count = m_next_l1_block;
+				}
+				else if (inst.param(1).is_immediate())
+				{
+					// preallocate the tables for hashjmp to fixed location in transient code
+					drccodeptr const code = get_codeptr(mode, inst.param(1).immediate());
+					if (!set_codeptr(mode, inst.param(1).immediate(), code))
+						block.abort();
+				}
+			}
 		}
 	}
 }
@@ -214,7 +239,7 @@ void drc_hash_table::set_default_codeptr(drccodeptr nocodeptr) noexcept
 	std::fill_n(m_emptyl2, 1 << m_l2bits, nocodeptr);
 
 	// now scan all existing L2 tables for entries
-	for (std::size_t i = 0; m_next_l2_block > i; ++i)
+	for (uint32_t i = 0; m_next_l2_block > i; ++i)
 	{
 		for (uint32_t l2entry = 0; (1 << m_l2bits > l2entry); ++l2entry)
 		{
@@ -317,26 +342,14 @@ void drc_map_variables::block_end(drcuml_block &block)
 	if (m_entry_list.empty())
 		return;
 
-	// begin "code generation" aligned to an 8-byte boundary
-	drccodeptr *top = m_cache.begin_codegen(sizeof(uint64_t) + sizeof(uint32_t) + 2 * sizeof(uint32_t) * m_entry_list.size());
-	if (!top)
-		block.abort();
-	auto dest = reinterpret_cast<uint32_t *>((uintptr_t(*top) + 7) & ~uintptr_t(7));
-
-	// store the cookie first
-	*(uint64_t *)dest = m_uniquevalue;
-	dest += 2;
-
-	// get the pointer to the first item and store an initial backwards offset
-	drccodeptr lastptr = m_entry_list.front().codeptr;
-	*dest = drccodeptr(dest) - lastptr;
-	dest++;
-
 	// now iterate over entries and store them
 	std::array<uint32_t, MAPVAR_COUNT> curvalue;
 	std::array<bool, MAPVAR_COUNT> changed;
 	std::fill(curvalue.begin(), curvalue.end(), 0);
 	std::fill(changed.begin(), changed.end(), false);
+	m_out_temp.clear();
+	m_out_temp.reserve(m_entry_list.size() * 2);
+	drccodeptr lastptr = m_entry_list.front().codeptr;
 	auto entry = m_entry_list.begin();
 	while (m_entry_list.end() != entry)
 	{
@@ -371,16 +384,16 @@ void drc_map_variables::block_end(drcuml_block &block)
 				uint32_t codedelta = entry->codeptr - lastptr;
 				while (codedelta > 0xffff)
 				{
-					*dest++ = uint32_t(0xffff) << 16;
+					m_out_temp.emplace_back(uint32_t(0xffff) << 16);
 					codedelta -= 0xffff;
 				}
-				*dest++ = (codedelta << 16) | (varmask << 4) | numchanged;
+				m_out_temp.emplace_back((codedelta << 16) | (varmask << 4) | numchanged);
 
 				// now output updated variable values
 				for (int varnum = 0; varnum < changed.size(); varnum++)
 				{
 					if (BIT(varmask, varnum))
-						*dest++ = curvalue[varnum];
+						m_out_temp.emplace_back(curvalue[varnum]);
 				}
 
 				// remember our lastptr
@@ -391,11 +404,27 @@ void drc_map_variables::block_end(drcuml_block &block)
 	}
 
 	// add a terminator
-	*dest++ = 0;
+	m_out_temp.emplace_back(0);
 
-	// complete codegen
-	*top = (drccodeptr)dest;
-	m_cache.end_codegen();
+	// begin "code generation" aligned to an 8-byte boundary
+	auto const required = sizeof(uint64_t) + sizeof(uint32_t) + (sizeof(uint32_t) * m_out_temp.size());
+	auto const align = std::align_val_t(std::lcm<std::size_t>(alignof(uint64_t), 8));
+	auto dest = reinterpret_cast<uint32_t *>(block.invariant()
+			? m_cache.alloc_invariant(required, align)
+			: m_cache.alloc_transient(required, align));
+	if (!dest)
+		block.abort();
+
+	// store the cookie first
+	*(uint64_t *)dest = m_uniquevalue;
+	dest += 2;
+
+	// get the pointer to the first item and store an initial backwards offset
+	*dest = drccodeptr(dest) - m_entry_list.front().codeptr;
+	dest++;
+
+	// copy the actual entries
+	dest = std::copy(m_out_temp.begin(), m_out_temp.end(), dest);
 }
 
 
@@ -507,9 +536,7 @@ uint32_t drc_map_variables::get_last_value(uint32_t mapvar)
 //  drc_label_list - constructor
 //-------------------------------------------------
 
-drc_label_list::drc_label_list(drc_cache &cache) :
-	m_cache(cache),
-	m_oob_callback_delegate(&drc_label_list::oob_callback, this)
+drc_label_list::drc_label_list()
 {
 }
 
@@ -540,8 +567,9 @@ void drc_label_list::block_begin(drcuml_block &block)
 
 void drc_label_list::block_end(drcuml_block &block)
 {
-	// can't free until the cache is clean of our OOB requests
-	assert(!m_cache.generating_code());
+	// service fixup requests
+	for (auto const &fixup : m_fixup_list)
+		fixup.callback(fixup.param, fixup.label->codeptr);
 
 	// free all of the pending fixup requests
 	m_free_fixups.splice(m_free_fixups.begin(), m_fixup_list);
@@ -570,8 +598,8 @@ drccodeptr drc_label_list::get_codeptr(uml::code_label label, drc_label_fixup_de
 		else
 			m_fixup_list.splice(m_fixup_list.end(), m_free_fixups, fixup);
 		fixup->label = &curlabel;
+		fixup->param = param;
 		fixup->callback = callback;
-		m_cache.request_oob_codegen(drc_oob_delegate(m_oob_callback_delegate), &*fixup, param);
 	}
 
 	return curlabel.codeptr;
@@ -634,18 +662,6 @@ drc_label_list::label_entry &drc_label_list::find_or_allocate(uml::code_label la
 	newlabel->label = label;
 	newlabel->codeptr = nullptr;
 	return *newlabel;
-}
-
-
-//-------------------------------------------------
-//  oob_callback - out-of-band codegen callback
-//  for labels
-//-------------------------------------------------
-
-void drc_label_list::oob_callback(drccodeptr *codeptr, void *param1, void *param2)
-{
-	label_fixup *fixup = reinterpret_cast<label_fixup *>(param1);
-	fixup->callback(param2, fixup->label->codeptr);
 }
 
 

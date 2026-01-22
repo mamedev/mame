@@ -84,23 +84,23 @@ struct drcbe_info
 class drcuml_block
 {
 public:
-	// construction/destruction
-	drcuml_block(drcuml_state &drcuml, u32 maxinst);
-	drcuml_block(drcuml_block const &) = delete;
-	drcuml_block &operator=(drcuml_block const &) = delete;
-	~drcuml_block();
-
 	// getters
 	bool inuse() const { return m_inuse; }
+	bool invariant() const { return m_invariant; }
 	u32 maxinst() const { return m_maxinst; }
 
 	// code generation
-	void begin();
 	void end();
-	void abort();
+	[[noreturn]] void abort();
 
 	// instruction appending
-	uml::instruction &append();
+	uml::instruction &append()
+	{
+		if (UNEXPECTED(m_nextinst >= m_maxinst))
+			overrun();
+		return m_inst[m_nextinst++]; // get a pointer to the next instruction
+	}
+
 	template <typename Format, typename... Params> void append_comment(Format &&fmt, Params &&... args);
 
 	// this class is thrown if abort() is called
@@ -110,18 +110,31 @@ public:
 		abort_compilation() { }
 	};
 
+protected:
+	// construction/destruction
+	drcuml_block(drcuml_block const &) = delete;
+	drcuml_block &operator=(drcuml_block const &) = delete;
+	drcuml_block(drcuml_state &drcuml, u32 maxinst);
+	~drcuml_block();
+
+	void begin(bool invariant);
+
 private:
+	using instruction_array_ptr = std::unique_ptr<uml::instruction []>;
+
 	// internal helpers
 	void optimize();
 	void disassemble();
 	char const *get_comment_text(uml::instruction const &inst, std::string &comment);
+	[[noreturn]] void overrun();
 
 	// internal state
-	drcuml_state &                  m_drcuml;   // pointer back to the owning UML
-	u32                             m_nextinst; // next instruction to fill in the cache
-	u32                             m_maxinst;  // maximum number of instructions
-	std::vector<uml::instruction>   m_inst;     // pointer to the instruction list
-	bool                            m_inuse;    // this block is in use
+	drcuml_state &          m_drcuml;       // pointer back to the owning UML
+	u32 const               m_maxinst;      // maximum number of instructions
+	u32                     m_nextinst;     // next instruction to fill in the cache
+	instruction_array_ptr   m_inst;         // pointer to the instruction list
+	bool                    m_invariant;    // this is an invariant block
+	bool                    m_inuse;        // this block is in use
 };
 
 
@@ -170,7 +183,8 @@ public:
 	int execute(uml::code_handle &entry) { return m_beintf->execute(entry); }
 
 	// code generation
-	drcuml_block &begin_block(u32 maxinst);
+	drcuml_block &begin_block(u32 maxinst) { return begin_block(maxinst, false); }
+	drcuml_block &begin_invariant_block(u32 maxinst) { return begin_block(maxinst, true); }
 
 	// back-end interface
 	void get_backend_info(drcbe_info &info) const { m_beintf->get_info(info); }
@@ -219,12 +233,23 @@ private:
 		std::string m_name;     // name of the symbol
 	};
 
+	class block_impl : public drcuml_block
+	{
+	public:
+		block_impl(drcuml_state &drcuml, u32 maxinst) : drcuml_block(drcuml, maxinst) { }
+		~block_impl() = default;
+
+		using drcuml_block::begin;
+	};
+
+	drcuml_block &begin_block(u32 maxinst, bool invariant);
+
 	// internal state
 	device_t &                              m_device;           // CPU device we are associated with
 	drc_cache &                             m_cache;            // pointer to the codegen cache
 	std::unique_ptr<drcbe_interface> const  m_beintf;           // backend interface pointer
 	std::unique_ptr<std::ostream> const     m_umllog;           // handle to the UML logfile
-	std::list<drcuml_block>                 m_blocklist;        // list of active blocks
+	std::list<block_impl>                   m_blocklist;        // list of active blocks
 	std::list<uml::code_handle>             m_handlelist;       // list of active handles
 	std::list<symbol>                       m_symlist;          // list of symbols
 };
@@ -247,7 +272,9 @@ inline void drcuml_block::append_comment(Format &&fmt, Params &&... args)
 	std::string const temp(util::string_format(std::forward<Format>(fmt), std::forward<Params>(args)...));
 
 	// allocate space in the cache to hold the comment
-	char *const comment = reinterpret_cast<char *>(m_drcuml.cache().alloc_temporary(temp.length() + 1, std::align_val_t(alignof(char))));
+	char *const comment = reinterpret_cast<char *>(invariant()
+			? m_drcuml.cache().alloc_invariant(temp.length() + 1, std::align_val_t(alignof(char)))
+			: m_drcuml.cache().alloc_transient(temp.length() + 1, std::align_val_t(alignof(char))));
 	if (comment)
 	{
 		strcpy(comment, temp.c_str());
