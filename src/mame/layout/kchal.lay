@@ -79,8 +79,8 @@ authors:hap
 	</element>
 
 	<group name="sb_board">
-		<bounds x="-0.25" y="-0.25" width="80.5" height="80.5" />
-		<element ref="cyan"><bounds x="-0.25" y="-0.25" width="80.5" height="80.5" /></element>
+		<bounds x="-0.35" y="-0.35" width="80.7" height="80.7" />
+		<element ref="cyan"><bounds x="-0.35" y="-0.35" width="80.7" height="80.7" /></element>
 
 		<!-- squares (avoid seams) -->
 		<element ref="cwhite"><bounds x="0"  y="0" width="11" height="11" /></element>
@@ -436,7 +436,7 @@ authors:hap
 	<view name="Internal Layout">
 		<bounds left="-15.5" right="102.5" top="-2.5" bottom="83" />
 
-		<group ref="sb_board"><bounds x="0" y="0" width="80.5" height="80.5" /></group>
+		<group ref="sb_board"><bounds x="-0.1" y="-0.1" width="80.7" height="80.7" /></group>
 		<group ref="sb_ui"><bounds x="-14" y="0.25" width="10" height="80" /></group>
 
 		<screen index="0"><bounds x="83.25" y="4.442" width="16" height="5.808" /></screen>
@@ -449,13 +449,13 @@ authors:hap
 			<param name="y" start="5.25" increment="10" />
 			<param name="i" start="7" increment="-1" />
 
-			<element name="0.~i~" ref="led"><bounds x="-2" yc="~y~" width="1.5" height="1.5" /></element>
+			<element name="0.~i~" ref="led"><bounds x="-1.95" yc="~y~" width="1.5" height="1.5" /></element>
 		</repeat>
 		<repeat count="8">
 			<param name="x" start="5.25" increment="10" />
 			<param name="i" start="7" increment="-1" />
 
-			<element name="1.~i~" ref="led"><bounds xc="~x~" y="81" width="1.5" height="1.5" /></element>
+			<element name="1.~i~" ref="led"><bounds xc="~x~" y="81.05" width="1.5" height="1.5" /></element>
 		</repeat>
 
 	</view>

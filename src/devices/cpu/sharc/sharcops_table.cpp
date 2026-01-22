@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
+#include "sharc.h"
 
 const adsp21062_device::SHARC_OP adsp21062_device::s_sharc_opcode_table[] =
 {
@@ -132,3 +133,6 @@ const adsp21062_device::SHARC_OP adsp21062_device::s_sharc_opcode_table[] =
 	//  |0 0 0|0 0 0 0 0|1|
 	{   0xff80,     0x0080,     &adsp21062_device::sharcop_idle                                        },
 };
+
+
+const size_t adsp21062_device::s_num_ops = std::size(s_sharc_opcode_table);

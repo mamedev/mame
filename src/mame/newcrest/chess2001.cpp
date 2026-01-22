@@ -3,15 +3,18 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-CXG Chess 2001, also sold by Hanimex as Computachess (model HCG 1900),
+Newcrest CXG Chess 2001, also sold by Hanimex as Computachess (model HCG 1900),
 and by CGL as Computachess Champion.
-CXG Chess 3000 is assumed to be on similar hardware as this.
+Newcrest CXG Chess 3000 is assumed to be on similar hardware as this.
 
 The chess engine is by Richard Lang, based on Cyrus.
 
-CXG Systems S.A. and Newcrest Technology Ltd. are related companies, with
-Eric White at the steering wheel. Newcrest(1984-1991) is probably a rename of
-"White and Allcock"(1981-1984).
+Newcrest Technology Ltd. and CXG Systems S.A. were related companies, with Eric
+White at the steering wheel. Newcrest(1984-1991) was probably a rename of "White
+and Allcock"(1981-1984). CXG Systems was apparently their distribution arm.
+
+Due to CXG logo/branding, Newcrest chess computers are more commonly refered
+to as CXG chess computers (just like eg. Hegener+Glaser and Mephisto).
 
 Hardware notes:
 - Zilog Z8400APS @ 4 MHz (8MHz XTAL)
@@ -213,4 +216,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE    INPUT      CLASS            INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1984, ch2001, 0,      0,      chess2001, chess2001, chess2001_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Software", "Chess 2001", MACHINE_SUPPORTS_SAVE )
+SYST( 1984, ch2001, 0,      0,      chess2001, chess2001, chess2001_state, empty_init, "Newcrest Technology / CXG Systems / Intelligent Software", "Chess 2001", MACHINE_SUPPORTS_SAVE )

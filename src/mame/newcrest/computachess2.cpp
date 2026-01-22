@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-CXG Computachess II (CXG-002 or WA-002)
+White and Allcock CXG Computachess II (CXG-002 or WA-002)
 
 It's the sequel to Sensor Computachess, on similar hardware. The chess engine is
 again by Intelligent Software.
@@ -203,4 +203,4 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1982, cpchess2, 0,      0,      cpchess2, cpchess2, cpchess2_state, empty_init, "CXG Systems / White and Allcock / Intelligent Software", "Computachess II", MACHINE_SUPPORTS_SAVE )
+SYST( 1982, cpchess2, 0,      0,      cpchess2, cpchess2, cpchess2_state, empty_init, "White and Allcock / CXG Systems / Intelligent Software", "Computachess II", MACHINE_SUPPORTS_SAVE )

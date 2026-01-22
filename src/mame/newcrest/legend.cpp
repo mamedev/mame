@@ -11,7 +11,6 @@ by Gyula Horváth, similar to the one in CXG Sphinx Legend.
 To start a new game, keep holding the NEW GAME button until the display says HELLO.
 
 TODO:
-- CXG Sphinx Legend may be on the same hardware? if so, move driver to cxg folder
 - is Krypton a product brand, or a company alias for the Chinese factory behind it?
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
@@ -63,15 +62,15 @@ H8/3256 A26 MCU is used in:
 #include "speaker.h"
 
 // internal artwork
-#include "krypton_challenge.lh"
+#include "kchal.lh"
 
 
 namespace {
 
-class kchal_state : public driver_device
+class legend_state : public driver_device
 {
 public:
-	kchal_state(const machine_config &mconfig, device_type type, const char *tag) :
+	legend_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
@@ -123,7 +122,7 @@ private:
 	void p7_w(u8 data);
 };
 
-void kchal_state::machine_start()
+void legend_state::machine_start()
 {
 	m_out_lcd.resolve();
 
@@ -142,7 +141,7 @@ void kchal_state::machine_start()
 
 // power
 
-void kchal_state::standby(int state)
+void legend_state::standby(int state)
 {
 	// clear display
 	if (state)
@@ -152,7 +151,7 @@ void kchal_state::standby(int state)
 	}
 }
 
-int kchal_state::update_irq2()
+int legend_state::update_irq2()
 {
 	// 2nd button row is tied to IRQ2 (used for on/off button)
 	int state = (m_inp_mux2 & m_inputs[1]->read()) ? ASSERT_LINE : CLEAR_LINE;
@@ -164,12 +163,12 @@ int kchal_state::update_irq2()
 
 // LCD
 
-void kchal_state::lcd_pwm_w(offs_t offset, u8 data)
+void legend_state::lcd_pwm_w(offs_t offset, u8 data)
 {
 	m_out_lcd[offset & 0x3f][offset >> 6] = data;
 }
 
-void kchal_state::update_lcd()
+void legend_state::update_lcd()
 {
 	u32 lcd_segs = bitswap<24>(m_lcd_segs,1,0, 15,14,13,12,11,10,9,8, 16,17,23,22,21,20,19,18, 25,26,27,28,29,31);
 
@@ -182,7 +181,7 @@ void kchal_state::update_lcd()
 }
 
 template <int N>
-void kchal_state::lcd_segs_w(u8 data)
+void legend_state::lcd_segs_w(u8 data)
 {
 	// P1x, P3x, P4x, P6x: LCD segments
 	const u8 shift = 8 * N;
@@ -193,14 +192,14 @@ void kchal_state::lcd_segs_w(u8 data)
 
 // misc
 
-void kchal_state::p2_w(u8 data)
+void legend_state::p2_w(u8 data)
 {
 	// P20-P27: input mux (chessboard), LED data
 	m_inp_mux = (m_inp_mux & 0x300) | (data ^ 0xff);
 	m_led_pwm->write_mx(~data);
 }
 
-void kchal_state::p5_w(offs_t offset, u8 data, u8 mem_mask)
+void legend_state::p5_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	// P50: LCD common 2
 	m_lcd_com = (m_lcd_com & 5) | (data << 1 & 2) | (mem_mask << 3 & 8);
@@ -216,7 +215,7 @@ void kchal_state::p5_w(offs_t offset, u8 data, u8 mem_mask)
 	m_led_pwm->write_my(~data >> 4 & 3);
 }
 
-u8 kchal_state::p6_r()
+u8 legend_state::p6_r()
 {
 	// P65: battery status
 	u8 data = m_inputs[2]->read() << 5 & 0x20;
@@ -228,7 +227,7 @@ u8 kchal_state::p6_r()
 	return ~data;
 }
 
-void kchal_state::p6_w(offs_t offset, u8 data, u8 mem_mask)
+void legend_state::p6_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	// P60,P61: LCD segs
 	lcd_segs_w<0>(data & 3);
@@ -241,7 +240,7 @@ void kchal_state::p6_w(offs_t offset, u8 data, u8 mem_mask)
 	m_inp_mux = (m_inp_mux & 0x1ff) | (BIT(~data, 6) << 9);
 }
 
-u8 kchal_state::p7_r()
+u8 legend_state::p7_r()
 {
 	// P70-P77: multiplexed inputs
 	u8 data = 0;
@@ -259,7 +258,7 @@ u8 kchal_state::p7_r()
 	return ~data;
 }
 
-void kchal_state::p7_w(u8 data)
+void legend_state::p7_w(u8 data)
 {
 	// P70-P77: input mux (other way around)
 	m_inp_mux2 = ~data;
@@ -273,7 +272,7 @@ void kchal_state::p7_w(u8 data)
 *******************************************************************************/
 
 #define PORT_CHANGED_IN1() \
-	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kchal_state::in1_changed), 0)
+	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(legend_state::in1_changed), 0)
 
 static INPUT_PORTS_START( kchal )
 	PORT_START("IN.0")
@@ -309,25 +308,25 @@ INPUT_PORTS_END
 *******************************************************************************/
 
 template <typename T>
-void kchal_state::cpu_config(T &maincpu)
+void legend_state::cpu_config(T &maincpu)
 {
 	maincpu.nvram_enable_backup(true);
 	maincpu.standby_cb().set(maincpu, FUNC(T::nvram_set_battery));
-	maincpu.standby_cb().append(FUNC(kchal_state::standby));
-	maincpu.write_port1().set(FUNC(kchal_state::lcd_segs_w<2>));
+	maincpu.standby_cb().append(FUNC(legend_state::standby));
+	maincpu.write_port1().set(FUNC(legend_state::lcd_segs_w<2>));
 	maincpu.read_port2().set_constant(0xef); // hardware config?
-	maincpu.write_port2().set(FUNC(kchal_state::p2_w));
-	maincpu.write_port3().set(FUNC(kchal_state::lcd_segs_w<1>));
-	maincpu.write_port4().set(FUNC(kchal_state::lcd_segs_w<3>));
+	maincpu.write_port2().set(FUNC(legend_state::p2_w));
+	maincpu.write_port3().set(FUNC(legend_state::lcd_segs_w<1>));
+	maincpu.write_port4().set(FUNC(legend_state::lcd_segs_w<3>));
 	maincpu.read_port5().set_constant(0xff);
-	maincpu.write_port5().set(FUNC(kchal_state::p5_w));
-	maincpu.read_port6().set(FUNC(kchal_state::p6_r));
-	maincpu.write_port6().set(FUNC(kchal_state::p6_w));
-	maincpu.read_port7().set(FUNC(kchal_state::p7_r));
-	maincpu.write_port7().set(FUNC(kchal_state::p7_w));
+	maincpu.write_port5().set(FUNC(legend_state::p5_w));
+	maincpu.read_port6().set(FUNC(legend_state::p6_r));
+	maincpu.write_port6().set(FUNC(legend_state::p6_w));
+	maincpu.read_port7().set(FUNC(legend_state::p7_r));
+	maincpu.write_port7().set(FUNC(legend_state::p7_w));
 }
 
-void kchal_state::shared(machine_config &config)
+void legend_state::shared(machine_config &config)
 {
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);
 	m_board->init_cb().set(m_board, FUNC(sensorboard_device::preset_chess));
@@ -336,7 +335,7 @@ void kchal_state::shared(machine_config &config)
 
 	// video hardware
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(2, 24);
-	m_lcd_pwm->output_x().set(FUNC(kchal_state::lcd_pwm_w));
+	m_lcd_pwm->output_x().set(FUNC(legend_state::lcd_pwm_w));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
 	screen.set_refresh_hz(60);
@@ -344,14 +343,14 @@ void kchal_state::shared(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
-	config.set_default_layout(layout_krypton_challenge);
+	config.set_default_layout(layout_kchal);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
-void kchal_state::kchal(machine_config &config)
+void legend_state::kchal(machine_config &config)
 {
 	H83256(config, m_maincpu, 20_MHz_XTAL);
 	cpu_config<h83256_device>(downcast<h83256_device &>(*m_maincpu));
@@ -359,7 +358,7 @@ void kchal_state::kchal(machine_config &config)
 	shared(config);
 }
 
-void kchal_state::kchala(machine_config &config)
+void legend_state::kchala(machine_config &config)
 {
 	H8325(config, m_maincpu, 20_MHz_XTAL);
 	cpu_config<h8325_device>(downcast<h8325_device &>(*m_maincpu));
@@ -397,6 +396,6 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1996, kchal,  0,      0,      kchal,   kchal, kchal_state, empty_init, "Krypton / Timorite", "Challenge (1996 version)", MACHINE_SUPPORTS_SAVE )
-SYST( 1994, kchala, kchal,  0,      kchala,  kchal, kchal_state, empty_init, "Krypton / Timorite", "Challenge (1994 version)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1996, kchal,  0,      0,      kchal,   kchal, legend_state, empty_init, "Krypton / Timorite", "Challenge (1996 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1994, kchala, kchal,  0,      kchala,  kchal, legend_state, empty_init, "Krypton / Timorite", "Challenge (1994 version)", MACHINE_SUPPORTS_SAVE )

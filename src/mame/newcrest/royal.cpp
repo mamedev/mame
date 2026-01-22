@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-CXG Sphinx Royal family
+Newcrest CXG Sphinx Royal family
 
 NOTE: Turn the power switch (or button in supra's case) off before exiting MAME,
 otherwise NVRAM won't save properly. And only turn the power off when it's the
@@ -21,7 +21,7 @@ Royal has 2 LCD panels, Supra has 1 (D12 pin is low), Granada and others have 0.
 The LCD panel has 4 7segs (no DP) and 2 unused segments: an x in the middle, and
 a white square under the first digit.
 
-The 1992 versions by National Telecommunications System Ltd (Granada CXG-347,
+The 1992 versions by National Telecommunication System Ltd (Granada CXG-347,
 Sierra, Seville) have a lower-speed 3.58MHz XTAL, but since none of them have
 LCD panels, users won't notice the slower chess clocks.
 
@@ -361,6 +361,6 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS        INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1988, sroyal,  0,      0,      royal,   royal,   royal_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Sphinx Royal", MACHINE_SUPPORTS_SAVE )
-SYST( 1988, granada, sroyal, 0,      granada, granada, royal_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Sphinx Granada", MACHINE_SUPPORTS_SAVE )
-SYST( 1988, supra,   sroyal, 0,      supra,   supra,   royal_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Sphinx Supra", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, sroyal,  0,      0,      royal,   royal,   royal_state, empty_init, "Newcrest Technology / CXG Systems / Intelligent Chess Software", "Sphinx Royal", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, granada, sroyal, 0,      granada, granada, royal_state, empty_init, "Newcrest Technology / CXG Systems / Intelligent Chess Software", "Sphinx Granada", MACHINE_SUPPORTS_SAVE )
+SYST( 1988, supra,   sroyal, 0,      supra,   supra,   royal_state, empty_init, "Newcrest Technology / CXG Systems / Intelligent Chess Software", "Sphinx Supra", MACHINE_SUPPORTS_SAVE )
