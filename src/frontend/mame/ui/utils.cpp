@@ -2082,6 +2082,19 @@ ui_software_info::ui_software_info(
 		if (feature.name() == "alt_title")
 			alttitles.emplace_back(ins.value());
 	}
+
+	if (!p.pieces().empty())
+	{
+		infotext.append(2, '\n');
+		infotext.append(util::string_format(_("swlist-info", "%u pieces"), p.pieces().size()));
+		for (software_piece_info const &piece : p.pieces())
+		{
+			if (piece.creator().empty())
+				infotext.append(1, '\n').append(util::string_format("%s : %s", piece.index(), piece.title()));
+			else
+				infotext.append(1, '\n').append(util::string_format("%s : %s - %s", piece.index(), piece.title(), piece.creator()));
+		}
+	}
 }
 
 // info for starting empty
