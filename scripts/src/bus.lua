@@ -1175,6 +1175,8 @@ if BUSES["BBC_TUBE"] then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/cms6502.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/cms6502.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_32016.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_32016.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_6502.cpp",
