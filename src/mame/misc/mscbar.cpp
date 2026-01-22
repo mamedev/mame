@@ -251,7 +251,7 @@ void mscbar_state::mscbar_data_map(address_map &map)
 
 void mscbar_state::mscbar(machine_config &config)
 {
-	i80c51_device &maincpu(I80C51(config, "maincpu", XTAL(10'738'635))); // actual cpu is at89c51
+	i80c51_device &maincpu(I80C51(config, "maincpu", XTAL(10'738'000))); // actual cpu is at89c51
 	maincpu.set_addrmap(AS_PROGRAM, &mscbar_state::mscbar_program_map);
 	maincpu.set_addrmap(AS_DATA, &mscbar_state::mscbar_data_map);
 	maincpu.port_in_cb<1>().set_ioport("P1");
