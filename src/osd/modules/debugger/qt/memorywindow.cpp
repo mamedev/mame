@@ -489,16 +489,17 @@ void DebuggerMemView::addItemsToContextMenu(QMenu *menu)
 	{
 		debug_view_memory &memView = *view<debug_view_memory>();
 		debug_view_memory_source const &source = downcast<debug_view_memory_source const &>(*memView.source());
-		address_space *const addressSpace = source.space();
-		if (addressSpace)
+		auto [mintf, spacenum] = source.space();
+		if (mintf)
 		{
+			const address_space_config *config = mintf->logical_space_config(spacenum);
 			// get the last known PC to write to this memory location
 			debug_view_xy const pos = memView.cursor_position();
-			offs_t const address = addressSpace->byte_to_address(memView.addressAtCursorPosition(pos));
-			offs_t a = address & addressSpace->logaddrmask();
+			offs_t const address = config->byte2addr(memView.addressAtCursorPosition(pos));
+			offs_t a = address & config->logaddrmask();
 			bool good = false;
 			address_space *tspace;
-			if (!addressSpace->device().memory().translate(addressSpace->spacenum(), device_memory_interface::TR_READ, a, tspace))
+			if (!mintf->translate(spacenum, device_memory_interface::TR_READ, a, tspace))
 			{
 				m_lastPc = "Bad address";
 			}

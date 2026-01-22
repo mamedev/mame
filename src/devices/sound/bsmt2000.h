@@ -13,7 +13,7 @@
 
 #pragma once
 
-#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms320c1x/tms320c1x.h"
 #include "dirom.h"
 
 
@@ -77,7 +77,7 @@ private:
 
 	// internal state
 	sound_stream *              m_stream;
-	required_device<tms32015_device> m_cpu;
+	required_device<tms320c15_device> m_cpu;
 	uint16_t                    m_register_select;
 	uint16_t                    m_write_data;
 	uint16_t                    m_rom_address;

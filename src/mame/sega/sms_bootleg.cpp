@@ -520,8 +520,19 @@ ROM_START( smssgamea )
 //  ROM_FILL(            0x780000, 0x80000, 0xff) // ROM1 position not populated
 ROM_END
 
+ROM_START( atgsms )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x400000, "game_data", ROMREGION_ERASEFF )
+	ROM_LOAD( "atgames_sms.u5",   0x000000, 0x400000, CRC(bf23cd7d) SHA1(185b8af5afc14615733475e927555e3f6bd28770) )
+ROM_END
+
 } // Anonymous namespace
 
 
 GAME( 199?, smssgame,  0,           sms_supergame, sms_supergame, smsbootleg_state, init_sms_supergame, ROT0, "Sono Corp Japan", "Super Game (Sega Master System Multi-game bootleg, 01 Final Bubble Bobble)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1990, smssgamea, smssgame,    sms_supergame, sms_supergame, smsbootleg_a_state, init_sms_supergame, ROT0, "Seo Jin (TV-Tuning license)", "Super Game (Sega Master System Multi-game bootleg, 01 Tri Formation)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // for German market?
+
+// should probably go in its own driver
+// this was dumped from a silver / purple unit with a 'time' logo on it, software seems to be generic AtGames though
+GAME( 200?, atgsms,    0,           sms_supergame, sms_supergame, smsbootleg_state, empty_init, ROT0, "AtGames / time", "20 SEGA Master System & Game Gear Classics - Plug & Play on TV", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

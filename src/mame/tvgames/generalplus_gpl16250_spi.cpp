@@ -22,17 +22,14 @@ public:
 	{
 	}
 
-	void generalplus_gpspispi(machine_config &config);
+	void generalplus_gpspispi(machine_config &config) ATTR_COLD;
 
-	void init_spi();
+	void init_spi() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-private:
 };
-
 
 
 class generalplus_gpspispi_bkrankp_game_state : public generalplus_gpspispi_game_state
@@ -44,18 +41,18 @@ public:
 	{
 	}
 
-	void generalplus_gpspispi_bkrankp(machine_config &config);
+	void generalplus_gpspispi_bkrankp(machine_config &config) ATTR_COLD;
 
 protected:
-	required_device<generic_slot_device> m_cart;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-private:
+	required_device<generic_slot_device> m_cart;
 };
 
 
 void generalplus_gpspispi_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
 }
 
 void generalplus_gpspispi_game_state::machine_reset()
@@ -63,7 +60,6 @@ void generalplus_gpspispi_game_state::machine_reset()
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 
 	//m_maincpu->set_paldisplaybank_high_hack(0);
-	m_maincpu->set_alt_tile_addressing_hack(1);
 }
 
 static INPUT_PORTS_START( gcm394 )
@@ -75,6 +71,8 @@ INPUT_PORTS_END
 
 void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &config)
 {
+	set_addrmap(0, &generalplus_gpspispi_game_state::cs_map_base);
+
 	GP_SPISPI(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpspispi_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpspispi_game_state::portb_r));
@@ -87,8 +85,6 @@ void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &confi
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (SPI bootstrap)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
-
-	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpspispi_game_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -226,6 +222,15 @@ ROM_START( lxcympp )
 	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(570b669c) SHA1(e7fcae662c8c8cae18cf1151d6caefacfe1e9fda) )
 ROM_END
 
+ROM_START( lxcymls )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x2000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(76c89fe5) SHA1(99668cbce2ace6ec972ee4e72fec8b93862a0ef4) )
+ROM_END
+
+
 void generalplus_gpspispi_game_state::init_spi()
 {
 	int vectorbase = 0x2fe0;
@@ -280,10 +285,11 @@ CONS(2015, prailpls, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gps
 // this is a half-head shaped unit, SHP13017-R1 main PCB  -  アンパンマン レッツゴー！育脳ドライブ きみものれるよ！アンパンマンごう「それいけ！アンパンマン」
 CONS(2014, anpanbd,  0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Let's Go! Ikunou Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-//  それいけ！アンパンマン」みんなで！育脳マット
+// それいけ！アンパンマン」みんなで！育脳マット
 CONS(2015, anpanm15, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Minnade! Ikunou Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2013, anpaneng, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Anpanman: Touch de English (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// ANPANMAN タッチであそぼ！はじめてEnglish (the furigana for "Enlish" says "えいご")
+CONS(2013, anpaneng, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Anpanman: Touch de Asobo! Hajimete English (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
@@ -308,3 +314,4 @@ CONS(202?, bk139in1,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_g
 CONS(2021, lxcyrace,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Racing (JL3150)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2021, lxcymsm,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Superman (JL3180SU)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2021, lxcympp,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Paw Patrol (JL3180PA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, lxcymls,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Lilo & Stitch (JL3180D_01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)

@@ -19,8 +19,12 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 	, m_irq_callback(*this)
 	, m_dma_end(*this)
 	, m_own(*this)
-	, m_dma_read(*this, 0)
-	, m_dma_write(*this)
+	, m_dma8_read(*this, 0)
+	, m_dma8_write(*this)
+	, m_dma16_read(*this, 0)
+	, m_dma16_write(*this)
+	, m_dma32_read(*this, 0)
+	, m_dma32_write(*this)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 	for (int i = 0; i < 4; i++)
@@ -66,6 +70,8 @@ void hd63450_device::device_start()
 	save_item(STRUCT_MEMBER(m_reg, bfc));
 	save_item(STRUCT_MEMBER(m_reg, gcr));
 
+	save_item(NAME(m_packed_value));
+	save_item(NAME(m_packed_index));
 	save_item(NAME(m_transfer_size));
 	save_item(NAME(m_halted));
 	save_item(NAME(m_drq_state));
@@ -75,7 +81,6 @@ void hd63450_device::device_start()
 void hd63450_device::device_reset()
 {
 	// Device is reset by pulling /BEC0-/BEC2 all low for 10 clocks
-
 	for (int x = 0; x < 4; x++)
 	{
 		m_reg[x].niv = 0x0f;
@@ -91,6 +96,8 @@ void hd63450_device::device_reset()
 
 		m_timer[x]->adjust(attotime::never);
 		m_halted[x] = 0;
+		m_packed_value[x] = 0;
+		m_packed_index[x] = 0;
 	}
 
 	m_irq_channel = -1;
@@ -308,6 +315,8 @@ void hd63450_device::dma_transfer_start(int channel)
 		m_timer[channel]->adjust(attotime::never, channel, attotime::never);
 
 	m_transfer_size[channel] = m_reg[channel].mtc;
+	m_packed_index[channel] = 0;
+	m_packed_value[channel] = 0;
 
 	LOG("DMA: Transfer begins: size=0x%08x\n",m_transfer_size[channel]);
 }
@@ -367,81 +376,106 @@ void hd63450_device::single_transfer(int x)
 
 	if (m_reg[x].ocr & 0x80)  // direction: 1 = device -> memory
 	{
-		if (!m_dma_read[x].isunset())
+		switch(m_reg[x].ocr & 0x30)  // operation size
 		{
-			data = m_dma_read[x](m_reg[x].mar);
-			if (data == -1)
-				return;  // not ready to receive data
+		case 0x00:  // 8 bit
+			if (!m_dma8_read[x].isunset())
+			{
+				data = m_dma8_read[x](m_reg[x].mar);
+				if (data == -1)
+					return;  // not ready to receive data
+			}
+			else
+				data = space.read_byte(m_reg[x].dar);  // read from device address
 			space.write_byte(m_reg[x].mar,data);
 			datasize = 1;
-		}
-		else
-		{
-			switch(m_reg[x].ocr & 0x30)  // operation size
-			{
-			case 0x00:  // 8 bit
-				data = space.read_byte(m_reg[x].dar);  // read from device address
-				space.write_byte(m_reg[x].mar, data);  // write to memory address
-				datasize = 1;
-				break;
-			case 0x10:  // 16 bit
+			break;
+
+		case 0x10:  // 16 bit
+			if (!m_dma16_read[x].isunset())
+				data = m_dma16_read[x](m_reg[x].mar);
+			else
 				data = space.read_word(m_reg[x].dar);  // read from device address
-				space.write_word(m_reg[x].mar, data);  // write to memory address
-				datasize = 2;
-				break;
-			case 0x20:  // 32 bit
-				data = space.read_word(m_reg[x].dar) << 16;  // read from device address
-				data |= space.read_word(m_reg[x].dar+2);
-				space.write_word(m_reg[x].mar, (data & 0xffff0000) >> 16);  // write to memory address
-				space.write_word(m_reg[x].mar+2, data & 0x0000ffff);
-				datasize = 4;
-				break;
-			case 0x30:  // 8 bit packed (?)
-				data = space.read_byte(m_reg[x].dar);  // read from device address
-				space.write_byte(m_reg[x].mar, data);  // write to memory address
-				datasize = 1;
-				break;
+			space.write_word(m_reg[x].mar,data);
+			datasize = 2;
+			break;
+
+		case 0x20:  // 32 bit
+			if (!m_dma32_read[x].isunset())
+				data = m_dma32_read[x](m_reg[x].mar);
+			else
+				data = space.read_dword(m_reg[x].dar);  // read from device address
+			space.write_word(m_reg[x].mar,data);
+			datasize = 4;
+			break;
+
+		case 0x30:  // 8 bit packed
+			if (!m_dma8_read[x].isunset())
+			{
+				data = m_dma8_read[x](m_reg[x].mar);
+				if (data == -1)
+					return;  // not ready to receive data
 			}
+			else
+				data = space.read_byte(m_reg[x].dar);  // read from device address
+			datasize = 0;
+			m_packed_value[x] |= data << (24 - 8*m_packed_index[x]);
+			m_packed_index[x] ++;
+			if (m_packed_index[x] != 4)
+				break;
+			space.write_dword(4*m_reg[x].mar,m_packed_value[x]);
+			if(m_reg[x].mtc >= 0x3fc)
+				logerror("%06x: %08x\n", 4*m_reg[x].mar,m_packed_value[x]);
+			m_packed_index[x] = 0;
+			m_packed_value[x] = 0;
 		}
-//              LOG("DMA#%i: byte transfer %08lx -> %08lx  (byte = %02x)\n",x,dmac.reg[x].dar,dmac.reg[x].mar,data);
 	}
 	else  // memory -> device
 	{
-		if (!m_dma_write[x].isunset())
+		switch(m_reg[x].ocr & 0x30)  // operation size
 		{
-			data = space.read_byte(m_reg[x].mar);
-			m_dma_write[x]((offs_t)m_reg[x].mar,data);
+		case 0x00:  // 8 bit
+			data = space.read_byte(m_reg[x].mar);  // read from memory address
+			if (!m_dma8_write[x].isunset())
+				m_dma8_write[x](m_reg[x].mar, data);
+			else
+				space.write_byte(m_reg[x].dar, data);  // write to device address
 			datasize = 1;
-		}
-		else
-		{
-			switch(m_reg[x].ocr & 0x30)  // operation size
-			{
-			case 0x00:  // 8 bit
-				data = space.read_byte(m_reg[x].mar);  // read from memory address
-				space.write_byte(m_reg[x].dar, data);  // write to device address
-				datasize = 1;
-				break;
-			case 0x10:  // 16 bit
-				data = space.read_word(m_reg[x].mar);  // read from memory address
+			break;
+
+		case 0x10:  // 16 bit
+			data = space.read_word(m_reg[x].mar);  // read from memory address
+			if (!m_dma16_write[x].isunset())
+				m_dma16_write[x](m_reg[x].mar, data);
+			else
 				space.write_word(m_reg[x].dar, data);  // write to device address
-				datasize = 2;
-				break;
-			case 0x20:  // 32 bit
-				data = space.read_word(m_reg[x].mar) << 16;  // read from memory address
-				data |= space.read_word(m_reg[x].mar+2);  // read from memory address
-				space.write_word(m_reg[x].dar, (data & 0xffff0000) >> 16);  // write to device address
-				space.write_word(m_reg[x].dar+2, data & 0x0000ffff);  // write to device address
-				datasize = 4;
-				break;
-			case 0x30:  // 8 bit packed (?)
-				data = space.read_byte(m_reg[x].mar);  // read from memory address
+			datasize = 2;
+			break;
+
+		case 0x20:  // 32 bit
+			data = space.read_dword(m_reg[x].mar);  // read from memory address
+			if (!m_dma32_write[x].isunset())
+				m_dma32_write[x](m_reg[x].mar, data);
+			else
+				space.write_dword(m_reg[x].dar, data);  // write to device address
+			datasize = 4;
+			break;
+		case 0x30:  // 8 bit packed
+			if (m_packed_index[x] == 0)
+				m_packed_value[x] = space.read_dword(4*m_reg[x].mar);  // read from memory address
+
+			data = (m_packed_value[x] >> (24 - 8*m_packed_index[x])) & 0xff;
+			if (!m_dma8_write[x].isunset())
+				m_dma8_write[x](m_reg[x].mar, data);
+			else
 				space.write_byte(m_reg[x].dar, data);  // write to device address
-				datasize = 1;
-				break;
-			}
+
+			datasize = 0;
+			m_packed_index[x] ++;
+			if (m_packed_index[x] == 4)
+				m_packed_index[x] = 0;
+			break;
 		}
-//              LOG("DMA#%i: byte transfer %08lx -> %08lx\n",x,m_reg[x].mar,m_reg[x].dar);
 	}
 
 	m_own(1);
@@ -454,21 +488,31 @@ void hd63450_device::single_transfer(int x)
 		set_error(x, 9);  //assume error in mar, TODO: other errors
 		return;
 	}
-
 	// decrease memory transfer counter
 	if (m_reg[x].mtc > 0)
-		m_reg[x].mtc--;
+	{
+		// When packed, only increment when the index looped to 0,
+		// every four bytes
+		if (datasize || m_packed_index[x] == 0)
+			m_reg[x].mtc--;
+	}
 
 	// handle change of memory and device addresses
+	// in packed mode, device moves by 1
 	if ((m_reg[x].scr & 0x03) == 0x01)
-		m_reg[x].dar+=datasize;
+		m_reg[x].dar += datasize ? datasize : 1;
 	else if ((m_reg[x].scr & 0x03) == 0x02)
-		m_reg[x].dar-=datasize;
+		m_reg[x].dar -= datasize ? datasize : 1;
 
-	if ((m_reg[x].scr & 0x0c) == 0x04)
-		m_reg[x].mar+=datasize;
-	else if ((m_reg[x].scr & 0x0c) == 0x08)
-		m_reg[x].mar-=datasize;
+	// in packed mode, memory moves by 1 (which means 32 bits...), but
+	// only when the index looped
+	if (datasize || m_packed_index[x] == 0)
+	{
+		if ((m_reg[x].scr & 0x0c) == 0x04)
+			m_reg[x].mar += datasize ? datasize : 1;
+		else if ((m_reg[x].scr & 0x0c) == 0x08)
+			m_reg[x].mar -= datasize ? datasize : 1;
+	}
 
 	if (m_reg[x].mtc <= 0)
 	{
@@ -541,7 +585,10 @@ void hd63450_device::drq_w(int channel, int state)
 		{
 			// in cycle steal mode DRQ is supposed to be edge triggered
 			single_transfer(channel);
-			m_timer[channel]->adjust(m_our_clock[channel], channel, m_our_clock[channel]);
+			if ((m_reg[channel].dcr & 0xc0) == 0x00)
+				m_timer[channel]->adjust(m_burst_clock[channel], channel, m_burst_clock[channel]);
+			else
+				m_timer[channel]->adjust(m_our_clock[channel], channel, m_our_clock[channel]);
 		}
 		else if (!state)
 			m_timer[channel]->adjust(attotime::never);

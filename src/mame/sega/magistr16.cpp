@@ -130,10 +130,10 @@ void magistr16_state::md_68k_map(address_map &map)
 	map(0xa11100, 0xa11101).lrw16(
 		NAME([this] (offs_t offset, u16 mem_mask) {
 			address_space &space = m_md68kcpu->space(AS_PROGRAM);
-			// TODO: enough for all edge cases but timekill
+			// TODO: as per teradrive
 			u16 open_bus = space.read_word(m_md68kcpu->pc() - 2) & 0xfefe;
 			// printf("%06x -> %04x\n", m_md68kcpu->pc() - 2, open_bus);
-			u16 res = (!m_z80_busrq || m_z80_reset) ^ 1;
+			u16 res = (m_mdz80cpu->busack_r() && !m_z80_reset) ^ 1;
 			return (res << 8) | (res) | open_bus;
 		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
@@ -438,6 +438,14 @@ void magistr16_state::magistr16(machine_config &config)
 	}
 
 	MEGADRIVE_CART_SLOT(config, m_md_cart, md_master_xtal / 7, megadrive_cart_options, nullptr).set_must_be_loaded(true);
+	m_md_cart->vres_cb().set([this](int state) {
+		if (state)
+		{
+			m_md68kcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+			for (auto &port : m_md_ioports)
+				port->reset();
+		}
+	});
 
 	SPEAKER(config, "md_speaker", 2).front();
 

@@ -18,9 +18,10 @@
 
 #include "bus/ata/ataintf.h"
 #include "cpu/t11/t11.h"
-#include "formats/bk0010_dsk.h"
 #include "imagedev/harddriv.h"
 #include "machine/1801vp128.h"
+
+#include "formats/bk0010_dsk.h"
 
 
 namespace {
@@ -46,6 +47,8 @@ class bk_altpro_device : public device_t,
 					public device_qbus_card_interface
 {
 public:
+	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
+
 	// construction/destruction
 	bk_altpro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -53,7 +56,7 @@ public:
 	void ata_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -107,14 +110,16 @@ const tiny_rom_entry *bk_altpro_device::device_rom_region() const
 void bk_altpro_device::device_add_mconfig(machine_config &config)
 {
 	K1801VP128(config, m_fdc, XTAL(4'000'000));
-	m_fdc->ds_in_callback().set([] (uint16_t data) {
-		switch (data & 15)
-		{
-			case 1: return 0;
-			case 2: return 1;
-			default: return -1;
-		}
-	});
+	m_fdc->ds_in_callback().set(
+			[] (uint16_t data)
+			{
+				switch (data & 15)
+				{
+					case 1: return 0;
+					case 2: return 1;
+					default: return -1;
+				}
+			});
 	FLOPPY_CONNECTOR(config, "fdc:0", bk_floppies, "525qd", bk_altpro_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", bk_floppies, "525qd", bk_altpro_device::floppy_formats);
 
@@ -130,15 +135,13 @@ void bk_altpro_device::device_start()
 {
 	m_ram = make_unique_clear<uint8_t[]>(4096);
 	m_bus->install_device(0177130, 0177133,
-		emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::read)),
-		emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::write))
-	);
+			emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::read)),
+			emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::write)));
 	m_bus->program_space().install_readwrite_handler(0177740, 0177757,
-		emu::rw_delegate(*this, FUNC(bk_altpro_device::ata_r)),
-		emu::rw_delegate(*this, FUNC(bk_altpro_device::ata_w)),
-		0, 0, t11_device::UNALIGNED_WORD
-	);
-	m_bus->program_space().install_rom(0160000, 0167777, memregion(this->subtag("maincpu").c_str())->base());
+			emu::rw_delegate(*this, FUNC(bk_altpro_device::ata_r)),
+			emu::rw_delegate(*this, FUNC(bk_altpro_device::ata_w)),
+			0, 0, t11_device::UNALIGNED_WORD);
+	m_bus->program_space().install_rom(0160000, 0167777, memregion("maincpu")->base());
 	m_bus->program_space().unmap_write(0160000, 0167777);
 	m_bus->program_space().install_ram(0170000, 0176777, &m_ram[0]);
 }

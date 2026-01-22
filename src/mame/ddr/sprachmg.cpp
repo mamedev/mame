@@ -84,7 +84,7 @@ public:
 		m_speech_select(0xff),
 		m_speech_module_pcb1(nullptr),
 		m_speech_module_pcb2(nullptr)
-		{ }
+	{ }
 
 	DECLARE_INPUT_CHANGED_MEMBER(keypad_res);
 
@@ -427,5 +427,5 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                         FULLNAME                               FLAGS
-COMP( 1985, sprachmg, 0,      0,      sprachmg, sprachmg, sprachmg_state, empty_init, "Institut für Kosmosforschung", "Gerät 32620 (Sprach/Morsegenerator)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY                           FULLNAME                                 FLAGS
+COMP( 1985, sprachmg, 0,      0,      sprachmg, sprachmg, sprachmg_state, empty_init, u8"Institut für Kosmosforschung", u8"Gerät 32620 (Sprach/Morsegenerator)", MACHINE_SUPPORTS_SAVE )

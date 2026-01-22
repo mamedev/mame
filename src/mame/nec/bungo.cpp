@@ -112,7 +112,7 @@ void bungo_mini5sx_state::machine_start()
 
 static void pc9801_floppies(device_slot_interface &device)
 {
-//  device.option_add("525dd", FLOPPY_525_DD);
+//  device.option_add("525dd", TEAC_FD_55F);
 //  device.option_add("525hd", FLOPPY_525_HD);
 	device.option_add("35hd", FLOPPY_35_HD);
 }

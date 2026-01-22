@@ -10,19 +10,22 @@
 
 #pragma once
 
+#include "atarimo.h"
+#include "slapstic.h"
+
 #include "machine/6522via.h"
 #include "machine/74259.h"
 #include "machine/adc0808.h"
 #include "machine/gen_latch.h"
 #include "machine/input_merger.h"
-#include "slapstic.h"
 #include "machine/timer.h"
 #include "sound/tms5220.h"
 #include "sound/ymopm.h"
-#include "atarimo.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class atarisy1_state : public driver_device
 {
@@ -53,30 +56,34 @@ public:
 		, m_via(*this, "via")
 	{ }
 
-	void indytemp(machine_config &config);
-	void roadb110(machine_config &config);
-	void peterpak(machine_config &config);
-	void roadrunn(machine_config &config);
-	void roadb109(machine_config &config);
-	void marble(machine_config &config);
+	void indytemp(machine_config &config) ATTR_COLD;
+	void roadb110(machine_config &config) ATTR_COLD;
+	void peterpak(machine_config &config) ATTR_COLD;
+	void roadrunn(machine_config &config) ATTR_COLD;
+	void roadb109(machine_config &config) ATTR_COLD;
+	void marble(machine_config &config) ATTR_COLD;
+	void reliefs1(machine_config &config) ATTR_COLD;
 
-	void init_roadblst();
-	void init_peterpak();
-	void init_marble();
-	void init_roadrunn();
-	void init_indytemp();
+	void init_roadblst() ATTR_COLD;
+	void init_peterpak() ATTR_COLD;
+	void init_marble() ATTR_COLD;
+	void init_roadrunn() ATTR_COLD;
+	void init_indytemp() ATTR_COLD;
+	void init_reliefs1() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+	static const atari_motion_objects_config s_mob_config;
+
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<generic_latch_8_device> m_mainlatch;
-	required_device<atari_slapstic_device> m_slapstic;
-	required_memory_bank m_slapstic_bank;
+	optional_device<atari_slapstic_device> m_slapstic;
+	optional_memory_bank m_slapstic_bank;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -121,7 +128,7 @@ protected:
 	uint8_t           m_cur[2][2]{};
 
 	void video_int_ack_w(uint8_t data = 0);
-	template<int Input> uint8_t digital_joystick_r();
+	template <int Input> uint8_t digital_joystick_r();
 	uint8_t adc_r(offs_t offset);
 	void adc_w(offs_t offset, uint8_t data);
 	uint16_t trakball_r(offs_t offset);
@@ -146,16 +153,16 @@ protected:
 	void yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void priority_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
-	static const atari_motion_objects_config s_mob_config;
-	void add_adc(machine_config &config);
-	void add_speech(machine_config &config);
-	void atarisy1(machine_config &config);
+	void add_adc(machine_config &config) ATTR_COLD;
+	void add_speech(machine_config &config) ATTR_COLD;
+	void atarisy1(machine_config &config) ATTR_COLD;
 
+	void main_map_noslapstic(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_ext_map(address_map &map) ATTR_COLD;
 
-	void init_slapstic();
+	void init_slapstic() ATTR_COLD;
 };
 
 class atarisy1r_state : public atarisy1_state
@@ -163,6 +170,7 @@ class atarisy1r_state : public atarisy1_state
 public:
 	using atarisy1_state::atarisy1_state;
 
+protected:
 	virtual void update_timers(int scanline) override;
 };
 

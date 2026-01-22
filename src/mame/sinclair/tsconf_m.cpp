@@ -234,9 +234,9 @@ void tsconf_state::tsconf_draw_txt(bitmap_rgb32 &bitmap, const rectangle &clipre
 		u32 *pix = &(bitmap.pix(vpos, hpos));
 		while (hpos <= cliprect.right())
 		{
-			u8 font_color = *(text_location + 128) & 0x0f;
-			u8 bg_color = (*(text_location + 128) & 0xf0) >> 4;
-			u8 char_x = *(font_location + (*text_location * 8) + (y_offset % 8));
+			u8 font_color = text_location[128] & 0x0f;
+			u8 bg_color = (text_location[128] & 0xf0) >> 4;
+			u8 char_x = font_location[(text_location[0] * 8) + (y_offset % 8)];
 			for (u8 b = 0x80 >> (x & 0x07); b != 0 && hpos <= cliprect.right(); b >>= 1, x++, hpos++)
 				*pix++ = m_palette->pen_color(pal_offset | ((char_x & b) ? font_color : bg_color));
 			text_location++;

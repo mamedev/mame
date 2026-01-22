@@ -66,11 +66,11 @@ authors:hap
 
 	<element name="text_visitor"><text string="VISITORS"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_hometeam"><text string="HOME TEAM"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_balls"><text string="BALLS"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_strikes"><text string="STR"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_balls"><text string=" BALLS "><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_strikes"><text string=" STR "><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_atbat"><text string=" AT BAT "><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_outs"><text string="OUTS"><color red="0.8" green="0.8" blue="0.8" /></text></element>
-	<element name="text_innings"><text string="ING"><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_outs"><text string=" OUTS "><color red="0.8" green="0.8" blue="0.8" /></text></element>
+	<element name="text_innings"><text string=" ING "><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_enemy"><text string="ENEMY"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 	<element name="text_spaceship"><text string="SPACE SHIP"><color red="0.8" green="0.8" blue="0.8" /></text></element>
 

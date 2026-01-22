@@ -10918,6 +10918,22 @@ ROM_START( tdpgal )
 	ROM_LOAD( "bprom.bin",       0x0000, 0x0020, CRC(2b4cf53f) SHA1(8d7eb0453173b9821eea32419b67559bfb4578d0) )
 ROM_END
 
+ROM_START( tdpgala )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "g8", 0x0000, 0x0800, CRC(7be819fe) SHA1(ab5a332914546692f9976e243daf3040f0d9952e) ) // matches tdpgal
+	ROM_LOAD( "f8", 0x0800, 0x0800, CRC(d6641a10) SHA1(d576eda7c47b3e0eba9fadbff9266b095daf4be3) )
+	ROM_LOAD( "e8", 0x1000, 0x0800, CRC(e6c85dca) SHA1(159cd711f012d29ed80007eeb9ab18fd8d943069) )
+	ROM_LOAD( "d8", 0x1800, 0x0800, CRC(a7dfcfe7) SHA1(75fc517bf4dd36f67c11fb5bc9ed7d48ed626ea5) )
+	ROM_LOAD( "c8", 0x2000, 0x1000, CRC(01484c16) SHA1(ea55578c330a40b0881f7b5eeeffb24b7bbb9741) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "j1", 0x0000, 0x0800, CRC(39eec13f) SHA1(5cd8045eaded0008a5aaec555c3841fd0f29b2a8) )
+	ROM_LOAD( "k1", 0x0800, 0x0800, CRC(3113bcfd) SHA1(e2792e5fe7d7f27bb329e3104dee3ca29d72ef48) ) // matches tdpgal
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s472.gg", 0x0000, 0x0020, CRC(2b4cf53f) SHA1(8d7eb0453173b9821eea32419b67559bfb4578d0) ) // matches tdpgal
+ROM_END
+
 ROM_START( kamakazi3 ) // Hack of Video Games (UK) Ltd. version???? flyer spells it Kamakaze III, also no year or (c)
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "f_r_a.bin",    0x0000, 0x0800, CRC(e8f3aa67) SHA1(a0e9576784dbe602dd9780e667f01f31defd7c00) )
@@ -16838,7 +16854,8 @@ GAME( 1981, redufob,     redufo,   galaxian,   redufob,    galaxian_state, init_
 GAME( 1981, redufob2,    redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 2)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redufob3,    redufo,   galaxian,   redufob3,   galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 3)",             MACHINE_SUPPORTS_SAVE )
 GAME( 19??, exodus,      redufo,   galaxian,   redufo,     galaxian_state, init_nolock,     ROT90,  "bootleg? (Subelectro)",           "Exodus (bootleg?)",                                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tdpgal,      0,        galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker",                                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tdpgal,      0,        galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker (Design Labs / Thomas Automatics)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tdpgala,     tdpgal,   galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Video Village",                   "Triple Draw Poker (Video Village)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1979, kamakazi3,   galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "hack",                            "Kamakazi III (hack of 'Super Galaxians')",                            MACHINE_SUPPORTS_SAVE ) // Hack of a hack (superg)
 GAME( 1979, spacian2,    galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "Namco / Taito",                   "T.T Spacian Part-2",                                                  MACHINE_SUPPORTS_SAVE ) // endorsed by Namco, or bootleg?
 

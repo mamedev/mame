@@ -122,8 +122,6 @@ public:
 	virtual int read_line_adc083x_sars() override;
 	virtual void write_line_d5(int state) override;
 
-	double punchmania_inputs_callback(uint8_t input);
-
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 

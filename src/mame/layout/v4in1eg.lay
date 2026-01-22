@@ -29,17 +29,17 @@ authors:hap
 		<bounds left="8" right="41.5" top="-1" bottom="11" />
 
 		<repeat count="4">
-			<param name="x" start="11.25" increment="8.333" />
+			<param name="x" start="12.25" increment="8.333" />
 			<param name="i" start="12" increment="1" />
 
-			<element name="~i~.a" ref="led"><bounds x="~x~" y="0" width="2" height="2" /></element>
+			<element name="~i~.a" ref="led"><bounds xc="~x~" y="0" width="2" height="2" /></element>
 		</repeat>
 
 		<repeat count="4">
-			<param name="x" start="6.25" increment="8.333" />
+			<param name="x" start="12.25" increment="8.333" />
 			<param name="i" start="1" increment="1" />
 
-			<element ref="text_l~i~"><bounds x="~x~" y="2" width="12" height="1.75" /></element>
+			<element ref="text_l~i~"><bounds xc="~x~" y="2" width="7" height="1.75" /></element>
 		</repeat>
 
 		<repeat count="12">

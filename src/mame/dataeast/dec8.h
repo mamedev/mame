@@ -226,6 +226,7 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(audiocpu_nmi_clear);
 	TIMER_CALLBACK_MEMBER(mcu_irq_clear);
+	TIMER_CALLBACK_MEMBER(nmigate_set) { m_nmigate->in_w<0>(param); }
 
 	TILE_GET_INFO_MEMBER(get_gondo_fix_tile_info);
 	TILE_GET_INFO_MEMBER(get_gondo_tile_info);
@@ -246,9 +247,11 @@ private:
 	void ghostb_map(address_map &map) ATTR_COLD;
 	void garyoret_map(address_map &map) ATTR_COLD;
 
+	u8 m_bank_data = 0xff;
 	bool m_secclr = false;
 	bool m_buffer_strobe = false;
 
+	emu_timer *m_nmi_timer = nullptr;
 	emu_timer *m_6502_timer = nullptr;
 	emu_timer *m_i8751_timer = nullptr;
 };

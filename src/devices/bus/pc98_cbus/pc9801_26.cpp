@@ -2,14 +2,19 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-NEC PC-9801-26 sound card
+NEC PC-9801-26(K) sound card
 
 Legacy sound card for PC-98xx family, composed by a single YM2203
+
+NOTES:
+- The only known difference between -26 and -26K is that former draws its clock from C-Bus root.
+  This makes the card to misbehave with 286+ machines.
 
 TODO:
 - DE-9 output writes (cfr. page 419 of PC-9801 Bible, needs software testing the functionality)
 - understand if dips can be read by SW;
 - configurable irq level needs a binding flush in C-bus handling;
+- Eventually emulate -26 clock style, currently hardwired as -26K;
 
 **************************************************************************************************/
 
@@ -25,14 +30,20 @@ TODO:
 //**************************************************************************
 
 // device type definition
-DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26/K")
+DEFINE_DEVICE_TYPE(PC9801_26, pc9801_26_device, "pc9801_26", "NEC PC-9801-26/K sound card")
 
-pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PC9801_26, tag, owner, clock)
-	, m_bus(*this, DEVICE_SELF_OWNER)
+pc9801_26_device::pc9801_26_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, type, tag, owner, clock)
+	, device_pc98_cbus_slot_interface(mconfig, *this)
 	, m_opn(*this, "opn")
 	, m_joy(*this, "joy_p%u", 1U)
+	, m_bios(*this, "bios")
 	, m_irq_jp(*this, "JP6A1_JP6A3")
+{
+}
+
+pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc9801_26_device(mconfig, PC9801_26, tag, owner, clock)
 {
 }
 
@@ -41,13 +52,8 @@ void pc9801_26_device::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 	YM2203(config, m_opn, 15.9744_MHz_XTAL / 4); // divider not verified
 	m_opn->irq_handler().set([this] (int state) {
-		switch(m_int_level & 3)
-		{
-			case 0: m_bus->int_w<0>(state); break;
-			case 1: m_bus->int_w<4>(state); break;
-			case 2: m_bus->int_w<6>(state); break;
-			case 3: m_bus->int_w<5>(state); break;
-		}
+		const int int_levels[4] = { 0, 4, 6, 5 };
+		m_bus->int_w(int_levels[m_int_level & 3], state);
 	});
 	/*
 	 * xx-- ---- IRSTx interrupt status 0/1
@@ -92,7 +98,7 @@ void pc9801_26_device::device_add_mconfig(machine_config &config)
 // to load a different bios for slots:
 // -cbus0 pc9801_26,bios=N
 ROM_START( pc9801_26 )
-	ROM_REGION( 0x4000, "sound_bios", ROMREGION_ERASEFF )
+	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
 	// PC9801_26k is a minor change that applies to 286+ CPUs
 	ROM_SYSTEM_BIOS( 0,  "26k",     "nec26k" )
 	ROMX_LOAD( "26k_wyka01_00.bin", 0x0000, 0x2000, CRC(f071bf69) SHA1(f3cdef94e9fee116cf4a9b54881e77c6cd903815), ROM_SKIP(1) | ROM_BIOS(0) )
@@ -153,44 +159,40 @@ void pc9801_26_device::device_start()
 
 void pc9801_26_device::device_reset()
 {
-	// install the ROM to the physical program space
-	u8 rom_setting = ioport("JP6A2")->read() & 7;
-	static const u32 rom_addresses[8] = { 0xc8000, 0xcc000, 0xd0000, 0xd4000, 0, 0, 0, 0 };
-	u32 current_rom = rom_addresses[rom_setting & 7];
-	memory_region *rom_region = memregion(this->subtag("sound_bios").c_str());
-	const u32 rom_size = rom_region->bytes() - 1;
-
-	// TODO: make most of this a C-Bus root responsibility
-	if (m_rom_base == 0)
-		m_rom_base = current_rom;
-
-	if (m_rom_base != 0)
-	{
-		logerror("%s: uninstall ROM at %08x-%08x\n", machine().describe_context(), m_rom_base, m_rom_base + rom_size);
-		m_bus->program_space().unmap_readwrite(m_rom_base, m_rom_base + rom_size);
-	}
-	if (current_rom != 0)
-	{
-		logerror("%s: install ROM at %08x-%08x\n", machine().describe_context(), current_rom, current_rom + rom_size);
-		m_bus->program_space().unmap_readwrite(current_rom, current_rom + rom_size);
-		m_bus->program_space().install_rom(
-			current_rom,
-			current_rom + rom_size,
-			rom_region->base()
-		);
-	}
-	m_rom_base = current_rom;
-
-	// install I/O ports
-	m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_26_device::io_map);
-
 	// read INT line
 	m_int_level = m_irq_jp->read() & 3;
 }
 
-void pc9801_26_device::device_validity_check(validity_checker &valid) const
+void pc9801_26_device::remap(int space_id, offs_t start, offs_t end)
 {
+	if (space_id == AS_PROGRAM)
+	{
+		// TODO: move base in device_reset
+		const u8 rom_setting = ioport("JP6A2")->read() & 7;
+		static const u32 rom_addresses[8] = { 0xc8000, 0xcc000, 0xd0000, 0xd4000, 0, 0, 0, 0 };
+		const u32 start_address = rom_addresses[rom_setting & 7];
+
+		if (start_address != 0)
+		{
+			const u32 end_address = start_address + 0x3fff;
+			logerror("map ROM at 0x%08x-0x%08x\n", start_address, end_address);
+			m_bus->space(AS_PROGRAM).install_rom(
+				start_address,
+				end_address,
+				m_bios->base()
+			);
+		}
+		else
+		{
+			logerror("ROM is disconnected\n");
+		}
+	}
+	else if (space_id == AS_IO)
+	{
+		m_bus->install_device(0x0000, 0x3fff, *this, &pc9801_26_device::io_map);
+	}
 }
+
 
 void pc9801_26_device::io_map(address_map &map)
 {

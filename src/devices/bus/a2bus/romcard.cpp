@@ -5,13 +5,18 @@
     romcard.cpp
 
     Implemention of the Apple II ROM card.  This is like a language
-    card, but with 12K instead of 16K, and ROM instead of RAM.
+    card, but with 12K instead of 16K, and ROM instead of RAM.  While
+    software normally expects to find it in slot 0, it may also be
+    installed in any other expansion bus slot.
 
     Apple at various points called it both "ROM Card" and
     "Firmware Card".
 
-    Some later DOS revisions remove support for the Applesoft BASIC
-    firmware card.
+    Some later revisions of DOS 3.3 remove support for the Applesoft
+    BASIC firmware card in slot 0 of an original Apple II, though
+    they will load Applesoft onto a language card if one is present
+    there.  Compatible revisions print "APPLE II PLUS OR ROMCARD"
+    when successfully booted on any non-Integer BASIC system.
 
 *********************************************************************/
 
@@ -30,7 +35,7 @@ public:
 	a2bus_romcard_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void bus_reset() override;
+	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// overrides of standard a2bus slot functions
@@ -41,6 +46,7 @@ public:
 	virtual uint16_t inh_start() override { return 0xd000; }
 	virtual uint16_t inh_end() override { return 0xffff; }
 	virtual int inh_type() override;
+	virtual void reset_from_bus() override;
 
 protected:
 	u8 *m_rom;
@@ -123,7 +129,7 @@ ROM_END
 
 static INPUT_PORTS_START( romcard )
 	PORT_START("CONFIG")
-	PORT_CONFNAME(0x01, 0x00, "Enable at boot")
+	PORT_CONFNAME(0x01, 0x00, "Enable at reset")
 	PORT_CONFSETTING(0x00, DEF_STR(No))
 	PORT_CONFSETTING(0x01, DEF_STR(Yes))
 INPUT_PORTS_END
@@ -193,7 +199,12 @@ void a2bus_romcardint_device::device_start()
 	a2bus_romcard_device::device_start();
 }
 
-void a2bus_romcard_device::bus_reset()
+void a2bus_romcard_device::device_reset()
+{
+	reset_from_bus();
+}
+
+void a2bus_romcard_device::reset_from_bus()
 {
 	if ((m_config->read() == 1) && (m_rom != nullptr))
 	{
