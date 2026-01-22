@@ -107,8 +107,15 @@ private:
 		std::vector<u16> buffer;
 	} m_cel;
 
+	struct {
+		u16 fb_pitch[2]; // regctl0 helper
+		u16 xclip, yclip; // regctl1 helper
+	} m_regis;
+
 	u32 mctl_r();
 	void mctl_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 regctl0_r();
+	void regctl0_w(offs_t offset, u32 data, u32 mem_mask);
 
 	void cel_start_w(offs_t offset, u32 data, u32 mem_mask);
 	void cel_stop_w(offs_t offset, u32 data, u32 mem_mask);
@@ -120,6 +127,17 @@ private:
 	u16 get_uncompressed_16bpp_lrform1(int x, int y, u16 woffset);
 	u16 get_compressed_16bpp(int x, int y, u16 woffset);
 
+	typedef u16 (madam_device::*get_woffset_func)(u32 ptr);
+	static const get_woffset_func get_woffset_table[2];
+	u16 get_woffset8(u32 ptr);
+	u16 get_woffset10(u32 ptr);
+
+	std::tuple<u8, u32> fetch_byte(u32 ptr, u8 frac);
+
+	typedef std::tuple<u16, u32> (madam_device::*fetch_rle_func)(u32 ptr, u8 frac);
+	static const fetch_rle_func fetch_rle_table[2];
+	std::tuple<u16, u32> get_coded_6bpp(u32 ptr, u8 frac);
+	std::tuple<u16, u32> get_uncoded_16bpp(u32 ptr, u8 frac);
 
 	TIMER_CALLBACK_MEMBER(dma_playerbus_cb);
 	TIMER_CALLBACK_MEMBER(cel_tick_cb);

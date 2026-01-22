@@ -547,7 +547,8 @@ CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, emp
 GAME( 1993, 3dobios, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
 
 GAME( 1995, orbatak, 3dobios, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// Beavis and Butthead (prototype), different CD drive, Jaguar CD derived?
+// Beavis and Butthead (prototype), with "proprietary" CD drive according to pitch deck
+// (likely not Jaguar CD derived because seems to work with stock 3do drive anyway)
 
 
 // American Laser Games uses its own BIOS (with additional "FKr-Severe-System-extended-RSA failed in CreateTask")

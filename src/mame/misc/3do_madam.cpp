@@ -74,7 +74,10 @@ void madam_device::device_start()
 	save_item(NAME(m_ccobctl0));
 	save_item(NAME(m_ppmpc));
 	save_item(NAME(m_regctl0));
+	save_item(STRUCT_MEMBER(m_regis, fb_pitch));
 	save_item(NAME(m_regctl1));
+	save_item(STRUCT_MEMBER(m_regis, xclip));
+	save_item(STRUCT_MEMBER(m_regis, yclip));
 	save_item(NAME(m_regctl2));
 	save_item(NAME(m_regctl3));
 	save_item(NAME(m_xyposh));
@@ -191,18 +194,14 @@ void madam_device::map(address_map &map)
 	);
 
 	// Regis
-	map(0x0130, 0x0133).lrw32(
-		NAME([this] () { return m_regctl0; }),
-		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			LOGREGIS("regctl0 (control word): %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_regctl0);
-		})
-	);
+	map(0x0130, 0x0133).rw(FUNC(madam_device::regctl0_r), FUNC(madam_device::regctl0_w));
 	map(0x0134, 0x0137).lrw32(
 		NAME([this] () { return m_regctl1; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGREGIS("regctl1 (X and Y clip values): %08x & %08x\n", data, mem_mask);
 			COMBINE_DATA(&m_regctl1);
+			m_regis.xclip = m_regctl1 & 0xffff;
+			m_regis.yclip = m_regctl1 >> 16;
 		})
 	);
 	map(0x0138, 0x013b).lrw32(
@@ -575,6 +574,56 @@ void madam_device::vdlp_continue_w(int state)
  *
  *****************/
 
+u32 madam_device::regctl0_r()
+{
+	return m_regctl0;
+}
+
+void madam_device::regctl0_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	LOGREGIS("regctl0 (control word): %08x & %08x\n", data, mem_mask);
+	if (ACCESSING_BITS_0_15 && data != m_regctl0)
+	{
+		COMBINE_DATA(&m_regctl0);
+		for (int i = 0; i < 2; i ++)
+		{
+			const u8 bit_base = i << 8;
+			u16 g1 = 0, g2 = 0;
+			bool illegal = false;
+			switch ((m_regctl0 >> bit_base) & 0xf)
+			{
+				case 0x00:  break;
+				case 0x01:  g1 += 32; break;
+				case 0x04:  g1 += 256; break;
+				case 0x08:  g1 += 1024; break;
+				default:    illegal = true; break;
+			}
+
+			switch ((m_regctl0 >> bit_base) & 0xf0)
+			{
+				case 0x00:  break;
+				case 0x10:  g2 += 64; break;
+				case 0x20:  g2 += 128; break;
+				case 0x40:  g2 += 256; break;
+				default:    illegal = true; break;
+			}
+
+			// TODO: verify these two statements
+			// - bit 1 and 7 are undefined;
+			// - multiple bits set in a nibble are illegal;
+			// these would be rejected by Portfolio, so we won't see this on normal means ...
+			if (illegal)
+			{
+				popmessage("3do_madam.cpp: illegal regctl0 setup %04x", m_regctl0);
+				return;
+			}
+
+			m_regis.fb_pitch[i] = (g1 + g2) >> 1;
+		}
+	}
+}
+
+
 void madam_device::cel_start_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGCEL("Start CEL engine\n");
@@ -697,8 +746,8 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
-			m_cel.xpos = util::sext(m_dma32_read_cb(m_cel.address + 0x10), 32);
-			m_cel.ypos = util::sext(m_dma32_read_cb(m_cel.address + 0x14), 32);
+			m_cel.xpos = (s32)(m_dma32_read_cb(m_cel.address + 0x10));
+			m_cel.ypos = (s32)(m_dma32_read_cb(m_cel.address + 0x14));
 			tick_time += 2;
 			// TODO: can be in 17.15 format (?)
 			LOGCEL("    xpos=%f ypos=%f\n",  (double)m_cel.xpos / 65536.0, (double)m_cel.ypos / 65536.0);
@@ -753,7 +802,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				LOGCEL("\n");
 			}
 
-			// ... we have to take an intermediate step in case the CEL is compressed (TBD)
+			// ... we have to take an intermediate step in case the CEL is compressed
 			m_cel.state = m_cel.packed ? DECOMPRESS : DRAW;
 			m_cel_timer->adjust(attotime::from_ticks(2 * tick_time, this->clock()));
 
@@ -799,8 +848,10 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, tlhpcnt
 			);
 
-			const u16 xclip = m_regctl1 & 0xffff;
-			const u16 yclip = m_regctl1 >> 16;
+			const u16 xclip = m_regis.xclip;
+			const u16 yclip = m_regis.yclip;
+			//const u16 src_pitch = m_regis.fb_pitch[0];
+			const u16 dst_pitch = m_regis.fb_pitch[1];
 
 			// encode source addressing in an easy to digest inner loop form
 			const u8 actual_src_mode = (m_cel.packed << 1) | lrform;
@@ -808,7 +859,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			// - 3do_gdo101 uses mostly this, with lrform + packed enabled on several elements
 			//   (the 3DO logo)
 			// - 3do_fz1 uses uncoded=0 + bpp=4
-			if (uncoded && bpp == 6)
+			if ((m_cel.packed && bpp == 4) || (uncoded && bpp == 6))
 			{
 				for (int y = 0; y < vcnt; y++)
 				{
@@ -830,7 +881,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 							continue;
 
 						u32 dst_address = m_regctl3;
-						dst_address += ((ypos & ~1) * 160) << 2;
+						dst_address += ((ypos & ~1) * dst_pitch) << 2;
 						dst_address += (xpos << 2);
 
 						u32 dst_data = m_dma32_read_cb(dst_address);
@@ -863,45 +914,122 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 	}
 }
 
+/******************
+ *
+ * Decompression
+ *
+ *****************/
+
+const madam_device::get_woffset_func madam_device::get_woffset_table[2] =
+{
+	&madam_device::get_woffset8,
+	&madam_device::get_woffset10
+};
+
+u16 madam_device::get_woffset8(u32 ptr)
+{
+	return m_dma8_read_cb(ptr) + 2;
+}
+
+u16 madam_device::get_woffset10(u32 ptr)
+{
+	return ((m_dma8_read_cb(ptr) << 8) | (m_dma8_read_cb(ptr + 1))) + 2;
+}
+
+std::tuple<u8, u32> madam_device::fetch_byte(u32 ptr, u8 frac)
+{
+	u16 res = m_dma8_read_cb(ptr) << frac;
+	if (frac)
+	{
+		const u8 shift = (8 - frac);
+		const u8 mask = 0xff >> shift;
+		ptr ++;
+		res |= (m_dma8_read_cb(ptr) >> shift) & mask;
+	}
+	return std::make_tuple(res & 0xff, ptr);
+}
+
+const madam_device::fetch_rle_func madam_device::fetch_rle_table[2] =
+{
+	&madam_device::get_coded_6bpp,
+	&madam_device::get_uncoded_16bpp
+};
+
+std::tuple<u16, u32> madam_device::get_coded_6bpp(u32 ptr, u8 frac)
+{
+	u8 idx;
+	const u32 plut_ptr = m_cel.plut_ptr;
+	std::tie(idx, ptr) = fetch_byte(ptr, frac);
+
+	// idx >>= 2;
+	// idx &= 0x3f;
+	idx >>= 1;
+	idx &= 0x7e;
+
+	return std::make_tuple((m_dma8_read_cb(plut_ptr + idx) << 8) | m_dma8_read_cb(plut_ptr + idx + 1), ptr);
+}
+
+std::tuple<u16, u32> madam_device::get_uncoded_16bpp(u32 ptr, u8 frac)
+{
+	return std::make_tuple((m_dma8_read_cb(ptr) << 8) | m_dma8_read_cb(ptr + 1), ptr + 2);
+}
+
 // LZ77 / LZSS alike
+// NOTE: documentation claims that is actually faster to use packed CEL
 u32 madam_device::cel_decompress()
 {
 	u32 tick_time = 1;
 	u32 source_ptr = m_cel.source_ptr;
 
 	const u16 vcnt = ((m_cel.pre0 >> 6) & 0xfff) + 1;
-	//const bool uncoded = !!BIT(m_cel.pre0, 4);
+	const bool uncoded = !!BIT(m_cel.pre0, 4);
 	const u8 bpp = (m_cel.pre0 >> 0) & 0x7;
 
-	if (bpp != 6)
+	if ((bpp == 4 && uncoded) || (bpp == 6 && !uncoded) || ((bpp != 4) && (bpp != 6)))
 	{
 		popmessage("3do_madam.cpp: unsupported Packed CEL %d %08x", bpp, source_ptr);
-		m_statbits |= (1 << 6);
-		cel_stop_w(0, 0, 0xffffffff);
-		return 0;
+		//m_statbits |= (1 << 6);
+		//cel_stop_w(0, 0, 0xffffffff);
+		return 1;
 	}
 
 	u16 tlhpcnt = 1;
 	const u16 pitch = 0x1000;
+	const u8 woffset_type = bpp >= 5;
+	const u8 woffset_inc = woffset_type + 1;
+	// Reminders:
+	// - bpp == 0 and bpp == 7 are illegal
+	// - bpp == 5 and 6 don't use the fractional part (matters only for anything below that)
+	static const u8 frac_bits[8] = { 0, 1, 2, 4, 6, 8, 16, 0 };
+	const u8 frac_inc = frac_bits[bpp];
+	const u8 actual_rle_mode = bpp == 6;
 
 	for (u16 yline = 0; yline < vcnt; yline ++)
 	{
 		u32 line_ptr = source_ptr;
-		u16 woffset = ((m_dma8_read_cb(line_ptr) << 8) | (m_dma8_read_cb(line_ptr + 1))) + 2;
+		u16 woffset = (this->*get_woffset_table[woffset_type])(line_ptr);
 		u32 next_ptr = line_ptr + woffset * 4;
-		line_ptr += 2;
-		tick_time += 2;
+		line_ptr += woffset_inc;
+		tick_time += 1;
+
 		u16 xpos = 0;
+		u8 frac_bit = 0;
+		u8 header = 0;
 		while (line_ptr < next_ptr)
 		{
-			const u8 header = m_dma8_read_cb(line_ptr);
+			std::tie(header, line_ptr) = fetch_byte(line_ptr, frac_bit);
+
 			const u8 packet_type = header >> 6;
 			const u8 num_bytes = (header & 0x3f) + 1;
 			u8 src;
 
-			line_ptr ++;
+			//frac_bit += 8;
+			//frac_bit &= 7;
+			// round up on even address
+			if (frac_bit == 0)
+				line_ptr ++;
 			tick_time ++;
-			u16 pixel_data;
+			u16 pixel_data = 0;
 			switch (packet_type)
 			{
 				// PACK_TRANSPARENT
@@ -912,27 +1040,30 @@ u32 madam_device::cel_decompress()
 
 					tick_time ++;
 					xpos += num_bytes;
-					line_ptr += 2;
+					//line_ptr += 2;
 					break;
 				// PACK_REPEAT
 				case 3:
-					pixel_data = (m_dma8_read_cb(line_ptr) << 8) | m_dma8_read_cb(line_ptr + 1);
+					std::tie(pixel_data, line_ptr) = (this->*fetch_rle_table[actual_rle_mode])(line_ptr, frac_bit);
+					frac_bit += frac_inc;
+					frac_bit &= 7;
+
 					for (src = 0; src < num_bytes; src++)
 						m_cel.buffer[yline * pitch + ((src + xpos) % pitch)] = pixel_data;
 
-					tick_time += 2;
+					tick_time ++;
 					xpos += num_bytes;
-					line_ptr += 2;
 					break;
 				// PACK_LITERAL
 				case 1:
 					for (src = 0; src < num_bytes; src++)
 					{
-						pixel_data = (m_dma8_read_cb(line_ptr) << 8) | m_dma8_read_cb(line_ptr + 1);
-						tick_time += 2;
+						//pixel_data = (m_dma8_read_cb(line_ptr) << 8) | m_dma8_read_cb(line_ptr + 1);
+						std::tie(pixel_data, line_ptr) = (this->*fetch_rle_table[actual_rle_mode])(line_ptr, frac_bit);
+						frac_bit += frac_inc;
+						frac_bit &= 7;
+						tick_time ++;
 						m_cel.buffer[yline * pitch + ((src + xpos) % pitch)] = pixel_data;
-
-						line_ptr += 2;
 					}
 
 					xpos += num_bytes;
@@ -954,6 +1085,12 @@ u32 madam_device::cel_decompress()
 	m_cel.pre1 = (tlhpcnt - 1);
 	return tick_time;
 }
+
+/******************
+ *
+ * FB fetch fns
+ *
+ *****************/
 
 const madam_device::get_pixel_func madam_device::get_pixel_table[4] =
 {
