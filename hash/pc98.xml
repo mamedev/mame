@@ -1279,7 +1279,7 @@ Utility disk file "BMENU." sports ugly GFX cyan fills (especially noticeable whe
                 		<rom name="win95b.img" size="1281968" crc="106cc9fa" sha1="2dde4d7d51494ab5e7805aefcea26ad80a4ba104"/>
             		</dataarea>
         	</part>
-    	</software>
+	</software>
 
 <!-- !Programming IDEs -->
 
