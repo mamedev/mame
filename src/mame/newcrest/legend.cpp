@@ -3,17 +3,56 @@
 // thanks-to:Berger
 /*******************************************************************************
 
-Krypton Challenge (model 5T-938)
+NTSL CXG Sphinx Legend / Krypton Challenge
 
-It was manufactured by Timorite, Ltd. (Eric White's company), the chess engine is
-by Gyula Horváth, similar to the one in CXG Sphinx Legend.
+The chess engine is by Gyula Horváth. To start a new game, keep holding the
+NEW GAME button until the display says HELLO.
 
-To start a new game, keep holding the NEW GAME button until the display says HELLO.
+Newcrest Technology went under in 1991, their assets were bought by NTSL (National
+Telecommunication System Ltd). NTSL promised to continue making new CXG Sphinx
+chess computers, but mostly sold rereleases of old Newcrest chess computers.
+CXG Sphinx Legend was one of the few new ones.
+
+A few years later, similar chess computers were produced by Timorite. Theirs
+were mainly distributed by Krypton and Systema. The CXG and Sphinx brands stayed
+with NTSL.
+
+slegend has (c) 1992 PARSYSTEM LTD in the ROM, and kchala has (c) 1993 PARMATE
+LTD, perhaps this was Horváth's software business.
 
 TODO:
-- is Krypton a product brand, or a company alias for the Chinese factory behind it?
+- when slegend was released, did CXG Systems S.A. still exist as a subsidiary,
+  or more likely CXG was only a logo/brand by then?
+- is Krypton a product brand, or a distribution subsidiary? (probably the latter)
 - it does a cold boot at every reset, so nvram won't work properly unless MAME
   adds some kind of auxillary autosave state feature at power-off
+
+================================================================================
+
+CXG Sphinx Legend family
+------------------------
+
+Hardware notes:
+
+Sphinx Concerto:
+- PCB label: 301/603 REV 5
+- Hitachi H8/325 MCU, 20MHz XTAL
+- LCD with 5 7segs and custom segments
+- piezo, 16 LEDs, button sensors chessboard
+
+Sphinx Accolade:
+- PCB label: 808-1004 (R.1) (double-sided PCB, no separate PCB for the buttons)
+- no LEDs, rest is same as Legend/Concerto
+
+H8/325 A44F MCU is used in:
+- CXG Sphinx Legend (model CXG-301), also distributed by Excalibur
+- CXG Sphinx Concerto (model CXG-603)
+- CXG Sphinx Accolade (model CXG-808)
+
+================================================================================
+
+Krypton Challenge (model 5T-938)
+--------------------------------
 
 Hardware notes:
 
@@ -37,13 +76,13 @@ Krypton Regency (1997 version):
 The H8/3256 MCU has Krypton Regency's model number (933) on the label, though
 it was also used in Challenge.
 
-H8/325 A95 MCU is used in:
+H8/325 A95P MCU is used in:
 - Krypton (or Systema) Challenge (black or gray, 1994 version)
 - Krypton Comet (suspected)
 - Krypton Regency (1995 version, with LEDs)
 - Excalibur Legend II (Excalibur brand Challenge)
 
-H8/3256 A26 MCU is used in:
+H8/3256 A26P MCU is used in:
 - Krypton (or Systema) Challenge (1996 version)
 - Krypton Regency (1997 version, without LEDs)
 - Excalibur Avenger (suspected, Excalibur brand Comet, with newer MCU)
@@ -62,6 +101,7 @@ H8/3256 A26 MCU is used in:
 #include "speaker.h"
 
 // internal artwork
+#include "cxg_legend.lh"
 #include "kchal.lh"
 
 
@@ -83,6 +123,7 @@ public:
 
 	template <typename T> void cpu_config(T &maincpu);
 	void shared(machine_config &config);
+	void slegend(machine_config &config);
 	void kchal(machine_config &config);
 	void kchala(machine_config &config);
 
@@ -114,6 +155,7 @@ private:
 	void standby(int state);
 	int update_irq2();
 
+	u8 p2_r();
 	void p2_w(u8 data);
 	void p5_w(offs_t offset, u8 data, u8 mem_mask);
 	u8 p6_r();
@@ -191,6 +233,12 @@ void legend_state::lcd_segs_w(u8 data)
 
 
 // misc
+
+u8 legend_state::p2_r()
+{
+	// P20-P27: hardware config via P40 (CPU frequency and whether or not it has LEDs)
+	return BIT(m_lcd_segs, 24) ? 0xff : 0xef;
+}
 
 void legend_state::p2_w(u8 data)
 {
@@ -274,7 +322,7 @@ void legend_state::p7_w(u8 data)
 #define PORT_CHANGED_IN1() \
 	PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(legend_state::in1_changed), 0)
 
-static INPUT_PORTS_START( kchal )
+static INPUT_PORTS_START( slegend )
 	PORT_START("IN.0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Knight")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Queen")
@@ -314,7 +362,7 @@ void legend_state::cpu_config(T &maincpu)
 	maincpu.standby_cb().set(maincpu, FUNC(T::nvram_set_battery));
 	maincpu.standby_cb().append(FUNC(legend_state::standby));
 	maincpu.write_port1().set(FUNC(legend_state::lcd_segs_w<2>));
-	maincpu.read_port2().set_constant(0xef); // hardware config?
+	maincpu.read_port2().set(FUNC(legend_state::p2_r));
 	maincpu.write_port2().set(FUNC(legend_state::p2_w));
 	maincpu.write_port3().set(FUNC(legend_state::lcd_segs_w<1>));
 	maincpu.write_port4().set(FUNC(legend_state::lcd_segs_w<3>));
@@ -343,11 +391,20 @@ void legend_state::shared(machine_config &config)
 	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
-	config.set_default_layout(layout_kchal);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
 	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "speaker", 0.25);
+}
+
+void legend_state::slegend(machine_config &config)
+{
+	H8325(config, m_maincpu, 20_MHz_XTAL);
+	cpu_config<h8325_device>(downcast<h8325_device &>(*m_maincpu));
+
+	shared(config);
+
+	config.set_default_layout(layout_cxg_legend);
 }
 
 void legend_state::kchal(machine_config &config)
@@ -356,14 +413,14 @@ void legend_state::kchal(machine_config &config)
 	cpu_config<h83256_device>(downcast<h83256_device &>(*m_maincpu));
 
 	shared(config);
+
+	config.set_default_layout(layout_kchal);
 }
 
 void legend_state::kchala(machine_config &config)
 {
-	H8325(config, m_maincpu, 20_MHz_XTAL);
-	cpu_config<h8325_device>(downcast<h8325_device &>(*m_maincpu));
-
-	shared(config);
+	slegend(config);
+	config.set_default_layout(layout_kchal);
 }
 
 
@@ -372,12 +429,20 @@ void legend_state::kchala(machine_config &config)
     ROM Definitions
 *******************************************************************************/
 
+ROM_START( slegend )
+	ROM_REGION16_BE( 0x8000, "maincpu", 0 )
+	ROM_LOAD("1992_ntsl_301603808_hd6433258a44f", 0x0000, 0x8000, CRC(107ffbe8) SHA1(73c7b2a377e802ad6d4de5a440843c71f11f95e9) )
+
+	ROM_REGION( 109652, "screen", 0 )
+	ROM_LOAD("slegend.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
+ROM_END
+
 ROM_START( kchal )
 	ROM_REGION16_BE( 0xc000, "maincpu", 0 )
 	ROM_LOAD("1996_933_timorite_hd6433256a26p.ic1", 0x0000, 0xc000, CRC(72eb3f2b) SHA1(30e4166e351210475cf9709b0feb717d9d3ac747) )
 
 	ROM_REGION( 109652, "screen", 0 )
-	ROM_LOAD("kchal.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
+	ROM_LOAD("slegend.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
 ROM_END
 
 ROM_START( kchala )
@@ -385,7 +450,7 @@ ROM_START( kchala )
 	ROM_LOAD("1993_vil_v938_hd6433258a95p.ic1", 0x0000, 0x8000, CRC(9277d7d4) SHA1(0ba5129846c11bb7bf02dade1b934e21c45316c8) )
 
 	ROM_REGION( 109652, "screen", 0 )
-	ROM_LOAD("kchal.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
+	ROM_LOAD("slegend.svg", 0, 109652, CRC(6840c49e) SHA1(a9c91143c5bea5ab41fe323e719da4a46ab9d631) )
 ROM_END
 
 } // anonymous namespace
@@ -396,6 +461,8 @@ ROM_END
     Drivers
 *******************************************************************************/
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1996, kchal,  0,      0,      kchal,   kchal, legend_state, empty_init, "Krypton / Timorite", "Challenge (1996 version)", MACHINE_SUPPORTS_SAVE )
-SYST( 1994, kchala, kchal,  0,      kchala,  kchal, legend_state, empty_init, "Krypton / Timorite", "Challenge (1994 version)", MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS         INIT        COMPANY, FULLNAME, FLAGS
+SYST( 1992, slegend, 0,      0,      slegend, slegend, legend_state, empty_init, "National Telecommunication System", "Sphinx Legend", MACHINE_SUPPORTS_SAVE )
+
+SYST( 1996, kchal,   0,      0,      kchal,   slegend, legend_state, empty_init, "Krypton / Timorite", "Challenge (1996 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1994, kchala,  kchal,  0,      kchala,  slegend, legend_state, empty_init, "Krypton / Timorite", "Challenge (1994 version)", MACHINE_SUPPORTS_SAVE )
