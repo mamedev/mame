@@ -1178,6 +1178,8 @@ if (BUSES["CBMIEC"]~=null) then
 		MAME_DIR .. "src/devices/bus/cbmiec/vic1520.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/c1526.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/c1526.h",
+		MAME_DIR .. "src/devices/bus/cbmiec/c5181.cpp",
+		MAME_DIR .. "src/devices/bus/cbmiec/c5181.h",
 	}
 end
 
