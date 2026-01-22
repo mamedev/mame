@@ -1152,6 +1152,8 @@ if BUSES["BBC_ROM"] then
 		MAME_DIR .. "src/devices/bus/bbc/rom/nvram.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/datagem.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/rom/datagem.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/detalker.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/detalker.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/genie.cpp",
