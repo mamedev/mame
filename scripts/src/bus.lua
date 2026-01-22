@@ -4459,6 +4459,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/pencil2/slot.h,BUSES["PENCIL2"] = true
+---------------------------------------------------
+
+if BUSES["PENCIL2"] then
+	files {
+		MAME_DIR .. "src/devices/bus/pencil2/slot.cpp",
+		MAME_DIR .. "src/devices/bus/pencil2/slot.h",
+		MAME_DIR .. "src/devices/bus/pencil2/coleco.cpp",
+		MAME_DIR .. "src/devices/bus/pencil2/coleco.h",
+		MAME_DIR .. "src/devices/bus/pencil2/ram.cpp",
+		MAME_DIR .. "src/devices/bus/pencil2/ram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/pet/cass.h,BUSES["PET"] = true
 --@src/devices/bus/pet/exp.h,BUSES["PET"] = true
 --@src/devices/bus/pet/user.h,BUSES["PET"] = true
