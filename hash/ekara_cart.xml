@@ -3182,6 +3182,23 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- this one has some songs programmed into it:
+	 
+	 ...
+	 
+	-->	
+	<software name="ekaraweb28b" cloneof="ekaraweb28">
+		<description>e-kara Web cartridge 28M (used, with 28 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x200000">
+				<rom name="ekara_user_red.bin" size="0x200000" crc="2acf2b95" sha1="100106cf9da486fcc5dae328721feb2ffba74b3b"/>
+			</dataarea>
+		</part>
+	</software>	
 
 	<software name="ekaraweb12">
 		<description>e-kara Web cartridge 12M (blank) (Japan)</description>
@@ -3458,6 +3475,40 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+	
+	<!-- this one has some songs programmed into it:
+	 
+	 ...
+	 
+	-->
+	<software name="ekaraweb12l" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 12 songs, set 10) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekara_user_blue.bin" size="0x100000" crc="2d36538d" sha1="455a16aea46e710a1a1f58b31341a5fc647426fe"/>
+			</dataarea>
+		</part>
+	</software>
+	
+	<!-- this one has some songs programmed into it:
+	 
+	 ...
+	 
+	-->
+	<software name="ekaraweb12m" cloneof="ekaraweb12">
+		<description>e-kara Web cartridge 12M (used, with 11 songs) (Japan)</description>
+		<year>2003</year>
+		<publisher>Takara</publisher>
+		<sharedfeat name="compatibility" value="EKARA"/>
+		<part name="cart" interface="ekara_cart">
+			<dataarea name="rom" size="0x100000">
+				<rom name="ekara_user_orange.bin" size="0x100000" crc="5614327d" sha1="5c415fe2529f0ee084914fe0ddb35d2ef161c939"/>
+			</dataarea>
+		</part>
+	</software>	
 
 	<!-- this one has some songs programmed into it:
 	     世界に一つだけの花            SMAP                                  Sekai ni Hitotsu Dake no Hana   SMAP
