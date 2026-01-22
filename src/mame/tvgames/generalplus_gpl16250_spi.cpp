@@ -22,17 +22,14 @@ public:
 	{
 	}
 
-	void generalplus_gpspispi(machine_config &config);
+	void generalplus_gpspispi(machine_config &config) ATTR_COLD;
 
-	void init_spi();
+	void init_spi() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-private:
 };
-
 
 
 class generalplus_gpspispi_bkrankp_game_state : public generalplus_gpspispi_game_state
@@ -44,18 +41,18 @@ public:
 	{
 	}
 
-	void generalplus_gpspispi_bkrankp(machine_config &config);
+	void generalplus_gpspispi_bkrankp(machine_config &config) ATTR_COLD;
 
 protected:
-	required_device<generic_slot_device> m_cart;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-private:
+	required_device<generic_slot_device> m_cart;
 };
 
 
 void generalplus_gpspispi_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
 }
 
 void generalplus_gpspispi_game_state::machine_reset()
@@ -74,6 +71,8 @@ INPUT_PORTS_END
 
 void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &config)
 {
+	set_addrmap(0, &generalplus_gpspispi_game_state::cs_map_base);
+
 	GP_SPISPI(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpspispi_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpspispi_game_state::portb_r));
@@ -86,8 +85,6 @@ void generalplus_gpspispi_game_state::generalplus_gpspispi(machine_config &confi
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0); // boot from internal ROM (SPI bootstrap)
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
-
-	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpspispi_game_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -288,10 +285,11 @@ CONS(2015, prailpls, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gps
 // this is a half-head shaped unit, SHP13017-R1 main PCB  -  アンパンマン レッツゴー！育脳ドライブ きみものれるよ！アンパンマンごう「それいけ！アンパンマン」
 CONS(2014, anpanbd,  0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Let's Go! Ikunou Drive (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-//  それいけ！アンパンマン」みんなで！育脳マット
+// それいけ！アンパンマン」みんなで！育脳マット
 CONS(2015, anpanm15, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "JoyPalette", "Anpanman: Minnade! Ikunou Mat (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(2013, anpaneng, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Anpanman: Touch de English (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// ANPANMAN タッチであそぼ！はじめてEnglish (the furigana for "Enlish" says "えいご")
+CONS(2013, anpaneng, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Anpanman: Touch de Asobo! Hajimete English (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 

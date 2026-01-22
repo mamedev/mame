@@ -12,6 +12,9 @@
 
 class mga2064w_device : public pci_card_device, public device_memory_interface {
 public:
+	// BitBlt non-functional
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void legacy_memory_map(address_map &map) ATTR_COLD;

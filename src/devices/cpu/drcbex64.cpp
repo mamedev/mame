@@ -1014,14 +1014,14 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	, m_log_asmjit(nullptr)
 	, m_lzcnt(false)
 	, m_bmi(false)
-	, m_absmask32((u32 *)cache.alloc_near(16*2 + 15))
+	, m_absmask32((u32 *)cache.alloc_near(16*2 + 15, std::align_val_t(alignof(u32))))
 	, m_absmask64(nullptr)
 	, m_rbpvalue(cache.near() + 0x80)
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
 	, m_endofblock(nullptr)
-	, m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
+	, m_near(*cache.alloc_near<near_state>())
 {
 	// check for optional CPU features
 	const auto &x86_features = CpuInfo::host().features().x86();
@@ -2044,7 +2044,7 @@ void drcbe_x64::op_hashjmp(Assembler &a, const instruction &inst)
 	a.mov(rsp, MABS(&m_near.stacksave));                                            // mov   rsp,[stacksave]
 
 	// fixed mode cases
-	if (modep.is_immediate() && m_hash.is_mode_populated(modep.immediate()))
+	if (modep.is_immediate() && m_hash.populate_mode(modep.immediate()))
 	{
 		if (pcp.is_immediate())
 		{

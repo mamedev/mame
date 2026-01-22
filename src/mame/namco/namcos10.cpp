@@ -30,7 +30,7 @@ Gegege no Kitaro Yokai Yokocho Matsuri de Battle Ja (GYM1 Ver.A)              (C
 GekiToride-Jong Space (10011 Ver.A)                                           (C) Namco/Metro, 2001
 Golgo 13 Juusei no Requiem (GLT1 Ver.A)                                       (C) Namco/8ing/Raizing, 2001
 Gunbalina (GNN1 Ver. A)                                                       (C) Namco, 2000
-*Hard Puncher Hajime no Ippo: The Fighting                                    (C) Namco/Taito, 2001
+Hard Puncher Hajime no Ippo: The Fighting (VER.2.02J)                         (C) Namco/Taito, 2001
 Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen (VER.2.00J) (C) Namco/Taito, 2002
 *Honne Hakkenki                                                               (C) Namco, 2001
 Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu! (KRG1 Ver.A)               (C) Namco, 2006
@@ -445,8 +445,8 @@ Notes:
                CN2 - 10-pin connector for controls
 
 This PCB is used on..
-Hajime no Ippo Hard Puncher   - CPLD marked F06-01. I/O board = none
-Hajime no Ippo Hard Puncher 2 - sticker HAZIMENO IPPO2 K91J0893A, HAZIME'NO IPPO2 VER.2.00J. CPLD marked F06-03. I/O board = unknown sensor board
+Hajime no Ippo Hard Puncher   - sticker HAZIME NO IPPO K91J0873A, HAZIME NO IPPO VER.2.02J. CPLD marked F06-01. I/O board = none
+Hajime no Ippo Hard Puncher 2 - sticker HAZIME NO IPPO2 K91J0893A, HAZIME'NO IPPO2 VER.2.00J. CPLD marked F06-03. I/O board = unknown sensor board
 
 Notes: There is a hidden "MEM(N)DATA CHECK SUM DISP" menu available in ippo2 that can be accessed by holding Speed Sensor Up + Start + Select during boot.
 
@@ -709,10 +709,10 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_resolve_objects() override ATTR_COLD;
 
-	void namcos10_base(machine_config &config);
-	void namcos10_exio(machine_config &config);
-	void namcos10_mgexio(machine_config &config);
-	void namcos10_exfinalio(machine_config &config);
+	void namcos10_base(machine_config &config) ATTR_COLD;
+	void namcos10_exio(machine_config &config) ATTR_COLD;
+	void namcos10_mgexio(machine_config &config) ATTR_COLD;
+	void namcos10_exfinalio(machine_config &config) ATTR_COLD;
 
 	void namcos10_map_inner(address_map &map) ATTR_COLD;
 	void namcos10_map(address_map &map) ATTR_COLD;
@@ -804,21 +804,21 @@ public:
 		, m_nand(*this, "nand")
 	{ }
 
-	void ns10_mrdrilr2(machine_config &config);
+	void ns10_mrdrilr2(machine_config &config) ATTR_COLD;
 
-	void init_mrdrilr2();
+	void init_mrdrilr2() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void namcos10_memm(machine_config &config);
+	void namcos10_memm(machine_config &config) ATTR_COLD;
 
 	void namcos10_memm_map_inner(address_map &map) ATTR_COLD;
 	void namcos10_memm_map(address_map &map) ATTR_COLD;
 
-	void memm_driver_init();
+	void memm_driver_init() ATTR_COLD;
 
 	void crypto_switch_w(uint16_t data);
 	uint16_t range_r(offs_t offset);
@@ -843,49 +843,49 @@ public:
 		, m_data_xor(0xaaaa)
 	{ }
 
-	void ns10_ballpom(machine_config &config);
-	void ns10_chocovdr(machine_config &config);
-	void ns10_gahaha(machine_config &config);
-	void ns10_gahaha2(machine_config &config);
-	void ns10_gamshara(machine_config &config);
-	void ns10_gegemdb(machine_config &config);
-	void ns10_gjspace(machine_config &config);
-	void ns10_kd2001(machine_config &config);
-	void ns10_keroro(machine_config &config);
-	void ns10_knpuzzle(machine_config &config);
-	void ns10_konotako(machine_config &config);
-	void ns10_medalnt(machine_config &config);
-	void ns10_medalnt2(machine_config &config);
-	void ns10_mrdrilrg(machine_config &config);
-	void ns10_nflclsfb(machine_config &config);
-	void ns10_pacmball(machine_config &config);
-	void ns10_panikuru(machine_config &config);
-	void ns10_ptblank3(machine_config &config);
-	void ns10_puzzball(machine_config &config);
-	void ns10_sekaikh(machine_config &config);
-	void ns10_slotouji(machine_config &config);
-	void ns10_startrgn(machine_config &config);
-	void ns10_sugorotic(machine_config &config);
-	void ns10_taiko2(machine_config &config);
-	void ns10_taiko3(machine_config &config);
-	void ns10_taiko4(machine_config &config);
-	void ns10_taiko5(machine_config &config);
-	void ns10_taiko6(machine_config &config);
-	void ns10_taikort(machine_config &config);
+	void ns10_ballpom(machine_config &config) ATTR_COLD;
+	void ns10_chocovdr(machine_config &config) ATTR_COLD;
+	void ns10_gahaha(machine_config &config) ATTR_COLD;
+	void ns10_gahaha2(machine_config &config) ATTR_COLD;
+	void ns10_gamshara(machine_config &config) ATTR_COLD;
+	void ns10_gegemdb(machine_config &config) ATTR_COLD;
+	void ns10_gjspace(machine_config &config) ATTR_COLD;
+	void ns10_kd2001(machine_config &config) ATTR_COLD;
+	void ns10_keroro(machine_config &config) ATTR_COLD;
+	void ns10_knpuzzle(machine_config &config) ATTR_COLD;
+	void ns10_konotako(machine_config &config) ATTR_COLD;
+	void ns10_medalnt(machine_config &config) ATTR_COLD;
+	void ns10_medalnt2(machine_config &config) ATTR_COLD;
+	void ns10_mrdrilrg(machine_config &config) ATTR_COLD;
+	void ns10_nflclsfb(machine_config &config) ATTR_COLD;
+	void ns10_pacmball(machine_config &config) ATTR_COLD;
+	void ns10_panikuru(machine_config &config) ATTR_COLD;
+	void ns10_ptblank3(machine_config &config) ATTR_COLD;
+	void ns10_puzzball(machine_config &config) ATTR_COLD;
+	void ns10_sekaikh(machine_config &config) ATTR_COLD;
+	void ns10_slotouji(machine_config &config) ATTR_COLD;
+	void ns10_startrgn(machine_config &config) ATTR_COLD;
+	void ns10_sugorotic(machine_config &config) ATTR_COLD;
+	void ns10_taiko2(machine_config &config) ATTR_COLD;
+	void ns10_taiko3(machine_config &config) ATTR_COLD;
+	void ns10_taiko4(machine_config &config) ATTR_COLD;
+	void ns10_taiko5(machine_config &config) ATTR_COLD;
+	void ns10_taiko6(machine_config &config) ATTR_COLD;
+	void ns10_taikort(machine_config &config) ATTR_COLD;
 
-	void memn_driver_init();
+	void memn_driver_init() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void namcos10_memn_base(machine_config &config);
-	void namcos10_memn(machine_config &config);
+	void namcos10_memn_base(machine_config &config) ATTR_COLD;
+	void namcos10_memn(machine_config &config) ATTR_COLD;
 
 	void namcos10_memn_map(address_map &map) ATTR_COLD;
 
-	void namcos10_nand_k9f2808u0b(machine_config &config, int nand_count);
-	void namcos10_nand_k9f5608u0d(machine_config &config, int nand_count);
+	void namcos10_nand_k9f2808u0b(machine_config &config, int nand_count) ATTR_COLD;
+	void namcos10_nand_k9f5608u0d(machine_config &config, int nand_count) ATTR_COLD;
 
 	void pio_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
 	void pio_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size);
@@ -930,9 +930,9 @@ public:
 		, m_p3_analog(*this, "P3_ANALOG%u", 1U)
 	{ }
 
-	void ns10_g13jnr(machine_config &config);
-	void ns10_nicetsuk(machine_config &config);
-	void ns10_squizchs(machine_config &config);
+	void ns10_g13jnr(machine_config &config) ATTR_COLD;
+	void ns10_nicetsuk(machine_config &config) ATTR_COLD;
+	void ns10_squizchs(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -1005,17 +1005,18 @@ public:
 		m_data_xor = 0x5300; // TODO: does the default value change depending on the game?
 	}
 
-	void ns10_ippo2(machine_config &config);
+	void ns10_ippo(machine_config &config) ATTR_COLD;
+	void ns10_ippo2(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void namcos10_memio_base(machine_config &config);
+	void namcos10_memio_base(machine_config &config) ATTR_COLD;
 	void namcos10_memio_map(address_map &map) ATTR_COLD;
 	void namcos10_memio_map_inner(address_map &map) ATTR_COLD;
 
-	void namcos10_nand_tc58256aft(machine_config &config, int nand_count);
+	void namcos10_nand_tc58256aft(machine_config &config, int nand_count) ATTR_COLD;
 
 	void nand_dataxor_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 };
@@ -3072,6 +3073,14 @@ void namcos10_memio_state::nand_dataxor_w(offs_t offset, uint16_t data, uint16_t
 	m_data_xor = ((data & 0xff) << 8) | (data >> 8);
 }
 
+void namcos10_memio_state::ns10_ippo(machine_config &config)
+{
+	namcos10_memio_base(config);
+	namcos10_nand_k9f2808u0b(config, 6);
+
+	m_unscrambler = [] (uint16_t data) { return bitswap<16>(data, 0xf, 0xe, 0xd, 0xc, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x5, 0x4, 0x3, 0x2, 0x1, 0x0); };
+}
+
 void namcos10_memio_state::ns10_ippo2(machine_config &config)
 {
 	namcos10_memio_base(config);
@@ -4126,6 +4135,32 @@ ROM_START( squizchs )
 	ROM_LOAD( "chs1vera_13.1b", 0x0000000, 0x1080000, CRC(739e3b1e) SHA1(d7a25984d939d69de11b0fea000e51fdb4759163) )
 ROM_END
 
+ROM_START( ippo )
+	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
+	ROM_FILL( 0x0000000, 0x400000, 0x55 )
+
+	ROM_REGION32_LE( 0x1080000, "nand0", 0 )
+	ROM_LOAD( "k9f2808u0a.ic4", 0x0000000, 0x1080000, CRC(f93878db) SHA1(921d316b74368d5ebeddb3c40fec7911f2ad33eb) )
+
+	ROM_REGION32_LE( 0x1080000, "nand1", 0 )
+	ROM_LOAD( "k9f2808u0a.ic8", 0x0000000, 0x1080000, CRC(142744bc) SHA1(fadc3265f87cd9fc3774e4c32a8e46167b397acf) )
+
+	ROM_REGION32_LE( 0x1080000, "nand2", 0 )
+	ROM_LOAD( "k9f2808u0a.ic5", 0x0000000, 0x1080000, CRC(3880d85b) SHA1(b7459b2e7bac02383ac67229927b38f8b796e2b0) )
+
+	ROM_REGION32_LE( 0x1080000, "nand3", 0 )
+	ROM_LOAD( "k9f2808u0a.ic9", 0x0000000, 0x1080000, CRC(da2fcdbb) SHA1(7f509c0c21442dc17beda6cfd086aebfc33a658c) )
+
+	ROM_REGION32_LE( 0x1080000, "nand4", 0 )
+	ROM_LOAD( "k9f2808u0a.ic6", 0x0000000, 0x1080000, CRC(d791a383) SHA1(90917d818c4697ed7977901bbbd54b6bcc74b718) )
+
+	ROM_REGION32_LE( 0x1080000, "nand5", 0 )
+	ROM_LOAD( "k9f2808u0a.ic10", 0x0000000, 0x1080000, CRC(f997c4d1) SHA1(88e79dd9985b5f6199ab608c8923299a6fdf7ced) )
+
+	ROM_REGION( 0x157, "plds", 0 )
+	ROM_LOAD( "f06-02.ic15", 0x000, 0x157, NO_DUMP ) // PAL20V8
+ROM_END
+
 ROM_START( ippo2 )
 	ROM_REGION32_LE( 0x400000, "maincpu:rom", 0 )
 	ROM_FILL( 0x0000000, 0x400000, 0x55 )
@@ -4219,4 +4254,5 @@ GAME( 2002, nicetsuk,  0,        ns10_nicetsuk,  nicetsuk,     namcos10_memp3_st
 GAME( 2003, squizchs,  0,        ns10_squizchs,  squizchs,     namcos10_memp3_state, memn_driver_init, ROT0, "Namco",                      "Seishun-Quiz Colorful High School (CHS1 Ver.A)", MACHINE_IMPERFECT_SOUND )
 
 // MEM/IO
+GAME( 2001, ippo,      0,        ns10_ippo,      ippo2,        namcos10_memio_state, memn_driver_init, ROT0, "Taito",             "Hard Puncher Hajime no Ippo - The Fighting! (VER.2.02J)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // 2001/06/23 14:15:16
 GAME( 2002, ippo2,     0,        ns10_ippo2,     ippo2,        namcos10_memio_state, memn_driver_init, ROT0, "Taito",             "Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen (VER.2.00J)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND ) // copyright 2001 but 2002/01/20 18:27:18 in ROM e 2002 on flyer

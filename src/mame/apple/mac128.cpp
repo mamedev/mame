@@ -307,10 +307,10 @@ private:
 
 void mac128_state::machine_start()
 {
-	m_ram_ptr = (u16*)m_ram->pointer();
+	m_ram_ptr = m_ram->pointer<u16>();
 	m_ram_size = m_ram->size()>>1;
 	m_ram_mask = m_ram_size - 1;
-	m_rom_ptr = (u16*)memregion("bootrom")->base();
+	m_rom_ptr = &memregion("bootrom")->as_u16();
 
 	save_item(NAME(m_overlay));
 	save_item(NAME(m_mouse_bit));

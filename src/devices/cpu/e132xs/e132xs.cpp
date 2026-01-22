@@ -95,6 +95,8 @@
 
 #include "32xsdefs.h"
 
+#include "emuopts.h"
+
 #include <algorithm>
 
 //#define VERBOSE 1
@@ -158,7 +160,7 @@ hyperstone_device::hyperstone_device(
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
 	, m_io_config("io", ENDIANNESS_BIG, io_data_width, io_addr_bits, (io_data_width == 16) ? -1 : -2)
-	, m_cache(CACHE_SIZE + sizeof(hyperstone_device))
+	, m_cache(CACHE_SIZE + sizeof(internal_hyperstone_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
@@ -1464,10 +1466,17 @@ void hyperstone_device::check_interrupts()
 
 void hyperstone_device::device_start()
 {
-	m_core = (internal_hyperstone_state *)m_cache.alloc_near(sizeof(internal_hyperstone_state));
-	memset(m_core, 0, sizeof(internal_hyperstone_state));
-
 	m_enable_drc = allow_drc();
+	if (m_enable_drc)
+	{
+		m_cache.allocate_cache(mconfig().options().drc_rwx());
+		m_core = m_cache.alloc_near<internal_hyperstone_state>();
+	}
+	else
+	{
+		m_core = &m_local_core;
+	}
+	memset(m_core, 0, sizeof(internal_hyperstone_state));
 
 #if E132XS_LOG_DRC_REGS || E132XS_LOG_INTERPRETER_REGS
 	if (m_enable_drc)
@@ -1553,66 +1562,69 @@ void hyperstone_device::device_start()
 		m_core->fl_lut[i] = (i ? i : 16);
 	}
 
-	const uint32_t umlflags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 4, 32, 1);
-
-	// add UML symbols
-	m_drcuml->symbol_add(&m_core->global_regs[PC_REGISTER],  sizeof(m_core->global_regs[PC_REGISTER]),  "pc");
-	m_drcuml->symbol_add(&m_core->global_regs[SR_REGISTER],  sizeof(m_core->global_regs[SR_REGISTER]),  "sr");
-	m_drcuml->symbol_add(&m_core->global_regs[FER_REGISTER], sizeof(m_core->global_regs[FER_REGISTER]), "fer");
-	m_drcuml->symbol_add(&m_core->global_regs[SP_REGISTER],  sizeof(m_core->global_regs[SP_REGISTER]),  "sp");
-	m_drcuml->symbol_add(&m_core->global_regs[UB_REGISTER],  sizeof(m_core->global_regs[UB_REGISTER]),  "ub");
-	m_drcuml->symbol_add(&m_core->trap_entry,                sizeof(m_core->trap_entry),                "trap_entry");
-	m_drcuml->symbol_add(&m_core->delay_pc,                  sizeof(m_core->delay_pc),                  "delay_pc");
-	m_drcuml->symbol_add(&m_core->delay_slot,                sizeof(m_core->delay_slot),                "delay_slot");
-	m_drcuml->symbol_add(&m_core->delay_slot_taken,          sizeof(m_core->delay_slot_taken),          "delay_slot_taken");
-	m_drcuml->symbol_add(&m_core->intblock,                  sizeof(m_core->intblock),                  "intblock");
-	m_drcuml->symbol_add(&m_core->powerdown,                 sizeof(m_core->powerdown),                 "powerdown");
-	m_drcuml->symbol_add(&m_core->arg0,                      sizeof(m_core->arg0),                      "arg0");
-	m_drcuml->symbol_add(&m_core->arg1,                      sizeof(m_core->arg1),                      "arg1");
-	m_drcuml->symbol_add(&m_core->icount,                    sizeof(m_core->icount),                    "icount");
-
-	char buf[4];
-	buf[3] = '\0';
-	buf[0] = 'g';
-	for (int i = 0; i < 32; i++)
+	if (m_enable_drc)
 	{
-		if (9 < i)
+		const uint32_t umlflags = 0;
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 4, 32, 1);
+
+		// add UML symbols
+		m_drcuml->symbol_add(&m_core->global_regs[PC_REGISTER],  sizeof(m_core->global_regs[PC_REGISTER]),  "pc");
+		m_drcuml->symbol_add(&m_core->global_regs[SR_REGISTER],  sizeof(m_core->global_regs[SR_REGISTER]),  "sr");
+		m_drcuml->symbol_add(&m_core->global_regs[FER_REGISTER], sizeof(m_core->global_regs[FER_REGISTER]), "fer");
+		m_drcuml->symbol_add(&m_core->global_regs[SP_REGISTER],  sizeof(m_core->global_regs[SP_REGISTER]),  "sp");
+		m_drcuml->symbol_add(&m_core->global_regs[UB_REGISTER],  sizeof(m_core->global_regs[UB_REGISTER]),  "ub");
+		m_drcuml->symbol_add(&m_core->trap_entry,                sizeof(m_core->trap_entry),                "trap_entry");
+		m_drcuml->symbol_add(&m_core->delay_pc,                  sizeof(m_core->delay_pc),                  "delay_pc");
+		m_drcuml->symbol_add(&m_core->delay_slot,                sizeof(m_core->delay_slot),                "delay_slot");
+		m_drcuml->symbol_add(&m_core->delay_slot_taken,          sizeof(m_core->delay_slot_taken),          "delay_slot_taken");
+		m_drcuml->symbol_add(&m_core->intblock,                  sizeof(m_core->intblock),                  "intblock");
+		m_drcuml->symbol_add(&m_core->powerdown,                 sizeof(m_core->powerdown),                 "powerdown");
+		m_drcuml->symbol_add(&m_core->arg0,                      sizeof(m_core->arg0),                      "arg0");
+		m_drcuml->symbol_add(&m_core->arg1,                      sizeof(m_core->arg1),                      "arg1");
+		m_drcuml->symbol_add(&m_core->icount,                    sizeof(m_core->icount),                    "icount");
+
+		char buf[4];
+		buf[3] = '\0';
+		buf[0] = 'g';
+		for (int i = 0; i < 32; i++)
 		{
-			buf[1] = '0' + (i / 10);
-			buf[2] = '0' + (i % 10);
+			if (9 < i)
+			{
+				buf[1] = '0' + (i / 10);
+				buf[2] = '0' + (i % 10);
+			}
+			else
+			{
+				buf[1] = '0' + i;
+				buf[2] = '\0';
+			}
+			m_drcuml->symbol_add(&m_core->global_regs[i], sizeof(uint32_t), buf);
 		}
-		else
+		buf[0] = 'l';
+		for (int i = 0; i < 64; i++)
 		{
-			buf[1] = '0' + i;
-			buf[2] = '\0';
+			if (9 < i)
+			{
+				buf[1] = '0' + (i / 10);
+				buf[2] = '0' + (i % 10);
+			}
+			else
+			{
+				buf[1] = '0' + i;
+				buf[2] = '\0';
+			}
+			m_drcuml->symbol_add(&m_core->local_regs[i], sizeof(uint32_t), buf);
 		}
-		m_drcuml->symbol_add(&m_core->global_regs[i], sizeof(uint32_t), buf);
+
+		m_drcuml->symbol_add(&m_core->arg0, sizeof(uint32_t), "arg0");
+		m_drcuml->symbol_add(&m_core->arg1, sizeof(uint32_t), "arg1");
+
+		/* initialize the front-end helper */
+		m_drcfe = std::make_unique<e132xs_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, m_single_instruction_mode ? 1 : COMPILE_MAX_SEQUENCE);
+
+		/* mark the cache dirty so it is updated on next execute */
+		m_cache_dirty = true;
 	}
-	buf[0] = 'l';
-	for (int i = 0; i < 64; i++)
-	{
-		if (9 < i)
-		{
-			buf[1] = '0' + (i / 10);
-			buf[2] = '0' + (i % 10);
-		}
-		else
-		{
-			buf[1] = '0' + i;
-			buf[2] = '\0';
-		}
-		m_drcuml->symbol_add(&m_core->local_regs[i], sizeof(uint32_t), buf);
-	}
-
-	m_drcuml->symbol_add(&m_core->arg0, sizeof(uint32_t), "arg0");
-	m_drcuml->symbol_add(&m_core->arg1, sizeof(uint32_t), "arg1");
-
-	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<e132xs_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, m_single_instruction_mode ? 1 : COMPILE_MAX_SEQUENCE);
-
-	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = true;
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,    "GENPC",     m_core->global_regs[0]).noshow();

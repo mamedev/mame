@@ -1,19 +1,27 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, XingXing
+/*
+Default bookkeeping passwords:
+* fearless: 1234
+* icescape: all Start
+* superkds: (unknown)
+* mjzb:     all Start
 
-// default bookkeeping passwords
-// fearless 1234
-// icescape all Start
-// superkds (unknown)
+Other games on this hardware:
+* Fist Talks
+  (uses mostly the same graphics as Fearless Pinocchio, but is a Rock,
+  Paper, Scissors game, not a fighter, and has only 4 graphic ROMs which
+  are likely all different to FP)
 
-// Other games on this hardware:
-// Fist Talks (uses mostly the same graphics as Fearless Pinocchio, but
-//             is a Rock, Paper, Scissors game, not a fighter, and has
-//             only 4 graphic ROMs which are likely all different to FP)
+TODO:
+* mjzb Last Chance button doesn't work in test mode - possibly an
+  original game bug.
+*/
 
 #include "emu.h"
 
 #include "igs027a.h"
+#include "igsmahjong.h"
 #include "pgmcrypt.h"
 #include "xamcu.h"
 
@@ -48,12 +56,17 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_ticket(*this, "ticket"),
+		m_hopper(*this, "hopper"),
 		m_io_dsw(*this, "DSW%u", 1U),
-		m_io_trackball(*this, "AN%u", 0)
+		m_io_trackball(*this, "AN%u", 0),
+		m_io_kbd(*this, "KEY%u", 0U)
 	{ }
+
+	ioport_value kbd_ioport_r();
 
 	void igs_fear(machine_config &config) ATTR_COLD;
 	void igs_fear_xor(machine_config &config) ATTR_COLD;
+	void mjzb(machine_config &config) ATTR_COLD;
 
 	void init_fear() ATTR_COLD;
 	void init_icescape() ATTR_COLD;
@@ -95,13 +108,16 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_device<ticket_dispenser_device> m_ticket;
+	optional_device<ticket_dispenser_device> m_ticket;
+	optional_device<hopper_device> m_hopper;
 
 	required_ioport_array<2> m_io_dsw;
 	optional_ioport_array<2> m_io_trackball;
+	optional_ioport_array<5> m_io_kbd;
 
 	u32 m_xor_table[0x100];
 
+	u8 m_kbd_sel;
 	u8 m_gpio_o;
 
 	int m_gfxrommask;
@@ -119,14 +135,33 @@ void igs_fear_state::machine_start()
 {
 	std::fill(std::begin(m_xor_table), std::end(m_xor_table), 0);
 
+	m_kbd_sel = 0;
+	m_gpio_o = 0;
+
 	save_item(NAME(m_xor_table));
 
+	save_item(NAME(m_kbd_sel));
 	save_item(NAME(m_gpio_o));
 }
 
 void igs_fear_state::machine_reset()
 {
 }
+
+
+ioport_value igs_fear_state::kbd_ioport_r()
+{
+	ioport_value data = 0xff;
+
+	for (unsigned i = 0; m_io_kbd.size() > i; i++)
+	{
+		if (BIT(m_kbd_sel, i))
+			data &= m_io_kbd[i].read_safe(0xff);
+	}
+
+	return data;
+}
+
 
 void igs_fear_state::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int xpos, int ypos, int height, int width, int palette, int flipx, int romoffset)
 {
@@ -407,6 +442,75 @@ static INPUT_PORTS_START( icescape )
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x00, "SW2:7")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mjzb )
+	PORT_START("IN0")
+	PORT_BIT( 0x003f, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(igs_fear_state::kbd_ioport_r))
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )         PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 开始
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 上
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 下
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 左
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 右
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )                                                      // 投币
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )                                               // 开分
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                // 査帐
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // A键
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // B键
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // C键
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                                              // 洗分
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )                                              // 退币
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x0040, IP_ACTIVE_LOW )                                                   // 测试
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_CUSTOM )         PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))  // 哈巴
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	IGS_MAHJONG_MATRIX_CONDITIONAL("DSW2", 0x40, 0x40)
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )       PORT_DIPLOCATION("SW1:1,2")    // 投币比率
+	PORT_DIPSETTING(    0x03, DEF_STR(1C_1C) )                                        // 1:1
+	PORT_DIPSETTING(    0x02, DEF_STR(1C_2C) )                                        // 1:2
+	PORT_DIPSETTING(    0x01, DEF_STR(1C_5C) )                                        // 1:5
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_10C) )                                       // 1:10
+	PORT_DIPNAME( 0x0c, 0x0c, "Key-In Rate" )          PORT_DIPLOCATION("SW1:3,4")    // 开分比率
+	PORT_DIPSETTING(    0x0c, "10" )
+	PORT_DIPSETTING(    0x08, "20" )
+	PORT_DIPSETTING(    0x04, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x10, 0x10, "Credit Limit" )         PORT_DIPLOCATION("SW1:5")      // 进分上限
+	PORT_DIPSETTING(    0x10, "1000" )
+	PORT_DIPSETTING(    0x00, "2000" )
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Demo_Sounds) )   PORT_DIPLOCATION("SW1:8")      // 示范音乐
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                          // 无
+	PORT_DIPSETTING(    0x80, DEF_STR(On) )                                           // 有
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Double Up Jackpot" )    PORT_DIPLOCATION("SW2:1,2")    // 比倍爆机
+	PORT_DIPSETTING(    0x03, "500" )
+	PORT_DIPSETTING(    0x02, "1000" )
+	PORT_DIPSETTING(    0x01, "1500" )
+	PORT_DIPSETTING(    0x00, "2000" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Minimum Bet" )          PORT_DIPLOCATION("SW2:3,4")     // 最小押注   (all settings show 1 in service mode and function identically)
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "1" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )       PORT_DIPLOCATION("SW2:5")       // 比倍游戏
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                           // 无
+	PORT_DIPSETTING(    0x10, DEF_STR(On) )                                            // 有
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Game Name" )  PORT_DIPLOCATION("SW2:6")       // 比倍续玩
+	PORT_DIPSETTING(    0x20, "Double Up" )                                            // 比倍
+	PORT_DIPSETTING(    0x00, "Continue Play" )                                        // 续玩
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Controls) )      PORT_DIPLOCATION("SW2:7")       // 操作模式
+	PORT_DIPSETTING(    0x40, "Mahjong" )                                              // 麻雀
+	PORT_DIPSETTING(    0x00, DEF_STR(Joystick) )                                      // 摇杆
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW2:8")
+INPUT_PORTS_END
+
 void igs_fear_state::vblank_irq(int state)
 {
 	m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, (state && m_screen->frame_number() & 1) ? 1 : 0);
@@ -497,8 +601,18 @@ void igs_fear_state::cpld_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	switch (offset * 4)
 	{
+	case 0x0:
+		m_kbd_sel = data & 0x1f;
+		break;
+
 	case 0x8:
-		m_ticket->motor_w(BIT(data, 7));
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 2)); // coin in or keyin
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 3)); // coin out or keyout
+
+		if (m_ticket)
+			m_ticket->motor_w(BIT(data, 7));
+		if (m_hopper)
+			m_hopper->motor_w(BIT(data, 6));
 		break;
 
 	default:
@@ -544,6 +658,15 @@ void igs_fear_state::igs_fear_xor(machine_config &config)
 	igs_fear(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_fear_state::main_xor_map);
+}
+
+void igs_fear_state::mjzb(machine_config &config)
+{
+	igs_fear_xor(config);
+
+	config.device_remove("ticket");
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 
@@ -665,4 +788,4 @@ void igs_fear_state::init_mjzb()
 GAME( 2005, superkds, 0, igs_fear_xor, superkds, igs_fear_state, init_superkds, ROT0, "IGS (Golden Dragon Amusement license)", "Super Kids / Jiu Nan Xiao Yingxiong (S019CN)", MACHINE_NODEVICE_LAN )
 GAME( 2006, fearless, 0, igs_fear_xor, fear,     igs_fear_state, init_fear,     ROT0, "IGS (American Alpha license)",          "Fearless Pinocchio (V101US)",                  0 )
 GAME( 2006, icescape, 0, igs_fear_xor, icescape, igs_fear_state, init_icescape, ROT0, "IGS",                                   "Icescape (V104FA)",                            MACHINE_NOT_WORKING ) // IGS FOR V104FA 2006-11-02, internal ROM "TUE AUG 30 10:47:23 2005 ICESCAPE_V100FA"
-GAME( 2003, mjzb,     0, igs_fear_xor, icescape, igs_fear_state, init_mjzb,     ROT0, "IGS",                                   "Majiang Zhengba (V103CN)",                     MACHINE_NOT_WORKING )
+GAME( 2003, mjzb,     0, mjzb,         mjzb,     igs_fear_state, init_mjzb,     ROT0, "IGS",                                   "Majiang Zhengba (V103CN)",                     0 )

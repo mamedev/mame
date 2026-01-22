@@ -28,17 +28,19 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "GeneralPl
 gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
+	m_rowscroll(*this, "^rowscroll"), // FIXME: assumption about surrounding system
+	m_rowzoom(*this, "^rowzoom"), // FIXME: assumption about surrounding system
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG),
-	m_video_irq_cb(*this),
+	m_renderer(*this, "renderer"),
 	m_palette(*this, "palette"),
 	m_gfxdecode(*this, "gfxdecode"),
 	m_space_read_cb(*this, 0),
-	m_rowscroll(*this, "^rowscroll"),
-	m_rowzoom(*this, "^rowzoom"),
+	m_video_irq_cb(*this),
+	m_cpuspace(*this, finder_base::DUMMY_TAG, -1),
+	m_cs_space(*this, finder_base::DUMMY_TAG, -1),
 	m_use_legacy_mode(false),
-	m_disallow_resolution_control(false),
-	m_renderer(*this, "renderer")
+	m_disallow_resolution_control(false)
 {
 }
 
@@ -314,8 +316,6 @@ void gcm394_base_video_device::device_reset()
 	m_page2_addr_msb = 0;
 	m_page3_addr_lsb = 0;
 	m_page3_addr_msb = 0;
-
-	m_renderer->set_video_spaces(m_cpuspace, m_cs_space, m_csbase);
 }
 
 uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -398,12 +398,12 @@ uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_r
 
 		for (int i = 0; i < 4; i++)
 		{
-			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, m_page0_addr_msb, m_page0_addr_lsb, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
-			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, m_page1_addr_msb, m_page1_addr_lsb, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
-			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, m_page2_addr_msb, m_page2_addr_lsb, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
-			m_renderer->draw_page(true, true, m_703a_palettebank, cliprect, scanline, i, m_page3_addr_msb, m_page3_addr_lsb, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
+			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page0_addr_msb, m_page0_addr_lsb, m_tmap0_scroll, m_tmap0_regs, mem, m_paletteram, m_rowscroll, 0);
+			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page1_addr_msb, m_page1_addr_lsb, m_tmap1_scroll, m_tmap1_regs, mem, m_paletteram, m_rowscroll, 1);
+			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page2_addr_msb, m_page2_addr_lsb, m_tmap2_scroll, m_tmap2_regs, mem, m_paletteram, m_rowscroll, 2);
+			m_renderer->draw_page(true, m_703a_palettebank, cliprect, scanline, i, m_page3_addr_msb, m_page3_addr_lsb, m_tmap3_scroll, m_tmap3_regs, mem, m_paletteram, m_rowscroll, 3);
 
-			m_renderer->draw_sprites(true, m_use_legacy_mode ? 2 : 1, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram, -1);
+			m_renderer->draw_sprites(true, m_use_legacy_mode ? 2 : 1, m_703a_palettebank, highres, cliprect, scanline, i, sprites_addr, mem, m_paletteram, m_spriteram);
 		}
 
 		m_renderer->apply_saturation_and_fade(bitmap, cliprect, scanline);
@@ -749,7 +749,7 @@ void gcm394_base_video_device::sprite_7042_extra_w(uint16_t data)
 	// B = blend mode (0 = use 702a for blending, 1 = use individual sprite blending)
 	// C = co-ordinate mode
 	// E = sprite enable
-	
+
 	//popmessage("extra modes %04x\n", data);
 }
 
@@ -1156,7 +1156,7 @@ void gcm394_base_video_device::device_add_mconfig(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_555, 256*0x10);
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx);
 
-	SPG_RENDERER(config, m_renderer, 0);
+	GPL_RENDERER(config, m_renderer, 0);
 }
 
 

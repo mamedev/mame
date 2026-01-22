@@ -361,7 +361,7 @@ Slackware-based distro, cfr. plamo3x
 	</software>
 
 	<!-- Supports IBM PC-AT, PC-98, Alpha, MIPS and PowerPC -->
-	<software name="winnt40w">
+	<software name="winnt40w" supported="partial">
 		<!--
 		Origin: Unknown
 		<rom name="disc2.ISO" size="434356224" crc="ffffffff" sha1="e2db9d9e3aab1401979d103d2d6109bfe3eff3ed"/>
@@ -377,9 +377,10 @@ Slackware-based distro, cfr. plamo3x
 		<notes><![CDATA[
 Triggers [pc98_kbd] 0x96 command at install startup
 Triggers tons of [DMA] 32-bit space registers at install startup
+3d Space Cadet has unresponsive inputs, wants the [pc98_kbd] autoconversion and maybe a Pentium class?
 ]]></notes>
 		<!-- NOTE: Win NT will ask disks in inverse order, so disk #3 first then #2, finally #1 -->
-		<info name="usage" value="From an HDD installed DOS, format three floppies then run WINNT.EXE in PC98 folder. Requires 16MB or more RAM." />
+		<info name="usage" value="From an HDD installed DOS, format three floppies then run WINNT.EXE in PC98 folder. Requires +32MB RAM, and at least 256MB of HDD space." />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="windows nt 4.0 workstation (disc 1)" sha1="32fb5639983ba8c3e726ce9b3291a9a14b37facd" />

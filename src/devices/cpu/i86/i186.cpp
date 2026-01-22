@@ -167,6 +167,9 @@ i80186_cpu_device::i80186_cpu_device(const machine_config &mconfig, device_type 
 	, m_irmx_irq_ack(*this)
 {
 	memcpy(m_timing, m_i80186_timing, sizeof(m_i80186_timing));
+	// The Effective Address calculation times are already included in the
+	// instruction timings for the 80186, so fill the table with zeros.
+	memset(m_ea_timing, 0, sizeof(m_i80186_ea_timing));
 	set_irq_acknowledge_callback(*this, FUNC(i80186_cpu_device::inta_callback));
 }
 

@@ -562,27 +562,27 @@ authors:hap
 		<element ref="black"><bounds x="80.5"  y="92.5" width="9" height="4" /></element>
 		<element ref="black"><bounds x="80.5"  y="97.5" width="9" height="4" /></element>
 
-		<element ref="text_go">      <bounds x="45.6" y="93.5" width="8.8" height="2" /></element>
-		<element ref="text_stop">    <bounds x="45.6" y="98.5" width="8.8" height="2" /></element>
-		<element ref="text_newgame"> <bounds x="55.6" y="93.5" width="8.8" height="2" /></element>
-		<element ref="text_sound">   <bounds x="55.6" y="98.5" width="8.8" height="2" /></element>
-		<element ref="text_plus">    <bounds x="70.6" y="93.0" width="8.8" height="3" /></element>
-		<element ref="text_minus">   <bounds x="70.6" y="97.6" width="8.8" height="3.8" /></element>
-		<element ref="text_function"><bounds x="80.6" y="93.5" width="8.8" height="2" /></element>
-		<element ref="text_tabcolor"><bounds x="80.6" y="98.5" width="8.8" height="2" /></element>
+		<element ref="text_go">      <bounds x="46" y="93.5" width="8" height="2" /></element>
+		<element ref="text_stop">    <bounds x="46" y="98.5" width="8" height="2" /></element>
+		<element ref="text_newgame"> <bounds x="56" y="93.5" width="8" height="2" /></element>
+		<element ref="text_sound">   <bounds x="56" y="98.5" width="8" height="2" /></element>
+		<element ref="text_plus">    <bounds x="71" y="93.0" width="8" height="3" /></element>
+		<element ref="text_minus">   <bounds x="71" y="97.6" width="8" height="3.8" /></element>
+		<element ref="text_function"><bounds x="81" y="93.5" width="8" height="2" /></element>
+		<element ref="text_tabcolor"><bounds x="81" y="98.5" width="8" height="2" /></element>
 
-		<element ref="text_white">   <bounds x="92.6" y="41.5" width="8.8" height="2" /></element>
-		<element ref="text_black">   <bounds x="92.6" y="46.5" width="8.8" height="2" /></element>
-		<element ref="text_check">   <bounds x="92.6" y="51.5" width="8.8" height="2" /></element>
-		<element ref="text_end">     <bounds x="92.6" y="56.5" width="8.8" height="2" /></element>
+		<element ref="text_white">   <bounds x="93" y="41.5" width="8" height="2" /></element>
+		<element ref="text_black">   <bounds x="93" y="46.5" width="8" height="2" /></element>
+		<element ref="text_check">   <bounds x="93" y="51.5" width="8" height="2" /></element>
+		<element ref="text_end">     <bounds x="93" y="56.5" width="8" height="2" /></element>
 
-		<element ref="text_normal">  <bounds x="92.6" y="61.5" width="8.8" height="2" /></element>
-		<element ref="text_analysis"><bounds x="92.6" y="66.5" width="8.8" height="2" /></element>
-		<element ref="text_setup">   <bounds x="92.6" y="71.5" width="8.8" height="2" /></element>
-		<element ref="text_level">   <bounds x="92.6" y="76.5" width="8.8" height="2" /></element>
-		<element ref="text_library"> <bounds x="92.6" y="81.5" width="8.8" height="2" /></element>
-		<element ref="text_info">    <bounds x="92.6" y="86.5" width="8.8" height="2" /></element>
-		<element ref="text_play">    <bounds x="92.6" y="96" width="8.8" height="2" /></element>
+		<element ref="text_normal">  <bounds x="93" y="61.5" width="8" height="2" /></element>
+		<element ref="text_analysis"><bounds x="93" y="66.5" width="8" height="2" /></element>
+		<element ref="text_setup">   <bounds x="93" y="71.5" width="8" height="2" /></element>
+		<element ref="text_level">   <bounds x="93" y="76.5" width="8" height="2" /></element>
+		<element ref="text_library"> <bounds x="93" y="81.5" width="8" height="2" /></element>
+		<element ref="text_info">    <bounds x="93" y="86.5" width="8" height="2" /></element>
+		<element ref="text_play">    <bounds x="93" y="96" width="8" height="2" /></element>
 
 		<element ref="ledo"><bounds x="93" y="11" width="1.8" height="0.7" /></element>
 		<element ref="ledo"><bounds x="93" y="16" width="1.8" height="0.7" /></element>

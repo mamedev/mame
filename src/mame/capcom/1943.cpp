@@ -44,7 +44,6 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/watchdog.h"
 #include "sound/ymopn.h"
 #include "speaker.h"
 
@@ -78,7 +77,7 @@ void _1943_state::c1943_map(address_map &map)
 	map(0xc007, 0xc007).lr8(NAME([this] () -> u8 { return m_mcu_to_cpu; }));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc804, 0xc804).w(FUNC(_1943_state::control_w)); // ROM bank switch, screen flip
-	map(0xc806, 0xc806).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xc806, 0xc806).w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request (not watchdog reset)
 	map(0xc807, 0xc807).lw8(NAME([this] (u8 data) { m_cpu_to_mcu = data; }));
 	map(0xd000, 0xd3ff).ram().w(FUNC(_1943_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(_1943_state::colorram_w)).share("colorram");
@@ -287,8 +286,6 @@ void _1943_state::_1943(machine_config &config)
 	m_mcu->port_out_cb<2>().set([this](u8 data){ m_mcu_p2 = data; });
 	m_mcu->port_out_cb<3>().set(FUNC(_1943_state::mcu_p3_w));
 
-	WATCHDOG_TIMER(config, "watchdog");
-
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(XTAL(24'000'000)/4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
@@ -298,6 +295,8 @@ void _1943_state::_1943(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1943);
 	PALETTE(config, m_palette, FUNC(_1943_state::_1943_palette), 32*4+16*16+16*16+16*16, 256);
+
+	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

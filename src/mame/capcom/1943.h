@@ -11,6 +11,7 @@
 #pragma once
 
 #include "cpu/mcs51/i8051.h"
+#include "video/bufsprite.h"
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -52,7 +53,7 @@ private:
 	required_shared_ptr<u8> m_scrollx;
 	required_shared_ptr<u8> m_scrolly;
 	required_shared_ptr<u8> m_bgscrollx;
-	required_shared_ptr<u8> m_spriteram;
+	required_device<buffered_spriteram8_device> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;

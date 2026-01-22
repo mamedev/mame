@@ -384,19 +384,19 @@ authors:hap
 	<group name="buttons1">
 		<bounds x="0" y="0" width="100" height="30" />
 
-		<element ref="text_r15a"><bounds xc="50" y="4.8" width="10" height="2.5" /></element>
+		<element ref="text_r15a"><bounds xc="50" y="4.8" width="9" height="2.5" /></element>
 
 		<repeat count="5">
 			<param name="x" start="10" increment="10" />
 			<param name="i" start="1" increment="1" />
-			<element ref="text_r1~i~"><bounds xc="~x~" y="7.0" width="10" height="2.5" /></element>
+			<element ref="text_r1~i~"><bounds xc="~x~" y="7.0" width="9" height="2.5" /></element>
 			<element ref="white2" blend="multiply"><bounds xc="~x~" y="1" width="10" height="9" /></element>
 			<element ref="cyan"><bounds xc="~x~" y="10" width="8.5" height="1" /></element>
 		</repeat>
 		<repeat count="5">
 			<param name="x" start="10" increment="10" />
 			<param name="i" start="1" increment="1" />
-			<element ref="text_r2~i~"><bounds xc="~x~" y="18.5" width="10" height="2.5" /></element>
+			<element ref="text_r2~i~"><bounds xc="~x~" y="18.5" width="9" height="2.5" /></element>
 			<element ref="white2" blend="multiply"><bounds xc="~x~" y="12.5" width="10" height="9" /></element>
 			<element ref="cyan"><bounds xc="~x~" y="21.5" width="8.5" height="1" /></element>
 		</repeat>

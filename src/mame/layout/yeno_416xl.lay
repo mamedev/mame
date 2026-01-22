@@ -360,8 +360,8 @@ authors:hap
 		<element ref="whitew"><bounds x="24.75" y="10" width="1.2" height="1.2" /></element>
 		<element ref="whitew"><bounds x="33.75" y="10" width="1.2" height="1.2" /></element>
 
-		<element ref="text_b0"><bounds x="26.5" y="10" width="10" height="1.3" /></element>
-		<element ref="text_b1"><bounds x="35.5" y="10" width="10" height="1.3" /></element>
+		<element ref="text_b0"><bounds x="26.5" y="10" width="6" height="1.3" /></element>
+		<element ref="text_b1"><bounds x="35.5" y="10" width="6" height="1.3" /></element>
 
 		<repeat count="4">
 			<param name="x1" start="6.75" increment="9" />
@@ -369,11 +369,11 @@ authors:hap
 			<param name="i" start="2" increment="1" />
 
 			<element ref="whitew"><bounds x="~x1~" y="17" width="1.2" height="1.2" /></element>
-			<element ref="text_b~i~"><bounds x="~x2~" y="17" width="10" height="1.3" /></element>
+			<element ref="text_b~i~"><bounds x="~x2~" y="17" width="6" height="1.3" /></element>
 		</repeat>
 
-		<element ref="text_b2a"><bounds x="8.5" y="18.2" width="10" height="1.3" /></element>
-		<element ref="text_b5a"><bounds x="35.5" y="18.2" width="10" height="1.3" /></element>
+		<element ref="text_b2a"><bounds x="8.5" y="18.2" width="6" height="1.3" /></element>
+		<element ref="text_b5a"><bounds x="35.5" y="18.2" width="6" height="1.3" /></element>
 
 		<repeat count="4">
 			<param name="x1" start="6.75" increment="9" />
@@ -381,11 +381,11 @@ authors:hap
 			<param name="i" start="6" increment="1" />
 
 			<element ref="whitew"><bounds x="~x1~" y="24" width="1.2" height="1.2" /></element>
-			<element ref="text_b~i~"><bounds x="~x2~" y="24" width="10" height="1.3" /></element>
+			<element ref="text_b~i~"><bounds x="~x2~" y="24" width="6" height="1.3" /></element>
 		</repeat>
 
-		<element ref="text_b9a"><bounds x="35.5" y="25.2" width="10" height="1.3" /></element>
-		<element ref="text_b9b"><bounds x="35.5" y="26.4" width="10" height="1.3" /></element>
+		<element ref="text_b9a"><bounds x="35.5" y="25.2" width="6" height="1.3" /></element>
+		<element ref="text_b9b"><bounds x="35.5" y="26.4" width="6" height="1.3" /></element>
 
 		<repeat count="3">
 			<param name="x1" start="5" increment="12.65" />
@@ -474,14 +474,14 @@ authors:hap
 			<param name="x" start="10" increment="10" />
 			<param name="i" start="5" increment="1" />
 
-			<element ref="text_l~i~"><bounds xc="~x~" y="15" width="10" height="2.5" /></element>
+			<element ref="text_l~i~"><bounds xc="~x~" y="15" width="9" height="2.5" /></element>
 		</repeat>
 
-		<element ref="text_l7a"><bounds x="27.5" y="12.7" width="10" height="2.5" /></element>
-		<element ref="text_l7b"><bounds x="27.5" y="15" width="10" height="2.5" /></element>
+		<element ref="text_l7a"><bounds x="27.5" y="12.7" width="9" height="2.5" /></element>
+		<element ref="text_l7b"><bounds x="27.5" y="15" width="9" height="2.5" /></element>
 
-		<element ref="text_l8a"><bounds x="37.8" y="12.7" width="10" height="2.5" /></element>
-		<element ref="text_l8b"><bounds x="37.8" y="15" width="10" height="2.5" /></element>
+		<element ref="text_l8a"><bounds x="37.8" y="12.7" width="9" height="2.5" /></element>
+		<element ref="text_l8b"><bounds x="37.8" y="15" width="9" height="2.5" /></element>
 
 		<element ref="cwhite" blend="multiply"><bounds x="5" y="0" width="90" height="20" /></element>
 
@@ -501,10 +501,10 @@ authors:hap
 		<bounds left="-18.5" right="126.5" top="-2.25" bottom="87.5" />
 
 		<!-- bottom labels -->
-		<element ref="text_l1"><bounds xc="10" y="81.35" width="10" height="1.3" /></element>
-		<element ref="text_l2"><bounds xc="30" y="81.35" width="10" height="1.3" /></element>
-		<element ref="text_l3"><bounds xc="50" y="81.35" width="10" height="1.3" /></element>
-		<element ref="text_l4"><bounds xc="70" y="81.35" width="10" height="1.3" /></element>
+		<element ref="text_l1"><bounds xc="10" y="81.35" width="7" height="1.3" /></element>
+		<element ref="text_l2"><bounds xc="30" y="81.35" width="7" height="1.3" /></element>
+		<element ref="text_l3"><bounds xc="50" y="81.35" width="7" height="1.3" /></element>
+		<element ref="text_l4"><bounds xc="70" y="81.35" width="7" height="1.3" /></element>
 
 		<!-- chessboard coords -->
 		<element ref="text_a"><bounds xc="5"  y="80.75" width="2" height="2" /></element>

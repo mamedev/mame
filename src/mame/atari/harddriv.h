@@ -19,7 +19,7 @@
 #include "cpu/dsp32/dsp32.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68010.h"
-#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms320c1x/tms320c1x.h"
 #include "cpu/tms34010/tms34010.h"
 
 #include "machine/74259.h"
@@ -554,7 +554,7 @@ private:
 	required_device<cpu_device> m_soundcpu;
 	required_device<ls259_device> m_latch;
 	required_device<dac_word_interface> m_dac;
-	required_device<tms32010_device> m_sounddsp;
+	required_device<tms320c10_device> m_sounddsp;
 	required_shared_ptr<uint16_t> m_sounddsp_ram;
 	required_region_ptr<uint8_t>  m_sound_rom;
 
