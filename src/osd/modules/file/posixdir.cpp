@@ -229,6 +229,31 @@ directory::ptr directory::open(std::string const &dirname)
 } // namespace osd
 
 
+std::string xdg_env;
+
+const char * getenv_xdg(const char * env_name)
+{
+	const char * env_value = std::getenv(env_name);
+
+	if (env_value) return env_value;
+
+	env_value = std::getenv("HOME");
+	if (!env_value) return nullptr;
+
+	xdg_env = env_value;
+
+	if ((std::string) env_name == "XDG_CACHE_HOME")
+		return xdg_env.append("/.cache").c_str();
+	if ((std::string) env_name == "XDG_CONFIG_HOME")
+		return xdg_env.append("/.config").c_str();
+	if ((std::string) env_name == "XDG_DATA_HOME")
+		return xdg_env.append("/.local/share").c_str();
+	if ((std::string) env_name == "XDG_STATE_HOME")
+		return xdg_env.append("/.local/state").c_str();
+
+	return nullptr;
+}
+
 //============================================================
 //  osd_subst_env
 //============================================================
@@ -276,7 +301,7 @@ std::string osd_subst_env(std::string_view src)
 				{
 					var.assign(start, it);
 					start = ++it;
-					const char *const exp = std::getenv(var.c_str());
+					const char *const exp = getenv_xdg(var.c_str());
 					if (exp)
 						result.append(exp);
 					else
@@ -288,7 +313,7 @@ std::string osd_subst_env(std::string_view src)
 				for (++it; (src.end() != it) && (('_' == *it) || std::isalnum(*it)); ++it) { }
 				var.assign(start, it);
 				start = it;
-				const char *const exp = std::getenv(var.c_str());
+				const char *const exp = getenv_xdg(var.c_str());
 				if (exp)
 					result.append(exp);
 				else
