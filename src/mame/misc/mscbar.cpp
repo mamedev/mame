@@ -266,24 +266,24 @@ void mscbar_state::mscbar(machine_config &config)
 	config.set_default_layout(layout_mscbar);
 
 	/* Keyboard & display interface */
-	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'635) / 6));
+	i8279_device &kbdc(I8279(config, "i8279", XTAL(10'738'000) / 6));
 	kbdc.out_sl_callback().set(FUNC(mscbar_state::multiplex_7seg_w));   // select  block of 7seg modules by multiplexing the SL scan lines
 	kbdc.in_rl_callback().set(FUNC(mscbar_state::keyboard_r));          // keyboard Return Lines
 	kbdc.out_disp_callback().set(FUNC(mscbar_state::display_7seg_data_w));
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'635) / 6));
+	ay8910_device &ay1(AY8910(config, "ay1", XTAL(10'738'000) / 6));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay1.port_a_write_callback().set(FUNC(mscbar_state::ay1_port_a_w));
 	ay1.port_b_write_callback().set(FUNC(mscbar_state::ay1_port_b_w));
 
-	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'738'635) / 6));
+	ay8910_device &ay2(AY8910(config, "ay2", XTAL(10'738'000) / 6));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.50);
 	ay2.port_a_write_callback().set(FUNC(mscbar_state::ay2_port_a_w));
 	ay2.port_b_write_callback().set(FUNC(mscbar_state::ay2_port_b_w));
    
-    OKIM6295(config, m_oki,  XTAL(10'738'635) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.00);  // Clock frequency & pin 7 not verified
+    OKIM6295(config, m_oki,  XTAL(10'738'000) / 4, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 1.00);  // Clock frequency & pin 7 not verified
 }
 
 void mscbar_state::machine_start()
