@@ -8,7 +8,7 @@
 
 #pragma once
 
-#define DEBUG_VRAM_VIEWER 0 // VRAM viewer for debug
+#define CV1K_DEBUG_VRAM_VIEWER 0 // VRAM viewer for debug
 
 class cv1k_blitter_device : public device_t, public device_video_interface
 {
@@ -862,7 +862,7 @@ private:
 	s32 m_firmware_version;
 
 	// debug vram viewer
-#ifdef DEBUG_VRAM_VIEWER
+#ifdef CV1K_DEBUG_VRAM_VIEWER
 	bool m_debug_vram_view_en;
 	int m_prev_screen_width;
 	int m_prev_screen_height;

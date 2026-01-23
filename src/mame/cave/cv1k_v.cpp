@@ -63,7 +63,7 @@ cv1k_blitter_device::cv1k_blitter_device(const machine_config &mconfig, const ch
 	, m_firmware_pos(0)
 	, m_firmware_port(0)
 	, m_firmware_version(0)
-#ifdef DEBUG_VRAM_VIEWER
+#ifdef CV1K_DEBUG_VRAM_VIEWER
 	, m_debug_vram_view_en(false)
 	, m_prev_screen_width(0)
 	, m_prev_screen_height(0)
@@ -87,7 +87,7 @@ void cv1k_blitter_device::device_start()
 	m_clip = m_bitmaps.cliprect();
 	m_clip.set(0, 0x2000 - 1, 0, 0x1000 - 1);
 
-#if DEBUG_VRAM_VIEWER
+#if CV1K_DEBUG_VRAM_VIEWER
 	m_debug_vram_view_en = false;
 	m_prev_screen_width = m_curr_screen_width = screen().width();
 	m_prev_screen_height = m_curr_screen_height = screen().height();
@@ -868,7 +868,7 @@ u32 cv1k_blitter_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 	bitmap.fill(0, cliprect);
 
-#if DEBUG_VRAM_VIEWER
+#if CV1K_DEBUG_VRAM_VIEWER
 	int curr_width = m_curr_screen_width;
 	int curr_height = m_curr_screen_height;
 	rectangle curr_visarea = m_curr_screen_visarea;
@@ -888,7 +888,7 @@ u32 cv1k_blitter_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	}
 #endif
 
-#if DEBUG_VRAM_VIEWER
+#if CV1K_DEBUG_VRAM_VIEWER
 	if (m_debug_vram_view_en)
 		copybitmap(bitmap, m_bitmaps, 0, 0, 0, 0, cliprect);
 	else
