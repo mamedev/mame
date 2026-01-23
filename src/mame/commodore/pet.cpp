@@ -148,7 +148,11 @@ ROM sockets:  UA3   2K or 4K character
     - 8296
         - PLA dumps
         - high resolution graphics
-			The RAM is accesed by writing the value #$83 into $E888. This is a register in the CRTC memory space that is intercepted by the board and serves as a latch to drive jumpers on the 8296D mainboard. Because the ROMs are banked out this way, all video memory manipulation must happen with interrupts disabled. Normal ROM operation is restored by writing #$0F into $E888.
+            The RAM is accessed by writing the value #$83 into $E888. This is a register
+            in the CRTC memory space that is intercepted by the board and serves as a
+            latch to drive jumpers on the 8296D mainboard. Because the ROMs are banked
+            out this way, all video memory manipulation must happen with interrupts
+            disabled. Normal ROM operation is restored by writing #$0F into $E888.
         - Malvern Particle Sizer OEM variant
 
 */
@@ -2003,7 +2007,7 @@ void pet80_state::pet80(machine_config &config)
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(XTAL(16'000'000), 800, 0, 640, 333, 0, 250);
 	m_screen->set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
-	
+
 	SY6545_1(config, m_crtc, XTAL(16'000'000)/16);
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
