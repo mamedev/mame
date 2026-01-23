@@ -84,8 +84,8 @@ pc98: InstallShield is painfully slow unless floppy is inserted
 		-->
 		<description>Disney's Hercules Action Game (USA)</description>
 		<year>1997</year>
-		<developer>Eurocom Developments</developer>
 		<publisher>Disney Interactive</publisher>
+		<info name="developer" value="Eurocom Developments" />
 		<sharedfeat name="compatibility" value="ibmpc,pc98" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -209,8 +209,8 @@ pc98: has color and graphic issues during gameplay
 		-->
 		<description>Road Rash (USA, Europe)</description>
 		<year>1996</year>
-		<developer>Papyrus Design Group</developer>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Papyrus Design Group" />
 		<sharedfeat name="compatibility" value="ibmpc,pc98" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
