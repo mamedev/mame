@@ -21,7 +21,7 @@ Once the tape has finished loading, just type RUN to start the loaded program --
 		<description>16K Letter Writter</description>
 		<year>1982</year>
 		<publisher>Milt Perry</publisher>
-		<info name="usage" value="Requires 16K RAM" />
+		<info name="required_ram" value="16K" />
 		<part name="cass" interface="apf_cass">
 			<dataarea name="cass" size="1743020">
 				<rom name="m_perry_16k_letter_writter(16k).wav" size="1743020" crc="d1ca5e2d" sha1="4c844e54836d4f1de0bf4d653860c5c20444d304"/>
@@ -33,7 +33,7 @@ Once the tape has finished loading, just type RUN to start the loaded program --
 		<description>An Adventure in Murder</description>
 		<year>198?</year>
 		<publisher>R. Eisman</publisher>
-		<info name="usage" value="Requires 16K RAM" />
+		<info name="required_ram" value="16K" />
 		<part name="cass" interface="apf_cass">
 			<dataarea name="cass" size="2030598">
 				<rom name="r_eisman_adventure_in_murder(16k).wav" size="2030598" crc="5fbd2aed" sha1="aca54da042c60b96fd7288f6a5df54d7239757c8"/>
@@ -45,7 +45,7 @@ Once the tape has finished loading, just type RUN to start the loaded program --
 		<description>ALPHAbit</description>
 		<year>19??</year>
 		<publisher>MR R's</publisher>
-		<info name="usage" value="Requires 16K RAM" />
+		<info name="required_ram" value="16K" />
 		<part name="cass" interface="apf_cass">
 			<dataarea name="cass" size="1750444">
 				<rom name="mr_rs_alphabit(16k).wav" size="1750444" crc="f7eb904d" sha1="19dfca668cc5c54af0278553f5600ba3e8bdd9ee"/>
@@ -652,7 +652,7 @@ checks whether the user is typing the program printed in the manual, for each le
 		<description>Mission: Improbable - Mission Alpha</description>
 		<year>1982</year>
 		<publisher>Geo-Grafix</publisher>
-		<info name="usage" value="Requires 16K RAM" />
+		<info name="required_ram" value="16K" />
 		<part name="cass" interface="apf_cass">
 			<dataarea name="cass" size="10269596">
 				<rom name="geo_grafix_mission-improbable_alpha(16k).wav" size="10269596" crc="29a0d823" sha1="75e7b305f2004af57fa9b1347c3e2f12cb68d525"/>
@@ -861,7 +861,7 @@ checks whether the user is typing the program printed in the manual, for each le
 		<description>Space Shuttle</description>
 		<year>19??</year>
 		<publisher>York 10 Computerware</publisher>
-		<info name="usage" value="Requires 16K RAM" />
+		<info name="required_ram" value="16K" />
 		<part name="cass" interface="apf_cass">
 			<dataarea name="cass" size="1759916">
 				<rom name="york_10_computerware_space_shuttle(16k).wav" size="1759916" crc="66a43b5a" sha1="1644bc35920e81876de630feb59d4ab761b87563"/>
@@ -987,7 +987,7 @@ checks whether the user is typing the program printed in the manual, for each le
 		<description>Transport + 15 Matches</description>
 		<year>19??</year>
 		<publisher>R. T. Carman</publisher>
-		<info name="usage" value="Transport requires 16K RAM" />
+		<info name="required_ram" value="Transport requires 16K RAM" />
 		<part name="cass" interface="apf_cass">
 			<dataarea name="cass" size="3680094">
 				<rom name="r_t_carman_transport(16k)_15_matches.wav" size="3680094" crc="5673884c" sha1="538ea35a11ce95243da6cb6bf568b8f840bbe40d"/>

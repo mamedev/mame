@@ -764,7 +764,7 @@ INVESTIGATE
 		<!-- PC8801 -->
 		<info name="release" value="198601xx"/>
 		<info name="alt_title" value="A列車で行こう"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="a-ressha de iko.d88" size="697696" crc="a932b822" sha1="daceef5bf691b961f2682ee6c8f46113a87bf52d"/-->
 
@@ -790,7 +790,7 @@ INVESTIGATE
 		<!-- PC8801 -->
 		<info name="release" value="198601xx"/>
 		<info name="alt_title" value="A列車で行こう"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
@@ -814,7 +814,7 @@ INVESTIGATE
 		<!-- PC8801 -->
 		<info name="release" value="198601xx"/>
 		<info name="alt_title" value="A列車で行こう"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System" />
@@ -837,7 +837,7 @@ INVESTIGATE
 		<publisher>コンプティーク (Comptiq)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">    <!-- Data CRC16: 49413 -->
@@ -852,7 +852,7 @@ INVESTIGATE
 		<publisher>コンプティーク (Comptiq)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="411952">    <!-- Data CRC16: 1268 -->
@@ -867,7 +867,7 @@ INVESTIGATE
 		<publisher>コンプティーク (Comptiq)</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">    <!-- Data CRC16: 7110 -->
@@ -1405,7 +1405,8 @@ Has serious GVRAM garbage drawn on gameplay [timing]?
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
-		<info name="usage" value="Needs BASIC V2, scenario disk must be in drive 2 at boot otherwise game will crash"/>
+		<info name="required_os" value="BASIC V2"/>
+		<info name="usage" value="Scenario disk must be in drive 2 at boot otherwise game will crash"/>
 		<!--combined image-->
 		<!--rom name="advanced fantasian.d88" size="1395328" crc="9e0d4f83" sha1="d8b593e3384d3bc3573fbeb5bdff64ac8a7680d6"/-->
 
@@ -1446,7 +1447,8 @@ Has serious GVRAM garbage drawn on gameplay [timing]?
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
-		<info name="usage" value="Needs BASIC V2, scenario disk must be in drive 2 at boot otherwise game will crash"/>
+		<info name="required_os" value="BASIC V2"/>
+		<info name="usage" value="Scenario disk must be in drive 2 at boot otherwise game will crash"/>
 		<!--combined image-->
 		<!--rom name="advanced fantasian.d88" size="1395328" crc="873791ba" sha1="1b98bf46f0c30bba4f1484fc299421f199bf4b40"/-->
 
@@ -1486,7 +1488,8 @@ Has serious GVRAM garbage drawn on gameplay [timing]?
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="アドヴァンスト ファンタジアン"/>
-		<info name="usage" value="Needs BASIC V2, scenario disk must be in drive 2 at boot otherwise game will crash"/>
+		<info name="required_os" value="BASIC V2"/>
+		<info name="usage" value="Scenario disk must be in drive 2 at boot otherwise game will crash"/>
 		<!--combined image (main/scenario/demo/user) -->
 		<!--rom name="fantasian 2.d88" size="1520320" crc="876b83d0" sha1="6a26a77c90d83fd82a1ba2ca70c1606fb9b5d002"/-->
 
@@ -1529,7 +1532,7 @@ Not extensively tested (language barrier)
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
 		<info name="alt_title" value="アドベンチャーランド"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="adventure land.d88" size="371280" crc="268c1be5" sha1="fb01b5f53a196e85fdd7ae2b7ffbae7f2c17cd24"/-->
 		<!-- Disk (Disk Basic, Saga#1)
@@ -1588,7 +1591,7 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198803xx"/>
 		<info name="alt_title" value="アグニの石"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="agni no ishi.d88" size="1248320" crc="7de039d4" sha1="e2894757b61aac177f6549a7717e4dd086c005bd"/-->
 
@@ -1623,7 +1626,7 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198803xx"/>
 		<info name="alt_title" value="アグニの石"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="agni no ishi(mad).d88" size="1248368" crc="8e7375d7" sha1="1c5eea7381ee3c595dc3bf191f01d1a7f1c62a84"/-->
 
@@ -1757,7 +1760,7 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198401xx"/>
 		<info name="alt_title" value="悪女かまきり"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 53749 -->
 				<rom name="akujo kamakiri.d88" size="348848" crc="e67cd0db" sha1="409f2815097475e8ea7e75f700cb428aee43985d"/>
@@ -2062,7 +2065,7 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		<info name="release" value="198502xx"/>
 		<info name="alt_title" value="アリババ"/>
 		<!-- Top/bottom lines don't draw on V2, probably has other inconveniences later on -->
-		<info name="usage" value="Suggested to use BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 9116 -->
@@ -2081,7 +2084,7 @@ Throws loading error on title screen
 		<!-- PC8801 -->
 		<info name="release" value="198502xx"/>
 		<info name="alt_title" value="アリババ"/>
-		<info name="usage" value="Suggested to use BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 56923 -->
@@ -2100,7 +2103,7 @@ Throws loading error on title screen
 		<!-- PC8801 -->
 		<info name="release" value="198502xx"/>
 		<info name="alt_title" value="アリババ"/>
-		<info name="usage" value="Suggested to use BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 20799 -->
@@ -2233,7 +2236,8 @@ Not extensively tested
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
 		<info name="alt_title" value="アリス"/>
-		<info name="usage" value="Needs BASIC V1, commands needs to be entered in uppercase"/>
+		<info name="required_os" value="BASIC V1"/>
+		<info name="usage" value="Commands needs to be entered in uppercase"/>
 		<!--combined image-->
 		<!--rom name="alice.d88" size="1046544" crc="e3204623" sha1="b305bdefd64338397fa3046e0b24259b0f3dd592"/-->
 
@@ -2266,7 +2270,7 @@ Not extensively tested
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
 		<info name="alt_title" value="アリス"/>
-		<info name="usage" value="Needs BASIC V1 or older"/>
+		<info name="required_os" value="BASIC V1 or older"/>
 		<!--combined image-->
 		<!--rom name="alice.d88" size="1046544" crc="52392bfe" sha1="e94862d7ff010c2f90390cf583518de5dfd92c0c"/-->
 
@@ -2341,7 +2345,7 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 		<year>1986</year>
 		<publisher>スクウェア (Square)</publisher>
 		<info name="alt_title" value="アルファ"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="287920">    <!-- Data CRC16: 4039 -->
@@ -2357,7 +2361,7 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 		<!-- PC8801 -->
 		<info name="release" value="198306xx"/>
 		<info name="alt_title" value="アルフォス"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="331440">    <!-- Data CRC16: 38369 -->
@@ -2373,7 +2377,7 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 		<!-- PC8801 -->
 		<info name="release" value="198306xx"/>
 		<info name="alt_title" value="アルフォス"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 24809 -->
@@ -2390,7 +2394,7 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 		<!-- PC8801 -->
 		<info name="release" value="198306xx"/>
 		<info name="alt_title" value="アルフォス"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">    <!-- Data CRC16: 39948 -->
@@ -2405,7 +2409,7 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 		<publisher>ソフトプラン (SoftPlan)</publisher>
 		<info name="release" value="198306xx"/>
 		<info name="alt_title" value="アマンザス"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="amanxas.d88" size="1046544" crc="364533a7" sha1="3ba3ccb3aea2efdb2ae2049790626612db8866b0"/-->
 
@@ -2438,7 +2442,7 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 		<!-- PC8801 -->
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="アマゾン学術探検"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="amazon gakujutsu tanken.d88" size="697696" crc="5cf4d69a" sha1="d45b9a68afc814320a3565b6252a8d9b2a7e37d1"/-->
 
@@ -2464,7 +2468,7 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 		<!-- PC8801 -->
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="アマゾン学術探検"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Program" />
@@ -2575,7 +2579,7 @@ Fails boot [underlying data is corrupt, error reading in HxC / winimage etc.]
 Unemulated optional [GSX8800] sound board support
 ]]></notes>
 		<info name="alt_title" value="アメリカントラック mkⅡ版"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348880">    <!-- Data CRC16: 52018 -->
@@ -2592,7 +2596,7 @@ Unemulated optional [GSX8800] sound board support
 Unemulated optional [GSX8800] sound board support
 ]]></notes>
 		<info name="alt_title" value="アメリカントラック mkⅡ版"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349024">    <!-- Data CRC16: 60057 -->
@@ -2608,7 +2612,7 @@ Unemulated optional [GSX8800] sound board support
 		<!-- PC8801 -->
 		<info name="release" value="198604xx"/>
 		<info name="alt_title" value="少女戦隊 エンジェル"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="angel.d88" size="697696" crc="c8e63e74" sha1="7b1cf5669f7b2178699dbabdfca15d21b64b4a40"/-->
 
@@ -2636,7 +2640,7 @@ Unemulated optional [GSX8800] sound board support
 		<!-- PC8801 -->
 		<info name="release" value="198604xx"/>
 		<info name="alt_title" value="少女戦隊 エンジェル"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="the fightgirls angel.d88" size="697696" crc="38309c41" sha1="09f3e6bab3d6d940e984f6ac934925d3aa8d0641"/-->
 
@@ -2664,7 +2668,7 @@ Unemulated optional [GSX8800] sound board support
 		<!-- PC8801 -->
 		<info name="release" value="198604xx"/>
 		<info name="alt_title" value="少女戦隊 エンジェル"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="shojo_sentai_angel.d88" size="697696" crc="30c58862" sha1="7fc3b599e4332dfd123e3ba3df0e78f4fffe8c28"/-->
 
@@ -3404,7 +3408,7 @@ ExtractDisk  [11]"#10 危険な年頃  " -> "Apple Club 11.d88" [a9f8422b]
 		<!-- PC8801 -->
 		<info name="release" value="198402xx"/>
 		<info name="alt_title" value="アップルーン"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240"> <!-- Data CRC16: 64612 -->
@@ -3954,7 +3958,7 @@ TODO: understand how to create an user disk
 		<info name="alt_title" value="アタック!! ひろ子ちゃん"/>
 		<!-- TODO: pinpoint exact version needed -->
 		<!-- (PC8801MA throws "division by zero" exception) -->
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
@@ -3992,7 +3996,7 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199009xx"/>
 		<info name="alt_title" value="アユミ"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="ayumi.d88" size="1399680" crc="b93011b6" sha1="5cb6e565652f614bbc3e61ca913c9f3ec0a42814"/-->
 
@@ -4032,7 +4036,8 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<!-- PC8801 -->
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="アズテック"/>
-		<info name="usage" value="Needs BASIC V1, press ESC key during gameplay for the action list"/>
+		<info name="required_os" value="BASIC V1"/>
+		<info name="usage" value="Press ESC key during gameplay for the action list"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="411952">
@@ -4048,7 +4053,8 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<!-- PC8801 -->
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="アズテック"/>
-		<info name="usage" value="Needs BASIC V1, press ESC key during gameplay for the action list"/>
+		<info name="required_os" value="BASIC V1"/>
+		<info name="usage" value="Press ESC key during gameplay for the action list"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
@@ -4064,7 +4070,7 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="バビロン"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!-- check Crimson usage information for instructions on how to create user disk -->
 		<!--combined image-->
 		<!--rom name="babylon.d88" size="1067728" crc="117d7783" sha1="31bf30823e223c63f9b71c92c024904416da9294"/-->
@@ -4098,7 +4104,7 @@ A few kanji drawings in gameplay are odd to look at (cfr. signs, sports as full 
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="バビロン"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="babylon.d88" size="1053856" crc="d7b18f7d" sha1="56ae40707ebe70e0fc109c3189276ba66a4ee059"/-->
 
@@ -4202,7 +4208,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
 		<info name="alt_title" value="ボールパニカー"/>
-		<info name="usage" value="Needs N[80SR] BASIC"/>
+		<info name="required_os" value="N[80SR] BASIC"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -4218,7 +4224,7 @@ Should be supported by [PC8001mkIISR] too
 		<publisher>CSKソフトウェアプロダクツ (CSK Software Products)</publisher>
 		<!-- PC8801 -->
 		<info name="alt_title" value="バルチック艦隊を追え"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -4789,7 +4795,8 @@ All weapons GFX displays are garbled in this version, is the dump right?
 		<!-- PC8801 -->
 		<info name="release" value="198401xx"/>
 		<info name="alt_title" value="ザ・ブラックオニキス"/>
-		<info name="usage" value="Needs BASIC V1, insert blank disk in drive 2 to create user disk thru option 1, use option 3 to view characters"/>
+		<info name="required_os" value="BASIC V1"/>
+		<info name="usage" value="Insert blank disk in drive 2 to create user disk thru option 1, use option 3 to view characters"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="299072">
@@ -4810,7 +4817,8 @@ Note: cannot mix party from disk 1 and 2
 		<!-- baddump: has extra characters in disk 1 -->
 		<info name="release" value="198401xx"/>
 		<info name="alt_title" value="ザ・ブラックオニキス"/>
-		<info name="usage" value="Needs BASIC V1, insert blank disk in drive 2 to create user disk thru option 1, use option 3 to view characters"/>
+		<info name="required_os" value="BASIC V1"/>
+		<info name="usage" value="Insert blank disk in drive 2 to create user disk thru option 1, use option 3 to view characters"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
 				<rom name="black onyx (a).d88" size="344496" crc="7f2aeef1" sha1="deb19017374982c60e3be21ea21183ac995f2b2d" status="baddump"/>
@@ -5071,7 +5079,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<!-- PC8801 -->
 		<info name="release" value="198410xx"/>
 		<info name="alt_title" value="バルダーダッシュ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
@@ -5087,7 +5095,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<!-- PC8801 -->
 		<info name="release" value="198410xx"/>
 		<info name="alt_title" value="ブルースリー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="411952">
@@ -5177,7 +5185,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
 		<info name="alt_title" value="バグ・アタック"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!-- "Converted by BEAR'S" -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -5566,7 +5574,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
 		<info name="alt_title" value="さよならジュピター"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!-- Written by CRAST -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -5583,7 +5591,7 @@ ExtractDisk  [02]"ｹﾝｼﾞｬﾉﾕｲｺﾞﾝ B   " -> "Bokensha-tachi - K
 		<!-- PC8801 -->
 		<info name="release" value="198712xx"/>
 		<info name="alt_title" value="ザ・病院"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="the byoin.d88" size="1395392" crc="deb47a27" sha1="4b4cf71fd04391e98402a58222be7dbfa31e365c"/-->
 
@@ -5741,7 +5749,7 @@ Not extensively tested
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900601"/>
 		<info name="alt_title" value="きゃんきゃんバニー スペリオール"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="cancan bunny 2.d88" size="1729904" crc="f0550d79" sha1="b7488be5091f25130af6152975f23354024c0083"/-->
 
@@ -5784,7 +5792,7 @@ Not extensively tested
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900601"/>
 		<info name="alt_title" value="きゃんきゃんバニー スペリオール"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="can can bunny superior.d88" size="1771552" crc="eec02037" sha1="7fcdeeb5169e9b97b260146efd24d275911d90d3"/-->
 
@@ -5867,7 +5875,7 @@ Not extensively tested
 		<!-- PC8801 -->
 		<info name="release" value="198307xx"/>
 		<info name="alt_title" value="キャノンボール"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
@@ -5897,7 +5905,7 @@ Not extensively tested
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="カーマイン88"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="carmine.d88" size="770496" crc="ade94761" sha1="220ee916091ece8176e56867e3923529a8c49591"/-->
 
@@ -5923,7 +5931,7 @@ Not extensively tested
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="カーマイン88"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="carmine.d88" size="1140944" crc="62aeef7e" sha1="18a952b782b71177fa0000652422d0ed23d7d6a5"/-->
 
@@ -5998,7 +6006,7 @@ erratic sound tempo during gameplay, [OPN] regression (runs on system timer irq)
 		<!-- PC8801 -->
 		<info name="release" value="198504xx"/>
 		<info name="alt_title" value="ザ・キャッスル"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="the castle.d88" size="697696" crc="6d88c2df" sha1="498cd6c8884e5524c9d04ceed01272c85f201202"/-->
 
@@ -6025,7 +6033,7 @@ erratic sound tempo during gameplay, [OPN] regression (runs on system timer irq)
 		<!-- PC8801 -->
 		<info name="release" value="198504xx"/>
 		<info name="alt_title" value="ザ・キャッスル"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="the castle.d88" size="697664" crc="7fcf5a49" sha1="320ede32ee67184c838d0f136a2f89ba999b81dc"/-->
 
@@ -6343,7 +6351,7 @@ Crashes while loading, [FDC]?
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
 		<info name="alt_title" value="珍さん麻雀/花札こいこい"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="296624">
@@ -6376,7 +6384,7 @@ Crashes while loading, [FDC]?
 		<!-- PC8801 -->
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="チョップリフター"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -6456,7 +6464,7 @@ Crashes while loading, [FDC]?
 		<!-- PC8801 -->
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="超人ロック"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -6472,7 +6480,7 @@ Crashes while loading, [FDC]?
 		<!-- PC8801 -->
 		<info name="release" value="199612xx"/>
 		<info name="alt_title" value="クリスチーヌ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -6513,7 +6521,7 @@ Crashes while loading, [FDC]?
 		<!-- PC8801 -->
 		<info name="release" value="198608xx"/>
 		<info name="alt_title" value="シティファイト"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -6604,7 +6612,7 @@ Has [3301] attribute bug in code edit mode
 		<publisher>コスモスコンピュータ (Cosmos Computer)</publisher>
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="カレイジアスペルセウス"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="328848">
@@ -6715,7 +6723,7 @@ Has [3301] attribute bug in code edit mode
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="コズミックソルジャー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -6986,7 +6994,7 @@ Keeps resetting to BASIC after "Heart Denshi" logo kicks-in, tries to self-modif
 		<!-- PC8801 -->
 		<info name="release" value="198505xx"/>
 		<info name="alt_title" value="クレージーランド"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -7329,7 +7337,7 @@ Keeps resetting to BASIC after "Heart Denshi" logo kicks-in, tries to self-modif
 		<!-- PC8801 -->
 		<info name="release" value="198408xx"/>
 		<info name="alt_title" value="クライシスマウンテン"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
@@ -7349,7 +7357,7 @@ Unemulated optional [GSX8800] sound board support
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900514"/>
 		<info name="alt_title" value="超美少女伝説クロッキー"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="croquis.d88" size="1046544" crc="cd2a9ef4" sha1="061740a4588d01d24883e623336306c5438dbade"/-->
 
@@ -7594,7 +7602,7 @@ Seldomly crashes (cannot reproduce reliably, "copy protection routine at PC=0x91
 		<!-- PC8801 -->
 		<info name="release" value="198504xx"/>
 		<info name="alt_title" value="キュービーパニック"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344528">
@@ -8083,7 +8091,7 @@ Not extensively tested
 		<!-- PC8801 -->
 		<info name="release" value="198310xx"/>
 		<info name="alt_title" value="大石油王"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
@@ -8261,7 +8269,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198401xx"/>
 		<info name="alt_title" value="ダーククリスタル"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!-- TODO: Additional steps to make this to start game (pressing space just flips thru katakana help screens?) -->
 		<!--combined image-->
 		<!--rom name="dark crystal.d88" size="1391040" crc="db4304ec" sha1="8d9654c430b4c495f1a8e173263b9baa6ff4a9c1"/-->
@@ -8303,7 +8311,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198401xx"/>
 		<info name="alt_title" value="脱出・妖気の樹海 -涅槃の森-"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -8345,7 +8353,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
 		<info name="alt_title" value="デビッド ミッドナイト・マジック"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -8363,7 +8371,7 @@ ExtractDisk  [02]"DAIVA_B        " -> "daiva_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="デイ・ドリーム"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="day dream.d88" size="766240" crc="8c974c97" sha1="d23f69e7d721063f5a640c910e557ae6b609d264"/-->
 
@@ -9280,7 +9288,7 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198312xx"/>
 		<info name="alt_title" value="デゼニランド"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="287920">
@@ -9895,7 +9903,7 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198310xx"/>
 		<info name="alt_title" value="ドクロンの館"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
@@ -10200,7 +10208,7 @@ ExtractDisk  [08]"下巻 ユーザー   " -> "aaa_08.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198902xx"/>
 		<info name="alt_title" value="ドラゴン"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -10488,7 +10496,7 @@ Not extensively tested
 		<!-- TODO: verify actual capitalization -->
 		<info name="developer" value="VIEWTECH"/>
 		<info name="alt_title" value="ドラゴンプリンセス 迷宮の魔道士"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="dragon princess.d88" size="544416" crc="2c87baf2" sha1="0856a303505d18c01b3c15cd14ba168efe5475ef"/-->
 
@@ -10517,7 +10525,7 @@ Not extensively tested
 		<!-- TODO: stylized with a cross between the two words -->
 		<info name="developer" value="Run Tech"/>
 		<info name="alt_title" value="ドラゴンプリンセス 迷宮の魔道士"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -10808,7 +10816,7 @@ but in different order
 		<!-- PC8801 -->
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="ドラゴンスレイヤー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="448144">    <!-- Data CRC16: 15654 -->
@@ -10824,7 +10832,7 @@ but in different order
 		<!-- PC8801 -->
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="ドラゴンスレイヤー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="499184">    <!-- Data CRC16: 40592 -->
@@ -10841,7 +10849,7 @@ but in different order
 		<!-- PC8801 -->
 		<info name="release" value="198604xx"/>
 		<info name="alt_title" value="ドラゴンスレイヤー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">    <!-- Data CRC16: 62315 -->
@@ -10857,7 +10865,7 @@ but in different order
 		<!-- PC8801 -->
 		<info name="release" value="198604xx"/>
 		<info name="alt_title" value="ドラゴンスレイヤー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="415840">    <!-- Data CRC16: 48963 -->
@@ -10873,7 +10881,7 @@ but in different order
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198909xx"/>
 		<info name="alt_title" value="ドラグーン・アーマー for アダルト"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="dragoon armor for adult.d88" size="1247520" crc="6adaed9b" sha1="5cbfbb854ef114e45897a3db9ca17b136f311088"/-->
 
@@ -10906,7 +10914,7 @@ but in different order
 		<!-- PC8801 -->
 		<info name="release" value="198308xx"/>
 		<info name="alt_title" value="ドリームランド"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
@@ -11138,7 +11146,7 @@ ExtractDisk  [02]"MAPﾃﾞｨｽｸ        " -> "duel kawanakajima_02.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900810"/>
 		<info name="alt_title" value="ダンジョンバスター"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="dungeon buster.d88" size="2093088" crc="ab66458a" sha1="a668701deb55e96e58ebd11a2cdba7235e474f60"/-->
 
@@ -11265,7 +11273,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198408xx"/>
 		<info name="alt_title" value="英雄伝説サーガ"/>
-		<info name="usage" value="Needs N[80SR] BASIC"/>
+		<info name="required_os" value="N[80SR] BASIC"/>
 		<!--combined image-->
 		<!--rom name="eiyu saga.d88" size="1036752" crc="0fc6c630" sha1="5d1361d062b2f9cae7acaedfef7b70f6ee48c42a"/-->
 
@@ -11301,7 +11309,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198408xx"/>
 		<info name="alt_title" value="英雄伝説サーガ"/>
-		<info name="usage" value="Needs N[80SR] BASIC"/>
+		<info name="required_os" value="N[80SR] BASIC"/>
 		<!--combined image-->
 		<!--rom name="eiyu densetsu saga.d88" size="1044672" crc="26190f21" sha1="a4a8d63a65c1466308be050b5b430301148a8d80"/-->
 
@@ -11334,7 +11342,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="英雄ヤマトタケル"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="eiyu yamato takeru.d88" size="1046544" crc="e77a48f0" sha1="dc30828dcffb1911cb9c127e1ef957c0a679501d"/-->
 
@@ -11367,7 +11375,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198501xx"/>
 		<info name="alt_title" value="エルドラド伝奇"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="eldrad.d88" size="697456" crc="18e7adf1" sha1="eae48b0a686a5d46da7769321ec026a79c52dfe6"/-->
 
@@ -11654,7 +11662,7 @@ FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
 		<!-- PC8801 -->
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="エミー Ⅱ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="emmy 2.d88" size="349536" crc="0b9c26dc" sha1="0a941f462da6477936e83df6bc7e1270c58ea846"/-->
 
@@ -11672,7 +11680,7 @@ FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
 		<!-- PC8801 -->
 		<info name="release" value="198411xx"/>
 		<info name="alt_title" value="エミー Ⅱ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -11962,7 +11970,7 @@ FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
 		<!-- PC8801 -->
 		<info name="release" value="198502xx"/>
 		<info name="alt_title" value="F2グランプリ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -12022,7 +12030,7 @@ FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
 		<!-- PC8801 -->
 		<info name="release" value="198504xx"/>
 		<info name="alt_title" value="フェアリーズレジデンス"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="fairies residence.d88" size="697696" crc="e1c84c7e" sha1="7ed518166b2a0fe97d52a51f23f0fef7fc98126b"/-->
 
@@ -12232,7 +12240,7 @@ FDC stalls [Tries to find a missing CHRN=(00 00 01 01)]
 		<!-- PC8801 -->
 		<info name="release" value="198502xx"/>
 		<info name="alt_title" value="ファンタジアン"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="fantasian.d88" size="697680" crc="d5529746" sha1="068e10c8b28f093b61e2a5e6dc7172cf3582e7e5"/-->
 
@@ -12379,7 +12387,8 @@ Sound gets stuck on PC8801mkIISR (verify)
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199112xx"/>
 		<info name="alt_title" value="ファイナルクライシス"/>
-		<info name="usage" value="Needs BASIC V2. Set 8MHz mode on a PC8801MA+"/>
+		<info name="required_os" value="BASIC V2"/>
+		<info name="usage" value="Set 8MHz mode on a PC8801MA+"/>
 		<!--combined image-->
 		<!--rom name="final crisis.d88" size="1050896" crc="25651cf0" sha1="640d48c9fd1f3870dd6ac5345e378ae25f7e57df"/-->
 
@@ -12412,7 +12421,8 @@ Sound gets stuck on PC8801mkIISR (verify)
 		<!-- PC8801mk2SR -->
 		<info name="release" value="199112xx"/>
 		<info name="alt_title" value="ファイナルクライシス"/>
-		<info name="usage" value="Needs BASIC V2. Set 8MHz mode on a PC8801MA+"/>
+		<info name="required_os" value="BASIC V2"/>
+		<info name="usage" value="Set 8MHz mode on a PC8801MA+"/>
 		<!--combined image-->
 		<!--rom name="final crisis.d88" size="1050896" crc="8de81a1e" sha1="5ee7355a788d6e54641544541549230637b24746"/-->
 
@@ -12448,7 +12458,7 @@ Sound gets stuck on PC8801mkIISR (verify)
 		<!-- PC8801 -->
 		<info name="release" value="198601xx"/>
 		<info name="alt_title" value="ファイナルロリータ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="360896">
@@ -12465,7 +12475,7 @@ Sound gets stuck on PC8801mkIISR (verify)
 		<info name="release" value="198601xx"/>
 		<!-- "Kai!?" -->
 		<info name="alt_title" value="ファイナルロリータ改"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="355872">
@@ -12831,7 +12841,7 @@ ExtractDisk  [02]"Mader Club DISK " -> "murder club_02.d88"
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="alt_title" value="フラッピー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -12846,7 +12856,7 @@ ExtractDisk  [02]"Mader Club DISK " -> "murder club_02.d88"
 		<publisher>デービーソフト (dB-Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="alt_title" value="フラッピー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349104">
@@ -12862,7 +12872,7 @@ ExtractDisk  [02]"Mader Club DISK " -> "murder club_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198511xx"/>
 		<info name="alt_title" value="フリッキー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -12878,7 +12888,7 @@ ExtractDisk  [02]"Mader Club DISK " -> "murder club_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198511xx"/>
 		<info name="alt_title" value="フリッキー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353200">
@@ -13067,7 +13077,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="フルーツフィールド"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -13108,7 +13118,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198403xx"/>
 		<info name="alt_title" value="ファンキーモンキー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353184">
@@ -13631,7 +13641,7 @@ ExtractDisk  [04]"Data Disk    " -> "formula cms_04.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198605xx"/>
 		<info name="alt_title" value="ガンマ5"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -14683,7 +14693,7 @@ ExtractDisk  [02]"Gradius改       " -> "gradius kai_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="ガムボール"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -15254,7 +15264,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198612xx"/>
 		<info name="alt_title" value="ハングオン"/>
-		<info name="usage" value="Needs N[80SR] BASIC"/>
+		<info name="required_os" value="N[80SR] BASIC"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -15600,7 +15610,7 @@ Should be supported by [PC8001mkIISR] too
 		<publisher>Mame House</publisher>
 		<!-- PC8801 -->
 		<info name="release" value="198605xx"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -15616,7 +15626,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198604xx"/>
 		<info name="alt_title" value="へらくれす"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="hercules.d88" size="697664" crc="49654a06" sha1="54ac293281dcf779d6189e22d3cc47b9bd8d49cb"/-->
 
@@ -15873,7 +15883,7 @@ Converted to .mfm from original .hfe
 		<!-- PC8801 - Tape?? -->
 		<info name="release" value="198501xx"/>
 		<info name="alt_title" value="ハイライズ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
@@ -15928,7 +15938,7 @@ Converted to .mfm from original .hfe
 		<!-- PC8801 -->
 		<info name="release" value="198308xx"/>
 		<info name="alt_title" value="ひつじやーい"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
@@ -15944,7 +15954,7 @@ Converted to .mfm from original .hfe
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="飛車"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349376">
@@ -16031,7 +16041,7 @@ Converted to .mfm from original .hfe
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オランダ妻は電気ウナギの夢を見るか?"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -16299,7 +16309,7 @@ Converted to .mfm from original .hfe
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198704xx"/>
 		<info name="alt_title" value="ホテルウォーズ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -16450,7 +16460,7 @@ Converted to .mfm from original .hfe
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="ハイドライド2"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="hydlide 2.d88" size="697744" crc="c1798da6" sha1="30f9941d17a6a79de6e0ef7a5da2b60a1c9f6bcf"/-->
 
@@ -16476,7 +16486,7 @@ Converted to .mfm from original .hfe
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="ハイドライド2"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="hydlide ii.d88" size="697696" crc="d3e55b66" sha1="9c57c6a363332e25e5454e7f2acbcd0776ac3f07"/-->
 
@@ -16501,7 +16511,7 @@ Converted to .mfm from original .hfe
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="ハイドライド2"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="hydlide 2.d88" size="697696" crc="a6febf35" sha1="d01b1a5ce93069fc935c12daa29414bf0f2fe399"/-->
 
@@ -17657,7 +17667,7 @@ Loading user disk will eventually lead to a disk swap, this will either not be r
 		<!-- PC8801 -->
 		<info name="release" value="198409xx"/>
 		<info name="alt_title" value="地獄の練習問題"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="jigoku no renshumondai.d88" size="961616" crc="686efba5" sha1="1b944dcce1d381289695fc38ae6e76c59a6dc27b"/-->
 
@@ -17721,7 +17731,7 @@ Loading user disk will eventually lead to a disk swap, this will either not be r
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="alt_title" value="ジャン狂"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!-- TODO: pinpoint exact supported platforms (definitely don't boot in PC8801MA) -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -17974,7 +17984,7 @@ Loading user disk will eventually lead to a disk swap, this will either not be r
 		<!-- PC8801 -->
 		<info name="release" value="198403xx"/>
 		<info name="alt_title" value="カブールスパイ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="kabul spy.d88" size="720128" crc="5fdfd95c" sha1="6cb13f0335158b520bd6d9dfa4c3a9f324d51e34"/-->
 
@@ -18067,7 +18077,7 @@ Loading user disk will eventually lead to a disk swap, this will either not be r
 		<!-- PC8801 -->
 		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="カレイドスコープ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="kaleidoscope.d88" size="1320320" crc="338833f8" sha1="8e66bced0b19c7b48c65bd3523a35c9dbafe9695"/-->
 
@@ -18107,7 +18117,7 @@ Loading user disk will eventually lead to a disk swap, this will either not be r
 		<!-- PC8801 -->
 		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="カレイドスコープ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="kaleidoscope 1.d88" size="927952" crc="58d81d8b" sha1="e78ff7eeaa7f530ae45e05dffd29020a2e55300f"/-->
 
@@ -18154,7 +18164,7 @@ Loading user disk will eventually lead to a disk swap, this will either not be r
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198907xx"/>
 		<info name="alt_title" value="神の聖都"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="kami no machi.d88" size="3326592" crc="d80ef8d3" sha1="4d7ef148615a7da76517d10a2510328f263cffc3"/-->
 
@@ -18219,7 +18229,7 @@ Loading user disk will eventually lead to a disk swap, this will either not be r
 		<description>Kami no Machi Demo</description>
 		<year>19??</year>
 		<publisher>スタジオパンサー (Studio Panther)</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="kami no machi demo.d88" size="697696" crc="63591dbd" sha1="5176e1a34928c10ee1cba59f6eaf38032640323c"/-->
 
@@ -18242,7 +18252,7 @@ Loading user disk will eventually lead to a disk swap, this will either not be r
 		<description>Kami no Machi Demo (SB2 ver)</description>
 		<year>19??</year>
 		<publisher>スタジオパンサー (Studio Panther)</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="kami no machi demo(sb2 ver).d88" size="697696" crc="aa62acb7" sha1="321159ec66239e4a4552f07ce01b04405db0c70d"/-->
 
@@ -18292,7 +18302,7 @@ Loading user disk will eventually lead to a disk swap, this will either not be r
 		<!-- PC8801 -->
 		<info name="release" value="198504xx"/>
 		<info name="alt_title" value="カムイの剣"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="kamui no ken.d88" size="784736" crc="695721bb" sha1="174bd128b34d22285d5299ea6ae7239d60860cf3"/-->
 
@@ -19211,7 +19221,7 @@ ExtractDisk  [04]"四             " -> "Kohakuiro no Yuigon 04.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198810xx"/>
 		<info name="alt_title" value="小森愛のどきどきラリー"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="komori ai no dokidoki rally.d88" size="697696" crc="7071b012" sha1="e6a14bdb07dccc646ef6831a8b21a8d89604b0c5"/-->
 
@@ -19237,7 +19247,7 @@ ExtractDisk  [04]"四             " -> "Kohakuiro no Yuigon 04.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198810xx"/>
 		<info name="alt_title" value="小森愛のどきどきラリー"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="komori ai no dokidoki rally.d88" size="697696" crc="2b45930c" sha1="ec7b6c80988a24a210a840d7e2ee1edbc5389613"/-->
 
@@ -19263,7 +19273,7 @@ ExtractDisk  [04]"四             " -> "Kohakuiro no Yuigon 04.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198810xx"/>
 		<info name="alt_title" value="小森愛のどきどきラリー"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="komori ai no dokidoki rally.d88" size="697696" crc="9ebc7696" sha1="2f641d472c226cd96e9490f14a89b3f937b25944"/-->
 
@@ -19787,7 +19797,7 @@ ExtractDisk  [04]"D_USER          " -> "kon'yamo asamade powerful mahjong 2_04.d
 		<!-- PC8801 -->
 		<info name="release" value="198308xx"/>
 		<info name="alt_title" value="巨大地震"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="kyodai jishin.d88" size="348848" crc="0964fcfd" sha1="448a0a64d459a43609d3bd6e5da4389d23527554"/>
@@ -20302,7 +20312,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198705xx"/>
 		<info name="alt_title" value="ローオブザ・ウエスト"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -20421,7 +20431,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198912xx"/>
 		<info name="alt_title" value="リバティー"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A" />
@@ -20914,7 +20924,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198310xx"/>
 		<info name="alt_title" value="ロリータ・シンドローム "/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -21122,7 +21132,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ルナーボール"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -21138,7 +21148,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="ルナーボール"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -21154,7 +21164,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198512xx"/>
 		<info name="alt_title" value="ルパン三世 カリオストロの城"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="lupin.d88" size="697696" crc="f3388287" sha1="6dfa6fec0ffa7ddac0d5c06fd215abd41fc2eee0"/-->
 
@@ -21180,7 +21190,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198512xx"/>
 		<info name="alt_title" value="ルパン三世 カリオストロの城"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="cagliostro no shiro.d88" size="697696" crc="5df51a65" sha1="8aac94a58fde90dca3cf61657836b95e814b2603"/-->
 
@@ -21322,7 +21332,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198512xx"/>
 		<info name="alt_title" value="メーベルズマンション"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
@@ -21383,7 +21393,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198702xx"/>
 		<info name="alt_title" value="マデリーン"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="madeleine.d88" size="804704" crc="896606dc" sha1="958f1b9718e4d4b4950ec4b4c10ea4675dbbb892"/-->
 
@@ -21467,7 +21477,7 @@ ExtractDisk  [02]"LAGRANGE      " -> "lagrange l-2_02.d88"
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="メルヘンヴェールmkII"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="390192">
@@ -21727,7 +21737,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198605xx"/>
 		<info name="alt_title" value="魔法使いの妹子"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -21743,7 +21753,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198605xx"/>
 		<info name="alt_title" value="魔法使いの妹子"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -21973,7 +21983,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198610xx"/>
 		<info name="alt_title" value="まじゃべんちゃー ねぎ麻雀"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -21989,7 +21999,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198610xx"/>
 		<info name="alt_title" value="まじゃべんちゃー ねぎ麻雀"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -22183,7 +22193,7 @@ ExtractDisk  [03]"USER_DISK    " -> "maha-kala_03.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198704xx"/>
 		<info name="alt_title" value="魔界復活"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="makai fukkatsu.d88" size="693312" crc="d7f65654" sha1="c0865d914b62e3b557255b54b811d81f93603bd5"/-->
 
@@ -22339,7 +22349,7 @@ TODO: belongs to [PC8001mkIISR]
 		<!-- PC8801 -->
 		<info name="release" value="198605xx"/>
 		<info name="alt_title" value="マッピー"/>
-		<info name="usage" value="Needs N[80SR] BASIC"/>
+		<info name="required_os" value="N[80SR] BASIC"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="353200">
@@ -23395,7 +23405,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="ミルキーウェイ"/>
-		<info name="usage" value="Needs N[80SR] BASIC, also needs V1 for pc8801 machines"/>
+		<info name="required_os" value="N[80SR] BASIC, also BASIC V1 for pc8801 machines"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349248">
@@ -23411,7 +23421,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
 		<info name="alt_title" value="マイナー2049er"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!-- "Converted by BEAR'S" -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -23446,7 +23456,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="ミンキーモモのパニックボール"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
@@ -23463,7 +23473,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="ミンキーモモのパニックボール"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
@@ -23611,7 +23621,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198408xx"/>
 		<info name="alt_title" value="ミッションインポッシブル"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="mission impossible.d88" size="371296" crc="5b49c7d2" sha1="0af5c69fe341d8b3b025a460001b10ab2ea5bdca"/-->
 
@@ -23844,7 +23854,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198404xx"/>
 		<info name="alt_title" value="モンスターランド"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
@@ -23959,7 +23969,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198706xx"/>
 		<info name="alt_title" value="素子姫アドベンチャー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -24055,7 +24065,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198408xx"/>
 		<info name="alt_title" value="ミスターロボット"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
@@ -24628,7 +24638,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198405xx"/>
 		<info name="alt_title" value="ニュートロン"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!-- Chun -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -24686,7 +24696,7 @@ Gameplay is too fast, requires [V1S] support
 		<!-- PC8801 -->
 		<info name="release" value="198307xx"/>
 		<info name="alt_title" value="忍者くん"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -25300,7 +25310,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>
-		<info name="usage" value="Needs N[80SR] BASIC"/>
+		<info name="required_os" value="N[80SR] BASIC"/>
 		<!--combined image-->
 		<!--rom name="okhotsk ni kiyu.d88" size="697696" crc="89dcadf0" sha1="26547667c745f6264564e3767f851387a1b8536d"/-->
 
@@ -25329,7 +25339,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>
-		<info name="usage" value="Needs N[80SR] BASIC"/>
+		<info name="required_os" value="N[80SR] BASIC"/>
 		<!--combined image-->
 		<!--rom name="okhotsk ni kiyu.d88" size="697696" crc="9fcbda53" sha1="86507a7ae84308954f02abef488fe4e544127f2f"/-->
 
@@ -25358,7 +25368,7 @@ Should be supported by [PC8001mkIISR] too
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="オホーツクに消ゆ"/>
-		<info name="usage" value="Needs N[80SR] BASIC"/>
+		<info name="required_os" value="N[80SR] BASIC"/>
 		<!--combined image-->
 		<!--rom name="okhotsk ni kiyu(runs through the end).d88" size="697696" crc="3db06aec" sha1="3e3a5edc48c88233f3a2b5b13c5cdc21d100d48d"/-->
 
@@ -25878,7 +25888,7 @@ Trashes memory after "PROGRAM loading"
 		<!-- PC8801 -->
 		<info name="release" value="198410xx"/>
 		<info name="alt_title" value="パイパニック"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -25897,7 +25907,7 @@ no sound on any non-vanilla PC-8801 (verify)
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198512xx"/>
 		<info name="alt_title" value="パラディン"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!-- Ken Akamatsu -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -26006,7 +26016,7 @@ Accesses I/O port $33, [PC8001mkIISR] check? (verify)
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="パラノイア88"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!-- programmed by Hideki Asano -->
 		<!-- TODO: inputs doesn't work on PC8801MA, pinpoint BASIC version -->
 
@@ -26024,7 +26034,7 @@ Accesses I/O port $33, [PC8001mkIISR] check? (verify)
 		<!-- PC8801 -->
 		<info name="release" value="198512xx"/>
 		<info name="alt_title" value="ぱよーんぽよょーん"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -26138,7 +26148,7 @@ Accesses I/O port $33, [PC8001mkIISR] check? (verify)
 		<!-- PC8801 -->
 		<info name="release" value="198403xx"/>
 		<info name="alt_title" value="ぺんぎんビレッジ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
@@ -26398,7 +26408,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		<!-- PC8801 -->
 		<info name="release" value="198605xx"/>
 		<info name="alt_title" value="ピンボールランド"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="354048">
@@ -26647,7 +26657,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="プラズマライン"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -26665,7 +26675,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="プラズマライン"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344768">
@@ -26683,7 +26693,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		<!-- PC8801 -->
 		<info name="release" value="198412xx"/>
 		<info name="alt_title" value="プラズマライン"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344752">
@@ -26699,7 +26709,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198901xx"/>
 		<info name="alt_title" value="ポッキー"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="pocky.d88" size="1773120" crc="f24125d1" sha1="199f5dc9ad48c76543f26e0c7f7e15bc1af4206e"/-->
 
@@ -26827,7 +26837,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ポップレモン"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="pop lemon.d88" size="697696" crc="b8b2be06" sha1="a3f59bb002801eae76c5ed4ab8327f9fd092bc28"/-->
 
@@ -26853,7 +26863,7 @@ ExtractDisk  [03]"ｼﾅﾘｵ2        " -> "phantasie iv the birth of heroes_03
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="ポップレモン"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="pop lemon.d88" size="697696" crc="9acd9ee4" sha1="093208b48173e3203a5e23663fff6273de227dd3"/-->
 
@@ -27611,7 +27621,7 @@ ExtractDisk  [07]"DiskD        " -> "psy-o-blade_07.d88"
 		<publisher>ハドソン (Hudson Soft)</publisher>
 		<!-- PC8801 -->
 		<info name="alt_title" value="パンチボールマリオブラザーズ"/>
-		<info name="usage" value="Needs BASIC V1L (for machines that supports it)"/>
+		<info name="required_os" value="BASIC V1L (for machines that supports it)"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -28684,7 +28694,7 @@ Gameplay is too fast, needs [V1S]
 		<!-- PC8801 -->
 		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="ロボレス2001"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -28700,7 +28710,7 @@ Gameplay is too fast, needs [V1S]
 		<!-- PC8801 -->
 		<info name="release" value="198607xx"/>
 		<info name="alt_title" value="ロボレス2001"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -28797,7 +28807,7 @@ ExtractDisk  [04]"シナリオ2   " -> "rogue alliance_04.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="ローラーボール"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -29355,8 +29365,8 @@ Start and Program Disks OK, the remaining part is damaged (missing d88 headers?)
 		<!-- PC8801 -->
 		<info name="release" value="198506xx"/>
 		<info name="alt_title" value="サミーライトフット"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!-- TODO: looks incompatible with 8 MHz mode -->
-		<info name="usage" value="Needs BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
@@ -30544,7 +30554,7 @@ Kinda ugly to look at without a shader
 		<!-- PC8801 -->
 		<info name="release" value="198508xx"/>
 		<info name="alt_title" value="戦闘伝説エルフ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="171760">
@@ -30677,9 +30687,10 @@ Kinda ugly to look at without a shader
 		<year>19??</year>
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<info name="alt_title" value="上海"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!-- TODO: pinpoint exact range of machines supported -->
 		<!-- crashes in vanilla pc8801 and 8801ma, works with mk2sr -->
-		<info name="usage" value="Needs BASIC V1, suggested to use pc8801mk2sr"/>
+		<info name="usage" value="Suggested to use pc8801mk2sr"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="345856">
@@ -30809,7 +30820,7 @@ Hangs or crashes at title screen
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198705xx"/>
 		<info name="alt_title" value="7人のサムライ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="shichinin no samurai.d88" size="697696" crc="adac3e0c" sha1="89884358c554cb2adfc7f271bdcfaba1b05acd2c"/-->
 
@@ -30899,7 +30910,7 @@ Hangs or crashes at title screen
 		<!-- PC8801 -->
 		<info name="release" value="198603xx"/>
 		<info name="alt_title" value="始皇帝"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -30916,7 +30927,7 @@ Hangs or crashes at title screen
 		<!-- PC8801 -->
 		<info name="release" value="198603xx"/>
 		<info name="alt_title" value="始皇帝"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -30964,7 +30975,7 @@ ExtractDisk  [04]"DATA DISK    " -> "shin kugyokuden(with patch)_04.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198811xx"/>
 		<info name="alt_title" value="新九玉伝"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="shin kugyokuden(with patch).d88" size="1665904" crc="be3c861e" sha1="14d4832bc29b721fe733877dfc112017710dcecd"/-->
 
@@ -31004,7 +31015,7 @@ ExtractDisk  [04]"DATA DISK    " -> "shin kugyokuden(with patch)_04.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198811xx"/>
 		<info name="alt_title" value="新九玉伝"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="shin kugyokuden.d88" size="1665840" crc="ca718eeb" sha1="c28948492a95683c0c584d67762daff5516af50d"/-->
 
@@ -31938,7 +31949,7 @@ ExtractDisk  [04]"disk 4          " -> "shiryo sensen 2_04.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198810xx"/>
 		<info name="alt_title" value="スカポン探検隊"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="skapon tankentai part 1.d88" size="1046544" crc="7ae17b5c" sha1="9e015f1f8e337c28d7e7f46ecc21130e5fac97d7"/-->
 
@@ -31971,7 +31982,7 @@ ExtractDisk  [04]"disk 4          " -> "shiryo sensen 2_04.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198602xx"/>
 		<info name="alt_title" value="スカイスクレーパー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
@@ -32297,7 +32308,7 @@ ExtractDisk  [04]"disk 4          " -> "shiryo sensen 2_04.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198402xx"/>
 		<info name="alt_title" value="倉庫番1&amp;2&amp;エディタ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348272">
@@ -32886,7 +32897,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198501xx"/>
 		<info name="alt_title" value="サザンクロス"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349376">
@@ -32916,7 +32927,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198709xx"/>
 		<info name="alt_title" value="スペースハリアー"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="space harrier.d88" size="697696" crc="ee0821ac" sha1="989acfd9082247ea98af743fc1455bdf85625459"/-->
 
@@ -32942,7 +32953,7 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198709xx"/>
 		<info name="alt_title" value="スペースハリアー"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="space harrier.d88" size="697696" crc="9975ae1d" sha1="8b35d20bba890b5742e57cb8c267629bda9f14d2"/-->
 
@@ -33050,7 +33061,8 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198406xx"/>
 		<info name="alt_title" value="スターアーサー伝説 Ⅱ -暗黒星雲-"/>
-		<info name="usage" value="Needs BASIC V1, on BASIC prompt type: run &quot;DRK1&quot; (case sensitive)"/>
+		<info name="required_os" value="BASIC V1"/>
+		<info name="usage" value="On BASIC prompt type: run &quot;DRK1&quot; (case sensitive)"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="345296">
@@ -33067,7 +33079,8 @@ ExtractDisk  [02]"A DISK          " -> "sorcerian music library_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198406xx"/>
 		<info name="alt_title" value="スターアーサー伝説 Ⅱ -暗黒星雲-"/>
-		<info name="usage" value="Needs BASIC V1, on BASIC prompt type: run &quot;DRK1&quot; (case sensitive)"/>
+		<info name="required_os" value="BASIC V1"/>
+		<info name="usage" value="On BASIC prompt type: run &quot;DRK1&quot; (case sensitive)"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
@@ -33119,8 +33132,9 @@ Not extensively tested
 		<!-- PC8801 -->
 		<info name="release" value="198804xx"/>
 		<info name="alt_title" value="スターシップランデブー"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!-- Gameplay playfield scrolling is disabled with 4 MHz -->
-		<info name="usage" value="Needs BASIC V2, runs better in 8 MHz Mode"/>
+		<info name="usage" value="Runs better in 8 MHz Mode"/>
 		<info name="developer" value="Arklight"/>
 		<!-- Omake: press F2 during OP for sound test -->
 		<!--combined image-->
@@ -33886,7 +33900,7 @@ FDC stalls [Tries to read a missing CHRN=(00 00 f7 01)]
 		<!-- PC8801 -->
 		<info name="release" value="198501xx"/>
 		<info name="alt_title" value="スワッシュバックラー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
@@ -35128,7 +35142,7 @@ TODO: used a timeempb created user disk, is it even possible to create one in th
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="タイムエンパイア"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -35149,7 +35163,7 @@ Gameplay is too fast, needs [V1S]
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="タイムエンパイア"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="time empire.d88" size="697696" crc="7026881b" sha1="b3759ccd41ff97215e5625e0e2286ac312809293"/-->
 
@@ -35179,7 +35193,7 @@ Has subtle copy protection: talking to any character in-game shows a "COPY" mess
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="タイムエンパイア"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="time empire.d88" size="822624" crc="1acd61f1" sha1="d0985d30e3c146980655f9771f36e6d67df0b4b8"/-->
 
@@ -35343,7 +35357,8 @@ NB: scenario creation is really slow, progress bar is given by the pixie moving 
 		<!-- PC8801mk2SR -->
 		<info name="release" value="19900824"/>
 		<info name="alt_title" value="ティルナノーグ 禁断の塔"/>
-		<info name="usage" value="Needs BASIC V2. In order to start a game create an user disk from item 3 -> 2, then on title screen select option 2 to create a scenario on said user disk"/>
+		<info name="required_os" value="BASIC V2"/>
+		<info name="usage" value="To start a game create an user disk from item 3 -> 2, then on title screen select option 2 to create a scenario on said user disk"/>
 		<!--combined image-->
 		<!--rom name="tir-nan-og.d88" size="1171472" crc="36d40ed1" sha1="0fecd94f2ad6e740cabf39c8be9225ff59b0fd39"/-->
 
@@ -35701,7 +35716,7 @@ Not extensively tested
 		<!-- PC8801 -->
 		<info name="release" value="198504xx"/>
 		<info name="alt_title" value="東京ナンパストリート"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -35733,7 +35748,7 @@ No sound, [beeper]? (verify)
 		<!-- PC8801 -->
 		<info name="release" value="198502xx"/>
 		<info name="alt_title" value="トンキー"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
 				<rom name="tonky.d88" size="348832" crc="a860738e" sha1="3f37248a34081c8e5076c425453a7aff890a8bc1"/>
@@ -35748,7 +35763,7 @@ No sound, [beeper]? (verify)
 		<!-- PC8801 -->
 		<info name="release" value="198611xx"/>
 		<info name="alt_title" value="トップルジップ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -35774,7 +35789,7 @@ No sound, [beeper]? (verify)
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="とっぷるじっぷSR"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -36812,7 +36827,7 @@ ExtractDisk  [03]"ﾕｰｻﾞｰｼｽﾃﾑﾃﾞｨｽｸ  " -> "ultima 3(pon
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198911xx"/>
 		<info name="alt_title" value="ウルティマ3"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="ultima 3.d88" size="1044256" crc="8758c2a2" sha1="76dfb44d312828e88b5c1107015ecf29496b397b"/-->
 
@@ -37483,7 +37498,7 @@ Shows Telenet Japan logo (!?) then hangs. PC=140 tries to jump to bad program fl
 		<!-- PC8801 -->
 		<info name="release" value="198509xx"/>
 		<info name="alt_title" value="バルトラッド"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="valtrad.d88" size="653904" crc="1d10cad6" sha1="8e07b2450a44122a8f94873db23a6fee19643451"/-->
 
@@ -37662,7 +37677,7 @@ Shows Telenet Japan logo (!?) then hangs. PC=140 tries to jump to bad program fl
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
 		<info name="alt_title" value="ヴォルガード"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="349632">
@@ -38024,7 +38039,7 @@ Shows Telenet Japan logo (!?) then hangs. PC=140 tries to jump to bad program fl
 		<!-- PC8801mk2SR -->
 		<info name="release" value="198812xx"/>
 		<info name="alt_title" value="ホワッツマイケル"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="what's michael.d88" size="1159920" crc="01e243c3" sha1="35db319933ea09d81b5d2c761bbd1eab130f2453"/-->
 
@@ -38161,7 +38176,7 @@ Shows Telenet Japan logo (!?) then hangs. PC=140 tries to jump to bad program fl
 		<!-- PC8801 -->
 		<info name="release" value="198501xx"/>
 		<info name="alt_title" value="ワイルドキャット"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!-- Nippon Columbia -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -38368,7 +38383,7 @@ Shows Telenet Japan logo (!?) then hangs. PC=140 tries to jump to bad program fl
 		<!-- PC8801 -->
 		<info name="release" value="198701xx"/>
 		<info name="alt_title" value="ウィンターゲームス"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348576">
@@ -39457,7 +39472,7 @@ ExtractDisk  [02]"xanadu80_b      " -> "xanadu_v80_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198510xx"/>
 		<info name="alt_title" value="ザナドゥ"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="xanadu(88-mkii ver).d88" size="1247520" crc="c67508ba" sha1="c313036c2d1c720a1107bdd47ac1623408665d19"/-->
 
@@ -39578,7 +39593,7 @@ ExtractDisk  [02]"xanadu80_b      " -> "xanadu_v80_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198511xx"/>
 		<info name="alt_title" value="ゼビウス"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348624">
@@ -39594,7 +39609,7 @@ ExtractDisk  [02]"xanadu80_b      " -> "xanadu_v80_02.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198511xx"/>
 		<info name="alt_title" value="ゼビウス"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -40335,7 +40350,7 @@ ExtractDisk  [05]"DISK D          " -> "yajiuma pennant race 2_05.d88"
 		<!-- PC8801 -->
 		<info name="release" value="198407xx"/>
 		<info name="alt_title" value="野球狂"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="131136">
@@ -40499,7 +40514,7 @@ Gameplay is a bit too fast
 		<!-- PC8801 -->
 		<info name="release" value="198408xx"/>
 		<info name="alt_title" value="妖怪探偵ちまちま"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="341472">
 				<rom name="chima chima.d88" size="341472" crc="d5ea88f5" sha1="da90ff3b3bee976535c6e77da74c9383b5c7b847"/>
@@ -40945,7 +40960,7 @@ Gameplay is a bit too fast
 		<!-- PC8801 -->
 		<info name="release" value="198602xx"/>
 		<info name="alt_title" value="Zガンダム"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -41529,7 +41544,7 @@ Not extensively tested
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="G.Create" />
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="angels - celica crisis.d88" size="697696" crc="18c5059b" sha1="7ad24be0b41833e24f814fc834f4269e91f81251"/-->
 
@@ -41685,7 +41700,7 @@ Not extensively tested
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Studio K2" />
 		<info name="alt_title" value="パトルエントリー"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="263184">
@@ -41754,7 +41769,7 @@ Not extensively tested
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Studio K2" />
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -41768,7 +41783,7 @@ Not extensively tested
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Studio K2" />
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="350224">
@@ -42489,7 +42504,7 @@ ExtractDisk  [02]"              " -> "charie music gallery vol.3_02.d88"
 		<year>1990</year>
 		<publisher>電脳科学研究所 (Denno Kagaku Kenkujo)</publisher>
 		<info name="alt_title" value="電脳通信 vol.1"/>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="422160">    <!-- Data CRC16: 33482 -->
 				<rom name="denno tsushin 1.d88" size="422160" crc="1e5cc645" sha1="e6800e7c9b50f2c3a69f380db9a4abe968b30182"/>
@@ -45114,7 +45129,7 @@ Fails detection of disk b ["Incorrect layout on track 3 head 1, expected_size=10
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Teikoku Soft" />
 		<info name="alt_title" value="人魚の涙"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -45780,7 +45795,7 @@ Prints "Bad Drive Number" then return to BASIC prompt but no key works
 		<year>1989</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="3.5インチ堂 (3.5Inch Do)" />
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -46028,7 +46043,7 @@ Prints "Bad Drive Number" then return to BASIC prompt but no key works
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Onion Soft" />
 		<info name="alt_title" value="りみちゃんの危険な夜"/>
-		<info name="usage" value="Needs BASIC V1H"/>
+		<info name="required_os" value="BASIC V1H"/>
 		<!--combined image-->
 		<!--rom name="rimichan no kikenna yoru.d88" size="697664" crc="e5a47323" sha1="35f3c83d562f14f4c812fe8c131cf918d9600b2c"/-->
 
@@ -46053,7 +46068,7 @@ Prints "Bad Drive Number" then return to BASIC prompt but no key works
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Onion Soft" />
 		<info name="alt_title" value="りみちゃんの危険な夜"/>
-		<info name="usage" value="Needs BASIC V1H"/>
+		<info name="required_os" value="BASIC V1H"/>
 		<!--combined image-->
 		<!--rom name="rimi-chan no kikenna yoru.d88" size="697696" crc="29d131be" sha1="6fdf1dc4e395ce63965736a1cb79d95292da555c"/-->
 
@@ -46078,7 +46093,7 @@ Prints "Bad Drive Number" then return to BASIC prompt but no key works
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="developer" value="Onion Soft" />
 		<info name="alt_title" value="りみちゃんの危険な夜"/>
-		<info name="usage" value="Needs BASIC V1H"/>
+		<info name="required_os" value="BASIC V1H"/>
 		<!--combined image-->
 		<!--rom name="rimi-chan no kikenna yoru.d88" size="697664" crc="f4951a54" sha1="5ecaa72b628d3f42963ca86eb95e1957608330d6"/-->
 
@@ -48598,7 +48613,7 @@ Not extensively tested
 		<year>1990</year>
 		<!-- "CaesarSoft" on title Doujinshi? -->
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="ashura no to.d88" size="348848" crc="eb174138" sha1="6b730f90744692b6fefb85d12bcafdcef5ccd38a"/>
@@ -49090,7 +49105,7 @@ Doesn't load, throws "Bad allocation table" with a Disk Basic FILES command, is 
 		<!-- TODO: first stage shows "Login", may be published there -->
 		<publisher>&lt;unknown&gt;</publisher>
 		<!-- Yoshihiko Mino. -->
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -49339,7 +49354,7 @@ Doesn't load, throws "Bad allocation table" with a Disk Basic FILES command, is 
 Crashes with text garbage display on boot (PC=8d57 sets a 0xb232 bad vector)
 Accesses [GSX8800] or [network board] then [RS-232C]
 ]]></notes>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -49356,7 +49371,8 @@ Accesses [GSX8800] or [network board] then [RS-232C]
 Resets at GRS logo, [FDC] throws scan ID failed on CHRN=(01 01 04 01) even if it exists?
 Draws TVRAM thru dedicated High RAM [unemulated, sports garbage display]
 ]]></notes>
-		<info name="usage" value="Needs BASIC V2, set a PC8801MA+ to 4MHz"/>
+		<info name="required_os" value="BASIC V2"/>
+		<info name="usage" value="Set PC8801MA+ to 4MHz"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="344496">
@@ -49369,7 +49385,7 @@ Draws TVRAM thru dedicated High RAM [unemulated, sports garbage display]
 		<description>Inner Space</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -49576,7 +49592,7 @@ Draws TVRAM thru dedicated High RAM [unemulated, sports garbage display]
 		<description>Lascivious Oranges</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="lascivious oranges.d88" size="697696" crc="5c333fd4" sha1="c810034473ed59375cad1f44da36e29f8567dd5f"/-->
 
@@ -49611,7 +49627,7 @@ Draws TVRAM thru dedicated High RAM [unemulated, sports garbage display]
 		<description>Leader</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -49697,7 +49713,7 @@ Hangs on selecting anything in main menu, FDC stalls [Throws scan ID failed on C
 		<year>1986</year>
 		<publisher>Teikoku</publisher>
 		<info name="alt_title" value="東国の使者"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="mahoutsukai no denshi 2.d88" size="697696" crc="fdc37dcc" sha1="e6158dc685e96e6950a41f6bef56798a356f8b03"/-->
 
@@ -49886,7 +49902,7 @@ Hangs on selecting anything in main menu, FDC stalls [Throws scan ID failed on C
 		<description>MIKIsan Jump! Easy</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!-- Omake: has cutesy animation for "V2 MODE only" -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -50223,7 +50239,7 @@ Not extensively tested
 		<year>1983</year>
 		<publisher>ポニカ (PonyCa)</publisher>
 		<info name="alt_title" value="ベンキ屋Youちゃん"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="66240">
@@ -50529,7 +50545,7 @@ Not extensively tested
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!-- K. Narita -->
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -50542,7 +50558,7 @@ Not extensively tested
 		<description>Rollinger</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -50556,7 +50572,7 @@ Not extensively tested
 		<description>Rose Potion</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="rose potion.d88" size="697696" crc="365879b9" sha1="252c453392979266ed10098a13daf071f07095fa"/-->
 
@@ -50579,7 +50595,7 @@ Not extensively tested
 		<description>RPG Construction</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="rpg construction.d88" size="697696" crc="45a446f3" sha1="634aa32f8caedb25bc595c8ac9b011dc9a894992"/-->
 
@@ -50890,7 +50906,7 @@ Not extensively tested
 		<description>Super Baseball</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -51061,7 +51077,8 @@ Throws a "disk error (code = 0)" if 1 is given as initial option (user disk sele
 Not extensively tested (language barrier, draws in katakana)
 ]]></notes>
 		<!-- "Copyright by OOIKE ATUSHI", doujin? -->
-		<info name="usage" value="Needs BASIC V1, type 0 as first option to bypass disk selection"/>
+		<info name="required_os" value="BASIC V1"/>
+		<info name="usage" value="Type 0 as first option to bypass disk selection"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="259616">
 				<rom name="thousantis-go no boken.d88" size="259616" crc="3664f627" sha1="fab3012c29efa88cf1f219667b0cbf357d492dc4"/>
@@ -51078,7 +51095,8 @@ Throws a "File not found in 2690" on loading after tutorial
 Throws a "disk error (code = 0)" if 1 is given as initial option (user disk select?)
 Not extensively tested (language barrier, draws in katakana)
 ]]></notes>
-		<info name="usage" value="Needs BASIC V1, type 0 as first option to bypass disk selection"/>
+		<info name="required_os" value="BASIC V1"/>
+		<info name="usage" value="Type 0 as first option to bypass disk selection"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="260432">
@@ -51384,7 +51402,7 @@ Not extensively tested (language barrier, draws in katakana)
 		<description>Video kun</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -51419,7 +51437,7 @@ Not extensively tested (language barrier, draws in katakana)
 		<description>X・na</description>
 		<year>1991</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="x'na.d88" size="3064144" crc="e5f98a9e" sha1="b1456ecdeec27d8c3e60988617f9f02d3d15b447"/-->
 
@@ -51489,7 +51507,7 @@ Not extensively tested (language barrier, draws in katakana)
 		<year>19??</year>
 		<publisher>九十九電機 (Tsukumo Denki)</publisher>
 		<info name="alt_title" value="野球拳"/>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -52177,7 +52195,8 @@ Tests [Sound Board 2]
 		<description>Dark Dungeon</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2, on prompt type load &quot;MADDD.M88&quot; then run"/>
+		<info name="required_os" value="BASIC V2"/>
+		<info name="usage" value="At prompt type load &quot;MADDD.M88&quot; then run"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -52190,7 +52209,7 @@ Tests [Sound Board 2]
 		<description>De Votion</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="de votion.d88" size="697696" crc="1c930bed" sha1="8b8227c7b13552124f8bfc213bee5ea2e384fd89"/-->
 
@@ -52313,7 +52332,7 @@ Tests [Sound Board 2]
 		<description>Druaga no Tou Kanko Tour</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -52587,7 +52606,7 @@ Black screen after setup menu
 		<description>Hai Arotta</description>
 		<year>1989</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -52766,7 +52785,7 @@ Black screen after setup menu
 		<description>Jark</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -53193,7 +53212,7 @@ ExtractDisk  [04]"game_2          " -> "loginsoft game create system - mamirin_0
 		<description>Mazekko Disk (compilation)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -53379,7 +53398,7 @@ ExtractDisk  [04]"game_2          " -> "loginsoft game create system - mamirin_0
 		<description>Nihon Jodan! Black Jack!</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="nihon jodan black jack!.d88" size="697696" crc="16dc996d" sha1="e259bdd55a33f198dda5b13952184b30d10c536c"/-->
 
@@ -53400,7 +53419,7 @@ ExtractDisk  [04]"game_2          " -> "loginsoft game create system - mamirin_0
 		<description>NOP Software</description>
 		<year>1989</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -53583,7 +53602,7 @@ ExtractDisk  [02]"Disk_B          " -> "pakapaka shoboken dp_02.d88"
 		<description>Pink Stream 3</description>
 		<year>1991</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!-- SSS -->
 
 		<part name="flop1" interface="floppy_5_25">
@@ -54031,7 +54050,7 @@ ExtractDisk  [02]"sos sword    " -> "s-os sword_02.d88"
 		<year>1988</year>
 		<!-- Studio Low-Life -->
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -54346,7 +54365,7 @@ Boot OK
 		<notes><![CDATA[
 Black screen, code goes to lalaland
 ]]></notes>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="483184">
@@ -55185,7 +55204,7 @@ Throws "Disk I/O Error" at boot, cannot access any file
 		<description>Pc88 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1 for most if not all games"/>
+		<info name="required_os" value="BASIC V1 (for most if not all games)"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -55339,7 +55358,7 @@ Throws "Disk I/O Error" at boot, cannot access any file
 		<description>88Gamez1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Most games requires BASIC V1"/>
+		<info name="required_os" value="BASIC V1 (for most games)"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -55360,7 +55379,7 @@ Throws "Disk I/O Error" at boot, cannot access any file
 		<description>88Gamez2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="At least games 4 and 5 requires BASIC V1"/>
+		<info name="required_os" value="BASIC V1 (at least games 4 and 5)"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -55373,7 +55392,7 @@ Throws "Disk I/O Error" at boot, cannot access any file
 		<description>88Pack1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="At least games 4 and 5 requires BASIC V1"/>
+		<info name="required_os" value="BASIC V1 (at least games 4 and 5)"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -55738,7 +55757,7 @@ ExtractDisk  [02]"DISK_2          " -> "sb2 music disk_02.d88"
 		<description>SB2 Music Disk</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 		<!--combined image-->
 		<!--rom name="sb2 music disk.d88" size="697664" crc="a6b42a6d" sha1="ed846b3846ceeea089803e0cc6011416c17f174f"/-->
 		<!-- Disk 1,2 -->
@@ -55894,7 +55913,7 @@ ExtractDisk  [02]"Hit88 Data      " -> "hit-88_assembler_02.d88"
 		<description>Nintendo Pack</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348832">
@@ -56599,7 +56618,7 @@ Sends a 0xff to I/O port $e6, flip that to 0x00 to make it boot
 Backup and trainer utility
 Not extensively tested
 ]]></notes>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="370608">    <!-- Data CRC16: 35950 -->
@@ -56699,7 +56718,7 @@ Not extensively tested
 		<description>8801 Kanji BASIC</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -56730,7 +56749,7 @@ ExtractDisk  [02]"DATA          " -> "charm copy_02.d88"
 		<description>Charm Copy</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="charm copy.d88" size="697696" crc="5bd36566" sha1="7d0fef21d3eb70a2818473496a8953cbbdb551fc"/-->
 
@@ -56963,7 +56982,7 @@ ExtractDisk  [02]"文字パターン    " -> "jet-8801a print studio_02.d88"
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!-- MORRIN software division -->
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="jet-8801a print studio.d88" size="697696" crc="d68eb772" sha1="dff97e69cae798beb1cdd08ab1c062672d860542"/-->
 
@@ -57083,7 +57102,7 @@ ExtractDisk  [02]"データ       " -> "kokyaku kanri_02.d88"
 		<description>Kokyaku Kanri</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="kokyaku kanri.d88" size="697696" crc="c9f2142d" sha1="e276ba8af972ef6648a0ead3e477930180ae4299"/-->
 
@@ -57379,7 +57398,7 @@ ExtractDisk  [04]"D DISK          " -> "musium sound board ii_04.d88"
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!-- TODO: returns an illegal function call in PC8801MA, pinpoint supported machines -->
-		<info name="usage" value="Needs BASIC V2"/>
+		<info name="required_os" value="BASIC V2"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -57414,7 +57433,7 @@ ExtractDisk  [03]"辞書            " -> "nihongo my card v1.0.2_03.d88"
 		<year>1984</year>
 		<!-- Avalon -->
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Needs BASIC V1"/>
+		<info name="required_os" value="BASIC V1"/>
 		<!--combined image-->
 		<!--rom name="nihongo my card v1.0.2.d88" size="1046544" crc="cc5cf526" sha1="a9c5cb87e65bd5c005b950ce4844f80e53a1acf9"/-->
 
@@ -57610,7 +57629,8 @@ ExtractDisk  [03]"DISK_1(MAS-SYS) " -> "personal musician pc88_03.d88"
 		<notes><![CDATA[
 No option seems to work out, some of which prompts user to insert a system disk (is the dump missing a disk?)
 ]]></notes>
-		<info name="usage" value="Needs BASIC V1, type run to start program"/>
+		<info name="required_os" value="BASIC V1"/>
+		<info name="usage" value="Type run to start program"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
