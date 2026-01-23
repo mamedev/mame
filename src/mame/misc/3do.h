@@ -36,7 +36,9 @@ public:
 		m_cdrom(*this, "cdrom"),
 		m_screen(*this, "screen"),
 		m_dac(*this, "dac%u", 0U),
-		m_bank1(*this, "bank1") { }
+		m_bank1(*this, "bank1"),
+		m_p1_r(*this, "P1.%u", 0)
+	{ }
 
 	void _3do(machine_config &config);
 	void _3do_pal(machine_config &config);
@@ -84,6 +86,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac;
 	required_memory_bank m_bank1;
+	required_ioport_array<2> m_p1_r;
 
 	SLOW2 m_slow2;
 	UNCLE m_uncle;

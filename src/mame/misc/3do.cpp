@@ -153,15 +153,24 @@ void _3do_state::main_mem(address_map &map)
 
 
 static INPUT_PORTS_START( 3do )
-	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START("P1.0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // ID
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1)
+
+	PORT_START("P1.1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME(u8"P1 P \u23f5/\u23f8") // Play/Pause
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME(u8"P1 X \u23f9") PORT_PLAYER(1) // Stop
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 RT") // Right Trigger
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 LT") // Left Trigger
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void _3do_state::machine_start()
@@ -213,6 +222,12 @@ void _3do_state::green_config(machine_config &config)
 	m_madam->dma32_write_cb().set([this] (offs_t offset, u32 data) {
 		address_space &space = m_maincpu->space();
 		space.write_dword(offset, data, 0xffff'ffff);
+	});
+	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
+		if (offset == 0)
+			return (m_p1_r[0]->read() << (24)) | (m_p1_r[1]->read() << 16);
+
+		return 0;
 	});
 	m_madam->irq_dply_cb().set(m_clio, FUNC(clio_device::dply_w));
 	m_madam->set_amy_tag("amy");

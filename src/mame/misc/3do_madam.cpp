@@ -36,6 +36,7 @@ madam_device::madam_device(const machine_config &mconfig, const char *tag, devic
 	, m_dma8_read_cb(*this, 0)
 	, m_dma32_read_cb(*this, 0)
 	, m_dma32_write_cb(*this)
+	, m_playerbus_read_cb(*this, 0)
 	, m_irq_dply_cb(*this)
 {
 }
@@ -399,7 +400,14 @@ void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_8_15)
 	{
 		if (!BIT(m_mctl, 15) && BIT(data, 15))
+		{
 			m_dma_playerbus_timer->adjust(attotime::from_ticks(2, this->clock()));
+			// HACK: Fake inputs here
+			// Madam can access Player bus from DMA only, and the port(s) are daisy chained thru
+			// bidirectional serial i/f (which also handle headphone jack and ROM device transfers)
+			// Smells a lot like an internal MCU doing the job ...
+			m_dma32_write_cb(m_dma[23][2] + 0x4, m_playerbus_read_cb(0));
+		}
 		if (BIT(m_mctl, 15) && !BIT(data, 15))
 		{
 			LOG("mctl: Player bus DMA abort?\n");
@@ -429,7 +437,6 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 		return;
 	}
 
-	// TODO: from RAM should likely first obtain the serial data from the controller(s)
 	// TODO: should cause a privbits exception if mask outside bounds
 	u32 src = m_dma[23][2];
 	u32 dst = m_dma[23][0];
@@ -1043,7 +1050,7 @@ u32 madam_device::cel_decompress()
 		(bpp == 4 && uncoded) ||
 		(bpp == 5))
 	{
-		popmessage("3do_madam.cpp: unsupported Packed CEL %d %08x", bpp, source_ptr);
+		popmessage("3do_madam.cpp: unsupported Packed CEL %d %d %08x", bpp, uncoded, source_ptr);
 		//m_statbits |= (1 << 6);
 		//cel_stop_w(0, 0, 0xffffffff);
 		return 1;
