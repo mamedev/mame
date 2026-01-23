@@ -37616,6 +37616,9 @@ gamecstl
 shutms11
 zidav630e
 
+@source:pc/sshuffle.cpp
+sshuffle
+
 @source:pc/tandy1t.cpp
 t1000
 t1000hx
