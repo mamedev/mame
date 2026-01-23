@@ -2179,8 +2179,8 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 	<software name="centint" supported="partial">
 		<description>Central Intelligence</description>
 		<year>1994</year>
-		<info name="required_os" value="DOS" />
 		<publisher>Ocean</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
