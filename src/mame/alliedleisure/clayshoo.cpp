@@ -36,32 +36,36 @@ public:
 	clayshoo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_videoram(*this, "videoram"),
 		m_ppi(*this, "ppi%u", 0),
 		m_pit(*this, "pit"),
 		m_dac(*this, "dac"),
-		m_videoram(*this, "videoram")
+		m_in(*this, "IN%u", 0),
+		m_an(*this, "AN%u", 0)
 	{ }
 
 	void clayshoo(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device_array<i8255_device, 2> m_ppi;
 	required_device<pit8253_device> m_pit;
 	required_device<dac_1bit_device> m_dac;
-	required_shared_ptr<uint8_t> m_videoram;
+	required_ioport_array<4> m_in;
+	required_ioport_array<2> m_an;
 
-	void analog_reset_w(uint8_t data);
-	uint8_t analog_r();
+	uint32_t screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	void input_port_select_w(uint8_t data);
 	uint8_t input_port_r();
-	uint32_t screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
 	TIMER_CALLBACK_MEMBER(reset_analog_bit);
-	uint8_t difficulty_input_port_r(int bit);
+	void analog_reset_w(uint8_t data);
+	uint8_t analog_r();
 	void create_analog_timers();
 
 	void main_io_map(address_map &map) ATTR_COLD;
@@ -69,103 +73,8 @@ private:
 
 	emu_timer *m_analog_timer[2];
 	uint8_t m_input_port_select = 0;
-	uint8_t m_analog_port_val = 0;
+	uint8_t m_analog_port_val = 0xff;
 };
-
-
-/*************************************
- *
- *  Digital control handling functions
- *
- *************************************/
-
-void clayshoo_state::input_port_select_w(uint8_t data)
-{
-	m_input_port_select = data;
-}
-
-
-uint8_t clayshoo_state::difficulty_input_port_r(int bit)
-{
-	uint8_t ret = 0;
-
-	/* read fake port and remap the buttons to 2 bits */
-	uint8_t raw = ioport("FAKE")->read();
-
-	if (raw & (1 << (bit + 1)))
-		ret = 0x03;     /* expert */
-	else if (raw & (1 << (bit + 2)))
-		ret = 0x01;     /* pro */
-	else
-		ret = 0x00;     /* amateur otherwise */
-
-	return ret;
-}
-
-
-uint8_t clayshoo_state::input_port_r()
-{
-	uint8_t ret = 0;
-
-	switch (m_input_port_select)
-	{
-	case 0x01: ret = ioport("IN0")->read(); break;
-	case 0x02: ret = ioport("IN1")->read(); break;
-	case 0x04: ret = (ioport("IN2")->read() & 0xf0) | difficulty_input_port_r(0) | (difficulty_input_port_r(3) << 2); break;
-	case 0x08: ret = ioport("IN3")->read(); break;
-	case 0x10:
-	case 0x20: break;  /* these two are not really used */
-	default: logerror("Unexpected port read: %02X\n", m_input_port_select);
-	}
-	return ret;
-}
-
-
-
-/*************************************
- *
- *  Analog control handling functions
- *
- *************************************/
-
-TIMER_CALLBACK_MEMBER(clayshoo_state::reset_analog_bit)
-{
-	m_analog_port_val &= ~param;
-}
-
-
-static attotime compute_duration(device_t *device, int analog_pos)
-{
-	/* the 58 comes from the length of the loop used to
-	   read the analog position */
-	return downcast<cpu_device *>(device)->cycles_to_attotime(58 * analog_pos);
-}
-
-
-void clayshoo_state::analog_reset_w(uint8_t data)
-{
-	/* reset the analog value, and start the two times that will fire
-	   off in a short period proportional to the position of the
-	   analog control and set the appropriate bit. */
-	m_analog_port_val = 0xff;
-
-	m_analog_timer[0]->adjust(compute_duration(m_maincpu.target(), ioport("AN1")->read()), 0x02);
-	m_analog_timer[1]->adjust(compute_duration(m_maincpu.target(), ioport("AN2")->read()), 0x01);
-}
-
-
-uint8_t clayshoo_state::analog_r()
-{
-	return m_analog_port_val;
-}
-
-
-void clayshoo_state::create_analog_timers()
-{
-	m_analog_timer[0] = timer_alloc(FUNC(clayshoo_state::reset_analog_bit), this);
-	m_analog_timer[1] = timer_alloc(FUNC(clayshoo_state::reset_analog_bit), this);
-}
-
 
 
 /*************************************
@@ -178,7 +87,7 @@ void clayshoo_state::machine_start()
 {
 	create_analog_timers();
 
-	/* register for state saving */
+	// register for state saving
 	save_item(NAME(m_input_port_select));
 	save_item(NAME(m_analog_port_val));
 }
@@ -193,9 +102,7 @@ void clayshoo_state::machine_start()
 
 uint32_t clayshoo_state::screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	offs_t offs;
-
-	for (offs = 0; offs < m_videoram.bytes(); offs++)
+	for (offs_t offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		uint8_t x = offs << 3;
 		uint8_t y = ~(offs >> 5);
@@ -218,6 +125,75 @@ uint32_t clayshoo_state::screen_update_clayshoo(screen_device &screen, bitmap_rg
 
 /*************************************
  *
+ *  Digital control handling functions
+ *
+ *************************************/
+
+void clayshoo_state::input_port_select_w(uint8_t data)
+{
+	m_input_port_select = data;
+}
+
+
+uint8_t clayshoo_state::input_port_r()
+{
+	uint8_t data = 0xff;
+
+	for (int i = 0; i < 4; i++)
+		if (BIT(m_input_port_select, i))
+			data &= m_in[i]->read();
+
+	return data;
+}
+
+
+
+/*************************************
+ *
+ *  Analog control handling functions
+ *
+ *************************************/
+
+TIMER_CALLBACK_MEMBER(clayshoo_state::reset_analog_bit)
+{
+	m_analog_port_val &= ~param;
+}
+
+
+void clayshoo_state::analog_reset_w(uint8_t data)
+{
+	/* reset the analog value, and start the two timers that will fire
+	   off in a short period proportional to the position of the
+	   analog control and set the appropriate bit. */
+	m_analog_port_val = 0xff;
+
+	for (int i = 0; i < 2; i++)
+	{
+		// the 58 comes from the length of the loop used to read the analog position
+		attotime duration = m_maincpu->cycles_to_attotime(58 * m_an[i]->read());
+		const int bit = i ? 0x01 : 0x02;
+
+		m_analog_timer[i]->adjust(duration, bit);
+	}
+}
+
+
+uint8_t clayshoo_state::analog_r()
+{
+	return m_analog_port_val;
+}
+
+
+void clayshoo_state::create_analog_timers()
+{
+	for (int i = 0; i < 2; i++)
+		m_analog_timer[i] = timer_alloc(FUNC(clayshoo_state::reset_analog_bit), this);
+}
+
+
+
+/*************************************
+ *
  *  Memory handlers
  *
  *************************************/
@@ -227,8 +203,8 @@ void clayshoo_state::main_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 	map(0x2000, 0x23ff).ram();
 	map(0x4000, 0x47ff).rom();
-	map(0x8000, 0x97ff).ram().share("videoram");    /* 6k of video ram according to readme */
-	map(0x9800, 0xa800).nopw();      /* not really mapped, but cleared */
+	map(0x8000, 0x97ff).ram().share("videoram"); // 6k of video ram according to readme
+	map(0x9800, 0xa800).nopw(); // not really mapped, but cleared
 	map(0xc800, 0xc800).rw(FUNC(clayshoo_state::analog_r), FUNC(clayshoo_state::analog_reset_w));
 }
 
@@ -261,21 +237,22 @@ void clayshoo_state::main_io_map(address_map &map)
 
 static INPUT_PORTS_START( clayshoo )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1C:8,7")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
-	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* doesn't appear to be used */
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      /* used */
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1C:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1C:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1C:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1C:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1C:2" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1C:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x07, 0x01, "Time/Bonus 1P-2P" )
+	PORT_DIPNAME( 0x07, 0x00, "Time/Bonus 1P-2P" ) PORT_DIPLOCATION("SW1B:8,7,6")
 	PORT_DIPSETTING(    0x00, "60/6k-90/6k" )
 	PORT_DIPSETTING(    0x01, "60/6k-120/8k" )
 	PORT_DIPSETTING(    0x02, "90/9.5k-150/9.5k" )
@@ -284,11 +261,21 @@ static INPUT_PORTS_START( clayshoo )
 	PORT_DIPSETTING(    0x05, "60/8k-120/10k" )
 	PORT_DIPSETTING(    0x06, "90/11.5k-150/11.5k" )
 	PORT_DIPSETTING(    0x07, "90/11.5k-190/13k" )
-	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* doesn't appear to be used */
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1B:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1B:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW1B:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW1B:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1B:1" )
 
-	PORT_START("IN2")
-	PORT_BIT( 0x03, IP_ACTIVE_LOW, IPT_CUSTOM )    /* amateur/expert/pro Player 2 */
-	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_CUSTOM )    /* amateur/expert/pro Player 1 */
+	PORT_START("IN2") // skill level switch is on the control panel and can be changed mid-game
+	PORT_CONFNAME( 0x03, 0x00, "P2 Skill Level" )
+	PORT_CONFSETTING(    0x00, "Amateur" )
+	PORT_CONFSETTING(    0x03, "Expert" )
+	PORT_CONFSETTING(    0x01, "Pro" )
+	PORT_CONFNAME( 0x0c, 0x00, "P1 Skill Level" )
+	PORT_CONFSETTING(    0x00, "Amateur" )
+	PORT_CONFSETTING(    0x0c, "Expert" )
+	PORT_CONFSETTING(    0x04, "Pro" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -298,22 +285,13 @@ static INPUT_PORTS_START( clayshoo )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("AN1")  /* IN4 - Fake analog control.  Visible in $c800 bit 1 */
-	PORT_BIT( 0x0f, 0x08, IPT_AD_STICK_Y ) PORT_MINMAX(0,0x0f) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(1)
+	PORT_START("AN0") // fake analog control, visible in $c800 bit 1
+	PORT_BIT( 0x0f, 0x08, IPT_PADDLE_V ) PORT_MINMAX(0x01,0x0f) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("AN2")  /* IN5 - Fake analog control.  Visible in $c800 bit 0 */
-	PORT_BIT( 0x0f, 0x08, IPT_AD_STICK_Y ) PORT_MINMAX(0,0x0f) PORT_SENSITIVITY(10) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
+	PORT_START("AN1") // fake analog control, visible in $c800 bit 0
+	PORT_BIT( 0x0f, 0x08, IPT_PADDLE_V ) PORT_MINMAX(0x01,0x0f) PORT_SENSITIVITY(50) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(2)
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("FAKE")  /* IN6 - Fake.  Visible in IN2 bits 0-1 and 2-3 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_PLAYER(2) PORT_NAME("P2 Amateur Difficulty")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_TOGGLE PORT_PLAYER(2) PORT_NAME("P2 Expert Difficulty")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_TOGGLE PORT_PLAYER(2) PORT_NAME("P2 Pro Difficulty")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_TOGGLE PORT_PLAYER(1) PORT_NAME("P1 Amateur Difficulty")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_TOGGLE PORT_PLAYER(1) PORT_NAME("P1 Expert Difficulty")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_TOGGLE PORT_PLAYER(1) PORT_NAME("P2 Pro Difficulty")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -323,12 +301,6 @@ INPUT_PORTS_END
  *  Machine driver
  *
  *************************************/
-
-void clayshoo_state::machine_reset()
-{
-	m_input_port_select = 0;
-	m_analog_port_val = 0;
-}
 
 void clayshoo_state::clayshoo(machine_config &config)
 {
@@ -384,6 +356,7 @@ ROM_START( clayshoo )
 ROM_END
 
 } // anonymous namespace
+
 
 
 /*************************************
