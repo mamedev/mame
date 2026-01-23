@@ -6,7 +6,7 @@ license:CC0-1.0
 	<element name="overlay">
 		<rect>
 			<bounds left="0" top="0" right="1" bottom="1" />
-			<color red="0.1" green="0.5" blue="1.0" />
+			<color red="0.1" green="0.6" blue="1.0" />
 		</rect>
 	</element>
 
