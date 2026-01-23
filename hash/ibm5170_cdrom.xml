@@ -151,13 +151,14 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		</part>
 	</software>
 
+	<!-- Direct X 3.0 -->
 	<!-- disc label: 688i_hk -->
 	<!-- Requires High Color -->
 	<software name="688ihuki" supported="no">
 		<description>688I Hunter-Killer</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="required_os" value="Windows 95, Direct X 3.0" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -450,14 +451,14 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
-	<!-- Pentium class 90 MHz -->
+	<!-- Pentium class 90 MHz, Direct X 5.0 -->
 	<!-- S3 "software video" is really slow -->
 	<!-- Disc label: Air War 3 -->
 	<software name="airwar3" supported="partial">
 		<description>Air Warrior III</description>
 		<year>1997</year>
 		<publisher>Interactive Magic / Kesmai Corporation</publisher>
-		<info name="required_os" value="Windows 95, Direct X 5.0" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1691,13 +1692,13 @@ Wacky Wheels:
 		</part>
 	</software>
 
-	<!-- Pentium class 90 MHz -->
+	<!-- Pentium class 90 MHz, Direct X 5.0 -->
 	<!-- TODO: ESC menu briefly appears then goes back into game mode (btanb due of 486 CPU used?) -->
 	<software name="bladerun">
 		<description>Blade Runner</description>
 		<year>1997</year>
 		<publisher>Virgin</publisher>
-		<info name="required_os" value="Windows 95, Direct X 5.0" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1824,6 +1825,7 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
+	<!-- Direct X 7.0 -->
 	<!-- Pentium class 200 MHz -->
 	<!-- TODO: invalid opcode exception after install -->
 	<software name="boorball" supported="no">
@@ -1831,7 +1833,7 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<year>2001</year>
 		<publisher>Xpiral / TSY</publisher>
 		<info name="alt_title" value="ブーアプス　ボール" />
-		<info name="required_os" value="Windows 95, Direct X 7.0" />
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="booaps" sha1="58d2602ca37c40041a6b504857d4c3057e52e94d" />
