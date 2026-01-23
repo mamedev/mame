@@ -521,12 +521,13 @@ license:CC0-1.0
 	</software>
 
 	<software name="keef">
-		<description>Keef the Thief</description>
+		<description>Keef the Thief (version 1.0)</description>
 		<year>1989</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Andy Gavin" />
 		<info name="programmer" value="Jason Rubin" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-10 -->
 		<!-- roleplaying game -->
@@ -684,19 +685,14 @@ license:CC0-1.0
 	</software>
 
 	<software name="slntsvce">
-		<description>Silent Service</description>
+		<description>Silent Service (version 925.01)</description>
 		<year>1987</year>
-		<publisher>Microprose</publisher>
-		<info name="programmer" value="Sid Meier" />
+		<publisher>Microprose Software</publisher>
+		<info name="author" value="Sid Meier" />
 		<info name="programmer" value="Ed Magnin" />
 		<info name="programmer" value="Jim Synoski" />
-		<info name="programmer" value="Michael Haire" />
-		<info name="programmer" value="Michele Mahan" />
-		<info name="programmer" value="Silas Warner" />
-		<info name="programmer" value="Al Roireau" />
-		<info name="programmer" value="Larry Martin" />
-		<info name="programmer" value="Edward Bever" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
+		<info name="version" value="925.01" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-18 -->
 		<!-- simulation game -->
@@ -1324,17 +1320,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmwrld">
-		<description>Where in the World is Carmen Sandiego?</description>
+	<software name="carmwrld10" cloneof="carmwrld">
+		<description>Where in the World is Carmen Sandiego? (version 1.0)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood" />
-		<info name="programmer" value="Lauren Elliott" />
+		<info name="author" value="Gene Portwood" />
+		<info name="author" value="Lauren Elliott" />
 		<info name="programmer" value="Loring Vogel" />
-		<info name="programmer" value="Leila Bronstein" />
-		<info name="programmer" value="Don Albrecht" />
-		<info name="programmer" value="Michelle McBride" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-27 -->
 		<!-- educational game -->
@@ -1348,6 +1342,32 @@ license:CC0-1.0
 			<feature name="part_id" value="Disk 2" />
 			<dataarea name="flop" size="1296791">
 				<rom name="where in the world is carmen sandiego iigs - disk 2.woz" size="1296791" crc="ade1e7f6" sha1="4933ac927a966edde20cac34fa5374a2a163889c" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carmwrld">
+		<description>Where in the World is Carmen Sandiego? (version 1.1)</description>
+		<year>1989</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="author" value="Gene Portwood" />
+		<info name="author" value="Lauren Elliott" />
+		<info name="programmer" value="Loring Vogel" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<info name="version" value="1.1" />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2021-05-27 -->
+		<!-- educational game -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk  Side " />
+			<dataarea name="flop" size="1296257">
+				<rom name="where in the world is carmen sandiego iigs v1.1 disk 1.woz" size="1296257" crc="0871454d" sha1="ab70c9d0c2d836fe477edb7d76a7763d36abc73b" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk  Side " />
+			<dataarea name="flop" size="1296257">
+				<rom name="where in the world is carmen sandiego iigs v1.1 disk 2.woz" size="1296257" crc="3893ecd0" sha1="c2680baaadb87317a610c20592db0c289fda289d" />
 			</dataarea>
 		</part>
 	</software>
@@ -1864,7 +1884,9 @@ license:CC0-1.0
 		<description>World Tour Golf</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="author" value="Evan and Nicky Robinson and Paul Reiche III" />
+		<info name="author" value="Evan Robinson" />
+		<info name="author" value="Nicky Robinson" />
+		<info name="author" value="Paul Reiche III" />
 		<info name="programmer" value="John Selhorst" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -2077,17 +2099,10 @@ license:CC0-1.0
 		<description>Where in the U.S.A. is Carmen Sandiego?</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood" />
-		<info name="programmer" value="Lauren Elliot" />
+		<info name="author" value="Gene Portwood" />
+		<info name="author" value="Lauren Elliot" />
+		<info name="developer" value="Sculptured Software" />
 		<info name="programmer" value="Peter Adams" />
-		<info name="programmer" value="Leila Bronstein" />
-		<info name="programmer" value="Julie Glavin" />
-		<info name="programmer" value="Michelle McBride" />
-		<info name="programmer" value="Dan Guerra" />
-		<info name="programmer" value="Les Pardue" />
-		<info name="programmer" value="Bevan Hulfenstein" />
-		<info name="programmer" value="Louis Evans" />
-		<info name="programmer" value="Tom Rettig" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-31 -->
@@ -2671,15 +2686,9 @@ license:CC0-1.0
 		<description>The Print Shop (version 1.0)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="David Balsam" />
-		<info name="programmer" value="Martin Kahn" />
+		<info name="author" value="David Balsam" />
+		<info name="author" value="Martin Kahn" />
 		<info name="programmer" value="Corey Kosak" />
-		<info name="programmer" value="Ann E. Kronen" />
-		<info name="programmer" value="Susan E. Schlangen" />
-		<info name="programmer" value="Richard Whittaker" />
-		<info name="programmer" value="Michelle McBride" />
-		<info name="programmer" value="Don Albrecht" />
-		<info name="programmer" value="Leila Bronstein" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM 01 or earlier." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -2697,10 +2706,6 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Roland Gustafsson" />
-		<info name="programmer" value="Leslie Wilson" />
-		<info name="programmer" value="Michelle Bushneff" />
-		<info name="programmer" value="Barbara Lawrence" />
-		<info name="programmer" value="Leila Bronstein" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-06-07 -->
@@ -2713,12 +2718,13 @@ license:CC0-1.0
 	</software>
 
 	<software name="fantvisn">
-		<description>Fantavision</description>
+		<description>Fantavision (version 1.0)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Scott Anderson" />
 		<info name="programmer" value="Ken Rosen" />
 		<info name="usage" value="Requires a 256K Apple IIgs ROM 01 or earlier." />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-06-07 and redumped: 2021-07-04 to correct the compatibility information. -->
 		<!-- graphics program -->
@@ -2736,23 +2742,18 @@ license:CC0-1.0
 		<info name="programmer" value="Randy McLaughlin" />
 		<info name="programmer" value="Al Borchers" />
 		<info name="programmer" value="Mike Johnston" />
-		<info name="programmer" value="Tony Hertzel" />
-		<info name="programmer" value="Thomas Hertzel" />
-		<info name="programmer" value="Paul Hertzel" />
-		<info name="programmer" value="Neal Vaughn" />
-		<info name="programmer" value="Dan Klassen" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-06-07 -->
 		<!-- graphics program -->
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - Program disk" />
+			<feature name="part_id" value="Disk 1 - Program" />
 			<dataarea name="flop" size="1296281">
 				<rom name="cartooners iigs - disk 1 - program.woz" size="1296281" crc="1ad490c0" sha1="8e64c731fc8f449c0c6c6b1ef39586bc8254b035" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Art disk" />
+			<feature name="part_id" value="Disk 2 - Art" />
 			<dataarea name="flop" size="1296277">
 				<rom name="cartooners iigs - disk 2 - art.woz" size="1296277" crc="9406f975" sha1="3a286df8f20643b488fa9277bd0364459ab0503f" />
 			</dataarea>
@@ -2853,7 +2854,6 @@ license:CC0-1.0
 		<info name="programmer" value="Ian Gooding" />
 		<info name="programmer" value="Michael Marcanted" />
 		<info name="programmer" value="Brett G. Durrett" />
-		<info name="programmer" value="Douglas Fulton" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-06-05 -->
@@ -3093,21 +3093,8 @@ license:CC0-1.0
 		<description>DeluxePaint II (version 2.01)</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Daniel Silva" />
+		<info name="author" value="Daniel Silva" />
 		<info name="programmer" value="Brent Iverson" />
-		<info name="programmer" value="David Grady" />
-		<info name="programmer" value="Greg Riker" />
-		<info name="programmer" value="Shelley Day" />
-		<info name="programmer" value="Jeff Johnnigman" />
-		<info name="programmer" value="Happy Keller" />
-		<info name="programmer" value="Nicholas Lavroff" />
-		<info name="programmer" value="Carolyn McFarlane" />
-		<info name="programmer" value="Richard Antaki" />
-		<info name="programmer" value="Paul Reiche III" />
-		<info name="programmer" value="Stu Roberson" />
-		<info name="programmer" value="Avril Harrison" />
-		<info name="programmer" value="Judy Campbell" />
-		<info name="programmer" value="Frank Wing" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
 		<info name="version" value="2.01" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -3319,13 +3306,29 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mcsdd">
+		<description>Music Construction Set Dealer Demo</description>
+		<year>1986</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="programmer" value="Will Harvey" />
+		<info name="programmer" value="Jim Nitchals" />
+		<info name="usage" value="Requires a 256K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS" />
+		<!-- Dump released: 2025-10-31 -->
+		<!-- self-running demo -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1296175">
+				<rom name="music construction set dealer demo disk iigs.woz" size="1296175" crc="e5702119" sha1="16d0d7ad1030a2e87f37a41c0acde506a7243c6f" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mcs">
 		<description>Music Construction Set (version 1.0)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Will Harvey" />
 		<info name="programmer" value="Jim Nitchals" />
-		<info name="programmer" value="Doug Fulton" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -3339,23 +3342,23 @@ license:CC0-1.0
 	</software>
 
 	<software name="instsynt">
-		<description>Instant Synthesizer (version 1.0)</description>
+		<description>Instant Synthesizer (version 1.00)</description>
 		<year>1988</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Larry Reed" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
-		<info name="version" value="1.0" />
+		<info name="version" value="1.00" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-06-14 -->
 		<!-- audio program -->
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - Program disk" />
+			<feature name="part_id" value="Disk 1 - Program" />
 			<dataarea name="flop" size="1296230">
 				<rom name="instant synthesizer iigs - disk 1 - program.woz" size="1296230" crc="d4e982f6" sha1="25eecac855d0784ba5df1125cecde22977d1474c" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Data disk" />
+			<feature name="part_id" value="Disk 2 - Data" />
 			<dataarea name="flop" size="1296227">
 				<rom name="instant synthesizer iigs - disk 2 - data.woz" size="1296227" crc="b3f3db36" sha1="278993013a1eb963e06f78af6d5f58d48cd86fc1" />
 			</dataarea>
@@ -3420,13 +3423,7 @@ license:CC0-1.0
 		<description>Jam Session (version 1.0)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Steve Capps" />
 		<info name="programmer" value="Neil Cormia" />
-		<info name="programmer" value="Ty Roberts" />
-		<info name="programmer" value="Ed Bogas" />
-		<info name="programmer" value="Edward Badasov" />
-		<info name="programmer" value="Latricia Turner" />
-		<info name="programmer" value="Avril Harrison" />
 		<info name="usage" value="Requires a 768K Apple IIgs ROM 01 or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
@@ -3836,6 +3833,7 @@ license:CC0-1.0
 		<description>ShowOff (version 1.1)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Denis Friedman Productions" />
 		<info name="programmer" value="Serge Hervy" />
 		<info name="programmer" value="Jean-Claude Lévy" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
@@ -5028,11 +5026,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="geometry">
-		<description>Geometry</description>
+		<description>Geometry (version 1.0)</description>
 		<year>1988</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="developer" value="Sensei Software" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2023-05-27 -->
 		<!-- educational program -->
