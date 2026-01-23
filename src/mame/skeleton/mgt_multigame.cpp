@@ -6,7 +6,9 @@ slot (?) multigame
 
 only available info is a string in the program ROM:
 MGT MULTI GAME 9 VER 9.04 ENG
-so for now assume the manufacturer is 'MGT' and the title 'Multi Game 9'
+so for now assume the title is 'Multi Game 9'
+
+Manufacturer has been identified as Paula (Ukraine)
 
 PCB is silkscreened:
 77C20001A
@@ -154,4 +156,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, mgtmg9, 0, mgtmg9, mgtmg9, mgt_multigame_state, empty_init, ROT0, "MGT", "Multi Game 9 (ver 9.04 Eng)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, mgtmg9, 0, mgtmg9, mgtmg9, mgt_multigame_state, empty_init, ROT0, "Paula", "Multi Game 9 (ver 9.04 Eng)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

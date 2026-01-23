@@ -13,19 +13,18 @@ Same or at least extremely similar lamps / LEDs layout
 'Custom Made By LZY-P' PCB
 
 W78E065 CPU (I8052 compatible)
-11 MHz XTAL
+10.7386 MHz XTAL
 KC8279P KDC (I8279 compatible)
 24C02 EEPROM
 2x KC89C72 (AY8910 compatible)
 YM2413
 3.579 MHz XTAL
 Oki M6295 (or clone, not readable)
+1 MHz resonator
 3x switch
 
 TODO:
-- remaining inputs / switches;
-- hopper;
-- SVG?
+- SVG / less simplistic layout?
 
 Schematics and manual with list of error codes are available.
 
@@ -44,6 +43,7 @@ After this sequence it will run normally.
 #include "machine/i2cmem.h"
 #include "machine/i8279.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
@@ -75,6 +75,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_i2cmem(*this, "i2cmem"),
 		m_oki(*this, "oki"),
+		m_hopper(*this, "hopper"),
 		m_inputs(*this, { "KEYS1", "KEYS2", "DSW", "PUSHBUTTONS" }),
 		m_digits(*this, "digit%u", 0U),
 		m_leds(*this, "led%u", 0U)
@@ -89,10 +90,11 @@ private:
 	required_device<i8052_device> m_maincpu;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<okim6295_device> m_oki;
+	required_device<hopper_device> m_hopper;
 
 	required_ioport_array<4> m_inputs;
 	output_finder<32> m_digits;
-	output_finder<30> m_leds;
+	output_finder<31> m_leds;
 
 	uint8_t m_kbd_line = 0;
 
@@ -120,7 +122,7 @@ void lanmao_state::leds_w(uint8_t data)
 {
 	for (uint8_t i = 0; i < 8; i++)
 	{
-		if ((i + (Which * 8)) < 30) // only 30 LEDs
+		if ((i + (Which * 8)) < 31) // only 31 LEDs
 			m_leds[i + (Which * 8)] = BIT(data, i);
 	}
 }
@@ -151,6 +153,7 @@ void lanmao_state::port1_w(uint8_t data)
 {
 	m_i2cmem->write_sda(BIT(data, 1));
 	m_i2cmem->write_scl(BIT(data, 2));
+	m_hopper->motor_w(BIT(data, 3));
 
 	if ((data & 0xf1) != 0xf1)
 		logerror("unknown port1 write: %02x\n", data);
@@ -175,7 +178,7 @@ void lanmao_state::data_map(address_map &map)
 	map(0x9000, 0x9001).w("ay1", FUNC(ay8910_device::address_data_w));
 	map(0x9002, 0x9003).w("ay2", FUNC(ay8910_device::address_data_w));
 	map(0xb000, 0xb001).rw("kdc", FUNC(i8279_device::read), FUNC(i8279_device::write));
-	map(0xc000, 0xc001).w("ym", FUNC(ym2413_device::write)); // according to schematics
+	map(0xc000, 0xc001).w("ym", FUNC(ym2413_device::write)); // according to schematics and present on PCB, but doesn't seem used?
 	map(0xd000, 0xd000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
@@ -193,13 +196,13 @@ static INPUT_PORTS_START( lanmao )
 
 	PORT_START("KEYS2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Unidentified button 2" ) PORT_CODE( KEYCODE_A )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Unidentified button 3" ) PORT_CODE( KEYCODE_S )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Unidentified button 4" ) PORT_CODE( KEYCODE_D )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Unidentified button 5" ) PORT_CODE( KEYCODE_F )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Unidentified button 6" ) PORT_CODE( KEYCODE_G )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Unidentified button 7" ) PORT_CODE( KEYCODE_H )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME( "Unidentified button 8" ) PORT_CODE( KEYCODE_I )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Single" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Shift Right" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Shift Left" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME( "Double" )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x03, "Running Lights Difficulty" )  PORT_DIPLOCATION("DSW:1,2")
@@ -238,30 +241,30 @@ static INPUT_PORTS_START( lanmao )
 
 	// what's marked as DIP hereunder is actually something else, but left as DIP for easier testing
 	PORT_START("P1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P1:1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "P1:1" )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_READ_LINE_DEVICE_MEMBER("i2cmem", FUNC(i2cmem_device::read_sda))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) // scl
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P1:4")
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P1:5")
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P1:6")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) // hopper sensor, gives error 31 if high
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "P1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P1:6" )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // hopper sensor, gives error 31 if high
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 
 	PORT_START("P3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P3:2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P3:3")
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "P3:4") // needs to be low to avoid error 30 (coin acceptor)
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P3:5")
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P3:6")
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "P3:7")
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "P3:8")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "P3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "P3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "P3:4" ) // needs to be low to avoid error 30 (coin acceptor)
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "P3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "P3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "P3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "P3:8" )
 INPUT_PORTS_END
 
 
 void lanmao_state::lanmao(machine_config &config)
 {
-	I8052(config, m_maincpu, 11_MHz_XTAL); // actually W78E065
+	I8052(config, m_maincpu, 10.738635_MHz_XTAL); // actually W78E065
 	m_maincpu->set_addrmap(AS_PROGRAM, &lanmao_state::program_map);
 	m_maincpu->set_addrmap(AS_DATA, &lanmao_state::data_map);
 	m_maincpu->port_in_cb<1>().set_ioport("P1");
@@ -269,7 +272,7 @@ void lanmao_state::lanmao(machine_config &config)
 	m_maincpu->port_out_cb<1>().set(FUNC(lanmao_state::port1_w));
 	m_maincpu->port_out_cb<3>().set(FUNC(lanmao_state::port3_w));
 
-	i8279_device &kdc(I8279(config, "kdc", 11_MHz_XTAL / 6 )); // TODO: divider
+	i8279_device &kdc(I8279(config, "kdc", 10.738635_MHz_XTAL / 6 )); // TODO: divider
 	kdc.out_irq_callback().set([this] (int state) { LOGPORTS8279("%s I8279 irq write: %02x\n", machine().describe_context(), state); }); // not connected according to schematics
 	kdc.out_sl_callback().set([this] (uint8_t data) { m_kbd_line = data; }); // 4 bit port
 	kdc.out_disp_callback().set(FUNC(lanmao_state::display_w)); // to 7-seg LEDs through to 2 CD4511 according to schematics
@@ -282,23 +285,25 @@ void lanmao_state::lanmao(machine_config &config)
 
 	I2C_24C02(config, "i2cmem");
 
+	HOPPER(config, m_hopper, attotime::from_msec(100)); // Guessed
+
 	config.set_default_layout(layout_marywu);
 
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	ay8910_device &ay1(AY8910(config, "ay1", 11_MHz_XTAL / 6)); // TODO: divider
+	ay8910_device &ay1(AY8910(config, "ay1", 10.738635_MHz_XTAL / 6)); // TODO: divider
 	ay1.port_a_write_callback().set(FUNC(lanmao_state::leds_w<0>));
 	ay1.port_b_write_callback().set(FUNC(lanmao_state::leds_w<1>));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 11_MHz_XTAL / 6)); // TODO: divider
+	ay8910_device &ay2(AY8910(config, "ay2", 10.738635_MHz_XTAL / 6)); // TODO: divider
 	ay2.port_a_write_callback().set(FUNC(lanmao_state::leds_w<2>));
 	ay2.port_b_write_callback().set(FUNC(lanmao_state::leds_w<3>));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	OKIM6295(config, m_oki, 11_MHz_XTAL / 10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // TODO: divider, pin 7
+	OKIM6295(config, m_oki, 1_MHz_XTAL, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // verified
 }
 
 

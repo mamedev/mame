@@ -3,7 +3,7 @@
 // thanks-to:Sean Riddle, Berger
 /*******************************************************************************
 
-CXG Super Enterprise
+Newcrest CXG Super Enterprise
 
 The chess engine is Kaare Danielsen's Enterprise program. It's the 16KB 'sequel'
 to LogiChess used in Enterprise "S" (emulated in saitek/companion2.cpp).
@@ -395,5 +395,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1986, senterp,  0,       0,      senterp,  senterp,  senterp_state,  empty_init, "CXG Systems / Newcrest Technology / LogiSoft", "Super Enterprise (model 210)", MACHINE_SUPPORTS_SAVE )
-SYST( 1986, senterpc, senterp, 0,      senterpc, senterpc, senterpc_state, empty_init, "CXG Systems / Newcrest Technology / LogiSoft", "Super Enterprise (model 210.C)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, senterp,  0,       0,      senterp,  senterp,  senterp_state,  empty_init, "Newcrest Technology / CXG Systems / LogiSoft", "Super Enterprise (model 210)", MACHINE_SUPPORTS_SAVE )
+SYST( 1986, senterpc, senterp, 0,      senterpc, senterpc, senterpc_state, empty_init, "Newcrest Technology / CXG Systems / LogiSoft", "Super Enterprise (model 210.C)", MACHINE_SUPPORTS_SAVE )

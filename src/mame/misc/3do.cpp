@@ -11,9 +11,13 @@ TODO:
 - Fix DSPP mapping (incompatible with later M2, consider an "opera_host_map" instead);
 - 3do_fz1: draws a tray open CD at top of VRAM space once it throws an error from GetCDType;
 - 3do_hc21: as above plus "Directory /remote not found";
-- 3do_fz10: as above but black screen;
-- 3do_gdo101: errors on DSPP semaphore, if skipped allocates GFX resources but draws in dots;
-- 3do_try: throws "QueueSport error on cmd 4: xfer across 1M boundary"
+- 3do_fz10: as above;
+- 3do_gdo101: errors on DSPP semaphore, hacked to make it boot;
+- 3do_try: throws "QueueSport error on cmd 4: xfer across 1M boundary", has issues with layer
+  clearances, never really pings Sport DMA (?);
+- 3do_fc2: same as above
+- 3do_fc1: hangs on OpenDiskFile at PC=2e6dc, path="/rom/system/tasks/shell", will "give up" if
+  skipped.
 
 References:
 - https://wiki.console5.com/wiki/Panasonic_3DO_FZ-1
@@ -117,6 +121,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "cpu/arm7/arm7.h"
 #include "imagedev/cdromimg.h"
 
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -129,7 +134,9 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 void _3do_state::main_mem(address_map &map)
 {
-	map(0x0000'0000, 0x001F'FFFF).bankrw(m_bank1);                                       /* DRAM */
+	map(0x0000'0000, 0x001F'FFFF).ram();
+	map(0x0000'0000, 0x001F'FFFF).view(m_overlay_view);
+	m_overlay_view[0](0x0000'0000, 0x001F'FFFF).rom().region("bios", 0).lw8(NAME([this] (offs_t offset) { m_overlay_view.disable(); }));
 	map(0x0020'0000, 0x003F'FFFF).ram().share(m_vram);                                   /* VRAM */
 	map(0x0300'0000, 0x030F'FFFF).rom().region("bios", 0);                               /* BIOS */
 	// slow bus
@@ -151,25 +158,29 @@ void _3do_state::main_mem(address_map &map)
 
 
 static INPUT_PORTS_START( 3do )
-	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_START("P1.0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) // ID
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 A") PORT_PLAYER(1)
+
+	PORT_START("P1.1")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 B") PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 C") PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME(u8"P1 P \u23f5/\u23f8") // Play/Pause
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_NAME(u8"P1 X \u23f9") PORT_PLAYER(1) // Stop
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 RT") // Right Trigger
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 LT") // Left Trigger
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void _3do_state::machine_start()
 {
 	m_nvram->set_base(&m_nvmem, sizeof(m_nvmem));
-
-	/* configure overlay */
-	// TODO: can overlay at 0-0x1FFFFF even be written to, or writes go to dram in any case?
-	m_bank1->configure_entry(0, m_dram);
-	m_bank1->configure_entry(1, memregion("overlay")->base());
 
 	m_slow2_init();
 	m_uncle.rev = 0x03800000;
@@ -180,8 +191,9 @@ void _3do_state::machine_start()
 void _3do_state::machine_reset()
 {
 	/* start with overlay enabled */
-	m_bank1->set_entry(1);
+	m_overlay_view.select(0);
 }
+
 
 // TODO: clocks (doubled vs. ARM?)
 void _3do_state::green_config(machine_config &config)
@@ -197,14 +209,25 @@ void _3do_state::green_config(machine_config &config)
 				printf("%c", data & 0xff);
 		}
 	});
-	m_madam->dma_read_cb().set([this] (offs_t offset) {
+	m_madam->dma8_read_cb().set([this] (offs_t offset) {
+		address_space &space = m_maincpu->space();
+		u8 ret = space.read_byte(offset);
+		return ret;
+	});
+	m_madam->dma32_read_cb().set([this] (offs_t offset) {
 		address_space &space = m_maincpu->space();
 		u32 ret = space.read_dword(offset, 0xffff'ffff);
 		return ret;
 	});
-	m_madam->dma_write_cb().set([this] (offs_t offset, u32 data) {
+	m_madam->dma32_write_cb().set([this] (offs_t offset, u32 data) {
 		address_space &space = m_maincpu->space();
 		space.write_dword(offset, data, 0xffff'ffff);
+	});
+	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
+		if (offset == 0)
+			return (m_p1_r[0]->read() << 24) | (m_p1_r[1]->read() << 16);
+
+		return 0;
 	});
 	m_madam->irq_dply_cb().set(m_clio, FUNC(clio_device::dply_w));
 	m_madam->set_amy_tag("amy");
@@ -274,6 +297,9 @@ void _3do_state::_3do(machine_config &config)
 	m_screen->set_screen_update(m_amy, FUNC(amy_device::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
+
+	SOFTWARE_LIST(config, "cdrom_list").set_original("3do");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 void _3do_state::_3do_pal(machine_config &config)
@@ -293,6 +319,9 @@ void _3do_state::_3do_pal(machine_config &config)
 	m_screen->set_screen_update(m_amy, FUNC(amy_device::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
+
+	SOFTWARE_LIST(config, "cdrom_list").set_original("3do");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 void _3do_state::arcade_ntsc(machine_config &config)
@@ -312,8 +341,6 @@ ROM_START(3do_fz1)
 	ROM_SYSTEM_BIOS( 2, "deva", "Development FZ-1 USA (later)" )
 	ROMX_LOAD( "panafz1_dev.bin", 0x000000, 0x100000, CRC(e8eba9dd) SHA1(4cb4ee36e0f5bc0995d34992b4f241c420d49b2e), ROM_BIOS(2) )
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
@@ -325,8 +352,6 @@ ROM_START(3do_fz1e)
 	ROM_SYSTEM_BIOS( 1, "unencrypted", "Unencrypted FZ-1 Europe" )
 	ROMX_LOAD( "panafz1e-unencrypted.bin", 0x000000, 0x100000, CRC(d3d345df) SHA1(4696951e492e5526772a860ea2c0f35411a80927), ROM_BIOS(1) )
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
@@ -338,8 +363,6 @@ ROM_START(3do_fz1j)
 	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-1 Japan with disabled RSA" )
 	ROMX_LOAD( "panafz1j-norsa.bin", 0x000000, 0x100000, CRC(82ce67c6) SHA1(a417587ae3b0b8ef00c830920c21af8bee88e419), ROM_BIOS(1) )
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "panafz1j-kanji.bin", 0x000000, 0x100000, CRC(45f478b1) SHA1(884515605ee243577ab20767ef8c1a7368e4e407) )
@@ -352,8 +375,6 @@ ROM_START(3do_fz10)
 	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-10 USA with disabled RSA" )
 	ROMX_LOAD( "panafz10-norsa.bin", 0x000000, 0x100000, CRC(230e6feb) SHA1(f05e642322c03694f06a809c0b90fc27ac73c002), ROM_BIOS(1) )
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
@@ -365,8 +386,6 @@ ROM_START(3do_fz10e)
 	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-10 Europe with disabled RSA" )
 	ROMX_LOAD( "panafz10e-anvil-norsa.bin", 0x000000, 0x100000, CRC(9a186221) SHA1(2765c7b4557cc838b32567d2428d088980295159), ROM_BIOS(1) )
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
@@ -377,8 +396,6 @@ ROM_START(3do_fz10j)
 	ROM_SYSTEM_BIOS( 0, "retail", "Retail FZ-10 Japan" )
 	ROMX_LOAD( "panafz10j.bin", 0x000000, 0x100000, CRC(07b50015) SHA1(fe7f9c9c6a98910013bf13f2cf798de9fea52acd), ROM_BIOS(0) )
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "panafz10ja-anvil-kanji.bin", 0x000000, 0x100000, CRC(ff7393de) SHA1(2e857b957803d0331fd229328df01f3ffab69eee) )
@@ -391,8 +408,6 @@ ROM_START(3do_gdo101)
 	ROM_SYSTEM_BIOS( 0, "gdo101m", "Retail GDO-101M" )
 	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(0) )
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
@@ -404,8 +419,6 @@ ROM_START(3do_fc1)
 	ROM_SYSTEM_BIOS( 0, "fc1", "FC-1 (encrypted, retail?)" )
 	ROMX_LOAD( "goldstar_fc1_enc.bin", 0x000000, 0x100000, CRC(5c5b4f98) SHA1(8ef7503c948314d242da47b7fdc272f68dac2aee), ROM_BIOS(0) )
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
@@ -418,8 +431,6 @@ ROM_START(3do_fc2)
 	ROM_SYSTEM_BIOS( 0, "fc2", "FC-2 (1.0 dev kit)" )
 	ROMX_LOAD( "3do_devkit_1.0fc2.bin", 0x000000, 0x100000, CRC(cdb23167) SHA1(bd325c869e1dde8a3872fc21565e0646a3d5b525), ROM_BIOS(0) )
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
@@ -429,8 +440,6 @@ ROM_START(3do_try)
 	ROM_SYSTEM_BIOS( 0, "retail", "Retail IMP-21J TRY Japan" )
 	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(0) )
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
@@ -443,8 +452,6 @@ ROM_START(3do_hc21)
 	ROM_SYSTEM_BIOS( 1, "b3", "b3 unencrypted" )
 	ROMX_LOAD( "sanyo_hc21_b3_unenc.bin", 0x000000, 0x100000, CRC(c4c3db01) SHA1(c389af32bcadf0d86826927dc3d20b7072f90069), ROM_BIOS(1) )
 
-	ROM_REGION32_BE( 0x200000, "overlay", 0 )
-	ROM_COPY( "bios", 0, 0, 0x200000 )
 
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 ROM_END
@@ -462,8 +469,6 @@ ROM_END
 	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 3, "sanyotry", "Sanyo TRY 3DO Interactive Multiplayer" ) \
 	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(3) ) \
-	ROM_REGION32_BE( 0x200000, "overlay", 0 ) \
-	ROM_COPY( "bios", 0, 0, 0x200000 ) \
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 
 
@@ -483,8 +488,6 @@ ROM_END
 	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
 	/* TC544000AF-150, 1xxxxxxxxxxxxxxxxxx = 0xFF */ \
 	ROM_LOAD( "saot_rom2.bin", 0x000000, 0x80000, CRC(b832da9a) SHA1(520d3d1b5897800af47f92efd2444a26b7a7dead) )  \
-	ROM_REGION32_BE( 0x200000, "overlay", 0 ) \
-	ROM_COPY( "bios", 0, 0, 0x200000 ) \
 	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
 
 ROM_START(alg3do)
@@ -515,31 +518,32 @@ ROM_END
 
 // console section
 // Panasonic
-CONS( 1993, 3do_fz1,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (USA)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1993, 3do_fz1e,   3do_fz1,    0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Europe)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1994, 3do_fz1j,   3do_fz1,    0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Japan)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1994, 3do_fz10,   0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (USA)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1994, 3do_fz10e,  3do_fz10,   0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Europe, Anvil chipset)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1994, 3do_fz10j,  3do_fz10,   0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Japan)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1993, 3do_fz1,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (USA)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1993, 3do_fz1e,   3do_fz1,    0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Europe)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz1j,   3do_fz1,    0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-1 R.E.A.L. Interactive Multiplayer (Japan)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz10,   0,          0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (USA)",    MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz10e,  3do_fz10,   0,       _3do_pal,   3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Europe, Anvil chipset)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_fz10j,  3do_fz10,   0,       _3do,       3do,    _3do_state, empty_init, "Panasonic", "3DO FZ-10 R.E.A.L. Interactive Multiplayer (Japan)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
 // Goldstar
-CONS( 1994, 3do_gdo101, 0,          0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO GDO-101M Interactive Multiplayer (USA?)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1994?,3do_fc1,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO FC-1 Interactive Multiplayer (USA)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1994?,3do_fc2,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar?", "3DO FC-2 Interactive Multiplayer (dev kit)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1994, 3do_gdo101, 0,          0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO GDO-101M Interactive Multiplayer (USA?)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994?,3do_fc1,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar",  "3DO FC-1 Interactive Multiplayer (USA)",              MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994?,3do_fc2,    3do_gdo101, 0,       _3do,       3do,    _3do_state, empty_init, "Goldstar?", "3DO FC-2 Interactive Multiplayer (dev kit)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
 // Sanyo
-CONS( 1995, 3do_try,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO IMP-21J TRY Interactive Multiplayer (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO HC-21 Interactive Multiplayer (USA, prototype)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+CONS( 1995, 3do_try,    0,          0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO IMP-21J TRY Interactive Multiplayer (Japan)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+CONS( 1994, 3do_hc21,   3do_try,    0,       _3do,       3do,    _3do_state, empty_init, "Sanyo", "3DO HC-21 Interactive Multiplayer (USA, prototype)",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
 
 
 // Arcade section
-GAME( 1993, 3dobios, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 1993, 3dobios, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "The 3DO Company",      "3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
 
-GAME( 1995, orbatak, 3dobios, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-// Beavis and Butthead (prototype), different CD drive, Jaguar CD derived?
+GAME( 1995, orbatak, 3dobios, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Orbatak (prototype)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+// Beavis and Butthead (prototype), with "proprietary" CD drive according to pitch deck
+// (likely not Jaguar CD derived because seems to work with stock 3do drive anyway)
 
 
 // American Laser Games uses its own BIOS (with additional "FKr-Severe-System-extended-RSA failed in CreateTask")
-GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IS_BIOS_ROOT )
+GAME( 1993, alg3do, 0,       _3do,           3do,   _3do_state, empty_init, ROT0,     "American Laser Games / The 3DO Company", "ALG 3DO BIOS",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_IS_BIOS_ROOT )
 
-GAME( 199?, md23do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
-GAME( 1994, sht3do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND )
+GAME( 199?, md23do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Mad Dog II: The Lost Gold (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
+GAME( 1994, sht3do,  alg3do, arcade_ntsc,    3do,   _3do_state, empty_init, ROT0,     "American Laser Games", "Shootout at Old Tucson (3DO hardware)", MACHINE_NOT_WORKING  | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING )
 

@@ -36,7 +36,9 @@ public:
 		m_cdrom(*this, "cdrom"),
 		m_screen(*this, "screen"),
 		m_dac(*this, "dac%u", 0U),
-		m_bank1(*this, "bank1") { }
+		m_overlay_view(*this, "overlay_view"),
+		m_p1_r(*this, "P1.%u", 0)
+	{ }
 
 	void _3do(machine_config &config);
 	void _3do_pal(machine_config &config);
@@ -45,7 +47,6 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 	void green_config(machine_config &config);
 
@@ -83,7 +84,8 @@ private:
 	required_device<cr560b_device> m_cdrom;
 	required_device<screen_device> m_screen;
 	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac;
-	required_memory_bank m_bank1;
+	memory_view m_overlay_view;
+	required_ioport_array<2> m_p1_r;
 
 	SLOW2 m_slow2;
 	UNCLE m_uncle;

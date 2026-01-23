@@ -3,8 +3,8 @@
 // thanks-to:Sean Riddle
 /*******************************************************************************
 
-CXG Sensor Computachess (CXG-001 or WA-001)
-CXG Portachess, Portachess II, Computachess IV, Sphinx Chess Voyager
+White and Allcock CXG Sensor Computachess (CXG-001 or WA-001)
+Newcrest CXG Portachess, Portachess II, Computachess IV, Sphinx Chess Voyager
 
 Sensor Computachess is White and Allcock's first original chess computer.
 Cassia's Chess Mate (aka Computachess) doesn't really count since it was a
@@ -241,5 +241,5 @@ ROM_END
 *******************************************************************************/
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE    INPUT      CLASS          INIT        COMPANY, FULLNAME, FLAGS
-SYST( 1985, scpchess,  0,        0,      scpchess,  scpchess,  cpchess_state, empty_init, "CXG Systems / Newcrest Technology / Intelligent Chess Software", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE )
-SYST( 1981, scpchessa, scpchess, 0,      scpchessa, scpchessa, cpchess_state, empty_init, "CXG Systems / White and Allcock / Intelligent Software", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1985, scpchess,  0,        0,      scpchess,  scpchess,  cpchess_state, empty_init, "Newcrest Technology / CXG Systems / Intelligent Chess Software", "Sensor Computachess (1985 version)", MACHINE_SUPPORTS_SAVE )
+SYST( 1981, scpchessa, scpchess, 0,      scpchessa, scpchessa, cpchess_state, empty_init, "White and Allcock / CXG Systems / Intelligent Software", "Sensor Computachess (1981 version)", MACHINE_SUPPORTS_SAVE )
