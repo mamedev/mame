@@ -190,13 +190,13 @@ void ace_state::main_map(address_map &map)
 
 	map(0xc008, 0xc00c).r(FUNC(ace_state::input_r<0>));
 	map(0xc00d, 0xc011).r(FUNC(ace_state::input_r<1>));
-	map(0xc012, 0xc016).r(FUNC(ace_state::input_r<2>));
+	map(0xc012, 0xc017).r(FUNC(ace_state::input_r<2>));
 	map(0xc013, 0xc013).unmapr();
 
 	map(0xc018, 0xc018).portr("RANGE");
 	map(0xc019, 0xc019).portr("TIME");
 
-	map(0xc020, 0xc026).nopr(); // sound triggers
+	map(0xc020, 0xc026).unmapr(); // sound triggers
 }
 
 
@@ -228,7 +228,7 @@ static INPUT_PORTS_START( ace )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // must be 1 after insert coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // read after death
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // read when plane destroyed
 
 	PORT_START("RANGE")
 	PORT_CONFNAME( 0x0f, 0x05, "Bullet Range" )

@@ -54,6 +54,10 @@ private:
 	required_ioport_array<4> m_in;
 	required_ioport_array<2> m_an;
 
+	emu_timer *m_analog_timer[2];
+	uint8_t m_input_port_select = 0;
+	uint8_t m_analog_port_val = 0xff;
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void input_port_select_w(uint8_t data);
@@ -66,10 +70,6 @@ private:
 
 	void main_io_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
-
-	emu_timer *m_analog_timer[2];
-	uint8_t m_input_port_select = 0;
-	uint8_t m_analog_port_val = 0xff;
 };
 
 
@@ -207,8 +207,8 @@ void clayshoo_state::main_io_map(address_map &map)
 	map(0x20, 0x23).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x30, 0x33).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x40, 0x43).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
-//  map(0x50, 0x50).noprw(); // ?
-//  map(0x60, 0x60).noprw(); // ?
+	map(0x50, 0x50).unmapw(); // ?
+	map(0x60, 0x60).unmapw(); // ?
 }
 
 
