@@ -101,6 +101,7 @@ files {
 	-- MAME_DIR .. "src/mame/hohner/d86.cpp",
 	-- MAME_DIR .. "src/mame/hohner/gp98.cpp",
 	MAME_DIR .. "src/mame/hohner/ustudio.cpp",
+	MAME_DIR .. "src/mame/hohner/ms4.cpp",
 	MAME_DIR .. "src/mame/hohner/xe9.cpp",
 	MAME_DIR .. "src/mame/wersi/keyfox10.cpp",
 	MAME_DIR .. "src/mame/wersi/max1.cpp",
