@@ -65,10 +65,10 @@ authors:hap
 		</text>
 	</element>
 
-	<element name="text_music"><text string="MUSIC:" align="1"><color red="0.02" green="0.02" blue="0.02" /></text></element>
-	<element name="text_speed"><text string="SPEED:" align="1"><color red="0.02" green="0.02" blue="0.02" /></text></element>
-	<element name="text_skill"><text string="SKILL:" align="1"><color red="0.02" green="0.02" blue="0.02" /></text></element>
-	<element name="text_game"><text string="GAME:" align="1"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_music"><text string="MUSIC:" align="2"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_speed"><text string="SPEED:" align="2"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_skill"><text string="SKILL:" align="2"><color red="0.02" green="0.02" blue="0.02" /></text></element>
+	<element name="text_game"><text string="GAME:" align="2"><color red="0.02" green="0.02" blue="0.02" /></text></element>
 
 	<element name="text_last"><text string="LAST"><color red="0.02" green="0.02" blue="0.02" /></text></element>
 	<element name="text_start"><text string="START"><color red="0.02" green="0.02" blue="0.02" /></text></element>
@@ -101,10 +101,10 @@ authors:hap
 		<element ref="text_7"><bounds x="12.3369" y="10.8215" width="0.5" height="0.5" /></element>
 		<element ref="text_8"><bounds x="10.8215" y="12.3369" width="0.5" height="0.5" /></element>
 
-		<element ref="text_music"><bounds x="9" y="8.8" width="2" height="0.29" /></element>
-		<element ref="text_speed"><bounds x="9" y="9.2" width="2" height="0.29" /></element>
-		<element ref="text_skill"><bounds x="9" y="9.6" width="2" height="0.29" /></element>
-		<element ref="text_game"><bounds x="9" y="10.0" width="2" height="0.29" /></element>
+		<element ref="text_music"><bounds x="7.75" y="8.8" width="2" height="0.29" /></element>
+		<element ref="text_speed"><bounds x="7.75" y="9.2" width="2" height="0.29" /></element>
+		<element ref="text_skill"><bounds x="7.75" y="9.6" width="2" height="0.29" /></element>
+		<element ref="text_game"><bounds x="7.75" y="10.0" width="2" height="0.29" /></element>
 
 		<element ref="switch_music" inputtag="FAKE" inputmask="0x02" inputraw="yes"><bounds x="10.25" y="8.8" width="1" height="0.29" /></element>
 		<element ref="switch_speed" inputtag="CPU" inputmask="0x01" inputraw="yes"><bounds x="10.25" y="9.2" width="1" height="0.29" /></element>

@@ -40,31 +40,55 @@ protected:
 		SS_ECC_CHECK_FAILURE    = 0x32
 	};
 
-	// SCSI commands
+	// SCSI commands (page 2-6/22 of the OMTI manual)
+	// NOTE: some of these are for the tape version
 	enum {
+		// group 0
 		SC_TEST_UNIT_READY      = 0x00,
-		SC_REZERO_UNIT          = 0x01,
+		SC_RECALIBRATE          = 0x01,
+		SC_REWIND               = 0x01, // tape
+		SC_RETENTION            = 0x02,
 		SC_REQUEST_SENSE        = 0x03,
 		SC_FORMAT_UNIT          = 0x04,
 		SC_CHECK_TRACK_FORMAT   = 0x05,
 		SC_FORMAT_TRACK         = 0x06,
-		SC_REASSIGN_BLOCKS      = 0x07,
+		SC_FORMAT_BAD_TRACK     = 0x07,
 		SC_READ                 = 0x08,
 		SC_WRITE                = 0x0a,
 		SC_SEEK                 = 0x0b,
-		SC_INIT_DRIVE_PARAMS    = 0x0c,
-		SC_READ_ECC_BURST       = 0x0d,
-		SC_FORMAT_ALT_TRACK     = 0x0e,
-		SC_WRITE_SECTOR_BUFFER  = 0x0f,
-		SC_READ_SECTOR_BUFFER   = 0x10,
-		SC_RAM_DIAG             = 0xe0,
-		SC_DRIVE_DIAG           = 0xe3,
-		SC_CONTROLLER_DIAG      = 0xe4,
-		SC_READ_LONG            = 0xe5,
-		SC_WRITE_LONG           = 0xe6
+		SC_ASSIGN_ALT_TRACK     = 0x0e,
+		SC_WRITE_FILE_MARK      = 0x10,
+		SC_SPACE_FORWARD        = 0x11,
+		SC_VERIFY               = 0x13,
+		SC_ERASE                = 0x19,
+		SC_CHANGE_CARTRIDGE     = 0x1b,
+		// group 1
+		SC_COPY                 = 0x20,
+		SC_BACKUP               = 0x22,
+		SC_RESTORE              = 0x23,
+		SC_BACKUP_WITH_HEADER   = 0x24,
+		SC_RESTORE_CONTINUE     = 0x26,
+		// group 2 (tape only)
+		SC_RETENTION_TAPE       = 0x44,
+		SC_VERIFY_TAPE          = 0x45,
+		SC_READ_SENSE           = 0x46,
+		SC_WRITE_HEADER         = 0x48,
+		SC_READ_HEADER          = 0x49,
+		SC_WRITE_BLOCKS         = 0x4a,
+		SC_READ_BLOCKS          = 0x4b,
+		// group 6
+		SC_DEFINE_FLEXIBLE_DISK_FORMAT = 0xc0,
+		SC_ASSIGN_DISK_PARAMETERS = 0xc2,
+		// group 7
+		SC_RAM_DIAGNOSTICS      = 0xe0,
+		SC_WRITE_ECC            = 0xe1,
+		SC_READ_ID              = 0xe2,
+		SC_READ_DATA_BUFFER     = 0xec,
+		SC_WRITE_DATA_BUFFER    = 0xef
 	};
 
 	// SCSI sense keys
+	// TODO: pickup defs
 	enum {
 		SK_NO_ERROR             = 0x00,
 		SK_DRIVE_NOT_READY      = 0x04,
@@ -81,6 +105,7 @@ protected:
 	virtual attotime scsi_data_command_delay() override;
 
 	uint8_t m_param[10];
+	//u32 m_seek;
 };
 
 DECLARE_DEVICE_TYPE(NSCSI_DTC510, nscsi_dtc510_device)

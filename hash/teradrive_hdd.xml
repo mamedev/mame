@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="teradrive_hdd" description="Sega Teradrive hard disk images">
+
+	<software name="dosv406n" supported="partial">
+		<description>IBM DOS (J4.06/V)</description>
+		<year>1991</year>
+		<publisher>IBM</publisher>
+		<notes><![CDATA[
+Nemesis HDD dump, with filestamps up to 1994. -chs 921,2,33
+PZLCNST: boots
+WOLF3D: drops back to DOS prompt, may need MD to ADLIB wrapper or better EMS management
+Other stuff not extensively tested
+]]></notes>
+		<part name="hdd" interface="ide_hdd">
+			<diskarea name="harddriv">
+				<disk name="TeraDriveHDD00000201" sha1="9c0746303a49cb205b207098ac4b672a7f22d4fa" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- archive.org HDD dump labeled Tera Drive Model 3 Hard Drive.dd -->
+	<!-- sha1 c2e9fa301c7b06992adc3946b3894770c01221b9 -->
+	<!-- refuses to standalone boot, bad? -->
+
+</softwarelist>

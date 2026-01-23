@@ -24953,6 +24953,24 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="micromages2">
+		<description>Micro Mages Second Quest</description>
+		<year>2022</year>
+		<publisher>Morphcat Games</publisher>
+		<info name="release" value="20220915" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="nrom" />
+			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="horizontal" />
+			<dataarea name="prg" size="32768">
+				<rom name="Micro Mages Second Quest prg" size="32768" crc="94cd391e" sha1="de626fd4556f8377c2c09928c7c89f333301cbe1" />
+			</dataarea>
+			<dataarea name="chr" size="8192">
+				<rom name="Micro Mages Second Quest chr" size="8192" crc="6f579478" sha1="73dea6d0bd2f8a9fb47e9d6329c9ebb8c9ace37b" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mightmagj" cloneof="mightmag">
 		<description>Might and Magic - Book One - Secret of the Inner Sanctum (Japan)</description>
 		<year>1990</year>
@@ -32103,6 +32121,43 @@ license:CC0-1.0
 			<feature name="mmc1_type" value="MMC1" />
 			<dataarea name="prg" size="131072">
 				<rom name="tks-g2-0 prg" size="131072" crc="cf9cf7a2" sha1="6ddcd59dc386a2e6a69c32bf0ceb9a9fe3e80bfc" offset="00000" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192" />
+		</part>
+	</software>
+
+	<software name="roniu">
+		<description>Roniu's Tale</description>
+		<year>2022</year>
+		<publisher>Mega Cat Studios</publisher>
+		<info name="developer" value="Kunjee Studio" />
+		<info name="release" value="20220221" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="262144">
+				<rom name="roniu's tale" size="262144" crc="22accf19" sha1="7217551cfebd33fb5501a8dc57560b9d576ff842" />
+			</dataarea>
+			<!-- 8k VRAM on cartridge -->
+			<dataarea name="vram" size="8192" />
+		</part>
+	</software>
+
+	<!-- Original file name is "Ronius_Tale_NewDemo.nes". Do older versions exist? -->
+	<software name="roniudemo" cloneof="roniu">
+		<description>Roniu's Tale (demo version)</description>
+		<year>2021</year>
+		<publisher>Mega Cat Studios</publisher>
+		<info name="developer" value="Kunjee Studio" />
+		<info name="release" value="20210908" />
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="uxrom" />
+			<feature name="pcb" value="NES-UNROM" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="prg" size="262144">
+				<rom name="roniu's tale demo" size="262144" crc="a0b8cb59" sha1="9f89467cbaf7adbbe42c7226358a484732027c07" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192" />

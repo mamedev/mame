@@ -105,7 +105,7 @@ private:
 
 void quadra605_state::machine_start()
 {
-	m_memcjr->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
+	m_memcjr->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 }
 
 void quadra605_state::machine_reset()
@@ -274,6 +274,6 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 1993, macqd605, 0, 0, macqd605, macadb, quadra605_state, init_macqd605,  "Apple Computer", "Macintosh Quadra 605", MACHINE_SUPPORTS_SAVE)
+COMP( 1993, macqd605, 0,        0, macqd605, macadb, quadra605_state, init_macqd605,  "Apple Computer", "Macintosh Quadra 605", MACHINE_SUPPORTS_SAVE)
 COMP( 1993, maclc475, macqd605, 0, maclc475, macadb, quadra605_state, init_macqd605,  "Apple Computer", "Macintosh LC/Performa 475", MACHINE_SUPPORTS_SAVE)
 COMP( 1994, maclc575, macqd605, 0, maclc575, macadb, quadra605_state, init_macqd605,  "Apple Computer", "Macintosh LC/Performa 575", MACHINE_SUPPORTS_SAVE)

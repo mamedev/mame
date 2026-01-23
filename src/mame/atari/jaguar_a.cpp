@@ -168,25 +168,35 @@ enum
  *
  *************************************/
 
-void jaguar_state::update_gpu_irq()
+void jaguar_state::update_dsp_irq()
 {
-	if (m_gpu_irq_state & m_dsp_regs[JINTCTRL] & 0x1f)
+	// HACK: why this is calling a DSP related irq section for triggering GPU!?
+	// area51 wants this for HDD boot ...
+	if (m_is_cojag)
 	{
-		m_gpu->set_input_line(1, ASSERT_LINE);
-		gpu_resume();
+		if (m_dsp_irq_state & BIT(m_dsp_regs[JINTCTRL], 0))
+		{
+			m_gpu->set_input_line(1, ASSERT_LINE);
+			gpu_resume();
+		}
+		else
+			m_gpu->set_input_line(1, CLEAR_LINE);
 	}
-	else
-		m_gpu->set_input_line(1, CLEAR_LINE);
+
+	if (BIT(m_gpu_regs[0xe0 / 2], 4) && m_dsp_irq_state & m_dsp_regs[JINTCTRL] & 0x1f)
+	{
+		trigger_host_cpu_irq(4);
+	}
 }
 
 
 void jaguar_state::external_int(int state)
 {
 	if (state != CLEAR_LINE)
-		m_gpu_irq_state |= 1;
+		m_dsp_irq_state |= 1;
 	else
-		m_gpu_irq_state &= ~1;
-	update_gpu_irq();
+		m_dsp_irq_state &= ~1;
+	update_dsp_irq();
 }
 
 
@@ -200,8 +210,8 @@ void jaguar_state::external_int(int state)
 void jaguar_state::sound_start()
 {
 	m_serial_timer = timer_alloc(FUNC(jaguar_state::serial_update), this);
-
-	m_gpu_irq_state = 0;
+	m_jpit_timer[0] = timer_alloc(FUNC(jaguar_state::jpit_update<0>), this);
+	m_jpit_timer[1] = timer_alloc(FUNC(jaguar_state::jpit_update<1>), this);
 
 #if ENABLE_SPEEDUP_HACKS
 	if (m_hacks_enabled)
@@ -209,6 +219,16 @@ void jaguar_state::sound_start()
 #endif
 }
 
+void jaguar_state::sound_reset()
+{
+	m_serial_timer->adjust(attotime::never);
+	m_jpit_timer[0]->adjust(attotime::never);
+	m_jpit_timer[1]->adjust(attotime::never);
+
+	m_serial_frequency = 0;
+	m_serial_smode = 0;
+	m_dsp_irq_state = 0;
+}
 
 
 /*************************************
@@ -225,12 +245,50 @@ uint16_t jaguar_state::jerry_regs_r(offs_t offset)
 	switch (offset)
 	{
 		case JINTCTRL:
-			return m_gpu_irq_state;
+			return m_dsp_irq_state;
 		case ASICTRL:
-			return (m_dsp_regs[offset] & 0xfeff) | 0x100; // assume fifo empty
+			// HACK: assume fifo empty
+			return (m_dsp_regs[offset] & 0xfeff) | 0x100;
+		case 0x36/2:
+		case 0x38/2:
+		case 0x3a/2:
+		case 0x3c/2:
+			if (!machine().side_effects_disabled())
+				popmessage("jaguar_a: JPIT%d timer read", offset - 0x36 / 2);
+			break;
 	}
 
 	return m_dsp_regs[offset];
+}
+
+void jaguar_state::update_jpit_timer(unsigned which)
+{
+	const u16 prescaler = m_dsp_regs[which ? JPIT2 : JPIT1];
+	const u16 divider = m_dsp_regs[which ? DSP1 : DSP0];
+
+	// pbfant sets a prescaler with no divider, expecting working sound with that alone
+	if (prescaler || divider)
+	{
+		attotime sample_period = attotime::from_ticks((1 + prescaler) * (1 + divider), m_dsp->clock());
+		m_jpit_timer[which]->adjust(sample_period);
+	}
+	else
+		m_jpit_timer[which]->adjust(attotime::never);
+
+}
+
+template <unsigned which> TIMER_CALLBACK_MEMBER(jaguar_state::jpit_update)
+{
+	// battlesp/battlesg expects JPIT sound irqs to trigger 68k
+	m_dsp_irq_state |= 1 << (2 + which);
+	update_dsp_irq();
+
+	// - mutntpng/cybermor wants these irqs
+	// - atarikrt/feverpit also expects this, unconditionally
+	// TODO: fixing atarikrt causes ironsold/ddragon5 black screen regression at startup, why?
+	m_dsp->set_input_line(2 + which, ASSERT_LINE);
+
+	update_jpit_timer(which);
 }
 
 
@@ -240,9 +298,20 @@ void jaguar_state::jerry_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	switch (offset)
 	{
+		case JPIT1:
+		case DSP0:
+			//printf("Primary sound %04x %04x\n", m_dsp_regs[JPIT1], m_dsp_regs[DSP0]);
+			update_jpit_timer(0);
+			break;
+		case JPIT2:
+		case DSP1:
+			//printf("Secondary sound %04x %04x\n", m_dsp_regs[JPIT2], m_dsp_regs[DSP1]);
+			update_jpit_timer(1);
+			break;
 		case JINTCTRL:
-			m_gpu_irq_state &= ~(m_dsp_regs[JINTCTRL] >> 8);
-			update_gpu_irq();
+			//printf("enable %04x\n", m_dsp_regs[JINTCTRL]);
+			m_dsp_irq_state &= ~(m_dsp_regs[JINTCTRL] >> 8);
+			update_dsp_irq();
 			break;
 	}
 
@@ -319,6 +388,34 @@ TIMER_CALLBACK_MEMBER(jaguar_state::serial_update)
  *
  *************************************/
 
+// TODO: only very specific mode supported
+// --x- ---- EVERYWORD Enable irq on every word at MSB (on both tx and rx)
+// ---x ---- FALLING enable irq on falling edge
+// ---- x--- RISING enable irq on rising edge
+// ---- -x-- WSEN
+// ---- --x- MODE32
+// ---- ---x INTERNAL enable serial clock (assume disabled on Jaguar CD)
+void jaguar_state::update_serial_timer()
+{
+	//printf("%04x %02x\n", m_serial_frequency, m_serial_smode);
+
+	switch(m_serial_smode)
+	{
+		case 0x00:
+			m_serial_timer->adjust(attotime::never);
+			break;
+		case 0x15:
+		{
+			attotime rate = attotime::from_hz(m_dsp->clock()) * (32 * 2 * (m_serial_frequency + 1));
+			m_serial_timer->adjust(rate, 0, rate);
+			break;
+		}
+		default:
+			logerror("Unsupported write to SMODE = %X\n", m_serial_smode);
+			break;
+	}
+}
+
 uint32_t jaguar_state::serial_r(offs_t offset)
 {
 	logerror("%s:jaguar_serial_r(%X)\n", machine().describe_context(), offset);
@@ -341,19 +438,16 @@ void jaguar_state::serial_w(offs_t offset, uint32_t data)
 			break;
 
 		/* frequency register */
+		// NOTE: BIOS sets frequency *after* control
 		case 4:
 			m_serial_frequency = data & 0xffff;
+			update_serial_timer();
 			break;
 
-		/* control register -- only very specific modes supported */
+		/* control register  */
 		case 5:
-			if ((data & 0x3f) != 0x15)
-				logerror("Unexpected write to SMODE = %X\n", data);
-			if ((data & 0x3f) == 0x15)
-			{
-				attotime rate = attotime::from_hz(m_dsp->clock()) * (32 * 2 * (m_serial_frequency + 1));
-				m_serial_timer->adjust(rate, 0, rate);
-			}
+			m_serial_smode = data & 0x3f;
+			update_serial_timer();
 			break;
 
 		default:

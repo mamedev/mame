@@ -55,12 +55,14 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "sound/flt_rc.h"
-#include "sound/mm5837.h"
 #include "sente6vb.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/clock.h"
 #include "machine/rescap.h"
+#include "sound/flt_rc.h"
+#include "sound/mm5837.h"
+
 #include "speaker.h"
 
 #define LOG_CEM_WRITES (1U << 1)

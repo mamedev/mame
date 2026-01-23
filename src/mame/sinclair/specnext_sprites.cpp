@@ -81,10 +81,15 @@ void specnext_sprites_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, 
 		const u8 n = m_zero_on_top ? i : (m_sprites_cache.size() - 1) - i;
 		const sprite_data &spr = m_sprites_cache[n];
 
+		s32 destx = m_offset_h + ((spr.x & 0x1ff) << 1);
+		if (destx > (m_offset_h + ((SCREEN_AREA.right() << 1) | 1))) destx -= 512 << 1;
+		s32 desty = m_offset_v + (spr.y & 0x1ff);
+		if (desty > (m_offset_v + SCREEN_AREA.bottom())) desty -= 512;
+
 		gfx((spr.rotate << 1) | spr.h)->prio_zoom_transpen(bitmap, clipped
 			, spr.pattern >> (1 - spr.h), spr.paloff
 			, spr.xmirror, spr.ymirror
-			, ((spr.x & 0x1ff) << 1) + m_offset_h, (spr.y & 0x1ff) + m_offset_v
+			, destx, desty
 			, 0x20000 << spr.xscale, 0x10000 << spr.yscale
 			, screen.priority(), pmask
 			, m_transp_colour & (spr.h ? 0x0f : 0xff));

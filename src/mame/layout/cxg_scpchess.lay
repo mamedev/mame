@@ -367,9 +367,9 @@ authors:hap
 		<element ref="but" inputtag="IN.0" inputmask="0x80"><bounds x="88" y="69" width="10" height="4" /></element>
 		<element ref="but" inputtag="IN.0" inputmask="0x40"><bounds x="88" y="79" width="10" height="4" /></element>
 
-		<element ref="text_l5"><bounds x="86" y="56.5" width="14" height="2" /></element>
-		<element ref="text_l6"><bounds x="86" y="66.5" width="14" height="2" /></element>
-		<element ref="text_l7"><bounds x="86" y="76.5" width="14" height="2" /></element>
+		<element ref="text_l5"><bounds x="88" y="56.5" width="10" height="2" /></element>
+		<element ref="text_l6"><bounds x="88" y="66.5" width="10" height="2" /></element>
+		<element ref="text_l7"><bounds x="88" y="76.5" width="10" height="2" /></element>
 
 	</view>
 </mamelayout>

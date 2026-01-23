@@ -118,8 +118,8 @@ authors:hap
 		<element ref="text_from"><bounds x="8.5" y="15.9" width="10.5" height="1.5" /></element>
 		<element ref="text_to"><bounds x="27" y="15.9" width="10.5" height="1.5" /></element>
 
-		<element ref="text_time"><bounds x="4.2" y="18.8" width="8" height="1.5" /></element>
-		<element ref="text_twhite"><bounds x="4.2" y="20.2" width="8" height="1.5" /></element>
+		<element ref="text_time"><bounds x="4.0" y="18.8" width="8" height="1.5" /></element>
+		<element ref="text_twhite"><bounds x="4.0" y="20.2" width="8" height="1.5" /></element>
 		<element ref="text_time"><bounds x="38" y="18.8" width="8" height="1.5" /></element>
 		<element ref="text_tblack"><bounds x="38" y="20.2" width="8" height="1.5" /></element>
 

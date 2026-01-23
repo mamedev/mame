@@ -319,8 +319,8 @@ void m68000_device::state_import(const device_state_entry &entry)
 		m_pc = m_ipc+2;
 		m_au = m_ipc+4;
 		auto dis = machine().disable_side_effects();
-		m_ir = m_ird = m_irdi = m_opcodes.read_word(m_ipc);
-		m_irc = m_dbin = m_opcodes.read_word(m_pc);
+		m_ir = m_ird = m_irdi = m_s_opcodes->read_word(m_ipc);
+		m_irc = m_dbin = m_s_opcodes->read_word(m_pc);
 		set_ftu_const();
 		m_inst_state = m_decode_table[m_ird];
 		m_inst_substate = 0;

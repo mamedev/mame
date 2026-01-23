@@ -2343,7 +2343,7 @@ void mpu4vid_state::hack_bwb_startup_protection()
 	// there's no checksum that we need to fix after this
 	// so we can't be sure there are no bad dumps?
 
-	uint16_t *rom = (uint16_t*)memregion("video")->base();
+	uint16_t *rom = &memregion("video")->as_u16();
 	int len = memregion("video")->bytes()/2;
 
 	uint16_t sequence[8] = { 0x3428, 0x0002, 0xb428, 0x0002, 0x671a, 0x2cbc, 0x0002, 0x4001 };
@@ -2467,7 +2467,7 @@ void mpu4vid_state::init_cybcas()
 	hack_bwb_startup_protection();
 
 	// hack out half the startup checks for now until we work out what they're checking!
-	uint16_t *rom = (uint16_t*)memregion("video")->base();
+	uint16_t *rom = &memregion("video")->as_u16();
 
 	for (int i = 0x1e42; i < 0x1e74; i += 2)
 		rom[i / 2] = 0x4e71;
@@ -9236,4 +9236,3 @@ GAME(  199?, v4missis,   0,        bwbvid_oki_bt471_german,    v4cybcas,   mpu4v
 GAME(  199?, v4picdil,   0,        bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4picdila,  v4picdil, bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4picdilz,  v4picdil, bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 3) (MPU4 Video)",GAME_FLAGS )
-

@@ -55,7 +55,7 @@ protected:
 	virtual uint16_t inh_end() override { return 0xffff; }
 	virtual int inh_type() override;
 	virtual void reset_from_bus() override;
-	
+
 private:
 	required_region_ptr<uint8_t> m_rom;
 	int m_rombank = 0;

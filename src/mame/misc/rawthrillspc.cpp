@@ -79,7 +79,7 @@ void rawthrillspc_state::rawthrillspc(machine_config &config)
 	ROM_SYSTEM_BIOS( 1, "104", "v1.0.3" ) \
 	ROMX_LOAD( "1.0.4_4m.bin", 0x00000, 0x20000, CRC(73f0420b) SHA1(4821d21d2c75084062cb1047eb08b1b3ab2424e1), ROM_BIOS(1) )
 
-ROM_START( guitarheroac )
+ROM_START( gtrhroac )
 	OPTIPLEX740_BIOS
 
 	DISK_REGION( "ide:0:hdd" )
@@ -128,7 +128,7 @@ ROM_END
  I/O board with ICE P/N X2034X, silkscreened as "500-00040-01" and with a CPLD labeled as "RIO v0x5016 Copyright 2010 Raw Thrills Inc".
  HASP USB security dongle.
 */
-ROM_START( doodlejmp )
+ROM_START( doodljmp )
 	ROM_REGION32_LE( 0x100000, "bios", 0 )
 	ROM_SYSTEM_BIOS( 0, "0515", "Compaq 5.15 (11/06/2009)" )
 	ROMX_LOAD( "w25x80a.bin", 0x000000, 0x100000, CRC(e91538ee) SHA1(32add79eba2049205a98fc4e854976e11d102a4c), ROM_BIOS(0) )
@@ -146,6 +146,6 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(2013, doodlejmp,    0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "ICE / Raw Thrills (Lima Sky license)",      "Doodle Jump Arcade (v1.16)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME(2004, fnf,          0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                               "The Fast And The Furious (v3.06)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME(2008, guitarheroac, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills (Activision / Konami license)", "Guitar Hero Arcade (v1.0.5)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2013, doodljmp, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "ICE / Raw Thrills (Lima Sky license)",      "Doodle Jump Arcade (v1.16)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2004, fnf,      0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                               "The Fast And The Furious (v3.06)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2008, gtrhroac, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills (Activision / Konami license)", "Guitar Hero Arcade (v1.0.5)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

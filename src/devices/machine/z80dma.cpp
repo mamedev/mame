@@ -736,7 +736,7 @@ void z80dma_device::write(u8 data)
 			if (data & 0x10)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(INTERRUPT_CTRL);
 		}
-		else if ((data & 0xC7) == 0x82) // WR5
+		else if ((data & 0xc7) == 0x82) // WR5
 		{
 			LOGREGS("%s: WR5 %02x\n", machine().describe_context(), data);
 			WR5 = data;
@@ -842,18 +842,19 @@ void z80dma_device::write(u8 data)
 				m_status |= 0x30;
 				m_ip = 0;
 				break;
-			case 0xFB:
-			case 0xFF: // TODO: p8k triggers this, it probably crashed.
+			case 0xfB:
+			case 0xff: // TODO: p8k triggers this, it probably crashed.
 				logerror("Z80DMA undocumented command triggered 0x%02X!\n", data);
 				break;
 			default:
 				logerror("Z80DMA Unknown WR6 command %02x\n", data);
 			}
 		}
-		else if (data == 0x8e) //newtype on Sharp X1, unknown purpose
-			logerror("Z80DMA Unknown base register %02x\n", data);
 		else
-			fatalerror("Z80DMA '%s' Unknown base register %02x\n", tag(), data);
+		{
+			// 0x8e: newtype on Sharp X1, unknown purpose
+			logerror("Z80DMA Unknown base register %02x\n", data);
+		}
 		m_cur_follow = 0;
 	}
 	else
@@ -894,7 +895,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 {
 	// normalize state
 	m_rdy = param;
-	m_status = (m_status & 0xFD) | (!is_ready() << 1);
+	m_status = (m_status & 0xfd) | (!is_ready() << 1);
 
 	if (is_ready() && INT_ON_READY)
 	{

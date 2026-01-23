@@ -433,7 +433,7 @@ ROM_END
 
 ROM_START( mrdu )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "d1",           0x0000, 0x2000, CRC(3dcd9359) SHA1(bfe00450ee8822f437d87514f051ad1be6de9463) )
+	ROM_LOAD( "d1",           0x0000, 0x2000, CRC(3dcd9359) SHA1(bfe00450ee8822f437d87514f051ad1be6de9463) ) // also seen with bytes 0x11c9-0x11d4 still intact, showing the 'LICENCED BY' tiles
 	ROM_LOAD( "d2",           0x2000, 0x2000, CRC(710058d8) SHA1(168cc179f2266bbf9437445bef9ff7d3358a8e6b) )
 	ROM_LOAD( "d3",           0x4000, 0x2000, CRC(467d12d8) SHA1(7bb85e6a780de1c0c224229ee571cab39098f78d) )
 	ROM_LOAD( "du4.bin",      0x6000, 0x2000, CRC(893bc218) SHA1(2b546989c4eef9f94594c50a48458c91e3f4983f) )

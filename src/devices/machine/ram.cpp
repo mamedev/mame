@@ -171,12 +171,14 @@ void ram_device::device_start()
 		m_size = defsize;
 
 	// allocate space for the ram
-	m_pointer = std::make_unique<u8 []>(m_size);
-	std::fill_n(m_pointer.get(), m_size, m_default_value);
+	m_pointer.reset(std::malloc(m_size));
+	if (!m_pointer)
+		throw emu_fatalerror("%s: error allocating memory", tag());
+	std::fill_n(reinterpret_cast<u8 *>(m_pointer.get()), m_size, m_default_value);
 
 	// register for state saving
 	save_item(NAME(m_size));
-	save_pointer(NAME(m_pointer), m_size);
+	save_pointer(NAME(reinterpret_cast<u8 *>(m_pointer.get())), m_size);
 }
 
 

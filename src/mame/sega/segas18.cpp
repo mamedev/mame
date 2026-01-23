@@ -3165,10 +3165,11 @@ ROM_END
  **************************************************************************************************************************
     Wally wo Sagase! (Where's Wally?), Sega System 18
     CPU: FD1094 317-0197B
+    I/O board: 834-6180-01
     ROM Board: 171-5873B
-   Main board: 837-8777-01
-      Game BD: 833-8775-01 WALLY
-    ROM Board: 834-8776-01
+   Main board: 837-8777
+      Game BD: 833-8775 WALLY
+    ROM Board: 834-8776  (with REV. B sticker)
 */
 ROM_START( wwallyj )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0197B
@@ -3227,7 +3228,11 @@ ROM_END
 /**************************************************************************************************************************
     Wally wo Sagase! (Where's Wally?), Sega System 18
     CPU: FD1094 317-0197A
+    I/O board: 834-6180-01
     ROM Board: 171-5873B
+   Main board: 837-8777
+      Game BD: 833-8775 WALLY
+    ROM Board: 834-8776  (with REV. A sticker)
 */
 ROM_START( wwallyja )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0197A
@@ -3286,13 +3291,17 @@ ROM_END
 /**************************************************************************************************************************
     Wally wo Sagase! (Where's Wally?) - 3 players, Sega System 18
     CPU: FD1094 317-0198A
-    GAME BD: 833-8775-01 WALLY 3P
+    I/O board: 834-6180-01
+    ROM Board: 171-5873B
+   Main board: 837-8777-01
+      Game BD: 833-8775-01 WALLY
+    ROM Board: 834-8776-01  (with REV. A sticker)
 */
 
 ROM_START( wwallyja3p )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // 68000 code - custom CPU 317-0198A
-	ROM_LOAD16_BYTE( "epr-14730a.a4", 0x000000, 0x40000, CRC(d897bcc6) SHA1(15f0b602eb3ac870241f53246a4251c07b27fb27) )
-	ROM_LOAD16_BYTE( "epr-14731a.a6", 0x000001, 0x40000, CRC(64328385) SHA1(7220d285762ec9d3656cb958cc71b43094aa4052) )
+	ROM_LOAD16_BYTE( "epr-14736a.a4", 0x000000, 0x40000, CRC(d897bcc6) SHA1(15f0b602eb3ac870241f53246a4251c07b27fb27) )
+	ROM_LOAD16_BYTE( "epr-14737a.a6", 0x000001, 0x40000, CRC(64328385) SHA1(7220d285762ec9d3656cb958cc71b43094aa4052) )
 
 	ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
 	ROM_LOAD( "317-0198a.key", 0x0000, 0x2000, CRC(32d313a4) SHA1(bb7a651c34a9e925d5a9928fabb77ca8724009f2) )

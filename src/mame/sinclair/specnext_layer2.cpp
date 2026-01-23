@@ -24,27 +24,48 @@ specnext_layer2_device &specnext_layer2_device::set_palette(const char *tag, u16
 	return *this;
 }
 
-rgb_t specnext_layer2_device::blend(u32 &target, const rgb_t pen, u8 mixer)
+void specnext_layer2_device::blend(u8 &prio, u32 &target, const rgb_t pen, bool is_transparent, bool is_prio_color, u8 pcode, u8 priority_mask, u8 mixer)
 {
-	switch (mixer)
-	{
-	case 0:
-		target = pen;
-		break;
-	case 1:
-		target = rgb_t(target) + pen;
-		break;
-	default:
-	{
-		const u8 five = pal3bit(5);
-		const rgb_t t = rgb_t(target);
-		target = rgb_t(0, rgb_t::clamp(t.r() + pen.r() - five)
-			, rgb_t::clamp(t.g() + pen.g() - five)
-			, rgb_t::clamp(t.b() + pen.b() - five));
-	}
-	}
+	if (is_transparent && !mixer)
+		return;
 
-	return target;
+	if (mixer)
+	{
+		if (!prio)
+			mixer = 0;
+		else if (!(prio & priority_mask) || (prio & ~priority_mask))
+			return;
+
+		if (is_transparent)
+			mixer = 3;
+
+		switch (mixer)
+		{
+		case 0:
+			target = pen;
+			break;
+		case 1:
+			target = rgb_t(target) + pen;
+			break;
+		case 2:
+		{
+			const u8 five = pal3bit(5);
+			const rgb_t t = rgb_t(target);
+			target = rgb_t(0, rgb_t::clamp(t.r() + pen.r() - five)
+				, rgb_t::clamp(t.g() + pen.g() - five)
+				, rgb_t::clamp(t.b() + pen.b() - five));
+		}
+			break;
+		default:
+			target = palette().pen_color(0x800);
+			break;
+		}
+	}
+	else if (is_prio_color || !(prio & priority_mask))
+	{
+		target = pen;
+		prio |= is_prio_color ? 8 : pcode;
+	}
 }
 
 void specnext_layer2_device::draw_mix(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 mixer)
@@ -68,7 +89,7 @@ void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitma
 	const u8 res = m_resolution + 1;
 	const u16 (&info)[5] = LAYER2_INFO[m_resolution];
 
-	rectangle clip = rectangle{ ((m_clip_x1 + 1) << res) - 1, (std::min<u16>(m_clip_x2 + 1, info[0]) << res) - 1, m_clip_y1, std::min<u8>(m_clip_y2, info[1] - 1) };
+	rectangle clip = rectangle{ m_clip_x1 << res, (std::min<u16>(m_clip_x2 + 1, info[0]) << res) - 1, m_clip_y1, std::min<u8>(m_clip_y2, info[1] - 1) };
 	u16 offset_h = m_offset_h - (info[2] << 1);
 	u16 offset_v = m_offset_v - info[2];
 	clip.offset(offset_h, offset_v);
@@ -80,7 +101,6 @@ void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitma
 
 	const rgb_t gt0 = rgbexpand<3,3,3>((m_global_transparent << 1) | 0, 6, 3, 0);
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
-	const rgb_t fallback_color = palette().pen_color(0x800);
 	const u16 pen_base = (m_layer2_palette_select ? m_palette_alt_offset : m_palette_base_offset) | (m_palette_offset << 4);
 	const u16 x_min = (((clip.left() - offset_h) >> 1) + m_scroll_x) % info[0];
 	const bool x_overscan = m_scroll_x >= info[0] && info[3] == 256;
@@ -95,25 +115,10 @@ void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitma
 		{
 			const u16 idx = pen_base + (*scr);
 			const rgb_t pen = palette().pen_color(idx);
-			if ((pen != gt0) && (pen != gt1))
-			{
-				const bool prio_color = m_pen_priority[idx];
-				if (prio_color || mixer || ((*(prio) & priority_mask) == 0))
-				{
-					blend(*pix, pen, (*(prio) == priority_mask) ? mixer : 0);
-					*(prio) |= prio_color ? 8 : pcode;
-				}
-				if (prio_color || mixer || ((*(prio + 1) & priority_mask) == 0))
-				{
-					blend(*(pix + 1), pen, (*(prio + 1) == priority_mask) ? mixer : 0);
-					*(prio + 1) |= prio_color ? 8 : pcode;
-				}
-			}
-			else if (mixer)
-			{
-				*pix = fallback_color;
-				*(pix + 1) = fallback_color;
-			}
+			const bool is_transparent = (pen == gt0) || (pen == gt1);
+			const bool is_prio_color = m_pen_priority[idx];
+			blend(prio[0], pix[0], pen, is_transparent, is_prio_color, pcode, priority_mask, mixer);
+			blend(prio[1], pix[1], pen, is_transparent, is_prio_color, pcode, priority_mask, mixer);
 
 			++x %= info[0];
 			if (x == 0 && !x_overscan)
@@ -128,7 +133,7 @@ void specnext_layer2_device::draw_16(screen_device &screen, bitmap_rgb32 &bitmap
 {
 	const u16 (&info)[5] = LAYER2_INFO[1];
 
-	rectangle clip = rectangle{ m_clip_x1 << 2, (std::min<u16>(m_clip_x2, info[0] - 1) << 2) | 1, m_clip_y1, std::min<u8>(m_clip_y2, info[1] - 1) };
+	rectangle clip = rectangle{ m_clip_x1 << 2, (std::min<u16>(m_clip_x2 + 1, info[0]) << 2) - 1, m_clip_y1, std::min<u8>(m_clip_y2, info[1] - 1) };
 
 	u16 offset_h = m_offset_h - (info[2] << 1);
 	u16 offset_v = m_offset_v - info[2];
@@ -156,31 +161,19 @@ void specnext_layer2_device::draw_16(screen_device &screen, bitmap_rgb32 &bitmap
 				hpos ^= 1;
 			else
 			{
-				u16 idx = pen_base + (*scr >> 4);
-				rgb_t pen = palette().pen_color(idx);
-				if ((pen != gt0) && (pen != gt1))
-				{
-					const bool prio_color = m_pen_priority[idx];
-					if (prio_color || mixer || ((*(prio) & priority_mask) == 0))
-					{
-						blend(*pix, pen, (*(prio) == priority_mask) ? mixer : 0);
-						*(prio) |= prio_color ? 8 : pcode;
-					}
-				}
+				const u16 idx = pen_base + (*scr >> 4);
+				const rgb_t pen = palette().pen_color(idx);
+				const bool is_transparent = (pen == gt0) || (pen == gt1);
+				const bool is_prio_color = m_pen_priority[idx];
+				blend(prio[0], pix[0], pen, is_transparent, is_prio_color, pcode, priority_mask, mixer);
 			}
 
 			{
-				u16 idx = pen_base + (*scr & 0x0f);
-				rgb_t pen = palette().pen_color(idx);
-				if ((pen != gt0) && (pen != gt1))
-				{
-					const bool prio_color = m_pen_priority[idx];
-					if (prio_color || mixer || ((*(prio + 1) & priority_mask) == 0))
-					{
-						blend(*(pix + 1), pen, (*(prio + 1) == priority_mask) ? mixer : 0);
-						*(prio + 1) |= prio_color ? 8 : pcode;
-					}
-				}
+				const u16 idx = pen_base + (*scr & 0x0f);
+				const rgb_t pen = palette().pen_color(idx);
+				const bool is_transparent = (pen == gt0) || (pen == gt1);
+				const bool is_prio_color = m_pen_priority[idx];
+				blend(prio[1], pix[1], pen, is_transparent, is_prio_color, pcode, priority_mask, mixer);
 			}
 
 			++x %= info[0];

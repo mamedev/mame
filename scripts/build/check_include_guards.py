@@ -26,7 +26,7 @@ def pathsplit(p):
 if __name__ == '__main__':
     extpat = re.compile('.+\\.(h|hpp)$')
     substpat = re.compile('[-.]')
-    guardpat = re.compile('^ *# *ifndef +([^\s]+)(\s+.*)?')
+    guardpat = re.compile(r'^ *# *ifndef +([^\s]+)(\s+.*)?')
     bad = False
     if len(sys.argv) < 2:
         sys.stderr.write("Error: requires at least one path defined\n")

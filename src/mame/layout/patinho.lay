@@ -51,7 +51,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="7" y="10" width="20" height="20"/>
 			<data><![CDATA[
 				<svg width="20" height="20">
-					<path 
+					<path
 						fill="#b3b3b3" stroke="#808080" stroke-width="1"
 						d="m 5.5,0.5 4,4 -8,8 6,6 8,-8 4,4 v -14 z" />
 				</svg>
@@ -61,7 +61,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 			<bounds x="10" y="10" width="20" height="20"/>
 			<data><![CDATA[
 				<svg width="20" height="20">
-					<path 
+					<path
 						fill="#b3b3b3" stroke="#808080" stroke-width="1"
 						d="m 0.5,14.5 4,-4 8,8 6,-6 -8,-8 4,-4 h -14 z" />
 				</svg>
@@ -1297,7 +1297,7 @@ Front panel of the Patinho Feio mini-computer with clickable buttons, switches a
 		<element ref="right_arrow">
 			<bounds x="629" y="310" width="22" height="14" />
 		</element>
-		
+
 		<element ref="right_arrow">
 			<bounds x="629" y="339" width="22" height="14" />
 		</element>

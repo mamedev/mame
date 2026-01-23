@@ -133,7 +133,7 @@ license:CC0-1.0
 
 	<software name="lpw39upda" cloneof="lpw39upd">
 	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MAME-->
-		<description>Lisa Pascal Workshop V3.9 Update (Alt)</description>
+		<description>Lisa Pascal Workshop V3.9 Update (alt)</description>
 		<year>1985</year>
 		<publisher>Apple Computer Inc.</publisher>
 
@@ -176,7 +176,7 @@ license:CC0-1.0
 
 	<software name="lpwsupa" cloneof="lpwsup">
 	<!--Disks might be bad. I marked it as bad, but it will be evident once Emulation of the System gets up and running in MAME-->
-		<description>Lisa Pascal Workshop Supplement (Alt)</description>
+		<description>Lisa Pascal Workshop Supplement (alt)</description>
 		<year>1985</year>
 		<publisher>Apple Computer Inc.</publisher>
 
@@ -236,7 +236,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lpw2a" cloneof="lpw2">
-		<description>Lisa Pascal Workshop V2 (Alt)</description>
+		<description>Lisa Pascal Workshop V2 (alt)</description>
 		<year>1983</year>
 		<publisher>Apple Computer Inc.</publisher>
 
@@ -326,7 +326,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lpw3a" cloneof="lpw3">
-		<description>Lisa Pascal Workshop V3 (Alt)</description>
+		<description>Lisa Pascal Workshop V3 (alt)</description>
 		<year>1983</year>
 		<publisher>Apple Computer Inc.</publisher>
 
@@ -488,7 +488,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lofsys30a" cloneof="lofsys30">
-		<description>Lisa Office System 7/7 (Ver. 3.0, Alt)</description>
+		<description>Lisa Office System 7/7 (Ver. 3.0, alt)</description>
 		<year>1983</year>
 		<publisher>Apple Computer Inc.</publisher>
 
@@ -602,7 +602,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="macwrk3a" cloneof="macwrk3">
-		<description>Lisa Macworks XL 3.0 (Alt)</description>
+		<description>Lisa Macworks XL 3.0 (alt)</description>
 		<year>1985</year>
 		<publisher>Apple Computer Inc.</publisher>
 		<info name="finder" value="4.1" />

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
+// thanks-to: Valley Bell
 /**************************************************************************************************
 
 Idol Japan SpeakBoard sound card
@@ -9,17 +10,25 @@ Predates -86/-73, first actual card to support YM2608
 https://j02.nobody.jp/jto98/n_desk_sound/msb.htm
 
 TODO:
-- check ADPCM (hplus doesn't seem to support it);
 - PnP;
 - stereo line-in;
 - Surround VR;
 - EMS;
 - SparkBoard derives from this (extra OPNA at $588)
 
+NOTES:
+- metlfrce MDZS.COM driver wants a +1 in ymfm_adpcm at_end fn.
+  It tries to detect the card existance by probing $3ffe0-$3ffff ADPCM RAM, with incrementing
+  values starting from 0x30. Without the bump it will read a 0 instead of the expected 0x4f,
+  failing the detection.
+
 ===================================================================================================
 
 - Known SW with SpeakBoard support
-  hplus
+  hplus (later on? Uses Kaja's PMD driver)
+  gaogao1
+  grounsed
+  metlfrce (Uses MDZS.COM driver)
   Lord Monarch demo (undumped? Support dropped in retail version)
   dedicated sound editor (undumped?)
 
@@ -101,6 +110,7 @@ void speakboard_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
+		// TODO: check against unmap ROM option
 		logerror("map ROM at 0x000cc000-0x000cffff\n");
 		m_bus->space(AS_PROGRAM).install_rom(
 			0xcc000,

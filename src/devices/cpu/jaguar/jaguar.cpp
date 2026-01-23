@@ -208,6 +208,10 @@ device_memory_interface::space_config_vector jaguar_cpu_device::memory_space_con
 
 void jaguar_cpu_device::update_register_banks()
 {
+	// - feverpit doesn't want this
+//	if (m_go == false)
+//		return;
+
 	/* pick the bank */
 	u32 bank = m_flags & RPAGEFLAG;
 	if (m_imask == true) bank = 0;
@@ -250,7 +254,7 @@ void jaguar_cpu_device::check_irqs()
 	int which = 0;
 
 	/* if the IMASK is set, bail */
-	if (m_imask == true)
+	if (m_imask == true || m_go == false)
 		return;
 
 	u8 latch = m_int_latch;
@@ -1299,7 +1303,7 @@ void jaguar_cpu_device::io_common_map(address_map &map)
 void jaguargpu_cpu_device::io_map(address_map &map)
 {
 	jaguar_cpu_device::io_common_map(map);
-	map(0x0c, 0x0f).w(FUNC(jaguargpu_cpu_device::end_w));
+	map(0x0c, 0x0f).w(FUNC(jaguargpu_cpu_device::endian_w));
 	map(0x18, 0x1b).rw(FUNC(jaguargpu_cpu_device::hidata_r), FUNC(jaguargpu_cpu_device::hidata_w));
 }
 
@@ -1307,7 +1311,7 @@ void jaguargpu_cpu_device::io_map(address_map &map)
 void jaguardsp_cpu_device::io_map(address_map &map)
 {
 	jaguar_cpu_device::io_common_map(map);
-	map(0x0c, 0x0f).w(FUNC(jaguardsp_cpu_device::dsp_end_w));
+	map(0x0c, 0x0f).w(FUNC(jaguardsp_cpu_device::dsp_endian_w));
 	map(0x18, 0x1b).w(FUNC(jaguardsp_cpu_device::modulo_w));
 	map(0x20, 0x23).r(FUNC(jaguardsp_cpu_device::high_accum_r));
 }
@@ -1320,22 +1324,31 @@ u32 jaguar_cpu_device::flags_r()
 void jaguar_cpu_device::flags_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_flags);
-	// clear imask only on bit 3 clear (1 has no effect)
-	if ((m_flags & 0x08) == 0)
-		m_imask = false;
+	if (ACCESSING_BITS_0_15)
+	{
+		// clear imask only on bit 3 clear (1 has no effect)
+		if ((m_flags & 0x08) == 0)
+			m_imask = false;
 
-	// update int latch & mask
-	m_int_mask = (m_flags >> 4) & 0x1f;
-	m_int_latch &= ~((m_flags >> 9) & 0x1f);
+		// update int latch & mask
+		m_int_mask = (m_flags >> 4) & 0x1f;
+		m_int_latch &= ~((m_flags >> 9) & 0x1f);
+
+		//for (int i = 0; i < 5; i++)
+		//{
+		//	if (BIT(m_flags, 9 + i))
+		//		set_input_line(i, CLEAR_LINE);
+		//}
+
+		// TODO: DMAEN (bit 15)
+	}
 
 	// TODO: move to specific handler
-	if (m_isdsp)
+	if (m_isdsp && ACCESSING_BITS_16_31)
 	{
 		m_int_mask |= (BIT(m_flags, 16) << 5);
 		m_int_latch &= ~(BIT(m_flags, 17) << 5);
 	}
-
-	// TODO: DMAEN (bit 15)
 
 	update_register_banks();
 	check_irqs();
@@ -1358,10 +1371,11 @@ void jaguar_cpu_device::matrix_address_w(offs_t offset, u32 data, u32 mem_mask)
 void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_pc);
-	if (m_go == false)
-		m_pc = m_io_pc & 0xffffff;
-	else
-		throw emu_fatalerror("%s: inflight PC write %08x", this->tag(), m_pc);
+	m_pc = m_io_pc & 0xffffff;
+	// HRM warns against changing PC while GPU/DSP is running
+	// - speedst2 does it anyway on DSP side
+	if (m_go == true)
+		logerror("%s: inflight PC write %08x", this->tag(), m_pc);
 }
 
 /*
@@ -1373,20 +1387,27 @@ void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
  * ---- ---x I/O endianness
  */
 // TODO: just log if anything farts for now, change to bit struct once we have something to test out
-void jaguar_cpu_device::end_w(offs_t offset, u32 data, u32 mem_mask)
+void jaguar_cpu_device::endian_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_end);
-	// sburnout sets bit 1 == 0
-	if ((m_io_end & 0x7) != 0x7)
-		throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
+	if (ACCESSING_BITS_0_7)
+	{
+		// sburnout sets bit 1 == 0
+		if ((m_io_end & 0x7) != 0x7)
+			throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
+	}
 }
 
-void jaguardsp_cpu_device::dsp_end_w(offs_t offset, u32 data, u32 mem_mask)
+void jaguardsp_cpu_device::dsp_endian_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_end);
-	// wolfn3d writes a '0' to bit 1 (which is a NOP for DSP)
-	if ((m_io_end & 0x5) != 0x5)
-		throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
+	if (ACCESSING_BITS_0_7)
+	{
+		// wolfn3d writes a '0' to bit 1 (which is a NOP for DSP)
+		// bretth sets 0x7e06 after dyna cam logo
+		if ((m_io_end & 0x5) != 0x5)
+			throw emu_fatalerror("%s: fatal endian setup %08x", this->tag(), m_io_end);
+	}
 }
 
 /*
@@ -1404,10 +1425,10 @@ void jaguardsp_cpu_device::dsp_end_w(offs_t offset, u32 data, u32 mem_mask)
 u32 jaguar_cpu_device::status_r()
 {
 	u32 result = ((m_version & 0xf)<<12) | (m_bus_hog<<11) | m_go;
-	result|= (m_int_latch & 0x1f) << 6;
+	result |= (m_int_latch & 0x1f) << 6;
 	// TODO: make it DSP specific
 	if (m_isdsp == true)
-		result|= (m_int_latch & 0x20) << 11;
+		result |= (m_int_latch & 0x20) << 11;
 	return result;
 }
 
@@ -1421,26 +1442,30 @@ void jaguar_cpu_device::go_w(int state)
 void jaguar_cpu_device::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_io_status);
-	bool new_go = BIT(m_io_status, 0);
-	if (new_go != m_go)
-		go_w(new_go);
-
-	if (BIT(m_io_status, 1))
-		m_cpu_interrupt(ASSERT_LINE);
-
-	// TODO: following does nothing if set by itself, or acts as a trap?
-	if (BIT(m_io_status, 2))
+	if (ACCESSING_BITS_0_15)
 	{
-		m_int_latch |= 1;
-		check_irqs();
+		bool new_go = BIT(m_io_status, 0);
+		if (new_go != m_go)
+			go_w(new_go);
+
+		if (BIT(m_io_status, 1))
+			m_cpu_interrupt(ASSERT_LINE);
+
+		// TODO: following does nothing if set by itself, or acts as a trap?
+		if (BIT(m_io_status, 2))
+		{
+			m_int_latch |= 1;
+			check_irqs();
+		}
+
+
+		// TODO: single step handling
+
+		m_bus_hog = BIT(m_io_status, 11);
+		// TODO: protect/protectse uses this, why?
+		if (m_bus_hog == true)
+			logerror("%s: bus hog enabled\n", this->tag());
 	}
-
-	// TODO: single step handling
-
-	m_bus_hog = BIT(m_io_status, 11);
-	// TODO: protect/protectse uses this, why?
-	if (m_bus_hog == true)
-		logerror("%s: bus hog enabled\n", this->tag());
 }
 
 u32 jaguargpu_cpu_device::hidata_r()
@@ -1471,7 +1496,7 @@ void jaguardsp_cpu_device::modulo_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 jaguardsp_cpu_device::high_accum_r()
 {
-	printf("%s: high 16-bit accumulator read\n", this->tag());
+	logerror("%s: high 16-bit accumulator read\n", this->tag());
 	return (m_accum >> 32) & 0xff;
 }
 

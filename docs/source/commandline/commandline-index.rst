@@ -201,6 +201,7 @@ Core Artwork Options
 | :ref:`[no]artwork_crop <mame-commandline-noartworkcrop>`
 | :ref:`fallback_artwork <mame-commandline-fallbackartwork>`
 | :ref:`override_artwork <mame-commandline-overrideartwork>`
+| :ref:`artwork_font <mame-commandline-artworkfont>`
 
 
 Core Screen Options

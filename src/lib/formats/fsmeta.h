@@ -37,7 +37,8 @@ enum class meta_name {
 	owner_id,
 	attributes,
 	oem_name,
-	max = oem_name
+	disk_id,
+	max = disk_id
 };
 
 enum class meta_type {

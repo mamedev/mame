@@ -185,7 +185,6 @@ private:
 	int m_tx_shift;
 	int m_tx_parity;
 	int m_tx_counter;
-	int m_tx_enable;
 	int m_tx_irq_enable;
 	int m_tx_internal_clock;
 };

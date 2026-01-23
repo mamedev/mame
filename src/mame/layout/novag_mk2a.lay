@@ -92,9 +92,9 @@ authors:hap
 		<element ref="orange"><bounds x="6"  y="10" width="4.25" height="4.25" /></element>
 		<element ref="orange"><bounds x="12" y="10" width="4.25" height="4.25" /></element>
 
-		<element ref="text_l01"><bounds x="-1" y="14.35" width="6.25" height="1" /></element>
-		<element ref="text_l02"><bounds x="5"  y="14.35" width="6.25" height="1" /></element>
-		<element ref="text_l03"><bounds x="11" y="14.35" width="6.25" height="1" /></element>
+		<element ref="text_l01"><bounds xc="2.125"  y="14.35" width="5.5" height="1" /></element>
+		<element ref="text_l02"><bounds xc="8.125"  y="14.35" width="5.5" height="1" /></element>
+		<element ref="text_l03"><bounds xc="14.125" y="14.35" width="5.5" height="1" /></element>
 
 		<element ref="brown"><bounds x="0"  y="16" width="4.25" height="4.25" /></element>
 		<element ref="brown"><bounds x="6"  y="16" width="4.25" height="4.25" /></element>
@@ -105,12 +105,12 @@ authors:hap
 		<element ref="brown"><bounds x="12" y="22" width="4.25" height="4.25" /></element>
 		<element ref="brown"><bounds x="18" y="22" width="4.25" height="4.25" /></element>
 
-		<element ref="text_lb"><bounds x="5"  y="20.35" width="6.25" height="1" /></element>
-		<element ref="text_lc"><bounds x="11" y="20.35" width="6.25" height="1" /></element>
-		<element ref="text_ld"><bounds x="17" y="20.35" width="6.25" height="1" /></element>
-		<element ref="text_le"><bounds x="-1" y="26.35" width="6.25" height="1" /></element>
-		<element ref="text_lf"><bounds x="5"  y="26.35" width="6.25" height="1" /></element>
-		<element ref="text_lg"><bounds x="11" y="26.35" width="6.25" height="1" /></element>
+		<element ref="text_lb"><bounds xc="8.125"  y="20.35" width="5.5" height="1" /></element>
+		<element ref="text_lc"><bounds xc="14.125" y="20.35" width="5.5" height="1" /></element>
+		<element ref="text_ld"><bounds xc="20.125" y="20.35" width="5.5" height="1" /></element>
+		<element ref="text_le"><bounds xc="2.125"  y="26.35" width="5.5" height="1" /></element>
+		<element ref="text_lf"><bounds xc="8.125"  y="26.35" width="5.5" height="1" /></element>
+		<element ref="text_lg"><bounds xc="14.125" y="26.35" width="5.5" height="1" /></element>
 
 		<element ref="white2"><bounds x="1.725" y="20.5" width="0.8" height="0.8" /></element>
 		<element ref="blackb"><bounds x="1.85" y="20.625" width="0.55" height="0.55" /></element>

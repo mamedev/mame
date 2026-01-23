@@ -14,6 +14,8 @@ class nscsi_bus_device : public device_t
 public:
 	nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	auto out_bsy_callback() { return m_bsy_handler.bind(); }
+
 	void ctrl_w(int refid, uint32_t lines, uint32_t mask);
 	void data_w(int refid, uint32_t lines);
 	void ctrl_wait(int refid, uint32_t lines, uint32_t mask);
@@ -32,6 +34,8 @@ private:
 		uint32_t ctrl, wait_ctrl;
 		uint32_t data;
 	};
+
+	devcb_write_line m_bsy_handler;
 
 	dev_t dev[16];
 	int devcnt;

@@ -103,14 +103,9 @@ void n64_state::video_start()
 {
 	m_rdp = std::make_unique<n64_rdp>(*this, m_rdram, m_rsp_dmem);
 
-	m_rdp->set_machine(machine());
 	m_rdp->init_internal_state();
 	m_rdp->set_n64_periphs(m_rcp_periphs);
-
-	m_rdp->m_blender.set_machine(machine());
-	m_rdp->m_blender.set_processor(m_rdp.get());
-
-	m_rdp->m_tex_pipe.set_machine(machine());
+	m_rcp_periphs->set_rdp(*m_rdp);
 
 	m_rdp->m_aux_buf = make_unique_clear<uint8_t[]>(EXTENT_AUX_COUNT);
 
@@ -2988,7 +2983,11 @@ void n64_rdp::process_command_list()
 
 /*****************************************************************************/
 
-n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem) : poly_manager<uint32_t, rdp_poly_state, 8>(state.machine())
+n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem)
+	: poly_manager<uint32_t, rdp_poly_state, 8>(state.machine())
+	, m_blender(state.machine(), *this)
+	, m_tex_pipe(*this)
+	, m_machine(state.machine())
 {
 	ignore = false;
 	dolog = false;
@@ -3012,7 +3011,6 @@ n64_rdp::n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem) : poly_manag
 
 	m_tmem = nullptr;
 
-	m_machine = nullptr;
 	m_n64_periphs = nullptr;
 
 	//memset(m_hidden_bits, 3, 8388608);

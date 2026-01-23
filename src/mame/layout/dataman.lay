@@ -7,25 +7,84 @@ authors:hap
 
 <!-- define elements -->
 
-	<element name="digit" defstate="0">
-		<led7seg><color red="0.2" green="1.0" blue="0.85" /></led7seg>
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="cyan"><rect><color red="0.2" green="1.0" blue="0.85" /></rect></element>
+
+	<element name="cyanm" defstate="0">
+		<rect state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></rect>
+		<rect state="1"><color red="1" green="1" blue="1" /></rect>
 	</element>
 
-	<element name="lamp_dot" defstate="0">
+	<element name="line22">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100" height="100">
+				<rect width="18" height="200" x="0" y="-10" transform="rotate(-22.0)" fill="#ffffff" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="digit" defstate="0"><led7seg><color red="0.2" green="1.0" blue="0.85" /></led7seg></element>
+
+	<element name="seg_dot" defstate="0">
 		<disk state="1"><color red="0.2" green="1.0" blue="0.85" /></disk>
 		<disk state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></disk>
 	</element>
-	<element name="lamp_dash" defstate="0">
+	<element name="seg_dash" defstate="0">
 		<rect state="1"><color red="0.2" green="1.0" blue="0.85" /></rect>
 		<rect state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></rect>
 	</element>
-	<element name="lamp_slash" defstate="0">
-		<text string="/" state="1"><color red="0.2" green="1.0" blue="0.85" /></text>
-		<text string="/" state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></text>
+
+	<element name="circle8" defstate="0">
+		<rect>
+			<bounds xc="5" yc="5" width="10" height="10" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<disk state="1">
+			<bounds xc="5" yc="5" width="8" height="8" />
+			<color red="0.2" green="1.0" blue="0.85" />
+		</disk>
+		<disk state="0">
+			<bounds xc="5" yc="5" width="8" height="8" />
+			<color red="0.0235" green="0.1255" blue="0.1059" />
+		</disk>
+		<disk>
+			<bounds xc="5" yc="5" width="6.6" height="6.6" />
+			<color red="0" green="0" blue="0" />
+		</disk>
+		<rect>
+			<bounds x="5" y="0" width="5" height="10" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<rect>
+			<bounds x="0" y="2.65" width="5" height="7.35" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+
+		<!-- erase edge -->
+		<rect>
+			<bounds x="0" y="2.55" width="2.55" height="1" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<rect>
+			<bounds x="0" y="2.45" width="2.45" height="1" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<rect>
+			<bounds x="0" y="2.35" width="2.35" height="1" />
+			<color red="0" green="0" blue="0" />
+		</rect>
+		<rect>
+			<bounds x="0" y="2.25" width="2.25" height="1" />
+			<color red="0" green="0" blue="0" />
+		</rect>
 	</element>
-	<element name="lamp_backslash" defstate="0">
-		<text string="&#x5c;" state="1"><color red="0.2" green="1.0" blue="0.85" /></text>
-		<text string="&#x5c;" state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></text>
+
+	<element name="line45">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="50" height="50">
+				<rect width="100" height="1.6" x="0" y="0" transform="rotate(45.0)" fill="#000000" />
+			</svg>
+		]]></data></image>
 	</element>
 
 
@@ -44,37 +103,48 @@ authors:hap
 		<element name="digit6" ref="digit"><bounds x="70" y="0" width="10" height="15" /></element>
 		<element name="digit7" ref="digit"><bounds x="80" y="0" width="10" height="15" /></element>
 
-<!-- math symbols custom digit -->
+		<!-- math symbols custom digit -->
+		<element ref="line22"><bounds x="21.5" y="1" width="5.5" height="5.5" /></element>
+		<element ref="line22"><bounds x="25.25" y="1" width="5.5" height="5.5" /><orientation flipy="yes" /></element>
+		<element ref="line22"><bounds x="21.5" y="8.5" width="5.5" height="5.5" /><orientation flipy="yes" /></element>
+		<element ref="line22"><bounds x="25.25" y="8.5" width="5.5" height="5.5" /></element>
 
-		<element name="2.6" ref="lamp_dash"><bounds x="21.5" y="7.35" width="7" height="0.5" /></element>
+		<element ref="cyan" blend="multiply"><bounds x="21" y="0.5" width="8" height="14" /></element>
 
-		<element name="2.1" ref="lamp_dash"><bounds x="24.75" y="3.7" width="0.5" height="3.0" /></element>
-		<element name="2.4" ref="lamp_dash"><bounds x="24.75" y="8.5" width="0.5" height="3.0" /></element>
+		<element name="2.5" ref="cyanm" blend="multiply"><bounds x="21" y="0.5" width="4" height="7" /></element>
+		<element name="2.5" ref="cyanm" blend="multiply"><bounds x="25" y="0.5" width="4" height="7" /></element>
+		<element name="2.5" ref="cyanm" blend="multiply"><bounds x="21" y="7.5" width="4" height="7" /></element>
+		<element name="2.5" ref="cyanm" blend="multiply"><bounds x="25" y="7.5" width="4" height="7" /></element>
 
-		<element name="2.0" ref="lamp_dot"><bounds x="24.25" y="1.8" width="1.5" height="1.5" /></element>
-		<element name="2.3" ref="lamp_dot"><bounds x="24.25" y="11.9" width="1.5" height="1.5" /></element>
+		<element ref="black" blend="multiply"><bounds xc="25" y="0" width="2" height="15" /></element>
 
-		<element name="2.5" ref="lamp_slash"><bounds x="24.3" y="-0.5" width="5" height="7.5" /></element>
-		<element name="2.5" ref="lamp_slash"><bounds x="20.7" y="7" width="5" height="7.5" /></element>
-		<element name="2.5" ref="lamp_backslash"><bounds x="20.7" y="-0.5" width="5" height="7.5" /></element>
-		<element name="2.5" ref="lamp_backslash"><bounds x="24.3" y="7" width="5" height="7.5" /></element>
+		<element name="2.6" ref="seg_dash"><bounds x="21.5" yc="7.5" width="7" height="1" /></element>
 
-<!-- equals sign digit -->
+		<element name="2.1" ref="seg_dash"><bounds xc="25" y="3" width="1" height="3.5" /></element>
+		<element name="2.4" ref="seg_dash"><bounds xc="25" y="8.5" width="1" height="3.5" /></element>
 
-		<element name="4.7" ref="lamp_dash"><bounds x="51.5" y="3.7" width="7" height="1" /></element>
-		<element name="4.7" ref="lamp_dash"><bounds x="51.5" y="10.5" width="7" height="1" /></element>
+		<element name="2.0" ref="seg_dot"><bounds xc="25" y="1" width="1.5" height="1.5" /></element>
+		<element name="2.3" ref="seg_dot"><bounds xc="25" y="12.5" width="1.5" height="1.5" /></element>
 
-<!-- "bulls eye" digit, it's supposed to be a segmented circle but that's not really possible to draw here -->
+		<!-- equals sign digit -->
+		<element name="4.7" ref="seg_dash"><bounds x="51.5" yc="4.2" width="7" height="1" /></element>
+		<element name="4.7" ref="seg_dash"><bounds x="51.5" yc="11" width="7" height="1" /></element>
 
-		<element name="8.6" ref="lamp_dash"><bounds x="92" y="3" width="1" height="4" /></element>
-		<element name="8.4" ref="lamp_dash"><bounds x="92" y="8" width="1" height="4" /></element>
-		<element name="8.1" ref="lamp_dash"><bounds x="104" y="3" width="1" height="4" /></element>
-		<element name="8.7" ref="lamp_dash"><bounds x="104" y="8" width="1" height="4" /></element>
+		<!-- "bulls eye" digit (starting at 1 o'clock, going clockwise)-->
+		<element name="8.0" ref="circle8" blend="add"><bounds x="90" y="-1" width="17" height="17" /><orientation flipx="yes" /></element>
+		<element name="8.1" ref="circle8" blend="add"><bounds x="90" y="-1" width="17" height="17" /><orientation rotate="90" /></element>
+		<element name="8.7" ref="circle8" blend="add"><bounds x="90" y="-1" width="17" height="17" /><orientation rotate="270" flipx="yes" /></element>
+		<element name="8.2" ref="circle8" blend="add"><bounds x="90" y="-1" width="17" height="17" /><orientation rotate="180" /></element>
+		<element name="8.3" ref="circle8" blend="add"><bounds x="90" y="-1" width="17" height="17" /><orientation flipy="yes" /></element>
+		<element name="8.4" ref="circle8" blend="add"><bounds x="90" y="-1" width="17" height="17" /><orientation rotate="270" /></element>
+		<element name="8.6" ref="circle8" blend="add"><bounds x="90" y="-1" width="17" height="17" /><orientation rotate="90" flipx="yes" /></element>
+		<element name="8.5" ref="circle8" blend="add"><bounds x="90" y="-1" width="17" height="17" /></element>
 
-		<element name="8.5" ref="lamp_dash"><bounds x="94" y="1" width="4" height="1" /></element>
-		<element name="8.0" ref="lamp_dash"><bounds x="99" y="1" width="4" height="1" /></element>
-		<element name="8.3" ref="lamp_dash"><bounds x="94" y="13" width="4" height="1" /></element>
-		<element name="8.2" ref="lamp_dash"><bounds x="99" y="13" width="4" height="1" /></element>
+		<element ref="black"><bounds xc="98.5" yc="7.5" width="0.5" height="15" /></element>
+		<element ref="black"><bounds xc="98.5" yc="7.5" width="15" height="0.5" /></element>
+
+		<element ref="line45"><bounds xc="99" yc="7.5" width="15" height="15" /></element>
+		<element ref="line45"><bounds xc="98" yc="7.5" width="15" height="15" /><orientation flipx="yes" /></element>
 
 	</view>
 </mamelayout>

@@ -24,7 +24,7 @@
 #include "imageutl.h"
 #include "uef_cas.h"
 
-#include "osdcomm.h" // little_endianize_int*
+#include "multibyte.h"
 
 #include <zlib.h>
 
@@ -49,7 +49,7 @@ static cassette_image::error csw_cassette_identify(cassette_image *cassette, cas
 
 	opts->bits_per_sample = 8;
 	opts->channels = 1;
-	opts->sample_frequency = little_endianize_int16(*(uint32_t*)(header + 0x19));
+	opts->sample_frequency = get_u32le(header + 0x19);
 	return cassette_image::error::SUCCESS;
 }
 
@@ -85,7 +85,7 @@ static cassette_image::error csw_cassette_load(cassette_image *cassette)
 	switch (header[0x17])
 	{
 	case 1:
-		sample_rate = little_endianize_int16(*(uint32_t*)(header + 0x19));
+		sample_rate = get_u32le(header + 0x19);
 		compression = header[0x1b];
 		bit = (header[0x1c] & 1) ? 127 : -128;
 		csw_data = 0x20;
@@ -95,13 +95,13 @@ static cassette_image::error csw_cassette_load(cassette_image *cassette)
 		break;
 
 	case 2:
-		sample_rate = little_endianize_int32(*(uint32_t*)(header + 0x19));
+		sample_rate = get_u32le(header + 0x19);
 		compression = header[0x21];
 		bit = (header[0x22] & 1) ? 127 : -128;
 		csw_data = (size_t) header[0x23] + 0x34;
 
 		LOG_FORMATS("Sample Rate: %u\n", sample_rate);
-		LOG_FORMATS("Number of Pulses: %u\n", little_endianize_int32(*(uint32_t *)(header + 0x1d)));
+		LOG_FORMATS("Number of Pulses: %u\n", get_u32le(header + 0x1d));
 		LOG_FORMATS("CompressionType: %u   Flags: %u\n", header[0x21], header[0x22]);
 		LOG_FORMATS("Encoder: ");
 		for (int i = 0; i < 16; i++)
@@ -124,7 +124,7 @@ static cassette_image::error csw_cassette_load(cassette_image *cassette)
 			bsize = image_data[pos];
 			if (bsize == 0)
 			{
-				bsize = little_endianize_int32(*(uint32_t *)(&image_data[pos + 1]));
+				bsize = get_u32le(&image_data[pos + 1]);
 				pos += 4;
 			}
 			for (int i = 0; i < bsize; i++)
@@ -179,7 +179,7 @@ static cassette_image::error csw_cassette_load(cassette_image *cassette)
 					d_stream.avail_out = 4;
 					d_stream.next_out = &gz_ptr[0];
 					err = inflate(&d_stream, Z_SYNC_FLUSH);
-					bsize = little_endianize_int32(*(uint32_t *)(&gz_ptr[0]));
+					bsize = get_u32le(&gz_ptr[0]);
 				}
 				for (int i = 0; i < bsize; i++)
 				{

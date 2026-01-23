@@ -524,7 +524,7 @@ void dragngun_state::dragngun_map(address_map &map)
 
 	map(0x0300000, 0x03fffff).rom().region("maincpu", 0x100000);
 	map(0x0400000, 0x0400000).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x0410000, 0x0410003).w(FUNC(dragngun_state::volume_w));
+	map(0x0410000, 0x0410000).w(FUNC(dragngun_state::lc7535_volume_w));
 	map(0x0418000, 0x0418003).w(FUNC(dragngun_state::speaker_switch_w));
 	map(0x0420000, 0x0420000).rw(FUNC(dragngun_state::eeprom_r), FUNC(dragngun_state::eeprom_w));
 	map(0x0430000, 0x043001f).w(FUNC(dragngun_state::lightgun_w));
@@ -570,7 +570,7 @@ void dragngun_state::lockload_map(address_map &map)
 	namcosprite_map(map);
 
 	map(0x300000, 0x3fffff).rom().region("maincpu", 0x100000);
-	map(0x410000, 0x410003).w(FUNC(dragngun_state::volume_w));
+	map(0x410000, 0x410000).w(FUNC(dragngun_state::volume_w));
 	map(0x420000, 0x420000).rw(FUNC(dragngun_state::eeprom_r), FUNC(dragngun_state::eeprom_w));
 	map(0x440000, 0x440003).portr("IN2");
 	map(0x500000, 0x500003).w(FUNC(dragngun_state::sprite_control_w));
@@ -730,7 +730,8 @@ void deco32_state::ioprot_w(offs_t offset, u16 data, u16 mem_mask)
 
 void deco32_state::volume_w(u8 data)
 {
-	// TODO: assume linear with a 0.0-1.0 dB scale for now
+	// TODO: Assumes linear scaling
+	// values go from 0x00 (max volume) to 0xff (min volume)
 	const u8 raw_vol = 0xff - data;
 	const float vol_output = float(raw_vol) / 255.0f;
 
@@ -747,52 +748,35 @@ u8 captaven_state::captaven_soundcpu_status_r()
 	return 0xff;
 }
 
-void dragngun_state::volume_w(u32 data)
+void dragngun_state::lc7535_volume_w(u8 data)
 {
 	m_vol_main->ce_w(BIT(data, 2));
 	m_vol_main->clk_w(BIT(data, 1));
 	m_vol_main->di_w(BIT(data, 0));
 
-	if (m_vol_gun.found())
-	{
-		m_vol_gun->ce_w(BIT(data, 2));
-		m_vol_gun->clk_w(BIT(data, 1));
-		m_vol_gun->di_w(BIT(data, 0));
-	}
+	m_vol_gun->ce_w(BIT(data, 2));
+	m_vol_gun->clk_w(BIT(data, 1));
+	m_vol_gun->di_w(BIT(data, 0));
 }
 
 void dragngun_state::speaker_switch_w(u32 data)
 {
-	// TODO: This should switch the oki3 output between the gun speaker and the standard speakers
-	m_gun_speaker_disabled = bool(BIT(data, 0));
+	bool gun_speaker_disabled = bool(BIT(data, 0));
 
-	logerror("Gun speaker: %s\n", m_gun_speaker_disabled ? "Disabled" : "Enabled");
-}
+	if (gun_speaker_disabled)
+	{
+		m_oki[2]->set_route_gain(0, m_vol_main, 0, 1.0);
+		m_oki[2]->set_route_gain(0, m_vol_main, 1, 1.0);
+		m_oki[2]->set_route_gain(0, m_vol_gun, 0, 0.0);
+	}
+	else
+	{
+		m_oki[2]->set_route_gain(0, m_vol_main, 0, 0.0);
+		m_oki[2]->set_route_gain(0, m_vol_main, 1, 0.0);
+		m_oki[2]->set_route_gain(0, m_vol_gun, 0, 1.0);
+	}
 
-LC7535_VOLUME_CHANGED( dragngun_state::volume_main_changed )
-{
-	// TODO: Support loudness
-	logerror("Main speaker volume: left = %d dB, right %d dB, loudness = %s\n", attenuation_left, attenuation_right, loudness ? "on" :"off");
-
-	// convert to 0.0 - 1.0
-	const float gain_l = m_vol_main->normalize(attenuation_left);
-	const float gain_r = m_vol_main->normalize(attenuation_right);
-
-	m_ym2151->set_output_gain(0, gain_l);
-	m_ym2151->set_output_gain(1, gain_r); // left and right are always set to the same value
-	m_oki[0]->set_output_gain(ALL_OUTPUTS, gain_l);
-	m_oki[1]->set_output_gain(ALL_OUTPUTS, gain_l);
-
-	if (m_oki[2].found() && m_gun_speaker_disabled)
-		m_oki[2]->set_output_gain(ALL_OUTPUTS, gain_l);
-}
-
-LC7535_VOLUME_CHANGED( dragngun_state::volume_gun_changed )
-{
-	logerror("Gun speaker volume: left = %d dB, right %d dB, loudness = %s\n", attenuation_left, attenuation_right, loudness ? "on" :"off");
-
-	if (m_oki[2].found() && !m_gun_speaker_disabled)
-		m_oki[2]->set_output_gain(ALL_OUTPUTS, m_vol_gun->normalize(attenuation_left));
+	logerror("%s: Gun speaker: %s\n", machine().describe_context(), gun_speaker_disabled ? "Disabled" : "Enabled");
 }
 
 void tattass_state::tattass_sound_irq_w(int state)
@@ -815,7 +799,7 @@ void deco32_state::sound_bankswitch_w(u8 data)
 void dragngun_state::lockload_okibank_lo_w(u8 data)
 {
 	m_oki2_bank = (m_oki2_bank & 2) | ((data >> 1) & 1);
-	logerror("Load OKI2 Bank Low bits: %02x, Current : %02x\n",(data >> 1) & 1, m_oki2_bank);
+	logerror("%s: Load OKI2 Bank Low bits: %02x, Current : %02x\n", machine().describe_context(), (data >> 1) & 1, m_oki2_bank);
 	m_oki[0]->set_rom_bank((data >> 0) & 1);
 	m_oki[1]->set_rom_bank(m_oki2_bank);
 }
@@ -823,7 +807,7 @@ void dragngun_state::lockload_okibank_lo_w(u8 data)
 void dragngun_state::lockload_okibank_hi_w(u8 data)
 {
 	m_oki2_bank = (m_oki2_bank & 1) | ((data & 1) << 1); // TODO : Actually value unverified
-	logerror("Load OKI2 Bank Hi bits: %02x, Current : %02x\n",((data & 1) << 1), m_oki2_bank);
+	logerror("%s: Load OKI2 Bank Hi bits: %02x, Current : %02x\n", machine().describe_context(), ((data & 1) << 1), m_oki2_bank);
 	m_oki[1]->set_rom_bank(m_oki2_bank);
 }
 
@@ -977,13 +961,14 @@ u32 dragngun_state::lightgun_r()
 	case 7: return m_io_light_y[1]->read();
 	}
 
-//  logerror("Illegal lightgun port %d read \n",m_lightgun_port);
+	//if (!machine().side_effects_disabled())
+		//logerror("%s: Illegal lightgun port %d read \n", machine().describe_context(), m_lightgun_port);
 	return 0;
 }
 
 void dragngun_state::lightgun_w(offs_t offset, u32 data)
 {
-//  logerror("Lightgun port %d\n",m_lightgun_port);
+//  logerror("%s: Lightgun port %d\n", machine().describe_context(), m_lightgun_port);
 	m_lightgun_port = offset;
 }
 
@@ -1065,7 +1050,7 @@ void tattass_state::tattass_control_w(offs_t offset, u32 data, u32 mem_mask)
 		{
 			if (m_buf_ptr)
 			{
-				logerror("Eprom reset (bit count %d): ", m_read_bit_count);
+				logerror("%s: Eprom reset (bit count %d): ", machine().describe_context(), m_read_bit_count);
 				for (int i = 0; i < m_buf_ptr; i++)
 					logerror("%s", BIT(m_buffer, m_buf_ptr - 1 - i) ? "1" : "0");
 				logerror("\n");
@@ -1081,7 +1066,7 @@ void tattass_state::tattass_control_w(offs_t offset, u32 data, u32 mem_mask)
 		{
 			if (m_buf_ptr >= 32)
 			{
-				logerror("Eprom overflow!");
+				logerror("%s: Eprom overflow!\n", machine().describe_context());
 				m_buf_ptr = 0;
 			}
 
@@ -1137,7 +1122,7 @@ void tattass_state::tattass_control_w(offs_t offset, u32 data, u32 mem_mask)
 				}
 				else
 				{
-					logerror("Detected unknown eprom command\n");
+					logerror("%s: Detected unknown eprom command\n", machine().describe_context());
 				}
 			}
 		}
@@ -1145,7 +1130,7 @@ void tattass_state::tattass_control_w(offs_t offset, u32 data, u32 mem_mask)
 		{
 			if (!(BIT(data, 6)))
 			{
-				logerror("Cs set low\n");
+				logerror("%s: Cs set low\n", machine().describe_context());
 				m_buf_ptr = 0;
 			}
 		}
@@ -2160,32 +2145,35 @@ void dragngun_state::dragngun(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
+	SPEAKER(config, "gun_speaker").front_center();
+
+	LC7535(config, m_vol_main);
+	m_vol_main->select_cb().set_constant(1);
+	m_vol_main->add_route(0, "speaker", 1.0, 0);
+	m_vol_main->add_route(1, "speaker", 1.0, 1);
+
+	LC7535(config, m_vol_gun);
+	m_vol_gun->select_cb().set_constant(0);
+	m_vol_gun->add_route(0, "gun_speaker", 1.0);
+
 	YM2151(config, m_ym2151, 32220000/9);
 	m_ym2151->irq_handler().set_inputline(m_audiocpu, 1);
 	m_ym2151->port_write_handler().set(FUNC(deco32_state::sound_bankswitch_w));
-	m_ym2151->add_route(0, "speaker", 0.42, 0);
-	m_ym2151->add_route(1, "speaker", 0.42, 1);
+	m_ym2151->add_route(0, m_vol_main, 0.42, 0);
+	m_ym2151->add_route(1, m_vol_main, 0.42, 1);
 
 	OKIM6295(config, m_oki[0], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
+	m_oki[0]->add_route(ALL_OUTPUTS, m_vol_main, 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, m_vol_main, 1.0, 1);
 
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
-	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
-	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
-
-	SPEAKER(config, "gun_speaker").front_center();
+	m_oki[1]->add_route(ALL_OUTPUTS, m_vol_main, 0.35, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, m_vol_main, 0.35, 1);
 
 	OKIM6295(config, m_oki[2], 32220000/32, okim6295_device::PIN7_HIGH);
-	m_oki[2]->add_route(ALL_OUTPUTS, "gun_speaker", 1.0);
-
-	LC7535(config, m_vol_main);
-	m_vol_main->select().set_constant(1);
-	m_vol_main->set_volume_callback(FUNC(dragngun_state::volume_main_changed));
-
-	LC7535(config, m_vol_gun);
-	m_vol_gun->select().set_constant(0);
-	m_vol_gun->set_volume_callback(FUNC(dragngun_state::volume_gun_changed));
+	m_oki[2]->add_route(ALL_OUTPUTS, m_vol_main, 0.0, 0);
+	m_oki[2]->add_route(ALL_OUTPUTS, m_vol_main, 0.0, 1);
+	m_oki[2]->add_route(ALL_OUTPUTS, m_vol_gun, 1.0, 0);
 }
 
 void dragngun_state::lockloadu(machine_config &config)
@@ -2207,6 +2195,7 @@ void dragngun_state::namco_sprites(machine_config &config)
 	NAMCO_C355SPR(config, m_sprgenzoom, 0);
 	m_sprgenzoom->set_tile_callback(namco_c355spr_device::c355_obj_code2tile_delegate(&dragngun_state::sprite_bank_callback, this));
 	m_sprgenzoom->set_palette(m_palette);
+	m_sprgenzoom->set_transparent_pen(15);
 	m_sprgenzoom->set_colors(32);
 	m_sprgenzoom->set_granularity(16);
 	m_sprgenzoom->set_read_spritetile(FUNC(dragngun_state::read_spritetile));
@@ -2215,7 +2204,9 @@ void dragngun_state::namco_sprites(machine_config &config)
 	m_sprgenzoom->set_read_spritelist(FUNC(dragngun_state::read_spritelist));
 	m_sprgenzoom->set_read_cliptable(FUNC(dragngun_state::read_cliptable));
 	m_sprgenzoom->set_priority_callback(FUNC(dragngun_state::sprite_priority_callback));
-	m_sprgenzoom->set_device_allocates_spriteram_and_bitmaps(false);
+	m_sprgenzoom->set_mix_callback(FUNC(dragngun_state::sprite_mix_callback));
+	m_sprgenzoom->set_device_allocates_spriteram(false);
+	m_sprgenzoom->set_alt_precision(true);
 }
 
 // DE-0420-1 + Bottom board DE-0421-0
@@ -2306,10 +2297,6 @@ void dragngun_state::lockload(machine_config &config)
 	OKIM6295(config, m_oki[1], 32220000/16, okim6295_device::PIN7_HIGH);
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 0);
 	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.35, 1);
-
-	LC7535(config, m_vol_main);
-	m_vol_main->select().set_constant(1);
-	m_vol_main->set_volume_callback(FUNC(dragngun_state::volume_main_changed));
 }
 
 void tattass_state::tattass(machine_config &config)

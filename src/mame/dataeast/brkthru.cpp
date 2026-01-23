@@ -1,53 +1,60 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
-/***************************************************************************
+/*******************************************************************************
 
-    Break Thru Doc. Data East (1986)
+Break Thru (C) Data East (1986)
 
-    driver by Phil Stroffolino
+driver by Phil Stroffolino
 
-    UNK-1.1    (16Kb)  Code (4000-7FFF)
-    UNK-1.2    (32Kb)  Main 6809 (8000-FFFF)
-    UNK-1.3    (32Kb)  Mapped (2000-3FFF)
-    UNK-1.4    (32Kb)  Mapped (2000-3FFF)
+UNK-1.1    (16Kb)  Code (4000-7FFF)
+UNK-1.2    (32Kb)  Main 6809 (8000-FFFF)
+UNK-1.3    (32Kb)  Mapped (2000-3FFF)
+UNK-1.4    (32Kb)  Mapped (2000-3FFF)
 
-    UNK-1.5    (32Kb)  Sound 6809 (8000-FFFF)
+UNK-1.5    (32Kb)  Sound 6809 (8000-FFFF)
 
-    Background has 4 banks, with 256 16x16x8 tiles in each bank.
-    UNK-1.6    (32Kb)  GFX Background
-    UNK-1.7    (32Kb)  GFX Background
-    UNK-1.8    (32Kb)  GFX Background
+Background has 4 banks, with 256 16x16x8 tiles in each bank.
+UNK-1.6    (32Kb)  GFX Background
+UNK-1.7    (32Kb)  GFX Background
+UNK-1.8    (32Kb)  GFX Background
 
-    UNK-1.9    (32Kb)  GFX Sprites
-    UNK-1.10   (32Kb)  GFX Sprites
-    UNK-1.11   (32Kb)  GFX Sprites
+UNK-1.9    (32Kb)  GFX Sprites
+UNK-1.10   (32Kb)  GFX Sprites
+UNK-1.11   (32Kb)  GFX Sprites
 
-    Text has 256 8x8x4 characters.
-    UNK-1.12   (8Kb)   GFX Text
+Text has 256 8x8x4 characters.
+UNK-1.12   (8Kb)   GFX Text
 
-    **************************************************************************
-    Memory Map for Main CPU by Carlos A. Lozano
-    **************************************************************************
+********************************************************************************
+  Memory Map for Main CPU by Carlos A. Lozano
+********************************************************************************
 
-    MAIN CPU
-    0000-03FF                                   W                   Plane0
-    0400-0BFF                                  R/W                  RAM
-    0C00-0FFF                                   W                   Plane2(Background)
-    1000-10FF                                   W                   Plane1(sprites)
-    1100-17FF                                  R/W                  RAM
-    1800-180F                                  R/W                  In/Out
-    1810-1FFF                                  R/W                  RAM (unmapped?)
-    2000-3FFF                                   R                   ROM Mapped(*)
-    4000-7FFF                                   R                   ROM(UNK-1.1)
-    8000-FFFF                                   R                   ROM(UNK-1.2)
+MAIN CPU
+0000-03FF                                   W                   Plane0
+0400-0BFF                                  R/W                  RAM
+0C00-0FFF                                   W                   Plane2(Background)
+1000-10FF                                   W                   Plane1(sprites)
+1100-17FF                                  R/W                  RAM
+1800-180F                                  R/W                  In/Out
+1810-1FFF                                  R/W                  RAM (unmapped?)
+2000-3FFF                                   R                   ROM Mapped(*)
+4000-7FFF                                   R                   ROM(UNK-1.1)
+8000-FFFF                                   R                   ROM(UNK-1.2)
 
-    Interrupts: Reset, NMI, IRQ
-    The test routine is at F000
+Interrupts: Reset, NMI, IRQ
+The test routine is at F000
 
-    Sound: YM2203 and YM3526 driven by 6809.  Sound added by Bryan McPhail, 1/4/98.
+Sound: YM2203 and YM3526 driven by 6809.  Sound added by Bryan McPhail, 1/4/98.
 
-    2008-07
-    Dip locations verified with manual for brkthru (US conv. kit) and darwin
+2008-07
+Dip locations verified with manual for brkthru (US conv. kit) and darwin
+
+brkthru, brkthruj and brkthrut have a Self Test Mode not mentioned anywhere
+in the manual. It is accessed by holding down both player 1 and player 2 start
+buttons while powering up the game. It can be accessed in MAME by holding the
+buttons down after the game has started then pressing F3 to reset the game.
+
+********************************************************************************
 
 Darwin 4078 PCB layout
 f205v
@@ -87,10 +94,10 @@ upper PCB - 3002A
 Notes:
 
       Chips:
-      HD68A09P : 3G1-UL-HD68A09P Japan (DIP40)
-      HD6809EP : 5M1-HD6809EP Japan (DIP40)
-       YM2203C : Yamaha YM2203C-5X-18-89-F (DIP40)
-        YM3526 : Yamaha YM3526-61-09-75-E (DIP40)
+      HD68A09P : 3G1-UL-HD68A09P Japan (DIP40) @ 6.0MHz
+      HD6809EP : 5M1-HD6809EP Japan (DIP40) @ 1.5MHz
+       YM2203C : Yamaha YM2203C-5X-18-89-F (DIP40) @ 1.5MHz
+        YM3526 : Yamaha YM3526-61-09-75-E (DIP40) @ 3.0MHz
 
       ROMs:
     1,2,3,5,6,7,8 : Intel IP27256
@@ -133,13 +140,18 @@ Notes:
     Connectors:
                2x flat cable to upper board
 
+    Horizontal video frequency:
+        HSync = Dot Clock / Horizontal Frame Length
+              = Xtal /2   / (HDisplay + HBlank)
+              = 12MHz/2   / (256 + 128)
+              = 15.625kHz
+    Vertical Video frequency:
+        VSync = HSync / Vertical Frame Length
+              = HSync / (VDisplay + VBlank)
+              = 15.625kHz / (240 + 32)
+              = 57.444855Hz (measured 57.40Hz on brkthru)
 
-brkthru, brkthruj and brkthrut have a Self Test Mode not mentioned anywhere
-in the manual. It is accessed by holding down both player 1 and player 2 start
-buttons while powering up the game. It can be accessed in MAME by holding the
-buttons down after the game has started then pressing F3 to reset the game.
-
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -168,13 +180,15 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_flipswitch(*this, "FLIP")
 	{ }
 
 	void brkthru(machine_config &config);
 	void darwin(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(flipscreen_switch) { flipscreen_w(m_flipscreen); }
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -194,20 +208,21 @@ private:
 	uint16_t m_bgscroll = 0;
 	uint8_t m_bgbasecolor = 0;
 	uint8_t m_flipscreen = 0;
+	uint8_t m_int_enable = 0;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_ioport m_flipswitch;
 
-	uint8_t m_nmi_mask = 0U;
-
-	void brkthru_1803_w(uint8_t data);
-	void darwin_0803_w(uint8_t data);
+	void control_w(uint8_t data);
+	void flipscreen_w(int state);
+	void bgscroll_w(uint8_t data);
+	void int_enable_w(uint8_t data);
 	void bgram_w(offs_t offset, uint8_t data);
 	void fgram_w(offs_t offset, uint8_t data);
-	void _1800_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	void palette(palette_device &palette) const;
@@ -326,36 +341,6 @@ void brkthru_state::video_start()
 }
 
 
-void brkthru_state::_1800_w(offs_t offset, uint8_t data)
-{
-	if (offset == 0)    // low 8 bits of scroll
-		m_bgscroll = (m_bgscroll & 0x100) | data;
-	else if (offset == 1)
-	{
-		// bit 0-2 = ROM bank select
-		m_mainbank->set_entry(data & 0x07);
-
-		// bit 3-5 = background tiles color code
-		if (((data & 0x38) >> 2) != m_bgbasecolor)
-		{
-			m_bgbasecolor = (data & 0x38) >> 2;
-			m_bg_tilemap->mark_all_dirty();
-		}
-
-		// bit 6 = screen flip
-		if (m_flipscreen != (data & 0x40))
-		{
-			m_flipscreen = data & 0x40;
-			m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-			m_fg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-
-		}
-
-		// bit 7 = high bit of scroll
-		m_bgscroll = (m_bgscroll & 0xff) | ((data & 0x80) << 1);
-	}
-}
-
 void brkthru_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int prio)
 {
 	// Draw the sprites. Note that it is important to draw them exactly in this order, to have the correct priorities.
@@ -374,7 +359,7 @@ void brkthru_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 	for (int offs = 0; offs < m_spriteram.bytes(); offs += 4)
 	{
-		if ((m_spriteram[offs] & 0x09) == prio)  // Enable && Low Priority
+		if ((m_spriteram[offs] & 0x09) == prio) // enabled && low priority
 		{
 			int sx = 240 - m_spriteram[offs + 3];
 			if (sx < -7)
@@ -383,27 +368,28 @@ void brkthru_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			int sy = 240 - m_spriteram[offs + 2];
 			int code = m_spriteram[offs + 1] + 128 * (m_spriteram[offs] & 0x06);
 			int color = (m_spriteram[offs] & 0xe0) >> 5;
-			if (m_flipscreen)
+			int flip = flip_screen();
+			if (flip)
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
 			}
 
-			if (m_spriteram[offs] & 0x10)    // double height
+			if (m_spriteram[offs] & 0x10) // double height
 			{
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code & ~1, color, m_flipscreen, m_flipscreen, sx, m_flipscreen ? sy + 16 : sy - 16, 0);
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code | 1, color, m_flipscreen, m_flipscreen, sx, sy, 0);
+				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code & ~1, color, flip, flip, sx, flip ? sy + 16 : sy - 16, 0);
+				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code | 1, color, flip, flip, sx, sy, 0);
 
 				// redraw with wraparound
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code & ~1, color, m_flipscreen, m_flipscreen, sx,(m_flipscreen ? sy + 16 : sy - 16) + 256, 0);
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code | 1, color, m_flipscreen, m_flipscreen, sx, sy + 256, 0);
+				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code & ~1, color, flip, flip, sx,(flip ? sy + 16 : sy - 16) + 256, 0);
+				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code | 1, color, flip, flip, sx, sy + 256, 0);
 			}
 			else
 			{
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code, color, m_flipscreen, m_flipscreen, sx, sy, 0);
+				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code, color, flip, flip, sx, sy, 0);
 
 				// redraw with wraparound
-				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code, color, m_flipscreen, m_flipscreen, sx, sy + 256, 0);
+				m_gfxdecode->gfx(9)->transpen(bitmap, cliprect, code, color, flip, flip, sx, sy + 256, 0);
 			}
 		}
 	}
@@ -436,34 +422,51 @@ uint32_t brkthru_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
  *
  *************************************/
 
-void brkthru_state::brkthru_1803_w(uint8_t data)
+void brkthru_state::flipscreen_w(int state)
 {
-	// bit 0 = NMI enable
-	m_nmi_mask = ~data & 1;
-
-	if (data & 2)
-		m_maincpu->set_input_line(0, CLEAR_LINE);
-
-	// bit 1 = ? maybe IRQ acknowledge
+	// screen flip is handled both by software and hardware
+	flip_screen_set(state ^ m_flipswitch->read());
+	m_flipscreen = state;
 }
 
-void brkthru_state::darwin_0803_w(uint8_t data)
+void brkthru_state::control_w(uint8_t data)
 {
-	// bit 0 = NMI enable
-	m_nmi_mask = data & 1;
-	logerror("0803 %02X\n", data);
+	// bit 0-2 = ROM bank select
+	m_mainbank->set_entry(data & 0x07);
 
-	if (data & 2)
+	// bit 3-5 = background tiles color code
+	if (((data & 0x38) >> 2) != m_bgbasecolor)
+	{
+		m_bgbasecolor = (data & 0x38) >> 2;
+		m_bg_tilemap->mark_all_dirty();
+	}
+
+	// bit 6 = screen flip
+	flipscreen_w(BIT(data, 6));
+
+	// bit 7 = high bit of scroll
+	m_bgscroll = (m_bgscroll & 0xff) | ((data & 0x80) << 1);
+}
+
+void brkthru_state::bgscroll_w(uint8_t data)
+{
+	// low 8 bits of scroll
+	m_bgscroll = (m_bgscroll & 0x100) | data;
+}
+
+void brkthru_state::int_enable_w(uint8_t data)
+{
+	// bit 0 = IRQ disable, bit 1 = NMI enable
+	m_int_enable = data;
+
+	if (data & 1)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
-
-
-	// bit 1 = ? maybe IRQ acknowledge
 }
 
 INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
 {
 	// coin insertion causes an IRQ
-	if (oldval)
+	if (oldval && BIT(~m_int_enable, 0))
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
@@ -485,9 +488,10 @@ void brkthru_state::brkthru_main_map(address_map &map)
 	map(0x1801, 0x1801).portr("P2");
 	map(0x1802, 0x1802).portr("DSW1");
 	map(0x1803, 0x1803).portr("DSW2_COIN");
-	map(0x1800, 0x1801).w(FUNC(brkthru_state::_1800_w));   // bg scroll and color, ROM bank selection, flip screen
+	map(0x1800, 0x1800).w(FUNC(brkthru_state::bgscroll_w));
+	map(0x1801, 0x1801).w(FUNC(brkthru_state::control_w));
 	map(0x1802, 0x1802).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x1803, 0x1803).w(FUNC(brkthru_state::brkthru_1803_w));   // NMI enable, + ?
+	map(0x1803, 0x1803).w(FUNC(brkthru_state::int_enable_w));
 	map(0x2000, 0x3fff).bankr(m_mainbank);
 	map(0x4000, 0xffff).rom();
 }
@@ -504,9 +508,10 @@ void brkthru_state::darwin_main_map(address_map &map)
 	map(0x0801, 0x0801).portr("P2");
 	map(0x0802, 0x0802).portr("DSW1");
 	map(0x0803, 0x0803).portr("DSW2_COIN");
-	map(0x0800, 0x0801).w(FUNC(brkthru_state::_1800_w));     // bg scroll and color, ROM bank selection, flip screen
+	map(0x0800, 0x0800).w(FUNC(brkthru_state::bgscroll_w));
+	map(0x0801, 0x0801).w(FUNC(brkthru_state::control_w));
 	map(0x0802, 0x0802).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0x0803, 0x0803).w(FUNC(brkthru_state::darwin_0803_w));     // NMI enable, + ?
+	map(0x0803, 0x0803).w(FUNC(brkthru_state::int_enable_w)); // always 0xff?
 	map(0x2000, 0x3fff).bankr(m_mainbank);
 	map(0x4000, 0xffff).rom();
 }
@@ -547,7 +552,7 @@ static INPUT_PORTS_START( brkthru )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))   // used only by the self test
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank)) // used only by the self test
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
@@ -584,40 +589,57 @@ static INPUT_PORTS_START( brkthru )
 	PORT_DIPSETTING(    0x04, "10000/20000 Points" )
 	PORT_DIPSETTING(    0x0c, "20000/30000 Points" )
 	PORT_DIPSETTING(    0x08, "20000/40000 Points" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:5") // Manual says ALWAYS OFF
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	// According to the manual, bit 5 should control Flip Screen
-//  PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:6")
-//  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	// SW2:7,8 ALWAYS OFF according to the manual
+	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	// SW2:6,7,8: can't be read by software, see FLIP for SW2:6, and SW2:7,8 are ALWAYS OFF according to the manual
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
+
+	PORT_START("FLIP") // hardware switch
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::flipscreen_switch), 0)
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( brkthruj )
+static INPUT_PORTS_START( brkthruu )
 	PORT_INCLUDE( brkthru )
 
 	PORT_MODIFY("DSW2_COIN")
-	PORT_SERVICE_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW2:5" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:5") // Manual says ALWAYS OFF
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( brkthrut )
+	PORT_INCLUDE( brkthruu )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( darwin )
 	PORT_INCLUDE( brkthru )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )   // Manual says must be OFF
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" ) // Manual says must be OFF
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )   // Manual says must be OFF
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" ) // Manual says must be OFF
 
-	PORT_MODIFY("DSW2_COIN")    // modified by Shingo Suzuki 1999/11/02
+	PORT_MODIFY("DSW2_COIN")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
@@ -629,14 +651,7 @@ static INPUT_PORTS_START( darwin )
 	PORT_DIPSETTING(    0x08, DEF_STR( Medium ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	// According to the manual, bit 5 should control Flip Screen
-//  PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:6")
-//  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	// SW2:5,7,8 ALWAYS OFF according to the manual
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(brkthru_state::coin_inserted), 0)
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" ) // Manual says must be OFF
 INPUT_PORTS_END
 
 
@@ -725,7 +740,7 @@ void brkthru_state::machine_start()
 	save_item(NAME(m_bgscroll));
 	save_item(NAME(m_bgbasecolor));
 	save_item(NAME(m_flipscreen));
-	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_int_enable));
 }
 
 void brkthru_state::machine_reset()
@@ -733,24 +748,22 @@ void brkthru_state::machine_reset()
 	m_bgscroll = 0;
 	m_bgbasecolor = 0;
 	m_flipscreen = 0;
-	m_nmi_mask = 0;
+	m_int_enable = 0;
 }
 
 void brkthru_state::vblank_irq(int state)
 {
-	if (state && m_nmi_mask)
+	if (state && BIT(m_int_enable, 1))
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 }
 
 void brkthru_state::brkthru(machine_config &config)
 {
-	static constexpr XTAL MASTER_CLOCK = XTAL(12'000'000);
-
 	// basic machine hardware
-	MC6809E(config, m_maincpu, MASTER_CLOCK / 8);         // 1.5 MHz ?
+	MC6809E(config, m_maincpu, 12_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &brkthru_state::brkthru_main_map);
 
-	MC6809(config, m_audiocpu, MASTER_CLOCK / 2);         // 1.5 MHz ?
+	MC6809(config, m_audiocpu, 12_MHz_XTAL / 2);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &brkthru_state::sound_map);
 
 	// video hardware
@@ -758,19 +771,7 @@ void brkthru_state::brkthru(machine_config &config)
 	PALETTE(config, m_palette, FUNC(brkthru_state::palette), 256);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK / 2, 384, 8, 248, 272, 8, 248); // verified for darwin, not 100% sure it's the same for brkthru
-	/* frames per second, vblank duration
-	    Horizontal video frequency:
-	        HSync = Dot Clock / Horizontal Frame Length
-	              = Xtal /2   / (HDisplay + HBlank)
-	              = 12MHz/2   / (240 + 144)
-	              = 15.625kHz
-	    Vertical Video frequency:
-	        VSync = HSync / Vertical Frame Length
-	              = HSync / (VDisplay + VBlank)
-	              = 15.625kHz / (240 + 32)
-	              = 57.444855Hz
-	    tuned by Shingo SUZUKI(VSyncMAME Project) 2000/10/19 */
+	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248);
 	screen.set_screen_update(FUNC(brkthru_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(brkthru_state::vblank_irq));
@@ -780,13 +781,13 @@ void brkthru_state::brkthru(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK / 8));
+	ym2203_device &ym1(YM2203(config, "ym1", 12_MHz_XTAL / 8));
 	ym1.add_route(0, "mono", 0.10);
 	ym1.add_route(1, "mono", 0.10);
 	ym1.add_route(2, "mono", 0.10);
 	ym1.add_route(3, "mono", 0.50);
 
-	ym3526_device &ym2(YM3526(config, "ym2", MASTER_CLOCK / 4));
+	ym3526_device &ym2(YM3526(config, "ym2", 12_MHz_XTAL / 4));
 	ym2.irq_handler().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 	ym2.add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1072,8 +1073,9 @@ ROM_END
  *************************************/
 
 GAME( 1986, brkthru,   0,       brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Break Thru (World)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthruu,  brkthru, brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East USA",                          "Break Thru (US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthruj,  brkthru, brkthru, brkthruj, brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Kyohkoh-Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthrut,  brkthru, brkthru, brkthruj, brkthru_state, empty_init, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, forcebrk,  brkthru, brkthru, brkthruj, brkthru_state, empty_init, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthruu,  brkthru, brkthru, brkthruu, brkthru_state, empty_init, ROT0,   "Data East USA",                          "Break Thru (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthruj,  brkthru, brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Kyoukou Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthrut,  brkthru, brkthru, brkthrut, brkthru_state, empty_init, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, forcebrk,  brkthru, brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, darwin,    0,       darwin,  darwin,   brkthru_state, empty_init, ROT270, "Data East Corporation",                  "Darwin 4078 (Japan)",         MACHINE_SUPPORTS_SAVE )

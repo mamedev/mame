@@ -38,18 +38,15 @@ public:
 		m_video_regs_3c = val;
 	}
 
-	uint16_t get_video_reg_1c(void) { return m_video_regs_1c; }
-	uint16_t get_video_reg_1d(void) { return m_video_regs_1d; }
-	uint16_t get_video_reg_1e(void) { return m_video_regs_1e; }
-	uint16_t get_video_reg_2a(void) { return m_video_regs_2a; }
-	uint16_t get_video_reg_30(void) { return m_video_regs_30; }
-	uint16_t get_video_reg_3c(void) { return m_video_regs_3c; }
+	uint16_t get_video_reg_1c() { return m_video_regs_1c; }
+	uint16_t get_video_reg_1d() { return m_video_regs_1d; }
+	uint16_t get_video_reg_1e() { return m_video_regs_1e; }
+	uint16_t get_video_reg_2a() { return m_video_regs_2a; }
+	uint16_t get_video_reg_30() { return m_video_regs_30; }
+	uint16_t get_video_reg_3c() { return m_video_regs_3c; }
 
 	void set_video_reg_42(uint16_t val) { m_video_regs_42 = val; }
-	uint16_t get_video_reg_42(void) { return m_video_regs_42; }
-
-	auto space_read_callback() { return m_space_read_cb.bind(); }
-	void set_video_spaces(address_space *cpuspace) { m_cpuspace = cpuspace; }
+	uint16_t get_video_reg_42() { return m_video_regs_42; }
 
 protected:
 	spg_renderer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -66,11 +63,11 @@ private:
 	void draw_linemap(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *scrollregs, uint16_t *tilemapregs, address_space &spc, uint16_t *paletteram);
 	inline uint8_t mix_channel(uint8_t a, uint8_t b, uint8_t alpha);
 	void update_vcmp_table();
-	void update_palette_lookup(void);
+	void update_palette_lookup();
 
 	uint8_t m_rgb5_to_rgb8[32];
-	uint32_t m_rgb555_to_rgb888[0x8000];
-	uint32_t m_rgb555_to_rgb888_current[0x8000];
+	std::unique_ptr<uint32_t []> m_rgb555_to_rgb888;
+	std::unique_ptr<uint32_t []> m_rgb555_to_rgb888_current;
 
 	// for vcmp
 	uint16_t m_video_regs_1c;
@@ -85,9 +82,6 @@ private:
 	uint16_t m_video_regs_42;
 
 	uint32_t m_ycmp_table[480];
-
-	devcb_read16 m_space_read_cb;
-	address_space *m_cpuspace;
 
 	bool m_brightness_or_saturation_dirty;
 	uint16_t m_linebuf[320];

@@ -3232,6 +3232,8 @@ if (BUSES["A2BUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/a2bus/grafex.h",
 		MAME_DIR .. "src/devices/bus/a2bus/grappler.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/grappler.h",
+		MAME_DIR .. "src/devices/bus/a2bus/ibsap2.cpp",
+		MAME_DIR .. "src/devices/bus/a2bus/ibsap2.h",
 		MAME_DIR .. "src/devices/bus/a2bus/lancegs.cpp",
 		MAME_DIR .. "src/devices/bus/a2bus/lancegs.h",
 		MAME_DIR .. "src/devices/bus/a2bus/laser128.cpp",
@@ -3311,6 +3313,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/a2kbd/a2kbd.h,BUSES["A2KBD"] = true
+---------------------------------------------------
+
+if (BUSES["A2KBD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/a2kbd/a2kbd.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/a2kbd.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/am100kbd.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/am100kbd.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/ivelultrkb.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/ivelultrkb.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/kb200.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/kb200.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/nkbd.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/nkbd.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/tk10.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/tk10.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/videnh2.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/videnh2.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/bus/nscsi/cd.h,BUSES["NSCSI"] = true
 --@src/devices/bus/nscsi/devices.h,BUSES["NSCSI"] = true
 --@src/devices/bus/nscsi/hd.h,BUSES["NSCSI"] = true
@@ -3347,6 +3373,8 @@ if (BUSES["NSCSI"]~=null) then
 		MAME_DIR .. "src/devices/bus/nscsi/hd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/pc8801_30.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/pc8801_30.h",
+		MAME_DIR .. "src/devices/bus/nscsi/pc98_hd.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/pc98_hd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/s1410.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/s1410.h",
 		MAME_DIR .. "src/devices/bus/nscsi/smoc501.cpp",
@@ -3941,8 +3969,8 @@ if (BUSES["MEGADRIVE_CART"]~=null) then
 		MAME_DIR .. "src/devices/bus/megadrive/cart/rockworld.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/rom.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/rom.h",
-		MAME_DIR .. "src/devices/bus/megadrive/cart/seganet.cpp",
-		MAME_DIR .. "src/devices/bus/megadrive/cart/seganet.h",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/segach.cpp",
+		MAME_DIR .. "src/devices/bus/megadrive/cart/segach.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/sfteam.cpp",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/sfteam.h",
 		MAME_DIR .. "src/devices/bus/megadrive/cart/smb.cpp",
@@ -5567,6 +5595,10 @@ if (BUSES["PC98_CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc98_cbus/fdd_2dd.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/fdd_2hd.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/fdd_2hd.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/lgy98.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/lgy98.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/lha201.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/lha201.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/mif201.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/mif201.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/mpu_pc98.cpp",
@@ -5591,6 +5623,8 @@ if (BUSES["PC98_CBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/pc98_cbus/sb16_ct2720.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/slot.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/slot.h",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/sound_orchestra.cpp",
+		MAME_DIR .. "src/devices/bus/pc98_cbus/sound_orchestra.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/sound.cpp",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/sound.h",
 		MAME_DIR .. "src/devices/bus/pc98_cbus/speakboard.cpp",
@@ -5784,6 +5818,8 @@ if (BUSES["MULTIBUS"]~=null) then
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7070.h",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/robotron_k7071.h",
+		MAME_DIR .. "src/devices/bus/multibus/sun1.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/sun1.h",
 	}
 end
 

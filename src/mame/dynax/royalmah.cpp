@@ -4565,6 +4565,26 @@ ROM_START( janputera ) // FRM-03 + PS-101 PCBs
 	ROM_LOAD( "prom",  0x0000, 0x0020, CRC(d3007282) SHA1(e4d863ab193e49208ed0f59dcddb1da0492314f6) )
 ROM_END
 
+/*
+Janyou Part I
+(c)1983 Shonan
+
+this set comes from a loose set of ROMs, so no PCB info available
+has 'OU PART 1' and 'ULY 1 1983 BY SHONAN' strings
+shows no title, so it's an educated guess based on Shonan's known games' list and code similarity with janyoup2
+*/
+ROM_START( janyou )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "d", 0x0000, 0x2000, CRC(eb7dda8c) SHA1(cf6fae80168ddef78f283aa55a3388bbc54e3506) ) // 2764
+	ROM_LOAD( "3", 0x2000, 0x1000, CRC(2f0a1da4) SHA1(3d407e668f1510ebe357bde51ba7c2160878a8cd) ) // 2732
+	ROM_LOAD( "4", 0x3000, 0x1000, CRC(538cbe03) SHA1(8634332d883033a5800901be664036c08fced61b) ) // "
+	ROM_LOAD( "5", 0x4000, 0x1000, CRC(16c09c73) SHA1(ea712f9ca3200ca27434e4200187b488e24f4c65) ) // "
+	ROM_LOAD( "6", 0x5000, 0x1000, CRC(8ce5e09a) SHA1(5f134e218ddf2ad8849ed8915bb780a9cb6f6381) ) // "
+	ROM_LOAD( "7", 0x6000, 0x1000, CRC(0e060269) SHA1(1e626f25fc86f4cace36919c827c84d36706293e) ) // "
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "mb7051",  0x0000, 0x0020, CRC(bc9b0be5) SHA1(dbbf0639c5928abe175578439009a45a3298b316) ) // no label
+ROM_END
 
 /***************************************************************************
 Janyou Part II
@@ -4741,6 +4761,21 @@ ROM_END
 ROM_START( tontonb )
 	ROM_REGION( 0x90000, "maincpu", 0 )
 	ROM_LOAD( "091.5e",     0x00000, 0x10000, CRC(d8d67b59) SHA1(7e7a85df738f80fc031cda8a104ac9c7b3e24785) )
+	// bank switched ROMs follow
+	ROM_RELOAD(             0x10000, 0x10000 )              // 0,1
+	/**/                                                    // 2,3 unused
+	ROM_LOAD( "093.5b",     0x30000, 0x10000, CRC(24b6be55) SHA1(11390d6ed55d7d0b7b84c6d36d4ac5330a06abba) )    // 4,5
+	/**/                                                    // 6,7 unused
+	ROM_LOAD( "092.5c",     0x50000, 0x10000, CRC(7ff2738b) SHA1(89a49f89705f499439dc024fc70c87141a84780b) )    // 8,9
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ic6k.bin",   0x0000, 0x0020, CRC(97e1defe) SHA1(b5002218b2292f7623dd9a205ce183dedeec03f1) )
+ROM_END
+
+
+ROM_START( tontonba ) // Ver. 1.00 string in ROM
+	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_LOAD( "0911.5e",    0x00000, 0x10000, CRC(8658ab39) SHA1(922f2e49661d1c08af3ac03b51beeae0b65c8c50) )
 	// bank switched ROMs follow
 	ROM_RELOAD(             0x10000, 0x10000 )              // 0,1
 	/**/                                                    // 2,3 unused
@@ -6470,6 +6505,7 @@ GAME( 1981?, openmj,      royalmj,  royalmah, royalmah,   royalmah_state,       
 GAME( 1982,  royalmah,    royalmj,  royalmah, royalmah,   royalmah_state,         empty_init,    ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1984?, chalgirl,    0,        chalgirl, royalmah,   royalmah_prgbank_state, init_chalgirl, ROT0,   "bootleg",                    "Challenge Girl (Falcon bootleg)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // verify ROM loading / banking, bad girl colors
 GAME( 1983,  seljan,      0,        seljan,   seljan,     royalmah_state,         empty_init,    ROT0,   "Jem / Dyna Corp",            "Sel-Jan (Japan)",                       0 )
+GAME( 1983,  janyou,      royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Shonan",                     "Janyou Part I (Double Bet)",            0 )
 GAME( 1983,  janyoup2,    royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1983,  janyoup2a,   royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983, no title screen)",0 )
 GAME( 1983,  janyoup2702, royalmj,  janyoup2, janyoup2,   royalmah_state,         empty_init,    ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.02, July 1 1983)",0 )
@@ -6494,7 +6530,8 @@ GAME( 1986,  mjyarou,     0,        mjyarou,  mjyarou,    royalmah_prgbank_state
 GAME( 1986,  mjyarou2,    mjyarou,  mjyarou,  mjyarou,    royalmah_prgbank_state, init_chalgirl, ROT0,   "Visco / Video System",       "Mahjong Yarou (Japan, set 2)",          MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // never seems to set the palette bank?
 GAME( 1986?, mjclub,      0,        mjclub,   mjclub,     royalmah_prgbank_state, init_tontonb,  ROT0,   "Xex",                        "Mahjong Club (Japan)",                  0 )
 GAME( 1987,  mjdiplob,    0,        mjdiplob, mjdiplob,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Mahjong Diplomat (Japan)",              0 )
-GAME( 1987,  tontonb,     0,        tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan)",                        0 )
+GAME( 1987,  tontonb,     0,        tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan, set 1)",                 0 )
+GAME( 1987,  tontonba,    tontonb,  tontonb,  tontonb,    royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Tonton (Japan, ver. 1.00)",             MACHINE_NOT_WORKING ) // hangs when entering bookkeeping, works after reset
 GAME( 1987,  makaijan,    0,        makaijan, makaijan,   royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Makaijan (Japan)",                      0 )
 GAME( 1988,  majs101b,    0,        majs101b, majs101b,   royalmah_prgbank_state, init_dynax,    ROT0,   "Dynax",                      "Mahjong Studio 101 (Japan)",            0 )
 GAME( 1988,  mjapinky,    0,        mjapinky, mjapinky,   royalmah_prgbank_state, init_tontonb,  ROT0,   "Dynax",                      "Almond Pinky (Japan)",                  0 )

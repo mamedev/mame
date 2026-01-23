@@ -19,6 +19,7 @@
 
 #include "notifier.h"
 
+#include <cstdlib>
 #include <optional>
 #include <set>
 #include <type_traits>
@@ -2578,13 +2579,13 @@ class memory_region
 	DISABLE_COPYING(memory_region);
 public:
 	// construction/destruction
-	memory_region(running_machine &machine, std::string name, u32 length, u8 width, endianness_t endian);
+	memory_region(std::string name, u32 length, u8 width, endianness_t endian);
 
 	// getters
-	running_machine &machine() const { return m_machine; }
-	u8 *base() { return (m_buffer.size() > 0) ? &m_buffer[0] : nullptr; }
-	u8 *end() { return base() + m_buffer.size(); }
-	u32 bytes() const { return m_buffer.size(); }
+	u8 *base() { return reinterpret_cast<u8 *>(m_buffer.get()); }
+	u8 *end() { return base() + m_length; }
+	u32 bytes() const { return m_length; }
+	u32 length() const { return m_length / m_bytewidth; }
 	const std::string &name() const { return m_name; }
 
 	// flag expansion
@@ -2593,19 +2594,21 @@ public:
 	u8 bytewidth() const { return m_bytewidth; }
 
 	// data access
-	u8 &as_u8(offs_t offset = 0) { return m_buffer[offset]; }
-	u16 &as_u16(offs_t offset = 0) { return reinterpret_cast<u16 *>(base())[offset]; }
-	u32 &as_u32(offs_t offset = 0) { return reinterpret_cast<u32 *>(base())[offset]; }
-	u64 &as_u64(offs_t offset = 0) { return reinterpret_cast<u64 *>(base())[offset]; }
+	u8 &as_u8(offs_t offset = 0) { return reinterpret_cast<u8 *>(m_buffer.get())[offset]; }
+	u16 &as_u16(offs_t offset = 0) { return reinterpret_cast<u16 *>(m_buffer.get())[offset]; }
+	u32 &as_u32(offs_t offset = 0) { return reinterpret_cast<u32 *>(m_buffer.get())[offset]; }
+	u64 &as_u64(offs_t offset = 0) { return reinterpret_cast<u64 *>(m_buffer.get())[offset]; }
 
 private:
+	struct stdlib_deleter { void operator()(void *p) const { std::free(p); } };
+
 	// internal data
-	running_machine &       m_machine;
-	std::string             m_name;
-	std::vector<u8>         m_buffer;
-	endianness_t            m_endianness;
-	u8                      m_bitwidth;
-	u8                      m_bytewidth;
+	std::string                             m_name;
+	std::unique_ptr<void, stdlib_deleter>   m_buffer;
+	u32                                     m_length;
+	endianness_t                            m_endianness;
+	u8                                      m_bitwidth;
+	u8                                      m_bytewidth;
 };
 
 
@@ -2729,7 +2732,7 @@ public:
 	void region_free(std::string name);
 
 private:
-	struct stdlib_deleter { void operator()(void *p) const { free(p); } };
+	struct stdlib_deleter { void operator()(void *p) const { std::free(p); } };
 
 	// internal state
 	running_machine &           m_machine;              // reference to the machine

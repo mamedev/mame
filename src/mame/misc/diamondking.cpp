@@ -14,10 +14,11 @@
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "sound/okim6376.h"
+
 #include "speaker.h"
 
-namespace
-{
+
+namespace {
 
 class ss1b202base_state : public driver_device
 {
@@ -37,8 +38,8 @@ private:
 class ss1b550base_state : public driver_device
 {
 public:
-	ss1b550base_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ss1b550base_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu")
 	{
 	}
@@ -52,8 +53,8 @@ private:
 class diamondking_state : public ss1b202base_state
 {
 public:
-	diamondking_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ss1b202base_state(mconfig, type, tag),
+	diamondking_state(const machine_config &mconfig, device_type type, const char *tag) :
+		ss1b202base_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_iocpu(*this, "iocpu"),
 		m_okim6376(*this, "oki")
@@ -125,7 +126,7 @@ static INPUT_PORTS_START(diamondking)
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW3:8")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(goldenchip)
+static INPUT_PORTS_START(goldnchp)
 	// On main board, near the AY-3-8910
 	PORT_START("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
@@ -315,7 +316,7 @@ REEL1->|C| A  |K6T0808C10 |    ____________                  |__||
  |_____________________________________________________|
 
 */
-ROM_START(diamondking) // With Euro support
+ROM_START(diamondk) // With Euro support
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("mb_ve_segasa_m-12_diamond_king_eur_ef4d_97-5848_b2018.u3", 0x00000, 0x10000, CRC(7e702012) SHA1(2858edc92fd1f672966af81ded4d6519427356bd))
 	ROM_LOAD("mb_d_segasa_m-12_diamond_king_3d65_97-5848_b2018.u2",      0x10000, 0x10000, CRC(36d16147) SHA1(03060841482444eb032eca7dab777fe56f124654))
@@ -327,7 +328,7 @@ ROM_START(diamondking) // With Euro support
 	ROM_LOAD( "b_segasa_m-12_diamond_king_sonido.ci4", 0x00000, 0x80000, CRC(1c0f8b4d) SHA1(38cf35e545db8f24320b0c80e6655d0a59aaec10) )
 ROM_END
 
-ROM_START(diamondkinp) // Without Euro support, just Ptas
+ROM_START(diamondko) // Without Euro support, just Ptas
 	ROM_REGION(0x20000, "maincpu", 0)
 	ROM_LOAD("mb_ve_segasa_m-12_diamond_king_eur_ef4d_97-5848_b2018.ci16", 0x00000, 0x10000, CRC(7e702012) SHA1(2858edc92fd1f672966af81ded4d6519427356bd))
 
@@ -400,7 +401,7 @@ _||_|    _________  _________  _________ |
  |_______|_|_|_|____ unused ___ unused __|
          | | | |  SEGASA SONIC 1B-2001-206
 */
-ROM_START(goldenchip)
+ROM_START(goldnchp)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("segasa_g.chip_l_chl.bin", 0x00000, 0x08000, CRC(1bc48a7d) SHA1(765129c552cc1e515a5ec1aba23d8663add5f025))
 
@@ -410,8 +411,8 @@ ROM_END
 
 } // anonymous namespace
 
-//   YEAR  NAME         PARENT       MACHINE      INPUT        CLASS              INIT        ROT   COMPANY           FULLNAME                               FLAGS
-GAME(2001, caribe,      0,           ss1b550base, caribe,      ss1b550base_state, empty_init, ROT0, "SegaSA / Sonic", "Caribe",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(1997, diamondking, 0,           diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (with Euro support)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(1997, diamondkinp, diamondking, diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (without Euro support)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(19??, goldenchip,  0,           ss1b202base, goldenchip,  ss1b202base_state, empty_init, ROT0, "SegaSA / Sonic", "Golden Chip",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+//   YEAR  NAME       PARENT    MACHINE      INPUT        CLASS              INIT        ROT   COMPANY           FULLNAME                               FLAGS
+GAME(2001, caribe,    0,        ss1b550base, caribe,      ss1b550base_state, empty_init, ROT0, "SegaSA / Sonic", "Caribe",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, diamondk,  0,        diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (with Euro support)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(1997, diamondko, diamondk, diamondking, diamondking, diamondking_state, empty_init, ROT0, "SegaSA / Sonic", "Diamond King (without Euro support)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(19??, goldnchp,  0,        ss1b202base, goldnchp,    ss1b202base_state, empty_init, ROT0, "SegaSA / Sonic", "Golden Chip",                         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)

@@ -65,7 +65,7 @@
 #include "ioprocs.h"
 #include "multibyte.h"
 
-#include "osdcore.h" // osd_printf_*, little_endianize_int32
+#include "osdcore.h" // osd_printf_*
 
 #include <zlib.h>
 
@@ -186,9 +186,9 @@ bool apd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 	int data = 0x7d0;
 	for (int track = 0; track < 166; track++) {
-		uint32_t sdlen = little_endianize_int32(*(uint32_t *)(&img[(track * 12) + 8 + 0x0]));
-		uint32_t ddlen = little_endianize_int32(*(uint32_t *)(&img[(track * 12) + 8 + 0x4]));
-		uint32_t qdlen = little_endianize_int32(*(uint32_t *)(&img[(track * 12) + 8 + 0x8]));
+		uint32_t sdlen = get_u32le(&img[(track * 12) + 8 + 0x0]);
+		uint32_t ddlen = get_u32le(&img[(track * 12) + 8 + 0x4]);
+		uint32_t qdlen = get_u32le(&img[(track * 12) + 8 + 0x8]);
 
 		if (sdlen > 0) {
 			generate_track_from_bitstream(track / 2, track % 2, &img[data], sdlen, image);

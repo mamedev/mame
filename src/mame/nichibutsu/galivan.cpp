@@ -1899,11 +1899,13 @@ ROM_END
 GAME( 1985, galivan,  0,        galivan,  galivan,  galivan_state,  empty_init,  ROT270, "Nichibutsu",                  "Cosmo Police Galivan (12/26/1985)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1985, galivan2, galivan,  galivan,  galivan,  galivan_state,  empty_init,  ROT270, "Nichibutsu",                  "Cosmo Police Galivan (12/16/1985)",                   MACHINE_SUPPORTS_SAVE )
 GAME( 1985, galivan3, galivan,  galivan,  galivan,  galivan_state,  empty_init,  ROT270, "Nichibutsu",                  "Cosmo Police Galivan (12/11/1985)",                   MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, dangar,   0,        galivan,  dangar,   galivan_state,  empty_init,  ROT270, "Nichibutsu",                  "Ufo Robo Dangar (4/09/1987)",                         MACHINE_SUPPORTS_SAVE ) // GV-1412-I and GV-1412-II pcbs
 GAME( 1986, dangara,  dangar,   galivan,  dangar2,  galivan_state,  empty_init,  ROT270, "Nichibutsu",                  "Ufo Robo Dangar (12/1/1986)",                         MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dangarj,  dangar,   dangarj,  dangar2,  dangarj_state,  empty_init,  ROT270, "Nichibutsu",                  "Ufo Robo Dangar (9/26/1986, Japan)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state,  empty_init,  ROT270, "bootleg",                     "Ufo Robo Dangar (9/26/1986, bootleg set 1)",          MACHINE_SUPPORTS_SAVE ) // checks protection like dangarj but check readback is patched at 0x9d58 (also checks I/O port 0xc0?)
 GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state,  empty_init,  ROT270, "bootleg",                     "Ufo Robo Dangar (9/26/1986, bootleg set 2)",          MACHINE_SUPPORTS_SAVE ) // directly patched at entry point 0x9d44
+
 GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Ninja Emaki (US)",                                    MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, ninjemat, ninjemak, galivan,  galivan,  ninjemak_state, empty_init,  ROT270, "Nichibutsu (Tecfri license)", "Ninja Emaki (Tecfri license)",                        MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
 GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan)",                           MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )

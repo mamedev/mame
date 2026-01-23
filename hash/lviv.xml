@@ -996,7 +996,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="slabir2a" cloneof="slabir2">
-		<description>S_LABIR2 (Alt)</description>
+		<description>S_LABIR2 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Load with BLOAD&quot;&quot;,R" />

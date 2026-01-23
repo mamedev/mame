@@ -78,7 +78,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tos21a" cloneof="tos21" supported="no">
-		<description>TOS 21 v1.81 (Alt)</description>
+		<description>TOS 21 v1.81 (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop" interface="floppy_8">

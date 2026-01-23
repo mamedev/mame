@@ -17,7 +17,7 @@
         LCD: LC7981
         Quad-UART: TE7774 (3000)
         Panel controller CPU: NEC uPD78C10AGQ @ 12 MHz
-        Sound DSP: L7A1045-L6048
+        Sound DSP: L7A1045-L6028
             DSP's wavedata bus is 16 bits wide and has 24 address bits (32 MiB total sample space)
 
         DMA channel 0 is SCSI, 1 is floppy, 2 is IC31 (some sort of direct-audio stream?), and 3 is the L7A1045 DSP
@@ -488,6 +488,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 	m_subcpu->an1_func().set(FUNC(mpc3000_state::an1_r));
 	m_subcpu->an2_func().set(FUNC(mpc3000_state::an2_r));
 	m_subcpu->an3_func().set(FUNC(mpc3000_state::an3_r));
+	m_subcpu->an3_func().set(FUNC(mpc3000_state::an4_r));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(80);

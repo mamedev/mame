@@ -39,7 +39,7 @@ void att6300p_mmu_device::device_start()
 	space().specific(m_mem16_space);
 	m_io = &space(AS_IO);
 
-	save_item(NAME(m_protected_mode));
+	save_item(NAME(m_protection_enabled));
 	save_item(NAME(m_map_table));
 	save_item(NAME(m_map_imask));
 	save_item(NAME(m_map_omask));
@@ -53,13 +53,15 @@ void att6300p_mmu_device::device_start()
 
 void att6300p_mmu_device::device_reset()
 {
-	set_protected_mode_enabled(false);
+	set_protection_enabled(false);
 	m_mem_wr_fastpath = true;
 	m_mem_prot_limit = 0;
 	m_io_setup_enabled = false;
 	m_mem_setup_enabled = false;
 	m_io_read_traps_enabled = false;
 	m_io_write_traps_enabled = false;
+
+	set_a20_enabled(false);
 
 	for (int i = 0; i < 32; i++)
 	{
@@ -70,10 +72,8 @@ void att6300p_mmu_device::device_reset()
 	memset(m_io_prot_table, 0, sizeof m_mem_prot_table);
 }
 
-void att6300p_mmu_device::set_protected_mode_enabled(bool enabled)
+void att6300p_mmu_device::set_a20_enabled(bool enabled)
 {
-	m_protected_mode = enabled;
-
 	if (enabled)
 	{
 		// Replaces A15-A19
@@ -87,6 +87,12 @@ void att6300p_mmu_device::set_protected_mode_enabled(bool enabled)
 		m_map_imask = 0x007fff;
 		m_map_omask = 0xff8000;
 	}
+}
+
+// Set whether the machines-specific protection circuitry is active.
+void att6300p_mmu_device::set_protection_enabled(bool enabled)
+{
+	m_protection_enabled = enabled;
 }
 
 void att6300p_mmu_device::update_fastpath()
@@ -183,7 +189,7 @@ uint16_t att6300p_mmu_device::io_r(offs_t offset, uint16_t mem_mask)
 {
 	offset <<= 1;
 
-	if (m_protected_mode)
+	if (m_protection_enabled)
 	{
 		// Skip protection checks
 		switch (mem_mask)
@@ -264,7 +270,7 @@ void att6300p_mmu_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	offset <<= 1;
 
-	if (m_protected_mode)
+	if (m_protection_enabled)
 	{
 		// Skip protection checks
 		switch (mem_mask)

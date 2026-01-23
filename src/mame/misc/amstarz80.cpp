@@ -69,7 +69,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void amstarz80(machine_config &config);
+	void amstarz80(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -88,13 +88,15 @@ uint32_t amstarz80_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 void amstarz80_state::prg_map(address_map &map)
 {
-	map(0x0000, 0x17ff).rom();
+	map(0x0000, 0x1bff).rom();
 	map(0x1c00, 0x1cff).ram();
+	map(0x1f00, 0x1fff).rom();
 	map(0x2000, 0x21ff).ram();
 	map(0x2400, 0x25ff).ram();
 	map(0x2800, 0x29ff).ram();
 	map(0x4000, 0x4000).portr("IN0");
 	map(0x4001, 0x4001).portr("IN1");
+	map(0x6000, 0x60ff).ram();
 }
 
 
@@ -150,8 +152,8 @@ void amstarz80_state::amstarz80(machine_config &config)
 }
 
 
-ROM_START( holddraw )
-	ROM_REGION( 0x1800, "maincpu", 0 )
+ROM_START( holddraw ) // AMSTAR ELEC ASSY 1061-3700
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "001-8000.b6", 0x0000, 0x0400, CRC(a25d17d4) SHA1(a5b9c83ace554811ac1442b44cdd72542ea2c425) )
 	ROM_LOAD( "001-8100.c7", 0x0400, 0x0400, CRC(2208a37a) SHA1(8cb528c3f83f779873e82b0d959810d5e3073291) )
 	ROM_LOAD( "001-8200.b7", 0x0800, 0x0400, CRC(9c27e9d7) SHA1(43103979e014ecc7b17a44a935257869ca184c2f) )
@@ -160,13 +162,19 @@ ROM_START( holddraw )
 	ROM_LOAD( "001-8500.c8", 0x1400, 0x0400, CRC(9c219088) SHA1(7430fe4eb3a6bf1838fd5513127f5248723bec0a) )
 	// one empty ROM socket at b8
 
-	ROM_REGION(0x800, "tiles", 0 )
+	ROM_REGION( 0x800, "tiles", 0 )
 	ROM_LOAD( "001_1201.e5", 0x000, 0x400, CRC(32197f7d) SHA1(07c8739033820e4e4e2fe4428f921d8fc7c8698b) )
 	ROM_LOAD( "1102.d5_a",   0x400, 0x400, BAD_DUMP CRC(bb4bd952) SHA1(a869d5d5c8bc45d414b1103c6fe2b2d7bb07291e) ) // handwritten label, 3 different reads until it can be determined if one is good or a good one can be assembled
 	ROM_LOAD( "1102.d5_b",   0x400, 0x400, BAD_DUMP CRC(ce57a4ee) SHA1(732fc54f32212d7590daa2da738acd1cce4d7c0d) )
 	ROM_LOAD( "1102.d5_c",   0x400, 0x400, BAD_DUMP CRC(0b30d921) SHA1(992709bb0ad18f646bfa1bccea45454a5f273457) )
 
-	ROM_REGION(0xc00, "proms", 0 )
+	// these custom ROMs were dumped via an adapter built on educated guessing of the pinout, so resulting dump isn't confirmed to be 100% correct
+	// they do contain good GFX data
+	ROM_REGION( 0x2000, "tiles2", 0 )
+	ROM_LOAD( "c27139m.b4", 0x0000, 0x1000, CRC(6e2b1b39) SHA1(61ccc2b78976633e6e8241c1f82bd63e1905b8d3) ) // 1xxxxxxxxxxx = 0x00
+	ROM_LOAD( "c27140m.b5", 0x1000, 0x1000, CRC(78fee34e) SHA1(3cef1c03d91ec5b74272ec63c4962009cf309b52) ) // 1xxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0xc00, "proms", 0 )
 	ROM_LOAD( "001-1400.d2", 0x000, 0x200, CRC(32c99cfc) SHA1(64d561230d69514a02f30d7bc69caa563e069d69) )
 	ROM_LOAD( "001-1500.f2", 0x200, 0x200, CRC(a27a7513) SHA1(84f5a29e55112d99a757b902aeef28e1370ef78f) )
 	ROM_LOAD( "001-1300.g1", 0x400, 0x200, CRC(eb581932) SHA1(b04cf5bb18bfc91654f63984aaf8e656e616b36f) )
@@ -175,7 +183,59 @@ ROM_START( holddraw )
 	ROM_LOAD( "j2.j2",       0xa00, 0x200, CRC(d7195174) SHA1(660e52c0d1c250ec9566d629c9e57e7b20acff26) ) // handwritten label
 ROM_END
 
+ROM_START( unkamst ) // AMSTAR ELEC ASSY 1061-3700. Had ROM labels removed / unreadable
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "e8", 0x0000, 0x2000, CRC(7edc245b) SHA1(85e79c94386dbc618130b3afa0dc426c29e2efca) ) // on a tiny daughter-board fit in e8
+	// empty ROM sockets at b6, b7, b8, c7, c8, d8
+
+	ROM_REGION( 0x400, "tiles", 0 )
+	ROM_LOAD( "2708.e5", 0x000, 0x400, CRC(8a0a90f5) SHA1(2bb2f27a3617dcf776c9ac9b713eafa3d8017c38) )
+	// empty ROM socket at d5
+
+	// these custom ROMs were dumped via an adapter built on educated guessing of the pinout, so resulting dump isn't confirmed to be 100% correct
+	// they do contain good GFX data
+	ROM_REGION( 0x2000, "tiles2", 0 )
+	ROM_LOAD( "c27139m.b4", 0x0000, 0x1000, CRC(6e2b1b39) SHA1(61ccc2b78976633e6e8241c1f82bd63e1905b8d3) ) // 1xxxxxxxxxxx = 0x00
+	ROM_LOAD( "c27140m.b5", 0x1000, 0x1000, CRC(78fee34e) SHA1(3cef1c03d91ec5b74272ec63c4962009cf309b52) ) // 1xxxxxxxxxxx = 0x00
+
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "d2", 0x000, 0x100, CRC(77d1cf3b) SHA1(f2891b9ea0af028c8b4f6aac254e4dfc27531da2) ) // d2 and g1 are identical?
+	ROM_LOAD( "f2", 0x100, 0x100, BAD_DUMP CRC(025996b1) SHA1(16e927c3a94c46ab2d870a37aa0dfacb4f95bdbf) ) // programmer said chip is bad
+	ROM_LOAD( "g1", 0x200, 0x100, CRC(77d1cf3b) SHA1(f2891b9ea0af028c8b4f6aac254e4dfc27531da2) )
+	ROM_LOAD( "g2", 0x300, 0x100, CRC(6d15591d) SHA1(424397e1d0f5c5aa203ce74b0f0ac3bedcb090bc) )
+	ROM_LOAD( "h2", 0x400, 0x100, CRC(5751f3ac) SHA1(5e0b5623688752ea18f8892c38682bc665524a16) )
+	ROM_LOAD( "j2", 0x500, 0x100, CRC(1ae17610) SHA1(8c41f936f2a21cdd63a68eb43b86897dad309255) )
+	// empty sockets at j1 and g11
+ROM_END
+
+ROM_START( unkamsta ) // AMSTAR ELEC ASSY 1061-3700. Had ROM labels removed / unreadable
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "e8", 0x0000, 0x2000, CRC(e1f86655) SHA1(41b7e8cb7bc1c7baabaf2c32259f07c905a95902) ) // on a tiny daughter-board fit in e8
+	// empty ROM sockets at b6, b7, b8, c7, c8, d8
+
+	ROM_REGION( 0x400, "tiles", 0 )
+	ROM_LOAD( "2708.e5", 0x000, 0x400, CRC(8a0a90f5) SHA1(2bb2f27a3617dcf776c9ac9b713eafa3d8017c38) )
+	// empty ROM socket at d5
+
+	// these custom ROMs were dumped via an adapter built on educated guessing of the pinout, so resulting dump isn't confirmed to be 100% correct
+	// they do contain good GFX data
+	ROM_REGION( 0x2000, "tiles2", 0 )
+	ROM_LOAD( "c27139m.b4", 0x0000, 0x1000, CRC(6e2b1b39) SHA1(61ccc2b78976633e6e8241c1f82bd63e1905b8d3) ) // 1xxxxxxxxxxx = 0x00
+	ROM_LOAD( "c29114.b5",  0x1000, 0x1000, CRC(78fee34e) SHA1(3cef1c03d91ec5b74272ec63c4962009cf309b52) ) // 1xxxxxxxxxxx = 0x00, different chip code but same contents as the other sets
+
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "d2",          0x000, 0x100, CRC(77d1cf3b) SHA1(f2891b9ea0af028c8b4f6aac254e4dfc27531da2) )
+	ROM_LOAD( "f2",          0x100, 0x100, CRC(a33b5045) SHA1(e7eb46c2f75a6a754d023542c4b229f27058a79b) )
+	ROM_LOAD( "g1",          0x200, 0x100, CRC(7238328c) SHA1(8693aa21f0ede154f0fc17abc1c4f392de4b8018) )
+	ROM_LOAD( "001_1602.g2", 0x300, 0x100, CRC(8364f735) SHA1(888376546430a9db223893896014ecc95e40d566) )
+	ROM_LOAD( "h2",          0x400, 0x100, CRC(5274d0b7) SHA1(a5b429c52434605b9dce336d55a4ffa4f47f3c1d) )
+	ROM_LOAD( "j2",          0x500, 0x100, CRC(3333f7bc) SHA1(d4f346ad853c6e46163da651f2bea4730e5774fc) )
+	// empty sockets at j1 and g11
+ROM_END
+
 } // anonymous namespace
 
 
-GAME( 1981, holddraw, 0, amstarz80, holddraw, amstarz80_state, empty_init, ROT0, "Amstar", "Hold & Draw", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // supposedly, but might actually be another similar game
+GAME( 1981, holddraw, 0,       amstarz80, holddraw, amstarz80_state, empty_init, ROT0, "Amstar", "Hold & Draw",                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // supposedly, but might actually be another similar game
+GAME( 198?, unkamst,  0,       amstarz80, holddraw, amstarz80_state, empty_init, ROT0, "Amstar", "unknown Amstar cards game (set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 198?, unkamsta, unkamst, amstarz80, holddraw, amstarz80_state, empty_init, ROT0, "Amstar", "unknown Amstar cards game (set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

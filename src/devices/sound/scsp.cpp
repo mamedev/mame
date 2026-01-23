@@ -942,8 +942,8 @@ void scsp_device::UpdateRegR(int reg)
 			break;
 
 		//case 0x20:
-		//	m_udata.data[0x20/2] ^= 0x400;
-		//	break;
+		//  m_udata.data[0x20/2] ^= 0x400;
+		//  break;
 
 		case 0x2a:
 		case 0x2b:

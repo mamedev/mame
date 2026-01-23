@@ -470,17 +470,17 @@ authors:hap
 		<element ref="text_l1a"><bounds x="95.5" y="30.4" width="11" height="1.6" /></element>
 		<element ref="text_l1b"><bounds x="95.5" y="32.0" width="11" height="1.6" /></element>
 
-		<element ref="text_l2"><bounds x="98.5" y="35.85" width="10" height="1.6" /></element>
-		<element ref="text_l3"><bounds x="98.5" y="39.85" width="10" height="1.6" /></element>
-		<element ref="text_l4"><bounds x="98.5" y="43.85" width="10" height="1.6" /></element>
-		<element ref="text_l5"><bounds x="98.5" y="47.85" width="10" height="1.6" /></element>
-		<element ref="text_l6"><bounds x="98.5" y="51.85" width="10" height="1.6" /></element>
-		<element ref="text_l7"><bounds x="98.5" y="55.85" width="10" height="1.6" /></element>
+		<element ref="text_l2"><bounds x="98.5" y="35.85" width="7" height="1.6" /></element>
+		<element ref="text_l3"><bounds x="98.5" y="39.85" width="7" height="1.6" /></element>
+		<element ref="text_l4"><bounds x="98.5" y="43.85" width="7" height="1.6" /></element>
+		<element ref="text_l5"><bounds x="98.5" y="47.85" width="7" height="1.6" /></element>
+		<element ref="text_l6"><bounds x="98.5" y="51.85" width="7" height="1.6" /></element>
+		<element ref="text_l7"><bounds x="98.5" y="55.85" width="7" height="1.6" /></element>
 
-		<element ref="text_r1"><bounds x="95.5" y="60.0" width="17" height="1.6" /></element>
-		<element ref="text_r2"><bounds x="95.5" y="64.5" width="17" height="1.6" /></element>
-		<element ref="text_r3"><bounds x="95.5" y="69.0" width="17" height="1.6" /></element>
-		<element ref="text_r4"><bounds x="95.5" y="73.5" width="17" height="1.6" /></element>
+		<element ref="text_r1"><bounds x="102" y="60.0" width="10.5" height="1.6" /></element>
+		<element ref="text_r2"><bounds x="102" y="64.5" width="10.5" height="1.6" /></element>
+		<element ref="text_r3"><bounds x="102" y="69.0" width="10.5" height="1.6" /></element>
+		<element ref="text_r4"><bounds x="102" y="73.5" width="10.5" height="1.6" /></element>
 
 		<element ref="text_r5"><bounds x="95.5" y="82.1" width="13" height="1.6" /></element>
 		<element ref="text_r6"><bounds x="109.7" y="82.1" width="5" height="1.6" /></element>

@@ -48,7 +48,7 @@ authors:smf
 			</element>
 		</collection>
 
-		<collection name="Control Panel">
+		<collection name="Control Panel" visible="no">
 			<element ref="rect">
 				<bounds x="0" y="268" width="4" height="4" />
 				<color alpha="0" />

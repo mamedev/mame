@@ -1557,7 +1557,7 @@ ROM_START( archrivl ) // Reports as rev 4.0 6/29/89
 	ROM_LOAD( "pls153.11j",   0x0000, 0x00eb, CRC(761c3b56) SHA1(06c1717face55cc5b05ec45be9525a3d25419b85) )
 	ROM_LOAD( "pls153.12j",   0x0100, 0x00eb, CRC(48eed036) SHA1(146b47ecb341b074acad0e4da2d81ff921bbaf7a) )
 	ROM_LOAD( "pls153.14h",   0x0200, 0x00eb, CRC(d4203273) SHA1(59fde5850ad55e257f10db857dfb9a1e929fc1ec) )
-	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, CRC(a42d769e) SHA1(fb38767efc93ffb3fdca15a3b7330b1c3e78555f) )
 	ROM_LOAD( "pal16r4a.14k", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
 	ROM_LOAD( "pal16r4a.2k",  0x0600, 0x0104, NO_DUMP ) // PAL is read protected
 	ROM_LOAD( "pal16r6a.15e", 0x0800, 0x0104, NO_DUMP ) // PAL is read protected
@@ -1604,7 +1604,7 @@ ROM_START( archrivla ) // Reports as rev 2.0 5/03/89
 	ROM_LOAD( "pls153.11j",   0x0000, 0x00eb, CRC(761c3b56) SHA1(06c1717face55cc5b05ec45be9525a3d25419b85) )
 	ROM_LOAD( "pls153.12j",   0x0100, 0x00eb, CRC(48eed036) SHA1(146b47ecb341b074acad0e4da2d81ff921bbaf7a) )
 	ROM_LOAD( "pls153.14h",   0x0200, 0x00eb, CRC(d4203273) SHA1(59fde5850ad55e257f10db857dfb9a1e929fc1ec) )
-	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, CRC(a42d769e) SHA1(fb38767efc93ffb3fdca15a3b7330b1c3e78555f) )
 	ROM_LOAD( "pal16r4a.14k", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
 	ROM_LOAD( "pal16r4a.2k",  0x0600, 0x0104, NO_DUMP ) // PAL is read protected
 	ROM_LOAD( "pal16r6a.15e", 0x0800, 0x0104, NO_DUMP ) // PAL is read protected
@@ -1651,7 +1651,7 @@ ROM_START( archrivlb ) // Reports as rev 2.0 5/03/89
 	ROM_LOAD( "pls153.11j",   0x0000, 0x00eb, CRC(761c3b56) SHA1(06c1717face55cc5b05ec45be9525a3d25419b85) )
 	ROM_LOAD( "pls153.12j",   0x0100, 0x00eb, CRC(48eed036) SHA1(146b47ecb341b074acad0e4da2d81ff921bbaf7a) )
 	ROM_LOAD( "pls153.14h",   0x0200, 0x00eb, CRC(d4203273) SHA1(59fde5850ad55e257f10db857dfb9a1e929fc1ec) )
-	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, NO_DUMP ) // PAL is read protected
+	ROM_LOAD( "pal12h6.14e",  0x0300, 0x0034, CRC(a42d769e) SHA1(fb38767efc93ffb3fdca15a3b7330b1c3e78555f) )
 	ROM_LOAD( "pal16r4a.14k", 0x0400, 0x0104, NO_DUMP ) // PAL is read protected
 	ROM_LOAD( "pal16r4a.2k",  0x0600, 0x0104, NO_DUMP ) // PAL is read protected
 	ROM_LOAD( "pal16r6a.15e", 0x0800, 0x0104, NO_DUMP ) // PAL is read protected

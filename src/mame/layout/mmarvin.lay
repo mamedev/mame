@@ -47,13 +47,14 @@ authors:hap
 		]]></data></image>
 	</element>
 
-	<element name="text_n1"><text string="DO (C)"><color red="0.7" green="0.1" blue="0.12" /></text></element>
-	<element name="text_n2"><text string="RE (D)"><color red="0.7" green="0.1" blue="0.12" /></text></element>
-	<element name="text_n3"><text string="MI (E)"><color red="0.7" green="0.1" blue="0.12" /></text></element>
-	<element name="text_n4"><text string="FA (F)"><color red="0.7" green="0.1" blue="0.12" /></text></element>
-	<element name="text_n5"><text string="SO (G)"><color red="0.7" green="0.1" blue="0.12" /></text></element> <!-- sic -->
-	<element name="text_n6"><text string="LA (A)"><color red="0.7" green="0.1" blue="0.12" /></text></element>
-	<element name="text_n7"><text string="TI (B)"><color red="0.7" green="0.1" blue="0.12" /></text></element>
+	<element name="text_n1"><text string="DO (C)" align="2"><color red="0.7" green="0.1" blue="0.12" /></text></element>
+	<element name="text_n2"><text string="RE (D)" align="2"><color red="0.7" green="0.1" blue="0.12" /></text></element>
+	<element name="text_n3"><text string="MI (E)" align="2"><color red="0.7" green="0.1" blue="0.12" /></text></element>
+	<element name="text_n4"><text string="FA (F)" align="2"><color red="0.7" green="0.1" blue="0.12" /></text></element>
+	<element name="text_n5"><text string="SO (G)" align="1"><color red="0.7" green="0.1" blue="0.12" /></text></element> <!-- sic -->
+	<element name="text_n6"><text string="LA (A)" align="1"><color red="0.7" green="0.1" blue="0.12" /></text></element>
+	<element name="text_n7"><text string="TI (B)" align="1"><color red="0.7" green="0.1" blue="0.12" /></text></element>
+	<element name="text_n8"><text string="DO (C)" align="1"><color red="0.7" green="0.1" blue="0.12" /></text></element>
 
 	<element name="text_l3"><text string="SCORE"><color red="0.6" green="0.6" blue="0.61" /></text></element>
 	<element name="text_l4"><text string="SPACE"><color red="0.6" green="0.6" blue="0.61" /></text></element>
@@ -117,14 +118,14 @@ authors:hap
 		<element name="1.6" ref="led"><bounds x="12.3" y="25.3" width="1" height="1" /></element>
 		<element name="1.8" ref="led"><bounds x="17.7" y="30.7" width="1" height="1" /></element>
 
-		<element ref="text_n1"><bounds x="22.4" y="27.8" width="5" height="1.3" /></element>
-		<element ref="text_n2"><bounds x="25.8" y="23.9" width="5" height="1.3" /></element>
-		<element ref="text_n3"><bounds x="25.8" y="18.6" width="5" height="1.3" /></element>
-		<element ref="text_n4"><bounds x="22.4" y="14.6" width="5" height="1.3" /></element>
-		<element ref="text_n5"><bounds x="16.8" y="14.6" width="5" height="1.3" /></element>
-		<element ref="text_n6"><bounds x="13.4" y="18.6" width="5" height="1.3" /></element>
-		<element ref="text_n7"><bounds x="13.4" y="23.9" width="5" height="1.3" /></element>
-		<element ref="text_n1"><bounds x="16.8" y="27.8" width="5" height="1.3" /></element>
+		<element ref="text_n1"><bounds x="22.4" y="28.0" width="4" height="1.3" /></element>
+		<element ref="text_n2"><bounds x="25.8" y="24.0" width="4" height="1.3" /></element>
+		<element ref="text_n3"><bounds x="25.8" y="18.7" width="4" height="1.3" /></element>
+		<element ref="text_n4"><bounds x="22.4" y="14.7" width="4" height="1.3" /></element>
+		<element ref="text_n5"><bounds x="17.5" y="14.7" width="4" height="1.3" /></element>
+		<element ref="text_n6"><bounds x="14.3" y="18.7" width="4" height="1.3" /></element>
+		<element ref="text_n7"><bounds x="14.3" y="24.0" width="4" height="1.3" /></element>
+		<element ref="text_n8"><bounds x="17.5" y="28.0" width="4" height="1.3" /></element>
 
 		<!-- main buttons -->
 		<element ref="nothing" inputtag="IN.1" inputmask="0x01"><bounds x="22.8" y="31" width="8.5" height="7" /></element> <!-- do1 -->

@@ -43,9 +43,12 @@ authors:Sandro Ronco, hap
 	<element name="text_g"> <text string="G"> <color red="0.81" green="0.8" blue="0.79" /></text> </element>
 	<element name="text_h"> <text string="H"> <color red="0.81" green="0.8" blue="0.79" /></text> </element>
 
-	<element name="text_enter">   <text string="ENTER">    <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_clear">   <text string="CLEAR">    <color red="1" green="1" blue="1" /></text> </element>
-	<element name="text_newgame"> <text string="NEW GAME"> <color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_enter"><text string="ENTER"><color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_clear"><text string="CLEAR"><color red="1" green="1" blue="1" /></text> </element>
+	<element name="text_newgame">
+		<rect><color red="0" green="0" blue="0" /></rect>
+		<text string=" NEW GAME "><color red="1" green="1" blue="1" /></text>
+	</element>
 
 
 <!-- sb board -->
@@ -364,11 +367,10 @@ authors:Sandro Ronco, hap
 
 		<element ref="white"><bounds x="1.2" y="21.4" width="9.6" height="0.8" /></element>
 		<element ref="blackb"><bounds x="1.5" y="21.2" width="9" height="0.8" /></element>
-		<element ref="blackb"><bounds x="2.7" y="21.5" width="6.6" height="0.8" /></element>
 
-		<element ref="text_newgame"> <bounds x="0.7"  y="21.4" width="11" height="1.4" /></element>
-		<element ref="text_clear">   <bounds x="12.5" y="21.4" width="5"  height="1.4" /></element>
-		<element ref="text_enter">   <bounds x="18.5" y="21.4" width="5"  height="1.4" /></element>
+		<element ref="text_newgame"> <bounds xc="6"   y="21.4" width="7.2" height="1.4" /></element>
+		<element ref="text_clear">   <bounds x="12.5" y="21.4" width="5" height="1.4" /></element>
+		<element ref="text_enter">   <bounds x="18.5" y="21.4" width="5" height="1.4" /></element>
 
 		<element ref="yellow" blend="multiply"><bounds left="0" right="24" top="11" bottom="24" /></element>
 

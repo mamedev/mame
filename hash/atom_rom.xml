@@ -272,7 +272,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pcharmea" cloneof="pcharme">
-		<description>P-Charme (Alt)</description>
+		<description>P-Charme (alt)</description>
 		<year>1984</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="author" value="Frans van Hoesel" />

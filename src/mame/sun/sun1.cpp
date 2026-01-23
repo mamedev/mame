@@ -65,9 +65,8 @@
 
 #include "emu.h"
 
-#include "sun1_cpu.h"
-
 #include "bus/multibus/multibus.h"
+#include "bus/multibus/sun1.h"
 
 namespace {
 
@@ -99,7 +98,7 @@ void sun1_state::machine_reset()
 
 static void sun1_cards(device_slot_interface &device)
 {
-	device.option_add("sun1cpu", MULTIBUS_SUN1CPU);
+	device.option_add("processor", MULTIBUS_SUN1);
 }
 
 void sun1_state::sun1(machine_config &config)
@@ -110,7 +109,7 @@ void sun1_state::sun1(machine_config &config)
 	// slot 1 is physically located at top, only slots 1-3 have P2
 	MULTIBUS_SLOT(config, "slot1", m_bus, sun1_cards, nullptr, false); // memory expansion 2
 	MULTIBUS_SLOT(config, "slot2", m_bus, sun1_cards, nullptr, false); // memory expansion 1
-	MULTIBUS_SLOT(config, "slot3", m_bus, sun1_cards, "sun1cpu", false); // processor
+	MULTIBUS_SLOT(config, "slot3", m_bus, sun1_cards, "processor", false);
 	MULTIBUS_SLOT(config, "slot4", m_bus, sun1_cards, nullptr, false); // bus master 1
 	MULTIBUS_SLOT(config, "slot5", m_bus, sun1_cards, nullptr, false); // bus master 2
 	MULTIBUS_SLOT(config, "slot6", m_bus, sun1_cards, nullptr, false); // multibus memory, optional

@@ -65,19 +65,19 @@ authors:hap
 
 	<element name="text_l1">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="CHECK"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string=" CHECK "><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_l2">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="CHECKMATE"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string=" CHECKMATE "><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_l3">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="STALEMATE"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string=" STALEMATE "><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 	<element name="text_l4">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="YOUR MOVE"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text string=" YOUR MOVE "><color red="0.1" green="0.1" blue="0.1" /></text>
 	</element>
 
 	<element name="text_p1"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/bk.svg" /><rect><color red="1" green="1" blue="1" alpha="0.19" /></rect></element>
@@ -402,9 +402,9 @@ authors:hap
 			<element ref="black" blend="add"><bounds xc="5" yc="~y~" width="5" height="5" /></element>
 		</repeat>
 
-		<element ref="text_b0"><bounds xc="5" yc="10" width="5" height="1.5" /></element>
+		<element ref="text_b0"><bounds xc="5" yc="10" width="4" height="1.5" /></element>
 
-		<element ref="text_b1"><bounds xc="10" yc="5" width="5" height="1.5" /></element>
+		<element ref="text_b1"><bounds xc="10" yc="5" width="4" height="1.5" /></element>
 		<element ref="whiteb" blend="multiply"><bounds xc="10" yc="5" width="5" height="5" /></element>
 
 		<repeat count="6">
@@ -412,14 +412,14 @@ authors:hap
 			<element ref="red"><bounds xc="10" yc="~y~" width="5" height="5" /></element>
 		</repeat>
 
-		<element ref="text_b2a"><bounds xc="10" yc="15.966" width="5" height="1.5" /></element>
-		<element ref="text_b2b"><bounds xc="10" yc="17.366" width="5" height="1.5" /></element>
-		<element ref="text_b3"><bounds xc="10" yc="28.333" width="5" height="1.5" /></element>
-		<element ref="text_b4"><bounds xc="10" yc="40" width="5" height="1.5" /></element>
-		<element ref="text_b5a"><bounds xc="10" yc="50.966" width="5" height="1.5" /></element>
-		<element ref="text_b5b"><bounds xc="10" yc="52.366" width="5" height="1.5" /></element>
-		<element ref="text_b6"><bounds xc="10" yc="63.333" width="5" height="1.5" /></element>
-		<element ref="text_b7"><bounds xc="10" yc="75" width="5" height="1.5" /></element>
+		<element ref="text_b2a"><bounds xc="10" yc="15.966" width="4" height="1.5" /></element>
+		<element ref="text_b2b"><bounds xc="10" yc="17.366" width="4" height="1.5" /></element>
+		<element ref="text_b3"><bounds xc="10" yc="28.333" width="4" height="1.5" /></element>
+		<element ref="text_b4"><bounds xc="10" yc="40" width="4" height="1.5" /></element>
+		<element ref="text_b5a"><bounds xc="10" yc="50.966" width="4" height="1.5" /></element>
+		<element ref="text_b5b"><bounds xc="10" yc="52.366" width="4" height="1.5" /></element>
+		<element ref="text_b6"><bounds xc="10" yc="63.333" width="4" height="1.5" /></element>
+		<element ref="text_b7"><bounds xc="10" yc="75" width="4" height="1.5" /></element>
 
 		<repeat count="6">
 			<param name="y1" start="80" increment="-11.666" />

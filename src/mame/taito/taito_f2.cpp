@@ -3001,8 +3001,9 @@ void cameltry_state::cameltry(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cameltry_state::cameltry_map);
 
 	/* video hardware */
-	MCFG_VIDEO_START_OVERRIDE(cameltry_state,dondokod)
+	MCFG_VIDEO_START_OVERRIDE(cameltry_state, dondokod)
 	m_screen->set_screen_update(FUNC(cameltry_state::screen_update_pri_roz));
+	m_screen->screen_vblank().set(FUNC(cameltry_state::screen_vblank_partial_buffer_delayed));
 
 	TC0100SCN(config, m_tc0100scn[0], 0);
 	m_tc0100scn[0]->set_offsets(3, 0);
@@ -3536,7 +3537,7 @@ void cameltry_state::cameltrya(machine_config &config)
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 2*8, 30*8-1);
 	m_screen->set_screen_update(FUNC(cameltry_state::screen_update_pri_roz));
-	m_screen->screen_vblank().set(FUNC(cameltry_state::screen_vblank_no_buffer));
+	m_screen->screen_vblank().set(FUNC(cameltry_state::screen_vblank_partial_buffer_delayed));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_taitof2);

@@ -123,12 +123,6 @@ private:
 };
 
 
-struct chainent
-{
-	uint8_t level;
-	uint64_t block;
-};
-
 class fork_entry
 {
 public:
@@ -311,7 +305,6 @@ enum
 	IMGTOOLINFO_PTR_ATTR_NAME,
 	IMGTOOLINFO_PTR_GET_ICON_INFO,
 	IMGTOOLINFO_PTR_SUGGEST_TRANSFER,
-	IMGTOOLINFO_PTR_GET_CHAIN,
 	IMGTOOLINFO_PTR_GET_GEOMETRY,
 	IMGTOOLINFO_PTR_READ_SECTOR,
 	IMGTOOLINFO_PTR_WRITE_SECTOR,
@@ -417,7 +410,6 @@ union imgtoolinfo
 	imgtoolerr_t    (*attr_name)        (uint32_t attribute, const imgtool_attribute *attr, char *buffer, size_t buffer_len);
 	imgtoolerr_t    (*get_iconinfo)     (imgtool::partition &partition, const char *path, imgtool_iconinfo *iconinfo);
 	imgtoolerr_t    (*suggest_transfer) (imgtool::partition &partition, const char *path, imgtool::transfer_suggestion *suggestions, size_t suggestions_length);
-	imgtoolerr_t    (*get_chain)        (imgtool::partition &partition, const char *path, imgtool::chainent *chain, size_t chain_size);
 	imgtoolerr_t    (*get_geometry)     (imgtool::image &image, uint32_t *tracks, uint32_t *heads, uint32_t *sectors);
 	imgtoolerr_t    (*read_sector)      (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, std::vector<uint8_t> &buffer);
 	imgtoolerr_t    (*write_sector)     (imgtool::image &image, uint32_t track, uint32_t head, uint32_t sector, const void *buffer, size_t len, int ddam);

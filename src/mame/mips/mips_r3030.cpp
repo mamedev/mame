@@ -154,11 +154,11 @@ public:
 	}
 
 	// machine config
-	void r3030(machine_config &config);
-	void rs3230(machine_config &config);
-	void rc3230(machine_config &config);
+	void r3030(machine_config &config) ATTR_COLD;
+	void rs3230(machine_config &config) ATTR_COLD;
+	void rc3230(machine_config &config) ATTR_COLD;
 
-	void r3030_init();
+	void r3030_init() ATTR_COLD;
 
 protected:
 	// driver_device overrides
@@ -546,7 +546,7 @@ ROM_END
 #define rom_rc3230 rom_r3030
 #define rom_rs3230 rom_r3030
 
-}
+} // anonymous namespace
 
 /*   YEAR   NAME       PARENT  COMPAT  MACHINE    INPUT  CLASS             INIT         COMPANY  FULLNAME       FLAGS */
 COMP(1990,  rc3230,    0,      0,      rc3230,    0,     mips_r3030_state, r3030_init, "MIPS",  "RC3230",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -97,8 +97,8 @@ license:CC0-1.0
 		     currently unsupported element rotations with arbitrary angles:
 
 		<rect>
-			<color red="0.6" green="0.6" blue="0.6"/>
-			<bounds x="22" y="2" width="3" height="12"/>
+		    <color red="0.6" green="0.6" blue="0.6"/>
+		    <bounds x="22" y="2" width="3" height="12"/>
 		</rect>
 		-->
 		<disk>
@@ -459,7 +459,7 @@ license:CC0-1.0
 	<element name="mode_text"><text string="MODE"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="amount_text"><text string="AMOUNT"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 
-	
+
 	<element name="lfo_2_text"><text string="LFO 2"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="trigger_text"><text string="TRIGGER"><color red="0.8" green="0.8" blue="0.8"/></text></element>
 	<element name="shape_1plus2_text"><text string="SHAPE 1+2"><color red="0.8" green="0.8" blue="0.8"/></text></element>

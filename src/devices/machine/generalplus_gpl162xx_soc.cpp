@@ -54,8 +54,8 @@ sunplus_gcm394_base_device::sunplus_gcm394_base_device(const machine_config& mco
 	m_portc_out(*this),
 	m_portd_out(*this),
 	m_nand_read_cb(*this, 0),
+	m_cs_space(*this, finder_base::DUMMY_TAG, -1),
 	m_csbase(0x20000),
-	m_cs_space(nullptr),
 	m_romtype(0),
 	m_space_read_cb(*this, 0),
 	m_space_write_cb(*this),
@@ -1634,7 +1634,6 @@ void sunplus_gcm394_base_device::device_reset()
 
 	m_unk_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 
-	m_spg_video->set_video_spaces(this->space(AS_PROGRAM), *m_cs_space, m_csbase);
 	m_spg_video->reset();
 }
 
@@ -1756,6 +1755,7 @@ void sunplus_gcm394_base_device::device_add_mconfig(machine_config &config)
 	GCM394_VIDEO(config, m_spg_video, DERIVED_CLOCK(1, 1), DEVICE_SELF, m_screen);
 	m_spg_video->write_video_irq_callback().set(FUNC(sunplus_gcm394_base_device::videoirq_w));
 	m_spg_video->space_read_callback().set(FUNC(sunplus_gcm394_base_device::read_space));
+	m_spg_video->set_video_space(DEVICE_SELF, AS_PROGRAM);
 }
 
 

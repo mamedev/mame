@@ -12,17 +12,17 @@
 /**************************************************************************************************************************************************************
 
   Sets below are bootleg / hacked sets, descriptions of what has been modified are provided where known
- -- use of these sets may present a risk to the operator, you should always ensure you're using original Igrosoft program roms on your PCB!
+ -- use of these sets may present a risk to the operator, you should always ensure you're using original Igrosoft program ROMs on your PCB!
 
  --------------------------------
 
   The sets which differs from the originals by 5-6 bytes are bootlegs that simply change
      the banking address. Usually to convert a Crazy Monkey PCB which use the address "F9".
-     Software exists to automatic modify any program rom's banking address for any PCB.
+     Software exists to automatic modify any program ROM's banking address for any PCB.
      This has resulted in dozens of different bootleg versions floating around the net.
 
    Some sets simply changed the version text to show a newer version.  This was likely done
-     so the opperator appears to be running a version that meets the standards of the changed
+     so the operator appears to be running a version that meets the standards of the changed
      gambling law (see below).
 
    Sets marked as "backdoor" are identical to originals, but have added code.  This code is
@@ -30,8 +30,8 @@
      increases odds for winning. These backdoor version were commonly used by administrators
      or PCB sellers to steal money from the slots owners.
    Software does exist to automatically add the backdoor code and allows for custom key
-     sequences.  As a result of this, there is also software to dectect the backdoor code
-     in program roms.
+     sequences.  As a result of this, there is also software to detect the backdoor code
+     in program ROMs.
    How to activate the backdoor (each combination is: No of lines, Bet value then Start):
      Enter the first five combinations - you'll become very lucky from this moment.
      Note: backdoor state stored in NVRAM.
@@ -236,6 +236,24 @@ ROM_START( czmon_8f ) // 050120 custom_alteras, modified graphics, many texts ch
 	ROM_LOAD( "bootleg_6b", 0x180000, 0x80000, CRC(4f8a61aa) SHA1(cb266f31ad573f627c8b8d54af88fa9e5a3676ea) )
 	ROM_LOAD( "bootleg_7b", 0x280000, 0x80000, CRC(a055fea1) SHA1(69498f7410acd3d66b391f9c8a1d541d3400674c) )
 	ROM_LOAD( "bootleg_8b", 0x380000, 0x80000, CRC(aa4b0eb3) SHA1(39a98e89a8137c9c986932398b748e48d7f21d9d) )
+
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(3a0e19fd) SHA1(27a56bd43264ccdd1d7db118dc218321338990ef) )
+ROM_END
+
+ROM_START( czmon_8g ) // 050120, just 4 bytes changed from the original version
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "cm0.rom", 0x00000, 0x40000, CRC(9af1e03f) SHA1(caadf48a36da48f4e126b286f6f5498005d8182a) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "crazymonkey_m.001", 0x000000, 0x80000, CRC(683f2be3) SHA1(6fdba4ec07752bf049787a11638895352e9d5f10) )
+	ROM_LOAD( "crazymonkey_m.002", 0x100000, 0x80000, CRC(e21ce6a4) SHA1(942ffe323ddbcaaad887cb5bc9f356550926083b) )
+	ROM_LOAD( "crazymonkey_m.003", 0x200000, 0x80000, CRC(c3d0e3d5) SHA1(5b0cb436c6b0bac1213c1df56702fa7f16856106) )
+	ROM_LOAD( "crazymonkey_m.004", 0x300000, 0x80000, CRC(f79df52c) SHA1(b99fa9f61849b62668bf9edff1c80212a9108b15) )
+	ROM_LOAD( "crazymonkey_m.005", 0x080000, 0x80000, CRC(9d4d2a94) SHA1(c714e110de628b343dfc7fff23befaa1276056a9) )
+	ROM_LOAD( "crazymonkey_m.006", 0x180000, 0x80000, CRC(a15f0fee) SHA1(3f06d5a1a41e1335bcc7586a5ea95b9b734155c0) )
+	ROM_LOAD( "crazymonkey_m.007", 0x280000, 0x80000, CRC(715a2528) SHA1(6c4c72592568ecbaa9518fb7271d2714dd22dbbb) )
+	ROM_LOAD( "crazymonkey_m.008", 0x380000, 0x80000, CRC(6fdb6fd5) SHA1(f40916112365de258956ec033aff79aae1f58690) )
 
 	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
 	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(3a0e19fd) SHA1(27a56bd43264ccdd1d7db118dc218321338990ef) )
@@ -2043,6 +2061,7 @@ GAME( 2003, czmon_8c,   czmon_13,  igrosoft_gamble, igrosoft_gamble, igrosoft_ga
 GAME( 2003, czmon_8d,   czmon_13,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,   ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, LOTTOGAME (I))",          MACHINE_SUPPORTS_SAVE ) // modified graphics, changed version text to "MDS_is_the_best_ LOTTOGAME (I)"
 GAME( 2003, czmon_8e,   czmon_13,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,   ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, LOTO PROGRAM V-CM2)",     MACHINE_SUPPORTS_SAVE ) // modified graphics, many texts changed, changed version text to "LOTO PROGRAM V-CM2"
 GAME( 2003, czmon_8f,   czmon_13,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_customl, ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, LOTOS CM01)",             MACHINE_SUPPORTS_SAVE ) // custom alteras, modified graphics, many texts changed, changed version text to "LOTOS CM01"
+GAME( 2003, czmon_8g,   czmon_13,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,   ROT0,  "bootleg", "Crazy Monkey (bootleg, 050120, payout percentage modified)", MACHINE_SUPPORTS_SAVE ) //
 GAME( 2003, czmon_9a,   czmon_13,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, init_customl, ROT0,  "bootleg", "Crazy Monkey (bootleg, 070315, VIDEO GAME-1 O01 set 1)", MACHINE_SUPPORTS_SAVE ) // custom alteras, modified graphics, changed version text to "VIDEO GAME-1 O01"
 GAME( 2003, czmon_9b,   czmon_13,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,   ROT0,  "bootleg", "Crazy Monkey (bootleg, 070315, VIDEO GAME-1 O01 set 2)", MACHINE_SUPPORTS_SAVE ) // modified graphics, changed version text to "VIDEO GAME-1 O01" (czmon_9a, decoded gfx)
 GAME( 2003, czmon_9c,   czmon_13,  igrosoft_gamble, igrosoft_gamble, igrosoft_gamble_state, empty_init,   ROT0,  "bootleg", "Crazy Monkey (bootleg, 070315, payout percentage 70)",   MACHINE_SUPPORTS_SAVE ) // payout percentage 70%

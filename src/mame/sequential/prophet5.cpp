@@ -38,8 +38,11 @@ TODO: Outline of voice architecture.
 This driver is based on the Prophet 5 Rev 3.0 technical manual, and is intended
 as an education tool.
 
-There is no layout and no audio. Running with `-oslog -output console` will
-display CVs, and voice and LED control signals.
+There is no audio. Running with `-oslog -output console` will display CVs, and
+voice and LED control signals.
+
+When the Prophet 5 boots up, it runs its autotune routine (`tune` LED will be
+illuminated). The synth is unresponsive while this is happening.
 */
 
 #include "emu.h"
@@ -51,6 +54,8 @@ display CVs, and voice and LED control signals.
 #include "machine/rescap.h"
 #include "machine/timer.h"
 #include "video/pwm.h"
+
+#include "sequential_prophet5.lh"
 
 #define LOG_SWITCHES (1U << 1)
 #define LOG_CV       (1U << 2)
@@ -85,6 +90,7 @@ protected:
 	void machine_reset() override ATTR_COLD;
 
 private:
+	static double normalized(const required_ioport &rp);
 	static double i_bias(const required_ioport &rp, double rp_max, double r, double v);
 
 	void switch_w(u8 data);
@@ -92,8 +98,8 @@ private:
 	u8 misc_r();
 	u8 adc_r();
 
-	void led_drive_w(u8 data);
 	void led_sink_w(u8 data);
+	void led_drive_w(u8 data);
 	void led_update_w(offs_t offset, u8 data);
 
 	void update_sh();
@@ -202,6 +208,12 @@ prophet5_state::prophet5_state(const machine_config &mconfig, device_type type, 
 	}
 }
 
+double prophet5_state::normalized(const required_ioport &input)
+{
+	assert(input->field(1)->minval() == 0);
+	return double(input->read()) / double(input->field(1)->maxval());
+}
+
 // Computes the current through resistor R, from the junction of the resistors
 // towards V. Rp1 and Rp2 are the two sides of a single potentiometer.
 //
@@ -212,7 +224,7 @@ prophet5_state::prophet5_state(const machine_config &mconfig, device_type type, 
 //               V
 double prophet5_state::i_bias(const required_ioport &rp, double rp_max, double r, double v)
 {
-	const double rp1 = rp_max * rp->read() / 100.0;
+	const double rp1 = rp_max * normalized(rp);
 	const double rp2 = rp_max - rp1;
 	// Compute voltage at the junction of all resistors.
 	const double vx = (r * rp1 * VMINUS + r * rp2 * VPLUS + rp1 * rp2 * v) / (r * rp1 + r * rp2 + rp1 * rp2);
@@ -266,20 +278,24 @@ u8 prophet5_state::adc_r()
 	return (d5 << 5) | (d4 << 4) | (d3 << 3) | (d2 << 2) | (d1 << 1) | d0;
 }
 
-void prophet5_state::led_drive_w(u8 data)
-{
-	m_led_matrix_pwm->write_my(data);
-	m_digit_pwm->write_my(data & 0x7f);
-}
-
 void prophet5_state::led_sink_w(u8 data)
 {
 	// The full LED matrix size is 8x7. Columns 0-4 control individual LEDs
 	// (m_led_matrix_pwm), and columns 5 and 6 control the "bank" and "program"
 	// 7-segment digit displays, respectively (m_digit_pwm). Only the first 7
 	// rows are used for the digit displays.
+
 	m_led_matrix_pwm->write_mx(data & 0x1f);
-	m_digit_pwm->write_mx((data >> 5) & 0x03);
+
+	// Using write_my() because video/pwm.cpp assumes the selected digit is in
+	// the row.
+	m_digit_pwm->write_my((data >> 5) & 0x03);
+}
+
+void prophet5_state::led_drive_w(u8 data)
+{
+	m_led_matrix_pwm->write_my(data);
+	m_digit_pwm->write_mx(data & 0x7f);
 }
 
 void prophet5_state::led_update_w(offs_t offset, u8 data)
@@ -354,7 +370,7 @@ void prophet5_state::update_vdac()
 
 	// The DAC voltage is scaled down and used as a reference for the ADC. It
 	// will be divided by ~2 if ADC Gain is properly calibrated.
-	const double adc_gain = RES_K(5) * m_adc_gain->read() / 100.0;  // R334
+	const double adc_gain = RES_K(5) * normalized(m_adc_gain);  // R334
 	m_adc_vref = m_vdac * RES_VOLTAGE_DIVIDER(adc_gain + RES_K(18.2), RES_K(20.0));  // R335, R336
 }
 
@@ -372,7 +388,7 @@ void prophet5_state::update_vmux()
 		if (!BIT(m_pot_mux_inh, mux))  // Active low.
 		{
 			const int pot_index = 8 * mux + m_pot_mux_abc;
-			vmux_sum += POT_V_MAX * m_pots[pot_index]->read() / 100.0;
+			vmux_sum += POT_V_MAX * normalized(m_pots[pot_index]);
 			++n_active_switches;
 		}
 	}
@@ -380,7 +396,7 @@ void prophet5_state::update_vmux()
 	if (m_seq_cv_enabled)  // U371C (CD4016) control input.
 	{
 		// CV input is expected to be 0-10V.
-		const double cv_in = 10.0 * m_seq_cv_in->read() / 100.0;
+		const double cv_in = 10.0 * normalized(m_seq_cv_in);
 
 		// The external CV is buffered, scaled, and offsetted by U374A (LM348
 		// op-amp) and surrounding circuit.
@@ -389,7 +405,7 @@ void prophet5_state::update_vmux()
 		constexpr double R396 = RES_R(470);
 		constexpr double R392 = RES_K(24.9);
 		constexpr double R391 = RES_K(30.1);
-		const double R386 = RES_K(10) * m_seq_scale->read() / 100.0;
+		const double R386 = RES_K(10) * normalized(m_seq_scale);
 		const double scaled_cv = cv_in * RES_VOLTAGE_DIVIDER(R396 + R392 + R386, R391);
 
 		// Offset resistor network.
@@ -600,6 +616,8 @@ void prophet5_state::prophet5rev30(machine_config &config)
 	PWM_DISPLAY(config, m_digit_pwm).set_size(2, 7);
 	m_digit_pwm->set_segmask(0x03, 0x7f);
 
+	config.set_default_layout(layout_sequential_prophet5);
+
 	auto &u332 = OUTPUT_LATCH(config, "misc_latch");
 	u332.bit_handler<0>().set(m_tune_ff, FUNC(ttl7474_device::clear_w));
 	u332.bit_handler<1>().set(m_tune_ff, FUNC(ttl7474_device::preset_w));
@@ -736,7 +754,7 @@ INPUT_PORTS_START(prophet5)
 
 	PORT_START("switch_row_4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("RECORD") PORT_CODE(KEYCODE_R)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BANK SELECT")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("BANK SELECT") PORT_CODE(KEYCODE_K)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("A-440")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TUNE")
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TO CASS")
@@ -862,79 +880,116 @@ INPUT_PORTS_START(prophet5)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TP304")
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("TP306")
 
-	// All knob potentiometers are 10K linear.
+	// All knob potentiometers are 10K linear, unless otherwise noted.
 
 	PORT_START("pot_0")  // R217
-	PORT_ADJUSTER(50, "GLIDE") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 0)
+	PORT_ADJUSTER(0, "GLIDE") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 0)
 
 	PORT_START("pot_1")  // R211
-	PORT_ADJUSTER(50, "LFO FREQ") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 1)
+	PORT_ADJUSTER(127, "LFO FREQ") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 1)
 
 	PORT_START("pot_2")  // R216
-	PORT_ADJUSTER(50, "WMOD SRC MIX") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 2)
+	PORT_ADJUSTER(0, "WMOD SRC MIX") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 2)
 
 	PORT_START("pot_3")  // R202
-	PORT_ADJUSTER(50, "PMOD OSC B") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 3)
+	PORT_ADJUSTER(0, "PMOD OSC B") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 3)
 
 	PORT_START("pot_4")  // R201
-	PORT_ADJUSTER(50, "PMOD FILT ENV") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 4)
+	PORT_ADJUSTER(0, "PMOD FILT ENV") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 4)
 
 	PORT_START("pot_5")  // R204
-	PORT_ADJUSTER(50, "OSC A FREQ") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 5)
+	PORT_ADJUSTER(127, "OSC A FREQ") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 5)
 
 	PORT_START("pot_6")  // R213
-	PORT_ADJUSTER(50, "OSC B FREQ") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 6)
+	PORT_ADJUSTER(127, "OSC B FREQ") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 6)
 
 	PORT_START("pot_7")  // R214
-	PORT_ADJUSTER(50, "OSC B FINE") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 7)
+	PORT_ADJUSTER(127, "OSC B FINE") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 7)
 
 	PORT_START("pot_8")  // R101
-	PORT_ADJUSTER(50, "FILT CUTOFF") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 8)
+	PORT_ADJUSTER(255, "FILT CUTOFF") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 8)
 
 	PORT_START("pot_9")  // R103
-	PORT_ADJUSTER(50, "FILT ENV AMT") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 9)
+	PORT_ADJUSTER(0, "FILT ENV AMT") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 9)
 
 	PORT_START("pot_10")  // R208
-	PORT_ADJUSTER(50, "MIX OSC B") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 10)
+	PORT_ADJUSTER(255, "MIX OSC B") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 10)
 
 	PORT_START("pot_11")  // R215
-	PORT_ADJUSTER(50, "OSC B PW") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 11)
+	PORT_ADJUSTER(127, "OSC B PW") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 11)
 
 	PORT_START("pot_12")  // R207
-	PORT_ADJUSTER(50, "MIX OSC A") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 12)
+	PORT_ADJUSTER(255, "MIX OSC A") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 12)
 
 	PORT_START("pot_13")  // R205
-	PORT_ADJUSTER(50, "OSC A PW") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 13)
+	PORT_ADJUSTER(127, "OSC A PW") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 13)
 
 	PORT_START("pot_14")  // R210
-	PORT_ADJUSTER(50, "MIX NOISE") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 14)
+	PORT_ADJUSTER(0, "MIX NOISE") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 14)
 
 	PORT_START("pot_15")  // R102
-	PORT_ADJUSTER(50, "FILT RESONANCE") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 15)
+	PORT_ADJUSTER(0, "FILT RESONANCE") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 15)
 
 	PORT_START("pot_16")  // R105
-	PORT_ADJUSTER(50, "FILT ATTACK") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 16)
+	PORT_ADJUSTER(10, "FILT ATTACK") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 16)
 
 	PORT_START("pot_17")  // R106
-	PORT_ADJUSTER(50, "FILT DECAY") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 17)
+	PORT_ADJUSTER(10, "FILT DECAY") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 17)
 
 	PORT_START("pot_18")  // R107
-	PORT_ADJUSTER(50, "FILT SUSTAIN") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 18)
+	PORT_ADJUSTER(255, "FILT SUSTAIN") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 18)
 
 	PORT_START("pot_19")  // R108
-	PORT_ADJUSTER(50, "FILT RELEASE") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 19)
+	PORT_ADJUSTER(20, "FILT RELEASE") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 19)
 
 	PORT_START("pot_20")  // R109
-	PORT_ADJUSTER(50, "AMP ATTACK") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 20)
+	PORT_ADJUSTER(10, "AMP ATTACK") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 20)
 
 	PORT_START("pot_21")  // R110
-	PORT_ADJUSTER(50, "AMP DECAY") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 21)
+	PORT_ADJUSTER(10, "AMP DECAY") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 21)
 
 	PORT_START("pot_22")  // R111
-	PORT_ADJUSTER(50, "AMP SUSTAIN") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 22)
+	PORT_ADJUSTER(255, "AMP SUSTAIN") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 22)
 
 	PORT_START("pot_23")  // R112
-	PORT_ADJUSTER(50, "AMP RELEASE") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 23)
+	PORT_ADJUSTER(20, "AMP RELEASE") PORT_MINMAX(0, 255)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_state::pot_adjusted), 23)
+
+	PORT_START("pot_tune")  // R104, 100K, linear
+	PORT_ADJUSTER(50, "MASTER TUNE")
+
+	PORT_START("pot_volume")  // R113, 100K, linear
+	PORT_ADJUSTER(90, "VOLUME")
+
+	PORT_START("wheel_pitch")  // R1, 100K, linear
+	PORT_BIT(0xff, 50, IPT_PADDLE) PORT_NAME("PITCH WHEEL") PORT_MINMAX(0, 100)
+		PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(30)
+
+	PORT_START("wheel_mod")  // R2, 100K, linear
+	PORT_ADJUSTER(0, "MOD WHEEL")
 
 	PORT_START("trimmer_dac_gain")  // R333, 100K trimmer.
 	// Default value based on calibration instructions, with a small error due

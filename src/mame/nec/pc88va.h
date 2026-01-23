@@ -49,7 +49,7 @@ public:
 		, m_fdd(*this, "upd765:%u", 0U)
 		, m_pic2(*this, "pic8259_slave")
 		, m_rtc(*this, "rtc")
-		, m_cbus_root(*this, "cbus_root")
+		, m_cbus_root(*this, "cbus")
 		// labelled "マウス" (mouse) - can't use "mouse" because of core -mouse option
 		, m_mouse_port(*this, "mouseport")
 		, m_opna(*this, "opna")
@@ -300,6 +300,8 @@ private:
 	void opna_map(address_map &map) ATTR_COLD;
 
 	void sgp_map(address_map &map) ATTR_COLD;
+
+	int m_dack;
 
 // TODO: stuff backported from PC88/PC98 as QoL that should really be common
 protected:

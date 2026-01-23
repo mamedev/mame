@@ -70,23 +70,23 @@ authors:Sandro Ronco, hap
 	<element name="text_white"> <text string="&#x25a1;" align="1">  <color red="0" green="0" blue="0" /></text> </element>
 	<element name="text_lcd">   <text string="MULTI INFO LCD">      <color red="0" green="0" blue="0" /></text> </element>
 
-	<element name="text_b1">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="1  "> <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_b2">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="2  "> <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_b3">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="3  "> <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_b4">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="4  "> <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_b5">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="5  "> <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_b6">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="6  "> <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_b1">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="1 "> <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_b2">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="2 "> <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_b3">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="3 "> <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_b4">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="4 "> <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_b5">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="5 "> <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_b6">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text string="6 "> <color red="0" green="0" blue="0" /></text> </element>
 
-	<element name="text_mem2">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" MEM">                 <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_info2"> <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" INFO">                <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_lev2">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" LEV">                 <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_b7">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" &#x25a0; 7 &#x25c4;"> <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_b8">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" &#x25a1; 8 &#x25ba;"> <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_book9"> <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" BOOK 9">              <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_pos0">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" POS  0">              <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_cl">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" CL">                  <color red="0" green="0" blue="0" /></text> </element>
-	<element name="text_ent">   <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" ENT">                 <color red="0.8" green="0.2" blue="0.2" /></text> </element>
-	<element name="text_res">   <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" RES">                 <color red="0.8" green="0.2" blue="0.2" /></text> </element>
+	<element name="text_mem2">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" MEM ">                <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_info2"> <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" INFO ">               <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_lev2">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" LEV ">                <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_b7">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" &#x25a0; 7 &#x25c4; "><color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_b8">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" &#x25a1; 8 &#x25ba; "><color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_book9"> <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" BOOK 9 ">             <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_pos0">  <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" POS  0 ">             <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_cl">    <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" CL ">                 <color red="0" green="0" blue="0" /></text> </element>
+	<element name="text_ent">   <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" ENT ">                <color red="0.8" green="0.2" blue="0.2" /></text> </element>
+	<element name="text_res">   <rect><color red="0.81" green="0.8" blue="0.79" /></rect>  <text align="1" string=" RES ">                <color red="0.8" green="0.2" blue="0.2" /></text> </element>
 
 	<element name="text_p1"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wp.svg" /><rect><color red="1" green="1" blue="1" alpha="0.03" /></rect></element>
 	<element name="text_p2"><rect><color red="1" green="1" blue="1" /></rect><image file="chess/wn.svg" /><rect><color red="1" green="1" blue="1" alpha="0.03" /></rect></element>

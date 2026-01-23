@@ -317,9 +317,14 @@ void seibucats_state::seibucats(machine_config &config)
 	screen.set_screen_update(FUNC(seibucats_state::screen_update_sys386f));
 	screen.set_raw(PIXEL_CLOCK, SPI_HTOTAL, SPI_HBEND, SPI_HBSTART, SPI_VTOTAL, SPI_VBEND, SPI_VBSTART);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seibucats);
-
 	PALETTE(config, m_palette, palette_device::BLACK, 8192);
+
+	SEI25X_RISE1X(config, m_spritegen, 0, m_palette, gfx_seibucats);
+	m_spritegen->set_screen("screen");
+	// see above
+	m_spritegen->set_pix_raw_shift(6);
+	m_spritegen->set_pri_raw_shift(14);
+	m_spritegen->set_transpen(63);
 
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();

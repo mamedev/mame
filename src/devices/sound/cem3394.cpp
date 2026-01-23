@@ -184,7 +184,7 @@ cem3394_device &cem3394_device::configure(double r_vco, double c_vco, double c_v
 	m_hpf_k = 1.0 - exp((-1 / (R_AC * c_ac)) * m_inv_sample_rate);
 
 	LOGMASKED(LOG_CONFIG, "CEM3394 config - vco zero freq: %f, filter zero freq: %f, sample rate: %d\n",
-	          m_vco_zero_freq, m_filter_zero_freq, int(sample_rate));
+			  m_vco_zero_freq, m_filter_zero_freq, int(sample_rate));
 	return *this;
 }
 
@@ -220,7 +220,12 @@ double cem3394_device::filter(double input, double cutoff)
 	double outscale = 1.0;
 	double res = m_filter_resonance;
 	if (res > 0.99)
-		res = 0.99, outscale = 0.5;
+	{
+		// Don't clamp if there is no input, to allow self-oscillation to occur.
+		if (m_wave_select)
+			res = 0.99;
+		outscale = 0.5;
+	}
 
 	// core filter implementation
 	double g = tan(M_PI * cutoff * m_inv_sample_rate);
@@ -368,9 +373,13 @@ void cem3394_device::sound_stream_update(sound_stream &stream)
 	{
 		// take into account any streaming voltage inputs
 		if (streaming_cv)
+		{
 			for (int i = 1; i < INPUT_COUNT; i++)
+			{
 				if (BIT(input_mask, i))
 					set_voltage_internal(i, stream.get(i, sampindex));
+			}
+		}
 
 		// get the current VCO position and step it forward
 		double vco_position = m_vco_position;
@@ -574,7 +583,7 @@ void cem3394_device::set_voltage_internal(int input, double voltage)
 			}
 			else if (voltage > 2.0)
 			{
-				m_pulse_width = 100;
+				m_pulse_width = 1;
 				m_wave_select &= ~WAVE_PULSE;
 			}
 			else

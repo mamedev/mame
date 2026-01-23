@@ -12,16 +12,25 @@ The sound hardware is a modified version of the 6803-based one used by the
 classic Irem games. There's only one AY 3-8910 chip and no MSM5205. There
 are also two SN76489 controlled directly by main(!) CPU, and used only for
 in-game music.
-The video hardware is pretty much like Irem games too. The only
-strange thing is that the screen is flipped vertically.
+The video hardware is pretty much like Irem games too. The only strange thing
+is that the screen is flipped vertically.
+
+The Z80 is a Z80A, not Z80B, but it's been confirmed that it runs at 6.0MHz.
+
+HSync measured 15.9946kHz
+VSync measured 56.7180Hz
 
 TODO:
 - sprite-sprite priorities are imperfect (simply reversing them won't fix it,
   motorcycle level will get much worse)
-- accurate screen timing (raw params), attract mode doesn't 1:1 match PCB
+- remove VIDEO_UPDATE_AFTER_VBLANK workaround (sprite DMA, probably)
+- Attract mode doesn't 1:1 match PCB, possibly video timing related. See BTANB
+  note which is currently not happening on MAME. Note that the Z80 and vblank
+  IRQ don't run from the same XTAL, so there's going to be slight differences
+  on real PCBs as well here due to XTAL tolerance.
 
 BTANB:
-- attract mode demo play stops playing and lets the timer run out
+- attract mode 2nd demo stops playing at 35s and lets the timer run out
 - heads of baddies clip off when you defeat them on the lowest floor
 - player sprite 1-scanline glitch at the lower part of motorcycle level
 - player sprite may briefly turn into garbage after a boss fight
@@ -136,10 +145,9 @@ void kncljoe_state::palette(palette_device &palette) const
 		int bit0, bit1, bit2;
 
 		// red component
-		bit0 = 0;
-		bit1 = BIT(color_prom[i + 0x300], 6);
-		bit2 = BIT(color_prom[i + 0x300], 7);
-		int const r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(color_prom[i + 0x300], 6);
+		bit1 = BIT(color_prom[i + 0x300], 7);
+		int const r = 0x52 * bit0 + 0xad * bit1;
 
 		// green component
 		bit0 = BIT(color_prom[i + 0x300], 3);
@@ -520,25 +528,22 @@ void kncljoe_state::machine_reset()
 void kncljoe_state::kncljoe(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, XTAL(6'000'000));  // verified on PCB
+	Z80(config, m_maincpu, 6_MHz_XTAL); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &kncljoe_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(kncljoe_state::irq0_line_hold));
 
-	M6803(config, m_soundcpu, XTAL(3'579'545)); // verified on PCB
+	M6803(config, m_soundcpu, 3.579545_MHz_XTAL); // verified on PCB
 	m_soundcpu->set_addrmap(AS_PROGRAM, &kncljoe_state::sound_map);
 	m_soundcpu->in_p1_cb().set(FUNC(kncljoe_state::m6803_port1_r));
 	m_soundcpu->out_p1_cb().set(FUNC(kncljoe_state::m6803_port1_w));
 	m_soundcpu->in_p2_cb().set(FUNC(kncljoe_state::m6803_port2_r));
 	m_soundcpu->out_p2_cb().set(FUNC(kncljoe_state::m6803_port2_w));
-	m_soundcpu->set_periodic_int(FUNC(kncljoe_state::sound_nmi), attotime::from_hz(3970)); // measured 3.970 kHz
+	m_soundcpu->set_periodic_int(FUNC(kncljoe_state::sound_nmi), attotime::from_hz(4000)); // every 4 scanlines
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(18.432_MHz_XTAL / 3, 384, 8, 248, 282, 0, 256);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1500));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(1*8, 31*8-1, 0*8, 32*8-1);
 	m_screen->set_screen_update(FUNC(kncljoe_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -550,13 +555,13 @@ void kncljoe_state::kncljoe(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	AY8910(config, m_ay8910, XTAL(3'579'545) / 4); // verified on PCB
+	AY8910(config, m_ay8910, 3.579545_MHz_XTAL / 4); // verified on PCB
 	m_ay8910->port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
 	m_ay8910->port_b_write_callback().set(FUNC(kncljoe_state::unused_w));
 	m_ay8910->add_route(ALL_OUTPUTS, "mono", 0.30);
 
-	SN76489(config, "sn1", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.30); // verified on PCB
-	SN76489(config, "sn2", XTAL(3'579'545)).add_route(ALL_OUTPUTS, "mono", 0.30); // verified on PCB
+	SN76489(config, "sn1", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.30); // verified on PCB
+	SN76489(config, "sn2", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.30); // verified on PCB
 }
 
 

@@ -160,7 +160,7 @@ private:
 
 void maclc_state::machine_start()
 {
-	m_v8->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
+	m_v8->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 
 	save_item(NAME(m_hdsel));
 }

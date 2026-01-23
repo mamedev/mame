@@ -14,6 +14,7 @@
 #include <string>
 #include <string_view>
 #include <system_error>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -32,6 +33,7 @@ enum class error : int {
 	invalid_name,
 	incorrect_size,
 	already_exists,
+	circular_reference,
 };
 
 enum class dir_entry_type {
@@ -58,9 +60,6 @@ public:
 
 		u32 size() const { return m_size; }
 
-		virtual const u8 *rodata() const = 0;
-		virtual u8 *data() = 0;
-
 		void write(u32 offset, const u8 *src, u32 size);
 		void fill(             u8 data);
 		void fill( u32 offset, u8 data, u32 size);
@@ -74,7 +73,7 @@ public:
 		void w32l( u32 offset, u32 data);
 
 		void read(u32 offset, u8 *dst, u32 size) const;
-		std::string_view rstr(u32 offset, u32 size) const;
+		std::string rstr(u32 offset, u32 size) const;
 		u8  r8(  u32 offset) const;
 		u16 r16b(u32 offset) const;
 		u32 r24b(u32 offset) const;
@@ -83,12 +82,20 @@ public:
 		u32 r24l(u32 offset) const;
 		u32 r32l(u32 offset) const;
 
+		bool eqmem(u32 offset, const u8 *src, u32 size) const;
+		bool eqstr(u32 offset, std::string_view str) const;
+
 	protected:
+		virtual void internal_write(u32 offset, const u8 *src, u32 size) = 0;
+		virtual void internal_fill(u32 offset, u8 data, u32 size) = 0;
+		virtual void internal_read(u32 offset, u8 *dst, u32 size) const = 0;
+		virtual bool internal_eqmem(u32 offset, const u8 *src, u32 size) const = 0;
+
 		u32 m_size;
 
 	private:
-		const u8 *roffs(const char *function, u32 off, u32 size) const;
-		u8 *woffs(const char *function, u32 off, u32 size);
+		void rcheck(const char *function, u32 off, u32 size) const;
+		void wcheck(const char *function, u32 off, u32 size) const;
 	};
 
 	fsblk_t() : m_block_size(0) {}
@@ -148,12 +155,15 @@ public:
 	// Replace the resource fork of a file, the file must already exist
 	virtual std::error_condition file_rsrc_write(const std::vector<std::string> &path, const std::vector<u8> &data);
 
+	// Enumerate the blocks used by a file or directory.  If path is empty, list blocks for root directory.
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path);
+
 	// Format an image, provide the volume metadata
 	virtual std::error_condition format(const meta_data &meta);
 
 	static void wstr(u8 *p, std::string_view str);
 
-	static std::string_view rstr(const u8 *p, u32 size);
+	static std::string rstr(const u8 *p, u32 size);
 
 	static std::string_view trim_end_spaces(std::string_view str);
 

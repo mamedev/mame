@@ -30,6 +30,8 @@ public:
 	pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	pc9801_26_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -38,13 +40,13 @@ protected:
 	u16 read_io_base();
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
-private:
+	virtual void io_map(address_map &map) ATTR_COLD;
+
 	required_device<ym2203_device>  m_opn;
+private:
 	required_device_array<msx_general_purpose_port_device, 2U> m_joy;
 	required_memory_region m_bios;
 	required_ioport m_irq_jp;
-
-	void io_map(address_map &map) ATTR_COLD;
 
 	u32 m_rom_base;
 	u8 m_joy_sel;

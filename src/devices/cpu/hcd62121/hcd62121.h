@@ -13,9 +13,10 @@ public:
 
 	auto kol_cb() { return m_kol_cb.bind(); }
 	auto koh_cb() { return m_koh_cb.bind(); }
-	auto port_cb() { return m_port_cb.bind(); }
+	auto port_w_cb() { return m_port_w_cb.bind(); }
 	auto opt_cb() { return m_opt_cb.bind(); }
 	auto ki_cb() { return m_ki_cb.bind(); }
+	auto port_r_cb() { return m_port_r_cb.bind(); }
 	auto in0_cb() { return m_in0_cb.bind(); }
 	auto input_flag_cb() { return m_input_flag_cb.bind(); }
 
@@ -132,9 +133,10 @@ private:
 
 	devcb_write8 m_kol_cb;
 	devcb_write8 m_koh_cb;
-	devcb_write8 m_port_cb;
+	devcb_write8 m_port_w_cb;
 	devcb_write8 m_opt_cb;
 	devcb_read8 m_ki_cb;
+	devcb_read8 m_port_r_cb;
 	devcb_read8 m_in0_cb;
 	devcb_read8 m_input_flag_cb;
 };

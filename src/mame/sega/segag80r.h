@@ -74,11 +74,6 @@ public:
 
 	uint8_t m_sound_state[2]{};
 	uint8_t m_sound_rate = 0;
-	uint16_t m_sound_addr = 0;
-	uint8_t m_sound_data = 0;
-	uint8_t m_square_state = 0;
-	uint8_t m_square_count = 0;
-	inline void sega005_update_sound_data();
 
 private:
 	required_shared_ptr<uint8_t> m_mainram;
@@ -186,32 +181,6 @@ private:
 
 	emu_timer *m_vblank_latch_clear_timer = nullptr;
 };
-
-
-/*----------- defined in segag80r_a.cpp -----------*/
-
-class sega005_sound_device : public device_t,
-									public device_sound_interface
-{
-public:
-	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	emu_timer *m_sega005_sound_timer;
-	sound_stream *m_sega005_stream;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream) override;
-
-private:
-	// internal state
-	TIMER_CALLBACK_MEMBER( sega005_auto_timer );
-};
-
-DECLARE_DEVICE_TYPE(SEGA005, sega005_sound_device)
 
 
 /*----------- defined in segag80r_v.cpp -----------*/

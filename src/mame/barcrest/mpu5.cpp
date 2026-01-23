@@ -24,19 +24,16 @@
         in the FM emu community wants to adopt this driver they're welcome to it.
 
      -- As a result of games being on multiple systems, and some of the original sets being a mess there could be one or two
-        out of position here (eg MPU4 video instead of MPU5) or with missing roms if there was extra hardware (nothing has been
-        removed from the rom loading comments, so if there were extra roms present they're still commented)
+        out of position here (eg MPU4 video instead of MPU5) or with missing ROMs if there was extra hardware (nothing has been
+        removed from the ROM loading comments, so if there were extra ROMs present they're still commented)
 
-        Some duplicate roms have been commented out for now, please don't remove these lines until the sets are properly sorted.
+        Some duplicate ROMs have been commented out for now, please don't remove these lines until the sets are properly sorted.
 
         Some games weren't even in the right zips, Eg the Red Hot Fever (MPU4) cotnained a mislabled MPU5 'Raise The Roof' set
-        with extra roms, probably actually from the MPU4 Red Hot Fever.  The game names are usually stored somewhat as plain
+        with extra ROMs, probably actually from the MPU4 Red Hot Fever.  The game names are usually stored somewhat as plain
         ASCII so spotting such problems is easy enough.
 
-        In general things have been added here if the rom structure and initial code looks like the MPU5 boot code
-
-
-    15/07/11 - rom loading for most games added, still some missing tho and clones still need sorting out properly.
+        In general things have been added here if the ROM structure and initial code looks like the MPU5 boot code
 */
 
 /* BARCREST MPU5 XP53922-v1
@@ -426,9 +423,9 @@ INPUT_PORTS_END
 void mpu5_state::machine_start()
 {
 	m_statuslamp.resolve();
-	m_cpuregion = (uint16_t*)memregion( "maincpu" )->base();
-	m_mainram = make_unique_clear<uint16_t[]>(0x20000);
-	m_pic_output_bit =0;
+	m_cpuregion = &memregion("maincpu")->as_u16();
+	m_mainram = make_unique_clear<uint16_t []>(0x20000);
+	m_pic_output_bit = 0;
 }
 
 

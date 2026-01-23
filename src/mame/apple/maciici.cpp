@@ -184,9 +184,9 @@ private:
 
 void maciici_state::machine_start()
 {
-	m_rbv->set_ram_info((u32 *)m_ram->pointer(), m_ram->size());
+	m_rbv->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 
-	m_rom_ptr = (u32 *)memregion("bootrom")->base();
+	m_rom_ptr = &memregion("bootrom")->as_u32();
 	m_rom_size = memregion("bootrom")->bytes();
 
 	m_last_taken_interrupt = -1;
@@ -194,7 +194,7 @@ void maciici_state::machine_start()
 
 void maciici_state::machine_reset()
 {
-	// main cpu shouldn't start until Egret wakes it up
+	// main CPU shouldn't start until Egret wakes it up
 	if (m_egret)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);

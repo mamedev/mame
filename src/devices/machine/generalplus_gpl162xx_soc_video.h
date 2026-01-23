@@ -12,19 +12,34 @@
 #pragma once
 
 #include "gpl_renderer.h"
+
 #include "cpu/unsp/unsp.h"
-#include "screen.h"
+
 #include "emupal.h"
+#include "screen.h"
+
 
 class gcm394_base_video_device : public device_t, public device_video_interface
 {
 public:
 	gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
+	auto write_video_irq_callback() { return m_video_irq_cb.bind(); }
+	auto space_read_callback() { return m_space_read_cb.bind(); }
+	template <typename T> void set_video_space(T &&tag, int no)
+	{
+		m_cpuspace.set_tag(tag, no);
+		m_renderer.lookup()->set_video_space(tag, no);
+	}
+	template <typename T> void set_cs_video_space(T &&tag, int no, uint32_t csbase)
+	{
+		m_cs_space.set_tag(tag, no);
+		m_csbase = csbase;
+		m_renderer.lookup()->set_cs_video_space(tag, no, csbase);
+	}
+
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank(int state);
-
-	auto space_read_callback() { return m_space_read_cb.bind(); }
 
 	void write_tmap_scroll(int tmap, uint16_t* regs, int offset, uint16_t data);
 	void write_tmap_extrascroll(int tmap, uint16_t* regs, int offset, uint16_t data);
@@ -34,8 +49,6 @@ public:
 	//void set_paldisplaybank_high(int pal_displaybank_high) { m_pal_displaybank_high = pal_displaybank_high; }
 	void set_legacy_video_mode() { m_use_legacy_mode = true; }
 	void set_disallow_resolution_control() { m_disallow_resolution_control = true; }
-
-	void set_video_spaces(address_space& cpuspace, address_space& cs_space, int csbase) { m_cpuspace = &cpuspace; m_cs_space = &cs_space; m_csbase = csbase; }
 
 	//void set_pal_sprites(int pal_sprites) { m_pal_sprites = pal_sprites; }
 	//void set_pal_back(int pal_back) { m_pal_back = pal_back; }
@@ -133,22 +146,35 @@ public:
 	uint16_t video_7051_r();
 	uint16_t video_70e0_prng_r();
 
-	auto write_video_irq_callback() { return m_video_irq_cb.bind(); }
-
-	virtual void device_add_mconfig(machine_config& config) override;
-
 protected:
+	virtual void device_add_mconfig(machine_config& config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(screen_pos_reached);
 
 	inline void check_video_irq();
 
+	void unk_vid_regs_w(int which, int offset, uint16_t data);
 
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+	void decodegfx(const char* tag);
+
+	required_shared_ptr<uint16_t> m_rowscroll;
+	required_shared_ptr<uint16_t> m_rowzoom;
 
 	required_device<unsp_device> m_cpu;
 	required_device<screen_device> m_screen;
+
+	required_device<gpl_renderer_device> m_renderer;
+	required_device<palette_device> m_palette;
+	required_device<gfxdecode_device> m_gfxdecode;
+	devcb_read16 m_space_read_cb;
+
+	devcb_write_line m_video_irq_cb;
+
+	required_address_space m_cpuspace;
+	optional_address_space m_cs_space;
+	int m_csbase;
 
 	uint16_t m_page0_addr_lsb;
 	uint16_t m_page0_addr_msb;
@@ -160,8 +186,6 @@ protected:
 	uint16_t m_videodma_size;
 	uint16_t m_videodma_dest;
 	uint16_t m_videodma_source;
-
-	devcb_write_line m_video_irq_cb;
 
 
 	// video 70xx
@@ -209,34 +233,18 @@ protected:
 	uint16_t m_page3_addr_lsb;
 	uint16_t m_page3_addr_msb;
 
-	void unk_vid_regs_w(int which, int offset, uint16_t data);
-
 	emu_timer *m_screenpos_timer;
 
 	uint16_t m_spriteram[0x400*2];
 	uint16_t m_paletteram[0x100*0x10];
 
-	required_device<palette_device> m_palette;
-	required_device<gfxdecode_device> m_gfxdecode;
-	devcb_read16 m_space_read_cb;
-
-	required_shared_ptr<uint16_t> m_rowscroll;
-	required_shared_ptr<uint16_t> m_rowzoom;
-
 	int m_maxgfxelement;
-	void decodegfx(const char* tag);
 
 	//int m_pal_displaybank_high;
 	//int m_pal_sprites;
 	//int m_pal_back;
 	bool m_use_legacy_mode; // could be related to the 'unused' bits in the palete bank select being set, but uncertain
 	bool m_disallow_resolution_control;
-
-	required_device<gpl_renderer_device> m_renderer;
-
-	address_space* m_cpuspace;
-	address_space* m_cs_space;
-	int m_csbase;
 };
 
 class gcm394_video_device : public gcm394_base_video_device

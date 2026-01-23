@@ -142,7 +142,7 @@ void isgsm_state::data_w(uint16_t data)
 		case 0x0: dest = memregion("sprites")->base();
 			break;
 
-		case 0x1: dest = memregion("gfx1")->base();
+		case 0x1: dest = memregion("tiles")->base();
 			break;
 
 		case 0x2: dest = memregion("soundcpu")->base();
@@ -238,7 +238,7 @@ void isgsm_state::data_w(uint16_t data)
 
 			dest[m_data_addr] = byte;
 
-			if (dest == memregion("gfx1")->base())
+			if (dest == memregion("tiles")->base())
 			{
 				// we need to re-decode the tiles if writing to this area to keep MAME happy
 				m_gfxdecode->gfx(0)->mark_dirty((m_data_addr & 0x1ffff) / 8);
@@ -578,7 +578,7 @@ void isgsm_state::init_tetrbx()
 	ROM_REGION16_BE( 0x100000, "bios", 0 ) \
 	ROM_LOAD16_WORD_SWAP("ism2006v00.u1",0x00000,0x20000, CRC(2292585c) SHA1(97ba0e0f0be832a5114d95151e519bc027f6675b) ) \
 	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 ) \
-	ROM_REGION( 0x60000, "gfx1", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x60000, "tiles", ROMREGION_ERASE00 ) \
 	ROM_REGION16_BE( 0x200000, "sprites", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0x40000, "soundcpu", ROMREGION_ERASE00 )
 

@@ -7,9 +7,9 @@
 
     note:
      this file contains the originals only
-     for bootlegs see multfish_boot.c
-     for reference information about undumped sets see multfish_Ref.c - if adding a new set ALWAYS check that, anything not listed in there is
-                                                                        almost certainly a bootleg.
+     for bootlegs see multfish_boot.cpp
+     for reference information about undumped sets see at the end of the file
+     - if adding a new set ALWAYS check that, anything not listed in there is almost certainly a bootleg.
 
 */
 

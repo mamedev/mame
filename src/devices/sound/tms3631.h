@@ -32,8 +32,8 @@ private:
 	sound_stream *m_stream;
 	int m_samplerate;
 	int m_basefreq;
-//	int m_counter8[8];
-//	int m_output8;
+//  int m_counter8[8];
+//  int m_output8;
 	int m_enable;
 	int m_wclk, m_ce;
 	u8 m_channel_select;

@@ -195,7 +195,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lifea" cloneof="life">
-		<description>LIFE (Alt)</description>
+		<description>LIFE (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass" interface="mikrosha_cass">

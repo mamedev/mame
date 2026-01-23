@@ -85,6 +85,7 @@ protected:
 	virtual void write_word(uint32_t addr, uint16_t data) override;
 
 	static const uint8_t m_i80186_timing[200];
+	static const uint8_t m_i80186_ea_timing[200];
 
 private:
 	void update_interrupt_state();

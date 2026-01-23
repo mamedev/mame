@@ -11,7 +11,9 @@ DEFINE_DEVICE_TYPE(GPL_RENDERER, gpl_renderer_device, "gpl_renderer", "GeneralPl
 
 gpl_renderer_device::gpl_renderer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-	m_space_read_cb(*this, 0)
+	m_space_read_cb(*this, 0),
+	m_cpuspace(*this, finder_base::DUMMY_TAG, -1),
+	m_cs_space(*this, finder_base::DUMMY_TAG, -1)
 {
 }
 
@@ -22,6 +24,9 @@ gpl_renderer_device::gpl_renderer_device(const machine_config &mconfig, const ch
 
 void gpl_renderer_device::device_start()
 {
+	m_rgb555_to_rgb888 = std::make_unique<uint32_t []>(0x8000);
+	m_rgb555_to_rgb888_current = std::make_unique<uint32_t []>(0x8000);
+
 	for (uint8_t i = 0; i < 32; i++)
 	{
 		m_rgb5_to_rgb8[i] = (i << 3) | (i >> 2);
@@ -48,7 +53,7 @@ void gpl_renderer_device::device_start()
 
 	save_item(NAME(m_ycmp_table));
 
-	save_item(NAME(m_rgb555_to_rgb888_current));
+	save_pointer(NAME(m_rgb555_to_rgb888_current), 0x8000);
 	save_item(NAME(m_brightness_or_saturation_dirty));
 
 	// new GPL features

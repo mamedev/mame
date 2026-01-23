@@ -12,6 +12,7 @@
 #include "machine/i8251.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
+#include "machine/timer.h"
 
 class device_v5x_interface : public device_interface
 {
@@ -39,7 +40,7 @@ public:
 	void rxd_w(int state) { m_scu->write_rxd(state); }
 
 protected:
-	device_v5x_interface(const machine_config &mconfig, nec_common_device &device, bool is_16bit);
+	device_v5x_interface(const machine_config &mconfig, nec_common_device &device, u32 clock, bool is_16bit);
 
 	// device_interface overrides
 	virtual void interface_post_start() override;
@@ -75,7 +76,7 @@ protected:
 
 	void BSEL_w(u8 data) {}
 	void BADR_w(u8 data) {}
-	void BRC_w(u8 data) {}
+	void BRC_w(u8 data);
 	void WMB0_w(u8 data) {}
 	void WCY1_w(u8 data) {}
 	void WCY0_w(u8 data) {}
@@ -104,6 +105,9 @@ protected:
 	void internal_irq_w(int state);
 
 	void tcu_clock_update();
+	void brc_update();
+
+	TIMER_DEVICE_CALLBACK_MEMBER(brc_timer_tick);
 
 	virtual void sint_w(int state) = 0;
 
@@ -111,6 +115,7 @@ protected:
 	required_device<v5x_dmau_device> m_dmau;
 	required_device<v5x_icu_device> m_icu;
 	required_device<v5x_scu_device> m_scu;
+	required_device<timer_device> m_brc_timer;
 
 	address_space_config m_internal_io_config;
 	address_space *m_internal_io;
@@ -133,6 +138,9 @@ protected:
 	u8 m_DULA;
 	u8 m_OPHA;
 	u8 m_TCKS;
+	u8 m_BRC;
+
+	bool m_brc_enable;
 };
 
 class v50_base_device : public nec_common_device, public device_v5x_interface

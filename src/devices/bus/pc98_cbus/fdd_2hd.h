@@ -15,7 +15,7 @@
 // ======================> mpu_pc98_device
 
 class fdd_2hd_bridge_device : public device_t
-                            , public device_pc98_cbus_slot_interface
+							, public device_pc98_cbus_slot_interface
 {
 public:
 	// construction/destruction

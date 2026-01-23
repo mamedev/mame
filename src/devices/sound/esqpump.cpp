@@ -2,10 +2,10 @@
 // copyright-holders:Christian Brunschen
 /***************************************************************************
 
-  esqpump.cpp - Ensoniq 5505/5506 to 5510 interface.
+  Ensoniq 5505/5506 to 5510 interface.
 
-    Modeled specifically after the routing of and for use with
-    the VFX family of keyboards.
+  Modeled specifically after the routing of and for use with
+  the VFX family of keyboards.
 
   By Christian Brunschen
 

@@ -18,7 +18,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="amcalla" cloneof="amcall">
-		<description>AMCALL (v2.06, Alt)</description>
+		<description>AMCALL (v2.06, alt)</description>
 		<year>1982</year>
 		<publisher>MicroCALL Services</publisher>
 		<info name="usage" value="Requires CP/M disk in drive A"/>
@@ -103,7 +103,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sysconfa" cloneof="sysconf">
-		<description>Osborne-1 System Confidence Test (v2.04, Alt)</description>
+		<description>Osborne-1 System Confidence Test (v2.04, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Requires CP/M disk in drive A"/>
@@ -184,7 +184,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cpm22a" cloneof="cpm22">
-		<description>60k CP/M v2.2 (Alt)</description>
+		<description>60k CP/M v2.2 (alt)</description>
 		<year>1981</year>
 		<publisher>Digital Research</publisher>
 		<part name="flop1" interface="floppy_5_25">

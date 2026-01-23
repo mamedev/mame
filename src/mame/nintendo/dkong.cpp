@@ -919,7 +919,31 @@ void dkong_state::spclforc_data_map(address_map &map)
 	map(S2650_DATA_PORT, S2650_DATA_PORT).w("snsnd", FUNC(sn76496_device::write));
 }
 
+void jammin_state::jammin_map(address_map &map)
+{
+	map(0x0000, 0x3fff).rom();
 
+	map(0x4000, 0x4001).ram().rw(m_ym2151, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
+
+	map(0x5000, 0x50ff).ram(); // might be open bus for 'random' reads based on source?
+
+	map(0x6000, 0x6bff).ram();
+	map(0x7000, 0x73ff).ram().share("sprite_ram"); /* sprite set 1 */
+	map(0x7400, 0x77ff).ram().w(FUNC(jammin_state::dkong_videoram_w)).share("video_ram");
+	map(0x7800, 0x780f).rw(m_dma8257, FUNC(i8257_device::read), FUNC(i8257_device::write));   /* P8257 control registers */
+	map(0x7c00, 0x7c00).portr("IN0");
+	map(0x7c80, 0x7c80).portr("IN1");
+	map(0x7d07, 0x7d07).portr("IN2");
+	map(0x7d80, 0x7d80).portr("DSW0");
+
+	map(0x7d82, 0x7d82).w(FUNC(jammin_state::dkong_flipscreen_w));
+	map(0x7d83, 0x7d83).w(FUNC(jammin_state::dkong_spritebank_w));                       /* 2 PSL Signal */
+	map(0x7d84, 0x7d84).w(FUNC(jammin_state::nmi_mask_w));
+	map(0x7d85, 0x7d85).w(FUNC(jammin_state::p8257_drq_w));          /* P8257 ==> /DRQ0 /DRQ1 */
+	map(0x7d86, 0x7d87).w(FUNC(jammin_state::dkong_palettebank_w));
+
+	map(0x8000, 0xbfff).rom();
+}
 
 /*************************************
  *
@@ -1589,6 +1613,59 @@ static INPUT_PORTS_START( strtheat )
 	PORT_INCLUDE( dkong_config )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( jammin )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Drum 4 - Hit 2 / Start 2")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Drum 3 - Hit 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Drum 2 - Hit 2")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Drum 1 - Hit 2")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Center Drum Hit / Menu Select")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Drum 4 - Hit 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Drum 3 - Hit 1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Drum 2 - Hit 1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Drum 1 - Hit 1 / Start 1")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 /*************************************
  *
  *  Graphics definitions
@@ -1611,6 +1688,22 @@ static GFXDECODE_START( gfx_dkong )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,       0, 64 )
 GFXDECODE_END
 
+static const gfx_layout tile_gfx2_alt =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60 },
+	{ 0*64,1*64,2*64,3*64,4*64,5*64,6*64,7*64,8*64,9*64,10*64,11*64,12*64,13*64,14*64,15*64 },
+	16*64
+};
+
+static GFXDECODE_START( gfx_jammin )
+	GFXDECODE_ENTRY( "gfx1", 0x0000, gfx_8x8x2_planar,   0, 64 )
+	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout,       0, 64 )
+	GFXDECODE_ENTRY( "gfx2_alt", 0, tile_gfx2_alt, 0, 16 )
+GFXDECODE_END
 
 /*************************************
  *
@@ -1705,6 +1798,22 @@ void dkong_state::dkong_base(machine_config &config)
 	PALETTE(config, m_palette, FUNC(dkong_state::dkong2b_palette), DK2B_PALETTE_LENGTH);
 
 	MCFG_VIDEO_START_OVERRIDE(dkong_state,dkong)
+}
+
+void jammin_state::jammin(machine_config &config)
+{
+	dkong_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &jammin_state::jammin_map);
+
+	GFXDECODE(config.replace(), m_gfxdecode, m_palette, gfx_jammin);
+
+	// sound hardware
+	SPEAKER(config, "speaker", 2).front();
+
+	YM2151(config, m_ym2151, CLOCK_1H); // matches video reference
+	m_ym2151->add_route(0, "speaker", 0.60, 0);
+	m_ym2151->add_route(1, "speaker", 0.60, 1);
 }
 
 void dkong_state::radarscp(machine_config &config)
@@ -3563,6 +3672,44 @@ ROM_START( shootgal )
 	ROM_LOAD( "82s147.prm",  0x0000, 0x0200, BAD_DUMP CRC(46e5bc92) SHA1(f4171f8650818c017d58ad7131a7aff100b1b99c) )    /* no dump - taken from hunchbkd */
 ROM_END
 
+
+ROM_START( jammin )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	// ROM was assembled from source, split into 0x4000 chunks as that's realistic for a DK type board / sub-board
+	ROM_LOAD( "jammin_0000.bin", 0x0000, 0x4000, CRC(71742497) SHA1(cd535759466de2236607942f0adaffb72b774e00) )
+	// the bytes for a table at 9b6c-9b87 were missing and have been reconstructed based on video reference
+	// but may not be accurate, they're used for 2 background tilemap columns on one stage
+	ROM_LOAD( "jammin_8000.bin", 0x8000, 0x4000, BAD_DUMP CRC(0a11442c) SHA1(84f1033f26cc1bb36d49b4da7a62d58f0ef04adf) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "jambak.pl0", 0x0000, 0x0800, CRC(af808d29) SHA1(cad060ee4e529f9a2ffa9675682b9e17bed4dffe) )
+	ROM_LOAD( "jambak.pl1", 0x0800, 0x0800, CRC(43eaccef) SHA1(37e032b60c0bbaea81b55b4d137cb2d9d047e521) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "jammin.7c", 0x0000, 0x0800, CRC(82361b24) SHA1(ed070586296c329cb88e3dfc4741d591ec59fb8d) )
+	ROM_LOAD( "jammin.7d", 0x0800, 0x0800, CRC(0f02eb55) SHA1(b97ee07dbd71bdc698ac775a721f220afd6bb7cc) )
+	ROM_LOAD( "jammin.7e", 0x1000, 0x0800, CRC(9563c301) SHA1(3947af64f3becf36afaacdb8c962bfccc236525d) )
+	ROM_LOAD( "jammin.7f", 0x1800, 0x0800, CRC(26c7f3b8) SHA1(a0a13ce692bcf40104099a4d9bb2c36aca885350) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "mac2e.bin", 0x000, 0x0100, CRC(65f57bc6) SHA1(8645c8291c7479ed093d64d3f9b19240d5cf8b4e) ) /* palette low 4 bits (inverted) */
+	ROM_LOAD( "mac2f.bin", 0x100, 0x0100, CRC(938955e5) SHA1(96accf365326e499898fb4d937d716df5792fade) ) /* palette high 4 bits (inverted) */
+	ROM_LOAD( "mac2n.bin", 0x200, 0x0100, CRC(e8198448) SHA1(20fc8da7858daa56be758148e5e80f5de30533f9) ) /* character color codes on a per-column basis */
+
+	// 4bpp version of the sprite graphics, all planes are unique compared to the 2bpp version
+	// did this get used?
+	ROM_REGION( 0x4000, "gfx2_alt", 0 ) // 4bpp of sprite data
+	ROM_LOAD16_WORD_SWAP( "jammin.int", 0x00000, 0x4000, CRC(0f9022de) SHA1(40f33dd7fcdc310c0eb93c3072b24f290247e974) )
+
+	// a 2nd set of lookup tables + proms
+	// what are they for?
+	ROM_REGION( 0x300, "proms_alt", 0 )
+	ROM_LOAD( "col2e.bin", 0x000, 0x0100, CRC(d22fd797) SHA1(a21be0d280eb376dc600b28a15ece0f9d1cb6d42) )
+	ROM_LOAD( "col2f.bin", 0x100, 0x0100, CRC(bf115ba7) SHA1(ecd12079c23ed73eed2056cad2c23e6bb19d803e) )
+	ROM_LOAD( "col2n.bin", 0x200, 0x0100, CRC(c5ded6e3) SHA1(21d172952f5befafec6fa93be5023f1df0eceb7d) )
+ROM_END
+
+
 /*************************************
  *
  *  Decryption code
@@ -3810,3 +3957,6 @@ GAME( 1984, drakton,   0,        drakton,   drakton,  dkong_state, init_drakton,
 GAME( 1984, drktnjr,   drakton,  drktnjr,   drakton,  dkong_state, init_drakton,  ROT270, "Epos Corporation", "Drakton (DKJr conversion)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1985, strtheat,  0,        strtheat,  strtheat, dkong_state, init_strtheat, ROT270, "Epos Corporation", "Street Heat (set 1, newer?)", MACHINE_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)
 GAME( 1985, strtheata, strtheat, strtheat,  strtheat, dkong_state, init_strtheat, ROT270, "Epos Corporation", "Street Heat (set 2, older?)", MACHINE_SUPPORTS_SAVE ) // distributed by Cardinal Amusements Products (a division of Epos Corporation)
+
+/* Atari */
+GAME( 1985, jammin,  0,    jammin, jammin,  jammin_state, empty_init, ROT270, "Atari Games", "Jammin' (prototype)", MACHINE_SUPPORTS_SAVE )

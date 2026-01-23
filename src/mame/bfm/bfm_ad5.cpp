@@ -167,7 +167,7 @@ void adder5_state::ad5_map(address_map &map)
 	map(0x80000000, 0x8000ffff).ram();
 	map(0x80800000, 0x8080ffff).ram();
 
-//	map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
+//  map(0xffff0000, 0xffff03ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::dev_r), FUNC(mcf5206e_peripheral_device::dev_w)); // technically this can be moved with MBAR
 }
 
 INPUT_PORTS_START( bfm_ad5 )

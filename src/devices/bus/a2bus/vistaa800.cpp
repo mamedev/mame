@@ -80,10 +80,7 @@ private:
 	void fdc_drq_w(uint8_t state);
 
 	required_device<fd1797_device> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 	required_region_ptr<uint8_t> m_rom;
 
 	uint16_t m_dmaaddr;
@@ -114,10 +111,7 @@ a2bus_vistaa800_device::a2bus_vistaa800_device(machine_config const &mconfig, co
 	device_t(mconfig, A2BUS_VISTAA800, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
 	m_fdc(*this, "fdc"),
-	m_floppy0(*this, "fdc:0"),
-	m_floppy1(*this, "fdc:1"),
-	m_floppy2(*this, "fdc:2"),
-	m_floppy3(*this, "fdc:3"),
+	m_floppy(*this, "fdc:%u", 0U),
 	m_rom(*this, "vistaa800_rom")
 {
 }
@@ -133,11 +127,9 @@ const tiny_rom_entry *a2bus_vistaa800_device::device_rom_region() const
 
 void a2bus_vistaa800_device::device_add_mconfig(machine_config &config)
 {
-	FD1797(config, m_fdc, 2'000'000);
-	FLOPPY_CONNECTOR(config, m_floppy0, vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy1, vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy2, vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy3, vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FD1797(config, m_fdc, 4_MHz_XTAL / 2);
+	for (auto &floppy : m_floppy)
+		FLOPPY_CONNECTOR(config, floppy, vistaa800_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	m_fdc->intrq_wr_callback().set(FUNC(a2bus_vistaa800_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(a2bus_vistaa800_device::fdc_drq_w));
@@ -270,10 +262,9 @@ void a2bus_vistaa800_device::write_c0nx(uint8_t offset, uint8_t data)
 
 			m_side = BIT(data, 6);
 
-			if (BIT(data, 0)) floppy = m_floppy0->get_device();
-			if (BIT(data, 1)) floppy = m_floppy1->get_device();
-			if (BIT(data, 2)) floppy = m_floppy2->get_device();
-			if (BIT(data, 3)) floppy = m_floppy3->get_device();
+			for (int i = 0; i < 4; i++)
+				if (BIT(data, i))
+					floppy = m_floppy[i]->get_device();
 			m_fdc->set_floppy(floppy);
 
 			if (floppy)

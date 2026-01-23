@@ -21,9 +21,9 @@ authors:hap
 	<view name="Internal Layout">
 		<bounds left="-26" right="37" top="-3" bottom="51" />
 
-		<element ref="text_l1"><bounds x="-30" y="3.5" width="27" height="6" /></element>
-		<element ref="text_l2"><bounds x="-30" y="20.5" width="27" height="6" /></element>
-		<element ref="text_l3"><bounds x="-30" y="37.5" width="27" height="6" /></element>
+		<element ref="text_l1"><bounds x="-26" y="3.5" width="23" height="6" /></element>
+		<element ref="text_l2"><bounds x="-26" y="20.5" width="23" height="6" /></element>
+		<element ref="text_l3"><bounds x="-26" y="37.5" width="23" height="6" /></element>
 
 		<element name="digit7" ref="digit"><bounds x="0" y="0" width="10" height="14" /></element>
 		<element name="digit6" ref="digit"><bounds x="12" y="0" width="10" height="14" /></element>

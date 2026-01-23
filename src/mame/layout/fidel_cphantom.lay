@@ -464,7 +464,7 @@ authors:Sandro Ronco, hap
 	<element name="text_s4"><text string="AUTO"><color red="0.0" green="0.4" blue="0.1" /></text></element>
 	<element name="text_s5"><text string="REPEAT"><color red="0.0" green="0.4" blue="0.1" /></text></element>
 	<element name="text_s6"><text string="YES"><color red="0.0" green="0.4" blue="0.1" /></text></element>
-	<element name="text_s7"><text string="NO/STOP"><color red="0.0" green="0.4" blue="0.1" /></text></element>
+	<element name="text_s7"><text string=" NO/STOP "><color red="0.0" green="0.4" blue="0.1" /></text></element>
 	<element name="text_s8"><text string="CLEAR"><color red="0.0" green="0.4" blue="0.1" /></text></element>
 
 	<group name="panel">

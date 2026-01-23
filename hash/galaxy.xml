@@ -40,7 +40,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="biorita2">
-		<description>Bioritam (Alt)</description>
+		<description>Bioritam (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
@@ -106,7 +106,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dijamanta" cloneof="dijamant">
-		<description>Dijamantski Rudnik (Alt Format)</description>
+		<description>Dijamantski Rudnik (alt format)</description>
 		<year>1985</year>
 		<publisher>Nenad Balint</publisher>
 		<part name="cass1" interface="galaxy_cass">
@@ -237,7 +237,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="lightcy2">
-		<description>Light Cycles (Alt)</description>
+		<description>Light Cycles (alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
@@ -468,7 +468,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="squasha" cloneof="squash">
-		<description>Squash (Alt Format)</description>
+		<description>Squash (alt format)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">
@@ -490,7 +490,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="scruisera" cloneof="scruiser">
-		<description>Super Cruiser (Alt Format)</description>
+		<description>Super Cruiser (alt format)</description>
 		<year>1985</year>
 		<publisher>Jasmin Halilovic</publisher>
 		<part name="cass1" interface="galaxy_cass">
@@ -578,7 +578,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tetrisa" cloneof="tetris">
-		<description>Tetris (Alt Format)</description>
+		<description>Tetris (alt format)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="galaxy_cass">

@@ -24,27 +24,25 @@ public:
 	{
 	}
 
-	void init_fif();
+	void generalplus_gpspi_direct(machine_config &config) ATTR_COLD;
 
-	void generalplus_gpspi_direct(machine_config &config);
+	void init_fif() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	virtual uint16_t cs0_r(offs_t offset) override;
-
-private:
 };
 
 void generalplus_gpspi_direct_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
 }
 
 void generalplus_gpspi_direct_game_state::machine_reset()
 {
 	cs_callback(0x00, 0x00, 0x00, 0x00, 0x00);
-	m_maincpu->set_cs_space(m_memory->get_program());
 
 	m_maincpu->reset(); // reset CPU so vector gets read etc.
 }
@@ -108,6 +106,8 @@ uint16_t generalplus_gpspi_direct_game_state::cs0_r(offs_t offset)
 
 void generalplus_gpspi_direct_game_state::generalplus_gpspi_direct(machine_config &config)
 {
+	set_addrmap(0, &generalplus_gpspi_direct_game_state::cs_map_base);
+
 	GPL951XX(config, m_maincpu, 96000000/2, m_screen);
 	m_maincpu->porta_in().set(FUNC(generalplus_gpspi_direct_game_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(generalplus_gpspi_direct_game_state::portb_r));
@@ -120,8 +120,7 @@ void generalplus_gpspi_direct_game_state::generalplus_gpspi_direct(machine_confi
 	m_maincpu->add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
 	m_maincpu->set_bootmode(0);
 	m_maincpu->set_cs_config_callback(FUNC(gcm394_game_state::cs_callback));
-
-	FULL_MEMORY(config, m_memory).set_map(&generalplus_gpspi_direct_game_state::cs_map_base);
+	m_maincpu->set_cs_space(DEVICE_SELF, 0);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	//m_screen->set_refresh_hz(20); // 20hz update gives more correct speed (and working inputs) in fixitflx and bfdigdug, but speed should probably be limited in some other way

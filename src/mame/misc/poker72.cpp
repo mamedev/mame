@@ -23,7 +23,7 @@ TODO:
 - Demo Sound enabled doesn't produce any sound (?)
 
 Notes:
-- On first boot it will moan about uninitailized RAM, enable service mode then
+- On first boot it will moan about uninitialized RAM, enable service mode then
   press all five hold buttons at same time
   (game is fussy on being exactly pressed together)
 

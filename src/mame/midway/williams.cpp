@@ -3569,6 +3569,7 @@ ROM_START( spdball )
 ROM_END
 
 
+// contains only material developed by Duncan Brown (no sound CPU program)
 ROM_START( alienar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "aarom01",   0x00000, 0x1000, CRC(bb0c21be) SHA1(dbf122870adaa49cd99e2c1e9fa4b78fb74ef2c1) )
@@ -3588,6 +3589,7 @@ ROM_START( alienar )
 ROM_END
 
 
+// uses the original Williams Stargate sound CPU program
 ROM_START( alienaru )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "aarom01",   0x00000, 0x1000, CRC(bb0c21be) SHA1(dbf122870adaa49cd99e2c1e9fa4b78fb74ef2c1) )
@@ -3994,7 +3996,7 @@ GAME( 1983, blasterkit, blaster,  blastkit,         blastkit, blaster_state,   e
 GAME( 1985, spdball,    0,        spdball,          spdball,  williams_state,  empty_init,    ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1985, alienar,    0,        alienar,          alienar,  williams_state,  empty_init,    ROT0,   "Duncan Brown", "Alien Arena",                    MACHINE_SUPPORTS_SAVE )
-GAME( 1985, alienaru,   alienar,  alienar,          alienar,  williams_state,  empty_init,    ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, alienaru,   alienar,  alienar,          alienar,  williams_state,  empty_init,    ROT0,   "Duncan Brown", "Alien Arena (with Stargate sound)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, lottofun,   0,        lottofun,         lottofun, williams_state,  empty_init,    ROT0,   "HAR Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
 

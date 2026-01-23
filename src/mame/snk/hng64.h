@@ -128,7 +128,7 @@ public:
 
 	template <unsigned N> auto lamps_out_cb() { return m_lamps_out_cb[N].bind(); }
 
-	void lamps_w(offs_t offset, u8 data) { m_lamps_out_cb[offset](data); }
+	void lamps_w(offs_t offset, u8 data);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -181,7 +181,9 @@ public:
 		m_in(*this, "IN%u", 0U),
 		m_samsho64_3d_hack(0),
 		m_roadedge_3d_hack(0),
-		m_vertsrom(*this, "verts")
+		m_vertsrom(*this, "verts"),
+		m_wheel_motor(*this, "wheel_motor"),
+		m_lamps_out(*this, "lamp%u", 0U)
 	{
 	}
 
@@ -346,6 +348,9 @@ private:
 
 	required_region_ptr<u16> m_vertsrom;
 	std::vector<polygon> m_polys;  // HNG64_MAX_POLYGONS
+
+	output_finder<> m_wheel_motor;
+	output_finder<8> m_lamps_out;
 
 	u16 main_latch[2]{};
 	u16 sound_latch[2]{};
@@ -541,6 +546,7 @@ private:
 	void sound_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void dsp_map(address_map &map) ATTR_COLD;
+	void dsp_ram_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SNK_HNG64_H

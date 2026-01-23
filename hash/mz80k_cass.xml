@@ -5,7 +5,7 @@
 As with other Sharp MZ series machines, there is no built in BASIC so this needs to be loaded from cassette before any
 BASIC programs can be run.
 
-Machine code programs (including BASIC interpreters) can be loaded directly from the monitor, using LOAD 
+Machine code programs (including BASIC interpreters) can be loaded directly from the monitor, using LOAD
 (or L on the MZ-80A) then RETURN.
 
 For BASIC programs, once BASIC loads, insert the programme cassette and type LOAD then RETURN.

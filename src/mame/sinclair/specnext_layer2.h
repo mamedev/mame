@@ -49,7 +49,7 @@ protected:
 private:
 	void draw_256(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode, u8 priority_mask, u8 mixer);
 	void draw_16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode, u8 priority_mask, u8 mixer);
-	static rgb_t blend(u32 &target, const rgb_t pen, u8 mixer);
+	void blend(u8 &prio, u32 &target, const rgb_t pen, bool is_transparent, bool is_prio_color, u8 pcode, u8 priority_mask, u8 mixer);
 
 	u16 m_offset_h, m_offset_v;
 	const u8 *m_host_ram_ptr;

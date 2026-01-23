@@ -64,7 +64,7 @@ void tama_id_state::tamaid(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(128, 128); 
+	m_screen->set_size(128, 128);
 	m_screen->set_visarea(0, 128 - 1, 0, 128 - 1);
 	m_screen->set_screen_update(FUNC(tama_id_state::screen_update));
 

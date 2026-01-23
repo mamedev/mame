@@ -26,7 +26,7 @@ void dsp56362_device::device_start()
 
 u32 dsp56362_device::get_reset_vector() const
 {
-	return m_omr == 0 ? 0xc00000 : m_omr == 8 ? 0x008000 : 0xff0000;
+	return (m_omr & 15) == 0 ? 0xc00000 : (m_omr & 15) == 8 ? 0x008000 : 0xff0000;
 }
 
 void dsp56362_device::device_reset()

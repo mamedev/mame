@@ -136,7 +136,7 @@ class n64_rdp : public poly_manager<uint32_t, rdp_poly_state, 8>
 public:
 	n64_rdp(n64_state &state, uint32_t* rdram, uint32_t* dmem);
 
-	running_machine &machine() const { assert(m_machine != nullptr); return *m_machine; }
+	running_machine &machine() const { return m_machine; }
 
 	void init_internal_state()
 	{
@@ -161,13 +161,14 @@ public:
 			m_tiles[i].invmm = rgbaint_t(~0, ~0, ~0, ~0);
 			m_tiles[i].invmask = rgbaint_t(~0, ~0, ~0, ~0);
 		}
+
+		m_tex_pipe.init_internal_state();
 	}
 
 	void        process_command_list();
 	uint64_t    read_data(uint32_t address);
 	std::string disassemble(const uint64_t *cmd_buf);
 
-	void        set_machine(running_machine& machine) { m_machine = &machine; }
 	void        set_n64_periphs(n64_periphs* periphs) { m_n64_periphs = periphs; }
 
 	// CPU-visible registers
@@ -265,7 +266,7 @@ public:
 	uint16_t decompress_cvmask_frombyte(uint8_t x);
 	void lookup_cvmask_derivatives(uint32_t mask, uint8_t* offx, uint8_t* offy, rdp_span_aux* userdata);
 
-	void        mark_frame() { m_capture.mark_frame(*m_machine); }
+	void        mark_frame() { m_capture.mark_frame(m_machine); }
 
 	misc_state_t m_misc_state;
 
@@ -347,7 +348,7 @@ private:
 	copy_pixel_t      m_copy_pixel[4];
 	fill_pixel_t      m_fill_pixel[4];
 
-	running_machine*  m_machine;
+	running_machine&  m_machine;
 	uint32_t*         m_rdram;
 	uint32_t*         m_dmem;
 	n64_periphs* m_n64_periphs;

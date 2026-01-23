@@ -509,7 +509,7 @@ authors:hap
 <!-- Private Line -->
 
 	<view name="Internal Layout (Private Line)">
-		<bounds left="-3.6875" right="138.5" top="7" bottom="86" />
+		<bounds left="-3.6875" right="139" top="7" bottom="86" />
 
 		<group ref="sb_board2"><bounds x="8.5" y="9" width="75" height="75" /></group>
 		<group ref="sb_ui"><bounds x="-2.28125" y="9" width="9.375" height="75" /></group>

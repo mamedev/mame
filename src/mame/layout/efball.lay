@@ -68,7 +68,7 @@ authors:hap
 
 		<element ref="text_down"><bounds x="-5" y="-39" width="74" height="14" /></element>
 		<element ref="text_field"><bounds x="71" y="-39" width="148" height="14" /></element>
-		<element ref="text_yards"><bounds x="221" y="-39" width="77" height="14" /></element>
+		<element ref="text_yards"><bounds x="223" y="-39" width="73" height="14" /></element>
 
 		<element ref="text_home"><bounds x="-5" y="100" width="74" height="14" /></element>
 		<element ref="text_time"><bounds x="71" y="100" width="148" height="14" /></element>

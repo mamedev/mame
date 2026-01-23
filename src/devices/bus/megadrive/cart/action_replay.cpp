@@ -31,6 +31,7 @@ megadrive_action_replay_device::megadrive_action_replay_device(const machine_con
 void megadrive_action_replay_device::device_add_mconfig(machine_config &config)
 {
 	MEGADRIVE_CART_SLOT(config, m_lockon_cart, this->clock(), megadrive_cart_options, nullptr).set_must_be_loaded(false);
+	// TODO: /VRES connection?
 }
 
 void megadrive_action_replay_device::device_start()

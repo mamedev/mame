@@ -107,7 +107,7 @@ private:
 
 void quadra800_state::machine_start()
 {
-	m_djmemc->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
+	m_djmemc->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 
 	// MAC PROM is stored with a bit swizzle and must match one of 2
 	// Apple-assigned OUI blocks 00:05:02 or 08:00:07

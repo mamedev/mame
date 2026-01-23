@@ -4088,18 +4088,20 @@ void magibomb_state::init_magibomb()
 void zoo_state::decrypt_rom(const decryption_info &table)
 {
 	const u32 size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("encrypted_rom")->base();
-	u16 * const decrypted = (u16 *)memregion("maincpu")->base();
-	std::unique_ptr<u16[]> tmp = std::make_unique<u16[]>(size/2);
+	u16 const *const rom = &memregion("encrypted_rom")->as_u16();
+	u16 *const decrypted = &memregion("maincpu")->as_u16();
+	std::unique_ptr<u16 []> tmp = std::make_unique<u16 []>(size/2);
 
 	// Pass 1: decrypt high and low byte independently.  They go
 	// through a bitswap and an xor, choosing between 8 possibilities
 	// through address bits.
 
-	for (u32 i = 0; i != size; i += 2) {
+	for (u32 i = 0; i != size; i += 2)
+	{
 		u16 orig = rom[i >> 1];
 		u16 result = 0;
-		for (u32 rb = 0; rb < 2; rb ++) {
+		for (u32 rb = 0; rb < 2; rb ++)
+		{
 			u8 val = orig >> (rb ? 0 : 8);
 			u32 index =
 				(BIT(i, table.rom[rb].bits[0]) << 2) |
@@ -4123,7 +4125,8 @@ void zoo_state::decrypt_rom(const decryption_info &table)
 
 	// Pass 2: copy back the decrypted data following the address
 	// scrambling
-	for (u32 i = 0; i != size; i += 2) {
+	for (u32 i = 0; i != size; i += 2)
+	{
 		u32 dest =
 			(i & 0xffffe003) |
 			(BIT(i, table.bits[0])  << 12) |

@@ -14,6 +14,7 @@ TODO:
 **************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
 #include "imagedev/floppy.h"
@@ -53,10 +54,16 @@ public:
 		, m_psg(*this, "psg")
 	{ }
 
-	void mz5500(machine_config &config);
+	void mz5500(machine_config &config) ATTR_COLD;
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset_cb);
 
 protected:
+	void io_map(address_map &map) ATTR_COLD;
+	virtual void mem_map(address_map &map) ATTR_COLD;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pic8259_device, 2>  m_pic;
 	required_device<am9517a_device> m_dmac;
@@ -71,15 +78,10 @@ protected:
 	floppy_image_device *m_current_floppy;
 	required_device<ay8912_device> m_psg;
 
-	void io_map(address_map &map) ATTR_COLD;
-	virtual void mem_map(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override ATTR_COLD;
-	void machine_reset() override ATTR_COLD;
 private:
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, u8 data);
-	void user_map(address_map &map);
+	void user_map(address_map &map) ATTR_COLD;
 
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
 	void upd7220_map(address_map &map) ATTR_COLD;
@@ -101,7 +103,7 @@ public:
 		: mz5500_state(mconfig, type, tag)
 	{ }
 
-	void mz6500(machine_config &config);
+	void mz6500(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -115,7 +117,7 @@ public:
 		: mz6500_state(mconfig, type, tag)
 	{ }
 
-	void mz6550(machine_config &config);
+	void mz6550(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void mem_map(address_map &map) override ATTR_COLD;
@@ -126,7 +128,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mz5500_state::hgdc_display_pixels )
 	rgb_t const *const palette = m_palette->palette()->entry_list_raw();
 	int const gfx[3] = { m_vram[(address + 0x00000)], m_vram[(address + 0x8000)], m_vram[(address + 0x10000)] };
 
-	for(u8 i=0; i<16; i++)
+	for (u8 i=0; i<16; i++)
 	{
 		u8 pen = (BIT(gfx[0], i)) | (BIT(gfx[1], i) << 1) | (BIT(gfx[2], i) << 2);
 
@@ -254,14 +256,14 @@ INPUT_PORTS_END
 
 void mz5500_state::machine_start()
 {
-	m_fdc->set_rate(250000);
+	m_fdc->set_rate(250'000);
 	m_current_floppy = nullptr;
 }
 
 void mz6500_state::machine_start()
 {
 	mz5500_state::machine_start();
-	m_fdc->set_rate(500000);
+	m_fdc->set_rate(500'000);
 }
 
 
@@ -346,7 +348,7 @@ void mz5500_state::mz5500(machine_config &config)
 	// MZ-5500: 5 MHz
 	// MZ-5600 onward: 8 or 5 MHz modes, user settable
 	// TODO: clocks for peripherals
-	I8086(config, m_maincpu, 8000000);
+	I8086(config, m_maincpu, 8'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz5500_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mz5500_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(m_pic[0], FUNC(pic8259_device::inta_cb));
@@ -362,7 +364,7 @@ void mz5500_state::mz5500(machine_config &config)
 	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir6_w));
 	m_pic[1]->in_sp_callback().set_constant(0);
 
-	AM9517A(config, m_dmac, 5000000);
+	AM9517A(config, m_dmac, 5'000'000);
 	m_dmac->dreq_active_low();
 	m_dmac->out_hreq_callback().set([this] (int state) {
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
@@ -430,13 +432,13 @@ void mz5500_state::mz5500(machine_config &config)
 	PALETTE(config, "palette").set_entries(8);
 
 	// TODO: should reach ~56 Hz
-	UPD7220(config, m_hgdc, 5000000 / 2);
+	UPD7220(config, m_hgdc, 5'000'000 / 2);
 	m_hgdc->set_addrmap(0, &mz5500_state::upd7220_map);
 	m_hgdc->set_display_pixels(FUNC(mz5500_state::hgdc_display_pixels));
 	m_hgdc->vsync_wr_callback().set(m_pic[0], FUNC(pic8259_device::ir0_w));
 
 	// wants ready for detecting if disk is in.
-	UPD765A(config, m_fdc, 5000000, true, true);
+	UPD765A(config, m_fdc, 5'000'000, true, true);
 	m_fdc->intrq_wr_callback().set(m_pic[1], FUNC(pic8259_device::ir1_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w)).invert();
 	FLOPPY_CONNECTOR(config, "fdc:0", mz6500_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
@@ -449,7 +451,7 @@ void mz5500_state::mz5500(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	// TODO: clock, discrete mixing
-	AY8912(config, m_psg, 4000000);
+	AY8912(config, m_psg, 4'000'000);
 	m_psg->port_a_write_callback().set(FUNC(mz5500_state::psg_porta_w));
 	m_psg->add_route(ALL_OUTPUTS, "mono", 0.25);
 }
@@ -457,7 +459,7 @@ void mz5500_state::mz5500(machine_config &config)
 void mz6500_state::mz6500(machine_config &config)
 {
 	mz5500_state::mz5500(config);
-	m_maincpu->set_clock(8000000);
+	m_maincpu->set_clock(8'000'000);
 
 	FLOPPY_CONNECTOR(config.replace(), "fdc:0", mz6500_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config.replace(), "fdc:1", mz6500_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
@@ -468,14 +470,14 @@ void mz6550_state::mz6550(machine_config &config)
 	mz6500_state::mz6500(config);
 
 	// TODO: still 8 MHz?
-	I80286(config.replace(), m_maincpu, 8000000);
+	I80286(config.replace(), m_maincpu, 8'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz6550_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &mz6550_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(m_pic[0], FUNC(pic8259_device::inta_cb));
 }
 
 
-// TODO: actual romlabels for all
+// TODO: actual ROM labels for all
 ROM_START( mz5500 )
 	ROM_REGION16_LE( 0x4000, "ipl", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(e5d47f08) SHA1(40f8463b140c18ebd596618907e78cd9f909e7f4))
@@ -510,8 +512,7 @@ ROM_START( mz6550 )
 ROM_END
 
 
-} // Anonymous namespace
-
+} // anonymous namespace
 
 
 COMP( 1984, mz5500, 0,      0, mz5500, mz6500, mz5500_state, empty_init, "Sharp", "MZ-5500", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

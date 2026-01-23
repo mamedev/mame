@@ -26,6 +26,8 @@ NOTES (PC side):
 - F1 at POST will bring a setup menu;
 - F2 (allegedly at DOS/V boot) will dual boot the machine;
 - a program named VVCHG switches back and forth between MD and PC, and setup 68k to 10 MHz mode;
+- WDL-330PS needs -chs 921,2,33 to sucessfully boot
+  cfr. https://github.com/86Box/86Box/issues/4505#issuecomment-2143369708
 
 NOTES (MD side):
 - 16 KiB of Z80 RAM (vs. 8 of stock)
@@ -42,8 +44,6 @@ NOTES (MD side):
 TODO:
 - RAM size always gets detected as 2560K even when it's not (from chipset?);
 - Quadtel EMM driver fails recognizing WD76C10 chipset with drv4;
-- Cannot HDD format with floppy insthdd.bat, cannot boot from HDD (needs floppy first).
-  Attached disk is a WDL-330PS with no geometry info available;
 - TMSS unlock and respective x86<->MD bus grants are sketchy;
 - SEGA TERADRIVE テラドライブ ユーザーズマニュアル known to exist (not scanned yet)
 - "TIMER FAIL" when exiting from F1 setup menu (keyboard? reset from chipset?);
@@ -880,14 +880,14 @@ void teradrive_state::at_softlists(machine_config &config)
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
 //  SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+//  SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom");
 	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 //  SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 
-//  TODO: MD portion
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("NTSC-J");
 	SOFTWARE_LIST(config, "td_disk_list").set_original("teradrive_flop");
-//  TODO: Teradrive HDD SW list
+	SOFTWARE_LIST(config, "td_hdd_list").set_original("teradrive_hdd");
 }
 
 void teradrive_state::teradrive(machine_config &config)
@@ -1038,6 +1038,15 @@ void teradrive_state::teradrive(machine_config &config)
 	}
 
 	MEGADRIVE_CART_SLOT(config, m_md_cart, md_master_xtal / 7, megadrive_cart_options, nullptr).set_must_be_loaded(false);
+	m_md_cart->vres_cb().set([this](int state) {
+		if (state)
+		{
+			m_md68kcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+			// segachnl seems to also require a port reset too
+			for (auto &port : m_md_ioports)
+				port->reset();
+		}
+	});
 
 	SPEAKER(config, "md_speaker", 2).front();
 
@@ -1080,5 +1089,5 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 1991, teradrive,  0,         0,       teradrive, teradrive, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan, Model 2)", MACHINE_NOT_WORKING )
-COMP( 1991, teradrive3, teradrive, 0,       teradrive, teradrive, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan, Model 3)", MACHINE_NOT_WORKING )
+COMP( 1991, teradrive,  0,         0,       teradrive, teradrive, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan, Model 2)", 0 )
+COMP( 1991, teradrive3, teradrive, 0,       teradrive, teradrive, teradrive_state, empty_init, "Sega / International Business Machines", "Teradrive (Japan, Model 3)", 0 )

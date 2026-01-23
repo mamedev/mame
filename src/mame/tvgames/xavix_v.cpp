@@ -1469,11 +1469,11 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 			/*
 			if (m_extra)
 			{
-				if (start & 0x4000)
-				{
-					start &= 0x3fff;
-					start ^= 0xc00;
-				}
+			    if (start & 0x4000)
+			    {
+			        start &= 0x3fff;
+			        start ^= 0xc00;
+			    }
 			}
 			*/
 

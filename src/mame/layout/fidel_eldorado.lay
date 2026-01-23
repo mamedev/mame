@@ -437,12 +437,12 @@ authors:hap
 		<element ref="cwhite"><bounds x="95" y="81" width="6" height="4" /></element>
 		<element ref="cwhite"><bounds x="95" y="86" width="6" height="4" /></element>
 
-		<element ref="text_l3"><bounds x="95" y="62.25" width="6" height="1.5" /></element>
-		<element ref="text_l4"><bounds x="95" y="67.25" width="6" height="1.5" /></element>
-		<element ref="text_l5"><bounds x="95" y="72.25" width="6" height="1.5" /></element>
+		<element ref="text_l3"><bounds x="95.25" y="62.25" width="5.5" height="1.5" /></element>
+		<element ref="text_l4"><bounds x="95.25" y="67.25" width="5.5" height="1.5" /></element>
+		<element ref="text_l5"><bounds x="95.25" y="72.25" width="5.5" height="1.5" /></element>
 		<element ref="speaker"><bounds xc="98" yc="78" width="2.1" height="2.1" /></element>
-		<element ref="text_l7"><bounds x="95" y="82.25" width="6" height="1.5" /></element>
-		<element ref="text_l8"><bounds x="95" y="87.25" width="6" height="1.5" /></element>
+		<element ref="text_l7"><bounds x="95.25" y="82.25" width="5.5" height="1.5" /></element>
+		<element ref="text_l8"><bounds x="95.25" y="87.25" width="5.5" height="1.5" /></element>
 
 		<element ref="hlb" inputtag="IN.0" inputmask="0x80"><bounds x="91.5" y="50" width="9.5" height="4" /><color alpha="0.2" /></element>
 		<element ref="hlb" inputtag="IN.0" inputmask="0x40"><bounds x="91.5" y="55" width="9.5" height="4" /><color alpha="0.2" /></element>

@@ -137,7 +137,7 @@ private:
 
 void maciivx_state::machine_start()
 {
-	m_vasp->set_ram_info((u32 *) m_ram->pointer(), m_ram->size());
+	m_vasp->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 
 	save_item(NAME(m_hdsel));
 }

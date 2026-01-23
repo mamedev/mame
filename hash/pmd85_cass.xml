@@ -797,7 +797,7 @@ If the Usage shows a filename of xx, it's because it hasn't been possible to ide
 | 19 KAREL3D2 | JUMP 0000 | 1,2,2A,3 | Marián Vittek / 3D Karel v3.2             |
 -->
 	<software name="karela" cloneof="karel"><!-- untested -->
-		<description>Karel (Alt)</description>
+		<description>Karel (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="In Monitor, MGLD 00 and press Play" />
@@ -815,7 +815,7 @@ If the Usage shows a filename of xx, it's because it hasn't been possible to ide
 | 03 KAREL3D2 | AutoRun   | 1,2,2A,3 | Marián Vittek / 3D Karel v3.2             |
 -->
 	<software name="karelb" cloneof="karel"><!-- untested -->
-		<description>Karel (Alt 2)</description>
+		<description>Karel (alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 

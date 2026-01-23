@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(NSCSI_CONNECTOR, nscsi_connector,  "nscsi_connector", "SCSI C
 
 
 nscsi_bus_device::nscsi_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, NSCSI_BUS, tag, owner, clock), data(0), ctrl(0)
+	device_t(mconfig, NSCSI_BUS, tag, owner, clock), m_bsy_handler(*this), data(0), ctrl(0)
 {
 	devcnt = 0;
 	std::fill(std::begin(dev), std::end(dev), dev_t{ nullptr, 0, 0, 0 });
@@ -96,10 +96,14 @@ void nscsi_bus_device::regen_ctrl(int refid)
 	}
 
 	octrl = octrl ^ ctrl;
-	if(octrl)
+	if(octrl) {
 		for(int i=0; i<devcnt; i++)
 			if(i != refid && (dev[i].wait_ctrl & octrl))
 				dev[i].dev->scsi_ctrl_changed();
+
+		if (octrl & nscsi_device::S_BSY)
+			m_bsy_handler((ctrl & nscsi_device::S_BSY) ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 uint32_t nscsi_bus_device::data_r() const

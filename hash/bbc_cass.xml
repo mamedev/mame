@@ -6940,7 +6940,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="hopperg" cloneof="hopper">
-		<description>Hopper (Ger)</description>
+		<description>Hopper (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="author" value="Neil Raine" />
@@ -8901,7 +8901,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="meteorsg" cloneof="meteors">
-		<description>Meteors (Ger)</description>
+		<description>Meteors (German)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBG13" />
@@ -9067,9 +9067,9 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="mineshafa" cloneof="mineshaf">
-		<description>Mineshaft (Alternative)</description>
+		<description>Mineshaft (Alternative Software)</description>
 		<year>1990</year>
-		<publisher>Alternative</publisher>
+		<publisher>Alternative Software</publisher>
 		<sharedfeat name="compatibility" value="B,M"/>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11986">
@@ -9252,7 +9252,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="monsterg" cloneof="monsters">
-		<description>Monsters (Ger)</description>
+		<description>Monsters (German)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBG03" />
@@ -10552,7 +10552,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="planetog" cloneof="plantoid">
-		<description>Planetoid (Ger)</description>
+		<description>Planetoid (German)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBG15" />
@@ -11675,7 +11675,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="rocketrag" cloneof="rocketra">
-		<description>Rocket Raid (Ger)</description>
+		<description>Rocket Raid (German)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBG05" />
@@ -12700,7 +12700,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="snapperg" cloneof="snapper">
-		<description>Snapper (Ger)</description>
+		<description>Snapper (German)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBG04" />
@@ -14065,7 +14065,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="superinvg" cloneof="superinv">
-		<description>Super Invaders (Ger)</description>
+		<description>Super Invaders (German)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="author" value="Geoffrey J Crammond" />
@@ -15909,7 +15909,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="welcomeg" cloneof="welcome">
-		<description>Willkommen (Ger)</description>
+		<description>Willkommen (German)</description>
 		<year>1981</year>
 		<publisher>Acornsoft</publisher>
 		<sharedfeat name="compatibility" value="B,M"/>
@@ -16632,7 +16632,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="dskdiaryg" cloneof="dskdiary">
-		<description>Desk Diary (Ger)</description>
+		<description>Desk Diary (German)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBB01" />
@@ -16991,7 +16991,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="busgamesg">
-		<description>Managementspiele (Ger)</description>
+		<description>Managementspiele (German)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBE03" />
@@ -17295,7 +17295,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="fs2_68">
-		<description>Fun School 2 (For 6-8 year olds)</description>
+		<description>Fun School 2 - For 6-8 year olds</description>
 		<year>1989</year>
 		<publisher>Database Educational Software</publisher>
 		<sharedfeat name="compatibility" value="B,M,ELK"/>
@@ -17307,7 +17307,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="fs2_ov8">
-		<description>Fun School 2 (For the Over-8s)</description>
+		<description>Fun School 2 - For the Over-8s</description>
 		<year>1989</year>
 		<publisher>Database Educational Software</publisher>
 		<sharedfeat name="compatibility" value="B,M,ELK"/>
@@ -17319,7 +17319,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="fs2_un6">
-		<description>Fun School 2 (For Under 6s)</description>
+		<description>Fun School 2 - For the Under-6s</description>
 		<year>1989</year>
 		<publisher>Database Educational Software</publisher>
 		<sharedfeat name="compatibility" value="B,M,ELK"/>
@@ -17379,7 +17379,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="jars">
-		<description>Kruege (Ger)</description>
+		<description>Kruege (German)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBE15" />
@@ -17539,7 +17539,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="missignsg" cloneof="missigns">
-		<description>Fehlende Zeichen (Ger)</description>
+		<description>Fehlende Zeichen (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft/ESM</publisher>
 		<info name="release" value="GBE09" />
@@ -17609,7 +17609,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="numberbag" cloneof="numberba">
-		<description>Zahlenwaage (Ger)</description>
+		<description>Zahlenwaage (German)</description>
 		<year>1982</year>
 		<publisher>Acornsoft/ESM</publisher>
 		<info name="release" value="GBE08" />
@@ -17647,7 +17647,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="peekocg" cloneof="peekoc">
-		<description>Peeko-Computer (Ger)</description>
+		<description>Peeko-Computer (German)</description>
 		<year>1982</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBE02" />
@@ -17747,7 +17747,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="sentseqg" cloneof="sentseq">
-		<description>Satzsalat (Ger)</description>
+		<description>Satzsalat (German)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBE07" />
@@ -17900,7 +17900,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="treeknowg" cloneof="treeknow">
-		<description>Baum der Weisheit (Ger)</description>
+		<description>Baum der Weisheit (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBE04" />
@@ -17987,7 +17987,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="wordhuntg">
-		<description>Wort-Schatzsuche (Ger)</description>
+		<description>Wort-Schatzsuche (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBE05" />
@@ -18013,7 +18013,7 @@ This list was compiled from the archive at http://www.stairwaytohell.com/.
 	</software>
 
 	<software name="wordseqg" cloneof="wordseq">
-		<description>Wortsalat (Ger)</description>
+		<description>Wortsalat (German)</description>
 		<year>1983</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="GBE06" />

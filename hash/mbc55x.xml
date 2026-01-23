@@ -19,7 +19,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="msdos211a" cloneof="msdos211">
-		<description>MS-DOS v2.11 (Alt?)</description>
+		<description>MS-DOS v2.11 (alt?)</description>
 		<year>198?</year>
 		<publisher>Sanyo / Microsoft</publisher>
 

@@ -878,7 +878,7 @@ Dragon 32/64 DOS floppy disks
 	</software>
 
 	<software name="magbasea" cloneof="magbase">
-		<description>Magbase (Alt)</description>
+		<description>Magbase (alt)</description>
 		<year>198?</year>
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -907,7 +907,7 @@ Dragon 32/64 DOS floppy disks
 	</software>
 
 	<software name="magbasedua" cloneof="magbasedu">
-		<description>Magbase (Dragon User) (Alt)</description>
+		<description>Magbase (Dragon User, alt)</description>
 		<year>1986</year>
 		<publisher>Pulser Software</publisher>
 		<part name="flop1" interface="floppy_5_25">

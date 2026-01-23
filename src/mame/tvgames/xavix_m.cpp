@@ -690,6 +690,17 @@ uint8_t xavix_state::timer_status_r()
 	return ret;
 }
 
+void xavix_state::timer_start()
+{
+	// TODO: the timer logic might still not be correct here
+
+	int divide = 1 << ((m_timer_freq&0x0f)+1);
+	uint32_t freq = m_maincpu->unscaled_clock(); // should this use ~21Mhz even on SuperXaviX with the faster CPU?
+	uint32_t freq_t_use = freq / divide;
+	//LOG("freq is %dhz divide is %d frequency used is %dhz baseval %02x curval %02x\n", freq, divide, freq_t_use, m_timer_baseval, m_timer_currentval);
+	m_freq_timer->adjust(attotime::from_hz(freq_t_use));
+}
+
 void xavix_state::timer_control_w(uint8_t data)
 {
 	/* timer is actively used by
@@ -719,12 +730,9 @@ void xavix_state::timer_control_w(uint8_t data)
 	// rad_fb / rad_madf don't set bit 0x40 (and doesn't seem to have a valid interrupt handler for timer, so probably means it generates no IRQ?)
 	if (data & 0x01) // timer start?
 	{
-		// TODO: work out the proper calculation here
-		// int divide = 1 << ((m_timer_freq&0x0f)+1);
-		// uint32_t freq = m_maincpu->unscaled_clock()/2;
-		// m_freq_timer->adjust(attotime::from_hz(freq / divide) * m_timer_baseval*20);
-		//m_freq_timer->adjust(attotime::from_usec(1000));
-		m_freq_timer->adjust(attotime::from_usec(50));
+		m_timer_currentval = m_timer_baseval;
+
+		timer_start();
 	}
 	else
 	{
@@ -749,7 +757,7 @@ uint8_t xavix_state::timer_curval_r()
 {
 	// TODO implement properly with timers etc. as rad_fb / rad_madfb rely on these values to calculate throw strength!
 	LOG("%s: timer_curval_r\n", machine().describe_context());
-	return machine().rand();
+	return m_timer_currentval;
 }
 
 
@@ -786,16 +794,23 @@ void xavix_state::timer_freq_w(uint8_t data)
 
 TIMER_CALLBACK_MEMBER(xavix_state::freq_timer_done)
 {
-	if ((m_timer_control & 0x40) && (!m_disable_timer_irq_hack)) // Timer IRQ enable?
-	{
-		m_irqsource |= 0x10;
-		m_timer_control |= 0x80;
-		update_irqs();
-	}
+	// or should this count up? games seem to set 0xff as the base value
+	// and reset the timer before it would ever have a chance to expire
+	m_timer_currentval--;
 
-	//logerror("freq_timer_done\n");
-	// reload
-	//m_freq_timer->adjust(attotime::from_usec(50000));
+	if (m_timer_currentval == 0xff)
+	{
+		if ((m_timer_control & 0x40)) // Timer IRQ enable?
+		{
+			m_irqsource |= 0x10;
+			m_timer_control |= 0x80;
+			update_irqs();
+		}
+	}
+	else
+	{
+		timer_start();
+	}
 }
 
 
@@ -1099,6 +1114,7 @@ void xavix_state::machine_start()
 	if (m_nvram)
 		m_nvram->set_base(&m_mainram[0x4000 - nvram_size], nvram_size);
 
+	m_sound->set_default_tempo(m_default_audio_tempo_override);
 
 	save_item(NAME(m_extbusctrl));
 	save_item(NAME(m_ioevent_enable));
@@ -1113,6 +1129,7 @@ void xavix_state::machine_start()
 	save_item(NAME(m_sound_regbase));
 	save_item(NAME(m_timer_control));
 	save_item(NAME(m_timer_freq));
+	save_item(NAME(m_timer_currentval));
 	save_item(NAME(m_txarray));
 	save_item(NAME(m_irqsource));
 	save_item(NAME(m_vectorenable));
@@ -1204,6 +1221,8 @@ void xavix_state::machine_reset()
 	m_irqsource = 0x00;
 
 	m_timer_control = 0x00;
+	m_timer_freq = 0x00;
+	m_timer_currentval = 0x00;
 
 	m_ioevent_enable = 0x00;
 	m_ioevent_active = 0x00;

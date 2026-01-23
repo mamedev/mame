@@ -150,6 +150,7 @@ private:
 	address_space_config m_opcodes_config;
 	address_space_config m_io_config;
 	static const uint8_t m_i80286_timing[200];
+	static const uint8_t m_i80286_ea_timing[200];
 
 	enum {
 		FAULT_DE = 0,

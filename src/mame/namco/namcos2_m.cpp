@@ -4,7 +4,7 @@
 
 Namco System II
 
-  namcos2.cpp
+  namcos2_m.cpp
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -18,13 +18,13 @@ Namco System II
 #include "machine/nvram.h"
 
 
-u16 namcos2_state::namcos2_finallap_prot_r(offs_t offset)
+u16 finallap_state::finallap_prot_r(offs_t offset)
 {
-	static const u16 table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
-	static const u16 table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
+	constexpr u16 table0[8] = { 0x0000,0x0040,0x0440,0x2440,0x2480,0xa080,0x8081,0x8041 };
+	constexpr u16 table1[8] = { 0x0040,0x0060,0x0060,0x0860,0x0864,0x08e4,0x08e5,0x08a5 };
 	u16 data;
 
-	switch( offset )
+	switch (offset)
 	{
 	case 0:
 		data = 0x0101;
@@ -71,7 +71,7 @@ u16 namcos2_state::namcos2_finallap_prot_r(offs_t offset)
 
 // S2 copy
 
-void namcos2_state::machine_start()
+void namcos2_base_state::machine_start()
 {
 	m_eeprom = std::make_unique<u8[]>(0x2000);
 	subdevice<nvram_device>("nvram")->set_base(m_eeprom.get(), 0x2000);
@@ -94,7 +94,7 @@ void gollygho_state::machine_start()
 	m_out_gun_recoil.resolve();
 }
 
-void namcos2_state::machine_reset()
+void namcos2_base_state::machine_reset()
 {
 	/* Initialise the bank select in the sound CPU */
 	m_audiobank->set_entry(0); /* Page in bank 0 */
@@ -106,7 +106,7 @@ void namcos2_state::machine_reset()
 }
 
 
-void namcos2_state::reset_all_subcpus(int state)
+void namcos2_base_state::reset_all_subcpus(int state)
 {
 	m_slave->set_input_line(INPUT_LINE_RESET, state);
 	if (m_c68)
@@ -123,7 +123,7 @@ void namcos2_state::reset_all_subcpus(int state)
 	}
 }
 
-void namcos2_state::sound_reset_w(u8 data)
+void namcos2_base_state::sound_reset_w(u8 data)
 {
 	if (data & 0x01)
 	{
@@ -138,7 +138,7 @@ void namcos2_state::sound_reset_w(u8 data)
 	}
 }
 
-void namcos2_state::system_reset_w(u8 data)
+void namcos2_base_state::system_reset_w(u8 data)
 {
 	reset_all_subcpus(data & 1 ? CLEAR_LINE : ASSERT_LINE);
 
@@ -150,12 +150,12 @@ void namcos2_state::system_reset_w(u8 data)
 /* EEPROM Load/Save and read/write handling                  */
 /*************************************************************/
 
-void namcos2_state::eeprom_w(offs_t offset, u8 data)
+void namcos2_base_state::eeprom_w(offs_t offset, u8 data)
 {
 	m_eeprom[offset] = data;
 }
 
-u8 namcos2_state::eeprom_r(offs_t offset)
+u8 namcos2_base_state::eeprom_r(offs_t offset)
 {
 	return m_eeprom[offset];
 }
@@ -195,12 +195,12 @@ suzuk8h2    1993
 sws93       1993    334         $014e
  *************************************************************/
 
-u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
+u16 namcos2_base_state::namcos2_68k_key_r(offs_t offset)
 {
 	switch (m_gametype)
 	{
 	case NAMCOS2_ORDYNE:
-		switch(offset)
+		switch (offset)
 		{
 		case 2: return 0x1001;
 		case 3: return 0x1;
@@ -212,21 +212,21 @@ u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 		break;
 
 	case NAMCOS2_STEEL_GUNNER_2:
-		switch(offset)
+		switch (offset)
 		{
 			case 4: return 0x15a;
 		}
 		break;
 
 	case NAMCOS2_MIRAI_NINJA:
-		switch(offset)
+		switch (offset)
 		{
 		case 7: return 0xB1;
 		}
 		break;
 
 	case NAMCOS2_PHELIOS:
-		switch(offset)
+		switch (offset)
 		{
 		case 0: return 0xF0;
 		case 1: return 0xFF0;
@@ -239,28 +239,28 @@ u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 		break;
 
 	case NAMCOS2_DIRT_FOX_JP:
-		switch(offset)
+		switch (offset)
 		{
 		case 1: return 0xB4;
 		}
 		break;
 
 	case NAMCOS2_FINEST_HOUR:
-		switch(offset)
+		switch (offset)
 		{
 		case 7: return 0xBC;
 		}
 		break;
 
 	case NAMCOS2_BURNING_FORCE:
-		switch(offset)
+		switch (offset)
 		{
 		case 1: return 0xBD;
 		}
 		break;
 
 	case NAMCOS2_MARVEL_LAND:
-		switch(offset)
+		switch (offset)
 		{
 		case 0: return 0x10;
 		case 1: return 0x110;
@@ -271,14 +271,14 @@ u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 		break;
 
 	case NAMCOS2_DRAGON_SABER:
-		switch(offset)
+		switch (offset)
 		{
 		case 2: return 0xC0;
 		}
 		break;
 
 	case NAMCOS2_ROLLING_THUNDER_2:
-		switch(offset)
+		switch (offset)
 		{
 		case 4:
 			if (m_sendval)
@@ -301,14 +301,14 @@ u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 		break;
 
 	case NAMCOS2_COSMO_GANG:
-		switch(offset)
+		switch (offset)
 		{
 		case 3: return 0x14A;
 		}
 		break;
 
 	case NAMCOS2_SUPER_WSTADIUM:
-		switch(offset)
+		switch (offset)
 		{
 	//  case 3: return 0x142;
 		case 4: return 0x142;
@@ -316,28 +316,28 @@ u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 		}
 
 	case NAMCOS2_SUPER_WSTADIUM_92:
-		switch(offset)
+		switch (offset)
 		{
 		case 3: return 0x14B;
 		}
 		break;
 
 	case NAMCOS2_SUPER_WSTADIUM_92T:
-		switch(offset)
+		switch (offset)
 		{
 		case 3: return 0x14C;
 		}
 		break;
 
 	case NAMCOS2_SUPER_WSTADIUM_93:
-		switch(offset)
+		switch (offset)
 		{
 		case 3: return 0x14E;
 		}
 		break;
 
 	case NAMCOS2_SUZUKA_8_HOURS_2:
-		switch(offset)
+		switch (offset)
 		{
 		case 3: return 0x14D;
 		case 2: return 0;
@@ -345,7 +345,7 @@ u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 		break;
 
 	case NAMCOS2_GOLLY_GHOST:
-		switch(offset)
+		switch (offset)
 		{
 		case 0: return 2;
 		case 1: return 2;
@@ -356,7 +356,7 @@ u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 
 
 	case NAMCOS2_BUBBLE_TROUBLE:
-		switch(offset)
+		switch (offset)
 		{
 		case 0: return 2; // not verified
 		case 1: return 2; // not verified
@@ -369,7 +369,7 @@ u16 namcos2_state::namcos2_68k_key_r(offs_t offset)
 	return machine().rand() & 0xffff;
 }
 
-void namcos2_state::namcos2_68k_key_w(offs_t offset, u16 data)
+void namcos2_base_state::namcos2_68k_key_w(offs_t offset, u16 data)
 {
 	if (m_gametype == NAMCOS2_MARVEL_LAND && offset == 5)
 	{
@@ -404,12 +404,12 @@ void namcos2_state::namcos2_68k_key_w(offs_t offset, u16 data)
 /*  Sound sub-system                                          */
 /**************************************************************/
 
-void namcos2_state::sound_bankselect_w(u8 data)
+void namcos2_base_state::sound_bankselect_w(u8 data)
 {
 	m_audiobank->set_entry(data >> 4);
 }
 
-u16 namcos2_state::c140_rom_r(offs_t offset)
+u16 namcos2_base_state::c140_rom_r(offs_t offset)
 {
 	/*
 	    Verified from schematics:

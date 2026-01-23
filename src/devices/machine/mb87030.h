@@ -163,7 +163,8 @@ private:
 		TransferRecvData,
 		TransferSendAck,
 		TransferWaitDeassertREQ,
-		TransferDeassertACK
+		TransferDeassertACK,
+		TransferWaitFifoEmpty
 		//TransferCommand,
 	} m_state;
 

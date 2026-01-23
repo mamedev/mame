@@ -15,9 +15,10 @@
 #include "bk_samara.h"
 
 #include "bus/ata/ataintf.h"
-#include "formats/bk0010_dsk.h"
 #include "imagedev/harddriv.h"
 #include "machine/1801vp128.h"
+
+#include "formats/bk0010_dsk.h"
 
 
 namespace {
@@ -48,7 +49,7 @@ public:
 	void cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -96,16 +97,18 @@ const tiny_rom_entry *bk_samara_device::device_rom_region() const
 void bk_samara_device::device_add_mconfig(machine_config &config)
 {
 	K1801VP128(config, m_fdc, XTAL(4'000'000));
-	m_fdc->ds_in_callback().set([] (uint16_t data) {
-		switch (data & 15)
-		{
-			case 1: return 0;
-			case 2: return 1;
-			case 4: return 2;
-			case 8: return 3;
-			default: return -1;
-		}
-	});
+	m_fdc->ds_in_callback().set(
+			[] (uint16_t data)
+			{
+				switch (data & 15)
+				{
+					case 1: return 0;
+					case 2: return 1;
+					case 4: return 2;
+					case 8: return 3;
+					default: return -1;
+				}
+			});
 	FLOPPY_CONNECTOR(config, "fdc:0", bk_floppies, "525qd", bk_samara_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", bk_floppies, "525qd", bk_samara_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:2", bk_floppies, "525qd", bk_samara_device::floppy_formats);
@@ -122,18 +125,15 @@ void bk_samara_device::device_add_mconfig(machine_config &config)
 void bk_samara_device::device_start()
 {
 	m_bus->install_device(0177130, 0177133,
-		emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::read)),
-		emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::write))
-	);
+			emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::read)),
+			emu::rw_delegate(m_fdc, FUNC(k1801vp128_device::write)));
 	m_bus->program_space().install_readwrite_handler(0177620, 0177623,
-		emu::rw_delegate(*this, FUNC(bk_samara_device::cs1_r)),
-		emu::rw_delegate(*this, FUNC(bk_samara_device::cs1_w))
-	);
+			emu::rw_delegate(*this, FUNC(bk_samara_device::cs1_r)),
+			emu::rw_delegate(*this, FUNC(bk_samara_device::cs1_w)));
 	m_bus->program_space().install_readwrite_handler(0177640, 0177657,
-		emu::rw_delegate(*this, FUNC(bk_samara_device::cs0_r)),
-		emu::rw_delegate(*this, FUNC(bk_samara_device::cs0_w))
-	);
-	m_bus->program_space().install_rom(0160000, 0167777, memregion(this->subtag("maincpu").c_str())->base());
+			emu::rw_delegate(*this, FUNC(bk_samara_device::cs0_r)),
+			emu::rw_delegate(*this, FUNC(bk_samara_device::cs0_w)));
+	m_bus->program_space().install_rom(0160000, 0167777, memregion("maincpu")->base());
 	m_bus->program_space().unmap_write(0160000, 0167777);
 }
 

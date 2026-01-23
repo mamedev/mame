@@ -1572,15 +1572,21 @@ void rollingc_state::main_map(address_map &map)
 	map(0xe000, 0xffff).rw(FUNC(rollingc_state::scattered_colorram2_r), FUNC(rollingc_state::scattered_colorram2_w));
 }
 
-
-void rollingc_state::io_map(address_map &map)
+void rollingc_state::rollingc_io_map(address_map &map)
 {
 	map(0x00, 0x00).portr("IN0").w(FUNC(rollingc_state::rollingc_sh_port_w));
 	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).portr("IN2").w(m_mb14241, FUNC(mb14241_device::shift_count_w));
-	map(0x03, 0x03).r(m_mb14241, FUNC(mb14241_device::shift_result_r)).w(FUNC(rollingc_state::invadpt2_sh_port_1_w));
-	map(0x04, 0x04).w(m_mb14241, FUNC(mb14241_device::shift_data_w));
+	map(0x02, 0x02).portr("IN2");
+	map(0x03, 0x03).w(FUNC(rollingc_state::invadpt2_sh_port_1_w));
 	map(0x05, 0x05).w(FUNC(rollingc_state::invadpt2_sh_port_2_w));
+}
+
+void rollingc_state::mraker_io_map(address_map &map)
+{
+	map(0x00, 0x00).w(FUNC(rollingc_state::mraker_sh_port1_w));
+	map(0x01, 0x01).portr("IN0");
+	map(0x02, 0x02).portr("IN1");
+	map(0x03, 0x03).portr("IN2");
 }
 
 
@@ -1603,6 +1609,49 @@ static INPUT_PORTS_START( rollingc )
 	PORT_DIPSETTING(    0x00, "RC=5000 / MB=2000" )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( mraker )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x10, "Upright (Normal)" )
+	PORT_DIPSETTING(    0x20, "Upright (Flip Screen)" )
+	PORT_DIPSETTING(    0x30, "Single (2 Coins/1 Credit)" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Harder ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
+
 void rollingc_state::machine_start()
 {
 	invaders_clone_palette_state::machine_start();
@@ -1617,21 +1666,26 @@ void rollingc_state::machine_start()
 	save_item(NAME(m_port_3_last));
 }
 
-void rollingc_state::rollingc(machine_config &config)
+void rollingc_state::mraker(machine_config &config)
 {
 	mw8080bw_root(config);
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &rollingc_state::main_map);
-	m_maincpu->set_addrmap(AS_IO, &rollingc_state::io_map);
-
-	// add shifter
-	MB14241(config, m_mb14241);
+	m_maincpu->set_addrmap(AS_IO, &rollingc_state::mraker_io_map);
 
 	// video hardware
 	m_screen->set_screen_update(FUNC(rollingc_state::screen_update_rollingc));
 
 	PALETTE(config, m_palette, FUNC(rollingc_state::rollingc_palette), 16);
+}
+
+void rollingc_state::rollingc(machine_config &config)
+{
+	mraker(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_IO, &rollingc_state::rollingc_io_map);
 
 	// sound hardware
 	invaders_samples_audio(config);
@@ -1644,7 +1698,6 @@ void rollingc_state::rollingc(machine_config &config)
 /* Taito "Space Chaser"                                */
 /*                                                     */
 /*******************************************************/
-
 
 uint8_t _8080bw_state::schaser_scattered_colorram_r(offs_t offset)
 {
@@ -5489,19 +5542,40 @@ ROM_END
 
 ROM_START( rollingc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rc01.bin",     0x0000, 0x0400, CRC(66fa50bf) SHA1(7451d4ff8d3b351a324aaecdbdc5b46672f5fdd0) )
-	ROM_LOAD( "rc02.bin",     0x0400, 0x0400, CRC(61c06ae4) SHA1(7685c806e20e4a4a0508a547ac08ca8f6d75bb79) )
-	ROM_LOAD( "rc03.bin",     0x0800, 0x0400, CRC(77e39fa0) SHA1(16bf88af1b97c5a2a81e105af08b8d9d1f10dcc8) )
-	ROM_LOAD( "rc04.bin",     0x0c00, 0x0400, CRC(3fdfd0f3) SHA1(4c5e7136a766f3f16399e61eaaa0e00ef6b619f7) )
-	ROM_LOAD( "rc05.bin",     0x1000, 0x0400, CRC(c26a8f5b) SHA1(f7a541999cfe04c6d6927d285484f0f81857e04a) )
-	ROM_LOAD( "rc06.bin",     0x1400, 0x0400, CRC(0b98dbe5) SHA1(33cedab82ddccb4caaf681fce553b5230a8d6f92) )
-	ROM_LOAD( "rc07.bin",     0x1800, 0x0400, CRC(6242145c) SHA1(b01bb02835dda89dc02604ec52e423167183e8c9) )
-	ROM_LOAD( "rc08.bin",     0x1c00, 0x0400, CRC(d23c2ef1) SHA1(909e3d53291dbd219f4f9e0047c65317b9f6d5bd) )
+	ROM_LOAD( "rc01.a4",     0x0000, 0x0400, CRC(66fa50bf) SHA1(7451d4ff8d3b351a324aaecdbdc5b46672f5fdd0) )
+	ROM_LOAD( "rc02.c4",     0x0400, 0x0400, CRC(61c06ae4) SHA1(7685c806e20e4a4a0508a547ac08ca8f6d75bb79) )
+	ROM_LOAD( "rc03.e4",     0x0800, 0x0400, CRC(77e39fa0) SHA1(16bf88af1b97c5a2a81e105af08b8d9d1f10dcc8) )
+	ROM_LOAD( "rc04.f4",     0x0c00, 0x0400, CRC(3fdfd0f3) SHA1(4c5e7136a766f3f16399e61eaaa0e00ef6b619f7) )
+	ROM_LOAD( "rc05.h4",     0x1000, 0x0400, CRC(c26a8f5b) SHA1(f7a541999cfe04c6d6927d285484f0f81857e04a) )
+	ROM_LOAD( "rc06.l4",     0x1400, 0x0400, CRC(0b98dbe5) SHA1(33cedab82ddccb4caaf681fce553b5230a8d6f92) )
+	ROM_LOAD( "rc07.a5",     0x1800, 0x0400, CRC(6242145c) SHA1(b01bb02835dda89dc02604ec52e423167183e8c9) )
+	ROM_LOAD( "rc08.c5",     0x1c00, 0x0400, CRC(d23c2ef1) SHA1(909e3d53291dbd219f4f9e0047c65317b9f6d5bd) )
 
-	ROM_LOAD( "rc09.bin",     0x4000, 0x0800, CRC(2e2c5b95) SHA1(33f4e2789d67e355ccd99d2c0d07301ec2bd3bc1) )
-	ROM_LOAD( "rc10.bin",     0x4800, 0x0800, CRC(ef94c502) SHA1(07c0504b2ebce0fa6e53e6957e7b6c0e9caab430) )
-	ROM_LOAD( "rc11.bin",     0x5000, 0x0800, CRC(a3164b18) SHA1(7270af25fa4171f86476f5dc409e658da7fba7fc) )
-	ROM_LOAD( "rc12.bin",     0x5800, 0x0800, CRC(2052f6d9) SHA1(036702fc40cf133eb374ed674695d7c6c79e8311) )
+	ROM_LOAD( "rc09.e4",     0x4000, 0x0800, CRC(2e2c5b95) SHA1(33f4e2789d67e355ccd99d2c0d07301ec2bd3bc1) )
+	ROM_LOAD( "rc10.f4",     0x4800, 0x0800, CRC(ef94c502) SHA1(07c0504b2ebce0fa6e53e6957e7b6c0e9caab430) )
+	ROM_LOAD( "rc11.h4",     0x5000, 0x0800, CRC(a3164b18) SHA1(7270af25fa4171f86476f5dc409e658da7fba7fc) )
+	ROM_LOAD( "rc12.l4",     0x5800, 0x0800, CRC(2052f6d9) SHA1(036702fc40cf133eb374ed674695d7c6c79e8311) )
+ROM_END
+
+
+ROM_START( mraker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mr_1.a4",     0x0000, 0x0400, CRC(0ba47dea) SHA1(bfd19b4ed673798f5b2b7d086d14c8569464eb64) )
+	ROM_LOAD( "mr_2.c4",     0x0400, 0x0400, CRC(fead8849) SHA1(7b7285789ec02bce0e357fb3bcba4f13a24e2df6) )
+	ROM_LOAD( "mr_3.e4",     0x0800, 0x0400, CRC(7d65358f) SHA1(96081bec39cb1542858cf60462e03562cb511f29) )
+	ROM_LOAD( "mr_4.f4",     0x0c00, 0x0400, CRC(22cc55ad) SHA1(8f302a8f3362eeaece81c95889774004786c17ef) )
+	ROM_LOAD( "mr_5.h4",     0x1000, 0x0400, CRC(e8048768) SHA1(0e2cc18a2807ae96df36301e2be819299493b247) )
+	ROM_LOAD( "mr_6.l4",     0x1400, 0x0400, CRC(1e717545) SHA1(f9a252a96997eb667c159fd7f9100e24555dbe3b) )
+	ROM_LOAD( "mr_7.a5",     0x1800, 0x0400, CRC(2f19de73) SHA1(59e0aa38c563ca891dfe43f47d8c704c1b29d2e5) )
+	ROM_LOAD( "mr_8.c5",     0x1c00, 0x0400, CRC(fddaf8d0) SHA1(fa31504780ab48b8c6cf223bae43e670ba121bcc) )
+
+	ROM_LOAD( "mr_9.e5",     0x4000, 0x0800, CRC(1ca1be22) SHA1(63546dd7a15e7eadd8483e2a98f5c8576fec7bfc) )
+	ROM_LOAD( "mr_10.f5",    0x4800, 0x0800, CRC(1901c0d4) SHA1(933d4624b009f239a030ff1fd867eb50363d066a) )
+	ROM_LOAD( "mr_11.h5",    0x5000, 0x0800, CRC(cb8e34ae) SHA1(36040a684d9b18ba38eb4876016fd437ecebe711) )
+	// l5 position for rom 12 unpopulated
+
+	ROM_REGION( 0x0400, "stars", 0 )
+	ROM_LOAD( "2708",        0x0000, 0x0400, NO_DUMP ) // unknown label
 ROM_END
 
 ROM_START( schaser )
@@ -6171,7 +6245,8 @@ GAME( 1980?,invrvngegw,  invrvnge, invrvnge,  invrvnge,  invrvnge_state, empty_i
 
 GAME( 1980, vortex,      0,        vortex,    vortex,    vortex_state,   init_vortex,   ROT270, "Zilec Electronics",                  "Vortex",                                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND ) // Encrypted 8080/IO
 
-GAME( 1979, rollingc,    0,        rollingc,  rollingc,  rollingc_state, empty_init,    ROT270, "Nichibutsu",                         "Rolling Crash / Moon Base",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, rollingc,    0,        rollingc,  rollingc,  rollingc_state, empty_init,    ROT270, "Nichibutsu",                         "Rolling Crash / Moon Base",                                       MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS )
+GAME( 1980, mraker,      0,        mraker,    mraker,    rollingc_state, empty_init,    ROT270, "Nichibutsu",                         "Moon Raker",                                                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_IMPERFECT_GRAPHICS ) // Missing starfield
 
 GAME( 1979, ozmawars,    0,        ozmawars,  ozmawars,  ozmawars_state, empty_init,    ROT270, "SNK",                                "Ozma Wars (set 1)",                                               MACHINE_SUPPORTS_SAVE )
 GAME( 1979, ozmawars2,   ozmawars, ozmawars,  ozmawars,  ozmawars_state, empty_init,    ROT270, "SNK",                                "Ozma Wars (set 2)",                                               MACHINE_SUPPORTS_SAVE ) // Uses Taito's three board color version of Space Invaders PCB

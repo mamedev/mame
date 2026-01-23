@@ -196,6 +196,9 @@ public:
 	template <typename T> pcvideo_pcjr_device &set_chr_gen_tag(T &&tag) { m_chr_gen.set_tag(std::forward<T>(tag)); return *this; }
 	template <typename T> pcvideo_pcjr_device &set_kanji_tag(T &&tag) { m_jxkanji.set_tag(std::forward<T>(tag)); return *this; }
 
+	// this needs to be called when the video RAM size is known
+	void set_16bit(bool val) { m_16bit = val; }
+
 	uint8_t read(address_space &space, offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
@@ -212,20 +215,25 @@ protected:
 	memory_access<17, 0, 0, ENDIANNESS_LITTLE>::cache m_vram;
 	optional_region_ptr<uint8_t> m_jxkanji;
 	devcb_write_line m_vsync_cb;
+	bool m_16bit;
 
 	uint8_t m_address_data_ff;
 	uint8_t m_mode_ctrl_1, m_mode_ctrl_2;
 
 private:
-	void pc_pcjr_mode_switch();
+	void mode_switch();
 	void vga_data_w(uint8_t data);
 
 	void pcjr_vsync_changed(int state);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
+	MC6845_UPDATE_ROW( text_inten_high_8bit_update_row );
 	MC6845_UPDATE_ROW( text_blink_update_row );
+	MC6845_UPDATE_ROW( text_blink_high_8bit_update_row );
 	MC6845_UPDATE_ROW( pcjx_text_update_row );
+	MC6845_UPDATE_ROW( gfx_4bpp_high_8bit_update_row );
 	MC6845_UPDATE_ROW( gfx_2bpp_update_row );
+	MC6845_UPDATE_ROW( gfx_2bpp_high_8bit_update_row );
 	MC6845_UPDATE_ROW( gfx_1bpp_update_row );
 };
 

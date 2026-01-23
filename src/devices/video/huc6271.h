@@ -28,7 +28,7 @@ public:
 
 	// I/O operations
 	//void data_transfer(uint32_t offset, uint32_t data);
-	void regs(address_map &map) ATTR_COLD;
+	void amap(address_map &map) ATTR_COLD;
 
 protected:
 	// device-level overrides
@@ -40,6 +40,11 @@ private:
 	const address_space_config      m_data_space_config;
 
 	void data_map(address_map &map) ATTR_COLD;
+
+	u16 m_hscroll;
+	u16 m_control;
+	u16 m_back_y, m_back_u, m_back_v;
+	u16 m_hsync;
 };
 
 

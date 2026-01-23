@@ -6,10 +6,10 @@
 #pragma once
 
 #include "generalplus_gpl16250.h"
-#include "machine/generalplus_gpl1625x_soc.h"
-#include "generalplus_gpl16250_m.h"
-#include "bus/generic/slot.h"
+
 #include "bus/generic/carts.h"
+#include "bus/generic/slot.h"
+#include "machine/generalplus_gpl1625x_soc.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -26,38 +26,39 @@ public:
 	{
 	}
 
-	void generalplus_gpac800(machine_config &config);
+	void generalplus_gpac800(machine_config &config) ATTR_COLD;
 
-	void nand_init210();
-	void nand_init210_32mb();
-	void nand_init840();
-	void nand_wlsair60();
-	void nand_vbaby();
-	void nand_tsm();
-	void nand_beambox();
-	void nand_kiugames();
+	void nand_init210() ATTR_COLD;
+	void nand_init210_32mb() ATTR_COLD;
+	void nand_init840() ATTR_COLD;
+	void nand_wlsair60() ATTR_COLD;
+	void nand_vbaby() ATTR_COLD;
+	void nand_tsm() ATTR_COLD;
+	void nand_beambox() ATTR_COLD;
+	void nand_kiugames() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	uint8_t read_nand(offs_t offset);
-	std::vector<uint16_t> m_sdram;
-	std::vector<uint16_t> m_sdram2;
 
 	virtual uint16_t cs0_r(offs_t offset) override;
 	virtual void cs0_w(offs_t offset, uint16_t data) override;
 	virtual uint16_t cs1_r(offs_t offset) override;
 	virtual void cs1_w(offs_t offset, uint16_t data) override;
 
-private:
-	optional_region_ptr<uint8_t> m_nandregion;
+	std::vector<uint16_t> m_sdram;
+	std::vector<uint16_t> m_sdram2;
 
+private:
 	void nand_create_stripped_region();
 
 	void dma_complete_hacks(int state);
 
-	std::vector<uint8_t> m_strippedrom{};
+	optional_region_ptr<uint8_t> m_nandregion;
+
+	std::vector<uint8_t> m_strippedrom;
 	int m_strippedsize = 0;
 	int m_size = 0;
 	int m_nandblocksize = 0;
@@ -78,13 +79,12 @@ public:
 	{
 	}
 
-	void generalplus_gpac800_vbaby(machine_config &config);
+	void generalplus_gpac800_vbaby(machine_config &config) ATTR_COLD;
 
 protected:
-	required_device<generic_slot_device> m_cart;
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-private:
+	required_device<generic_slot_device> m_cart;
 };
 
 

@@ -281,8 +281,10 @@ license:CC0-1.0
 
 	<software name="aplesoft">
 		<description>Applesoft IIa</description>
-		<year>1977</year>
+		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
+		<info name="serial" value="002-0007-01" />
+		<info name="partno" value="A2T0004X" />
 		<info name="usage" value=">Load 16K" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Applesoft IIa" />
@@ -553,7 +555,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="briccol">
-		<description>Brick out / Color Demonstration Programs</description>
+		<description>Brick Out / Color Demonstration Programs</description>
 		<year>1978</year>
 		<publisher>Apple Computer, Inc.</publisher>
 		<info name="serial" value="685-0003-00" />

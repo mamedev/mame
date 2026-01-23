@@ -1621,7 +1621,7 @@ void t10mmc::WriteData( uint8_t *data, int dataLength )
 		int len = dataLength;
 		int reserved = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? data[0] + 1 : get_u16be(&data[0]) + 2;
 		if (len != reserved && reserved)
-			m_device->logerror("T10MMC: reserved length=%d (%d)", reserved, dataLength);
+			m_device->logerror("T10MMC: reserved length=%d (%d)\n", reserved, dataLength);
 
 		int bdlen = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? data[3] : get_u16be(&data[6]);
 		int ptr = (command[0] == T10SPC_CMD_MODE_SELECT_6) ? 4 : 8;

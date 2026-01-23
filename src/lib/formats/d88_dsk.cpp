@@ -511,13 +511,13 @@ bool d88_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				std::tie(err, actual) = read_at(io, pos, hs, 16); // FIXME: check for errors and premature EOF
 				pos += 16;
 
-				uint16_t size = little_endianize_int16(*(uint16_t *)(hs+14));
+				uint16_t size = get_u16le(hs+14);
 
 				if(pos + size > file_size)
 					return true;
 
 				if(i == 0) {
-					sector_count = little_endianize_int16(*(uint16_t *)(hs+4));
+					sector_count = get_u16le(hs+4);
 					// Support broken vfman converter
 					if(sector_count == 0x1000)
 						sector_count = 0x10;

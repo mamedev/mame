@@ -2140,14 +2140,13 @@ license:CC0-1.0
 	</software>
 
 	<software name="dreamzne">
-		<description>Dream Zone (version 3.2)</description>
+		<description>Dream Zone (version 3.2 #29711)</description>
 		<year>1987</year>
 		<publisher>Baudville</publisher>
+		<info name="partno" value="29711" />
 		<info name="programmer" value="Andy Gavin" />
-		<info name="programmer" value="Jason Rubin" />
-		<info name="programmer" value="Sarah Sidman" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<info name="version" value="3.2" />
+		<info name="version" value="3.2 #29711" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-05-31 -->
 		<!-- adventure game -->
@@ -2893,14 +2892,15 @@ license:CC0-1.0
 	</software>
 
 	<software name="816paint">
-		<description>816/Paint (version 3.1)</description>
+		<description>816/Paint (version 3.1 #24721)</description>
 		<year>1987</year>
 		<publisher>Baudville</publisher>
+		<info name="partno" value="24721" />
 		<info name="programmer" value="Michael Darooge" />
 		<info name="programmer" value="Robert Barris" />
 		<info name="programmer" value="Gregory C. Miller" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<info name="version" value="3.1" />
+		<info name="version" value="3.1 #24721" />
 		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-06-08 -->
 		<!-- graphics program -->

@@ -18,7 +18,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="msdos211ta" cloneof="msdos211t">
-		<description>MS-DOS (Version 2.11, Tandy version 02.11.24, Alt)</description>
+		<description>MS-DOS (Version 2.11, Tandy version 02.11.24, alt)</description>
 		<year>1986</year>
 		<publisher>Tandy</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -165,7 +165,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pdesk2hxa" cloneof="pdesk2hx">
-		<description>Personal DeskMate 2 (Tandy 1000 HX, Alt)</description>
+		<description>Personal DeskMate 2 (Tandy 1000 HX, alt)</description>
 		<year>1987</year>
 		<publisher>Tandy</publisher>
 		<info name="version" value="01.00.00" />

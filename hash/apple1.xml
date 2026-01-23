@@ -39,7 +39,7 @@ Basic programs:
 
 <!-- This version does seem to work better than the above, so we include it temporarily until we fix the subtle bug causing the parent not to be loaded properly -->
 	<software name="basica" cloneof="basic">
-		<description>Apple I Basic (Alt)</description>
+		<description>Apple I Basic (alt)</description>
 		<year>1976</year>
 		<publisher>Apple Computer Inc.</publisher>
 		<info name="usage" value="Load at E000.EFFFR, enter at E000R" />

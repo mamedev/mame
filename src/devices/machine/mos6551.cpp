@@ -45,7 +45,7 @@ mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, d
 	m_tx_state(STATE_START),
 	m_tx_output(OUTPUT_MARK),
 	m_tx_clock(0), m_tx_bits(0), m_tx_shift(0), m_tx_parity(0),
-	m_tx_counter(0), m_tx_enable(0), m_tx_irq_enable(0), m_tx_internal_clock(0)
+	m_tx_counter(0), m_tx_irq_enable(0), m_tx_internal_clock(0)
 {
 }
 
@@ -56,7 +56,7 @@ const int mos6551_device::internal_divider[] =
 
 const int mos6551_device::transmitter_controls[4][3] =
 {
-	//tx irq, tx ena, brk
+	//tx irq, rts, brk
 	{0, 0, 0},
 	{1, 1, 0},
 	{0, 1, 0},
@@ -125,7 +125,6 @@ void mos6551_device::device_start()
 	save_item(NAME(m_tx_shift));
 	save_item(NAME(m_tx_parity));
 	save_item(NAME(m_tx_counter));
-	save_item(NAME(m_tx_enable));
 	save_item(NAME(m_tx_irq_enable));
 	save_item(NAME(m_tx_internal_clock));
 
@@ -362,7 +361,7 @@ void mos6551_device::write_command(uint8_t data)
 	// bits 2-3
 	int transmitter_control = (m_command >> 2) & 3;
 	m_tx_irq_enable = transmitter_controls[transmitter_control][0] && !m_dtr;
-	m_tx_enable = transmitter_controls[transmitter_control][1];
+	bool rts_active = transmitter_controls[transmitter_control][1];
 	m_brk = transmitter_controls[transmitter_control][2];
 	if (!m_tx_irq_enable && (m_irq_state & IRQ_TDRE))
 	{
@@ -380,9 +379,9 @@ void mos6551_device::write_command(uint8_t data)
 		m_parity = PARITY_NONE;
 	}
 
-	output_rts(!(m_tx_enable || m_echo_mode));
+	output_rts(!(rts_active || m_echo_mode));
 
-	if (m_dtr || m_rts)
+	if (m_dtr)
 	{
 		m_tx_output = OUTPUT_MARK;
 		output_txd(1);
@@ -713,145 +712,142 @@ void mos6551_device::transmitter_clock(int state)
 				}
 			}
 
-			if (m_tx_enable)
+			if (!m_cts && m_tx_output == OUTPUT_MARK && !(m_status & SR_TDRE))
 			{
-				if (!m_cts && m_tx_output == OUTPUT_MARK && !(m_status & SR_TDRE))
+				m_tx_state = STATE_START;
+				m_tx_counter = 0;
+			}
+
+			m_tx_counter++;
+
+			switch (m_tx_state)
+			{
+			case STATE_START:
+				m_tx_counter = 0;
+
+				m_tx_state = STATE_DATA;
+				m_tx_shift = m_tdr;
+				m_tx_bits = 0;
+				m_tx_parity = 0;
+
+				if (m_cts || m_rts)
 				{
-					m_tx_state = STATE_START;
-					m_tx_counter = 0;
+					m_tx_output = OUTPUT_MARK;
+				}
+				else if (!(m_status & SR_TDRE))
+				{
+					LOG("MOS6551: TX DATA %x\n", m_tdr);
+
+					m_tx_output = OUTPUT_TXD;
+
+					LOG("MOS6551: TX START BIT\n");
+
+					m_status |= SR_TDRE;
+				}
+				else if (m_brk)
+				{
+					m_tx_output = OUTPUT_BREAK;
+
+					LOG("MOS6551: TX BREAK START\n");
+				}
+				else
+				{
+					m_tx_output = OUTPUT_MARK;
 				}
 
-				m_tx_counter++;
-
-				switch (m_tx_state)
+				if (m_tx_irq_enable && m_tx_output != OUTPUT_BREAK)
 				{
-				case STATE_START:
+					m_irq_state |= IRQ_TDRE;
+					update_irq();
+				}
+
+				output_txd(0);
+				break;
+
+			case STATE_DATA:
+				if (m_tx_counter == m_divide)
+				{
 					m_tx_counter = 0;
 
-					m_tx_state = STATE_DATA;
-					m_tx_shift = m_tdr;
-					m_tx_bits = 0;
-					m_tx_parity = 0;
-
-					if (m_cts)
+					if (m_tx_bits < m_wordlength)
 					{
-						m_tx_output = OUTPUT_MARK;
+						output_txd((m_tx_shift >> m_tx_bits) & 1);
+
+						m_tx_bits++;
+						m_tx_parity ^= m_txd;
+
+						if (m_tx_output == OUTPUT_TXD)
+						{
+							LOG("MOS6551: TX DATA BIT %d %d\n", m_tx_bits, m_txd);
+						}
 					}
-					else if (!(m_status & SR_TDRE))
+					else if (m_tx_bits == m_wordlength && m_parity != PARITY_NONE)
 					{
-						LOG("MOS6551: TX DATA %x\n", m_tdr);
+						m_tx_bits++;
 
-						m_tx_output = OUTPUT_TXD;
+						switch (m_parity)
+						{
+						case PARITY_ODD:
+							m_tx_parity = !m_tx_parity;
+							break;
 
-						LOG("MOS6551: TX START BIT\n");
+						case PARITY_MARK:
+							m_tx_parity = 1;
+							break;
 
-						m_status |= SR_TDRE;
-					}
-					else if (m_brk)
-					{
-						m_tx_output = OUTPUT_BREAK;
+						case PARITY_SPACE:
+							m_tx_parity = 0;
+							break;
+						}
 
-						LOG("MOS6551: TX BREAK START\n");
+						output_txd(m_tx_parity);
+
+						if (m_tx_output == OUTPUT_TXD)
+						{
+							LOG("MOS6551: TX PARITY BIT %d\n", m_txd);
+						}
 					}
 					else
 					{
-						m_tx_output = OUTPUT_MARK;
-					}
+						m_tx_state = STATE_STOP;
 
-					if (m_tx_irq_enable && m_tx_output != OUTPUT_BREAK)
-					{
-						m_irq_state |= IRQ_TDRE;
-						update_irq();
-					}
+						output_txd(1);
 
-					output_txd(0);
-					break;
-
-				case STATE_DATA:
-					if (m_tx_counter == m_divide)
-					{
-						m_tx_counter = 0;
-
-						if (m_tx_bits < m_wordlength)
+						if (m_tx_output == OUTPUT_TXD)
 						{
-							output_txd((m_tx_shift >> m_tx_bits) & 1);
-
-							m_tx_bits++;
-							m_tx_parity ^= m_txd;
-
-							if (m_tx_output == OUTPUT_TXD)
-							{
-								LOG("MOS6551: TX DATA BIT %d %d\n", m_tx_bits, m_txd);
-							}
+							LOG("MOS6551: TX STOP BIT\n");
 						}
-						else if (m_tx_bits == m_wordlength && m_parity != PARITY_NONE)
+					}
+				}
+				break;
+
+			case STATE_STOP:
+				if (m_tx_counter >= stoplength())
+				{
+					if (m_tx_output == OUTPUT_BREAK)
+					{
+						if (!m_brk)
 						{
-							m_tx_bits++;
+							LOG("MOS6551: TX BREAK END\n");
 
-							switch (m_parity)
-							{
-							case PARITY_ODD:
-								m_tx_parity = !m_tx_parity;
-								break;
-
-							case PARITY_MARK:
-								m_tx_parity = 1;
-								break;
-
-							case PARITY_SPACE:
-								m_tx_parity = 0;
-								break;
-							}
-
-							output_txd(m_tx_parity);
-
-							if (m_tx_output == OUTPUT_TXD)
-							{
-								LOG("MOS6551: TX PARITY BIT %d\n", m_txd);
-							}
-						}
-						else
-						{
+							m_tx_counter = 0;
 							m_tx_state = STATE_STOP;
+							m_tx_output = OUTPUT_TXD;
 
 							output_txd(1);
-
-							if (m_tx_output == OUTPUT_TXD)
-							{
-								LOG("MOS6551: TX STOP BIT\n");
-							}
-						}
-					}
-					break;
-
-				case STATE_STOP:
-					if (m_tx_counter >= stoplength())
-					{
-						if (m_tx_output == OUTPUT_BREAK)
-						{
-							if (!m_brk)
-							{
-								LOG("MOS6551: TX BREAK END\n");
-
-								m_tx_counter = 0;
-								m_tx_state = STATE_STOP;
-								m_tx_output = OUTPUT_TXD;
-
-								output_txd(1);
-							}
-							else
-							{
-								m_tx_counter--;
-							}
 						}
 						else
 						{
-							m_tx_state = STATE_START;
-							m_tx_counter = 0;
+							m_tx_counter--;
 						}
 					}
-					break;
+					else
+					{
+						m_tx_state = STATE_START;
+						m_tx_counter = 0;
+					}
 				}
+				break;
 			}
 		}
 	}

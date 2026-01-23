@@ -142,7 +142,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 	</software>
 
 	<software name="alphosa" cloneof="alphos" supported="no">
-		<description>Alphos (Alt?)</description>
+		<description>Alphos (alt?)</description>
 		<year>1983</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -542,7 +542,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 	</software>
 
 	<software name="galaxiana" cloneof="galaxian" supported="no">
-		<description>Galaxian (Alt?)</description>
+		<description>Galaxian (alt?)</description>
 		<year>1983</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
 		<!-- PC8801 -->
@@ -676,7 +676,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 	</software>
 
 	<software name="jelda2a" cloneof="jelda2" supported="no">
-		<description>Jelda II (Alt)</description>
+		<description>Jelda II (alt)</description>
 		<year>1984</year>
 		<publisher>キャリーラボ (Carry Lab)</publisher>
 		<!-- PC8801 -->
@@ -806,7 +806,7 @@ kanji name, romaji name, manufacturer, release date in %MMM %YY format, notes
 	</software>
 
 	<software name="wakumeph" supported="no">
-		<description>Star Arthur Densetsu I - Wakusei Mephius (Alt)</description>
+		<description>Star Arthur Densetsu I - Wakusei Mephius (alt)</description>
 		<year>1983</year>
 		<publisher>T&amp;E Soft</publisher>
 		<!-- PC8801 -->

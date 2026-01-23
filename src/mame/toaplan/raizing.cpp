@@ -643,8 +643,8 @@ static INPUT_PORTS_START( bgareggak )
 
 	PORT_MODIFY("JMPR")
 	PORT_CONFNAME( 0x0003,  0x0003, DEF_STR( Region ) ) //PORT_CONFLOCATION("JP:!2,!1")
-	PORT_CONFSETTING(       0x0001, "Greece" )
-	PORT_CONFSETTING(       0x0003, "Korea" )
+	PORT_CONFSETTING(       0x0001, "Greece (Tuning)" )
+	PORT_CONFSETTING(       0x0003, "Korea (Dream Island)" )
 INPUT_PORTS_END
 
 

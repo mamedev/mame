@@ -1213,7 +1213,7 @@ ROM_END
 
 void jungleyo_state::init_jungleyo()
 {
-	u16 *src = (u16 *)memregion("maincpu")->base();
+	u16 *src = &memregion("maincpu")->as_u16();
 
 	for (int i = 0x00000; i < 0x10000 / 2; i++)
 		src[i] = bitswap<16>(src[i] ^ 0x00ff, 8, 10, 15, 11, 9, 14, 12, 13, 6, 4, 2, 7, 3, 0, 1, 5);
@@ -1237,7 +1237,7 @@ void jungleyo_state::init_jungleyo()
 
 void jungleyo_state::init_frtgenie()
 {
-	u16 *src = (u16 *)memregion("maincpu")->base();
+	u16 *src = &memregion("maincpu")->as_u16();
 
 	for (int i = 0x00000; i < 0x10000 / 2; i++)
 		src[i] = bitswap<16>(src[i] ^ 0x00ff, 11, 12, 14, 9, 10, 13, 8, 15, 5, 0, 2, 3, 6, 1, 4, 7);
@@ -1264,7 +1264,7 @@ void jungleyo_state::init_frtgenie()
 
 void jungleyo_state::init_kingfrt()
 {
-	u16 *src = (u16 *)memregion("maincpu")->base();
+	u16 *src = &memregion("maincpu")->as_u16();
 
 	for (int i = 0x00000; i < 0x10000 / 2; i++)
 		src[i] = bitswap<16>(src[i] ^ 0x00ff, 15, 9, 12, 10, 14, 13, 8, 11, 7, 6, 1, 4, 3, 5, 0, 2);
@@ -1289,7 +1289,7 @@ void jungleyo_state::init_kingfrt()
 template <uint16_t Reset_addr>
 void jungleyo_state::init_magjack()
 {
-	u16 *src = (u16 *)memregion("maincpu")->base();
+	u16 *src = &memregion("maincpu")->as_u16();
 
 	for (int i = 0x00000; i < 0x10000 / 2; i++)
 		src[i] = bitswap<16>(src[i] ^ 0xffff, 15, 12, 9, 13, 14, 11, 8, 10, 0, 4, 7, 1, 6, 5, 2, 3);

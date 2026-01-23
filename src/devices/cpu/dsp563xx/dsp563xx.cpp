@@ -40,10 +40,18 @@ void dsp563xx_device::device_start()
 	state_add<u32>(DSP563XX_SSL, "SSL", std::bind(&dsp563xx_device::get_ssl, this), std::bind(&dsp563xx_device::set_ssl, this, _1)).formatstr("%06X");
 	state_add(DSP563XX_A, "A", m_a).formatstr("%014X");
 	state_add(DSP563XX_B, "B", m_b).formatstr("%014X");
+	state_add(DSP563XX_A0, "A0", m_temp).noshow().callimport().callexport();
+	state_add(DSP563XX_A1, "A1", m_temp).noshow().callimport().callexport();
+	state_add(DSP563XX_A2, "A2", m_temp).noshow().callimport().callexport();
+	state_add(DSP563XX_B0, "B0", m_temp).noshow().callimport().callexport();
+	state_add(DSP563XX_B1, "B1", m_temp).noshow().callimport().callexport();
+	state_add(DSP563XX_B2, "B2", m_temp).noshow().callimport().callexport();
 	state_add(DSP563XX_X0, "X0", m_x0).formatstr("%06X");
 	state_add(DSP563XX_X1, "X1", m_x1).formatstr("%06X");
 	state_add(DSP563XX_Y0, "Y0", m_y0).formatstr("%06X");
 	state_add(DSP563XX_Y1, "Y1", m_y1).formatstr("%06X");
+	state_add(DSP563XX_X, "X", m_temp).noshow().callimport().callexport();
+	state_add(DSP563XX_Y, "Y", m_temp).noshow().callimport().callexport();
 	state_add(DSP563XX_R0, "R0", m_r[0]).formatstr("%06X");
 	state_add(DSP563XX_R1, "R1", m_r[1]).formatstr("%06X");
 	state_add(DSP563XX_R2, "R2", m_r[2]).formatstr("%06X");
@@ -68,6 +76,8 @@ void dsp563xx_device::device_start()
 	state_add(DSP563XX_M5, "M5", m_m[5]).formatstr("%06X");
 	state_add(DSP563XX_M6, "M6", m_m[6]).formatstr("%06X");
 	state_add(DSP563XX_M7, "M7", m_m[7]).formatstr("%06X");
+	state_add(DSP563XX_VBA, "VBA", m_vba).formatstr("%06X");
+	state_add(DSP563XX_EP, "EP", m_ep).formatstr("%06X");
 
 	save_item(NAME(m_icount));
 	save_item(NAME(m_a));
@@ -115,6 +125,7 @@ void dsp563xx_device::device_start()
 	m_npc = 0;
 	m_skip = false;
 	m_temp_lc = 0;
+	m_temp = 0; // For callimport/callexport use
 
 	set_icountptr(m_icount);
 }
@@ -169,8 +180,8 @@ void dsp563xx_device::execute_run()
 				m_npc = (m_pc + (ex ? 2 : 1)) & 0xffffff;
 				m_rep = false;
 			}
-		}
-		else {
+
+		} else {
 			m_npc = (m_pc + (ex ? 2 : 1)) & 0xffffff;
 			if(loop) {
 				if(m_lc != 1 || (m_emr & EMR_FV)) {
@@ -211,10 +222,34 @@ device_memory_interface::space_config_vector dsp563xx_device::memory_space_confi
 
 void dsp563xx_device::state_import(const device_state_entry &entry)
 {
+	switch(entry.index()) {
+	case DSP563XX_A0: set_a0(m_temp); break;
+	case DSP563XX_A1: set_a1(m_temp); break;
+	case DSP563XX_A2: set_a2(m_temp); break;
+	case DSP563XX_B0: set_b0(m_temp); break;
+	case DSP563XX_B1: set_b1(m_temp); break;
+	case DSP563XX_B2: set_b2(m_temp); break;
+	case DSP563XX_X: set_x(m_temp); break;
+	case DSP563XX_Y: set_y(m_temp); break;
+	default:
+		logerror("Unhandled state import %d\n", entry.index());
+	}
 }
 
 void dsp563xx_device::state_export(const device_state_entry &entry)
 {
+	switch(entry.index()) {
+	case DSP563XX_A0: m_temp = get_a0(); break;
+	case DSP563XX_A1: m_temp = get_a1(); break;
+	case DSP563XX_A2: m_temp = get_a2(); break;
+	case DSP563XX_B0: m_temp = get_b0(); break;
+	case DSP563XX_B1: m_temp = get_b1(); break;
+	case DSP563XX_B2: m_temp = get_b2(); break;
+	case DSP563XX_X: m_temp = get_x(); break;
+	case DSP563XX_Y: m_temp = get_y(); break;
+	default:
+		logerror("Unhandled state export %d\n", entry.index());
+	}
 }
 
 void dsp563xx_device::state_string_export(const device_state_entry &entry, std::string &str) const

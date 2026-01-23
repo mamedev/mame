@@ -1,0 +1,188 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Software list of Sharp MZ-2000 snapshots, created to provide support for software that will run as a snapshot image in MAME but (currently) not in the original media.
+-->
+<softwarelist name="mz2000_snap" description="Sharp MZ-2000 snapshots">
+
+<!-- !Operating Systems -->
+
+	<software name="mz1z001" supported="yes">
+		<description>BASIC MZ-1Z001 (v1.0c)</description>
+		<year>1982</year>
+		<publisher>Sharp</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="19547">
+				<rom name="mz-1z001.bin" size="19547" crc="07e7f9cb" sha1="dd2117682cde53eba97f4a05e561030415bec787" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mz1z002" supported="yes">
+		<description>BASIC MZ-1Z002 (v1.0a)</description>
+		<year>1982</year>
+		<publisher>Sharp</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="23783">
+				<rom name="mz-1z002.bin" size="23783" crc="fe027b3a" sha1="62709e147ab7c08ae341489e92f56bbac951c59e" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Games -->
+
+	<software name="binary" supported="yes">
+		<description>Binary Land</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="61440">
+				<rom name="binary-land.bin" size="61440" crc="11c04480" sha1="7606b2156944ae6cd948d991a358bde0cbe92157" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cloudkdm" supported="yes">
+		<description>Cloud Kingdom</description>
+		<year>1983</year>
+		<publisher>Unison World Inc.</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="48401">
+				<rom name="cloud-kingdom.bin" size="48401" crc="a3a4dcd7" sha1="ffc4b6e56bad22feb5dfe3a5001b1cb0bb91e915" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dawnptrl" supported="yes">
+		<description>Dawn Patrol</description>
+		<year>1986?</year>
+		<publisher>Silver Ball Software</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="38144">
+				<rom name="dawn-patrol.bin" size="38144" crc="9b9c2674" sha1="209e835526b8cd716b7669bb68d448198b3d1bb7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="falcadv" supported="yes">
+		<description>Falcon Adventure</description>
+		<year>1983</year>
+		<publisher>Unison World Inc.</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="48896">
+				<rom name="falcon-adventure.bin" size="48896" crc="c55e9284" sha1="9bb70fc7c29786f51b34bb4e4b5c48b8cf1a3d41" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flicky" supported="yes">
+		<description>Flicky</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="51200">
+				<rom name="flicky.bin" size="51200" crc="28a79d1b" sha1="86468c6ab2a229d49eeda20d2160607cebcbe18b" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frntline" supported="yes">
+		<description>Front Line</description>
+		<year>1984?</year>
+		<publisher>Carry Soft</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="62464">
+				<rom name="front-line.bin" size="62464" crc="4b48693a" sha1="19313bc7bbe133398996e3aee343a3440ab6afca" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lucy" supported="yes">
+		<description>Lucy</description>
+		<year>19??</year>
+		<publisher>Pasol</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="47872">
+				<rom name="lucy.bin" size="47872" crc="254f1Ea9" sha1="08d0a0b32e866cd9ea20bf39b0bc54877e1d90b6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mahjong" supported="yes">
+		<description>Mahjong</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="27008">
+				<rom name="mahjong.bin" size="27008" crc="ffb3dd27" sha1="3f6f7397e6144c776f614f257c85f1963ceb913a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mariosp" supported="yes">
+		<description>Mario Bros. Special</description>
+		<year>1984</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="42240">
+				<rom name="mario-special.bin" size="42240" crc="5d69a9c8" sha1="77edf691aa9a1172bed96953da1925cf22fb0a57" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plazmaln" supported="yes">
+		<description>Plazma Line</description>
+		<year>1984?</year>
+		<publisher>Techno Soft</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="54016">
+				<rom name="plazma-line.bin" size="54016" crc="ffc092a7" sha1="9de360f2443690184459780f256c9a1cbc56d4af" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="undrgrnd" supported="yes">
+		<description>Underground City</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="46592">
+				<rom name="underground-city.bin" size="46592" crc="361de7f3" sha1="328f20ca3845bc42390c60286540ea0435241a90" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wildwest" supported="yes">
+		<description>Wild Western</description>
+		<year>19??</year>
+		<publisher>Carry Soft</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="62464">
+				<rom name="wild-western.bin" size="62464" crc="136751bd" sha1="fb29b0cf279b3ae8fdb3d7524ea8c937affe8a92" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xetter2k" supported="yes">
+		<description>Xetter</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="61461">
+				<rom name="xetter-2000.bin" size="61461" crc="a9dc0D9d" sha1="798298638335c0dcbc5cd9ed14f3163894a892d1" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xeter2k2" supported="yes">
+		<description>Xetter II</description>
+		<year>19??</year>
+		<publisher>K.Kuromusha</publisher>
+		<part name="snap" interface="mz_snap">
+			<dataarea name="snap" size="36760">
+				<rom name="xetter-2000-2.bin" size="36760" crc="2f2992f9" sha1="277ee072e015fed04db3a1009e9a4ff41f306d13" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

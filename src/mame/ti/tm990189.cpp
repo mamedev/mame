@@ -474,11 +474,10 @@ void tm990_189_rs232_image_device::call_unload()
 }
 
 
-/* static TMS9902_RTS_CALLBACK( rts_callback )
+/* void tm990189_state::rts_callback(int state)
 {
-    tm990189 *state = device->machine().driver_data<tm990189>();
-    state->m_rs232_rts = RTS;
-    tms9902->set_cts(RTS);
+    m_rs232_rts = state;
+    m_tms9918->set_cts(state);
 } */
 
 void tm990189_state::xmit_callback(uint8_t data)

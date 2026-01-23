@@ -33,8 +33,8 @@ authors:hap
 	<view name="Internal Layout">
 		<bounds left="25" right="190" top="40" bottom="100" />
 
-		<element ref="text_l1"><bounds x="0" y="52" width="47.5" height="6" /></element>
-		<element ref="text_l2"><bounds x="0" y="68" width="47.5" height="6" /></element>
+		<element ref="text_l1"><bounds x="26" y="52" width="21.5" height="6" /></element>
+		<element ref="text_l2"><bounds x="26" y="68" width="21.5" height="6" /></element>
 		<element ref="text_l3"><bounds x="71" y="84" width="90" height="6" /></element>
 		<element ref="text_l4"><bounds x="71" y="84" width="90" height="6" /></element>
 

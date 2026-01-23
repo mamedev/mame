@@ -80,7 +80,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="browserb" supported="no">
-		<description>@World Browser (USA, Prototype)</description>
+		<description>@World Browser (USA, prototype)</description>
 		<year>1997</year>
 		<publisher>Apple</publisher>
 		<info name="serial" value="41458" />
@@ -267,6 +267,22 @@ license:CC0-1.0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="compton" sha1="d30c34a1f32761e8dc0a8b8e01051099e1255d02"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="comptonp" cloneof="compton" supported="no">
+		<!--
+		http://redump.org/disc/128570/
+		<rom name="Compton's Interactive Encyclopedia - @World Edition (USA) (Beta) (1996-10-28).cue" size="143" crc="3de7dc4f" sha1="92ba912add9f284a02a9c0a758a5b5b89eff01d0"/>
+		<rom name="Compton's Interactive Encyclopedia - @World Edition (USA) (Beta) (1996-10-28).bin" size="783086640" crc="393265f1" sha1="2d753c87c832a6878bce3818d42060f4f644e8f8"/>
+		-->
+		<description>Compton's Interactive Encyclopedia (USA, prototype 19961028)</description>
+		<year>1996</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="compton's interactive encyclopedia - @world edition (usa) (beta) (1996-10-28).chd" sha1="e47575203af896d1525b3fa5f0c9bd1630a30a72"/>
 			</diskarea>
 		</part>
 	</software>
@@ -532,6 +548,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="mrpotatop" supported="no">
+		<!--
+		http://redump.org/disc/128568/
+		<rom name="Mr. Potato Head Saves Veggie Valley (USA) (Beta) (1996-10-30).cue" size="127" crc="014a399f" sha1="e1706fed2c4d06ea60df9765d61aca17793c0013"/>
+		<rom name="Mr. Potato Head Saves Veggie Valley (USA) (Beta) (1996-10-30).bin" size="783086640" crc="a538ab3a" sha1="609e586f4ef51f40122a6eb8fbc02f50d3468d36"/>
+		-->
+		<description>Mr. Potato Head Saves Veggie Valley (USA, prototype 19961030)</description>
+		<year>1996</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="mr. potato head saves veggie valley (usa) (beta) (1996-10-30).chd" sha1="1086c44370fea88e0bc9d81154ac61204f06190e"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="gundamzd" supported="no">
 		<description>Mobile Suit Gundam - Zion Dukedom Military-File (Japan)</description>
 		<year>1996</year>
@@ -763,6 +795,22 @@ license:CC0-1.0
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="powerran" sha1="7eb631487f4ee521d157c2e5b5280af9346cd6a7"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="powerranp" cloneof="powerran" supported="no">
+		<!--
+		http://redump.org/disc/128570/
+		<rom name="Saban's Power Rangers Zeo Versus the Machine Empire (USA) (Beta) (1996-10-23).cue" size="143" crc="a059ce57" sha1="0a47c695bef66a508d73aa2d41979edb834b9ac6"/>
+		<rom name="Saban's Power Rangers Zeo Versus the Machine Empire (USA) (Beta) (1996-10-23).bin" size="783086640" crc="fdad6a9f" sha1="cacd6d6afff3fbc26193f464cf1a529f0d0345ef"/>
+		-->
+		<description>Power Rangers Zeo Vs. The Machine Empire (USA, prototype 19961023)</description>
+		<year>1996</year>
+		<publisher>Bandai</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="saban's power rangers zeo versus the machine empire (usa) (beta) (1996-10-23).chd" sha1="3457739631d3d1dc7b94699c55404fa78c9ad36c"/>
 			</diskarea>
 		</part>
 	</software>

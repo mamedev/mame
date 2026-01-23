@@ -20,7 +20,7 @@ authors:hap
 	<element name="ind_low" defstate="0">
 		<rect state="0"><color red="0.515" green="0.537" blue="0.548" /></rect>
 		<rect state="1"><color red="0.196" green="0.176" blue="0.235" /></rect>
-		<text string="LOW">
+		<text string=" LOW ">
 			<color red="0.5412" green="0.57255" blue="0.5804" />
 		</text>
 	</element>
@@ -28,7 +28,7 @@ authors:hap
 	<element name="ind_error" defstate="0">
 		<rect state="0"><color red="0.515" green="0.537" blue="0.548" /></rect>
 		<rect state="1"><color red="0.196" green="0.176" blue="0.235" /></rect>
-		<text string="ERROR">
+		<text string=" ERROR ">
 			<color red="0.5412" green="0.57255" blue="0.5804" />
 		</text>
 	</element>
@@ -96,19 +96,19 @@ authors:hap
 	</element>
 
 	<element name="ind_de" defstate="0">
-		<text string="DE" align="1" state="0">
+		<text string="DE" align="2" state="0">
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
-		<text string="DE" align="1" state="1">
+		<text string="DE" align="2" state="1">
 			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
 
 	<element name="ind_g" defstate="0">
-		<text string="G" align="1" state="0">
+		<text string="G" align="0" state="0">
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
-		<text string="G" align="1" state="1">
+		<text string="G" align="0" state="1">
 			<color red="0.196" green="0.176" blue="0.235" />
 		</text>
 	</element>
@@ -246,10 +246,10 @@ authors:hap
 
 		<!-- right: run, sys -->
 		<element name="seg3" ref="ind_run">
-			<bounds x="115.5" y="6.5" width="20" height="5" />
+			<bounds x="115.5" y="6.5" width="8" height="5" />
 		</element>
 		<element name="seg4" ref="ind_sys">
-			<bounds x="115.5" y="12" width="20" height="5" />
+			<bounds x="115.5" y="12" width="8" height="5" />
 		</element>
 
 		<!-- top: _low, _error, 2nd, inv, alpha, lc, ins -->
@@ -261,41 +261,41 @@ authors:hap
 		</element>
 
 		<element name="seg41" ref="ind_2nd">
-			<bounds x="32" y="1" width="20" height="5" />
+			<bounds x="32" y="1" width="7.5" height="5" />
 		</element>
 		<element name="seg44" ref="ind_inv">
-			<bounds x="41" y="1" width="20" height="5" />
+			<bounds x="41" y="1" width="6.5" height="5" />
 		</element>
 		<element name="seg42" ref="ind_alpha">
-			<bounds x="50" y="1" width="20" height="5" />
+			<bounds x="50" y="1" width="12" height="5" />
 		</element>
 		<element name="seg12" ref="ind_lc">
-			<bounds x="64.3" y="1" width="20" height="5" />
+			<bounds x="64.3" y="1" width="4.5" height="5" />
 		</element>
 		<element name="seg11" ref="ind_ins">
-			<bounds x="71.3" y="1" width="20" height="5" />
+			<bounds x="71.3" y="1" width="7" height="5" />
 		</element>
 
 		<!-- top: deg/rad/grad -->
 		<element name="seg10" ref="ind_de">
-			<bounds x="80" y="1" width="20" height="5" />
+			<bounds x="79.75" y="1" width="5.5" height="5" />
 		</element>
 		<element name="seg13" ref="ind_g">
-			<bounds x="85" y="1" width="20" height="5" />
+			<bounds x="85" y="1" width="3" height="5" />
 		</element>
 		<element name="seg14" ref="ind_rad">
-			<bounds x="87.8" y="1" width="20" height="5" />
+			<bounds x="88" y="1" width="7.75" height="5" />
 		</element>
 
 		<!-- top: hex, oct, i/o -->
 		<element name="seg0" ref="ind_hex">
-			<bounds x="97.7" y="1" width="20" height="5" />
+			<bounds x="97.7" y="1" width="7.5" height="5" />
 		</element>
 		<element name="seg1" ref="ind_oct">
-			<bounds x="107" y="1" width="20" height="5" />
+			<bounds x="107" y="1" width="7.5" height="5" />
 		</element>
 		<element name="seg2" ref="ind_io">
-			<bounds x="117.5" y="1" width="20" height="5" />
+			<bounds x="117.5" y="1" width="6" height="5" />
 		</element>
 
 	</view>

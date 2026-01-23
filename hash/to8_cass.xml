@@ -57,7 +57,7 @@ Thanks to DCMOTO (http://dcmoto.free.fr) for info!
 	</software>
 
 	<software name="dctransa" cloneof="dctrans">
-		<description>DC Transferts (Alt)</description>
+		<description>DC Transferts (alt)</description>
 		<year>2006</year>
 		<publisher>DCsoft</publisher>
 

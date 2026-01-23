@@ -14,16 +14,26 @@
     the original Mobigo is ROM+RAM config
     the Mobigo 2 is NAND+RAM config
     cartridges are compatible
+
+    Known Undumped:
+    MobiGo 2 (USA, English)
+    MobiGo (UK and Australia, English)
+    MobiGo 2 (UK and Australia, English)
+    MobiGo (Canada, English)
+    MobiGo 2 (Canada, English)
+    MobiGo (Canada, French)
+
 */
 
 #include "emu.h"
 #include "generalplus_gpl16250_nand.h"
 #include "generalplus_gpl16250_romram.h"
 
-#include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
-#include "softlist_dev.h"
+#include "bus/generic/slot.h"
+
 #include "screen.h"
+#include "softlist_dev.h"
 
 
 namespace {
@@ -36,11 +46,11 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	void mobigo2(machine_config &config);
+	void mobigo2(machine_config &config) ATTR_COLD;
 
 protected:
-
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
 	required_device<generic_slot_device> m_cart;
 };
 
@@ -52,12 +62,12 @@ public:
 		m_cart(*this, "cartslot")
 	{ }
 
-	void mobigo(machine_config &config);
-	void init_mobigo();
+	void mobigo(machine_config &config) ATTR_COLD;
+	void init_mobigo() ATTR_COLD;
 
 protected:
-
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+
 	required_device<generic_slot_device> m_cart;
 };
 
@@ -101,6 +111,8 @@ void mobigo_state::mobigo(machine_config &config)
 
 void mobigo2_state::mobigo2(machine_config &config)
 {
+	set_addrmap(0, &mobigo2_state::cs_map_base);
+
 	GPAC800(config, m_maincpu, 96000000/2, m_screen);  // Doesn't have GPnandnand header in NAND tho, so non-standard bootloader
 	m_maincpu->porta_in().set(FUNC(mobigo2_state::porta_r));
 	m_maincpu->portb_in().set(FUNC(mobigo2_state::portb_r));
@@ -115,8 +127,6 @@ void mobigo2_state::mobigo2(machine_config &config)
 	m_maincpu->set_cs_config_callback(FUNC(mobigo2_state::cs_callback));
 
 	m_maincpu->nand_read_callback().set(FUNC(mobigo2_state::read_nand));
-
-	FULL_MEMORY(config, m_memory).set_map(&mobigo2_state::cs_map_base);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(60);
@@ -168,6 +178,6 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2010, mobigo,  0,      0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2010, mobigos, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2012, mobigo2, 0,      0, mobigo2,  mobigo, mobigo2_state, nand_init840, "VTech", "MobiGo 2 (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2010, mobigo,  0,      0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo (USA)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2011, mobigos, mobigo, 0, mobigo,   mobigo, mobigo_state,  init_mobigo , "VTech", "MobiGo (Spain)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2013, mobigo2, 0,      0, mobigo2,  mobigo, mobigo2_state, nand_init840, "VTech", "MobiGo 2 (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

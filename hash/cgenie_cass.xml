@@ -2755,7 +2755,7 @@ is confirmed.
 
 	<!-- NF Error in 790 -->
 	<software name="numberupa" supported="no">
-		<description>Numbers Up Shoot Out (Alt)</description>
+		<description>Numbers Up Shoot Out (alt)</description>
 		<year>1984</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="author" value="Tony Hockney" />

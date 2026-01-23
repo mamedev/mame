@@ -1,0 +1,180 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+NOTE:
+- we treat supported="no" for something that have major issues everywhere,
+  "partial" for stuff running on 1+ systems but don't on others.
+
+TODO:
+- Windows/Macintosh mix-ins;
+- Verify and hookup for FM Towns;
+
+-->
+<softwarelist name="generic_cdrom" description="Cross-platform CD-ROM images">
+
+	<!-- Windows 95, Direct X 3.0 (in cdrom under Instdx.exe) -->
+	<software name="arabkid" supported="partial">
+		<description>Arabian Kid (Japan)</description>
+		<year>1996</year>
+		<publisher>ASCII / Yellow Horn</publisher>
+		<notes><![CDATA[
+pc98: InstallShield is painfully slow unless floppy is inserted
+]]></notes>
+		<info name="alt_title" value="あらびあんKid" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="kid" sha1="a837c3f4cde66b244bccbae22cb1cec83df6698d" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- Very slow on 486 -->
+	<!-- TODO: has transparency issues on main menu -->
+	<software name="clawj" supported="partial">
+		<description>Claw (Japan v1.2)</description>
+		<!-- '98 according to readme.txt -->
+		<year>1998</year>
+		<publisher>Monolith Productions</publisher>
+		<notes><![CDATA[
+pc98: InstallShield is painfully slow unless floppy is inserted
+]]></notes>
+		<info name="version" value="1.2" />
+		<info name="alt_title" value="Captain Claw" />
+		<info name="usage" value="pc98: relocate install location to A:" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="clawj" sha1="eb48e779ba6cb342fa661f3aa64df23149f16449" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- 256 colors / 800x600 -->
+	<software name="geolight" supported="partial">
+		<description>Geo Light Moon (Japan v1.00)</description>
+		<year>1997</year>
+		<publisher>Nihon Softec / J-Ware</publisher>
+		<notes><![CDATA[
+pc98: requires a graphic accelerator for setting the intended resolution
+]]></notes>
+		<info name="version" value="1.00" />
+		<info name="usage" value="Tick first two options to the left for sound" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="geolight" sha1="e49202c3ff76db5f7fb5f794655d40cc91acb4d9" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- Pentium class 60 MHz minimum -->
+	<!-- Japanese version of Hunter Hunted -->
+	<software name="jakebrstj" supported="partial">
+		<description>Jake Burst (Japan)</description>
+		<year>1997</year>
+		<publisher>Sierra / Pioneer Inc</publisher>
+		<notes><![CDATA[
+pc98: installer test detects pc9821ap2 CPU as 100 MHz
+]]></notes>
+		<info name="alt_title" value="ジェイクバースト" />
+		<part name="cdrom" interface="cdrom">
+			<feature name="disk_label" value="SPRW·5015" />
+			<diskarea name="cdrom">
+				<disk name="jake_b" sha1="5efd03633979db40cd37a4c1ba1176cdb8b35c83" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- Cannot be installed on non-Japanese OS -->
+	<!-- Created from "Kotobuki.iso" size="90093568" crc="ff036452" sha1="ee62d7a2fa124b3535d0f1abc323a4aa3e1f1a35" -->
+	<software name="kotobuki" supported="partial">
+		<description>Kotobuki (Japan)</description>
+		<year>1997</year>
+		<publisher>C's Ware</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="kotobuki" sha1="7b0afa327d4b4d4be2c1069e60d9679900db93b8" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- Created from "KU2_IMPACT.cue" size="1107" crc="c08e9181" sha1="d051cf135a5c238ff0a44c08b85a9facfb453f54" -->
+	<!-- Created from "KU2_IMPACT.bin" size="725053392" crc="6980d026" sha1="71ce80ba25d657968d914df9a834172b99487b4f" -->
+	<software name="ku2impact" supported="partial">
+		<description>KU2 Impact (Japan)</description>
+		<year>1995</year>
+		<publisher>Panther Software</publisher>
+		<notes><![CDATA[
+pc98: [PC-9801-86] joystick port doesn't work (does it need specifically a -118?)
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="ku2impact" sha1="2e1f1c8ce81065fcdf2081daa97c72180243f1e0" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95J -->
+	<software name="moon" supported="partial">
+		<description>Moon (Japan)</description>
+		<year>1998</year>
+		<publisher>Over Rise</publisher>
+		<notes><![CDATA[
+pc98: has color issues on intro
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="moon" sha1="fbed194fc5a070dd7be8dc20f990dda9e73a2322" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<!-- Pentium class -->
+	<!-- Direct 3D -->
+	<!-- Missing dependency on English Win 98, requires Japanese OS? -->
+	<software name="moondrg" supported="partial">
+		<description>Moon Dragon (Japan)</description>
+		<year>1997</year>
+		<publisher>Gaea</publisher>
+		<notes><![CDATA[
+pc98: has color and graphic issues during gameplay
+]]></notes>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="moondrg" sha1="fc79ee0bbc66f22c32fa4a171ba7c97094b195e6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Source: http://redump.org/disc/92228/ -->
+	<!-- <rom name="Dig, The (Japan).cue" size="82" crc="7127b717" sha1="d0ffba436592b115b8ab5eb3b400210562d8031e"/> -->
+	<!-- <rom name="Dig, The (Japan).bin" size="778196832" crc="550c8138" sha1="3b3f8c72d86e380142299a91218139f32b34a682"/> -->
+	<!-- Pentium 133 MHz -->
+	<software name="thedig_jp" supported="partial">
+		<description>The Dig (Japan)</description>
+		<year>1995</year>
+		<publisher>MicroMouse</publisher>
+		<notes><![CDATA[
+https://www.pcgamingwiki.com/wiki/The_Dig
+pc98: access [PC-9801-73] registers
+]]></notes>
+		<info name="developer" value="LucasArts" />
+		<info name="region" value="Japan" />
+
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dig, The (Japan)" sha1="0930e3f659a57797e81b8c4c4b3cce44948f7a8f" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

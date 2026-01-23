@@ -26,18 +26,17 @@ public:
 	{
 	}
 
-	void tkmag220(machine_config &config);
+	void tkmag220(machine_config &config) ATTR_COLD;
 
 protected:
-
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	int m_upperbase = 0;
-
 	virtual uint16_t cs0_r(offs_t offset) override;
 
 	void tkmag220_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	int m_upperbase = 0;
 };
 
 
@@ -49,19 +48,18 @@ public:
 	{
 	}
 
-	void beijuehh(machine_config &config);
+	void beijuehh(machine_config &config) ATTR_COLD;
 
 protected:
-
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	int m_upperbase = 0;
-
 	virtual uint16_t cs0_r(offs_t offset) override;
 
 	void beijuehh_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void beijuehh_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	int m_upperbase = 0;
 
 	uint16_t m_portb_data = 0U;
 	uint16_t m_portd_data = 0U;
@@ -79,24 +77,21 @@ public:
 
 	virtual uint16_t cs0_r(offs_t offset) override;
 
-	void gameu(machine_config &config);
+	void gameu(machine_config &config) ATTR_COLD;
 
-	void init_gameu();
-	void init_gameu50();
-	void init_gameu108();
+	void init_gameu() ATTR_COLD;
+	void init_gameu50() ATTR_COLD;
+	void init_gameu108() ATTR_COLD;
 
 protected:
-
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void gameu_porta_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void gameu_portd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	void decrypt_gameu();
 
 	uint32_t m_upperbase;
 	uint16_t m_porta_data;
@@ -729,6 +724,8 @@ void gameu_handheld_game_state::gameu_portd_w(offs_t offset, uint16_t data, uint
 }
 void gameu_handheld_game_state::machine_start()
 {
+	gcm394_game_state::machine_start();
+
 	m_upperbase = 0;
 	m_porta_data = 0;
 	m_portb_data = 0;

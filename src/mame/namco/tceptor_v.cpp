@@ -514,8 +514,8 @@ uint32_t tceptor_state::screen_update_tceptor(screen_device &screen, bitmap_ind1
 
 	for (pri = 0; pri < 8; pri++)
 	{
-		m_c45_road->draw(bitmap, cliprect, pri * 2);
-		m_c45_road->draw(bitmap, cliprect, pri * 2 + 1);
+		m_c45_road->draw(screen, bitmap, cliprect, pri * 2);
+		m_c45_road->draw(screen, bitmap, cliprect, pri * 2 + 1);
 		draw_sprites(bitmap, cliprect, pri);
 	}
 
