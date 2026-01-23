@@ -34,9 +34,28 @@ pc98: InstallShield is painfully slow unless floppy is inserted
 	</software>
 
 	<!-- Windows 95 -->
-	<!-- Very slow on 486 -->
+	<software name="claws" supported="partial">
+		<!--
+		redump.org/disc/66831
+		<rom name="Claw (Spain).bin" size="586311264" crc="769a374d" sha1="b22009a123bf22730af62295a9c13a9f0339b873"/>
+		<rom name="Claw (Spain).cue" size="93" crc="f2aabd3d" sha1="fa3ca84a512786a79aa4fc4197f728efe533f157"/>
+		-->
+		<description>Claw (Spain v1.1)</description>
+		<year>1997</year>
+		<publisher>Monolith Productions</publisher>
+		<info name="version" value="1.1" />
+		<info name="alt_title" value="Captain Claw" />
+		<sharedfeat name="compatibility" value="ibmpc,pc98" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="claws" sha1="d134487f49fb429075e4daebbc881befdefffc98" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Very slow on pc9821ap2 -->
 	<!-- TODO: has transparency issues on main menu -->
-	<software name="clawj" supported="partial">
+	<software name="clawj" cloneof="claws" supported="partial">
 		<description>Claw (Japan v1.2)</description>
 		<!-- '98 according to readme.txt -->
 		<year>1998</year>
@@ -51,6 +70,26 @@ pc98: InstallShield is painfully slow unless floppy is inserted
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="clawj" sha1="eb48e779ba6cb342fa661f3aa64df23149f16449" />
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- Windows 95 -->
+	<software name="hercules">
+		<!--
+		redump.org/disc/64876
+		<rom name="Disney's Hercules Action Game (USA) (Track 1).bin" size="307914432" crc="1233a831" sha1="4a067edcc5673be944c68d6564da6f67ef184c09"/>
+		<rom name="Disney's Hercules Action Game (USA) (Track 2).bin" size="364176624" crc="02f6272f" sha1="bd3051ec23f9484c48e26159ec3ed22afd28e355"/>
+		<rom name="Disney's Hercules Action Game (USA).cue" size="263" crc="df17a4c6" sha1="6d71ac964a00da261aadebed5db1ebb60a12ec33"/>
+		-->
+		<description>Disney's Hercules Action Game (USA)</description>
+		<year>1997</year>
+		<developer>Eurocom Developments</developer>
+		<publisher>Disney Interactive</publisher>
+		<sharedfeat name="compatibility" value="ibmpc,pc98" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="hercules" sha1="abaabc962629a4be3546546c7a06508ba80a0123" />
 			</diskarea>
 		</part>
 	</software>
@@ -158,6 +197,24 @@ pc98: has color and graphic issues during gameplay
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="moondrg" sha1="fc79ee0bbc66f22c32fa4a171ba7c97094b195e6" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="roadrash">
+		<!--
+		redump.org/disc/31611
+		<rom name="Road Rash (USA, Europe) (En,Fr,De,Es,It).bin" size="594865488" crc="3b4e7f82" sha1="e00f2418f38a6d62e14fcc24e4b1d2ef07a036ad"/>
+		<rom name="Road Rash (USA, Europe) (En,Fr,De,Es,It).cue" size="129" crc="4c209859" sha1="b1b27eaf93c604aaaf6d8b5de0cdd3dd0bb53fba"/>
+		-->
+		<description>Road Rash (USA, Europe)</description>
+		<year>1996</year>
+		<developer>Papyrus Design Group</developer>
+		<publisher>Electronic Arts</publisher>
+		<sharedfeat name="compatibility" value="ibmpc,pc98" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="roadrash" sha1="6c813a546808b581884bc589a7beeb78491ea2ae" />
 			</diskarea>
 		</part>
 	</software>
