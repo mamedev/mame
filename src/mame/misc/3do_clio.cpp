@@ -66,8 +66,8 @@ void clio_device::device_start()
 	save_item(NAME(m_audout));
 	save_item(NAME(m_cstatbits));
 	save_item(NAME(m_wdog));
-	save_item(NAME(m_hcnt));
-	save_item(NAME(m_vcnt));
+//	save_item(NAME(m_hcnt));
+//	save_item(NAME(m_vcnt));
 	save_item(NAME(m_seed));
 	save_item(NAME(m_random));
 	save_item(NAME(m_irq0));
@@ -190,22 +190,17 @@ void clio_device::map(address_map &map)
 		NAME([this] () { return m_screen->hpos(); }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOG("hcnt (?): %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_hcnt);
+			// COMBINE_DATA(&m_hcnt);
 		})
 	);
-	// TODO: needs to moved to a proper timer callback function
-	// (or use frame_number for fake interlace readback)
 	map(0x0034, 0x0037).lrw32(
 		NAME([this] () {
-			if ( m_screen->vpos() == 0 && !machine().side_effects_disabled() )
-			{
-				m_vcnt ^= 0x800;
-			}
-			return ( m_vcnt & 0x800 ) | m_screen->vpos();
+			// 0: even field
+			return ((m_screen->frame_number() & 1) << 11) | m_screen->vpos();
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOG("vcnt (?): %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_vcnt);
+			// COMBINE_DATA(&m_vcnt);
 		})
 	);
 	map(0x0038, 0x003b).lrw32(

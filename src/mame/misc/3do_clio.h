@@ -57,8 +57,8 @@ private:
 	uint32_t  m_audout = 0;         /* 03400024 */
 	uint32_t  m_cstatbits = 0;      /* 03400028 */
 	uint32_t  m_wdog = 0;           /* 0340002c */
-	uint32_t  m_hcnt = 0;           /* 03400030 */
-	uint32_t  m_vcnt = 0;           /* 03400034 */
+//	uint32_t  m_hcnt = 0;           /* 03400030 */
+//	uint32_t  m_vcnt = 0;           /* 03400034 */
 	uint32_t  m_seed = 0;           /* 03400038 */
 	uint32_t  m_random = 0;         /* 0340004c */
 	uint32_t  m_irq0 = 0;           /* 03400040 / 03400044 */

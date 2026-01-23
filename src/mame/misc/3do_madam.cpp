@@ -730,6 +730,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, (m_cel.current_ccb & 0xe) >> 1
 			);
 			// FIXME: relative to what?
+			// - 3do_fz1 / 3do_fz10 RGB dots (scaled by hdx/vdy=8.0) are the first & last entry setup, relative to zero?
 			if (!npabs || !spabs || !ppabs)
 			{
 				popmessage("CEL relative address use at %08x %d|%d|%d", m_cel.address, npabs, spabs, ppabs);
@@ -859,7 +860,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			// - 3do_gdo101 uses mostly this, with lrform + packed enabled on several elements
 			//   (the 3DO logo)
 			// - 3do_fz1 uses uncoded=0 + bpp=4
-			if ((m_cel.packed && bpp == 4) || (uncoded && bpp == 6))
+			if ((m_cel.packed && bpp == 3) || (m_cel.packed && bpp == 4) || (bpp == 6))
 			{
 				for (int y = 0; y < vcnt; y++)
 				{
@@ -949,12 +950,48 @@ std::tuple<u8, u32> madam_device::fetch_byte(u32 ptr, u8 frac)
 	return std::make_tuple(res & 0xff, ptr);
 }
 
-const madam_device::fetch_rle_func madam_device::fetch_rle_table[2] =
+const madam_device::fetch_rle_func madam_device::fetch_rle_table[16] =
 {
-	&madam_device::get_coded_6bpp,
-	&madam_device::get_uncoded_16bpp
+	&madam_device::get_unemulated,  // 0: illegal
+	&madam_device::get_unemulated,
+	&madam_device::get_unemulated,  // 1: 1bpp
+	&madam_device::get_unemulated,
+	&madam_device::get_unemulated,  // 2: 2bpp
+	&madam_device::get_unemulated,
+	&madam_device::get_coded_4bpp,  // 3: 4bpp
+	&madam_device::get_unemulated,
+	&madam_device::get_coded_6bpp,  // 4: 6bpp
+	&madam_device::get_unemulated,
+	&madam_device::get_unemulated,  // 5: 8bpp
+	&madam_device::get_unemulated,
+	&madam_device::get_coded_16bpp, // 6: 16bpp
+	&madam_device::get_uncoded_16bpp,
+	&madam_device::get_unemulated,  // 7: illegal
+	&madam_device::get_unemulated
 };
 
+// Stub for unemulated/illegal paths
+std::tuple<u16, u32> madam_device::get_unemulated(u32 ptr, u8 frac)
+{
+	return std::make_tuple(0, ptr + 1);
+};
+
+// - 3do_try "3" charset
+std::tuple<u16, u32> madam_device::get_coded_4bpp(u32 ptr, u8 frac)
+{
+	u8 idx;
+	const u32 plut_ptr = m_cel.plut_ptr;
+	std::tie(idx, ptr) = fetch_byte(ptr, frac);
+
+	// idx >>= 4;
+	// idx &= 0x0f;
+	idx >>= 3;
+	idx &= 0x1e;
+
+	return std::make_tuple((m_dma8_read_cb(plut_ptr + idx) << 8) | m_dma8_read_cb(plut_ptr + idx + 1), ptr);
+}
+
+// - 3do_fz1 / 3do_fz10
 std::tuple<u16, u32> madam_device::get_coded_6bpp(u32 ptr, u8 frac)
 {
 	u8 idx;
@@ -969,6 +1006,20 @@ std::tuple<u16, u32> madam_device::get_coded_6bpp(u32 ptr, u8 frac)
 	return std::make_tuple((m_dma8_read_cb(plut_ptr + idx) << 8) | m_dma8_read_cb(plut_ptr + idx + 1), ptr);
 }
 
+// - 3do_try on Sanyo 3DO logo
+// A wasteful mode, sets woffset10 and 2 bytes per color fetch for a PLUT lookup trip.
+std::tuple<u16, u32> madam_device::get_coded_16bpp(u32 ptr, u8 frac)
+{
+	const u32 plut_ptr = m_cel.plut_ptr;
+	u8 idx = m_dma8_read_cb(ptr + 1);
+
+	idx <<= 1;
+	idx &= 0x7e;
+
+	return std::make_tuple((m_dma8_read_cb(plut_ptr + idx) << 8) | m_dma8_read_cb(plut_ptr + idx + 1), ptr + 2);
+}
+
+// - 3do_gdo101
 std::tuple<u16, u32> madam_device::get_uncoded_16bpp(u32 ptr, u8 frac)
 {
 	return std::make_tuple((m_dma8_read_cb(ptr) << 8) | m_dma8_read_cb(ptr + 1), ptr + 2);
@@ -985,7 +1036,12 @@ u32 madam_device::cel_decompress()
 	const bool uncoded = !!BIT(m_cel.pre0, 4);
 	const u8 bpp = (m_cel.pre0 >> 0) & 0x7;
 
-	if ((bpp == 4 && uncoded) || (bpp == 6 && !uncoded) || ((bpp != 4) && (bpp != 6)))
+	if ((bpp == 0 || bpp == 7) ||
+		(bpp == 1) ||
+		(bpp == 2) ||
+		(bpp == 3 && uncoded) ||
+		(bpp == 4 && uncoded) ||
+		(bpp == 5))
 	{
 		popmessage("3do_madam.cpp: unsupported Packed CEL %d %08x", bpp, source_ptr);
 		//m_statbits |= (1 << 6);
@@ -1002,7 +1058,7 @@ u32 madam_device::cel_decompress()
 	// - bpp == 5 and 6 don't use the fractional part (matters only for anything below that)
 	static const u8 frac_bits[8] = { 0, 1, 2, 4, 6, 8, 16, 0 };
 	const u8 frac_inc = frac_bits[bpp];
-	const u8 actual_rle_mode = bpp == 6;
+	const u8 actual_rle_mode = (bpp << 1) | uncoded;
 
 	for (u16 yline = 0; yline < vcnt; yline ++)
 	{
@@ -1034,6 +1090,7 @@ u32 madam_device::cel_decompress()
 			{
 				// PACK_TRANSPARENT
 				// TODO: untested
+				// Does it write a 0 or it actually 0-fill from PLUT anyway?
 				case 2:
 					for (src = 0; src < num_bytes; src++)
 						m_cel.buffer[yline * pitch + ((src + xpos) % pitch)] = 0;
