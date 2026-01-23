@@ -11,7 +11,8 @@ The chess engine is by Richard Lang, based on Cyrus.
 
 Newcrest Technology Ltd. and CXG Systems S.A. were related companies, with Eric
 White at the steering wheel. Newcrest (1984-1991) was probably a rename of "White
-and Allcock" (1981-1984). CXG Systems was apparently their distribution arm.
+and Allcock" (1981-1984). CXG Systems was apparently their PCB manufacturing and
+perhaps also their distribution arm.
 
 Due to CXG logo/branding, Newcrest chess computers are more commonly referred
 to as CXG chess computers (just like eg. Hegener+Glaser and Mephisto).

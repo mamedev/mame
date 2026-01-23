@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Zsolt Vasvari
-/***************************************************************************
+/*******************************************************************************
 
     Allied Leisure Clay Shoot hardware
 
@@ -10,17 +10,22 @@
         * Clay Shoot
 
     Known issues:
-        * no sound
+        * missing SN76477 sound effects
         * cocktail mode, dipswitch or alternate romset?
           (cocktail set has a color overlay, upright set has a backdrop)
 
-****************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/pit8253.h"
 #include "machine/watchdog.h"
+#include "sound/dac.h"
+
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
@@ -31,6 +36,9 @@ public:
 	clayshoo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_ppi(*this, "ppi%u", 0),
+		m_pit(*this, "pit"),
+		m_dac(*this, "dac"),
 		m_videoram(*this, "videoram")
 	{ }
 
@@ -42,6 +50,9 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device_array<i8255_device, 2> m_ppi;
+	required_device<pit8253_device> m_pit;
+	required_device<dac_1bit_device> m_dac;
 	required_shared_ptr<uint8_t> m_videoram;
 
 	void analog_reset_w(uint8_t data);
@@ -56,7 +67,7 @@ private:
 	void main_io_map(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 
-	emu_timer *m_analog_timer_1 = nullptr, *m_analog_timer_2 = nullptr;
+	emu_timer *m_analog_timer[2];
 	uint8_t m_input_port_select = 0;
 	uint8_t m_analog_port_val = 0;
 };
@@ -74,7 +85,7 @@ void clayshoo_state::input_port_select_w(uint8_t data)
 }
 
 
-uint8_t clayshoo_state::difficulty_input_port_r( int bit )
+uint8_t clayshoo_state::difficulty_input_port_r(int bit)
 {
 	uint8_t ret = 0;
 
@@ -123,7 +134,7 @@ TIMER_CALLBACK_MEMBER(clayshoo_state::reset_analog_bit)
 }
 
 
-static attotime compute_duration( device_t *device, int analog_pos )
+static attotime compute_duration(device_t *device, int analog_pos)
 {
 	/* the 58 comes from the length of the loop used to
 	   read the analog position */
@@ -138,8 +149,8 @@ void clayshoo_state::analog_reset_w(uint8_t data)
 	   analog control and set the appropriate bit. */
 	m_analog_port_val = 0xff;
 
-	m_analog_timer_1->adjust(compute_duration(m_maincpu.target(), ioport("AN1")->read()), 0x02);
-	m_analog_timer_2->adjust(compute_duration(m_maincpu.target(), ioport("AN2")->read()), 0x01);
+	m_analog_timer[0]->adjust(compute_duration(m_maincpu.target(), ioport("AN1")->read()), 0x02);
+	m_analog_timer[1]->adjust(compute_duration(m_maincpu.target(), ioport("AN2")->read()), 0x01);
 }
 
 
@@ -149,10 +160,10 @@ uint8_t clayshoo_state::analog_r()
 }
 
 
-void clayshoo_state::create_analog_timers(  )
+void clayshoo_state::create_analog_timers()
 {
-	m_analog_timer_1 = timer_alloc(FUNC(clayshoo_state::reset_analog_bit), this);
-	m_analog_timer_2 = timer_alloc(FUNC(clayshoo_state::reset_analog_bit), this);
+	m_analog_timer[0] = timer_alloc(FUNC(clayshoo_state::reset_analog_bit), this);
+	m_analog_timer[1] = timer_alloc(FUNC(clayshoo_state::reset_analog_bit), this);
 }
 
 
@@ -233,9 +244,9 @@ void clayshoo_state::main_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).w("watchdog", FUNC(watchdog_timer_device::reset_w));
-	map(0x20, 0x23).rw("ppi8255_0", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x30, 0x33).rw("ppi8255_1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-//  map(0x40, 0x43).noprw(); // 8253 for sound?
+	map(0x20, 0x23).rw(m_ppi[0], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x30, 0x33).rw(m_ppi[1], FUNC(i8255_device::read), FUNC(i8255_device::write));
+	map(0x40, 0x43).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 //  map(0x50, 0x50).noprw(); // ?
 //  map(0x60, 0x60).noprw(); // ?
 }
@@ -256,10 +267,10 @@ static INPUT_PORTS_START( clayshoo )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )
 	PORT_BIT( 0x3c, IP_ACTIVE_LOW, IPT_UNKNOWN )        /* doesn't appear to be used */
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )  /* not 100% positive */
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )      /* used */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )      /* used */
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -321,15 +332,15 @@ void clayshoo_state::machine_reset()
 
 void clayshoo_state::clayshoo(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 5068000/4);      /* 5.068/4 Mhz (divider is a guess) */
+	// basic machine hardware
+	Z80(config, m_maincpu, 5.0688_MHz_XTAL / 2); // divider is a guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &clayshoo_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &clayshoo_state::main_io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(clayshoo_state::irq0_line_hold));
 
 	WATCHDOG_TIMER(config, "watchdog");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_size(256, 256);
 	screen.set_visarea(0, 255, 64, 255);
@@ -337,11 +348,22 @@ void clayshoo_state::clayshoo(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_screen_update(FUNC(clayshoo_state::screen_update_clayshoo));
 
-	I8255A(config, "ppi8255_0");
+	I8255(config, m_ppi[0]);
 
-	i8255_device &ppi1(I8255A(config, "ppi8255_1"));
-	ppi1.out_pa_callback().set(FUNC(clayshoo_state::input_port_select_w));
-	ppi1.in_pb_callback().set(FUNC(clayshoo_state::input_port_r));
+	I8255(config, m_ppi[1]);
+	m_ppi[1]->out_pa_callback().set(FUNC(clayshoo_state::input_port_select_w));
+	m_ppi[1]->in_pb_callback().set(FUNC(clayshoo_state::input_port_r));
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+
+	PIT8253(config, m_pit);
+	m_pit->set_clk<0>(5.0688_MHz_XTAL / 2);
+	m_pit->set_clk<1>(5.0688_MHz_XTAL / 2);
+	m_pit->set_clk<2>(5.0688_MHz_XTAL / 2);
+	m_pit->out_handler<0>().set(m_dac, FUNC(dac_bit_interface::write)).invert();
+
+	DAC_1BIT(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.25);
 }
 
 
@@ -354,11 +376,11 @@ void clayshoo_state::clayshoo(machine_config &config)
 
 ROM_START( clayshoo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "0",      0x0000, 0x0800, CRC(9df9d9e3) SHA1(8ce71a6faf5df9c8c3dbb92a443b62c0f376491c) )
-	ROM_LOAD( "1",      0x0800, 0x0800, CRC(5134a631) SHA1(f0764a5161934564fd0416be26087cf812e0c422) )
-	ROM_LOAD( "2",      0x1000, 0x0800, CRC(5b5a67f6) SHA1(c97b4d44e6dc5dd0c42e04ffceed8934975fe769) )
-	ROM_LOAD( "3",      0x1800, 0x0800, CRC(7eda8e44) SHA1(2974f8b06653aee2ffd96ff402707acfc059bc91) )
-	ROM_LOAD( "4",      0x4000, 0x0800, CRC(3da16196) SHA1(eb0c0cf0c8fc3db05ac0c469fb20fe92ae6f27ce) )
+	ROM_LOAD( "0.d8", 0x0000, 0x0800, CRC(9df9d9e3) SHA1(8ce71a6faf5df9c8c3dbb92a443b62c0f376491c) )
+	ROM_LOAD( "1.d7", 0x0800, 0x0800, CRC(5134a631) SHA1(f0764a5161934564fd0416be26087cf812e0c422) )
+	ROM_LOAD( "2.d6", 0x1000, 0x0800, CRC(5b5a67f6) SHA1(c97b4d44e6dc5dd0c42e04ffceed8934975fe769) )
+	ROM_LOAD( "3.d5", 0x1800, 0x0800, CRC(7eda8e44) SHA1(2974f8b06653aee2ffd96ff402707acfc059bc91) )
+	ROM_LOAD( "4.d4", 0x4000, 0x0800, CRC(3da16196) SHA1(eb0c0cf0c8fc3db05ac0c469fb20fe92ae6f27ce) )
 ROM_END
 
 } // anonymous namespace
@@ -370,4 +392,4 @@ ROM_END
  *
  *************************************/
 
-GAME( 1979, clayshoo, 0, clayshoo, clayshoo, clayshoo_state, empty_init, ROT0, "Allied Leisure", "Clay Shoot", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, clayshoo, 0, clayshoo, clayshoo, clayshoo_state, empty_init, ROT0, "Allied Leisure", "Clay Shoot", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
