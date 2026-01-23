@@ -2,7 +2,7 @@
 // copyright-holders:Tim Schuerewegen
 /**************************************************************************
 
-    sord_cas.c
+    sord_cas.cpp
 
     Format code for Sord M5 cassette files
 
@@ -58,7 +58,7 @@ static cassette_image::error sordm5_tap_load( cassette_image *cassette)
 	{
 		// read block type
 		block_type = cassette->image_read_byte(image_pos + 0);
-		if ((block_type != 'H') && (block_type != 'D')) return cassette_image::error::INVALID_IMAGE;
+		if ((block_type != 'H') && (block_type != 'D') && (block_type != 'E') && (block_type != 'F')) return cassette_image::error::INVALID_IMAGE;
 		// read block size
 		block_size = cassette->image_read_byte(image_pos + 1);
 		if (block_size == 0) block_size = 0x100;
@@ -71,7 +71,9 @@ static cassette_image::error sordm5_tap_load( cassette_image *cassette)
 			time_index += SORDM5_WAVESAMPLES_BLOCK;
 		}
 		// add sync
-		if (block_type == 'H') filler_length = 2.4 * (3150 / 8); else filler_length = 0.15 * (3150 / 8);
+		if (block_type == 'H') filler_length = 2.4 * (3150 / 8);
+		else if (block_type == 'D') filler_length = 0.15 * (3150 / 8); //consecutive data
+		else filler_length = 0.8 * (3150 / 8); //non-consecutive data
 		err = cassette->put_modulated_filler(0, time_index, 0xFF, filler_length, sordm5_cas_modulation, &time_displacement);
 		if (err != cassette_image::error::SUCCESS) return err;
 		time_index += time_displacement;
