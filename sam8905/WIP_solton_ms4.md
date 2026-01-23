@@ -177,6 +177,156 @@ Called `midi_panic_all_channels` - when the RX buffer overflows:
 | 0x1D20 | Voice enable table 2 (5 entries) |
 | 0x1D9A | Active Sensing timeout counter |
 
+## Program Change -> SAM Programming Callgraph
+
+### Overview
+
+Program Change messages trigger loading of SAM8905 algorithms (A-RAM) and voice parameters (D-RAM).
+Valid programs: **0-65** (66 total), validated via lookup table at code address 0xC8A1.
+ROM pointer table at code address 0x0040 contains 2-byte big-endian pointers to program data.
+
+### Program Data Format
+
+Each program entry in code space starts with:
+
+| Offset | Size | Description |
+|--------|------|-------------|
+| 0-7 | 8 | ASCII name (space-padded) |
+| 8 | 1 | Null terminator (0x00) |
+| 9 | 1 | Flags: bit 7 = complex init, bits 3:0 = SAM slot count |
+| 10-11 | 2 | Algorithm reference |
+| 12 | 1 | Unknown (always 0x01 in sampled programs) |
+| 13-14 | 2 | Code pointer (algorithm/waveform data) |
+| 15+ | var | Voice parameters, D-RAM init data |
+
+### Callgraph
+
+```
+handle_program_change (0xC45B)
+│
+├── table_lookup (0xDC1C) - validate program number (table at 0xC8A1)
+├── FUN_CODE_0026 - DPTR += 2*A (index into ROM pointer table at 0x0040)
+│
+├── [If program_data[9] bit 7 SET - complex init path:]
+│   ├── voice_kill_channel (0xA785) - for ch
+│   ├── voice_kill_channel (0xA785) - for ch+4
+│   │   └── voice_deactivate (0xA69C) - SAM D-RAM writes to silence voice
+│   ├── FUN_CODE_98ad - unknown setup
+│   ├── FUN_CODE_b70b - unknown setup
+│   ├── voice_assign_algorithm (0xB4BF) - allocate voice, load A-RAM
+│   │   └── sam_write_aram (0xAD43) - write 32 A-RAM words (algorithm)
+│   └── voice_init_slots (0x9A2D) - allocate and init D-RAM slots
+│       └── sam_write_dram (0xA4BC) - write single D-RAM entry
+│
+└── [If program_data[9] bit 7 CLEAR - simple path:]
+    ├── voice_kill_channel (0xA785) - for ch
+    ├── voice_kill_channel (0xA785) - for ch+4
+    └── voice_assign_algorithm (0xB4BF)
+        └── sam_write_aram (0xAD43) - write 32 A-RAM words
+```
+
+### SAM Register Access Pattern
+
+All SAM writes use P2=0x80 (Port 2 provides high address byte for MOVX, giving 0x8000+ range):
+
+**A-RAM Write (sam_write_aram at 0xAD43):**
+- Sets P2=0x80
+- Loops 32 times (one full algorithm = 32 words):
+  - reg 0 (0x8000): address (auto-increments)
+  - reg 1 (0x8001): data low byte
+  - reg 2 (0x8002): data high byte (7 bits)
+  - reg 4 (0x8004): control with bit 1 SET (A-RAM select) + bit 0 (write enable)
+
+**D-RAM Write (sam_write_dram at 0xA4BC):**
+- Sets P2=0x80
+- Single entry write:
+  - reg 0 (0x8000): address
+  - reg 1 (0x8001): data low byte
+  - reg 2 (0x8002): data mid byte
+  - reg 3 (0x8003): data high byte (3 bits)
+  - reg 4 (0x8004): control with bit 1 CLEAR (D-RAM select) + bit 0 (write enable)
+
+### Voice Management
+
+- Voice pool at XRAM 0x11EE (8 entries, one per voice slot)
+- Active voices form a linked list via *(voice_id + 0x7E) as next pointer
+- voice_kill_channel walks the list and deactivates voices matching target channel
+- voice_assign_algorithm allocates from pool, assigns algorithm slot via *(voice_id + 0x8E)
+- voice_init_slots reads slot count from program_data[9] & 0x0F, allocates D-RAM slots via FUN_CODE_a9cf
+
+### Program List (66 programs, ROM ms4_05_r1_0.bin)
+
+| # | Name | ROM Addr | Description |
+|---|------|----------|-------------|
+| 0 | dpiano27 | 0x926A | Piano |
+| 1 | dstringh | 0x462B | Strings |
+| 2 | dcoros7 | 0x7415 | Chorus |
+| 3 | dsaxs6 | 0x70A8 | Soprano Sax |
+| 4 | dtrumph | 0x4672 | Trumpet |
+| 5 | dpfluteh | 0x46B9 | Pan Flute |
+| 6 | dbvios10 | 0x72F9 | Bass Violas |
+| 7 | dclaguih | 0x4700 | Classical Guitar |
+| 8 | dvibesh | 0x610E | Vibes |
+| 9 | djorgh | 0x4747 | Jazz Organ |
+| 10 | dchorg1h | 0x478E | Church Organ 1 |
+| 11 | dmtrumph | 0x47D5 | Muted Trumpet |
+| 12 | dbrassh | 0x481C | Brass |
+| 13 | dmarimb | 0x4DC8 | Marimba |
+| 14 | dsteelg | 0x4863 | Steel Guitar |
+| 15 | dmand4 | 0x73CE | Mandolin |
+| 16 | dsaxa4 | 0x48BF | Alto Sax |
+| 17 | drsax4 | 0x4906 | Tenor Sax |
+| 18 | dstrath | 0x8BEB | Stratocaster |
+| 19 | djguit | 0x494D | Jazz Guitar |
+| 20 | dharmh | 0x49A9 | Harmonica |
+| 21 | dleadgh | 0x49F0 | Lead Guitar |
+| 22 | dfzguith | 0x4A37 | Fuzz Guitar |
+| 23 | dfhamh | 0x4A7E | Fender Ham(mond?) |
+| 24 | dclikorh | 0x4AC5 | Click Organ |
+| 25 | drockorh | 0x4B0C | Rock Organ |
+| 26 | dstee | 0x8CA3 | Steel (variant) |
+| 27 | dfguith | 0x4B53 | Finger Guitar |
+| 28 | dbanjo | 0x4B9A | Banjo |
+| 29 | dstratl | 0x8C47 | Stratocaster Low |
+| 30 | delguirh | 0x4C50 | Electric Guitar |
+| 31 | dstopg2 | 0x8CFF | Stopped Organ 2 |
+| 32 | dchorg2h | 0x4C97 | Church Organ 2 |
+| 33 | dstrin2h | 0x8B03 | Strings 2 |
+| 34 | dcello9 | 0x7340 | Cello |
+| 35 | doboe4 | 0x7387 | Oboe |
+| 36 | dfluteh | 0x4CDE | Flute |
+| 37 | dclarinh | 0x4D25 | Clarinet |
+| 38 | dpizzah | 0x8D59 | Pizzicato |
+| 39 | dstrih | 0x8BA4 | Strings (short) |
+| 40 | dliptroh | 0x4E24 | Lip Trombone |
+| 41 | dcrntle | 0x4E6B | Cornet (low) |
+| 42 | dcrnthh | 0x6264 | Cornet (high) |
+| 43 | dmuseth | 0x4F0C | Musette |
+| 44 | daccordh | 0x4F53 | Accordion |
+| 45 | dcassoth | 0x4F9A | Cassotto |
+| 46 | ddiatonh | 0x8ABC | Diatonic |
+| 47 | dzith2 | 0x8A06 | Zither |
+| 48 | dfantash | 0x4FE1 | Fantasy |
+| 49 | dnoisfl | 0x5028 | Noise Flute |
+| 50 | dukule | 0x89AA | Ukulele |
+| 51 | dcelesth | 0x506F | Celeste |
+| 52 | dcor7 | 0x8963 | Chorus (variant) |
+| 53 | dkalimb | 0x50B6 | Kalimba |
+| 54 | dstring3 | 0x5112 | Strings 3 |
+| 55 | dkvoi1 | 0x5164 | Key Voice 1 |
+| 56 | dkvoi2 | 0x51B6 | Key Voice 2 |
+| 57 | dlah | 0x520D | Lah (voice) |
+| 58 | dbellsh | 0x5254 | Bells |
+| 59 | dmagic | 0x8664 | Magic |
+| 60 | dloopc2h | 0x52E2 | Loop C 2 |
+| 61 | dloopchh | 0x529B | Loop Ch |
+| 62 | dparadh | 0x5329 | Paradise |
+| 63 | dfanh | 0x861D | Fanfare |
+| 64 | dpiano7 | 0x745C | Piano 7 |
+| 65 | dpiano37 | 0x9006 | Piano 37 |
+
+Note: All names are prefixed with 'd' (likely "data" marker). Many end with 'h' (possibly "high" quality/resolution flag).
+
 ## Key Function Addresses
 
 | Address | Name | Purpose |
@@ -189,8 +339,17 @@ Called `midi_panic_all_channels` - when the RX buffer overflows:
 | 0x9AB0 | handle_pitch_bend | Pitch Bend processing (dual-layer) |
 | 0xB59B | sysex_voice_enable | SysEx voice mask processing |
 | 0xBDBC | midi_panic_all_channels | Buffer overflow panic handler |
+| 0xA785 | voice_kill_channel | Kill all active voices on a channel |
+| 0xA69C | voice_deactivate | Deactivate single voice (SAM D-RAM silence) |
+| 0xB4BF | voice_assign_algorithm | Allocate voice slot, load SAM A-RAM algorithm |
+| 0xAD43 | sam_write_aram | Write 32-word algorithm to SAM A-RAM |
+| 0x9A2D | voice_init_slots | Allocate and initialize SAM D-RAM voice slots |
+| 0xA4BC | sam_write_dram | Write single D-RAM entry to SAM |
 | 0xDC1C | table_lookup | Generic byte-search in code space |
+| 0xDC9C | load_dptr_from_xram | Load DPTR from 2-byte XRAM pointer |
 | 0xDCB3 | add_a_to_dptr | Utility: DPTR += A (indexed array access) |
+| 0x0026 | dptr_add_2a | Utility: DPTR += 2*A (word-indexed table access) |
+| 0x0003 | indexed_array_access | Utility: indexed access to XRAM arrays |
 
 ## Implementation Steps
 
@@ -201,3 +360,5 @@ Called `midi_panic_all_channels` - when the RX buffer overflows:
 - [x] Test with `./mamemuse ms4 -rompath /home/jeff/bastel/roms/hohner -oslog`
 - [x] Firmware boots, SAM init visible, no unmapped access errors
 - [x] Document MIDI implementation via Ghidra analysis
+- [x] Analyze program range (0-65) and document callgraph from MIDI to SAM programming
+- [x] Name and comment all SAM-related functions in Ghidra (voice_kill_channel, voice_deactivate, voice_assign_algorithm, sam_write_aram, voice_init_slots, sam_write_dram)
