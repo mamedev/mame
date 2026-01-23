@@ -72,6 +72,12 @@ public:
             fclose(m_gal_log);
             m_gal_log = nullptr;
         }
+        // Close trace log
+        if (m_trace_file)
+        {
+            fclose(m_trace_file);
+            m_trace_file = nullptr;
+        }
         // Dump SAM memory on exit
         dump_sam_memory();
     }
@@ -219,6 +225,12 @@ private:
     void log_gal_inputs(bool rd, bool wr, bool psen, u16 addr);
     FILE *m_gal_log = nullptr;
     u32 m_gal_seen[8] = {};  // Bitmap for 256 possible input combinations
+
+    // P1 trace logging - when firmware is built with KEYFOX10_TRACE,
+    // P1 outputs function-entry/exit IDs for timing analysis
+    FILE *m_trace_file = nullptr;
+    bool m_trace_enabled = true;
+    u64 m_trace_start_cycle = 0;
 
     // SAM8905 memory dump (called from destructor)
     void dump_sam_memory() const;
@@ -374,6 +386,13 @@ void keyfox10_state::port0_w(u8 data)
 
 void keyfox10_state::port1_w(u8 data)
 {
+    // P1 trace logging: when enabled, log every P1 write with cycle count
+    if (m_trace_enabled && m_trace_file)
+    {
+        u64 cycles = m_maincpu->total_cycles() - m_trace_start_cycle;
+        fprintf(m_trace_file, "%llu %02X\n", (unsigned long long)cycles, data);
+    }
+
     //data ^= (P1_CLK_LED | P1_CLK_SW);
     u8 changed = m_port1 ^ data;
     u8 rising = changed & data;
@@ -657,13 +676,6 @@ u8 keyfox10_state::sam_snd_r(offs_t offset)
     if (!BIT(m_port3, 5))  // T1=0: ROM data
     {
         u32 rom_offset = 0x18000 + offset;
-        if (m_rom_watch_addr >= 0) // && rom_offset == u32(m_rom_watch_addr))
-        {
-            logerror("ROM watch: PC=%04X read ROM[%05X] = %02X\n",
-                m_maincpu->pc(), rom_offset, m_rom[rom_offset]);
-            if (m_watch_break)
-                machine().debug_break();
-        }
         return m_rom[rom_offset];
     }
     // T1=1: SAM chip (only first 8 bytes decoded)
@@ -688,12 +700,6 @@ u8 keyfox10_state::sam_fx_r(offs_t offset)
     {
         u32 rom_offset = 0x1E000 + offset;
         if (m_rom_watch_addr >= 0) // && rom_offset == u32(m_rom_watch_addr))
-        {
-            logerror("ROM watch: PC=%04X read ROM[%05X] = %02X\n",
-                m_maincpu->pc(), rom_offset, m_rom[rom_offset]);
-            if (m_watch_break)
-                machine().debug_break();
-        }
         return m_rom[rom_offset];
     }
     // T1=1: SAM chip (only first 8 bytes decoded)
@@ -863,6 +869,18 @@ void keyfox10_state::log_gal_inputs(bool rd, bool wr, bool psen, u16 addr)
 
 void keyfox10_state::machine_start()
 {
+    // Open P1 trace log file (always enabled - low overhead, useful for profiling)
+    m_trace_file = fopen("keyfox10_trace.log", "w");
+    if (m_trace_file)
+    {
+        fprintf(m_trace_file, "# Keyfox10 P1 trace log\n");
+        fprintf(m_trace_file, "# Format: <cycle_count> <P1_hex_value>\n");
+        fprintf(m_trace_file, "# Function entry: non-zero value (ID)\n");
+        fprintf(m_trace_file, "# Function exit: 00\n");
+        m_trace_enabled = true;
+        m_trace_start_cycle = 0;  // Will be set on first CPU cycle
+    }
+
     // Open GAL log file
     //m_gal_log = fopen("gal_inputs.log", "w");
     if (m_gal_log)
