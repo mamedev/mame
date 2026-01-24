@@ -33683,6 +33683,9 @@ tricep
 @source:motorola/ampscarp.cpp
 ampscarp
 
+@source:motorola/assist05.cpp
+assist05
+
 @source:motorola/exorciser.cpp
 exorciser
 
@@ -44056,6 +44059,9 @@ madmoney2
 @source:skeleton/marsvending.cpp
 apvm110
 apvm110a
+
+@source:skeleton/mcc1.cpp
+mcc1
 
 @source:skeleton/megacrane.cpp
 megacrane
