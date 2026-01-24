@@ -33,17 +33,15 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 	, m_xbus_write_cb(*this)
 	, m_dac_l(*this)
 	, m_dac_r(*this)
-//  , m_adb_in_cb(*this)
-	, m_adb_out_cb(*this)
 {
 }
 
 void clio_device::device_add_mconfig(machine_config &config)
 {
 	DSPP(config, m_dspp, DERIVED_CLOCK(1, 1));
-//  m_dspp->int_handler().set([this] (int state) { printf("%d\n", state); });
-//  m_dspp->dma_read_handler().set(FUNC(m2_bda_device::read_bus8));
-//  m_dspp->dma_write_handler().set(FUNC(m2_bda_device::write_bus8));
+//	m_dspp->int_handler().set([this] (int state) { printf("%d\n", state); });
+//	m_dspp->dma_read_handler().set(FUNC(m2_bda_device::read_bus8));
+//	m_dspp->dma_write_handler().set(FUNC(m2_bda_device::write_bus8));
 }
 
 void clio_device::device_start()
@@ -61,41 +59,11 @@ void clio_device::device_start()
 	m_dac_timer = timer_alloc(FUNC(clio_device::dac_update_cb), this);
 	m_dac_timer->adjust(attotime::from_hz(16.9345));
 
-	save_item(NAME(m_csysbits));
-	save_item(NAME(m_vint0));
-	save_item(NAME(m_vint1));
-	save_item(NAME(m_audin));
-	save_item(NAME(m_audout));
-	save_item(NAME(m_cstatbits));
-	save_item(NAME(m_wdog));
-//  save_item(NAME(m_hcnt));
-//  save_item(NAME(m_vcnt));
-	save_item(NAME(m_seed));
-	save_item(NAME(m_random));
 	save_item(NAME(m_irq0));
-	save_item(NAME(m_irq0_enable));
-	save_item(NAME(m_mode));
-	save_item(NAME(m_badbits));
 	save_item(NAME(m_irq1));
+	save_item(NAME(m_irq0_enable));
 	save_item(NAME(m_irq1_enable));
-	save_item(NAME(m_hdelay));
-	save_item(NAME(m_adbio));
-	save_item(NAME(m_adbctl));
-
-	save_item(NAME(m_timer_count));
-	save_item(NAME(m_timer_backup));
 	save_item(NAME(m_timer_ctrl));
-	save_item(NAME(m_slack));
-
-	save_item(NAME(m_dma_enable));
-
-	save_item(NAME(m_expctl));
-	save_item(NAME(m_type0_4));
-	save_item(NAME(m_dipir1));
-	save_item(NAME(m_dipir2));
-
-	save_item(NAME(m_sel));
-	save_item(NAME(m_poll));
 }
 
 void clio_device::device_reset()
@@ -107,7 +75,6 @@ void clio_device::device_reset()
 	m_timer_ctrl = 0;
 	m_vint0 = m_vint1 = 0xffff'ffff;
 	m_slack = 336;
-	m_adbio = 0x00;
 	m_system_timer->adjust(attotime::from_ticks(m_slack, this->clock()));
 	m_scan_timer->adjust(m_screen->time_until_pos(0), 0);
 }
@@ -127,10 +94,10 @@ void clio_device::xbus_int_w(int state)
 
 	//if ((m_sel & 0x0f) == 0)
 	//{
-	//  if (state)
-	//      m_poll |= 0x10;
-	//  else
-	//      m_poll &= ~0x10;
+	//	if (state)
+	//		m_poll |= 0x10;
+	//	else
+	//		m_poll &= ~0x10;
 	//}
 }
 
@@ -193,17 +160,22 @@ void clio_device::map(address_map &map)
 		NAME([this] () { return m_screen->hpos(); }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOG("hcnt (?): %08x & %08x\n", data, mem_mask);
-			// COMBINE_DATA(&m_hcnt);
+			COMBINE_DATA(&m_hcnt);
 		})
 	);
+	// TODO: needs to moved to a proper timer callback function
+	// (or use frame_number for fake interlace readback)
 	map(0x0034, 0x0037).lrw32(
 		NAME([this] () {
-			// 0: even field
-			return ((m_screen->frame_number() & 1) << 11) | m_screen->vpos();
+			if ( m_screen->vpos() == 0 && !machine().side_effects_disabled() )
+			{
+				m_vcnt ^= 0x800;
+			}
+			return ( m_vcnt & 0x800 ) | m_screen->vpos();
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOG("vcnt (?): %08x & %08x\n", data, mem_mask);
-			// COMBINE_DATA(&m_vcnt);
+			COMBINE_DATA(&m_vcnt);
 		})
 	);
 	map(0x0038, 0x003b).lrw32(
@@ -262,7 +234,7 @@ void clio_device::map(address_map &map)
 		})
 	);
 
-//  map(0x005c, 0x005f) unknown if used at all
+//	map(0x005c, 0x005f) unknown if used at all
 	map(0x0060, 0x0067).lrw32(
 		NAME([this] () { return m_irq1; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -303,21 +275,10 @@ void clio_device::map(address_map &map)
 	map(0x0084, 0x0087).lrw32(
 		NAME([this] () { return m_adbio; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			if (ACCESSING_BITS_0_7 && data != m_adbio)
-			{
+			if (data != 0x62)
 				LOG("adbio %08x & %08x\n", data, mem_mask);
-				if (BIT(data, 7))
-					m_adb_out_cb[3](BIT(data, 3));
-				if (BIT(data, 6))
-					m_adb_out_cb[2](BIT(data, 2));
-				if (BIT(data, 5))
-					m_adb_out_cb[1](BIT(data, 1));
-				if (BIT(data, 4))
-					m_adb_out_cb[0](BIT(data, 0));
-
-				COMBINE_DATA(&m_adbio);
-				m_adbio &= 0xff;
-			}
+			COMBINE_DATA(&m_adbio);
+			m_adbio &= 0xff;
 		})
 	);
 	map(0x0088, 0x008b).lrw32(
@@ -381,9 +342,9 @@ void clio_device::map(address_map &map)
 		})
 	);
 
-//  map(0x0300, 0x0303) FIFO init
-//  map(0x0304, 0x0307) DMA request enable
-//  map(0x0308, 0x030b) DMA request disable
+//	map(0x0300, 0x0303) FIFO init
+//	map(0x0304, 0x0307) DMA request enable
+//	map(0x0308, 0x030b) DMA request disable
 	// NOTE: not readable on Red revision apparently
 	map(0x0304, 0x030b).lrw32(
 		NAME([this] () { return m_dma_enable; }),
@@ -395,7 +356,7 @@ void clio_device::map(address_map &map)
 			LOG("DMA request %s: %08x & %08x\n", offset ? "clear" : "set", data, mem_mask);
 		})
 	);
-//  map(0x0380, 0x0383) FIFO status
+//	map(0x0380, 0x0383) FIFO status
 
 	// XBus
 	map(0x0400, 0x0407).lrw32(
@@ -474,14 +435,14 @@ void clio_device::map(address_map &map)
 		NAME([this] () { return m_xbus_read_cb(m_sel & 0x8f); }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) { m_xbus_write_cb(m_sel & 0x8f, data & 0xff); })
 	);
-//  map(0x05c0, 0x05ff) Data
+//	map(0x05c0, 0x05ff) Data
 
 	// TODO: should really map these directly in DSPP core
-//  map(0x17d0, 0x17d3) Semaphore
+//	map(0x17d0, 0x17d3) Semaphore
 	// HACK: for 3do_gdo101
 	map(0x17d0, 0x17d3).lr32(NAME([] () { return 0x0004'0000; }));
-//  map(0x17d4, 0x17d7) Semaphore ACK
-//  map(0x17e0, 0x17ff) DSPP DMA and state
+//	map(0x17d4, 0x17d7) Semaphore ACK
+//	map(0x17e0, 0x17ff) DSPP DMA and state
 	map(0x17e8, 0x17eb).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			// reset?
@@ -509,7 +470,7 @@ void clio_device::map(address_map &map)
 			LOGDSPP("DSPP $17fc %08x & %08x\n", data, mem_mask);
 			m_dspp->write(0x6070 >> 2, data);
 			//if (data & 1)
-			//  machine().debug_break();
+			//	machine().debug_break();
 		})
 	);
 	// DSPP N paths (code)
@@ -614,7 +575,6 @@ void clio_device::request_fiq(uint32_t irq_req, uint8_t type)
 	}
 }
 
-// TODO: this actually generates from Amy not from Clio
 TIMER_CALLBACK_MEMBER(clio_device::scan_timer_cb)
 {
 	int scanline = param;

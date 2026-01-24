@@ -150,7 +150,7 @@ void hyperstone_device::execute_run_drc()
 	// reset the cache if dirty
 	if (m_cache_dirty)
 	{
-		m_drcuml->reset();
+		code_flush_cache();
 		m_cache_dirty = false;
 	}
 
@@ -166,7 +166,7 @@ void hyperstone_device::execute_run_drc()
 		else if (execute_result == EXECUTE_UNMAPPED_CODE)
 			fatalerror("Attempted to execute unmapped code at PC=%08X\n", m_core->global_regs[0]);
 		else if (execute_result == EXECUTE_RESET_CACHE)
-			m_drcuml->reset();
+			code_flush_cache();
 		else if (execute_result == EXECUTE_OUT_OF_CYCLES)
 			break;
 	}
@@ -190,14 +190,18 @@ void hyperstone_device::flush_drc_cache()
 }
 
 /*-------------------------------------------------
-    generate_invariant - generate static code
+    code_flush_cache - flush the cache and
+    regenerate static code
 -------------------------------------------------*/
 
-void hyperstone_device::generate_invariant()
+void hyperstone_device::code_flush_cache()
 {
+	/* empty the transient cache contents */
+	m_drcuml->reset();
+
 	try
 	{
-		drcuml_block &block(m_drcuml->begin_invariant_block(640));
+		drcuml_block &block(m_drcuml->begin_block(640));
 		uml::code_label label = 1;
 
 		// generate the entry point and out-of-cycles handlers
@@ -355,7 +359,7 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 		}
 		catch (const drcuml_block::abort_compilation &)
 		{
-			m_drcuml->reset();
+			code_flush_cache();
 		}
 	}
 }

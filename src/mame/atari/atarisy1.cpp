@@ -2561,7 +2561,7 @@ ROM_START( reliefs1 ) // LSI CART 2
 	ROM_REGION( 0x2000, "alpha", 0 )
 	MOTHERBOARD_ALPHA
 
-	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
+  	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "rp-p0-1.c14.bin",  0x000000, 0x008000, CRC(fe82b82d) SHA1(56319cc7df1ac368443335a4ce9ef97b3585c6a9) )  /* bank 1, plane 0 */
 	ROM_LOAD( "rp-p1-1.c36.bin",  0x010000, 0x008000, CRC(8ebbbd7b) SHA1(d8c3a438d0416e81ce74dc870e1519ade858ae86) )  /* bank 1, plane 1 */
 	ROM_LOAD( "rp-p2-1.c16.bin",  0x020000, 0x008000, CRC(bdffa7ea) SHA1(33d8de21d0b8a1eddfce97bf7304ec2a416f2816) )  /* bank 1, plane 2 */
@@ -2702,4 +2702,4 @@ GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1r_state, init_road
 
 // not a clone of relief because it needs to be a clone of atarisy1 BIOS and it's more like an unreleased prequel than a version of the released title
 // joystick inputs don't work in test mode if service mode is accessed from ingame, only if the emulation is started with the test switch on (is real hardware the same?)
-GAME( 1986, reliefs1,   atarisy1, reliefs1, reliefs1, atarisy1r_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", 0 )
+GAME( 1986, reliefs1,   atarisy1, reliefs1, reliefs1, atarisy1r_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )

@@ -171,11 +171,7 @@ enum
 void jaguar_state::update_dsp_irq()
 {
 	// HACK: why this is calling a DSP related irq section for triggering GPU!?
-	// cojag:area51 wants this for HDD boot.
-	// > IDE controller only connects to Jerry EINT0.
-	// > 32-bit IDE BUS to controller comes from TOM databus through F245 buffers
-	// irq 1 would be Jerry->GPU irq, should probably interrupt GPU but on any mask,
-	// leaving the internal m_flags responsibility about accepting or refusing it ...
+	// area51 wants this for HDD boot ...
 	if (m_is_cojag)
 	{
 		if (m_dsp_irq_state & BIT(m_dsp_regs[JINTCTRL], 0))

@@ -9,6 +9,5 @@
 
 
 DECLARE_DEVICE_TYPE(MPF_SSB, device_mpf1_exp_interface)
-DECLARE_DEVICE_TYPE(MPF_SSB_IP, device_mpf1_exp_interface)
 
 #endif // MAME_BUS_MPF1_SSB_H

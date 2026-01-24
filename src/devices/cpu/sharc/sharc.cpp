@@ -390,33 +390,36 @@ void adsp21062_device::iop_w(offs_t offset, uint32_t data)
 #include "sharcmem.hxx"
 #include "sharcdma.hxx"
 #include "sharcops.hxx"
+#include "sharcops.h"
 
 
 
 void adsp21062_device::build_opcode_table()
 {
-	for (int i = 0; i < std::size(m_sharc_op); i++)
+	int i, j;
+	int num_ops = sizeof(s_sharc_opcode_table) / sizeof(SHARC_OP);
+
+	for (i=0; i < 512; i++)
 	{
 		m_sharc_op[i] = &adsp21062_device::sharcop_unimplemented;
+	}
 
-		const uint16_t op = i << 7;
+	for (i=0; i < 512; i++)
+	{
+		uint16_t op = i << 7;
 
-		int j = 0;
-		while (j < s_num_ops)
+		for (j=0; j < num_ops; j++)
 		{
-			auto &opcode = s_sharc_opcode_table[j++];
-			if ((opcode.op_mask & op) == opcode.op_bits)
+			if ((s_sharc_opcode_table[j].op_mask & op) == s_sharc_opcode_table[j].op_bits)
 			{
-				m_sharc_op[i] = opcode.handler;
-				break;
-			}
-		}
-		while (j < s_num_ops)
-		{
-			auto &opcode = s_sharc_opcode_table[j++];
-			if ((opcode.op_mask & op) == opcode.op_bits)
-			{
-				fatalerror("build_opcode_table: table already filled! (i=%04X, j=%d)\n", i, j);
+				if (m_sharc_op[i] != &adsp21062_device::sharcop_unimplemented)
+				{
+					fatalerror("build_opcode_table: table already filled! (i=%04X, j=%d)\n", i, j);
+				}
+				else
+				{
+					m_sharc_op[i] = s_sharc_opcode_table[j].handler;
+				}
 			}
 		}
 	}
