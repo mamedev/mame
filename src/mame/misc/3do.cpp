@@ -138,7 +138,7 @@ void _3do_state::main_mem(address_map &map)
 	map(0x0000'0000, 0x001F'FFFF).view(m_overlay_view);
 	m_overlay_view[0](0x0000'0000, 0x001F'FFFF).rom().region("bios", 0).lw8(NAME([this] (offs_t offset) { m_overlay_view.disable(); }));
 	map(0x0020'0000, 0x003F'FFFF).ram().share(m_vram);                                   /* VRAM */
-	map(0x0300'0000, 0x030F'FFFF).rom().region("bios", 0);                               /* BIOS */
+	map(0x0300'0000, 0x030F'FFFF).m(m_bankdev, FUNC(address_map_bank_device::amap32));   /* BIOS */
 	// slow bus
 	map(0x0310'0000, 0x0313'FFFF).ram();                                                 /* Brooktree? */
 	map(0x0314'0000, 0x0315'FFFF).mirror(0x20000).rw(FUNC(_3do_state::nvarea_r), FUNC(_3do_state::nvarea_w)).umask32(0x000000ff);                /* NVRAM */
@@ -156,6 +156,11 @@ void _3do_state::main_mem(address_map &map)
 //  map(0x0380'0000, 0x03??'????) trace big RAM
 }
 
+void _3do_state::bios_mem(address_map &map)
+{
+	map(0x0000'0000, 0x000F'FFFF).rom().region("bios", 0);
+	map(0x0010'0000, 0x001F'FFFF).rom().region("kanji", 0);
+}
 
 static INPUT_PORTS_START( 3do )
 	PORT_START("P1.0")
@@ -190,8 +195,9 @@ void _3do_state::machine_start()
 
 void _3do_state::machine_reset()
 {
-	/* start with overlay enabled */
+	// start with overlay enabled, and bank pointing at BIOS
 	m_overlay_view.select(0);
+	m_bankdev->set_bank(0);
 }
 
 
@@ -259,6 +265,9 @@ void _3do_state::green_config(machine_config &config)
 	});
 	m_clio->vsync_cb().set(m_madam, FUNC(madam_device::vdlp_start_w));
 	m_clio->hsync_cb().set(m_madam, FUNC(madam_device::vdlp_continue_w));
+	m_clio->adb_out_cb<2>().set([this] (int state) { m_bankdev->set_bank(state & 1); });
+
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&_3do_state::bios_mem).set_options(ENDIANNESS_BIG, 32, (20 + 1), 0x100000);
 
 	AMY(config, m_amy, XTAL(50'000'000)/4);
 	m_amy->set_screen("screen");
@@ -341,8 +350,7 @@ ROM_START(3do_fz1)
 	ROM_SYSTEM_BIOS( 2, "deva", "Development FZ-1 USA (later)" )
 	ROMX_LOAD( "panafz1_dev.bin", 0x000000, 0x100000, CRC(e8eba9dd) SHA1(4cb4ee36e0f5bc0995d34992b4f241c420d49b2e), ROM_BIOS(2) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START(3do_fz1e)
@@ -352,8 +360,7 @@ ROM_START(3do_fz1e)
 	ROM_SYSTEM_BIOS( 1, "unencrypted", "Unencrypted FZ-1 Europe" )
 	ROMX_LOAD( "panafz1e-unencrypted.bin", 0x000000, 0x100000, CRC(d3d345df) SHA1(4696951e492e5526772a860ea2c0f35411a80927), ROM_BIOS(1) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START(3do_fz1j)
@@ -363,8 +370,7 @@ ROM_START(3do_fz1j)
 	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-1 Japan with disabled RSA" )
 	ROMX_LOAD( "panafz1j-norsa.bin", 0x000000, 0x100000, CRC(82ce67c6) SHA1(a417587ae3b0b8ef00c830920c21af8bee88e419), ROM_BIOS(1) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "panafz1j-kanji.bin", 0x000000, 0x100000, CRC(45f478b1) SHA1(884515605ee243577ab20767ef8c1a7368e4e407) )
 ROM_END
 
@@ -375,8 +381,7 @@ ROM_START(3do_fz10)
 	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-10 USA with disabled RSA" )
 	ROMX_LOAD( "panafz10-norsa.bin", 0x000000, 0x100000, CRC(230e6feb) SHA1(f05e642322c03694f06a809c0b90fc27ac73c002), ROM_BIOS(1) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START(3do_fz10e)
@@ -386,8 +391,7 @@ ROM_START(3do_fz10e)
 	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-10 Europe with disabled RSA" )
 	ROMX_LOAD( "panafz10e-anvil-norsa.bin", 0x000000, 0x100000, CRC(9a186221) SHA1(2765c7b4557cc838b32567d2428d088980295159), ROM_BIOS(1) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 // TODO: supposedly this is a pre-Anvil model (kanji ROM may not fit)
@@ -396,8 +400,7 @@ ROM_START(3do_fz10j)
 	ROM_SYSTEM_BIOS( 0, "retail", "Retail FZ-10 Japan" )
 	ROMX_LOAD( "panafz10j.bin", 0x000000, 0x100000, CRC(07b50015) SHA1(fe7f9c9c6a98910013bf13f2cf798de9fea52acd), ROM_BIOS(0) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "panafz10ja-anvil-kanji.bin", 0x000000, 0x100000, CRC(ff7393de) SHA1(2e857b957803d0331fd229328df01f3ffab69eee) )
 ROM_END
 
@@ -408,8 +411,7 @@ ROM_START(3do_gdo101)
 	ROM_SYSTEM_BIOS( 0, "gdo101m", "Retail GDO-101M" )
 	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(0) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 // NOTE: prints an extra "goldstar-fc1 encrypted" on screen, doesn't ping the logic analyzer
@@ -419,8 +421,7 @@ ROM_START(3do_fc1)
 	ROM_SYSTEM_BIOS( 0, "fc1", "FC-1 (encrypted, retail?)" )
 	ROMX_LOAD( "goldstar_fc1_enc.bin", 0x000000, 0x100000, CRC(5c5b4f98) SHA1(8ef7503c948314d242da47b7fdc272f68dac2aee), ROM_BIOS(0) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 // devstation unit, prints "3DO-NTSC-1.0fc2 encrypted" and Logic Analyzer stuff directly OSD.
@@ -431,8 +432,7 @@ ROM_START(3do_fc2)
 	ROM_SYSTEM_BIOS( 0, "fc2", "FC-2 (1.0 dev kit)" )
 	ROMX_LOAD( "3do_devkit_1.0fc2.bin", 0x000000, 0x100000, CRC(cdb23167) SHA1(bd325c869e1dde8a3872fc21565e0646a3d5b525), ROM_BIOS(0) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START(3do_try)
@@ -440,8 +440,9 @@ ROM_START(3do_try)
 	ROM_SYSTEM_BIOS( 0, "retail", "Retail IMP-21J TRY Japan" )
 	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(0) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	// baddump: the actual kanji ROM for this model needs dumping
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
+	ROM_LOAD( "panafz1j-kanji.bin", 0x000000, 0x100000, BAD_DUMP CRC(45f478b1) SHA1(884515605ee243577ab20767ef8c1a7368e4e407) )
 ROM_END
 
 // model number "MPHC2100USA"
@@ -452,8 +453,7 @@ ROM_START(3do_hc21)
 	ROM_SYSTEM_BIOS( 1, "b3", "b3 unencrypted" )
 	ROMX_LOAD( "sanyo_hc21_b3_unenc.bin", 0x000000, 0x100000, CRC(c4c3db01) SHA1(c389af32bcadf0d86826927dc3d20b7072f90069), ROM_BIOS(1) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 
@@ -469,7 +469,7 @@ ROM_END
 	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 3, "sanyotry", "Sanyo TRY 3DO Interactive Multiplayer" ) \
 	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(3) ) \
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 
 
 ROM_START(3dobios)
@@ -488,7 +488,7 @@ ROM_END
 	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
 	/* TC544000AF-150, 1xxxxxxxxxxxxxxxxxx = 0xFF */ \
 	ROM_LOAD( "saot_rom2.bin", 0x000000, 0x80000, CRC(b832da9a) SHA1(520d3d1b5897800af47f92efd2444a26b7a7dead) )  \
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 
 ROM_START(alg3do)
 	ALG_BIOS

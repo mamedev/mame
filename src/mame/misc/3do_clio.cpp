@@ -33,6 +33,8 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 	, m_xbus_write_cb(*this)
 	, m_dac_l(*this)
 	, m_dac_r(*this)
+//	, m_adb_in_cb(*this)
+	, m_adb_out_cb(*this)
 {
 }
 
@@ -105,6 +107,7 @@ void clio_device::device_reset()
 	m_timer_ctrl = 0;
 	m_vint0 = m_vint1 = 0xffff'ffff;
 	m_slack = 336;
+	m_adbio = 0x00;
 	m_system_timer->adjust(attotime::from_ticks(m_slack, this->clock()));
 	m_scan_timer->adjust(m_screen->time_until_pos(0), 0);
 }
@@ -300,10 +303,21 @@ void clio_device::map(address_map &map)
 	map(0x0084, 0x0087).lrw32(
 		NAME([this] () { return m_adbio; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			if (data != 0x62)
+			if (ACCESSING_BITS_0_7 && data != m_adbio)
+			{
 				LOG("adbio %08x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_adbio);
-			m_adbio &= 0xff;
+				if (BIT(data, 7))
+					m_adb_out_cb[3](BIT(data, 3));
+				if (BIT(data, 6))
+					m_adb_out_cb[2](BIT(data, 2));
+				if (BIT(data, 5))
+					m_adb_out_cb[1](BIT(data, 1));
+				if (BIT(data, 4))
+					m_adb_out_cb[0](BIT(data, 0));
+
+				COMBINE_DATA(&m_adbio);
+				m_adbio &= 0xff;
+			}
 		})
 	);
 	map(0x0088, 0x008b).lrw32(

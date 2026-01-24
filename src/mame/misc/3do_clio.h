@@ -26,6 +26,7 @@ public:
 	auto dacr_cb() { return m_dac_r.bind(); }
 	auto hsync_cb() { return m_hsync_cb.bind(); }
 	auto vsync_cb() { return m_vsync_cb.bind(); }
+	template <std::size_t Line> auto adb_out_cb() { return m_adb_out_cb[Line].bind(); }
 
 	void xbus_int_w(int state);
 
@@ -48,6 +49,7 @@ private:
 	devcb_write8        m_xbus_write_cb;
 	devcb_write16       m_dac_l;
 	devcb_write16       m_dac_r;
+	devcb_write_line::array<4> m_adb_out_cb;
 
 	uint32_t  m_revision = 0;       /* 03400000 */
 	uint32_t  m_csysbits = 0;       /* 03400004 */
