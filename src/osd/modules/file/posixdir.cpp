@@ -291,10 +291,36 @@ std::string osd_subst_env(std::string_view src)
 
 			if (!var.empty())
 			{
-				const char *const exp = std::getenv(var.c_str());
-				if (exp)
+				bool env_found = false, is_xdg_env = false;
+				const char* const xdg_envs[4][2] = {
+					{"XDG_CONFIG_HOME", "/.config"},
+					{"XDG_DATA_HOME",   "/.local/share"},
+					{"XDG_STATE_HOME",  "/.local/state"},
+					{"XDG_CACHE_HOME",  "/.cache"}};
+
+				for (const char* const* xdg_env: xdg_envs)
+					if (var == xdg_env[0])
+					{
+						is_xdg_env = true;
+						break;
+					}
+
+				if (const char* const exp = std::getenv(var.c_str()); exp && !(is_xdg_env && std::string_view(exp).empty()))
+				{
 					result.append(exp);
-				else
+					env_found = true;
+				}
+
+				if (const char* const home = std::getenv("HOME"); !env_found && is_xdg_env && home)
+					for (const char* const* xdg_env: xdg_envs)
+						if (var == xdg_env[0])
+						{
+							result.append(home).append(xdg_env[1]);
+							env_found = true;
+							break;
+						}
+
+				if (!env_found)
 					fprintf(stderr, "Warning: osd_subst_env variable %s not found.\n", var.c_str());
 			}
 		}
