@@ -187,6 +187,34 @@ void lc89510_temp_device::device_start()
 	m_type1_interrupt_callback.resolve();
 	m_type2_interrupt_callback.resolve();
 	m_type3_interrupt_callback.resolve();
+
+	save_item(NAME(segacd.current_frame));
+	save_item(NAME(SCD_BUFFER));
+	save_item(NAME(SCD_STATUS));
+	save_item(NAME(SCD_STATUS_CDC));
+	save_item(NAME(SCD_CURLBA));
+	save_item(NAME(SCD_CURTRK));
+	save_item(NAME(CDC_DECODE));
+	save_item(NAME(CDC_REG0));
+	save_item(NAME(CDC_REG1));
+	save_item(NAME(CDC_BUFFER));
+	save_item(NAME(CDD_RX));
+	save_item(NAME(CDD_TX));
+	save_item(NAME(CDD_STATUS));
+	save_item(NAME(CDD_MIN));
+	save_item(NAME(CDD_SEC));
+	save_item(NAME(CDD_FRAME));
+	save_item(NAME(CDD_EXT));
+	save_item(NAME(CDD_CONTROL));
+	save_item(NAME(CDD_DONE));
+	save_item(NAME(segacd_irq_mask));
+	save_item(NAME(nff0002));
+	save_item(NAME(nff0016));
+	save_item(NAME(LC8951RegistersR));
+	save_item(NAME(LC8951RegistersW));
+	save_item(NAME(bNeoCDCommsClock));
+	save_item(NAME(NeoCDCommsWordCount));
+	save_item(NAME(NeoCD_StatusHack));
 }
 
 void lc89510_temp_device::device_reset()
