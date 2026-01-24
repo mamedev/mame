@@ -83,9 +83,9 @@ void i80c52_device::device_reset()
 void i80c52_device::sfr_map(address_map &map)
 {
 	i8052_device::sfr_map(map);
-	map(0xa9, 0xa9).rw(FUNC(i80c52_device::saddr_r ), FUNC(i80c52_device::saddr_w ));
-	map(0xb7, 0xb7).rw(FUNC(i80c52_device::iph_r   ), FUNC(i80c52_device::iph_w   ));
-	map(0xb9, 0xb9).rw(FUNC(i80c52_device::saden_r ), FUNC(i80c52_device::saden_w ));
+	map(0xa9, 0xa9).rw(FUNC(i80c52_device::saddr_r), FUNC(i80c52_device::saddr_w));
+	map(0xb7, 0xb7).rw(FUNC(i80c52_device::iph_r  ), FUNC(i80c52_device::iph_w  ));
+	map(0xb9, 0xb9).rw(FUNC(i80c52_device::saden_r), FUNC(i80c52_device::saden_w));
 
 /* Philips 80C52 */
 /* ============= */

@@ -99,8 +99,7 @@ const mcs51_disassembler::mem_info mcs51_disassembler::default_names[] = {
 	{ 0x1ae, "ie.6"  },
 	{ 0x1af, "ea"    },
 
-	/* FIXME: port 3 - depends on external circuits and not really
-	 * implemented in the core. TBD */
+	// FIXME: port 3 - depends on external circuits and not really implemented in the core. TBD
 	{ 0x1b0, "rxd"   },
 	{ 0x1b1, "txd"   },
 	{ 0x1b2, "int0"  },

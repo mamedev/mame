@@ -70,22 +70,22 @@
     CONSTANTS
 ***************************************************************************/
 
-/* m_pc vectors */
+// m_pc vectors
 
 enum
 {
-	V_RESET = 0x000,    /* power on address */
-	V_IE0   = 0x003,    /* External Interrupt 0 */
-	V_TF0   = 0x00b,    /* Timer 0 Overflow */
-	V_IE1   = 0x013,    /* External Interrupt 1 */
-	V_TF1   = 0x01b,    /* Timer 1 Overflow */
-	V_RITI  = 0x023,    /* Serial Receive/Transmit */
+	V_RESET = 0x000,    // power on address
+	V_IE0   = 0x003,    // External Interrupt 0
+	V_TF0   = 0x00b,    // Timer 0 Overflow
+	V_IE1   = 0x013,    // External Interrupt 1
+	V_TF1   = 0x01b,    // Timer 1 Overflow
+	V_RITI  = 0x023,    // Serial Receive/Transmit
 
-	/* 8052 Only Vectors */
-	V_TF2   = 0x02b,    /* Timer 2 Overflow */
+	// 8052 Only Vectors
+	V_TF2   = 0x02b,    // Timer 2 Overflow
 
-	/* DS5002FP */
-	V_PFI   = 0x02b     /* Power Failure Interrupt */
+	// DS5002FP
+	V_PFI   = 0x02b     // Power Failure Interrupt
 };
 
 enum serial_state : u8
@@ -395,7 +395,7 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	, m_port_out_cb(*this)
 	, m_rtemp(0)
 {
-	/* default to standard cmos interfacing */
+	// default to standard cmos interfacing
 	for (auto & elem : m_forced_inputs)
 		elem = 0;
 
@@ -475,7 +475,7 @@ void mcs51_cpu_device::clear_current_irq()
 	LOG("New: %d %02x\n", m_cur_irq_prio, m_irq_active);
 }
 
-/* Generate an external ram address for read/writing using indirect addressing mode */
+// Generate an external ram address for read/writing using indirect addressing mode
 
 /*The lowest 8 bits of the address are passed in (from the R0/R1 register), however
   the hardware can be configured to set the rest of the address lines to any available output port pins, which
@@ -529,7 +529,7 @@ void mcs51_cpu_device::transmit_receive(int source)
 {
 	int mode = (BIT(m_scon, SCON_SM0) << 1) | BIT(m_scon, SCON_SM1);
 
-	if (source == 1) /* timer1 */
+	if (source == 1) // timer1
 		m_uart.smod_div = (m_uart.smod_div + 1) & !BIT(m_pcon, PCON_SMOD);
 
 	switch (mode)
@@ -579,8 +579,8 @@ void mcs51_cpu_device::transmit_receive(int source)
 			break;
 		// 9 bit uart
 		case 2:
-			m_uart.rx_clk += (source == 0) ? (BIT(m_pcon, PCON_SMOD) ? 6 : 3) : 0; /* clock / 12 * 3 / 8 (16) = clock / 32 (64)*/
-			m_uart.tx_clk += (source == 0) ? (BIT(m_pcon, PCON_SMOD) ? 6 : 3) : 0; /* clock / 12 */
+			m_uart.rx_clk += (source == 0) ? (BIT(m_pcon, PCON_SMOD) ? 6 : 3) : 0; // clock / 12 * 3 / 8 (16) = clock / 32 (64)
+			m_uart.tx_clk += (source == 0) ? (BIT(m_pcon, PCON_SMOD) ? 6 : 3) : 0; // clock / 12
 			break;
 	}
 
@@ -733,12 +733,12 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 
 	if (BIT(m_tcon, TCON_TR0))
 	{
-		u32 delta;
+		// counter / external input
+		u32 delta = BIT(m_tmod, TMOD_CT0) ? m_t0_cnt : cycles;
 
-		/* counter / external input */
-		delta = BIT(m_tmod, TMOD_CT0) ? m_t0_cnt : cycles;
-		/* taken, reset */
+		// taken, reset
 		m_t0_cnt = 0;
+
 		/* TODO: Not sure about IE0. The manual specifies INT0=high,
 		 * which in turn means CLEAR_LINE.
 		 * IE0 may be edge triggered depending on IT0 */
@@ -747,38 +747,38 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 
 		switch (mode)
 		{
-			case 0: /* 13 Bit Timer Mode */
+			case 0: // 13 Bit Timer Mode
 				count = ((m_th0 << 5) | (m_tl0 & 0x1f));
 				count += delta;
-				if (count & 0xffffe000) /* Check for overflow */
+				if (count & 0xffffe000) // Check for overflow
 					set_tf0(1);
 				m_th0 = (count >> 5) & 0xff;
 				m_tl0 = count & 0x1f;
 				break;
-			case 1: /* 16 Bit Timer Mode */
+			case 1: // 16 Bit Timer Mode
 				count = ((m_th0 << 8) | m_tl0);
 				count += delta;
-				if (count & 0xffff0000) /* Check for overflow */
+				if (count & 0xffff0000) // Check for overflow
 					set_tf0(1);
 				m_th0 = (count >> 8) & 0xff;
 				m_tl0 = count & 0xff;
 				break;
-			case 2: /* 8 Bit Autoreload */
+			case 2: // 8 Bit Autoreload
 				count = ((u32)m_tl0) + delta;
-				if (count & 0xffffff00) /* Check for overflow */
+				if (count & 0xffffff00) // Check for overflow
 				{
 					set_tf0(1);
-					count += m_th0; /* Reload timer */
+					count += m_th0; // Reload timer
 				}
-				/* Update new values of the counter */
+				// Update new values of the counter
 				m_tl0 =  count & 0xff;
 				break;
 			case 3:
-				/* Split Timer 1 */
+				// Split Timer 1
 				count = ((u32)m_tl0) + delta;
-				if (count & 0xffffff00) /* Check for overflow */
+				if (count & 0xffffff00) // Check for overflow
 					set_tf0(1);
-				m_tl0 = count & 0xff; /* Update new values of the counter */
+				m_tl0 = count & 0xff; // Update new values of the counter
 				break;
 		}
 	}
@@ -787,31 +787,33 @@ void mcs51_cpu_device::update_timer_t0(int cycles)
 		switch (mode)
 		{
 		case 3:
-			/* Split Timer 2 */
-			count = ((u32)m_th0) + cycles; /* No gate control or counting !*/
-			if (count & 0xffffff00) /* Check for overflow */
+			// Split Timer 2
+			count = ((u32)m_th0) + cycles; // No gate control or counting !
+			if (count & 0xffffff00) // Check for overflow
 				set_tf1(1);
-			m_th0 = count & 0xff; /* Update new values of the counter */
+			m_th0 = count & 0xff; // Update new values of the counter
 			break;
 		}
 	}
 }
 
-/* From the DS5002FP User Manual
+/*
+
+From the DS5002FP User Manual:
 When Timer 1 is selected for operation in Mode 3, it stops counting and holds its current value. This
 action is the same as setting TR1 = 0. When Timer 0 is selected in Mode 3, Timer 1???s control bits are
 stolen as described above. As a result, Timer 1???s functions are limited in this MODE. It is forced to
 operate as a timer whose clock in-put is 12 tCLK and it cannot generate an interrupt on overflow. In
 addition, it also cannot be used with the GATE function. However, it can be started and stopped by
 switching it into or out of Mode 3 or it can be assigned as a baud rate generator for the serial port.
-*/
 
-/* Intel documentation:
- *  Timer 1 may still be used in modes 0, 1, and 2, while timer 0
- * is in mode 3. With one important exception:  No interrupts
- * will be generated by timer 1 while timer 0 is using the TF1
- * overflow flag
- */
+Intel documentation:
+Timer 1 may still be used in modes 0, 1, and 2, while timer 0
+is in mode 3. With one important exception:  No interrupts
+will be generated by timer 1 while timer 0 is using the TF1
+overflow flag
+
+*/
 
 void mcs51_cpu_device::update_timer_t1(int cycles)
 {
@@ -823,13 +825,14 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 	{
 		if (BIT(m_tcon, TCON_TR1))
 		{
-			u32 delta;
 			u32 overflow = 0;
 
-			/* counter / external input */
-			delta = BIT(m_tmod, TMOD_CT1) ? m_t1_cnt : cycles;
-			/* taken, reset */
+			// counter / external input
+			u32 delta = BIT(m_tmod, TMOD_CT1) ? m_t1_cnt : cycles;
+
+			// taken, reset
 			m_t1_cnt = 0;
+
 			/* TODO: Not sure about IE0. The manual specifies INT0=high,
 			 * which in turn means CLEAR_LINE. Change to access last_state?
 			 * IE0 may be edge triggered depending on IT0 */
@@ -838,30 +841,30 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 
 			switch (mode)
 			{
-				case 0: /* 13 Bit Timer Mode */
+				case 0: // 13 Bit Timer Mode
 					count = ((m_th1 << 5) | (m_tl1 & 0x1f));
 					count += delta;
-					overflow = count & 0xffffe000; /* Check for overflow */
+					overflow = count & 0xffffe000; // Check for overflow
 					m_th1 = (count >> 5) & 0xff;
 					m_tl1 = count & 0x1f;
 					break;
-				case 1: /* 16 Bit Timer Mode */
+				case 1: // 16 Bit Timer Mode
 					count = ((m_th1 << 8) | m_tl1);
 					count += delta;
-					overflow = count & 0xffff0000; /* Check for overflow */
+					overflow = count & 0xffff0000; // Check for overflow
 					m_th1 = (count >> 8) & 0xff;
 					m_tl1 = count & 0xff;
 					break;
-				case 2: /* 8 Bit Autoreload */
+				case 2: // 8 Bit Autoreload
 					count = ((u32)m_tl1) + delta;
-					overflow = count & 0xffffff00; /* Check for overflow */
+					overflow = count & 0xffffff00; // Check for overflow
 					if (overflow)
-						count += m_th1; /* Reload timer */
-					/* Update new values of the counter */
+						count += m_th1; // Reload timer
+					// Update new values of the counter
 					m_tl1 =  count & 0xff;
 					break;
 				case 3:
-					/* do nothing */
+					// do nothing
 					break;
 			}
 			if (overflow)
@@ -873,38 +876,38 @@ void mcs51_cpu_device::update_timer_t1(int cycles)
 	}
 	else
 	{
-		u32 delta;
 		u32 overflow = 0;
+		u32 delta = cycles;
 
-		delta =  cycles;
-		/* taken, reset */
+		// taken, reset
 		m_t1_cnt = 0;
+
 		switch (mode)
 		{
-			case 0: /* 13 Bit Timer Mode */
+			case 0: // 13 Bit Timer Mode
 				count = ((m_th1 << 5) | (m_tl1 & 0x1f));
 				count += delta;
-				overflow = count & 0xffffe000; /* Check for overflow */
+				overflow = count & 0xffffe000; // Check for overflow
 				m_th1 = (count >> 5) & 0xff;
 				m_tl1 = count & 0x1f;
 				break;
-			case 1: /* 16 Bit Timer Mode */
+			case 1: // 16 Bit Timer Mode
 				count = ((m_th1 << 8) | m_tl1);
 				count += delta;
-				overflow = count & 0xffff0000; /* Check for overflow */
+				overflow = count & 0xffff0000; // Check for overflow
 				m_th1 = (count >> 8) & 0xff;
 				m_tl1 = count & 0xff;
 				break;
-			case 2: /* 8 Bit Autoreload */
+			case 2: // 8 Bit Autoreload
 				count = ((u32)m_tl1) + delta;
-				overflow = count & 0xffffff00; /* Check for overflow */
+				overflow = count & 0xffffff00; // Check for overflow
 				if (overflow)
-					count += m_th1; /* Reload timer */
-				/* Update new values of the counter */
+					count += m_th1; // Reload timer
+				// Update new values of the counter
 				m_tl1 = count & 0xff;
 				break;
 			case 3:
-				/* do nothing */
+				// do nothing
 				break;
 		}
 		if (overflow)
@@ -918,30 +921,31 @@ void mcs51_cpu_device::update_timer_t2(int cycles)
 {
 }
 
-/* Check and update status of serial port */
+// Check and update status of serial port
 void mcs51_cpu_device::update_irq_prio()
 {
 	for (int i = 0; i < 8; i++)
 		m_irq_prio[i] = ((m_ip >> i) & 1) | (((m_iph >> i) & 1) << 1);
 }
 
-/***********************************************************************************
- Check for pending Interrupts and process - returns # of cycles used for the int
+/*
 
- Note about priority & interrupting interrupts..
- 1) A high priority interrupt cannot be interrupted by anything!
- 2) A low priority interrupt can ONLY be interrupted by a high priority interrupt
- 3) If more than 1 Interrupt Flag is set (ie, 2 simultaneous requests occur),
-    the following logic works as follows:
-    1) If two requests come in of different priority levels, the higher one is selected..
-    2) If the requests are of the same level, an internal order is used:
-        a) IEO
-        b) TFO
-        c) IE1
-        d) TF1
-        e) RI+TI
-        f) TF2+EXF2
- **********************************************************************************/
+Check for pending Interrupts and process - returns # of cycles used for the int
+
+Note about priority & interrupting interrupts..
+1) A high priority interrupt cannot be interrupted by anything!
+2) A low priority interrupt can ONLY be interrupted by a high priority interrupt
+3) If more than 1 Interrupt Flag is set (ie, 2 simultaneous requests occur),
+   the following logic works as follows:
+   1) If two requests come in of different priority levels, the higher one is selected..
+   2) If the requests are of the same level, an internal order is used:
+       a) IEO
+       b) TFO
+       c) IE1
+       d) TF1
+       e) RI+TI
+       f) TF2+EXF2
+*/
 
 void mcs51_cpu_device::irqs_complete_and_mask(u8 &ints, u8 int_mask)
 {
@@ -1008,11 +1012,11 @@ void mcs51_cpu_device::check_irqs()
 		standard_irq_callback(1, m_pc);
 	}
 
-	//Save current pc to stack, set pc to new interrupt vector
+	// Save current pc to stack, set pc to new interrupt vector
 	push_pc();
 	m_pc = int_vec;
 
-	/* interrupts take 24 cycles */
+	// interrupts take 24 cycles
 	m_inst_cycles += 2;
 
 	// Set current Irq & Priority being serviced
@@ -1026,7 +1030,7 @@ void mcs51_cpu_device::check_irqs()
 	{
 		case V_IE0:
 			// External Int Flag only cleared when configured as Edge Triggered..
-			if (BIT(m_tcon, TCON_IT0)) /* for some reason having this, breaks alving dmd games */
+			if (BIT(m_tcon, TCON_IT0)) // for some reason having this, breaks alving dmd games
 				set_ie0(0);
 			break;
 		case V_TF0:
@@ -1035,7 +1039,7 @@ void mcs51_cpu_device::check_irqs()
 			break;
 		case V_IE1:
 			// External Int Flag only cleared when configured as Edge Triggered..
-			if (BIT(m_tcon, TCON_IT1)) /* for some reason having this, breaks alving dmd games */
+			if (BIT(m_tcon, TCON_IT1)) // for some reason having this, breaks alving dmd games
 				set_ie1(0);
 			break;
 		case V_TF1:
@@ -1043,17 +1047,15 @@ void mcs51_cpu_device::check_irqs()
 			set_tf1(0);
 			break;
 		case V_RITI:
-			/* no flags are cleared, TI and RI remain set until reset by software */
+			// no flags are cleared, TI and RI remain set until reset by software
 			break;
-		/* I8052 specific */
+		// I8052 specific
 		case V_TF2:
-			/* no flags are cleared according to manual */
+			// no flags are cleared according to manual
 			break;
-		/* DS5002FP specific */
-		/* case V_PFI:
-		 *  no flags are cleared, PFW is reset by software
-		 *  This has the same vector as V_TF2.
-		 */
+		// DS5002FP specific
+		// case V_PFI:
+		// no flags are cleared, PFW is reset by software, this has the same vector as V_TF2.
 	}
 }
 
@@ -1095,10 +1097,9 @@ void mcs51_cpu_device::handle_irq(int irqline, int state, u32 new_state, u32 tr_
 			}
 			else
 			{
-				if (!BIT(m_tcon, TCON_IT0)) /* clear if level triggered */
+				if (!BIT(m_tcon, TCON_IT0)) // clear if level triggered
 					set_ie0(0);
 			}
-
 			break;
 
 		// External Interrupt 1
@@ -1117,7 +1118,7 @@ void mcs51_cpu_device::handle_irq(int irqline, int state, u32 new_state, u32 tr_
 			}
 			else
 			{
-				if (!BIT(m_tcon, TCON_IT1)) /* clear if level triggered */
+				if (!BIT(m_tcon, TCON_IT1)) // clear if level triggered
 					set_ie1(0);
 			}
 			break;
@@ -1147,7 +1148,8 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 	 *
 	 */
 	u32 new_state = (m_last_line_state & ~(1 << irqline)) | ((state != CLEAR_LINE) << irqline);
-	/* detect 0->1 transitions */
+
+	// detect 0->1 transitions
 	u32 tr_state = (~m_last_line_state) & new_state;
 
 	handle_irq(irqline, state, new_state, tr_state);
@@ -1158,7 +1160,7 @@ void mcs51_cpu_device::handle_ta_window()
 {
 }
 
-/* Execute cycles */
+// Execute cycles
 void mcs51_cpu_device::execute_run()
 {
 	do
@@ -1209,7 +1211,7 @@ void mcs51_cpu_device::device_start()
 	space(AS_INTD).specific(m_intd);
 	space(AS_INTI).specific(m_inti);
 
-	/* Save states */
+	// Save states
 	save_item(NAME(m_ppc));
 	save_item(NAME(m_pc));
 	save_item(NAME(m_rwm));
@@ -1312,7 +1314,7 @@ void mcs51_cpu_device::state_string_export(const device_state_entry &entry, std:
 	}
 }
 
-/* Reset registers to the initial values */
+// Reset registers to the initial values
 void mcs51_cpu_device::device_reset()
 {
 	m_last_line_state = 0;
@@ -1321,13 +1323,13 @@ void mcs51_cpu_device::device_reset()
 	m_t2_cnt = 0;
 	m_t2ex_cnt = 0;
 
-	/* Flag as NO IRQ in Progress */
+	// Flag as NO IRQ in Progress
 	m_irq_active = 0;
 	m_cur_irq_prio = -1;
 	m_last_op = 0;
 	m_last_bit = 0;
 
-	/* these are all defined reset states */
+	// these are all defined reset states
 	m_rwm = 0;
 	m_ppc = m_pc;
 	m_pc = 0;
@@ -1348,7 +1350,7 @@ void mcs51_cpu_device::device_reset()
 	m_tl1 = 0;
 	m_tl0 = 0;
 
-	/* set the port configurations to all 1's */
+	// set the port configurations to all 1's
 	p3_w(0xff);
 	p2_w(0xff);
 	p1_w(0xff);

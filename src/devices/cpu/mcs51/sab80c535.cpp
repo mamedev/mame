@@ -51,7 +51,6 @@ DEFINE_DEVICE_TYPE(SAB80C535, sab80c535_device, "sab80c535", "Siemens SAB80C535"
 // f8: p5
 
 
-
 void sab80c535_device::p4_w(u8 data)
 {
 	m_p4 = data;

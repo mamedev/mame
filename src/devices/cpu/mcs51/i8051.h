@@ -113,17 +113,17 @@ protected:
 	};
 
 	enum {
-		PCON_SMOD  = 7,
-		PCON_GF1   = 3,
-		PCON_GF0   = 2,
-		PCON_PD    = 1,
-		PCON_IDL   = 0,
+		PCON_SMOD = 7,
+		PCON_GF1  = 3,
+		PCON_GF0  = 2,
+		PCON_PD   = 1,
+		PCON_IDL  = 0,
 
-		PCON_POR   = 6,
-		PCON_PFW   = 5,
-		PCON_WTR   = 4,
-		PCON_EPFW  = 3,
-		PCON_EWT   = 2,
+		PCON_POR  = 6,
+		PCON_PFW  = 5,
+		PCON_WTR  = 4,
+		PCON_EPFW = 3,
+		PCON_EWT  = 2,
 	};
 
 	// construction/destruction
@@ -156,45 +156,45 @@ protected:
 	address_space_config m_inti_config;
 
 	// Internal stuff
-	u16 m_ppc;              // previous pc
-	u16 m_pc;               // current pc
-	bool m_has_pd;          // can powerdown
-	u8  m_rwm;              // Signals that the current instruction is a read/write/modify instruction
+	u16 m_ppc;             // previous pc
+	u16 m_pc;              // current pc
+	bool m_has_pd;         // can powerdown
+	u8 m_rwm;              // Signals that the current instruction is a read/write/modify instruction
 
-	int m_inst_cycles;      // cycles for the current instruction
-	const u32 m_rom_size;   // size (in bytes) of internal program ROM/EPROM
-	int m_ram_mask;         // second ram bank for indirect access available ?
-	int m_num_interrupts;   // number of interrupts supported
-	u32 m_last_line_state;  // last state of input lines line
-	int m_t0_cnt;           // number of 0->1 transitions on T0 line
-	int m_t1_cnt;           // number of 0->1 transitions on T1 line
-	int m_t2_cnt;           // number of 0->1 transitions on T2 line
-	int m_t2ex_cnt;         // number of 0->1 transitions on T2EX line
-	int m_cur_irq_prio;     // Holds value of the current IRQ Priority Level; -1 if no irq
-	u8  m_irq_active;       // mask which irq levels are serviced
-	u8  m_irq_prio[8];      // interrupt priority
+	int m_inst_cycles;     // cycles for the current instruction (temporary variable)
+	const u32 m_rom_size;  // size (in bytes) of internal program ROM/EPROM
+	int m_ram_mask;        // second ram bank for indirect access available?
+	int m_num_interrupts;  // number of interrupts supported
+	u32 m_last_line_state; // last state of input lines line
+	int m_t0_cnt;          // number of 0->1 transitions on T0 line
+	int m_t1_cnt;          // number of 0->1 transitions on T1 line
+	int m_t2_cnt;          // number of 0->1 transitions on T2 line
+	int m_t2ex_cnt;        // number of 0->1 transitions on T2EX line
+	int m_cur_irq_prio;    // Holds value of the current IRQ Priority Level; -1 if no irq
+	u8 m_irq_active;       // mask which irq levels are serviced
+	u8 m_irq_prio[8];      // interrupt priority
 
-	u8  m_forced_inputs[4]; // allow read even if configured as output
+	u8 m_forced_inputs[4]; // allow read even if configured as output
 
 	// JB-related hacks
-	u8  m_last_op;
-	u8  m_last_bit;
+	u8 m_last_op;
+	u8 m_last_bit;
 
-	int      m_icount;
+	int m_icount;
 
 	struct mcs51_uart
 	{
-		u8  data_out;       // data to send out
-		u8  data_in;
-		u8  txbit;
-		u8  txd;
-		u8  rxbit;
-		u8  rxb8;
+		u8 data_out;       // data to send out
+		u8 data_in;
+		u8 txbit;
+		u8 txd;
+		u8 rxbit;
+		u8 rxb8;
 
-		int smod_div;       // signal divided by 2^SMOD
-		int rx_clk;         // rx clock
-		int tx_clk;         // tx clock
-	} m_uart;               // internal uart
+		int smod_div;      // signal divided by 2^SMOD
+		int rx_clk;        // rx clock
+		int tx_clk;        // tx clock
+	} m_uart;              // internal uart
 
 	// Internal Ram
 	u16 m_dptr;

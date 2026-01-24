@@ -32,7 +32,7 @@ i8752_device::i8752_device(const machine_config &mconfig, const char *tag, devic
 
 void i8052_device::update_timer_t2(int cycles)
 {
-	/* Update Timer 2 */
+	// Update Timer 2
 	if (BIT(m_t2con, T2CON_TR2))
 	{
 		int mode = ((BIT(m_t2con, T2CON_TCLK) | BIT(m_t2con, T2CON_RCLK)) << 1) | BIT(m_t2con, T2CON_CP);
@@ -43,7 +43,7 @@ void i8052_device::update_timer_t2(int cycles)
 
 		switch (mode)
 		{
-			case 0: /* 16 Bit Auto Reload */
+			case 0: // 16 Bit Auto Reload
 				if (count & 0xffff0000)
 				{
 					set_tf2(1);
@@ -56,7 +56,7 @@ void i8052_device::update_timer_t2(int cycles)
 				}
 				m_t2 = count;
 				break;
-			case 1: /* 16 Bit Capture */
+			case 1: // 16 Bit Capture
 				if (count & 0xffff0000)
 					set_tf2(1);
 				m_t2 = count;
@@ -68,7 +68,7 @@ void i8052_device::update_timer_t2(int cycles)
 				}
 				break;
 			case 2:
-			case 3: /* Baud rate */
+			case 3: // Baud rate
 				if (count & 0xffff0000)
 				{
 					count += m_rcap2;
