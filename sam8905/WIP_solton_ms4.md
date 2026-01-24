@@ -175,6 +175,9 @@ Called `midi_panic_all_channels` - when the RX buffer overflows:
 | 0x1D19 | SysEx mask2 / voice enable pattern 2 |
 | 0x1D1A | Voice enable table 1 (5 entries, 0xC0=on, 0x00=off) |
 | 0x1D20 | Voice enable table 2 (5 entries) |
+| 0x1E20+ch | All-notes-off flag per channel |
+| 0x1E50+ch | Sustain pedal value per channel |
+| 0x1D99 | Main loop periodic counter (reloads to 25) |
 | 0x1D9A | Active Sensing timeout counter |
 
 ## Program Change -> SAM Programming Callgraph
@@ -327,6 +330,220 @@ All SAM writes use P2=0x80 (Port 2 provides high address byte for MOVX, giving 0
 
 Note: All names are prefixed with 'd' (likely "data" marker). Many end with 'h' (possibly "high" quality/resolution flag).
 
+## Note On/Off -> SAM D-RAM Callgraph
+
+### Overview
+
+Note On/Off messages trigger voice allocation, D-RAM parameter writes, and sustain pedal management.
+Voice status is tracked per-note in XRAM at 0x14D5 (128 bytes per channel, indexed by note number).
+
+### Voice Status Byte (XRAM 0x14D5+ch*0x80+note)
+
+| Bit | Meaning |
+|-----|---------|
+| 7 | Key physically held (Note On active) |
+| 6 | Sustain-held (sustain pedal holding this voice) |
+| 4 | Pending release (marked during sustain transitions) |
+| 3:0 | Voice slot ID or other state |
+
+### Callgraph
+
+```
+handle_note_on_off (0xB75F)
+│
+├── [Note On (velocity > 0):]
+│   ├── Channel mask check (channels 0-3 only)
+│   ├── Note range split: if note > threshold (table at 0xD383), use ch+4 (second layer)
+│   ├── Voice table lookup (XRAM 0x14D5+ch*0x80+note)
+│   ├── Set status byte = 0x80 | slot_id (key held)
+│   └── voice_trigger_note (0xA834)
+│       ├── Read 10 bytes from per-channel state (XRAM 0x1200+ch*0x0C)
+│       ├── Allocate D-RAM slots via FUN_CODE_a9cf
+│       └── dram_param_processor (0xAA9A) - for each slot
+│           ├── Read 5 init bytes from program data
+│           └── Loop: read parameter descriptors, dispatch via bits[5:3]:
+│               ├── Type 0 (0xAD8F): frequency/pitch
+│               ├── Type 1 (0xADBD): complex (596 bytes, envelope setup)
+│               ├── Type 2 (0xB030): filter/amplitude
+│               ├── Type 3 (0xB222): param type 3
+│               ├── Type 4 (0xB278): param type 4
+│               ├── Type 5 (0xB2D2): param type 5
+│               └── Type 6 (0xB2CF): param type 6
+│                   └── sam_write_dram (0xA4BC)
+│
+├── [Note Off (velocity = 0):]
+│   └── handle_note_off_sustain (0xBC31)
+│       ├── Check sustain pedal (XRAM 0x1E50[ch] bit 0x40)
+│       ├── If sustain ON: set bit 0x10 (sustained hold), clear bit 0x80
+│       └── If sustain OFF and (status & 0x50)==0:
+│           └── voice_trigger_note (0xA834) - release parameters
+│
+├── [Sustain Pedal Off (CC#64 < 64):]
+│   └── cc_sustain_pedal (0xC390)
+│       └── handle_sustain_release (0xBDD5)
+│           ├── Find voices with bit 0x10 set
+│           ├── If bit 0x40 not set: voice_trigger_note (release)
+│           └── Clear bit 0x10
+│
+└── [All Notes Off (CC#123):]
+    └── handle_all_notes_off (0xBAE1)
+        ├── Scan all 128 notes in voice table
+        ├── For active voices: clear upper bits (mask 0x2F)
+        ├── Call voice_trigger_note for each
+        └── If 0x1E20 flag set: voice_kill_channel (0xA785)
+```
+
+### Per-Channel State (XRAM 0x1200 + ch*0x0C)
+
+Each channel has 12 bytes of state used by voice_trigger_note:
+
+| Offset | Purpose |
+|--------|---------|
+| 0x00 | Channel flags |
+| 0x01 | Program/voice mode |
+| 0x02 | Volume (CC#7 value, written by cc_volume_handler) |
+| 0x07 | Note/velocity data pointer high |
+| 0x08 | Note/velocity data pointer low |
+| 0x0A | Volume copy (also written by cc_volume_handler) |
+
+## Envelope and Modulation Update System
+
+### Architecture
+
+The MS4 uses a software envelope/LFO engine running on the 80C52, which periodically updates SAM D-RAM parameters. The system has three layers:
+
+1. **Timer 1 ISR** (0xD440): Fires every ~5.5ms, increments tick counter (INTMEM 0x17)
+2. **Main Loop periodic call** (every 2 ticks ≈ 11ms): Calls `periodic_voice_update` (0x9BA7)
+3. **CC#7 immediate update**: `envelope_tick_volume` (0xA403) re-evaluates envelopes on volume change
+
+### Main Loop Structure (MAINLOOP at 0xDA30)
+
+```
+Init:
+  - Set up SFRs (T2CON=0x34, SCON=0x5C, IE=0x98, TMOD=0x11)
+  - Enable Timer 1 & Serial interrupts
+  - Call init functions (0xB70B, 0x98AD)
+
+Loop:
+  1. Call SERIAL_HANDLER (process one MIDI byte)
+  2. Check INTMEM 0x17 (Timer 1 tick counter)
+  3. If ticks >= 2:
+     a. Call periodic_voice_update (0x9BA7) -- ENVELOPE/LFO TICK
+     b. Decrement loop counter (XRAM 0x1D99)
+     c. If counter reaches 0 (every 25 ticks ≈ 275ms):
+        - Reset counter to 25
+        - Call slow periodic task (0xB6CD)
+     d. Subtract 2 from tick counter
+  4. Loop back to step 1
+```
+
+### periodic_voice_update (0x9BA7) - The Core Update
+
+Called every ~11ms. Structure:
+
+**Outer loop**: Walks active voice linked list (head at INTMEM 0x54, next at voice+0x7E)
+
+For each voice:
+- Sets P2 = voice slot (provides high byte for XRAM access to per-voice state)
+- Reads flags from voice XRAM 0xFB
+- Gets channel from voice XRAM 0xFC upper nibble
+- Computes mod wheel contribution: XRAM 0x1183 (mod wheel) * XRAM 0x1184+ch (sensitivity)
+
+**Inner loop 1** (Envelope/LFO state machine, 7 blocks of 16 bytes at voice XRAM 0x00-0x6F):
+
+Each 16-byte parameter state block:
+
+| Offset | Purpose |
+|--------|---------|
+| 0x00-0x01 | Envelope segment pointer (code space) |
+| 0x02 | Status: bit 7=LFO active, bit 6=envelope active, bits 2:0=waveform type |
+| 0x03 | Modulation flags: bit 7=pitch bend, bit 6=mod wheel |
+| 0x04 | LFO rate increment |
+| 0x05 | LFO rate/phase step |
+| 0x06 | LFO amplitude |
+| 0x07 | LFO output value (computed result) |
+| 0x08-0x09 | Envelope current position (16-bit) |
+| 0x0A-0x0B | Phase accumulator (16-bit, for LFO) |
+| 0x0C | Envelope flags: bit 7=active |
+| 0x0D | Envelope target value |
+| 0x0E | Envelope rate/mode: bits 2:0 = end action (0=next seg, 1=loop, 2=sustain, 3=stop, 4=off) |
+| 0x0F | Envelope rate multiplier |
+
+LFO Waveform types (switch on byte+2 & 7):
+- 0, 5, 6, 7: Sine (64-entry table at code 0x9833)
+- 1: Identity (ramp up)
+- 2: Inverted (ramp down)
+- 3: Square
+- 4: Noise (LFSR: val*3 + 0x43)
+
+**Inner loop 2** (Parameter output and SAM write):
+
+Iterates parameter descriptor list (IRAM 0x70+, same as envelope_tick_volume):
+- 0xFF = end of list -> move to next voice in linked list
+- 0x0F = skip
+- Otherwise: compute IRAM state address = (desc_low_nibble * 8) | 0x80
+- Check status bits [5:3]:
+  - 0x38 = done/idle -> skip
+  - 0x10 = "volume envelope" type -> calls FUN_CODE_a18f (SAM D-RAM write)
+  - Other = modulation type:
+    - Reads LFO output from state block
+    - Applies pitch bend (from XRAM 0x1194/0x1195 per channel)
+    - Applies mod wheel (DAT_INTMEM_41/42)
+    - Saturates to +/-127
+    - Calls modulation_write_dram (0x9FCD) to write to SAM D-RAM
+
+### CC#7 Volume -> Immediate Envelope Update
+
+```
+cc_handler_dual_layer (0xC7A3)
+└── cc_dispatch (0xC1A0)
+    └── cc_switch_handler (0xC2BA) [case index 8 = CC#7]
+        └── cc_volume_handler (0xC34C)
+            ├── Store value to XRAM 0x1202[ch] and 0x120A[ch]
+            └── envelope_tick_volume (0xA403)
+                ├── Walk voice linked list for channel
+                ├── For each voice: iterate parameter descriptors
+                ├── Check envelope state bits[5:3] == 0x10
+                └── envelope_write_dram (0xA471)
+                    ├── Compute parameter from rate * scale
+                    └── sam_write_dram (0xA4BC)
+```
+
+### CC Dispatch Jump Table (0xC833, 16 entries after subtracting 5 from CC index)
+
+| Entry | CC Index | CC# | Handler Address | Function |
+|-------|----------|-----|-----------------|----------|
+| 0 | 5 | 1 | 0xC2CA | Modulation Wheel |
+| 1 | 6 | 5 | 0xC2D8 | Portamento Time |
+| 2 | 7 | 65 | 0xC303 | Portamento On/Off |
+| 3 | 8 | 7 | 0xC34C | Volume (triggers envelope update) |
+| 4 | 9 | 10 | 0xC374 | Pan |
+| 5 | 10 | 64 | 0xC390 | Sustain Pedal |
+| 6 | 11 | 66 | 0xC3C4 | Sostenuto |
+| 7 | 12 | 67 | 0xC3FE | Soft Pedal |
+| 8-15 | 13-20 | 123-127+ | 0xC41F+ | Channel Mode messages |
+
+### Key RAM Addresses (Envelope/Modulation)
+
+| Address | Purpose |
+|---------|---------|
+| INTMEM 0x17 | Timer 1 tick counter (decremented by main loop) |
+| INTMEM 0x34 | Current channel being processed |
+| INTMEM 0x38 | Current parameter descriptor |
+| INTMEM 0x3A | Current voice slot ID |
+| INTMEM 0x3B | Current IRAM state block address |
+| INTMEM 0x41-42 | Mod wheel contribution (computed per voice) |
+| INTMEM 0x4F | Parameter list iterator |
+| INTMEM 0x54 | Active voice linked list head |
+| XRAM 0x1183 | Mod wheel value (signed) |
+| XRAM 0x1184+ch | Mod wheel sensitivity per channel |
+| XRAM 0x1194/95+ch*2 | Pitch bend value per channel (16-bit) |
+| XRAM 0x1E50+ch | Sustain pedal value per channel |
+| XRAM voice+0x7E | Next voice pointer (linked list) |
+| XRAM voice+0x00-0x6F | 7 parameter state blocks (16 bytes each) |
+| XRAM voice+0xFB | Voice flags |
+| XRAM voice+0xFC | Channel (upper nibble) |
+
 ## Key Function Addresses
 
 | Address | Name | Purpose |
@@ -334,7 +551,7 @@ Note: All names are prefixed with 'd' (likely "data" marker). Many end with 'h' 
 | 0xB630 | ISR_UART_HANDLER | UART ISR: buffer RX, dequeue TX |
 | 0xC635 | SERIAL_HANDLER | Main loop MIDI parser/dispatcher |
 | 0xB75F | handle_note_on_off | Note On/Off processing |
-| 0xC1A0 | handle_control_change | CC lookup and dispatch |
+| 0xC1A0 | cc_dispatch | CC lookup and dispatch |
 | 0xC45B | handle_program_change | Program Change with ROM table lookup |
 | 0x9AB0 | handle_pitch_bend | Pitch Bend processing (dual-layer) |
 | 0xB59B | sysex_voice_enable | SysEx voice mask processing |
@@ -345,6 +562,23 @@ Note: All names are prefixed with 'd' (likely "data" marker). Many end with 'h' 
 | 0xAD43 | sam_write_aram | Write 32-word algorithm to SAM A-RAM |
 | 0x9A2D | voice_init_slots | Allocate and initialize SAM D-RAM voice slots |
 | 0xA4BC | sam_write_dram | Write single D-RAM entry to SAM |
+| 0x9BA7 | periodic_voice_update | Main loop periodic envelope/LFO/modulation update (~11ms) |
+| 0x9FCD | modulation_write_dram | Write modulation parameter to SAM D-RAM |
+| 0xA403 | envelope_tick_volume | CC#7 Volume immediate envelope update |
+| 0xA471 | envelope_write_dram | Compute and write single envelope parameter to SAM D-RAM |
+| 0xA834 | voice_trigger_note | Voice trigger (Note On/Off, sustain release) |
+| 0xAA9A | dram_param_processor | D-RAM parameter processor (7-type switch on bits[5:3]) |
+| 0xBAE1 | handle_all_notes_off | All Notes Off: scan + retrigger all active voices |
+| 0xBC31 | handle_note_off_sustain | Note Off with sustain pedal check |
+| 0xBDD5 | handle_sustain_release | Release voices held by sustain pedal |
+| 0xBF18 | handle_sustain_toggle | Sustain pedal on/off transition handler |
+| 0xC1A0 | cc_dispatch | CC lookup table (0xD405) and dispatch |
+| 0xC2BA | cc_switch_handler | CC handler switch (16-entry jump table at 0xC833) |
+| 0xC34C | cc_volume_handler | CC#7 handler: store + envelope update |
+| 0xC390 | cc_sustain_pedal | CC#64 handler: sustain pedal on/off |
+| 0xC7A3 | cc_handler_dual_layer | CC dual-layer wrapper (ch + ch+4) |
+| 0xD417 | find_active_voice | Search voice table backward for active entry |
+| 0xD440 | Timer1_ISR | Timer 1 ISR: reload + increment tick counter (INTMEM 0x17) |
 | 0xDC1C | table_lookup | Generic byte-search in code space |
 | 0xDC9C | load_dptr_from_xram | Load DPTR from 2-byte XRAM pointer |
 | 0xDCB3 | add_a_to_dptr | Utility: DPTR += A (indexed array access) |
@@ -362,3 +596,12 @@ Note: All names are prefixed with 'd' (likely "data" marker). Many end with 'h' 
 - [x] Document MIDI implementation via Ghidra analysis
 - [x] Analyze program range (0-65) and document callgraph from MIDI to SAM programming
 - [x] Name and comment all SAM-related functions in Ghidra (voice_kill_channel, voice_deactivate, voice_assign_algorithm, sam_write_aram, voice_init_slots, sam_write_dram)
+- [x] Trace handle_note_on_off callgraph to SAM D-RAM writes
+- [x] Identify voice status byte semantics (bits 7,6,4 = key held, sustain, pending)
+- [x] Trace sustain pedal handling (CC#64 -> handle_sustain_release/handle_sustain_toggle)
+- [x] Identify periodic envelope/modulation update function (periodic_voice_update at 0x9BA7)
+- [x] Document main loop structure (Timer 1 ticks -> periodic_voice_update every ~11ms)
+- [x] Document LFO waveform types (sine, ramp, square, noise via LFSR)
+- [x] Document per-voice parameter state block format (16 bytes: envelope + LFO state)
+- [x] Document CC#7 Volume immediate envelope update path
+- [x] Name and comment all note/envelope/CC functions in Ghidra (17 functions total)
