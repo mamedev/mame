@@ -966,6 +966,65 @@ void ppc_device::device_start()
 			m_fdregmap[31] = uml::F8;
 	}
 
+	try
+	{
+		/* generate the entry point and out-of-cycles handlers */
+		static_generate_entry_point();
+		static_generate_nocode_handler();
+		static_generate_out_of_cycles();
+		static_generate_tlb_mismatch();
+		if (m_cap & PPCCAP_603_MMU)
+			static_generate_swap_tgpr();
+
+		/* append exception handlers for various types */
+		static_generate_exception(EXCEPTION_RESET,     true,  "exception_reset");
+		static_generate_exception(EXCEPTION_MACHCHECK, true,  "exception_machine_check");
+		static_generate_exception(EXCEPTION_DSI,       true,  "exception_dsi");
+		static_generate_exception(EXCEPTION_ISI,       true,  "exception_isi");
+		static_generate_exception(EXCEPTION_EI,        true,  "exception_ei");
+		static_generate_exception(EXCEPTION_EI,        false, "exception_ei_norecover");
+		static_generate_exception(EXCEPTION_ALIGN,     true,  "exception_align");
+		static_generate_exception(EXCEPTION_PROGRAM,   true,  "exception_program");
+		static_generate_exception(EXCEPTION_NOFPU,     true,  "exception_fpu_unavailable");
+		static_generate_exception(EXCEPTION_DECREMENT, true,  "exception_decrementer");
+		static_generate_exception(EXCEPTION_SYSCALL,   true,  "exception_syscall");
+		static_generate_exception(EXCEPTION_TRACE,     true,  "exception_trace");
+		static_generate_exception(EXCEPTION_FPASSIST,  true,  "exception_floating_point_assist");
+		if (m_cap & PPCCAP_603_MMU)
+		{
+			static_generate_exception(EXCEPTION_ITLBMISS,  true,  "exception_itlb_miss");
+			static_generate_exception(EXCEPTION_DTLBMISSL, true,  "exception_dtlb_miss_load");
+			static_generate_exception(EXCEPTION_DTLBMISSS, true,  "exception_dtlb_miss_store");
+		}
+
+		/* add subroutines for memory accesses */
+		for (int mode = 0; mode < 8; mode++)
+		{
+			static_generate_memory_accessor(mode, 1, false, false, "read8",       m_read8[mode],       nullptr);
+			static_generate_memory_accessor(mode, 1, true,  false, "write8",      m_write8[mode],      nullptr);
+			static_generate_memory_accessor(mode, 2, false, true,  "read16mask",  m_read16mask[mode],  nullptr);
+			static_generate_memory_accessor(mode, 2, false, false, "read16",      m_read16[mode],      m_read16mask[mode]);
+			static_generate_memory_accessor(mode, 2, true,  true,  "write16mask", m_write16mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 2, true,  false, "write16",     m_write16[mode],     m_write16mask[mode]);
+			static_generate_memory_accessor(mode, 4, false, true,  "read32mask",  m_read32mask[mode],  nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, "read32align", m_read32align[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, false, false, "read32",      m_read32[mode],      m_read32mask[mode]);
+			static_generate_memory_accessor(mode, 4, true,  true,  "write32mask", m_write32mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 4, true,  false, "write32align",m_write32align[mode],nullptr);
+			static_generate_memory_accessor(mode, 4, true,  false, "write32",     m_write32[mode],     m_write32mask[mode]);
+			static_generate_memory_accessor(mode, 8, false, true,  "read64mask",  m_read64mask[mode],  nullptr);
+			static_generate_memory_accessor(mode, 8, false, false, "read64",      m_read64[mode],      m_read64mask[mode]);
+			static_generate_memory_accessor(mode, 8, true,  true,  "write64mask", m_write64mask[mode], nullptr);
+			static_generate_memory_accessor(mode, 8, true,  false, "write64",     m_write64[mode],     m_write64mask[mode]);
+			static_generate_lsw_entries(mode);
+			static_generate_stsw_entries(mode);
+		}
+	}
+	catch (drcuml_block::abort_compilation &)
+	{
+		fatalerror("Error generating PPC static handlers\n");
+	}
+
 	/* mark the cache dirty so it is updated on next execute */
 	m_cache_dirty = true;
 }

@@ -647,7 +647,7 @@ void cr560b_device::cmd_version()
 	m_output_fifo[10] = 0x00; // ^?
 	m_output_fifo[11] = m_status;
 
-//	status_change(status);
+//  status_change(status);
 	status_enable(12);
 }
 

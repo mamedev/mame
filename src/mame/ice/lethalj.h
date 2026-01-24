@@ -42,6 +42,10 @@ public:
 
 	ioport_value cclownz_paddle();
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	void ripribit_control_w(uint16_t data);
 	void cfarm_control_w(uint16_t data);
@@ -53,9 +57,6 @@ private:
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
 	void lethalj_map(address_map &map) ATTR_COLD;
-
-	virtual void machine_start() override { m_lamps.resolve(); }
-	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(gen_ext1_int);
 

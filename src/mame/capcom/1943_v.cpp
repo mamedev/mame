@@ -285,13 +285,14 @@ void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx
 
 void _1943_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = 0; offs < m_spriteram.bytes(); offs += 32)
+	const u8 *spriteram = m_spriteram->buffer();
+	for (int offs = 0; offs < m_spriteram->bytes(); offs += 32)
 	{
-		const u8 attr = m_spriteram[offs + 1];
-		const u32 code = m_spriteram[offs] + ((attr & 0xe0) << 3);
+		const u8 attr = spriteram[offs + 1];
+		const u32 code = spriteram[offs] + ((attr & 0xe0) << 3);
 		const u32 color = attr & 0x0f;
-		int sx = m_spriteram[offs + 3] - ((attr & 0x10) << 4);
-		int sy = m_spriteram[offs + 2];
+		int sx = spriteram[offs + 3] - ((attr & 0x10) << 4);
+		int sy = spriteram[offs + 2];
 
 		if (flip_screen())
 		{

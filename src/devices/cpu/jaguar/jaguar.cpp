@@ -1200,7 +1200,7 @@ void jaguar_cpu_device::shlq_n_rn(u16 op)
 	// NOTE: convert_zero doesn't seem right here, 32 - convert_zero[0] = 0
 	// wolfn3d, nbajamte
 	const s32 r1 = (op >> 5) & 31;
-	// 	const s32 r1 = convert_zero[(op >> 5) & 31];
+	//  const s32 r1 = convert_zero[(op >> 5) & 31];
 	const u32 r2 = m_r[dreg];
 	const u32 res = r2 << (32 - r1);
 	m_r[dreg] = res;

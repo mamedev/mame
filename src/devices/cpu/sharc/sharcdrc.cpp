@@ -167,20 +167,17 @@ static void cfunc_unimplemented_shiftimm(void *param)
 
 void adsp21062_device::sharc_cfunc_unimplemented()
 {
-	uint64_t op = m_core->arg64;
-	fatalerror("PC=%08X: Unimplemented op %04X%08X\n", m_core->pc, (uint32_t)(op >> 32), (uint32_t)(op));
+	fatalerror("PC=%08X: Unimplemented op %012X\n", m_core->pc, m_core->arg64);
 }
 
 void adsp21062_device::sharc_cfunc_unimplemented_compute()
 {
-	uint64_t op = m_core->arg64;
-	fatalerror("PC=%08X: Unimplemented compute %04X%08X\n", m_core->pc, (uint32_t)(op >> 32), (uint32_t)(op));
+	fatalerror("PC=%08X: Unimplemented compute %012X\n", m_core->pc, m_core->arg64);
 }
 
 void adsp21062_device::sharc_cfunc_unimplemented_shiftimm()
 {
-	uint64_t op = m_core->arg64;
-	fatalerror("PC=%08X: Unimplemented shiftimm %04X%08X\n", m_core->pc, (uint32_t)(op >> 32), (uint32_t)(op));
+	fatalerror("PC=%08X: Unimplemented shiftimm %012X\n", m_core->pc, m_core->arg64);
 }
 
 void adsp21062_device::sharc_cfunc_pcstack_overflow()

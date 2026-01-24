@@ -179,11 +179,11 @@ namespace {
 class neptunp2_state : public driver_device
 {
 public:
-	neptunp2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_okim6376(*this, "oki")
-		{ }
+	neptunp2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_okim6376(*this, "oki")
+	{ }
 
 	void no_video(machine_config &config) ATTR_COLD;
 
@@ -201,10 +201,10 @@ private:
 class neptunp2_video_state : public neptunp2_state
 {
 public:
-	neptunp2_video_state(const machine_config &mconfig, device_type type, const char *tag)
-		: neptunp2_state(mconfig, type, tag),
-			m_gfxdecode(*this, "gfxdecode"),
-			m_tileram(*this, "tileram")
+	neptunp2_video_state(const machine_config &mconfig, device_type type, const char *tag) :
+		neptunp2_state(mconfig, type, tag),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_tileram(*this, "tileram")
 	{ }
 
 	void video(machine_config &config) ATTR_COLD;

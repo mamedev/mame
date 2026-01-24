@@ -9,24 +9,24 @@
 DEFINE_DEVICE_TYPE(LISAMMU, lisa_mmu_device, "lisammu", "Lisa MMU")
 
 lisa_mmu_device::lisa_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-    device_t(mconfig, LISAMMU, tag, owner, clock),
-    device_memory_interface(mconfig, *this),
+	device_t(mconfig, LISAMMU, tag, owner, clock),
+	device_memory_interface(mconfig, *this),
 	m_parity_err_cb(*this),
-    m_maincpu(*this, finder_base::DUMMY_TAG),
-    m_video(*this, finder_base::DUMMY_TAG),
-    m_ram_config("ram", ENDIANNESS_BIG, 16, 24),
-    m_io_config("io", ENDIANNESS_BIG, 16, 24),
-    m_special_io_config("special_io", ENDIANNESS_BIG, 16, 24),
-    m_cpu_space_config("cpu_space", ENDIANNESS_BIG, 16, 24, 0, address_map_constructor(FUNC(lisa_mmu_device::default_autovectors_map), this))
+	m_maincpu(*this, finder_base::DUMMY_TAG),
+	m_video(*this, finder_base::DUMMY_TAG),
+	m_ram_config("ram", ENDIANNESS_BIG, 16, 24),
+	m_io_config("io", ENDIANNESS_BIG, 16, 24),
+	m_special_io_config("special_io", ENDIANNESS_BIG, 16, 24),
+	m_cpu_space_config("cpu_space", ENDIANNESS_BIG, 16, 24, 0, address_map_constructor(FUNC(lisa_mmu_device::default_autovectors_map), this))
 {
 }
 
 lisa_mmu_device::mmu::mmu(m68000_device *maincpu, address_space &ram, address_space &io, address_space &special_io, address_space &cpu_space) : m_maincpu(maincpu), m_a_ram(ram), m_a_io(io), m_a_special_io(special_io), m_a_cpu_space(cpu_space)
 {
-    ram.specific(m_ram);
-    io.specific(m_io);
-    special_io.specific(m_special_io);
-    cpu_space.specific(m_cpu_space);
+	ram.specific(m_ram);
+	io.specific(m_io);
+	special_io.specific(m_special_io);
+	cpu_space.specific(m_cpu_space);
 
 	for(int i=0; i != 128*4; i++) {
 		m_base_address[i] = 0;
@@ -66,28 +66,28 @@ void lisa_mmu_device::mmu::setup_entry(int entry, u16 sor, u16 slr)
 
 u16 lisa_mmu_device::mmu::read_program(offs_t addr, u16 mem_mask)
 {
-    return read(addr, mem_mask);
+	return read(addr, mem_mask);
 }
 
 u16 lisa_mmu_device::mmu::read_data(offs_t addr, u16 mem_mask)
 {
-    return read(addr, mem_mask);
+	return read(addr, mem_mask);
 }
 
 void lisa_mmu_device::mmu::write_program(offs_t addr, u16 data, u16 mem_mask)
 {
-    write(addr, data, mem_mask);
+	write(addr, data, mem_mask);
 }
 
 void lisa_mmu_device::mmu::write_data(offs_t addr, u16 data, u16 mem_mask)
 {
-    write(addr, data, mem_mask);
+	write(addr, data, mem_mask);
 }
 
 u16 lisa_mmu_device::mmu::read(offs_t addr, u16 mem_mask)
 {
-    u64 cyc = m_maincpu->total_cycles();
-    if(cyc & 3)
+	u64 cyc = m_maincpu->total_cycles();
+	if(cyc & 3)
 		if(m_maincpu->access_before_time((cyc|3) + 1, cyc))
 			return 0;
 
@@ -138,8 +138,8 @@ u16 lisa_mmu_device::mmu::read(offs_t addr, u16 mem_mask)
 void lisa_mmu_device::mmu::write(offs_t addr, u16 data, u16 mem_mask)
 {
 
-    u64 cyc = m_maincpu->total_cycles();
-    if(cyc & 3)
+	u64 cyc = m_maincpu->total_cycles();
+	if(cyc & 3)
 		if(m_maincpu->access_before_time((cyc|3) + 1, cyc))
 			return;
 
@@ -193,7 +193,7 @@ void lisa_mmu_device::mmu::write(offs_t addr, u16 data, u16 mem_mask)
 
 u16 lisa_mmu_device::mmu::read_cpu(offs_t addr, u16 mem_mask)
 {
-    return m_cpu_space.read_interruptible(addr, mem_mask);
+	return m_cpu_space.read_interruptible(addr, mem_mask);
 }
 
 void lisa_mmu_device::mmu::recompute_slot()
@@ -276,8 +276,8 @@ bool lisa_mmu_device::mmu::translate(int spacenum, int intention, offs_t &addres
 
 void lisa_mmu_device::device_start()
 {
-    m_mmu = std::make_unique<mmu>(m_maincpu.target(), space(AS_RAM), space(AS_IO), space(AS_SPECIAL_IO), space(m68000_device::AS_CPU_SPACE));
-    m_maincpu->set_current_mmu(m_mmu.get());
+	m_mmu = std::make_unique<mmu>(m_maincpu.target(), space(AS_RAM), space(AS_IO), space(AS_SPECIAL_IO), space(m68000_device::AS_CPU_SPACE));
+	m_maincpu->set_current_mmu(m_mmu.get());
 
 	std::fill(m_sor.begin(), m_sor.end(), 0x0000);
 	std::fill(m_slr.begin(), m_slr.end(), 0x0000);
@@ -301,12 +301,12 @@ void lisa_mmu_device::device_reset()
 
 device_memory_interface::space_config_vector lisa_mmu_device::memory_space_config() const
 {
-    return space_config_vector {
+	return space_config_vector {
 	std::make_pair(AS_RAM, &m_ram_config),
 	std::make_pair(AS_IO, &m_io_config),
 	std::make_pair(AS_SPECIAL_IO, &m_special_io_config),
 	std::make_pair(m68000_device::AS_CPU_SPACE, &m_cpu_space_config),
-    };
+	};
 }
 
 void lisa_mmu_device::sor_w(offs_t address, u16 data, u16 mem_mask)

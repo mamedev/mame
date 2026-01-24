@@ -134,6 +134,9 @@ public:
 		bool bool_value() const { return int_value() != 0; }
 		int int_value() const;
 		float float_value() const;
+		bool bool_default_value() const { return int_default_value() != 0; }
+		int int_default_value() const;
+		float float_default_value() const;
 		int priority() const noexcept { return m_priority; }
 		void set_priority(int priority) noexcept { m_priority = priority; }
 		option_type type() const noexcept { return m_type; }

@@ -51,10 +51,10 @@ TODO:
 
 TODO (MD side):
 - some games (orunnersj, rhythmld and late SGDK games) fails on Z80 bus request stuff (fixed);
-- timekillu still hangs on Z80 bus request reads (open bus really?)
+- Needs proper open bus behaviour for Z80 busack in timekillu and others;
 - dashdes: is a flickerfest during gameplay (fixed?);
 - sonic2/combatca: no interlace support in 2-players mode;
-- dheadj: scrolling issues in stage 4-1 (blocks overflowing with );
+- dheadj: scrolling issues in stage 4-1 (tile blocks overflows when scrolling);
 - skitchin: one line off during gameplay;
 - caesar: no sound;
 - gynougj: stray tile on top-left of title screen;
@@ -565,7 +565,11 @@ void teradrive_state::md_68k_map(address_map &map)
 	map(0xa11100, 0xa11101).lrw16(
 		NAME([this] (offs_t offset, u16 mem_mask) {
 			address_space &space = m_md68kcpu->space(AS_PROGRAM);
-			// TODO: enough for all edge cases but timekill
+			// TODO: enough for all edge cases but timekillu/telebrad/arkagis
+			// - ddragon, beast, superoff, indyheat depends on this
+			// - timekillu is very erratic
+			// - telebrad reads to byte $a11'101 while Z80 is held in reset (should be open bus so 0xfeff mask)
+			// - arkagis does a bad branch displacement when looping for busack (PC=1796 and other places)
 			u16 open_bus = space.read_word(m_md68kcpu->pc() - 2) & 0xfefe;
 			// printf("%06x -> %04x\n", m_md68kcpu->pc() - 2, open_bus);
 			u16 res = (m_mdz80cpu->busack_r() && !m_z80_reset) ^ 1;

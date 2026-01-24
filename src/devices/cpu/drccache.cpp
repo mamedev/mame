@@ -12,6 +12,7 @@
 #include "drccache.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <numeric>
 
 
@@ -88,6 +89,7 @@ drc_cache::drc_cache(std::size_t bytes) noexcept
 	: m_near(nullptr)
 	, m_neartop(nullptr)
 	, m_base(nullptr)
+	, m_invartop(nullptr)
 	, m_top(nullptr)
 	, m_rwbase(nullptr)
 	, m_limit(nullptr)
@@ -123,13 +125,14 @@ drc_cache::~drc_cache()
 	{
 		try
 		{
-			m_max_temporary = std::max<std::size_t>(m_max_temporary, m_top - m_base);
+			m_max_temporary = std::max<std::size_t>(m_max_temporary, m_top - m_invartop);
 			osd_printf_verbose(
-					"drc_cache: Statistics:\nFlush count %u, near cache use %u, permanent cache use %u/%u, maximum temporary cache use %u\n",
+					"drc_cache: Statistics:\nFlush count %u, near cache use %u, permanent cache use %u/%u, invariant cache use %u, maximum transient cache use %u\n",
 					m_flush_count,
 					m_neartop - m_near,
 					m_size - (m_end - m_near),
 					m_size - (m_limit - m_near),
+					m_invartop - m_base,
 					m_max_temporary);
 #if defined(MAME_DEBUG)
 			osd_printf_verbose(
@@ -179,6 +182,7 @@ void drc_cache::allocate_cache(bool rwx)
 	m_near = reinterpret_cast<drccodeptr>(m_cache->get());
 	m_neartop = m_near;
 	m_base = align_ptr_up(m_near + NEAR_CACHE_SIZE, m_cache->page_size());
+	m_invartop = m_base;
 	m_top = m_base;
 	m_limit = m_near + m_cache->size();
 	m_end = m_limit;
@@ -222,9 +226,9 @@ void drc_cache::flush() noexcept
 	assert(!m_codegen);
 
 	// just reset the top back to the base and re-seed
-	m_max_temporary = std::max<std::size_t>(m_max_temporary, m_top - m_base);
+	m_max_temporary = std::max<std::size_t>(m_max_temporary, m_top - m_invartop);
 	++m_flush_count;
-	m_top = m_base;
+	m_top = m_invartop;
 }
 
 
@@ -357,11 +361,30 @@ void *drc_cache::alloc_near(std::size_t bytes, std::align_val_t align) noexcept
 
 
 //-------------------------------------------------
-//  alloc_temporary - allocate temporary memory
+//  alloc_invariant - allocate invariant memory
 //  from the cache
 //-------------------------------------------------
 
-void *drc_cache::alloc_temporary(std::size_t bytes, std::align_val_t align) noexcept
+void *drc_cache::alloc_invariant(std::size_t bytes, std::align_val_t align) noexcept
+{
+	if (UNEXPECTED(m_top > m_invartop))
+	{
+		osd_printf_error("drc_cache: cannot allocate invariant memory after allocating transient memory\n");
+		std::abort();
+	}
+
+	auto const result = alloc_transient(bytes, align);
+	m_invartop = m_top;
+	return result;
+}
+
+
+//-------------------------------------------------
+//  alloc_transient - allocate transient memory
+//  from the cache
+//-------------------------------------------------
+
+void *drc_cache::alloc_transient(std::size_t bytes, std::align_val_t align) noexcept
 {
 	// can't allocate in the middle of codegen
 	assert(!m_codegen);
@@ -370,12 +393,13 @@ void *drc_cache::alloc_temporary(std::size_t bytes, std::align_val_t align) noex
 	assert(std::size_t(align));
 
 	// if no space, we just fail
-	drccodeptr const ptr = m_top;
-	if ((ptr + bytes) > m_limit)
+	drccodeptr const ptr = align_ptr_up(m_top, std::size_t(align));
+	drccodeptr const end = align_ptr_up(ptr + bytes, CACHE_ALIGNMENT);
+	if (end > m_limit)
 		return nullptr;
 
 	// otherwise, update the cache top
-	m_top = align_ptr_up(ptr + bytes, std::lcm(std::size_t(align), CACHE_ALIGNMENT));
+	m_top = end;
 	ensure_writable(ptr);
 	return ptr;
 }
@@ -416,7 +440,6 @@ drccodeptr *drc_cache::begin_codegen(uint32_t reserve_bytes) noexcept
 {
 	// can't restart in the middle of codegen
 	assert(!m_codegen);
-	assert(m_oob_list.empty());
 
 	// if no space, we just fail
 	if ((m_top + reserve_bytes) > m_limit)
@@ -428,6 +451,19 @@ drccodeptr *drc_cache::begin_codegen(uint32_t reserve_bytes) noexcept
 	return &m_top;
 }
 
+drccodeptr *drc_cache::begin_codegen_invariant(uint32_t reserve_bytes) noexcept
+{
+	if (UNEXPECTED(m_top > m_invartop))
+	{
+		osd_printf_error("drc_cache: cannot allocate invariant memory after allocating transient memory\n");
+		std::abort();
+	}
+
+	auto const result = begin_codegen(reserve_bytes);
+	m_invargen = true;
+	return result;
+}
+
 
 //-------------------------------------------------
 //  end_codegen - complete code generation
@@ -437,49 +473,13 @@ drccodeptr drc_cache::end_codegen()
 {
 	drccodeptr const result = m_codegen;
 
-	// run the OOB handlers
-	while (!m_oob_list.empty())
-	{
-		// call the callback
-		m_oob_list.front().m_callback(&m_top, m_oob_list.front().m_param1, m_oob_list.front().m_param2);
-		assert((m_top - m_codegen) < CODEGEN_MAX_BYTES);
-
-		// add it to the free list
-		m_oob_free.splice(m_oob_free.begin(), m_oob_list, m_oob_list.begin());
-	}
-
 	// update the cache top
 	osd::invalidate_instruction_cache(m_codegen, m_top - m_codegen);
 	m_top = align_ptr_up(m_top, CACHE_ALIGNMENT);
+	if (m_invargen)
+		m_invartop = m_top;
 	m_codegen = nullptr;
+	m_invargen = false;
 
 	return result;
-}
-
-
-//-------------------------------------------------
-//  request_oob_codegen - request callback for
-//  out-of-band codegen
-//-------------------------------------------------
-
-void drc_cache::request_oob_codegen(drc_oob_delegate &&callback, void *param1, void *param2)
-{
-	assert(m_codegen);
-
-	// pull an item from the free list
-	std::list<oob_handler>::iterator oob;
-	if (m_oob_free.empty())
-	{
-		oob = m_oob_list.emplace(m_oob_list.end());
-	}
-	else
-	{
-		oob = m_oob_free.begin();
-		m_oob_list.splice(m_oob_list.end(), m_oob_free, oob);
-	}
-
-	// fill it in
-	oob->m_callback = std::move(callback);
-	oob->m_param1 = param1;
-	oob->m_param2 = param2;
 }

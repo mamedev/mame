@@ -593,7 +593,7 @@ private:
 	template <a64::Inst::Id Opcode> void op_float_alu(a64::Assembler &a, const uml::instruction &inst);
 	template <a64::Inst::Id Opcode> void op_float_alu2(a64::Assembler &a, const uml::instruction &inst);
 
-	size_t emit(CodeHolder &ch);
+	size_t emit(CodeHolder &ch, bool invariant);
 
 
 	// helper functions
@@ -651,6 +651,7 @@ private:
 	drc_map_variables m_map;
 	FILE *m_log_asmjit;
 	carry_state m_carry_state;
+	bool m_invariant_block;
 
 	arm64_entry_point_func m_entry;
 	drccodeptr m_exit;
@@ -1544,6 +1545,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_carry_state(carry_state::POISON)
+	, m_invariant_block(false)
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
@@ -1578,39 +1580,8 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 			accessors.mask_high_bits = (shiftedmask & (shiftedmask + 1)) != 0;
 		}
 	}
-}
 
-drcbe_arm64::~drcbe_arm64()
-{
-	if (m_log_asmjit)
-		fclose(m_log_asmjit);
-}
-
-size_t drcbe_arm64::emit(CodeHolder &ch)
-{
-	Error err;
-
-	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
-	size_t const code_size = ch.code_size();
-
-	// test if enough room remains in the DRC cache
-	drccodeptr *cachetop = m_cache.begin_codegen(alignment + code_size);
-	if (!cachetop)
-		return 0;
-
-	err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
-	if (err != kErrorOk)
-		throw emu_fatalerror("CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
-
-	// update the drc cache and end codegen
-	*cachetop += alignment + code_size;
-	m_cache.end_codegen();
-
-	return code_size;
-}
-
-void drcbe_arm64::reset()
-{
+	// generate invariant code
 	uint8_t *dst = (uint8_t *)m_cache.top();
 
 	CodeHolder ch;
@@ -1683,13 +1654,46 @@ void drcbe_arm64::reset()
 	call_arm_addr(a, (const void *)entrypoint);
 
 	// emit the generated code
-	emit(ch);
+	emit(ch, true);
+
+	// set the "no code" pointer
+	m_hash.set_default_codeptr(m_nocode);
+}
+
+drcbe_arm64::~drcbe_arm64()
+{
+	if (m_log_asmjit)
+		fclose(m_log_asmjit);
+}
+
+size_t drcbe_arm64::emit(CodeHolder &ch, bool invariant)
+{
+	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
+	size_t const code_size = ch.code_size();
+
+	// try to allocate space from the DRC cache
+	auto space = invariant
+			? m_cache.alloc_invariant(alignment + code_size, std::align_val_t(1))
+			: m_cache.alloc_transient(alignment + code_size, std::align_val_t(1));
+	if (!space)
+		return 0;
+
+	assert(uintptr_t(space) <= ch.base_address());
+	Error const err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
+	if (err != kErrorOk)
+		throw emu_fatalerror("CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
+
+	osd::invalidate_instruction_cache(drccodeptr(ch.base_address()), code_size);
+
+	return code_size;
+}
+
+void drcbe_arm64::reset()
+{
+	m_carry_state = carry_state::POISON;
 
 	// reset our hash tables
 	m_hash.reset();
-	m_hash.set_default_codeptr(m_nocode);
-
-	m_carry_state = carry_state::POISON;
 }
 
 int drcbe_arm64::execute(code_handle &entry)
@@ -1712,6 +1716,7 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
 	m_carry_state = carry_state::POISON;
+	m_invariant_block = block.invariant();
 
 	// compute the base by aligning the cache top to a cache line
 	auto [err, linesize] = osd_get_cache_line_size();
@@ -1771,7 +1776,7 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	a.b(m_endofblock);
 
 	// emit the generated code
-	if (!emit(ch))
+	if (!emit(ch, block.invariant()))
 		block.abort();
 
 	// tell all of our utility objects that the block is finished
@@ -1975,7 +1980,7 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 
 	if (modep.is_immediate() && m_hash.populate_mode(modep.immediate()))
 	{
-		if (pcp.is_immediate())
+		if (pcp.is_immediate() && !m_invariant_block)
 		{
 			const uint32_t l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
 			const uint32_t l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();

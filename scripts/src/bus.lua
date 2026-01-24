@@ -1152,6 +1152,8 @@ if BUSES["BBC_ROM"] then
 		MAME_DIR .. "src/devices/bus/bbc/rom/nvram.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/datagem.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/rom/datagem.h",
+		MAME_DIR .. "src/devices/bus/bbc/rom/detalker.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/rom/detalker.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/rom/dfs.h",
 		MAME_DIR .. "src/devices/bus/bbc/rom/genie.cpp",
@@ -1173,6 +1175,8 @@ if BUSES["BBC_TUBE"] then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube.h",
+		MAME_DIR .. "src/devices/bus/bbc/tube/cms6502.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/tube/cms6502.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_32016.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_32016.h",
 		MAME_DIR .. "src/devices/bus/bbc/tube/tube_6502.cpp",
@@ -1553,6 +1557,8 @@ if BUSES["CBMIEC"] then
 		MAME_DIR .. "src/devices/bus/cbmiec/vic1520.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/c1526.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/c1526.h",
+		MAME_DIR .. "src/devices/bus/cbmiec/c5181.cpp",
+		MAME_DIR .. "src/devices/bus/cbmiec/c5181.h",
 	}
 end
 
@@ -3563,6 +3569,8 @@ if BUSES["MULTIBUS"] then
 	files {
 		MAME_DIR .. "src/devices/bus/multibus/multibus.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/multibus.h",
+		MAME_DIR .. "src/devices/bus/multibus/exos201.cpp",
+		MAME_DIR .. "src/devices/bus/multibus/exos201.h",
 		MAME_DIR .. "src/devices/bus/multibus/dsd5217.cpp",
 		MAME_DIR .. "src/devices/bus/multibus/dsd5217.h",
 		MAME_DIR .. "src/devices/bus/multibus/isbc202.cpp",
@@ -4451,6 +4459,23 @@ if BUSES["PCI"] then
 		MAME_DIR .. "src/devices/bus/pci/ymp21.h",
 		MAME_DIR .. "src/devices/bus/pci/zr36057.cpp",
 		MAME_DIR .. "src/devices/bus/pci/zr36057.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/pencil2/slot.h,BUSES["PENCIL2"] = true
+---------------------------------------------------
+
+if BUSES["PENCIL2"] then
+	files {
+		MAME_DIR .. "src/devices/bus/pencil2/slot.cpp",
+		MAME_DIR .. "src/devices/bus/pencil2/slot.h",
+		MAME_DIR .. "src/devices/bus/pencil2/coleco.cpp",
+		MAME_DIR .. "src/devices/bus/pencil2/coleco.h",
+		MAME_DIR .. "src/devices/bus/pencil2/ram.cpp",
+		MAME_DIR .. "src/devices/bus/pencil2/ram.h",
 	}
 end
 

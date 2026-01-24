@@ -9,7 +9,7 @@ TODO:
  - bootlegs needs to be properly listed as such or dropped out;
  - Consider splitting regional lists into separate XMLs entities;
 -->
-<softwarelist name="psx" description="Sony Playstation CD-ROMs">
+<softwarelist name="psx" description="Sony PlayStation CD-ROMs">
 <!-- redump.org US PS1 discs (1795 of 1799), based on 'Sony - PlayStation - Datfile (8777) (2017-10-10 01-37-51)'
 
 These CHDs have been converted from redump.org disc images.
@@ -908,8 +908,9 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
-	<software name="alliedgn">
-		<!-- Original images (Redump)
+	<software name="alliedgn_us" cloneof="alliedgn" supported="partial">
+		<!--
+		http://redump.org/disc/11549/
 		<rom name="Allied General (USA).cue" size="780" crc="d6e0f56a" sha1="ba4841b73c22664737f2fb007ec5d9bd85058c6b"/>
 		<rom name="Allied General (USA) (Track 1).bin" size="368033904" crc="e631c283" sha1="0eda7fcaebf7e60efa9444f27b5f658503b0ddcc"/>
 		<rom name="Allied General (USA) (Track 2).bin" size="28318080" crc="da9e7d82" sha1="0193b7ca6ca05cac5c399aa26964080e911a2f60"/>
@@ -922,11 +923,16 @@ The game freezes when loading (after the intro)
 		<description>Allied General (USA)</description>
 		<year>1996</year>
 		<publisher>Mindscape</publisher>
+		<notes><![CDATA[
+Corrupted sound on title menu and during gameplay
+]]></notes>
+		<info name="developer" value="Strategic Simulations, Inc"/>
+		<info name="language" value="English" />
 		<info name="serial" value="SLUS-00303"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="allied general (usa)" sha1="10223774396172b4cbce84a1f4cd90c33c6eaf8c"/>
+				<disk name="Allied General (USA)" sha1="ca7d9a93f2902106e9f56c49fe3b8d182fdb17e0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1820,8 +1826,9 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
-	<software name="asteroid">
-		<!-- Original images (Redump)
+	<software name="asteroid_us" cloneof="asteroid">
+		<!--
+		http://redump.org/disc/11553/
 		<rom name="Asteroids (USA).cue" size="200" crc="76ccf0e5" sha1="57e3276a9c53b651b845db1327f346e2bbce78c3"/>
 		<rom name="Asteroids (USA) (Track 1).bin" size="117712896" crc="06ed5e2b" sha1="f577f9f77a65686e94fd4717b2b657a0698da51c"/>
 		<rom name="Asteroids (USA) (Track 2).bin" size="52249680" crc="2a6e4f43" sha1="47ade8eeae8b2d23431e2256aaad46122cd81cb0"/>
@@ -1829,11 +1836,14 @@ The game freezes when loading (after the intro)
 		<description>Asteroids (USA)</description>
 		<year>1998</year>
 		<publisher>Activision</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Syrox Developments"/>
+		<info name="language" value="English" />
 		<info name="serial" value="SLUS-00773"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="asteroids (usa)" sha1="04aea1e4423a4f1353288dd63e6911265feccf55"/>
+				<disk name="Asteroids (USA)" sha1="e59d3a8fa874f6c01dde1905b63c8e60bd363b20"/>
 			</diskarea>
 		</part>
 	</software>
@@ -1985,8 +1995,9 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
-	<software name="awf111x">
-		<!-- Original images (Redump)
+	<software name="awf111x_us" cloneof="awf111x">
+		<!--
+		http://redump.org/disc/10703/
 		<rom name="Agile Warrior - F-111X (USA).cue" size="1581" crc="f2c992e1" sha1="95c3befb5d6c3709c1e2a81635a11b090878f319"/>
 		<rom name="Agile Warrior - F-111X (USA) (Track 01).bin" size="293230896" crc="2c08ac77" sha1="2d8dc1289b5b106d2026d4161542acb39cc8790a"/>
 		<rom name="Agile Warrior - F-111X (USA) (Track 02).bin" size="12867792" crc="4b90dc03" sha1="439ff316c72a64805a46ac07aba1ed43a16a3456"/>
@@ -2002,14 +2013,16 @@ The game freezes when loading (after the intro)
 		<rom name="Agile Warrior - F-111X (USA) (Track 12).bin" size="41620992" crc="67c72d78" sha1="12faeeb4d06bf61bd8feb59a23c295df9279a7b1"/>
 		<rom name="Agile Warrior - F-111X (USA) (Track 13).bin" size="24990000" crc="cf7329e1" sha1="93ee7e7ea4181e92e187a4d6c1d347bd5aec4759"/>
 		-->
-		<description>Agile Warrior - F-111X (USA)</description>
+		<description>Agile Warrior: F-111X (USA)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive Entertainment</publisher>
+		<info name="developer" value="Black Ops Entertainment"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00023"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="agile warrior - f-111x (usa)" sha1="455fbb37203e37d310292ecf05e5edc239b29556"/>
+				<disk name="Agile Warrior - F-111X (USA)" sha1="ea2a5b0ee817bc199dc3748f54090ca668e33be3"/>
 			</diskarea>
 		</part>
 	</software>
@@ -4098,8 +4111,9 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
-	<software name="bublbobl">
-		<!-- Original images (Redump)
+	<software name="bublbobl_us" cloneof="bublbobl">
+		<!--
+		http://redump.org/disc/12157/
 		<rom name="Bubble Bobble also featuring Rainbow Islands (USA).cue" size="270" crc="586d4e7a" sha1="cb253d349d0e5feb14651334be11a15b6d803456"/>
 		<rom name="Bubble Bobble also featuring Rainbow Islands (USA) (Track 1).bin" size="63130032" crc="37c1b316" sha1="7a6e826a8707a64224fcf1e9143e813004ba5cff"/>
 		<rom name="Bubble Bobble also featuring Rainbow Islands (USA) (Track 2).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
@@ -4107,11 +4121,13 @@ The game freezes when loading (after the intro)
 		<description>Bubble Bobble also featuring Rainbow Islands (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<info name="developer" value="Probe Entertainment"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00370"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="bubble bobble also featuring rainbow islands (usa)" sha1="c43ba72269ba09a2311c112cf2f0889db327ce28"/>
+				<disk name="Bubble Bobble also featuring Rainbow Islands (USA)" sha1="1561fd3ea3e4b1426087c0d6d87003faef4d752f"/>
 			</diskarea>
 		</part>
 	</software>
@@ -11705,19 +11721,26 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
-	<software name="ironblod">
-		<!-- Original images (Redump)
+	<software name="ironblod_us" cloneof="ironblod" supported="partial">
+		<!--
+		http://redump.org/disc/13347/
+		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA).cue" size="314" crc="da574c2e" sha1="8ddd831ffe12b85517b13c1d3fbe32476a5b6f86"/>
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Track 1).bin" size="254858016" crc="4cccc5a5" sha1="cc3de5867336c667afdbfea1df2c8f4c18b1a97c"/>
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Track 2).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
 		-->
-		<description>Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA)</description>
+		<description>Advanced Dungeons &amp; Dragons: Iron &amp; Blood - Warriors of Ravenloft (USA)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Corrupted music on title menu and during gameplay
+]]></notes>
+		<info name="developer" value="Take 2 Interactive"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00378"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="advanced dungeons &amp; dragons - iron &amp; blood - warriors of ravenloft (usa)" sha1="18245fa03c7b3e9ebadb1f4ddaa9a022c49ba58e"/>
+				<disk name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA)" sha1="17801ddab215bcc26034feb352967b41cdc95d40"/>
 			</diskarea>
 		</part>
 	</software>
@@ -30758,19 +30781,22 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
-	<software name="xena">
-		<!-- Original images (Redump)
+	<software name="xena_us" cloneof="xena">
+		<!--
+		http://redump.org/disc/5900/
 		<rom name="Xena - Warrior Princess (USA).cue" size="95" crc="0df509ec" sha1="80d65cad44108b87adc0a5b1170a0f1aeb9d257a"/>
 		<rom name="Xena - Warrior Princess (USA).bin" size="322790832" crc="3ff3122d" sha1="2f7ee5625aaa02c536938fb66fcf06d4d8f6b422"/>
 		-->
 		<description>Xena - Warrior Princess (USA)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Universal Studios Digital Arts"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00977"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="xena - warrior princess (usa)" sha1="926ea8e4a69d52e61b114238a3a478b176daafed"/>
+				<disk name="Xena - Warrior Princess (USA)" sha1="6a84f5fa66267541e2a39ace5b8ac28406b8598c"/>
 			</diskarea>
 		</part>
 	</software>
@@ -33569,19 +33595,26 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
-	<software name="ironblodd" cloneof="ironblod">
-		<!-- Original images (Redump)
+	<software name="ironblodd_us" cloneof="ironblod" supported="partial">
+		<!--
+		http://redump.org/disc/12702/
+		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Demo).cue" size="328" crc="37ddbff7" sha1="f5338f1df9ab91d0dfdb290cf283b2ff31de8faa"/>
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Demo) (Track 1).bin" size="62683152" crc="28e0137e" sha1="4890dae42b32d2f6951e16e7c8bdd2591bfd04be"/>
 		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Demo) (Track 2).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
 		-->
-		<description>Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA, demo)</description>
+		<description>Advanced Dungeons &amp; Dragons: Iron &amp; Blood - Warriors of Ravenloft (USA, demo)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Corrupted music during gameplay
+]]></notes>
+		<info name="developer" value="Take 2 Interactive"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00212"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="advanced dungeons &amp; dragons - iron &amp; blood - warriors of ravenloft (usa) (demo)" sha1="614402a4d799bd584a7ad79df21d42e6601fba2a"/>
+				<disk name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (USA) (Demo)" sha1="074381718c6cc4037ff0d5d1f10164dc5eae3721"/>
 			</diskarea>
 		</part>
 	</software>
@@ -35394,9 +35427,10 @@ The game freezes when loading (after the intro)
 		<rom name="PSone - Wherever, Whenever, Forever. (USA) (No EDC) (Track 2).bin" size="23992752" crc="957803ce" sha1="a863d4134e1ca3730a2938d2ff0238c4d7e92eeb"/>
 		<rom name="PSone - Wherever, Whenever, Forever. (USA) (No EDC) (Track 3).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>PSone - Wherever, Whenever, Forever. (USA, No EDC)</description>
+		<description>PSone - Wherever, Whenever, Forever. (USA, no EDC)</description>
 		<year>2001</year>
 		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="copy_protection" value="Anti-modchip"/>
 		<info name="serial" value="SCUS-94799"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -35413,9 +35447,11 @@ The game freezes when loading (after the intro)
 		<rom name="PSone - Wherever, Whenever, Forever. (USA) (EDC) (Track 2).bin" size="23992752" crc="957803ce" sha1="a863d4134e1ca3730a2938d2ff0238c4d7e92eeb"/>
 		<rom name="PSone - Wherever, Whenever, Forever. (USA) (EDC) (Track 3).bin" size="1401792" crc="780b1fc7" sha1="d11089e8cd3f7d9fc4dfd1156e1a02f2f992897a"/>
 		-->
-		<description>PSone - Wherever, Whenever, Forever. (USA, EDC)</description>
+		<description>PSone - Wherever, Whenever, Forever. (USA, with EDC)</description>
 		<year>2001</year>
 		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="copy_protection" value="Anti-modchip"/>
 		<info name="serial" value="SCUS-94799"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -37411,7 +37447,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 6).bin" size="2725968" crc="ea4b3a4f" sha1="4725220b27cb4bc82bee0a75bd877a8b82918125"/>
 		<rom name="A Ressha de Ikou 4 - Evolution Global (Japan) (En,Ja,Fr,De) (PlayStation the Best) (Track 7).bin" size="37777824" crc="8dad9514" sha1="8bac1847399d12808ddcc2b39b8c8d2eafe18870"/>
 		-->
-		<description>A Ressha de Ikou 4 - Evolution Global (Japan) (PlayStation the Best)</description>
+		<description>A Ressha de Ikou 4 - Evolution Global (Japan, PlayStation the Best)</description>
 		<year>1997</year>
 		<publisher>Artdink</publisher>
 		<info name="developer" value="Artdink" />
@@ -37540,7 +37576,7 @@ The entries in this section are intended to replace the existing "low-grade" Jap
 		<rom name="Ace Combat 2 (Japan) (Rev 1).cue" size="94" crc="88674451" sha1="abbe669ce3d639194f772f3f26df7e03042507fe"/>
 		<rom name="Ace Combat 2 (Japan) (Rev 1).bin" size="580271328" crc="0eef1401" sha1="0c556057cda63d629f8950265016de8e27c6ab2f"/>
 		-->
-		<description>Ace Combat 2 (Japan, rev. 1) (PlayStation the Best)</description>
+		<description>Ace Combat 2 (Japan, rev. 1, PlayStation the Best)</description>
 		<year>1999</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="エースコンバット２"/>
@@ -37732,6 +37768,99 @@ The game only boot on PAL
 		</part>
 	</software>
 
+	<software name="advanrac">
+		<!--
+		http://redump.org/disc/34512/
+		<rom name="Advan Racing (Japan).cue" size="210" crc="786a33e3" sha1="df460f1f3aceaac0eeaae3cab86e18563c4d0753"/>
+		<rom name="Advan Racing (Japan) (Track 1).bin" size="565545456" crc="e1c9440b" sha1="b763ac6a0c1461a16f58a7d7af5a84ef5f1fee14"/>
+		<rom name="Advan Racing (Japan) (Track 2).bin" size="34009920" crc="027d3086" sha1="2075a5258c461d30944839758ba2c290a2c456d4"/>
+		-->
+		<description>Advan Racing (Japan)</description>
+		<year>1998</year>
+		<publisher>Atlus</publisher>
+		<info name="alt_title" value="アドバン・レーシング"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="release" value="19981119" />
+		<info name="serial" value="SLPS-01689" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Advan Racing (Japan)" sha1="091321f67379100a4cdb2aab43feb0cceafb623e"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="armstrng_jp" cloneof="armstrng">
+		<!--
+		http://redump.org/disc/34392/
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan).cue" size="2464" crc="bd1f1cc4" sha1="f7c6b644e16a32a944612a84288759a913d2fb13"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 01).bin" size="179928000" crc="5127e79b" sha1="30af6929705ccf6ddc323f74d314a26928310cdb"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 02).bin" size="33106752" crc="93fd7de6" sha1="ed9c6d10f0b9a5671a167123fb19367a59f332c5"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 03).bin" size="4393536" crc="e4bc7e40" sha1="522da8b69d9e64364a51179cc265401322b546c5"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 04).bin" size="15433824" crc="219ce0ff" sha1="4c84530cef29df7049b9068d832056fc9aaaec49"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 05).bin" size="20166048" crc="dd11a4d0" sha1="dab43590f00d25b15bb446f82004fc3366a1c144"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 06).bin" size="31493280" crc="5292150b" sha1="451c463449fc3bed5f24f21e6d15519b444a86f8"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 07).bin" size="29771616" crc="f3252987" sha1="7b0a8c47550461daa27c90437966247d19cadc58"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 08).bin" size="25022928" crc="eb03c363" sha1="e72b86b079716a14fe161e18365ea16406743097"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 09).bin" size="19803840" crc="5df7f217" sha1="890545efeb25aa1756920e62b68d6c952dcdbb9d"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 10).bin" size="30209088" crc="86e7bdaf" sha1="4c91fb1905b52af18f939c93b3e58f67a4d79392"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 11).bin" size="14281344" crc="96fc9923" sha1="655cf195bdedaea3a92a2027f7dda9441a6c67c8"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 12).bin" size="38184720" crc="35ff2d90" sha1="4b537163b9841aeadc8a55e94c0f7c5bf65556db"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 13).bin" size="37359168" crc="8f9d398f" sha1="0d2411a54529b991a878bbc21a857e111d14c38f"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 14).bin" size="31836672" crc="8f3dacd9" sha1="9979f8cdf56ce22db2caeaf434b5a176c32cc349"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 15).bin" size="18082176" crc="3954efd7" sha1="8b3051e953347a41c7f6ca61451d21f94879e80d"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 16).bin" size="45337152" crc="7fa72de5" sha1="1df1a2493194f0fccdb5b7b5c66523874aefe82b"/>
+		<rom name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan) (Track 17).bin" size="45337152" crc="7fa72de5" sha1="1df1a2493194f0fccdb5b7b5c66523874aefe82b"/>
+		-->
+		<description>Agent Armstrong: Himitsu Shirei Daisakusen (Japan)</description>
+		<year>1997</year>
+		<publisher>WE Net</publisher>
+		<info name="alt_title" value="エージェント・アームストロング　～秘密指令大作戦～"/>
+		<info name="developer" value="King of the Jungle" />
+		<info name="language" value="Japanese" />
+		<info name="release" value="19971204" />
+		<info name="serial" value="SLPS-01073 (WG 0005)" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Agent Armstrong - Himitsu Shirei Daisakusen (Japan)" sha1="41d45732c0af7339d7a319c14abaffeb6f33b854"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="awf111x_jp" cloneof="awf111x">
+		<!--
+		http://redump.org/disc/36228/
+		<rom name="Agile Warrior - F-111X (Japan).cue" size="1607" crc="88c170bc" sha1="3986cb464792b6cd33dbf088b5a63727be61f325"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 01).bin" size="292918080" crc="5ce59c36" sha1="94ab4f49174199bcf0d527e869c7c371bec81ced"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 02).bin" size="12867792" crc="4b90dc03" sha1="439ff316c72a64805a46ac07aba1ed43a16a3456"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 03).bin" size="29508192" crc="12f6b68c" sha1="a1063eb4db85d1e35b26ffbc203c34bc9b76a351"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 04).bin" size="41620992" crc="67c72d78" sha1="12faeeb4d06bf61bd8feb59a23c295df9279a7b1"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 05).bin" size="26801040" crc="f7ab8f98" sha1="98019081f8a780c760541aa4e82a6dab471ff20f"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 06).bin" size="24990000" crc="cf7329e1" sha1="93ee7e7ea4181e92e187a4d6c1d347bd5aec4759"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 07).bin" size="21911232" crc="4d955464" sha1="e25029c75d90380c4572b9efc2aa335dd26f3031"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 08).bin" size="24914736" crc="6e8f36ed" sha1="607a1e8b9a0d70689239cc1d0dce7b1a74b9e14a"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 09).bin" size="18500832" crc="2a19a4f4" sha1="43e7946db9627134d75ca223b6ac755734132eba"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 10).bin" size="27666576" crc="2d0060f7" sha1="6c974692c0975c4786f1914606e9c6f0615311d6"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 11).bin" size="17176656" crc="d3a7faf0" sha1="210ca15e3bf5f7148a8e7516d41bba6f11edc663"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 12).bin" size="41620992" crc="67c72d78" sha1="12faeeb4d06bf61bd8feb59a23c295df9279a7b1"/>
+		<rom name="Agile Warrior - F-111X (Japan) (Track 13).bin" size="41620992" crc="67c72d78" sha1="12faeeb4d06bf61bd8feb59a23c295df9279a7b1"/>
+		-->
+		<description>Agile Warrior (Japan)</description>
+		<year>1996</year>
+		<publisher>Virgin Interactive</publisher>
+		<info name="alt_title" value="アジャイル・ウォーリアー"/>
+		<info name="developer" value="Black Ops Entertainment"/>
+		<info name="language" value="Japanese"/>
+		<info name="serial" value="SLPS-00179"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Agile Warrior - F-111X (Japan)" sha1="186dc6d56ada00e88678b4a29fcbdc5d30700f72"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="airracec">
 		<!--
 		http://redump.org/disc/11035
@@ -37872,6 +38001,38 @@ Battle screen status bar flickers
 		</part>
 	</software>
 
+	<software name="alliedgn_jp" cloneof="alliedgn" supported="partial">
+		<!--
+		http://redump.org/disc/36502/
+		<rom name="Allied General (Japan) (En,Ja).cue" size="974" crc="7d2a7f6e" sha1="3263e257ead925b66800a4d23e61b3873cc30ba0"/>
+		<rom name="Allied General (Japan) (En,Ja) (Track 1).bin" size="320683440" crc="007e3fc1" sha1="ac778357eddf400a943e96b0f7febd074086ceab"/>
+		<rom name="Allied General (Japan) (En,Ja) (Track 2).bin" size="28318080" crc="da9e7d82" sha1="0193b7ca6ca05cac5c399aa26964080e911a2f60"/>
+		<rom name="Allied General (Japan) (En,Ja) (Track 3).bin" size="49312032" crc="2fdf0098" sha1="02595052b3b72c10caade0724ea2da51ae6b7f11"/>
+		<rom name="Allied General (Japan) (En,Ja) (Track 4).bin" size="30872352" crc="706c5ee0" sha1="3c2c7c17303ff728efbc52c3fcbd13613783fb38"/>
+		<rom name="Allied General (Japan) (En,Ja) (Track 5).bin" size="12218640" crc="bd466f34" sha1="37e0a40ad6da1cf9ca3d65f76d685b7051b330c5"/>
+		<rom name="Allied General (Japan) (En,Ja) (Track 6).bin" size="43573152" crc="ddec7810" sha1="5daf64d1345a3122d157b9b8bb55c87809d91bbd"/>
+		<rom name="Allied General (Japan) (En,Ja) (Track 7).bin" size="11778816" crc="9c7ca2c3" sha1="80e498e6b3f3003ab9329dfa04e7279283a09774"/>
+		<rom name="Allied General (Japan) (En,Ja) (Track 8).bin" size="28318080" crc="da9e7d82" sha1="0193b7ca6ca05cac5c399aa26964080e911a2f60"/>
+		-->
+		<description>Allied General (Japan)</description>
+		<year>1997</year>
+		<publisher>Xing Entertainment</publisher>
+		<notes><![CDATA[
+Corrupted sound on title menu and during gameplay
+]]></notes>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Strategic Simulations, Inc"/>
+		<info name="language" value="English" />
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS-00843"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Allied General (Japan) (En,Ja)" sha1="92bba40fb03fb83c782334baeb07f3e9054c2b7c"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="aitd2_jp" cloneof="aitd2">
 		<!--
 		http://redump.org/disc/13174
@@ -37890,6 +38051,195 @@ Battle screen status bar flickers
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Alone in the Dark 2 (Japan)" sha1="3d03366a2d78f89cdcde2577a5baefa63ad864e1"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="asteroid_jp" cloneof="asteroid">
+		<!--
+		http://redump.org/disc/12336/
+		<rom name="SuperLite 1500 Series - Asteroids (Japan).cue" size="257" crc="e3da89d5" sha1="51bb6cc9283dfefb895fa64f0c50f41bb56af600"/>
+		<rom name="SuperLite 1500 Series - Asteroids (Japan) (Track 1).bin" size="120349488" crc="837cff54" sha1="892fd09d8ca7e2fc5833954c7af6c9cd45097e60"/>
+		<rom name="SuperLite 1500 Series - Asteroids (Japan) (Track 2).bin" size="49330848" crc="18538a6e" sha1="bd7a68bb32edb2cb05de4e0e38c1665e43898b26"/>
+		-->
+		<description>Asteroids (Japan, SuperLite 1500 Series)</description>
+		<year>1999</year>
+		<publisher>Success</publisher>
+		<info name="alt_title" value="SuperLite 1500 シリーズ アステロイド"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Syrox Developments"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPM-86239"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="SuperLite 1500 Series - Asteroids (Japan)" sha1="720e02b61fa2841a4cef78a8275dfa526c964499"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sennakd_jp" cloneof="sennakd">
+		<!--
+		http://redump.org/disc/33627
+		<rom name="Ayrton Senna Kart Duel (Japan).cue" size="850" crc="dff9c82b" md5="87a13ddc3e31a67a0204b32731268d9b" sha1="09c16737269bc1e868d81d92c687ea92e8755959"/>
+		<rom name="Ayrton Senna Kart Duel (Japan) (Track 1).bin" size="58026192" crc="f966e832" md5="17d5857e309f33fa1e6f95b4d6e90ceb" sha1="c0d45ec4fee8e9ae6b4af1010b40d976d612241c"/>
+		<rom name="Ayrton Senna Kart Duel (Japan) (Track 2).bin" size="54046608" crc="2d3ef50e" md5="d1961b5e1e5d884789351629ff63b5f1" sha1="461b77fc68b8b8c49af5b30dccbd3b9ab35cb044"/>
+		<rom name="Ayrton Senna Kart Duel (Japan) (Track 3).bin" size="32041296" crc="47cbe11c" md5="924ec1f34f3047559cfdb6407a433fac" sha1="dcb5aa50e5761eec25b504352bedfbbb4d486da0"/>
+		<rom name="Ayrton Senna Kart Duel (Japan) (Track 4).bin" size="34376832" crc="347ea9fb" md5="fe21881f4ef7b2fb3d9287f01bf7b815" sha1="f66cb17fc765e10c466f36e8c2a7e220a7af884b"/>
+		<rom name="Ayrton Senna Kart Duel (Japan) (Track 5).bin" size="53936064" crc="5f6ba2ff" md5="3f2187d15b95ebd95cffc1f8d8000aec" sha1="36cce1154f43306466bbc747da9574cac4df6297"/>
+		<rom name="Ayrton Senna Kart Duel (Japan) (Track 6).bin" size="54340608" crc="0b1e6f2a" md5="e1b7e84c0e37840ab69d177617c05f4d" sha1="740a1b7ddd400b1bc7611a5222fe0ba813eb442f"/>
+		<rom name="Ayrton Senna Kart Duel (Japan) (Track 7).bin" size="54340608" crc="0b1e6f2a" md5="e1b7e84c0e37840ab69d177617c05f4d" sha1="740a1b7ddd400b1bc7611a5222fe0ba813eb442f"/>
+		-->
+		<description>Ayrton Senna Kart Duel (Japan)</description>
+		<year>1996</year>
+		<publisher>Gaps</publisher>
+		<info name="alt_title" value="アイルトン・セナ　カート・デュエル"/>
+		<info name="developer" value="Gaps"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS-00380"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ayrton Senna Kart Duel (Japan)" sha1="84ef2bb8844d279af32ffe5ae6aea61ad8dadbfd"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sennakd2_jp" cloneof="sennakd2">
+		<!--
+		http://redump.org/disc/34583/
+		<rom name="Ayrton Senna KartDuel 2 (Japan).cue" size="732" crc="599c8e94" sha1="c60ed22490c3e27c8c4917a51303b67ec4bf3974"/>
+		<rom name="Ayrton Senna KartDuel 2 (Japan) (Track 1).bin" size="116661552" crc="5c13c575" sha1="1d45b0d6b6b5eb62671ad4d42eb7a76854d1ccdc"/>
+		<rom name="Ayrton Senna KartDuel 2 (Japan) (Track 2).bin" size="21534912" crc="de4ff27b" sha1="03864a5226476baac2a9ece84ba0bc3aa31417c9"/>
+		<rom name="Ayrton Senna KartDuel 2 (Japan) (Track 3).bin" size="21525504" crc="29dda558" sha1="a9e3a3615580cc57ca7bff800261f2141eb6a591"/>
+		<rom name="Ayrton Senna KartDuel 2 (Japan) (Track 4).bin" size="21527856" crc="3a4bf5cc" sha1="b64f8ceb44dfe535d87f8800b9dcfcea1566b3ad"/>
+		<rom name="Ayrton Senna KartDuel 2 (Japan) (Track 5).bin" size="21701904" crc="c9c5c94f" sha1="be7051a02c4ba10158d3607a0f196b6f9b2ceb3a"/>
+		<rom name="Ayrton Senna KartDuel 2 (Japan) (Track 6).bin" size="37062816" crc="9b8f3d83" sha1="31741ecf704e04475cc4d6b5996639ed144abf4d"/>
+		-->
+		<description>Ayrton Senna KartDuel 2 (Japan)</description>
+		<year>1997</year>
+		<publisher>Gaps</publisher>
+		<info name="alt_title" value="アイルトン・セナ・カートデュエル２"/>
+		<info name="developer" value="Gaps"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS-01072"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ayrton Senna KartDuel 2 (Japan)" sha1="2ddf7550feef296b2e25b609fddfd7b3a7367541"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sennakdsp">
+		<!--
+		http://redump.org/disc/35745/
+		<rom name="Ayrton Senna Kart Duel Special (Japan).cue" size="1038" crc="8fa6ccd8" sha1="71de159cda0f5178303cf816fb61c879baa906b9"/>
+		<rom name="Ayrton Senna Kart Duel Special (Japan) (Track 1).bin" size="99774192" crc="010312a0" sha1="648ff2abe6c2203d63f553a46420b46a663ef727"/>
+		<rom name="Ayrton Senna Kart Duel Special (Japan) (Track 2).bin" size="23211888" crc="97236094" sha1="27d7b1ad21b07447132bee4b5c2c0abac0f270b8"/>
+		<rom name="Ayrton Senna Kart Duel Special (Japan) (Track 3).bin" size="54046608" crc="2d3ef50e" sha1="461b77fc68b8b8c49af5b30dccbd3b9ab35cb044"/>
+		<rom name="Ayrton Senna Kart Duel Special (Japan) (Track 4).bin" size="32041296" crc="47cbe11c" sha1="dcb5aa50e5761eec25b504352bedfbbb4d486da0"/>
+		<rom name="Ayrton Senna Kart Duel Special (Japan) (Track 5).bin" size="34376832" crc="347ea9fb" sha1="f66cb17fc765e10c466f36e8c2a7e220a7af884b"/>
+		<rom name="Ayrton Senna Kart Duel Special (Japan) (Track 6).bin" size="53936064" crc="5f6ba2ff" sha1="36cce1154f43306466bbc747da9574cac4df6297"/>
+		<rom name="Ayrton Senna Kart Duel Special (Japan) (Track 7).bin" size="54340608" crc="0b1e6f2a" sha1="740a1b7ddd400b1bc7611a5222fe0ba813eb442f"/>
+		<rom name="Ayrton Senna Kart Duel Special (Japan) (Track 8).bin" size="31810800" crc="1428b715" sha1="354b3c4d850c45e309a748c834d96a13f112dedf"/>
+		-->
+		<description>Ayrton Senna Kart Duel Special (Japan)</description>
+		<year>1999</year>
+		<publisher>Gaps</publisher>
+		<info name="alt_title" value="アイルトンセナ　カートデュエルスペシャル"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Gaps"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLPS-01659"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ayrton Senna Kart Duel Special (Japan)" sha1="7ebdd1e7c37d18647286a8457ec3bc90bbf140a8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="boxerroad">
+		<!--
+		http://redump.org/disc/2765/
+		<rom name="Boxer's Road (Japan).cue" size="2512" crc="9d7f13a7" sha1="2f66701a08cd4e739602a7b0bb1e8669399337e4"/>
+		<rom name="Boxer's Road (Japan) (Track 01).bin" size="56716128" crc="aebb7928" sha1="7c4d32d41818c56dce74f30b8b293c4f9ed6dfdd"/>
+		<rom name="Boxer's Road (Japan) (Track 02).bin" size="4101888" crc="90cc6e1d" sha1="11dc04e65590f08eee3da87617da04148158fe10"/>
+		<rom name="Boxer's Road (Japan) (Track 03).bin" size="32107152" crc="94dcd499" sha1="8654e56441409a3690f2052a10d4d4a051c2756f"/>
+		<rom name="Boxer's Road (Japan) (Track 04).bin" size="26815152" crc="1f5b3a99" sha1="fa7fd62e6ca8e12ae5f25f94f9238a5534a29945"/>
+		<rom name="Boxer's Road (Japan) (Track 05).bin" size="26815152" crc="1ff87956" sha1="270c4872de7b1b5b41305ba7b6bb78a55cadffbf"/>
+		<rom name="Boxer's Road (Japan) (Track 06).bin" size="26815152" crc="daee3166" sha1="3bea34f02e81ffb513c6a60b11ee82c0f3bb1de2"/>
+		<rom name="Boxer's Road (Japan) (Track 07).bin" size="26815152" crc="e4a3aeaa" sha1="8bfc8ec96271cc8e836e82cd4287f2567d0d13e8"/>
+		<rom name="Boxer's Road (Japan) (Track 08).bin" size="34753152" crc="90714c90" sha1="15ca7d615f34ed43d6b7bf65f2fbf89c32c2b666"/>
+		<rom name="Boxer's Road (Japan) (Track 09).bin" size="26815152" crc="bb338f33" sha1="c0fc24aaf69159cdeacbe4aeb052ab68f04054f0"/>
+		<rom name="Boxer's Road (Japan) (Track 10).bin" size="34753152" crc="0a71ab0f" sha1="e7e8fafb368744d766c287587177e8eff98260a1"/>
+		<rom name="Boxer's Road (Japan) (Track 11).bin" size="34753152" crc="8c6c77ad" sha1="e64057d85fc133d73527d8ef01264223ca11d683"/>
+		<rom name="Boxer's Road (Japan) (Track 12).bin" size="34753152" crc="f65087c7" sha1="0e78782c2b6cebaf83ce6fb821e3e0bbd7271693"/>
+		<rom name="Boxer's Road (Japan) (Track 13).bin" size="34753152" crc="c1a6f78c" sha1="5402d07a6692918e752bd70f713cdd6c7f5ad6a9"/>
+		<rom name="Boxer's Road (Japan) (Track 14).bin" size="3981936" crc="b4c363e7" sha1="25f9045bddaea8974b2ea8817ae0dacd8b11f081"/>
+		<rom name="Boxer's Road (Japan) (Track 15).bin" size="34753152" crc="782eb3a3" sha1="dce62e6e32655706c1c54e3fbc53e5b701a8f5f0"/>
+		<rom name="Boxer's Road (Japan) (Track 16).bin" size="34753152" crc="e1c9bc9f" sha1="1c6a8d58ff22521bb60d784b6cdc19f66b6e1824"/>
+		<rom name="Boxer's Road (Japan) (Track 17).bin" size="1147776" crc="d0c2e155" sha1="8cf511eb3298dc32bac142d0a84e1ae3d5c42a91"/>
+		<rom name="Boxer's Road (Japan) (Track 18).bin" size="35635152" crc="70d17b89" sha1="d5dd0f0fcf8c19826ed98b49d7aecadb61c58e50"/>
+		<rom name="Boxer's Road (Japan) (Track 19).bin" size="35635152" crc="a5afd1e4" sha1="278a1709a7ad91bad036fcb5341b555330b9f548"/>
+		<rom name="Boxer's Road (Japan) (Track 20).bin" size="35635152" crc="8d2b780d" sha1="1f01064fa3e72542932b5456b628317cfb46718f"/>
+		<rom name="Boxer's Road (Japan) (Track 21).bin" size="35987952" crc="6c197f5d" sha1="ca8f970cb15aae2272b6609f8ea8fd6ed5115cb4"/>
+		<rom name="Boxer's Road (Japan) (Track 22).bin" size="35635152" crc="866d5de9" sha1="420facb07279be008749aaae368e99d9714275a1"/>
+		-->
+		<description>Boxer's Road (Japan)</description>
+		<year>1995</year>
+		<publisher>New</publisher>
+		<info name="alt_title" value="ボクサーズ・ロード"/>
+		<info name="developer" value="New"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS-00033"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Boxer's Road (Japan)" sha1="dec48a2ba46f56d3d9efe2f8189168dc7e143058"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="boxerroad_pb" cloneof="boxerroad">
+		<!--
+		http://redump.org/disc/6537/
+		<rom name="Boxer's Road (Japan) (Rev 1).cue" size="2688" crc="d8da532a" sha1="a0856292487fe54c109396a4fe9420e82312fb27"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 01).bin" size="56723184" crc="e3b2e7af" sha1="b0153df85cce35aa3eede5e567b3d2fc6d15d1dc"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 02).bin" size="4101888" crc="90cc6e1d" sha1="11dc04e65590f08eee3da87617da04148158fe10"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 03).bin" size="32107152" crc="94dcd499" sha1="8654e56441409a3690f2052a10d4d4a051c2756f"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 04).bin" size="26815152" crc="1f5b3a99" sha1="fa7fd62e6ca8e12ae5f25f94f9238a5534a29945"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 05).bin" size="26815152" crc="1ff87956" sha1="270c4872de7b1b5b41305ba7b6bb78a55cadffbf"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 06).bin" size="26815152" crc="daee3166" sha1="3bea34f02e81ffb513c6a60b11ee82c0f3bb1de2"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 07).bin" size="26815152" crc="e4a3aeaa" sha1="8bfc8ec96271cc8e836e82cd4287f2567d0d13e8"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 08).bin" size="34753152" crc="90714c90" sha1="15ca7d615f34ed43d6b7bf65f2fbf89c32c2b666"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 09).bin" size="26815152" crc="bb338f33" sha1="c0fc24aaf69159cdeacbe4aeb052ab68f04054f0"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 10).bin" size="34753152" crc="0a71ab0f" sha1="e7e8fafb368744d766c287587177e8eff98260a1"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 11).bin" size="34753152" crc="8c6c77ad" sha1="e64057d85fc133d73527d8ef01264223ca11d683"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 12).bin" size="34753152" crc="f65087c7" sha1="0e78782c2b6cebaf83ce6fb821e3e0bbd7271693"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 13).bin" size="34753152" crc="c1a6f78c" sha1="5402d07a6692918e752bd70f713cdd6c7f5ad6a9"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 14).bin" size="3981936" crc="b4c363e7" sha1="25f9045bddaea8974b2ea8817ae0dacd8b11f081"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 15).bin" size="34753152" crc="782eb3a3" sha1="dce62e6e32655706c1c54e3fbc53e5b701a8f5f0"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 16).bin" size="34753152" crc="e1c9bc9f" sha1="1c6a8d58ff22521bb60d784b6cdc19f66b6e1824"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 17).bin" size="1147776" crc="d0c2e155" sha1="8cf511eb3298dc32bac142d0a84e1ae3d5c42a91"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 18).bin" size="35635152" crc="70d17b89" sha1="d5dd0f0fcf8c19826ed98b49d7aecadb61c58e50"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 19).bin" size="35635152" crc="a5afd1e4" sha1="278a1709a7ad91bad036fcb5341b555330b9f548"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 20).bin" size="35635152" crc="8d2b780d" sha1="1f01064fa3e72542932b5456b628317cfb46718f"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 21).bin" size="35987952" crc="6c197f5d" sha1="ca8f970cb15aae2272b6609f8ea8fd6ed5115cb4"/>
+		<rom name="Boxer's Road (Japan) (Rev 1) (Track 22).bin" size="35635152" crc="866d5de9" sha1="420facb07279be008749aaae368e99d9714275a1"/>
+		-->
+		<description>Boxer's Road (Japan) (PlayStation the Best)</description>
+		<year>1996</year>
+		<publisher>New</publisher>
+		<info name="alt_title" value="ボクサーズ・ロード"/>
+		<info name="developer" value="New"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS-91007"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Boxer's Road (Japan) (Rev 1)" sha1="e4e611077e394f1e2c51347e9507dda28df78bc9"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38096,6 +38446,28 @@ Battle screen status bar flickers
 		</part>
 	</software>
 
+	<software name="sampras_jp" cloneof="sampras">
+		<!--
+		http://redump.org/disc/30968/
+		<rom name="Sampras Extreme Tennis (Japan).cue" size="230" crc="f57276a8" sha1="0bacc6a64b05c566f0e8734b0c491d6f27592ad2"/>
+		<rom name="Sampras Extreme Tennis (Japan) (Track 1).bin" size="544250448" crc="9ef4f8cb" sha1="e00bd7506582d5caf24fa1821bb07ae87cde832d"/>
+		<rom name="Sampras Extreme Tennis (Japan) (Track 2).bin" size="41543376" crc="c206e837" sha1="3d6468863690e21f935f9be3ec961f78ba1493d3"/>
+		-->
+		<description>Sampras Extreme Tennis (Japan)</description>
+		<year>1997</year>
+		<publisher>Codemasters</publisher>
+		<info name="alt_title" value="サンプラス・エクストリーム・テニス"/>
+		<info name="developer" value="Virgin Interactive"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS-00594"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Sampras Extreme Tennis (Japan)" sha1="76dbafcea032d529a5a3fb762121a05f485bec03"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- http://redump.org/disc/14070/ -->
 	<software name="sentokka">
 		<description>Sentou Kokka: Air Land Battle (Japan, rev. 1)</description>
@@ -38109,6 +38481,51 @@ Battle screen status bar flickers
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sentou kokka - air land battle (japan) (rev 1)" sha1="f058f3987ade1e373c103efce5a2d0f91ad31844"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="septentr">
+		<!--
+		http://redump.org/disc/4117/
+		<rom name="Septentrion - Out of the Blue (Japan).cue" size="103" crc="9978edb1" sha1="6d80c3ad001c3db3fd6eea192119a912386b4f49"/>
+		<rom name="Septentrion - Out of the Blue (Japan).bin" size="198595824" crc="59a2d045" sha1="1db5cc6aefb64bbfb4820d48bcfbb95df77e8bb2"/>
+		-->
+		<description>Septentrion: Out of the Blue (Japan)</description>
+		<year>1999</year>
+		<publisher>Human Entertainment</publisher>
+		<info name="alt_title" value="セプテントリオン ～Out of the Blue～"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Human Club"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS-01940"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Septentrion - Out of the Blue (Japan)" sha1="5be36fc872e66f6d5e216cc120370be200cfeaa2"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="septentr_mw" cloneof="septentr">
+		<!--
+		http://redump.org/disc/69181/
+		<rom name="Septentrion - Out of the Blue (Japan) (Major Wave).cue" size="270" crc="dabb84e3" sha1="5a0f3a153bf85aaea22f2b3e6bf6f4ad9dd29a8f"/>
+		<rom name="Septentrion - Out of the Blue (Japan) (Major Wave) (Track 1).bin" size="163473408" crc="31bdff32" sha1="e30efeef3cc1307cd83d5cbf23e217d75d03cfdd"/>
+		<rom name="Septentrion - Out of the Blue (Japan) (Major Wave) (Track 2).bin" size="56535024" crc="a35e373c" sha1="180ae8034534d377f317ef4259b458b0b4be83cb"/>
+		-->
+		<description>Septentrion: Out of the Blue (Japan) (Major Wave series)</description>
+		<year>2000</year>
+		<publisher>Hamster</publisher>
+		<info name="alt_title" value="セプテントリオン ～Out of the Blue～"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Human Club"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPM-86612"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Septentrion - Out of the Blue (Japan) (Major Wave)" sha1="598c7d5ac984989c47f1a74806a74b0ce5d58033"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38475,28 +38892,6 @@ Battle screen status bar flickers
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ad lib ouji... to fuyukai na nakamatachi (japan) [slps-03510]" sha1="76c198db22196a82014fd7deea1dc49b5a0a6c14" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- boot OK, loading screens blacks out for a split second -->
-	<software name="advanrac">
-		<!--
-		Unknown source
-		<rom name="Advan Racing (Japan) (Track 1) [SLPS-01689].bin" size="565898256" crc="2663d852" sha1="651124fa56238f2f9504ccb9924e2ccb3d7c4646"/>
-		<rom name="Advan Racing (Japan) (Track 2) [SLPS-01689].bin" size="33657120" crc="ba904e85" sha1="11ab3b1eed7f08622bbf0dc33bb676f12da9fbfd"/>
-		<rom name="Advan Racing (Japan) [SLPS-01689].cue" size="213" crc="1e2ab168" sha1="909b963886b59677316131a49ab9984476f7aab2"/>
-		-->
-		<description>Advan Racing (Japan)</description>
-		<year>1998</year>
-		<publisher>Atlus</publisher>
-		<info name="serial" value="SLPS-01689" />
-		<info name="release" value="19981119" />
-		<info name="alt_title" value="アドバン・レーシング"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="advan racing (japan) [slps-01689]" sha1="ffb12aad0606c6bb52c917ee5f900ffb080379e8" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -39357,27 +39752,6 @@ Battle screen status bar flickers
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="armed fighter (japan) [slps-01598]" sha1="9af77275f184a012f463d0254232e1c8b22a773c" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<!-- hangs at PS logo, boot OK with US BIOS but with hacked PS logo (bootleg dump) -->
-	<software name="armstrng" supported="no">
-		<!--
-		Unknown source
-		<rom name="Agent Armstrong (Japan) [SLPS-01073].bin" size="19145280" crc="43b7de21" sha1="d35d48ba596e477befde58ce9658a60e797c834f"/>
-		<rom name="Agent Armstrong (Japan) [SLPS-01073].cue" size="102" crc="5dd96f46" sha1="8b865586923e2941cf720c18330eb1ee4687b8da"/>
-		-->
-		<description>Agent Armstrong - Himitsu Shirei Daisakusen (Japan)</description>
-		<year>1997</year>
-		<publisher>WENet</publisher>
-		<info name="serial" value="SLPS-01073 (WG 0005)" />
-		<info name="release" value="19971204" />
-		<info name="alt_title" value="エージェントアームストロング 秘密司令大作戦"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="agent armstrong (japan) [slps-01073]" sha1="f3de15194878d54e51f79644e79ebff33e6c5811" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -61182,6 +61556,30 @@ The game freezes when loading (after the intro)
 		</part>
 	</software>
 
+	<software name="ironblod" supported="partial">
+		<!--
+		http://redump.org/disc/23066/
+		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (Europe).cue" size="320" crc="19a59436" sha1="25eb0d779d524b700cedd9f38e56076c3af10526"/>
+		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (Europe) (Track 1).bin" size="255034416" crc="2ecbc2ec" sha1="7b618aa1190ecaf46dc40c9e9aa06f497fb2d0f7"/>
+		<rom name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (Europe) (Track 2).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
+		-->
+		<description>Advanced Dungeons &amp; Dragons: Iron &amp; Blood - Warriors of Ravenloft (Europe)</description>
+		<year>1996</year>
+		<publisher>Acclaim Entertainment</publisher>
+		<notes><![CDATA[
+Corrupted music on title menu and during gameplay
+]]></notes>
+		<info name="developer" value="Take 2 Interactive"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-00386"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Advanced Dungeons &amp; Dragons - Iron &amp; Blood - Warriors of Ravenloft (Europe)" sha1="0b61ebfa37118b55cecf61cca9552f3512f6f727"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="afl99" supported="partial">
 		<!--
 		http://redump.org/disc/31412
@@ -61202,6 +61600,77 @@ During gameplay, the commentary speech audio is playing too fast
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="AFL 99 (Australia)" sha1="f4a6fb58cfde4b9cdfb67ca44fdf561fbf67c824"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="armstrng">
+		<!--
+		http://redump.org/disc/19655/
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es).cue" size="2243" crc="db235923" sha1="dbaf8b33a9b74a7765ef48ea5bad3e617d4b7e1a"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 01).bin" size="237392064" crc="ce836f09" sha1="895eb83448ec5ec0acc1f213ab4a869a97172989"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 02).bin" size="33106752" crc="93fd7de6" sha1="ed9c6d10f0b9a5671a167123fb19367a59f332c5"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 03).bin" size="4393536" crc="e4bc7e40" sha1="522da8b69d9e64364a51179cc265401322b546c5"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 04).bin" size="15433824" crc="219ce0ff" sha1="4c84530cef29df7049b9068d832056fc9aaaec49"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 05).bin" size="20166048" crc="dd11a4d0" sha1="dab43590f00d25b15bb446f82004fc3366a1c144"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 06).bin" size="31493280" crc="5292150b" sha1="451c463449fc3bed5f24f21e6d15519b444a86f8"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 07).bin" size="29771616" crc="f3252987" sha1="7b0a8c47550461daa27c90437966247d19cadc58"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 08).bin" size="25022928" crc="eb03c363" sha1="e72b86b079716a14fe161e18365ea16406743097"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 09).bin" size="19803840" crc="5df7f217" sha1="890545efeb25aa1756920e62b68d6c952dcdbb9d"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 10).bin" size="30209088" crc="86e7bdaf" sha1="4c91fb1905b52af18f939c93b3e58f67a4d79392"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 11).bin" size="14281344" crc="96fc9923" sha1="655cf195bdedaea3a92a2027f7dda9441a6c67c8"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 12).bin" size="38184720" crc="35ff2d90" sha1="4b537163b9841aeadc8a55e94c0f7c5bf65556db"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 13).bin" size="37359168" crc="8f9d398f" sha1="0d2411a54529b991a878bbc21a857e111d14c38f"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 14).bin" size="31836672" crc="8f3dacd9" sha1="9979f8cdf56ce22db2caeaf434b5a176c32cc349"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 15).bin" size="18082176" crc="3954efd7" sha1="8b3051e953347a41c7f6ca61451d21f94879e80d"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 16).bin" size="45337152" crc="7fa72de5" sha1="1df1a2493194f0fccdb5b7b5c66523874aefe82b"/>
+		<rom name="Agent Armstrong (Europe) (En,Fr,De,Es) (Track 17).bin" size="45337152" crc="7fa72de5" sha1="1df1a2493194f0fccdb5b7b5c66523874aefe82b"/>
+		-->
+		<description>Agent Armstrong (Europe)</description>
+		<year>1997</year>
+		<publisher>Virgin Interactive</publisher>
+		<info name="developer" value="King of the Jungle"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-00474"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Agent Armstrong (Europe) (En,Fr,De,Es)" sha1="2f73d4a3b1c39fc026f1a84a56ce3e13b4c74a9d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="awf111x">
+		<!--
+		http://redump.org/disc/29331/
+		<rom name="Agile Warrior - F-111X (Europe).cue" size="1620" crc="af0e2d64" sha1="c0fec5f06efac670084a9e04090ef6fb9956d6e8"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 01).bin" size="293604864" crc="58a78d11" sha1="c39336f239662e77996e7d80cd7ee77e720d4591"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 02).bin" size="12867792" crc="4b90dc03" sha1="439ff316c72a64805a46ac07aba1ed43a16a3456"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 03).bin" size="29508192" crc="12f6b68c" sha1="a1063eb4db85d1e35b26ffbc203c34bc9b76a351"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 04).bin" size="41620992" crc="67c72d78" sha1="12faeeb4d06bf61bd8feb59a23c295df9279a7b1"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 05).bin" size="26801040" crc="f7ab8f98" sha1="98019081f8a780c760541aa4e82a6dab471ff20f"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 06).bin" size="24990000" crc="cf7329e1" sha1="93ee7e7ea4181e92e187a4d6c1d347bd5aec4759"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 07).bin" size="21911232" crc="4d955464" sha1="e25029c75d90380c4572b9efc2aa335dd26f3031"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 08).bin" size="24914736" crc="6e8f36ed" sha1="607a1e8b9a0d70689239cc1d0dce7b1a74b9e14a"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 09).bin" size="18500832" crc="2a19a4f4" sha1="43e7946db9627134d75ca223b6ac755734132eba"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 10).bin" size="27666576" crc="2d0060f7" sha1="6c974692c0975c4786f1914606e9c6f0615311d6"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 11).bin" size="17176656" crc="d3a7faf0" sha1="210ca15e3bf5f7148a8e7516d41bba6f11edc663"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 12).bin" size="41620992" crc="67c72d78" sha1="12faeeb4d06bf61bd8feb59a23c295df9279a7b1"/>
+		<rom name="Agile Warrior - F-111X (Europe) (Track 13).bin" size="41620992" crc="67c72d78" sha1="12faeeb4d06bf61bd8feb59a23c295df9279a7b1"/>
+		-->
+		<description>Agile Warrior: F-111X (Europe)</description>
+		<year>1996</year>
+		<publisher>Virgin Interactive</publisher>
+		<info name="developer" value="Black Ops Entertainment"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SLES-00124"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Agile Warrior - F-111X (Europe)" sha1="f97cd4a067ef2c6d033ced02751fcc2d81710d95"/>
 			</diskarea>
 		</part>
 	</software>
@@ -61674,6 +62143,37 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
+	<software name="alliedgn" supported="partial">
+		<!--
+		http://redump.org/disc/26263/
+		<rom name="Allied General (Europe).cue" size="918" crc="2d21857c" sha1="3703a846580b7f9232b8c7cbc575ebf02a51653b"/>
+		<rom name="Allied General (Europe) (Track 1).bin" size="361323648" crc="db60c65c" sha1="a4d7b88051de247059043bf4511751ede33742b5"/>
+		<rom name="Allied General (Europe) (Track 2).bin" size="28452144" crc="09e60cab" sha1="57b163e0ee20ff12d6d19423e2f08248a14cca8c"/>
+		<rom name="Allied General (Europe) (Track 3).bin" size="31596768" crc="b2fdfe7e" sha1="f91da1034b1fde1d5624485a6df7b8ab236103d3"/>
+		<rom name="Allied General (Europe) (Track 4).bin" size="72690912" crc="523e5e8a" sha1="8641c51c4a7e730fe2a6dadb0f96bab0846bcd47"/>
+		<rom name="Allied General (Europe) (Track 5).bin" size="33821760" crc="b52b8218" sha1="c16e937c1403df7df9f539adbd57378f218bfeca"/>
+		<rom name="Allied General (Europe) (Track 6).bin" size="33337248" crc="339fb78b" sha1="c91704df2d4dc01436f3019a76de2dc6de017a85"/>
+		<rom name="Allied General (Europe) (Track 7).bin" size="60307632" crc="97e68b2b" sha1="c2cfe6ca9f50959847d27f8ac5b9fcec286bf041"/>
+		<rom name="Allied General (Europe) (Track 8).bin" size="72690912" crc="523e5e8a" sha1="8641c51c4a7e730fe2a6dadb0f96bab0846bcd47"/>
+		-->
+		<description>Panzer General II: Allied General (Europe)</description>
+		<year>1997</year>
+		<publisher>Mindscape</publisher>
+		<notes><![CDATA[
+Corrupted sound on title menu and during gameplay
+]]></notes>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Strategic Simulations, Inc"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-00417"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Allied General (Europe)" sha1="d1a249f93aa7dea611f50d00456a7d26586ca26b"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="aitd2">
 		<!--
 		http://redump.org/disc/485
@@ -61902,6 +62402,29 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
+	<software name="animalfb">
+		<!--
+		http://redump.org/disc/15750/
+		<rom name="Animal Football (Europe) (En,Fr,De).cue" size="101" crc="d6971d65" sha1="7a5edaac263e2ab4ba026bfd95150362c1da5bac"/>
+		<rom name="Animal Football (Europe) (En,Fr,De).bin" size="428974224" crc="553cb437" sha1="7e3cae65567f3c2e1b9dfdad3fc5f90d84026baf"/>
+		-->
+		<description>Animal Football (Europe)</description>
+		<year>2003</year>
+		<publisher>Phoenix Games</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="The Code Monkeys"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="serial" value="SLES-04071"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Animal Football (Europe) (En,Fr,De)" sha1="7d8979ce3989b254f63c6783919de2d27d5a861e"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="smcourt2">
 		<!--
 		http://redump.org/disc/5500
@@ -61961,6 +62484,120 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
+	<software name="archer3d">
+		<!--
+		http://redump.org/disc/4217/
+		<rom name="Archer Maclean's 3D Pool (Europe).cue" size="744" crc="b786676a" sha1="ab5fbb7ba2ba2edcf5c0d2b1135d4b9f53475943"/>
+		<rom name="Archer Maclean's 3D Pool (Europe) (Track 1).bin" size="50323392" crc="7f01a3b0" sha1="7699da953e9f1b61c3ac7159d7ea9aa9d2570831"/>
+		<rom name="Archer Maclean's 3D Pool (Europe) (Track 2).bin" size="21309120" crc="bd07e39d" sha1="6fb7fc27ec02f9847848ef4f87c0f379cd94542b"/>
+		<rom name="Archer Maclean's 3D Pool (Europe) (Track 3).bin" size="17120208" crc="9f4ff8e5" sha1="b50bc663fecaefa7032efd9c7a748ccf7e355d29"/>
+		<rom name="Archer Maclean's 3D Pool (Europe) (Track 4).bin" size="21309120" crc="5f5c4300" sha1="8be67d9b04962e8f4cfce957f9cb54ac3cf6e0e7"/>
+		<rom name="Archer Maclean's 3D Pool (Europe) (Track 5).bin" size="16767408" crc="8f118a42" sha1="3f5aef598d660bad8598d01708e9f5ebce6a9ba5"/>
+		<rom name="Archer Maclean's 3D Pool (Europe) (Track 6).bin" size="42693504" crc="87129cc0" sha1="20a927a3e41dec1f855b0e8c5961e84211ffae3f"/>
+		-->
+		<description>Archer Maclean's 3D Pool (Europe)</description>
+		<year>2003</year>
+		<publisher>Ignition Entertainment</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Ignition Entertainment"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-04096"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Archer Maclean's 3D Pool (Europe)" sha1="bb3b925b8bd59e86d2434440a5c2bc710fad9bf6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="asteroid">
+		<!--
+		http://redump.org/disc/31337/
+		<rom name="Asteroids (Europe).cue" size="206" crc="9ee5b199" sha1="329fdefe6c75fecd216f1927903b374c26876a4e"/>
+		<rom name="Asteroids (Europe) (Track 1).bin" size="118216224" crc="de2aabf5" sha1="9e3de51ba879ff856872880b9f98b022c3e9dbcb"/>
+		<rom name="Asteroids (Europe) (Track 2).bin" size="32636352" crc="ce6b485b" sha1="58c7fc8a14ad29c9f3546e5cca3e19367a39397f"/>
+		-->
+		<description>Asteroids (Europe)</description>
+		<year>1998</year>
+		<publisher>Activision</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Syrox Developments"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-01418"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Asteroids (Europe)" sha1="baa672b929961eadc2465c781ba6be4105166209"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="asteroid_fr" cloneof="asteroid">
+		<!--
+		http://redump.org/disc/29533/
+		<rom name="Asteroids (France).cue" size="206" crc="16da3e97" sha1="e4e1f8b697a8dadda86cbe4a0c32d29b7c6dfd08"/>
+		<rom name="Asteroids (France) (Track 1).bin" size="195112512" crc="ea93c5ff" sha1="4fca37dc48d6aacc677f4e42c219e57ffeec3cc7"/>
+		<rom name="Asteroids (France) (Track 2).bin" size="32636352" crc="ce6b485b" sha1="58c7fc8a14ad29c9f3546e5cca3e19367a39397f"/>
+		-->
+		<description>Asteroids (France)</description>
+		<year>1998</year>
+		<publisher>Activision</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Syrox Developments"/>
+		<info name="language" value="French" />
+		<info name="serial" value="SLES-01468"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Asteroids (France)" sha1="5320307909af0369b66c876b71a5f93b28aa5e27"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="asteroid_de" cloneof="asteroid">
+		<!--
+		http://redump.org/disc/23173/
+		<rom name="Asteroids (Germany).cue" size="208" crc="7de2ef81" sha1="5b504f9c93289f6ae1eb1301077bda51fa1fff27"/>
+		<rom name="Asteroids (Germany) (Track 1).bin" size="195112512" crc="1af8eaed" sha1="58e8f933ce912a624040fd8dccd2eaf11c9d8feb"/>
+		<rom name="Asteroids (Germany) (Track 2).bin" size="32636352" crc="ce6b485b" sha1="58c7fc8a14ad29c9f3546e5cca3e19367a39397f"/>
+		-->
+		<description>Asteroids (Germany)</description>
+		<year>1998</year>
+		<publisher>Activision</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Syrox Developments"/>
+		<info name="language" value="German" />
+		<info name="serial" value="SLES-01468"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Asteroids (Germany)" sha1="37d805ac6e0650f8dbf2a26da05915ca75b48a3a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="asteroid_it" cloneof="asteroid">
+		<!--
+		http://redump.org/disc/27978/
+		<rom name="Asteroids (Italy).cue" size="204" crc="e2abbc33" sha1="1ae92afe93d51ad1aeb82a7de73c1951bf350032"/>
+		<rom name="Asteroids (Italy) (Track 1).bin" size="195112512" crc="3c01b284" sha1="71c0dc876eb4ae7df3861c7d9c281657b9503bcb"/>
+		<rom name="Asteroids (Italy) (Track 2).bin" size="32636352" crc="ce6b485b" sha1="58c7fc8a14ad29c9f3546e5cca3e19367a39397f"/>
+		-->
+		<description>Asteroids (Italy)</description>
+		<year>1998</year>
+		<publisher>Activision</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Syrox Developments"/>
+		<info name="language" value="Italian" />
+		<info name="serial" value="SLES-01470"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Asteroids (Italy)" sha1="495a79036afa4b7a91e6338166c804f2cf07ea72"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- http://redump.org/disc/1036/ -->
 	<!-- Came bundled with releases of "Crash Bandicoot" and "Tekken 2" -->
 	<software name="acrels96">
@@ -61974,6 +62611,83 @@ During gameplay, the commentary speech audio is playing too fast
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="autumn-christmas releases '96 (europe)" sha1="21f49d294575dec485c24866508fe40c3c0c2728"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sennakd">
+		<!--
+		http://redump.org/disc/25723
+		<rom name="Ayrton Senna Kart Duel (Europe).cue" size="857" crc="04eac66b" sha1="7f3dec2412ad3e2d9ad123fd53585be4f2487de2"/>
+		<rom name="Ayrton Senna Kart Duel (Europe) (Track 1).bin" size="89027904" crc="f3ff3ffe" sha1="d7ac163acd747be965ac9dc5b35cd4abdebe3f64"/>
+		<rom name="Ayrton Senna Kart Duel (Europe) (Track 2).bin" size="54046608" crc="37688641" sha1="7b96f58c601c2e1a9a389f9701ee4440dda7cff8"/>
+		<rom name="Ayrton Senna Kart Duel (Europe) (Track 3).bin" size="32041296" crc="928c2778" sha1="93042ee4614b7ca7141ba6ad15076d4bc9f0c3b9"/>
+		<rom name="Ayrton Senna Kart Duel (Europe) (Track 4).bin" size="34376832" crc="665785cd" sha1="09d38282e22d463f7fe149111acdaec596ea14ae"/>
+		<rom name="Ayrton Senna Kart Duel (Europe) (Track 5).bin" size="53936064" crc="8a986761" sha1="645e68428e619d857f7a1fa8a57402a47d8e14ac"/>
+		<rom name="Ayrton Senna Kart Duel (Europe) (Track 6).bin" size="54340608" crc="0b1e6f2a" sha1="740a1b7ddd400b1bc7611a5222fe0ba813eb442f"/>
+		<rom name="Ayrton Senna Kart Duel (Europe) (Track 7).bin" size="54340608" crc="0b1e6f2a" sha1="740a1b7ddd400b1bc7611a5222fe0ba813eb442f"/>
+		-->
+		<description>Ayrton Senna Kart Duel (Europe)</description>
+		<year>1996</year>
+		<publisher>Sunsoft</publisher>
+		<info name="developer" value="Gaps"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-00493"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ayrton Senna Kart Duel (Europe)" sha1="82d288437b57742a070a39c4f3d82ec56f7769db"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sennakd2">
+		<!--
+		http://redump.org/disc/23040/
+		<rom name="Ayrton Senna Kart Duel 2 (Europe).cue" size="744" crc="c222ead2" sha1="55553251fe8bccded1d95356f28cd9ab68027f2d"/>
+		<rom name="Ayrton Senna Kart Duel 2 (Europe) (Track 1).bin" size="121379664" crc="a7943e29" sha1="a55e9078feeaa8385dd71e96203b2be5f8156b51"/>
+		<rom name="Ayrton Senna Kart Duel 2 (Europe) (Track 2).bin" size="21534912" crc="de4ff27b" sha1="03864a5226476baac2a9ece84ba0bc3aa31417c9"/>
+		<rom name="Ayrton Senna Kart Duel 2 (Europe) (Track 3).bin" size="21525504" crc="29dda558" sha1="a9e3a3615580cc57ca7bff800261f2141eb6a591"/>
+		<rom name="Ayrton Senna Kart Duel 2 (Europe) (Track 4).bin" size="21527856" crc="3a4bf5cc" sha1="b64f8ceb44dfe535d87f8800b9dcfcea1566b3ad"/>
+		<rom name="Ayrton Senna Kart Duel 2 (Europe) (Track 5).bin" size="21701904" crc="c9c5c94f" sha1="be7051a02c4ba10158d3607a0f196b6f9b2ceb3a"/>
+		<rom name="Ayrton Senna Kart Duel 2 (Europe) (Track 6).bin" size="37062816" crc="9b8f3d83" sha1="31741ecf704e04475cc4d6b5996639ed144abf4d"/>
+		-->
+		<description>Ayrton Senna Kart Duel 2 (Europe)</description>
+		<year>1997</year>
+		<publisher>Sunsoft</publisher>
+		<info name="developer" value="Gaps"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-01024"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Ayrton Senna Kart Duel 2 (Europe)" sha1="625d0b6a58b5062ab665b3ab4bb3156f654d4783"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="babyfelx">
+		<!--
+		http://redump.org/disc/15634/
+		<rom name="Baby Felix Tennis (Europe) (En,Fr,De,Es,It,Nl).cue" size="112" crc="6f7e03a4" sha1="2df76d718f877f40a5c677568e1c4b91b54c04c5"/>
+		<rom name="Baby Felix Tennis (Europe) (En,Fr,De,Es,It,Nl).bin" size="152094432" crc="3ab7f7e9" sha1="fb97aee090eabdd38961720607462a710b8efc37"/>
+		-->
+		<description>Baby Felix Tennis (Europe)</description>
+		<year>2002</year>
+		<publisher>LSP</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="LSP"/>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-03991"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Baby Felix Tennis (Europe) (En,Fr,De,Es,It,Nl)" sha1="98d689abe4f7ee04f6db6a92080b00ae69bc128a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -62024,6 +62738,27 @@ During gameplay, the commentary speech audio is playing too fast
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Bedlam (Europe) (En,Fr,De,Es,It,Nl)" sha1="489738e7bb291244442d8cbd6800701f93f0e515"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="bublbobl">
+		<!--
+		http://redump.org/disc/4225/
+		<rom name="Bubble Bobble also featuring Rainbow Islands (Europe).cue" size="276" crc="e6758f76" sha1="f21d705692c4019ce24b399c556f67c7bc924785"/>
+		<rom name="Bubble Bobble also featuring Rainbow Islands (Europe) (Track 1).bin" size="63125328" crc="32111834" sha1="5c76166cc09120d955e734aeb643419a9c0bd66f"/>
+		<rom name="Bubble Bobble also featuring Rainbow Islands (Europe) (Track 2).bin" size="32163600" crc="9eb22530" sha1="bea344b803475b463195df6fd60834069afe246e"/>
+		-->
+		<description>Bubble Bobble also featuring Rainbow Islands (Europe)</description>
+		<year>1996</year>
+		<publisher>Acclaim</publisher>
+		<info name="developer" value="Probe Entertainment"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SLES-00448"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Bubble Bobble also featuring Rainbow Islands (Europe)" sha1="552159e14c9d8ad5c188212588de7319eab9d1c0"/>
 			</diskarea>
 		</part>
 	</software>
@@ -63128,6 +63863,31 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
+	<software name="sampras">
+		<!--
+		http://redump.org/disc/7563/
+		<rom name="Sampras Extreme Tennis (Europe) (En,Fr,De,Es,It).cue" size="266" crc="04480e4e" sha1="ffa5e6c74928f01e470fce1ed11bf9ca9a574e6d"/>
+		<rom name="Sampras Extreme Tennis (Europe) (En,Fr,De,Es,It) (Track 1).bin" size="542827488" crc="366fd133" sha1="dc8e6781f16207776f33daaeb789cfc27f3ae25b"/>
+		<rom name="Sampras Extreme Tennis (Europe) (En,Fr,De,Es,It) (Track 2).bin" size="41543376" crc="c206e837" sha1="3d6468863690e21f935f9be3ec961f78ba1493d3"/>
+		-->
+		<description>Sampras Extreme Tennis (Europe)</description>
+		<year>1997</year>
+		<publisher>Codemasters</publisher>
+		<info name="developer" value="Codemasters"/>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-00217"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Sampras Extreme Tennis (Europe) (En,Fr,De,Es,It)" sha1="2d3c9e180276b5073682eda614bf95d40b3138bb"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- http://redump.org/disc/135/ -->
 	<software name="silenthe" cloneof="silenth">
 		<description>Silent Hill (Europe)</description>
@@ -63609,75 +64369,70 @@ Missing subchannel Q LibCrypt protection
 		</part>
 	</software>
 
-	<software name="xenaeu" cloneof="xena">
-		<!-- http://redump.org/disc/495/
+	<software name="xena">
+		<!--
+		http://redump.org/disc/495/
 		<rom name="Xena - Warrior Princess (Europe).cue" size="98" crc="ae47d108" sha1="584c14f66a7b8d4bcd20e62d3f398085267090a3"/>
 		<rom name="Xena - Warrior Princess (Europe).bin" size="323089536" crc="fa261fdd" sha1="fc941396e2d66dbdeab50a3b46a29c504df46a9d"/>
 		-->
 		<description>Xena - Warrior Princess (Europe)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Universal Studios Digital Arts"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLES-02265"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="xena - warrior princess (europe)" sha1="905363eed4e63e7abc0c5332eb76a0f9833047e3"/>
+				<disk name="Xena - Warrior Princess (Europe)" sha1="905363eed4e63e7abc0c5332eb76a0f9833047e3"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="xenaeup" cloneof="xena">
-		<!-- http://redump.org/disc/73771/
-		<rom name="Xena - Warrior Princess (Europe) (Beta) (1999-08-19).cue" size="118" crc="4c3ef6c5" sha1="e550abafa3a232a2251c4a30b8178f88eadccdd3"/>
-		<rom name="Xena - Warrior Princess (Europe) (Beta) (1999-08-19).bin" size="323089536" crc="c62a1aed" sha1="b08008b525572a1881721841b23e9e9173c13f4f"/>
-		-->
-		<description>Xena - Warrior Princess (Europe, prototype 19990819)</description>
-		<year>1999</year>
-		<publisher>Electronic Arts</publisher>
-		<info name="serial" value="SLES-02265"/>
-		<sharedfeat name="compatibility" value="PAL-E"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="xena - warrior princess (europe) (beta) (1999-08-19)" sha1="7402e2d8ffbd5385665a39f9ca5765d2566a733d"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="xenafr" cloneof="xena">
-		<!-- http://redump.org/disc/27698/
+	<software name="xena_fr" cloneof="xena">
+		<!--
+		http://redump.org/disc/27698/
 		<rom name="Xena - Warrior Princess (France).cue" size="98" crc="884f600d" sha1="fc8d25f2ed23a9288d293f15650da750b6f04fbe"/>
 		<rom name="Xena - Warrior Princess (France).bin" size="322247520" crc="f0e624a4" sha1="c90d7746d4c04475b08396fc19123bed486223cf"/>
 		-->
 		<description>Xena - Warrior Princess (France)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Universal Studios Digital Arts"/>
+		<info name="language" value="French"/>
 		<info name="serial" value="SLES-02266"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="xena - warrior princess (france)" sha1="88bae561994b64c321130b6e014d73b8c95075cd"/>
+				<disk name="Xena - Warrior Princess (France)" sha1="88bae561994b64c321130b6e014d73b8c95075cd"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="xenage" cloneof="xena">
-		<!-- http://redump.org/disc/3102/
+	<software name="xena_de" cloneof="xena">
+		<!--
+		http://redump.org/disc/3102/
 		<rom name="Xena - Warrior Princess (Germany).cue" size="99" crc="1ac61d44" sha1="22ac767a0e7acae3cf7cae83bc78fe91e550ebc9"/>
 		<rom name="Xena - Warrior Princess (Germany).bin" size="322322784" crc="3864ac15" sha1="fbaccb4a05f261b0357dd79ee4f6ee105c161e7f"/>
 		-->
 		<description>Xena - Warrior Princess (Germany)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Universal Studios Digital Arts"/>
+		<info name="language" value="German"/>
 		<info name="serial" value="SLES-02267"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="xena - warrior princess (germany)" sha1="fa99dca29d58cb8ba63bd92c61bd733ecf663c46"/>
+				<disk name="Xena - Warrior Princess (Germany)" sha1="fa99dca29d58cb8ba63bd92c61bd733ecf663c46"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="xenasp" cloneof="xena">
+	<software name="xena_es" cloneof="xena">
 		<!-- http://redump.org/disc/27846/
 		<rom name="Xena - Warrior Princess (Spain).cue" size="95" crc="6a1b3aee" sha1="db8298341cf382f1b0f0c8eec91f8c3af7112ba6"/>
 		<rom name="Xena - Warrior Princess (Spain).bin" size="322647360" crc="ae926547" sha1="c29377d3a8a1de78a536461c4b9803fbccad48cb"/>
@@ -63685,11 +64440,14 @@ Missing subchannel Q LibCrypt protection
 		<description>Xena - Warrior Princess (Spain)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Universal Studios Digital Arts"/>
+		<info name="language" value="Spanish"/>
 		<info name="serial" value="SLES-02268"/>
 		<sharedfeat name="compatibility" value="PAL-E"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="xena - warrior princess (spain)" sha1="b161ef9a8fdf12c063691b0c43b8e06c905599fa"/>
+				<disk name="Xena - Warrior Princess (Spain)" sha1="b161ef9a8fdf12c063691b0c43b8e06c905599fa"/>
 			</diskarea>
 		</part>
 	</software>
@@ -64569,6 +65327,27 @@ use an alternate design found on the demo disk... It might be possible to enable
 	</software>
 
 	<software name="xenap" cloneof="xena">
+		<!--
+		http://redump.org/disc/73771/
+		<rom name="Xena - Warrior Princess (Europe) (Beta) (1999-08-19).cue" size="118" crc="4c3ef6c5" sha1="e550abafa3a232a2251c4a30b8178f88eadccdd3"/>
+		<rom name="Xena - Warrior Princess (Europe) (Beta) (1999-08-19).bin" size="323089536" crc="c62a1aed" sha1="b08008b525572a1881721841b23e9e9173c13f4f"/>
+		-->
+		<description>Xena - Warrior Princess (Europe, prototype 19990819)</description>
+		<year>1999</year>
+		<publisher>Electronic Arts</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Universal Studios Digital Arts"/>
+		<info name="language" value="English"/>
+		<info name="serial" value="SLES-02265"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Xena - Warrior Princess (Europe) (beta) (1999-08-19)" sha1="7402e2d8ffbd5385665a39f9ca5765d2566a733d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="xenap_us" cloneof="xena">
 		<!-- Original images (Hidden Palace)
 		<rom name="PSX - Xena Warrior Princess 8-11-99 Beta 2.cue" size="106" crc="9246d5ab" sha1="a814b889c39b124ebaf5b36df552bda29188e3f4"/>
 		<rom name="PSX - Xena Warrior Princess 8-11-99 Beta 2.img" size="322790832" crc="8b374bab" sha1="7ed87334f2012441df585e603bffd28033530a8c"/>
@@ -64576,6 +65355,8 @@ use an alternate design found on the demo disk... It might be possible to enable
 		<description>Xena - Warrior Princess (USA, prototype 19990811)</description>
 		<year>1999</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="developer" value="Universal Studios Digital Arts"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00977"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">

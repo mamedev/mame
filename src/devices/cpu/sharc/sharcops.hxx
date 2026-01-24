@@ -2728,5 +2728,5 @@ void adsp21062_device::sharcop_idle()
 
 void adsp21062_device::sharcop_unimplemented()
 {
-	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X\n", (uint16_t)(m_core->opcode >> 32), (uint32_t)(m_core->opcode), m_core->pc);
+	fatalerror("SHARC: Unimplemented opcode %012X at %08X\n", m_core->opcode, m_core->pc);
 }

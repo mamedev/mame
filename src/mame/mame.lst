@@ -16496,10 +16496,6 @@ cncchess2
 @source:chess/conic_cchess3.cpp
 cncchess3
 
-@source:chess/krypton_challenge.cpp
-kchal
-kchala
-
 @source:chess/regence.cpp
 regence
 
@@ -16831,6 +16827,7 @@ cbm8296gd
 mmf9000
 mmf9000_se
 pet2001
+pet2001j
 pet20018
 pet2001b
 pet2001b16
@@ -16888,45 +16885,6 @@ c10
 @source:cromemco/mcb216.cpp
 cb308
 mcb216
-
-@source:cxg/chess2001.cpp
-ch2001
-
-@source:cxg/computachess.cpp
-scpchess
-scpchessa
-
-@source:cxg/computachess2.cpp
-cpchess2
-
-@source:cxg/dominator.cpp
-scmder
-sdtor
-sdtora
-sgalaxy
-sgalaxya
-sgalaxyb
-
-@source:cxg/pchess.cpp
-pchess
-
-@source:cxg/professor.cpp
-scprof
-
-@source:cxg/royal.cpp
-granada
-sroyal
-supra
-
-@source:cxg/senterprise.cpp
-senterp
-senterpc
-
-@source:cxg/junior.cpp
-sjunior
-
-@source:cxg/sphinx40.cpp
-sphinx40
 
 @source:cybiko/cybiko.cpp
 cybikov1
@@ -33725,6 +33683,9 @@ tricep
 @source:motorola/ampscarp.cpp
 ampscarp
 
+@source:motorola/assist05.cpp
+assist05
+
 @source:motorola/exorciser.cpp
 exorciser
 
@@ -35281,6 +35242,50 @@ elf2
 
 @source:netronics/exp85.cpp
 exp85
+
+@source:newcrest/chess2001.cpp
+ch2001
+
+@source:newcrest/computachess.cpp
+scpchess
+scpchessa
+
+@source:newcrest/computachess2.cpp
+cpchess2
+
+@source:newcrest/dominator.cpp
+scmder
+sdtor
+sdtora
+sgalaxy
+sgalaxya
+sgalaxyb
+
+@source:newcrest/legend.cpp
+kchal
+kchala
+slegend
+
+@source:newcrest/pchess.cpp
+pchess
+
+@source:newcrest/professor.cpp
+scprof
+
+@source:newcrest/royal.cpp
+granada
+sroyal
+supra
+
+@source:newcrest/senterprise.cpp
+senterp
+senterpc
+
+@source:newcrest/junior.cpp
+sjunior
+
+@source:newcrest/sphinx40.cpp
+sphinx40
 
 @source:next/next.cpp
 next
@@ -44055,6 +44060,9 @@ madmoney2
 apvm110
 apvm110a
 
+@source:skeleton/mcc1.cpp
+mcc1
+
 @source:skeleton/megacrane.cpp
 megacrane
 
@@ -44064,6 +44072,9 @@ mes
 @source:skeleton/mfabfz.cpp
 mfabfz
 mfabfz85
+
+@source:skeleton/mgt_multigame.cpp
+mgtmg9
 
 @source:skeleton/mice.cpp
 mice_6502

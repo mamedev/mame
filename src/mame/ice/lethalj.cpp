@@ -192,6 +192,24 @@ Pin #11(+) | | R               |
 #define VIDEO_CLOCK_LETHALJ     XTAL(11'059'200)
 
 
+/*************************************
+ *
+ *  Initialisation
+ *
+ *************************************/
+
+void lethalj_state::machine_start()
+{
+	m_lamps.resolve();
+
+	save_item(NAME(m_blitter_data));
+	save_item(NAME(m_vispage));
+	save_item(NAME(m_gunx));
+	save_item(NAME(m_guny));
+	save_item(NAME(m_blank_palette));
+}
+
+
 
 /*************************************
  *
@@ -741,7 +759,7 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *  Machine drivers
+ *  Machine configs
  *
  *************************************/
 
@@ -1234,19 +1252,19 @@ void lethalj_state::init_cclownz()
  *
  *************************************/
 
-GAME( 1996, lethalj,   0,        lethalj,  lethalj,   lethalj_state, empty_init,    ROT0,  "The Game Room",                 "Lethal Justice (Version 2.3)", 0 )
+GAME( 1996, lethalj,   0,        lethalj,  lethalj,   lethalj_state, empty_init,    ROT0,  "The Game Room",                 "Lethal Justice (Version 2.3)", MACHINE_SUPPORTS_SAVE )
 /* manual states (C) 1998 Innovative Concepts in Entertainment, Inc. */
-GAME( 1998, franticf,  0,        franticf, franticf,  lethalj_state, empty_init,    ROT0,  "ICE",                           "Frantic Fred (Release 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // unemulated I/Os, flickers when inserting a coin (should disable blitter?)
-GAME( 1996, franticfa, franticf, franticf, franticfa, lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Frantic Fred", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // as above
-GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 10)", 0 )
-GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 8)", 0 )
-GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 7)", 0 )
-GAME( 1997, eggventr4, eggventr, gameroom, eggventr2, lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 4)", 0 )
-GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 2)", 0 )
-GAME( 1997, eggventr1, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "Kyle Hodgetts / The Game Room", "Egg Venture (Release 1)", 0 )
-GAME( 1997, eggventra, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", 0 )
-GAME( 1997, eggventrd, eggventr, gameroom, eggvntdx,  lethalj_state, empty_init,    ROT0,  "The Game Room",                 "Egg Venture Deluxe", 0 )
-GAME( 1997, ripribit,  0,        gameroom, ripribit,  lethalj_state, init_ripribit, ROT0,  "LAI Games",                     "Ripper Ribbit (Version 3.5)", 0 )
-GAME( 1997, ripribita, ripribit, gameroom, ripribit,  lethalj_state, init_ripribit, ROT0,  "LAI Games",                     "Ripper Ribbit (Version 2.8.4)", 0 )
-GAME( 1999, cfarm,     0,        gameroom, cfarm,     lethalj_state, init_cfarm,    ROT90, "LAI Games",                     "Chicken Farm (Version 2.0)", 0 )
-GAME( 1999, cclownz,   0,        gameroom, cclownz,   lethalj_state, init_cclownz,  ROT0,  "LAI Games",                     "Crazzy Clownz (Version 1.0)", 0 )
+GAME( 1998, franticf,  0,        franticf, franticf,  lethalj_state, empty_init,    ROT0,  "ICE",                           "Frantic Fred (Release 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // unemulated I/Os, flickers when inserting a coin (should disable blitter?)
+GAME( 1996, franticfa, franticf, franticf, franticfa, lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Frantic Fred", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // as above
+GAME( 1997, eggventr,  0,        gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 10)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, eggventr8, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 8)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, eggventr7, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 7)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, eggventr4, eggventr, gameroom, eggventr2, lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, eggventr2, eggventr, gameroom, eggventr2, lethalj_state, empty_init,    ROT0,  "ICE / The Game Room",           "Egg Venture (Release 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, eggventr1, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "Kyle Hodgetts / The Game Room", "Egg Venture (Release 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, eggventra, eggventr, gameroom, eggventr,  lethalj_state, empty_init,    ROT0,  "The Game Room (A.L. Australia license)", "Egg Venture (A.L. Release)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, eggventrd, eggventr, gameroom, eggvntdx,  lethalj_state, empty_init,    ROT0,  "The Game Room",                 "Egg Venture Deluxe", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, ripribit,  0,        gameroom, ripribit,  lethalj_state, init_ripribit, ROT0,  "LAI Games",                     "Ripper Ribbit (Version 3.5)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, ripribita, ripribit, gameroom, ripribit,  lethalj_state, init_ripribit, ROT0,  "LAI Games",                     "Ripper Ribbit (Version 2.8.4)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, cfarm,     0,        gameroom, cfarm,     lethalj_state, init_cfarm,    ROT90, "LAI Games",                     "Chicken Farm (Version 2.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1999, cclownz,   0,        gameroom, cclownz,   lethalj_state, init_cclownz,  ROT0,  "LAI Games",                     "Crazzy Clownz (Version 1.0)", MACHINE_SUPPORTS_SAVE )

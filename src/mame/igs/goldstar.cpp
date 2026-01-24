@@ -17895,7 +17895,7 @@ ROM_END
 
     Micro Manufacturing, Inc.
     Date: 04-20-1994
-	Ser#: MAC-PCB-145090
+    Ser#: MAC-PCB-145090
 
   - 1x NEC D8255AC-2
   - 6x HM6116 SRAMs
@@ -33726,8 +33726,8 @@ GAMEL( 199?, cb3e,       ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e
 GAMEL( 199?, cb3f,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3f,      ROT0, "bootleg (Cleco)",   "Cherry Bonus III (set 5, encrypted bootleg)", MACHINE_NOT_WORKING, layout_chrygld ) // partially decrypted, stops at 'call attendant'
 GAMEL( 199?, cb3g,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 6)",          0,                   layout_cherryb3 )
 GAMEL( 199?, cb3h,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 7)",          0,                   layout_cherryb3 )
-GAMEL( 1992, cb3i,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.3.0)",                  MACHINE_NOT_WORKING, layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx. 
-GAMEL( 199?, cb3j,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.2.20)",                 MACHINE_NOT_WORKING, layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx. 
+GAMEL( 1992, cb3i,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.3.0)",                  MACHINE_NOT_WORKING, layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx.
+GAMEL( 199?, cb3j,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.2.20)",                 MACHINE_NOT_WORKING, layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx.
 GAMEL( 199?, cb3s51,     ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.5.1)",                  0,                   layout_cherryb3 )
 GAMEL( 199?, chryglda,   ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                   layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chryangla, ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // DYNA CB3  V1.40 string, playable, but still has protections

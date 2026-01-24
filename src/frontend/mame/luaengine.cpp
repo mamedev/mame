@@ -1398,7 +1398,23 @@ void lua_engine::initialize()
 			}
 		}));
 	core_options_entry_type.set("description", &core_options::entry::description);
-	core_options_entry_type.set("default_value", &core_options::entry::default_value);
+	core_options_entry_type.set("default_value",
+		[](core_options::entry &e, sol::this_state s) -> sol::object
+		{
+			if (e.type() == core_options::option_type::INVALID)
+				return sol::lua_nil;
+			switch (e.type())
+			{
+			case core_options::option_type::BOOLEAN:
+				return sol::make_object(s, e.bool_default_value());
+			case core_options::option_type::INTEGER:
+				return sol::make_object(s, e.int_default_value());
+			case core_options::option_type::FLOAT:
+				return sol::make_object(s, e.float_default_value());
+			default:
+				return sol::make_object(s, e.default_value());
+			}
+		});
 	core_options_entry_type.set("minimum", &core_options::entry::minimum);
 	core_options_entry_type.set("maximum", &core_options::entry::maximum);
 	core_options_entry_type.set("has_range", &core_options::entry::has_range);

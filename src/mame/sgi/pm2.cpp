@@ -8,7 +8,6 @@
  *  -
  *
  * TODO:
- *  - keyboard
  *  - mouse
  *  - memory parity
  *  - serial flow control
@@ -26,6 +25,8 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
+
+#include "emupal.h"
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
@@ -85,6 +86,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	void gfx_mconfig(machine_config &config);
 
 	void mem_map(address_map &map) ATTR_COLD;
 
@@ -168,9 +171,9 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_current_mmu(m_mmu);
 
 	// Multibus interrupts
-	int_callback<1>().set_inputline(m_cpu, INPUT_LINE_IRQ1);
-	int_callback<2>().set_inputline(m_cpu, INPUT_LINE_IRQ2);
-	int_callback<5>().set_inputline(m_cpu, INPUT_LINE_IRQ5);
+	int_callback<1>().set_inputline(m_cpu, INPUT_LINE_IRQ1).invert();
+	int_callback<2>().set_inputline(m_cpu, INPUT_LINE_IRQ2).invert();
+	int_callback<5>().set_inputline(m_cpu, INPUT_LINE_IRQ5).invert();
 
 	input_merger_any_high_device &irq6(INPUT_MERGER_ANY_HIGH(config, "irq6"));
 	irq6.output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ6);
@@ -206,6 +209,8 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	m_port[1]->rxd_handler().set(m_duart[0], FUNC(scn2681_device::rx_b_w));
 	m_port[2]->rxd_handler().set(m_duart[1], FUNC(scn2681_device::rx_a_w));
 	m_port[3]->rxd_handler().set(m_duart[1], FUNC(scn2681_device::rx_b_w));
+
+	gfx_mconfig(config);
 }
 
 void sgi_pm2_device::device_config_complete()
@@ -328,6 +333,26 @@ void sgi_pm2_device::map_w(offs_t offset, u16 data, u16 mem_mask)
 		LOG("map_w access disabled\n");
 	else
 		m_map[offset >> 11] = data;
+}
+
+static const gfx_layout sgi_pm2 =
+{
+	8, 16, 144, 1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 15 * 8, 14 * 8, 13 * 8, 12 * 8, 11 * 8, 10 * 8, 9 * 8, 8 * 8, 7 * 8, 6 * 8, 5 * 8, 4 * 8, 3 * 8, 2 * 8, 1 * 8, 0 * 8 },
+	8 * 16
+};
+
+static GFXDECODE_START(sgi_pm2_gfx)
+	GFXDECODE_ENTRY("prom1", 0x1b8c, sgi_pm2, 0, 1)
+GFXDECODE_END
+
+void sgi_pm2_device::gfx_mconfig(machine_config &config)
+{
+	// gfxdecode is only to show the font data in the tile viewer
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+	GFXDECODE(config, "gfx", "palette", sgi_pm2_gfx);
 }
 
 ROM_START(sgi_pm2)
