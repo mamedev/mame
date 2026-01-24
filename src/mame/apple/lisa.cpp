@@ -90,7 +90,7 @@ private:
 	bool m_power_button_forced_pressed, m_power_on, m_crdy, m_iocop_g3_forced_low;
 	bool m_kbd, m_iocop_kbd, m_kbcop_kbd, m_kbcop_so;
 	u8 m_iocop_select, m_kbcop_d;
-	
+
 	void lisa_ram_map(address_map &map) ATTR_COLD;
 	void lisa_io_map(address_map &map) ATTR_COLD;
 	void lisa_special_io_map(address_map &map) ATTR_COLD;
@@ -316,7 +316,7 @@ void lisa_state::machine_start()
 	m_iocop_select = 0;
 	m_iocop_kbd = false;
 	m_kbcop_kbd = false;
-	m_kbd = true;	
+	m_kbd = true;
 	m_kbcop_so = false;
 	m_kbcop_d = 0;
 }
@@ -362,7 +362,7 @@ u8 lisa_state::iocop_g_r()
 		g |= 2 | (m_kbd ? 1 : 0);
 	}
 
-	//	logerror("iocop g read %d\n", (machine().time().as_ticks(3932160*2)+1)/2);
+	//  logerror("iocop g read %d\n", (machine().time().as_ticks(3932160*2)+1)/2);
 
 	return g;
 }
@@ -371,7 +371,7 @@ u8 lisa_state::kbcop_g_r()
 {
 	if(m_kbcop_so) {
 		u32 pc = m_kbcop->pcbase();
-		//		logerror("kbcop g read %d (%x)\n", (machine().time().as_ticks(3932160*2)+1)/2, m_kbcop->pcbase());
+		//      logerror("kbcop g read %d (%x)\n", (machine().time().as_ticks(3932160*2)+1)/2, m_kbcop->pcbase());
 		// bit3=0 seems to mean reset?
 		return 0xe | (m_kbd  && (pc != 0xb2000) ? 0 : 1);
 
@@ -389,7 +389,7 @@ void lisa_state::iocop_kbd_w(int state)
 
 void lisa_state::kbcop_kbd_w(int state)
 {
-	//	logerror("kbcop sk %d\n", state);
+	//  logerror("kbcop sk %d\n", state);
 	m_kbcop_kbd = state;
 	kbd_update();
 }
@@ -413,7 +413,7 @@ u8 lisa_state::kbcop_l_r()
 void lisa_state::kbcop_d_w(u8 data)
 {
 	m_kbcop_d = data;
-	//	logerror("kbcop_d_w %x (%03x)\n", data, m_kbcop->pcbase());
+	//  logerror("kbcop_d_w %x (%03x)\n", data, m_kbcop->pcbase());
 }
 
 void lisa_state::iocop_d_w(u8 data)

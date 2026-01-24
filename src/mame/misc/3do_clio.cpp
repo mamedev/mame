@@ -33,7 +33,7 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 	, m_xbus_write_cb(*this)
 	, m_dac_l(*this)
 	, m_dac_r(*this)
-//	, m_adb_in_cb(*this)
+//  , m_adb_in_cb(*this)
 	, m_adb_out_cb(*this)
 {
 }
@@ -68,8 +68,8 @@ void clio_device::device_start()
 	save_item(NAME(m_audout));
 	save_item(NAME(m_cstatbits));
 	save_item(NAME(m_wdog));
-//	save_item(NAME(m_hcnt));
-//	save_item(NAME(m_vcnt));
+//  save_item(NAME(m_hcnt));
+//  save_item(NAME(m_vcnt));
 	save_item(NAME(m_seed));
 	save_item(NAME(m_random));
 	save_item(NAME(m_irq0));

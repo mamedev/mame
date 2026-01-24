@@ -22,10 +22,10 @@
               bypass it by entering then exiting service mode;
     - sgt24h: has input analog issues, steering doesn't center when neutral,
       gas and brake pedals pulses instead of being fixed;
-	- vcop2: stage select has tilemap priority issue, tilemap B (city model) has priority bit set,
-	         yet it should appear underneath tilemap A ("shoot to select") which does not;
-	- srallyc: initial enemy car placement seems to be slightly incorrect for a few cars,
-	           seems to be affected by i960 clock speed, may need wait state emulation to fix
+    - vcop2: stage select has tilemap priority issue, tilemap B (city model) has priority bit set,
+             yet it should appear underneath tilemap A ("shoot to select") which does not;
+    - srallyc: initial enemy car placement seems to be slightly incorrect for a few cars,
+               seems to be affected by i960 clock speed, may need wait state emulation to fix
 
     Notes:
     - some analog games can be calibrated in service mode via volume control item ...
@@ -7506,16 +7506,16 @@ ROM_START( hpyagu98 ) /* Hanguk Pro Yagu 98, Model 2A, ROM board# 834-11342 REV.
 	ROM_LOAD16_WORD_SWAP( "bb-sn-4.37", 0x600000, 0x200000, CRC(8692fbf3) SHA1(d8e854bba7b54fba85e182d761a9fd02fd13646f) )
 
 	/*
-		hpyagu98 requires certain values to be set in the EEPROM and backup RAM, otherwise it fails with Error #1:
-		- The values 0xfa, 0xe3, 0xa6 and 0x29 at addresses 0x08 through 0x0b respectively in the EEPROM;
-		- The string "98KOREA PRO B.B." at the start of backup RAM;
-		- The 32-bit magic number 0x5042c660 at address 0x398 in backup RAM;
-		- A 16-bit checksum at address 0x1d4 in backup RAM.
+	    hpyagu98 requires certain values to be set in the EEPROM and backup RAM, otherwise it fails with Error #1:
+	    - The values 0xfa, 0xe3, 0xa6 and 0x29 at addresses 0x08 through 0x0b respectively in the EEPROM;
+	    - The string "98KOREA PRO B.B." at the start of backup RAM;
+	    - The 32-bit magic number 0x5042c660 at address 0x398 in backup RAM;
+	    - A 16-bit checksum at address 0x1d4 in backup RAM.
 
-		It is possible that this may be a form of copy protection to prevent simple duplication of the game ROMs.
+	    It is possible that this may be a form of copy protection to prevent simple duplication of the game ROMs.
 
-		In addition, with the other values unchanged the game/coin options are invalid. These partly handcrafted EEPROM and backup RAM
-		files are provided to allow the game to boot with the game/coin options set to match the defaults for dynabb97.
+	    In addition, with the other values unchanged the game/coin options are invalid. These partly handcrafted EEPROM and backup RAM
+	    files are provided to allow the game to boot with the game/coin options set to match the defaults for dynabb97.
 	*/
 	ROM_REGION16_LE(0x80, "eeprom", 0) // EEPROM
 	ROM_LOAD("hpyagu98_nvram", 0x00, 0x80, CRC(3634c60f) SHA1(1ab7b74fd05b2d21496af9b2a477c0d197847c55))

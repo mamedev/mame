@@ -1656,7 +1656,7 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 
 	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c2n");
 	m_cassette->read_handler().set(m_pia1, FUNC(pia6821_device::ca1_w));
-	
+
 	PET_DATASSETTE_PORT(config, m_cassette2, cbm_datassette_devices, nullptr);
 	m_cassette2->read_handler().set(M6522_TAG, FUNC(via6522_device::write_cb1));
 
@@ -2243,7 +2243,7 @@ ROM_START( pet8032 )
 	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.ua3", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) ) 
+	ROM_LOAD( "901447-10.ua3", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 ROM_END
 
 
@@ -2260,7 +2260,7 @@ ROM_START( cbm8032 )
 	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.ua3", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) ) 
+	ROM_LOAD( "901447-10.ua3", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 ROM_END
 
 #define rom_cbm8096 rom_cbm8032
@@ -2313,7 +2313,7 @@ ROM_START( cbm8032_se )
 	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-14.ua3", 0x0000, 0x800, CRC(48c77d29) SHA1(aa7c8ff844d16ec05e2b32acc586c58d9e35388c) ) 
+	ROM_LOAD( "901447-14.ua3", 0x0000, 0x800, CRC(48c77d29) SHA1(aa7c8ff844d16ec05e2b32acc586c58d9e35388c) )
 ROM_END
 
 
@@ -2367,7 +2367,7 @@ ROM_START( cbm8296 )
 	ROM_LOAD( "8296.ue8", 0x000, 0x800, CRC(a3475de6) SHA1(b715db83fd26458dfd254bef5c4aae636753f7f5) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
-	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) ) 
+	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 
 	ROM_REGION( 0x20, "prom", 0 )
 	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
@@ -2402,7 +2402,7 @@ ROM_START( cbm8296ed )
 	ROM_LOAD( "execudesk.ue8", 0x0000, 0x1000, CRC(bef0eaa1) SHA1(7ea63a2d651f516e96b8725195c13542ea495ebd) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
-	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) ) 
+	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 
 	ROM_REGION( 0x20, "prom", 0 )
 	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
@@ -2435,7 +2435,7 @@ ROM_START( cbm8296d )
 	ROM_LOAD( "324243-01.ue8", 0x0000, 0x1000, CRC(4000e833) SHA1(dafbdf8ba0a1fe7d7b9586ffbfc9e5390c0fcf6f) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
-	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) ) 
+	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 
 	ROM_REGION( 0x20, "prom", 0 )
 	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
@@ -2503,7 +2503,7 @@ ROM_START( cbm8296gd )
 	ROM_LOAD( "324243-01.ue8", 0x0000, 0x1000, CRC(4000e833) SHA1(dafbdf8ba0a1fe7d7b9586ffbfc9e5390c0fcf6f) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
-	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) ) 
+	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 
 	ROM_REGION( 0x20, "prom", 0 )
 	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing

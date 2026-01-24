@@ -486,7 +486,7 @@ void snesb_state::piratdwb_map(address_map &map)
 	map(0xc00000, 0xc00000).r("latch", FUNC(generic_latch_8_device::read));
 	map(0xc00001, 0xc00001).w("latch", FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xc00002, 0xc00002).portr("C00002");
-//	map(0xc00003, 0xc00003).w // watchdog? (written to on every NMI)
+//  map(0xc00003, 0xc00003).w // watchdog? (written to on every NMI)
 	map(0xc00004, 0xc00004).portr("DSW");
 }
 
@@ -498,9 +498,9 @@ void snesb_state::piratdwb_68k_map(address_map &map)
 	map(0x050000, 0x0503ff).ram();
 
 	map(0x080000, 0x080000).w("latch", FUNC(generic_latch_8_device::write));
-//	map(0x0c0000, 0x0c0000).w // ?
+//  map(0x0c0000, 0x0c0000).w // ?
 	map(0x100000, 0x100001).portr("COIN");
-//	map(0x140000, 0x140000).w // ?
+//  map(0x140000, 0x140000).w // ?
 	map(0x180000, 0x180000).lw8(
 		NAME([this](offs_t, u8) { m_68k->set_input_line(INPUT_LINE_NMI, m_prot_nmi = 0); })
 	);

@@ -65,13 +65,14 @@
 
 #include "emu.h"
 
+#include "gridkeyb.h"
+
 #include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
-#include "gridkeyb.h"
 #include "machine/i7220.h"
-#include "machine/i8087.h"
 #include "machine/i80130.h"
+#include "machine/i8087.h"
 #include "machine/i8255.h"
 #include "machine/mm58174.h"
 #include "machine/ram.h"
@@ -116,12 +117,12 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::WAN; }
 
-	void grid1129(machine_config &config);
-	void grid1131(machine_config &config);
-	void grid1121(machine_config &config);
-	void grid1139(machine_config &config);
-	void grid1109(machine_config &config);
-	void grid1101(machine_config &config);
+	void grid1129(machine_config &config) ATTR_COLD;
+	void grid1131(machine_config &config) ATTR_COLD;
+	void grid1121(machine_config &config) ATTR_COLD;
+	void grid1139(machine_config &config) ATTR_COLD;
+	void grid1109(machine_config &config) ATTR_COLD;
+	void grid1101(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -136,6 +137,11 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	required_device<tms9914_device> m_tms9914;
+
+	bool m_kbd_ready = false;
+	uint16_t m_kbd_data = 0;
+
+	uint16_t *m_videoram = nullptr;
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -157,11 +163,6 @@ private:
 	void grid1101_io(address_map &map) ATTR_COLD;
 	void grid1101_map(address_map &map) ATTR_COLD;
 	void grid1121_map(address_map &map) ATTR_COLD;
-
-	bool m_kbd_ready = false;
-	uint16_t m_kbd_data = 0;
-
-	uint16_t *m_videoram = nullptr;
 };
 
 

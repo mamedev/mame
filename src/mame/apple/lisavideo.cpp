@@ -67,8 +67,8 @@ void lisa_video_device::device_add_mconfig(machine_config &config)
 void lisa_video_device::device_config_complete()
 {
 
-//	m_visible = screen().visible_area();
-	//	fprintf(stderr, "COMPLETE size %x %x - %d %d\n", m_visible.left(), m_visible.top(), m_visible.width(), m_visible.height());
+//  m_visible = screen().visible_area();
+	//  fprintf(stderr, "COMPLETE size %x %x - %d %d\n", m_visible.left(), m_visible.top(), m_visible.width(), m_visible.height());
 }
 
 void lisa_video_device::base_w(u8 data)

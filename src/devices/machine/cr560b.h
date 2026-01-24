@@ -56,7 +56,7 @@ private:
 	void cmd_seek();
 	void cmd_motor_on();
 	void cmd_motor_off();
-//	void cmd_diag();
+//  void cmd_diag();
 	void cmd_read_status();
 	//void cmd_drawer_open();
 	//void cmd_drawer_close();

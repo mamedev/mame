@@ -384,7 +384,7 @@ void luna_68k_state::i2m_int_clear(u32 data)
 
 void luna_68k_state::cpu_interrupt_set(int level, int state)
 {
-	//	logerror("cpu_interrupt_set(%d, %d)\n", level, state);
+	//  logerror("cpu_interrupt_set(%d, %d)\n", level, state);
 	if(state)
 		m_cpu_interrupts |= 1 << level;
 	else
@@ -397,7 +397,7 @@ void luna_68k_state::cpu_interrupt_set(int level, int state)
 
 u8 luna_68k_state::cpu_vector_r()
 {
-	//	logerror("Interrupt taken, mask=%02x\n", m_cpu_interrupts);
+	//  logerror("Interrupt taken, mask=%02x\n", m_cpu_interrupts);
 	if(BIT(m_cpu_interrupts, ICPU_IOC)) {
 		// Code tries to clear the interrupt at 30000838 but the mmu misroutes the address (to 838, in ram)?
 		cpu_interrupt_set(ICPU_IOC, 0);
@@ -431,7 +431,7 @@ void luna_68k_state::acrtc_display(bitmap_ind16 &bitmap, const rectangle &clipre
 {
 	if(data)
 		bitmap.pix(y, x) = 257;
-	//		logerror("%d %d\n", x, y);
+	//      logerror("%d %d\n", x, y);
 }
 
 u32 luna_68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -478,7 +478,7 @@ void luna_68k_state::cpu_map(address_map &map)
 	map(0x20200000, 0x20200003).lr32(NAME([]() -> u32 { return 1; }));
 	map(0x20280000, 0x2029ffff).rw(FUNC(luna_68k_state::ioc_ram_r), FUNC(luna_68k_state::ioc_ram_w));
 
-	//	map(0x30000000, 0x3fffffff).r(FUNC(luna_68k_state::bus_error_r));
+	//  map(0x30000000, 0x3fffffff).r(FUNC(luna_68k_state::bus_error_r));
 	map(0x30000834, 0x30000837).rw(FUNC(luna_68k_state::i2m_r), FUNC(luna_68k_state::m2i_w));
 	map(0x30000838, 0x3000083b).w(FUNC(luna_68k_state::i2m_int_clear));
 
@@ -780,7 +780,7 @@ INPUT_PORTS_START(luna)
 	PORT_DIPSETTING(         0x00000040, "On")
 	PORT_DIPNAME(0x00000080, 0x00000000, "Disable diagnostics")
 	PORT_DIPSETTING(         0x00000000, "Off")
- 	PORT_DIPSETTING(         0x00000080, "On")
+	PORT_DIPSETTING(         0x00000080, "On")
 	PORT_DIPNAME(0x00000100, 0x00000000, "unk08")
 	PORT_DIPSETTING(         0x00000000, "Off")
 	PORT_DIPSETTING(         0x00000100, "On")
