@@ -243,6 +243,137 @@ def decode_dram_stream(stream):
     return entries
 
 
+def format_handler_detail(entry):
+    """
+    Format decoded details for a handler entry's bytes.
+
+    Returns a string with the decoded meaning of each byte, or None
+    if no detailed decode is available for this handler type.
+    """
+    b = entry['bytes']
+    handler = entry.get('handler', '')
+
+    if handler == '0x08' and len(b) >= 10:
+        # Pitch handler (dram_config_handler_08, CODE:ADBD)
+        # byte[0]: dispatch (bits 2:0 = sub-flags)
+        # byte[1]: velocity sensitivity (0=none)
+        # byte[2]: note offset (unsigned, added to MIDI note, octave-wrapped)
+        # byte[3]: ctrl (bit3=MIX override, bit5=portamento, bit7=modulation)
+        # byte[4]: pitch bend range (stored & 0x7F)
+        # byte[5]: fine tune low
+        # byte[6]: fine tune high
+        # byte[7]: (skipped by firmware, unused)
+        # byte[8]: portamento/mod rate
+        # byte[9]: portamento/mod depth
+        flags = []
+        if b[3] & 0x80:
+            flags.append('MOD')
+        if b[3] & 0x20:
+            flags.append('PORT')
+        if b[3] & 0x08:
+            flags.append('MIX_OVR')
+        flags_str = '|'.join(flags) if flags else 'none'
+        fine = (b[6] << 8) | b[5]
+        vel_str = f"vel_sens=0x{b[1]:02X}" if b[1] else "vel_sens=off"
+        fine_str = f"fine=0x{fine:04X}" if fine else "fine=0"
+        bend_str = f"bend={b[4] & 0x7F}" if b[4] & 0x7F else ""
+        mod_str = ""
+        if b[8] or b[9]:
+            mod_str = f" rate=0x{b[8]:02X} depth=0x{b[9]:02X}"
+        parts = [f"note_ofs=0x{b[2]:02X}", vel_str, f"ctrl=[{flags_str}]"]
+        if fine:
+            parts.append(fine_str)
+        if bend_str:
+            parts.append(bend_str)
+        if mod_str:
+            parts.append(mod_str.strip())
+        return ' '.join(parts)
+
+    elif handler == '0x10' and len(b) >= 9:
+        # Amplitude handler (dram_config_handler_10, CODE:B030)
+        # byte[0]: dispatch/flags (bit0=output_sel, bit1=copy_level, bit2=phase_inv)
+        # byte[1]: base level
+        # byte[2]: amplitude (0=skip/NOP path)
+        # byte[3]: envelope ctrl (bit7=env_on, bit6=no_vel_scale, bit4=special, bit0=mod_enable)
+        # byte[4]: attack/decay rate (bit3=portamento flag)
+        # byte[5]: (unused in read path)
+        # byte[6]: sustain level
+        # byte[7]: velocity sensitivity
+        # byte[8]: modulation amount
+        if b[2] == 0:
+            return "amplitude=0 (skip/NOP)"
+        flags = []
+        if b[3] & 0x80:
+            flags.append('ENV')
+        if b[3] & 0x40:
+            flags.append('NO_VEL_SCALE')
+        if b[3] & 0x10:
+            flags.append('SPECIAL')
+        if b[3] & 0x01:
+            flags.append('MOD')
+        flags_str = '|'.join(flags) if flags else 'none'
+        parts = [f"amp=0x{b[2]:02X}", f"level=0x{b[1]:02X}",
+                 f"env=[{flags_str}]", f"atk=0x{b[4]:02X}",
+                 f"sus=0x{b[6]:02X}"]
+        if b[7]:
+            parts.append(f"vel=0x{b[7]:02X}")
+        if b[8]:
+            parts.append(f"mod=0x{b[8]:02X}")
+        return ' '.join(parts)
+
+    elif handler == '0x18' and len(b) >= 4:
+        # D-RAM write handler (dram_config_handler_18, CODE:B222)
+        # byte[0]: value written to D-RAM slot
+        # byte[1-3]: modulation/velocity data
+        val = b[0]
+        return f"val=0x{val:02X} mod=[{b[1]:02X} {b[2]:02X} {b[3]:02X}]"
+
+    elif handler == '0x20' and len(b) >= 4:
+        # Output config handler (dram_config_handler_20, CODE:B278)
+        # byte[0]: dispatch
+        # byte[1]: XRAM 0xF9 value
+        # byte[2]: XRAM 0xFA value
+        # byte[3]: bits 2:0 → XRAM 0xFB low bits
+        return f"xram_F9=0x{b[1]:02X} xram_FA=0x{b[2]:02X} xram_FB_lo={b[3] & 7}"
+
+    elif entry['name'] == 'terminator':
+        return f"val=0x{b[0]:02X} → D-RAM word value"
+
+    return None
+
+
+def format_voice_init_detail(data):
+    """
+    Decode 7-byte voice init data (copied to XRAM voice slot by voice_init_copy_and_envelope).
+
+    Layout (from firmware at CODE:AB73):
+      [0:1]: Envelope segment table pointer (LE) - points to 3-byte entries in code space
+      [2]:   Control flags:
+             bit 7 = envelope enable (triggers rate/level processing)
+             bit 6 = level sign flag (ORs 0x80 into velocity level)
+             (byte & 0x48) != 0x40 → clears slot[8:9]
+      [3]:   Reserved (always 0x00 in MS4 ROM)
+      [4]:   Envelope sustain/attack parameter
+      [5]:   Envelope depth/modulation parameter
+      [6]:   Envelope rate (processed to rate<<2 when envelope enabled, 0=default)
+    """
+    if len(data) < 7:
+        return None
+    env_ptr = data[0] | (data[1] << 8)
+    flags = []
+    if data[2] & 0x80:
+        flags.append('ENV')
+    if data[2] & 0x40:
+        flags.append('LSIGN')
+    flags_str = '|'.join(flags) if flags else 'none'
+    parts = [f"env_tbl=0x{env_ptr:04X}", f"ctrl=[{flags_str}]"]
+    if data[4] or data[5] or data[6]:
+        parts.append(f"atk=0x{data[4]:02X}")
+        parts.append(f"depth=0x{data[5]:02X}")
+        parts.append(f"rate=0x{data[6]:02X}")
+    return ' '.join(parts)
+
+
 def parse_program(rom, addr, next_addr=None):
     """
     Parse an MS4 program structure starting at addr.
@@ -393,6 +524,9 @@ def print_detailed_programs(programs):
             for i, slot in enumerate(prog['voice_slots']):
                 vdata = ' '.join(f"{b:02X}" for b in slot['data'])
                 print(f"    Slot {i}: ptr=0x{slot['ptr']:04X} data=[{vdata}]")
+                detail = format_voice_init_detail(slot['data'])
+                if detail:
+                    print(f"             {detail}")
         else:
             print(f"  Voice slots: NONE (ptr=0x0000)")
 
@@ -406,6 +540,9 @@ def print_detailed_programs(programs):
                 byte_hex = ' '.join(f"{b:02X}" for b in entry['bytes'])
                 print(f"    word {entry['word']:2d} [{entry['offset']:3d}]: "
                       f"{entry['name']:<10s} {byte_hex}")
+                detail = format_handler_detail(entry)
+                if detail:
+                    print(f"{'':>29}{detail}")
 
 
 def print_aram_analysis(programs):
@@ -497,16 +634,17 @@ def print_voice_data_analysis(programs):
             voice_ptrs[ptr]['programs'].append(prog['name'])
 
     print(f"\n{len(voice_ptrs)} unique voice data pointers:\n")
-    print(f"{'Pointer':<9} {'Data (7 bytes)':<24} {'Programs'}")
-    print("-" * 80)
+    print(f"{'Pointer':<9} {'Data (7 bytes)':<24} {'Decoded':<40} {'Programs'}")
+    print("-" * 120)
 
     for ptr in sorted(voice_ptrs.keys()):
         info = voice_ptrs[ptr]
         data_str = ' '.join(f"{b:02X}" for b in info['data'])
-        names_str = ', '.join(info['programs'][:4])
-        if len(info['programs']) > 4:
-            names_str += f" (+{len(info['programs']) - 4} more)"
-        print(f"  0x{ptr:04X}  {data_str:<24} {names_str}")
+        detail = format_voice_init_detail(info['data']) or ''
+        names_str = ', '.join(info['programs'][:3])
+        if len(info['programs']) > 3:
+            names_str += f" (+{len(info['programs']) - 3} more)"
+        print(f"  0x{ptr:04X}  {data_str:<24} {detail:<40} {names_str}")
 
     # Multi-slot programs
     multi_slot = [(idx, p) for idx, p in programs if len(p['voice_slots']) > 1]

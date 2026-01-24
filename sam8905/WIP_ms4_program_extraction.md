@@ -115,17 +115,77 @@ Decode with: `from sam8905_aram_decoder import decode_algorithm`
 
 ## Voice Init Data
 
-The LE pointer at program offset 15-16 points to 7 bytes of voice initialization
-data in CODE space. This data is copied to the XRAM voice slot during note init
-by dram_param_processor (at 0xAB73 path).
+The LE pointer at program offset 15-16 points to voice initialization data in
+CODE space. 7 bytes are copied to the XRAM voice slot by `voice_init_copy_and_envelope`
+(CODE:AB73). Additional bytes (7-11) are read in-place for velocity modulation.
 
-Example (dpiano27): ptr=0x18C8 → data: `12 09 40 00 00 00 00`
+### Byte Layout (7 bytes copied to XRAM slot)
 
-Programs with pointer = 0x0000 appear to be placeholders (dcello9, dpizzah, dparadh).
+| Byte | XRAM Slot | Description |
+|------|-----------|-------------|
+| 0 | slot+0 | Envelope segment table pointer - low byte (LE) |
+| 1 | slot+1 | Envelope segment table pointer - high byte |
+| 2 | slot+2 | Control: bit7=ENV_ENABLE, bit6=LEVEL_SIGN |
+| 3 | slot+3 | Reserved (always 0x00 in MS4 ROM) |
+| 4 | slot+4 | Envelope sustain/attack parameter |
+| 5 | slot+5 | Envelope depth/modulation parameter |
+| 6 | slot+6 | Envelope rate (processed to rate<<2 when ENV set, 0=default) |
 
-## D-RAM Parameter Entry Format
+### Additional ROM bytes (read in-place, not copied)
 
-Same 3-byte format as Keyfox10:
+| Byte | Description |
+|------|-------------|
+| 7 | Velocity-to-level modifier (signed, 0=none; always 0 in MS4 ROM) |
+| 8 | Skipped by firmware |
+| 9 | Velocity mod amount for slot[5] (always 0 in MS4 ROM) |
+| 10 | Velocity mod amount for slot[4] (always 0 in MS4 ROM) |
+| 11 | Velocity mod type/rate param (always 0 in MS4 ROM) |
+
+### XRAM Voice Slot Structure (16 bytes per slot)
+
+After `voice_init_copy_and_envelope` completes:
+
+| Offset | Source | Description |
+|--------|--------|-------------|
+| 0-1 | init[0:1] | Envelope table pointer (advanced during segment scan) |
+| 2 | init[2] | Control flags |
+| 3 | init[3] | Reserved |
+| 4 | init[4] | Attack param (velocity-modulated by ROM byte 10) |
+| 5 | init[5] | Depth param (velocity-modulated by ROM byte 9) |
+| 6 | init[6] | Rate → overwritten with level (0x7F/0x00) when ENV |
+| 7 | cleared | Always 0 |
+| 8-9 | cleared | Cleared if (byte[2] & 0x48) != 0x40 |
+| 10-11 | from rate | rate << 2 (16-bit, set when ENV enabled) |
+| 12 | computed | Velocity-modified level (from ROM byte 7 × velocity_curve_lookup) |
+| 13-15 | env table | First matching 3-byte envelope segment entry |
+
+### Envelope Segment Table
+
+Pointed to by bytes[0:1]. Contains 3-byte entries scanned sequentially:
+- Termination: entry[2]!=0 OR (entry[1] & 0xF8)!=0 → use this entry
+- Non-terminal: entry[0] → slot[9], advance pointer by 3, continue scan
+- In all MS4 programs, the first entry always terminates (immediate use)
+
+### Control Byte (byte[2]) Patterns in MS4 ROM
+
+| Value | Meaning | Programs |
+|-------|---------|----------|
+| 0x40 | LSIGN only (no envelope) | Most programs (piano, organ, guitar, etc.) |
+| 0xC0 | ENV+LSIGN (envelope enabled) | Brass, sax, flute, strings, harmonica |
+
+Programs with pointer = 0x0000 are placeholders (dcello9, dpizzah, dparadh).
+
+### Firmware Functions
+
+| Function | Address | Purpose |
+|----------|---------|---------|
+| voice_init_copy_and_envelope | CODE:AB73 | Copy 7 bytes, scan env table, set up envelope |
+| voice_init_next_slot | CODE:AB40 | Advance INTMEM_3b by 16, continue or start D-RAM |
+| velocity_curve_lookup | CODE:B3C5 | Table lookup for velocity-based attenuation |
+
+## D-RAM Parameter Entry Format (offset 12-16)
+
+The 5-byte header entry at program offset 12:
 
 ```
 Byte 0 (val_lo):   D-RAM word bits 7-0
@@ -134,7 +194,155 @@ Byte 2 (ctrl):     Control byte
         Bit 7:     Conditional offset flag
         Bits 6-3:  D-RAM address nibble (slot offset within 16-word section)
         Bits 2-0:  Mix/routing bits
+Byte 3 (ptr_lo):   Voice init data pointer low (LE)
+Byte 4 (ptr_hi):   Voice init data pointer high (LE)
 ```
+
+If pointer != 0: voice init path (copies 7 bytes from pointer to XRAM voice slot).
+If pointer == 0: no voice init, begins D-RAM config stream directly.
+
+## D-RAM Config Stream Format
+
+The D-RAM config stream follows the voice slot pointers (offset 17+).
+It encodes initial values for 16 D-RAM words per SAM algorithm slot.
+
+### Dispatch Loop (dram_config_dispatch, CODE:AB4C)
+
+- Counter (INTMEM_39) initialized to 16 (0x10) by dram_param_processor
+- Each iteration reads one dispatch byte from the stream pointer (DPTR)
+- Bits 5:3 of the dispatch byte select a handler
+- Bit 7 set = terminator (writes byte value to D-RAM slot, exits)
+- Counter decremented after each word; exits when counter == 0
+
+### Handler Table (Ghidra functions at port 8195)
+
+| Bits 5:3 | Dispatch | Function | Bytes | Description |
+|----------|----------|----------|-------|-------------|
+| 000 | 0x00-0x07 | dram_config_handler_00 (AD8F) | 3 or 4 | Short write: 3 data bytes; if byte[3] bits 7:5==0 then 4th byte is extra data, else byte[3] is next dispatch |
+| 001 | 0x08-0x0F | dram_config_handler_08 (ADBD) | 10 | Pitch/frequency: note tables, octave, pitch bend, portamento, modulation |
+| 010 | 0x10-0x17 | dram_config_handler_10 (B030) | 9 | Amplitude/level: envelope, velocity scaling, sustain, attack rate |
+| 011 | 0x18-0x1F | dram_config_handler_18 (B222) | 4 | D-RAM write: value + optional velocity modulation, writes via sam_write_dram |
+| 100 | 0x20-0x27 | dram_config_handler_20 (B278) | 4 | Output routing: writes XRAM 0xF9-FB, **TERMINATES** stream |
+| 101 | 0x28-0x2F | dram_config_handler_28 (B2D2) | 1 | Write constant 0x28 to D-RAM word |
+| 110 | 0x30-0x37 | dram_config_handler_30 (B2CF) | 0* | Skip remaining: fills all remaining words with skip, **TERMINATES** |
+| 111 | 0x38-0x3F | (inline in dispatch) | 1 | Write constant 0x38 to D-RAM word |
+
+*Handler 0x30 does not advance the pointer; it recursively skips until counter==0.
+
+### Stream Termination Conditions
+
+1. **Counter exhausted**: 16 D-RAM words processed (normal completion)
+2. **Bit 7 terminator**: dispatch byte with bit 7 set writes value and exits
+3. **Handler 0x20**: output config handler does not call dispatch loop
+4. **Handler 0x30**: skips all remaining words without consuming stream data
+
+### Helper Functions
+
+| Function | Address | Purpose |
+|----------|---------|---------|
+| dram_config_apply_velocity | B1EC | Attenuates MIX bits by velocity (INTMEM_3F) |
+| dram_config_skip_4bytes | AD82 | Skips 4-byte handler_18 entry (conditional path) |
+| modulation_write_dram | (existing) | Writes pitch with modulation via SAM |
+
+### Observed Stream Lengths
+
+| Length | Count | Pattern |
+|--------|-------|---------|
+| 14 bytes | 46 | 1× handler_08 (10) + 1× handler_00 (3) + terminator (1) |
+| 51 bytes | 16 | 1× handler_08 (10) + handler_00 (4) + multiple handler_18 (4 each) + terminator |
+| 62 bytes | 2 | Extended strings (dstring3, dkvoi1) |
+| 67 bytes | 1 | dkvoi2 |
+
+## Periodic Voice Update System
+
+### periodic_voice_update (CODE:9BA7)
+
+Called by Timer 1 ISR. Iterates the active voice linked list and updates
+all LFO/envelope blocks and D-RAM slot modulations per voice.
+
+### Per-Voice XRAM Page Layout (256 bytes, selected by P2)
+
+| Offset | Size | Description |
+|--------|------|-------------|
+| 0x00-0x6F | 112 | 7 LFO/envelope state blocks (16 bytes each) |
+| 0x70+ | ~16 | D-RAM slot ID table (slot count + slot IDs) |
+| 0x80-0xFF | 128 | D-RAM slot modulation state (8 bytes per slot, up to 16 slots) |
+| 0xFB | 1 | Voice flags |
+| 0xFC | 1 | MIDI channel |
+| 0xFD | 1 | Next voice pointer (linked list, 0xFF = end) |
+
+### LFO/Envelope Block (16 bytes each, 7 per voice)
+
+| Byte | Description |
+|------|-------------|
+| 0 | Waveform type (0/5/6/7=sine, 1=ramp, 2=inverted, 3=square, 4=noise) |
+| 1 | Frequency/rate |
+| 2-3 | Phase accumulator (16-bit, incremented by freq each tick) |
+| 4-5 | Amplitude (current output value) |
+| 6-7 | Envelope segment pointer (CODE space) |
+| 8-9 | Envelope state |
+| 10-11 | Target/limit |
+| 12-15 | Additional state |
+
+LFO waveform computation:
+- sine: table at CODE:9833 (64 entries, 6-bit index from phase high byte)
+- ramp: phase high byte = output
+- inverted: 0xFF - phase high byte
+- square: 0x00 or 0xFF based on phase MSB
+- noise: LFSR (x = x*3 + 0x43)
+
+### D-RAM Slot Modulation State (8 bytes per slot)
+
+| Byte | Description |
+|------|-------------|
+| 0 | Type: 0x10=amplitude, bit7=portamento, 0x38=skip, other=pitch |
+| 1 | D-RAM word address (slot_id << 4 | word_offset) |
+| 2 | Type-dependent: rate counter (porta) or envelope block index (amp) |
+| 3 | Type-dependent: rate value (porta) or velocity scale (amp) |
+| 4-5 | Current value (16-bit: pitch or amplitude) |
+| 6-7 | Target value (16-bit, portamento only) |
+
+### Global Modulation LFO (XRAM 0x1180-0x1183)
+
+| Address | Name | Description |
+|---------|------|-------------|
+| 0x1180 | mod_lfo_rate | LFO rate (0=off, higher=faster vibrato) |
+| 0x1181 | mod_lfo_phase_lo | Phase accumulator low byte |
+| 0x1182 | mod_lfo_phase_hi | Phase accumulator high byte |
+| 0x1183 | mod_lfo_output | Sine table lookup result (vibrato depth) |
+
+Phase increment = rate × 32. Sine indexed by (phase_hi >> 1) & 0x3F.
+Rate is set by MIDI mod wheel (CC#1) handler.
+
+### Global XRAM Memory Map
+
+| Address | Size | Name | Description |
+|---------|------|------|-------------|
+| 0x1180 | 1 | mod_lfo_rate | Global vibrato LFO rate |
+| 0x1181-82 | 2 | mod_lfo_phase | Global vibrato phase accumulator |
+| 0x1183 | 1 | mod_lfo_output | Global vibrato sine output |
+| 0x1184 | 16 | mod_sensitivity | Per-channel modulation sensitivity |
+| 0x1194 | 32 | pitch_bend | Per-channel pitch bend (16-bit × 16 ch) |
+| 0x11EE | 8 | algorithm_pool | SAM algorithm slot allocation pool |
+| 0x14D3 | 2 | program_base | Current program pointer (LE) |
+
+### INTMEM Locations
+
+| Address | Name | Description |
+|---------|------|-------------|
+| 0x53 | dram_slot_free_list | D-RAM slot linked list head |
+| 0x54 | active_voice_list_head | Active voice linked list (0xFF=empty) |
+| 0x9E | algorithm_slot_lookup | 8-byte pool-to-slot mapping table |
+
+### Voice Update Functions
+
+| Function | Address | Purpose |
+|----------|---------|---------|
+| periodic_voice_update | 9BA7 | Main timer ISR voice update loop |
+| global_mod_lfo_update | A314 | Advance global vibrato LFO (sine) |
+| dram_slot_amplitude_update | A18F | Update amplitude via envelope output |
+| dram_slot_apply_mod_depth | A2E3 | Apply modulation depth to slot pitch |
+| dram_slot_portamento_update | A33E | Smooth pitch glide toward target |
 
 ## Tasks
 
@@ -146,9 +354,14 @@ Byte 2 (ctrl):     Control byte
 - [x] Correct program structure (byte 12 is D-RAM param, not algo index)
 - [x] Add Ghidra comments to key functions
 - [x] Write WIP document
-- [ ] Update parser to use corrected structure (voice_data_ptr at offset 15-16)
-- [ ] Decode voice init data (7 bytes at pointer)
-- [ ] Parse D-RAM parameter entries from offset 12+
+- [x] Update parser to use corrected structure (voice_data_ptr at offset 15-16)
+- [x] Parse D-RAM config stream with forward-scanning byte consumption
+- [x] Document all D-RAM config handlers in Ghidra (rename + comments)
+- [x] Decode voice init data (7+5 bytes: envelope table ptr, control, rate, velocity mods)
+- [x] Document periodic_voice_update and voice XRAM page structure
+- [x] Label XRAM/INTMEM memory regions in Ghidra (mod LFO, pitch bend, algorithm pool, etc.)
+- [x] Rename and comment voice update sub-functions (amplitude, portamento, mod depth, global LFO)
+- [ ] Decode D-RAM stream commands (interpret handler_08 pitch, handler_10 amplitude, etc.)
 - [ ] Cross-reference D-RAM entries with A-RAM algorithm D-RAM usage
 
 ## How to Run
