@@ -100,6 +100,149 @@ def parse_aram_data(rom, ptr):
     return words
 
 
+def scan_dram_stream(rom, start):
+    """
+    Forward-scan a D-RAM config stream to find its end.
+
+    The stream encodes up to 16 D-RAM word values using variable-length commands.
+    Each dispatch byte's bits 5:3 select a handler with known byte consumption.
+    Stream terminates when:
+      - 16 D-RAM words processed (counter exhausted)
+      - Dispatch byte has bit 7 set (terminator value)
+      - Handler 0x20 reached (output config, terminates loop)
+      - Handler 0x30 reached (skip remaining, no bytes consumed)
+
+    Handler byte consumption (from firmware at CODE:AA9A dispatch loop):
+      bits 5:3 = 000 (0x00): 3 or 4 bytes (4 if byte[3] & 0xE0 == 0)
+      bits 5:3 = 001 (0x08): 10 bytes (pitch/frequency)
+      bits 5:3 = 010 (0x10): 9 bytes (amplitude/level)
+      bits 5:3 = 011 (0x18): 4 bytes (D-RAM write)
+      bits 5:3 = 100 (0x20): 4 bytes (output config, TERMINATES)
+      bits 5:3 = 101 (0x28): 1 byte (write constant)
+      bits 5:3 = 110 (0x30): 0 bytes (skip remaining, TERMINATES)
+      bits 5:3 = 111 (0x38): 1 byte (write constant, default case)
+
+    Returns: address past the last consumed byte.
+    """
+    pos = start
+    words_remaining = 16  # INTMEM_39 initialized to 0x10
+
+    while words_remaining > 0 and pos < len(rom):
+        dispatch = rom[pos]
+
+        # Bit 7 set = terminator (writes value, exits)
+        if dispatch & 0x80:
+            pos += 1  # the terminator byte itself is consumed
+            break
+
+        handler = dispatch & 0x38
+
+        if handler == 0x00:
+            # 3 bytes + check byte[3]
+            if pos + 3 < len(rom) and (rom[pos + 3] & 0xE0) == 0:
+                pos += 4
+            else:
+                pos += 3  # byte[3] is next dispatch byte
+        elif handler == 0x08:
+            pos += 10
+        elif handler == 0x10:
+            pos += 9
+        elif handler == 0x18:
+            pos += 4
+        elif handler == 0x20:
+            pos += 4  # terminates
+            break
+        elif handler == 0x28:
+            pos += 1
+        elif handler == 0x30:
+            # skip remaining - no bytes consumed, terminates
+            pos += 1  # consume the 0x30 dispatch byte itself
+            break
+        else:  # 0x38 default
+            pos += 1
+
+        words_remaining -= 1
+
+    return pos
+
+
+HANDLER_NAMES = {
+    0x00: 'short_wr',
+    0x08: 'pitch',
+    0x10: 'amplitude',
+    0x18: 'dram_wr',
+    0x20: 'output',
+    0x28: 'const28',
+    0x30: 'skip_rem',
+    0x38: 'const38',
+}
+
+
+def decode_dram_stream(stream):
+    """
+    Decode a D-RAM config stream into per-word handler entries.
+
+    Returns list of dicts: {word, handler, name, bytes, terminator}
+    """
+    entries = []
+    pos = 0
+    word = 0
+
+    while word < 16 and pos < len(stream):
+        dispatch = stream[pos]
+
+        if dispatch & 0x80:
+            entries.append({
+                'word': word, 'handler': 'termin',
+                'name': 'terminator',
+                'bytes': stream[pos:pos + 1], 'offset': pos,
+            })
+            break
+
+        handler = dispatch & 0x38
+
+        if handler == 0x00:
+            if pos + 3 < len(stream) and (stream[pos + 3] & 0xE0) == 0:
+                n = 4
+            else:
+                n = 3
+        elif handler == 0x08:
+            n = 10
+        elif handler == 0x10:
+            n = 9
+        elif handler == 0x18:
+            n = 4
+        elif handler == 0x20:
+            n = 4
+            entries.append({
+                'word': word, 'handler': f'0x{handler:02X}',
+                'name': HANDLER_NAMES[handler],
+                'bytes': stream[pos:pos + n], 'offset': pos,
+            })
+            break
+        elif handler == 0x28:
+            n = 1
+        elif handler == 0x30:
+            entries.append({
+                'word': word, 'handler': f'0x{handler:02X}',
+                'name': HANDLER_NAMES[handler],
+                'bytes': stream[pos:pos + 1], 'offset': pos,
+            })
+            break
+        else:  # 0x38
+            n = 1
+
+        entries.append({
+            'word': word, 'handler': f'0x{handler:02X}',
+            'name': HANDLER_NAMES[handler],
+            'bytes': stream[pos:pos + n], 'offset': pos,
+        })
+        pos += n
+        word += 1
+
+    return entries
+
+
 def parse_program(rom, addr, next_addr=None):
     """
     Parse an MS4 program structure starting at addr.
@@ -172,15 +315,15 @@ def parse_program(rom, addr, next_addr=None):
                 })
         dram_stream_offset = pos - addr
 
-    # D-RAM command stream (variable-length encoding)
-    # Each byte's bits 5:3 select a handler; bit 7 set = terminator
+    # D-RAM command stream: variable-length encoding for 16 D-RAM words.
+    # Forward-scan using handler byte consumption from firmware analysis.
     prog['dram_stream_offset'] = dram_stream_offset
-    if prog['size'] and prog['size'] > dram_stream_offset:
+    prog['dram_stream'] = []
+    if (prog['size'] is None or prog['size'] > dram_stream_offset) and \
+       addr + dram_stream_offset < len(rom):
         stream_start = addr + dram_stream_offset
-        stream_end = addr + prog['size']
+        stream_end = scan_dram_stream(rom, stream_start)
         prog['dram_stream'] = list(rom[stream_start:stream_end])
-    else:
-        prog['dram_stream'] = []
 
     # Raw header for debugging (first 22 bytes)
     header_len = min(22, prog['size']) if prog['size'] else 22
@@ -253,15 +396,16 @@ def print_detailed_programs(programs):
         else:
             print(f"  Voice slots: NONE (ptr=0x0000)")
 
-        # D-RAM command stream
+        # D-RAM command stream with per-handler breakdown
         stream = prog['dram_stream']
         if stream:
-            stream_hex = ' '.join(f"{b:02X}" for b in stream[:52])
-            if len(stream) > 52:
-                stream_hex += f" ... (+{len(stream) - 52} bytes)"
             print(f"  D-RAM stream (offset {prog['dram_stream_offset']}, "
                   f"{len(stream)} bytes):")
-            print(f"    {stream_hex}")
+            entries = decode_dram_stream(stream)
+            for entry in entries:
+                byte_hex = ' '.join(f"{b:02X}" for b in entry['bytes'])
+                print(f"    word {entry['word']:2d} [{entry['offset']:3d}]: "
+                      f"{entry['name']:<10s} {byte_hex}")
 
 
 def print_aram_analysis(programs):
@@ -416,8 +560,9 @@ def print_dram_stream_analysis(programs):
     print("\n" + "=" * 100)
     print("D-RAM COMMAND STREAM ANALYSIS")
     print("  Format: variable-length commands, bits 5:3 select handler, bit 7 = terminator")
-    print("  Handlers: 0x00=ad8f, 0x08=adbd, 0x10=b030, 0x18=b222,")
-    print("            0x20=b278, 0x28=b2d2, 0x30=b2cf, 0x38=NOP(skip)")
+    print("  Handlers: 0x00=short_write(3-4B), 0x08=pitch(10B), 0x10=amplitude(9B),")
+    print("            0x18=dram_write(4B), 0x20=output_cfg(4B,TERM), 0x28=const(1B),")
+    print("            0x30=skip_remaining(TERM), 0x38=const(1B)")
     print("-" * 80)
 
     # Group by stream length
@@ -435,15 +580,18 @@ def print_dram_stream_analysis(programs):
             names_str += f" (+{len(names) - 5} more)"
         print(f"  {slen:3d} bytes: {len(names)} programs  ({names_str})")
 
-    print(f"\n{'Idx':<4} {'Name':<10} {'Offset':<7} {'Len':<5} {'First 20 bytes'}")
-    print("-" * 80)
+    print(f"\n{'Idx':<4} {'Name':<10} {'Len':<5} {'Words':<6} {'Handlers used'}")
+    print("-" * 100)
     for idx, prog in programs:
         stream = prog['dram_stream']
         if not stream:
             continue
-        first_bytes = ' '.join(f"{b:02X}" for b in stream[:20])
-        print(f"{idx:<4} {prog['name']:<10} {prog['dram_stream_offset']:<7} "
-              f"{len(stream):<5} {first_bytes}")
+        entries = decode_dram_stream(stream)
+        handler_summary = ' '.join(
+            f"{e['name']}({len(e['bytes'])})" for e in entries
+        )
+        print(f"{idx:<4} {prog['name']:<10} {len(stream):<5} "
+              f"{len(entries):<6} {handler_summary}")
 
 
 def main():
