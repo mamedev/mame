@@ -1360,14 +1360,19 @@ void lua_engine::initialize()
 			else
 				e.set_value(val ? 1 : 0, OPTION_PRIORITY_CMDLINE);
 		},
+		[] (core_options::entry &e, sol::this_state s, int val)
+		{
+			if (e.type() != core_options::option_type::INTEGER)
+				luaL_error(s, "Cannot set option to wrong type");
+			else
+				e.set_value(val, OPTION_PRIORITY_CMDLINE);
+		},
 		[] (core_options::entry &e, sol::this_state s, float val)
 		{
-			if (e.type() == core_options::option_type::FLOAT)
-				e.set_value(val, OPTION_PRIORITY_CMDLINE);
-			else if (e.type() == core_options::option_type::INTEGER && static_cast<int>(val) == val)
-				e.set_value(static_cast<int>(val), OPTION_PRIORITY_CMDLINE);
-			else
+			if (e.type() != core_options::option_type::FLOAT)
 				luaL_error(s, "Cannot set option to wrong type");
+			else
+				e.set_value(val, OPTION_PRIORITY_CMDLINE);
 		},
 		[] (core_options::entry &e, sol::this_state s, const char *val)
 		{
