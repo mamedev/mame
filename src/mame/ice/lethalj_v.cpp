@@ -79,7 +79,7 @@ uint16_t lethalj_state::lethalj_gun_r(offs_t offset)
 
 /*************************************
  *
- *  video startup
+ *  Video startup
  *
  *************************************/
 
@@ -87,13 +87,12 @@ void lethalj_state::video_start()
 {
 	/* allocate video RAM for screen */
 	m_screenram = std::make_unique<uint16_t[]>(BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
+	save_pointer(NAME(m_screenram), BLITTER_DEST_WIDTH * BLITTER_DEST_HEIGHT);
 
 	/* predetermine blitter info */
 	m_blitter_rows = m_blitter_base.length() / BLITTER_SOURCE_WIDTH;
 
 	m_gen_ext1_int_timer = timer_alloc(FUNC(lethalj_state::gen_ext1_int), this);
-
-	m_vispage = 0;
 }
 
 
@@ -118,14 +117,13 @@ void lethalj_state::do_blit()
 	int width = (uint16_t)m_blitter_data[5];
 	int dstx = (int16_t)m_blitter_data[6];
 	int height = (uint16_t)m_blitter_data[7];
-	int y;
 /*
     logerror("blitter data = %04X %04X %04X %04X %04X %04X %04X %04X\n",
             m_blitter_data[0], m_blitter_data[1], m_blitter_data[2], m_blitter_data[3],
             m_blitter_data[4], m_blitter_data[5], m_blitter_data[6], m_blitter_data[7]);
 */
 	/* loop over Y coordinates */
-	for (y = 0; y <= height; y++, srcy++, dsty++)
+	for (int y = 0; y <= height; y++, srcy++, dsty++)
 	{
 		/* clip in Y */
 		if (dsty >= 0 && dsty < BLITTER_DEST_HEIGHT/2)
@@ -134,10 +132,9 @@ void lethalj_state::do_blit()
 			uint16_t *dest = m_screenram.get() + ((dsty + ((m_vispage ^ 1) << 8)) << 9);
 			int sx = srcx;
 			int dx = dstx;
-			int x;
 
 			/* loop over X coordinates */
-			for (x = 0; x <= width; x++, sx++, dx++)
+			for (int x = 0; x <= width; x++, sx++, dx++)
 			{
 				dx &= 0x1ff;
 
@@ -176,7 +173,7 @@ void lethalj_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 /*************************************
  *
- *  video update
+ *  Video update
  *
  *************************************/
 
