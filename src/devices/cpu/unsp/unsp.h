@@ -121,35 +121,6 @@ public:
 	void cfunc_muls();
 
 protected:
-	unsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
-
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual void device_stop() override ATTR_COLD;
-
-	// device_execute_interface overrides
-	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
-	virtual uint32_t execute_max_cycles() const noexcept override { return 5; }
-	virtual void execute_run() override;
-	virtual void execute_set_input(int inputnum, int state) override;
-
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
-
-	// device_state_interface overrides
-	virtual void state_import(const device_state_entry& entry) override;
-	virtual void state_export(const device_state_entry& entry) override;
-	virtual void state_string_export(const device_state_entry& entry, std::string& str) const override;
-
-	// device_disasm_interface overrides
-	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
-
-	// HACK: IRQ line state can only be modified directly by hardware on-board the SPG SoC itself.
-	// Therefore, to avoid an unnecessary scheduler sync when the derived spg2xx_device sets or
-	// clears an interrupt line, we provide this direct accessor.
-	void set_state_unsynced(int inputnum, int state);
-
 	enum : uint32_t
 	{
 		REG_SP = 0,
@@ -206,10 +177,35 @@ protected:
 		int m_icount;
 	};
 
-	/* core state */
-	internal_unsp_state* m_core;
+	unsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
 
-protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
+
+	// device_execute_interface overrides
+	virtual uint32_t execute_min_cycles() const noexcept override { return 5; }
+	virtual uint32_t execute_max_cycles() const noexcept override { return 5; }
+	virtual void execute_run() override;
+	virtual void execute_set_input(int inputnum, int state) override;
+
+	// device_memory_interface overrides
+	virtual space_config_vector memory_space_config() const override;
+
+	// device_state_interface overrides
+	virtual void state_import(const device_state_entry& entry) override;
+	virtual void state_export(const device_state_entry& entry) override;
+	virtual void state_string_export(const device_state_entry& entry, std::string& str) const override;
+
+	// device_disasm_interface overrides
+	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	// HACK: IRQ line state can only be modified directly by hardware on-board the SPG SoC itself.
+	// Therefore, to avoid an unnecessary scheduler sync when the derived spg2xx_device sets or
+	// clears an interrupt line, we provide this direct accessor.
+	void set_state_unsynced(int inputnum, int state);
+
 	uint16_t read16(uint32_t address) { return m_program.read_word(address); }
 
 	void write16(uint32_t address, uint16_t data)
@@ -244,6 +240,9 @@ protected:
 	void unimplemented_opcode(uint16_t op, uint16_t ximm);
 	void unimplemented_opcode(uint16_t op, uint16_t ximm, uint16_t ximm_2);
 	virtual bool op_is_divq(const uint16_t op) { return false; }
+
+	/* core state */
+	internal_unsp_state* m_core;
 
 	int m_iso;
 
@@ -286,7 +285,6 @@ private:
 	void execute_one(const uint16_t op);
 
 
-
 	address_space_config m_program_config;
 	memory_access<23, 1, -1, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<23, 1, -1, ENDIANNESS_BIG>::specific m_program;
@@ -319,6 +317,7 @@ private:
 
 	bool m_enable_drc;
 	uint16_t m_vectorbase;
+	internal_unsp_state m_local_core; // for non-DRC mode
 
 	void execute_run_drc();
 	void flush_drc_cache();

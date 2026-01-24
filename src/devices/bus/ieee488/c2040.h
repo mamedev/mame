@@ -32,16 +32,6 @@ public:
 	// construction/destruction
 	c2040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint8_t dio_r();
-	void dio_w(uint8_t data);
-	uint8_t riot1_pa_r();
-	void riot1_pa_w(uint8_t data);
-	uint8_t riot1_pb_r();
-	void riot1_pb_w(uint8_t data);
-	void via_pb_w(uint8_t data);
-
-	void c2040_fdc_mem(address_map &map) ATTR_COLD;
-	void c2040_main_mem(address_map &map) ATTR_COLD;
 protected:
 	c2040_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -69,6 +59,14 @@ protected:
 	void add_common_devices(machine_config &config);
 	inline void update_ieee_signals();
 
+	uint8_t dio_r() { return m_bus->dio_r(); };
+	void dio_w(uint8_t data) { m_bus->dio_w(this, data); };
+	uint8_t riot1_pa_r();
+	void riot1_pa_w(uint8_t data);
+	uint8_t riot1_pb_r();
+	void riot1_pb_w(uint8_t data);
+	void via_pb_w(uint8_t data);
+
 	static void floppy_formats(format_registration &fr);
 
 	required_device<m6502_device> m_maincpu;
@@ -80,9 +78,11 @@ protected:
 	required_device<floppy_image_device> m_floppy0;
 	optional_device<floppy_image_device> m_floppy1;
 	required_device<c2040_fdc_device> m_fdc;
-	required_memory_region m_gcr;
 	required_ioport m_address;
 	output_finder<4> m_leds;
+
+	void c2040_fdc_mem(address_map &map) ATTR_COLD;
+	void c2040_main_mem(address_map &map) ATTR_COLD;
 
 	// IEEE-488 bus
 	int m_rfdo;                         // not ready for data output

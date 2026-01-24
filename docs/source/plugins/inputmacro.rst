@@ -90,12 +90,17 @@ Each step has delay, duration and input settings:
   completing the macro in the case of the final step).  You can reset the
   setting to one frame by pressing the UI Clear key.
 * Set the **Input** settings to the emulated inputs to activate for the step.
-  Only non-toggle digital inputs are supported.  Select **Add input** to set
-  multiple inputs for a step (this option will only appear after you set the
-  first input for the initially created step when creating a new macro).  If
-  the step has multiple inputs, you can highlight an input on the menu and press
-  the UI Clear key to delete it (all steps must have at least one input, so you
-  can’t delete the only input for a step).
+  Only non-toggle digital inputs and non-wrapping analog inputs are supported.
+  Select **Add input** to set multiple inputs for a step (this option will only
+  appear after you set the first input for the initially created step when
+  creating a new macro).  If the step has multiple inputs, you can highlight an
+  input on the menu and press the UI Clear key to delete it (all steps must have
+  at least one input, so you can’t delete the only input for a step).
+* For analog inputs, you can set the desired **Value** that the input should
+  have at each step.  You can adjust the value by pressing the UI Left and UI
+  Right keys, or type a numeric value and press the UI Select key to accept the
+  new value.  The value will be limited to the valid range for the input.
+  Pressing the UI Clear key will set the default value for the input.
 * If the macro has multiple steps, you can select **Delete step** to delete a
   step (this options does not appear if the macro only has a single step).
   Remember to check that the **On release** and **When held** settings are
@@ -236,3 +241,24 @@ This macro involves steps that activate multiple inputs.  The macro will
 complete if the activation sequence is released early, allowing you to tap the
 key momentarily to perform the move.  Holding the activation sequence holds down
 the attack button.
+
+Virtua Cop Aim Off-Screen
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This macro allows you to hold a key to simulate pointing the lightgun away from
+the screen:
+
+* **Name**: 1P Aim Off-Screen
+* **Activation combination**: Kbd Alt
+* **On release**: Stop immediately
+* **When held**: Prolong step 1
+* **Step 1**:
+
+  * **Delay (frames)**: 0
+  * **Duration (frames)**: 1
+  * **Input 1**: Lightgun X
+  * **Value (131-630)**: 131
+  * **Input 2**: Lightgun Y
+  * **Value (36-425)**: 36
+
+This macro involves setting analog input values.

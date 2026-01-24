@@ -280,10 +280,10 @@ void vme_sys68k_iscsi1_card_device::device_add_mconfig(machine_config &config)
 	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
 	m_dmac->irq_callback().set(FUNC(vme_sys68k_iscsi1_card_device::dma_irq));
-	//m_dmac->dma_read<0>().set(FUNC(vme_sys68k_iscsi1_card_device::scsi_read_byte));  // ch 0 = SCSI
-	//m_dmac->dma_write<0>().set(FUNC(vme_sys68k_iscsi1_card_device::scsi_write_byte));
-	m_dmac->dma_read<1>().set(FUNC(vme_sys68k_iscsi1_card_device::fdc_read_byte));  // ch 1 = fdc
-	m_dmac->dma_write<1>().set(FUNC(vme_sys68k_iscsi1_card_device::fdc_write_byte));
+	//m_dmac->dma8_read<0>().set(FUNC(vme_sys68k_iscsi1_card_device::scsi_read_byte));  // ch 0 = SCSI
+	//m_dmac->dma8_write<0>().set(FUNC(vme_sys68k_iscsi1_card_device::scsi_write_byte));
+	m_dmac->dma8_read<1>().set(FUNC(vme_sys68k_iscsi1_card_device::fdc_read_byte));  // ch 1 = fdc
+	m_dmac->dma8_write<1>().set(FUNC(vme_sys68k_iscsi1_card_device::fdc_write_byte));
 }
 
 const tiny_rom_entry *vme_sys68k_iscsi1_card_device::device_rom_region() const

@@ -288,15 +288,19 @@ G)ame Connector, dual row 50 pins
 */
 
 #include "emu.h"
+
+#include "tc0780fpa.h"
+
+#include "cpu/mn10200/mn10200.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/tlcs900/tmp95c063.h"
-#include "cpu/mn10200/mn10200.h"
-#include "cpu/tms32051/tms32051.h"
-#include "tc0780fpa.h"
+#include "cpu/tms320c5x/tms320c5x.h"
 #include "machine/nvram.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 #define LOG_TLCS_TO_PPC_COMMANDS (1U << 1)
 #define LOG_PPC_TO_TLCS_COMMANDS (1U << 2)
@@ -1028,7 +1032,7 @@ void taitopjc_state::taitopjc(machine_config &config)
 	m_iocpu->set_vblank_int("screen", FUNC(taitopjc_state::vbi));
 
 	// TMS320C53 DSP
-	TMS32053(config, m_dsp, 40_MHz_XTAL); // 80MHz rated part, should be 40.0000MHz x 2?
+	TMS320C53(config, m_dsp, 40_MHz_XTAL); // 80MHz rated part, should be 40.0000MHz x 2?
 	m_dsp->set_addrmap(AS_PROGRAM, &taitopjc_state::tms_program_map);
 	m_dsp->set_addrmap(AS_DATA, &taitopjc_state::tms_data_map);
 	m_dsp->set_addrmap(AS_IO, &taitopjc_state::tms_io_map);

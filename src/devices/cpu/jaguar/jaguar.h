@@ -63,6 +63,8 @@ public:
 	u32 iobus_r(offs_t offset, u32 mem_mask = ~0);
 	void go_w(int state);
 
+	void set_branch_hack(bool is_hack) { m_branch_hack = is_hack; }
+
 protected:
 	jaguar_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 version, bool isdsp, address_map_constructor io_map);
 
@@ -137,6 +139,7 @@ protected:
 	bool        m_isdsp;
 	int         m_icount;
 	int         m_bankswitch_icount;
+	bool        m_branch_hack;
 	devcb_write_line m_cpu_interrupt;
 	memory_access<24, 2, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<24, 2, 0, ENDIANNESS_BIG>::specific m_program;

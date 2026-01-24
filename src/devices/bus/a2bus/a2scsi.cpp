@@ -33,8 +33,11 @@
 
 #include "emu.h"
 #include "a2scsi.h"
+
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
+
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /***************************************************************************
@@ -66,18 +69,9 @@ ROM_END
 
 void a2bus_scsi_device::device_add_mconfig(machine_config &config)
 {
-	// These machines were strictly external CD-ROMs so sound didn't route back into them; the AppleCD SC had
-	// RCA jacks for connection to speakers/a stereo.
-	SPEAKER(config, "speaker", 2).front();
-
 	NSCSI_BUS(config, m_scsibus);
 	NSCSI_CONNECTOR(config, "scsibus:0", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsibus:1").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config(
-		[](device_t *device)
-		{
-			device->subdevice<cdda_device>("cdda")->add_route(0, "^^speaker", 1.0, 0);
-			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1);
-		});
+	NSCSI_CONNECTOR(config, "scsibus:1", default_scsi_devices, "aplcdsc_ext", false);
 	NSCSI_CONNECTOR(config, "scsibus:2", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:3", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr, false);
@@ -86,6 +80,8 @@ void a2bus_scsi_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device) {
 		downcast<ncr5380_device &>(*device).drq_handler().set(*this, FUNC(a2bus_scsi_device::drq_w));
 	});
+
+//	SOFTWARE_LIST(config, "cd_apple_dev").set_original("apple_devcd");
 }
 
 //-------------------------------------------------

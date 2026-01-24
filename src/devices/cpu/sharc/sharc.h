@@ -282,6 +282,7 @@ private:
 		opcode_func handler;
 	};
 	static const SHARC_OP s_sharc_opcode_table[];
+	static const size_t s_num_ops;
 
 	struct ASTAT_DRC
 	{

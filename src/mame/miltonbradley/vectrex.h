@@ -1,10 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Mathis Rosenhauer
-/*****************************************************************************
- *
- * includes/vectrex.h
- *
- ****************************************************************************/
+
 #ifndef MAME_MILTONBRADLEY_VECTREX_H
 #define MAME_MILTONBRADLEY_VECTREX_H
 

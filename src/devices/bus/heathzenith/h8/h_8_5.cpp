@@ -215,7 +215,7 @@ void h_8_5_device::device_add_mconfig(machine_config &config)
 	rs232.dsr_handler().set(m_console, FUNC(i8251_device::write_dsr));
 	rs232.set_option_device_input_defaults("h19", DEVICE_INPUT_DEFAULTS_NAME(h19));
 
-	SPEAKER(config, "mono").front_right();
+	SPEAKER(config, "mono").front_center();
 
 	CASSETTE(config, m_cass_player);
 	m_cass_player->set_formats(h8_cassette_formats);

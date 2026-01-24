@@ -74,6 +74,8 @@ TODO:
   * powerlrd: occurs at pink mountain on the right, it's not 1:1 identical on MAME
   * several homebrews by Rafael: precisely placed overlap to force character
     color to change to white, see for example Piggyback Planet and Mean Santa
+- on the real console, disabling display while 824x is rendering major system may
+  cause glitches, such as duplicated graphics, is this the trick backgamm uses?
 - 8245(PAL) video timing is not 100% accurate, though vtotal and htotal should
   be correct. The 8245 is put into slave mode at vblank, timing signals and
   vblank IRQ are taken over during it (the Videopac pcb even has extra TTL to

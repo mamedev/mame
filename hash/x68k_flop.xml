@@ -8597,7 +8597,7 @@ Sometimes turning doesn't work (verify)
 	</software>
 
 	<software name="laplacec" cloneof="laplace" supported="no">
-		<description>Laplace no Ma (cracked)</description>
+		<description>Laplace no Ma (older, cracked)</description>
 		<year>1990</year>
 		<publisher>ハミングバード (HummingBird)</publisher>
 		<notes>The user disk creation process doesn't recognize the data disk</notes>

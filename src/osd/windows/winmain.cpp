@@ -29,6 +29,7 @@
 #include <clocale>
 #include <cstdarg>
 #include <cstdio>
+#include <locale>
 #include <mutex>
 #include <optional>
 #include <sstream>
@@ -173,6 +174,9 @@ static int is_double_click_start(int argc);
 int main(int argc, char *argv[])
 {
 	std::setlocale(LC_ALL, "");
+#if defined(_LIBCPP_VERSION) && defined(_UCRT)
+	std::locale::global(std::locale(""));
+#endif
 	std::vector<std::string> args = osd_get_command_line(argc, argv);
 
 	// use small output buffers on non-TTYs (i.e. pipes)

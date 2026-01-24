@@ -148,6 +148,11 @@ ROM sockets:  UA3   2K or 4K character
     - 8296
         - PLA dumps
         - high resolution graphics
+            The RAM is accessed by writing the value #$83 into $E888. This is a register
+            in the CRTC memory space that is intercepted by the board and serves as a
+            latch to drive jumpers on the 8296D mainboard. Because the ROMs are banked
+            out this way, all video memory manipulation must happen with interrupts
+            disabled. Normal ROM operation is restored by writing #$0F into $E888.
         - Malvern Particle Sizer OEM variant
 
 */
@@ -264,6 +269,7 @@ public:
 	void user_diag_w(int state);
 
 	MC6845_BEGIN_UPDATE( pet_begin_update );
+	MC6845_ON_UPDATE_ADDR_CHANGED( crtc_update_addr );
 	MC6845_UPDATE_ROW( pet40_update_row );
 
 	TIMER_CALLBACK_MEMBER( sync_tick );
@@ -390,8 +396,6 @@ public:
 	DECLARE_MACHINE_START( pet80 );
 	DECLARE_MACHINE_RESET( pet80 );
 
-	MC6845_UPDATE_ROW( cbm8296_update_row );
-
 protected:
 	MC6845_UPDATE_ROW( pet80_update_row );
 };
@@ -433,6 +437,8 @@ public:
 	void cbm8296d(machine_config &config);
 	void cbm8296(machine_config &config);
 
+	MC6845_UPDATE_ROW( cbm8296_update_row );
+
 private:
 	required_memory_region m_basic_rom;
 	required_memory_region m_editor_rom;
@@ -456,6 +462,7 @@ private:
 	void write(offs_t offset, uint8_t data);
 
 	uint8_t m_cr;
+	uint8_t m_hre;
 	void cbm8296_mem(address_map &map) ATTR_COLD;
 };
 
@@ -853,8 +860,13 @@ void cbm8296_state::write(offs_t offset, uint8_t data)
 		}
 		if (BIT(offset, 7))
 		{
-			if (BIT(offset, 0))
+			if (BIT(offset, 3))
 			{
+				m_hre = data;
+			}
+			else if (BIT(offset, 0))
+			{
+				m_screen->update_partial(m_screen->vpos());
 				m_crtc->register_w(data);
 			}
 			else
@@ -1382,6 +1394,10 @@ MC6845_BEGIN_UPDATE( pet_state::pet_begin_update )
 	bitmap.fill(rgb_t::black(), cliprect);
 }
 
+MC6845_ON_UPDATE_ADDR_CHANGED( pet_state::crtc_update_addr )
+{
+}
+
 MC6845_UPDATE_ROW( pet80_state::pet80_update_row )
 {
 	int x = 0;
@@ -1463,28 +1479,27 @@ MC6845_UPDATE_ROW( pet_state::pet40_update_row )
 //  MC6845 CBM8296
 //-------------------------------------------------
 
-MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
+MC6845_UPDATE_ROW( cbm8296_state::cbm8296_update_row )
 {
 	int x = 0;
-	int char_rom_mask = m_char_rom->bytes() - 1;
 	const pen_t *pen = m_palette->pens();
 
 	for (int column = 0; column < x_count; column++)
 	{
-		uint8_t lsd = 0, data = 0;
-		uint8_t rra = ra & 0x07;
-		int no_row = !BIT(ra, 3);
-		int ra4 = BIT(ra, 4);
-		int chr_option = BIT(ma, 13);
-		offs_t vma = (ma + column) & 0x1fff;
-		offs_t drma = 0x8000 | ra4 << 14 | ((vma & 0xf00) << 1) | (vma & 0xff);
+		u8 const rra = ra & 0x07;
+		bool const no_row = !BIT(ra, 3);
+		bool const ra4 = BIT(ra, 4);
+		bool const chr_option = BIT(ma, 13);
+		bool clkvla = 0;
+		offs_t const vma = (ma + column) & 0x1fff;
+		offs_t drma = 0x8000 | ra4 << 14 | ((vma & 0xf00) << 1) | clkvla << 8 | (vma & 0xff);
 
 		// even character
 
-		lsd = m_ram->pointer()[drma];
+		u8 lsd = m_ram->pointer()[drma];
 
 		offs_t char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		data = m_char_rom->base()[char_addr & char_rom_mask];
+		u8 data = m_char_rom->base()[char_addr & 0xfff];
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
@@ -1494,10 +1509,12 @@ MC6845_UPDATE_ROW( pet80_state::cbm8296_update_row )
 
 		// odd character
 
-		lsd = m_ram->pointer()[drma | 0x100];
+		clkvla = 1;
+		drma = 0x8000 | ra4 << 14 | ((vma & 0xf00) << 1) | clkvla << 8 | (vma & 0xff);
+		lsd = m_ram->pointer()[drma];
 
 		char_addr = (chr_option << 11) | (m_graphic << 10) | ((lsd & 0x7f) << 3) | rra;
-		data = m_char_rom->base()[char_addr & char_rom_mask];
+		data = m_char_rom->base()[char_addr & 0xfff];
 
 		for (int bit = 0; bit < 8; bit++, data <<= 1)
 		{
@@ -1560,14 +1577,6 @@ MACHINE_START_MEMBER( pet_state, pet2001 )
 
 MACHINE_RESET_MEMBER( pet_state, pet )
 {
-	m_maincpu->reset();
-
-	m_via->reset();
-	m_pia1->reset();
-	m_pia2->reset();
-
-	m_exp->reset();
-
 	m_ieee->host_ren_w(0);
 
 	if (m_sync_period != attotime::zero)
@@ -1586,8 +1595,6 @@ MACHINE_START_MEMBER( pet_state, pet40 )
 MACHINE_RESET_MEMBER( pet_state, pet40 )
 {
 	MACHINE_RESET_CALL_MEMBER(pet);
-
-	m_crtc->reset();
 }
 
 
@@ -1602,8 +1609,6 @@ MACHINE_START_MEMBER( pet80_state, pet80 )
 MACHINE_RESET_MEMBER( pet80_state, pet80 )
 {
 	MACHINE_RESET_CALL_MEMBER(pet);
-
-	m_crtc->reset();
 }
 
 
@@ -1739,10 +1744,7 @@ void pet_state::pet(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_color(rgb_t::green());
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 200);
-	m_screen->set_visarea(0, 320-1, 0, 200-1);
+	m_screen->set_raw(XTAL(8'000'000)/2, 320, 0, 320, 200, 0, 200);
 	m_screen->set_screen_update(FUNC(pet_state::screen_update));
 	m_sync_period = attotime::from_hz(120);
 
@@ -1886,10 +1888,7 @@ void pet2001b_state::pet4032f(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
 
 	// video hardware
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 250);
-	m_screen->set_visarea(0, 320 - 1, 0, 250 - 1);
+	m_screen->set_raw(XTAL(16'000'000)/2, 400, 0, 320, 333, 0, 200);
 	m_screen->set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 	m_sync_period = attotime::never;
 
@@ -1942,10 +1941,7 @@ void pet_state::cbm4032f(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
 
 	// video hardware
-	m_screen->set_refresh_hz(50);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	m_screen->set_size(320, 250);
-	m_screen->set_visarea(0, 320 - 1, 0, 250 - 1);
+	m_screen->set_raw(XTAL(16'000'000)/2, 400, 0, 320, 400, 0, 200);
 	m_screen->set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 	m_sync_period = attotime::never;
 
@@ -1955,6 +1951,7 @@ void pet_state::cbm4032f(machine_config &config)
 	m_crtc->set_char_width(8);
 	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
 	m_crtc->set_update_row_callback(FUNC(pet_state::pet40_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(pet_state::crtc_update_addr));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2006,20 +2003,18 @@ void pet80_state::pet80(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &pet_state::pet2001_mem);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_color(rgb_t::green());
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(640, 250);
-	screen.set_visarea(0, 640 - 1, 0, 250 - 1);
-	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_color(rgb_t::green());
+	m_screen->set_raw(XTAL(16'000'000), 800, 0, 640, 333, 0, 250);
+	m_screen->set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
 
-	MC6845(config, m_crtc, XTAL(16'000'000)/16);
+	SY6545_1(config, m_crtc, XTAL(16'000'000)/16);
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(2*8);
 	m_crtc->set_begin_update_callback(FUNC(pet_state::pet_begin_update));
 	m_crtc->set_update_row_callback(FUNC(pet80_state::pet80_update_row));
+	m_crtc->set_on_update_addr_change_callback(FUNC(pet_state::crtc_update_addr));
 	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
 
 	// sound hardware
@@ -2070,11 +2065,8 @@ void cbm8296_state::cbm8296(machine_config &config)
 	PLS100(config, PLA1_TAG);
 	PLS100(config, PLA2_TAG);
 
-	m_crtc->set_clock(XTAL(16'000'000)/16);
-	m_crtc->set_show_border_area(true);
-	m_crtc->set_char_width(2*8);
-	m_crtc->set_update_row_callback(FUNC(pet80_state::cbm8296_update_row));
-	m_crtc->out_vsync_callback().set(M6520_1_TAG, FUNC(pia6821_device::cb1_w));
+	m_screen->set_raw(XTAL(16'000'000), 944, 0, 640, 339, 0, 250);
+	m_crtc->set_update_row_callback(FUNC(cbm8296_state::cbm8296_update_row));
 
 	subdevice<ieee488_slot_device>("ieee8")->set_default_option("c8250");
 

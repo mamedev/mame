@@ -328,6 +328,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55F,         teac_fd_55f,         "floppy_5_
 DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55G,         teac_fd_55g,         "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(ALPS_3255190X,       alps_3255190x,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(IBM_6360,            ibm_6360,            "floppy_8")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_TWIGGY,       floppy_twiggy,       "floppy_twiggy")
 
 DECLARE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device)
 
