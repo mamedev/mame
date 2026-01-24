@@ -123,7 +123,6 @@ T-12 to T-15 - 27512 OTP EPROM (sprites)
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/watchdog.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
 
@@ -145,7 +144,7 @@ void sidearms_state::bankswitch_w(uint8_t data)
 uint8_t sidearms_state::turtship_ports_r(offs_t offset)
 {
 	int res = 0;
-	for (int i = 0; i < 5;i++)
+	for (int i = 0; i < 5; i++)
 		res |= ((m_ports[i].read_safe(0) >> offset) & 1) << i;
 
 	return res;
@@ -160,14 +159,14 @@ void sidearms_state::sidearms_map(address_map &map)
 	map(0xc400, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xc800, 0xc800).portr("SYSTEM").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc801, 0xc801).portr("P1").w(FUNC(sidearms_state::bankswitch_w));
-	map(0xc802, 0xc802).portr("P2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xc802, 0xc802).portr("P2").w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request
 	map(0xc803, 0xc803).portr("DSW0");
 	map(0xc804, 0xc804).portr("DSW1").w(FUNC(sidearms_state::control_w));
 	map(0xc805, 0xc805).portr("DSW2").w(FUNC(sidearms_state::star_scrollx_w));
 	map(0xc806, 0xc806).w(FUNC(sidearms_state::star_scrolly_w));
 	map(0xc808, 0xc809).writeonly().share("bg_scrollx");
 	map(0xc80a, 0xc80b).writeonly().share("bg_scrolly");
-	map(0xc80c, 0xc80c).w(FUNC(sidearms_state::gfxctrl_w));   /* background and sprite enable */
+	map(0xc80c, 0xc80c).w(FUNC(sidearms_state::gfxctrl_w)); // background and sprite enable
 	map(0xd000, 0xd7ff).ram().w(FUNC(sidearms_state::videoram_w)).share("videoram");
 	map(0xd800, 0xdfff).ram().w(FUNC(sidearms_state::colorram_w)).share("colorram");
 	map(0xe000, 0xefff).ram();
@@ -185,13 +184,13 @@ void sidearms_state::turtship_map(address_map &map)
 	map(0xe800, 0xe807).r(FUNC(sidearms_state::turtship_ports_r));
 	map(0xe800, 0xe800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xe801, 0xe801).w(FUNC(sidearms_state::bankswitch_w));
-	map(0xe802, 0xe802).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xe802, 0xe802).w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request
 	map(0xe804, 0xe804).w(FUNC(sidearms_state::control_w));
 	map(0xe805, 0xe805).w(FUNC(sidearms_state::star_scrollx_w));
 	map(0xe806, 0xe806).w(FUNC(sidearms_state::star_scrolly_w));
 	map(0xe808, 0xe809).writeonly().share("bg_scrollx");
 	map(0xe80a, 0xe80b).writeonly().share("bg_scrolly");
-	map(0xe80c, 0xe80c).w(FUNC(sidearms_state::gfxctrl_w));   /* background and sprite enable */
+	map(0xe80c, 0xe80c).w(FUNC(sidearms_state::gfxctrl_w)); // background and sprite enable
 	map(0xf000, 0xf7ff).ram().w(FUNC(sidearms_state::videoram_w)).share("videoram");
 	map(0xf800, 0xffff).ram().w(FUNC(sidearms_state::colorram_w)).share("colorram");
 }
@@ -228,7 +227,7 @@ void sidearms_state::whizz_map(address_map &map)
 	map(0xc400, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xc800, 0xc800).portr("DSW0").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc801, 0xc801).portr("DSW1").w(FUNC(sidearms_state::whizz_bankswitch_w));
-	map(0xc802, 0xc802).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xc802, 0xc802).portr("DSW2").w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request
 	map(0xc803, 0xc803).portr("IN0").nopw();
 	map(0xc804, 0xc804).portr("IN1").w(FUNC(sidearms_state::control_w));
 	map(0xc805, 0xc805).portr("IN2").nopw();
@@ -265,9 +264,7 @@ static INPUT_PORTS_START( sidearms )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x08, 0x08, "Freeze" )    /* I'm not sure it's really a dip switch */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -344,7 +341,9 @@ static INPUT_PORTS_START( sidearms )
 
 	PORT_START("DSW2")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))     /* not sure, but likely */
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( turtship )
@@ -576,7 +575,7 @@ static INPUT_PORTS_START( whizz )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -684,15 +683,12 @@ void sidearms_state::sidearms(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::sidearms_sound_map);
 
-	WATCHDOG_TIMER(config, "watchdog");
-
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sidearms);
@@ -727,14 +723,11 @@ void sidearms_state::turtship(machine_config &config)
 	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::sidearms_sound_map);
 
-	WATCHDOG_TIMER(config, "watchdog");
-
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8); // 61.0338 Hz measured
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -773,15 +766,12 @@ void sidearms_state::whizz(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
 
-	WATCHDOG_TIMER(config, "watchdog");
-
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turtship);
@@ -1300,25 +1290,6 @@ ROM_START( whizz )  /* Whizz Philko 1989. Original pcb. Boardnumber: 01-90 / Ser
 	ROM_LOAD( "t-7.y8",    0x0000, 0x8000, CRC(a8b5f750) SHA1(94eb7af3cb8bee87ce3d31260e3bde062ebbc8f0) )
 ROM_END
 
-void sidearms_state::init_sidearms()
-{
-	m_gameid = 0;
-}
-
-void sidearms_state::init_turtship()
-{
-	m_gameid = 1;
-}
-
-void sidearms_state::init_dyger()
-{
-	m_gameid = 2;
-}
-
-void sidearms_state::init_whizz()
-{
-	m_gameid = 3;
-}
 
 // date string is at 0xaa2 in 'rom 03' it does not appear to be displayed
 

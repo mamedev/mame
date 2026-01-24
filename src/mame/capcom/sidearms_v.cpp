@@ -25,12 +25,12 @@ void sidearms_state::colorram_w(offs_t offset, uint8_t data)
 
 void sidearms_state::control_w(uint8_t data)
 {
-	/* bits 0 and 1 are coin counters */
+	// bits 0 and 1 are coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
-	/* bit 2 and 3 lock the coin chutes */
-	if (!m_gameid || m_gameid==3)
+	// bit 2 and 3 lock the coin chutes
+	if (!m_gameid || m_gameid == 3)
 	{
 		machine().bookkeeping().coin_lockout_w(0, !(data & 0x04));
 		machine().bookkeeping().coin_lockout_w(1, !(data & 0x08));
@@ -41,13 +41,13 @@ void sidearms_state::control_w(uint8_t data)
 		machine().bookkeeping().coin_lockout_w(1, data & 0x08);
 	}
 
-	/* bit 4 resets the sound CPU */
+	// bit 4 resets the sound CPU
 	if (data & 0x10)
 	{
 		m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 	}
 
-	/* bit 5 enables starfield */
+	// bit 5 enables starfield
 	if (m_staron != (data & 0x20))
 	{
 		m_staron = data & 0x20;
@@ -55,10 +55,10 @@ void sidearms_state::control_w(uint8_t data)
 		m_hcount_191 = m_vcount_191 = 0;
 	}
 
-	/* bit 6 enables char layer */
+	// bit 6 enables char layer
 	m_charon = data & 0x40;
 
-	/* bit 7 flips screen */
+	// bit 7 flips screen
 	if (m_flipon != (data & 0x80))
 	{
 		m_flipon = data & 0x80;
@@ -69,8 +69,8 @@ void sidearms_state::control_w(uint8_t data)
 
 void sidearms_state::gfxctrl_w(uint8_t data)
 {
-	m_objon = data & 0x01;
-	m_bgon = data & 0x02;
+	m_bgon = data & 0x01;
+	m_objon = data & 0x02;
 }
 
 void sidearms_state::star_scrollx_w(uint8_t data)
@@ -129,10 +129,10 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
 
 TILEMAP_MAPPER_MEMBER(sidearms_state::tilemap_scan)
 {
-	/* logical (col,row) -> memory offset */
+	// logical (col,row) -> memory offset
 	int offset = ((row << 7) + col) << 1;
 
-	/* swap bits 1-7 and 8-10 of the address to compensate for the funny layout of the ROM data */
+	// swap bits 1-7 and 8-10 of the address to compensate for the funny layout of the ROM data
 	return ((offset & 0xf801) | ((offset & 0x0700) >> 7) | ((offset & 0x00fe) << 3)) & 0x7fff;
 }
 
@@ -142,8 +142,7 @@ void sidearms_state::video_start()
 
 	if (!m_gameid)
 	{
-		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidearms_state::get_sidearms_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(sidearms_state::tilemap_scan)),
-				32, 32, 128, 128);
+		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidearms_state::get_sidearms_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(sidearms_state::tilemap_scan)), 32, 32, 128, 128);
 
 		m_bg_tilemap->set_transparent_pen(15);
 	}
@@ -152,8 +151,7 @@ void sidearms_state::video_start()
 		m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidearms_state::get_philko_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(sidearms_state::tilemap_scan)), 32, 32, 128, 128);
 	}
 
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidearms_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS,
-			8, 8, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(sidearms_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
 
 	m_fg_tilemap->set_transparent_pen(3);
 
@@ -177,19 +175,19 @@ void sidearms_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &
 {
 	uint8_t *buffered_spriteram = m_spriteram->buffer();
 	gfx_element *gfx = m_gfxdecode->gfx(2);
-	int offs, attr, color, code, x, y, flipx, flipy;
-
+	int flipx, flipy;
 	flipy = flipx = m_flipon;
 
-	for (offs = end_offset - 32; offs >= start_offset; offs -= 32)
+	for (int offs = end_offset - 32; offs >= start_offset; offs -= 32)
 	{
-		y = buffered_spriteram[offs + 2];
-		if (!y || buffered_spriteram[offs + 5] == 0xc3) continue;
+		int y = buffered_spriteram[offs + 2];
+		if (!y || buffered_spriteram[offs + 5] == 0xc3)
+			continue;
 
-		attr = buffered_spriteram[offs + 1];
-		color = attr & 0xf;
-		code = buffered_spriteram[offs] + ((attr << 3) & 0x700);
-		x = buffered_spriteram[offs + 3] + ((attr << 4) & 0x100);
+		int attr = buffered_spriteram[offs + 1];
+		int color = attr & 0xf;
+		int code = buffered_spriteram[offs] + ((attr << 3) & 0x700);
+		int x = buffered_spriteram[offs + 3] + ((attr << 4) & 0x100);
 
 		if (m_flipon)
 		{
@@ -197,11 +195,10 @@ void sidearms_state::draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &
 			y = (30 * 8) - y;
 		}
 
-
-			gfx->transpen(bitmap,cliprect,
-			code, color,
-			flipx, flipy,
-			x, y, 15);
+		gfx->transpen(bitmap,cliprect,
+				code, color,
+				flipx, flipy,
+				x, y, 15);
 	}
 }
 
@@ -355,5 +352,6 @@ uint32_t sidearms_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	if (m_charon)
 		m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }

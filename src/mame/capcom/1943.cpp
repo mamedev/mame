@@ -36,7 +36,6 @@
       vertical line and has a vblank counter. All this isn't used by the MCU
       program, it only exchanges a value with the main CPU.
 
-
 */
 
 #include "emu.h"
@@ -77,7 +76,7 @@ void _1943_state::c1943_map(address_map &map)
 	map(0xc007, 0xc007).lr8(NAME([this] () -> u8 { return m_mcu_to_cpu; }));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc804, 0xc804).w(FUNC(_1943_state::control_w)); // ROM bank switch, screen flip
-	map(0xc806, 0xc806).w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request (not watchdog reset)
+	map(0xc806, 0xc806).w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request
 	map(0xc807, 0xc807).lw8(NAME([this] (u8 data) { m_cpu_to_mcu = data; }));
 	map(0xd000, 0xd3ff).ram().w(FUNC(_1943_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(_1943_state::colorram_w)).share("colorram");

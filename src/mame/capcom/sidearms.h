@@ -31,10 +31,10 @@ public:
 	void turtship(machine_config &config);
 	void whizz(machine_config &config);
 
-	void init_dyger();
-	void init_sidearms();
-	void init_whizz();
-	void init_turtship();
+	void init_sidearms() { m_gameid = 0; }
+	void init_turtship() { m_gameid = 1; }
+	void init_dyger() { m_gameid = 2; }
+	void init_whizz() { m_gameid = 3; }
 
 private:
 	required_device<cpu_device> m_maincpu;
