@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-/**********************************************************************************************************************************
+/************************************************************************************
 
 Skeleton driver for Arachnid "Super Shuffle" (electromechanical + video).
 
@@ -22,7 +22,7 @@ Linux operating system.
 Game starts with the following message on screen:
   "It's better to be wanted for murder that not to be wanted at all. - Marty Winch"
 
-***********************************************************************************************************************************/
+************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
@@ -52,6 +52,9 @@ private:
 
 void sshuffle_state::sshuffle_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0xe0000);
+	map(0xfff00000, 0xffffffff).rom().region("bios", 0);
 }
 
 void sshuffle_state::sshuffle_io(address_map &map)
@@ -80,7 +83,7 @@ ROM_START(sshuffle)
 	ROM_LOAD("iob_pic18f4520.bin", 0x0000, 0x8000, CRC(e6c32bc4) SHA1(619e30dd5d3d8da15e1dc8d03a3cb996981464a0))
 
 	DISK_REGION("ide:0:hdd")
-	DISK_IMAGE("shuffleboard_bowling", 0, SHA1(6fcc7b5e525c9a3083e29edfb6657664c9c4c9d4)) // Image tested on real hardware, may contain operator or players game
+	DISK_IMAGE("shuffleboard_bowling", 0, BAD_DUMP SHA1(6fcc7b5e525c9a3083e29edfb6657664c9c4c9d4)) // Image tested on real hardware, but may contain operator or players data
 ROM_END
 
 } // anonymous namespace
