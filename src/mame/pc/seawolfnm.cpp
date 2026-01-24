@@ -1,14 +1,14 @@
 // license:BSD-3-Clause
 // copyright-holders:
 
-/**********************************************************************************************************************************
+/****************************************************************************
 
 Skeleton driver for "Sea Wolf - Next Mission", from Coastal Amusements Inc.
 
 Based on an Foxconn "45CMX" PCB:
 -Intel Celeron SL9XN 1.8GHz/512/800/06 CPU.
 -1024MB DDR2-667 RAM.
--North Bridge : Intel® 945GC/945G chipset, South Bridge : Intel® ICH7.
+-North Bridge: Intel 945GC/945G chipset; South Bridge: Intel ICH7.
 
 Jaton Video-PX8400GS-EX video board with 512 MB RAM (NVIDIA GeForce 8400GS).
 
@@ -17,7 +17,7 @@ Coastal Game I/O PCB:
 -Buttons for set and calibration.
 -Etc.
 
-***********************************************************************************************************************************/
+****************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
@@ -47,6 +47,9 @@ private:
 
 void seawolfnm_state::seawolfnm_map(address_map &map)
 {
+	map(0x00000000, 0x0009ffff).ram();
+	map(0x000e0000, 0x000fffff).rom().region("bios", 0x60000);
+	map(0xfff80000, 0xffffffff).rom().region("bios", 0);
 }
 
 void seawolfnm_state::seawolfnm_io(address_map &map)
@@ -75,7 +78,7 @@ ROM_START(seawolfnm)
 	ROM_LOAD("sea_wolf_1_89c5131a.bin", 0x0000, 0x8000, NO_DUMP)
 
 	DISK_REGION("ide:0:hdd")
-	DISK_IMAGE("sea_wolf_the_next_mission_0.9.9_12-25-08_coastal_amusements_inc", 0, SHA1(dc47d60ba04d33aece91838598828edbf79e8eb5)) // Image tested on real hardware, may contain operator or players game
+	DISK_IMAGE("sea_wolf_the_next_mission_0.9.9_12-25-08_coastal_amusements_inc", 0, BAD_DUMP SHA1(dc47d60ba04d33aece91838598828edbf79e8eb5)) // Image tested on real hardware, but may contain operator or players data
 ROM_END
 
 } // anonymous namespace
