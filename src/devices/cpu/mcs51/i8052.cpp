@@ -146,32 +146,32 @@ void i8052_device::sfr_map(address_map &map)
 	map(0xcc, 0xcd).rw(FUNC(i8052_device::t2_r   ), FUNC(i8052_device::t2_w   ));
 }
 
-u8   i8052_device::t2con_r ()
+u8 i8052_device::t2con_r()
 {
 	return m_t2con;
 }
 
-void i8052_device::t2con_w (u8 data)
+void i8052_device::t2con_w(u8 data)
 {
 	m_t2con = data;
 }
 
-u8   i8052_device::rcap2_r (offs_t offset)
+u8 i8052_device::rcap2_r(offs_t offset)
 {
 	return m_rcap2 >> (offset*8);
 }
 
-void i8052_device::rcap2_w (offs_t offset, u8 data)
+void i8052_device::rcap2_w(offs_t offset, u8 data)
 {
 	m_rcap2 = (m_rcap2 & ~(0xff << (offset*8))) | (data << (offset*8));
 }
 
-u8   i8052_device::t2_r (offs_t offset)
+u8 i8052_device::t2_r(offs_t offset)
 {
 	return m_t2 >> (offset*8);
 }
 
-void i8052_device::t2_w (offs_t offset, u8 data)
+void i8052_device::t2_w(offs_t offset, u8 data)
 {
 	m_t2 = (m_t2 & ~(0xff << (offset*8))) | (data << (offset*8));
 }

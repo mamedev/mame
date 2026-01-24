@@ -142,9 +142,7 @@ void ds5002fp_device::ds_protected(u8 &val, u8 data, u8 ta_mask, u8 mask)
 
 	is_timed_access = (m_ta_window > 0) && (m_ta == 0x55);
 	if (is_timed_access)
-	{
 		ta_mask = 0xff;
-	}
 	data = (val & (~ta_mask)) | (data & ta_mask);
 	val = (val & (~mask)) | (data & mask);
 }

@@ -60,7 +60,7 @@ void sab80c535_device::p4_w(u8 data)
 
 u8 sab80c535_device::p4_r()
 {
-	if(m_p4 == 0)
+	if (m_p4 == 0)
 		return 0;
 	return m_p4 & m_port_in_cb[4]();
 }
@@ -73,7 +73,7 @@ void sab80c535_device::p5_w(u8 data)
 
 u8 sab80c535_device::p5_r()
 {
-	if(m_p5 == 0)
+	if (m_p5 == 0)
 		return 0;
 	return m_p5 & m_port_in_cb[5]();
 }

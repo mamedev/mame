@@ -159,52 +159,52 @@ void mcs51_cpu_device::inti_map(address_map &map)
 	map(0x00, m_ram_mask).ram().share(m_internal_ram);
 }
 
-u8   mcs51_cpu_device::psw_r ()
+u8 mcs51_cpu_device::psw_r()
 {
 	return m_psw;
 }
 
-void mcs51_cpu_device::psw_w (u8 data)
+void mcs51_cpu_device::psw_w(u8 data)
 {
 	m_psw = (m_psw & 0x01) | (data & 0xfe);
 }
 
-u8   mcs51_cpu_device::acc_r ()
+u8 mcs51_cpu_device::acc_r()
 {
 	return m_acc;
 }
 
-u8   mcs51_cpu_device::b_r   ()
+u8 mcs51_cpu_device::b_r()
 {
 	return m_b;
 }
 
-void mcs51_cpu_device::b_w   (u8 data)
+void mcs51_cpu_device::b_w(u8 data)
 {
 	m_b = data;
 }
 
-u8   mcs51_cpu_device::sp_r  ()
+u8 mcs51_cpu_device::sp_r()
 {
 	return m_sp;
 }
 
-void mcs51_cpu_device::sp_w  (u8 data)
+void mcs51_cpu_device::sp_w(u8 data)
 {
 	m_sp = data;
 }
 
-u8   mcs51_cpu_device::dptr_r (offs_t offset)
+u8 mcs51_cpu_device::dptr_r(offs_t offset)
 {
 	return m_dptr >> (offset*8);
 }
 
-void mcs51_cpu_device::dptr_w (offs_t offset, u8 data)
+void mcs51_cpu_device::dptr_w(offs_t offset, u8 data)
 {
 	m_dptr = (m_dptr & ~(0xff << (offset*8))) | (data << (offset*8));
 }
 
-u8   mcs51_cpu_device::pcon_r()
+u8 mcs51_cpu_device::pcon_r()
 {
 	return m_pcon;
 }
@@ -214,7 +214,7 @@ void mcs51_cpu_device::pcon_w(u8 data)
 	m_pcon = data;
 }
 
-u8   mcs51_cpu_device::tcon_r()
+u8 mcs51_cpu_device::tcon_r()
 {
 	return m_tcon;
 }
@@ -224,7 +224,7 @@ void mcs51_cpu_device::tcon_w(u8 data)
 	m_tcon = data;
 }
 
-u8   mcs51_cpu_device::tmod_r()
+u8 mcs51_cpu_device::tmod_r()
 {
 	return m_tmod;
 }
@@ -234,7 +234,7 @@ void mcs51_cpu_device::tmod_w(u8 data)
 	m_tmod = data;
 }
 
-u8   mcs51_cpu_device::scon_r()
+u8 mcs51_cpu_device::scon_r()
 {
 	return m_scon;
 }
@@ -252,7 +252,7 @@ void mcs51_cpu_device::scon_w(u8 data)
 	}
 }
 
-u8   mcs51_cpu_device::sbuf_r()
+u8 mcs51_cpu_device::sbuf_r()
 {
 	return m_sbuf;
 }
@@ -265,61 +265,61 @@ void mcs51_cpu_device::sbuf_w(u8 data)
 	m_uart.txbit = SIO_START;
 }
 
-u8   mcs51_cpu_device::ie_r  ()
+u8 mcs51_cpu_device::ie_r()
 {
 	return m_ie;
 }
 
-void mcs51_cpu_device::ie_w  (u8 data)
+void mcs51_cpu_device::ie_w(u8 data)
 {
 	m_ie = data;
 }
 
-u8   mcs51_cpu_device::ip_r  ()
+u8 mcs51_cpu_device::ip_r()
 {
 	return m_ip;
 }
 
-void mcs51_cpu_device::ip_w  (u8 data)
+void mcs51_cpu_device::ip_w(u8 data)
 {
 	m_ip = data;
 	update_irq_prio();
 }
 
-u8   mcs51_cpu_device::p0_r  ()
+u8 mcs51_cpu_device::p0_r()
 {
 	return m_rwm ? m_p0 : (m_p0 | m_forced_inputs[0]) & m_port_in_cb[0]();
 }
 
-void mcs51_cpu_device::p0_w  (u8 data)
+void mcs51_cpu_device::p0_w(u8 data)
 {
 	m_p0 = data;
 	m_port_out_cb[0](m_p0);
 }
 
-u8   mcs51_cpu_device::p1_r  ()
+u8 mcs51_cpu_device::p1_r()
 {
 	return m_rwm ? m_p1 : (m_p1 | m_forced_inputs[1]) & m_port_in_cb[1]();
 }
 
-void mcs51_cpu_device::p1_w  (u8 data)
+void mcs51_cpu_device::p1_w(u8 data)
 {
 	m_p1 = data;
 	m_port_out_cb[1](m_p1);
 }
 
-u8   mcs51_cpu_device::p2_r  ()
+u8 mcs51_cpu_device::p2_r()
 {
 	return m_rwm ? m_p2 : (m_p2 | m_forced_inputs[2]) & m_port_in_cb[2]();
 }
 
-void mcs51_cpu_device::p2_w  (u8 data)
+void mcs51_cpu_device::p2_w(u8 data)
 {
 	m_p2 = data;
 	m_port_out_cb[2](m_p2);
 }
 
-u8   mcs51_cpu_device::p3_r  ()
+u8 mcs51_cpu_device::p3_r()
 {
 	return m_rwm ? m_p3 :
 		(m_p3 | m_forced_inputs[3]) & m_port_in_cb[3]()
@@ -327,7 +327,7 @@ u8   mcs51_cpu_device::p3_r  ()
 		& ~(BIT(m_last_line_state, MCS51_INT1_LINE) ? 8 : 0);
 }
 
-void mcs51_cpu_device::p3_w  (u8 data)
+void mcs51_cpu_device::p3_w(u8 data)
 {
 	m_p3 = data;
 	// P3.1 = SFR(P3) & TxD
@@ -337,42 +337,42 @@ void mcs51_cpu_device::p3_w  (u8 data)
 		m_port_out_cb[3](m_p3);
 }
 
-u8   mcs51_cpu_device::tl0_r ()
+u8 mcs51_cpu_device::tl0_r()
 {
 	return m_tl0;
 }
 
-void mcs51_cpu_device::tl0_w (u8 data)
+void mcs51_cpu_device::tl0_w(u8 data)
 {
 	m_tl0 = data;
 }
 
-u8   mcs51_cpu_device::tl1_r ()
+u8 mcs51_cpu_device::tl1_r()
 {
 	return m_tl1;
 }
 
-void mcs51_cpu_device::tl1_w (u8 data)
+void mcs51_cpu_device::tl1_w(u8 data)
 {
 	m_tl1 = data;
 }
 
-u8   mcs51_cpu_device::th0_r ()
+u8 mcs51_cpu_device::th0_r()
 {
 	return m_th0;
 }
 
-void mcs51_cpu_device::th0_w (u8 data)
+void mcs51_cpu_device::th0_w(u8 data)
 {
 	m_th0 = data;
 }
 
-u8   mcs51_cpu_device::th1_r ()
+u8 mcs51_cpu_device::th1_r()
 {
 	return m_th1;
 }
 
-void mcs51_cpu_device::th1_w (u8 data)
+void mcs51_cpu_device::th1_w(u8 data)
 {
 	m_th1 = data;
 }
@@ -399,7 +399,7 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 	for (auto & elem : m_forced_inputs)
 		elem = 0;
 
-	for(int i=0; i != 8; i++) {
+	for (int i = 0; i != 8; i++) {
 		m_port_in_cb[i].bind().set([this, i]() { return port_default_r(i); });
 		m_port_out_cb[i].bind().set([this, i](u8 data) { port_default_w(i, data); });
 	}
@@ -408,7 +408,7 @@ mcs51_cpu_device::mcs51_cpu_device(const machine_config &mconfig, device_type ty
 
 u8 mcs51_cpu_device::port_default_r(int port)
 {
-	if(!machine().side_effects_disabled())
+	if (!machine().side_effects_disabled())
 		logerror("read of un-hooked port %d (PC=%X)\n", port, m_ppc);
 	return 0xff;
 }
@@ -572,12 +572,12 @@ void mcs51_cpu_device::transmit_receive(int source)
 				}
 			}
 			return;
-		//8 bit uart ( + start,stop bit ) - baud set by timer1 or timer2
+		// 8 bit uart (+ start,stop bit) - baud set by timer1 or timer2
 		case 1:
 		case 3:
 			handle_8bit_uart_clock(source);
 			break;
-		//9 bit uart
+		// 9 bit uart
 		case 2:
 			m_uart.rx_clk += (source == 0) ? (BIT(m_pcon, PCON_SMOD) ? 6 : 3) : 0; /* clock / 12 * 3 / 8 (16) = clock / 32 (64)*/
 			m_uart.tx_clk += (source == 0) ? (BIT(m_pcon, PCON_SMOD) ? 6 : 3) : 0; /* clock / 12 */
@@ -657,8 +657,10 @@ void mcs51_cpu_device::transmit_receive(int source)
 					m_uart.rxbit = SIO_DATA0;
 				}
 				else
+				{
 					// false start bit
 					m_uart.rxbit = SIO_START_LE;
+				}
 				break;
 			case SIO_DATA0: case SIO_DATA1: case SIO_DATA2: case SIO_DATA3:
 			case SIO_DATA4: case SIO_DATA5: case SIO_DATA6: case SIO_DATA7:
@@ -692,8 +694,10 @@ void mcs51_cpu_device::transmit_receive(int source)
 							set_ri(1);
 						}
 						else if (data)
+						{
 							// RI if valid stop bit
 							set_ri(1);
+						}
 						break;
 					case 2:
 					case 3:
@@ -955,7 +959,7 @@ void mcs51_cpu_device::check_irqs()
 	u8 int_vec = 0;
 	int priority_request = -1;
 
-	//If All Interrupts Disabled or no pending abort..
+	// Abort if all interrupts disabled or none pending
 	u8 int_mask = BIT(m_ie, IE_A) ? m_ie : 0x00;
 
 	irqs_complete_and_mask(ints, int_mask);
@@ -963,7 +967,7 @@ void mcs51_cpu_device::check_irqs()
 	if (!ints)
 		return;
 
-	if(manage_idle_on_interrupt(ints))
+	if (manage_idle_on_interrupt(ints))
 		return;
 
 	for (int i = 0; i < m_num_interrupts; i++)
@@ -1011,31 +1015,31 @@ void mcs51_cpu_device::check_irqs()
 	/* interrupts take 24 cycles */
 	m_inst_cycles += 2;
 
-	//Set current Irq & Priority being serviced
+	// Set current Irq & Priority being serviced
 	m_cur_irq_prio = priority_request;
 	m_irq_active |= (1 << priority_request);
 
 	LOG("Take: %d %02x\n", m_cur_irq_prio, m_irq_active);
 
-	//Clear any interrupt flags that should be cleared since we're servicing the irq!
+	// Clear any interrupt flags that should be cleared since we're servicing the irq!
 	switch (int_vec)
 	{
 		case V_IE0:
-			//External Int Flag only cleared when configured as Edge Triggered..
+			// External Int Flag only cleared when configured as Edge Triggered..
 			if (BIT(m_tcon, TCON_IT0)) /* for some reason having this, breaks alving dmd games */
 				set_ie0(0);
 			break;
 		case V_TF0:
-			//Timer 0 - Always clear Flag
+			// Timer 0 - Always clear Flag
 			set_tf0(0);
 			break;
 		case V_IE1:
-			//External Int Flag only cleared when configured as Edge Triggered..
+			// External Int Flag only cleared when configured as Edge Triggered..
 			if (BIT(m_tcon, TCON_IT1)) /* for some reason having this, breaks alving dmd games */
 				set_ie1(0);
 			break;
 		case V_TF1:
-			//Timer 1 - Always clear Flag
+			// Timer 1 - Always clear Flag
 			set_tf1(0);
 			break;
 		case V_RITI:
@@ -1073,12 +1077,12 @@ void mcs51_cpu_device::handle_irq(int irqline, int state, u32 new_state, u32 tr_
 {
 	switch (irqline)
 	{
-		//External Interrupt 0
+		// External Interrupt 0
 		case MCS51_INT0_LINE:
-			//Line Asserted?
+			// Line Asserted?
 			if (state != CLEAR_LINE)
 			{
-				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT0 active lo!
+				// Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT0 active lo!
 				if (BIT(m_tcon, TCON_IT0))
 				{
 					if (BIT(tr_state, MCS51_INT0_LINE))
@@ -1086,7 +1090,7 @@ void mcs51_cpu_device::handle_irq(int irqline, int state, u32 new_state, u32 tr_
 				}
 				else
 				{
-					set_ie0(1); //Nope, just set it..
+					set_ie0(1); // Nope, just set it..
 				}
 			}
 			else
@@ -1097,19 +1101,19 @@ void mcs51_cpu_device::handle_irq(int irqline, int state, u32 new_state, u32 tr_
 
 			break;
 
-		//External Interrupt 1
+		// External Interrupt 1
 		case MCS51_INT1_LINE:
-			//Line Asserted?
+			// Line Asserted?
 			if (state != CLEAR_LINE)
 			{
-				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT1 active lo!
+				// Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT1 active lo!
 				if (BIT(m_tcon, TCON_IT1))
 				{
 					if (BIT(tr_state, MCS51_INT1_LINE))
 						set_ie1(1);
 				}
 				else
-					set_ie1(1); //Nope, just set it..
+					set_ie1(1); // Nope, just set it..
 			}
 			else
 			{

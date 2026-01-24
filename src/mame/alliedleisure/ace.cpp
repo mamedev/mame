@@ -183,8 +183,8 @@ void ace_state::main_map(address_map &map)
 	map(0x0000, 0x09ff).rom();
 
 	map(0x2000, 0x20ff).ram().w(FUNC(ace_state::ace_scoreram_w)).share(m_scoreram); // 2x2101
-	map(0x8300, 0x83ff).ram(); // 2x2101
 	map(0x8000, 0x80ff).ram().w(FUNC(ace_state::ace_characterram_w)).share(m_characterram); // 3x3101 (3 bits)
+	map(0x8300, 0x83ff).ram(); // 2x2101
 
 	map(0xc000, 0xc005).writeonly().share(m_objpos);
 
@@ -228,7 +228,7 @@ static INPUT_PORTS_START( ace )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // must be 1 after insert coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // read when plane destroyed
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // read when plane is destroyed
 
 	PORT_START("RANGE")
 	PORT_CONFNAME( 0x0f, 0x05, "Bullet Range" )
