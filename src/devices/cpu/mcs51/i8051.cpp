@@ -1234,6 +1234,15 @@ void mcs51_cpu_device::device_start()
 	save_item(NAME(m_ip));
 	save_item(NAME(m_iph));
 
+	save_item(NAME(m_p0));
+	save_item(NAME(m_p1));
+	save_item(NAME(m_p2));
+	save_item(NAME(m_p3));
+	save_item(NAME(m_tl0));
+	save_item(NAME(m_tl1));
+	save_item(NAME(m_th0));
+	save_item(NAME(m_th1));
+
 	save_item(NAME(m_uart.data_out));
 	save_item(NAME(m_uart.data_in));
 	save_item(NAME(m_uart.txbit));
