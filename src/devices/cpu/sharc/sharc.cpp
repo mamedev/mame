@@ -702,6 +702,8 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->laddr.loop_type));
 	save_item(NAME(m_core->curlcntr));
 	save_item(NAME(m_core->lcntr));
+	save_item(NAME(m_core->iop_write_num));
+	save_item(NAME(m_core->iop_data));
 
 	save_item(NAME(m_core->dag1.i));
 	save_item(NAME(m_core->dag1.m));
