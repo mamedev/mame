@@ -37,18 +37,18 @@
 #endif
 
 			// convert source to clr
-			pen_to_clr(pen, &s_clr.trgb);
+			pen_to_clr(pen, s_clr.trgb);
 			//s_clr.data = (pen >> 3); // using the union is actually significantly slower than our pen_to_clr to function!
 			// source * intesity and clamp
 
 #if TINT == 1
-			s_clr.trgb.mul(*tint_clr);
+			s_clr.trgb.mul(tint_clr);
 #endif
 
 			#if BLENDED == 1
 
 				// convert destination to clr
-				pen_to_clr(*bmp, &d_clr.trgb);
+				pen_to_clr(*bmp, d_clr.trgb);
 				//d_clr.data = *bmp >> 3; // using the union is actually significantly slower than our pen_to_clr to function!
 				#if _SMODE == 0
 				//g_profiler.start(PROFILER_USER7);

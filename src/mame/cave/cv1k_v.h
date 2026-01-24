@@ -1,23 +1,22 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Luca Elia, MetalliC
-/* emulation of Altera Cyclone EP1C12 FPGA programmed as a blitter */
-#ifndef MAME_CAVE_EP1C12_H
-#define MAME_CAVE_EP1C12_H
+// emulation of Cave CV1000 blitter hardware
+// programmed to Altera Cyclone EP1C12 FPGA
+
+#ifndef MAME_CAVE_CV1K_V_H
+#define MAME_CAVE_CV1K_V_H
 
 #pragma once
 
-#define DEBUG_VRAM_VIEWER 0 // VRAM viewer for debug
+#define CV1K_DEBUG_VRAM_VIEWER 0 // VRAM viewer for debug
 
-class ep1c12_device : public device_t, public device_video_interface
+class cv1k_blitter_device : public device_t, public device_video_interface
 {
 public:
-	ep1c12_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	cv1k_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename T> void set_cpu(T &&maintag) { m_maincpu.set_tag(std::forward<T>(maintag)); }
 	auto port_r_callback() { return m_port_r_cb.bind(); }
 	void set_rambase(u16* rambase) { m_ram16 = rambase; }
-
-	inline u16 READ_NEXT_WORD(offs_t *addr);
 
 	void set_mainramsize(size_t ramsize)
 	{
@@ -30,39 +29,18 @@ public:
 	u64 fpga_r();
 	void fpga_w(offs_t offset, u64 data, u64 mem_mask = ~0);
 
-	void draw_screen(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	u16* m_ram16;
-	u32 m_gfx_addr;
-	u32 m_gfx_scroll_x, m_gfx_scroll_y;
-	u32 m_gfx_clip_x, m_gfx_clip_y;
-
-	int m_gfx_size;
-	std::unique_ptr<bitmap_rgb32> m_bitmaps;
-	rectangle m_clip;
-
-	u16* m_use_ram;
-	size_t m_main_ramsize; // type D has double the main ram
-	size_t m_main_rammask;
-
-	void install_handlers(int addr1, int addr2);
+	void install_handlers(address_space &space, int addr1, int addr2);
 
 	u32 blitter_r(offs_t offset, u32 mem_mask = ~0);
 	void blitter_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 m_gfx_addr_shadowcopy;
-	u32 m_gfx_clip_x_shadowcopy, m_gfx_clip_y_shadowcopy;
-	std::unique_ptr<u16[]> m_ram16_copy;
-	inline void gfx_upload_shadow_copy(address_space &space, offs_t *addr);
-	inline void gfx_create_shadow_copy(address_space &space);
-	inline u16 COPY_NEXT_WORD(address_space &space, offs_t *addr);
-	inline void gfx_draw_shadow_copy(address_space &space, offs_t *addr);
-	inline void gfx_upload(offs_t *addr);
-	inline void gfx_draw(offs_t *addr);
-	void gfx_exec();
-	u32 gfx_ready_r();
-	void gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
 
 protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
 	// Number of bytes that are read each time Blitter fetches operations from SRAM.
 	static inline constexpr int OPERATION_CHUNK_SIZE_BYTES = 64;
 
@@ -233,8 +211,8 @@ protected:
 	};
 
 	typedef void (*blitfunction)(
-			bitmap_rgb32 *,
-			const rectangle *,
+			bitmap_rgb32 &,
+			const rectangle &,
 			u32 *gfx,
 			int src_x,
 			int src_y,
@@ -246,12 +224,12 @@ protected:
 			const u8 s_alpha,
 			const u8 d_alpha,
 			//int tint,
-			const clr_t *);
-
+			const clr_t &);
 
 #define BLIT_FUNCTION static void
-#define BLIT_PARAMS bitmap_rgb32 *bitmap, const rectangle *clip, u32 *gfx, int src_x, int src_y, const int dst_x_start, const int dst_y_start, int dimx, int dimy, const bool flipy, const u8 s_alpha, const u8 d_alpha, const clr_t *tint_clr
+#define BLIT_PARAMS bitmap_rgb32 &bitmap, const rectangle &clip, u32 *gfx, int src_x, int src_y, const int dst_x_start, const int dst_y_start, int dimx, int dimy, const bool flipy, const u8 s_alpha, const u8 d_alpha, const clr_t &tint_clr
 
+	// TODO: convert these to template for simplicity?
 	BLIT_FUNCTION draw_sprite_f0_ti0_plain(BLIT_PARAMS);
 	BLIT_FUNCTION draw_sprite_f0_ti0_tr1_s0_d0(BLIT_PARAMS);
 	BLIT_FUNCTION draw_sprite_f0_ti0_tr1_s1_d0(BLIT_PARAMS);
@@ -785,26 +763,26 @@ protected:
 	BLIT_FUNCTION draw_sprite_f1_ti0_tr1_simple(BLIT_PARAMS);
 	BLIT_FUNCTION draw_sprite_f1_ti0_tr0_simple(BLIT_PARAMS);
 
-	static inline void pen_to_clr(u32 pen, clr_t *clr)
+	static inline void pen_to_clr(u32 pen, clr_t &clr)
 	{
 	// --t- ---- rrrr r--- gggg g--- bbbb b---  format
-		clr->r = (pen >> (16+3));// & 0x1f;
-		clr->g = (pen >>  (8+3));// & 0x1f;
-		clr->b = (pen >>   3);// & 0x1f;
+		clr.r = (pen >> (16+3));// & 0x1f;
+		clr.g = (pen >>  (8+3));// & 0x1f;
+		clr.b = (pen >>     3);// & 0x1f;
 
 	// --t- ---- ---r rrrr ---g gggg ---b bbbb  format
-	//  clr->r = (pen >> 16) & 0x1f;
-	//  clr->g = (pen >> 8) & 0x1f;
-	//  clr->b = (pen >> 0) & 0x1f;
+	//  clr.r = (pen >> 16) & 0x1f;
+	//  clr.g = (pen >> 8) & 0x1f;
+	//  clr.b = (pen >> 0) & 0x1f;
 
 	};
 
 	// convert separate r,g,b biases (0..80..ff) to clr_t (-1f..0..1f)
-	void tint_to_clr(u8 r, u8 g, u8 b, clr_t *clr)
+	void tint_to_clr(u8 r, u8 g, u8 b, clr_t &clr)
 	{
-		clr->r  =   r>>2;
-		clr->g  =   g>>2;
-		clr->b  =   b>>2;
+		clr.r = r >> 2;
+		clr.g = g >> 2;
+		clr.b = b >> 2;
 	};
 
 	// (1|s|d) * s_factor * s + (1|s|d) * d_factor * d
@@ -816,9 +794,6 @@ protected:
 	// 5: -source
 	// 6: -dest
 	// 7: *
-
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	// Called when a Blitter operation does not cause any draws/uploads to be performed.
 	// If multiple draws in a row are performed outside of an active clipping area,
@@ -843,23 +818,51 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(blitter_delay_callback);
 
+	inline void gfx_upload_shadow_copy(address_space &space, offs_t &addr);
+	inline void gfx_create_shadow_copy(address_space &space);
+	inline u16 READ_NEXT_WORD(offs_t &addr);
+	inline u16 COPY_NEXT_WORD(address_space &space, offs_t &addr);
+	inline void gfx_draw_shadow_copy(address_space &space, offs_t &addr);
+	inline void gfx_upload(offs_t &addr);
+	inline void gfx_draw(offs_t &addr);
+	void gfx_exec();
+	u32 gfx_ready_r();
+	void gfx_exec_w(address_space &space, offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	u16* m_ram16;
+	u32 m_gfx_addr;
+	u32 m_gfx_scroll_x, m_gfx_scroll_y;
+	u32 m_gfx_clip_x, m_gfx_clip_y;
+
+	u32 m_gfx_addr_shadowcopy;
+	u32 m_gfx_clip_x_shadowcopy, m_gfx_clip_y_shadowcopy;
+	std::unique_ptr<u16[]> m_ram16_copy;
+
+	int m_gfx_size;
+	bitmap_rgb32 m_bitmaps;
+	rectangle m_clip;
+
+	u16* m_use_ram;
+	size_t m_main_ramsize; // type D has double the main ram
+	size_t m_main_rammask;
+
 	osd_work_queue *m_work_queue;
 	osd_work_item *m_blitter_request;
 
 	// blit timing
 	emu_timer *m_blitter_delay_timer;
-	int m_blitter_busy;
+	u8 m_blitter_busy;
 	u64 m_blit_delay_ns;
 	u16 m_blit_idle_op_bytes;
 
 	// fpga firmware
 	std::vector<u8> m_firmware;
-	int m_firmware_pos;
+	s32 m_firmware_pos;
 	u8 m_firmware_port;
-	int m_firmware_version;
+	s32 m_firmware_version;
 
 	// debug vram viewer
-#ifdef DEBUG_VRAM_VIEWER
+#ifdef CV1K_DEBUG_VRAM_VIEWER
 	bool m_debug_vram_view_en;
 	int m_prev_screen_width;
 	int m_prev_screen_height;
@@ -883,11 +886,10 @@ protected:
 	static const blitfunction f1_ti0_tr0_blit_funcs[64];
 
 	// internal states
-	required_device<cpu_device> m_maincpu;
 	devcb_read32 m_port_r_cb;
 };
 
 
-DECLARE_DEVICE_TYPE(EP1C12, ep1c12_device)
+DECLARE_DEVICE_TYPE(CV1K_BLITTER, cv1k_blitter_device)
 
-#endif // MAME_CAVE_EP1C12_H
+#endif // MAME_CAVE_CV1K_V_H
