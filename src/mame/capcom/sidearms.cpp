@@ -155,8 +155,8 @@ void sidearms_state::sidearms_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xc400, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xc000, 0xc3ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc400, 0xc7ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xc800, 0xc800).portr("SYSTEM").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc801, 0xc801).portr("P1").w(FUNC(sidearms_state::bankswitch_w));
 	map(0xc802, 0xc802).portr("P2").w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request
@@ -179,8 +179,8 @@ void sidearms_state::turtship_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xe3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xe400, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xe000, 0xe3ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe400, 0xe7ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xe800, 0xe807).r(FUNC(sidearms_state::turtship_ports_r));
 	map(0xe800, 0xe800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xe801, 0xe801).w(FUNC(sidearms_state::bankswitch_w));
@@ -223,8 +223,8 @@ void sidearms_state::whizz_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xc400, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xc000, 0xc3ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc400, 0xc7ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xc800, 0xc800).portr("DSW0").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc801, 0xc801).portr("DSW1").w(FUNC(sidearms_state::whizz_bankswitch_w));
 	map(0xc802, 0xc802).portr("DSW2").w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request
