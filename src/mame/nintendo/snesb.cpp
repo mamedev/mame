@@ -15,6 +15,7 @@
     - Iron (bootleg of Iron Commando)
     - Killer Instinct
     - Legend
+    - Pirates of Dark Water
     - Rushing Beat Shura
     - Sonic Blast Man II Special Turbo
     - Teenage Mutant Ninja Turtles - Mutant Warriors
@@ -31,7 +32,7 @@ TODO:
  - denseib,2: fix gfx glitches, missing texts
  - venom    : gfx glitches on second level
  - wldgunsb : remove hack for continue counter (values at 0x781010 and 0x781012 are expected to be initialized on reset/boot)
- - piratdwb : probably protected. Role of the M68000 currently not investigated.
+ - piratdwb : is coinage supposed to be configurable?
 
 ***************************************************************************
 
@@ -153,6 +154,7 @@ Iron PCB (same as Final Fight 2?)
 #include "snes.h"
 
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
 #include "speaker.h"
 
 
@@ -163,6 +165,7 @@ class snesb_state : public snes_state
 public:
 	snesb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: snes_state(mconfig, type, tag),
+		m_68k(*this, "m68000"),
 		m_shared_ram(*this, "shared_ram%u", 1U)
 	{ }
 
@@ -191,11 +194,16 @@ public:
 	void init_tmntmwb() ATTR_COLD;
 	void init_venom() ATTR_COLD;
 	void init_wldgunsb() ATTR_COLD;
-	void init_anheizs() ATTR_COLD;
+	void init_piratdwb() ATTR_COLD;
+
+	DECLARE_INPUT_CHANGED_MEMBER(piratdwb_coin_w);
+	int prot_nmi_r() { return m_prot_nmi; }
 
 private:
+	optional_device<m68000_device> m_68k;
 	optional_shared_ptr_array<int8_t, 2> m_shared_ram;
 	uint8_t m_cnt = 0;
+	ioport_value m_prot_nmi = 0;
 	uint8_t prot_cnt_r();
 	uint8_t sb2b_6a6xxx_r(offs_t offset);
 	uint8_t sb2b_7xxx_r(offs_t offset);
@@ -347,6 +355,16 @@ uint8_t snesb_state::wldgunsb_72443a_r() // in-game
 	return 0x66;
 }
 
+// Pirates of Dark Water
+
+INPUT_CHANGED_MEMBER(snesb_state::piratdwb_coin_w)
+{
+	// 68k program expects two NMIs per coin
+	// (TODO: is this really supposed to be 2 coins/credit then?)
+	m_68k->set_input_line(INPUT_LINE_NMI, m_prot_nmi = 1);
+}
+
+
 void snesb_state::snesb_map(address_map &map)
 {
 	map(0x000000, 0x7dffff).rw(FUNC(snesb_state::snes_r_bank1), FUNC(snesb_state::snes_w_bank1));
@@ -464,6 +482,12 @@ void snesb_state::tmntmwb_map(address_map &map)
 void snesb_state::piratdwb_map(address_map &map)
 {
 	snesb_map(map);
+
+	map(0xc00000, 0xc00000).r("latch", FUNC(generic_latch_8_device::read));
+	map(0xc00001, 0xc00001).w("latch", FUNC(generic_latch_8_device::acknowledge_w));
+	map(0xc00002, 0xc00002).portr("C00002");
+//	map(0xc00003, 0xc00003).w // watchdog? (written to on every NMI)
+	map(0xc00004, 0xc00004).portr("DSW");
 }
 
 void snesb_state::piratdwb_68k_map(address_map &map)
@@ -473,22 +497,13 @@ void snesb_state::piratdwb_68k_map(address_map &map)
 	map(0x04e000, 0x04ffff).ram();
 	map(0x050000, 0x0503ff).ram();
 
-//  map(0x080000, 0x080000).lw8(
-//      NAME([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(0x7ffff?, data); })
-//  );
-
-	// interrupts main CPU on coin triggers
-	map(0x0c0000, 0x0c0000).lw8(
-		NAME([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(0x7ffff4, data); })
-	);
+	map(0x080000, 0x080000).w("latch", FUNC(generic_latch_8_device::write));
+//	map(0x0c0000, 0x0c0000).w // ?
 	map(0x100000, 0x100001).portr("COIN");
-//  map(0x140000, 0x140000).lw8(
-//      NAME([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(0x7ffff?, data); })
-//  );
-//  map(0x180000, 0x180000).lw8(
-//      NAME([this] (offs_t offset, u8 data) { m_maincpu->space(AS_PROGRAM).write_byte(0x7ffff?, data); })
-//  );
-
+//	map(0x140000, 0x140000).w // ?
+	map(0x180000, 0x180000).lw8(
+		NAME([this](offs_t, u8) { m_68k->set_input_line(INPUT_LINE_NMI, m_prot_nmi = 0); })
+	);
 }
 
 static INPUT_PORTS_START( snes_common )
@@ -1029,11 +1044,37 @@ static INPUT_PORTS_START( tmntmwb )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
+// verified from 5A22 code
 static INPUT_PORTS_START( piratdwb )
 	PORT_INCLUDE(snes_common)
 
+	PORT_START("C00002")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("latch", FUNC(generic_latch_8_device::pending_r))
+	// checked during SNES NMI - if low, exits attract mode, but locks up game if low for more than 8 frames at a time
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(snesb_state::prot_nmi_r))
+	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("DSW")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW ) //
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW ) // supposed to be for coinage (table at 83F69F), but not actually used
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW ) //
+	PORT_DIPNAME( 0x38, 0x30, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x38, "1 (Easiest)" )
+	PORT_DIPSETTING(    0x30, "2" ) // "Normal" (default) on SNES
+	PORT_DIPSETTING(    0x28, "3" ) // "Hard" on SNES
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x18, "5" )
+	PORT_DIPSETTING(    0x10, "6" )
+	PORT_DIPSETTING(    0x08, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0xc0, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0x40, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+
 	PORT_START("COIN")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(snesb_state::piratdwb_coin_w), 0)
 INPUT_PORTS_END
 
 
@@ -1157,11 +1198,10 @@ void snesb_state::piratdwb(machine_config &config)
 	base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &snesb_state::piratdwb_map);
 
-	m68000_device &protcpu(M68000(config, "m68000", 16_MHz_XTAL / 2));
-	protcpu.set_addrmap(AS_PROGRAM, &snesb_state::piratdwb_68k_map);
-//  maincpu.set_cpu_space(AS_PROGRAM);
-	// unknown irq and source (all points the same, NMI tied to coin chute?)
-	protcpu.set_vblank_int("screen", FUNC(snesb_state::irq1_line_hold));
+	GENERIC_LATCH_8(config, "latch").set_separate_acknowledge(true);
+
+	M68000(config, m_68k, 16_MHz_XTAL / 2);
+	m_68k->set_addrmap(AS_PROGRAM, &snesb_state::piratdwb_68k_map);
 }
 
 
@@ -1680,11 +1720,9 @@ void snesb_state::init_wldgunsb()
 	init_snes();
 }
 
-void snesb_state::init_anheizs()
+void snesb_state::init_piratdwb()
 {
-	// boot vector
-	//dst[0x7ffc] = 0x40;
-	//dst[0x7ffd] = 0x80;
+	save_item(NAME(m_prot_nmi));
 
 	init_snes();
 }
@@ -1909,4 +1947,4 @@ GAME( 1996, legendsb,     0,        extrainp,     legendsb, snesb_state, init_le
 GAME( 1997, rushbets,     0,        rushbets,     legendsb, snesb_state, init_rushbets,  ROT0, "bootleg",         "Rushing Beat Shura (SNES bootleg)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, venom,        0,        venom,        venom,    snesb_state, init_venom,     ROT0, "bootleg",         "Venom & Spider-Man - Separation Anxiety (SNES bootleg)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",         "Wild Guns (SNES bootleg)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
-GAME( 199?, piratdwb,     0,        piratdwb,     piratdwb, snesb_state, init_anheizs,   ROT0, "bootleg (Conny)", "The Pirates of Dark Water (SNES bootleg)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 199?, piratdwb,     0,        piratdwb,     piratdwb, snesb_state, init_piratdwb,  ROT0, "bootleg (Conny)", "The Pirates of Dark Water (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
