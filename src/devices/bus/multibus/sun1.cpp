@@ -43,9 +43,6 @@
 //#define VERBOSE (LOG_GENERAL|LOG_DOG)
 #include "logmacro.h"
 
-
-namespace {
-
 enum irq_mask : u8
 {
 	WATCHDOG = 0x80,
@@ -118,6 +115,8 @@ protected:
 	bool m_watchdog;
 	bool m_parity;
 };
+
+DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_SUN1, device_multibus_interface, multibus_sun1_device, "sun1_cpu", "Sun Microsystems Sun-1 CPU board")
 
 void multibus_sun1_device::device_start()
 {
@@ -485,6 +484,8 @@ protected:
 private:
 };
 
+DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_SGI_PM1, device_multibus_interface, multibus_sgi_pm1_device, "sgi_pm1", "Silicon Graphics PM1")
+
 void multibus_sgi_pm1_device::device_reset()
 {
 	multibus_sun1_device::device_reset();
@@ -525,9 +526,3 @@ ioport_constructor multibus_sgi_pm1_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(sgi_pm1);
 }
-
-} // anonymous namespace
-
-
-DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_SUN1,    device_multibus_interface, multibus_sun1_device,    "sun1_cpu", "Sun Microsystems Sun-1 CPU board")
-DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_SGI_PM1, device_multibus_interface, multibus_sgi_pm1_device, "sgi_pm1",  "Silicon Graphics PM1")

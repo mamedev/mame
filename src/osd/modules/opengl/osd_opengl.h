@@ -36,8 +36,13 @@
 		#include <OpenGL/gl.h>
 		#include <OpenGL/glext.h>
 	#else
+	#ifdef SDLMAME_SDL3
+		#include <SDL3/SDL_version.h>
+		#include <SDL3/SDL_opengl.h>
+	#else
 		#include <SDL2/SDL_version.h>
 		#include <SDL2/SDL_opengl.h>
+	#endif
 	#endif
 
 	class osd_gl_context

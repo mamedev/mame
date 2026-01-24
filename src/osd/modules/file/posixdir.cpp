@@ -276,11 +276,6 @@ std::string osd_subst_env(std::string_view src)
 				{
 					var.assign(start, it);
 					start = ++it;
-					const char *const exp = std::getenv(var.c_str());
-					if (exp)
-						result.append(exp);
-					else
-						fprintf(stderr, "Warning: osd_subst_env variable %s not found.\n", var.c_str());
 				}
 			}
 			else if ((src.end() != start) && (('_' == *start) || std::isalnum(*start)))
@@ -288,15 +283,45 @@ std::string osd_subst_env(std::string_view src)
 				for (++it; (src.end() != it) && (('_' == *it) || std::isalnum(*it)); ++it) { }
 				var.assign(start, it);
 				start = it;
-				const char *const exp = std::getenv(var.c_str());
-				if (exp)
-					result.append(exp);
-				else
-					fprintf(stderr, "Warning: osd_subst_env variable %s not found.\n", var.c_str());
 			}
 			else
 			{
 				result.push_back('$');
+			}
+			if (!var.empty())
+			{
+				bool found = false;
+				const char *const exp = std::getenv(var.c_str());
+				if (exp)
+				{
+					result.append(exp);
+					found = true;
+				}
+				else if (std::string home = std::getenv("HOME"); !home.empty())
+				{
+					if (var == "XDG_CONFIG_HOME")
+					{
+						result.append(home.append("/.config").c_str());
+						found = true;
+					}
+					else if (var == "XDG_DATA_HOME")
+					{
+						result.append(home.append("/.local/share").c_str());
+						found = true;
+					}
+					else if (var == "XDG_STATE_HOME")
+					{
+						result.append(home.append("/.local/state").c_str());
+						found = true;
+					}
+					else if (var == "XDG_CACHE_HOME")
+					{
+						result.append(home.append("/.cache").c_str());
+						found = true;
+					}
+				}
+				if (!found)
+					fprintf(stderr, "Warning: osd_subst_env variable %s not found.\n", var.c_str());
 			}
 		}
 	}

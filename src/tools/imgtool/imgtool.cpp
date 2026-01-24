@@ -244,7 +244,7 @@ void imgtool_warn(const char *format, ...)
 	if (global_warn)
 	{
 		va_start(va, format);
-		vsprintf(buffer, format, va);
+		vsnprintf(buffer, 2000, format, va);
 		va_end(va);
 		global_warn(buffer);
 	}
@@ -1703,11 +1703,12 @@ imgtoolerr_t imgtool::partition::get_file(const char *filename, const char *fork
 
 		if (filter_extension != nullptr)
 		{
-			alloc_dest = (char*)malloc(strlen(filename) + 1 + strlen(filter_extension) + 1);
+			const size_t length = strlen(filename) + 1 + strlen(filter_extension) + 1;
+			alloc_dest = (char *)malloc(length);
 			if (!alloc_dest)
 				return IMGTOOLERR_OUTOFMEMORY;
 
-			sprintf(alloc_dest, "%s.%s", filename, filter_extension);
+			snprintf(alloc_dest, length, "%s.%s", filename, filter_extension);
 			dest = alloc_dest;
 		}
 		else

@@ -166,19 +166,16 @@ void drcuml_state::reset()
 		// flush the cache
 		m_cache.flush();
 
-		// reset all transient handle code pointers
+		// reset all handle code pointers
 		for (uml::code_handle &handle : m_handlelist)
-		{
-			if (*handle.codeptr_addr() >= m_cache.top())
-				*handle.codeptr_addr() = nullptr;
-		}
+			*handle.codeptr_addr() = nullptr;
 
 		// call the backend to reset
 		m_beintf->reset();
 	}
-	catch (drcuml_block::abort_compilation const &)
+	catch (drcuml_block::abort_compilation &)
 	{
-		throw emu_fatalerror("Out of cache space in drcuml_state::reset\n");
+		fatalerror("Out of cache space in drcuml_state::reset\n");
 	}
 }
 
@@ -187,24 +184,22 @@ void drcuml_state::reset()
 //  begin_block - begin a new code block
 //-------------------------------------------------
 
-drcuml_block &drcuml_state::begin_block(uint32_t maxinst, bool invariant)
+drcuml_block &drcuml_state::begin_block(uint32_t maxinst)
 {
 	// find an inactive block that matches our qualifications
-	block_impl *bestblock(nullptr);
-	for (block_impl &block : m_blocklist)
+	drcuml_block *bestblock(nullptr);
+	for (drcuml_block &block : m_blocklist)
 	{
 		if (!block.inuse() && (block.maxinst() >= maxinst) && (!bestblock || (block.maxinst() < bestblock->maxinst())))
 			bestblock = &block;
 	}
 
 	// if we failed to find one, allocate a new one
-	// TODO: over-allocation was supposed to be * 3 / 2 but it was getting squared, and now things depend on it
-	// every use of begin_block needs to be reviewed to ensure maxinst is reasonable
 	if (!bestblock)
-		bestblock = &*m_blocklist.emplace(m_blocklist.end(), *this, maxinst * 9 / 4);
+		bestblock = &*m_blocklist.emplace(m_blocklist.end(), *this, maxinst * 3 / 2);
 
 	// start the block
-	bestblock->begin(invariant);
+	bestblock->begin();
 	return *bestblock;
 }
 
@@ -286,10 +281,9 @@ void drcuml_state::log_vprintf(util::format_argument_pack<char> const &args)
 
 drcuml_block::drcuml_block(drcuml_state &drcuml, u32 maxinst)
 	: m_drcuml(drcuml)
-	, m_maxinst(maxinst)
 	, m_nextinst(0)
-	, m_inst(new uml::instruction[m_maxinst])
-	, m_invariant(false)
+	, m_maxinst(maxinst * 3/2)
+	, m_inst(m_maxinst)
 	, m_inuse(false)
 {
 }
@@ -308,12 +302,11 @@ drcuml_block::~drcuml_block()
 //  begin - begin code generation
 //-------------------------------------------------
 
-void drcuml_block::begin(bool invariant)
+void drcuml_block::begin()
 {
-	// set up the block information
-	m_nextinst = 0;
-	m_invariant = invariant;
+	// set up the block information and return it
 	m_inuse = true;
+	m_nextinst = 0;
 }
 
 
@@ -361,9 +354,14 @@ void drcuml_block::abort()
 //  append - append an opcode to the block
 //-------------------------------------------------
 
-void drcuml_block::overrun()
+uml::instruction &drcuml_block::append()
 {
-	throw emu_fatalerror("Overran maxinst in drcuml_block_append\n");
+	// get a pointer to the next instruction
+	uml::instruction &curinst(m_inst[m_nextinst++]);
+	if (m_nextinst > m_maxinst)
+		fatalerror("Overran maxinst in drcuml_block_append\n");
+
+	return curinst;
 }
 
 

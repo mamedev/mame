@@ -794,12 +794,11 @@ if (_OPTIONS["osd"] == "sdl") then
 		if _OPTIONS["USE_LIBSDL"]~="1" then
 			configuration { "mingw*"}
 				links {
-					"SDL2main",
-					"SDL2",
+					"SDL3",
 				}
 			configuration { "vs*" }
 				links {
-					"SDL2",
+					"SDL3",
 					"imm32",
 					"version",
 				}

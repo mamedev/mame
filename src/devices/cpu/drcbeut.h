@@ -74,10 +74,8 @@ private:
 
 	std::vector<drccodeptr **> m_l1blocks;
 	std::vector<drccodeptr *> m_l2blocks;
-	std::vector<bool> m_invariant_modes;
-	uint32_t m_next_l1_block;
-	uint32_t m_next_l2_block;
-	uint32_t m_invariant_mode_count;
+	std::size_t m_next_l1_block;
+	std::size_t m_next_l2_block;
 
 	// internal state
 	drc_cache &             m_cache;                // cache where allocations come from
@@ -131,11 +129,10 @@ private:
 	using map_entry_vector = std::vector<map_entry>;
 
 	// internal state
-	drc_cache &             m_cache;            // pointer to the cache
-	uint64_t                m_uniquevalue;      // unique value used to find the table
-	uint32_t                m_mapvalue[uml::MAPVAR_END - uml::MAPVAR_M0]; // array of current values
-	map_entry_vector        m_entry_list;       // list of entries
-	std::vector<uint32_t>   m_out_temp;         // buffer for building output
+	drc_cache &         m_cache;            // pointer to the cache
+	uint64_t            m_uniquevalue;      // unique value used to find the table
+	uint32_t            m_mapvalue[uml::MAPVAR_END - uml::MAPVAR_M0]; // array of current values
+	map_entry_vector    m_entry_list;       // list of entries
 };
 
 
@@ -148,7 +145,7 @@ class drc_label_list
 {
 public:
 	// construction/destruction
-	drc_label_list();
+	drc_label_list(drc_cache &cache);
 	~drc_label_list();
 
 	// block begin/end
@@ -170,7 +167,6 @@ private:
 	struct label_fixup
 	{
 		label_entry *       label;          // the label in question
-		void *              param;          // user parameter value
 		drc_label_fixup_delegate callback;  // callback
 	};
 	using label_fixup_list = std::list<label_fixup>;
@@ -178,10 +174,13 @@ private:
 	// internal helpers
 	void reset(bool fatal_on_leftovers);
 	label_entry &find_or_allocate(uml::code_label label);
+	void oob_callback(drccodeptr *codeptr, void *param1, void *param2);
 
 	// internal state
+	drc_cache &         m_cache;            // pointer to the cache
 	label_entry_list    m_list;             // head of the live list
-	label_fixup_list    m_fixup_list;       // list of pending fixups
+	label_fixup_list    m_fixup_list;       // list of pending oob fixups
+	drc_oob_delegate    m_oob_callback_delegate; // pre-computed delegate
 	label_entry_list    m_free_labels;
 	label_fixup_list    m_free_fixups;
 };
