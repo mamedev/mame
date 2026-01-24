@@ -29,6 +29,7 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 	, m_firq_cb(*this)
 	, m_vsync_cb(*this)
 	, m_hsync_cb(*this)
+	, m_xbus_sel_cb(*this)
 	, m_xbus_read_cb(*this, 0xff)
 	, m_xbus_write_cb(*this)
 	, m_dac_l(*this)
@@ -120,18 +121,14 @@ void clio_device::dply_w(int state)
 
 void clio_device::xbus_int_w(int state)
 {
-	if (state && m_poll & 7)
+	if (state)
 	{
-		request_fiq(1 << 2, 0);
+		m_xbus_rdy[0] |= 0x10;
+		if (m_poll & 7)
+			request_fiq(1 << 2, 0);
 	}
-
-	//if ((m_sel & 0x0f) == 0)
-	//{
-	//  if (state)
-	//      m_poll |= 0x10;
-	//  else
-	//      m_poll &= ~0x10;
-	//}
+	else
+		m_xbus_rdy[0] &= ~0x10;
 }
 
 // $0340'0000 base
@@ -441,6 +438,7 @@ void clio_device::map(address_map &map)
 			m_sel &= 0xff;
 			/* Start WRSEL cycle */
 
+			m_xbus_sel_cb(data);
 			LOGXBUS("xbus sel: %02x & %08x\n", data, mem_mask);
 			/* Detection of too many devices on the bus */
 			switch ( data & 0xff )
@@ -454,18 +452,30 @@ void clio_device::map(address_map &map)
 			}
 		})
 	);
+	/*
+	 * x--- ---- media access (read clear)
+	 * -x-- ---- write valid (r/o)
+	 * --x- ---- read valid (r/o)
+	 * ---x ---- status valid (r/o)
+	 * ---- x--- reset
+	 * ---- -x-- write irq enable
+	 * ---- --x- read irq enable
+	 * ---- ---x status irq enable
+	 */
 	map(0x0540, 0x057f).lrw32(
-		NAME([this] () {
-			// HACK: until I understand semantics
+		NAME([this] () -> u8 {
+			u8 res = m_poll;
+			//m_poll &= ~0x80;
 			if (m_sel == 0)
-				return (m_poll & 0xef) | (machine().rand() & 0x10);
-			return m_poll;
+				return (res & 0xef) | (m_xbus_rdy[0] & 0x10);
+			return (res);
 		}),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGXBUS("xbus poll: %02x & %08x\n", data, mem_mask);
-			COMBINE_DATA(&m_poll);
-			m_poll &= 0xf8;
-			m_poll |= data & 7;
+			//COMBINE_DATA(&m_poll);
+			//m_poll &= 0xf8;
+			if (ACCESSING_BITS_0_7)
+				m_poll = data & 0xff;
 		})
 	);
 	// 1--- 1111 external device
@@ -478,7 +488,7 @@ void clio_device::map(address_map &map)
 
 	// TODO: should really map these directly in DSPP core
 //  map(0x17d0, 0x17d3) Semaphore
-	// HACK: for 3do_gdo101
+	// HACK: temporary to allow 3do_gdo101 boot
 	map(0x17d0, 0x17d3).lr32(NAME([] () { return 0x0004'0000; }));
 //  map(0x17d4, 0x17d7) Semaphore ACK
 //  map(0x17e0, 0x17ff) DSPP DMA and state

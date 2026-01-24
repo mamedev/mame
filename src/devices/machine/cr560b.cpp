@@ -8,7 +8,8 @@ Panasonic pre-IDE MKE interface, akin to CR-511-B (which this is based off) and 
 Soundblaster.
 
 TODO:
-- stub;
+- Enough to load some TOC and nothing else;
+- Find common points with other MKE drives, generate a streamlined interface;
 
 **************************************************************************************************/
 
@@ -236,7 +237,6 @@ TIMER_CALLBACK_MEMBER(cr560b_device::sten)
 	m_status_ready = true;
 
 	m_sten_cb(0);
-	m_sten_cb(1);
 }
 
 void cr560b_device::status_enable(uint8_t output_length)
@@ -251,8 +251,7 @@ void cr560b_device::status_enable(uint8_t output_length)
 		if (m_input_fifo[0] != 0x87 || (VERBOSE & LOG_SUBQ))
 			LOGMASKED(LOG_CMD, "-> Output: %02x %02x %02x %02x  %02x %02x %02x %02x  %02x %02x %02x %02x\n", m_output_fifo[0], m_output_fifo[1], m_output_fifo[2], m_output_fifo[3], m_output_fifo[4], m_output_fifo[5], m_output_fifo[6], m_output_fifo[7], m_output_fifo[8], m_output_fifo[9], m_output_fifo[10], m_output_fifo[11]);
 
-		//m_sten_timer->adjust(attotime::from_usec(64 * 4)); // TODO
-		m_sten_timer->adjust(attotime::from_usec(2));
+		m_sten_timer->adjust(attotime::from_usec(64 * 4)); // TODO
 	}
 }
 
@@ -292,11 +291,11 @@ uint8_t cr560b_device::read()
 			if (m_output_fifo_pos < m_output_fifo_length)
 			{
 				m_sten_cb(0);
-				m_sten_cb(1);
 			}
 			else
 			{
 				m_status_ready = false;
+				m_sten_cb(1);
 			}
 		}
 	}
@@ -360,7 +359,7 @@ void cr560b_device::write(uint8_t data)
 		case 0x05: cmd_read_status(); break;
 		//case 0x06: cmd_drawer_open(); break;
 		//case 0x07: cmd_drawer_close(); break;
-		//case 0x09: cmd_set_mode(); break;
+		case 0x09: cmd_set_mode(); break;
 		//case 0x0a: cmd_reset(); break;
 		//case 0x0b: cmd_flush(); break;
 
@@ -378,15 +377,15 @@ void cr560b_device::write(uint8_t data)
 		case 0x82: cmd_read_error(); break;
 		case 0x83: cmd_version(); break;
 		//case 0x84: cmd_mode_sense(); break;
-		//case 0x85: cmd_read_capacity(); break;
+		case 0x85: cmd_read_capacity(); break;
 		//case 0x86: cmd_read_header(); break;
 		//case 0x87: cmd_read_subq(); break;
 		//case 0x88: cmd_read_upc(); break;
 		//case 0x89: cmd_read_isrc(); break;
 		//case 0x8a: cmd_read_disc_code(); break;
-		//case 0x8b: cmd_read_disc_info(); break;
-		//case 0x8c: cmd_read_toc(); break;
-		//case 0x8d: cmd_read_session_info(); break;
+		case 0x8b: cmd_read_disc_info(); break;
+		case 0x8c: cmd_read_toc(); break;
+		case 0x8d: cmd_read_session_info(); break;
 		//case 0x8e: cmd_read_device_driver(); break;
 
 		default:
@@ -406,7 +405,7 @@ void cr560b_device::enable_w(int state)
 	m_enabled = !bool(state); // active low
 }
 
-// TODO: unverified
+// TODO: unverified in this implementation
 void cr560b_device::cmd_seek()
 {
 	LOGMASKED(LOG_CMD, "Command: Seek\n");
@@ -421,7 +420,7 @@ void cr560b_device::cmd_seek()
 	status_enable(1);
 }
 
-// TODO: unverified
+// TODO: unverified in this implementation
 // labeled as "No Operation" in 3do Technical Manual
 void cr560b_device::cmd_read_status()
 {
@@ -435,7 +434,7 @@ void cr560b_device::cmd_read_status()
 	status_enable(1);
 }
 
-// TODO: unverified
+// TODO: unverified in this implementation
 // Spinup
 void cr560b_device::cmd_motor_on()
 {
@@ -451,7 +450,7 @@ void cr560b_device::cmd_motor_on()
 	status_enable(1);
 }
 
-// TODO: unverifed
+// TODO: unverifed in this implementation
 // Spindown
 void cr560b_device::cmd_motor_off()
 {
@@ -467,8 +466,34 @@ void cr560b_device::cmd_motor_off()
 	status_enable(1);
 }
 
+void cr560b_device::cmd_set_mode()
+{
+	LOGMASKED(LOG_CMD, "Command: Set Mode\n");
+	LOGPARAM;
 
-// TODO: unverified
+	switch(m_input_fifo[1])
+	{
+		case 0x00:
+			m_sector_size = (m_input_fifo[3] << 8) | m_input_fifo[4];
+			LOGMASKED(LOG_CMD, "-> sector size %d\n", m_sector_size);
+			break;
+		//case 1: same setup as 0 (?)
+		//case 2: unknown
+		//case 3: set speed 80 00 00 00
+		//case 4: unknown 01 00 00 00
+		//case 5: set volume
+	}
+
+	u8 status = m_status;
+	status |= STATUS_SUCCESS;
+	m_output_fifo[0] = 0x09;
+	m_output_fifo[1] = status;
+
+	status_change(status);
+	status_enable(2);
+}
+
+// TODO: unverified in this implementation
 void cr560b_device::cmd_play_msf()
 {
 	LOGMASKED(LOG_CMD, "Command: Play MSF\n");
@@ -526,7 +551,7 @@ void cr560b_device::cmd_play_msf()
 	status_enable(1);
 }
 
-// TODO: unverified
+// TODO: unverified in this implementation
 void cr560b_device::cmd_play_track()
 {
 	LOGMASKED(LOG_CMD, "Command: Play Track\n");
@@ -554,7 +579,7 @@ void cr560b_device::cmd_play_track()
 	status_enable(1);
 }
 
-// TODO: unverified
+// TODO: unverified in this implementation (sure needs data ready in Clio)
 void cr560b_device::cmd_read()
 {
 	LOGMASKED(LOG_CMD, "Command: Read\n");
@@ -562,23 +587,23 @@ void cr560b_device::cmd_read()
 
 	u8 read_mode = m_input_fifo[4];
 
-	switch(read_mode)
-	{
-		case 0x00:
-			LOG("Warning: Unsupported MSF mode\n");
-			break;
-		case 0x01:
-			// compared to CR-511 this is shuffled around to accomodate the transfer mode
-			m_transfer_lba = (m_input_fifo[1] << 16) | (m_input_fifo[2] << 8) | (m_input_fifo[3] << 0);
-			m_transfer_sectors = (m_input_fifo[5] << 8) | (m_input_fifo[6] << 0);
-			m_transfer_length = m_transfer_sectors * m_sector_size;
+	if (read_mode & 0xfe)
+		throw emu_fatalerror("Unknown read mode %02x", read_mode);
 
-			LOGMASKED(LOG_CMD, "-> LBA %d, sectors %d\n", m_transfer_lba, m_transfer_sectors);
-			break;
-		default:
-			throw emu_fatalerror("Unknown read mode %02x", read_mode);
+	// compared to CR-511 this is shuffled around to accomodate the transfer mode
+	u32 start_sector = (m_input_fifo[1] << 16) | (m_input_fifo[2] << 8) | (m_input_fifo[3] << 0);
+
+	if (read_mode == 0)
+	{
+		LOGMASKED(LOG_CMD, "MSF mode %08x ", start_sector);
+		start_sector = msf_to_lba(start_sector);
 	}
 
+	m_transfer_lba = start_sector;
+	m_transfer_sectors = (m_input_fifo[5] << 8) | (m_input_fifo[6] << 0);
+	m_transfer_length = m_transfer_sectors * m_sector_size;
+
+	LOGMASKED(LOG_CMD, "-> LBA %d, sectors %d\n", m_transfer_lba, m_transfer_sectors);
 
 	m_cdda->stop_audio();
 
@@ -587,8 +612,11 @@ void cr560b_device::cmd_read()
 	status &= ~STATUS_PLAYING;
 	status |= STATUS_MOTOR;
 
+	m_output_fifo[0] = 0x10;
+	m_output_fifo[1] = status;
+
 	status_change(status);
-	status_enable(1);
+	status_enable(2);
 }
 
 // checked in BIOS if a CD is inserted
@@ -651,3 +679,203 @@ void cr560b_device::cmd_version()
 	status_enable(12);
 }
 
+// same as cmd_read_session_info on regular single session disk
+void cr560b_device::cmd_read_capacity()
+{
+	LOGMASKED(LOG_CMD, "Command: Read Capacity\n");
+	LOGPARAM;
+
+	u8 status = m_status;
+	// TODO: unconfirmed here
+	bool msf = bool(BIT(m_input_fifo[1], 1));
+
+	m_output_fifo[0] = 0x85;
+	if (exists())
+	{
+		uint32_t track_start = get_track_start(0xaa);
+
+		LOGMASKED(LOG_CMD, "Lead out start %d\n", track_start);
+
+		if (msf)
+			track_start = lba_to_msf(track_start);
+
+		status |= STATUS_READY;
+
+		m_output_fifo[1] = 0;
+		m_output_fifo[2] = track_start >> 16;
+		m_output_fifo[3] = track_start >> 8;
+		m_output_fifo[4] = track_start >> 0;
+		m_output_fifo[5] = 0;
+		m_output_fifo[6] = 0;
+		m_output_fifo[7] = status;
+
+		status_enable(8);
+	}
+	else
+	{
+		status |= STATUS_ERROR;
+		m_output_fifo[1] = status;
+	}
+
+	status_change(status);
+}
+
+
+void cr560b_device::cmd_read_disc_info()
+{
+	LOGMASKED(LOG_CMD, "Command: Read Disc Info\n");
+	LOGPARAM;
+
+	uint8_t status = m_status;
+	status |= STATUS_READY;
+
+	m_output_fifo[0] = 0x8b;
+
+	if (exists())
+	{
+		uint8_t last_track = get_last_track();
+		uint32_t last_lba = get_track_start(0xaa);
+		uint32_t last_msf = lba_to_msf(last_lba);
+
+		status |= STATUS_MOTOR | STATUS_SUCCESS;
+
+		// TODO: determine disk type
+		m_output_fifo[1] = 0x00;
+		m_output_fifo[2] = 1; // first track
+		m_output_fifo[3] = last_track;
+		m_output_fifo[4] = last_msf >> 16;
+		m_output_fifo[5] = last_msf >> 8;
+		m_output_fifo[6] = last_msf >> 0;
+		m_output_fifo[7] = status;
+		status_change(status);
+		status_enable(8);
+	}
+	else
+	{
+		status |= STATUS_ERROR;
+		m_output_fifo[1] = status;
+		status_change(status);
+		status_enable(2);
+	}
+}
+
+// almost identical vs. CR-511B
+void cr560b_device::cmd_read_toc()
+{
+	LOGMASKED(LOG_CMD, "Command: Read TOC\n");
+	LOGPARAM;
+
+	// 01: bit 1 - msf or lba
+	// 02: track
+	// 03: unused?
+	// 04: unused?
+	// 05: unused?
+	// 06: unused?
+
+	// TODO: unconfirmed here
+	bool msf = bool(BIT(m_input_fifo[1], 1));
+	uint8_t track = m_input_fifo[2];
+
+	uint8_t status = m_status;
+
+	status |= STATUS_MOTOR;
+
+	m_output_fifo[0] = 0x8c;
+	if (track > get_last_track() || !exists())
+	{
+		LOGMASKED(LOG_CMD, "Invalid track requested: %d\n", track);
+
+		status |= STATUS_ERROR;
+		m_output_fifo[1] = status;
+		status_enable(2);
+	}
+	else if (track == 0)
+	{
+		uint32_t track_start = get_track_start(0xaa);
+
+		LOGMASKED(LOG_CMD, "Track 0 requested, lead out start %d\n", track_start);
+
+		if (msf)
+			track_start = lba_to_msf(track_start);
+
+		status |= STATUS_READY;
+
+		m_output_fifo[1] = 0;
+		m_output_fifo[2] = get_adr_control(0xaa);
+		m_output_fifo[3] = 1; // first track
+		m_output_fifo[4] = get_last_track();
+		m_output_fifo[5] = track_start >> 16;
+		m_output_fifo[6] = track_start >> 8;
+		m_output_fifo[7] = track_start >> 0;
+		m_output_fifo[8] = 0;
+		m_output_fifo[9] = status;
+
+		status_enable(10);
+	}
+	else
+	{
+		uint32_t track_start = get_track_start(track - 1);
+
+		LOGMASKED(LOG_CMD, "Track %d requested, start %d\n", track, track_start);
+
+		status |= STATUS_READY;
+
+		if (msf)
+			track_start = lba_to_msf(track_start);
+
+		m_output_fifo[1] = 0;
+		m_output_fifo[2] = get_adr_control(track - 1);
+		m_output_fifo[3] = track;
+		m_output_fifo[4] = 0;
+		m_output_fifo[5] = track_start >> 16;
+		m_output_fifo[6] = track_start >> 8;
+		m_output_fifo[7] = track_start >> 0;
+		m_output_fifo[8] = 0;
+		m_output_fifo[9] = status;
+
+		status_enable(10);
+	}
+
+	status_change(status);
+}
+
+// TODO: shouldn't matter for stock 3do games beyond reading lead-out but yes it's a thing
+void cr560b_device::cmd_read_session_info()
+{
+	LOGMASKED(LOG_CMD, "Command: Read Session Info\n");
+	LOGPARAM;
+
+	u8 status = m_status;
+	// TODO: unconfirmed here
+	bool msf = bool(BIT(m_input_fifo[1], 1));
+
+	m_output_fifo[0] = 0x8d;
+	if (exists())
+	{
+		uint32_t track_start = get_track_start(0xaa);
+
+		LOGMASKED(LOG_CMD, "Lead out start %d\n", track_start);
+
+		if (msf)
+			track_start = lba_to_msf(track_start);
+
+		status |= STATUS_READY;
+
+		m_output_fifo[1] = 0;
+		m_output_fifo[2] = track_start >> 16;
+		m_output_fifo[3] = track_start >> 8;
+		m_output_fifo[4] = track_start >> 0;
+		m_output_fifo[5] = 0;
+		m_output_fifo[6] = 0;
+		m_output_fifo[7] = status;
+
+		status_enable(8);
+	}
+	else
+	{
+		status |= STATUS_ERROR;
+		m_output_fifo[1] = status;
+	}
+
+	status_change(status);
+}

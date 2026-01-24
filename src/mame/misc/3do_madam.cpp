@@ -220,6 +220,7 @@ void madam_device::map(address_map &map)
 			COMBINE_DATA(&m_regctl3);
 		})
 	);
+	// TODO: these are in 16.16 format
 	map(0x0140, 0x0143).lrw32(
 		NAME([this] () { return m_xyposh; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -248,6 +249,7 @@ void madam_device::map(address_map &map)
 			COMBINE_DATA(&m_linedxyl);
 		})
 	);
+	// TODO: these are in 12.20 format
 	map(0x0150, 0x0153).lrw32(
 		NAME([this] () { return m_dxyh; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -672,6 +674,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			if (m_cel.skip && m_cel.last)
 			{
 				LOGCEL("Skip + Last, done\n");
+				m_statbits |= (1 << 6);
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
@@ -741,6 +744,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			if (!npabs || !spabs || !ppabs)
 			{
 				popmessage("CEL relative address use at %08x %d|%d|%d", m_cel.address, npabs, spabs, ppabs);
+				m_statbits |= (1 << 6);
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
@@ -751,6 +755,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			if (!ldsize || !ldprs || !yoxy || !ldpixc)
 			{
 				popmessage("CEL using existing values at %08x %d|%d|%d|%d", m_cel.address, ldsize, ldprs, yoxy, ldpixc);
+				m_statbits |= (1 << 6);
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
@@ -1051,9 +1056,9 @@ u32 madam_device::cel_decompress()
 		(bpp == 5))
 	{
 		popmessage("3do_madam.cpp: unsupported Packed CEL %d %d %08x", bpp, uncoded, source_ptr);
-		//m_statbits |= (1 << 6);
-		//cel_stop_w(0, 0, 0xffffffff);
-		return 1;
+		m_statbits |= (1 << 6);
+		cel_stop_w(0, 0, 0xffffffff);
+		return 0;
 	}
 
 	u16 tlhpcnt = 1;
@@ -1096,8 +1101,10 @@ u32 madam_device::cel_decompress()
 			switch (packet_type)
 			{
 				// PACK_TRANSPARENT
-				// TODO: untested
-				// Does it write a 0 or it actually 0-fill from PLUT anyway?
+				// TODO: doesn't really work properly, particularly when bgnd is 1
+				// - 3do_fz10 CD overlays uses plenty of these, which currently fills solid black
+				// We could cheat and pull bit 15 high, but then we have to deal accordingly
+				// when writing to framebuffer (that uses it as cornerweight or CLUT selector) ...
 				case 2:
 					for (src = 0; src < num_bytes; src++)
 						m_cel.buffer[yline * pitch + ((src + xpos) % pitch)] = 0;

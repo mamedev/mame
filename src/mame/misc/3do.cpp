@@ -7,8 +7,12 @@
 Driver file to handle emulation of the 3DO systems
 
 TODO:
-- Fix Xbus directions in Clio (takes forever for everything below);
-- Fix DSPP mapping (incompatible with later M2, consider an "opera_host_map" instead);
+- Data enable from CD drive to Clio;
+- DSPP mapping (incompatible with later M2, consider an "opera_host_map" instead);
+- Replace ARM7 with ARM60;
+- Fix VRAM size (should be 1 MB, but everything fails to boot);
+- CEL engine should really halt main CPU when running, paused only when irqs are taken;
+- MMU (user programs will need it);
 - 3do_fz1: draws a tray open CD at top of VRAM space once it throws an error from GetCDType;
 - 3do_hc21: as above plus "Directory /remote not found";
 - 3do_fz10: as above;
@@ -244,6 +248,9 @@ void _3do_state::green_config(machine_config &config)
 			m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	});
 	m_clio->set_screen_tag("screen");
+	m_clio->xbus_sel_cb().set([this] (u8 data) {
+		m_cdrom->enable_w(data != 0);
+	});
 	m_clio->xbus_read_cb().set([this] (offs_t offset) -> u8 {
 		if (offset == 0)
 		{
@@ -255,12 +262,10 @@ void _3do_state::green_config(machine_config &config)
 	m_clio->xbus_write_cb().set([this] (offs_t offset, u8 data) {
 		if (offset == 0)
 		{
-			m_cdrom->enable_w(0);
 			m_cdrom->cmd_w(0);
 			m_cdrom->write(data);
 			return;
 		}
-		m_cdrom->enable_w(1);
 		m_cdrom->cmd_w(1);
 	});
 	m_clio->vsync_cb().set(m_madam, FUNC(madam_device::vdlp_start_w));
@@ -278,7 +283,7 @@ void _3do_state::green_config(machine_config &config)
 	m_cdrom->set_interface("cdrom");
 //  m_cdrom->scor_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
 //  m_cdrom->stch_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
-//  m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus...));
+//  m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_rdy_w)).invert();
 	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_int_w)).invert();
 //  m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus...));
 
