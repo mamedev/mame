@@ -58,6 +58,11 @@ void sega_16bit_sprite_device::device_start()
 	// save states
 	save_item(NAME(m_flip));
 	save_item(NAME(m_bank));
+	save_item(NAME(m_xoffs));
+	save_item(NAME(m_yoffs));
+	save_item(NAME(m_xoffs_flipped));
+	save_item(NAME(m_yoffs_flipped));
+	//save_item(NAME(m_addrmap)); /*it's unclear for a while, where to put bootleg_sys16a_sprite_device-specific variable to*/
 }
 
 
