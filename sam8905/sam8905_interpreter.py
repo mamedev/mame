@@ -471,8 +471,8 @@ class SAM8905Interpreter:
                 inst = s.aram[pc_start + pc]
                 self.execute_instruction(slot, inst, pc)
 
-        # Accumulators are 24-bit, output upper 16 bits (per SAM8905 datasheet)
-        return s.l_acc >> 8, s.r_acc >> 8
+        # Accumulators are 24-bit, output upper 15 bits (DAC_SHIFT=9, per SAM8905 hardware investigation)
+        return s.l_acc >> 9, s.r_acc >> 9
 
     def run(self, num_frames: int, active_slots: Optional[List[int]] = None) -> np.ndarray:
         """Run for multiple frames and collect output.
@@ -488,9 +488,9 @@ class SAM8905Interpreter:
 
         for i in range(num_frames):
             l, r = self.execute_frame(active_slots)
-            # Clamp to 16-bit signed range
-            samples[i, 0] = max(-32768, min(32767, l))
-            samples[i, 1] = max(-32768, min(32767, r))
+            # Clamp to 15-bit signed range (SAM8905 DAC output)
+            samples[i, 0] = max(-16384, min(16383, l))
+            samples[i, 1] = max(-16384, min(16383, r))
 
             if self.trace_enabled and self.history is not None:
                 self.history.append({
@@ -527,7 +527,8 @@ class SAM8905Interpreter:
 # ============================================================
 
 def plot_waveform(samples: np.ndarray, sample_rate: int = 44100,
-                  title: str = "SAM8905 Output", figsize: Tuple[int, int] = (12, 4)):
+                  title: str = "SAM8905 Output", figsize: Tuple[int, int] = (12, 4),
+                  normalize: bool = False):
     """Plot stereo waveform.
 
     Args:
@@ -535,24 +536,36 @@ def plot_waveform(samples: np.ndarray, sample_rate: int = 44100,
         sample_rate: Sample rate in Hz
         title: Plot title
         figsize: Figure size tuple
+        normalize: If True, scale signal to fit ±16383 range for better visualization
     """
     import matplotlib.pyplot as plt
 
     time_ms = np.arange(len(samples)) / sample_rate * 1000
 
+    # Optionally normalize to full 15-bit range
+    plot_samples = samples
+    norm_factor = 1.0
+    if normalize:
+        max_abs = max(np.abs(samples).max(), 1)  # Avoid division by zero
+        norm_factor = 16383.0 / max_abs
+        plot_samples = samples * norm_factor
+
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=figsize, sharex=True)
 
-    ax1.plot(time_ms, samples[:, 0], 'b-', linewidth=0.5)
+    ax1.plot(time_ms, plot_samples[:, 0], 'b-', linewidth=0.5)
     ax1.set_ylabel('Left')
-    ax1.set_title(title)
+    if normalize:
+        ax1.set_title(f"{title} (normalized {norm_factor:.1f}x)")
+    else:
+        ax1.set_title(title)
     ax1.grid(True, alpha=0.3)
-    ax1.set_ylim(-35000, 35000)
+    ax1.set_ylim(-16384, 16384)
 
-    ax2.plot(time_ms, samples[:, 1], 'r-', linewidth=0.5)
+    ax2.plot(time_ms, plot_samples[:, 1], 'r-', linewidth=0.5)
     ax2.set_ylabel('Right')
     ax2.set_xlabel('Time (ms)')
     ax2.grid(True, alpha=0.3)
-    ax2.set_ylim(-35000, 35000)
+    ax2.set_ylim(-16384, 16384)
 
     plt.tight_layout()
     return fig
