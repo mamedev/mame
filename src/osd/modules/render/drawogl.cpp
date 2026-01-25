@@ -1246,20 +1246,11 @@ int renderer_ogl::draw(const int update)
 
 		GLsizei iScale = 1;
 
-		#ifndef SDLMAME_SDL3
 		/*
 		    Mac hack: macOS version 10.15 and later flipped from assuming you don't support Retina to
-		    assuming you do support Retina.  SDL 2.0.11 is scheduled to fix this, but it's not out yet.
-		    So we double-scale everything if you're on 10.15 or later and SDL is not at least version 2.0.11.
-		    SDL3 does not require this.
+		    assuming you do support Retina.
 		*/
-		#if defined(SDLMAME_MACOSX) && !defined(OSD_MAC)
-		SDL_version sdlVers;
-		SDL_GetVersion(&sdlVers);
-		// Only do this if SDL is not at least 2.0.11.
-		if ((sdlVers.major == 2) && (sdlVers.minor == 0) && (sdlVers.patch < 11))
-		#endif
-		#if defined(SDLMAME_MACOSX) || defined(OSD_MAC)
+		#if !defined(SDLMAME_MACOSX) && defined(OSD_MAC)
 		{
 			// now get the Darwin kernel version
 			int dMaj, dMin, dPatch;
@@ -1279,7 +1270,6 @@ int renderer_ogl::draw(const int update)
 			  }
 			}
 		}
-		#endif
 		#endif
 
 		glViewport(0.0, 0.0, (GLsizei) m_width * iScale, (GLsizei) m_height * iScale);

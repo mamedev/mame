@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
 #ifdef SDLMAME_SDL3
 	if (!SDL_Init(SDL_INIT_VIDEO))
 #else
-if (SDL_Init(SDL_INIT_VIDEO) < 0)
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 #endif
 	{
 		fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
@@ -413,10 +413,6 @@ if (SDL_Init(SDL_INIT_VIDEO) < 0)
 			break;
 		}
 		event.type = 0;
-
-#ifdef SDLMAME_OS2
-		SDL_Delay(10);
-#endif
 	}
 	SDL_Quit();
 	return(0);

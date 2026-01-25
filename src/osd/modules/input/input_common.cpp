@@ -203,6 +203,7 @@ key_trans_entry keyboard_trans_table::s_default_table[] =
 	KEY_TRANS_ENTRY0(OTHER_SWITCH, MAIL,           MAIL,           VK_LAUNCH_MAIL,         0,        "MAIL"),
 	KEY_TRANS_ENTRY0(OTHER_SWITCH, MEDIASELECT,    MEDIASELECT,    VK_LAUNCH_MEDIA_SELECT, 0,        "MEDIASEL"),
 #endif
+
 	// sentinel
 	KEY_TRANS_ENTRY0(INVALID,      UNKNOWN,        UNKNOWN,        0,                      0,        "INVALID")
 };
