@@ -4751,7 +4751,7 @@ void saturn_state::vdp2_drawgfxzoom(
 	myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
-	if( gfx )
+	if (gfx)
 	{
 		const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 		const uint8_t *source_base = gfx->get_data(code % gfx->elements());
@@ -4773,7 +4773,7 @@ void saturn_state::vdp2_drawgfxzoom(
 			int x_index_base;
 			int y_index;
 
-			if( flipx )
+			if (flipx)
 			{
 				x_index_base = (sprite_screen_width-1)*dx;
 				dx = -dx;
@@ -4783,7 +4783,7 @@ void saturn_state::vdp2_drawgfxzoom(
 				x_index_base = 0;
 			}
 
-			if( flipy )
+			if (flipy)
 			{
 				y_index = (sprite_screen_height-1)*dy;
 				dy = -dy;
@@ -4793,27 +4793,27 @@ void saturn_state::vdp2_drawgfxzoom(
 				y_index = 0;
 			}
 
-			if( sx < myclip.left())
+			if (sx < myclip.left())
 			{
 				// clip left
 				int pixels = myclip.left()-sx;
 				sx += pixels;
 				x_index_base += pixels*dx;
 			}
-			if( sy < myclip.top() )
+			if (sy < myclip.top() )
 			{
 				// clip top
 				int pixels = myclip.top()-sy;
 				sy += pixels;
 				y_index += pixels*dy;
 			}
-			if( ex > myclip.right()+1 )
+			if (ex > myclip.right()+1)
 			{
 				// clip right
 				int pixels = ex-myclip.right()-1;
 				ex -= pixels;
 			}
-			if( ey > myclip.bottom()+1 )
+			if (ey > myclip.bottom()+1)
 			{
 				// clip bottom
 				int pixels = ey-myclip.bottom()-1;
@@ -4821,14 +4821,12 @@ void saturn_state::vdp2_drawgfxzoom(
 			}
 
 			// skip if inner loop doesn't draw anything
-			if( ex > sx )
+			if (ex > sx )
 			{
-				int y;
-
-				// case : STV_TRANSPARENCY_ALPHA
 				if (transparency & STV_TRANSPARENCY_ALPHA)
 				{
-					for( y=sy; y<ey; y++ )
+					// case : STV_TRANSPARENCY_ALPHA
+					for (int y = sy; y < ey; y++)
 					{
 						uint8_t const *const source = source_base + (y_index>>16) * gfx->rowbytes();
 						uint32_t *const dest = &dest_bmp.pix(y);
@@ -4836,7 +4834,7 @@ void saturn_state::vdp2_drawgfxzoom(
 						int x_index = x_index_base;
 						for( int x=sx; x<ex; x++ )
 						{
-							if(vdp2_window_process(x,y))
+							if(vdp2_window_process(x, y))
 							{
 								int c = source[x_index>>16];
 								if ((transparency & STV_TRANSPARENCY_NONE) || (c != 0))
@@ -4848,19 +4846,18 @@ void saturn_state::vdp2_drawgfxzoom(
 						y_index += dy;
 					}
 				}
-
-				// case : STV_TRANSPARENCY_ADD_BLEND
 				else if (transparency & STV_TRANSPARENCY_ADD_BLEND)
 				{
-					for( y=sy; y<ey; y++ )
+					// case : STV_TRANSPARENCY_ADD_BLEND
+					for (int y = sy; y < ey; y++)
 					{
 						uint8_t const *const source = source_base + (y_index>>16) * gfx->rowbytes();
 						uint32_t *const dest = &dest_bmp.pix(y);
 
 						int x_index = x_index_base;
-						for( int x=sx; x<ex; x++ )
+						for (int x = sx; x < ex; x++)
 						{
-							if(vdp2_window_process(x,y))
+							if (vdp2_window_process(x, y))
 							{
 								int c = source[x_index>>16];
 								if ((transparency & STV_TRANSPARENCY_NONE) || (c != 0))
@@ -4872,19 +4869,18 @@ void saturn_state::vdp2_drawgfxzoom(
 						y_index += dy;
 					}
 				}
-
-				// case : STV_TRANSPARENCY_PEN
 				else
 				{
-					for( y=sy; y<ey; y++ )
+					// case : STV_TRANSPARENCY_PEN
+					for (int y = sy; y < ey; y++)
 					{
 						uint8_t const *const source = source_base + (y_index>>16) * gfx->rowbytes();
 						uint32_t *const dest = &dest_bmp.pix(y);
 
 						int x_index = x_index_base;
-						for( int x=sx; x<ex; x++ )
+						for (int x = sx; x < ex; x++)
 						{
-							if(vdp2_window_process(x,y))
+							if (vdp2_window_process(x, y))
 							{
 								int c = source[x_index>>16];
 								if ((transparency & STV_TRANSPARENCY_NONE) || (c != 0))
@@ -4966,7 +4962,7 @@ void saturn_state::vdp2_drawgfxzoom_rgb555(
 			int x_index_base;
 			int y_index;
 
-			if( flipx )
+			if (flipx)
 			{
 				x_index_base = (sprite_screen_width-1)*dx;
 				dx = -dx;
@@ -4976,7 +4972,7 @@ void saturn_state::vdp2_drawgfxzoom_rgb555(
 				x_index_base = 0;
 			}
 
-			if( flipy )
+			if (flipy)
 			{
 				y_index = (sprite_screen_height-1)*dy;
 				dy = -dy;
@@ -4986,27 +4982,27 @@ void saturn_state::vdp2_drawgfxzoom_rgb555(
 				y_index = 0;
 			}
 
-			if( sx < myclip.left())
+			if (sx < myclip.left())
 			{
 				// clip left
 				int pixels = myclip.left()-sx;
 				sx += pixels;
 				x_index_base += pixels*dx;
 			}
-			if( sy < myclip.top() )
+			if (sy < myclip.top())
 			{
 				// clip top
 				int pixels = myclip.top()-sy;
 				sy += pixels;
 				y_index += pixels*dy;
 			}
-			if( ex > myclip.right()+1 )
+			if (ex > myclip.right()+1)
 			{
 				// clip right
 				int pixels = ex-myclip.right()-1;
 				ex -= pixels;
 			}
-			if( ey > myclip.bottom()+1 )
+			if (ey > myclip.bottom()+1)
 			{
 				// clip bottom
 				int pixels = ey-myclip.bottom()-1;
@@ -5014,20 +5010,18 @@ void saturn_state::vdp2_drawgfxzoom_rgb555(
 			}
 
 			// skip if inner loop doesn't draw anything
-			if( ex > sx )
+			if (ex > sx)
 			{
-				int y;
-
-				// case : STV_TRANSPARENCY_ALPHA
 				if (transparency & STV_TRANSPARENCY_ALPHA)
 				{
-					for( y=sy; y<ey; y++ )
+					// case : STV_TRANSPARENCY_ALPHA
+					for(int y = sy; y < ey; y++)
 					{
 						uint8_t const *const source = gfxdata + (y_index>>16)*16;
 						uint32_t *const dest = &dest_bmp.pix(y);
 
 						int x_index = x_index_base;
-						for( int x=sx; x<ex; x++ )
+						for (int x = sx; x < ex; x++)
 						{
 							int data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
 							int b = pal5bit((data & 0x7c00) >> 10);
@@ -5045,17 +5039,16 @@ void saturn_state::vdp2_drawgfxzoom_rgb555(
 						y_index += dy;
 					}
 				}
-
-				// case : STV_TRANSPARENCY_ADD_BLEND
 				else if (transparency & STV_TRANSPARENCY_ADD_BLEND)
 				{
-					for( y=sy; y<ey; y++ )
+					// case : STV_TRANSPARENCY_ADD_BLEND
+					for (int y = sy; y < ey; y++)
 					{
 						uint8_t const *const source = gfxdata + (y_index>>16)*16;
 						uint32_t *const dest = &dest_bmp.pix(y);
 
 						int x_index = x_index_base;
-						for( int x=sx; x<ex; x++ )
+						for (int x = sx; x < ex; x++)
 						{
 							int data = (source[(x_index*2+0)>>16]<<0)|(source[(x_index*2+1)>>16]<<8);
 							int b = pal5bit((data & 0x7c00) >> 10);
@@ -5073,23 +5066,22 @@ void saturn_state::vdp2_drawgfxzoom_rgb555(
 						y_index += dy;
 					}
 				}
-
-				// case : STV_TRANSPARENCY_PEN
 				else
 				{
-					for( y=sy; y<ey; y++ )
+					// case : STV_TRANSPARENCY_PEN
+					for (int y = sy; y < ey; y++)
 					{
 						uint8_t const *const source = gfxdata + (y_index>>16)*16;
 						uint32_t *const dest = &dest_bmp.pix(y);
 
 						int x_index = x_index_base;
-						for( int x=sx; x<ex; x++ )
+						for (int x = sx; x < ex; x++)
 						{
 							int data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
 							int b = pal5bit((data & 0x7c00) >> 10);
 							int g = pal5bit((data & 0x03e0) >> 5);
 							int r = pal5bit( data & 0x001f);
-							if(current_tilemap.fade_control & 1)
+							if (current_tilemap.fade_control & 1)
 								vdp2_compute_color_offset(&r,&g,&b,current_tilemap.fade_control & 2);
 
 							if ((transparency & STV_TRANSPARENCY_NONE) || (data & 0x8000))
@@ -5108,7 +5100,7 @@ void saturn_state::vdp2_drawgfxzoom_rgb555(
 }
 
 
-void saturn_state::vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle &clip, uint32_t code, int flipx, int flipy, int sx, int sy, int transparency, int alpha)
+void saturn_state::vdp2_drawgfx_rgb555(bitmap_rgb32 &dest_bmp, const rectangle &clip, uint32_t code, int flipx, int flipy, int sx, int sy, int transparency, int alpha)
 {
 	rectangle myclip;
 	uint8_t* gfxdata;
@@ -5135,7 +5127,7 @@ void saturn_state::vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle 
 		int x_index_base;
 		int y_index;
 
-		if( flipx )
+		if (flipx)
 		{
 			x_index_base = (sprite_screen_width-1)*dx;
 			dx = -dx;
@@ -5145,7 +5137,7 @@ void saturn_state::vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle 
 			x_index_base = 0;
 		}
 
-		if( flipy )
+		if (flipy)
 		{
 			y_index = (sprite_screen_height-1)*dy;
 			dy = -dy;
@@ -5155,27 +5147,27 @@ void saturn_state::vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle 
 			y_index = 0;
 		}
 
-		if( sx < myclip.left())
+		if (sx < myclip.left())
 		{
 			// clip left
 			int pixels = myclip.left()-sx;
 			sx += pixels;
 			x_index_base += pixels*dx;
 		}
-		if( sy < myclip.top() )
+		if (sy < myclip.top())
 		{
 			// clip top
 			int pixels = myclip.top()-sy;
 			sy += pixels;
 			y_index += pixels*dy;
 		}
-		if( ex > myclip.right()+1 )
+		if (ex > myclip.right()+1)
 		{
 			// clip right
 			int pixels = ex-myclip.right()-1;
 			ex -= pixels;
 		}
-		if( ey > myclip.bottom()+1 )
+		if (ey > myclip.bottom()+1)
 		{
 			// clip bottom
 			int pixels = ey-myclip.bottom()-1;
@@ -5183,17 +5175,15 @@ void saturn_state::vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle 
 		}
 
 		// skip if inner loop doesn't draw anything
-		if( ex > sx )
+		if (ex > sx)
 		{
-			int y;
-
-			for( y=sy; y<ey; y++ )
+			for (int y = sy; y < ey; y++)
 			{
 				uint8_t const *const source = gfxdata + (y_index>>16)*16;
 				uint32_t *const dest = &dest_bmp.pix(y);
 
 				int x_index = x_index_base;
-				for( int x=sx; x<ex; x++ )
+				for (int x = sx; x < ex; x++)
 				{
 					uint16_t data = (source[(x_index>>16)*2] << 8) | source[(x_index>>16)*2+1];
 					if ((data & 0x8000) || (transparency & STV_TRANSPARENCY_NONE))
@@ -5201,7 +5191,7 @@ void saturn_state::vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle 
 						int b = pal5bit((data & 0x7c00) >> 10);
 						int g = pal5bit((data & 0x03e0) >> 5);
 						int r = pal5bit( data & 0x001f);
-						if(current_tilemap.fade_control & 1)
+						if (current_tilemap.fade_control & 1)
 							vdp2_compute_color_offset(&r,&g,&b,current_tilemap.fade_control & 2);
 
 						if (transparency & STV_TRANSPARENCY_ALPHA)
