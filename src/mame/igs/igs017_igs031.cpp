@@ -197,7 +197,7 @@ void igs017_igs031_device::bg_w(offs_t offset, u8 data)
 }
 
 
-// Eeach 16 bit word in the sprites gfx roms contains three 5 bit pens: x-22222-11111-00000 (little endian!).
+// Each 16 bit word in the sprites gfx roms contains three 5 bit pens: x-22222-11111-00000 (little endian!).
 // This routine expands each word into three bytes.
 void igs017_igs031_device::expand_sprites()
 {
@@ -276,29 +276,33 @@ void igs017_igs031_device::draw_sprite(bitmap_ind16 &bitmap, const rectangle &cl
 	int ey = sy + dimy;
 
 	if (sx < cliprect.min_x)
-	{ // clip left
+	{
+		// clip left
 		int pixels = cliprect.min_x - sx;
 		sx += pixels;
 		x_index_base += xinc * pixels;
 	}
 	if (sy < cliprect.min_y)
-	{ // clip top
+	{
+		// clip top
 		int pixels = cliprect.min_y - sy;
 		sy += pixels;
 		y_index += yinc * pixels;
 	}
-	// NS 980211 - fixed incorrect clipping
 	if (ex > cliprect.max_x + 1)
-	{ // clip right
+	{
+		// clip right
 		ex = cliprect.max_x + 1;
 	}
 	if (ey > cliprect.max_y + 1)
-	{ // clip bottom
+	{
+		// clip bottom
 		ey = cliprect.max_y + 1;
 	}
 
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
-	{ // skip if inner loop doesn't draw anything
+	{
 		for (int y = sy; y < ey; y++)
 		{
 			u8 const *const source = source_base + y_index * dimx;

@@ -4729,11 +4729,15 @@ void saturn_state::vdp2_drawgfxzoom(
 		transmask = 1 << (0 & 0xff);
 
 		if ((gfx->pen_usage(code) & ~transmask) == 0)
-			/* character is totally transparent, no need to draw */
+		{
+			// character is totally transparent, no need to draw
 			return;
+		}
 		else if ((gfx->pen_usage(code) & transmask) == 0)
-			/* character is totally opaque, can disable transparency */
+		{
+			// character is totally opaque, can disable transparency
 			transparency |= STV_TRANSPARENCY_NONE;
+		}
 	}
 
 	/*
@@ -4743,8 +4747,7 @@ void saturn_state::vdp2_drawgfxzoom(
 	1<<17 : double to 200%
 	*/
 
-
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
+	// force clip to bitmap boundary
 	myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
@@ -4758,7 +4761,7 @@ void saturn_state::vdp2_drawgfxzoom(
 
 		if (sprite_screen_width && sprite_screen_height)
 		{
-			/* compute sprite increment per screen pixel */
+			// compute sprite increment per screen pixel
 			//int dx = (gfx->width()<<16)/sprite_screen_width;
 			//int dy = (gfx->height()<<16)/sprite_screen_height;
 			int dx = current_tilemap.incx;
@@ -4791,34 +4794,38 @@ void saturn_state::vdp2_drawgfxzoom(
 			}
 
 			if( sx < myclip.left())
-			{ /* clip left */
+			{
+				// clip left
 				int pixels = myclip.left()-sx;
 				sx += pixels;
 				x_index_base += pixels*dx;
 			}
 			if( sy < myclip.top() )
-			{ /* clip top */
+			{
+				// clip top
 				int pixels = myclip.top()-sy;
 				sy += pixels;
 				y_index += pixels*dy;
 			}
-			/* NS 980211 - fixed incorrect clipping */
 			if( ex > myclip.right()+1 )
-			{ /* clip right */
+			{
+				// clip right
 				int pixels = ex-myclip.right()-1;
 				ex -= pixels;
 			}
 			if( ey > myclip.bottom()+1 )
-			{ /* clip bottom */
+			{
+				// clip bottom
 				int pixels = ey-myclip.bottom()-1;
 				ey -= pixels;
 			}
 
-			if( ex>sx )
-			{ /* skip if inner loop doesn't draw anything */
+			// skip if inner loop doesn't draw anything
+			if( ex > sx )
+			{
 				int y;
 
-				/* case : STV_TRANSPARENCY_ALPHA */
+				// case : STV_TRANSPARENCY_ALPHA
 				if (transparency & STV_TRANSPARENCY_ALPHA)
 				{
 					for( y=sy; y<ey; y++ )
@@ -4840,7 +4847,9 @@ void saturn_state::vdp2_drawgfxzoom(
 
 						y_index += dy;
 					}
-				} /* case : STV_TRANSPARENCY_ADD_BLEND */
+				}
+
+				// case : STV_TRANSPARENCY_ADD_BLEND
 				else if (transparency & STV_TRANSPARENCY_ADD_BLEND)
 				{
 					for( y=sy; y<ey; y++ )
@@ -4862,7 +4871,9 @@ void saturn_state::vdp2_drawgfxzoom(
 
 						y_index += dy;
 					}
-				} /* case : STV_TRANSPARENCY_PEN */
+				}
+
+				// case : STV_TRANSPARENCY_PEN
 				else
 				{
 					for( y=sy; y<ey; y++ )
@@ -4930,8 +4941,7 @@ void saturn_state::vdp2_drawgfxzoom_rgb555(
 	1<<17 : double to 200%
 	*/
 
-
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
+	// force clip to bitmap boundary
 	myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
@@ -4977,34 +4987,38 @@ void saturn_state::vdp2_drawgfxzoom_rgb555(
 			}
 
 			if( sx < myclip.left())
-			{ /* clip left */
+			{
+				// clip left
 				int pixels = myclip.left()-sx;
 				sx += pixels;
 				x_index_base += pixels*dx;
 			}
 			if( sy < myclip.top() )
-			{ /* clip top */
+			{
+				// clip top
 				int pixels = myclip.top()-sy;
 				sy += pixels;
 				y_index += pixels*dy;
 			}
-			/* NS 980211 - fixed incorrect clipping */
 			if( ex > myclip.right()+1 )
-			{ /* clip right */
+			{
+				// clip right
 				int pixels = ex-myclip.right()-1;
 				ex -= pixels;
 			}
 			if( ey > myclip.bottom()+1 )
-			{ /* clip bottom */
+			{
+				// clip bottom
 				int pixels = ey-myclip.bottom()-1;
 				ey -= pixels;
 			}
 
-			if( ex>sx )
-			{ /* skip if inner loop doesn't draw anything */
+			// skip if inner loop doesn't draw anything
+			if( ex > sx )
+			{
 				int y;
 
-				/* case : STV_TRANSPARENCY_ALPHA */
+				// case : STV_TRANSPARENCY_ALPHA
 				if (transparency & STV_TRANSPARENCY_ALPHA)
 				{
 					for( y=sy; y<ey; y++ )
@@ -5030,7 +5044,9 @@ void saturn_state::vdp2_drawgfxzoom_rgb555(
 
 						y_index += dy;
 					}
-				} /* case : STV_TRANSPARENCY_ADD_BLEND */
+				}
+
+				// case : STV_TRANSPARENCY_ADD_BLEND
 				else if (transparency & STV_TRANSPARENCY_ADD_BLEND)
 				{
 					for( y=sy; y<ey; y++ )
@@ -5056,7 +5072,9 @@ void saturn_state::vdp2_drawgfxzoom_rgb555(
 
 						y_index += dy;
 					}
-				} /* case : STV_TRANSPARENCY_PEN */
+				}
+
+				// case : STV_TRANSPARENCY_PEN
 				else
 				{
 					for( y=sy; y<ey; y++ )
@@ -5103,7 +5121,7 @@ void saturn_state::vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle 
 		current_tilemap.window_control.enabled[1])
 		popmessage("Window Enabled for RGB555 tiles");
 
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
+	// force clip to bitmap boundary
 	myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
@@ -5138,31 +5156,35 @@ void saturn_state::vdp2_drawgfx_rgb555( bitmap_rgb32 &dest_bmp, const rectangle 
 		}
 
 		if( sx < myclip.left())
-		{ /* clip left */
+		{
+			// clip left
 			int pixels = myclip.left()-sx;
 			sx += pixels;
 			x_index_base += pixels*dx;
 		}
 		if( sy < myclip.top() )
-		{ /* clip top */
+		{
+			// clip top
 			int pixels = myclip.top()-sy;
 			sy += pixels;
 			y_index += pixels*dy;
 		}
-		/* NS 980211 - fixed incorrect clipping */
 		if( ex > myclip.right()+1 )
-		{ /* clip right */
+		{
+			// clip right
 			int pixels = ex-myclip.right()-1;
 			ex -= pixels;
 		}
 		if( ey > myclip.bottom()+1 )
-		{ /* clip bottom */
+		{
+			// clip bottom
 			int pixels = ey-myclip.bottom()-1;
 			ey -= pixels;
 		}
 
-		if( ex>sx )
-		{ /* skip if inner loop doesn't draw anything */
+		// skip if inner loop doesn't draw anything
+		if( ex > sx )
+		{
 			int y;
 
 			for( y=sy; y<ey; y++ )
@@ -5214,9 +5236,10 @@ void saturn_state::vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectangle 
 		current_tilemap.window_control.enabled[1])
 		popmessage("Window Enabled for RGB888 tiles");
 
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
+	// force clip to bitmap boundary
 	myclip = clip;
 	myclip &= dest_bmp.cliprect();
+
 	{
 		int dx = current_tilemap.incx;
 		int dy = current_tilemap.incy;
@@ -5248,31 +5271,35 @@ void saturn_state::vdp2_drawgfx_rgb888( bitmap_rgb32 &dest_bmp, const rectangle 
 		}
 
 		if( sx < myclip.left())
-		{ /* clip left */
+		{
+			// clip left
 			int pixels = myclip.left()-sx;
 			sx += pixels;
 			x_index_base += pixels*dx;
 		}
 		if( sy < myclip.top() )
-		{ /* clip top */
+		{
+			// clip top
 			int pixels = myclip.top()-sy;
 			sy += pixels;
 			y_index += pixels*dy;
 		}
-		/* NS 980211 - fixed incorrect clipping */
 		if( ex > myclip.right()+1 )
-		{ /* clip right */
+		{
+			// clip right
 			int pixels = ex-myclip.right()-1;
 			ex -= pixels;
 		}
 		if( ey > myclip.bottom()+1 )
-		{ /* clip bottom */
+		{
+			// clip bottom
 			int pixels = ey-myclip.bottom()-1;
 			ey -= pixels;
 		}
 
-		if( ex>sx )
-		{ /* skip if inner loop doesn't draw anything */
+		// skip if inner loop doesn't draw anything
+		if( ex > sx )
+		{
 			for( int y=sy; y<ey; y++ )
 			{
 				uint8_t const *const source = gfxdata + (y_index>>16)*32;
@@ -5323,41 +5350,40 @@ void saturn_state::vdp2_drawgfx_alpha(bitmap_rgb32 &dest_bmp,const rectangle &cl
 	x_index_base = flipx ? gfx->width()-1 : 0;
 	y_index = flipy ? gfx->height()-1 : 0;
 
-	/* start coordinates */
+	// start coordinates
 	sx = offsx;
 	sy = offsy;
 
-	/* end coordinates */
+	// end coordinates
 	ex = sx + gfx->width();
 	ey = sy + gfx->height();
 
-	/* clip left */
 	if (sx < clip.left())
 	{
+		// clip left
 		int pixels = clip.left()-sx;
 		sx += pixels;
 		x_index_base += xinc*pixels;
 	}
-
-	/* clip top */
 	if (sy < clip.top())
-	{   int pixels = clip.top()-sy;
+	{
+		// clip top
+		int pixels = clip.top()-sy;
 		sy += pixels;
 		y_index += yinc*pixels;
 	}
-
-	/* clip right */
 	if (ex > clip.right()+1)
 	{
+		// clip right
 		ex = clip.right()+1;
 	}
-	/* clip bottom */
 	if (ey > clip.bottom()+1)
 	{
+		// clip bottom
 		ey = clip.bottom()+1;
 	}
 
-	/* skip if inner loop doesn't draw anything */
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
 	{
 		for (int y = sy; y < ey; y++)
@@ -5396,41 +5422,40 @@ void saturn_state::vdp2_drawgfx_transpen(bitmap_rgb32 &dest_bmp,const rectangle 
 	x_index_base = flipx ? gfx->width()-1 : 0;
 	y_index = flipy ? gfx->height()-1 : 0;
 
-	/* start coordinates */
+	// start coordinates
 	sx = offsx;
 	sy = offsy;
 
-	/* end coordinates */
+	// end coordinates
 	ex = sx + gfx->width();
 	ey = sy + gfx->height();
 
-	/* clip left */
 	if (sx < clip.left())
 	{
+		// clip left
 		int pixels = clip.left()-sx;
 		sx += pixels;
 		x_index_base += xinc*pixels;
 	}
-
-	/* clip top */
 	if (sy < clip.top())
-	{   int pixels = clip.top()-sy;
+	{
+		// clip top
+		int pixels = clip.top()-sy;
 		sy += pixels;
 		y_index += yinc*pixels;
 	}
-
-	/* clip right */
 	if (ex > clip.right()+1)
 	{
+		// clip right
 		ex = clip.right()+1;
 	}
-	/* clip bottom */
 	if (ey > clip.bottom()+1)
 	{
+		// clip bottom
 		ey = clip.bottom()+1;
 	}
 
-	/* skip if inner loop doesn't draw anything */
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
 	{
 		for (int y = sy; y < ey; y++)
