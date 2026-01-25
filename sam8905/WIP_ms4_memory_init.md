@@ -134,8 +134,8 @@ note_freq[n] = (pitch_table_hi[n] << 16) | (pitch_table_mid[n] << 8) | pitch_tab
 ```
 
 The computation uses a base frequency constant and octave division via
-successive right-shifts. The sine table at CODE:9833 (256 bytes) provides
-the LFO waveform data.
+successive right-shifts. The LFO sine table at CODE:9833 (64 bytes) provides
+the vibrato waveform data (indexed by `(phase_hi >> 1) & 0x3F`).
 
 
 ## INTMEM (128 bytes) Memory Map
@@ -163,9 +163,12 @@ Used for various flag bits. Specific bit assignments TBD.
 | 0x37    | sam_ctrl_flags        | -     | SAM control register value |
 | 0x38    | dram_address_counter  | -     | D-RAM address counter during init |
 | 0x39    | remaining_slots       | 0x10  | Remaining D-RAM slots to process |
+| 0x3a    | voice_page_num        | -     | Current voice page (P2 value for XRAM) |
 | 0x3b    | voice_slot_base       | -     | XRAM voice slot R1 base |
 | 0x3c    | midi_note             | -     | Current MIDI note number |
 | 0x3d    | midi_velocity         | -     | Current MIDI velocity |
+| 0x3e    | amplitude_scale       | -     | Amplitude scaling factor (for env) |
+| 0x3f    | velocity_mix_atten    | -     | Velocity MIX attenuation (bit7=MIXL/MIXR sel) |
 | 0x40    | pitch_bend_value      | -     | Current pitch bend (signed) |
 | 0x41    | rom_data_ptr_lo       | -     | ROM parse pointer low byte |
 | 0x42    | rom_data_ptr_hi       | -     | ROM parse pointer high byte |
@@ -250,13 +253,16 @@ This sets each slot's control word with algorithm routing and full mix (0x0F = M
 | 9A2D    | voice_init_slots            | Allocate D-RAM slots, init voice pages, copy program data |
 | AB40    | voice_init_next_slot        | Advance to next D-RAM word, dispatch config handler |
 | AB73    | voice_init_copy_and_envelope| Copy 7-byte envelope data to slot, process envelope table |
-| AD8F    | dram_config_handler_00      | D-RAM short write (3-4 byte entries) |
-| ADBD    | dram_config_handler_08      | Pitch/frequency setup (10-byte entries) |
-| B030    | dram_config_handler_10      | (TBD) |
-| B222    | dram_config_handler_18      | (TBD) |
-| B278    | dram_config_handler_20      | (TBD) |
-| B2D2    | dram_config_handler_28      | (TBD) |
-| B2CF    | dram_config_handler_30      | (TBD) |
+| AB4C    | dram_config_dispatch        | Dispatch loop: reads byte, selects handler by bits 5:3 |
+| AD82    | dram_config_skip_4bytes     | Skip 4-byte entry (conditional path in handler_18) |
+| AD8F    | dram_config_handler_00      | Short D-RAM write (3-4 bytes) |
+| ADBD    | dram_config_handler_08      | Pitch/frequency setup (10 bytes) |
+| B030    | dram_config_handler_10      | Amplitude/level + envelope (9 bytes) |
+| B1EC    | dram_config_apply_velocity  | Attenuate MIX bits by velocity |
+| B222    | dram_config_handler_18      | D-RAM write + velocity mod (4 bytes) |
+| B278    | dram_config_handler_20      | Output routing config (4 bytes, TERMINATES) |
+| B2D2    | dram_config_handler_28      | Write constant 0x28 (1 byte) |
+| B2CF    | dram_config_handler_30      | Skip remaining / re-dispatch (1 byte) |
 
 ### D-RAM Config Stream Format
 
@@ -273,11 +279,98 @@ Dispatch byte format:
 Handler types:
 - **0x00**: Short D-RAM write (3-4 bytes: dispatch + value_lo + value_hi [+ extra])
 - **0x08**: Pitch/frequency (10 bytes: dispatch + vel_sens + note_offset + ctrl + bend_range + fine_lo + fine_hi + skip + port_rate + port_depth)
-- **0x10-0x30**: Additional parameter types (TBD)
-- **0x38**: Default handler (writes 0x38 to slot, advances to next word)
+- **0x10**: Amplitude/level (9 bytes: dispatch + base_level + amplitude + env_ctrl + rate + unused + sustain + vel_sens + mod_amt)
+- **0x18**: D-RAM write + velocity mod (4 bytes: dispatch_value + mod1 + mod2 + mod3)
+- **0x20**: Output routing (4 bytes: dispatch + route1→page[F9] + route2→page[FA] + route3_bits→page[FB]). TERMINATES.
+- **0x28**: Write constant 0x28 to slot (1 byte, just dispatch). Simple placeholder.
+- **0x30**: Skip remaining words (1 byte). Re-enters dispatch loop for remaining words without consuming stream data. TERMINATES when counter=0.
+- **0x38**: Inline default (1 byte). Writes 0x38 to slot, advances to next word.
 
 Between D-RAM word entries, a 2-byte voice_data_ptr is read. If non-zero,
 `voice_init_copy_and_envelope` is called to set up the envelope for that word.
+
+### Handler 0x10: Amplitude/Level (9 bytes)
+
+Most complex handler. Controls D-RAM amplitude with velocity scaling and envelope.
+
+```
+Stream: [dispatch] [base_level] [amplitude] [env_ctrl] [rate] [unused] [sustain] [vel_sens] [mod_amt]
+
+dispatch bits:
+  bit 0: output_sel (1=apply velocity to D-RAM output)
+  bit 1: copy_level (1=copy computed level to slot[7])
+  bit 2: phase_inv (1=invert phase in D-RAM write)
+
+env_ctrl bits:
+  bit 7: envelope_enable (store to dram_slot_index for periodic update)
+  bit 6: no_velocity_scaling (skip velocity * amplitude attenuation)
+  bit 4: special_mode (store to dram_slot_index, different D-RAM write path)
+  bit 0: modulation_enable (apply mod to MIX attenuation)
+
+rate bits:
+  bit 3: portamento_flag (register for periodic amplitude portamento)
+
+Velocity scaling (when vel_sens != 0):
+  amplitude -= amplitude * (127-velocity) * vel_sens / 256
+
+Phase inversion (bit 2 set, no velocity scaling):
+  Writes complement of amplitude to D-RAM word N-1 as negative phase offset
+```
+
+### Handler 0x18: D-RAM Write + Velocity Mod (4 bytes)
+
+Simple word write with optional MIX velocity attenuation.
+
+```
+Stream: [dispatch_value] [mod_byte_1] [mod_byte_2] [mod_byte_3]
+
+dispatch_value: stored to voice_slot_base[0]
+If dispatch bit 0 set:
+  mod_byte_1 stored to voice_slot_base[1]
+  dram_config_apply_velocity(mod_byte_2, mod_byte_3) called
+  → attenuates MIXR or MIXL bits by velocity_mix_atten (INTMEM:3F)
+Writes to SAM D-RAM at current address
+```
+
+### Handler 0x20: Output Routing (4 bytes, TERMINATES)
+
+Configures the voice output routing in the voice page. This is the
+last handler called for a voice - it terminates the dispatch loop.
+
+```
+Stream: [dispatch] [route1] [route2] [route3]
+
+route1 → XRAM page[0xF9]  (output routing byte 1)
+route2 → XRAM page[0xFA]  (output routing byte 2)
+route3 bits 2:0 → XRAM page[0xFB] low 3 bits (merge with existing)
+
+Sets voice_slot_base = 0xF8 (point to output routing area of voice page)
+Optionally writes to SAM D-RAM or applies velocity attenuation
+```
+
+### Handler 0x28: Write Constant (1 byte)
+
+Placeholder/padding handler. Writes constant 0x28 to the voice slot
+and advances the stream pointer by 1 byte (just the dispatch byte itself).
+
+### Handler 0x30: Skip Remaining (1 byte, may TERMINATE)
+
+Advances to next D-RAM word without consuming additional stream data.
+Then re-enters the dispatch loop. If a new dispatch byte is found, it
+dispatches to the appropriate handler. Terminates when the remaining
+word counter reaches 0 or a terminator byte is encountered.
+
+### dram_config_apply_velocity
+
+Attenuates the MIX routing bits based on velocity:
+```
+If velocity_mix_atten bit 7 = 0:
+  MIXR = max(0, slot[1] bits 2:0 - velocity_mix_atten)
+If velocity_mix_atten bit 7 = 1:
+  MIXL = max(0, slot[1] bits 5:3 - (velocity_mix_atten & 0x7F))
+```
+This provides velocity-sensitive output level by reducing the SAM
+D-RAM MIX routing values for quieter notes.
 
 
 ## Voice Init ROM Data Format
@@ -314,7 +407,7 @@ Bytes read in-place (5 bytes, not copied):
 - [x] Add Ghidra labels to D-RAM free list and per-channel data
 - [x] Document voice_init functions and their memory usage
 - [x] Document D-RAM config stream format
-- [ ] Trace dram_config_handler_10 through _30 (remaining handlers)
+- [x] Trace dram_config_handler_10 through _30 (remaining handlers)
 - [ ] Characterize EXTMEM 0x11F6-0x14D2 region
 - [ ] Characterize EXTMEM 0x1CE5-0x1FFF region
 - [ ] Map bit-addressable INTMEM (0x20-0x2F) flag assignments
