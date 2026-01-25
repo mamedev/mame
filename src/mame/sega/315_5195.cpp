@@ -437,9 +437,20 @@ void sega_315_5195_mapper_device::device_start()
 	m_decrypted_space = m_cpu->has_space(AS_OPCODES) ? &m_cpu->space(AS_OPCODES) : nullptr;
 
 	// register for saves
+	save_item(NAME(info.size_mask));
+	save_item(NAME(info.base));
+	save_item(NAME(info.mirror));
+	save_item(NAME(info.start));
+	save_item(NAME(info.end));
+	save_item(NAME(m_start));
+	save_item(NAME(m_end));
+	save_item(NAME(m_rgnoffs));
 	save_item(NAME(m_regs));
+	save_item(NAME(m_curregion));
+	save_item(NAME(m_banks));
 	save_item(NAME(m_to_sound));
 	save_item(NAME(m_from_sound));
+	save_item(NAME(m_open_bus_recurse));
 }
 
 
