@@ -97,6 +97,7 @@ drc_cache::drc_cache(std::size_t bytes) noexcept
 	, m_codegen(nullptr)
 	, m_size(bytes)
 	, m_rwx(false)
+	, m_invargen(false)
 	, m_max_temporary(0)
 	, m_flush_count(0)
 #if defined(MAME_DEBUG)

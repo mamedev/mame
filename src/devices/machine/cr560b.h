@@ -60,7 +60,7 @@ private:
 	void cmd_read_status();
 	//void cmd_drawer_open();
 	//void cmd_drawer_close();
-	//void cmd_set_mode();
+	void cmd_set_mode();
 	//void cmd_reset();
 	//void cmd_flush();
 	//void cmd_lock();
@@ -75,15 +75,15 @@ private:
 	void cmd_read_error();
 	void cmd_version();
 	//void cmd_mode_sense();
-	//void cmd_read_capacity();
+	void cmd_read_capacity();
 	//void cmd_read_header();
 	//void cmd_read_subq();
 	//void cmd_read_upc();
 	//void cmd_read_isrc();
 	//void cmd_read_disc_code();
-	//void cmd_read_disc_info();
-	//void cmd_read_toc();
-	//void cmd_read_session_info();
+	void cmd_read_disc_info();
+	void cmd_read_toc();
+	void cmd_read_session_info();
 	//void cmd_read_device_driver();
 
 	// drive status

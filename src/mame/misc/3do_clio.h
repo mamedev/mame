@@ -20,6 +20,7 @@ public:
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	auto firq_cb() { return m_firq_cb.bind(); }
+	auto xbus_sel_cb() { return m_xbus_sel_cb.bind(); }
 	auto xbus_read_cb() { return m_xbus_read_cb.bind(); }
 	auto xbus_write_cb() { return m_xbus_write_cb.bind(); }
 	auto dacl_cb() { return m_dac_l.bind(); }
@@ -28,6 +29,7 @@ public:
 	auto vsync_cb() { return m_vsync_cb.bind(); }
 	template <std::size_t Line> auto adb_out_cb() { return m_adb_out_cb[Line].bind(); }
 
+	void xbus_rdy_w(int state);
 	void xbus_int_w(int state);
 
 //  void expansion_w(int state);
@@ -45,6 +47,7 @@ private:
 	devcb_write_line    m_firq_cb;
 	devcb_write_line    m_vsync_cb;
 	devcb_write_line    m_hsync_cb;
+	devcb_write8        m_xbus_sel_cb;
 	devcb_read8         m_xbus_read_cb;
 	devcb_write8        m_xbus_write_cb;
 	devcb_write16       m_dac_l;
@@ -91,6 +94,7 @@ private:
 //  uint32_t  m_avdidata = 0;       /* 034005c0 - 034005ff */
 	uint32_t  m_sel;
 	uint32_t  m_poll;
+	u8        m_xbus_rdy[0x10];
 									/* DSPP */
 //  uint32_t  m_semaphore = 0;      /* 034017d0 */
 //  uint32_t  m_semaack = 0;        /* 034017d4 */

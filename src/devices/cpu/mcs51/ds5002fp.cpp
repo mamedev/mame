@@ -252,7 +252,7 @@ u8 ds5002fp_device::ta_r()
 void ds5002fp_device::ta_w(u8 data)
 {
 	m_previous_ta = m_ta;
-	//  init the time window after having wrote 0xaa
+	// init the time window after having wrote 0xaa
 	if ((data == 0xaa) && (m_ta_window == 0))
 	{
 		m_ta_window = 6; // 4*12 + 2*12

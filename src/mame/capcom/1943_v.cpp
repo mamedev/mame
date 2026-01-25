@@ -133,32 +133,32 @@ void _1943_state::colorram_w(offs_t offset, u8 data)
 
 void _1943_state::control_w(u8 data)
 {
-	/* bits 0 and 1 are coin counters */
+	// bits 0 and 1 are coin counters
 	machine().bookkeeping().coin_counter_w(0, data & 0x01);
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 
-	/* bits 2, 3 and 4 select the ROM bank */
+	// bits 2, 3 and 4 select the ROM bank
 	m_mainbank->set_entry((data & 0x1c) >> 2);
 
-	/* bit 5 resets the sound CPU */
+	// bit 5 resets the sound CPU
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 
-	/* bit 6 flips screen */
+	// bit 6 flips screen
 	flip_screen_set(data & 0x40);
 
-	/* bit 7 enables characters */
+	// bit 7 enables characters
 	m_char_on = data & 0x80;
 }
 
 void _1943_state::layer_w(u8 data)
 {
-	/* bit 4 enables bg 1 */
+	// bit 4 enables bg 1
 	m_bg1_on = data & 0x10;
 
-	/* bit 5 enables bg 2 */
+	// bit 5 enables bg 2
 	m_bg2_on = data & 0x20;
 
-	/* bit 6 enables sprites */
+	// bit 6 enables sprites
 	m_obj_on = data & 0x40;
 }
 
@@ -209,12 +209,11 @@ void _1943_state::video_start()
 	save_item(NAME(m_bg2_on));
 }
 
-void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-							u8 transparent_color)
+void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
+		u32 code, u32 color, bool flipx, bool flipy, int offsx, int offsy, u8 transparent_color)
 {
 	bitmap_ind8 &priority_bitmap = m_screen->priority();
-	/* Start drawing */
+
 	const u16 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 	const u8 *source_base = gfx->get_data(code % gfx->elements());
 
@@ -233,29 +232,33 @@ void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx
 	int ey = sy + gfx->height();
 
 	if (sx < clip.min_x)
-	{ // clip left
+	{
+		// clip left
 		const int pixels = clip.min_x - sx;
 		sx += pixels;
 		x_index_base += xinc * pixels;
 	}
 	if (sy < clip.min_y)
-	{ // clip top
+	{
+		// clip top
 		const int pixels = clip.min_y - sy;
 		sy += pixels;
 		y_index += yinc * pixels;
 	}
-	// NS 980211 - fixed incorrect clipping
 	if (ex > clip.max_x + 1)
-	{ // clip right
+	{
+		// clip right
 		ex = clip.max_x + 1;
 	}
 	if (ey > clip.max_y + 1)
-	{ // clip bottom
+	{
+		// clip bottom
 		ey = clip.max_y + 1;
 	}
 
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
-	{ // skip if inner loop doesn't draw anything
+	{
 		for (int y = sy; y < ey; y++)
 		{
 			u8 const *const source = source_base + y_index * gfx->rowbytes();
