@@ -20,6 +20,7 @@ public:
 
 	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_luna_mode(bool active) { m_luna_mode = active; }
 	auto irq_callback() { return m_irq_callback.bind(); }
 	auto dma_end() { return m_dma_end.bind(); }
 	auto own() { return m_own.bind(); }
@@ -109,6 +110,8 @@ private:
 	devcb_write16::array<4> m_dma16_write;
 	devcb_read32::array<4> m_dma32_read;
 	devcb_write32::array<4> m_dma32_write;
+
+	bool m_luna_mode;
 
 	attotime m_our_clock[4];
 	attotime m_burst_clock[4];

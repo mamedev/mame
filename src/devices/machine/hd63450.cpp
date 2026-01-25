@@ -25,6 +25,7 @@ hd63450_device::hd63450_device(const machine_config &mconfig, const char *tag, d
 	, m_dma16_write(*this)
 	, m_dma32_read(*this, 0)
 	, m_dma32_write(*this)
+	, m_luna_mode(false)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
 {
 	for (int i = 0; i < 4; i++)
@@ -379,7 +380,7 @@ void hd63450_device::single_transfer(int x)
 		switch(m_reg[x].ocr & 0x30)  // operation size
 		{
 		case 0x00:  // 8 bit
-			if (!m_dma8_read[x].isunset())
+			if (m_reg[x].dcr & 0x20)
 			{
 				data = m_dma8_read[x](m_reg[x].mar);
 				if (data == -1)
@@ -410,24 +411,32 @@ void hd63450_device::single_transfer(int x)
 			break;
 
 		case 0x30:  // 8 bit packed
-			if (!m_dma8_read[x].isunset())
+			if (m_luna_mode)
 			{
 				data = m_dma8_read[x](m_reg[x].mar);
-				if (data == -1)
-					return;  // not ready to receive data
+				datasize = 0;
+				m_packed_value[x] |= data << (24 - 8*m_packed_index[x]);
+				m_packed_index[x] ++;
+				if (m_packed_index[x] != 4)
+					break;
+				space.write_dword(4*m_reg[x].mar,m_packed_value[x]);
+				m_packed_index[x] = 0;
+				m_packed_value[x] = 0;
 			}
 			else
-				data = space.read_byte(m_reg[x].dar);  // read from device address
-			datasize = 0;
-			m_packed_value[x] |= data << (24 - 8*m_packed_index[x]);
-			m_packed_index[x] ++;
-			if (m_packed_index[x] != 4)
-				break;
-			space.write_dword(4*m_reg[x].mar,m_packed_value[x]);
-			if(m_reg[x].mtc >= 0x3fc)
-				logerror("%06x: %08x\n", 4*m_reg[x].mar,m_packed_value[x]);
-			m_packed_index[x] = 0;
-			m_packed_value[x] = 0;
+			{
+				if (!m_dma8_read[x].isunset())
+				{
+					data = m_dma8_read[x](m_reg[x].mar);
+					if (data == -1)
+						return;  // not ready to receive data
+				}
+				else
+					data = space.read_byte(m_reg[x].dar);  // read from device address
+				space.write_byte(m_reg[x].mar,data);
+				datasize = 1;
+			}
+			break;
 		}
 	}
 	else  // memory -> device
@@ -461,19 +470,28 @@ void hd63450_device::single_transfer(int x)
 			datasize = 4;
 			break;
 		case 0x30:  // 8 bit packed
-			if (m_packed_index[x] == 0)
-				m_packed_value[x] = space.read_dword(4*m_reg[x].mar);  // read from memory address
+			if (m_luna_mode)
+			{
+				if (m_packed_index[x] == 0)
+					m_packed_value[x] = space.read_dword(4*m_reg[x].mar);  // read from memory address
 
-			data = (m_packed_value[x] >> (24 - 8*m_packed_index[x])) & 0xff;
-			if (!m_dma8_write[x].isunset())
+				data = (m_packed_value[x] >> (24 - 8*m_packed_index[x])) & 0xff;
 				m_dma8_write[x](m_reg[x].mar, data);
-			else
-				space.write_byte(m_reg[x].dar, data);  // write to device address
 
-			datasize = 0;
-			m_packed_index[x] ++;
-			if (m_packed_index[x] == 4)
-				m_packed_index[x] = 0;
+				datasize = 0;
+				m_packed_index[x] ++;
+				if (m_packed_index[x] == 4)
+					m_packed_index[x] = 0;
+			}
+			else
+			{
+				data = space.read_byte(m_reg[x].mar);  // read from memory address
+				if (!m_dma8_write[x].isunset())
+					m_dma8_write[x](m_reg[x].mar, data);
+				else
+					space.write_byte(m_reg[x].dar, data);  // write to device address
+				datasize = 1;
+			}
 			break;
 		}
 	}
