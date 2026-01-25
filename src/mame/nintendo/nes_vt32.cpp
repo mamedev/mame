@@ -546,16 +546,24 @@ CONS( 2021, matet100,  0,        0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_
 // Uses DIPs switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2016, fcpocket,  0,  0,  nes_vt32_4x16mb,   nes_vt32_fp, nes_vt32_unk_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
 
-CONS( 2020, lxpc,      0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console (English/French)", MACHINE_NOT_WORKING )
-CONS( 2020, lxpcs,     lxpc,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console (English/Spanish)", MACHINE_NOT_WORKING )
-CONS( 2020, lxpcg,     lxpc,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console (English/German)", MACHINE_NOT_WORKING )
-// aside from the boot screens these have no theming and all contain a barely disguised bootleg version of Nintendo's Pinball in the Games section
-CONS( 2020, lxpcsp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man (English/French)", MACHINE_NOT_WORKING )
-CONS( 2020, lxpcli,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Lilo & Stitch (English/French)", MACHINE_NOT_WORKING )
-CONS( 2020, lxpcpp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Paw Patrol (English/French)", MACHINE_NOT_WORKING )
-CONS( 2020, lxpcdp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Disney Princess (English/French)", MACHINE_NOT_WORKING )
-CONS( 2020, lxpcgp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Gabby's Dollhouse (English/French)", MACHINE_NOT_WORKING )
-// Power Console - Frozen
+// all Power Consoles contain a barely disguised bootleg version of Nintendo's Pinball in the Games section
+// these are the generic unthemed units
+CONS( 2020, lxpc,      0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console (JCG100i1, English/French)", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcs,     lxpc,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console (JCG100i2, English/Spanish)", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcg,     lxpc,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console (JCG100i3, English/German)", MACHINE_NOT_WORKING )
+
+// aside from the boot screens these have no theming
+// there are likely many more language combinations for each
+CONS( 2020, lxpcsp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man (JCG100SPi1, English/French)", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcli,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Lilo & Stitch (JCG100Di1, English/French)", MACHINE_NOT_WORKING )
+// Power Console - Lilo & Stitch (JCG100i2, English/Spanish)
+// Power Console - Lilo & Stitch (JCG100i3, English/German)
+CONS( 2020, lxpcpp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Paw Patrol (JCG100PAi1, English/French)", MACHINE_NOT_WORKING )
+// Power Console - Paw Patrol (JCG100PAi5, English/Italian)
+CONS( 2020, lxpcdp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Disney Princess (JCG100DPi1, English/French)", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcgp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Gabby's Dollhouse (JCG100GDHi1, English/French)", MACHINE_NOT_WORKING )
+// Power Console - Frozen (JCG100FZi1, English/French) 
+// Power Console - Frozen (JCG100FZi12, English/Czech)
 
 // unclear SoC types maybe even different
 // Rush'n Attack has the raster split in the wrong place on the 5 language version (mountains in first stage) when using real hardware
