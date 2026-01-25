@@ -47,6 +47,22 @@
 #include "speaker.h"
 
 
+/* Interrupts */
+
+TIMER_DEVICE_CALLBACK_MEMBER(_1943_state::scanline)
+{
+	const int scanline = param;
+
+	// 2 main interrupts per frame (mid-screen interrupt is 96 scanlines before vblank)
+	if (scanline == 144 || scanline == 240)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+
+	// 4 audio interrupts per frame on 32V
+	if ((scanline % 64) == 32)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
+}
+
+
 /* Protection Handlers */
 
 void _1943_state::mcu_p3_w(u8 data)
@@ -120,7 +136,7 @@ static INPUT_PORTS_START( 1943 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )    // VBLANK
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -271,11 +287,9 @@ void _1943_state::_1943(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(24'000'000)/4); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1943_state::c1943_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_1943_state::irq0_line_hold));
 
 	Z80(config, m_audiocpu, XTAL(24'000'000)/8); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_1943_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(_1943_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	I8751(config, m_mcu, XTAL(24'000'000)/8); /* verified on pcb */
 	m_mcu->port_in_cb<0>().set([this](){ return m_cpu_to_mcu; });
@@ -284,6 +298,8 @@ void _1943_state::_1943(machine_config &config)
 	m_mcu->port_in_cb<2>().set([this](){ return m_audiocpu_to_mcu; });
 	m_mcu->port_out_cb<2>().set([this](u8 data){ m_mcu_p2 = data; });
 	m_mcu->port_out_cb<3>().set(FUNC(_1943_state::mcu_p3_w));
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(_1943_state::scanline), "screen", 0, 16);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);

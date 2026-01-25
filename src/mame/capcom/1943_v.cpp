@@ -209,9 +209,8 @@ void _1943_state::video_start()
 	save_item(NAME(m_bg2_on));
 }
 
-void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-							u8 transparent_color)
+void _1943_state::_1943_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
+		u32 code, u32 color, bool flipx, bool flipy, int offsx, int offsy, u8 transparent_color)
 {
 	bitmap_ind8 &priority_bitmap = m_screen->priority();
 	/* Start drawing */
