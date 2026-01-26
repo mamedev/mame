@@ -2038,7 +2038,8 @@ void supracan_state::video_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		{
 			LOGMASKED(LOG_VIDEO, "video_flags = %04x\n", data);
 
-			if (data & 0xc00)
+			// data & 0x800: boomzoo
+			if (data & 0x400)
 				popmessage("Interlace enable %04x", data & 0xc00);
 
 			// TODO: verify if this support midframe switching
@@ -2469,4 +2470,4 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     STATE           INIT        COMPANY                  FULLNAME        FLAGS */
-CONS( 1995, supracan, 0,      0,      supracan, supracan, supracan_state, empty_init, "Funtech Entertainment", "Super A'Can",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+CONS( 1995, supracan, 0,      0,      supracan, supracan, supracan_state, empty_init, "Funtech Entertainment", "Super A'Can",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

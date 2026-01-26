@@ -23,8 +23,12 @@ public:
 	auto irq_callback() { return m_irq_callback.bind(); }
 	auto dma_end() { return m_dma_end.bind(); }
 	auto own() { return m_own.bind(); }
-	template <int Ch> auto dma_read() { return m_dma_read[Ch].bind(); }
-	template <int Ch> auto dma_write() { return m_dma_write[Ch].bind(); }
+	template <int Ch> auto dma8_read() { return m_dma8_read[Ch].bind(); }
+	template <int Ch> auto dma8_write() { return m_dma8_write[Ch].bind(); }
+	template <int Ch> auto dma16_read() { return m_dma16_read[Ch].bind(); }
+	template <int Ch> auto dma16_write() { return m_dma16_write[Ch].bind(); }
+	template <int Ch> auto dma32_read() { return m_dma32_read[Ch].bind(); }
+	template <int Ch> auto dma32_write() { return m_dma32_write[Ch].bind(); }
 
 	template <typename T> void set_cpu_tag(T &&cpu_tag) { m_cpu.set_tag(std::forward<T>(cpu_tag)); }
 	void set_clocks(const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
@@ -99,20 +103,24 @@ private:
 	devcb_write_line m_irq_callback;
 	devcb_write8 m_dma_end;
 	devcb_write_line m_own;
-	devcb_read8::array<4> m_dma_read;
-	devcb_write8::array<4> m_dma_write;
+	devcb_read8::array<4> m_dma8_read;
+	devcb_write8::array<4> m_dma8_write;
+	devcb_read16::array<4> m_dma16_read;
+	devcb_write16::array<4> m_dma16_write;
+	devcb_read32::array<4> m_dma32_read;
+	devcb_write32::array<4> m_dma32_write;
 
 	attotime m_our_clock[4];
 	attotime m_burst_clock[4];
 
 	// internal state
 	hd63450_regs m_reg[4];
+	uint32_t m_packed_value[4], m_packed_index[4];
 	emu_timer* m_timer[4];  // for timing data reading/writing each channel
 	uint16_t m_transfer_size[4];
 	bool m_halted[4];  // non-zero if a channel has been halted, and can be continued later.
 	required_device<cpu_device> m_cpu;
 	bool m_drq_state[4];
-
 	int8_t m_irq_channel;
 	uint8_t m_bec;
 

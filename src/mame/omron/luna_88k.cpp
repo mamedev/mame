@@ -7,6 +7,8 @@
  * Sources:
  *  - Tetsuya Isaki's nono Luna emulator (http://www.pastel-flower.jp/~isaki/nono/)
  *  - OpenBSD source code
+ *  - https://man.openbsd.org/pcexmem.4 and https://gist.github.com/ao-kenji/7843096
+ *    for C-Bus section
  *
  * TODO:
  *  - xp i/o controller
@@ -180,6 +182,7 @@ public:
 		, m_spc(*this, "scsi%u:7:spc", 0U)
 		, m_net(*this, "net%u", 0U)
 		, m_cbus_root(*this, "cbus")
+		, m_cbus_irq(*this, "cbus_irq")
 		, m_eprom(*this, "eprom")
 		, m_fzrom(*this, "fzrom")
 	{
@@ -190,17 +193,31 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void cpu_map(address_map &map) override ATTR_COLD;
 
 	required_device<mc146818_device> m_rtc;
 	required_device_array<mb89352_device, 2> m_spc;
 	required_device_array<am7990_device, 2> m_net;
 	required_device<pc98_cbus_root_device> m_cbus_root;
+	required_device<input_merger_any_low_device> m_cbus_irq;
 	required_region_ptr<u32> m_eprom;
 	required_region_ptr<u8> m_fzrom;
 
 private:
 	u8 m_fzrom_addr;
+
+	u8 m_cbus_cisr = 0xff;
+
+	template <unsigned Line> void cbus_irq_w(int state)
+	{
+		// TODO: verify ack state i.e. -86 FM/DAC signals
+		if (state)
+		{
+			m_cbus_irq->in_clear<Line>();
+			m_cbus_cisr &= ~(1 << Line);
+		}
+	}
 };
 
 void luna88k_state::init()
@@ -247,6 +264,7 @@ void luna88k2_state::machine_start()
 	luna_88k_state_base::machine_start();
 
 	save_item(NAME(m_fzrom_addr));
+	save_item(NAME(m_cbus_cisr));
 }
 
 void luna_88k_state_base::machine_reset()
@@ -266,6 +284,13 @@ void luna_88k_state_base::machine_reset()
 		i = 0;
 
 	irq_check();
+}
+
+void luna88k2_state::machine_reset()
+{
+	luna_88k_state_base::machine_reset();
+
+	m_cbus_cisr = 0xff;
 }
 
 void luna_88k_state_base::cpu_map(address_map &map)
@@ -349,11 +374,26 @@ void luna88k2_state::cpu_map(address_map &map)
 
 	// 0x8100'0000 ext board A
 	// 0x8300'0000 ext board B
-	// https://man.openbsd.org/pcexmem.4
 	map(0x9000'0000, 0x90ff'ffff).rw(m_cbus_root, FUNC(pc98_cbus_root_device::mem_r), FUNC(pc98_cbus_root_device::mem_w));
-	// 0x9100'0000 pc-9801 irq 4 (?)
 	map(0x9100'0000, 0x9100'ffff).rw(m_cbus_root, FUNC(pc98_cbus_root_device::io_r), FUNC(pc98_cbus_root_device::io_w));
-
+	map(0x9110'0000, 0x9110'0000).lrw8(
+		[this] (offs_t offset) -> u8 { return m_cbus_cisr; }, "cbus_cisr_r",
+		[this] (offs_t offset, u8 data) {
+			const u8 Line = data & 7;
+			switch(Line)
+			{
+				case 0: m_cbus_irq->in_set<0>(); break;
+				case 1: m_cbus_irq->in_set<1>(); break;
+				case 2: m_cbus_irq->in_set<2>(); break;
+				case 3: m_cbus_irq->in_set<3>(); break;
+				case 4: m_cbus_irq->in_set<4>(); break;
+				case 5: m_cbus_irq->in_set<5>(); break;
+				case 6: m_cbus_irq->in_set<6>(); break;
+				case 7: m_cbus_irq->in_set<7>(); break;
+			}
+			m_cbus_cisr |= 1 << Line;
+		}, "cbus_cisr_w"
+	).umask32(0xff000000);
 
 	map(0xe100'0000, 0xe100'003f).m(m_spc[0], FUNC(mb89352_device::map)).umask32(0xff000000);
 	map(0xe100'0040, 0xe100'007f).m(m_spc[1], FUNC(mb89352_device::map)).umask32(0xff000000);
@@ -597,8 +637,20 @@ void luna88k2_state::luna88k2(machine_config &config)
 	m_net[1]->dma_in().set(FUNC(luna88k2_state::net_r));
 	m_net[1]->dma_out().set(FUNC(luna88k2_state::net_w));
 
+	INPUT_MERGER_ANY_LOW(config, m_cbus_irq);
+	m_cbus_irq->output_handler().set(net_irq, FUNC(input_merger_any_low_device::in_w<2>));
+
 	PC98_CBUS_ROOT(config, m_cbus_root, 0);
-	// TODO: interrupts
+	m_cbus_root->int_cb<0>().set(FUNC(luna88k2_state::cbus_irq_w<0>));
+	m_cbus_root->int_cb<1>().set(FUNC(luna88k2_state::cbus_irq_w<1>));
+	m_cbus_root->int_cb<2>().set(FUNC(luna88k2_state::cbus_irq_w<2>));
+	m_cbus_root->int_cb<3>().set(FUNC(luna88k2_state::cbus_irq_w<3>));
+	m_cbus_root->int_cb<4>().set(FUNC(luna88k2_state::cbus_irq_w<4>)); // INT42
+	m_cbus_root->int_cb<5>().set(FUNC(luna88k2_state::cbus_irq_w<5>));
+	m_cbus_root->int_cb<6>().set(FUNC(luna88k2_state::cbus_irq_w<6>));
+	// TODO: how it really handles INT41 vs. INT42?
+//  m_cbus_root->int_cb<7>().set(FUNC(luna88k2_state::cbus_irq_w<4?>)); // INT41
+	// TODO: NMI & DRQ
 
 	PC98_CBUS_SLOT(config, "cbus:0", 0, m_cbus_root, luna88k2_cbus_devices, nullptr);
 }

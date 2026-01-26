@@ -24,7 +24,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="advgamea" cloneof="advgame">
-		<description>The Adventure Game (Alt)</description>
+		<description>The Adventure Game (alt)</description>
 		<year>1987</year>
 		<publisher>Tamás Juhász</publisher>
 
@@ -36,7 +36,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="advgameb" cloneof="advgame">
-		<description>The Adventure Game (Alt 2)</description>
+		<description>The Adventure Game (alt 2)</description>
 		<year>1987</year>
 		<publisher>Tamás Juhász</publisher>
 
@@ -60,7 +60,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="aknamezoa" cloneof="aknamezo">
-		<description>Aknamező (Alt)</description>
+		<description>Aknamező (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -108,7 +108,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="amobaa" cloneof="amoba">
-		<description>Amőba (Alt)</description>
+		<description>Amőba (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -180,7 +180,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="atomixa" cloneof="atomix">
-		<description>Atomix (Alt)</description>
+		<description>Atomix (alt)</description>
 		<year>1991</year>
 		<publisher>STV</publisher>
 
@@ -300,7 +300,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="bekajatea" cloneof="bekajate">
-		<description>Béka-játék (Alt)</description>
+		<description>Béka-játék (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -456,7 +456,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="clementia" cloneof="clementi">
-		<description>Clementina a boszorkány (Alt)</description>
+		<description>Clementina a boszorkány (alt)</description>
 		<year>198?</year>
 		<publisher>Zsolt Magyar - Zoltán Nagy</publisher>
 
@@ -516,7 +516,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="cyrus2a" cloneof="cyrus2">
-		<description>Cyrus II (Alt)</description>
+		<description>Cyrus II (alt)</description>
 		<year>1985</year>
 		<publisher>Intelligent Chess Software</publisher>
 
@@ -564,7 +564,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ejtoernya" cloneof="ejtoerny">
-		<description>Ejtőernyő (Alt)</description>
+		<description>Ejtőernyő (alt)</description>
 		<year>198?</year>
 		<publisher>Software in LUX</publisher>
 
@@ -636,7 +636,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="faltoroa" cloneof="faltoro">
-		<description>Faltörő játék (Alt)</description>
+		<description>Faltörő játék (alt)</description>
 		<year>1986</year>
 		<publisher>SealProgram</publisher>
 
@@ -660,7 +660,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="feketesoa" cloneof="feketeso">
-		<description>Fekete sólyom (Alt)</description>
+		<description>Fekete sólyom (alt)</description>
 		<year>198?</year>
 		<publisher>Software in LUX</publisher>
 
@@ -684,7 +684,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="felkarua" cloneof="felkaru">
-		<description>Félkarú rabló (Alt)</description>
+		<description>Félkarú rabló (alt)</description>
 		<year>1986</year>
 		<publisher>Gábor Balogh</publisher>
 
@@ -744,7 +744,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="forditsa" cloneof="fordits">
-		<description>Fordíts (Alt)</description>
+		<description>Fordíts (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -756,7 +756,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="forditsb" cloneof="fordits">
-		<description>Fordíts (Alt 2)</description>
+		<description>Fordíts (alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -792,7 +792,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="fuela" cloneof="fuel">
-		<description>Fuel (Alt)</description>
+		<description>Fuel (alt)</description>
 		<year>1988</year>
 		<publisher>Attila Barabás</publisher>
 
@@ -828,7 +828,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="geoa" cloneof="geo">
-		<description>GEO (Alt)</description>
+		<description>GEO (alt)</description>
 		<year>1987</year>
 		<publisher>Videoton</publisher>
 
@@ -840,7 +840,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="geob" cloneof="geo">
-		<description>GEO (Alt 2)</description>
+		<description>GEO (alt 2)</description>
 		<year>1987</year>
 		<publisher>Videoton</publisher>
 
@@ -876,7 +876,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gombocfaa" cloneof="gombocfa">
-		<description>Gombócfaló (Alt)</description>
+		<description>Gombócfaló (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -924,7 +924,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="gyufajata" cloneof="gyufajat">
-		<description>Gyufajáték (Alt)</description>
+		<description>Gyufajáték (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -948,7 +948,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="hamburgra" cloneof="hamburgr">
-		<description>Hamburger (Alt)</description>
+		<description>Hamburger (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -960,7 +960,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="hamburgrb" cloneof="hamburgr">
-		<description>Hamburger (Alt 2)</description>
+		<description>Hamburger (alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -1008,7 +1008,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="hanoitrna" cloneof="hanoitrn">
-		<description>Hanoi torony (Alt)</description>
+		<description>Hanoi torony (alt)</description>
 		<year>1985</year>
 		<publisher>János Horváth - György Vámos</publisher>
 
@@ -1044,7 +1044,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="invadersa" cloneof="invaders">
-		<description>Invaders (Alt)</description>
+		<description>Invaders (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -1116,7 +1116,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jetpacka" cloneof="jetpack">
-		<description>Jet Pack (Alt)</description>
+		<description>Jet Pack (alt)</description>
 		<year>198?</year>
 		<publisher>Software in LUX</publisher>
 
@@ -1152,7 +1152,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="jupitera" cloneof="jupiter">
-		<description>Jupiter (Alt)</description>
+		<description>Jupiter (alt)</description>
 		<year>198?</year>
 		<publisher>Péter Dörner</publisher>
 
@@ -1260,7 +1260,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kigyosjaa" cloneof="kigyosja">
-		<description>Kigyós játék (Alt)</description>
+		<description>Kigyós játék (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -1284,7 +1284,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kiscsavaa" cloneof="kiscsava">
-		<description>Kis csavargó (Alt)</description>
+		<description>Kis csavargó (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -1320,7 +1320,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="kockapoka" cloneof="kockapok">
-		<description>Kockapóker (Alt)</description>
+		<description>Kockapóker (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -1464,7 +1464,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="letraa" cloneof="letra">
-		<description>Létra (Alt)</description>
+		<description>Létra (alt)</description>
 		<year>198?</year>
 		<publisher>Novotrade</publisher>
 
@@ -1572,7 +1572,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="marokkoa" cloneof="marokko">
-		<description>Marokkó (Alt)</description>
+		<description>Marokkó (alt)</description>
 		<year>198?</year>
 		<publisher>Videoton</publisher>
 
@@ -1596,7 +1596,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="mastminda" cloneof="mastmind">
-		<description>Mastermind (Alt)</description>
+		<description>Mastermind (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -1704,7 +1704,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="motrodeoa" cloneof="motrodeo">
-		<description>Motorodeó (Alt)</description>
+		<description>Motorodeó (alt)</description>
 		<year>198?</year>
 		<publisher>Imre Ehreth - STV</publisher>
 
@@ -1740,7 +1740,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ninjaa" cloneof="ninja">
-		<description>Ninja (Alt)</description>
+		<description>Ninja (alt)</description>
 		<year>198?</year>
 		<publisher>Novotrade</publisher>
 
@@ -1752,7 +1752,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ninjab" cloneof="ninja">
-		<description>Ninja (Alt 2)</description>
+		<description>Ninja (alt 2)</description>
 		<year>198?</year>
 		<publisher>Novotrade</publisher>
 
@@ -1776,7 +1776,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="nyulvadaa" cloneof="nyulvada">
-		<description>Nyúlvadászat (Alt)</description>
+		<description>Nyúlvadászat (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -1884,7 +1884,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="packmana" cloneof="packman">
-		<description>Pack Man (Alt)</description>
+		<description>Pack Man (alt)</description>
 		<year>198?</year>
 		<publisher>Videoton</publisher>
 
@@ -1896,7 +1896,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="packmanb" cloneof="packman">
-		<description>Pack Man (Alt 2)</description>
+		<description>Pack Man (alt 2)</description>
 		<year>198?</year>
 		<publisher>Videoton</publisher>
 
@@ -1944,7 +1944,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="pokera" cloneof="poker">
-		<description>Póker (Unisoft Gmk, Alt)</description>
+		<description>Póker (Unisoft Gmk, alt)</description>
 		<year>1986</year>
 		<publisher>Unisoft Gmk</publisher>
 
@@ -2028,7 +2028,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="reversia" cloneof="reversi">
-		<description>Reversi (Alt)</description>
+		<description>Reversi (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2064,7 +2064,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="rohamma" cloneof="rohamm">
-		<description>RoHAMM (Alt)</description>
+		<description>RoHAMM (alt)</description>
 		<year>1989</year>
 		<publisher>Novotrade</publisher>
 
@@ -2088,7 +2088,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="romboloa" cloneof="rombolo">
-		<description>Romboló (Alt)</description>
+		<description>Romboló (alt)</description>
 		<year>198?</year>
 		<publisher>Police Sowtver</publisher>
 
@@ -2160,7 +2160,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="sarkanya" cloneof="sarkany">
-		<description>Sárkánybarlang (Alt)</description>
+		<description>Sárkánybarlang (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2184,7 +2184,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="satirozaa" cloneof="satiroza">
-		<description>Satírozás (Alt)</description>
+		<description>Satírozás (alt)</description>
 		<year>1991</year>
 		<publisher>DGT Software - Vindics</publisher>
 
@@ -2292,7 +2292,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="stripfora" cloneof="stripfor">
-		<description>Strip-forgó (Alt)</description>
+		<description>Strip-forgó (alt)</description>
 		<year>198?</year>
 		<publisher>Ubisoft</publisher>
 
@@ -2436,7 +2436,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="telexa" cloneof="telex">
-		<description>Telex - 1500 szó magyarul (Alt)</description>
+		<description>Telex - 1500 szó magyarul (alt)</description>
 		<year>1988</year>
 		<publisher>Novotrade</publisher>
 
@@ -2484,7 +2484,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tolia" cloneof="toli">
-		<description>Toli (Alt)</description>
+		<description>Toli (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2508,7 +2508,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="tisztaa" cloneof="tiszta">
-		<description>Tiszta lappal (Alt)</description>
+		<description>Tiszta lappal (alt)</description>
 		<year>1987</year>
 		<publisher>King ec Software - Endre Piret</publisher>
 
@@ -2568,7 +2568,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="transvera" cloneof="transver">
-		<description>Transversion (Alt)</description>
+		<description>Transversion (alt)</description>
 		<year>1991</year>
 		<publisher>TVCM</publisher>
 
@@ -2616,7 +2616,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="turbrudia" cloneof="turbrudi">
-		<description>Turbó Rudi (Alt)</description>
+		<description>Turbó Rudi (alt)</description>
 		<year>1987</year>
 		<publisher>Novotrade</publisher>
 
@@ -2712,7 +2712,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="ufoa" cloneof="ufo">
-		<description>UFO (Alt)</description>
+		<description>UFO (alt)</description>
 		<year>1992</year>
 		<publisher>STV</publisher>
 
@@ -2748,7 +2748,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="urcsataa" cloneof="urcsata">
-		<description>Űrcsata (Alt)</description>
+		<description>Űrcsata (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2784,7 +2784,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="vadasza" cloneof="vadasz">
-		<description>Vadász (Alt)</description>
+		<description>Vadász (alt)</description>
 		<year>1987</year>
 		<publisher>Csaba Kiss</publisher>
 
@@ -2808,7 +2808,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="vadnyugaa" cloneof="vadnyuga">
-		<description>Vadnyugat (Alt)</description>
+		<description>Vadnyugat (alt)</description>
 		<year>1987</year>
 		<publisher>Szabolcs Pőcze</publisher>
 
@@ -2844,7 +2844,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="varosa" cloneof="varos">
-		<description>Város (Alt)</description>
+		<description>Város (alt)</description>
 		<year>1986</year>
 		<publisher>Centrum - Ferenc Dobai</publisher>
 
@@ -2880,7 +2880,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="vezetesa" cloneof="vezetes">
-		<description>Vezetés (Alt)</description>
+		<description>Vezetés (alt)</description>
 		<year>1987</year>
 		<publisher>King ec Software</publisher>
 
@@ -2916,7 +2916,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="vilibanya" cloneof="vilibany">
-		<description>Vili a bányász (Alt)</description>
+		<description>Vili a bányász (alt)</description>
 		<year>1991</year>
 		<publisher>Vindics</publisher>
 
@@ -2952,7 +2952,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="vtbridzsa" cloneof="vtbridzs">
-		<description>VT Bridzs (Alt)</description>
+		<description>VT Bridzs (alt)</description>
 		<year>1985</year>
 		<publisher>Intelligent Software</publisher>
 
@@ -2976,7 +2976,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="walltrisa" cloneof="walltris">
-		<description>Walltris (Alt)</description>
+		<description>Walltris (alt)</description>
 		<year>1992</year>
 		<publisher>STV</publisher>
 

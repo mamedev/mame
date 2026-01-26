@@ -49,7 +49,7 @@ authors:hap
 	<element name="text_l4b"><text string="BACK"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_l5"><text string="MOVE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_l6"><text string="INTERRUPT"><color red="0.81" green="0.8" blue="0.79" /></text></element>
-	<element name="text_l7"><text string="COMPUTING"><color red="0.81" green="0.8" blue="0.79" /></text></element>
+	<element name="text_l7"><text string="COMPUTING" align="1"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 
 	<element name="text_l8"><text string="WHITE"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_l9a"><text string="VERIFY /"><color red="0.81" green="0.8" blue="0.79" /></text></element>
@@ -389,7 +389,7 @@ authors:hap
 		<element name="8.1" ref="led2"><bounds x="111.25" y="70.666" width="1.5" height="1.5" /></element>
 		<element name="8.13" ref="led2"><bounds x="111.25" y="79.000" width="1.5" height="1.5" /></element>
 
-		<element ref="text_l7"><bounds x="100" y="84.000" width="12" height="2" /></element>
+		<element ref="text_l7"><bounds x="101.25" y="84.000" width="12" height="2" /></element>
 		<element name="8.12" ref="led2"><bounds x="99.25" y="84.4" width="1.5" height="1.5" /></element>
 
 		<repeat count="6">

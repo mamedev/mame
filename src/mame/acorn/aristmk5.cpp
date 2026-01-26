@@ -2320,7 +2320,7 @@ void aristmk5_state::init_aristmk5()
 		// verification.  Given that the existing bad-dumps would be non-obvious if it the checksums weren't incorrect
 		// this is potentially worrying.  The actual checksum scheme is weak too, a simple 32-bit add.
 
-		uint32_t *ROM = (uint32_t*)memregion("game_prg")->base();
+		uint32_t *ROM = &memregion("game_prg")->as_u32();
 		int size = memregion("game_prg")->bytes();
 		int found = 0;
 

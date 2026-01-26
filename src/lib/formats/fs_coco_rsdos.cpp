@@ -18,6 +18,7 @@ Limitation:
 #include "util/strformat.h"
 
 #include <bitset>
+#include <numeric>
 #include <optional>
 #include <regex>
 #include <string_view>
@@ -61,6 +62,7 @@ public:
 	virtual std::pair<std::error_condition, meta_data> metadata(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<dir_entry>> directory_contents(const std::vector<std::string> &path) override;
 	virtual std::pair<std::error_condition, std::vector<u8>> file_read(const std::vector<std::string> &path) override;
+	virtual std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> enum_blocks(const std::vector<std::string> &path) override;
 	virtual std::error_condition format(const meta_data &meta) override;
 	virtual std::error_condition file_create(const std::vector<std::string> &path, const meta_data &meta) override;
 	virtual std::error_condition file_write(const std::vector<std::string> &path, const std::vector<u8> &data) override;
@@ -280,8 +282,8 @@ std::pair<std::error_condition, std::vector<u8>> coco_rsdos_impl::file_read(cons
 		result.resize(current_size + byte_count);
 
 		// determine which track and sector this granule starts at
-		int track = granule / 2 + (granule >= 34 ? 1 : 0);
-		int sector = granule % 2 * 9 + 1;
+		int track = granule / TRACK_GRANULE_COUNT + (granule >= DIRECTORY_TRACK * TRACK_GRANULE_COUNT ? 1 : 0);
+		int sector = granule % TRACK_GRANULE_COUNT * GRANULE_SECTOR_COUNT + 1;
 
 		// and read all the sectors
 		while (byte_count > 0)
@@ -300,6 +302,65 @@ std::pair<std::error_condition, std::vector<u8>> coco_rsdos_impl::file_read(cons
 		}
 	}
 	return std::make_pair(std::error_condition(), std::move(result));
+}
+
+
+//-------------------------------------------------
+//  coco_rsdos_impl::enum_blocks
+//-------------------------------------------------
+
+std::tuple<std::error_condition, std::vector<u32>, std::vector<u32>> coco_rsdos_impl::enum_blocks(const std::vector<std::string> &path)
+{
+	if (path.empty())
+	{
+		std::vector<u32> blocks;
+		bool done = false;
+		for (int dir_sector = 3; !done && dir_sector <= 18; dir_sector++)
+		{
+			blocks.push_back(DIRECTORY_TRACK * TRACK_SECTOR_COUNT + dir_sector - 1);
+
+			// read this directory sector
+			auto dir_block = read_sector(DIRECTORY_TRACK, dir_sector);
+
+			// and loop through all entries
+			for (int file_index = 0; file_index < 8; file_index++)
+			{
+				// 0xFF marks the end of the directory
+				rsdos_dirent entry = get_dirent(*dir_block, file_index);
+				if (entry.m_filename[0] == '\xFF')
+				{
+					done = true;
+					break;
+				}
+			}
+		}
+
+		return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(blocks));
+	}
+	else
+	{
+		// attempt to find the file
+		const std::optional<rsdos_dirent> dirent = dirent_from_path(path);
+		if (!dirent)
+			return std::make_tuple(error::not_found, std::vector<u32>(), std::vector<u32>());
+
+		std::vector<u32> blocks;
+		u8 granule;
+		u16 byte_count;
+		granule_iterator iter(*this, *dirent);
+		while (iter.next(granule, byte_count))
+		{
+			u16 sector_count = (byte_count + SECTOR_SIZE - 1) / SECTOR_SIZE;
+			blocks.resize(blocks.size() + sector_count);
+			std::iota(blocks.end() - sector_count, blocks.end(), granule * GRANULE_SECTOR_COUNT);
+		}
+		for (auto &sector : blocks)
+		{
+			if (sector >= DIRECTORY_TRACK * TRACK_SECTOR_COUNT)
+				sector += TRACK_SECTOR_COUNT;
+		}
+		return std::make_tuple(std::error_condition(), std::vector<u32>(), std::move(blocks));
+	}
 }
 
 

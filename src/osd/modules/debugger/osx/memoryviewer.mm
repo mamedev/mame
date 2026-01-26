@@ -142,7 +142,8 @@
 
 - (IBAction)debugNewMemoryWindow:(id)sender {
 	debug_view_memory_source const *source = [memoryView source];
-	[console debugNewMemoryWindowForSpace:source->space()
+	auto [mintf, spacenum] = source->space();
+	[console debugNewMemoryWindowForSpace:&mintf->space(spacenum)
 								   device:source->device()
 							   expression:[memoryView expression]];
 }
@@ -150,7 +151,8 @@
 
 - (IBAction)debugNewDisassemblyWindow:(id)sender {
 	debug_view_memory_source const *source = [memoryView source];
-	[console debugNewDisassemblyWindowForSpace:source->space()
+	auto [mintf, spacenum] = source->space();
+	[console debugNewDisassemblyWindowForSpace:&mintf->space(spacenum)
 										device:source->device()
 									expression:[memoryView expression]];
 }

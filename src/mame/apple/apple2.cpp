@@ -9,6 +9,7 @@
     Special thanks to the Apple II Documentation Project/Antoine Vignau and Peter Ferrie.
 
 II: original base model.  RAM sizes of 4, 8, 12, 16, 20, 24, 32, 36, and 48 KB possible.
+    (Later motherboard revisions only support multiples of 16 KB.)
     8K of ROM at $E000-$FFFF, empty sockets for $D000-$D7FF and $D800-$DFFF.
     Programmer's Aid #1 was sold by Apple for $D000-$D7FF, some third-party ROMs
     were also available.
@@ -17,8 +18,9 @@ II: original base model.  RAM sizes of 4, 8, 12, 16, 20, 24, 32, 36, and 48 KB p
     Revision 0 boards also did not include a color killer in text mode, making text
     fringey on color TVs/monitors.
 
-    ROM contains original non-autostart Monitor and Integer BASIC; apparently
-    Autostart + Integer is also possible.
+    ROM contains original non-autostart Monitor and Integer BASIC.  The Autostart
+    ROM was later offered as an upgrade (A2M0027); it was sometimes mounted on the
+    language card.
 
     To boot a floppy disk from the monitor, assuming the disk controller is in
     slot 6, input the command 6^P (where ^P stands for control-P).  The monitor
@@ -30,9 +32,11 @@ II Plus: RAM options reduced to 16/32/48 KB.
     6502 BASIC as also found in Commodore and many other computers.
 
 
-    Users of both models often connected the SHIFT key to the paddle #2 button
-    (mapped to $C063) in order to inform properly written software that characters
-    were to be intended upper/lower case.
+    Users of both models often connected the SHIFT key to one of the game I/O
+    inputs, typically joystick switch #2 (read from $C063), in order to inform
+    properly written software that characters were intended to be upper/lower
+    case.  A few word processors also demand that the CONTROL key be connected
+    in place of another game I/O input.
 
     Both models commonly included a RAM "language card" in slot 0 which added 16K
     of RAM which could be banked into the $D000-$FFFF space to replace the ROMs.
@@ -50,12 +54,11 @@ II Plus: RAM options reduced to 16/32/48 KB.
 #include "bus/a2bus/a2bus.h"
 #include "bus/a2bus/cards.h"
 #include "bus/a2gameio/gameio.h"
+#include "bus/a2kbd/a2kbd.h"
 #include "cpu/m6502/m6502.h"
 #include "imagedev/cassette.h"
 #include "machine/74259.h"
-#include "machine/kb3600.h"
 #include "machine/ram.h"
-#include "machine/timer.h"
 
 #include "sound/spkrdev.h"
 
@@ -69,7 +72,6 @@ II Plus: RAM options reduced to 16/32/48 KB.
 namespace {
 
 #define A2_CPU_TAG "maincpu"
-#define A2_KBDC_TAG "ay3600"
 #define A2_SPEAKER_TAG "speaker"
 #define A2_CASSETTE_TAG "tape"
 #define A2_UPPERBANK_TAG "inhbank"
@@ -82,16 +84,12 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, A2_CPU_TAG),
 		m_screen(*this, "screen"),
-		m_scantimer(*this, "scantimer"),
 		m_ram(*this, RAM_TAG),
-		m_ay3600(*this, A2_KBDC_TAG),
+		m_kbd(*this, "kbd"),
 		m_video(*this, A2_VIDEO_TAG),
 		m_a2common(*this, "a2common"),
 		m_a2bus(*this, "a2bus"),
 		m_gameio(*this, "gameio"),
-		m_kbspecial(*this, "keyb_special"),
-		m_kbrepeat(*this, "keyb_repeat"),
-		m_resetdip(*this, "reset_dip"),
 		m_sysconfig(*this, "a2_config"),
 		m_speaker(*this, A2_SPEAKER_TAG),
 		m_cassette(*this, A2_CASSETTE_TAG),
@@ -101,24 +99,17 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
-	required_device<timer_device> m_scantimer;
 	required_device<ram_device> m_ram;
-	required_device<ay3600_device> m_ay3600;
+	required_device<a2kbd_connector_device> m_kbd;
 	required_device<a2_video_device_composite> m_video;
 	required_device<apple2_common_device> m_a2common;
 	required_device<a2bus_device> m_a2bus;
 	required_device<apple2_gameio_device> m_gameio;
-	required_ioport m_kbspecial;
-	required_ioport m_kbrepeat;
-	optional_ioport m_resetdip;
 	required_ioport m_sysconfig;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<addressable_latch_device> m_softlatch;
 	memory_view m_upperbank;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -126,8 +117,8 @@ public:
 	u8 ram_r(offs_t offset);
 	void ram_w(offs_t offset, u8 data);
 	u8 keyb_data_r();
-	u8 keyb_strobe_r();
-	void keyb_strobe_w(u8 data);
+	u8 keyb_clr_strobe_r();
+	void keyb_clr_strobe_w(u8 data);
 	u8 cassette_toggle_r();
 	void cassette_toggle_w(u8 data);
 	u8 speaker_toggle_r();
@@ -149,19 +140,21 @@ public:
 	void a2bus_irq_w(int state);
 	void a2bus_nmi_w(int state);
 	void a2bus_inh_w(int state);
-	int ay3600_shift_r();
-	int ay3600_control_r();
-	void ay3600_data_ready_w(int state);
-	void ay3600_ako_w(int state);
+	void keyb_data_w(u8 data);
+	void keyb_strobe_w(int state);
+	void keyb_reset_w(int state);
 
 	void apple2_common(machine_config &config);
 	void apple2jp(machine_config &config);
 	void apple2(machine_config &config);
-	void space84(machine_config &config);
-	[[maybe_unused]] void dodo(machine_config &config);
+	void uniap2(machine_config &config);
+	void am64(machine_config &config);
+	void am100(machine_config &config);
+	void dodo(machine_config &config);
 	void albert(machine_config &config);
 	void ivelultr(machine_config &config);
 	void apple2p(machine_config &config);
+	void apple2pe(machine_config &config);
 	void apple2_map(address_map &map) ATTR_COLD;
 
 private:
@@ -279,7 +272,7 @@ void apple2_state::machine_start()
 	m_upperbank.select(0);
 	m_inh_slot = -1;
 	m_inh_bank = 0;
-	m_strobe = 0;
+	m_anykeydown = false;
 	m_transchar = 0;
 
 	// precalculate joystick time constants
@@ -299,7 +292,7 @@ void apple2_state::machine_start()
 	}
 
 	m_joystick_x1_time = m_joystick_x2_time = m_joystick_y1_time = m_joystick_y2_time = 0;
-	m_reset_latch = false;
+	m_reset_latch = true;
 
 	// setup save states
 	save_item(NAME(m_speaker_state));
@@ -326,64 +319,8 @@ void apple2_state::machine_reset()
 {
 	// m_inh_slot is not reset here since bootable cards may want to override the monitor
 	m_cnxx_slot = -1;
-	m_anykeydown = false;
-}
-
-/***************************************************************************
-    VIDEO
-***************************************************************************/
-
-TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
-{
-	int scanline = param;
-
-	if (scanline == 192)
-	{
-		// check reset
-		if ((m_resetdip.found()) && (m_resetdip->read() & 1)) // if reset DIP is present, use it
-		{
-			// CTRL-RESET
-			if ((m_kbspecial->read() & 0x88) == 0x88)
-			{
-				if (!m_reset_latch)
-				{
-					m_reset_latch = true;
-					m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-				}
-			}
-			else
-			{
-				if (m_reset_latch)
-				{
-					m_reset_latch = false;
-					// allow cards to see reset
-					m_a2bus->reset_bus();
-					m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-				}
-			}
-		}
-		else    // plain RESET
-		{
-			if (m_kbspecial->read() & 0x80)
-			{
-				if (!m_reset_latch)
-				{
-					m_reset_latch = true;
-					m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-				}
-			}
-			else
-			{
-				if (m_reset_latch)
-				{
-					m_reset_latch = false;
-					// allow cards to see reset
-					m_a2bus->reset_bus();
-					m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
-				}
-			}
-		}
-	}
+	m_strobe = 0;
+	m_kbd->ack_w(0);
 }
 
 /***************************************************************************
@@ -396,19 +333,23 @@ u8 apple2_state::keyb_data_r()
 	return m_transchar | m_strobe;
 }
 
-u8 apple2_state::keyb_strobe_r()
+u8 apple2_state::keyb_clr_strobe_r()
 {
 	// reads floating bus, clears strobe
 	if (!machine().side_effects_disabled())
 	{
+		if (m_strobe)
+			m_kbd->ack_w(0);
 		m_strobe = 0;
 	}
 	return read_floatingbus();
 }
 
-void apple2_state::keyb_strobe_w(u8 data)
+void apple2_state::keyb_clr_strobe_w(u8 data)
 {
 	// clear keyboard latch
+	if (m_strobe)
+		m_kbd->ack_w(0);
 	m_strobe = 0;
 }
 
@@ -476,8 +417,8 @@ u8 apple2_state::flags_r(offs_t offset)
 	case 2:  // button 1
 		return (m_gameio->sw1_r() ? 0x80 : 0) | uFloatingBus7;
 
-	case 3:  // button 2, inverted (or SHIFT key, with SHIFT key mod)
-		return ((m_gameio->sw2_r() || ((m_sysconfig->read() & 0x04) && (m_kbspecial->read() & 0x06))) ? 0 : 0x80) | uFloatingBus7;
+	case 3:  // button 2 (or SHIFT key, with SHIFT key mod)
+		return (((m_sysconfig->read() & 0x04) ? m_kbd->shift_r() : m_gameio->sw2_r()) ? 0x80 : 0) | uFloatingBus7;
 
 	case 4:  // joy 1 X axis
 		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
@@ -488,10 +429,12 @@ u8 apple2_state::flags_r(offs_t offset)
 		return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 6: // joy 2 X axis
+		if (m_sysconfig->read() & 0x08) return (m_kbd->shift_r() ? 0x80 : 0) | uFloatingBus7;
 		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 		return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 7: // joy 2 Y axis
+		if (m_sysconfig->read() & 0x08) return (m_kbd->control_r() ? 0x80 : 0) | uFloatingBus7;
 		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
 		return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 	}
@@ -811,7 +754,7 @@ void apple2_state::apple2_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rw(FUNC(apple2_state::ram_r), FUNC(apple2_state::ram_w));
 	map(0xc000, 0xc000).mirror(0xf).r(FUNC(apple2_state::keyb_data_r)).nopw();
-	map(0xc010, 0xc010).mirror(0xf).rw(FUNC(apple2_state::keyb_strobe_r), FUNC(apple2_state::keyb_strobe_w));
+	map(0xc010, 0xc010).mirror(0xf).rw(FUNC(apple2_state::keyb_clr_strobe_r), FUNC(apple2_state::keyb_clr_strobe_w));
 	map(0xc020, 0xc020).mirror(0xf).rw(FUNC(apple2_state::cassette_toggle_r), FUNC(apple2_state::cassette_toggle_w));
 	map(0xc030, 0xc030).mirror(0xf).rw(FUNC(apple2_state::speaker_toggle_r), FUNC(apple2_state::speaker_toggle_w));
 	map(0xc040, 0xc040).mirror(0xf).rw(FUNC(apple2_state::utility_strobe_r), FUNC(apple2_state::utility_strobe_w));
@@ -830,122 +773,43 @@ void apple2_state::apple2_map(address_map &map)
     KEYBOARD
 ***************************************************************************/
 
-int apple2_state::ay3600_shift_r()
+void apple2_state::keyb_data_w(u8 data)
 {
-	// either shift key
-	if (m_kbspecial->read() & 0x06)
-	{
-		return ASSERT_LINE;
-	}
-
-	return CLEAR_LINE;
+	m_transchar = data;
 }
 
-int apple2_state::ay3600_control_r()
+void apple2_state::keyb_strobe_w(int state)
 {
-	if (m_kbspecial->read() & 0x08)
+	if (m_anykeydown != state)
 	{
-		return ASSERT_LINE;
-	}
-
-	return CLEAR_LINE;
-}
-
-static const u8 a2_key_remap[0x32][4] =
-{
-/*    norm shft ctrl both */
-	{ 0x33,0x23,0x33,0x23 },    /* 3 #     00     */
-	{ 0x34,0x24,0x34,0x24 },    /* 4 $     01     */
-	{ 0x35,0x25,0x35,0x25 },    /* 5 %     02     */
-	{ 0x36,'&', 0x35,'&'  },    /* 6 &     03     */
-	{ 0x37,0x27,0x37,0x27 },    /* 7 '     04     */
-	{ 0x38,0x28,0x38,0x28 },    /* 8 (     05     */
-	{ 0x39,0x29,0x39,0x29 },    /* 9 )     06     */
-	{ 0x30,0x30,0x30,0x30 },    /* 0       07     */
-	{ 0x3a,0x2a,0x3a,0x2a },    /* : *     08     */
-	{ 0x2d,0x3d,0x2d,0x3d },    /* - =     09     */
-	{ 0x51,0x51,0x11,0x11 },    /* q Q     0a     */
-	{ 0x57,0x57,0x17,0x17 },    /* w W     0b     */
-	{ 0x45,0x45,0x05,0x05 },    /* e E     0c     */
-	{ 0x52,0x52,0x12,0x12 },    /* r R     0d     */
-	{ 0x54,0x54,0x14,0x14 },    /* t T     0e     */
-	{ 0x59,0x59,0x19,0x19 },    /* y Y     0f     */
-	{ 0x55,0x55,0x15,0x15 },    /* u U     10     */
-	{ 0x49,0x49,0x09,0x09 },    /* i I     11     */
-	{ 0x4f,0x4f,0x0f,0x0f },    /* o O     12     */
-	{ 0x50,0x40,0x10,0x00 },    /* p P     13     */
-	{ 0x44,0x44,0x04,0x04 },    /* d D     14     */
-	{ 0x46,0x46,0x06,0x06 },    /* f F     15     */
-	{ 0x47,0x47,0x07,0x07 },    /* g G     16     */
-	{ 0x48,0x48,0x08,0x08 },    /* h H     17     */
-	{ 0x4a,0x4a,0x0a,0x0a },    /* j J     18     */
-	{ 0x4b,0x4b,0x0b,0x0b },    /* k K     19     */
-	{ 0x4c,0x4c,0x0c,0x0c },    /* l L     1a     */
-	{ ';' ,0x2b,';' ,0x2b },    /* ; +     1b     */
-	{ 0x08,0x08,0x08,0x08 },    /* Left    1c     */
-	{ 0x15,0x15,0x15,0x15 },    /* Right   1d     */
-	{ 0x5a,0x5a,0x1a,0x1a },    /* z Z     1e     */
-	{ 0x58,0x58,0x18,0x18 },    /* x X     1f     */
-	{ 0x43,0x43,0x03,0x03 },    /* c C     20     */
-	{ 0x56,0x56,0x16,0x16 },    /* v V     21     */
-	{ 0x42,0x42,0x02,0x02 },    /* b B     22     */
-	{ 0x4e,0x5e,0x0e,0x1e },    /* n N     23     */
-	{ 0x4d,0x5d,0x0d,0x1d },    /* m M     24     */
-	{ 0x2c,0x3c,0x2c,0x3c },    /* , <     25     */
-	{ 0x2e,0x3e,0x2e,0x3e },    /* . >     26     */
-	{ 0x2f,0x3f,0x2f,0x3f },    /* / ?     27     */
-	{ 0x53,0x53,0x13,0x13 },    /* s S     28     */
-	{ 0x32,0x22,0x32,0x00 },    /* 2 "     29     */
-	{ 0x31,0x21,0x31,0x31 },    /* 1 !     2a     */
-	{ 0x1b,0x1b,0x1b,0x1b },    /* Escape  2b     */
-	{ 0x41,0x41,0x01,0x01 },    /* a A     2c     */
-	{ 0x20,0x20,0x20,0x20 },    /* Space   2d     */
-	{ 0x00,0x00,0x20,0x00 },    /* 0x2e unused    */
-	{ 0x00,0x00,0x20,0x00 },    /* 0x2f unused    */
-	{ 0x00,0x00,0x20,0x00 },    /* 0x30 unused    */
-	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
-};
-
-void apple2_state::ay3600_data_ready_w(int state)
-{
-	if (state == ASSERT_LINE)
-	{
-		int mod = 0;
-
-		// if the user presses a valid key to start the driver from the info screen,
-		// we will see that key.  ignore keys in the first 25,000 cycles (in my tests,
-		// the unwanted key shows up at 17030 cycles)
-		if (m_maincpu->total_cycles() < 25000)
+		m_anykeydown = state;
+		if (state)
 		{
-			return;
-		}
+			// if the user presses a valid key to start the driver from the info screen,
+			// we will see that key.  ignore keys in the first 25,000 cycles (in my tests,
+			// the unwanted key shows up at 17030 cycles)
+			if (m_maincpu->total_cycles() < 25000)
+			{
+				return;
+			}
 
-		m_lastchar = m_ay3600->b_r();
-
-		mod = (m_kbspecial->read() & 0x06) ? 0x01 : 0x00;
-		mod |= (m_kbspecial->read() & 0x08) ? 0x02 : 0x00;
-
-		m_transchar = a2_key_remap[m_lastchar&0x3f][mod];
-		m_strobe = 0x80;
-//      printf("new char = %04x (%02x)\n", m_lastchar&0x3f, m_transchar);
-	}
-}
-
-void apple2_state::ay3600_ako_w(int state)
-{
-	m_anykeydown = (state == ASSERT_LINE) ? true : false;
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::ay3600_repeat)
-{
-	// is the key still down?
-	if (m_anykeydown)
-	{
-		if (m_kbrepeat->read() & 1)
-		{
 			m_strobe = 0x80;
+			m_kbd->ack_w(1);
 		}
 	}
+}
+
+void apple2_state::keyb_reset_w(int state)
+{
+	if (state && !m_reset_latch)
+	{
+		// allow cards to see reset
+		m_a2bus->reset_bus();
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
+	else if (!state && m_reset_latch)
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	m_reset_latch = state;
 }
 
 /***************************************************************************
@@ -954,164 +818,14 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::ay3600_repeat)
 
 INPUT_PORTS_START( apple2_sysconfig )
 	PORT_START("a2_config")
-	PORT_CONFNAME(0x04, 0x04, "Shift key mod")  // default to installed
-	PORT_CONFSETTING(0x00, "Not present")
-	PORT_CONFSETTING(0x04, "Installed")
-INPUT_PORTS_END
-
-	/*
-	  Apple II / II Plus key matrix (from "The Apple II Circuit Description")
-
-	      | Y0  | Y1  | Y2  | Y3  | Y4  | Y5  | Y6  | Y7  | Y8  | Y9  |
-	      |     |     |     |     |     |     |     |     |     |     |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X0  |  3  |  4  |  5  |  6  |  7  |  8  |  9  |  0  | :*  |  -  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X1  |  Q  |  W  |  E  |  R  |  T  |  Y  |  U  |  I  |  O  |  P  |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X2  |  D  |  F  |  G  |  H  |  J  |  K  |  L  | ;+  |LEFT |RIGHT|
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X3  |  Z  |  X  |  C  |  V  |  B  |  N  |  M  | ,<  | .>  |  /? |
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	  X4  |  S  |  2  |  1  | ESC |  A  |SPACE|     |     |     |ENTER|
-	  ----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
-	*/
-
-static INPUT_PORTS_START( apple2_common )
-	PORT_START("X0")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)  PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)  PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)  PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)  PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)  PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)  PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)  PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)  PORT_CHAR('0')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS)  PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
-
-	PORT_START("X1")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)  PORT_CHAR('Q', 'q') PORT_CHAR() PORT_CHAR(0x11)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W)  PORT_CHAR('W', 'w') PORT_CHAR() PORT_CHAR(0x17)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E)  PORT_CHAR('E', 'e') PORT_CHAR() PORT_CHAR(0x05)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R)  PORT_CHAR('R', 'r') PORT_CHAR() PORT_CHAR(0x12)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T)  PORT_CHAR('T', 't') PORT_CHAR() PORT_CHAR(0x14)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y)  PORT_CHAR('Y', 'y') PORT_CHAR() PORT_CHAR(0x19)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U)  PORT_CHAR('U', 'u')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)  PORT_CHAR('I', 'i') PORT_CHAR() PORT_CHAR(0x09)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O)  PORT_CHAR('O', 'o') PORT_CHAR() PORT_CHAR(0x0f)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P  @")     PORT_CODE(KEYCODE_P)  PORT_CHAR('P', 'p') PORT_CHAR('@') PORT_CHAR(0x10)
-
-	PORT_START("X2")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D)  PORT_CHAR('D', 'd') PORT_CHAR() PORT_CHAR(0x04)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F)  PORT_CHAR('F', 'f') PORT_CHAR() PORT_CHAR(0x06)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G  BELL")  PORT_CODE(KEYCODE_G)  PORT_CHAR('G', 'g') PORT_CHAR() PORT_CHAR(0x07)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H)  PORT_CHAR('H', 'h')
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J)  PORT_CHAR('J', 'j') PORT_CHAR() PORT_CHAR(0x0a)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K)  PORT_CHAR('K', 'k') PORT_CHAR() PORT_CHAR(0x0b)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L)  PORT_CHAR('L', 'l') PORT_CHAR() PORT_CHAR(0x0c)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_LEFT)      PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT), 0x08)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(UTF8_RIGHT)     PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT), 0x15)
-
-	PORT_START("X3")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z)  PORT_CHAR('Z', 'z') PORT_CHAR() PORT_CHAR(0x1a)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X)  PORT_CHAR('X', 'x') PORT_CHAR() PORT_CHAR(0x18)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C)  PORT_CHAR('C', 'c') PORT_CHAR() PORT_CHAR(0x03)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V)  PORT_CHAR('V', 'v') PORT_CHAR() PORT_CHAR(0x16)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)  PORT_CHAR('B', 'b') PORT_CHAR() PORT_CHAR(0x02)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N  ^")     PORT_CODE(KEYCODE_N)  PORT_CHAR('N', 'n') PORT_CHAR('^') PORT_CHAR(0x0e)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M)  PORT_CHAR('M', 'm') PORT_CHAR(']')
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)  PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP)   PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH)  PORT_CHAR('/') PORT_CHAR('?')
-
-	PORT_START("X4")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S)  PORT_CHAR('S', 's') PORT_CHAR() PORT_CHAR(0x13)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)  PORT_CHAR('2') PORT_CHAR('\"')
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Esc")      PORT_CODE(KEYCODE_ESC)      PORT_CHAR(0x1b)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A)          PORT_CHAR('A', 'a') PORT_CHAR() PORT_CHAR(0x01)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE)  PORT_CHAR(' ')
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Return")   PORT_CODE(KEYCODE_ENTER)    PORT_CHAR(0x0d)
-
-	PORT_START("X5")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X6")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X7")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("X8")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("keyb_special")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")   PORT_CODE(KEYCODE_LSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right Shift")  PORT_CODE(KEYCODE_RSHIFT)   PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl")         PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_SHIFT_2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Reset")        PORT_CODE(KEYCODE_F12)
+	PORT_CONFNAME(0x0c, 0x04, "Shift key mod")  // default to installed
+	PORT_CONFSETTING(0x00, "Not connected")
+	PORT_CONFSETTING(0x04, "SW2 = Shift")
+	PORT_CONFSETTING(0x08, "PADDL2 = Shift, PADDL3 = Ctrl") // Zardax Word Processor expects this as default
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( apple2 )
-	PORT_INCLUDE(apple2_common)
-
-	PORT_START("keyb_repeat")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Rept")         PORT_CODE(KEYCODE_BACKSLASH)
-
 	PORT_INCLUDE(apple2_sysconfig)
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( apple2p )
-	PORT_INCLUDE( apple2 )
-
-	PORT_START("reset_dip")
-	PORT_DIPNAME( 0x01, 0x01, "Reset" ) PORT_DIPLOCATION("S1:1")
-	PORT_DIPSETTING( 0x01, "Ctrl+Reset" )
-	PORT_DIPSETTING( 0x00, "Reset" )
 INPUT_PORTS_END
 
 void apple2_state::apple2_common(machine_config &config)
@@ -1121,8 +835,6 @@ void apple2_state::apple2_common(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &apple2_state::apple2_map);
 	m_maincpu->set_dasm_override(FUNC(apple2_state::dasm_trampoline));
 
-	TIMER(config, m_scantimer, 0);
-	m_scantimer->configure_scanline(FUNC(apple2_state::apple2_interrupt), "screen", 0, 1);
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	APPLE2_VIDEO_COMPOSITE(config, m_video, XTAL(14'318'181)).set_screen(m_screen);
@@ -1148,27 +860,14 @@ void apple2_state::apple2_common(machine_config &config)
 	m_softlatch->q_out_cb<6>().set(m_gameio, FUNC(apple2_gameio_device::an2_w));
 	m_softlatch->q_out_cb<6>().append(m_video, FUNC(a2_video_device::an2_w));
 	m_softlatch->q_out_cb<7>().set(m_gameio, FUNC(apple2_gameio_device::an3_w));
+	m_softlatch->q_out_cb<7>().append(m_kbd, FUNC(a2kbd_connector_device::an3_w));
 
 	APPLE2_GAMEIO(config, m_gameio, m_screen, apple2_gameio_device::iiandplus_options, nullptr);
 
-	/* keyboard controller */
-	AY3600(config, m_ay3600, 0);
-	m_ay3600->x0().set_ioport("X0");
-	m_ay3600->x1().set_ioport("X1");
-	m_ay3600->x2().set_ioport("X2");
-	m_ay3600->x3().set_ioport("X3");
-	m_ay3600->x4().set_ioport("X4");
-	m_ay3600->x5().set_ioport("X5");
-	m_ay3600->x6().set_ioport("X6");
-	m_ay3600->x7().set_ioport("X7");
-	m_ay3600->x8().set_ioport("X8");
-	m_ay3600->shift().set(FUNC(apple2_state::ay3600_shift_r));
-	m_ay3600->control().set(FUNC(apple2_state::ay3600_control_r));
-	m_ay3600->data_ready().set(FUNC(apple2_state::ay3600_data_ready_w));
-	m_ay3600->ako().set(FUNC(apple2_state::ay3600_ako_w));
-
-	/* repeat timer.  15 Hz from page 90 of "The Apple II Circuit Description */
-	TIMER(config, "repttmr", 0).configure_periodic(FUNC(apple2_state::ay3600_repeat), attotime::from_hz(15));
+	A2KBD_CONNECTOR(config, m_kbd, &a2kbd_connector_device::default_options, "nkbd");
+	m_kbd->b_callback().set(FUNC(apple2_state::keyb_data_w));
+	m_kbd->strobe_callback().set(FUNC(apple2_state::keyb_strobe_w));
+	m_kbd->reset_callback().set(FUNC(apple2_state::keyb_reset_w));
 
 	/* slot devices */
 	A2BUS(config, m_a2bus, 0);
@@ -1214,9 +913,28 @@ void apple2_state::apple2p(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("48K").set_extra_options("16K,32K,48K").set_default_value(0x00);
 }
 
-void apple2_state::space84(machine_config &config)
+void apple2_state::apple2pe(machine_config &config)
 {
 	apple2p(config);
+	m_kbd->set_default_option("videnh2");
+}
+
+void apple2_state::uniap2(machine_config &config)
+{
+	apple2p(config);
+	m_kbd->set_default_option("uniap2ti");
+}
+
+void apple2_state::am64(machine_config &config)
+{
+	apple2p(config);
+	m_kbd->set_default_option("tk10");
+}
+
+void apple2_state::am100(machine_config &config)
+{
+	apple2p(config);
+	m_kbd->set_default_option("am100");
 }
 
 void apple2_state::apple2jp(machine_config &config)
@@ -1234,13 +952,16 @@ void apple2_state::dodo(machine_config &config)
 void apple2_state::albert(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, true>)));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, false, true>)));
 }
 
 void apple2_state::ivelultr(machine_config &config)
 {
 	apple2p(config);
 	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>)));
+
+	m_kbd->set_default_option("ivelultr");
+	m_kbd->mode_callback().set(m_video, FUNC(a2_video_device::an2_w)); // not actually AN2 here
 }
 
 #if 0
@@ -1279,7 +1000,7 @@ ROM_START(apple2) /* the classic, non-autoboot apple2 with integer basic in rom.
 	ROM_SYSTEM_BIOS(0, "default", "Original Monitor")
 	ROMX_LOAD ( "341-0004-00.f8", 0x3800, 0x0800, CRC(020a86d0) SHA1(52a18bd578a4694420009cad7a7a5779a8c00226), ROM_BIOS(0))
 	ROM_SYSTEM_BIOS(1, "autostart", "Autostart Monitor")
-	ROMX_LOAD ( "341-0020-00.f8", 0x3800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098), ROM_BIOS(1)) /* 341-0020-00: Autostart Monitor/Applesoft Basic $f800; Was sometimes mounted on Language card; Label(from Apple Language Card - Front.jpg): S 8115 // C68018 // 341-0020-00 */
+	ROMX_LOAD ( "341-0020-00.f8", 0x3800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098), ROM_BIOS(1)) /* 341-0020-00: Autostart Monitor/Applesoft Basic $f800; Label(from Apple Language Card - Front.jpg): S 8115 // C68018 // 341-0020-00 */
 ROM_END
 
 ROM_START(apple2p) /* the autoboot apple2+ with applesoft (microsoft-written) basic in rom; optional card with monitor and integer basic was possible but isn't yet supported */
@@ -1292,7 +1013,20 @@ ROM_START(apple2p) /* the autoboot apple2+ with applesoft (microsoft-written) ba
 	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
 	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
 	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
-	ROM_LOAD ( "341-0020-00.f8", 0x3800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098)) /* 341-0020-00: Autostart Monitor/Applesoft Basic $f800; Was sometimes mounted on Language card; Label(from Apple Language Card - Front.jpg): S 8115 // C68018 // 341-0020-00 */
+	ROM_LOAD ( "341-0020-00.f8", 0x3800, 0x0800, CRC(079589c4) SHA1(a28852ff997b4790e53d8d0352112c4b1a395098)) /* 341-0020-00: Autostart Monitor/Applesoft Basic $f800; Label(from Apple Language Card - Front.jpg): S 8115 // C68018 // 341-0020-00 */
+ROM_END
+
+ROM_START(apple2pe)
+	ROM_REGION(0x0800,"gfx1",0)
+	ROM_LOAD ( "videx lower case chip rom.bin", 0x0000, 0x0800, CRC(00f68076) SHA1(447874fe0850c8add3fd5b13fa98f6648fe6f999))
+
+	ROM_REGION(0x4000, "maincpu", ROMREGION_LE)
+	ROM_LOAD ( "341-0011.d0", 0x1000, 0x0800, CRC(6f05f949) SHA1(0287ebcef2c1ce11dc71be15a99d2d7e0e128b1e))
+	ROM_LOAD ( "341-0012.d8", 0x1800, 0x0800, CRC(1f08087c) SHA1(a75ce5aab6401355bf1ab01b04e4946a424879b5))
+	ROM_LOAD ( "341-0013.e0", 0x2000, 0x0800, CRC(2b8d9a89) SHA1(8d82a1da63224859bd619005fab62c4714b25dd7))
+	ROM_LOAD ( "341-0014.e8", 0x2800, 0x0800, CRC(5719871a) SHA1(37501be96d36d041667c15d63e0c1eff2f7dd4e9))
+	ROM_LOAD ( "341-0015.f0", 0x3000, 0x0800, CRC(9a04eecf) SHA1(e6bf91ed28464f42b807f798fc6422e5948bf581))
+	ROM_LOAD ( "monitor.bin", 0x3800, 0x0800, CRC(65d726d3) SHA1(2186b371b96fc279338fe67c5e351438d86f4f7f)) // Autostart ROM patched as described on p. A-4 of Enhancer ][ manual
 ROM_END
 
 ROM_START(ace1000)
@@ -1382,19 +1116,6 @@ ROM_START(uniap2en)
 	ROM_LOAD ( "unitron.f0"   , 0x3000, 0x1000, CRC(8e047c4a) SHA1(78c57c0e00dfce7fdec9437fe2b4c25def447e5d))
 ROM_END
 
-ROM_START(uniap2ti) /* "Teclado Inteligente" means "smart keyboard" in brazilian portuguese */
-	ROM_REGION(0x1000,"gfx1",0)
-	ROM_LOAD ( "unitron.chr", 0x0000, 0x1000, CRC(7fdd1af6) SHA1(2f4f90d90f2f3a8c1fbea304e1072780fb22e698))
-
-	ROM_REGION(0x4000,"maincpu",0)
-	ROM_LOAD ( "unitron_pt.d0", 0x1000, 0x1000, CRC(311beae6) SHA1(f6379aba9ac982850edc314c93a393844a3349ef))
-	ROM_LOAD ( "unitron.e0"   , 0x2000, 0x1000, CRC(0d494efd) SHA1(a2fd1223a3ca0cfee24a6afe66ea3c4c144dd98e))
-	ROM_LOAD ( "unitron.f0"   , 0x3000, 0x1000, CRC(8e047c4a) SHA1(78c57c0e00dfce7fdec9437fe2b4c25def447e5d))
-
-	ROM_REGION(0x4000,"keyboard",0)
-	ROM_LOAD ( "unitron_apii+_keyboard.ic3", 0x0800, 0x0800, CRC(edc43205) SHA1(220cc21d86f1ab63a301ae7a9c5ff0f3f6cddb70))
-ROM_END
-
 ROM_START(microeng)
 	ROM_REGION(0x0800,"gfx1",0)
 	ROM_LOAD ( "microengenho_6c.bin", 0x0000, 0x0800, CRC(64f415c6) SHA1(f9d312f128c9557d9d6ac03bfad6c3ddf83e5659))
@@ -1478,22 +1199,16 @@ ROM_START(am64)
 	ROM_REGION(0x2000, "spares", 0)
 	// parallel card ROM
 	ROM_LOAD( "ap-2716.bin",  0x0000, 0x0800, CRC(c6990f08) SHA1(e7daf63639234e46738a4d78a49287d11ccaf537) )
-	// i8048 keyboard MCU ROM
-	ROM_LOAD( "tk10.bin",     0x0800, 0x0800, CRC(a06c5b78) SHA1(27c5160b913e0f62120f384026d24b9f1acb6970) )
 ROM_END
 
 ROM_START(ivelultr)
-	ROM_REGION(0x2000,"gfx1",0)
+	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD( "ultra.chr", 0x0000, 0x1000,CRC(fed62c85) SHA1(479fb3f38a3f7332cef2e8c4856871afe8dc6017))
-	ROM_LOAD( "ultra.chr", 0x1000, 0x1000,CRC(fed62c85) SHA1(479fb3f38a3f7332cef2e8c4856871afe8dc6017))
 
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD( "ultra1.bin", 0x2000, 0x1000, CRC(8ab49c1c) SHA1(b41da28a40c3a22bc10a954a86716a1a2bae04a4))
 	ROM_CONTINUE(0x1000, 0x1000)
 	ROM_LOAD( "ultra2.bin", 0x3000, 0x1000, CRC(1ac1e17e) SHA1(a5b8adec37da91970c303905b5e2c4d1b715ee4e))
-
-	ROM_REGION(0x800, "kbmcu", 0)   // 6802 code for keyboard MCU (very unlike real Apples, will require some reverse-engineering)
-	ROM_LOAD( "ultra4.bin", 0x0000, 0x0800, CRC(3dce51ac) SHA1(676b6e775d5159049cae5b6143398ec7b2bf437a) )
 ROM_END
 
 ROM_START(laser2c)
@@ -1598,9 +1313,6 @@ ROM_START(am100)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD( "nfl-asem-am100-u43.bin", 0x0000, 0x0800, CRC(863e657f) SHA1(cc954204c503bc545ec0d08862483aaad83805d5) )
 
-	ROM_REGION( 0x1000, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "nfl-asem-am100-keyboard-u5.bin", 0x0000, 0x0800, CRC(28f5ea38) SHA1(9f24c54f7cee41f7fef41294f05c4bc89d65acfb) )
-
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD("nfl-asem-am100-u24.bin", 0x0000, 0x4000, CRC(2fb0c717) SHA1(cb4f754d3e1aec9603faebc308a4a63466242e43) )
 ROM_END
@@ -1608,9 +1320,6 @@ ROM_END
 ROM_START(dodo)
 	ROM_REGION(0x2000,"gfx1", 0)
 	ROM_LOAD( "gtac_2_charrom_um2316_a5.bin", 0x0000, 0x0800, CRC(a2dfcfeb) SHA1(adea922f950667d3b24297d2f64de697c28d6c17) )
-
-	ROM_REGION( 0x1000, "keyboard", ROMREGION_ERASE00 )
-	ROM_LOAD( "nfl-asem-am100-keyboard-u5.bin", 0x0000, 0x0800, CRC(28f5ea38) SHA1(9f24c54f7cee41f7fef41294f05c4bc89d65acfb) ) // borrowed from the am100
 
 	ROM_REGION(0x4000, "maincpu",0)
 	ROM_LOAD( "dodo2764.bin", 0x2000, 0x1000, CRC(4b761f87) SHA1(2e1741db8134c4c715ecae480f5bda51d58ae296) )
@@ -1620,29 +1329,30 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT    CLASS          INIT        COMPANY                FULLNAME
-COMP( 1977, apple2,   0,      0,      apple2,   apple2,  apple2_state, empty_init, "Apple Computer",      "Apple ][", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, apple2p,  apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Apple Computer",      "Apple ][+", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, apple2jp, apple2, 0,      apple2jp, apple2p, apple2_state, empty_init, "Apple Computer",      "Apple ][ J-Plus", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, elppa,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Victor do Brasil",    "Elppa II+", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, microeng, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Spectrum Eletronica (SCOPUS)", "Micro Engenho", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, maxxi,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Polymax",             "Maxxi", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, prav82,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Pravetz",             "Pravetz 82", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, ace100,   apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 100", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, ace1000,  apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 1000", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, uniap2en, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, uniap2pt, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, uniap2ti, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Craft",               "Craft II+", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT   CLASS          INIT        COMPANY                FULLNAME
+COMP( 1977, apple2,   0,      0,      apple2,   apple2, apple2_state, empty_init, "Apple Computer",      "Apple ][", MACHINE_SUPPORTS_SAVE )
+COMP( 1979, apple2p,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Apple Computer",      "Apple ][+", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, apple2pe, apple2, 0,      apple2pe, apple2, apple2_state, empty_init, "hack (Videx)",        "Apple ][+ (with Enhancer ][ lowercase display mod)", MACHINE_SUPPORTS_SAVE )
+COMP( 1980, apple2jp, apple2, 0,      apple2jp, apple2, apple2_state, empty_init, "Apple Computer",      "Apple ][ J-Plus", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, elppa,    apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Victor do Brasil",    "Elppa II+", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, microeng, apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Spectrum Eletronica (SCOPUS)", "Micro Engenho", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, maxxi,    apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Polymax",             "Maxxi", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, prav82,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Pravetz",             "Pravetz 82", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, ace100,   apple2, 0,      apple2,   apple2, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 100", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, ace1000,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Franklin Computer",   "Franklin ACE 1000", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, uniap2en, apple2, 0,      uniap2,   apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in English)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, uniap2pt, apple2, 0,      uniap2,   apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II (in Brazilian Portuguese)", MACHINE_SUPPORTS_SAVE )
+//COMP( 1984, uniap2ti, apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Unitron Eletronica",  "Unitron AP II+ (Teclado Inteligente)", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, craft2p,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Craft",               "Craft II+", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 // reverse font direction + wider character cell -\/
-COMP( 1984, ivelultr, apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "Pravetz",             "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, space84,  apple2, 0,      space84,  apple2p, apple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_SUPPORTS_SAVE )
-COMP( 1985, am64,     apple2, 0,      space84,  apple2p, apple2_state, empty_init, "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
-//COMP( 19??, laba2p,   apple2, 0,      laba2p,   apple2p, apple2_state, empty_init, "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
-COMP( 1985, laser2c,  apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
-COMP( 1982, basis108, apple2, 0,      apple2,   apple2p, apple2_state, empty_init, "Basis",               "Basis 108", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-COMP( 1984, hkc8800a, apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "China HKC",           "HKC 8800A", MACHINE_SUPPORTS_SAVE )
-COMP( 1984, albert,   apple2, 0,      albert,   apple2p, apple2_state, empty_init, "Albert Computers, Inc.", "Albert", MACHINE_SUPPORTS_SAVE )
-COMP( 198?, am100,    apple2, 0,      apple2p,  apple2p, apple2_state, empty_init, "ASEM S.p.A.",         "AM100",     MACHINE_SUPPORTS_SAVE )
-COMP( 198?, dodo,     apple2, 0,      ivelultr, apple2p, apple2_state, empty_init, "GTAC",                "Do-Do",     MACHINE_SUPPORTS_SAVE )
+COMP( 1984, ivelultr, apple2, 0,      ivelultr, apple2, apple2_state, empty_init, "Ivasim",              "Ivel Ultra", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, prav8m,   apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "Pravetz",             "Pravetz 8M", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, space84,  apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "ComputerTechnik/IBS", "Space 84",   MACHINE_SUPPORTS_SAVE )
+COMP( 1985, am64,     apple2, 0,      am64,     apple2, apple2_state, empty_init, "ASEM",                "AM 64", MACHINE_SUPPORTS_SAVE )
+//COMP( 19??, laba2p,   apple2, 0,      laba2p,   apple2, apple2_state, empty_init, "<unknown>",           "Lab equipment Apple II Plus clone", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, laser2c,  apple2, 0,      dodo,     apple2, apple2_state, empty_init, "Milmar",              "Laser //c", MACHINE_SUPPORTS_SAVE )
+COMP( 1982, basis108, apple2, 0,      apple2,   apple2, apple2_state, empty_init, "Basis Microcomputer GmbH", "Basis 108", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1984, hkc8800a, apple2, 0,      apple2p,  apple2, apple2_state, empty_init, "China HKC",           "HKC 8800A", MACHINE_SUPPORTS_SAVE )
+COMP( 1984, albert,   apple2, 0,      albert,   apple2, apple2_state, empty_init, "Albert Computers, Inc.", "Albert", MACHINE_SUPPORTS_SAVE )
+COMP( 198?, am100,    apple2, 0,      am100,    apple2, apple2_state, empty_init, "ASEM S.p.A.",         "AM100",     MACHINE_SUPPORTS_SAVE )
+COMP( 198?, dodo,     apple2, 0,      dodo,     apple2, apple2_state, empty_init, "GTAC",                "Do-Do",     MACHINE_SUPPORTS_SAVE )

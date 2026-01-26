@@ -240,6 +240,8 @@ u8 pc8801_31_device::clock_r()
 
 	// Update: pc8801_flop:dslayed is the odd one: if this is active it tries to load a redbook CD
 	// even if one isn't inserted, hanging in the process. Sense for CD motor?
+	if (!m_cddrive->is_motor_on())
+		return 0;
 	m_clock_hb ^= 1;
 	return m_clock_hb << 7;
 }

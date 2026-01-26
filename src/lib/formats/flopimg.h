@@ -521,7 +521,8 @@ public:
 		FF_3        = 0x20202033, //!< "3   " 3 inch disk
 		FF_35       = 0x20203533, //!< "35  " 3.5 inch disk
 		FF_525      = 0x20353235, //!< "525 " 5.25 inch disk
-		FF_8        = 0x20202038  //!< "8   " 8 inch disk
+		FF_8        = 0x20202038, //!< "8   " 8 inch disk
+		FF_TWIG     = 0x47495754, //!< "TWIG" 5.25 twiggy
 	};
 
 	//! Variants

@@ -45,8 +45,8 @@ CMDL01 - Medal Mahjong Moukari Bancho
 ?????? - Pirates of Gappori: http://web.archive.org/web/20090907145501/http://www.cave.co.jp/gameonline/gappori/
 ?????? - Uhauha Ooku: http://web.archive.org/web/20141104001322/http://www.cave.co.jp/gameonline/oooku/
 
-Note: CA018 - Deathsmiles II: Makai no Merry Christmas on PC based platform (see cavepc.cpp)
-      CA020 - DoDonPachi DaiOuJou Tamashii on PGM2 platform
+Note: CA018 - Deathsmiles II: Makai no Merry Christmas on PC based platform (see cave/cavepc.cpp)
+      CA020 - DoDonPachi DaiOuJou Tamashii on PGM2 platform (see igs/pgm2.cpp)
 
 
 PCB CV1000-B / CV1000-D
@@ -181,6 +181,7 @@ Remaining Video issues
 
 Timing
  - Correct CPU slowdown emulation and flags (and speed of RAM). Most slowdown seems due to SH-3 uncached RAM access wait states, which is not implemented.
+ - Requires to measure screen raw params for correct video timing?
 
 31/12/2021:
   Akai Katana and Dodonpachi Saidaioujou removed at the request of the
@@ -190,7 +191,7 @@ Timing
 
 #include "emu.h"
 
-#include "ep1c12.h"
+#include "cv1k_v.h"
 
 #include "cpu/sh/sh3comn.h"
 #include "cpu/sh/sh4.h"
@@ -235,53 +236,45 @@ protected:
 
 private:
 	required_device<sh7709s_device> m_maincpu;
-	required_device<ep1c12_device> m_blitter;
+	required_device<cv1k_blitter_device> m_blitter;
 	required_device<samsung_k9f1g08u0m_device> m_nand;
 	required_device<rtc9701_device> m_eeprom;
 
-	required_shared_ptr<uint64_t> m_ram;
-	required_region_ptr<uint64_t> m_rombase;
-
-	uint8_t flash_io_r(offs_t offset);
-	void flash_io_w(offs_t offset, uint8_t data);
-	uint8_t serial_rtc_eeprom_r(offs_t offset);
-	void serial_rtc_eeprom_w(offs_t offset, uint8_t data);
-	uint64_t flash_port_e_r();
-
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<u64> m_ram;
+	required_region_ptr<u64> m_rombase;
 
 	required_ioport m_eepromout;
 
-	uint32_t m_idleramoffs;
-	uint32_t m_idlepc;
+	u32 m_idleramoffs;
+	u32 m_idlepc;
 
-	uint64_t speedup_r();
-	void install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed);
+	u8 flash_io_r(offs_t offset);
+	void flash_io_w(offs_t offset, u8 data);
+	u8 serial_rtc_eeprom_r(offs_t offset);
+	void serial_rtc_eeprom_w(offs_t offset, u8 data);
+	u64 flash_port_e_r();
 
+	u64 speedup_r();
+	void install_speedups(u32 idleramoff, u32 idlepc, bool is_typed);
+
+	void base_map(address_map &map) ATTR_COLD;
 	void cv1k_d_map(address_map &map) ATTR_COLD;
 	void cv1k_map(address_map &map) ATTR_COLD;
-	void cv1k_port(address_map &map) ATTR_COLD;
+	void port_map(address_map &map) ATTR_COLD;
 };
 
 
 /**************************************************************************/
 
-uint32_t cv1k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_blitter->draw_screen(bitmap,cliprect);
-	return 0;
-}
-
-
 // FLASH interface
 
-uint64_t cv1k_state::flash_port_e_r()
+u64 cv1k_state::flash_port_e_r()
 {
 	return ((!m_nand->is_busy() ? 0x20 : 0x00)) | 0xdf;
 }
 
 
-uint8_t cv1k_state::flash_io_r(offs_t offset)
+u8 cv1k_state::flash_io_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -293,7 +286,8 @@ uint8_t cv1k_state::flash_io_r(offs_t offset)
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			// logerror("flash_io_r offset %04x\n", offset);
+			//if (!machine().side_effects_disabled())
+				//logerror("%s: unknown flash_io_r offset %04x\n", machine().describe_context(), offset);
 			return 0xff;
 
 		case 0x00:
@@ -301,13 +295,13 @@ uint8_t cv1k_state::flash_io_r(offs_t offset)
 	}
 }
 
-void cv1k_state::flash_io_w(offs_t offset, uint8_t data)
+void cv1k_state::flash_io_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
 		default:
 		case 0x03:
-			logerror("unknown flash_io_w offset %04x data %02x\n", offset, data); // 03 enable/disable fgpa access?
+			logerror("%s: unknown flash_io_w offset %04x data %02x\n", machine().describe_context(), offset, data); // 03 enable/disable fgpa access?
 			break;
 
 		case 0x00:
@@ -318,7 +312,7 @@ void cv1k_state::flash_io_w(offs_t offset, uint8_t data)
 			m_nand->command_w(data);
 			break;
 
-		case 0x2:
+		case 0x02:
 			m_nand->address_w(data);
 			break;
 	}
@@ -327,7 +321,7 @@ void cv1k_state::flash_io_w(offs_t offset, uint8_t data)
 
 // ibarablk uses the rtc to render the clock in the first attract demo
 // if this code returns bad values it has gfx corruption.  the ibarablka set doesn't do this?!
-uint8_t cv1k_state::serial_rtc_eeprom_r(offs_t offset)
+u8 cv1k_state::serial_rtc_eeprom_r(offs_t offset)
 {
 	switch (offset)
 	{
@@ -339,7 +333,7 @@ uint8_t cv1k_state::serial_rtc_eeprom_r(offs_t offset)
 	}
 }
 
-void cv1k_state::serial_rtc_eeprom_w(offs_t offset, uint8_t data)
+void cv1k_state::serial_rtc_eeprom_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
@@ -352,42 +346,44 @@ void cv1k_state::serial_rtc_eeprom_w(offs_t offset, uint8_t data)
 			break;
 
 		default:
-			logerror("unknown serial_rtc_eeprom_w access offset %02x data %02x\n", offset, data);
+			logerror("%s: unknown serial_rtc_eeprom_w access offset %02x data %02x\n", machine().describe_context(), offset, data);
 			break;
 	}
 }
 
 
-void cv1k_state::cv1k_map(address_map &map)
+void cv1k_state::base_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw(); // mmmbanc writes here on startup for some reason..
-	map(0x0c000000, 0x0c7fffff).ram().share("mainram");// work RAM
 	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
 	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
 	map(0x10c00000, 0x10c00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
 //  map(0x18000000, 0x18000057) // blitter, installed on reset
 	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
+}
+
+void cv1k_state::cv1k_map(address_map &map)
+{
+	// ROM area is mirrored?
+	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw(); // mmmbanc writes here on startup for some reason..
+	map(0x0c000000, 0x0c7fffff).ram().share(m_ram);// work RAM
+	base_map(map);
 }
 
 void cv1k_state::cv1k_d_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rom().region("maincpu", 0).nopw(); // mmmbanc writes here on startup for some reason..
-	map(0x0c000000, 0x0cffffff).ram().share("mainram"); // work RAM
-	map(0x10000000, 0x10000007).rw(FUNC(cv1k_state::flash_io_r), FUNC(cv1k_state::flash_io_w));
-	map(0x10400000, 0x10400007).w("ymz770", FUNC(ymz770_device::write));
-	map(0x10c00000, 0x10c00007).rw(FUNC(cv1k_state::serial_rtc_eeprom_r), FUNC(cv1k_state::serial_rtc_eeprom_w));
-//  map(0x18000000, 0x18000057) // blitter, installed on reset
-	map(0xf0000000, 0xf0ffffff).ram(); // mem mapped cache (sh3 internal?)
+	map(0x0c000000, 0x0cffffff).ram().share(m_ram); // work RAM
+	base_map(map);
 }
 
-void cv1k_state::cv1k_port(address_map &map)
+void cv1k_state::port_map(address_map &map)
 {
 	map(SH3_PORT_C, SH3_PORT_C+7).portr("PORT_C");
 	map(SH3_PORT_D, SH3_PORT_D+7).portr("PORT_D");
 	map(SH3_PORT_E, SH3_PORT_E+7).r(FUNC(cv1k_state::flash_port_e_r));
 	map(SH3_PORT_F, SH3_PORT_F+7).portr("PORT_F");
 	map(SH3_PORT_L, SH3_PORT_L+7).portr("PORT_L");
-	map(SH3_PORT_J, SH3_PORT_J+7).rw(m_blitter, FUNC(ep1c12_device::fpga_r), FUNC(ep1c12_device::fpga_w));
+	map(SH3_PORT_J, SH3_PORT_J+7).rw(m_blitter, FUNC(cv1k_blitter_device::fpga_r), FUNC(cv1k_blitter_device::fpga_w));
 }
 
 
@@ -458,8 +454,8 @@ INPUT_PORTS_END
 
 void cv1k_state::machine_reset()
 {
-	m_blitter->set_rambase(reinterpret_cast<uint16_t *>(m_ram.target()));
-	m_blitter->install_handlers( 0x18000000, 0x18000057 );
+	m_blitter->set_rambase(reinterpret_cast<u16 *>(m_ram.target()));
+	m_blitter->install_handlers(m_maincpu->space(AS_PROGRAM), 0x18000000, 0x18000057);
 	m_blitter->reset();
 }
 
@@ -478,7 +474,7 @@ void cv1k_state::cv1k(machine_config &config)
 	m_maincpu->set_md(8, 0);
 	m_maincpu->set_sh4_clock(12.8_MHz_XTAL*8); // 102.4MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &cv1k_state::cv1k_map);
-	m_maincpu->set_addrmap(AS_IO, &cv1k_state::cv1k_port);
+	m_maincpu->set_addrmap(AS_IO, &cv1k_state::port_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cv1k_state::irq2_line_hold)); // irq2 actually asserted at V-sync pulse, not at V-blank
 
 	RTC9701(config, m_eeprom);
@@ -490,13 +486,13 @@ void cv1k_state::cv1k(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 512);
 	screen.set_visarea(0, 320-1, 0, 240-1);
-	screen.set_screen_update(FUNC(cv1k_state::screen_update));
+	screen.set_screen_update(m_blitter, FUNC(cv1k_blitter_device::screen_update));
 
 	SPEAKER(config, "mono").front_center();
 	YMZ770(config, "ymz770", 16.384_MHz_XTAL).add_route(1, "mono", 1.0); // only Right output used, Left is not connected
 
-	EP1C12(config, m_blitter, 0);
-	m_blitter->set_cpu(m_maincpu);
+	CV1K_BLITTER(config, m_blitter, 0);
+	m_blitter->set_screen("screen");
 	m_blitter->port_r_callback().set_ioport("DSW");
 	m_blitter->set_mainramsize(0x800000);
 }
@@ -504,23 +500,7 @@ void cv1k_state::cv1k(machine_config &config)
 void cv1k_state::cv1k_d(machine_config &config)
 {
 	cv1k(config);
-
-	/* basic machine hardware */
-	SH7709S(config.replace(), m_maincpu, 12.8_MHz_XTAL*8, ENDIANNESS_BIG); // 102.4MHz
-	m_maincpu->set_md(0, 0); // none of this is verified
-	m_maincpu->set_md(1, 0); // (the sh3 is different to the sh4 anyway, should be changed)
-	m_maincpu->set_md(2, 0);
-	m_maincpu->set_md(3, 0);
-	m_maincpu->set_md(4, 0);
-	m_maincpu->set_md(5, 1);
-	m_maincpu->set_md(6, 0);
-	m_maincpu->set_md(7, 1);
-	m_maincpu->set_md(8, 0);
-	m_maincpu->set_sh4_clock(12.8_MHz_XTAL*8); // 102.4MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &cv1k_state::cv1k_d_map);
-	m_maincpu->set_addrmap(AS_IO, &cv1k_state::cv1k_port);
-	m_maincpu->set_vblank_int("screen", FUNC(cv1k_state::irq2_line_hold));
-
 	m_blitter->set_mainramsize(0x1000000);
 }
 
@@ -944,7 +924,7 @@ ROM_END
 //  ROM_IGNORE( 0x000100 ) // Flash extra bytes
 // ROM_END
 
-uint64_t cv1k_state::speedup_r()
+u64 cv1k_state::speedup_r()
 {
 	const offs_t pc = m_maincpu->pc();
 
@@ -954,21 +934,21 @@ uint64_t cv1k_state::speedup_r()
 	return m_ram[m_idleramoffs / 8];
 }
 
-void cv1k_state::install_speedups(uint32_t idleramoff, uint32_t idlepc, bool is_typed)
+void cv1k_state::install_speedups(u32 idleramoff, u32 idlepc, bool is_typed)
 {
 	m_idleramoffs = idleramoff;
 	m_idlepc = idlepc;
 
 	m_maincpu->sh2drc_set_options(SH2DRC_FASTEST_OPTIONS);
 
-	m_maincpu->sh2drc_add_pcflush(idlepc+2);
+	m_maincpu->sh2drc_add_pcflush(idlepc + 2);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000+m_idleramoffs, 0xc000000+m_idleramoffs+7, read64smo_delegate(*this, FUNC(cv1k_state::speedup_r)));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000000 + m_idleramoffs, 0xc000000 + m_idleramoffs + 7, read64smo_delegate(*this, FUNC(cv1k_state::speedup_r)));
 
 	m_maincpu->sh2drc_add_fastram(0x00000000, 0x003fffff, true, m_rombase);
 
-	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0c000000+m_idleramoffs-1, false, m_ram);
-	m_maincpu->sh2drc_add_fastram(0x0c000000+m_idleramoffs+8, is_typed ? 0x0cffffff : 0x0c7fffff, false, m_ram + ((m_idleramoffs+8)/8));
+	m_maincpu->sh2drc_add_fastram(0x0c000000, 0x0c000000 + m_idleramoffs - 1, false, m_ram);
+	m_maincpu->sh2drc_add_fastram(0x0c000000 + m_idleramoffs + 8, is_typed ? 0x0cffffff : 0x0c7fffff, false, m_ram + ((m_idleramoffs + 8) / 8));
 }
 
 
@@ -1014,64 +994,64 @@ void cv1k_state::init_ddpdfk()
 // The black label versions are intentionally not set as clones, they were re-releases with different game codes, not bugfixes.
 
 // CA011  Mushihime-Sama
-GAME( 2004, mushisam,   0,        cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)",   "Mushihime-Sama (2004/10/12.MASTER VER.)",                                       MACHINE_IMPERFECT_TIMING )
-GAME( 2004, mushisama,  mushisam, cv1k,   cv1k, cv1k_state, init_ibara,    ROT270, "Cave (AMI license)",   "Mushihime-Sama (2004/10/12 MASTER VER.)",                                       MACHINE_IMPERFECT_TIMING )
-GAME( 2004, mushisamb,  mushisam, cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)",   "Mushihime-Sama (2004/10/12 MASTER VER)",                                        MACHINE_IMPERFECT_TIMING )
+GAME( 2004, mushisam,   0,        cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)",   "Mushihime-Sama (Japan, 2004/10/12.MASTER VER.)",                                       MACHINE_IMPERFECT_TIMING )
+GAME( 2004, mushisama,  mushisam, cv1k,   cv1k, cv1k_state, init_ibara,    ROT270, "Cave (AMI license)",   "Mushihime-Sama (Japan, 2004/10/12 MASTER VER.)",                                       MACHINE_IMPERFECT_TIMING )
+GAME( 2004, mushisamb,  mushisam, cv1k,   cv1k, cv1k_state, init_mushisam, ROT270, "Cave (AMI license)",   "Mushihime-Sama (Japan, 2004/10/12 MASTER VER)",                                        MACHINE_IMPERFECT_TIMING )
 
 // CA012  Ibara
-GAME( 2005, ibara,      0,        cv1k,   cv1ks,cv1k_state, init_ibara,    ROT270, "Cave (AMI license)",   "Ibara (2005/03/22 MASTER VER.., '06. 3. 7 ver.)",                               MACHINE_IMPERFECT_TIMING )
-GAME( 2005, ibarao,     ibara,    cv1k,   cv1ks,cv1k_state, init_ibara,    ROT270, "Cave (AMI license)",   "Ibara (2005/03/22 MASTER VER..)",                                               MACHINE_IMPERFECT_TIMING )
+GAME( 2005, ibara,      0,        cv1k,   cv1ks,cv1k_state, init_ibara,    ROT270, "Cave (AMI license)",   "Ibara (Japan, 2005/03/22 MASTER VER.., '06. 3. 7 ver.)",                               MACHINE_IMPERFECT_TIMING )
+GAME( 2005, ibarao,     ibara,    cv1k,   cv1ks,cv1k_state, init_ibara,    ROT270, "Cave (AMI license)",   "Ibara (Japan, 2005/03/22 MASTER VER..)",                                               MACHINE_IMPERFECT_TIMING )
 
 // CA012B Ibara Kuro Black Label
-GAME( 2006, ibarablk,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Ibara Kuro Black Label (2006/02/06. MASTER VER.)",                              MACHINE_IMPERFECT_TIMING )
-GAME( 2006, ibarablka,  ibarablk, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Ibara Kuro Black Label (2006/02/06 MASTER VER.)",                               MACHINE_IMPERFECT_TIMING )
+GAME( 2006, ibarablk,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Ibara Kuro Black Label (Japan, 2006/02/06. MASTER VER.)",                              MACHINE_IMPERFECT_TIMING )
+GAME( 2006, ibarablka,  ibarablk, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Ibara Kuro Black Label (Japan, 2006/02/06 MASTER VER.)",                               MACHINE_IMPERFECT_TIMING )
 
 // CA013  Espgaluda II
-GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (2005/11/14.MASTER VER.)",                                         MACHINE_IMPERFECT_TIMING )
-GAME( 2005, espgal2a,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (2005/11/14 MASTER VER, newer CV1000-B PCB)",                      MACHINE_IMPERFECT_TIMING )
-GAME( 2005, espgal2b,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (2005/11/14 MASTER VER, original CV1000-B PCB)",                   MACHINE_IMPERFECT_TIMING )
+GAME( 2005, espgal2,    0,        cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (Japan, 2005/11/14.MASTER VER.)",                                         MACHINE_IMPERFECT_TIMING )
+GAME( 2005, espgal2a,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (Japan, 2005/11/14 MASTER VER, newer CV1000-B PCB)",                      MACHINE_IMPERFECT_TIMING )
+GAME( 2005, espgal2b,   espgal2,  cv1k,   cv1k, cv1k_state, init_espgal2,  ROT270, "Cave (AMI license)",   "Espgaluda II (Japan, 2005/11/14 MASTER VER, original CV1000-B PCB)",                   MACHINE_IMPERFECT_TIMING )
 
 // CA???  Puzzle! Mushihime-Tama
-GAME( 2005, mushitam,   0,        cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)",   "Puzzle! Mushihime-Tama (2005/09/09.MASTER VER)",                                MACHINE_IMPERFECT_TIMING )
-GAME( 2005, mushitama,  mushitam, cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)",   "Puzzle! Mushihime-Tama (2005/09/09 MASTER VER)",                                MACHINE_IMPERFECT_TIMING )
+GAME( 2005, mushitam,   0,        cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)",   "Puzzle! Mushihime-Tama (Japan, 2005/09/09.MASTER VER)",                                MACHINE_IMPERFECT_TIMING )
+GAME( 2005, mushitama,  mushitam, cv1k,   cv1k, cv1k_state, init_mushitam, ROT0,   "Cave (AMI license)",   "Puzzle! Mushihime-Tama (Japan, 2005/09/09 MASTER VER)",                                MACHINE_IMPERFECT_TIMING )
 
 // CA014  Pink Sweets: Ibara Sorekara
-GAME( 2006, pinkswts,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER....)",                       MACHINE_IMPERFECT_TIMING )
-GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER...)",                        MACHINE_IMPERFECT_TIMING )
-GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (2006/04/06 MASTER VER.)",                          MACHINE_IMPERFECT_TIMING )
-GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (2006/xx/xx MASTER VER.)",                          MACHINE_IMPERFECT_TIMING ) // defaults to freeplay, possibly bootlegged from show/dev version?
+GAME( 2006, pinkswts,   0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (Japan, 2006/04/06 MASTER VER....)",                       MACHINE_IMPERFECT_TIMING )
+GAME( 2006, pinkswtsa,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (Japan, 2006/04/06 MASTER VER...)",                        MACHINE_IMPERFECT_TIMING )
+GAME( 2006, pinkswtsb,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (Japan, 2006/04/06 MASTER VER.)",                          MACHINE_IMPERFECT_TIMING )
+GAME( 2006, pinkswtsx,  pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Pink Sweets: Ibara Sorekara (Japan, 2006/xx/xx MASTER VER.)",                          MACHINE_IMPERFECT_TIMING ) // defaults to freeplay, possibly bootlegged from show/dev version?
 GAME( 2017, pinkswtssc, pinkswts, cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "bootleg (Four Horsemen)", "Pink Sweets: Suicide Club (2017/10/31 SUICIDECLUB VER., bootleg)",           MACHINE_IMPERFECT_TIMING ) // dumped from bootleg with pre-patched hack
 
 // CA015  Mushihime-Sama Futari
-GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Ver 1.5 (2006/12/8.MASTER VER. 1.54.)",                   MACHINE_IMPERFECT_TIMING )
-GAME( 2006, futari15a,  futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Ver 1.5 (2006/12/8 MASTER VER 1.54)",                     MACHINE_IMPERFECT_TIMING )
-GAME( 2006, futari10,   futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Ver 1.0 (2006/10/23 MASTER VER.)",                        MACHINE_IMPERFECT_TIMING )
+GAME( 2006, futari15,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Ver 1.5 (Japan, 2006/12/8.MASTER VER. 1.54.)",                   MACHINE_IMPERFECT_TIMING )
+GAME( 2006, futari15a,  futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Ver 1.5 (Japan, 2006/12/8 MASTER VER 1.54)",                     MACHINE_IMPERFECT_TIMING )
+GAME( 2006, futari10,   futari15, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Ver 1.0 (Japan, 2006/10/23 MASTER VER.)",                        MACHINE_IMPERFECT_TIMING )
 
 // CA015B Mushihime-Sama Futari Black Label
-GAME( 2007, futaribl,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Black Label - Another Ver (2009/11/27 INTERNATIONAL BL)", MACHINE_IMPERFECT_TIMING ) // re-released for Chinese market
-GAME( 2007, futariblj,  futaribl, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Black Label (2007/12/11 BLACK LABEL VER)",                MACHINE_IMPERFECT_TIMING )
+GAME( 2007, futaribl,   0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Black Label - Another Ver (World, 2009/11/27 INTERNATIONAL BL)", MACHINE_IMPERFECT_TIMING ) // re-released for Chinese market
+GAME( 2007, futariblj,  futaribl, cv1k,   cv1k, cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Mushihime-Sama Futari Black Label (Japan, 2007/12/11 BLACK LABEL VER)",                MACHINE_IMPERFECT_TIMING )
 
 // CA016  Muchi Muchi Pork!
-GAME( 2007, mmpork,     0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Muchi Muchi Pork! (2007/ 4/17 MASTER VER.)",                                    MACHINE_IMPERFECT_TIMING )
+GAME( 2007, mmpork,     0,        cv1k,   cv1ks,cv1k_state, init_pinkswts, ROT270, "Cave (AMI license)",   "Muchi Muchi Pork! (Japan, 2007/ 4/17 MASTER VER.)",                                    MACHINE_IMPERFECT_TIMING )
 
 // CA017  Deathsmiles
-GAME( 2007, deathsml,   0,        cv1k,   cv1k, cv1k_state, init_deathsml, ROT0,   "Cave (AMI license)",   "Deathsmiles (2007/10/09 MASTER VER)",                                           MACHINE_IMPERFECT_TIMING )
+GAME( 2007, deathsml,   0,        cv1k,   cv1k, cv1k_state, init_deathsml, ROT0,   "Cave (AMI license)",   "Deathsmiles (Japan, 2007/10/09 MASTER VER)",                                           MACHINE_IMPERFECT_TIMING )
 
 // CA017B Deathsmiles Black Label
-GAME( 2008, dsmbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave (AMI license)",   "Deathsmiles MegaBlack Label (2008/10/06 MEGABLACK LABEL VER)",                  MACHINE_IMPERFECT_TIMING )
+GAME( 2008, dsmbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave (AMI license)",   "Deathsmiles MegaBlack Label (Japan, 2008/10/06 MEGABLACK LABEL VER)",                  MACHINE_IMPERFECT_TIMING )
 
 // CA019  Do-Don-Pachi Dai-Fukkatsu
-GAME( 2008, ddpdfk,     0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)",   "DoDonPachi Dai-Fukkatsu Ver 1.5 (2008/06/23 MASTER VER 1.5)",                   MACHINE_IMPERFECT_TIMING )
-GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)",   "DoDonPachi Dai-Fukkatsu Ver 1.0 (2008/05/16 MASTER VER)",                       MACHINE_IMPERFECT_TIMING )
+GAME( 2008, ddpdfk,     0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)",   "DoDonPachi Dai-Fukkatsu Ver 1.5 (Japan, 2008/06/23 MASTER VER 1.5)",                   MACHINE_IMPERFECT_TIMING )
+GAME( 2008, ddpdfk10,   ddpdfk,   cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave (AMI license)",   "DoDonPachi Dai-Fukkatsu Ver 1.0 (Japan, 2008/05/16 MASTER VER)",                       MACHINE_IMPERFECT_TIMING )
 
 // CA019B Do-Don-Pachi Dai-Fukkatsu Black Label
-GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi Dai-Fukkatsu Black Label (2010/1/18 BLACK LABEL)",                   MACHINE_IMPERFECT_TIMING )
+GAME( 2010, dfkbl,      0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",                 "DoDonPachi Dai-Fukkatsu Black Label (Japan, 2010/1/18 BLACK LABEL)",                   MACHINE_IMPERFECT_TIMING )
 
 // CA021  Akai Katana
-//GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
+//GAME( 2010, akatana,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT0,   "Cave",               "Akai Katana (Japan, 2010/ 8/13 MASTER VER.)",                            MACHINE_IMPERFECT_TIMING )
 
 // CA??? DoDonPachi SaiDaiOuJou
-//GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi SaiDaiOuJou (2012/ 4/20)",                             MACHINE_IMPERFECT_TIMING )
+//GAME( 2012, ddpsdoj,    0,        cv1k_d, cv1k, cv1k_state, init_ddpdfk,   ROT270, "Cave",               "DoDonPachi SaiDaiOuJou (Japan, 2012/ 4/20)",                             MACHINE_IMPERFECT_TIMING )
 
 // CMDL01 Medal Mahjong Moukari Bancho
-GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )
+GAME( 2007, mmmbanc,    0,        cv1k,   cv1k, cv1k_state, init_pinkswts, ROT0,   "Cave (AMI license)",   "Medal Mahjong Moukari Bancho (Japan, 2007/06/05 MASTER VER.)",                         MACHINE_NOT_WORKING )

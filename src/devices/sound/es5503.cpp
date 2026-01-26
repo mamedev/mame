@@ -22,23 +22,25 @@
   data at that point isn't 0x80 or very near it.
 
   Changes:
-  0.2 (RB) - improved behavior for volumes > 127, fixes missing notes in Nucleus & missing voices in Thexder
-  0.3 (RB) - fixed extraneous clicking, improved timing behavior for e.g. Music Construction Set & Music Studio
-  0.4 (RB) - major fixes to IRQ semantics and end-of-sample handling.
-  0.5 (RB) - more flexible wave memory hookup (incl. banking) and save state support.
-  1.0 (RB) - properly respects the input clock
-  2.0 (RB) - C++ conversion, more accurate oscillator IRQ timing
-  2.1 (RB) - Corrected phase when looping; synthLAB, Arkanoid, and Arkanoid II no longer go out of tune
+  0.2 (RB)   - improved behavior for volumes > 127, fixes missing notes in Nucleus & missing voices in Thexder
+  0.3 (RB)   - fixed extraneous clicking, improved timing behavior for e.g. Music Construction Set & Music Studio
+  0.4 (RB)   - major fixes to IRQ semantics and end-of-sample handling.
+  0.5 (RB)   - more flexible wave memory hookup (incl. banking) and save state support.
+  1.0 (RB)   - properly respects the input clock
+  2.0 (RB)   - C++ conversion, more accurate oscillator IRQ timing
+  2.1 (RB)   - Corrected phase when looping; synthLAB, Arkanoid, and Arkanoid II no longer go out of tune
   2.1.1 (RB) - Fixed issue introduced in 2.0 where IRQs were delayed
   2.1.2 (RB) - Fixed SoundSmith POLY.SYNTH inst where one-shot on the even oscillator and swap on the odd should loop.
                Conversely, the intro voice in FTA Delta Demo has swap on the even and one-shot on the odd and doesn't
                want to loop.
   2.1.3 (RB) - Fixed oscillator enable register off-by-1 which caused everything to be half a step sharp.
-  2.2 (RB) - More precise one-shot even/swap odd behavior from hardware observations with Ian Brumby's SWAPTEST.
-  2.3 (RB) - Sync & AM modes added, emulate the volume glitch for the highest-numbered enabled oscillator.
+  2.2 (RB)   - More precise one-shot even/swap odd behavior from hardware observations with Ian Brumby's SWAPTEST.
+  2.3 (RB)   - Sync & AM modes added, emulate the volume glitch for the highest-numbered enabled oscillator.
   2.3.1 (RB) - Fixed thinko in the volume glitch emulation and minor cleanup.
-  2.4 (RB) - Halting an oscillator from the CPU behaves the same as halting it from the DOC itself.
-             Skate or Die on the IIgs accidentally relies on this behavior.
+  2.4 (RB)   - Halting an oscillator from the CPU behaves the same as halting it from the DOC itself.
+               Skate or Die on the IIgs accidentally relies on this behavior.
+  2.4.1 (RB) - Fixed the phase preservation on looping samples, which was introducing a subtle (1 sample position)
+               pitch error on each loop.
 */
 
 #include "emu.h"
@@ -124,8 +126,18 @@ void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int ress
 	}
 	else    // preserve the relative phase of the oscillator when looping
 	{
-		uint16_t wtsize = pOsc->wtsize - 1;
-		*accumulator -= (wtsize << resshift);
+		const uint16_t wtsize = pOsc->wtsize;
+		// For the ideal case, the accumulator is greater than or equal to the wave table size.
+		// Unfortunately degenerate cases can occur on this chip (especially with SoundSmith on
+		// the IIgs), so in those cases just zero the integer part of the accumulator.)
+		if ((*accumulator >> resshift) < wtsize)
+		{
+			*accumulator -= ((*accumulator >> resshift) << resshift);
+		}
+		else    // Ideal case.  Just subtract the wave table size from the integer part.
+		{
+			*accumulator -= (wtsize << resshift);
+		}
 	}
 
 	// if we're in swap mode, start the partner

@@ -306,8 +306,8 @@ void triplex_state::triplex(machine_config &config)
 
 	HD63450(config, m_dmac, 16_MHz_XTAL / 2, m_maincpu); // HD68450
 	m_dmac->irq_callback().set_inputline(m_maincpu, M68K_IRQ_3);
-	m_dmac->dma_read<0>().set(m_ncr5380, FUNC(ncr5380_device::dma_r));
-	m_dmac->dma_write<0>().set(m_ncr5380, FUNC(ncr5380_device::dma_w));
+	m_dmac->dma8_read<0>().set(m_ncr5380, FUNC(ncr5380_device::dma_r));
+	m_dmac->dma8_write<0>().set(m_ncr5380, FUNC(ncr5380_device::dma_w));
 
 	// TODO: MC68451 MMU
 

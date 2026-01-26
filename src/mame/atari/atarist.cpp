@@ -1415,6 +1415,7 @@ void st_state::common(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("st_flop");
+	SOFTWARE_LIST(config, "demos_list").set_original("st_flop_demos");
 	SOFTWARE_LIST(config, "cart_list").set_original("st_cart");
 }
 

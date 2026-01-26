@@ -49,13 +49,12 @@ DEFINE_DEVICE_TYPE(A2BUS_MCMS2, a2bus_mcms2_device, "a2mcms2", "Mountain Compute
 
 void a2bus_mcms1_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "mcms_l").front_left();
-	SPEAKER(config, "mcms_r").front_right();
+	SPEAKER(config, "mcms", 2).front();
 
 	MCMS(config, m_mcms, 1000000);
 	m_mcms->irq_cb().set(FUNC(a2bus_mcms1_device::irq_w));
-	m_mcms->add_route(0, "mcms_l", 1.0);
-	m_mcms->add_route(1, "mcms_r", 1.0);
+	m_mcms->add_route(0, "mcms", 1.0, 0);
+	m_mcms->add_route(1, "mcms", 1.0, 1);
 }
 
 //**************************************************************************

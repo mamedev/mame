@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    mips3com.c
+    mips3com.cpp
 
     Common MIPS III/IV definitions and functions
 
@@ -11,40 +11,6 @@
 #include "emu.h"
 #include "mips3com.h"
 #include "ps2vu.h"
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static void tlb_entry_log_half(mips3_tlb_entry *entry, int tlbindex, int which);
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    tlb_entry_matches_asid - true if the given
-    TLB entry matches the provided ASID
--------------------------------------------------*/
-
-static inline bool tlb_entry_matches_asid(const mips3_tlb_entry *entry, uint8_t asid)
-{
-	return (entry->entry_hi & 0xff) == asid;
-}
-
-
-/*-------------------------------------------------
-    tlb_entry_is_global - true if the given
-    TLB entry is global
--------------------------------------------------*/
-
-static inline bool tlb_entry_is_global(const mips3_tlb_entry *entry)
-{
-	return (entry->entry_lo[0] & entry->entry_lo[1] & TLB_GLOBAL);
-}
 
 
 void mips3_device::execute_set_input(int inputnum, int state)
@@ -98,7 +64,7 @@ void mips3_device::mips3com_asid_changed()
 
 	/* iterate over all non-global TLB entries and remap them */
 	for (tlbindex = 0; tlbindex < m_tlbentries; tlbindex++)
-		if (!tlb_entry_is_global(&m_tlb[tlbindex]))
+		if (!m_tlb[tlbindex].is_global())
 			tlb_map_entry(tlbindex);
 }
 
@@ -114,13 +80,13 @@ void mips3_device::mips3com_tlbr()
 	/* only handle entries within the TLB */
 	if (tlbindex < m_tlbentries)
 	{
-		mips3_tlb_entry *entry = &m_tlb[tlbindex];
+		const mips3_tlb_entry &entry = m_tlb[tlbindex];
 
 		/* copy data from the TLB entry into the COP0 registers */
-		m_core->cpr[0][COP0_PageMask] = entry->page_mask;
-		m_core->cpr[0][COP0_EntryHi] = entry->entry_hi;
-		m_core->cpr[0][COP0_EntryLo0] = entry->entry_lo[0];
-		m_core->cpr[0][COP0_EntryLo1] = entry->entry_lo[1];
+		m_core->cpr[0][COP0_PageMask] = entry.page_mask;
+		m_core->cpr[0][COP0_EntryHi] = entry.entry_hi;
+		m_core->cpr[0][COP0_EntryLo0] = entry.entry_lo[0];
+		m_core->cpr[0][COP0_EntryLo1] = entry.entry_lo[1];
 	}
 }
 
@@ -178,14 +144,14 @@ void mips3_device::mips3com_tlbp()
 	/* iterate over TLB entries */
 	for (tlbindex = 0; tlbindex < m_tlbentries; tlbindex++)
 	{
-		mips3_tlb_entry *entry = &m_tlb[tlbindex];
-		uint64_t mask = ~((entry->page_mask >> 13) & 0xfff) << 13;
+		const mips3_tlb_entry &entry = m_tlb[tlbindex];
+		const uint64_t mask = ~((entry.page_mask >> 13) & 0xfff) << 13;
 
 		/* if the relevant bits of EntryHi match the relevant bits of the TLB */
-		if ((entry->entry_hi & mask) == (m_core->cpr[0][COP0_EntryHi] & mask))
+		if ((entry.entry_hi & mask) == (m_core->cpr[0][COP0_EntryHi] & mask))
 
 			/* and if we are either global or matching the current ASID, then stop */
-			if ((entry->entry_hi & 0xff) == (m_core->cpr[0][COP0_EntryHi] & 0xff) || ((entry->entry_lo[0] & entry->entry_lo[1]) & TLB_GLOBAL))
+			if ((entry.entry_hi & 0xff) == (m_core->cpr[0][COP0_EntryHi] & 0xff) || ((entry.entry_lo[0] & entry.entry_lo[1]) & TLB_GLOBAL))
 				break;
 	}
 
@@ -380,12 +346,12 @@ uint32_t mips3_device::compute_fpu_prid_register()
 void mips3_device::tlb_map_entry(int tlbindex)
 {
 	int current_asid = m_core->cpr[0][COP0_EntryHi] & 0xff;
-	mips3_tlb_entry *entry = &m_tlb[tlbindex];
+	const mips3_tlb_entry &entry = m_tlb[tlbindex];
 	uint32_t count, vpn;
 	int which;
 
 	/* the ASID doesn't match the current ASID, and if the page isn't global, unmap it from the TLB */
-	if (!tlb_entry_matches_asid(entry, current_asid) && !tlb_entry_is_global(entry))
+	if (!entry.matches_asid(current_asid) && !entry.is_global())
 	{
 		vtlb_load(2 * tlbindex + 0, 0, 0, 0);
 		vtlb_load(2 * tlbindex + 1, 0, 0, 0);
@@ -393,7 +359,7 @@ void mips3_device::tlb_map_entry(int tlbindex)
 	}
 
 	/* extract the VPN index; ignore if the virtual address is beyond 32 bits */
-	vpn = ((entry->entry_hi >> 13) & 0x07ffffff) << 1;
+	vpn = ((entry.entry_hi >> 13) & 0x07ffffff) << 1;
 	if (vpn >= (1 << (MIPS3_MAX_PADDR_SHIFT - MIPS3_MIN_PAGE_SHIFT)))
 	{
 		vtlb_load(2 * tlbindex + 0, 0, 0, 0);
@@ -403,16 +369,16 @@ void mips3_device::tlb_map_entry(int tlbindex)
 
 	/* get the number of pages from the page mask */
 	/* R5900: if the S bit is set in EntryLo, it is the scratchpad, and is always 4 pages. */
-	if ((entry->entry_lo[0] & 0x80000000) && m_flavor == MIPS3_TYPE_R5900)
+	if ((entry.entry_lo[0] & 0x80000000) && m_flavor == MIPS3_TYPE_R5900)
 		count = 4;
 	else
-		count = ((entry->page_mask >> 13) & 0x00fff) + 1;
+		count = ((entry.page_mask >> 13) & 0x00fff) + 1;
 
 	/* loop over both the even and odd pages */
 	for (which = 0; which < 2; which++)
 	{
 		uint32_t effvpn = vpn + count * which;
-		uint64_t lo = entry->entry_lo[which];
+		uint64_t lo = entry.entry_lo[which];
 		uint32_t pfn;
 		uint32_t flags = 0;
 
@@ -452,19 +418,19 @@ void mips3_device::tlb_write_common(int tlbindex)
 	/* only handle entries within the TLB */
 	if (tlbindex < m_tlbentries)
 	{
-		mips3_tlb_entry *entry = &m_tlb[tlbindex];
+		mips3_tlb_entry &entry = m_tlb[tlbindex];
 
 		/* fill in the new TLB entry from the COP0 registers */
-		entry->page_mask = m_core->cpr[0][COP0_PageMask];
-		entry->entry_hi = m_core->cpr[0][COP0_EntryHi] & ~(entry->page_mask & u64(0x0000000001ffe000U));
-		entry->entry_lo[0] = m_core->cpr[0][COP0_EntryLo0];
-		entry->entry_lo[1] = m_core->cpr[0][COP0_EntryLo1];
+		entry.page_mask = m_core->cpr[0][COP0_PageMask];
+		entry.entry_hi = m_core->cpr[0][COP0_EntryHi] & ~(entry.page_mask & u64(0x0000000001ffe000U));
+		entry.entry_lo[0] = m_core->cpr[0][COP0_EntryLo0];
+		entry.entry_lo[1] = m_core->cpr[0][COP0_EntryLo1];
 
 		/* remap this TLB entry */
 		tlb_map_entry(tlbindex);
 		/* log the two halves once they are in */
-		tlb_entry_log_half(entry, tlbindex, 0);
-		tlb_entry_log_half(entry, tlbindex, 1);
+		entry.log_half(tlbindex, 0);
+		entry.log_half(tlbindex, 1);
 	}
 }
 
@@ -474,25 +440,24 @@ void mips3_device::tlb_write_common(int tlbindex)
     entry
 -------------------------------------------------*/
 
-static void tlb_entry_log_half(mips3_tlb_entry *entry, int tlbindex, int which)
+void mips3_device::mips3_tlb_entry::log_half(int tlbindex, int which) const
 {
-if (PRINTF_TLB)
-{
-	uint64_t hi = entry->entry_hi;
-	uint64_t lo = entry->entry_lo[which];
-	uint32_t vpn = (((hi >> 13) & 0x07ffffff) << 1);
-	uint32_t asid = hi & 0xff;
-	uint32_t r = (hi >> 62) & 3;
-	uint32_t pfn = (lo >> 6) & 0x00ffffff;
-	uint32_t c = (lo >> 3) & 7;
-	uint32_t pagesize = (((entry->page_mask >> 13) & 0xfff) + 1) << MIPS3_MIN_PAGE_SHIFT;
-	uint64_t vaddr = (uint64_t)vpn * MIPS3_MIN_PAGE_SIZE;
-	uint64_t paddr = (uint64_t)pfn * MIPS3_MIN_PAGE_SIZE;
+	if (PRINTF_TLB)
+	{
+		const uint64_t hi = entry_hi;
+		const uint64_t lo = entry_lo[which];
+		const uint32_t vpn = (((hi >> 13) & 0x07ffffff) << 1);
+		const uint32_t asid = hi & 0xff;
+		const uint32_t r = (hi >> 62) & 3;
+		const uint32_t pfn = (lo >> 6) & 0x00ffffff;
+		const uint32_t c = (lo >> 3) & 7;
+		const uint32_t pagesize = (((page_mask >> 13) & 0xfff) + 1) << MIPS3_MIN_PAGE_SHIFT;
+		const uint64_t vaddr = ((uint64_t)vpn * MIPS3_MIN_PAGE_SIZE) + (pagesize * which);
+		const uint64_t paddr = (uint64_t)pfn * MIPS3_MIN_PAGE_SIZE;
 
-	vaddr += pagesize * which;
-
-	printf("index=%08X  pagesize=%08X  vaddr=%08X%08X  paddr=%08X%08X  asid=%02X  r=%X  c=%X  dvg=%c%c%c\n",
-			tlbindex, pagesize, (uint32_t)(vaddr >> 32), (uint32_t)vaddr, (uint32_t)(paddr >> 32), (uint32_t)paddr,
-			asid, r, c, (lo & 4) ? 'd' : '.', (lo & 2) ? 'v' : '.', (lo & 1) ? 'g' : '.');
-}
+		util::stream_format(std::cout,
+				"index=%08X  pagesize=%08X  vaddr=%016X  paddr=%016X  asid=%02X  r=%X  c=%X  dvg=%c%c%c\n",
+				tlbindex, pagesize, vaddr, paddr,
+				asid, r, c, (lo & 4) ? 'd' : '.', (lo & 2) ? 'v' : '.', (lo & 1) ? 'g' : '.');
+	}
 }

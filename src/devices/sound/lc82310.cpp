@@ -229,7 +229,7 @@ void lc82310_device::handle_command(uint8_t cmd, uint8_t param)
 			0.0,                          // 76
 		};
 
-		int speaker_idx = cmd == CMD_UNK15_VOL ? 1 : 0; // guessed, both are set at the same time in current use cases
+		const int speaker_idx = (cmd == CMD_UNK15_VOL) ? 1 : 0; // guessed, both are set at the same time in current use cases
 		m_output_gain[speaker_idx] = gain_table[std::min<uint8_t>(param, 0x4c)];
 
 		set_output_gain(speaker_idx, m_output_gain[speaker_idx]);
@@ -239,7 +239,6 @@ void lc82310_device::handle_command(uint8_t cmd, uint8_t param)
 TIMER_CALLBACK_MEMBER(lc82310_device::update_sample_rate)
 {
 	stream->set_sample_rate(m_frame_sample_rate);
-	
 }
 
 bool lc82310_device::fill_buffer()
@@ -264,7 +263,8 @@ bool lc82310_device::fill_buffer()
 	m_mp3data_count -= pos;
 
 	// Sample rate changed
-	if(frame_sample_rate != m_frame_sample_rate) {
+	if (frame_sample_rate != m_frame_sample_rate)
+	{
 		m_frame_sample_rate = frame_sample_rate;
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(lc82310_device::update_sample_rate), this));
 		return true;
@@ -301,9 +301,12 @@ void lc82310_device::sound_stream_update(sound_stream &stream)
 
 	while (pos < csamples)
 	{
-		if (m_sample_count == 0) {
-			if(fill_buffer()) {
-				while(pos < csamples) {
+		if (m_sample_count == 0)
+		{
+			if (fill_buffer())
+			{
+				while (pos < csamples)
+				{
 					stream.put(0, pos, 0);
 					stream.put(1, pos, 0);
 					pos++;

@@ -23,7 +23,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="colorpnta" cloneof="colorpnt">
-		<description>Colorpaint (Alt)</description>
+		<description>Colorpaint (alt)</description>
 		<year>198?</year>
 		<publisher>Olivetti Prodest?</publisher>
 
@@ -47,7 +47,7 @@ This list is exclusively for Italian MO5 and MO6 software
 	</software>
 
 	<software name="scriptora" cloneof="scriptor">
-		<description>Scriptor (Alt)</description>
+		<description>Scriptor (alt)</description>
 		<year>1986</year>
 		<publisher>Olivetti Prodest</publisher>
 

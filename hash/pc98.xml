@@ -44751,19 +44751,19 @@ hand repaired copy protection, looks for deleted sector -8 and -9 on track 76
 		</part>
 	</software>
 
-    <software name="soapstry">
-        <description>Soapland Story</description>
-        <year>1987</year>
+	<software name="soapstry">
+		<description>Soapland Story</description>
+		<year>1987</year>
 		<publisher>ハード (Hard)</publisher>
-        <info name="alt_title" value="ソープランドストーリー" />
-        <info name="release" value="198709xx" />
+		<info name="alt_title" value="ソープランドストーリー" />
+		<info name="release" value="198709xx" />
 		<info name="usage" value="Boot in BASIC and set MEMSW SSW3 to 05 thru MON (will otherwise throw an overflow error at bootstrap)" />
-        <part name="flop1" interface="floppy_5_25">
-            <dataarea name="flop" size="1187040">
-                <rom name="soapland story.d88" size="1187040" crc="9dbb2392" sha1="21cd5846770f62c37a4b5118fad7bb2ad25d1f3a" offset="0" />
-            </dataarea>
-        </part>
-    </software>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1187040">
+				<rom name="soapland story.d88" size="1187040" crc="9dbb2392" sha1="21cd5846770f62c37a4b5118fad7bb2ad25d1f3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="softhard">
 		<description>Soft de Hard na Monogatari</description>
@@ -70292,6 +70292,21 @@ Driver disks for [C-Bus] network cards
 			<feature name="part_id" value="Disk 6"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="disk6.hdm" size="1261568" crc="6b45307b" sha1="3ad3124069a074dc84e62454908007ffe9517e0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcfxga" supported="no">
+		<description>PC-FXGA (C-Bus version)</description>
+		<year>1995</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Install disk for [PC-FXGA]
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk" />
+			<dataarea name="flop" size="1265664">
+				<rom name="pc-fxga.fdi" size="1265664" crc="f2547992" sha1="1bcb715d02acfa89f75578bfa655b01db5726206" offset="0" />
 			</dataarea>
 		</part>
 	</software>

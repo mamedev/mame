@@ -66,24 +66,40 @@ public:
 	}
 
 	bw2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~bw2_expansion_slot_device();
+	virtual ~bw2_expansion_slot_device() { }
+
+	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
 
 	// computer interface
-	uint8_t cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
-	void cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6);
+	void ram_select(int bank);
 
-	uint8_t slot_r(offs_t offset);
-	void slot_w(offs_t offset, uint8_t data);
+	void rs232_select(int state);
 
-	uint8_t modsel_r(offs_t offset);
-	void modsel_w(offs_t offset, uint8_t data);
+	u8 slot_r(offs_t offset);
+	void slot_w(offs_t offset, u8 data);
+
+	u8 modsel_r(offs_t offset);
+	void modsel_w(offs_t offset, u8 data);
+
+	// card interface
+	required_address_space memspace() { return m_memspace; }
+
+	bool ram2() const { return m_bank == 2; }
+	bool ram3() const { return m_bank == 3; }
+	bool ram4() const { return m_bank == 4; }
+	bool ram5() const { return m_bank == 5; }
+	bool ram6() const { return m_bank == 6; }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
-	device_bw2_expansion_slot_interface *m_cart;
+	required_address_space m_memspace;
+
+private:
+	device_bw2_expansion_slot_interface *m_card;
+
+	int m_bank;
 };
 
 
@@ -94,20 +110,19 @@ class device_bw2_expansion_slot_interface : public device_interface
 {
 public:
 	// construction/destruction
-	virtual ~device_bw2_expansion_slot_interface();
+	device_bw2_expansion_slot_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_bw2_expansion_slot_interface() { }
 
-	virtual uint8_t bw2_cd_r(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) { return data; }
-	virtual void bw2_cd_w(offs_t offset, uint8_t data, int ram2, int ram3, int ram4, int ram5, int ram6) { }
+	virtual void ram_select() { }
+	virtual void rs232_select(int state) { }
 
-	virtual uint8_t bw2_slot_r(offs_t offset) { return 0xff; }
-	virtual void bw2_slot_w(offs_t offset, uint8_t data) { }
+	virtual u8 slot_r(offs_t offset) { return 0xff; }
+	virtual void slot_w(offs_t offset, u8 data) { }
 
-	virtual uint8_t bw2_modsel_r(offs_t offset) { return 0xff; }
-	virtual void bw2_modsel_w(offs_t offset, uint8_t data) { }
+	virtual u8 modsel_r(offs_t offset) { return 0xff; }
+	virtual void modsel_w(offs_t offset, u8 data) { }
 
 protected:
-	device_bw2_expansion_slot_interface(const machine_config &mconfig, device_t &device);
-
 	bw2_expansion_slot_device *m_slot;
 };
 

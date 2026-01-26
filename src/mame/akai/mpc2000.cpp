@@ -19,6 +19,12 @@
         Panel controller CPU: NEC uPD78C10AGQ @ 12 MHz
         Sound DSP: L7A1045-L6028
 
+    TODO:
+        - FDC motor is never turned off, at least via auxcmd.  Is there some other uPD76x
+          mechanism that might do this?  Floppy sounds are disabled for now because of this.
+        - SCSI and ATA don't work (SCSI has the same issues as MPC3000, likely the same cause)
+        - Boot ROM is an Intel E28F800B5 "boot block flash", and can be live updated.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -41,6 +47,7 @@
 #include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
+#include "machine/intelfsh.h"
 #include "machine/mb87030.h"
 #include "machine/mb89371.h"
 #include "machine/pit8253.h"
@@ -53,6 +60,10 @@
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include "mpc2000xl.lh"
+
+#define ENABLE_FLASH (0)
+
 static constexpr uint8_t BIT4 = (1 << 4);
 static constexpr uint8_t BIT5 = (1 << 5);
 
@@ -64,12 +75,16 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
 		, m_dsp(*this, "dsp")
+#if ENABLE_FLASH
+		, m_flash(*this, "flash%u", 0U)
+#endif
 		, m_screen(*this, "screen")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:0")
 		, m_ata(*this, "ata")
 		, m_sio(*this, "sio")
 		, m_keys(*this, "Y%u", 0)
+		, m_drums(*this, "PB%u", 0)
 		, m_dataentry(*this, "DATAENTRY")
 		, m_key_scan_row(0)
 		, m_drum_scan_row(0)
@@ -82,6 +97,7 @@ public:
 		, m_fdc_drq(0)
 		, m_ata_irq(0)
 		, m_ata_drq(0)
+		, m_wadcsn(0)
 		, m_lcdx{ 0, 0 }
 		, m_lcdy{ 0, 0 }
 		, m_lcdcmd{ 0, 0 }
@@ -99,12 +115,16 @@ private:
 	required_device<v53a_device> m_maincpu;
 	required_device<upd7810_device> m_subcpu;
 	required_device<l7a1045_sound_device> m_dsp;
+#if ENABLE_FLASH
+	required_device_array<intel_28f016sa_16bit_device, 8> m_flash;
+#endif
 	required_device<screen_device> m_screen;
 	required_device<upd72069_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<ata_interface_device> m_ata;
 	required_device<mb89371_device> m_sio;
 	required_ioport_array<8> m_keys;
+	required_ioport_array<4> m_drums;
 	required_ioport m_dataentry;
 
 	static void floppies(device_slot_interface &device);
@@ -116,6 +136,7 @@ private:
 	void mpc2000_io_map(address_map &map) ATTR_COLD;
 	void mpc2000_sub_map(address_map &map) ATTR_COLD;
 	void dsp_map(address_map &map) ATTR_COLD;
+	void dsp_rom_map(address_map &map) ATTR_COLD;
 
 	uint8_t dma_memr_cb(offs_t offset);
 	void dma_memw_cb(offs_t offset, uint8_t data);
@@ -126,12 +147,18 @@ private:
 	template <int cs> void lcd_csw(offs_t offset, uint8_t data);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	uint8_t wadcsn_r();
+	void wadcn_w(uint8_t data);
+
 	uint8_t subcpu_pa_r();
 	uint8_t subcpu_pb_r();
 	uint8_t subcpu_pc_r();
 	void subcpu_pb_w(uint8_t data);
 	void subcpu_pc_w(uint8_t data);
-	uint8_t an_pads_r();
+	uint8_t an0_pads_r();
+	uint8_t an1_pads_r();
+	uint8_t an2_pads_r();
+	uint8_t an3_pads_r();
 	uint8_t an4_r();
 
 	void fdc_scsi_w(int state);
@@ -149,6 +176,7 @@ private:
 	int m_last_dial, m_count_dial, m_quadrature_phase;
 	int m_fdc_ata, m_fdc_irq, m_fdc_drq, m_ata_irq, m_ata_drq;
 
+	uint8_t m_wadcsn;
 	uint16_t m_lcdx[2];
 	uint8_t m_lcdy[2], m_lcdcmd[2];
 	uint16_t m_vram[256*64];
@@ -170,9 +198,15 @@ void mpc2000_state::machine_reset()
 
 void mpc2000_state::mpc2000_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).ram(); // RAM is 2x HM5118160 (1M x 16 bit) for a total of 4MiB
-	map(0x080000, 0x0fffff).rom().region("maincpu", 0);
-	map(0x100000, 0x3fffff).ram();
+	map(0x00'0000, 0x07'ffff).ram(); // RAM is 2x HM5118160 (1M x 16 bit) for a total of 4MiB
+	map(0x08'0000, 0x0f'ffff).rom().region("maincpu", 0).mirror(0x70'0000);
+	map(0x10'0000, 0x17'ffff).ram();
+	map(0x20'0000, 0x27'ffff).ram();
+	map(0x30'0000, 0x37'ffff).ram();
+	map(0x40'0000, 0x47'ffff).ram();
+	map(0x50'0000, 0x57'ffff).ram();
+	map(0x60'0000, 0x67'ffff).ram();
+	map(0x70'0000, 0x77'ffff).ram();
 }
 
 /*
@@ -200,6 +234,7 @@ void mpc2000_state::mpc2000_io_map(address_map &map)
 	map(0x0060, 0x0063).rw(FUNC(mpc2000_state::lcd_csr), FUNC(mpc2000_state::lcd_csw<0>)).umask16(0x00ff);
 	map(0x0080, 0x008f).m(m_dsp, FUNC(l7a1045_sound_device::map));
 	map(0x00a0, 0x00a3).nopw(); // silence effects writes
+	map(0x00c0, 0x00c0).rw(FUNC(mpc2000_state::wadcsn_r), FUNC(mpc2000_state::wadcn_w)).umask16(0x00ff);
 	map(0x00e0, 0x00ff).rw(m_ata, FUNC(ata_interface_device::cs1_r), FUNC(ata_interface_device::cs1_w));
 
 	map(0x0100, 0x0103).rw(FUNC(mpc2000_state::lcd_csr), FUNC(mpc2000_state::lcd_csw<1>)).umask16(0x00ff);
@@ -240,10 +275,24 @@ void mpc2000_state::dsp_map(address_map &map)
 	map(0x0000'0000, 0x01ff'ffff).ram();
 }
 
+void mpc2000_state::dsp_rom_map(address_map &map)
+{
+#if ENABLE_FLASH
+	map(0x0000'0000, 0x001f'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x0020'0000, 0x003f'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x0040'0000, 0x005f'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x0060'0000, 0x007f'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x0080'0000, 0x009f'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x00a0'0000, 0x00bf'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x00c0'0000, 0x00df'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+	map(0x00e0'0000, 0x00ff'ffff).rw(m_flash[0], FUNC(intel_28f016sa_16bit_device::read), FUNC(intel_28f016sa_16bit_device::write));
+#endif
+}
+
 void mpc2000_state::mpc2000_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(64, 140, 250));
-	palette.set_pen_color(1, rgb_t(230, 240, 250));
+	palette.set_pen_color(0, rgb_t(230, 240, 250));
+	palette.set_pen_color(1, rgb_t(64, 140, 250));
 }
 
 u32 mpc2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -302,6 +351,24 @@ template <int cs> void mpc2000_state::lcd_csw(offs_t offset, uint8_t data)
 template void mpc2000_state::lcd_csw<0>(offs_t offset, uint8_t data);
 template void mpc2000_state::lcd_csw<1>(offs_t offset, uint8_t data);
 
+// WADCSN, handled by Xilinx FPGA at IC220
+// bit 7 = 1 to enable the right channel input
+// bit 6 = 1 to enable the left channel input
+// bit 5 is always clear
+// bit 4 is always set
+// bit 3 = 1 to disable analog input
+// bit 2 = 1 to enable S/PDIF digital input
+// bit 1 is always set
+// bit 0 is always clear
+uint8_t mpc2000_state::wadcsn_r()
+{
+	return m_wadcsn;
+}
+
+void mpc2000_state::wadcn_w(uint8_t data)
+{
+	m_wadcsn = data;
+}
 
 INPUT_CHANGED_MEMBER(mpc2000_state::variation_changed)
 {
@@ -339,6 +406,7 @@ uint8_t mpc2000_state::subcpu_pa_r()
 
 uint8_t mpc2000_state::subcpu_pb_r()
 {
+	// There's a vestigal read and shift right 4 of this at subcpu PC=218 but it appears unused.
 	return 0;
 }
 
@@ -406,9 +474,40 @@ void mpc2000_state::subcpu_pc_w(uint8_t data)
 	m_key_scan_row = ((data ^ 0xff) >> 1) & 7;
 }
 
-uint8_t mpc2000_state::an_pads_r()
+uint8_t mpc2000_state::an0_pads_r()
 {
-	return 0xff;
+	if (m_drums[m_drum_scan_row]->read() & 0x80)
+	{
+		return 0xff;
+	}
+	return 0;
+}
+
+uint8_t mpc2000_state::an1_pads_r()
+{
+	if (m_drums[m_drum_scan_row]->read() & 0x40)
+	{
+		return 0xff;
+	}
+	return 0;
+}
+
+uint8_t mpc2000_state::an2_pads_r()
+{
+	if (m_drums[m_drum_scan_row]->read() & 0x20)
+	{
+		return 0xff;
+	}
+	return 0;
+}
+
+uint8_t mpc2000_state::an3_pads_r()
+{
+	if (m_drums[m_drum_scan_row]->read() & 0x10)
+	{
+		return 0xff;
+	}
+	return 0;
 }
 
 uint8_t mpc2000_state::an4_r()
@@ -540,10 +639,10 @@ void mpc2000_state::mpc2000(machine_config &config)
 	m_subcpu->pc_in_cb().set(FUNC(mpc2000_state::subcpu_pc_r));
 	m_subcpu->pb_out_cb().set(FUNC(mpc2000_state::subcpu_pb_w));
 	m_subcpu->pc_out_cb().set(FUNC(mpc2000_state::subcpu_pc_w));
-	m_subcpu->an0_func().set(FUNC(mpc2000_state::an_pads_r));
-	m_subcpu->an1_func().set(FUNC(mpc2000_state::an_pads_r));
-	m_subcpu->an2_func().set(FUNC(mpc2000_state::an_pads_r));
-	m_subcpu->an3_func().set(FUNC(mpc2000_state::an_pads_r));
+	m_subcpu->an0_func().set(FUNC(mpc2000_state::an0_pads_r));
+	m_subcpu->an1_func().set(FUNC(mpc2000_state::an1_pads_r));
+	m_subcpu->an2_func().set(FUNC(mpc2000_state::an2_pads_r));
+	m_subcpu->an3_func().set(FUNC(mpc2000_state::an3_pads_r));
 	m_subcpu->an4_func().set(FUNC(mpc2000_state::an4_r));
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
@@ -564,7 +663,7 @@ void mpc2000_state::mpc2000(machine_config &config)
 
 	FLOPPY_CONNECTOR(config, m_floppy, mpc2000_state::floppies, "35hd", add_formats).enable_sound(false);
 
-	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, false);
+	ATA_INTERFACE(config, m_ata).options(ata_devices, "cdrom", nullptr, false);
 	m_ata->irq_handler().set(FUNC(mpc2000_state::ata_irq_w));
 	m_ata->dmarq_handler().set(FUNC(mpc2000_state::ata_drq_w));
 
@@ -610,6 +709,7 @@ void mpc2000_state::mpc2000(machine_config &config)
 
 	L7A1045(config, m_dsp, 33.8688_MHz_XTAL); // clock verified by schematic
 	m_dsp->set_addrmap(AS_DATA, &mpc2000_state::dsp_map);
+	m_dsp->set_addrmap(AS_IO, &mpc2000_state::dsp_rom_map);
 	m_dsp->drq_handler_cb().set(m_maincpu, FUNC(v53a_device::dreq_w<3>));
 	m_dsp->add_route(l7a1045_sound_device::L6028_LEFT, "speaker", 1.0, 0);
 	m_dsp->add_route(l7a1045_sound_device::L6028_RIGHT, "speaker", 1.0, 1);
@@ -623,8 +723,21 @@ void mpc2000_state::mpc2000(machine_config &config)
 	m_dsp->add_route(l7a1045_sound_device::L6028_OUT6, "outputs", 1.0, 6);
 	m_dsp->add_route(l7a1045_sound_device::L6028_OUT7, "outputs", 1.0, 7);
 
+#if ENABLE_FLASH
+	INTEL_28F016SA_16BIT(config, m_flash[0]);
+	INTEL_28F016SA_16BIT(config, m_flash[1]);
+	INTEL_28F016SA_16BIT(config, m_flash[2]);
+	INTEL_28F016SA_16BIT(config, m_flash[3]);
+	INTEL_28F016SA_16BIT(config, m_flash[4]);
+	INTEL_28F016SA_16BIT(config, m_flash[5]);
+	INTEL_28F016SA_16BIT(config, m_flash[6]);
+	INTEL_28F016SA_16BIT(config, m_flash[7]);
+#endif
+
 	// back compatible with MPC3000 and MPC60 disks
 	SOFTWARE_LIST(config, "flop_mpc3000").set_original("mpc3000_flop");
+
+	config.set_default_layout(layout_mpc2000xl);
 }
 
 static INPUT_PORTS_START( mpc2000 )
@@ -640,7 +753,7 @@ static INPUT_PORTS_START( mpc2000 )
 	PORT_START("Y1")
 	PORT_BIT(0x81, IP_ACTIVE_LOW, IPT_UNUSED)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Soft Key 2") PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Enter") PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2 / Misc") PORT_CODE(KEYCODE_2)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Step >") PORT_CODE(KEYCODE_S)
@@ -697,6 +810,30 @@ static INPUT_PORTS_START( mpc2000 )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Full Level") PORT_CODE(KEYCODE_F8)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Bank D") PORT_CODE(KEYCODE_STOP)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Bank C") PORT_CODE(KEYCODE_COMMA)
+
+	PORT_START("PB0")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 13") PORT_CODE(KEYCODE_PGUP)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 14") PORT_CODE(KEYCODE_NUMLOCK)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 15") PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 16") PORT_CODE(KEYCODE_ASTERISK)
+
+	PORT_START("PB1")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 9") PORT_CODE(KEYCODE_PGDN)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 10") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 11") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 12") PORT_CODE(KEYCODE_9_PAD)
+
+	PORT_START("PB2")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 5") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 6") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 7") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 8") PORT_CODE(KEYCODE_PLUS_PAD)
+
+	PORT_START("PB3")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 1") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 2") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 3") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Pad 4") PORT_CODE(KEYCODE_3_PAD)
 
 	PORT_START("VARIATION")
 	PORT_ADJUSTER(100, "NOTE VARIATION") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpc2000_state::variation_changed), 1)

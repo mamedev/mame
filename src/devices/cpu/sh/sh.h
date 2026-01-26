@@ -101,24 +101,6 @@ class sh_common_execution : public cpu_device
 {
 
 public:
-	sh_common_execution(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal)
-		: cpu_device(mconfig, type, tag, owner, clock)
-		, m_sh2_state(nullptr)
-		, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
-		, m_drcuml(nullptr)
-		, m_drcoptions(0)
-		, m_entry(nullptr)
-		, m_read8(nullptr)
-		, m_write8(nullptr)
-		, m_read16(nullptr)
-		, m_write16(nullptr)
-		, m_read32(nullptr)
-		, m_write32(nullptr)
-		, m_interrupt(nullptr)
-		, m_nocode(nullptr)
-		, m_out_of_cycles(nullptr)
-	{ }
-
 	// Data that needs to be stored close to the generated DRC code
 	struct internal_sh2_state
 	{
@@ -203,6 +185,8 @@ protected:
 		EXECUTE_UNMAPPED_CODE       = 2,
 		EXECUTE_RESET_CACHE         = 3
 	};
+
+	sh_common_execution(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal);
 
 	void ADD(uint32_t m, uint32_t n);
 	void ADDI(uint32_t i, uint32_t n);

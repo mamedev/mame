@@ -6,13 +6,13 @@
 
 ***************************************************************************/
 
-
 #include "emu.h"
 
 #include "cpu/sh/sh4.h"
 
-#include "screen.h"
 #include "emupal.h"
+#include "screen.h"
+
 
 namespace {
 
@@ -28,15 +28,15 @@ public:
 	void hp620lx(machine_config &config);
 
 protected:
-	virtual void machine_start() override ATTR_COLD { };
+	virtual void machine_start() override ATTR_COLD { }
 
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
 	void hp620lx_map(address_map &map) ATTR_COLD;
-	void hp620lx_palette(palette_device &palette) const ATTR_COLD { };
-	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; };
+	void hp620lx_palette(palette_device &palette) const ATTR_COLD { }
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; }
 };
 
 void hp620lx_state::hp620lx_map(address_map &map)

@@ -492,7 +492,7 @@ Incorrect layout on track 1 head 0, expected_size=100000, current_size=135872
 	</software>
 
 	<software name="profmja" cloneof="profmj">
-		<description>Professional Mahjong (v2.1, Alt)</description>
+		<description>Professional Mahjong (v2.1, alt)</description>
 		<year>198?</year>
 		<publisher>シャノアール (Chat Noir)</publisher>
 		<info name="alt_title" value="プロフェッショナル麻雀"/>

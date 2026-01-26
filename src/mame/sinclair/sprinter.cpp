@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Andrei I. Holub
+// thanks-to:Blade, TolikTrek, RomanRom2
 /*******************************************************************************************
 
 Sprinter Sp2000 (Peters Plus Ltd)

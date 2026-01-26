@@ -25,8 +25,9 @@
 
 debug_view_disasm_source::debug_view_disasm_source(std::string &&name, device_t &device)
 	: debug_view_source(std::move(name), &device),
-		m_space(device.memory().space(AS_PROGRAM)),
-		m_decrypted_space(device.memory().has_space(AS_OPCODES) ? device.memory().space(AS_OPCODES) : device.memory().space(AS_PROGRAM)),
+		m_dev(&device.memory()),
+		m_space(AS_PROGRAM),
+		m_decrypted_space(device.memory().has_logical_space(AS_OPCODES) ? AS_OPCODES : AS_PROGRAM),
 		m_pcbase(nullptr)
 {
 	const device_state_interface *state;
@@ -93,7 +94,7 @@ void debug_view_disasm::enumerate_sources()
 	// iterate over devices with disassembly interfaces
 	for (device_disasm_interface &dasm : disasm_interface_enumerator(machine().root_device()))
 	{
-		if (dasm.device().memory().space_config(AS_PROGRAM))
+		if (dasm.device().memory().has_logical_space(AS_PROGRAM))
 		{
 			m_source_list.emplace_back(
 					std::make_unique<debug_view_disasm_source>(
@@ -122,7 +123,8 @@ void debug_view_disasm::view_notify(debug_view_notification type)
 	{
 		const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 		m_expression.set_context(&source.device()->debug()->symtable());
-		m_expression.set_default_base(source.space().is_octal() ? 8 : 16);
+		auto [dev, space] = source.space();
+		m_expression.set_default_base(dev->logical_space_config(space)->is_octal() ? 8 : 16);
 	}
 }
 
@@ -242,7 +244,9 @@ bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
 {
 	// Consider that instructions are 64 bytes max
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-	int shift = source.m_space.addr_shift();
+	auto [dev, space] = source.space();
+	const address_space_config *config = dev->logical_space_config(space);
+	int shift = config->addr_shift();
 
 	offs_t backwards_offset;
 	if(shift < 0)
@@ -254,7 +258,7 @@ bool debug_view_disasm::generate_with_pc(debug_disasm_buffer &buffer, offs_t pc)
 
 	m_dasm.clear();
 	m_recompute = false;
-	offs_t address = (pc - m_backwards_steps*backwards_offset) & source.m_space.logaddrmask();
+	offs_t address = (pc - m_backwards_steps*backwards_offset) & config->logaddrmask();
 	// Handle wrap at 0
 	if(address > pc)
 		address = 0;
@@ -324,7 +328,9 @@ void debug_view_disasm::generate_dasm(debug_disasm_buffer &buffer, offs_t pc)
 			m_topleft.y = 0;
 		}
 		const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-		generate_from_address(buffer, m_expression.value() & source.m_space.logaddrmask());
+		auto [dev, space] = source.space();
+		const address_space_config *config = dev->logical_space_config(space);
+		generate_from_address(buffer, m_expression.value() & config->logaddrmask());
 		return;
 	}
 
@@ -560,7 +566,9 @@ void debug_view_disasm::set_disasm_width(u32 width)
 void debug_view_disasm::set_selected_address(offs_t address)
 {
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
-	address = address & source.m_space.logaddrmask();
+	auto [dev, space] = source.space();
+	const address_space_config *config = dev->logical_space_config(space);
+	address = address & config->logaddrmask();
 	for(int line = 0; line < m_total.y; line++)
 		if(m_dasm[line].m_address == address) {
 			m_cursor.y = line;
