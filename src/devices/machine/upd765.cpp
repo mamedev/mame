@@ -225,6 +225,9 @@ void ps2_fdc_device::set_mode(mode_t _mode)
 
 void upd765_family_device::device_start()
 {
+	save_item(NAME(external_ready));
+	//save_item(NAME(mode));
+	save_item(NAME(main_phase));
 	save_item(NAME(selected_drive));
 	save_item(NAME(drive_busy));
 
