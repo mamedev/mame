@@ -805,6 +805,19 @@ void sb16_lle_device::device_start()
 	save_item(NAME(m_dma16_cnt));
 	//save_item(NAME(m_adc_fifo)); /*temporarely decision*/
 	//save_item(NAME(m_dac_fifo));
+	save_item(NAME(m_adc_fifo_head));
+	save_item(NAME(m_adc_fifo_tail));
+	save_item(NAME(m_dac_fifo_head));
+	save_item(NAME(m_dac_fifo_tail));
+	save_item(NAME(m_adc_r));
+	save_item(NAME(m_dac_r));
+	save_item(NAME(m_adc_h));
+	save_item(NAME(m_dac_h));
+	save_item(NAME(m_irq8));
+	save_item(NAME(m_irq16));
+	save_item(NAME(m_irq_midi));
+	save_item(NAME(m_dma8_done));
+	save_item(NAME(m_dma16_done));
 }
 
 
