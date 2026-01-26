@@ -41,6 +41,7 @@ madam_device::madam_device(const machine_config &mconfig, const char *tag, devic
 	, m_irq_dexp_cb(*this)
 	, m_playerbus_read_cb(*this, 0)
 	, m_irq_dply_cb(*this)
+	, m_is_pal(false)
 {
 }
 
@@ -56,6 +57,8 @@ void madam_device::device_start()
 	m_dma_exp_timer = timer_alloc(FUNC(madam_device::dma_exp_cb), this);
 	m_dma_playerbus_timer = timer_alloc(FUNC(madam_device::dma_playerbus_cb), this);
 	m_cel_timer = timer_alloc(FUNC(madam_device::cel_tick_cb), this);
+
+	m_display_hclocks = m_is_pal ? 384 : 320;
 
 	// max vcnt x max tlhpcnt, for Packed stuff
 	// TODO: reduce footprint
@@ -627,7 +630,7 @@ void madam_device::vdlp_continue_w(int state)
 	{
 		u32 y_base = (m_vdlp.y_src & ~1) * (m_vdlp.modulo);
 		u8 shift = ((m_vdlp.y_src & 1) ^ 1) * 16;
-		for (int x = 0; x < 320; x++)
+		for (int x = 0; x < m_display_hclocks; x++)
 		{
 			const u32 dot = m_dma32_read_cb(m_vdlp.fb_address + ((x + y_base) << 2));
 			m_amy->pixel_xfer(x, m_vdlp.y_dest, dot >> shift);
@@ -708,6 +711,7 @@ void madam_device::cel_start_w(offs_t offset, u32 data, u32 mem_mask)
 	m_cel.address = m_dma[26][1];
 	m_statbits |= 1 << 4;
 	m_statbits &= ~(1 << 6);
+	m_cel.next_ptr = m_cel.source_ptr = m_cel.plut_ptr = 0;
 	m_cel_timer->adjust(attotime::from_ticks(2, this->clock()));
 }
 
@@ -737,6 +741,15 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			LOGCEL("CEL fetch params [%08x] flags=%08x\n", m_cel.address, m_cel.current_ccb);
 			m_cel.skip = !!BIT(m_cel.current_ccb, 31);
 			m_cel.last = !!BIT(m_cel.current_ccb, 30);
+			const bool npabs = !!BIT(m_cel.current_ccb, 29);
+			// FIXME: as below
+			if (!npabs && m_cel.next_ptr && !m_cel.last)
+			{
+				popmessage("CEL actual relative next_ptr use at %08x (current %08x -> %08x)", m_cel.address, m_cel.next_ptr, m_dma32_read_cb(m_cel.address + 0x04));
+				m_statbits |= (1 << 6);
+				cel_stop_w(0, 0, 0xffffffff);
+				return;
+			}
 			m_cel.next_ptr = m_dma32_read_cb(m_cel.address + 0x04);
 
 			if (m_cel.skip && m_cel.last)
@@ -760,7 +773,6 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				tick_time += 1;
 			}
 
-			const bool npabs = !!BIT(m_cel.current_ccb, 29);
 			const bool spabs = !!BIT(m_cel.current_ccb, 28);
 			const bool ppabs = !!BIT(m_cel.current_ccb, 27);
 			const bool ldsize = !!BIT(m_cel.current_ccb, 26);
@@ -809,7 +821,8 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			);
 			// FIXME: relative to what?
 			// - 3do_fz1 / 3do_fz10 RGB dots (scaled by hdx/vdy=8.0) are the first & last entry setup, relative to zero?
-			if (!npabs || !spabs || !ppabs)
+			// - ditto for "Welcome To Photo CD Imaging" app startup
+			if ((!spabs && m_cel.source_ptr) || (!ppabs && m_cel.plut_ptr))
 			{
 				popmessage("CEL relative address use at %08x %d|%d|%d", m_cel.address, npabs, spabs, ppabs);
 				m_statbits |= (1 << 6);
@@ -917,11 +930,13 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, bpp
 				, BPP_VALUES[bpp]
 			);
+			const u16 woffset8 =  ((m_cel.pre1 >> 24) & 0x7f) + 2;
 			const u16 woffset10 = ((m_cel.pre1 >> 16) & 0x3ff) + 2;
+			const u16 woffset = bpp >= 5 ? woffset10 : woffset8;
 			const bool lrform = !!BIT(m_cel.pre1, 11);
 			const u16 tlhpcnt = ((m_cel.pre1 >> 0) & 0x7ff) + 1;
 			LOGCEL("    woffset(8)=%d woffset(10)=%d noswap=%d unclsb=%d lrform=%d tlhpcnt=%d\n"
-				, ((m_cel.pre1 >> 24) & 0x7f) + 2
+				, woffset8
 				, woffset10
 				, BIT(m_cel.pre1, 14)
 				, (m_cel.pre1 >> 12) & 3
@@ -935,12 +950,8 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			const u16 dst_pitch = m_regis.fb_pitch[1];
 
 			// encode source addressing in an easy to digest inner loop form
-			const u8 actual_src_mode = (m_cel.packed << 1) | lrform;
+			const u8 actual_src_mode = m_cel.packed ? 32 : (bpp << 2) | (uncoded << 1) | lrform;
 
-			// - 3do_gdo101 uses mostly this, with lrform + packed enabled on several elements
-			//   (the 3DO logo)
-			// - 3do_fz1 uses uncoded=0 + bpp=4
-			if ((m_cel.packed && bpp == 3) || (m_cel.packed && bpp == 4) || (bpp == 6))
 			{
 				for (int y = 0; y < vcnt; y++)
 				{
@@ -955,7 +966,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 						if (xpos != std::clamp<unsigned>(xpos, 0, xclip))
 							continue;
 
-						u16 src_data = (this->*get_pixel_table[actual_src_mode])(x, y, woffset10);
+						u16 src_data = (this->*get_pixel_table[actual_src_mode])(x, y, woffset);
 
 						// opaque check
 						if (!src_data && !m_cel.bgnd)
@@ -1231,15 +1242,101 @@ u32 madam_device::cel_decompress()
  *
  *****************/
 
-const madam_device::get_pixel_func madam_device::get_pixel_table[4] =
+const madam_device::get_pixel_func madam_device::get_pixel_table[32 + 1] =
 {
-	&madam_device::get_uncompressed_16bpp_lrform0,
-	&madam_device::get_uncompressed_16bpp_lrform1,
-	&madam_device::get_compressed_16bpp,
-	&madam_device::get_compressed_16bpp
+	// 0 <invalid>
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 1bpp
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 2bpp
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 4bpp
+	&madam_device::get_pixel_4bpp_coded_lrform0,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 6bpp
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 8bpp
+	&madam_device::get_pixel_8bpp_coded_lrform0,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 16bpp
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_16bpp_uncoded_lrform0,
+	&madam_device::get_pixel_16bpp_uncoded_lrform1,
+	// 7 <invalid>
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// packed handling (directly extended from RLE)
+	&madam_device::get_pixel_packed
 };
 
-u16 madam_device::get_uncompressed_16bpp_lrform0(int x, int y, u16 woffset)
+u16 madam_device::get_pixel_invalid(int x, int y, u16 woffset)
+{
+	// arbitrary mesh pattern so it will be obvious if triggered
+	u16 src_data = BIT(x + y, 0) ? 0x001f : 0x7fe0;
+	return src_data;
+}
+
+// - fz1/fz10 spinning RGB cube drops
+// - Photo CD numerical indices
+u16 madam_device::get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+	u32 plut_address = m_cel.plut_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	cel_address += ((x & ~1) >> 1);
+	u8 src_shift = (x & 1) ^ 1;
+
+//	u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 4)) & 0xf;
+	u16 plut_data = (m_dma8_read_cb(cel_address) >> (src_shift * 4)) & 0xf;
+	plut_data <<= 1;
+
+	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
+	return src_data;
+}
+
+
+// - fz10 Storage Managers
+u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+	u32 plut_address = m_cel.plut_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	cel_address += ((x) << 0);
+	//u8 src_shift = (x & 3) ^ 3;
+
+//	u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 8)) & 0xff;
+	u16 plut_data = m_dma8_read_cb(cel_address);
+	plut_data <<= 1;
+
+	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
+	return src_data;
+}
+
+// - BIOSes in general
+u16 madam_device::get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
@@ -1252,7 +1349,7 @@ u16 madam_device::get_uncompressed_16bpp_lrform0(int x, int y, u16 woffset)
 	return src_data;
 }
 
-u16 madam_device::get_uncompressed_16bpp_lrform1(int x, int y, u16 woffset)
+u16 madam_device::get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
@@ -1265,7 +1362,7 @@ u16 madam_device::get_uncompressed_16bpp_lrform1(int x, int y, u16 woffset)
 	return src_data;
 }
 
-u16 madam_device::get_compressed_16bpp(int x, int y, u16 woffset)
+u16 madam_device::get_pixel_packed(int x, int y, u16 woffset)
 {
 	const u16 pitch = 0x1000;
 

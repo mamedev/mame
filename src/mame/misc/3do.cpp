@@ -318,7 +318,9 @@ void _3do_state::_3do(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: proper params (mostly running in interlace mode)
-	m_screen->set_raw(X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262);
+	// htotal=1592 according to page 36 of HW spec, this is off wrt 15.734 kHz spec
+	// (half clocks during HSync?)
+	m_screen->set_raw(X2_CLOCK_NTSC / 2, 1560, 254, 1534, 263, 22, 262);
 	m_screen->set_screen_update(m_amy, FUNC(amy_device::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
@@ -339,9 +341,12 @@ void _3do_state::_3do_pal(machine_config &config)
 	green_config(config);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: proper params
-	m_screen->set_raw(X2_CLOCK_PAL / 2, 1592, 254, 1534, 313, 22, 312);
+	// TODO: as above, actual params are unknown
+	// assumed 15.625 kHz as per PAL spec, display range looks a bit off
+	m_screen->set_raw(X2_CLOCK_PAL / 2, 1888, 254, 1790, 313, 22, 312);
 	m_screen->set_screen_update(m_amy, FUNC(amy_device::screen_update));
+	m_amy->set_is_pal(true);
+	m_madam->set_is_pal(true);
 
 	SPEAKER(config, "speaker", 2).front();
 

@@ -30,6 +30,9 @@ public:
 	auto playerbus_read_cb()    { return m_playerbus_read_cb.bind(); }
 	auto irq_dply_cb()          { return m_irq_dply_cb.bind(); }
 
+	// init setter
+	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
+
 	void map(address_map &map);
 
 	void vdlp_start_w(int state);
@@ -87,6 +90,9 @@ private:
 	uint32_t  m_mult_control = 0;   /* 033007f0-033007f4 */
 	uint32_t  m_mult_status = 0;    /* 033007f8 */
 
+	bool m_is_pal;
+	u16 m_display_hclocks;
+
 	struct {
 		u32 address;
 		u16 scanlines;
@@ -136,10 +142,13 @@ private:
 	u32 cel_decompress();
 
 	typedef u16 (madam_device::*get_pixel_func)(int x, int y, u16 woffset);
-	static const get_pixel_func get_pixel_table[4];
-	u16 get_uncompressed_16bpp_lrform0(int x, int y, u16 woffset);
-	u16 get_uncompressed_16bpp_lrform1(int x, int y, u16 woffset);
-	u16 get_compressed_16bpp(int x, int y, u16 woffset);
+	static const get_pixel_func get_pixel_table[32 + 1];
+	u16 get_pixel_invalid(int x, int y, u16 woffset);
+	u16 get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset);
+	u16 get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset);
+	u16 get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset);
+	u16 get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset);
+	u16 get_pixel_packed(int x, int y, u16 woffset);
 
 	typedef u16 (madam_device::*get_woffset_func)(u32 ptr);
 	static const get_woffset_func get_woffset_table[2];
