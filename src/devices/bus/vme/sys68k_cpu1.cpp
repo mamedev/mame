@@ -148,6 +148,8 @@ vme_sys68k_cpu1_card_device::vme_sys68k_cpu1_card_device(machine_config const &m
 	, m_serial_p3(*this, "SERIAL_P3")
 	, m_serial_p4(*this, "SERIAL_P4")
 	, m_serial_p5(*this, "SERIAL_P5")
+	, m_panel(*this, "PANEL")
+	, m_halt_led(*this, "led_halt")
 	, m_cart(*this, "exp_rom1")
 	, m_eprom(*this, "eprom")
 	, m_ram(*this, "ram")
@@ -214,6 +216,10 @@ static INPUT_PORTS_START (sys68k_cpu1)
 	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150/600")
 	PORT_CONFSETTING(mc14411_device::TIMER_F13, "110/440")
 	PORT_CONFSETTING(mc14411_device::TIMER_F15, "60/240")
+
+	PORT_START("PANEL")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RESET") PORT_CODE(KEYCODE_F5) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vme_sys68k_cpu1_card_device::reset_button), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ABORT") PORT_CODE(KEYCODE_F6) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vme_sys68k_cpu1_card_device::abort_button), 0)
 
 INPUT_PORTS_END
 
@@ -292,10 +298,33 @@ void vme_sys68k_cpu1_card_device::centronics_select_w(int state)
 	m_pit->portb_setbit(0, state);
 }
 
+/* Front panel RESET button */
+INPUT_CHANGED_MEMBER(vme_sys68k_cpu1_card_device::reset_button)
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+/* Front panel ABORT button — directly wired to IRQ level 7, vector 31 */
+INPUT_CHANGED_MEMBER(vme_sys68k_cpu1_card_device::abort_button)
+{
+	m_maincpu->set_input_line(M68K_IRQ_7, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+/* Poll CPU halt state for the front panel HALT LED */
+TIMER_CALLBACK_MEMBER(vme_sys68k_cpu1_card_device::halt_update)
+{
+	m_halt_led = m_maincpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET) ? 1 : 0;
+}
+
 /* Start it up */
 void vme_sys68k_cpu1_card_device::device_start()
 {
 	LOG("%s\n", FUNCNAME);
+
+	// Front panel HALT LED
+	m_halt_led.resolve();
+	m_halt_timer = timer_alloc(FUNC(vme_sys68k_cpu1_card_device::halt_update), this);
+	m_halt_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_ack));
