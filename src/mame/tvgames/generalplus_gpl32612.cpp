@@ -382,6 +382,12 @@ ROM_START( doraet17 )
 	ROM_IGNORE(0x50) // 'config' bytes
 ROM_END
 
+ROM_START( banpear )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25l643.u5", 0x0000, 0x800000, CRC(5b378083) SHA1(3aa13d1220e4db7be4420dfd2a5d11300359a12c) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
 ROM_START( intrtvg )
 	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
@@ -623,6 +629,8 @@ CONS( 2019, anpncp19,        0,        0,      gpl32612, gpl32612, generalplus_g
 // uses GPL32630A has GPspispi header
 CONS( 2017, doraet17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon 2017 Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// uses a glob, has GPspispi header, "Pear 265077A. 2022 11 22" on PCB
+CONS( 2022, banpear,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Bandai Pear (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // company is called 深圳市飞讯互动科技有限公司
 // surface details erased on SoC for both of these

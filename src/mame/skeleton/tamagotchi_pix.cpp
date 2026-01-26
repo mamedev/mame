@@ -140,6 +140,13 @@ ROM_START( tamapix )
 	ROM_LOAD( "25q64.u5", 0x000000, 0x800000, CRC(559d0cc8) SHA1(bd5510a38cd4b293bc89bced99718d2998c5b893) )
 ROM_END
 
+ROM_START( suitcase )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	// this is an SPI ROM so there's an internal bootstrap at least
+	ROM_LOAD( "25l6433.bin", 0x000000, 0x800000, CRC(8a60681f) SHA1(d6a58fd6e8b7c3807e7476e6b5602353bb4cc068) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
 ROM_START( precur2w )
 	// this is an SPI ROM so there's an internal bootstrap at least
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
@@ -150,5 +157,6 @@ ROM_END
 
 CONS( 2020, tamapix,       0,              0,      tamapix,  tamapix, tamagotchi_pix_state, empty_init, "Bandai", "Tamagotchi Pix", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
+CONS( 2022, suitcase,      0,              0,      tamapix,  tamapix, tamagotchi_pix_state, empty_init, "Bandai", "Suitcase Pet (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // "Muscat A 2022 01 15" on PCB
 CONS( 2022, precur2w,      0,              0,      precur2w, tamapix, precur2w_state,       empty_init, "Bandai", "PreCure 2-Way Heart (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

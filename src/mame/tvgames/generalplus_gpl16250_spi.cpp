@@ -248,6 +248,14 @@ ROM_START( lxcymls )
 	ROM_LOAD( "25q256.bin", 0x0000, 0x2000000, CRC(76c89fe5) SHA1(99668cbce2ace6ec972ee4e72fec8b93862a0ef4) )
 ROM_END
 
+ROM_START( dgun3944 )
+	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
+	//ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only (if it exists at all)
+
+	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASE00)
+	ROM_LOAD( "by25q128as.bin", 0x0000, 0x1000000, CRC(cf2bfc98) SHA1(f8c984f0278506d74b0b6337d2e96bb9d3a58148) )
+ROM_END
+
 void generalplus_gpspispi_game_state::init_spi()
 {
 	int vectorbase = 0x2fe0;
@@ -338,3 +346,4 @@ CONS(2021, lxcyrace,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_g
 CONS(2021, lxcymsm,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Superman (JL3180SU)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2021, lxcympp,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Paw Patrol (JL3180PA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS(2021, lxcymls,   0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "Lexibook", "Cyber Arcade Motion - Lilo & Stitch (JL3180D_01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS(2021, dgun3944,  0, 0, generalplus_gpspispi, gcm394, generalplus_gpspispi_game_state, empty_init, "dreamGEAR", "My Arcade All Star Sports (Pixel Pocket, DGUNL3944)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
