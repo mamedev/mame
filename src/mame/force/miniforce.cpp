@@ -97,11 +97,7 @@
  */
 #include "emu.h"
 #include "bus/vme/vme.h"
-#include "bus/vme/cp31.h"
-#include "bus/vme/hcpu30.h"
-#include "bus/vme/sys68k_cpu20.h"
-#include "bus/vme/sys68k_iscsi.h"
-#include "bus/vme/sys68k_isio.h"
+#include "bus/vme/vme_cards.h"
 
 #define VERBOSE (0) // (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC printf
@@ -148,15 +144,6 @@ void miniforce_state::machine_reset()
 static INPUT_PORTS_START (miniforce)
 INPUT_PORTS_END
 
-static void miniforce_vme_cards(device_slot_interface &device)
-{
-	device.option_add("cp31",   VME_CP31);
-	device.option_add("cpu21",  VME_SYS68K_CPU21);
-	device.option_add("isio",   VME_SYS68K_ISIO1);
-	device.option_add("iscsi",  VME_SYS68K_ISCSI1);
-	device.option_add("hcpu30", VME_HCPU30);
-}
-
 /*
  * Machine configuration
  */
@@ -164,15 +151,15 @@ void miniforce_state::miniforce(machine_config &config)
 {
 //  ->set_addrmap(AS_PROGRAM, &miniforce_state::miniforce_mem);
 	VME(config, "vme");
-	VME_SLOT(config, "vme:slot1", miniforce_vme_cards, "cpu21");
-	VME_SLOT(config, "vme:slot2", miniforce_vme_cards, nullptr);
-	VME_SLOT(config, "vme:slot3", miniforce_vme_cards, nullptr);
-	VME_SLOT(config, "vme:slot4", miniforce_vme_cards, nullptr);
-	VME_SLOT(config, "vme:slot5", miniforce_vme_cards, nullptr);
-	VME_SLOT(config, "vme:slot6", miniforce_vme_cards, nullptr);
-	VME_SLOT(config, "vme:slot7", miniforce_vme_cards, nullptr);
-	VME_SLOT(config, "vme:slot8", miniforce_vme_cards, nullptr);
-	VME_SLOT(config, "vme:slot9", miniforce_vme_cards, nullptr);
+	VME_SLOT(config, "vme:slot1", vme_cards, "sys68k_cpu21");
+	VME_SLOT(config, "vme:slot2", vme_cards, nullptr);
+	VME_SLOT(config, "vme:slot3", vme_cards, nullptr);
+	VME_SLOT(config, "vme:slot4", vme_cards, nullptr);
+	VME_SLOT(config, "vme:slot5", vme_cards, nullptr);
+	VME_SLOT(config, "vme:slot6", vme_cards, nullptr);
+	VME_SLOT(config, "vme:slot7", vme_cards, nullptr);
+	VME_SLOT(config, "vme:slot8", vme_cards, nullptr);
+	VME_SLOT(config, "vme:slot9", vme_cards, nullptr);
 }
 
 ROM_START(miniforce)
