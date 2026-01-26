@@ -47532,7 +47532,9 @@ rs70_648
 @source:tvgames/myaatari.cpp
 kuniotv
 myaatari
+galghdmi
 pachdmi
+tetrhdmi
 
 @source:tvgames/pubint_storyreader.cpp
 pi_stry
