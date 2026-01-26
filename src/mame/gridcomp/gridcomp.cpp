@@ -156,7 +156,7 @@ private:
 
 	uint32_t screen_update_110x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_generic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int px);
+	uint32_t screen_update_generic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int width, int height);
 
 	void kbd_put(u16 data);
 
@@ -245,15 +245,15 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 	return ret;
 }
 
-uint32_t gridcomp_state::screen_update_generic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int px)
+uint32_t gridcomp_state::screen_update_generic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int width, int height)
 {
-	for (int y = 0; y < 240; y++)
+	for (int y = 0; y < height; y++)
 	{
 		uint16_t *p = &bitmap.pix(y);
 
-		int const offset = y * (px / 16);
+		int const offset = y * (width / 16);
 
-		for (int x = offset; x < offset + px / 16; x++)
+		for (int x = offset; x < offset + width / 16; x++)
 		{
 			uint16_t const gfx = m_videoram[x];
 
@@ -269,12 +269,12 @@ uint32_t gridcomp_state::screen_update_generic(screen_device &screen, bitmap_ind
 
 uint32_t gridcomp_state::screen_update_110x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return screen_update_generic(screen, bitmap, cliprect, 320);
+	return screen_update_generic(screen, bitmap, cliprect, 320, 240);
 }
 
 uint32_t gridcomp_state::screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return screen_update_generic(screen, bitmap, cliprect, 512);
+	return screen_update_generic(screen, bitmap, cliprect, 512, 256);
 }
 
 void gridcomp_state::machine_start()
@@ -459,6 +459,8 @@ void gridcomp_state::grid1139(machine_config &config)
 {
 	grid1131(config);
 	m_ram->set_default_size("512K");
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update_113x));
+	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 256);
 }
 
 
