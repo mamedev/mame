@@ -299,7 +299,8 @@ CONS(2015, anpanm15, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gps
 // ANPANMAN タッチであそぼ！はじめてEnglish (the furigana for "Enlish" says "えいご")
 CONS(2013, anpaneng, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Anpanman: Touch de Asobo! Hajimete English (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
-CONS(201?, jspodred, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "JSPod (red, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// 甲虫王者ムシキング むしとりバトルずかん  (JS Pod on PCB)
+CONS(201?, jspodred, 0, 0, generalplus_gpspispi,         gcm394, generalplus_gpspispi_game_state,         init_spi, "Sega Toys", "Kouchuu Ouja Mushiking: Mushitori Battle Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2015, bkrankp,  0, 0, generalplus_gpspispi_bkrankp, gcm394, generalplus_gpspispi_bkrankp_game_state, init_spi, "Bandai", "Karaoke Ranking Party (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 

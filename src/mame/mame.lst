@@ -19977,9 +19977,6 @@ wtalker
 xl25
 zodiac
 
-@source:handheld/hh_sonix_snc73231.cpp
-precur2w
-
 @source:handheld/hh_ucom4.cpp
 alnchase
 astrocmd
@@ -44375,6 +44372,7 @@ systel100
 luckyvl
 
 @source:skeleton/tamagotchi_pix.cpp
+precur2w
 tamapix
 
 @source:skeleton/tavernie.cpp
