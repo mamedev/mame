@@ -372,6 +372,15 @@ ROM_START( intrtvg )
 	DISK_IMAGE( "interactivetv", 0, SHA1(7061e28c4560b763bda1157036b79c726387e430) )
 ROM_END
 
+ROM_START( arb605 )
+	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q80.u6", 0x0000, 0x100000, CRC(8dbf398e) SHA1(fdee8b93967f79cfd577b944841a65744dd251aa) )
+	ROM_IGNORE(0x50) // 'config' bytes
+
+	DISK_REGION( "sdcard" ) // 4GB SD Card
+	DISK_IMAGE( "ar_game_console_b605", 0, SHA1(433d354529e262de9d833a7a423a37915ba3362c) )
+ROM_END
+
 ROM_START( ardancem )
 	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(ba2cdacd) SHA1(d47829ee5310140665146262a44e0ba91942f25c) )
@@ -593,6 +602,9 @@ CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 202?, intrtvg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "Interactive Game Console (Model B608, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // also very generic packaging, similar SD card content to above, including NES games, but with some extra music/videos for the dance part
 CONS( 202?, ardancem,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Dance Mat (Model DM02, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// likewise
+CONS( 202?, arb605,          0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Game Console (Model B605, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
 
 // might not fit here (no GP header, chip details erased) but seems similar to the above otherwise
 CONS( 202?, dancef2p,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "<unknown>", "Dance Factory 2 Player Dance Mat",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
