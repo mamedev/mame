@@ -630,7 +630,8 @@ CONS( 2019, anpncp19,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 2017, doraet17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon 2017 Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses a glob, has GPspispi header, "Pear 265077A. 2022 11 22" on PCB
-CONS( 2022, banpear,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Bandai Pear (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// めざせ！あこがれのわたし♡プリキュアミラーパッド！オールスター
+CONS( 2022, banpear,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "PreCure Mirror Pad! All Star (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // company is called 深圳市飞讯互动科技有限公司
 // surface details erased on SoC for both of these

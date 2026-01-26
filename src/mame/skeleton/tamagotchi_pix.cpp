@@ -157,6 +157,9 @@ ROM_END
 
 CONS( 2020, tamapix,       0,              0,      tamapix,  tamapix, tamagotchi_pix_state, empty_init, "Bandai", "Tamagotchi Pix", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2022, suitcase,      0,              0,      tamapix,  tamapix, tamagotchi_pix_state, empty_init, "Bandai", "Suitcase Pet (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// わんだふるぷりきゅあ！　どうぶつおせわがた～っぷり　あつめておせわしよ　キラニコトランク
+CONS( 2022, suitcase,      0,              0,      tamapix,  tamapix, tamagotchi_pix_state, empty_init, "Bandai", "Wonderful PreCure! Dō Butsu O-se Wa Gata ~-Ppuri Atsumete O-sewashi Yo Kirani Koto Ranku (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+// デリシャスパーティ プリキュア ハートキュアウォッチ＆ハートフルーツペンダントカバースペシャルセット
 // "Muscat A 2022 01 15" on PCB
-CONS( 2022, precur2w,      0,              0,      precur2w, tamapix, precur2w_state,       empty_init, "Bandai", "PreCure 2-Way Heart (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2022, precur2w,      0,              0,      precur2w, tamapix, precur2w_state,       empty_init, "Bandai", "Delicious Party PreCure Heart Cure Watch & Heart Fruit Pendant Cover Special Set (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
