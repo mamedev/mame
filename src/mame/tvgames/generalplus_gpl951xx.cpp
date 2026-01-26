@@ -318,6 +318,11 @@ ROM_START( segapet3a )
 	ROM_LOAD16_WORD_SWAP( "blue_gpr25l64.ic3", 0x0000, 0x800000, CRC(02a63c63) SHA1(54d8c1c52a30d7b2a21f69439d9ff2ef7b2a606b) )
 ROM_END
 
+ROM_START( segaptdx )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "gpr25l640.ic3", 0x0000, 0x800000, CRC(971837c5) SHA1(b0e639fbd1e2b41934a98fde8425ded84f1a8159) )
+ROM_END
+
 ROM_START( bubltea )
 	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "gpr25l64.ic2", 0x0000, 0x800000, CRC(a6d73241) SHA1(bc67d932ffc83d91dc2d64f40bbce08c1e8b9f4e) )
@@ -406,6 +411,9 @@ CONS( 2019, segapet2a, segapet2, 0, generalplus_gpspi_direct, bfspyhnt, generalp
 // もっちふわペット もっちまるず
 CONS( 2020, segapet3,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Mocchifuwa Pet Mocchimaruzu (set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 CONS( 2020, segapet3a, segapet3, 0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Mocchifuwa Pet Mocchimaruzu (set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// DX version of the first game, 2020 on box, updated fabric cover, still has 2018 on case, but different software?
+CONS( 2020, segaptdx,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Sega Toys", "Mocchiri Pet Mocchimaruzu DX", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // まぜまぜミックス！ぷにタピちゃん
 CONS( 201?, bubltea,   0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Bandai", "Mazemaze Mix! Puni Tapi-chan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
