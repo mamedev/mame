@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Joakim Larsson Edstrom
+
+Force Computers SYS68K/CPU-1 front panel layout
+-->
+<mamelayout version="2">
+
+	<!-- Background colors -->
+	<element name="panel_bg">
+		<rect><color red="0.15" green="0.15" blue="0.15" /></rect>
+	</element>
+	<element name="silver">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+	</element>
+
+	<!-- LED element (green, active high) -->
+	<element name="led_green" defstate="0">
+		<disk state="0"><color red="0.1" green="0.2" blue="0.1" /></disk>
+		<disk state="1"><color red="0.0" green="1.0" blue="0.0" /></disk>
+	</element>
+
+	<!-- Text labels (white on dark) -->
+	<element name="txt_cpu1"><text string="CPU-1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_rst"><text string="RST"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_abt"><text string="ABT"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_run"><text string="RUN"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_hlt"><text string="HLT"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_bm"><text string="BM"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_flm"><text string="FLM"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_epr"><text string="EPR"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_2ws"><text string="2WS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_4ws"><text string="4WS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_6ws"><text string="6WS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_8ws"><text string="8WS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_12ws"><text string="12WS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_14ws"><text string="14WS"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_csh"><text string="CSH"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_rm"><text string="R/M"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_rs232"><text string="RS232"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_p4"><text string="P4"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="txt_p3"><text string="P3"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+
+	<!-- Button elements -->
+	<element name="btn_dark">
+		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
+	</element>
+
+	<!-- Front panel group (reusable across views) -->
+	<group name="panel">
+		<!-- Dark panel background -->
+		<element ref="panel_bg"><bounds x="0" y="0" width="46" height="345" /></element>
+		<!-- Silver accent strip -->
+		<element ref="silver"><bounds x="46" y="0" width="2" height="345" /></element>
+
+		<!-- Title -->
+		<element ref="txt_cpu1"><bounds x="3" y="5" width="40" height="14" /></element>
+
+		<!-- RST button -->
+		<element ref="btn_dark"><bounds x="8" y="30" width="30" height="16" /></element>
+		<element ref="txt_rst"><bounds x="8" y="32" width="30" height="12" /></element>
+
+		<!-- ABT button -->
+		<element ref="btn_dark"><bounds x="8" y="50" width="30" height="16" /></element>
+		<element ref="txt_abt"><bounds x="8" y="52" width="30" height="12" /></element>
+
+		<!-- LEDs with labels -->
+		<!-- RUN -->
+		<element name="led_run" ref="led_green"><bounds x="6" y="82" width="8" height="8" /></element>
+		<element ref="txt_run"><bounds x="16" y="81" width="26" height="10" /></element>
+		<!-- HLT -->
+		<element name="led_hlt" ref="led_green"><bounds x="6" y="96" width="8" height="8" /></element>
+		<element ref="txt_hlt"><bounds x="16" y="95" width="26" height="10" /></element>
+		<!-- BM -->
+		<element name="led_bm" ref="led_green"><bounds x="6" y="110" width="8" height="8" /></element>
+		<element ref="txt_bm"><bounds x="16" y="109" width="26" height="10" /></element>
+
+		<!-- FLM -->
+		<element name="led_flm" ref="led_green"><bounds x="6" y="132" width="8" height="8" /></element>
+		<element ref="txt_flm"><bounds x="16" y="131" width="26" height="10" /></element>
+		<!-- EPR -->
+		<element name="led_epr" ref="led_green"><bounds x="6" y="146" width="8" height="8" /></element>
+		<element ref="txt_epr"><bounds x="16" y="145" width="26" height="10" /></element>
+		<!-- 2WS -->
+		<element name="led_2ws" ref="led_green"><bounds x="6" y="160" width="8" height="8" /></element>
+		<element ref="txt_2ws"><bounds x="16" y="159" width="26" height="10" /></element>
+		<!-- 4WS -->
+		<element name="led_4ws" ref="led_green"><bounds x="6" y="174" width="8" height="8" /></element>
+		<element ref="txt_4ws"><bounds x="16" y="173" width="26" height="10" /></element>
+		<!-- 6WS -->
+		<element name="led_6ws" ref="led_green"><bounds x="6" y="188" width="8" height="8" /></element>
+		<element ref="txt_6ws"><bounds x="16" y="187" width="26" height="10" /></element>
+		<!-- 8WS -->
+		<element name="led_8ws" ref="led_green"><bounds x="6" y="202" width="8" height="8" /></element>
+		<element ref="txt_8ws"><bounds x="16" y="201" width="26" height="10" /></element>
+		<!-- 12WS -->
+		<element name="led_12ws" ref="led_green"><bounds x="6" y="216" width="8" height="8" /></element>
+		<element ref="txt_12ws"><bounds x="16" y="215" width="26" height="10" /></element>
+		<!-- 14WS -->
+		<element name="led_14ws" ref="led_green"><bounds x="6" y="230" width="8" height="8" /></element>
+		<element ref="txt_14ws"><bounds x="16" y="229" width="26" height="10" /></element>
+
+		<!-- CSH button -->
+		<element ref="btn_dark"><bounds x="8" y="254" width="30" height="16" /></element>
+		<element ref="txt_csh"><bounds x="8" y="256" width="30" height="12" /></element>
+
+		<!-- R/M button -->
+		<element ref="btn_dark"><bounds x="8" y="274" width="30" height="16" /></element>
+		<element ref="txt_rm"><bounds x="8" y="276" width="30" height="12" /></element>
+
+		<!-- Serial port area -->
+		<element ref="txt_rs232"><bounds x="3" y="310" width="40" height="10" /></element>
+		<element ref="txt_p4"><bounds x="3" y="325" width="18" height="10" /></element>
+		<element ref="txt_p3"><bounds x="25" y="325" width="18" height="10" /></element>
+	</group>
+
+	<!-- Front Panel with Terminal: panel strip + terminal side by side (dropped if no terminal) -->
+	<view name="Front Panel with Terminal">
+		<group ref="panel"><bounds x="0" y="0" width="48" height="345" /></group>
+		<screen tag="rs232trm:terminal:terminal_screen"><bounds x="52" y="0" width="460" height="345" /></screen>
+	</view>
+
+	<!-- Terminal view: just the terminal screen (dropped if no terminal attached) -->
+	<view name="Terminal">
+		<screen tag="rs232trm:terminal:terminal_screen"><bounds x="0" y="0" width="640" height="480" /></screen>
+	</view>
+
+	<!-- Front Panel: standalone panel strip (always available) -->
+	<view name="Front Panel">
+		<group ref="panel"><bounds x="0" y="0" width="48" height="345" /></group>
+	</view>
+
+</mamelayout>
