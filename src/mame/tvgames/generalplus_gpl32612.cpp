@@ -324,7 +324,12 @@ ROM_END
 
 ROM_START( bananlap )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD( "gpr25l64.u3", 0x0000, 0x800000, CRC(46441cd5) SHA1(da1891a21e23c60492719c2b953e453885fc1bde) )
+	ROM_LOAD( "orange_gpr25l64.u3", 0x0000, 0x800000, CRC(46441cd5) SHA1(da1891a21e23c60492719c2b953e453885fc1bde) )
+ROM_END
+
+ROM_START( bananlapa )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "yellow_mx25l6406e.u1", 0x0000, 0x800000, CRC(2bc14be1) SHA1(7072c040d7f5b6d89ea19cad9d8a1841ff70f51e) )
 ROM_END
 
 ROM_START( bandolap )
@@ -552,7 +557,9 @@ CONS( 2014, bandplap,        0,        0,      gpl32612, gpl32612, generalplus_g
 // ディズニー&ディズニー／ピクサーキャラクターズ ワンダフルドリームパソコン
 CONS( 2014, bandslap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Wonderful Dream PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // あそんでまなべる！マウスでクリック！アンパンマンパソコン
-CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Asonde Manaberu! Mouse de Click! Anpanman PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Asonde Manaberu! Mouse de Click! Anpanman PC (Japan, orange/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, orange base
+// one of these is probably a 'plus' version, code is different
+CONS( 2014, bananlapa,       bananlap, 0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Asonde Manaberu! Mouse de Click! Anpanman PC (Japan, yellow/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, yellow base
 // ドラえもんステップアップパソコン
 CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Step Up PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
