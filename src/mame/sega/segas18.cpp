@@ -78,6 +78,7 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
 				case ROM_BOARD_171_SHADOW:  break;  // ???
 				case ROM_BOARD_837_7525:
 				case ROM_BOARD_171_5874:
+				case ROM_BOARD_171_5987_A:  mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(*this, FUNC(segas18_state::genesis_vdp_r)), write16_delegate(*this, FUNC(segas18_state::genesis_vdp_w))); break;
 				case ROM_BOARD_171_5987:    mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(*this, FUNC(segas18_state::genesis_vdp_r)), write16_delegate(*this, FUNC(segas18_state::genesis_vdp_w))); break;
 				default:                    assert(false);
 			}
@@ -88,6 +89,7 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
 			{
 				case ROM_BOARD_171_SHADOW:  mapper.map_as_handler(0x00000, 0x00010, 0xfffff0, read16_delegate(*this, FUNC(segas18_state::genesis_vdp_r)), write16_delegate(*this, FUNC(segas18_state::genesis_vdp_w))); break;
 				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(*this)); break;
+				case ROM_BOARD_171_5987_A: break;
 				case ROM_BOARD_171_5987:    if (romsize <= 0x100000)
 												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom1base", "decrypted_rom1base", 0x80000, write16_delegate(*this, FUNC(segas18_state::rom_5987_bank_w)));
 											else
@@ -106,6 +108,7 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t i
 				case ROM_BOARD_171_SHADOW:
 				case ROM_BOARD_171_5874:    mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate(*this)); break;
 				case ROM_BOARD_837_7525:
+				case ROM_BOARD_171_5987_A: break;
 				case ROM_BOARD_171_5987:    if (romsize <= 0x100000)
 												mapper.map_as_rom(0x00000, 0x80000, 0xf80000, "rom0base", "decrypted_rom0base", 0x00000, write16_delegate(*this));
 											else
@@ -1550,7 +1553,11 @@ void segas18_state::ddcrew4p_fd1094(machine_config &config)
 	m_ppi->in_pc_callback().set_ioport("EXSERVICE");
 }
 
+void segas18_state::aquario_fd1094(machine_config &config)
+{
+	system18(config);
 
+}
 
 /*************************************
  *
@@ -2399,6 +2406,44 @@ ROM_START( ddcrewj2d )
 	ROM_LOAD( "mpr-14132.c6", 0x080000, 0x80000, CRC(1fae0220) SHA1(8414c74318ea915816c6b67801ac7c8c3fc905f9) )
 	ROM_LOAD( "mpr-14131.c5", 0x100000, 0x80000, CRC(be5a7d0b) SHA1(c2c598b0cf711273fdd568f3401375e9772c1d61) )
 	ROM_LOAD( "epr-14130.c4", 0x180000, 0x80000, CRC(948f34a1) SHA1(d4c6728d5eea06cee6ac15a34ec8cccb4cc4b982) )
+ROM_END
+
+/**************************************************************************************************************************
+ **************************************************************************************************************************
+ **************************************************************************************************************************
+    Clockwork Aquario, Sega System 18
+
+*/
+ROM_START( aquario )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 code - custom CPU 317-0196
+	ROM_LOAD16_BYTE( "a4.bin", 0x000000, 0x80000, CRC(c58ff95f) SHA1(27301df8f72ccc8a27e9520e11035aa63b8e03b6) )
+	ROM_LOAD16_BYTE( "a6.bin", 0x000001, 0x80000, CRC(b4a94cd9) SHA1(2059942a26d9e1de63b329d1c8b643535761d2d8) )
+	ROM_LOAD16_BYTE( "a5.bin", 0x100000, 0x80000, CRC(1cef8145) SHA1(78a1be8ea0cc0d4e56b2cf9a7c1bd3e08352e175) )
+	ROM_LOAD16_BYTE( "a7.bin", 0x100001, 0x80000, CRC(504e4665) SHA1(9b052b48b7cb2da880d6589fdcd1041eca555f7c) )
+
+	// ROM_REGION( 0x2000, "maincpu:key", 0 )  // decryption key
+	// ROM_LOAD( "317-0196.key", 0x0000, 0x2000, CRC(cb942262) SHA1(7ad7cd3df887c6e6435d74784cb12ce016acd0da) )
+
+	ROM_REGION( 0x180000, "tiles", 0 )
+	ROM_LOAD( "c1.bin", 0x000000, 0x80000, CRC(93ad1357) SHA1(09b35481798035b5f7d7d533e27418a298c6e2c7) )
+	ROM_LOAD( "c2.bin", 0x080000, 0x80000, CRC(4010d14b) SHA1(f9d2e726a032f49fac69a223107966f2884821b5) )
+	ROM_LOAD( "c3.bin", 0x100000, 0x80000, CRC(3a3d0285) SHA1(21899b3b2bcb979d53e78b0d48c493a9a15955c7) )
+
+	ROM_REGION16_BE( 0x400000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "c10.bin", 0x000001, 0x80000, CRC(c9ce76f9) SHA1(a096583f5e81f02d6a34802688d201d8d986a84a) )
+	ROM_LOAD16_BYTE( "a10.bin", 0x000000, 0x80000, CRC(b863e533) SHA1(e80fa6a74c43c040fd4b857247aecf03a3de3d87) )
+	ROM_LOAD16_BYTE( "c11.bin", 0x100001, 0x80000, CRC(06edb7bc) SHA1(e24ec7b52638edaa8debee0aca40ddf902c63334) )
+	ROM_LOAD16_BYTE( "a11.bin", 0x100000, 0x80000, CRC(8b568940) SHA1(19cd028cd43fa07904deb0250564251ba0128c4b) )
+	ROM_LOAD16_BYTE( "c12.bin", 0x200001, 0x80000, CRC(0bb79c56) SHA1(fdaa6cc9efb3104b78392530547bd82c21cff825) )
+	ROM_LOAD16_BYTE( "a12.bin", 0x200000, 0x80000, CRC(0219923f) SHA1(1e52df5ef155f5a4d74eabea22bb431a569e344f) )
+	ROM_LOAD16_BYTE( "c13.bin", 0x300001, 0x80000, CRC(0beef46e) SHA1(eccba6d4e015e93f5ca25ef6df31a491193d08a4) )
+	ROM_LOAD16_BYTE( "a13.bin", 0x300000, 0x80000, CRC(9ea5c73d) SHA1(e42002cc13548a8aba6ffb0c60470b345b88eaa8) )
+
+	ROM_REGION( 0x200000, "soundcpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "c7.bin", 0x000000, 0x40000, CRC(f1183938) SHA1(9409f0dc02773892803bc6d37f1bdbd894cf1805) )
+	ROM_LOAD( "c6.bin", 0x080000, 0x80000, CRC(39f11291) SHA1(3b4680bd2e20bd297644dda0a26f958c74826d47) )
+	ROM_LOAD( "c5.bin", 0x100000, 0x80000, CRC(6a380dca) SHA1(4589efc9e994ef9d07d4033e20c21afca4875005) )
+	ROM_LOAD( "c4.bin", 0x180000, 0x80000, CRC(1bd081f8) SHA1(e5b0b5d8334486f813d7c430bb7fce3f69605a21) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -3380,6 +3425,10 @@ void segas18_state::init_wwally()
 	m_custom_io_w = write16sm_delegate(*this, FUNC(segas18_state::wwally_custom_io_w));
 }
 
+void segas18_state::init_aquario()
+{
+	init_generic(ROM_BOARD_171_5987);
+}
 
 /*************************************
  *
@@ -3388,6 +3437,8 @@ void segas18_state::init_wwally()
  *************************************/
 
 //    YEAR, NAME,      PARENT,   MACHINE,              INPUT,                   INIT,              MONITOR, COMPANY,        FULLNAME,                                        FLAGS
+GAME( 2021, aquario,   0,        aquario_fd1094,       ddcrew2p, segas18_state, init_aquario,      ROT0,   "Sega / Westone","Clockwork Aquario (prototype)", 0 )
+
 GAME( 1990, astorm,    0,        system18_fd1094,      astorm2p, segas18_state, init_generic_5874, ROT0,   "Sega",          "Alien Storm (World, 2 Players) (FD1094 317-0154)", 0 )
 GAME( 1990, astorm3,   astorm,   system18_fd1094,      astorm,   segas18_state, init_generic_5874, ROT0,   "Sega",          "Alien Storm (World, 3 Players) (FD1094 317-0148)", 0 )
 GAME( 1990, astormu,   astorm,   system18_fd1094,      astorm,   segas18_state, init_generic_5874, ROT0,   "Sega",          "Alien Storm (US, 3 Players) (FD1094 317-0147)", 0 )
