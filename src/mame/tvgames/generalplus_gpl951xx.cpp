@@ -243,6 +243,18 @@ ROM_START( punistar )
 	ROM_LOAD16_WORD_SWAP( "xm25qh64c.ic3", 0x0000, 0x800000, CRC(72f54f23) SHA1(902955764d0b61decc057eb3afaf2960cf2134c6) )
 ROM_END
 
+ROM_START( flufflav )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "gpr25l320.u2", 0x0000, 0x400000, CRC(d2dbb9c1) SHA1(d59b53769093411a377a346877fc5f8f4b7d8c12) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
+ROM_START( pockrmsr )
+	ROM_REGION16_BE(0x800000, "maincpu:spidirect", ROMREGION_ERASE00)
+	ROM_LOAD16_WORD_SWAP( "25l6433f.ic102", 0x0000, 0x800000, CRC(adafd2c6) SHA1(c053d17d835382d84030c1e8f41d6edc757437ea) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
 ROM_START( pokgoget )
 	ROM_REGION16_BE(0x2000000, "maincpu:spidirect", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "mx25l25645g.u1", 0x0000, 0x2000000, CRC(a76ae22f) SHA1(3fa5eeedb3fe343a7707d76710298377b22b0681) )
@@ -373,6 +385,13 @@ CONS(2021, punij2pk, punirune, 0, generalplus_gpspi_direct, bfspyhnt, generalplu
 CONS(2021, punifrnd, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Punirunes Punitomo Tsuushin (hot pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 CONS(2021, punistar, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Punirunes Punistarz (pink, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// 'Poo' emoji shaped item, comes in multiple colours, has a solder pad which might change between units
+// this was dumped from the 'Lavender' unit
+CONS(2021, flufflav, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Happinet", "Fuwatcho Uncho Fuwa Fuwa (lavender, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+
+// available in 2 colours, ROM confirmed to be the same on both
+CONS(2021, pockrmsr,  0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Bandai", "Pocket Room - Sanrio Characters (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // Pocket Monsters ガチッとゲットだぜ! モンスターボールゴー! - Pocket Monsters is printed on the inner shell, but not the box?
 CONS(2021, pokgoget, 0,        0, generalplus_gpspi_direct, bfspyhnt, generalplus_gpspi_direct_game_state, empty_init, "Takara Tomy", "Gachitto Get da ze! Monster Ball Go! (210406, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
