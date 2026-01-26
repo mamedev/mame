@@ -19620,6 +19620,9 @@ compperf
 scrablexa
 tmbaskb
 
+@source:handheld/hh_mediatek_mt6260a.cpp
+sonicwtc
+
 @source:handheld/hh_pic16.cpp
 drdunk
 flash
