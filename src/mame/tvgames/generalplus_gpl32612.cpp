@@ -469,6 +469,10 @@ ROM_START( segcarsh )
 	ROM_LOAD( "mx25l12833.sfrom1", 0x0000, 0x1000000, CRC(46a350fc) SHA1(1efa026abce3f2bd8a7e32519c4705dbdcfc5919) )
 ROM_END
 
+ROM_START( jpaddp )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx25l6406e.sfrom1", 0x0000, 0x800000, CRC(4e482f10) SHA1(e393090a98324fb33374d2203ef7763e1e15b361) )
+ROM_END
 
 ROM_START( dinopc )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
@@ -640,6 +644,9 @@ CONS( 2016, segdis16,            0,        0,      gpl32612, gpl32612, generalpl
 
 // uses GPL32611
 CONS( 201?, segcarsh,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Disney Cars Shake It! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses glob, has GPSPI header
+CONS( 201?, jpaddp,              0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Jewel Pad Diamond Premium (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32600A
 // マウスでバトル!! 恐竜図鑑パソコン
