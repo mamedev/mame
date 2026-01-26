@@ -17,12 +17,14 @@ TODO:
 #include "cr560b.h"
 
 #define LOG_CMD    (1 << 1)
-#define LOG_PARAM  (1 << 2)
-#define LOG_DATA   (1 << 3)
-#define LOG_SUBQ   (1 << 4)
-#define LOG_SUBQ2  (1 << 5) // log subq data to popmessage
+#define LOG_TOC    (1 << 2)
+#define LOG_PARAM  (1 << 3)
+#define LOG_DATA   (1 << 4)
+#define LOG_SUBQ   (1 << 5)
+#define LOG_SUBQ2  (1 << 6) // log subq data to popmessage
 
-#define VERBOSE (LOG_GENERAL | LOG_CMD | LOG_PARAM)
+#define VERBOSE (LOG_GENERAL | LOG_TOC | LOG_CMD | LOG_PARAM)
+//#define VERBOSE (LOG_TOC)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #define LOGPARAM LOGMASKED(LOG_PARAM, "-> Param: %02x %02x %02x %02x %02x %02x\n", \
@@ -703,10 +705,12 @@ void cr560b_device::cmd_read_capacity()
 	{
 		uint32_t track_start = get_track_start(0xaa);
 
-		LOGMASKED(LOG_CMD, "Lead out start %d\n", track_start);
+		LOGMASKED(LOG_TOC, "Lead out start %d\n", track_start);
 
 		//if (msf)
 		track_start = lba_to_msf(track_start);
+
+		LOGMASKED(LOG_TOC, "-> MSF %06x\n", track_start);
 
 		status |= STATUS_READY;
 
@@ -747,6 +751,8 @@ void cr560b_device::cmd_read_disc_info()
 		uint32_t last_msf = lba_to_msf(last_lba);
 
 		status |= STATUS_MOTOR | STATUS_SUCCESS;
+
+		LOGMASKED(LOG_TOC, "First track %d last track %d, lead out start %d\n", 1, last_track, last_msf);
 
 		// TODO: determine disk type
 		m_output_fifo[1] = 0x00;
@@ -802,10 +808,12 @@ void cr560b_device::cmd_read_toc()
 	{
 		uint32_t track_start = get_track_start(0xaa);
 
-		LOGMASKED(LOG_CMD, "Track 0 requested, lead out start %d\n", track_start);
+		LOGMASKED(LOG_TOC, "TOC: Track 0 requested, lead out start %d\n", track_start);
 
 		//if (msf)
 		track_start = lba_to_msf(track_start);
+
+		LOGMASKED(LOG_TOC, "-> MSF %06x %d\n", track_start, track_start);
 
 		status |= STATUS_READY;
 
@@ -825,12 +833,14 @@ void cr560b_device::cmd_read_toc()
 	{
 		uint32_t track_start = get_track_start(track - 1);
 
-		LOGMASKED(LOG_CMD, "Track %d requested, start %d\n", track, track_start);
+		LOGMASKED(LOG_TOC, "Track %d requested, start %d\n", track, track_start);
 
 		status |= STATUS_READY;
 
 		//if (msf)
 		track_start = lba_to_msf(track_start);
+
+		LOGMASKED(LOG_TOC, "-> MSF %06x %d\n", track_start, track_start);
 
 		m_output_fifo[1] = 0;
 		m_output_fifo[2] = get_adr_control(track - 1);
@@ -863,10 +873,12 @@ void cr560b_device::cmd_read_session_info()
 	{
 		uint32_t track_start = get_track_start(0xaa);
 
-		LOGMASKED(LOG_CMD, "Lead out start %d\n", track_start);
+		LOGMASKED(LOG_TOC, "Session: Lead out start %d\n", track_start);
 
 		//if (msf)
 		track_start = lba_to_msf(track_start);
+
+		LOGMASKED(LOG_TOC, "-> MSF %06x\n", track_start);
 
 		status |= STATUS_READY;
 

@@ -484,6 +484,7 @@ void madam_device::exp_dma_req_w(int state)
 	m_irq_dexp_cb(0);
 	if (state)
 	{
+		//printf("%08x %08x\n", m_dma[20][0], m_dma[20][1]);
 		m_arm_ctl_cb(0);
 		m_dma_exp_timer->adjust(attotime::from_ticks(8, this->clock()));
 	}

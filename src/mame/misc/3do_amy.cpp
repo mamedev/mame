@@ -39,7 +39,7 @@ void amy_device::device_start()
 	save_item(STRUCT_MEMBER(m_custom_clut, g));
 	save_item(STRUCT_MEMBER(m_custom_clut, b));
 
-	m_display_hclocks = m_is_pal ? 384 : 320;
+	m_display_hclocks = (m_is_pal ? 384 : 320) * 4;
 }
 
 void amy_device::device_reset()
@@ -108,7 +108,7 @@ void amy_device::pixel_xfer(int x, int y, u16 dot)
 
 void amy_device::blank_line(int y)
 {
-	const rectangle clip(0, y, m_display_hclocks * 4, y + 1);
+	const rectangle clip(0, y, m_display_hclocks, y + 1);
 
 	// TODO: vblank color really
 	m_bitmap.fill(rgb_t::black(), clip);
