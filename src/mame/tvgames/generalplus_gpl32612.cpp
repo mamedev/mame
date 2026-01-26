@@ -364,6 +364,24 @@ ROM_START( banaquap )
 	ROM_LOAD( "gpr25l64.u8", 0x0000, 0x800000, CRC(3a434fe0) SHA1(34c55bebe7451d9046311b6c704e0e66347f5a39) )
 ROM_END
 
+ROM_START( anpntb18 )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l6406e.u1", 0x0000, 0x800000, CRC(9191bfdc) SHA1(c48c0b5234b2d031f811d75995912d49baf80f89) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
+ROM_START( anpncp19 )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l640.u3", 0x0000, 0x800000, CRC(f7b1dce3) SHA1(d682abc9a3fbdb66fdc712da486b3e7bbdebbe48) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
+ROM_START( doraet17 )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l640.u3", 0x0000, 0x800000, CRC(5d1d634f) SHA1(8e8faa2fa4b512611ed35936e0d0c8e2360d0a05) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
 ROM_START( intrtvg )
 	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
@@ -595,6 +613,16 @@ CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_g
 
 // uses GPL32630A has GPspispi header  マーメイドアクアポット
 CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tropical Rouge! PreCure: Mermaid Aqua Pot (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32630A has GPspispi header
+CONS( 2018, anpntb18,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman 2018 Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32630A has GPspispi header
+CONS( 2019, anpncp19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman 2019 Color Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32630A has GPspispi header
+CONS( 2017, doraet17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon 2017 Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
 
 // company is called 深圳市飞讯互动科技有限公司
 // surface details erased on SoC for both of these
