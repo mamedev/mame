@@ -302,6 +302,13 @@ ROM_START( pokepeac )
 	ROM_LOAD( "tc58nvg0s3hta00.u2", 0x0000, 0x8800000, CRC(bdd128b8) SHA1(412eeb83649ea499e4e6ce3c447f0c177d8bc0ce) )
 ROM_END
 
+ROM_START( froz2dct )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l640.u6", 0x0000, 0x800000, CRC(bc9971cc) SHA1(e33d3af88d4d290294d750e41f946f9fa761a31e) )
+
+	// an SDcard was present in the slot, but contained only user photos
+ROM_END
+
 ROM_START( anpanm19 )
 	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25l1280.u3", 0x0000, 0x1000000, CRC(7932fb3e) SHA1(a381eeba5357fe71e4d6081b9b91b57e5705f7f1) )
@@ -561,6 +568,9 @@ CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_g
 
 // unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
 CONS( 201?, smatomo,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Smatomo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
+CONS( 2020, froz2dct,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Takara Tomy",        "Frozen 2 Dream Camera Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // (these all use the same PCB) - unknown SoC (uses a glob) has GPspispi header, ARM based, SPI ROM
 // ディズニー&ディズニー／ピクサーキャラクターズ ワンダフルスイートパソコン
