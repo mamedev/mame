@@ -199,13 +199,14 @@ void luna_68k_ioc_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &luna_68k_ioc_device::cpuspace_map);
 	m_cpu->reset_cb().set(*this, FUNC(luna_68k_ioc_device::reset_cb));
 
-	HD63450(config, m_dma[0], 20'000'000 / 2, m_cpu);
+	// Warning, direct access to the main cpu is gross
+	HD63450(config, m_dma[0], 10_MHz_XTAL, ":cpu");
 	m_dma[0]->set_clocks(attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80));
 	m_dma[0]->set_burst_clocks(attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80));
 	m_dma[0]->irq_callback().set([this](int state) { m_interrupt_dma0_cb(state); });
 	m_dma[0]->set_luna_mode(true);
 
-	HD63450(config, m_dma[1], 20'000'000 / 2, m_cpu);
+	HD63450(config, m_dma[1], 10_MHz_XTAL, ":cpu");
 	m_dma[1]->set_clocks(attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80));
 	m_dma[1]->set_burst_clocks(attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80));
 	m_dma[1]->irq_callback().set([this](int state) { m_interrupt_dma1_cb(state); });

@@ -270,8 +270,10 @@ void luna_68k_state::cpu_cpuspace_map(address_map &map)
 {
 	map(0xfffffff3, 0xfffffff3).r(FUNC(luna_68k_state::level1_ack_r));
 	map(0xfffffff5, 0xfffffff5).r(FUNC(luna_68k_state::cpu_vector_r));
+	map(0xfffffff7, 0xfffffff7).lr8(NAME([]() { return m68000_base_device::autovector(3); }));
 	map(0xfffffff9, 0xfffffff9).r(FUNC(luna_68k_state::cpu_vector_r));
 	map(0xfffffffb, 0xfffffffb).r(FUNC(luna_68k_state::level5_ack_r));
+	map(0xfffffffd, 0xfffffffd).lr8(NAME([]() { return m68000_base_device::autovector(6); }));
 	map(0xffffffff, 0xffffffff).lr8(NAME([]() { return m68000_base_device::autovector(7); }));
 }
 
