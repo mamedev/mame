@@ -36,6 +36,9 @@ madam_device::madam_device(const machine_config &mconfig, const char *tag, devic
 	, m_dma8_read_cb(*this, 0)
 	, m_dma32_read_cb(*this, 0)
 	, m_dma32_write_cb(*this)
+	, m_dma_exp_read_cb(*this, 0)
+	, m_arm_ctl_cb(*this)
+	, m_irq_dexp_cb(*this)
 	, m_playerbus_read_cb(*this, 0)
 	, m_irq_dply_cb(*this)
 {
@@ -50,6 +53,7 @@ void madam_device::device_start()
 	m_revision = 0x01020200;
 	m_msysbits = 0x51;
 
+	m_dma_exp_timer = timer_alloc(FUNC(madam_device::dma_exp_cb), this);
 	m_dma_playerbus_timer = timer_alloc(FUNC(madam_device::dma_playerbus_cb), this);
 	m_cel_timer = timer_alloc(FUNC(madam_device::cel_tick_cb), this);
 
@@ -110,6 +114,8 @@ void madam_device::device_reset()
 	m_mctl = 0;
 	m_cel.state = IDLE;
 	m_statbits = 0;
+	m_dma_exp_enable = false;
+	m_dma_exp_timer->adjust(attotime::never);
 	m_dma_playerbus_timer->adjust(attotime::never);
 	m_cel_timer->adjust(attotime::never);
 }
@@ -424,6 +430,12 @@ void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_mctl);
 }
 
+/******************
+ *
+ * Player bus DMA
+ *
+ ******************/
+
 TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 {
 	if (!BIT(m_mctl, 15))
@@ -455,6 +467,62 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 
 	m_dma_playerbus_timer->adjust(attotime::from_ticks(2, this->clock()));
 }
+
+/******************
+ *
+ * Exp DMA
+ *
+ ******************/
+
+void madam_device::exp_dma_req_w(int state)
+{
+	// printf("exp_dma_req_w %d\n", state);
+	m_dma_exp_enable = state;
+	m_irq_dexp_cb(0);
+	if (state)
+	{
+		m_arm_ctl_cb(0);
+		m_dma_exp_timer->adjust(attotime::from_ticks(8, this->clock()));
+	}
+	else
+	{
+		m_arm_ctl_cb(1);
+		m_dma_exp_timer->adjust(attotime::never);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(madam_device::dma_exp_cb)
+{
+	if (!m_dma_exp_enable)
+	{
+		return;
+	}
+
+	u32 count = m_dma[20][1];
+
+	if (BIT(count, 31))
+	{
+		m_dma_exp_enable = false;
+		m_arm_ctl_cb(1);
+		m_irq_dexp_cb(1);
+		m_dma_exp_timer->adjust(attotime::never);
+		return;
+	}
+
+	u32 dst = m_dma[20][0];
+
+	u32 data = (m_dma_exp_read_cb() << 24) | (m_dma_exp_read_cb() << 16) | (m_dma_exp_read_cb() << 8) | (m_dma_exp_read_cb() << 0);
+
+	m_dma32_write_cb(dst, data);
+
+	count -= 4;
+	dst += 4;
+	m_dma[20][0] = dst;
+	m_dma[20][1] = count;
+
+	m_dma_exp_timer->adjust(attotime::from_ticks(8, this->clock()));
+}
+
 
 /******************
  *

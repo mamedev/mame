@@ -17,9 +17,16 @@ public:
 	template <typename T> void set_amy_tag(T &&tag) { m_amy.set_tag(std::forward<T>(tag)); }
 
 	auto diag_cb()              { return m_diag_cb.bind(); }
+	// for CEL unpacking
 	auto dma8_read_cb()         { return m_dma8_read_cb.bind(); }
+	// generic memory read writes
 	auto dma32_read_cb()        { return m_dma32_read_cb.bind(); }
 	auto dma32_write_cb()       { return m_dma32_write_cb.bind(); }
+	// for CD drive
+	auto dma_exp_read_cb()      { return m_dma_exp_read_cb.bind(); }
+	auto arm_ctl_cb()           { return m_arm_ctl_cb.bind(); }
+	auto irq_dexp_cb()          { return m_irq_dexp_cb.bind(); }
+	// for I/O
 	auto playerbus_read_cb()    { return m_playerbus_read_cb.bind(); }
 	auto irq_dply_cb()          { return m_irq_dply_cb.bind(); }
 
@@ -27,6 +34,8 @@ public:
 
 	void vdlp_start_w(int state);
 	void vdlp_continue_w(int state);
+
+	void exp_dma_req_w(int state);
 
 protected:
 	// device-level overrides
@@ -39,6 +48,9 @@ private:
 	devcb_read8      m_dma8_read_cb;
 	devcb_read32     m_dma32_read_cb;
 	devcb_write32    m_dma32_write_cb;
+	devcb_read8      m_dma_exp_read_cb;
+	devcb_write_line m_arm_ctl_cb;
+	devcb_write_line m_irq_dexp_cb;
 	devcb_read32     m_playerbus_read_cb;
 	devcb_write_line m_irq_dply_cb;
 
@@ -145,11 +157,15 @@ private:
 	std::tuple<u16, u32> get_coded_16bpp(u32 ptr, u8 frac);
 	std::tuple<u16, u32> get_uncoded_16bpp(u32 ptr, u8 frac);
 
-	TIMER_CALLBACK_MEMBER(cel_tick_cb);
 	emu_timer *m_cel_timer;
+	TIMER_CALLBACK_MEMBER(cel_tick_cb);
 
 	emu_timer *m_dma_playerbus_timer;
 	TIMER_CALLBACK_MEMBER(dma_playerbus_cb);
+
+	bool m_dma_exp_enable;
+	emu_timer *m_dma_exp_timer;
+	TIMER_CALLBACK_MEMBER(dma_exp_cb);
 };
 
 DECLARE_DEVICE_TYPE(MADAM, madam_device)

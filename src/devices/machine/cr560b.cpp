@@ -8,7 +8,7 @@ Panasonic pre-IDE MKE interface, akin to CR-511-B (which this is based off) and 
 Soundblaster.
 
 TODO:
-- Enough to load some TOC and nothing else;
+- Enough to load a few sectors and nothing else;
 - Find common points with other MKE drives, generate a streamlined interface;
 
 **************************************************************************************************/
@@ -115,6 +115,7 @@ void cr560b_device::device_reset()
 	m_input_fifo_pos = 0;
 	m_output_fifo_pos = 0;
 	m_output_fifo_length = 0;
+	m_sector_size = 2048;
 
 	m_status_ready = false;
 	m_data_ready = false;
@@ -133,7 +134,9 @@ std::pair<std::error_condition, std::string> cr560b_device::call_load()
 	auto ret = cdrom_image_device::call_load();
 
 	if (!ret.first)
+	{
 		status_change(m_status | STATUS_MEDIA);
+	}
 
 	return ret;
 }
@@ -160,13 +163,16 @@ uint32_t cr560b_device::lba_to_msf(int32_t lba)
 
 int32_t cr560b_device::msf_to_lba(uint32_t msf)
 {
-	uint32_t lba = 0;
+	int32_t lba = 0;
 
 	lba += ((msf >> 16) & 0xff) * 60 * 75;
 	lba += ((msf >> 8) & 0xff) * 75;
 	lba += ((msf >> 0) & 0xff);
 
 	lba -= 2 * 75;  // msf 00:02:00 is equivalent to lba 0
+
+	if (lba < 0)
+		throw emu_fatalerror("Requested lba in lead-in %08x %08x\n", msf, lba);
 
 	return lba;
 }
@@ -224,7 +230,10 @@ void cr560b_device::status_change(uint8_t status)
 		m_status = status;
 
 		if (m_status & STATUS_MOTOR)
+		{
+			// TODO: add double speed
 			m_frame_timer->adjust(attotime::from_hz(75), 0, attotime::from_hz(75));
+		}
 		else
 			m_frame_timer->adjust(attotime::never);
 
@@ -477,7 +486,7 @@ void cr560b_device::cmd_set_mode()
 			m_sector_size = (m_input_fifo[3] << 8) | m_input_fifo[4];
 			LOGMASKED(LOG_CMD, "-> sector size %d\n", m_sector_size);
 			break;
-		//case 1: same setup as 0 (?)
+		//case 1: same setup as 0, sector size for write?
 		//case 2: unknown
 		//case 3: set speed 80 00 00 00
 		//case 4: unknown 01 00 00 00
@@ -687,7 +696,7 @@ void cr560b_device::cmd_read_capacity()
 
 	u8 status = m_status;
 	// TODO: unconfirmed here
-	bool msf = bool(BIT(m_input_fifo[1], 1));
+	//bool msf = bool(BIT(m_input_fifo[1], 1));
 
 	m_output_fifo[0] = 0x85;
 	if (exists())
@@ -696,8 +705,8 @@ void cr560b_device::cmd_read_capacity()
 
 		LOGMASKED(LOG_CMD, "Lead out start %d\n", track_start);
 
-		if (msf)
-			track_start = lba_to_msf(track_start);
+		//if (msf)
+		track_start = lba_to_msf(track_start);
 
 		status |= STATUS_READY;
 
@@ -773,7 +782,7 @@ void cr560b_device::cmd_read_toc()
 	// 06: unused?
 
 	// TODO: unconfirmed here
-	bool msf = bool(BIT(m_input_fifo[1], 1));
+	//bool msf = bool(BIT(m_input_fifo[1], 1));
 	uint8_t track = m_input_fifo[2];
 
 	uint8_t status = m_status;
@@ -795,8 +804,8 @@ void cr560b_device::cmd_read_toc()
 
 		LOGMASKED(LOG_CMD, "Track 0 requested, lead out start %d\n", track_start);
 
-		if (msf)
-			track_start = lba_to_msf(track_start);
+		//if (msf)
+		track_start = lba_to_msf(track_start);
 
 		status |= STATUS_READY;
 
@@ -820,8 +829,8 @@ void cr560b_device::cmd_read_toc()
 
 		status |= STATUS_READY;
 
-		if (msf)
-			track_start = lba_to_msf(track_start);
+		//if (msf)
+		track_start = lba_to_msf(track_start);
 
 		m_output_fifo[1] = 0;
 		m_output_fifo[2] = get_adr_control(track - 1);
@@ -847,7 +856,7 @@ void cr560b_device::cmd_read_session_info()
 
 	u8 status = m_status;
 	// TODO: unconfirmed here
-	bool msf = bool(BIT(m_input_fifo[1], 1));
+	//bool msf = bool(BIT(m_input_fifo[1], 1));
 
 	m_output_fifo[0] = 0x8d;
 	if (exists())
@@ -856,8 +865,8 @@ void cr560b_device::cmd_read_session_info()
 
 		LOGMASKED(LOG_CMD, "Lead out start %d\n", track_start);
 
-		if (msf)
-			track_start = lba_to_msf(track_start);
+		//if (msf)
+		track_start = lba_to_msf(track_start);
 
 		status |= STATUS_READY;
 

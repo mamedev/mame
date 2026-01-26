@@ -233,6 +233,16 @@ void _3do_state::green_config(machine_config &config)
 		address_space &space = m_maincpu->space();
 		space.write_dword(offset, data, 0xffff'ffff);
 	});
+	// TODO: disregard enable and cmd, those needs to be from xbus
+	m_madam->dma_exp_read_cb().set([this] () {
+		m_cdrom->enable_w(0);
+		m_cdrom->cmd_w(1);
+		u8 res = m_cdrom->read();
+		m_cdrom->cmd_w(0);
+		return res;
+	});
+	m_madam->arm_ctl_cb().set(m_clio, FUNC(clio_device::arm_ctl_w));
+	m_madam->irq_dexp_cb().set(m_clio, FUNC(clio_device::dexp_w));
 	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
 		if (offset == 0)
 			return (m_p1_r[0]->read() << 24) | (m_p1_r[1]->read() << 16);
@@ -268,6 +278,7 @@ void _3do_state::green_config(machine_config &config)
 		}
 		m_cdrom->cmd_w(1);
 	});
+	m_clio->exp_dma_enable_cb().set(m_madam, FUNC(madam_device::exp_dma_req_w));
 	m_clio->vsync_cb().set(m_madam, FUNC(madam_device::vdlp_start_w));
 	m_clio->hsync_cb().set(m_madam, FUNC(madam_device::vdlp_continue_w));
 	m_clio->adb_out_cb<2>().set([this] (int state) { m_bankdev->set_bank(state & 1); });
@@ -285,7 +296,7 @@ void _3do_state::green_config(machine_config &config)
 //  m_cdrom->stch_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
 //  m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_rdy_w)).invert();
 	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_int_w)).invert();
-//  m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus...));
+	m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus_wr_w));
 
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
