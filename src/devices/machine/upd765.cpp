@@ -243,6 +243,19 @@ void upd765_family_device::device_start()
 	save_item(NAME(command_pos));
 	save_item(NAME(result_pos));
 	save_item(NAME(sectors_read));
+	save_item(NAME(dor));
+	save_item(NAME(dsr));
+	save_item(NAME(fifo));
+	save_item(NAME(command));
+	save_item(NAME(result));
+	save_item(NAME(st1));
+	save_item(NAME(st2));
+	save_item(NAME(st3));
+	save_item(NAME(fifocfg));
+	save_item(NAME(precomp));
+	save_item(NAME(spec));
+	save_item(NAME(sector_size));
+	save_item(NAME(cur_rate));
 	save_item(NAME(selected_drive));
 	save_item(NAME(drive_busy));
 
