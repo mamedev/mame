@@ -27,6 +27,10 @@ void pc9801_state::video_start()
 	std::fill(std::begin(m_video_ff), std::end(m_video_ff), 0);
 	save_pointer(NAME(m_video_ff), 8);
 	save_pointer(NAME(m_ex_video_ff), 128);
+	save_item(NAME(m_font_line));
+	save_item(NAME(m_gfx_ff));
+	//save_pointer(NAME(m_txt_scroll_reg), 8);
+	//save_pointer(NAME(m_pal_clut), 4);
 }
 
 uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
