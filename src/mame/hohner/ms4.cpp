@@ -7,8 +7,8 @@
 #include "sound/sam8905.h"
 #include "speaker.h"
 
-//#define LOG_SAM    (1U << 1)
-#define LOG_SAM    0
+#define LOG_SAM    (1U << 1)
+//#define LOG_SAM    0
 #define VERBOSE (LOG_SAM)
 #include "logmacro.h"
 
@@ -143,8 +143,8 @@ void ms4_state::sam_wcs_w(u32 data)
 		m_phi_latched = phi;
 		m_wf_latched = wf;
 		m_wcs_active = true;
-		LOGMASKED(LOG_SAM, "WCS latch: WF=0x%03X PHI=0x%03X (latched PHI[2:10]=0x%03X)\n",
-			wf, phi, (phi >> 2) & 0x1FF);
+		// LOGMASKED(LOG_SAM, "WCS latch: WF=0x%03X PHI=0x%03X (latched PHI[2:10]=0x%03X)\n",
+		// 	wf, phi, (phi >> 2) & 0x1FF);
 	} else if (!external) {
 		// /WCS going high - internal waveform selected
 		m_wcs_active = false;
@@ -153,12 +153,30 @@ void ms4_state::sam_wcs_w(u32 data)
 
 u16 ms4_state::sam_waveform_r(offs_t offset)
 {
-	// XE9 waveform ROM access with 74HC174 address latching
+	// XE9 external memory read
+	// SAM8905 outputs: WA[19:0] = { WAVE[7:0], PHI[11:0] }
+	//
+	// Memory select via WA16 (= WAVE[4]):
+	//   WA16=0: ROM read (6x 512KB waveform ROMs)
+	//   WA16=1: SRAM read (2x 8KB delay buffer)
+	//
+	// SRAM chip select: CS1=/WCS (low), CS2=WA16 (high)
+	// SRAM address: WA1-WA13 → A0-A12 (8K words)
+
+	uint32_t wa16 = (offset >> 16) & 1;  // WAVE[4] - memory select
+
+	if (wa16) {
+		// SRAM read - WA1-WA13 → A0-A12 (13 bits = 8K addresses)
+		uint32_t sram_addr = (offset >> 1) & 0x1FFF;
+		if (sram_addr < SAM_SRAM_SIZE)
+			return m_sam_sram[sram_addr];
+		return 0;
+	}
+
+	// ROM read - 74HC174 address latching for waveform ROMs
 	// Hardware: 6x 512KB ROMs organized as 4 banks of 12-bit samples
 	//   ROMs 0-3 (XEL0-XEL3): upper 8 bits (WD4-WD11)
 	//   ROMs 4-5 (XEL4-XEL5): lower nibble (WD0-WD3)
-	//
-	// SAM8905 outputs: WA[19:0] = { WAVE[7:0], PHI[11:0] }
 	//
 	// 74HC174 latch captures WA[2:10] on /WCS falling edge (WWF with external WF)
 	// ROM address generation:
@@ -218,19 +236,25 @@ u16 ms4_state::sam_waveform_r(offs_t offset)
 
 void ms4_state::sam_waveform_w(offs_t offset, u16 data)
 {
-	// SAM SRAM write
-	// 15-bit address from SAM: ((WF & 0x7) << 12) | (PHI & 0xFFF)
-	// Hardware mapping:
-	//   WA1-WA13 → SRAM A0-A12 (13 bits = 8KB per chip)
-	//   WA16 → chip select (but callback only has WA14:0, so use WA14)
+	// SAM external memory write
+	// Address from SAM: WA[19:0] = (WF[7:0] << 12) | PHI[11:0]
 	//
-	// Address bits: [14]=bank, [13:1]=addr, [0]=unused
-	uint32_t bank = (offset >> 14) & 1;
-	uint32_t addr = (offset >> 1) & 0x1FFF;
-	uint32_t linear = (bank << 13) | addr;
+	// WA16 (= WF[4]) selects SRAM via chip select logic:
+	//   WA16=0: ROM (read-only, write ignored)
+	//   WA16=1: SRAM write enabled
+	//
+	// SRAM address: WA1-WA13 → A0-A12 (13 bits = 8K addresses)
 
-	if (linear < SAM_SRAM_SIZE)
-		m_sam_sram[linear] = (int16_t)data;
+	uint32_t wa16 = (offset >> 16) & 1;  // WF[4] - SRAM chip select
+
+	if (!wa16)
+		return;  // WA16=0 means ROM selected, ignore write
+
+	// SRAM write - WA1-WA13 → A0-A12
+	uint32_t sram_addr = (offset >> 1) & 0x1FFF;
+
+	if (sram_addr < SAM_SRAM_SIZE)
+		m_sam_sram[sram_addr] = (int16_t)data;
 }
 
 void ms4_state::machine_start()
