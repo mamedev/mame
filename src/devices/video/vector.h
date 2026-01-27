@@ -40,6 +40,7 @@ public:
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 
 private:
 	/* The vertices are buffered here */
@@ -56,6 +57,9 @@ private:
 	int m_vector_index;
 	int m_min_intensity;
 	int m_max_intensity;
+
+	bitmap_argb32 m_dot_bitmap;
+	render_texture* m_dot_texture;
 
 	float normalized_sigmoid(float n, float k);
 };
