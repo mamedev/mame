@@ -1677,6 +1677,17 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 
 	m_fdc_timer = timer_alloc(FUNC(pc9801vm_state::fdc_trigger), this);
 
+	save_item(NAME(m_uart_irq_mask));
+	save_item(NAME(m_uart_irq_pending));
+
+	save_item(NAME(m_nmi_ff));
+
+	save_item(NAME(m_fdc_2hd_ctrl));
+
+	save_item(NAME(m_dma_offset));
+	save_item(NAME(m_dma_autoinc));
+	save_item(NAME(m_dack));
+
 	save_item(NAME(m_dac1bit_disable));
 
 	save_item(NAME(m_dma_access_ctrl));
@@ -1695,6 +1706,7 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 	save_item(STRUCT_MEMBER(m_grcg, tile_index));
 
 	save_item(NAME(m_vram_bank));
+	save_item(NAME(m_vram_disp));
 }
 
 MACHINE_START_MEMBER(pc9801us_state,pc9801us)
