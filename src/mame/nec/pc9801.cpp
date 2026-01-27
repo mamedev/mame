@@ -1707,6 +1707,16 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 
 	save_item(NAME(m_vram_bank));
 	save_item(NAME(m_vram_disp));
+
+	save_item(NAME(m_mouse.control));
+	save_item(NAME(m_mouse.lx));
+	save_item(NAME(m_mouse.ly));
+	save_item(NAME(m_mouse.dx));
+	save_item(NAME(m_mouse.dy));
+	save_item(NAME(m_mouse.prev_dx));
+	save_item(NAME(m_mouse.prev_dy));
+	save_item(NAME(m_mouse.freq_reg));
+	save_item(NAME(m_mouse.freq_index));
 }
 
 MACHINE_START_MEMBER(pc9801us_state,pc9801us)
