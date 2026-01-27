@@ -612,8 +612,8 @@ CONS( 2014, bandplap,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 2014, bandslap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Wonderful Dream PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // あそんでまなべる！マウスでクリック！アンパンマンパソコン
 CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Asonde Manaberu! Mouse de Click! Anpanman PC (Japan, orange/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, orange base
-// one of these is probably a 'plus' version, code is different
-CONS( 2014, bananlapa,       bananlap, 0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Asonde Manaberu! Mouse de Click! Anpanman PC (Japan, yellow/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, yellow base
+// アンパンマンカラーパソコンスタート
+CONS( 2014, bananlapa,       bananlap, 0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Color PC Start (Japan, yellow/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, yellow base
 // ドラえもんステップアップパソコン
 CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Step Up PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
@@ -621,13 +621,16 @@ CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tropical Rouge! PreCure: Mermaid Aqua Pot (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32630A has GPspispi header
-CONS( 2018, anpntb18,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman 2018 Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// アンパンマンすくすく知育パッド
+CONS( 2018, anpntb18,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Sukusuku Chiiku Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32630A has GPspispi header
-CONS( 2017, anpncp17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman 2017 Color Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// アンパンマンカラーパッドプラス ピンクカラーVer.
+CONS( 2017, anpncp17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Color Pad Plus (Pink Color Version) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32630A has GPspispi header
-CONS( 2017, doraet17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon 2017 Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// ドラえもんひらめきパッド
+CONS( 2017, doraet17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Hirameki Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses a glob, has GPspispi header, "Pear 265077A. 2022 11 22" on PCB
 // めざせ！あこがれのわたし♡プリキュアミラーパッド！オールスター

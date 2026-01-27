@@ -6660,7 +6660,8 @@ CONS( 200?, gm235upc,  0,  0,  gm235upc, gm235upc, vt1682_dance_state, regular_i
 // "Anpanman Color PC" (アンパンマンカラーパソコン)
 CONS( 2009, anpncpc,   0,  0,  anpncpc, anpncpc, vt1682_anpncpc_state, regular_init,  "Bandai", "Anpanman Color PC (Japan)", MACHINE_NOT_WORKING )
 
-CONS( 2012, anpnvt12,  0,  0,  anpncpc, anpncpc, vt1682_anpncpc_state, regular_init,  "Bandai", "Anpanman 2012 PC (Japan)", MACHINE_NOT_WORKING )
+// マウスでクリック アンパンマンカラーパソコン
+CONS( 2012, anpnvt12,  0,  0,  anpncpc, anpncpc, vt1682_anpncpc_state, regular_init,  "Bandai", "Mouse de Click Anpanman Color PC (Japan)", MACHINE_NOT_WORKING )
 
 // as with others the cmpmx10 and cmpmx11 have minor offset issues in some games, you can see it easily in Jewel Master
 // 2007 is the copyright date shown on all the games, but the unit could have been released later
