@@ -370,7 +370,7 @@ ROM_START( anpntb18 )
 	ROM_IGNORE(0x50) // 'config' bytes
 ROM_END
 
-ROM_START( anpncp19 )
+ROM_START( anpncp17 )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "gpr25l640.u3", 0x0000, 0x800000, CRC(f7b1dce3) SHA1(d682abc9a3fbdb66fdc712da486b3e7bbdebbe48) )
 	ROM_IGNORE(0x50) // 'config' bytes
@@ -624,7 +624,7 @@ CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 2018, anpntb18,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman 2018 Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32630A has GPspispi header
-CONS( 2019, anpncp19,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman 2019 Color Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2017, anpncp17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman 2017 Color Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32630A has GPspispi header
 CONS( 2017, doraet17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon 2017 Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
