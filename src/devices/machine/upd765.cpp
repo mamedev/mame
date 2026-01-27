@@ -228,6 +228,15 @@ void upd765_family_device::device_start()
 	save_item(NAME(external_ready));
 	//save_item(NAME(mode));
 	save_item(NAME(main_phase));
+	save_item(NAME(cur_irq));
+	save_item(NAME(irq));
+	save_item(NAME(drq));
+	save_item(NAME(internal_drq));
+	save_item(NAME(tc));
+	save_item(NAME(tc_done));
+	save_item(NAME(locked));
+	save_item(NAME(mfm));
+	save_item(NAME(scan_done));
 	save_item(NAME(selected_drive));
 	save_item(NAME(drive_busy));
 
