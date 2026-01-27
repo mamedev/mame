@@ -327,6 +327,21 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 	}
 
 	// WXY (Write X and Y registers) - executes when bit 3 = 0
+	//
+	// NOTE on /WWE interpolation readback:
+	// In hardware, WXY and clearB execute simultaneously within the same cycle.
+	// Per the SAM8905 prog guide, WSP during clearB directly controls /WWE:
+	//   clearB + WSP  → /WWE=1 (HIGH, inactive)
+	//   clearB (no WSP) → /WWE=0 (LOW, active): WD bus goes high-impedance
+	//
+	// In the SRAM write sequence, the SECOND <clearB,WSP> is what applies SAM Y
+	// data onto WD pins. For interpolation readback that step is skipped, so SAM
+	// never drives the bus -- the 74HC244 can drive PHI[0:2] onto WD[0:2] instead:
+	//   RSP <clearB,WSP>   -- /WWE=1, ext mem outputs disabled, bus quiet
+	//   RSP <clearB,WXY>   -- /WWE=0, SAM didn't drive WD (no 2nd clearB+WSP),
+	//                         74HC244 drives PHI[0:2], WXY latches into X
+	// When /WWE=0 and WXY is a receiver, get_waveform() should return
+	// the 74HC244 output (m_phi & 0x07) instead of ROM data -- not yet implemented.
 	if (!BIT(inst, 3)) {
 		m_y = (bus >> 7) & 0xFFF;
 		m_x = get_waveform(m_wf, m_phi, mad, slot_idx) & 0xFFF;
@@ -342,10 +357,36 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 		m_b = 0;
 		//update_carry();  // B changed
 
-		// WWE (Write Waveform Enable) - triggered by RSP + clearB + WSP
-		// RSP = emitter_sel==3, clearB = bit 2 active, WSP = bit 8 active
-		// Per SAM8905 datasheet Section 9: Data to write is loaded into Y register
-		// via WXY instruction before WWE fires. WWE outputs Y to WD pins.
+		// WWE (Write Waveform Enable) / WOE (Write Output Enable)
+		//
+		// Per SAM8905 prog guide Section 9, WSP during clearB directly controls /WWE:
+		//   clearB + WSP  → /WWE=1 (HIGH): SAM drives WD bus (data output active)
+		//   clearB (no WSP) → /WWE=0 (LOW): write pulse / WD bus high-impedance
+		// When no clearB is active, /WWE returns to LOW (normal operation).
+		//
+		// SRAM WRITE sequence (from prog guide Section 9):
+		//   RM WF,   <WWF>           ;activate /WCS chip select
+		//   RM PHI,  <WPHI>          ;set address
+		//   RM DATA, <WXY>           ;prepare Y data on WD pins
+		//   RSP      <clearB,WSP>    ;/WWE=1 disable ext mem outputs
+		//   RSP      <clearB,WSP>    ;/WWE=1 apply SAM Y data to WD pins
+		//   RSP      <clearB>        ;/WWE=0 write pulse (SRAM latches data)
+		//   RSP      <clearB,WSP>    ;/WWE=1
+		//   RSP      <clearB,WSP>    ;/WWE=1 data still applied
+		//                            ;(next non-clearB: data removed, /WWE=0 normal)
+		// Note: it is the SECOND <clearB,WSP> that puts SAM data on the WD bus.
+		// The first only disables external memory outputs.
+		//
+		// INTERPOLATION READBACK (74HC244, e.g. XE9 board):
+		// By skipping the 2nd <clearB,WSP>, SAM never drives WD -- the bus stays
+		// free for the 74HC244 to drive PHI[0:2] onto WD[0:2]:
+		//   RSP      <clearB,WSP>    ;/WWE=1 ext mem outputs disabled, bus quiet
+		//   RSP      <clearB,WXY>    ;/WWE=0 SAM WD still not driven (no 2nd WSP)
+		//                            ;74HC244 drives PHI[0:2], WXY latches into X
+		//
+		// Current implementation is SIMPLIFIED: triggers write on RSP + clearB + WSP.
+		// Correct behavior: check WSP within clearB to determine /WWE level, and
+		// when /WWE=0 with WXY active, get_waveform() should return 74HC244 output.
 		if (emitter_sel == 3 && wsp && !m_waveform_write.isunset()) {
 			// Only fire for external memory (WF[8]=0)
 			// Machine driver handles chip select logic (e.g., WA16 for SRAM vs ROM)

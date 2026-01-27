@@ -350,6 +350,105 @@ This means that for external waveforms, the X register may be updated by WPHI/WW
 
 **Note:** Existing algorithms are structured to ensure correct timing by placing sufficient NOP cycles between WPHI and WXY. The 7-cycle delay in Example 2 (External Memory Wave Oscillator) accommodates both external memory access time and this address-to-X timing.
 
+### External Memory Control Signals
+
+The SAM8905 provides dedicated control signals for external waveform memory:
+
+| Signal | Description |
+|--------|-------------|
+| **/WCS** | Waveform Chip Select - active low when external waveform selected |
+| **/WOE** | Waveform Output Enable - active low for memory read |
+| **/WWE** | Waveform Write Enable - active low for memory write |
+| **WA0-WA19** | 20-bit waveform address bus |
+| **WD0-WD11** | 12-bit waveform data bus (directly into X register on read) |
+
+### External Memory Read Timing (Fig 7 from datasheet)
+
+```
+micro-       ┌──────┐           ┌─────────────┐
+instruction  │ WWF  │           │    WXY      │
+             │ WPHI │           │             │
+             └──────┘           └─────────────┘
+                │                     │
+                │<─── 2×TCLCL ───────>│
+                │                     │
+WA0-WA19   ████████                   │
+(address)        │ valid ─────────────│────────────
+                 │<──TWADMI──>        │
+                 │            │       │
+/WCS       ──────┘____________│_______│___┐──────
+                              │<─TMIWD─>  │
+                              │       │   │
+WD0-WD11   ──────────────────────────████████────
+(data)                              valid
+```
+
+**Timing parameters:**
+- **TWADMI**: Address setup time before /WCS active
+- **TMIWD**: Data valid time after /WCS active, before WXY samples
+- **2×TCLCL**: Minimum cycles between address setup and data read (~88ns at 45MHz)
+
+**Sequence:**
+1. **WWF + WPHI** instruction sets address on WA0-WA19
+2. **/WCS** goes low after address stable (TWADMI)
+3. External memory outputs data on WD0-WD11
+4. **WXY** instruction latches data into X register
+
+### External Memory Write Timing (Fig 8 from datasheet)
+
+```
+micro-       ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐
+instruction  │  1   │  │  1   │  │  2   │  │  2   │
+             └──────┘  └──────┘  └──────┘  └──────┘
+                │         │         │         │
+                │<────── 2×TCLCL ──────────>  │
+                │         │         │         │
+                │    ┌────┘    ┌────┘         │
+/WOE       ─────┴────┘         │              └────────
+                │<──TWOEWE──>  │
+                │         │    │<──TWEWD───>  │
+                │         │    │         │    │
+WD0-WD11   high-Z        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓   high-Z
+(data)                    │valid data   │
+                │         │    │         │    │
+/WWE       ─────────────────────┘________│____┴────────
+                               │<TWEWOE>│
+
+Instruction types:
+  1 = RSP, <clearB, WSP>
+  2 = RSP, <clearB>
+```
+
+**Sequence:**
+1. First **RSP, <clearB, WSP>** - /WOE goes high (disable external memory outputs)
+2. Second **RSP, <clearB, WSP>** - Data from Y register applied to WD pins (TWOEWD)
+3. **RSP, <clearB>** (without WSP) - /WWE goes low (write pulse)
+4. **RSP, <clearB, WSP>** - /WWE goes high, data still valid (TWEWOE)
+5. Final cycle - data removed, /WOE returns low (normal operation)
+
+### /WCS and Address Latching
+
+When external memory hardware uses address latches (e.g., 74HC174), the /WCS signal provides the latch clock:
+
+1. **WWF selects external waveform** (WF[8]=0): /WCS goes low
+2. **74HC174 latches upper address bits** on /WCS falling edge
+3. **Subsequent WPHI** changes lower address (phase) without affecting latched upper bits
+4. **/WCS stays low** while external waveform mode is active
+5. **Selecting internal waveform** (WF[8]=1): /WCS goes high, latch holds previous value
+
+This allows efficient multi-tap delay line access:
+```
+RM   WF,   <WWF>         ; Set waveform bank - latches upper address
+RM   PHI1, <WPHI>        ; First delay tap address
+...                      ; Wait for access
+RM   AMP1, <WXY>         ; Read first tap
+RM   PHI2, <WPHI>        ; Second delay tap (same bank, different phase)
+...                      ; Wait for access
+RM   AMP2, <WXY>         ; Read second tap
+```
+
+The latched upper address (from WF) remains stable across multiple WPHI/WXY operations, allowing multiple reads from the same memory page with only the phase (lower address) changing.
+
 ---
 
 ## 7. Simple Algorithm Examples
