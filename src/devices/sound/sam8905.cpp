@@ -16,6 +16,7 @@ sam8905_device::sam8905_device(const machine_config &mconfig, const char *tag, d
 	, m_waveform_read(*this, 0)
 	, m_waveform_write(*this)
 	, m_sample_output(*this)
+	, m_wcs_callback(*this)
 {
 }
 
@@ -365,10 +366,14 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 	// WWF (Write Waveform)
 	if (!BIT(inst, 1)) {
 		m_wf = (bus >> 9) & 0x1FF;
-		// External waveform: WWF updates address, triggers ROM read, updates X
-		// if (!(m_wf & 0x100)) {
-		// 	m_x = get_waveform(m_wf, m_phi, mad, slot_idx) & 0xFFF;
-		// }
+
+		// Fire /WCS callback when WWF executes
+		// /WCS goes low when external waveform selected (WF[8]=0)
+		// Pass (wf << 12) | phi so driver can latch PHI for 74HC174
+		if (!m_wcs_callback.isunset()) {
+			uint32_t wcs_data = (m_wf << 12) | (m_phi & 0xFFF);
+			m_wcs_callback(wcs_data);
+		}
 	}
 
 	// WACC (Accumulate) - with proper dB attenuation

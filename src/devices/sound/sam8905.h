@@ -24,6 +24,10 @@ public:
 	// Sample output callback for inter-chip audio (L/R packed as upper/lower 16 bits)
 	auto sample_output_callback() { return m_sample_output.bind(); }
 
+	// /WCS callback - fires when WWF executes, passes (wf << 12) | phi
+	// Driver uses this to latch PHI bits for external 74HC174 address latches
+	auto wcs_callback() { return m_wcs_callback.bind(); }
+
 	// Master-slave synchronization for chained SAM chips
 	// In slave mode, the chip doesn't generate samples on its own - it's triggered by master
 	void set_slave_mode(bool slave) { m_slave_mode = slave; }
@@ -68,6 +72,11 @@ private:
 
 	// Sample output callback for inter-chip audio
 	devcb_write32 m_sample_output;
+
+	// /WCS (Waveform Chip Select) callback - fires when WWF changes WF register
+	// Active low when external waveform selected (WF[8]=0)
+	// Callback receives: (wf << 12) | phi - allowing driver to latch PHI for 74HC174
+	devcb_write32 m_wcs_callback;
 
 	// Master-slave mode for chained chips
 	bool m_slave_mode;
