@@ -169,7 +169,7 @@ license:CC0-1.0
 	    18. 花
 	    19. 故郷
 	-->
-	<software name="ro101">
+	<software name="ro101" supported="no">
 		<description>The Hit Parade (RO-101)</description>
 		<year>1983</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -201,7 +201,7 @@ license:CC0-1.0
 	    17. 契り
 	    18. 北酒場
 	-->
-	<software name="ro102">
+	<software name="ro102" supported="no">
 		<description>Hit Kayou (RO-102)</description>
 		<year>1983</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -232,7 +232,7 @@ license:CC0-1.0
 	    15. 季節の中で
 	    16. 人生の空から
 	-->
-	<software name="ro103">
+	<software name="ro103" supported="no">
 		<description>New Music (RO-103)</description>
 		<year>1983</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -264,7 +264,7 @@ license:CC0-1.0
 	    16. 浮草ぐらし
 	    17. 中の島ブルース
 	-->
-	<software name="ro106">
+	<software name="ro106" supported="no">
 		<description>Enka Vol.2 Karaoke Hit Shuu (RO-106)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -297,7 +297,7 @@ license:CC0-1.0
 	    17. 雨の慕情
 	    18. ふたりの春
 	-->
-	<software name="ro108">
+	<software name="ro108" supported="no">
 		<description>Enka 3 (RO-108)</description>
 		<year>1984</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -329,7 +329,7 @@ license:CC0-1.0
 	    16. 愛のオルゴール
 	    17. 雨にぬれても
 	-->
-	<software name="ro110">
+	<software name="ro110" supported="no">
 		<description>Easy Listening 3 (RO-110)</description>
 		<year>1985</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -359,7 +359,7 @@ license:CC0-1.0
 	    14. 居酒屋
 	    15. 中の島ブルース
 	-->
-	<software name="ro111">
+	<software name="ro111" supported="no">
 		<description>Enka 4 (RO-111)</description>
 		<year>1985?</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -389,7 +389,7 @@ license:CC0-1.0
 	    14. 港のはいから人魚
 	    15. 迷宮のアンドローラ
 	-->
-	<software name="ro113">
+	<software name="ro113" supported="no">
 		<description>Young Best Hits (RO-113)</description>
 		<year>1985</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -419,7 +419,7 @@ license:CC0-1.0
 	    14. 港町ブルース
 	    15. 冬のリヴィエラ
 	-->
-	<software name="ro114">
+	<software name="ro114" supported="no">
 		<description>Enka 5 (RO-114)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -449,7 +449,7 @@ license:CC0-1.0
 	    14. ラスト・コンサート
 	    15. 80日間世界一周
 	-->
-	<software name="ro118">
+	<software name="ro118" supported="no">
 		<description>Screen Themes 3 (RO-118)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -484,7 +484,7 @@ license:CC0-1.0
 	    19. はしれ ちょうとっきゅう
 	    20. こぎつね
 	-->
-	<software name="ro119">
+	<software name="ro119" supported="no">
 		<description>Kodomo no Uta 3 (RO-119)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -519,7 +519,7 @@ license:CC0-1.0
 	    19. かもめの歌
 	    20. 北空港
 	-->
-	<software name="ro125e">
+	<software name="ro125e" supported="no">
 		<description>Enka 9 (RO-125E)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -538,7 +538,7 @@ license:CC0-1.0
 	    3. エーゲ海の真珠 / PENELOPE
 	    4. 涙のトッカータ / TOCCATA
 	-->
-	<software name="ro151">
+	<software name="ro151" supported="no">
 		<description>Paul Mauriat (RO-151)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -557,7 +557,7 @@ license:CC0-1.0
 	    3. 天国のキッス
 	    4. 秘密の楽園
 	-->
-	<software name="ro153">
+	<software name="ro153" supported="no">
 		<description>Young Hits (RO-153)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -576,7 +576,7 @@ license:CC0-1.0
 	    3. ワイワイワールド ～Dr.スランプ・アラレちゃん～
 	    4. CAT'S EYE
 	-->
-	<software name="ro155">
+	<software name="ro155" supported="no">
 		<description>Animation (RO-155)</description>
 		<year>1984?</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -599,7 +599,7 @@ license:CC0-1.0
 	    7. いぬのおまわりさん
 	    8. とんでったバナナ
 	-->
-	<software name="ro158">
+	<software name="ro158" supported="no">
 		<description>Kodomo no Uta 1 (RO-158)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -618,7 +618,7 @@ license:CC0-1.0
 	    3. 日本昔ばなし
 	    4. ラムのラブソング-うる星やつら-
 	-->
-	<software name="ro162">
+	<software name="ro162" supported="no">
 		<description>Animation 2 (RO-162)</description>
 		<year>1984</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -638,7 +638,7 @@ license:CC0-1.0
 	    4. タッチ～「タッチ」
 	    5. 水の星より愛をこめて～「機動戦士Zガンダム」
 	-->
-	<software name="ro166">
+	<software name="ro166" supported="no">
 		<description>Animation Themes 3 (RO-166)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -661,7 +661,7 @@ license:CC0-1.0
 	    7. 『聖闘士星矢(セイントセイヤ)』より『ペガサス幻想(ファンタジー)』
 	    8. 『のらくろクン』より『Hold Me(ホールド ミー)』
 	-->
-	<software name="ro169a">
+	<software name="ro169a" supported="no">
 		<description>Animation Themes 4 (RO-169A)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -684,7 +684,7 @@ license:CC0-1.0
 	    7. 『キテレツ大百科』より『キテレツ大百科』
 	    8. 『小公子セディ』より『ぼくらのセディ』
 	-->
-	<software name="ro170a">
+	<software name="ro170a" supported="no">
 		<description>Animation Themes 5 (RO-170A)</description>
 		<year>1988</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -705,7 +705,7 @@ license:CC0-1.0
 	    5. こいのぼり
 	    6. 婚礼の合唱
 	-->
-	<software name="ro171i">
+	<software name="ro171i" supported="no">
 		<description>Event Songs (RO-171I)</description>
 		<year>1988?</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -726,7 +726,7 @@ license:CC0-1.0
 	    5. 戦闘のテーマ
 	    6. そして伝説へ・・・
 	-->
-	<software name="ro172g">
+	<software name="ro172g" supported="no">
 		<description>Game Music: Dragon Quest III Yori (RO-172G)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -748,7 +748,7 @@ license:CC0-1.0
 	    6. 仮面ライダーBLACK RX
 	    7. 勇気りんりん
 	-->
-	<software name="ro178a">
+	<software name="ro178a" supported="no">
 		<description>Animation Themes 6 (RO-178A)</description>
 		<year>1989</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -770,7 +770,7 @@ license:CC0-1.0
 	    6. 神の御子は
 	    7. グローリア(荒野の果てに)
 	-->
-	<software name="ro180x">
+	<software name="ro180x" supported="no">
 		<description>Christmas Songs 2 (RO-180X)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -792,7 +792,7 @@ license:CC0-1.0
 	    6. 酒とバラの日々 / DAYS OF WINE AND ROSES
 	    7. ユード・ビー・ソー・ナイス・トゥカム・ホーム・トゥ / YOU'D BE SO NICE TO COME HOME TO
 	-->
-	<software name="ro181s">
+	<software name="ro181s" supported="no">
 		<description>Standards 2 (RO-181S)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -814,7 +814,7 @@ license:CC0-1.0
 	    6. ディ・トリッパー / DAY TRIPPER
 	    7. プリーズ・プリーズ・ミー / PLEASE PLEASE ME
 	-->
-	<software name="ro182b">
+	<software name="ro182b" supported="no">
 		<description>Beatles 2 (RO-182B)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -836,7 +836,7 @@ license:CC0-1.0
 	    6. 炎のエスカルゴ
 	    7. 小市民 2
 	-->
-	<software name="ro183c">
+	<software name="ro183c" supported="no">
 		<description>Comic Songs (RO-183C)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -866,7 +866,7 @@ license:CC0-1.0
 	    14. あかちゃん
 	    15. アンダルコのうた
 	-->
-	<software name="ro184t">
+	<software name="ro184t" supported="no">
 		<description>Shougakusei no Ongaku 1 (RO-184T)</description>
 		<year>1989?</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -896,7 +896,7 @@ license:CC0-1.0
 	    14. 夜汽車
 	    15. 月夜
 	-->
-	<software name="ro185t">
+	<software name="ro185t" supported="no">
 		<description>Shougakusei no Ongaku 2 (RO-185T)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -924,7 +924,7 @@ license:CC0-1.0
 	    12. 星に向かい 光に向かい
 	    13. あおげばとうとし
 	-->
-	<software name="ro186t">
+	<software name="ro186t" supported="no">
 		<description>Shougakusei no Ongaku 3 (RO-186T)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -946,7 +946,7 @@ license:CC0-1.0
 	    6. Dang Dang 気になる 「美味しんぼ」より
 	    7. キッチンから愛をこめて 「ハーイ あっこです」より
 	-->
-	<software name="ro189a">
+	<software name="ro189a" supported="no">
 		<description>Animation Themes 7 (RO-189A)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -967,7 +967,7 @@ license:CC0-1.0
 	    5. BE MY BABY
 	    6. Runner
 	-->
-	<software name="ro191y">
+	<software name="ro191y" supported="no">
 		<description>Young Best Hits 8 (RO-191Y)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
@@ -989,7 +989,7 @@ license:CC0-1.0
 	    6. NEVERLAND～YAWARA! メインテーマ～
 	    7. Return to Myself～しない、しない、ナツ。
 	-->
-	<software name="ro192y">
+	<software name="ro192y" supported="no">
 		<description>Young Best Hits 9 (RO-192Y)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
