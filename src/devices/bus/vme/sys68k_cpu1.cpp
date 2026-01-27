@@ -150,6 +150,9 @@ vme_sys68k_cpu1_card_device::vme_sys68k_cpu1_card_device(machine_config const &m
 	, m_serial_p5(*this, "SERIAL_P5")
 	, m_panel(*this, "PANEL")
 	, m_halt_led(*this, "led_halt")
+	, m_p3_conn(*this, "conn_p3")
+	, m_p4_conn(*this, "conn_p4")
+	, m_p5_conn(*this, "conn_p5")
 	, m_cart(*this, "exp_rom1")
 	, m_eprom(*this, "eprom")
 	, m_ram(*this, "ram")
@@ -326,6 +329,11 @@ void vme_sys68k_cpu1_card_device::device_start()
 	m_halt_timer = timer_alloc(FUNC(vme_sys68k_cpu1_card_device::halt_update), this);
 	m_halt_timer->adjust(attotime::from_hz(10), 0, attotime::from_hz(10));
 
+	// Front panel connector status
+	m_p3_conn.resolve();
+	m_p4_conn.resolve();
+	m_p5_conn.resolve();
+
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_ack));
 	save_item(NAME(m_centronics_select));
@@ -347,6 +355,26 @@ void vme_sys68k_cpu1_card_device::device_start()
 void vme_sys68k_cpu1_card_device::device_reset()
 {
 	LOG("%s\n", FUNCNAME);
+
+	// Front panel connector status — identify connected device type
+	// (must be set here rather than device_start, as layout resolve_tags overwrites outputs with defstate)
+	auto detect_port = [this](char const *tag) -> int {
+		auto *port = subdevice<rs232_port_device>(tag);
+		if (!port || !port->get_card_device())
+			return 0; // not connected
+		char const *devtag = port->get_card_device()->device().basetag();
+		if (!strcmp(devtag, "terminal") || !strcmp(devtag, "h19") || !strcmp(devtag, "ie15") || !strcmp(devtag, "swtpc8212"))
+			return 1; // terminal
+		if (!strcmp(devtag, "null_modem"))
+			return 2; // null modem
+		if (!strcmp(devtag, "printer") || !strcmp(devtag, "rs_printer"))
+			return 3; // printer
+		return 0;
+	};
+
+	m_p3_conn = detect_port("rs232host");
+	m_p4_conn = detect_port("rs232trm");
+	m_p5_conn = 0; // P5 has no RS232_PORT configured
 
 	// Set up the BRG divider. RSA is a jumper setting and RSB is always set High
 	m_brg->rsa_w(m_serial_brf->read() == 0x80 ? ASSERT_LINE : CLEAR_LINE);

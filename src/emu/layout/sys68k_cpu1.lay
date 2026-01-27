@@ -37,6 +37,14 @@ Matches real hardware: RESET and ABORT pushbuttons, HALT LED, P3/P4/P5 connector
 		<rect><color red="0.70" green="0.70" blue="0.70" /></rect>
 	</element>
 
+	<!-- Connection status indicator (0=none, 1=terminal, 2=null modem, 3=printer) -->
+	<element name="conn_status" defstate="0">
+		<text state="0" string="--"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="1" string="TERMINAL"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="2" string="NULL MODEM"><color red="0.0" green="0.0" blue="0.0" /></text>
+		<text state="3" string="PRINTER"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
 	<!-- Button elements (interactive) -->
 	<element name="btn_reset" defstate="0">
 		<rect state="0"><color red="0.25" green="0.25" blue="0.25" /></rect>
@@ -73,15 +81,23 @@ Matches real hardware: RESET and ABORT pushbuttons, HALT LED, P3/P4/P5 connector
 		<!-- P3 serial port connector (Host) -->
 		<element ref="txt_p3"><bounds x="3" y="118" width="18" height="10" /></element>
 		<element ref="db25"><bounds x="10" y="130" width="22" height="50" /></element>
+		<element name="conn_p3" ref="conn_status"><bounds x="10" y="152" width="22" height="5" /></element>
 
 		<!-- P4 serial port connector (Terminal) -->
 		<element ref="txt_p4"><bounds x="3" y="192" width="18" height="10" /></element>
 		<element ref="db25"><bounds x="10" y="204" width="22" height="50" /></element>
+		<element name="conn_p4" ref="conn_status"><bounds x="10" y="227" width="22" height="5" /></element>
 
 		<!-- P5 serial port connector (Remote) -->
 		<element ref="txt_p5"><bounds x="3" y="268" width="18" height="10" /></element>
 		<element ref="db25"><bounds x="10" y="280" width="22" height="50" /></element>
+		<element name="conn_p5" ref="conn_status"><bounds x="10" y="303" width="22" height="5" /></element>
 	</group>
+
+	<!-- Front Panel: standalone panel strip (always available) -->
+	<view name="Front Panel">
+		<group ref="panel"><bounds x="0" y="0" width="48" height="345" /></group>
+	</view>
 
 	<!-- Front Panel with Terminal: panel strip + terminal side by side (dropped if no terminal) -->
 	<view name="Front Panel with Terminal">
@@ -92,11 +108,6 @@ Matches real hardware: RESET and ABORT pushbuttons, HALT LED, P3/P4/P5 connector
 	<!-- Terminal view: just the terminal screen (dropped if no terminal attached) -->
 	<view name="Terminal">
 		<screen tag="rs232trm:terminal:terminal_screen"><bounds x="0" y="0" width="640" height="480" /></screen>
-	</view>
-
-	<!-- Front Panel: standalone panel strip (always available) -->
-	<view name="Front Panel">
-		<group ref="panel"><bounds x="0" y="0" width="48" height="345" /></group>
 	</view>
 
 </mamelayout>

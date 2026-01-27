@@ -93,6 +93,9 @@ private:
 	// Front panel
 	required_ioport             m_panel;
 	output_finder<>             m_halt_led;
+	output_finder<>             m_p3_conn;
+	output_finder<>             m_p4_conn;
+	output_finder<>             m_p5_conn;
 	emu_timer                  *m_halt_timer;
 
 	uint16_t *m_usrrom;
