@@ -181,29 +181,34 @@ u16 ms4_state::sam_waveform_r(offs_t offset)
 	// Build 18-bit ROM address: RA[17:0]
 	uint32_t rom_addr = (ra_high << 9) | ra_low;
 
-	// Bank select from WA[19:18] = WAVE[7:6]
-	// 74LS139 decodes to /CS0-/CS3 for 4 banks
-	uint32_t wave = (offset >> 12) & 0xFF;
-	uint32_t rom_bank = (wave >> 6) & 0x03;
+	// Bank select from WA[19:18] via 74LS139
+	// WA19 selects ROM pair: 0→(ROM0,ROM1)+ROM4, 1→(ROM2,ROM3)+ROM5
+	// WA18 selects within pair: adds 0 or 1 to base ROM
+	uint32_t wa19 = (offset >> 19) & 1;  // WAVE[7]
+	uint32_t wa18 = (offset >> 18) & 1;  // WAVE[6]
+	uint32_t wa1 = (current_phi >> 1) & 1;  // PHI[1] - nibble select via 74LS257
+
+	// Upper byte ROM: 0-3
+	// 74LS139 decoding: WA19=0→ROM0/1, WA19=1→ROM2/3, WA18 selects within pair
+	uint32_t upper_rom = (wa19 << 1) | wa18;
 
 	// Read upper 8 bits from ROMs 0-3
-	// ROM layout: bank 0 = offset 0x000000, bank 1 = 0x080000, etc.
-	uint32_t upper_addr = (rom_bank * 0x80000) + (rom_addr & 0x7FFFF);
+	// ROM layout: ROM0=0x000000, ROM1=0x080000, ROM2=0x100000, ROM3=0x180000
+	uint32_t upper_addr = (upper_rom * 0x80000) + (rom_addr & 0x7FFFF);
 	if (upper_addr >= 0x200000)
 		return 0;
 	uint8_t upper_byte = m_samples[upper_addr];
 
 	// Read lower nibble from ROMs 4-5
-	// ROM 4 (XEL4) at 0x200000, ROM 5 (XEL5) at 0x280000
-	// Bank select bit determines which nibble ROM: banks 0,1 → ROM4, banks 2,3 → ROM5
-	uint32_t nibble_rom = (rom_bank >> 1) & 1;  // 0 for banks 0-1, 1 for banks 2-3
-	uint32_t nibble_addr = 0x200000 + (nibble_rom * 0x80000) + (rom_addr & 0x7FFFF);
+	// WA19 selects nibble ROM: 0→ROM4 (0x200000), 1→ROM5 (0x280000)
+	uint32_t nibble_rom_offset = 0x200000 + (wa19 * 0x80000);
+	uint32_t nibble_addr = nibble_rom_offset + (rom_addr & 0x7FFFF);
 	if (nibble_addr >= 0x300000)
 		return 0;
 	uint8_t nibble_byte = m_samples[nibble_addr];
 
-	// Extract correct nibble based on bank (even/odd)
-	uint8_t lower_nibble = (rom_bank & 1) ? (nibble_byte >> 4) : (nibble_byte & 0x0F);
+	// WA1 (PHI[1]) selects low/high nibble via 74LS257 MUX
+	uint8_t lower_nibble = wa1 ? (nibble_byte >> 4) : (nibble_byte & 0x0F);
 
 	// Combine to 12-bit sample: upper 8 bits + lower 4 bits
 	int16_t sample = ((int8_t)upper_byte << 4) | lower_nibble;
