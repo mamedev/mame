@@ -237,6 +237,12 @@ void upd765_family_device::device_start()
 	save_item(NAME(locked));
 	save_item(NAME(mfm));
 	save_item(NAME(scan_done));
+	save_item(NAME(fifo_write));
+	save_item(NAME(fifo_pos));
+	save_item(NAME(fifo_expected));
+	save_item(NAME(command_pos));
+	save_item(NAME(result_pos));
+	save_item(NAME(sectors_read));
 	save_item(NAME(selected_drive));
 	save_item(NAME(drive_busy));
 
