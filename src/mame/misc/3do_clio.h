@@ -30,7 +30,6 @@ public:
 	auto vsync_cb() { return m_vsync_cb.bind(); }
 	template <std::size_t Line> auto adb_out_cb() { return m_adb_out_cb[Line].bind(); }
 
-	void xbus_rdy_w(int state);
 	void xbus_int_w(int state);
 	void xbus_wr_w(int state);
 

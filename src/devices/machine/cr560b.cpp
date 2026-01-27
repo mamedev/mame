@@ -7,6 +7,12 @@ CR-560-B CD-ROM drive
 Panasonic pre-IDE MKE interface, akin to CR-511-B (which this is based off) and Creative
 Soundblaster.
 
+NOTES:
+- all commands but cmd_reset and cmd_read_subq acknowledge command byte issued
+  in first output return byte;
+- 3do disks are not ISO9660 compatible. First sector at LBA 0 / MSF 00:02:00 is described at:
+  https://github.com/trapexit/portfolio_os/blob/bee7b0c8e4287083c73cb5497b658880c9e7af8e/utils/discdata.h#L52
+
 TODO:
 - Enough to load a few sectors and nothing else;
 - Find common points with other MKE drives, generate a streamlined interface;
@@ -90,6 +96,7 @@ void cr560b_device::device_start()
 
 	std::fill(std::begin(m_input_fifo), std::end(m_input_fifo), 0x00);
 	std::fill(std::begin(m_output_fifo), std::end(m_output_fifo), 0x00);
+	std::fill(std::begin(m_transfer_buffer), std::end(m_transfer_buffer), 0xff);
 
 	// register for save states
 	save_item(NAME(m_input_fifo));
@@ -368,6 +375,7 @@ void cr560b_device::write(uint8_t data)
 		case 0x03: cmd_motor_off(); break;
 		//case 0x04: cmd_diag(); break;
 		case 0x05: cmd_read_status(); break;
+		// TODO: drawer_open is issued by fz10e just after purging the disc avatars
 		//case 0x06: cmd_drawer_open(); break;
 		//case 0x07: cmd_drawer_close(); break;
 		case 0x09: cmd_set_mode(); break;
@@ -416,19 +424,42 @@ void cr560b_device::enable_w(int state)
 	m_enabled = !bool(state); // active low
 }
 
+/******************
+ *
+ * Commands
+ *
+ *****************/
+
 // TODO: unverified in this implementation
 void cr560b_device::cmd_seek()
 {
 	LOGMASKED(LOG_CMD, "Command: Seek\n");
 	LOGPARAM;
 
+	const u8 seek_mode = m_input_fifo[1];
+	const u32 param = (m_input_fifo[2] << 16) | (m_input_fifo[3] << 8) | (m_input_fifo[4]);
+
+	switch(seek_mode)
+	{
+		case 0x00:
+			LOGMASKED(LOG_CMD, "-> To LBA %06x\n", param);
+			break;
+		case 0x02:
+			LOGMASKED(LOG_CMD, "-> To MSF %06x\n", param);
+			break;
+		default:
+			LOGMASKED(LOG_CMD, "-> Unknown mode %02x!\n", seek_mode);
+			break;
+	}
+
 	// TODO: Does this enable STATUS_SUCCESS?
 	u8 status = m_status;
 	status |= STATUS_MOTOR;
-	m_output_fifo[0] = status;
+	m_output_fifo[0] = 0x01;
+	m_output_fifo[1] = status;
 
 	status_change(status);
-	status_enable(1);
+	status_enable(2);
 }
 
 // TODO: unverified in this implementation
@@ -439,10 +470,11 @@ void cr560b_device::cmd_read_status()
 
 	u8 status = m_status;
 	status &= ~STATUS_SUCCESS;
-	m_output_fifo[0] = status;
+	m_output_fifo[0] = 0x05;
+	m_output_fifo[1] = status;
 
 	status_change(status);
-	status_enable(1);
+	status_enable(2);
 }
 
 // TODO: unverified in this implementation
@@ -455,10 +487,11 @@ void cr560b_device::cmd_motor_on()
 	// TODO: Does this enable STATUS_SUCCESS?
 	u8 status = m_status;
 	status |= STATUS_SUCCESS;
-	m_output_fifo[0] = status;
+	m_output_fifo[0] = 0x02;
+	m_output_fifo[1] = status;
 
 	status_change(status);
-	status_enable(1);
+	status_enable(2);
 }
 
 // TODO: unverifed in this implementation
@@ -471,10 +504,11 @@ void cr560b_device::cmd_motor_off()
 	// TODO: Does this enable STATUS_SUCCESS?
 	u8 status = m_status;
 	status &= ~STATUS_MOTOR;
-	m_output_fifo[0] = status;
+	m_output_fifo[0] = 0x03;
+	m_output_fifo[1] = status;
 
 	status_change(status);
-	status_enable(1);
+	status_enable(2);
 }
 
 void cr560b_device::cmd_set_mode()
@@ -526,7 +560,6 @@ void cr560b_device::cmd_play_msf()
 	{
 		LOGMASKED(LOG_CMD, "Stop audio\n");
 
-
 		if (m_cdda->audio_active())
 			status |= STATUS_SUCCESS;
 
@@ -534,8 +567,6 @@ void cr560b_device::cmd_play_msf()
 
 		status &= ~STATUS_PLAYING;
 		status &= ~STATUS_MOTOR;
-
-		status_change(status);
 	}
 	else if (start_lba < end_lba)
 	{
@@ -547,19 +578,18 @@ void cr560b_device::cmd_play_msf()
 
 		status |= STATUS_PLAYING;
 		status |= STATUS_MOTOR;
-
-		status_change(status);
 	}
 	else
 	{
 		LOGMASKED(LOG_CMD, "Invalid range %d to %d!\n", start_lba, end_lba);
 
 		status |= STATUS_ERROR;
-		status_change(status);
 	}
 
-	m_output_fifo[0] = status;
-	status_enable(1);
+	m_output_fifo[0] = 0x0e;
+	m_output_fifo[1] = status;
+	status_change(status);
+	status_enable(2);
 }
 
 // TODO: unverified in this implementation
@@ -584,10 +614,11 @@ void cr560b_device::cmd_play_track()
 	status |= STATUS_PLAYING;
 	status |= STATUS_MOTOR;
 
-	m_output_fifo[0] = status;
+	m_output_fifo[0] = 0x0f;
+	m_output_fifo[1] = status;
 
 	status_change(status);
-	status_enable(1);
+	status_enable(2);
 }
 
 // TODO: unverified in this implementation (sure needs data ready in Clio)
