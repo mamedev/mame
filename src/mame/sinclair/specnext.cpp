@@ -3042,6 +3042,10 @@ void specnext_state::map_regs(address_map &map)
 INPUT_PORTS_START(specnext)
 	PORT_INCLUDE(spec_plus)
 
+	PORT_MODIFY("CONFIG")
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+
 	PORT_START("ISSUE")
 	PORT_CONFNAME(0x03, 0x02, "Hardware Version" )
 	PORT_CONFSETTING(0x00, "Issue 1 (TBBLUE)" )
