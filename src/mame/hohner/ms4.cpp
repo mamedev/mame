@@ -8,6 +8,7 @@
 #include "speaker.h"
 
 #define LOG_SAM    (1U << 1)
+//#define LOG_SAM    0
 #define VERBOSE (LOG_SAM)
 #include "logmacro.h"
 
@@ -29,6 +30,7 @@ private:
 	void program_map(address_map &map) ATTR_COLD;
 	void data_map(address_map &map) ATTR_COLD;
 
+    void port2_w(u8 data);
 	u8 port3_r();
 	void port3_w(u8 data);
 
@@ -59,6 +61,17 @@ void ms4_state::data_map(address_map &map)
 	map(0x0000, 0x1fff).ram();
 	// SAM8905 decodes only A0-A2, chip select on A15
 	map(0x8000, 0xffff).rw(FUNC(ms4_state::sam_r), FUNC(ms4_state::sam_w));
+}
+
+void ms4_state::port2_w(u8 data)
+{
+    // if (m_port2 != data)
+    // {
+    //     LOGMASKED(LOG_PORT, "P2 write: 0x%02X\n", data);
+    //     // Log P2 changes specifically since it's used for external memory address high byte
+    //     LOGMASKED(LOG_SAM, "P2 = 0x%02X (ext addr A8-A15)\n", data);
+    // }
+    // m_port2 = data;
 }
 
 u8 ms4_state::port3_r()
@@ -122,6 +135,7 @@ void ms4_state::ms4(machine_config &config)
 	I80C32(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ms4_state::program_map);
 	m_maincpu->set_addrmap(AS_DATA, &ms4_state::data_map);
+    m_maincpu->port_out_cb<2>().set(FUNC(ms4_state::port2_w)); // keyfox2
 	m_maincpu->port_in_cb<3>().set(FUNC(ms4_state::port3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(ms4_state::port3_w));
 
@@ -134,7 +148,7 @@ void ms4_state::ms4(machine_config &config)
 	SPEAKER(config, "lspeaker").front_left();
 	SPEAKER(config, "rspeaker").front_right();
 
-	SAM8905(config, m_sam, 16_MHz_XTAL, 1024);
+	SAM8905(config, m_sam, 45'158'400, 1024);
 	m_sam->waveform_read_callback().set(FUNC(ms4_state::sam_waveform_r));
 	m_sam->add_route(0, "lspeaker", 1.0);
 	m_sam->add_route(1, "rspeaker", 1.0);
@@ -142,8 +156,15 @@ void ms4_state::ms4(machine_config &config)
 
 ROM_START(ms4)
 	ROM_REGION(0x10000, "program", 0)
-	ROM_LOAD("ms4_05_r1_0.bin", 0x0000, 0x10000, CRC(b02cd104) SHA1(1c10d26481c20d0de2df9cf3e2b5112cd40fe3ba)) // SOLO SOUNDS CH1-4
+//	ROM_LOAD("ms4_05_r1_0.bin", 0x0000, 0x10000, CRC(b02cd104) SHA1(1c10d26481c20d0de2df9cf3e2b5112cd40fe3ba)) // SOLO SOUNDS CH1-4
 //	ROM_LOAD("ms4_06_r1_1.bin", 0x0000, 0x10000, CRC(b02cd104) SHA1(1c10d26481c20d0de2df9cf3e2b5112cd40fe3ba)) // DRUMS CH16 + ACCOMP CH5-8
+
+//	ROM_LOAD("kf31_ic7_630792l_v1_1.bin", 0x0000, 0x10000, CRC(b02cd104) SHA1(1c10d26481c20d0de2df9cf3e2b5112cd40fe3ba))
+//	ROM_LOAD("kf31_ic7_630792l_v1_0_uart.bin", 0x0000, 0x10000, CRC(b02cd104) SHA1(1c10d26481c20d0de2df9cf3e2b5112cd40fe3ba))
+
+//	ROM_LOAD("xe9l_v141_uart.bin", 0x0000, 0x10000, CRC(b02cd104) SHA1(1c10d26481c20d0de2df9cf3e2b5112cd40fe3ba))
+	ROM_LOAD("xe9r_v141_uart.bin", 0x0000, 0x10000, CRC(b02cd104) SHA1(1c10d26481c20d0de2df9cf3e2b5112cd40fe3ba))
+
 ROM_END
 
 } // anonymous namespace
