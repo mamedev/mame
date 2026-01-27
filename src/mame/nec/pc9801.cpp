@@ -1679,9 +1679,9 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 	save_item(NAME(m_dma_autoinc));
 	save_item(NAME(m_dack));
 
-	save_item(STRUCT_MEMBER(m_grcg, mode));
-	save_item(STRUCT_MEMBER(m_grcg, tile));
-	save_item(STRUCT_MEMBER(m_grcg, tile_index));
+	save_item(NAME(m_grcg.mode));
+	save_item(NAME(m_grcg.tile));
+	save_item(NAME(m_grcg.tile_index));
 
 	save_item(NAME(m_vram_bank));
 	save_item(NAME(m_vram_disp));
