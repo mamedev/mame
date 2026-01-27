@@ -417,7 +417,7 @@ void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
 			// Madam can access Player bus from DMA only, and the port(s) are daisy chained thru
 			// bidirectional serial i/f (which also handle headphone jack and ROM device transfers)
 			// Smells a lot like an internal MCU doing the job ...
-			m_dma32_write_cb(m_dma[23][2] + 0x4, m_playerbus_read_cb(0));
+			m_dma32_write_cb(m_dma[DMA_CONTROL_PORT][2] + 0x4, m_playerbus_read_cb(0));
 		}
 		if (BIT(m_mctl, 15) && !BIT(data, 15))
 		{
@@ -444,7 +444,7 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 	if (!BIT(m_mctl, 15))
 		return;
 
-	u32 count = m_dma[23][1];
+	u32 count = m_dma[DMA_CONTROL_PORT][1];
 
 	if (BIT(count, 31))
 	{
@@ -455,8 +455,8 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 	}
 
 	// TODO: should cause a privbits exception if mask outside bounds
-	u32 src = m_dma[23][2];
-	u32 dst = m_dma[23][0];
+	u32 src = m_dma[DMA_CONTROL_PORT][2];
+	u32 dst = m_dma[DMA_CONTROL_PORT][0];
 
 	const u32 data = m_dma32_read_cb(src);
 	m_dma32_write_cb(dst, data);
@@ -464,9 +464,9 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 	count -= 4;
 	src += 4;
 	dst += 4;
-	m_dma[23][0] = dst;
-	m_dma[23][1] = count;
-	m_dma[23][2] = src;
+	m_dma[DMA_CONTROL_PORT][0] = dst;
+	m_dma[DMA_CONTROL_PORT][1] = count;
+	m_dma[DMA_CONTROL_PORT][2] = src;
 
 	m_dma_playerbus_timer->adjust(attotime::from_ticks(2, this->clock()));
 }
@@ -484,7 +484,7 @@ void madam_device::exp_dma_req_w(int state)
 	m_irq_dexp_cb(0);
 	if (state)
 	{
-		//printf("%08x %08x\n", m_dma[20][0], m_dma[20][1]);
+		//printf("%08x %08x\n", m_dma[DMA_EXP0][0], m_dma[DMA_EXP0][1]);
 		m_arm_ctl_cb(0);
 		m_dma_exp_timer->adjust(attotime::from_ticks(8, this->clock()));
 	}
@@ -502,7 +502,7 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_exp_cb)
 		return;
 	}
 
-	u32 count = m_dma[20][1];
+	u32 count = m_dma[DMA_EXP0][1];
 
 	if (BIT(count, 31))
 	{
@@ -513,7 +513,7 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_exp_cb)
 		return;
 	}
 
-	u32 dst = m_dma[20][0];
+	u32 dst = m_dma[DMA_EXP0][0];
 
 	u32 data = (m_dma_exp_read_cb() << 24) | (m_dma_exp_read_cb() << 16) | (m_dma_exp_read_cb() << 8) | (m_dma_exp_read_cb() << 0);
 
@@ -521,8 +521,8 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_exp_cb)
 
 	count -= 4;
 	dst += 4;
-	m_dma[20][0] = dst;
-	m_dma[20][1] = count;
+	m_dma[DMA_EXP0][0] = dst;
+	m_dma[DMA_EXP0][1] = count;
 
 	m_dma_exp_timer->adjust(attotime::from_ticks(8, this->clock()));
 }
@@ -543,13 +543,16 @@ void madam_device::vdlp_start_w(int state)
 		return;
 	}
 
-//  if (m_vdlp.address == m_dma[24][0])
+//  if (m_vdlp.address == m_dma[DMA_CLUT_MID][0])
 //  {
 //      m_vdlp.fetch = false;
 //      return;
 //  }
 
-	m_vdlp.address = m_dma[24][0];
+	// 0: control
+	// 1: video
+	// 2: mid-line
+	m_vdlp.address = m_dma[DMA_CLUT_MID][0];
 	m_vdlp.scanlines = 0;
 	m_vdlp.fetch = true;
 	m_vdlp.y_dest = 6;
@@ -709,7 +712,11 @@ void madam_device::cel_start_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGCEL("Start CEL engine\n");
 	m_cel.state = FETCH_PARAMS;
-	m_cel.address = m_dma[26][1];
+	// 0: control
+	// 1: first CCoB
+	// 2: PIP
+	// 3: data start
+	m_cel.address = m_dma[DMA_CEL_CONTROL][1];
 	m_statbits |= 1 << 4;
 	m_statbits &= ~(1 << 6);
 	m_cel.next_ptr = m_cel.source_ptr = m_cel.plut_ptr = 0;
@@ -970,7 +977,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 						u16 src_data = (this->*get_pixel_table[actual_src_mode])(x, y, woffset);
 
 						// opaque check
-						if (!src_data && !m_cel.bgnd)
+						if (!(src_data & 0x7fff) && !m_cel.bgnd)
 							continue;
 
 						u32 dst_address = m_regctl3;

@@ -90,6 +90,46 @@ private:
 	uint32_t  m_mult_control = 0;   /* 033007f0-033007f4 */
 	uint32_t  m_mult_status = 0;    /* 033007f8 */
 
+	enum {
+		DMA_RAM_TO_DSPP0 = 0,
+		DMA_RAM_TO_DSPP1,
+		DMA_RAM_TO_DSPP2,
+		DMA_RAM_TO_DSPP3,
+		DMA_RAM_TO_DSPP4,
+		DMA_RAM_TO_DSPP5,
+		DMA_RAM_TO_DSPP6,
+		DMA_RAM_TO_DSPP7,
+		DMA_RAM_TO_DSPP8,
+		DMA_RAM_TO_DSPP9,
+		DMA_RAM_TO_DSPP10,
+		DMA_RAM_TO_DSPP11,
+		DMA_RAM_TO_DSPP12,
+		// 13
+		DMA_RAM_TO_UNCLE,
+		DMA_RAM_TO_EXTERNAL,
+		DMA_RAM_TO_DSPP_NSTACK,
+		// 16
+		DMA_DSPP_TO_RAM0,
+		DMA_DSPP_TO_RAM1,
+		DMA_DSPP_TO_RAM2,
+		DMA_DSPP_TO_RAM3,
+		// 20
+		DMA_EXP0, // to/from
+		DMA_UNCLE_TO_RAM,
+		DMA_EXTERNAL_TO_RAM,
+		// a.k.a. Player Bus DMA / refresh DMA (on subchannel 3)
+		DMA_CONTROL_PORT,
+		DMA_CLUT_MID,
+		DMA_VIDEO_MID,
+		DMA_CEL_CONTROL,
+		DMA_CEL_DATA,
+		// 28 SlipStream stuff
+		DMA_COMMAND_GRABBER,
+		DMA_FRAME_GRABBER
+		// 30: unused
+		// 31: unassigned
+	};
+
 	bool m_is_pal;
 	u16 m_display_hclocks;
 
