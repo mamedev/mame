@@ -1667,15 +1667,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 	m_fdc_2hd->set_rate(500000);
 
 	m_sys_type = 0x00 >> 6;
-}
-
-MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
-{
-	MACHINE_START_CALL_MEMBER(pc9801_common);
-
-	m_sys_type = 0x80 >> 6;
-
-	m_fdc_timer = timer_alloc(FUNC(pc9801vm_state::fdc_trigger), this);
 
 	save_item(NAME(m_uart_irq_mask));
 	save_item(NAME(m_uart_irq_pending));
@@ -1687,23 +1678,6 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 	save_item(NAME(m_dma_offset));
 	save_item(NAME(m_dma_autoinc));
 	save_item(NAME(m_dack));
-
-	save_item(NAME(m_dac1bit_disable));
-
-	save_item(NAME(m_dma_access_ctrl));
-
-	save_item(NAME(m_egc.regs));
-	save_item(NAME(m_egc.pat));
-	save_item(NAME(m_egc.src));
-	save_item(NAME(m_egc.count));
-	save_item(NAME(m_egc.leftover));
-	save_item(NAME(m_egc.first));
-	save_item(NAME(m_egc.start));
-	save_item(NAME(m_egc.mask));
-
-	save_item(STRUCT_MEMBER(m_grcg, mode));
-	//  save_pointer(STRUCT_MEMBER(m_grcg, tile), 4);
-	save_item(STRUCT_MEMBER(m_grcg, tile_index));
 
 	save_item(NAME(m_vram_bank));
 	save_item(NAME(m_vram_disp));
@@ -1717,6 +1691,41 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 	save_item(NAME(m_mouse.prev_dy));
 	save_item(NAME(m_mouse.freq_reg));
 	save_item(NAME(m_mouse.freq_index));
+}
+
+MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
+{
+	MACHINE_START_CALL_MEMBER(pc9801_common);
+
+	m_sys_type = 0x80 >> 6;
+
+	m_fdc_timer = timer_alloc(FUNC(pc9801vm_state::fdc_trigger), this);
+
+	save_item(NAME(m_gate_a20));
+	save_item(NAME(m_dma_access_ctrl));
+	save_item(NAME(m_ide_sel));
+	save_item(NAME(m_dac1bit_disable));
+
+	save_item(NAME(m_fdc_3mode.dev_sel));
+	save_item(NAME(m_fdc_3mode.access_144mb));
+	
+	save_item(NAME(m_analog16.pal_entry));
+	save_item(NAME(m_analog16.r));
+	save_item(NAME(m_analog16.g));
+	save_item(NAME(m_analog16.b));
+
+	save_item(NAME(m_egc.regs));
+	save_item(NAME(m_egc.pat));
+	save_item(NAME(m_egc.src));
+	save_item(NAME(m_egc.count));
+	save_item(NAME(m_egc.leftover));
+	save_item(NAME(m_egc.first));
+	save_item(NAME(m_egc.start));
+	save_item(NAME(m_egc.mask));
+
+	save_item(STRUCT_MEMBER(m_grcg, mode));
+	//  save_pointer(STRUCT_MEMBER(m_grcg, tile), 4);
+	save_item(STRUCT_MEMBER(m_grcg, tile_index));
 }
 
 MACHINE_START_MEMBER(pc9801us_state,pc9801us)
