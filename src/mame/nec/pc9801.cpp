@@ -1658,15 +1658,6 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 {
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
-}
-
-MACHINE_START_MEMBER(pc9801_state,pc9801f)
-{
-	MACHINE_START_CALL_MEMBER(pc9801_common);
-
-	m_fdc_2hd->set_rate(500000);
-
-	m_sys_type = 0x00 >> 6;
 
 	save_item(NAME(m_uart_irq_mask));
 	save_item(NAME(m_uart_irq_pending));
@@ -1695,6 +1686,15 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 	save_item(NAME(m_mouse.prev_dy));
 	save_item(NAME(m_mouse.freq_reg));
 	save_item(NAME(m_mouse.freq_index));
+}
+
+MACHINE_START_MEMBER(pc9801_state,pc9801f)
+{
+	MACHINE_START_CALL_MEMBER(pc9801_common);
+
+	m_fdc_2hd->set_rate(500000);
+
+	m_sys_type = 0x00 >> 6;
 }
 
 MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
@@ -1738,6 +1738,7 @@ MACHINE_START_MEMBER(pc9801bx_state,pc9801bx2)
 {
 	MACHINE_START_CALL_MEMBER(pc9801us);
 
+	save_item(NAME(m_hole_15m));
 	// ...
 }
 
