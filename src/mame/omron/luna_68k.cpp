@@ -238,11 +238,18 @@ void luna_68k_state::cpu_map(address_map &map)
 	// Firmware handles up to 512M, kernel stops at 256M, but
 	// diagnostics and kernel boot take multiple eternities to run.
 
+	// DMA can handle up to 64M (24-bits worth of 32-bit words).
+
 	// "Normal" ram size is 16M, fast boot for testing is 4M.
 	// Hardware limit may have been 32M, maybe more.  There is at
 	// least one real system booting with 24M.
 
-	map(0x00000000, 0x003fffff).ram(); // 8 SIMMs for RAM arranged as two groups of 4, soldered
+	// 16M is done as 4 SIMMs for RAM arranged as two groups of 4,
+	// soldered. There are 8 potential slots.  That limits naturally
+	// to 32M, but it's unknown how many address lines max the simms
+	// can have.
+
+	map(0x00000000, 0x003fffff).ram(); 
 	map(0x00000000, 0x00000007).view(m_cpu_boot);
 	m_cpu_boot[0](0x00000000, 0x00000007).rom().region("eprom", 0);
 

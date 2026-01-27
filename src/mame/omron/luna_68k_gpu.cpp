@@ -36,6 +36,23 @@ void luna_68k_gpu_device::device_start()
 	save_item(NAME(m_rplnslct));
 	save_item(NAME(m_wplnslct));
 	save_item(NAME(m_wplndat));
+	if(0)
+	m_cpu->space(AS_PROGRAM).install_read_tap(0xf00288f4, 0xf00288f7, "rectangle_copy",
+											  [this](offs_t offset, u32 &, u32 mem_mask) {
+												  if(machine().side_effects_disabled())
+													  return;
+												  u32 sp = m_cpu->state_int(M68K_SP);
+												  address_space &tspace = m_cpu->space(0);
+												  logerror("rectangle_copy source=(%d, %d) rect=(%d, %d) dest=(%d, %d) rop=%02x caller=%x (%x, %08x)\n",
+														   tspace.read_dword(sp+4),
+														   tspace.read_dword(sp+8),
+														   tspace.read_dword(sp+12),
+														   tspace.read_dword(sp+16),
+														   tspace.read_dword(sp+20),
+														   tspace.read_dword(sp+24),
+														   m_rop,
+														   tspace.read_dword(sp), offset, mem_mask);
+											  });
 }
 
 void luna_68k_gpu_device::device_reset()
@@ -552,6 +569,8 @@ u32 luna_68k_gpu_device::fb_r(offs_t offset)
 	for(u32 x=0; x != 32; x++)
 		if(BIT(*src++, m_rplnslct))
 			res |= 0x80000000 >> x;
+	if(0)
+		logerror("fb_r %05x (%4d, %4d) = %08x rop %02x (%s)\n", offset, (offset & 63)*32, offset >> 6, res, m_rop, machine().describe_context());
 	return res;
 }
 
@@ -560,7 +579,16 @@ void luna_68k_gpu_device::fb_w(offs_t offset, u32 data)
 	// Needs to take the rop into account, but no idea what the values
 	// mean at this point
 
-	logerror("fb_w %05x (%4d, %4d) = %08x & %08x rop %02x (%s)\n", offset, (offset & 63)*32, offset >> 6, data, m_pnkmsk, m_rop, machine().describe_context());
+	if(0)
+		logerror("fb_w %05x (%4d, %4d) = %08x & %08x rop %02x (%s)\n", offset, (offset & 63)*32, offset >> 6, data, m_pnkmsk, m_rop, machine().describe_context());
+
+	// rops
+	//  00 = dst=src
+	//  30 = dst=0
+	//  3a = dst |= src?
+
+	if(m_rop == 0x30)
+		data = 0;
 
 	u16 *dest = &m_fb[offset << 5];
 	for(u32 x=0; x != 32; x++)
