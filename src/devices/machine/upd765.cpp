@@ -225,6 +225,16 @@ void ps2_fdc_device::set_mode(mode_t _mode)
 
 void upd765_family_device::device_start()
 {
+	save_item(STRUCT_MEMBER(flopi, main_state));
+	save_item(STRUCT_MEMBER(flopi, sub_state));
+	save_item(STRUCT_MEMBER(flopi, dir));
+	save_item(STRUCT_MEMBER(flopi, counter));
+	save_item(STRUCT_MEMBER(flopi, pcn));
+	save_item(STRUCT_MEMBER(flopi, st0));
+	save_item(STRUCT_MEMBER(flopi, st0_filled));
+	save_item(STRUCT_MEMBER(flopi, live));
+	save_item(STRUCT_MEMBER(flopi, index));
+	save_item(STRUCT_MEMBER(flopi, ready));
 	save_item(NAME(external_ready));
 	//save_item(NAME(mode));
 	save_item(NAME(main_phase));
