@@ -3017,4 +3017,52 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+	<software name="battlot">
+		<description>Battlot</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="battlot.bin" size="0x8000" crc="a4199a30" sha1="583ed08ecf5bdf71e563ea4d46fbfce15747a57e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy">
+		<description>Mazy</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="mazy.bin" size="0x8000" crc="47be8090" sha1="b9843548636a954b2e8d78282082c7699ed56280" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras">
+		<description>Neuras</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="neuras.a78" size="0x8000" crc="993046ed" sha1="7be4ae126825318fed16442fd2afffd130f05af4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruptus">
+		<description>Ruptus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="ruptus.bin" size="0x8000" crc="056c6d48" sha1="6c5cccbdcb64aff62883542c043b5baa7f233ccc" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
