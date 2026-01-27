@@ -1146,6 +1146,7 @@ void keyfox10_state::sam_snd_sample_out(uint32_t data)
 // We store full 12-bit for slightly better audio quality than real hardware.
 void keyfox10_state::sam_fx_waveform_w(offs_t offset, u16 data)
 {
+
     // offset is 15-bit address (0-32767)
     if (offset < FX_SRAM_SIZE) {
         // Hardware: SRAM stores only 8 bits (bits 10:3 of 12-bit SAM data)
@@ -1162,8 +1163,8 @@ void keyfox10_state::sam_fx_waveform_w(offs_t offset, u16 data)
             sram_write_trace++;
         }
     } else {
-        printf("ERRR!\n");
-        exit(1);
+        //printf("ERRR!\n");
+        //exit(1);
     }
 }
 

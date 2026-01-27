@@ -347,17 +347,13 @@ void sam8905_device::execute_cycle(int slot_idx, uint16_t inst, int pc_start, in
 		// Per SAM8905 datasheet Section 9: Data to write is loaded into Y register
 		// via WXY instruction before WWE fires. WWE outputs Y to WD pins.
 		if (emitter_sel == 3 && wsp && !m_waveform_write.isunset()) {
-			// Only write externally when WF indicates external memory (WF < 0x80)
-			// WF >= 0x80 is input sample address space, WF >= 0x100 is internal waveform
-			if ((m_wf & 0x1FF) < 0x80) {
-				// Build 15-bit SRAM address: lower 15 bits of (WF << 12 | PHI)
-				// SRAM WA0-WA14 connects to SAM address bus bits 0-14
-				// 32KB = 15 bits: WF[2:0] << 12 | PHI[11:0]
-				uint32_t ext_addr = ((m_wf & 0x7) << 12) | (m_phi & 0xFFF);
+			// Only fire for external memory (WF[8]=0)
+			// Machine driver handles chip select logic (e.g., WA16 for SRAM vs ROM)
+			if (!(m_wf & 0x100)) {
+				// Output full address: WA[19:0] = (WF[7:0] << 12) | PHI[11:0]
+				uint32_t ext_addr = ((m_wf & 0xFF) << 12) | (m_phi & 0xFFF);
 				// Write data is from Y register (12-bit signed)
 				int16_t ext_data = m_y & 0xFFF;
-				// Sign extend to 16-bit for callback
-				//if (ext_data & 0x800) ext_data |= 0xF000;
 				m_waveform_write(ext_addr, ext_data);
 			}
 		}
