@@ -364,9 +364,273 @@ Example comparison for `_sam_dram_write`:
 ## Next Steps
 
 1. [ ] Create test harness to validate extracted functions
-2. [ ] Extract Priority 2: Voice Management functions
+2. [x] Extract Priority 2: Voice Management functions
 3. [x] Create Makefile for building modules
 4. [ ] Test against MAME emulation
+5. [ ] Extract Priority 3: Envelope Management functions
+6. [ ] Extract Priority 4: MIDI Processing functions
+
+---
+
+## Priority 2: Voice Management
+
+### Extraction Date: 2026-01-26
+
+---
+
+## Functions Extracted
+
+### 1. dptr_add_r6r7
+
+**Original Address**: CODE:DCA8
+**Size**: 11 bytes
+**Extracted To**: `util/util.asm`
+
+#### Ghidra Disassembly
+```
+CODE:dca8: E582        MOV A,DPL
+CODE:dcaa: 2F          ADD A,R7
+CODE:dcab: F582        MOV DPL,A
+CODE:dcad: E583        MOV A,DPH
+CODE:dcaf: 3E          ADDC A,R6
+CODE:dcb0: F583        MOV DPH,A
+CODE:dcb2: 22          RET
+```
+
+#### Analysis
+- **Purpose**: Add 16-bit value R6:R7 to DPTR
+- **Used by**: voice_pages_clear for indexed memory clearing
+
+---
+
+### 2. find_active_voice
+
+**Original Address**: CODE:D417
+**Size**: 41 bytes
+**Extracted To**: `voice/voice_util.asm`
+
+#### Ghidra Disassembly
+```
+CODE:d417: 852783      MOV DPH,0x27
+CODE:d41a: 852882      MOV DPL,0x28
+CODE:d41d: E529        MOV A,0x29
+CODE:d41f: 6016        JZ 0xd437
+CODE:d421: 14          DEC A
+CODE:d422: 2582        ADD A,DPL
+CODE:d424: F582        MOV DPL,A
+CODE:d426: E4          CLR A
+CODE:d427: 3583        ADDC A,DPH
+CODE:d429: F583        MOV DPH,A
+CODE:d42b: E0          MOVX A,@DPTR
+CODE:d42c: 700C        JNZ 0xd43a
+CODE:d42e: 1582        DEC DPL
+CODE:d430: 5002        JNC 0xd434
+CODE:d432: 1583        DEC DPH
+CODE:d434: D529F4      DJNZ 0x29,0xd42b
+CODE:d437: 74FF        MOV A,#0xff
+CODE:d439: 22          RET
+CODE:d43a: C3          CLR CY
+CODE:d43b: E582        MOV A,DPL
+CODE:d43d: 9528        SUBB A,0x28
+CODE:d43f: 22          RET
+```
+
+#### Analysis
+- **Purpose**: Search voice table backward for first active voice
+- **Inputs**: IRAM 0x27/0x28=table base, 0x29=count
+- **Returns**: A=voice index or 0xFF if not found
+
+---
+
+### 3. voice_pages_clear
+
+**Original Address**: CODE:B70B
+**Size**: 84 bytes
+**Extracted To**: `voice/voice_util.asm`
+
+#### Analysis
+- **Purpose**: Clear two XRAM voice page regions
+- **Region 1**: 0x14D5-0x1CD4 (0x800 bytes = 2KB)
+- **Region 2**: 0x1CD5-0x1CE4 (16 bytes)
+- **Calls**: dptr_add_r6r7 for indexed access
+
+---
+
+### 4. voice_deactivate
+
+**Original Address**: CODE:A69C
+**Size**: 233 bytes
+**Extracted To**: `voice/voice_mgmt.asm`
+
+#### Analysis
+- **Purpose**: Deactivate a voice, clear slot assignments
+- **Inputs**: IRAM 0x3A = voice page number
+- **Key operations**:
+  - Clear active flags (preserve bits 7,6,4)
+  - Clear slot assignment entries (14 bytes each)
+  - Write SAM D-RAM control words for slot cleanup
+  - Handle linked slot list at offsets 0x80, 0x88, 0x90...0xF0
+- **Contains**: LJMP 0x0000 as error handler (should not be reached)
+
+---
+
+### 5. voice_kill_channel
+
+**Original Address**: CODE:A785
+**Size**: 46 bytes
+**Extracted To**: `voice/voice_mgmt.asm`
+
+#### Ghidra Disassembly
+```
+CODE:a785: E554        MOV A,0x54
+CODE:a787: B4FF03      CJNE A,#0xff,0xa78d
+CODE:a78a: 02A7B2      LJMP 0xa7b2
+CODE:a78d: F53A        MOV 0x3a,A
+CODE:a78f: F5A0        MOV 0xa0,A
+CODE:a791: 79FC        MOV R1,#0xfc
+CODE:a793: E3          MOVX A,@R1
+CODE:a794: C4          SWAP A
+CODE:a795: 540F        ANL A,#0xf
+CODE:a797: 6534        XRL A,0x34
+CODE:a799: 700E        JNZ 0xa7a9
+CODE:a79b: 12A69C      LCALL 0xa69c
+... (continues)
+CODE:a7b2: 22          RET
+```
+
+#### Analysis
+- **Purpose**: Kill all voices on a MIDI channel
+- **Inputs**: IRAM 0x34=channel, 0x54=voice list head
+- **Iterates**: Through linked list at offset 0x7E
+- **Calls**: voice_deactivate for each matching voice
+
+---
+
+### 6. voice_assign_algorithm
+
+**Original Address**: CODE:B4BF
+**Size**: 153 bytes
+**Extracted To**: `voice/voice_init.asm`
+
+#### Analysis
+- **Purpose**: Assign algorithm to voice slot
+- **Inputs**: IRAM 0x34-0x36=voice info, B=algorithm number
+- **Algorithm table**: XRAM 0x11EE, 8 entries
+- **Key operations**:
+  - Initial delay (3584 cycles)
+  - Search algorithm table for existing or empty slot
+  - Copy slot mapping to channel->algorithm map
+  - Call sam_aram_write to load algorithm data
+- **External refs**: FUN_CODE_b49f, sam_aram_write
+
+---
+
+### 7. voice_init_slots
+
+**Original Address**: CODE:9A2D
+**Size**: 131 bytes
+**Extracted To**: `voice/voice_init.asm`
+
+#### Analysis
+- **Purpose**: Allocate and initialize SAM D-RAM slots
+- **Inputs**: IRAM 0x34-0x36=voice info, Bit 0x01=source select
+- **Key operations**:
+  - Get slot count from program flags byte (bits 3:0)
+  - Call slot_allocate (FUN_CODE_a9cf)
+  - Initialize slot control area (0xFB, 0xFC, 0x70-0x7F)
+  - Write D-RAM control word for each slot
+  - Copy 8-byte envelope parameters to page 0x11
+- **External refs**: slot_allocate, sam_dram_write
+
+---
+
+## IRAM Address Map (Voice Management)
+
+| Address | Name | Description |
+|---------|------|-------------|
+| 0x08-09 | LOOP_CNT | 16-bit loop counter |
+| 0x27 | VOICE_TABLE_HI | Voice table DPH |
+| 0x28 | VOICE_TABLE_LO | Voice table DPL |
+| 0x29 | VOICE_COUNT | Voices to search |
+| 0x34 | VOICE_CHANNEL | MIDI channel (0-15) |
+| 0x35 | VOICE_PAGE_HI | Voice page high |
+| 0x36 | VOICE_PAGE_LO | Voice page low |
+| 0x37 | VOICE_CTRL_SHADOW | SAM control shadow |
+| 0x38 | VOICE_SLOT_ADDR | Current slot addr |
+| 0x3A | VOICE_P2_SAVE | Saved P2 value |
+| 0x41 | PROG_PTR_HI | Program ptr high |
+| 0x42 | PROG_PTR_LO | Program ptr low |
+| 0x4A | VOICE_SLOT_COUNT | Slots for voice |
+| 0x54 | VOICE_LIST_HEAD | Voice linked list head |
+| 0x8E+ | ALG_MAP_BASE | Channel->alg map |
+| 0x9E+ | ALG_SLOT_BASE | Slot->alg map |
+
+---
+
+## Files Created (Priority 2)
+
+```
+sam8905/firmware/
+├── build/
+│   ├── util.lst/rel          # Utility module
+│   ├── voice_util.lst/rel    # Voice utilities
+│   ├── voice_mgmt.lst/rel    # Voice management
+│   └── voice_init.lst/rel    # Voice initialization
+├── util/
+│   ├── Makefile
+│   └── util.asm              # dptr_add_r6r7
+└── voice/
+    ├── Makefile
+    ├── voice_defs.inc        # IRAM definitions
+    ├── voice_util.asm        # find_active_voice, voice_pages_clear
+    ├── voice_mgmt.asm        # voice_deactivate, voice_kill_channel
+    └── voice_init.asm        # voice_assign_algorithm, voice_init_slots
+```
+
+---
+
+## Build Verification (Priority 2)
+
+**Build commands:**
+```
+cd sam8905/firmware/util && make
+cd sam8905/firmware/voice && make
+```
+
+**Exported symbols:**
+```
+_dptr_add_r6r7         @ 0x0000  (11 bytes)
+_find_active_voice     @ 0x0000  (41 bytes)
+_voice_pages_clear     @ 0x0029  (84 bytes)
+_voice_deactivate      @ 0x0000  (233 bytes)
+_voice_kill_channel    @ 0x00F5  (46 bytes)
+_voice_assign_algorithm @ 0x0000 (153 bytes)
+_voice_init_slots      @ 0x0099  (131 bytes)
+```
+
+**External references (to be resolved at link time):**
+- _slot_allocate (FUN_CODE_a9cf)
+- _indexed_array_access (FUN_CODE_a50d)
+- _sam_aram_write, _sam_dram_write (from core/)
+
+---
+
+## Status
+
+### Priority 2: Voice Management - COMPLETE
+
+| Task | Status |
+|------|--------|
+| Extract dptr_add_r6r7 | ✓ Done |
+| Extract find_active_voice | ✓ Done |
+| Extract voice_pages_clear | ✓ Done |
+| Extract voice_deactivate | ✓ Done |
+| Extract voice_kill_channel | ✓ Done |
+| Extract voice_assign_algorithm | ✓ Done |
+| Extract voice_init_slots | ✓ Done |
+| Create voice_defs.inc | ✓ Done |
+| Create Makefiles | ✓ Done |
+| Verify build | ✓ Done |
 
 ---
 
@@ -387,4 +651,13 @@ functions_disassemble(address="0xA4CE")  # sam_dram_write_wait
 
 # Get callgraph for dependency analysis
 analysis_get_callgraph(address="0xA53C", max_depth=3)
+
+# Priority 2: Voice Management
+functions_disassemble(address="0xDCA8")  # dptr_add_r6r7
+functions_disassemble(address="0xD417")  # find_active_voice
+functions_disassemble(address="0xB70B")  # voice_pages_clear
+functions_disassemble(address="0xA69C")  # voice_deactivate
+functions_disassemble(address="0xA785")  # voice_kill_channel
+functions_disassemble(address="0xB4BF")  # voice_assign_algorithm
+functions_disassemble(address="0x9A2D")  # voice_init_slots
 ```
