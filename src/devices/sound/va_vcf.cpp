@@ -17,18 +17,26 @@ va_lpf4_device::va_lpf4_device(const machine_config &mconfig, device_type type, 
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
 	, m_input_gain(1)
+	, m_drive(1)
+	, m_drive_inv(1)
 	, m_fc(0)
 	, m_res(0)
+	, m_stages()
+	, m_alpha0(1)
+	, m_G4(1)
 {
-	std::fill(m_a.begin(), m_a.end(), 0);
-	std::fill(m_b.begin(), m_b.end(), 0);
-	std::fill(m_x.begin(), m_x.end(), 0);
-	std::fill(m_y.begin(), m_y.end(), 0);
 }
 
-va_lpf4_device& va_lpf4_device::configure_input_gain(float gain)
+va_lpf4_device &va_lpf4_device::configure_input_gain(float gain)
 {
 	m_input_gain = gain;
+	return *this;
+}
+
+va_lpf4_device &va_lpf4_device::va_lpf4_device::configure_drive(float drive)
+{
+	m_drive = drive;
+	m_drive_inv = 1.0F / drive;
 	return *this;
 }
 
@@ -61,7 +69,7 @@ void va_lpf4_device::set_fixed_res_cv(float res_cv)
 
 	m_stream->update();
 	m_res = res;
-	recalc_filter();
+	recalc_alpha0();
 }
 
 float va_lpf4_device::get_freq()
@@ -97,18 +105,19 @@ void va_lpf4_device::device_start()
 
 	save_item(NAME(m_fc));
 	save_item(NAME(m_res));
-	save_item(NAME(m_a));
-	save_item(NAME(m_b));
-	save_item(NAME(m_x));
-	save_item(NAME(m_y));
+	save_item(STRUCT_MEMBER(m_stages, alpha));
+	save_item(STRUCT_MEMBER(m_stages, beta));
+	save_item(STRUCT_MEMBER(m_stages, state));
+	save_item(NAME(m_alpha0));
+	save_item(NAME(m_G4));
 
-	m_stream = stream_alloc(get_sound_requested_inputs(), 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+	// Using a minimum of 96KHz to reduce aliasing due to distortion.
+	m_stream = stream_alloc(get_sound_requested_inputs(), 1, std::max(96000, machine().sample_rate()));
 	recalc_filter();
 }
 
 /*
     A 4-level lowpass filter with a loopback:
-
 
              +-[+]-<-[*-1]--------------------------+
              |  |                                   |
@@ -125,67 +134,68 @@ void va_lpf4_device::device_start()
 
     output = input * (1+r)/((1+s/G)^4+r)
 
-    to which the usual z-transform can be applied (see votrax.c)
+    The implementation here is based on [1], which is based on the SynthLab SDK
+    [2], which itself is based on Zavalishin's ladder filter "TPT"
+    discretization in [3].
+
+    [1] https://github.com/ddiakopoulos/MoogLadders/blob/main/src/OberheimVariationModel.h
+    [2] https://www.willpirkle.com/synthlab/docs/html/index.html (also described
+        in his book: "Designing Software Synthesizer Plugins in C++")
+    [3] "The Art of VA Filter Design", V Zavalishin, Chapter 5.3.
 */
 void va_lpf4_device::sound_stream_update(sound_stream &stream)
 {
 	const bool streaming_freq = BIT(get_sound_requested_inputs_mask(), INPUT_FREQ);
 	const bool streaming_res = BIT(get_sound_requested_inputs_mask(), INPUT_RES);
-	const bool streaming_cv = streaming_freq || streaming_res;
 
 	const int n = stream.samples();
 	for(int i = 0; i < n; ++i)
 	{
-		if (streaming_cv)
+		if (streaming_freq)
 		{
-			bool recalc = false;
-			if (streaming_freq)
+			const float fc = cv_to_freq(stream.get(INPUT_FREQ, i));
+			if (fc != m_fc)
 			{
-				const float fc = cv_to_freq(stream.get(INPUT_FREQ, i));
-				if (fc != m_fc)
-				{
-					m_fc = fc;
-					recalc = true;
-				}
-			}
-			if (streaming_res)
-			{
-				const float res = cv_to_res(stream.get(INPUT_RES, i));
-				if (res != m_res)
-				{
-					m_res = res;
-					recalc = true;
-				}
-			}
-			if (recalc)
+				m_fc = fc;
 				recalc_filter();
-		}
-
-		const float x = stream.get(INPUT_AUDIO, i) * m_input_gain;
-		const float y = (x * m_a[0]
-						+ m_x[0] * m_a[1] + m_x[1] * m_a[2] + m_x[2] * m_a[3] + m_x[3] * m_a[4]
-						- m_y[0] * m_b[1] - m_y[1] * m_b[2] - m_y[2] * m_b[3] - m_y[3] * m_b[4]) / m_b[0];
-		memmove(&m_x[1], &m_x[0], 3 * sizeof(float));
-		memmove(&m_y[1], &m_y[0], 3 * sizeof(float));
-		m_x[0] = x;
-		m_y[0] = y;
-		stream.put(0, i, y);
-
-		// When the input goes quiet, the filter can oscillate continuously at
-		// very low volume and, in some cases, eventually "explode". Detect low
-		// volume states and stop any oscillations.
-		bool quiet = true;
-		for (const auto my : m_y)
-		{
-			if (fabsf(my) > 1e-20)
-			{
-				quiet = false;
-				break;
 			}
 		}
-		if (quiet)
-			std::fill(m_y.begin(), m_y.end(), 0);
+
+		if (streaming_res)
+		{
+			const float res = cv_to_res(stream.get(INPUT_RES, i));
+			if (res != m_res)
+			{
+				m_res = res;
+				recalc_alpha0();
+			}
+		}
+
+		float sigma = 0;
+		for (const filter_stage &stage : m_stages)
+			sigma += stage.beta * stage.state;
+
+		// Adding a tiny amount of noise to the input signal, to ensure the
+		// filter can self-oscillate even when there is no input.
+		const float noise = 2 * (float(machine().rand()) / std::numeric_limits<u32>::max() - 0.5F);  // [-1, 1]
+		const float x = stream.get(INPUT_AUDIO, i) * m_input_gain + 0.000001F * noise;
+
+		float u = (x - m_res * sigma) * m_alpha0;
+		u = m_drive_inv * tanhf(u * m_drive);
+
+		for (filter_stage &stage : m_stages)
+		{
+			const float vn = (u - stage.state) * stage.alpha;
+			u = vn + stage.state;
+			stage.state = vn + u;
+		}
+		stream.put(0, i, u);
 	}
+}
+
+void va_lpf4_device::recalc_alpha0()
+{
+	m_alpha0 = 1.0F / (1.0F + m_res * m_G4);
 }
 
 void va_lpf4_device::recalc_filter()
@@ -210,23 +220,19 @@ void va_lpf4_device::recalc_filter()
 	else
 		g = tanf(w_max * T / 2) / w_max * w;
 
-	const float gzc = 1 / g;
-	const float gzc2 = gzc * gzc;
-	const float gzc3 = gzc2 * gzc;
-	const float gzc4 = gzc3 * gzc;
-	const float r1 = 1 + m_res;
+	const float gp1 = 1 + g;
+	const float G = g / gp1;
+	const float G2 = G * G;
+	m_G4 = G2 * G2;
+	recalc_alpha0();
 
-	m_a[0] = r1;
-	m_a[1] = 4 * r1;
-	m_a[2] = 6 * r1;
-	m_a[3] = 4 * r1;
-	m_a[4] = r1;
+	for (filter_stage &stage : m_stages)
+		stage.alpha = G;
 
-	m_b[0] =      r1 + 4 * gzc + 6 * gzc2 + 4 * gzc3 + gzc4;
-	m_b[1] = 4 * (r1 + 2 * gzc            - 2 * gzc3 - gzc4);
-	m_b[2] = 6 * (r1           - 2 * gzc2            + gzc4);
-	m_b[3] = 4 * (r1 - 2 * gzc            + 2 * gzc3 - gzc4);
-	m_b[4] =      r1 - 4 * gzc + 6 * gzc2 - 4 * gzc3 + gzc4;
+	m_stages[0].beta = G2 * G / gp1;
+	m_stages[1].beta = G2 / gp1;
+	m_stages[2].beta = G / gp1;
+	m_stages[3].beta = 1.0F / gp1;
 }
 
 // Parallel combination of the external feedback resistor (recommended value is
@@ -245,6 +251,12 @@ cem3320_lpf4_device::cem3320_lpf4_device(const machine_config &mconfig, const ch
 	constexpr float AI0 = 0.9F;  // From the datasheet.
 	m_cv2freq = AI0 / (2 * float(M_PI) * R_EQ * float(c_p));
 	configure_input_gain(R_EQ);
+
+	// The CEM3320 clips at 12V Peak-to-peak. Started with 1/6 (see documentation
+	// for configure_drive()), and settled on 1/5 after experimentation.
+	// Determining the "correct" value will require measurements on the real
+	// device.
+	configure_drive(1.0F / 5.0F);
 }
 
 cem3320_lpf4_device::cem3320_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -254,7 +266,7 @@ cem3320_lpf4_device::cem3320_lpf4_device(const machine_config &mconfig, const ch
 
 cem3320_lpf4_device &cem3320_lpf4_device::configure_voltage_input(float r_i)
 {
-	configure_input_gain((1.0 / r_i) * R_EQ);
+	configure_input_gain((1.0F / r_i) * R_EQ);
 	return *this;
 }
 
@@ -350,10 +362,9 @@ float cem3320_lpf4_device::cv_to_res(float res_cv) const
 
 	// The equations in the datasheet can result in slightly negative gain
 	// values. Clamp those to 0.
-	// The CEM3320 supports some gain above 4, which results in an increased
-	// self-oscillation amplitude. But the implementation here does not support
-	// gain >= 4, so clamp it.
-	return std::clamp(gain, 0.0F, 3.99F);
+	// Note that the CEM3320 supports gain values above 4, which increase the
+	// amplitude of self-oscillation.
+	return std::max(gain, 0.0F);
 }
 
 DEFINE_DEVICE_TYPE(VA_LPF4, va_lpf4_device, "va_lpf4", "4th order LPF")
