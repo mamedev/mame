@@ -21,6 +21,8 @@ void pc9801_state::video_start()
 	m_char_rom = memregion("chargen")->base();
 	m_kanji_rom = memregion("kanji")->base();
 
+	save_item(NAME(m_font_addr));
+	save_item(NAME(m_font_lr));
 	std::fill(std::begin(m_ex_video_ff), std::end(m_ex_video_ff), 0);
 	std::fill(std::begin(m_video_ff), std::end(m_video_ff), 0);
 	save_pointer(NAME(m_video_ff), 8);
