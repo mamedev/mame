@@ -1679,6 +1679,10 @@ MACHINE_START_MEMBER(pc9801_state,pc9801f)
 	save_item(NAME(m_dma_autoinc));
 	save_item(NAME(m_dack));
 
+	save_item(STRUCT_MEMBER(m_grcg, mode));
+	save_item(STRUCT_MEMBER(m_grcg, tile));
+	save_item(STRUCT_MEMBER(m_grcg, tile_index));
+
 	save_item(NAME(m_vram_bank));
 	save_item(NAME(m_vram_disp));
 
@@ -1721,11 +1725,8 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 	save_item(NAME(m_egc.leftover));
 	save_item(NAME(m_egc.first));
 	save_item(NAME(m_egc.start));
+	save_item(NAME(m_egc.loaded));
 	save_item(NAME(m_egc.mask));
-
-	save_item(STRUCT_MEMBER(m_grcg, mode));
-	//  save_pointer(STRUCT_MEMBER(m_grcg, tile), 4);
-	save_item(STRUCT_MEMBER(m_grcg, tile_index));
 }
 
 MACHINE_START_MEMBER(pc9801us_state,pc9801us)
