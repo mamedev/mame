@@ -413,14 +413,6 @@ ROM_START( ardancem )
 	DISK_IMAGE( "ardancemat", 0, SHA1(df8cb065f5ce0ca863b205549ecc4c27647f9954) )
 ROM_END
 
-ROM_START( dancef2p )
-	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD( "sy25q80.bin", 0x0000, 0x100000, CRC(eca3cc26) SHA1(7f4b811677fe0da27cfa7eb5827a59c023bfc984) )
-
-	DISK_REGION( "sdcard" ) // 16GB SD Card
-	DISK_IMAGE( "dance_factory_2p", 0, SHA1(369c822213a2e702493d54e87ef6f4b2560a0466) )
-ROM_END
-
 ROM_START( pdcm2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "internal.rom", 0x00000, 0x40000, NO_DUMP ) // used as bootstrap only?
@@ -644,11 +636,6 @@ CONS( 202?, intrtvg,         0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 202?, ardancem,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Dance Mat (Model DM02, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // likewise
 CONS( 202?, arb605,          0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Game Console (Model B605, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
-
-// might not fit here (no GP header, chip details erased) but seems similar to the above otherwise
-CONS( 202?, dancef2p,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "<unknown>", "Dance Factory 2 Player Dance Mat",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-
 
 // unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
 // ROM has 'GPNandTag2' header rather than the usual
