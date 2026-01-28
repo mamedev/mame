@@ -74,5 +74,5 @@ ROM_END
 
 } // anonymous namespace
 
-CONS( 201?, sonicwtc, 0, 0, sonicwtc, sonicwtc, sonicwtc_state, empty_init, "Smyths Toys", "Sonic the Hedgehog Kids Smart Watch", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 201?, sonicwtc, 0, 0, sonicwtc, sonicwtc, sonicwtc_state, empty_init, "Accutime", "Sonic the Hedgehog Kids Smart Watch", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
