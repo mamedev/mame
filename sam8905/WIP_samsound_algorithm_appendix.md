@@ -30,6 +30,8 @@
 - [x] Algorithm PM4Y2 - Cascaded PM (topology 2)
 - [x] Algorithm PM4Y4P - Cascaded PM+ (boosted)
 - [x] Algorithm PM4Y9 - Cascaded PM (topology 9)
+- [x] Algorithm SAMPDRF - Sampling with low-pass filter
+- [x] Algorithm SAMPDRFH - 2x Sampling with low-pass filter (half rate)
 - [ ] Remaining algorithms (add as scans become available)
 - [ ] Cross-reference algorithms to firmware ROM A-RAM data
 - [ ] Map algorithm names to MS4 program numbers
@@ -931,6 +933,75 @@ DPHI3 -> A3 -> PM -> DPHI2 -> DA2 -> PM -> DPHI1 -> DA1 -> MIXL/MIXR
 
 ---
 
+## Algorithm: SAMPDRF
+
+**Name**: SAMPDRF
+**Family**: SAMPLING
+**Description**: Sampling with low-pass filter. Note: product specific, to be used with samPC or compatible board supporting dynamic RAMs.
+
+```mermaid
+graph TD
+    WF["WF | DPHI"] --> SAMP["DRAM<br/>sampling"]
+    SAMP --> AMP["AMP"]
+    AMP --> FILT{{"Filter12<br/>Q — FC"}}
+    FILT --> MIX["MIXL<br/>MIXR"]
+    MIX --> OUT(("output"))
+```
+
+### Signal Flow
+
+1. **Waveform / Pitch**: WF selects waveform source, DPHI controls playback rate
+2. **Sampling**: DRAM sampling reads sample data from dynamic RAM
+3. **Amplitude**: AMP controls output level
+4. **Filter**: 12 dB state-variable low-pass with Q (resonance) and FC (cutoff)
+5. **Output**: MIXL/MIXR
+
+### Notes
+
+- Requires samPC or compatible hardware with dynamic RAM support
+- DPHI controls playback pitch/rate
+- Low-pass filter for anti-aliasing and timbral control
+
+---
+
+## Algorithm: SAMPDRFH
+
+**Name**: SAMPDRFH
+**Family**: SAMPLING
+**Description**: 2 x Sampling with low-pass filter. Note: product specific, to be used with samPC or compatible board supporting dynamic RAMs. Half sampling rate (22.05 kHz).
+
+```mermaid
+graph TD
+    WF0["WF0 | DPHI0"] --> SAMP0["DRAM<br/>sampling"]
+    WF1["WF1 | DPHI1"] --> SAMP1["DRAM<br/>sampling"]
+
+    SAMP0 --> A0["A0"]
+    SAMP1 --> A1["A1"]
+
+    A0 --> FILT{{"Filter12<br/>Q — FC"}}
+    A1 --> FILT
+
+    FILT --> MIX["MIXL<br/>MIXR"]
+    MIX --> OUT(("output"))
+```
+
+### Signal Flow
+
+1. **Sample sources**: Two independent DRAM sampling channels (WF0/DPHI0 and WF1/DPHI1)
+2. **Amplitude**: A0 and A1 control individual channel levels
+3. **Filter**: 12 dB state-variable low-pass with Q and FC (shared by both channels)
+4. **Output**: MIXL/MIXR
+
+### Notes
+
+- Half sampling rate mode (22.05 kHz instead of 44.1 kHz)
+- Uses H switch in CALG compiler (62 micro-instructions max)
+- Two independent sample playback channels
+- Shared low-pass filter for both channels
+- Requires samPC or compatible hardware with dynamic RAM support
+
+---
+
 ## Index
 
 | Algorithm | Family | Oscillators | Key Feature |
@@ -960,3 +1031,5 @@ DPHI3 -> A3 -> PM -> DPHI2 -> DA2 -> PM -> DPHI1 -> DA1 -> MIXL/MIXR
 | PM4Y2 | PM | 4 (sine) | Cascaded PM: 3->2->1->0 (linked freq variant) |
 | PM4Y4P | PM | 4 (sine) | Cascaded PM: 3->2 split with PM+, 0 independent |
 | PM4Y9 | PM | 4 (sine) | PM: 3->2->1 chain + 0 independent carrier |
+| SAMPDRF | Sampling | 1 (DRAM) | DRAM sampling + 12dB SVF low-pass |
+| SAMPDRFH | Sampling | 2 (DRAM) | 2x DRAM sampling + 12dB SVF LP, half rate (22.05 kHz) |
