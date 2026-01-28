@@ -505,11 +505,18 @@ ioport_constructor vme_sys68k_cpu20_card_device_base::device_input_ports() const
 	return INPUT_PORTS_NAME(sys68k_cpu20);
 }
 
-// TODO: Reset doesn't work - need to restore ROM mapping at address 0 before releasing reset,
-// otherwise the 68020 reads the reset vector from RAM instead of ROM.
 INPUT_CHANGED_MEMBER(vme_sys68k_cpu20_card_device_base::reset_button)
 {
-	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	if (newval)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+	else
+	{
+		// Restore boot ROM mapping before releasing reset
+		device_reset();
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
 }
 
 INPUT_CHANGED_MEMBER(vme_sys68k_cpu20_card_device_base::abort_button)
