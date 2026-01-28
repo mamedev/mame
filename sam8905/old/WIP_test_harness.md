@@ -1,5 +1,7 @@
 # SAM8905 Standalone Test Harness Implementation
 
+*** DEPRECATED - OUT OF DATE - INITIAL TESTING FOR devices/sound/sam8905.cpp ***
+
 ## Goal
 Standalone test harness for SAM8905 DSP emulation that loads A-RAM/D-RAM captures from Keyfox10 ROM and generates audio output for verification.
 
@@ -74,7 +76,7 @@ mame/sam8905/
 ```
 - I: Idle flag (1=slot produces no sound)
 - ALG: Algorithm number (0-7 for 44.1kHz, 0-3 for 22.05kHz)
-- M: Interrupt mask
+/home/jeff/bastel/mame/mame/.git/index.lock/home/jeff/bastel/mame/mame/.git/index.lock- M: Interrupt mask
 
 ### 22.05kHz Mode (Keyfox10)
 ```cpp
