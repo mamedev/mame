@@ -34,25 +34,26 @@ class pcfx_state : public driver_device
 {
 public:
 	pcfx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_huc6261(*this, "huc6261"),
-		m_intc(*this, "intc"),
-		m_pads(*this, "P%u", 1U) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_huc6261(*this, "huc6261")
+		, m_intc(*this, "intc")
+		, m_pads(*this, "P%u", 1U)
+	{ }
 
-	void pcfx(machine_config &config);
+	void pcfx(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void int_w(offs_t line, u8 state);
 
-	uint16_t pad_r(offs_t offset);
-	void pad_w(offs_t offset, uint16_t data);
-	[[maybe_unused]] uint8_t extio_r(offs_t offset);
-	[[maybe_unused]] void extio_w(offs_t offset, uint8_t data);
+	u16 pad_r(offs_t offset);
+	void pad_w(offs_t offset, u16 data);
+	[[maybe_unused]] u8 extio_r(offs_t offset);
+	[[maybe_unused]] void extio_w(offs_t offset, u8 data);
 
 	template <int Pad> TIMER_CALLBACK_MEMBER(pad_func);
 
@@ -61,46 +62,45 @@ private:
 
 	struct pcfx_pad_t
 	{
-		uint8_t ctrl[2]{};
-		uint8_t status[2]{};
-		uint32_t latch[2]{};
+		u8 ctrl[2]{};
+		u8 status[2]{};
+		u32 latch[2]{};
 	};
 
 	pcfx_pad_t m_pad;
-	emu_timer *m_pad_timers[2];
+	emu_timer *m_pad_timers[2]{};
+
+	u8 m_bram_control = 0;
+	std::unique_ptr<u8[]> m_nvram_ptr = nullptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<huc6261_device> m_huc6261;
 	required_device<pcfx_intc_device> m_intc;
 	required_ioport_array<2> m_pads;
-	std::unique_ptr<u8[]> m_nvram_ptr;
-
-	u8 m_bram_control;
-
-	void int_w(offs_t line, u8 state);
 };
 
 
-uint8_t pcfx_state::extio_r(offs_t offset)
+u8 pcfx_state::extio_r(offs_t offset)
 {
 	address_space &io_space = m_maincpu->space(AS_IO);
 
 	return io_space.read_byte(offset);
 }
 
-void pcfx_state::extio_w(offs_t offset, uint8_t data)
+void pcfx_state::extio_w(offs_t offset, u8 data)
 {
 	address_space &io_space = m_maincpu->space(AS_IO);
 
 	io_space.write_byte(offset, data);
 }
 
-uint16_t pcfx_state::pad_r(offs_t offset)
+u16 pcfx_state::pad_r(offs_t offset)
 {
-	uint16_t res;
-	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
+	offset <<= 1;
+	u16 res;
+	const u8 port_type = BIT(offset, 7);
 
-	if(((offset<<1) & 0x40) == 0)
+	if (BIT(~offset, 6))
 	{
 		// status
 		/*
@@ -113,12 +113,15 @@ uint16_t pcfx_state::pad_r(offs_t offset)
 	else
 	{
 		// received data
-		res = m_pad.latch[port_type] >> (((offset<<1) & 2) ? 16 : 0);
+		res = m_pad.latch[port_type] >> ((offset & 2) ? 16 : 0);
 
-		if(((offset<<1) & 0x02) == 0)
+		if (BIT(~offset, 1))
 		{
-			m_pad.status[port_type] &= ~8; // clear latch on LSB read according to docs
-			m_intc->irq11_w(CLEAR_LINE);
+			if (!machine().side_effects_disabled())
+			{
+				m_pad.status[port_type] &= ~8; // clear latch on LSB read according to docs
+				m_intc->irq11_w(CLEAR_LINE);
+			}
 		}
 	}
 
@@ -134,11 +137,12 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 	m_intc->irq11_w(ASSERT_LINE);
 }
 
-void pcfx_state::pad_w(offs_t offset, uint16_t data)
+void pcfx_state::pad_w(offs_t offset, u16 data)
 {
-	uint8_t port_type = ((offset<<1) & 0x80) >> 7;
+	offset <<= 1;
+	const u8 port_type = BIT(offset, 7);
 
-	if(((offset<<1) & 0x40) == 0)
+	if (BIT(~offset, 6))
 	{
 		// control
 		/*
@@ -146,7 +150,7 @@ void pcfx_state::pad_w(offs_t offset, uint16_t data)
 		---- --x- enable multi-tap
 		---- ---x enable send (0->1 transition)
 		*/
-		if(data & 1 && (!(m_pad.ctrl[port_type] & 1)))
+		if (data & 1 && (!(m_pad.ctrl[port_type] & 1)))
 		{
 			m_pad_timers[port_type]->adjust(attotime::from_usec(100)); // TODO: time
 		}
@@ -164,11 +168,11 @@ void pcfx_state::pad_w(offs_t offset, uint16_t data)
 void pcfx_state::pcfx_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00000000, 0x001FFFFF).ram();   /* RAM */
-//  map(0x80000000, 0x80FFFFFF).rw(FUNC(pcfx_state::extio_r), FUNC(pcfx_state::extio_w));    /* EXTIO */
-//  map(0x80700000, 0x807FFFFF).rom().region("scsi_rom", 0); // EXTIO ROM area
+	map(0x00000000, 0x001fffff).ram();   /* RAM */
+//  map(0x80000000, 0x80ffffff).rw(FUNC(pcfx_state::extio_r), FUNC(pcfx_state::extio_w));    /* EXTIO */
+//  map(0x80700000, 0x807fffff).rom().region("scsi_rom", 0); // EXTIO ROM area
 	// internal backup control
-	map(0xE0000000, 0xE7FFFFFF).lrw8(
+	map(0xe0000000, 0xe7ffffff).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_nvram_ptr[offset & 0x7fff];
 		}),
@@ -178,36 +182,36 @@ void pcfx_state::pcfx_mem(address_map &map)
 			m_nvram_ptr[offset & 0x7fff] = data;
 		})
 	).umask32(0x00ff00ff);
-	map(0xE8000000, 0xE9FFFFFF).noprw();   /* Extended BackUp RAM */
-//  map(0xF8000000, 0xF8000007).noprw();   /* PIO, needed by pcfxga for reading backup "RAM" from DOS/V host */
-	map(0xFFF00000, 0xFFFFFFFF).rom().region("ipl", 0);  /* ROM */
+	map(0xe8000000, 0xe9ffffff).noprw();   /* Extended BackUp RAM */
+//  map(0xf8000000, 0xf8000007).noprw();   /* PIO, needed by pcfxga for reading backup "RAM" from DOS/V host */
+	map(0xfff00000, 0xffffffff).rom().region("ipl", 0);  /* ROM */
 }
 
 void pcfx_state::pcfx_io(address_map &map)
 {
-	map(0x00000000, 0x000000FF).rw(FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
-	map(0x00000100, 0x000001FF).w("huc6230", FUNC(huc6230_device::write)).umask32(0x00ff00ff);   /* HuC6230 */
-	map(0x00000200, 0x000002FF).m("huc6271", FUNC(huc6271_device::amap));   /* HuC6271 */
-	map(0x00000300, 0x000003FF).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
-	map(0x00000400, 0x000004FF).rw("huc6270_a", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-A */
-	map(0x00000500, 0x000005FF).rw("huc6270_b", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).umask32(0x0000ffff); /* HuC6270-B */
+	map(0x00000000, 0x000000ff).rw(FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
+	map(0x00000100, 0x000001ff).w("huc6230", FUNC(huc6230_device::write)).umask32(0x00ff00ff);   /* HuC6230 */
+	map(0x00000200, 0x000002ff).m("huc6271", FUNC(huc6271_device::amap));   /* HuC6271 */
+	map(0x00000300, 0x000003ff).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
+	map(0x00000400, 0x000004ff).rw("huc6270_a", FUNC(huc6270_device::read16), FUNC(huc6270_device::write16)).umask32(0x0000ffff); /* HuC6270-A */
+	map(0x00000500, 0x000005ff).rw("huc6270_b", FUNC(huc6270_device::read16), FUNC(huc6270_device::write16)).umask32(0x0000ffff); /* HuC6270-B */
 	map(0x00000600, 0x00000607).mirror(0xf8).m("huc6272", FUNC(huc6272_device::amap)); // King
-	map(0x00000C00, 0x00000C00).r("huc6270_a", FUNC(huc6270_device::get_ar));
-	map(0x00000C40, 0x00000C40).r("huc6270_b", FUNC(huc6270_device::get_ar));
-	map(0x00000C80, 0x00000C80).lrw8(
+	map(0x00000c00, 0x00000c00).r("huc6270_a", FUNC(huc6270_device::get_ar));
+	map(0x00000c40, 0x00000c40).r("huc6270_b", FUNC(huc6270_device::get_ar));
+	map(0x00000c80, 0x00000c80).lrw8(
 		NAME([this] (offs_t offset) { return m_bram_control; }),
 		NAME([this] (offs_t offset, u8 data) {
 			m_bram_control = data & 3;
 			// TODO: bit 1 to FX-BMP
 		})
 	);
-	map(0x00000E00, 0x00000EFF).rw(m_intc, FUNC(pcfx_intc_device::read), FUNC(pcfx_intc_device::write)).umask32(0x0000ffff);
-//  map(0x00000F00, 0x00000FFF).noprw(); // Timer
-//  map(0x00500000, 0x005000FF) Aurora mirror
-//  map(0x00600000, 0x006FFFFF).r(FUNC(pcfx_state::scsi_ctrl_r)); // SCSI control for EXTIO
-//  map(0x00700000, 0x007FFFFF).rom().region("scsi_rom", 0); // EXTIO ROM area
-	map(0x00700000, 0x007FFFFF).lr8(NAME([] () { return 0; })); // suppress logging
-	map(0x80500000, 0x805000FF).noprw(); // pcfxga Kubota/Hudson HuC6273 "Aurora" 3d controller
+	map(0x00000e00, 0x00000eff).rw(m_intc, FUNC(pcfx_intc_device::read), FUNC(pcfx_intc_device::write)).umask32(0x0000ffff);
+//  map(0x00000f00, 0x00000fff).noprw(); // Timer
+//  map(0x00500000, 0x005000ff) Aurora mirror
+//  map(0x00600000, 0x006fffff).r(FUNC(pcfx_state::scsi_ctrl_r)); // SCSI control for EXTIO
+//  map(0x00700000, 0x007fffff).rom().region("scsi_rom", 0); // EXTIO ROM area
+	map(0x00700000, 0x007fffff).lr8(NAME([] () { return 0; })); // suppress logging
+	map(0x80500000, 0x805000ff).noprw(); // pcfxga Kubota/Hudson HuC6273 "Aurora" 3d controller
 }
 
 
@@ -263,13 +267,6 @@ void pcfx_state::machine_reset()
 	m_bram_control = 0;
 }
 
-
-uint32_t pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_huc6261->video_update( bitmap, cliprect );
-	return 0;
-}
-
 void pcfx_state::int_w(offs_t line, u8 state)
 {
 	m_maincpu->set_input_line(line, state ? ASSERT_LINE : CLEAR_LINE);
@@ -288,20 +285,21 @@ void pcfx_state::pcfx(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_screen_update(FUNC(pcfx_state::screen_update));
+	screen.set_screen_update(m_huc6261, FUNC(huc6261_device::screen_update));
 	screen.set_raw(XTAL(21'477'272), huc6261_device::WPF, 64, 64 + 1024 + 64, huc6261_device::LPF, 18, 18 + 242);
 
-	huc6270_device &huc6270_a(HUC6270(config, "huc6270_a", 0));
+	huc6270_device &huc6270_a(HUC6270(config, "huc6270_a", XTAL(21'477'272)));
 	huc6270_a.set_vram_size(0x20000);
 	huc6270_a.irq().set(m_intc, FUNC(pcfx_intc_device::irq12_w));
 
-	huc6270_device &huc6270_b(HUC6270(config, "huc6270_b", 0));
+	huc6270_device &huc6270_b(HUC6270(config, "huc6270_b", XTAL(21'477'272)));
 	huc6270_b.set_vram_size(0x20000);
 	huc6270_b.irq().set(m_intc, FUNC(pcfx_intc_device::irq14_w));
 
 	HUC6261(config, m_huc6261, XTAL(21'477'272));
 	m_huc6261->set_vdc1_tag("huc6270_a");
 	m_huc6261->set_vdc2_tag("huc6270_b");
+	m_huc6261->set_rainbow_tag("huc6271");
 	m_huc6261->set_king_tag("huc6272");
 
 	huc6272_device &huc6272(HUC6272(config, "huc6272", XTAL(21'477'272)));

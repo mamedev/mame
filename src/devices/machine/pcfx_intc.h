@@ -9,7 +9,7 @@
 class pcfx_intc_device : public device_t
 {
 public:
-	pcfx_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	pcfx_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	auto int_cb() { return m_int_w.bind(); }
 
@@ -28,8 +28,8 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-private:
 
+private:
 	devcb_write8 m_int_w;
 
 	u16 m_irq_mask;
