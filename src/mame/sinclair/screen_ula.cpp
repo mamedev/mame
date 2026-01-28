@@ -262,8 +262,6 @@ void screen_ula_device::device_add_mconfig(machine_config &config)
 
 void screen_ula_device::device_start()
 {
-	save_item(NAME(m_offset_h));
-	save_item(NAME(m_offset_v));
 	save_item(NAME(m_global_transparent));
 	save_item(NAME(m_ula_palette_select));
 	save_item(NAME(m_ulanext_en));
