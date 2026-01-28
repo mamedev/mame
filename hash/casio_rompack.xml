@@ -16,7 +16,7 @@ license:CC0-1.0
 	==============================================================================================
 	JAPANESE ROM PACKS
 	==============================================================================================
-	RO-104      19??    Enka Vol.1 Karaoke Hit Shuu
+	RO-104      19??    Enka Vol.1 Karaoke Hit-shū
 	RO-105      19??    New Music [2]
 	RO-107      19??    New Music [3]
 	RO-109      1984    New Music [4]
@@ -265,7 +265,7 @@ license:CC0-1.0
 	    17. 中の島ブルース
 	-->
 	<software name="ro106" supported="no">
-		<description>Enka Vol.2 Karaoke Hit Shuu (RO-106)</description>
+		<description>Enka Vol.2 Karaoke Hit-shū (RO-106)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
 		<info name="alt_title" value="演歌 Vol.2 カラオケヒット集"/>
@@ -727,7 +727,7 @@ license:CC0-1.0
 	    6. そして伝説へ・・・
 	-->
 	<software name="ro172g" supported="no">
-		<description>Game Music: Dragon Quest III Yori (RO-172G)</description>
+		<description>Game Music: "Dragon Quest III" Yori (RO-172G)</description>
 		<year>19??</year>
 		<publisher>Casio / Sight &amp; Sound International Inc.</publisher>
 		<info name="alt_title" value="ゲーム ミュージック 『ドラゴンクエストⅢ』より"/>
