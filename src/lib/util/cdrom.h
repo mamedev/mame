@@ -292,9 +292,9 @@ private:
 	static int tokenize(const char *linebuffer, int i, int linebuffersize, char *token, int tokensize);
 	static int msf_to_frames(const char *token);
 	static uint32_t parse_wav_sample(std::string_view filename, uint32_t *dataoffs);
-	static uint16_t read_uint16(FILE *infile);
-	static uint32_t read_uint32(FILE *infile);
-	static uint64_t read_uint64(FILE *infile);
+	static uint16_t read_uint16(util::read_stream &infile);
+	static uint32_t read_uint32(util::read_stream &infile);
+	static uint64_t read_uint64(util::read_stream &infile);
 };
 
 #endif // MAME_LIB_UTIL_CDROM_H
