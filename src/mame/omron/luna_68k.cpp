@@ -142,7 +142,7 @@ u32 luna_68k_state::bus_error_r(offs_t offset)
 }
 
 // For three of the four cpu, the rom overlays the ram at 0 until a
-// reset opcode is reached, maybe.  It could also be om ram write,
+// reset opcode is reached, maybe.  It could also be on ram write,
 // but the opcode is easier :-)
 
 void luna_68k_state::cpu_reset_cb(int)
@@ -196,15 +196,15 @@ u8 luna_68k_state::cpu_vector_r()
 		return 0x50 | (m_ioc->get_i2m() & 0xf);
 	}
 	if(BIT(m_cpu_interrupts, ICPU_SCSII))
-	   return 0x68;
+		return 0x68;
 	if(BIT(m_cpu_interrupts, ICPU_SCSIE))
-	   return 0x6c;
-	if(BIT(m_cpu_interrupts, ICPU_DMA0)) {
-		logerror("dma0 vector read\n");
+		return 0x6c;
+
+	// Not sure the dma interrupts exist
+	if(BIT(m_cpu_interrupts, ICPU_DMA0))
 		return 0x42;
-	}
 	if(BIT(m_cpu_interrupts, ICPU_DMA1))
-	   return 0x78;
+		return 0x78;
 
 	return 24; // Spurious interrupt
 }
@@ -239,6 +239,7 @@ void luna_68k_state::cpu_map(address_map &map)
 	// diagnostics and kernel boot take multiple eternities to run.
 
 	// DMA can handle up to 64M (24-bits worth of 32-bit words).
+	// There doesn't seem to be code for bounce buffers in the kernel.
 
 	// "Normal" ram size is 16M, fast boot for testing is 4M.
 	// Hardware limit may have been 32M, maybe more.  There is at
@@ -298,7 +299,7 @@ void luna_68k_state::luna(machine_config &config)
 
 	DS1287(config, m_rtc, 32'768);
 
-	UPD7201(config, m_sio, 9'830'000); // D9.83B0
+	UPD7201(config, m_sio, XTAL(9'830'000)); // D9.83B0
 	m_sio->out_int_callback().set_inputline(m_cpu, M68K_IRQ_6);
 
 	// console
@@ -317,7 +318,7 @@ void luna_68k_state::luna(machine_config &config)
 	m_serial[1]->rxd_handler().set(m_sio, FUNC(upd7201_device::rxb_w));
 	m_serial[1]->cts_handler().set(m_sio, FUNC(upd7201_device::ctsb_w));
 
-	AM9513(config, m_stc, 9'830'000/2); // FIXME: clock? sources?
+	AM9513(config, m_stc, XTAL(9'830'000)/2);
 	m_stc->fout_cb().set(m_stc, FUNC(am9513_device::gate1_w)); // assumption based on a common configuration
 	m_stc->out1_cb().set_inputline(m_cpu, M68K_IRQ_7);
 	m_stc->out2_cb().set(FUNC(luna_68k_state::level5_w));
@@ -328,6 +329,7 @@ void luna_68k_state::luna(machine_config &config)
 	m_stc->out5_cb().append(m_sio, FUNC(upd7201_device::txcb_w));
 
 	LUNA_68K_IOC(config, m_ioc);
+	m_ioc->set_main_space_tag(m_cpu, AS_PROGRAM);
 	m_ioc->interrupt_cb().set([this](int state) { cpu_interrupt_set(ICPU_IOC, state); });
 	m_ioc->interrupt_scsii_cb().set([this](int state) { cpu_interrupt_set(ICPU_SCSII, state); });
 	m_ioc->interrupt_scsie_cb().set([this](int state) { cpu_interrupt_set(ICPU_SCSIE, state); });

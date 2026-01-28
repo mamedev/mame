@@ -7,6 +7,7 @@
 
 luna_68k_ioc_device::luna_68k_ioc_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, LUNA_68K_IOC, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
 	, m_dma(*this, "dma%u", 0U)
 	, m_spc(*this, "scsi%u:7:spc", 0U)
@@ -16,11 +17,15 @@ luna_68k_ioc_device::luna_68k_ioc_device(machine_config const &mconfig, char con
 	, m_cio(*this, "cio")
 	, m_ram(*this, "ram")
 	, m_boot(*this, "boot")
+	, m_main_space(*this, finder_base::DUMMY_TAG, 0)
 	, m_interrupt_cb(*this)
 	, m_interrupt_scsii_cb(*this)
 	, m_interrupt_scsie_cb(*this)
 	, m_interrupt_dma0_cb(*this)
 	, m_interrupt_dma1_cb(*this)
+	, m_scsi0_dma_read(*this, 0)
+	, m_scsi0_dma_write(*this)
+	, m_dma_config("dma", ENDIANNESS_BIG, 8, 24, 0)
 {
 }
 
@@ -30,6 +35,13 @@ void luna_68k_ioc_device::device_start()
 	save_item(NAME(m_m2i));
 	save_item(NAME(m_i2m));
 	save_item(NAME(m_direction));
+	save_item(NAME(m_scsi_drq0));
+	save_item(NAME(m_packed_data));
+	save_item(NAME(m_packed_index));
+
+	space(0).install_readwrite_handler(0, 0xffffff,
+									   emu::rw_delegate(*this, FUNC(luna_68k_ioc_device::dma_r)),
+									   emu::rw_delegate(*this, FUNC(luna_68k_ioc_device::dma_w)));
 }
 
 void luna_68k_ioc_device::device_reset()
@@ -46,9 +58,18 @@ void luna_68k_ioc_device::device_reset()
 	m_i2m = 0;
 	m_interrupt_hack = 2;
 	m_direction = 0;
+	m_packed_data = 0;
+	m_packed_index = 0;
 
 	// Overlay the rom at 0 on reset
 	m_boot.select(0);
+}
+
+device_memory_interface::space_config_vector luna_68k_ioc_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_dma_config)
+	};
 }
 
 // ioc/cpu shared ram, cpu is 32-bits wide, ioc is 16, hence the need for trampolines
@@ -114,15 +135,88 @@ void luna_68k_ioc_device::i2m_int_clear(u32 data)
 	m_interrupt_cb(0);
 }
 
+// Special dma expander
+//
+// It uses an hd63450 as the dma engine, but only uses its address
+// generation capability.  It does 32-bits accesses, packing four
+// bytes in one bus transaction.  It uses the 24 address bits as bits
+// 2-25, giving 64M addressing capability instead of the normal 16M.
+
+// It seems to be only connected to the internal scsi
+
 void luna_68k_ioc_device::direction_w(u16 data)
 {
-	// Bit 3 is internal dma direction, for some reason
+	logerror("direction %04x\n", data);
 	m_direction = data;
 }
 
 u16 luna_68k_ioc_device::direction_r()
 {
 	return m_direction;
+}
+
+void luna_68k_ioc_device::scsi_drq0_w(int state)
+{
+	if(state == m_scsi_drq0)
+		return;
+	m_scsi_drq0 = state;
+	if(m_scsi_drq0) {
+		if(BIT(m_direction, 3)) {
+			while(m_scsi_drq0 && m_packed_index != 4) {
+				m_packed_data |= m_scsi0_dma_read() << (24 - 8*m_packed_index);
+				m_packed_index ++;
+			}
+			if(m_packed_index == 4)
+				m_dma[0]->drq2_w(1);
+
+		} else {
+			if(m_packed_index == 0)
+				m_dma[0]->drq2_w(1);
+			
+			else {
+				while(m_scsi_drq0 && m_packed_index != 5) {
+					m_scsi0_dma_write(m_packed_data >> (24 - 8*(m_packed_index-1)));
+					m_packed_index ++;
+				}
+				if(m_packed_index == 5) {
+					m_packed_index = 0;
+					m_packed_data = 0;
+					if(m_scsi_drq0)
+						m_dma[0]->drq2_w(1);
+				}
+			}
+		}
+	} else {
+		m_dma[0]->drq2_w(0);
+	}
+}
+
+void luna_68k_ioc_device::dma_w(offs_t offset, u8)
+{
+	if(!BIT(m_direction, 3))
+		return;
+	m_dma[0]->drq2_w(0);
+	m_main_space->write_dword(offset*4, m_packed_data);
+	m_packed_data = 0;
+	m_packed_index = 0;
+	if(m_scsi_drq0) {
+		scsi_drq0_w(0);
+		scsi_drq0_w(1);
+	}
+}
+
+u8 luna_68k_ioc_device::dma_r(offs_t offset)
+{
+	if(BIT(m_direction, 3))
+		return 0;
+	m_packed_data = m_main_space->read_dword(offset*4);
+	m_packed_index = 1;
+	m_dma[0]->drq2_w(0);
+	if(m_scsi_drq0) {
+		scsi_drq0_w(0);
+		scsi_drq0_w(1);
+	}
+	return 0;
 }
 
 void luna_68k_ioc_device::vme_map(address_map &map)
@@ -199,18 +293,15 @@ void luna_68k_ioc_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &luna_68k_ioc_device::cpuspace_map);
 	m_cpu->reset_cb().set(*this, FUNC(luna_68k_ioc_device::reset_cb));
 
-	// Warning, direct access to the main cpu is gross
-	HD63450(config, m_dma[0], 10_MHz_XTAL, ":cpu");
+	HD63450(config, m_dma[0], 10_MHz_XTAL, DEVICE_SELF, 0);
 	m_dma[0]->set_clocks(attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80));
 	m_dma[0]->set_burst_clocks(attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80));
 	m_dma[0]->irq_callback().set([this](int state) { m_interrupt_dma0_cb(state); });
-	m_dma[0]->set_luna_mode(true);
 
-	HD63450(config, m_dma[1], 10_MHz_XTAL, ":cpu");
+	HD63450(config, m_dma[1], 10_MHz_XTAL, DEVICE_SELF, 0);
 	m_dma[1]->set_clocks(attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80));
 	m_dma[1]->set_burst_clocks(attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80), attotime::from_nsec(80));
 	m_dma[1]->irq_callback().set([this](int state) { m_interrupt_dma1_cb(state); });
-	m_dma[1]->set_luna_mode(true);
 
 	// internal SCSI
 	NSCSI_BUS(config, "scsi0");
@@ -229,9 +320,9 @@ void luna_68k_ioc_device::device_add_mconfig(machine_config &config)
 							
 							spc.set_clock(10'000'000);
 							spc.out_irq_callback().set([this](int state) { m_interrupt_scsii_cb(state); });
-							spc.out_dreq_callback().set(*dma, FUNC(hd63450_device::drq2_w));
-							dma->dma8_read<2>().set(spc, FUNC(mb89352_device::dma_r));
-							dma->dma8_write<2>().set(spc, FUNC(mb89352_device::dma_w));
+							spc.out_dreq_callback().set(*this, FUNC(luna_68k_ioc_device::scsi_drq0_w));
+							m_scsi0_dma_read.bind().set(spc, FUNC(mb89352_device::dma_r));
+							m_scsi0_dma_write.bind().set(spc, FUNC(mb89352_device::dma_w));
 						});
 
 	// external SCSI

@@ -583,12 +583,15 @@ void luna_68k_gpu_device::fb_w(offs_t offset, u32 data)
 		logerror("fb_w %05x (%4d, %4d) = %08x & %08x rop %02x (%s)\n", offset, (offset & 63)*32, offset >> 6, data, m_pnkmsk, m_rop, machine().describe_context());
 
 	// rops
-	//  00 = dst=src
-	//  30 = dst=0
-	//  3a = dst |= src?
+	//  00 = dst = src   (used when scrolling the whole text screen)
+	//  15 = ?           (used in the initial wall-of-letters)
+	//  30 = dst = 0     (used when clearing part/all of the text screen)
+	//  3a = dst = ~src? (used for the cursor, could be dst = ~dst too maybe)
 
 	if(m_rop == 0x30)
 		data = 0;
+	if(m_rop == 0x3a)
+		data = ~data;
 
 	u16 *dest = &m_fb[offset << 5];
 	for(u32 x=0; x != 32; x++)
