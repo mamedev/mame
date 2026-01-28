@@ -7,8 +7,8 @@
 ## TODO
 
 - [x] Transcribe Section 4-2 SCREEN 2 - Objects Definition (pages 13-15)
-- [ ] Transcribe Section 4-3 SCREEN 3 - Modulators
-- [ ] Transcribe Section 4-4 SCREEN 4 - Keyboard Curves
+- [x] Transcribe Section 4-3 SCREEN 3 - Modulators and Envelope Generators (page 17)
+- [x] Transcribe Section 4-4 SCREEN 4 - Keyboard Curves (page 19)
 - [ ] Transcribe Figure 6 - Objects Definition screen layout
 - [ ] Transcribe Figure 7 - General modulation structure diagram
 - [ ] Transcribe Algorithm charts (referenced throughout)
@@ -151,6 +151,116 @@ The special object allows to define parameters at the voice level. These paramet
 Some algorithms may need parameters which are constant values transferred to the SAM memory at key on. Examples are initial and final memory addresses for sampling, constants for filters, mixes for flutes, etc. These parameters are called transfer objects. If the current algorithm requires some of them, then the actual name used in the algorithm appears on the screen, as well as the transfer value defined in the algorithm. This value may be changed.
 
 > **Firmware note**: Transfer objects are written as direct D-RAM word values during `voice_note_init_dram` (CODE:A89B). They correspond to D-RAM handler 0x18 (D-RAM write + velocity mod) documented in WIP_ms4_program_extraction.md. The handler writes a 19-bit word to a specific D-RAM address, with optional velocity-based MIXL/MIXR attenuation.
+
+---
+
+## 4-3 SCREEN 3 - Modulators and Envelope Generators (fig 8)
+
+This screen defines the software modulators which can be applied to frequency and/or amplitude objects, as well as associated envelope generators.
+
+### 4-3-1 Modulators
+
+Up to 8 modulators can be defined for one sound. Modulators not used (i.e. with no EG amount or no LFO amount or not assigned in screen 2) will be automatically deleted in order to save memory space in the final product.
+
+#### Modulator Parameters
+
+| Parameter | Description | Range / Values |
+|-----------|-------------|----------------|
+| **EG number** | Envelope generator assignment | 0-5. One EG can be shared by several modulators |
+| **No sustain** | Ignore EG sustain point | |
+| **Free run** | No action at key-off on the EG | |
+| **Reset** | Always restart EG from amplitude 0 at key-on | |
+| **LFO wave** | LFO waveform shape | sine, up saw, down saw, square, S&H (random) |
+| **LFO attack** | LFO onset time | Together with speed and delay, these 3 params define the LFO |
+| **LFO speed** | LFO rate | |
+| **LFO delay** | LFO onset delay | |
+| **Kbd to EG rate** | Keyboard follow curve depth on EG rate | Requires kbd curve assignment. Used for piano-like sounds where lower notes fade slower than higher notes |
+| **Kbd to LFO speed** | Keyboard follow curve depth on LFO speed | Requires kbd curve assignment |
+| **Kbd to LFO attack** | Keyboard follow curve depth on LFO attack | Same as above for LFO attack |
+| **LFO Kbd curve** | Keyboard follow curve for LFO | References curve on SCREEN 4 |
+| **EG Kbd curve** | Keyboard follow curve for EG | References curve on SCREEN 5 |
+
+> **Firmware cross-references**:
+> - **Modulator system**: Up to 8 modulators stored in voice XRAM page. Each modulator has an LFO state + EG pointer. The `periodic_voice_update` (CODE:9BA7) iterates over active modulators each tick.
+> - **LFO wave**: LFO waveform generation in `global_mod_lfo_update` (CODE:A314). The 5 waveforms (sine, up saw, down saw, square, S&H) are generated from the LFO phase accumulator. S&H uses a pseudo-random generator.
+> - **LFO attack/speed/delay**: LFO state machine runs during `dram_slot_apply_mod_depth` (CODE:A2E3). Delay holds LFO at zero, attack ramps LFO amplitude from 0 to full, then speed controls the steady-state rate.
+> - **EG number**: The EG assignment is parsed during `voice_init_copy_and_envelope` (CODE:AB73). EG sharing allows e.g. one EG to control both amplitude and pitch vibrato depth.
+> - **No sustain / Free run / Reset**: These flags modify EG behavior. They are stored as bit flags in the modulator config bytes and checked by `envelope_tick_volume` (CODE:A403).
+> - **Kbd to EG rate**: Keyboard curve lookup via `velocity_curve_lookup` (CODE:B3C5) applied as a scaling factor to the EG rate parameter. This makes higher notes decay faster (piano behavior).
+
+---
+
+### 4-3-2 Envelope Generators
+
+Up to 6 envelope generators can be defined (EG0 to EG5), each envelope being up to 9 segments.
+
+A segment is specified by:
+- An **amplitude** to be reached (0 to 127)
+- A **rate** to reach this amplitude (1 to 99)
+- An **indicator** field (character just after the rate)
+
+#### Envelope Segment Editing
+
+| Action | Method |
+|--------|--------|
+| Insert segment | Click indicator field, type **I** |
+| Delete segment | Click indicator field, type **D** |
+| Step through segments | Use **>** and **<** keys |
+
+#### Indicator Field Characters
+
+| Indicator | Meaning |
+|-----------|---------|
+| **S** | Sustain point. Envelope holds at this level until key is released (unless a loop is defined) |
+| **L** | Loop point (replaces sustain). Loop length set with + and - keys, shown with "<". Can also be in release portion |
+| **E** | Envelope end. Typing E twice deletes all segments to the right |
+
+To add a new envelope generator, click an indicator field below an existing envelope and type I.
+
+> **Firmware cross-references**:
+> - **Envelope generator**: The EG state machine is implemented in `envelope_tick_volume` (CODE:A403). Each tick, the current segment's rate determines how quickly the output moves toward the target amplitude. When the target is reached, the next segment begins.
+> - **Segment storage**: Each EG's segments are stored in the program data region. The 9-segment limit with amplitude (0-127) and rate (1-99) matches the byte encoding found in the voice page XRAM layout. Amplitude 0-127 maps to 7 bits; rate 1-99 maps to 7 bits.
+> - **Sustain (S)**: During sustain, `envelope_tick_volume` holds the output constant until a note-off event advances the EG past the sustain point. Sustain behavior is modified by the modulator's "No sustain" and "Free run" flags.
+> - **Loop (L)**: Loop replaces sustain with a repeating segment sequence. The EG cycles between the loop start and current position, useful for sustained evolving timbres (e.g., slow tremolo or filter sweep).
+> - **Envelope output**: Written to D-RAM via `envelope_write_dram` (CODE:A471). For amplitude EGs, the output directly scales the D-RAM AMP word. For frequency/pitch EGs, the output is scaled by the "EG amount" parameter before applying to DPHI via `modulation_write_dram` (CODE:9FCD).
+> - **6 EGs × 9 segments**: The 8-byte envelope parameter block copied by `voice_init_slots` (CODE:9A2D) at page 0x11 offset 0xE6 contains the initial EG configuration.
+
+---
+
+## 4-4 SCREEN 4 - Keyboard Curves (fig 9)
+
+This screen allows to define up to 8 keyboard curves.
+
+Keyboard curves can be used to modify parameters according to an incoming key number: (de)tuning of a frequency object, amplitude of an amplitude object, rate of an envelope generator, speed and attack time of an LFO.
+
+Up to 20 keyboard points can be defined with a keyboard curve, each point being specified by:
+- A **key number** (MIDI number, i.e. 36 for the lowest C of a 5-octave keyboard)
+- A **value** ranging from -63 to +63 (0 meaning no correction)
+
+You can add points to a keyboard curve by clicking between Note and Val towards the bottom of the screen and remove points by clicking towards the top of the screen. The added points will follow the last increments (note and value) entered.
+
+Once you have defined a keyboard curve, you should return to screen 2 or 3 to assign it and specify some amount.
+
+#### Example
+
+Suppose you want a given amplitude object to sound only in the lowest octave of a 5-octave keyboard, then the corresponding keyboard curve should look like:
+
+```
+Note  Val
+ 36     0
+ 48     0
+ 49   -63
+```
+
+> **Firmware cross-references**:
+> - **Keyboard curve lookup**: Implemented by `velocity_curve_lookup` (CODE:B3C5). The function takes a MIDI note number and looks up the corresponding value from the curve's point table, interpolating between defined points.
+> - **Curve storage**: Up to 8 curves × 20 points × 2 bytes (note + value) stored in the program data XRAM region. The -63 to +63 range (7-bit signed) is stored as a signed byte.
+> - **Application points**: Keyboard curves are applied at key-on during `voice_note_init_dram` (CODE:A89B) and `voice_init_copy_and_envelope` (CODE:AB73). They affect:
+>   - Frequency objects: pitch offset via "Kbd Amount" (non-chromatic tuning)
+>   - Amplitude objects: level scaling via "Kbd Am"
+>   - EG rate: decay time scaling via "Kbd to EG rate" (piano key follow)
+>   - LFO speed/attack: rate scaling via "Kbd to LFO speed" / "Kbd to LFO attack"
+> - **The example curve**: Notes 36-48 get value 0 (no modification), note 49+ gets -63 (maximum attenuation). This effectively mutes the amplitude object above the first octave, creating a keyboard split.
 
 ---
 
