@@ -11,6 +11,8 @@
 - [x] Transcribe Section 4-4 SCREEN 4 - Keyboard Curves (page 19)
 - [ ] Transcribe Figure 6 - Objects Definition screen layout
 - [ ] Transcribe Figure 7 - General modulation structure diagram
+- [x] Transcribe Section 5 - Algorithm Charts and Scratch Sounds (page 19)
+- [x] Transcribe Section 6 - Algorithm Programming (pages 20-22)
 - [ ] Transcribe Algorithm charts (referenced throughout)
 - [ ] Complete firmware function cross-references for all parameters
 - [ ] Map editor parameter ranges to D-RAM word bit fields
@@ -261,6 +263,210 @@ Note  Val
 >   - EG rate: decay time scaling via "Kbd to EG rate" (piano key follow)
 >   - LFO speed/attack: rate scaling via "Kbd to LFO speed" / "Kbd to LFO attack"
 > - **The example curve**: Notes 36-48 get value 0 (no modification), note 49+ gets -63 (maximum attenuation). This effectively mutes the amplitude object above the first octave, creating a keyboard split.
+
+---
+
+## 5 - Algorithm Charts and Associated Scratch Sounds
+
+You will find in appendix 1 the charts of the currently available algorithms. Each algorithm has an associated scratch sound whose name is the same as the algorithm (under directory `C:\SAM\SAMPC\SNDSTART`).
+
+If you wish to start from a scratch sound, then load it (LOAD or click from main menu) and save it (SAVE AS) under the name you wish to give to your sound. In this way, you will avoid modifications of the original scratch sound file.
+
+---
+
+## 6 - Algorithm Programming
+
+This chapter explains how to define a new algorithm, compile it in order to get a scratch sound and debug it. A comprehensive example is given on a two operators phase modulation algorithm. The user is supposed to be familiar with the SAM hardware structure as defined in the "SAM user's manual".
+
+### 6-1 Algorithm Source Format
+
+A new algorithm should be written using any text editor able to produce ASCII text format. The extension `.ALG` should be given to the source algorithm file. An algorithm consists of a samSOUND comment line, variable declaration lines and statement lines.
+
+#### 6-1-1 samSOUND Comment Line
+
+The samSOUND comment line allows a line of text to be displayed by the sound editor, normally to identify the algorithm function. The format is:
+
+```
+[COMMENT]
+- text line to be displayed by the sound editor -
+```
+
+The line following the `[COMMENT]` statement is used as a comment line by the sound editor.
+
+#### 6-1-2 SAM DRAM Variable Declarations
+
+Format:
+
+```
+label   =   constant   optional_object_identifier   ;optional comment
+```
+
+- **label**: 1 to 5 alphanumeric characters
+- **constant**: 0 to 15, specifies the actual address inside the SAM DRAM block
+- **optional object identifier**: if present, specifies that the corresponding information is to be displayed by the samSOUND editor and to be processed in real time
+
+##### Possible Object Identifiers
+
+| Identifier | Description |
+|------------|-------------|
+| `<DPHI>` | Frequency object |
+| `<PHI>` | Phase object |
+| `<A>` | Amplitude object with no output to the accumulator and no mix |
+| `<A_O>` | Amplitude object with output to accumulator and no mix |
+| `<A_M>` | Amplitude object with output to accumulator and mix |
+| `<DA>` | Amp slope object with no output to the accumulator |
+| `<DA_O>` | Amp slope object with output to the accumulator |
+| `<X>` value | Transfer object, value is in hex up to 7FFFF |
+| `<X15>` value | Special xfer object at address 15 |
+
+To minimize envelope noise, it is always preferable to work with DA or DA_O objects, which will allow to update by software an envelope slope instead of actual amplitude values.
+
+The `<X15>` value object is mandatory and should always be defined at address 15.
+
+##### Example: Sinus oscillator with Amplitude slope control
+
+```
+DPHI    EQU   0    <DPHI>     ;frequency object
+PHI     EQU   1    <PHI>      ;phase object
+AMP     EQU   2               ;amplitude (processed internally by sam)
+DAMP    EQU   3    <DA_O>     ;amplitude slope object
+K_A_M   EQU   15   <X15> 200BF ;special object with interrupt mask
+```
+
+#### 6-1-3 Statements
+
+Statements define the micro-instructions of an algorithm. There are up to 30 statements with SSR=0 and 62 with SSR=1. The general format of a statement is:
+
+```
+OP    MAD,<RLIST>    ;comment
+```
+
+where:
+- **OP** is the bus emitter op-code: `RM`, `RADD`, `RP`, `RSP`
+- **MAD** the DRAM address variable
+- **RLIST** the list of receivers/special actions, separated by commas: `WA`, `WB`, `WM`, `WXY`, `WWF`, `WPHI`, `WSP`, `WACC`, `CLEARB`
+
+Please refer to the SAM user's manual for a detailed description of the micro-instructions.
+
+##### Example: Sinus oscillator with amplitude slope control
+
+```
+; Micro-program statements
+        RM     K_A_M,<WXY,WSP>           ;set mix
+        RM     PHI,<WA,WPHI,WSP>         ;PHIreg=Areg=PHI, wave=sinus
+        RM     DPHI,<WB>                 ;frequency (phase angle)
+        RADD   PHI,<WM>                  ;PHI updated for next time
+        RM     AMP,<WA,WXY>              ;Xreg=sin(PHI) Yreg=Areg=AMP
+        RM     DAMP,<WB>                 ;Breg=amp slope
+        RADD   AMP,<WM,WSP>              ;AMP updated, WSP prevents overflow
+        RSP    ,<WACC>                   ;accumulate
+```
+
+### 6-2 Algorithm Compiler
+
+Once an algorithm has been written, it must be compiled in order to generate a corresponding scratch sound definition, which will fit this algorithm.
+
+The algorithm compiler is invoked by:
+
+```
+CALG    filename [D] [H] [S] [B] [L]
+```
+
+where filename is the source algorithm (if no extension, `.ALG` is assumed).
+
+Optional switches:
+
+| Switch | Description |
+|--------|-------------|
+| **D** | Display the compile process |
+| **H** | Half sampling frequency algorithm (62 micro-instructions max) |
+| **S** | Generate a C source code for the algorithm (file `filename.ASC`) |
+| **B** | Generate a binary file (file `filename.ASB`) |
+| **L** | Generate a listing file (file `filename.LST`) |
+
+The normal invocation of CALG is:
+
+```
+CALG    filename
+```
+
+which will generate the `filename.SND` scratch sound file.
+
+If an error occurs during the compiling process, CALG displays an error message and exits to DOS. Using the D switch allows to locate the error.
+
+### 6-3 Algorithm Debugging
+
+An algorithm can be debugged under the samSOUND editor (samPC), by using the SCREEN 1 debugging features (see section 4-1, single step and graphic).
+
+### 6-4 Algorithm Example
+
+Following is an algorithm development session. The developed algorithm is a sinus (carrier), phase modulated by another sinus (modulator). Frequencies and amplitude envelopes are fully under external processor control.
+
+**Step 1**: Use a text editor to enter the following algorithm source, under name `PM2.ALG`:
+
+```
+[COMMENT]
+-[da1,dphi1]- PM -[da0,dphi0] --
+;.......................
+; sam algorithm source
+;.......................
+
+; Phase modulated sinus oscillator
+
+; variable declarations
+DPHIC     =    0    <DPHI>     ; carrier frequency
+PHIC      =    1    <PHI>      ; carrier phase
+AC        =    2               ; carrier amplitude
+DAC       =    3    <DA_O>     ; carrier amplitude slope (signal out)
+
+DPHIM     =    4    <DPHI>     ; modulator frequency
+PHIM      =    5    <PHI>      ; modulator phase
+AM        =    6               ; modulator amplitude
+DAM       =    7    <DA>       ; modulator amplitude slope
+
+K_A_M     =    15   <X15> 200BF  ; mix and interrupt mask
+
+; Micro-program statements
+        RM     K_A_M,<WXY,WSP>           ;set output mix
+; compute modulator
+        RM     PHIM,<WA,WPHI,WSP>        ;Areg=PHIreg=PHIM, wave=sinus
+        RM     DPHIM,<WB>                ;Breg=DPHIM
+        RADD   PHIM,<WM>                 ;PHIM updated
+
+        RM     AM,<WA,WXY>               ;Xreg=sin(PHIM) Yreg=Areg=AM
+        RM     DAM,<WB>                  ;Breg=DAM (amplitude slope)
+        RADD   AM,<WM,WSP>               ;update amplitude
+
+        RP     ,<WA,WB>                  ;Areg=Breg=phase modulation
+        RADD   ,<WA,WB>                  ;boost
+        RADD   ,<WB>                     ;Breg= 4 x phase modulation
+
+; compute carrier
+        RM     PHIC,<WA>                 ;Areg=PHIC
+        RADD   ,<WPHI>                   ;PHIreg=PHIC + 4 x phase modulation
+        RM     DPHIC,<WB>                ;Breg=DPHIC
+        RADD   PHIC,<WM>                 ;PHIC updated
+
+        RM     AC,<WA,WXY>               ;Xreg=sin(PHIC+mod) Yreg=Areg=AC
+        RM     DAC,<WB>                  ;Breg=DAC (amplitude slope)
+        RADD   AC,<WM,WSP>               ;update amplitude
+
+        RSP    ,<WACC>                   ;output to accumulator
+```
+
+**Step 2**: Compiling — type:
+
+```
+CALG PM2
+```
+
+to compile the previous source. The scratch sound file `PM2.SND` will be generated. Copy this file to the sounds main directory (usually `C:\SAM\SAMPC`).
+
+**Step 3**: Start the sound editor (samPC or samPCX depending on the board you have).
+
+**Step 4**: Select PM2 from the sound menu and save it (SAVE AS) under another name to avoid killing your original scratch sound.
+
+**Step 5**: Make your sound(s) as with the other scratch sounds.
 
 ---
 
