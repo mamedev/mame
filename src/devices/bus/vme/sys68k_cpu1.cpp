@@ -372,9 +372,9 @@ void vme_sys68k_cpu1_card_device::device_reset()
 		return 0;
 	};
 
-	m_p3_conn = detect_port("rs232host");
-	m_p4_conn = detect_port("rs232trm");
-	m_p5_conn = 0; // P5 has no RS232_PORT configured
+	m_p3_conn = detect_port("p3");
+	m_p4_conn = detect_port("p4");
+	m_p5_conn = detect_port("p5");
 
 	// Set up the BRG divider. RSA is a jumper setting and RSB is always set High
 	m_brg->rsa_w(m_serial_brf->read() == 0x80 ? ASSERT_LINE : CLEAR_LINE);
@@ -533,24 +533,30 @@ void vme_sys68k_cpu1_card_device::device_add_mconfig(machine_config &config)
 	 * UI mount <file> feature.
 	 */
 	ACIA6850(config, m_aciahost, 0);
-	m_aciahost->txd_handler().set("rs232host", FUNC(rs232_port_device::write_txd));
-	m_aciahost->rts_handler().set("rs232host", FUNC(rs232_port_device::write_rts));
+	m_aciahost->txd_handler().set("p3", FUNC(rs232_port_device::write_txd));
+	m_aciahost->rts_handler().set("p3", FUNC(rs232_port_device::write_rts));
 
-	rs232_port_device &rs232host(RS232_PORT(config, "rs232host", default_rs232_devices, "null_modem"));
-	rs232host.rxd_handler().set(m_aciahost, FUNC(acia6850_device::write_rxd));
-	rs232host.cts_handler().set(m_aciahost, FUNC(acia6850_device::write_cts));
+	rs232_port_device &p3(RS232_PORT(config, "p3", default_rs232_devices, "null_modem"));
+	p3.rxd_handler().set(m_aciahost, FUNC(acia6850_device::write_rxd));
+	p3.cts_handler().set(m_aciahost, FUNC(acia6850_device::write_cts));
 
 	/* P4/Terminal Port config */
 	ACIA6850(config, m_aciaterm, 0);
-	m_aciaterm->txd_handler().set("rs232trm", FUNC(rs232_port_device::write_txd));
-	m_aciaterm->rts_handler().set("rs232trm", FUNC(rs232_port_device::write_rts));
+	m_aciaterm->txd_handler().set("p4", FUNC(rs232_port_device::write_txd));
+	m_aciaterm->rts_handler().set("p4", FUNC(rs232_port_device::write_rts));
 
-	rs232_port_device &rs232trm(RS232_PORT(config, "rs232trm", default_rs232_devices, "terminal"));
-	rs232trm.rxd_handler().set(m_aciaterm, FUNC(acia6850_device::write_rxd));
-	rs232trm.cts_handler().set(m_aciaterm, FUNC(acia6850_device::write_cts));
+	rs232_port_device &p4(RS232_PORT(config, "p4", default_rs232_devices, "terminal"));
+	p4.rxd_handler().set(m_aciaterm, FUNC(acia6850_device::write_rxd));
+	p4.cts_handler().set(m_aciaterm, FUNC(acia6850_device::write_cts));
 
 	/* P5/Remote Port config */
 	ACIA6850(config, m_aciaremt, 0);
+	m_aciaremt->txd_handler().set("p5", FUNC(rs232_port_device::write_txd));
+	m_aciaremt->rts_handler().set("p5", FUNC(rs232_port_device::write_rts));
+
+	rs232_port_device &p5(RS232_PORT(config, "p5", default_rs232_devices, nullptr));
+	p5.rxd_handler().set(m_aciaremt, FUNC(acia6850_device::write_rxd));
+	p5.cts_handler().set(m_aciaremt, FUNC(acia6850_device::write_cts));
 
 	/* Bit Rate Generator */
 	MC14411(config, m_brg, XTAL(1'843'200));

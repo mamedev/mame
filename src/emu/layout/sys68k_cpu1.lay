@@ -102,12 +102,12 @@ Matches real hardware: RESET and ABORT pushbuttons, HALT LED, P3/P4/P5 connector
 	<!-- Front Panel with Terminal: panel strip + terminal side by side (dropped if no terminal) -->
 	<view name="Front Panel with Terminal">
 		<group ref="panel"><bounds x="0" y="0" width="48" height="345" /></group>
-		<screen tag="rs232trm:terminal:terminal_screen"><bounds x="52" y="0" width="460" height="345" /></screen>
+		<screen tag="p4:terminal:terminal_screen"><bounds x="52" y="0" width="460" height="345" /></screen>
 	</view>
 
 	<!-- Terminal view: just the terminal screen (dropped if no terminal attached) -->
 	<view name="Terminal">
-		<screen tag="rs232trm:terminal:terminal_screen"><bounds x="0" y="0" width="640" height="480" /></screen>
+		<screen tag="p4:terminal:terminal_screen"><bounds x="0" y="0" width="640" height="480" /></screen>
 	</view>
 
 </mamelayout>
