@@ -13,10 +13,10 @@
 #include "logmacro.h"
 
 // Select which ROM set to use (uncomment one):
-#define MS4_ROM_SET_XE9L    // XE9 left section (xe9l_v141_uart.bin + xel*.bin)
-//#define MS4_ROM_SET_XE9R      // XE9 right section (xe9r_v141_uart.bin + xer*.bin)
-//#define MS4_ROM_SET_MS4_05  // MS4 solo sounds (ms4_05_r1_0.bin)
-//#define MS4_ROM_SET_MS4_06  // MS4 drums+accomp (ms4_06_r1_1.bin)
+#define MS4_ROM_SET_XE9L      // XE9 left section (xe9l_v141_uart.bin + xel*.bin) --- Drums on CH13
+//#define MS4_ROM_SET_XE9R      // XE9 right section (xe9r_v141_uart.bin + xer*.bin) -- LEAD SQAURE, TANGO ACCORDION DISTORTED
+//#define MS4_ROM_SET_MS4_05    // MS4 solo sounds (ms4_05_r1_0.bin)
+//#define MS4_ROM_SET_MS4_06    // MS4 drums+accomp (ms4_06_r1_1.bin)
 
 namespace {
 
@@ -196,8 +196,12 @@ u16 ms4_state::sam_waveform_r(offs_t offset)
 	// RA[17:9] = latched PHI[10:2] (from 74HC174, 9 bits = waveform page)
 	uint32_t ra_high = (m_phi_latched >> 2) & 0x1FF;
 
-	// Build 18-bit ROM address: RA[17:0]
-	uint32_t rom_addr = (ra_high << 9) | ra_low;
+	uint32_t wa17 = (offset >> 17) & 1;
+
+	uint32_t ra18 = wa17 << 18;
+
+	// Build 18-bit ROM address: RA[18:0]
+	uint32_t rom_addr = ra18 | (ra_high << 9) | ra_low;
 
 	// Bank select from WA[19:18] via 74LS139
 	// WA19 selects ROM pair: 0→(ROM0,ROM1)+ROM4, 1→(ROM2,ROM3)+ROM5
@@ -213,16 +217,25 @@ u16 ms4_state::sam_waveform_r(offs_t offset)
 	// Read upper 8 bits from ROMs 0-3
 	// ROM layout: ROM0=0x000000, ROM1=0x080000, ROM2=0x100000, ROM3=0x180000
 	uint32_t upper_addr = (upper_rom * 0x80000) + (rom_addr & 0x7FFFF);
-	if (upper_addr >= 0x200000)
+	if (upper_addr >= 0x200000) {
+		printf("ERR 1\n");
+		exit(1);
 		return 0;
+	}
 	uint8_t upper_byte = m_samples[upper_addr];
 
 	// Read lower nibble from ROMs 4-5
 	// WA19 selects nibble ROM: 0→ROM4 (0x200000), 1→ROM5 (0x280000)
-	uint32_t nibble_rom_offset = 0x200000 + (wa19 * 0x80000);
+	//uint32_t nibble_rom_offset = 0x200000 + (wa19 * 0x80000);
+	//
+	// WA19 selects nibble ROM: 1→ROM4 (0x200000), 0→ROM5 (0x280000)
+	uint32_t nibble_rom_offset = 0x200000 + (wa19 == 0 ? 0x80000 : 0x00000);
 	uint32_t nibble_addr = nibble_rom_offset + (rom_addr & 0x7FFFF);
-	if (nibble_addr >= 0x300000)
+	if (nibble_addr >= 0x300000) {
+		printf("ERR 2\n");
+		exit(1);
 		return 0;
+	}
 	uint8_t nibble_byte = m_samples[nibble_addr];
 
 	// WA1 (PHI[1]) selects low/high nibble via 74LS257 MUX
