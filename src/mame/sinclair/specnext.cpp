@@ -3821,12 +3821,10 @@ void specnext_state::tbblue(machine_config &config)
 	SPI_SDCARD(config, m_sdcards[0], 0);
 	m_sdcards[0]->set_prefer_sdhc();
 	m_sdcards[0]->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
-	m_sdcards[0]->set_delays_ext(0, 1); // This is a minimum delay which allows Tha Atic Atac's loader to work.
 
 	SPI_SDCARD(config, m_sdcards[1], 0);
 	m_sdcards[1]->set_prefer_sdhc();
 	m_sdcards[1]->spi_miso_callback().set(FUNC(specnext_state::spi_miso_w));
-	m_sdcards[1]->set_delays_ext(0, 1);
 
 	SPEAKER(config.replace(), "speakers", 2).front();
 	m_speaker->add_route(ALL_OUTPUTS, "speakers", 0.50, 1);
