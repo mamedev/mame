@@ -25,6 +25,11 @@
 - [x] Algorithm FMPY0 - Cascaded FM/PM hybrid
 - [x] Algorithm FMSVLP - FM oscillator low-pass filtered
 - [x] Algorithm FPBY2 - Cascaded PM with feed-back
+- [x] Algorithm NOISVBP/NOISVLP/NOISVHP - Filtered noise
+- [x] Algorithm PM4Y0 - Cascaded PM (topology 0)
+- [x] Algorithm PM4Y2 - Cascaded PM (topology 2)
+- [x] Algorithm PM4Y4P - Cascaded PM+ (boosted)
+- [x] Algorithm PM4Y9 - Cascaded PM (topology 9)
 - [ ] Remaining algorithms (add as scans become available)
 - [ ] Cross-reference algorithms to firmware ROM A-RAM data
 - [ ] Map algorithm names to MS4 program numbers
@@ -742,6 +747,190 @@ FB -> DPHI3 -> A3 -> PM+ -> DPHI2 -> DA2 -> PM+ -> DPHI1 -> DA1 -> PM+ -> DPHI0 
 
 ---
 
+## Algorithm: NOISVBP / NOISVLP / NOISVHP
+
+**Name**: NOISVBP [NOISVLP] [NOISVHP]
+**Family**: NOISE
+**Description**: White noise generator with band-pass (resp. [low-pass][high-pass]) filter. Care must be taken to run with small DARN values when using high resonance.
+
+```mermaid
+graph TD
+    NOISE["white<br/>noise"] --> DARN["DARN"]
+
+    DARN --> FILT{{"Filter12<br/>Q — FC"}}
+
+    FILT --> DABP["DABP<br/>[DALP]<br/>[DAHP]"]
+
+    DABP --> MIX["MIXL<br/>MIXR"]
+    MIX --> OUT(("output"))
+```
+
+### Signal Flow
+
+1. **Source**: White noise generator (pseudo-random)
+2. **Amplitude**: DARN (noise amplitude)
+3. **Filter**: 12 dB state-variable filter with Q (resonance) and FC (cutoff)
+4. **Output select**: DABP (band-pass) / DALP (low-pass) / DAHP (high-pass)
+5. **Output**: MIXL/MIXR
+
+### Variants
+
+| Algorithm | Filter Output |
+|-----------|---------------|
+| NOISVBP | Band-pass (DABP) |
+| NOISVLP | Low-pass (DALP) |
+| NOISVHP | High-pass (DAHP) |
+
+---
+
+## Algorithm: PM4Y0
+
+**Name**: PM4Y0
+**Family**: PM
+**Description**: Cascaded phase modulation. Warning: A3 is not smoothed, noise may happen if a modulator is applied.
+
+```mermaid
+graph TD
+    OSC3["DPHI3<br/>sine"] --> A3["A3"]
+    A3 --> PM3{{"PM"}}
+
+    OSC2["DPHI2<br/>sine"] --> DA2["DA2"]
+    PM3 --> DA2
+    DA2 --> PM2{{"PM"}}
+
+    OSC1["DPHI1<br/>sine"] --> DA1["DA1"]
+    PM2 --> DA1
+    DA1 --> PM1{{"PM"}}
+
+    OSC0["DPHI0<br/>sine"] --> DA0["DA0"]
+    PM1 --> DA0
+
+    DA0 --> MIX["MIXL<br/>MIXR"]
+    MIX --> OUT(("output"))
+```
+
+### Topology
+
+```
+DPHI3 -> A3 -> PM -> DPHI2 -> DA2 -> PM -> DPHI1 -> DA1 -> PM -> DPHI0 -> DA0 -> MIXL/MIXR
+```
+
+4 operators in series (all PM). Single carrier (DPHI0), 3 modulators cascaded. Phase modulation version of FM4Y0.
+
+---
+
+## Algorithm: PM4Y2
+
+**Name**: PM4Y2
+**Family**: PM
+**Description**: Cascaded PM. Warning: A3 is not smoothed, noise may happen if a modulator is applied.
+
+```mermaid
+graph TD
+    OSC3["DPHI3<br/>sine"] --> A3["A3"]
+    A3 --> PM3{{"PM"}}
+
+    OSC2["DPHI2<br/>sine"] --> DA2["DA2"]
+    PM3 --> DA2
+    DA2 --> PM2{{"PM"}}
+
+    OSC1["DPHI1<br/>sine"] --> DA1["DA1"]
+    PM2 --> DA1
+    DA1 --> PM1{{"PM"}}
+
+    OSC0["DPHI0<br/>sine"] --> DA0["DA0"]
+    PM1 --> DA0
+
+    DA0 --> MIX["MIXL<br/>MIXR"]
+    MIX --> OUT(("output"))
+```
+
+### Topology
+
+```
+DPHI3 -> A3 -> PM -> DPHI2 -> DA2 -> PM -> DPHI1 -> DA1 -> PM -> DPHI0 -> DA0 -> MIXL/MIXR
+```
+
+Same chain as PM4Y0, different frequency linking (DPHI3 independent, DPHI2 linked to DPHI1, DPHI1 linked to DPHI0, DPHI0 independent). Phase modulation version of FM4Y2.
+
+---
+
+## Algorithm: PM4Y4P
+
+**Name**: PM4Y4P
+**Family**: PM
+**Description**: Cascaded PM. PM+ means "boosted" PM. Warning: A3 is not smoothed, noise may happen if a modulator is applied.
+
+```mermaid
+graph TD
+    OSC3["DPHI3<br/>sine"] --> A3["A3"]
+    A3 --> PM3{{"PM"}}
+
+    OSC2["DPHI2<br/>sine"] --> DA2["DA2"]
+    PM3 --> DA2
+
+    OSC1["DPHI1<br/>sine"] --> DA1["DA1"]
+    DA2 --> PMplus{{"PM+"}}
+    DA1 --> PMplus
+
+    OSC0["DPHI0<br/>sine"] --> DA0["DA0"]
+
+    PMplus --> MIX["MIXL<br/>MIXR"]
+    DA0 --> MIX
+
+    MIX --> OUT(("output"))
+```
+
+### Topology
+
+```
+DPHI3 -> A3 -> PM -> DPHI2 -> DA2 -\
+                                    +-> PM+ -> MIXL/MIXR
+             DPHI1 -> DA1 ---------/
+             DPHI0 -> DA0 ----------------> MIXL/MIXR
+```
+
+Split topology with boosted PM: DPHI3 modulates DPHI2, then DPHI2+DPHI1 merge via PM+. DPHI0 is independent carrier to output.
+
+---
+
+## Algorithm: PM4Y9
+
+**Name**: PM4Y9
+**Family**: PM
+**Description**: Cascaded phase modulation. Warning: A3 is not smoothed, noise may happen if a modulator is applied.
+
+```mermaid
+graph TD
+    OSC3["DPHI3<br/>sine"] --> A3["A3"]
+    A3 --> PM3{{"PM"}}
+
+    OSC2["DPHI2<br/>sine"] --> DA2["DA2"]
+    PM3 --> DA2
+    DA2 --> PM2{{"PM"}}
+
+    OSC1["DPHI1<br/>sine"] --> DA1["DA1"]
+    PM2 --> DA1
+
+    OSC0["DPHI0<br/>sine"] --> DA0["DA0"]
+
+    DA1 --> MIX["MIXL<br/>MIXR"]
+    DA0 --> MIX
+
+    MIX --> OUT(("output"))
+```
+
+### Topology
+
+```
+DPHI3 -> A3 -> PM -> DPHI2 -> DA2 -> PM -> DPHI1 -> DA1 -> MIXL/MIXR
+                                     DPHI0 -> DA0 -------> MIXL/MIXR
+```
+
+3-operator PM chain (DPHI3->DPHI2->DPHI1) plus independent carrier DPHI0. Two outputs summed. Phase modulation version of FM4Y9.
+
+---
+
 ## Index
 
 | Algorithm | Family | Oscillators | Key Feature |
@@ -764,3 +953,10 @@ FB -> DPHI3 -> A3 -> PM+ -> DPHI2 -> DA2 -> PM+ -> DPHI1 -> DA1 -> PM+ -> DPHI0 
 | FMPY0 | FM/PM | 4 (sine) | Like FM4Y0 but PM between operators 2 and 1 |
 | FMSVLP | FM | 2 (sine) | FM oscillator + 12dB SVF low-pass |
 | FPBY2 | PM | 4 (sine) | Cascaded PM+ with feed-back on operator 3 |
+| NOISVBP | Noise | 1 (noise) | White noise + 12dB SVF band-pass |
+| NOISVLP | Noise | 1 (noise) | White noise + 12dB SVF low-pass |
+| NOISVHP | Noise | 1 (noise) | White noise + 12dB SVF high-pass |
+| PM4Y0 | PM | 4 (sine) | Cascaded PM: 3->2->1->0 (all series) |
+| PM4Y2 | PM | 4 (sine) | Cascaded PM: 3->2->1->0 (linked freq variant) |
+| PM4Y4P | PM | 4 (sine) | Cascaded PM: 3->2 split with PM+, 0 independent |
+| PM4Y9 | PM | 4 (sine) | PM: 3->2->1 chain + 0 independent carrier |
