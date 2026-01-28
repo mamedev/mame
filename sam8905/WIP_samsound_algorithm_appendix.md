@@ -33,6 +33,7 @@
 - [x] Algorithm SAMPDRF - Sampling with low-pass filter
 - [x] Algorithm SAMPDRFH - 2x Sampling with low-pass filter (half rate)
 - [x] Algorithm WF2SLBP/WF2SLHP/WF2SVLP - Filtered wave (2 internal)
+- [x] Algorithm PMFOF - Formant synthesis (FOF)
 - [ ] Remaining algorithms (add as scans become available)
 - [ ] Cross-reference algorithms to firmware ROM A-RAM data
 - [ ] Map algorithm names to MS4 program numbers
@@ -934,6 +935,63 @@ DPHI3 -> A3 -> PM -> DPHI2 -> DA2 -> PM -> DPHI1 -> DA1 -> MIXL/MIXR
 
 ---
 
+## Algorithm: PMFOF
+
+**Name**: PMFOF
+**Family**: FORMANT
+**Description**: Repetitive pattern, the pattern shape being 1+cos type distorted by a phase modulation.
+
+```mermaid
+graph TD
+    PMDP["PMDP<br/>sine"] --> PMA["PMA"]
+
+    DEXC["DEXC<br/>pulse"] --> RESET["(reset)"]
+    RESET --> DENV_OSC["DENV<br/>1+cos<br/>(see note)"]
+    RESET --> DPHI_OSC["DPHI<br/>sine"]
+
+    PMA --> DENV_OSC
+
+    DENV_OSC --> RING{{"ring"}}
+    DPHI_OSC --> RING
+
+    RING --> DA["DA"]
+    DA --> MIX["MIXL<br/>MIXR"]
+    MIX --> OUT(("output"))
+```
+
+### Signal Flow
+
+1. **Excitation pulse**: DEXC generates trigger pulses at the fundamental frequency (pitch)
+2. **Formant carrier**: DPHI sine oscillator, reset on each DEXC pulse (sets formant center frequency)
+3. **Formant envelope**: DENV single-period 1+cos oscillator, triggered by DEXC pulse
+4. **Phase modulation**: PMA modulates the DENV envelope phase (PMDP sine -> PMA amplitude)
+5. **Ring modulation**: DENV envelope × DPHI sine shapes each formant grain
+6. **Output**: DA (amplitude) -> MIXL/MIXR
+
+### Timing Diagram
+
+```
+DEXC:  |     |     |     |     |   (trigger pulses)
+       ▼     ▼     ▼     ▼     ▼
+DPHI:  ~∿~∿  ~∿~∿  ~∿~∿  ~∿~∿  ~∿  (sine, reset each pulse)
+DENV:  ⌢     ⌢     ⌢     ⌢     ⌢   (1+cos envelope grains)
+```
+
+### Notes
+
+- **FOF synthesis**: This implements Fonction d'Onde Formantique (IRCAM formant synthesis)
+- **DENV oscillator**: Single period 1+cos waveform triggered by DEXC, phase modulated by PMA
+- **DEXC**: Controls fundamental frequency (repetition rate of formant grains)
+- **DPHI**: Controls formant center frequency (the sine frequency within each grain)
+- **PMA/PMDP**: Phase modulation adds timbral complexity to the formant envelope
+- Used for vocal formant synthesis, vowel-like timbres
+
+### Links
+- https://fr.audiofanzine.com/synthese-sonore-acoustique/editorial/dossiers/la-synthese-formantique-et-arithmetique-lineaire.html Roland D50 used this?
+- https://www.soundonsound.com/techniques/formant-synthesis
+
+---
+
 ## Algorithm: SAMPDRF
 
 **Name**: SAMPDRF
@@ -1073,6 +1131,7 @@ graph TD
 | PM4Y2 | PM | 4 (sine) | Cascaded PM: 3->2->1->0 (linked freq variant) |
 | PM4Y4P | PM | 4 (sine) | Cascaded PM: 3->2 split with PM+, 0 independent |
 | PM4Y9 | PM | 4 (sine) | PM: 3->2->1 chain + 0 independent carrier |
+| PMFOF | Formant | 2 (sine + 1+cos) | FOF synthesis: triggered formant grains with PM envelope |
 | SAMPDRF | Sampling | 1 (DRAM) | DRAM sampling + 12dB SVF low-pass |
 | SAMPDRFH | Sampling | 2 (DRAM) | 2x DRAM sampling + 12dB SVF LP, half rate (22.05 kHz) |
 | WF2SLBP | Filtered wave | 2 (wave osc) | 2 internal waves + 12dB SVF band-pass |
