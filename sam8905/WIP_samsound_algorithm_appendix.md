@@ -32,6 +32,7 @@
 - [x] Algorithm PM4Y9 - Cascaded PM (topology 9)
 - [x] Algorithm SAMPDRF - Sampling with low-pass filter
 - [x] Algorithm SAMPDRFH - 2x Sampling with low-pass filter (half rate)
+- [x] Algorithm WF2SLBP/WF2SLHP/WF2SVLP - Filtered wave (2 internal)
 - [ ] Remaining algorithms (add as scans become available)
 - [ ] Cross-reference algorithms to firmware ROM A-RAM data
 - [ ] Map algorithm names to MS4 program numbers
@@ -1002,6 +1003,47 @@ graph TD
 
 ---
 
+## Algorithm: WF2SLBP / WF2SLHP / WF2SVLP
+
+**Name**: WF2SLBP [WF2SLHP] [WF2SVLP]
+**Family**: FILTERED WAVE
+**Description**: 2 internal waves filtered. Warning: aliasing noise when used with middle/high frequency. Band pass (resp [high-pass][low-pass]) output.
+
+```mermaid
+graph TD
+    OSC0["DPHI0<br/>WF"] --> A0["A0"]
+    OSC1["DPHI1<br/>WF"] --> A1["A1"]
+
+    A0 --> FILT{{"Filter12<br/>Q — FC"}}
+    A1 --> FILT
+
+    FILT --> MIX["MIXL<br/>MIXR"]
+    MIX --> OUT(("output"))
+```
+
+### Signal Flow
+
+1. **Oscillator 0**: DPHI0 with wave (internal wave ramp or square only) -> A0 (amplitude)
+2. **Oscillator 1**: DPHI1 with wave (internal wave ramp or square only) -> A1 (amplitude)
+3. **Filter**: 12 dB state-variable filter with Q (resonance) and FC (cutoff), both oscillators summed at input
+4. **Output**: Filter output -> MIXL/MIXR
+
+### Variants
+
+| Algorithm | Filter Output |
+|-----------|---------------|
+| WF2SLBP | Band-pass |
+| WF2SLHP | High-pass |
+| WF2SVLP | Low-pass |
+
+### Notes
+
+- Only internal waveforms (ramp or square) should be used - external waveforms not supported
+- Aliasing can occur at middle/high frequencies due to the non-bandlimited waveform sources
+- Two independent oscillators allow for detuning, layering, or different waveform combinations
+
+---
+
 ## Index
 
 | Algorithm | Family | Oscillators | Key Feature |
@@ -1033,3 +1075,6 @@ graph TD
 | PM4Y9 | PM | 4 (sine) | PM: 3->2->1 chain + 0 independent carrier |
 | SAMPDRF | Sampling | 1 (DRAM) | DRAM sampling + 12dB SVF low-pass |
 | SAMPDRFH | Sampling | 2 (DRAM) | 2x DRAM sampling + 12dB SVF LP, half rate (22.05 kHz) |
+| WF2SLBP | Filtered wave | 2 (wave osc) | 2 internal waves + 12dB SVF band-pass |
+| WF2SLHP | Filtered wave | 2 (wave osc) | 2 internal waves + 12dB SVF high-pass |
+| WF2SVLP | Filtered wave | 2 (wave osc) | 2 internal waves + 12dB SVF low-pass |
