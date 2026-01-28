@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    ldverify.c
+    ldverify.cpp
 
     Laserdisc AVI/CHD verifier.
 
