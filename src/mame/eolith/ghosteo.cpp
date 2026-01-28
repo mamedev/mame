@@ -729,7 +729,7 @@ ROM_END
 
 ROM_START( touryuu ) // Same hardware: GHOST Ver1.1 2003.03.28
 	ROM_REGION( 0x4200000, "flash", 0 ) // ARM 32 bit code
-	ROM_LOAD( "u1.bin", 0x0000000, 0x4200000, CRC(aff9507e) SHA1(1abcaddf15420768f6b68c5a2097f593ac8dfaa5) )
+	ROM_LOAD( "u1.bin", 0x0000000, 0x4200000, CRC(aff9507e) SHA1(1abcaddf15420768f6b68c5a2097f593ac8dfaa5) ) // HY27US08121M
 
 	// banked every 0x10000 bytes ?
 	ROM_REGION( 0x080000, "qs1000:cpu", 0 )
