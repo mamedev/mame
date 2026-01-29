@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <cctype>
 #include <fstream>
+#include <locale>
 #include <sstream>
 
 
@@ -688,6 +689,7 @@ void debugger_commands::execute_printf(const std::vector<std::string_view> &para
 {
 	// then do a printf
 	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	if (mini_printf(buffer, params))
 		m_console.printf("%s\n", std::move(buffer).str());
 }
@@ -701,6 +703,7 @@ void debugger_commands::execute_logerror(const std::vector<std::string_view> &pa
 {
 	// then do a printf
 	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	if (mini_printf(buffer, params))
 		m_machine.logerror("%s", std::move(buffer).str());
 }
@@ -714,6 +717,7 @@ void debugger_commands::execute_tracelog(const std::vector<std::string_view> &pa
 {
 	// then do a printf
 	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	if (mini_printf(buffer, params))
 		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str());
 }
@@ -727,6 +731,7 @@ void debugger_commands::execute_tracesym(const std::vector<std::string_view> &pa
 {
 	// build a format string appropriate for the parameters and validate them
 	std::ostringstream format;
+	format.imbue(std::locale::classic());
 	for (int i = 0; i < params.size(); i++)
 	{
 		// find this symbol
@@ -752,6 +757,7 @@ void debugger_commands::execute_tracesym(const std::vector<std::string_view> &pa
 
 	// then do a printf
 	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	if (mini_printf(buffer, printf_params))
 		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str());
 }
@@ -1017,25 +1023,28 @@ void debugger_commands::execute_ignore(const std::vector<std::string_view> &para
 	if (params.empty())
 	{
 		// if there are no parameters, dump the ignore list
-		std::string buffer;
+		std::ostringstream buffer;
+		buffer.imbue(std::locale::classic());
 
 		// loop over all executable devices
+		bool empty = true;
 		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 		{
 			// build up a comma-separated list
 			if (!exec.device().debug()->observing())
 			{
-				if (buffer.empty())
-					buffer = string_format("Currently ignoring device '%s'", exec.device().tag());
+				if (empty)
+					util::stream_format(buffer, "Currently ignoring device '%s'", exec.device().tag());
 				else
-					buffer.append(string_format(", '%s'", exec.device().tag()));
+					util::stream_format(buffer, ", '%s'", exec.device().tag());
+				empty = false;
 			}
 		}
 
 		// special message for none
-		if (buffer.empty())
-			buffer = string_format("Not currently ignoring any devices");
-		m_console.printf("%s\n", buffer);
+		if (empty)
+			buffer << "Not currently ignoring any devices";
+		m_console.printf("%s\n", std::move(buffer).str());
 	}
 	else
 	{
@@ -1080,25 +1089,28 @@ void debugger_commands::execute_observe(const std::vector<std::string_view> &par
 	if (params.empty())
 	{
 		// if there are no parameters, dump the ignore list
-		std::string buffer;
+		std::ostringstream buffer;
+		buffer.imbue(std::locale::classic());
 
 		// loop over all executable devices
+		bool empty = true;
 		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 		{
 			// build up a comma-separated list
 			if (exec.device().debug()->observing())
 			{
-				if (buffer.empty())
-					buffer = string_format("Currently observing CPU '%s'", exec.device().tag());
+				if (empty)
+					util::stream_format(buffer, "Currently observing CPU '%s'", exec.device().tag());
 				else
-					buffer.append(string_format(", '%s'", exec.device().tag()));
+					util::stream_format(buffer, ", '%s'", exec.device().tag());
+				empty = false;
 			}
 		}
 
 		// special message for none
-		if (buffer.empty())
-			buffer = string_format("Not currently observing any devices");
-		m_console.printf("%s\n", buffer);
+		if (empty)
+			buffer << "Not currently observing any devices";
+		m_console.printf("%s\n", std::move(buffer).str());
 	}
 	else
 	{
@@ -1128,24 +1140,28 @@ void debugger_commands::execute_suspend(const std::vector<std::string_view> &par
 	// if there are no parameters, dump the ignore list
 	if (params.empty())
 	{
-		std::string buffer;
+		std::ostringstream buffer;
+		buffer.imbue(std::locale::classic());
 
 		// loop over all executable devices
+		bool empty = true;
 		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
-
+		{
 			// build up a comma-separated list
 			if (exec.device().debug()->suspended())
 			{
-				if (buffer.empty())
-					buffer = string_format("Currently suspended device '%s'", exec.device().tag());
+				if (empty)
+					util::stream_format(buffer, "Currently suspended device '%s'", exec.device().tag());
 				else
-					buffer.append(string_format(", '%s'", exec.device().tag()));
+					util::stream_format(buffer, ", '%s'", exec.device().tag());
+				empty = false;
 			}
+		}
 
 		// special message for none
-		if (buffer.empty())
-			buffer = string_format("No currently suspended devices");
-		m_console.printf("%s\n", buffer);
+		if (empty)
+			buffer << "No currently suspended devices";
+		m_console.printf("%s\n", std::move(buffer).str());
 	}
 	else
 	{
@@ -1187,24 +1203,28 @@ void debugger_commands::execute_resume(const std::vector<std::string_view> &para
 	// if there are no parameters, dump the ignore list
 	if (params.empty())
 	{
-		std::string buffer;
+		std::ostringstream buffer;
+		buffer.imbue(std::locale::classic());
 
 		// loop over all executable devices
+		bool empty = true;
 		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
-
+		{
 			// build up a comma-separated list
 			if (exec.device().debug()->suspended())
 			{
-				if (buffer.empty())
-					buffer = string_format("Currently suspended device '%s'", exec.device().tag());
+				if (empty)
+					util::stream_format(buffer, "Currently suspended device '%s'", exec.device().tag());
 				else
-					buffer.append(string_format(", '%s'", exec.device().tag()));
+					util::stream_format(buffer, ", '%s'", exec.device().tag());
+				empty = false;
 			}
+		}
 
 		// special message for none
-		if (buffer.empty())
-			buffer = string_format("No currently suspended devices");
-		m_console.printf("%s\n", buffer);
+		if (empty)
+			buffer << "No currently suspended devices";
+		m_console.printf("%s\n", std::move(buffer).str());
 	}
 	else
 	{
@@ -1454,7 +1474,8 @@ void debugger_commands::execute_bpdisenable(bool enable, const std::vector<std::
 void debugger_commands::execute_bplist(const std::vector<std::string_view> &params)
 {
 	int printed = 0;
-	std::string buffer;
+	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	auto const apply =
 			[this, &printed, &buffer] (device_t &device)
 			{
@@ -1465,13 +1486,15 @@ void debugger_commands::execute_bplist(const std::vector<std::string_view> &para
 					// loop over the breakpoints
 					for (const auto &bpp : device.debug()->breakpoint_list())
 					{
+						buffer.str("");
+						buffer.seekp(0);
 						debug_breakpoint &bp = *bpp.second;
-						buffer = string_format("%c%4X @ %0*X", bp.enabled() ? ' ' : 'D', bp.index(), device.debug()->logaddrchars(), bp.address());
+						util::stream_format(buffer, "%c%4X @ %0*X", bp.enabled() ? ' ' : 'D', bp.index(), device.debug()->logaddrchars(), bp.address());
 						if (std::string(bp.condition()).compare("1") != 0)
-							buffer.append(string_format(" if %s", bp.condition()));
+							util::stream_format(buffer, " if %s", bp.condition());
 						if (std::string(bp.action()).compare("") != 0)
-							buffer.append(string_format(" do %s", bp.action()));
-						m_console.printf("%s\n", buffer);
+							util::stream_format(buffer, " do %s", bp.action());
+						m_console.printf("%s\n", std::move(buffer).str());
 						printed++;
 					}
 				}
@@ -1631,7 +1654,8 @@ void debugger_commands::execute_wpdisenable(bool enable, const std::vector<std::
 void debugger_commands::execute_wplist(const std::vector<std::string_view> &params)
 {
 	int printed = 0;
-	std::string buffer;
+	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	auto const apply =
 			[this, &printed, &buffer] (device_t &device)
 			{
@@ -1649,17 +1673,19 @@ void debugger_commands::execute_wplist(const std::vector<std::string_view> &para
 						// loop over the watchpoints
 						for (const auto &wp : device.debug()->watchpoint_vector(spacenum))
 						{
-							buffer = string_format(
+							buffer.str("");
+							buffer.seekp(0);
+							util::stream_format(buffer,
 									"%c%4X @ %0*X-%0*X %s",
 									wp->enabled() ? ' ' : 'D', wp->index(),
 									wp->space().addrchars(), wp->address(),
 									wp->space().addrchars(), wp->address() + wp->length() - 1,
 									types[int(wp->type())]);
 							if (std::string(wp->condition()).compare("1") != 0)
-								buffer.append(string_format(" if %s", wp->condition()));
+								util::stream_format(buffer, " if %s", wp->condition());
 							if (std::string(wp->action()).compare("") != 0)
-								buffer.append(string_format(" do %s", wp->action()));
-							m_console.printf("%s\n", buffer);
+								util::stream_format(buffer, " do %s", wp->action());
+							m_console.printf("%s\n", std::move(buffer).str());
 							printed++;
 						}
 					}
@@ -1871,7 +1897,8 @@ void debugger_commands::execute_epdisenable(bool enable, const std::vector<std::
 void debugger_commands::execute_eplist(const std::vector<std::string_view> &params)
 {
 	int printed = 0;
-	std::string buffer;
+	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	auto const apply =
 			[this, &printed, &buffer] (device_t &device)
 			{
@@ -1883,12 +1910,14 @@ void debugger_commands::execute_eplist(const std::vector<std::string_view> &para
 					for (const auto &epp : device.debug()->exceptionpoint_list())
 					{
 						debug_exceptionpoint &ep = *epp.second;
-						buffer = string_format("%c%4X : %X", ep.enabled() ? ' ' : 'D', ep.index(), ep.type());
+						buffer.str("");
+						buffer.seekp(0);
+						util::stream_format(buffer, "%c%4X : %X", ep.enabled() ? ' ' : 'D', ep.index(), ep.type());
 						if (std::string(ep.condition()).compare("1") != 0)
-							buffer.append(string_format(" if %s", ep.condition()));
+							util::stream_format(buffer, " if %s", ep.condition());
 						if (!ep.action().empty())
-							buffer.append(string_format(" do %s", ep.action()));
-						m_console.printf("%s\n", buffer);
+							util::stream_format(buffer, " do %s", ep.action());
+						m_console.printf("%s\n", std::move(buffer).str());
 						printed++;
 					}
 				}
@@ -1922,7 +1951,8 @@ void debugger_commands::execute_eplist(const std::vector<std::string_view> &para
 void debugger_commands::execute_rplist(const std::vector<std::string_view> &params)
 {
 	int printed = 0;
-	std::string buffer;
+	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	auto const apply =
 			[this, &printed, &buffer] (device_t &device)
 			{
@@ -1933,10 +1963,12 @@ void debugger_commands::execute_rplist(const std::vector<std::string_view> &para
 					// loop over the registerpoints
 					for (const auto &rp : device.debug()->registerpoint_list())
 					{
-						buffer = string_format("%c%4X if %s", rp.enabled() ? ' ' : 'D', rp.index(), rp.condition());
+						buffer.str("");
+						buffer.seekp(0);
+						util::stream_format(buffer, "%c%4X if %s", rp.enabled() ? ' ' : 'D', rp.index(), rp.condition());
 						if (!rp.action().empty())
-							buffer.append(string_format(" do %s", rp.action()));
-						m_console.printf("%s\n", buffer);
+							util::stream_format(buffer, " do %s", rp.action());
+						m_console.printf("%s\n", std::move(buffer).str());
 						printed++;
 					}
 				}
@@ -2197,6 +2229,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 		m_console.printf("Error opening file '%s'\n", params[0]);
 		return;
 	}
+	f.imbue(std::locale::classic());
 
 	// determine the file size, if not specified
 	const address_space_config *config = mintf->logical_space_config(spacenum);
@@ -2432,6 +2465,7 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 
 	// now write the data out
 	util::ovectorstream output;
+	output.imbue(std::locale::classic());
 	output.reserve(200);
 
 	const unsigned delta = (shift >= 0) ? (width << shift) : (width >> -shift);
@@ -2507,8 +2541,9 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 						data = tspace->read_byte(i+j);
 						break;
 					}
-					for (unsigned int b = 0; b != width; b++) {
-						u8 byte = data >> (8 * (be ? (width-1-b) : b));
+					for (unsigned int b = 0; b != width; b++)
+					{
+						u8 const byte = data >> (8 * (be ? (width-1-b) : b));
 						util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
 					}
 				}
@@ -2618,6 +2653,7 @@ bool debugger_commands::execute_dump_try_memory(const std::vector<std::string_vi
 
 	// now write the data out
 	util::ovectorstream output;
+	output.imbue(std::locale::classic());
 	output.reserve(200);
 
 	const unsigned delta = (shift >= 0) ? (width << shift) : (width >> -shift);
@@ -2751,6 +2787,7 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 
 	// now write the data out
 	util::ovectorstream output;
+	output.imbue(std::locale::classic());
 	output.reserve(200);
 
 	auto dis = mintf->device().machine().disable_side_effects();
@@ -2942,6 +2979,7 @@ bool debugger_commands::execute_strdump_try_memory(const std::vector<std::string
 
 	// now write the data out
 	util::ovectorstream output;
+	output.imbue(std::locale::classic());
 	output.reserve(200);
 
 	bool terminated = true;
@@ -3484,6 +3522,7 @@ void debugger_commands::execute_cheatlist(const std::vector<std::string_view> &p
 	// write the cheat list
 	u32 active_cheat = 0;
 	util::ovectorstream output;
+	output.imbue(std::locale::classic());
 	for (u64 cheatindex = 0; cheatindex < m_cheat.cheatmap.size(); cheatindex += 1)
 	{
 		if (m_cheat.cheatmap[cheatindex].state == 1)
@@ -4144,6 +4183,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 		m_console.printf("Error opening file '%s'\n", params[0]);
 		return;
 	}
+	f.imbue(std::locale::classic());
 
 	if (bytes)
 	{
@@ -4194,6 +4234,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 	if (params.size() > 2)
 	{
 		std::stringstream stream;
+		stream.imbue(std::locale::classic());
 		stream.str(std::string(params[2]));
 
 		std::string flag;
@@ -4236,6 +4277,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 			m_console.printf("Error opening file '%s'\n", params[0]);
 			return;
 		}
+		f->imbue(std::locale::classic());
 	}
 
 	// do it
