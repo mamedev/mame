@@ -482,6 +482,7 @@ void cem3394_device::device_start()
 double cem3394_device::compute_db(double voltage)
 {
 	// assumes 0.0 == full off, 4.0 == full on, with linear taper, as described in the datasheet
+	// the typical max attenuation is 90dB, according to the datasheet
 
 	// above 4.0, maximum volume
 	if (voltage >= 4.0)
@@ -499,7 +500,7 @@ double cem3394_device::compute_db(double voltage)
 	else
 	{
 		double temp = 20.0 * pow(2.0, 2.5 - voltage);
-		if (temp < 90.0) return 90.0;
+		if (temp > 90.0) return 90.0;
 		else return temp;
 	}
 }
@@ -507,31 +508,8 @@ double cem3394_device::compute_db(double voltage)
 
 sound_stream::sample_t cem3394_device::compute_db_volume(double voltage)
 {
-	double temp;
-
-	// assumes 0.0 == full off, 4.0 == full on, with linear taper, as described in the datasheet
-
-	// above 4.0, maximum volume
-	if (voltage >= 4.0)
-		return 1.0;
-
-	// below 0.0, minimum volume
-	else if (voltage <= 0.0)
-		return 0;
-
-	// between 2.5 and 4.0, linear from 20dB to 0dB
-	else if (voltage >= 2.5)
-		temp = (4.0 - voltage) * (1.0 / 1.5) * 20.0;
-
-	// between 0.0 and 2.5, exponential to 20dB
-	else
-	{
-		temp = 20.0 * pow(2.0, 2.5 - voltage);
-		if (temp < 50.0) return 0;
-	}
-
 	// convert from dB to volume and return
-	return powf(0.891251f, temp);
+	return powf(0.891251f, compute_db(voltage));
 }
 
 
@@ -624,14 +602,20 @@ void cem3394_device::set_voltage_internal(int input, double voltage)
 			LOGMASKED(LOG_CONTROL_CHANGES, "FLT_FREQ=%6.3fV -> freq=%f\n", voltage, m_filter_frequency);
 			break;
 
-		// modulation depth is 0.01*freq at 0V and 2.0*freq at 3.5V
+		// At max depth, the frequency is modulated from 0.01x to 2.0x. This
+		// implementation modulates from 0.01x to 1.99x, for simpler math.
+		// 0% modulation is achieved when the CV is below -0.3 - +0.1 V. Using
+		// a threshold of 0.01 here, to ensure the min CV set by the sixtrak
+		// results in 0% modulation.
+		// 100% modulation is achieved when the CV is above 3 - 4 V. Using the
+		// midpoint (3.5) as the threshold here.
 		case MODULATION_AMOUNT:
-			if (voltage < 0.0)
-				m_filter_modulation = 0.01;
+			if (voltage < 0.01)
+				m_filter_modulation = 0;
 			else if (voltage > 3.5)
-				m_filter_modulation = 1.99;
+				m_filter_modulation = 1.98;
 			else
-				m_filter_modulation = (voltage * (1.0 / 3.5)) * 1.98 + 0.01;
+				m_filter_modulation = 1.98 * (voltage - 0.01) / (3.5 - 0.01);
 			LOGMASKED(LOG_CONTROL_CHANGES, "FLT_MODU=%6.3fV -> mod=%f\n", voltage, m_filter_modulation);
 			break;
 
