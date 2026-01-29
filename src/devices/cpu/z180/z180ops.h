@@ -963,6 +963,5 @@ uint8_t z180_device::SET(uint8_t bit, uint8_t value)
  ***************************************************************/
 #define SLP {                                                   \
 	_PC -= 2;                                                      \
-	m_icount = 0;                                           \
 	m_HALT = 2;                                                 \
 }

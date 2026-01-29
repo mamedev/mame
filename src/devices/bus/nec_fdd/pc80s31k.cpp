@@ -271,7 +271,7 @@ static void pc88_floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_XDF_FORMAT);
 	fr.add(FLOPPY_PC98FDI_FORMAT);
 	// eventually ...
-//	fr.add(FLOPPY_HFE_FORMAT);
+//  fr.add(FLOPPY_HFE_FORMAT);
 }
 
 void pc80s31_device::device_add_mconfig(machine_config &config)

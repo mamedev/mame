@@ -376,7 +376,7 @@ void *virtual_memory_allocation::do_alloc(std::initializer_list<std::size_t> blo
 	s *= info.dwPageSize;
 	if (!s)
 		return nullptr;
-	LPVOID const result(VirtualAlloc(nullptr, s, MEM_COMMIT, PAGE_NOACCESS));
+	LPVOID const result(VirtualAlloc(nullptr, s, MEM_RESERVE | MEM_COMMIT, PAGE_NOACCESS));
 	if (result)
 	{
 		size = s;

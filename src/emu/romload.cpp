@@ -948,7 +948,7 @@ void rom_load_manager::fill_rom_data(memory_region &region, const rom_entry *rom
 	u8 fill_byte = u8(strtol(romp->hashdata().c_str(), nullptr, 0));
 
 	// fill the data (filling value is stored in place of the hashdata)
-	if(skip != 0)
+	if (skip != 0)
 	{
 		for (int i = 0; i < numbytes; i+= skip + 1)
 			base[i] = fill_byte;

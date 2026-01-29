@@ -3706,7 +3706,7 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<feature name="start_page" value="1"/>
 			<dataarea name="rom" size="0x4000">
-				<rom name="chick fighter (japan).rom" size="0x4000" crc="b82e9e22" sha1="87b9eb98f60607bd6e70400e83d3e7e83f8eb6ac" />
+				<rom name="chick fighter (japan).rom" size="0x4000" crc="8884b37b" sha1="f0af202a8a2e44e3d224b40496549e331620f1f9" />
 			</dataarea>
 		</part>
 	</software>

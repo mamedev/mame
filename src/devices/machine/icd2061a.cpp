@@ -68,6 +68,7 @@ void icd2061a_device::device_start()
 	save_item(NAME(m_vclkout_select));
 	save_item(NAME(m_mclkout_select));
 
+	save_item(NAME(m_regs));
 	save_item(NAME(m_reg_clocks));
 	save_item(NAME(m_prescale));
 	save_item(NAME(m_powerdown_mode));
@@ -92,6 +93,7 @@ void icd2061a_device::device_start()
 	m_clk = 1;
 	m_cmd = 0;
 
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
 	std::fill(std::begin(m_prescale), std::end(m_prescale), 2);
 	m_powerdown_mode = 0;
 	m_muxref_vclkout_source = 0;

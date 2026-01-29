@@ -584,7 +584,6 @@ imgtool::partition::partition(imgtool::image &image, const imgtool_class &imgcla
 	m_attr_name = (imgtoolerr_t(*)(uint32_t, const imgtool_attribute *, char *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_ATTR_NAME);
 	m_get_iconinfo = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool_iconinfo *)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_ICON_INFO);
 	m_suggest_transfer = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool::transfer_suggestion *, size_t))  imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_SUGGEST_TRANSFER);
-	m_get_chain = (imgtoolerr_t(*)(imgtool::partition &, const char *, imgtool::chainent *, size_t)) imgtool_get_info_fct(&imgclass, IMGTOOLINFO_PTR_GET_CHAIN);
 	m_writefile_optguide = (const util::option_guide *) imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 
 	const char *writefile_optspec = (const char *)imgtool_get_info_ptr(&imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
@@ -1516,99 +1515,6 @@ imgtoolerr_t imgtool::partition::suggest_file_filters(const char *path,
 		i++;
 	}
 	suggestions[j].viability = (imgtool::suggestion_viability_t)0;
-
-	return IMGTOOLERR_SUCCESS;
-}
-
-
-//-------------------------------------------------
-//  partition::get_chain - retrieves the block
-//  chain for a file or directory on a partition
-//-------------------------------------------------
-
-imgtoolerr_t imgtool::partition::get_chain(const char *path, imgtool::chainent *chain, size_t chain_size)
-{
-	assert(chain_size > 0);
-
-	if (!m_get_chain)
-		return imgtoolerr_t(IMGTOOLERR_UNIMPLEMENTED | IMGTOOLERR_SRC_FUNCTIONALITY);
-
-	// initialize the chain array, so the module's get_chain function can be lazy
-	for (int i = 0; i < chain_size; i++)
-	{
-		chain[i].level = 0;
-		chain[i].block = ~0;
-	}
-
-	return m_get_chain(*this, path, chain, chain_size - 1);
-}
-
-
-//-------------------------------------------------
-//  partition::get_chain_string - retrieves
-//  the block chain for a file or directory on a
-//  partition
-//-------------------------------------------------
-
-imgtoolerr_t imgtool::partition::get_chain_string(const char *path, char *buffer, size_t buffer_len)
-{
-	imgtoolerr_t err;
-	imgtool::chainent chain[512];
-	uint64_t last_block;
-	uint8_t cur_level = 0;
-	int len, i;
-	int comma_needed = false;
-
-	// determine the last block identifier
-	chain[0].block = ~0;
-	last_block = chain[0].block;
-
-	err = get_chain(path, chain, std::size(chain));
-	if (err)
-		return err;
-
-	len = snprintf(buffer, buffer_len, "[");
-	buffer += len;
-	buffer_len -= len;
-
-	for (i = 0; chain[i].block != last_block; i++)
-	{
-		while(cur_level < chain[i].level)
-		{
-			len = snprintf(buffer, buffer_len, " [");
-			buffer += len;
-			buffer_len -= len;
-			cur_level++;
-			comma_needed = false;
-		}
-		while(cur_level > chain[i].level)
-		{
-			len = snprintf(buffer, buffer_len, "]");
-			buffer += len;
-			buffer_len -= len;
-			cur_level--;
-		}
-
-		if (comma_needed)
-		{
-			len = snprintf(buffer, buffer_len, ", ");
-			buffer += len;
-			buffer_len -= len;
-		}
-
-		len = snprintf(buffer, buffer_len, "%u", (unsigned) chain[i].block);
-		buffer += len;
-		buffer_len -= len;
-		comma_needed = true;
-	}
-
-	do
-	{
-		len = snprintf(buffer, buffer_len, "]");
-		buffer += len;
-		buffer_len -= len;
-	}
-	while(cur_level-- > 0);
 
 	return IMGTOOLERR_SUCCESS;
 }

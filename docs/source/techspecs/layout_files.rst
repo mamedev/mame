@@ -509,13 +509,13 @@ image
     layout file.  Image file formats are detected by examining the content of
     the files, file name extensions are ignored.
 text
-    Draws text in using the UI font in the specified colour.  The text to draw
-    must be supplied using a ``string`` attribute.  An ``align`` attribute may
-    be supplied to set text alignment.  If present, the ``align`` attribute must
-    be an integer, where 0 (zero) means centred, 1 (one) means left-aligned,
-    2 (two) means right-aligned, and 3 (three) means that the text will be
-    stretched horizontally to fill its bounds. If the ``align`` attribute is
-    absent, the text will be centred.
+    Draws text in the specified colour, using the artwork font.  The text to
+    draw must be supplied using a ``string`` attribute.  An ``align`` attribute
+    may be supplied to set text alignment.  If present, the ``align`` attribute
+    must be an integer, where 0 (zero) means centred, 1 (one) means
+    left-aligned, 2 (two) means right-aligned, and 3 (three) means that the text
+    will be stretched horizontally to fill its bounds.  If the ``align``
+    attribute is absent, the text will be centred.
 led7seg
     Draws a standard seven-segment (plus decimal point) digital LED/fluorescent
     display in the specified colour.  The low eight bits of the element’s state
@@ -556,17 +556,18 @@ led16segsc
     additional bits correspond to the decimal point and comma tail.  Unlit
     segments are drawn at low intensity (0x20/0xff).
 simplecounter
-    Displays the numeric value of the element’s state using the system font in
-    the specified colour.  The value is formatted in decimal notation.  A
+    Displays the numeric value of the element’s state in the specified colour,
+    using the artwork font.  The value is formatted in decimal notation.  A
     ``digits`` attribute may be supplied to specify the minimum number of digits
     to display.  If present, the ``digits`` attribute must be a positive
     integer; if absent, a minimum of two digits will be displayed.  A
     ``maxstate`` attribute may be supplied to specify the maximum state value to
     display.  If present, the ``maxstate`` attribute must be a non-negative
-    number; if absent it defaults to 999.  An ``align`` attribute may be supplied
-    to set text alignment.  If present, the ``align`` attribute must be an
-    integer, where 0 (zero) means centred, 1 (one) means left-aligned, and 2
-    (two) means right-aligned; if absent, the text will be centred.
+    number; if absent it defaults to 999.  An ``align`` attribute may be
+    supplied to set text alignment.  If present, the ``align`` attribute must be
+    an integer, where 0 (zero) means centred, 1 (one) means left-aligned, and 3
+    (three) means that the text will be stretched horizontally to fill its
+    bounds.  If the ``align`` attribute is absent, the text will be centred.
 
 An example element that draws a static left-aligned text string:
 
@@ -1390,8 +1391,8 @@ layouts, MAME automatically generates views based on the machine configuration.
 The following views will be automatically generated:
 
 * If the system has no screens and no viable views were found in the internal
-  and external layouts, MAME will load a view that shows the message “No screens
-  attached to the system”.
+  and external layouts, MAME will load a view that shows the message “No visual
+  output.”
 * For each emulated screen, MAME will generate a view showing the screen at its
   physical aspect ratio with rotation applied.
 * For each emulated screen where the configured pixel aspect ratio doesn’t match

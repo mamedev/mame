@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    pngcmp.c
+    pngcmp.cpp
 
-    PNG comparison (based on regrep.c)
+    PNG comparison (based on regrep.cpp)
 
 ****************************************************************************/
 

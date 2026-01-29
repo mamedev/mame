@@ -60,13 +60,19 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-
 	void thinkpad850(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
+
+	void main_map(address_map &map) ATTR_COLD;
 };
 
+
+void thinkpad8xx_state::main_map(address_map &map)
+{
+	map(0xfff00000, 0xfff7ffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START(thinkpad8xx)
 INPUT_PORTS_END
@@ -74,6 +80,7 @@ INPUT_PORTS_END
 void thinkpad8xx_state::thinkpad850(machine_config &config)
 {
 	PPC603(config, m_maincpu, 33.333_MHz_XTAL * 3); // IBM PPCI603eFC100BPQ
+	m_maincpu->set_addrmap(AS_PROGRAM, &thinkpad8xx_state::main_map);
 
 	// All BIOS ROM chip lines are routed through the S-MOS 85G7814
 
@@ -82,6 +89,7 @@ void thinkpad8xx_state::thinkpad850(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	SOFTWARE_LIST(config, "thinkpad8xx").set_original("thinkpad8xx");
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("prep");
 }
 
 

@@ -395,18 +395,18 @@ authors:hap
 			<param name="y" start="8.3" increment="8.05714" />
 			<param name="i" start="1" increment="1" />
 
-			<element ref="text_l~i~a"><bounds xc="10" y="~y~" width="8" height="1.5" /></element>
-			<element ref="text_m~i~a"><bounds xc="18" y="~y~" width="8" height="1.5" /></element>
-			<element ref="text_r~i~a"><bounds xc="26" y="~y~" width="8" height="1.5" /></element>
+			<element ref="text_l~i~a"><bounds xc="10" y="~y~" width="7.5" height="1.5" /></element>
+			<element ref="text_m~i~a"><bounds xc="18" y="~y~" width="7.5" height="1.5" /></element>
+			<element ref="text_r~i~a"><bounds xc="26" y="~y~" width="7.5" height="1.5" /></element>
 		</repeat>
 
 		<repeat count="8">
 			<param name="y" start="13.7" increment="8.05714" />
 			<param name="i" start="1" increment="1" />
 
-			<element ref="text_l~i~b"><bounds xc="10" y="~y~" width="8" height="1.5" /></element>
-			<element ref="text_m~i~b"><bounds xc="18" y="~y~" width="8" height="1.5" /></element>
-			<element ref="text_r~i~b"><bounds xc="26" y="~y~" width="8" height="1.5" /></element>
+			<element ref="text_l~i~b"><bounds xc="10" y="~y~" width="7.5" height="1.5" /></element>
+			<element ref="text_m~i~b"><bounds xc="18" y="~y~" width="7.5" height="1.5" /></element>
+			<element ref="text_r~i~b"><bounds xc="26" y="~y~" width="7.5" height="1.5" /></element>
 		</repeat>
 
 		<element ref="butd" inputtag="IN.1" inputmask="0x80"><bounds xc="10" y="10.000" width="5.65" height="3.6" /></element>

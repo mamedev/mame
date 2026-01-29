@@ -1145,17 +1145,7 @@ void armedf_state::sound_config_common(machine_config &config) // common amongst
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.4); // SIP R2R DAC @ G11-2 with 74HC374P latch
 }
 
-void armedf_state::sound_config(machine_config &config) // 3526, used on almost all non-bootlegs
-{
-	sound_config_common(config);
-
-	m_audiocpu->set_addrmap(AS_PROGRAM, &armedf_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &armedf_state::sound_3526_portmap);
-
-	YM3526(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.2);
-}
-
-void armedf_state::sound_config_3812(machine_config &config) // 3812, used on bootlegs and skyrobo/bigfghtr
+void armedf_state::sound_config(machine_config &config) // 3812, used on all pcbs and bootlegs except for legion (and maybe cclimbr2)
 {
 	sound_config_common(config);
 
@@ -1165,7 +1155,7 @@ void armedf_state::sound_config_3812(machine_config &config) // 3812, used on bo
 	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.2);
 }
 
-void armedf_state::sound_config_legion(machine_config &config) // 3526, used on non-bootleg legion and cclimbr2
+void armedf_state::sound_config_legion(machine_config &config) // 3526, used on non-bootleg legion and maybe cclimbr2, needs verification
 {
 	sound_config_common(config);
 
@@ -1175,7 +1165,7 @@ void armedf_state::sound_config_legion(machine_config &config) // 3526, used on 
 	YM3526(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.2);
 }
 
-void armedf_state::sound_config_legion_3812(machine_config &config) // 3812, used on legion bootlegs
+void armedf_state::sound_config_legion_3812(machine_config &config) // 3812, used on legion bootlegs and maybe cclimbr2, needs verification
 {
 	sound_config_common(config);
 
@@ -1217,7 +1207,7 @@ void armedf_state::terrafjb(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
 	/* sound hardware */
-	sound_config_3812(config);
+	sound_config(config);
 }
 
 void armedf_state::terrafb(machine_config &config)
@@ -1240,7 +1230,7 @@ void armedf_state::kozure(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
 	/* sound hardware */
-	sound_config_3812(config);
+	sound_config(config);
 }
 
 void armedf_state::armedf(machine_config &config)
@@ -1327,7 +1317,7 @@ void bigfghtr_state::bigfghtr(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(bigfghtr_state,armedf)
 
-	sound_config_3812(config);
+	sound_config(config);
 }
 
 

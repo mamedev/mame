@@ -95,10 +95,10 @@ void pm2_mmu_device::device_start()
 	save_item(NAME(m_super));
 	save_item(NAME(m_boot));
 
-	m_space[0]->specific(m_cpu_mem);
-	m_space[1]->specific(m_cpu_spc);
-	m_space[2]->specific(m_bus_mem);
-	m_space[3]->specific(m_bus_pio);
+	m_space[0]->specific(m_bus_mem);
+	m_space[1]->specific(m_bus_pio);
+	m_space[2]->specific(m_cpu_mem);
+	m_space[3]->specific(m_cpu_spc);
 }
 
 void pm2_mmu_device::device_reset()
@@ -173,6 +173,30 @@ std::optional<std::pair<unsigned, offs_t>> pm2_mmu_device::translate(offs_t cons
 
 	// protection error
 	return std::nullopt;
+}
+
+bool pm2_mmu_device::translate(int spacenum, int intention, offs_t &address, address_space *&target_space)
+{
+	if (spacenum == m68000_base_device::AS_CPU_SPACE)
+	{
+		target_space = m_space[3];
+		return true;
+	}
+
+	if (spacenum != AS_PROGRAM)
+		return false;
+
+	auto const t = translate(address, intention);
+	if (!t.has_value())
+		return false;
+
+	auto const [type, physical] = t.value();
+	if (type == 3)
+		return false;
+
+	address = physical;
+	target_space = m_space[type];
+	return true;
 }
 
 template <bool Execute> u16 pm2_mmu_device::mmu_read(offs_t logical, u16 mem_mask)

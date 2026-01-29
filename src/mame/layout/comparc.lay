@@ -109,18 +109,18 @@ authors:hap
 	<element name="text_g11"><text string="FIRE AWAY" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 	<element name="text_g12"><text string="HIDE 'N SEEK" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
 
-	<element name="text_b1"><text string="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
-	<element name="text_b2"><text string="2"><color red="0.94" green="0.94" blue="0.94" /></text></element>
-	<element name="text_b3"><text string="3"><color red="0.94" green="0.94" blue="0.94" /></text></element>
-	<element name="text_b4"><text string="4"><color red="0.94" green="0.94" blue="0.94" /></text></element>
-	<element name="text_b5"><text string="5"><color red="0.94" green="0.94" blue="0.94" /></text></element>
-	<element name="text_b6"><text string="6"><color red="0.94" green="0.94" blue="0.94" /></text></element>
-	<element name="text_b7"><text string="7"><color red="0.94" green="0.94" blue="0.94" /></text></element>
-	<element name="text_b8"><text string="8"><color red="0.94" green="0.94" blue="0.94" /></text></element>
-	<element name="text_b9"><text string="9"><color red="0.94" green="0.94" blue="0.94" /></text></element>
-	<element name="text_b10"><text string="10"><color red="0.94" green="0.94" blue="0.94" /></text></element>
-	<element name="text_b11"><text string="11"><color red="0.94" green="0.94" blue="0.94" /></text></element>
-	<element name="text_b12"><text string="12"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b1"><text string="1" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b2"><text string="2" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b3"><text string="3" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b4"><text string="4" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b5"><text string="5" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b6"><text string="6" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b7"><text string="7" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b8"><text string="8" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b9"><text string="9" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b10"><text string="10" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b11"><text string="11" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
+	<element name="text_b12"><text string="12" align="1"><color red="0.94" green="0.94" blue="0.94" /></text></element>
 
 
 <!-- build screen -->
@@ -368,38 +368,38 @@ authors:hap
 		</element>
 
 		<!-- gamename labels -->
-		<element ref="text_g1"><bounds x="3.8" y="21.8" width="9.2" height="1.4" /></element>
-		<element ref="text_g5"><bounds x="16.8" y="21.8" width="9.2" height="1.4" /></element>
-		<element ref="text_g9"><bounds x="29.8" y="21.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g1"><bounds x="3.8" y="21.8" width="9.1" height="1.4" /></element>
+		<element ref="text_g5"><bounds x="16.8" y="21.8" width="9.1" height="1.4" /></element>
+		<element ref="text_g9"><bounds x="29.8" y="21.8" width="9.1" height="1.4" /></element>
 
-		<element ref="text_g2"><bounds x="3.8" y="36.8" width="9.2" height="1.4" /></element>
-		<element ref="text_g6"><bounds x="16.8" y="36.8" width="9.2" height="1.4" /></element>
-		<element ref="text_g10"><bounds x="29.8" y="36.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g2"><bounds x="3.8" y="36.8" width="9.1" height="1.4" /></element>
+		<element ref="text_g6"><bounds x="16.8" y="36.8" width="9.1" height="1.4" /></element>
+		<element ref="text_g10"><bounds x="29.8" y="36.8" width="9.1" height="1.4" /></element>
 
-		<element ref="text_g3"><bounds x="3.8" y="51.8" width="9.2" height="1.4" /></element>
-		<element ref="text_g7"><bounds x="16.8" y="51.8" width="9.2" height="1.4" /></element>
-		<element ref="text_g11"><bounds x="29.8" y="51.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g3"><bounds x="3.8" y="51.8" width="9.1" height="1.4" /></element>
+		<element ref="text_g7"><bounds x="16.8" y="51.8" width="9.1" height="1.4" /></element>
+		<element ref="text_g11"><bounds x="29.8" y="51.8" width="9.1" height="1.4" /></element>
 
-		<element ref="text_g4"><bounds x="3.8" y="66.8" width="9.2" height="1.4" /></element>
-		<element ref="text_g8"><bounds x="16.8" y="66.8" width="9.2" height="1.4" /></element>
-		<element ref="text_g12"><bounds x="29.8" y="66.8" width="9.2" height="1.4" /></element>
+		<element ref="text_g4"><bounds x="3.8" y="66.8" width="9.1" height="1.4" /></element>
+		<element ref="text_g8"><bounds x="16.8" y="66.8" width="9.1" height="1.4" /></element>
+		<element ref="text_g12"><bounds x="29.8" y="66.8" width="9.1" height="1.4" /></element>
 
 		<!-- number labels -->
-		<element ref="text_b1"><bounds x="12.8" y="20.8" width="2" height="2" /></element>
-		<element ref="text_b5"><bounds x="25.8" y="20.8" width="2" height="2" /></element>
-		<element ref="text_b9"><bounds x="38.8" y="20.8" width="2" height="2" /></element>
+		<element ref="text_b1"><bounds x="13.3" y="20.8" width="2" height="2" /></element>
+		<element ref="text_b5"><bounds x="26.3" y="20.8" width="2" height="2" /></element>
+		<element ref="text_b9"><bounds x="39.3" y="20.8" width="2" height="2" /></element>
 
-		<element ref="text_b2"><bounds x="12.8" y="35.8" width="2" height="2" /></element>
-		<element ref="text_b6"><bounds x="25.8" y="35.8" width="2" height="2" /></element>
-		<element ref="text_b10"><bounds x="38.8" y="35.8" width="2" height="2" /></element>
+		<element ref="text_b2"><bounds x="13.3" y="35.8" width="2" height="2" /></element>
+		<element ref="text_b6"><bounds x="26.3" y="35.8" width="2" height="2" /></element>
+		<element ref="text_b10"><bounds x="39.3" y="35.8" width="2" height="2" /></element>
 
-		<element ref="text_b3"><bounds x="12.8" y="50.8" width="2" height="2" /></element>
-		<element ref="text_b7"><bounds x="25.8" y="50.8" width="2" height="2" /></element>
-		<element ref="text_b11"><bounds x="38.8" y="50.8" width="2" height="2" /></element>
+		<element ref="text_b3"><bounds x="13.3" y="50.8" width="2" height="2" /></element>
+		<element ref="text_b7"><bounds x="26.3" y="50.8" width="2" height="2" /></element>
+		<element ref="text_b11"><bounds x="39.3" y="50.8" width="2" height="2" /></element>
 
-		<element ref="text_b4"><bounds x="12.8" y="65.8" width="2" height="2" /></element>
-		<element ref="text_b8"><bounds x="25.8" y="65.8" width="2" height="2" /></element>
-		<element ref="text_b12"><bounds x="38.8" y="65.8" width="2" height="2" /></element>
+		<element ref="text_b4"><bounds x="13.3" y="65.8" width="2" height="2" /></element>
+		<element ref="text_b8"><bounds x="26.3" y="65.8" width="2" height="2" /></element>
+		<element ref="text_b12"><bounds x="39.3" y="65.8" width="2" height="2" /></element>
 
 	</view>
 </mamelayout>

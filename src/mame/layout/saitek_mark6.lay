@@ -351,7 +351,7 @@ authors:hap
 	<element name="text_sound1"><text string="SOUND"><color red="0.81" green="0.8" blue="0.79" /></text></element>
 	<element name="text_sound2"><text string="SOUND"><color red="0.65" green="0.12" blue="0.15" /></text></element>
 
-	<element name="text_r9"><text string="|9" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
+	<element name="text_r9"><text string=" |9" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
 	<element name="text_r8"><text string="H|8" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
 	<element name="text_r7"><text string="G|7" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
 	<element name="text_r6"><text string="F|6" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
@@ -360,7 +360,7 @@ authors:hap
 	<element name="text_r3"><text string="C|3" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
 	<element name="text_r2"><text string="B|2" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
 	<element name="text_r1"><text string="A|1" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
-	<element name="text_r0"><text string="|0" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
+	<element name="text_r0"><text string=" |0" align="2"><color red="0.6" green="0.6" blue="0.59" /></text></element>
 
 	<element name="text_p1"><image file="chess/wk.svg"><color alpha="0.83" /></image></element>
 	<element name="text_p2"><image file="chess/wq.svg"><color alpha="0.83" /></image></element>
@@ -543,16 +543,16 @@ authors:hap
 		<element ref="text_b2ad1" blend="add" inputtag="IN.6" inputmask="0x04" inputraw="yes"><bounds x="9.8" y="61.4" width="7.5" height="1.4" /></element>
 		<element ref="text_b2ad2" blend="add" inputtag="IN.6" inputmask="0x04" inputraw="yes"><bounds x="9.8" y="62.7" width="7.5" height="1.4" /></element>
 
-		<element ref="text_r9" blend="add"><bounds x="16.5" y="26" width="6" height="1.4" /></element>
-		<element ref="text_r8" blend="add"><bounds x="16.5" y="30" width="6" height="1.4" /></element>
-		<element ref="text_r7" blend="add"><bounds x="16.5" y="34" width="6" height="1.4" /></element>
-		<element ref="text_r6" blend="add"><bounds x="16.5" y="38" width="6" height="1.4" /></element>
-		<element ref="text_r5" blend="add"><bounds x="16.5" y="42" width="6" height="1.4" /></element>
-		<element ref="text_r4" blend="add"><bounds x="16.5" y="46" width="6" height="1.4" /></element>
-		<element ref="text_r3" blend="add"><bounds x="16.5" y="50" width="6" height="1.4" /></element>
-		<element ref="text_r2" blend="add"><bounds x="16.5" y="54" width="6" height="1.4" /></element>
-		<element ref="text_r1" blend="add"><bounds x="16.5" y="58" width="6" height="1.4" /></element>
-		<element ref="text_r0" blend="add"><bounds x="16.5" y="62" width="6" height="1.4" /></element>
+		<element ref="text_r9" blend="add"><bounds x="20.6" y="26" width="1.9" height="1.4" /></element>
+		<element ref="text_r8" blend="add"><bounds x="20.6" y="30" width="1.9" height="1.4" /></element>
+		<element ref="text_r7" blend="add"><bounds x="20.6" y="34" width="1.9" height="1.4" /></element>
+		<element ref="text_r6" blend="add"><bounds x="20.6" y="38" width="1.9" height="1.4" /></element>
+		<element ref="text_r5" blend="add"><bounds x="20.6" y="42" width="1.9" height="1.4" /></element>
+		<element ref="text_r4" blend="add"><bounds x="20.6" y="46" width="1.9" height="1.4" /></element>
+		<element ref="text_r3" blend="add"><bounds x="20.6" y="50" width="1.9" height="1.4" /></element>
+		<element ref="text_r2" blend="add"><bounds x="20.6" y="54" width="1.9" height="1.4" /></element>
+		<element ref="text_r1" blend="add"><bounds x="20.6" y="58" width="1.9" height="1.4" /></element>
+		<element ref="text_r0" blend="add"><bounds x="20.6" y="62" width="1.9" height="1.4" /></element>
 
 		<element ref="text_p1" blend="add"><bounds x="17.5" y="37" width="3" height="3" /></element>
 		<element ref="text_p2" blend="add"><bounds x="17.5" y="41" width="3" height="3" /></element>

@@ -683,7 +683,7 @@ LVS-DG2
 #define LOG_VREGS           (1U << 4)
 #define LOG_SYSREGS         (1U << 5)
 
-#define VERBOSE (LOG_GENERAL)
+#define VERBOSE (0)
 #include "logmacro.h"
 
 

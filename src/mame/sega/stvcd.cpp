@@ -2270,14 +2270,14 @@ void stvcd_device::read_new_dir(uint32_t fileno)
 					case 0: // boot record
 						break;
 
-					case 1: // primary vol. desc
+					case 1: // primary volume descriptor
 						foundpd = 1;
 						break;
 
-					case 2: // secondary vol desc
+					case 2: // secondary volume descriptor
 						break;
 
-					case 3: // vol. section descriptor
+					case 3: // volume section descriptor
 						break;
 
 					case 0xff:
@@ -2287,7 +2287,7 @@ void stvcd_device::read_new_dir(uint32_t fileno)
 			}
 		}
 
-		// got primary vol. desc.
+		// got primary volume descriptor
 		if (foundpd)
 		{
 			//dirfad = get_u32le(&sect[140]);
@@ -2325,6 +2325,7 @@ void stvcd_device::read_new_dir(uint32_t fileno)
 }
 
 // makes the directory pointed to by FAD current
+// https://wiki.osdev.org/ISO_9660 for a detailed reference
 void stvcd_device::make_dir_current(uint32_t fad)
 {
 	uint32_t i;
@@ -2343,6 +2344,11 @@ void stvcd_device::make_dir_current(uint32_t fad)
 
 	nextent = 0;
 	numentries = 0;
+
+	// on directories bigger than 1 FAD we have to keep track of gaps
+	// i.e. a sector will end with a 0 marker but continues in the next sector.
+	// cfr. chaossd and sengblad
+	u32 sector_number = 0;
 	while (nextent < MAX_DIR_SIZE)
 	{
 		if (sect[nextent])
@@ -2352,7 +2358,13 @@ void stvcd_device::make_dir_current(uint32_t fad)
 		}
 		else
 		{
-			nextent = MAX_DIR_SIZE;
+			if (sector_number < curroot.length)
+			{
+				sector_number += 0x800;
+				nextent = sector_number;
+			}
+			else
+				nextent = MAX_DIR_SIZE;
 		}
 	}
 
@@ -2360,6 +2372,7 @@ void stvcd_device::make_dir_current(uint32_t fad)
 	curentry = &curdir[0];
 	numfiles = numentries;
 
+	sector_number = 0;
 	nextent = 0;
 	while (numentries)
 	{
@@ -2384,6 +2397,13 @@ void stvcd_device::make_dir_current(uint32_t fad)
 		// [32] name character size
 		// [33+ ...] file name
 
+		if (!sect[nextent+0] && sector_number < curroot.length)
+		{
+			sector_number += 0x800;
+			nextent = sector_number;
+			continue;
+		}
+
 		curentry->record_size = sect[nextent+0];
 		curentry->xa_record_size = sect[nextent+1];
 		curentry->firstfad = get_u32le(&sect[nextent+2]);
@@ -2406,7 +2426,7 @@ void stvcd_device::make_dir_current(uint32_t fad)
 			curentry->name[i] = sect[nextent+33+i];
 		}
 		curentry->name[i] = '\0';   // terminate
-		//LOGWARN("%08x %08x %s %d/%d/%d\n",curentry->firstfad,curentry->length,curentry->name,curentry->year,curentry->month,curentry->day);
+		//printf("%d: %08x %08x %s %d/%d/%d\n", nextent, curentry->firstfad,curentry->length,curentry->name,curentry->year,curentry->month,curentry->day);
 
 		nextent += sect[nextent];
 		curentry++;

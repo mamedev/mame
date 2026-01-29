@@ -15,14 +15,14 @@
     the Mobigo 2 is NAND+RAM config
     cartridges are compatible
 
-	Known Undumped:
-	MobiGo 2 (USA, English)
-	MobiGo (UK and Australia, English)
-	MobiGo 2 (UK and Australia, English)
-	MobiGo (Canada, English)
-	MobiGo 2 (Canada, English)
-	MobiGo (Canada, French)
-	
+    Known Undumped:
+    MobiGo 2 (USA, English)
+    MobiGo (UK and Australia, English)
+    MobiGo 2 (UK and Australia, English)
+    MobiGo (Canada, English)
+    MobiGo 2 (Canada, English)
+    MobiGo (Canada, French)
+
 */
 
 #include "emu.h"

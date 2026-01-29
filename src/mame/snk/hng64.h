@@ -213,7 +213,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	
+
 private:
 	static constexpr int HNG64_MASTER_CLOCK = 50'000'000;
 
@@ -546,6 +546,7 @@ private:
 	void sound_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 	void dsp_map(address_map &map) ATTR_COLD;
+	void dsp_ram_map(address_map &map) ATTR_COLD;
 };
 
 #endif // MAME_SNK_HNG64_H

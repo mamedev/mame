@@ -35,6 +35,8 @@ video:   Sprite Zooming - the current algorithm is leaving gaps, most noticeable
 
 video:   Sprite positions still kludged slightly (see skns_sprite_kludge)
 
+puzzloopkbl: Different sprite RAM format?
+
 ------------------
 
 SUPER-KANEKO-NOVA-SYSTEM
@@ -472,8 +474,6 @@ void skns_state::machine_reset()
 		hit.disconnect= 1;
 	else
 		hit.disconnect= 0;
-
-	membank("bank1")->set_base(memregion("user1")->base());
 }
 
 
@@ -741,7 +741,7 @@ void skns_state::skns_map(address_map &map)
 	map(0x02a00000, 0x02a0001f).ram().w(FUNC(skns_state::pal_regs_w)).share("pal_regs");
 	map(0x02a40000, 0x02a5ffff).ram().w(FUNC(skns_state::palette_ram_w)).share("palette_ram");
 	map(0x02f00000, 0x02f000ff).rw(FUNC(skns_state::hit_r), FUNC(skns_state::hit_w));
-	map(0x04000000, 0x041fffff).bankr("bank1"); /* GAME ROM */
+	map(0x04000000, 0x041fffff).rom().region("game", 0);
 	map(0x04800000, 0x0483ffff).ram().w(FUNC(skns_state::v3t_w)).share("v3t_ram"); /* tilemap b ram based tiles */
 	map(0x05000000, 0x05000003).nopw();  /* watchdog, probably.  Always writes 0 */
 	map(0x06000000, 0x060fffff).ram().share("main_ram");
@@ -1063,7 +1063,7 @@ void skns_state::init_galpans3()   { m_spritegen->skns_sprite_kludge(-1,-1); ini
 ROM_START( skns )
 	SKNS_BIOS
 
-	ROM_REGION32_BE( 0x200000, "user1", ROMREGION_ERASE00 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", ROMREGION_ERASE00 ) // SH-2 Code mapped at 0x04000000
 
 	ROM_REGION( 0x800000, "spritegen", ROMREGION_ERASE00 ) // Sprites
 
@@ -1078,7 +1078,7 @@ ROM_END
 ROM_START( cyvern )
 	SKNS_USA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "cv-usa.u10", 0x000000, 0x100000, CRC(1023ddca) SHA1(7967e3e876cdb797bdaa2eb5136a33cd43941501) )
 	ROM_LOAD16_BYTE( "cv-usa.u8",  0x000001, 0x100000, CRC(f696f6be) SHA1(d9e66173ca12693255d2bb0982da2fb96bfd155d) )
 
@@ -1102,7 +1102,7 @@ ROM_END
 ROM_START( cyvernj )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "cvj-even.u10", 0x000000, 0x100000, CRC(802fadb4) SHA1(cbfac3a87a4863466117c61f2ecaf63d506352f6) )
 	ROM_LOAD16_BYTE( "cvj-odd.u8",   0x000001, 0x100000, CRC(f8a0fbdd) SHA1(5cc8c12c13b5eb3456083e70100450ba041de76e) )
 
@@ -1126,7 +1126,7 @@ ROM_END
 ROM_START( galpani4 )
 	SKNS_EUROPE
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gp4-000-e0.u10", 0x000000, 0x080000, CRC(7464cc28) SHA1(4ea6185b62d3e25efdaafb91397b51bc8f12fdee) ) // Hitachi HN27C4001G-10
 	ROM_LOAD16_BYTE( "gp4-001-e0.u8",  0x000001, 0x080000, CRC(8d162069) SHA1(1bd0181a9c9f37c8e8c9d6f75f045d76dffcd903) ) // Hitachi HN27C4001G-10
 
@@ -1154,7 +1154,7 @@ ROM_END
 ROM_START( galpani4j )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gp4j1.u10", 0x000000, 0x080000, CRC(919a3893) SHA1(83b89a9e628a1f46f8a56ea512fc8ad641d5e239) )
 	ROM_LOAD16_BYTE( "gp4j1.u8",  0x000001, 0x080000, CRC(94cb1fb7) SHA1(ac90103dd43cdce6a287ffc13631c1de477a9a71) )
 
@@ -1177,7 +1177,7 @@ ROM_END
 ROM_START( galpani4k ) /* ROM-BOARD NEP-16 part number GP04K00372 with extra sound sample ROM at U7 */
 	SKNS_KOREA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gp4k1.u10", 0x000000, 0x080000, CRC(cbd5c3a0) SHA1(17fc0d6f6050ffd31707cee3fcc263cd5b9d0c4f) )
 	ROM_LOAD16_BYTE( "gp4k1.u8",  0x000001, 0x080000, CRC(7a95bfe2) SHA1(82e24fd4674ec25bc6608ced0921e8573fcff2c2) )
 
@@ -1207,7 +1207,7 @@ But it's clearly meant for Korea as it shows a Korean region warning and KA+cat 
 ROM_START( galpaniex ) /* ROM-BOARD NEP-16 part number GP04K01334 with extra sound sample ROM at U7 */
 	SKNS_ASIA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gpex_even_u10_d804_2001-2-6.u10", 0x000000, 0x100000, CRC(d3b504e6) SHA1(c5b3e06ee35386db5e0032b4cb7d49b7fbbcf531) ) // GPEX  even U10  2001/2/6    D804
 	ROM_LOAD16_BYTE( "gpex_odd_u8_14c6_2001-2-6.u8",    0x000001, 0x100000, CRC(f3fe305a) SHA1(99d2f4e0857ebffd93674de22fb2836353f68974) ) // GPEX   odd U8   2001/2/6    14C6
 
@@ -1231,7 +1231,7 @@ ROM_END
 ROM_START( galpanidx )
 	SKNS_ASIA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gpdx.u10", 0x000000, 0x100000, CRC(8eca883d) SHA1(f5a102ac21aeebc44afcd0ef7f655de21d4442b2) )
 	ROM_LOAD16_BYTE( "gpdx.u8",  0x000001, 0x100000, CRC(b0088d8f) SHA1(2363620265d3fc53bae1c5889ea761444f80735a) )
 
@@ -1255,7 +1255,7 @@ ROM_END
 ROM_START( galpanisu )
 	SKNS_KOREA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gpsu_e_1q07_00.6.5.u10", 0x000000, 0x100000, CRC(3bf4c440) SHA1(88941ee62a1d975c4a848e6fa79c2757afe47833) ) // handwritten label
 	ROM_LOAD16_BYTE( "gpsu_o_16d1_00.6.5.u8",  0x000001, 0x100000, CRC(d4fef828) SHA1(ccf5c62ad3a5b54ea35a421cfe9d402a4a2dda6c) ) // handwritten label
 
@@ -1283,7 +1283,7 @@ ROM_END
 ROM_START( galpanis )
 	SKNS_EUROPE
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gps-000-e1.u10", 0x000000, 0x100000, CRC(b9ea3c44) SHA1(c1913545cd71ee75e60ade744a2a1054f770b981) ) // revision 1
 	ROM_LOAD16_BYTE( "gps-001-e1.u8",  0x000001, 0x100000, CRC(ded57bd0) SHA1(4c0122f0521829d4d83b6b1c403f7e6470f14951) )
 
@@ -1307,7 +1307,7 @@ ROM_END
 ROM_START( galpanise )
 	SKNS_EUROPE
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "u10", 0x000000, 0x100000, CRC(e78e1623) SHA1(f68346b65d2613c8515894d9a239fcbb0b5cb52d) ) // mask ROM with no labels - GPS-000-E0?
 	ROM_LOAD16_BYTE( "u8",  0x000001, 0x100000, CRC(098eff7c) SHA1(3cac22cbb11905a46afaa62c0470624b3b554fc0) ) // mask ROM with no labels - GPS-001-E0?
 
@@ -1331,7 +1331,7 @@ ROM_END
 ROM_START( galpanisj )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gps-000-j1.u10", 0x000000, 0x100000, CRC(c6938c3f) SHA1(05853ee6a44a55702788a75580b04a4be45e9bcb) )
 	ROM_LOAD16_BYTE( "gps-001-j1.u8",  0x000001, 0x100000, CRC(e764177a) SHA1(3a1333eb1022ed1a275b9c3d44b5f4ab81618fb6) )
 
@@ -1355,7 +1355,7 @@ ROM_END
 ROM_START( galpanisa )
 	SKNS_ASIA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gps-000-a0_9abc.u10", 0x000000, 0x100000, CRC(4e24b799) SHA1(614f4eb6a7b0ab03ea6ada28a670ed0759b3f4f9) ) // hand written labels with checksum
 	ROM_LOAD16_BYTE( "gps-001-a0_bd64.u8",  0x000001, 0x100000, CRC(aa4db8af) SHA1(10cc15fa065b6a2dcaf8c7d701c5ae7c18e4e863) ) // hand written labels with checksum
 
@@ -1379,7 +1379,7 @@ ROM_END
 ROM_START( galpanisk )
 	SKNS_KOREA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gps-000-k1.u10", 0x000000, 0x100000, CRC(c9ff3d8a) SHA1(edfec265654aaa8cb307424e5b2899e708392cd0) ) // revision 1
 	ROM_LOAD16_BYTE( "gps-001-k1.u8",  0x000001, 0x100000, CRC(354e601d) SHA1(4d176f2337a3b0b63548b2e542f9fa87d0a1ef7b) )
 
@@ -1403,7 +1403,7 @@ ROM_END
 ROM_START( galpaniska )
 	SKNS_KOREA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gps-000-k0.u10", 0x000000, 0x100000, CRC(be74128c) SHA1(6d506e1bb715e6bfd98eda5e69475d2f75911d26) ) // revision 0 (first version)
 	ROM_LOAD16_BYTE( "gps-001-k0.u8",  0x000001, 0x100000, CRC(701f793d) SHA1(7278dc68d5b92a26675333ef8b4b2c04c27f1b03) )
 
@@ -1427,7 +1427,7 @@ ROM_END
 ROM_START( galpans2 ) //only the 2 program ROMs were dumped, but mask ROMs are supposed to match.
 	SKNS_EUROPE
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gps2e_u6__ver.3.u6", 0x000000, 0x100000, CRC(72fff5d1) SHA1(57001e04c469281a82a2956c6bc33502d5a3b882) )
 	ROM_LOAD16_BYTE( "gps2e_u4__ver.3.u4", 0x000001, 0x100000, CRC(95061601) SHA1(f98f1af9877b097e97acc5a3844ef9c523a92843) )
 
@@ -1453,7 +1453,7 @@ ROM_END
 ROM_START( galpans2j )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gps2j.u6", 0x000000, 0x100000, CRC(6e74005b) SHA1(a57e8307062e262c2e7a84e2c58f7dfe03fc0f78) )
 	ROM_LOAD16_BYTE( "gps2j.u4", 0x000001, 0x100000, CRC(9b4b2304) SHA1(0b481f4d71d92bf23f38ed22979efd4409004857) )
 
@@ -1479,7 +1479,7 @@ ROM_END
 ROM_START( galpans2a )
 	SKNS_ASIA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gps2av11.u6", 0x000000, 0x100000, CRC(61c05d5f) SHA1(e47c7951c1f688edb6c677532f750537a64bb7b3) )
 	ROM_LOAD16_BYTE( "gps2av11.u4", 0x000001, 0x100000, CRC(2e8c0ac2) SHA1(d066260d6d3c2924b42394e867523e6112a125c5) )
 
@@ -1505,7 +1505,7 @@ ROM_END
 ROM_START( galpansu ) // standard Kaneko NOVA SYSTEM ROM 4 BOARD cart with genuine Kaneko labels & chips
 	SKNS_KOREA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gps2k_u6_ver.5.u6", 0x000000, 0x100000, CRC(18ffb6d3) SHA1(73d1c5483ab93855c855c32807a70bf0c4185a1e) )
 	ROM_LOAD16_BYTE( "gps2k_u4_ver.5.u4", 0x000001, 0x100000, CRC(211f3c7c) SHA1(06d3cb95ef7f1e55965b37fb837ec4f3317c83d4) )
 
@@ -1549,7 +1549,7 @@ Gals Panic 2 set.
 ROM_START( galpansua )
 	SKNS_KOREA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "su.u10", 0x000000, 0x100000, CRC(5ae66218) SHA1(c3f32603e1da945efb984ff99e1a30202e535773) )
 	ROM_LOAD16_BYTE( "su.u8",  0x000001, 0x100000, CRC(10977a03) SHA1(2ab95398d6b88d8819f368ee6104d7f8b485778d) )
 
@@ -1575,7 +1575,7 @@ ROM_END
 ROM_START( galpans3 )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gpss3.u10", 0x000000, 0x100000, CRC(c1449a72) SHA1(02db81a0ea349742d6ddf71d59fcfce45f0c5212) )
 	ROM_LOAD16_BYTE( "gpss3.u8",  0x000001, 0x100000, CRC(11eb44cf) SHA1(482ef27fa86d6777def46918eac8be019896c0b0) )
 
@@ -1596,7 +1596,7 @@ ROM_END
 ROM_START( gutsn )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "gts000j0.u6", 0x000000, 0x080000, CRC(8ee91310) SHA1(8dd918189fe445d79c7f028168862b852f70a6f2) )
 	ROM_LOAD16_BYTE( "gts001j0.u4", 0x000001, 0x080000, CRC(80b8ee66) SHA1(4faf5f358ceee866f09bd81e63ba3ebd21bde835) )
 
@@ -1617,7 +1617,7 @@ ROM_END
 ROM_START( panicstr )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "ps1000j0.u10", 0x000000, 0x100000, CRC(59645f89) SHA1(8da205c6e38899d6c637941700dd7eea56011c10) )
 	ROM_LOAD16_BYTE( "ps1001j0.u8",  0x000001, 0x100000, CRC(c4722be9) SHA1(7009d320a80cfa7d80efc5fc915081914bc3c827) )
 
@@ -1639,7 +1639,7 @@ ROM_END
 ROM_START( puzzloop )
 	SKNS_EUROPE
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "pl00e4.u6", 0x000000, 0x080000, CRC(7d3131a5) SHA1(f9302aa27addb8a730102b1869a34063d8b44e62) ) // V0.94
 	ROM_LOAD16_BYTE( "pl00e4.u4", 0x000001, 0x080000, CRC(40dc3291) SHA1(d955752a2c884e6dd951f9a87f9d249bb1ab9116) ) // V0.94
 
@@ -1661,7 +1661,7 @@ ROM_END
 ROM_START( puzzloope )
 	SKNS_EUROPE
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "pl00e1.u6", 0x000000, 0x080000, CRC(273adc38) SHA1(37ca873342ba9fb9951114048a9cd255f73fe19c) ) // V0.93
 	ROM_LOAD16_BYTE( "pl00e1.u4", 0x000001, 0x080000, CRC(14ac2870) SHA1(d1abcfd64d7c0ead67e879c40e1010453fd4da13) ) // V0.93
 
@@ -1683,7 +1683,7 @@ ROM_END
 ROM_START( puzzloopj )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "pl0j2.u6", 0x000000, 0x080000, CRC(23c3bf97) SHA1(77ea1f32bed5709a6ad5b250370f08cfe8036867) ) // V0.94
 	ROM_LOAD16_BYTE( "pl0j2.u4", 0x000001, 0x080000, CRC(55b2a3cb) SHA1(d4cbe143fe2ad622af808cbd9eedffeff3b77e0d) ) // V0.94
 
@@ -1705,7 +1705,7 @@ ROM_END
 ROM_START( puzzloopa )
 	SKNS_ASIA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "pl0a3.u6", 0x000000, 0x080000, CRC(4e8673b8) SHA1(17acfb0550912e6f2519df2bc24fbf629a1f6147) ) // V0.94
 	ROM_LOAD16_BYTE( "pl0a3.u4", 0x000001, 0x080000, CRC(e08a1a07) SHA1(aba58a81ae46c7b4e235a3213984026d170fa189) ) // V0.94
 
@@ -1727,7 +1727,7 @@ ROM_END
 ROM_START( puzzloopk )
 	SKNS_KOREA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "pl0k4.u6", 0x000000, 0x080000, CRC(8d81f20c) SHA1(c32a525e8f92a625e3fecb7c43dd04b13e0a75e4) ) // V0.94
 	ROM_LOAD16_BYTE( "pl0k4.u4", 0x000001, 0x080000, CRC(17c78e41) SHA1(4a4b612ae00d521d2947ab32554ebb615be72471) ) // V0.94
 
@@ -1746,10 +1746,32 @@ ROM_START( puzzloopk )
 	ROM_LOAD( "pzl30000.u4", 0x000000, 0x400000, CRC(38604b8d) SHA1(1191cf48a6a7baa58e51509442b40ea67f5252d2) )
 ROM_END
 
+ROM_START( puzzloopkbl )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "u42", 0x00000, 0x80000, CRC(bc26a491) SHA1(90b1b3b7cffd07f1d549e860b8b5d74609e36968) )
+
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_LOAD16_WORD_SWAP( "u86", 0x000000, 0x100000, CRC(64c3e2b1) SHA1(d52bd9f1fa280ef0327ad5e59eda8a1c3c96c7ea) )
+
+	ROM_REGION( 0x800000, "spritegen", 0 ) // Sprites
+	ROM_LOAD( "l1.u10", 0x000000, 0x400000, CRC(35bf6897) SHA1(8a1f1f5234a61971a62401633de1dec1920fc4da) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) // Tiles Plane A
+	ROM_LOAD( "l2.u98", 0x000000, 0x400000, CRC(ff558e68) SHA1(69a50c8100edbf2d5d92ce14b3f079f76c544bdd) )
+
+	ROM_REGION( 0x800000, "gfx3", ROMREGION_ERASE00 ) // Tiles Plane B
+	// First 0x040000 bytes (0x03ff Tiles) are RAM Based Tiles
+	// 0x040000 - 0x3fffff empty?
+	ROM_LOAD( "l3.u99", 0x400000, 0x400000, CRC(c8b3be64) SHA1(6da9ca8b963ebf10df6bc02bd1bdc66392e2fa60) )
+
+	ROM_REGION( 0x400000, "ymz", 0 ) // Samples
+	ROM_LOAD( "l4.u14", 0x000000, 0x400000, CRC(38604b8d) SHA1(1191cf48a6a7baa58e51509442b40ea67f5252d2) )
+ROM_END
+
 ROM_START( puzzloopu )
 	SKNS_USA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "plue5.u6", 0x000000, 0x080000, CRC(e6f3f82f) SHA1(ac61dc22fa3c1b1c2f3a41d3a8fb43938b77ca68) ) // V0.94
 	ROM_LOAD16_BYTE( "plue5.u4", 0x000001, 0x080000, CRC(0d081d30) SHA1(ec0cdf120126104b9bb706f68c9ba9c3777dd69c) ) // V0.94
 
@@ -1771,7 +1793,7 @@ ROM_END
 ROM_START( jjparads )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "jp1j1.u10", 0x000000, 0x080000, CRC(de2fb669) SHA1(229ff1ae0ec5bc77fc17642964e0bb0146594e86) )
 	ROM_LOAD16_BYTE( "jp1j1.u8",  0x000001, 0x080000, CRC(7276efb1) SHA1(3edc265b5c02da7d21a2494a6dc2878fbad93f87) )
 
@@ -1794,7 +1816,7 @@ ROM_END
 ROM_START( jjparad2 )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "jp2000j1.u6", 0x000000, 0x080000, CRC(5d75e765) SHA1(33bcd8f929f6025b00df2ea783b13a391a28a5c3) )
 	ROM_LOAD16_BYTE( "jp2001j1.u4", 0x000001, 0x080000, CRC(1771910a) SHA1(7ca9584d379d7b41f303a3ba861f943c570ad97c) )
 
@@ -1818,7 +1840,7 @@ ROM_END
 ROM_START( sengekis )
 	SKNS_ASIA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "ss01a.u6", 0x000000, 0x080000, CRC(962fe857) SHA1(3df74c5efff11333dea9316a063129dcec0d7bdd) )
 	ROM_LOAD16_BYTE( "ss01a.u4", 0x000001, 0x080000, CRC(ee853c23) SHA1(ddbf7f7cf509788ee3daf7b4d8ae1482e6e31a03) )
 
@@ -1844,7 +1866,7 @@ ROM_END
 ROM_START( sengekisj )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "ss01j.u6", 0x000000, 0x080000, CRC(9efdcd5a) SHA1(66cca04d07999dc8ca0bcf19db925996b34d0390) )
 	ROM_LOAD16_BYTE( "ss01j.u4", 0x000001, 0x080000, CRC(92c3f45e) SHA1(60c647e66b0126fb7749874be39938972481b957) )
 
@@ -1870,7 +1892,7 @@ ROM_END
 ROM_START( senknow )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "snw000j1.u6", 0x000000, 0x080000, CRC(0d6136f6) SHA1(eedd011cfe03577bfaf386723502d03f6e5dbd8c) )
 	ROM_LOAD16_BYTE( "snw001j1.u4", 0x000001, 0x080000, CRC(4a10ec3d) SHA1(bbec4fc53bd61d06ffe5a53debada5785b124fdd) )
 
@@ -1894,7 +1916,7 @@ ROM_END
 ROM_START( teljan )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "tel1j.u10", 0x000000, 0x080000, CRC(09b552fe) SHA1(2f315fd09eb22fa8c81faa1e926038f20daa845f) )
 	ROM_LOAD16_BYTE( "tel1j.u8",  0x000001, 0x080000, CRC(070b4345) SHA1(5743f12a351b89593c6adfaeb8a5a2ab7bc8b424) )
 
@@ -1918,7 +1940,7 @@ ROM_END
 ROM_START( ryouran )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "or-000-j2.u10",  0x000000, 0x080000, CRC(cba8ca4e) SHA1(7389502622a04101ca34f7b390ca0da820f62590) )
 	ROM_LOAD16_BYTE( "or-001-j2.u8",   0x000001, 0x080000, CRC(8e79c6b7) SHA1(0441d279cdc998e96abd6f607eceb4f866f58337) )
 
@@ -1942,7 +1964,7 @@ ROM_END
 ROM_START( ryourano )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "or000j1.u10",  0x000000, 0x080000, CRC(d93aa491) SHA1(dc01707f1e80d81f28d6b685d08fc6c0d2bf7330) )
 	ROM_LOAD16_BYTE( "or001j1.u8",   0x000001, 0x080000, CRC(f466e5e9) SHA1(65d699f6f9e299333e51a6a52cb13a0f1a902fe1) )
 
@@ -1966,7 +1988,7 @@ ROM_END
 ROM_START( vblokbrk )
 	SKNS_EUROPE
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "sk000e2-e.u10", 0x000000, 0x080000, CRC(5a278f10) SHA1(6f1be0657da76144b0feeed672d92a85091289b6) ) // labeled  SK000e2/E
 	ROM_LOAD16_BYTE( "sk000e-o.u8",   0x000001, 0x080000, CRC(aecf0647) SHA1(4752e5012bae8e7af3972b455b4346499ec2b49c) ) // labeled  SK000e/O
 
@@ -1988,7 +2010,7 @@ ROM_END
 ROM_START( vblokbrka )
 	SKNS_ASIA
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "sk01a.u10", 0x000000, 0x080000, CRC(4d1be53e) SHA1(3d28b73a67530147962b8df6244af8bea2ab080f) )
 	ROM_LOAD16_BYTE( "sk01a.u8",  0x000001, 0x080000, CRC(461e0197) SHA1(003573a4abdbecc6dd234a13c61ef07a25d980e2) )
 
@@ -2010,7 +2032,7 @@ ROM_END
 ROM_START( sarukani )
 	SKNS_JAPAN
 
-	ROM_REGION32_BE( 0x200000, "user1", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
 	ROM_LOAD16_BYTE( "sk1j1.u10", 0x000000, 0x080000, CRC(fcc131b6) SHA1(5e3e71ee1f736b6098e671e6f57b1fb313c81adb) )
 	ROM_LOAD16_BYTE( "sk1j1.u8",  0x000001, 0x080000, CRC(3b6aa343) SHA1(a969b20b1170d82351024cab9e37f2fbfd01ddeb) )
 
@@ -2032,58 +2054,59 @@ ROM_END
 
 /***** GAME DRIVERS *****/
 
-GAME( 1996, skns,      0,        skns,  skns,     skns_state, empty_init,     ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", MACHINE_IS_BIOS_ROOT )
+GAME( 1996, skns,        0,        skns,  skns,     skns_state, empty_init,     ROT0,  "Kaneko", "Super Kaneko Nova System BIOS", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1996, galpani4,  skns,     sknse, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Europe)",                          MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, galpani4j, galpani4, sknsj, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)",                           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, galpani4k, galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)",                           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, galpaniex, galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic EX (Korea)",                          MACHINE_IMPERFECT_GRAPHICS ) // copyright 2000, re-release for the Asian/Korean market?
-GAME( 2000, galpanisu, galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic SU (Korea, Gals Panic 4 re-release)", MACHINE_IMPERFECT_GRAPHICS ) // copyright 2000, re-release for the Asian/Korean market?
-GAME( 2001, galpanidx, galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic DX (Asia)",                           MACHINE_IMPERFECT_GRAPHICS ) // copyright 2001, re-release for the Asian market?
+GAME( 1996, galpani4,    skns,     sknse, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Europe)",                          MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, galpani4j,   galpani4, sknsj, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)",                           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, galpani4k,   galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)",                           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, galpaniex,   galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic EX (Korea)",                          MACHINE_IMPERFECT_GRAPHICS ) // copyright 2000, re-release for the Asian/Korean market?
+GAME( 2000, galpanisu,   galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic SU (Korea, Gals Panic 4 re-release)", MACHINE_IMPERFECT_GRAPHICS ) // copyright 2000, re-release for the Asian/Korean market?
+GAME( 2001, galpanidx,   galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic DX (Asia)",                           MACHINE_IMPERFECT_GRAPHICS ) // copyright 2001, re-release for the Asian market?
 
-GAME( 1996, jjparads,  skns,     sknsj, skns_1p,  skns_state, init_jjparads,  ROT0,  "Electro Design", "Jan Jan Paradise", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, jjparads,    skns,     sknsj, skns_1p,  skns_state, init_jjparads,  ROT0,  "Electro Design", "Jan Jan Paradise", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, galpanis,  skns,     sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, revision 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, galpanise, galpanis, sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 2)", MACHINE_IMPERFECT_GRAPHICS ) // E0 set??
-GAME( 1997, galpanisj, galpanis, sknsj, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan, revision 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, galpanisa, galpanis, sknsa, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Asia)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, galpanisk, galpanis, sknsk, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Korea, revision 1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, galpaniska,galpanis, sknsk, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Korea)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanis,    skns,     sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, revision 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanise,   galpanis, sknse, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Europe, set 2)", MACHINE_IMPERFECT_GRAPHICS ) // E0 set??
+GAME( 1997, galpanisj,   galpanis, sknsj, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Japan, revision 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanisa,   galpanis, sknsa, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpanisk,   galpanis, sknsk, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Korea, revision 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, galpaniska,  galpanis, sknsk, galpanis, skns_state, init_galpanis,  ROT0,  "Kaneko", "Gals Panic S - Extra Edition (Korea)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, jjparad2,  skns,     sknsj, skns_1p,  skns_state, init_jjparad2,  ROT0,  "Electro Design", "Jan Jan Paradise 2", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, jjparad2,    skns,     sknsj, skns_1p,  skns_state, init_jjparad2,  ROT0,  "Electro Design", "Jan Jan Paradise 2", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, sengekis,  skns,     sknsa, skns,     skns_state, init_sengekis,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Asia)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sengekisj, sengekis, sknsj, skns,     skns_state, init_sengekij,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sengekis,    skns,     sknsa, skns,     skns_state, init_sengekis,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sengekisj,   sengekis, sknsj, skns,     skns_state, init_sengekij,  ROT90, "Kaneko / Warashi", "Sengeki Striker (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1997, vblokbrk,  skns,     sknse, vblokbrk, skns_state, init_sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Europe)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, vblokbrka, vblokbrk, sknsa, vblokbrk, skns_state, init_sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Asia)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, sarukani,  vblokbrk, sknsj, vblokbrk, skns_state, init_sarukani,  ROT0,  "Kaneko / Mediaworks", "Saru-Kani-Hamu-Zou (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, vblokbrk,    skns,     sknse, vblokbrk, skns_state, init_sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Europe)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, vblokbrka,   vblokbrk, sknsa, vblokbrk, skns_state, init_sarukani,  ROT0,  "Kaneko / Mediaworks", "VS Block Breaker (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, sarukani,    vblokbrk, sknsj, vblokbrk, skns_state, init_sarukani,  ROT0,  "Kaneko / Mediaworks", "Saru-Kani-Hamu-Zou (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1998, cyvern,    skns,     sknsu, cyvern,   skns_state, init_cyvern,    ROT90, "Kaneko", "Cyvern - The Dragon Weapons (US)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, cyvernj,   cyvern,   sknsj, cyvern,   skns_state, init_cyvern,    ROT90, "Kaneko", "Cyvern - The Dragon Weapons (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, cyvern,      skns,     sknsu, cyvern,   skns_state, init_cyvern,    ROT90, "Kaneko", "Cyvern - The Dragon Weapons (US)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, cyvernj,     cyvern,   sknsj, cyvern,   skns_state, init_cyvern,    ROT90, "Kaneko", "Cyvern - The Dragon Weapons (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1998, puzzloop,  skns,     sknse, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.94)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
-GAME( 1998, puzzloope, puzzloop, sknse, puzzloop, skns_state, init_puzzloope, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.93)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, puzzloopj, puzzloop, sknsj, puzzloop, skns_state, init_puzzloopj, ROT0,  "Mitchell", "Puzz Loop (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, puzzloopa, puzzloop, sknsa, puzzloop, skns_state, init_puzzloopa, ROT0,  "Mitchell", "Puzz Loop (Asia)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, puzzloopk, puzzloop, sknsk, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
-GAME( 1998, puzzloopu, puzzloop, sknsu, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (USA)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloop,    skns,     sknse, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.94)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
+GAME( 1998, puzzloope,   puzzloop, sknse, puzzloop, skns_state, init_puzzloope, ROT0,  "Mitchell", "Puzz Loop (Europe, v0.93)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloopj,   puzzloop, sknsj, puzzloop, skns_state, init_puzzloopj, ROT0,  "Mitchell", "Puzz Loop (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloopa,   puzzloop, sknsa, puzzloop, skns_state, init_puzzloopa, ROT0,  "Mitchell", "Puzz Loop (Asia)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloopk,   puzzloop, sknsk, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // Same speed up as US version
+GAME( 1998, puzzloopkbl, puzzloop, sknsk, puzzloop, skns_state, init_puzzloopu, ROT0,  "bootleg",  "Puzz Loop (Korea, bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, puzzloopu,   puzzloop, sknsu, puzzloop, skns_state, init_puzzloopu, ROT0,  "Mitchell", "Puzz Loop (USA)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1998, ryouran ,  skns,     sknsj, skns_1p,  skns_state, init_ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (revision 2)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, ryourano,  ryouran,  sknsj, skns_1p,  skns_state, init_ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (revision 1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, ryouran,     skns,     sknsj, skns_1p,  skns_state, init_ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (revision 2)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, ryourano,    ryouran,  sknsj, skns_1p,  skns_state, init_ryouran,   ROT0,  "Electro Design", "VS Mahjong Otome Ryouran (revision 1)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, galpans2,  skns,     sknse, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Europe, version 3)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, galpans2j, galpans2, sknsj, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, galpans2a, galpans2, sknsa, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Asia, version 1.1)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, galpansu,  galpans2, sknsk, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea, version 5)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, galpansua, galpans2, sknsk, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // official or hack?
+GAME( 1999, galpans2,    skns,     sknse, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Europe, version 3)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpans2j,   galpans2, sknsj, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpans2a,   galpans2, sknsa, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic S2 (Asia, version 1.1)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpansu,    galpans2, sknsk, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea, version 5)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, galpansua,   galpans2, sknsk, galpanis, skns_state, init_galpans2,  ROT0,  "Kaneko", "Gals Panic SU (Korea)", MACHINE_IMPERFECT_GRAPHICS ) // official or hack?
 
-GAME( 1999, panicstr,  skns,     sknsj, galpanis, skns_state, init_panicstr,  ROT0,  "Kaneko", "Panic Street (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, panicstr,    skns,     sknsj, galpanis, skns_state, init_panicstr,  ROT0,  "Kaneko", "Panic Street (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, senknow ,  skns,     sknsj, skns,     skns_state, init_senknow,   ROT0,  "Kaneko / Kouyousha", "Sen-Know (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, senknow,     skns,     sknsj, skns,     skns_state, init_senknow,   ROT0,  "Kaneko / Kouyousha", "Sen-Know (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1999, teljan  ,  skns,     sknsj, skns_1p,  skns_state, init_teljan,    ROT0,  "Electro Design", "Tel Jan", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, teljan,      skns,     sknsj, skns_1p,  skns_state, init_teljan,    ROT0,  "Electro Design", "Tel Jan", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 2000, gutsn,     skns,     sknsj, skns,     skns_state, init_gutsn,     ROT0,  "Kaneko / Kouyousha", "Guts'n (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, gutsn,       skns,     sknsj, skns,     skns_state, init_gutsn,     ROT0,  "Kaneko / Kouyousha", "Guts'n (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 2002, galpans3,  skns,     sknsj, galpanis, skns_state, init_galpans3,  ROT0,  "Kaneko", "Gals Panic S3 (Japan)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2002, galpans3,    skns,     sknsj, galpanis, skns_state, init_galpans3,  ROT0,  "Kaneko", "Gals Panic S3 (Japan)", MACHINE_IMPERFECT_GRAPHICS )

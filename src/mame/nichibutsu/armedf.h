@@ -64,7 +64,6 @@ protected:
 	void video_config(machine_config &config, int hchar_start, int vstart, int vend);
 	void sound_config_common(machine_config &config);
 	void sound_config(machine_config &config);
-	void sound_config_3812(machine_config &config);
 	void sound_config_legion(machine_config &config);
 	void sound_config_legion_3812(machine_config &config);
 
@@ -147,8 +146,7 @@ protected:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap);
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-						u32 code, u32 color, u32 clut, int flipx, int flipy, int offsx, int offsy,
-						bitmap_ind8 &primap, u32 pmask, int transparent_color);
+			u32 code, u32 color, u32 clut, int flipx, int flipy, int offsx, int offsy, bitmap_ind8 &primap, u32 pmask, int transparent_color);
 	void common_map(address_map &map) ATTR_COLD;
 	void armedf_map(address_map &map) ATTR_COLD;
 	void cclimbr2_map(address_map &map) ATTR_COLD;

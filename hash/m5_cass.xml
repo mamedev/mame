@@ -10,13 +10,13 @@ license:CC0-1.0
 -->
 
 <softwarelist name="m5_cass" description="Sord M5 cassettes">
-	
+
 	<software name="3dsquash">
 		<description>3D Squash</description>
 		<year>19??</year>
 		<publisher>Sord</publisher>
 		<info name="usage" value="Mount together with &quot;BASIC-I&quot; and load with TAPE"/>
-		<sharedfeat name="requirement" value="m5_cart:basici"/>	
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="6471">
 				<rom name="3d.squash.cas" size="6471" crc="4b866a06" sha1="583848b8e6bbe8f445a3e0bb5032d030a7336f08"/>
@@ -210,7 +210,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="sansuu">
 		<description>Sansuu Keisan</description>
 		<year>19??</year>
@@ -332,7 +332,7 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<software name="synthesr">
 		<description>Synthesizer</description>
 		<year>19??</year>
@@ -365,7 +365,7 @@ license:CC0-1.0
 		<year>19??</year>
 		<publisher>Sord</publisher>
 		<info name="usage" value="Mount together with &quot;BASIC-I&quot; and load with TAPE"/>
-		<sharedfeat name="requirement" value="m5_cart:basici"/>	
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="4167">
 				<rom name="touchdown.cas" size="4167" crc="dd6e65ad" sha1="19a291422572709a94fbbd949955f19007896b8d"/>
@@ -378,7 +378,7 @@ license:CC0-1.0
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Mount together with &quot;BASIC-I&quot; and load with CHAIN"/>
-		<sharedfeat name="requirement" value="m5_cart:basici"/>	
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="4108">
 				<rom name="hanoi.cas" size="4108" crc="a91c50be" sha1="b81e42cabf4b7d0d8389a4e4cae1ea8a49f628f2"/>
@@ -391,7 +391,7 @@ license:CC0-1.0
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Mount together with &quot;BASIC-I&quot; and load with CHAIN"/>
-		<sharedfeat name="requirement" value="m5_cart:basici"/>	
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="1345">
 				<rom name="tvadjust.cas" size="1345" crc="6b2980fc" sha1="88490185fae07f8ef848b2153fbd954c12066fcd"/>
@@ -404,7 +404,7 @@ license:CC0-1.0
 		<year>19??</year>
 		<publisher>Takara</publisher>
 		<info name="usage" value="Mount together with &quot;BASIC-I&quot; and load with TAPE"/>
-		<sharedfeat name="requirement" value="m5_cart:basici"/>	
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="2381">
 				<rom name="ufo.cas" size="2381" crc="d38eb3b7" sha1="822ca2814f6f089b6d99582b8f99637135cb4cb7"/>
@@ -417,7 +417,7 @@ license:CC0-1.0
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="Mount together with &quot;BASIC-I&quot; and load with TAPE"/>
-		<sharedfeat name="requirement" value="m5_cart:basici"/>	
+		<sharedfeat name="requirement" value="m5_cart:basici"/>
 		<part name="cass1" interface="m5_cass">
 			<dataarea name="cass" size="4746">
 				<rom name="zacbanic.cas" size="4746" crc="05026a99" sha1="463bdea30de9e67db98f7c2a2c5bb7e3799ef96d"/>

@@ -17,18 +17,22 @@ TODO:
 For rebel5 and newer, the chess engine is by Ed Schröder. Older chesscomputers in
 this driver were authored by Ulf Rathsman.
 
+B&P (Blitz- und Problemlösungs-Modul, initially called Blitz-Modul) 2025 version
+is a free update by one of the people who worked on the original version. It adds
+some new features, and supports the HG240 module.
+
 The MM II program was also licensed to Daimler-Benz, who gave away several custom
 chesscomputers as a parting gift to retiring executives. The hardware is same as MM II.
 see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
 see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
 
-MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
-real one (updated MM II engine) didn't get further than a prototype.
-
 MM II (Nona program) wasn't a commercial release. After Mondial came out, Frans Morsch
 ported his Nona program to MM II hardware, using Ed Schröder's interface (hence the
 similarity with Rebel). According to research, this version competed in the 1985 Dutch
 Open Computer Chess Championship.
+
+MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
+real one (updated MM II engine) didn't get further than a prototype.
 
 MM IV TurboKit 18MHz - (mm4tk)
 This is a replacement ROM combining the TurboKit initial ROM with the original MM IV.
@@ -47,11 +51,9 @@ Polgar. Ed Schröder participated with it at the 1989 WMCCC in Portorose, on an 
 module combined with the TK20 TurboKit. For more information, see:
 http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm (mistakenly claims it's MM V)
 
-MM VI (Saitek, 1994) is on different hardware, H8 CPU.
-
-B&P (Blitz- und Problemlösungs-Modul, initially called Blitz-Modul) 2025 version
-is a free update by one of the people who worked on the original version. It adds
-some new features, and supports the HG240 module.
+MM VI was announced in 1994, and was going to be on similar hardware with a program
+by Ed Schröder. After H+G was bought by Saitek, it was released in 1996 on H8 CPU
+hardware with a program by Frans Morsch.
 
 ================================================================================
 

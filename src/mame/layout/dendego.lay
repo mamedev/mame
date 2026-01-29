@@ -30,7 +30,7 @@ authors:hap
 <!-- panel text -->
 
 	<element name="text_door">
-		<text string="doors" align="1">
+		<text string="doors">
 			<color red="0.0" green="0.0" blue="0.0" />
 		</text>
 	</element>
@@ -216,7 +216,7 @@ authors:hap
 			<bounds x="86" y="314" width="14" height="14" />
 		</element>
 		<element ref="text_door">
-			<bounds x="84" y="304" width="25" height="9" />
+			<bounds x="81" y="304" width="24" height="9" />
 		</element>
 
 		<element name="lamp7" ref="lamp_rect_white">

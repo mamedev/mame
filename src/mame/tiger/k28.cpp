@@ -10,6 +10,10 @@ Tiger Electronics K-2-8 (model 7-232) Sold in Hong Kong, distributed in US as:
 1981 K-2-8 models 7-230 and 7-231 are on different hardware, having a different
 keyboard, VFD, and the SC-01-A speech chip, emulated in k28o.cpp.
 
+To make it get words from an inserted module, press the module button before
+entering a skill level (there is no visual or audible confirmation that the
+module is active, other than a different word library of course).
+
 Hardware notes:
 - PCB label: 201223A (main), REV0 ET828D (LCD)
 - TMS1400 MP7324 (die label: TMS1400, MP7324, 28L 01D D000 R100)

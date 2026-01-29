@@ -7729,11 +7729,13 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Black screen, [CD-Block] doesn't read root directory properly -->
 	<software name="sengblad" supported="no">
 		<description>Sengoku Blade - Sengoku Ace Episode II (Japan)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
+		<notes><![CDATA[
+Missing elements during gameplay [VDP2] priorities?
+]]></notes>
 		<info name="serial" value="T-14410G"/>
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="戦国ブレード"/>
@@ -7750,11 +7752,14 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Black screen, [CD-Block] doesn't read root directory properly -->
 	<software name="chaossd" supported="no">
 		<description>Senkutsu Katsuryu Taisen - Chaos Seed (Japan, rev A)</description>
 		<year>1998</year>
 		<publisher>ESP</publisher>
+		<notes><![CDATA[
+Black screen after loading of a new game
+[VDP2] Gradation enabled a003
+]]></notes>
 		<info name="serial" value="T-30902G"/>
 		<info name="release" value="19980129"/>
 		<info name="alt_title" value="仙窟活龍大戦 カオスシード"/>
@@ -13107,11 +13112,13 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Black screen, [CD-Block] doesn't read root directory properly -->
 	<software name="sengblada" cloneof="sengblad" supported="no">
 		<description>Sengoku Blade - Sengoku Ace Episode II (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
+		<notes><![CDATA[
+Missing elements during gameplay [VDP2] priorities?
+]]></notes>
 		<info name="serial" value="T-14410G"/>
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="戦国ブレード"/>

@@ -43,8 +43,7 @@ protected:
 
 private:
 	required_device<huc6271_device> m_huc6271;
-	required_device<speaker_device> m_cdda_l;
-	required_device<speaker_device> m_cdda_r;
+	required_device<speaker_device> m_cdda;
 
 	uint8_t m_register;
 	uint32_t m_kram_addr_r, m_kram_addr_w;
@@ -95,8 +94,8 @@ private:
 	const address_space_config      m_data_space_config;
 	const address_space_config      m_io_space_config;
 	required_shared_ptr<uint16_t>   m_microprg_ram;
-	required_shared_ptr<uint32_t>   m_kram_page0;
-	required_shared_ptr<uint32_t>   m_kram_page1;
+	required_shared_ptr<uint16_t>   m_kram_page0;
+	required_shared_ptr<uint16_t>   m_kram_page1;
 	required_device<scsi_port_device> m_scsibus;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<output_latch_device> m_scsi_data_out;
@@ -142,8 +141,8 @@ private:
 	u32 kram_write_address_r(offs_t offset);
 	void kram_write_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	u32 kram_read_data_r(offs_t offset, u32 mem_mask = ~0);
-	void kram_write_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u16 kram_read_data_r(offs_t offset, u16 mem_mask = ~0);
+	void kram_write_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	u32 kram_page_setup_r(offs_t offset);
 	void kram_page_setup_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -154,6 +153,7 @@ private:
 
 	void microprogram_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void microprogram_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u8 microprogram_control_r(offs_t offset);
 	void microprogram_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	template <unsigned N> void bg_bat_w(offs_t offset, u32 data, u32 mem_mask = ~0);

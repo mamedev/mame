@@ -72,11 +72,9 @@ void mephisto_display1_device::lcd_pwm_w(offs_t offset, u64 data)
 
 void mephisto_display1_device::update_lcd()
 {
+	const u32 data = m_common ? ~m_digit_data : m_digit_data;
 	for (int i = 0; i < 4; i++)
-	{
-		const u32 data = m_common ? ~m_digit_data : m_digit_data;
 		m_lcd_pwm->write_row(i, data >> (i * 8) & 0xff);
-	}
 }
 
 void mephisto_display1_device::common_w(int state)

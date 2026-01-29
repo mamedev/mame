@@ -71,7 +71,7 @@ void kidsupstar_state::kidsupstar(machine_config &config)
 	m_screen->set_visarea(0, 48-1, 0, 48-1);
 	m_screen->set_screen_update(FUNC(kidsupstar_state::screen_update_kidsupstar));
 
-	SPEAKER(config, "mono").front_left();
+	SPEAKER(config, "mono").front_center();
 }
 
 // Spanish machine, may be different between regions.

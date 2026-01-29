@@ -398,12 +398,12 @@ authors:hap
 			<param name="y" start="0.2" increment="10" />
 			<param name="i" start="1" increment="1" />
 
-			<element ref="text_r~i~"><bounds xc="10" y="~y~" width="8" height="1.6" /></element>
+			<element ref="text_r~i~"><bounds xc="10" y="~y~" width="7.2" height="1.6" /></element>
 		</repeat>
 
-		<element ref="text_r8"><bounds xc="18" y="10.2" width="8" height="1.6" /></element>
-		<element ref="text_r9"><bounds xc="18" y="50.2" width="8" height="1.6" /></element>
-		<element ref="text_r10"><bounds xc="18" y="60.2" width="8" height="1.6" /></element>
+		<element ref="text_r8"><bounds xc="18" y="10.2" width="7.2" height="1.6" /></element>
+		<element ref="text_r9"><bounds xc="18" y="50.2" width="7.2" height="1.6" /></element>
+		<element ref="text_r10"><bounds xc="18" y="60.2" width="7.2" height="1.6" /></element>
 
 		<repeat count="8">
 			<param name="y" start="5" increment="10" />

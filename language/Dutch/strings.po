@@ -1,6 +1,6 @@
 # Dutch translations for MAME package
 # Nederlandse vertalingen voor het pakket MAME.
-# Copyright (C) 1997-2025 MAMEdev and contributors
+# Copyright (C) 1997-2026 MAMEdev and contributors
 # This file is distributed under the same license as the MAME package.
 # Automatically generated, 2023.
 #

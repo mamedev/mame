@@ -139,7 +139,7 @@ void pc98lt_state::fdc_ctrl_w(offs_t offset, u8 data)
 		m_vfo_timer->adjust(attotime::from_msec(100), 1);
 	}
 	//else if (!ttrg && BIT(m_fdc_ctrl, 0) )
-	//	m_vfo_timer->adjust(attotime::never);
+	//  m_vfo_timer->adjust(attotime::never);
 
 	m_fdc_ctrl = data;
 	if(BIT(data, 6))
@@ -504,8 +504,8 @@ void pc98lt_state::lt_config(machine_config &config)
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->out_eop_cb().set(FUNC(pc98lt_state::tc_w));
-//	m_maincpu->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
-//	m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
+//  m_maincpu->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
+//  m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_maincpu->in_ior_cb<3>().set(m_fdc, FUNC(upd765a_device::dma_r));
 	m_maincpu->out_iow_cb<3>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_maincpu->in_memr_cb().set([this] (offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_byte(offset); });
@@ -545,7 +545,7 @@ void pc98lt_state::lt_config(machine_config &config)
 	UPD765A(config, m_fdc, 8'000'000, false, true);
 	m_fdc->intrq_wr_callback().set(m_fdc_irqs, FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v50_device::dreq_w<3>)).invert(); // 2dd
-//	m_fdc->drq_wr_callback().append(m_maincpu, FUNC(v50_device::dreq_w<2>)).invert();
+//  m_fdc->drq_wr_callback().append(m_maincpu, FUNC(v50_device::dreq_w<2>)).invert();
 	FLOPPY_CONNECTOR(config, "fdc:0", pc9801_floppies, "525dd", pc9801_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", pc9801_floppies, "525dd", pc9801_state::floppy_formats);
 
