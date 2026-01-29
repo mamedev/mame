@@ -50,8 +50,8 @@ protected:
 private:
 	void int_w(offs_t line, u8 state);
 
-	u16 pad_r(offs_t offset);
-	void pad_w(offs_t offset, u16 data);
+	template <int Pad> u16 pad_r(offs_t offset);
+	template <int Pad> void pad_w(offs_t offset, u16 data);
 	[[maybe_unused]] u8 extio_r(offs_t offset);
 	[[maybe_unused]] void extio_w(offs_t offset, u8 data);
 
@@ -94,33 +94,32 @@ void pcfx_state::extio_w(offs_t offset, u8 data)
 	io_space.write_byte(offset, data);
 }
 
+template <int Pad>
 u16 pcfx_state::pad_r(offs_t offset)
 {
-	offset <<= 1;
 	u16 res;
-	const u8 port_type = BIT(offset, 7);
 
-	if (BIT(~offset, 6))
+	if (BIT(~offset, 5))
 	{
 		// status
 		/*
 		---- x---
 		---- ---x incoming data state (0=available)
 		*/
-		res = m_pad.status[port_type];
-		//printf("STATUS %d\n",port_type);
+		res = m_pad.status[Pad];
+		//logerror("%s: STATUS %d\n", machine().describe_context(), Pad);
 	}
 	else
 	{
 		// received data
-		res = m_pad.latch[port_type] >> ((offset & 2) ? 16 : 0);
+		res = m_pad.latch[Pad] >> (BIT(offset, 0) << 4);
 
-		if (BIT(~offset, 1))
+		if (BIT(~offset, 0))
 		{
 			if (!machine().side_effects_disabled())
 			{
-				m_pad.status[port_type] &= ~8; // clear latch on LSB read according to docs
-				m_intc->irq11_w(CLEAR_LINE);
+				m_pad.status[Pad] &= ~8; // clear latch on LSB read according to docs
+				m_intc->irq_w<11>(CLEAR_LINE);
 			}
 		}
 	}
@@ -134,15 +133,13 @@ TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
 	m_pad.latch[Pad] = m_pads[Pad]->read();
 	m_pad.status[Pad] |= 8;
 	m_pad.ctrl[Pad] &= ~1; // ack TX line
-	m_intc->irq11_w(ASSERT_LINE);
+	m_intc->irq_w<11>(ASSERT_LINE);
 }
 
+template <int Pad>
 void pcfx_state::pad_w(offs_t offset, u16 data)
 {
-	offset <<= 1;
-	const u8 port_type = BIT(offset, 7);
-
-	if (BIT(~offset, 6))
+	if (BIT(~offset, 5))
 	{
 		// control
 		/*
@@ -150,18 +147,18 @@ void pcfx_state::pad_w(offs_t offset, u16 data)
 		---- --x- enable multi-tap
 		---- ---x enable send (0->1 transition)
 		*/
-		if (data & 1 && (!(m_pad.ctrl[port_type] & 1)))
+		if (data & 1 && (!(m_pad.ctrl[Pad] & 1)))
 		{
-			m_pad_timers[port_type]->adjust(attotime::from_usec(100)); // TODO: time
+			m_pad_timers[Pad]->adjust(attotime::from_usec(100)); // TODO: time
 		}
 
-		m_pad.ctrl[port_type] = data & 7;
-		//printf("%04x CONTROL %d\n",data,port_type);
+		m_pad.ctrl[Pad] = data & 7;
+		//logerror("%s: %04x CONTROL %d\n", machine().describe_context(), data, Pad);
 	}
 	else
 	{
 		// transmitted data
-		//printf("%04x TX %d\n",data,port_type);
+		//logerror("%s: %04x TX %d\n", machine().describe_context(), data, Pad);
 	}
 }
 
@@ -189,7 +186,8 @@ void pcfx_state::pcfx_mem(address_map &map)
 
 void pcfx_state::pcfx_io(address_map &map)
 {
-	map(0x00000000, 0x000000ff).rw(FUNC(pcfx_state::pad_r), FUNC(pcfx_state::pad_w)); /* PAD */
+	map(0x00000000, 0x0000007f).rw(FUNC(pcfx_state::pad_r<0>), FUNC(pcfx_state::pad_w<0>)); /* PAD */
+	map(0x00000080, 0x000000ff).rw(FUNC(pcfx_state::pad_r<1>), FUNC(pcfx_state::pad_w<1>)); /* PAD */
 	map(0x00000100, 0x000001ff).w("huc6230", FUNC(huc6230_device::write)).umask32(0x00ff00ff);   /* HuC6230 */
 	map(0x00000200, 0x000002ff).m("huc6271", FUNC(huc6271_device::amap));   /* HuC6271 */
 	map(0x00000300, 0x000003ff).rw(m_huc6261, FUNC(huc6261_device::read), FUNC(huc6261_device::write)).umask32(0x0000ffff);  /* HuC6261 */
@@ -290,11 +288,11 @@ void pcfx_state::pcfx(machine_config &config)
 
 	huc6270_device &huc6270_a(HUC6270(config, "huc6270_a", XTAL(21'477'272)));
 	huc6270_a.set_vram_size(0x20000);
-	huc6270_a.irq().set(m_intc, FUNC(pcfx_intc_device::irq12_w));
+	huc6270_a.irq().set(m_intc, FUNC(pcfx_intc_device::irq_w<12>));
 
 	huc6270_device &huc6270_b(HUC6270(config, "huc6270_b", XTAL(21'477'272)));
 	huc6270_b.set_vram_size(0x20000);
-	huc6270_b.irq().set(m_intc, FUNC(pcfx_intc_device::irq14_w));
+	huc6270_b.irq().set(m_intc, FUNC(pcfx_intc_device::irq_w<14>));
 
 	HUC6261(config, m_huc6261, XTAL(21'477'272));
 	m_huc6261->set_vdc1_tag("huc6270_a");
@@ -303,7 +301,7 @@ void pcfx_state::pcfx(machine_config &config)
 	m_huc6261->set_king_tag("huc6272");
 
 	huc6272_device &huc6272(HUC6272(config, "huc6272", XTAL(21'477'272)));
-	huc6272.irq_changed_callback().set(m_intc, FUNC(pcfx_intc_device::irq13_w));
+	huc6272.irq_changed_callback().set(m_intc, FUNC(pcfx_intc_device::irq_w<13>));
 	huc6272.set_rainbow_tag("huc6271");
 
 	HUC6271(config, "huc6271", XTAL(21'477'272));

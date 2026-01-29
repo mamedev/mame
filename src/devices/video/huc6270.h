@@ -21,11 +21,11 @@ public:
 	void set_vram_size(u32 vram_size) { m_vram_size = vram_size; }
 	auto irq() { return m_irq_changed_cb.bind(); }
 
-	// 8 bit accessor used at PC engine
+	// 8 bit accessor used for PC engine
 	u8 read8(offs_t offset);
 	void write8(offs_t offset, u8 data);
 
-	// 16 bit accessor used at PC-FX
+	// 16 bit accessor used for PC-FX
 	u16 read16(offs_t offset);
 	void write16(offs_t offset, u16 data);
 

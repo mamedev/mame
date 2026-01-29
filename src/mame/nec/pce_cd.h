@@ -150,15 +150,15 @@ private:
 	u8 m_adpcm_dma_reg = 0;
 	u8 m_fader_ctrl = 0;
 
-	std::unique_ptr<u8[]>   m_bram;
-	std::unique_ptr<u8[]>   m_adpcm_ram;
-	s32     m_bram_locked = 0;
-	s32     m_adpcm_read_ptr = 0;
+	std::unique_ptr<u8[]> m_bram;
+	std::unique_ptr<u8[]> m_adpcm_ram;
+	s32  m_bram_locked = 0;
+	s32  m_adpcm_read_ptr = 0;
 	u8   m_adpcm_read_buf = 0;
-	s32     m_adpcm_write_ptr = 0;
+	s32  m_adpcm_write_ptr = 0;
 	u8   m_adpcm_write_buf = 0;
-	s32     m_adpcm_length = 0;
-	s32     m_adpcm_clock_divider = 0;
+	s32  m_adpcm_length = 0;
+	s32  m_adpcm_clock_divider = 0;
 	u32  m_msm_start_addr = 0;
 	u32  m_msm_end_addr = 0;
 	u32  m_msm_half_addr = 0;

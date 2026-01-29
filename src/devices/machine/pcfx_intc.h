@@ -16,14 +16,7 @@ public:
 	u16 read(offs_t offset);
 	void write(offs_t offset, u16 data);
 
-	void irq8_w(int state)  { set_irq_line( 8, state); }
-	void irq9_w(int state)  { set_irq_line( 9, state); }
-	void irq10_w(int state) { set_irq_line(10, state); }
-	void irq11_w(int state) { set_irq_line(11, state); }
-	void irq12_w(int state) { set_irq_line(12, state); }
-	void irq13_w(int state) { set_irq_line(13, state); }
-	void irq14_w(int state) { set_irq_line(14, state); }
-	void irq15_w(int state) { set_irq_line(15, state); }
+	template <unsigned Which> void irq_w(int state)  { set_irq_line(Which, state); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;

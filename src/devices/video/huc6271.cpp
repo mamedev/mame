@@ -5,7 +5,7 @@
     Hudson/NEC HuC6271 "Rainbow" device
 
     TODO:
-    - everything related to video decoding
+    - everything related to MJPEG decoding
 
 ***************************************************************************/
 
