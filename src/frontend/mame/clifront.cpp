@@ -1154,9 +1154,15 @@ const char cli_frontend::s_softlist_xml_dtd[] =
 				"\t\t\t<!ELEMENT sharedfeat EMPTY>\n"
 				"\t\t\t\t<!ATTLIST sharedfeat name CDATA #REQUIRED>\n"
 				"\t\t\t\t<!ATTLIST sharedfeat value CDATA #IMPLIED>\n"
-				"\t\t\t<!ELEMENT part (feature*, dataarea*, diskarea*, dipswitch*)>\n"
+				"\t\t\t<!ELEMENT part (piece*, feature*, dataarea*, diskarea*, dipswitch*)>\n"
 				"\t\t\t\t<!ATTLIST part name CDATA #REQUIRED>\n"
 				"\t\t\t\t<!ATTLIST part interface CDATA #REQUIRED>\n"
+				"\t\t\t\t<!ELEMENT piece EMPTY>\n"
+				"\t\t\t\t\t<!ATTLIST piece index CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST piece title CDATA #REQUIRED>\n"
+				"\t\t\t\t\t<!ATTLIST piece creator CDATA>\n"
+				"\t\t\t\t\t<!ATTLIST piece alt_title CDATA>\n"
+				"\t\t\t\t\t<!ATTLIST piece alt_creator CDATA>\n"
 				"\t\t\t\t<!ELEMENT feature EMPTY>\n"
 				"\t\t\t\t\t<!ATTLIST feature name CDATA #REQUIRED>\n"
 				"\t\t\t\t\t<!ATTLIST feature value CDATA #IMPLIED>\n"
@@ -1224,6 +1230,18 @@ void cli_frontend::output_single_softlist(std::ostream &out, software_list_devic
 				util::stream_format(out, " interface=\"%s\"", normalize_string(part.interface()));
 
 			out << ">\n";
+
+			for (const auto &piece : part.pieces())
+			{
+				util::stream_format(out, "\t\t\t\t<piece index=\"%s\" title=\"%s\"", normalize_string(piece.index()), normalize_string(piece.title()));
+				if (!piece.creator().empty())
+					util::stream_format(out, " creator=\"%s\"", normalize_string(piece.creator()));
+				if (!piece.alt_title().empty())
+					util::stream_format(out, " alt_title=\"%s\"", normalize_string(piece.alt_title()));
+				if (!piece.alt_creator().empty())
+					util::stream_format(out, " alt_creator=\"%s\"", normalize_string(piece.alt_creator()));
+				out << ">\n";
+			}
 
 			for (const auto &flist : part.features())
 				util::stream_format(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name(), normalize_string(flist.value()));
