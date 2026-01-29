@@ -504,3 +504,119 @@ void dram_config_handler_10(void)
     /* Continue dispatch */
     dram_config_advance_and_dispatch();
 }
+
+/*============================================================================
+ * Modulation Write to D-RAM (CODE:9FCD)
+ *
+ * Called during periodic voice update to write pitch modulation.
+ * Computes: final_pitch = base_pitch + (modulation * base_pitch / scale)
+ *
+ * The modulation value is a signed 16-bit number (mod_hi:mod_lo).
+ * The base pitch is a 19-bit value stored in the voice slot.
+ *
+ * Algorithm:
+ *   1. Early exit if modulation unchanged
+ *   2. Store new modulation to slot[0xE:0xF]
+ *   3. Handle sign: if negative, negate and track sign
+ *   4. If slot[0] bit 0 set: scale by 16 (fine pitch mode)
+ *   5. Multiply: offset = modulation * base_pitch >> scale
+ *   6. Re-apply sign
+ *   7. Add offset to base pitch
+ *   8. Write result to SAM D-RAM
+ *============================================================================*/
+
+void modulation_write_dram(int8_t mod_lo, int8_t mod_hi, uint8_t dispatch)
+{
+    uint8_t page = g_intmem.voice_page_num;
+    uint8_t slot_base = g_intmem.voice_slot_base;
+
+    /* Read last modulation value */
+    uint8_t last_lo = voice_page_read(page, slot_base + 0x0E);
+    uint8_t last_hi = voice_page_read(page, slot_base + 0x0F);
+
+    /* Check if modulation unchanged - early exit */
+    if (last_lo == (uint8_t)mod_lo && last_hi == (uint8_t)mod_hi) {
+        return;
+    }
+
+    /* Store new modulation value */
+    voice_page_write(page, slot_base + 0x0E, (uint8_t)mod_lo);
+    voice_page_write(page, slot_base + 0x0F, (uint8_t)mod_hi);
+
+    /* Read base pitch from slot */
+    uint8_t base_lo = voice_page_read(page, slot_base + 1);
+    uint8_t base_mid = voice_page_read(page, slot_base + 2);
+    uint8_t base_hi = voice_page_read(page, slot_base + 3) & 0x07;  /* Only bits 2:0 */
+
+    /* Handle sign */
+    int16_t mod_value = ((int16_t)mod_hi << 8) | ((uint8_t)mod_lo);
+    uint8_t negative = (mod_hi < 0) ? 1 : 0;
+
+    uint16_t abs_mod;
+    if (negative) {
+        abs_mod = (uint16_t)(-mod_value);
+    } else {
+        /* Positive: shift left by 1 (original firmware does RLC) */
+        abs_mod = (uint16_t)mod_value << 1;
+    }
+
+    /* Check fine pitch mode (slot[0] bit 0) */
+    uint8_t slot_flags = voice_page_read(page, slot_base);
+    if (slot_flags & 0x01) {
+        /* Fine pitch mode: scale by 16 (shift right by 4) */
+        if ((abs_mod >> 8) < 0x10) {
+            /* No overflow, do the scale */
+            abs_mod <<= 4;  /* Original does nibble swap which is *16 */
+        } else {
+            /* Saturate to max */
+            abs_mod = 0x7FFF;
+        }
+    }
+
+    /*
+     * Multiply modulation by base pitch
+     *
+     * Uses multiply_16x24 from sam_math.h which implements the exact
+     * 8051 MUL AB sequence with proper carry propagation.
+     */
+    uint32_t base_pitch = ((uint32_t)base_hi << 16) |
+                          ((uint32_t)base_mid << 8) |
+                          base_lo;
+
+    /* Compute offset = (abs_mod * base_pitch) >> 16 using 8x8 multiplies */
+    uint32_t offset = multiply_16x24(abs_mod, base_pitch);
+
+    /* Apply sign */
+    int32_t signed_offset = negative ? -(int32_t)offset : (int32_t)offset;
+
+    /* Add to base pitch */
+    int32_t final_pitch = (int32_t)base_pitch + signed_offset;
+
+    /* Clamp to valid 19-bit range */
+    if (final_pitch < 0) {
+        final_pitch = 0;
+    } else if (final_pitch > 0x7FFFF) {
+        final_pitch = 0x7FFFF;
+    }
+
+    /* Extract bytes */
+    uint8_t final_lo = (uint8_t)(final_pitch & 0xFF);
+    uint8_t final_mid = (uint8_t)((final_pitch >> 8) & 0xFF);
+    uint8_t final_hi = (uint8_t)((final_pitch >> 16) & 0x07);
+
+    /* Check for valid range before writing (original checks bit 2 of high byte) */
+    if (final_hi & 0x04) {
+        /* Out of range, don't write */
+        return;
+    }
+
+    /* Write to SAM D-RAM */
+    sam_write_reg(SAM_REG_ADDR_DATA, g_intmem.dram_address_counter);
+    sam_write_reg(SAM_REG_DATA1, final_lo);
+    sam_write_reg(SAM_REG_DATA2, final_mid);
+    sam_write_reg(SAM_REG_DATA3, final_hi);
+    sam_write_reg(SAM_REG_CTRL, g_intmem.sam_ctrl_flags);
+
+    /* Suppress unused parameter warning */
+    (void)dispatch;
+}

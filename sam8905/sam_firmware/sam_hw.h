@@ -158,3 +158,12 @@ void sam_init(void);
  * Sets control word (offset 0x0F) of each slot with nibble-swapped slot ID.
  */
 void sam_init_slots(void);
+
+/*============================================================================
+ * Test Support (available when SAM_HW_PLATFORM is not defined)
+ *============================================================================*/
+
+#ifndef SAM_HW_PLATFORM
+extern uint32_t g_sam_write_count;
+void sam_hw_reset_trace(void);
+#endif

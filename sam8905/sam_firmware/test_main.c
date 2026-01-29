@@ -1611,6 +1611,131 @@ static int test_noise_lfsr(void)
 }
 
 /*============================================================================
+ * Package C: Modulation D-RAM Write Tests
+ *============================================================================*/
+
+static int test_multiply_16x24(void)
+{
+    printf("=== Test: multiply_16x24 ===\n");
+
+    /* Test 1: Zero modulation = zero offset */
+    uint32_t result = multiply_16x24(0x0000, 0x010000);
+    if (result != 0) {
+        printf("FAIL: 0x0000 * 0x010000 = 0x%06X (expected 0)\n", result);
+        return 1;
+    }
+
+    /* Test 2: Zero base = zero offset */
+    result = multiply_16x24(0x8000, 0x000000);
+    if (result != 0) {
+        printf("FAIL: 0x8000 * 0x000000 = 0x%06X (expected 0)\n", result);
+        return 1;
+    }
+
+    /* Test 3: Full modulation * small base
+     * 0xFFFF * 0x000100 >> 16 should be ~0xFF (255)
+     */
+    result = multiply_16x24(0xFFFF, 0x000100);
+    if (result < 0xF0 || result > 0x110) {
+        printf("FAIL: 0xFFFF * 0x000100 = 0x%06X (expected ~0xFF)\n", result);
+        return 1;
+    }
+
+    /* Test 4: Half modulation * 0x010000
+     * 0x8000 * 0x010000 >> 16 = 0x8000
+     */
+    result = multiply_16x24(0x8000, 0x010000);
+    if (result < 0x7F00 || result > 0x8100) {
+        printf("FAIL: 0x8000 * 0x010000 = 0x%06X (expected ~0x8000)\n", result);
+        return 1;
+    }
+
+    /* Test 5: Verify 8x8 multiply sequence gives same result as 32-bit
+     * For typical pitch values, should match closely
+     */
+    uint16_t mod = 0x1000;
+    uint32_t base = 0x020000;  /* Mid-range pitch */
+    result = multiply_16x24(mod, base);
+    uint32_t expected = (uint32_t)(((uint64_t)mod * base) >> 16);
+    /* Allow some tolerance for different rounding */
+    int32_t diff = (int32_t)result - (int32_t)expected;
+    if (diff < -16 || diff > 16) {
+        printf("FAIL: 0x%04X * 0x%06X = 0x%06X (expected ~0x%06X, diff=%d)\n",
+               mod, base, result, expected, diff);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_modulation_write_dram(void)
+{
+    printf("=== Test: modulation_write_dram ===\n");
+
+    /* Initialize state */
+    memset(&g_intmem, 0x00, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0x00, sizeof(g_intmem_upper));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+    sam_hw_reset_trace();
+
+    /* Setup: voice page 0, slot base 0x10 */
+    g_intmem.voice_page_num = 0;
+    g_intmem.voice_slot_base = 0x10;
+    g_intmem.dram_address_counter = 0x05;  /* D-RAM word 5 */
+    g_intmem.sam_ctrl_flags = 0x40;
+
+    /* Setup base pitch in voice slot: 0x010000 (65536) */
+    voice_page_write(0, 0x10 + 0, 0x08);     /* dispatch byte */
+    voice_page_write(0, 0x10 + 1, 0x00);     /* base_lo */
+    voice_page_write(0, 0x10 + 2, 0x00);     /* base_mid */
+    voice_page_write(0, 0x10 + 3, 0x01);     /* base_hi (19-bit: 0x10000) */
+
+    /* Initial last modulation = different value to trigger write */
+    voice_page_write(0, 0x10 + 0x0E, 0xFF);  /* last mod_lo */
+    voice_page_write(0, 0x10 + 0x0F, 0xFF);  /* last mod_hi */
+
+    /* Test 1: Zero modulation - should write base pitch unchanged */
+    modulation_write_dram(0, 0, 0x08);
+
+    /* Check that modulation was stored */
+    uint8_t stored_lo = voice_page_read(0, 0x10 + 0x0E);
+    uint8_t stored_hi = voice_page_read(0, 0x10 + 0x0F);
+    if (stored_lo != 0 || stored_hi != 0) {
+        printf("FAIL: modulation not stored (got %02X %02X, expected 00 00)\n",
+               stored_lo, stored_hi);
+        return 1;
+    }
+
+    /* Test 2: Same modulation again - should early exit */
+    sam_hw_reset_trace();
+    modulation_write_dram(0, 0, 0x08);
+
+    /* No SAM writes should have occurred (early exit path) */
+    if (g_sam_write_count > 0) {
+        printf("FAIL: early exit didn't work (got %d SAM writes)\n", g_sam_write_count);
+        return 1;
+    }
+
+    /* Test 3: Positive modulation */
+    /* Set different last modulation to trigger write */
+    voice_page_write(0, 0x10 + 0x0E, 0xFF);
+    voice_page_write(0, 0x10 + 0x0F, 0xFF);
+
+    sam_hw_reset_trace();
+    modulation_write_dram(0x10, 0x00, 0x08);  /* Small positive modulation */
+
+    /* Should have written to SAM (5 reg writes for D-RAM: addr, data1, data2, data3, ctrl) */
+    if (g_sam_write_count < 4) {
+        printf("FAIL: expected SAM writes (got %d)\n", g_sam_write_count);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+/*============================================================================
  * Main
  *============================================================================*/
 
@@ -1657,6 +1782,10 @@ int main(void)
     failures += test_sine_table();
     failures += test_global_mod_lfo_update();
     failures += test_noise_lfsr();
+
+    /* Package C: Modulation D-RAM Tests */
+    failures += test_multiply_16x24();
+    failures += test_modulation_write_dram();
 
     printf("=================================\n");
     if (failures == 0) {

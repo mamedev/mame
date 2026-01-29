@@ -77,6 +77,49 @@ __code const uint8_t sine_table[64];
 #endif
 ```
 
+### ⚠️ MULTIPLICATION WARNING
+
+**DO NOT simply use C's native multiplication when porting 8051 firmware!**
+
+The 8051's MUL AB instruction does 8×8→16 unsigned multiply. The original firmware
+uses this extensively for:
+
+1. **Modulation math** - LFO × depth, velocity × sensitivity
+2. **Pitch offset calculation** - 16×24 bit multi-byte multiply
+3. **Envelope scaling** - amplitude × curve
+
+When porting, you must understand WHICH type of multiply is being done:
+
+**Type 1: Signed modulation multiply (use sam_math.h functions)**
+```c
+// Original: CPL A / MUL AB / ADD A,B sequence for signed result
+// Use: signed_multiply_sat(), signed_multiply_chain()
+int8_t result = signed_multiply_sat(factor, curve_value);
+```
+
+**Type 2: Unsigned multi-byte multiply (use explicit 8×8 components)**
+```c
+// Original: Multiple MUL AB with accumulation for large values
+// MUST break into explicit 8×8 multiplies to match firmware behavior:
+uint16_t p1 = (uint16_t)hi_byte * lo_byte;   // OK: 8×8→16
+uint16_t p2 = (uint16_t)lo_byte * mid_byte;  // OK: 8×8→16
+// Then accumulate with proper alignment
+
+// WRONG: Direct large multiply may give different results
+uint32_t bad = (uint32_t)big_value * other_value;  // May differ!
+```
+
+**Why this matters:**
+- C allows the compiler to choose multiply implementation
+- 8051's MUL AB has specific overflow/truncation behavior
+- Multi-byte multiply sequences depend on exact intermediate values
+- SDCC may or may not generate identical code to hand-written assembly
+
+**Testing strategy:**
+- Test with reference firmware traces showing intermediate values
+- Compare bit-for-bit with known-good outputs
+- Use Ghidra MCP to trace original multiply sequences
+
 ## Memory Architecture
 
 ### INTMEM (128 bytes) - `intmem_t`

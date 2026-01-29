@@ -21,8 +21,17 @@ static void dram_clear_all(void);
 /* Dummy register storage for testing without hardware */
 static uint8_t sam_regs[8];
 
+/* Write tracing for tests */
+uint32_t g_sam_write_count = 0;
+
+void sam_hw_reset_trace(void)
+{
+    g_sam_write_count = 0;
+}
+
 void sam_write_reg(uint8_t reg, uint8_t value)
 {
+    g_sam_write_count++;
     if (reg < 8) {
         sam_regs[reg] = value;
     }

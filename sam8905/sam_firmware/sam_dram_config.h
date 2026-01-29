@@ -184,6 +184,32 @@ void dram_config_write_slot_byte(uint8_t value);
 uint8_t dram_config_apply_velocity(uint8_t value, uint8_t sensitivity);
 
 /*============================================================================
+ * Runtime Modulation Functions (called from periodic_voice_update)
+ *============================================================================*/
+
+/**
+ * Write pitch modulation to D-RAM (CODE:9FCD)
+ *
+ * Called during periodic voice update to apply LFO/pitch bend modulation
+ * to a D-RAM pitch word. Computes: base_pitch + (modulation * base_pitch)
+ *
+ * The modulation state block (8 bytes at voice_slot_base) contains:
+ *   [0]: dispatch byte (identifies D-RAM word type)
+ *   [1]: base pitch low byte
+ *   [2]: base pitch mid byte
+ *   [3]: base pitch high byte (bits 2:0) + flags
+ *   [4-5]: modulation parameters
+ *   [6-7]: last written modulation (used to detect changes)
+ *   [0xE]: last mod_lo (relative to voice_slot_base start)
+ *   [0xF]: last mod_hi
+ *
+ * @param mod_lo   Modulation value low byte
+ * @param mod_hi   Modulation value high byte (signed)
+ * @param dispatch Dispatch byte from slot (for D-RAM address calculation)
+ */
+void modulation_write_dram(int8_t mod_lo, int8_t mod_hi, uint8_t dispatch);
+
+/*============================================================================
  * Test Support
  *============================================================================*/
 
