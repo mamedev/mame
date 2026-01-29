@@ -2,21 +2,39 @@
 // copyright-holders:flama12333
 /*************************************************************************
 Basic Hardware info: (Wip)
-U2 W78E052C40DL        - MCU (8kb) 8052 Microcontroller with internal rom.
-U7 HM6264LP-12         - RAM (8kb) 
-U17 U6295              - ADPCM Clone of MSM6295
-U18 UM3567             - OPLL Clone of ym2413
-U22 ATF1508AS          - EEPLD
-U49 D8255AC-2          - PPI1 for led
-U50 M5L8255AP-5        - PPI2  for led
+At front PCB Labeled SC031028A1-1 CY-123
+U23 U25 U24 hd74ls138p
+U6  U27 U28 U29? hd74ls245p
+U2 W78E052C40DL                       - MCU (8kb) 8052 Microcontroller with internal rom.
+U7 HM6264LP-12                        - RAM (8kb) 
+U17 U6295                             - ADPCM Clone of MSM6295
+U18 UM3567                            - OPLL Clone of ym2413
+U22 ATF1508AS                         - EEPLD
+U49 D8255AC-2                         - PPI1 for led
+U50 M5L8255AP-5                       - PPI2 for led
 EEPROM:
-NM27C010 or TMS27C010A - ROM (128kb) program rom. first 8kb empty.
-m27c801-100f1          - ROM (1024kb) adpcm rom.
+m27c801-100f1                         - ROM (1024kb) adpcm rom.
 
 xtal:
 X1 3.579MHZ            - ???
 X2 10.738M             - mcu
 X3 3.57mhz             - OPLL 
+
+At Back PCB 
+FEITALIN GAME SQUARES 20/03/08 #959 - Sticker
+NM27C010 or TMS27C010A At back of pcb - ROM (128kb) program rom. first 8kb empty.
+3.6v 60mah - Varta Battery
+
+Port:
+CN8 DB37
+J1 CON12
+J2 CON11
+J3 6PIN PW
+J4 CON2
+J5 2.5 NH 9P
+J6 2.5 NH 10P
+J7 CON8
+J8 CON30A
 
 Todo:
 Loop at 378 ljmp loop. waiting for timer?. 
