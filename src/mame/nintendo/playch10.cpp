@@ -715,7 +715,7 @@ void playch10_state::machine_start()
 	else
 		pc10_set_videorom_bank(0, 8, 0, 8);
 
-	save_item(STRUCT_MEMBER(m_chr_page.writable));
+	save_item(STRUCT_MEMBER(m_chr_page, writable));
 	save_item(NAME(m_up_8w));
 	save_item(NAME(m_pc10_nmi_enable));
 	save_item(NAME(m_pc10_dog_di));
