@@ -2788,7 +2788,8 @@ void segas24_state::init_roughrac()
 	m_track_size = 0x2d00;
 }
 
-}
+} // anonymous namespace
+
 
 /*************************************
  *
