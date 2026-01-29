@@ -166,6 +166,9 @@ void clio_device::arm_ctl_w(int state)
 	if (state)
 	{
 		m_expctl |= 0x80;
+		// TODO: is this really a thing?
+		// avoids starting the DMA again (with count already underflowed),
+		// but BIOS clears this status on receiving dexp_w anyway ...
 		m_dma_enable &= ~(1 << 20);
 	}
 	else
@@ -258,7 +261,8 @@ void clio_device::map(address_map &map)
 	);
 	// TODO: should likely follow seed number, and be truly RNG
 	map(0x003c, 0x003f).lr32(NAME([this] () {
-		LOG("random read (!)\n");
+		if (!machine().side_effects_disabled())
+			LOG("random read (!)\n");
 		return m_random;
 	}));
 
@@ -640,7 +644,7 @@ IRQ0
 0x0000f000 DMA DSPP->RAM *
 0x00000800 DSPP
 0x00000400 Timer  1
-0x00000200 Timer  3 <- needed to surpass current hang point
+0x00000200 Timer  3
 0x00000100 Timer  5
 0x00000080 Timer  7
 0x00000040 Timer  9
@@ -678,12 +682,7 @@ void clio_device::request_fiq(uint32_t irq_req, uint8_t type)
 	else
 		m_irq0 &= ~(1 << 31);
 
-	if((m_irq0 & m_irq0_enable) || (m_irq1 & m_irq1_enable))
-	{
-		//printf("Go irq %08x & %08x %08x & %08x\n",m_irq0, m_irq0_enable, m_irq1, m_irq1_enable);
-		m_firq_cb(1);
-		//m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
-	}
+	m_firq_cb((m_irq0 & m_irq0_enable) || (m_irq1 & m_irq1_enable));
 }
 
 // TODO: this actually generates from Amy not from Clio
@@ -769,6 +768,10 @@ TIMER_CALLBACK_MEMBER( clio_device::system_timer_cb )
 
 	// Opera specification goes this lengthy explaination about "64" being the unit of time
 	// but 3do_fc2 and 3do_gdo101 won't boot with a timer tick this small ...
+	// TODO: causes "PAL system detected" in most BIOSes
+	// - slack may just be the start time
+	// - in an ideal world we would split this implementation in separate timers,
+	//   however that will give more scheduler roundtrips, in an already crowded scenario ...
 	m_system_timer->adjust(attotime::from_ticks(m_slack, this->clock()));
 }
 

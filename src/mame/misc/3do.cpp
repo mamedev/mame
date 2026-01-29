@@ -7,18 +7,22 @@
 Driver file to handle emulation of the 3DO systems
 
 TODO:
-- Data enable from CD drive to Clio;
+- Incomplete XBus/CD drive semantics
+\- 3do disks fail to be recognized;
+\- Photo CD bails out at startup with error -8021 (unless A is held on 3do_fz10e & Sanyo based
+   romsets, where first picture is loaded then bails out anyway)
+\- Audio CD black screen (needs DSPP irq), has plenty of Cel, VDLP and sport issues later
+   (reads random port, asks for audio tracks *with* subcode);
 - DSPP mapping (incompatible with later M2, consider an "opera_host_map" instead);
 - Replace ARM7 with ARM60;
-- Fix VRAM size (should be 1 MB, but everything fails to boot);
+- Fix VRAM size (should be 1 MB, but every single BIOS fails to boot with that, wrong ARM type?);
 - CEL engine should really halt main CPU when running, paused only when irqs are taken;
 - MMU (user programs will need it);
-- 3do_fz1: draws a tray open CD at top of VRAM space once it throws an error from GetCDType;
-- 3do_hc21: as above plus "Directory /remote not found";
-- 3do_fz10: as above;
+- 3do_fz1: black screen after insert disk screen (needs DSPP irq);
+- 3do_hc21 (bios 0): some intermediate garbage on top-left of CELs;
 - 3do_gdo101: errors on DSPP semaphore, hacked to make it boot;
-- 3do_try: throws "QueueSport error on cmd 4: xfer across 1M boundary", has issues with layer
-  clearances, never really pings Sport DMA (?);
+- 3do_try, 3do_hc21 (bios 1): throws "QueueSport error on cmd 4: xfer across 1M boundary",
+  has issues with layer clearances, never really pings Sport DMA, needs smaller VRAM?
 - 3do_fc2: same as above
 - 3do_fc1: hangs on OpenDiskFile at PC=2e6dc, path="/rom/system/tasks/shell", will "give up" if
   skipped.
@@ -95,7 +99,7 @@ Models:
 - Creative 3DO Blaster - PC Card (ISA)
 - Panasonic N-1005 "Robo" 3DO (Japan), based on FZ-1 with 5x CD media changer and VCD adapter
   built-in
-- a Scientific Atlanta STT, with a Nicky device in BIGTRACE space
+- a Scientific Atlanta Set Top Terminal, with a Nicky device in BIGTRACE space
 
 ===================================================================================================
 
@@ -235,7 +239,7 @@ void _3do_state::green_config(machine_config &config)
 	});
 	// TODO: disregard enable and cmd, those needs to be from xbus
 	m_madam->dma_exp_read_cb().set([this] () {
-		m_cdrom->enable_w(0);
+		//m_cdrom->enable_w(0);
 		m_cdrom->cmd_w(1);
 		u8 res = m_cdrom->read();
 		m_cdrom->cmd_w(0);

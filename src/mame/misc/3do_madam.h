@@ -161,7 +161,7 @@ private:
 		u32 source_ptr;
 		u32 plut_ptr;
 		s32 xpos, ypos;
-		u32 hdx, hdy, vdx, vdy;
+		s32 hdx, hdy, vdx, vdy;
 		u32 hddx, hddy;
 		u32 pixc, pre0, pre1;
 		std::vector<u16> buffer;
@@ -179,12 +179,14 @@ private:
 
 	void cel_start_w(offs_t offset, u32 data, u32 mem_mask);
 	void cel_stop_w(offs_t offset, u32 data, u32 mem_mask);
+	void cel_continue_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 cel_decompress();
 
 	typedef u16 (madam_device::*get_pixel_func)(int x, int y, u16 woffset);
 	static const get_pixel_func get_pixel_table[32 + 1];
 	u16 get_pixel_invalid(int x, int y, u16 woffset);
 	u16 get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset);
+	u16 get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset);
 	u16 get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset);
 	u16 get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset);
 	u16 get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset);

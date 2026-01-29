@@ -118,6 +118,7 @@ void madam_device::device_reset()
 	m_cel.state = IDLE;
 	m_statbits = 0;
 	m_dma_exp_enable = false;
+	m_arm_ctl_cb(1);
 	m_dma_exp_timer->adjust(attotime::never);
 	m_dma_playerbus_timer->adjust(attotime::never);
 	m_cel_timer->adjust(attotime::never);
@@ -186,7 +187,8 @@ void madam_device::map(address_map &map)
 	map(0x0100, 0x0103).w(FUNC(madam_device::cel_start_w));
 	// SPRSTOP - Stop the CEL engine (W)
 	map(0x0104, 0x0107).w(FUNC(madam_device::cel_stop_w));
-//  map(0x0108, 0x010b)  SPRCNTU - Continue the CEL engine (W)
+	// SPRCNTU - Continue the CEL engine (W)
+	map(0x0108, 0x010b).w(FUNC(madam_device::cel_continue_w));
 //  map(0x010c, 0x010f)  SPRPAUS - Pause the CEL engine (W)
 	map(0x0110, 0x0113).lrw32(
 		NAME([this] () { return m_ccobctl0; }),
@@ -515,6 +517,7 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_exp_cb)
 
 	u32 dst = m_dma[DMA_EXP0][0];
 
+	// TODO: decrement Clio xfercnt from here
 	u32 data = (m_dma_exp_read_cb() << 24) | (m_dma_exp_read_cb() << 16) | (m_dma_exp_read_cb() << 8) | (m_dma_exp_read_cb() << 0);
 
 	m_dma32_write_cb(dst, data);
@@ -731,8 +734,17 @@ void madam_device::cel_stop_w(offs_t offset, u32 data, u32 mem_mask)
 	m_cel_timer->adjust(attotime::never);
 }
 
-// TODO: is all of this madness burst, cycle steal or a mix of the two?
-// 3do_try alternating Sanyo/3do logos spinning seems that some bus hog is ought to happen ...
+// TODO: just a stub to avoid tanking performance with debugger
+void madam_device::cel_continue_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// ...
+}
+
+// TODO: timings are sketchy and not known
+// ARM lock line is directly tied to Madam, which is raised when CEL engine is running.
+// CEL is paused when any irq is issued at the end of current CEL (so during fetch phase)
+// resumed by triggering SPRCNTU port (manually in SW);
+// cfr. 3do_try alternating Sanyo/3do logos spins (way too fast)
 TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 {
 	u32 tick_time;
@@ -854,10 +866,10 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			// TODO: can be in 17.15 format (?)
 			LOGCEL("    xpos=%f ypos=%f\n",  (double)m_cel.xpos / 65536.0, (double)m_cel.ypos / 65536.0);
 
-			m_cel.hdx = m_dma32_read_cb(m_cel.address + 0x18);
-			m_cel.hdy = m_dma32_read_cb(m_cel.address + 0x1c);
-			m_cel.vdx = m_dma32_read_cb(m_cel.address + 0x20);
-			m_cel.vdy = m_dma32_read_cb(m_cel.address + 0x24);
+			m_cel.hdx = (s32)m_dma32_read_cb(m_cel.address + 0x18);
+			m_cel.hdy = (s32)m_dma32_read_cb(m_cel.address + 0x1c);
+			m_cel.vdx = (s32)m_dma32_read_cb(m_cel.address + 0x20);
+			m_cel.vdy = (s32)m_dma32_read_cb(m_cel.address + 0x24);
 			tick_time += 4;
 			LOGCEL("    hdx=%f hdy=%f vdx=%f vdy=%f\n"
 				, (double)m_cel.hdx / 1048576.0, (double)m_cel.hdy / 1048576.0
@@ -1273,7 +1285,7 @@ const madam_device::get_pixel_func madam_device::get_pixel_table[32 + 1] =
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
 	// 6bpp
-	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_6bpp_coded_lrform0,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
 	&madam_device::get_pixel_invalid,
@@ -1323,6 +1335,24 @@ u16 madam_device::get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset)
 	return src_data;
 }
 
+// - 'R' letter in "Welcome to the REAL world" for fz1
+u16 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+	u32 plut_address = m_cel.plut_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	// math would make more sense with / 3 ~ % 3 but the pitch would be off that way (dword boundary?)
+	cel_address += (x / 4) * 3;
+	u8 src_shift = (3 - (x % 4)) * 6;
+
+	u16 plut_data = ((m_dma8_read_cb(cel_address + 0) << 16) + (m_dma8_read_cb(cel_address + 1) << 8) + (m_dma8_read_cb(cel_address + 2))) >> (src_shift) & 0x3f;
+	plut_data <<= 1;
+
+	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
+	return src_data;
+}
 
 // - fz10 Storage Managers
 u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
