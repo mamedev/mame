@@ -27,7 +27,7 @@ ROM_PATH = "/home/jeff/bastel/roms/hohner/ms4/ms4_05_r1_0.bin"
 
 # Program pointer table in code space
 PROGRAM_PTR_TABLE = 0x0040
-NUM_PROGRAMS = 66
+NUM_PROGRAMS = 247
 
 # Import A-RAM decoder from same directory
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -261,11 +261,26 @@ def decode_dram_init(stream, alg_key='027A'):
     amp_params = {'level': 0, 'amp': 0x7F, 'vel_sens': 0, 'env_ctrl': 0}
 
     # Algorithm-specific waveform words (need internal sine = 0x100 << 9)
-    # Based on WWF instructions in each algorithm
+    # Based on WWF instructions in each algorithm (RM with WWF bit active)
+    # Algorithms with empty list use WPHI+WSP combo which sets WF=0x100 internally
     waveform_words = {
-        '027A': [4, 10, 15],  # PC02: D[10], PC04: D[15], PC08/PC19: D[4]
-        '02BA': [15],         # PC00: D[15]
-        '02FA': [11, 12, 15], # PC05: D[11], PC14: D[12], PC00: D[15]
+        '027A': [4, 10, 15],
+        '02BA': [4, 15],
+        '02FA': [11, 12, 15],
+        '033A': [],
+        '037A': [15],
+        '03BA': [],
+        '03FA': [],
+        '043A': [15],
+        '047A': [15],
+        '04BA': [13, 15],
+        '04FA': [],
+        '053A': [15],
+        '057A': [15],
+        '05BA': [],
+        '05FA': [],
+        '063A': [],
+        '067A': [13, 14],
     }
     wf_words = waveform_words.get(alg_key, [])
 
@@ -823,10 +838,14 @@ def export_programs_python(programs, output_path):
     - ALGORITHMS: dict of A-RAM instruction arrays keyed by hex address
     - PROGRAMS_XXXX: lists of program dicts for each algorithm
     """
-    # Group programs by A-RAM pointer
+    # Group programs by A-RAM pointer, skip SILENCE entries (aram_ptr=0x0000)
     by_algorithm = {}
+    skipped = 0
     for idx, prog in programs:
         ptr = prog['aram_ptr']
+        if ptr == 0x0000:
+            skipped += 1
+            continue  # Skip SILENCE/invalid programs
         ptr_key = f"{ptr:04X}"
         if ptr_key not in by_algorithm:
             by_algorithm[ptr_key] = {
@@ -834,6 +853,9 @@ def export_programs_python(programs, output_path):
                 'programs': []
             }
         by_algorithm[ptr_key]['programs'].append((idx, prog))
+
+    if skipped:
+        print(f"Skipped {skipped} SILENCE programs (aram_ptr=0x0000)")
 
     with open(output_path, 'w') as f:
         f.write('"""\n')
@@ -932,7 +954,8 @@ def export_programs_python(programs, output_path):
             f.write(f"    '{ptr_key}': PROGRAMS_{ptr_key},\n")
         f.write('}\n')
 
-    print(f"Exported {len(programs)} programs to {output_path}")
+    total_exported = sum(len(v['programs']) for v in by_algorithm.values())
+    print(f"Exported {total_exported} programs to {output_path}")
     for ptr_key in sorted(by_algorithm.keys()):
         count = len(by_algorithm[ptr_key]['programs'])
         print(f"  Algorithm 0x{ptr_key}: {count} programs")

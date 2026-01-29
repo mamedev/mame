@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 """
+DEPRECATED: see ms4_parse_programs.py for future development
+
 nKeyfox10 Program and Sound Structure Parser
 Parses sound program data and D-RAM templates from the ROM
 

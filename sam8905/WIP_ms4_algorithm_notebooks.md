@@ -8,14 +8,32 @@ This provides a foundation for implementing envelope/LFO modulators based on fir
 ## MS4 Algorithm Summary
 
 From `ms4_parse_programs.py` analysis:
+- **Program pointer table**: 0x0040, 247 entries
+- **Valid programs**: 229 (18 SILENCE entries at 0x022E skipped)
+- **Algorithms**: 17 unique (at addresses 0x027A through 0x067A)
 
 | Algorithm | ROM Address | Programs | Description |
 |-----------|-------------|----------|-------------|
-| ALG_027A  | 0x027A      | 52       | Main voice algorithm (piano, strings, brass, etc.) |
-| ALG_02BA  | 0x02BA      | 12       | Percussion/plucked (marimba, steel guitar, banjo) |
+| ALG_027A  | 0x027A      | 57       | Main voice algorithm (piano, strings, brass, etc.) |
+| ALG_02BA  | 0x02BA      | 124      | Percussion/plucked + many variants |
 | ALG_02FA  | 0x02FA      | 2        | String/voice special (dstring3, dkvoi1) |
+| ALG_033A  | 0x033A      | 7        | Electric piano variants (dxketron, epiano9, etc.) |
+| ALG_037A  | 0x037A      | 1        | xt_pia1 |
+| ALG_03BA  | 0x03BA      | 10       | Guitar/bass variants (medium, gibson, jazzy2, etc.) |
+| ALG_03FA  | 0x03FA      | 7        | Organ/synth variants (solosint, church3, vibes, etc.) |
+| ALG_043A  | 0x043A      | 2        | Brass (trombone, dopenbra) |
+| ALG_047A  | 0x047A      | 3        | Sweet/mellow (dsweetb, dboweds, dsm100) |
+| ALG_04BA  | 0x04BA      | 5        | Synth pads (xt_sybr3, space, whalead, etc.) |
+| ALG_04FA  | 0x04FA      | 1        | mb_pad1 |
+| ALG_053A  | 0x053A      | 1        | strings |
+| ALG_057A  | 0x057A      | 1        | analog |
+| ALG_05BA  | 0x05BA      | 3        | Organ (dorgan5, dsmith, d1684) |
+| ALG_05FA  | 0x05FA      | 3        | Organ (dchurch2, drotoorg, dorgan2) |
+| ALG_063A  | 0x063A      | 1        | whistle |
+| ALG_067A  | 0x067A      | 1        | wind |
 
-Note: dkvoi2 uses ALG_02BA despite being a "voice" preset.
+Algorithm addresses are spaced 0x40 bytes (64 bytes = 32 words) apart.
+Note: 0x06BA is NOT a valid algorithm (garbage data after 0x067A).
 
 ## Implementation Steps
 
