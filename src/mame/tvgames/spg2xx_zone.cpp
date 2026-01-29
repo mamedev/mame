@@ -18,10 +18,10 @@ public:
 		m_bankmask(0x7)
 	{ }
 
-	void wireless60(machine_config& config);
+	void wireless60(machine_config& config) ATTR_COLD;
 
-	void init_lx_jg7415();
-	void init_zone100();
+	void init_lx_jg7415() ATTR_COLD;
+	void init_zone100() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -48,12 +48,12 @@ public:
 		m_romregion(*this, "maincpu")
 	{ }
 
-	void zone40(machine_config &config);
-	void zone40p(machine_config &config);
-	void zonekdft(machine_config &config);
+	void zone40(machine_config &config) ATTR_COLD;
+	void zone40p(machine_config &config) ATTR_COLD;
+	void zonekdft(machine_config &config) ATTR_COLD;
 
-	void init_zone40();
-	void init_reactmd();
+	void init_zone40() ATTR_COLD;
+	void init_reactmd() ATTR_COLD;
 
 
 protected:

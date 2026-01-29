@@ -21,7 +21,7 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
-	void eks515(machine_config &config);
+	void eks515(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;

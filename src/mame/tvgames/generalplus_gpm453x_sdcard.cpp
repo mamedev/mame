@@ -23,7 +23,7 @@ public:
 		m_sdcard(*this, "sdcard")
 	{ }
 
-	void gpm4530a_lexibook(machine_config &config);
+	void gpm4530a_lexibook(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

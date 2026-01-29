@@ -45,11 +45,11 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
-	void tamapix(machine_config &config);
+	void tamapix(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -57,7 +57,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void mem_map(address_map &map);
+	void mem_map(address_map &map) ATTR_COLD;
 };
 
 class precur2w_state : public tamagotchi_pix_state
@@ -68,14 +68,14 @@ public:
 		, m_cart(*this, "cartslot")
 	{ }
 
-	void precur2w(machine_config &config);
+	void precur2w(machine_config &config) ATTR_COLD;
 
 protected:
 
 private:
 	required_device<generic_slot_device> m_cart;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) ATTR_COLD;
 };
 
 uint32_t tamagotchi_pix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
