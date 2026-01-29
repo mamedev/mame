@@ -271,6 +271,12 @@ int main(int argc, char *argv[])
     printf("Initializing SAM8905 emulator...\n");
     sam8905_emu_init(&g_sam_emu);
     sam8905_emu_set_instance(&g_sam_emu);
+
+    /* Initialize SAM8905 via firmware's hardware abstraction layer */
+    printf("Initializing SAM8905 via sam_hw interface...\n");
+    sam_init();  /* This goes through sam_write_reg -> sam_hw_emu -> emulator */
+
+    /* Load test algorithm */
     setup_sinus_algorithm();
 
     /* Initialize ALSA MIDI */

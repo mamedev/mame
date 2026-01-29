@@ -99,15 +99,18 @@ static void dram_clear_all(void)
 }
 
 /*============================================================================
- * sam_init_slots (CODE:A523 area)
+ * sam_init_slots
  *
- * Initialize word 15 of each D-RAM slot with ALG/MIX control.
+ * Initialize control word (offset 0x0F) of each D-RAM slot.
  *
  * For slot N:
  *   Address = (N << 4) | 0x0F
  *   Value = (nibble_swap(N) << 8) | 0x0F00
  *
  * This sets algorithm routing and full mix (MIXL=1, MIXR=7).
+ *
+ * NOTE: This is initialization code, not the firmware's read-modify-write
+ * sam_dram_write_word15 (CODE:A523) which sets the ACTIVE bit on existing slots.
  *============================================================================*/
 
 void sam_init_slots(void)

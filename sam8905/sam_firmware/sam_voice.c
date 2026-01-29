@@ -150,7 +150,7 @@ void voice_list_add_pending(uint8_t page)
  * Original disassembly:
  *   99bc: E53A        MOV A,0x3a           ; voice_page_num
  *   99be: FE          MOV R6,A
- *   99bf: 12A523      LCALL 0xa523         ; sam_dram_write_word15
+ *   99bf: 12A523      LCALL 0xa523         ; sam_dram_set_active (read-modify-write)
  *   99c2: 78FB        MOV R0,#0xfb
  *   99c4: E4          CLR A
  *   99c5: F2          MOVX @R0,A           ; clear page[0xFB] (status)
@@ -185,7 +185,7 @@ void voice_slots_clear(uint8_t page)
     uint8_t i;
 
     /* Set control word for this slot (word 15) */
-    /* sam_dram_write_word15 sets IDLE bit */
+    /* Original firmware calls sam_dram_set_active (CODE:A523) which does read-modify-write */
     sam_init_slots();  /* This writes word 15 for all slots - TODO: may need per-slot version */
 
     /* Clear voice page status */

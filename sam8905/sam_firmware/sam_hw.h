@@ -50,37 +50,47 @@ extern uint8_t sam_read_reg(uint8_t reg);
 
 /*============================================================================
  * D-RAM Operations
+ *
+ * SAM8905 D-RAM is 19 bits wide (not 16!):
+ *   REG_DATA1 = bits 7:0
+ *   REG_DATA2 = bits 15:8
+ *   REG_DATA3 = bits 18:16 (only low 3 bits used)
+ *
+ * See MAME src/devices/sound/sam8905.cpp lines 600-603 for register mapping.
  *============================================================================*/
 
 /**
- * Write 16-bit value to D-RAM
+ * Write 19-bit value to D-RAM
  *
- * D-RAM has 256 addresses × 16 bits.
+ * D-RAM has 256 addresses × 19 bits.
  * Address 0x00-0xFF, organized as 16 slots × 16 words.
  *
  * @param addr  D-RAM address (0x00-0xFF)
- * @param value 16-bit value to write
+ * @param value 19-bit value to write (bits 18:0 used, upper bits ignored)
  */
-static inline void sam_dram_write(uint8_t addr, uint16_t value)
+static inline void sam_dram_write(uint8_t addr, uint32_t value)
 {
     sam_write_reg(SAM_REG_ADDR_DATA, addr);
-    sam_write_reg(SAM_REG_DATA1, (uint8_t)(value >> 8));   /* high byte */
-    sam_write_reg(SAM_REG_DATA2, (uint8_t)(value & 0xFF)); /* low byte */
+    sam_write_reg(SAM_REG_DATA1, (uint8_t)(value & 0xFF));          /* bits 7:0   */
+    sam_write_reg(SAM_REG_DATA2, (uint8_t)((value >> 8) & 0xFF));   /* bits 15:8  */
+    sam_write_reg(SAM_REG_DATA3, (uint8_t)((value >> 16) & 0x07));  /* bits 18:16 */
     sam_write_reg(SAM_REG_CTRL, SAM_CTRL_DRAM_WR);
 }
 
 /**
- * Write 16-bit value to D-RAM with low/high bytes
+ * Write 19-bit value to D-RAM from individual bytes
  *
- * @param addr    D-RAM address (0x00-0xFF)
- * @param lo      Low byte of value
- * @param hi      High byte of value
+ * @param addr  D-RAM address (0x00-0xFF)
+ * @param b0    Bits 7:0
+ * @param b1    Bits 15:8
+ * @param b2    Bits 18:16 (only low 3 bits used)
  */
-static inline void sam_dram_write_bytes(uint8_t addr, uint8_t hi, uint8_t lo)
+static inline void sam_dram_write_bytes(uint8_t addr, uint8_t b0, uint8_t b1, uint8_t b2)
 {
     sam_write_reg(SAM_REG_ADDR_DATA, addr);
-    sam_write_reg(SAM_REG_DATA1, hi);
-    sam_write_reg(SAM_REG_DATA2, lo);
+    sam_write_reg(SAM_REG_DATA1, b0);
+    sam_write_reg(SAM_REG_DATA2, b1);
+    sam_write_reg(SAM_REG_DATA3, b2 & 0x07);
     sam_write_reg(SAM_REG_CTRL, SAM_CTRL_DRAM_WR);
 }
 
@@ -93,19 +103,25 @@ static inline void sam_dram_clear_all(void)
 {
     uint16_t addr;
     for (addr = 0; addr < 256; addr++) {
-        sam_dram_write((uint8_t)addr, 0x0000);
+        sam_dram_write((uint8_t)addr, 0x00000);
     }
 }
 
 /**
- * Write word 15 of a D-RAM slot (ALG/MIX control)
+ * Write to word index 15 (offset 0x0F) of a D-RAM slot
  *
- * Word 15 of each slot configures algorithm routing and mix levels.
+ * Word 15 of each slot contains ALG/MIX control bits.
+ * This is a simple write - NOT the read-modify-write that the
+ * original firmware's sam_dram_write_word15 (CODE:A523) does.
+ *
+ * NOTE: The original firmware function reads the current value,
+ * ORs bit 11 (ACTIVE), then writes back. Use this helper only
+ * for initialization where you're setting the full value.
  *
  * @param slot  Slot number (0-15)
- * @param value Control word value
+ * @param value 19-bit control word value
  */
-static inline void sam_dram_write_word15(uint8_t slot, uint16_t value)
+static inline void sam_dram_write_slot_ctrl(uint8_t slot, uint32_t value)
 {
     uint8_t addr = (slot << 4) | 0x0F;
     sam_dram_write(addr, value);
@@ -139,6 +155,6 @@ void sam_init(void);
 /**
  * Initialize D-RAM slots with default ALG/MIX configuration
  *
- * Sets word 15 of each slot with nibble-swapped slot ID.
+ * Sets control word (offset 0x0F) of each slot with nibble-swapped slot ID.
  */
 void sam_init_slots(void);
