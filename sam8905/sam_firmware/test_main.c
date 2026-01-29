@@ -1069,6 +1069,219 @@ static int test_voice_list_remove(void)
 }
 
 /*============================================================================
+ * MIDI Handler Tests
+ *============================================================================*/
+
+static int test_midi_handle_note(void)
+{
+    printf("=== Test: midi_handle_note ===\n");
+
+    /* Initialize */
+    memset(&g_intmem, 0x00, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0x00, sizeof(g_intmem_upper));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+    memset(s_test_rom, 0x00, sizeof(s_test_rom));
+
+    /* Initialize slot manager (sets up free list) */
+    sam_slot_manager_init();
+
+    /* Use test ROM buffer for all ROM-accessing modules */
+    dram_config_set_test_rom(s_test_rom);
+    voice_set_test_rom(s_test_rom);
+    midi_set_test_rom(s_test_rom);
+
+    /* Set up a minimal program at address 0x0100 */
+    /* Program pointer table at 0x0040 - program 0 points to 0x0100 */
+    s_test_rom[0x0040] = 0x01;  /* High byte: 0x01 */
+    s_test_rom[0x0041] = 0x00;  /* Low byte: 0x00 -> 0x0100 */
+
+    /* Program structure at 0x0100 */
+    /* Offset 9: flags (slot count in lower 4 bits) */
+    s_test_rom[0x0100 + 9] = 0x01;  /* 1 slot */
+
+    /* Offset 10-11: voice init data pointer (little-endian) */
+    s_test_rom[0x0100 + 10] = 0x50;  /* Low byte */
+    s_test_rom[0x0100 + 11] = 0x01;  /* High byte -> 0x0150 */
+
+    /* Offset 22 (0x16): 8 bytes for program_init_copy */
+    for (int i = 0; i < 8; i++) {
+        s_test_rom[0x0100 + 0x16 + i] = 0x20 + i;
+    }
+
+    /* Voice init data at 0x0150 - simple terminator */
+    s_test_rom[0x0150] = 0x80;  /* Terminator */
+
+    /* Set channel 0 to use program 0 */
+    g_intmem.channel_current_prog[0] = 0;
+
+    /* Initial state: no active voices */
+    if (g_intmem.active_voice_list_head != VOICE_LIST_END) {
+        printf("FAIL: initial active list not empty\n");
+        return 1;
+    }
+
+    /* --- Note On --- */
+    midi_handle_note(0, 60, 100);  /* Channel 0, note 60 (C4), velocity 100 */
+
+    /* Verify a voice was allocated */
+    if (g_intmem.active_voice_list_head == VOICE_LIST_END) {
+        printf("FAIL: no voice allocated after note on\n");
+        return 1;
+    }
+
+    /* Verify the allocated page has correct note stored */
+    uint8_t page = g_intmem.active_voice_list_head;
+    uint8_t stored_note = voice_page_read(page, 0xF8);
+    if (stored_note != 60) {
+        printf("FAIL: stored note = %d (expected 60)\n", stored_note);
+        return 1;
+    }
+
+    /* Verify voice count decreased by 1 */
+    if (g_intmem.dram_slot_count != 15) {
+        printf("FAIL: dram_slot_count = %d (expected 15)\n", g_intmem.dram_slot_count);
+        return 1;
+    }
+
+    /* --- Note Off --- */
+    midi_handle_note(0, 60, 0);  /* Same note, velocity 0 = note off */
+
+    /* Verify voice marked for release (status bit 5 set) */
+    uint8_t status = voice_page_read(page, VOICE_PAGE_STATUS);
+    if (!(status & VOICE_STATUS_RELEASE)) {
+        printf("FAIL: voice not marked for release, status = 0x%02X\n", status);
+        return 1;
+    }
+
+    /* Clean up */
+    dram_config_set_test_rom(NULL);
+    voice_set_test_rom(NULL);
+    midi_set_test_rom(NULL);
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_midi_handle_program_change(void)
+{
+    printf("=== Test: midi_handle_program_change ===\n");
+
+    /* Initialize */
+    memset(&g_intmem, 0x00, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0x00, sizeof(g_intmem_upper));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+    memset(s_test_rom, 0x00, sizeof(s_test_rom));
+
+    /* Use test ROM buffer for all ROM-accessing modules */
+    dram_config_set_test_rom(s_test_rom);
+    voice_set_test_rom(s_test_rom);
+    midi_set_test_rom(s_test_rom);
+
+    /* Set up program pointer table at 0x0040 */
+    /* Program 5 points to 0x0200 */
+    s_test_rom[0x0040 + 5*2] = 0x02;      /* High byte */
+    s_test_rom[0x0040 + 5*2 + 1] = 0x00;  /* Low byte -> 0x0200 */
+
+    /* Program structure at 0x0200 */
+    /* Offset 22 (0x16): 8 bytes for program_init_copy */
+    for (int i = 0; i < 8; i++) {
+        s_test_rom[0x0200 + 0x16 + i] = 0xA0 + i;
+    }
+
+    /* Initial state: channel 0 has program 0 */
+    g_intmem.channel_current_prog[0] = 0;
+
+    /* Send program change on channel 0 */
+    midi_handle_program_change(0, 5);
+
+    /* Verify channel 0 now has program 5 */
+    if (g_intmem.channel_current_prog[0] != 5) {
+        printf("FAIL: channel_current_prog[0] = %d (expected 5)\n",
+               g_intmem.channel_current_prog[0]);
+        return 1;
+    }
+
+    /* Verify program_init_copy was updated */
+    for (int i = 0; i < 8; i++) {
+        if (g_extmem.program_init_copy[i] != (0xA0 + i)) {
+            printf("FAIL: program_init_copy[%d] = 0x%02X (expected 0x%02X)\n",
+                   i, g_extmem.program_init_copy[i], 0xA0 + i);
+            return 1;
+        }
+    }
+
+    /* Verify current_program_base pointer was set */
+    uint16_t expected_ptr = 0x0200;
+    uint16_t actual_ptr = g_extmem.current_program_base[0] |
+                          ((uint16_t)g_extmem.current_program_base[1] << 8);
+    if (actual_ptr != expected_ptr) {
+        printf("FAIL: current_program_base = 0x%04X (expected 0x%04X)\n",
+               actual_ptr, expected_ptr);
+        return 1;
+    }
+
+    /* Clean up */
+    dram_config_set_test_rom(NULL);
+    voice_set_test_rom(NULL);
+    midi_set_test_rom(NULL);
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_midi_handle_pitch_bend(void)
+{
+    printf("=== Test: midi_handle_pitch_bend ===\n");
+
+    /* Initialize */
+    memset(&g_intmem, 0x00, sizeof(g_intmem));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+
+    /* Test 1: Center position (no bend) - MSB=0x40, LSB=0x00 = 0x2000 */
+    midi_handle_pitch_bend(0, 0x00, 0x40);
+
+    /* Result should be 0 (center) */
+    int16_t bend = (int16_t)((g_extmem.pitch_bend[0] << 8) |
+                             g_extmem.pitch_bend[1]);
+    if (bend != 0) {
+        printf("FAIL: center bend = %d (expected 0)\n", bend);
+        return 1;
+    }
+
+    /* Test 2: Max bend up - MSB=0x7F, LSB=0x7F = 0x3FFF */
+    midi_handle_pitch_bend(1, 0x7F, 0x7F);
+
+    bend = (int16_t)((g_extmem.pitch_bend[2] << 8) |
+                     g_extmem.pitch_bend[3]);
+    if (bend != 8191) {  /* 0x3FFF - 0x2000 = 0x1FFF = 8191 */
+        printf("FAIL: max up bend = %d (expected 8191)\n", bend);
+        return 1;
+    }
+
+    /* Test 3: Max bend down - MSB=0x00, LSB=0x00 = 0x0000 */
+    midi_handle_pitch_bend(2, 0x00, 0x00);
+
+    bend = (int16_t)((g_extmem.pitch_bend[4] << 8) |
+                     g_extmem.pitch_bend[5]);
+    if (bend != -8192) {  /* 0x0000 - 0x2000 = -0x2000 = -8192 */
+        printf("FAIL: max down bend = %d (expected -8192)\n", bend);
+        return 1;
+    }
+
+    /* Test 4: Verify different channels store independently */
+    /* Channel 0 should still have center value */
+    bend = (int16_t)((g_extmem.pitch_bend[0] << 8) |
+                     g_extmem.pitch_bend[1]);
+    if (bend != 0) {
+        printf("FAIL: channel 0 changed after writing other channels\n");
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+/*============================================================================
  * Main
  *============================================================================*/
 
@@ -1102,6 +1315,9 @@ int main(void)
     failures += test_voice_slot_allocate();
     failures += test_voice_slot_free_to_list();
     failures += test_voice_list_remove();
+    failures += test_midi_handle_note();
+    failures += test_midi_handle_program_change();
+    failures += test_midi_handle_pitch_bend();
 
     printf("=================================\n");
     if (failures == 0) {

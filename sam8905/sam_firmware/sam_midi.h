@@ -222,3 +222,17 @@ void midi_set_omni(uint8_t enable);
  * @return         1 if accepted, 0 if not
  */
 uint8_t midi_channel_accepted(uint8_t channel);
+
+/*============================================================================
+ * Test Support
+ *============================================================================*/
+
+/**
+ * Set test ROM buffer for MIDI functions
+ *
+ * When set to non-NULL, ROM access functions in MIDI will read from this
+ * buffer instead of g_rom. Pass NULL to revert to normal operation.
+ *
+ * @param rom  Pointer to test ROM buffer, or NULL
+ */
+void midi_set_test_rom(uint8_t *rom);

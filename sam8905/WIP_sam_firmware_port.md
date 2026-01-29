@@ -399,10 +399,10 @@ unported functions). Use the original addresses as function name suffixes for tr
 |----------|-----------|--------|
 | B630 | `midi_rx_isr()` in sam_midi.c | [x] |
 | C635 | `midi_process_byte()` in sam_midi.c | [x] |
-| B75F | `midi_handle_note()` stub | [ ] |
+| B75F | `midi_handle_note()` - simplified implementation | [x] |
 | C1A0 | `midi_handle_cc()` stub | [ ] |
-| C45B | `midi_handle_program_change()` stub | [ ] |
-| 9AB0 | `midi_handle_pitch_bend()` stub | [ ] |
+| C45B | `midi_handle_program_change()` in sam_midi.c | [x] |
+| 9AB0 | `midi_handle_pitch_bend()` - simplified implementation | [x] |
 | BDBC | `midi_panic()` in sam_midi.c | [x] |
 
 ### Phase 5: Voice Management
@@ -530,7 +530,10 @@ Track newly identified INTMEM/EXTMEM addresses found during porting:
 - [x] MIDI TX buffer - `midi_tx_queue()`, `midi_tx_dequeue()` tested
 - [x] Integrate with emulator - `emu/main_emu.c` uses ported MIDI parser
   - Handler stubs are weak symbols, overridden by emulator for simple sound
-- [ ] Implement message handlers (note, CC, program change, pitch bend) - stub implementations present
+- [x] Implement `midi_handle_note()` - simplified note on/off (no dual-layer, no sustain pedal)
+- [x] Implement `midi_handle_program_change()` - loads program from ROM
+- [x] Implement `midi_handle_pitch_bend()` - simplified pitch bend (no sensitivity scaling)
+- [ ] Implement `midi_handle_cc()` - CC handler dispatch
 - [ ] SysEx voice enable handler
 
 ### Phase 5: Voice Management (CRITICAL PATH)

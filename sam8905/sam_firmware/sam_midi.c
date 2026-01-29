@@ -6,6 +6,35 @@
 
 #include "sam_midi.h"
 #include "sam_firmware.h"
+#include <stddef.h>
+
+/*============================================================================
+ * Test Support
+ *
+ * Test ROM hook allows unit tests to provide ROM data without modifying
+ * the const g_rom array.
+ *============================================================================*/
+
+static uint8_t *s_midi_test_rom = NULL;
+
+/**
+ * Set test ROM buffer for MIDI functions.
+ */
+void midi_set_test_rom(uint8_t *rom)
+{
+    s_midi_test_rom = rom;
+}
+
+/**
+ * Read a byte from ROM (or test buffer if set).
+ */
+static inline uint8_t midi_rom_read(uint16_t addr)
+{
+    if (s_midi_test_rom != NULL) {
+        return s_midi_test_rom[addr];
+    }
+    return g_rom[addr];
+}
 
 /*============================================================================
  * MIDI Buffer Access Helpers
@@ -415,12 +444,99 @@ void midi_panic(void)
 #define WEAK_STUB
 #endif
 
+/**
+ * midi_handle_note - Simplified note on/off handler
+ *
+ * This is a simplified implementation that:
+ * - On note-on: allocates a voice and initializes D-RAM slots
+ * - On note-off: finds the voice and marks it for release
+ *
+ * The original firmware has much more complex handling including:
+ * - Per-channel note tracking tables at XRAM 0x14D5
+ * - Dual-layer support (notes above threshold use ch+4)
+ * - Sustain pedal hold (XRAM 0x1E50)
+ * - Highest note tracking for mono mode
+ *
+ * This simplified version just allocates/releases voices directly.
+ */
 WEAK_STUB void midi_handle_note(uint8_t channel, uint8_t note, uint8_t velocity)
 {
-    /* TODO: Call sam_voice_init() or sam_voice_release() */
-    (void)channel;
-    (void)note;
-    (void)velocity;
+    uint8_t page;
+    uint8_t next;
+    uint8_t voice_note;
+    uint8_t voice_channel;
+
+    if (velocity == 0) {
+        /* Note Off - find and release the voice playing this note */
+        page = g_intmem.active_voice_list_head;
+        while (page != VOICE_LIST_END) {
+            /* Read note and channel from voice page */
+            /* Note stored at offset 0xF8, channel in slot ID at 0xFC */
+            voice_note = voice_page_read(page, 0xF8);
+            voice_channel = voice_page_read(page, VOICE_PAGE_SLOT_ID) & 0x0F;
+
+            next = voice_list_next(page);
+
+            if (voice_note == note && voice_channel == channel) {
+                /* Found it - mark for release */
+                voice_deactivate(page);
+                return;
+            }
+
+            page = next;
+        }
+        /* Voice not found - ignore (already released?) */
+        return;
+    }
+
+    /* Note On - allocate and initialize a voice */
+
+    /* Store MIDI parameters in intmem for voice_init_slots */
+    g_intmem.midi_note = note;
+    g_intmem.midi_velocity = velocity;
+    g_intmem.current_slot_id = channel;
+
+    /* Get program pointer for this channel
+     * For now, use a fixed program pointer at CODE:0x0040 (MS4 program table)
+     * Real implementation would look up from channel_current_prog table
+     */
+    uint8_t program_num = g_intmem.channel_current_prog[channel & 0x03];
+    uint16_t program_ptr_addr = 0x0040 + (program_num * 2);
+
+    /* Read program pointer (big-endian in ROM) */
+    uint16_t program_ptr = ((uint16_t)midi_rom_read(program_ptr_addr) << 8) |
+                           midi_rom_read(program_ptr_addr + 1);
+
+    g_intmem.program_base_dph = (uint8_t)(program_ptr >> 8);
+    g_intmem.program_base_dpl = (uint8_t)(program_ptr & 0xFF);
+
+    /* Set up SAM control flags */
+    g_intmem.sam_ctrl_flags = SAM_CTRL_DRAM_WR;
+
+    /* Allocate and initialize voice slots */
+    voice_init_slots();
+
+    /* If allocation succeeded, set up D-RAM configuration */
+    if (g_intmem.voice_page_num != VOICE_LIST_END) {
+        uint8_t page = g_intmem.voice_page_num;
+
+        /* Store note in voice page for later lookup */
+        voice_page_write(page, 0xF8, note);
+
+        /* Set up D-RAM config dispatch parameters */
+        /* Voice init data pointer is at program_base + 10-11 (little-endian) */
+        uint16_t voice_data_ptr = midi_rom_read(program_ptr + 10) |
+                                  ((uint16_t)midi_rom_read(program_ptr + 11) << 8);
+
+        g_intmem.rom_data_ptr_lo = (uint8_t)(voice_data_ptr & 0xFF);
+        g_intmem.rom_data_ptr_hi = (uint8_t)(voice_data_ptr >> 8);
+        g_intmem.voice_slot_base = 0;
+        g_intmem.remaining_slots = 16;  /* Process all 16 D-RAM words */
+        g_intmem.dram_address_counter = swap_nibbles(page);
+
+        /* Run D-RAM config dispatch to initialize voice parameters */
+        dram_config_dispatch();
+    }
 }
 
 WEAK_STUB void midi_handle_cc(uint8_t channel, uint8_t cc, uint8_t value)
@@ -431,11 +547,50 @@ WEAK_STUB void midi_handle_cc(uint8_t channel, uint8_t cc, uint8_t value)
     (void)value;
 }
 
+/**
+ * midi_handle_program_change - Program change handler (CODE:C45B)
+ *
+ * Loads program data from ROM based on program number.
+ *
+ * Original firmware behavior:
+ * 1. Look up program pointer from table at CODE:0x0040 (MS4)
+ * 2. Store pointer at EXTMEM 0x14D3-0x14D4 (little-endian)
+ * 3. Copy 8 bytes from program+0x16 to EXTMEM 0x11E6-0x11ED
+ *
+ * This allows subsequent note-on events to use the new program data.
+ */
 WEAK_STUB void midi_handle_program_change(uint8_t channel, uint8_t program)
 {
-    /* TODO: Load program data from ROM */
-    (void)channel;
-    (void)program;
+    uint16_t program_ptr_addr;
+    uint16_t program_ptr;
+    uint8_t i;
+
+    /* Clamp program number to valid range (0-65 for MS4) */
+    if (program >= 66) {
+        program = 65;
+    }
+
+    /* Store program number for this channel (only 4 channels tracked) */
+    if ((channel & 0x03) == channel) {
+        g_intmem.channel_current_prog[channel] = program;
+    }
+
+    /* Calculate program pointer table address */
+    /* MS4 uses CODE:0x0040 with big-endian 2-byte entries */
+    program_ptr_addr = 0x0040 + (program * 2);
+
+    /* Read program pointer (big-endian in ROM) */
+    program_ptr = ((uint16_t)midi_rom_read(program_ptr_addr) << 8) |
+                  midi_rom_read(program_ptr_addr + 1);
+
+    /* Store pointer at EXTMEM 0x14D3-0x14D4 (little-endian) */
+    g_extmem.current_program_base[0] = (uint8_t)(program_ptr & 0xFF);
+    g_extmem.current_program_base[1] = (uint8_t)(program_ptr >> 8);
+
+    /* Copy 8 bytes from program+0x16 to program_init_copy */
+    for (i = 0; i < 8; i++) {
+        g_extmem.program_init_copy[i] = midi_rom_read(program_ptr + 0x16 + i);
+    }
 }
 
 WEAK_STUB void midi_handle_aftertouch(uint8_t channel, uint8_t pressure)
@@ -446,12 +601,49 @@ WEAK_STUB void midi_handle_aftertouch(uint8_t channel, uint8_t pressure)
     (void)pressure;
 }
 
+/**
+ * midi_handle_pitch_bend - Pitch bend handler (CODE:C801 → 9AB0)
+ *
+ * Stores pitch bend value in the pitch_bend for real-time pitch modulation.
+ *
+ * Original firmware behavior:
+ * 1. Convert 14-bit bend to signed value: (MSB << 7 | LSB) - 0x2000
+ * 2. Scale by sensitivity from EXTMEM 0x11E5 using lookup tables at CODE:9873/9880
+ * 3. Store 16-bit result at EXTMEM 0x1194 + channel*2 (little-endian)
+ * 4. Repeat for channel+4 (dual-layer support)
+ *
+ * Simplification: We store a simplified signed 16-bit value directly.
+ * The periodic voice update uses this to modulate active voice pitches.
+ *
+ * @param channel  MIDI channel (0-15)
+ * @param lsb      Pitch bend LSB (bits 0-6 of 14-bit value)
+ * @param msb      Pitch bend MSB (bits 7-13 of 14-bit value)
+ */
 WEAK_STUB void midi_handle_pitch_bend(uint8_t channel, uint8_t lsb, uint8_t msb)
 {
-    /* TODO: Update pitch bend for channel and channel+4 (dual-layer) */
-    (void)channel;
-    (void)lsb;
-    (void)msb;
+    int16_t bend_value;
+    uint16_t table_offset;
+
+    /* Convert 14-bit MIDI pitch bend to signed value
+     * MIDI pitch bend: 0x0000 = max down, 0x2000 = center, 0x3FFF = max up
+     * Signed result: -8192 to +8191
+     */
+    bend_value = (int16_t)(((uint16_t)msb << 7) | lsb) - 0x2000;
+
+    /* Store in pitch_bend at 0x1194 + channel*2 (little-endian)
+     * The original firmware applies sensitivity scaling here, but we
+     * simplify by storing the raw value. The periodic update or D-RAM
+     * handler can apply scaling when needed.
+     */
+    table_offset = channel * 2;
+    if (table_offset < 32) {  /* Safety check: 16 channels × 2 bytes */
+        g_extmem.pitch_bend[table_offset] = (uint8_t)(bend_value >> 8);     /* High byte */
+        g_extmem.pitch_bend[table_offset + 1] = (uint8_t)(bend_value & 0xFF); /* Low byte */
+    }
+
+    /* Original firmware also updates channel+4 for dual-layer support.
+     * Simplification: We skip the dual-layer update.
+     */
 }
 
 void midi_handle_sysex(uint8_t byte)
