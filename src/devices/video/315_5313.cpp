@@ -2224,7 +2224,7 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 		for (int srcx = 0, xx = 0, dstx = 0; srcx < horz; dstx++)
 		{
 			m_32x_scanline_func(srcx, m_video_renderline[srcx] & 0x20000, lineptr[dstx]);
-			if (++xx >= mul)
+			if (++xx >= 4)
 			{
 				srcx++;
 				xx = 0;
