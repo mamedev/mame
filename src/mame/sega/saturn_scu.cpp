@@ -402,7 +402,7 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 
 	tmp_src = tmp_dst = 0;
 
-	total_size = m_dma[level].size ;
+	total_size = m_dma[level].size;
 	if(m_dma[level].rup == false) tmp_src = m_dma[level].src;
 	if(m_dma[level].wup == false) tmp_dst = m_dma[level].dst;
 
@@ -417,7 +417,9 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 		else
 			m_dma[level].dst_add <<= 1;
 
-		for (i = 0; i < m_dma[level].size;i+=m_dma[level].dst_add)
+		//printf("%d: %08x %08x %d\n", level, m_dma[level].dst, m_dma[level].size, m_dma[level].dst_add);
+
+		for (i = 0; i < m_dma[level].size; i+=m_dma[level].dst_add)
 		{
 			m_hostspace->write_dword(m_dma[level].dst,m_hostspace->read_dword(m_dma[level].src));
 			if(m_dma[level].dst_add == 8)
@@ -439,7 +441,7 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 			dma_single_transfer(m_dma[level].src, m_dma[level].dst, &src_shift);
 
 			if(src_shift)
-				m_dma[level].src+= m_dma[level].src_add ;
+				m_dma[level].src+= m_dma[level].src_add;
 
 			/* if target is Work RAM H, the add value is fixed, behaviour confirmed by Final Romance 2, Virtual Mahjong and Burning Rangers */
 			m_dma[level].dst += ((m_dma[level].dst & 0x07000000) == 0x06000000) ? 2 : m_dma[level].dst_add;

@@ -239,7 +239,8 @@ void _3do_state::green_config(machine_config &config)
 	});
 	// TODO: disregard enable and cmd, those needs to be from xbus
 	m_madam->dma_exp_read_cb().set([this] () {
-		//m_cdrom->enable_w(0);
+		// ... in particular, 3do_fz1j and audio CD player will deselect during a DMA transfer (?)
+		m_cdrom->enable_w(0);
 		m_cdrom->cmd_w(1);
 		u8 res = m_cdrom->read();
 		m_cdrom->cmd_w(0);
