@@ -1,5 +1,9 @@
 # Solton MS4 - Firmware Analysis
 
+**Related documentation:**
+- `WIP_ms4_memory_init.md` - Detailed INTMEM/EXTMEM memory maps, boot sequence, voice init data format
+- `WIP_sam_firmware_port.md` - C port planning, struct definitions, porting task list
+
 ## Hardware
 
 - **CPU**: 80C52 (I80C32 in MAME - ROM-less variant with Timer 2)
@@ -412,9 +416,19 @@ Each channel has 12 bytes of state used by voice_trigger_note:
 
 The MS4 uses a software envelope/LFO engine running on the 80C52, which periodically updates SAM D-RAM parameters. The system has three layers:
 
-1. **Timer 1 ISR** (0xD440): Fires every ~5.5ms, increments tick counter (INTMEM 0x17)
-2. **Main Loop periodic call** (every 2 ticks ≈ 11ms): Calls `periodic_voice_update` (0x9BA7)
+1. **Timer 1 ISR** (0xD440): Fires every ~5.5ms, increments two tick counters:
+   - **INTMEM 0x17 (Bank2 R7)**: Fast tick - triggers periodic_voice_update
+   - **INTMEM 0x16 (Bank2 R6)**: Slow tick - triggers Active Sense timeout
+2. **Main Loop periodic call** (every 2 fast ticks ≈ 11ms): Calls `periodic_voice_update` (0x9BA7)
 3. **CC#7 immediate update**: `envelope_tick_volume` (0xA403) re-evaluates envelopes on volume change
+
+**Timer 1 Configuration:**
+```
+Mode:       Timer 1, Mode 1 (16-bit)
+Reload:     TH1=0xE3, TL1=0x5B (0xE35B = 58203)
+Period:     (65536 - 58203) × 12 / 16MHz = 5.5ms
+ISR:        Switches to Bank 2, reloads timer, increments R6 and R7
+```
 
 ### Main Loop Structure (MAINLOOP at 0xDA30)
 
@@ -426,15 +440,21 @@ Init:
 
 Loop:
   1. Call SERIAL_HANDLER (process one MIDI byte)
-  2. Check INTMEM 0x17 (Timer 1 tick counter)
-  3. If ticks >= 2:
+  2. Check INTMEM 0x17 (Bank2 R7, fast tick counter)
+  3. If fast ticks >= 2:
      a. Call periodic_voice_update (0x9BA7) -- ENVELOPE/LFO TICK
-     b. Decrement loop counter (XRAM 0x1D99)
-     c. If counter reaches 0 (every 25 ticks ≈ 275ms):
-        - Reset counter to 25
-        - Call slow periodic task (0xB6CD)
-     d. Subtract 2 from tick counter
-  4. Loop back to step 1
+     b. Decrement XRAM 0x1D99 (Active Sense TX counter)
+     c. If counter reaches 0:
+        - Reset counter to 0x19 (25)
+        - Send MIDI Active Sense (0xFE)
+     d. Subtract 2 from fast tick counter
+  4. Check INTMEM 0x16 (Bank2 R6, slow tick counter)
+  5. If slow ticks >= 2:
+     a. Reset slow tick counter to 0
+     b. Decrement active_sense_timer (MIDI RX timeout)
+     c. If timeout reached: call midi_panic_all_channels (0xBDBC)
+     d. Increment XRAM 0x1D96, when reaches 100: clear XRAM 0x12CD
+  6. Loop back to step 1
 ```
 
 ### periodic_voice_update (0x9BA7) - The Core Update
@@ -525,9 +545,12 @@ cc_handler_dual_layer (0xC7A3)
 
 ### Key RAM Addresses (Envelope/Modulation)
 
+See `WIP_ms4_memory_init.md` for comprehensive INTMEM/EXTMEM memory maps.
+
 | Address | Purpose |
 |---------|---------|
-| INTMEM 0x17 | Timer 1 tick counter (decremented by main loop) |
+| INTMEM 0x16 | Timer 1 slow tick counter (Bank2 R6, Active Sense timeout) |
+| INTMEM 0x17 | Timer 1 fast tick counter (Bank2 R7, voice update) |
 | INTMEM 0x34 | Current channel being processed |
 | INTMEM 0x38 | Current parameter descriptor |
 | INTMEM 0x3A | Current voice slot ID |

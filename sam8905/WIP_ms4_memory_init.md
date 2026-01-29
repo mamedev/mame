@@ -3,6 +3,10 @@
 Analysis of the Hohner MS4 (ms4_05_r1_0.bin) boot sequence and memory layout,
 traced from the 80C52 reset vector through all initialization routines.
 
+**Related documentation:**
+- `WIP_solton_ms4.md` - General firmware analysis, MIDI handlers, envelope/modulation update system
+- `WIP_sam_firmware_port.md` - C port planning, struct definitions, porting task list
+
 ## Boot Sequence
 
 ```
@@ -206,7 +210,7 @@ different register assignments:
 |---------|----------|-------|
 | 0x08    | R0       | Byte to transmit |
 
-#### Bank 2 (0x10-0x17) - MIDI Parser / CC Dispatch Context
+#### Bank 2 (0x10-0x17) - MIDI Parser / CC Dispatch / Timer Ticks
 
 | Address | Register | Usage |
 |---------|----------|-------|
@@ -214,6 +218,13 @@ different register assignments:
 | 0x11    | R1       | Calculated MIDI channel (base-adjusted) |
 | 0x12    | R2       | First MIDI data byte (note/CC number) |
 | 0x13    | R3       | Second MIDI data byte (velocity/CC value) |
+| 0x16    | R6       | **Slow tick counter** (incremented by Timer 1 ISR) |
+| 0x17    | R7       | **Fast tick counter** (incremented by Timer 1 ISR) |
+
+R6/R7 are incremented by the Timer 1 ISR (CODE:D440) every ~5.5ms. The main loop
+consumes these ticks: R7 triggers `periodic_voice_update()` every 2 ticks (~11ms),
+R6 handles slower periodic tasks like active sense timeout.
+See `WIP_solton_ms4.md` "Envelope and Modulation Update System" for full details.
 
 Used by SERIAL_HANDLER for MIDI message parsing and cc_dispatch for CC
 handler lookup. R1-R3 hold the parsed message components.
@@ -272,7 +283,19 @@ Formula: bit_addr = (byte_addr - 0x20) * 8 + bit_num
 - _2_5: Note trigger pending
 - _2_6: Multi-voice/layer mode active
 
-### Voice System Variables (0x30-0x5F)
+### Copy/Utility Variables (0x2F-0x33)
+
+Used by `program_data_copy` for block copy operations:
+
+| Address | Name                  | Init  | Description |
+|---------|-----------------------|-------|-------------|
+| 0x2F    | copy_count            | -     | Byte count for copy operation |
+| 0x30    | copy_src_lo           | -     | Copy source pointer low byte |
+| 0x31    | copy_src_hi           | -     | Copy source pointer high byte |
+| 0x32    | copy_dst_lo           | -     | Copy destination pointer low byte |
+| 0x33    | copy_dst_hi           | -     | Copy destination pointer high byte |
+
+### Voice System Variables (0x34-0x5F)
 
 | Address | Name                  | Init  | Description |
 |---------|-----------------------|-------|-------------|
@@ -291,13 +314,17 @@ Formula: bit_addr = (byte_addr - 0x20) * 8 + bit_num
 | 0x40    | pitch_bend_value      | -     | Current pitch bend (signed) |
 | 0x41    | rom_data_ptr_lo       | -     | ROM parse pointer low byte |
 | 0x42    | rom_data_ptr_hi       | -     | ROM parse pointer high byte |
+| 0x43    | dram_entry_lo         | -     | D-RAM entry value low byte |
+| 0x44    | dram_entry_hi         | -     | D-RAM entry value high byte |
 | 0x45    | voice_data_ptr_lo     | -     | Voice init data pointer low |
 | 0x46    | voice_data_ptr_hi     | -     | Voice init data pointer high |
 | 0x47    | voice_state_ptr_lo    | -     | Voice state XRAM pointer low |
 | 0x48    | voice_state_ptr_hi    | -     | Voice state XRAM pointer high |
 | 0x49    | voice_state_byte      | -     | Voice state (bit5=active, bits3:0=slot) |
 | 0x4a    | slot_count            | -     | Number of D-RAM slots for voice |
+| 0x4b    | velocity_curve_ptr    | -     | Velocity curve table pointer (CODE space) |
 | 0x4c    | portamento_value      | -     | Portamento rate (CC5 value) |
+| 0x4e    | voice_list_prev       | -     | Previous voice in linked list (voice_free traversal) |
 | 0x4f    | dram_slot_index       | -     | Current D-RAM slot write index |
 | 0x51    | lfsr_state            | -     | Noise LFO LFSR state (x = x*3 + 0x43) |
 | 0x52    | octave_shift          | 0     | Octave transposition counter |
@@ -575,5 +602,8 @@ Bytes read in-place (5 bytes, not copied):
 - [x] Document INTMEM register bank usage (Bank 0-2 calling conventions)
 - [x] Map bit-addressable INTMEM (0x20-0x2F) flag assignments (17 flags in bytes 0x20-0x22)
 - [x] Document additional voice variables (0x47-0x49 voice state, 0x51 LFSR)
-- [ ] Document Timer 1 ISR (0xD440) periodic voice update trigger
+- [x] Name copy/utility variables (0x2F-0x33: copy_count, copy_src/dst pointers)
+- [x] Name D-RAM entry variables (0x43-0x44: dram_entry_lo/hi, 0x4b: velocity_curve_ptr)
+- [x] Name voice list traversal variable (0x4e: voice_list_prev)
+- [x] Document Timer 1 ISR (0xD440) periodic voice update trigger
 - [ ] Complete remaining bit flag analysis (bytes 0x23-0x2F if any used)
