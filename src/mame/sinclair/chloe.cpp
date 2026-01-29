@@ -938,7 +938,8 @@ void chloe_state::chloe(machine_config &config)
 	PALETTE(config, m_palette, FUNC(chloe_state::spectrum_palette), 256);
 	SPECTRUM_ULA_UNCONTENDED(config.replace(), m_ula);
 
-	SCREEN_ULA_PLUS(config, m_ula_scr, 0).set_raster_offset(SCR_256x192.left(), SCR_256x192.top()).set_palette(m_palette->device().tag(), 0x000, 0x000);
+	SCREEN_ULA_PLUS(config, m_ula_scr, 0).set_palette(m_palette->device().tag(), 0x000, 0x000);
+	m_ula_scr->set_raster_offset(SCR_256x192.left(), SCR_256x192.top());
 
 	SPEAKER(config.replace(), "speakers", 2).front();
 

@@ -97,8 +97,7 @@ void vme_tp880v_card_device::device_add_mconfig(machine_config &config)
 
 	// TODO: MC68440 is function and pin compatible with MC68450/HD63450, but
 	// has only two DMA channels instead of four.
-	HD63450(config, m_dma, 10'000'000); // MC68440FN10
-	m_dma->set_cpu_tag(m_ios);
+	HD63450(config, m_dma, 10'000'000, m_ios, AS_PROGRAM); // MC68440FN10
 	m_dma->irq_callback().set_inputline(m_ios, INPUT_LINE_IRQ3);
 	m_dma->dma8_read<0>().set(m_scsi, FUNC(ncr53c90_device::dma_r));
 	m_dma->dma8_write<0>().set(m_scsi, FUNC(ncr53c90_device::dma_w));

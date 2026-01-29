@@ -13,10 +13,11 @@
 #include "machine/z80scc.h"
 #include "machine/z8536.h"
 
-class luna_68k_ioc_device : public device_t {
+class luna_68k_ioc_device : public device_t, public device_memory_interface {
 public:
 	luna_68k_ioc_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock=0);
 
+	template <typename T> void set_main_space_tag(T &&main_tag, int main_space) { m_main_space.set_tag(std::forward<T>(main_tag), main_space); }
 	auto interrupt_cb() { return m_interrupt_cb.bind(); }
 	auto interrupt_scsii_cb() { return m_interrupt_scsii_cb.bind(); }
 	auto interrupt_scsie_cb() { return m_interrupt_scsie_cb.bind(); }
@@ -24,8 +25,6 @@ public:
 	auto interrupt_dma1_cb() { return m_interrupt_dma1_cb.bind(); }
 
 	void vme_map(address_map &map);
-	u16 shared_ram_r(offs_t offset);
-	void shared_ram_w(offs_t offset, u16 data, u16 mem_mask);
 	u8 get_i2m() const { return m_i2m; }
 
 public:
@@ -33,6 +32,7 @@ public:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual space_config_vector memory_space_config() const override;
 
 private:
 	required_device<m68000_device> m_cpu;
@@ -44,22 +44,38 @@ private:
 	required_device<z8536_device> m_cio;
 	required_shared_ptr<u16> m_ram;
 	memory_view m_boot;
+	required_address_space m_main_space;
 	devcb_write_line m_interrupt_cb;
 	devcb_write_line m_interrupt_scsii_cb;
 	devcb_write_line m_interrupt_scsie_cb;
 	devcb_write_line m_interrupt_dma0_cb;
 	devcb_write_line m_interrupt_dma1_cb;
+	devcb_read8 m_scsi0_dma_read;
+	devcb_write8 m_scsi0_dma_write;
+	address_space_config m_dma_config;
 
+	u32 m_packed_data;
+	u32 m_packed_index;
 	u8 m_m2i;
 	u8 m_i2m;
 	u16 m_direction;
 	int m_interrupt_hack;
+	bool m_scsi_drq0;
 
 	void cpu_map(address_map &map) ATTR_COLD;
 	void cpuspace_map(address_map &map) ATTR_COLD;
 
 	void direction_w(u16 data);
 	u16 direction_r();
+	void dma_w(offs_t offset, u8);
+	u8 dma_r(offs_t offset);
+
+	u16 shared_ram_r(offs_t offset);
+	void shared_ram_w(offs_t offset, u16 data, u16 mem_mask);
+
+	void scsi_drq0_w(int state);
+	void scsi_drq1_w(int state);
+
 	void m2i_w(u32 data);
 	u8 m2i_r();
 	void m2i_int_clear(u8 data);

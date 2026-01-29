@@ -11,10 +11,10 @@ class specnext_lores_device : public device_t, public device_gfx_interface
 public:
 	specnext_lores_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	specnext_lores_device &set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h; m_offset_v = offset_v; return *this; }
 	specnext_lores_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; return *this; }
 	specnext_lores_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
 
+	void set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h; m_offset_v = offset_v; }
 	void set_global_transparent(u8 global_transparent) { m_global_transparent = global_transparent; }
 	void lores_palette_select_w(bool lores_palette_select) { m_lores_palette_select = lores_palette_select; }
 

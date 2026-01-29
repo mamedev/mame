@@ -12,15 +12,14 @@ class hd63450_device : public device_t
 {
 public:
 	template <typename T>
-	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cputag)
+	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&dma_tag, int dma_space)
 		: hd63450_device(mconfig, tag, owner, clock)
 	{
-		set_cpu_tag(std::forward<T>(cputag));
+		set_dma_space_tag(std::forward<T>(dma_tag), dma_space);
 	}
 
 	hd63450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_luna_mode(bool active) { m_luna_mode = active; }
 	auto irq_callback() { return m_irq_callback.bind(); }
 	auto dma_end() { return m_dma_end.bind(); }
 	auto own() { return m_own.bind(); }
@@ -31,7 +30,7 @@ public:
 	template <int Ch> auto dma32_read() { return m_dma32_read[Ch].bind(); }
 	template <int Ch> auto dma32_write() { return m_dma32_write[Ch].bind(); }
 
-	template <typename T> void set_cpu_tag(T &&cpu_tag) { m_cpu.set_tag(std::forward<T>(cpu_tag)); }
+	template <typename T> void set_dma_space_tag(T &&dma_tag, int dma_space) { m_dma_space.set_tag(std::forward<T>(dma_tag), dma_space); }
 	void set_clocks(const attotime &clk1, const attotime &clk2, const attotime &clk3, const attotime &clk4)
 	{
 		m_our_clock[0] = clk1;
@@ -101,6 +100,7 @@ private:
 		uint8_t gcr;  // [3f]  General Control Register (R/W)
 	};
 
+	required_address_space m_dma_space;
 	devcb_write_line m_irq_callback;
 	devcb_write8 m_dma_end;
 	devcb_write_line m_own;
@@ -111,18 +111,16 @@ private:
 	devcb_read32::array<4> m_dma32_read;
 	devcb_write32::array<4> m_dma32_write;
 
-	bool m_luna_mode;
+	cpu_device *m_cpu;
 
 	attotime m_our_clock[4];
 	attotime m_burst_clock[4];
 
 	// internal state
 	hd63450_regs m_reg[4];
-	uint32_t m_packed_value[4], m_packed_index[4];
 	emu_timer* m_timer[4];  // for timing data reading/writing each channel
 	uint16_t m_transfer_size[4];
 	bool m_halted[4];  // non-zero if a channel has been halted, and can be continued later.
-	required_device<cpu_device> m_cpu;
 	bool m_drq_state[4];
 	int8_t m_irq_channel;
 	uint8_t m_bec;

@@ -22238,7 +22238,8 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		</part>
 	</software>
 
-	<software name="metroid0">
+	<!-- "Original Metroid" game mode (NES Metroid emulated) has severe graphics issues. -->
+	<software name="metroid0" supported="partial">
 		<description>Metroid - Zero Mission (Europe)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
@@ -22254,7 +22255,7 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		</part>
 	</software>
 
-	<software name="metroid0p" cloneof="metroid0">
+	<software name="metroid0p" cloneof="metroid0" supported="partial">
 		<description>Metroid - Zero Mission (Europe, prototype)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
@@ -22266,7 +22267,7 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		</part>
 	</software>
 
-	<software name="metroid0j" cloneof="metroid0">
+	<software name="metroid0j" cloneof="metroid0" supported="partial">
 		<description>Metroid - Zero Mission (Japan)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
@@ -22281,7 +22282,7 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		</part>
 	</software>
 
-	<software name="metroid0u" cloneof="metroid0">
+	<software name="metroid0u" cloneof="metroid0" supported="partial">
 		<description>Metroid - Zero Mission (USA)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
@@ -22300,7 +22301,7 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		</part>
 	</software>
 
-	<software name="metroid0up" cloneof="metroid0">
+	<software name="metroid0up" cloneof="metroid0" supported="partial">
 		<description>Metroid - Zero Mission (USA, prototype)</description>
 		<year>2004</year>
 		<publisher>Nintendo</publisher>
