@@ -2394,27 +2394,27 @@ ROM_END
 ***************************************************************************/
 
 // Sigma Medal Games
-GAME( 1997, dodghero, 0,        dodghero, sigma_1b, sigmab98_state, empty_init,    ROT0, "Sigma",             "Minna Atsumare! Dodge Hero",           0 )
-GAME( 1997, sushimar, 0,        dodghero, sigma_3b, sigmab98_state, empty_init,    ROT0, "Sigma",             "Itazura Daisuki! Sushimaru Kun",       0 )
-GAME( 1997, gegege,   0,        sigmab98, sigma_1b, sigmab98_state, init_gegege,   ROT0, "Sigma / Banpresto", "GeGeGe no Kitarou Youkai Slot",        0 )
-GAME( 1997, b3rinsya, 0,        sigmab98, sigma_5b, sigmab98_state, init_b3rinsya, ROT0, "Sigma",             "Burning Sanrinsya - Burning Tricycle", 0 ) // 1997 in the rom
-GAME( 1997, pepsiman, 0,        sigmab98, sigma_3b, sigmab98_state, init_pepsiman, ROT0, "Sigma",             "PEPSI Man",                            0 )
-GAME( 1998, tbeastw2, 0,        sigmab98, sigma_3b, sigmab98_state, init_tbeastw2, ROT0, "Sigma / Transformer Production Company / Takara", "Transformers Beast Wars II", 0 ) // 1997 in the rom
-GAME( 1997, ucytokyu, 0,        sigmab98, sigma_js, sigmab98_state, init_ucytokyu, ROT0, "Sigma",             "Uchuu Tokkyuu Medalian",               0 ) // Banpresto + others in the ROM
-GAME( 2000, dashhero, 0,        sigmab98, sigma_1b, sigmab98_state, init_dashhero, ROT0, "Sigma",             "Minna Ganbare! Dash Hero",             MACHINE_NOT_WORKING ) // 1999 in the rom
+GAME( 1997, dodghero, 0,        dodghero, sigma_1b, sigmab98_state, empty_init,    ROT0, "Sigma",                                                          "Minna Atsumare! Dodge Hero",           MACHINE_IMPERFECT_SOUND )
+GAME( 1997, sushimar, 0,        dodghero, sigma_3b, sigmab98_state, empty_init,    ROT0, "Sigma",                                                          "Itazura Daisuki! Sushimaru Kun",       0 )
+GAME( 1997, gegege,   0,        sigmab98, sigma_1b, sigmab98_state, init_gegege,   ROT0, "Sigma / Banpresto",                                              "GeGeGe no Kitarou Youkai Slot",        0 )
+GAME( 1997, b3rinsya, 0,        sigmab98, sigma_5b, sigmab98_state, init_b3rinsya, ROT0, "Sigma",                                                          "Burning Sanrinsya - Burning Tricycle", 0 ) // 1997 in the ROM
+GAME( 1997, pepsiman, 0,        sigmab98, sigma_3b, sigmab98_state, init_pepsiman, ROT0, "Sigma",                                                          "PEPSI Man",                            0 )
+GAME( 1998, tbeastw2, 0,        sigmab98, sigma_3b, sigmab98_state, init_tbeastw2, ROT0, "Sigma / Transformer Production Company / Takara",                "Transformers Beast Wars II",           0 ) // 1997 in the ROM
+GAME( 1997, ucytokyu, 0,        sigmab98, sigma_js, sigmab98_state, init_ucytokyu, ROT0, "Sigma",                                                          "Uchuu Tokkyuu Medalian",               0 ) // Banpresto + others in the ROM
+GAME( 2000, dashhero, 0,        sigmab98, sigma_1b, sigmab98_state, init_dashhero, ROT0, "Sigma",                                                          "Minna Ganbare! Dash Hero",             MACHINE_NOT_WORKING ) // 1999 in the ROM
 // Banpresto Medal Games
 GAME( 2001, lufykzku, 0,        lufykzku, lufykzku, lufykzku_state, init_lufykzku, ROT0, "Banpresto / Eiichiro Oda / Shueisha - Fuji TV - Toho Animation", "Otakara Itadaki Luffy Kaizoku-Dan! (Japan, v1.02)", 0 )
-GAME( 2002, mnrockman,0,        rockman,  lufykzku, lufykzku_state, init_rockman,  ROT0, "Banpresto / Capcom / Shogakukan / ShoPro / TV Tokyo", "Medal Network: Rockman EXE", 0 )
+GAME( 2002, mnrockman,0,        rockman,  lufykzku, lufykzku_state, init_rockman,  ROT0, "Banpresto / Capcom / Shogakukan / ShoPro / TV Tokyo",            "Medal Network: Rockman EXE",                        0 )
 // Sammy Medal Games:
-GAME( 1999, sammymdl, 0,        sammymdl, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Sammy Medal Game System BIOS",         MACHINE_IS_BIOS_ROOT )
-GAME( 1999, kingyosu, sammymdl, itazuram, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Dokidoki Kingyo Sukui",                0 )
-GAME( 1999, shatekds, sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Shatekids",                            0 )
-GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Animal Catch",                         0 )
-GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sammymdl_state, init_itazuram, ROT0, "Sammy",             "Itazura Monkey",                       0 )
-GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Pye-nage Taikai",                      0 )
-GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Taihou de Doboon",                     0 )
-GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Hae Hae Ka Ka Ka",                     0 )
-GAME( 2001, kotekita, sammymdl, haekaka,  sammymdl, sammymdl_state, init_haekaka,  ROT0, "Sammy",             "Kotekitai Slot",                       0 )
-GAME( 2002, gunkids,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Hayauchi Gun Kids",                    0 )
-GAME( 2003, wantouch, sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",             "Wantouchable",                         0 )
-GAME( 2003, gocowboy, 0,        gocowboy, gocowboy, sammymdl_state, empty_init,    ROT0, "Sammy",             "Go Go Cowboy (English, prize)",        0 )
+GAME( 1999, sammymdl, 0,        sammymdl, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",                                                          "Sammy Medal Game System BIOS",  MACHINE_IS_BIOS_ROOT )
+GAME( 1999, kingyosu, sammymdl, itazuram, sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",                                                          "Dokidoki Kingyo Sukui",         0 )
+GAME( 1999, shatekds, sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",                                                          "Shatekids",                     0 )
+GAME( 2000, animalc,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",                                                          "Animal Catch",                  0 )
+GAME( 2000, itazuram, sammymdl, itazuram, sammymdl, sammymdl_state, init_itazuram, ROT0, "Sammy",                                                          "Itazura Monkey",                0 )
+GAME( 2000, pyenaget, sammymdl, pyenaget, sammymdl, sammymdl_state, init_haekaka,  ROT0, "Sammy",                                                          "Pye-nage Taikai",               0 )
+GAME( 2000, tdoboon,  sammymdl, tdoboon,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",                                                          "Taihou de Doboon",              0 )
+GAME( 2001, haekaka,  sammymdl, haekaka,  haekaka,  sammymdl_state, init_haekaka,  ROT0, "Sammy",                                                          "Hae Hae Ka Ka Ka",              0 )
+GAME( 2001, kotekita, sammymdl, haekaka,  sammymdl, sammymdl_state, init_haekaka,  ROT0, "Sammy",                                                          "Kotekitai Slot",                0 )
+GAME( 2002, gunkids,  sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",                                                          "Hayauchi Gun Kids",             0 )
+GAME( 2003, wantouch, sammymdl, animalc,  sammymdl, sammymdl_state, init_animalc,  ROT0, "Sammy",                                                          "Wantouchable",                  0 )
+GAME( 2003, gocowboy, 0,        gocowboy, gocowboy, sammymdl_state, empty_init,    ROT0, "Sammy",                                                          "Go Go Cowboy (English, prize)", 0 )
