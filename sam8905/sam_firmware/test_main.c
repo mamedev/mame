@@ -1736,6 +1736,136 @@ static int test_modulation_write_dram(void)
 }
 
 /*============================================================================
+ * Package D: Portamento Tests
+ *============================================================================*/
+
+static int test_portamento_update(void)
+{
+    printf("=== Test: portamento_update ===\n");
+
+    /* Initialize state */
+    memset(&g_intmem, 0x00, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0x00, sizeof(g_intmem_upper));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+
+    /* Setup: voice page 0, slot base 0x10 */
+    g_intmem.voice_page_num = 0;
+    g_intmem.voice_slot_base = 0x10;
+    g_intmem.dram_address_counter = 0x05;
+    g_intmem.sam_ctrl_flags = 0x40;
+
+    /* Test 1: Glide UP - current < target
+     * Current = 0x010000, Target = 0x020000, Rate = 0x10
+     * Should increase current pitch
+     */
+    /* Target pitch at slot+1,2,3 */
+    voice_page_write(0, 0x10 + 1, 0x00);   /* target_lo */
+    voice_page_write(0, 0x10 + 2, 0x00);   /* target_mid */
+    voice_page_write(0, 0x10 + 3, 0x02);   /* target_hi */
+
+    /* Current pitch at slot+9,10,11 */
+    voice_page_write(0, 0x10 + 9, 0x00);   /* current_lo */
+    voice_page_write(0, 0x10 + 10, 0x00);  /* current_mid */
+    voice_page_write(0, 0x10 + 11, 0x01);  /* current_hi */
+
+    /* Rate at slot+12 */
+    voice_page_write(0, 0x10 + 12, 0x10);  /* rate */
+
+    /* Portamento flag at slot+4 */
+    voice_page_write(0, 0x10 + 4, 0x80);   /* bit7 = active */
+
+    sam_hw_reset_trace();
+    dram_slot_portamento_update();
+
+    /* Check that current pitch increased */
+    uint8_t new_lo = voice_page_read(0, 0x10 + 9);
+    uint8_t new_mid = voice_page_read(0, 0x10 + 10);
+    uint8_t new_hi = voice_page_read(0, 0x10 + 11);
+    uint32_t new_pitch = ((uint32_t)new_hi << 16) | ((uint32_t)new_mid << 8) | new_lo;
+
+    if (new_pitch <= 0x010000) {
+        printf("FAIL: glide UP - pitch didn't increase (0x%06X)\n", new_pitch);
+        return 1;
+    }
+    if (new_pitch > 0x020000) {
+        printf("FAIL: glide UP - pitch overshot target (0x%06X)\n", new_pitch);
+        return 1;
+    }
+
+    /* Verify SAM was written to */
+    if (g_sam_write_count < 4) {
+        printf("FAIL: expected SAM writes (got %d)\n", g_sam_write_count);
+        return 1;
+    }
+
+    /* Test 2: Glide DOWN - current > target
+     * Current = 0x020000, Target = 0x010000, Rate = 0x10
+     */
+    voice_page_write(0, 0x10 + 1, 0x00);
+    voice_page_write(0, 0x10 + 2, 0x00);
+    voice_page_write(0, 0x10 + 3, 0x01);   /* target = 0x010000 */
+
+    voice_page_write(0, 0x10 + 9, 0x00);
+    voice_page_write(0, 0x10 + 10, 0x00);
+    voice_page_write(0, 0x10 + 11, 0x02);  /* current = 0x020000 */
+
+    voice_page_write(0, 0x10 + 4, 0x80);   /* active */
+
+    dram_slot_portamento_update();
+
+    new_hi = voice_page_read(0, 0x10 + 11);
+    new_mid = voice_page_read(0, 0x10 + 10);
+    new_lo = voice_page_read(0, 0x10 + 9);
+    new_pitch = ((uint32_t)new_hi << 16) | ((uint32_t)new_mid << 8) | new_lo;
+
+    if (new_pitch >= 0x020000) {
+        printf("FAIL: glide DOWN - pitch didn't decrease (0x%06X)\n", new_pitch);
+        return 1;
+    }
+    if (new_pitch < 0x010000) {
+        printf("FAIL: glide DOWN - pitch overshot target (0x%06X)\n", new_pitch);
+        return 1;
+    }
+
+    /* Test 3: Arrival at target - should clear portamento flag
+     * Set current very close to target
+     */
+    voice_page_write(0, 0x10 + 1, 0x00);
+    voice_page_write(0, 0x10 + 2, 0x00);
+    voice_page_write(0, 0x10 + 3, 0x01);   /* target = 0x010000 */
+
+    voice_page_write(0, 0x10 + 9, 0x05);
+    voice_page_write(0, 0x10 + 10, 0x00);
+    voice_page_write(0, 0x10 + 11, 0x01);  /* current = 0x010005 (very close) */
+
+    voice_page_write(0, 0x10 + 12, 0x10);  /* rate */
+    voice_page_write(0, 0x10 + 4, 0x80);   /* active */
+
+    dram_slot_portamento_update();
+
+    /* Check portamento flag was cleared */
+    uint8_t flags = voice_page_read(0, 0x10 + 4);
+    if (flags & 0x80) {
+        printf("FAIL: portamento flag should be cleared on arrival\n");
+        return 1;
+    }
+
+    /* Pitch should be at or very near target */
+    new_hi = voice_page_read(0, 0x10 + 11);
+    new_mid = voice_page_read(0, 0x10 + 10);
+    new_lo = voice_page_read(0, 0x10 + 9);
+    new_pitch = ((uint32_t)new_hi << 16) | ((uint32_t)new_mid << 8) | new_lo;
+
+    if (new_pitch != 0x010000) {
+        printf("FAIL: on arrival, pitch should equal target (got 0x%06X)\n", new_pitch);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+/*============================================================================
  * Main
  *============================================================================*/
 
@@ -1786,6 +1916,9 @@ int main(void)
     /* Package C: Modulation D-RAM Tests */
     failures += test_multiply_16x24();
     failures += test_modulation_write_dram();
+
+    /* Package D: Portamento Tests */
+    failures += test_portamento_update();
 
     printf("=================================\n");
     if (failures == 0) {

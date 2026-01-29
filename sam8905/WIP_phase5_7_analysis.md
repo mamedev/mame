@@ -356,7 +356,7 @@ portamento. Package E would add proper volume envelopes.
 | A: Math | ✅ COMPLETE | test_signed_multiply_sat, test_signed_multiply_chain | In sam_math.h |
 | B: LFO | ✅ COMPLETE | test_sine_table, test_global_mod_lfo_update, test_noise_lfsr | In sam_lfo.c/h |
 | C: Pitch Mod | ✅ COMPLETE | test_multiply_16x24, test_modulation_write_dram | multiply_16x24 in sam_math.h, modulation_write_dram in sam_dram_config.c |
-| D: Portamento | ⏳ PENDING | | dram_slot_portamento_update (A33E) |
+| D: Portamento | ✅ COMPLETE | test_portamento_update | dram_slot_portamento_update in sam_dram_config.c |
 | E: Amplitude | ⏳ PENDING | | dram_slot_apply_mod_depth, dram_slot_amplitude_update |
 | F: Voice Init | ⏳ PENDING | | voice_init_copy_and_envelope, voice_init_next_slot refactor |
 | G: Orchestrator | ⏳ PENDING | | periodic_voice_update final assembly |

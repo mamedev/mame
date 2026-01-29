@@ -209,6 +209,33 @@ uint8_t dram_config_apply_velocity(uint8_t value, uint8_t sensitivity);
  */
 void modulation_write_dram(int8_t mod_lo, int8_t mod_hi, uint8_t dispatch);
 
+/**
+ * Portamento (pitch glide) update for D-RAM slot (CODE:A33E)
+ *
+ * Called during periodic voice update when portamento is active.
+ * Smoothly glides current pitch toward target pitch at configured rate.
+ *
+ * Voice slot layout (16 bytes at voice_slot_base):
+ *   [0]:    dispatch byte (type identifier)
+ *   [1-3]:  base/target pitch (lo, mid, hi & 0x07)
+ *   [4]:    portamento flags (bit7 = active)
+ *   [5]:    rate divisor
+ *   [6]:    depth/unused
+ *   [7]:    last direction (0x01 or 0xFF for change detection)
+ *   [8]:    unused
+ *   [9-11]: current pitch (lo, mid, hi)
+ *   [12]:   rate multiplier (step = delta * rate)
+ *   [13]:   sign/direction tracking
+ *
+ * Algorithm:
+ *   1. delta = current - target (signed 24-bit)
+ *   2. step = |delta| * rate, minimum = rate
+ *   3. new_pitch = target + signed_step (approaches target)
+ *   4. If overshoot: clamp to target, clear portamento flag
+ *   5. Write to SAM D-RAM
+ */
+void dram_slot_portamento_update(void);
+
 /*============================================================================
  * Test Support
  *============================================================================*/

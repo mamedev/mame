@@ -620,3 +620,148 @@ void modulation_write_dram(int8_t mod_lo, int8_t mod_hi, uint8_t dispatch)
     /* Suppress unused parameter warning */
     (void)dispatch;
 }
+
+/*============================================================================
+ * Portamento (Pitch Glide) Update (CODE:A33E)
+ *
+ * Smoothly glides current pitch toward target pitch.
+ * Called from periodic_voice_update when portamento is active.
+ *
+ * The algorithm computes a proportional step size:
+ *   step = |delta| * rate
+ * This means larger pitch distances result in larger steps (faster glide).
+ * A minimum step of 'rate' is enforced when delta×rate rounds to zero.
+ *============================================================================*/
+
+void dram_slot_portamento_update(void)
+{
+    uint8_t page = g_intmem.voice_page_num;
+    uint8_t slot_base = g_intmem.voice_slot_base;
+
+    /* Read target pitch (where we're gliding TO) from slot+1,2,3 */
+    uint8_t target_lo = voice_page_read(page, slot_base + 1);
+    uint8_t target_mid = voice_page_read(page, slot_base + 2);
+    uint8_t target_hi = voice_page_read(page, slot_base + 3) & 0x07;
+
+    /* Read current pitch (where we ARE) from slot+9,10,11 */
+    uint8_t current_lo = voice_page_read(page, slot_base + 9);
+    uint8_t current_mid = voice_page_read(page, slot_base + 10);
+    uint8_t current_hi = voice_page_read(page, slot_base + 11) & 0x07;
+
+    /* Read rate multiplier from slot+12 */
+    uint8_t rate = voice_page_read(page, slot_base + 12);
+
+    /* Compute delta = current - target (signed 24-bit) */
+    int32_t current_pitch = ((int32_t)current_hi << 16) |
+                            ((int32_t)current_mid << 8) |
+                            current_lo;
+    int32_t target_pitch = ((int32_t)target_hi << 16) |
+                           ((int32_t)target_mid << 8) |
+                           target_lo;
+
+    int32_t delta = current_pitch - target_pitch;
+    uint8_t negative = (delta < 0) ? 1 : 0;
+
+    /* Take absolute value of delta */
+    uint32_t abs_delta;
+    if (negative) {
+        abs_delta = (uint32_t)(-delta);
+    } else {
+        abs_delta = (uint32_t)delta;
+    }
+
+    /*
+     * Compute step = (abs_delta * rate) >> 16
+     * Using 8×8 multiplies to match firmware behavior.
+     *
+     * abs_delta is 19-bit max, rate is 8-bit
+     * We multiply mid:hi portion by rate (ignoring low byte for speed)
+     */
+    uint8_t delta_mid = (uint8_t)((abs_delta >> 8) & 0xFF);
+    uint8_t delta_hi = (uint8_t)((abs_delta >> 16) & 0x07);
+
+    uint16_t p1 = (uint16_t)rate * delta_mid;
+    uint16_t p2 = (uint16_t)rate * delta_hi;
+
+    /* Combine: step = (p1 >> 8) + p2 (approximately) */
+    uint32_t step = (p1 >> 8) + p2;
+
+    /* Low byte contribution for more precision */
+    uint8_t delta_lo = (uint8_t)(abs_delta & 0xFF);
+    uint16_t p0 = (uint16_t)rate * delta_lo;
+    step = ((uint32_t)(p0 >> 8) + p1 + ((uint32_t)p2 << 8)) >> 8;
+
+    /* If step is zero, use rate as minimum step */
+    if (step == 0) {
+        step = rate;
+    }
+
+    /* Re-apply sign: if current > target, step should be negative */
+    int32_t signed_step;
+    if (negative) {
+        /* Current < target, need to increase (positive step) */
+        signed_step = (int32_t)step;
+    } else {
+        /* Current > target, need to decrease (negative step) */
+        signed_step = -(int32_t)step;
+    }
+
+    /* Compute new pitch = current + signed_step (moving toward target) */
+    int32_t new_pitch = current_pitch + signed_step;
+
+    /* Check for overshoot:
+     * If we were below target (negative delta) and now above, clamp.
+     * If we were above target (positive delta) and now below, clamp.
+     */
+    int32_t new_delta = new_pitch - target_pitch;
+    uint8_t overshot = 0;
+
+    if (negative && new_delta >= 0) {
+        /* Was below target, now at or above - overshot */
+        overshot = 1;
+    } else if (!negative && new_delta <= 0) {
+        /* Was above target, now at or below - overshot */
+        overshot = 1;
+    }
+
+    if (overshot) {
+        /* Clamp to target and clear portamento flag */
+        new_pitch = target_pitch;
+
+        /* Clear portamento active flag (bit 7 of slot+4) */
+        uint8_t flags = voice_page_read(page, slot_base + 4);
+        voice_page_write(page, slot_base + 4, flags & 0x7F);
+    }
+
+    /* Clamp to valid 19-bit range */
+    if (new_pitch < 0) {
+        new_pitch = 0;
+    } else if (new_pitch > 0x7FFFF) {
+        new_pitch = 0x7FFFF;
+    }
+
+    /* Extract bytes */
+    uint8_t new_lo = (uint8_t)(new_pitch & 0xFF);
+    uint8_t new_mid = (uint8_t)((new_pitch >> 8) & 0xFF);
+    uint8_t new_hi = (uint8_t)((new_pitch >> 16) & 0x07);
+
+    /* Store new current pitch back to slot+9,10,11 */
+    voice_page_write(page, slot_base + 9, new_lo);
+    voice_page_write(page, slot_base + 10, new_mid);
+    voice_page_write(page, slot_base + 11, new_hi);
+
+    /* Update slot+3 high bits (preserve flags in bits 7:3) */
+    uint8_t slot3 = voice_page_read(page, slot_base + 3);
+    voice_page_write(page, slot_base + 3, (slot3 & 0xF8) | new_hi);
+
+    /* Write to SAM D-RAM */
+    sam_write_reg(SAM_REG_ADDR_DATA, g_intmem.dram_address_counter);
+    sam_write_reg(SAM_REG_DATA1, new_lo);
+    sam_write_reg(SAM_REG_DATA2, new_mid);
+    sam_write_reg(SAM_REG_DATA3, new_hi);
+    sam_write_reg(SAM_REG_CTRL, g_intmem.sam_ctrl_flags);
+
+    /* Update direction indicator at slot+7 (for change detection) */
+    uint8_t direction = (new_hi == 0 && new_mid == 0) ? 0x01 : 0xFF;
+    voice_page_write(page, slot_base + 7, direction);
+}
