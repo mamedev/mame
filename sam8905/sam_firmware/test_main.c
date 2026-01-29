@@ -1866,6 +1866,121 @@ static int test_portamento_update(void)
 }
 
 /*============================================================================
+ * Package E: Amplitude/Envelope Tests
+ *============================================================================*/
+
+static int test_apply_mod_depth(void)
+{
+    printf("=== Test: apply_mod_depth ===\n");
+
+    /* Initialize state */
+    memset(&g_intmem, 0x00, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0x00, sizeof(g_intmem_upper));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+
+    /* Setup: voice page 0, slot base 0x20 */
+    g_intmem.voice_page_num = 0;
+    g_intmem.voice_slot_base = 0x20;
+    g_intmem.midi_velocity = 0x60;  /* Mid velocity */
+
+    /* Test 1: Zero sensitivity = pass through */
+    voice_page_write(0, 0x20 + 6, 0x00);  /* sensitivity = 0 */
+
+    uint8_t result = dram_slot_apply_mod_depth(0x55);
+    if (result != 0x55) {
+        printf("FAIL: zero sensitivity should pass through (got 0x%02X)\n", result);
+        return 1;
+    }
+
+    /* Test 2: Non-zero sensitivity applies scaling */
+    voice_page_write(0, 0x20 + 6, 0x40);  /* sensitivity = 64 */
+    voice_page_write(0, 0x20 + 4, 0xFF);  /* flags with bit5 set */
+
+    result = dram_slot_apply_mod_depth(0x7F);
+
+    /* Check that slot[0] was written with masked value */
+    uint8_t slot0 = voice_page_read(0, 0x20);
+    if (slot0 != 0x7F) {
+        printf("FAIL: slot[0] should be 0x7F (got 0x%02X)\n", slot0);
+        return 1;
+    }
+
+    /* Check that bit5 of slot+4 was cleared */
+    uint8_t flags = voice_page_read(0, 0x20 + 4);
+    if (flags & 0x20) {
+        printf("FAIL: bit5 of slot+4 should be cleared\n");
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_amplitude_update(void)
+{
+    printf("=== Test: amplitude_update ===\n");
+
+    /* Initialize state */
+    memset(&g_intmem, 0x00, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0x00, sizeof(g_intmem_upper));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+
+    /* Setup: voice page 0, slot base 0x30 */
+    g_intmem.voice_page_num = 0;
+    g_intmem.voice_slot_base = 0x30;
+    g_intmem.dram_address_counter = 0x08;
+    g_intmem.sam_ctrl_flags = 0x40;
+    g_intmem.midi_velocity = 0x7F;
+
+    /* Setup slot data */
+    voice_page_write(0, 0x30 + 0, 0x10);  /* type = amplitude */
+    voice_page_write(0, 0x30 + 1, 0x20);  /* base level */
+    voice_page_write(0, 0x30 + 2, 0x00);  /* envelope block index */
+    voice_page_write(0, 0x30 + 3, 0x00);  /* flags (no skip) */
+    voice_page_write(0, 0x30 + 4, 0x00);  /* env ctrl (no envelope) */
+    voice_page_write(0, 0x30 + 6, 0x00);  /* mod sensitivity = 0 */
+
+    /* Test 1: Simple amplitude write (no envelope) */
+    sam_hw_reset_trace();
+    dram_slot_amplitude_update(0x7F, 0x00);
+
+    /* Should write to SAM */
+    if (g_sam_write_count < 4) {
+        printf("FAIL: expected SAM writes (got %d)\n", g_sam_write_count);
+        return 1;
+    }
+
+    /* Test 2: With envelope control enabled */
+    voice_page_write(0, 0x30 + 4, 0x08);  /* bit3 = envelope gate */
+    voice_page_write(0, 0x30 + 8, 0x80);  /* atten_lo */
+    voice_page_write(0, 0x30 + 9, 0x40);  /* atten_hi */
+
+    sam_hw_reset_trace();
+    dram_slot_amplitude_update(0x60, 0x00);
+
+    /* Should write scaled amplitude */
+    if (g_sam_write_count < 4) {
+        printf("FAIL: envelope path should write SAM (got %d)\n", g_sam_write_count);
+        return 1;
+    }
+
+    /* Test 3: Skip flag set (bit4 of slot+3) */
+    voice_page_write(0, 0x30 + 3, 0x10);  /* bit4 = skip */
+
+    sam_hw_reset_trace();
+    dram_slot_amplitude_update(0x7F, 0x00);
+
+    /* Should NOT write to SAM (early exit) */
+    if (g_sam_write_count != 0) {
+        printf("FAIL: skip flag should prevent SAM writes (got %d)\n", g_sam_write_count);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+/*============================================================================
  * Main
  *============================================================================*/
 
@@ -1919,6 +2034,10 @@ int main(void)
 
     /* Package D: Portamento Tests */
     failures += test_portamento_update();
+
+    /* Package E: Amplitude/Envelope Tests */
+    failures += test_apply_mod_depth();
+    failures += test_amplitude_update();
 
     printf("=================================\n");
     if (failures == 0) {

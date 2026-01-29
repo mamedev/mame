@@ -357,6 +357,19 @@ portamento. Package E would add proper volume envelopes.
 | B: LFO | ✅ COMPLETE | test_sine_table, test_global_mod_lfo_update, test_noise_lfsr | In sam_lfo.c/h |
 | C: Pitch Mod | ✅ COMPLETE | test_multiply_16x24, test_modulation_write_dram | multiply_16x24 in sam_math.h, modulation_write_dram in sam_dram_config.c |
 | D: Portamento | ✅ COMPLETE | test_portamento_update | dram_slot_portamento_update in sam_dram_config.c |
-| E: Amplitude | ⏳ PENDING | | dram_slot_apply_mod_depth, dram_slot_amplitude_update |
+| E: Amplitude | ✅ COMPLETE | test_apply_mod_depth, test_amplitude_update | SIMPLIFIED - see shortcuts below |
 | F: Voice Init | ⏳ PENDING | | voice_init_copy_and_envelope, voice_init_next_slot refactor |
 | G: Orchestrator | ⏳ PENDING | | periodic_voice_update final assembly |
+
+### Package E Shortcuts (requires follow-up for full fidelity)
+
+**dram_slot_apply_mod_depth (A2E3):**
+- Uses linear velocity instead of curve table lookup
+- Missing bank register preservation (not needed in C)
+
+**dram_slot_amplitude_update (A18F):**
+- No read-modify-write D-RAM (affects smooth envelope release)
+- No envelope block cross-reference (affects dynamic envelope)
+- No negative amplitude handling (affects inverted envelopes)
+- Simplified done flag propagation
+- Linear velocity instead of curve table

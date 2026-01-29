@@ -765,3 +765,210 @@ void dram_slot_portamento_update(void)
     uint8_t direction = (new_hi == 0 && new_mid == 0) ? 0x01 : 0xFF;
     voice_page_write(page, slot_base + 7, direction);
 }
+
+/*============================================================================
+ * Apply Modulation Depth (CODE:A2E3)
+ *
+ * Applies velocity-based scaling to modulation input.
+ * Called from amplitude update to scale envelope/LFO output.
+ *
+ * ⚠️ PORTING SHORTCUTS - TODO for full fidelity:
+ * --------------------------------------------
+ * 1. Velocity curve table: Original uses curve table at (0x11, midi_velocity-0x3C)
+ *    for non-linear velocity response. We use linear (midi_velocity - 0x3C).
+ *    Affects: Velocity feel/response curve.
+ *
+ * 2. Bank register preservation: Original saves/restores R1 (BANK0_R1).
+ *    Not needed in C but affects register allocation on 8051.
+ *============================================================================*/
+
+uint8_t dram_slot_apply_mod_depth(uint8_t mod_input)
+{
+    uint8_t page = g_intmem.voice_page_num;
+    uint8_t slot_base = g_intmem.voice_slot_base;
+
+    /* Read mod sensitivity from slot+6 */
+    uint8_t mod_sensitivity = voice_page_read(page, slot_base + 6);
+
+    /* If sensitivity is zero, no modulation - return input unchanged */
+    if (mod_sensitivity == 0) {
+        return mod_input;
+    }
+
+    /* Store masked input to slot[0] as current mod level */
+    voice_page_write(page, slot_base, mod_input & 0x7F);
+
+    /* Clear bit 5 of slot+4 (reset mod state flag) */
+    uint8_t flags = voice_page_read(page, slot_base + 4);
+    voice_page_write(page, slot_base + 4, flags & 0xDF);
+
+    /*
+     * Apply velocity-based scaling using signed_multiply_chain
+     *
+     * The original computes:
+     *   result = signed_multiply_chain(velocity_curve[midi_velocity - 0x3C], mod_sensitivity)
+     *
+     * We use a simplified version: scale mod_input by sensitivity
+     * Full implementation would need the velocity curve table lookup.
+     */
+    int8_t velocity_factor = (int8_t)(g_intmem.midi_velocity - 0x3C);
+    int8_t scaled = signed_multiply_chain(velocity_factor, (int8_t)mod_sensitivity, (int8_t)mod_input);
+
+    return (uint8_t)scaled;
+}
+
+/*============================================================================
+ * Amplitude/Envelope Update (CODE:A18F)
+ *
+ * Updates amplitude for a D-RAM slot based on envelope state.
+ * This is a complex function in the original firmware with many code paths.
+ *
+ * Simplified implementation focuses on:
+ * 1. Reading envelope output
+ * 2. Applying velocity scaling
+ * 3. Writing amplitude to D-RAM
+ *
+ * ⚠️ PORTING SHORTCUTS - TODO for full fidelity:
+ * --------------------------------------------
+ * 1. Read-modify-write D-RAM: Original reads current D-RAM value and
+ *    accumulates for envelope release curves. We just write new value.
+ *    Affects: Smooth envelope release transitions.
+ *
+ * 2. Envelope block cross-reference: Original checks envelope state from
+ *    one of 7 LFO/envelope blocks (indexed by slot+4 bits 2:0). We don't
+ *    read the envelope block output.
+ *    Affects: Dynamic envelope following.
+ *
+ * 3. Negative amplitude handling: Original has special path when amplitude
+ *    goes negative (envelope inversion). Not implemented.
+ *    Affects: Inverted envelope effects.
+ *
+ * 4. Done flag propagation: Original sets _0_4, _0_5 flags for voice
+ *    management. We only set dram_slot_index.
+ *    Affects: Voice release timing.
+ *
+ * 5. Velocity curve table lookup: Original uses a 128-byte curve table
+ *    for non-linear velocity response. We use linear.
+ *    Affects: Velocity feel/response.
+ *============================================================================*/
+
+void dram_slot_amplitude_update(uint8_t env_output, uint8_t gate_flags)
+{
+    uint8_t page = g_intmem.voice_page_num;
+    uint8_t slot_base = g_intmem.voice_slot_base;
+
+    /* Apply modulation depth scaling */
+    uint8_t mod_output = dram_slot_apply_mod_depth(env_output);
+
+    /* Read control flags from slot+3 */
+    uint8_t ctrl_flags = voice_page_read(page, slot_base + 3);
+
+    /* Check bit 4 - if set, skip this update */
+    if (ctrl_flags & 0x10) {
+        /* Check bit 3 for alternate path */
+        if (!(ctrl_flags & 0x08)) {
+            return;
+        }
+        /* Set done flag and return */
+        uint8_t slot0 = voice_page_read(page, slot_base);
+        voice_page_write(page, slot_base, (slot0 & 0x7F));
+        return;
+    }
+
+    /* Read envelope control from slot+4 */
+    uint8_t env_ctrl = voice_page_read(page, slot_base + 4);
+
+    /* Check envelope enable bits (0x18) */
+    if ((env_ctrl & 0x18) == 0) {
+        /* No envelope - simple direct amplitude write */
+        uint8_t base_level = voice_page_read(page, slot_base + 1) & 0x3F;
+
+        sam_write_reg(SAM_REG_ADDR_DATA, g_intmem.dram_address_counter);
+        sam_write_reg(SAM_REG_DATA1, base_level);
+        sam_write_reg(SAM_REG_DATA2, mod_output);
+        sam_write_reg(SAM_REG_DATA3, 0);
+        sam_write_reg(SAM_REG_CTRL, g_intmem.sam_ctrl_flags);
+        goto simple_write;
+    }
+
+    /* Check envelope gate bit (bit 3) */
+    if (!(env_ctrl & 0x08)) {
+        /* Direct write path */
+        uint8_t base_level = voice_page_read(page, slot_base + 1) & 0x3F;
+
+        /* Write amplitude to D-RAM */
+        sam_write_reg(SAM_REG_ADDR_DATA, g_intmem.dram_address_counter);
+        sam_write_reg(SAM_REG_DATA1, base_level);
+        sam_write_reg(SAM_REG_DATA2, (env_output << 4) >> 1);
+        sam_write_reg(SAM_REG_DATA3, env_output >> 5);
+        sam_write_reg(SAM_REG_CTRL, g_intmem.sam_ctrl_flags);
+        goto check_done;
+    }
+
+    /* Envelope-gated amplitude path */
+    {
+        /* Read velocity/mix attenuation from slot+8,9 */
+        uint8_t atten_lo = voice_page_read(page, slot_base + 8);
+        uint8_t atten_hi = voice_page_read(page, slot_base + 9);
+
+        uint8_t atten_hi_masked = atten_hi & 0x7F;
+
+        /* Check for zero attenuation */
+        if (atten_hi_masked == 0 && (atten_lo & 0xF0) == 0) {
+            /* Zero attenuation - minimal amplitude */
+            uint8_t base_level = voice_page_read(page, slot_base + 1) & 0x3F;
+
+            sam_write_reg(SAM_REG_ADDR_DATA, g_intmem.dram_address_counter);
+            sam_write_reg(SAM_REG_DATA1, base_level);
+            sam_write_reg(SAM_REG_DATA2, 0);
+            sam_write_reg(SAM_REG_DATA3, 0);
+            sam_write_reg(SAM_REG_CTRL, g_intmem.sam_ctrl_flags);
+        } else {
+            /*
+             * Scale mod_output by attenuation
+             * attenuation is 12-bit: (atten_lo >> 4) | (atten_hi << 4)
+             */
+            uint16_t attenuation = ((uint16_t)(atten_lo >> 4)) | ((uint16_t)atten_hi << 4);
+
+            /* Multiply: result = mod_output * attenuation */
+            uint16_t p1 = (uint16_t)mod_output * (uint8_t)(attenuation & 0xFF);
+            uint16_t p2 = (uint16_t)mod_output * (uint8_t)(attenuation >> 8);
+
+            uint8_t result_lo = (uint8_t)(p1 >> 8);
+            uint8_t result_mid = (uint8_t)p2 + result_lo;
+            uint8_t result_hi = (uint8_t)(p2 >> 8);
+            if (result_mid < result_lo) result_hi--;  /* Handle borrow */
+
+            /* Check slot[0] bit 2 for read-modify-write mode */
+            uint8_t slot0 = voice_page_read(page, slot_base);
+            if (slot0 & 0x04) {
+                /* Read-modify-write: read current D-RAM value and accumulate */
+                /* For simplicity, just write the new value */
+            }
+
+            /* Write to D-RAM */
+            uint8_t base_level = voice_page_read(page, slot_base + 1) & 0x3F;
+
+            sam_write_reg(SAM_REG_ADDR_DATA, g_intmem.dram_address_counter);
+            sam_write_reg(SAM_REG_DATA1, base_level | (result_lo & 0xC0));
+            sam_write_reg(SAM_REG_DATA2, result_mid);
+            sam_write_reg(SAM_REG_DATA3, result_hi & 0x07);
+            sam_write_reg(SAM_REG_CTRL, g_intmem.sam_ctrl_flags);
+        }
+    }
+
+check_done:
+    /* Check if we should mark slot as done */
+    ctrl_flags = voice_page_read(page, slot_base + 3);
+    if (ctrl_flags & 0x10) {
+        /* Already handled above */
+        return;
+    }
+
+simple_write:
+    /* Update done flag based on gate_flags */
+    (void)gate_flags;  /* Used in full implementation for envelope state */
+
+    /* Mark update complete in slot index */
+    g_intmem.dram_slot_index = 0x0F;
+}

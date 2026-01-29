@@ -236,6 +236,48 @@ void modulation_write_dram(int8_t mod_lo, int8_t mod_hi, uint8_t dispatch);
  */
 void dram_slot_portamento_update(void);
 
+/**
+ * Apply modulation depth scaling (CODE:A2E3)
+ *
+ * Called from amplitude update to apply velocity-based modulation depth.
+ *
+ * Voice slot layout:
+ *   [0]: current mod level (output)
+ *   [4]: flags (bit5 cleared on update)
+ *   [6]: mod sensitivity/depth
+ *
+ * @param mod_input  Input modulation value (from LFO/envelope)
+ * @return           Scaled modulation output
+ */
+uint8_t dram_slot_apply_mod_depth(uint8_t mod_input);
+
+/**
+ * Amplitude/envelope update for D-RAM slot (CODE:A18F)
+ *
+ * Called from periodic_voice_update when mod state type == 0x10.
+ * Reads envelope output, applies velocity scaling, writes to D-RAM.
+ *
+ * This is a complex function with multiple code paths:
+ * - Direct amplitude write (no envelope)
+ * - Envelope-gated amplitude
+ * - Read-modify-write D-RAM for envelope release
+ * - Various flag-based behaviors
+ *
+ * Voice slot layout:
+ *   [0]: dispatch type (0x10 for amplitude)
+ *   [1]: base level (bits 5:0)
+ *   [2]: envelope block index
+ *   [3]: flags (bit4=skip, bit3=envelope gate)
+ *   [4]: more flags (bit3=env enable, bits2:0=env block)
+ *   [5-6]: reserved
+ *   [7]: mod amount
+ *   [8-9]: velocity/mix attenuation (16-bit)
+ *
+ * @param env_output   Envelope output value
+ * @param gate_flags   Gate control flags
+ */
+void dram_slot_amplitude_update(uint8_t env_output, uint8_t gate_flags);
+
 /*============================================================================
  * Test Support
  *============================================================================*/
