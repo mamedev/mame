@@ -556,13 +556,75 @@ WEAK_STUB void midi_handle_note(uint8_t channel, uint8_t note, uint8_t velocity)
     }
 }
 
+/**
+ * midi_handle_cc - Control Change handler (CODE:C2BA dispatch)
+ *
+ * Simplified implementation handling the most important CCs:
+ * - CC 1: Modulation wheel
+ * - CC 7: Volume (main volume)
+ * - CC 10: Pan
+ * - CC 64: Sustain pedal
+ * - CC 121: Reset all controllers
+ * - CC 123: All notes off
+ *
+ * Original firmware uses a jump table at CODE:0xC833 indexed by (CC - 5).
+ * We simplify by handling only the essential CCs.
+ */
 WEAK_STUB void midi_handle_cc(uint8_t channel, uint8_t cc, uint8_t value)
 {
     DEBUG_MIDI("CC ch=%d cc=%d val=%d", channel, cc, value);
-    /* TODO: Dispatch CC to handlers */
-    (void)channel;
-    (void)cc;
-    (void)value;
+
+    switch (cc) {
+        case 1:  /* Modulation wheel */
+            /* Store at EXTMEM 0x1184 + channel */
+            if (channel < 16) {
+                g_extmem.mod_wheel_sens[channel] = value;
+            }
+            break;
+
+        case 7:  /* Volume */
+            /* TODO: Store and apply to active voices
+             * Original stores at channel-indexed location and updates D-RAM
+             */
+            (void)value;
+            break;
+
+        case 10: /* Pan */
+            /* TODO: Store and apply to output routing
+             * Affects voice page bytes 0xF9-0xFB
+             */
+            (void)value;
+            break;
+
+        case 64: /* Sustain pedal */
+            /* TODO: Store at 0x1E50 + channel
+             * When on (value >= 64), note-off is delayed until pedal released
+             */
+            (void)value;
+            break;
+
+        case 121: /* Reset all controllers */
+            /* Reset mod wheel, pitch bend, etc. to defaults */
+            if (channel < 16) {
+                g_extmem.mod_wheel_sens[channel] = 0;
+                /* Reset pitch bend to center */
+                g_extmem.pitch_bend[channel * 2] = 0;
+                g_extmem.pitch_bend[channel * 2 + 1] = 0;
+            }
+            break;
+
+        case 123: /* All notes off */
+            midi_all_notes_off(channel);
+            break;
+
+        case 120: /* All sound off - immediate silence */
+            midi_panic();
+            break;
+
+        default:
+            /* Unhandled CC - ignore */
+            break;
+    }
 }
 
 /**

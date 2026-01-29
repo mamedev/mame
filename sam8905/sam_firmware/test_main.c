@@ -1229,6 +1229,57 @@ static int test_midi_handle_program_change(void)
     return 0;
 }
 
+static int test_midi_handle_cc(void)
+{
+    printf("=== Test: midi_handle_cc ===\n");
+
+    /* Initialize */
+    memset(&g_intmem, 0x00, sizeof(g_intmem));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+
+    /* Test CC 1: Mod wheel */
+    midi_handle_cc(0, 1, 64);
+    if (g_extmem.mod_wheel_sens[0] != 64) {
+        printf("FAIL: mod_wheel_sens[0] = %d (expected 64)\n", g_extmem.mod_wheel_sens[0]);
+        return 1;
+    }
+
+    /* Test CC 1 on different channel */
+    midi_handle_cc(5, 1, 100);
+    if (g_extmem.mod_wheel_sens[5] != 100) {
+        printf("FAIL: mod_wheel_sens[5] = %d (expected 100)\n", g_extmem.mod_wheel_sens[5]);
+        return 1;
+    }
+
+    /* Verify channel 0 unchanged */
+    if (g_extmem.mod_wheel_sens[0] != 64) {
+        printf("FAIL: mod_wheel_sens[0] changed to %d\n", g_extmem.mod_wheel_sens[0]);
+        return 1;
+    }
+
+    /* Test CC 121: Reset all controllers */
+    /* First set some values */
+    g_extmem.mod_wheel_sens[2] = 127;
+    g_extmem.pitch_bend[4] = 0x10;  /* Channel 2 high byte */
+    g_extmem.pitch_bend[5] = 0x20;  /* Channel 2 low byte */
+
+    /* Reset channel 2 */
+    midi_handle_cc(2, 121, 0);
+
+    /* Verify reset */
+    if (g_extmem.mod_wheel_sens[2] != 0) {
+        printf("FAIL: mod_wheel after reset = %d (expected 0)\n", g_extmem.mod_wheel_sens[2]);
+        return 1;
+    }
+    if (g_extmem.pitch_bend[4] != 0 || g_extmem.pitch_bend[5] != 0) {
+        printf("FAIL: pitch_bend not reset\n");
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
 static int test_midi_handle_pitch_bend(void)
 {
     printf("=== Test: midi_handle_pitch_bend ===\n");
@@ -1317,6 +1368,7 @@ int main(void)
     failures += test_voice_list_remove();
     failures += test_midi_handle_note();
     failures += test_midi_handle_program_change();
+    failures += test_midi_handle_cc();
     failures += test_midi_handle_pitch_bend();
 
     printf("=================================\n");

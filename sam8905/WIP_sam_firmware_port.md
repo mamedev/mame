@@ -400,7 +400,7 @@ unported functions). Use the original addresses as function name suffixes for tr
 | B630 | `midi_rx_isr()` in sam_midi.c | [x] |
 | C635 | `midi_process_byte()` in sam_midi.c | [x] |
 | B75F | `midi_handle_note()` - simplified implementation | [x] |
-| C1A0 | `midi_handle_cc()` stub | [ ] |
+| C1A0 | `midi_handle_cc()` - basic CC handling (mod, reset, all notes off) | [x] |
 | C45B | `midi_handle_program_change()` in sam_midi.c | [x] |
 | 9AB0 | `midi_handle_pitch_bend()` - simplified implementation | [x] |
 | BDBC | `midi_panic()` in sam_midi.c | [x] |
@@ -533,7 +533,7 @@ Track newly identified INTMEM/EXTMEM addresses found during porting:
 - [x] Implement `midi_handle_note()` - simplified note on/off (no dual-layer, no sustain pedal)
 - [x] Implement `midi_handle_program_change()` - loads program from ROM
 - [x] Implement `midi_handle_pitch_bend()` - simplified pitch bend (no sensitivity scaling)
-- [ ] Implement `midi_handle_cc()` - CC handler dispatch
+- [x] Implement `midi_handle_cc()` - basic CC handling (CC1 mod wheel, CC121 reset, CC123 all notes off)
 - [ ] SysEx voice enable handler
 
 ### Phase 5: Voice Management (CRITICAL PATH)
