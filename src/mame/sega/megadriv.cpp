@@ -752,7 +752,7 @@ void md_core_state::megadriv_timers(machine_config &config)
 	TIMER(config, m_scan_timer).configure_generic(m_vdp, FUNC(sega315_5313_device::megadriv_scanline_timer_callback));
 }
 
-void md_core_state::md_core_ntsc(machine_config &config)
+void md_core_state::md_core_ntsc(machine_config &config, bool use_lcm_scaling)
 {
 	M68000(config, m_maincpu, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &md_core_state::cpu_space_map);
@@ -761,22 +761,22 @@ void md_core_state::md_core_ntsc(machine_config &config)
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
+	m_vdp->set_lcm_scaling(use_lcm_scaling);
 	m_vdp->set_is_pal(false);
 	m_vdp->vint_cb().set(FUNC(md_core_state::vdp_vint_cb));
 	m_vdp->hint_cb().set(FUNC(md_core_state::vdp_hint_cb));
 	m_vdp->set_screen("megadriv");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(MASTER_CLOCK_NTSC / 10 / 262 / 342); // same as SMS?
-//  m_screen->set_refresh_hz(double(MASTER_CLOCK_NTSC) / 8 / 262 / 427); // or 427 Htotal?
+	m_screen->set_refresh_hz(MASTER_CLOCK_NTSC / 3420 / 262); // 3420 clock per scanline
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
-	m_screen->set_size(64*8, 620);
-	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
+	m_screen->set_size(64 * 8 * (use_lcm_scaling ? 5 : 1), 620);
+	m_screen->set_visarea(0, (32 * 8 * (use_lcm_scaling ? 5 : 1)) - 1, 0, 28 * 8-1);
 	m_screen->set_screen_update(FUNC(md_core_state::screen_update_megadriv)); /* Copies a bitmap */
 	m_screen->screen_vblank().set(FUNC(md_core_state::screen_vblank_megadriv)); /* Used to Sync the timing */
 }
 
-void md_core_state::md_core_pal(machine_config &config)
+void md_core_state::md_core_pal(machine_config &config, bool use_lcm_scaling)
 {
 	M68000(config, m_maincpu, MASTER_CLOCK_PAL / 7); // 7.67 MHz
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &md_core_state::cpu_space_map);
@@ -785,17 +785,17 @@ void md_core_state::md_core_pal(machine_config &config)
 	megadriv_timers(config);
 
 	SEGA315_5313(config, m_vdp, MASTER_CLOCK_PAL, m_maincpu);
+	m_vdp->set_lcm_scaling(use_lcm_scaling);
 	m_vdp->set_is_pal(true);
 	m_vdp->vint_cb().set(FUNC(md_core_state::vdp_vint_cb));
 	m_vdp->hint_cb().set(FUNC(md_core_state::vdp_hint_cb));
 	m_vdp->set_screen("megadriv");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(MASTER_CLOCK_PAL / 10 / 313 / 342); // same as SMS?
-//  m_screen->set_refresh_hz(MASTER_CLOCK_PAL / 8 / 313 / 423); // or 423 Htotal?
+	m_screen->set_refresh_hz(MASTER_CLOCK_PAL / 3420 / 313); // 3420 clock per scanline
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
-	m_screen->set_size(64*8, 620);
-	m_screen->set_visarea(0, 32*8-1, 0, 28*8-1);
+	m_screen->set_size(64 * 8 * (use_lcm_scaling ? 5 : 1), 620);
+	m_screen->set_visarea(0, (32*8 * (use_lcm_scaling ? 5 : 1)) - 1, 0, 28 * 8 - 1);
 	m_screen->set_screen_update(FUNC(md_core_state::screen_update_megadriv)); /* Copies a bitmap */
 	m_screen->screen_vblank().set(FUNC(md_core_state::screen_vblank_megadriv)); /* Used to Sync the timing */
 }
@@ -843,9 +843,9 @@ void md_ctrl_state::ctrl2_6button(machine_config &config)
 }
 
 
-void md_base_state::md_ntsc(machine_config &config)
+void md_base_state::md_ntsc(machine_config &config, bool use_lcm_scaling)
 {
-	md_core_ntsc(config);
+	md_core_ntsc(config, use_lcm_scaling);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_68k_map);
 
@@ -870,9 +870,9 @@ void md_base_state::md_ntsc(machine_config &config)
 	m_ymsnd->add_route(1, "speaker", 0.50, 1);
 }
 
-void md_base_state::md2_ntsc(machine_config &config)
+void md_base_state::md2_ntsc(machine_config &config, bool use_lcm_scaling)
 {
-	md_ntsc(config);
+	md_ntsc(config, use_lcm_scaling);
 
 	// Internalized YM3438 in VDP ASIC
 	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_NTSC / 7); // 7.67 MHz
@@ -882,9 +882,9 @@ void md_base_state::md2_ntsc(machine_config &config)
 
 /************ PAL hardware has a different master clock *************/
 
-void md_base_state::md_pal(machine_config &config)
+void md_base_state::md_pal(machine_config &config, bool use_lcm_scaling)
 {
-	md_core_pal(config);
+	md_core_pal(config, use_lcm_scaling);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &md_base_state::megadriv_68k_map);
 
@@ -908,9 +908,9 @@ void md_base_state::md_pal(machine_config &config)
 	m_ymsnd->add_route(1, "speaker", 0.50, 1);
 }
 
-void md_base_state::md2_pal(machine_config &config)
+void md_base_state::md2_pal(machine_config &config, bool use_lcm_scaling)
 {
-	md_pal(config);
+	md_pal(config, use_lcm_scaling);
 
 	// Internalized YM3438 in VDP ASIC
 	YM3438(config.replace(), m_ymsnd, MASTER_CLOCK_PAL / 7); /* 7.67 MHz */
