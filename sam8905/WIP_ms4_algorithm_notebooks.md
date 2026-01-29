@@ -48,6 +48,7 @@ Note: 0x06BA is NOT a valid algorithm (garbage data after 0x067A).
 - [x] Update notebooks to use program dram_init values
 - [x] Extract shared parsing code to `parse_programs.py` module
 - [x] Create `parse_programs_xe9l.py` for XE9L ROM analysis
+- [x] Add drum sound parsing to `parse_programs_xe9l.py`
 - [ ] Implement envelope/LFO modulators to update D-RAM dynamically
 
 ## Testing Results
@@ -160,8 +161,32 @@ The XE9L ROM (xe9l_v141.bin, 64KB) uses the same program format:
 | ALG_3503  | 0x3503      | 0xC0       | -        | percussion/rhythm slot 6 |
 | ALG_9AFF  | 0x9AFF      | 0xE0       | -        | percussion/rhythm slot 7 |
 
-Only 4 algorithms are referenced by program entries (0x002A, 0x006A, 0x00AA, 0x00EA).
+Only 4 algorithms are referenced by regular program entries (0x002A, 0x006A, 0x00AA, 0x00EA).
 The other 4 (0x871A, 0x86DA, 0x3503, 0x9AFF) are for rhythm/percussion patterns.
+
+### XE9L Drum Kit Structure
+
+**Drum Kit "STA DRUM"** at 0x8600:
+- 8-byte name, 1-byte null terminator
+- Flags: 0x82, Algorithm: 0x86DA (little-endian at offset 10-11)
+- Mapping table at offset 38: 3-byte entries (ptr_hi, ptr_lo, flags)
+  - flags=0x80: Direct drum sound pointer (30 entries)
+  - flags=0x81: Direct drum sound with flag (hi-hat pedal etc.)
+  - flags=0x13: Reference to regular program (29 entries)
+  - Total: 124 mapping entries
+
+**33 Drum Sounds** at 0x8760-0x8D6B:
+- All use algorithm 0x86DA (percussion/rhythm slot 1)
+- Same format as regular programs:
+  - 8-byte ASCII name (space-padded)
+  - 1-byte null terminator at offset 8
+  - 1-byte flags at offset 9 (typically 0x11)
+  - 2-byte algorithm pointer at offset 10-11 (little-endian: 0xDA, 0x86)
+  - D-RAM init data following header
+- Size: 46-49 bytes per entry (variable based on D-RAM data)
+- Sounds: GATESD, MONDO, KICK1, KICK2, STICK, SNARE1, SNARE2, CLAPS, CLOHH, PEDHH, OPHH,
+  LOBG, SHGUIRO, HIWB, LOGUIRO, BRTAP, BELL, BRSLAP, CAB, CHINA, CLAVES, COWB, HIAGO,
+  HIBG, MAR, MUCG, MUCUI, OPCUI, RIDE1, SHAKER, TAMB, metro1, metro2
 
 ## Files
 
