@@ -13,6 +13,8 @@
 #include "sam_types.h"
 #include "sam_hw.h"
 #include "sam_rom.h"
+#include "sam_utils.h"
+#include "sam_math.h"
 
 /*============================================================================
  * Global State

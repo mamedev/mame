@@ -365,10 +365,13 @@ unported functions). Use the original addresses as function name suffixes for tr
 
 | Original | C Function | Status |
 |----------|-----------|--------|
-| DCA8 | `dptr_add_r6r7()` | [ ] |
-| DCB3 | `add_a_to_dptr()` | [ ] |
-| DC1C | `table_search_match()` | [ ] |
-| DC9C | `load_dptr_from_xram()` | [ ] |
+| DCA8 | N/A (native pointer arithmetic in C) | [x] |
+| DCB3 | N/A (native pointer arithmetic in C) | [x] |
+| DC1C | `table_search_match()` in sam_utils.c | [x] |
+| DC9C | `load_ptr_from_xram()` in sam_utils.c | [x] |
+| - | `block_copy_rom_to_xram()` in sam_utils.c | [x] |
+| - | `block_copy_xram_to_xram()` in sam_utils.c | [x] |
+| - | Byte manipulation: `swap_nibbles()`, rotates, clamps | [x] |
 
 ### Phase 2: SAM Interface
 
@@ -493,11 +496,13 @@ Track newly identified INTMEM/EXTMEM addresses found during porting:
 - [x] Create `test_main.c` for host-based unit tests
 
 ### Phase 1: Utilities
-- [ ] Port `dptr_add_r6r7` (DCA8)
-- [ ] Port `add_a_to_dptr` (DCB3)
-- [ ] Port `table_search_match` (DC1C)
-- [ ] Port `load_dptr_from_xram` (DC9C)
-- [ ] Test utilities
+- [x] Port `dptr_add_r6r7` (DCA8) - N/A in C (native pointer arithmetic)
+- [x] Port `add_a_to_dptr` (DCB3) - N/A in C (native pointer arithmetic)
+- [x] Port `table_search_match` (DC1C) - `table_search_match()` in sam_utils.c
+- [x] Port `load_dptr_from_xram` (DC9C) - `load_ptr_from_xram()` in sam_utils.c
+- [x] Add block copy utilities - `block_copy_rom_to_xram()`, `block_copy_xram_to_xram()`
+- [x] Add byte manipulation utilities - `swap_nibbles()`, `rotate_left_carry()`, `rotate_right_carry()`, `clamp_u8()`, `clamp_u7()`
+- [x] Test utilities - all tests pass
 
 ### Phase 2: SAM Interface
 - [x] Port `sam_write_dram` (A4BC) - `sam_dram_write()` in sam_hw.h

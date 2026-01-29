@@ -18,8 +18,8 @@ CFLAGS_HOST = $(CFLAGS_COMMON) -g -O2
 CFLAGS_8051 = $(CFLAGS_COMMON) --model-large -mmcs51
 
 # Sources
-SRCS = sam_init.c sam_hw.c
-HDRS = sam_types.h sam_hw.h sam_config.h sam_rom.h sam_firmware.h
+SRCS = sam_init.c sam_hw.c sam_utils.c
+HDRS = sam_types.h sam_hw.h sam_config.h sam_rom.h sam_firmware.h sam_utils.h sam_math.h sam_pitch_tables.h
 
 # Output
 BUILD_HOST = build/host

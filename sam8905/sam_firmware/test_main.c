@@ -294,6 +294,160 @@ static int test_pitch_table_transpose(void)
 }
 
 /*============================================================================
+ * Utility Tests
+ *============================================================================*/
+
+static int test_table_search(void)
+{
+    printf("=== Test: table_search_match ===\n");
+
+    static const uint8_t test_table[] = {0x10, 0x20, 0x30, 0x40, 0x50};
+    uint8_t result;
+
+    /* Find existing values */
+    result = table_search_match(test_table, 5, 0x10);
+    if (result != 0) {
+        printf("FAIL: search for 0x10 returned %d (expected 0)\n", result);
+        return 1;
+    }
+
+    result = table_search_match(test_table, 5, 0x30);
+    if (result != 2) {
+        printf("FAIL: search for 0x30 returned %d (expected 2)\n", result);
+        return 1;
+    }
+
+    result = table_search_match(test_table, 5, 0x50);
+    if (result != 4) {
+        printf("FAIL: search for 0x50 returned %d (expected 4)\n", result);
+        return 1;
+    }
+
+    /* Not found */
+    result = table_search_match(test_table, 5, 0xFF);
+    if (result != 0xFF) {
+        printf("FAIL: search for 0xFF returned %d (expected 0xFF)\n", result);
+        return 1;
+    }
+
+    /* Test nomatch */
+    result = table_search_nomatch(test_table, 5, 0x10);
+    if (result != 1) {
+        printf("FAIL: nomatch for 0x10 returned %d (expected 1)\n", result);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_load_ptr(void)
+{
+    printf("=== Test: load_ptr_from_xram ===\n");
+
+    uint8_t *xram = (uint8_t *)&g_extmem;
+    uint16_t ptr;
+
+    /* Set up a test pointer in XRAM (little-endian: 0x1234) */
+    xram[0x100] = 0x34;  /* low byte */
+    xram[0x101] = 0x12;  /* high byte */
+
+    ptr = load_ptr_from_xram(0x100);
+    if (ptr != 0x1234) {
+        printf("FAIL: loaded ptr = 0x%04X (expected 0x1234)\n", ptr);
+        return 1;
+    }
+
+    /* Test at boundary */
+    xram[0] = 0xCD;
+    xram[1] = 0xAB;
+    ptr = load_ptr_from_xram(0);
+    if (ptr != 0xABCD) {
+        printf("FAIL: loaded ptr at 0 = 0x%04X (expected 0xABCD)\n", ptr);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_block_copy(void)
+{
+    printf("=== Test: block_copy_xram_to_xram ===\n");
+
+    uint8_t *xram = (uint8_t *)&g_extmem;
+
+    /* Set up source data */
+    xram[0x200] = 0xAA;
+    xram[0x201] = 0xBB;
+    xram[0x202] = 0xCC;
+    xram[0x203] = 0xDD;
+
+    /* Clear destination */
+    xram[0x300] = 0x00;
+    xram[0x301] = 0x00;
+    xram[0x302] = 0x00;
+    xram[0x303] = 0x00;
+
+    /* Set up copy parameters */
+    g_intmem.copy_src_lo = 0x00;
+    g_intmem.copy_src_hi = 0x02;  /* 0x0200 */
+    g_intmem.copy_dst_lo = 0x00;
+    g_intmem.copy_dst_hi = 0x03;  /* 0x0300 */
+    g_intmem.copy_count = 4;
+
+    /* Do the copy */
+    block_copy_xram_to_xram();
+
+    /* Verify */
+    if (xram[0x300] != 0xAA || xram[0x301] != 0xBB ||
+        xram[0x302] != 0xCC || xram[0x303] != 0xDD) {
+        printf("FAIL: copied data mismatch\n");
+        printf("  expected: AA BB CC DD\n");
+        printf("  got:      %02X %02X %02X %02X\n",
+               xram[0x300], xram[0x301], xram[0x302], xram[0x303]);
+        return 1;
+    }
+
+    /* Verify copy variables updated */
+    if (g_intmem.copy_count != 0) {
+        printf("FAIL: copy_count not zero after copy\n");
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_swap_nibbles(void)
+{
+    printf("=== Test: swap_nibbles ===\n");
+
+    if (swap_nibbles(0x12) != 0x21) {
+        printf("FAIL: swap_nibbles(0x12) != 0x21\n");
+        return 1;
+    }
+
+    if (swap_nibbles(0xAB) != 0xBA) {
+        printf("FAIL: swap_nibbles(0xAB) != 0xBA\n");
+        return 1;
+    }
+
+    if (swap_nibbles(0x00) != 0x00) {
+        printf("FAIL: swap_nibbles(0x00) != 0x00\n");
+        return 1;
+    }
+
+    if (swap_nibbles(0xFF) != 0xFF) {
+        printf("FAIL: swap_nibbles(0xFF) != 0xFF\n");
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+/*============================================================================
  * Main
  *============================================================================*/
 
@@ -311,6 +465,10 @@ int main(void)
     failures += test_init_all();
     failures += test_pitch_table_init();
     failures += test_pitch_table_transpose();
+    failures += test_table_search();
+    failures += test_load_ptr();
+    failures += test_block_copy();
+    failures += test_swap_nibbles();
 
     printf("=================================\n");
     if (failures == 0) {
