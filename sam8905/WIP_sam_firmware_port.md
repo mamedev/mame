@@ -510,8 +510,9 @@ Track newly identified INTMEM/EXTMEM addresses found during porting:
 - [x] Port `extmem_clear_all` (D454) - `sam_extmem_clear_all()` in sam_init.c
 - [x] Port `voice_pages_clear` (B70B) - `sam_voice_pages_clear()` in sam_init.c
 - [x] Port `slot_manager_init` (9904) - `sam_slot_manager_init()` in sam_init.c
-- [ ] Port `pitch_table_init` (9B16) - placeholder only, needs exact algorithm
-- [ ] Verify pitch table against ROM/MAME
+- [x] Port `pitch_table_init` (9B16) - `sam_pitch_table_init()` in sam_init.c
+- [x] Add ROM pitch tables - `sam_pitch_tables.h` (extracted from CODE:92B1/9331/93B1)
+- [x] Verify pitch table - tests for transpose=0 and transpose=64 pass
 
 ### Phase 4: MIDI (basic)
 - [ ] Port `isr_uart_handler` (B630)

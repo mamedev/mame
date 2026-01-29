@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "sam_firmware.h"
+#include "sam_pitch_tables.h"
 
 /* ROM data placeholder */
 CODE uint8_t g_rom[0x10000];
@@ -176,6 +177,122 @@ static int test_init_all(void)
     return 0;
 }
 
+static int test_pitch_table_init(void)
+{
+    printf("=== Test: sam_pitch_table_init (transpose=0) ===\n");
+
+    /* Clear pitch tables */
+    memset(g_extmem.pitch_table_lo, 0xFF, 128);
+    memset(g_extmem.pitch_table_mid, 0xFF, 128);
+    memset(g_extmem.pitch_table_hi, 0xFF, 128);
+
+    /* Set transpose to 0 */
+    g_intmem.current_slot_id = 0;
+
+    /* Initialize pitch tables */
+    sam_pitch_table_init();
+
+    /* With transpose=0, output should match input exactly */
+    int errors = 0;
+    for (int note = 0; note < 128; note++) {
+        if (g_extmem.pitch_table_lo[note] != g_pitch_base_lo[note]) {
+            if (errors < 5) {
+                printf("FAIL: pitch_lo[%d] = 0x%02X (expected 0x%02X)\n",
+                       note, g_extmem.pitch_table_lo[note], g_pitch_base_lo[note]);
+            }
+            errors++;
+        }
+        if (g_extmem.pitch_table_mid[note] != g_pitch_base_mid[note]) {
+            if (errors < 5) {
+                printf("FAIL: pitch_mid[%d] = 0x%02X (expected 0x%02X)\n",
+                       note, g_extmem.pitch_table_mid[note], g_pitch_base_mid[note]);
+            }
+            errors++;
+        }
+        if (g_extmem.pitch_table_hi[note] != (g_pitch_base_hi[note] & 0x07)) {
+            if (errors < 5) {
+                printf("FAIL: pitch_hi[%d] = 0x%02X (expected 0x%02X)\n",
+                       note, g_extmem.pitch_table_hi[note], g_pitch_base_hi[note] & 0x07);
+            }
+            errors++;
+        }
+    }
+
+    if (errors > 0) {
+        printf("Total errors: %d\n", errors);
+        return 1;
+    }
+
+    /* Print a few sample values */
+    printf("Sample pitch values (note: lo/mid/hi):\n");
+    for (int note = 0; note < 128; note += 16) {
+        printf("  %3d: %02X/%02X/%02X\n", note,
+               g_extmem.pitch_table_lo[note],
+               g_extmem.pitch_table_mid[note],
+               g_extmem.pitch_table_hi[note]);
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_pitch_table_transpose(void)
+{
+    printf("=== Test: sam_pitch_table_init (transpose=64) ===\n");
+
+    /*
+     * The pitch table algorithm computes:
+     *   multiplier = base >> 3 (16-bit extract from 24-bit base)
+     *   offset = (transpose × multiplier) >> 8
+     *   result = base + offset
+     *
+     * This gives: result ≈ base × (1 + transpose/2048)
+     *
+     * For transpose=64:
+     *   result ≈ base × (1 + 64/2048) = base × 1.03125 (~3.1% increase)
+     *
+     * Maximum range (transpose=±127/128) is about ±6.2% (≈±1 semitone).
+     * This is a fine-tuning/pitch-bend parameter.
+     */
+
+    /* Set transpose to 64 */
+    g_intmem.current_slot_id = 64;
+
+    /* Initialize pitch tables */
+    sam_pitch_table_init();
+
+    /* Check a few notes */
+    int errors = 0;
+    double expected_ratio = 1.0 + 64.0/2048.0;  /* 1.03125 */
+
+    printf("Comparing base vs transposed (+64), expected ratio ~%.4f:\n", expected_ratio);
+    for (int note = 64; note < 128; note += 8) {  /* Use higher notes for better resolution */
+        uint32_t base = ((uint32_t)g_pitch_base_hi[note] << 16) |
+                        ((uint32_t)g_pitch_base_mid[note] << 8) |
+                        g_pitch_base_lo[note];
+        uint32_t result = ((uint32_t)g_extmem.pitch_table_hi[note] << 16) |
+                          ((uint32_t)g_extmem.pitch_table_mid[note] << 8) |
+                          g_extmem.pitch_table_lo[note];
+
+        double ratio = (double)result / base;
+        printf("  %3d: base=0x%06X result=0x%06X ratio=%.4f\n",
+               note, base, result, ratio);
+
+        /* Allow 1% tolerance for integer rounding */
+        if (ratio < expected_ratio * 0.99 || ratio > expected_ratio * 1.01) {
+            errors++;
+        }
+    }
+
+    if (errors > 0) {
+        printf("FAIL: %d notes outside expected range\n", errors);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
 /*============================================================================
  * Main
  *============================================================================*/
@@ -192,6 +309,8 @@ int main(void)
     failures += test_extmem_clear();
     failures += test_slot_manager_init();
     failures += test_init_all();
+    failures += test_pitch_table_init();
+    failures += test_pitch_table_transpose();
 
     printf("=================================\n");
     if (failures == 0) {
