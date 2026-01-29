@@ -435,13 +435,29 @@ unported functions). Use the original addresses as function name suffixes for tr
 
 ### Phase 7: Envelope/Modulation System
 
+**Package A: Math Utilities** (see `sam_math.h`):
 | Original | C Function | Status |
 |----------|-----------|--------|
-| 9BA7 | `periodic_voice_update()` | [ ] |
+| AA6F | `signed_multiply_sat()` in sam_math.h | [x] |
+| AA52 | `signed_multiply_chain()` in sam_math.h | [x] |
+
+**Package B: LFO** (see `sam_lfo.h`, `sam_lfo.c`):
+| Original | C Function | Status |
+|----------|-----------|--------|
+| A314 | `global_mod_lfo_update()` in sam_lfo.c | [x] |
+| - | `g_sine_table[64]` in sam_lfo.c | [x] |
+| - | `noise_lfsr_next()` in sam_lfo.h | [x] |
+
+**Package C-G: Remaining Modulation** (see `WIP_phase5_7_analysis.md`):
+| Original | C Function | Status |
+|----------|-----------|--------|
 | 9FCD | `modulation_write_dram()` | [ ] |
+| A33E | `dram_slot_portamento_update()` | [ ] |
+| A2E3 | `dram_slot_apply_mod_depth()` | [ ] |
+| A18F | `dram_slot_amplitude_update()` | [ ] |
 | A403 | `envelope_tick_volume()` | [ ] |
 | A471 | `envelope_write_dram()` | [ ] |
-| A18F | `volume_envelope_update()` | [ ] |
+| 9BA7 | `periodic_voice_update()` | [ ] |
 
 ### Phase 8: Main Loop
 

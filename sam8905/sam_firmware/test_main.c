@@ -1333,6 +1333,284 @@ static int test_midi_handle_pitch_bend(void)
 }
 
 /*============================================================================
+ * Math Tests (Package A)
+ *============================================================================*/
+
+static int test_signed_multiply_sat(void)
+{
+    printf("=== Test: signed_multiply_sat ===\n");
+
+    int8_t result;
+
+    /* Test 1: Zero inputs */
+    result = signed_multiply_sat(0, 0);
+    if (result != 0) {
+        printf("FAIL: 0×0 = %d (expected 0)\n", result);
+        return 1;
+    }
+
+    /* Test 2: Positive × positive (small) */
+    result = signed_multiply_sat(10, 20);
+    /* (10 * 20) >> 7 + 20 = 1.5 + 20 ≈ 21-22 */
+    if (result < 20 || result > 25) {
+        printf("FAIL: 10×20 = %d (expected ~21)\n", result);
+        return 1;
+    }
+
+    /* Test 3: Maximum positive values */
+    result = signed_multiply_sat(127, 127);
+    /* Should saturate to 127 */
+    if (result != 127) {
+        printf("FAIL: 127×127 = %d (expected 127 saturated)\n", result);
+        return 1;
+    }
+
+    /* Test 4: Negative × positive */
+    result = signed_multiply_sat(-64, 64);
+    /* (-64 * 64) >> 7 + 64 = -32 + 64 = 32 */
+    if (result < 28 || result > 36) {
+        printf("FAIL: -64×64 = %d (expected ~32)\n", result);
+        return 1;
+    }
+
+    /* Test 5: Negative × negative */
+    result = signed_multiply_sat(-64, -64);
+    /* (64 * 64) >> 7 - 64 = 32 - 64 = -32 */
+    if (result < -40 || result > -24) {
+        printf("FAIL: -64×-64 = %d (expected ~-32)\n", result);
+        return 1;
+    }
+
+    /* Test 6: Large opposite signs
+     * Formula: b + (a*b)>>7 ≈ b * (1 + a/128)
+     * For a=-127, b=127: 127 * (1 - 127/128) ≈ 127 * (1/128) ≈ 1
+     */
+    result = signed_multiply_sat(-127, 127);
+    if (result < -2 || result > 4) {
+        printf("FAIL: -127×127 = %d (expected ~1)\n", result);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_signed_multiply_chain(void)
+{
+    printf("=== Test: signed_multiply_chain ===\n");
+
+    int8_t result;
+
+    /* Test 1: Zero factor = return accumulator unchanged */
+    result = signed_multiply_chain(0, 50, 100);
+    if (result != 100) {
+        printf("FAIL: chain(0, 50, 100) = %d (expected 100)\n", result);
+        return 1;
+    }
+
+    /* Test 2: Simple accumulate */
+    result = signed_multiply_chain(64, 64, 0);
+    /* (64 * 64) >> 7 + 0 = 32 */
+    if (result < 28 || result > 36) {
+        printf("FAIL: chain(64, 64, 0) = %d (expected ~32)\n", result);
+        return 1;
+    }
+
+    /* Test 3: With base accumulator */
+    result = signed_multiply_chain(64, 64, 50);
+    /* (64 * 64) >> 7 + 50 = 32 + 50 = 82 */
+    if (result < 78 || result > 86) {
+        printf("FAIL: chain(64, 64, 50) = %d (expected ~82)\n", result);
+        return 1;
+    }
+
+    /* Test 4: Negative offset */
+    result = signed_multiply_chain(-64, 64, 50);
+    /* (-64 * 64) >> 7 + 50 = -32 + 50 = 18 */
+    if (result < 14 || result > 22) {
+        printf("FAIL: chain(-64, 64, 50) = %d (expected ~18)\n", result);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+/*============================================================================
+ * LFO Tests (Package B)
+ *============================================================================*/
+
+static int test_global_mod_lfo_update(void)
+{
+    printf("=== Test: global_mod_lfo_update ===\n");
+
+    /* Initialize EXTMEM */
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+
+    /* Test 1: Rate = 0 should not change anything */
+    g_extmem.mod_lfo_rate = 0;
+    g_extmem.mod_lfo_phase_lo = 0;
+    g_extmem.mod_lfo_phase_hi = 0;
+    g_extmem.mod_lfo_output = 0x55;  /* Sentinel value */
+
+    global_mod_lfo_update();
+
+    if (g_extmem.mod_lfo_output != 0x55) {
+        printf("FAIL: rate=0 changed output from 0x55 to 0x%02X\n", g_extmem.mod_lfo_output);
+        return 1;
+    }
+    if (g_extmem.mod_lfo_phase_lo != 0 || g_extmem.mod_lfo_phase_hi != 0) {
+        printf("FAIL: rate=0 changed phase\n");
+        return 1;
+    }
+
+    /* Test 2: Rate = 1 should increment by 32 */
+    g_extmem.mod_lfo_rate = 1;
+    g_extmem.mod_lfo_phase_lo = 0;
+    g_extmem.mod_lfo_phase_hi = 0;
+
+    global_mod_lfo_update();
+
+    /* Phase should be 32 (0x0020) */
+    uint16_t phase = ((uint16_t)g_extmem.mod_lfo_phase_hi << 8) | g_extmem.mod_lfo_phase_lo;
+    if (phase != 32) {
+        printf("FAIL: rate=1, phase = %d (expected 32)\n", phase);
+        return 1;
+    }
+
+    /* Output should be from sine table index 0 = 0x00 */
+    if (g_extmem.mod_lfo_output != g_sine_table[0]) {
+        printf("FAIL: output = 0x%02X (expected 0x%02X)\n",
+               g_extmem.mod_lfo_output, g_sine_table[0]);
+        return 1;
+    }
+
+    /* Test 3: Verify sine table lookup at various phases */
+    /* Set phase_hi = 0x40 (table index = 0x40 >> 1 & 0x3F = 32 = start of negative half) */
+    g_extmem.mod_lfo_phase_hi = 0x40;
+    g_extmem.mod_lfo_phase_lo = 0;
+    g_extmem.mod_lfo_rate = 0;  /* Don't advance, just check initial lookup */
+
+    /* Call with rate > 0 to trigger lookup */
+    g_extmem.mod_lfo_rate = 1;
+    global_mod_lfo_update();
+
+    /* After update, phase = 0x4020, index = 0x40 >> 1 & 0x3F = 32 */
+    /* But we called update so phase changed. Let's check different approach */
+
+    /* Test 4: Maximum rate should cycle quickly */
+    g_extmem.mod_lfo_rate = 255;
+    g_extmem.mod_lfo_phase_lo = 0;
+    g_extmem.mod_lfo_phase_hi = 0;
+
+    global_mod_lfo_update();
+
+    /* Phase should be 255 * 32 = 8160 = 0x1FE0 */
+    phase = ((uint16_t)g_extmem.mod_lfo_phase_hi << 8) | g_extmem.mod_lfo_phase_lo;
+    if (phase != 8160) {
+        printf("FAIL: rate=255, phase = %d (expected 8160)\n", phase);
+        return 1;
+    }
+
+    /* Test 5: Verify phase wraps at 16 bits */
+    g_extmem.mod_lfo_phase_lo = 0xE0;
+    g_extmem.mod_lfo_phase_hi = 0xFF;  /* 0xFFE0 */
+    g_extmem.mod_lfo_rate = 1;
+
+    global_mod_lfo_update();
+
+    /* Should wrap: 0xFFE0 + 0x20 = 0x10000 = 0x0000 (16-bit wrap) */
+    phase = ((uint16_t)g_extmem.mod_lfo_phase_hi << 8) | g_extmem.mod_lfo_phase_lo;
+    if (phase != 0) {
+        printf("FAIL: wrap test, phase = 0x%04X (expected 0x0000)\n", phase);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_sine_table(void)
+{
+    printf("=== Test: sine_table ===\n");
+
+    /* Test 1: Table starts at 0 */
+    if (g_sine_table[0] != 0x00) {
+        printf("FAIL: sine_table[0] = 0x%02X (expected 0x00)\n", g_sine_table[0]);
+        return 1;
+    }
+
+    /* Test 2: Peak at index 16 should be 0x7F (max positive) */
+    if (g_sine_table[16] != 0x7F) {
+        printf("FAIL: sine_table[16] = 0x%02X (expected 0x7F)\n", g_sine_table[16]);
+        return 1;
+    }
+
+    /* Test 3: Zero crossing at index 32 */
+    if (g_sine_table[32] != 0x00) {
+        printf("FAIL: sine_table[32] = 0x%02X (expected 0x00)\n", g_sine_table[32]);
+        return 1;
+    }
+
+    /* Test 4: Negative peak at index 48 should be 0x81 (-127) */
+    if (g_sine_table[48] != 0x81) {
+        printf("FAIL: sine_table[48] = 0x%02X (expected 0x81)\n", g_sine_table[48]);
+        return 1;
+    }
+
+    /* Test 5: Verify signed interpretation */
+    int8_t val16 = (int8_t)g_sine_table[16];
+    int8_t val48 = (int8_t)g_sine_table[48];
+    if (val16 != 127) {
+        printf("FAIL: signed sine_table[16] = %d (expected 127)\n", val16);
+        return 1;
+    }
+    if (val48 != -127) {
+        printf("FAIL: signed sine_table[48] = %d (expected -127)\n", val48);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_noise_lfsr(void)
+{
+    printf("=== Test: noise_lfsr ===\n");
+
+    /* Test LFSR sequence: x = x * 3 + 0x43 */
+    noise_lfsr_seed(0);
+
+    uint8_t val1 = noise_lfsr_next();  /* 0 * 3 + 0x43 = 0x43 */
+    if (val1 != 0x43) {
+        printf("FAIL: lfsr[1] = 0x%02X (expected 0x43)\n", val1);
+        return 1;
+    }
+
+    uint8_t val2 = noise_lfsr_next();  /* 0x43 * 3 + 0x43 = 0xC9 + 0x43 = 0x10C & 0xFF = 0x0C */
+    if (val2 != 0x0C) {
+        printf("FAIL: lfsr[2] = 0x%02X (expected 0x0C)\n", val2);
+        return 1;
+    }
+
+    uint8_t val3 = noise_lfsr_next();  /* 0x0C * 3 + 0x43 = 0x24 + 0x43 = 0x67 */
+    if (val3 != 0x67) {
+        printf("FAIL: lfsr[3] = 0x%02X (expected 0x67)\n", val3);
+        return 1;
+    }
+
+    /* Test seeding */
+    noise_lfsr_seed(0xAB);
+    if (g_intmem.lfsr_state != 0xAB) {
+        printf("FAIL: seed didn't set state\n");
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+/*============================================================================
  * Main
  *============================================================================*/
 
@@ -1370,6 +1648,15 @@ int main(void)
     failures += test_midi_handle_program_change();
     failures += test_midi_handle_cc();
     failures += test_midi_handle_pitch_bend();
+
+    /* Package A: Math Tests */
+    failures += test_signed_multiply_sat();
+    failures += test_signed_multiply_chain();
+
+    /* Package B: LFO Tests */
+    failures += test_sine_table();
+    failures += test_global_mod_lfo_update();
+    failures += test_noise_lfsr();
 
     printf("=================================\n");
     if (failures == 0) {

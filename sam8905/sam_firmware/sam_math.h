@@ -214,6 +214,124 @@ static inline uint8_t div_u16_u8(uint16_t dividend, uint8_t divisor, uint8_t *re
  * Fixed-Point Utilities
  *============================================================================*/
 
+/*============================================================================
+ * Signed Multiply with Saturation (CODE:AA6F)
+ *
+ * The firmware's signed_multiply_sat function performs:
+ *   result = (|a| * |b|) >> 7, with sign handling and saturation
+ *
+ * Used for LFO amplitude scaling, envelope depth modulation, etc.
+ *
+ * Original disassembly pattern:
+ *   - Extract signs, take absolute values
+ *   - Multiply (rotate left to get 8.8 format)
+ *   - Take high byte
+ *   - Re-apply combined sign
+ *   - Add second operand and saturate on overflow
+ *============================================================================*/
+
+/**
+ * Signed 8×8 multiply with saturation (CODE:AA6F)
+ *
+ * Computes approximately: (a * b) >> 7 + b, saturated to [-127, +127]
+ *
+ * The result is clamped if overflow occurs.
+ *
+ * @param a  First signed operand (-128 to +127)
+ * @param b  Second signed operand (-128 to +127)
+ * @return   Saturated result (-127 to +127)
+ */
+static inline int8_t signed_multiply_sat(int8_t a, int8_t b)
+{
+    /* Extract signs and take absolute values */
+    uint8_t neg_result = 0;
+    uint8_t abs_a = (uint8_t)a;
+    uint8_t abs_b = (uint8_t)b;
+
+    if (a < 0) {
+        neg_result = 1;
+        abs_a = (uint8_t)(-a);
+    }
+    if (b < 0) {
+        neg_result ^= 1;
+        abs_b = (uint8_t)(-b);
+    }
+
+    /* Multiply and take high byte (after rotate left = *2, so effectively >>7) */
+    /* Original: (val << 1 | val >> 7 | 1) * abs_a >> 8 */
+    uint16_t product = (uint16_t)((abs_b << 1) | (abs_b >> 7) | 1) * abs_a;
+    uint8_t scaled = (uint8_t)(product >> 8);
+
+    /* Re-apply sign */
+    int16_t signed_scaled = neg_result ? -(int16_t)scaled : (int16_t)scaled;
+
+    /* Add second operand */
+    int16_t result = signed_scaled + (int16_t)b;
+
+    /* Saturate to [-127, +127] on overflow */
+    if (result > 127) return 127;
+    if (result < -127) return -127;
+    return (int8_t)result;
+}
+
+/*============================================================================
+ * Signed Multiply Chain (CODE:AA52)
+ *
+ * Chained multiply: multiplies two values and adds to accumulator.
+ * Used for velocity modulation of envelope parameters.
+ *
+ * signed_multiply_chain(factor, curve_val, accumulator)
+ *   = accumulator + (factor * curve_val) >> 7
+ *============================================================================*/
+
+/**
+ * Signed multiply with accumulate (CODE:AA52)
+ *
+ * Computes: accumulator + (factor * curve_val) >> 7
+ *
+ * @param factor       Signed factor (-128 to +127)
+ * @param curve_val    Curve lookup value (signed)
+ * @param accumulator  Value to add to
+ * @return             Result (not saturated)
+ */
+static inline int8_t signed_multiply_chain(int8_t factor, int8_t curve_val, int8_t accumulator)
+{
+    if (factor == 0) {
+        return accumulator;
+    }
+
+    /* Extract signs */
+    uint8_t neg_result = 0;
+    uint8_t abs_factor = (uint8_t)factor;
+    uint8_t abs_curve = (uint8_t)curve_val;
+
+    if (factor < 0) {
+        neg_result = 1;
+        abs_factor = (uint8_t)(-factor);
+    }
+    if (curve_val < 0) {
+        neg_result ^= 1;
+        abs_curve = (uint8_t)(-curve_val);
+    }
+
+    /* Multiply and scale */
+    uint16_t product = (uint16_t)abs_factor * abs_curve;
+    uint8_t scaled = (uint8_t)(product >> 7);
+
+    /* Apply sign and add to accumulator */
+    int16_t offset = neg_result ? -(int16_t)scaled : (int16_t)scaled;
+    int16_t result = (int16_t)accumulator + offset;
+
+    /* Clamp to int8 range */
+    if (result > 127) return 127;
+    if (result < -128) return -128;
+    return (int8_t)result;
+}
+
+/*============================================================================
+ * Pitch Scaling
+ *============================================================================*/
+
 /**
  * Scale a 24-bit value by a signed 8-bit factor
  *
