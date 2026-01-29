@@ -19621,6 +19621,9 @@ compperf
 scrablexa
 tmbaskb
 
+@source:handheld/hh_mediatek_mt6260a.cpp
+sonicwtc
+
 @source:handheld/hh_pic16.cpp
 drdunk
 flash
@@ -35855,6 +35858,7 @@ max10in1
 maxx5in1
 maxx6in1
 mousekid
+pp6578
 soulbird
 ts_handy11
 vsmaxx15
@@ -35962,8 +35966,13 @@ fcpocket
 fingerd
 k10_2l
 k10_5l
+lxpc
+lxpcdp
+lxpcg
+lxpcgp
 lxpcli
 lxpcpp
+lxpcs
 lxpcsp
 matet100
 matet220
@@ -35998,6 +36007,7 @@ gbox2020
 gcs2mgp
 gon100
 goretrop
+goretropa
 gtct885
 h12p1000
 hkb502
@@ -36307,6 +36317,7 @@ wrecking
 @source:nintendo/vt1682.cpp
 110dance
 anpncpc
+anpnvt12
 cmpmx10
 cmpmx11
 dance555
@@ -40886,6 +40897,7 @@ mympac
 mympaca
 mypac
 mypaca
+mypacgld
 mysf2
 mysinv
 reactmd
@@ -43843,6 +43855,9 @@ karatvst
 karatvsta
 mks4001
 
+@source:skeleton/eks515.cpp
+eks515
+
 @source:skeleton/elcirculo.cpp
 elcirculo
 
@@ -44364,6 +44379,7 @@ systel100
 luckyvl
 
 @source:skeleton/tamagotchi_pix.cpp
+precur2w
 tamapix
 
 @source:skeleton/tavernie.cpp
@@ -47349,11 +47365,13 @@ tsbuzz
 
 @source:tvgames/generalplus_gp327902.cpp
 chikawac
+fairicam
 smksagas
 smksagasa
 smkmikke
 smkmikkea
 tomyegg
+tomyegga
 
 @source:tvgames/generalplus_gpl16250_mobigo.cpp
 mobigo
@@ -47422,6 +47440,8 @@ anpaneng
 anpanm15
 bk139in1
 bkrankp
+dgun3944
+jspodred
 lxcymls
 lxcympp
 lxcymsm
@@ -47430,6 +47450,7 @@ pokegac2
 pokegac2y
 pokegach
 prailpls
+vmastspi
 
 @source:tvgames/generalplus_gpl951xx.cpp
 fixitflx
@@ -47441,6 +47462,8 @@ bfspyhnt
 bftetris
 bubltea
 dsgnpal
+flufflav
+pockrmsr
 pokebala
 pokeissh
 pokemech
@@ -47458,6 +47481,7 @@ segapet2
 segapet2a
 segapet3
 segapet3a
+segaptdx
 smkcatch
 smkgacha
 smkguras
@@ -47472,22 +47496,30 @@ bkid218
 @source:tvgames/generalplus_gpl32612.cpp
 airobo
 anpanm19
+anpncp17
+anpntb18
+arb605
 arcadege
 ardancem
 bananlap
+bananlapa
 banaquap
 bandolap
 bandplap
 bandslap
+banpear
 chiikpc
 dinopc
 dmnslayg
+doraet17
+froz2dct
 intrtvg
-jak_swbstrik
-jak_tmnthp
 jak_dchp
 jak_ddhp
 jak_prhp
+jak_swbstrik
+jak_tmnthp
+jpaddp
 kidizmb
 kidizmp
 neopad
@@ -47514,6 +47546,7 @@ leappawp
 
 @source:tvgames/generalplus_gpm453x_sdcard.cpp
 lx_jg7420
+lx_jg7440
 rizstals
 
 @source:tvgames/magiceyes_pollux_vr3520f.cpp
@@ -47529,7 +47562,9 @@ rs70_648
 @source:tvgames/myaatari.cpp
 kuniotv
 myaatari
+galghdmi
 pachdmi
+tetrhdmi
 
 @source:tvgames/pubint_storyreader.cpp
 pi_stry
@@ -47557,6 +47592,7 @@ jak_wpt
 sstarkar
 
 @source:tvgames/spg29x.cpp
+bratzlfe
 hyprscan
 jak_bbh
 jak_bbsf
@@ -47564,6 +47600,7 @@ prail07
 zonefamf
 
 @source:tvgames/spg29x_lexibook_jg7425.cpp
+dancef2p
 fundr200
 lx_aven
 lx_frozen
@@ -47831,15 +47868,16 @@ wiii3spt
 wiwi18
 
 @source:tvgames/spg2xx_zone.cpp
+itvg49
+lx_jg7410
+lx_jg7415
+react
 wirels60
 zone40
-itvg49
 zone60
 zone100
-lx_jg7415
-lx_jg7410
+zonekdft
 zonemini
-react
 
 @source:tvgames/titan_soc.cpp
 colecofl
@@ -48047,6 +48085,7 @@ xavjmat
 xavmusic
 xavmusicj
 xavpkjr
+xavpowrk
 xavtenni
 xavtennij
 
