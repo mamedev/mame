@@ -448,6 +448,187 @@ static int test_swap_nibbles(void)
 }
 
 /*============================================================================
+ * MIDI Tests
+ *============================================================================*/
+
+static int test_midi_rx_buffer(void)
+{
+    printf("=== Test: MIDI RX buffer ===\n");
+
+    /* Initialize MIDI subsystem */
+    midi_init();
+
+    /* Verify initial state */
+    if (g_extmem.midi_rx_count != 0) {
+        printf("FAIL: initial rx_count = %d (expected 0)\n", g_extmem.midi_rx_count);
+        return 1;
+    }
+
+    /* Simulate receiving some bytes */
+    midi_rx_isr(0x90);  /* Note On ch 0 */
+    midi_rx_isr(0x3C);  /* Note 60 (C4) */
+    midi_rx_isr(0x7F);  /* Velocity 127 */
+
+    /* Check buffer count */
+    if (g_extmem.midi_rx_count != 3) {
+        printf("FAIL: rx_count = %d (expected 3)\n", g_extmem.midi_rx_count);
+        return 1;
+    }
+
+    /* Check buffer contents */
+    if (g_extmem.midi_rx_buffer[0] != 0x90 ||
+        g_extmem.midi_rx_buffer[1] != 0x3C ||
+        g_extmem.midi_rx_buffer[2] != 0x7F) {
+        printf("FAIL: buffer contents mismatch\n");
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_midi_realtime_filter(void)
+{
+    printf("=== Test: MIDI realtime filter ===\n");
+
+    midi_init();
+
+    /* Send real-time messages (should be filtered) */
+    midi_rx_isr(0xF8);  /* Timing Clock */
+    midi_rx_isr(0xFA);  /* Start */
+    midi_rx_isr(0xFB);  /* Continue */
+    midi_rx_isr(0xFC);  /* Stop */
+    midi_rx_isr(0xFE);  /* Active Sensing */
+    midi_rx_isr(0xFF);  /* System Reset */
+
+    /* Buffer should be empty */
+    if (g_extmem.midi_rx_count != 0) {
+        printf("FAIL: realtime messages not filtered, count = %d\n",
+               g_extmem.midi_rx_count);
+        return 1;
+    }
+
+    /* Send a normal message */
+    midi_rx_isr(0x90);
+    if (g_extmem.midi_rx_count != 1) {
+        printf("FAIL: normal message not received\n");
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_midi_channel_filter(void)
+{
+    printf("=== Test: MIDI channel filter ===\n");
+
+    midi_init();
+    midi_set_base_channel(0);  /* Accept channels 0-3 */
+
+    /* Channel 0 should be accepted */
+    if (!midi_channel_accepted(0)) {
+        printf("FAIL: channel 0 not accepted\n");
+        return 1;
+    }
+
+    /* Channel 3 should be accepted */
+    if (!midi_channel_accepted(3)) {
+        printf("FAIL: channel 3 not accepted\n");
+        return 1;
+    }
+
+    /* Channel 4 should NOT be accepted */
+    if (midi_channel_accepted(4)) {
+        printf("FAIL: channel 4 accepted (should not be)\n");
+        return 1;
+    }
+
+    /* Test base channel offset */
+    midi_set_base_channel(4);  /* Accept channels 4-7 */
+
+    if (!midi_channel_accepted(4)) {
+        printf("FAIL: channel 4 not accepted with base=4\n");
+        return 1;
+    }
+    if (midi_channel_accepted(3)) {
+        printf("FAIL: channel 3 accepted with base=4 (should not be)\n");
+        return 1;
+    }
+
+    /* Test OMNI mode */
+    midi_set_omni(1);
+    if (!midi_channel_accepted(15)) {
+        printf("FAIL: channel 15 not accepted in OMNI mode\n");
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_midi_tx_buffer(void)
+{
+    printf("=== Test: MIDI TX buffer ===\n");
+
+    midi_init();
+
+    /* Queue some bytes */
+    if (!midi_tx_queue(0x90)) {
+        printf("FAIL: could not queue byte 1\n");
+        return 1;
+    }
+    if (!midi_tx_queue(0x3C)) {
+        printf("FAIL: could not queue byte 2\n");
+        return 1;
+    }
+    if (!midi_tx_queue(0x7F)) {
+        printf("FAIL: could not queue byte 3\n");
+        return 1;
+    }
+
+    /* Check TX count */
+    if (g_extmem.midi_tx_count != 3) {
+        printf("FAIL: tx_count = %d (expected 3)\n", g_extmem.midi_tx_count);
+        return 1;
+    }
+
+    /* TX should no longer be idle */
+    if (g_intmem.flags_21 & FLAG21_TX_IDLE) {
+        printf("FAIL: TX still idle after queuing\n");
+        return 1;
+    }
+
+    /* Dequeue and verify */
+    uint8_t byte;
+    if (!midi_tx_dequeue(&byte) || byte != 0x90) {
+        printf("FAIL: dequeued byte 1 = 0x%02X (expected 0x90)\n", byte);
+        return 1;
+    }
+    if (!midi_tx_dequeue(&byte) || byte != 0x3C) {
+        printf("FAIL: dequeued byte 2 = 0x%02X (expected 0x3C)\n", byte);
+        return 1;
+    }
+    if (!midi_tx_dequeue(&byte) || byte != 0x7F) {
+        printf("FAIL: dequeued byte 3 = 0x%02X (expected 0x7F)\n", byte);
+        return 1;
+    }
+
+    /* Buffer should be empty and TX idle */
+    if (g_extmem.midi_tx_count != 0) {
+        printf("FAIL: tx_count = %d after dequeue (expected 0)\n", g_extmem.midi_tx_count);
+        return 1;
+    }
+    if (!(g_intmem.flags_21 & FLAG21_TX_IDLE)) {
+        printf("FAIL: TX not idle after emptying buffer\n");
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+/*============================================================================
  * Main
  *============================================================================*/
 
@@ -469,6 +650,10 @@ int main(void)
     failures += test_load_ptr();
     failures += test_block_copy();
     failures += test_swap_nibbles();
+    failures += test_midi_rx_buffer();
+    failures += test_midi_realtime_filter();
+    failures += test_midi_channel_filter();
+    failures += test_midi_tx_buffer();
 
     printf("=================================\n");
     if (failures == 0) {

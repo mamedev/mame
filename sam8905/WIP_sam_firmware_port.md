@@ -397,13 +397,13 @@ unported functions). Use the original addresses as function name suffixes for tr
 
 | Original | C Function | Status |
 |----------|-----------|--------|
-| B630 | `isr_uart_handler()` | [ ] |
-| C635 | `serial_handler()` | [ ] |
-| B75F | `handle_note_on_off()` | [ ] |
-| C1A0 | `cc_dispatch()` | [ ] |
-| C45B | `handle_program_change()` | [ ] |
-| 9AB0 | `handle_pitch_bend()` | [ ] |
-| BDC | `midi_panic_all_channels()` | [ ] |
+| B630 | `midi_rx_isr()` in sam_midi.c | [x] |
+| C635 | `midi_process_byte()` in sam_midi.c | [x] |
+| B75F | `midi_handle_note()` stub | [ ] |
+| C1A0 | `midi_handle_cc()` stub | [ ] |
+| C45B | `midi_handle_program_change()` stub | [ ] |
+| 9AB0 | `midi_handle_pitch_bend()` stub | [ ] |
+| BDBC | `midi_panic()` in sam_midi.c | [x] |
 
 ### Phase 5: Voice Management
 
@@ -520,9 +520,15 @@ Track newly identified INTMEM/EXTMEM addresses found during porting:
 - [x] Verify pitch table - tests for transpose=0 and transpose=64 pass
 
 ### Phase 4: MIDI (basic)
-- [ ] Port `isr_uart_handler` (B630)
-- [ ] Port `serial_handler` (C635)
-- [ ] Test MIDI RX buffering
+- [x] Port `isr_uart_handler` (B630) - `midi_rx_isr()` in sam_midi.c
+- [x] Port `serial_handler` (C635) - `midi_process_byte()` in sam_midi.c
+- [x] Test MIDI RX buffering - RX buffer, realtime filter, channel filter tests pass
+- [x] MIDI TX buffer - `midi_tx_queue()`, `midi_tx_dequeue()` tested
+- [x] Integrate with emulator - `emu/main_emu.c` uses ported MIDI parser
+  - Handler stubs are weak symbols, overridden by emulator for simple sound
+- [ ] Implement message handlers (note, CC, program change, pitch bend) - stub implementations present
+- [ ] SysEx voice enable handler
+
 
 ### Phase 5-8: Remaining
 - [ ] (expand as Phase 1-4 complete)
