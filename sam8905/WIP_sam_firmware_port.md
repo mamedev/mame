@@ -529,9 +529,164 @@ Track newly identified INTMEM/EXTMEM addresses found during porting:
 - [ ] Implement message handlers (note, CC, program change, pitch bend) - stub implementations present
 - [ ] SysEx voice enable handler
 
+### Phase 5: Voice Management (CRITICAL PATH)
 
-### Phase 5-8: Remaining
-- [ ] (expand as Phase 1-4 complete)
+This is the core of note-on/off handling. Must be done before Program Change works.
+
+**Note On path (CODE:B75F → 9A2D):**
+1. `midi_handle_note()` receives channel, note, velocity
+2. Call `voice_init_slots()` (9A2D) to allocate D-RAM slots
+3. Allocate voice page from free list (0x53 → linked list at 0x7E-0x8D)
+4. Copy program data to voice page (from ROM via program pointer)
+5. Call D-RAM config dispatch loop to initialize SAM slots
+
+**Tasks:**
+- [ ] Port `voice_init_slots` (9A2D) - main note-on entry point
+  - Inputs: channel (0x08), note (0x09), velocity (0x0A) in Bank 1
+  - Allocates voice page from free list
+  - Sets up voice_page_num (0x3A), voice_slot_base (0x3B)
+- [ ] Port `voice_alloc_page` (A9CF) - allocate from free list
+  - Returns page number, updates free list head (0x53)
+  - Returns 0xFF if no free pages
+- [ ] Port `voice_init_next_slot` (AB40) - advance D-RAM word, dispatch
+  - Reads dispatch byte from voice data stream
+  - Calls appropriate handler based on bits 5:3
+- [ ] Port `dram_config_dispatch` (AB4C) - dispatch loop
+  - Loops through D-RAM words calling handlers
+  - Terminates on bit 7 set or handler 0x20
+- [ ] Port `voice_init_copy_and_envelope` (AB73) - envelope setup
+  - Copies 7-byte envelope data to voice slot
+  - Processes envelope table pointer
+
+**Note Off path (CODE:A69C):**
+- [ ] Port `voice_deactivate` (A69C) - mark voice for release
+  - Sets release flag in voice page
+  - Voice continues through release phase
+- [ ] Port `voice_free_page` - return page to free list
+  - Called when envelope reaches zero
+
+**Voice List Management:**
+- [ ] Port active voice list traversal (head at 0x54)
+- [ ] Port pending release list (head at 0x55)
+- [ ] Port channel note tracking (0x9F-0xA2, 0xAF-0xB2)
+
+### Phase 6: D-RAM Config Handlers
+
+These decode the voice init data stream and write to SAM D-RAM.
+
+| Handler | Address | Bytes | Description |
+|---------|---------|-------|-------------|
+| 0x00 | AD8F | 3-4 | Short D-RAM write |
+| 0x08 | ADBD | 10 | Pitch/frequency setup |
+| 0x10 | B030 | 9 | Amplitude/level + envelope |
+| 0x18 | B222 | 4 | D-RAM write + velocity mod |
+| 0x20 | B278 | 4 | Output routing (TERMINATES) |
+| 0x28 | B2D2 | 1 | Write constant 0x28 |
+| 0x30 | B2CF | 1 | Skip/re-dispatch |
+
+**Tasks:**
+- [ ] Port `dram_config_handler_00` (AD8F) - simple D-RAM write
+- [ ] Port `dram_config_handler_08` (ADBD) - pitch setup (most complex)
+  - Handles pitch table lookup, portamento, mod wheel
+  - 10 bytes: dispatch + vel_sens + note_offset + ctrl + bend_range + fine_lo + fine_hi + skip + port_rate + port_depth
+- [ ] Port `dram_config_handler_10` (B030) - amplitude/envelope
+  - Handles velocity scaling, envelope enable, modulation
+  - 9 bytes: dispatch + base_level + amplitude + env_ctrl + rate + unused + sustain + vel_sens + mod_amt
+- [ ] Port `dram_config_handler_18` (B222) - velocity-modulated write
+- [ ] Port `dram_config_handler_20` (B278) - output routing
+- [ ] Port `dram_config_apply_velocity` (B1EC) - MIX attenuation
+
+### Phase 7: Envelope and Modulation System
+
+Called periodically from Timer 1 ISR via main loop.
+
+**Tasks:**
+- [ ] Port `periodic_voice_update` (9BA7) - main periodic handler
+  - Called every ~11ms when tick counter >= 2
+  - Iterates active voice list
+  - Updates envelopes and modulation
+- [ ] Port `envelope_tick_volume` (A403) - advance envelope state
+  - Reads envelope segment table
+  - Updates envelope phase and level
+- [ ] Port `envelope_write_dram` (A471) - write envelope to SAM
+- [ ] Port `modulation_write_dram` (9FCD) - LFO/mod wheel to D-RAM
+- [ ] Port `volume_envelope_update` (A18F) - volume envelope processing
+- [ ] Port LFO update - mod_lfo_rate (0x1180) → output (0x1183)
+- [ ] Port noise LFO - LFSR at 0x51 (x = x*3 + 0x43)
+
+### Phase 8: Main Loop and Timer
+
+**Tasks:**
+- [ ] Port `timer1_isr` (D440) - increment tick counters
+  - Increments Bank 2 R6 (slow) and R7 (fast)
+  - Fast tick triggers periodic_voice_update every 2 ticks (~11ms)
+- [ ] Port `main_loop` (DA30) - event loop
+  - Calls `midi_process_byte()` for MIDI
+  - Checks tick counters for periodic updates
+  - Handles active sensing timeout
+- [ ] Port `reset_entry` (DCBC) - full initialization sequence
+
+### Phase 9: Program Change and CC Handlers
+
+Depends on Phase 5-7 being complete.
+
+**Tasks:**
+- [ ] Port `handle_program_change` (C45B)
+  - Looks up program pointer from table at CODE:0x0040
+  - Stores pointer at 0x14D3-0x14D4
+  - Copies 8 bytes to 0x11E6-0x11ED (program_init_copy)
+- [ ] Port `cc_dispatch` (C1A0) - CC number lookup and handler call
+- [ ] Port CC handlers:
+  - CC 1: Modulation wheel → 0x1184-0x1193
+  - CC 5: Portamento time → 0x4C
+  - CC 7: Volume
+  - CC 10: Pan
+  - CC 64: Sustain pedal → 0x1E50+ch
+  - CC 65: Portamento on/off
+  - CC 123: All notes off
+  - CC 124-127: Mode messages (OMNI, MONO, POLY)
+- [ ] Port `handle_pitch_bend` (9AB0) - updates 0x1194-0x11B3
+
+### Emulator Integration
+
+See `WIP_sam_firmware_port_emu.md` for full emulator documentation.
+
+**Current state:**
+- [x] SAM8905 emulator ported from MAME (`emu/sam8905_emu.c`)
+- [x] PortAudio audio output (`emu/audio_portaudio.c`)
+- [x] ALSA MIDI input - raw bytes (`emu/midi_alsa_raw.c`)
+- [x] Main loop with basic sound generation (`emu/main_emu.c`)
+- [x] Firmware MIDI parser integrated (bytes → `midi_rx_isr()` → parser)
+
+**Next steps for emulator:**
+- [ ] Connect `sam_hw.c` to emulator D-RAM/A-RAM writes
+- [ ] Port voice allocation (Phase 5) to get real note-on working
+- [ ] Add stereo output to PortAudio
+- [ ] Add MIDI output for Active Sensing
+
+**Testing with emulator:**
+```bash
+cd sam_firmware/emu
+make
+./sam_emu
+# In another terminal:
+aconnect <midi_keyboard_port> <sam_emu_port>
+```
+
+## Implementation Priority
+
+For quickest path to working sound with real programs:
+
+1. **Phase 5 (Voice Management)** - Need voice_alloc_page and voice_init_slots
+2. **Phase 6 (D-RAM Handlers)** - At minimum: handler_08 (pitch) and handler_10 (amplitude)
+3. **Phase 9 (Program Change)** - Load actual program data from ROM
+4. **Phase 7 (Envelopes)** - For proper ADSR, can start with simple attack-sustain
+
+Simplified approach for initial testing:
+- Hard-code a simple sine wave program (like emulator does now)
+- Port voice allocation to use proper free list
+- Add pitch table lookup for correct note frequencies
+- Skip complex envelope processing initially
 
 ## Notes
 
