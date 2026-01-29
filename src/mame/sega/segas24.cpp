@@ -337,19 +337,21 @@ Notes:
 */
 
 #include "emu.h"
-#include "emupal.h"
+
+#include "315_5296.h"
+#include "fd1094.h"
+#include "segaic24.h"
 #include "segaipt.h"
 
 #include "cpu/m68000/m68000.h"
-#include "fd1094.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
 #include "machine/upd4701.h"
-#include "315_5296.h"
 #include "sound/dac.h"
 #include "sound/ymopm.h"
-#include "segaic24.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -367,6 +369,8 @@ Notes:
 #define FDC_LEGACY_LOG      0
 #define FDC_LOG(x) do { if (FDC_LEGACY_LOG) logerror x; } while (0)
 
+namespace {
+
 enum {
 	IRQ_YM2151 = 1,
 	IRQ_TIMER  = 2,
@@ -374,22 +378,6 @@ enum {
 	IRQ_SPRITE = 4,
 	IRQ_FRC = 5
 };
-
-namespace {
-	struct layer_sort {
-		layer_sort(segas24_mixer_device &_mixer) : mixer(_mixer) { }
-
-		bool operator()(int l1, int l2) {
-			static const int default_pri[12] = { 0, 1, 2, 3, 4, 5, 6, 7, -4, -3, -2, -1 };
-			int p1 = mixer.get_reg(l1) & 7;
-			int p2 = mixer.get_reg(l2) & 7;
-			if(p1 != p2)
-				return p1 - p2 < 0;
-			return default_pri[l2] - default_pri[l1] < 0;
-		}
-
-		segas24_mixer_device &mixer;
-	};
 
 class segas24_state : public driver_device
 {
@@ -450,6 +438,8 @@ public:
 	void system24(machine_config &config);
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
 private:
@@ -460,16 +450,15 @@ private:
 	required_shared_ptr<uint16_t> m_paletteram;
 	optional_memory_region m_romboard;
 	optional_region_ptr<uint8_t> m_floppy;
-
 	optional_memory_bank_array<2> m_rombank;
 
-	static const uint8_t  s_mahmajn_mlt[8];
+	static const uint8_t s_mahmajn_mlt[8];
 	static const uint8_t s_mahmajn2_mlt[8];
-	static const uint8_t      s_qgh_mlt[8];
+	static const uint8_t s_qgh_mlt[8];
 	static const uint8_t s_bnzabros_mlt[8];
-	static const uint8_t   s_qrouka_mlt[8];
+	static const uint8_t s_qrouka_mlt[8];
 	static const uint8_t s_quizmeku_mlt[8];
-	static const uint8_t   s_dcclub_mlt[8];
+	static const uint8_t s_dcclub_mlt[8];
 
 	uint8_t m_fdc_track_side = 0;
 	uint8_t m_fdc_mode = 0;
@@ -502,7 +491,6 @@ private:
 	//timer_device *m_irq_frc;
 	required_device<timer_device> m_frc_cnt_timer;
 	uint8_t m_frc_mode = 0;
-
 	bool m_cnt1 = false;
 
 	required_device<segas24_tile_device> m_vtile;
@@ -544,8 +532,6 @@ private:
 	void irq_timer_sync();
 	void irq_timer_start(int old_tmode);
 	void cnt1(int state);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_clear_cb);
@@ -577,6 +563,7 @@ private:
 	void dcclubj_cpu1_map(address_map &map) ATTR_COLD;
 	void dcclubj_cpu2_map(address_map &map) ATTR_COLD;
 };
+
 
 // Floppy Disk Controller
 
@@ -793,6 +780,7 @@ void segas24_state::iod_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	logerror("IO daughterboard write %02x, %04x & %04x %s\n", offset, data, mem_mask, machine().describe_context());
 }
 
+
 /* HACK for Gain Ground to avoid 'forced free play' issue
 
 Notes from Olivier
@@ -842,8 +830,6 @@ why refresh on CPU A's bus doesn't count as contention for CPU B and
 vice-versa. So there's only refresh event that eats up time for both
 CPUs to worry about.
 
-
-
 */
 
 TIMER_CALLBACK_MEMBER(segas24_state::gground_hack_timer_callback)
@@ -853,7 +839,6 @@ TIMER_CALLBACK_MEMBER(segas24_state::gground_hack_timer_callback)
 
 
 // Cpu #1 reset control
-
 
 void segas24_state::cnt1(int state)
 {
@@ -880,7 +865,6 @@ void segas24_state::cnt1(int state)
 
 
 // Rom board bank access
-
 
 void segas24_state::reset_bank()
 {
@@ -933,13 +917,13 @@ void segas24_state::frc_w(uint8_t data)
 
 // Protection magic latch
 
-const uint8_t  segas24_state::s_mahmajn_mlt[8] = { 5, 1, 6, 2, 3, 7, 4, 0 };
+const uint8_t segas24_state::s_mahmajn_mlt[8]  = { 5, 1, 6, 2, 3, 7, 4, 0 };
 const uint8_t segas24_state::s_mahmajn2_mlt[8] = { 6, 0, 5, 3, 1, 4, 2, 7 };
-const uint8_t      segas24_state::s_qgh_mlt[8] = { 3, 7, 4, 0, 2, 6, 5, 1 };
+const uint8_t segas24_state::s_qgh_mlt[8]      = { 3, 7, 4, 0, 2, 6, 5, 1 };
 const uint8_t segas24_state::s_bnzabros_mlt[8] = { 2, 4, 0, 5, 7, 3, 1, 6 };
-const uint8_t   segas24_state::s_qrouka_mlt[8] = { 1, 6, 4, 7, 0, 5, 3, 2 };
+const uint8_t segas24_state::s_qrouka_mlt[8]   = { 1, 6, 4, 7, 0, 5, 3, 2 };
 const uint8_t segas24_state::s_quizmeku_mlt[8] = { 0, 3, 2, 4, 6, 1, 7, 5 };
-const uint8_t   segas24_state::s_dcclub_mlt[8] = { 4, 7, 3, 0, 2, 6, 5, 1 };
+const uint8_t segas24_state::s_dcclub_mlt[8]   = { 4, 7, 3, 0, 2, 6, 5, 1 };
 
 
 uint8_t segas24_state::mlatch_r()
@@ -949,7 +933,6 @@ uint8_t segas24_state::mlatch_r()
 
 void segas24_state::mlatch_w(uint8_t data)
 {
-	int i;
 	uint8_t mxor = 0;
 	if(!m_mlatch_table) {
 		logerror("Protection: magic latch accessed but no table loaded %s\n", machine().describe_context());
@@ -957,7 +940,7 @@ void segas24_state::mlatch_w(uint8_t data)
 	}
 
 	if(data != 0xff) {
-		for(i=0; i<8; i++)
+		for(int i=0; i<8; i++)
 			if(m_mlatch & (1<<i))
 				mxor |= 1 << m_mlatch_table[i];
 		m_mlatch = data ^ mxor;
@@ -1044,7 +1027,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
 
 	if (m_irq_tmode == 1 || m_irq_tmode == 2)
 	{
-	//  m_screen->update_now();
+		//m_screen->update_now();
 		m_screen->update_partial(m_screen->vpos());
 	}
 }
@@ -1189,6 +1172,56 @@ void segas24_state::irq_ym(int state)
 }
 
 
+// Screen update
+
+uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if(m_vmixer->get_reg(13) & 1) {
+		bitmap.fill(m_palette->black_pen());
+		return 0;
+	}
+
+	screen.priority().fill(0);
+	bitmap.fill(0, cliprect);
+
+	std::vector<int> order;
+	order.resize(12);
+	for(int i=0; i<12; i++)
+		order[i] = i;
+
+	std::sort(order.begin(), order.end(), [this](int l1, int l2) {
+		static const int default_pri[12] = { 0, 1, 2, 3, 4, 5, 6, 7, -4, -3, -2, -1 };
+
+		int p1 = m_vmixer->get_reg(l1) & 7;
+		int p2 = m_vmixer->get_reg(l2) & 7;
+
+		if(p1 != p2)
+			return p1 < p2;
+
+		return default_pri[l2] < default_pri[l1];
+	});
+
+	// zero value pixels from the bottommost layer show color 0 of the specified palette
+	// to do this we draw the tilemap layers in reverse order as opaque
+	for (int i = 11; i >= 0; i--)
+		if (order[i] < 8 && (order[i] & 1) == 0)
+			m_vtile->draw(screen, bitmap, cliprect, order[i], 0, TILEMAP_DRAW_OPAQUE);
+
+	int spri[4]{};
+	int level = 0;
+	for(int i=0; i<12; i++)
+		if(order[i] < 8)
+			m_vtile->draw(screen, bitmap, cliprect, order[i], level, 0);
+		else {
+			spri[order[i]-8] = level;
+			level++;
+		}
+
+	m_vsprite->draw(bitmap, cliprect, screen.priority(), spri);
+	return 0;
+}
+
+
 // 315-5242
 
 uint16_t segas24_state::paletteram_r(offs_t offset)
@@ -1281,7 +1314,6 @@ fc-ff ramhi
  The BIOS ROM mirror at $100000 is common to both CPUs.
 */
 
-
 void segas24_state::common_map(address_map &map)
 {
 	map(0x080000, 0x0bffff).mirror(0x040000).ram().share("share1");
@@ -1369,6 +1401,7 @@ void segas24_state::dcclubj_cpu1_map(address_map &map)
 	roughrac_common_map(map);
 }
 
+
 /*************************************
  *
  *  CPU 2 memory handlers
@@ -1409,6 +1442,7 @@ void segas24_state::decrypted_opcodes_map(address_map &map)
 {
 	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
 }
+
 
 /*************************************
  *
@@ -1478,42 +1512,6 @@ void segas24_state::machine_reset()
 	}
 }
 
-uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	if(m_vmixer->get_reg(13) & 1) {
-		bitmap.fill(m_palette->black_pen());
-		return 0;
-	}
-
-	screen.priority().fill(0);
-	bitmap.fill(0, cliprect);
-
-	std::vector<int> order;
-	order.resize(12);
-	for(int i=0; i<12; i++)
-		order[i] = i;
-
-	std::sort(order.begin(), order.end(), layer_sort(*m_vmixer));
-
-	// zero value pixels from the bottommost layer show color 0 of the specified palette
-	// to do this we draw the tilemap layers in reverse order as opaque
-	for (int i = 11; i >= 0; i--)
-		if (order[i] < 8 && (order[i] & 1) == 0)
-			m_vtile->draw(screen, bitmap, cliprect, order[i], 0, TILEMAP_DRAW_OPAQUE);
-
-	int spri[4]{};
-	int level = 0;
-	for(int i=0; i<12; i++)
-		if(order[i] < 8)
-			m_vtile->draw(screen, bitmap, cliprect, order[i], level, 0);
-		else {
-			spri[order[i]-8] = level;
-			level++;
-		}
-
-	m_vsprite->draw(bitmap, cliprect, screen.priority(), spri);
-	return 0;
-}
 
 /*************************************
  *
