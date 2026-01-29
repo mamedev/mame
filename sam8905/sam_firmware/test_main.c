@@ -9,8 +9,11 @@
 #include "sam_firmware.h"
 #include "sam_pitch_tables.h"
 
-/* ROM data placeholder */
+/* ROM data placeholder (const to match declaration) */
 CODE uint8_t g_rom[0x10000];
+
+/* Mutable test ROM buffer for D-RAM config tests */
+static uint8_t s_test_rom[0x10000];
 
 /*============================================================================
  * Test Helpers
@@ -629,6 +632,443 @@ static int test_midi_tx_buffer(void)
 }
 
 /*============================================================================
+ * D-RAM Config Tests
+ *============================================================================*/
+
+static int test_dram_config_dispatch_simple(void)
+{
+    printf("=== Test: dram_config_dispatch (simple) ===\n");
+
+    /* Initialize */
+    memset(&g_intmem, 0x00, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0x00, sizeof(g_intmem_upper));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+    memset(s_test_rom, 0x00, sizeof(s_test_rom));
+
+    /* Use test ROM buffer */
+    dram_config_set_test_rom(s_test_rom);
+
+    /* Set up a simple config stream with handler 0x28 (constant write) */
+    /* Stream: 0x28 (handler), then terminator 0x80 */
+    s_test_rom[0x1000] = 0x28;  /* Handler 0x28: write constant */
+    s_test_rom[0x1001] = 0x80;  /* Terminator */
+
+    /* Set up dispatch parameters */
+    g_intmem.rom_data_ptr_lo = 0x00;
+    g_intmem.rom_data_ptr_hi = 0x10;  /* 0x1000 */
+    g_intmem.voice_page_num = 0;       /* Use voice page 0 */
+    g_intmem.voice_slot_base = 0x00;   /* Start at offset 0 */
+    g_intmem.remaining_slots = 2;      /* Process 2 words */
+    g_intmem.dram_address_counter = 0;
+
+    /* Run dispatch */
+    dram_config_dispatch();
+
+    /* Verify: first slot should have 0x28 */
+    uint8_t slot0 = voice_page_read(0, 0x00);
+    if (slot0 != 0x28) {
+        printf("FAIL: slot 0 = 0x%02X (expected 0x28)\n", slot0);
+        return 1;
+    }
+
+    /* Second slot should have 0x80 (terminator value) */
+    uint8_t slot1 = voice_page_read(0, 0x08);  /* Offset advances by 8 */
+    if (slot1 != 0x80) {
+        printf("FAIL: slot 1 = 0x%02X (expected 0x80)\n", slot1);
+        return 1;
+    }
+
+    /* Remaining slots should be 0 (terminated) */
+    if (g_intmem.remaining_slots != 0) {
+        printf("FAIL: remaining_slots = %d (expected 0)\n", g_intmem.remaining_slots);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_dram_config_handler_00(void)
+{
+    printf("=== Test: dram_config_handler_00 (short write) ===\n");
+
+    /* Initialize */
+    memset(&g_intmem, 0x00, sizeof(g_intmem));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+    memset(s_test_rom, 0x00, sizeof(s_test_rom));
+
+    /* Use test ROM buffer */
+    dram_config_set_test_rom(s_test_rom);
+
+    /* Set up a 3-byte write: dispatch + value_lo + value_hi + terminator */
+    s_test_rom[0x2000] = 0x00;  /* Handler 0x00 */
+    s_test_rom[0x2001] = 0x34;  /* value_lo */
+    s_test_rom[0x2002] = 0x12;  /* value_hi */
+    s_test_rom[0x2003] = 0x80;  /* Next byte has bit 7 set = terminator */
+
+    /* Set up dispatch parameters */
+    g_intmem.rom_data_ptr_lo = 0x00;
+    g_intmem.rom_data_ptr_hi = 0x20;  /* 0x2000 */
+    g_intmem.voice_page_num = 1;       /* Use voice page 1 */
+    g_intmem.voice_slot_base = 0x10;   /* Start at offset 0x10 */
+    g_intmem.remaining_slots = 2;
+    g_intmem.dram_address_counter = 0;
+
+    /* Run dispatch */
+    dram_config_dispatch();
+
+    /* Verify: slot should have dispatch byte and values */
+    uint8_t d = voice_page_read(1, 0x10);
+    uint8_t lo = voice_page_read(1, 0x11);
+    uint8_t hi = voice_page_read(1, 0x12);
+
+    if (d != 0x00 || lo != 0x34 || hi != 0x12) {
+        printf("FAIL: slot data = %02X %02X %02X (expected 00 34 12)\n", d, lo, hi);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_dram_config_velocity_scaling(void)
+{
+    printf("=== Test: dram_config_apply_velocity ===\n");
+
+    /* Test cases */
+    uint8_t result;
+
+    /* No sensitivity: should return original value */
+    g_intmem.midi_velocity = 64;
+    result = dram_config_apply_velocity(100, 0);
+    if (result != 100) {
+        printf("FAIL: vel_sens=0: %d (expected 100)\n", result);
+        return 1;
+    }
+
+    /* Full velocity, any sensitivity: should return original value */
+    g_intmem.midi_velocity = 127;
+    result = dram_config_apply_velocity(100, 127);
+    if (result != 100) {
+        printf("FAIL: vel=127, sens=127: %d (expected 100)\n", result);
+        return 1;
+    }
+
+    /* Zero velocity, full sensitivity: should return ~0 */
+    g_intmem.midi_velocity = 0;
+    result = dram_config_apply_velocity(100, 127);
+    if (result != 0) {
+        printf("FAIL: vel=0, sens=127: %d (expected 0)\n", result);
+        return 1;
+    }
+
+    /* Half velocity, half sensitivity: should attenuate somewhat */
+    g_intmem.midi_velocity = 64;
+    result = dram_config_apply_velocity(100, 64);
+    /* Expected: 100 - ((127-64) * 64) / 128 = 100 - (63*64)/128 = 100 - 31.5 ≈ 68-69 */
+    if (result < 65 || result > 72) {
+        printf("FAIL: vel=64, sens=64: %d (expected ~68)\n", result);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+/*============================================================================
+ * Voice Management Tests
+ *============================================================================*/
+
+static int test_voice_init_slots(void)
+{
+    printf("=== Test: voice_init_slots ===\n");
+
+    /* Initialize */
+    memset(&g_intmem, 0x00, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0x00, sizeof(g_intmem_upper));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+    memset(s_test_rom, 0x00, sizeof(s_test_rom));
+
+    /* Initialize slot manager (sets up free list) */
+    sam_slot_manager_init();
+
+    /* Use test ROM buffer for both modules */
+    dram_config_set_test_rom(s_test_rom);
+    voice_set_test_rom(s_test_rom);
+
+    /* Set up a minimal program at address 0x3000 */
+    /* Offset 9: flags byte (slot_count in lower 4 bits) */
+    s_test_rom[0x3000 + 9] = 0x02;  /* 2 slots */
+
+    /* Offset 22 (0x16): 8 bytes for program_init_copy */
+    for (int i = 0; i < 8; i++) {
+        s_test_rom[0x3000 + 0x16 + i] = 0x10 + i;
+    }
+
+    /* Set up intmem parameters */
+    g_intmem.program_base_dpl = 0x00;
+    g_intmem.program_base_dph = 0x30;  /* 0x3000 */
+    g_intmem.current_slot_id = 0x00;
+    g_intmem.sam_ctrl_flags = SAM_CTRL_DRAM_WR;
+
+    /* Initial state check */
+    if (g_intmem.dram_slot_count != 16) {
+        printf("FAIL: initial dram_slot_count = %d (expected 16)\n", g_intmem.dram_slot_count);
+        return 1;
+    }
+
+    /* Call voice_init_slots */
+    voice_init_slots();
+
+    /* Verify slot_count was set */
+    if (g_intmem.slot_count != 2) {
+        printf("FAIL: slot_count = %d (expected 2)\n", g_intmem.slot_count);
+        return 1;
+    }
+
+    /* Verify 2 pages were allocated (count should be 14) */
+    if (g_intmem.dram_slot_count != 14) {
+        printf("FAIL: dram_slot_count = %d (expected 14)\n", g_intmem.dram_slot_count);
+        return 1;
+    }
+
+    /* Verify first page (page 0) was initialized */
+    uint8_t status = voice_page_read(0, VOICE_PAGE_STATUS);
+    if (status != 0x20) {
+        printf("FAIL: page 0 status = 0x%02X (expected 0x20)\n", status);
+        return 1;
+    }
+
+    uint8_t active = voice_page_read(0, VOICE_PAGE_ACTIVE);
+    if (active != 0xFF) {
+        printf("FAIL: page 0 active = 0x%02X (expected 0xFF)\n", active);
+        return 1;
+    }
+
+    /* Verify D-RAM flags at 0x70-0x73 = 0x0F */
+    for (int i = 0x70; i < 0x74; i++) {
+        uint8_t flag = voice_page_read(0, i);
+        if (flag != 0x0F) {
+            printf("FAIL: page 0 offset 0x%02X = 0x%02X (expected 0x0F)\n", i, flag);
+            return 1;
+        }
+    }
+
+    /* Verify program_init_copy was filled */
+    for (int i = 0; i < 8; i++) {
+        if (g_extmem.program_init_copy[i] != (0x10 + i)) {
+            printf("FAIL: program_init_copy[%d] = 0x%02X (expected 0x%02X)\n",
+                   i, g_extmem.program_init_copy[i], 0x10 + i);
+            return 1;
+        }
+    }
+
+    /* Clean up */
+    dram_config_set_test_rom(NULL);
+    voice_set_test_rom(NULL);
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_voice_list_next(void)
+{
+    printf("=== Test: voice_list_next / voice_list_set_next ===\n");
+
+    /* Initialize slot manager (sets up free list) */
+    memset(&g_intmem, 0xFF, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0xFF, sizeof(g_intmem_upper));
+    sam_slot_manager_init();
+
+    /* Verify linked list traversal */
+    for (uint8_t page = 0; page < 15; page++) {
+        uint8_t next = voice_list_next(page);
+        if (next != page + 1) {
+            printf("FAIL: voice_list_next(%d) = %d (expected %d)\n", page, next, page + 1);
+            return 1;
+        }
+    }
+
+    /* Last page should point to end */
+    if (voice_list_next(15) != VOICE_LIST_END) {
+        printf("FAIL: voice_list_next(15) = %d (expected 0xFF)\n", voice_list_next(15));
+        return 1;
+    }
+
+    /* Test setting next pointer */
+    voice_list_set_next(5, 10);
+    if (voice_list_next(5) != 10) {
+        printf("FAIL: voice_list_set_next(5, 10) didn't work\n");
+        return 1;
+    }
+
+    /* Restore for other tests */
+    voice_list_set_next(5, 6);
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_voice_slot_allocate(void)
+{
+    printf("=== Test: voice_slot_allocate ===\n");
+
+    /* Initialize slot manager */
+    memset(&g_intmem, 0xFF, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0xFF, sizeof(g_intmem_upper));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+    sam_slot_manager_init();
+
+    /* Set slot_count to 1 (allocate 1 page at a time) */
+    g_intmem.slot_count = 1;
+
+    /* Before allocation */
+    if (g_intmem.dram_slot_count != 16) {
+        printf("FAIL: initial dram_slot_count = %d (expected 16)\n", g_intmem.dram_slot_count);
+        return 1;
+    }
+
+    /* Allocate first page - should get page 0 */
+    uint8_t page = voice_slot_allocate();
+    if (page != 0) {
+        printf("FAIL: first allocation returned %d (expected 0)\n", page);
+        return 1;
+    }
+
+    /* Check count decreased */
+    if (g_intmem.dram_slot_count != 15) {
+        printf("FAIL: dram_slot_count = %d (expected 15)\n", g_intmem.dram_slot_count);
+        return 1;
+    }
+
+    /* Free list head should now be 1 */
+    if (g_intmem.dram_slot_free_list != 1) {
+        printf("FAIL: free list head = %d (expected 1)\n", g_intmem.dram_slot_free_list);
+        return 1;
+    }
+
+    /* Active list should contain page 0 */
+    if (g_intmem.active_voice_list_head != 0) {
+        printf("FAIL: active_voice_list_head = %d (expected 0)\n", g_intmem.active_voice_list_head);
+        return 1;
+    }
+
+    /* Allocate second page - should get page 1 */
+    g_intmem.slot_count = 1;
+    page = voice_slot_allocate();
+    if (page != 1) {
+        printf("FAIL: second allocation returned %d (expected 1)\n", page);
+        return 1;
+    }
+
+    /* Check count decreased again */
+    if (g_intmem.dram_slot_count != 14) {
+        printf("FAIL: dram_slot_count = %d (expected 14)\n", g_intmem.dram_slot_count);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_voice_slot_free_to_list(void)
+{
+    printf("=== Test: voice_slot_free_to_list ===\n");
+
+    /* Initialize slot manager */
+    memset(&g_intmem, 0xFF, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0xFF, sizeof(g_intmem_upper));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+    sam_slot_manager_init();
+
+    /* Allocate two pages */
+    g_intmem.slot_count = 1;
+    voice_slot_allocate();  /* page 0 */
+    g_intmem.slot_count = 1;
+    voice_slot_allocate();  /* page 1 */
+
+    /* Free list head should be 2, count should be 14 */
+    if (g_intmem.dram_slot_free_list != 2) {
+        printf("FAIL: after alloc, free list head = %d (expected 2)\n", g_intmem.dram_slot_free_list);
+        return 1;
+    }
+    if (g_intmem.dram_slot_count != 14) {
+        printf("FAIL: after alloc, count = %d (expected 14)\n", g_intmem.dram_slot_count);
+        return 1;
+    }
+
+    /* Return page 0 to free list */
+    voice_slot_free_to_list(0);
+
+    /* Free list head should now be 0 */
+    if (g_intmem.dram_slot_free_list != 0) {
+        printf("FAIL: after free, free list head = %d (expected 0)\n", g_intmem.dram_slot_free_list);
+        return 1;
+    }
+
+    /* Page 0 should point to 2 (former head) */
+    if (voice_list_next(0) != 2) {
+        printf("FAIL: page 0 next = %d (expected 2)\n", voice_list_next(0));
+        return 1;
+    }
+
+    /* Count should be 15 */
+    if (g_intmem.dram_slot_count != 15) {
+        printf("FAIL: after free, count = %d (expected 15)\n", g_intmem.dram_slot_count);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+static int test_voice_list_remove(void)
+{
+    printf("=== Test: voice_list_remove ===\n");
+
+    /* Initialize slot manager */
+    memset(&g_intmem, 0xFF, sizeof(g_intmem));
+    memset(&g_intmem_upper, 0xFF, sizeof(g_intmem_upper));
+    memset(&g_extmem, 0x00, sizeof(g_extmem));
+    sam_slot_manager_init();
+
+    /* Allocate three pages: 0, 1, 2 */
+    g_intmem.slot_count = 1;
+    voice_slot_allocate();  /* page 0 */
+    g_intmem.slot_count = 1;
+    voice_slot_allocate();  /* page 1 */
+    g_intmem.slot_count = 1;
+    voice_slot_allocate();  /* page 2 */
+
+    /* Active list should be: 0 -> 1 -> 2 -> end */
+    if (g_intmem.active_voice_list_head != 0) {
+        printf("FAIL: active head = %d (expected 0)\n", g_intmem.active_voice_list_head);
+        return 1;
+    }
+
+    /* Remove page 1 from middle */
+    voice_list_remove(1);
+
+    /* Active list should be: 0 -> 2 -> end */
+    if (voice_list_next(0) != 2) {
+        printf("FAIL: after remove, page 0 next = %d (expected 2)\n", voice_list_next(0));
+        return 1;
+    }
+
+    /* Remove head (page 0) */
+    voice_list_remove(0);
+
+    /* Active list should be: 2 -> end */
+    if (g_intmem.active_voice_list_head != 2) {
+        printf("FAIL: after head remove, active head = %d (expected 2)\n", g_intmem.active_voice_list_head);
+        return 1;
+    }
+
+    printf("PASS\n\n");
+    return 0;
+}
+
+/*============================================================================
  * Main
  *============================================================================*/
 
@@ -654,6 +1094,14 @@ int main(void)
     failures += test_midi_realtime_filter();
     failures += test_midi_channel_filter();
     failures += test_midi_tx_buffer();
+    failures += test_dram_config_dispatch_simple();
+    failures += test_dram_config_handler_00();
+    failures += test_dram_config_velocity_scaling();
+    failures += test_voice_init_slots();
+    failures += test_voice_list_next();
+    failures += test_voice_slot_allocate();
+    failures += test_voice_slot_free_to_list();
+    failures += test_voice_list_remove();
 
     printf("=================================\n");
     if (failures == 0) {

@@ -16,6 +16,8 @@
 #include "sam_utils.h"
 #include "sam_math.h"
 #include "sam_midi.h"
+#include "sam_voice.h"
+#include "sam_dram_config.h"
 
 /*============================================================================
  * Global State

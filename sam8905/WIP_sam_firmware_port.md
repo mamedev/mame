@@ -409,25 +409,29 @@ unported functions). Use the original addresses as function name suffixes for tr
 
 | Original | C Function | Status |
 |----------|-----------|--------|
-| 9A2D | `voice_init_slots()` | [ ] |
+| 9A2D | `voice_init_slots()` in sam_voice.c | [x] |
 | AB40 | `voice_init_next_slot()` | [ ] |
 | AB73 | `voice_init_copy_and_envelope()` | [ ] |
-| AB4C | `dram_config_dispatch()` | [ ] |
+| AB4C | `dram_config_dispatch()` in sam_dram_config.c | [x] |
 | B4BF | `voice_assign_algorithm()` | [ ] |
-| A785 | `voice_kill_channel()` | [ ] |
-| A69C | `voice_deactivate()` | [ ] |
+| A785 | `voice_kill_channel()` in sam_voice.c | [x] |
+| A69C | `voice_deactivate()` in sam_voice.c | [x] |
+| A9CF | `voice_slot_allocate()` in sam_voice.c | [x] |
+| 9946 | `voice_free()` in sam_voice.c | [x] |
+| A012 | `voice_steal_find()` in sam_voice.c | [x] |
 
 ### Phase 6: D-RAM Config Handlers
 
 | Original | C Function | Status |
 |----------|-----------|--------|
-| AD8F | `dram_config_handler_00()` | [ ] |
-| ADBD | `dram_config_handler_08()` | [ ] |
-| B030 | `dram_config_handler_10()` | [ ] |
-| B222 | `dram_config_handler_18()` | [ ] |
-| B278 | `dram_config_handler_20()` | [ ] |
-| B2D2 | `dram_config_handler_28()` | [ ] |
-| B2CF | `dram_config_handler_30()` | [ ] |
+| AD8F | `dram_config_handler_00()` in sam_dram_config.c | [x] |
+| ADBD | `dram_config_handler_08()` in sam_dram_config.c | [x] |
+| B030 | `dram_config_handler_10()` in sam_dram_config.c | [x] |
+| B222 | `dram_config_handler_18()` in sam_dram_config.c | [x] |
+| B278 | `dram_config_handler_20()` in sam_dram_config.c | [x] |
+| B2D2 | `dram_config_handler_28()` in sam_dram_config.c | [x] |
+| B2CF | `dram_config_handler_30()` in sam_dram_config.c | [x] |
+| B1EC | `dram_config_apply_velocity()` in sam_dram_config.c | [x] |
 
 ### Phase 7: Envelope/Modulation System
 
@@ -541,17 +545,17 @@ This is the core of note-on/off handling. Must be done before Program Change wor
 5. Call D-RAM config dispatch loop to initialize SAM slots
 
 **Tasks:**
-- [ ] Port `voice_init_slots` (9A2D) - main note-on entry point
-  - Inputs: channel (0x08), note (0x09), velocity (0x0A) in Bank 1
-  - Allocates voice page from free list
-  - Sets up voice_page_num (0x3A), voice_slot_base (0x3B)
-- [ ] Port `voice_alloc_page` (A9CF) - allocate from free list
+- [x] Port `voice_init_slots` (9A2D) - main note-on entry point - `voice_init_slots()` in sam_voice.c
+  - Reads slot_count from program flags, allocates voice pages
+  - Initializes voice page status, slot ID, active marker, D-RAM flags
+  - Writes D-RAM word 15, copies program_init_copy
+- [x] Port `voice_slot_allocate` (A9CF) - allocate from free list - `voice_slot_allocate()` in sam_voice.c
   - Returns page number, updates free list head (0x53)
   - Returns 0xFF if no free pages
 - [ ] Port `voice_init_next_slot` (AB40) - advance D-RAM word, dispatch
   - Reads dispatch byte from voice data stream
   - Calls appropriate handler based on bits 5:3
-- [ ] Port `dram_config_dispatch` (AB4C) - dispatch loop
+- [x] Port `dram_config_dispatch` (AB4C) - dispatch loop - `dram_config_dispatch()` in sam_dram_config.c
   - Loops through D-RAM words calling handlers
   - Terminates on bit 7 set or handler 0x20
 - [ ] Port `voice_init_copy_and_envelope` (AB73) - envelope setup
@@ -559,15 +563,16 @@ This is the core of note-on/off handling. Must be done before Program Change wor
   - Processes envelope table pointer
 
 **Note Off path (CODE:A69C):**
-- [ ] Port `voice_deactivate` (A69C) - mark voice for release
+- [x] Port `voice_deactivate` (A69C) - mark voice for release - `voice_deactivate()` in sam_voice.c
   - Sets release flag in voice page
   - Voice continues through release phase
-- [ ] Port `voice_free_page` - return page to free list
-  - Called when envelope reaches zero
+- [x] Port `voice_free` (9946) - full deallocation - `voice_free()` in sam_voice.c
+  - Clears D-RAM, removes from list, returns to free list
 
 **Voice List Management:**
-- [ ] Port active voice list traversal (head at 0x54)
-- [ ] Port pending release list (head at 0x55)
+- [x] Port active voice list traversal (head at 0x54) - `voice_list_next()`, `voice_list_remove()` in sam_voice.c
+- [x] Port pending release list (head at 0x55) - `voice_list_add_pending()` in sam_voice.c
+- [x] Port voice stealing (A012) - `voice_steal_find()` in sam_voice.c
 - [ ] Port channel note tracking (0x9F-0xA2, 0xAF-0xB2)
 
 ### Phase 6: D-RAM Config Handlers
@@ -585,16 +590,18 @@ These decode the voice init data stream and write to SAM D-RAM.
 | 0x30 | B2CF | 1 | Skip/re-dispatch |
 
 **Tasks:**
-- [ ] Port `dram_config_handler_00` (AD8F) - simple D-RAM write
-- [ ] Port `dram_config_handler_08` (ADBD) - pitch setup (most complex)
-  - Handles pitch table lookup, portamento, mod wheel
-  - 10 bytes: dispatch + vel_sens + note_offset + ctrl + bend_range + fine_lo + fine_hi + skip + port_rate + port_depth
-- [ ] Port `dram_config_handler_10` (B030) - amplitude/envelope
-  - Handles velocity scaling, envelope enable, modulation
-  - 9 bytes: dispatch + base_level + amplitude + env_ctrl + rate + unused + sustain + vel_sens + mod_amt
-- [ ] Port `dram_config_handler_18` (B222) - velocity-modulated write
-- [ ] Port `dram_config_handler_20` (B278) - output routing
-- [ ] Port `dram_config_apply_velocity` (B1EC) - MIX attenuation
+- [x] Port `dram_config_handler_00` (AD8F) - short D-RAM write - in sam_dram_config.c
+- [x] Port `dram_config_handler_08` (ADBD) - pitch setup - in sam_dram_config.c
+  - Basic implementation: pitch table lookup, fine tune
+  - TODO: Full portamento and mod wheel support
+- [x] Port `dram_config_handler_10` (B030) - amplitude/envelope - in sam_dram_config.c
+  - Basic implementation: velocity scaling, envelope params stored
+  - TODO: Full envelope state initialization
+- [x] Port `dram_config_handler_18` (B222) - velocity-modulated write - in sam_dram_config.c
+- [x] Port `dram_config_handler_20` (B278) - output routing (TERMINATES) - in sam_dram_config.c
+- [x] Port `dram_config_handler_28` (B2D2) - write constant 0x28 - in sam_dram_config.c
+- [x] Port `dram_config_handler_30` (B2CF) - skip remaining - in sam_dram_config.c
+- [x] Port `dram_config_apply_velocity` (B1EC) - MIX attenuation - in sam_dram_config.c
 
 ### Phase 7: Envelope and Modulation System
 
