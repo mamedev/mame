@@ -1184,10 +1184,8 @@ uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	screen.priority().fill(0);
 	bitmap.fill(0, cliprect);
 
-	std::vector<int> order;
-	order.resize(12);
-	for(int i=0; i<12; i++)
-		order[i] = i;
+	std::array<int, 12> order;
+	std::iota(order.begin(), order.end(), 0); // 0-11
 
 	std::sort(order.begin(), order.end(), [this](int l1, int l2) {
 		static const int default_pri[12] = { 0, 1, 2, 3, 4, 5, 6, 7, -4, -3, -2, -1 };
