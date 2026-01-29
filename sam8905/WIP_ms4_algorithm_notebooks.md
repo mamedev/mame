@@ -46,6 +46,8 @@ Note: 0x06BA is NOT a valid algorithm (garbage data after 0x067A).
 - [x] Add `decode_dram_init()` to generate per-program initial D-RAM tables
 - [x] Export dram_init, pitch_params, amp_params, waveform_words per program
 - [x] Update notebooks to use program dram_init values
+- [x] Extract shared parsing code to `parse_programs.py` module
+- [x] Create `parse_programs_xe9l.py` for XE9L ROM analysis
 - [ ] Implement envelope/LFO modulators to update D-RAM dynamically
 
 ## Testing Results
@@ -138,10 +140,31 @@ Implementation will require:
 3. Implement LFO for pitch/amplitude modulation
 4. Update D-RAM words per sample based on modulator outputs
 
+## XE9L ROM Analysis
+
+The XE9L ROM (xe9l_v141.bin, 64KB) uses the same program format:
+
+- **Program pointer table**: 0x33AD, 171 entries
+- **Undefined programs**: 96 (marker 0x001E)
+- **Valid programs**: 75
+- **Algorithms**: 4 unique (at addresses 0x002A, 0x006A, 0x00AA, 0x00EA)
+
+| Algorithm | ROM Address | Programs | Description |
+|-----------|-------------|----------|-------------|
+| ALG_002A  | 0x002A      | 3        | B16_8, EPIANO2, B8 |
+| ALG_006A  | 0x006A      | 51       | Most programs (clavinets, pianos, guitars, etc.) |
+| ALG_00AA  | 0x00AA      | 20       | Accordion, musette, harp variants |
+| ALG_00EA  | 0x00EA      | 1        | CLAVINET |
+
+Algorithms are loaded once via `sam_programs_1` initialization.
+
 ## Files
 
-- `sam8905/ms4_parse_programs.py` - Parser with export function
-- `sam8905/ms4_programs.py` - Exported program data (generated)
+- `sam8905/parse_programs.py` - Shared parsing module (common functions)
+- `sam8905/ms4_parse_programs.py` - MS4 parser with export function
+- `sam8905/parse_programs_xe9l.py` - XE9L parser with export function
+- `sam8905/ms4_programs.py` - Exported MS4 program data (generated)
+- `sam8905/xe9l_programs.py` - Exported XE9L program data (generated)
 - `sam8905/notebooks/ms4_alg_027a.ipynb` - Main algorithm notebook
 - `sam8905/notebooks/ms4_alg_02ba.ipynb` - Percussion algorithm notebook
 - `sam8905/notebooks/ms4_alg_02fa.ipynb` - Special voice algorithm notebook

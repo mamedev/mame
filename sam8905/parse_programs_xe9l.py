@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """
-MS4 Program Structure Parser
-Parses program data and A-RAM algorithms from the MS4 ROM.
+XE9L Program Structure Parser
+
+Parses program data from the XE9L (Hohner) ROM.
 Uses shared parsing code from parse_programs.py.
 
-MS4 specifics:
-- ROM: ms4_05_r1_0.bin (64KB code space only)
-- Program pointer table at 0x0040, 247 entries (big-endian)
-- 18 SILENCE programs (aram_ptr=0x0000 at addr 0x022E) skipped
-- 17 unique algorithms at 0x027A through 0x067A
+XE9L specifics:
+- ROM: xe9l_v141.bin (64KB)
+- Program pointer table at 0x33AD, 171 entries (big-endian)
+- Undefined program marker: 0x001E
+- 4 algorithms at 0x002A, 0x006A, 0x00AA, 0x00EA
+- Algorithms loaded via sam_programs_1 initialization
 """
 
 import sys
@@ -18,16 +20,17 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from parse_programs import (
     get_word, parse_program, parse_aram_data,
-    decode_dram_stream, decode_dram_init, decode_dram_ctrl, analyze_algorithms_wwf,
+    decode_dram_stream, decode_dram_init, analyze_algorithms_wwf,
     format_handler_detail, format_voice_init_detail,
     decode_algorithm, analyze_dram_usage,
 )
 
-ROM_PATH = "/home/jeff/bastel/roms/hohner/ms4/ms4_05_r1_0.bin"
+ROM_PATH = "/home/jeff/bastel/roms/hohner/ms4/xe9l_v141.bin"
 
-# Program pointer table in code space
-PROGRAM_PTR_TABLE = 0x0040
-NUM_PROGRAMS = 247
+# Program pointer table
+PROGRAM_PTR_TABLE = 0x33AD
+NUM_PROGRAMS = 171
+UNDEFINED_ADDR = 0x001E  # Empty/undefined program marker
 
 
 def read_rom():
@@ -38,7 +41,7 @@ def read_rom():
 def print_program_summary(programs):
     """Print summary table of all programs"""
     print("=" * 110)
-    print(f"MS4 PROGRAM STRUCTURE ANALYSIS (0x{PROGRAM_PTR_TABLE:04X} table, {NUM_PROGRAMS} entries)")
+    print(f"XE9L PROGRAM STRUCTURE ANALYSIS (0x{PROGRAM_PTR_TABLE:04X} table, {NUM_PROGRAMS} entries)")
     print("=" * 110)
 
     print(f"\n{'Idx':<4} {'Addr':<7} {'Size':<5} {'Name':<10} {'Flags':<6} "
@@ -63,57 +66,6 @@ def print_program_summary(programs):
               f"0x{prog['flags']:02X}{ci} {prog['slot_count']:<6} "
               f"0x{prog['aram_ptr']:04X} {de0}  {vptr_str}   "
               f"{stream_len:<7} {vdata}")
-
-
-def print_detailed_programs(programs):
-    """Print detailed per-program data"""
-    print("\n" + "=" * 100)
-    print("DETAILED PROGRAM DATA")
-    print("=" * 100)
-
-    for idx, prog in programs:
-        print(f"\n{'─' * 80}")
-        print(f"Program {idx}: \"{prog['name']}\" at 0x{prog['addr']:04X} "
-              f"(size={prog['size']})")
-        print(f"  Raw header: {prog['raw_header']}")
-        print(f"  Flags: 0x{prog['flags']:02X} "
-              f"(complex={'yes' if prog['complex_init'] else 'no'}, "
-              f"slots={prog['slot_count']})")
-        print(f"  A-RAM ptr: 0x{prog['aram_ptr']:04X}")
-
-        # D-RAM entry 0
-        de0 = prog['dram_entry0']
-        ctrl = de0['ctrl']
-        print(f"  D-RAM entry0: [{de0['raw']}] "
-              f"word=0x{de0['dram_word']:04X}, "
-              f"addr_nibble={ctrl['addr_nibble']}, "
-              f"mix={ctrl['mix_bits']}")
-
-        # Voice slots
-        if prog['voice_slots']:
-            print(f"  Voice slots: {len(prog['voice_slots'])}")
-            for i, slot in enumerate(prog['voice_slots']):
-                vdata = ' '.join(f"{b:02X}" for b in slot['data'])
-                print(f"    Slot {i}: ptr=0x{slot['ptr']:04X} data=[{vdata}]")
-                detail = format_voice_init_detail(slot['data'])
-                if detail:
-                    print(f"             {detail}")
-        else:
-            print(f"  Voice slots: NONE (ptr=0x0000)")
-
-        # D-RAM command stream with per-handler breakdown
-        stream = prog['dram_stream']
-        if stream:
-            print(f"  D-RAM stream (offset {prog['dram_stream_offset']}, "
-                  f"{len(stream)} bytes):")
-            entries = decode_dram_stream(stream)
-            for entry in entries:
-                byte_hex = ' '.join(f"{b:02X}" for b in entry['bytes'])
-                print(f"    word {entry['word']:2d} [{entry['offset']:3d}]: "
-                      f"{entry['name']:<10s} {byte_hex}")
-                detail = format_handler_detail(entry)
-                if detail:
-                    print(f"{'':>29}{detail}")
 
 
 def print_aram_analysis(programs, rom):
@@ -161,159 +113,68 @@ def print_aram_analysis(programs, rom):
                 print(f"  D-RAM[{addr:2d}]: read={counts['read']}, write={counts['write']}")
 
 
-def print_flags_analysis(programs):
-    """Analyze flag byte patterns"""
+def print_detailed_programs(programs):
+    """Print detailed per-program data"""
     print("\n" + "=" * 100)
-    print("FLAGS ANALYSIS (offset 9: bit7=complex_init, bits3:0=slot_count)")
-    print("-" * 80)
+    print("DETAILED PROGRAM DATA")
+    print("=" * 100)
 
-    flag_counts = {}
-    for _, prog in programs:
-        flag = prog['flags']
-        if flag not in flag_counts:
-            flag_counts[flag] = []
-        flag_counts[flag].append(prog['name'])
-
-    for flag, names in sorted(flag_counts.items()):
-        ci = 'complex' if flag & 0x80 else 'simple'
-        slots = flag & 0x0F
-        print(f"  0x{flag:02X} ({ci}, {slots} slots): {len(names)} programs")
-        if len(names) <= 8:
-            print(f"    {', '.join(names)}")
-
-
-def print_voice_data_analysis(programs):
-    """Analyze voice init data pointers and content"""
-    print("\n" + "=" * 100)
-    print("VOICE INIT DATA ANALYSIS (offset 15-16, points to 7 bytes per slot)")
-    print("-" * 80)
-
-    # Collect all unique voice data pointers across all slots
-    voice_ptrs = {}
-    for _, prog in programs:
-        for slot in prog['voice_slots']:
-            ptr = slot['ptr']
-            if ptr not in voice_ptrs:
-                voice_ptrs[ptr] = {'data': slot['data'], 'programs': []}
-            voice_ptrs[ptr]['programs'].append(prog['name'])
-
-    print(f"\n{len(voice_ptrs)} unique voice data pointers:\n")
-    print(f"{'Pointer':<9} {'Data (7 bytes)':<24} {'Decoded':<40} {'Programs'}")
-    print("-" * 120)
-
-    for ptr in sorted(voice_ptrs.keys()):
-        info = voice_ptrs[ptr]
-        data_str = ' '.join(f"{b:02X}" for b in info['data'])
-        detail = format_voice_init_detail(info['data']) or ''
-        names_str = ', '.join(info['programs'][:3])
-        if len(info['programs']) > 3:
-            names_str += f" (+{len(info['programs']) - 3} more)"
-        print(f"  0x{ptr:04X}  {data_str:<24} {detail:<40} {names_str}")
-
-    # Multi-slot programs
-    multi_slot = [(idx, p) for idx, p in programs if len(p['voice_slots']) > 1]
-    if multi_slot:
-        print(f"\n{len(multi_slot)} multi-slot programs:")
-        for idx, prog in multi_slot:
-            ptrs = [f"0x{s['ptr']:04X}" for s in prog['voice_slots']]
-            print(f"  {idx:2d} {prog['name']:<10} {len(prog['voice_slots'])} slots: {', '.join(ptrs)}")
-
-
-def print_dram_entry0_analysis(programs):
-    """Analyze first D-RAM entry (offset 12-14) patterns"""
-    print("\n" + "=" * 100)
-    print("D-RAM ENTRY 0 ANALYSIS (offset 12-14: val_lo, val_mid, ctrl)")
-    print("-" * 80)
-
-    # Group by ctrl byte value
-    ctrl_groups = {}
-    for _, prog in programs:
-        ctrl_raw = prog['dram_entry0']['ctrl']['raw']
-        if ctrl_raw not in ctrl_groups:
-            ctrl_groups[ctrl_raw] = []
-        ctrl_groups[ctrl_raw].append(prog['name'])
-
-    print("\nControl byte distribution:")
-    for ctrl_val, names in sorted(ctrl_groups.items()):
-        decoded = decode_dram_ctrl(ctrl_val)
-        print(f"  ctrl=0x{ctrl_val:02X} (addr={decoded['addr_nibble']}, "
-              f"mix={decoded['mix_bits']}): "
-              f"{len(names)} programs")
-
-    # Group by full entry
-    entry_groups = {}
-    for _, prog in programs:
-        key = prog['dram_entry0']['raw']
-        if key not in entry_groups:
-            entry_groups[key] = []
-        entry_groups[key].append(prog['name'])
-
-    print(f"\n{len(entry_groups)} unique D-RAM entry0 values:")
-    for entry_raw, names in sorted(entry_groups.items()):
-        names_str = ', '.join(names[:4])
-        if len(names) > 4:
-            names_str += f" (+{len(names) - 4} more)"
-        print(f"  [{entry_raw}]: {names_str}")
-
-
-def print_dram_stream_analysis(programs):
-    """Analyze D-RAM command stream patterns"""
-    print("\n" + "=" * 100)
-    print("D-RAM COMMAND STREAM ANALYSIS")
-    print("  Format: variable-length commands, bits 5:3 select handler, bit 7 = terminator")
-    print("  Handlers: 0x00=short_write(3-4B), 0x08=pitch(10B), 0x10=amplitude(9B),")
-    print("            0x18=dram_write(4B), 0x20=output_cfg(4B,TERM), 0x28=const(1B),")
-    print("            0x30=skip_remaining(TERM), 0x38=const(1B)")
-    print("-" * 80)
-
-    # Group by stream length
-    len_groups = {}
-    for _, prog in programs:
-        slen = len(prog['dram_stream'])
-        if slen not in len_groups:
-            len_groups[slen] = []
-        len_groups[slen].append(prog['name'])
-
-    print("\nStream length distribution:")
-    for slen, names in sorted(len_groups.items()):
-        names_str = ', '.join(names[:5])
-        if len(names) > 5:
-            names_str += f" (+{len(names) - 5} more)"
-        print(f"  {slen:3d} bytes: {len(names)} programs  ({names_str})")
-
-    print(f"\n{'Idx':<4} {'Name':<10} {'Len':<5} {'Words':<6} {'Handlers used'}")
-    print("-" * 100)
     for idx, prog in programs:
+        print(f"\n{'─' * 80}")
+        print(f"Program {idx}: \"{prog['name']}\" at 0x{prog['addr']:04X} "
+              f"(size={prog['size']})")
+        print(f"  Raw header: {prog['raw_header']}")
+        print(f"  Flags: 0x{prog['flags']:02X} "
+              f"(complex={'yes' if prog['complex_init'] else 'no'}, "
+              f"slots={prog['slot_count']})")
+        print(f"  A-RAM ptr: 0x{prog['aram_ptr']:04X}")
+
+        de0 = prog['dram_entry0']
+        ctrl = de0['ctrl']
+        print(f"  D-RAM entry0: [{de0['raw']}] "
+              f"word=0x{de0['dram_word']:04X}, "
+              f"addr_nibble={ctrl['addr_nibble']}, "
+              f"mix={ctrl['mix_bits']}")
+
+        if prog['voice_slots']:
+            print(f"  Voice slots: {len(prog['voice_slots'])}")
+            for i, slot in enumerate(prog['voice_slots']):
+                vdata = ' '.join(f"{b:02X}" for b in slot['data'])
+                print(f"    Slot {i}: ptr=0x{slot['ptr']:04X} data=[{vdata}]")
+                detail = format_voice_init_detail(slot['data'])
+                if detail:
+                    print(f"             {detail}")
+        else:
+            print(f"  Voice slots: NONE")
+
         stream = prog['dram_stream']
-        if not stream:
-            continue
-        entries = decode_dram_stream(stream)
-        handler_summary = ' '.join(
-            f"{e['name']}({len(e['bytes'])})" for e in entries
-        )
-        print(f"{idx:<4} {prog['name']:<10} {len(stream):<5} "
-              f"{len(entries):<6} {handler_summary}")
+        if stream:
+            print(f"  D-RAM stream (offset {prog['dram_stream_offset']}, "
+                  f"{len(stream)} bytes):")
+            entries = decode_dram_stream(stream)
+            for entry in entries:
+                byte_hex = ' '.join(f"{b:02X}" for b in entry['bytes'])
+                print(f"    word {entry['word']:2d} [{entry['offset']:3d}]: "
+                      f"{entry['name']:<10s} {byte_hex}")
+                detail = format_handler_detail(entry)
+                if detail:
+                    print(f"{'':>29}{detail}")
 
 
 def export_programs_python(programs, rom, output_path):
     """Export programs grouped by algorithm to a Python file."""
-    # Collect unique A-RAM pointers (skip SILENCE entries)
+    # Collect unique A-RAM pointers
     aram_ptrs = set()
     for _, prog in programs:
-        if prog['aram_ptr'] != 0x0000:
-            aram_ptrs.add(prog['aram_ptr'])
+        aram_ptrs.add(prog['aram_ptr'])
 
     # Analyze WWF instructions for each algorithm
     waveform_words = analyze_algorithms_wwf(rom, aram_ptrs)
 
-    # Group programs by A-RAM pointer, skip SILENCE entries (aram_ptr=0x0000)
+    # Group programs by A-RAM pointer
     by_algorithm = {}
-    skipped = 0
     for idx, prog in programs:
         ptr = prog['aram_ptr']
-        if ptr == 0x0000:
-            skipped += 1
-            continue  # Skip SILENCE/invalid programs
         ptr_key = f"{ptr:04X}"
         if ptr_key not in by_algorithm:
             by_algorithm[ptr_key] = {
@@ -322,16 +183,13 @@ def export_programs_python(programs, rom, output_path):
             }
         by_algorithm[ptr_key]['programs'].append((idx, prog))
 
-    if skipped:
-        print(f"Skipped {skipped} SILENCE programs (aram_ptr=0x0000)")
-
     with open(output_path, 'w') as f:
         f.write('"""\n')
-        f.write('MS4 Program Data Export\n')
-        f.write('Generated by ms4_parse_programs.py\n')
+        f.write('XE9L Program Data Export\n')
+        f.write('Generated by parse_programs_xe9l.py\n')
         f.write('\n')
         f.write('Contains A-RAM algorithm data and D-RAM configurations\n')
-        f.write(f'for MS4 programs, grouped by algorithm.\n')
+        f.write(f'for XE9L programs, grouped by algorithm.\n')
         f.write('"""\n\n')
 
         # Export algorithms
@@ -435,7 +293,7 @@ def main():
 
     # Build sorted address list for size calculation
     valid_addrs = sorted(set(
-        a for a in addrs if a != 0xFFFF and a < len(rom)
+        a for a in addrs if a != UNDEFINED_ADDR and a < len(rom)
     ))
 
     addr_to_size = {}
@@ -447,8 +305,12 @@ def main():
 
     # Parse each program
     programs = []
+    undefined_count = 0
     for i, addr in enumerate(addrs):
-        if addr == 0xFFFF or addr >= len(rom):
+        if addr == UNDEFINED_ADDR:
+            undefined_count += 1
+            continue
+        if addr >= len(rom):
             continue
 
         next_addr = addr + addr_to_size[addr] if addr_to_size.get(addr) else None
@@ -457,11 +319,12 @@ def main():
             programs.append((i, prog))
 
     print(f"Total entries: {NUM_PROGRAMS}")
+    print(f"Undefined (0x{UNDEFINED_ADDR:04X}): {undefined_count}")
     print(f"Valid programs: {len(programs)}\n")
 
     # Check for --export flag
     if '--export' in sys.argv:
-        output_path = os.path.join(os.path.dirname(__file__), 'ms4_programs.py')
+        output_path = os.path.join(os.path.dirname(__file__), 'xe9l_programs.py')
         export_programs_python(programs, rom, output_path)
         return
 
