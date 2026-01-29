@@ -64,7 +64,24 @@ Tests 8KB XRAM (0x0000-0x1FFF) with walking-bit pattern:
 | 0x11E5          | 1     | (unknown)               | 0x00       | |
 | 0x11E6-0x11ED   | 8     | program_init_copy       | from ROM   | Copied from program_base+22 |
 | 0x11EE-0x11F5   | 8     | algorithm_pool          | 0x00       | SAM algorithm slot pool |
-| 0x11F6-0x14D2   | 733   | (uncharacterized)       | 0x00       | |
+| 0x11F6-0x11FF   | 10    | (uncharacterized)       | 0x00       | |
+| 0x1200-0x12BF   | 192   | (uncharacterized)       | 0x00       | Channel data tables |
+| **MIDI Serial Subsystem (0x12C0-0x14D2)** |
+| 0x12C0          | 1     | midi_base_channel       | 0x00       | MIDI base channel (0-15) |
+| 0x12C1-0x12C2   | 2     | (unknown)               | 0x00       | |
+| 0x12C3          | 1     | sysex_state             | 0x00       | SysEx state machine (0-4) |
+| 0x12C4-0x12CB   | 8     | (unknown)               | 0x00       | |
+| 0x12CC          | 1     | midi_running_status     | 0x00       | Running status byte |
+| 0x12CD          | 1     | midi_rx_read_pos        | 0x00       | RX buffer read position |
+| 0x12CE          | 1     | midi_rx_count           | 0x00       | RX buffer byte count |
+| 0x12CF          | 1     | midi_rx_write_pos       | 0x00       | RX buffer write position |
+| 0x12D0          | 1     | (unknown)               | 0x00       | |
+| 0x12D1          | 1     | midi_tx_count           | 0x00       | TX buffer byte count |
+| 0x12D2          | 1     | midi_tx_write_pos       | 0x00       | TX buffer write position |
+| 0x12D3          | 1     | midi_tx_read_pos        | 0x00       | TX buffer read position |
+| 0x12D4          | 1     | midi_current_byte       | 0x00       | Current byte being processed |
+| 0x12D5-0x13D3   | 255   | midi_tx_buffer          | 0x00       | TX circular buffer (255 bytes) |
+| 0x13D4-0x14D2   | 255   | midi_rx_buffer          | 0x00       | RX circular buffer (255 bytes) |
 | 0x14D3-0x14D4   | 2     | current_program_base    | 0x00       | Current program pointer (LE) |
 | 0x14D5-0x1CD4   | 2048  | extended_voice_pages    | 0x00       | 8 pages × 256 bytes |
 | 0x1CD5-0x1CE4   | 16    | voice_ctrl_area_2       | 0x00       | Per-voice status/flags |
@@ -142,16 +159,118 @@ the vibrato waveform data (indexed by `(phase_hi >> 1) & 0x3F`).
 
 ### Register Banks (0x00-0x1F)
 
-| Address | Size | Description |
-|---------|------|-------------|
-| 0x00-0x07 | 8 | Register Bank 0 (R0-R7, default) |
-| 0x08-0x0F | 8 | Register Bank 1 (voice update context) |
-| 0x10-0x17 | 8 | Register Bank 2 (ISR context) |
-| 0x18-0x1F | 8 | Register Bank 3 (unused?) |
+The 8051 has 4 register banks selected via PSW bits RS0/RS1. Each bank provides
+R0-R7 registers at different physical INTMEM addresses.
+
+#### Bank 0 (0x00-0x07) - Default Working Registers
+
+Used as scratch registers within functions. R0/R1 are special as they can be
+used for indirect addressing (MOVX @R0, @R1).
+
+| Address | Register | Usage |
+|---------|----------|-------|
+| 0x00    | R0       | Indirect pointer, loop variable |
+| 0x01    | R1       | Indirect pointer, saved across calls |
+| 0x02    | R2       | Scratch |
+| 0x03    | R3       | Scratch |
+| 0x04    | R4       | DPTR high byte / 16-bit math |
+| 0x05    | R5       | DPTR low byte / 16-bit math |
+| 0x06    | R6       | Parameter / 16-bit math high |
+| 0x07    | R7       | Parameter / return value / 16-bit math low |
+
+#### Bank 1 (0x08-0x0F) - MIDI Handler Parameters
+
+Used to pass parameters to MIDI event handlers. Different handler chains use
+different register assignments:
+
+**Note On/Off handlers** (handle_note_on_off, handle_all_notes_off):
+
+| Address | Register | Usage |
+|---------|----------|-------|
+| 0x08    | R0       | MIDI channel (0-15, masked to 0-3 for voices) |
+| 0x09    | R1       | MIDI note number (0-127) |
+| 0x0A    | R2       | MIDI velocity (0-127, 0=note off) |
+| 0x0B    | R3       | Voice status / scratch |
+| 0x0C    | R4       | Loop counter |
+
+**CC handlers** (cc_sustain_pedal, cc_expression, etc.):
+
+| Address | Register | Usage |
+|---------|----------|-------|
+| 0x0D    | R5       | MIDI channel |
+| 0x0F    | R7       | CC value (0-127) |
+
+**Other handlers** (midi_tx_queue_byte):
+
+| Address | Register | Usage |
+|---------|----------|-------|
+| 0x08    | R0       | Byte to transmit |
+
+#### Bank 2 (0x10-0x17) - MIDI Parser / CC Dispatch Context
+
+| Address | Register | Usage |
+|---------|----------|-------|
+| 0x10    | R0       | CC handler index (from cc_dispatch lookup) |
+| 0x11    | R1       | Calculated MIDI channel (base-adjusted) |
+| 0x12    | R2       | First MIDI data byte (note/CC number) |
+| 0x13    | R3       | Second MIDI data byte (velocity/CC value) |
+
+Used by SERIAL_HANDLER for MIDI message parsing and cc_dispatch for CC
+handler lookup. R1-R3 hold the parsed message components.
+
+#### Bank 3 (0x18-0x1F) - Unused
+
+No references found in firmware analysis.
 
 ### Bit-Addressable Area (0x20-0x2F)
 
-Used for various flag bits. Specific bit assignments TBD.
+INTMEM bytes 0x20-0x2F are bit-addressable via bit addresses 0x00-0x7F.
+Formula: bit_addr = (byte_addr - 0x20) * 8 + bit_num
+
+| Bit Addr | Byte.Bit | Ghidra Name | Description |
+|----------|----------|-------------|-------------|
+| 0x01     | 0x20.1   | _0_1        | ROM access mode (MOVC vs MOVX) |
+| 0x02     | 0x20.2   | _0_2        | Sign flag (negative value indicator) |
+| 0x03     | 0x20.3   | _0_3        | LFO waveform bypass flag |
+| 0x04     | 0x20.4   | _0_4        | Voice release mode flag |
+| 0x06     | 0x20.6   | _0_6        | Voice allocation active flag |
+| 0x07     | 0x20.7   | _0_7        | Amplitude update mode flag |
+| 0x09     | 0x21.1   | _1_1        | Layer select (0=normal, 1=dual) |
+| 0x08     | 0x21.0   | _1_0        | Envelope update trigger |
+| 0x0A     | 0x21.2   | _1_2        | Algorithm pool full flag |
+| 0x0B     | 0x21.3   | _1_3        | MIDI TX idle (buffer empty) |
+| 0x0C     | 0x21.4   | _1_4        | OMNI mode (ignore channel) |
+| 0x0D     | 0x21.5   | _1_5        | MIDI TX overflow flag |
+| 0x0E     | 0x21.6   | _1_6        | MIDI RX overflow (triggers panic) |
+| 0x0F     | 0x21.7   | _1_7        | MIDI expecting 2nd data byte |
+| 0x10     | 0x22.0   | _2_0        | Timer 1 state save (ISR context) |
+| 0x14     | 0x22.4   | _2_4        | Voice enable changed flag |
+| 0x15     | 0x22.5   | _2_5        | Note trigger flag |
+| 0x16     | 0x22.6   | _2_6        | Multi-voice mode flag |
+
+**Byte 0x20 - Computation/Voice Flags:**
+- _0_1: ROM access mode for envelope table reads
+- _0_2: Sign flag for signed arithmetic
+- _0_3: LFO bypass / portamento active
+- _0_4: Voice in release phase
+- _0_6: Voice allocation in progress
+- _0_7: Amplitude special update mode
+
+**Byte 0x21 - MIDI/System Flags:**
+- _1_0: Envelope needs D-RAM update
+- _1_1: Layer select (dual-voice mode)
+- _1_2: Algorithm pool exhausted
+- _1_3: TX idle (triggers TI on new byte)
+- _1_4: OMNI mode (receive all channels)
+- _1_5: TX buffer overflow
+- _1_6: RX buffer overflow (triggers All Notes Off)
+- _1_7: Parser state (waiting for 2nd data byte)
+
+**Byte 0x22 - Voice/Timer Flags:**
+- _2_0: Saved T1 state during UART ISR
+- _2_4: Voice enable changed (sysex_voice_enable)
+- _2_5: Note trigger pending
+- _2_6: Multi-voice/layer mode active
 
 ### Voice System Variables (0x30-0x5F)
 
@@ -174,14 +293,44 @@ Used for various flag bits. Specific bit assignments TBD.
 | 0x42    | rom_data_ptr_hi       | -     | ROM parse pointer high byte |
 | 0x45    | voice_data_ptr_lo     | -     | Voice init data pointer low |
 | 0x46    | voice_data_ptr_hi     | -     | Voice init data pointer high |
+| 0x47    | voice_state_ptr_lo    | -     | Voice state XRAM pointer low |
+| 0x48    | voice_state_ptr_hi    | -     | Voice state XRAM pointer high |
+| 0x49    | voice_state_byte      | -     | Voice state (bit5=active, bits3:0=slot) |
 | 0x4a    | slot_count            | -     | Number of D-RAM slots for voice |
 | 0x4c    | portamento_value      | -     | Portamento rate (CC5 value) |
 | 0x4f    | dram_slot_index       | -     | Current D-RAM slot write index |
+| 0x51    | lfsr_state            | -     | Noise LFO LFSR state (x = x*3 + 0x43) |
 | 0x52    | octave_shift          | 0     | Octave transposition counter |
 | 0x53    | dram_slot_free_list   | 0x00  | Free list head (linked list) |
 | 0x54    | active_voice_list_head| 0xFF  | Active voice list (0xFF=empty) |
 | 0x55    | pending_voice_list    | 0xFF  | Pending voice release list |
 | 0x56    | dram_slot_count       | 0x10  | Total D-RAM slots available |
+
+### Per-Channel Tables (0x57-0x77)
+
+| Address   | Size | Name                   | Description |
+|-----------|------|------------------------|-------------|
+| 0x57-0x5A | 4    | channel_split_program  | Keyboard split program index per channel (0-3) |
+| 0x67-0x6A | 4    | channel_current_prog   | Current program number per channel (0-3) |
+| 0x77      | 1    | scratch_77             | Temporary storage (e.g., note transpose offset) |
+
+Accessed as `INTMEM[channel + 0x57]` and `INTMEM[channel + 0x67]` in handle_program_change.
+Value 0xFF means no split/unassigned.
+
+### Table Search Parameters (0x78-0x7C)
+
+Used by `table_search_match` (CODE:DC1C) and `table_search_nomatch` for linear
+table searches in CODE space:
+
+| Address | Name             | Description |
+|---------|------------------|-------------|
+| 0x78    | search_ptr_hi    | Search pointer DPH |
+| 0x79    | search_ptr_lo    | Search pointer DPL |
+| 0x7A    | search_value     | Value to match/not-match |
+| 0x7B    | search_count_hi  | Search length high byte |
+| 0x7C    | search_count_lo  | Search length low byte |
+
+Returns index of match (or 0xFF if not found).
 
 ### D-RAM Free List (0x7E-0x8D)
 
@@ -215,6 +364,19 @@ channels 8-15 are unassigned (0).
 
 8 bytes. Maps algorithm pool index to actual D-RAM slot number.
 Initialized to 0x00 during slot_manager_init.
+
+### Per-Channel Note Tracking (0x9F-0xB2)
+
+| Address   | Size | Name                   | Description |
+|-----------|------|------------------------|-------------|
+| 0x9F-0xA2 | 4    | channel_highest_note   | Highest active note per channel (0-3) |
+| 0xAF-0xB2 | 4    | channel_note_count     | Active note count per channel (0-3) |
+
+Updated by handle_note_on_off. Cleared by handle_all_notes_off:
+```
+INTMEM[channel + 0x9F] = 0  // Reset highest note
+INTMEM[channel + 0xAF] = 0  // Reset note count
+```
 
 
 ## SAM8905 D-RAM Initialization
@@ -410,5 +572,8 @@ Bytes read in-place (5 bytes, not copied):
 - [x] Trace dram_config_handler_10 through _30 (remaining handlers)
 - [ ] Characterize EXTMEM 0x11F6-0x14D2 region
 - [ ] Characterize EXTMEM 0x1CE5-0x1FFF region
-- [ ] Map bit-addressable INTMEM (0x20-0x2F) flag assignments
+- [x] Document INTMEM register bank usage (Bank 0-2 calling conventions)
+- [x] Map bit-addressable INTMEM (0x20-0x2F) flag assignments (17 flags in bytes 0x20-0x22)
+- [x] Document additional voice variables (0x47-0x49 voice state, 0x51 LFSR)
 - [ ] Document Timer 1 ISR (0xD440) periodic voice update trigger
+- [ ] Complete remaining bit flag analysis (bytes 0x23-0x2F if any used)
