@@ -410,6 +410,44 @@ Cleanup of remaining FUN_CODE_xxxx functions found after Phase 2.
 | 0xc937 | FUN_CODE_c937 | UNUSED_padding_c937 | NOP padding, not real code | ✓ Renamed |
 | 0xca58 | FUN_CODE_ca58 | UNUSED_padding_ca58 | NOP padding, not real code | ✓ Renamed |
 
+### Development/Debug Functions (No Callers)
+
+| Address | Original Name | New Name | Purpose | Status |
+|---------|---------------|----------|---------|--------|
+| 0xb558 | FUN_CODE_b558 | DEV_algorithm_upload_restart | Validate algorithm_pool, warm restart | ✓ Renamed |
+| 0xb576 | FUN_CODE_b576 | DEBUG_dump_sam_dram_halt | Dump 256 SAM D-RAM slots to XRAM 0x1c00, halt | ✓ Renamed |
+
+#### DEV_algorithm_upload_restart (0xb558) Analysis
+
+**Status**: Vestigial development code - never called in production.
+
+- `algorithm_pool` is at **EXTMEM 0x11EE** (XRAM, 8 entries)
+- Checks 9 entries in pool (off-by-one? or includes sentinel)
+- If any entry is 0xFF: sets all 16 channels idle, returns
+- If all valid: clears pool entries to 0, then **LJMP 0x0000** (warm restart)
+- **No callers anywhere in ROM** - truly dead code
+
+**Location**: Immediately after `voice_assign_algorithm` (0xb4bf-0xb557):
+- voice_assign_algorithm ends with RET at 0xb557
+- DEV_algorithm_upload_restart starts at 0xb558 - no fall-through possible
+
+**Normal algorithm pool handling** (in voice_assign_algorithm):
+- Reads pool at 0x11EE to find/allocate algorithm slots
+- If 0xFF found (pool exhausted): **LJMP 0x0000** (system reset!)
+
+**Theory**: Used during development with **ICE (In-Circuit Emulator)**:
+- 80C32 has no JTAG, but ICE was common for 8051 dev in late 80s
+- Developer could manually set PC to 0xb558 via ICE
+- Left in ROM but never wired up to SysEx or other trigger
+
+#### DEBUG_dump_sam_dram_halt (0xb576) Analysis
+
+- Disables interrupts (EA=0)
+- Reads all 256 SAM D-RAM slots
+- Writes 4-byte records to XRAM 0x1c00: [param3, param2, param1, 0xAA]
+- Enters infinite loop (halt)
+- Used to capture SAM state for debugging
+
 ---
 
 ## Statistics
@@ -428,10 +466,11 @@ Cleanup of remaining FUN_CODE_xxxx functions found after Phase 2.
 ### Phase 3 (Remaining FUN_CODE cleanup)
 - **Real functions renamed**: 10
 - **Data/padding marked**: 5
-- **Total Phase 3**: 15
+- **Dev/debug functions**: 2
+- **Total Phase 3**: 17
 
 ### Overall
-- **Total functions renamed**: 60
+- **Total functions renamed**: 62
 - **Remaining FUN_CODE_xxxx**: 0 (all functions named!)
 - **Status**: ✓ COMPLETE
 
