@@ -20,7 +20,7 @@ public:
 		, m_screen(*this, "screen")
 	{ }
 
-	void sonicwtc(machine_config &config);
+	void sonicwtc(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
