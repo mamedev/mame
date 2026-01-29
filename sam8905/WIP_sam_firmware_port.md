@@ -482,12 +482,14 @@ Track newly identified INTMEM/EXTMEM addresses found during porting:
 ## Task List
 
 ### Setup
-- [ ] Create `sam_firmware/` directory structure
-- [ ] Create `sam_types.h` with struct definitions
-- [ ] Create `sam_hw.h` with SAM8905 interface
-- [ ] Create `sam_rom.h` with ROM access macros
-- [ ] Create `sam_config.h` for device-specific constants (program table addr, etc.)
-- [ ] Create build system (Makefile for SDCC)
+- [x] Create `sam_firmware/` directory structure
+- [x] Create `sam_types.h` with struct definitions
+- [x] Create `sam_hw.h` with SAM8905 interface
+- [x] Create `sam_rom.h` with ROM access macros
+- [x] Create `sam_config.h` for device-specific constants
+- [x] Create `sam_firmware.h` main header
+- [x] Create build system (Makefile for SDCC + host testing)
+- [x] Create `test_main.c` for host-based unit tests
 
 ### Phase 1: Utilities
 - [ ] Port `dptr_add_r6r7` (DCA8)
@@ -497,17 +499,17 @@ Track newly identified INTMEM/EXTMEM addresses found during porting:
 - [ ] Test utilities
 
 ### Phase 2: SAM Interface
-- [ ] Port `sam_write_dram` (A4BC)
-- [ ] Port `sam_write_aram` (AD43)
-- [ ] Port `sam_dram_clear_all` (A53C)
-- [ ] Port `sam_dram_write_word15` (A523)
+- [x] Port `sam_write_dram` (A4BC) - `sam_dram_write()` in sam_hw.h
+- [x] Port `sam_write_aram` (AD43) - `sam_aram_write_slot()` in sam_hw.c
+- [x] Port `sam_dram_clear_all` (A53C) - `dram_clear_all()` in sam_hw.c
+- [x] Port `sam_dram_write_word15` (A523) - `sam_init_slots()` in sam_hw.c
 - [ ] Test SAM writes against MAME trace
 
 ### Phase 3: Memory Init
-- [ ] Port `extmem_clear_all` (D454)
-- [ ] Port `voice_pages_clear` (B70B)
-- [ ] Port `slot_manager_init` (9904)
-- [ ] Port `pitch_table_init` (9B16)
+- [x] Port `extmem_clear_all` (D454) - `sam_extmem_clear_all()` in sam_init.c
+- [x] Port `voice_pages_clear` (B70B) - `sam_voice_pages_clear()` in sam_init.c
+- [x] Port `slot_manager_init` (9904) - `sam_slot_manager_init()` in sam_init.c
+- [ ] Port `pitch_table_init` (9B16) - placeholder only, needs exact algorithm
 - [ ] Verify pitch table against ROM/MAME
 
 ### Phase 4: MIDI (basic)
