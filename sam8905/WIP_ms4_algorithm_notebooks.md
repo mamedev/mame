@@ -147,16 +147,21 @@ The XE9L ROM (xe9l_v141.bin, 64KB) uses the same program format:
 - **Program pointer table**: 0x33AD, 171 entries
 - **Undefined programs**: 96 (marker 0x001E)
 - **Valid programs**: 75
-- **Algorithms**: 4 unique (at addresses 0x002A, 0x006A, 0x00AA, 0x00EA)
+- **Algorithms**: 8 total loaded by `load_algo_table_1`
 
-| Algorithm | ROM Address | Programs | Description |
-|-----------|-------------|----------|-------------|
-| ALG_002A  | 0x002A      | 3        | B16_8, EPIANO2, B8 |
-| ALG_006A  | 0x006A      | 51       | Most programs (clavinets, pianos, guitars, etc.) |
-| ALG_00AA  | 0x00AA      | 20       | Accordion, musette, harp variants |
-| ALG_00EA  | 0x00EA      | 1        | CLAVINET |
+| Algorithm | ROM Address | A-RAM Slot | Programs | Description |
+|-----------|-------------|------------|----------|-------------|
+| ALG_871A  | 0x871A      | 0x00       | -        | percussion/rhythm slot 0 |
+| ALG_86DA  | 0x86DA      | 0x20       | -        | percussion/rhythm slot 1 |
+| ALG_00EA  | 0x00EA      | 0x40       | 1        | CLAVINET |
+| ALG_00AA  | 0x00AA      | 0x60       | 20       | accordion variants |
+| ALG_006A  | 0x006A      | 0x80       | 51       | main instruments |
+| ALG_002A  | 0x002A      | 0xA0       | 3        | bass/piano (B16_8, EPIANO2, B8) |
+| ALG_3503  | 0x3503      | 0xC0       | -        | percussion/rhythm slot 6 |
+| ALG_9AFF  | 0x9AFF      | 0xE0       | -        | percussion/rhythm slot 7 |
 
-Algorithms are loaded once via `sam_programs_1` initialization.
+Only 4 algorithms are referenced by program entries (0x002A, 0x006A, 0x00AA, 0x00EA).
+The other 4 (0x871A, 0x86DA, 0x3503, 0x9AFF) are for rhythm/percussion patterns.
 
 ## Files
 

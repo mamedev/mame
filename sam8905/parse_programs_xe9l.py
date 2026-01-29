@@ -9,8 +9,16 @@ XE9L specifics:
 - ROM: xe9l_v141.bin (64KB)
 - Program pointer table at 0x33AD, 171 entries (big-endian)
 - Undefined program marker: 0x001E
-- 4 algorithms at 0x002A, 0x006A, 0x00AA, 0x00EA
-- Algorithms loaded via sam_programs_1 initialization
+- 8 algorithms loaded by load_algo_table_1:
+  - 0x871A → A-RAM slot 0 (percussion/rhythm)
+  - 0x86DA → A-RAM slot 1 (percussion/rhythm)
+  - 0x00EA → A-RAM slot 2 (CLAVINET)
+  - 0x00AA → A-RAM slot 3 (accordion variants)
+  - 0x006A → A-RAM slot 4 (main instruments)
+  - 0x002A → A-RAM slot 5 (bass/piano)
+  - 0x3503 → A-RAM slot 6 (percussion/rhythm)
+  - 0x9AFF → A-RAM slot 7 (percussion/rhythm)
+- Programs reference only 4 algorithms: 0x002A, 0x006A, 0x00AA, 0x00EA
 """
 
 import sys
@@ -31,6 +39,22 @@ ROM_PATH = "/home/jeff/bastel/roms/hohner/ms4/xe9l_v141.bin"
 PROGRAM_PTR_TABLE = 0x33AD
 NUM_PROGRAMS = 171
 UNDEFINED_ADDR = 0x001E  # Empty/undefined program marker
+
+# All 8 algorithms loaded by load_algo_table_1
+# Format: (rom_addr, aram_slot, description)
+ALL_ALGORITHMS = [
+    (0x871A, 0x00, "percussion/rhythm slot 0"),
+    (0x86DA, 0x20, "percussion/rhythm slot 1"),
+    (0x00EA, 0x40, "CLAVINET"),
+    (0x00AA, 0x60, "accordion variants"),
+    (0x006A, 0x80, "main instruments"),
+    (0x002A, 0xA0, "bass/piano"),
+    (0x3503, 0xC0, "percussion/rhythm slot 6"),
+    (0x9AFF, 0xE0, "percussion/rhythm slot 7"),
+]
+
+# Algorithms referenced by programs (subset of above)
+PROGRAM_ALGORITHMS = {0x002A, 0x006A, 0x00AA, 0x00EA}
 
 
 def read_rom():
@@ -71,10 +95,10 @@ def print_program_summary(programs):
 def print_aram_analysis(programs, rom):
     """Print A-RAM algorithm analysis"""
     print("\n" + "=" * 100)
-    print("A-RAM ALGORITHM ANALYSIS")
+    print("A-RAM ALGORITHM ANALYSIS (8 algorithms loaded by load_algo_table_1)")
     print("=" * 100)
 
-    # Find unique A-RAM pointers
+    # Find unique A-RAM pointers from programs
     aram_ptrs = {}
     for idx, prog in programs:
         ptr = prog['aram_ptr']
@@ -82,30 +106,33 @@ def print_aram_analysis(programs, rom):
             aram_ptrs[ptr] = []
         aram_ptrs[ptr].append((idx, prog['name']))
 
-    print(f"\n{len(aram_ptrs)} unique A-RAM algorithms found:\n")
-    print(f"{'A-RAM Ptr':<10} {'Count':<6} {'Programs'}")
+    # Print algorithm table
+    print(f"\n{'ROM Addr':<10} {'A-RAM':<7} {'Programs':<8} {'Description'}")
     print("-" * 80)
 
-    for ptr in sorted(aram_ptrs.keys()):
-        names = [f"{idx}:{name}" for idx, name in aram_ptrs[ptr]]
-        names_str = ', '.join(names[:6])
-        if len(names) > 6:
-            names_str += f" (+{len(names) - 6} more)"
-        print(f"0x{ptr:04X}    {len(names):<6} {names_str}")
+    for rom_addr, aram_slot, desc in ALL_ALGORITHMS:
+        prog_count = len(aram_ptrs.get(rom_addr, []))
+        prog_str = str(prog_count) if prog_count > 0 else "-"
+        print(f"0x{rom_addr:04X}    0x{aram_slot:02X}    {prog_str:<8} {desc}")
 
-    # Decode all unique algorithms
+    # Decode all 8 algorithms
     print("\n" + "-" * 80)
     print("DECODED A-RAM ALGORITHMS")
     print("-" * 80)
 
-    for ptr in sorted(aram_ptrs.keys()):
-        aram_data = parse_aram_data(rom, ptr)
+    for rom_addr, aram_slot, desc in ALL_ALGORITHMS:
+        aram_data = parse_aram_data(rom, rom_addr)
         if aram_data:
-            users = ', '.join(name for _, name in aram_ptrs[ptr][:5])
-            if len(aram_ptrs[ptr]) > 5:
-                users += f" (+{len(aram_ptrs[ptr]) - 5} more)"
+            prog_list = aram_ptrs.get(rom_addr, [])
+            if prog_list:
+                users = ', '.join(name for _, name in prog_list[:5])
+                if len(prog_list) > 5:
+                    users += f" (+{len(prog_list) - 5} more)"
+                user_info = f"used by {len(prog_list)} programs: {users}"
+            else:
+                user_info = "not referenced by programs (percussion/rhythm)"
             print(f"\n{'─' * 60}")
-            print(f"A-RAM at 0x{ptr:04X} (used by {len(aram_ptrs[ptr])} programs: {users})")
+            print(f"A-RAM at 0x{rom_addr:04X} → slot 0x{aram_slot:02X} ({user_info})")
             print(decode_algorithm(aram_data))
             print("\nD-RAM usage:")
             usage = analyze_dram_usage(aram_data)
@@ -163,13 +190,13 @@ def print_detailed_programs(programs):
 
 def export_programs_python(programs, rom, output_path):
     """Export programs grouped by algorithm to a Python file."""
-    # Collect unique A-RAM pointers
-    aram_ptrs = set()
+    # Collect all A-RAM pointers (from programs + additional ones)
+    all_aram_ptrs = set(addr for addr, _, _ in ALL_ALGORITHMS)
     for _, prog in programs:
-        aram_ptrs.add(prog['aram_ptr'])
+        all_aram_ptrs.add(prog['aram_ptr'])
 
     # Analyze WWF instructions for each algorithm
-    waveform_words = analyze_algorithms_wwf(rom, aram_ptrs)
+    waveform_words = analyze_algorithms_wwf(rom, all_aram_ptrs)
 
     # Group programs by A-RAM pointer
     by_algorithm = {}
@@ -189,21 +216,34 @@ def export_programs_python(programs, rom, output_path):
         f.write('Generated by parse_programs_xe9l.py\n')
         f.write('\n')
         f.write('Contains A-RAM algorithm data and D-RAM configurations\n')
-        f.write(f'for XE9L programs, grouped by algorithm.\n')
+        f.write('for XE9L programs, grouped by algorithm.\n')
+        f.write('\n')
+        f.write('8 algorithms loaded by load_algo_table_1:\n')
+        for rom_addr, aram_slot, desc in ALL_ALGORITHMS:
+            f.write(f'  0x{rom_addr:04X} -> A-RAM slot 0x{aram_slot:02X} ({desc})\n')
         f.write('"""\n\n')
 
-        # Export algorithms
+        # Export ALL 8 algorithms (including those not referenced by programs)
         f.write('# A-RAM algorithm data (32 x 15-bit instruction words)\n')
+        f.write('# Includes all 8 algorithms loaded by load_algo_table_1\n')
         f.write('ALGORITHMS = {\n')
-        for ptr_key in sorted(by_algorithm.keys()):
-            aram = by_algorithm[ptr_key]['aram_data']
+        for rom_addr, aram_slot, desc in ALL_ALGORITHMS:
+            ptr_key = f"{rom_addr:04X}"
+            aram = parse_aram_data(rom, rom_addr)
             if aram:
-                f.write(f"    '{ptr_key}': [\n")
+                f.write(f"    '{ptr_key}': [  # slot 0x{aram_slot:02X} - {desc}\n")
                 for i in range(0, 32, 8):
                     chunk = aram[i:i+8]
                     hex_vals = ', '.join(f'0x{v:04X}' for v in chunk)
                     f.write(f"        {hex_vals},\n")
                 f.write("    ],\n")
+        f.write('}\n\n')
+
+        # Export algorithm slot mapping
+        f.write('# Algorithm ROM address to A-RAM slot mapping\n')
+        f.write('ALGORITHM_SLOTS = {\n')
+        for rom_addr, aram_slot, desc in ALL_ALGORITHMS:
+            f.write(f"    '0x{rom_addr:04X}': 0x{aram_slot:02X},  # {desc}\n")
         f.write('}\n\n')
 
         # Export programs for each algorithm
@@ -274,9 +314,12 @@ def export_programs_python(programs, rom, output_path):
 
     total_exported = sum(len(v['programs']) for v in by_algorithm.values())
     print(f"Exported {total_exported} programs to {output_path}")
-    for ptr_key in sorted(by_algorithm.keys()):
-        count = len(by_algorithm[ptr_key]['programs'])
-        print(f"  Algorithm 0x{ptr_key}: {count} programs")
+    print(f"Algorithms exported: {len(ALL_ALGORITHMS)} (all loaded by load_algo_table_1)")
+    for rom_addr, aram_slot, desc in ALL_ALGORITHMS:
+        ptr_key = f"{rom_addr:04X}"
+        count = len(by_algorithm.get(ptr_key, {}).get('programs', []))
+        prog_info = f"{count} programs" if count > 0 else "no programs (rhythm/percussion)"
+        print(f"  0x{ptr_key} (slot 0x{aram_slot:02X}): {prog_info}")
 
 
 def main():
