@@ -1029,6 +1029,7 @@ void s8k_state::s8k(machine_config &config)
 
 ROM_START( s8000 )
 	ROM_REGION16_BE(0x4000,"maincpu", 0)
+	ROM_DEFAULT_BIOS( "v22" )
 
 	ROM_SYSTEM_BIOS( 0, "v12", "Version 1.2" )
 	ROMX_LOAD("cpu-12.u74", 0x0001, 0x1000, CRC(ab2ca534) SHA1(25857479801397f1f18c55b40f81cb5ba7a01a55), ROM_SKIP(1) | ROM_BIOS(0))
