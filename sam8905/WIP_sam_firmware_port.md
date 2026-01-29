@@ -19,6 +19,7 @@ The C port aims to be usable across all these platforms.
 **Reference documentation (MS4-specific analysis):**
 - `WIP_ms4_memory_init.md` - INTMEM/EXTMEM memory maps, boot sequence
 - `WIP_solton_ms4.md` - Function addresses, MIDI handlers, envelope system
+- `WIP_sam_firmware_port_emu.md` - SAM8905 emulator and Linux platform support
 
 ## Device Variations
 
