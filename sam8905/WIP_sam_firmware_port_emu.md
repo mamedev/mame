@@ -16,8 +16,26 @@ sam_firmware/emu/
 ├── sam8905_emu.c      # Emulator implementation (ported from MAME)
 ├── audio_portaudio.h  # PortAudio audio output interface
 ├── audio_portaudio.c  # PortAudio implementation
-├── midi_alsa.h        # ALSA MIDI input interface
-└── midi_alsa.c        # ALSA sequencer implementation
+├── midi_alsa.h        # ALSA MIDI input (parsed messages)
+├── midi_alsa.c        # ALSA sequencer - parsed message mode
+├── midi_alsa_raw.h    # ALSA MIDI input (raw bytes)
+├── midi_alsa_raw.c    # ALSA sequencer - raw byte mode
+├── main_emu.c         # Main loop (MS4-like structure)
+├── Makefile           # Build for Linux
+└── sam_emu            # Output binary
+```
+
+## Building and Running
+
+```bash
+cd sam_firmware/emu
+make
+./sam_emu
+```
+
+Then connect a MIDI device:
+```bash
+aconnect <source_port> <sam_emu_port>
 ```
 
 ## SAM8905 Emulator
@@ -273,11 +291,17 @@ void sam_write_reg(uint8_t reg, uint8_t value) {
 
 - [x] Copy SAM8905 emulator from Ambika Retro
 - [x] Copy PortAudio audio output
-- [x] Copy ALSA MIDI input
+- [x] Copy ALSA MIDI input (parsed messages)
+- [x] Add ALSA MIDI raw byte interface (`midi_alsa_raw.c`)
 - [x] Fix include paths
-- [ ] Create test harness integrating emulator with firmware
+- [x] Create Makefile for emu build
+- [x] Create main loop (`main_emu.c`) with MS4-like structure
+- [x] Test basic sine wave generation with MIDI note on/off
+- [x] Integrate firmware MIDI parser (`sam_midi.c`) with emulator
+  - ALSA MIDI bytes → `midi_rx_isr()` → firmware RX buffer
+  - Main loop calls `midi_process_byte()` for parsing
+  - Weak stub handlers overridden in `main_emu.c` for simple sound generation
 - [ ] Add stereo output support to audio_portaudio.c
 - [ ] Add MIDI output support (for Active Sense, etc.)
-- [ ] Create Makefile for emu build
-- [ ] Test basic sine wave generation
+- [ ] Port firmware voice allocation
 - [ ] Integrate with sam_hw.c register interface
