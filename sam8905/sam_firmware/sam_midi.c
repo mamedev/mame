@@ -9,6 +9,20 @@
 #include <stddef.h>
 
 /*============================================================================
+ * Debug Output
+ *
+ * Only enabled for emulator builds (SAM_HW_PLATFORM defined in Makefile).
+ * SDCC builds get no-op macros.
+ *============================================================================*/
+
+#ifdef SAM_HW_PLATFORM
+#include <stdio.h>
+#define DEBUG_MIDI(fmt, ...) do { printf("MIDI: " fmt "\n", ##__VA_ARGS__); fflush(stdout); } while(0)
+#else
+#define DEBUG_MIDI(fmt, ...) do { } while(0)
+#endif
+
+/*============================================================================
  * Test Support
  *
  * Test ROM hook allows unit tests to provide ROM data without modifying
@@ -466,6 +480,9 @@ WEAK_STUB void midi_handle_note(uint8_t channel, uint8_t note, uint8_t velocity)
     uint8_t voice_note;
     uint8_t voice_channel;
 
+    DEBUG_MIDI("Note %s ch=%d note=%d vel=%d",
+               velocity ? "ON" : "OFF", channel, note, velocity);
+
     if (velocity == 0) {
         /* Note Off - find and release the voice playing this note */
         page = g_intmem.active_voice_list_head;
@@ -541,6 +558,7 @@ WEAK_STUB void midi_handle_note(uint8_t channel, uint8_t note, uint8_t velocity)
 
 WEAK_STUB void midi_handle_cc(uint8_t channel, uint8_t cc, uint8_t value)
 {
+    DEBUG_MIDI("CC ch=%d cc=%d val=%d", channel, cc, value);
     /* TODO: Dispatch CC to handlers */
     (void)channel;
     (void)cc;
@@ -564,6 +582,8 @@ WEAK_STUB void midi_handle_program_change(uint8_t channel, uint8_t program)
     uint16_t program_ptr_addr;
     uint16_t program_ptr;
     uint8_t i;
+
+    DEBUG_MIDI("Program Change ch=%d prog=%d", channel, program);
 
     /* Clamp program number to valid range (0-65 for MS4) */
     if (program >= 66) {
