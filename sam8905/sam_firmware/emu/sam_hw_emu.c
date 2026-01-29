@@ -13,11 +13,13 @@
  * Register State
  *
  * The SAM8905 uses a register interface where:
- * - Reg 0 (ADDR_DATA): Address for memory access / data byte 0
- * - Reg 1 (DATA1): Data byte 1 (high byte for D-RAM)
- * - Reg 2 (DATA2): Data byte 2 (low byte for D-RAM)
- * - Reg 3 (DATA3): Data byte 3 (for A-RAM writes)
+ * - Reg 0 (ADDR_DATA): Address for memory access
+ * - Reg 1 (DATA1): D-RAM bits 7:0 / A-RAM inst0 high byte
+ * - Reg 2 (DATA2): D-RAM bits 15:8 / A-RAM inst1 low byte
+ * - Reg 3 (DATA3): D-RAM bits 18:16 / A-RAM inst1 high byte
  * - Reg 4 (CTRL): Control - triggers memory operation
+ *
+ * See MAME src/devices/sound/sam8905.cpp for register mapping.
  *============================================================================*/
 
 static uint8_t g_sam_addr = 0;      /* Current address */

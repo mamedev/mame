@@ -14,6 +14,7 @@ sam_firmware/emu/
 ├── sam8905.h          # SAM8905 high-level interface (constants, macros)
 ├── sam8905_emu.h      # Emulator state structure and API
 ├── sam8905_emu.c      # Emulator implementation (ported from MAME)
+├── sam_hw_emu.c       # Platform implementation of sam_hw.h for emulator
 ├── audio_portaudio.h  # PortAudio audio output interface
 ├── audio_portaudio.c  # PortAudio implementation
 ├── midi_alsa.h        # ALSA MIDI input (parsed messages)
@@ -301,7 +302,11 @@ void sam_write_reg(uint8_t reg, uint8_t value) {
   - ALSA MIDI bytes → `midi_rx_isr()` → firmware RX buffer
   - Main loop calls `midi_process_byte()` for parsing
   - Weak stub handlers overridden in `main_emu.c` for simple sound generation
+- [x] Integrate with sam_hw.c register interface
+  - `sam_hw_emu.c` implements `sam_write_reg()`/`sam_read_reg()`
+  - Translates register writes to `sam8905_write_dram()`/`sam8905_write_aram()`
+  - `sam_init()` now works through the emulator
+- [x] Add MIDI port auto-connect via command line (`-m <port>`)
 - [ ] Add stereo output support to audio_portaudio.c
 - [ ] Add MIDI output support (for Active Sense, etc.)
 - [ ] Port firmware voice allocation
-- [ ] Integrate with sam_hw.c register interface

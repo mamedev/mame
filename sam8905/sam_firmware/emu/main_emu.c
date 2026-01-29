@@ -21,18 +21,19 @@
 #include "sam8905_emu.h"
 #include "audio_portaudio.h"
 #include "midi_alsa_raw.h"
+#include "sam_rom_emu.h"
 
 /* Include firmware headers (SAM_DEVICE_MS4 defined in Makefile) */
 #include "../sam_firmware.h"
 
 /*============================================================================
- * Global State - Firmware Memory
+ * Global State - Firmware Memory (defined in sam_init.c)
  *============================================================================*/
 
-/* These are the global memory structures used by the firmware */
-IDATA intmem_t g_intmem;
-IDATA intmem_upper_t g_intmem_upper;
-XDATA extmem_t g_extmem;
+/* These are declared in sam_init.c, we just reference them here */
+extern IDATA intmem_t g_intmem;
+extern IDATA intmem_upper_t g_intmem_upper;
+extern XDATA extmem_t g_extmem;
 
 static Sam8905Emu g_sam_emu;
 static volatile int g_running = 1;
@@ -45,73 +46,12 @@ static void midi_rx_callback(uint8_t byte, void *user_data)
 {
     (void)user_data;
 
+    /* Debug: print received MIDI bytes */
+    printf("MIDI RX: 0x%02X\n", byte);
+    fflush(stdout);
+
     /* Call firmware's UART ISR handler */
     midi_rx_isr(byte);
-}
-
-/*============================================================================
- * MIDI Message Handlers - Called by firmware's midi_process_byte()
- *
- * These override the stub implementations in sam_midi.c.
- * Eventually these will call the ported voice management code.
- *============================================================================*/
-
-void midi_handle_note(uint8_t channel, uint8_t note, uint8_t velocity)
-{
-    printf("Note %s: ch=%d note=%d vel=%d\n",
-           velocity > 0 ? "On " : "Off", channel, note, velocity);
-
-    /* TODO: Call sam_voice_init() when voice management is ported */
-    /* For now, just play a simple tone on slot 0 */
-    if (velocity > 0) {
-        /* Calculate phase increment for note */
-        /* phase_inc = freq_hz * 4096 / 44100 */
-        /* A4 (note 69) = 440 Hz → phase_inc ≈ 41 */
-        double freq = 440.0 * pow(2.0, (note - 69) / 12.0);
-        uint16_t phase_inc = (uint16_t)(freq * 4096.0 / 44100.0);
-
-        /* Set up slot 0 */
-        sam8905_write_dram(SAM8905_DRAM_ADDR(0, 1), SAM8905_DPHI(phase_inc));
-        sam8905_write_dram(SAM8905_DRAM_ADDR(0, 2),
-            SAM8905_AMP_MIX(velocity * 8, 7, 7));
-        sam8905_write_dram(SAM8905_DRAM_ADDR(0, 15), SAM8905_SLOT_ACTIVE_44K(0));
-    } else {
-        /* Note off */
-        sam8905_write_dram(SAM8905_DRAM_ADDR(0, 15), SAM8905_SLOT_IDLE);
-    }
-}
-
-void midi_handle_cc(uint8_t channel, uint8_t cc, uint8_t value)
-{
-    printf("CC: ch=%d cc=%d val=%d\n", channel, cc, value);
-    /* TODO: Dispatch to handlers when ported */
-}
-
-void midi_handle_program_change(uint8_t channel, uint8_t program)
-{
-    printf("Program Change: ch=%d prog=%d\n", channel, program);
-    /* TODO: Load program from ROM when ported */
-}
-
-void midi_handle_aftertouch(uint8_t channel, uint8_t pressure)
-{
-    /* Ignored for now */
-    (void)channel;
-    (void)pressure;
-}
-
-void midi_handle_pitch_bend(uint8_t channel, uint8_t lsb, uint8_t msb)
-{
-    printf("Pitch Bend: ch=%d val=%d\n", channel, ((int)msb << 7) | lsb);
-    /* TODO: Update pitch bend when ported */
-}
-
-void midi_all_notes_off(uint8_t channel)
-{
-    printf("All Notes Off: ch=%d\n", channel);
-    /* TODO: Kill all voices on channel when ported */
-    /* For now, just silence slot 0 */
-    sam8905_write_dram(SAM8905_DRAM_ADDR(0, 15), SAM8905_SLOT_IDLE);
 }
 
 /*============================================================================
@@ -174,6 +114,18 @@ static void signal_handler(int sig)
 {
     (void)sig;
     g_running = 0;
+    printf("\nReceived signal, shutting down...\n");
+    fflush(stdout);
+}
+
+static void setup_signals(void)
+{
+    struct sigaction sa;
+    sa.sa_handler = signal_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;  /* Don't restart syscalls */
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
 }
 
 /*============================================================================
@@ -223,6 +175,7 @@ static void print_usage(const char *prog)
 {
     printf("Usage: %s [options]\n", prog);
     printf("Options:\n");
+    printf("  -r <file>   Load ROM file (e.g., ms4_05_r1_0.bin)\n");
     printf("  -m <port>   Connect to MIDI port (substring match)\n");
     printf("              e.g.: -m \"Midi Through\" or -m \"USB\"\n");
     printf("  -l          List available MIDI ports and exit\n");
@@ -232,11 +185,14 @@ static void print_usage(const char *prog)
 int main(int argc, char *argv[])
 {
     const char *midi_port = NULL;
+    const char *rom_path = NULL;
     int list_only = 0;
 
     /* Parse command line */
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-m") == 0 && i + 1 < argc) {
+        if (strcmp(argv[i], "-r") == 0 && i + 1 < argc) {
+            rom_path = argv[++i];
+        } else if (strcmp(argv[i], "-m") == 0 && i + 1 < argc) {
             midi_port = argv[++i];
         } else if (strcmp(argv[i], "-l") == 0) {
             list_only = 1;
@@ -254,14 +210,23 @@ int main(int argc, char *argv[])
     printf("========================\n\n");
 
     /* Setup signal handler */
-    signal(SIGINT, signal_handler);
-    signal(SIGTERM, signal_handler);
+    setup_signals();
 
     /* Initialize firmware memory structures */
     printf("Initializing firmware...\n");
     memset(&g_intmem, 0, sizeof(g_intmem));
     memset(&g_intmem_upper, 0, sizeof(g_intmem_upper));
     memset(&g_extmem, 0, sizeof(g_extmem));
+
+    /* Load ROM if specified */
+    if (rom_path) {
+        if (rom_load(rom_path) < 0) {
+            fprintf(stderr, "Failed to load ROM\n");
+            return 1;
+        }
+    } else {
+        rom_init_empty();
+    }
 
     /* Initialize firmware MIDI subsystem */
     midi_init();
