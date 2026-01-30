@@ -19,6 +19,9 @@
 #define DEBUG_DRAM(fmt, ...) do { } while(0)
 #endif
 
+/* Forward declarations (defined later in this file) */
+void dram_param_processor_finish(void);
+
 /*============================================================================
  * ROM Access Helpers
  *
@@ -144,6 +147,124 @@ uint8_t dram_config_apply_velocity(uint8_t value, uint8_t sensitivity)
         return 0;
     }
     return value - (uint8_t)scaled;
+}
+
+/*============================================================================
+ * Parameter Processor (CODE:AA9A)
+ *
+ * Main entry point for D-RAM parameter initialization.
+ *
+ * MS4 Program format (from parse_programs.py analysis):
+ *   Offset 12-14: dram_entry0 (3 bytes, one-time)
+ *   Offset 15-16: first voice_data_ptr (2 bytes)
+ *   Offset 17+: Additional 2-byte slot pointers until 0x0000
+ *   After 0x0000: D-RAM stream
+ *
+ * Process flow:
+ *   1. Read initial 5 bytes (entry0 + first voice_ptr) at offset 12
+ *   2. If voice_ptr != 0: process envelope at that pointer, advance slot_base
+ *   3. Read 2-byte slot pointers until 0x0000
+ *   4. When 0x0000 found: switch to D-RAM dispatch mode
+ *
+ * Called with rom_data_ptr pointing to program_base + 12
+ *============================================================================*/
+
+void dram_param_processor(void)
+{
+    uint8_t entry_byte0, entry_lo, entry_hi;
+    uint8_t voice_ptr_lo, voice_ptr_hi;
+    uint16_t voice_ptr;
+
+    DEBUG_DRAM("param_processor: stream=0x%04X slot_base=%d",
+               ((uint16_t)g_intmem.rom_data_ptr_hi << 8) | g_intmem.rom_data_ptr_lo,
+               g_intmem.voice_slot_base);
+
+    /* Read initial 5 bytes: 3-byte D-RAM entry + 2-byte voice_data_ptr */
+    entry_byte0 = dram_config_read_stream_byte();
+    entry_lo = dram_config_read_stream_byte();
+    entry_hi = dram_config_read_stream_byte();
+    voice_ptr_lo = dram_config_read_stream_byte();
+    voice_ptr_hi = dram_config_read_stream_byte();
+
+    voice_ptr = ((uint16_t)voice_ptr_hi << 8) | voice_ptr_lo;
+
+    DEBUG_DRAM("  entry0: 0x%02X%02X%02X, first_voice_ptr=0x%04X",
+               entry_byte0, entry_lo, entry_hi, voice_ptr);
+
+    /* Store entry bytes in intmem */
+    g_intmem.velocity_curve_ptr = entry_byte0;
+    g_intmem.dram_entry_lo = entry_lo;
+    g_intmem.dram_entry_hi = entry_hi;
+    g_intmem.voice_data_ptr_lo = voice_ptr_lo;
+    g_intmem.voice_data_ptr_hi = voice_ptr_hi;
+
+    /* Process first envelope block if voice_ptr != 0 */
+    if (voice_ptr != 0) {
+        DEBUG_DRAM("  processing envelope at 0x%04X, slot_base=%d", voice_ptr, g_intmem.voice_slot_base);
+        voice_init_copy_and_envelope();
+        /* voice_init_copy_and_envelope advances slot_base and calls back to dram_param_processor_continue */
+        return;
+    }
+
+    /* voice_ptr == 0: no envelope blocks, go straight to D-RAM dispatch */
+    dram_param_processor_finish();
+}
+
+/*============================================================================
+ * Parameter Processor Continue (called after envelope processing)
+ *
+ * Reads additional 2-byte slot pointers until 0x0000, then switches to
+ * D-RAM dispatch mode.
+ *============================================================================*/
+
+void dram_param_processor_continue(void)
+{
+    uint8_t voice_ptr_lo, voice_ptr_hi;
+    uint16_t voice_ptr;
+    int iteration_limit = 20;
+
+    DEBUG_DRAM("param_processor_continue: slot_base=%d", g_intmem.voice_slot_base);
+
+    while (iteration_limit-- > 0) {
+        /* Read 2-byte slot pointer */
+        voice_ptr_lo = dram_config_read_stream_byte();
+        voice_ptr_hi = dram_config_read_stream_byte();
+        voice_ptr = ((uint16_t)voice_ptr_hi << 8) | voice_ptr_lo;
+
+        DEBUG_DRAM("  slot_ptr=0x%04X", voice_ptr);
+
+        if (voice_ptr == 0) {
+            /* Terminator found, switch to D-RAM dispatch */
+            dram_param_processor_finish();
+            return;
+        }
+
+        /* Store and process envelope block */
+        g_intmem.voice_data_ptr_lo = voice_ptr_lo;
+        g_intmem.voice_data_ptr_hi = voice_ptr_hi;
+
+        DEBUG_DRAM("  processing envelope at 0x%04X, slot_base=%d", voice_ptr, g_intmem.voice_slot_base);
+        voice_init_copy_and_envelope();
+        /* voice_init_copy_and_envelope will call back to continue */
+        return;
+    }
+}
+
+/*============================================================================
+ * Parameter Processor Finish (switches to D-RAM dispatch mode)
+ *============================================================================*/
+
+void dram_param_processor_finish(void)
+{
+    DEBUG_DRAM("param_processor_finish: switching to D-RAM dispatch");
+
+    /* Set voice_slot_base for D-RAM dispatch phase */
+    /* Original: voice_slot_base = (dram_address_counter << 4) >> 1 | 0x80 */
+    g_intmem.voice_slot_base = ((g_intmem.dram_address_counter << 4) >> 1) | 0x80;
+    g_intmem.remaining_slots = 16;
+
+    /* Start D-RAM dispatch */
+    dram_config_dispatch();
 }
 
 /*============================================================================
@@ -498,6 +619,10 @@ void dram_config_handler_08(void)
     voice_page_write(g_intmem.voice_page_num, g_intmem.voice_slot_base + 6, ctrl_flags);
     voice_page_write(g_intmem.voice_page_num, g_intmem.voice_slot_base + 7, bend_range);
 
+    /* Update slot mapping for periodic modulation (from CODE:AE49-AE4E) */
+    /* Original: if (_0_3 != '\x01') { write dram_address to slot_map; dram_slot_index++; } */
+    dram_config_update_slot_mapping();
+
     /* Continue dispatch */
     dram_config_advance_and_dispatch();
 }
@@ -550,6 +675,12 @@ void dram_config_handler_10(void)
     voice_page_write(g_intmem.voice_page_num, g_intmem.voice_slot_base + 5, sustain);
     voice_page_write(g_intmem.voice_page_num, g_intmem.voice_slot_base + 6, vel_sens);
     voice_page_write(g_intmem.voice_page_num, g_intmem.voice_slot_base + 7, mod_amt);
+
+    /* Update slot mapping for periodic amplitude modulation
+     * Original has complex conditions based on env_ctrl bits, simplified here */
+    if (env_ctrl & 0x80) {  /* Envelope enabled */
+        dram_config_update_slot_mapping();
+    }
 
     /* Continue dispatch */
     dram_config_advance_and_dispatch();

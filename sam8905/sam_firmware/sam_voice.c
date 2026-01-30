@@ -697,8 +697,9 @@ void voice_init_copy_and_envelope(void)
 
     /* Check skip flag (_0_3 in original) */
     if (g_intmem.flags_20 & 0x08) {
-        /* Skip this block, continue to next */
-        voice_init_next_slot();
+        /* Skip this block, continue to next 5-byte param block */
+        g_intmem.voice_slot_base += 16;  /* LFO/envelope blocks are 16 bytes */
+        dram_param_processor_continue();  /* Continue reading slot pointers */
         return;
     }
 
@@ -777,8 +778,9 @@ void voice_init_copy_and_envelope(void)
 
     /* Check envelope enable (bit 7 of ctrl_flags) */
     if (!(ctrl_flags & 0x80)) {
-        /* No envelope enable - continue to next slot */
-        voice_init_next_slot();
+        /* No envelope enable - continue to next 5-byte param block */
+        g_intmem.voice_slot_base += 16;  /* LFO/envelope blocks are 16 bytes */
+        dram_param_processor_continue();  /* Continue reading slot pointers */
         return;
     }
 
@@ -808,8 +810,9 @@ void voice_init_copy_and_envelope(void)
     /* Clear slot[7] again (envelope output cleared at start of envelope) */
     voice_page_write(page, slot_base + 7, 0);
 
-    /* Continue to next slot */
-    voice_init_next_slot();
+    /* Continue to next 5-byte param block */
+    g_intmem.voice_slot_base += 16;  /* LFO/envelope blocks are 16 bytes */
+    dram_param_processor();  /* Continue reading param blocks */
 }
 
 /*============================================================================
@@ -979,16 +982,21 @@ void periodic_voice_update(void)
         }
 
         /*====================================================================
-         * PART 2: D-RAM Slot Modulation
+         * PART 2: D-RAM Slot Modulation (verified against CODE:9DCA-9E6E)
          *
          * Iterates through slot mapping at page+0x70 area.
          * For each active D-RAM slot, reads mod type and dispatches.
          *
-         * Slot mapping: page[0x70+i] contains D-RAM slot index (0x0F = inactive)
+         * Slot mapping: page[0x70+i] contains D-RAM slot index (0xFF = end of list)
          * Mod state: page[0x80 + slot*8] contains dispatch type
+         *
+         * Original behavior when slot_index == 0xFF (end of list):
+         *   - If status bit 5 (0x20) is set: continue to next voice (don't free)
+         *   - If status bit 5 is NOT set: call voice_free()
          *====================================================================*/
 
         /* Iterate through slot mapping entries (up to 16) */
+        uint8_t should_free = 0;
         for (uint8_t i = 0; i < 16; i++) {
             slot_index = voice_page_read(page, 0x70 + i);
 
@@ -997,8 +1005,20 @@ void periodic_voice_update(void)
                 DEBUG_VOICE("  slot_map[%d]=0x%02X", i, slot_index);
             }
 
-            /* Check if slot is active (0xFF or 0x0F = inactive) */
-            if (slot_index == 0xFF || slot_index == 0x0F) {
+            /* Check for end of slot list (0xFF) - verified against Ghidra CODE:9E4B */
+            if (slot_index == 0xFF) {
+                uint8_t status = voice_page_read(page, VOICE_PAGE_STATUS);
+                DEBUG_VOICE("  slot_map end: status=0x%02X, bit5=%d", status, (status >> 5) & 1);
+                if (!(status & 0x20)) {
+                    /* Bit 5 NOT set: voice should be freed (CODE:9E56-9E5F) */
+                    should_free = 1;
+                }
+                /* Otherwise bit 5 set: don't free, just continue to next voice */
+                break;
+            }
+
+            /* Skip inactive entries (0x0F = no modulation for this D-RAM word) */
+            if (slot_index == 0x0F) {
                 continue;
             }
 
@@ -1061,14 +1081,14 @@ void periodic_voice_update(void)
             }
         }
 
-        /* Check voice status for release completion */
-        uint8_t status = voice_page_read(page, VOICE_PAGE_STATUS);
+        /* Get next voice BEFORE potential free (voice_free modifies the list) */
         uint8_t next_page = voice_list_next(page);
 
-        if ((status & VOICE_STATUS_RELEASE) && !(status & VOICE_STATUS_ACTIVE)) {
-            /* Voice has completed release - free it */
+        /* Free voice if flagged (verified against Ghidra CODE:9E56-9E5F) */
+        if (should_free) {
+            DEBUG_VOICE("  freeing voice page %d", page);
             g_intmem.voice_page_num = page;
-            voice_free();
+            next_page = voice_free();  /* voice_free returns next page */
         }
 
         /* Move to next voice */

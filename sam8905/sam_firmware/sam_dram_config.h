@@ -34,6 +34,34 @@
  *============================================================================*/
 
 /**
+ * D-RAM parameter processor (CODE:AA9A)
+ *
+ * Main entry point for D-RAM parameter initialization.
+ * Processes envelope/LFO blocks first, then dispatches D-RAM config.
+ *
+ * Entry: rom_data_ptr_lo/hi = stream pointer (program_base + 12)
+ *        voice_slot_base = 0 (for envelope/LFO blocks)
+ *        dram_slot_index = 0x70
+ *        dram_address_counter = swap_nibbles(page)
+ */
+void dram_param_processor(void);
+
+/**
+ * Continue param processing after envelope block
+ *
+ * Called from voice_init_copy_and_envelope to read remaining
+ * 2-byte slot pointers until 0x0000 terminator.
+ */
+void dram_param_processor_continue(void);
+
+/**
+ * Finish param processing and switch to D-RAM dispatch
+ *
+ * Called when slot pointer terminator (0x0000) is found.
+ */
+void dram_param_processor_finish(void);
+
+/**
  * D-RAM config dispatch loop (CODE:AB4C)
  *
  * Reads dispatch bytes from voice data stream and calls handlers.
@@ -173,6 +201,17 @@ uint8_t dram_config_peek_stream_byte(void);
  * @param value  Byte to write at voice_page[voice_page_num][voice_slot_base]
  */
 void dram_config_write_slot_byte(uint8_t value);
+
+/**
+ * Update slot mapping for periodic modulation (from CODE:AE49-AE4E)
+ *
+ * Writes dram_address_counter to voice_page[dram_slot_index] and increments
+ * dram_slot_index. Called from pitch/amplitude handlers to register which
+ * D-RAM words need periodic modulation updates.
+ *
+ * Entry: dram_slot_index should be initialized to 0x70 before dispatch
+ */
+void dram_config_update_slot_mapping(void);
 
 /**
  * Apply velocity scaling to a value (CODE:B1EC)

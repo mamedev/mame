@@ -2259,13 +2259,14 @@ static int test_rom_program_load_and_note_on(void)
 
     /*
      * Verify voice page has pitch data from handler 0x08
-     * Pitch for note 60 should be stored at voice_slot_base+1,2,3
+     * Handler 0x08 is first in stream, voice_slot_base starts at 0x80
+     * So pitch is stored at: dispatch=0x80, lo=0x81, mid=0x82, hi=0x83
      */
-    uint8_t pitch_lo = voice_page_read(page, 0x01);
-    uint8_t pitch_mid = voice_page_read(page, 0x02);
-    uint8_t pitch_hi = voice_page_read(page, 0x03);
+    uint8_t pitch_lo = voice_page_read(page, 0x81);
+    uint8_t pitch_mid = voice_page_read(page, 0x82);
+    uint8_t pitch_hi = voice_page_read(page, 0x83);
     uint32_t pitch = ((uint32_t)pitch_hi << 16) | ((uint32_t)pitch_mid << 8) | pitch_lo;
-    printf("  Pitch value for note 60: 0x%06X\n", pitch);
+    printf("  Pitch value for note 60: 0x%06X (at 0x81-0x83)\n", pitch);
 
     if (pitch == 0) {
         printf("FAIL: pitch is zero (pitch table not initialized?)\n");

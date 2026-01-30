@@ -543,29 +543,32 @@ WEAK_STUB void midi_handle_note(uint8_t channel, uint8_t note, uint8_t velocity)
         /* Store note in voice page for later lookup */
         voice_page_write(page, 0xF8, note);
 
-        /* Set up D-RAM config dispatch parameters */
-        /* D-RAM stream starts at program_base + 17 (after header and dram_entry0)
+        /* Set up D-RAM parameter processor (CODE:AA9A flow)
          * Program format:
          *   0-7:   name (8 bytes)
          *   8:     null terminator
          *   9:     flags (slot count in low nibble)
          *   10-11: A-RAM pointer (LE)
-         *   12-14: D-RAM entry0 (3 bytes)
-         *   15-16: voice init data pointer (LE)
-         *   17+:   D-RAM stream
+         *   12+:   D-RAM param blocks (5 bytes each: 3-byte entry + 2-byte ptr)
+         *          When ptr==0, switches to D-RAM dispatch mode
+         *
+         * The param processor reads 5-byte blocks starting at offset 12.
+         * If the 2-byte pointer is non-zero, it processes envelope/LFO data.
+         * When pointer is zero, it switches to D-RAM dispatch for the
+         * remaining data stream.
          */
-        uint16_t dram_stream_addr = program_ptr + 17;
+        uint16_t param_stream_addr = program_ptr + 12;
 
-        g_intmem.rom_data_ptr_lo = (uint8_t)(dram_stream_addr & 0xFF);
-        g_intmem.rom_data_ptr_hi = (uint8_t)(dram_stream_addr >> 8);
-        g_intmem.voice_slot_base = 0;
-        g_intmem.remaining_slots = 16;  /* Process all 16 D-RAM words */
+        g_intmem.rom_data_ptr_lo = (uint8_t)(param_stream_addr & 0xFF);
+        g_intmem.rom_data_ptr_hi = (uint8_t)(param_stream_addr >> 8);
+        g_intmem.voice_slot_base = 0;  /* Envelope/LFO blocks at 0x00-0x6F */
         g_intmem.dram_address_counter = swap_nibbles(page);
+        g_intmem.dram_slot_index = 0x70;  /* Slot mapping starts at 0x70 (from CODE:A8E7) */
 
-        /* Run D-RAM config dispatch to initialize voice parameters */
-        DEBUG_MIDI("dram_config_dispatch: stream=0x%04X", dram_stream_addr);
-        dram_config_dispatch();
-        DEBUG_MIDI("dram_config_dispatch done");
+        /* Run D-RAM parameter processor (handles envelope setup + D-RAM dispatch) */
+        DEBUG_MIDI("dram_param_processor: stream=0x%04X slot_idx=0x%02X", param_stream_addr, g_intmem.dram_slot_index);
+        dram_param_processor();
+        DEBUG_MIDI("dram_param_processor done");
     } else {
         DEBUG_MIDI("voice allocation failed");
     }

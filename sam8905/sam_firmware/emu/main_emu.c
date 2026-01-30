@@ -260,6 +260,7 @@ static void print_usage(const char *prog)
     printf("  -m <port>   Connect to MIDI port (substring match)\n");
     printf("              e.g.: -m \"Midi Through\" or -m \"USB\"\n");
     printf("  -l          List available MIDI ports and exit\n");
+    printf("  -t          Test mode: inject note-on and run a few updates\n");
     printf("  -h          Show this help\n");
 }
 
@@ -269,6 +270,7 @@ int main(int argc, char *argv[])
     const char *rom_path = NULL;
     int program_num = -1;  /* -1 = use test algorithm */
     int list_only = 0;
+    int test_mode = 0;
 
     /* Parse command line */
     for (int i = 1; i < argc; i++) {
@@ -280,6 +282,8 @@ int main(int argc, char *argv[])
             midi_port = argv[++i];
         } else if (strcmp(argv[i], "-l") == 0) {
             list_only = 1;
+        } else if (strcmp(argv[i], "-t") == 0) {
+            test_mode = 1;
         } else if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
             print_usage(argv[0]);
             return 0;
@@ -335,54 +339,85 @@ int main(int argc, char *argv[])
         setup_test_algorithm();
     }
 
-    /* Initialize ALSA MIDI */
-    printf("Initializing ALSA MIDI...\n");
-    if (midi_raw_init("SAM8905 Synth", midi_rx_callback, NULL) < 0) {
-        fprintf(stderr, "Failed to initialize MIDI\n");
-        return 1;
-    }
+    /* Skip MIDI/audio init in test mode */
+    if (!test_mode) {
+        /* Initialize ALSA MIDI */
+        printf("Initializing ALSA MIDI...\n");
+        if (midi_raw_init("SAM8905 Synth", midi_rx_callback, NULL) < 0) {
+            fprintf(stderr, "Failed to initialize MIDI\n");
+            return 1;
+        }
 
-    /* List ports if requested */
-    if (list_only) {
-        midi_raw_list_ports();
-        midi_raw_shutdown();
-        return 0;
-    }
-
-    /* Auto-connect to specified port, or just list available ports */
-    if (midi_port) {
-        if (midi_raw_connect(midi_port) < 0) {
+        /* List ports if requested */
+        if (list_only) {
             midi_raw_list_ports();
-            fprintf(stderr, "\nFailed to connect to MIDI port '%s'\n", midi_port);
+            midi_raw_shutdown();
+            return 0;
+        }
+
+        /* Auto-connect to specified port, or just list available ports */
+        if (midi_port) {
+            if (midi_raw_connect(midi_port) < 0) {
+                midi_raw_list_ports();
+                fprintf(stderr, "\nFailed to connect to MIDI port '%s'\n", midi_port);
+                midi_raw_shutdown();
+                return 1;
+            }
+        } else {
+            midi_raw_list_ports();
+            printf("\nNo MIDI port specified. Use -m <port> to auto-connect.\n");
+            printf("Or connect manually with: aconnect <source> %d:0\n\n",
+                   midi_raw_get_client_id());
+        }
+
+        /* Initialize PortAudio */
+        printf("\nInitializing audio...\n");
+        if (audio_portaudio_init(44100) < 0) {
+            fprintf(stderr, "Failed to initialize audio\n");
             midi_raw_shutdown();
             return 1;
         }
-    } else {
-        midi_raw_list_ports();
-        printf("\nNo MIDI port specified. Use -m <port> to auto-connect.\n");
-        printf("Or connect manually with: aconnect <source> %d:0\n\n",
-               midi_raw_get_client_id());
-    }
+        audio_portaudio_set_callback(audio_callback, NULL);
 
-    /* Initialize PortAudio */
-    printf("\nInitializing audio...\n");
-    if (audio_portaudio_init(44100) < 0) {
-        fprintf(stderr, "Failed to initialize audio\n");
-        midi_raw_shutdown();
-        return 1;
-    }
-    audio_portaudio_set_callback(audio_callback, NULL);
-
-    /* Start audio */
-    if (audio_portaudio_start() < 0) {
-        fprintf(stderr, "Failed to start audio\n");
-        audio_portaudio_shutdown();
-        midi_raw_shutdown();
-        return 1;
+        /* Start audio */
+        if (audio_portaudio_start() < 0) {
+            fprintf(stderr, "Failed to start audio\n");
+            audio_portaudio_shutdown();
+            midi_raw_shutdown();
+            return 1;
+        }
     }
 
     /* Initialize timer */
     timer_init();
+
+    /* Test mode: inject MIDI directly and run a few updates */
+    if (test_mode) {
+        printf("\n=== TEST MODE: Injecting Note-On ===\n");
+        fflush(stdout);
+
+        /* Inject Note-On: channel 0, note 60 (C4), velocity 100 */
+        printf("Injecting: Note-On ch=0 note=60 vel=100\n");
+        midi_rx_isr(0x90);  /* Note-On, channel 0 */
+        midi_process_byte();
+        midi_rx_isr(60);    /* Note number */
+        midi_process_byte();
+        midi_rx_isr(100);   /* Velocity */
+        midi_process_byte();
+
+        printf("\n=== Running periodic updates ===\n");
+        fflush(stdout);
+
+        /* Run a few periodic updates */
+        for (int i = 0; i < 5; i++) {
+            printf("--- Periodic update %d ---\n", i + 1);
+            fflush(stdout);
+            periodic_voice_update();
+        }
+
+        printf("\n=== Test complete ===\n");
+        return 0;
+    }
 
     printf("\nRunning... Press Ctrl+C to quit\n");
     printf("Connect MIDI and play notes!\n\n");
