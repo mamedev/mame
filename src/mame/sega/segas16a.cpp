@@ -211,27 +211,27 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void system16a_no7751(machine_config &config);
-	void system16a(machine_config &config);
-	void system16a_fd1089a_no7751(machine_config &config);
-	void system16a_fd1089b_no7751(machine_config &config);
-	void system16a_fd1089a(machine_config &config);
-	void system16a_fd1094(machine_config &config);
-	void system16a_no7751p(machine_config &config);
-	void system16a_fd1094_no7751(machine_config &config);
-	void system16a_i8751(machine_config &config);
-	void system16a_fd1089b(machine_config &config);
-	void aceattaca_fd1094(machine_config &config);
+	void system16a_no7751(machine_config &config) ATTR_COLD;
+	void system16a(machine_config &config) ATTR_COLD;
+	void system16a_fd1089a_no7751(machine_config &config) ATTR_COLD;
+	void system16a_fd1089b_no7751(machine_config &config) ATTR_COLD;
+	void system16a_fd1089a(machine_config &config) ATTR_COLD;
+	void system16a_fd1094(machine_config &config) ATTR_COLD;
+	void system16a_no7751p(machine_config &config) ATTR_COLD;
+	void system16a_fd1094_no7751(machine_config &config) ATTR_COLD;
+	void system16a_i8751(machine_config &config) ATTR_COLD;
+	void system16a_fd1089b(machine_config &config) ATTR_COLD;
+	void aceattaca_fd1094(machine_config &config) ATTR_COLD;
 
 	// game-specific driver init
-	void init_generic();
-	void init_dumpmtmt();
-	void init_fantzonep();
-	void init_sjryukoa();
-	void init_aceattaca();
-	void init_passsht16a();
-	void init_mjleague();
-	void init_sdi();
+	void init_generic() ATTR_COLD;
+	void init_dumpmtmt() ATTR_COLD;
+	void init_fantzonep() ATTR_COLD;
+	void init_sjryukoa() ATTR_COLD;
+	void init_aceattaca() ATTR_COLD;
+	void init_passsht16a() ATTR_COLD;
+	void init_mjleague() ATTR_COLD;
+	void init_sdi() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;

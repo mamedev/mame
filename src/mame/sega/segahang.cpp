@@ -71,30 +71,30 @@ public:
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void sound_board_2203(machine_config &config);
-	void sound_board_2203x2(machine_config &config);
-	void sound_board_2151(machine_config &config);
-	void shared_base(machine_config &config);
-	void hangon_base(machine_config &config);
-	void sharrier_base(machine_config &config);
-	void enduror_base(machine_config &config);
-	void endurord_base(machine_config &config);
-	void endurob2(machine_config &config);
-	void shangupb(machine_config &config);
-	void enduror(machine_config &config);
-	void shangonro(machine_config &config);
-	void enduror1d(machine_config &config);
-	void endurord(machine_config &config);
-	void sharrier(machine_config &config);
-	void endurobl(machine_config &config);
-	void enduror1(machine_config &config);
-	void hangon(machine_config &config);
+	void sound_board_2203(machine_config &config) ATTR_COLD;
+	void sound_board_2203x2(machine_config &config) ATTR_COLD;
+	void sound_board_2151(machine_config &config) ATTR_COLD;
+	void shared_base(machine_config &config) ATTR_COLD;
+	void hangon_base(machine_config &config) ATTR_COLD;
+	void sharrier_base(machine_config &config) ATTR_COLD;
+	void enduror_base(machine_config &config) ATTR_COLD;
+	void endurord_base(machine_config &config) ATTR_COLD;
+	void endurob2(machine_config &config) ATTR_COLD;
+	void shangupb(machine_config &config) ATTR_COLD;
+	void enduror(machine_config &config) ATTR_COLD;
+	void shangonro(machine_config &config) ATTR_COLD;
+	void enduror1d(machine_config &config) ATTR_COLD;
+	void endurord(machine_config &config) ATTR_COLD;
+	void sharrier(machine_config &config) ATTR_COLD;
+	void endurobl(machine_config &config) ATTR_COLD;
+	void enduror1(machine_config &config) ATTR_COLD;
+	void hangon(machine_config &config) ATTR_COLD;
 
 	// game-specific driver init
-	void init_generic();
-	void init_sharrier();
-	void init_endurobl();
-	void init_endurob2();
+	void init_generic() ATTR_COLD;
+	void init_sharrier() ATTR_COLD;
+	void init_endurobl() ATTR_COLD;
+	void init_endurob2() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

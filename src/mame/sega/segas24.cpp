@@ -407,40 +407,40 @@ public:
 	{
 	}
 
-	void init_crkdown();
-	void init_quizmeku();
-	void init_qrouka();
-	void init_roughrac();
-	void init_qgh();
-	void init_gground();
-	void init_mahmajn2();
-	void init_sspiritj();
-	void init_mahmajn();
-	void init_hotrod();
-	void init_sspirits();
-	void init_dcclub();
-	void init_bnzabros();
-	void init_dcclubfd();
-	void init_qsww();
-	void init_sgmast();
+	void init_crkdown() ATTR_COLD;
+	void init_quizmeku() ATTR_COLD;
+	void init_qrouka() ATTR_COLD;
+	void init_roughrac() ATTR_COLD;
+	void init_qgh() ATTR_COLD;
+	void init_gground() ATTR_COLD;
+	void init_mahmajn2() ATTR_COLD;
+	void init_sspiritj() ATTR_COLD;
+	void init_mahmajn() ATTR_COLD;
+	void init_hotrod() ATTR_COLD;
+	void init_sspirits() ATTR_COLD;
+	void init_dcclub() ATTR_COLD;
+	void init_bnzabros() ATTR_COLD;
+	void init_dcclubfd() ATTR_COLD;
+	void init_qsww() ATTR_COLD;
+	void init_sgmast() ATTR_COLD;
 
-	void dcclub(machine_config &config);
-	void dcclubj(machine_config &config);
-	void mahmajn(machine_config &config);
-	void sgmastj(machine_config &config);
-	void system24_floppy(machine_config &config);
-	void system24_floppy_dcclub(machine_config &config);
-	void system24_floppy_fd1094(machine_config &config);
-	void system24_floppy_fd_upd(machine_config &config);
-	void system24_floppy_hotrod(machine_config &config);
-	void system24_floppy_rom(machine_config &config);
-	void system24_rom(machine_config &config);
-	void system24(machine_config &config);
+	void dcclub(machine_config &config) ATTR_COLD;
+	void dcclubj(machine_config &config) ATTR_COLD;
+	void mahmajn(machine_config &config) ATTR_COLD;
+	void sgmastj(machine_config &config) ATTR_COLD;
+	void system24_floppy(machine_config &config) ATTR_COLD;
+	void system24_floppy_dcclub(machine_config &config) ATTR_COLD;
+	void system24_floppy_fd1094(machine_config &config) ATTR_COLD;
+	void system24_floppy_fd_upd(machine_config &config) ATTR_COLD;
+	void system24_floppy_hotrod(machine_config &config) ATTR_COLD;
+	void system24_floppy_rom(machine_config &config) ATTR_COLD;
+	void system24_rom(machine_config &config) ATTR_COLD;
+	void system24(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void device_post_load() override;
+	virtual void device_post_load() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -569,7 +569,8 @@ private:
 
 uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if(m_vmixer->get_reg(13) & 1) {
+	if (m_vmixer->get_reg(13) & 1)
+	{
 		bitmap.fill(m_palette->black_pen());
 		return 0;
 	}
@@ -580,17 +581,19 @@ uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	std::array<int, 12> order;
 	std::iota(order.begin(), order.end(), 0); // 0-11
 
-	std::sort(order.begin(), order.end(), [this](int l1, int l2) {
-		static const int default_pri[12] = { 0, 1, 2, 3, 4, 5, 6, 7, -4, -3, -2, -1 };
+	std::sort(order.begin(), order.end(),
+			[this](int l1, int l2)
+			{
+				constexpr int default_pri[12] = { 0, 1, 2, 3, 4, 5, 6, 7, -4, -3, -2, -1 };
 
-		int p1 = m_vmixer->get_reg(l1) & 7;
-		int p2 = m_vmixer->get_reg(l2) & 7;
+				int p1 = m_vmixer->get_reg(l1) & 7;
+				int p2 = m_vmixer->get_reg(l2) & 7;
 
-		if(p1 != p2)
-			return p1 < p2;
+				if (p1 != p2)
+					return p1 < p2;
 
-		return default_pri[l2] < default_pri[l1];
-	});
+				return default_pri[l2] < default_pri[l1];
+			});
 
 	// zero value pixels from the bottommost layer show color 0 of the specified palette
 	// to do this we draw the tilemap layers in reverse order as opaque
@@ -600,13 +603,18 @@ uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	int spri[4]{};
 	int level = 0;
-	for(int i=0; i<12; i++)
-		if(order[i] < 8)
-			m_vtile->draw(screen, bitmap, cliprect, order[i], level, 0);
-		else {
-			spri[order[i]-8] = level;
+	for (auto i : order)
+	{
+		if (i < 8)
+		{
+			m_vtile->draw(screen, bitmap, cliprect, i, level, 0);
+		}
+		else
+		{
+			spri[i - 8] = level;
 			level++;
 		}
+	}
 
 	m_vsprite->draw(bitmap, cliprect, screen.priority(), spri);
 	return 0;
@@ -1229,19 +1237,18 @@ uint16_t segas24_state::paletteram_r(offs_t offset)
 
 void segas24_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	int r, g, b;
-	COMBINE_DATA (m_paletteram + offset);
+	COMBINE_DATA(m_paletteram + offset);
 	data = m_paletteram[offset];
 
-	r = (data & 0x00f) << 4;
+	int r = (data & 0x00f) << 4;
 	if(data & 0x1000)
 		r |= 8;
 
-	g = data & 0x0f0;
+	int g = data & 0x0f0;
 	if(data & 0x2000)
 		g |= 8;
 
-	b = (data & 0xf00) >> 4;
+	int b = (data & 0xf00) >> 4;
 	if(data & 0x4000)
 		b |= 8;
 
@@ -1251,11 +1258,14 @@ void segas24_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 
-	if(data & 0x8000) {
+	if (data & 0x8000)
+	{
 		r = 255-0.6*(255-r);
 		g = 255-0.6*(255-g);
 		b = 255-0.6*(255-b);
-	} else {
+	}
+	else
+	{
 		r = 0.6*r;
 		g = 0.6*g;
 		b = 0.6*b;
@@ -1450,7 +1460,7 @@ void segas24_state::decrypted_opcodes_map(address_map &map)
 
 void segas24_state::machine_start()
 {
-	if ((m_romboard != nullptr) && (m_rombank[0] != nullptr) && (m_rombank[1] != nullptr))
+	if (m_romboard && m_rombank[0] && m_rombank[1])
 	{
 		uint8_t *usr1 = m_romboard->base();
 		m_rombank[0]->configure_entries(0, 16, usr1, 0x40000);

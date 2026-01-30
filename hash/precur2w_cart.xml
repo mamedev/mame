@@ -10,7 +10,7 @@ license:CC0-1.0
 		<!-- "Muscat PM card 2022 04 20" on PCB -->
 		<year>2022</year>
 		<publisher>Bandai</publisher>
-		<info name="alt_title" value="プリキュア パーティアップカバー&amp;お子さまランチセット"/>
+		<info name="alt_title" value="プリキュア パーティアップカバー＆お子さまランチセット"/>
 		<part name="cart" interface="precur2w_cart">
 			<dataarea name="rom" size="0x100000">
 				<rom name="by25q80es.u1" size="0x100000" crc="7ecaf4ee" sha1="ad4162c537c89c2bc7df02830899a3ae3fceb7af" />

@@ -344,19 +344,19 @@ public:
 		m_bankmotor_delta(0)
 	{ }
 
-	void shangon_fd1089b(machine_config &config);
-	void outrun_fd1094(machine_config &config);
-	void outrundx(machine_config &config);
-	void shangon(machine_config &config);
-	void outrun_fd1089a(machine_config &config);
-	void outrun(machine_config &config);
-	void outrun_base(machine_config &config);
+	void shangon_fd1089b(machine_config &config) ATTR_COLD;
+	void outrun_fd1094(machine_config &config) ATTR_COLD;
+	void outrundx(machine_config &config) ATTR_COLD;
+	void shangon(machine_config &config) ATTR_COLD;
+	void outrun_fd1089a(machine_config &config) ATTR_COLD;
+	void outrun(machine_config &config) ATTR_COLD;
+	void outrun_base(machine_config &config) ATTR_COLD;
 
 	// game-specific driver init
-	void init_generic();
-	void init_outrun();
-	void init_outrunb();
-	void init_shangon();
+	void init_generic() ATTR_COLD;
+	void init_outrun() ATTR_COLD;
+	void init_outrunb() ATTR_COLD;
+	void init_shangon() ATTR_COLD;
 
 	ioport_value bankmotor_pos_r();
 
