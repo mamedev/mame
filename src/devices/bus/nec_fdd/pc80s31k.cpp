@@ -546,6 +546,11 @@ void pc88va2_fd_if_device::device_start()
 	floppy = m_floppy[1]->get_device();
 	if(floppy)
 		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va2_fd_if_device::fdc_update_ready, this));
+
+	save_item(NAME(m_fdc_ctrl_2));
+	save_item(NAME(m_fdc_mode));
+	save_item(NAME(m_xtmask));
+	save_item(NAME(m_dmae));
 }
 
 void pc88va2_fd_if_device::device_reset()
