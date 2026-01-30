@@ -151,8 +151,8 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "fd1089.h"
 #include "fd1094.h"
 
-#include "segaic16.h"
 #include "sega16sp.h"
+#include "segaic16.h"
 #include "segaipt.h"
 
 #include "cpu/m68000/m68000.h"
@@ -171,6 +171,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 
 #include "screen.h"
 #include "speaker.h"
+
 
 namespace {
 
@@ -232,6 +233,11 @@ public:
 	void init_mjleague();
 	void init_sdi();
 
+protected:
+	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	// PPI read/write callbacks
 	void misc_control_w(uint8_t data);
@@ -276,11 +282,6 @@ private:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
 	typedef delegate<void (uint8_t, uint8_t)> lamp_changed_delegate;
-
-	// driver overrides
-	virtual void video_start() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 	// I8751 simulations
 	void dumpmtmt_i8751_sim();

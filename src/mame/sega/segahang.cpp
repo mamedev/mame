@@ -20,6 +20,7 @@
 
 #include "fd1089.h"
 #include "fd1094.h"
+
 #include "sega16sp.h"
 #include "segaic16.h"
 #include "segaic16_road.h"
@@ -95,12 +96,12 @@ public:
 	void init_endurobl();
 	void init_endurob2();
 
-private:
-	// driver overrides
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+private:
 	TIMER_CALLBACK_MEMBER(i8751_sync);
 	TIMER_CALLBACK_MEMBER(ppi_sync);
 

@@ -280,6 +280,7 @@ Notes:
 
 #include "315_5195.h"
 #include "fd1089.h"
+
 #include "sega16sp.h"
 #include "segaic16.h"
 #include "segaic16_road.h"
@@ -299,6 +300,7 @@ Notes:
 #include "speaker.h"
 
 #include "outrun.lh"
+
 
 namespace {
 
@@ -359,6 +361,11 @@ public:
 	ioport_value bankmotor_pos_r();
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
 	// PPI read/write handlers
 	uint8_t unknown_porta_r();
 	uint8_t unknown_portb_r();
@@ -393,11 +400,6 @@ protected:
 	void sound_map(address_map &map) ATTR_COLD;
 	void sound_portmap(address_map &map) ATTR_COLD;
 	void sub_map(address_map &map) ATTR_COLD;
-
-	// device overrides
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq2_gen_tick);
 	TIMER_CALLBACK_MEMBER(scanline_tick);

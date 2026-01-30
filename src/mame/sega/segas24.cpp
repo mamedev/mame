@@ -565,6 +565,54 @@ private:
 };
 
 
+// Screen update
+
+uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	if(m_vmixer->get_reg(13) & 1) {
+		bitmap.fill(m_palette->black_pen());
+		return 0;
+	}
+
+	screen.priority().fill(0);
+	bitmap.fill(0, cliprect);
+
+	std::array<int, 12> order;
+	std::iota(order.begin(), order.end(), 0); // 0-11
+
+	std::sort(order.begin(), order.end(), [this](int l1, int l2) {
+		static const int default_pri[12] = { 0, 1, 2, 3, 4, 5, 6, 7, -4, -3, -2, -1 };
+
+		int p1 = m_vmixer->get_reg(l1) & 7;
+		int p2 = m_vmixer->get_reg(l2) & 7;
+
+		if(p1 != p2)
+			return p1 < p2;
+
+		return default_pri[l2] < default_pri[l1];
+	});
+
+	// zero value pixels from the bottommost layer show color 0 of the specified palette
+	// to do this we draw the tilemap layers in reverse order as opaque
+	for (int i = 11; i >= 0; i--)
+		if (order[i] < 8 && (order[i] & 1) == 0)
+			m_vtile->draw(screen, bitmap, cliprect, order[i], 0, TILEMAP_DRAW_OPAQUE);
+
+	int spri[4]{};
+	int level = 0;
+	for(int i=0; i<12; i++)
+		if(order[i] < 8)
+			m_vtile->draw(screen, bitmap, cliprect, order[i], level, 0);
+		else {
+			spri[order[i]-8] = level;
+			level++;
+		}
+
+	m_vsprite->draw(bitmap, cliprect, screen.priority(), spri);
+	return 0;
+}
+
+
 // Floppy Disk Controller
 
 void segas24_state::fdc_init()
@@ -1169,54 +1217,6 @@ void segas24_state::irq_ym(int state)
 	m_irq_yms = state;
 	m_maincpu->set_input_line(IRQ_YM2151+1, m_irq_yms && (m_irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
 	m_subcpu->set_input_line(IRQ_YM2151+1, m_irq_yms && (m_irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-// Screen update
-
-uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	if(m_vmixer->get_reg(13) & 1) {
-		bitmap.fill(m_palette->black_pen());
-		return 0;
-	}
-
-	screen.priority().fill(0);
-	bitmap.fill(0, cliprect);
-
-	std::array<int, 12> order;
-	std::iota(order.begin(), order.end(), 0); // 0-11
-
-	std::sort(order.begin(), order.end(), [this](int l1, int l2) {
-		static const int default_pri[12] = { 0, 1, 2, 3, 4, 5, 6, 7, -4, -3, -2, -1 };
-
-		int p1 = m_vmixer->get_reg(l1) & 7;
-		int p2 = m_vmixer->get_reg(l2) & 7;
-
-		if(p1 != p2)
-			return p1 < p2;
-
-		return default_pri[l2] < default_pri[l1];
-	});
-
-	// zero value pixels from the bottommost layer show color 0 of the specified palette
-	// to do this we draw the tilemap layers in reverse order as opaque
-	for (int i = 11; i >= 0; i--)
-		if (order[i] < 8 && (order[i] & 1) == 0)
-			m_vtile->draw(screen, bitmap, cliprect, order[i], 0, TILEMAP_DRAW_OPAQUE);
-
-	int spri[4]{};
-	int level = 0;
-	for(int i=0; i<12; i++)
-		if(order[i] < 8)
-			m_vtile->draw(screen, bitmap, cliprect, order[i], level, 0);
-		else {
-			spri[order[i]-8] = level;
-			level++;
-		}
-
-	m_vsprite->draw(bitmap, cliprect, screen.priority(), spri);
-	return 0;
 }
 
 
@@ -2306,6 +2306,7 @@ void segas24_state::sgmastj(machine_config &config)
 	io.in_pa_callback().set(FUNC(segas24_state::dcclub_p1_r));
 	io.in_pc_callback().set(FUNC(segas24_state::dcclub_p3_r));
 }
+
 
 /*************************************
  *
