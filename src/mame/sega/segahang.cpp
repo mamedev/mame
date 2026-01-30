@@ -17,24 +17,25 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "fd1089.h"
+#include "fd1094.h"
+#include "sega16sp.h"
+#include "segaic16.h"
+#include "segaic16_road.h"
+#include "segaipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/adc0804.h"
 #include "machine/i8255.h"
 #include "machine/gen_latch.h"
-#include "segaic16.h"
-#include "segaic16_road.h"
-#include "sega16sp.h"
-#include "screen.h"
-#include "segaipt.h"
-
-#include "fd1089.h"
-#include "fd1094.h"
 #include "sound/segapcm.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
 
+#include "screen.h"
 #include "speaker.h"
 
 #define LOG_MCU (1U << 1)
@@ -42,18 +43,7 @@
 #include "logmacro.h"
 
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-const uint32_t MASTER_CLOCK_25MHz = 25174800;
-const uint32_t MASTER_CLOCK_10MHz = 10000000;
-const uint32_t MASTER_CLOCK_8MHz = 8000000;
-
 namespace {
-
-// ======================> segahang_state
 
 class segahang_state : public sega_16bit_common_base
 {
@@ -179,6 +169,131 @@ private:
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 	output_finder<2>         m_lamps;
 };
+
+
+//**************************************************************************
+//  VIDEO HARDWARE
+//**************************************************************************
+
+//-------------------------------------------------
+//  video_start - initialize the video system
+//-------------------------------------------------
+
+void segahang_state::video_start()
+{
+	// initialize the tile/text layers
+	m_segaic16vid->tilemap_init( 0, segaic16_video_device::TILEMAP_HANGON, 0x000, 0, 2);
+
+	// initialize the road
+	m_segaic16road->segaic16_road_init(0, m_sharrier_video ? segaic16_road_device::ROAD_SHARRIER : segaic16_road_device::ROAD_HANGON, 0x038, 0x7c0, 0x7c0, 0);
+}
+
+//-------------------------------------------------
+//  screen_update - render all graphics
+//-------------------------------------------------
+
+uint32_t segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// if no drawing is happening, fill with black and get out
+	if (!m_segaic16vid->m_display_enable)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+
+	// start the sprites drawing
+	m_sprites->draw_async(cliprect);
+
+	// reset priorities
+	screen.priority().fill(0, cliprect);
+
+	// draw the low priority road layer
+	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, segaic16_road_device::ROAD_BACKGROUND);
+
+	// draw background
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0, 0x01);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1, 0x02);
+
+	// draw foreground
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 0, 0x02);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 1, 0x04);
+
+	// draw the high priority road
+	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, segaic16_road_device::ROAD_FOREGROUND);
+
+	// text layer
+	// note that we inflate the priority of the text layer to prevent sprites
+	// from drawing over the high scores
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 0, 0x08);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 1, 0x08);
+
+	// mix in sprites
+	bitmap_ind16 &sprites = m_sprites->bitmap();
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
+			{
+				for (int y = rect.min_y; y <= rect.max_y; y++)
+				{
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					uint8_t const *const pri = &screen.priority().pix(y);
+
+					if (!m_sharrier_video)
+					{
+						// hangon mixing
+						for (int x = rect.min_x; x <= rect.max_x; x++)
+						{
+							// only process written pixels
+							uint16_t const pix = src[x];
+							if (pix != 0xffff)
+							{
+								// compare sprite priority against tilemap priority
+								int const priority = pix >> 10;
+								if ((1 << priority) > pri[x])
+								{
+									// if color bits are all 1, this triggers shadow/hilight
+									if ((pix & 0x3f0) == 0x3f0)
+										dest[x] += m_shadow ? m_palette_entries*2 : m_palette_entries;
+
+									// otherwise, just add in sprite palette base
+									else
+										dest[x] = 0x400 | (pix & 0x3ff);
+								}
+							}
+						}
+					}
+					else
+					{
+						// sharrier mixing
+						for (int x = rect.min_x; x <= rect.max_x; x++)
+						{
+							// only process written pixels
+							uint16_t const pix = src[x];
+							if (pix != 0xffff)
+							{
+								// compare sprite priority against tilemap priority
+								int const priority = ((pix >> 9) & 2) | 1;
+								if ((1 << priority) > pri[x])
+								{
+									// if shadow bit is 0 and pix data is 0xa, this triggers shadow/hilight
+									if ((pix & 0x80f) == 0x00a)
+										dest[x] += m_palette_entries;
+
+									// otherwise, just add in sprite palette base
+									else
+										dest[x] = 0x400 | (pix & 0x3ff);
+								}
+							}
+						}
+					}
+				}
+			});
+
+	return 0;
+}
+
+
 
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS
@@ -358,10 +473,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(segahang_state::hangon_irq)
 	int scanline = param;
 
 	// according to the schematics, IRQ2 is generated every 16 scanlines
-	if((scanline % 16) == 0)
+	if ((scanline % 16) == 0)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
-	if(scanline == 240)
+	if (scanline == 240)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 #endif
@@ -382,6 +497,7 @@ uint8_t segahang_state::sound_data_r()
 	m_i8255[0]->pc6_w(CLEAR_LINE);
 	return m_soundlatch->read();
 }
+
 
 
 //**************************************************************************
@@ -448,6 +564,7 @@ void segahang_state::machine_start()
 	m_i8751_sync_timer = timer_alloc(FUNC(segahang_state::i8751_sync), this);
 }
 
+
 //-------------------------------------------------
 //  machine_reset
 //-------------------------------------------------
@@ -464,123 +581,6 @@ void segahang_state::machine_reset()
 	m_adc_select = 0;
 }
 
-//-------------------------------------------------
-//  video_start - initialize the video system
-//-------------------------------------------------
-
-void segahang_state::video_start()
-{
-	// initialize the tile/text layers
-	m_segaic16vid->tilemap_init( 0, segaic16_video_device::TILEMAP_HANGON, 0x000, 0, 2);
-
-	// initialize the road
-	m_segaic16road->segaic16_road_init(0, m_sharrier_video ? segaic16_road_device::ROAD_SHARRIER : segaic16_road_device::ROAD_HANGON, 0x038, 0x7c0, 0x7c0, 0);
-}
-
-//-------------------------------------------------
-//  screen_update - render all graphics
-//-------------------------------------------------
-
-uint32_t segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// if no drawing is happening, fill with black and get out
-	if (!m_segaic16vid->m_display_enable)
-	{
-		bitmap.fill(m_palette->black_pen(), cliprect);
-		return 0;
-	}
-
-	// start the sprites drawing
-	m_sprites->draw_async(cliprect);
-
-	// reset priorities
-	screen.priority().fill(0, cliprect);
-
-	// draw the low priority road layer
-	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, segaic16_road_device::ROAD_BACKGROUND);
-
-	// draw background
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0, 0x01);
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1, 0x02);
-
-	// draw foreground
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 0, 0x02);
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 1, 0x04);
-
-	// draw the high priority road
-	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, segaic16_road_device::ROAD_FOREGROUND);
-
-	// text layer
-	// note that we inflate the priority of the text layer to prevent sprites
-	// from drawing over the high scores
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 0, 0x08);
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 1, 0x08);
-
-	// mix in sprites
-	bitmap_ind16 &sprites = m_sprites->bitmap();
-	m_sprites->iterate_dirty_rects(
-			cliprect,
-			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
-			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
-				{
-					uint16_t *const dest = &bitmap.pix(y);
-					uint16_t const *const src = &sprites.pix(y);
-					uint8_t const *const pri = &screen.priority().pix(y);
-
-					if (!m_sharrier_video)
-					{
-						// hangon mixing
-						for (int x = rect.min_x; x <= rect.max_x; x++)
-						{
-							// only process written pixels
-							uint16_t const pix = src[x];
-							if (pix != 0xffff)
-							{
-								// compare sprite priority against tilemap priority
-								int const priority = pix >> 10;
-								if ((1 << priority) > pri[x])
-								{
-									// if color bits are all 1, this triggers shadow/hilight
-									if ((pix & 0x3f0) == 0x3f0)
-										dest[x] += m_shadow ? m_palette_entries*2 : m_palette_entries;
-
-									// otherwise, just add in sprite palette base
-									else
-										dest[x] = 0x400 | (pix & 0x3ff);
-								}
-							}
-						}
-					}
-					else
-					{
-						// sharrier mixing
-						for (int x = rect.min_x; x <= rect.max_x; x++)
-						{
-							// only process written pixels
-							uint16_t const pix = src[x];
-							if (pix != 0xffff)
-							{
-								// compare sprite priority against tilemap priority
-								int const priority = ((pix >> 9) & 2) | 1;
-								if ((1 << priority) > pri[x])
-								{
-									// if shadow bit is 0 and pix data is 0xa, this triggers shadow/hilight
-									if ((pix & 0x80f) == 0x00a)
-										dest[x] += m_palette_entries;
-
-									// otherwise, just add in sprite palette base
-									else
-										dest[x] = 0x400 | (pix & 0x3ff);
-								}
-							}
-						}
-					}
-				}
-			});
-
-	return 0;
-}
 
 //-------------------------------------------------
 //  timer events
@@ -667,6 +667,7 @@ void segahang_state::fd1094_decrypted_opcodes_map(address_map &map)
 {
 	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
 }
+
 
 //**************************************************************************
 //  SOUND CPU ADDRESS MAPS
@@ -966,6 +967,7 @@ static INPUT_PORTS_START( enduror )
 INPUT_PORTS_END
 
 
+
 //**************************************************************************
 //  GRAPHICS DECODING
 //**************************************************************************
@@ -983,11 +985,11 @@ GFXDECODE_END
 void segahang_state::shared_base(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, MASTER_CLOCK_25MHz/4);
+	M68000(config, m_maincpu, 25.1748_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segahang_state::hangon_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segahang_state::irq4_line_hold));
 
-	M68000(config, m_subcpu, MASTER_CLOCK_25MHz/4);
+	M68000(config, m_subcpu, 25.1748_MHz_XTAL / 4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segahang_state::sub_map);
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
@@ -1008,7 +1010,7 @@ void segahang_state::shared_base(machine_config &config)
 		m_i8255[i]->tri_pc_callback().set_constant(0);
 	}
 
-	ADC0804(config, m_adc, MASTER_CLOCK_25MHz/4/6);
+	ADC0804(config, m_adc, 25.1748_MHz_XTAL / 4 / 6);
 	m_adc->vin_callback().set(FUNC(segahang_state::analog_r));
 
 	SEGAIC16VID(config, m_segaic16vid, 0, "gfxdecode");
@@ -1019,7 +1021,7 @@ void segahang_state::shared_base(machine_config &config)
 	PALETTE(config, m_palette).set_entries(2048*3);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_raw(25.1748_MHz_XTAL / 4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segahang_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -1038,10 +1040,10 @@ void segahang_state::sharrier_base(machine_config &config)
 	shared_base(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(MASTER_CLOCK_10MHz);
+	m_maincpu->set_clock(10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segahang_state::sharrier_map);
 
-	m_subcpu->set_clock(MASTER_CLOCK_10MHz);
+	m_subcpu->set_clock(10_MHz_XTAL);
 
 	// video hardware
 	SEGA_SHARRIER_SPRITES(config, m_sprites, 0);
@@ -1053,7 +1055,7 @@ void segahang_state::enduror_base(machine_config &config)
 	sharrier_base(config);
 
 	// basic machine hardware
-	FD1089B(config.replace(), m_maincpu, MASTER_CLOCK_10MHz);
+	FD1089B(config.replace(), m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segahang_state::sharrier_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segahang_state::irq4_line_hold));
 }
@@ -1063,7 +1065,7 @@ void segahang_state::endurord_base(machine_config &config)
 	sharrier_base(config);
 
 	// basic machine hardware
-	M68000(config.replace(), m_maincpu, MASTER_CLOCK_10MHz);
+	M68000(config.replace(), m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segahang_state::sharrier_map);
 	m_maincpu->set_vblank_int("screen", FUNC(segahang_state::irq4_line_hold));
 }
@@ -1071,14 +1073,14 @@ void segahang_state::endurord_base(machine_config &config)
 void segahang_state::sound_board_2203(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_soundcpu, MASTER_CLOCK_8MHz/2);
+	Z80(config, m_soundcpu, 8_MHz_XTAL / 2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segahang_state::sound_map_2203);
 	m_soundcpu->set_addrmap(AS_IO, &segahang_state::sound_portmap_2203);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", MASTER_CLOCK_8MHz/2));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 8_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline("soundcpu", 0);
 	ymsnd.add_route(0, "speaker", 0.05, 0);
 	ymsnd.add_route(0, "speaker", 0.05, 1);
@@ -1089,7 +1091,7 @@ void segahang_state::sound_board_2203(machine_config &config)
 	ymsnd.add_route(3, "speaker", 0.15, 0);
 	ymsnd.add_route(3, "speaker", 0.15, 1);
 
-	segapcm_device &pcm(SEGAPCM(config, "pcm", MASTER_CLOCK_8MHz));
+	segapcm_device &pcm(SEGAPCM(config, "pcm", 8_MHz_XTAL));
 	pcm.set_bank(segapcm_device::BANK_512);
 	pcm.add_route(0, "speaker", 0.40, 0);
 	pcm.add_route(1, "speaker", 0.40, 1);
@@ -1098,14 +1100,14 @@ void segahang_state::sound_board_2203(machine_config &config)
 void segahang_state::sound_board_2203x2(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_soundcpu, MASTER_CLOCK_8MHz/2);
+	Z80(config, m_soundcpu, 8_MHz_XTAL / 2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segahang_state::sound_map_2151);
 	m_soundcpu->set_addrmap(AS_IO, &segahang_state::sound_portmap_2203x2);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	ym2203_device &ym1(YM2203(config, "ym1", MASTER_CLOCK_8MHz/2));
+	ym2203_device &ym1(YM2203(config, "ym1", 8_MHz_XTAL / 2));
 	ym1.irq_handler().set_inputline("soundcpu", 0);
 	ym1.add_route(0, "speaker", 0.05, 0);
 	ym1.add_route(0, "speaker", 0.05, 1);
@@ -1116,7 +1118,7 @@ void segahang_state::sound_board_2203x2(machine_config &config)
 	ym1.add_route(3, "speaker", 0.15, 0);
 	ym1.add_route(3, "speaker", 0.15, 1);
 
-	ym2203_device &ym2(YM2203(config, "ym2", MASTER_CLOCK_8MHz/2));
+	ym2203_device &ym2(YM2203(config, "ym2", 8_MHz_XTAL / 2));
 	ym2.add_route(0, "speaker", 0.05, 0);
 	ym2.add_route(0, "speaker", 0.05, 1);
 	ym2.add_route(1, "speaker", 0.05, 0);
@@ -1126,7 +1128,7 @@ void segahang_state::sound_board_2203x2(machine_config &config)
 	ym2.add_route(3, "speaker", 0.15, 0);
 	ym2.add_route(3, "speaker", 0.15, 1);
 
-	segapcm_device &pcm(SEGAPCM(config, "pcm", MASTER_CLOCK_8MHz/2));
+	segapcm_device &pcm(SEGAPCM(config, "pcm", 8_MHz_XTAL / 2));
 	pcm.set_bank(segapcm_device::BANK_512);
 	pcm.add_route(0, "speaker", 0.40, 0);
 	pcm.add_route(1, "speaker", 0.40, 1);
@@ -1135,23 +1137,24 @@ void segahang_state::sound_board_2203x2(machine_config &config)
 void segahang_state::sound_board_2151(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_soundcpu, MASTER_CLOCK_8MHz/2);
+	Z80(config, m_soundcpu, 8_MHz_XTAL / 2);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segahang_state::sound_map_2151);
 	m_soundcpu->set_addrmap(AS_IO, &segahang_state::sound_portmap_2151);
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", MASTER_CLOCK_8MHz/2));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 8_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline(m_soundcpu, 0);
 	ymsnd.add_route(0, "speaker", 0.30, 0);
 	ymsnd.add_route(1, "speaker", 0.30, 1);
 
-	segapcm_device &pcm(SEGAPCM(config, "pcm", MASTER_CLOCK_8MHz/2));
+	segapcm_device &pcm(SEGAPCM(config, "pcm", 8_MHz_XTAL / 2));
 	pcm.set_bank(segapcm_device::BANK_512);
 	pcm.add_route(0, "speaker", 0.70, 0);
 	pcm.add_route(1, "speaker", 0.70, 1);
 }
+
 
 
 //**************************************************************************
@@ -1241,7 +1244,6 @@ void segahang_state::endurob2(machine_config &config)
 //**************************************************************************
 //  ROM definitions
 //**************************************************************************
-
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -2556,6 +2558,8 @@ void segahang_state::init_endurob2()
 }
 
 } // anonymous namespace
+
+
 
 //**************************************************************************
 //  GAME DRIVERS
