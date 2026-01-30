@@ -148,6 +148,13 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 
 #include "emu.h"
 
+#include "fd1089.h"
+#include "fd1094.h"
+
+#include "segaic16.h"
+#include "sega16sp.h"
+#include "segaipt.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/i8051.h"
@@ -161,19 +168,11 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "machine/watchdog.h"
 #include "sound/dac.h"
 #include "sound/ymopm.h"
-#include "segaic16.h"
-#include "sega16sp.h"
-#include "segaipt.h"
-
-#include "fd1089.h"
-#include "fd1094.h"
 
 #include "screen.h"
 #include "speaker.h"
 
 namespace {
-
-// ======================> segas16a_state
 
 class segas16a_state : public sega_16bit_common_base
 {
@@ -357,6 +356,95 @@ private:
 	required_ioport     m_accel;
 	required_ioport     m_steer;
 };
+
+
+//**************************************************************************
+//  VIDEO HARDWARE
+//**************************************************************************
+
+//-------------------------------------------------
+//  video_start - initialize the video system
+//-------------------------------------------------
+
+void segas16a_state::video_start()
+{
+	// initialize the tile/text layers
+	m_segaic16vid->tilemap_init( 0, segaic16_video_device::TILEMAP_16A, 0x000, 0, 1);
+}
+
+//-------------------------------------------------
+//  screen_update - render all graphics
+//-------------------------------------------------
+
+uint32_t segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// if no drawing is happening, fill with black and get out
+	if (!m_segaic16vid->m_display_enable)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+
+	// start the sprites drawing
+	m_sprites->draw_async(cliprect);
+
+	// reset priorities
+	screen.priority().fill(0, cliprect);
+
+	// draw background opaquely first, not setting any priorities
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1 | TILEMAP_DRAW_OPAQUE, 0x00);
+
+	// draw background again, just to set the priorities on non-transparent pixels
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0, 0x01);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1, 0x02);
+
+	// draw foreground
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 0, 0x02);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 1, 0x04);
+
+	// text layer
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 0, 0x04);
+	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 1, 0x08);
+
+	// mix in sprites
+	bitmap_ind16 &sprites = m_sprites->bitmap();
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
+			{
+				for (int y = rect.min_y; y <= rect.max_y; y++)
+				{
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					uint8_t const *const pri = &screen.priority().pix(y);
+					for (int x = rect.min_x; x <= rect.max_x; x++)
+					{
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// compare sprite priority against tilemap priority
+							int priority = pix >> 10;
+							if ((1 << priority) > pri[x])
+							{
+								// if color bits are all 1, this triggers shadow/hilight
+								if ((pix & 0x3f0) == 0x3f0)
+									dest[x] += m_palette_entries;
+
+								// otherwise, just add in sprite palette base
+								else
+									dest[x] = 0x400 | (pix & 0x3ff);
+							}
+						}
+					}
+				}
+			});
+
+	return 0;
+}
+
+
 
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS
@@ -582,6 +670,8 @@ void segas16a_state::upd7751_rom_offset_w(uint8_t data)
 	int newdata = (data << Shift) & mask;
 	m_upd7751_rom_address = (m_upd7751_rom_address & ~mask) | newdata;
 }
+
+
 
 //**************************************************************************
 //  D7751 SOUND GENERATOR CPU READ/WRITE HANDLERS
@@ -833,87 +923,6 @@ void segas16a_state::machine_reset()
 	m_mj_input_num = 0;
 }
 
-//-------------------------------------------------
-//  video_start - initialize the video system
-//-------------------------------------------------
-
-void segas16a_state::video_start()
-{
-	// initialize the tile/text layers
-	m_segaic16vid->tilemap_init( 0, segaic16_video_device::TILEMAP_16A, 0x000, 0, 1);
-}
-
-//-------------------------------------------------
-//  screen_update - render all graphics
-//-------------------------------------------------
-
-uint32_t segas16a_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// if no drawing is happening, fill with black and get out
-	if (!m_segaic16vid->m_display_enable)
-	{
-		bitmap.fill(m_palette->black_pen(), cliprect);
-		return 0;
-	}
-
-	// start the sprites drawing
-	m_sprites->draw_async(cliprect);
-
-	// reset priorities
-	screen.priority().fill(0, cliprect);
-
-	// draw background opaquely first, not setting any priorities
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1 | TILEMAP_DRAW_OPAQUE, 0x00);
-
-	// draw background again, just to set the priorities on non-transparent pixels
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0, 0x01);
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1, 0x02);
-
-	// draw foreground
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 0, 0x02);
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 1, 0x04);
-
-	// text layer
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 0, 0x04);
-	m_segaic16vid->tilemap_draw( screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 1, 0x08);
-
-	// mix in sprites
-	bitmap_ind16 &sprites = m_sprites->bitmap();
-	m_sprites->iterate_dirty_rects(
-			cliprect,
-			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
-			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
-				{
-					uint16_t *const dest = &bitmap.pix(y);
-					uint16_t const *const src = &sprites.pix(y);
-					uint8_t const *const pri = &screen.priority().pix(y);
-					for (int x = rect.min_x; x <= rect.max_x; x++)
-					{
-						// only process written pixels
-						uint16_t const pix = src[x];
-						if (pix != 0xffff)
-						{
-							// compare sprite priority against tilemap priority
-							int priority = pix >> 10;
-							if ((1 << priority) > pri[x])
-							{
-								// if color bits are all 1, this triggers shadow/hilight
-								if ((pix & 0x3f0) == 0x3f0)
-									dest[x] += m_palette_entries;
-
-								// otherwise, just add in sprite palette base
-								else
-									dest[x] = 0x400 | (pix & 0x3ff);
-							}
-						}
-					}
-				}
-			});
-
-	return 0;
-}
 
 //-------------------------------------------------
 //  timer events
@@ -1251,6 +1260,8 @@ void segas16a_state::decrypted_opcodes_map(address_map &map)
 {
 	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
 }
+
+
 
 //**************************************************************************
 //  SOUND CPU ADDRESS MAPS
@@ -2428,7 +2439,6 @@ void segas16a_state::system16a_fd1094_no7751(machine_config &config)
 //**************************************************************************
 //  ROM definitions
 //**************************************************************************
-
 
 //*************************************************************************************************************************
 //*************************************************************************************************************************
@@ -4169,6 +4179,7 @@ ROM_START( wb35d )
 ROM_END
 
 
+
 //**************************************************************************
 //  CONFIGURATION
 //**************************************************************************
@@ -4241,6 +4252,8 @@ void segas16a_state::init_sjryukoa()
 }
 
 } // anonymous namespace
+
+
 
 //**************************************************************************
 //  GAME DRIVERS
