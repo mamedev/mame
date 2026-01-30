@@ -569,8 +569,7 @@ private:
 
 uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	if (m_vmixer->get_reg(13) & 1)
-	{
+	if(m_vmixer->get_reg(13) & 1) {
 		bitmap.fill(m_palette->black_pen());
 		return 0;
 	}
@@ -582,8 +581,7 @@ uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	std::iota(order.begin(), order.end(), 0); // 0-11
 
 	std::sort(order.begin(), order.end(),
-			[this](int l1, int l2)
-			{
+			[this](int l1, int l2) {
 				constexpr int default_pri[12] = { 0, 1, 2, 3, 4, 5, 6, 7, -4, -3, -2, -1 };
 
 				int p1 = m_vmixer->get_reg(l1) & 7;
@@ -603,14 +601,10 @@ uint32_t segas24_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	int spri[4]{};
 	int level = 0;
-	for (auto i : order)
-	{
-		if (i < 8)
-		{
+	for(auto i : order) {
+		if (i < 8) {
 			m_vtile->draw(screen, bitmap, cliprect, i, level, 0);
-		}
-		else
-		{
+		} else {
 			spri[i - 8] = level;
 			level++;
 		}
@@ -793,14 +787,14 @@ void segas24_state::fdc_ctrl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint8_t segas24_state::dcclub_p1_r()
 {
-	static const uint8_t pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9, 0, 0, 0 };
-	return (m_p1->read() & 0xf) | ((~pos[m_paddle->read()>>4]<<4) & 0xf0);
+	constexpr uint8_t pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9, 0, 0, 0 };
+	return (m_p1->read() & 0xf) | ((~pos[m_paddle->read() >> 4] << 4) & 0xf0);
 }
 
 uint8_t segas24_state::dcclub_p3_r()
 {
-	static const uint8_t pos[16] = { 0, 0, 0, 0, 0, 0,  0, 0, 0, 1, 3, 2 };
-	return(~pos[m_paddle->read()>>4] & 0x03) | 0xfc;
+	constexpr uint8_t pos[16] = { 0, 0, 0, 0, 0, 0,  0, 0, 0, 1, 3, 2 };
+	return(~pos[m_paddle->read() >> 4] & 0x03) | 0xfc;
 }
 
 
@@ -898,34 +892,30 @@ TIMER_CALLBACK_MEMBER(segas24_state::gground_hack_timer_callback)
 
 void segas24_state::cnt1(int state)
 {
-	if (bool(state) != m_cnt1)
-	{
-		if (state)
-		{
+	if(bool(state) != m_cnt1) {
+		if (state) {
 			m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_subcpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
 			//osd_printf_debug("enable 2nd cpu!\n");
 			//machine().debug_break();
-			if (m_gground_hack_timer)
-			{
+			if(m_gground_hack_timer) {
 				m_subcpu->set_clock_scale(0.7); // reduce clock speed temporarily so a check passes, see notes above
 				m_gground_hack_timer->adjust(attotime::from_seconds(2));
 			}
-		}
-		else
+		} else {
 			m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+		}
 	}
 
 	m_cnt1 = bool(state);
 }
 
 
-// Rom board bank access
+// ROM board bank access
 
 void segas24_state::reset_bank()
 {
-	if (m_romboard != nullptr)
-	{
+	if(m_romboard) {
 		m_rombank[0]->set_entry(m_curbank & 15);
 		m_rombank[1]->set_entry(m_curbank & 15);
 	}
@@ -965,7 +955,7 @@ uint8_t segas24_state::frc_r()
 
 void segas24_state::frc_w(uint8_t data)
 {
-	/* Undocumented behaviour, Bonanza Bros. seems to use this for irq ack'ing ... */
+	// Undocumented behaviour, Bonanza Bros. seems to use this for IRQ ack'ing ...
 	m_maincpu->set_input_line(IRQ_FRC+1, CLEAR_LINE);
 	m_subcpu->set_input_line(IRQ_FRC+1, CLEAR_LINE);
 }
@@ -1192,9 +1182,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
 	int scanline = param;
 
 	/* TODO: perhaps vblank irq happens at 400, sprite IRQ certainly don't at 0! */
-	if(scanline == 0) { irq = IRQ_SPRITE; m_irq_sprite = true; }
-	else if(scanline == 384) { irq = IRQ_VBLANK; m_irq_vblank = true; }
-	else
+	if(scanline == 0) {
+		irq = IRQ_SPRITE;
+		m_irq_sprite = true;
+	} else if(scanline == 384) {
+		irq = IRQ_VBLANK;
+		m_irq_vblank = true;
+	} else
 		return;
 
 	m_irq_timer_clear->adjust(attotime::from_hz(HSYNC_CLOCK));
@@ -1258,14 +1252,11 @@ void segas24_state::paletteram_w(offs_t offset, uint16_t data, uint16_t mem_mask
 
 	m_palette->set_pen_color(offset, rgb_t(r, g, b));
 
-	if (data & 0x8000)
-	{
+	if(data & 0x8000) {
 		r = 255-0.6*(255-r);
 		g = 255-0.6*(255-g);
 		b = 255-0.6*(255-b);
-	}
-	else
-	{
+	} else {
 		r = 0.6*r;
 		g = 0.6*g;
 		b = 0.6*b;
@@ -1327,17 +1318,17 @@ void segas24_state::common_map(address_map &map)
 	map(0x080000, 0x0bffff).mirror(0x040000).ram().share("share1");
 	map(0x100000, 0x13ffff).mirror(0x0c0000).rom().region("maincpu", 0);
 	map(0x200000, 0x20ffff).mirror(0x110000).rw("tile", FUNC(segas24_tile_device::tile_r), FUNC(segas24_tile_device::tile_w));
-	map(0x220000, 0x220001).mirror(0x11fffe).nopw();        /* Horizontal split position (ABSEL) */
-	map(0x240000, 0x240001).mirror(0x11fffe).nopw();        /* Scanline trigger position (XHOUT) */
-	map(0x260000, 0x260001).mirror(0x10fffe).nopw();        /* Frame trigger position (XVOUT) */
-	map(0x270000, 0x270001).mirror(0x10fffe).nopw();        /* Synchronization mode */
+	map(0x220000, 0x220001).mirror(0x11fffe).nopw();        // Horizontal split position (ABSEL)
+	map(0x240000, 0x240001).mirror(0x11fffe).nopw();        // Scanline trigger position (XHOUT)
+	map(0x260000, 0x260001).mirror(0x10fffe).nopw();        // Frame trigger position (XVOUT)
+	map(0x270000, 0x270001).mirror(0x10fffe).nopw();        // Synchronization mode
 	map(0x280000, 0x29ffff).mirror(0x160000).rw("tile", FUNC(segas24_tile_device::char_r), FUNC(segas24_tile_device::char_w));
 	map(0x400000, 0x403fff).mirror(0x1f8000).rw(FUNC(segas24_state::paletteram_r), FUNC(segas24_state::paletteram_w)).share("paletteram");
 	map(0x404000, 0x40401f).mirror(0x1fbfe0).rw("mixer", FUNC(segas24_mixer_device::read), FUNC(segas24_mixer_device::write));
 	map(0x600000, 0x63ffff).mirror(0x180000).rw("sprite", FUNC(segas24_sprite_device::read), FUNC(segas24_sprite_device::write));
-	map(0x800000, 0x80003f).mirror(0x1ffe00).rw("io", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write)).umask16(0x00ff);
+	map(0x800000, 0x80003f).mirror(0x1ffe00).umask16(0x00ff).rw("io", FUNC(sega_315_5296_device::read), FUNC(sega_315_5296_device::write));
 	map(0x800040, 0x80007f).mirror(0x1ffe00).rw(FUNC(segas24_state::iod_r), FUNC(segas24_state::iod_w));
-	map(0x800100, 0x800103).mirror(0x1ffe00).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
+	map(0x800100, 0x800103).mirror(0x1ffe00).umask16(0x00ff).rw("ymsnd", FUNC(ym2151_device::read), FUNC(ym2151_device::write));
 	map(0xa00000, 0xa00007).mirror(0x0ffff8).rw(FUNC(segas24_state::irq_r), FUNC(segas24_state::irq_w));
 	map(0xb00000, 0xb00007).mirror(0x07fff0).rw(FUNC(segas24_state::fdc_r), FUNC(segas24_state::fdc_w));
 	map(0xb00008, 0xb0000f).mirror(0x07fff0).rw(FUNC(segas24_state::fdc_status_r), FUNC(segas24_state::fdc_ctrl_w));
@@ -1353,21 +1344,21 @@ void segas24_state::common_map(address_map &map)
 
 void segas24_state::rombd_common_map(address_map &map)
 {
-	map(0xb80000, 0xbbffff).bankr("rombank1");
+	map(0xb80000, 0xbbffff).bankr(m_rombank[0]);
 	map(0xbc0001, 0xbc0001).mirror(0x03fff8).rw(FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
-	map(0xc80000, 0xcbffff).bankr("rombank2");
+	map(0xc80000, 0xcbffff).bankr(m_rombank[1]);
 	map(0xcc0001, 0xcc0001).mirror(0x03fff8).rw(FUNC(segas24_state::curbank_r), FUNC(segas24_state::curbank_w));
 }
 
 void segas24_state::roughrac_common_map(address_map &map)
 {
-	map(0xc00000, 0xc00007).mirror(0x07ffe0).r("upd4701", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0xc00000, 0xc00007).mirror(0x07ffe0).umask16(0x00ff).r("upd4701", FUNC(upd4701_device::read_xy));
 }
 
 void segas24_state::hotrod_common_map(address_map &map)
 {
-	map(0xc00000, 0xc00007).mirror(0x07ffe0).r("upd1", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
-	map(0xc00008, 0xc0000f).mirror(0x07ffe0).r("upd2", FUNC(upd4701_device::read_xy)).umask16(0x00ff);
+	map(0xc00000, 0xc00007).mirror(0x07ffe0).umask16(0x00ff).r("upd1", FUNC(upd4701_device::read_xy));
+	map(0xc00008, 0xc0000f).mirror(0x07ffe0).umask16(0x00ff).r("upd2", FUNC(upd4701_device::read_xy));
 	map(0xc00011, 0xc00011).mirror(0x07ffec).rw("adc1", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::select_w));
 	map(0xc00013, 0xc00013).mirror(0x07ffec).rw("adc2", FUNC(msm6253_device::d7_r), FUNC(msm6253_device::select_w));
 }
@@ -1460,8 +1451,7 @@ void segas24_state::decrypted_opcodes_map(address_map &map)
 
 void segas24_state::machine_start()
 {
-	if (m_romboard && m_rombank[0] && m_rombank[1])
-	{
+	if(m_romboard && m_rombank[0] && m_rombank[1]) {
 		uint8_t *usr1 = m_romboard->base();
 		m_rombank[0]->configure_entries(0, 16, usr1, 0x40000);
 		m_rombank[1]->configure_entries(0, 16, usr1, 0x40000);
@@ -1469,8 +1459,7 @@ void segas24_state::machine_start()
 		save_item(NAME(m_curbank));
 	}
 
-	if (m_track_size)
-	{
+	if(m_track_size) {
 		subdevice<nvram_device>("floppy_nvram")->set_base(&m_floppy[0], 2*m_track_size);
 
 		save_item(NAME(m_fdc_track_side));
@@ -1513,8 +1502,7 @@ void segas24_state::machine_reset()
 	m_mlatch = 0x00;
 	m_frc_mode = 0;
 	m_frc_cnt_timer->reset();
-	if ((m_romboard != nullptr) && (m_rombank[0] != nullptr) && (m_rombank[1] != nullptr))
-	{
+	if(m_romboard && m_rombank[0] && m_rombank[1]) {
 		m_curbank = 0;
 		reset_bank();
 	}
