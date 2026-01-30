@@ -9,6 +9,17 @@
 #include "../sam_hw.h"
 #include <stdio.h>
 
+/* Debug logging - disable by defining SAM_HW_DEBUG=0 */
+#ifndef SAM_HW_DEBUG
+#define SAM_HW_DEBUG 0
+#endif
+
+#if SAM_HW_DEBUG
+#define DEBUG_HW(fmt, ...) do { printf("SAM_HW: " fmt "\n", ##__VA_ARGS__); fflush(stdout); } while(0)
+#else
+#define DEBUG_HW(fmt, ...) do { } while(0)
+#endif
+
 /*============================================================================
  * Register State
  *

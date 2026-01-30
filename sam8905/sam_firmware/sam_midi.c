@@ -13,11 +13,19 @@
  *
  * Only enabled for emulator builds (SAM_HW_PLATFORM defined in Makefile).
  * SDCC builds get no-op macros.
+ * Set DEBUG_MIDI_ENABLED=0 to disable MIDI debug output at compile time.
  *============================================================================*/
 
 #ifdef SAM_HW_PLATFORM
 #include <stdio.h>
+#ifndef DEBUG_MIDI_ENABLED
+#define DEBUG_MIDI_ENABLED 1
+#endif
+#if DEBUG_MIDI_ENABLED
 #define DEBUG_MIDI(fmt, ...) do { printf("MIDI: " fmt "\n", ##__VA_ARGS__); fflush(stdout); } while(0)
+#else
+#define DEBUG_MIDI(fmt, ...) do { } while(0)
+#endif
 #else
 #define DEBUG_MIDI(fmt, ...) do { } while(0)
 #endif

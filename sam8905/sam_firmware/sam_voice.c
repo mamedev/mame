@@ -16,7 +16,14 @@
 
 #ifdef SAM_HW_PLATFORM
 #include <stdio.h>
+#ifndef DEBUG_VOICE_ENABLED
+#define DEBUG_VOICE_ENABLED 1
+#endif
+#if DEBUG_VOICE_ENABLED
 #define DEBUG_VOICE(fmt, ...) do { printf("VOICE: " fmt "\n", ##__VA_ARGS__); fflush(stdout); } while(0)
+#else
+#define DEBUG_VOICE(fmt, ...) do { } while(0)
+#endif
 #else
 #define DEBUG_VOICE(fmt, ...) do { } while(0)
 #endif
@@ -196,9 +203,19 @@ void voice_slots_clear(uint8_t page)
     uint8_t addr;
     uint8_t i;
 
-    /* Set control word for this slot (word 15) */
-    /* Original firmware calls sam_dram_set_active (CODE:A523) which does read-modify-write */
-    sam_init_slots();  /* This writes word 15 for all slots - TODO: may need per-slot version */
+    /* Clear this slot's D-RAM word 15 to idle
+     * NOTE: The original firmware calls sam_dram_set_active (CODE:A523) which does
+     * read-modify-write. We do a simpler write here.
+     * Previously this called sam_init_slots() which cleared ALL slots - that was a bug!
+     */
+    {
+        uint8_t addr = (page << 4) | 0x0F;  /* D-RAM word 15 of this slot */
+        sam_write_reg(SAM_REG_ADDR_DATA, addr);
+        sam_write_reg(SAM_REG_DATA1, 0x00);
+        sam_write_reg(SAM_REG_DATA2, 0x08);  /* Bit 11 (idle) = 1 */
+        sam_write_reg(SAM_REG_DATA3, 0x00);
+        sam_write_reg(SAM_REG_CTRL, g_intmem.sam_ctrl_flags);
+    }
 
     /* Clear voice page status */
     voice_page_write(page, VOICE_PAGE_STATUS, 0x00);

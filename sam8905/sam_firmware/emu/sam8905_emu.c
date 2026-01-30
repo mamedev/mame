@@ -21,8 +21,16 @@
 #include <math.h>
 #include <stdio.h>
 
-/* Debug logging */
+/* Debug logging - disable by defining SAM_DEBUG=0 or commenting out */
+#ifndef SAM_DEBUG
+#define SAM_DEBUG 1
+#endif
+
+#if SAM_DEBUG
 #define DEBUG_SAM(fmt, ...) do { printf("SAM: " fmt "\n", ##__VA_ARGS__); fflush(stdout); } while(0)
+#else
+#define DEBUG_SAM(fmt, ...) do { } while(0)
+#endif
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846

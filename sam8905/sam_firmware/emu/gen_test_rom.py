@@ -38,17 +38,24 @@ ARAM_ADDR = 0x2000
 #   10:9  = Emitter: 0=RM, 1=RADD, 2=RP, 3=RSP
 #   8     = WSP (modifier)
 #   7=WA, 6=WB, 5=WM, 4=WPHI, 3=WXY, 2=clearB, 1=WWF, 0=WACC
+#
+# NOTE: The original 0x13CF instruction combined WM+WPHI+WSP, but WM+WSP makes
+# the write conditional on !carry. When phase overflows 19 bits, carry=1 and
+# writes are blocked, stopping the oscillator! Split into two instructions:
+# - RADD 2, WM (no WSP) to always write phase
+# - RM 2, WPHI, WSP to set PHI with internal sine
 ALGORITHM_SINUS = [
     0x107F,  # RM 2, WA            - Read accumulated phase from DRAM[2] into A
     0x00BF,  # RM 0, WB            - Read pitch increment from DRAM[0] into B
-    0x13CF,  # RADD 2, WM,WPHI,WSP - Write A+B to DRAM[2], set PHI, WSP→internal sine
+    0x12DF,  # RADD 2, WM          - Write A+B to DRAM[2] (always, no WSP)
+    0x11EF,  # RM 2, WPHI, WSP     - Read phase back, set PHI with internal sine
     0x09F7,  # RM 1, WXY, WSP      - Read amp from DRAM[1], X=waveform(phi), Y=amp, mix_l/r
     0x06FE,  # RSP, WACC           - Accumulate X*Y to output
     # Fill rest with NOP (0x7FFF)
     0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF,
     0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF,
     0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF,
-    0x7FFF, 0x7FFF, 0x7FFF,
+    0x7FFF, 0x7FFF,
 ]
 
 # A-RAM algorithm from MS4 address 0x027A (used by dpiano27)

@@ -10,11 +10,22 @@
 
 /*============================================================================
  * Debug Output
+ *
+ * Only enabled for emulator builds (SAM_HW_PLATFORM defined in Makefile).
+ * SDCC builds get no-op macros.
+ * Set DEBUG_DRAM_ENABLED=0 to disable D-RAM debug output at compile time.
  *============================================================================*/
 
 #ifdef SAM_HW_PLATFORM
 #include <stdio.h>
+#ifndef DEBUG_DRAM_ENABLED
+#define DEBUG_DRAM_ENABLED 1
+#endif
+#if DEBUG_DRAM_ENABLED
 #define DEBUG_DRAM(fmt, ...) do { printf("DRAM: " fmt "\n", ##__VA_ARGS__); fflush(stdout); } while(0)
+#else
+#define DEBUG_DRAM(fmt, ...) do { } while(0)
+#endif
 #else
 #define DEBUG_DRAM(fmt, ...) do { } while(0)
 #endif
