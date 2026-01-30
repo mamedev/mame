@@ -446,11 +446,11 @@ void sega_315_5195_mapper_device::device_start()
 	save_item(NAME(m_end));
 	save_item(NAME(m_rgnoffs));
 	save_item(NAME(m_regs));
-	save_item(NAME(m_curregion));
+	//save_item(NAME(m_curregion));
 	save_item(NAME(m_banks));
 	save_item(NAME(m_to_sound));
 	save_item(NAME(m_from_sound));
-	save_item(NAME(m_open_bus_recurse));
+	//save_item(NAME(m_open_bus_recurse));
 }
 
 
