@@ -329,7 +329,7 @@
 	MAMEMemoryViewer *win = [[MAMEMemoryViewer alloc] initWithMachine:*machine console:self];
 	[auxiliaryWindows addObject:win];
 	[win release];
-	if ([win selectSubviewForSpace:space])
+	if (space && [win selectSubviewForSpace:space])
 	{
 		if (expression != nil)
 			[win setExpression:expression];
@@ -346,7 +346,7 @@
 	MAMEDisassemblyViewer *win = [[MAMEDisassemblyViewer alloc] initWithMachine:*machine console:self];
 	[auxiliaryWindows addObject:win];
 	[win release];
-	if ([win selectSubviewForSpace:space])
+	if (space && [win selectSubviewForSpace:space])
 	{
 		if (expression != nil)
 			[win setExpression:expression];
