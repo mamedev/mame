@@ -22902,7 +22902,7 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 		</part>
 	</software>
 
-	<software name="metroid0c" cloneof="metroid0">
+	<software name="metroid0c" cloneof="metroid0" supported="partial">
 		<description>Miteluode - Lingdian Renwu (China)</description>
 		<year>2005</year>
 		<publisher>iQue</publisher>
