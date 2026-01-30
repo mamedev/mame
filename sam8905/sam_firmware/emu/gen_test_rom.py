@@ -29,14 +29,39 @@ PROGRAM_ADDR = 0x1000
 # Where to place A-RAM algorithm data
 ARAM_ADDR = 0x2000
 
+# Simple sinus oscillator algorithm - modified for MS4 firmware D-RAM layout
+# Firmware writes: DRAM[0]=pitch, DRAM[1]=amplitude, DRAM[2]=routing (unused by algo)
+# Uses DRAM[2] for phase accumulation (starts at 0, not touched by firmware after init)
+#
+# Instruction bits (active LOW for receivers):
+#   14:11 = MAD (D-RAM address within slot)
+#   10:9  = Emitter: 0=RM, 1=RADD, 2=RP, 3=RSP
+#   8     = WSP (modifier)
+#   7=WA, 6=WB, 5=WM, 4=WPHI, 3=WXY, 2=clearB, 1=WWF, 0=WACC
+ALGORITHM_SINUS = [
+    0x107F,  # RM 2, WA            - Read accumulated phase from DRAM[2] into A
+    0x00BF,  # RM 0, WB            - Read pitch increment from DRAM[0] into B
+    0x13CF,  # RADD 2, WM,WPHI,WSP - Write A+B to DRAM[2], set PHI, WSP→internal sine
+    0x09F7,  # RM 1, WXY, WSP      - Read amp from DRAM[1], X=waveform(phi), Y=amp, mix_l/r
+    0x06FE,  # RSP, WACC           - Accumulate X*Y to output
+    # Fill rest with NOP (0x7FFF)
+    0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF,
+    0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF,
+    0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF, 0x7FFF,
+    0x7FFF, 0x7FFF, 0x7FFF,
+]
+
 # A-RAM algorithm from MS4 address 0x027A (used by dpiano27)
 # 32 x 15-bit instruction words, stored as little-endian word pairs
-ALGORITHM = [
+ALGORITHM_DPIANO = [
     0x08EF, 0x7EFB, 0x50BD, 0x28F7, 0x78FD, 0x4CCF, 0x59F7, 0x11EF,
     0x20FD, 0x086F, 0x3ADF, 0x113F, 0x42DF, 0x18BF, 0x7CF7, 0x43DF,
     0x30BF, 0x2876, 0x41EF, 0x20FD, 0x38EE, 0x2BDF, 0x087F, 0x00BF,
     0x0ADF, 0x48F7, 0x113F, 0x12DF, 0x18BF, 0x13DE, 0x7FFF, 0x7FFF,
 ]
+
+# Default to simple sinus for testing
+ALGORITHM = ALGORITHM_SINUS
 
 # D-RAM stream for simple fixed-amplitude sound
 # Handler 0x08 (pitch): 10 bytes
@@ -89,14 +114,16 @@ def build_program(name: str, slot_count: int, aram_ptr: int, dram_stream: bytes,
     """
     Build MS4-format program structure.
 
-    Offsets:
+    MS4 format (based on firmware analysis):
         0-7:   Name (8 bytes, space-padded)
         8:     Null terminator
         9:     Flags (bit7=complex, bits3:0=slot_count)
         10-11: A-RAM pointer (little-endian)
         12-14: D-RAM entry0 (3 bytes)
-        15-16: Voice init data pointer (little-endian)
-        17+:   D-RAM stream
+        15-16: First voice_ptr (little-endian) - envelope/LFO block
+        17-18: Second voice_ptr OR 0x0000 terminator
+        ...    More voice_ptrs until 0x0000
+        N:     D-RAM handler stream (after 0x0000 terminator)
     """
     prog = bytearray()
 
@@ -116,12 +143,17 @@ def build_program(name: str, slot_count: int, aram_ptr: int, dram_stream: bytes,
     # D-RAM entry0 (3 bytes) - using typical values
     prog.extend([0x01, 0xA4, 0x85])  # word=0xA401, addr=8, mix=5
 
-    # Voice init data pointer (little-endian) - points after program header
-    # We'll place voice init right after dram_stream
-    voice_ptr = PROGRAM_ADDR + 17 + len(dram_stream)
+    # Calculate where voice init data will be placed
+    # Layout: header (17 bytes) + voice_ptr (2) + terminator (2) + dram_stream + voice_init
+    voice_ptr = PROGRAM_ADDR + 17 + 2 + 2 + len(dram_stream)
+
+    # First voice_ptr (little-endian) - points to envelope/LFO init data
     prog.extend(struct.pack('<H', voice_ptr))
 
-    # D-RAM stream
+    # Slot pointer terminator (0x0000) - indicates no more envelope blocks
+    prog.extend([0x00, 0x00])
+
+    # D-RAM handler stream (after terminator)
     prog.extend(dram_stream)
 
     # Voice init data
@@ -144,7 +176,15 @@ def build_aram_data(algorithm: list) -> bytes:
 
 
 def main():
-    output_file = sys.argv[1] if len(sys.argv) > 1 else 'test_rom.bin'
+    import argparse
+    parser = argparse.ArgumentParser(description='Generate SAM8905 test ROM')
+    parser.add_argument('output', nargs='?', default='test_rom.bin', help='Output ROM file')
+    parser.add_argument('--algo', choices=['sinus', 'dpiano'], default='sinus',
+                        help='Algorithm to use (default: sinus)')
+    args = parser.parse_args()
+
+    output_file = args.output
+    algorithm = ALGORITHM_SINUS if args.algo == 'sinus' else ALGORITHM_DPIANO
 
     # Create empty ROM
     rom = bytearray(ROM_SIZE)
@@ -159,7 +199,7 @@ def main():
         rom[ptr_addr + 1] = PROGRAM_ADDR & 0xFF
 
     # Build A-RAM algorithm data
-    aram_data = build_aram_data(ALGORITHM)
+    aram_data = build_aram_data(algorithm)
     rom[ARAM_ADDR:ARAM_ADDR + len(aram_data)] = aram_data
 
     # Build test program
@@ -178,6 +218,7 @@ def main():
 
     print(f"Generated test ROM: {output_file}")
     print(f"  ROM size: {ROM_SIZE} bytes (0x{ROM_SIZE:X})")
+    print(f"  Algorithm: {args.algo}")
     print(f"  Program table: 0x{PROGRAM_PTR_TABLE:04X} ({NUM_PROGRAMS} entries)")
     print(f"  Program addr: 0x{PROGRAM_ADDR:04X} ({len(program)} bytes)")
     print(f"  A-RAM addr: 0x{ARAM_ADDR:04X} ({len(aram_data)} bytes)")

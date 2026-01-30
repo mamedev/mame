@@ -623,6 +623,20 @@ void dram_config_handler_08(void)
     /* Original: if (_0_3 != '\x01') { write dram_address to slot_map; dram_slot_index++; } */
     dram_config_update_slot_mapping();
 
+    /* Write initial pitch to SAM D-RAM (from CODE:AF6A-AF76)
+     * The original firmware writes pitch directly to SAM:
+     *   EXTMEM_8000 = dram_address_counter (D-RAM address)
+     *   EXTMEM_8001 = pitch_lo
+     *   EXTMEM_8002 = pitch_mid
+     *   EXTMEM_8003 = pitch_hi & 0x07
+     *   EXTMEM_8004 = sam_ctrl_flags (triggers write)
+     */
+    sam_write_reg(SAM_REG_ADDR_DATA, g_intmem.dram_address_counter);
+    sam_write_reg(SAM_REG_DATA1, (uint8_t)pitch);
+    sam_write_reg(SAM_REG_DATA2, (uint8_t)(pitch >> 8));
+    sam_write_reg(SAM_REG_DATA3, (uint8_t)(pitch >> 16) & 0x07);
+    sam_write_reg(SAM_REG_CTRL, g_intmem.sam_ctrl_flags);
+
     /* Continue dispatch */
     dram_config_advance_and_dispatch();
 }
@@ -680,6 +694,19 @@ void dram_config_handler_10(void)
      * Original has complex conditions based on env_ctrl bits, simplified here */
     if (env_ctrl & 0x80) {  /* Envelope enabled */
         dram_config_update_slot_mapping();
+    }
+
+    /* Write initial amplitude to SAM D-RAM (from CODE:B1B0-B1C8)
+     * The original firmware writes amplitude directly if no envelope/special mode.
+     * Format: base_level in low byte, amplitude in upper bits
+     * For simple case: D-RAM word = (base_level & 0x3F) | (amplitude << 7)
+     */
+    if (amplitude != 0 && !(env_ctrl & 0x10)) {  /* amplitude != 0 and not special mode */
+        sam_write_reg(SAM_REG_ADDR_DATA, g_intmem.dram_address_counter);
+        sam_write_reg(SAM_REG_DATA1, base_level);
+        sam_write_reg(SAM_REG_DATA2, final_level);
+        sam_write_reg(SAM_REG_DATA3, 0);
+        sam_write_reg(SAM_REG_CTRL, g_intmem.sam_ctrl_flags);
     }
 
     /* Continue dispatch */

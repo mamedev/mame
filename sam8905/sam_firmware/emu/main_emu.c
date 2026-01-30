@@ -415,6 +415,41 @@ int main(int argc, char *argv[])
             periodic_voice_update();
         }
 
+        /* Dump slot 0 state */
+        printf("\n=== Slot 0 state ===\n");
+        printf("DRAM[0][0]  = 0x%05X (pitch)\n", sam8905_read_dram(0x00));
+        printf("DRAM[0][1]  = 0x%05X (amplitude)\n", sam8905_read_dram(0x01));
+        printf("DRAM[0][15] = 0x%05X (control)\n", sam8905_read_dram(0x0F));
+        printf("  idle bit (11): %d\n", (sam8905_read_dram(0x0F) >> 11) & 1);
+        printf("  alg bits (10:8): %d\n", (sam8905_read_dram(0x0F) >> 8) & 7);
+
+        /* Dump first A-RAM instructions */
+        printf("\n=== A-RAM algorithm 0 ===\n");
+        for (int i = 0; i < 8; i++) {
+            printf("  ARAM[%d] = 0x%04X\n", i, sam8905_read_aram(i));
+        }
+
+        /* Generate some audio samples and check for non-zero output */
+        printf("\n=== Generating audio samples ===\n");
+        fflush(stdout);
+        int32_t left, right;
+        int non_zero_count = 0;
+        int32_t max_sample = 0;
+        for (int i = 0; i < 1000; i++) {
+            sam8905_process_frame(&left, &right);
+            if (left != 0 || right != 0) {
+                non_zero_count++;
+                if (left > max_sample) max_sample = left;
+                if (right > max_sample) max_sample = right;
+                if (left < -max_sample) max_sample = -left;
+                if (right < -max_sample) max_sample = -right;
+            }
+            if (i < 10 || (i % 100 == 0)) {
+                printf("  Sample %d: L=%d R=%d\n", i, left, right);
+            }
+        }
+        printf("Non-zero samples: %d/1000, max amplitude: %d\n", non_zero_count, max_sample);
+
         printf("\n=== Test complete ===\n");
         return 0;
     }
