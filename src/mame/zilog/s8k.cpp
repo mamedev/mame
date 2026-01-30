@@ -170,8 +170,6 @@ private:
 	void daisy_interrupt(int state);
 	void segt_interrupt(int state);
 
-	offs_t m_memsize = 0;
-
 	// Board registers
 	uint8_t m_reg_scr	= 0; // System Configuration Register
 	uint8_t m_reg_sbr	= 0; // System Break Register
@@ -672,8 +670,6 @@ void s8k_state::install_memory()
 {
 	void *LROM, *LRAM;
 
-	m_memsize = m_ram->size();
-
 	address_space& pspace = m_maincpu->space(AS_PROGRAM);
 	address_space& dspace = m_maincpu->space(AS_DATA);
 	address_space& sspace = m_maincpu->space(z8001_device::AS_STACK);
@@ -889,7 +885,7 @@ void s8k_state::s8k(machine_config &config)
 	m_maincpu->viack().set("s8k_16_daisy", FUNC(s8k_16_daisy_device::viack_r));
 	m_maincpu->ns().set(FUNC(s8k_state::normal_led_w));
 
-	RAM(config, RAM_TAG).set_default_size("512K").set_default_value(0).set_extra_options("256K,512K,1M,2M,4M");
+	RAM(config, m_ram).set_default_size("1M").set_default_value(0).set_extra_options("256K,512K,768K,1M,2M,3M,4M,5M,6M,7M");
 
 	S8K_16_DAISY(config, m_daisy, 0);
 	m_daisy->set_daisy_config(s8k_16_daisy_chain);
@@ -1028,16 +1024,16 @@ void s8k_state::s8k(machine_config &config)
 //**************************************************************************
 
 ROM_START( s8000 )
-	ROM_REGION16_BE(0x4000,"maincpu", 0)
-	ROM_DEFAULT_BIOS( "v22" )
+	ROM_REGION16_BE(0x4000, "maincpu", 0)
+	ROM_DEFAULT_BIOS("v22")
 
-	ROM_SYSTEM_BIOS( 0, "v12", "Version 1.2" )
+	ROM_SYSTEM_BIOS(0, "v12", "Version 1.2")
 	ROMX_LOAD("cpu-12.u74", 0x0001, 0x1000, CRC(ab2ca534) SHA1(25857479801397f1f18c55b40f81cb5ba7a01a55), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("cpu-12.u75", 0x2001, 0x1000, CRC(c8d3be3b) SHA1(efbca6fcbf53565075b67a14096d0f725839494a), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("cpu-12.u76", 0x0000, 0x1000, CRC(81a4cac6) SHA1(9e74883a365f1034610b1c4681ca3611362d62ea), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("cpu-12.u77", 0x2000, 0x1000, CRC(6b8b4536) SHA1(85ff7c9be0f51e299d4f9406064cd32df08b8f16), ROM_SKIP(1) | ROM_BIOS(0))
 
-	ROM_SYSTEM_BIOS( 1, "v22", "Version 2.2" )
+	ROM_SYSTEM_BIOS(1, "v22", "Version 2.2")
 	ROMX_LOAD("cpu-22.u74", 0x0001, 0x1000, CRC(8a3ea482) SHA1(0572b21ac5aeb24cec01d7682f1ad7eef08cb070), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("cpu-22.u75", 0x2001, 0x1000, CRC(8ddb6479) SHA1(93eec5a59a7856d19e32f526dddb4f21c1864373), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("cpu-22.u76", 0x0000, 0x1000, CRC(198ce8ee) SHA1(743d75dab6f4ea85b2f95ec1b620134f4416a351), ROM_SKIP(1) | ROM_BIOS(1))
@@ -1047,9 +1043,9 @@ ROM_END
 //TODO: Series Two (HPCPU) Models
 /*
 ROM_START( s8000_s2 )
-	ROM_REGION16_BE(0x4000,"maincpu", 0)
+	ROM_REGION16_BE(0x4000, "maincpu", 0)
 
-	ROM_SYSTEM_BIOS( 0, "v101", "Version 10.1" )
+	ROM_SYSTEM_BIOS(0, "v101", "Version 10.1")
 	ROMX_LOAD("cpu-101.19e", 0x0000, 0x2000, CRC(a77055c8) SHA1(f1268c6b163f9e4151d425ccc2f5cb4c9c0af8c8), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD("cpu-101.21e", 0x0001, 0x2000, CRC(610e8b0c) SHA1(bc804e09cf6905c9f0ccc502a15c98841ee4b087), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
