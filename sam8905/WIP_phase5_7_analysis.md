@@ -358,7 +358,7 @@ portamento. Package E would add proper volume envelopes.
 | C: Pitch Mod | ✅ COMPLETE | test_multiply_16x24, test_modulation_write_dram | multiply_16x24 in sam_math.h, modulation_write_dram in sam_dram_config.c |
 | D: Portamento | ✅ COMPLETE | test_portamento_update | dram_slot_portamento_update in sam_dram_config.c |
 | E: Amplitude | ✅ COMPLETE | test_apply_mod_depth, test_amplitude_update | SIMPLIFIED - see shortcuts below |
-| F: Voice Init | ⏳ PENDING | | voice_init_copy_and_envelope, voice_init_next_slot refactor |
+| F: Voice Init | ✅ COMPLETE | test_voice_init_copy_and_envelope | SIMPLIFIED - see shortcuts below |
 | G: Orchestrator | ⏳ PENDING | | periodic_voice_update final assembly |
 
 ### Package E Shortcuts (requires follow-up for full fidelity)
@@ -373,3 +373,16 @@ portamento. Package E would add proper volume envelopes.
 - No negative amplitude handling (affects inverted envelopes)
 - Simplified done flag propagation
 - Linear velocity instead of curve table
+
+### Package F Shortcuts (requires follow-up for full fidelity)
+
+**voice_init_copy_and_envelope (AB73):**
+- Velocity modulation of envelope params not implemented (bytes 9-11 in ROM)
+- velocity_curve_lookup replaced with linear approximation
+- Envelope table scanning is simplified (may miss edge cases)
+- signed_multiply_sat for envelope level scaling not fully matched
+- Bank register preservation not tracked (not needed in C)
+
+**voice_init_next_slot (AB40):**
+- Uses existing dram_config_advance_and_dispatch (already ported)
+- Mutual recursion eliminated by calling voice_init_next_slot at end

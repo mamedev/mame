@@ -637,18 +637,151 @@ void voice_init_next_slot(void)
  * voice_init_copy_and_envelope (CODE:AB73)
  *
  * Copies envelope data to voice slot and processes envelope table.
- * Called during D-RAM configuration.
+ * Called during D-RAM configuration when setting up LFO/envelope blocks.
  *
- * TODO: Full implementation requires envelope system (Phase 7).
+ * Voice init data layout (7 bytes copied to slot[0..6]):
+ *   [0]: Envelope segment table pointer - low byte
+ *   [1]: Envelope segment table pointer - high byte
+ *   [2]: Control flags (bit7=enable, bit6=sign, bits 6,3 for clear condition)
+ *   [3]: Reserved
+ *   [4]: Envelope sustain/attack parameter
+ *   [5]: Envelope depth/modulation parameter
+ *   [6]: Envelope rate
+ *
+ * After copy:
+ *   - Clears slot[7]
+ *   - Conditionally clears slot[8:9] based on flags
+ *   - Scans envelope table for initial segment
+ *   - Sets up rate in slot[10:11] = rate << 2
+ *
+ * ⚠️ PORTING SHORTCUTS:
+ * - Velocity modulation of envelope params not implemented
+ * - Envelope table scanning simplified
+ * - velocity_curve_lookup replaced with linear
  *============================================================================*/
 
 void voice_init_copy_and_envelope(void)
 {
-    /* TODO: Implement envelope initialization
-     * This function copies 7 bytes of envelope data to the voice slot
-     * and sets up the envelope pointer for the periodic update routine.
-     *
-     * For now, this is a placeholder - voices will work but without
-     * proper envelope processing.
-     */
+    uint8_t page = g_intmem.voice_page_num;
+    uint8_t slot_base = g_intmem.voice_slot_base;
+
+    /* Get ROM pointer from voice_data_ptr */
+    uint16_t rom_ptr = ((uint16_t)g_intmem.voice_data_ptr_hi << 8) |
+                       g_intmem.voice_data_ptr_lo;
+
+    /* Check skip flag (_0_3 in original) */
+    if (g_intmem.flags_20 & 0x08) {
+        /* Skip this block, continue to next */
+        voice_init_next_slot();
+        return;
+    }
+
+    /* Copy 7 bytes from ROM to voice slot */
+    for (uint8_t i = 0; i < 7; i++) {
+        uint8_t value = ROM_BYTE(rom_ptr + i);
+        voice_page_write(page, slot_base + i, value);
+    }
+
+    /* Clear slot[7] (output value) */
+    voice_page_write(page, slot_base + 7, 0);
+
+    /* Read control flags from slot[2] */
+    uint8_t ctrl_flags = voice_page_read(page, slot_base + 2);
+
+    /* Conditionally clear slot[8:9] (phase accumulator) */
+    /* Original: if ((ctrl_flags & 0x48) != 0x40) clear */
+    if ((ctrl_flags & 0x48) != 0x40) {
+        voice_page_write(page, slot_base + 8, 0);
+        voice_page_write(page, slot_base + 9, 0);
+    }
+
+    /* Get envelope table pointer from slot[0:1] */
+    uint8_t env_ptr_lo = voice_page_read(page, slot_base);
+    uint8_t env_ptr_hi = voice_page_read(page, slot_base + 1);
+    uint16_t env_ptr = ((uint16_t)env_ptr_hi << 8) | env_ptr_lo;
+
+    /* If envelope pointer is non-zero, scan envelope table */
+    if (env_ptr != 0) {
+        /* Scan 3-byte envelope entries until terminator found
+         * Terminator: byte[2] != 0 OR (byte[1] & 0xF8) != 0 OR (byte[1] & 7) != 0
+         */
+        while (1) {
+            /* Copy 3 bytes to slot[0xD:0xF] */
+            uint8_t e0 = ROM_BYTE(env_ptr);
+            uint8_t e1 = ROM_BYTE(env_ptr + 1);
+            uint8_t e2 = ROM_BYTE(env_ptr + 2);
+
+            voice_page_write(page, slot_base + 0x0D, e0);
+            voice_page_write(page, slot_base + 0x0E, e1);
+            voice_page_write(page, slot_base + 0x0F, e2);
+
+            /* Check terminator conditions */
+            if (e2 != 0 || (e1 & 0xF8) != 0) {
+                break;  /* Found active entry */
+            }
+
+            /* Also copy e0 to slot[9] and check e1 bits 2:0 */
+            voice_page_write(page, slot_base + 9, e0);
+
+            if ((e1 & 0x07) != 0) {
+                break;  /* Terminator found */
+            }
+
+            /* Advance envelope pointer by 3 */
+            env_ptr += 3;
+
+            /* Update slot[0:1] with new pointer (16-bit add with carry) */
+            env_ptr_lo = voice_page_read(page, slot_base);
+            voice_page_write(page, slot_base, env_ptr_lo + 3);
+            if (env_ptr_lo > 0xFC) {
+                env_ptr_hi = voice_page_read(page, slot_base + 1);
+                voice_page_write(page, slot_base + 1, env_ptr_hi + 1);
+            }
+        }
+
+        /* Clear slot[0xC] (level output) */
+        voice_page_write(page, slot_base + 0x0C, 0);
+
+        /* Handle bit 6 of control flags (sign flag) */
+        if (ctrl_flags & 0x40) {
+            uint8_t level = voice_page_read(page, slot_base + 0x0C);
+            voice_page_write(page, slot_base + 0x0C, level | 0x80);
+        }
+    }
+
+    /* Check envelope enable (bit 7 of ctrl_flags) */
+    if (!(ctrl_flags & 0x80)) {
+        /* No envelope enable - continue to next slot */
+        voice_init_next_slot();
+        return;
+    }
+
+    /* Envelope enabled - set up rate and level */
+    uint8_t sustain = voice_page_read(page, slot_base + 4);
+
+    /* Set initial level: 0x7F if sustain==0, else 0 */
+    uint8_t level = (sustain == 0) ? 0x7F : 0x00;
+    voice_page_write(page, slot_base + 6, level);
+
+    /* Get original rate from slot[6] (was overwritten with level) */
+    /* Note: We need to read rate BEFORE writing level - use the ROM value */
+    uint8_t rate = ROM_BYTE(rom_ptr + 6);
+
+    /* Set up rate in slot[10:11] = rate << 2 */
+    if (rate == 0) {
+        /* Zero rate: use default */
+        uint8_t default_rate = (sustain == 0) ? 3 : 1;
+        voice_page_write(page, slot_base + 10, default_rate);
+        voice_page_write(page, slot_base + 11, 0);
+    } else {
+        /* rate << 2 = rate * 4 */
+        voice_page_write(page, slot_base + 10, rate << 2);
+        voice_page_write(page, slot_base + 11, rate >> 6);  /* High bits */
+    }
+
+    /* Clear slot[7] again (envelope output cleared at start of envelope) */
+    voice_page_write(page, slot_base + 7, 0);
+
+    /* Continue to next slot */
+    voice_init_next_slot();
 }
