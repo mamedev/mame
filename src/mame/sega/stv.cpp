@@ -1026,7 +1026,7 @@ void stv_state::hopper_mem(address_map &map)
 void stv_state::stvcd_mem(address_map &map)
 {
 	stv_mem(map);
-	map(0x05800000, 0x0589ffff).rw("saturn_cd_hle", FUNC(saturn_cd_hle_device::stvcd_r), FUNC(saturn_cd_hle_device::stvcd_w));
+	map(0x05800000, 0x0589ffff).m("saturn_cd_hle", FUNC(saturn_cd_hle_device::amap));
 }
 
 void stv_state::sound_mem(address_map &map)

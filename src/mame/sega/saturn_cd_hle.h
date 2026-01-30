@@ -12,8 +12,7 @@
 #include "sound/cdda.h"
 
 class saturn_cd_hle_device : public device_t,
-							 public device_mixer_interface,
-							 public device_memory_interface
+							 public device_mixer_interface
 {
 	static constexpr unsigned MAX_FILTERS = 24;
 	static constexpr unsigned MAX_BLOCKS = 200;
@@ -22,8 +21,7 @@ class saturn_cd_hle_device : public device_t,
 public:
 	saturn_cd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint32_t stvcd_r(offs_t offset, uint32_t mem_mask = ~0);
-	void stvcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void amap(address_map &map);
 
 	void set_tray_open();
 	void set_tray_close();
@@ -33,13 +31,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
-	virtual space_config_vector memory_space_config() const override;
 
 private:
-	const address_space_config      m_space_config;
-
-	void io_regs(address_map &map) ATTR_COLD;
-
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
 	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );
 

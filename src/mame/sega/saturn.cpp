@@ -556,7 +556,7 @@ void sat_console_state::saturn_mem(address_map &map)
 //  map(0x04000000, 0x047fffff).ram(); // External Battery RAM area
 	map(0x04ffffff, 0x04ffffff).r(FUNC(sat_console_state::saturn_cart_type_r));
 	map(0x05000000, 0x057fffff).r(FUNC(sat_console_state::abus_dummy_r));
-	map(0x05800000, 0x0589ffff).rw(m_saturn_cd_hle, FUNC(saturn_cd_hle_device::stvcd_r), FUNC(saturn_cd_hle_device::stvcd_w));
+	map(0x05800000, 0x0589ffff).m(m_saturn_cd_hle, FUNC(saturn_cd_hle_device::amap));
 	/* Sound */
 	map(0x05a00000, 0x05a7ffff).rw(FUNC(sat_console_state::soundram_r), FUNC(sat_console_state::soundram_w));
 	map(0x05b00000, 0x05b00fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));

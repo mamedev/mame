@@ -102,8 +102,6 @@ DEFINE_DEVICE_TYPE(SATURN_CD_HLE, saturn_cd_hle_device, "saturn_cd_hle", "Sega S
 saturn_cd_hle_device::saturn_cd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SATURN_CD_HLE, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
-	, device_memory_interface(mconfig, *this)
-	, m_space_config("regs", ENDIANNESS_LITTLE, 32, 20, 0, address_map_constructor(FUNC(saturn_cd_hle_device::io_regs), this))
 	, m_cdrom_image(*this, "cdrom")
 	, m_sector_timer(*this, "sector_timer")
 	, m_sh1_timer(*this, "sh1_cmd")
@@ -240,18 +238,11 @@ void saturn_cd_hle_device::device_reset()
 }
 
 
-device_memory_interface::space_config_vector saturn_cd_hle_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
-}
-
 /*
  * Block interface
  */
 
-void saturn_cd_hle_device::io_regs(address_map &map)
+void saturn_cd_hle_device::amap(address_map &map)
 {
 	map(0x18000, 0x18003).rw(FUNC(saturn_cd_hle_device::datatrns_r), FUNC(saturn_cd_hle_device::datatrns_w));
 	map(0x90000, 0x90003).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::datatrns_r), FUNC(saturn_cd_hle_device::datatrns_w));
@@ -568,15 +559,6 @@ void saturn_cd_hle_device::cr4_w(uint16_t data)
 	m_sh1_timer->adjust(attotime::from_hz(get_timing_command()));
 }
 
-uint32_t saturn_cd_hle_device::stvcd_r(offs_t offset, uint32_t mem_mask)
-{
-	return this->space().read_dword(offset<<2, mem_mask);
-}
-
-void saturn_cd_hle_device::stvcd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	this->space().write_dword(offset<<2,data, mem_mask);
-}
 
 /*
  * CDC command helpers
