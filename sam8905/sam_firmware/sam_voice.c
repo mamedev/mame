@@ -7,6 +7,7 @@
 #include "sam_voice.h"
 #include "sam_firmware.h"
 #include "sam_dram_config.h"
+#include "sam_lfo.h"
 #include <stddef.h>  /* For NULL */
 
 /*============================================================================
@@ -784,4 +785,258 @@ void voice_init_copy_and_envelope(void)
 
     /* Continue to next slot */
     voice_init_next_slot();
+}
+
+/*============================================================================
+ * periodic_voice_update (CODE:9BA7)
+ *
+ * Main periodic update orchestrator. Called every timer tick.
+ *
+ * ⚠️ PORTING SHORTCUTS documented in sam_voice.h
+ *============================================================================*/
+
+void periodic_voice_update(void)
+{
+    uint8_t page;
+    uint8_t slot_base;
+    uint8_t ctrl_byte;
+    uint8_t waveform_type;
+    uint8_t phase_hi;
+    int8_t lfo_output;
+    uint8_t env_output;
+    uint8_t slot_index;
+    uint8_t mod_type;
+
+    /* Update global modulation LFO (mod wheel) */
+    global_mod_lfo_update();
+
+    /* Iterate through all active voices */
+    page = g_intmem.active_voice_list_head;
+
+    while (page != VOICE_LIST_END) {
+        g_intmem.voice_page_num = page;
+
+        /*====================================================================
+         * PART 1: LFO/Envelope Block Processing
+         *
+         * 7 blocks × 16 bytes at offsets 0x00-0x60
+         * Each block is an LFO or envelope generator.
+         *
+         * Block layout:
+         *   [0-1]: Envelope segment pointer
+         *   [2]:   Control (bit7=enable, bits2:0=waveform type)
+         *   [3]:   Reserved
+         *   [4]:   Sustain/attack param
+         *   [5]:   Depth/mod param
+         *   [6]:   Output amplitude (envelope)
+         *   [7]:   Output value (LFO result)
+         *   [8-9]: Phase accumulator (16-bit)
+         *   [10-11]: Rate (16-bit)
+         *   [12]:  Envelope control
+         *   [13-15]: Envelope segment data
+         *====================================================================*/
+
+        for (slot_base = 0x00; slot_base < 0x70; slot_base += 0x10) {
+            g_intmem.voice_slot_base = slot_base;
+
+            /* Read control byte at slot+2 */
+            ctrl_byte = voice_page_read(page, slot_base + 2);
+
+            /* Check enable bit (bit 7) */
+            if (!(ctrl_byte & 0x80)) {
+                continue;  /* Block disabled, skip */
+            }
+
+            /* Get waveform type (bits 2:0) */
+            waveform_type = ctrl_byte & 0x07;
+
+            /* Read current phase from slot+8,9 */
+            uint8_t phase_lo = voice_page_read(page, slot_base + 8);
+            phase_hi = voice_page_read(page, slot_base + 9);
+
+            /* Read rate from slot+10,11 */
+            uint8_t rate_lo = voice_page_read(page, slot_base + 10);
+            uint8_t rate_hi = voice_page_read(page, slot_base + 11);
+            uint16_t rate = ((uint16_t)rate_hi << 8) | rate_lo;
+
+            /* Advance phase */
+            uint16_t phase = ((uint16_t)phase_hi << 8) | phase_lo;
+            phase += rate;
+
+            /* Store new phase */
+            voice_page_write(page, slot_base + 8, (uint8_t)(phase & 0xFF));
+            voice_page_write(page, slot_base + 9, (uint8_t)(phase >> 8));
+            phase_hi = (uint8_t)(phase >> 8);
+
+            /* Compute LFO output based on waveform type */
+            switch (waveform_type) {
+            case 0:  /* Sine */
+            case 5:  /* Sine variant (treated as sine) */
+            case 6:  /* Sine variant */
+            case 7:  /* Sine variant */
+                {
+                    /* Sine lookup using phase_hi >> 1 as index */
+                    uint8_t table_idx = (phase_hi >> 1) & 0x3F;
+                    lfo_output = (int8_t)g_sine_table[table_idx];
+                }
+                break;
+
+            case 1:  /* Ramp (sawtooth) */
+                /* Output = phase_hi directly (0-255 ramp) */
+                lfo_output = (int8_t)(phase_hi - 0x80);  /* Center around 0 */
+                break;
+
+            case 2:  /* Inverted ramp */
+                lfo_output = (int8_t)(0x80 - phase_hi);  /* Inverted */
+                break;
+
+            case 3:  /* Square */
+                /* Output = +127 or -127 based on phase_hi bit 7 */
+                lfo_output = (phase_hi & 0x80) ? 0x7F : 0x81;
+                break;
+
+            case 4:  /* Noise (LFSR) */
+                /* Only update noise when phase wraps */
+                if (phase < rate) {
+                    /* Phase wrapped - advance LFSR */
+                    lfo_output = (int8_t)noise_lfsr_next();
+                } else {
+                    /* Keep previous value */
+                    lfo_output = (int8_t)voice_page_read(page, slot_base + 7);
+                }
+                break;
+
+            default:
+                lfo_output = 0;
+                break;
+            }
+
+            /* Store LFO output at slot+7 */
+            voice_page_write(page, slot_base + 7, (uint8_t)lfo_output);
+
+            /* Read envelope output from slot+6 (may be updated by envelope logic) */
+            env_output = voice_page_read(page, slot_base + 6);
+
+            /* Check envelope control at slot+12 for envelope processing */
+            uint8_t env_ctrl = voice_page_read(page, slot_base + 12);
+
+            /* Simple envelope advance: if env_ctrl non-zero, process envelope */
+            if (env_ctrl != 0) {
+                /* Read target level from slot+13 */
+                uint8_t target = voice_page_read(page, slot_base + 13);
+                uint8_t env_rate = voice_page_read(page, slot_base + 14);
+
+                /* Simple linear envelope toward target */
+                if (env_output < target) {
+                    uint8_t step = (env_rate > 0) ? env_rate : 1;
+                    if (env_output + step >= target) {
+                        env_output = target;
+                    } else {
+                        env_output += step;
+                    }
+                } else if (env_output > target) {
+                    uint8_t step = (env_rate > 0) ? env_rate : 1;
+                    if (env_output < step || env_output - step <= target) {
+                        env_output = target;
+                    } else {
+                        env_output -= step;
+                    }
+                }
+
+                /* Store updated envelope output */
+                voice_page_write(page, slot_base + 6, env_output);
+            }
+        }
+
+        /*====================================================================
+         * PART 2: D-RAM Slot Modulation
+         *
+         * Iterates through slot mapping at page+0x70 area.
+         * For each active D-RAM slot, reads mod type and dispatches.
+         *
+         * Slot mapping: page[0x70+i] contains D-RAM slot index (0x0F = inactive)
+         * Mod state: page[0x80 + slot*8] contains dispatch type
+         *====================================================================*/
+
+        /* Iterate through slot mapping entries (up to 16) */
+        for (uint8_t i = 0; i < 16; i++) {
+            slot_index = voice_page_read(page, 0x70 + i);
+
+            /* Check if slot is active (0xFF or 0x0F = inactive) */
+            if (slot_index == 0xFF || slot_index == 0x0F) {
+                continue;
+            }
+
+            /* Calculate mod state block address: 0x80 + (slot_index & 0x0F) * 8 */
+            uint8_t mod_state_offset = 0x80 + ((slot_index & 0x0F) * 8);
+            g_intmem.voice_slot_base = mod_state_offset;
+
+            /* Read mod type from first byte of mod state block */
+            mod_type = voice_page_read(page, mod_state_offset);
+
+            /* Calculate D-RAM address for this slot */
+            g_intmem.dram_address_counter = (swap_nibbles(page) & 0xF0) | (slot_index & 0x0F);
+
+            /* Dispatch based on mod type */
+            if ((mod_type & 0x38) == 0x10) {
+                /* Type 0x10: Amplitude update */
+                /* Read envelope output from corresponding LFO block */
+                uint8_t env_block = mod_type & 0x07;  /* Envelope block index */
+                uint8_t env_slot_base = env_block * 0x10;
+                env_output = voice_page_read(page, env_slot_base + 6);
+                uint8_t gate_flags = voice_page_read(page, env_slot_base + 12);
+
+                dram_slot_amplitude_update(env_output, gate_flags);
+            }
+            else if (mod_type & 0x80) {
+                /* Bit 7 set: Portamento update */
+                dram_slot_portamento_update();
+            }
+            else if ((mod_type & 0x38) == 0x38) {
+                /* Type 0x38: Skip */
+                continue;
+            }
+            else {
+                /* Other types: Pitch modulation */
+                /* Get modulation value from global LFO or per-voice LFO */
+                uint8_t mod_block = (mod_type >> 4) & 0x07;
+
+                int8_t mod_lo, mod_hi;
+                if (mod_block == 0) {
+                    /* Use global mod LFO */
+                    mod_lo = (int8_t)g_extmem.mod_lfo_output;
+                    mod_hi = (mod_lo < 0) ? -1 : 0;  /* Sign extend */
+                } else {
+                    /* Use per-voice LFO block output */
+                    uint8_t lfo_slot_base = (mod_block - 1) * 0x10;
+                    mod_lo = (int8_t)voice_page_read(page, lfo_slot_base + 7);
+                    mod_hi = (mod_lo < 0) ? -1 : 0;  /* Sign extend */
+                }
+
+                /* Apply mod sensitivity from mod state block */
+                uint8_t mod_sens = voice_page_read(page, mod_state_offset + 4);
+                if (mod_sens > 0) {
+                    /* Scale modulation by sensitivity */
+                    int16_t scaled = ((int16_t)mod_lo * mod_sens) >> 7;
+                    mod_lo = (int8_t)(scaled & 0xFF);
+                    mod_hi = (int8_t)(scaled >> 8);
+                }
+
+                modulation_write_dram(mod_lo, mod_hi, mod_type);
+            }
+        }
+
+        /* Check voice status for release completion */
+        uint8_t status = voice_page_read(page, VOICE_PAGE_STATUS);
+        uint8_t next_page = voice_list_next(page);
+
+        if ((status & VOICE_STATUS_RELEASE) && !(status & VOICE_STATUS_ACTIVE)) {
+            /* Voice has completed release - free it */
+            g_intmem.voice_page_num = page;
+            voice_free();
+        }
+
+        /* Move to next voice */
+        page = next_page;
+    }
 }

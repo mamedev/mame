@@ -359,7 +359,7 @@ portamento. Package E would add proper volume envelopes.
 | D: Portamento | ✅ COMPLETE | test_portamento_update | dram_slot_portamento_update in sam_dram_config.c |
 | E: Amplitude | ✅ COMPLETE | test_apply_mod_depth, test_amplitude_update | SIMPLIFIED - see shortcuts below |
 | F: Voice Init | ✅ COMPLETE | test_voice_init_copy_and_envelope | SIMPLIFIED - see shortcuts below |
-| G: Orchestrator | ⏳ PENDING | | periodic_voice_update final assembly |
+| G: Orchestrator | ✅ COMPLETE | test_periodic_voice_update | periodic_voice_update in sam_voice.c - SIMPLIFIED, see shortcuts below |
 
 ### Package E Shortcuts (requires follow-up for full fidelity)
 
@@ -386,3 +386,25 @@ portamento. Package E would add proper volume envelopes.
 **voice_init_next_slot (AB40):**
 - Uses existing dram_config_advance_and_dispatch (already ported)
 - Mutual recursion eliminated by calling voice_init_next_slot at end
+
+### Package G Shortcuts (requires follow-up for full fidelity)
+
+**periodic_voice_update (9BA7):**
+- Envelope segment processing: Simplified linear envelope advance.
+  Original scans ROM-based envelope tables with 3-byte segments.
+  Affects: Complex envelope shapes (multi-segment ADSR).
+
+- LFO waveforms 5,6,7: Treated as sine. Original may have variants.
+  Affects: Alternative LFO shapes.
+
+- D-RAM slot mapping: Simplified iteration (0x70-0x7F).
+  Original has more complex slot lookup with voice state checks.
+  Affects: Multi-slot voice configurations.
+
+- Mod source selection: Uses mod_block from dispatch byte directly.
+  Original has more complex source routing (global LFO vs per-voice).
+  Affects: Per-voice modulation routing.
+
+- Voice release detection: Checks RELEASE flag without ACTIVE.
+  Original has more nuanced envelope completion detection.
+  Affects: Voice release timing.

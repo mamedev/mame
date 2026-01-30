@@ -298,3 +298,50 @@ static inline void voice_page_write(uint8_t page, uint8_t offset, uint8_t value)
  * @param rom  Pointer to test ROM buffer, or NULL
  */
 void voice_set_test_rom(uint8_t *rom);
+
+/*============================================================================
+ * Periodic Update
+ *============================================================================*/
+
+/**
+ * Periodic voice update (CODE:9BA7)
+ *
+ * Called every timer tick to update all active voices.
+ * This is the main orchestrator for:
+ *
+ * PART 1: LFO/Envelope Block Processing (7 blocks × 16 bytes)
+ *   - Iterates voice_slot_base from 0x00 to 0x60 (step 0x10)
+ *   - Each 16-byte block is an LFO/envelope generator
+ *   - LFO waveform computation based on type:
+ *     - 0,5,6,7: Sine (table lookup)
+ *     - 1: Ramp (identity)
+ *     - 2: Inverted ramp
+ *     - 3: Square
+ *     - 4: Noise (LFSR)
+ *   - Envelope segment processing
+ *
+ * PART 2: D-RAM Slot Modulation (page+0x70..0xFF)
+ *   - Iterates through slot mapping at page+0x70 area
+ *   - Dispatches based on mod type:
+ *     - 0x10: amplitude → dram_slot_amplitude_update
+ *     - bit7: portamento → dram_slot_portamento_update
+ *     - 0x38: skip
+ *     - other: pitch mod → modulation_write_dram
+ *
+ * ⚠️ PORTING SHORTCUTS - TODO for full fidelity:
+ * --------------------------------------------
+ * 1. Envelope segment processing: Simplified envelope advance logic.
+ *    Original scans ROM-based envelope tables with 3-byte segments.
+ *    Affects: Complex envelope shapes (multi-segment ADSR).
+ *
+ * 2. LFO waveforms 5,6,7: Treated as sine. Original may have variants.
+ *    Affects: Alternative LFO shapes.
+ *
+ * 3. Voice free integration: voice_free() called but voice list
+ *    iteration may not exactly match firmware.
+ *    Affects: Voice release timing.
+ *
+ * 4. Global LFO integration: Calls global_mod_lfo_update separately.
+ *    Original may interleave differently.
+ */
+void periodic_voice_update(void);

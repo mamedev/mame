@@ -614,15 +614,15 @@ This is the core of note-on/off handling. Must be done before Program Change wor
 - [x] Port `voice_slot_allocate` (A9CF) - allocate from free list - `voice_slot_allocate()` in sam_voice.c
   - Returns page number, updates free list head (0x53)
   - Returns 0xFF if no free pages
-- [ ] Port `voice_init_next_slot` (AB40) - advance D-RAM word, dispatch
+- [x] Port `voice_init_next_slot` (AB40) - advance D-RAM word, dispatch - `voice_init_next_slot()` in sam_voice.c
   - Reads dispatch byte from voice data stream
   - Calls appropriate handler based on bits 5:3
 - [x] Port `dram_config_dispatch` (AB4C) - dispatch loop - `dram_config_dispatch()` in sam_dram_config.c
   - Loops through D-RAM words calling handlers
   - Terminates on bit 7 set or handler 0x20
-- [ ] Port `voice_init_copy_and_envelope` (AB73) - envelope setup
+- [x] Port `voice_init_copy_and_envelope` (AB73) - envelope setup - `voice_init_copy_and_envelope()` in sam_voice.c
   - Copies 7-byte envelope data to voice slot
-  - Processes envelope table pointer
+  - Processes envelope table pointer (SIMPLIFIED - see WIP_phase5_7_analysis.md)
 
 **Note Off path (CODE:A69C):**
 - [x] Port `voice_deactivate` (A69C) - mark voice for release - `voice_deactivate()` in sam_voice.c
@@ -670,18 +670,19 @@ These decode the voice init data stream and write to SAM D-RAM.
 Called periodically from Timer 1 ISR via main loop.
 
 **Tasks:**
-- [ ] Port `periodic_voice_update` (9BA7) - main periodic handler
+- [x] Port `periodic_voice_update` (9BA7) - main periodic handler - `periodic_voice_update()` in sam_voice.c
   - Called every ~11ms when tick counter >= 2
   - Iterates active voice list
   - Updates envelopes and modulation
-- [ ] Port `envelope_tick_volume` (A403) - advance envelope state
-  - Reads envelope segment table
+  - SIMPLIFIED - see WIP_phase5_7_analysis.md for shortcuts taken
+- [x] Port `envelope_tick_volume` (A403) - advance envelope state - integrated into `periodic_voice_update()`
+  - Reads envelope segment table (SIMPLIFIED - linear envelope)
   - Updates envelope phase and level
-- [ ] Port `envelope_write_dram` (A471) - write envelope to SAM
-- [ ] Port `modulation_write_dram` (9FCD) - LFO/mod wheel to D-RAM
-- [ ] Port `volume_envelope_update` (A18F) - volume envelope processing
-- [ ] Port LFO update - mod_lfo_rate (0x1180) → output (0x1183)
-- [ ] Port noise LFO - LFSR at 0x51 (x = x*3 + 0x43)
+- [x] Port `envelope_write_dram` (A471) - write envelope to SAM - `dram_slot_amplitude_update()` in sam_dram_config.c
+- [x] Port `modulation_write_dram` (9FCD) - LFO/mod wheel to D-RAM - `modulation_write_dram()` in sam_dram_config.c
+- [x] Port `volume_envelope_update` (A18F) - volume envelope processing - `dram_slot_amplitude_update()` in sam_dram_config.c
+- [x] Port LFO update - mod_lfo_rate (0x1180) → output (0x1183) - `global_mod_lfo_update()` in sam_lfo.c
+- [x] Port noise LFO - LFSR at 0x51 (x = x*3 + 0x43) - `noise_lfsr_next()` in sam_lfo.h
 
 ### Phase 8: Main Loop and Timer
 
