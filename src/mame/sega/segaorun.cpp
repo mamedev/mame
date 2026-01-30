@@ -300,18 +300,7 @@ Notes:
 
 #include "outrun.lh"
 
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-const auto MASTER_CLOCK = XTAL(40'000'000);
-const auto SOUND_CLOCK = XTAL(16'000'000);
-const auto MASTER_CLOCK_25MHz = XTAL(25'174'800);
-
 namespace {
-
-// ======================> segaorun_state
 
 class segaorun_state : public sega_16bit_common_base
 {
@@ -1502,14 +1491,14 @@ GFXDECODE_END
 void segaorun_state::outrun_base(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, MASTER_CLOCK/4);
+	M68000(config, m_maincpu, 40_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 
-	M68000(config, m_subcpu, MASTER_CLOCK/4);
+	M68000(config, m_subcpu, 40_MHz_XTAL / 4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sub_map);
 
-	Z80(config, m_soundcpu, SOUND_CLOCK/4);
+	Z80(config, m_soundcpu, 16_MHz_XTAL / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segaorun_state::sound_portmap);
 
@@ -1525,10 +1514,10 @@ void segaorun_state::outrun_base(machine_config &config)
 	m_i8255->in_pc_callback().set(FUNC(segaorun_state::unknown_portc_r));
 	m_i8255->out_pc_callback().set(FUNC(segaorun_state::video_control_w));
 
-	ADC0804(config, m_adc, MASTER_CLOCK_25MHz/4/6);
+	ADC0804(config, m_adc, 25.1748_MHz_XTAL / 4 / 6);
 	m_adc->vin_callback().set(FUNC(segaorun_state::analog_r));
 
-	SEGA_315_5195_MEM_MAPPER(config, m_mapper, MASTER_CLOCK/4, m_maincpu);
+	SEGA_315_5195_MEM_MAPPER(config, m_mapper, 40_MHz_XTAL / 4, m_maincpu);
 	m_mapper->set_mapper(FUNC(segaorun_state::memory_mapper));
 	m_mapper->pbf().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
@@ -1537,7 +1526,7 @@ void segaorun_state::outrun_base(machine_config &config)
 	PALETTE(config, m_palette).set_entries(4096*2);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_raw(25.1748_MHz_XTAL / 4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segaorun_state::screen_update_outrun));
 	m_screen->set_palette(m_palette);
 
@@ -1547,11 +1536,11 @@ void segaorun_state::outrun_base(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/4));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4));
 	ymsnd.add_route(0, "speaker", 0.30, 0);
 	ymsnd.add_route(1, "speaker", 0.30, 1);
 
-	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/4));
+	segapcm_device &pcm(SEGAPCM(config, "pcm", 16_MHz_XTAL / 4));
 	pcm.set_bank(segapcm_device::BANK_512);
 	pcm.add_route(0, "speaker", 0.70, 0);
 	pcm.add_route(1, "speaker", 0.70, 1);
@@ -1586,7 +1575,7 @@ void segaorun_state::outrun_fd1094(machine_config &config)
 	outrun(config);
 
 	// basic machine hardware
-	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	FD1094(config.replace(), m_maincpu, 40_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segaorun_state::decrypted_opcodes_map);
 	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
@@ -1597,7 +1586,7 @@ void segaorun_state::outrun_fd1089a(machine_config &config)
 	outrun(config);
 
 	// basic machine hardware
-	FD1089A(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	FD1089A(config.replace(), m_maincpu, 40_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
@@ -1617,7 +1606,7 @@ void segaorun_state::shangon(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_raw(25.1748_MHz_XTAL / 4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segaorun_state::screen_update_shangon));
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
@@ -1628,7 +1617,7 @@ void segaorun_state::shangon_fd1089b(machine_config &config)
 	shangon(config);
 
 	// basic machine hardware
-	FD1089B(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	FD1089B(config.replace(), m_maincpu, 40_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
