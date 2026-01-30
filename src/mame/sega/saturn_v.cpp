@@ -6769,24 +6769,24 @@ void saturn_state::vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cli
 //      if(VDP2_SCXDN0 || VDP2_SCXDN1 || VDP2_SCYDN0 || VDP2_SCYDN1)
 //          popmessage("Fractional part scrolling write");
 
-		/* Pukunpa */
+		/* pukunpa */
 		//if(VDP2_SPWINEN)
 		//  popmessage("Sprite Window enabled");
 
-		/* Capcom Collection Dai 2 - Choh Makaimura (Duh!) */
+		/* capgen2 - Choh Makaimura (obviously) */
 		if(VDP2_MZCTL & 0x1f && POPMESSAGE_DEBUG)
 			popmessage("Mosaic control enabled = %04x\n",VDP2_MZCTL);
 
-		/* Bio Hazard bit 1 */
-		/* Airs Adventure 0x3e */
-		/* Bakuretsu Hunter */
+		/* revil/biohaz bit 1 */
+		/* airsadve 0x3e */
+		/* bakhunt */
 		if(VDP2_LNCLEN & ~2 && POPMESSAGE_DEBUG)
 			popmessage("Line Colour screen enabled %04x %08x",VDP2_LNCLEN,VDP2_LCTAU<<16|VDP2_LCTAL);
 
-		/* Bio Hazard 0x400 = extended color calculation enabled */
-		/* Advanced World War 0x200 = color calculation ratio mode */
-		/* Whizz = 0x8100 */
-		/* Dark Saviour = 0x9051 on save select screen (the one with a Saturn in the background) */
+		/* revil/biohaz 0x400 = extended color calculation enabled */
+		/* aww 0x200 = color calculation ratio mode */
+		/* whizz/whizzj = 0x8100 */
+		/* darksavu = 0x9051 on save select screen (the one with a Saturn in the background) */
 		if(VDP2_CCCR & 0x6000)
 			popmessage("Gradation enabled %04x",VDP2_CCCR);
 
@@ -6794,49 +6794,49 @@ void saturn_state::vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cli
 		if(VDP2_SFCCMD && POPMESSAGE_DEBUG)
 			popmessage("Special Color Calculation enable %04x",VDP2_SFCCMD);
 
-		/* Cleopatra Fortune Transparent Shadow */
-		/* Pretty Fighter X Back & Transparent Shadow*/
+		/* cleopatr Transparent Shadow */
+		/* prettyx Back & Transparent Shadow*/
 		//if(VDP2_SDCTL & 0x0120)
 		//  popmessage("%s shadow select bit enabled",VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
 
-		/* Langrisser III bit 3 normal, bit 1 during battle field */
-		/* Metal Slug bit 0 during gameplay */
-		/* Bug! Sega Away Logo onward 0x470 */
-		/* Command & Conquer 0x0004 0xc000 */
+		/* lengris3 bit 3 normal, bit 1 during battle field */
+		/* mslug bit 0 during gameplay */
+		/* bugu Sega Away Logo onward 0x470 */
+		/* cncu 0x0004 0xc000 */
 		if(VDP2_SFSEL & ~0x47f)
 			popmessage("Special Function Code Select enable %04x %04x",VDP2_SFSEL,VDP2_SFCODE);
 
-		/* Albert Odyssey Gaiden 0x0001 */
-		/* Asuka 120% 0x0101 */
-		/* Slam n Jam 96 0x0003 */
+		/* albodys 0x0001 */
+		/* asuka120 0x0101 */
+		/* slamnjamu 0x0003 */
 		if(VDP2_ZMCTL & 0x0200)
 			popmessage("Reduction enable %04x",VDP2_ZMCTL);
 
-		/* Burning Rangers and friends FMV, J.League Pro Soccer Club Wo Tsukurou!! backgrounds */
+		/* burningru based FMVs, jltsuk backgrounds */
 		if(VDP2_SCRCTL & 0x0101 && POPMESSAGE_DEBUG)
 			popmessage("Vertical cell scroll enable %04x",VDP2_SCRCTL);
 
-		/* Magical Drop III 0x200 -> color calculation window */
-		/* Ide Yousuke Meijin No Shin Jissen Mahjong 0x0303 */
-		/* Decathlete 0x088 */
-		/* Sexy Parodius 0x2300 */
+		/* magdrop3 0x200 -> color calculation window */
+		/* ideyusmj 0x0303 */
+		/* decathlt 0x088 */
+		/* sexyparo 0x2300 */
 //      if(VDP2_WCTLD & 0x2000)
 //          popmessage("Special window enabled %04x",VDP2_WCTLD);
 
-		/* Shining Force III, After Burner 2 (doesn't make a proper use tho?) */
-		/* Layer Section */
+		/* shinfrc3u, aburner2 (doesn't make a proper use tho?) */
+		/* layersec */
 		//if(VDP2_W0LWE || VDP2_W1LWE)
 		//  popmessage("Line Window %s %08x enabled",VDP2_W0LWE ? "0" : "1",VDP2_W0LWTA);
 
-		/* Akumajou Dracula, bits 2-4 */
-		/* Arcana Strikes bit 5 */
-		/* Choh Makai Mura 0x0055 */
-		/* Sega Rally 0x0155 */
-		/* Find Love  0x4400 */
-		/* Dragon Ball Z 0x3800 - 0x2c00 */
-		/* Assault Suit Leynos 2 0x0200*/
-		/* Bug! 0x8800 */
-		/* Wonder 3 0x0018 */
+		/* draculax bits 2-4 */
+		/* acstrike bit 5 */
+		/* capgen2 - Choh Makaimura 0x0055 */
+		/* srallycu 0x0155 */
+		/* findlove 0x4400 */
+		/* dbzsbuto 0x3800 - 0x2c00 */
+		/* leynos2 0x0200*/
+		/* bugu 0x8800 */
+		/* wonder3 0x0018 */
 		if(VDP2_SFPRMD & ~0xff7f)
 			popmessage("Special Priority Mode enabled %04x",VDP2_SFPRMD);
 	}
@@ -8327,7 +8327,7 @@ void saturn_state::vdp2_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 
 	if(VDP2_VRAMSZ)
-		printf("VDP2 sets up 8 Mbit VRAM!\n");
+		logerror("VDP2 sets up 8 Mbit VRAM!\n");
 }
 
 int saturn_state::get_hblank_duration()

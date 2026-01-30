@@ -169,6 +169,7 @@ private:
 	uint8_t status_type;
 	uint16_t hirqmask, hirqreg;
 	uint16_t cd_stat;
+	uint16_t cd_next_stat;
 	uint32_t cd_curfad;// = 0;
 	uint32_t cd_fad_seek;
 	uint32_t fadstoplay;// = 0;
@@ -192,6 +193,8 @@ private:
 	required_device<timer_device> m_sector_timer;
 	required_device<timer_device> m_sh1_timer;
 	required_device<cdda_device> m_cdda;
+
+	void cd_change_status(u16 new_status);
 
 	// CDC commands
 	// 0x00

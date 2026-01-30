@@ -173,8 +173,8 @@ void stvcd_device::device_reset()
 {
 	int32_t i, j;
 
-	hirqmask = 0xffff;
-	hirqreg = 0xffff;
+	hirqmask = 0;
+	hirqreg = 0;
 	cr1 = 'C';
 	cr2 = ('D'<<8) | 'B';
 	cr3 = ('L'<<8) | 'O';
@@ -222,12 +222,16 @@ void stvcd_device::device_reset()
 	{
 		LOG("Opened CD-ROM successfully, reading root directory\n");
 		read_new_dir(0xffffff);    // read root directory
+		cd_curfad = 150;
+		fadstoplay = 0;
 	}
 	else
 	{
 		cd_stat = CD_STAT_NODISC;
 	}
 
+	in_buffer = 0;
+	buffull = 0;
 	cd_speed = 2;
 	cdda_repeat_count = 0;
 	tray_is_closed = 1;
@@ -297,7 +301,10 @@ void stvcd_device::datatrns_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 inline u32 stvcd_device::dataxfer_long_r()
 {
-	uint32_t rv = 0;
+	uint32_t rv = 0xffff'ffff;
+
+	if (machine().side_effects_disabled())
+		return rv;
 
 	switch (xfertype32)
 	{
@@ -351,8 +358,8 @@ inline u32 stvcd_device::dataxfer_long_r()
 			break;
 
 		default:
-			LOGWARN("CD: unhandled 32-bit transfer type %d\n", (int)xfertype32);
-			break;
+			// punt in particular if SH-2 or SCU DMA try to go overboard ...
+			throw emu_fatalerror("CD: attempting to read 32-bit data port with invalid transfer mode %d", (int)xfertype32);
 	}
 
 	return rv;
@@ -642,6 +649,12 @@ void stvcd_device::mpeg_standard_return(uint16_t cur_status)
 	cr4 = 0x1000; // video status
 }
 
+void stvcd_device::cd_change_status(u16 new_status)
+{
+	cd_stat = CD_STAT_BUSY;
+	cd_next_stat = new_status;
+}
+
 /*
  * CDC commands
  */
@@ -678,7 +691,7 @@ void stvcd_device::cmd_get_toc()
 {
 	LOGCMD("%s: Get TOC\n", machine().describe_context());
 	cd_readTOC();
-	cd_stat = CD_STAT_TRANS|CD_STAT_PAUSE;
+	cd_stat = CD_STAT_TRANS | CD_STAT_PAUSE;
 	cr1 = cd_stat;
 	cr2 = 102*2;    // TOC length in words (102 entries @ 2 words/4bytes each)
 	cr3 = 0;
@@ -700,7 +713,7 @@ void stvcd_device::cmd_get_session_info()
 	switch (cr1 & 0xff)
 	{
 		case 0: // get total session info / disc end
-			cd_stat = CD_STAT_PAUSE;
+			cd_change_status(CD_STAT_PAUSE);
 			cr1 = cd_stat;
 			cr2 = 0;
 			cr3 = 0x0100 | tocbuf[(101*4)+1];
@@ -708,7 +721,7 @@ void stvcd_device::cmd_get_session_info()
 			break;
 
 		case 1: // get total session info / disc start
-			cd_stat = CD_STAT_PAUSE;
+			cd_change_status(CD_STAT_PAUSE);
 			cr1 = cd_stat;
 			cr2 = 0;
 			cr3 = 0x0100;   // sessions in high byte, session start in lower
@@ -743,7 +756,7 @@ void stvcd_device::cmd_init_cdsystem()
 	{
 		if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 		{
-			cd_stat = CD_STAT_PAUSE;
+			cd_change_status(CD_STAT_PAUSE);
 			cd_curfad = 150;
 			//cur_track = 1;
 			fadstoplay = 0;
@@ -864,7 +877,7 @@ void stvcd_device::cmd_play_disc()
 	uint8_t play_mode;
 
 	LOGCMD("%s: Play Disc\n",   machine().describe_context());
-	cd_stat = CD_STAT_PLAY;
+	cd_change_status(CD_STAT_PLAY);
 
 	play_mode = (cr3 >> 8) & 0x7f;
 
@@ -888,7 +901,7 @@ void stvcd_device::cmd_play_disc()
 			{
 				cur_track = (start_pos)>>8;
 				cd_fad_seek = m_cdrom_image->get_track_start(cur_track-1);
-				cd_stat = CD_STAT_SEEK;
+				cd_change_status(CD_STAT_SEEK);
 				m_cdda->pause_audio(0);
 			}
 			else
@@ -994,7 +1007,7 @@ void stvcd_device::cmd_seek_disc()
 
 		if (temp == 0xffffff)
 		{
-			cd_stat = CD_STAT_PAUSE;
+			cd_change_status(CD_STAT_PAUSE);
 			m_cdda->pause_audio(1);
 		}
 		else
@@ -1008,7 +1021,7 @@ void stvcd_device::cmd_seek_disc()
 		// is it a valid track?
 		if (cr2 >> 8)
 		{
-			cd_stat = CD_STAT_PAUSE;
+			cd_change_status(CD_STAT_PAUSE);
 			cur_track = cr2>>8;
 			cd_curfad = m_cdrom_image->get_track_start(cur_track-1);
 			m_cdda->pause_audio(1);
@@ -1016,7 +1029,7 @@ void stvcd_device::cmd_seek_disc()
 		}
 		else // error!
 		{
-			cd_stat = CD_STAT_STANDBY;
+			cd_change_status(CD_STAT_STANDBY);
 			cd_curfad = 0xffffffff;
 			cur_track = 0xff;
 			m_cdda->stop_audio(); //stop any pending CD-DA
@@ -1641,7 +1654,7 @@ void stvcd_device::cmd_get_and_delete_sector_data()
 		return;
 	}
 
-	/* Yoshimoto Mahjong uses the REJECT status to verify when the data is ready. */
+	/* yoshimj uses the REJECT status to verify when the data is ready. */
 	// TODO: verify again if it's really REJECT or something else
 	if (partitions[bufnum].numblks < sectnum)
 	{
@@ -1669,8 +1682,7 @@ void stvcd_device::cmd_get_and_delete_sector_data()
 
 void stvcd_device::cmd_put_sector_data()
 {
-	// put sector data
-	/* After Burner 2, Out Run, Fantasy Zone and Dungeon Master Nexus trips this */
+	// aburner2, outrun, fantzone and dmastnx needs this
 
 	uint32_t sectnum = cr4 & 0xff;
 	uint32_t sectofs = cr2;
@@ -1716,8 +1728,7 @@ void stvcd_device::cmd_move_sector_data()
 
 void stvcd_device::cmd_copy_sector_data()
 {
-	// copy sector data
-	/* Sword & Sorcery / Riglord Saga 2 uses this */
+	// swordsor and riglord2 uses this
 	// TODO: incomplete
 	uint32_t src_filter = (cr3>>8)&0xff;
 	uint32_t dst_filter = cr1&0xff;
@@ -1821,6 +1832,7 @@ void stvcd_device::cmd_get_target_file_info()
 	LOGCMD("%s: Get File Info\n",   machine().describe_context());
 	cd_stat |= CD_STAT_TRANS;
 	cd_stat &= 0xff00;      // clear top byte of return value
+
 	playtype = 0;
 	cdda_repeat_count = 0;
 	hirqreg |= (CMOK|DRDY);
@@ -1853,8 +1865,6 @@ void stvcd_device::cmd_get_target_file_info()
 		cr3 = 0;
 		cr4 = 0;
 
-		// TODO: chaossd and sengblad does this
-		// (iso9660 parsing doesn't read beyond the first sector)
 		if (curdir[temp].firstfad == 0 || curdir[temp].length == 0)
 			throw emu_fatalerror("File ID not found in XFERTYPE_FILEINFO_1");
 //      LOGWARN("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
@@ -1886,7 +1896,7 @@ void stvcd_device::cmd_read_file()
 	file_id = ((cr3 & 0xff) << 16)|(cr4);
 	file_size = ((curdir[file_id].length + sectlenin - 1) / sectlenin) - file_offset;
 
-	cd_stat = CD_STAT_PLAY|0x80;    // set "cd-rom" bit
+	cd_change_status(CD_STAT_PLAY | 0x80);  // set "cd-rom" bit
 	cd_curfad = (curdir[file_id].firstfad + file_offset);
 	fadstoplay = file_size;
 	if(file_filter < MAX_FILTERS)
@@ -1916,7 +1926,8 @@ void stvcd_device::cmd_abort_file()
 	xfertype32 = XFERTYPE32_INVALID;
 	xferdnum = 0;
 	if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-		cd_stat = CD_STAT_PAUSE;    // force to pause
+		cd_change_status(CD_STAT_PAUSE); // force to pause
+
 	cr_standard_return(cd_stat);
 	status_type = 0;
 }
@@ -1926,7 +1937,7 @@ void stvcd_device::cmd_check_copy_protection()
 	// appears to be copy protection check.  needs only to return OK.
 	LOGCMD("%s: Verify copy protection\n",   machine().describe_context());
 	if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-		cd_stat = CD_STAT_PAUSE;
+		cd_change_status(CD_STAT_PAUSE);
 
 //   cr1 = cd_stat;  // necessary to pass
 //   cr2 = 0x4;
@@ -1949,7 +1960,8 @@ void stvcd_device::cmd_get_disc_region()
 	// get disc region
 	LOGCMD("%s: Get disc region\n",   machine().describe_context());
 	if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
-		cd_stat = CD_STAT_PAUSE;
+		cd_change_status(CD_STAT_PAUSE);
+
 	cr1 = cd_stat;  // necessary to pass
 	if(cr2 == 0x0001) // MPEG card
 		cr2 = 0x2;
@@ -2743,95 +2755,106 @@ stvcd_device::partitionT *stvcd_device::cd_read_filtered_sector(int32_t fad, uin
 // loads in data set up by a CD-block PLAY command
 void stvcd_device::cd_playdata()
 {
-	if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
-	{
-		int32_t fad_diff;
-		LOGSEEK("PRE %08x %08x %08x %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad);
-
-		fad_diff = (cd_fad_seek - cd_curfad);
-
-		/* Zero Divide wants this TODO: timings. */
-		if(fad_diff > (750*cd_speed))
-		{
-			LOGSEEK("PRE FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad,750*cd_speed);
-			cd_curfad += (750*cd_speed);
-			LOGSEEK("POST FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, 750*cd_speed);
-		}
-		else if(fad_diff < (-750*cd_speed))
-		{
-			LOGSEEK("PRE REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
-			cd_curfad -= (750*cd_speed);
-			LOGSEEK("POST REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
-		}
-		else
-		{
-			LOGSEEK("Ready\n");
-			cd_curfad = cd_fad_seek;
-			cd_stat = CD_STAT_PLAY;
-		}
-
-		return;
-	}
-
 	if (LIVE_CD_VIEW)
-		popmessage("%04x %d %d", cd_stat, cd_curfad, fadstoplay);
+		popmessage("%04x %d %d (%d)", cd_stat, cd_curfad, fadstoplay, buffull);
 
-	if ((cd_stat & 0x0f00) == CD_STAT_PLAY)
+	switch(cd_stat & 0x0f00)
 	{
-		if (fadstoplay)
+		case CD_STAT_BUSY:
 		{
-			LOGXFER("STVCD: Reading FAD %d\n", cd_curfad);
+			// accept the previously chained command
+			// amagishi wants this at startup
+			cd_stat = cd_next_stat;
+			break;
+		}
+		case CD_STAT_SEEK:
+		{
+			int32_t fad_diff;
+			LOGSEEK("PRE %08x %08x %08x %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad);
 
-			if (m_cdrom_image->exists())
+			fad_diff = (cd_fad_seek - cd_curfad);
+
+			/* Zero Divide wants this TODO: timings. */
+			if(fad_diff > (750*cd_speed))
 			{
-				uint8_t p_ok;
+				LOGSEEK("PRE FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad,750*cd_speed);
+				cd_curfad += (750*cd_speed);
+				LOGSEEK("POST FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, 750*cd_speed);
+			}
+			else if(fad_diff < (-750*cd_speed))
+			{
+				LOGSEEK("PRE REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
+				cd_curfad -= (750*cd_speed);
+				LOGSEEK("POST REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
+			}
+			else
+			{
+				LOGSEEK("Ready\n");
+				cd_curfad = cd_fad_seek;
+				cd_change_status(CD_STAT_PLAY);
+			}
 
-				if(m_cdrom_image->get_track_type(m_cdrom_image->get_track(cd_curfad)) != cdrom_file::CD_TRACK_AUDIO)
-				{
-					cd_read_filtered_sector(cd_curfad,&p_ok);
-					m_cdda->stop_audio(); //stop any pending CD-DA
-				}
-				else
-				{
-					 // TODO: pinpoint cases when this isn't okay
-					 // (out of bounds disc for example)
-					p_ok = 1;
-					m_cdda->start_audio(cd_curfad, 1);
-				}
+			break;
+		}
+		case CD_STAT_PLAY:
+		{
+			if (fadstoplay)
+			{
+				LOGXFER("STVCD: Reading FAD %d\n", cd_curfad);
 
-				if(p_ok)
+				if (m_cdrom_image->exists())
 				{
-					cd_curfad++;
-					fadstoplay--;
-					hirqreg |= CSCT;
-					sectorstore = 1;
+					uint8_t p_ok;
 
-					if (!fadstoplay)
+					if(m_cdrom_image->get_track_type(m_cdrom_image->get_track(cd_curfad)) != cdrom_file::CD_TRACK_AUDIO)
 					{
-						if(cdda_repeat_count >= cdda_maxrepeat)
+						cd_read_filtered_sector(cd_curfad,&p_ok);
+						m_cdda->stop_audio(); //stop any pending CD-DA
+					}
+					else
+					{
+						// TODO: pinpoint cases when this isn't okay
+						// (out of bounds disc for example)
+						p_ok = 1;
+						m_cdda->start_audio(cd_curfad, 1);
+					}
+
+					if(p_ok)
+					{
+						cd_curfad++;
+						fadstoplay--;
+						hirqreg |= CSCT;
+						sectorstore = 1;
+
+						if (!fadstoplay)
 						{
-							LOG("cd_playdata: playback ended\n");
-							cd_stat = CD_STAT_PAUSE;
-
-							hirqreg |= PEND;
-
-							if (playtype == 1)
+							if(cdda_repeat_count >= cdda_maxrepeat)
 							{
-								LOG("cd_playdata: setting EFLS\n");
-								hirqreg |= EFLS;
-							}
-						}
-						else
-						{
-							if(cdda_repeat_count < 0xe)
-								cdda_repeat_count++;
+								LOG("cd_playdata: playback ended\n");
+								cd_change_status(CD_STAT_PAUSE);
 
-							cd_curfad = m_cdrom_image->get_track_start(cur_track-1) + 150;
-							fadstoplay = m_cdrom_image->get_track_start(cur_track) - cd_curfad;
+								hirqreg |= PEND;
+
+								if (playtype == 1)
+								{
+									LOG("cd_playdata: setting EFLS\n");
+									hirqreg |= EFLS;
+								}
+							}
+							else
+							{
+								if(cdda_repeat_count < 0xe)
+									cdda_repeat_count++;
+
+								cd_curfad = m_cdrom_image->get_track_start(cur_track-1) + 150;
+								fadstoplay = m_cdrom_image->get_track_start(cur_track) - cd_curfad;
+							}
 						}
 					}
 				}
 			}
+
+			break;
 		}
 	}
 }
@@ -2851,7 +2874,8 @@ void stvcd_device::set_tray_open()
 		return;
 
 	hirqreg |= DCHG;
-	cd_stat = CD_STAT_OPEN;
+
+	cd_change_status(CD_STAT_OPEN);
 
 	// unmount the existing image, pretend that's what user wants if we are there.
 	m_cdrom_image->unload();
@@ -2873,11 +2897,11 @@ void stvcd_device::set_tray_close()
 	{
 		LOG("Opened CD-ROM successfully, reading root directory\n");
 		//read_new_dir(0xffffff);  // read root directory
-		cd_stat = CD_STAT_PAUSE;
+		cd_change_status(CD_STAT_PAUSE);
 	}
 	else
 	{
-		cd_stat = CD_STAT_NODISC;
+		cd_change_status(CD_STAT_NODISC);
 	}
 
 	cd_speed = 2;

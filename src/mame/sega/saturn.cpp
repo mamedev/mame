@@ -872,9 +872,9 @@ void sat_console_state::saturn(machine_config &config)
 	m_scsp->add_route(0, "speaker", 1.0, 0);
 	m_scsp->add_route(1, "speaker", 1.0, 1);
 
-	stvcd_device &stvcd(STVCD(config, "stvcd", 0));
-	stvcd.add_route(0, "scsp", 1.0, 0);
-	stvcd.add_route(1, "scsp", 1.0, 1);
+	STVCD(config, m_stvcd, 0);
+	m_stvcd->add_route(0, "scsp", 1.0, 0);
+	m_stvcd->add_route(1, "scsp", 1.0, 1);
 
 	SATURN_CONTROL_PORT(config, "ctrl1", saturn_controls, "joypad");
 	SATURN_CONTROL_PORT(config, "ctrl2", saturn_controls, "joypad");
