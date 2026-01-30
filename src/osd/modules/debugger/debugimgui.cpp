@@ -1616,7 +1616,7 @@ void debug_imgui::debugger_update()
 	if(!view_main_disasm || !view_main_regs || !view_main_console || !m_machine || (m_machine->phase() != machine_phase::RUNNING))
 		return;
 
-	if(!m_machine->debugger().cpu().is_stopped())
+	if(!m_machine->debugger().state().is_stopped())
 	{
 		if(m_take_ui)
 		{
