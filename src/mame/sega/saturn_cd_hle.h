@@ -1,8 +1,8 @@
-// license:LGPL-2.1+
-// copyright-holders:Angelo Salese, R. Belmont
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Angelo Salese
 
-#ifndef MAME_SEGA_STVCD_H
-#define MAME_SEGA_STVCD_H
+#ifndef MAME_SEGA_SATURN_CD_HLE_H
+#define MAME_SEGA_SATURN_CD_HLE_H
 
 #pragma once
 
@@ -11,16 +11,16 @@
 #include "machine/timer.h"
 #include "sound/cdda.h"
 
-class stvcd_device : public device_t,
-					 public device_mixer_interface,
-					 public device_memory_interface
+class saturn_cd_hle_device : public device_t,
+							 public device_mixer_interface,
+							 public device_memory_interface
 {
 	static constexpr unsigned MAX_FILTERS = 24;
 	static constexpr unsigned MAX_BLOCKS = 200;
 	static constexpr uint32_t MAX_DIR_SIZE = 256*1024;
 
 public:
-	stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_cd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint32_t stvcd_r(offs_t offset, uint32_t mem_mask = ~0);
 	void stvcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -278,6 +278,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(STVCD, stvcd_device)
+DECLARE_DEVICE_TYPE(SATURN_CD_HLE, saturn_cd_hle_device)
 
-#endif // MAME_SEGA_STVCD_H
+#endif // MAME_SEGA_SATURN_CD_HLE_H
