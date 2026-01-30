@@ -531,7 +531,10 @@ WEAK_STUB void midi_handle_note(uint8_t channel, uint8_t note, uint8_t velocity)
     g_intmem.sam_ctrl_flags = SAM_CTRL_DRAM_WR;
 
     /* Allocate and initialize voice slots */
+    DEBUG_MIDI("voice_init_slots: prog_ptr=0x%04X slot_count=%d free_list=%d",
+               program_ptr, g_intmem.slot_count, g_intmem.dram_slot_free_list);
     voice_init_slots();
+    DEBUG_MIDI("voice_init_slots done: page=%d", g_intmem.voice_page_num);
 
     /* If allocation succeeded, set up D-RAM configuration */
     if (g_intmem.voice_page_num != VOICE_LIST_END) {
@@ -541,18 +544,30 @@ WEAK_STUB void midi_handle_note(uint8_t channel, uint8_t note, uint8_t velocity)
         voice_page_write(page, 0xF8, note);
 
         /* Set up D-RAM config dispatch parameters */
-        /* Voice init data pointer is at program_base + 10-11 (little-endian) */
-        uint16_t voice_data_ptr = midi_rom_read(program_ptr + 10) |
-                                  ((uint16_t)midi_rom_read(program_ptr + 11) << 8);
+        /* D-RAM stream starts at program_base + 17 (after header and dram_entry0)
+         * Program format:
+         *   0-7:   name (8 bytes)
+         *   8:     null terminator
+         *   9:     flags (slot count in low nibble)
+         *   10-11: A-RAM pointer (LE)
+         *   12-14: D-RAM entry0 (3 bytes)
+         *   15-16: voice init data pointer (LE)
+         *   17+:   D-RAM stream
+         */
+        uint16_t dram_stream_addr = program_ptr + 17;
 
-        g_intmem.rom_data_ptr_lo = (uint8_t)(voice_data_ptr & 0xFF);
-        g_intmem.rom_data_ptr_hi = (uint8_t)(voice_data_ptr >> 8);
+        g_intmem.rom_data_ptr_lo = (uint8_t)(dram_stream_addr & 0xFF);
+        g_intmem.rom_data_ptr_hi = (uint8_t)(dram_stream_addr >> 8);
         g_intmem.voice_slot_base = 0;
         g_intmem.remaining_slots = 16;  /* Process all 16 D-RAM words */
         g_intmem.dram_address_counter = swap_nibbles(page);
 
         /* Run D-RAM config dispatch to initialize voice parameters */
+        DEBUG_MIDI("dram_config_dispatch: stream=0x%04X", dram_stream_addr);
         dram_config_dispatch();
+        DEBUG_MIDI("dram_config_dispatch done");
+    } else {
+        DEBUG_MIDI("voice allocation failed");
     }
 }
 

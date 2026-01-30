@@ -9,6 +9,17 @@
 #include <stddef.h>  /* For NULL */
 
 /*============================================================================
+ * Debug Output
+ *============================================================================*/
+
+#ifdef SAM_HW_PLATFORM
+#include <stdio.h>
+#define DEBUG_DRAM(fmt, ...) do { printf("DRAM: " fmt "\n", ##__VA_ARGS__); fflush(stdout); } while(0)
+#else
+#define DEBUG_DRAM(fmt, ...) do { } while(0)
+#endif
+
+/*============================================================================
  * ROM Access Helpers
  *
  * The firmware can access ROM via MOVC (code space) or MOVX (data space).
@@ -76,6 +87,38 @@ void dram_config_write_slot_byte(uint8_t value)
 }
 
 /*============================================================================
+ * Slot Mapping Update (verified against original at CODE:AE49-AE4E)
+ *
+ * Original assembly:
+ *   MOV R1,0x4f          ; R1 = dram_slot_index
+ *   MOV A,0x38           ; A = dram_address_counter
+ *   MOVX @R1,A           ; Write to XDATA at (P2:R1) = voice_page[dram_slot_index]
+ *   INC 0x4f             ; dram_slot_index++
+ *
+ * Called from dram_config_handler_08 when _0_3 flag is not set.
+ * dram_slot_index is initialized to 0x70 in voice_note_init_dram before
+ * calling dram_param_processor.
+ *
+ * Updates the slot mapping at page[dram_slot_index] with the current
+ * D-RAM address counter. This tells periodic_voice_update() which D-RAM
+ * words need modulation processing.
+ *============================================================================*/
+
+void dram_config_update_slot_mapping(void)
+{
+    uint8_t page = g_intmem.voice_page_num;
+    uint8_t dram_addr = g_intmem.dram_address_counter;
+
+    DEBUG_DRAM("slot_map[0x%02X] = 0x%02X", g_intmem.dram_slot_index, dram_addr);
+
+    /* Write D-RAM address to slot mapping (MOVX @R1,A with P2=page) */
+    voice_page_write(page, g_intmem.dram_slot_index, dram_addr);
+
+    /* Increment slot index for next configured word */
+    g_intmem.dram_slot_index++;
+}
+
+/*============================================================================
  * Velocity Scaling (CODE:B1EC)
  *
  * Applies velocity-based attenuation to a value.
@@ -113,10 +156,17 @@ uint8_t dram_config_apply_velocity(uint8_t value, uint8_t sensitivity)
 void dram_config_dispatch(void)
 {
     uint8_t dispatch;
+    int iteration_limit = 100;  /* Safety limit */
 
-    while (g_intmem.remaining_slots > 0) {
+    DEBUG_DRAM("dispatch: stream=0x%04X remaining=%d slot_base=%d",
+               ((uint16_t)g_intmem.rom_data_ptr_hi << 8) | g_intmem.rom_data_ptr_lo,
+               g_intmem.remaining_slots, g_intmem.voice_slot_base);
+
+    while (g_intmem.remaining_slots > 0 && iteration_limit-- > 0) {
         /* Read dispatch byte from stream */
         dispatch = dram_config_peek_stream_byte();
+
+        DEBUG_DRAM("  byte=0x%02X handler=0x%02X", dispatch, dispatch & 0x38);
 
         /* Check terminator bit (bit 7) */
         if (dispatch & 0x80) {

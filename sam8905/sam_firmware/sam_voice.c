@@ -11,6 +11,17 @@
 #include <stddef.h>  /* For NULL */
 
 /*============================================================================
+ * Debug Output
+ *============================================================================*/
+
+#ifdef SAM_HW_PLATFORM
+#include <stdio.h>
+#define DEBUG_VOICE(fmt, ...) do { printf("VOICE: " fmt "\n", ##__VA_ARGS__); fflush(stdout); } while(0)
+#else
+#define DEBUG_VOICE(fmt, ...) do { } while(0)
+#endif
+
+/*============================================================================
  * Linked List Primitives
  *
  * The linked list uses INTMEM addresses 0x7E-0x8D.
@@ -378,6 +389,10 @@ uint8_t voice_slot_allocate(void)
 
     slots_needed = g_intmem.slot_count;
 
+    DEBUG_VOICE("slot_allocate: need=%d avail=%d free_head=%d active_head=0x%02X",
+                slots_needed, g_intmem.dram_slot_count,
+                g_intmem.dram_slot_free_list, g_intmem.active_voice_list_head);
+
 retry:
     /* Check if enough slots available */
     if (slots_needed > g_intmem.dram_slot_count) {
@@ -420,6 +435,9 @@ retry:
 
     /* Update free list head to point past allocated slots */
     g_intmem.dram_slot_free_list = current;
+
+    DEBUG_VOICE("slot_allocate: allocated page=%d, new_active_head=0x%02X",
+                first_allocated, g_intmem.active_voice_list_head);
 
     return first_allocated;
 }
@@ -544,16 +562,23 @@ void voice_init_slots(void)
     /* Get program pointer */
     program_ptr = ((uint16_t)g_intmem.program_base_dph << 8) | g_intmem.program_base_dpl;
 
+    DEBUG_VOICE("init_slots: program_ptr=0x%04X", program_ptr);
+
     /* Read flags byte from program_base + 9 */
     flags_byte = voice_rom_read(program_ptr + 9);
+
+    DEBUG_VOICE("init_slots: flags_byte=0x%02X (rom[0x%04X])", flags_byte, program_ptr + 9);
 
     /* Extract slot count (lower 4 bits) */
     slot_count = flags_byte & 0x0F;
     g_intmem.slot_count = slot_count;
 
     if (slot_count == 0) {
+        DEBUG_VOICE("init_slots: slot_count=0, returning");
         return;  /* No slots to allocate */
     }
+
+    DEBUG_VOICE("init_slots: slot_count=%d, allocating", slot_count);
 
     /* Allocate voice pages from free list */
     first_page = voice_slot_allocate();
@@ -566,7 +591,7 @@ void voice_init_slots(void)
     for (i = 0; i < slot_count && page != VOICE_LIST_END; i++) {
         g_intmem.voice_page_num = page;
 
-        /* Set voice page status (offset 0xFB) = 0x20 */
+        /* Set voice page status (offset 0xFB) = 0x20 (from Ghidra: DAT_EXTMEM_00fb = 0x20) */
         voice_page_write(page, VOICE_PAGE_STATUS, 0x20);
 
         /* Set slot ID (offset 0xFC) = nibble-swapped current_slot_id */
@@ -813,8 +838,13 @@ void periodic_voice_update(void)
     /* Iterate through all active voices */
     page = g_intmem.active_voice_list_head;
 
+    DEBUG_VOICE("periodic_update: active_list_head=0x%02X", page);
+
     while (page != VOICE_LIST_END) {
         g_intmem.voice_page_num = page;
+
+        DEBUG_VOICE("periodic_update: processing page %d, status=0x%02X",
+                    page, voice_page_read(page, VOICE_PAGE_STATUS));
 
         /*====================================================================
          * PART 1: LFO/Envelope Block Processing
@@ -961,6 +991,11 @@ void periodic_voice_update(void)
         /* Iterate through slot mapping entries (up to 16) */
         for (uint8_t i = 0; i < 16; i++) {
             slot_index = voice_page_read(page, 0x70 + i);
+
+            /* Debug: show first few slot mapping entries */
+            if (i < 4) {
+                DEBUG_VOICE("  slot_map[%d]=0x%02X", i, slot_index);
+            }
 
             /* Check if slot is active (0xFF or 0x0F = inactive) */
             if (slot_index == 0xFF || slot_index == 0x0F) {

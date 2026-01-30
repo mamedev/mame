@@ -19,6 +19,10 @@
 #include "sam8905_emu.h"
 #include <string.h>
 #include <math.h>
+#include <stdio.h>
+
+/* Debug logging */
+#define DEBUG_SAM(fmt, ...) do { printf("SAM: " fmt "\n", ##__VA_ARGS__); fflush(stdout); } while(0)
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -376,7 +380,17 @@ void sam8905_write_aram(uint8_t addr, uint16_t inst) {
 
 void sam8905_write_dram(uint8_t addr, uint32_t param) {
     if (g_emu_instance) {
-        g_emu_instance->dram[addr] = param & MASK19;  // 19-bit
+        uint8_t slot = addr >> 4;
+        uint8_t word = addr & 0x0F;
+        param &= MASK19;
+        DEBUG_SAM("DRAM[%d][%d] = 0x%05X (addr=0x%02X)", slot, word, param, addr);
+        g_emu_instance->dram[addr] = param;
+
+        /* Check if slot becomes active (word 15, bit 17 = idle flag) */
+        if (word == 15) {
+            int is_idle = (param & SAM8905_SLOT_IDLE) != 0;
+            DEBUG_SAM("  Slot %d %s (alg=%d)", slot, is_idle ? "IDLE" : "ACTIVE", param & 0x07);
+        }
     }
 }
 

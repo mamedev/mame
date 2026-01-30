@@ -17,11 +17,11 @@ LDFLAGS = -lportaudio -lasound -lm
 EMU_SRCS = main_emu.c sam8905_emu.c audio_portaudio.c midi_alsa_raw.c sam_hw_emu.c sam_rom_emu.c
 
 # Firmware sources (from parent directory)
-FW_SRCS = ../sam_midi.c ../sam_hw.c ../sam_voice.c ../sam_dram_config.c ../sam_init.c ../sam_utils.c
+FW_SRCS = ../sam_midi.c ../sam_hw.c ../sam_voice.c ../sam_dram_config.c ../sam_init.c ../sam_utils.c ../sam_lfo.c
 
 # All sources and objects
 SRCS = $(EMU_SRCS) $(FW_SRCS)
-OBJS = $(EMU_SRCS:.c=.o) sam_midi.o sam_hw.o sam_voice.o sam_dram_config.o sam_init.o sam_utils.o
+OBJS = $(EMU_SRCS:.c=.o) sam_midi.o sam_hw.o sam_voice.o sam_dram_config.o sam_init.o sam_utils.o sam_lfo.o
 
 # Output
 TARGET = sam_emu
@@ -53,6 +53,9 @@ sam_init.o: ../sam_init.c ../sam_firmware.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 sam_utils.o: ../sam_utils.c ../sam_utils.h ../sam_firmware.h
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+sam_lfo.o: ../sam_lfo.c ../sam_lfo.h ../sam_firmware.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:

@@ -129,25 +129,107 @@ static void setup_signals(void)
 }
 
 /*============================================================================
- * Algorithm Setup (simple sinus oscillator)
+ * MS4 Program Loading
+ *
+ * Loads a program from MS4 ROM:
+ * - Program pointer table at 0x0040 (big-endian)
+ * - A-RAM data at program+10 (little-endian pointer to 64 bytes)
+ * - Voice init data at program+13 (little-endian pointer)
  *============================================================================*/
 
-static void setup_sinus_algorithm(void)
+#define MS4_PROGRAM_TABLE   0x0040
+#define MS4_NUM_PROGRAMS    66
+
+static int load_ms4_program(int program_num)
+{
+    uint16_t ptr_addr, prog_addr, aram_ptr;
+    char name[9];
+    uint8_t flags, slot_count;
+    int i;
+
+    if (!rom_is_loaded()) {
+        fprintf(stderr, "No ROM loaded\n");
+        return -1;
+    }
+
+    if (program_num < 0 || program_num >= MS4_NUM_PROGRAMS) {
+        fprintf(stderr, "Program number must be 0-%d\n", MS4_NUM_PROGRAMS - 1);
+        return -1;
+    }
+
+    /* Read program pointer (big-endian) */
+    ptr_addr = MS4_PROGRAM_TABLE + (program_num * 2);
+    prog_addr = (g_rom[ptr_addr] << 8) | g_rom[ptr_addr + 1];
+
+    if (prog_addr == 0xFFFF || prog_addr >= 0x10000) {
+        fprintf(stderr, "Invalid program address\n");
+        return -1;
+    }
+
+    /* Read program name (8 bytes, space-padded) */
+    for (i = 0; i < 8; i++) {
+        name[i] = g_rom[prog_addr + i];
+    }
+    name[8] = '\0';
+
+    /* Read flags (offset 9) */
+    flags = g_rom[prog_addr + 9];
+    slot_count = flags & 0x0F;
+
+    /* Read A-RAM pointer (offset 10-11, little-endian) */
+    aram_ptr = g_rom[prog_addr + 10] | (g_rom[prog_addr + 11] << 8);
+
+    printf("Loading MS4 program %d: '%s'\n", program_num, name);
+    printf("  Address: 0x%04X, Flags: 0x%02X, Slots: %d\n", prog_addr, flags, slot_count);
+    printf("  A-RAM ptr: 0x%04X\n", aram_ptr);
+
+    /* Load A-RAM algorithm (32 words, stored as low/high byte pairs) */
+    if (aram_ptr == 0 || aram_ptr + 64 > 0x10000) {
+        printf("  Warning: Invalid A-RAM pointer, using test algorithm\n");
+        /* Fall back to simple sine for testing */
+        sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, 0), 0x016F);
+        sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, 1), 0x08BF);
+        sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, 2), 0x11F7);
+        sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, 3), 0x02DF);
+        sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, 4), 0x06FF);
+        sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, 5), 0x06FE);
+        for (i = 6; i < 32; i++) {
+            sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, i), 0x7FFF);
+        }
+    } else {
+        printf("  Loading A-RAM algorithm from 0x%04X:\n    ", aram_ptr);
+        for (i = 0; i < 32; i++) {
+            uint8_t lo = g_rom[aram_ptr + i * 2];
+            uint8_t hi = g_rom[aram_ptr + i * 2 + 1];
+            uint16_t word = (hi << 8) | lo;
+            sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, i), word);
+            if (i < 8) printf("0x%04X ", word);
+        }
+        printf("...\n");
+    }
+
+    /* Initialize all D-RAM slots to idle */
+    for (i = 0; i < 16; i++) {
+        sam8905_write_dram(SAM8905_DRAM_ADDR(i, 15), SAM8905_SLOT_IDLE);
+    }
+
+    /* Store program info for MIDI handler */
+    g_intmem.channel_current_prog[0] = program_num;
+    g_intmem.channel_current_prog[1] = program_num;
+    g_intmem.channel_current_prog[2] = program_num;
+    g_intmem.channel_current_prog[3] = program_num;
+
+    printf("  Program loaded, ready for MIDI\n");
+    return 0;
+}
+
+static void setup_test_algorithm(void)
 {
     /*
      * Simple sinus oscillator algorithm (from programmer's guide):
-     * PHI=0, DPHI=1, AMP=2
-     *
-     * Instructions:
-     * 0: RM PHI, <WA,WPHI,WSP>   - Load phase, set WF=sinus
-     * 1: RM DPHI, <WB>           - Load phase increment
-     * 2: RM AMP, <WXY,WSP>       - Load amplitude, X=sin(PHI)
-     * 3: RADD PHI, <WM>          - Update phase = PHI + DPHI
-     * 4: RSP                     - NOP
-     * 5: RSP, <WACC>             - Accumulate output
+     * For testing without ROM.
      */
-
-    printf("Loading sinus oscillator algorithm...\n");
+    printf("Loading test sinus oscillator algorithm...\n");
 
     sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, 0), 0x016F);  /* RM 0, <WA,WPHI,WSP> */
     sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, 1), 0x08BF);  /* RM 1, <WB> */
@@ -156,12 +238,10 @@ static void setup_sinus_algorithm(void)
     sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, 4), 0x06FF);  /* RSP */
     sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, 5), 0x06FE);  /* RSP, <WACC> */
 
-    /* Fill rest with NOPs */
-    for (int i = 6; i < 30; i++) {
-        sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, i), 0x06FF);
+    for (int i = 6; i < 32; i++) {
+        sam8905_write_aram(SAM8905_ARAM_ADDR_44K(0, i), 0x7FFF);
     }
 
-    /* All slots start idle */
     for (int slot = 0; slot < 16; slot++) {
         sam8905_write_dram(SAM8905_DRAM_ADDR(slot, 15), SAM8905_SLOT_IDLE);
     }
@@ -176,6 +256,7 @@ static void print_usage(const char *prog)
     printf("Usage: %s [options]\n", prog);
     printf("Options:\n");
     printf("  -r <file>   Load ROM file (e.g., ms4_05_r1_0.bin)\n");
+    printf("  -p <num>    Load program number from ROM (0-65, requires -r)\n");
     printf("  -m <port>   Connect to MIDI port (substring match)\n");
     printf("              e.g.: -m \"Midi Through\" or -m \"USB\"\n");
     printf("  -l          List available MIDI ports and exit\n");
@@ -186,12 +267,15 @@ int main(int argc, char *argv[])
 {
     const char *midi_port = NULL;
     const char *rom_path = NULL;
+    int program_num = -1;  /* -1 = use test algorithm */
     int list_only = 0;
 
     /* Parse command line */
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-r") == 0 && i + 1 < argc) {
             rom_path = argv[++i];
+        } else if (strcmp(argv[i], "-p") == 0 && i + 1 < argc) {
+            program_num = atoi(argv[++i]);
         } else if (strcmp(argv[i], "-m") == 0 && i + 1 < argc) {
             midi_port = argv[++i];
         } else if (strcmp(argv[i], "-l") == 0) {
@@ -237,12 +321,19 @@ int main(int argc, char *argv[])
     sam8905_emu_init(&g_sam_emu);
     sam8905_emu_set_instance(&g_sam_emu);
 
-    /* Initialize SAM8905 via firmware's hardware abstraction layer */
-    printf("Initializing SAM8905 via sam_hw interface...\n");
-    sam_init();  /* This goes through sam_write_reg -> sam_hw_emu -> emulator */
+    /* Initialize SAM8905 and firmware state */
+    printf("Initializing SAM8905 and firmware...\n");
+    sam_init_all();  /* Full init: SAM chip, free list, pitch tables, etc. */
 
-    /* Load test algorithm */
-    setup_sinus_algorithm();
+    /* Load algorithm */
+    if (program_num >= 0 && rom_is_loaded()) {
+        if (load_ms4_program(program_num) < 0) {
+            fprintf(stderr, "Failed to load program %d\n", program_num);
+            return 1;
+        }
+    } else {
+        setup_test_algorithm();
+    }
 
     /* Initialize ALSA MIDI */
     printf("Initializing ALSA MIDI...\n");
@@ -314,8 +405,8 @@ int main(int argc, char *argv[])
 
         /* Check fast tick (Bank 2 R7 = INTMEM 0x17) */
         if (TICK_FAST(&g_intmem) >= 2) {
-            /* Would call sam_periodic_voice_update() here */
-            /* For now, nothing to do */
+            /* Call periodic voice update to process envelopes and write D-RAM */
+            periodic_voice_update();
             TICK_FAST(&g_intmem) -= 2;
         }
 
