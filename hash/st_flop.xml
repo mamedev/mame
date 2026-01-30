@@ -185,7 +185,7 @@ White screen, [68k] stalls on bootstrap
 
 	<software name="aburner" supported="no">
 		<!-- SPS (CAPS) release 3118 -->
-		<description>Afterburner (Europe)</description>
+		<description>After Burner (Europe)</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<sharedfeat name="compatibility" value="PAL"/>

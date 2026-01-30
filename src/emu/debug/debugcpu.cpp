@@ -714,11 +714,11 @@ void device_debug::interrupt_hook(int irqline, offs_t pc)
 	if ((m_flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (m_stopirq == -1 || m_stopirq == irqline))
 	{
 		m_device.machine().debugger().cpu().set_execution_stopped();
-		const address_space &space = m_memory->space(AS_PROGRAM);
-		if (space.is_octal())
-			m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d, PC=%0*o)\n", m_device.tag(), irqline, (space.logaddr_width() + 2) / 3, pc);
+		const address_space_config *config = m_memory->logical_space_config(AS_PROGRAM);
+		if (config->is_octal())
+			m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d, PC=%0*o)\n", m_device.tag(), irqline, config->logaddrchars(), pc);
 		else
-			m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d, PC=%0*X)\n", m_device.tag(), irqline, space.logaddrchars(), pc);
+			m_device.machine().debugger().console().printf("Stopped on interrupt (CPU '%s', IRQ %d, PC=%0*X)\n", m_device.tag(), irqline, config->logaddrchars(), pc);
 		compute_debug_flags();
 	}
 

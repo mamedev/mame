@@ -61,13 +61,11 @@ private:
 	int  m_serout_offs;
 	uint8_t m_serout_buff[512];
 	uint8_t m_serout_chksum;
-//  int  m_serout_delay;
 
 	int  m_serin_count;
 	int  m_serin_offs;
 	uint8_t m_serin_buff[512];
 	uint8_t m_serin_chksum;
-	int  m_serin_delay;
 	emu_timer *m_serin_timer;
 
 	bool m_command;

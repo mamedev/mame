@@ -3276,24 +3276,6 @@ Core Input Options
 
             mame apple2e -ui_active
 
-.. _mame-commandline-nooffscreenreload:
-
-**-[no]offscreen_reload** / **-[no]reload**
-
-    Controls whether or not MAME treats a second button input from a lightgun as
-    a reload signal.  In this case, MAME will report the gun's position as
-    (0,MAX) with the trigger held, which is equivalent to an offscreen reload.
-
-    This is only needed for games that required you to shoot offscreen to
-    reload, and then only if your gun does not support off screen reloads.
-
-    The default is OFF (**-nooffscreen_reload**).
-
-    Example:
-        .. code-block:: bash
-
-            mame lethalen -offscreen_reload
-
 .. _mame-commandline-joystickmap:
 
 **-joystick_map** *<map>* / **-joymap** *<map>*
@@ -3923,7 +3905,9 @@ Core Misc Options
 
 **-[no]drc**
 
-    Enable DRC (dynamic recompiler) CPU core if available for maximum speed.
+    Enable DRC (dynamic recompiler) CPU cores if available.  Turn this option
+    off to use interpreter CPU cores if available.  This option does not affect
+    CPUs that only support one core type.
 
     The default is ON (**-drc**).
 
@@ -3932,18 +3916,37 @@ Core Misc Options
 
             mame ironfort -nodrc
 
+.. _mame-commandline-drcrwx:
+
+**\-[no]drc_rwx**
+
+    Allow DRC CPU cores to use memory that is simultaneously writable and
+    executable if supported.  Turning this option off may decrease performance.
+    This option only affects DRC CPU cores, and has no effect in configurations
+    that do not allow memory to be simultaneously writable and executable (e.g.
+    recent versions of macOS and NetBSD).
+
+    The default is ON (**-drc_rwx**).
+
+    Example:
+        .. code-block:: bash
+
+            mame fiveside -nodrc_rwx
+
 .. _mame-commandline-drcusec:
 
 **\-[no]drc_use_c**
 
-    Force DRC to use the C code backend.
+    Force DRC CPU cores to use the portable C code back-end when a native
+    back-end is available.  This option only affects DRC CPU cores, and has no
+    effect if a native DRC back-end is not available.
 
     The default is OFF (**-nodrc_use_c**).
 
     Example:
         .. code-block:: bash
 
-            mame ironfort -drc_use_c
+            mame vamphalf -drc_use_c
 
 .. _mame-commandline-drcloguml:
 

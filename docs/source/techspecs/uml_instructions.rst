@@ -378,7 +378,7 @@ Call the subroutine beginning at the specified code handle.
 | .. code-block::         | .. code-block:: C++                  |
 |                         |                                      |
 |     callh   handle      |     UML_CALLH(block, handle);        |
-|     callh   handle,cond |     UML_CALLHc(block, handle, cond); |
+|     callh   handle,cond |     UML_CALLHc(block, cond, handle); |
 +-------------------------+--------------------------------------+
 
 Operands

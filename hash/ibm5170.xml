@@ -4167,7 +4167,7 @@ license:CC0-1.0
 		<year>1997</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.0a" />
-		<info name="usage" value="8MB RAM required" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
@@ -4181,7 +4181,7 @@ license:CC0-1.0
 		<year>1997</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.0a" />
-		<info name="usage" value="8MB RAM required" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
@@ -4195,7 +4195,7 @@ license:CC0-1.0
 		<year>1997</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.0" />
-		<info name="usage" value="8MB RAM required" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
@@ -4209,7 +4209,7 @@ license:CC0-1.0
 		<year>1998</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.1" />
-		<info name="usage" value="8MB RAM required" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<!-- source image is only 1469440 bytes, added 0xF6 padding -->
@@ -4223,7 +4223,7 @@ license:CC0-1.0
 		<year>1999</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.05" />
-		<info name="usage" value="8MB RAM required" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo modem v405.dat" size="1474560" crc="1449909a" sha1="e35b2822eb2391ebcac04cb5f3ec8a284f601bb8"/>
@@ -4236,7 +4236,7 @@ license:CC0-1.0
 		<year>1999</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.00" />
-		<info name="usage" value="8MB RAM required" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo modem v400.dat" size="1474560" crc="7cc3be15" sha1="3ded9ef17784b18f1c356e2bfeacfd9ecef4f716"/>
@@ -4249,7 +4249,7 @@ license:CC0-1.0
 		<year>1998</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="3.03" />
-		<info name="usage" value="8MB RAM required" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo modem v303.dat" size="1474560" crc="de42476d" sha1="b330dc04a920886f2243377c9edd80c23bc3e90a"/>
@@ -4262,7 +4262,7 @@ license:CC0-1.0
 		<year>1999</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.05" />
-		<info name="usage" value="8MB RAM required" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v405.dat" size="1474560" crc="315a822c" sha1="c8baa52161c069dae25410ce09a3b1c095961323"/>
@@ -4275,7 +4275,7 @@ license:CC0-1.0
 		<year>1999</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.00" />
-		<info name="usage" value="8MB RAM required" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v400.dat" size="1474560" crc="72d7de91" sha1="bcc589a419500376cf5101ddf80d416ee43c0c1d"/>
@@ -4288,7 +4288,7 @@ license:CC0-1.0
 		<year>1998</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="3.03" />
-		<info name="usage" value="8MB RAM required" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v303.dat" size="1474560" crc="694a0448" sha1="d1bb83273ae2da9fb1fe93ae08c951ec91d6ea3f"/>
@@ -4301,7 +4301,7 @@ license:CC0-1.0
 		<year>1998</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="2.0" />
-		<info name="usage" value="8MB RAM required" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxdemo network v20.dat" size="1474560" crc="2026021a" sha1="a8a49d60accc19f67b09e8fe5b84ae6c3c18806e"/>
@@ -5164,7 +5164,8 @@ license:CC0-1.0
 		<description>Photon microGUI Runtime version 1.10 for QNX 4.2x</description>
 		<year>1996</year>
 		<publisher>QNX Software Systems</publisher>
-		<info name="usage" value="Requires QNX and 8MB RAM" />
+		<info name="required_os" value="QNX" />
+		<info name="required_ram" value="8MB" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="phomgui1.img" size="1474560" crc="cd9d7ac2" sha1="d79f87675d4c80cef3412bbd620ad6e260201f5c"/>
@@ -6223,7 +6224,7 @@ Windows drivers for [PS/2] and [USB] optical mouse family (VID=0x0458)
 Various 3C90x [PCI] drivers
 Subset of EtherCD
 ]]></notes>
-		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows 95" />
+		<info name="required_os" value="Windows 3.11 for Workgroups, Windows 95" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -6240,7 +6241,7 @@ Subset of EtherCD
 3C589 LAN+Modem [ISA], [Jazz] and [PCMCIA] Ethernet card drivers
 Contains AutoLink software for NetWare DOS support
 ]]></notes>
-		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 3.5, Windows 95, DOS, OS/2" />
+		<info name="required_os" value="Windows 3.11 for Workgroups, Windows NT 3.5, Windows 95, DOS, OS/2" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -6257,7 +6258,7 @@ Contains AutoLink software for NetWare DOS support
 3C575 LAN [ISA], [PCI], [Jazz] and [PCMCIA] Ethernet card drivers
 Contains AutoLink software for NetWare DOS support
 ]]></notes>
-		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 4.0, Windows 95, DOS" />
+		<info name="required_os" value="Windows 3.11 for Workgroups, Windows NT 4.0, Windows 95, DOS" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -6273,7 +6274,7 @@ Contains AutoLink software for NetWare DOS support
 		<notes><![CDATA[
 3Com and US Robotics [modem] drivers
 ]]></notes>
-		<sharedfeat name="platform" value="Windows 3.11 for Workgroups, Windows NT 3.5" />
+		<info name="required_os" value="Windows 3.11 for Workgroups, Windows NT 3.5" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -6289,7 +6290,7 @@ Contains AutoLink software for NetWare DOS support
 		<notes><![CDATA[
 [PS/2] and [USB] optical mouse family drivers
 ]]></notes>
-		<sharedfeat name="platform" value="Windows 3.1, Windows 95, Windows 98, Windows ME, Windows NT 4.0, Windows 2000, DOS" />
+		<info name="required_os" value="Windows 3.1, Windows 95, Windows 98, Windows ME, Windows NT 4.0, Windows 2000, DOS" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
@@ -8078,7 +8079,7 @@ cfr. wbxlboot
 		<description>The Greatest Little PIC Book</description>
 		<year>1997?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires Windows 3.1 or later"/>
+		<info name="required_os" value="Windows 3.1 or later"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1" />
 			<dataarea name="flop" size="1474560">
@@ -9328,7 +9329,7 @@ cfr. wbxlboot
 		<year>1996</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.10" />
-		<info name="usage" value="Requires Win32" />
+		<info name="required_os" value="Win32" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="phindows.img" size="1474560" crc="2cd8fa94" sha1="14e7976d55deea3d7e191fc58ad2ad2a9654908f"/>
@@ -9384,7 +9385,7 @@ cfr. wbxlboot
 		<year>1996</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="4.23" />
-		<info name="usage" value="Requires QNX" />
+		<info name="required_os" value="QNX" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="qnxtcp1.img" size="1474560" crc="9b1f7bcb" sha1="d364b3a16e9983e040e82a278a75106a7f25f6ea"/>
@@ -10230,7 +10231,7 @@ Missing [modem] features, assume requiring a connection to a Reuters device such
 		<year>1996</year>
 		<publisher>QNX Software Systems</publisher>
 		<info name="version" value="1.10" />
-		<info name="usage" value="Requires QNX" />
+		<info name="required_os" value="QNX" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="photdev1.img" size="1474560" crc="e86e52f5" sha1="aee415ed6d2a3c52916b2f3c74dd760daa150b96"/>
@@ -10849,7 +10850,7 @@ The disks have had their OEM IDs modified by Windows
 		<publisher>Scandinavian PC Systems</publisher>
 		<info name="version" value="1.0" />
 		<info name="copy_protection" value="Serial number required: 8F-046-016088, 8F-046-022378" />
-		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<info name="required_os" value="Windows 3.1, Windows 95" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "10425680">
 				<rom name="Alfons paahittelaada (Sweden) (Disk 1).mfi" size="10425680" crc="f59149ee" sha1="cc1436942e50419d58088a86c4fe74a50e09b46c"/>
@@ -10870,7 +10871,7 @@ The disks have had their OEM IDs modified by Windows
 Disks have been converted from IMG due to unusual structure.
 ]]></notes>
 		<info name="copy_protection" value="Serial number required: 8H-046-015934" />
-		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<info name="required_os" value="Windows 3.1, Windows 95" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1472273">
 				<rom name="Alfons paa aeventyr i trafiken (Sweden) (Disk 1).imd" size="1472273" crc="db44d2e0" sha1="3b74e2367aeea6d3497d942790104baabc873226"/>
@@ -11831,7 +11832,7 @@ Differences between clone/parent:
 		<publisher>Interplay</publisher>
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Interplay" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Startup Disk" />
 			<dataarea name="flop" size = "737280">
@@ -12259,7 +12260,7 @@ Differences between clone/parent:
 		<year>1994</year>
 		<publisher>Virgin Games</publisher>
 		<notes>This release was dual Windows / Macintosh.</notes>
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -12388,8 +12389,7 @@ Differences between clone/parent:
 		<year>1995</year>
 		<publisher>Impressions Software</publisher>
 		<notes>This pack includes: "Maze Craze", "Invaders", "Mine Trap", "Brick Buster", "Fighter Ace"</notes>
-		<info name="usage" value="Requires Windows 3.x" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Classics Arcade [Impressions] [1995] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="0c94a2a1" sha1="dc63331d32b4cd5a6927e1b9e84babb9a5a691f8"/>
@@ -13483,7 +13483,7 @@ Differences between clone/parent:
 		<year>1994</year>
 		<publisher>Elf</publisher>
 		<info name="alt_title" value="同級生" />
-		<info name="usage" value="Requires DOS/V" />
+		<info name="required_os" value="DOS/V" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size = "1474560">
@@ -13521,7 +13521,7 @@ Differences between clone/parent:
 		<year>1995</year>
 		<publisher>Elf</publisher>
 		<info name="alt_title" value="同級生２" />
-		<info name="usage" value="Requires DOS/V" />
+		<info name="required_os" value="DOS/V" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size = "1474560">
@@ -15441,7 +15441,7 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		<description>GayBlade</description>
 		<year>1992</year>
 		<publisher>RJBest</publisher>
-		<info name="usage" value="Requires Windows 3.1"/>
+		<info name="required_os" value="Windows 3.1"/>
 		<info name="version" value="2.0" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
@@ -15842,7 +15842,7 @@ Bad Dump: the disks has an accessed file record and a modified OEM id
 		<year>1995</year>
 		<publisher>Scandinavian PC Systems</publisher>
 		<info name="copy_protection" value="Serial number required: 8E-046-018192, 8E-046-015848, 8E-046-019252" />
-		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<info name="required_os" value="Windows 3.1, Windows 95" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "10744031">
 				<rom name="Handla med Alfons (Sweden) (Disk 1).mfi" size="10744031" crc="1881dfa6" sha1="472b3b47bfc6206b2badfd4d49fab223e7ea173a"/>
@@ -16439,8 +16439,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<description>I Dream of Jeannie</description>
 		<year>1996</year>
 		<publisher>Trendmasters</publisher>
-		<info name="usage" value="Windows 3.x required"/>
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="I Dream of Jeannie [Trendmasters] [1996] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="8944c5d0" sha1="04d9a1359065db2fc93d013ff051788933c1c1c8"/>
@@ -17125,7 +17124,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<publisher>Cinnabar Software</publisher>
 		<info name="developer" value="Cinnabar Software" />
 		<info name="version" value="1.0" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Jeweler's Dilemma [Cinnabar] [1992] [3.5DD] [Disk 1 of 1].img" size="737280" crc="87e52f11" sha1="b9311be18887acb98d704a5923259a26507205a5"/>
@@ -17139,7 +17138,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<publisher>Cinnabar Software</publisher>
 		<info name="developer" value="Cinnabar Software" />
 		<info name="version" value="1.0" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="Jeweler's Dilemma [Cinnabar] [1992] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="7975c7c1" sha1="fe397dff87a12b1ef36f253cd98eddc92637f35d"/>
@@ -17238,7 +17237,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 		<year>1995</year>
 		<publisher>Moonchild</publisher>
 		<info name="alt_title" value="快楽の掟　‐蒼い体験‐" />
-		<info name="usage" value="Requires DOS/V" />
+		<info name="required_os" value="DOS/V" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size = "1474560">
@@ -17789,7 +17788,7 @@ Add-on for Harpoon II and update patch to version 2.1.11
 Disks have been converted from IMG due to unusual structure.
 ]]></notes>
 		<info name="copy_protection" value="Serial number required: 8G-046-016181" />
-		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<info name="required_os" value="Windows 3.1, Windows 95" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1472273">
 				<rom name="Kom till Alfons hemliga kalas (Sweden) (Disk 1).imd" size="1472273" crc="b166385b" sha1="e1e23e30f8e4e2e6ac04c4611c14070fffe93a56"/>
@@ -18692,7 +18691,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1995</year>
 		<publisher>Scandinavian PC Systems</publisher>
 		<info name="copy_protection" value="Serial number required: 8B-046-018116" />
-		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<info name="required_os" value="Windows 3.1, Windows 95" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="Maala med Alfons (Sweden).img" size="737280" crc="7a6664e9" sha1="b24eeb8da1fef79021fa2e925da2d946a6423d4c"/>
@@ -19077,8 +19076,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1993</year>
 		<publisher>Microsoft</publisher>
 		<notes>This pack includes: "Asteroids", "Battlezone", "Centipede", "Missile Command", "Tempest"</notes>
-		<info name="usage" value="Requires Windows 3.x" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Microsoft Arcade [Microsoft] [1993] [3.5HD] [Disk 1 of 1].img" size="1474560" crc="c67a3e7c" sha1="57977ba651e20b3a731d756a19be60d121537ef9"/>
@@ -19091,8 +19089,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1990</year>
 		<publisher>Microsoft</publisher>
 		<notes>This pack includes: "Tetris", "Minesweeper", "Cruel", "Golf", "TicTactics", "Taipei", "Pegged", "IdleWild"</notes>
-		<info name="usage" value="Requires Windows 3.x" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Microsoft Entertainment Pack [Microsoft] [1990] [3.5DD] [Disk 1 of 1].img" size="737280" crc="7cbdfa34" sha1="aafedd723426a34d367f1c30e9d5748c5691b0a4"/>
@@ -19105,8 +19102,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1991</year>
 		<publisher>Microsoft</publisher>
 		<notes>This pack includes: "FreeCell", "JigSawed", "Pipe Dream", "Rodent's Revenge", "RattlerRace", "Stones", "Tut's Tomb", "IdleWild"</notes>
-		<info name="usage" value="Requires Windows 3.x" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Microsoft Entertainment Pack 2 [Microsoft] [1991] [3.5DD] [Disk 1 of 2].img" size="737280" crc="6e9bb9ed" sha1="f58f33d635c8177c170fa559c536effafa18e7b2"/>
@@ -19124,8 +19120,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1991</year>
 		<publisher>Microsoft</publisher>
 		<notes>This pack includes: "Fuji Golf", "Klotski", "LifeGenesis", "SkieFree", "TetraVex", "TriPeaks", "WordZap", "IdleWild"</notes>
-		<info name="usage" value="Requires Windows 3.x" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Microsoft Entertainment Pack 3 [Microsoft] [1991] [3.5DD] [Disk 1 of 1].img" size="737280" crc="ea49d42a" sha1="843c3ccc003b8a83d205bf07084eea0528622a9d"/>
@@ -19138,8 +19133,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
 		<notes>This pack includes: "JezzBall", "Maxwell's Maniac", "Chip's Challenge", "Dr. Black Jack", "Tic Tac Drop", "Go Figure!", "Chess"</notes>
-		<info name="usage" value="Requires Windows 3.x" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Microsoft Entertainment Pack 4 [Microsoft] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="732c46b7" sha1="b0c7d2d2b4b54b32620c6b9fbe75036459c40987"/>
@@ -19156,8 +19150,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Microsoft Entertainment Pack 4 (alt)</description>
 		<year>1992</year>
 		<publisher>Microsoft</publisher>
-		<info name="usage" value="Requires Windows 3.x" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="Microsoft Entertainment Pack 4 (alt) [Microsoft] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="28a4bf38" sha1="24c8951ebf28a2511e14b68ede428f1cf965e32e"/>
@@ -19190,7 +19183,7 @@ Bad Dump: the disk has a modified LOTUS.CFG configuration file
 		<description>Microsoft Return of Arcade</description>
 		<year>1996</year>
 		<publisher>Microsoft</publisher>
-		<info name="usage" value="Requires Windows 95" />
+		<info name="required_os" value="Windows 95" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="disk1.img" size="1474560" crc="52469b53" sha1="70b4b69e56821ab549c80ae0ecad6cbd335d0631"/>
@@ -20376,7 +20369,7 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<year>1994</year>
 		<publisher>Kogado Studio</publisher>
 		<info name="alt_title" value="パワードール" />
-		<info name="usage" value="Requires DOS/V" />
+		<info name="required_os" value="DOS/V" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Disk 1.img" size="1474560" crc="bcf007c7" sha1="ab6c71520c9384a81dcc992d4578c4c620b42129"/>
@@ -20572,7 +20565,7 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<year>1995</year>
 		<publisher>Scandinavian PC Systems</publisher>
 		<info name="copy_protection" value="Serial number required: 8C-046-020096" />
-		<sharedfeat name="platform" value="Windows 3.1, Windows 95" />
+		<info name="required_os" value="Windows 3.1, Windows 95" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "1474560">
 				<rom name="Pussla med Alfons (Sweden) (Disk 1).img" size="1474560" crc="3d6c0d52" sha1="7f6d8c88cae42516f5bc02614b33740c9b2ef220"/>
@@ -21340,7 +21333,7 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<publisher>Maxis</publisher>
 		<info name="copy_protection" value="Manual required on installation setup" />
 		<info name="developer" value="Maxis Software" />
-		<info name="usage" value="Requires Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="RoboSport [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="81258412" sha1="bed82f0bebcc3496185de03ef834fb57b89aebb3"/>
@@ -21359,7 +21352,7 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<publisher>Maxis</publisher>
 		<info name="copy_protection" value="Manual required on installation setup" />
 		<info name="developer" value="Maxis Software" />
-		<info name="usage" value="Requires Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="RoboSport [Maxis] [1992] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="eb5a4f6d" sha1="b77a1895dcee0d367caa663c2ac70e592c129e5a"/>
@@ -21900,8 +21893,7 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<description>SimAnt (Windows 3.x release)</description>
 		<year>1992</year>
 		<publisher>Maxis</publisher>
-		<info name="usage" value="Requires Windows 3.x" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="SimAnt (win 3.x release) [Maxis] [1992] [3.5DD] [Disk 1 of 2].img" size="737280" crc="5ec6bb7d" sha1="7666d4e9b3d78ca109481c5225ebc51e286b51f8"/>
@@ -21918,9 +21910,8 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<description>SimCity Classic (Windows 3.x release) (3.5")</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
-		<info name="usage" value="Requires Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<info name="version" value="1.1" />
-		<sharedfeat name="platform" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 1 of 2] [Install Disk].img" size="737280" crc="a2a24523" sha1="15970109725d27fce3609f83c367b07b9979df1a"/>
@@ -21937,9 +21928,8 @@ https://github.com/wanda-phi/pfr/blob/main/TECH.md
 		<description>SimCity Classic (Windows 3.x release) (5.25")</description>
 		<year>1993</year>
 		<publisher>Maxis</publisher>
-		<info name="usage" value="Requires Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<info name="version" value="1.1" />
-		<sharedfeat name="platform" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "1228800">
 				<rom name="SimCity Classic (Windows 3.x release) [Maxis] [1993] [5.25HD] [Disk 1 of 1].img" size="1228800" crc="5a87c7a4" sha1="6d668984561cbec5e2556925910c6275680f438d"/>
@@ -22117,7 +22107,7 @@ Floppy disk 2 - Bad Dump Status: Modified OEM ID and modified root
 		<year>1993</year>
 		<publisher>Maxis</publisher>
 		<info name="developer" value="Maxis" />
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
 				<rom name="SimLife (Windows 3.x release) [Maxis] [1993] [3.5DD] [Disk 1 of 3].img" size="737280" crc="40136c47" sha1="4a80d0ec9c6cc7360bfeb23323b0a520b79a35b4"/>
@@ -23541,8 +23531,8 @@ Add-on pack to Syndicate. It requires the original game and includes 3 new weapo
 		<year>1992</year>
 		<publisher>Spectrum Holobyte</publisher>
 		<info name="developer" value="Sphere" />
+		<info name="required_os" value="Windows 3.x" />
 		<info name="version" value="Version 1.0 10/23/92" />
-		<sharedfeat name="platform" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="Tetris Classic (windows 3.x release) [Spectrum Holobyte] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="79804dc4" sha1="2ce4e7641a5d9422d79a85d300a7c0f9140ade88"/>
@@ -25433,8 +25423,7 @@ Disk 2 includes: "The Lords of Midnight (ZX Spectrum)", "Doomdark's Revenge (ZX 
 		<year>1992</year>
 		<publisher>Ziff-Davis Publishing</publisher>
 		<notes>Disk 1 and 2 include a pack of utilities for Windows 3.x</notes>
-		<info name="usage" value="Requires Windows 3.x"/>
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="PC Magazine (All Star - December 1992) [Ziff-Davis] [1992] [3.5HD] [Disk 1 of 2].img" size="1474560" crc="ca98b850" sha1="fca1f50b13707b3812417ca4836d60ded26d88cf"/>
@@ -25483,7 +25472,7 @@ This useful program (from Serif - the makers of PagePlus) illustrates only some 
 "Magazine": From this month's issue of PC Plus we have the third part of the Video Library project written in Visual Basic 2 (for Windows).
 From Programmers' Workshop a trio of programs: TBM and SHUFFLE in Basic, and SHOWSIZE in assembly language and COM form.
 ]]></notes>
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="SuperDisk" />
@@ -25503,7 +25492,7 @@ Disk includes:
 "SinkSub": Windows game in which your frigate, armed with depth charges, must evade and destroy the enemy's best fleet of submarines.
 "Magazine": Various files, macros, bits and pieces from Help Screen. Use Basic's Draw command from Wilf's Programmers' Workshop. A project and a new utility from Visual Basic Workshop.
 ]]></notes>
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="SuperDisk" />
@@ -25524,7 +25513,7 @@ Disk includes:
 "Roblist UK BBS Listing": Comprehensive listing of UK bulletin boards, plus ftp sites and other interesting Internet locations.
 "From PC PLUS Magazine": Files from this month's Hands On section, including Help Screen, Visual  Basic Workshop and Wilf's Programmers' Workshop.
 ]]></notes>
-		<sharedfeat name="platform" value="Windows 3.x" />
+		<info name="required_os" value="Windows 3.x" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="SuperDisk" />

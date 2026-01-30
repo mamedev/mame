@@ -194,7 +194,7 @@
             315-5250 (x2)  -- compare/timer
             315-5275       -- road generator
             315-5278 (PAL) -- sprite ROM bank control
-            315-5279 (PAL) -- video mixing (Afterburner)
+            315-5279 (PAL) -- video mixing (After Burner)
             315-5280 (PAL) -- Z80 address decoding
             315-5290 (PAL) -- main CPU address decoding
             315-5291 (PAL) -- main CPU address decoding

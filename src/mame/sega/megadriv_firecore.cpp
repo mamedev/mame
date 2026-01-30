@@ -216,6 +216,10 @@ ROM_START( mateta )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( mypacgld )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "am29lv160db.u2", 0x000000, 0x200000, CRC(7a01cf42) SHA1(c9fb66f1d38710aae6b94c1fbc99a8763730cfce) )
+ROM_END
 
 ROM_START( mypac )
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -453,6 +457,8 @@ void megadriv_firecore_state::init_mdhh100()
 //
 // due to differences in the SoC compared to real MD hardware (including sound + new video modes) these have been left
 // as NOT WORKING for now although some games run to a degree
+
+CONS( 2020, mypacgld,  0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Pac-Man 40th Anniversary (DGUNL-3290 / TUV-01, Micro Player)", MACHINE_NOT_WORKING )
 
 CONS( 2021, mypac,     0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Pac-Man (DGUNL-4198, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 CONS( 2021, mypaca,    mypac,    0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Pac-Man (DGUNL-4194, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )

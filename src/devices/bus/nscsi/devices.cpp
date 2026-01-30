@@ -38,6 +38,7 @@ void default_scsi_devices(device_slot_interface &device)
 	device.option_add("smoc501", SMOC501);
 	device.option_add("aplcd150", APPLECD150);
 	device.option_add("aplcdsc", NSCSI_CDROM_APPLE);
+	device.option_add("aplcdsc_ext", NSCSI_CDROM_APPLE_EXT);
 	device.option_add("cfp1080s", CFP1080S);
 	device.option_add("pc98_hd", NSCSI_PC98_HD);
 }

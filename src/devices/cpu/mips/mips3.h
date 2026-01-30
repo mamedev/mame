@@ -15,10 +15,12 @@ MIPS III/IV emulator.
 #pragma once
 
 
-#include "divtlb.h"
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "ps2vu.h"
+
+#include "divtlb.h"
+
 
 DECLARE_DEVICE_TYPE(R4000BE, r4000be_device)
 DECLARE_DEVICE_TYPE(R4000LE, r4000le_device)
@@ -235,9 +237,6 @@ enum {
 	MIPS3_R31H,
 };
 
-#define MIPS3_MAX_FASTRAM       3
-#define MIPS3_MAX_HOTSPOTS      16
-
 /* COP1 CCR register */
 #define COP1_FCR31              (m_core->ccr[1][31])
 
@@ -258,21 +257,12 @@ INTERRUPT CONSTANTS
 STRUCTURES
 ***************************************************************************/
 
-/* MIPS3 TLB entry */
-struct mips3_tlb_entry {
-	uint64_t          page_mask;
-	uint64_t          entry_hi;
-	uint64_t          entry_lo[2];
-};
-
-#define MIPS3_MAX_TLB_ENTRIES       48
-
 class mips3_frontend;
 
 class mips3_device : public cpu_device, public device_vtlb_interface {
+protected:
 	friend class mips3_frontend;
 
-protected:
 	/* MIPS flavors */
 	enum mips3_flavor {
 		/* MIPS III variants */
@@ -294,10 +284,27 @@ protected:
 		MIPS3_TYPE_RM7000
 	};
 
+	static inline constexpr unsigned MIPS3_MAX_FASTRAM      = 3;
+	static inline constexpr unsigned MIPS3_MAX_HOTSPOTS     = 16;
+
+	static inline constexpr unsigned MIPS3_MAX_TLB_ENTRIES  = 48;
+
+	// MIPS3 TLB entry
+	struct mips3_tlb_entry {
+		bool matches_asid(uint8_t asid) const noexcept;
+		bool is_global() const noexcept;
+		void log_half(int tlbindex, int which) const;
+
+		uint64_t    page_mask;
+		uint64_t    entry_hi;
+		uint64_t    entry_lo[2];
+	};
+
 public:
 	// construction/destruction
 	mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endiannes, uint32_t data_bits);
 
+	void set_drc_cache_size(size_t bytes) { m_drc_cache.set_size(bytes); }
 	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
 	void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
 	void set_secondary_cache_line_size(uint8_t secondary_cache_line_size) { c_secondary_cache_line_size = secondary_cache_line_size; }
@@ -312,7 +319,7 @@ public:
 	void mips3drc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;

@@ -168,6 +168,8 @@ void specnext_tiles_device::device_start()
 		, tilemap_get_info_delegate(*this, FUNC(specnext_tiles_device::get_tile_info))
 		, TILEMAP_SCAN_ROWS, 8, 8, 80, 32);
 
+	save_item(NAME(m_offset_h));
+	save_item(NAME(m_offset_v));
 	save_item(NAME(m_global_transparent));
 	save_item(NAME(m_tm_palette_select));
 	save_item(NAME(m_control));

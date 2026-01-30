@@ -32,9 +32,9 @@ The Grid         v1.2   10/18/2000
 
 #include "dcs.h"
 
-#include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/pic16c5x/pic16c5x.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "machine/ibm21s850.h"
 #include "machine/nvram.h"
 #include "machine/tsb12lv01a.h"
@@ -51,7 +51,7 @@ static constexpr int BEAM_XOFFS = 40; // table in the code indicates an offset o
 #define LOG_FIREWIRE    (1U << 1)
 #define LOG_DISK        (1U << 2)
 #define LOG_DISK_JR     (1U << 3)
-#define LOG_TMS32032    (1U << 4)
+#define LOG_TMS320C32   (1U << 4)
 #define LOG_INPUT       (1U << 5)
 #define LOG_CMOS        (1U << 6)
 #define LOG_UNKNOWN     (1U << 7)
@@ -255,18 +255,18 @@ void midzeus_state::machine_reset()
 
 TIMER_CALLBACK_MEMBER(midzeus_state::display_irq_off)
 {
-	m_maincpu->set_input_line(TMS3203X_IRQ0, CLEAR_LINE);
+	m_maincpu->set_input_line(TMS320C3X_IRQ0, CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
 {
-	m_maincpu->set_input_line(TMS3203X_IRQ0, ASSERT_LINE);
+	m_maincpu->set_input_line(TMS320C3X_IRQ0, ASSERT_LINE);
 	m_display_irq_off_timer->adjust(attotime::from_hz(30000000));
 }
 
 void midzeus2_state::zeus_irq(int state)
 {
-	m_maincpu->set_input_line(TMS3203X_IRQ2, ASSERT_LINE);
+	m_maincpu->set_input_line(TMS320C3X_IRQ2, ASSERT_LINE);
 }
 
 
@@ -610,16 +610,16 @@ void midzeus2_state::firewire_irq(int state)
 void midzeus2_state::update_firewire_irq()
 {
 	LOGMASKED(LOG_FIREWIRE, "%ssserting FW IRQ\n", (m_fw_int_enable && m_fw_int) ? "A" : "Dea");
-	m_maincpu->set_input_line(TMS3203X_IRQ3, (m_fw_int_enable && m_fw_int) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(TMS320C3X_IRQ3, (m_fw_int_enable && m_fw_int) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*************************************
  *
- *  TMS32031 I/O accesses
+ *  TMS320C31 I/O accesses
  *
  *************************************/
 
-uint32_t midzeus_state::tms32032_control_r(offs_t offset)
+uint32_t midzeus_state::tms320c32_control_r(offs_t offset)
 {
 	// watch for accesses to the timers
 	if (offset == 0x24 || offset == 0x34)
@@ -634,16 +634,16 @@ uint32_t midzeus_state::tms32032_control_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 	{
 		if (offset != 0x64)
-			LOGMASKED(LOG_TMS32032, "%06X:tms32032_control_r(%02X)\n", m_maincpu->pc(), offset);
+			LOGMASKED(LOG_TMS320C32, "%06X:tms320c32_control_r(%02X)\n", m_maincpu->pc(), offset);
 	}
 
-	return m_tms32032_control[offset];
+	return m_tms320c32_control[offset];
 }
 
 
-void midzeus_state::tms32032_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void midzeus_state::tms320c32_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_tms32032_control[offset]);
+	COMBINE_DATA(&m_tms320c32_control[offset]);
 
 	// ignore changes to the memory control register
 	if (offset == 0x64)
@@ -657,7 +657,7 @@ void midzeus_state::tms32032_control_w(offs_t offset, uint32_t data, uint32_t me
 			m_timer[which]->adjust(attotime::never);
 	}
 	else
-		LOGMASKED(LOG_TMS32032, "%06X:tms32032_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
+		LOGMASKED(LOG_TMS320C32, "%06X:tms320c32_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -744,9 +744,9 @@ void invasnab_state::update_gun_irq()
 {
 	// low 2 bits of gun_control seem to enable IRQs
 	if (m_gun_irq_state & m_gun_control & 0x03)
-		m_maincpu->set_input_line(TMS3203X_IRQ3, ASSERT_LINE);
+		m_maincpu->set_input_line(TMS320C3X_IRQ3, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(TMS3203X_IRQ3, CLEAR_LINE);
+		m_maincpu->set_input_line(TMS320C3X_IRQ3, CLEAR_LINE);
 }
 
 
@@ -820,7 +820,7 @@ void midzeus_state::zeus_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).ram().share(m_ram_base);
 	map(0x400000, 0x41ffff).ram();
-	map(0x808000, 0x80807f).rw(FUNC(midzeus_state::tms32032_control_r), FUNC(midzeus_state::tms32032_control_w)).share(m_tms32032_control);
+	map(0x808000, 0x80807f).rw(FUNC(midzeus_state::tms320c32_control_r), FUNC(midzeus_state::tms320c32_control_w)).share(m_tms320c32_control);
 	map(0x880000, 0x8803ff).rw(FUNC(midzeus_state::zeus_r), FUNC(midzeus_state::zeus_w)).share(m_zeusbase);
 	map(0x8d0000, 0x8d0009).rw(FUNC(midzeus_state::disk_asic_jr_r), FUNC(midzeus_state::disk_asic_jr_w));
 	map(0x990000, 0x99000f).rw(m_ioasic, FUNC(midway_ioasic_device::read), FUNC(midway_ioasic_device::write));
@@ -842,7 +842,7 @@ void midzeus2_state::zeus2_map(address_map &map)
 	map.unmap_value_high();
 	map(0x000000, 0x03ffff).ram().share(m_ram_base);
 	map(0x400000, 0x43ffff).ram();
-	map(0x808000, 0x80807f).rw(FUNC(midzeus2_state::tms32032_control_r), FUNC(midzeus2_state::tms32032_control_w)).share(m_tms32032_control);
+	map(0x808000, 0x80807f).rw(FUNC(midzeus2_state::tms320c32_control_r), FUNC(midzeus2_state::tms320c32_control_w)).share(m_tms320c32_control);
 	map(0x880000, 0x88007f).rw(m_zeus, FUNC(zeus2_device::zeus2_r), FUNC(zeus2_device::zeus2_w));
 	map(0x8a0000, 0x8a00cf).rw(m_fw_link, FUNC(tsb12lv01a_device::read), FUNC(tsb12lv01a_device::write));
 	//map(0x8a0000, 0x8a00cf).rw(FUNC(midzeus2_state::firewire_r), FUNC(midzeus2_state::firewire_w)).share("firewire");
@@ -1370,7 +1370,7 @@ static constexpr XTAL CPU_CLOCK = XTAL(60'000'000);
 void midzeus_state::midzeus(machine_config &config)
 {
 	// basic machine hardware
-	TMS32032(config, m_maincpu, CPU_CLOCK);
+	TMS320C32(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus_state::zeus_map);
 	m_maincpu->set_vblank_int("screen", FUNC(midzeus_state::display_irq));
 
@@ -1421,7 +1421,7 @@ void invasnab_state::invasn(machine_config &config)
 void midzeus2_state::midzeus2(machine_config &config)
 {
 	// basic machine hardware
-	TMS32032(config, m_maincpu, CPU_CLOCK);
+	TMS320C32(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &midzeus2_state::zeus2_map);
 	m_maincpu->set_vblank_int("screen", FUNC(midzeus2_state::display_irq));
 

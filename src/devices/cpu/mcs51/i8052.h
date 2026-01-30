@@ -51,12 +51,12 @@ protected:
 	void set_tf2 (bool state) { set_bit<T2CON_TF2 >(m_t2con, state); }
 	void set_exf2(bool state) { set_bit<T2CON_EXF2>(m_t2con, state); }
 
-	u8   t2con_r();
+	u8 t2con_r();
 	void t2con_w(u8 data);
-	u8   rcap2_r(offs_t offset);
+	u8 rcap2_r(offs_t offset);
 	void rcap2_w(offs_t offset, u8 data);
-	u8   t2_r   (offs_t offset);
-	void t2_w   (offs_t offset, u8 data);
+	u8 t2_r(offs_t offset);
+	void t2_w(offs_t offset, u8 data);
 };
 
 class i8032_device : public i8052_device

@@ -302,6 +302,13 @@ ROM_START( pokepeac )
 	ROM_LOAD( "tc58nvg0s3hta00.u2", 0x0000, 0x8800000, CRC(bdd128b8) SHA1(412eeb83649ea499e4e6ce3c447f0c177d8bc0ce) )
 ROM_END
 
+ROM_START( froz2dct )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l640.u6", 0x0000, 0x800000, CRC(bc9971cc) SHA1(e33d3af88d4d290294d750e41f946f9fa761a31e) )
+
+	// an SDcard was present in the slot, but contained only user photos
+ROM_END
+
 ROM_START( anpanm19 )
 	ROM_REGION(  0x1000000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25l1280.u3", 0x0000, 0x1000000, CRC(7932fb3e) SHA1(a381eeba5357fe71e4d6081b9b91b57e5705f7f1) )
@@ -324,7 +331,12 @@ ROM_END
 
 ROM_START( bananlap )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
-	ROM_LOAD( "gpr25l64.u3", 0x0000, 0x800000, CRC(46441cd5) SHA1(da1891a21e23c60492719c2b953e453885fc1bde) )
+	ROM_LOAD( "orange_gpr25l64.u3", 0x0000, 0x800000, CRC(46441cd5) SHA1(da1891a21e23c60492719c2b953e453885fc1bde) )
+ROM_END
+
+ROM_START( bananlapa )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "yellow_mx25l6406e.u1", 0x0000, 0x800000, CRC(2bc14be1) SHA1(7072c040d7f5b6d89ea19cad9d8a1841ff70f51e) )
 ROM_END
 
 ROM_START( bandolap )
@@ -352,12 +364,45 @@ ROM_START( banaquap )
 	ROM_LOAD( "gpr25l64.u8", 0x0000, 0x800000, CRC(3a434fe0) SHA1(34c55bebe7451d9046311b6c704e0e66347f5a39) )
 ROM_END
 
+ROM_START( anpntb18 )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l6406e.u1", 0x0000, 0x800000, CRC(9191bfdc) SHA1(c48c0b5234b2d031f811d75995912d49baf80f89) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
+ROM_START( anpncp17 )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l640.u3", 0x0000, 0x800000, CRC(f7b1dce3) SHA1(d682abc9a3fbdb66fdc712da486b3e7bbdebbe48) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
+ROM_START( doraet17 )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l640.u3", 0x0000, 0x800000, CRC(5d1d634f) SHA1(8e8faa2fa4b512611ed35936e0d0c8e2360d0a05) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
+ROM_START( banpear )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25l643.u5", 0x0000, 0x800000, CRC(5b378083) SHA1(3aa13d1220e4db7be4420dfd2a5d11300359a12c) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
 ROM_START( intrtvg )
 	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "25q08.u6", 0x0000, 0x100000, CRC(5aa91972) SHA1(296108e8683063c16951ff326e6ff3d63d9ed5b8) )
 
 	DISK_REGION( "sdcard" ) // 4GB SD Card
 	DISK_IMAGE( "interactivetv", 0, SHA1(7061e28c4560b763bda1157036b79c726387e430) )
+ROM_END
+
+ROM_START( arb605 )
+	ROM_REGION(  0x100000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "25q80.u6", 0x0000, 0x100000, CRC(8dbf398e) SHA1(fdee8b93967f79cfd577b944841a65744dd251aa) )
+	ROM_IGNORE(0x50) // 'config' bytes
+
+	DISK_REGION( "sdcard" ) // 4GB SD Card
+	DISK_IMAGE( "ar_game_console_b605", 0, SHA1(433d354529e262de9d833a7a423a37915ba3362c) )
 ROM_END
 
 ROM_START( ardancem )
@@ -367,7 +412,6 @@ ROM_START( ardancem )
 	DISK_REGION( "sdcard" ) // 16GB SD Card
 	DISK_IMAGE( "ardancemat", 0, SHA1(df8cb065f5ce0ca863b205549ecc4c27647f9954) )
 ROM_END
-
 
 ROM_START( pdcm2 )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
@@ -457,6 +501,10 @@ ROM_START( segcarsh )
 	ROM_LOAD( "mx25l12833.sfrom1", 0x0000, 0x1000000, CRC(46a350fc) SHA1(1efa026abce3f2bd8a7e32519c4705dbdcfc5919) )
 ROM_END
 
+ROM_START( jpaddp )
+	ROM_REGION( 0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx25l6406e.sfrom1", 0x0000, 0x800000, CRC(4e482f10) SHA1(e393090a98324fb33374d2203ef7763e1e15b361) )
+ROM_END
 
 ROM_START( dinopc )
 	ROM_REGION16_BE( 0x40000, "maincpu:internal", ROMREGION_ERASE00 )
@@ -546,18 +594,39 @@ CONS( 2019, anpanm19,        0,        0,      gpl32612, gpl32612, generalplus_g
 // unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
 CONS( 201?, smatomo,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Smatomo (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
+// unknown (uses a glob) has GPspispi header, ARM based, SPI ROM
+CONS( 2020, froz2dct,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Takara Tomy",        "Frozen 2 Dream Camera Tablet (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
 // (these all use the same PCB) - unknown SoC (uses a glob) has GPspispi header, ARM based, SPI ROM
 // ディズニー&ディズニー／ピクサーキャラクターズ ワンダフルスイートパソコン
 CONS( 2014, bandplap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Wonderful Sweet PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // ディズニー&ディズニー／ピクサーキャラクターズ ワンダフルドリームパソコン
 CONS( 2014, bandslap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Wonderful Dream PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // あそんでまなべる！マウスでクリック！アンパンマンパソコン
-CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Asonde Manaberu! Mouse de Click! Anpanman PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Asonde Manaberu! Mouse de Click! Anpanman PC (Japan, orange/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, orange base
+// アンパンマンカラーパソコンスタート
+CONS( 2014, bananlapa,       bananlap, 0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Color PC Start (Japan, yellow/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, yellow base
 // ドラえもんステップアップパソコン
 CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Step Up PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32630A has GPspispi header  マーメイドアクアポット
 CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Tropical Rouge! PreCure: Mermaid Aqua Pot (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32630A has GPspispi header
+// アンパンマンすくすく知育パッド
+CONS( 2018, anpntb18,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Sukusuku Chiiku Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32630A has GPspispi header
+// アンパンマンカラーパッドプラス ピンクカラーVer.
+CONS( 2017, anpncp17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Color Pad Plus (Pink Color Version) (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses GPL32630A has GPspispi header
+// ドラえもんひらめきパッド
+CONS( 2017, doraet17,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Hirameki Pad (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses a glob, has GPspispi header, "Pear 265077A. 2022 11 22" on PCB
+// めざせ！あこがれのわたし♡プリキュアミラーパッド！オールスター
+CONS( 2022, banpear,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "PreCure Mirror Pad! All Star (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // company is called 深圳市飞讯互动科技有限公司
 // surface details erased on SoC for both of these
@@ -565,6 +634,8 @@ CONS( 2021, banaquap,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 202?, intrtvg,         0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "Interactive Game Console (Model B608, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // also very generic packaging, similar SD card content to above, including NES games, but with some extra music/videos for the dance part
 CONS( 202?, ardancem,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Dance Mat (Model DM02, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+// likewise
+CONS( 202?, arb605,          0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Shen Zhen Shi Fei Xun Hu Dong Technology",     "AR Game Console (Model B605, YRPRSODF)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // unknown (uses a glob) but it's GeneralPlus and ARM based, so put in here for now
 // ROM has 'GPNandTag2' header rather than the usual
@@ -622,6 +693,9 @@ CONS( 2016, segdis16,            0,        0,      gpl32612, gpl32612, generalpl
 
 // uses GPL32611
 CONS( 201?, segcarsh,            0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Disney Cars Shake It! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// uses glob, has GPSPI header
+CONS( 201?, jpaddp,              0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Sega Toys",        "Jewel Pad Diamond Premium (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // uses GPL32600A
 // マウスでバトル!! 恐竜図鑑パソコン

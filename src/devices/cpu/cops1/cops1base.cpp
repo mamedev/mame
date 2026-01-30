@@ -197,7 +197,7 @@ void cops1_base_device::execute_run()
 		increment_pc();
 		cycle();
 
-		if (m_op != 0x25)
+		if (m_op != 0x25 || m_skip)
 			m_write_blk(1);
 
 		// fetch opcode argument

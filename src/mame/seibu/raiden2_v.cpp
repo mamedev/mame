@@ -249,7 +249,7 @@ u32 xsedae_state::pri_callback(u8 pri)
 		case 2: return GFX_PMASK_8;
 		// above everything
 		case 3:
-		default: return 0; 
+		default: return 0;
 	}
 }
 

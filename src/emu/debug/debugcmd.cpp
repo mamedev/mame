@@ -33,6 +33,7 @@
 #include <algorithm>
 #include <cctype>
 #include <fstream>
+#include <locale>
 #include <sstream>
 
 
@@ -606,13 +607,14 @@ bool debugger_commands::mini_printf(std::ostream &stream, const std::vector<std:
 
 				case 's':
 					{
-						address_space *space;
-						if (param < params.size() && m_console.validate_target_address_parameter(params[param++], -1, space, number))
+						device_memory_interface *mintf;
+						int spacenum = -1;
+						if (param < params.size() && m_console.validate_target_address_parameter(params[param++], spacenum, mintf, number))
 						{
 							address_space *tspace;
 							std::string s;
 
-							for (u32 address = u32(number), taddress; space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, taddress = address, tspace); address++)
+							for (u32 address = u32(number), taddress; mintf->translate(spacenum, device_memory_interface::TR_READ, taddress = address, tspace); address++)
 							{
 								u8 const data = tspace->read_byte(taddress);
 
@@ -687,6 +689,7 @@ void debugger_commands::execute_printf(const std::vector<std::string_view> &para
 {
 	// then do a printf
 	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	if (mini_printf(buffer, params))
 		m_console.printf("%s\n", std::move(buffer).str());
 }
@@ -700,6 +703,7 @@ void debugger_commands::execute_logerror(const std::vector<std::string_view> &pa
 {
 	// then do a printf
 	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	if (mini_printf(buffer, params))
 		m_machine.logerror("%s", std::move(buffer).str());
 }
@@ -713,6 +717,7 @@ void debugger_commands::execute_tracelog(const std::vector<std::string_view> &pa
 {
 	// then do a printf
 	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	if (mini_printf(buffer, params))
 		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str());
 }
@@ -726,6 +731,7 @@ void debugger_commands::execute_tracesym(const std::vector<std::string_view> &pa
 {
 	// build a format string appropriate for the parameters and validate them
 	std::ostringstream format;
+	format.imbue(std::locale::classic());
 	for (int i = 0; i < params.size(); i++)
 	{
 		// find this symbol
@@ -751,6 +757,7 @@ void debugger_commands::execute_tracesym(const std::vector<std::string_view> &pa
 
 	// then do a printf
 	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	if (mini_printf(buffer, printf_params))
 		m_console.get_visible_cpu()->debug()->trace_printf("%s", std::move(buffer).str());
 }
@@ -1016,25 +1023,28 @@ void debugger_commands::execute_ignore(const std::vector<std::string_view> &para
 	if (params.empty())
 	{
 		// if there are no parameters, dump the ignore list
-		std::string buffer;
+		std::ostringstream buffer;
+		buffer.imbue(std::locale::classic());
 
 		// loop over all executable devices
+		bool empty = true;
 		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 		{
 			// build up a comma-separated list
 			if (!exec.device().debug()->observing())
 			{
-				if (buffer.empty())
-					buffer = string_format("Currently ignoring device '%s'", exec.device().tag());
+				if (empty)
+					util::stream_format(buffer, "Currently ignoring device '%s'", exec.device().tag());
 				else
-					buffer.append(string_format(", '%s'", exec.device().tag()));
+					util::stream_format(buffer, ", '%s'", exec.device().tag());
+				empty = false;
 			}
 		}
 
 		// special message for none
-		if (buffer.empty())
-			buffer = string_format("Not currently ignoring any devices");
-		m_console.printf("%s\n", buffer);
+		if (empty)
+			buffer << "Not currently ignoring any devices";
+		m_console.printf("%s\n", std::move(buffer).str());
 	}
 	else
 	{
@@ -1079,25 +1089,28 @@ void debugger_commands::execute_observe(const std::vector<std::string_view> &par
 	if (params.empty())
 	{
 		// if there are no parameters, dump the ignore list
-		std::string buffer;
+		std::ostringstream buffer;
+		buffer.imbue(std::locale::classic());
 
 		// loop over all executable devices
+		bool empty = true;
 		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
 		{
 			// build up a comma-separated list
 			if (exec.device().debug()->observing())
 			{
-				if (buffer.empty())
-					buffer = string_format("Currently observing CPU '%s'", exec.device().tag());
+				if (empty)
+					util::stream_format(buffer, "Currently observing CPU '%s'", exec.device().tag());
 				else
-					buffer.append(string_format(", '%s'", exec.device().tag()));
+					util::stream_format(buffer, ", '%s'", exec.device().tag());
+				empty = false;
 			}
 		}
 
 		// special message for none
-		if (buffer.empty())
-			buffer = string_format("Not currently observing any devices");
-		m_console.printf("%s\n", buffer);
+		if (empty)
+			buffer << "Not currently observing any devices";
+		m_console.printf("%s\n", std::move(buffer).str());
 	}
 	else
 	{
@@ -1127,24 +1140,28 @@ void debugger_commands::execute_suspend(const std::vector<std::string_view> &par
 	// if there are no parameters, dump the ignore list
 	if (params.empty())
 	{
-		std::string buffer;
+		std::ostringstream buffer;
+		buffer.imbue(std::locale::classic());
 
 		// loop over all executable devices
+		bool empty = true;
 		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
-
+		{
 			// build up a comma-separated list
 			if (exec.device().debug()->suspended())
 			{
-				if (buffer.empty())
-					buffer = string_format("Currently suspended device '%s'", exec.device().tag());
+				if (empty)
+					util::stream_format(buffer, "Currently suspended device '%s'", exec.device().tag());
 				else
-					buffer.append(string_format(", '%s'", exec.device().tag()));
+					util::stream_format(buffer, ", '%s'", exec.device().tag());
+				empty = false;
 			}
+		}
 
 		// special message for none
-		if (buffer.empty())
-			buffer = string_format("No currently suspended devices");
-		m_console.printf("%s\n", buffer);
+		if (empty)
+			buffer << "No currently suspended devices";
+		m_console.printf("%s\n", std::move(buffer).str());
 	}
 	else
 	{
@@ -1186,24 +1203,28 @@ void debugger_commands::execute_resume(const std::vector<std::string_view> &para
 	// if there are no parameters, dump the ignore list
 	if (params.empty())
 	{
-		std::string buffer;
+		std::ostringstream buffer;
+		buffer.imbue(std::locale::classic());
 
 		// loop over all executable devices
+		bool empty = true;
 		for (device_execute_interface &exec : execute_interface_enumerator(m_machine.root_device()))
-
+		{
 			// build up a comma-separated list
 			if (exec.device().debug()->suspended())
 			{
-				if (buffer.empty())
-					buffer = string_format("Currently suspended device '%s'", exec.device().tag());
+				if (empty)
+					util::stream_format(buffer, "Currently suspended device '%s'", exec.device().tag());
 				else
-					buffer.append(string_format(", '%s'", exec.device().tag()));
+					util::stream_format(buffer, ", '%s'", exec.device().tag());
+				empty = false;
 			}
+		}
 
 		// special message for none
-		if (buffer.empty())
-			buffer = string_format("No currently suspended devices");
-		m_console.printf("%s\n", buffer);
+		if (empty)
+			buffer << "No currently suspended devices";
+		m_console.printf("%s\n", std::move(buffer).str());
 	}
 	else
 	{
@@ -1358,23 +1379,18 @@ void debugger_commands::execute_bpset(const std::vector<std::string_view> &param
 {
 	// param 1 is the address/CPU
 	u64 address;
-	address_space *space;
-	if (!m_console.validate_target_address_parameter(params[0], AS_PROGRAM, space, address))
+	device_memory_interface *mintf;
+	int spacenum = AS_PROGRAM;
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, address))
 		return;
 
 	device_execute_interface const *execute;
-	if (!space->device().interface(execute))
+	if (!mintf->device().interface(execute))
 	{
-		m_console.printf("Device %s is not a CPU\n", space->device().name());
+		m_console.printf("Device %s is not a CPU\n", mintf->device().name());
 		return;
 	}
-	device_debug *const debug = space->device().debug();
-
-	if (space->spacenum() != AS_PROGRAM)
-	{
-		m_console.printf("Only program space breakpoints are supported\n");
-		return;
-	}
+	device_debug *const debug = mintf->device().debug();
 
 	// param 2 is the condition
 	parsed_expression condition(debug->symtable());
@@ -1458,7 +1474,8 @@ void debugger_commands::execute_bpdisenable(bool enable, const std::vector<std::
 void debugger_commands::execute_bplist(const std::vector<std::string_view> &params)
 {
 	int printed = 0;
-	std::string buffer;
+	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	auto const apply =
 			[this, &printed, &buffer] (device_t &device)
 			{
@@ -1469,13 +1486,15 @@ void debugger_commands::execute_bplist(const std::vector<std::string_view> &para
 					// loop over the breakpoints
 					for (const auto &bpp : device.debug()->breakpoint_list())
 					{
+						buffer.str("");
+						buffer.seekp(0);
 						debug_breakpoint &bp = *bpp.second;
-						buffer = string_format("%c%4X @ %0*X", bp.enabled() ? ' ' : 'D', bp.index(), device.debug()->logaddrchars(), bp.address());
+						util::stream_format(buffer, "%c%4X @ %0*X", bp.enabled() ? ' ' : 'D', bp.index(), device.debug()->logaddrchars(), bp.address());
 						if (std::string(bp.condition()).compare("1") != 0)
-							buffer.append(string_format(" if %s", bp.condition()));
+							util::stream_format(buffer, " if %s", bp.condition());
 						if (std::string(bp.action()).compare("") != 0)
-							buffer.append(string_format(" do %s", bp.action()));
-						m_console.printf("%s\n", buffer);
+							util::stream_format(buffer, " do %s", bp.action());
+						m_console.printf("%s\n", std::move(buffer).str());
 						printed++;
 					}
 				}
@@ -1509,19 +1528,19 @@ void debugger_commands::execute_bplist(const std::vector<std::string_view> &para
 void debugger_commands::execute_wpset(int spacenum, const std::vector<std::string_view> &params)
 {
 	u64 address, length;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// param 1 is the address/CPU
-	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, address))
 		return;
 
 	device_execute_interface const *execute;
-	if (!space->device().interface(execute))
+	if (!mintf->device().interface(execute))
 	{
-		m_console.printf("Device %s is not a CPU\n", space->device().name());
+		m_console.printf("Device %s is not a CPU\n", mintf->device().name());
 		return;
 	}
-	device_debug *const debug = space->device().debug();
+	device_debug *const debug = mintf->device().debug();
 
 	// param 2 is the length
 	if (!m_console.validate_number_parameter(params[1], length))
@@ -1545,6 +1564,14 @@ void debugger_commands::execute_wpset(int spacenum, const std::vector<std::strin
 		}
 	}
 
+	address_space *tspace;
+	offs_t taddress = address;
+	if (!mintf->translate(spacenum, type == read_or_write::READ ? device_memory_interface::TR_READ : device_memory_interface::TR_WRITE, taddress, tspace))
+	{
+		m_console.printf("Address %x in logical space %s does not map to anything\n", address, mintf->logical_space_config(spacenum)->name());
+		return;
+	}
+
 	// param 4 is the condition
 	parsed_expression condition(debug->symtable());
 	if (params.size() > 3 && !m_console.validate_expression_parameter(params[3], condition))
@@ -1556,7 +1583,7 @@ void debugger_commands::execute_wpset(int spacenum, const std::vector<std::strin
 		return;
 
 	// set the watchpoint
-	int const wpnum = debug->watchpoint_set(*space, type, address, length, (condition.is_empty()) ? nullptr : condition.original_string(), action);
+	int const wpnum = debug->watchpoint_set(*tspace, type, taddress, length, (condition.is_empty()) ? nullptr : condition.original_string(), action);
 	m_console.printf("Watchpoint %X set\n", wpnum);
 }
 
@@ -1627,7 +1654,8 @@ void debugger_commands::execute_wpdisenable(bool enable, const std::vector<std::
 void debugger_commands::execute_wplist(const std::vector<std::string_view> &params)
 {
 	int printed = 0;
-	std::string buffer;
+	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	auto const apply =
 			[this, &printed, &buffer] (device_t &device)
 			{
@@ -1645,17 +1673,19 @@ void debugger_commands::execute_wplist(const std::vector<std::string_view> &para
 						// loop over the watchpoints
 						for (const auto &wp : device.debug()->watchpoint_vector(spacenum))
 						{
-							buffer = string_format(
+							buffer.str("");
+							buffer.seekp(0);
+							util::stream_format(buffer,
 									"%c%4X @ %0*X-%0*X %s",
 									wp->enabled() ? ' ' : 'D', wp->index(),
 									wp->space().addrchars(), wp->address(),
 									wp->space().addrchars(), wp->address() + wp->length() - 1,
 									types[int(wp->type())]);
 							if (std::string(wp->condition()).compare("1") != 0)
-								buffer.append(string_format(" if %s", wp->condition()));
+								util::stream_format(buffer, " if %s", wp->condition());
 							if (std::string(wp->action()).compare("") != 0)
-								buffer.append(string_format(" do %s", wp->action()));
-							m_console.printf("%s\n", buffer);
+								util::stream_format(buffer, " do %s", wp->action());
+							m_console.printf("%s\n", std::move(buffer).str());
 							printed++;
 						}
 					}
@@ -1867,7 +1897,8 @@ void debugger_commands::execute_epdisenable(bool enable, const std::vector<std::
 void debugger_commands::execute_eplist(const std::vector<std::string_view> &params)
 {
 	int printed = 0;
-	std::string buffer;
+	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	auto const apply =
 			[this, &printed, &buffer] (device_t &device)
 			{
@@ -1879,12 +1910,14 @@ void debugger_commands::execute_eplist(const std::vector<std::string_view> &para
 					for (const auto &epp : device.debug()->exceptionpoint_list())
 					{
 						debug_exceptionpoint &ep = *epp.second;
-						buffer = string_format("%c%4X : %X", ep.enabled() ? ' ' : 'D', ep.index(), ep.type());
+						buffer.str("");
+						buffer.seekp(0);
+						util::stream_format(buffer, "%c%4X : %X", ep.enabled() ? ' ' : 'D', ep.index(), ep.type());
 						if (std::string(ep.condition()).compare("1") != 0)
-							buffer.append(string_format(" if %s", ep.condition()));
+							util::stream_format(buffer, " if %s", ep.condition());
 						if (!ep.action().empty())
-							buffer.append(string_format(" do %s", ep.action()));
-						m_console.printf("%s\n", buffer);
+							util::stream_format(buffer, " do %s", ep.action());
+						m_console.printf("%s\n", std::move(buffer).str());
 						printed++;
 					}
 				}
@@ -1918,7 +1951,8 @@ void debugger_commands::execute_eplist(const std::vector<std::string_view> &para
 void debugger_commands::execute_rplist(const std::vector<std::string_view> &params)
 {
 	int printed = 0;
-	std::string buffer;
+	std::ostringstream buffer;
+	buffer.imbue(std::locale::classic());
 	auto const apply =
 			[this, &printed, &buffer] (device_t &device)
 			{
@@ -1929,10 +1963,12 @@ void debugger_commands::execute_rplist(const std::vector<std::string_view> &para
 					// loop over the registerpoints
 					for (const auto &rp : device.debug()->registerpoint_list())
 					{
-						buffer = string_format("%c%4X if %s", rp.enabled() ? ' ' : 'D', rp.index(), rp.condition());
+						buffer.str("");
+						buffer.seekp(0);
+						util::stream_format(buffer, "%c%4X if %s", rp.enabled() ? ' ' : 'D', rp.index(), rp.condition());
 						if (!rp.action().empty())
-							buffer.append(string_format(" do %s", rp.action()));
-						m_console.printf("%s\n", buffer);
+							util::stream_format(buffer, " do %s", rp.action());
+						m_console.printf("%s\n", std::move(buffer).str());
 						printed++;
 					}
 				}
@@ -2016,17 +2052,18 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		return;
 
 	u64 offset, endoffset, length;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// validate parameters
-	if (!m_console.validate_target_address_parameter(params[1], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[1], spacenum, mintf, offset))
 		return;
 	if (!m_console.validate_number_parameter(params[2], length))
 		return;
 
 	// determine the addresses to write
-	endoffset = (offset + length - 1) & space->addrmask();
-	offset = offset & space->addrmask();
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+	endoffset = (offset + length - 1) & config->addrmask();
+	offset = offset & config->addrmask();
 	endoffset++;
 
 	// open the file
@@ -2039,16 +2076,16 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 	}
 
 	// now write the data out
-	auto dis = space->device().machine().disable_side_effects();
-	switch (space->addr_shift())
+	auto dis = mintf->device().machine().disable_side_effects();
+	switch (config->addr_shift())
 	{
 	case -3:
 		for (u64 i = offset; i != endoffset; i++)
 		{
 			offs_t curaddr = i;
 			address_space *tspace;
-			u64 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_qword(curaddr) : space->unmap();
+			u64 data = mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace) ?
+				tspace->read_qword(curaddr) : 0;
 			fwrite(&data, 8, 1, f);
 		}
 		break;
@@ -2057,8 +2094,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		{
 			offs_t curaddr = i;
 			address_space *tspace;
-			u32 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_dword(curaddr) : space->unmap();
+			u32 data = mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace) ?
+				tspace->read_dword(curaddr) : 0;
 			fwrite(&data, 4, 1, f);
 		}
 		break;
@@ -2067,8 +2104,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		{
 			offs_t curaddr = i;
 			address_space *tspace;
-			u16 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_word(curaddr) : space->unmap();
+			u16 data = mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace) ?
+				tspace->read_word(curaddr) : 0;
 			fwrite(&data, 2, 1, f);
 		}
 		break;
@@ -2077,8 +2114,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		{
 			offs_t curaddr = i;
 			address_space *tspace;
-			u8 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_byte(curaddr) : space->unmap();
+			u8 data = mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace) ?
+				tspace->read_byte(curaddr) : 0;
 			fwrite(&data, 1, 1, f);
 		}
 		break;
@@ -2089,8 +2126,8 @@ void debugger_commands::execute_save(int spacenum, const std::vector<std::string
 		{
 			offs_t curaddr = i;
 			address_space *tspace;
-			u16 data = space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace) ?
-				tspace->read_word(curaddr) : space->unmap();
+			u16 data = mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace) ?
+				tspace->read_word(curaddr) : 0;
 			fwrite(&data, 2, 1, f);
 		}
 		break;
@@ -2175,10 +2212,10 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 		return;
 
 	u64 offset, endoffset, length = 0;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// validate parameters
-	if (!m_console.validate_target_address_parameter(params[1], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[1], spacenum, mintf, offset))
 		return;
 	if (params.size() > 2 && !m_console.validate_number_parameter(params[2], length))
 		return;
@@ -2192,27 +2229,29 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 		m_console.printf("Error opening file '%s'\n", params[0]);
 		return;
 	}
+	f.imbue(std::locale::classic());
 
 	// determine the file size, if not specified
+	const address_space_config *config = mintf->logical_space_config(spacenum);
 	if (params.size() <= 2)
 	{
 		f.seekg(0, std::ios::end);
 		length = f.tellg();
 		f.seekg(0);
-		if (space->addr_shift() < 0)
-			length >>= -space->addr_shift();
-		else if (space->addr_shift() > 0)
-			length <<= space->addr_shift();
+		if (config->addr_shift() < 0)
+			length >>= -config->addr_shift();
+		else if (config->addr_shift() > 0)
+			length <<= config->addr_shift();
 	}
 
 	// determine the addresses to read
-	endoffset = (offset + length - 1) & space->addrmask();
-	offset = offset & space->addrmask();
+	endoffset = (offset + length - 1) & config->addrmask();
+	offset = offset & config->addrmask();
 	u64 i = 0;
 
 	// now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1)
-	auto dis = space->device().machine().disable_side_effects();
-	switch (space->addr_shift())
+	auto dis = mintf->device().machine().disable_side_effects();
+	switch (config->addr_shift())
 	{
 	case -3:
 		for (i = offset; f.good() && (i <= endoffset || endoffset == offset - 1); i++)
@@ -2221,7 +2260,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			u64 data;
 			f.read((char *)&data, 8);
 			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
+			if (f && mintf->translate(spacenum, device_memory_interface::TR_WRITE, curaddr, tspace))
 				tspace->write_qword(curaddr, data);
 		}
 		break;
@@ -2232,7 +2271,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			u32 data;
 			f.read((char *)&data, 4);
 			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
+			if (f && mintf->translate(spacenum, device_memory_interface::TR_WRITE, curaddr, tspace))
 				tspace->write_dword(curaddr, data);
 		}
 		break;
@@ -2243,7 +2282,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			u16 data;
 			f.read((char *)&data, 2);
 			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
+			if (f && mintf->translate(spacenum, device_memory_interface::TR_WRITE, curaddr, tspace))
 				tspace->write_word(curaddr, data);
 		}
 		break;
@@ -2254,7 +2293,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			u8 data;
 			f.read((char *)&data, 1);
 			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
+			if (f && mintf->translate(spacenum, device_memory_interface::TR_WRITE, curaddr, tspace))
 				tspace->write_byte(curaddr, data);
 		}
 		break;
@@ -2267,7 +2306,7 @@ void debugger_commands::execute_load(int spacenum, const std::vector<std::string
 			u16 data;
 			f.read((char *)&data, 2);
 			address_space *tspace;
-			if (f && space->device().memory().translate(space->spacenum(), device_memory_interface::TR_WRITE, curaddr, tspace))
+			if (f && mintf->translate(spacenum, device_memory_interface::TR_WRITE, curaddr, tspace))
 				tspace->write_word(curaddr, data);
 		}
 		break;
@@ -2365,10 +2404,12 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 		return;
 
 	// validate parameters
-	address_space *space;
+	device_memory_interface *mintf;
 	u64 offset;
-	if (!m_console.validate_target_address_parameter(params[1], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[1], spacenum, mintf, offset))
 		return;
+
+	const address_space_config *config = mintf->logical_space_config(spacenum);
 
 	u64 length;
 	if (!m_console.validate_number_parameter(params[2], length))
@@ -2382,18 +2423,18 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 	if (params.size() > 4 && !m_console.validate_boolean_parameter(params[4], ascii))
 		return;
 
-	u64 rowsize = space->byte_to_address(16);
+	u64 rowsize = config->byte2addr(16);
 	if (params.size() > 5 && !m_console.validate_number_parameter(params[5], rowsize))
 		return;
 
-	int shift = space->addr_shift();
+	int shift = config->addr_shift();
 	u64 granularity = shift >= 0 ? 1 : 1 << -shift;
 
 	// further validation
 	if (width == 0)
-		width = space->data_width() / 8;
-	if (width < space->address_to_byte(1))
-		width = space->address_to_byte(1);
+		width = config->data_width() / 8;
+	if (width < config->addr2byte(1))
+		width = config->addr2byte(1);
 	if (width != 1 && width != 2 && width != 4 && width != 8)
 	{
 		m_console.printf("Invalid width! (must be 1,2,4 or 8)\n");
@@ -2404,14 +2445,14 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 		m_console.printf("Invalid width! (must be at least %d)\n", granularity);
 		return;
 	}
-	if (rowsize == 0 || (rowsize % space->byte_to_address(width)) != 0)
+	if (rowsize == 0 || (rowsize % config->byte2addr(width)) != 0)
 	{
-		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", space->byte_to_address(width));
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)\n", config->byte2addr(width));
 		return;
 	}
 
-	u64 endoffset = (offset + length - 1) & space->addrmask();
-	offset = offset & space->addrmask();
+	u64 endoffset = (offset + length - 1) & config->addrmask();
+	offset = offset & config->addrmask();
 
 	// open the file
 	std::string filename(params[0]);
@@ -2424,12 +2465,13 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 
 	// now write the data out
 	util::ovectorstream output;
+	output.imbue(std::locale::classic());
 	output.reserve(200);
 
 	const unsigned delta = (shift >= 0) ? (width << shift) : (width >> -shift);
 
-	auto dis = space->device().machine().disable_side_effects();
-	bool be = space->endianness() == ENDIANNESS_BIG;
+	auto dis = mintf->device().machine().disable_side_effects();
+	bool be = config->endianness() == ENDIANNESS_BIG;
 
 	for (u64 i = offset; i <= endoffset; i += rowsize)
 	{
@@ -2437,7 +2479,7 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 		output.rdbuf()->clear();
 
 		// print the address
-		util::stream_format(output, "%0*X: ", space->logaddrchars(), i);
+		util::stream_format(output, "%0*X: ", config->logaddrchars(), i);
 
 		// print the bytes
 		for (u64 j = 0; j < rowsize; j += delta)
@@ -2446,7 +2488,7 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 			{
 				offs_t curaddr = i + j;
 				address_space *tspace;
-				if (space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace))
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace))
 				{
 					switch (width)
 					{
@@ -2481,7 +2523,7 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 			{
 				offs_t curaddr = i + j;
 				address_space *tspace;
-				if (space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace))
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace))
 				{
 					u64 data = 0;
 					switch (width)
@@ -2499,8 +2541,9 @@ void debugger_commands::execute_dump(int spacenum, const std::vector<std::string
 						data = tspace->read_byte(i+j);
 						break;
 					}
-					for (unsigned int b = 0; b != width; b++) {
-						u8 byte = data >> (8 * (be ? (width-1-b) : b));
+					for (unsigned int b = 0; b != width; b++)
+					{
+						u8 const byte = data >> (8 * (be ? (width-1-b) : b));
 						util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
 					}
 				}
@@ -2610,6 +2653,7 @@ bool debugger_commands::execute_dump_try_memory(const std::vector<std::string_vi
 
 	// now write the data out
 	util::ovectorstream output;
+	output.imbue(std::locale::classic());
 	output.reserve(200);
 
 	const unsigned delta = (shift >= 0) ? (width << shift) : (width >> -shift);
@@ -2710,8 +2754,8 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 	if (params.size() > 3 && !m_console.validate_number_parameter(params[3], term))
 		return;
 
-	address_space *space;
-	if (!m_console.validate_device_space_parameter((params.size() > 4) ? params[4] : std::string_view(), spacenum, space))
+	device_memory_interface *mintf;
+	if (!m_console.validate_device_space_parameter((params.size() > 4) ? params[4] : std::string_view(), spacenum, mintf))
 		return;
 
 	// further validation
@@ -2730,20 +2774,23 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 		return;
 	}
 
-	const int shift = space->addr_shift();
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+
+	const int shift = config->addr_shift();
 	const unsigned delta = (shift >= 0) ? (1 << shift) : 1;
 	const unsigned width = (shift >= 0) ? 1 : (1 << -shift);
-	const bool be = space->endianness() == ENDIANNESS_BIG;
+	const bool be = config->endianness() == ENDIANNESS_BIG;
 
-	offset = offset & space->addrmask();
+	offset = offset & config->addrmask();
 	if (shift > 0)
 		length >>= shift;
 
 	// now write the data out
 	util::ovectorstream output;
+	output.imbue(std::locale::classic());
 	output.reserve(200);
 
-	auto dis = space->device().machine().disable_side_effects();
+	auto dis = mintf->device().machine().disable_side_effects();
 
 	bool terminated = true;
 	while (length-- != 0)
@@ -2755,14 +2802,14 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 			output.rdbuf()->clear();
 
 			// print the address
-			util::stream_format(output, "%0*X: \"", space->logaddrchars(), offset);
+			util::stream_format(output, "%0*X: \"", config->logaddrchars(), offset);
 		}
 
 		// get the character data
 		u64 data = 0;
 		offs_t curaddr = offset;
 		address_space *tspace;
-		if (space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, curaddr, tspace))
+		if (mintf->translate(spacenum, device_memory_interface::TR_READ, curaddr, tspace))
 		{
 			switch (width)
 			{
@@ -2805,7 +2852,7 @@ void debugger_commands::execute_strdump(int spacenum, const std::vector<std::str
 				output.rdbuf()->clear();
 
 				// print the address
-				util::stream_format(output, "%0*X.%d: \"", space->logaddrchars(), offset, n);
+				util::stream_format(output, "%0*X.%d: \"", config->logaddrchars(), offset, n);
 			}
 
 			u8 ch = data & 0xff;
@@ -2932,6 +2979,7 @@ bool debugger_commands::execute_strdump_try_memory(const std::vector<std::string
 
 	// now write the data out
 	util::ovectorstream output;
+	output.imbue(std::locale::classic());
 	output.reserve(200);
 
 	bool terminated = true;
@@ -3124,8 +3172,15 @@ void debugger_commands::execute_cheatrange(bool init, const std::vector<std::str
 		}
 
 		// fourth argument is device/space
-		if (!m_console.validate_device_space_parameter((params.size() > 3) ? params[3] : std::string_view(), -1, space))
+		int spacenum = -1;
+		device_memory_interface *mintf;
+		if (!m_console.validate_device_space_parameter((params.size() > 3) ? params[3] : std::string_view(), spacenum, mintf))
 			return;
+
+		// cheats only really work on directly physically-backed logical spaces
+		if (!mintf->has_space(spacenum))
+			return;
+		space = &mintf->space(spacenum);
 	}
 
 	cheat_region_map cheat_region[100]; // FIXME: magic number
@@ -3467,6 +3522,7 @@ void debugger_commands::execute_cheatlist(const std::vector<std::string_view> &p
 	// write the cheat list
 	u32 active_cheat = 0;
 	util::ovectorstream output;
+	output.imbue(std::locale::classic());
 	for (u64 cheatindex = 0; cheatindex < m_cheat.cheatmap.size(); cheatindex += 1)
 	{
 		if (m_cheat.cheatmap[cheatindex].state == 1)
@@ -3554,18 +3610,19 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 		return;
 
 	u64 offset, length;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// validate parameters
-	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, offset))
 		return;
 	if (!m_console.validate_number_parameter(params[1], length))
 		return;
 
 	// further validation
-	u64 const endoffset = space->address_to_byte_end((offset + length - 1) & space->addrmask());
-	offset = space->address_to_byte(offset & space->addrmask());
-	int cur_data_size = (space->addr_shift() > 0) ? 2 : (1 << -space->addr_shift());
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+	u64 const endoffset = config->addr2byte_end((offset + length - 1) & config->addrmask());
+	offset = config->addr2byte(offset & config->addrmask());
+	int cur_data_size = (config->addr_shift() > 0) ? 2 : (1 << -config->addr_shift());
 	if (cur_data_size == 0)
 		cur_data_size = 1;
 
@@ -3609,8 +3666,7 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 	}
 
 	// now search
-	device_memory_interface &memory = space->device().memory();
-	auto dis = space->device().machine().disable_side_effects();
+	auto dis = mintf->device().machine().disable_side_effects();
 	int found = 0;
 	for (u64 i = offset; i <= endoffset; i += data_size[0])
 	{
@@ -3620,37 +3676,37 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 		// find the entire string
 		for (int j = 0; j < data_count && match; j++)
 		{
-			offs_t address = space->byte_to_address(i + suboffset);
+			offs_t address = config->byte2addr(i + suboffset);
 			address_space *tspace;
 			switch (data_size[j])
 			{
 			case 1:
-				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
+				address &= config->logaddrmask();
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, address, tspace))
 					match = tspace->read_byte(address) == u8(data_to_find[j]);
 				else
 					match = false;
 				break;
 
 			case 2:
-				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
+				address &= config->logaddrmask();
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, address, tspace))
 					match = tspace->read_word_unaligned(address) == u16(data_to_find[j]);
 				else
 					match = false;
 				break;
 
 			case 4:
-				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
+				address &= config->logaddrmask();
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, address, tspace))
 					match = tspace->read_dword_unaligned(address) == u32(data_to_find[j]);
 				else
 					match = false;
 				break;
 
 			case 8:
-				address &= space->logaddrmask();
-				if (memory.translate(space->spacenum(), device_memory_interface::TR_READ, address, tspace))
+				address &= config->logaddrmask();
+				if (mintf->translate(spacenum, device_memory_interface::TR_READ, address, tspace))
 					match = tspace->read_qword_unaligned(address) == u64(data_to_find[j]);
 				else
 					match = false;
@@ -3667,7 +3723,7 @@ void debugger_commands::execute_find(int spacenum, const std::vector<std::string
 		if (match)
 		{
 			found++;
-			m_console.printf("Found at %0*X\n", space->addrchars(), u32(space->byte_to_address(i)));
+			m_console.printf("Found at %0*X\n", config->addrchars(), u32(config->byte2addr(i)));
 		}
 	}
 
@@ -3821,17 +3877,18 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 		return;
 
 	u64 offset, length;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// validate parameters
-	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, offset))
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, offset))
 		return;
 	if (!m_console.validate_number_parameter(params[1], length))
 		return;
 
 	// further validation
-	offset = space->address_to_byte(offset & space->addrmask());
-	int cur_data_size = (space->addr_shift() > 0) ? 2 : (1 << -space->addr_shift());
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+	offset = config->addr2byte(offset & config->addrmask());
+	int cur_data_size = (config->addr_shift() > 0) ? 2 : (1 << -config->addr_shift());
 	if (cur_data_size == 0)
 		cur_data_size = 1;
 
@@ -3876,19 +3933,18 @@ void debugger_commands::execute_fill(int spacenum, const std::vector<std::string
 		return;
 
 	// now fill memory
-	device_memory_interface &memory = space->device().memory();
-	auto dis = space->device().machine().disable_side_effects();
-	u64 count = space->address_to_byte(length);
+	auto dis = mintf->device().machine().disable_side_effects();
+	u64 count = config->addr2byte(length);
 	while (count != 0)
 	{
 		// write the entire string
 		for (int j = 0; j < data_count; j++)
 		{
-			offs_t address = space->byte_to_address(offset) & space->logaddrmask();
+			offs_t address = config->byte2addr(offset) & config->logaddrmask();
 			address_space *tspace;
-			if (!memory.translate(space->spacenum(), device_memory_interface::TR_WRITE, address, tspace))
+			if (!mintf->translate(spacenum, device_memory_interface::TR_WRITE, address, tspace))
 			{
-				m_console.printf("Fill aborted due to page fault at %0*X\n", space->logaddrchars(), space->byte_to_address(offset) & space->logaddrmask());
+				m_console.printf("Fill aborted due to page fault at %0*X\n", config->logaddrchars(), config->byte2addr(offset) & config->logaddrmask());
 				length = 0;
 				break;
 			}
@@ -4064,7 +4120,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 {
 	u64 offset, length;
 	bool bytes = true;
-	address_space *space;
+	device_memory_interface *mintf;
 
 	// validate parameters
 	if (!m_console.validate_number_parameter(params[1], offset))
@@ -4073,14 +4129,15 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 		return;
 	if (params.size() > 3 && !m_console.validate_boolean_parameter(params[3], bytes))
 		return;
-	if (!m_console.validate_device_space_parameter(params.size() > 4 ? params[4] : std::string_view(), AS_PROGRAM, space))
+	int spacenum = AS_PROGRAM;
+	if (!m_console.validate_device_space_parameter(params.size() > 4 ? params[4] : std::string_view(), spacenum, mintf))
 		return;
 
 	// determine the width of the bytes
 	device_disasm_interface *dasmintf;
-	if (!space->device().interface(dasmintf))
+	if (!mintf->device().interface(dasmintf))
 	{
-		m_console.printf("No disassembler available for %s\n", space->device().name());
+		m_console.printf("No disassembler available for %s\n", mintf->device().name());
 		return;
 	}
 
@@ -4092,7 +4149,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 	int max_opcodes_size = 0;
 	int max_disasm_size = 0;
 
-	debug_disasm_buffer buffer(space->device());
+	debug_disasm_buffer buffer(mintf->device());
 
 	for (u64 i = 0; i < length; )
 	{
@@ -4126,12 +4183,13 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 		m_console.printf("Error opening file '%s'\n", params[0]);
 		return;
 	}
+	f.imbue(std::locale::classic());
 
 	if (bytes)
 	{
 		for (unsigned int i=0; i != pcs.size(); i++)
 		{
-			const char *comment = space->device().debug()->comment_text(pcs[i]);
+			const char *comment = mintf->device().debug()->comment_text(pcs[i]);
 			if (comment)
 				util::stream_format(f, "%s: %-*s %-*s // %s\n", tpc[i], max_opcodes_size, topcodes[i], max_disasm_size, instructions[i], comment);
 			else
@@ -4142,7 +4200,7 @@ void debugger_commands::execute_dasm(const std::vector<std::string_view> &params
 	{
 		for (unsigned int i=0; i != pcs.size(); i++)
 		{
-			const char *comment = space->device().debug()->comment_text(pcs[i]);
+			const char *comment = mintf->device().debug()->comment_text(pcs[i]);
 			if (comment)
 				util::stream_format(f, "%s: %-*s // %s\n", tpc[i], max_disasm_size, instructions[i], comment);
 			else
@@ -4176,6 +4234,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 	if (params.size() > 2)
 	{
 		std::stringstream stream;
+		stream.imbue(std::locale::classic());
 		stream.str(std::string(params[2]));
 
 		std::string flag;
@@ -4218,6 +4277,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 			m_console.printf("Error opening file '%s'\n", params[0]);
 			return;
 		}
+		f->imbue(std::locale::classic());
 	}
 
 	// do it
@@ -4361,17 +4421,12 @@ void debugger_commands::execute_trackmem(const std::vector<std::string_view> &pa
 	if (params.size() > 2 && !m_console.validate_boolean_parameter(params[2], clear))
 		return;
 
-	// Get the address space for the given cpu
-	address_space *space;
-	if (!m_console.validate_device_space_parameter(cpuparam, AS_PROGRAM, space))
-		return;
-
 	// Inform the CPU it's time to start tracking memory writes
 	cpu->debug()->set_track_mem(turnOn);
 
 	// Clear out the existing data if requested
 	if (clear)
-		space->device().debug()->track_mem_data_clear();
+		cpu->debug()->track_mem_data_clear();
 }
 
 
@@ -4383,23 +4438,25 @@ void debugger_commands::execute_pcatmem(int spacenum, const std::vector<std::str
 {
 	// Gather the required target address/space parameter
 	u64 address;
-	address_space *space;
-	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
+	device_memory_interface *mintf;
+
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, address))
 		return;
 
 	// Translate the address
-	offs_t a = address & space->logaddrmask();
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+	offs_t a = address & config->logaddrmask();
 	address_space *tspace;
-	if (!space->device().memory().translate(space->spacenum(), device_memory_interface::TR_READ, a, tspace))
+	if (!mintf->translate(spacenum, device_memory_interface::TR_READ, a, tspace))
 	{
 		m_console.printf("Address translation failed\n");
 		return;
 	}
 
 	// Get the value of memory at the address
-	u64 data = space->unmap();
-	auto dis = space->device().machine().disable_side_effects();
-	switch (space->data_width())
+	u64 data = 0;
+	auto dis = mintf->device().machine().disable_side_effects();
+	switch (config->data_width())
 	{
 	case 8:
 		data = tspace->read_byte(a);
@@ -4419,7 +4476,7 @@ void debugger_commands::execute_pcatmem(int spacenum, const std::vector<std::str
 	}
 
 	// Recover the pc & print
-	const offs_t result = space->device().debug()->track_mem_pc_from_space_address_data(space->spacenum(), address, data);
+	const offs_t result = mintf->device().debug()->track_mem_pc_from_space_address_data(spacenum, address, data);
 	if (result != (offs_t)(-1))
 		m_console.printf("%02x\n", result);
 	else
@@ -4493,10 +4550,12 @@ void debugger_commands::execute_map(int spacenum, const std::vector<std::string_
 {
 	// validate parameters
 	u64 address;
-	address_space *space;
-	if (!m_console.validate_target_address_parameter(params[0], spacenum, space, address))
+	device_memory_interface *mintf;
+
+	if (!m_console.validate_target_address_parameter(params[0], spacenum, mintf, address))
 		return;
-	address &= space->logaddrmask();
+	const address_space_config *config = mintf->logical_space_config(spacenum);
+	address &= config->logaddrmask();
 
 	// do the translation first
 	for (int intention = device_memory_interface::TR_READ; intention <= device_memory_interface::TR_FETCH; intention++)
@@ -4504,18 +4563,18 @@ void debugger_commands::execute_map(int spacenum, const std::vector<std::string_
 		static const char *const intnames[] = { "Read", "Write", "Fetch" };
 		offs_t taddress = address;
 		address_space *tspace;
-		if (space->device().memory().translate(space->spacenum(), intention, taddress, tspace))
+		if (mintf->translate(spacenum, intention, taddress, tspace))
 		{
 			std::string mapname = tspace->get_handler_string((intention == device_memory_interface::TR_WRITE) ? read_or_write::WRITE : read_or_write::READ, taddress);
 			m_console.printf(
 					"%7s: %0*X logical %s == %0*X physical %s -> %s\n",
 					intnames[intention & 3],
-					space->logaddrchars(), address, space->name(),
+					config->logaddrchars(), address, config->name(),
 					tspace->addrchars(), taddress, tspace->name(),
 					mapname);
 		}
 		else
-			m_console.printf("%7s: %0*X logical is unmapped\n", intnames[intention & 3], space->logaddrchars(), address);
+			m_console.printf("%7s: %0*X logical is unmapped\n", intnames[intention & 3], config->logaddrchars(), address);
 	}
 }
 

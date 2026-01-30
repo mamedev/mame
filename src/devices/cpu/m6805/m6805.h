@@ -97,6 +97,7 @@ protected:
 	// opcode tables
 	static op_handler_table s_hmos_s_ops;
 	static op_handler_table s_hmos_b_ops;
+	static op_handler_table s_cmos_s_ops;
 	static op_handler_table s_cmos_b_ops;
 	static op_handler_table s_hc_s_ops;
 	static op_handler_table s_hc_b_ops;

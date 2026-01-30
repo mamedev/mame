@@ -3,13 +3,38 @@
 
 #include "emu.h"
 #include "sh.h"
+
 #include "sh_dasm.h"
+
 #include "cpu/drcumlsh.h"
+
+#include "emuopts.h"
+
+
+sh_common_execution::sh_common_execution(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, endianness_t endianness, address_map_constructor internal)
+	: cpu_device(mconfig, type, tag, owner, clock)
+	, m_sh2_state(nullptr)
+	, m_cache(CACHE_SIZE + sizeof(internal_sh2_state))
+	, m_drcuml(nullptr)
+	, m_drcoptions(0)
+	, m_entry(nullptr)
+	, m_read8(nullptr)
+	, m_write8(nullptr)
+	, m_read16(nullptr)
+	, m_write16(nullptr)
+	, m_read32(nullptr)
+	, m_write32(nullptr)
+	, m_interrupt(nullptr)
+	, m_nocode(nullptr)
+	, m_out_of_cycles(nullptr)
+{
+}
 
 void sh_common_execution::device_start()
 {
 	/* allocate the implementation-specific state from the full cache */
-	m_sh2_state = (internal_sh2_state *)m_cache.alloc_near(sizeof(internal_sh2_state));
+	m_cache.allocate_cache(mconfig().options().drc_rwx());
+	m_sh2_state = m_cache.alloc_near<internal_sh2_state>();
 
 	save_item(NAME(m_sh2_state->pc));
 	save_item(NAME(m_sh2_state->sr));

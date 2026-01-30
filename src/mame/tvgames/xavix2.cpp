@@ -822,7 +822,7 @@ ROM_END
 } // anonymous namespace
 
 // Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本
-CONS( 2006, ban_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Naruto (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Naruto Ninja Taikan - Dattebayo! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ 影発動体感! ブルードラゴン -極めろ!ファイヤークライシス!-
 CONS( 2006, ban_bldj, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Kage Hatsudou Taikan! Blue Dragon - Kiwamero! Fire Crisis! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

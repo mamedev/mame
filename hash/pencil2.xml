@@ -10,18 +10,13 @@ license:CC0-1.0
 Undumped known carts
 ~~~~~~~~~~~~~~~~~~~~
 SD-BASIC V1.0
-Le Jardin Magique (PEN-701)
 Alien Invader
-Big Foot Chase
-Mouse Trap
 Parashooter
 Pinball
 Robot Killer
-Smurf
 Space Squadron
 Space Vulture
 Super Bug
-Zaxxon
 
 Undumped known floppies
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -39,13 +34,27 @@ Reminder Calendar
 
 -->
 
+	<software name="bigfoot">
+		<description>Big Foot Chase</description>
+		<year>1983</year>
+		<publisher>Soundic Electronics</publisher>
+		<info name="serial" value="PEN-701"/>
+		<info name="alt_title" value="Le Jardin Magique"/>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="pen701.bin" size="8192" crc="fa1872ca" sha1="faf0325b38f36e776c1da2db280b865889c39cc8" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Dumped using plgDavid's IZE80 board in a ColecoVision by the team at silicium.org -->
 	<software name="treasure">
-		<description>Treasure Hunt / Le Plongeur a la Recherche du Tresor</description>
+		<description>Treasure Hunt</description>
 		<year>1983</year>
 		<publisher>Soundic Electronics</publisher>
 		<info name="serial" value="PEN-702"/>
-		<part name="cart" interface="pencil2_cart">
+		<info name="alt_title" value="Le Plongeur a la Recherche du Tresor"/>
+		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="pen702a.bin" size="8192" crc="9879e2ff" sha1="159b3d50abff42bd53351a13f316bef993b019e7" offset="0x0000" />
 				<rom name="pen702b.bin" size="4096" crc="ddfd95fc" sha1="8d33e7b2821d2e26af3b8721be3732455baeb757" offset="0x2000" />
@@ -73,12 +82,69 @@ Therefore it is not known which rom "202" or "203" is which address range.
 		<year>1983</year>
 		<publisher>Soundic Electronics</publisher>
 		<info name="serial" value="PEN-700"/>
-		<part name="cart" interface="pencil2_cart">
+		<part name="cart" interface="coleco_cart">
 			<dataarea name="rom" size="24576">
 				<rom name="203.bin" size="8192" crc="f502175c" sha1="cb2190e633e98586758008577265a7a2bc088233" offset="0x0000" />
 				<rom name="1-or.bin" size="4096" crc="1ddedccd" sha1="5fc0d30b5997224b67bf286725468194359ced5a" offset="0x2000" />
 				<rom size="4096" offset="0x4000" loadflag="reload" />
 				<rom name="202.bin" size="8192" crc="5171097d" sha1="171999bc04dc98c74c0722b2866310d193dc0f82" offset="0x4000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- non-commercial / homebrew releases -->
+
+	<software name="deepspac">
+		<description>Deepspace</description>
+		<year>2022</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="RobertK"/>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="Deepspace_Pencil2.rom" size="32768" crc="e11dc18d" sha1="565b655a74327ce2494096010e78c8c30a5e3323"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="htron">
+		<description>H-Tron</description>
+		<year>2019</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="RobertK"/>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="Htron_Pencil2.rom" size="32768" crc="042d3563" sha1="c7d59627b80adc2a625f637484816e6b2bc8fcad"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mmind">
+		<description>Mastermind RK</description>
+		<year>2025</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="RobertK"/>
+		<part name="cart" interface="coleco_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="mm_Pencil2.rom" size="32768" crc="ddaad5f0" sha1="5e6d747c1a9bbc1918c8d0ff51fd15fd1f95c2cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sokoban">
+		<description>Sokoban RK</description>
+		<year>2025</year>
+		<publisher>&lt;homebrew&gt;</publisher>
+		<info name="author" value="RobertK"/>
+		<part name="cart1" interface="coleco_cart">
+			<feature name="part_id" value="01-25"/>
+			<dataarea name="rom" size="32768">
+				<rom name="SokobanRK_Pencil2_01-25.rom" size="32768" crc="20254405" sha1="631b5546c26d45a7980d926c064f929b0d02586d"/>
+			</dataarea>
+		</part>
+		<part name="cart2" interface="coleco_cart">
+			<feature name="part_id" value="26-50"/>
+			<dataarea name="rom" size="32768">
+				<rom name="SokobanRK_Pencil2_26-50.rom" size="32768" crc="b9c939c9" sha1="49e3e17a700800d7f3d38c53777f599779e8c936"/>
 			</dataarea>
 		</part>
 	</software>

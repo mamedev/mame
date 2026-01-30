@@ -232,9 +232,6 @@ void tms5110_device::register_for_save_states()
 	save_item(NAME(m_digital_select));
 
 	save_item(NAME(m_speech_rom_bitnum));
-
-	save_item(NAME(m_romclk_hack_timer_started));
-	save_item(NAME(m_romclk_hack_state));
 }
 
 
@@ -1021,7 +1018,6 @@ void tms5110_device::device_start()
 	m_stream = stream_alloc(0, 1, clock() / 80);
 
 	m_state = CTL_STATE_INPUT; /* most probably not defined */
-	m_romclk_hack_timer = timer_alloc(FUNC(tms5110_device::romclk_hack_toggle), this);
 
 	register_for_save_states();
 }
@@ -1078,10 +1074,6 @@ void tms5110_device::device_reset()
 	m_next_is_address = false;
 	m_address = 0;
 	m_addr_bit = 0;
-
-	m_romclk_hack_timer->adjust(attotime::never);
-	m_romclk_hack_timer_started = false;
-	m_romclk_hack_state = false;
 }
 
 
@@ -1162,28 +1154,6 @@ uint8_t m58817_device::status_r()
 	return (TALK_STATUS() << 0); /* CTL1 = still talking ? */
 }
 
-TIMER_CALLBACK_MEMBER(tms5110_device::romclk_hack_toggle)
-{
-	m_romclk_hack_state = !m_romclk_hack_state;
-}
-
-//-------------------------------------------------
-//  romclk_hack_r - read status of romclk
-//-------------------------------------------------
-
-int tms5110_device::romclk_hack_r()
-{
-	/* bring up to date first */
-	m_stream->update();
-
-	/* create and start timer if necessary */
-	if (!m_romclk_hack_timer_started)
-	{
-		m_romclk_hack_timer_started = true;
-		m_romclk_hack_timer->adjust(attotime::from_hz(clock() / 40), 0, attotime::from_hz(clock() / 40));
-	}
-	return m_romclk_hack_state;
-}
 
 
 /******************************************************************************

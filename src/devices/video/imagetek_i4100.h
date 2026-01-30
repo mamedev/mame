@@ -201,11 +201,11 @@ protected:
 	void draw_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
 	inline u8 get_tile_pix(u16 code, u8 x, u8 y, bool const big, u32 &pix);
 	void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u32 const pcode,
-					int sx, int sy, int wx, int wy, bool const big, int const layer);
+			int sx, int sy, int wx, int wy, bool const big, int const layer);
 	void draw_spritegfx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &clip,
-					u32 const gfxstart, u16 const width, u16 const height,
-					u16 color, int const flipx, int const flipy, int sx, int sy,
-					u32 const scale, u8 const prival);
+			u32 const gfxstart, u16 const width, u16 const height,
+			u16 color, int const flipx, int const flipy, int sx, int sy,
+			u32 const scale, u8 const prival);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void expand_gfx1();
 

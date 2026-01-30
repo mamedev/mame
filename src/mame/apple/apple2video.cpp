@@ -407,7 +407,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 {
 	unsigned invert_mask = Invert ? 0 : 0x7f;
 
-	if (Model == model::IIE || Model == model::IIGS)
+	if (Model == model::IIE || Model == model::PRAVETZ_8C || Model == model::IIGS)
 	{
 		if (!m_altcharset)
 		{
@@ -421,7 +421,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 				}
 			}
 		}
-		else
+		else if (Model != model::PRAVETZ_8C)
 		{
 			if ((code >= 0x60) && (code <= 0x7f))
 			{
@@ -429,11 +429,11 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 				invert_mask ^= 0x7f;  // and flip the color
 			}
 		}
-		if (Model == model::IIE)
+		if (Model != model::IIGS)
 		{
 			code |= get_iie_langsw() * 0x100;
 		}
-		else if ((Model == model::IIGS) && BIT(m_GS_langsel, 3))
+		else if (BIT(m_GS_langsel, 3))
 		{
 			code |= (m_GS_langsel >> 5) * 0x100;
 		}
@@ -583,7 +583,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 	// printf("TXT: row %d startcol %d stopcol %d left %d right %d\n", beginrow, startcol, stopcol, cliprect.left(), cliprect.right());
 
-	bool const is_80_column = (Model == model::IIE || Model == model::IIGS) && m_80col;
+	bool const is_80_column = (Model == model::IIE || Model == model::PRAVETZ_8C || Model == model::IIGS) && m_80col;
 	bool const monochrome = !(m_graphics && composite_monitor() && composite_text_color(is_80_column));
 	for (int row = beginrow; row <= endrow; row++)
 	{
@@ -604,7 +604,7 @@ void a2_video_device::text_update(screen_device &screen, bitmap_ind16 &bitmap, c
 			}
 		}
 
-		if (Model == model::IIE && rgb_monitor() && m_dhires && !m_80col)
+		if ((Model == model::IIE || Model == model::PRAVETZ_8C) && rgb_monitor() && m_dhires && !m_80col)
 		{
 			// Video-7 foreground-background mode
 			render_line_color_array(&bitmap.pix(row), words, startcol, stopcol, &aux_page[aux_address]);
@@ -1000,7 +1000,7 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 	}
 
 	// always update the flash timer here so it's smooth regardless of mode switches
-	if (Model == model::IIE || Model == model::IIGS)
+	if (Model == model::IIE || Model == model::PRAVETZ_8C || Model == model::IIGS)
 	{
 		// video scanner overflow flash timer every 16 frames, ~1.87 Hz (NTSC)
 		m_flash = screen.frame_number() & 0x10;
@@ -1019,7 +1019,7 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 
 		if (m_hires)
 		{
-			if ((Model == model::IIE || Model == model::IIGS) && m_dhires && m_80col && m_aux_ptr)
+			if ((Model == model::IIE || Model == model::PRAVETZ_8C || Model == model::IIGS) && m_dhires && m_80col && m_aux_ptr)
 			{
 				dhgr_update(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}
@@ -1030,7 +1030,7 @@ uint32_t a2_video_device::screen_update(screen_device &screen, bitmap_ind16 &bit
 		}
 		else    // lo-res
 		{
-			if ((Model == model::IIE || Model == model::IIGS) && m_dhires && m_80col && m_aux_ptr)
+			if ((Model == model::IIE || Model == model::PRAVETZ_8C || Model == model::IIGS) && m_dhires && m_80col && m_aux_ptr)
 			{
 				lores_update<true>(screen, bitmap, cliprect, 0, text_start_row - 1);
 			}
@@ -1058,6 +1058,7 @@ template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, tr
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::PRAVETZ_8C, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

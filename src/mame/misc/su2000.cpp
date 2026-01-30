@@ -51,7 +51,7 @@
 #include "pcshare.h"
 
 #include "cpu/i386/i386.h"
-#include "cpu/tms32031/tms32031.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "machine/ds128x.h"
 #include "machine/idectrl.h"
 #include "machine/pckeybrd.h"
@@ -152,7 +152,7 @@ void su2000_state::su2000(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
 
 #if 0
-	tms32031_device &tracker(TMS32031(config, "tracker", TMS320C1_CLOCK));
+	tms320c31_device &tracker(TMS320C31(config, "tracker", TMS320C1_CLOCK));
 	tracker.set_addrmap(AS_PROGRAM, &su2000_state::tracker_map);
 
 	mc88100_device &pix_cpu1(MC88110(config, "pix_cpu1", MC88110_CLOCK));

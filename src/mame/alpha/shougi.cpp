@@ -91,6 +91,7 @@ PROM  : Type MB7051
 #include "screen.h"
 #include "speaker.h"
 
+
 namespace {
 
 class shougi_state : public driver_device
@@ -109,16 +110,16 @@ public:
 
 	void shougi(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	void nmi_enable_w(int state);
-	uint8_t semaphore_r();
-
 	void shougi_palette(palette_device &palette) const;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
-	virtual void machine_start() override ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
 	void readport_sub(address_map &map) ATTR_COLD;
 	void sub_map(address_map &map) ATTR_COLD;
@@ -132,14 +133,14 @@ private:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	uint8_t m_nmi_enabled = 0;
-	int m_r = 0;
+	uint8_t m_sharedram_dir = 0;
 };
 
 void shougi_state::machine_start()
 {
 	// register for savestates
 	save_item(NAME(m_nmi_enabled));
-	save_item(NAME(m_r));
+	save_item(NAME(m_sharedram_dir));
 }
 
 
@@ -179,21 +180,21 @@ void shougi_state::shougi_palette(palette_device &palette) const
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int bit0,bit1,bit2;
+		int bit0, bit1, bit2;
 
-		/* red component */
+		// red component
 		bit0 = (color_prom[i] >> 0) & 0x01;
 		bit1 = (color_prom[i] >> 1) & 0x01;
 		bit2 = (color_prom[i] >> 2) & 0x01;
 		int const r = combine_weights(weights_r, bit0, bit1, bit2);
 
-		/* green component */
+		// green component
 		bit0 = (color_prom[i] >> 3) & 0x01;
 		bit1 = (color_prom[i] >> 4) & 0x01;
 		bit2 = (color_prom[i] >> 5) & 0x01;
 		int const g = combine_weights(weights_g, bit0, bit1, bit2);
 
-		/* blue component */
+		// blue component
 		bit0 = (color_prom[i] >> 6) & 0x01;
 		bit1 = (color_prom[i] >> 7) & 0x01;
 		int const b = combine_weights(weights_b, bit0, bit1);
@@ -207,20 +208,19 @@ uint32_t shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 {
 	for (int offs = 0; offs < 0x4000; offs++)
 	{
-		int sx, sy, x, data1, data2, color, data;
+		const int sx = offs >> 8; // 00..0x3f (64*4 = 256)
+		const int sy = offs & 0xff; // 00..0xff
 
-		sx = offs >> 8;     /*00..0x3f (64*4=256)*/
-		sy = offs & 0xff;   /*00..0xff*/
+		const uint8_t data_bits = m_videoram[0x4000 + offs];
+		const uint8_t color_bits = m_videoram[offs];
 
-		data1 = m_videoram[offs];           /* color */
-		data2 = m_videoram[0x4000 + offs];  /* pixel data */
-
-		for (x=0; x<4; x++) /*4 pixels per byte (2 bitplanes in 2 nibbles: 1st=bits 7-4, 2nd=bits 3-0)*/
+		// 4 pixels per byte (2 bitplanes in 2 nibbles: 1st=bits 7-4, 2nd=bits 3-0)
+		for (int x = 0; x < 4; x++)
 		{
-			color= ((data1>>x) & 1) | (((data1>>(4+x)) & 1)<<1);
-			data = ((data2>>x) & 1) | (((data2>>(4+x)) & 1)<<1);
+			int data = BIT(data_bits, x) << 0 | BIT(data_bits, x + 4) << 1;
+			int color = BIT(color_bits, x) << 2 | BIT(color_bits, x + 4) << 3;
 
-			bitmap.pix(255-sy, 255-(sx*4 + x)) = color*4 + data;
+			bitmap.pix(255 - sy, 255 - (sx*4 + x)) = data | color;
 		}
 	}
 
@@ -262,40 +262,31 @@ INTERRUPT_GEN_MEMBER(shougi_state::vblank_nmi)
 void shougi_state::main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).ram(); /* 2114 x 2 (0x400 x 4bit each) */
+	map(0x4000, 0x43ff).ram(); // 2114 x 2 (0x400 x 4bit each)
 	map(0x4800, 0x480f).w("mainlatch", FUNC(ls259_device::write_a3));
 	map(0x4800, 0x4800).portr(m_dsw);
 	map(0x5000, 0x5000).portr(m_p1);
-	map(0x5800, 0x5800).portr(m_p2).w("watchdog", FUNC(watchdog_timer_device::reset_w)); /* game won't boot if watchdog doesn't work */
+	map(0x5800, 0x5800).portr(m_p2).w("watchdog", FUNC(watchdog_timer_device::reset_w)); // game won't boot if watchdog doesn't work
 	map(0x6000, 0x6000).w("aysnd", FUNC(ay8910_device::address_w));
 	map(0x6800, 0x6800).w("aysnd", FUNC(ay8910_device::data_w));
 	map(0x7000, 0x73ff).rw(m_alpha_8201, FUNC(alpha_8201_device::ext_ram_r), FUNC(alpha_8201_device::ext_ram_w));
-	map(0x7800, 0x7bff).ram().share("sharedram"); /* 2114 x 2 (0x400 x 4bit each) */
-	map(0x8000, 0xffff).ram().share("videoram"); /* 4116 x 16 (32K) */
+	map(0x7800, 0x7bff).ram().share("sharedram"); // 2114 x 2 (0x400 x 4bit each)
+	map(0x8000, 0xffff).ram().share("videoram"); // 4116 x 16 (32K)
 }
 
 
 // subcpu side
 
-uint8_t shougi_state::semaphore_r()
-{
-	// d0: waits for it to be set before handling NMI routine
-	// hmm it must be a signal from maincpu, but what?
-	m_r ^= 1;
-	return m_r;
-}
-
-
 void shougi_state::sub_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x63ff).ram().share("sharedram"); /* 2114 x 2 (0x400 x 4bit each) */
+	map(0x6000, 0x63ff).ram().share("sharedram"); // 2114 x 2 (0x400 x 4bit each)
 }
 
 void shougi_state::readport_sub(address_map &map)
 {
 	map.global_mask(0x00ff);
-	map(0x00, 0x00).r(FUNC(shougi_state::semaphore_r));
+	map(0x00, 0x00).lr8(NAME([this]() { return m_sharedram_dir; })); // waits for d0 to toggle before handling NMI routine
 }
 
 
@@ -374,30 +365,30 @@ INPUT_PORTS_END
 
 void shougi_state::shougi(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, XTAL(10'000'000)/4);
+	// basic machine hardware
+	Z80(config, m_maincpu, 10_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &shougi_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(shougi_state::vblank_nmi));
 
-	Z80(config, m_subcpu, XTAL(10'000'000)/4);
+	Z80(config, m_subcpu, 10_MHz_XTAL / 4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &shougi_state::sub_map);
 	m_subcpu->set_addrmap(AS_IO, &shougi_state::readport_sub);
 
-	ALPHA_8201(config, m_alpha_8201, XTAL(10'000'000)/4/8);
+	ALPHA_8201(config, m_alpha_8201, 10_MHz_XTAL / 4 / 8);
 
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
-	mainlatch.q_out_cb<0>().set_nop(); // 0: sharedram = sub, 1: sharedram = main (TODO!)
+	mainlatch.q_out_cb<0>().set([this] (int state) { m_sharedram_dir = state; }); // 0: subcpu, 1: maincpu
 	mainlatch.q_out_cb<1>().set(FUNC(shougi_state::nmi_enable_w));
 	mainlatch.q_out_cb<2>().set_nop(); // ?
 	mainlatch.q_out_cb<3>().set(m_alpha_8201, FUNC(alpha_8201_device::mcu_start_w)); // start/halt ALPHA-8201
-	mainlatch.q_out_cb<4>().set(m_alpha_8201, FUNC(alpha_8201_device::bus_dir_w)).invert(); // ALPHA-8201 shared RAM bus direction: 0: mcu, 1: maincpu
+	mainlatch.q_out_cb<4>().set(m_alpha_8201, FUNC(alpha_8201_device::bus_dir_w)).invert(); // 0: mcu, 1: maincpu
 	mainlatch.q_out_cb<7>().set_nop(); // nothing? connected to +5v via resistor
 
 	config.set_perfect_quantum(m_maincpu);
 
 	WATCHDOG_TIMER(config, "watchdog").set_vblank_count("screen", 0x10); // assuming it's the same as champbas
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -408,10 +399,10 @@ void shougi_state::shougi(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(shougi_state::shougi_palette), 32);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "aysnd", XTAL(10'000'000)/8).add_route(ALL_OUTPUTS, "mono", 0.30);
+	AY8910(config, "aysnd", 10_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.30);
 }
 
 
@@ -435,7 +426,7 @@ ROM_START( shougi )
 	ROM_LOAD( "6.3f",    0x2000, 0x1000, CRC(d5a91b16) SHA1(1d21295667c3eb186f9e7f867763f2f2697fd350) )
 	ROM_LOAD( "9.3k",    0x3000, 0x1000, CRC(dbbfa66e) SHA1(fcf23fcc65e8253325937acaf7aad4253be5e6df) )
 	ROM_LOAD( "7.3h",    0x4000, 0x1000, CRC(7ea8ec4a) SHA1(d3b999a683f49c911871d0ae6bb2022e73e3cfb8) )
-	/* shougi has one socket empty */
+	// shougi has one socket empty
 
 	ROM_REGION( 0x2000, "alpha_8201:mcu", 0 )
 	ROM_LOAD( "alpha-8201_44801a75_2f25.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
@@ -470,6 +461,6 @@ ROM_END
 } // anonymous namespace
 
 
-/*    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT        MONITOR  COMPANY                              FULLNAME          FLAGS */
+//    YEAR  NAME     PARENT  MACHINE  INPUT    STATE         INIT        MONITOR  COMPANY                              FULLNAME          FLAGS
 GAME( 1982, shougi,  0,      shougi,  shougi,  shougi_state, empty_init, ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi",         MACHINE_SUPPORTS_SAVE )
 GAME( 1982, shougi2, 0,      shougi,  shougi2, shougi_state, empty_init, ROT0,    "Alpha Denshi Co. (Tehkan license)", "Shougi Part II", MACHINE_SUPPORTS_SAVE )

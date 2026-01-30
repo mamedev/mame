@@ -15,9 +15,11 @@
 ****************************************************************************/
 
 #include "emu.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/mips/mips3.h"
 #include "machine/mc68681.h"
+
 #include "screen.h"
 
 
@@ -26,8 +28,8 @@ namespace {
 class ncd_mips_state : public driver_device
 {
 public:
-	ncd_mips_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	ncd_mips_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_mainram(*this, "mainram"),
@@ -36,40 +38,35 @@ public:
 	}
 
 	void hmxpro(machine_config &config);
-	void hmxpro_map(address_map &map) ATTR_COLD;
 
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-	void duart_irq_handler(int state);
-	INTERRUPT_GEN_MEMBER(vblank);
-
-private:
+protected:
 	virtual void machine_reset() override ATTR_COLD;
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	optional_shared_ptr<uint32_t> m_mainram;
 	required_device<scn2681_device> m_duart;
 
+	void hmxpro_map(address_map &map) ATTR_COLD;
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void duart_irq_handler(int state);
+	void vblank(int state);
+
 	u32 unk_r();
 	void tty_w(u32 data);
-
-//  u32 m_palette[256];
-//  u8 m_r, m_g, m_b, m_entry, m_stage;
 };
 
 
 void ncd_mips_state::machine_reset()
 {
-//  m_entry = 0;
-//  m_stage = 0;
-//  m_r = m_g = m_b = 0;
 }
 
-INTERRUPT_GEN_MEMBER(ncd_mips_state::vblank)
+void ncd_mips_state::vblank(int state)
 {
 }
-
 
 uint32_t ncd_mips_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -83,12 +80,12 @@ u32 ncd_mips_state::unk_r()
 
 void ncd_mips_state::tty_w(u32 data)
 {
-	printf("%c", (data>>16) & 0x7f);
+	//printf("%c", (data >> 16) & 0x7f);
 }
 
 void ncd_mips_state::hmxpro_map(address_map &map)
 {
-	map(0x00000000, 0x003fffff).ram();  // VRAM
+	map(0x00000000, 0x003fffff).ram(); // VRAM
 	map(0x10000000, 0x103fffff).ram();
 	map(0x18000028, 0x1800002b).r(FUNC(ncd_mips_state::unk_r));
 	map(0x18000058, 0x1800005b).w(FUNC(ncd_mips_state::tty_w));
@@ -101,15 +98,13 @@ void ncd_mips_state::hmxpro_map(address_map &map)
 
 void ncd_mips_state::duart_irq_handler(int state)
 {
-	//m_maincpu->set_input_line(M68K_IRQ_6, state);
 }
 
 void ncd_mips_state::hmxpro(machine_config &config)
 {
 	/* basic machine hardware */
-	R4600BE(config, m_maincpu, 50000000);
+	R4600BE(config, m_maincpu, 50'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ncd_mips_state::hmxpro_map);
-	m_maincpu->set_periodic_int(FUNC(ncd_mips_state::vblank), attotime::from_hz(70.06));
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL);
 	m_duart->irq_cb().set(FUNC(ncd_mips_state::duart_irq_handler));
@@ -117,6 +112,7 @@ void ncd_mips_state::hmxpro(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(77.4144_MHz_XTAL, 1376, 0, 1024, 803, 0, 768);
 	m_screen->set_screen_update(FUNC(ncd_mips_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(ncd_mips_state::vblank));
 }
 
 static INPUT_PORTS_START( hmxpro )
@@ -137,5 +133,5 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    CLASS          INIT               COMPANY                 FULLNAME           FLAGS
-COMP( 1994, hmxpro, 0,      0,        hmxpro, hmxpro, ncd_mips_state,  empty_init,   "Network Computing Devices", "NCD HMX PRO", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS           INIT        COMPANY                      FULLNAME       FLAGS
+COMP( 1994, hmxpro, 0,      0,      hmxpro,  hmxpro, ncd_mips_state, empty_init, "Network Computing Devices", "NCD HMX PRO", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

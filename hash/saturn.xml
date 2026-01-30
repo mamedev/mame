@@ -58,7 +58,7 @@ license:CC0-1.0
 	  2do Arukoto wa Sando-R (Japan) (Satakore) [T-6804G]                                   |  @@
 	  2tax Gold (Japan) [T-4305G]                                                           | (2taxgold)      playable?
 	  3D Baseball: The Majors (Japan) [T-18003G]                                            | (3dbball)       layer / transparency problem ingame, v. slow
-	  3D Lemmings (Japan) [T-15013G]                                                        | (3dlemminj)     hard lock after loading
+	  3D Lemmings (Japan) [T-15013G]                                                        | (3dlemminj)
 	  3D Mission Shooting Finalist (Japan) [T-18511G]                                       | (finalist)      gets stuck on loading screen
 	  3x3 Eyes: Kyuusei Koushu S (Japan) [T-21301G]                                         | (3x3eyes)       playable?
 	  6 Inch My Darling (Japan) [T-19721G]                                                  | (6inchmyd)      playable?
@@ -71,7 +71,7 @@ license:CC0-1.0
 	  Advanced Variable Geo (Japan) (Genteiban) [T-32506G]                                  |  @@
 	  Advanced World War: Sennen Teikoku no Metsubou (Japan) [GS-9087]                      | (aww)           missing gfx during FMVs?
 	  Advanced World War: Sennen Teikoku no Metsubou (Japan) (Satakore) [GS-9190]           |  @@
-	  After Burner II (Japan) (Sega Ages) [GS-9109]                                         | (aburner2)      gets stuck on loading screen
+	  After Burner II (Japan) (Sega Ages) [GS-9109]                                         | (aburner2)
 	  AI Igo (Japan) [T-17601G]                                                             | (aiigo)         playable
 	  Ai Iijima: Good Island Cafe (Japan) [T-25201G]                                        | (aiiijima)      menu options missing after first video?
 	  AI Shougi (Japan) [T-18602G]                                                          | (aishogi)
@@ -2753,11 +2753,14 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- Image Fight has serious [VDP1/VDP2] video bugs (missing layers, misaligned layers, no options text is displayed ...) -->
 	<software name="imgftxm" supported="no">
 		<description>Arcade Gears Vol. 4 - Image Fight &amp; X-Multiply (Japan)</description>
 		<year>1998</year>
 		<publisher>Xing</publisher>
+		<notes><![CDATA[
+Image Fight has serious [VDP1] [VDP2] video bugs (missing layers, misaligned layers, no options text is displayed ...)
+Crashes often after Xing logo with [DRC]
+]]></notes>
 		<info name="serial" value="T-26110G"/>
 		<info name="release" value="19980820"/>
 		<info name="alt_title" value="イメージファイト &amp; エックスマルチプライ アーケードギアーズ"/>
@@ -2996,13 +2999,15 @@ Olympic Soccer (Fra) T-7904H-09
 		</part>
 	</software>
 
-	<!-- No text in main menu [VDP1/VDP2] -->
-	<!-- No background layer in inventory screen, [VDP1] inverted window -->
-	<!-- Options menu is too large [VDP1], sports [VDP1] zooming error for the background zombie, has no back layer drawing [VDP2] -->
 	<software name="biohaz" cloneof="revil" supported="no">
 		<description>Bio Hazard (Japan)</description>
 		<year>1997</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+No text in main menu [VDP1] [VDP2]
+No background layer in inventory screen, [VDP1] inverted window
+Options menu is too large [VDP1], sports [VDP1] zooming error for the background zombie, has no back layer drawing [VDP2]
+]]></notes>
 		<info name="serial" value="T-1219G"/>
 		<info name="release" value="19970725"/>
 		<info name="alt_title" value="バイオ ハザード"/>
@@ -5579,12 +5584,14 @@ Gal select screen sports unmasked text layer over box, [VDP2] enables window log
 		</part>
 	</software>
 
-	<!-- Black screen, caused by cache RAM setting a value of 0xf to [SCU] irq mask -->
-	<!-- Afterwards: black screen after FMV, [CD-Block] loops with commands 0x45 -> 0x43 -->
 	<software name="astalj" cloneof="astal" supported="no">
 		<description>Kisuishou Densetsu Astal (Japan, 4M)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen, caused by cache RAM setting a value of 0xf to [SCU] irq mask
+Afterwards: black screen after FMV, [CD-Block] loops with commands 0x45 -> 0x43
+]]></notes>
 		<info name="serial" value="GS-9019"/>
 		<info name="release" value="19950428"/>
 		<info name="alt_title" value="輝水晶伝説アスタル"/>
@@ -7502,7 +7509,7 @@ Gal select screen sports unmasked text layer over box, [VDP2] enables window log
 	<!-- Doesn't draw the Sega Ages logo at boot [VDP2?] -->
 	<!-- Pings [CD-Block] HIRM register, no noticeable effect? -->
 	<software name="columns" supported="no">
-		<description>Sega Ages - Columns Arcade Collection (Japan)</description>
+		<description>Sega Ages: Columns Arcade Collection (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9161"/>
@@ -7516,12 +7523,14 @@ Gal select screen sports unmasked text layer over box, [VDP2] enables window log
 		</part>
 	</software>
 
-	<!-- TODO: Verify initial Sega logo animation -->
-	<!-- BGMs are mostly silent, never completes underlying [CD-Block] transfer -->
 	<software name="fantzone" supported="no">
-		<description>Sega Ages - Fantasy Zone (Japan)</description>
+		<description>Sega Ages: Fantasy Zone (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+TODO: Verify initial Sega logo animation
+BGMs are mostly silent, never completes underlying [CD-Block] transfer
+]]></notes>
 		<info name="serial" value="GS-9136"/>
 		<info name="release" value="19970221"/>
 		<info name="alt_title" value="ファンタジーゾーン"/>
@@ -7533,9 +7542,9 @@ Gal select screen sports unmasked text layer over box, [VDP2] enables window log
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages - Galaxy Force II (Japan)... -->
+	<!-- Identifying Sega Ages: Galaxy Force II (Japan)... -->
 	<software name="gforce2" supported="no">
-		<description>Sega Ages - Galaxy Force II (Japan)</description>
+		<description>Sega Ages: Galaxy Force II (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9197"/>
@@ -7549,9 +7558,9 @@ Gal select screen sports unmasked text layer over box, [VDP2] enables window log
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages - I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan)... -->
+	<!-- Identifying Sega Ages: I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan)... -->
 	<software name="mickdnld" supported="no">
-		<description>Sega Ages - I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan)</description>
+		<description>Sega Ages: I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9179"/>
@@ -7565,9 +7574,9 @@ Gal select screen sports unmasked text layer over box, [VDP2] enables window log
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages - Memorial Selection Vol.2 (Japan)... -->
+	<!-- Identifying Sega Ages: Memorial Selection Vol.2 (Japan)... -->
 	<software name="samem2" supported="no">
-		<description>Sega Ages - Memorial Selection Vol. 2 (Japan)</description>
+		<description>Sega Ages: Memorial Selection Vol. 2 (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9163"/>
@@ -7582,11 +7591,11 @@ Gal select screen sports unmasked text layer over box, [VDP2] enables window log
 	</software>
 
 	<software name="outrun" supported="no">
-		<description>Sega Ages - Out Run (Japan)</description>
+		<description>Sega Ages: Out Run (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<notes><![CDATA[
-Keeps repeating voice samples [SCSP]
+Keeps repeating SFX samples [SCSP]
 Sega logo animation draws offset [VDP2]
 ]]></notes>
 		<info name="serial" value="GS-9110"/>
@@ -7604,7 +7613,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- PS2 sports wrong tilemap-sprite priorities on gameplay (sprites going above buildings, menuing etc.) [VDP1/VDP2] -->
 	<!-- TODO: verify PS1/PS3/PS4 -->
 	<software name="pstarcol" supported="no">
-		<description>Sega Ages - Phantasy Star Collection (Japan)</description>
+		<description>Sega Ages: Phantasy Star Collection (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9186"/>
@@ -7618,9 +7627,9 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages - Power Drift (Japan)... -->
+	<!-- Identifying Sega Ages: Power Drift (Japan)... -->
 	<software name="pdrift" supported="no">
-		<description>Sega Ages - Power Drift (Japan)</description>
+		<description>Sega Ages: Power Drift (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9181"/>
@@ -7634,9 +7643,9 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages - Space Harrier (Japan) (1M)... -->
+	<!-- Identifying Sega Ages: Space Harrier (Japan) (1M)... -->
 	<software name="sharrier" supported="no">
-		<description>Sega Ages - Space Harrier (Japan, 1M)</description>
+		<description>Sega Ages: Space Harrier (Japan, 1M)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9108"/>
@@ -7729,11 +7738,13 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Black screen, [CD-Block] doesn't read root directory properly -->
 	<software name="sengblad" supported="no">
 		<description>Sengoku Blade - Sengoku Ace Episode II (Japan)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
+		<notes><![CDATA[
+Missing elements during gameplay [VDP2] priorities?
+]]></notes>
 		<info name="serial" value="T-14410G"/>
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="戦国ブレード"/>
@@ -7750,11 +7761,14 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Black screen, [CD-Block] doesn't read root directory properly -->
 	<software name="chaossd" supported="no">
 		<description>Senkutsu Katsuryu Taisen - Chaos Seed (Japan, rev A)</description>
 		<year>1998</year>
 		<publisher>ESP</publisher>
+		<notes><![CDATA[
+Black screen after loading of a new game
+[VDP2] Gradation enabled a003
+]]></notes>
 		<info name="serial" value="T-30902G"/>
 		<info name="release" value="19980129"/>
 		<info name="alt_title" value="仙窟活龍大戦 カオスシード"/>
@@ -10851,7 +10865,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Fantasy Zone (JAP) (DW0427)... -->
 	<software name="fantzonea" cloneof="fantzone" supported="no">
-		<description>Sega Ages - Fantasy Zone (Japan, alt)</description>
+		<description>Sega Ages: Fantasy Zone (Japan, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9136"/>
@@ -11050,11 +11064,13 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Black screen after Capcom FMV logo, enables [SCU] Timer 0 + HBlank irqs and loops reading 0x6055670 -->
 	<software name="gakkokow" supported="no">
 		<description>Gakkou no Kowai Uwasa - Hanako-san ga Kita!! (Japan)</description>
 		<year>1995</year>
 		<publisher>Capcom</publisher>
+		<notes><![CDATA[
+Black screen after Capcom FMV logo, enables [SCU] Timer 0 + HBlank irqs and loops reading 0x6055670
+]]></notes>
 		<info name="serial" value="T-1205G"/>
 		<info name="release" value="19950811"/>
 		<info name="alt_title" value="学校のコワイうわさ 花子さんがきた!!"/>
@@ -13028,9 +13044,9 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Sega Ages - Out Run (JAP) (v1.005) (DW0151)... -->
+	<!-- Identifying Sega Ages: Out Run (JAP) (v1.005) (DW0151)... -->
 	<software name="outruna" cloneof="outrun" supported="no">
-		<description>Sega Ages - Out Run (Japan, v1.005)</description>
+		<description>Sega Ages: Out Run (Japan, v1.005)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9110"/>
@@ -13107,11 +13123,13 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Black screen, [CD-Block] doesn't read root directory properly -->
 	<software name="sengblada" cloneof="sengblad" supported="no">
 		<description>Sengoku Blade - Sengoku Ace Episode II (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Atlus</publisher>
+		<notes><![CDATA[
+Missing elements during gameplay [VDP2] priorities?
+]]></notes>
 		<info name="serial" value="T-14410G"/>
 		<info name="release" value="19961122"/>
 		<info name="alt_title" value="戦国ブレード"/>
@@ -13664,7 +13682,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Syukudai ga Tant-R (JAP) (DW0143)... -->
 	<software name="tantr" supported="no">
-		<description>Sega Ages - Shukudai ga Tant-R (Japan)</description>
+		<description>Sega Ages: Shukudai ga Tant-R (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9042"/>
@@ -14940,11 +14958,14 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying 3D Lemmings (T-15013G)... -->
 	<software name="3dlemminj" cloneof="3dlemmin" supported="no">
 		<description>3D Lemmings (Japan)</description>
 		<year>1996</year>
 		<publisher>Imagineer</publisher>
+		<notes><![CDATA[
+[VDP1] rendering issue when "3d" zooms on title screen
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-15013G"/>
 		<info name="release" value="19960823"/>
 		<info name="alt_title" value="3D レミングス"/>
@@ -15000,11 +15021,14 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Afterburner II (GS-9109)... -->
 	<software name="aburner2" supported="no">
-		<description>Sega Ages - Afterburner II (Japan)</description>
+		<description>Sega Ages: After Burner II (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Offset Sega Ages logo, [VDP1]?
+No [SCSP] SFXs
+]]></notes>
 		<info name="serial" value="GS-9109"/>
 		<info name="release" value="19960927"/>
 		<info name="alt_title" value="アフターバーナーⅡ"/>
@@ -15065,11 +15089,13 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Black screen, enables [SCU] Timer 1 -->
 	<software name="aitd2ja" cloneof="aitd2" supported="no">
 		<description>Alone in the Dark 2 (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts Victor</publisher>
+		<notes><![CDATA[
+Black screen, enables [SCU] Timer 1
+]]></notes>
 		<info name="serial" value="T-10602G"/>
 		<info name="release" value="19960223"/>
 		<info name="alt_title" value="アローン・イン・ザ・ダーク2"/>
@@ -15081,14 +15107,18 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Hangs at Sega logo, expects [CD-Block] status change from PAUSE (Double PAUSE -> STANDBY?) -->
 	<software name="amagishi" supported="no">
 		<description>Amagi Shien (Japan)</description>
 		<year>1997</year>
 		<publisher>Clip House</publisher>
+		<notes><![CDATA[
+Sound clips overdrives a bit
+Not extensively tested
+]]></notes>
 		<info name="serial" value="T-1513G"/>
 		<info name="release" value="19970214"/>
 		<info name="alt_title" value="天城紫苑"/>
+		<info name="developer" value="Success"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -17047,7 +17077,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Fantasy Zone (GS-9136)... -->
 	<software name="fantzoneb" cloneof="fantzone" supported="no">
-		<description>Sega Ages - Fantasy Zone (Japan, alt 2)</description>
+		<description>Sega Ages: Fantasy Zone (Japan, alt 2)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9136"/>
@@ -18219,12 +18249,13 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying Houkago Renai Club ~Koi no Etude~ Disc 1 (T-19713G)... -->
-	<!-- Identifying Houkago Renai Club ~Koi no Etude~ Disc 2 (T-19713G)... -->
 	<software name="houkago" supported="no">
 		<description>Houkago Renai Club - Koi no Etude (Japan)</description>
 		<year>1998</year>
 		<publisher>KID</publisher>
+		<notes><![CDATA[
+Allegedly should enable [VDP2] RGB1 with RGB0 disabled
+]]></notes>
 		<info name="serial" value="T-19713G"/>
 		<info name="release" value="19980115"/>
 		<info name="alt_title" value="放課後恋愛クラブ ～恋のエチュード～"/>
@@ -20119,7 +20150,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Ages Memorial Selection Volume 1 (GS-9135)... -->
 	<software name="samem1" supported="no">
-		<description>Sega Ages - Memorial Selection Vol. 1 (Japan)</description>
+		<description>Sega Ages: Memorial Selection Vol. 1 (Japan)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9135"/>
@@ -20135,7 +20166,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Sega Ages Memorial Selection Volume 2 (GS-9163)... -->
 	<software name="samem2a" cloneof="samem2" supported="no">
-		<description>Sega Ages - Memorial Selection Vol. 2 (Japan, alt)</description>
+		<description>Sega Ages: Memorial Selection Vol. 2 (Japan, alt)</description>
 		<year>1997</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9163"/>
@@ -20770,7 +20801,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Syukudai ga Tant-R (GS-9042)... -->
 	<software name="tantra" cloneof="tantr" supported="no">
-		<description>Sega Ages - Shukudai ga Tant-R (Japan, alt)</description>
+		<description>Sega Ages: Shukudai ga Tant-R (Japan, alt)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9042"/>
@@ -27681,7 +27712,7 @@ Sega logo animation draws offset [VDP2]
 	<!-- TODO: Quiz Rouka ni Tattenasai black screen once before game over, cannot repro (stage 2?) -->
 	<!-- TODO: test Ichidant-R -->
 	<software name="ichidntr" supported="no">
-		<description>Sega Ages - Rouka ni Ichidant-R (Japan)</description>
+		<description>Sega Ages: Rouka ni Ichidant-R (Japan)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9043"/>
@@ -29526,7 +29557,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying CastleOfIllusion... -->
 	<software name="mickdnlda" cloneof="mickdnld" supported="no">
-		<description>Sega Ages - I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan, alt)</description>
+		<description>Sega Ages: I Love Mickey Mouse - Fushigi no Oshiro Daibouken &amp; I Love Donald Duck - Georgia Ou no Hihou (Japan, alt)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="GS-9179"/>
@@ -31262,7 +31293,7 @@ Sega logo animation draws offset [VDP2]
 
 	<!-- Identifying Discworld_II-Redump... -->
 	<software name="discwrl2" supported="no">
-		<description>Discworld II - Missing Presumed...?! (Europe)</description>
+		<description>Discworld II: Missing Presumed...?! (Europe)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="MK81093-50"/>
@@ -36262,11 +36293,13 @@ Sega logo animation draws offset [VDP2]
 		</part>
 	</software>
 
-	<!-- Identifying dw-sat-iday... -->
 	<software name="indepdayu" cloneof="indepday" supported="no">
 		<description>Independence Day (USA)</description>
 		<year>1997</year>
 		<publisher>Fox Interactive</publisher>
+		<notes><![CDATA[
+Cross-border [SH2]: DMA 0 start 25818000, 25e40000, 1000000, 4a01, 0, 1, 2
+]]></notes>
 		<info name="serial" value="T-16104H"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">

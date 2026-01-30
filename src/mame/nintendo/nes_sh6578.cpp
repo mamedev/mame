@@ -737,6 +737,11 @@ ROM_START( bb6578 )
 	ROM_LOAD( "tv game baseball.bin", 0x00000, 0x80000, CRC(dec862b2) SHA1(fb3d97ccde17ab6ead8eafb4e0aafb72fbb6674c) )
 ROM_END
 
+ROM_START( pp6578 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "pingpongtvgame.bin", 0x00000, 0x80000, CRC(b5438d19) SHA1(3bccbf006c9c3cd5b71672a083e5d084eef5c2b9) )
+ROM_END
+
 ROM_START( 6578cjz1 )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD( "tv game1.bin", 0x00000, 0x100000, CRC(161c4119) SHA1(b2ce91b070bcaba73c8a23e7067fe8ba41151a40) )
@@ -840,6 +845,8 @@ CONS( 2001, soulbird,     0,  0,  nes_sh6578,     soulbird,    nes_sh6578_state,
 CONS( 200?, cpatrolm,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "TimeTop", "City Patrolman", MACHINE_NOT_WORKING )
 
 CONS( 200?, bb6578,      0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "DaiDaiXing Electronics", "TV Games Baseball (SH6578 hardware)", MACHINE_NOT_WORKING )
+
+CONS( 200?, pp6578,      0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "DaiDaiXing Electronics", "TV Games Ping Pong (SH6578 hardware)", MACHINE_NOT_WORKING )
 
 // these don't boot much further than the timetop logo and a splash screen
 // 超级知识大富翁 (Chāojí Zhīshì Dà Fùwēng)

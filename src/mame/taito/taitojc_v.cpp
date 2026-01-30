@@ -9,8 +9,10 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "video/poly.h"
 #include "taitojc.h"
+
+#include "video/poly.h"
+
 
 static const gfx_layout char_layout =
 {

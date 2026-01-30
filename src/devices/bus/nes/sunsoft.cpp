@@ -296,7 +296,7 @@ void nes_sunsoft_3_device::write_h(offs_t offset, uint8_t data)
 
  Sunsoft-4 board emulation
 
- Games: AfterBurner & Maharaja
+ Games: After Burner & Maharaja
 
  iNES: mapper 68
 

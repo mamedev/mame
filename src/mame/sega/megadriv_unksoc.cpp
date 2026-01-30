@@ -134,7 +134,7 @@ void megadriv_ra145_state::write_a1630a(offs_t offset, uint16_t data, uint16_t m
 	case 0x1d: m_bank = 0x1440000; break;// = Thunder Force 2                        1d  (This is meant to be Revenge of Shinobi according to the menu, but incorrect game was in the ROM)
 	case 0x1e: m_bank = 0x14c0000; break;// = Wings of Wor                           1e
 	case 0x1f: m_bank = 0x1540000; break;// = Wrestle War                            1f
-	case 0x20: m_bank = 0x15c0000; break;// = Afterburner 2                          20
+	case 0x20: m_bank = 0x15c0000; break;// = After Burner II                        20
 	case 0x21: m_bank = 0x1640000; break;// = Altered Beast                          21
 	case 0x22: m_bank = 0x16c0000; break;// = Captain Planet                         22
 	case 0x23: m_bank = 0x1740000; break;// = Bimimi Run                             23

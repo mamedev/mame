@@ -77,7 +77,7 @@ Touch & Tell modules:
 English:
 - Alphabet Fun: VSM: 4KB CD2611
 - Animal Friends: VSM: 16KB CD2355
-- Number Fun: VSM: 4KB CD2612*, CD2612A
+- Number Fun: VSM: 4KB CD2612* or CD2612A
 - All About Me: VSM: 4KB CD2613
 - World of Transportation: VSM: 16KB CD2361
 - Little Creatures: VSM: 16KB CD2362

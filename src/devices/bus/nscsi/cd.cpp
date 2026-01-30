@@ -7,6 +7,7 @@
 
 #include "coreutil.h"
 #include "multibyte.h"
+#include "speaker.h"
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -22,6 +23,7 @@ DEFINE_DEVICE_TYPE(NSCSI_XM5401SUN, nscsi_toshiba_xm5401_sun_device, "nxm5401sun
 DEFINE_DEVICE_TYPE(NSCSI_XM5701, nscsi_toshiba_xm5701_device, "nxm5701", "XM-5701B 12x CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_XM5701SUN, nscsi_toshiba_xm5701_sun_device, "nxm5701sun", "XM-5701B Sun 12x CD-ROM (New)")
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_APPLE, nscsi_cdrom_apple_device, "scsi_cdrom_apple", "Apple SCSI CD-ROM")
+DEFINE_DEVICE_TYPE(NSCSI_CDROM_APPLE_EXT, nscsi_cdrom_apple_ext_device, "scsi_cdrom_apple_ext", "Apple SCSI CD-ROM (external)")
 
 // ZuluSCSI/BlueSCSI toolbox commands.  All are 10 bytes as of protocol version 0.
 static constexpr uint8_t TOOLBOX_LIST_FILES     = 0xd0;
@@ -88,9 +90,19 @@ nscsi_toshiba_xm5701_sun_device::nscsi_toshiba_xm5701_sun_device(const machine_c
 
 // drive identifies as an original Apple CDSC (Sony CDU-8001 with custom firmware)
 nscsi_cdrom_apple_device::nscsi_cdrom_apple_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_cdrom_device(mconfig, NSCSI_CDROM_APPLE, tag, owner, "SONY    ", "CD-ROM CDU-8002 ", "1.8g", 0x00, 0x05),
+	nscsi_cdrom_apple_device(mconfig, NSCSI_CDROM_APPLE, tag, owner, 0)
+{
+}
+
+nscsi_cdrom_apple_device::nscsi_cdrom_apple_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock) :
+	nscsi_cdrom_device(mconfig, type, tag, owner, clock),
 	m_stopped(true),
 	m_stop_position(0)
+{
+}
+
+nscsi_cdrom_apple_ext_device::nscsi_cdrom_apple_ext_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	nscsi_cdrom_apple_device(mconfig, NSCSI_CDROM_APPLE_EXT, tag, owner, clock)
 {
 }
 
@@ -1745,4 +1757,14 @@ void nscsi_cdrom_apple_device::scsi_put_data(int id, int pos, uint8_t data)
 		cdda->set_output_gain(1, data / 255.0f);
 	}
 
+}
+
+void nscsi_cdrom_apple_ext_device::device_add_mconfig(machine_config &config)
+{
+	nscsi_cdrom_apple_device::device_add_mconfig(config);
+
+	SPEAKER(config, "cdrom_speaker", 2).front();
+	const auto cdda = subdevice<cdda_device>("cdda");
+	cdda->add_route(0, "cdrom_speaker", 1.0, 0);
+	cdda->add_route(1, "cdrom_speaker", 1.0, 1);
 }

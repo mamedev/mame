@@ -100,8 +100,8 @@ private:
 	bitmap_ind8 m_sprites_bitmap_pri;
 	int m_prev_sprites_count = 0;
 
-	void draw_single_sprite(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 width, u8 height, u32 code, u32 color, bool flipx, bool flipy,
-							int offsx, int offsy, u8 transparent_color, u8 priority);
+	void draw_single_sprite(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 width, u8 height,
+			u32 code, u32 color, bool flipx, bool flipy, int offsx, int offsy, u8 transparent_color, u8 priority);
 	void draw_sprites();
 	void copy_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &sprites_bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect);
 
@@ -387,8 +387,7 @@ TILE_GET_INFO_MEMBER(base_state::get_fg_tile_info)
 }
 
 void base_state::draw_single_sprite(bitmap_ind16 &dest_bmp, const rectangle &clip, u8 width, u8 height,
-							u32 code, u32 color, bool flipx, bool flipy, int offsx, int offsy,
-							u8 transparent_color, u8 priority)
+		u32 code, u32 color, bool flipx, bool flipy, int offsx, int offsy, u8 transparent_color, u8 priority)
 {
 	// Start drawing
 	const u16 pal = color << 8;
@@ -409,29 +408,33 @@ void base_state::draw_single_sprite(bitmap_ind16 &dest_bmp, const rectangle &cli
 	int ey = sy + height;
 
 	if (sx < clip.min_x)
-	{ // clip left
+	{
+		// clip left
 		const int pixels = clip.min_x - sx;
 		sx += pixels;
 		x_index_base += xinc * pixels;
 	}
 	if (sy < clip.min_y)
-	{ // clip top
+	{
+		// clip top
 		const int pixels = clip.min_y - sy;
 		sy += pixels;
 		y_index += yinc * pixels;
 	}
-	// NS 980211 - fixed incorrect clipping
 	if (ex > clip.max_x + 1)
-	{ // clip right
+	{
+		// clip right
 		ex = clip.max_x + 1;
 	}
 	if (ey > clip.max_y + 1)
-	{ // clip bottom
+	{
+		// clip bottom
 		ey = clip.max_y + 1;
 	}
 
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
-	{ // skip if inner loop doesn't draw anything
+	{
 		for (int y = sy; y < ey; y++)
 		{
 			u8 const *const source = source_base + y_index * width;

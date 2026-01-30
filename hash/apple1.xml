@@ -28,7 +28,7 @@ Basic programs:
 		<description>Apple I Basic</description>
 		<year>1976</year>
 		<publisher>Apple Computer Inc.</publisher>
-			<!-- P/N A1T001X-->
+		<info name="partno" value="A1T001X" />
 		<info name="usage" value="Load at E000.EFFFR, enter at E000R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="6644780">
@@ -114,7 +114,7 @@ Basic programs:
 		<description>Dis-Assembler</description>
 		<year>1976</year>
 		<publisher>Apple Computer Inc.</publisher>
-			<!-- P/N A1T008X-->
+		<info name="partno" value="A1T008X" />
 		<info name="usage" value="Load at 800.09FFR, enter at 09F0R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="1905164">
@@ -127,7 +127,7 @@ Basic programs:
 		<description>Extended Monitor</description>
 		<year>1977</year>
 		<publisher>Apple Computer Inc.</publisher>
-			<!-- P/N A1T009X-->
+		<info name="partno" value="A1T009X" />
 		<info name="usage" value="Load at 0800.0FFFR, enter at 0F3DR" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="2146422">
@@ -152,7 +152,7 @@ Basic programs:
 		<description>Lunar Lander</description>
 		<year>1976</year>
 		<publisher>Apple Computer Inc.</publisher>
-			<!-- P/N A1T003X-->
+		<info name="partno" value="A1T003X" />
 		<info name="usage" value="Load at 300.0A00R, enter at 0300R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="3350056">
@@ -165,7 +165,7 @@ Basic programs:
 		<description>Mastermind</description>
 		<year>1976</year>
 		<publisher>Apple Computer Inc.</publisher>
-			<!-- P/N A1T002X-->
+		<info name="partno" value="A1T002X" />
 		<info name="usage" value="Load at 300.03FFR, enter at 0300R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="1196032">
@@ -241,7 +241,7 @@ Basic programs:
 		<description>Blackjack</description>
 		<year>1976</year>
 		<publisher>Apple Computer Inc.</publisher>
-			<!-- P/N A1T004X-->
+		<info name="partno" value="A1T004X" />
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR800.0FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="5751412">
@@ -350,7 +350,7 @@ Basic programs:
 		<description>Hamurabi (Apple)</description>
 		<year>1976</year>
 		<publisher>Apple Computer Inc</publisher>
-			<!-- P/N A1T005X-->
+		<info name="partno" value="A1T005X" />
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="6953140">
@@ -445,7 +445,8 @@ Basic programs:
 		<description>Apple Startrek</description>
 		<year>1976</year>
 		<publisher>Apple Computer Inc.</publisher>
-			<!-- P/N A1T006X "Mini-Startrek" -->
+		<info name="alt_title" value="Mini-Startrek" />
+		<info name="partno" value="A1T006X" />
 			<!-- "Apple Startrek" from Interface Age Magazine -->
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
@@ -483,7 +484,8 @@ Basic programs:
 		<description>TREK II</description>
 		<year>1977</year>
 		<publisher>Apple Computer Inc.</publisher>
-			<!-- P/N A1T007X "16K-Startrek" -->
+		<info name="alt_title" value="16K-Startrek" />
+		<info name="partno" value="A1T007X" />
 		<info name="usage" value="First load BASIC, then load at 4A.00FFR0300.2FFFR, enter at E2B3R" />
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="8022016">

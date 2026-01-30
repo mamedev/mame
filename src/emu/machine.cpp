@@ -119,8 +119,10 @@ std::string running_machine::describe_context() const
 		cpu_device *cpu = dynamic_cast<cpu_device *>(&executing->device());
 		if (cpu != nullptr)
 		{
-			address_space &prg = cpu->space(AS_PROGRAM);
-			return string_format(prg.is_octal() ? "'%s' (%0*o)" :  "'%s' (%0*X)", cpu->tag(), prg.logaddrchars(), cpu->pc());
+			address_space *tspace;
+			offs_t address = cpu->pc();
+			bool ok = cpu->translate(AS_PROGRAM, device_memory_interface::TR_READ, address, tspace);
+			return string_format((ok && tspace->is_octal()) ? "'%s' (%0*o)" :  "'%s' (%0*X)", cpu->tag(), ok ? tspace->logaddrchars() : 1, cpu->pc());
 		}
 	}
 

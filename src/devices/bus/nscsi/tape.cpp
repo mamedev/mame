@@ -11,6 +11,7 @@
 #include "util/multibyte.h"
 #include "util/tape_file_interface.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 
@@ -18,7 +19,7 @@
 // #define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(NSCSI_TAPE, nscsi_tape_device, "scsi_tape", "SCSI tape");
+namespace {
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -28,6 +29,19 @@ static constexpr u32 TAPE_DEFAULT_FIXED_BLOCK_LEN = 512;
 
 static constexpr int TAPE_RW_BUF_ID = 2;
 static constexpr int TAPE_PL_BUF_ID = 3;
+
+
+template <size_t N, typename T>
+void clear_response(uint8_t (&buf)[N], T len)
+{
+	assert(std::size(buf) >= len);
+	std::fill_n(buf, len, 0);
+}
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE(NSCSI_TAPE, nscsi_tape_device, "scsi_tape", "SCSI tape");
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -230,8 +244,7 @@ void nscsi_tape_device::handle_inquiry(const u8 lun) // mandatory; SCSI-2 sectio
 	if (vpd_enable || page_code) // error: we don't support vital product data or pages other than 0
 		return report_bad_cdb_field();
 
-	assert(sizeof(scsi_cmdbuf) >= 36);
-	memset(scsi_cmdbuf, 0, 36);
+	clear_response(scsi_cmdbuf, 36);
 	scsi_cmdbuf[0] = (lun == 0) ? 0x01 : 0x7f; // we support tape device on LUN 0 only, per 7.5.3(a)
 	scsi_cmdbuf[1] = 0x80; // we support removing tape
 	scsi_cmdbuf[2] = 0x02; // we're compliant with SCSI-2 only
@@ -365,8 +378,7 @@ void nscsi_tape_device::handle_mode_sense_6() // mandatory; SCSI-2 sections 8.2.
 		return report_no_saving_params();
 
 	const u8 resp_len = bd_disable ? 4 : 12; // response length
-	assert(sizeof(scsi_cmdbuf) >= resp_len);
-	memset(scsi_cmdbuf, 0, resp_len);
+	clear_response(scsi_cmdbuf, resp_len);
 	scsi_cmdbuf[0] = resp_len - 1; // mode data length does not include itself, per SCSI-2 section 8.3.3
 	scsi_cmdbuf[2] = (m_has_tape && m_image->get_file()->is_read_only()) ? 0x80 : 0; // device-specific parameter
 	scsi_cmdbuf[3] = bd_disable ? 0 : 8; // block descriptor length
@@ -612,8 +624,7 @@ void nscsi_tape_device::handle_read_block_limits() // mandatory; SCSI-2 section 
 	if ((scsi_cmdbuf[1] & 0x1f) || scsi_cmdbuf[2] || scsi_cmdbuf[3] || scsi_cmdbuf[4]) // error: reserved bits set
 		return report_bad_cdb_field();
 
-	assert(sizeof(scsi_cmdbuf) >= 6);
-	memset(scsi_cmdbuf, 0, 6);
+	clear_response(scsi_cmdbuf, 6);
 	put_u24be(&scsi_cmdbuf[1], 0xffffff); // 16MB; "maximum block length limit"
 	put_u16be(&scsi_cmdbuf[4], m_fixed_block_len); // "minimum block length limit"
 	scsi_data_in(SBUF_MAIN, 6);
@@ -664,8 +675,7 @@ void nscsi_tape_device::handle_read_position() // optional; SCSI-2 section 10.2.
 		const bool bpu = status == tape_status::UNKNOWN
 					  || status == tape_status::UNKNOWN_EW
 					  || status == tape_status::EOM;
-		assert(sizeof(scsi_cmdbuf) >= 20);
-		memset(scsi_cmdbuf, 0, 20);
+		clear_response(scsi_cmdbuf, 20);
 		scsi_cmdbuf[0] = (bom ? 0x80 : 0) // is position at BOM
 					   | (eom ? 0x40 : 0) // is position between EW and EOM
 					   | (bpu ? 0x04 : 0); // is next block address invalid; "block position unknown"

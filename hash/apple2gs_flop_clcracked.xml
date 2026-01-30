@@ -632,7 +632,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="dhilchl">
-		<description>Downhill Challenge (cleanly cracked)</description>
+		<description>Downhill Challenge (trex crack)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="author" value="Christian Bertrand" />
@@ -640,10 +640,8 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 512K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Downhill Challenge" is a 1989 sports game designed by Christian Bertrand, ported to the Apple IIgs by Jean Claude Levy, and distributed by Brøderbund Software. -->
+		<!-- sports game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - System disk"/>
 			<dataarea name="flop" size="819264">
@@ -678,31 +676,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="fantavsn">
-		<description>Fantavision (version 2.1) (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Scott Anderson" />
-		<info name="programmer" value="Ken Rosen" />
-		<info name="version" value="2.1" />
-		<info name="usage" value="Requires a 256K Apple IIgs ROM 01 or earlier." />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 256K Apple IIgs ROM 01 or earlier. -->
-		<!-- NOT Compatible with the Apple IIgs ROM03. -->
-		<!-- "Fantavision IIgs" is a 1987 graphics program developed by Scott Anderson and Ken Rosen, and distributed by Brøderbund Software. -->
-		<!-- About screen shows "BrøderbundS NEW FANTAVISION GS" -->
-		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819264">
-				<rom name="fantavision v2.1 iigs (trex crack).2mg" size="819264" crc="e0430e48" sha1="cb7762e193296cb3648687424b5911ea4c8d3902"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="fantavsna" cloneof="fantavsn">
-		<description>Fantavision (version 1.0) (cleanly cracked)</description>
+	<software name="fantvisn10" cloneof="fantvisn">
+		<description>Fantavision (version 1.0) (trex crack)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Scott Anderson" />
@@ -711,15 +686,33 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 256K Apple IIgs ROM 01 or earlier." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 256K Apple IIgs ROM 01 or earlier. -->
-		<!-- NOT Compatible with the Apple IIgs ROM03. -->
-		<!-- "Fantavision IIgs" is a 1987 graphics program developed by Scott Anderson and Ken Rosen, and distributed by Brøderbund Software. -->
 		<!-- About screen shows "Brøderbund presents FANTAVISION" -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
+		<!-- graphics program -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="fantavision v1.0 iigs (trex crack).2mg" size="819264" crc="0a94d284" sha1="09ee33786fef5f1d1eaadeb85ba275c9a451f003"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fantvisn">
+		<description>Fantavision (version 2.1) (trex crack)</description>
+		<year>1987</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="programmer" value="Scott Anderson" />
+		<info name="programmer" value="Ken Rosen" />
+		<info name="version" value="2.1" />
+		<info name="usage" value="Requires a 256K Apple IIgs ROM 01 or earlier." />
+		<!-- NOT Compatible with the Apple IIgs ROM03. -->
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2021-08-13 -->
+		<!-- About screen shows "BrøderbundS NEW FANTAVISION GS" -->
+		<!-- Protection: Nibble count on tracks $20 & $21 -->
+		<!-- graphics program -->
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819264">
+				<rom name="fantavision v2.1 iigs (trex crack).2mg" size="819264" crc="e0430e48" sha1="cb7762e193296cb3648687424b5911ea4c8d3902"/>
 			</dataarea>
 		</part>
 	</software>
@@ -807,17 +800,16 @@ license:CC0-1.0
 	</software>
 
 	<software name="geometry">
-		<description>Geometry (version 1.0) (cleanly cracked)</description>
+		<description>Geometry (version 1.0) (trex crack)</description>
 		<year>1988</year>
 		<publisher>Brøderbund</publisher>
-		<info name="version" value="1.0" />
+		<info name="developer" value="Sensei Software" />
 		<info name="usage" value="Requires a 768K Apple IIgs." />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 768K Apple IIgs. -->
-		<!-- "Geometry v1.0" is a educational program teaching the concepts of geometry by Sensei Software, and publised by Brøderbund Software. -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
+		<!-- educational program -->
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - System disk"/>
 			<dataarea name="flop" size="819264">
@@ -1538,7 +1530,6 @@ license:CC0-1.0
 		<publisher>Electronic Arts</publisher>
 		<info name="programmer" value="Will Harvey" />
 		<info name="programmer" value="Jim Nitchals" />
-		<info name="programmer" value="Doug Fulton" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
@@ -1861,55 +1852,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="showoff">
-		<description>ShowOff (version 1.1) (cleanly cracked)</description>
-		<year>1987</year>
-		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Serge Hervy" />
-		<info name="programmer" value="Jean-Claude Lévy" />
-		<info name="version" value="1.1" />
-		<info name="usage" value="Requires a 512K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS"/>
-		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "ShowOff" is a 1987 graphics program developed by Serge Hervy and Jean-Claude Lévy, and distributed by Brøderbund Software. -->
-		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1 - Program disk"/>
-			<dataarea name="flop" size="819264">
-				<rom name="showoff v1.1 iigs - disk 1 - program (trex crack).2mg" size="819264" crc="f0ab3f1c" sha1="33260ca055d031b237eca650c9bf054b341170b5"/>
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2 - Slide show disk"/>
-			<dataarea name="flop" size="819264">
-				<rom name="showoff iigs - disk 2 - slide show (trex crack).2mg" size="819264" crc="52348475" sha1="2fc72e0fcd0c398a56e4b4ef5e247c9961bc5a8c"/>
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3 - Graphics collection - world events"/>
-			<dataarea name="flop" size="819264">
-				<rom name="showoff iigs - disk 3 - graphics collection - world events (trex crack).2mg" size="819264" crc="fa1a5ceb" sha1="b64402b6ace256145ba3bae31682520dca7c79af"/>
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="showoffa" cloneof="showoff">
-		<description>ShowOff (Version 1.0) (cleanly cracked)</description>
+		<description>ShowOff (Version 1.0) (trex crack)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Denis Friedman Productions" />
 		<info name="programmer" value="Serge Hervy" />
 		<info name="programmer" value="Jean-Claude Lévy" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM 01 or earlier." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2023-04-13 -->
-		<!-- It requires a 512K Apple IIgs ROM 01 or earlier. -->
-		<!-- NOT Compatible with the Apple IIgs ROM03. -->
-		<!-- "ShowOff" is a 1987 graphics program developed by Serge Hervy and Jean-Claude Lévy, and distributed by Brøderbund Software. -->
+		<!-- graphics program -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1 - Program disk"/>
 			<dataarea name="flop" size="819264">
@@ -1930,8 +1885,41 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="showoff">
+		<description>ShowOff (version 1.1) (trex crack)</description>
+		<year>1987</year>
+		<publisher>Brøderbund Software</publisher>
+		<info name="developer" value="Denis Friedman Productions" />
+		<info name="programmer" value="Serge Hervy" />
+		<info name="programmer" value="Jean-Claude Lévy" />
+		<info name="version" value="1.1" />
+		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<sharedfeat name="compatibility" value="A2GS"/>
+		<!-- Dump released: 2021-08-13 -->
+		<!-- graphics program -->
+		<!-- Protection: Nibble count on tracks $20 & $21 -->
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1 - Program disk"/>
+			<dataarea name="flop" size="819264">
+				<rom name="showoff v1.1 iigs - disk 1 - program (trex crack).2mg" size="819264" crc="f0ab3f1c" sha1="33260ca055d031b237eca650c9bf054b341170b5"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2 - Slide show disk"/>
+			<dataarea name="flop" size="819264">
+				<rom name="showoff iigs - disk 2 - slide show (trex crack).2mg" size="819264" crc="52348475" sha1="2fc72e0fcd0c398a56e4b4ef5e247c9961bc5a8c"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3 - Graphics collection - world events"/>
+			<dataarea name="flop" size="819264">
+				<rom name="showoff iigs - disk 3 - graphics collection - world events (trex crack).2mg" size="819264" crc="fa1a5ceb" sha1="b64402b6ace256145ba3bae31682520dca7c79af"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pirates">
-		<description>Sid Meier's Pirates! (cleanly cracked)</description>
+		<description>Sid Meier's Pirates! (trex crack)</description>
 		<year>1987</year>
 		<publisher>Microprose</publisher>
 		<info name="developer" value="Sid Meier" />
@@ -1940,11 +1928,9 @@ license:CC0-1.0
 		<info name="usage" value="Requires a 256K Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2023-02-24 -->
-		<!-- It requires a 256K Apple IIgs. -->
-		<!-- "Pirates!" is a 1987 simulation game developed by Sid Meier, programmed by Dan Chang & Ed Magnin, sound by Ken Lagace & Silas Warner, art by Micheal Haire, Murray Taylor & Max Remington and distributed by Microprose. -->
 		<!-- Protection: Modified ProDOS 8 and altered disk format -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
+		<!-- simulation game -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="sid meier's pirates iigs (trex crack).2mg" size="819264" crc="5c53623d" sha1="551eb337651bee99d235a321ed921cf10efeee66" />
@@ -1953,26 +1939,18 @@ license:CC0-1.0
 	</software>
 
 	<software name="slntsvce">
-		<description>Silent Service (version 925.01) (cleanly cracked)</description>
+		<description>Silent Service (version 925.01) (trex crack)</description>
 		<year>1987</year>
-		<publisher>Microprose</publisher>
-		<info name="programmer" value="Sid Meier" />
+		<publisher>Microprose Software</publisher>
+		<info name="author" value="Sid Meier" />
 		<info name="programmer" value="Ed Magnin" />
 		<info name="programmer" value="Jim Synoski" />
-		<info name="programmer" value="Michael Haire" />
-		<info name="programmer" value="Michele Mahan" />
-		<info name="programmer" value="Silas Warner" />
-		<info name="programmer" value="Al Roireau" />
-		<info name="programmer" value="Larry Martin" />
-		<info name="programmer" value="Edward Bever" />
-		<info name="version" value="925.01" />
 		<info name="usage" value="Requires a 256K Apple IIgs." />
-		<sharedfeat name="compatibility" value="A2GS"/>
+		<info name="version" value="925.01" />
+		<sharedfeat name="compatibility" value="A2GS" />
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 256K Apple IIgs. -->
-		<!-- "Silent Service" is a 1987 simulation game developed by Sid Meier, Ed Magnin, Jim Synoski, Michael Haire, Michele Mahan, Silas Warner, Al Roireau, Larry Martin, and Edward Bever, and distributed by Microprose. -->
+		<!-- simulation game -->
 		<!-- Protection: Bad block check for block $7 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="silent service v925.01 iigs (trex crack).2mg" size="819264" crc="1551b534" sha1="2f1c466c647bb448b081d69233f11d2c45092242"/>
@@ -2546,7 +2524,6 @@ license:CC0-1.0
 		<info name="programmer" value="Ian Gooding" />
 		<info name="programmer" value="Michael Marcanted" />
 		<info name="programmer" value="Brett G. Durrett" />
-		<info name="programmer" value="Douglas Fulton" />
 		<info name="usage" value="Requires a 1MB Apple IIgs." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
@@ -2712,27 +2689,18 @@ license:CC0-1.0
 	</software>
 
 	<software name="printshp">
-		<description>The Print Shop (version 1.0) (cleanly cracked)</description>
+		<description>The Print Shop (version 1.0) (trex crack)</description>
 		<year>1987</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="David Balsam" />
-		<info name="programmer" value="Martin Kahn" />
+		<info name="author" value="David Balsam" />
+		<info name="author" value="Martin Kahn" />
 		<info name="programmer" value="Corey Kosak" />
-		<info name="programmer" value="Ann E. Kronen" />
-		<info name="programmer" value="Susan E. Schlangen" />
-		<info name="programmer" value="Richard Whittaker" />
-		<info name="programmer" value="Michelle McBride" />
-		<info name="programmer" value="Don Albrecht" />
-		<info name="programmer" value="Leila Bronstein" />
 		<info name="version" value="1.0" />
 		<info name="usage" value="Requires a 512K Apple IIgs ROM 01 or earlier." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs ROM 01 or earlier. -->
-		<!-- NOT Compatible with the Apple IIgs ROM03. -->
-		<!-- "The Print Shop IIgs" is a 1987 graphics program developed by David Balsam, Martin Kahn, Corey Kosak, Ann E. Kronen, Susan E. Schlangen, Richard Whittaker, Michelle McBride, Don Albrecht, and Leila Bronstein, and distributed by Brøderbund Software. -->
+		<!-- graphics program -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819264">
 				<rom name="the print shop v1.0 iigs (trex crack).2mg" size="819264" crc="0b761d41" sha1="69b56345568b39fd8aa59455b44a341a600c848e"/>
@@ -3180,28 +3148,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carmnusa">
-		<description>Where in the U.S.A. is Carmen Sandiego? (cleanly cracked)</description>
+	<software name="carmusa">
+		<description>Where in the U.S.A. is Carmen Sandiego? (trex crack)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood" />
-		<info name="programmer" value="Lauren Elliot" />
+		<info name="author" value="Gene Portwood" />
+		<info name="author" value="Lauren Elliot" />
+		<info name="developer" value="Sculptured Software" />
 		<info name="programmer" value="Peter Adams" />
-		<info name="programmer" value="Leila Bronstein" />
-		<info name="programmer" value="Julie Glavin" />
-		<info name="programmer" value="Michelle McBride" />
-		<info name="programmer" value="Dan Guerra" />
-		<info name="programmer" value="Les Pardue" />
-		<info name="programmer" value="Bevan Hulfenstein" />
-		<info name="programmer" value="Louis Evans" />
-		<info name="programmer" value="Tom Rettig" />
 		<info name="usage" value="Requires a 1MB Apple IIgs ROM 01 or later." />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 1MB Apple IIgs ROM 01 or later. -->
-		<!-- "Where in the U.S.A. is Carmen Sandiego?" is a 1989 educational game developed by Gene Portwood, Lauren Elliot, Peter Adams, Leila Bronstein, Julie Glavin, Michelle McBride, Dan Guerra, Les Pardue, Bevan Hulfenstein, Louis Evans, and Tom Rettig, and distributed by Brøderbund Software. -->
+		<!-- educational game -->
 		<!-- Protection: Key-Word, A manual is required to look up a letter / word or use of code wheel for a specific response -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -3217,22 +3176,18 @@ license:CC0-1.0
 	</software>
 
 	<software name="carmnwld">
-		<description>Where in the World is Carmen Sandiego? (cleanly cracked)</description>
+		<description>Where in the World is Carmen Sandiego? (version 1.0) (trex crack)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood" />
-		<info name="programmer" value="Lauren Elliott" />
+		<info name="author" value="Gene Portwood" />
+		<info name="author" value="Lauren Elliott" />
 		<info name="programmer" value="Loring Vogel" />
-		<info name="programmer" value="Leila Bronstein" />
-		<info name="programmer" value="Don Albrecht" />
-		<info name="programmer" value="Michelle McBride" />
 		<info name="usage" value="Requires a 512K Apple IIgs." />
+		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->
-		<!-- It requires a 512K Apple IIgs. -->
-		<!-- "Where in the World is Carmen Sandiego?" is a 1989 educational game developed by Gene Portwood, Lauren Elliott, Loring Vogel, Leila Bronstein, Don Albrecht, and Michelle McBride, and distributed by Brøderbund Software. -->
+		<!-- educational game -->
 		<!-- Protection: Nibble count on tracks $20 & $21 -->
-
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="819264">
@@ -3318,7 +3273,9 @@ license:CC0-1.0
 		<description>World Tour Golf (trex crack)</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="author" value="Evan and Nicky Robinson and Paul Reiche III" />
+		<info name="author" value="Evan Robinson" />
+		<info name="author" value="Nicky Robinson" />
+		<info name="author" value="Paul Reiche III" />
 		<info name="programmer" value="John Selhorst" />
 		<sharedfeat name="compatibility" value="A2GS"/>
 		<!-- Dump released: 2021-08-13 -->

@@ -962,7 +962,7 @@ void avr8_base_device::set_lock_bits(const uint8_t byte)
 }
 
 //-------------------------------------------------
-//  unimplemented_opcode - bail on unspuported
+//  unimplemented_opcode - bail on unsupported
 //  instruction
 //-------------------------------------------------
 

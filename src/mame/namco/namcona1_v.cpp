@@ -231,7 +231,7 @@ void namcona1_state::pdraw_tile(
 	const u8 *source_base = gfx->get_data((code % gfx->elements()));
 	const u8 *mask_base = mask->get_data((code % mask->elements()));
 
-	/* compute sprite increment per screen pixel */
+	// compute sprite increment per screen pixel
 	int dx, dy;
 
 	int ex = sx + gfx->width();
@@ -264,35 +264,34 @@ void namcona1_state::pdraw_tile(
 
 	if (sx < clip.min_x)
 	{
-		/* clip left */
+		// clip left
 		int pixels = clip.min_x - sx;
 		sx += pixels;
 		x_index_base += pixels * dx;
 	}
 	if (sy < clip.min_y)
 	{
-		/* clip top */
+		// clip top
 		int pixels = clip.min_y - sy;
 		sy += pixels;
 		y_index += pixels * dy;
 	}
-	/* NS 980211 - fixed incorrect clipping */
 	if (ex > clip.max_x + 1)
 	{
-		/* clip right */
+		// clip right
 		int pixels = ex - clip.max_x - 1;
 		ex -= pixels;
 	}
 	if (ey > clip.max_y + 1)
 	{
-		/* clip bottom */
+		// clip bottom
 		int pixels = ey - clip.max_y - 1;
 		ey -= pixels;
 	}
 
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
 	{
-		/* skip if inner loop doesn't draw anything */
 		for (int y = sy; y < ey; y++)
 		{
 			u8 const *const source = source_base + y_index * gfx->rowbytes();
@@ -314,14 +313,14 @@ void namcona1_state::pdraw_tile(
 				}
 				else
 				{
-					/* sprite pixel is opaque */
+					// sprite pixel is opaque
 					if (mask_addr[x_index] != 0)
 					{
 						if (pri[x] <= priority)
 						{
 							const u8 c = source[x_index];
 
-							/* render a shadow only if the sprites color is $F (8bpp) or $FF (4bpp) */
+							// render a shadow only if the sprites color is $F (8bpp) or $FF (4bpp)
 							if (bShadow)
 							{
 								if ((gfx_region == 0 && color == 0x0f) ||
@@ -355,11 +354,11 @@ void namcona1_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	const u16 *source = m_spriteram;
 
 	const u16 sprite_control = m_vreg[0x22 / 2];
-	if (sprite_control & 1) source += 0x400; /* alternate spriteram bank */
+	if (sprite_control & 1) source += 0x400; // alternate spriteram bank
 
 	for (int which = 0; which < 0x100; which++)
 	{
-		/* max 256 sprites */
+		// max 256 sprites
 		int bpp4,palbase;
 		const u16 ypos    = source[0];    /* FHHH---Y YYYYYYYY    flipy, height, ypos */
 		const u16 tile    = source[1];    /* O???TTTT TTTTTTTT    opaque tile */

@@ -17,6 +17,10 @@
 class trident_vga_device :  public svga_device
 {
 public:
+	// SDD fails on higher resolutions, TGUI9680 black screens in calchase (wants PCI?), BitBlt untested
+	// Needs major incremental split
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	uint8_t port_83c6_r(offs_t offset);
 	void port_83c6_w(offs_t offset, uint8_t data);
 	uint8_t port_43c6_r(offs_t offset);
@@ -160,17 +164,15 @@ private:
 	uint32_t handle_rop(uint32_t src, uint32_t dst);
 };
 
-class tgui9860_device : public trident_vga_device
+class tgui9680_device : public trident_vga_device
 {
 public:
-	tgui9860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class tvga9000_device : public trident_vga_device
 {
 public:
-	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
-
 	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -178,7 +180,7 @@ protected:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(TRIDENT_VGA,  tgui9860_device)
+DECLARE_DEVICE_TYPE(TGUI9680_VGA, tgui9680_device)
 DECLARE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device)
 
 #endif // MAME_VIDEO_PC_VGA_TRIDENT_H

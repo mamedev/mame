@@ -9,14 +9,17 @@
 
 #pragma once
 
-#include "cpu/tms32010/tms32010.h"
-#include "machine/74259.h"
-#include "video/mc6845.h"
-#include "video/bufsprite.h"
 #include "toaplan_scu.h"
+
+#include "cpu/tms320c1x/tms320c1x.h"
+#include "machine/74259.h"
+#include "video/bufsprite.h"
+#include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
+
 
 class twincobr_state : public driver_device
 {
@@ -48,7 +51,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<tms32010_device> m_dsp;
+	required_device<tms320c10_device> m_dsp;
 	required_device<toaplan_scu_device> m_spritegen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

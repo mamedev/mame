@@ -228,7 +228,7 @@ protected:
 	void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
-	TIMER_CALLBACK_MEMBER(check_sound_irq);
+	TIMER_CALLBACK_MEMBER(irq_mask_delayed_update);
 
 	void render_frame_start();
 	void geo_parse();

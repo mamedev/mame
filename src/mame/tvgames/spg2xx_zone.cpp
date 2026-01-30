@@ -18,10 +18,10 @@ public:
 		m_bankmask(0x7)
 	{ }
 
-	void wireless60(machine_config& config);
+	void wireless60(machine_config& config) ATTR_COLD;
 
-	void init_lx_jg7415();
-	void init_zone100();
+	void init_lx_jg7415() ATTR_COLD;
+	void init_zone100() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -48,11 +48,12 @@ public:
 		m_romregion(*this, "maincpu")
 	{ }
 
-	void zone40(machine_config &config);
-	void zone40p(machine_config &config);
+	void zone40(machine_config &config) ATTR_COLD;
+	void zone40p(machine_config &config) ATTR_COLD;
+	void zonekdft(machine_config &config) ATTR_COLD;
 
-	void init_zone40();
-	void init_reactmd();
+	void init_zone40() ATTR_COLD;
+	void init_reactmd() ATTR_COLD;
 
 
 protected:
@@ -209,6 +210,25 @@ static INPUT_PORTS_START( wirels60 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( zonekdft )
+	PORT_START("P1")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P3")
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
 void wireless60_state::wireless60(machine_config &config)
 {
 	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
@@ -230,6 +250,20 @@ void zone40_state::zone40(machine_config &config)
 
 	m_maincpu->porta_out().set(FUNC(zone40_state::zone40_porta_w));
 	m_maincpu->porta_in().set(FUNC(zone40_state::zone40_porta_r));
+}
+
+void zone40_state::zonekdft(machine_config &config)
+{
+	SPG24X(config, m_maincpu, XTAL(27'000'000), m_screen);
+	m_maincpu->set_addrmap(AS_PROGRAM, &zone40_state::mem_map_z40);
+	m_maincpu->set_pal(true);
+
+	spg2xx_base(config);
+	m_screen->set_refresh_hz(50);
+
+	m_maincpu->porta_out().set(FUNC(zone40_state::zone40_porta_w));
+
+	m_maincpu->portb_in().set(FUNC(zone40_state::base_portb_r));
 }
 
 void zone40_state::zone40p(machine_config &config)
@@ -306,6 +340,14 @@ ROM_START( zone40 )
 	ROM_LOAD16_WORD_SWAP( "zone40.bin", 0x0000, 0x4000000, CRC(4ba1444f) SHA1(de83046ab93421486668a247972ad6d3cda19440) )
 ROM_END
 
+ROM_START( zonekdft )
+	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "s29gl128n10tfi01.u1", 0x0000, 0x1000000, CRC(3e94bf73) SHA1(d0e9b34fde2f9aff767a4858a88dfcef0a36211d) )
+	ROM_RELOAD(0x1000000,0x1000000)
+	ROM_RELOAD(0x2000000,0x1000000)
+	ROM_RELOAD(0x3000000,0x1000000)
+ROM_END
+
 
 
 ROM_START( itvg49 )
@@ -372,6 +414,7 @@ CONS( 2009, zone40,   0, 0, zone40,     wirels60, zone40_state,      init_zone40
 CONS( 2009, itvg49,   0, 0, zone40p,    wirels60, zone40_state,      init_reactmd,    "TaiKee / Waixing",                                      "Interactive TV Games 49-in-1 (PAL)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, zonemini, 0, 0, zone40,     wirels60, zone40_state,      init_reactmd,    "Ultimate Products Ltd. / Waixing",                      "Zone Mini",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2009, react,    0, 0, zone40,     wirels60, zone40_state,      init_reactmd,    "Ultimate Products Ltd. / Waixing",                      "Reactor 32-in-1 (NTSC)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, zonekdft, 0, 0, zonekdft,   zonekdft, zone40_state,      init_reactmd,    "Ultimate Products Ltd. / Waixing",                      "Zone Kids Fit (18-in-1)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 
 // These have a newer selection of games by JungleTac instead of the Waixing ones

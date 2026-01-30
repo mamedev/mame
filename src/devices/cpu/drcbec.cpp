@@ -464,7 +464,6 @@ drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint3
 	drcbe_interface(drcuml, cache, device),
 	m_hash(cache, modes, addrbits, ignorebits),
 	m_map(cache, 0xaaaaaaaa55555555),
-	m_labels(cache),
 	m_fixup_delegate(&drcbe_c::fixup_label, this)
 {
 }
@@ -520,8 +519,10 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 	m_map.block_begin(block);
 
 	// begin codegen; fail if we can't
-	drccodeptr *cachetop = m_cache.begin_codegen((numinst + regclears) * sizeof(drcbec_instruction) * 4);
-	if (cachetop == nullptr)
+	drccodeptr *cachetop = block.invariant()
+			? m_cache.begin_codegen_invariant((numinst + regclears) * sizeof(drcbec_instruction) * 4)
+			: m_cache.begin_codegen((numinst + regclears) * sizeof(drcbec_instruction) * 4);
+	if (!cachetop)
 		block.abort();
 
 	// compute the base by aligning the cache top to an even multiple of drcbec_instruction

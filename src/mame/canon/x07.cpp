@@ -103,6 +103,15 @@ void x07_state::t6834_cmd (uint8_t cmd)
 				data = 0x0a;
 			else if(address == 0xd000)
 				data = ioport("BATTERY")->read();
+			else if (address >= 0xe000 && address < 0xe200 && ((address & 0xf) != 0xf)) // VRAM and col 0-119 ?
+			{
+				data = 0;
+				const int y = (address & 0x1ff) >> 4;
+				const int x = (address & 0x000f) * 8;
+				// Read video data from LCD
+				for (int p = 0; p < 8; ++p)
+					data |= (m_lcd_map[y][x+p] ? (1 << (7-p)) : 0);
+			}
 			else
 				data = m_t6834_ram[address & 0x7ff];
 
@@ -118,6 +127,17 @@ void x07_state::t6834_cmd (uint8_t cmd)
 			address = m_in.data[m_in.read++];
 			address |= (m_in.data[m_in.read++] << 8);
 
+			if (address >= 0xe000 && address < 0xe200 && ((address & 0xf) != 0xf)) // VRAM and col 0-119 ?
+			{
+				const int y = (address & 0x1ff) >> 4;
+				const int x = (address & 0x000f) * 8;
+				// Write video data to LCD
+				for (int p = 0; p < 8; ++p)
+				{
+					m_lcd_map[y][x+p] = (data & (1 << (7-p))) ? 1 : 0;
+				}
+			}
+			
 			m_t6834_ram[address & 0x7ff] = data;
 		}
 		break;

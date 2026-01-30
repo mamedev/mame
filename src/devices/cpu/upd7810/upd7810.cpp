@@ -518,7 +518,7 @@ void upd7801_device::configure_ops()
 }
 
 upd7801_device::upd7801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: upd7810_device(mconfig, UPD7801, tag, owner, clock, address_map_constructor(FUNC(upd7801_device::upd_internal_128_ram_map), this))
+	: upd7810_device(mconfig, UPD7801, tag, owner, clock, address_map_constructor(FUNC(upd7801_device::upd_internal_4096_rom_128_ram_map), this))
 {
 }
 
@@ -1773,6 +1773,7 @@ void upd7810_device::device_start()
 	state_add( UPD7810_PC,   "PC",   m_pc.w.l).formatstr("%04X");
 	state_add( UPD7810_SP,   "SP",   m_sp.w.l).formatstr("%04X");
 	state_add( UPD7810_PSW,  "PSW",  m_psw).formatstr("%02X");
+	state_add( UPD7810_IFF,  "IFF",  m_iff).formatstr("%1u");
 	state_add( UPD7810_A,    "A",    m_va.b.l).formatstr("%02X");
 	state_add( UPD7810_V,    "V",    m_va.b.h).formatstr("%02X");
 	state_add( UPD7810_EA,   "EA",   m_ea.w.l).formatstr("%04X");
@@ -1837,17 +1838,23 @@ void upd7801_device::device_start()
 	state_add( UPD7810_PC,   "PC",   m_pc.w.l).formatstr("%04X");
 	state_add( UPD7810_SP,   "SP",   m_sp.w.l).formatstr("%04X");
 	state_add( UPD7810_PSW,  "PSW",  m_psw).formatstr("%02X");
+	state_add( UPD7810_IFF,  "IFF",  m_iff).formatstr("%1u");
 	state_add( UPD7810_A,    "A",    m_va.b.l).formatstr("%02X");
 	state_add( UPD7810_V,    "V",    m_va.b.h).formatstr("%02X");
-	state_add( UPD7810_EA,   "EA",   m_ea.w.l).formatstr("%04X");
 	state_add( UPD7810_BC,   "BC",   m_bc.w.l).formatstr("%04X");
 	state_add( UPD7810_DE,   "DE",   m_de.w.l).formatstr("%04X");
 	state_add( UPD7810_HL,   "HL",   m_hl.w.l).formatstr("%04X");
+	state_add( UPD7810_A2,   "A'",   m_va2.b.l).formatstr("%02X");
+	state_add( UPD7810_V2,   "V'",   m_va2.b.h).formatstr("%02X");
+	state_add( UPD7810_BC2,  "BC'",  m_bc2.w.l).formatstr("%04X");
+	state_add( UPD7810_DE2,  "DE'",  m_de2.w.l).formatstr("%04X");
+	state_add( UPD7810_HL2,  "HL'",  m_hl2.w.l).formatstr("%04X");
 	state_add( UPD7810_CNT0, "CNT0", m_cnt.b.l).formatstr("%02X");
 	state_add( UPD7810_CNT1, "CNT1", m_cnt.b.h).formatstr("%02X");
 	state_add( UPD7810_TM0,  "TM0",  m_tm.b.l).formatstr("%02X");
 	state_add( UPD7810_TM1,  "TM1",  m_tm.b.h).formatstr("%02X");
 	state_add( UPD7810_MB,   "MB",   m_mb).formatstr("%02X");
+	state_add( UPD7810_MC,   "MC",   m_mc).formatstr("%02X");
 	state_add( UPD7810_MKL,  "MKL",  m_mkl).formatstr("%02X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc.w.l ).formatstr("%04X").noshow();
@@ -1862,9 +1869,8 @@ void upd78c05_device::device_start()
 	state_add( UPD7810_PC,   "PC",   m_pc.w.l).formatstr("%04X");
 	state_add( UPD7810_SP,   "SP",   m_sp.w.l).formatstr("%04X");
 	state_add( UPD7810_PSW,  "PSW",  m_psw).formatstr("%02X");
+	state_add( UPD7810_IFF,  "IFF",  m_iff).formatstr("%1u");
 	state_add( UPD7810_A,    "A",    m_va.b.l).formatstr("%02X");
-	state_add( UPD7810_V,    "V",    m_va.b.h).formatstr("%02X");
-	state_add( UPD7810_EA,   "EA",   m_ea.w.l).formatstr("%04X");
 	state_add( UPD7810_BC,   "BC",   m_bc.w.l).formatstr("%04X");
 	state_add( UPD7810_DE,   "DE",   m_de.w.l).formatstr("%04X");
 	state_add( UPD7810_HL,   "HL",   m_hl.w.l).formatstr("%04X");

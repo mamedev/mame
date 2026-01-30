@@ -1093,7 +1093,8 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 	case SEROUT_C:
 		LOG("%s: POKEY SEROUT $%02x\n", machine().describe_context(), data);
 		m_SEROUT = data;
-		m_serout_full = true;
+		if (m_SKCTL & SK_RESET)
+			m_serout_full = true;
 		break;
 
 	case IRQEN_C:

@@ -97,7 +97,7 @@ void isa16_svga_tgui9680_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(trident_vga_device::screen_update));
 
-	TRIDENT_VGA(config, m_vga, 0);
+	TGUI9680_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x200000);
 }

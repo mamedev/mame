@@ -383,13 +383,14 @@ Notes:
 
 #include "emu.h"
 #include "taitojc.h"
+
 #include "taito_en.h"
+#include "taitoio.h"
 
 #include "cpu/m68000/m68040.h"
 #include "cpu/mc68hc11/mc68hc11.h"
-#include "cpu/tms32051/tms32051.h"
+#include "cpu/tms320c5x/tms320c5x.h"
 #include "machine/eepromser.h"
-#include "taitoio.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
 
@@ -739,10 +740,16 @@ void taitojc_state::hc11_output_w(uint8_t data)
     unused?
 
     sidebs/sidebs2:
-    ?
+    d0:
+    d1:
+    d2:
+    d3: Wheel motor direction
+    d4 - d7: Wheel motor torque
 */
 	for (int i = 0; i < 8; i++)
 		m_lamps[i] = BIT(data, i);
+
+	m_wheel_motor = (data >> 3) & 0x1f;
 }
 
 template <int Ch>
@@ -757,8 +764,6 @@ void taitojc_state::hc11_pgm_map(address_map &map)
 	map(0x4000, 0x5fff).ram();
 	map(0x8000, 0xffff).rom();
 }
-
-
 
 
 /***************************************************************************
@@ -1072,6 +1077,7 @@ void taitojc_state::machine_start()
 
 	m_lamps.resolve();
 	m_counters.resolve();
+	m_wheel_motor.resolve();
 }
 
 void dendego_state::machine_start()
@@ -1108,7 +1114,7 @@ void taitojc_state::taitojc(machine_config &config)
 	sub.in_an6_callback().set(FUNC(taitojc_state::hc11_analog_r<6>));
 	sub.in_an7_callback().set(FUNC(taitojc_state::hc11_analog_r<7>));
 
-	TMS32051(config, m_dsp, XTAL(10'000'000)*4); // 40MHz, clock source = CY7C991
+	TMS320C51(config, m_dsp, XTAL(10'000'000)*4); // 40MHz, clock source = CY7C991
 	m_dsp->set_addrmap(AS_PROGRAM, &taitojc_state::tms_program_map);
 	m_dsp->set_addrmap(AS_DATA, &taitojc_state::tms_data_map);
 

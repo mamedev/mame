@@ -268,14 +268,14 @@ void menu_bookkeeping::populate_text(std::optional<text_layout> &layout, float &
 		// show total time first
 		prevtime = machine().time();
 		if (prevtime.seconds() >= (60 * 60))
-			layout->add_text(util::string_format(_("Uptime: %1$d:%2$02d:%3$02d\n\n"), prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60), color);
+			layout->add_text(util::string_format(_("menu-bookkeeping", "Uptime: %1$d:%2$02d:%3$02d\n\n"), prevtime.seconds() / (60 * 60), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60), color);
 		else
-			layout->add_text(util::string_format(_("Uptime: %1$d:%2$02d\n\n"), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60), color);
+			layout->add_text(util::string_format(_("menu-bookkeeping", "Uptime: %1$d:%2$02d\n\n"), (prevtime.seconds() / 60) % 60, prevtime.seconds() % 60), color);
 
 		// show tickets at the top
 		int const tickets = machine().bookkeeping().get_dispensed_tickets();
 		if (tickets > 0)
-			layout->add_text(util::string_format(_("Tickets dispensed: %1$d\n\n"), tickets), color);
+			layout->add_text(util::string_format(_("menu-bookkeeping", "Tickets dispensed: %1$d\n\n"), tickets), color);
 
 		// loop over coin counters
 		for (int ctrnum = 0; ctrnum < bookkeeping_manager::COIN_COUNTERS; ctrnum++)
@@ -286,13 +286,10 @@ void menu_bookkeeping::populate_text(std::optional<text_layout> &layout, float &
 			// display the coin counter number
 			// display how many coins
 			// display whether or not we are locked out
-			layout->add_text(
-					util::string_format(
-						(count == 0) ? _("Coin %1$c: NA%3$s\n") : _("Coin %1$c: %2$d%3$s\n"),
-						ctrnum + 'A',
-						count,
-						locked ? _(" (locked)") : ""),
-					color);
+			auto const format = !count
+					? (locked ? _("menu-bookkeeping", "Coin %1$c: NA (locked)\n") : _("menu-bookkeeping", "Coin %1$c: NA\n"))
+					: (locked ? _("menu-bookkeeping", "Coin %1$c: %2$d (locked)\n") : _("menu-bookkeeping", "Coin %1$c: %2$d\n"));
+			layout->add_text(util::string_format(format, ctrnum + 'A', count), color);
 		}
 
 		lines = layout->lines();
@@ -930,7 +927,7 @@ void menu_machine_configure::setup_bios()
 menu_plugins_configure::menu_plugins_configure(mame_ui_manager &mui, render_container &container)
 	: menu(mui, container)
 {
-	set_heading(_("Plugins"));
+	set_heading(_("menu-plugins", "Plugins"));
 }
 
 menu_plugins_configure::~menu_plugins_configure()
@@ -990,7 +987,7 @@ void menu_plugins_configure::populate()
 		}
 	}
 	if (first)
-		item_append(_("No plugins found"), FLAG_DISABLE, nullptr);
+		item_append(_("menu-plugins", "No plugins found"), FLAG_DISABLE, nullptr);
 	item_append(menu_item_type::SEPARATOR);
 }
 

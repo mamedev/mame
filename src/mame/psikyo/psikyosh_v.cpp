@@ -430,7 +430,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 		u32 const code, u16 const color, u8 const flipx, u8 const flipy, s32 const offsx, s32 const offsy,
 		s16 const alpha, u32 const zoomx, u32 const zoomy, u8 const wide, u8 const high, u16 const z)
 {
-	rectangle myclip; /* Clip to screen boundaries */
+	rectangle myclip; // Clip to screen boundaries
 	int code_offset = 0;
 
 	if (!zoomx || !zoomy)
@@ -440,11 +440,11 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 
 	assert(dest_bmp.bpp() == 32);
 
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
+	// force clip to bitmap boundary
 	myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
-	/* Temporary fallback for non-zoomed, needs z-buffer. Note that this is probably a lot slower than drawgfx.c, especially if there was separate code for flipped cases */
+	// Temporary fallback for non-zoomed, needs z-buffer. Note that this is probably a lot slower than drawgfx.c, especially if there was separate code for flipped cases
 	if (zoomx == 0x400 && zoomy == 0x400)
 	{
 		int xstart, ystart, xend, yend, xinc, yinc;
@@ -455,7 +455,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 		if (flipy)  { ystart = high - 1; yend = -1;   yinc = -1; }
 		else        { ystart = 0;        yend = high; yinc = +1; }
 
-		/* Start drawing */
+		// Start drawing
 		if (gfx)
 		{
 			for (int ytile = ystart; ytile != yend; ytile += yinc)
@@ -473,42 +473,45 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 					if (flipy)  { y_index = gfx->height()-1; }
 					else        { y_index = 0; }
 
-					/* start coordinates */
+					// start coordinates
 					int sx = offsx + xtile * gfx->width();
 					int sy = offsy + ytile * gfx->height();
 
-					/* end coordinates */
+					// end coordinates
 					int ex = sx + gfx->width();
 					int ey = sy + gfx->height();
 
 					if (sx < myclip.left())
-					{ /* clip left */
+					{
+						// clip left
 						const int pixels = myclip.left() - sx;
 						sx += pixels;
 						x_index_base += xinc * pixels;
 					}
 					if (sy < myclip.top())
-					{ /* clip top */
+					{
+						// clip top
 						const int pixels = myclip.top() - sy;
 						sy += pixels;
 						y_index += yinc * pixels;
 					}
-					/* NS 980211 - fixed incorrect clipping */
 					if (ex > myclip.right() + 1)
-					{ /* clip right */
+					{
+						// clip right
 						const int pixels = ex - myclip.right() - 1;
 						ex -= pixels;
 					}
 					if (ey > myclip.bottom() + 1)
-					{ /* clip bottom */
+					{
+						// clip bottom
 						const int pixels = ey - myclip.bottom() - 1;
 						ey -= pixels;
 					}
 
+					// skip if inner loop doesn't draw anything
 					if (ex > sx)
-					{ /* skip if inner loop doesn't draw anything */
-
-						/* case 1: no alpha */
+					{
+						// case 1: no alpha
 						if (alpha == 0xff)
 						{
 							if (z > 0)
@@ -554,7 +557,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 							}
 						}
 
-						/* case 6: alpha-blended */
+						// case 6: alpha-blended
 						else if (alpha >= 0)
 						{
 							if (z > 0)
@@ -600,8 +603,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 							}
 						}
 
-						/* pjp 31/5/02 */
-						/* case 7: TRANSPARENCY_ALPHARANGE */
+						// case 7: TRANSPARENCY_ALPHARANGE
 						else
 						{
 							if (z > 0)
@@ -652,10 +654,10 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 			}
 		}
 	}
-	else /* Zoomed */
+	else // Zoomed
 	{
-		/* Make a copy of complete sprite at top-left of zoom_bitmap */
-		/* Because I'm too slow to get it to work on the fly */
+		// Make a copy of complete sprite at top-left of zoom_bitmap
+		// Because I'm too slow to get it to work on the fly
 		for (int ytile = 0; ytile < high; ytile++)
 		{
 			for (int xtile = 0; xtile < wide; xtile++)
@@ -674,7 +676,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 			}
 		}
 
-		/* Start drawing */
+		// Start drawing
 		if (gfx)
 		{
 			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
@@ -684,11 +686,11 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 
 			if (sprite_screen_width && sprite_screen_height)
 			{
-				/* start coordinates */
+				// start coordinates
 				int sx = offsx;
 				int sy = offsy;
 
-				/* end coordinates */
+				// end coordinates
 				int ex = sx + sprite_screen_width;
 				int ey = sy + sprite_screen_height;
 
@@ -704,34 +706,37 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 				else        { y_index = 0; dy = zoomy; }
 
 				if (sx < myclip.left())
-				{ /* clip left */
+				{
+					// clip left
 					const int pixels = myclip.left() - sx;
 					sx += pixels;
 					x_index_base += pixels * dx;
 				}
 				if (sy < myclip.top())
-				{ /* clip top */
+				{
+					// clip top
 					const int pixels = myclip.top() - sy;
 					sy += pixels;
 					y_index += pixels * dy;
 				}
-				/* NS 980211 - fixed incorrect clipping */
 				if (ex > myclip.right() + 1)
-				{ /* clip right */
+				{
+					// clip right
 					const int pixels = ex-myclip.right() - 1;
 					ex -= pixels;
 				}
 				if (ey > myclip.bottom() + 1)
-				{ /* clip bottom */
+				{
+					// clip bottom
 					const int pixels = ey-myclip.bottom() - 1;
 					ey -= pixels;
 				}
 
+				// skip if inner loop doesn't draw anything
 				if (ex > sx)
-				{ /* skip if inner loop doesn't draw anything */
-
-					/* case 1: no alpha */
-					/* Note: adjusted to >>10 and draws from zoom_bitmap not gfx */
+				{
+					// case 1: no alpha
+					// Note: adjusted to >>10 and draws from zoom_bitmap not gfx
 					if (alpha == 0xff)
 					{
 						if (z > 0)
@@ -771,7 +776,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 						}
 					}
 
-					/* case 6: alpha-blended */
+					// case 6: alpha-blended
 					else if (alpha >= 0)
 					{
 						if (z > 0)
@@ -811,7 +816,7 @@ void psikyosh_state::psikyosh_drawgfxzoom(bitmap_rgb32 &dest_bmp, const rectangl
 						}
 					}
 
-					/* case 7: TRANSPARENCY_ALPHARANGE */
+					// case 7: TRANSPARENCY_ALPHARANGE
 					else
 					{
 						if (z > 0)

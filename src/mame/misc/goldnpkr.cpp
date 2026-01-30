@@ -917,7 +917,7 @@
   Sound System:
 
   Utilizes two SN76489AN Programmable Sound Generators (PSGs), with the second being an
-  adition not present in the original design.
+  addition not present in the original design.
   Currently supported games initialize both PSGs at addresses 2400h and 2800h, though only
   the one at 2400h is actively used.
   A READY line, tied to PIA1 port A, is monitored to ensure proper system operation.
@@ -1080,7 +1080,6 @@
 #include "cpu/m6805/m68705.h"
 #include "cpu/z80/z80.h"
 #include "machine/6821pia.h"
-#include "machine/bankdev.h"
 #include "machine/nvram.h"
 #include "machine/segacrpt_device.h"
 #include "machine/ticket.h"
@@ -1095,11 +1094,11 @@
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "pmpoker.lh"
 #include "goldnpkr.lh"
 #include "goldnswp.lh"
-#include "upndown.lh"
 #include "lespendu.lh"
+#include "pmpoker.lh"
+#include "upndown.lh"
 
 
 namespace {
@@ -1114,96 +1113,97 @@ class goldnpkr_state : public driver_device
 public:
 	goldnpkr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
+		m_lamps(*this, "lamp%u", 0U),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_pia(*this, "pia%u", 0U),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_discrete(*this, "discrete"),
-		m_videoram(*this, "videoram"),
-		m_colorram(*this, "colorram"),
 		m_hopper(*this, "hopper"),
 		m_ay8910(*this, "ay8910"),
-		m_snsnd(*this, "snsnd"),
-		m_lamps(*this, "lamp%u", 0U)
+		m_snsnd(*this, "snsnd")
 	{ }
 
-	void wildcard(machine_config &config);
-	void wildcrdb(machine_config &config);
-	void wildcrde(machine_config &config);
-	void witchcrd(machine_config &config);
-	void mondial(machine_config &config);
-	void wcfalcon(machine_config &config);
-	void geniea(machine_config &config);
-	void genie(machine_config &config);
-	void pottnpkr(machine_config &config);
-	void goldnpkr(machine_config &config);
-	void witchcdj(machine_config &config);
-	void wcrdxtnd(machine_config &config);
-	void super21p(machine_config &config);
-	void op5cards(machine_config &config);
-	void caspoker(machine_config &config);
-	void icp_ext(machine_config &config);
-	void gldnirq0(machine_config &config);
-	void lespendu(machine_config &config);
-	void icproul(machine_config &config);
-	void glfever(machine_config &config);
-	void kmhpan(machine_config &config);
-	void unkicpf40(machine_config &config);
-	void wing_w90(machine_config &config);
-	void dep_9801(machine_config &config);
+	void wildcard(machine_config &config) ATTR_COLD;
+	void wildcrdb(machine_config &config) ATTR_COLD;
+	void wildcrde(machine_config &config) ATTR_COLD;
+	void witchcrd(machine_config &config) ATTR_COLD;
+	void mondial(machine_config &config) ATTR_COLD;
+	void wcfalcon(machine_config &config) ATTR_COLD;
+	void geniea(machine_config &config) ATTR_COLD;
+	void genie(machine_config &config) ATTR_COLD;
+	void pottnpkr(machine_config &config) ATTR_COLD;
+	void goldnpkr(machine_config &config) ATTR_COLD;
+	void witchcdj(machine_config &config) ATTR_COLD;
+	void wcrdxtnd(machine_config &config) ATTR_COLD;
+	void super21p(machine_config &config) ATTR_COLD;
+	void op5cards(machine_config &config) ATTR_COLD;
+	void caspoker(machine_config &config) ATTR_COLD;
+	void icp_ext(machine_config &config) ATTR_COLD;
+	void gldnirq0(machine_config &config) ATTR_COLD;
+	void icproul(machine_config &config) ATTR_COLD;
+	void glfever(machine_config &config) ATTR_COLD;
+	void kmhpan(machine_config &config) ATTR_COLD;
+	void unkicpf40(machine_config &config) ATTR_COLD;
+	void wing_w90(machine_config &config) ATTR_COLD;
+	void dep_9801(machine_config &config) ATTR_COLD;
 
-	void init_vkdlswwh();
-	void init_icp1db();
-	void init_vkdlswwp();
-	void init_vkdlsww();
-	void init_vkdlsb();
-	void init_vkdlsc();
-	void init_vkdlswwl();
-	void init_vkdlswwu();
-	void init_vkdlswwo();
-	void init_vkdlswwa();
-	void init_vkdlsa();
-	void init_vkdlswwt();
-	void init_vkdlswwd();
-	void init_wstrike();
-	void init_vkdlswws();
-	void init_vkdlswwc();
-	void init_vkdlswwr();
-	void init_vkdlswwv();
-	void init_bchancep();
-	void init_bonuspkr();
-	void init_super98();
-	void init_pokersis();
-	void init_lespendu();
-	void init_lespenduj();
-	void init_op5cards();
-	void init_olym65();
-	void init_glfev();
-	void init_ped42();
-
-	uint8_t pottnpkr_mux_port_r();
-	void lamps_a_w(uint8_t data);
-	void lespendu_lamps_a_w(uint8_t data);
-	void sound_w(uint8_t data);
-	void mux_w(uint8_t data);
-	void lespendu_mux_w(uint8_t data);
-
-	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void init_vkdlswwh() ATTR_COLD;
+	void init_icp1db() ATTR_COLD;
+	void init_vkdlswwp() ATTR_COLD;
+	void init_vkdlsww() ATTR_COLD;
+	void init_vkdlsb() ATTR_COLD;
+	void init_vkdlsc() ATTR_COLD;
+	void init_vkdlswwl() ATTR_COLD;
+	void init_vkdlswwu() ATTR_COLD;
+	void init_vkdlswwo() ATTR_COLD;
+	void init_vkdlswwa() ATTR_COLD;
+	void init_vkdlsa() ATTR_COLD;
+	void init_vkdlswwt() ATTR_COLD;
+	void init_vkdlswwd() ATTR_COLD;
+	void init_wstrike() ATTR_COLD;
+	void init_vkdlswws() ATTR_COLD;
+	void init_vkdlswwc() ATTR_COLD;
+	void init_vkdlswwr() ATTR_COLD;
+	void init_vkdlswwv() ATTR_COLD;
+	void init_bchancep() ATTR_COLD;
+	void init_bonuspkr() ATTR_COLD;
+	void init_super98() ATTR_COLD;
+	void init_pokersis() ATTR_COLD;
+	void init_op5cards() ATTR_COLD;
+	void init_olym65() ATTR_COLD;
+	void init_glfev() ATTR_COLD;
+	void init_ped42() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override { m_lamps.resolve(); }
-
 	virtual void video_start() override ATTR_COLD;
+
+	uint8_t pottnpkr_mux_port_r();
+	void lamps_a_w(uint8_t data);
+	void sound_w(uint8_t data);
+	void mux_w(uint8_t data);
 
 	void goldnpkr_videoram_w(offs_t offset, uint8_t data);
 	void goldnpkr_colorram_w(offs_t offset, uint8_t data);
 
-	void witchcrd_palette(palette_device &palette) const;
-	void super21p_palette(palette_device &palette) const;
-	void wing_w90_palette(palette_device &palette) const;
+	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void goldnpkr_base(machine_config &config);
+	void witchcrd_palette(palette_device &palette) const ATTR_COLD;
+	void super21p_palette(palette_device &palette) const ATTR_COLD;
+	void wing_w90_palette(palette_device &palette) const ATTR_COLD;
+
+	void goldnpkr_base(machine_config &config) ATTR_COLD;
+
+	void common_io_map(address_map &map) ATTR_COLD;
+
+	output_finder<9> m_lamps;
+
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
 	required_device<cpu_device> m_maincpu;
 	required_device_array<pia6821_device, 2> m_pia;
@@ -1212,6 +1212,7 @@ protected:
 	required_device<palette_device> m_palette;
 	optional_device<discrete_device> m_discrete;
 
+	uint8_t m_mux_data = 0;
 
 private:
 	uint8_t goldnpkr_mux_port_r();
@@ -1226,16 +1227,14 @@ private:
 	TILE_GET_INFO_MEMBER(super21p_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wing_w90_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(kmhpan_get_bg_tile_info);
-	void goldnpkr_palette(palette_device &palette) const;
+	void goldnpkr_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_VIDEO_START(wcrdxtnd);
 	DECLARE_VIDEO_START(super21p);
 	DECLARE_VIDEO_START(wing_w90);
 	DECLARE_VIDEO_START(kmhpan);
-	void wcrdxtnd_palette(palette_device &palette) const;
+	void wcrdxtnd_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_MACHINE_START(mondial);
-	DECLARE_MACHINE_START(lespendu);
 	DECLARE_MACHINE_RESET(mondial);
-	DECLARE_MACHINE_RESET(lespendu);
 
 	void genie_map(address_map &map) ATTR_COLD;
 	void goldnpkr_map(address_map &map) ATTR_COLD;
@@ -1253,25 +1252,48 @@ private:
 	void super21p_map(address_map &map) ATTR_COLD;
 	void op5cards_map(address_map &map) ATTR_COLD;
 	void icp_ext_map(address_map &map) ATTR_COLD;
-	void lespendu_map(address_map &map) ATTR_COLD;
 	void glfever_map(address_map &map) ATTR_COLD;
 	void kmhpan_map(address_map &map) ATTR_COLD;
 	void unkicpf40_map(address_map &map) ATTR_COLD;
 	void wing_w90_map(address_map &map) ATTR_COLD;
 	void dep_9801_map(address_map &map) ATTR_COLD;
 
-	required_shared_ptr<uint8_t> m_videoram;
-	required_shared_ptr<uint8_t> m_colorram;
 	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device<ay8910_device> m_ay8910;
 	optional_device<sn76489a_device> m_snsnd;
-	output_finder<9> m_lamps;
 
 	tilemap_t *m_bg_tilemap = nullptr;
-	uint8_t m_mux_data = 0;
 	uint8_t m_pia0_PA_data = 0;
 	uint8_t m_ay8910_data = 0;
 	uint8_t m_ay8910_control = 0;
+};
+
+
+class lespendu_state : public goldnpkr_state
+{
+public:
+	lespendu_state(const machine_config &mconfig, device_type type, const char *tag) :
+		goldnpkr_state(mconfig, type, tag),
+		m_databank(*this, "databank")
+	{
+	}
+
+	void lespendu(machine_config &config) ATTR_COLD;
+
+	void init_lespendu() ATTR_COLD;
+	void init_lespenduj() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	void lespendu_lamps_a_w(uint8_t data);
+	void lespendu_mux_w(uint8_t data);
+
+	void lespendu_map(address_map &map) ATTR_COLD;
+
+private:
+	required_memory_bank m_databank;
 };
 
 
@@ -1282,25 +1304,26 @@ public:
 		goldnpkr_state(mconfig, type, tag),
 		m_cpubank(*this, "cpubank"),
 		m_mcu(*this, "mcu"),
-		m_bankdev(*this, "bankdev"),
+		m_overlay(*this, "overlay"),
 		m_cpubank_xor(0),
 		m_portc_data(0x0f)
 	{ }
 
-	void megadpkr(machine_config &config);
+	void megadpkr(machine_config &config) ATTR_COLD;
 
 private:
-	uint8_t cpubank_decrypt_r(offs_t offset);
+	template <offs_t Base> uint8_t cpubank_decrypt_r(offs_t offset);
 	void mcu_command_w(uint8_t data);
 	void mcu_portb_w(uint8_t data);
 	void mcu_portc_w(uint8_t data);
-	void megadpkr_banked_map(address_map &map) ATTR_COLD;
+
 	void megadpkr_map(address_map &map) ATTR_COLD;
 
 	required_region_ptr<uint8_t> m_cpubank;
 
 	required_device<m68705p_device> m_mcu;
-	required_device<address_map_bank_device> m_bankdev;
+
+	memory_view m_overlay;
 
 	uint8_t m_cpubank_xor;
 	uint8_t m_portc_data;
@@ -1334,10 +1357,10 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::get_bg_tile_info)
     xx-- ----   unused.
 */
 
-	int attr = m_colorram[tile_index];
-	int code = ((attr & 1) << 8) | m_videoram[tile_index];
-	int bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
-	int color = (attr & 0x3c) >> 2;     // bits 2-3-4-5 for color
+	uint16_t const attr = m_colorram[tile_index];
+	uint16_t const code = ((attr & 1) << 8) | m_videoram[tile_index];
+	uint16_t const bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
+	uint16_t const color = (attr & 0x3c) >> 2;     // bits 2-3-4-5 for color
 
 	tileinfo.set(bank, code, color, 0);
 }
@@ -1352,10 +1375,10 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
     xx-- --xx   tiles bank.
 */
 
-	int attr = m_colorram[tile_index];
-	int code = ((attr & 1) << 8) | m_videoram[tile_index];
-	int bank = (attr & 0x03) + ((attr & 0xc0) >> 4);    // bits 0, 1, 6 & 7 switch the gfx banks
-	int color = (attr & 0x3c) >> 2;                     // bits 2-3-4-5 for color
+	uint16_t const attr = m_colorram[tile_index];
+	uint16_t const code = ((attr & 1) << 8) | m_videoram[tile_index];
+	uint16_t const bank = bitswap<4>(attr, 7, 6, 1, 0);    // bits 0, 1, 6 & 7 switch the gfx banks
+	uint16_t const color = (attr & 0x3c) >> 2;             // bits 2-3-4-5 for color
 
 	tileinfo.set(bank, code, color, 0);
 }
@@ -1370,10 +1393,10 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::super21p_get_bg_tile_info)
     x--- --xx   tiles bank.
 */
 
-	int attr = m_colorram[tile_index];
-	int code = ((attr & 1) << 8) | m_videoram[tile_index];
-	int bank = (attr & 0x03);       // bits 0-1, switch the gfx banks
-	int color = (attr & 0x70) >> 3; // bits 4-5-6 for color, shifted x2 to match the color groups used.
+	uint16_t const attr = m_colorram[tile_index];
+	uint16_t const code = ((attr & 1) << 8) | m_videoram[tile_index];
+	uint16_t const bank = attr & 0x03;         // bits 0-1, switch the gfx banks
+	uint16_t const color = (attr & 0x70) >> 3; // bits 4-5-6 for color, shifted x2 to match the color groups used.
 
 	tileinfo.set(bank, code, color, 0);
 
@@ -1405,14 +1428,11 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::wing_w90_get_bg_tile_info)
     xx-- ----   unused.
 */
 
-	int attr = m_colorram[tile_index];
+	uint16_t const attr = m_colorram[tile_index];
 
-	int code = ((attr & 0x01) << 8) | m_videoram[tile_index];
-	int bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
-	int color = (attr & 0x3c) >> 2;     // bits 2-3-4-5 for color
-
-	if (attr & 0x01)
-		bank = 1;
+	uint16_t const code = ((attr & 0x01) << 8) | m_videoram[tile_index];
+	uint16_t const bank = BIT(attr, 0) | BIT(attr, 1); // bit 0 or 1 switch the gfx banks
+	uint16_t const color = (attr & 0x3c) >> 2;         // bits 2-3-4-5 for color
 
 	tileinfo.set(bank, code, color, 0);
 }
@@ -1428,10 +1448,10 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::kmhpan_get_bg_tile_info)
     x--- ----   unused.
 */
 
-	int attr = m_colorram[tile_index];
-	int code = ((attr & 1) << 8) | m_videoram[tile_index];
-	int bank = (attr & 0x03) + ((attr & 0x40) >> 4);
-	int color = (attr & 0x3c) >> 2;
+	uint16_t const attr = m_colorram[tile_index];
+	uint16_t const code = ((attr & 1) << 8) | m_videoram[tile_index];
+	uint16_t const bank = bitswap<3>(attr, 6, 1, 0);
+	uint16_t const color = (attr & 0x3c) >> 2;
 
 	tileinfo.set(bank, code, color, 0);
 }
@@ -1716,14 +1736,14 @@ void goldnpkr_state::mux_w(uint8_t data)
 	m_lamps[8] = !BIT(data, 3); // coin lockout
 }
 
-void goldnpkr_state::lespendu_mux_w(uint8_t data)
+void lespendu_state::lespendu_mux_w(uint8_t data)
 {
 	m_mux_data = data ^ 0xff;   // inverted
 
-	if(data == 0x00)
+	if (data == 0x00)
 		data = 0xff;
 
-	membank("bank0")->set_entry(data & 0x07); // for both sets
+	m_databank->set_entry(data & 0x07); // for both sets
 }
 
 
@@ -1830,7 +1850,7 @@ void goldnpkr_state::lamps_a_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(2, data & 0x20);  // counter 3
 }
 
-void goldnpkr_state::lespendu_lamps_a_w(uint8_t data)
+void lespendu_state::lespendu_lamps_a_w(uint8_t data)
 {
 /* Le Super Pendu lamps and counters wiring *
 
@@ -1869,22 +1889,30 @@ void goldnpkr_state::sound_w(uint8_t data)
 *           Memory Map Information           *
 *********************************************/
 
-void goldnpkr_state::goldnpkr_map(address_map &map)
+void goldnpkr_state::common_io_map(address_map &map)
 {
-	map.global_mask(0x7fff);
-	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
+}
+
+void goldnpkr_state::goldnpkr_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+
+	common_io_map(map);
+
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
 	map(0x2000, 0x7fff).rom();  // superdbl uses 0x2000..0x3fff address space
 }
 
 void goldnpkr_state::witchcdj_map(address_map &map)
 {
 	goldnpkr_map(map);
+
 	map(0x0801, 0x0801).unmaprw();
 	map(0x0802, 0x0802).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 }
@@ -1892,26 +1920,20 @@ void goldnpkr_state::witchcdj_map(address_map &map)
 void goldnpkr_state::pottnpkr_map(address_map &map)
 {
 	map.global_mask(0x3fff);
+
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x3fff).rom();
 }
 
 void goldnpkr_state::witchcrd_map(address_map &map)
 {
 	map.global_mask(0x7fff);
+
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
 //  map(0x2108, 0x210b).noprw(); // unknown 40-pin device
 	map(0x2800, 0x2fff).ram();
@@ -1932,11 +1954,12 @@ void goldnpkr_state::witchcrd_map(address_map &map)
 void goldnpkr_state::witchcrd_falcon_map(address_map &map)
 {
 	map.global_mask(0x7fff);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 	map(0x2000, 0x2000).portr("SW2");
 	map(0x2100, 0x2100).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2101, 0x2101).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -1945,13 +1968,9 @@ void goldnpkr_state::witchcrd_falcon_map(address_map &map)
 
 void goldnpkr_state::wildcard_map(address_map &map)
 {
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
 	map(0x2200, 0x27ff).rom();  // for VK set
 	map(0x2800, 0x2fff).ram();  // for VK set
@@ -1964,13 +1983,9 @@ void goldnpkr_state::wildcard_map(address_map &map)
 */
 void goldnpkr_state::wcrdxtnd_map(address_map &map)
 {
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram(); //.share("nvram"); // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
 	map(0x2200, 0x27ff).rom();  // for VK hardware
 	map(0x2800, 0x2fff).ram().share("nvram");   // Dallas ds1210 + battery backed RAM
@@ -1989,8 +2004,8 @@ void goldnpkr_state::wildcrdb_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 	map(0x2000, 0x2000).portr("SW2");
 	map(0x2100, 0x2100).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2101, 0x2101).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -2022,7 +2037,7 @@ void goldnpkr_state::wildcrdb_mcu_io_map(address_map &map)
 
   Code checks if 2A00-2A03 contains read only 00 to 03 values.
   At some point transfer the control into the range 2A00-2FFF and die due the lack of code.
-  There is no rom with these sequential values. Seems injected by the extra encrypted CPU.
+  There is no ROM with these sequential values. Seems injected by the extra encrypted CPU.
 
 */
 
@@ -2034,8 +2049,8 @@ void goldnpkr_state::genie_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x17ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1fff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x17ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x1800, 0x1fff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 	map(0x2000, 0x3fff).rom();
 }
 
@@ -2043,13 +2058,10 @@ void goldnpkr_state::genie_map(address_map &map)
 void goldnpkr_state::mondial_map(address_map &map)
 {
 	map.global_mask(0x7fff);
+
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x4000, 0x7fff).bankr("bank1");
 }
 
@@ -2060,8 +2072,8 @@ void goldnpkr_state::super21p_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0804, 0x0807).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0808, 0x080b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 	map(0x2000, 0x2000).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x2001, 0x2001).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x8000, 0xffff).rom();
@@ -2070,85 +2082,63 @@ void goldnpkr_state::super21p_map(address_map &map)
 void goldnpkr_state::icp_ext_map(address_map &map)
 {
 	map.global_mask(0x7fff);
+
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x3fff).rom();
 	map(0x6000, 0x7fff).rom();
 }
 
-void goldnpkr_state::lespendu_map(address_map &map)
+void lespendu_state::lespendu_map(address_map &map)
 {
 	map.global_mask(0x7fff);
-	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 
-	map(0x5000, 0x5fff).bankr("bank0");
+	common_io_map(map);
+
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+
+	map(0x5000, 0x5fff).bankr(m_databank);
 	map(0x6000, 0x7fff).rom();
 }
 
 void goldnpkr_state::op5cards_map(address_map &map)
 {
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW2");
 	map(0xc000, 0xffff).rom();
 }
 
 void goldnpkr_state::glfever_map(address_map &map)
 {
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SWA");
-	map(0x3000, 0x7fff).rom();  // base rom space
+	map(0x3000, 0x7fff).rom();  // base ROM space
 	map(0xa000, 0xa000).portr("SWB");
-	map(0xf000, 0xffff).rom();  // extended rom space
+	map(0xf000, 0xffff).rom();  // extended ROM space
 }
 
 void goldnpkr_state::kmhpan_map(address_map &map)
 {
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2400, 0x2400).w("sn", FUNC(sn76489a_device::write));
 //  map(0x2800, 0x2800).w  // SN76489AN, initialized but not present on PCB. not written during gameplay
 	map(0x4000, 0x7fff).rom();
-	map(0xc000, 0xffff).rom();  // extended rom space
+	map(0xc000, 0xffff).rom();  // extended ROM space
 }
 
 void goldnpkr_state::unkicpf40_map(address_map &map)
 {
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SWA");
 	map(0x4000, 0x7fff).rom();  // bankswitched through 74ls154
 	map(0xa000, 0xa000).portr("SWB");
@@ -2157,13 +2147,9 @@ void goldnpkr_state::unkicpf40_map(address_map &map)
 
 void goldnpkr_state::wing_w90_map(address_map &map)
 {
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2400, 0x2400).w("snsnd", FUNC(sn76489_device::write));  // SN76489AN PSG
 //  map(0x2800, 0x2800).w();  // Initializes another SN76489, not present in the PCB, and then no activity
@@ -2173,13 +2159,9 @@ void goldnpkr_state::wing_w90_map(address_map &map)
 
 void goldnpkr_state::dep_9801_map(address_map &map)
 {
+	common_io_map(map);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
-	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
 	map(0x2000, 0xffff).rom();
 }
 
@@ -2194,22 +2176,20 @@ void blitz_state::megadpkr_map(address_map &map)
 
 /*  There is another set of PIAs controlled by the code.
     Maybe they are just mirrors...
+    FIXME: this comment and commented code doesn't make sense - the video RAM is in this range
 
     map(0x10f4, 0x10f7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
     map(0x10f8, 0x10fb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 */
-	map(0x1000, 0x13ff).ram().w(FUNC(blitz_state::goldnpkr_videoram_w)).share("videoram");
-	map(0x1800, 0x1bff).ram().w(FUNC(blitz_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x1000, 0x13ff).ram().w(FUNC(blitz_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x1800, 0x1bff).ram().w(FUNC(blitz_state::goldnpkr_colorram_w)).share(m_colorram);
 
-	map(0x4000, 0x7fff).rw(m_bankdev, FUNC(address_map_bank_device::read8), FUNC(address_map_bank_device::write8));
+	map(0x4000, 0x47ff).rw("timekpr", FUNC(m48t02_device::read), FUNC(m48t02_device::write));
+	map(0x4000, 0x7fff).view(m_overlay);
+	m_overlay[0](0x4000, 0x7fff).r(FUNC(blitz_state::cpubank_decrypt_r<0x0000>)).nopw();
+	m_overlay[1](0x4000, 0x7fff).r(FUNC(blitz_state::cpubank_decrypt_r<0x4000>)).nopw();
 	map(0x8000, 0xbfff).nopr().w(FUNC(blitz_state::mcu_command_w));
 	map(0xc000, 0xffff).rom();
-}
-
-void blitz_state::megadpkr_banked_map(address_map &map)
-{
-	map(0x00000, 0x07fff).r(FUNC(blitz_state::cpubank_decrypt_r));
-	map(0x08000, 0x087ff).rw("timekpr", FUNC(m48t02_device::read), FUNC(m48t02_device::write));
 }
 
 
@@ -5324,17 +5304,19 @@ MACHINE_RESET_MEMBER(goldnpkr_state, mondial)
 	membank("bank1")->set_entry(seldsw);
 }
 
-MACHINE_START_MEMBER(goldnpkr_state, lespendu)
+void lespendu_state::machine_start()
 {
-	m_lamps.resolve();
+	goldnpkr_state::machine_start();
 
-	uint8_t *ROM = memregion("data")->base();
-	membank("bank0")->configure_entries(0, 8, &ROM[0], 0x1000);
+	uint8_t *const ROM = memregion("data")->base();
+	m_databank->configure_entries(0, 8, &ROM[0], 0x1000);
 }
 
-MACHINE_RESET_MEMBER(goldnpkr_state, lespendu)
+void lespendu_state::machine_reset()
 {
-	membank("bank0")->set_entry(7);
+	goldnpkr_state::machine_reset();
+
+	m_databank->set_entry(7);
 }
 
 
@@ -5663,21 +5645,18 @@ void goldnpkr_state::gldnirq0(machine_config &config)
 }
 
 
-void goldnpkr_state::lespendu(machine_config &config)
+void lespendu_state::lespendu(machine_config &config)
 {
 	goldnpkr(config);
 
 	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::lespendu_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &lespendu_state::lespendu_map);
 
-	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::lespendu_lamps_a_w));
+	m_pia[0]->writepb_handler().set(FUNC(lespendu_state::lespendu_lamps_a_w));
 
 	m_pia[1]->readpa_handler().set_ioport("SW1");
 	m_pia[1]->readpb_handler().set_ioport("SW2");
-	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::lespendu_mux_w)); // ++ bankswitch
-
-	MCFG_MACHINE_START_OVERRIDE(goldnpkr_state, lespendu)
-	MCFG_MACHINE_RESET_OVERRIDE(goldnpkr_state, lespendu)
+	m_pia[1]->writepb_handler().set(FUNC(lespendu_state::lespendu_mux_w)); // ++ bankswitch
 
 	// video hardware
 	m_gfxdecode->set_info(gfx_lespendu);
@@ -5783,8 +5762,6 @@ void blitz_state::megadpkr(machine_config &config)
 	M6502(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &blitz_state::megadpkr_map);
 
-	ADDRESS_MAP_BANK(config, "bankdev").set_map(&blitz_state::megadpkr_banked_map).set_data_width(8).set_addr_width(16).set_stride(0x4000);
-
 	M68705P5(config, m_mcu, CPU_CLOCK); // unknown
 	m_mcu->portb_w().set(FUNC(blitz_state::mcu_portb_w));
 	m_mcu->portc_w().set(FUNC(blitz_state::mcu_portc_w));
@@ -5792,18 +5769,18 @@ void blitz_state::megadpkr(machine_config &config)
 	M48T02(config, "timekpr", 0);
 
 	PIA6821(config, m_pia[0]);
-	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
-	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::lamps_a_w));
+	m_pia[0]->readpa_handler().set(FUNC(blitz_state::pottnpkr_mux_port_r));
+	m_pia[0]->writepb_handler().set(FUNC(blitz_state::lamps_a_w));
 
 	PIA6821(config, m_pia[1]);
 	m_pia[1]->readpa_handler().set_ioport("SW1");
-	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::sound_w));
-	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
+	m_pia[1]->writepa_handler().set(FUNC(blitz_state::sound_w));
+	m_pia[1]->writepb_handler().set(FUNC(blitz_state::mux_w));
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(PIXEL_CLOCK, (37 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8); // from MC6845 parameters
-	m_screen->set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+	m_screen->set_screen_update(FUNC(blitz_state::screen_update_goldnpkr));
 
 	mc6845_device &crtc(MC6845(config, "crtc", CPU_CLOCK));
 	crtc.set_screen("screen");
@@ -5839,9 +5816,10 @@ void goldnpkr_state::dep_9801(machine_config &config)
 *    Blitz System decrypt and MCU handlers    *
 **********************************************/
 
+template <offs_t Base>
 uint8_t blitz_state::cpubank_decrypt_r(offs_t offset)
 {
-	return m_cpubank[offset] ^ m_cpubank_xor;
+	return m_cpubank[Base | offset] ^ m_cpubank_xor;
 }
 
 void blitz_state::mcu_command_w(uint8_t data)
@@ -5867,7 +5845,10 @@ void blitz_state::mcu_portc_w(uint8_t data)
 		m_maincpu->resume(SUSPEND_REASON_HALT);
 	}
 
-	m_bankdev->set_bank((BIT(data, 2) << 1) | BIT(data, 3));
+	if (BIT(data, 2))
+		m_overlay.disable();
+	else
+		m_overlay.select(BIT(data, 3));
 
 	m_portc_data = data;
 }
@@ -14811,7 +14792,7 @@ void goldnpkr_state::init_pokersis()
 }
 
 
-void goldnpkr_state::init_lespendu()
+void lespendu_state::init_lespendu()
 {
 	uint8_t *ROM0 = memregion("maincpu")->base();
 	uint8_t *ROM1 = memregion("data")->base();
@@ -14827,7 +14808,7 @@ void goldnpkr_state::init_lespendu()
 	ROM0[0x75de] = 0x1f;  // fix lamps bug
 }
 
-void goldnpkr_state::init_lespenduj()
+void lespendu_state::init_lespenduj()
 {
 	uint8_t *ROM0 = memregion("maincpu")->base();
 	uint8_t *ROM1 = memregion("data")->base();
@@ -15079,8 +15060,8 @@ GAMEL( 198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init
 GAME(  1987, super21p,  0,        super21p, super21p, goldnpkr_state, empty_init,    ROT0,   "Public MNG",               "Super 21",                                MACHINE_IMPERFECT_COLORS )
 GAME(  1987, op5cards,  0,        op5cards, op5cards, goldnpkr_state, init_op5cards, ROT0,   "MNG",                      "Open 5 Cards",                            0 )  // initialize lamps but doesn't seems to use them
 
-GAMEL( 198?, lespendu,  0,        lespendu, lespendu, goldnpkr_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
-GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, goldnpkr_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
+GAMEL( 198?, lespendu,  0,        lespendu, lespendu, lespendu_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
+GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, lespendu_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
 
 GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Roulette (ICP-1 PCB)",                    0 )  // password protected
 
@@ -15152,8 +15133,8 @@ GAMEL( 198?, boasorte,  bchanceq, gldnirq0, goldnpkr, goldnpkr_state, empty_init
 /*************************************** SETS W/MCU ***************************************/
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY          FULLNAME                                             FLAGS
-GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.3 MD)", 0 )
-GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.1 MD)", 0 )
+GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.3 MD)", MACHINE_NOT_WORKING )
+GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.1 MD)", MACHINE_NOT_WORKING )
 GAME(  1990, maxidpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Maxi Double Poker (version 1.8)",                    MACHINE_NOT_WORKING )
 
 

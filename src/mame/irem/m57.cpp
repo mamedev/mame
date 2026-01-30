@@ -3,13 +3,21 @@
 
 /****************************************************************************
 
-    Irem M57 hardware
+    Irem M57 hardware (Tropical Angel)
+    driver by Phil Stroffolino
+
+    Locations based on m58.cpp driver
+
+    BTANB:
+    - the sea has a purple tint, the flyer photos are blue/cyan, but those
+      don't match multiple PCB references
+
+    TODO:
+    - accurate palette resnet verified with PCB, take away any doubt exactly
+      how much purple the sea looks
+    - flipscreen/cocktail mode is glitchy
 
 *****************************************************************************
-
-    Tropical Angel
-
-    driver by Phil Stroffolino
 
     IREM M57 board stack with a M52-SOUND-E sound PCB.
 
@@ -43,10 +51,6 @@
      license seal and genuine IREM serial number sticker.
      The "new" ROMs have hand written labels, while those that match the current
      Tropical Angel set look to be factory labeled chips.
-
-*****************************************************************************
-
-    Locations based on m58.cpp driver
 
 ****************************************************************************/
 
@@ -302,6 +306,7 @@ void m57_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 }
 
+
 /*************************************
  *
  *  Sprite rendering
@@ -442,6 +447,7 @@ static INPUT_PORTS_START( m57 )
 	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW2:8" )
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Games port definitions
@@ -528,18 +534,13 @@ GFXDECODE_END
 void m57_state::m57(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6);  // verified on PCB
+	Z80(config, m_maincpu, 18.432_MHz_XTAL / 6); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &m57_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(m57_state::irq0_line_hold));
 
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(57);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790)); // accurate frequency, measured on a Moon Patrol board, is 56.75Hz.
-				/* the Lode Runner manual (similar but different hardware)
-				   talks about 55Hz and 1790ms vblank duration. */
-	screen.set_size(32*8, 32*8);
-	screen.set_visarea(1*8, 31*8-1, 1*8, 31*8-1);
+	screen.set_raw(18.432_MHz_XTAL / 3, 384, 8, 248, 282, 8, 248); // based on m52
 	screen.set_screen_update(FUNC(m57_state::screen_update));
 	screen.set_palette(m_palette);
 
@@ -627,5 +628,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, troangel, 0,        m57, troangel, m57_state, empty_init, ROT0, "Irem", "Tropical Angel",     MACHINE_SUPPORTS_SAVE )
-GAME( 1983, newtangl, troangel, m57, troangel, m57_state, empty_init, ROT0, "Irem", "New Tropical Angel", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, troangel, 0,        m57, troangel, m57_state, empty_init, ROT0, "Irem", "Tropical Angel",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1983, newtangl, troangel, m57, troangel, m57_state, empty_init, ROT0, "Irem", "New Tropical Angel", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

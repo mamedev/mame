@@ -448,14 +448,14 @@ void twincobr_state::fnshark_sound_io_map(address_map &map)
 	map(0x50, 0x50).portr("DSWB");
 }
 
-/***************************** TMS32010 Memory Map **************************/
+/***************************** TMS320C10 Memory Map **************************/
 
 void twincobr_state::dsp_program_map(address_map &map)
 {
 	map(0x000, 0x7ff).rom();
 }
 
-	// $000 - 08F  TMS32010 Internal Data RAM in Data Address Space
+	// $000 - 08F  TMS320C10 Internal Data RAM in Data Address Space
 
 void twincobr_state::dsp_io_map(address_map &map)
 {
@@ -677,7 +677,7 @@ void twincobr_state::twincobr(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &twincobr_state::sound_program_map);
 	audiocpu.set_addrmap(AS_IO, &twincobr_state::sound_io_map);
 
-	TMS32010(config, m_dsp, XTAL(28'000'000) / 2);         // 14MHz CLKin
+	TMS320C10(config, m_dsp, XTAL(28'000'000) / 2);         // 14MHz CLKin
 	m_dsp->set_addrmap(AS_PROGRAM, &twincobr_state::dsp_program_map);
 	// Data Map is internal to the CPU
 	m_dsp->set_addrmap(AS_IO, &twincobr_state::dsp_io_map);

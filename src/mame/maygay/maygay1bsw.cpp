@@ -2479,7 +2479,7 @@ ROM_START( m1monodt ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  ) ROM_L
 GAME( 199?, m1monodt, 0, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Monopoly (Dutch) (Maygay) (M1A/B)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
-  Pink Panther (Dutch)
+  Pink Panther (German)
 ******************************************************************************************************************************************************************************************************/
 
 // uPD7759 rom?
@@ -2488,7 +2488,15 @@ GAME( 199?, m1monodt, 0, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, R
 	ROM_LOAD( "ppsound.bin", 0x0000, 0x040000, CRC(8742981e) SHA1(1ba33c59ec5f878ebab111a77551213aad4b0993) )
 ROM_START( m1ppdt ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "pinkpanther.bin", 0x0000, 0x010000, CRC(09040f9d) SHA1(25c545e599711bf5ff2361c51e6629b69673da33) ) m1_ppdt_sound ROM_END_M1A_MCU
 
-GAME( 199?, m1ppdt, 0, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (German) (Maygay) (M1A/B)",GAME_FLAGS )
+GAME( 199?, m1ppdt,       0, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (German) (Maygay) (M1A/B) (set 1)",GAME_FLAGS )
+
+// uPD7759 rom?
+#define m1_ppdta_sound \
+	ROM_REGION( 0x100000, "upd", ROMREGION_ERASE00  ) \
+	ROM_LOAD( "ppsound.bin", 0x0000, 0x040000, CRC(e20eea22) SHA1(2e000fa7e85759c7f4c254d4d9c33ef481e459a7) )
+ROM_START( m1ppdta ) ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  ) ROM_LOAD( "pinkpanther.bin", 0x0000, 0x010000, CRC(793a764e) SHA1(0ba570da8ee4b5dda1d7d482a1f6ad85b70714c4) ) m1_ppdta_sound ROM_END_M1A_MCU
+
+GAME( 1995, m1ppdta, m1ppdt, maygay_m1_nec, maygay_m1, maygay1b_state, init_m1nec, ROT0, "Maygay", "Pink Panther (German) (Maygay) (M1A/B) (set 2)",GAME_FLAGS )
 
 /*******************************************************************************************************************************************************************************************************
   Supernova

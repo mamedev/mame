@@ -185,10 +185,23 @@ ROM_START( tomyegg )
 	ROM_LOAD( "gpr25l6403f.u1", 0x0000, 0x800000, CRC(2acd6752) SHA1(85e59546a1af4618c75c275cead7ef0f5e3faa44) )
 ROM_END
 
+ROM_START( tomyegga ) // might just be different user data (or factory defaults)
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "gpr25l640.u1", 0x0000, 0x800000, CRC(dfcbc66d) SHA1(a192d0682a078197b7f97ef36f35a7e3ee539855) )
+	ROM_IGNORE(0x50) // 'config' data
+ROM_END
+
 ROM_START( chikawac )
 	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
 	ROM_LOAD( "xm25qh64c.u1", 0x0000, 0x800000, CRC(88c984aa) SHA1(6e176960b64fc3576efaa40dfe2ff0a6dcea3c3f) )
 ROM_END
+
+ROM_START( fairicam )
+	ROM_REGION(  0x800000, "spi", ROMREGION_ERASE00 )
+	ROM_LOAD( "mx25l3225.ic3", 0x0000, 0x400000, CRC(49e8f8d7) SHA1(de37967f317884eeb3b95a9d7b94b776995a7a90) )
+	ROM_IGNORE(0x50) // 'config' bytes
+ROM_END
+
 
 } // anonymous namespace
 
@@ -215,8 +228,11 @@ CONS( 2021, smkmikkea,       smkmikke, 0,      gp327902, gp327902, generalplus_g
 
 // キラッとプリ☆チャン プリたまGO ミスティパープル
 CONS( 2019, tomyegg,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Misty Purple (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+CONS( 2019, tomyegga,        tomyegg,  0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Kiratto Pri-Chan - PritamaGO: Powder Pink (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // these also exist, are they the same software or different versions?
-// Powder Pink (パウダーピンク)
 // Mint Blue (ミントブルー).
 
 CONS( 2021, chikawac,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Chiikawa Camera De Ya-! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+
+// リルリルフェアリル　フェアリルカメラ  
+CONS( 2016, fairicam,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Sega Toys",        "Rilu Rilu Fairilu Camera (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

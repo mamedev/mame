@@ -42,7 +42,9 @@
     Clocks verified on 86612-A-2 and 86612-B-2 boards, serial no. 39646
     ("Bionic Commando", US region) by scope measurement at clock pins.
     Timings verified at SYNC pin and BLUE pin (jamma edge),
-    using an Agilent DSO9404A scope and two N2873A 500MHz probes
+    using an Agilent DSO9404A scope and two N2873A 500MHz probes.
+
+    MAME is using jotego's timing instead (262*384).
 
     BTANB [MT00209] (verified on real PCB):
     - misplaced sprites (see beginning of level 1 or 2 for example)
@@ -76,6 +78,7 @@
       to 128 currently to compensate.
     - The game doesn't set the coin lockout in service mode, so the coin inputs
       can't be tested there if you uncomment and enable it.
+    - Reverify video timing.
 
 ***************************************************************************/
 
@@ -157,10 +160,10 @@ private:
 	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
-	tilemap_t   *m_tx_tilemap = nullptr;
-	tilemap_t   *m_bg_tilemap = nullptr;
-	tilemap_t   *m_fg_tilemap = nullptr;
-	uint16_t    m_scroll[4]{};
+	tilemap_t *m_tx_tilemap = nullptr;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	uint16_t m_scroll[4]{};
 
 	// audio
 	void audiocpu_nmi_w(u8 data);
@@ -194,7 +197,7 @@ void bionicc_state::main_map(address_map &map)
 	map(0xe4002, 0xe4002).mirror(0x3ffc).w(FUNC(bionicc_state::audiocpu_nmi_w));
 	map(0xe4002, 0xe4003).mirror(0x3ffc).portr("DSW");
 	map(0xe8010, 0xe8017).w(FUNC(bionicc_state::scroll_w));
-	map(0xe8018, 0xe8019).nopw(); // vblank irq ack?
+	map(0xe8018, 0xe8019).w(m_spriteram, FUNC(buffered_spriteram16_device::write));
 	map(0xe801a, 0xe801b).w(FUNC(bionicc_state::dmaon_w));
 	map(0xec000, 0xecfff).mirror(0x3000).ram().w(FUNC(bionicc_state::txvideoram_w)).share("txvideoram");
 	map(0xf0000, 0xf3fff).ram().w(FUNC(bionicc_state::fgvideoram_w)).share("fgvideoram");
@@ -598,8 +601,8 @@ void bionicc_state::output_w(u8 data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(bionicc_state::scanline)
 {
-	// vblank-out irq - drives the game (V256)
-	if (param == 256)
+	// vblank-out irq - drives the game (V256?)
+	if (param == 240)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 
 	// vblank-in irq - processes inputs (!LVBL)
@@ -653,7 +656,6 @@ void bionicc_state::bionicc(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(bionicc_state::screen_update));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bionicc);
@@ -666,6 +668,7 @@ void bionicc_state::bionicc(machine_config &config)
 
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	YM2151(config, "ymsnd", 14.318181_MHz_XTAL / 4).add_route(0, "mono", 0.60).add_route(1, "mono", 0.60);

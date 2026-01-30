@@ -1,75 +1,131 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Leaman, Curt Coder
-/***************************************************************************
+/*******************************************************************************
 
-  Sidearms
-  ========
-
-  Driver provided by Paul Leaman
-
-
-Change Log:
-
-MAY-2015 System11
-
-- added turtshipko and turtshipkn.
-- amended comments for T-5 instances, A14 is tied high on the PCBs hence
-  the need to load the higher half of the ROM only
-- order of age is guessed - turtshipko has grey bullets and a different
-  level order, 3x horizontal and then 3x vertical (as far as tested).
-  Bullets probably fixed based on feedback before it was licensed to Sharp
-  Image and Pacific Games - differences between US/JP/Korea versions
-  previously in MAME are minimal.
-- turtshipkn I assume is newer, the disclaimer is in pure Korean and the
-  orange bullets are retained.  Given the 88/9 release date from the
-  startup screen it would seem unlikely that this came out first, then
-  got grey bullets and back to orange in time for it to still be a 1988
-  game in other countries.
-
-JUL-2003 AAT
-
-- cleaned video and corrected screen flipping
-
-JUN-2003 (Curt Coder)
-
-- converted driver to use tilemaps
-
-FEB-2003 AAT
-
-- added preliminary starfield emulation. circuit transcribed from
-  schematics but still not perfect.
-
-- rewrote video update and the following bugs seem to be fixed:
-
-  sidearms060red:  attract mode and stage six crashing
-  sidearms055gre:  strange background color
-  turtship37b5yel: various graphics glitches and priority problems
+Sidearms
+Driver provided by Paul Leaman
 
 Notes:
 
-  The main board of Side Arms has an unpopulated position reserved for a
-  8751 protection MCU.
+The main board of Side Arms has an unpopulated position reserved for a
+8751 protection MCU.
 
-  Unknown PROMs are mostly used for timing. Only the first four sprite
-  encoding parameters have been identified, the other 28(!) are
-  believed to be line-buffer controls.
+Unknown PROMs are mostly used for timing. Only the first four sprite
+encoding parameters have been identified, the other 28(!) are
+believed to be line-buffer controls.
 
-  A bootleg has been found that matches "sidearmsj" but with the
-  starfield data ROM being half the size of the original one and
-  containing its second half. Also, it seems that, as the original
-  game it's currently emulated, it uses just the first half of the
-  starfield ROM, so it's something worth checking.
+A bootleg has been found that matches "sidearmsj" but with the
+starfield data ROM being half the size of the original one and
+containing its second half. Also, it seems that, as the original
+game it's currently emulated, it uses just the first half of the
+starfield ROM, so it's something worth checking.
 
-***************************************************************************/
+********************************************************************************
+
+Turtle Ship (Philko / Pacific Games license (Japan region), 1988)
+Hardware info by Guru
+
+Philko's hardware is very bootleg-like and most probably
+made in the same factory that made other bootlegs.
+The sound circuit looks very close to the sound circuit
+on Sidearms and 1943. You could say the entire Turtle
+Ship board is a bootleg of Side Arms with different
+graphics. They disguised the board by shuffling parts
+around and putting the video board on top to make it
+look like different hardware. However a dump of the
+bi-polar PROMs reveals they are the same as Side Arms
+which makes this just another bootleg ;-)
+
+PCB Layout
+----------
+
+CPU Board
+
+20-40-2 PHILKO
+|---------------------------------------------------|
+|LA4460 VOL YM3014     YM2203    T-4.8A    LC3517(1)|
+|  VOL LM324   YM3014  YM2203                       |
+|                                Z80A               |
+|ULN2003                                       16MHz|
+|     Z80B   T-1.3E    HY6264           82S123.9E   |
+|            T-2.3G    T-3.5G                       |
+|                                                   |
+|J                      HY6264                      |
+|A           LC3517(2)                              |
+|M                               T-5.8K             |
+|M           LC3517(2)                              |
+|A                                                  |
+|  DIP-SW1                                          |
+|  DIP-SW2         PAL16L8                82S129.11P|
+|                                         82S129.11R|
+|--------------------|---------|-----|---------|----|
+                     |---------|     |---------|
+Notes:
+        Z80A - ZILOG Z80A CPU. Clock 4.000MHz [16/4] (sound CPU)
+        Z80B - ZILOG Z80B CPU. Clock 8.000MHz [16/2] (main CPU)
+      YM2203 - Yamaha YM2203 FM Operator Type-N(OPN) sound chip. Clock 4.000MHz [16/4]
+      YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter. Clock 1.3333MHz [16/4/3]
+   HY6264(1) - Hyundai HY6264 8kBx8-bit SRAM (main program RAM)
+   HY6264(2) - Hyundai HY6264 8kBx8-bit SRAM (character/text layer RAM)
+   LC3517(1) - Sanyo LC3517 2kBx8-bit SRAM (sound CPU RAM)
+   LC3517(2) - Sanyo LC3517 2kBx8-bit SRAM (color RAM)
+      LA4460 - Sanyo LA4460 12W AF Audio Power Amplifier
+       LM324 - Texas Instruments LM324 Quad Operational Amplifier
+       SW1/2 - 8-position DIP switch labelled on the board as 'DIP-SW1' and 'DIP-SW2'
+       HSync - 15.6246kHz. Measured on horizontal timing PROM at 11R
+       VSync - 61.0338Hz. Measured on vertical timing PROM at 11P
+      T-1.3E \
+      T-2.3G | 27256 OTP EPROM (main program)
+      T-3.5G /
+      T-4.8A - 27256 OTP EPROM (sound program)
+      T-5.8K - 27256 OTP EPROM (characters / text layer). A14 is tied high on the PCB
+               effectively making this chip a 27128
+   82S123.9E - Signetics 82S123 32x8-bit Bi-Polar PROM (sound CPU-related)
+               The address lines are tied to the sound CPU and when removed there is no sound.
+  82S129.11P - Signetics 82S129 256x4-bit Bi-Polar PROM (vertical timing PROM)
+  82S129.11R - Signetics 82S129 256x4-bit Bi-Polar PROM (horizontal timing PROM)
+
+
+Top Board
+
+20-41-1
+|-----------------------------------|
+|T-6.1A T-8.1D       T-12.1G T-13.1I|
+|  T-7.1B            T-14.3G T-15.3I|
+|T-9.3A T-11.3D                     |
+|  T-10.3B                          |
+|                                   |
+|                                   |
+|                  T-16.9F          |
+|                         2018 2018 |
+|                                   |
+|                                   |
+|                                   |
+|                |------|           |
+|    LC3517      |PK8808|           |
+|    LC3517      |      |           |
+|    LC3517      |------|           |
+|----|---------|-----|---------|----|
+     |---------|     |---------|
+Notes:
+      PK8808 - Altera EP1800LC Erasable Programmable Logic Device (EPLD in PLCC68 package) acting as the sprite generator chip.
+               This is clearly a clone of Capcom's custom 86S105 sprite chip but without the internal RAM.
+      LC3517 - Sanyo LC3517 2kBx8-bit SRAM (sprite RAM for the PK8808 i.e. the internal RAM on the 86S105)
+        2018 - Toshiba TMM2018 2kBx8-bit SRAM (sprite RAM)
+T-12 to T-15 - 27512 OTP EPROM (sprites)
+   T6 to T11 - 27512 OTP EPROM (tiles)
+         T16 - 27256 OTP EPROM (background tiles)
+
+*******************************************************************************/
 
 #include "emu.h"
 #include "sidearms.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/watchdog.h"
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -83,12 +139,28 @@ void sidearms_state::bankswitch_w(uint8_t data)
 	membank("bank1")->set_entry(data & 0x07);
 }
 
+void sidearms_state::whizz_bankswitch_w(uint8_t data)
+{
+	membank("bank1")->set_entry(bitswap<2>(data,6,7));
+}
 
-// Turtle Ship input ports are rotated 90 degrees
+
+TIMER_DEVICE_CALLBACK_MEMBER(sidearms_state::scanline)
+{
+	const int scanline = param;
+
+	// 2 interrupts per frame, every 128 scanlines
+	if (scanline == 112 || scanline == 240)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
+
 uint8_t sidearms_state::turtship_ports_r(offs_t offset)
 {
 	int res = 0;
-	for (int i = 0; i < 5;i++)
+
+	// Turtle Ship input ports are rotated 90 degrees
+	for (int i = 0; i < 5; i++)
 		res |= ((m_ports[i].read_safe(0) >> offset) & 1) << i;
 
 	return res;
@@ -99,18 +171,18 @@ void sidearms_state::sidearms_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xc400, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xc000, 0xc3ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc400, 0xc7ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xc800, 0xc800).portr("SYSTEM").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc801, 0xc801).portr("P1").w(FUNC(sidearms_state::bankswitch_w));
-	map(0xc802, 0xc802).portr("P2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xc802, 0xc802).portr("P2").w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request
 	map(0xc803, 0xc803).portr("DSW0");
 	map(0xc804, 0xc804).portr("DSW1").w(FUNC(sidearms_state::control_w));
 	map(0xc805, 0xc805).portr("DSW2").w(FUNC(sidearms_state::star_scrollx_w));
 	map(0xc806, 0xc806).w(FUNC(sidearms_state::star_scrolly_w));
 	map(0xc808, 0xc809).writeonly().share("bg_scrollx");
 	map(0xc80a, 0xc80b).writeonly().share("bg_scrolly");
-	map(0xc80c, 0xc80c).w(FUNC(sidearms_state::gfxctrl_w));   /* background and sprite enable */
+	map(0xc80c, 0xc80c).w(FUNC(sidearms_state::gfxctrl_w)); // background and sprite enable
 	map(0xd000, 0xd7ff).ram().w(FUNC(sidearms_state::videoram_w)).share("videoram");
 	map(0xd800, 0xdfff).ram().w(FUNC(sidearms_state::colorram_w)).share("colorram");
 	map(0xe000, 0xefff).ram();
@@ -123,18 +195,18 @@ void sidearms_state::turtship_map(address_map &map)
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcfff).ram();
 	map(0xd000, 0xdfff).ram().share("spriteram");
-	map(0xe000, 0xe3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xe400, 0xe7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xe000, 0xe3ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xe400, 0xe7ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xe800, 0xe807).r(FUNC(sidearms_state::turtship_ports_r));
 	map(0xe800, 0xe800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xe801, 0xe801).w(FUNC(sidearms_state::bankswitch_w));
-	map(0xe802, 0xe802).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xe802, 0xe802).w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request
 	map(0xe804, 0xe804).w(FUNC(sidearms_state::control_w));
 	map(0xe805, 0xe805).w(FUNC(sidearms_state::star_scrollx_w));
 	map(0xe806, 0xe806).w(FUNC(sidearms_state::star_scrolly_w));
 	map(0xe808, 0xe809).writeonly().share("bg_scrollx");
 	map(0xe80a, 0xe80b).writeonly().share("bg_scrolly");
-	map(0xe80c, 0xe80c).w(FUNC(sidearms_state::gfxctrl_w));   /* background and sprite enable */
+	map(0xe80c, 0xe80c).w(FUNC(sidearms_state::gfxctrl_w)); // background and sprite enable
 	map(0xf000, 0xf7ff).ram().w(FUNC(sidearms_state::videoram_w)).share("videoram");
 	map(0xf800, 0xffff).ram().w(FUNC(sidearms_state::colorram_w)).share("colorram");
 }
@@ -150,28 +222,15 @@ void sidearms_state::sidearms_sound_map(address_map &map)
 
 /* Whizz */
 
-void sidearms_state::whizz_bankswitch_w(uint8_t data)
-{
-	int bank = 0;
-	switch (data & 0xC0)
-	{
-		case 0x00 : bank = 0;   break;
-		case 0x40 : bank = 2;   break;
-		case 0x80 : bank = 1;   break;
-		case 0xC0 : bank = 3;   break;
-	}
-	membank("bank1")->set_entry(bank);
-}
-
 void sidearms_state::whizz_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
-	map(0xc000, 0xc3ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
-	map(0xc400, 0xc7ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xc000, 0xc3ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xc400, 0xc7ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0xc800, 0xc800).portr("DSW0").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc801, 0xc801).portr("DSW1").w(FUNC(sidearms_state::whizz_bankswitch_w));
-	map(0xc802, 0xc802).portr("DSW2").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xc802, 0xc802).portr("DSW2").w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request
 	map(0xc803, 0xc803).portr("IN0").nopw();
 	map(0xc804, 0xc804).portr("IN1").w(FUNC(sidearms_state::control_w));
 	map(0xc805, 0xc805).portr("IN2").nopw();
@@ -208,9 +267,7 @@ static INPUT_PORTS_START( sidearms )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x08, 0x08, "Freeze" )    /* I'm not sure it's really a dip switch */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -287,7 +344,9 @@ static INPUT_PORTS_START( sidearms )
 
 	PORT_START("DSW2")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))     /* not sure, but likely */
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( turtship )
@@ -295,7 +354,7 @@ static INPUT_PORTS_START( turtship )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -374,7 +433,7 @@ static INPUT_PORTS_START( dyger )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )    /* seems to be 1-player only */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -519,7 +578,7 @@ static INPUT_PORTS_START( whizz )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -619,41 +678,39 @@ GFXDECODE_END
 
 void sidearms_state::sidearms(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000); /* 4 MHz (?) */
+	// basic machine hardware
+	Z80(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sidearms_state::sidearms_map);
-	m_maincpu->set_vblank_int("screen", FUNC(sidearms_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4000000); /* 4 MHz (?) */
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::sidearms_sound_map);
 
-	WATCHDOG_TIMER(config, "watchdog");
+	TIMER(config, "scantimer").configure_scanline(FUNC(sidearms_state::scanline), "screen", 112, 128);
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sidearms);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	ym2203_device &ym1(YM2203(config, "ym1", 4000000));
+	ym2203_device &ym1(YM2203(config, "ym1", 16_MHz_XTAL / 4));
 	ym1.irq_handler().set_inputline(m_audiocpu, 0);
 	ym1.add_route(0, "mono", 0.15);
 	ym1.add_route(1, "mono", 0.15);
 	ym1.add_route(2, "mono", 0.15);
 	ym1.add_route(3, "mono", 0.25);
 
-	ym2203_device &ym2(YM2203(config, "ym2", 4000000));
+	ym2203_device &ym2(YM2203(config, "ym2", 16_MHz_XTAL / 4));
 	ym2.add_route(0, "mono", 0.15);
 	ym2.add_route(1, "mono", 0.15);
 	ym2.add_route(2, "mono", 0.15);
@@ -662,29 +719,27 @@ void sidearms_state::sidearms(machine_config &config)
 
 void sidearms_state::turtship(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	// basic machine hardware
+	Z80(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sidearms_state::turtship_map);
-	m_maincpu->set_vblank_int("screen", FUNC(sidearms_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 16_MHz_XTAL / 2); // strangely it runs double the clock of the main CPU, but verified on PCB
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::sidearms_sound_map);
 
-	WATCHDOG_TIMER(config, "watchdog");
+	TIMER(config, "scantimer").configure_scanline(FUNC(sidearms_state::scanline), "screen", 112, 128);
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8); // 61.0338 Hz measured
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turtship);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -705,41 +760,38 @@ void sidearms_state::turtship(machine_config &config)
 
 void sidearms_state::whizz(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 4000000);        /* 4 MHz (?) */
+	// basic machine hardware
+	Z80(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sidearms_state::whizz_map);
-	m_maincpu->set_vblank_int("screen", FUNC(sidearms_state::irq0_line_hold));
 
-	Z80(config, m_audiocpu, 4000000);
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sidearms_state::whizz_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &sidearms_state::whizz_io_map);
 
 	config.set_maximum_quantum(attotime::from_hz(60000));
 
-	WATCHDOG_TIMER(config, "watchdog");
+	TIMER(config, "scantimer").configure_scanline(FUNC(sidearms_state::scanline), "screen", 112, 128);
 
-	/* video hardware */
+	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
 	screen.set_screen_update(FUNC(sidearms_state::screen_update));
-	screen.screen_vblank().set("spriteram", FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turtship);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", 4000000));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4));
 	ymsnd.add_route(0, "mono", 1.0);
 	ymsnd.add_route(1, "mono", 1.0);
 }
-
 
 
 
@@ -960,104 +1012,6 @@ ROM_START( turtship )
 	ROM_LOAD( "82s129.11r", 0x100, 0x100, CRC(c47c182a) SHA1(47d6139256e6838f633a04084bd0a7a84912f7fb) ) // horizontal timing
 	ROM_LOAD( "82s123.9e",  0x200, 0x020, CRC(c5817816) SHA1(cc642daafa0bcb160ee04e74e2d168fd44087608) ) // tied to the sound Z80 and without it there's no sound on the real PCB
 ROM_END
-
-/***************************************************************************
-
-Turtle Ship (Philko / Pacific Games license (Japan region), 1988)
-Hardware info by Guru
-
-Philko's hardware is very bootleg-like and most probably
-made in the same factory that made other bootlegs.
-The sound circuit looks very close to the sound circuit
-on Sidearms and 1943. You could say the entire Turtle
-Ship board is a bootleg of Side Arms with different
-graphics. They disguised the board by shuffling parts
-around and putting the video board on top to make it
-look like different hardware. However a dump of the
-bi-polar PROMs reveals they are the same as Side Arms
-which makes this just another bootleg ;-)
-
-PCB Layout
-----------
-
-CPU Board
-
-20-40-2 PHILKO
-|---------------------------------------------------|
-|LA4460 VOL YM3014     YM2203    T-4.8A    LC3517(1)|
-|  VOL LM324   YM3014  YM2203                       |
-|                                Z80A               |
-|ULN2003                                       16MHz|
-|     Z80B   T-1.3E    HY6264           82S123.9E   |
-|            T-2.3G    T-3.5G                       |
-|                                                   |
-|J                      HY6264                      |
-|A           LC3517(2)                              |
-|M                               T-5.8K             |
-|M           LC3517(2)                              |
-|A                                                  |
-|  DIP-SW1                                          |
-|  DIP-SW2         PAL16L8                82S129.11P|
-|                                         82S129.11R|
-|--------------------|---------|-----|---------|----|
-                     |---------|     |---------|
-Notes:
-        Z80A - ZILOG Z80A CPU. Clock 4.000MHz [16/4] (sound CPU)
-        Z80B - ZILOG Z80B CPU. Clock 8.000MHz [16/2] (main CPU)
-      YM2203 - Yamaha YM2203 FM Operator Type-N(OPN) sound chip. Clock 4.000MHz [16/4]
-      YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter. Clock 1.3333MHz [16/4/3]
-   HY6264(1) - Hyundai HY6264 8kBx8-bit SRAM (main program RAM)
-   HY6264(2) - Hyundai HY6264 8kBx8-bit SRAM (character/text layer RAM)
-   LC3517(1) - Sanyo LC3517 2kBx8-bit SRAM (sound CPU RAM)
-   LC3517(2) - Sanyo LC3517 2kBx8-bit SRAM (color RAM)
-      LA4460 - Sanyo LA4460 12W AF Audio Power Amplifier
-       LM324 - Texas Instruments LM324 Quad Operational Amplifier
-       SW1/2 - 8-position DIP switch labelled on the board as 'DIP-SW1' and 'DIP-SW2'
-       HSync - 15.6246kHz. Measured on horizontal timing PROM at 11R
-       VSync - 61.0338Hz. Measured on vertical timing PROM at 11P
-      T-1.3E \
-      T-2.3G | 27256 OTP EPROM (main program)
-      T-3.5G /
-      T-4.8A - 27256 OTP EPROM (sound program)
-      T-5.8K - 27256 OTP EPROM (characters / text layer). A14 is tied high on the PCB
-               effectively making this chip a 27128
-   82S123.9E - Signetics 82S123 32x8-bit Bi-Polar PROM (sound CPU-related)
-               The address lines are tied to the sound CPU and when removed there is no sound.
-  82S129.11P - Signetics 82S129 256x4-bit Bi-Polar PROM (vertical timing PROM)
-  82S129.11R - Signetics 82S129 256x4-bit Bi-Polar PROM (horizontal timing PROM)
-
-
-Top Board
-
-20-41-1
-|-----------------------------------|
-|T-6.1A T-8.1D       T-12.1G T-13.1I|
-|  T-7.1B            T-14.3G T-15.3I|
-|T-9.3A T-11.3D                     |
-|  T-10.3B                          |
-|                                   |
-|                                   |
-|                  T-16.9F          |
-|                         2018 2018 |
-|                                   |
-|                                   |
-|                                   |
-|                |------|           |
-|    LC3517      |PK8808|           |
-|    LC3517      |      |           |
-|    LC3517      |------|           |
-|----|---------|-----|---------|----|
-     |---------|     |---------|
-Notes:
-      PK8808 - Altera EP1800LC Erasable Programmable Logic Device (EPLD in PLCC68 package) acting as the sprite generator chip.
-               This is clearly a clone of Capcom's custom 86S105 sprite chip but without the internal RAM.
-      LC3517 - Sanyo LC3517 2kBx8-bit SRAM (sprite RAM for the PK8808 i.e. the internal RAM on the 86S105)
-        2018 - Toshiba TMM2018 2kBx8-bit SRAM (sprite RAM)
-T-12 to T-15 - 27512 OTP EPROM (sprites)
-   T6 to T11 - 27512 OTP EPROM (tiles)
-         T16 - 27256 OTP EPROM (background tiles)
-
-***************************************************************************/
 
 ROM_START( turtshipj )
 	ROM_REGION( 0x20000, "maincpu", 0 )     /* 64k for code + banked ROMs images */
@@ -1342,25 +1296,6 @@ ROM_START( whizz )  /* Whizz Philko 1989. Original pcb. Boardnumber: 01-90 / Ser
 	ROM_LOAD( "t-7.y8",    0x0000, 0x8000, CRC(a8b5f750) SHA1(94eb7af3cb8bee87ce3d31260e3bde062ebbc8f0) )
 ROM_END
 
-void sidearms_state::init_sidearms()
-{
-	m_gameid = 0;
-}
-
-void sidearms_state::init_turtship()
-{
-	m_gameid = 1;
-}
-
-void sidearms_state::init_dyger()
-{
-	m_gameid = 2;
-}
-
-void sidearms_state::init_whizz()
-{
-	m_gameid = 3;
-}
 
 // date string is at 0xaa2 in 'rom 03' it does not appear to be displayed
 

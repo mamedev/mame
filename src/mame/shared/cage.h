@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "cpu/tms32031/tms32031.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "machine/gen_latch.h"
 #include "machine/timer.h"
 #include "sound/dmadac.h"
@@ -46,20 +46,20 @@ public:
 protected:
 	atari_cage_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( cage_timer_callback );
 
-	required_device<tms32031_device> m_cpu;
+	required_device<tms320c31_device> m_cpu;
 
 	void update_dma_state();
 	void update_timer(int which);
 	void update_serial();
-	uint32_t tms32031_io_r(offs_t offset);
-	void tms32031_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t tms320c31_io_r(offs_t offset);
+	void tms320c31_io_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void update_control_lines();
 	uint32_t cage_from_main_r();
 	void cage_from_main_ack_w(uint32_t data);
@@ -94,7 +94,7 @@ private:
 
 	uint8_t m_timer_enabled[2];
 
-	uint32_t m_tms32031_io_regs[0x100];
+	uint32_t m_tms320c31_io_regs[0x100];
 	uint16_t m_from_main;
 	uint16_t m_control;
 
@@ -115,7 +115,7 @@ public:
 
 	void cage_map_seattle(address_map &map) ATTR_COLD;
 protected:
-	// optional information overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 };

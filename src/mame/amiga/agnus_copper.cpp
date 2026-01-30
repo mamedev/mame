@@ -145,7 +145,7 @@ void agnus_copper_device::dmacon_set(u16 data)
  *
  * Documentation is quite contradictory here.
  * This bit is supposed to allow Copper access of the
- * lowest registers. OriginaL HRM states that it gives
+ * lowest registers. Original HRM states that it gives
  * access to the blitter HW therefore $dff080 is the
  * minimum for non-cdang and $dff040 for cdang mode.
  *

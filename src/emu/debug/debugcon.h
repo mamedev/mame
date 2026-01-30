@@ -117,6 +117,7 @@ public:
 
 	// validates a parameter as a numeric value
 	bool validate_number_parameter(std::string_view param, u64 &result);
+	bool validate_number_parameter(std::string_view param, offs_t &result);
 
 	// validates a parameter as a device
 	bool validate_device_parameter(std::string_view param, device_t *&result);
@@ -125,10 +126,10 @@ public:
 	bool validate_cpu_parameter(std::string_view param, device_t *&result);
 
 	// validates a parameter as an address space identifier
-	bool validate_device_space_parameter(std::string_view param, int spacenum, address_space *&result);
+	bool validate_device_space_parameter(std::string_view param, int &spacenum, device_memory_interface *&mintf);
 
 	// validates a parameter as a target address and retrieves the given address space and address
-	bool validate_target_address_parameter(std::string_view param, int spacenum, address_space *&space, u64 &addr);
+	bool validate_target_address_parameter(std::string_view param, int &spacenum, device_memory_interface *&mintf, u64 &addr);
 
 	// validates a parameter as a address with memory region or share name and retrieves the given address and region or share
 	bool validate_address_with_memory_parameter(std::string_view param, u64 &addr, memory_region *&region, memory_share *&share);

@@ -28,25 +28,28 @@ Driver's Eyes works,
 */
 
 #include "emu.h"
+
+#include "namco68.h"
+#include "namco_c139.h"
+#include "namco_c148.h"
 #include "namcoio_gearbox.h"
-#include "screen.h"
-#include "emupal.h"
-#include "speaker.h"
+#include "namcos21_3d.h"
+#include "namcos21_dsp.h"
+
+#include "namco_c355spr.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/tms32025/tms32025.h"
+#include "cpu/tms320c2x/tms320c2x.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
-#include "namco_c139.h"
-#include "namco_c148.h"
-#include "namco68.h"
-#include "namcos21_dsp.h"
-#include "namco_c355spr.h"
-#include "namcos21_3d.h"
 #include "sound/c140.h"
 #include "sound/ymopm.h"
+
 #include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
 
 
 #define ENABLE_LOGGING      0

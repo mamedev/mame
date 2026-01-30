@@ -23,6 +23,8 @@
 #include "../osd/modules/input/input_module.h"
 
 #include <limits>
+#include <locale>
+#include <sstream>
 
 
 namespace ui {
@@ -88,7 +90,6 @@ std::vector<submenu::option> submenu::advanced_options()
 			{ option_type::EMU,  N_("Multi-mouse"),                             OPTION_MULTIMOUSE },
 			{ option_type::EMU,  N_("Steadykey"),                               OPTION_STEADYKEY },
 			{ option_type::EMU,  N_("UI active"),                               OPTION_UI_ACTIVE },
-			{ option_type::EMU,  N_("Off-screen reload"),                       OPTION_OFFSCREEN_RELOAD },
 			{ option_type::EMU,  N_("Joystick deadzone"),                       OPTION_JOYSTICK_DEADZONE },
 			{ option_type::EMU,  N_("Joystick saturation"),                     OPTION_JOYSTICK_SATURATION },
 			{ option_type::EMU,  N_("Joystick threshold"),                      OPTION_JOYSTICK_THRESHOLD },
@@ -252,7 +253,7 @@ bool submenu::handle(event const *ev)
 	float f_cur, f_step;
 
 	// process the menu
-	if (ev && ev->itemref && (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT || ev->iptkey == IPT_UI_SELECT))
+	if (ev && ev->itemref && (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT || ev->iptkey == IPT_UI_CLEAR || ev->iptkey == IPT_UI_SELECT))
 	{
 		option &sm_option = *reinterpret_cast<option *>(ev->itemref);
 
@@ -265,46 +266,58 @@ bool submenu::handle(event const *ev)
 			{
 			case core_options::option_type::BOOLEAN:
 				changed = true;
-				sm_option.options->set_value(sm_option.name, !strcmp(sm_option.entry->value(),"1") ? "0" : "1", OPTION_PRIORITY_CMDLINE);
+				if (ev->iptkey == IPT_UI_CLEAR)
+					sm_option.options->set_value(sm_option.name, sm_option.entry->default_value(), OPTION_PRIORITY_CMDLINE);
+				else
+					sm_option.options->set_value(sm_option.name, sm_option.entry->bool_value() ? 0 : 1, OPTION_PRIORITY_CMDLINE);
 				break;
 			case core_options::option_type::INTEGER:
 				if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
-					int i_cur = atoi(sm_option.entry->value());
+					int i_cur = sm_option.entry->int_value();
 					(ev->iptkey == IPT_UI_LEFT) ? i_cur-- : i_cur++;
 					sm_option.options->set_value(sm_option.name, i_cur, OPTION_PRIORITY_CMDLINE);
+				}
+				else if (ev->iptkey == IPT_UI_CLEAR)
+				{
+					changed = true;
+					sm_option.options->set_value(sm_option.name, sm_option.entry->default_value(), OPTION_PRIORITY_CMDLINE);
 				}
 				break;
 			case core_options::option_type::FLOAT:
 				if (ev->iptkey == IPT_UI_LEFT || ev->iptkey == IPT_UI_RIGHT)
 				{
 					changed = true;
-					f_cur = atof(sm_option.entry->value());
+					f_cur = sm_option.entry->float_value();
 					if (sm_option.entry->has_range())
 					{
 						const char *minimum = sm_option.entry->minimum();
 						const char *maximum = sm_option.entry->maximum();
-						f_step = atof(minimum);
-						if (f_step <= 0.0F) {
-							int pmin = getprecisionchr(minimum);
-							int pmax = getprecisionchr(maximum);
-							tmptxt = '1' + std::string((pmin > pmax) ? pmin : pmax, '0');
-							f_step = 1 / atof(tmptxt.c_str());
+						std::istringstream str(minimum);
+						str.imbue(std::locale::classic());
+						str >> f_step;
+						if (f_step <= 0.0F)
+						{
+							int precision = std::max(getprecisionchr(minimum), getprecisionchr(maximum));
+							f_step = std::pow(0.1, precision);
 						}
 					}
 					else
 					{
 						int precision = getprecisionchr(sm_option.entry->default_value().c_str());
-						tmptxt = '1' + std::string(precision, '0');
-						f_step = 1 / atof(tmptxt.c_str());
+						f_step = std::pow(0.1, precision);
 					}
 					if (ev->iptkey == IPT_UI_LEFT)
 						f_cur -= f_step;
 					else
 						f_cur += f_step;
-					tmptxt = string_format("%g", f_cur);
-					sm_option.options->set_value(sm_option.name, tmptxt.c_str(), OPTION_PRIORITY_CMDLINE);
+					sm_option.options->set_value(sm_option.name, f_cur, OPTION_PRIORITY_CMDLINE);
+				}
+				else if (ev->iptkey == IPT_UI_CLEAR)
+				{
+					changed = true;
+					sm_option.options->set_value(sm_option.name, sm_option.entry->default_value(), OPTION_PRIORITY_CMDLINE);
 				}
 				break;
 			case core_options::option_type::STRING:
@@ -320,6 +333,11 @@ bool submenu::handle(event const *ev)
 					else
 						v_cur = sm_option.value[++cur_value];
 					sm_option.options->set_value(sm_option.name, v_cur.c_str(), OPTION_PRIORITY_CMDLINE);
+				}
+				else if (ev->iptkey == IPT_UI_CLEAR)
+				{
+					changed = true;
+					sm_option.options->set_value(sm_option.name, sm_option.entry->default_value(), OPTION_PRIORITY_CMDLINE);
 				}
 				break;
 			default:
@@ -377,11 +395,16 @@ void submenu::populate()
 			case core_options::option_type::INTEGER:
 				{
 					int i_min, i_max;
-					int i_cur = atoi(sm_option->entry->value());
+					int i_cur = sm_option->entry->int_value();
 					if (sm_option->entry->has_range())
 					{
-						i_min = atoi(sm_option->entry->minimum());
-						i_max = atoi(sm_option->entry->maximum());
+						std::istringstream str;
+						str.imbue(std::locale::classic());
+						str.str(sm_option->entry->minimum());
+						str >> i_min;
+						str.seekg(0);
+						str.str(sm_option->entry->maximum());
+						str >> i_max;
 					}
 					else
 					{
@@ -399,11 +422,16 @@ void submenu::populate()
 			case core_options::option_type::FLOAT:
 				{
 					float f_min, f_max;
-					float f_cur = atof(sm_option->entry->value());
+					float f_cur = sm_option->entry->float_value();
 					if (sm_option->entry->has_range())
 					{
-						f_min = atof(sm_option->entry->minimum());
-						f_max = atof(sm_option->entry->maximum());
+						std::istringstream str;
+						str.imbue(std::locale::classic());
+						str.str(sm_option->entry->minimum());
+						str >> f_min;
+						str.seekg(0);
+						str.str(sm_option->entry->maximum());
+						str >> f_max;
 					}
 					else
 					{
@@ -411,10 +439,9 @@ void submenu::populate()
 						f_max = std::numeric_limits<float>::max();
 					}
 					arrow_flags = get_arrow_flags(f_min, f_max, f_cur);
-					std::string tmptxt = string_format("%g", f_cur);
 					item_append(
 							_(sm_option->description),
-							tmptxt,
+							string_format("%g", f_cur),
 							arrow_flags,
 							reinterpret_cast<void *>(&*sm_option));
 				}

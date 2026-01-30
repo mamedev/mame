@@ -29,7 +29,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms320c1x/tms320c1x.h"
 #include "bus/rs232/rs232.h"
 #include "machine/input_merger.h"
 #include "machine/scn_pci.h"
@@ -66,7 +66,7 @@ private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_shared_ptr<uint16_t> m_mainram;
 	required_device<dac_12bit_r2r_device> m_dac;
-	required_device<tms32010_device> m_dsp;
+	required_device<tms320c10_device> m_dsp;
 	required_device<scn2661c_device> m_epci;
 	required_device<input_merger_device> m_epci_irq;
 	required_device<rs232_port_device> m_rs232;
@@ -312,7 +312,7 @@ void dtc03_state::dtc03(machine_config &config)
 
 	INPUT_MERGER_ANY_HIGH(config, m_epci_irq).output_handler().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
-	TMS32010(config, m_dsp, XTAL(20'000'000)); // 20MHz xtal
+	TMS320C10(config, m_dsp, XTAL(20'000'000)); // 20MHz xtal
 	m_dsp->set_addrmap(AS_PROGRAM, &dtc03_state::dsp_mem);
 	m_dsp->set_addrmap(AS_IO, &dtc03_state::dsp_io);
 	m_dsp->bio().set(FUNC(dtc03_state::bio_line_r)); // guessing this hookup is the same as DTC-07

@@ -96,10 +96,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="advent0">
-		<description>Adventure 0 - Special Sampler</description>
+	<software name="saga0ssamp">
+		<description>Scott Adams Graphic Adventure #0: Special Sampler (Adventureland)</description>
 		<year>1979</year>
 		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Scott Adams" />
 		<info name="usage" value="*800.5777R 800G 24K" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Adventure Sampler" />
@@ -109,10 +110,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="advent1">
-		<description>Adventure 1 - Adventure Land</description>
+	<software name="saga1aland">
+		<description>Scott Adams Graphic Adventure #1: Adventureland</description>
 		<year>1979</year>
 		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Scott Adams" />
 		<info name="usage" value="*800.5777R 800G 24K" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Adventure Land" />
@@ -122,10 +124,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="advent3">
-		<description>Adventure 3 - Mission Impossible</description>
+	<software name="saga3misimp">
+		<description>Scott Adams Graphic Adventure #3: Mission Impossible</description>
 		<year>1979</year>
 		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Scott Adams" />
 		<info name="usage" value="*800.5777R 800G 24K" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Mission Impossible" />
@@ -135,10 +138,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="advent4">
-		<description>Adventure 4 - Voodoo Castle</description>
+	<software name="saga4voocas">
+		<description>Scott Adams Graphic Adventure #4: Voodoo Castle</description>
 		<year>1979</year>
 		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Alexis Adams" />
 		<info name="usage" value="*800.5777R 800G 24K" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Voodoo Castle" />
@@ -2134,6 +2138,7 @@ license:CC0-1.0
 		<description>Planetoids</description>
 		<year>1981</year>
 		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Marc Goodman" />
 		<info name="usage" value="*800.1E66R 800G 24K" />
 		<part name="cass" interface="apple2_cass">
 			<feature name="part_id" value="Planetoids" />

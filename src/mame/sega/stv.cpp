@@ -1109,7 +1109,7 @@ void stv_state::stv(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &stv_state::sound_mem);
 	m_audiocpu->reset_cb().set(FUNC(stv_state::m68k_reset_callback));
 
-	SATURN_SCU(config, m_scu, 0);
+	SATURN_SCU(config, m_scu, XTAL(57'272'727) / 4);
 	m_scu->set_hostcpu(m_maincpu);
 
 	SMPC_HLE(config, m_smpc_hle, XTAL(4'000'000));

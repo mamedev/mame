@@ -45,10 +45,6 @@ public:
 	uint8_t ctl_r();
 	void pdc_w(int state);
 
-	// this is only used by cvs.cpp
-	// it is not related at all to the speech generation and conflicts with the new ROM controller interface.
-	int romclk_hack_r();
-
 protected:
 	tms5110_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int variant);
 
@@ -56,8 +52,6 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
-
-	TIMER_CALLBACK_MEMBER(romclk_hack_toggle);
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream) override;
@@ -176,11 +170,6 @@ private:
 	uint8_t m_digital_select;
 
 	int32_t m_speech_rom_bitnum;
-
-	uint8_t m_romclk_hack_timer_started;
-	uint8_t m_romclk_hack_state;
-
-	emu_timer *m_romclk_hack_timer;
 };
 
 

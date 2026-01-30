@@ -870,6 +870,9 @@ private:
 
 	void sdmg2_keys_hopper_w(u8 data);
 
+	void sdmg2p_counter_w(u8 data);
+	void sdmg2p_sound_hopper_w(u8 data);
+
 	void slqz2_sound_hopper_w(u8 data);
 	u8 slqz2_scramble_data_r();
 
@@ -1714,7 +1717,7 @@ void igs017_state::init_sdmg2p()
 		rom[i] = x;
 	}
 
-//  m_igs_string->dump("sdmg2p_string.key", 0x7f512, 0x?????, true);
+//  m_igs_string->dump("sdmg2p_string.key", 0x7f512, 0x7f426, true);
 }
 
 // mgdh, mgdha
@@ -2324,6 +2327,11 @@ void igs017_state::init_jking302us()
 
 		rom[i] = x;
 	}
+
+	// IGS029 send command
+	//rom[0x5f32/2] = 0x6010;
+	//rom[0x5f7e/2] = 0x4e75;
+	//rom[0x5fa6/2] = 0x6006;
 
 	m_igs017_igs031->tarzan_decrypt_tiles(1); // TODO: verify once it works
 	m_igs017_igs031->tarzan_decrypt_sprites(0, 0); // TODO: verify once it works
@@ -3015,9 +3023,32 @@ void igs017_state::mgdh_mux_map(address_map &map)
 
 // sdmg2p
 
+void igs017_state::sdmg2p_counter_w(u8 data)
+{
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));   // coin out counter
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));   // coin in  counter
+
+	if (data & ~0x03)
+		logerror("%s: warning, unknown bits written in counter_w = %02x\n", machine().describe_context(), data);
+}
+
+void igs017_state::sdmg2p_sound_hopper_w(u8 data)
+{
+	m_hopper->motor_w(BIT(data, 6));
+	m_oki->set_rom_bank(BIT(data, 7));
+
+	if (data & ~0xc0)
+		logerror("%s: warning, unknown bits written in sound_hopper_w = %02x\n", machine().describe_context(), data);
+}
+
 void igs017_state::sdmg2p_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
+
+	map(0x003041, 0x003041).w(m_igs_incdec, FUNC(igs_incdec_device::reset_w));
+	map(0x003043, 0x003043).w(m_igs_incdec, FUNC(igs_incdec_device::dec_w));
+	map(0x003047, 0x003047).w(m_igs_incdec, FUNC(igs_incdec_device::inc_w));
+	map(0x00304a, 0x00304b).r(m_igs_incdec, FUNC(igs_incdec_device::result_r));
 
 	map(0x100000, 0x103fff).ram().share("nvram");
 
@@ -3029,13 +3060,13 @@ void igs017_state::sdmg2p_map(address_map &map)
 	map(0xb10001, 0xb10001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
-void igs017_state::sdmg2p_mux_map(address_map &map) // TODO: hopper motor w
+void igs017_state::sdmg2p_mux_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x00, 0x00).r(NAME((&igs017_state::keys_ipt_r<u8, 2, 2>)));
+	map(0x00, 0x00).r(NAME((&igs017_state::keys_ipt_r<u8, 2, 2>))).w(FUNC(igs017_state::sdmg2p_counter_w));
 	map(0x01, 0x01).portr("JOY");
-	map(0x02, 0x02).portr("BUTTONS").w(FUNC(igs017_state::mgdh_keys_hopper_w));
-	map(0x03, 0x03).portr("COINS").w(FUNC(igs017_state::mgdh_counter_w));
+	map(0x02, 0x02).portr("BUTTONS");
+	map(0x03, 0x03).portr("COINS").w(FUNC(igs017_state::sdmg2p_sound_hopper_w));
 
 	igs_string_mux_map(map);
 }
@@ -5131,6 +5162,8 @@ void igs017_state::sdmg2p(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	IGS_STRING(config, m_igs_string, 0);
+
+	IGS_INCDEC(config, m_igs_incdec, 0);
 }
 
 void igs017_state::jking302us(machine_config &config)
@@ -5687,10 +5720,10 @@ ROM_START( sdmg2p )
 	ROM_LOAD( "ma.dy_text.u18", 0x000000, 0x080000, CRC(e46a3a52) SHA1(7b3f113170904dc474712a6a76162a8ee5dbd318) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "ma.dy_sp.u14", 0x00000, 0x80000, CRC(b31c6349) SHA1(9e8e5b029e1eff47581f99ecf2da3f17bee01f32) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_LOAD( "ma.dy_sp.u14", 0x00000, 0x80000, CRC(3c16fb8c) SHA1(3361d3774f1bd50f9a0d8f2195a17fd1a2d3a9b3) )
 
 	ROM_REGION( 0xec, "igs_string", 0 )
-	ROM_LOAD( "sdmg2p_string.key", 0x00, 0xec, NO_DUMP )
+	ROM_LOAD( "sdmg2p_string.key", 0x00, 0xec, CRC(c134a304) SHA1(397ef67ebb6c63a6d4d1405a237aa40a4d9a3d43) )
 ROM_END
 
 /***************************************************************************
@@ -6593,7 +6626,7 @@ GAME ( 1999,  tarzanc,     0,        tarzan,     tarzan,      igs017_state, init
 GAME ( 1999,  tarzan,      tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzan,     ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V109C, set 2)",                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing sprites and sound ROM, imperfect tiles decryption
 GAME ( 1999,  tarzana,     tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzana,    ROT0, "IGS", "Tarzan (V107)",                                                      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // missing IGS029 protection, missing sprites and sound ROM
 GAME ( 1999,  tarzanb,     tarzanc,  tarzan,     tarzan,      igs017_state, init_tarzanc,    ROT0, "IGS", "Tarzan Chuang Tian Guan (China, V110)",                              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME ( 2000,  sdmg2p,      0,        sdmg2p,     sdmg2p,      igs017_state, init_sdmg2p,     ROT0, "IGS", "Maque Wangchao / Chaoji Da Manguan 2 - Jiaqiang Ban (China, V100C)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 麻雀王朝 / 超級大滿貫 2 -加強版 protection kicks in after starting game, hopper isn't hooked up correctly
+GAME ( 2000,  sdmg2p,      0,        sdmg2p,     sdmg2p,      igs017_state, init_sdmg2p,     ROT0, "IGS", "Maque Wangchao / Chaoji Da Manguan 2 - Jiaqiang Ban (China, V100C)", 0 ) // 麻雀王朝 / 超級大滿貫 2 -加強版
 GAMEL( 2000?, starzan,     0,        starzan,    starzan,     igs017_state, init_starzan,    ROT0, "IGS (G.F. Gioca license)", "Super Tarzan (Italy, V100I)",                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION, layout_starzan )
 GAMEL( 2000?, jking103a,   starzan,  starzan,    starzan,     igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V103A)",                                                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION, layout_starzan )
 GAMEL( 2000?, jking105us,  starzan,  starzan,    tarzan202fa, igs017_state, init_jking103a,  ROT0, "IGS", "Jungle King (V105US)",                                               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION, layout_starzan )

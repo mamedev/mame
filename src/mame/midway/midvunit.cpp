@@ -25,8 +25,8 @@
 #include "emu.h"
 #include "midvunit.h"
 
-#include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "machine/nvram.h"
 
 #include "speaker.h"
@@ -275,11 +275,11 @@ void midvunit_base_state::sound_w(uint32_t data)
 
 /*************************************
  *
- *  TMS32031 I/O accesses
+ *  TMS320C31 I/O accesses
  *
  *************************************/
 
-uint32_t midvunit_base_state::tms32031_control_r(offs_t offset)
+uint32_t midvunit_base_state::tms320c31_control_r(offs_t offset)
 {
 	// watch for accesses to the timers
 	if (offset == 0x24 || offset == 0x34)
@@ -287,7 +287,7 @@ uint32_t midvunit_base_state::tms32031_control_r(offs_t offset)
 		// timer is clocked at 100ns
 		int const which = (offset >> 4) & 1;
 		int32_t const result = (m_timer[which]->elapsed() * m_timer_rate).as_double();
-		//LOGREGS("%06X:tms32031_control_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
+		//LOGREGS("%06X:tms320c31_control_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 		return result;
 	}
 
@@ -295,16 +295,16 @@ uint32_t midvunit_base_state::tms32031_control_r(offs_t offset)
 	{
 		// log anything else except the memory control register
 		if (offset != 0x64)
-			LOGREGS("%06X:tms32031_control_r(%02X)\n", m_maincpu->pc(), offset);
+			LOGREGS("%06X:tms320c31_control_r(%02X)\n", m_maincpu->pc(), offset);
 	}
 
-	return m_tms32031_control[offset];
+	return m_tms320c31_control[offset];
 }
 
 
-void midvunit_base_state::tms32031_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void midvunit_base_state::tms320c31_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_tms32031_control[offset]);
+	COMBINE_DATA(&m_tms320c31_control[offset]);
 
 
 	if (offset == 0x64)
@@ -313,7 +313,7 @@ void midvunit_base_state::tms32031_control_w(offs_t offset, uint32_t data, uint3
 	{
 		// watch for accesses to the timers
 		int const which = (offset >> 4) & 1;
-		//LOGREGS("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
+		//LOGREGS("%06X:tms320c31_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 		if (data & 0x40)
 			m_timer[which]->reset();
 
@@ -324,7 +324,7 @@ void midvunit_base_state::tms32031_control_w(offs_t offset, uint32_t data, uint3
 			m_timer_rate = 10000000.;
 	}
 	else
-		LOGREGS("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
+		LOGREGS("%06X:tms320c31_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -671,7 +671,7 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0x000000, 0x01ffff).ram().share(m_ram_base);
 	map(0x400000, 0x41ffff).ram();
 	map(0x600000, 0x600000).w(FUNC(midvunit_state::dma_queue_w));
-	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share(m_tms32031_control);
+	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms320c31_control_r), FUNC(midvunit_state::tms320c31_control_w)).share(m_tms320c31_control);
 	map(0x900000, 0x97ffff).rw(FUNC(midvunit_state::videoram_r), FUNC(midvunit_state::videoram_w));
 	map(0x980000, 0x980000).r(FUNC(midvunit_state::dma_queue_entries_r));
 	map(0x980020, 0x980020).r(FUNC(midvunit_state::scanline_r));
@@ -721,7 +721,7 @@ void midvplus_state::midvplus_map(address_map &map)
 	map(0x000000, 0x01ffff).ram().share(m_ram_base);
 	map(0x400000, 0x41ffff).ram().share(m_fastram_base);
 	map(0x600000, 0x600000).w(FUNC(midvplus_state::dma_queue_w));
-	map(0x808000, 0x80807f).rw(FUNC(midvplus_state::tms32031_control_r), FUNC(midvplus_state::tms32031_control_w)).share(m_tms32031_control);
+	map(0x808000, 0x80807f).rw(FUNC(midvplus_state::tms320c31_control_r), FUNC(midvplus_state::tms320c31_control_w)).share(m_tms320c31_control);
 	map(0x900000, 0x97ffff).rw(FUNC(midvplus_state::videoram_r), FUNC(midvplus_state::videoram_w));
 	map(0x980000, 0x980000).r(FUNC(midvplus_state::dma_queue_entries_r));
 	map(0x980020, 0x980020).r(FUNC(midvplus_state::scanline_r));
@@ -1171,7 +1171,7 @@ void midvunit_base_state::midvcommon(machine_config &config)
 	constexpr XTAL CPU_CLOCK = 50_MHz_XTAL;
 
 	// basic machine hardware
-	TMS32031(config, m_maincpu, CPU_CLOCK);
+	TMS320C31(config, m_maincpu, CPU_CLOCK);
 
 	TIMER(config, m_timer[0]).configure_generic(nullptr);
 	TIMER(config, m_timer[1]).configure_generic(nullptr);

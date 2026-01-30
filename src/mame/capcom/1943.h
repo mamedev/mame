@@ -5,12 +5,16 @@
     1943
 
 ***************************************************************************/
+
 #ifndef MAME_CAPCOM_1943_H
 #define MAME_CAPCOM_1943_H
 
 #pragma once
 
 #include "cpu/mcs51/i8051.h"
+#include "machine/timer.h"
+#include "video/bufsprite.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
@@ -52,7 +56,7 @@ private:
 	required_shared_ptr<u8> m_scrollx;
 	required_shared_ptr<u8> m_scrolly;
 	required_shared_ptr<u8> m_bgscrollx;
-	required_shared_ptr<u8> m_spriteram;
+	required_device<buffered_spriteram8_device> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
@@ -64,10 +68,10 @@ private:
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_bg2_tilemap = nullptr;
-	int     m_char_on = 0;
-	int     m_obj_on = 0;
-	int     m_bg1_on = 0;
-	int     m_bg2_on = 0;
+	int m_char_on = 0;
+	int m_obj_on = 0;
+	int m_bg1_on = 0;
+	int m_bg2_on = 0;
 
 	/* protection */
 	u8 m_cpu_to_mcu = 0; // ls374 at 5k
@@ -78,6 +82,7 @@ private:
 	u8 m_mcu_p2 = 0;
 	u8 m_mcu_p3 = 0;
 
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void mcu_p3_w(u8 data);
 
 	void videoram_w(offs_t offset, u8 data);
@@ -93,9 +98,8 @@ private:
 	virtual void video_start() override ATTR_COLD;
 	void _1943_palette(palette_device &palette) const;
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void _1943_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-							u8 transparent_color);
+	void _1943_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
+			u32 code, u32 color, bool flipx, bool flipy, int offsx, int offsy, u8 transparent_color);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void c1943_map(address_map &map) ATTR_COLD;

@@ -328,7 +328,7 @@ ROM_END
   as if it was programmed for MM77L.
 
   Hold all 4 buttons at boot (not counting RESET) for a led test.
-  Cassia was Eric White/Ken Cohen's company, later named CXG, known for
+  Cassia was Eric White/Ken Cohen's company, later named Newcrest, known for
   their chess computers.
 
 *******************************************************************************/

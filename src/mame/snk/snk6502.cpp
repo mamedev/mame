@@ -1140,6 +1140,37 @@ ROM_START( vanguard )
 	ROM_LOAD( "sk6_ic11.bin", 0x5000, 0x0800, CRC(c36df041) SHA1(8b51934229b961180d1edb99be3a4d337d37f66f) )
 ROM_END
 
+ROM_START( vanguarda ) // original PCB. Minor changes in ROM 5 and ROM 8, but they seem legit
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.rom1", 0x4000, 0x1000, CRC(6a29e354) SHA1(ff953962ebc14a28cfc96f8e269cb1e1c188ed8a) )
+	ROM_LOAD( "2.rom2", 0x5000, 0x1000, CRC(302bba54) SHA1(1944f229481328a0635fafda65054106f42a532a) )
+	ROM_LOAD( "3.rom3", 0x6000, 0x1000, CRC(424755f6) SHA1(b4762b40c7ed70d4b90319a1a30983a41a096afb) )
+	ROM_LOAD( "4.rom4", 0x7000, 0x1000, CRC(54603274) SHA1(31571a560dbe300417b3ed5b114fa1d9ef742da9) )
+	ROM_LOAD( "5.rom5", 0x8000, 0x1000, CRC(fc403426) SHA1(33c90bb8065067060fc632da6959fd630c742478) )
+	ROM_RELOAD(         0xf000, 0x1000 )  /* for the reset and interrupt vectors */
+	ROM_LOAD( "6.rom6", 0x9000, 0x1000, CRC(0d5b47d0) SHA1(922621c23f33fe756cb6baa12e5465c4e64f2dda) )
+	ROM_LOAD( "7.rom7", 0xa000, 0x1000, CRC(8549b8f8) SHA1(375bc6f7e15564d5cf7e00c44e2651793c56d6ca) )
+	ROM_LOAD( "8.rom8", 0xb000, 0x1000, CRC(1c557ab4) SHA1(a395f8f9b39ee068b8c0b63a8c1aa5b716d07d70) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "sk5_ic50.bin", 0x0000, 0x0800, CRC(e7d4315b) SHA1(b99e4ea07292a0eabaa6098037c92a5678627cec) )
+	ROM_LOAD( "sk5_ic51.bin", 0x0800, 0x0800, CRC(96e87858) SHA1(4e9ccb055919c8acf5837e062857647d5363af60) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "sk5_ic7.bin",  0x0000, 0x0020, CRC(ad782a73) SHA1(ddf44f74a20f10ed976c434a885857dade1f86d7) ) /* foreground colors */
+	ROM_LOAD( "sk5_ic6.bin",  0x0020, 0x0020, CRC(7dc9d450) SHA1(9b2d1dfb3270a562d14bd54bfb3405a9095becc0) ) /* background colors */
+
+	ROM_REGION( 0x1000, "snk6502", 0 )  /* sound ROMs */
+	ROM_LOAD( "sk4_ic51.bin", 0x0000, 0x0800, CRC(d2a64006) SHA1(3f20b59ce1954f65535cd5603ca9271586428e35) )  /* sound ROM 1 */
+	ROM_LOAD( "sk4_ic52.bin", 0x0800, 0x0800, CRC(cc4a0b6f) SHA1(251b24d60083d516c4ba686d75b41e04d10f7198) )  /* sound ROM 2 */
+
+	ROM_REGION( 0x5800, "speech", 0 )   /* space for the speech ROMs (not supported) */
+	//ROM_LOAD( "hd38882.bin",  0x0000, 0x4000, NO_DUMP )   /* HD38882 internal ROM */
+	ROM_LOAD( "sk6_ic07.bin", 0x4000, 0x0800, CRC(2b7cbae9) SHA1(3d44a0232d7c94d8170cc06e90cc30bd57c99202) )
+	ROM_LOAD( "sk6_ic08.bin", 0x4800, 0x0800, CRC(3b7e9d7c) SHA1(d9033188068b2aaa1502c89cf09f955eded8fa7a) )
+	ROM_LOAD( "sk6_ic11.bin", 0x5000, 0x0800, CRC(c36df041) SHA1(8b51934229b961180d1edb99be3a4d337d37f66f) )
+ROM_END
+
 ROM_START( vanguardc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sk4_ic07.bin", 0x4000, 0x1000, CRC(6a29e354) SHA1(ff953962ebc14a28cfc96f8e269cb1e1c188ed8a) )
@@ -1614,7 +1645,8 @@ GAME( 1981, satansat,    0,        satansat, satansat, snk6502_state, empty_init
 GAME( 1981, satansata,   satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK", "Satan of Saturn (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, zarzon,      satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "SNK (Taito America license)", "Zarzon", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, satansatind, satansat, satansat, satansat, snk6502_state, empty_init, ROT90, "bootleg (Inder S.A.)", "Satan of Saturn (Inder S.A., bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1981, vanguard,    0,        vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK", "Vanguard (SNK)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguard,    0,        vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK", "Vanguard (SNK, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, vanguarda,   vanguard, vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK", "Vanguard (SNK, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, vanguardc,   vanguard, vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK (Centuri license)", "Vanguard (Centuri)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, vanguardg,   vanguard, vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK", "Vanguard (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1981, vanguardj,   vanguard, vanguard, vanguard, vanguard_state,empty_init, ROT90, "SNK", "Vanguard (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

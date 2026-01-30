@@ -147,7 +147,7 @@ void sis496_state::sis496(machine_config &config)
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
 	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
-	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom");
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("ibmpc");
 	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
 	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");

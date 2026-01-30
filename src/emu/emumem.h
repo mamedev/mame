@@ -2063,6 +2063,10 @@ public:
 	int logaddr_width() const { return m_logaddr_width; }
 	int page_shift() const { return m_page_shift; }
 	bool is_octal() const { return m_is_octal; }
+	offs_t addrmask() const { return make_bitmask<offs_t>(m_addr_width); }
+	u8 addrchars() const { return m_is_octal ? (m_addr_width + 2) / 3 : (m_addr_width + 3) / 4; }
+	offs_t logaddrmask() const { return make_bitmask<offs_t>(m_logaddr_width); }
+	u8 logaddrchars() const { return m_is_octal ? (m_logaddr_width + 2) / 3 : (m_logaddr_width + 3) / 4; }
 
 	// Actual alignment of the bus addresses
 	int alignment() const { int bytes = m_data_width / 8; return m_addr_shift < 0 ? bytes >> -m_addr_shift : bytes << m_addr_shift; }
@@ -2101,17 +2105,16 @@ public:
 	endianness_t endianness() const { return m_config.endianness(); }
 	int addr_shift() const { return m_config.addr_shift(); }
 	bool is_octal() const { return m_config.is_octal(); }
+	offs_t addrmask() const { return m_addrmask; }
+	u8 addrchars() const { return m_addrchars; }
+	offs_t logaddrmask() const { return m_logaddrmask; }
+	u8 logaddrchars() const { return m_logaddrchars; }
 
 	// address-to-byte conversion helpers
 	offs_t address_to_byte(offs_t address) const { return m_config.addr2byte(address); }
 	offs_t address_to_byte_end(offs_t address) const { return m_config.addr2byte_end(address); }
 	offs_t byte_to_address(offs_t address) const { return m_config.byte2addr(address); }
 	offs_t byte_to_address_end(offs_t address) const { return m_config.byte2addr_end(address); }
-
-	offs_t addrmask() const { return m_addrmask; }
-	u8 addrchars() const { return m_addrchars; }
-	offs_t logaddrmask() const { return m_logaddrmask; }
-	u8 logaddrchars() const { return m_logaddrchars; }
 
 	// unmap ranges (short form)
 	void unmap_read(offs_t addrstart, offs_t addrend, offs_t addrmirror = 0, u16 flags = 0) { unmap_generic(addrstart, addrend, addrmirror, flags, read_or_write::READ, false); }
@@ -2307,13 +2310,13 @@ protected:
 	void check_optimize_mirror(const char *function, offs_t addrstart, offs_t addrend, offs_t addrmirror, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror);
 	void check_address(const char *function, offs_t addrstart, offs_t addrend);
 
-	address_space_installer(const address_space_config &config, memory_manager &manager) :
-		m_config(config),
-		m_manager(manager),
-		m_addrmask(make_bitmask<offs_t>(m_config.addr_width())),
-		m_logaddrmask(make_bitmask<offs_t>(m_config.logaddr_width())),
-		m_addrchars((m_config.addr_width() + 3) / 4),
-		m_logaddrchars((m_config.logaddr_width() + 3) / 4)
+	address_space_installer(const address_space_config &config, memory_manager &manager)
+		: m_config(config),
+		  m_manager(manager),
+		  m_addrmask(make_bitmask<offs_t>(m_config.addr_width())),
+		  m_logaddrmask(make_bitmask<offs_t>(m_config.logaddr_width())),
+		  m_addrchars(m_config.m_is_octal ? (m_config.addr_width() + 2) / 3 : (m_config.addr_width() + 3) / 4),
+		  m_logaddrchars(m_config.m_is_octal ? (m_config.logaddr_width() + 2) / 3 : (m_config.logaddr_width() + 3) / 4)
 	{}
 
 	const address_space_config &m_config;       // configuration of this space

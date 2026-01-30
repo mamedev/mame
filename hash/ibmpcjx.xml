@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="ibmpcjx" description="IBM PC JX floppy disk images">
+<softwarelist name="ibmpcjx" description="IBM JX PC floppy disk images">
 
 	<software name="eiyuden" supported="partial">
 		<description>Eiyuu Densetsu Saga</description>

@@ -49,7 +49,7 @@ static cassette_image::error csw_cassette_identify(cassette_image *cassette, cas
 
 	opts->bits_per_sample = 8;
 	opts->channels = 1;
-	opts->sample_frequency = get_u32le(header + 0x19);
+	opts->sample_frequency = header[0x17] == 1 ? get_u16le(header + 0x19) : get_u32le(header + 0x19);
 	return cassette_image::error::SUCCESS;
 }
 
@@ -85,7 +85,7 @@ static cassette_image::error csw_cassette_load(cassette_image *cassette)
 	switch (header[0x17])
 	{
 	case 1:
-		sample_rate = get_u32le(header + 0x19);
+		sample_rate = get_u16le(header + 0x19);
 		compression = header[0x1b];
 		bit = (header[0x1c] & 1) ? 127 : -128;
 		csw_data = 0x20;

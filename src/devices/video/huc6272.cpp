@@ -52,8 +52,7 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, HUC6272, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_huc6271(*this, finder_base::DUMMY_TAG)
-	, m_cdda_l(*this, "cdda_l")
-	, m_cdda_r(*this, "cdda_r")
+	, m_cdda(*this, "cdda")
 	, m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, 0, address_map_constructor(FUNC(huc6272_device::microprg_map), this))
 	, m_data_space_config("kram", ENDIANNESS_LITTLE, 16, 19, -1, address_map_constructor(FUNC(huc6272_device::kram_map), this))
 	, m_io_space_config("io", ENDIANNESS_LITTLE, 32, 7, -2, address_map_constructor(FUNC(huc6272_device::io_map), this))
@@ -72,14 +71,13 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 void huc6272_device::cdrom_config(device_t *device)
 {
 	cdda_device *cdda = device->subdevice<cdda_device>("cdda");
-	cdda->add_route(0, "^^cdda_l", 1.0);
-	cdda->add_route(1, "^^cdda_r", 1.0);
+	cdda->add_route(0, "^^cdda", 1.0, 0);
+	cdda->add_route(1, "^^cdda", 1.0, 1);
 }
 
 void huc6272_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, m_cdda_l).front_left();
-	SPEAKER(config, m_cdda_r).front_right();
+	SPEAKER(config, m_cdda, 2).front();
 
 	scsi_port_device &scsibus(SCSI_PORT(config, "scsi"));
 	scsibus.set_data_input_buffer("scsi_data_in");
@@ -718,10 +716,7 @@ uint8_t huc6272_device::adpcm_update_1()
 
 void huc6272_device::cdda_update(offs_t offset, uint8_t data)
 {
-	if (offset)
-		m_cdda_r->set_input_gain(0, float(data & 0x3f) / 63.0);
-	else
-		m_cdda_l->set_input_gain(0, float(data & 0x3f) / 63.0);
+	m_cdda->set_input_gain(offset, float(data & 0x3f) / 63.0);
 }
 
 void huc6272_device::interrupt_update()

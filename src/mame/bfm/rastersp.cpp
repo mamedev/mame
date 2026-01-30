@@ -21,7 +21,7 @@
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "cpu/i386/i386.h"
-#include "cpu/tms32031/tms32031.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "machine/53c7xx.h"
 #include "machine/bacta_datalogger.h"
 #include "machine/mc146818.h"
@@ -94,7 +94,7 @@ protected:
 	void dsp_map_base(address_map &map) ATTR_COLD;
 
 	required_device<i486_device>     m_maincpu;
-	required_device<tms3203x_device> m_dsp;
+	required_device<tms320c3x_device> m_dsp;
 	required_device<z80scc_device>   m_duart;
 
 	void update_irq(uint32_t which, uint32_t state);
@@ -151,8 +151,8 @@ private:
 	void port2_w(uint32_t data);
 	void port3_w(uint32_t data);
 	void dpylist_w(uint32_t data);
-	uint32_t tms32031_control_r(offs_t offset);
-	void tms32031_control_w(offs_t offset, uint32_t data);
+	uint32_t tms320c31_control_r(offs_t offset);
+	void tms320c31_control_w(offs_t offset, uint32_t data);
 	void dsp_unk_w(uint32_t data);
 	void dsp_ctrl_w(uint32_t data);
 	void dsp_486_int_w(uint32_t data);
@@ -309,8 +309,8 @@ void rastersp_state::machine_reset()
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Set IRQ1 line to cause DSP to boot from 0x400000
-	m_dsp->set_input_line(TMS3203X_IRQ1, ASSERT_LINE);
-	m_dsp->set_input_line(TMS3203X_IRQ1, CLEAR_LINE);
+	m_dsp->set_input_line(TMS320C3X_IRQ1, ASSERT_LINE);
+	m_dsp->set_input_line(TMS320C3X_IRQ1, CLEAR_LINE);
 
 	// Reset DSP internal registers
 	m_tms_io_regs[SPORT_GLOBAL_CTL] = 0;
@@ -610,8 +610,8 @@ void rastersp_state::scsi_irq(int state)
 
 	if (state && BIT(m_dsp_ctrl_data, 5))
 	{
-		m_dsp->set_input_line(TMS3203X_IRQ0, ASSERT_LINE);
-		m_dsp->set_input_line(TMS3203X_IRQ0, CLEAR_LINE);
+		m_dsp->set_input_line(TMS320C3X_IRQ0, ASSERT_LINE);
+		m_dsp->set_input_line(TMS320C3X_IRQ0, CLEAR_LINE);
 	}
 }
 
@@ -756,8 +756,8 @@ void rastersp_state::port1_w(uint32_t data)
 	*/
 	if (BIT(data, 5) && BIT(m_dsp_ctrl_data, 5))
 	{
-		m_dsp->set_input_line(TMS3203X_IRQ2, ASSERT_LINE);
-		m_dsp->set_input_line(TMS3203X_IRQ2, CLEAR_LINE);
+		m_dsp->set_input_line(TMS320C3X_IRQ2, ASSERT_LINE);
+		m_dsp->set_input_line(TMS320C3X_IRQ2, CLEAR_LINE);
 	}
 
 	m_watchdog->reset_line_w(BIT(data, 7));
@@ -949,8 +949,8 @@ TIMER_CALLBACK_MEMBER(rastersp_state::tms_tx_timer)
 	// Signal a transmit interrupt
 	if (m_tms_io_regs[SPORT_GLOBAL_CTL] & (1 << 23))
 	{
-		m_dsp->set_input_line(TMS3203X_XINT0, ASSERT_LINE);
-		m_dsp->set_input_line(TMS3203X_XINT0, CLEAR_LINE);
+		m_dsp->set_input_line(TMS320C3X_XINT0, ASSERT_LINE);
+		m_dsp->set_input_line(TMS320C3X_XINT0, CLEAR_LINE);
 	}
 }
 
@@ -960,7 +960,7 @@ TIMER_CALLBACK_MEMBER(rastersp_state::tms_timer1)
 }
 
 
-uint32_t rastersp_state::tms32031_control_r(offs_t offset)
+uint32_t rastersp_state::tms320c31_control_r(offs_t offset)
 {
 	uint32_t val = m_tms_io_regs[offset];
 
@@ -975,7 +975,7 @@ uint32_t rastersp_state::tms32031_control_r(offs_t offset)
 		}
 		default:
 		{
-			logerror("TMS32031: Unhandled I/O read: %x\n", offset);
+			logerror("TMS320C31: Unhandled I/O read: %x\n", offset);
 		}
 	}
 
@@ -983,7 +983,7 @@ uint32_t rastersp_state::tms32031_control_r(offs_t offset)
 }
 
 
-void rastersp_state::tms32031_control_w(offs_t offset, uint32_t data)
+void rastersp_state::tms320c31_control_w(offs_t offset, uint32_t data)
 {
 	uint32_t old = m_tms_io_regs[offset];
 
@@ -1038,7 +1038,7 @@ void rastersp_state::tms32031_control_w(offs_t offset, uint32_t data)
 		}
 		default:
 		{
-			logerror("TMS32031: Unhandled I/O write: %x %x\n", offset, data);
+			logerror("TMS320C31: Unhandled I/O write: %x %x\n", offset, data);
 		}
 	}
 }
@@ -1147,7 +1147,7 @@ void rastersp_state::io_map(address_map &map)
 void rastersp_state::dsp_map_base(address_map &map)
 {
 	map(0x400000, 0x40ffff).rom().region("dspboot", 0);
-	map(0x808000, 0x80807f).rw(FUNC(rastersp_state::tms32031_control_r), FUNC(rastersp_state::tms32031_control_w));
+	map(0x808000, 0x80807f).rw(FUNC(rastersp_state::tms320c31_control_r), FUNC(rastersp_state::tms320c31_control_w));
 	map(0x880402, 0x880402).w(FUNC(rastersp_state::dsp_unk_w));
 	map(0x883c00, 0x883c00).w(FUNC(rastersp_state::dsp_486_int_w));
 	map(0xc00000, 0xc03fff).bankrw("bank2");
@@ -1441,7 +1441,7 @@ void rastersp_state::rs_config_base(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(rastersp_state::irq_callback));
 	m_maincpu->set_addrmap(AS_IO, &rastersp_state::io_map);
 
-	TMS32031(config, m_dsp, 33'330'000);
+	TMS320C31(config, m_dsp, 33'330'000);
 	m_dsp->set_mcbl_mode(true); // Boot-loader mode
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);

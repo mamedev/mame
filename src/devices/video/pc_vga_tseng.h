@@ -64,6 +64,7 @@ protected:
 class et4kw32i_vga_device :  public tseng_vga_device
 {
 public:
+	// BitBlt
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	// construction/destruction

@@ -34,12 +34,11 @@ private:
 		virtual u32 r32(offs_t pc) const override;
 		virtual u64 r64(offs_t pc) const override;
 
-		void set_source(address_space &space);
+		void set_source(device_memory_interface *dev, int spacenum);
 		void set_source(debug_data_buffer &back, bool opcode);
 
 		bool active() const;
 
-		address_space *get_underlying_space() const;
 		std::string data_to_string(offs_t pc, offs_t size) const;
 		void data_get(offs_t pc, offs_t size, std::vector<u8> &data) const;
 
@@ -56,7 +55,8 @@ private:
 		std::function<void (offs_t, offs_t, std::vector<u8> &)> m_data_get;
 		std::function<offs_t (offs_t, offs_t)> m_next_pc_wrap;
 
-		address_space *m_space;
+		device_memory_interface *m_dev;
+		int m_spacenum;
 		debug_data_buffer *m_back;
 		bool m_opcode;
 		offs_t m_page_mask, m_pc_mask;

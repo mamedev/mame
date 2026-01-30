@@ -12,6 +12,7 @@ class nscsi_harddisk_device : public nscsi_full_device
 {
 public:
 	nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void set_default_model_name(const std::string_view &model);
 
 protected:
 	nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -25,6 +26,7 @@ protected:
 	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
 
 	required_device<harddisk_image_device> image;
+	std::string m_default_model_name;
 	uint8_t block[512];
 	int lba, cur_lba, blocks;
 	int bytes_per_sector;

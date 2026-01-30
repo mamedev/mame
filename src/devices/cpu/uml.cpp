@@ -236,7 +236,7 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 //-------------------------------------------------
 
 uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
-	: m_code(reinterpret_cast<drccodeptr *>(drcuml.cache().alloc_near(sizeof(drccodeptr))))
+	: m_code(drcuml.cache().alloc_near<drccodeptr>())
 	, m_string(name)
 	, m_drcuml(drcuml)
 {

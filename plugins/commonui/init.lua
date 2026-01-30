@@ -106,7 +106,7 @@ function commonui.input_selection_menu(action, title, filter)
 
 	function menu:handle(index, event)
 		local selection
-		if (event == 'back') or ((index == input_item_cancel) and (event == 'select')) then
+		if (event == 'back') or ((index == index_cancel) and (event == 'select')) then
 			action(nil)
 			return true
 		elseif event == 'select' then

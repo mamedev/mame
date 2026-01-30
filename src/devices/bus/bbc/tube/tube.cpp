@@ -107,6 +107,7 @@ void bbc_tube_slot_device::jim_w(offs_t offset, uint8_t data)
 
 
 // slot devices
+#include "cms6502.h"
 #include "tube_32016.h"
 #include "tube_6502.h"
 #include "tube_80186.h"
@@ -143,7 +144,7 @@ void bbc_tube_devices(device_slot_interface &device)
 	device.option_add("a500",   BBC_TUBE_A500);    /* Acorn A500 2nd Processor */
 	device.option_add("a500d",  BBC_TUBE_A500D);   /* Acorn A500 (Dual MEMC) 2nd Processor */
 	device.option_add("casper", BBC_TUBE_CASPER);  /* Casper 68000 2nd Processor */
-	//device.option_add("cms6502", BBC_TUBE_CMS6502); /* CMS 6502 2nd processor */
+	device.option_add("cms6502", BBC_CMS6502);     /* CMS 6502 2nd processor */
 	device.option_add("cms6809", BBC_TUBE_CMS6809); /* CMS 6809 2nd processor */
 	device.option_add("matchbox", BBC_TUBE_MATCHBOX); /* Matchbox Co-Processor */
 	//device.option_add("pmsb2p", BBC_TUBE_PMSB2P);  /* PMS B2P-6502 */

@@ -6,9 +6,6 @@
  ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/tms32010/tms32010.h"
-#include "sound/ymopl.h"
 #include "toaplan1.h"
 
 

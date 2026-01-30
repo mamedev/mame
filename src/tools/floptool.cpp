@@ -1404,7 +1404,7 @@ static int help(int argc, char *argv[])
 		return 0;
 	}
 
-	if(std::find_if(std::begin(s_command_usage), std::end(s_command_usage), [argv] (const command_info &info) { return !strcmp(info.name, argv[2]); }) != std::end(s_command_usage)) {
+	if(std::any_of(std::begin(s_command_usage), std::end(s_command_usage), [argv] (const command_info &info) { return !strcmp(info.name, argv[2]); })) {
 		display_usage(stdout, argv[0], argv[2]);
 		return 0;
 	}

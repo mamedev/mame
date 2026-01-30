@@ -115,7 +115,8 @@ void namco_c355spr_device::zdrawgfxzoom(
 		const u32 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
 
 		const u8 *source_base = gfx->get_data(code % gfx->elements());
-		/* compute sprite increment per screen pixel */
+
+		// compute sprite increment per screen pixel
 		int dx = (gfx->width() << 16) / sprite_screen_width;
 		int dy = (gfx->height() << 16) / sprite_screen_height;
 
@@ -146,30 +147,35 @@ void namco_c355spr_device::zdrawgfxzoom(
 		}
 
 		if (hpos < clip.min_x)
-		{ /* clip left */
+		{
+			// clip left
 			int pixels = clip.min_x - hpos;
 			hpos += pixels;
 			x_index_base += pixels * dx;
 		}
 		if (vpos < clip.min_y)
-		{ /* clip top */
+		{
+			// clip top
 			int pixels = clip.min_y - vpos;
 			vpos += pixels;
 			y_index += pixels * dy;
 		}
 		if (ex > clip.max_x + 1)
-		{ /* clip right */
+		{
+			// clip right
 			int pixels = ex - clip.max_x - 1;
 			ex -= pixels;
 		}
 		if (ey > clip.max_y + 1)
-		{ /* clip bottom */
+		{
+			// clip bottom
 			int pixels = ey - clip.max_y - 1;
 			ey -= pixels;
 		}
 
+		// skip if inner loop doesn't draw anything
 		if (ex > hpos)
-		{ /* skip if inner loop doesn't draw anything */
+		{
 			for (int y = vpos; y < ey; y++)
 			{
 				u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();

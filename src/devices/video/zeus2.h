@@ -10,9 +10,11 @@
 
 #pragma once
 
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "video/poly.h"
+
 #include "video/rgbutil.h"
-#include "cpu/tms32031/tms32031.h"
+
 
 /*************************************
 *  Constants
@@ -220,7 +222,7 @@ public:
 			return reinterpret_cast<float&>(val);
 		}
 		else
-			return tms3203x_device::fp_to_float(val);
+			return tms320c3x_device::fp_to_float(val);
 	}
 
 	inline uint32_t frame_addr_from_xy(uint32_t x, uint32_t y, bool render)

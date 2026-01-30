@@ -51,6 +51,9 @@ public:
 
 	void adam(machine_config &config);
 
+	void computer_reset_w(int state);
+	void game_reset_w(int state);
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<m6801_cpu_device> m_netcpu;
@@ -89,6 +92,8 @@ private:
 
 	void joy1_irq_w(int state);
 	void joy2_irq_w(int state);
+
+	void mioc_reset(bool game);
 
 	// memory state
 	uint8_t m_mioc;

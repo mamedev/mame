@@ -13,7 +13,9 @@
 
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
+
 #include "machine/gen_fifo.h"
+
 
 class mb86235_frontend;
 

@@ -925,14 +925,14 @@ void toaplan1_state::outzone_sound_io_map(address_map &map)
 }
 
 
-/***************************** TMS32010 Memory Map **************************/
+/***************************** TMS320C10 Memory Map **************************/
 
 void toaplan1_demonwld_state::dsp_program_map(address_map &map)
 {
 	map(0x000, 0x7ff).rom();
 }
 
-	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
+	/* $000 - 08F  TMS320C10 Internal Data RAM in Data Address Space */
 
 void toaplan1_demonwld_state::dsp_io_map(address_map &map)
 {
@@ -2069,7 +2069,7 @@ void toaplan1_demonwld_state::demonwld(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_demonwld_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_demonwld_state::sound_io_map);
 
-	TMS32010(config, m_dsp, XTAL(28'000'000) / 2);
+	TMS320C10(config, m_dsp, XTAL(28'000'000) / 2);
 	m_dsp->set_addrmap(AS_PROGRAM, &toaplan1_demonwld_state::dsp_program_map);
 	m_dsp->set_addrmap(AS_IO, &toaplan1_demonwld_state::dsp_io_map);
 	m_dsp->bio().set(FUNC(toaplan1_demonwld_state::bio_r));
@@ -2554,7 +2554,7 @@ ROM_START( demonwld )
 	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) // ???
 ROM_END
 
-// has the same sound rom and same attract order as the parent set, but still a 1989 copyright
+// has the same sound ROM and same attract order as the parent set, but still a 1989 copyright
 // main 68k program ROMs had an additional 'N' stamped on them
 ROM_START( demonwld1 )
 	ROM_REGION( 0x040000, "maincpu", 0 ) // Main 68K code

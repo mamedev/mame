@@ -1109,9 +1109,65 @@ ROM_START( rbbrite )
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+/*
+
+goretrop / goretropa have 2 copies of the main licensed game list in the ROM (not including the 'bonus' games)
+the 2nd copy has 2 extra games, gargoyle qst 2 & mega man (maybe due to regional licensing?)
+
+goretrop has 2 additional games over goretropa; commando and higemaru so is probably the newer set
+
+001 8 eyes
+002 1942
+003 1943
+004 bad dudes
+005 bad st brawler
+006 bionic commando
+007 buggy popper
+008 burgertime
+009 code name viper
+010 commando (not in the goretropa set)
+011 dark lord
+012 dash galaxy
+013 exed exes
+014 gargoyle qst 2 (not in first copy of the list)
+015 ghost n goblins
+016 gun smoke
+017 higemaru (not in the goretropa set)
+018 legendary wings
+019 mega man (not in first copy of the list)
+020 mega man 2
+021 mega man 3
+022 m final fight
+023 motor city
+024 mutant virus
+025 nightshade
+026 noahs ark
+027 power punch
+028 pyramids of ra done
+029 rescue mission
+030 section z
+031 side pocket
+032 sonson
+033 street fighter 2010
+034 strider
+035 target renegade
+036 tetris
+037 thunderbolt 2
+038 treasure master
+039 trojan
+
+both sets have 225 bonus games
+
+*/
+
 ROM_START( goretrop )
 	ROM_REGION( 0x2000000, "mainrom", 0 )
 	ROM_LOAD( "goretroportable.bin", 0x00000, 0x2000000, CRC(e7279dd3) SHA1(5f096ce22e46f112c2cc6588cb1c527f4f0430b5) )
+ROM_END
+
+ROM_START( goretropa )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "goretro.bin", 0x00000, 0x2000000, CRC(e2c579cc) SHA1(b5cb8883d1f0b238fc9966ac635583dd5c66bcfe) )
 ROM_END
 
 ROM_START( s10fake )
@@ -1416,7 +1472,8 @@ CONS( 202?, retro620, 0,        0,  vt36x_vibesswap_16mb, vt369, vt36x_state, em
 CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_init, "Coleco", "Rainbow Brite (mini-arcade)", MACHINE_NOT_WORKING )
 
 // there's also a 250+ version of the unit below at least; protection(?) is similar to rbbrite
-CONS( 2018, goretrop,  0,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
+CONS( 2018, goretrop,  0,         0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
+CONS( 2018, goretropa, goretrop,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games (older)", MACHINE_NOT_WORKING ) // doesn't have commando or higemaru 
 
 // all games after the first 180 listed on the menu are duplicates. BTANB: games 501-520 are mislabeled duplicates: e.g., "511. Exerion" actually loads Pac-Man.
 // unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)

@@ -26,13 +26,13 @@ chesscomputers as a parting gift to retiring executives. The hardware is same as
 see(1): http://chesseval.com/ChessEvalJournal/DaimlerBenz.htm
 see(2): http://chesseval.com/RareBoard/DaimlerBenzBoard.htm
 
-MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
-real one (updated MM II engine) didn't get further than a prototype.
-
 MM II (Nona program) wasn't a commercial release. After Mondial came out, Frans Morsch
 ported his Nona program to MM II hardware, using Ed Schröder's interface (hence the
 similarity with Rebel). According to research, this version competed in the 1985 Dutch
 Open Computer Chess Championship.
+
+MM III was never released officially. Rebell 5,0 is commonly known as MM III, but the
+real one (updated MM II engine) didn't get further than a prototype.
 
 MM IV TurboKit 18MHz - (mm4tk)
 This is a replacement ROM combining the TurboKit initial ROM with the original MM IV.
@@ -51,7 +51,9 @@ Polgar. Ed Schröder participated with it at the 1989 WMCCC in Portorose, on an 
 module combined with the TK20 TurboKit. For more information, see:
 http://chesseval.com/ChessEvalJournal/PrototypeMMV.htm (mistakenly claims it's MM V)
 
-MM VI (Saitek, 1994) is on different hardware, H8 CPU.
+MM VI was announced in 1994, and was going to be on similar hardware with a program
+by Ed Schröder. After H+G was bought by Saitek, it was released in 1996 on H8 CPU
+hardware with a program by Frans Morsch.
 
 ================================================================================
 

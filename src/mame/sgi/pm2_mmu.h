@@ -50,16 +50,16 @@ protected:
 	std::optional<std::pair<unsigned, offs_t>> translate(offs_t const address, unsigned const mode);
 	template <bool Execute> u16 mmu_read(offs_t logical, u16 mem_mask);
 	void mmu_write(offs_t logical, u16 data, u16 mem_mask);
+	virtual bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 private:
 	required_address_space m_space[4];
 	devcb_write_line m_error;
 
-	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_mem;
-	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_spc;
-
 	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_bus_mem;
 	memory_access<16, 1, 0, ENDIANNESS_LITTLE>::specific m_bus_pio;
+	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_mem;
+	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_spc;
 
 	std::unique_ptr<u16[]> m_page;
 	std::unique_ptr<u16[]> m_prot;

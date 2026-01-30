@@ -51,7 +51,7 @@
 #include "taitosnd.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/tms32025/tms32025.h"
+#include "cpu/tms320c2x/tms320c2x.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "taitoio_yoke.h"

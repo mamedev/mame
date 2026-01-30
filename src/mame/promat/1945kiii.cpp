@@ -139,9 +139,8 @@ private:
 
 	virtual void video_start() override ATTR_COLD;
 
-	void k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-							u8 transparent_color, bool flicker);
+	void k3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
+			u32 code, u32 color, bool flipx, bool flipy, int offsx, int offsy, u8 transparent_color, bool flicker);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -189,9 +188,8 @@ void k3_state::video_start()
 	save_item(NAME(m_refresh));
 }
 
-void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-							u8 transparent_color, bool flicker)
+void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
+		u32 code, u32 color, bool flipx, bool flipy, int offsx, int offsy, u8 transparent_color, bool flicker)
 {
 	// Start drawing
 	const u16 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
@@ -212,29 +210,33 @@ void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_eleme
 	int ey = sy + gfx->height();
 
 	if (sx < clip.min_x)
-	{ // clip left
+	{
+		// clip left
 		int pixels = clip.min_x - sx;
 		sx += pixels;
 		x_index_base += xinc * pixels;
 	}
 	if (sy < clip.min_y)
-	{ // clip top
+	{
+		// clip top
 		int pixels = clip.min_y - sy;
 		sy += pixels;
 		y_index += yinc * pixels;
 	}
-	// NS 980211 - fixed incorrect clipping
 	if (ex > clip.max_x + 1)
-	{ // clip right
+	{
+		// clip right
 		ex = clip.max_x + 1;
 	}
 	if (ey > clip.max_y + 1)
-	{ // clip bottom
+	{
+		// clip bottom
 		ey = clip.max_y + 1;
 	}
 
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
-	{ // skip if inner loop doesn't draw anything
+	{
 		for (int y = sy; y < ey; y++)
 		{
 			u8 const *const source = source_base + y_index * gfx->rowbytes();

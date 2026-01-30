@@ -125,12 +125,12 @@
 #include "machine/rescap.h"
 #include "machine/watchdog.h"
 #include "sound/pokey.h"
-#include "video/resnet.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "video/resnet.h"
 
 
 namespace {
@@ -138,8 +138,8 @@ namespace {
 class cloak_state : public driver_device
 {
 public:
-	cloak_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	cloak_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_slave(*this, "slave"),
 		m_gfxdecode(*this, "gfxdecode"),

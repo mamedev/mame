@@ -13,6 +13,9 @@
 class matrox_vga_device :  public svga_device
 {
 public:
+	// SDD refresh rates are doubled
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	matrox_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void ramdac_ext_map(address_map &map) ATTR_COLD;

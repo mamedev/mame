@@ -33,7 +33,7 @@ found out that it was written for a HP-9810A by Alan A. Wray in 1974, and CC1 is
 similar to it. Ron C. Nelson must have ported the algorithms to 8080 when he wrote
 his Altair 8800 chess program, and this is what made it into CC1.
 
-CC1 hardware overview:
+Hardware notes:
 - PCB label: PC-P-86, P179 C-2 7.77
 - NEC 8080AF @ 2MHz(18MHz XTAL through a 8224)
 - Everything goes via a NEC B8228, its special features are unused.

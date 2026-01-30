@@ -167,7 +167,7 @@ void tzbx15_device::roundupt_drawgfxzoomrotate(
 	1<<17 : double to 200%
 	*/
 
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
+	// force clip to bitmap boundary
 	rectangle myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
@@ -183,13 +183,12 @@ void tzbx15_device::roundupt_drawgfxzoomrotate(
 
 		if (sprite_screen_width && sprite_screen_height)
 		{
-			/* compute sprite increment per screen pixel */
+			// compute sprite increment per screen pixel
 			int dx = (gfx->width()<<16)/sprite_screen_width;
 			int dy = (gfx->height()<<16)/sprite_screen_height;
 
 			int sx;//=ssx>>16;
 			int sy;//=ssy>>16;
-
 
 //          int ex = sx+sprite_screen_width;
 //          int ey = sy+sprite_screen_height;
@@ -228,46 +227,48 @@ void tzbx15_device::roundupt_drawgfxzoomrotate(
 			}
 
 			if( sx < myclip.min_x)
-			{ /* clip left */
+			{
+				// clip left
 				int pixels = myclip.min_x-sx;
 				sx += pixels;
 				x_index_base += pixels*dx;
 			}
 			if( sy < myclip.min_y )
-			{ /* clip top */
+			{
+				// clip top
 				int pixels = myclip.min_y-sy;
 				sy += pixels;
 				y_index += pixels*dy;
 			}
-			/* NS 980211 - fixed incorrect clipping */
 			if( ex > myclip.max_x+1 )
-			{ /* clip right */
+			{
+				// clip right
 				int pixels = ex-myclip.max_x-1;
 				ex -= pixels;
 			}
 			if( ey > myclip.max_y+1 )
-			{ /* clip bottom */
+			{
+				// clip bottom
 				int pixels = ey-myclip.max_y-1;
 				ey -= pixels;
 			}
 
-			if( ex>sx )
-			{ /* skip if inner loop doesn't draw anything */
+			// skip if inner loop doesn't draw anything
+			if( ex > sx )
+			{
 #if 0
 				int startx=0;
 				int starty=0;
 
-//              int incxx=0x10000;
-//              int incxy=0;
-//              int incyx=0;
-//              int incyy=0x10000;
+				//int incxx=0x10000;
+				//int incxy=0;
+				//int incyx=0;
+				//int incyy=0x10000;
 				double theta=rotate * ((2.0 * M_PI)/512.0);
 				double c=cos(theta);
 				double s=sin(theta);
 
-
-			//  if (ey-sy > 0)
-			//      dy=dy / (ey-sy);
+				//if (ey-sy > 0) dy=dy / (ey-sy);
 				{
 					float angleAsRadians=(float)rotate * (7.28f / 512.0f);
 					//float ccx = cosf(angleAsRadians);

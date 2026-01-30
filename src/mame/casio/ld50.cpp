@@ -42,8 +42,6 @@
     TODO:
     - LCD artwork
     - clickable layout?
-    - possibly connect a MIDI out port in lieu of the SAM9793
-      (MCS51 core needs proper serial output first)
     - dump/emulate the HE80085 somehow
  */
 
@@ -64,6 +62,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_lcdc(*this, "lcdc")
+		, m_midi(*this, "mdout")
 		, m_datarom(*this, "datarom")
 		, m_inputs(*this, "IN%u", 0U)
 		, m_pads(*this, "PADS")
@@ -87,10 +86,10 @@ private:
 	virtual void driver_reset() override;
 
 	HD44780_PIXEL_UPDATE(lcd_update);
-	void palette_init(palette_device &palette);
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<hd44780_device> m_lcdc;
+	required_device<midi_port_device> m_midi;
 
 	required_memory_region m_datarom;
 	required_ioport_array<5> m_inputs;
@@ -109,12 +108,6 @@ HD44780_PIXEL_UPDATE(ld50_state::lcd_update)
 {
 	if (x < 6 && y < 8 && line < 2 && pos < 8)
 		bitmap.pix(y, line * 48 + pos * 6 + x) = state;
-}
-
-void ld50_state::palette_init(palette_device &palette)
-{
-	palette.set_pen_color(0, rgb_t(255, 255, 255));
-	palette.set_pen_color(1, rgb_t(0, 0, 0));
 }
 
 
@@ -150,7 +143,7 @@ void ld50_state::port2_w(u8 data)
 	/*
 	bit 0: reset output
 	bit 1: unused
-	bit 2: auto power off
+	bit 2: battery level
 	bit 3: ROM output enable
 	bit 4: ROM address low byte latch
 	bit 5: ROM address mid byte latch
@@ -194,7 +187,7 @@ void ld50_state::port3_w(u8 data)
 {
 	/*
 	bit 0: LCD enable
-	bit 1: MIDI Tx (TODO)
+	bit 1: MIDI Tx
 	bit 2: unused
 	bit 3: trigger sound effect
 	bit 4: shift register clock (for volume)
@@ -212,6 +205,7 @@ void ld50_state::port3_w(u8 data)
 	m_port[3] = data;
 
 	m_lcdc->e_w(BIT(data, 0));
+	m_midi->write_txd(BIT(data, 1));
 
 	if (BIT(set, 3))
 	{
@@ -274,12 +268,15 @@ void ld50_state::ld50(machine_config &config)
 	m_maincpu->port_out_cb<0>().set(FUNC(ld50_state::port0_w));
 	m_maincpu->port_in_cb<1>().set(FUNC(ld50_state::port1_r));
 	m_maincpu->port_out_cb<2>().set(FUNC(ld50_state::port2_w));
+	m_maincpu->port_in_cb<2>().set_ioport("P2");
 	m_maincpu->port_out_cb<3>().set(FUNC(ld50_state::port3_w));
 
 	// LCD
 	HD44780(config, m_lcdc, 270'000); // TODO: clock not measured, datasheet typical clock used
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(ld50_state::lcd_update));
+
+	MIDI_PORT(config, m_midi, midiout_slot, "midiout");
 
 	// screen (for testing only)
 	// TODO: the actual LCD with custom segments
@@ -291,10 +288,17 @@ void ld50_state::ld50(machine_config &config)
 	screen.set_visarea_full();
 	screen.set_palette("palette");
 
-	PALETTE(config, "palette", FUNC(ld50_state::palette_init), 2);
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 }
 
 INPUT_PORTS_START(ld50)
+	PORT_START("P2")
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x04, 0x00, "Battery Level" )
+	PORT_CONFSETTING( 0x00, "Normal" )
+	PORT_CONFSETTING( 0x04, "Low")
+	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_START("PADS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Drum Pad 4")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Drum Pad 3")

@@ -28,7 +28,7 @@ void deco_mlc_state::video_start()
 		m_shadow_shift = 11 - s;
 	}
 
-//  temp_bitmap = std::make_unique<bitmap_rgb32>(512, 512);
+	//temp_bitmap = std::make_unique<bitmap_rgb32>(512, 512);
 	m_buffered_spriteram = std::make_unique<u16[]>(0x3000 / 4);
 	m_spriteram_spare = std::make_unique<u16[]>(0x3000 / 4);
 	m_spriteram = std::make_unique<u16[]>(0x3000 / 4);
@@ -40,9 +40,8 @@ void deco_mlc_state::video_start()
 
 
 void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gfx_element *gfx,
-		u32 code1,u32 code2, u32 color,int flipx,int sx,
-		int transparent_color,int use8bpp,
-		int scalex, int srcline, int shadowMode )
+		u32 code1, u32 code2, u32 color, int flipx, int sx, int transparent_color,
+		int use8bpp, int scalex, int srcline, int shadowMode)
 {
 	if (!scalex) return;
 	const u32 alphaMode = m_irq_ram[0x04 / 4] & 0xc0;
@@ -54,14 +53,12 @@ void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gf
 	1<<17 : double to 200%
 	*/
 
-	/* KW 991012 -- Added code to force clip to bitmap boundary */
-
 	const int sprite_screen_width = (scalex * 16 + (sx & 0xffff)) >> 16;
 
 	sx >>= 16;
 	if (sprite_screen_width)
 	{
-		/* compute sprite increment per screen pixel */
+		// compute sprite increment per screen pixel
 		int dx = (16 << 16) / sprite_screen_width;
 
 		int ex = sx + sprite_screen_width;
@@ -79,20 +76,22 @@ void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gf
 		}
 
 		if (sx < clip.left())
-		{ /* clip left */
+		{
+			// clip left
 			int pixels = clip.left() - sx;
 			sx += pixels;
 			x_index_base += pixels * dx;
 		}
-		/* NS 980211 - fixed incorrect clipping */
 		if (ex > clip.right() + 1)
-		{ /* clip right */
+		{
+			// clip right
 			int pixels = ex-clip.right() - 1;
 			ex -= pixels;
 		}
 
-		if (ex>sx)
-		{ /* skip if inner loop doesn't draw anything */
+		// skip if inner loop doesn't draw anything
+		if (ex > sx)
+		{
 			const pen_t *pal = &m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
 			const u8 *code_base1 = gfx->get_data(code1 % gfx->elements());
 			const u8 *code_base2 = gfx->get_data(code2 % gfx->elements());
@@ -100,7 +99,8 @@ void deco_mlc_state::drawgfxzoomline(u32* dest, u8* pri,const rectangle &clip,gf
 			const u8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
 			// alphaMode & 0xc0 = 0xc0 : Shadow, 0 : Alpha or Pre-shadowed, Other bits unknown
 			if (shadowMode && (alphaMode & 0xc0))
-			{   /* TODO : 8bpp and shadow can use simultaneously? */
+			{
+				// TODO : 8bpp and shadow can use simultaneously?
 				int x, x_index = x_index_base;
 				for (x = sx; x < ex; x++)
 				{

@@ -2189,16 +2189,7 @@ void mastninj_state::descramble_gfx(uint8_t* src)
 		std::vector<uint8_t> buffer(len);
 		for (int i = 0;i < len; i++)
 		{
-			buffer[i] = src[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 5, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 3, 2, 1, 0)];
-		}
-		std::copy(buffer.begin(), buffer.end(), &src[0]);
-	}
-
-	{
-		std::vector<uint8_t> buffer(len);
-		for (int i = 0; i < len; i++)
-		{
-			buffer[i] = src[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 6, 14, 13, 12, 11, 10, 9, 8, 7, 5, 4, 3, 2, 1, 0)];
+			buffer[i] = src[bitswap<24>(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 5, 6, 14, 13, 12, 11, 10, 9, 8, 7, 4, 3, 2, 1, 0)];
 		}
 		std::copy(buffer.begin(), buffer.end(), &src[0]);
 	}

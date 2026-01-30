@@ -26,6 +26,8 @@ DECLARE_DEVICE_TYPE(M68705R3, m68705r3_device)
 DECLARE_DEVICE_TYPE(M68705U3, m68705u3_device)
 //DECLARE_DEVICE_TYPE(M68705U5, m68705u5_device) // Secured EPROM
 
+DECLARE_DEVICE_TYPE(M146805E2, m146805e2_device)
+
 class m6805_timer
 {
 public:
@@ -166,6 +168,7 @@ protected:
 	static unsigned const PORT_COUNT = 4;
 
 	m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size);
+	m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, configuration_params const &params, unsigned ram_size);
 
 	void map(address_map &map) { internal_map(map); }
 	virtual void internal_map(address_map &map) ATTR_COLD;
@@ -449,6 +452,21 @@ protected:
 	virtual tiny_rom_entry const *device_rom_region() const override ATTR_COLD;
 
 	virtual u8 get_mask_options() const override;
+};
+
+class m146805_device : public m6805_hmos_device
+{
+protected:
+	m146805_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size);
+
+	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 4) / 5; }
+	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return cycles * 5; }
+};
+
+class m146805e2_device : public m146805_device
+{
+public:
+	m146805e2_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 };
 
 #define M6805_INT_TIMER             (M6805_IRQ_LINE + 1)

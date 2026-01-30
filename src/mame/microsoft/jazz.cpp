@@ -424,6 +424,7 @@ void jazz_state::jazz(machine_config &config)
 
 	// software list
 	SOFTWARE_LIST(config, m_softlist).set_original("jazz");
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("mipsr4000");
 }
 
 void jazz_state::led_w(u8 data)

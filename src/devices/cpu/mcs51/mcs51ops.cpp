@@ -8,7 +8,7 @@
 
 #include "logmacro.h"
 
-/* # of oscillations each opcode requires*/
+// # of oscillations each opcode requires
 const u8 mcs51_cpu_device::mcs51_cycles[256] =
 {
 	1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -54,12 +54,11 @@ u8 mcs51_cpu_device::bit_address_r(u8 offset)
 	u8 word;
 	u8 mask;
 	int bit_pos;
-	int distance;   /* distance between bit addressable words */
-					/* 1 for normal bits, 8 for sfr bit addresses */
+	int distance; // distance between bit addressable words (1 for normal bits, 8 for sfr bit addresses)
 
 	m_last_bit = offset;
 
-	//User defined bit addresses 0x20-0x2f (values are 0x0-0x7f)
+	// User defined bit addresses 0x20-0x2f (values are 0x0-0x7f)
 	if (offset < 0x80)
 	{
 		distance = 1;
@@ -68,7 +67,7 @@ u8 mcs51_cpu_device::bit_address_r(u8 offset)
 		mask = (0x1 << bit_pos);
 		return((m_intd.read_byte(word) & mask) >> bit_pos);
 	}
-	//SFR bit addressable registers
+	// SFR bit addressable registers
 	else
 	{
 		distance = 8;
@@ -87,7 +86,7 @@ void mcs51_cpu_device::bit_address_w(u8 offset, u8 bit)
 	u8 result;
 	int distance;
 
-	/* User defined bit addresses 0x20-0x2f (values are 0x0-0x7f) */
+	// User defined bit addresses 0x20-0x2f (values are 0x0-0x7f)
 	if (offset < 0x80)
 	{
 		distance = 1;
@@ -99,7 +98,7 @@ void mcs51_cpu_device::bit_address_w(u8 offset, u8 bit)
 		result = result | bit;
 		m_intd.write_byte(word, result);
 	}
-	/* SFR bit addressable registers */
+	// SFR bit addressable registers
 	else
 	{
 		distance = 8;

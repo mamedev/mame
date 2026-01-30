@@ -15,6 +15,9 @@
 class cirrus_gd5428_vga_device :  public svga_device
 {
 public:
+	// MT09345 / MT09374, SDD can crash at higher res
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	// construction/destruction
 	cirrus_gd5428_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 

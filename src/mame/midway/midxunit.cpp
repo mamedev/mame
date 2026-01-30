@@ -706,6 +706,75 @@ void midxunit_state::midxunit(machine_config &config)
  *************************************/
 
 ROM_START( revx )
+	ROM_REGION32_LE( 0x200000, "maincpu", 0 ) // 34020 code
+	ROM_LOAD32_BYTE( "revx_l2.0_u51.u51", 0x00000, 0x80000, CRC(2c996003) SHA1(54819bdf1f9a77f43281effdbcd2dd69a3787e88) )
+	ROM_LOAD32_BYTE( "revx_l2.0_u52.u52", 0x00001, 0x80000, CRC(f1d4d6fb) SHA1(5927126eb0e54e99a2cfcccbe81739e3b165ec69) )
+	ROM_LOAD32_BYTE( "revx_l2.0_u53.u53", 0x00002, 0x80000, CRC(59ca7084) SHA1(802d7cb8e15476133394c871416e0a5ffd9c00ee) )
+	ROM_LOAD32_BYTE( "revx_l2.0_u54.u54", 0x00003, 0x80000, CRC(4f577dd9) SHA1(0a2fa80a1473f16b5a2227e596f8dc1d45ef7d01) )
+
+	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )  // sound data
+	//ROM_LOAD16_BYTE( "p5_revolution_x_sound_rom_u2.u2", 0x000000, 0x80000, CRC(4ed9e803) SHA1(ba50f1beb9f2a2cf5110897209b5e9a2951ff165) ) // the prototype "Release 1" ROM was on the board but the game rejects it with a startup error (not upgraded properly?)
+	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u2.u2", 0x000000, 0x80000, CRC(d2ed9f5e) SHA1(415ce5e41a560d135ea41c7924219fdeda504237) ) // shows as "Sound Software Version - Release 2"
+	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u3.u3", 0x200000, 0x80000, CRC(af8f253b) SHA1(25a0000cab177378070f7a6e3c7378fe87fad63e) )
+	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u4.u4", 0x400000, 0x80000, CRC(3ccce59c) SHA1(e81a31d64c64e7b1d25f178c53da3d68453c203c) )
+	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u5.u5", 0x600000, 0x80000, CRC(a0438006) SHA1(560d216d21cb8073dbee0fd20ebe589932a9144e) )
+	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u6.u6", 0x800000, 0x80000, CRC(b7b34f60) SHA1(3b9682c6a00fa3bdb47e69d8e8ceccc244ee55b5) )
+	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u7.u7", 0xa00000, 0x80000, CRC(6795fd88) SHA1(7c3790730a8b99b63112c851318b1c7e4989e5e0) )
+	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u8.u8", 0xc00000, 0x80000, CRC(793a7eb5) SHA1(4b1f81b68f95cedf1b356ef362d1eb37acc74b16) )
+	ROM_LOAD16_BYTE( "l1_revolution_x_sound_rom_u9.u9", 0xe00000, 0x80000, CRC(14ddbea1) SHA1(8dba9dc5529ea77c4312ea61f825bf9062ffc6c3) )
+
+	ROM_REGION( 0x2000, "pic", 0 )
+	ROM_LOAD( "419_revolution-x_u444.u444", 0x0000, 0x2000, CRC(7df57330) SHA1(fa6733972f45d90563c184b6735da7a40cee1bf2) )
+
+	ROM_REGION( 0x1000000, "video", 0 )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u120.u120", 0x0000000, 0x80000, CRC(523af1f0) SHA1(a67c0fd757e860fc1c1236945952a295b4d5df5a) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u121.u121", 0x0000001, 0x80000, CRC(78201d93) SHA1(fb0b8f887eec433f7624f387d7fb6f633ea30d7c) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u122.u122", 0x0000002, 0x80000, CRC(2cf36144) SHA1(22ed0eefa2c7c836811fac5f717c3f38254eabc2) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u123.u123", 0x0000003, 0x80000, CRC(6912e1fb) SHA1(416f0de711d80e9182ede524c568c5095b1bec61) )
+
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u110.u110", 0x0200000, 0x80000, CRC(e3f7f0af) SHA1(5877d9f488b0f4362a9482007c3ff7f4589a036f) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u111.u111", 0x0200001, 0x80000, CRC(49fe1a69) SHA1(9ae54b461f0524c034fbcb6fcd3fd5ccb5d7265a) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u112.u112", 0x0200002, 0x80000, CRC(7e3ba175) SHA1(dd2fe90988b544f67dbe6151282fd80d49631388) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u113.u113", 0x0200003, 0x80000, CRC(c0817583) SHA1(2f866e5888e212b245984344950d0e1fb8957a73) )
+
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u101.u101", 0x0400000, 0x80000, CRC(5a08272a) SHA1(17da3c9d71114f5fdbf50281a942be3da3b6f564) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u102.u102", 0x0400001, 0x80000, CRC(11d567d2) SHA1(7ebe6fd39a0335e1fdda150d2dc86c3eaab17b2e) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u103.u103", 0x0400002, 0x80000, CRC(d338e63b) SHA1(0a038217542667b3a01ecbcad824ee18c084f293) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u104.u104", 0x0400003, 0x80000, CRC(f7b701ee) SHA1(0fc5886e5857326bee7272d5d482a878cbcea83c) )
+
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u91.u91",   0x0600000, 0x80000, CRC(52a63713) SHA1(dcc0ff3596bd5d273a8d4fd33b0b9b9d588d8354) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u92.u92",   0x0600001, 0x80000, CRC(fae3621b) SHA1(715d41ea789c0c724baa5bd90f6f0f06b9cb1c64) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u93.u93",   0x0600002, 0x80000, CRC(7065cf95) SHA1(6c5888da099e51c4b1c592721c5027c899cf52e3) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u94.u94",   0x0600003, 0x80000, CRC(600d5b98) SHA1(6aef98c91f87390c0759fe71a272a3ccadd71066) )
+
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u81.u81",   0x0800000, 0x80000, CRC(729eacb1) SHA1(d130162ae22b99c84abfbe014c4e23e20afb757f) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u82.u82",   0x0800001, 0x80000, CRC(19acb904) SHA1(516059b516bc5b1669c9eb085e0cdcdee520dff0) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u83.u83",   0x0800002, 0x80000, CRC(0e223456) SHA1(1eedbd667f4a214533d1c22ca5312ecf2d4a3ab4) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u84.u84",   0x0800003, 0x80000, CRC(d3de0192) SHA1(2d22c5bac07a7411f326691167c7c70eba4b371f) )
+
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u71.u71",   0x0a00000, 0x80000, CRC(2b29fddb) SHA1(57b71e5c18b56bf58216e690fdefa6d30d88d34a) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u72.u72",   0x0a00001, 0x80000, CRC(2680281b) SHA1(d1ae0701d20166a00d8733d9d12246c140a5fb96) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u73.u73",   0x0a00002, 0x80000, CRC(420bde4d) SHA1(0f010cdeddb59631a5420dddfc142c50c2a1e65a) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u74.u74",   0x0a00003, 0x80000, CRC(26627410) SHA1(a612121554549afff5c8e8c54774ca7b0220eda8) )
+
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u63.u63",   0x0c00000, 0x80000, CRC(3066e3f3) SHA1(25548923db111bd6c6cff44bfb63cb9eb2ef0b53) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u64.u64",   0x0c00001, 0x80000, CRC(c33f5309) SHA1(6bb333f563ea66c4c862ffd5fb91fb5e1b919fe8) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u65.u65",   0x0c00002, 0x80000, CRC(6eee3e71) SHA1(0ef22732e0e2bb5207559decd43f90d1e338ad7b) )
+	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u66.u66",   0x0c00003, 0x80000, CRC(b43d6fff) SHA1(87584e7aeea9d52a43023d40c359591ff6342e84) )
+
+	//TODO: Fix the need of reloading program ROMs here, there are no duplicate ROMs on the real PCB
+	ROM_LOAD32_BYTE( "revx_l2.0_u51.u51",                  0x0e00000, 0x80000, CRC(2c996003) SHA1(54819bdf1f9a77f43281effdbcd2dd69a3787e88) )
+	ROM_LOAD32_BYTE( "revx_l2.0_u52.u52",                  0x0e00001, 0x80000, CRC(f1d4d6fb) SHA1(5927126eb0e54e99a2cfcccbe81739e3b165ec69) )
+	ROM_LOAD32_BYTE( "revx_l2.0_u53.u53",                  0x0e00002, 0x80000, CRC(59ca7084) SHA1(802d7cb8e15476133394c871416e0a5ffd9c00ee) )
+	ROM_LOAD32_BYTE( "revx_l2.0_u54.u54",                  0x0e00003, 0x80000, CRC(4f577dd9) SHA1(0a2fa80a1473f16b5a2227e596f8dc1d45ef7d01) )
+
+	ROM_REGION( 0x600, "plds", 0 )
+	ROM_LOAD( "a-17722.u1",   0x000, 0x117, CRC(054de7a3) SHA1(bb7abaec50ed704c03b44d5d54296898f7c80d38) )
+	ROM_LOAD( "a-17721.u955", 0x200, 0x117, CRC(033fe902) SHA1(6efb4e519ed3c9d49fff046a679762b506b3a75b) )
+	ROM_LOAD( "snd-gal16v8a.u17", 0x400, 0x117, NO_DUMP ) // Protected
+ROM_END
+
+ROM_START( revx1 )
 	ROM_REGION32_LE( 0x200000, "maincpu", 0 )   // 34020 code
 	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u51.u51",  0x00000, 0x80000, CRC(9960ac7c) SHA1(441322f061d627ca7573f612f370a85794681d0f) ) // labels needs to be verified, so far was observed only reprogrammed P5 ROMs
 	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u52.u52",  0x00001, 0x80000, CRC(fbf55510) SHA1(8a5b0004ed09391fe37f0f501b979903d6ae4868) )
@@ -761,6 +830,7 @@ ROM_START( revx )
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u65.u65",  0x0c00002, 0x80000, CRC(6eee3e71) SHA1(0ef22732e0e2bb5207559decd43f90d1e338ad7b) )
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u66.u66",  0x0c00003, 0x80000, CRC(b43d6fff) SHA1(87584e7aeea9d52a43023d40c359591ff6342e84) )
 
+	//TODO: Fix the need of reloading program ROMs here, there are no duplicate ROMs on the real PCB
 	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u51.u51",  0x0e00000, 0x80000, CRC(9960ac7c) SHA1(441322f061d627ca7573f612f370a85794681d0f) ) // labels needs to be verified, so far was observed only reprogrammed P5 ROMs
 	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u52.u52",  0x0e00001, 0x80000, CRC(fbf55510) SHA1(8a5b0004ed09391fe37f0f501b979903d6ae4868) )
 	ROM_LOAD32_BYTE( "l1_revolution_x_game_rom_u53.u53",  0x0e00002, 0x80000, CRC(a045b265) SHA1(b294d3a56e41f5ec4ab9bbcc0088833b1cab1879) )
@@ -828,6 +898,7 @@ ROM_START( revxp5 )
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u65.u65",  0x0c00002, 0x80000, CRC(6eee3e71) SHA1(0ef22732e0e2bb5207559decd43f90d1e338ad7b) )
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u66.u66",  0x0c00003, 0x80000, CRC(b43d6fff) SHA1(87584e7aeea9d52a43023d40c359591ff6342e84) )
 
+	//TODO: Fix the need of reloading program ROMs here, there are no duplicate ROMs on the real PCB
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u51.u51",  0xe00000, 0x80000, CRC(f3877eee) SHA1(7a4fdce36edddd35308c107c992ce626a2c9eb8c) )
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u52.u52",  0xe00001, 0x80000, CRC(199a54d8) SHA1(45319437e11176d4926c00c95c372098203a32a3) )
 	ROM_LOAD32_BYTE( "p5_revolution_x_game_rom_u53.u53",  0xe00002, 0x80000, CRC(fcfcf72a) SHA1(b471afb416e3d348b046b0b40f497d27b0afa470) )
@@ -848,5 +919,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, revx,   0,    midxunit, revx, midxunit_state, empty_init, ROT0, "Midway", "Revolution X (rev 1.0 6/16/94)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1994, revxp5, revx, midxunit, revx, midxunit_state, empty_init, ROT0, "Midway", "Revolution X (prototype, rev 5.0 5/23/94)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, revx,   0,    midxunit, revx, midxunit_state, empty_init, ROT0, "Midway", "Revolution X (revision 2.0 9/8/94)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1994, revx1,  revx, midxunit, revx, midxunit_state, empty_init, ROT0, "Midway", "Revolution X (revision 1.0 6/16/94)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1994, revxp5, revx, midxunit, revx, midxunit_state, empty_init, ROT0, "Midway", "Revolution X (prototype, revision 5.0 5/23/94)", MACHINE_SUPPORTS_SAVE )

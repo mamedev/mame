@@ -337,7 +337,7 @@ license:CC0-1.0
 		<description>OPEN ACCESS</description>
 		<year>1984</year>
 		<publisher>Software Products International</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="298418">
 				<rom name="5_oa1.td0" size="298418" crc="e7a75f55" sha1="7800962bb767c90893b5808dc9c0b81e6b3d1740"/>
@@ -409,7 +409,7 @@ license:CC0-1.0
 		<description>BASIC-86 v5.28 (DOS)</description>
 		<year>1983</year>
 		<publisher>Microsoft</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_basic86_compiler.ima" size="368640" crc="fdabeada" sha1="15eee3e4453a78382fd84ef49ffde871f113eb85"/>
@@ -454,7 +454,7 @@ license:CC0-1.0
 		<description>DMV IEEE-448 Inteface Diagnostic</description>
 		<year>198?</year>
 		<publisher>NCR Corporation</publisher>
-		<info name="usage" value="Requires CP/M-80" />
+		<info name="required_os" value="CP/M-80" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="181066">
 				<rom name="diagi488.td0" size="181066" crc="cac53b40" sha1="6ee0dcab9b044f4aefa661294b47f86ca4860cb8"/>
@@ -515,7 +515,7 @@ license:CC0-1.0
 		<description>NCR PC2PC Network Requester v1.01.00</description>
 		<year>1985</year>
 		<publisher>NCR Corporation</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_pc2pc_requester_1.01_sn000541.ima" size="368640" crc="2315c8e7" sha1="a7f7565a096a24d3ea11d17fd96659a9ca549554"/>
@@ -527,7 +527,7 @@ license:CC0-1.0
 		<description>NCR PC2PC Network Requester v1.01.00 (alt)</description>
 		<year>1985</year>
 		<publisher>NCR Corporation</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_pc2pc_requester_1.01_sn000542.ima" size="368640" crc="67f02514" sha1="08c241be76b724e5d8ff834015e8dbe77d01ed75"/>
@@ -539,7 +539,7 @@ license:CC0-1.0
 		<description>StarBurst v1.01</description>
 		<year>198?</year>
 		<publisher>MicroPro International</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_starburst.ima" size="368640" crc="479117aa" sha1="9bdb9d80d3103808f278e145d7a414155d1a642b"/>
@@ -551,7 +551,7 @@ license:CC0-1.0
 		<description>NCR 7900 Terminal Emulators (DOS)</description>
 		<year>1984</year>
 		<publisher>NCR Corporation</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_7900_terminal_emulator.ima" size="368640" crc="0c862436" sha1="e32074e3ee7fbab84caf878daa70aa46743da72c"/>
@@ -574,7 +574,7 @@ license:CC0-1.0
 		<description>C Compiler V1.2.3</description>
 		<year>1983</year>
 		<publisher>SuperSoft</publisher>
-		<info name="usage" value="Requires CP/M-80" />
+		<info name="required_os" value="CP/M-80" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="243115">
 				<rom name="dmv_c_compiler_disk1.cqi" size="243115" crc="14744291" sha1="d82776ad7873ad81b894db0b97fa8cabad0d88f0"/>
@@ -617,7 +617,7 @@ license:CC0-1.0
 		<description>RM/COBOL Compiler v1.5E</description>
 		<year>1983</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_rm-cobol_1.5_sn00276.ima" size="368640" crc="52e82acb" sha1="45c41cb80938bf51d5577e35ee847478e8574938"/>
@@ -629,7 +629,7 @@ license:CC0-1.0
 		<description>Supersort v1.62</description>
 		<year>1983</year>
 		<publisher>MicroPro International</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_supersort_1.62_msbbkcmr.ima" size="368640" crc="0f349862" sha1="eb1146e8fa107942e0d08261c625763534f5d7ed"/>
@@ -641,7 +641,7 @@ license:CC0-1.0
 		<description>T.I.M. III v3.31</description>
 		<year>1983</year>
 		<publisher>Innovative Software, Inc.</publisher>
-		<info name="usage" value="Requires CP/M-80" />
+		<info name="required_os" value="CP/M-80" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="191356">
 				<rom name="dmv_tim_iii_disk1.cqi" size="191356" crc="ac4d79ef" sha1="b462eeb984d74a582af829230d583d12eb2abf5f"/>
@@ -663,7 +663,7 @@ license:CC0-1.0
 		<description>Microsoft FORTRAN 77 v3.13</description>
 		<year>1983</year>
 		<publisher>Microsoft</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_ms-fortran_disk1.ima" size="368640" crc="59695cc3" sha1="b587bf8786a198b69e6a3b71045686a9e21b8b35"/>
@@ -700,7 +700,7 @@ license:CC0-1.0
 		<description>SuperCalc V1.12</description>
 		<year>1983</year>
 		<publisher>SORCIM CORP.</publisher>
-		<info name="usage" value="Requires CP/M-80" />
+		<info name="required_os" value="CP/M-80" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="82682">
 				<rom name="dmv_supercalc.cqi" size="82682" crc="c7f937a3" sha1="aa8ebbf6a9df3e4a080b477f7ee9dd429e367a87"/>
@@ -723,7 +723,7 @@ license:CC0-1.0
 		<description>WordStar V3.0</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires CP/M-80" />
+		<info name="required_os" value="CP/M-80" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="133164">
 				<rom name="dmv_wordstar.cqi" size="133164" crc="b10b60f8" sha1="d69b2a319a45b3c0d7448dcc9a533ae48935b20f"/>
@@ -735,7 +735,7 @@ license:CC0-1.0
 		<description>WordStar V3.30</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_wordstar.ima" size="368640" crc="db5b21de" sha1="a48be861068c0dbcf9ddfbd87fccdb0b131af340"/>
@@ -747,7 +747,7 @@ license:CC0-1.0
 		<description>WordStar V3.30 (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_wordstar_another.ima" size="368640" crc="ff36914f" sha1="a23b8a92e2a70defc5661ff8b0aa180b79b453ce"/>
@@ -759,7 +759,7 @@ license:CC0-1.0
 		<description>WordStar V3.30 (alt 2)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_wordstar_install.ima" size="368640" crc="580593bd" sha1="5a0e73b774bb711cbf6a0346bb094d0c9e72c76c"/>
@@ -782,7 +782,7 @@ license:CC0-1.0
 		<description>WordStar V3.40</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="301730">
 				<rom name="5ws340.td0" size="301730" crc="995d40bd" sha1="86dc7659e3e63c7cdd8d687c77ce2d788cb8d6c4"/>
@@ -806,7 +806,7 @@ license:CC0-1.0
 		<description>Mailmerge</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires CP/M-86" />
+		<info name="required_os" value="CP/M-86" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="7495">
 				<rom name="dmv_mailmerge.cqi" size="7495" crc="0bd0d452" sha1="98927cd6bce5ab71fcdcc2abb97a602ab4612247"/>
@@ -819,7 +819,7 @@ license:CC0-1.0
 		<description>SpellStar</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires CP/M-86" />
+		<info name="required_os" value="CP/M-86" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="123130">
 				<rom name="dmv_spellstar.cqi" size="123130" crc="57dab5b1" sha1="75ee6b7457c1165287c39eb0075993dc1ed441ac"/>
@@ -858,7 +858,7 @@ license:CC0-1.0
 		<description>MS-Pascal Compiler</description>
 		<year>198?</year>
 		<publisher>Microsoft</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_ms-pascal_disk1.ima" size="368640" crc="db53e64b" sha1="6d335b5a5bfdf548843c5198452e1037cb8b7d0d"/>
@@ -890,7 +890,7 @@ license:CC0-1.0
 		<description>Microsoft BASIC Compiler v5.50</description>
 		<year>1983</year>
 		<publisher>Microsoft</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_gw-basic_compiler.ima" size="368640" crc="dfd68a97" sha1="36d21dd4038b76514e6e172d82b8410d6364cc78"/>
@@ -958,7 +958,7 @@ license:CC0-1.0
 		<description>DR Draw (Monochrome)</description>
 		<year>1983</year>
 		<publisher>Digital Research</publisher>
-		<info name="usage" value="Requires CP/M-86" />
+		<info name="required_os" value="CP/M-86" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="189140">
 				<rom name="86drmo-m.td0" size="189140" crc="61543ccf" sha1="b8e33a0076bd1568a40d403bb6b391e6c45f9569"/>
@@ -1036,7 +1036,7 @@ license:CC0-1.0
 		<description>dBASE II v2.40</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_dbase_ii.ima" size="368640" crc="1ecc1219" sha1="e80f1e2688dcab71d9f64a7672ad2ae1a9c9ec81"/>
@@ -1059,7 +1059,7 @@ license:CC0-1.0
 		<description>DataStar v1.42</description>
 		<year>1983</year>
 		<publisher>MicroPro International</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_datastar_install.ima" size="368640" crc="eeb57cc3" sha1="03a456e7e5e395a9cc23dc37f1ad749f288fcb91"/>
@@ -1071,7 +1071,7 @@ license:CC0-1.0
 		<description>ReportStar v1.03</description>
 		<year>1983</year>
 		<publisher>MicroPro International</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_reportstar_install.ima" size="368640" crc="52466f8e" sha1="f96cd87ec0b91d129c754ef9f1d83c3d8e1d9f6a"/>
@@ -1083,7 +1083,7 @@ license:CC0-1.0
 		<description>DataStar v1.42 + ReportStar v1.03</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="368640">
 				<rom name="dmv_datastar_reportstar.ima" size="368640" crc="c93f5a97" sha1="cce9cec9e8a874f1009aded5bc4b90cb0507a285"/>
@@ -1106,7 +1106,7 @@ license:CC0-1.0
 		<description>EXCHANGE DOS</description>
 		<year>1983</year>
 		<publisher>NCR Corporation</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="64327">
 				<rom name="dmv_cpm_ms-dos_xfer_ms-dos.td0" size="64327" crc="843487fc" sha1="7c8484c732188b12d42c0b208762688b86cfea80"/>
@@ -1337,7 +1337,7 @@ license:CC0-1.0
 		<description>DOS Tools</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="310424">
 				<rom name="5toolup.td0" size="310424" crc="0d6dd24b" sha1="9af548e2a8f7796051142d571a1ffdfa0b5876fd"/>
@@ -1349,7 +1349,7 @@ license:CC0-1.0
 		<description>DOS Utilities</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="120724">
 				<rom name="5dos.td0" size="120724" crc="1b9be00b" sha1="7e836ae19df1c60fdea3c7415e85c83682a4625d"/>
@@ -1361,7 +1361,7 @@ license:CC0-1.0
 		<description>Norton Utilities v3.00</description>
 		<year>1985</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="330832">
 				<rom name="5numasm.td0" size="330832" crc="816b44d6" sha1="4aca217035365e10ff3a571a9fff2714fed24459"/>
@@ -1373,7 +1373,7 @@ license:CC0-1.0
 		<description>Norton Utilities v3.00 (alt)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="360330">
 				<rom name="5clock.td0" size="360330" crc="754edfaf" sha1="1019de5737c16ea41bd13288f98529750d3fcc0e"/>
@@ -1385,7 +1385,7 @@ license:CC0-1.0
 		<description>OPEN ACCESS (3 LZH archives)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="366876">
 				<rom name="5oa.td0" size="366876" crc="9f19d87e" sha1="6fffb96196f027f123f8858cf3093e2efa2c8850"/>
@@ -1397,7 +1397,7 @@ license:CC0-1.0
 		<description>Print Master (2 LZH archives)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="292654">
 				<rom name="5pm.td0" size="292654" crc="c088727d" sha1="f18d7a53eaaef55b0ccffa795c41677db7681f8b"/>
@@ -1420,7 +1420,7 @@ license:CC0-1.0
 		<description>Bradford (LZH archive)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires MS-DOS" />
+		<info name="required_os" value="MS-DOS" />
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="215116">
 				<rom name="5noidea.td0" size="215116" crc="9ad1dd63" sha1="d1144b5ddc5f1256ca03428c61abeb035e752a39"/>

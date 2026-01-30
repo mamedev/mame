@@ -658,7 +658,7 @@ void segaxbd_state::generic_iochip0_lamps_w(uint8_t data)
 
 //-------------------------------------------------
 //  aburner2_motor_r - motor reads from port A
-//  of I/O chip 0 for Afterburner II
+//  of I/O chip 0 for After Burner II
 //-------------------------------------------------
 
 uint8_t segaxbd_state::aburner2_motor_r()
@@ -672,7 +672,7 @@ uint8_t segaxbd_state::aburner2_motor_r()
 
 //-------------------------------------------------
 //  aburner2_motor_w - motor writes to port B
-//  of I/O chip 0 for Afterburner II
+//  of I/O chip 0 for After Burner II
 //-------------------------------------------------
 
 void segaxbd_state::aburner2_motor_w(uint8_t data)
@@ -1147,7 +1147,7 @@ static INPUT_PORTS_START( aburner )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// According to the manual, SWB:4 sets 3 or 4 lives, but it doesn't actually do that.
-	// However, it does on Afterburner II.  Maybe there's another version of Afterburner
+	// However, it does on After Burner II.  Maybe there's another version of After Burner
 	// that behaves as the manual suggests.
 	// In the Japanese manual "DIP SW B:4 / NOT USED"
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWB:5")
@@ -2041,7 +2041,7 @@ void segaxbd_new_state::sega_rascot(machine_config &config)
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Afterburner, Sega X-board
+//  After Burner, Sega X-board
 //  CPU: 68000 (317-????)
 //
 //  Missing the Deluxe/Upright English (US?) version ROM set
@@ -2063,7 +2063,7 @@ void segaxbd_new_state::sega_rascot(machine_config &config)
 //     EPR-11100.101
 //     EPR-11101.105
 //     EPR-11094.92--
-//     EPR-11095.96  \ These 4 found in Afterburner II (German)??
+//     EPR-11095.96  \ These 4 found in After Burner II (German)??
 //     EPR-11096.100 /
 //     EPR-11097.104-
 //   Sound Data
@@ -2117,7 +2117,7 @@ ROM_END
 //*************************************************************************************************************************
 //*************************************************************************************************************************
 //*************************************************************************************************************************
-//  Afterburner II, Sega X-board
+//  After Burner II, Sega X-board
 //  CPU: 68000 (317-????)
 //
 ROM_START( aburner2 )
@@ -2165,7 +2165,7 @@ ROM_START( aburner2 )
 ROM_END
 
 //*************************************************************************************************************************
-//  Afterburner II (German), Sega X-board
+//  After Burner II (German), Sega X-board
 //  CPU: 68000 (317-????)
 //  Sega Game ID #: 834-6335-04 AFTER BURNER
 //

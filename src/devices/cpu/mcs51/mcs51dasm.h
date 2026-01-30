@@ -60,11 +60,11 @@ protected:
 	virtual void disassemble_op_lcall(std::ostream& stream, unsigned& PC, const data_buffer& params);
 	virtual offs_t disassemble_op(std::ostream &stream, unsigned PC, offs_t pc, const data_buffer &opcodes, const data_buffer &params, uint8_t op);
 
-	std::string get_data_address( uint8_t arg ) const;
-	std::string get_bit_address( uint8_t arg ) const;
+	std::string get_data_address(uint8_t arg) const;
+	std::string get_bit_address(uint8_t arg) const;
+
 private:
 	std::unordered_map<offs_t, const char *> m_names;
-
 };
 
 class i8051_disassembler : public mcs51_disassembler

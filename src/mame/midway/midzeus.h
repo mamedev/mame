@@ -78,7 +78,7 @@ public:
 		m_ioasic(*this, "ioasic"),
 		m_ram_base(*this, "ram_base"),
 		m_nvram(*this, "nvram"),
-		m_tms32032_control(*this, "tms32032_ctl"),
+		m_tms320c32_control(*this, "tms320c32_ctl"),
 		m_mainbank(*this, "mainbank")
 	{ }
 
@@ -96,8 +96,8 @@ protected:
 	void cmos_protect_w(uint32_t data);
 	uint32_t disk_asic_jr_r(offs_t offset);
 	void disk_asic_jr_w(offs_t offset, uint32_t data);
-	uint32_t tms32032_control_r(offs_t offset);
-	void tms32032_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t tms320c32_control_r(offs_t offset);
+	void tms320c32_control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t zeus_r(offs_t offset);
 	void zeus_w(offs_t offset, uint32_t data);
 
@@ -121,7 +121,7 @@ protected:
 	required_device<midway_ioasic_device> m_ioasic;
 	required_shared_ptr<uint32_t> m_ram_base;
 	required_shared_ptr<uint32_t> m_nvram;
-	required_shared_ptr<uint32_t> m_tms32032_control;
+	required_shared_ptr<uint32_t> m_tms320c32_control;
 	optional_memory_bank m_mainbank;
 
 private:

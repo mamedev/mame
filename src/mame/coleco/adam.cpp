@@ -351,7 +351,7 @@ uint8_t adam_state::mreq_r(offs_t offset)
 {
 	int bmreq = 0, biorq = 1, eos_enable = 1, boot_rom_cs = 1, aux_decode_1 = 1, aux_rom_cs = 1, cas1 = 1, cas2 = 1, cs1 = 1, cs2 = 1, cs3 = 1, cs4 = 1;
 
-	uint8_t data = 0;
+	uint8_t data = 0xff;
 
 	if (offset < 0x8000)
 	{
@@ -889,8 +889,30 @@ void adam_state::adam_io(address_map &map)
 //-------------------------------------------------
 
 static INPUT_PORTS_START( adam )
-	// defined in bus/adamnet/kb.c
+	PORT_START("RESET") // switches on either side of cartridge slot
+	PORT_BIT(1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Computer Reset") PORT_CODE(KEYCODE_F11) PORT_WRITE_LINE_MEMBER(FUNC(adam_state::computer_reset_w))
+	PORT_BIT(2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Cartridge Reset") PORT_CODE(KEYCODE_F12) PORT_WRITE_LINE_MEMBER(FUNC(adam_state::game_reset_w))
 INPUT_PORTS_END
+
+
+void adam_state::computer_reset_w(int state)
+{
+	if (!state)
+		mioc_reset(false);
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	m_netcpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+}
+
+
+void adam_state::game_reset_w(int state)
+{
+	if (!state)
+		mioc_reset(true);
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+	m_netcpu->set_input_line(INPUT_LINE_RESET, state ? CLEAR_LINE : ASSERT_LINE);
+}
 
 
 
@@ -962,25 +984,28 @@ void adam_state::machine_start()
 
 void adam_state::machine_reset()
 {
-	if (m_cart->exists())
+	// reset to computer mode at power up
+	mioc_reset(false);
+}
+
+
+void adam_state::mioc_reset(bool game)
+{
+	if (game)
 	{
-		// game reset
+		// game mode
 		m_game = 1;
-		m_mioc = (HI_CARTRIDGE_ROM << 2) | LO_OS7_ROM_INTERNAL_RAM;
+		mioc_w((HI_CARTRIDGE_ROM << 2) | LO_OS7_ROM_INTERNAL_RAM);
 	}
 	else
 	{
-		// computer reset
+		// computer mode
 		m_game = 0;
-		m_mioc = 0;
+		mioc_w(0);
 	}
 
 	m_an = 0;
-
-	m_maincpu->reset();
-	m_netcpu->reset();
 }
-
 
 
 //**************************************************************************

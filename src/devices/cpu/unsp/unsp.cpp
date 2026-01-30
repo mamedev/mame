@@ -18,16 +18,18 @@
 
 #include "emu.h"
 #include "unsp.h"
-#include "unspfe.h"
 
 #include "unspdasm.h"
+#include "unspfe.h"
+
+#include "emuopts.h"
 
 #include <climits>
 
 DEFINE_DEVICE_TYPE(UNSP,    unsp_device,    "unsp",    "SunPlus u'nSP (ISA 1.0)")
 // 1.1 is just 1.0 with better CPI?
 DEFINE_DEVICE_TYPE(UNSP_11, unsp_11_device, "unsp_11", "SunPlus u'nSP (ISA 1.1)")
- // it's possible that most unSP systems we emulate are 1.2, but are not using 99% of the additional features / instructions over 1.0 (only enable_irq and enable_fiq are meant to be 1.2 specific and used, but that could be a research error)
+ // it's possible that most μ'nSP systems we emulate are 1.2, but are not using 99% of the additional features / instructions over 1.0 (only enable_irq and enable_fiq are meant to be 1.2 specific and used, but that could be a research error)
 DEFINE_DEVICE_TYPE(UNSP_12, unsp_12_device, "unsp_12", "SunPlus u'nSP (ISA 1.2)")
 // found on GCM394 die (based on use of 2 extended push/pop opcodes in the smartfp irq), has extra instructions
 DEFINE_DEVICE_TYPE(UNSP_20, unsp_20_device, "unsp_20", "SunPlus u'nSP (ISA 2.0)")
@@ -43,9 +45,9 @@ unsp_device::unsp_device(const machine_config &mconfig, device_type type, const 
 #if UNSP_LOG_OPCODES || UNSP_LOG_REGS
 	, m_log_ops(0)
 #endif
-	, m_drccache(CACHE_SIZE + sizeof(unsp_device))
-	, m_drcuml(nullptr)
-	, m_drcfe(nullptr)
+	, m_drccache(CACHE_SIZE + sizeof(internal_unsp_state))
+	, m_drcuml()
+	, m_drcfe()
 	, m_drcoptions(0)
 	, m_cache_dirty(0)
 	, m_entry(nullptr)
@@ -190,15 +192,23 @@ void unsp_device::unimplemented_opcode(uint16_t op, uint16_t ximm, uint16_t ximm
 
 void unsp_device::device_start()
 {
-
-	m_core = (internal_unsp_state *)m_drccache.alloc_near(sizeof(internal_unsp_state));
-	memset(m_core, 0, sizeof(internal_unsp_state));
-
 #if ENABLE_UNSP_DRC
 	m_enable_drc = allow_drc() && (m_iso < 12);
 #else
 	m_enable_drc = false;
 #endif
+
+	if (m_enable_drc)
+	{
+		m_drccache.allocate_cache(mconfig().options().drc_rwx());
+		m_core = m_drccache.alloc_near<internal_unsp_state>();
+	}
+	else
+	{
+		m_core = &m_local_core;
+	}
+	memset(m_core, 0, sizeof(internal_unsp_state));
+
 
 #if UNSP_LOG_REGS
 	if (m_enable_drc)
@@ -212,34 +222,37 @@ void unsp_device::device_start()
 	space(AS_PROGRAM).cache(m_cache);
 	space(AS_PROGRAM).specific(m_program);
 
-	uint32_t umlflags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, umlflags, 1, 23, 0);
+	if (m_enable_drc)
+	{
+		uint32_t umlflags = 0;
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, umlflags, 1, 23, 0);
 
-	// add UML symbols-
-	m_drcuml->symbol_add(&m_core->m_r[REG_SP], sizeof(uint32_t), "SP");
-	m_drcuml->symbol_add(&m_core->m_r[REG_R1], sizeof(uint32_t), "R1");
-	m_drcuml->symbol_add(&m_core->m_r[REG_R2], sizeof(uint32_t), "R2");
-	m_drcuml->symbol_add(&m_core->m_r[REG_R3], sizeof(uint32_t), "R3");
-	m_drcuml->symbol_add(&m_core->m_r[REG_R4], sizeof(uint32_t), "R4");
-	m_drcuml->symbol_add(&m_core->m_r[REG_BP], sizeof(uint32_t), "BP");
-	m_drcuml->symbol_add(&m_core->m_r[REG_SR], sizeof(uint32_t), "SR");
-	m_drcuml->symbol_add(&m_core->m_r[REG_PC], sizeof(uint32_t), "PC");
-	m_drcuml->symbol_add(&m_core->m_enable_irq, sizeof(uint32_t), "IRQE");
-	m_drcuml->symbol_add(&m_core->m_enable_fiq, sizeof(uint32_t), "FIQE");
-	m_drcuml->symbol_add(&m_core->m_fir_move, sizeof(uint32_t), "FIR_MOV");
-	m_drcuml->symbol_add(&m_core->m_sb, sizeof(uint32_t), "SB");
-	m_drcuml->symbol_add(&m_core->m_aq, sizeof(uint32_t), "AQ");
-	m_drcuml->symbol_add(&m_core->m_fra, sizeof(uint32_t), "FRA");
-	m_drcuml->symbol_add(&m_core->m_bnk, sizeof(uint32_t), "BNK");
-	m_drcuml->symbol_add(&m_core->m_ine, sizeof(uint32_t), "INE");
-	m_drcuml->symbol_add(&m_core->m_pri, sizeof(uint32_t), "PRI");
-	m_drcuml->symbol_add(&m_core->m_icount, sizeof(m_core->m_icount), "icount");
+		// add UML symbols-
+		m_drcuml->symbol_add(&m_core->m_r[REG_SP], sizeof(uint32_t), "SP");
+		m_drcuml->symbol_add(&m_core->m_r[REG_R1], sizeof(uint32_t), "R1");
+		m_drcuml->symbol_add(&m_core->m_r[REG_R2], sizeof(uint32_t), "R2");
+		m_drcuml->symbol_add(&m_core->m_r[REG_R3], sizeof(uint32_t), "R3");
+		m_drcuml->symbol_add(&m_core->m_r[REG_R4], sizeof(uint32_t), "R4");
+		m_drcuml->symbol_add(&m_core->m_r[REG_BP], sizeof(uint32_t), "BP");
+		m_drcuml->symbol_add(&m_core->m_r[REG_SR], sizeof(uint32_t), "SR");
+		m_drcuml->symbol_add(&m_core->m_r[REG_PC], sizeof(uint32_t), "PC");
+		m_drcuml->symbol_add(&m_core->m_enable_irq, sizeof(uint32_t), "IRQE");
+		m_drcuml->symbol_add(&m_core->m_enable_fiq, sizeof(uint32_t), "FIQE");
+		m_drcuml->symbol_add(&m_core->m_fir_move, sizeof(uint32_t), "FIR_MOV");
+		m_drcuml->symbol_add(&m_core->m_sb, sizeof(uint32_t), "SB");
+		m_drcuml->symbol_add(&m_core->m_aq, sizeof(uint32_t), "AQ");
+		m_drcuml->symbol_add(&m_core->m_fra, sizeof(uint32_t), "FRA");
+		m_drcuml->symbol_add(&m_core->m_bnk, sizeof(uint32_t), "BNK");
+		m_drcuml->symbol_add(&m_core->m_ine, sizeof(uint32_t), "INE");
+		m_drcuml->symbol_add(&m_core->m_pri, sizeof(uint32_t), "PRI");
+		m_drcuml->symbol_add(&m_core->m_icount, sizeof(m_core->m_icount), "icount");
 
-	/* initialize the front-end helper */
-	m_drcfe = std::make_unique<unsp_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+		/* initialize the front-end helper */
+		m_drcfe = std::make_unique<unsp_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
-	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = true;
+		/* mark the cache dirty so it is updated on next execute */
+		m_cache_dirty = true;
+	}
 
 	// register our state for the debugger
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_core->m_r[REG_SR]).callimport().callexport().formatstr("%4s").noshow();
@@ -339,14 +352,8 @@ void unsp_20_device::device_reset()
 
 void unsp_device::device_stop()
 {
-	if (m_drcfe != nullptr)
-	{
-		m_drcfe = nullptr;
-	}
-	if (m_drcuml != nullptr)
-	{
-		m_drcuml = nullptr;
-	}
+	m_drcfe.reset();
+	m_drcuml.reset();
 #if UNSP_LOG_REGS
 	fclose(m_log_file);
 #endif

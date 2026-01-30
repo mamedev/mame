@@ -782,6 +782,16 @@ around it by adding **-U_FORTIFY_SOURCE** to the compiler flags (e.g. by using
 the **ARCHOPTS** setting, or setting the **CFLAGS** and **CXXFLAGS** environment
 variables.
 
+Issues affecting MinGW clang
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+MinGW clang and llvm can give spurious undefined symbol errors when linking
+using CodeView format symbols with high symbol detail levels.  If you encounter
+undefined symbol errors when linking with **PDB_SYMBOLS=1** to produce CodeView
+format symbols, try setting **SYMLEVEL=1** to reduce the symbol detail level
+(line number tables will still be included, but local variables will be
+omitted).
+
 Issues affecting Microsoft Visual Studio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

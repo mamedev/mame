@@ -452,8 +452,8 @@ void x1twin_state::x1twin(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, pce_io);
 	m_maincpu->port_in_cb().set(FUNC(x1twin_state::pce_joystick_r));
 	m_maincpu->port_out_cb().set(FUNC(x1twin_state::pce_joystick_w));
-	m_maincpu->add_route(0, "pce_l", 0.5);
-	m_maincpu->add_route(1, "pce_r", 0.5);
+	m_maincpu->add_route(0, "pce", 0.5, 0);
+	m_maincpu->add_route(1, "pce", 0.5, 1);
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(x1twin_state::pce_interrupt), "pce_screen", 0, 1);
 	#endif
@@ -493,10 +493,8 @@ void x1twin_state::x1twin(machine_config &config)
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "x1_cart", "bin,rom");
 
-	SPEAKER(config, "x1_l").front_left();
-	SPEAKER(config, "x1_r").front_right();
-	SPEAKER(config, "pce_l").front_left();
-	SPEAKER(config, "pce_r").front_right();
+	SPEAKER(config, "x1", 2).front();
+	SPEAKER(config, "pce", 2).front();
 
 //  SPEAKER(config, "speaker", 2).front();
 
@@ -504,13 +502,13 @@ void x1twin_state::x1twin(machine_config &config)
 	ay8910_device &ay(AY8910(config, "ay", MAIN_CLOCK/8));
 	ay.port_a_read_callback().set_ioport("P1");
 	ay.port_b_read_callback().set_ioport("P2");
-	ay.add_route(ALL_OUTPUTS, "x1_l", 0.25);
-	ay.add_route(ALL_OUTPUTS, "x1_r", 0.25);
+	ay.add_route(ALL_OUTPUTS, "x1", 0.25, 0);
+	ay.add_route(ALL_OUTPUTS, "x1", 0.25, 1);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_formats(x1_cassette_formats);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "x1_l", 0.25).add_route(ALL_OUTPUTS, "x1_r", 0.10);
+	m_cassette->add_route(ALL_OUTPUTS, "x1", 0.25, 0).add_route(ALL_OUTPUTS, "x1", 0.10, 1);
 	m_cassette->set_interface("x1_cass");
 
 	SOFTWARE_LIST(config, "cass_list").set_original("x1_cass");
