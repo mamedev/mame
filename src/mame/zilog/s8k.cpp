@@ -643,8 +643,7 @@ uint16_t s8k_state::ram_r(address_space &space, offs_t offset, uint16_t mask)
 	{
 		const uint8_t *memptr = m_ram->pointer() + offset;
 
-		return (((mask & 0xff00) & ((uint16_t)(memptr[0]) << 8)) |
-				((mask & 0x00ff) & ((uint16_t)(memptr[1]))));
+		return (mask & big_endianize_int16(reinterpret_cast<const uint16_t*>(memptr)[0]));
 	}
 	else if(space.spacenum() == AS_PROGRAM)
 		return 0x8d07;	// NOP instruction
