@@ -37,8 +37,8 @@ protected:
 
 	virtual void machine_reset() override ATTR_COLD;
 
-	void md_core_ntsc(machine_config &config);
-	void md_core_pal(machine_config &config);
+	void md_core_ntsc(machine_config &config, bool use_lcm_scaling = false);
+	void md_core_pal(machine_config &config, bool use_lcm_scaling = false);
 
 	void megadriv_tas_callback(offs_t offset, uint8_t data);
 
@@ -110,11 +110,10 @@ protected:
 
 	void megadriv_stop_scanline_timer();
 
-	void md_ntsc(machine_config &config);
-	void md2_ntsc(machine_config &config);
-	void md_pal(machine_config &config);
-	void md2_pal(machine_config &config);
-	void md_bootleg(machine_config &config);
+	void md_ntsc(machine_config &config, bool use_lcm_scaling = false);
+	void md2_ntsc(machine_config &config, bool use_lcm_scaling = false);
+	void md_pal(machine_config &config, bool use_lcm_scaling = false);
+	void md2_pal(machine_config &config, bool use_lcm_scaling = false);
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
