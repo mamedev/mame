@@ -190,15 +190,15 @@ Board contains only 29 ROMs and not much else.
 
 #include "emu.h"
 #include "emupal.h"
+#include "taito_en.h"
+#include "taitoio.h"
 #include "tc0100scn.h"
 #include "tc0360pri.h"
 #include "tc0480scp.h"
-#include "taito_en.h"
 
 #include "cpu/m68000/m68020.h"
 #include "machine/adc0808.h"
 #include "machine/eepromser.h"
-#include "taitoio.h"
 #include "machine/watchdog.h"
 #include "sound/es5506.h"
 #include "screen.h"
@@ -310,6 +310,8 @@ void undrfire_state::video_start()
 		m_palette->set_pen_color(i, rgb_t(0,0,0));
 
 	m_frame_counter = 0;
+
+	save_item(NAME(m_dislayer));
 }
 
 /***************************************************************
@@ -903,6 +905,10 @@ void undrfire_state::machine_start()
 	m_gun_recoil.resolve();
 	m_lamp.resolve();
 	m_wheel_vibration.resolve();
+
+	save_item(NAME(m_port_sel));
+	save_item(NAME(m_frame_counter));
+	save_item(NAME(m_rotate_ctrl));
 }
 
 /**********************************************************
