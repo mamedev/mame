@@ -2,6 +2,14 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
+
+Majority of cassette based software can be loaded simply by:
+- Pressing ENTER at both the 'How many disk drives' and 'How many files' prompts.
+- Typing CLOAD and pressing ENTER to start loading. 
+- Typing RUN and ENTER once loading is complete.
+
+A smaller number of software titles require specific loading instructions, these are noted
+in the 'usage' info field.
 -->
 <softwarelist name="pasopia7_cass" description="Toshiba Pasopia 7 PA7007 cassettes">
 
@@ -16,6 +24,268 @@ Keeps ringing [DAC1BIT] when ball goes O.B.
 		<part name="cass1" interface="pasopia7_cass">
 			<dataarea name="cass" size="31821868">
 				<rom name="3d golf simulation.wav" size="31821868" crc="1005e6a0" sha1="538562b9c80f07b8671454cc5a2e270fec7440c9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="akarui" supported="yes">
+		<description>Akarui Noen</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="4070572">
+				<rom name="akarui noen.wav" size="4070572" crc="92ca1ee8" sha1="d2e907ad4dde6c9a5e5a87bf96b5c50d361f7c8f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphos" supported="yes">
+		<description>Alphos</description>
+		<year>1983</year>
+		<publisher>Namco</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="6947322">
+				<rom name="alphos.wav" size="6947322" crc="91a14b84" sha1="398e878ce9a35b31cf55057a191d20a460353e69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ameno" supported="yes">
+		<description>Ame No Hi Wa Oisogashi</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="3618652">
+				<rom name="ame no hi wa oisogashi.wav" size="3618652" crc="05d0c079" sha1="21e5fe0569e2591ef9f26f6954ca3fd37c4a7724"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bombrman" supported="yes">
+		<description>Bomber Man</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="9753792">
+				<rom name="bomber man.wav" size="9753792" crc="2a3ee7f5" sha1="987bd1f3a8b6074a3beb2928d01f6cceacabd173"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubblekd" supported="yes">
+		<description>Bubble Kund 1999</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="3230262">
+				<rom name="bubble kund 1999.wav" size="3230262" crc="34ee7a0d" sha1="9efd2074bc1f10ccbbf849a35e82d6f111c518d7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cannonbl" supported="yes">
+		<description>Cannon Ball</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="2188752">
+				<rom name="cannon ball.wav" size="2188752" crc="0a7926ea" sha1="f651dcee04aa84f14d5aaeb8457454d796942461"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="doordoor" supported="yes">
+		<description>Door Door</description>
+		<year>1983</year>
+		<publisher>Enix</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="4968392">
+				<rom name="door door.wav" size="4968392" crc="d2d10ab6" sha1="0ba01de1bd672861e129a508ea7b8810d1dfc175"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fieldwar" supported="yes">
+		<description>Field Wars</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="5944232">
+				<rom name="field wars.wav" size="5944232" crc="53f452f6" sha1="cc5ce65a4ffe4cafedec851983f2c84fa5773787"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flyboy" supported="no">
+		<description>Fly Boy</description>
+		<year>1983</year>
+		<publisher>SilverBall Software</publisher>		
+		<notes><![CDATA[
+Freezes during loading.
+]]></notes>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="6391482">
+				<rom name="fly boy.wav" size="6391482" crc="333ad602" sha1="d1bfdfbf582542c1343e3c09fb0599083746a4a4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fruitpar" supported="yes">
+		<description>Fruits Paradise</description>
+		<year>1984</year>
+		<publisher>Tatsuno System</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="5289582">
+				<rom name="fruits paradise.wav" size="5289582" crc="b0c3bee6" sha1="1c547c488b0b50ca2ac4e6d2d6e3f70b2a13ab26"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="golfgame" supported="no">
+		<description>Golf game</description>
+		<year>1984</year>
+		<publisher>Tatsuno System</publisher>		
+		<notes><![CDATA[
+Freezes at loading screen.
+]]></notes>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="6066032">
+				<rom name="golf game.wav" size="6066032" crc="d70dccb8" sha1="414229740bab909a3379158c7054762aa832f18a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hitsuji" supported="yes">
+		<description>Hitsuji Ya-i!</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="3837482">
+				<rom name="hitsuji yai.wav" size="3837482" crc="219bf296" sha1="74f28e21e6f075830913d278c8a7ba1abe76d783"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="iceblock" supported="no">
+		<description>Ice Block</description>
+		<year>1983</year>
+		<publisher>dB-Soft</publisher>		
+		<notes><![CDATA[
+Freezes at loading screen.
+]]>]</notes>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="6828832">
+				<rom name="ice block.wav" size="6828832" crc="8Bb13e5b" sha1="c9546d481bc348cb6679048706d1934cb2b6adb6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jankyou" supported="yes">
+		<description>Jan-kyou</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="4114462">
+				<rom name="jankyou.wav" size="4114462" crc="052752dc" sha1="7dce7b9292fc693495ca88a6b9ca6d881975a2be"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="justicek" supported="yes">
+		<description>Justice Knight</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="6078422">
+				<rom name="justice knight.wav" size="6078422" crc="1786b8f7" sha1="fd17db777001795fbf8a403cac5929fd8924e580"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kaerusht" supported="yes">
+		<description>Kaeru Shooter</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="2140262">
+				<rom name="kaeru shooter.wav" size="2140262" crc="b15f28e3" sha1="8258e4aa00536c8f6b587ab843e47e4381df6e69"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mahjong" supported="no">
+		<description>Mahjong</description>
+		<year>1983</year>
+		<publisher>Tatsuno System</publisher>		
+		<notes><![CDATA[
+Freezes during loading.
+]]></notes>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="7231862">
+				<rom name="mahjong.wav" size="7231862" crc="14787598" sha1="46631c97b051ab9af26207f9ef155763962aeeba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="majomhka" supported="no">
+		<description>Majo Moheka no Yakata</description>
+		<year>1983</year>
+		<publisher>Compaq</publisher>		
+		<notes><![CDATA[
+Loads but marked unsupported as instruction to start game is not known.
+]]></notes>
+		<info name="usage" value="BLOAD #-1,&quot;ADVEN&quot;"/>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="2696042">
+				<rom name="majo moheka no yakata.wav" size="2696042" crc="59ce7af6" sha1="71e089cab922b2cd2dfe27afd2e156ef6a44ba85"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osakajin" supported="yes">
+		<description>Osaka no Jin</description>
+		<year>1983</year>
+		<publisher>KIYA Overseas Industry Co.,Ltd</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="5883672">
+				<rom name="osaka no jin.wav" size="5883672" crc="8e7850ae" sha1="009eed6ca4b731d10a59c118b4c0075ae8bc113b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="packings" supported="yes">
+		<description>Packings</description>
+		<year>1983</year>
+		<publisher>Brain Computer</publisher>
+		<info name="usage" value="BLOAD #-1,&quot;PACKIN&quot; then A=&amp;HC000:CALL A"/>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="2766952">
+				<rom name="packings.wav" size="2766952" crc="bbce454b" sha1="9bd7447b6ca1d9b5493ef6a5df336ae14de87d93"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pasprogs" supported="no">
+		<description>Pasopia7 Programs (System Tape)</description>
+		<year>19??</year>
+		<publisher>Toshiba</publisher>		
+		<notes><![CDATA[
+Freezes at loading screen.
+]]></notes>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="35571600">
+				<rom name="pasopia7 programs.wav" size="35571600" crc="a93aa810" sha1="c6de7d9ff5e2b95293a048d83cad50f6f8a18fc1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poibosu" supported="yes">
+		<description>Poibosu Part 1</description>
+		<year>1983</year>
+		<publisher>Zat Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="7191032">
+				<rom name="poibosu.wav" size="7191032" crc="07272638" sha1="3670eeb53c9a316fa5faff9f638d1cbbabdde0d9"/>
 			</dataarea>
 		</part>
 	</software>
@@ -50,5 +320,37 @@ Black screen, tight loops on PPI port B bit 6
 		</part>
 	</software>
 
+	<software name="spy0011" supported="yes">
+		<description>SPY-0011</description>
+		<year>1983</year>
+		<publisher>Champion Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="5784542">
+				<rom name="spy-0011.wav" size="5784542" crc="9a28a57a" sha1="277365cb84ac0770e8b0024d70f004a1521a3ff4"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball" supported="yes">
+		<description>Super Baseball</description>
+		<year>1983</year>
+		<publisher>Tiny Soft</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="4923582">
+				<rom name="super baseball.wav" size="4923582" crc="890c8656" sha1="15a6c38abcacdd0d4322d85e797fe99e483ecfc0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tsushogi" supported="yes">
+		<description>Tsume Shogi</description>
+		<year>1983</year>
+		<publisher>Apollo Technica</publisher>
+		<part name="cass1" interface="pasopia7_cass">
+			<dataarea name="cass" size="5259002">
+				<rom name="tsume shogi.wav" size="5259002" crc="eb13b96c" sha1="1231726737513ac4fccc4a7def456eb485c3249b"/>
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
