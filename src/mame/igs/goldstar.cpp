@@ -270,12 +270,12 @@
 #include "sound/sn76496.h"
 #include "sound/ymopl.h"
 #include "video/ramdac.h"
-#include "video/resnet.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "video/resnet.h"
 
 #include <algorithm>
 
@@ -342,7 +342,6 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-
 	void goldfrui(machine_config &config) ATTR_COLD;
 	void goldstar(machine_config &config) ATTR_COLD;
 	void goldstbl(machine_config &config) ATTR_COLD;
@@ -379,7 +378,6 @@ protected:
 	optional_shared_ptr<uint8_t> m_bg_scroll;
 
 	optional_shared_ptr_array<uint8_t, 4> m_reel_ram;
-
 	optional_shared_ptr_array<uint8_t, 4> m_reel_scroll;
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
@@ -412,6 +410,7 @@ protected:
 	void fg_atrram_w(offs_t offset, uint8_t data);
 	void bg_vidram_w(offs_t offset, uint8_t data);
 	void bg_atrram_w(offs_t offset, uint8_t data);
+	void reel_mark_all_dirty();
 	template <uint8_t Which> void reel_ram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void reel_scroll_w(offs_t offset, uint8_t data);
 	void goldstar_fa00_w(uint8_t data);
@@ -741,7 +740,6 @@ private:
 	uint8_t sm7831_read(offs_t offset);
 	void sm7831_write(offs_t offset, uint8_t data);
 
-
 	// handlers for lucky bar MCU ports
 	uint8_t mcu_portb_r();
 	void mcu_porta_w(uint8_t data);
@@ -985,7 +983,6 @@ void wingco_state::machine_start()
 	save_item(NAME(m_vidreg));
 	save_item(NAME(sm7831_X_reg));
 	save_item(NAME(sm7831_Y_reg));
-
 }
 
 void unkch_state::machine_start()
@@ -1061,7 +1058,6 @@ void goldstar_state::reel_scroll_w(offs_t offset, uint8_t data)
 {
 	m_reel_scroll[Which][offset] = data;
 	m_reel_scroll[Which][offset + 1] = data;
-
 }
 
 
@@ -1149,9 +1145,18 @@ TILE_GET_INFO_MEMBER(cmaster_state::get_pkrmast_bg_tile_info)
 
 //  popmessage("m_reel_bank:%02x", (m_reel_bank - 1) );
 //  popmessage("code:%02x", m_bg_vidram[tile_index] );
-
 }
 
+
+void goldstar_state::reel_mark_all_dirty()
+{
+	for (auto & tilemap : m_reel_tilemap)
+	{
+		if (!tilemap)
+			continue;
+		tilemap->mark_all_dirty();
+	}
+}
 
 template <uint8_t Which>
 void goldstar_state::reel_ram_w(offs_t offset, uint8_t data)
@@ -1404,7 +1409,6 @@ VIDEO_START_MEMBER(unkch_state, bonusch)
 
 	// 1 for regular reels; 2 for d-up reel numbers.
 //  m_reelbank = 2;
-
 }
 
 VIDEO_START_MEMBER(cmaster_state, pkrmast)
@@ -1482,7 +1486,6 @@ VIDEO_START_MEMBER(cmaster_state, amaztsk)
 	m_fg_tilemap->set_transparent_pen(0);
 
 //  m_enable_reg = 0x0b;
-
 }
 
 VIDEO_START_MEMBER(cmaster_state, animalhs)
@@ -1873,11 +1876,11 @@ uint32_t wingco_state::screen_update_flaming7(screen_device &screen, bitmap_rgb3
 	{
 		for (int i = 0; i < 64; i++)
 		{
-				// all three reels tilemaps
-				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
-				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
-				m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
-				m_reel_tilemap[3]->set_scrolly(i, m_reel_scroll[3][i]);
+			// all four reels tilemaps
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+			m_reel_tilemap[3]->set_scrolly(i, m_reel_scroll[3][i]);
 		}
 
 		const rectangle visible1(0*8, (14+49)*8-1,  4*8,  (4+7)*8-1);
@@ -2340,7 +2343,6 @@ void cmast97_state::cmast97_palette_init(palette_device &palette) const
 		uint16_t const data = (colours[i + 0x100] + (colours[i] << 8)) >> 1;
 		palette.set_pen_color(i, pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 	}
-
 }
 
 void goldstar_state::cm_palette(palette_device &palette) const
@@ -2513,7 +2515,6 @@ void goldstar_state::bonusch_palette(palette_device &palette) const
 		bit3 = BIT(color_prom[0x500 + i], 3);
 		int const b2 = combine_weights(weights_b, bit0, bit1, bit2, bit3);
 
-
 		// PROMs circuitry, 1st GFX bank
 		palette.set_pen_color(i, rgb_t(r1, g1, b1));
 
@@ -2533,9 +2534,7 @@ void goldstar_state::goldstar_fa00_w(uint8_t data)
 	// bit 1 toggles continuously - might be irq enable or watchdog reset
 	// bit 2 selects background gfx color (I think)
 	m_bgcolor = (data & 0x04) >> 2;
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
+	reel_mark_all_dirty();
 
 	m_ticket_dispenser->motor_w(BIT(data, 7));
 }
@@ -2606,10 +2605,7 @@ void cmaster_state::background_col_w(uint8_t data)
 	m_bgcolor = (data & 0x03) >> 0;
 	#endif
 
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
-
+	reel_mark_all_dirty();
 }
 
 
@@ -2807,7 +2803,6 @@ void cmaster_state::coincount_w(uint8_t data)
 
 	m_ticket_dispenser->motor_w(BIT(data,7));
 //  popmessage("counters: %02X", data);
-
 }
 
 void cmaster_state::pkm_out0_w(uint8_t data)
@@ -2827,7 +2822,6 @@ void cmaster_state::pkm_out0_w(uint8_t data)
 
 	m_ticket_dispenser->motor_w(BIT(data,0)); //pkrmast:port 0x00 - jkrmast:port 0x13
 //  popmessage("pkm_out0_w: %02X", data);
-
 }
 
 
@@ -2836,7 +2830,6 @@ void cmaster_state::jkm_vid_reg_w(uint8_t data)
 	m_enable_reg = bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0);
 
 //  popmessage("jkm data, enable reg:%02x :: reg:%02x", data, m_enable_reg);
-
 }
 
 void cmaster_state::pkm_vid_reg_w(uint8_t data)
@@ -2848,7 +2841,6 @@ void cmaster_state::pkm_vid_reg_w(uint8_t data)
 
 //  popmessage("pkm enable reg:%02x", m_enable_reg );
 //  popmessage("pkm reel bank:%02x", m_reel_bank );
-
 }
 
 void cmaster_state::pkm_reel_reg_w(uint8_t data)
@@ -2871,7 +2863,6 @@ void cmaster_state::pkm_reel_reg_w(uint8_t data)
 	m_bg_tilemap->mark_all_dirty();
 
 //  popmessage("pkm reel data:%02x", data );
-
 }
 
 void cmaster_state::ll3_vid_reg_w(uint8_t data)
@@ -2916,25 +2907,19 @@ void cmaster_state::czb_vid_reg_w(uint8_t data)
 
 void cb3_state::coincount_w(uint8_t data)
 {
-
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);  // Counter 1 Coin A
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);  // Counter 2 Key In
 	machine().bookkeeping().coin_counter_w(2, data & 0x10);  // Counter 3 Coin C
 	machine().bookkeeping().coin_counter_w(3, data & 0x08);  // Counter 4 Coin D
 	machine().bookkeeping().coin_counter_w(4, data & 0x01);  // Counter 5 Payout
-
 }
 
 void cb3_state::misc_out_w(uint8_t data)
 {
-
 	m_bgcolor = (data & 0x04) >> 2;
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
+	reel_mark_all_dirty();
 
 	m_ticket_dispenser->motor_w(!BIT(data,7));
-
 }
 
 void wingco_state::magodds_outb850_w(uint8_t data)
@@ -2942,7 +2927,7 @@ void wingco_state::magodds_outb850_w(uint8_t data)
 	uint8_t pal_index[8] = { 0, 1, 6, 3, 4, 5, 2, 7 }; // fix reels BG color
 	m_bgreels = pal_index[data & 0x07];                // set BG reels color index
 
-	if (data&0x20)
+	if (data & 0x20)
 		m_tile_bank = 2;
 	else
 		m_tile_bank = 0;
@@ -3072,9 +3057,7 @@ void wingco_state::system_outputc_w(uint8_t data)
 
 	m_ticket_dispenser->motor_w(!BIT(data, 7));
 
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
+	reel_mark_all_dirty();
 
 //  popmessage("system_outputc_w %02x",data);
 }
@@ -3084,13 +3067,10 @@ void wingco_state::flaming7_outputc_w(uint8_t data)
 	m_nmi_enable = data & 8;
 	m_vidreg = data & 2;
 
-
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
+	reel_mark_all_dirty();
 
 	//  popmessage("system_outputc_w %02x",data);
 }
@@ -3224,7 +3204,6 @@ void wingco_state::tmcu_p1_out(uint8_t data)
 {
 	m_mcu_p1 = data;
 //  logerror("MCU Port1:%02x\n", tmcu_p1_out);
-
 }
 
 uint8_t cd3poker_state::armaly_prot_r()
@@ -3382,9 +3361,7 @@ void cmaster_state::anhs_reel_reg_w(uint8_t data)
 		default:  m_reel_bank = 0x0;
 	}
 
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
+	reel_mark_all_dirty();
 }
 
 
@@ -3626,7 +3603,6 @@ void wingco_state::sm7831_write(offs_t offset, uint8_t data)
 				break;
 		default: break;
 	}
-
 }
 
 
@@ -3743,7 +3719,6 @@ void sanghopm_state::star100_map(address_map &map)
 
 	map(0xf000, 0xf7ff).ram().share("nvram");
 	map(0xf800, 0xffff).ram();
-
 }
 
 void sanghopm_state::star100_readport(address_map &map)
@@ -3774,7 +3749,6 @@ void sanghopm_state::star100_readport(address_map &map)
 
 	map(0xe0, 0xe0).nopw();                                // bit0 = watchdog feeder
 	map(0xe1, 0xe1).w(FUNC(sanghopm_state::enablebg_w));   // enable/disable bg register.
-
 }
 
 /*
@@ -3882,7 +3856,6 @@ void cb3_state::ncb3_readwriteport(address_map &map)
 
 	map(0x10, 0x10).portr("DSW5");  // confirmed for ncb3
 	map(0x81, 0x81).w(FUNC(cb3_state::ncb3_port81_w));  // ---> large writes.
-
 }
 
 /* ncb3 findings...
@@ -3970,7 +3943,6 @@ void goldstar_state::wcherry_readwriteport(address_map &map)
 	map(0x08, 0x08).noprw(); // leftover $182f
 	map(0x10, 0x10).nopr();  // leftover
 	map(0x81, 0x81).nopw();  // watchdog?
-
 }
 
 
@@ -4004,7 +3976,6 @@ void cmaster_state::cm99_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x5fff).bankr("bank1");
 	map(0x6000, 0xcfff).rom();
-
 
 	map(0xd000, 0xd7ff).ram().share("nvram");
 	map(0xd800, 0xdfff).ram();
@@ -4054,7 +4025,6 @@ void cmaster_state::clb_map(address_map &map)
 {
 	cm_map(map);
 	map(0xd800, 0xdfff).rom();
-
 }
 
 void cmaster_state::ll3_map(address_map &map)
@@ -16237,7 +16207,6 @@ void wingco_state::nd8lines(machine_config &config)
 	config.device_remove("aysnd");
 
 	SN76489A(config, "draw8sn", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
-
 }
 
 void wingco_state::lucky8f(machine_config &config)
@@ -16518,7 +16487,6 @@ void wingco_state::magodds(machine_config &config)
 
 	// payout hardware
 	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
-
 }
 
 void goldstar_state::kkotnoli(machine_config &config)
@@ -16775,7 +16743,6 @@ void cmaster_state::amaztsk(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(cmaster_state, amaztsk)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(cmaster_state::screen_update_amaztsk));
-
 }
 
 void unkch_state::vblank_irq(int state)
@@ -30757,7 +30724,6 @@ ROM_END
 
 ****************************************************/
 
-
 void goldstar_state::init_goldstar()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -30938,7 +30904,6 @@ void cmaster_state::init_crazybonb()
 
 	rom[0x2527]=0xb2; // change call $b006 to call $b59f / Protection #10
 	rom[0x2528]=0xb5;
-
 }
 
 void cd3poker_state::init_3cdp()  // v1.6 & v1.0
@@ -31352,7 +31317,6 @@ void wingco_state::init_wcat3()
 
 	rom[0x0114] = 0x70;
 	rom[0x0115] = 0xb8;
-
 }
 
 //  this block swapping is the same for chry10, chrygld and cb3
@@ -31519,7 +31483,6 @@ void goldstar_state::init_chryangl()
 	rom[0x1784] = 0x25; // read start button
 	rom[0x1785] = 0x18; //
 	rom[0x1793] = 0x66; // autostart on max bet p1
-
 }
 
 void cb3_state::init_chryangla()
@@ -31620,7 +31583,6 @@ void goldstar_state::init_chryanglb()
 
 	//rom[0x1784] = 0x25; // ENABLE START BUTTON (BUT FAILS)
 	//rom[0x1785] = 0x18; //
-
 }
 
 void cmaster_state::init_wcat3a()  // seems ok, but needs checking
@@ -31962,7 +31924,6 @@ void cmaster_state::decrypt_ll3()
 	std::swap_ranges(&rom[0x1800], &rom[0x2000], &rom[0x4800]);
 	std::swap_ranges(&rom[0x2800], &rom[0x3000], &rom[0xa800]);
 	std::swap_ranges(&rom[0x6800], &rom[0x7000], &rom[0x9800]);
-
 }
 
 void cmaster_state::init_ll3() // verified with ICE dump
@@ -32623,7 +32584,6 @@ void cmaster_state::init_nfb96_c1()
 		rom[i] = x;
 	}
 	m_maincpu->space(AS_IO).install_read_handler(0x31, 0x31, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x68>)));
-
 }
 
 void cmaster_state::init_nfb96_c1_2()  // C1 PCB, different CPLD
@@ -32643,7 +32603,6 @@ void cmaster_state::init_nfb96_c1_2()  // C1 PCB, different CPLD
 		rom[i] = x;
 	}
 	m_maincpu->space(AS_IO).install_read_handler(0x18, 0x18, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x3a>)));
-
 }
 
 void cmaster_state::init_nfb96_c2()
@@ -32688,7 +32647,6 @@ void cmaster_state::init_nfb96_d()
 
 	// csel96b
 	m_maincpu->space(AS_IO).install_read_handler(0x6e, 0x6e, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x96>)));
-
 }
 
 
@@ -32709,7 +32667,6 @@ void cmaster_state::init_nfb96_dk()
 		rom[i] = x;
 	}
 	m_maincpu->space(AS_IO).install_read_handler(0x2e, 0x2e, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xbe>)));
-
 }
 
 void cmaster_state::init_nfb96_g()
@@ -32992,7 +32949,6 @@ void cmaster_state::init_tonypok()
 	io.install_read_port(0x04, 0x04, "IN0" );
 	io.install_read_port(0x05, 0x05, "IN1" );
 	io.install_read_port(0x06, 0x06, "IN2" );
-
 }
 
 void goldstar_state::init_super9()
@@ -33064,7 +33020,6 @@ void goldstar_state::init_super9()
 	rom[0x0239] = 0xf7;
 
 	rom[0xea80] = 0x00;  // reels tilemap mask
-
 }
 
 
@@ -33466,7 +33421,6 @@ void wingco_state::init_l8tet()
 	rom[0x120e] = 0x00;   // skip bet protection
 	rom[0x01c9] = 0x68;   // alt mcu protection
 	rom[0x788f] = 0x20;   // alt mcu protection
-
 }
 
 void cmaster_state::init_reelmag()
@@ -33475,7 +33429,6 @@ void cmaster_state::init_reelmag()
 
 	rom[0xc803] = 0xbf; // unknown protection device (not rom)
 	rom[0xc80a] = 0x7f; // unknown protection device (not rom)
-
 }
 
 void cmaster_state::init_rm7b()
@@ -33488,7 +33441,6 @@ void cmaster_state::init_rm7b()
 	rom[0x00d5] = 0xd7;
 	rom[0x00d6] = 0x36;
 	rom[0x00d7] = 0xaa;
-
 }
 
 void wingco_state::init_skch()
@@ -33595,7 +33547,6 @@ void goldstar_state::init_moonlghtb()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0xc780] = 0x00;   // black
-
 }
 
 void cmaster_state::init_cutya()
@@ -33685,7 +33636,6 @@ void cmaster_state::init_cm99()
 	init_cmv4();
 
 	// intended, for specific game init.
-
 }
 
 
