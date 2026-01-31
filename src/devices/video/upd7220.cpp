@@ -758,6 +758,10 @@ void upd7220_device::device_start()
 	save_item(NAME(m_disp));
 	save_item(NAME(m_gchr));
 	save_item(NAME(m_pattern));
+	save_item(NAME(m_dma_type));
+	save_item(NAME(m_dma_mod));
+	save_item(NAME(m_dma_data));
+	save_item(NAME(m_dma_transfer_length));
 	save_item(NAME(m_mask));
 	save_item(NAME(m_pitch));
 	save_item(NAME(m_ra_addr));
