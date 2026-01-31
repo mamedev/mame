@@ -259,8 +259,9 @@ void _3do_state::green_config(machine_config &config)
 
 	CLIO(config, m_clio, XTAL(50'000'000)/4);
 	m_clio->firq_cb().set([this] (int state) {
-		if (state)
-			m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+		//if (state)
+		//	m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	});
 	m_clio->set_screen_tag("screen");
 	m_clio->xbus_sel_cb().set([this] (u8 data) {

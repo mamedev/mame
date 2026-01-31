@@ -1344,7 +1344,7 @@ u16 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
 	cel_address += ((y) * woffset) << 2;
 	// math would make more sense with / 3 ~ % 3 but the pitch would be off that way (dword boundary?)
 	cel_address += (x / 4) * 3;
-	u8 src_shift = (3 - (x % 4)) * 6;
+	u8 src_shift = (~x & 3) * 6;
 
 	u16 plut_data = ((m_dma8_read_cb(cel_address + 0) << 16) + (m_dma8_read_cb(cel_address + 1) << 8) + (m_dma8_read_cb(cel_address + 2))) >> (src_shift) & 0x3f;
 	plut_data <<= 1;

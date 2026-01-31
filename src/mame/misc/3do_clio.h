@@ -69,12 +69,10 @@ private:
 //  uint32_t  m_vcnt = 0;           /* 03400034 */
 	uint32_t  m_seed = 0;           /* 03400038 */
 	uint32_t  m_random = 0;         /* 0340004c */
-	uint32_t  m_irq0 = 0;           /* 03400040 / 03400044 */
-	uint32_t  m_irq0_enable = 0;    /* 03400048 / 0340004c */
+	uint32_t  m_irq[2];         	/* 03400040 / 03400044 ~ 03400060 / 03400064 */
+	uint32_t  m_irq_enable[2];      /* 03400048 / 0340004c ~ 03400068 / 0340006c */
 	uint32_t  m_mode = 0;           /* 03400050 / 03400054 */
 	uint32_t  m_badbits = 0;        /* 03400058 */
-	uint32_t  m_irq1 = 0;           /* 03400060 / 03400064 */
-	uint32_t  m_irq1_enable = 0;    /* 03400068 / 0340006c */
 	uint32_t  m_hdelay = 0;         /* 03400080 */
 	uint32_t  m_adbio = 0;          /* 03400084 */
 	uint32_t  m_adbctl = 0;         /* 03400088 */
@@ -116,7 +114,59 @@ private:
 									/* 03403c00 - 03403c3f DSPP EO stack (16bit reads) */
 //  uint32_t  m_dsppclkreload = 0;  /* 034039dc / 03403fbc */
 
-	void request_fiq(uint32_t irq_req, uint8_t type);
+	enum {
+		IRQ_VINT0 = 0,
+		IRQ_VINT1,
+		IRQ_EXINT, // level sensitive
+		IRQ_TIMINT15,
+		IRQ_TIMINT13,
+		IRQ_TIMINT11,
+		IRQ_TIMINT9,
+		IRQ_TIMINT7,
+		IRQ_TIMINT5,
+		IRQ_TIMINT3,
+		IRQ_TIMINT1,
+		IRQ_DSPPINT,
+		// DMA DSPP->RAM #
+		IRQ_DDRINT0,
+		IRQ_DDRINT1,
+		IRQ_DDRINT2,
+		IRQ_DDRINT3,
+		// DMA RAM->DSPP # (with reload optional modes)
+		IRQ_DRDINT0,
+		IRQ_DRDINT1,
+		IRQ_DRDINT2,
+		IRQ_DRDINT3,
+		IRQ_DRDINT4,
+		IRQ_DRDINT5,
+		IRQ_DRDINT6,
+		IRQ_DRDINT7,
+		IRQ_DRDINT8,
+		IRQ_DRDINT9,
+		IRQ_DRDINT10,
+		IRQ_DRDINT11,
+		IRQ_DRDINT12,
+		IRQ_DEXINT,
+		// trap irq
+		IRQ_SW,
+		// second priority, for interrupt word 1
+		IRQ_SCNDPINT,
+		IRQ_PLYINT = 0,
+		IRQ_DIPIR,
+		IRQ_PDINT, // level sensitive
+		// no official names from here onward
+		IRQ_DMARAM_DSPPN,
+		IRQ_DMA_TO_UNCLE,
+		IRQ_DMA_FROM_UNCLE,
+		IRQ_DMA_TO_EXTERNAL,
+		IRQ_DMA_FROM_EXTERNAL,
+		IRQ_BADBITS,
+		// following are from Red chipset onward
+		IRQ_DSPP_UNDERFLOW,
+		IRQ_DSPP_OVERFLOW
+	};
+
+	template <unsigned N> void request_fiq(uint32_t irq_req);
 
 	TIMER_CALLBACK_MEMBER( scan_timer_cb );
 	TIMER_CALLBACK_MEMBER( system_timer_cb );
