@@ -311,7 +311,7 @@ void undrfire_state::video_start()
 
 	m_frame_counter = 0;
 
-	save_item(NAME(m_dislayer));
+	//save_item(NAME(m_dislayer));
 }
 
 /***************************************************************
@@ -908,7 +908,7 @@ void undrfire_state::machine_start()
 
 	save_item(NAME(m_port_sel));
 	save_item(NAME(m_frame_counter));
-	save_item(NAME(m_rotate_ctrl));
+	//save_item(NAME(m_rotate_ctrl));
 }
 
 /**********************************************************
