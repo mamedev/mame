@@ -333,6 +333,8 @@ private:
 		uint32_t curlcntr;
 		uint32_t lcntr;
 		uint8_t extdma_shift;
+		uint32_t iop_write_num;
+		uint32_t iop_data;
 
 		/* Data Address Generator (DAG) */
 		SHARC_DAG dag1;     // (DM bus)
