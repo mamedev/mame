@@ -87,6 +87,8 @@ private:
 
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
+
+	void p2_w(uint8_t data);
 };
 
 
@@ -100,26 +102,28 @@ void st25_state::program_map(address_map &map)
 	// O5
 	map(0xa0000, 0xbffff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write));
 	// O6 NC
-
+	map(0xc0000, 0xdffff).noprw();
 	// internal to CPU
 	map(0xfc000, 0xfffff).rom().region("maskrom", 0);
 }
 
 void st25_state::io_map(address_map &map)
 {
-	/* Suspect I/O ports:
-	 *
-	 * OUT: 0x00, 0x03, 0x05, 0x06, 0x10, 0x16, 0x26, 0x41, 0x50, 0xe6,
-	 *      0x3000, 0x3001, 0x5000, 0x9884,
-	 *      0xd000-0xd00f
-	 *
-	 * IN:  0x00, 0x02, 0x06, 0x08, 0x27, 0x3e, 0xa3, 0xae,
-	 *      0xa3ec,
-	 *      0xd001-0xd00f,
-	 *      0xfff8, 0xfff9
-	 */
+	///ICC3 74HC138 inputs A13-15
 
-	map(0x3000, 0x3001).nopw(); //watchdog?
+	map(0x0000, 0x1fff).noprw();
+	map(0x2000, 0x3fff).noprw();
+	map(0x4000, 0x5fff).noprw();
+	map(0x6000, 0x7fff).noprw();
+	map(0x8000, 0x9fff).noprw();
+	map(0xa000, 0xbfff).noprw();
+	map(0xc000, 0xdfff).noprw();
+	map(0xe000, 0xffff).noprw();
+}
+
+void st25_state::p2_w(uint8_t data)
+{
+	m_oki->write(data);
 }
 
 static INPUT_PORTS_START(st25)
@@ -131,6 +135,8 @@ void st25_state::st25(machine_config &config)
 	V25(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &st25_state::io_map);
+
+	m_maincpu->p2_out_cb().set(FUNC(st25_state::p2_w));
 
 	M48T02(config, m_rtc, 0); // ST M48T18-150PC1
 
@@ -145,7 +151,7 @@ ROM_START(alphar)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("w27e40.ic2", 0x00000, 0x80000, CRC(3cba9ebe) SHA1(f49a00e0d6f6e34e7fa24bc4339e51c6834bba67))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -156,7 +162,7 @@ ROM_START(amarillo)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("27c040.ic2", 0x00000, 0x80000, CRC(b5058562) SHA1(c96ca309ca8214dcaeeef41ac29e8c325c08a9d9))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -170,7 +176,7 @@ ROM_START(arenau)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("27c2001.ic2", 0x00000, 0x40000, CRC(2348e6c3) SHA1(7708a2ffc3b5154bd1793fb7332e26125cdc9696))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -181,7 +187,7 @@ ROM_START(avanti)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("avantie_w27e040.ic2", 0x00000, 0x80000, CRC(14278f3a) SHA1(82a8a5e35e0eee8f4dbcb0e7b6491528c6444fad))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -192,7 +198,7 @@ ROM_START(ballermn)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("27c2001.ic2", 0x00000, 0x40000, CRC(a20915f1) SHA1(cd7e1339bc635a8e16381858b93fe28f04fa725d))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -203,7 +209,7 @@ ROM_START(bgaction)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("27c020a.ic2", 0x00000, 0x80000, CRC(177e3fee) SHA1(a4ca38dfdf79eb3524381ea3b6fa7700ad24a966))
 
 	ROM_REGION(0x2000, "nvram", 0)
@@ -217,7 +223,7 @@ ROM_START(bigkick)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("w27e040_big_kick_st25.ic2", 0x00000, 0x80000, CRC(7277e039) SHA1(67e17c675aa68b3e828027c12ea7f51a6ead9549))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -228,7 +234,7 @@ ROM_START(blizzard)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("tms27c020dip32_blizzard_pgm_119438_170296.ic2", 0x00000, 0x40000, CRC(7ff91608) SHA1(988335313141ca63d06abab6fd2542b167c5c04a))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -239,7 +245,7 @@ ROM_START(boosters)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("w27e040_booster_speed_st25.ic2", 0x00000, 0x80000, CRC(9d86d9b9) SHA1(32c6845210807549bf7808b8815a0ac98f2b203a))
 
 	ROM_REGION(0x02000, "nvram", 0)
@@ -253,7 +259,7 @@ ROM_START(cttower)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("panther_city_tower.ic2", 0x00000, 0x80000, CRC(454f200b) SHA1(087ca6b34fc7b5d14fc9ab3f32dc46254acb54a9))
 
 	ROM_REGION(0x40000, "nvram", 0)
@@ -267,7 +273,7 @@ ROM_START(colossos)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("w27c40.ic2", 0x00000, 0x80000, CRC(724d0d1e) SHA1(f8f1d78e101757afddbbe47b14c0c17ee77e800e))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -278,7 +284,7 @@ ROM_START(galaktca)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("galaktica_124460.ic2_w27e040_12.ic2", 0x00000, 0x80000, CRC(a99c6250) SHA1(a9129eeec99c630b0a3e6355deedb86a1ae5062c))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -289,7 +295,7 @@ ROM_START(jamaica)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("panther_jamaica.ic2", 0x00000, 0x80000, CRC(a7119368) SHA1(e50174bd7bb2ba00ab9fda3995007d60f0811242))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -300,7 +306,7 @@ ROM_START(macaor)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("123742.ic2", 0x00000, 0x80000, CRC(3eeb68c3) SHA1(09f606988608dc89b1714347145b5b01352aa144))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -311,7 +317,7 @@ ROM_START(majesto)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("majesto_m27c2001_st2_122559_28.09.02.ic2", 0x00000, 0x40000, CRC(e08a308c) SHA1(7e015508949e32fd86334ae0e95baf11ca5e26b2))
 
 	ROM_REGION(0x02000, "nvram", 0)
@@ -325,7 +331,7 @@ ROM_START(matrixx)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("winbondw27e040_12.ic2", 0x00000, 0x80000, CRC(6def28eb) SHA1(baab03b436277185aee806aff5f9d804a5bc4664))
 
 	ROM_REGION(0x02000, "nvram", 0)
@@ -342,7 +348,7 @@ ROM_START(mtclssic)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("w27e040_tsop32_123986_15.09.2004.ic2", 0x00000, 0x80000, CRC(123e9290) SHA1(c252640ae166fba6b8b76474f3ad2162c0521e87))
 
 	ROM_REGION(0x02000, "nvram", 0)
@@ -362,7 +368,7 @@ ROM_START(purpurr)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("pur_pur_royal_2804_w27e020.ic2", 0x00000, 0x40000, CRC(f7058b6a) SHA1(ad307de9dc979e6c21237b893bb186fc75533b60))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -373,7 +379,7 @@ ROM_START(robin)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("m27c2001_panther_robin_1705.ic2", 0x00000, 0x40000, CRC(1e465f8d) SHA1(63cd069c867c54f24af893ec2d6ad36016b7e179))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -384,7 +390,7 @@ ROM_START(stakeoff)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("27c020a.ic2", 0x00000, 0x40000, CRC(b1553dc1) SHA1(d04d1e0d7cf553588d6abf2f5c95e0d8a761f8b6))
 
 	ROM_REGION(0x02000, "nvram", 0)
@@ -398,7 +404,7 @@ ROM_START(spasch)
 	ROM_REGION(0x4000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x0000, 0x4000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("124253.ic2", 0x00000, 0x80000, CRC(fe23b37a) SHA1(9d461b01d05c6e71e3d32800a429ad3f733d7274))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -409,7 +415,7 @@ ROM_START(tango)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("am27c020_nsm_tango.ic2", 0x00000, 0x40000, CRC(7c0fec14) SHA1(9c2c463c9b39dd1167203c67fb6632d9379a37fe))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -420,7 +426,7 @@ ROM_START(tobago)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("27c2001.ic2", 0x00000, 0x40000, CRC(dc7e529b) SHA1(3bf7b3e0a27c808061c47515513fa6e76d26cd63))
 
 	ROM_REGION(0x80000, "oki", 0)
@@ -431,7 +437,7 @@ ROM_START(xeno)
 	ROM_REGION(0x04000, "maskrom", 0)
 	ROM_LOAD("d70322.icc2", 0x00000, 0x04000, CRC(a3be4fee) SHA1(3e19009d90f71ab21d927cdd31dc60dda652e045))
 
-	ROM_REGION(0x80000, "maincpu", 0)
+	ROM_REGION(0xA0000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD("w27e040_xeno_125227.ic2", 0x00000, 0x80000, CRC(349e38d1) SHA1(0e97ad119cf6864aee826da4c1d560094ff6f22d))
 
 	ROM_REGION(0x80000, "oki", 0)
