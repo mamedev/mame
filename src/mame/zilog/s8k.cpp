@@ -202,8 +202,8 @@ private:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define MAIN_CLOCK 		5528650 /* 5.5 Mhz (44.440 Mhz / 8) */
-#define MASTER_CLOCK	(4 * MAIN_CLOCK) /* 22.1 Mhz */
+#define MAIN_CLOCK 		(44.44_MHz_XTAL / 8) /* 5.555 Mhz */
+#define MASTER_CLOCK	(MAIN_CLOCK * 4)
 #define CTC_CLOCK		(2.4576_MHz_XTAL / 2)
 
 // System Configuration Register control bits 0-4
