@@ -92,9 +92,16 @@ private:
 
 void st25_state::program_map(address_map &map)
 {
+	// ICC4 74AS138 inputs A17-19
+	// O0
 	map(0x00000, 0x1ffff).ram();
-	map(0x20000, 0x7ffff).rom().region("maincpu", 0x20000);
-	map(0x80000, 0xeffff).ram();
+	// O1-O4
+	map(0x20000, 0x9ffff).rom().region("maincpu", 0x20000);
+	// O5
+	map(0xa0000, 0xbffff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write));
+	// O6 NC
+
+	// internal to CPU
 	map(0xfc000, 0xfffff).rom().region("maskrom", 0);
 }
 
