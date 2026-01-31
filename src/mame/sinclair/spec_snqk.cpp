@@ -30,14 +30,13 @@
 #include "emu.h"
 #include "spec_snqk.h"
 
+#include "bus/spectrum/ay/slot.h"
+#include "cpu/z80/z80.h"
+#include "hrust.h"
 #include "specpls3.h"
 #include "spec128.h"
 #include "spectrum.h"
 #include "timex.h"
-
-#include "bus/spectrum/ay/slot.h"
-#include "cpu/z80/z80.h"
-
 #include "ui/uimain.h"
 
 #include "corestr.h"
@@ -205,6 +204,15 @@ SNAPSHOT_LOAD_MEMBER(spectrum_state::snapshot_cb)
 			return std::make_pair(image_error::INVALIDLENGTH, "Invalid .FRZ file size");
 
 		setup_frz(&snapshot_data[0], snapshot_size);
+	}
+	else if (image.is_filetype("spg"))
+	{
+		if (snapshot_data[32] != 'S' || snapshot_data[33] != 'p' || snapshot_data[34] != 'e' || snapshot_data[35] != 'c'
+			|| snapshot_data[36] != 't' || snapshot_data[37] != 'r' || snapshot_data[38] != 'u' || snapshot_data[39] != 'm'
+			|| snapshot_data[40] != 'P' || snapshot_data[41] != 'r' ||snapshot_data[42] != 'o' || snapshot_data[43] != 'g')
+			return std::make_pair(image_error::INVALIDIMAGE, "Invalid .SPG file header.");
+
+		setup_spg(&snapshot_data[0], snapshot_size);
 	}
 	else
 	{
@@ -2394,6 +2402,90 @@ void spectrum_state::setup_z80(const uint8_t *snapdata, uint32_t snapsize)
 			ts2068_update_memory();
 		}
 	}
+}
+
+/*
+	Load a .SPG (Spectrum Prog) file.
+
+	v1.1: https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv1_1.txt
+	v1.0: https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv1_0.txt
+	v0.2  https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv0_2.txt
+*/
+void spectrum_state::setup_spg(const u8 *snapdata, u32 snapsize)
+{
+	u16 data;
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	hrust_decoder hrust;
+
+	data = snapdata[SPG_OFFSET + 0x2c];
+	if (BIT(data, 4, 4) != 1 || BIT(data, 0, 4) != 0) // just v1.0 for now
+	{
+		logerror("Can't load .SPG file v%d.%d\n", BIT(data, 4, 4), BIT(data, 0, 4));
+		return;
+	}
+
+	m_maincpu->set_state_int(Z80_IY, 0x5c3a);
+	m_maincpu->set_state_int(Z80_HL2, 0x2758);
+	m_maincpu->set_state_int(Z80_I, 0x3f);
+	m_maincpu->set_state_int(Z80_IM, 1);
+	m_port_7ffd_data = 16;
+
+	data = (snapdata[SPG_OFFSET + 0x31] << 8) | snapdata[SPG_OFFSET + 0x30];
+	if (data < 0x4000)
+	{
+		logerror("PC(%04x) < 0x4000 is not allowed\n", data);
+	}
+	m_maincpu->set_state_int(Z80_PC, data);
+
+	data = (snapdata[SPG_OFFSET + 0x33] << 8) | snapdata[SPG_OFFSET + 0x32];
+	m_maincpu->set_state_int(Z80_SP, data);
+
+	const u8 page3 = snapdata[SPG_OFFSET + 0x34];
+
+	data = snapdata[SPG_OFFSET + 0x35];
+	m_maincpu->set_state_int(Z80_IFF1, BIT(data, 2));
+
+	offs_t data_offset = SPG_DATA;
+	for (auto b = 0; b < 0x100; b++)
+	{
+		data = snapdata[SPG_BLOCK_INFO(b) + 0];
+		const u16 offs = BIT(data, 0, 5) * 512;
+		const bool is_last = BIT(data, 7);
+
+		data = snapdata[SPG_BLOCK_INFO(b) + 1];
+		const u16 size = (BIT(data, 0, 5) + 1) * 512;
+		const u8 compression = BIT(data, 6, 2);
+
+		data = snapdata[SPG_BLOCK_INFO(b) + 2];
+		bank3_set_page(data);
+
+		switch (compression)
+		{
+			case 0x00:
+				for (auto i = 0; i < size; i++)
+					space.write_byte(0xc000 + offs + i, snapdata[data_offset + i]);
+				break;
+
+			case 0x01:
+				logerror("Unsupported MegaLZ compressed");
+				return;
+				break;
+
+			case 0x02:
+				hrust.decode(space, &snapdata[data_offset], 0xc000 + offs, size);
+				break;
+
+			default:
+				logerror("Unsupported compression: %d\n", compression);
+				return;
+		}
+
+		data_offset += size;
+		if (is_last)
+			break;
+	}
+
+	bank3_set_page(page3);
 }
 
 QUICKLOAD_LOAD_MEMBER(spectrum_state::quickload_cb)

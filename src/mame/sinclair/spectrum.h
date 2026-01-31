@@ -96,6 +96,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	// until machine/spec_snqk.cpp gets somehow disentangled
+	virtual void bank3_set_page(u8 page) { }
 	virtual void plus3_update_memory() { }
 	virtual void spectrum_128_update_memory() { }
 	virtual void ts2068_update_memory() { }
@@ -206,7 +207,7 @@ protected:
 	void setup_frz(const uint8_t *snapdata, uint32_t snapsize);
 	void z80_decompress_block(address_space &space, const uint8_t *source, uint16_t dest, uint16_t size);
 	void setup_z80(const uint8_t *snapdata, uint32_t snapsize);
-
+	void setup_spg(const u8 *snapdata, u32 snapsize);
 	// quickload helpers
 	void log_quickload(const char *type, uint32_t start, uint32_t length, uint32_t exec, const char *exec_format);
 	void setup_scr(const uint8_t *quickdata, uint32_t quicksize);
