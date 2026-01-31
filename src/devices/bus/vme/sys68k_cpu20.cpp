@@ -187,6 +187,8 @@
 
 #include "cpu/m68000/m68020.h"
 #include "bus/rs232/rs232.h"
+
+#include "sys68k_cpu21.lh"
 #include "machine/68230pit.h"
 #include "machine/68153bim.h"
 #include "machine/68561mpcc.h"
@@ -240,6 +242,12 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
 DEVICE_INPUT_DEFAULTS_END
+
+static INPUT_PORTS_START(sys68k_cpu20)
+	PORT_START("PANEL")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("RST") PORT_CODE(KEYCODE_F5) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vme_sys68k_cpu20_card_device_base::reset_button), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("ABT") PORT_CODE(KEYCODE_F6) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(vme_sys68k_cpu20_card_device_base::abort_button), 0)
+INPUT_PORTS_END
 
 void vme_sys68k_cpu20_card_device_base::cpu_space_map(address_map &map)
 {
@@ -307,6 +315,8 @@ void vme_sys68k_cpu20_card_device_base::device_add_mconfig(machine_config &confi
 	rs232_port_device &rs232p3(RS232_PORT(config, RS232P3_TAG, default_rs232_devices, nullptr));
 	rs232p3.rxd_handler().set(m_mpcc3, FUNC(mpcc68561_device::write_rx));
 	rs232p3.cts_handler().set(m_mpcc3, FUNC(mpcc68561_device::cts_w));
+
+	config.set_default_layout(layout_sys68k_cpu21);
 }
 
 void vme_sys68k_cpu20_card_device::device_add_mconfig(machine_config &config)
@@ -378,6 +388,11 @@ vme_sys68k_cpu20_card_device_base::vme_sys68k_cpu20_card_device_base(const machi
 	, m_eprom (*this, "eprom")
 	, m_ram (*this, "ram")
 	, m_board_id(board_id)
+	, m_panel(*this, "PANEL")
+	, m_p4_conn(*this, "p4_conn")
+	, m_p3_conn(*this, "p3_conn")
+	, m_rs232p1(*this, "rs232p1")
+	, m_rs232p2(*this, "rs232p2")
 {
 	LOG("vme_sys68k_cpu20_card_device_base ctor\n");
 }
@@ -447,6 +462,9 @@ void vme_sys68k_cpu20_card_device_base::device_start()
 			read8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_r)), write8_delegate(*subdevice<z80sio_device>("pit"), FUNC(z80sio_device::cb_w)), 0x00ff);
 #endif
 	m_arbiter_start = timer_alloc(FUNC(vme_sys68k_cpu20_card_device_base::grant_bus), this);
+
+	m_p4_conn.resolve();
+	m_p3_conn.resolve();
 }
 
 void vme_sys68k_cpu20_card_device_base::device_reset()
@@ -467,6 +485,43 @@ void vme_sys68k_cpu20_card_device_base::device_reset()
 				m_boot_mph.remove();
 			}
 		});
+
+	// Detect connected RS232 devices and update connector status outputs
+	auto detect_conn = [](rs232_port_device &port) -> int {
+		device_rs232_port_interface *dev = port.get_card_device();
+		if (!dev) return 0; // nothing connected
+		std::string_view tag = dev->device().basetag();
+		if (tag == "terminal") return 1;
+		if (tag == "null_modem") return 2;
+		if (tag == "printer") return 3;
+		return 0;
+	};
+	m_p4_conn = detect_conn(*m_rs232p1);
+	m_p3_conn = detect_conn(*m_rs232p2);
+}
+
+ioport_constructor vme_sys68k_cpu20_card_device_base::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(sys68k_cpu20);
+}
+
+INPUT_CHANGED_MEMBER(vme_sys68k_cpu20_card_device_base::reset_button)
+{
+	if (newval)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+	else
+	{
+		// Restore boot ROM mapping before releasing reset
+		device_reset();
+		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	}
+}
+
+INPUT_CHANGED_MEMBER(vme_sys68k_cpu20_card_device_base::abort_button)
+{
+	m_maincpu->set_input_line(M68K_IRQ_7, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 //-------------------------------------------------

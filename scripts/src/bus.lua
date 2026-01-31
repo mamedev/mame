@@ -6194,9 +6194,11 @@ if BUSES["VME"] then
 
 	dependency {
 		{ MAME_DIR .. "src/devices/bus/vme/sys68k_cpu1.cpp", GEN_DIR .. "emu/layout/sys68k_cpu1.lh" },
+		{ MAME_DIR .. "src/devices/bus/vme/sys68k_cpu20.cpp", GEN_DIR .. "emu/layout/sys68k_cpu21.lh" },
 	}
 
 	custombuildtask {
+		layoutbuildtask("emu/layout", "sys68k_cpu21"),
 		layoutbuildtask("emu/layout", "sys68k_cpu1"),
 	}
 end

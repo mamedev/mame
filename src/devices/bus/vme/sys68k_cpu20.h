@@ -10,6 +10,8 @@
 #include "machine/68230pit.h"
 #include "machine/68153bim.h"
 
+class rs232_port_device;
+
 DECLARE_DEVICE_TYPE(VME_SYS68K_CPU20,   vme_sys68k_cpu20_card_device)
 DECLARE_DEVICE_TYPE(VME_SYS68K_CPU21S,  vme_sys68k_cpu21s_card_device)
 DECLARE_DEVICE_TYPE(VME_SYS68K_CPU21,   vme_sys68k_cpu21_card_device)
@@ -23,6 +25,10 @@ DECLARE_DEVICE_TYPE(VME_SYS68K_CPU21YB, vme_sys68k_cpu21yb_card_device)
 //**************************************************************************
 class vme_sys68k_cpu20_card_device_base :  public device_t, public device_vme_card_interface
 {
+public:
+	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	DECLARE_INPUT_CHANGED_MEMBER(abort_button);
+
 protected:
 	// PIT port C Board ID bits
 	static constexpr unsigned CPU20 = 0x40;
@@ -47,6 +53,7 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(grant_bus);
 
@@ -80,6 +87,12 @@ private:
 
 	void        update_irq_to_maincpu();
 	const fc_board_t  m_board_id;
+
+	required_ioport m_panel;
+	output_finder<> m_p4_conn;
+	output_finder<> m_p3_conn;
+	required_device<rs232_port_device> m_rs232p1;
+	required_device<rs232_port_device> m_rs232p2;
 };
 
 //**************************************************************************
