@@ -768,7 +768,7 @@ void md_core_state::md_core_ntsc(machine_config &config, bool use_lcm_scaling)
 	m_vdp->set_screen("megadriv");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(MASTER_CLOCK_NTSC / 3420 / 262); // 3420 clock per scanline
+	m_screen->set_refresh_hz(MASTER_CLOCK_NTSC / 3420.0 / 262.0); // 3420 clock per scanline
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
 	m_screen->set_size(64 * 8 * (use_lcm_scaling ? 5 : 1), 620);
 	m_screen->set_visarea(0, (32 * 8 * (use_lcm_scaling ? 5 : 1)) - 1, 0, 28 * 8-1);
@@ -792,7 +792,7 @@ void md_core_state::md_core_pal(machine_config &config, bool use_lcm_scaling)
 	m_vdp->set_screen("megadriv");
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(MASTER_CLOCK_PAL / 3420 / 313); // 3420 clock per scanline
+	m_screen->set_refresh_hz(MASTER_CLOCK_PAL / 3420.0 / 313.0); // 3420 clock per scanline
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.
 	m_screen->set_size(64 * 8 * (use_lcm_scaling ? 5 : 1), 620);
 	m_screen->set_visarea(0, (32*8 * (use_lcm_scaling ? 5 : 1)) - 1, 0, 28 * 8 - 1);
