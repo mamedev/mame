@@ -161,7 +161,7 @@ static int load_ms4_program(int program_num)
     ptr_addr = MS4_PROGRAM_TABLE + (program_num * 2);
     prog_addr = (g_rom[ptr_addr] << 8) | g_rom[ptr_addr + 1];
 
-    if (prog_addr == 0xFFFF || prog_addr >= 0x10000) {
+    if (prog_addr == 0xFFFF) {
         fprintf(stderr, "Invalid program address\n");
         return -1;
     }
@@ -449,6 +449,55 @@ int main(int argc, char *argv[])
             }
         }
         printf("Non-zero samples: %d/1000, max amplitude: %d\n", non_zero_count, max_sample);
+
+        /* Test note-off */
+        printf("\n=== Injecting Note-Off ===\n");
+        fflush(stdout);
+
+        /* Inject Note-Off: channel 0, note 60, velocity 0 */
+        printf("Injecting: Note-Off ch=0 note=60 vel=0\n");
+        midi_rx_isr(0x80);  /* Note-Off, channel 0 */
+        midi_process_byte();
+        midi_rx_isr(60);    /* Note number */
+        midi_process_byte();
+        midi_rx_isr(0);     /* Velocity 0 */
+        midi_process_byte();
+
+        /* Run periodic update to process note-off */
+        printf("\n=== Running periodic update after note-off ===\n");
+        for (int i = 0; i < 3; i++) {
+            printf("--- Periodic update %d ---\n", i + 1);
+            fflush(stdout);
+            periodic_voice_update();
+        }
+
+        /* Dump slot 0 state after note-off */
+        printf("\n=== Slot 0 state after note-off ===\n");
+        printf("DRAM[0][0]  = 0x%05X (pitch)\n", sam8905_read_dram(0x00));
+        printf("DRAM[0][1]  = 0x%05X (amplitude)\n", sam8905_read_dram(0x01));
+        printf("DRAM[0][15] = 0x%05X (control)\n", sam8905_read_dram(0x0F));
+        printf("  idle bit (11): %d\n", (sam8905_read_dram(0x0F) >> 11) & 1);
+        printf("  alg bits (10:8): %d\n", (sam8905_read_dram(0x0F) >> 8) & 7);
+
+        /* Generate samples after note-off - should be zero */
+        printf("\n=== Generating audio after note-off ===\n");
+        fflush(stdout);
+        int non_zero_after = 0;
+        for (int i = 0; i < 500; i++) {
+            sam8905_process_frame(&left, &right);
+            if (left != 0 || right != 0) {
+                non_zero_after++;
+                if (i < 10) {
+                    printf("  Sample %d: L=%d R=%d (unexpected!)\n", i, left, right);
+                }
+            }
+        }
+        printf("Non-zero samples after note-off: %d/500\n", non_zero_after);
+        if (non_zero_after == 0) {
+            printf("SUCCESS: Note-off stopped the sound!\n");
+        } else {
+            printf("FAIL: Sound continues after note-off\n");
+        }
 
         printf("\n=== Test complete ===\n");
         return 0;

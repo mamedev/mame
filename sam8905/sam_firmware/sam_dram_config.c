@@ -512,15 +512,21 @@ void dram_config_handler_18(void)
     value_hi = dram_config_read_stream_byte();
     vel_sens = dram_config_read_stream_byte();
 
-    /* Apply velocity scaling if sensitivity non-zero */
-    if (vel_sens != 0) {
+    /* Write dispatch byte to voice page slot (for mod state) */
+    voice_page_write(g_intmem.voice_page_num, g_intmem.voice_slot_base, dispatch);
+
+    /* Apply velocity scaling if bit 0 set and vel_sens non-zero */
+    if ((dispatch & 0x01) && vel_sens != 0) {
+        voice_page_write(g_intmem.voice_page_num, g_intmem.voice_slot_base + 1, value_lo);
         value_hi = dram_config_apply_velocity(value_hi, vel_sens);
     }
 
-    /* Write to voice page slot */
-    voice_page_write(g_intmem.voice_page_num, g_intmem.voice_slot_base, dispatch);
-    voice_page_write(g_intmem.voice_page_num, g_intmem.voice_slot_base + 1, value_lo);
-    voice_page_write(g_intmem.voice_page_num, g_intmem.voice_slot_base + 2, value_hi);
+    /* Write to SAM D-RAM (original: P2=0x80, sam_write_dram, P2=page) */
+    sam_write_reg(SAM_REG_ADDR_DATA, g_intmem.dram_address_counter);
+    sam_write_reg(SAM_REG_DATA1, dispatch);
+    sam_write_reg(SAM_REG_DATA2, value_lo);
+    sam_write_reg(SAM_REG_DATA3, value_hi & 0x07);
+    sam_write_reg(SAM_REG_CTRL, g_intmem.sam_ctrl_flags);
 
     /* Continue dispatch */
     dram_config_advance_and_dispatch();
@@ -548,7 +554,14 @@ void dram_config_handler_20(void)
     /* Write to voice page output routing offsets (0xF9-0xFB) */
     voice_page_write(g_intmem.voice_page_num, VOICE_PAGE_ROUTE1, route1);
     voice_page_write(g_intmem.voice_page_num, VOICE_PAGE_ROUTE2, route2);
-    voice_page_write(g_intmem.voice_page_num, VOICE_PAGE_ROUTE3, route3);
+
+    /* Route3/status (0xFB): only update bits 2:0, preserve bits 7:3
+     * Original: DAT_EXTMEM_00fb = bVar2 & 7 | DAT_EXTMEM_00fb & 0xf8 */
+    {
+        uint8_t current_status = voice_page_read(g_intmem.voice_page_num, VOICE_PAGE_ROUTE3);
+        uint8_t new_status = (route3 & 0x07) | (current_status & 0xF8);
+        voice_page_write(g_intmem.voice_page_num, VOICE_PAGE_ROUTE3, new_status);
+    }
 
     /* Also write to voice slot base */
     voice_page_write(g_intmem.voice_page_num, g_intmem.voice_slot_base, dispatch);

@@ -307,6 +307,116 @@ void sam_write_reg(uint8_t reg, uint8_t value) {
   - Translates register writes to `sam8905_write_dram()`/`sam8905_write_aram()`
   - `sam_init()` now works through the emulator
 - [x] Add MIDI port auto-connect via command line (`-m <port>`)
+- [x] Fix handler_18 to write to SAM D-RAM (not just voice page)
+- [x] Fix handler_20 status byte preservation (bits 7:3 must be preserved)
+- [ ] Implement envelope modulation (periodic amplitude updates)
 - [ ] Add stereo output support to audio_portaudio.c
 - [ ] Add MIDI output support (for Active Sense, etc.)
 - [ ] Port firmware voice allocation
+
+## Progress Log
+
+### 2026-01-30: D-RAM Handler Fixes
+
+#### Issue 1: Handler 0x18 Not Writing to SAM D-RAM
+
+**Problem**: `dram_config_handler_18` was only writing to voice page memory, not to SAM D-RAM.
+
+**Discovery**: Ghidra decompilation of MS4 firmware CODE:B222 showed the original firmware:
+1. Reads dispatch, value_lo, value_hi, vel_sens from stream
+2. Writes dispatch to voice page (for mod state tracking)
+3. Calls `sam_write_dram(dram_address_counter)` to write to SAM D-RAM
+4. Advances DRAM address counter
+
+**Fix in `sam_dram_config.c`**: Added SAM register writes:
+```c
+/* Write to SAM D-RAM */
+sam_write_reg(SAM_REG_ADDR_DATA, g_intmem.dram_address_counter);
+sam_write_reg(SAM_REG_DATA1, dispatch);
+sam_write_reg(SAM_REG_DATA2, value_lo);
+sam_write_reg(SAM_REG_DATA3, value_hi & 0x07);
+sam_write_reg(SAM_REG_CTRL, g_intmem.sam_ctrl_flags);
+```
+
+**Result**: D-RAM words D[2], D[3], D[4], D[6], D[10], D[11] now written correctly.
+
+#### Issue 2: Handler 0x20 Clobbering Voice Status
+
+**Problem**: `dram_config_handler_20` was overwriting `VOICE_PAGE_ROUTE3` (offset 0xFB) entirely, which cleared bit 5 (0x20) - the "processing active" flag set during voice allocation.
+
+**Discovery**: Ghidra decompilation of CODE:B278 showed:
+```c
+DAT_EXTMEM_00fb = bVar2 & 7 | DAT_EXTMEM_00fb & 0xf8
+```
+The original firmware only modifies bits 2:0, preserving bits 7:3.
+
+**Fix in `sam_dram_config.c`**:
+```c
+/* Route3/status (0xFB): only update bits 2:0, preserve bits 7:3 */
+uint8_t current_status = voice_page_read(g_intmem.voice_page_num, VOICE_PAGE_ROUTE3);
+uint8_t new_status = (route3 & 0x07) | (current_status & 0xF8);
+voice_page_write(g_intmem.voice_page_num, VOICE_PAGE_ROUTE3, new_status);
+```
+
+**Result**: Voice status now goes from 0x20 → 0x23 (active + routing) instead of 0x20 → 0x03 (freed).
+
+### Current Status
+
+**Working**:
+- MIDI input → voice allocation → program loading
+- A-RAM algorithm loading from ROM
+- D-RAM handler chain execution (0x00, 0x08, 0x10, 0x18, 0x20)
+- Simple test ROM with sinus algorithm produces sound
+- Handler 0x18 writes D-RAM values correctly
+- Voice status preserved correctly through handler chain
+
+**Not Working**:
+- Complex MS4 algorithms (e.g., dpiano27/Algorithm 027A) produce 0 audio
+
+### Root Cause: Complex Algorithms Need Envelope Modulation
+
+Algorithm 027A (dpiano27) analysis shows it reads amplitude from D[5]:
+```
+Instruction 0x09F7: RM 1, WXY, WSP
+  - MAD = 1 → DRAM offset 1 → voice_base + 1 → D[5] for slot 0
+  - WXY = set X (waveform) and Y (amplitude)
+  - Without D[5] set, Y=0, output=0
+```
+
+**Why D[5] is not initialized**:
+- dpiano27's D-RAM stream has NO handler 0x10 (amplitude handler)
+- The firmware relies on **envelope modulation** to dynamically update amplitude words
+- Envelope modulation runs periodically (Timer 1 ISR) and scales amplitude based on ADSR state
+- Without envelope modulation, D[5] stays at 0 → no audio
+
+### What's Needed to Complete
+
+**Option A: Implement Envelope Modulation**
+- Port `voice_mod_update()` or equivalent from firmware
+- Called from periodic timer (every ~10ms)
+- Reads envelope parameters from voice page
+- Calculates current amplitude based on ADSR state
+- Writes scaled amplitude to SAM D-RAM
+
+**Option B: Use Simpler Test Programs**
+- Create test ROM with explicit amplitude setup (handler 0x10 in D-RAM stream)
+- Algorithm uses D[1] for amplitude instead of requiring envelope
+- gen_test_rom.py already does this with ALGORITHM_SINUS
+
+**Option C: Patch MS4 Programs**
+- Modify dpiano27's D-RAM stream to include amplitude handler
+- Direct approach but requires understanding each algorithm's D-RAM layout
+
+**Recommended Path**: Start with Option B (simpler test programs work), then implement Option A (envelope modulation) for full MS4 program compatibility.
+
+### Algorithm D-RAM Layout Reference
+
+**Simple Sinus (test ROM)**:
+- D[0] = pitch (phase increment)
+- D[1] = amplitude (direct, no envelope)
+- D[2] = phase accumulator (internal)
+
+**Algorithm 027A (dpiano27)**:
+- D[0] = pitch
+- D[2], D[5], D[11] = amplitude words (via WXY instructions)
+- Requires envelope modulation to set D[5]

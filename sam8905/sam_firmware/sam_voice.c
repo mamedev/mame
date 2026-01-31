@@ -462,22 +462,40 @@ retry:
 /*============================================================================
  * voice_deactivate (CODE:A69C)
  *
- * Mark voice for release (note-off). Voice continues through release phase.
+ * Mark voice for release (note-off).
  *
- * TODO: Implement based on Ghidra analysis
+ * Original firmware (from Ghidra):
+ * 1. Clears LFO/envelope blocks (0x00-0x70)
+ * 2. Iterates D-RAM slot mapping (0x80-0xF8) and writes release values
+ * 3. Sets DAT_EXTMEM_00fb = 0x08 (status = VOICE_STATUS_ACTIVE, bit 5 clear)
+ * 4. Sets DAT_EXTMEM_0070 = 0xFF (marks slot mapping end)
+ *
+ * This allows the voice to be freed on next periodic update since the check
+ * `if (!(status & 0x20))` becomes true when bit 5 is clear.
+ *
+ * Simplified implementation: just set status and idle the SAM slot.
  *============================================================================*/
 
 void voice_deactivate(uint8_t page)
 {
-    uint8_t status;
+    DEBUG_VOICE("deactivate: page=%d", page);
 
-    /* Set release flag in voice page status */
-    status = voice_page_read(page, VOICE_PAGE_STATUS);
-    status |= VOICE_STATUS_RELEASE;
-    voice_page_write(page, VOICE_PAGE_STATUS, status);
+    /* Set SAM D-RAM word 15 idle bit to stop the sound */
+    uint8_t slot_addr = (page << 4) | 0x0F;
+    sam_write_reg(SAM_REG_ADDR_DATA, slot_addr);
+    sam_write_reg(SAM_REG_DATA1, 0x00);
+    sam_write_reg(SAM_REG_DATA2, 0x08);  /* Bit 11 (idle) = 1 */
+    sam_write_reg(SAM_REG_DATA3, 0x00);
+    sam_write_reg(SAM_REG_CTRL, SAM_CTRL_DRAM_WR);
 
-    /* Clear active flag - voice will be freed when envelope reaches zero */
-    g_intmem.flags_20 |= FLAG20_VOICE_RELEASE;
+    /* Set status = 0x08 (matching original: DAT_EXTMEM_00fb = 8)
+     * This clears bit 5, allowing voice to be freed on next periodic update */
+    voice_page_write(page, VOICE_PAGE_STATUS, VOICE_STATUS_ACTIVE);
+
+    /* Mark slot mapping as done (matching original: DAT_EXTMEM_0070 = 0xFF) */
+    voice_page_write(page, 0x70, 0xFF);
+
+    DEBUG_VOICE("  status=0x%02X, slot idle", VOICE_STATUS_ACTIVE);
 }
 
 /*============================================================================
