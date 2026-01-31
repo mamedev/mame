@@ -11,12 +11,6 @@ Wersi Max1 - 4-digit 7-segment display
 		<led7seg><color red="1.0" green="0.2" blue="0.1" /></led7seg>
 	</element>
 
-	<!-- Decimal point -->
-	<element name="dp" defstate="0">
-		<disk state="1"><color red="1.0" green="0.2" blue="0.1" /></disk>
-		<disk state="0"><color red="0.15" green="0.03" blue="0.015" /></disk>
-	</element>
-
 	<!-- Background -->
 	<element name="background"><rect><color red="0.1" green="0.1" blue="0.1" /></rect></element>
 
@@ -24,15 +18,8 @@ Wersi Max1 - 4-digit 7-segment display
 		<element ref="background"><bounds x="0" y="0" width="200" height="60" /></element>
 
 		<element name="digit0" ref="digit"><bounds x="10" y="10" width="30" height="40" /></element>
-		<element name="dp0" ref="dp"><bounds x="42" y="46" width="4" height="4" /></element>
-
 		<element name="digit1" ref="digit"><bounds x="50" y="10" width="30" height="40" /></element>
-		<element name="dp1" ref="dp"><bounds x="82" y="46" width="4" height="4" /></element>
-
 		<element name="digit2" ref="digit"><bounds x="90" y="10" width="30" height="40" /></element>
-		<element name="dp2" ref="dp"><bounds x="122" y="46" width="4" height="4" /></element>
-
 		<element name="digit3" ref="digit"><bounds x="130" y="10" width="30" height="40" /></element>
-		<element name="dp3" ref="dp"><bounds x="162" y="46" width="4" height="4" /></element>
 	</view>
 </mamelayout>
