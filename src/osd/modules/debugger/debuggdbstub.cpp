@@ -939,7 +939,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 		assert(m_state != nullptr);
 		m_memory = &m_maincpu->memory();
 		m_address_space = &m_memory->space(AS_PROGRAM);
-		m_debugger_cpu = &m_machine->debugger().cpu();
+		m_debugger_cpu = &m_machine->debugger().state();
 		m_debugger_console = &m_machine->debugger().console();
 
 		m_is_be = m_address_space->endianness() == ENDIANNESS_BIG;
