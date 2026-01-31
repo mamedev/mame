@@ -8,7 +8,6 @@
 
 #include "cdrom.h"
 #include "imagedev/cdromimg.h"
-#include "machine/timer.h"
 #include "sound/cdda.h"
 
 class saturn_cd_hle_device : public device_t,
@@ -33,8 +32,13 @@ protected:
 	virtual void device_stop() override ATTR_COLD;
 
 private:
-	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
-	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );
+	required_device<cdrom_image_device> m_cdrom_image;
+	required_device<cdda_device> m_cdda;
+
+	emu_timer *m_sh1_timer;
+	emu_timer *m_sector_timer;
+	TIMER_CALLBACK_MEMBER( sh1_command_cb );
+	TIMER_CALLBACK_MEMBER( cd_sector_cb );
 
 	struct direntryT
 	{
@@ -167,7 +171,6 @@ private:
 	uint32_t cd_fad_seek;
 	uint32_t fadstoplay;// = 0;
 	uint32_t in_buffer;// = 0;    // amount of data in the buffer
-	int oddframe;// = 0;
 	int buffull, sectorstore, freeblocks;
 	int cur_track;
 	uint8_t cmd_pending;
@@ -182,10 +185,6 @@ private:
 	int numfiles;            // # of entries in current directory
 	int firstfile;           // first non-directory file
 
-	required_device<cdrom_image_device> m_cdrom_image;
-	required_device<timer_device> m_sector_timer;
-	required_device<timer_device> m_sh1_timer;
-	required_device<cdda_device> m_cdda;
 
 	void cd_change_status(u16 new_status);
 
@@ -255,10 +254,10 @@ private:
 	inline u32 dataxfer_long_r();
 	inline u16 dataxfer_word_r();
 	inline void dataxfer_long_w(u32 data);
-	uint16_t cr1_r();
-	uint16_t cr2_r();
-	uint16_t cr3_r();
-	uint16_t cr4_r();
+	uint16_t dr1_r();
+	uint16_t dr2_r();
+	uint16_t dr3_r();
+	uint16_t dr4_r();
 	void cr1_w(uint16_t data);
 	void cr2_w(uint16_t data);
 	void cr3_w(uint16_t data);
