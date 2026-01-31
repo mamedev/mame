@@ -149,6 +149,7 @@ void saturn_cd_hle_device::device_start()
 	save_item(NAME(hirqmask));
 	save_item(NAME(hirqreg));
 	save_item(NAME(cd_stat));
+	save_item(NAME(cd_next_stat));
 	save_item(NAME(cd_curfad));
 	save_item(NAME(cd_fad_seek));
 	save_item(NAME(fadstoplay));
@@ -189,7 +190,7 @@ void saturn_cd_hle_device::device_reset()
 	// reset flag vars
 	buffull = sectorstore = 0;
 
-	freeblocks = 200;
+	freeblocks = MAX_BLOCKS;
 
 	sectlenin = sectlenout = 2048;
 
@@ -221,7 +222,7 @@ void saturn_cd_hle_device::device_reset()
 		LOG("Opened CD-ROM successfully, reading root directory\n");
 		read_new_dir(0xffffff);    // read root directory
 		cd_curfad = 150;
-		fadstoplay = 0;
+		fadstoplay = -1;
 	}
 	else
 	{
@@ -831,7 +832,7 @@ void saturn_cd_hle_device::cmd_end_data_transfer()
 				transpart->size -= xferdnum;
 				transpart->numblks -= xfersectnum;
 
-				if (freeblocks == 200)
+				if (freeblocks == MAX_BLOCKS)
 				{
 					sectorstore = 0;
 				}
@@ -1280,11 +1281,12 @@ void saturn_cd_hle_device::cmd_reset_selector()
 	int i,j;
 	// Reset Selector
 
-	LOGCMD("%s: Reset Selector\n",   machine().describe_context());
+	LOGCMD("%s: Reset Selector %02x\n", machine().describe_context(), cr1);
 
 	if((cr1 & 0xff) == 0x00)
 	{
-		uint8_t bufnum = cr3>>8;
+		uint8_t bufnum = cr3 >> 8;
+		LOGCMD("\tbufnum %02x\n", bufnum);
 
 		if(bufnum < MAX_FILTERS)
 		{
@@ -1301,7 +1303,7 @@ void saturn_cd_hle_device::cmd_reset_selector()
 
 		// TODO: buffer full flag
 
-		if (freeblocks == 200) { sectorstore = 0; }
+		if (freeblocks == MAX_BLOCKS) { sectorstore = 0; }
 
 		hirqreg |= (CMOK|ESEL);
 		cr_standard_return(cd_stat);
@@ -1369,7 +1371,7 @@ void saturn_cd_hle_device::cmd_get_buffer_size()
 {
 	// get Buffer Size
 	cr1 = cd_stat;
-	cr2 = (freeblocks > 200) ? 200 : freeblocks;
+	cr2 = (freeblocks > MAX_BLOCKS) ? MAX_BLOCKS : freeblocks;
 	cr3 = 0x1800;
 	cr4 = 200;
 	LOG("Get Buffer Size = %d\n", cr2);
@@ -1403,6 +1405,7 @@ void saturn_cd_hle_device::cmd_get_buffer_partition_sector_number()
 	LOGCMD("%s: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4);
 
 	//LOGWARN("%04x\n",cr4);
+	// TODO: shouldn't trigger DRDY in any case?
 	if(cr4 == 0)
 		hirqreg |= (CMOK);
 	else
@@ -1606,7 +1609,7 @@ void saturn_cd_hle_device::cmd_delete_sector_data()
 
 	partitions[bufnum].numblks -= sectnum;
 
-	if (freeblocks == 200)
+	if (freeblocks == MAX_BLOCKS)
 	{
 		sectorstore = 0;
 	}
@@ -1665,10 +1668,11 @@ void saturn_cd_hle_device::cmd_get_and_delete_sector_data()
 void saturn_cd_hle_device::cmd_put_sector_data()
 {
 	// aburner2, outrun, fantzone and dmastnx needs this
+	// TODO: transfer shouldn't be here
 
 	uint32_t sectnum = cr4 & 0xff;
 	uint32_t sectofs = cr2;
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 
 	LOGCMD("%s: Put sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
 
@@ -1764,7 +1768,7 @@ void saturn_cd_hle_device::cmd_change_directory()
 	LOGCMD("%s: Change Directory\n",   machine().describe_context());
 	hirqreg |= (CMOK|EFLS);
 
-	temp = (cr3&0xff)<<16;
+	temp = (cr3 & 0xff) << 16;
 	temp |= cr4;
 
 	read_new_dir(temp);
@@ -2151,7 +2155,7 @@ saturn_cd_hle_device::blockT *saturn_cd_hle_device::cd_alloc_block(uint8_t *blkn
 	int32_t i;
 
 	// search the 200 available blocks for a free one
-	for (i = 0; i < 200; i++)
+	for (i = 0; i < MAX_BLOCKS; i++)
 	{
 		if (blocks[i].size == -1)
 		{
@@ -2186,7 +2190,7 @@ void saturn_cd_hle_device::cd_free_block(blockT *blktofree)
 		return;
 	}
 
-	for (i = 0; i < 200; i++)
+	for (i = 0; i < MAX_BLOCKS; i++)
 	{
 		if (&blocks[i] == blktofree)
 		{
@@ -2219,9 +2223,9 @@ void saturn_cd_hle_device::cd_defragblocks(partitionT *part)
 	blockT *temp;
 	uint8_t temp2;
 
-	for (i = 0; i < (MAX_BLOCKS-1); i++)
+	for (i = 0; i < (MAX_BLOCKS - 1); i++)
 	{
-		for (j = i+1; j < MAX_BLOCKS; j++)
+		for (j = i + 1; j < MAX_BLOCKS; j++)
 		{
 			if ((part->blocks[i] == (blockT *)nullptr) && (part->blocks[j] != (blockT *)nullptr))
 			{
