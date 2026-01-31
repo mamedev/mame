@@ -260,8 +260,11 @@ u16 max1_state::sam_waveform_r(offs_t offset)
     // ROM address = (WAVE[6:0] << 10) | PHI[11:2]
     uint32_t wave = (offset >> 12) & 0x7F;
     uint32_t phi = offset & 0xFFF;
-    uint32_t phi_int = (phi >> 2) & 0x3FF;
-    uint32_t rom_addr = (wave << 10) | phi_int;
+    // uint32_t phi_int = (phi >> 2) & 0x3FF;
+    // uint32_t rom_addr = (wave << 10) | phi_int;
+
+    uint32_t phi_int = (phi >> 3) & 0x3FF;
+    uint32_t rom_addr = (wave << 9) | phi_int;
 
     // Max1 has single 128KB sample ROM
     if (rom_addr >= 0x20000)
@@ -289,7 +292,7 @@ static INPUT_PORTS_START(max1)
     PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("KEY 0") PORT_CODE(KEYCODE_1)
     PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("KEY 1") PORT_CODE(KEYCODE_2)
     PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("KEY 2") PORT_CODE(KEYCODE_3)
-    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("KEY 3") PORT_CODE(KEYCODE_4)
+    PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("KEY 3") PORT_CODE(KEYCODE_4)
 INPUT_PORTS_END
 
 void max1_state::max1(machine_config &config)
