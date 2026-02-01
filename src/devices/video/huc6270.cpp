@@ -354,7 +354,7 @@ inline void huc6270_device::handle_vblank()
 		 */
 		if (m_dvssr_written || BIT(m_dcr, 4))
 		{
-			LOG("%s: SATB transfer from %05x\n", this->tag(), m_dvssr << 1);
+			LOG("SATB transfer from %05x\n", m_dvssr << 1);
 			for (int i = 0; i < 4 * 64; i += 4)
 			{
 				m_sat[i + 0] = m_vram[(m_dvssr + i + 0) & m_vram_mask] & 0x03ff;
@@ -626,7 +626,7 @@ inline void huc6270_device::handle_dma()
 		const int desr_inc = (m_dcr & 0x0008) ? -1 : +1;
 		const int sour_inc = (m_dcr & 0x0004) ? -1 : +1;
 
-		LOG("%s: doing dma sour = %04x, desr = %04x, lenr = %04x\n", this->tag(), m_sour, m_desr, m_lenr);
+		LOG("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr);
 
 		do {
 			// area 0x8000-0xffff cannot be r/w (open bus)
