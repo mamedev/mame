@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Paul Leaman
-/***************************************************************************
+/*******************************************************************************
 
 Legendary Wings
 Section Z
@@ -12,8 +12,8 @@ Driver provided by Paul Leaman
 TODO:
 - sectionz does "false contacts" on the coin counters, causing them to
   increment twice per coin.
-- verify avengers MCU comms, and redump internal ROM as well (see note
-  in ROM defs under AVENGERS_MCU)
+- verify avengers MCU comms, and redump internal ROM as well (see note in
+  ROM defs under AVENGERS_MCU)
 - palette bus conflicts, real hardware does weird stuff if you write to
   palette RAM outside of vblank
 
@@ -22,35 +22,34 @@ BTANB:
 
 Notes:
 
-Avengers has a protection chip underneath the sound module.
-The protection is extensive: palette data, calculates player movement,
-even a hand in the sound.
+Avengers has a protection chip underneath the sound module. The protection
+is extensive: palette data, calculates player movement, even a hand in the
+sound. The Trojan schematics also include the MCU, but the PCB doesn't?
 
-avengers061gre2: corrupted graphics in Avengers' ending not fixed.
-This bug is not in the Japanese set "Buraiken".
+avengers061gre2: corrupted graphics in Avengers' ending not fixed. This bug
+is not in the Japanese set "Buraiken".
 It might just be a bug in the original: the tiles for the character
 image are just not present in the US version, replaced by more tiles
 for the title animation. The tile map ROM is the same between the two
 versions.
 
-trojan37b1gre: stage 2-1 boss x flip glitches not fixed.
-This could be a side effect of sprite RAM buffering. Suggest buffering
-on-screen content instead of sprite memory.
+trojan37b1gre: stage 2-1 boss x flip glitches not fixed. This could be a
+side effect of sprite RAM buffering. Suggest buffering on-screen content
+instead of sprite memory.
 
-Previous clock settings were too low. Sometimes Avengers and Trojan
-could not finish clearing VRAM before a new frame is drawn and left
-behind screen artifacts. Avengers' second CPU was forced to pre-empt
-during soundlatch operations, resulting in double or missing sound
-effects.
+Previous clock settings were too low. Sometimes Avengers and Trojan could
+not finish clearing VRAM before a new frame is drawn and left behind
+screen artifacts. Avengers' second CPU was forced to pre-empt during
+soundlatch operations, resulting in double or missing sound effects.
 
 Trojan (Romstar) Manual has some bonus live values as well as locations
-which do no jive with actual emulation.  One can only assume this means
+which do no jive with actual emulation. One can only assume this means
 the manual is incorrect and software was adjusted later but the game could
 use some PCB comparisons of DIP selections to be certain.
 
 Video timing: Measured 55.37Hz on Section Z, 15.62kHz & 55.4Hz on Avengers.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -132,7 +131,6 @@ private:
 	tilemap_t *m_bg1_tilemap = nullptr;
 	tilemap_t *m_bg2_tilemap = nullptr;
 	uint8_t m_bg2_image = 0U;
-	bool m_spr_avenger_hw = false;
 	uint8_t m_scroll_x[2]{};
 	uint8_t m_scroll_y[2]{};
 
@@ -172,7 +170,6 @@ private:
 	TILE_GET_INFO_MEMBER(trojan_get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
 	DECLARE_VIDEO_START(trojan);
-	DECLARE_VIDEO_START(avengers);
 	uint32_t screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -193,14 +190,262 @@ private:
 	void trojan_map(address_map &map) ATTR_COLD;
 };
 
-/* Avengers runs on hardware almost identical to Trojan, but with a protection
- * device and some small changes to the memory map and video hardware.
+
+/*************************************
  *
- * Background colors are fetched 64 bytes at a time and copied to palette RAM.
+ *  Callbacks for the TileMap code
  *
- * Another function takes as input 2 pairs of (x,y) coordinates, and returns
- * a code reflecting the direction (8 angles) from one point to the other.
- */
+ *************************************/
+
+TILEMAP_MAPPER_MEMBER(lwings_state::get_bg2_memory_offset)
+{
+	return (row * 0x800) | (col * 2);
+}
+
+TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
+{
+	int code = m_fgvideoram[tile_index];
+	int color = m_fgvideoram[tile_index + 0x400];
+	tileinfo.set(0,
+			code + ((color & 0xc0) << 2),
+			color & 0x0f,
+			TILE_FLIPYX((color & 0x30) >> 4));
+}
+
+TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
+{
+	int code = m_bg1videoram[tile_index];
+	int color = m_bg1videoram[tile_index + 0x400];
+	tileinfo.set(1,
+			code + ((color & 0xe0) << 3),
+			color & 0x07,
+			TILE_FLIPYX((color & 0x18) >> 3));
+}
+
+TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
+{
+	int code = m_bg1videoram[tile_index];
+	int color = m_bg1videoram[tile_index + 0x400];
+	code += (color & 0xe0)<<3;
+	tileinfo.set(1,
+			code,
+			(color & 7),
+			((color & 0x10) ? TILE_FLIPX : 0));
+
+	tileinfo.group = (color & 0x08) >> 3;
+}
+
+TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
+{
+	int code, color;
+	uint8_t *rom = memregion("gfx5")->base();
+	int mask = memregion("gfx5")->bytes() - 1;
+
+	tile_index = (tile_index + m_bg2_image * 0x20) & mask;
+	code = rom[tile_index];
+	color = rom[tile_index + 1];
+	tileinfo.set(3,
+			code + ((color & 0x80) << 1),
+			color & 0x07,
+			TILE_FLIPYX((color & 0x30) >> 4));
+}
+
+
+/*************************************
+ *
+ *  Start the video hardware emulation
+ *
+ *************************************/
+
+void lwings_state::video_start()
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::lwings_get_bg1_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+
+	m_fg_tilemap->set_transparent_pen(3);
+}
+
+VIDEO_START_MEMBER(lwings_state,trojan)
+{
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::trojan_get_bg1_tile_info)),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(lwings_state::get_bg2_memory_offset)), 16, 16, 32, 16);
+
+	m_fg_tilemap->set_transparent_pen(3);
+	m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); // split type 0 is totally transparent in front half
+	m_bg1_tilemap->set_transmask(1, 0xf07f, 0x0f81); // split type 1 has pens 7-11 opaque in front half
+}
+
+
+/*************************************
+ *
+ *  Display refresh
+ *
+ *************************************/
+
+inline bool lwings_state::is_sprite_on(uint8_t const *buffered_spriteram, int offs)
+{
+	int const sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
+	int const sy = buffered_spriteram[offs + 2];
+
+	return sx || sy;
+}
+
+void lwings_state::lwings_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
+
+	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+	{
+		if (is_sprite_on(buffered_spriteram, offs))
+		{
+			int sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
+			int sy = buffered_spriteram[offs + 2];
+			if (sy > 0xf8)
+				sy -= 0x100;
+			int code = buffered_spriteram[offs] | (buffered_spriteram[offs + 1] & 0xc0) << 2;
+			int color = (buffered_spriteram[offs + 1] & 0x38) >> 3;
+			int flipx = buffered_spriteram[offs + 1] & 0x02;
+			int flipy = buffered_spriteram[offs + 1] & 0x04;
+
+			if (flip_screen())
+			{
+				sx = 240 - sx;
+				sy = 240 - sy;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+
+			m_gfxdecode->gfx(2)->transpen(
+					bitmap, cliprect,
+					code + (m_sprbank * 0x400), color,
+					flipx, flipy, sx, sy,
+					15);
+		}
+	}
+}
+
+void lwings_state::trojan_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
+
+	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
+	{
+		if (is_sprite_on(buffered_spriteram, offs))
+		{
+			int sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
+			int sy = buffered_spriteram[offs + 2];
+			if (sy > 0xf8)
+				sy -= 0x100;
+			int code = buffered_spriteram[offs] | bitswap<3>(buffered_spriteram[offs + 1],7,5,6) << 8;
+			int color = (buffered_spriteram[offs + 1] & 0x0e) >> 1;
+
+			// flipping differs between horizontal/vertical orientation
+			int flipx, flipy;
+			if ((machine().system().flags & machine_flags::MASK_ORIENTATION) == 0)
+			{
+				// Trojan
+				flipx = buffered_spriteram[offs + 1] & 0x10;
+				flipy = 1;
+			}
+			else
+			{
+				// Avengers
+				flipx = 0;
+				flipy = ~buffered_spriteram[offs + 1] & 0x10;
+			}
+
+			if (flip_screen())
+			{
+				sx = 240 - sx;
+				sy = 240 - sy;
+				flipx = !flipx;
+				flipy = !flipy;
+			}
+
+			m_gfxdecode->gfx(2)->transpen(
+					bitmap, cliprect,
+					code, color,
+					flipx, flipy, sx, sy,
+					15);
+		}
+	}
+}
+
+uint32_t lwings_state::screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	lwings_draw_sprites(bitmap, cliprect);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+uint32_t lwings_state::screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
+
+	trojan_draw_sprites(bitmap, cliprect);
+
+	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
+	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
+
+/*************************************
+ *
+ *  Memory & I/O handlers
+ *
+ *************************************/
+
+void lwings_state::lwings_fgvideoram_w(offs_t offset, uint8_t data)
+{
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+void lwings_state::lwings_bg1videoram_w(offs_t offset, uint8_t data)
+{
+	m_bg1videoram[offset] = data;
+	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
+}
+
+
+void lwings_state::lwings_bg1_scrollx_w(offs_t offset, uint8_t data)
+{
+	m_scroll_x[offset] = data;
+	m_bg1_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
+}
+
+void lwings_state::lwings_bg1_scrolly_w(offs_t offset, uint8_t data)
+{
+	m_scroll_y[offset] = data;
+	m_bg1_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
+}
+
+void lwings_state::trojan_bg2_scrollx_w(uint8_t data)
+{
+	m_bg2_tilemap->set_scrollx(0, data);
+}
+
+void lwings_state::trojan_bg2_image_w(uint8_t data)
+{
+	if (m_bg2_image != data)
+	{
+		m_bg2_image = data;
+		m_bg2_tilemap->mark_all_dirty();
+	}
+}
+
+void lwings_state::sprite_dma_w(uint8_t data)
+{
+	if (m_screen->vblank())
+		m_spriteram->copy();
+}
+
 
 void lwings_state::lwings_bankswitch_w(uint8_t data)
 {
@@ -224,6 +469,14 @@ void lwings_state::lwings_bankswitch_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }
 
+void lwings_state::msm5205_w(uint8_t data)
+{
+	m_msm->s1_w(BIT(data, 6));
+	m_msm->reset_w(BIT(data, 7));
+
+	m_msm->data_w(data & 0xf);
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(lwings_state::scanline)
 {
 	const int scanline = param;
@@ -241,6 +494,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(lwings_state::scanline)
 		m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
+
+/* Avengers runs on hardware almost identical to Trojan, but with a protection
+ * device and some small changes to the memory map and video hardware.
+ *
+ * Background colors are fetched 64 bytes at a time and copied to palette RAM.
+ *
+ * Another function takes as input 2 pairs of (x,y) coordinates, and returns
+ * a code reflecting the direction (8 angles) from one point to the other.
+ */
 
 uint8_t lwings_state::mcu_p0_r()
 {
@@ -299,13 +561,12 @@ uint8_t lwings_state::avengers_soundlatch_ack_r()
 	return data;
 }
 
-void lwings_state::msm5205_w(uint8_t data)
-{
-	m_msm->s1_w(BIT(data, 6));
-	m_msm->reset_w(BIT(data, 7));
 
-	m_msm->data_w(data & 0xf);
-}
+/*************************************
+ *
+ *  Address maps
+ *
+ *************************************/
 
 void lwings_state::buraikenb_map(address_map &map)
 {
@@ -467,266 +728,6 @@ void lwings_state::trojan_adpcm_io_map(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).r("soundlatch2", FUNC(generic_latch_8_device::read));
 	map(0x01, 0x01).w(FUNC(lwings_state::msm5205_w));
-}
-
-
-/***************************************************************************
-
-  Callbacks for the TileMap code
-
-***************************************************************************/
-
-TILEMAP_MAPPER_MEMBER(lwings_state::get_bg2_memory_offset)
-{
-	return (row * 0x800) | (col * 2);
-}
-
-TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
-{
-	int code = m_fgvideoram[tile_index];
-	int color = m_fgvideoram[tile_index + 0x400];
-	tileinfo.set(0,
-			code + ((color & 0xc0) << 2),
-			color & 0x0f,
-			TILE_FLIPYX((color & 0x30) >> 4));
-}
-
-TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
-{
-	int code = m_bg1videoram[tile_index];
-	int color = m_bg1videoram[tile_index + 0x400];
-	tileinfo.set(1,
-			code + ((color & 0xe0) << 3),
-			color & 0x07,
-			TILE_FLIPYX((color & 0x18) >> 3));
-}
-
-TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
-{
-	int code = m_bg1videoram[tile_index];
-	int color = m_bg1videoram[tile_index + 0x400];
-	code += (color & 0xe0)<<3;
-	tileinfo.set(1,
-			code,
-			(color & 7),
-			((color & 0x10) ? TILE_FLIPX : 0));
-
-	tileinfo.group = (color & 0x08) >> 3;
-}
-
-TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
-{
-	int code, color;
-	uint8_t *rom = memregion("gfx5")->base();
-	int mask = memregion("gfx5")->bytes() - 1;
-
-	tile_index = (tile_index + m_bg2_image * 0x20) & mask;
-	code = rom[tile_index];
-	color = rom[tile_index + 1];
-	tileinfo.set(3,
-			code + ((color & 0x80) << 1),
-			color & 0x07,
-			TILE_FLIPYX((color & 0x30) >> 4));
-}
-
-
-/***************************************************************************
-
-  Start the video hardware emulation.
-
-***************************************************************************/
-
-void lwings_state::video_start()
-{
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::lwings_get_bg1_tile_info)), TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-
-	m_fg_tilemap->set_transparent_pen(3);
-}
-
-VIDEO_START_MEMBER(lwings_state,trojan)
-{
-	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
-	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::trojan_get_bg1_tile_info)),TILEMAP_SCAN_COLS, 16, 16, 32, 32);
-	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(lwings_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(lwings_state::get_bg2_memory_offset)), 16, 16, 32, 16);
-
-	m_fg_tilemap->set_transparent_pen(3);
-	m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); // split type 0 is totally transparent in front half
-	m_bg1_tilemap->set_transmask(1, 0xf07f, 0x0f81); // split type 1 has pens 7-11 opaque in front half
-
-	m_spr_avenger_hw = false;
-}
-
-VIDEO_START_MEMBER(lwings_state,avengers)
-{
-	VIDEO_START_CALL_MEMBER(trojan);
-	m_spr_avenger_hw = true;
-}
-
-
-/***************************************************************************
-
-  Memory handlers
-
-***************************************************************************/
-
-void lwings_state::lwings_fgvideoram_w(offs_t offset, uint8_t data)
-{
-	m_fgvideoram[offset] = data;
-	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
-}
-
-void lwings_state::lwings_bg1videoram_w(offs_t offset, uint8_t data)
-{
-	m_bg1videoram[offset] = data;
-	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
-}
-
-
-void lwings_state::lwings_bg1_scrollx_w(offs_t offset, uint8_t data)
-{
-	m_scroll_x[offset] = data;
-	m_bg1_tilemap->set_scrollx(0, m_scroll_x[0] | (m_scroll_x[1] << 8));
-}
-
-void lwings_state::lwings_bg1_scrolly_w(offs_t offset, uint8_t data)
-{
-	m_scroll_y[offset] = data;
-	m_bg1_tilemap->set_scrolly(0, m_scroll_y[0] | (m_scroll_y[1] << 8));
-}
-
-void lwings_state::trojan_bg2_scrollx_w(uint8_t data)
-{
-	m_bg2_tilemap->set_scrollx(0, data);
-}
-
-void lwings_state::trojan_bg2_image_w(uint8_t data)
-{
-	if (m_bg2_image != data)
-	{
-		m_bg2_image = data;
-		m_bg2_tilemap->mark_all_dirty();
-	}
-}
-
-void lwings_state::sprite_dma_w(uint8_t data)
-{
-	if (m_screen->vblank())
-		m_spriteram->copy();
-}
-
-
-/***************************************************************************
-
-  Display refresh
-
-***************************************************************************/
-
-inline bool lwings_state::is_sprite_on(uint8_t const *buffered_spriteram, int offs)
-{
-	int const sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
-	int const sy = buffered_spriteram[offs + 2];
-
-	return sx || sy;
-}
-
-void lwings_state::lwings_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
-
-	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
-	{
-		if (is_sprite_on(buffered_spriteram, offs))
-		{
-			int sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
-			int sy = buffered_spriteram[offs + 2];
-			if (sy > 0xf8)
-				sy -= 0x100;
-			int code = buffered_spriteram[offs] | (buffered_spriteram[offs + 1] & 0xc0) << 2;
-			int color = (buffered_spriteram[offs + 1] & 0x38) >> 3;
-			int flipx = buffered_spriteram[offs + 1] & 0x02;
-			int flipy = buffered_spriteram[offs + 1] & 0x04;
-
-			if (flip_screen())
-			{
-				sx = 240 - sx;
-				sy = 240 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			m_gfxdecode->gfx(2)->transpen(
-					bitmap, cliprect,
-					code + (m_sprbank * 0x400), color,
-					flipx, flipy, sx, sy,
-					15);
-		}
-	}
-}
-
-void lwings_state::trojan_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
-
-	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
-	{
-		if (is_sprite_on(buffered_spriteram, offs))
-		{
-			int sx = buffered_spriteram[offs + 3] - 0x100 * (buffered_spriteram[offs + 1] & 0x01);
-			int sy = buffered_spriteram[offs + 2];
-			if (sy > 0xf8)
-				sy -= 0x100;
-			int code = buffered_spriteram[offs] |
-					((buffered_spriteram[offs + 1] & 0x20) << 4) |
-					((buffered_spriteram[offs + 1] & 0x40) << 2) |
-					((buffered_spriteram[offs + 1] & 0x80) << 3);
-			int color = (buffered_spriteram[offs + 1] & 0x0e) >> 1;
-
-			int flipx, flipy;
-			if (m_spr_avenger_hw)
-			{
-				flipx = 0;                                      /* Avengers */
-				flipy = ~buffered_spriteram[offs + 1] & 0x10;
-			}
-			else
-			{
-				flipx = buffered_spriteram[offs + 1] & 0x10;    /* Trojan */
-				flipy = 1;
-			}
-
-			if (flip_screen())
-			{
-				sx = 240 - sx;
-				sy = 240 - sy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
-			m_gfxdecode->gfx(2)->transpen(
-					bitmap, cliprect,
-					code, color,
-					flipx, flipy, sx, sy,
-					15);
-		}
-	}
-}
-
-uint32_t lwings_state::screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg1_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	lwings_draw_sprites(bitmap, cliprect);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
-}
-
-uint32_t lwings_state::screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_bg2_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	trojan_draw_sprites(bitmap, cliprect);
-	m_bg1_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-	return 0;
 }
 
 
@@ -1343,9 +1344,6 @@ void lwings_state::avengers(machine_config &config)
 	GENERIC_LATCH_8(config, m_mculatch[2]);
 
 	m_adpcmcpu->set_addrmap(AS_IO, &lwings_state::avengers_adpcm_io_map);
-
-	// video hardware
-	MCFG_VIDEO_START_OVERRIDE(lwings_state,avengers)
 }
 
 void lwings_state::buraikenb(machine_config &config)
