@@ -3017,4 +3017,258 @@ almost nothing like the prototype.
 		</part>
 	</software>
 
+	<!-- Inufuto Homebrew -->
+
+	<software name="aerial">
+		<description>Aerial</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="aerial.bin" size="0x8000" crc="1e4593db" sha1="af87626303bf076bb8f5250f14ab705b5ec218d3" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="antiair">
+		<description>AntiAir</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="antiair.bin" size="0x8000" crc="bfce8dee" sha1="db1a4a63f481fa64b520d0d1c74905bad7d187e8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ascend">
+		<description>Ascend</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="ascend.bin" size="0x8000" crc="d581ef7b" sha1="7d023f4bccff1eac5a1189742cbd180bc7945a4f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awass">
+		<description>Awass</description>
+		<year>2026</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="awass.bin" size="0x8000" crc="b89e3605" sha1="4e02c582369b009bc767ad513dae686eb77c8eb4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="battlot">
+		<description>Battlot</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="battlot.bin" size="0x8000" crc="a4199a30" sha1="583ed08ecf5bdf71e563ea4d46fbfce15747a57e" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bootskell">
+		<description>Bootskell</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="bootskell.bin" size="0x4000" crc="7b3dfd62" sha1="7f4a7f9a8970f11a44b815476d49b640b7607855" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cacorm">
+		<description>Cacorm</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="cacorm.bin" size="0x4000" crc="7419e768" sha1="98f946ff4f9ef420a2e76697d6cdf27d6a275337" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cavit">
+		<description>Cavit</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="cavit.bin" size="0x8000" crc="885c29af" sha1="0bdccc6a4115177893d3841ce6ad0dcfcf21664a" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cracky">
+		<description>Cracky</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="cracky.bin" size="0x4000" crc="59677a47" sha1="ccc90d001967904f7df04e1382736e76cd0d5dce" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="guntus">
+		<description>Guntus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="guntus.bin" size="0x8000" crc="45cca116" sha1="4e7b98f00c956928a0443fc513da6699b5d50417" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hopman">
+		<description>Hopman</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="hopman.bin" size="0x4000" crc="2a0d1e6b" sha1="48cd71a5f1ecf0ee58e4cdb95cd3ef8504eeccff" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impetus">
+		<description>Impetus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="impetus.bin" size="0x8000" crc="a0a0da0c" sha1="7f879b35e749f8030fe5787d2fde2644fac62ec8" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lift">
+		<description>Lift</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="lift.bin" size="0x4000" crc="d34fd674" sha1="57e4b7db1071a2b68cf4afa6bf8751cd540ca8c4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy">
+		<description>Mazy</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="mazy.bin" size="0x8000" crc="47be8090" sha1="b9843548636a954b2e8d78282082c7699ed56280" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mazy2">
+		<description>Mazy2</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="mazy2.bin" size="0x8000" crc="499de304" sha1="8623981e67db9a2d796012303ab2c31c423fbca7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mieyen">
+		<description>Mieyen</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="mieyen.bin" size="0x8000" crc="5d3babdc" sha1="c173ff433b4a469eba1730a91b5003fb3b6973af" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neuras">
+		<description>Neuras</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="neuras.a78" size="0x8000" crc="993046ed" sha1="7be4ae126825318fed16442fd2afffd130f05af4" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="osotos">
+		<description>Osotos</description>
+		<year>2024</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="osotos.bin" size="0x8000" crc="b223e461" sha1="8ac41eb9a1964b70da1c14b14c451f4577e256d6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ruptus">
+		<description>Ruptus</description>
+		<year>2022</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="ruptus.bin" size="0x8000" crc="056c6d48" sha1="6c5cccbdcb64aff62883542c043b5baa7f233ccc" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svellas">
+		<description>Svellas</description>
+		<year>2025</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="svellas.bin" size="0x8000" crc="716476ed" sha1="d98d0b48e59a43dba1bbeb72fd0f5637e316222f" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yewdow">
+		<description>Yewdow</description>
+		<year>2023</year>
+		<publisher>Inufuto</publisher>
+		<part name="cart" interface="a7800_cart">
+			<feature name="slot" value="a78_rom" />
+			<dataarea name="rom" size="0x8000">
+				<rom name="yewdow.bin" size="0x8000" crc="ad176c55" sha1="6a0ce23aa25b624bdea13d7f3dccebcf167ec63d" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
