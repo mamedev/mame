@@ -311,7 +311,9 @@ void undrfire_state::video_start()
 
 	m_frame_counter = 0;
 
-	//save_item(NAME(m_dislayer));
+#ifdef MAME_DEBUG
+	save_item(NAME(m_dislayer));
+#endif
 }
 
 /***************************************************************
