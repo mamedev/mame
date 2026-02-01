@@ -682,9 +682,9 @@ void adsp21062_device::device_start()
 	m_core->fp0 = 0.0f;
 	m_core->fp1 = 1.0f;
 
-	save_item(NAME(m_core->pc));
 	save_pointer(NAME(&m_core->r[0].r), std::size(m_core->r));
 	save_pointer(NAME(&m_core->reg_alt[0].r), std::size(m_core->reg_alt));
+	save_item(NAME(m_core->pc));
 	save_item(NAME(m_core->mrf));
 	save_item(NAME(m_core->mrb));
 
@@ -771,8 +771,10 @@ void adsp21062_device::device_start()
 	save_item(STRUCT_MEMBER(m_core->dma_op, pmode));
 	save_item(STRUCT_MEMBER(m_core->dma_op, chained_direction));
 	save_item(STRUCT_MEMBER(m_core->dma_op, active));
+	save_item(STRUCT_MEMBER(m_core->dma_op, chained));
 
 	save_item(NAME(m_core->dma_status));
+	save_item(NAME(m_core->write_stalled));
 
 	save_item(NAME(m_core->interrupt_active));
 
