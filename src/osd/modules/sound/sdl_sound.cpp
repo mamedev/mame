@@ -101,11 +101,7 @@ int sound_sdl::init(osd_interface &osd, const osd_options &options)
 	// Capture is not implemented in SDL2, and the enumeration
 	// interface is different in SDL3
 	const int dev_count = SDL_GetNumAudioDevices(0);
-#if 0
 	for(int i=0; i != dev_count; i++) {
-#else
-	for(int i=dev_count-1; i != -1; i--) {
-#endif
 		SDL_AudioSpec spec;
 		const char *const name = SDL_GetAudioDeviceName(i, 0);
 #if SDL_VERSION_ATLEAST(2, 0, 16)
