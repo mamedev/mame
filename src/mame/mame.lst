@@ -37482,6 +37482,9 @@ iskr1031
 mc1502
 pk88
 
+@source:pc/mdartstr.cpp
+mdartstr
+
 @source:pc/megapc.cpp
 megapc
 megapcpl
