@@ -16,7 +16,7 @@ va_lpf4_device::va_lpf4_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
-	, m_embedded_sample_rate(0)
+	, m_streamless_sample_rate(0)
 	, m_input_gain(1)
 	, m_gain_comp(0)
 	, m_drive(1)
@@ -29,9 +29,9 @@ va_lpf4_device::va_lpf4_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-va_lpf4_device &va_lpf4_device::configure_embedded(u32 sample_rate)
+va_lpf4_device &va_lpf4_device::configure_streamless(u32 sample_rate)
 {
-	m_embedded_sample_rate = sample_rate;
+	m_streamless_sample_rate = sample_rate;
 	return *this;
 }
 
@@ -118,16 +118,16 @@ void va_lpf4_device::device_start()
 			fatalerror("%s: requires input 0 to be connected.\n", tag());
 		if (get_sound_requested_inputs_mask() & ~u64(7))
 			fatalerror("%s: can only have inputs 0-2 connected.\n", tag());
-		if (m_embedded_sample_rate > 0)
-			fatalerror("%s: configured as embedded, but the output stream is connected.\n", tag());
+		if (m_streamless_sample_rate > 0)
+			fatalerror("%s: configured as streamless, but the output stream is connected.\n", tag());
 
 		// Using a minimum of 96KHz to reduce aliasing due to distortion.
 		m_stream = stream_alloc(get_sound_requested_inputs(), 1, std::max(96000, machine().sample_rate()));
 	}
-	else if (m_embedded_sample_rate == 0)
+	else if (m_streamless_sample_rate == 0)
 	{
 		fatalerror("%s: not configured properly. Should either have streams connected, "
-		           "or be configured as embedded.\n", tag());
+		           "or be configured as streamless.\n", tag());
 	}
 
 	save_item(NAME(m_fc));
@@ -196,7 +196,7 @@ sound_stream::sample_t va_lpf4_device::process_sample_internal(sound_stream::sam
 sound_stream::sample_t va_lpf4_device::process_sample(sound_stream::sample_t s)
 {
 	if (get_sound_requested_outputs() > 0)
-		fatalerror("%s: process_sample() can only be used when in embedded mode.\n", tag());
+		fatalerror("%s: process_sample() can only be used when in streamless mode.\n", tag());
 	return process_sample_internal(s);
 }
 
@@ -235,7 +235,7 @@ u32 va_lpf4_device::sample_rate() const
 	if (m_stream)
 		return m_stream->sample_rate();
 	else
-		return m_embedded_sample_rate;
+		return m_streamless_sample_rate;
 }
 
 void va_lpf4_device::recalc_alpha0()

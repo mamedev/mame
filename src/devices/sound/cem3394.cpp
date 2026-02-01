@@ -313,7 +313,7 @@ void cem3394_device::device_start()
 {
 	// compute a sample rate
 	const int sample_rate = int(round(1.0 / m_inv_sample_rate));
-	m_vcf->configure_embedded(sample_rate);
+	m_vcf->configure_streamless(sample_rate);
 
 	// allocate stream channels
 	m_stream = stream_alloc(get_sound_requested_inputs(), 1, sample_rate);
