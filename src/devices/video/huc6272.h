@@ -49,7 +49,7 @@ private:
 	u32 m_kram_addr_r, m_kram_addr_w;
 	u16 m_kram_inc_r, m_kram_inc_w;
 	u8 m_kram_page_r, m_kram_page_w;
-	u32 m_kram_load_reg = 0, m_kram_write_reg = 0;
+	u32 m_kram_load_reg, m_kram_write_reg;
 	u32 m_page_setting;
 
 	struct{
@@ -90,12 +90,12 @@ private:
 		u32 addr[2]{};
 	}m_adpcm;
 
-	const address_space_config      m_program_space_config;
-	const address_space_config      m_data_space_config;
-	const address_space_config      m_io_space_config;
-	required_shared_ptr<u16>   m_microprg_ram;
-	required_shared_ptr_array<u16, 2> m_kram_page;
-	required_device<scsi_port_device> m_scsibus;
+	const address_space_config           m_program_space_config;
+	const address_space_config           m_data_space_config;
+	const address_space_config           m_io_space_config;
+	required_shared_ptr<u16>             m_microprg_ram;
+	required_shared_ptr_array<u16, 2>    m_kram_page;
+	required_device<scsi_port_device>    m_scsibus;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_ctrl_in;
