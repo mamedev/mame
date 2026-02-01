@@ -19,7 +19,7 @@ class a2_video_device : public device_t, public device_palette_interface, public
 {
 public:
 	// Models with different text-mode behavior. II includes the II+ and IIE includes the IIc and IIc Plus.
-	enum class model { II, IIE, IIGS, II_J_PLUS, IVEL_ULTRA };
+	enum class model { II, IIE, PRAVETZ_8C, IIGS, II_J_PLUS, IVEL_ULTRA };
 
 	// construction/destruction
 	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

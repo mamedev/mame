@@ -14,6 +14,8 @@ TODO:
 -->
 <softwarelist name="generic_cdrom" description="Cross-platform CD-ROM images">
 
+<!-- !Games -->
+
 	<!-- Windows 95, Direct X 3.0 (in cdrom under Instdx.exe) -->
 	<software name="arabkid" supported="partial">
 		<description>Arabian Kid (Japan)</description>
@@ -182,15 +184,63 @@ pc98: access [PC-9801-73] registers
 		</part>
 	</software>
 
+	<!-- Windows 95/98/ME/XP and Mac OS supported -->
+	<!-- Requires 256 colors minimum otherwise they crashes at boot -->
+	<software name="v16imagine" supported="partial">
+		<description>Viper -V16- Imagine (International)</description>
+		<year>2001</year>
+		<publisher>Sogna / Hobibox Europe</publisher>
+		<notes><![CDATA[
+ibmpc: Has [8514] icon glitch
+pc98: [PC-9801-86] offset sound in places (verify)
+]]></notes>
+		<info name="language" value="English" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Japanese" />
+		<info name="language" value="Spanish" />
+		<info name="usage" value="Requires at least 256 color depth" />
+		<sharedfeat name="compatibility" value="ibmpc,pc98" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="GX" sha1="5de4abf4a883a56ec389bb255d176b5a39a63420" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="v16rise" supported="partial">
+		<description>Viper -V16- RISE (International)</description>
+		<year>2001</year>
+		<publisher>Sogna / Hobibox Europe</publisher>
+		<notes><![CDATA[
+ibmpc: Has [8514] icon glitch
+pc98: [PC-9801-86] offset sound in places (verify)
+]]></notes>
+		<info name="language" value="English" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Japanese" />
+		<info name="language" value="Spanish" />
+		<info name="usage" value="Requires at least 256 color depth" />
+		<sharedfeat name="compatibility" value="ibmpc,pc98" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="GX4" sha1="a600a961b5127d3a5ee368c20d9f54e6ede23b81" />
+			</diskarea>
+		</part>
+	</software>
+
+<!-- !Operating Systems -->
+
 	<!-- dec/jensen.cpp and ibm/thinkpad8xx.cpp drivers (for alpha and prep) are not working -->
 	<software name="winnt31" supported="partial">
 		<description>Windows NT 3.1 (3.10.528.1, MSDN, en-US)</description> <!-- This SKU became "Workstation" in 3.5, 3.51, and 4.0 -->
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<notes><![CDATA[
-		This floppy image is actually connected to the 1993 release, but it works.
-		None of the files changed on the CD are part of the floppy disk.
-		]]></notes>
+This floppy image is actually connected to the 1993 release, but it works.
+None of the files changed on the CD are part of the floppy disk.
+]]></notes>
 		<info name="language" value="English"/>
 		<sharedfeat name="compatibility" value="alpha,ibmpc,mipsr4000" />
 		<part name="cdrom" interface="cdrom">
@@ -261,9 +311,9 @@ pc98: access [PC-9801-73] registers
 		<year>1993</year>
 		<publisher>Microsoft</publisher>
 		<notes><![CDATA[
-		While the standard (“Workstation”) edition was included in the MSDN 1994 set,
-		Advanced Server was not.  An updated Advanced Server build may not exist.
-		]]></notes>
+While the standard (“Workstation”) edition was included in the MSDN 1994 set,
+Advanced Server was not.  An updated Advanced Server build may not exist.
+]]></notes>
 		<info name="language" value="English"/>
 		<sharedfeat name="compatibility" value="alpha,ibmpc,mipsr4000" />
 		<part name="cdrom" interface="cdrom">
@@ -592,8 +642,8 @@ pc98: access [PC-9801-73] registers
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<notes><![CDATA[
-		This version often gets mislabeled as 3.50.800.1 even though no such build exists.
-		]]></notes>
+This version often gets mislabeled as 3.50.800.1 even though no such build exists.
+]]></notes>
 		<info name="language" value="English"/>
 		<sharedfeat name="compatibility" value="alpha,ibmpc,mipsr4000" />
 		<part name="cdrom" interface="cdrom">
@@ -647,8 +697,8 @@ pc98: access [PC-9801-73] registers
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 		<notes><![CDATA[
-		This version often gets mislabeled as 3.50.800.1 even though no such build exists.
-		]]></notes>
+This version often gets mislabeled as 3.50.800.1 even though no such build exists.
+]]></notes>
 		<info name="language" value="English"/>
 		<sharedfeat name="compatibility" value="alpha,ibmpc,mipsr4000" />
 		<part name="cdrom" interface="cdrom">
@@ -880,8 +930,8 @@ pc98: access [PC-9801-73] registers
 		<year>1996</year>
 		<publisher>Microsoft</publisher>
 		<notes><![CDATA[
-		This release gets frequently mis-identified online as RTM, but it is actually Service Pack 1.
-		]]></notes>
+This release gets frequently mis-identified online as RTM, but it is actually Service Pack 1.
+]]></notes>
 		<sharedfeat name="compatibility" value="alpha,ibmpc,mipsr4000,prep" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -943,8 +993,8 @@ pc98: access [PC-9801-73] registers
 		<year>1996</year>
 		<publisher>Microsoft</publisher>
 		<notes><![CDATA[
-		This release gets frequently mis-identified online as RTM, but it is actually Service Pack 1.
-		]]></notes>
+This release gets frequently mis-identified online as RTM, but it is actually Service Pack 1.
+]]></notes>
 		<sharedfeat name="compatibility" value="alpha,ibmpc,mipsr4000,prep" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1036,9 +1086,9 @@ pc98: access [PC-9801-73] registers
 		<year>1997</year>
 		<publisher>Microsoft</publisher>
 		<notes><![CDATA[
-		This installs as 4.0.1381.2 (SP1), but immediately prompts to install
-		Service Pack 3 to bring it to 4.0.1381.4. Let's go with that number.
-		]]></notes>
+This installs as 4.0.1381.2 (SP1), but immediately prompts to install
+Service Pack 3 to bring it to 4.0.1381.4. Let's go with that number.
+]]></notes>
 		<sharedfeat name="compatibility" value="alpha,ibmpc" />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Operating System"/>
@@ -1105,8 +1155,8 @@ pc98: access [PC-9801-73] registers
 		<year>1999</year>
 		<publisher>Microsoft</publisher>
 		<notes><![CDATA[
-		ISO file CRC32 hash is not 0xffffffff.  Microsoft actually shipped this image, it's an exception. :-)
-		]]></notes>
+ISO file CRC32 hash is not 0xffffffff.  Microsoft actually shipped this image, it's an exception. :-)
+]]></notes>
 		<info name="release" value="19990526" />
 		<info name="language" value="English" />
 		<info name="usage" value="This updates the operating system, but is not the operating system installer itself." />

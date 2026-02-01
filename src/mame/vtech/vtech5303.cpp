@@ -68,7 +68,7 @@ void vtech5303_state::vtech5303(machine_config &config)
 	m_screen->set_visarea(0, 64-1, 0, 32-1);
 	m_screen->set_screen_update(FUNC(vtech5303_state::screen_update_vtech5303));
 
-	SPEAKER(config, "mono").front_left();
+	SPEAKER(config, "mono").front_center();
 }
 
 // Spanish machine

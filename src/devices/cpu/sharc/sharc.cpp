@@ -7,8 +7,14 @@
 
 #include "emu.h"
 #include "sharc.h"
-#include "sharcfe.h"
+
 #include "sharcdsm.h"
+#include "sharcfe.h"
+
+#include "emuopts.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 
 #define DISABLE_FAST_REGISTERS      1
@@ -297,7 +303,7 @@ void adsp21062_device::iop_w(offs_t offset, uint32_t data)
 {
 	switch (offset)
 	{
-		case 0x00: break;       // System configuration
+		case 0x00: m_core->syscon = data; break;
 		case 0x02: break;       // External Memory Wait State Configuration
 		case 0x04: // External port DMA buffer 0
 		/* TODO: Last Bronx uses this to init the program, int_index however is 0? */
@@ -387,36 +393,33 @@ void adsp21062_device::iop_w(offs_t offset, uint32_t data)
 #include "sharcmem.hxx"
 #include "sharcdma.hxx"
 #include "sharcops.hxx"
-#include "sharcops.h"
 
 
 
 void adsp21062_device::build_opcode_table()
 {
-	int i, j;
-	int num_ops = sizeof(s_sharc_opcode_table) / sizeof(SHARC_OP);
-
-	for (i=0; i < 512; i++)
+	for (int i = 0; i < std::size(m_sharc_op); i++)
 	{
 		m_sharc_op[i] = &adsp21062_device::sharcop_unimplemented;
-	}
 
-	for (i=0; i < 512; i++)
-	{
-		uint16_t op = i << 7;
+		const uint16_t op = i << 7;
 
-		for (j=0; j < num_ops; j++)
+		int j = 0;
+		while (j < s_num_ops)
 		{
-			if ((s_sharc_opcode_table[j].op_mask & op) == s_sharc_opcode_table[j].op_bits)
+			auto &opcode = s_sharc_opcode_table[j++];
+			if ((opcode.op_mask & op) == opcode.op_bits)
 			{
-				if (m_sharc_op[i] != &adsp21062_device::sharcop_unimplemented)
-				{
-					fatalerror("build_opcode_table: table already filled! (i=%04X, j=%d)\n", i, j);
-				}
-				else
-				{
-					m_sharc_op[i] = s_sharc_opcode_table[j].handler;
-				}
+				m_sharc_op[i] = opcode.handler;
+				break;
+			}
+		}
+		while (j < s_num_ops)
+		{
+			auto &opcode = s_sharc_opcode_table[j++];
+			if ((opcode.op_mask & op) == opcode.op_bits)
+			{
+				fatalerror("build_opcode_table: table already filled! (i=%04X, j=%d)\n", i, j);
 			}
 		}
 	}
@@ -426,17 +429,34 @@ void adsp21062_device::build_opcode_table()
 
 void adsp21062_device::external_iop_write(uint32_t address, uint32_t data)
 {
-	if (address == 0x1c)
+	// host packing mode used to determine width of external host bus width (16/32)
+	// if writing to external port DMA buffer, just write the data directly;
+	// external_dma_write() handles packed data
+	if (m_core->syscon & 0x10 && address != 0x04)
 	{
-		if (data != 0)
+		if ((m_core->iop_write_num++ & 1) == 0)
 		{
-			m_core->dma[6].control = data;
+			m_core->iop_data = data & 0xffff;
+			return;
+		}
+		else
+		{
+			m_core->iop_data |= (data & 0xffff) << 16;
 		}
 	}
 	else
 	{
-		osd_printf_debug("SHARC IOP write %08X, %08X\n", address, data);
-		m_data->write_dword(address, data);
+		m_core->iop_data = data;
+	}
+
+	if (address == 0x1c)
+	{
+		m_core->dma[6].control = m_core->iop_data;
+	}
+	else
+	{
+		LOG("SHARC IOP write %08X, %08X\n", address, m_core->iop_data);
+		m_data->write_dword(address, m_core->iop_data);
 	}
 }
 
@@ -474,7 +494,8 @@ void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 
 void adsp21062_device::device_start()
 {
-	m_core = (sharc_internal_state *)m_cache.alloc_near(sizeof(sharc_internal_state));
+	m_cache.allocate_cache(mconfig().options().drc_rwx());
+	m_core = m_cache.alloc_near<sharc_internal_state>();
 	memset(m_core, 0, sizeof(sharc_internal_state));
 
 	m_program = &space(AS_PROGRAM);
@@ -681,6 +702,8 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->laddr.loop_type));
 	save_item(NAME(m_core->curlcntr));
 	save_item(NAME(m_core->lcntr));
+	save_item(NAME(m_core->iop_write_num));
+	save_item(NAME(m_core->iop_data));
 
 	save_item(NAME(m_core->dag1.i));
 	save_item(NAME(m_core->dag1.m));
@@ -904,6 +927,9 @@ void adsp21062_device::device_reset()
 			m_core->dma[6].int_index      = 0x20000;
 			m_core->dma[6].int_modifier   = 1;
 			m_core->dma[6].int_count      = 0x100;
+			m_core->dma[6].ext_index      = 0x400000;
+			m_core->dma[6].ext_modifier   = 1;
+			m_core->dma[6].ext_count      = 0x600;
 			m_core->dma[6].control        = 0xa1;
 			break;
 		}
@@ -924,6 +950,10 @@ void adsp21062_device::device_reset()
 	m_core->lstkp = 0;
 	m_core->pcstkp = 0;
 	m_core->interrupt_active = 0;
+
+	m_core->syscon = 0x10;
+	m_core->iop_write_num = 0;
+	m_core->iop_data = 0;
 
 	m_drcfe->flush();
 }

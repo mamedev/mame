@@ -1013,17 +1013,17 @@ void imagetek_i4100_device::blitter_w(offs_t offset, uint16_t data, uint16_t mem
  ***************************************************************************/
 
 void imagetek_i4100_device::draw_spritegfx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &clip,
-							u32 const gfxstart, u16 const width, u16 const height,
-							u16 color, int const flipx, int const flipy, int sx, int sy,
-							u32 const scale, u8 const prival)
+		u32 const gfxstart, u16 const width, u16 const height,
+		u16 color, int const flipx, int const flipy, int sx, int sy,
+		u32 const scale, u8 const prival)
 {
 	if (!scale) return;
 	u8 trans;
-	bool const is_8bpp = (m_support_8bpp == true && color == 0xf) ? true : false;  /* 8bpp */
+	bool const is_8bpp = (m_support_8bpp == true && color == 0xf) ? true : false;
 
 	if (is_8bpp)
 	{
-		/* Bounds checking */
+		// Bounds checking
 		if ((gfxstart + width * height - 1) >= m_gfxrom.bytes())
 			return;
 
@@ -1032,7 +1032,7 @@ void imagetek_i4100_device::draw_spritegfx(screen_device &screen, bitmap_rgb32 &
 	}
 	else
 	{
-		/* Bounds checking */
+		// Bounds checking
 		if ((gfxstart + width / 2 * height - 1) >= m_gfxrom.bytes())
 			return;
 
@@ -1051,7 +1051,7 @@ void imagetek_i4100_device::draw_spritegfx(screen_device &screen, bitmap_rgb32 &
 	const int sprite_screen_width = (scale * width + 0x8000) >> 16;
 	if (sprite_screen_width && sprite_screen_height)
 	{
-		/* compute sprite increment per screen pixel */
+		// compute sprite increment per screen pixel
 		int dx = (width << 16) / sprite_screen_width;
 		int dy = (height << 16) / sprite_screen_height;
 
@@ -1082,30 +1082,35 @@ void imagetek_i4100_device::draw_spritegfx(screen_device &screen, bitmap_rgb32 &
 		}
 
 		if (sx < clip.min_x)
-		{ /* clip left */
+		{
+			// clip left
 			int pixels = clip.min_x - sx;
 			sx += pixels;
 			x_index_base += pixels * dx;
 		}
 		if (sy < clip.min_y)
-		{ /* clip top */
+		{
+			// clip top
 			int pixels = clip.min_y - sy;
 			sy += pixels;
 			y_index += pixels * dy;
 		}
 		if (ex > clip.max_x + 1)
-		{ /* clip right */
+		{
+			// clip right
 			int pixels = ex - clip.max_x - 1;
 			ex -= pixels;
 		}
 		if (ey > clip.max_y + 1)
-		{ /* clip bottom */
+		{
+			// clip bottom
 			int pixels = ey - clip.max_y - 1;
 			ey -= pixels;
 		}
 
+		// skip if inner loop doesn't draw anything
 		if (ex > sx)
-		{ /* skip if inner loop doesn't draw anything */
+		{
 			bitmap_ind8 &priority_bitmap = screen.priority();
 			if (priority_bitmap.valid())
 			{
@@ -1359,7 +1364,7 @@ inline u8 imagetek_i4100_device::get_tile_pix(u16 code, u8 x, u8 y, bool const b
 ***************************************************************************/
 
 void imagetek_i4100_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 flags, u32 const pcode,
-							int sx, int sy, int wx, int wy, bool const big, int const layer)
+		int sx, int sy, int wx, int wy, bool const big, int const layer)
 {
 	bitmap_ind8 &priority_bitmap = screen.priority();
 

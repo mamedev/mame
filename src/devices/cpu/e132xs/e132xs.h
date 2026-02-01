@@ -467,6 +467,8 @@ private:
 	uml::code_handle *m_io_write32;
 	uml::code_handle *m_exception;
 
+	internal_hyperstone_state m_local_core; // for non-DRC mode
+
 	uint32_t m_debug_local_regs[16];
 
 	bool m_enable_drc;
@@ -477,7 +479,7 @@ private:
 
 	void execute_run_drc();
 	void flush_drc_cache();
-	void code_flush_cache();
+	void generate_invariant();
 	void code_compile_block(uint8_t mode, offs_t pc);
 	//void load_fast_iregs(drcuml_block &block);
 	//void save_fast_iregs(drcuml_block &block);

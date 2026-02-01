@@ -194,7 +194,7 @@ private:
 	static const u8 MACHINE_NEXT = 0x0a;
 	static const u8 MACHINE_NEXT_AB = 0xfa; // Anti Brick (reset disabled, bootrom)
 	static const u8 G_VERSION = 0x32; // 3.02
-	static const u8 G_SUB_VERSION = 0x01;
+	static const u8 G_SUB_VERSION = 0x04;
 	static const u8 G_VIDEO_INC = 0b11;
 	static const u16 UTM_FALLBACK_PEN = 0x800;
 
@@ -361,7 +361,7 @@ private:
 	required_ioport m_io_issue;
 	optional_ioport m_io_video;
 	optional_ioport m_io_layers;
-	required_ioport_array<3> m_io_mouse;
+	required_ioport_array<4> m_io_mouse;
 	required_ioport m_io_joy_left;
 	required_ioport m_io_joy_right;
 
@@ -396,7 +396,7 @@ private:
 	bool m_nr_03_user_dt_lock;
 	u8 m_nr_03_machine_timing; // u3
 	bool m_nr_03_config_mode;
-	u8 m_nr_04_romram_bank; // u7
+	u8 m_nr_04_romram_bank; // issue <5 - u7, issue5 - u8
 	u8 m_nr_05_joy0; // u3
 	u8 m_nr_05_joy1; // u3
 	bool m_nr_05_5060;
@@ -422,6 +422,7 @@ private:
 	bool m_nr_0a_mouse_button_reverse;
 	bool m_nr_0a_divmmc_automap_en;
 	u8 m_nr_0a_mf_type; // u2
+	bool m_nr_0a_sd_swap;
 	bool m_nr_0b_joy_iomode_0;
 	u8 m_nr_0b_joy_iomode; // u2
 	bool m_nr_0b_joy_iomode_en;
@@ -670,7 +671,8 @@ void specnext_state::bank_update(u8 bank)
 	const bool sram_pre_layer2_wr_en = m_port_123b_layer2_map_wr_en;
 	const u16 sram_pre_layer2_A21_A13 = layer2_A21_A13;
 
-	u8 sram_pre_A20_A13, sram_pre_override; // u3: divmmc & layer 2 & romcs
+	u16 sram_pre_A21_A13; // u9
+	u8 sram_pre_override; // u3: divmmc & layer 2 & romcs
 	bool sram_pre_active, sram_pre_bank5, sram_pre_bank7, sram_pre_rdonly;
 	if (is_rom) // 0-1
 	{
@@ -678,7 +680,7 @@ void specnext_state::bank_update(u8 bank)
 		m_mf->enable_w(port_multiface_io_en());
 		if (m_mf->mf_enabled_r())
 		{
-			sram_pre_A20_A13 = 0b00001010 | cpu_a13;
+			sram_pre_A21_A13 = 0b000001010 | cpu_a13;
 			sram_pre_active = 1;
 			sram_pre_bank5 = sram_pre_bank7 = 0;
 			sram_pre_rdonly = !cpu_a13;
@@ -686,7 +688,7 @@ void specnext_state::bank_update(u8 bank)
 		}
 		else if (BIT(~mmu_A21_A13, 8))
 		{
-			sram_pre_A20_A13 = mmu_A21_A13 & 0xff;
+			sram_pre_A21_A13 = mmu_A21_A13 & 0xff;
 			sram_pre_active = !mem_active_bank5 && !mem_active_bank7;
 			sram_pre_bank5 = mem_active_bank5;
 			sram_pre_bank7 = mem_active_bank7;
@@ -695,7 +697,7 @@ void specnext_state::bank_update(u8 bank)
 		}
 		else if (m_nr_03_config_mode)
 		{
-			sram_pre_A20_A13 = (m_nr_04_romram_bank << 1) | cpu_a13;
+			sram_pre_A21_A13 = (m_nr_04_romram_bank << 1) | cpu_a13;
 			sram_pre_active = 1;
 			sram_pre_bank5 = sram_pre_bank7 = 0;
 			sram_pre_rdonly = 0;
@@ -703,7 +705,7 @@ void specnext_state::bank_update(u8 bank)
 		}
 		else
 		{
-			sram_pre_A20_A13 = (m_sram_rom << 1) | cpu_a13;
+			sram_pre_A21_A13 = (m_sram_rom << 1) | cpu_a13;
 			sram_pre_active = 1;
 			sram_pre_bank5 = sram_pre_bank7 = 0;
 			sram_pre_rdonly = !(nr_8c_altrom_en() && nr_8c_altrom_rw());
@@ -712,7 +714,7 @@ void specnext_state::bank_update(u8 bank)
 	}
 	else
 	{
-		sram_pre_A20_A13 = mmu_A21_A13 & 0xff;
+		sram_pre_A21_A13 = mmu_A21_A13 & 0xff;
 		sram_pre_active = BIT(~mmu_A21_A13, 8) && !mem_active_bank5 && !mem_active_bank7;
 		sram_pre_bank5 = mem_active_bank5;
 		sram_pre_bank7 = mem_active_bank7;
@@ -740,11 +742,11 @@ void specnext_state::bank_update(u8 bank)
 		m_divmmc->automap_rom3_active_w(sram_divmmc_automap_rom3_en);
 		m_divmmc->clock_w();
 
-		u8 sram_A20_A13;
+		u16 sram_A21_A13; // u9
 		bool sram_active, sram_bank5, sram_bank7, sram_rdonly, sram_romcs_en, sram_mem_hide_n;
 		if (BIT(sram_pre_override, 2) && m_divmmc->divmmc_rom_en_r())
 		{
-			sram_A20_A13 = 0b00001000;
+			sram_A21_A13 = 0b000001000;
 			sram_active = 1;
 			sram_bank5 = sram_bank7 = 0;
 			sram_rdonly = 1;
@@ -753,7 +755,7 @@ void specnext_state::bank_update(u8 bank)
 		}
 		else if (BIT(sram_pre_override, 2) && m_divmmc->divmmc_ram_en_r())
 		{
-			sram_A20_A13 = 0b00010000 | m_divmmc->divmmc_ram_bank_r();
+			sram_A21_A13 = 0b000010000 | m_divmmc->divmmc_ram_bank_r();
 			sram_active = 1;
 			sram_bank5 = sram_bank7 = 0;
 			sram_rdonly = m_divmmc->divmmc_rdonly_r();
@@ -762,7 +764,7 @@ void specnext_state::bank_update(u8 bank)
 		}
 		else if (sram_layer2_map_en)
 		{
-			sram_A20_A13 = sram_pre_layer2_A21_A13 & 0xff;
+			sram_A21_A13 = sram_pre_layer2_A21_A13 & 0xff;
 			sram_active = BIT(~sram_pre_layer2_A21_A13, 8);
 			sram_bank5 = sram_bank7 = 0;
 			sram_rdonly = 0;
@@ -771,7 +773,7 @@ void specnext_state::bank_update(u8 bank)
 		}
 		else if (sram_romcs)
 		{
-			sram_A20_A13 = 0b00011110 | BIT(sram_pre_A20_A13, 0);
+			sram_A21_A13 = 0b000011110 | BIT(sram_pre_A21_A13, 0);
 			sram_active = 1;
 			sram_bank5 = sram_bank7 = 0;
 			sram_rdonly = 1;
@@ -780,7 +782,7 @@ void specnext_state::bank_update(u8 bank)
 		}
 		else if (sram_altrom_en)
 		{
-			sram_A20_A13 = 0b00001100 | (sram_pre_alt_128_n << 1) | BIT(sram_pre_A20_A13, 0);
+			sram_A21_A13 = 0b000001100 | (sram_pre_alt_128_n << 1) | BIT(sram_pre_A21_A13, 0);
 			sram_active = 1;
 			sram_bank5 = sram_bank7 = 0;
 			sram_rdonly = sram_pre_rdonly;
@@ -789,7 +791,7 @@ void specnext_state::bank_update(u8 bank)
 		}
 		else
 		{
-			sram_A20_A13 = sram_pre_A20_A13;
+			sram_A21_A13 = sram_pre_A21_A13;
 			sram_active = sram_pre_active;
 			sram_bank5 = sram_pre_bank5;
 			sram_bank7 = sram_pre_bank7;
@@ -803,22 +805,22 @@ void specnext_state::bank_update(u8 bank)
 
 		if (cpu_rd_n)
 		{
-			m_page_shadow[bank] = sram_rdonly ? ~0 : sram_A20_A13;
+			m_page_shadow[bank] = sram_rdonly ? ~0 : sram_A21_A13;
 		}
 		else
 		{
-			m_bank_ram[bank]->set_entry(sram_A20_A13);
-			if (sram_rdonly || (m_page_shadow[bank] != sram_A20_A13))
+			m_bank_ram[bank]->set_entry(sram_A21_A13);
+			if (sram_rdonly || (m_page_shadow[bank] != sram_A21_A13))
 			{
 				views[bank].get().select(0);
-				LOGMEM("ROM%d = %x\n", bank, sram_A20_A13);
+				LOGMEM("ROM%d = %x\n", bank, sram_A21_A13);
 			}
 			else
 			{
-				if (m_page_shadow[bank] == sram_A20_A13)
+				if (m_page_shadow[bank] == sram_A21_A13)
 					m_page_shadow[bank] = ~0;
 				views[bank].get().disable();
-				LOGMEM("RAM%d = %x\n", bank, sram_A20_A13);
+				LOGMEM("RAM%d = %x\n", bank, sram_A21_A13);
 			}
 		}
 	}
@@ -1118,9 +1120,9 @@ void specnext_state::port_e3_reg_w(u8 data)
 void specnext_state::port_e7_reg_w(u8 data)
 {
 	if ((data & 3) == 0b10)
-		m_port_e7_reg = 0xfe;
+		m_port_e7_reg = 0b11111100 | (!m_nr_0a_sd_swap << 1) | m_nr_0a_sd_swap;
 	else if ((data & 3) == 0x01)
-		m_port_e7_reg = 0xfd;
+		m_port_e7_reg =  0b11111100 | (m_nr_0a_sd_swap << 1) | !m_nr_0a_sd_swap;
 	else if ((data == 0xfb) || (data == 0xf7))
 		m_port_e7_reg = data;
 	else if ((data == 0x7f) && (m_nr_03_config_mode || BIT(m_nr_02_reset_type, 2)))
@@ -1454,7 +1456,7 @@ u8 specnext_state::reg_r(offs_t nr_register)
 		port_253b_dat = (m_nr_09_psg_mono  << 5) | (m_nr_09_sprite_tie << 4) | (0 << 3) | ((!m_nr_09_hdmi_audio_en) << 2) | m_nr_09_scanlines; // m_eff_nr_09_scanlines
 		break;
 	case 0x0a:
-		port_253b_dat = (m_nr_0a_mf_type << 6) | (0 << 5) | (m_nr_0a_divmmc_automap_en << 4) | (m_nr_0a_mouse_button_reverse << 3) | (0 << 2) | m_nr_0a_mouse_dpi;
+		port_253b_dat = (m_nr_0a_mf_type << 6) | (m_nr_0a_sd_swap << 5) | (m_nr_0a_divmmc_automap_en << 4) | (m_nr_0a_mouse_button_reverse << 3) | (0 << 2) | m_nr_0a_mouse_dpi;
 		break;
 	case 0x0b:
 		port_253b_dat = (m_nr_0b_joy_iomode_en << 7) | (0 << 6) | (m_nr_0b_joy_iomode << 4) | (0b000 << 1) | m_nr_0b_joy_iomode_0;
@@ -1912,7 +1914,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 
 		break;
 	case 0x04:
-		m_nr_04_romram_bank = BIT(nr_wr_dat, 0, 7);
+		m_nr_04_romram_bank = nr_wr_dat & (m_io_issue->read() < 3 ? 0x7f : 0xff);
 		bank_update(0, 2);
 		break;
 	case 0x05:
@@ -1958,7 +1960,10 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 		break;
 	case 0x0a:
 		if (m_nr_03_config_mode == 1)
+		{
 			nr_0a_mf_type_w(BIT(nr_wr_dat, 6, 2));
+			m_nr_0a_sd_swap = BIT(nr_wr_dat, 5);
+		}
 		m_nr_0a_divmmc_automap_en = BIT(nr_wr_dat, 4);
 		m_nr_0a_mouse_button_reverse = BIT(nr_wr_dat, 3);
 		m_nr_0a_mouse_dpi = BIT(nr_wr_dat, 0, 2);
@@ -2622,6 +2627,9 @@ void specnext_state::line_irq_adjust()
 
 INPUT_CHANGED_MEMBER(specnext_state::on_mf_nmi)
 {
+	if (m_nr_03_config_mode)
+		return;
+
 	m_nr_02_generate_mf_nmi = newval & 1;
 	do_mf_nmi();
 	m_nr_02_generate_mf_nmi = 0;
@@ -2629,6 +2637,9 @@ INPUT_CHANGED_MEMBER(specnext_state::on_mf_nmi)
 
 INPUT_CHANGED_MEMBER(specnext_state::on_divmmc_nmi)
 {
+	if (m_nr_03_config_mode)
+		return;
+
 	m_nr_02_generate_divmmc_nmi = newval & 1;
 	if (m_nr_06_button_drive_nmi_en && m_nr_02_generate_divmmc_nmi)
 		m_maincpu->nmi();
@@ -2977,9 +2988,9 @@ void specnext_state::map_io(address_map &map)
 	map(0x000b, 0x000b).mirror(0xff00).lrw8(NAME([this]() { return dma_r(1); }), NAME([this](u8 data) { dma_w(1, data); }));
 	map(0x006b, 0x006b).mirror(0xff00).lrw8(NAME([this]() { return dma_r(0); }), NAME([this](u8 data) { dma_w(0, data); }));
 
-	map(0x0bdf, 0x0bdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); }));                 // #fbdf
-	map(0x0fdf, 0x0fdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return ~m_io_mouse[1]->read(); }));                // #ffdf
-	map(0x0adf, 0x0adf).mirror(0xf000).lr8(NAME([this]() -> u8 { return 0x80 | (m_io_mouse[2]->read() & 0x07); })); // #fadf
+	map(0x0bdf, 0x0bdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return m_io_mouse[0]->read(); })); // #fbdf
+	map(0x0fdf, 0x0fdf).mirror(0xf000).lr8(NAME([this]() -> u8 { return m_io_mouse[1]->read(); })); // #ffdf
+	map(0x0adf, 0x0adf).mirror(0xf000).lr8(NAME([this]() -> u8 { return (m_io_mouse[3]->read() << 4) | m_io_mouse[2]->read(); })); // #fadf
 
 	map(0x0037, 0x0037).mirror(0xff00).r(FUNC(specnext_state::kempston_md_r<1>));
 
@@ -3061,12 +3072,16 @@ INPUT_PORTS_START(specnext)
 	PORT_MODIFY("LINE7")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SYMBOL SHIFT") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 	
+	PORT_MODIFY("CONFIG")
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 
 	PORT_START("ISSUE")
 	PORT_CONFNAME(0x03, 0x02, "Hardware Version" )
 	PORT_CONFSETTING(0x00, "Issue 1 (TBBLUE)" )
 	PORT_CONFSETTING(0x01, "Issue 2 (KS 1)" )
 	PORT_CONFSETTING(0x02, "Issue 4 (KS 2)" )
+	PORT_CONFSETTING(0x03, "Issue 5 (KS 3)" )
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("VIDEO")
@@ -3079,12 +3094,16 @@ INPUT_PORTS_START(specnext)
 	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(40)
 
 	PORT_START("mouse_input2")
-	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_SENSITIVITY(40)
+	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_REVERSE PORT_SENSITIVITY(40)
 
 	PORT_START("mouse_input3")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON2)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON1)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Middle mouse button") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON4) PORT_NAME("Mouse Button Left") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON5) PORT_NAME("Mouse Button Right") PORT_CODE(MOUSECODE_BUTTON2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON6) PORT_NAME("Mouse Button Middle") PORT_CODE(MOUSECODE_BUTTON3)
+	PORT_BIT(0xf8, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("mouse_input4")
+	PORT_BIT(0x0f, 0, IPT_DIAL_V) PORT_REVERSE PORT_NAME("Mouse Scroll V") PORT_SENSITIVITY(1) PORT_CODE(MOUSECODE_Z)
 
 	PORT_START("JOY_LEFT")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_CODE(JOYCODE_HAT1RIGHT) PORT_NAME("Joystick (L) Right") PORT_CODE(JOYCODE_X_RIGHT_SWITCH) PORT_8WAY
@@ -3207,6 +3226,7 @@ void specnext_state::machine_start()
 	save_item(NAME(m_nr_0a_mouse_button_reverse));
 	save_item(NAME(m_nr_0a_divmmc_automap_en));
 	save_item(NAME(m_nr_0a_mf_type));
+	save_item(NAME(m_nr_0a_sd_swap));
 	save_item(NAME(m_nr_0b_joy_iomode_0));
 	save_item(NAME(m_nr_0b_joy_iomode));
 	save_item(NAME(m_nr_0b_joy_iomode_en));
@@ -3435,6 +3455,7 @@ void specnext_state::reset_hard()
 	m_nr_09_hdmi_audio_en = 1;
 	m_nr_09_sprite_tie = 0;
 	nr_0a_mf_type_w(0b00);
+	m_nr_0a_sd_swap = 0;
 	m_nr_0a_divmmc_automap_en = 0;
 	m_nr_0a_mouse_button_reverse = 0;
 	m_nr_0a_mouse_dpi = 0b01;
@@ -3795,8 +3816,7 @@ void specnext_state::tbblue(machine_config &config)
 	spectrum_128(config);
 	config.device_remove("exp");
 	config.device_remove("dma");
-	// m_ram->set_default_size("1M").set_extra_options("2M");
-	m_ram->set_default_size("2M").set_default_value(0);
+	m_ram->set_default_size("4M").set_default_value(0);
 
 	Z80N(config.replace(), m_maincpu, 28_MHz_XTAL / 8);
 	m_maincpu->set_daisy_config(z80_daisy_chain);
@@ -3898,6 +3918,7 @@ ROM_START(tbblue)
 
 	ROM_SYSTEM_BIOS(1, "bootab", "BootROM - AntiBrick")
 	ROMX_LOAD( "bootrom-ab.cfffa702.bin", 0x0000, 0x2000, CRC(1d16e9d4) SHA1(6f9c8771e5a9ef5a6b52a31b2e65f0698f0f5cfa), ROM_BIOS(1))
+
 ROM_END
 
 } // Anonymous namespace

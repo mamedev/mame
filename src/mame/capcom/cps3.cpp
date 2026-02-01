@@ -632,15 +632,15 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 	1<<17 : double to 200%
 	*/
 
-	/* force clip to bitmap boundary */
+	// force clip to bitmap boundary
 	rectangle myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
-	/* 32-bit ONLY */
+	// 32-bit ONLY
 	{
 		if (gfx)
 		{
-//          const pen_t *pal = &gfx->colortable[gfx->granularity() * (color % gfx->colors())];
+			//const pen_t *pal = &gfx->colortable[gfx->granularity() * (color % gfx->colors())];
 			u32 palbase = (gfx->granularity() * color) & 0x1ffff;
 			const pen_t *pal = &m_mame_colours[palbase];
 			const u8 *source_base = gfx->get_data(code % gfx->elements());
@@ -650,7 +650,7 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 
 			if (sprite_screen_width && sprite_screen_height)
 			{
-				/* compute sprite increment per screen pixel */
+				// compute sprite increment per screen pixel
 				int dx = (gfx->width()<<16)/sprite_screen_width;
 				int dy = (gfx->height()<<16)/sprite_screen_height;
 
@@ -681,30 +681,35 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 				}
 
 				if (sx < myclip.left())
-				{ /* clip left */
+				{
+					// clip left
 					int pixels = myclip.left()-sx;
 					sx += pixels;
 					x_index_base += pixels*dx;
 				}
 				if (sy < myclip.top())
-				{ /* clip top */
+				{
+					// clip top
 					int pixels = myclip.top()-sy;
 					sy += pixels;
 					y_index += pixels*dy;
 				}
 				if (ex > myclip.right()+1)
-				{ /* clip right */
+				{
+					// clip right
 					int pixels = ex-myclip.right()-1;
 					ex -= pixels;
 				}
 				if (ey > myclip.bottom()+1)
-				{ /* clip bottom */
+				{
+					// clip bottom
 					int pixels = ey-myclip.bottom()-1;
 					ey -= pixels;
 				}
 
+				// skip if inner loop doesn't draw anything
 				if (ex > sx)
-				{ /* skip if inner loop doesn't draw anything */
+				{
 					if (transparency == CPS3_TRANSPARENCY_NONE)
 					{
 						for (int y = sy; y < ey; y++)

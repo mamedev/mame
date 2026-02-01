@@ -171,7 +171,11 @@ enum
 void jaguar_state::update_dsp_irq()
 {
 	// HACK: why this is calling a DSP related irq section for triggering GPU!?
-	// area51 wants this for HDD boot ...
+	// cojag:area51 wants this for HDD boot.
+	// > IDE controller only connects to Jerry EINT0.
+	// > 32-bit IDE BUS to controller comes from TOM databus through F245 buffers
+	// irq 1 would be Jerry->GPU irq, should probably interrupt GPU but on any mask,
+	// leaving the internal m_flags responsibility about accepting or refusing it ...
 	if (m_is_cojag)
 	{
 		if (m_dsp_irq_state & BIT(m_dsp_regs[JINTCTRL], 0))
@@ -228,6 +232,9 @@ void jaguar_state::sound_reset()
 	m_serial_frequency = 0;
 	m_serial_smode = 0;
 	m_dsp_irq_state = 0;
+
+	m_dsp_regs[JPIT1] = m_dsp_regs[DSP0] = 0;
+	m_dsp_regs[JPIT2] = m_dsp_regs[DSP1] = 0;
 }
 
 
@@ -248,6 +255,7 @@ uint16_t jaguar_state::jerry_regs_r(offs_t offset)
 			return m_dsp_irq_state;
 		case ASICTRL:
 			// HACK: assume fifo empty
+			// Why this is a thing to begin with? Is there UART debugging for CoJag games?
 			return (m_dsp_regs[offset] & 0xfeff) | 0x100;
 		case 0x36/2:
 		case 0x38/2:
@@ -263,18 +271,23 @@ uint16_t jaguar_state::jerry_regs_r(offs_t offset)
 
 void jaguar_state::update_jpit_timer(unsigned which)
 {
-	const u16 prescaler = m_dsp_regs[which ? JPIT2 : JPIT1];
-	const u16 divider = m_dsp_regs[which ? DSP1 : DSP0];
+	// NOTE: in u64 because `from_ticks` expects u64
+	// - jaguarcd will otherwise hang with a 0xffff 0xffff setup right off the bat (PC=802008)
+	const u64 prescaler = m_dsp_regs[which ? JPIT2 : JPIT1];
+	const u64 divider = m_dsp_regs[which ? DSP1 : DSP0];
 
 	// pbfant sets a prescaler with no divider, expecting working sound with that alone
 	if (prescaler || divider)
 	{
-		attotime sample_period = attotime::from_ticks((1 + prescaler) * (1 + divider), m_dsp->clock());
+		const u64 jpit_value = (1 + prescaler) * (1 + divider);
+		attotime sample_period = attotime::from_ticks(jpit_value, m_dsp->clock());
 		m_jpit_timer[which]->adjust(sample_period);
 	}
 	else
+	{
 		m_jpit_timer[which]->adjust(attotime::never);
-
+		m_dsp->set_input_line(2 + which, CLEAR_LINE);
+	}
 }
 
 template <unsigned which> TIMER_CALLBACK_MEMBER(jaguar_state::jpit_update)
@@ -299,12 +312,12 @@ void jaguar_state::jerry_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		case JPIT1:
 		case DSP0:
-			//printf("Primary sound %04x %04x\n", m_dsp_regs[JPIT1], m_dsp_regs[DSP0]);
+			//printf("Primary sound %04x %04x %08x\n", m_dsp_regs[JPIT1], m_dsp_regs[DSP0], mem_mask);
 			update_jpit_timer(0);
 			break;
 		case JPIT2:
 		case DSP1:
-			//printf("Secondary sound %04x %04x\n", m_dsp_regs[JPIT2], m_dsp_regs[DSP1]);
+			//printf("Secondary sound %04x %04x %08x\n", m_dsp_regs[JPIT2], m_dsp_regs[DSP1], mem_mask);
 			update_jpit_timer(1);
 			break;
 		case JINTCTRL:
@@ -402,6 +415,8 @@ void jaguar_state::update_serial_timer()
 	{
 		case 0x00:
 			m_serial_timer->adjust(attotime::never);
+			// pdrive seems incredibly fuzzy on having this disabled when SMODE is off
+			m_dsp->set_input_line(1, CLEAR_LINE);
 			break;
 		// TODO: atarikrt uses SMODE 0x05 but still expects an irq?
 		case 0x05:
@@ -420,7 +435,8 @@ void jaguar_state::update_serial_timer()
 
 uint32_t jaguar_state::serial_r(offs_t offset)
 {
-	logerror("%s:jaguar_serial_r(%X)\n", machine().describe_context(), offset);
+	if (!machine().side_effects_disabled())
+		logerror("%s:jaguar_serial_r(%X)\n", machine().describe_context(), offset);
 	return 0;
 }
 

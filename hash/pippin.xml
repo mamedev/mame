@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="pippin" description="Apple / Bandai Pippin CD-ROMs">
+<softwarelist name="pippin" description="Apple Pippin CD-ROMs">
 
 <!-- Todo: Some (maybe all?) Pippin discs are compatible with macs
 
@@ -282,7 +282,7 @@ license:CC0-1.0
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="compton's interactive encyclopedia - @world edition (usa) (beta) (1996-10-28).chd" sha1="e47575203af896d1525b3fa5f0c9bd1630a30a72"/>
+				<disk name="compton's interactive encyclopedia - @world edition (usa) (beta) (1996-10-28)" sha1="e47575203af896d1525b3fa5f0c9bd1630a30a72"/>
 			</diskarea>
 		</part>
 	</software>
@@ -559,7 +559,7 @@ license:CC0-1.0
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="mr. potato head saves veggie valley (usa) (beta) (1996-10-30).chd" sha1="1086c44370fea88e0bc9d81154ac61204f06190e"/>
+				<disk name="mr. potato head saves veggie valley (usa) (beta) (1996-10-30)" sha1="1086c44370fea88e0bc9d81154ac61204f06190e"/>
 			</diskarea>
 		</part>
 	</software>
@@ -810,7 +810,7 @@ license:CC0-1.0
 		<publisher>Bandai</publisher>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="saban's power rangers zeo versus the machine empire (usa) (beta) (1996-10-23).chd" sha1="3457739631d3d1dc7b94699c55404fa78c9ad36c"/>
+				<disk name="saban's power rangers zeo versus the machine empire (usa) (beta) (1996-10-23)" sha1="3457739631d3d1dc7b94699c55404fa78c9ad36c"/>
 			</diskarea>
 		</part>
 	</software>

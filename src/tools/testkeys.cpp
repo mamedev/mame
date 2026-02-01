@@ -1,9 +1,8 @@
+// license:BSD-3-Clause
+// copyright-holders:Couriersud
 //============================================================
 //
 //  testkeys.cpp - A small utility to analyze SDL keycodes
-//
-//  Copyright (c) 1996-2022, Nicola Salmoria and the MAME Team.
-//  Visit https://mamedev.org for licensing and usage restrictions.
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //  testkeys by couriersud

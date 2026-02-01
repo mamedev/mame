@@ -56,7 +56,7 @@ void geniuscolor_state::geniuscolor(machine_config &config)
 	m_screen->set_visarea(0, 104-1, 0, 48-1);
 	m_screen->set_screen_update(FUNC(geniuscolor_state::screen_update_geniuscolor));
 
-	SPEAKER(config, "mono").front_left();
+	SPEAKER(config, "mono").front_center();
 }
 
 // Spanish machine

@@ -216,6 +216,18 @@ ROM_START( ubox30 )
 ROM_END
 
 
+ROM_START( dancef2p )
+	ROM_REGION(  0x100000, "extrom", ROMREGION_ERASE00 )
+	ROM_LOAD( "sy25q80.bin", 0x0000, 0x100000, CRC(eca3cc26) SHA1(7f4b811677fe0da27cfa7eb5827a59c023bfc984) )
+
+	DISK_REGION( "sdcard" ) // 16GB SD Card
+	DISK_IMAGE( "dance_factory_2p", 0, SHA1(369c822213a2e702493d54e87ef6f4b2560a0466) )
+
+	ROM_REGION( 0x008000, "spg290", ROMREGION_32BIT | ROMREGION_LE )
+	ROM_LOAD32_DWORD("internal.rom", 0x000000, 0x008000, NO_DUMP)
+ROM_END
+
+
 } // anonymous namespace
 
 CONS( 2015, fundr200,    0,         0,     lexibook_jg7425,   lexibook_jg7425, lexibook_jg7425_state, empty_init, "Funderdome", "Funderdome Video Game Entertainment System 200+ Games (FUN-GAME32-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // FUN-GAME32-1 on manual
@@ -225,6 +237,8 @@ CONS( 2016, lx_frozen,   0,         0,     lexibook_jg7425,   lexibook_jg7425, l
 
 // slightly different, but same basic structure of the external ROM
 COMP( 201?, zone3d,      0,         0,      lexibook_jg7425,  lexibook_jg7425, lexibook_jg7425_state, empty_init,"Zone", "Zone 3D", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
+CONS( 202?, dancef2p,    0,         0,      lexibook_jg7425,  lexibook_jg7425, lexibook_jg7425_state, empty_init,  "<unknown>", "Dance Factory 2 Player Dance Mat",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
 // Unknown hardware, HDMI dongle with wireless pads.
 // Uses standard chips, not globs, but surface details on CPU/SoC have been erased.
