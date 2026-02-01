@@ -10,7 +10,7 @@
 enum
 {
 	Z80_INPUT_LINE_WAIT = INPUT_LINE_IRQ0 + 1,
-	Z80_INPUT_LINE_BUSRQ,
+	Z80_INPUT_LINE_BUSREQ,
 
 	Z80_INPUT_LINE_MAX
 };
@@ -139,7 +139,7 @@ protected:
 	devcb_write_line m_halt_cb;
 	devcb_write_line m_busack_cb;
 
-	static constexpr u8 SA_BUSRQ         = 0;
+	static constexpr u8 SA_BUSREQ        = 0;
 	static constexpr u8 SA_NMI_PENDING   = 1;
 	static constexpr u8 SA_IRQ_ON        = 2;
 	static constexpr u8 SA_HALT          = 3;
@@ -172,7 +172,7 @@ protected:
 	u8           m_nmi_state;    // nmi pin state
 	u8           m_irq_state;    // irq pin state
 	int          m_wait_state;   // wait pin state
-	int          m_busrq_state;  // bus request pin state
+	int          m_busreq_state; // bus request pin state
 	u8           m_busack_state; // bus acknowledge pin state
 	u16          m_ea;
 

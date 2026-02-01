@@ -668,7 +668,7 @@ void z80_device::device_start()
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_wait_state));
-	save_item(NAME(m_busrq_state));
+	save_item(NAME(m_busreq_state));
 	save_item(NAME(m_busack_state));
 	save_item(NAME(m_ea));
 	save_item(NAME(m_service_attention));
@@ -706,7 +706,7 @@ void z80_device::device_start()
 	m_nmi_state = 0;
 	m_irq_state = 0;
 	m_wait_state = 0;
-	m_busrq_state = 0;
+	m_busreq_state = 0;
 	m_busack_state = 0;
 	m_ea = 0;
 	m_service_attention = 0;
@@ -788,10 +788,10 @@ void z80_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
-	case Z80_INPUT_LINE_BUSRQ:
-		if (m_busrq_state == CLEAR_LINE && state != CLEAR_LINE)
-			set_service_attention<SA_BUSRQ, 1>();
-		m_busrq_state = state;
+	case Z80_INPUT_LINE_BUSREQ:
+		if (m_busreq_state == CLEAR_LINE && state != CLEAR_LINE)
+			set_service_attention<SA_BUSREQ, 1>();
+		m_busreq_state = state;
 		break;
 
 	case INPUT_LINE_NMI:

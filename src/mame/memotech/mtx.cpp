@@ -394,7 +394,7 @@ void mtx_state::mtx512(machine_config &config)
 	m_exp_ext->set_io_space(m_maincpu, AS_IO);
 	m_exp_ext->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp_ext->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_exp_ext->busreq_handler().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_exp_ext->busreq_handler().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 
 	/* J0 internal expansion - rs232 board with disk drive bus */
 	MTX_EXP_SLOT(config, m_exp_int, mtx_int_expansion_devices, nullptr);
@@ -402,7 +402,7 @@ void mtx_state::mtx512(machine_config &config)
 	m_exp_int->set_io_space(m_maincpu, AS_IO);
 	m_exp_int->int_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_exp_int->nmi_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
-	m_exp_int->busreq_handler().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_exp_int->busreq_handler().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 
 	/* software lists */
 	SOFTWARE_LIST(config, "cass_list").set_original("mtx_cass");

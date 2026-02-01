@@ -1051,7 +1051,7 @@ ffff
 		return;
 	}
 	if (m_service_attention) {
-		if (m_busrq_state) { // SA_BUSRQ
+		if (m_busreq_state) { // SA_BUSREQ
 			if (!m_busack_state) {
 				m_busack_state = 1;
 				m_busack_cb(1);
@@ -1061,7 +1061,7 @@ ffff
 			m_ref = 0xffff00;
 			return;
 		} else {
-			set_service_attention<SA_BUSRQ, 0>();
+			set_service_attention<SA_BUSREQ, 0>();
 			if (m_busack_state) {
 				m_busack_state = 0;
 				m_busack_cb(0);

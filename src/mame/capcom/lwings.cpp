@@ -455,7 +455,7 @@ void lwings_state::msm5205_w(uint8_t data)
 void lwings_state::sprite_dma_trigger_w(uint8_t data)
 {
 	if (m_screen->vblank())
-		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, ASSERT_LINE);
 }
 
 void lwings_state::sprite_dma_start_w(int state)
@@ -472,7 +472,7 @@ void lwings_state::sprite_dma_start_w(int state)
 
 TIMER_CALLBACK_MEMBER(lwings_state::sprite_dma_end)
 {
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, CLEAR_LINE);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, CLEAR_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(lwings_state::scanline)
