@@ -100,8 +100,8 @@ void shoken_md06_state::sound_io_map(address_map &map)
 	map.global_mask(0xff);
 	map.unmap_value_high();
 
-	map(0x40, 0x40).rw("oki", FUNC(okim9810_device::read), FUNC(okim9810_device::write)); // w?
-	map(0x41, 0x41).w("oki", FUNC(okim9810_device::write_tmp_register)); // ?
+	// map(0xXX, 0xXX).rw("oki", FUNC(okim9810_device::read), FUNC(okim9810_device::write)); // w?
+	// map(0xXX, 0xXX).w("oki", FUNC(okim9810_device::write_tmp_register)); // ?
 	// map(0x40, 0x40).nopw(); // rw?
 	// map(0x41, 0x41).nopw(); // w?
 	map(0x50, 0x5f).rw("rtc", FUNC(rtc62423_device::read), FUNC(rtc62423_device::write));
