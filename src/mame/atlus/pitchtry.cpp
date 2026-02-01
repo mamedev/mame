@@ -51,7 +51,6 @@ private:
 void pitchtry_state::program_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xff00, 0xffff).rom().region("maincpu", 0); // ??
 }
 
 void pitchtry_state::data_map(address_map &map)
@@ -142,7 +141,7 @@ INPUT_PORTS_END
 void pitchtry_state::pitchtry(machine_config &config)
 {
 	// basic machine hardware
-	Z8681(config, m_maincpu, 22'118'000 / 2); // wrong model, the correct one has more internal RAM. Chip rated for 16MHz?
+	Z86C91(config, m_maincpu, 22'118'000 / 2); // Chip rated for 16MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &pitchtry_state::program_map);
 	m_maincpu->set_addrmap(AS_DATA, &pitchtry_state::data_map);
 
