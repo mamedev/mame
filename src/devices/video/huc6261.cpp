@@ -20,8 +20,6 @@
 #include "emu.h"
 #include "huc6261.h"
 
-#include "screen.h"
-
 #include <algorithm>
 
 //#define VERBOSE 1
@@ -40,7 +38,7 @@ DEFINE_DEVICE_TYPE(HUC6261, huc6261_device, "huc6261", "Hudson HuC6261 VCE")
 huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, HUC6261, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
-	, m_huc6270{*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG}}
+	, m_huc6270{*this, { finder_base::DUMMY_TAG, finder_base::DUMMY_TAG }}
 	, m_huc6271(*this, finder_base::DUMMY_TAG)
 	, m_huc6272(*this, finder_base::DUMMY_TAG)
 	, m_last_h(0)
@@ -78,7 +76,7 @@ huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-inline u32 huc6261_device::yuv2rgb(u32 yuv)
+inline u32 huc6261_device::yuv2rgb(u32 yuv) const
 {
 	const u8 y = yuv >> 8;
 	const u16 uv = ((yuv & 0xf0) << 8) | ((yuv & 0xf) << 4);
@@ -90,7 +88,7 @@ inline u32 huc6261_device::yuv2rgb(u32 yuv)
 	return (r << 16) | (g << 8) | b;
 }
 
-void huc6261_device::apply_pal_offs(u16 &pix_data)
+inline void huc6261_device::apply_pal_offs(u16 &pix_data) const
 {
 	// sprite
 	if (pix_data & huc6270_device::HUC6270_SPRITE)
