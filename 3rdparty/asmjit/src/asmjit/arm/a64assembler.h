@@ -1,6 +1,6 @@
 // This file is part of AsmJit project <https://asmjit.com>
 //
-// See asmjit.h or LICENSE.md for license and copyright information
+// See <asmjit/core.h> or LICENSE.md for license and copyright information
 // SPDX-License-Identifier: Zlib
 
 #ifndef ASMJIT_ARM_A64ASSEMBLER_H_INCLUDED
@@ -21,7 +21,7 @@ class ASMJIT_VIRTAPI Assembler
     public EmitterExplicitT<Assembler> {
 
 public:
-  typedef BaseAssembler Base;
+  using Base = BaseAssembler;
 
   //! \name Construction & Destruction
   //! \{
@@ -34,22 +34,22 @@ public:
   //! \name Emit
   //! \{
 
-  ASMJIT_API Error _emit(InstId instId, const Operand_& o0, const Operand_& o1, const Operand_& o2, const Operand_* opExt) override;
+  ASMJIT_API Error _emit(InstId inst_id, const Operand_& o0, const Operand_& o1, const Operand_& o2, const Operand_* op_ext) override;
 
   //! \}
 
   //! \name Align
   //! \{
 
-  ASMJIT_API Error align(AlignMode alignMode, uint32_t alignment) override;
+  ASMJIT_API Error align(AlignMode align_mode, uint32_t alignment) override;
 
   //! \}
 
   //! \name Events
   //! \{
 
-  ASMJIT_API Error onAttach(CodeHolder* code) noexcept override;
-  ASMJIT_API Error onDetach(CodeHolder* code) noexcept override;
+  ASMJIT_API Error on_attach(CodeHolder& code) noexcept override;
+  ASMJIT_API Error on_detach(CodeHolder& code) noexcept override;
 
   //! \}
 };

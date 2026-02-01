@@ -25,8 +25,8 @@
 #include "emu.h"
 #include "midvunit.h"
 
-#include "cpu/tms32031/tms32031.h"
 #include "cpu/adsp2100/adsp2100.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "machine/nvram.h"
 
 #include "speaker.h"
@@ -70,6 +70,8 @@ void midvunit_base_state::machine_start()
 void midvunit_state::machine_start()
 {
 	midvunit_base_state::machine_start();
+
+	m_shifter_state = 0; // start with fake shifter in neutral
 
 	save_item(NAME(m_adc_shift));
 	save_item(NAME(m_last_port0));
@@ -129,28 +131,38 @@ void midvplus_state::machine_reset()
  *
  *************************************/
 
+INPUT_CHANGED_MEMBER(midvunit_state::gear_button)
+{
+	if (newval)
+	{
+		if ((param != m_shifter_state) || !BIT(m_conf->read(), 1))
+			m_shifter_state = param;
+		else
+			m_shifter_state = 0;
+	}
+}
+
+INPUT_CHANGED_MEMBER(midvunit_state::shift_button)
+{
+	if (newval)
+	{
+		if (!param)
+			m_shifter_state = (m_shifter_state << 1) & 0x3c00;
+		else if (!m_shifter_state)
+			m_shifter_state = 0x2000;
+		else if (0x0400 != m_shifter_state)
+			m_shifter_state >>= 1;
+	}
+}
+
 uint32_t midvunit_state::port0_r()
 {
 	uint16_t val = m_in0->read();
-	uint16_t diff = val ^ m_last_port0;
 
-	if (!machine().side_effects_disabled())
-	{
-		// make sure the shift controls are mutually exclusive
-		if ((diff & 0x0400) && !(val & 0x0400))
-			m_shifter_state = (m_shifter_state == 1) ? 0 : 1;
-		if ((diff & 0x0800) && !(val & 0x0800))
-			m_shifter_state = (m_shifter_state == 2) ? 0 : 2;
-		if ((diff & 0x1000) && !(val & 0x1000))
-			m_shifter_state = (m_shifter_state == 4) ? 0 : 4;
-		if ((diff & 0x2000) && !(val & 0x2000))
-			m_shifter_state = (m_shifter_state == 8) ? 0 : 8;
-		m_last_port0 = val;
-	}
+	if (BIT(m_conf->read(), 0))
+		val = (val | 0x3c00) ^ m_shifter_state;
 
-	val = (val | 0x3c00) ^ (m_shifter_state << 10);
-
-	return (val << 16) | val;
+	return (uint32_t(val) << 16) | val;
 }
 
 
@@ -263,11 +275,11 @@ void midvunit_base_state::sound_w(uint32_t data)
 
 /*************************************
  *
- *  TMS32031 I/O accesses
+ *  TMS320C31 I/O accesses
  *
  *************************************/
 
-uint32_t midvunit_base_state::tms32031_control_r(offs_t offset)
+uint32_t midvunit_base_state::tms320c31_control_r(offs_t offset)
 {
 	// watch for accesses to the timers
 	if (offset == 0x24 || offset == 0x34)
@@ -275,7 +287,7 @@ uint32_t midvunit_base_state::tms32031_control_r(offs_t offset)
 		// timer is clocked at 100ns
 		int const which = (offset >> 4) & 1;
 		int32_t const result = (m_timer[which]->elapsed() * m_timer_rate).as_double();
-		//LOGREGS("%06X:tms32031_control_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
+		//LOGREGS("%06X:tms320c31_control_r(%02X) = %08X\n", m_maincpu->pc(), offset, result);
 		return result;
 	}
 
@@ -283,16 +295,16 @@ uint32_t midvunit_base_state::tms32031_control_r(offs_t offset)
 	{
 		// log anything else except the memory control register
 		if (offset != 0x64)
-			LOGREGS("%06X:tms32031_control_r(%02X)\n", m_maincpu->pc(), offset);
+			LOGREGS("%06X:tms320c31_control_r(%02X)\n", m_maincpu->pc(), offset);
 	}
 
-	return m_tms32031_control[offset];
+	return m_tms320c31_control[offset];
 }
 
 
-void midvunit_base_state::tms32031_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void midvunit_base_state::tms320c31_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_tms32031_control[offset]);
+	COMBINE_DATA(&m_tms320c31_control[offset]);
 
 
 	if (offset == 0x64)
@@ -301,7 +313,7 @@ void midvunit_base_state::tms32031_control_w(offs_t offset, uint32_t data, uint3
 	{
 		// watch for accesses to the timers
 		int const which = (offset >> 4) & 1;
-		//LOGREGS("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
+		//LOGREGS("%06X:tms320c31_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 		if (data & 0x40)
 			m_timer[which]->reset();
 
@@ -312,7 +324,7 @@ void midvunit_base_state::tms32031_control_w(offs_t offset, uint32_t data, uint3
 			m_timer_rate = 10000000.;
 	}
 	else
-		LOGREGS("%06X:tms32031_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
+		LOGREGS("%06X:tms320c31_control_w(%02X) = %08X\n", m_maincpu->pc(), offset, data);
 }
 
 
@@ -659,7 +671,7 @@ void midvunit_state::midvunit_map(address_map &map)
 	map(0x000000, 0x01ffff).ram().share(m_ram_base);
 	map(0x400000, 0x41ffff).ram();
 	map(0x600000, 0x600000).w(FUNC(midvunit_state::dma_queue_w));
-	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms32031_control_r), FUNC(midvunit_state::tms32031_control_w)).share(m_tms32031_control);
+	map(0x808000, 0x80807f).rw(FUNC(midvunit_state::tms320c31_control_r), FUNC(midvunit_state::tms320c31_control_w)).share(m_tms320c31_control);
 	map(0x900000, 0x97ffff).rw(FUNC(midvunit_state::videoram_r), FUNC(midvunit_state::videoram_w));
 	map(0x980000, 0x980000).r(FUNC(midvunit_state::dma_queue_entries_r));
 	map(0x980020, 0x980020).r(FUNC(midvunit_state::scanline_r));
@@ -709,7 +721,7 @@ void midvplus_state::midvplus_map(address_map &map)
 	map(0x000000, 0x01ffff).ram().share(m_ram_base);
 	map(0x400000, 0x41ffff).ram().share(m_fastram_base);
 	map(0x600000, 0x600000).w(FUNC(midvplus_state::dma_queue_w));
-	map(0x808000, 0x80807f).rw(FUNC(midvplus_state::tms32031_control_r), FUNC(midvplus_state::tms32031_control_w)).share(m_tms32031_control);
+	map(0x808000, 0x80807f).rw(FUNC(midvplus_state::tms320c31_control_r), FUNC(midvplus_state::tms320c31_control_w)).share(m_tms320c31_control);
 	map(0x900000, 0x97ffff).rw(FUNC(midvplus_state::videoram_r), FUNC(midvplus_state::videoram_w));
 	map(0x980000, 0x980000).r(FUNC(midvplus_state::dma_queue_entries_r));
 	map(0x980020, 0x980020).r(FUNC(midvplus_state::scanline_r));
@@ -747,10 +759,10 @@ static INPUT_PORTS_START( midvunit )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("4th Gear")    // 4th
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("3rd Gear")    // 3rd
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("2nd Gear")    // 2nd
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("1st Gear")    // 1st
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("4th Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::gear_button), 0x0400)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("3rd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::gear_button), 0x0800)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("2nd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::gear_button), 0x1000)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("1st Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::gear_button), 0x2000)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -772,6 +784,18 @@ static INPUT_PORTS_START( midvunit )
 
 	PORT_START("BRAKE")     // brake pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
+
+	PORT_START("FAKE")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Neutral Gear") PORT_CONDITION("CONF", 0x07, EQUALS, 0x01) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::gear_button), 0x0000)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Shift Down")   PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::shift_button), 0)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Shift Up")     PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::shift_button), 1)
+
+	PORT_START("CONF")
+	PORT_CONFNAME( 0x07, 0x01, "Shifter Type" )
+	PORT_CONFSETTING(    0x01, "Buttons (sticky)" )   // for convenience for people without a shifter
+	PORT_CONFSETTING(    0x03, "Buttons (toggling)" ) // avoids the need for the neutral button
+	PORT_CONFSETTING(    0x05, "Sequential" )         // for spring-return shifter, paddles or buttons
+	PORT_CONFSETTING(    0x00, "H-Pattern" )          // for use with a real shifter
 INPUT_PORTS_END
 
 
@@ -1147,7 +1171,7 @@ void midvunit_base_state::midvcommon(machine_config &config)
 	constexpr XTAL CPU_CLOCK = 50_MHz_XTAL;
 
 	// basic machine hardware
-	TMS32031(config, m_maincpu, CPU_CLOCK);
+	TMS320C31(config, m_maincpu, CPU_CLOCK);
 
 	TIMER(config, m_timer[0]).configure_generic(nullptr);
 	TIMER(config, m_timer[1]).configure_generic(nullptr);

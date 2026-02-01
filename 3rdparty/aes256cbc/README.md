@@ -229,4 +229,3 @@ Contributions and feedback are welcome! If you find issues or have ideas for imp
 ## License
 
 This standard AES-256 CBC implementation is provided under the [MIT License](./LICENSE).
-

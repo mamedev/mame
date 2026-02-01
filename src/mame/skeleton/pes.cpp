@@ -62,7 +62,7 @@ Current status:
 */
 
 #include "emu.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "sound/tms5220.h"
 #include "bus/rs232/terminal.h"
 #include "bus/rs232/rs232.h"

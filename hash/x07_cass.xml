@@ -196,7 +196,7 @@ license:CC0-1.0
 
 <!-- The listing was supposed to be completed in Hebdogiciel 169, which was not published -->
 	<software name="beachead">
-		<description>Beach-Head (Fra, Incomplete)</description>
+		<description>Beach-Head (France, incomplete)</description>
 		<year>1987</year>
 		<publisher>&lt;type-in&gt;</publisher>
 		<info name="magazine" value="Hebdogiciel 168" />
@@ -1078,7 +1078,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="seawart">
-		<description>Sea War (Fra, Trancart)</description>
+		<description>Sea War (France, Trancart)</description>
 		<year>1985</year>
 		<publisher>&lt;type-in&gt;</publisher>
 		<info name="magazine" value="Hebdogiciel 71" />
@@ -1097,7 +1097,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="seawarj">
-		<description>SeaWar (Fra, Jorden)</description>
+		<description>SeaWar (France, Jorden)</description>
 		<year>1986</year>
 		<publisher>&lt;type-in&gt;</publisher>
 		<info name="magazine" value="Hebdogiciel 165-167" />

@@ -642,7 +642,7 @@ void roldfrog_state::roldfrog(machine_config &config)
 	ymsnd.add_route(3, "mono", 1.0);
 }
 
-template <unsigned Which> 
+template <unsigned Which>
 void funystrp_state::adpcm_int(int state)
 {
 	if (m_snd_interrupt_enable[Which] || m_msm_toggle[Which] == 1)

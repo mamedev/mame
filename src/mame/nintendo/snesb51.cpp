@@ -62,7 +62,7 @@
 
 #include "emu.h"
 #include "snes.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "emupal.h"
 #include "speaker.h"
 

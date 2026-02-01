@@ -10,6 +10,8 @@ NOTE:
 -->
 <softwarelist name="generic_flop_525" description="Cross-platform 5.25&quot; disk images">
 
+<!-- !Games -->
+
 	<!-- original from pc8801_flop -->
 	<software name="gruppe">
 		<description>Gruppe</description>
@@ -77,6 +79,51 @@ pc8801: crashes before reaching title screen (has V2 mode detection, which impli
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="350560">
 				<rom name="victorious nine.d88" size="350560" crc="2fc94dfd" sha1="e29f55bed953e0304d88b8eed9448f31eb888298"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- !Doujinshi -->
+
+	<!-- original in pc98.xml -->
+	<software name="0x0f">
+		<description>0x0F exp.3</description>
+		<year>1994?</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="usage" value="Run platform_name.BAT from DOS/humanOS" />
+		<sharedfeat name="compatibility" value="pc98,x68k"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="0x0f_exp3.hdm" size="1261568" crc="5e51b3e3" sha1="df99f88c8202d39d3ab8f0ffa8205f89c91e8885" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- original in pc98.xml -->
+	<software name="akazucc">
+		<description>Akazukin Cha Cha - CG Works ver 1.00 (.hdm format)</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="usage" value="Run platform_name.BAT from DOS if it don't autoboot" />
+		<!-- FM Towns also supported but that is 3.5" only (?) -->
+		<sharedfeat name="compatibility" value="pc98,pc88va,x68k"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="little_red_riding_hood_chacha_-_cg_works_ver1.hdm" size="1261568" crc="6062e4cf" sha1="910c826b387519601db369b8064e4eb488cdd00c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- from x68k_flop.xml -->
+	<software name="akazucca" cloneof="akazucc">
+		<description>Akazukin Cha Cha - CG Works ver 1.00 (.xdf format)</description>
+		<year>1994</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<info name="usage" value="Run platform_name.BAT from DOS if it don't autoboot" />
+		<sharedfeat name="compatibility" value="pc98,pc88va,x68k"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="akazukin_cha_cha_cg.xdf" size="1261568" crc="6062e4cf" sha1="910c826b387519601db369b8064e4eb488cdd00c" />
 			</dataarea>
 		</part>
 	</software>

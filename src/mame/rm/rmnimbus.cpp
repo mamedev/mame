@@ -13,7 +13,7 @@
 #include "rmnimbus.h"
 #include "rmnkbd.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "imagedev/floppy.h"
 
 #include "bus/isa/fdc.h"

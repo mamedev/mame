@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "sei25x_rise1x_spr.h"
+
 #include "machine/7200fifo.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
@@ -23,35 +25,38 @@
 class seibuspi_base_state : public driver_device
 {
 protected:
-	seibuspi_base_state(const machine_config &mconfig, device_type type, const char *tag)
+	seibuspi_base_state(const machine_config &mconfig, device_type type, const char *tag, size_t paletteram_size, size_t spriteram_size, u32 sprite_bpp)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mainram(*this, "mainram")
 		, m_eeprom(*this, "eeprom")
-		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_spritegen(*this, "spritegen")
+		, m_palette_ram(*this, "palette_ram", paletteram_size, ENDIANNESS_LITTLE)
+		, m_sprite_ram(*this, "sprite_ram", spriteram_size, ENDIANNESS_LITTLE)
 		, m_key(*this, "KEY%u", 0)
 		, m_special(*this, "SPECIAL")
+		, m_sprite_bpp(sprite_bpp)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u32> m_mainram;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<sei25x_rise1x_device> m_spritegen;
+
+	memory_share_creator<u32> m_palette_ram;
+	memory_share_creator<u16> m_sprite_ram;
 
 	optional_ioport_array<5> m_key;
 	optional_ioport m_special;
 
+	const u32 m_sprite_bpp;
+
 	u32 m_video_dma_length = 0;
 	u32 m_video_dma_address = 0;
 	u16 m_layer_enable = 0;
-	std::unique_ptr<u32[]> m_palette_ram;
-	std::unique_ptr<u32[]> m_sprite_ram;
-	u32 m_palette_ram_size = 0;
-	u32 m_sprite_ram_size = 0;
 	u8 m_alpha_table[0x2000]{};
-	u32 m_sprite_bpp = 0;
 
 	virtual void video_start() override ATTR_COLD;
 
@@ -61,9 +66,6 @@ protected:
 	void video_dma_address_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u8 spi_status_r();
 	void eeprom_w(u8 data);
-
-	void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, u32 code, u32 color, bool flipx, bool flipy, int sx, int sy, bitmap_ind8 &primap, u8 primask);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap, int priority);
 
 	u32 screen_update_sys386f(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -78,7 +80,7 @@ class sys386f_state : public seibuspi_base_state
 {
 public:
 	sys386f_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seibuspi_base_state(mconfig, type, tag)
+		: seibuspi_base_state(mconfig, type, tag, 0x4000, 0x2000, 8)
 	{ }
 
 	void sys386f(machine_config &config) ATTR_COLD;
@@ -103,13 +105,19 @@ class seibuspi_tilemap_state : public seibuspi_base_state
 {
 public:
 	seibuspi_tilemap_state(const machine_config &mconfig, device_type type, const char *tag)
-		: seibuspi_base_state(mconfig, type, tag)
+		: seibuspi_base_state(mconfig, type, tag, 0x3000, 0x1000, 6)
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_tilemap_ram(*this, "tilemap_ram", 0x4000, ENDIANNESS_LITTLE)
 	{ }
 
 	void init_rdft22kc() ATTR_COLD;
 	void init_rfjet2kc() ATTR_COLD;
 
 protected:
+	required_device<gfxdecode_device> m_gfxdecode;
+	memory_share_creator<u32> m_tilemap_ram;
+	bitmap_ind16 m_sprite_bitmap;
+
 	tilemap_t *m_text_layer = nullptr;
 	tilemap_t *m_back_layer = nullptr;
 	tilemap_t *m_midl_layer = nullptr;
@@ -125,8 +133,6 @@ protected:
 	u32 m_back_layer_d14 = 0;
 	u32 m_midl_layer_d14 = 0;
 	u32 m_fore_layer_d14 = 0;
-	std::unique_ptr<u32[]> m_tilemap_ram;
-	u32 m_tilemap_ram_size = 0;
 	u32 m_bg_fore_layer_position = 0;
 
 	virtual void video_start() override ATTR_COLD;
@@ -143,7 +149,10 @@ protected:
 	u32 rfjet_speedup_r();
 
 	void set_layer_offsets();
+	void blend_pixel(u32 &dest, u16 pen);
+	void blend_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int pri);
 	void combine_tilemap(bitmap_rgb32 &bitmap, const rectangle &cliprect, tilemap_t *tile, int sx, int sy, int opaque, s16 *rowscroll);
+	u32 gfxbank_callback(u32 code, u8 ext);
 
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	TILE_GET_INFO_MEMBER(get_back_tile_info);

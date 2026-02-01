@@ -2,21 +2,22 @@
 // copyright-holders:R. Belmont
 /***************************************************************************
 
-    mpc3000.cpp - Akai / Roger Linn MPC-3000 music workstation
+    mpc3000.cpp - Akai / Roger Linn MPC3000 music workstation
     Driver by R. Belmont
+    Thanks go to Guru, Happy, crazyc, and AJR
 
     Hardware:
-        CPU: NEC V53 (33 MHz?)
+        CPU: NEC V53 (32 MHz)
              8086-compatible CPU
              8237-compatible DMA controller
              8254-compatible timer
              8259-compatible IRQ controller
-        Floppy: uPD72069 (3000), uPD72068 (2000 & 2000XL)
+        Floppy: uPD72069 (3000)
         SCSI: MB89352
         LCD: LC7981
-        Quad-UART: TE7774 (3000), 2x MB89371A (2000 & 2000XL)
+        Quad-UART: TE7774 (3000)
         Panel controller CPU: NEC uPD78C10AGQ @ 12 MHz
-        Sound DSP: L7A1045-L6048
+        Sound DSP: L7A1045-L6028
             DSP's wavedata bus is 16 bits wide and has 24 address bits (32 MiB total sample space)
 
         DMA channel 0 is SCSI, 1 is floppy, 2 is IC31 (some sort of direct-audio stream?), and 3 is the L7A1045 DSP
@@ -28,16 +29,6 @@
 
         TE7774 hookups: RXD1 is MIDI IN 1, RXD2 is MIDI IN 2, RXD3 and 4 are wire-ORed to the uPD7810's TX line.
                         TXD1-4 are MIDI OUTs 1, 2, 3, and 4.
-
-    MPC2000 and 2000XL: (MPC2000 is often called "MPC2000 Classic" but apparently not by Akai)
-        CPU: NEC V53
-        Floppy: uPD72068
-        SCSI: MB89352
-        LCD:
-        Dual UART: MB89371A
-        (V53's 8251 is used for panel comms here)
-        Panel controller CPU: NEC uPD7810 @ 12 MHz
-        Sound DSP: L6048
 
 MPCs on other hardware:
 
@@ -72,8 +63,8 @@ MPCs on other hardware:
     Y0 row: PAD BANK    FULL LEVEL     keypad 7    keypad 8  keypad 9   DISK        PROGRAM/SOUNDS MIXER/EFFECTS
     Y1 row: 16 LEVELS   ASSIGN         keypad 4    keypad 5  keypad 6   MIDI        SONG           OTHER
     Y2 row: AFTER                      keypad 1    keypad 2  keypad 3   SEQ EDIT    STEP EDIT      EDIT LOOP
-    Y3 row: SOFT KEY 1  SOFT KEY 3     keypad 0    keypad .  ENTER      TEMPO/SYNC  TRANSPOSE      SIMUL SEQ
-    Y4 row: SOFT KEY 2  SOFT KEY 4                 <         <<         AUTO PUNCH  COUNT IN       WAIT FOR
+    Y3 row: SOFT KEY 1  SOFT KEY 2     keypad 0    keypad .  ENTER      TEMPO/SYNC  TRANSPOSE      SIMUL SEQ
+    Y4 row: SOFT KEY 3  SOFT KEY 4                 <         <<         AUTO PUNCH  COUNT IN       WAIT FOR
     Y5 row:                            keypad -    keypad +  <- (LEFT)  ^ (UP)      \/ (DOWN)      > (RIGHT)
     Y6 row:                                        ERASE     TIMING C   TAP TEMPO   MAIN SCREEN    HELP
     Y7 row: STOP        PLAY           PLAY START  REC       OVER DUB   LOCATE      >              >>
@@ -85,23 +76,42 @@ MPCs on other hardware:
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bus/midi/midi.h"
+#include "bus/nscsi/devices.h"
 #include "cpu/nec/v5x.h"
 #include "cpu/upd7810/upd7810.h"
 #include "imagedev/floppy.h"
-#include "sound/l7a1045_l6028_dsp_a.h"
-#include "video/hd61830.h"
-#include "bus/midi/midi.h"
-#include "bus/nscsi/devices.h"
-#include "speaker.h"
-#include "screen.h"
-#include "emupal.h"
+#include "formats/dfi_dsk.h"
+#include "formats/hxchfe_dsk.h"
+#include "formats/hxcmfm_dsk.h"
+#include "formats/imd_dsk.h"
+#include "formats/mfi_dsk.h"
+#include "formats/td0_dsk.h"
+#include "formats/dsk_dsk.h"
+#include "formats/pc_dsk.h"
+#include "formats/ipf_dsk.h"
 #include "machine/74259.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
 #include "machine/mb87030.h"
+#include "machine/nvram.h"
 #include "machine/pit8253.h"
 #include "machine/te7774.h"
+#include "machine/timer.h"
 #include "machine/upd765.h"
+#include "sound/l7a1045_l6028_dsp_a.h"
+#include "video/hd61830.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "softlist_dev.h"
+#include "speaker.h"
+
+#include "mpc3000.lh"
+
+static constexpr uint8_t BIT4 = (1 << 4);
+static constexpr uint8_t BIT5 = (1 << 5);
 
 class mpc3000_state : public driver_device
 {
@@ -117,11 +127,21 @@ public:
 		, m_floppy(*this, "fdc:0")
 		, m_sio(*this, "sio")
 		, m_keys(*this, "Y%u", 0)
+		, m_drums(*this, "PB%u", 0)
+		, m_dataentry(*this, "DATAENTRY")
+		, m_key_scan_row(0)
+		, m_drum_scan_row(0)
+		, m_variation_slider(0)
+		, m_last_dial(0)
+		, m_count_dial(0)
+		, m_quadrature_phase(0)
 	{ }
 
 	void mpc3000(machine_config &config);
 
 	void init_mpc3000();
+
+	DECLARE_INPUT_CHANGED_MEMBER(variation_changed);
 
 private:
 	required_device<v53a_device> m_maincpu;
@@ -133,6 +153,8 @@ private:
 	required_device<floppy_connector> m_floppy;
 	required_device<te7774_device> m_sio;
 	required_ioport_array<8> m_keys;
+	required_ioport_array<4> m_drums;
+	required_ioport m_dataentry;
 
 	static void floppies(device_slot_interface &device);
 
@@ -142,21 +164,41 @@ private:
 	void mpc3000_map(address_map &map) ATTR_COLD;
 	void mpc3000_io_map(address_map &map) ATTR_COLD;
 	void mpc3000_sub_map(address_map &map) ATTR_COLD;
+	void dsp_map(address_map &map) ATTR_COLD;
 
-	uint16_t dma_memr_cb(offs_t offset);
-	void dma_memw_cb(offs_t offset, uint16_t data);
+	uint8_t dma_memr_cb(offs_t offset);
+	void dma_memw_cb(offs_t offset, uint8_t data);
+	uint16_t dma_mem16r_cb(offs_t offset);
+	void dma_mem16w_cb(offs_t offset, uint16_t data);
 	void mpc3000_palette(palette_device &palette) const;
+
+	uint8_t fdc_hc365_r();
 
 	uint8_t subcpu_pa_r();
 	uint8_t subcpu_pb_r();
+	uint8_t subcpu_pc_r();
 	void subcpu_pb_w(uint8_t data);
 	void subcpu_pc_w(uint8_t data);
+	uint8_t an0_r();
+	uint8_t an1_r();
+	uint8_t an2_r();
+	uint8_t an3_r();
+	uint8_t an4_r();
 
-	uint8_t m_key_scan_row;
+	TIMER_DEVICE_CALLBACK_MEMBER(dial_timer_tick);
+
+	uint8_t m_key_scan_row, m_drum_scan_row, m_variation_slider;
+	int m_last_dial, m_count_dial, m_quadrature_phase;
 };
 
 void mpc3000_state::machine_start()
 {
+	save_item(NAME(m_key_scan_row));
+	save_item(NAME(m_drum_scan_row));
+	save_item(NAME(m_variation_slider));
+	save_item(NAME(m_last_dial));
+	save_item(NAME(m_count_dial));
+	save_item(NAME(m_quadrature_phase));
 }
 
 void mpc3000_state::machine_reset()
@@ -166,8 +208,8 @@ void mpc3000_state::machine_reset()
 void mpc3000_state::mpc3000_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).mirror(0x80000).rom().region("maincpu", 0);
-	map(0x300000, 0x3fffff).ram();
-	map(0x500000, 0x500fff).ram(); // actually 8-bit battery-backed RAM
+	map(0x300000, 0x3fffff).ram();  // 2x HM658512 (512Kx8)
+	map(0x500000, 0x500fff).ram().share("nvram");
 }
 
 void mpc3000_state::mpc3000_io_map(address_map &map)
@@ -184,18 +226,44 @@ void mpc3000_state::mpc3000_io_map(address_map &map)
 	map(0x00e0, 0x00e0).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
 	map(0x00e2, 0x00e2).rw(m_lcdc, FUNC(hd61830_device::status_r), FUNC(hd61830_device::control_w)).umask16(0x00ff);
 	map(0x00e8, 0x00eb).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
+	map(0x00e8, 0x00eb).r(FUNC(mpc3000_state::fdc_hc365_r)).umask16(0xff00);
 	map(0x00f0, 0x00f7).rw("synctmr", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
 	map(0x00f8, 0x00ff).rw("adcexp", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 }
 
-uint16_t mpc3000_state::dma_memr_cb(offs_t offset)
+void mpc3000_state::dsp_map(address_map &map)
+{
+	map(0x0000'0000, 0x01ff'ffff).ram();
+}
+
+// bit 0 = ED   1 if disk was not ejected prior to last check,
+// bit 1 = /EDD (enhanced density if 0, DD/HD if 1?)
+// bit 2 = /HDD (high density if 0, double density if 1)
+// bits 3 & 4 = footswitches
+uint8_t mpc3000_state::fdc_hc365_r()
+{
+	const auto imagedev = m_floppy->get_device();
+	return (imagedev->floppy_is_hd() ? 0x04 : 0x00) | imagedev->dskchg_r();
+}
+
+uint16_t mpc3000_state::dma_mem16r_cb(offs_t offset)
 {
 	return m_maincpu->space(AS_PROGRAM).read_word(offset << 1);
 }
 
-void mpc3000_state::dma_memw_cb(offs_t offset, uint16_t data)
+void mpc3000_state::dma_mem16w_cb(offs_t offset, uint16_t data)
 {
 	m_maincpu->space(AS_PROGRAM).write_word(offset << 1, data);
+}
+
+uint8_t mpc3000_state::dma_memr_cb(offs_t offset)
+{
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset);
+}
+
+void mpc3000_state::dma_memw_cb(offs_t offset, uint8_t data)
+{
+	m_maincpu->space(AS_PROGRAM).write_byte(offset, data);
 }
 
 void mpc3000_state::mpc3000_sub_map(address_map &map)
@@ -205,9 +273,10 @@ void mpc3000_state::mpc3000_sub_map(address_map &map)
 
 void mpc3000_state::mpc3000_palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(138, 146, 148));
-	palette.set_pen_color(1, rgb_t(92, 83, 88));
+	palette.set_pen_color(0, rgb_t(64, 140, 250));
+	palette.set_pen_color(1, rgb_t(230, 240, 250));
 }
+
 uint8_t mpc3000_state::subcpu_pa_r()
 {
 	return m_keys[7 - m_key_scan_row]->read();
@@ -215,26 +284,146 @@ uint8_t mpc3000_state::subcpu_pa_r()
 
 uint8_t mpc3000_state::subcpu_pb_r()
 {
-	return 0;
+	return m_drums[m_drum_scan_row]->read();
+}
+
+uint8_t mpc3000_state::subcpu_pc_r()
+{
+	uint8_t rv = 0;
+
+	if (m_count_dial)
+	{
+		const bool negative = (m_count_dial < 0);
+
+		// MPC2000 schematics have a diagram that indicates that a single positive click of the data entry dial
+		// will cause a rising edge on PC4, then a rising edge on PC5, then a falling edge on PC4, and then a falling
+		// edge on PC5.  We assume the negative direction swaps which bit rises first as per traditional quadrature.
+		// Experimentation shows that the uPD7810 wants the pulse trains to change at most every second read of this
+		// port, hence the doubling up of the phases.
+		switch (m_quadrature_phase >> 1)
+		{
+			case 0:
+				rv = negative ? BIT5 : BIT4;
+				break;
+
+			case 1:
+				rv = BIT4 | BIT5;
+				break;
+
+			case 2:
+				rv = negative ? BIT4 : BIT5;
+				break;
+
+			case 3:
+				rv = 0;
+				break;
+		}
+		m_quadrature_phase++;
+		m_quadrature_phase &= 7;
+
+		// generate a complete 4-part pulse train for each single change in the position
+		if (m_quadrature_phase == 0)
+		{
+			if (m_count_dial < 0)
+			{
+				m_count_dial++;
+			}
+			else
+			{
+				m_count_dial--;
+			}
+		}
+	}
+
+	return rv;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(mpc3000_state::dial_timer_tick)
+{
+	const int new_dial = m_dataentry->read();
+
+	if (new_dial != m_last_dial)
+	{
+		int diff = new_dial - m_last_dial;
+		if (diff > 0x80)
+		{
+			diff = 0x100 - diff;
+		}
+		if (diff < -0x80)
+		{
+			diff = -0x100 - diff;
+		}
+
+		m_count_dial += diff;
+		m_last_dial = new_dial;
+	}
 }
 
 // drum pad row select, active low
 void mpc3000_state::subcpu_pb_w(uint8_t data)
 {
-//  printf("subcpu port B = %02x\n", data);
+	m_drum_scan_row = (data & 0xf) ^ 0xf;
+	if (m_drum_scan_row != 0)
+	{
+		// get a row number 0-3
+		m_drum_scan_row = count_leading_zeros_32(m_drum_scan_row) - 28;
+	}
+}
+
+uint8_t mpc3000_state::an0_r()
+{
+	return 0xff;
+}
+
+uint8_t mpc3000_state::an1_r()
+{
+	return 0xff;
+}
+
+uint8_t mpc3000_state::an2_r()
+{
+	return 0xff;
+}
+
+uint8_t mpc3000_state::an3_r()
+{
+	return 0xff;
+}
+
+uint8_t mpc3000_state::an4_r()
+{
+	return m_variation_slider;
+}
+
+INPUT_CHANGED_MEMBER(mpc3000_state::variation_changed)
+{
+	if (!oldval && newval)
+	{
+		m_variation_slider = newval;
+	}
 }
 
 // main buttons row select (PC1-PC3)
 void mpc3000_state::subcpu_pc_w(uint8_t data)
 {
-//  printf("subcpu port C = %02x (%02x)\n", data, data ^ 0xff);
 	m_key_scan_row = ((data ^ 0xff) >> 1) & 7;
-//  printf("port C = %02x => row %d\n", data, m_key_scan_row);
 }
 
 void mpc3000_state::floppies(device_slot_interface &device)
 {
-	device.option_add("35hd", FLOPPY_35_HD);
+	device.option_add("35hd", FLOPPY_35_HD); // Akai shipped a Teac FD-235HF-3300 with these
+}
+
+static void add_formats(format_registration &fr)
+{
+	fr.add(FLOPPY_DFI_FORMAT);
+	fr.add(FLOPPY_MFM_FORMAT);
+	fr.add(FLOPPY_TD0_FORMAT);
+	fr.add(FLOPPY_IMD_FORMAT);
+	fr.add(FLOPPY_DSK_FORMAT);
+	fr.add(FLOPPY_PC_FORMAT);
+	fr.add(FLOPPY_IPF_FORMAT);
+	fr.add(FLOPPY_HFE_FORMAT);
 }
 
 void mpc3000_state::mpc3000(machine_config &config)
@@ -243,12 +432,13 @@ void mpc3000_state::mpc3000(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mpc3000_state::mpc3000_map);
 	m_maincpu->set_addrmap(AS_IO, &mpc3000_state::mpc3000_io_map);
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v53a_device::hack_w));
-	m_maincpu->in_mem16r_cb().set(FUNC(mpc3000_state::dma_memr_cb));
-	m_maincpu->out_mem16w_cb().set(FUNC(mpc3000_state::dma_memw_cb));
+	m_maincpu->in_memr_cb().set(FUNC(mpc3000_state::dma_memr_cb));
+	m_maincpu->out_memw_cb().set(FUNC(mpc3000_state::dma_memw_cb));
+	m_maincpu->in_mem16r_cb().set(FUNC(mpc3000_state::dma_mem16r_cb));
+	m_maincpu->out_mem16w_cb().set(FUNC(mpc3000_state::dma_mem16w_cb));
 	m_maincpu->out_eop_cb().set("tc", FUNC(input_merger_device::in_w<0>));
 	m_maincpu->in_ior_cb<0>().set("scsi:7:spc", FUNC(mb89352_device::dma_r));
 	m_maincpu->out_iow_cb<0>().set("scsi:7:spc", FUNC(mb89352_device::dma_w));
-	m_maincpu->out_dack_cb<1>().set("tc", FUNC(input_merger_device::in_w<1>));
 	m_maincpu->in_ior_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_r));
 	m_maincpu->out_iow_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_w));
 	m_maincpu->in_io16r_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_r16_cb));
@@ -292,7 +482,13 @@ void mpc3000_state::mpc3000(machine_config &config)
 	m_subcpu->pa_in_cb().set(FUNC(mpc3000_state::subcpu_pa_r));
 	m_subcpu->pb_in_cb().set(FUNC(mpc3000_state::subcpu_pb_r));
 	m_subcpu->pb_out_cb().set(FUNC(mpc3000_state::subcpu_pb_w));
+	m_subcpu->pc_in_cb().set(FUNC(mpc3000_state::subcpu_pc_r));
 	m_subcpu->pc_out_cb().set(FUNC(mpc3000_state::subcpu_pc_w));
+	m_subcpu->an0_func().set(FUNC(mpc3000_state::an0_r));
+	m_subcpu->an1_func().set(FUNC(mpc3000_state::an1_r));
+	m_subcpu->an2_func().set(FUNC(mpc3000_state::an2_r));
+	m_subcpu->an3_func().set(FUNC(mpc3000_state::an3_r));
+	m_subcpu->an3_func().set(FUNC(mpc3000_state::an4_r));
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(80);
@@ -303,11 +499,13 @@ void mpc3000_state::mpc3000(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(mpc3000_state::mpc3000_palette), 2);
 
+	NVRAM(config, "nvram");     // LC3517 2048x8 SRAM with battery backup
+
 	UPD72069(config, m_fdc, V53_CLKOUT); // TODO: upd72069 supports motor control
 	m_fdc->intrq_wr_callback().set("intp3", FUNC(input_merger_device::in_w<0>));
 	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<1>));
 
-	FLOPPY_CONNECTOR(config, m_floppy, mpc3000_state::floppies, "35hd", floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppy, mpc3000_state::floppies, "35hd", add_formats).enable_sound(true);
 
 	pit8254_device &pit(PIT8254(config, "synctmr", 0)); // MB89254
 	pit.set_clk<0>(V53_PCLKOUT);
@@ -359,20 +557,37 @@ void mpc3000_state::mpc3000(machine_config &config)
 		});
 
 	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "outputs", 8).unknown();
 
-	L7A1045(config, m_dsp, 33.8688_MHz_XTAL / 2); // clock verified by schematic
+	L7A1045(config, m_dsp, 33.8688_MHz_XTAL); // clock verified by schematic
+	m_dsp->set_addrmap(AS_DATA, &mpc3000_state::dsp_map);
 	m_dsp->drq_handler_cb().set(m_maincpu, FUNC(v53a_device::dreq_w<3>));
-	m_dsp->add_route(0, "speaker", 1.0, 0);
-	m_dsp->add_route(1, "speaker", 1.0, 1);
+	m_dsp->add_route(l7a1045_sound_device::L6028_LEFT, "speaker", 1.0, 0);
+	m_dsp->add_route(l7a1045_sound_device::L6028_RIGHT, "speaker", 1.0, 1);
+
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT0, "outputs", 1.0, 0);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT1, "outputs", 1.0, 1);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT2, "outputs", 1.0, 2);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT3, "outputs", 1.0, 3);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT4, "outputs", 1.0, 4);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT5, "outputs", 1.0, 5);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT6, "outputs", 1.0, 6);
+	m_dsp->add_route(l7a1045_sound_device::L6028_OUT7, "outputs", 1.0, 7);
+
+	TIMER(config, "dialtimer").configure_periodic(FUNC(mpc3000_state::dial_timer_tick), attotime::from_hz(60.0));
+
+	SOFTWARE_LIST(config, "flop_mpc3000").set_original("mpc3000_flop");
+
+	config.set_default_layout(layout_mpc3000);
 }
 
 static INPUT_PORTS_START( mpc3000 )
 	PORT_START("Y0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Pad Bank") PORT_CODE(KEYCODE_ESC)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Full Level") PORT_CODE(KEYCODE_TILDE)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Disk") PORT_CODE(KEYCODE_Q)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Program/Sounds") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Mixer/Effects") PORT_CODE(KEYCODE_E)
@@ -380,9 +595,9 @@ static INPUT_PORTS_START( mpc3000 )
 	PORT_START("Y1")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("16 Levels") PORT_CODE(KEYCODE_TAB)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Assign") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("MIDI") PORT_CODE(KEYCODE_A)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Song") PORT_CODE(KEYCODE_S)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Other") PORT_CODE(KEYCODE_D)
@@ -390,17 +605,17 @@ static INPUT_PORTS_START( mpc3000 )
 	PORT_START("Y2")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("After") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Seq Edit") PORT_CODE(KEYCODE_Z)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Step Edit") PORT_CODE(KEYCODE_X)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Edit Loop") PORT_CODE(KEYCODE_C)
 
 	PORT_START("Y3")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Soft Key 1") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Soft Key 3") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Soft Key 2") PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_NAME(".")
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tempo/Sync") PORT_CODE(KEYCODE_R)
@@ -408,11 +623,11 @@ static INPUT_PORTS_START( mpc3000 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Simul Seq") PORT_CODE(KEYCODE_Y)
 
 	PORT_START("Y4")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Soft Key 2") PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Soft Key 3") PORT_CODE(KEYCODE_F3)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Soft Key 4") PORT_CODE(KEYCODE_F4)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_NAME("<")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) PORT_NAME("<<")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_NAME("<<")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) PORT_NAME("<")
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Auto Punch") PORT_CODE(KEYCODE_F)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Count In") PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Wait For") PORT_CODE(KEYCODE_H)
@@ -443,6 +658,36 @@ static INPUT_PORTS_START( mpc3000 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Locate") PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(">") PORT_CODE(KEYCODE_F8)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME(">>") PORT_CODE(KEYCODE_F9)
+
+	PORT_START("PB0")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hihat Loose") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hihat Pedal") PORT_CODE(KEYCODE_PLUS_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Floor Tom") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ride Bell") PORT_CODE(KEYCODE_ASTERISK)
+
+	PORT_START("PB1")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hihat Closed") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Hihat Open") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Low Tom") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ride Cymbal") PORT_CODE(KEYCODE_SLASH_PAD)
+
+	PORT_START("PB2")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Bass") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Snare") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Mid Tom") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Crash2") PORT_CODE(KEYCODE_NUMLOCK)
+
+	PORT_START("PB3")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Side Stick") PORT_CODE(KEYCODE_0_PAD)
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Alt Snare") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("High Tom") PORT_CODE(KEYCODE_PGDN)
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Crash") PORT_CODE(KEYCODE_PGUP)
+
+	PORT_START("VARIATION")
+	PORT_ADJUSTER(100, "NOTE VARIATION") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mpc3000_state::variation_changed), 1)
+
+	PORT_START("DATAENTRY")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_CODE_DEC(KEYCODE_F14) PORT_CODE_INC(KEYCODE_F15)
 INPUT_PORTS_END
 
 ROM_START( mpc3000 )
@@ -465,12 +710,10 @@ ROM_START( mpc3000 )
 
 	ROM_REGION(0x8000, "subcpu", 0)    // uPD78C10 panel controller code
 	ROM_LOAD( "mp3000__op_v1.0.am27c256__id0110.ic602.bin", 0x000000, 0x008000, CRC(b0b783d3) SHA1(a60016184fc07ba00dcc19ba4da60e78aceff63c) )
-
-	ROM_REGION( 0x2000000, "dsp", ROMREGION_ERASE00 )   // sample RAM
 ROM_END
 
 void mpc3000_state::init_mpc3000()
 {
 }
 
-CONS( 1994, mpc3000, 0, 0, mpc3000, mpc3000, mpc3000_state, init_mpc3000, "Akai / Roger Linn", "MPC-3000", MACHINE_NOT_WORKING )
+CONS( 1994, mpc3000, 0, 0, mpc3000, mpc3000, mpc3000_state, init_mpc3000, "Akai / Roger Linn", "MPC3000", MACHINE_NOT_WORKING )

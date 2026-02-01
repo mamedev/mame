@@ -269,6 +269,10 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			util::stream_format(stream, "ASL   %s", ea1);
 			break;
 		// 0064xx: MARK (not implemented on T-11)
+		case 0006400:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
+			util::stream_format(stream, "MARK  %s", ea1);
+			break;
 		// 0065xx: MFPI (not implemented on T-11)
 		// 0066xx: MTPI (not implemented on T-11)
 		case 0006700:
@@ -353,9 +357,25 @@ offs_t t11_disassembler::disassemble(std::ostream &stream, offs_t pc, const data
 			break;
 
 		// 070xxx: MUL (not implemented on T-11)
+		case 0070000: case 0070100: case 0070200: case 0070300: case 0070400: case 0070500: case 0070600: case 0070700:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
+			util::stream_format(stream, "MUL   %s,%s", ea1, regs[hi & 7]);
+			break;
 		// 071xxx: DIV (not implemented on T-11)
+		case 0071000: case 0071100: case 0071200: case 0071300: case 0071400: case 0071500: case 0071600: case 0071700:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
+			util::stream_format(stream, "DIV   %s,%s", ea1, regs[hi & 7]);
+			break;
 		// 072xxx: ASH (not implemented on T-11)
+		case 0072000: case 0072100: case 0072200: case 0072300: case 0072400: case 0072500: case 0072600: case 0072700:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
+			util::stream_format(stream, "ASH   %s,%s", ea1, regs[hi & 7]);
+			break;
 		// 073xxx: ASHC (not implemented on T-11)
+		case 0073000: case 0073100: case 0073200: case 0073300: case 0073400: case 0073500: case 0073600: case 0073700:
+			ea1 = MakeEA<false> (lo, pc, opcodes);
+			util::stream_format(stream, "ASHC  %s,%s", ea1, regs[hi & 7]);
+			break;
 		case 0074000: case 0074100: case 0074200: case 0074300: case 0074400: case 0074500: case 0074600: case 0074700:
 			ea1 = MakeEA<false> (lo, pc, opcodes);
 			util::stream_format(stream, "XOR   %s,%s", regs[hi & 7], ea1);

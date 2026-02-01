@@ -97,7 +97,6 @@ blnctry:
 #include "seta2.h"
 
 #include "cpu/m68000/mcf5206e.h"
-#include "machine/mcf5206e.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "machine/watchdog.h"
@@ -473,7 +472,12 @@ void seta2_state::namcostr_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	map(0x200000, 0x21ffff).ram();                                                              // RAM
+	map(0x300000, 0x3003ff).ram().share("nvram");
+	map(0x400000, 0x400001).portr("DSW");
+	map(0x400002, 0x400003).portr("SYSTEM");
 	map(0x400006, 0x400007).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).nopw();
+	map(0x500001, 0x500001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
+	map(0x500003, 0x500003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
 	map(0x800000, 0x83ffff).ram().share(m_spriteram);                                           // Sprites
 	map(0x840000, 0x84ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
 	map(0x860000, 0x86003f).ram().w(FUNC(seta2_state::vregs_w)).share(m_vregs);                 // Video Registers
@@ -786,9 +790,9 @@ void funcube_touchscreen_device::tra_callback()
 
 // Main CPU
 
-uint32_t funcube_state::debug_r()
+uint16_t funcube_state::debug_r()
 {
-	uint32_t ret = m_in_debug->read();
+	uint16_t ret = m_in_debug->read();
 
 	// This bits let you move the crosshair in the inputs / touch panel test with a joystick
 	if (!(m_screen->frame_number() % 3))
@@ -802,20 +806,17 @@ void funcube_state::funcube_map(address_map &map)
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00200000, 0x0020ffff).ram();
 
-	map(0x00400000, 0x00400003).r(FUNC(funcube_state::debug_r));
-	map(0x00400004, 0x00400007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
+	map(0x00400002, 0x00400003).r(FUNC(funcube_state::debug_r));
+	map(0x00400006, 0x00400007).r("watchdog", FUNC(watchdog_timer_device::reset16_r)).nopw();
 
 	map(0x00500001, 0x00500001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
 	map(0x00500003, 0x00500003).w(m_oki, FUNC(okim9810_device::write_tmp_register));
 
 	map(0x00800000, 0x0083ffff).rw(FUNC(funcube_state::spriteram_r), FUNC(funcube_state::spriteram_w));
-	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write32)).share("palette");  // Palette
+	map(0x00840000, 0x0084ffff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
 	map(0x00860000, 0x0086003f).rw(FUNC(funcube_state::vregs_r), FUNC(funcube_state::vregs_w));
 
 	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w)).umask32(0x00ff00ff);
-
-	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
-	map(0xffffe000, 0xffffffff).ram();    // SRAM
 }
 
 void funcube_state::funcube2_map(address_map &map)
@@ -823,7 +824,7 @@ void funcube_state::funcube2_map(address_map &map)
 	map(0x00000000, 0x0007ffff).rom();
 	map(0x00200000, 0x0020ffff).ram();
 
-	map(0x00500000, 0x00500003).r(FUNC(funcube_state::debug_r));
+	map(0x00500002, 0x00500003).r(FUNC(funcube_state::debug_r));
 	map(0x00500004, 0x00500007).r("watchdog", FUNC(watchdog_timer_device::reset32_r)).nopw();
 
 	map(0x00600001, 0x00600001).rw(m_oki, FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
@@ -835,7 +836,7 @@ void funcube_state::funcube2_map(address_map &map)
 
 	map(0x00c00000, 0x00c002ff).rw(FUNC(funcube_state::nvram_r), FUNC(funcube_state::nvram_w)).umask32(0x00ff00ff);
 
-	map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
+//  map(0xf0000000, 0xf00001ff).rw("maincpu_onboard", FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_r), FUNC(mcf5206e_peripheral_device::seta2_coldfire_regs_w)); // technically this can be moved with MBAR
 	map(0xffffe000, 0xffffffff).ram();    // SRAM
 }
 
@@ -2203,6 +2204,43 @@ static INPUT_PORTS_START( funcube )
 	PORT_DIPSETTING( 0x00800000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( blnctry )
+	PORT_START("DSW")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW)
+	PORT_DIPNAME( 0x02, 0x02, "DSW" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Test Button")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Left Button")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Right Button")
+	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 
 /***************************************************************************
 
@@ -2433,17 +2471,6 @@ void seta2_state::telpacfl(machine_config &config)
                                Funcube series
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(funcube_state::funcube_interrupt)
-{
-	int scanline = param;
-
-	if (scanline == 368)
-		m_maincpu->set_input_line(1, HOLD_LINE);
-
-	if (scanline == 0)
-		m_maincpu->set_input_line(2, HOLD_LINE);
-}
-
 void funcube_state::machine_start()
 {
 	seta2_state::machine_start();
@@ -2462,11 +2489,12 @@ void funcube_state::machine_reset()
 	m_funcube_leds = 0;
 }
 
+// original on EVA board, no Coldfire
 void funcube_state::funcube(machine_config &config)
 {
-	MCF5206E(config, m_maincpu, XTAL(25'447'000));
+	// TODO: check exact type and clock
+	TMP68301(config, m_maincpu, XTAL(50'000'000)/3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(funcube_state::funcube_interrupt), "screen", 0, 1);
 
 	H83007(config, m_sub, FUNCUBE_SUB_CPU_CLOCK);
 	m_sub->set_addrmap(AS_PROGRAM, &funcube_state::funcube_sub_map);
@@ -2475,8 +2503,6 @@ void funcube_state::funcube(machine_config &config)
 	m_sub->read_porta().set(FUNC(funcube_state::outputs_r));
 	m_sub->write_porta().set(FUNC(funcube_state::outputs_w));
 	m_sub->write_portb().set(FUNC(funcube_state::leds_w));
-
-	MCF5206E_PERIPHERAL(config, "maincpu_onboard", 0, m_maincpu);
 
 	FUNCUBE_TOUCHSCREEN(config, "touchscreen", 200).tx_cb().set(m_sub, FUNC(h8_device::sci_rx_w<1>));
 
@@ -2492,6 +2518,7 @@ void funcube_state::funcube(machine_config &config)
 	m_screen->set_visarea(0x0+1, 0x140-1+1, 0x00, 0xf0-1);
 	m_screen->set_screen_update(FUNC(funcube_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(funcube_state::screen_vblank));
+	m_screen->screen_vblank().append_inputline(m_maincpu, 0);
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_seta2);
@@ -2509,12 +2536,16 @@ void funcube_state::funcube(machine_config &config)
 void funcube_state::funcube2(machine_config &config)
 {
 	funcube(config);
+	MCF5206E(config.replace(), m_maincpu, XTAL(25'447'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &funcube_state::funcube2_map);
+	downcast<mcf5206e_device &>(*m_maincpu).gpio_r_cb().set_ioport("BATTERY");
 
 	m_sub->read_port4().set([]() -> u8 { return 0; }); // unused
 
 	// video hardware
 	m_screen->set_visarea(0x0, 0x140-1, 0x00, 0xf0-1);
+	m_screen->screen_vblank().set(FUNC(funcube_state::screen_vblank));
+	m_screen->screen_vblank().append_inputline(m_maincpu, 1);
 }
 
 
@@ -2525,6 +2556,8 @@ void seta2_state::namcostr(machine_config &config)
 	// does this have a ticket dispenser?
 
 	WATCHDOG_TIMER(config, "watchdog");
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -2674,6 +2707,8 @@ U42, U43 & U47 are mask ROMs read as 27C322
 
 The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 
+"15.5846kHz hsync, vsync between 60-61Hz (can't split the csync)"
+
 ***************************************************************************/
 
 ROM_START( funcube2 )
@@ -2750,9 +2785,11 @@ ROM_END
 
 void funcube_state::init_funcube()
 {
-	uint32_t *main_cpu = (uint32_t *) memregion("maincpu")->base();
+//  uint16_t *main_cpu = (uint16_t *) memregion("maincpu")->base();
+//
+//  main_cpu[0x064/2] = 0x0000;
+//  main_cpu[0x066/2] = 0x042a; // PIC protection?
 
-	main_cpu[0x064/4] = 0x0000042a; // PIC protection?
 }
 
 void funcube_state::init_funcube2()
@@ -4463,9 +4500,9 @@ GAME( 2000, penbros,   0,        penbros,  penbros,  seta2_state,    empty_init,
 GAME( 2000, ablast,    penbros,  penbros,  penbros,  seta2_state,    empty_init,    ROT0,   "Subsino",               "Hong Tian Lei (A-Blast) (Japan)",                     MACHINE_NO_COCKTAIL ) // 轟天雷/Hōng tiān léi
 GAME( 2000, ablastb,   penbros,  ablastb,  penbros,  seta2_state,    empty_init,    ROT0,   "bootleg",               "Hong Tian Lei (A-Blast) (bootleg)",                   MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND  ) // at least "tilemap sprite" scrolly flag differs, FPGA instead of x1-010
 
-GAME( 1998, blnctry,   0,        namcostr, funcube,  seta2_state,    empty_init,    ROT0,   "Namco",                 "Balance Try (Japan, ver 1.00)",                       MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
+GAME( 1999, blnctry,   0,        namcostr, blnctry,  seta2_state,    empty_init,    ROT0,   "Namco",                 "Balance Try (Japan, ver 1.00)",                       MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING ) // sets 1999/02/01 in NVRAM
 
-GAME( 2000, namcostr,  0,        namcostr, funcube,  seta2_state,    init_namcostr, ROT0,   "Namco",                 "Namco Stars",                                         MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
+GAME( 2000, namcostr,  0,        namcostr, blnctry,  seta2_state,    init_namcostr, ROT0,   "Namco",                 "Namco Stars",                                         MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING )
 
 GAME( 2000, deerhunt,  0,        samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.3",                               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, deerhunta, deerhunt, samshoot, deerhunt, seta2_state,    empty_init,    ROT0,   "Sammy USA Corporation", "Deer Hunting USA V4.2",                               MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )

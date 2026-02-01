@@ -11,8 +11,11 @@
 
 #include "emu.h"
 #include "dspp.h"
-#include "dsppfe.h"
+
 #include "dsppdasm.h"
+#include "dsppfe.h"
+
+#include "emuopts.h"
 
 
 //**************************************************************************
@@ -142,13 +145,21 @@ void dspp_device::device_start()
 {
 	m_isdrc = false;//allow_drc();
 
-	m_core = (dspp_internal_state *)m_cache.alloc_near(sizeof(dspp_internal_state));
+	if (m_isdrc)
+	{
+		m_cache.allocate_cache(mconfig().options().drc_rwx());
+		m_core = m_cache.alloc_near<dspp_internal_state>();
+
+		uint32_t flags = 0;
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 16, 0);
+
+		m_drcfe = std::make_unique<dspp_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+	}
+	else
+	{
+		m_core = &m_local_core;
+	}
 	memset(m_core, 0, sizeof(dspp_internal_state));
-
-	uint32_t flags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 16, 0);
-
-	m_drcfe = std::make_unique<dspp_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 	// Get our address spaces
 	space(AS_PROGRAM).cache(m_code_cache);

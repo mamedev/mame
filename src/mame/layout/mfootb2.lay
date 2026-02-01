@@ -58,13 +58,13 @@ authors:hap
 		<element ref="white"><bounds x="58" y="1" width="2" height="46" /></element>
 		<element ref="white"><bounds x="123" y="1" width="2" height="46" /></element>
 
-		<element ref="text_down"><bounds x="4" y="1" width="54" height="9" /></element>
-		<element ref="text_field"><bounds x="58" y="1" width="67" height="9" /></element>
-		<element ref="text_yards"><bounds x="124" y="1" width="56" height="9" /></element>
+		<element ref="text_down"><bounds xc="31" y="1" width="50" height="9" /></element>
+		<element ref="text_field"><bounds xc="91.5" y="1" width="64" height="9" /></element>
+		<element ref="text_yards"><bounds xc="151.5" y="1" width="48" height="9" /></element>
 
-		<element ref="text_home"><bounds x="4" y="38" width="54" height="9" /></element>
-		<element ref="text_time"><bounds x="58" y="38" width="67" height="9" /></element>
-		<element ref="text_visitors"><bounds x="124" y="38" width="56" height="9" /></element>
+		<element ref="text_home"><bounds xc="31" y="38" width="50" height="9" /></element>
+		<element ref="text_time"><bounds xc="91.5" y="38" width="70" height="9" /></element>
+		<element ref="text_visitors"><bounds xc="151.5" y="38" width="50" height="9" /></element>
 	</group>
 
 

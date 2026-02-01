@@ -508,7 +508,7 @@
 
 #include "emu.h"
 #include "cpu/i86/i186.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/gen_latch.h"
 #include "machine/i8256.h"

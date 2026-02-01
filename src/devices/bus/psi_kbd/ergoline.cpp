@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "ergoline.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 
 //**************************************************************************

@@ -14,22 +14,22 @@ Ernesto Corvi & Mariusz Wojcieszek
 
 #pragma once
 
-#include "cpu/m68000/m68000.h"
-#include "cpu/m68000/m68020.h"
-#include "cpu/m68000/m68030.h"
-#include "cpu/m68000/m68040.h"
-#include "machine/bankdev.h"
-#include "bus/rs232/rs232.h"
-#include "bus/centronics/ctronics.h"
-#include "machine/mos6526.h"
-#include "machine/msm6242.h"
-#include "machine/i2cmem.h"
-
 #include "agnus_copper.h"
 #include "akiko.h"
 #include "amigaaga.h"
 #include "paula.h"
 #include "paulafdc.h"
+
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/m68000/m68030.h"
+#include "cpu/m68000/m68040.h"
+#include "machine/bankdev.h"
+#include "machine/i2cmem.h"
+#include "machine/mos6526.h"
+#include "machine/msm6242.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -528,9 +528,9 @@ protected:
 	// read them on both big-endian and little-endian systems, we store the custom
 	// registers in 32-bit natural order. This means we need to XOR the register
 	// address with 1 on little-endian systems.
-	uint16_t &CUSTOM_REG(offs_t x) { return m_custom_regs[BYTE_XOR_BE(x)]; }
+	uint16_t &CUSTOM_REG(offs_t x) { return util::big_endian_cast<uint16_t>(m_custom_regs)[x]; }
 	int16_t &CUSTOM_REG_SIGNED(offs_t x) { return (int16_t &)CUSTOM_REG(x); }
-	uint32_t &CUSTOM_REG_LONG(offs_t x) { return *(uint32_t *)&m_custom_regs[x]; }
+	uint32_t &CUSTOM_REG_LONG(offs_t x) { return m_custom_regs[x >> 1]; }
 
 	// agnus/alice chip id
 	enum
@@ -619,7 +619,7 @@ protected:
 	int m_cia_0_irq = 0;
 	int m_cia_1_irq = 0;
 
-	uint16_t m_custom_regs[256]{};
+	uint32_t m_custom_regs[256/2]{};
 	static const char *const s_custom_reg_names[0x100];
 
 	void ocs_map(address_map &map) ATTR_COLD;

@@ -2,8 +2,6 @@
 // copyright-holders:Miodrag Milanovic
 /***************************************************************************
 
-    main.c
-
     Castool command line front end
 
     27/03/2009 Initial version by Miodrag Milanovic

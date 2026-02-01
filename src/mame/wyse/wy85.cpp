@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "bus/rs232/rs232.h"
 #include "bus/wysekbd/wysekbd.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 #include "machine/er1400.h"
 #include "machine/mc68681.h"
 #include "sound/beep.h"

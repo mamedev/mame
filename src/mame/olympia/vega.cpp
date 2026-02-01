@@ -790,7 +790,10 @@ void vega_state::machine_start()
 
 void vega_state::vega(machine_config &config)
 {
-	I8035(config, m_maincpu, 4000000);
+	constexpr auto CRTC_CLOCK = 10'920'000;
+	constexpr auto CPU_CLOCK = CRTC_CLOCK / 2;
+
+	I8035(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vega_state::vega_map);
 	m_maincpu->set_addrmap(AS_IO, &vega_state::vega_io_map);
 	m_maincpu->p1_in_cb().set_ioport("DSW");
@@ -819,7 +822,7 @@ void vega_state::vega(machine_config &config)
 	screen.set_screen_update(FUNC(vega_state::screen_update));
 	screen.set_palette(m_palette);
 
-	DP8350(config, m_crtc, 10920000); // pins 21/22 connected to XTAL, 3 to GND
+	DP8350(config, m_crtc, CRTC_CLOCK); // pins 21/22 connected to XTAL, 3 to GND
 	m_crtc->set_screen("screen");
 	m_crtc->refresh_control(0);
 	m_crtc->vblank_callback().set_inputline(m_maincpu, MCS48_INPUT_IRQ); // inverse of pin 2?
@@ -830,7 +833,7 @@ void vega_state::vega(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, m_ay8910, 1500000);
+	AY8910(config, m_ay8910, CPU_CLOCK / 3);
 	m_ay8910->port_a_read_callback().set(FUNC(vega_state::ay8910_pa_r));
 	m_ay8910->port_b_read_callback().set(FUNC(vega_state::ay8910_pb_r));
 	m_ay8910->port_a_write_callback().set(FUNC(vega_state::ay8910_pa_w));

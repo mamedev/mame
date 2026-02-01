@@ -315,7 +315,7 @@ void linndrum_vcf_eg_device::update_freq_cv_offset()
 	m_i_offset = vx / R;
 
 	LOGMASKED(LOG_CALIBRATION, "%s: CV Offset current: %f. CV range: %f - %f\n",
-	          tag(), m_i_offset, get_freq_cv(0), get_freq_cv(EG_V_TARGET));
+			  tag(), m_i_offset, get_freq_cv(0), get_freq_cv(EG_V_TARGET));
 }
 
 DECLARE_INPUT_CHANGED_MEMBER(linndrum_vcf_eg_device::freq_cv_offset_changed)
@@ -402,7 +402,7 @@ private:
 	required_device<linndrum_vcf_eg_device> m_bass_eg;
 	required_device<timer_device> m_hat_trigger_timer;  // U37B (LM556).
 	required_device<va_rc_eg_device> m_hat_eg;
-	required_device<va_vca_device> m_hat_vca;  // CEM3360 (U91B).
+	required_device<cem3360_vca_device> m_hat_vca;  // U91B.
 	bool m_hat_open = false;
 	bool m_hat_triggered = false;
 	std::array<bool, NUM_MUX_VOICES> m_mux_counting = { false, false, false, false, false, false, false, false };
@@ -758,15 +758,16 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// The bass VCF has a cutoff frequency of ~1.4KHz, which transiently
 	// increases to ~100KHz when the voice triggers.
 	LINNDRUM_VCF_EG(config, m_bass_eg, ":trimmer_bass_freq_cv_offset", RES_K(18), RES_K(5.1));  // R135, R133.
-	auto &bass_vcf = CEM3320_LPF4(config, "bass_vcf", CAP_P(150), RES_K(100));
+	auto &bass_vcf = CEM3320_LPF4(config, "bass_vcf", CAP_P(150));
+	bass_vcf.configure_voltage_input(RES_K(91));  // R87.
 	m_mux_volume[MV_BASS]->add_route(0, bass_vcf, 1.0, cem3320_lpf4_device::INPUT_AUDIO);
 	m_bass_eg->add_route(0, bass_vcf, 1.0, cem3320_lpf4_device::INPUT_FREQ);
 
 	TIMER(config, m_hat_trigger_timer).configure_generic(FUNC(linndrum_audio_device::hat_trigger_timer_tick));  // LM556 (U37B).
 	VA_RC_EG(config, m_hat_eg).set_c(HAT_C22);
-	VA_VCA(config, m_hat_vca).configure_cem3360_linear_cv();
-	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0, 0);
-	m_hat_eg->add_route(0, m_hat_vca, HAT_EG2CV_SCALER, 1);
+	CEM3360_VCA(config, m_hat_vca);
+	m_mux_volume[MV_HAT]->add_route(0, m_hat_vca, 1.0, cem3360_vca_device::INPUT_AUDIO);
+	m_hat_eg->add_route(0, m_hat_vca, HAT_EG2CV_SCALER, cem3360_vca_device::INPUT_GAIN);
 
 	// *** Snare / sidestick section.
 
@@ -805,7 +806,8 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// The tom VCF has a cutoff frequency of ~650Hz, which transiently
 	// increases to ~46KHz when the voice triggers.
 	LINNDRUM_VCF_EG(config, m_tom_eg, ":trimmer_tom_freq_cv_offset", RES_K(10), RES_K(10));
-	auto &tom_vcf = CEM3320_LPF4(config, "tom_conga_vcf", CAP_P(330), RES_K(100));
+	auto &tom_vcf = CEM3320_LPF4(config, "tom_conga_vcf", CAP_P(330));
+	tom_vcf.configure_voltage_input(RES_K(91));
 	m_tom_dac->add_route(0, tom_vcf, 1.0, cem3320_lpf4_device::INPUT_AUDIO);
 	m_tom_eg->add_route(0, tom_vcf, 1.0, cem3320_lpf4_device::INPUT_FREQ);
 

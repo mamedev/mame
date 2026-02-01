@@ -18,20 +18,23 @@ public:
 	// construction/destruction
 	att6300p_mmu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto trapio_callback() { return m_trapio.bind(); }
+
+	// MMU configuration
+	void set_a20_enabled(bool enabled);
+	void set_protection_enabled(bool enabled);
+	void set_mem_mapping(uint32_t target_addr[32]);
+	void set_mem_setup_enabled(bool enabled);
+	void set_io_setup_enabled(bool enabled);
+	void set_memprot_enabled(bool enabled);
+	void set_io_read_traps_enabled(bool enabled);
+	void set_io_write_traps_enabled(bool enabled);
+
 	// All CPU accesses are directed to the MMU via these calls
 	uint16_t mem_r(offs_t offset, uint16_t mem_mask);
 	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t io_r(offs_t offset, uint16_t mem_mask);
 	void io_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-
-	// MMU configuration
-	void set_protected_mode_enabled(bool enabled);
-	void set_mem_mapping(uint32_t target_addr[32]);
-	void set_mem_setup_enabled(bool enabled);
-	void set_io_setup_enabled(bool enabled);
-	void set_memprot_enabled(bool enabled);
-
-	auto trapio_callback() { return m_trapio.bind(); }
 
 protected:
 	// device-level overrides
@@ -51,29 +54,31 @@ private:
 	memory_access<24, 1, 0, ENDIANNESS_LITTLE>::specific m_mem16_space;
 	address_space *m_io;
 
-	bool m_protected_mode;
+	bool m_protection_enabled;
 	uint32_t m_map_table[32];
 	uint32_t m_map_imask, m_map_omask;
 	bool m_mem_wr_fastpath;
 	uint32_t m_mem_prot_limit;
 	bool m_mem_setup_enabled;
 	bool m_io_setup_enabled;
+	bool m_io_read_traps_enabled;
+	bool m_io_write_traps_enabled;
 
 	bool m_mem_prot_table[1024];
 	uint8_t m_io_prot_table[4096];
 
 	// Per-port IO protection flags
 	enum {
-		IO_PROT_INHIBIT_WRITE	= 1,
-		IO_PROT_INHIBIT_READ	= 2,
-		IO_PROT_TRAP			= 4
+		IO_PROT_NOTRAP          = 2,
+		IO_PROT_INHIBIT_READ    = 4,
+		IO_PROT_INHIBIT_WRITE   = 8,
 	};
 
 	// Flags for trapped IO accesses
 	enum {
-		TRAPIO_FLAG__IORC		= 2,	// Active Low
-		TRAPIO_FLAG__LBHE		= 4,	// Active Low
-		TRAPIO_FLAG_LA0			= 8
+		TRAPIO_FLAG__IORC       = 2,    // Active Low
+		TRAPIO_FLAG__LBHE       = 4,    // Active Low
+		TRAPIO_FLAG_LA0         = 8
 	};
 };
 

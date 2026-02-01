@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include "pc80s31k.h"
-
 #include "bus/centronics/ctronics.h"
+#include "bus/nec_fdd/pc80s31k.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
 #include "machine/buffer.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -119,6 +119,8 @@ protected:
 	required_device<beep_device> m_beep;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
+
+	DECLARE_SNAPSHOT_LOAD_MEMBER(snapshot_cb);
 
 private:
 	uint8_t port40_r();

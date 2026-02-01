@@ -38,7 +38,7 @@ K-665 sound chip (Oki M6295 clone)
 #include "emu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"

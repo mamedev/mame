@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "cl_sh260.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 DEFINE_DEVICE_TYPE(EV346, isa16_ev346_device, "ev346", "Everex EV-346 disk controller")
 DEFINE_DEVICE_TYPE(JC1310, isa16_jc1310_device, "jc1310", "Joincom JC-1310 disk controller")

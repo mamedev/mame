@@ -149,13 +149,15 @@
 #include "jagblit.h"
 
 #define LOG_BLITS           (1U << 1)
-#define LOG_BAD_BLITS       (1U << 2)
-#define LOG_BLITTER_STATS   (1U << 3)
-#define LOG_BLITTER_WRITE   (1U << 4)
-#define LOG_UNHANDLED_BLITS (1U << 5)
-#define LOG_OBJECTS         (1U << 6)
+#define LOG_BLITTER_STATS   (1U << 2)
+#define LOG_BLITTER_WRITE   (1U << 3)
+#define LOG_UNHANDLED_BLITS (1U << 4)
+#define LOG_OBJECTS         (1U << 5)
+#define LOG_OBJECT_DRAW     (1U << 6) // log drawing details (verbose)
+#define LOG_OBJECT_BRANCH   (1U << 7) // log branch taken (verbose)
 
-#define VERBOSE (0)
+#define VERBOSE (LOG_UNHANDLED_BLITS)
+//#define LOG_OUTPUT_FUNC osd_printf_warning
 #include "logmacro.h"
 
 
@@ -295,8 +297,11 @@ inline void jaguar_state::verify_host_cpu_irq()
 	}
 }
 
-inline void jaguar_state::trigger_host_cpu_irq(int level)
+void jaguar_state::trigger_host_cpu_irq(int level)
 {
+	// NOTE: pending flag occurs only if irq is enabled
+	if (!BIT(m_gpu_regs[INT1], level))
+		return;
 	m_cpu_irq_state |= 1 << level;
 	verify_host_cpu_irq();
 }
@@ -309,7 +314,9 @@ void jaguar_state::gpu_cpu_int(int state)
 
 void jaguar_state::dsp_cpu_int(int state)
 {
-	trigger_host_cpu_irq(4);
+	m_dsp_irq_state |= 1 << 1;
+	update_dsp_irq();
+	//trigger_host_cpu_irq(4);
 }
 
 
@@ -555,11 +562,29 @@ uint32_t jaguar_state::blitter_r(offs_t offset, uint32_t mem_mask)
 #if USE_LEGACY_BLITTER
 	switch (offset)
 	{
-		case B_CMD: /* B_CMD */
-			return m_blitter_status & 3;
+		// $f02238
+		case B_CMD:
+		{
+			// handle normal idle + inner/outer idle
+			// TODO: other values, which depends on blitter being in async thread
+			// JTRM claims all of them as "for diagnostic only"
+			const u32 is_idle = (m_blitter_status & 1) * 0x805;
+			return is_idle | (m_blitter_status & 2);
+		}
+
+		// avsp reads A1/A2_PIXEL data there (doors after the first section)
+		// this is documented in JTRM, cfr. section 10 of "Tom bugs"
+		// $f02204
+		case A1_FLAGS:
+			return m_blitter_regs[A1_PIXEL];
+
+		// $f0222c
+		case A2_FLAGS:
+			return m_blitter_regs[A2_PIXEL];
 
 		default:
-			logerror("%s:Blitter read register @ F022%02X\n", machine().describe_context(), offset * 4);
+			if(!machine().side_effects_disabled())
+				logerror("%s:Blitter read register @ F022%02X\n", machine().describe_context(), offset * 4);
 			return 0;
 	}
 	#else
@@ -581,6 +606,14 @@ void jaguar_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		blitter_run();
 	}
 
+	// TODO: B_STOP (for collision detection, assuming anything ever used this)
+	if (offset == B_STOP && ACCESSING_BITS_0_15 && BIT(data, 1))
+	{
+		m_blitter_status = 1;
+		m_blitter_done_timer->adjust(attotime::never);
+	}
+
+
 	LOGMASKED(LOG_BLITTER_WRITE, "%s:Blitter write register @ F022%02X = %08X\n", machine().describe_context(), offset * 4, data);
 #else
 	m_blitter->iobus_w(offset, data, mem_mask);
@@ -597,7 +630,7 @@ void jaguar_state::blitter_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 uint16_t jaguar_state::tom_regs_r(offs_t offset)
 {
-	if (offset != INT1 && offset != INT2 && offset != HC && offset != VC)
+	if (offset != INT1 && offset != INT2 && offset != HC && offset != VC && !machine().side_effects_disabled())
 		logerror("%s:TOM read register @ F00%03X\n", machine().describe_context(), offset * 2);
 
 	switch (offset)
@@ -629,7 +662,6 @@ uint16_t jaguar_state::tom_regs_r(offs_t offset)
 void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t reg_store = m_gpu_regs[offset];
-	attotime sample_period;
 	if (offset < GPU_REGS)
 	{
 		COMBINE_DATA(&m_gpu_regs[offset]);
@@ -637,17 +669,14 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		switch (offset)
 		{
 			case MEMCON1:
+				// TODO: this seems unused by anything in a meaningful way, convert to fatalerror?
 				if((m_gpu_regs[offset] & 1) == 0)
 					printf("Warning: ROMHI = 0!\n");
 
 				break;
 			case PIT0:
 			case PIT1:
-				if (m_gpu_regs[PIT0] && m_gpu_regs[PIT0] != 0xffff) //FIXME: avoid too much small timers for now
-				{
-					sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
-					m_pit_timer->adjust(sample_period);
-				}
+				update_pit_timer();
 				break;
 
 			case INT1:
@@ -658,13 +687,27 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			// TODO: INT2 bus mechanism
 
 			case VMODE:
+				// TODO: verify if bit 0 also suspend the object timer until next frame
 				if (reg_store != m_gpu_regs[offset])
+				{
 					set_palette(m_gpu_regs[VMODE]);
+				}
 				break;
 
 			case OBF:   /* clear GPU interrupt */
+			{
 				m_gpu->set_input_line(3, CLEAR_LINE);
+				//m_gpu_regs[OBF] &= ~1;
+
+				// kasumi, valdiser and defender resumes the object processor after the
+				// GPU receives an irq when it writes here
+				// TODO: this is a stopgap setup
+				const u16 hdb1 = ((m_gpu_regs[HDB1] & 0x7ff) / 2);
+
+				m_object_timer->adjust(attotime::zero, m_screen->vpos() * 2 | (hdb1 << 16));
+
 				break;
+			}
 
 			case HP:
 			case HBB:
@@ -742,17 +785,42 @@ uint32_t jaguar_state::cojag_gun_input_r(offs_t offset)
 TIMER_CALLBACK_MEMBER(jaguar_state::blitter_done)
 {
 	m_blitter_status = 1;
+	// TODO: kasumi, nbajamte and cojag:area51 at least enables the done irq, verify if needed or not
+//  m_gpu->set_input_line(4, ASSERT_LINE);
+}
+
+void jaguar_state::update_pit_timer()
+{
+	// raiden BGM tempo depends on this
+	// NOTE: in u64 because `from_ticks` expects u64
+	// - aircars/aircars94/fforlife/trevmcfr writes 0xffff 0xffff, also read periodically
+	//   (which is a write only register ...)
+	const u64 prescaler = m_gpu_regs[PIT0];
+	const u64 divider = m_gpu_regs[PIT1];
+
+	// printf("%04x %04x\n", prescaler, divider);
+
+	// TODO: randomly crash/hang here in pitfall (or it's something else?)
+	if (prescaler != 0)
+	{
+		const u64 pit_value = (1 + prescaler) * (1 + divider);
+
+		attotime sample_period = attotime::from_ticks(pit_value, m_gpu->clock());
+		m_pit_timer->adjust(sample_period);
+	}
+	else
+		m_pit_timer->adjust(attotime::never);
+
 }
 
 TIMER_CALLBACK_MEMBER(jaguar_state::pit_update)
 {
-	if (m_gpu_regs[INT1] & 0x8)
-		trigger_host_cpu_irq(3);
-	if (m_gpu_regs[PIT0] != 0)
-	{
-		attotime sample_period = attotime::from_ticks((1+m_gpu_regs[PIT0]) * (1+m_gpu_regs[PIT1]), m_gpu->clock()/2);
-		m_pit_timer->adjust(sample_period);
-	}
+	trigger_host_cpu_irq(3);
+	// PIT also triggers an irq 2 on GPU side
+	// TODO: pinpoint what requires this
+	m_gpu->set_input_line(2, ASSERT_LINE);
+
+	update_pit_timer();
 }
 
 TIMER_CALLBACK_MEMBER(jaguar_state::gpu_sync)
@@ -768,14 +836,17 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 	int hdb = param >> 16;
 	const rectangle &visarea = m_screen->visible_area();
 
-	/* only run if video is enabled and we are past the "display begin" */
-	if ((m_gpu_regs[VMODE] & 1) && vc >= (m_gpu_regs[VDB] & 0x7ff))
+	/* only run if video is enabled and we are inside the display range */
+	// - valdiser depends on not drawing at display end ...
+	if ((m_gpu_regs[VMODE] & 1) && vc >= (m_gpu_regs[VDB] & 0x7ff) && vc < (m_gpu_regs[VDE] & 0x7ff))
 	{
+		// NOTE: 760 is the max size of line buffer, as per the memory mapped ranges
+		const int line_size = 760;
 		uint32_t *dest = &m_screen_bitmap.pix(vc >> 1);
 		int maxx = visarea.right();
 		int hde = effective_hvalue(m_gpu_regs[HDE]) >> 1;
-		uint16_t x,scanline[760];
-		uint8_t y,pixel_width = ((m_gpu_regs[VMODE]>>10)&3)+1;
+		uint16_t x;
+		uint8_t xx, pixel_width = ((m_gpu_regs[VMODE] >> 10) & 3) + 1;
 
 		/* if we are first on this scanline, clear to the border color */
 		if (ENABLE_BORDERS && vc % 2 == 0)
@@ -786,26 +857,44 @@ TIMER_CALLBACK_MEMBER(jaguar_state::scanline_update)
 		}
 
 		/* process the object list for this counter value */
-		process_object_list(vc, scanline);
+		// NOTE: line buffer is still a parameter because there are two of them (alternating display and draw)
+		process_object_list(vc, m_line_buffer);
 
 		/* copy the data to the target, clipping */
+		// TODO: shouldn't happen here, also "pixel_width" is in 0.25 steps not linear
 		if ((m_gpu_regs[VMODE] & 0x106) == 0x002)   /* RGB24 */
 		{
 			for (x = 0; x < 760 && hdb <= maxx && hdb < hde; x+=2)
-				for (y = 0; y < pixel_width; y++)
+			{
+				for (xx = 0; xx < pixel_width; xx++)
 				{
-					uint8_t r = m_pen_table[(scanline[x]&0xff)|256];
-					uint8_t g = m_pen_table[(scanline[x]>>8)|512];
-					uint8_t b = m_pen_table[scanline[x+1]&0xff];
-					dest[hdb++] = rgb_t(r, g, b);
+					uint8_t r = m_pen_table[(m_line_buffer[x % line_size]&0xff)|256];
+					uint8_t g = m_pen_table[(m_line_buffer[x % line_size]>>8)|512];
+					uint8_t b = m_pen_table[m_line_buffer[(x+1) % line_size]&0xff];
+					dest[hdb % line_size] = rgb_t(r, g, b);
+					hdb++;
 				}
+			}
 		}
 		else
 		{
 			for (x = 0; x < 760 && hdb <= maxx && hdb < hde; x++)
-				for (y = 0; y < pixel_width; y++)
-					dest[hdb++] = m_pen_table[scanline[x]];
+			{
+				for (xx = 0; xx < pixel_width; xx++)
+				{
+					dest[hdb % line_size] = m_pen_table[m_line_buffer[x % line_size]];
+					hdb++;
+				}
+			}
 		}
+	}
+	// punt if we are in suspend state (next timer at $f00026)
+	// TODO: this causes a stall in valdiser at "out of time"
+	// GPU r/w the current line buffer for a zoom-in/-out effect.
+	// Removing this check causes double framerate in mutntpng
+	if (m_suspend_object_pointer)
+	{
+		return;
 	}
 
 	/* adjust the timer in a loop, to handle missed cases */
@@ -833,11 +922,6 @@ void jaguar_state::video_start()
 	m_pit_timer = timer_alloc(FUNC(jaguar_state::pit_update), this);
 	m_gpu_sync_timer = timer_alloc(FUNC(jaguar_state::gpu_sync), this);
 
-	adjust_object_timer(0);
-	m_blitter_done_timer->adjust(attotime::never);
-	m_pit_timer->adjust(attotime::never);
-	m_gpu_sync_timer->adjust(attotime::never);
-
 	m_screen_bitmap.allocate(760, 512);
 
 	jagobj_init();
@@ -849,6 +933,18 @@ void jaguar_state::video_start()
 	m_pixel_clock = m_is_cojag ? COJAG_PIXEL_CLOCK.value() : JAGUAR_CLOCK.value();
 }
 
+void jaguar_state::video_reset()
+{
+	m_suspend_object_pointer = 0;
+	m_blitter_status = 1;
+	//m_gpu_regs[OBF] = 0;
+
+	m_blitter_done_timer->adjust(attotime::never);
+	m_pit_timer->adjust(attotime::never);
+	m_gpu_sync_timer->adjust(attotime::never);
+
+	adjust_object_timer(0);
+}
 
 void jaguar_state::device_postload()
 {

@@ -182,6 +182,11 @@ void diskiing_device::device_reset()
 	m_wozfdc->set_floppies(m_floppy[0], m_floppy[1]);
 }
 
+void diskiing_device::reset_from_bus()
+{
+	m_wozfdc->reset();
+}
+
 /*-------------------------------------------------
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
@@ -234,4 +239,10 @@ void a2bus_applesurance_device::device_reset()
 {
 	m_c800_bank = 1;
 	diskiing_device::device_reset();
+}
+
+void a2bus_applesurance_device::reset_from_bus()
+{
+	m_c800_bank = 1;
+	diskiing_device::reset_from_bus();
 }

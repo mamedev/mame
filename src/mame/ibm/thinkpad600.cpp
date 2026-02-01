@@ -320,7 +320,7 @@ void thinkpad600_state::thinkpad600(machine_config &config)
 }
 
 
-ROM_START(thinkpad760xd)
+ROM_START(tpad760xd)
 	ROM_REGION( 0x80000, "pci:07.0", 0 )
 	ROM_LOAD( "e28f004_89g8164_rev37_h1897m.u17",      0x00000, 0x80000, CRC(6092594f) SHA1(25681e4952a432e1170f69ae75f3260245b6b44b) ) // BIOS
 
@@ -331,7 +331,7 @@ ROM_START(thinkpad760xd)
 	ROM_LOAD( "st93c46c.u30",                          0x00000, 0x00080, CRC(22cac7b5) SHA1(ee48ecf5d59e243e9afb0ca7e41ed8437eec8097) ) // BIOS settings
 ROM_END
 
-ROM_START(thinkpad600)
+ROM_START(tpad600)
 	ROM_REGION( 0x80000, "pci:07.0", 0 )
 	ROM_LOAD( "tms28f004b_18l9949_rev16-i2298m.u76",   0x00000, 0x80000, CRC(00a52b32) SHA1(08db425b8edb3a036f22beb588caa6f050fc8eb2) )
 
@@ -345,7 +345,7 @@ ROM_START(thinkpad600)
 	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
 ROM_END
 
-ROM_START(thinkpad600e)
+ROM_START(tpad600e)
 	ROM_REGION( 0x80000, "bios", 0 )
 	ROM_LOAD( "e28f004b5t80-10l1056_rev15_h0399m.u60", 0x00000, 0x80000, CRC(fba7567b) SHA1(a84e7d4e5740150e78e5002714c9125705f3356a) )
 
@@ -370,7 +370,7 @@ ROM_START(thinkpad600e)
 	ROM_LOAD( "atf1500al-modemboard.u12",              0x00000, 0x00c39, CRC(7ecd4b79) SHA1(b69ef5fe227b466f331f863ba20efd7e23056809) ) // On modem PCB
 ROM_END
 
-ROM_START(thinkpad600x)
+ROM_START(tpad600x)
 	ROM_REGION( 0x80000, "pci:07.0", 0 )
 	ROM_LOAD( "e28f004b5t80_08k3492_rev25_b0800m.u36", 0x00000, 0x80000, CRC(5c64ef91) SHA1(1aa2d68aff96c1ccc6859c5480fcfc5e73ab250d) )
 
@@ -381,7 +381,7 @@ ROM_START(thinkpad600x)
 	ROM_LOAD( "atmel24rf08ct.u79",                     0x00000, 0x00080, NO_DUMP ) // BIOS settings
 ROM_END
 
-ROM_START(thinkpad770z)
+ROM_START(tpad770z)
 	ROM_REGION( 0x80000, "pci:07.0", 0 )
 	ROM_LOAD( "e28f004b5t80-10l1055-rev09-d0999m.u59", 0x00000, 0x80000, CRC(f9f255c5) SHA1(ee209802d08c6498a42e52c5c45ce469dc095ad4) )
 
@@ -400,9 +400,9 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR, NAME,          PARENT, COMPAT, MACHINE,      INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,         FLAGS
-COMP( 1995, thinkpad760xd, 0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 760XD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, thinkpad600,   0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, thinkpad600e,  0,      0,      thinkpad600e, thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, thinkpad600x,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600X",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, thinkpad770z,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR, NAME,      PARENT, COMPAT, MACHINE,      INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,         FLAGS
+COMP( 1995, tpad760xd, 0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 760XD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, tpad600,   0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, tpad600e,  0,      0,      thinkpad600e, thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, tpad600x,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600X",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, tpad770z,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -1826,7 +1826,7 @@ void sc4_state::init_sc4()
 void sc4_state::init_sc4mbus()
 {
 	init_sc4();
-	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	uint16_t *rom = &memregion("maincpu")->as_u16();
 	find_mbus(rom);
 }
 

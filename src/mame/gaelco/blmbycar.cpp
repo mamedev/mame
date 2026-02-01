@@ -53,7 +53,6 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_okibank(*this, "okibank"),
-		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_sprites(*this, "sprites"),
 		m_vram(*this, "vram_%u", 0U),
@@ -74,7 +73,6 @@ protected:
 
 private:
 	// devices
-	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<gaelco_wrally_sprites_device> m_sprites;
 
@@ -219,8 +217,8 @@ TILE_GET_INFO_MEMBER(base_state::get_tile_info)
 
 void base_state::video_start()
 {
-	m_tilemap[0] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(base_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
-	m_tilemap[1] = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(base_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	m_tilemap[0] = &machine().tilemap().create(*m_sprites, tilemap_get_info_delegate(*this, FUNC(base_state::get_tile_info<0>)), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
+	m_tilemap[1] = &machine().tilemap().create(*m_sprites, tilemap_get_info_delegate(*this, FUNC(base_state::get_tile_info<1>)), TILEMAP_SCAN_ROWS, 16, 16, DIM_NX, DIM_NY );
 	m_tilemap[1]->set_transparent_pen(0);
 }
 
@@ -603,12 +601,9 @@ void base_state::base(machine_config &config)
 	screen.set_screen_update(FUNC(blmbycar_state::screen_update));
 	screen.set_palette(m_palette);
 
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_blmbycar);
-
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 0x2000);
 
-	BLMBYCAR_SPRITES(config, m_sprites, 0);
-	m_sprites->set_gfxdecode_tag("gfxdecode");
+	BLMBYCAR_SPRITES(config, m_sprites, 0, m_palette, gfx_blmbycar);
 	m_sprites->set_screen("screen");
 
 	// sound hardware

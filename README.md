@@ -15,7 +15,6 @@ MAME's purpose is to preserve decades of software history. As electronic technol
 
 * [MAME Forums on bannister.org](https://forums.bannister.org/ubbthreads.php?ubb=cfrm&c=5)
 * [r/MAME](https://www.reddit.com/r/MAME/) on Reddit
-* [MAMEWorld Forums](https://www.mameworld.info/ubbthreads/)
 
 ## Development
 
@@ -87,7 +86,7 @@ is required to use the "MAME" name, logo, or wordmark.
 <img align="right" width="100" src="https://opensource.org/wp-content/uploads/2009/06/OSIApproved.svg">
 </a>
 
-    Copyright (c) 1997-2025  MAMEdev and contributors
+    Copyright (c) 1997-2026  MAMEdev and contributors
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License version 2, as provided in

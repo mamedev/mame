@@ -46,7 +46,6 @@ protected:
 	// overrides of standard a2bus slot functions
 	virtual uint8_t read_c0nx(uint8_t offset) override;
 	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
-	virtual bool take_c800() override { return false; }
 
 	required_device<sn76489_device> m_sn1;
 	required_device<sn76489_device> m_sn2;
@@ -89,38 +88,36 @@ protected:
 
 void a2bus_alfam2_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "alf_l").front_left();
-	SPEAKER(config, "alf_r").front_right();
+	SPEAKER(config, "alf", 2).front();
 
 	SN76489(config, m_sn1, 1020484);
-	m_sn1->add_route(ALL_OUTPUTS, "alf_l", 0.50);
+	m_sn1->add_route(ALL_OUTPUTS, "alf", 0.50, 0);
 
 	SN76489(config, m_sn2, 1020484);
-	m_sn2->add_route(ALL_OUTPUTS, "alf_l", 0.50);
-	m_sn2->add_route(ALL_OUTPUTS, "alf_r", 0.50);
+	m_sn2->add_route(ALL_OUTPUTS, "alf", 0.50, 0);
+	m_sn2->add_route(ALL_OUTPUTS, "alf", 0.50, 1);
 
 	SN76489(config, m_sn3, 1020484);
-	m_sn3->add_route(ALL_OUTPUTS, "alf_r", 0.50);
+	m_sn3->add_route(ALL_OUTPUTS, "alf", 0.50, 1);
 }
 
 void a2bus_aesms_device::device_add_mconfig(machine_config &config)
 {
-	SPEAKER(config, "alf_l").front_left();
-	SPEAKER(config, "alf_r").front_right();
+	SPEAKER(config, "alf", 2).front();
 
 	SN76489(config, m_sn1, 1020484);
-	m_sn1->add_route(ALL_OUTPUTS, "alf_l", 0.50);
+	m_sn1->add_route(ALL_OUTPUTS, "alf", 0.50, 0);
 
 	SN76489(config, m_sn2, 1020484);
-	m_sn2->add_route(ALL_OUTPUTS, "alf_l", 0.50);
-	m_sn2->add_route(ALL_OUTPUTS, "alf_r", 0.50);
+	m_sn2->add_route(ALL_OUTPUTS, "alf", 0.50, 0);
+	m_sn2->add_route(ALL_OUTPUTS, "alf", 0.50, 1);
 
 	SN76489(config, m_sn3, 1020484);
-	m_sn3->add_route(ALL_OUTPUTS, "alf_r", 0.50);
+	m_sn3->add_route(ALL_OUTPUTS, "alf", 0.50, 1);
 
 	SN76489(config, m_sn4, 1020484);
-	m_sn4->add_route(ALL_OUTPUTS, "alf_l", 0.50);
-	m_sn4->add_route(ALL_OUTPUTS, "alf_r", 0.50);
+	m_sn4->add_route(ALL_OUTPUTS, "alf", 0.50, 0);
+	m_sn4->add_route(ALL_OUTPUTS, "alf", 0.50, 1);
 }
 
 //**************************************************************************

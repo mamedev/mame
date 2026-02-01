@@ -58,13 +58,22 @@
 
     0  ffffffffssssaaaa   aaaaaaaaaaaaaaaa   aaaa------------
         f = flags?  always 01
-        s = sample type? always 1
+        s = sample format, 0 = 16 bits, 1 = 8 bits.
+            also 0 = RAM address space, 1 = ROM address space
         a = sample start address (24 bits, 16 MiB addressable)
+
+        For DMA, this is set to the DMA start address on channel 0
+        and it's expected to increment for each word transferred.
+        Setting the sample format field to 8 bit apparently causes
+        the
 
     1  ffffffff----aaaa   aaaaaaaaaaaaaaaa   rrrrrrrrrrrrrrrr
         f = flags.  0 for loop encoded by distance from sample end, 1 for loop encoded as an absolute address (see register 2)
         a = sample end address, bits 23-4
         r = sample rate in 4.12 fixed point relative to 44100 Hz (0x1000 = 44100 Hz)
+
+        For DMA, this register on channel 0 appears to be an inverted address mask?
+        Given a DMA of 0x1000 words, this is typically set to 0xfffff1000.
 
     If the flags field of register 1 is 0, register 2 is encoded like this:
     2  ----------------   mmmmmmmmmmmmmmmm   bbbbbbbbbbbbbbbb
@@ -79,10 +88,6 @@
     2  ----------------   aaaaaaaaaaaaaaaa   aaaa--------AAAA
         a = loop start address, bits 19-0
         A = loop start address, bits 23-20
-        If bit 15 of m is NOT set, then the base is the offset from the start of the sample
-        to the loop start, and the end of the sample is the loop start plus the multiplier.
-        This is currently speculation based on HNG64 behavior.  Once the MPC3000 runs it should
-        be possible to better understand this.
 
     3  ----------------   vvvvvvvvvvvvvvvv   ----------------
         v = volume envelope starting value (16 bit, maaaaybe signed?)
@@ -100,12 +105,12 @@
         R = filter resonance (4 bits, 0 = 1.0, 0xf = 0.0)
         r = filter cutoff frequency envelope rate in 8.8 fixed point
 
-    7  ----------------   vvvvvvvveeeeooos   llllllllrrrrrrrr left/right volume
+    7  ----------------   vvvvvvvveeeedddd   llllllllrrrrrrrr left/right volume
         e = delay effect parameters, unknown encoding
-        0 = routing destination
-            HNG uses 1, 2, and 3 as individual mono outputs and 7 for the main output
-
-        s = this output contributes to the main stereo output if set?
+        d = routing destination
+            0xf means "send to delay effect"
+            0-7 sends to one of the individual outputs as follows:
+            5, 1, 4, 0, 7, 3, 6, 2 maps to outputs 0-7 in order.
         l = left volume (8 bit, 0-255)
         r = right volume (8 bit, 0-255)
         v = destination send volume (8 bit, 0-255)
@@ -114,12 +119,24 @@
 
     9  ----------------   ----------------   ---------------- (written as an atomic update)
 
-    a  ----------------   ----------------   ----------------
-        Unknown, written once on bootup for HNG64 games.
+    a  ----------------   aaaaaaaaaaaaaaaa   vvvvvvvvvvvvvvdd
+        a is sample address in 0x10000 sample buffer
+        v is volume level
+        d is destination, 00 left channel, 01 right channel, 10 ??, 11 feedback to delay buffer
 
     TODO:
     - How does the delay effect work?
-    - How does DMA work?
+
+    Delay effect notes from the S3000's editor page.
+    All of these writes are register A, the voice number seems to be
+    the function select.
+    1 & 2 are the first stage volume and routing
+    5 is first stage feedback amount
+    12 & 13 are the second stage volume and routing
+    16 is second stage feedback amount
+    18 & 19 are the third stage volume and routing
+    20 & 21 are the final output volume and routing
+    22 is third stage feedback amount
 
 **************************************************************************************************/
 
@@ -127,9 +144,12 @@
 #include "l7a1045_l6028_dsp_a.h"
 #include "debugger.h"
 
-#define LOG_REGISTERS   (1U << 1)
-#define LOG_READBACK    (1U << 2)
-#define LOG_KEYON       (1U << 3)
+#define LOG_REGISTERS           (1U << 1)
+#define LOG_READBACK_POSITION   (1U << 2)
+#define LOG_READBACK_VOL        (1U << 3)
+#define LOG_READBACK_FILTER     (1U << 4)
+#define LOG_KEYON               (1U << 5)
+#define LOG_DMA                 (1U << 6)
 
 #define VERBOSE (0)
 
@@ -148,15 +168,23 @@ enum
 	L6028_Mixer_Params
 };
 
+static constexpr int CONTROL_DMA_START      = 6;
+static constexpr int CONTROL_KEY_ON         = 8;
+
 DEFINE_DEVICE_TYPE(L7A1045, l7a1045_sound_device, "l7a1045", "L7A1045 L6028 DSP-A")
+
+// channel mapping is weird
+static constexpr int channel_remap[8] = { 3, 1, 7, 5, 2, 0, 6, 4 };
 
 l7a1045_sound_device::l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, L7A1045, tag, owner, clock),
 	  device_sound_interface(mconfig, *this),
+	  device_memory_interface(mconfig, *this),
 	  m_drq_handler(*this),
 	  m_stream(nullptr),
 	  m_key(0),
-	  m_rom(*this, DEVICE_SELF)
+	  m_mem_config("l6028", ENDIANNESS_LITTLE, 16, 25),
+	  m_rom_config("l6028_rom", ENDIANNESS_LITTLE, 16, 25)
 {
 }
 
@@ -168,10 +196,19 @@ void l7a1045_sound_device::map(address_map &map)
 	map(0x000c, 0x000d).w(FUNC(l7a1045_sound_device::atomic_w));
 }
 
+device_memory_interface::space_config_vector l7a1045_sound_device::memory_space_config() const
+{
+	return space_config_vector
+	{
+		std::make_pair(AS_DATA, &m_mem_config),
+		std::make_pair(AS_IO, &m_rom_config)
+	};
+}
+
 void l7a1045_sound_device::device_start()
 {
-	// Check that the ROM region length is a power of two that we can make a mask from
-	assert(!(m_rom.length() & (m_rom.length() - 1)));
+	space(AS_DATA).cache(m_cache);
+	space(AS_IO).cache(m_rom_cache);
 
 	// Allocate the stream
 	m_sample_rate = clock() / 768.0f;
@@ -198,6 +235,7 @@ void l7a1045_sound_device::device_start()
 	save_item(STRUCT_MEMBER(m_voice, l));
 	save_item(STRUCT_MEMBER(m_voice, send_dest));
 	save_item(STRUCT_MEMBER(m_voice, send_level));
+	save_item(STRUCT_MEMBER(m_voice, sample_type));
 	save_item(NAME(m_key));
 	save_item(NAME(m_cur_channel));
 	save_item(NAME(m_cur_register));
@@ -226,22 +264,40 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 
 			for (int j = 0; j < stream.samples(); j++)
 			{
+				uint32_t address;
 				int32_t sample;
 				uint8_t data;
 
 				pos += (frac >> 12);
 				frac &= 0xfff;
 
-				if ((start + pos) >= end)
+				if ((end > start) && ((start + pos) >= end))
 				{
 					pos = (vptr->end - vptr->start) - vptr->loop_start;
 				}
-				const uint32_t address = (start + pos) & (m_rom.length() - 1);
-				data = m_rom[address];
-				sample = (data & 0xfc) >> 2;
-				if(sample & 0x20)
-					sample -= 0x40;
-				sample <<= 4+2*(~data & 3);
+
+				switch (vptr->sample_type)
+				{
+					case 0: // 16-bit linear, little-endian
+						address = ((start << 1) + (pos << 1));
+						sample = (int16_t)m_cache.read_word(address);
+						break;
+
+					case 1: // 12-bit non-linear, encoded into 8 bits
+						address = (start + pos);
+						data = m_rom_cache.read_byte(address);
+						sample = (data & 0xfc) >> 2;
+						if (sample & 0x20)
+							sample -= 0x40;
+						sample <<= 4 + 2 * (~data & 3);
+						break;
+
+					default:
+						logerror("l7a1045: unknown sample type %d\n", vptr->sample_type);
+						sample = 0;
+						break;
+				}
+
 				frac += step;
 
 				// volume envelope processing
@@ -293,13 +349,17 @@ void l7a1045_sound_device::sound_stream_update(sound_stream &stream)
 				const int32_t fout = vptr->l;
 				const int64_t left = (fout * (uint64_t(vptr->l_volume) * uint64_t(vptr->env_volume))) >> 24;
 				const int64_t right = (fout * (uint64_t(vptr->r_volume) * uint64_t(vptr->env_volume))) >> 24;
-				const int64_t send = (fout * (uint64_t(vptr->send_level) * uint64_t(vptr->env_volume))) >> 24;
 				stream.add_int(0, j, left, 32768);
 				stream.add_int(1, j, right, 32768);
 
 				if (vptr->send_level > 0)
 				{
-					stream.add_int(2 + ((vptr->send_dest >> 1) & 7), j, send, 32768);
+					const int dest = vptr->send_dest & 0xf;
+					if (dest != 0xf)
+					{
+						const int64_t send = (fout * (uint64_t(vptr->send_level) * uint64_t(vptr->env_volume))) >> 24;
+						stream.add_int(2 + channel_remap[dest], j, send, 32768);
+					}
 				}
 			}
 
@@ -357,19 +417,20 @@ uint16_t l7a1045_sound_device::voiceregs_r(offs_t offset)
 		m_regs[0][m_cur_channel] |= (uint64_t(current_addr) << 12);
 		m_regs[0][m_cur_channel] |= vptr->frac & 0x0fff;
 
-		LOGMASKED(LOG_REGISTERS, "ch %d cur pos %08x final %012llx\n", m_cur_channel, current_addr, m_regs[0][m_cur_channel]);
+		LOGMASKED(LOG_READBACK_POSITION, "ch %d cur pos %08x final %012llx (%s)\n", m_cur_channel, current_addr, m_regs[0][m_cur_channel], machine().describe_context());
 	}
 	break;
 
 	case L6028_Volume_Env:
 		m_regs[3][m_cur_channel] &= 0xffff'0000'ffff;
 		m_regs[3][m_cur_channel] |= (uint64_t(vptr->env_volume) << 16);
-		LOGMASKED(LOG_READBACK, "ch %d read env vol %x => %012llx\n", m_cur_channel, vptr->env_volume, m_regs[3][m_cur_channel]);
+		LOGMASKED(LOG_READBACK_VOL, "ch %d read env vol %x => %012llx (%s)\n", m_cur_channel, vptr->env_volume, m_regs[3][m_cur_channel], machine().describe_context());
 		break;
 
 	case L6028_Filter_Env:
 		m_regs[5][m_cur_channel] &= 0xffff'0000'ffff;
 		m_regs[5][m_cur_channel] |= (uint64_t(vptr->flt_freq) << 16);
+		LOGMASKED(LOG_READBACK_FILTER, "ch %d read filter cutoff %x => %012llx\n", m_cur_channel, vptr->env_volume, m_regs[3][m_cur_channel]);
 		break;
 	}
 
@@ -393,7 +454,7 @@ void l7a1045_sound_device::voiceregs_w(offs_t offset, uint16_t data)
 		// sample start address
 		case L6028_Start:
 			vptr->start = (m_regs[L6028_Start][m_cur_channel] >> 12) & 0x00ff'ffff;
-			vptr->start &= m_rom.length() - 1;
+			vptr->sample_type = (m_regs[L6028_Start][m_cur_channel] >> 36) & 0xf;
 
 			// clear the pos on start writes (required for DMA tests on MPC3000, and HNG64 likes to leave voices keyed on and just write new parameters)
 			vptr->pos = 0;
@@ -411,7 +472,6 @@ void l7a1045_sound_device::voiceregs_w(offs_t offset, uint16_t data)
 		// loop end address and pitch step
 		case L6028_End:
 			vptr->end = (m_regs[L6028_End][m_cur_channel] >> 12) & 0x00ff'fff0;
-			vptr->end &= m_rom.length() - 1;
 
 			vptr->step = m_regs[1][m_cur_channel] & 0xffff;
 			if (offset == 2)
@@ -429,6 +489,12 @@ void l7a1045_sound_device::voiceregs_w(offs_t offset, uint16_t data)
 		case L6028_Volume_Env:
 			vptr->env_volume = (m_regs[L6028_Volume_Env][m_cur_channel] & 0xffff'0000) >> 16;
 			vptr->env_pos = 0;
+
+			// MPC3000 writes timed 0 to offset 0 to silence
+			if (offset == 0 && data == 0)
+			{
+				m_key &= ~(1 << m_cur_channel);
+			}
 			break;
 
 		// envelope target volumes plus step rate
@@ -490,13 +556,23 @@ uint16_t l7a1045_sound_device::control_r()
 {
 	return 0;
 }
-
-// 4f is written here to assert DRQ, at which point the V53 DMAs the key on word
+// bit 0 = set for wave DMA transfers
+// bit 1 = set for wave DMA transfers
+// bit 2 = set for wave DMA transfers
+// bit 3 = set for stereo recording and wave DMA transfers
+// bit 4 = set for stereo recording
+// bit 5 = DMA direction (0 = write, 1 = read)
+// bit 6 = DMA start
+// bit 7 = set when DMA complete?
+// bit 8 = key on current channel
+// bit 15 = busy flag (possibly DMA specifically?)
 void l7a1045_sound_device::control_w(uint16_t data)
 {
 	m_stream->update();
 
-	if (BIT(data, 8)) // key on
+	LOGMASKED(LOG_REGISTERS, "%s: %04x to control (ch %d)\n", tag(), data, m_cur_channel);
+
+	if (BIT(data, CONTROL_KEY_ON))
 	{
 		l7a1045_voice* const vptr = &m_voice[m_cur_channel];
 
@@ -507,34 +583,49 @@ void l7a1045_sound_device::control_w(uint16_t data)
 		recalc_loop_start(vptr);
 
 		LOGMASKED(LOG_KEYON, "ch %d key on start %08x end %08x loop %08x mixer %016llx\n", m_cur_channel, vptr->start, vptr->end, vptr->loop_start, m_regs[L6028_Mixer_Params][m_cur_channel]);
+		LOGMASKED(LOG_KEYON, "      raw 0 %012llx 1 %012llx 2 %012llx\n", m_regs[0][m_cur_channel], m_regs[1][m_cur_channel], m_regs[2][m_cur_channel]);
+		LOGMASKED(LOG_KEYON, "      raw 3 %012llx 4 %012llx 5 %012llx\n", m_regs[3][m_cur_channel], m_regs[4][m_cur_channel], m_regs[5][m_cur_channel]);
+		LOGMASKED(LOG_KEYON, "      raw 6 %012llx 7 %012llx\n", m_regs[6][m_cur_channel], m_regs[7][m_cur_channel]);
 	}
 
-	m_drq_handler(BIT(data, 0));
+	m_drq_handler(BIT(data, CONTROL_DMA_START));
 }
 
 void l7a1045_sound_device::atomic_w(uint16_t data)
 {
+	LOGMASKED(LOG_REGISTERS, "%s atomic write %04x to reg %x\n", tag(), data, m_cur_register);
 	m_regs[m_cur_register][m_cur_channel] = 0;
-}
-
-uint8_t l7a1045_sound_device::dma_r_cb(offs_t offset)
-{
-	m_voice[0].pos++;
-	return 0;
-}
-
-void l7a1045_sound_device::dma_w_cb(offs_t offset, uint8_t data)
-{
-	m_voice[0].pos++;
 }
 
 uint16_t l7a1045_sound_device::dma_r16_cb()
 {
+	const offs_t byteoffs = (m_voice[0].start << 1) + (m_voice[0].pos << 1);
+
 	m_voice[0].pos++;
-	return 0;
+	if (m_voice[0].sample_type == 1)
+	{
+		LOGMASKED(LOG_DMA, "%s DMA read ROM @ %08x\n", tag(), byteoffs);
+		return m_rom_cache.read_word(byteoffs);
+	}
+
+	LOGMASKED(LOG_DMA, "%s DMA read RAM @ %08x\n", tag(), byteoffs);
+	return m_cache.read_word(byteoffs);
 }
 
 void l7a1045_sound_device::dma_w16_cb(uint16_t data)
 {
+	const offs_t byteoffs = (m_voice[0].start << 1) + (m_voice[0].pos << 1);
+
+	if (m_voice[0].sample_type == 1)
+	{
+		m_rom_cache.write_word(byteoffs, data);
+		LOGMASKED(LOG_DMA, "%s DMA ROM write %04x to %08x\n", tag(), data, byteoffs);
+	}
+	else
+	{
+		m_cache.write_word(byteoffs, data);
+		LOGMASKED(LOG_DMA, "%s DMA RAM write %04x to %08x\n", tag(), data, byteoffs);
+	}
+
 	m_voice[0].pos++;
 }

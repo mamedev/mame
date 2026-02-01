@@ -115,7 +115,7 @@ void x37_state::x37(machine_config &config)
 
 	NS32081(config, m_fpu, 20'000'000/2);
 
-	HD63450(config, m_dmac, 20'000'000/2, m_cpu);
+	HD63450(config, m_dmac, 20'000'000/2, m_cpu, AS_PROGRAM);
 
 	Z8536(config, m_cio, 6000000);
 	NMC9306(config, m_nvram, 0);

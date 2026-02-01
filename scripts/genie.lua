@@ -213,6 +213,11 @@ newoption {
 }
 
 newoption {
+	trigger = "PDB_SYMBOLS",
+	description = "Generate CodeView PDB symbols.",
+}
+
+newoption {
 	trigger = "PROFILER",
 	description = "Include the internal profiler.",
 }
@@ -718,9 +723,12 @@ local version = str_to_version(_OPTIONS["gcc_version"])
 if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 	buildoptions {
 		"-g" .. _OPTIONS["SYMLEVEL"],
-		"-fno-omit-frame-pointer",
-		"-fno-optimize-sibling-calls",
 	}
+	if _OPTIONS["PDB_SYMBOLS"]~=nil and _OPTIONS["PDB_SYMBOLS"]~=0 then
+		buildoptions {
+			"-gcodeview",
+		}
+	end
 end
 
 --# we need to disable some additional implicit optimizations for profiling
@@ -1007,7 +1015,6 @@ end
 			end
 			buildoptions {
 				"-fdiagnostics-show-note-include-stack",
-				"-Wno-error=tautological-compare",
 				"-Wno-cast-align",
 				"-Wno-constant-logical-operand",
 				"-Wno-extern-c-compat",
@@ -1341,7 +1348,6 @@ elseif _OPTIONS["vs"]=="clangcl" then
 			"-Wno-unused-private-field",
 			"-Wno-xor-used-as-pow",
 			"-Wno-error=deprecated-declarations",
-			"-Wno-error=tautological-compare",
 		}
 	if _OPTIONS["DEPRECATED"]=="0" then
 		buildoptions {

@@ -11,7 +11,7 @@
 
 #include "emu.h"
 #include "bus/wysekbd/wysekbd.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "machine/eepromser.h"
 #include "screen.h"
 

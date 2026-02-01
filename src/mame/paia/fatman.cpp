@@ -52,7 +52,7 @@ until a restart or reset (F3).
 
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "bus/midi/midiinport.h"
 #include "bus/midi/midioutport.h"
 #include "machine/rescap.h"
@@ -351,7 +351,7 @@ void fatman_state::update_vca_eg()
 	}
 
 	LOGMASKED(LOG_EG, "VCA EG decay: %d, release: %d, attacked: %d, trip dt: %g\n",
-	          m_vca_eg_decay, m_vca_eg_release, attacked, comp_trip_dt.as_double());
+			  m_vca_eg_decay, m_vca_eg_release, attacked, comp_trip_dt.as_double());
 }
 
 // `param` specifies whether the VCA EG voltage has exceeded the EG reference.

@@ -14,7 +14,7 @@
 #include "bu3905.h"
 #include "sa16.h"
 //#include "bus/midi/midi.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8052.h"
 #include "machine/i8251.h"
 #include "mb62h195.h"
 #include "mb63h149.h"

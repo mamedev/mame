@@ -31,6 +31,8 @@ public:
 	uint8_t indir_reg_r();
 	void indir_reg_w(uint8_t data);
 
+	uint8_t status_r();
+
 	// Master Reset (MR) Interface
 	void reset_w(int state);
 

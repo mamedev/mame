@@ -396,7 +396,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/tms32031/tms32031.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
@@ -1797,8 +1797,8 @@ void itech32_state::base_devices(machine_config &config)
 	m_ensoniq->set_region2("ensoniq.2");
 	m_ensoniq->set_region3("ensoniq.3");
 	m_ensoniq->set_channels(1);               // channels
-	m_ensoniq->add_route(0, "speaker", 0.1, 1); // swapped stereo
-	m_ensoniq->add_route(1, "speaker", 0.1, 0);
+	m_ensoniq->add_route(0, "speaker", 1.6, 1); // swapped stereo
+	m_ensoniq->add_route(1, "speaker", 1.6, 0);
 }
 
 void itech32_state::via(machine_config &config)
@@ -1848,10 +1848,10 @@ void drivedge_state::drivedge(machine_config &config)
 	nvram_device &nvram(NVRAM(config, "nvram32"));
 	nvram.set_custom_handler(FUNC(drivedge_state::nvram_init));
 
-	TMS32031(config, m_dsp[0], TMS_CLOCK);
+	TMS320C31(config, m_dsp[0], TMS_CLOCK);
 	m_dsp[0]->set_addrmap(AS_PROGRAM, &drivedge_state::tms1_map);
 
-	TMS32031(config, m_dsp[1], TMS_CLOCK);
+	TMS320C31(config, m_dsp[1], TMS_CLOCK);
 	m_dsp[1]->set_addrmap(AS_PROGRAM, &drivedge_state::tms2_map);
 
 	base_devices(config);
@@ -1872,8 +1872,8 @@ void drivedge_state::drivedge(machine_config &config)
 	SPEAKER(config, "back", 2).rear();
 
 	m_ensoniq->set_channels(2);
-	m_ensoniq->add_route(2, "back", 0.1, 1);  // swapped stereo
-	m_ensoniq->add_route(3, "back", 0.1, 0);
+	m_ensoniq->add_route(2, "back", 1.6, 1);  // swapped stereo
+	m_ensoniq->add_route(3, "back", 1.6, 0);
 }
 
 void shoottv_state::shoottv(machine_config &config)
