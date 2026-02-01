@@ -5,8 +5,10 @@
 
 #pragma once
 
-#include "cpu/tms32025/tms32025.h"
 #include "namcos21_3d.h"
+
+#include "cpu/tms320c2x/tms320c2x.h"
+
 
 #define WINRUN_MAX_POLY_PARAM (1+256*3)
 

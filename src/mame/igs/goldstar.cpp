@@ -270,12 +270,12 @@
 #include "sound/sn76496.h"
 #include "sound/ymopl.h"
 #include "video/ramdac.h"
-#include "video/resnet.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+#include "video/resnet.h"
 
 #include <algorithm>
 
@@ -342,7 +342,6 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-
 	void goldfrui(machine_config &config) ATTR_COLD;
 	void goldstar(machine_config &config) ATTR_COLD;
 	void goldstbl(machine_config &config) ATTR_COLD;
@@ -379,7 +378,6 @@ protected:
 	optional_shared_ptr<uint8_t> m_bg_scroll;
 
 	optional_shared_ptr_array<uint8_t, 4> m_reel_ram;
-
 	optional_shared_ptr_array<uint8_t, 4> m_reel_scroll;
 
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
@@ -412,6 +410,7 @@ protected:
 	void fg_atrram_w(offs_t offset, uint8_t data);
 	void bg_vidram_w(offs_t offset, uint8_t data);
 	void bg_atrram_w(offs_t offset, uint8_t data);
+	void reel_mark_all_dirty();
 	template <uint8_t Which> void reel_ram_w(offs_t offset, uint8_t data);
 	template <uint8_t Which> void reel_scroll_w(offs_t offset, uint8_t data);
 	void goldstar_fa00_w(uint8_t data);
@@ -741,7 +740,6 @@ private:
 	uint8_t sm7831_read(offs_t offset);
 	void sm7831_write(offs_t offset, uint8_t data);
 
-
 	// handlers for lucky bar MCU ports
 	uint8_t mcu_portb_r();
 	void mcu_porta_w(uint8_t data);
@@ -985,7 +983,6 @@ void wingco_state::machine_start()
 	save_item(NAME(m_vidreg));
 	save_item(NAME(sm7831_X_reg));
 	save_item(NAME(sm7831_Y_reg));
-
 }
 
 void unkch_state::machine_start()
@@ -1061,7 +1058,6 @@ void goldstar_state::reel_scroll_w(offs_t offset, uint8_t data)
 {
 	m_reel_scroll[Which][offset] = data;
 	m_reel_scroll[Which][offset + 1] = data;
-
 }
 
 
@@ -1149,9 +1145,18 @@ TILE_GET_INFO_MEMBER(cmaster_state::get_pkrmast_bg_tile_info)
 
 //  popmessage("m_reel_bank:%02x", (m_reel_bank - 1) );
 //  popmessage("code:%02x", m_bg_vidram[tile_index] );
-
 }
 
+
+void goldstar_state::reel_mark_all_dirty()
+{
+	for (auto & tilemap : m_reel_tilemap)
+	{
+		if (!tilemap)
+			continue;
+		tilemap->mark_all_dirty();
+	}
+}
 
 template <uint8_t Which>
 void goldstar_state::reel_ram_w(offs_t offset, uint8_t data)
@@ -1404,7 +1409,6 @@ VIDEO_START_MEMBER(unkch_state, bonusch)
 
 	// 1 for regular reels; 2 for d-up reel numbers.
 //  m_reelbank = 2;
-
 }
 
 VIDEO_START_MEMBER(cmaster_state, pkrmast)
@@ -1482,7 +1486,6 @@ VIDEO_START_MEMBER(cmaster_state, amaztsk)
 	m_fg_tilemap->set_transparent_pen(0);
 
 //  m_enable_reg = 0x0b;
-
 }
 
 VIDEO_START_MEMBER(cmaster_state, animalhs)
@@ -1873,11 +1876,11 @@ uint32_t wingco_state::screen_update_flaming7(screen_device &screen, bitmap_rgb3
 	{
 		for (int i = 0; i < 64; i++)
 		{
-				// all three reels tilemaps
-				m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
-				m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
-				m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
-				m_reel_tilemap[3]->set_scrolly(i, m_reel_scroll[3][i]);
+			// all four reels tilemaps
+			m_reel_tilemap[0]->set_scrolly(i, m_reel_scroll[0][i]);
+			m_reel_tilemap[1]->set_scrolly(i, m_reel_scroll[1][i]);
+			m_reel_tilemap[2]->set_scrolly(i, m_reel_scroll[2][i]);
+			m_reel_tilemap[3]->set_scrolly(i, m_reel_scroll[3][i]);
 		}
 
 		const rectangle visible1(0*8, (14+49)*8-1,  4*8,  (4+7)*8-1);
@@ -2340,7 +2343,6 @@ void cmast97_state::cmast97_palette_init(palette_device &palette) const
 		uint16_t const data = (colours[i + 0x100] + (colours[i] << 8)) >> 1;
 		palette.set_pen_color(i, pal5bit(data >> 5), pal5bit(data >> 10), pal5bit(data >> 0));
 	}
-
 }
 
 void goldstar_state::cm_palette(palette_device &palette) const
@@ -2513,7 +2515,6 @@ void goldstar_state::bonusch_palette(palette_device &palette) const
 		bit3 = BIT(color_prom[0x500 + i], 3);
 		int const b2 = combine_weights(weights_b, bit0, bit1, bit2, bit3);
 
-
 		// PROMs circuitry, 1st GFX bank
 		palette.set_pen_color(i, rgb_t(r1, g1, b1));
 
@@ -2533,9 +2534,7 @@ void goldstar_state::goldstar_fa00_w(uint8_t data)
 	// bit 1 toggles continuously - might be irq enable or watchdog reset
 	// bit 2 selects background gfx color (I think)
 	m_bgcolor = (data & 0x04) >> 2;
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
+	reel_mark_all_dirty();
 
 	m_ticket_dispenser->motor_w(BIT(data, 7));
 }
@@ -2606,10 +2605,7 @@ void cmaster_state::background_col_w(uint8_t data)
 	m_bgcolor = (data & 0x03) >> 0;
 	#endif
 
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
-
+	reel_mark_all_dirty();
 }
 
 
@@ -2807,7 +2803,6 @@ void cmaster_state::coincount_w(uint8_t data)
 
 	m_ticket_dispenser->motor_w(BIT(data,7));
 //  popmessage("counters: %02X", data);
-
 }
 
 void cmaster_state::pkm_out0_w(uint8_t data)
@@ -2827,7 +2822,6 @@ void cmaster_state::pkm_out0_w(uint8_t data)
 
 	m_ticket_dispenser->motor_w(BIT(data,0)); //pkrmast:port 0x00 - jkrmast:port 0x13
 //  popmessage("pkm_out0_w: %02X", data);
-
 }
 
 
@@ -2836,7 +2830,6 @@ void cmaster_state::jkm_vid_reg_w(uint8_t data)
 	m_enable_reg = bitswap<8>(data, 7, 6, 5, 4, 2, 3, 1, 0);
 
 //  popmessage("jkm data, enable reg:%02x :: reg:%02x", data, m_enable_reg);
-
 }
 
 void cmaster_state::pkm_vid_reg_w(uint8_t data)
@@ -2848,7 +2841,6 @@ void cmaster_state::pkm_vid_reg_w(uint8_t data)
 
 //  popmessage("pkm enable reg:%02x", m_enable_reg );
 //  popmessage("pkm reel bank:%02x", m_reel_bank );
-
 }
 
 void cmaster_state::pkm_reel_reg_w(uint8_t data)
@@ -2871,7 +2863,6 @@ void cmaster_state::pkm_reel_reg_w(uint8_t data)
 	m_bg_tilemap->mark_all_dirty();
 
 //  popmessage("pkm reel data:%02x", data );
-
 }
 
 void cmaster_state::ll3_vid_reg_w(uint8_t data)
@@ -2916,25 +2907,19 @@ void cmaster_state::czb_vid_reg_w(uint8_t data)
 
 void cb3_state::coincount_w(uint8_t data)
 {
-
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);  // Counter 1 Coin A
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);  // Counter 2 Key In
 	machine().bookkeeping().coin_counter_w(2, data & 0x10);  // Counter 3 Coin C
 	machine().bookkeeping().coin_counter_w(3, data & 0x08);  // Counter 4 Coin D
 	machine().bookkeeping().coin_counter_w(4, data & 0x01);  // Counter 5 Payout
-
 }
 
 void cb3_state::misc_out_w(uint8_t data)
 {
-
 	m_bgcolor = (data & 0x04) >> 2;
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
+	reel_mark_all_dirty();
 
 	m_ticket_dispenser->motor_w(!BIT(data,7));
-
 }
 
 void wingco_state::magodds_outb850_w(uint8_t data)
@@ -2942,7 +2927,7 @@ void wingco_state::magodds_outb850_w(uint8_t data)
 	uint8_t pal_index[8] = { 0, 1, 6, 3, 4, 5, 2, 7 }; // fix reels BG color
 	m_bgreels = pal_index[data & 0x07];                // set BG reels color index
 
-	if (data&0x20)
+	if (data & 0x20)
 		m_tile_bank = 2;
 	else
 		m_tile_bank = 0;
@@ -3072,9 +3057,7 @@ void wingco_state::system_outputc_w(uint8_t data)
 
 	m_ticket_dispenser->motor_w(!BIT(data, 7));
 
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
+	reel_mark_all_dirty();
 
 //  popmessage("system_outputc_w %02x",data);
 }
@@ -3084,13 +3067,10 @@ void wingco_state::flaming7_outputc_w(uint8_t data)
 	m_nmi_enable = data & 8;
 	m_vidreg = data & 2;
 
-
 	if (!m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
+	reel_mark_all_dirty();
 
 	//  popmessage("system_outputc_w %02x",data);
 }
@@ -3224,7 +3204,6 @@ void wingco_state::tmcu_p1_out(uint8_t data)
 {
 	m_mcu_p1 = data;
 //  logerror("MCU Port1:%02x\n", tmcu_p1_out);
-
 }
 
 uint8_t cd3poker_state::armaly_prot_r()
@@ -3382,9 +3361,7 @@ void cmaster_state::anhs_reel_reg_w(uint8_t data)
 		default:  m_reel_bank = 0x0;
 	}
 
-	m_reel_tilemap[0]->mark_all_dirty();
-	m_reel_tilemap[1]->mark_all_dirty();
-	m_reel_tilemap[2]->mark_all_dirty();
+	reel_mark_all_dirty();
 }
 
 
@@ -3626,7 +3603,6 @@ void wingco_state::sm7831_write(offs_t offset, uint8_t data)
 				break;
 		default: break;
 	}
-
 }
 
 
@@ -3743,7 +3719,6 @@ void sanghopm_state::star100_map(address_map &map)
 
 	map(0xf000, 0xf7ff).ram().share("nvram");
 	map(0xf800, 0xffff).ram();
-
 }
 
 void sanghopm_state::star100_readport(address_map &map)
@@ -3774,7 +3749,6 @@ void sanghopm_state::star100_readport(address_map &map)
 
 	map(0xe0, 0xe0).nopw();                                // bit0 = watchdog feeder
 	map(0xe1, 0xe1).w(FUNC(sanghopm_state::enablebg_w));   // enable/disable bg register.
-
 }
 
 /*
@@ -3882,7 +3856,6 @@ void cb3_state::ncb3_readwriteport(address_map &map)
 
 	map(0x10, 0x10).portr("DSW5");  // confirmed for ncb3
 	map(0x81, 0x81).w(FUNC(cb3_state::ncb3_port81_w));  // ---> large writes.
-
 }
 
 /* ncb3 findings...
@@ -3970,7 +3943,6 @@ void goldstar_state::wcherry_readwriteport(address_map &map)
 	map(0x08, 0x08).noprw(); // leftover $182f
 	map(0x10, 0x10).nopr();  // leftover
 	map(0x81, 0x81).nopw();  // watchdog?
-
 }
 
 
@@ -4004,7 +3976,6 @@ void cmaster_state::cm99_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x5fff).bankr("bank1");
 	map(0x6000, 0xcfff).rom();
-
 
 	map(0xd000, 0xd7ff).ram().share("nvram");
 	map(0xd800, 0xdfff).ram();
@@ -4054,7 +4025,6 @@ void cmaster_state::clb_map(address_map &map)
 {
 	cm_map(map);
 	map(0xd800, 0xdfff).rom();
-
 }
 
 void cmaster_state::ll3_map(address_map &map)
@@ -16237,7 +16207,6 @@ void wingco_state::nd8lines(machine_config &config)
 	config.device_remove("aysnd");
 
 	SN76489A(config, "draw8sn", PSG_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.80);
-
 }
 
 void wingco_state::lucky8f(machine_config &config)
@@ -16518,7 +16487,6 @@ void wingco_state::magodds(machine_config &config)
 
 	// payout hardware
 	TICKET_DISPENSER(config, m_ticket_dispenser, attotime::from_msec(50));
-
 }
 
 void goldstar_state::kkotnoli(machine_config &config)
@@ -16775,7 +16743,6 @@ void cmaster_state::amaztsk(machine_config &config)
 
 	MCFG_VIDEO_START_OVERRIDE(cmaster_state, amaztsk)
 	subdevice<screen_device>("screen")->set_screen_update(FUNC(cmaster_state::screen_update_amaztsk));
-
 }
 
 void unkch_state::vblank_irq(int state)
@@ -17870,6 +17837,120 @@ ROM_START( cb3h )  // very similar to the cb3 set, but changes are legit
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "dm74s288.d12", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+/*
+  Cherry Bonus III (ver.3.0)
+
+  Blue Taiwanese W4 PCB + original Dyna daughterboard
+  silkscreened DYNA D9005 with:
+
+  - Unknown DIL-40 IC (maybe a Z80) (IC4)
+  - 68-pins custom Dyna "DP 1200-5" IC (IC3)
+  - 1x 27C512 ROM (IC5)
+  - 1x Sanyo LC3517AS-12 (IC6)
+  - 1x empty DIL-8 socket (IC1)
+
+  - 1x Battery
+  - 1x 8-DIP switches bank (SW5)
+  - 1x Reset switch
+
+  Main Board:
+
+  - 1x DIL40 IC (seems a 8255)
+    stickered:
+
+    Micro Manufacturing, Inc.
+    Date: 04-20-1994
+    Ser#: MAC-PCB-145090
+
+  - 1x NEC D8255AC-2
+  - 6x HM6116 SRAMs
+  - 3x 27C256 ROMs
+  - 4x 2764 ROMs
+
+  - 4x 8-DIP switches banks
+  - 1x 12 MHz crystal
+
+*/
+ROM_START( cb3i )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dyna.ic5", 0x0000, 0x1000, CRC(89924713) SHA1(f1334772f4855b492f3de6621803c02f018331a5) )
+	ROM_CONTINUE(         0x7000, 0x1000)  // 1000 to 7000
+	ROM_CONTINUE(         0x1000, 0x1000)  // 2000 to 1000 ok
+	ROM_CONTINUE(         0x5000, 0x1000)  // 3000 to 5000 ok
+	ROM_CONTINUE(         0x2000, 0x1000)  // 4000 to 2000 ok
+	ROM_CONTINUE(         0x4000, 0x1000)  // 5000 to 4000
+	ROM_CONTINUE(         0x3000, 0x1000)  // 6000 to 3000 ok
+	ROM_CONTINUE(         0x6000, 0x1000)  // 7000 to 6000 ok
+	ROM_CONTINUE(         0x8000, 0x8000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "dyna.h7",  0x00000, 0x08000, CRC(83650a94) SHA1(e79420ab559d3f74013708767ca3f238fd333fb7) )
+	ROM_LOAD( "dyna.h8",  0x08000, 0x08000, CRC(2f46a3f5) SHA1(3e6022ee8f84039e48f41aea5e68ee28aabdc556) )
+	ROM_LOAD( "dyna.h10", 0x10000, 0x08000, CRC(dcf97517) SHA1(0a29696e0464c8878c499b1786a17080fd088a72) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "dyna.h1", 0x00000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "dyna.h2", 0x02000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )  // original bad dump (bad addressing)
+	ROM_LOAD( "dyna.h4", 0x04000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
+	ROM_LOAD( "dyna.h5", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "dyna.g13",  0x0000, 0x0100, CRC(59ac98e4) SHA1(5fc0f1a48c49c956cdb8826e20663dc57a9175e4) )  // 1st bank colors, low 4 bits.
+	ROM_LOAD_NIB_HIGH( "dyna.g14",  0x0000, 0x0100, CRC(0d8f35bd) SHA1(0c2a0145cdaaf9beabdce241731a36b0c65f18a2) )  // 1st bank colors, high 4 bits.
+	ROM_LOAD(          "dyna.d13",  0x0080, 0x0020, CRC(77a85e21) SHA1(3b41e0ab7cc55c5d78914d23e8289383f5bd5654) )  // 2nd bank colors
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "dyna.f3", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "dyna.d1", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+/*
+  Cherry Bonus III
+  v2.20
+
+  Main + daughterbord
+
+  Same daughterboard from the V.30
+  DYNA D9005
+
+*/
+ROM_START( cb3j )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // daughterboard
+	ROM_LOAD( "cb3s_v2.20.ic5", 0x0000, 0x1000, CRC(a8379120) SHA1(b31a2f65d610bd24a714e9455d917a8b9c9c452d) )
+	ROM_CONTINUE(         0x7000, 0x1000)  // 1000 to 7000
+	ROM_CONTINUE(         0x1000, 0x1000)  // 2000 to 1000
+	ROM_CONTINUE(         0x5000, 0x1000)  // 3000 to 5000
+	ROM_CONTINUE(         0x2000, 0x1000)  // 4000 to 2000
+	ROM_CONTINUE(         0x4000, 0x1000)  // 5000 to 4000
+	ROM_CONTINUE(         0x3000, 0x1000)  // 6000 to 3000
+	ROM_CONTINUE(         0x6000, 0x1000)  // 7000 to 6000
+	ROM_CONTINUE(         0x8000, 0x8000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom5.bin",  0x00000, 0x08000, CRC(83650a94) SHA1(e79420ab559d3f74013708767ca3f238fd333fb7) )
+	ROM_LOAD( "rom6.bin",  0x08000, 0x08000, CRC(2f46a3f5) SHA1(3e6022ee8f84039e48f41aea5e68ee28aabdc556) )
+	ROM_LOAD( "rom7.bin", 0x10000, 0x08000, CRC(dcf97517) SHA1(0a29696e0464c8878c499b1786a17080fd088a72) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom1.bin", 0x00000, 0x02000, CRC(7cc6d26b) SHA1(de33e8985affce7bd3ead89463117c9aaa93d5e4) )
+	ROM_LOAD( "rom2.bin", 0x02000, 0x02000, CRC(e73ea4e3) SHA1(c9fd56461f6986d6bc170403d298fcc408a524e9) )
+	ROM_LOAD( "rom3.bin", 0x04000, 0x02000, CRC(91162010) SHA1(3acc21e7074602b247f2f392eb181802092d2f21) )
+	ROM_LOAD( "rom4.bin", 0x06000, 0x02000, CRC(cbcc6bfb) SHA1(5bafc934fef1f50d8c182c39d3a7ce795c89d175) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "n82s129.13g",  0x0000, 0x0100, CRC(59ac98e4) SHA1(5fc0f1a48c49c956cdb8826e20663dc57a9175e4) )  // 1st bank colors, low 4 bits.
+	ROM_LOAD_NIB_HIGH( "n82s129.14g",  0x0000, 0x0100, CRC(0d8f35bd) SHA1(0c2a0145cdaaf9beabdce241731a36b0c65f18a2) )  // 1st bank colors, high 4 bits.
+	ROM_LOAD(          "dm74s288.13d", 0x0080, 0x0020, CRC(77a85e21) SHA1(3b41e0ab7cc55c5d78914d23e8289383f5bd5654) )  // 2nd bank colors
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "n82s129.3f", 0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "dm74s288.12d", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /*
@@ -30643,7 +30724,6 @@ ROM_END
 
 ****************************************************/
 
-
 void goldstar_state::init_goldstar()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -30824,7 +30904,6 @@ void cmaster_state::init_crazybonb()
 
 	rom[0x2527]=0xb2; // change call $b006 to call $b59f / Protection #10
 	rom[0x2528]=0xb5;
-
 }
 
 void cd3poker_state::init_3cdp()  // v1.6 & v1.0
@@ -31238,7 +31317,6 @@ void wingco_state::init_wcat3()
 
 	rom[0x0114] = 0x70;
 	rom[0x0115] = 0xb8;
-
 }
 
 //  this block swapping is the same for chry10, chrygld and cb3
@@ -31405,7 +31483,6 @@ void goldstar_state::init_chryangl()
 	rom[0x1784] = 0x25; // read start button
 	rom[0x1785] = 0x18; //
 	rom[0x1793] = 0x66; // autostart on max bet p1
-
 }
 
 void cb3_state::init_chryangla()
@@ -31506,7 +31583,6 @@ void goldstar_state::init_chryanglb()
 
 	//rom[0x1784] = 0x25; // ENABLE START BUTTON (BUT FAILS)
 	//rom[0x1785] = 0x18; //
-
 }
 
 void cmaster_state::init_wcat3a()  // seems ok, but needs checking
@@ -31848,7 +31924,6 @@ void cmaster_state::decrypt_ll3()
 	std::swap_ranges(&rom[0x1800], &rom[0x2000], &rom[0x4800]);
 	std::swap_ranges(&rom[0x2800], &rom[0x3000], &rom[0xa800]);
 	std::swap_ranges(&rom[0x6800], &rom[0x7000], &rom[0x9800]);
-
 }
 
 void cmaster_state::init_ll3() // verified with ICE dump
@@ -32509,7 +32584,6 @@ void cmaster_state::init_nfb96_c1()
 		rom[i] = x;
 	}
 	m_maincpu->space(AS_IO).install_read_handler(0x31, 0x31, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x68>)));
-
 }
 
 void cmaster_state::init_nfb96_c1_2()  // C1 PCB, different CPLD
@@ -32529,7 +32603,6 @@ void cmaster_state::init_nfb96_c1_2()  // C1 PCB, different CPLD
 		rom[i] = x;
 	}
 	m_maincpu->space(AS_IO).install_read_handler(0x18, 0x18, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x3a>)));
-
 }
 
 void cmaster_state::init_nfb96_c2()
@@ -32574,7 +32647,6 @@ void cmaster_state::init_nfb96_d()
 
 	// csel96b
 	m_maincpu->space(AS_IO).install_read_handler(0x6e, 0x6e, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0x96>)));
-
 }
 
 
@@ -32595,7 +32667,6 @@ void cmaster_state::init_nfb96_dk()
 		rom[i] = x;
 	}
 	m_maincpu->space(AS_IO).install_read_handler(0x2e, 0x2e, read8smo_delegate(*this, FUNC(cmaster_state::fixedval_r<0xbe>)));
-
 }
 
 void cmaster_state::init_nfb96_g()
@@ -32878,7 +32949,6 @@ void cmaster_state::init_tonypok()
 	io.install_read_port(0x04, 0x04, "IN0" );
 	io.install_read_port(0x05, 0x05, "IN1" );
 	io.install_read_port(0x06, 0x06, "IN2" );
-
 }
 
 void goldstar_state::init_super9()
@@ -32950,7 +33020,6 @@ void goldstar_state::init_super9()
 	rom[0x0239] = 0xf7;
 
 	rom[0xea80] = 0x00;  // reels tilemap mask
-
 }
 
 
@@ -33352,7 +33421,6 @@ void wingco_state::init_l8tet()
 	rom[0x120e] = 0x00;   // skip bet protection
 	rom[0x01c9] = 0x68;   // alt mcu protection
 	rom[0x788f] = 0x20;   // alt mcu protection
-
 }
 
 void cmaster_state::init_reelmag()
@@ -33361,7 +33429,6 @@ void cmaster_state::init_reelmag()
 
 	rom[0xc803] = 0xbf; // unknown protection device (not rom)
 	rom[0xc80a] = 0x7f; // unknown protection device (not rom)
-
 }
 
 void cmaster_state::init_rm7b()
@@ -33374,7 +33441,6 @@ void cmaster_state::init_rm7b()
 	rom[0x00d5] = 0xd7;
 	rom[0x00d6] = 0x36;
 	rom[0x00d7] = 0xaa;
-
 }
 
 void wingco_state::init_skch()
@@ -33481,7 +33547,6 @@ void goldstar_state::init_moonlghtb()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	rom[0xc780] = 0x00;   // black
-
 }
 
 void cmaster_state::init_cutya()
@@ -33571,7 +33636,6 @@ void cmaster_state::init_cm99()
 	init_cmv4();
 
 	// intended, for specific game init.
-
 }
 
 
@@ -33585,16 +33649,16 @@ void cmaster_state::init_cm99()
 
 ****************************************************/
 
-//     YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT            ROT   COMPANY              FULLNAME                                       FLAGS              LAYOUT
-GAMEL( 199?, goldstar,   0,        goldstar, goldstar, goldstar_state, init_goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                 layout_goldstar )
-GAMEL( 199?, goldstbl,   goldstar, goldstbl, goldstar, goldstar_state, empty_init,     ROT0, "IGS",               "Golden Star (Blue version)",                  0,                 layout_goldstar )
+//     YEAR  NAME        PARENT    MACHINE   INPUT     STATE           INIT            ROT   COMPANY              FULLNAME                                       FLAGS                LAYOUT
+GAMEL( 199?, goldstar,   0,        goldstar, goldstar, goldstar_state, init_goldstar,  ROT0, "IGS",               "Golden Star",                                 0,                   layout_goldstar )
+GAMEL( 199?, goldstbl,   goldstar, goldstbl, goldstar, goldstar_state, empty_init,     ROT0, "IGS",               "Golden Star (Blue version)",                  0,                   layout_goldstar )
 GAME(  199?, moonlght,   goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.0629, low program)",            0 )
 GAME(  199?, moonlghta,  goldstar, moonlght, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Moon Light (v.0629, high program)",           0 )
 GAME(  199?, moonlghtb,  goldstar, moonlght, goldstar, goldstar_state, init_moonlghtb, ROT0, "bootleg",           "Moon Light (v.02L0A, low program)",           0 )
 GAME(  199?, moonlghtc,  goldstar, moonlght, goldstar, goldstar_state, init_moonlghtb, ROT0, "bootleg",           "Moon Light (v.02L0A, high program, alt gfx)", 0 )
-GAME(  199?, gregular,   goldstar, moonlght, gregular, goldstar_state, empty_init,     ROT0, "bootleg (Playmark)","Golden Regular (version 388/2000)",           0 )                         // hacked to only hand pay
-GAMEL( 199?, chrygld,    0,        chrygld,  chrygld,  cb3_state,      init_chrygld,   ROT0, "bootleg",           "Cherry Gold I (set 1)",                       0,                 layout_chrygld )
-GAMEL( 199?, chry10,     0,        chrygld,  chry10,   cb3_state,      init_chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                 layout_chrygld )
+GAME(  199?, gregular,   goldstar, moonlght, gregular, goldstar_state, empty_init,     ROT0, "bootleg (Playmark)","Golden Regular (version 388/2000)",           0 )                  // hacked to only hand pay
+GAMEL( 199?, chrygld,    0,        chrygld,  chrygld,  cb3_state,      init_chrygld,   ROT0, "bootleg",           "Cherry Gold I (set 1)",                       0,                   layout_chrygld )
+GAMEL( 199?, chry10,     0,        chrygld,  chry10,   cb3_state,      init_chry10,    ROT0, "bootleg",           "Cherry 10 (bootleg with PIC16F84)",           0,                   layout_chrygld )
 GAME(  199?, goldfrui,   goldstar, goldfrui, goldstar, goldstar_state, empty_init,     ROT0, "bootleg",           "Gold Fruit",                                  0 )                  // maybe fullname should be 'Gold Fruit (main 40%)'
 GAME(  2001, super9,     goldstar, super9,   super9,   goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark, V. M271B)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // needs palette, inputs / outputs checked
 GAME(  2001, super9a,    goldstar, super9,   super9,   goldstar_state, init_super9,    ROT0, "Playmark",          "Super Nove (Playmark, V. M271C)",             MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING ) // needs palette, inputs / outputs checked
@@ -33602,18 +33666,20 @@ GAME(  2001, wcherry,    0,        wcherry,  wcherry,  goldstar_state, init_wche
 
 
 // are these really Dyna, or bootlegs?
-GAMEL( 199?, ncb3,       0,        ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0,                 layout_cherryb3 )
-GAMEL( 199?, cb3a,       ncb3,     ncb3,     cb3a,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0,                 layout_cherryb3 )
-GAMEL( 199?, cb3,        ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0,                 layout_cherryb3 )
-GAMEL( 199?, cb3b,       ncb3,     cherrys,  ncb3,     cb3_state,      init_cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0,                 layout_cherryb3 )
-GAMEL( 199?, cb3c,       ncb3,     cb3c,     cb3c,     cb3_state,      init_cb3c,      ROT0, "bootleg",           "Cherry Bonus III (Ivanhoe V46-0799)",         0,                 layout_chrygld ) // fg gfx rom needs redump. for now using the parent fg gfx
-GAMEL( 199?, cb3d,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                 layout_cherryb3 )
-GAMEL( 199?, cb3e,       ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                 layout_chrygld )
+GAMEL( 199?, ncb3,       0,        ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 1)",          0,                   layout_cherryb3 )
+GAMEL( 199?, cb3a,       ncb3,     ncb3,     cb3a,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 2)",          0,                   layout_cherryb3 )
+GAMEL( 199?, cb3,        ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, encrypted)",      0,                   layout_cherryb3 )
+GAMEL( 199?, cb3b,       ncb3,     cherrys,  ncb3,     cb3_state,      init_cherrys,   ROT0, "Dyna",              "Cherry Bonus III (alt)",                      0,                   layout_cherryb3 )
+GAMEL( 199?, cb3c,       ncb3,     cb3c,     cb3c,     cb3_state,      init_cb3c,      ROT0, "bootleg",           "Cherry Bonus III (Ivanhoe V46-0799)",         0,                   layout_chrygld ) // fg gfx rom needs redump. for now using the parent fg gfx
+GAMEL( 199?, cb3d,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "bootleg",           "Cherry Bonus III (set 3)",                    0,                   layout_cherryb3 )
+GAMEL( 199?, cb3e,       ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Bonus III (set 4, encrypted bootleg)", 0,                   layout_chrygld )
 GAMEL( 199?, cb3f,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3f,      ROT0, "bootleg (Cleco)",   "Cherry Bonus III (set 5, encrypted bootleg)", MACHINE_NOT_WORKING, layout_chrygld ) // partially decrypted, stops at 'call attendant'
-GAMEL( 199?, cb3g,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 6)",          0,                 layout_cherryb3 )
-GAMEL( 199?, cb3h,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 7)",          0,                 layout_cherryb3 )
-GAMEL( 199?, cb3s51,     ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.5.1)",                  0,                 layout_cherryb3 )
-GAMEL( 199?, chryglda,   ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                 layout_chrygld )  // Runs in CB3e hardware.
+GAMEL( 199?, cb3g,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 6)",          0,                   layout_cherryb3 )
+GAMEL( 199?, cb3h,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 7)",          0,                   layout_cherryb3 )
+GAMEL( 1992, cb3i,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.3.0)",                  MACHINE_NOT_WORKING, layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx.
+GAMEL( 199?, cb3j,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.2.20)",                 MACHINE_NOT_WORKING, layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx.
+GAMEL( 199?, cb3s51,     ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.5.1)",                  0,                   layout_cherryb3 )
+GAMEL( 199?, chryglda,   ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                   layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chryangla, ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // DYNA CB3  V1.40 string, playable, but still has protections
 
 // looks like a hack of Cherry Bonus 3
@@ -33622,55 +33688,55 @@ GAME(  1994, chryanglb,  ncb3,     chryanglb, chryanglb, cmaster_state, init_chr
 
 
 // cherry master hardware has a rather different mem map, but is basically the same
-GAMEL( 198?, cmv823,     0,        cm,       cmv801,   cmaster_state,  init_cmv823,    ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.23)",     0,                 layout_cmv4 )  // encrypted
-GAMEL( 198?, cmv801,     cmv823,   cm,       cmv801,   cmaster_state,  init_cm,        ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.01)",     0,                 layout_cmv4 )  // says ED-96 where the manufacturer is on some games...
-GAMEL( 198?, cmpap,      0,        cm,       cmpap,    cmaster_state,  init_cmpap,     ROT0, "Pick-A-Party Brazil", "Cherry Master (ED-98, Pick-A-Party)",       0,                 layout_cmv4 )
+GAMEL( 198?, cmv823,     0,        cm,       cmv801,   cmaster_state,  init_cmv823,    ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.23)",     0,                   layout_cmv4 )  // encrypted
+GAMEL( 198?, cmv801,     cmv823,   cm,       cmv801,   cmaster_state,  init_cm,        ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.01)",     0,                   layout_cmv4 )  // says ED-96 where the manufacturer is on some games...
+GAMEL( 198?, cmpap,      0,        cm,       cmpap,    cmaster_state,  init_cmpap,     ROT0, "Pick-A-Party Brazil", "Cherry Master (ED-98, Pick-A-Party)",       0,                   layout_cmv4 )
 
 
 // most of these are almost certainly bootlegs, with added features, hacked payouts etc. identifying which are
 // the original, unmodified Dyna versions is almost impossible due to lack of documentation from back in the day,
 // even original boards almost always run modified sets
-GAMEL( 1992, cmv4,       0,        cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 1)",                0,                 layout_cmv4 )
-GAMEL( 1992, cmv4a,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                0,                 layout_cmv4 ) // with tetris tiles leftover
-GAMEL( 199?, cmwm,       cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Watermelon bootleg / hack)",   0,                 layout_cmv4 ) // CM Fruit Bonus ver.2 T bootleg/hack
-GAMEL( 1995, cmfun,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0,                 layout_cmv4 )
-GAMEL( 1996, 3cdpoker,   0,        cd3poker, cmv4,     cd3poker_state, init_3cdp,      ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.6)",                     0,                 layout_cmv4 )
-GAMEL( 1996, 3cdpokera,  3cdpoker, cd3poker, cmv4,     cd3poker_state, init_3cdp,      ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.0)",                     0,                 layout_cmv4 )
-GAMEL( 1991, cmaster,    0,        cm,       cmaster,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0,                 layout_cmaster )
-GAMEL( 1991, cmasterb,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0,                 layout_cmasterb )
-GAMEL( 1991, cm1codar,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "CODERE Argentina",  "Cherry Master I (ver.1.01, Spanish, CODERE, set 1)",  0,         layout_cmasterb )
-GAMEL( 1991, cm1codara,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "CODERE Argentina",  "Cherry Master I (ver.1.01, Spanish, CODERE, set 2)",  0,         layout_cmasterb )
-GAMEL( 1991, cm1codarb,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "CODERE Argentina",  "Cherry Master I (ver.1.01, Spanish, CODERE, set 3)",  0,         layout_cmasterb )
-GAMEL( 1991, cm1spa,     cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, Spanish, Dyna)",   0,                 layout_cmasterb )
-GAMEL( 1991, packsystem, cmaster,  cm,       cmasterb, cmaster_state,  init_cmezspina, ROT0, "bootleg",           "Pack System (Game FB55 ver.2, encrypted)",    0,                 layout_cmasterb )
-GAMEL( 1991, cmezspin,   cmaster,  cm,       cmezspin, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (E-Z Spin bootleg / hack)",   0,                 layout_cmezspin ) // CM Fruit Bonus 55 ver.2 bootleg/hack
-GAMEL( 199?, cmezspina,  cmaster,  cm,       cmezspin, cmaster_state,  init_cmezspina, ROT0, "bootleg",           "Cherry Master I (E-Z Spin Hands Count bootleg / hack, set 1)", 0, layout_cmezspin )
-GAMEL( 199?, cmezspinb,  cmaster,  cm,       cmezspin, cmaster_state,  init_cmezspina, ROT0, "bootleg",           "Cherry Master I (E-Z Spin Hands Count bootleg / hack, set 2)", 0, layout_cmezspin )
-GAMEL( 1991, cmasterc,   cmaster,  cmasterc, cmasterc, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 3)",           0,                 layout_cmasterc )
+GAMEL( 1992, cmv4,       0,        cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 1)",                0,                   layout_cmv4 )
+GAMEL( 1992, cmv4a,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (ver.4, set 2)",                0,                   layout_cmv4 ) // with tetris tiles leftover
+GAMEL( 199?, cmwm,       cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Watermelon bootleg / hack)",   0,                   layout_cmv4 ) // CM Fruit Bonus ver.2 T bootleg/hack
+GAMEL( 1995, cmfun,      cmv4,     cm,       cmv4,     cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master (Fun USA v2.5 bootleg / hack)", 0,                   layout_cmv4 )
+GAMEL( 1996, 3cdpoker,   0,        cd3poker, cmv4,     cd3poker_state, init_3cdp,      ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.6)",                     0,                   layout_cmv4 )
+GAMEL( 1996, 3cdpokera,  3cdpoker, cd3poker, cmv4,     cd3poker_state, init_3cdp,      ROT0, "Armaly Labs",       "3 Cards Poker 96 (V1.0)",                     0,                   layout_cmv4 )
+GAMEL( 1991, cmaster,    0,        cm,       cmaster,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 1)",           0,                   layout_cmaster )
+GAMEL( 1991, cmasterb,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 2)",           0,                   layout_cmasterb )
+GAMEL( 1991, cm1codar,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "CODERE Argentina",  "Cherry Master I (ver.1.01, Spanish, CODERE, set 1)",  0,           layout_cmasterb )
+GAMEL( 1991, cm1codara,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "CODERE Argentina",  "Cherry Master I (ver.1.01, Spanish, CODERE, set 2)",  0,           layout_cmasterb )
+GAMEL( 1991, cm1codarb,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "CODERE Argentina",  "Cherry Master I (ver.1.01, Spanish, CODERE, set 3)",  0,           layout_cmasterb )
+GAMEL( 1991, cm1spa,     cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, Spanish, Dyna)",   0,                   layout_cmasterb )
+GAMEL( 1991, packsystem, cmaster,  cm,       cmasterb, cmaster_state,  init_cmezspina, ROT0, "bootleg",           "Pack System (Game FB55 ver.2, encrypted)",    0,                   layout_cmasterb )
+GAMEL( 1991, cmezspin,   cmaster,  cm,       cmezspin, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (E-Z Spin bootleg / hack)",   0,                   layout_cmezspin ) // CM Fruit Bonus 55 ver.2 bootleg/hack
+GAMEL( 199?, cmezspina,  cmaster,  cm,       cmezspin, cmaster_state,  init_cmezspina, ROT0, "bootleg",           "Cherry Master I (E-Z Spin Hands Count bootleg / hack, set 1)", 0,  layout_cmezspin )
+GAMEL( 199?, cmezspinb,  cmaster,  cm,       cmezspin, cmaster_state,  init_cmezspina, ROT0, "bootleg",           "Cherry Master I (E-Z Spin Hands Count bootleg / hack, set 2)", 0,  layout_cmezspin )
+GAMEL( 1991, cmasterc,   cmaster,  cmasterc, cmasterc, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 3)",           0,                   layout_cmasterc )
 GAMEL( 1991, cmasterbv,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 4, with Blitz Poker ROM?)", MACHINE_NOT_WORKING, layout_cmasterb ) // Cherry Master works, but no idea how to use the Blitz ROM
-GAMEL( 1991, cmasterd,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 5)",           0,                 layout_cmasterb )
-GAMEL( 1991, cmastere,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 6)",           0,                 layout_cmasterb )
-GAMEL( 1991, cmasterf,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)",           0,                 layout_cmasterb )
-GAMEL( 1991, cmasterg,   cmaster,  cm,       cmasterg, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                 layout_cmasterb )
-GAMEL( 1991, cmasterh,   cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                 layout_cmasterb )
-GAMEL( 1991, cmasteri,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 9)",           0,                 layout_cmasterb ) // NMC27CP128Q being 32k x8 instead of 16k x8...
-GAMEL( 1991, cmasterj,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 10, BET stops all)",  0,          layout_cmasterb )
-GAMEL( 1991, cmasterk,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 11, TAKE stops all)", 0,          layout_cmasterb )
-GAMEL( 1991, cmasterl,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 12)",          0,                 layout_cmasterb )
-GAMEL( 1991, cmasterm,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 13, BET stops all)",  0,          layout_cmasterb )
-GAMEL( 1991, cmastern,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 14, TAKE stops all)", 0,          layout_cmasterb )
-GAMEL( 1991, skillmst,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v5.0)",                 0,                 layout_cmasterb )
-GAMEL( 1991, skillmsta,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v3.0)",                 0,                 layout_cmasterb )
-GAMEL( 1991, cutyline,   0,        cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cuty Line (LC-88, ver.1.01)",                 0,                 layout_cmasterb )
+GAMEL( 1991, cmasterd,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 5)",           0,                   layout_cmasterb )
+GAMEL( 1991, cmastere,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 6)",           0,                   layout_cmasterb )
+GAMEL( 1991, cmasterf,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)",           0,                   layout_cmasterb )
+GAMEL( 1991, cmasterg,   cmaster,  cm,       cmasterg, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 8, V4-B-)",    0,                   layout_cmasterb )
+GAMEL( 1991, cmasterh,   cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.10)",                  0,                   layout_cmasterb )
+GAMEL( 1991, cmasteri,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 9)",           0,                   layout_cmasterb ) // NMC27CP128Q being 32k x8 instead of 16k x8...
+GAMEL( 1991, cmasterj,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 10, BET stops all)",  0,            layout_cmasterb )
+GAMEL( 1991, cmasterk,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 11, TAKE stops all)", 0,            layout_cmasterb )
+GAMEL( 1991, cmasterl,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 12)",          0,                   layout_cmasterb )
+GAMEL( 1991, cmasterm,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 13, BET stops all)",  0,            layout_cmasterb )
+GAMEL( 1991, cmastern,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 14, TAKE stops all)", 0,            layout_cmasterb )
+GAMEL( 1991, skillmst,   cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v5.0)",                 0,                   layout_cmasterb )
+GAMEL( 1991, skillmsta,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Skill Master (ver.fst v3.0)",                 0,                   layout_cmasterb )
+GAMEL( 1991, cutyline,   0,        cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "Dyna",              "Cuty Line (LC-88, ver.1.01)",                 0,                   layout_cmasterb )
 GAMEL( 1991, cutylinea,  cutyline, cm,       cutylinea, cmaster_state, init_cutya,     ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.8.05C)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 1991, cutylineb,  cutyline, cutylineb,cutylinea, cmaster_state, init_cutya,     ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7C.14)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
 GAMEL( 1991, cutylinec,  cutyline, cm,       cutylinea, cmaster_state, init_cutya,     ROT0, "bootleg",           "Cuty Line (LC-88 bootleg, ver.7.07C)",        MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING, layout_cmasterb ) // needs correct memory map
-GAMEL( 1991, lonestar,   cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Lonestar Roundup (set 1)",                    0,                 layout_cmasterb )
-GAMEL( 1991, lonestara,  cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Lonestar Roundup (set 2)",                    0,                 layout_cmasterb )
-GAMEL( 1991, skdelux2k,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Florida Skill Deluxe 2K (FBV2 ver.T)",        0,                 layout_cmasterb )
-GAMEL( 1991, skdelux99,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Florida Skill Deluxe 99 (FBV2 ver.T)",        0,                 layout_cmasterb )
+GAMEL( 1991, lonestar,   cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Lonestar Roundup (set 1)",                    0,                   layout_cmasterb )
+GAMEL( 1991, lonestara,  cmaster,  cm,       cmasterh, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Lonestar Roundup (set 2)",                    0,                   layout_cmasterb )
+GAMEL( 1991, skdelux2k,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Florida Skill Deluxe 2K (FBV2 ver.T)",        0,                   layout_cmasterb )
+GAMEL( 1991, skdelux99,  cmaster,  cm,       cmasterb, cmaster_state,  init_cmv4,      ROT0, "bootleg",           "Florida Skill Deluxe 99 (FBV2 ver.T)",        0,                   layout_cmasterb )
 GAMEL( 199?, super7,     cmaster,  super7,   super7,   cmaster_state,  init_super7,    ROT0, "bootleg",           "Super Seven (ver. 2.3)",                      MACHINE_NOT_WORKING, layout_cmasterb ) // inputs / outputs needs verifying
-GAMEL( 1993, wcat3a,     wcat3,    wcat3a,   wcat3a,   cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat S (CMV4 hardware)",                  0,                 layout_wcat3a ) // CAT2 101893
+GAMEL( 1993, wcat3a,     wcat3,    wcat3a,   wcat3a,   cmaster_state,  init_wcat3a,    ROT0, "E.A.I.",            "Wild Cat S (CMV4 hardware)",                  0,                   layout_wcat3a ) // CAT2 101893
 GAMEL( 1993, ll3,        0,        ll3,      ll3,      cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 1)",            0,  layout_ll3 )
 GAMEL( 1993, ll3a,       ll3,      ll3,      ll3a,     cmaster_state,  init_ll3,       ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 2, Macedonia)", 0,  layout_ll3 )
 GAMEL( 1993, ll3b,       ll3,      ll3,      ll3b,     cmaster_state,  init_ll3b,      ROT0, "bootleg",           "Lucky Line III (ver 2.00, Wang QL-1 v3.03, set 3)",            0,  layout_ll3 )
@@ -33708,10 +33774,10 @@ GAME(  1993, missbingoc, crazybonb, crazybonb, crazybonb, cmaster_state, init_cr
 GAME(  199?, chthree,    cmaster,  cm,       cmaster,  cmaster_state,  init_chthree,   ROT0, "Promat",            "Channel Three",                               0 ) // hack of cmaster, still shows DYNA CM-1 V1.01 in book-keeping
 
 // Dyna D9101 PCB
-GAMEL( 1991, eldoraddoa,  eldoradd, animalhs, eldoradoa, cmaster_state, init_eldoraddoa, ROT0, "Dyna",             "El Dorado (V1.4D)",                          0,                 layout_animalhs )
-GAMEL( 1991, eldoraddoab, eldoradd, animalhs, eldoradoa, cmaster_state, init_eldoraddoa, ROT0, "Dyna / Grayhound", "El Dorado (V1.5U, Dyna/Grayhound)",          0,                 layout_animalhs )
-GAMEL( 1991, animalhs,    0,        animalhs, animalhs,  cmaster_state, init_animalhs,   ROT0, "Suns Co Ltd.",     "Animal House (V1.0, set 1)",                 0,                 layout_animalhs )
-GAMEL( 1991, animalhsa,   animalhs, animalhs, animalhs,  cmaster_state, init_animalhs,   ROT0, "Suns Co Ltd.",     "Animal House (V1.0, set 2)",                 0,                 layout_animalhs )
+GAMEL( 1991, eldoraddoa,  eldoradd, animalhs, eldoradoa, cmaster_state, init_eldoraddoa, ROT0, "Dyna",             "El Dorado (V1.4D)",                          0,                   layout_animalhs )
+GAMEL( 1991, eldoraddoab, eldoradd, animalhs, eldoradoa, cmaster_state, init_eldoraddoa, ROT0, "Dyna / Grayhound", "El Dorado (V1.5U, Dyna/Grayhound)",          0,                   layout_animalhs )
+GAMEL( 1991, animalhs,    0,        animalhs, animalhs,  cmaster_state, init_animalhs,   ROT0, "Suns Co Ltd.",     "Animal House (V1.0, set 1)",                 0,                   layout_animalhs )
+GAMEL( 1991, animalhsa,   animalhs, animalhs, animalhs,  cmaster_state, init_animalhs,   ROT0, "Suns Co Ltd.",     "Animal House (V1.0, set 2)",                 0,                   layout_animalhs )
 
 // Dyna D9106/D9106C PCB
 GAME(  1991, eldoradd,   0,        eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V5.1DR)",                          MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
@@ -33725,68 +33791,68 @@ GAME(  1991, eldoraddoc, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_ini
 GAME(  1991, eldoraddod, eldoradd, eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "El Dorado (V1.1U)",                           MACHINE_NOT_WORKING ) // different GFX hw?
 
 GAME(  1991, cmast91,    0,        cmast91,  cmast91,  cmaster_state,  init_cmast91,   ROT0, "Dyna",              "Cherry Master '91 (ver.1.30)",                0 )
-GAMEL( 1991, cll,        0,        cmast91,  cmast91,  cmaster_state,  init_cll,       ROT0, "Dyna / TAB Austria","Cuty Line Limited (ver.1.30)",                0,    layout_cmv4 ) // needs verifying dips, missing girls
+GAMEL( 1991, cll,        0,        cmast91,  cmast91,  cmaster_state,  init_cll,       ROT0, "Dyna / TAB Austria","Cuty Line Limited (ver.1.30)",                0,                   layout_cmv4 ) // needs verifying dips, missing girls
 GAME(  1992, cmast92,    0,        eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '92 (V1.2D)",                   MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
 GAME(  1992, cmast92a,   cmast92,  eldoradd, cmast91,  cmaster_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '92 (V1.1D)",                   MACHINE_NOT_WORKING ) // different GFX hw? Game is running and sounds play
-GAMEL( 1996, cmast97,    0,        cmast97,  cmast97,  cmast97_state,  init_cm97,      ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 1)",             0,    layout_cmast97 )
-GAMEL( 1997, cmast97a,   cmast97,  cmast97,  cmast97a, cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 2, no girls)",   0,    layout_cmast97 )
-GAMEL( 1996, cmast97b,   cmast97,  cmast97,  cmast97a, cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 3, no girls)",   0,    layout_cmast97 )
-GAMEL( 1996, cmast97i,   cmast97,  cmast97,  cmast97i, cmast97_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     0,    layout_cmast97 )
-GAMEL( 1997, jpknight,   0,        jpknight, cmast97a, cmast97_state,  empty_init,     ROT0, "Dyna / R-Stone",    "Jackpot Knight (V1.1)",                       0,    layout_cmast97 ) // check inputs
+GAMEL( 1996, cmast97,    0,        cmast97,  cmast97,  cmast97_state,  init_cm97,      ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 1)",             0,                   layout_cmast97 )
+GAMEL( 1997, cmast97a,   cmast97,  cmast97,  cmast97a, cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 2, no girls)",   0,                   layout_cmast97 )
+GAMEL( 1996, cmast97b,   cmast97,  cmast97,  cmast97a, cmast97_state,  empty_init,     ROT0, "Dyna",              "Cherry Master '97 (V1.7, set 3, no girls)",   0,                   layout_cmast97 )
+GAMEL( 1996, cmast97i,   cmast97,  cmast97,  cmast97i, cmast97_state,  empty_init,     ROT0, "Dyna",              "Cheri Mondo '97 (V1.4I)",                     0,                   layout_cmast97 )
+GAMEL( 1997, jpknight,   0,        jpknight, cmast97a, cmast97_state,  empty_init,     ROT0, "Dyna / R-Stone",    "Jackpot Knight (V1.1)",                       0,                   layout_cmast97 ) // check inputs
 
 // Dyna CM99 hardware (dynamic banking)
-GAMEL( 1999, cmast99,    0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Dyna",              "Cherry Master '99 (QL-1 V9B.00)",             MACHINE_NOT_WORKING,     layout_cmv4 )
-GAMEL( 1999, cmast99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, bootleg)",    MACHINE_NOT_WORKING,     layout_cmv4 )
-GAMEL( 1999, cmast99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, Cleco)",      MACHINE_NOT_WORKING,     layout_cmv4 )
-GAMEL( 1999, cmast99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QL-1 V9B.00, USA long PCB)", MACHINE_NOT_WORKING,   layout_cmv4 )
+GAMEL( 1999, cmast99,    0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Dyna",              "Cherry Master '99 (QL-1 V9B.00)",             MACHINE_NOT_WORKING,   layout_cmv4 )
+GAMEL( 1999, cmast99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, bootleg)",    MACHINE_NOT_WORKING,   layout_cmv4 )
+GAMEL( 1999, cmast99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, Cleco)",      MACHINE_NOT_WORKING,   layout_cmv4 )
+GAMEL( 1999, cmast99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QL-1 V9B.00, USA long PCB)", MACHINE_NOT_WORKING, layout_cmv4 )
 GAMEL( 1999, cmast99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QL-1 V9B.00, Cleco, Hand Count?)", MACHINE_NOT_WORKING, layout_cmv4 ) // different bankswitching? see the ROM load notes
-GAMEL( 1998, texas99,    cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00)",                     MACHINE_NOT_WORKING,     layout_cmv4 ) // similar to cmast99
-GAMEL( 1998, texas99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, bootleg)",            MACHINE_NOT_WORKING,     layout_cmv4 ) // similar to cmast99b
-GAMEL( 1998, texas99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, Cleco)",              MACHINE_NOT_WORKING,     layout_cmv4 )
-GAMEL( 1998, texas99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, USA long PCB)",       MACHINE_NOT_WORKING,     layout_cmv4 )
-GAMEL( 1998, texas99e,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Kolom",             "New Texas '99 (QL-1 V9B.00, Kolom V1)",       MACHINE_NOT_WORKING,     layout_cmv4 ) // DB with MCU... see the ROM load notes
-GAMEL( 1998, texas99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, Cleco, Hand Count?)", MACHINE_NOT_WORKING,     layout_cmv4 ) // different bankswitching? see the ROM load notes
-GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet
-GAME(  1999, top7,       0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 1)",                         MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet
-GAME(  1999, top7a,      top7,     cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 2)",                         MACHINE_NOT_WORKING ) // doesn't boot, not investigated yet
-GAME(  1996, war3cb,     0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "S.B.E.",            "War III Cherry Best",                         MACHINE_NOT_WORKING ) // different portmap?
+GAMEL( 1998, texas99,    cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00)",                     MACHINE_NOT_WORKING,   layout_cmv4 ) // similar to cmast99
+GAMEL( 1998, texas99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, bootleg)",            MACHINE_NOT_WORKING,   layout_cmv4 ) // similar to cmast99b
+GAMEL( 1998, texas99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, Cleco)",              MACHINE_NOT_WORKING,   layout_cmv4 )
+GAMEL( 1998, texas99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, USA long PCB)",       MACHINE_NOT_WORKING,   layout_cmv4 )
+GAMEL( 1998, texas99e,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Kolom",             "New Texas '99 (QL-1 V9B.00, Kolom V1)",       MACHINE_NOT_WORKING,   layout_cmv4 ) // DB with MCU... see the ROM load notes
+GAMEL( 1998, texas99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, Cleco, Hand Count?)", MACHINE_NOT_WORKING,   layout_cmv4 ) // different bankswitching? see the ROM load notes
+GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
+GAME(  1999, top7,       0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 1)",                         MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
+GAME(  1999, top7a,      top7,     cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 2)",                         MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
+GAME(  1996, war3cb,     0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "S.B.E.",            "War III Cherry Best",                         MACHINE_NOT_WORKING )   // different portmap?
 
-GAME(  1995, tcl,        0,        cm,       cmaster,  cmaster_state,  init_tcl,       ROT0, "Uniwang",           "Taiwan Chess Legend",                         MACHINE_NOT_WORKING ) // incomplete decryption
+GAME(  1995, tcl,        0,        cm,       cmaster,  cmaster_state,  init_tcl,       ROT0, "Uniwang",           "Taiwan Chess Legend",                         MACHINE_NOT_WORKING )   // incomplete decryption
 
 // --- Wing W-4 hardware ---
-GAMEL( 1989, lucky8,     0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 1, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8a,    lucky8,   lucky8,   lucky8a,  wingco_state,   init_lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 2, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8b,    lucky8,   lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 3, W-4, extended gfx)",             0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 1989, lucky8c,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 4, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8d,    lucky8,   lucky8,   lucky8d,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 5, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8e,    lucky8,   lucky8,   lucky8d,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 6, W-4, main 40%, d-up 60%)",       0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8f,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8f,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 7, W-4, encrypted)",                0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8g,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 8, W-4)",                           0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1991, lucky8h,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Super Turbo (Hack)",                     0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8i,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Eagle/Wing",        "New Lucky 8 Lines (set 9, W-4, Eagle, licensed by Wing)",  0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 199?, lucky8j,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Crown Turbo (Hack)",                     MACHINE_NOT_WORKING,   layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8k,    lucky8,   lucky8k,  lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 10, W-4, encrypted NEC D315-5136)", 0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1989, lucky8l,    lucky8,   lucky8,   lucky8l,  wingco_state,   init_lucky8l,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 11, W-4)",                          0,                     layout_lucky8 )    // uses a strange mix of PLDs and PROMs for colors
-GAMEL( 1989, lucky8m,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8m,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 12, W-4, encrypted)",               0,                     layout_lucky8 )
-GAMEL( 1989, lucky8n,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8n,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 13)",                               0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1988, lucky8o,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines (set 14, W-4, Yamate)",                  0,                     layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8,     0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 1, W-4)",                           0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8a,    lucky8,   lucky8,   lucky8a,  wingco_state,   init_lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 2, W-4)",                           0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8b,    lucky8,   lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 3, W-4, extended gfx)",             0,                      layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1989, lucky8c,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8a,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 4, W-4)",                           0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8d,    lucky8,   lucky8,   lucky8d,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 5, W-4, main 40%, d-up 60%)",       0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8e,    lucky8,   lucky8,   lucky8d,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 6, W-4, main 40%, d-up 60%)",       0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8f,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8f,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 7, W-4, encrypted)",                0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8g,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 8, W-4)",                           0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1991, lucky8h,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Super Turbo (Hack)",                     0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8i,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Eagle/Wing",        "New Lucky 8 Lines (set 9, W-4, Eagle, licensed by Wing)",  0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 199?, lucky8j,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines Crown Turbo (Hack)",                     MACHINE_NOT_WORKING,    layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8k,    lucky8,   lucky8k,  lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 10, W-4, encrypted NEC D315-5136)", 0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1989, lucky8l,    lucky8,   lucky8,   lucky8l,  wingco_state,   init_lucky8l,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 11, W-4)",                          0,                      layout_lucky8 )    // uses a strange mix of PLDs and PROMs for colors
+GAMEL( 1989, lucky8m,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8m,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 12, W-4, encrypted)",               0,                      layout_lucky8 )
+GAMEL( 1989, lucky8n,    lucky8,   lucky8f,  lucky8,   wingco_state,   init_lucky8n,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 13)",                               0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1988, lucky8o,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines (set 14, W-4, Yamate)",                  0,                      layout_lucky8 )    // 2 control sets...
 GAMEL( 1988, lucky8p,    lucky8,   lucky8p,  lucky8,   wingco_state,   init_lucky8p,   ROT0, "bootleg (Cleco)",   "New Lucky 8 Lines (set 15, W-4, Cleco bootleg)",           MACHINE_IMPERFECT_GRAPHICS, layout_lucky8 ) // 2 control sets, missing GFX on title screen (wrong GFX ROMs)
-GAMEL( 1988, lucky8q,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 16, W-4)",                          0,                     layout_lucky8 )
-GAMEL( 1987, lucky8r,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8r,   ROT0, "TQ System",         "New Lucky 8 Lines (set 17, W-4, turbo, protected)",        0,                     layout_lucky8 )    // shift left registers protection
-GAMEL( 1988, lucky8s,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8s,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 18, W-4, bingo/fever, protected)",  0,                     layout_lucky8 )    // shift left registers protection
-GAME(  1997, lucky8t,    lucky8,   lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg (Bigico)",  "New Lucky 8 Lines (A900 2nd gen, Cross and Bell Bonus)",   0 )                                       // only 1 control set, no lamps except 2 leftovers...
-GAMEL( 1989, lucky8u,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 19, W-4)",                          0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 1988, lucky8v,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 20, W-4, 58%)",                     0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 198?, ns8linew,   ns8lines, lucky8t,  ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                     layout_lucky8 )    // 2 control sets...
-GAMEL( 198?, ns8linewa,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 1985, ns8linewb,  ns8lines, lucky8t,  ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus, Yamate, 1985)", 0,        layout_lucky8p1 ) // only 1 control set...
-GAMEL( 1988, ns8linewc,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 1)", 0, layout_lucky8p1 ) // only 1 control set...
-GAMEL( 1988, ns8linewd,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 2)", 0, layout_lucky8p1 ) // only 1 control set...
-GAMEL( 1991, nd8lines,   lucky8,   nd8lines, nd8lines, wingco_state,   init_nd8lines,  ROT0, "Yamate (bootleg)",  "New Draw 8 Lines (Version 2.1)",                           0,                     layout_nd8lines )  // SN commands inverted bitorder.
-GAMEL( 1989, f16s8l,     lucky8,   lucky8t,  f16s8l,   wingco_state,   empty_init,     ROT0, "Leisure Ent",       "F-16 Super 8 Lines",                                       0,                     layout_lucky8p1 )  // only 1 control set...
-GAMEL( 198?, super972,   ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 0,                     layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1988, lucky8q,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 16, W-4)",                          0,                      layout_lucky8 )
+GAMEL( 1987, lucky8r,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8r,   ROT0, "TQ System",         "New Lucky 8 Lines (set 17, W-4, turbo, protected)",        0,                      layout_lucky8 )    // shift left registers protection
+GAMEL( 1988, lucky8s,    lucky8,   lucky8,   lucky8,   wingco_state,   init_lucky8s,   ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 18, W-4, bingo/fever, protected)",  0,                      layout_lucky8 )    // shift left registers protection
+GAME(  1997, lucky8t,    lucky8,   lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg (Bigico)",  "New Lucky 8 Lines (A900 2nd gen, Cross and Bell Bonus)",   0 )                                        // only 1 control set, no lamps except 2 leftovers...
+GAMEL( 1989, lucky8u,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 19, W-4)",                          0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1988, lucky8v,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 20, W-4, 58%)",                     0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                      layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                      layout_lucky8p1 )  // only 1 control set...
+GAMEL( 198?, ns8linew,   ns8lines, lucky8t,  ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 198?, ns8linewa,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus)", 0,                      layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1985, ns8linewb,  ns8lines, lucky8t,  ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus, Yamate, 1985)", 0,        layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1988, ns8linewc,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 1)", 0, layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1988, ns8linewd,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",            "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 2)", 0, layout_lucky8p1 )  // only 1 control set...
+GAMEL( 1991, nd8lines,   lucky8,   nd8lines, nd8lines, wingco_state,   init_nd8lines,  ROT0, "Yamate (bootleg)",  "New Draw 8 Lines (Version 2.1)",                           0,                      layout_nd8lines )  // SN commands inverted bitorder.
+GAMEL( 1989, f16s8l,     lucky8,   lucky8t,  f16s8l,   wingco_state,   empty_init,     ROT0, "Leisure Ent",       "F-16 Super 8 Lines",                                       0,                      layout_lucky8p1 )  // only 1 control set...
+GAMEL( 198?, super972,   ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",         "Super 97-2 (Witch Bonus)",                                 0,                      layout_lucky8p1 )  // only 1 control set...
 GAME(  198?, luckybar,   0,        luckybar, ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "Lucky Bar (W-4 with MC68705 MCU)",                         0 )  // MC68705 MCU
 GAMEL( 198?, kkotnoli,   0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",              "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
 GAME(  198?, ladylinr,   0,        ladylinr, ladylinr, goldstar_state, empty_init,     ROT0, "TAB Austria",       "Lady Liner (set 1)",                                       0 )
@@ -33805,7 +33871,7 @@ GAMEL( 1990, cbaai,      cbonus,   cbaai,    cbaai,    wingco_state,   init_cbaa
 GAMEL( 199?, ttactoe,    0,        lucky8t,  ttactoe,  wingco_state,   empty_init,     ROT0, "bootleg (Sundance)","Tic Tac Toe (Sundance bootleg of New Lucky 8 Lines)",      0,                     layout_lucky8 )      // needs more DSW figured out
 GAME(  1995, superdrg,   0,        superdrg, superdrg, wingco_state,   empty_init,     ROT0, "OCT",               "Super Dragon (Ver 211)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // " - SUPER DROGON 950828 211 (sic)
 
-GAME(  1985, luckylad,   0,        luckylad, luckylad, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS )  // controls / dips, colors not correctly decoded
+GAME(  1985, luckylad,   0,        luckylad, luckylad, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Lucky Lady (Wing, encrypted)",                             MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS ) // controls / dips, colors not correctly decoded
 
 GAMEL( 1993, bingowng,   0,        bingowng, bingowng, wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Bingo (set 1)",                                            0,                     layout_bingowng )
 GAMEL( 1993, bingownga,  bingowng, bingownga,bingownga,wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Bingo (set 2)",                                            0,                     layout_bingowng )
@@ -33965,10 +34031,10 @@ GAME( 2002, carb2002,    nfb96,    amcoe2,   nfb96bl,   cmaster_state,  init_nfb
 GAME( 2003, carb2003,    nfb96,    amcoe2,   nfb96bl,   cmaster_state,  init_nfb96bl,   ROT0, "bootleg",       "Carriage Bonus 2003 (bootleg)",                                            MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2006, noved,       nfb96,    amcoe2,   nfb96bl,   cmaster_state,  init_noved,     ROT0, "bootleg (Kon)", "Nove Diamante (bootleg)",                                                  0 )
 
-GAME( 2003, nfm,         0,        nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic / TSK", "Fruit Bonus 2002 (Ming-Yang Electronic / TSK, vFB02-07A)",         MACHINE_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
-GAME( 2003, nfma,        nfm,      nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic / TSK", "Fruit Bonus 2002 (Ming-Yang Electronic / TSK, vFB02-01A)",         MACHINE_NOT_WORKING ) // vFB02-01A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
-GAME( 2006, amaztsk,     0,        amaztsk,  amaztsk,   cmaster_state,  init_tsk<0xba>, ROT0, "Ming-Yang Electronic / TSK", "Amazonia (Ming-Yang Electronic / TSK)",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // resets when starting reels, reels don't show, inputs need fixing, no sound
-GAME( 2006, halltsk,     0,        nfm,      nfm,       cmaster_state,  init_tsk<0x71>, ROT0, "Ming-Yang Electronic / TSK", "Halloween (Ming-Yang Electronic / TSK, version 1.0)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // resets when starting reels, reels don't show, inputs need fixing, no sound
+GAME( 2003, nfm,         0,        nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic / TSK", "Fruit Bonus 2002 (Ming-Yang Electronic / TSK, vFB02-07A)",    MACHINE_NOT_WORKING ) // vFB02-07A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
+GAME( 2003, nfma,        nfm,      nfm,      nfm,       cmaster_state,  empty_init,     ROT0, "Ming-Yang Electronic / TSK", "Fruit Bonus 2002 (Ming-Yang Electronic / TSK, vFB02-01A)",    MACHINE_NOT_WORKING ) // vFB02-01A "Copyright By Ms. Liu Orchis 2003/03/06", needs correct PROM and USER1 regions decode
+GAME( 2006, amaztsk,     0,        amaztsk,  amaztsk,   cmaster_state,  init_tsk<0xba>, ROT0, "Ming-Yang Electronic / TSK", "Amazonia (Ming-Yang Electronic / TSK)",                       MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // resets when starting reels, reels don't show, inputs need fixing, no sound
+GAME( 2006, halltsk,     0,        nfm,      nfm,       cmaster_state,  init_tsk<0x71>, ROT0, "Ming-Yang Electronic / TSK", "Halloween (Ming-Yang Electronic / TSK, version 1.0)",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // resets when starting reels, reels don't show, inputs need fixing, no sound
 
 
 // Super Cherry Master sets...

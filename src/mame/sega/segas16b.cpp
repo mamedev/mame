@@ -1250,7 +1250,7 @@ void segas16b_state::upd7759_generate_nmi(int state)
 //  state if we have a handler
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( segas16b_state::i8751_main_cpu_vblank )
+INTERRUPT_GEN_MEMBER(segas16b_state::i8751_main_cpu_vblank)
 {
 	// if we have a fake 8751 handler, call it on VBLANK
 	if (!m_i8751_vblank_hook.isnull())
@@ -4403,24 +4403,24 @@ void segas16b_state::atomicp(machine_config &config) // 10MHz CPU Clock verified
 
 INTERRUPT_GEN_MEMBER(dfjail_state::soundirq_cb)
 {
-	if (m_nmi_enable == true)
-	{
+	if (m_nmi_enable)
 		m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-	}
 }
 
 void dfjail_state::machine_start()
 {
 	segas16b_state::machine_start();
+
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_dac_data));
 }
 
 void dfjail_state::machine_reset()
 {
+	segas16b_state::machine_reset();
+
 	m_nmi_enable = false;
 	m_dac_data = 0;
-	segas16b_state::machine_reset();
 }
 
 void dfjail_state::dfjail(machine_config &config)
@@ -9993,11 +9993,6 @@ void segas16b_state::init_generic(segas16b_rom_board rom_board)
 	// create default read/write handlers
 	m_custom_io_r = read16_delegate(*this, FUNC(segas16b_state::standard_io_r));
 	m_custom_io_w = write16_delegate(*this, FUNC(segas16b_state::standard_io_w));
-
-	// save state
-	save_item(NAME(m_atomicp_sound_count));
-	save_item(NAME(m_mj_input_num));
-	save_item(NAME(m_mj_last_val));
 }
 
 
@@ -10011,6 +10006,7 @@ void segas16b_state::init_generic_5358() { init_generic(ROM_BOARD_171_5358); }
 void segas16b_state::init_generic_5521() { init_generic(ROM_BOARD_171_5521); }
 void segas16b_state::init_generic_5704() { init_generic(ROM_BOARD_171_5704); }
 void segas16b_state::init_generic_5797() { init_generic(ROM_BOARD_171_5797); }
+
 void segas16b_state::init_generic_korean()
 {
 	init_generic(ROM_BOARD_KOREAN);
@@ -10020,24 +10016,28 @@ void segas16b_state::init_generic_korean()
 	m_atomicp_sound_divisor = 1;
 	m_segaic16vid->m_display_enable = 1;
 
+	save_item(NAME(m_atomicp_sound_count));
+
 	// allocate a sound timer
 	emu_timer *timer = timer_alloc(FUNC(segas16b_state::atomicp_sound_irq), this);
 	timer->adjust(attotime::from_hz(10000), 0, attotime::from_hz(10000));
 }
+
 void segas16b_state::init_lockonph()
 {
 	init_generic(ROM_BOARD_KOREAN);
 
 	// configure special behaviors for the Korean boards
 	m_disable_screen_blanking = true;
-	m_atomicp_sound_divisor = 1;
 	m_segaic16vid->m_display_enable = 1;
 
 	m_spritepalbase = 0x800; // tiles are 4bpp so sprite base is 0x800 instead of 0x400
 }
+
 void segas16b_state::init_generic_bootleg()
 {
 	init_generic(ROM_BOARD_KOREAN);
+
 	m_disable_screen_blanking = true;
 	m_segaic16vid->m_display_enable = 1;
 }
@@ -10146,6 +10146,9 @@ void segas16b_state::init_sjryuko_5358_small()
 	m_custom_io_r = read16_delegate(*this, FUNC(segas16b_state::sjryuko_custom_io_r));
 	m_custom_io_w = write16_delegate(*this, FUNC(segas16b_state::sjryuko_custom_io_w));
 	m_tilemap_type = segaic16_video_device::TILEMAP_16B_ALT;
+
+	save_item(NAME(m_mj_input_num));
+	save_item(NAME(m_mj_last_val));
 }
 
 void segas16b_state::init_timescan_5358_small()

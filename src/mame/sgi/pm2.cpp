@@ -2,13 +2,12 @@
 // copyright-holders:Patrick Mackinlay
 
 /*
- * SGI IRIS 1400/1500 PM2 processor board
+ * SGI IRIS PM2 processor board
  *
  * Sources:
  *  -
  *
  * TODO:
- *  - keyboard
  *  - mouse
  *  - memory parity
  *  - serial flow control
@@ -20,14 +19,19 @@
 
 #include "pm2.h"
 #include "pm2_mmu.h"
+#include "iris_kbd.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/mc68681.h"
 #include "machine/input_merger.h"
+#include "machine/mc68681.h"
 
-#define VERBOSE 0
+#include "emupal.h"
+
+//#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
+
+namespace {
 
 enum status_mask : u16
 {
@@ -66,7 +70,7 @@ public:
 		, m_cpu(*this, "cpu")
 		, m_mmu(*this, "mmu")
 		, m_duart(*this, "duart%u", 0U)
-		, m_port(*this, "port%u", 0U)
+		, m_port(*this, "port%u", 1U)
 		, m_ram(*this, "ram")
 		, m_config(*this, "CONFIG")
 		, m_led(*this, "led")
@@ -82,6 +86,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	void gfx_mconfig(machine_config &config);
 
 	void mem_map(address_map &map) ATTR_COLD;
 
@@ -117,8 +123,6 @@ private:
 	bool m_installed;
 };
 
-DEFINE_DEVICE_TYPE_PRIVATE(SGI_PM2, device_multibus_interface, sgi_pm2_device, "sgi_pm2", "Silicon Graphics PM2")
-
 void sgi_pm2_device::device_start()
 {
 	save_item(NAME(m_status));
@@ -147,8 +151,13 @@ void sgi_pm2_device::device_reset()
 		m_installed = true;
 	}
 
-	m_status = 0;
+	m_status = STATUS_EN0 | STATUS_EN1;
 	m_exception = 0x0f;
+}
+
+void keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("kbd", IRIS_KBD);
 }
 
 void sgi_pm2_device::device_add_mconfig(machine_config &config)
@@ -161,11 +170,13 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	m_mmu->error().set([this](int state) { m_cpu->trigger_bus_error(); });
 	m_cpu->set_current_mmu(m_mmu);
 
-	// multibus interrupt level 5
-	int_callback<5>().set_inputline(m_cpu, INPUT_LINE_IRQ5);
+	// Multibus interrupts
+	int_callback<1>().set_inputline(m_cpu, INPUT_LINE_IRQ1).invert();
+	int_callback<2>().set_inputline(m_cpu, INPUT_LINE_IRQ2).invert();
+	int_callback<5>().set_inputline(m_cpu, INPUT_LINE_IRQ5).invert();
 
-	input_merger_any_high_device &irq5(INPUT_MERGER_ANY_HIGH(config, "irq5"));
-	irq5.output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ6);
+	input_merger_any_high_device &irq6(INPUT_MERGER_ANY_HIGH(config, "irq6"));
+	irq6.output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ6);
 
 	/*
 	 * UART0: refresh timer (15us)
@@ -181,10 +192,10 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	 *  0x01 DTRA
 	 *  0x02 DTRB
 	 */
-	MC68681(config, m_duart[0], 3.6864_MHz_XTAL).irq_cb().set(irq5, FUNC(input_merger_any_high_device::in_w<0>));
-	MC68681(config, m_duart[1], 3.6864_MHz_XTAL).irq_cb().set(irq5, FUNC(input_merger_any_high_device::in_w<1>));
+	MC68681(config, m_duart[0], 3.6864_MHz_XTAL).irq_cb().set(irq6, FUNC(input_merger_any_high_device::in_w<0>));
+	MC68681(config, m_duart[1], 3.6864_MHz_XTAL).irq_cb().set(irq6, FUNC(input_merger_any_high_device::in_w<1>));
 
-	RS232_PORT(config, m_port[0], default_rs232_devices, nullptr); // TODO: keyboard
+	RS232_PORT(config, m_port[0], keyboard_devices, nullptr);
 	RS232_PORT(config, m_port[1], default_rs232_devices, "terminal");
 	RS232_PORT(config, m_port[2], default_rs232_devices, nullptr);
 	RS232_PORT(config, m_port[3], default_rs232_devices, nullptr);
@@ -198,14 +209,16 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	m_port[1]->rxd_handler().set(m_duart[0], FUNC(scn2681_device::rx_b_w));
 	m_port[2]->rxd_handler().set(m_duart[1], FUNC(scn2681_device::rx_a_w));
 	m_port[3]->rxd_handler().set(m_duart[1], FUNC(scn2681_device::rx_b_w));
+
+	gfx_mconfig(config);
 }
 
 void sgi_pm2_device::device_config_complete()
 {
-	m_mmu.lookup()->set_space<0>(m_cpu, AS_PROGRAM);
-	m_mmu.lookup()->set_space<1>(m_cpu, m68000_device::AS_CPU_SPACE);
-	m_mmu.lookup()->set_space<2>(m_bus, AS_PROGRAM);
-	m_mmu.lookup()->set_space<3>(m_bus, AS_IO);
+	m_mmu.lookup()->set_space<0>(m_bus, AS_PROGRAM);
+	m_mmu.lookup()->set_space<1>(m_bus, AS_IO);
+	m_mmu.lookup()->set_space<2>(m_cpu, AS_PROGRAM);
+	m_mmu.lookup()->set_space<3>(m_cpu, m68000_device::AS_CPU_SPACE);
 }
 
 void sgi_pm2_device::mem_map(address_map &map)
@@ -322,6 +335,26 @@ void sgi_pm2_device::map_w(offs_t offset, u16 data, u16 mem_mask)
 		m_map[offset >> 11] = data;
 }
 
+static const gfx_layout sgi_pm2 =
+{
+	8, 16, 144, 1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 15 * 8, 14 * 8, 13 * 8, 12 * 8, 11 * 8, 10 * 8, 9 * 8, 8 * 8, 7 * 8, 6 * 8, 5 * 8, 4 * 8, 3 * 8, 2 * 8, 1 * 8, 0 * 8 },
+	8 * 16
+};
+
+static GFXDECODE_START(sgi_pm2_gfx)
+	GFXDECODE_ENTRY("prom1", 0x1b8c, sgi_pm2, 0, 1)
+GFXDECODE_END
+
+void sgi_pm2_device::gfx_mconfig(machine_config &config)
+{
+	// gfxdecode is only to show the font data in the tile viewer
+	PALETTE(config, "palette", palette_device::MONOCHROME);
+	GFXDECODE(config, "gfx", "palette", sgi_pm2_gfx);
+}
+
 ROM_START(sgi_pm2)
 	ROM_DEFAULT_BIOS("v36")
 	ROM_SYSTEM_BIOS(0, "v36", "V3.6 February 28, 1985")
@@ -376,3 +409,7 @@ ioport_constructor sgi_pm2_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(sgi_pm2);
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(SGI_PM2, device_multibus_interface, sgi_pm2_device, "sgi_pm2", "Silicon Graphics PM2")

@@ -394,12 +394,12 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 		break;
 
 		/* 0x03 to 0x08 INSTR Register */
-	case 0x03: instr_latch = ((instr_latch & 0x00ffffffffffULL) | (int64_t(data)&0xff)<<40); LOG("%s",string_format("ES5510: Host Write INSTR latch[5] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x04: instr_latch = ((instr_latch & 0xff00ffffffffULL) | (int64_t(data)&0xff)<<32); LOG("%s",string_format("ES5510: Host Write INSTR latch[4] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x05: instr_latch = ((instr_latch & 0xffff00ffffffULL) | (int64_t(data)&0xff)<<24); LOG("%s",string_format("ES5510: Host Write INSTR latch[3] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x06: instr_latch = ((instr_latch & 0xffffff00ffffULL) | (int64_t(data)&0xff)<<16); LOG("%s",string_format("ES5510: Host Write INSTR latch[2] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x07: instr_latch = ((instr_latch & 0xffffffff00ffULL) | (int64_t(data)&0xff)<< 8); LOG("%s",string_format("ES5510: Host Write INSTR latch[1] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x08: instr_latch = ((instr_latch & 0xffffffffff00ULL) | (int64_t(data)&0xff)<< 0); LOG("%s",string_format("ES5510: Host Write INSTR latch[0] = %02x -> %012x\n", data, instr_latch).c_str()); break;
+	case 0x03: instr_latch = ((instr_latch & 0x00ffffffffffULL) | (int64_t(data)&0xff)<<40); LOG("ES5510: Host Write INSTR latch[5] = %02x -> %012x\n", data, instr_latch); break;
+	case 0x04: instr_latch = ((instr_latch & 0xff00ffffffffULL) | (int64_t(data)&0xff)<<32); LOG("ES5510: Host Write INSTR latch[4] = %02x -> %012x\n", data, instr_latch); break;
+	case 0x05: instr_latch = ((instr_latch & 0xffff00ffffffULL) | (int64_t(data)&0xff)<<24); LOG("ES5510: Host Write INSTR latch[3] = %02x -> %012x\n", data, instr_latch); break;
+	case 0x06: instr_latch = ((instr_latch & 0xffffff00ffffULL) | (int64_t(data)&0xff)<<16); LOG("ES5510: Host Write INSTR latch[2] = %02x -> %012x\n", data, instr_latch); break;
+	case 0x07: instr_latch = ((instr_latch & 0xffffffff00ffULL) | (int64_t(data)&0xff)<< 8); LOG("ES5510: Host Write INSTR latch[1] = %02x -> %012x\n", data, instr_latch); break;
+	case 0x08: instr_latch = ((instr_latch & 0xffffffffff00ULL) | (int64_t(data)&0xff)<< 0); LOG("ES5510: Host Write INSTR latch[0] = %02x -> %012x\n", data, instr_latch); break;
 
 		/* 0x09 to 0x0b DIL Register (r/o) */
 
@@ -473,7 +473,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 		break;
 
 	case 0x80: /* Read select - GPR + INSTR */
-		LOG("%s",string_format("ES5510: Host Read INSTR+GPR %02x (%s): %012x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & 0xffffffffffffULL, gpr[data] & 0xffffff, gpr[data]).c_str());
+		LOG("ES5510: Host Read INSTR+GPR %02x (%s): %012x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & 0xffffffffffffULL, gpr[data] & 0xffffff, gpr[data]);
 
 		/* Check if an INSTR address is selected */
 		if (data < 0xa0) {
@@ -494,7 +494,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 	case 0xc0: /* Write select - INSTR */
 #if VERBOSE
 		DESCRIBE_INSTR(buf, instr_latch, gpr[data], nullptr, nullptr, nullptr, nullptr);
-		LOG("%s",string_format("ES5510: Host Write INSTR %02x %012x: %s\n", data, instr_latch & 0xffffffffffffULL, buf).c_str());
+		LOG("ES5510: Host Write INSTR %02x %012x: %s\n", data, instr_latch & 0xffffffffffffULL, buf);
 #endif
 		if (data < 0xa0) {
 			instr[data] = instr_latch & 0xffffffffffffULL;
@@ -504,7 +504,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 	case 0xe0: /* Write select - GPR + INSTR */
 #if VERBOSE
 		DESCRIBE_INSTR(buf, instr_latch, gpr_latch, nullptr, nullptr, nullptr, nullptr);
-		LOG("%s",string_format("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, util::sext(gpr_latch, 24), buf).c_str());
+		LOG("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, util::sext(gpr_latch, 24), buf);
 #endif
 		if (data < 0xa0) {
 			instr[data] = instr_latch;

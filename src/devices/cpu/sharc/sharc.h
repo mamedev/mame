@@ -282,6 +282,7 @@ private:
 		opcode_func handler;
 	};
 	static const SHARC_OP s_sharc_opcode_table[];
+	static const size_t s_num_ops;
 
 	struct ASTAT_DRC
 	{
@@ -332,6 +333,8 @@ private:
 		uint32_t curlcntr;
 		uint32_t lcntr;
 		uint8_t extdma_shift;
+		uint32_t iop_write_num;
+		uint32_t iop_data;
 
 		/* Data Address Generator (DAG) */
 		SHARC_DAG dag1;     // (DM bus)

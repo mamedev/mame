@@ -875,9 +875,9 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
 
 	VPRINTF("memory_view::install_read_before_time(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -897,9 +897,9 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
 
 	VPRINTF("memory_view::install_read_before_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -919,9 +919,9 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
 
 	VPRINTF("memory_view::install_read_after_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -943,9 +943,9 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
 
 	VPRINTF("memory_view::install_write_before_time(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -965,9 +965,9 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
 
 	VPRINTF("memory_view::install_write_before_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -987,9 +987,9 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
 
 	VPRINTF("memory_view::install_write_after_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1010,9 +1010,9 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
 
 	VPRINTF("memory_view::install_readwrite_before_time(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1034,9 +1034,9 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
 
 	VPRINTF("memory_view::install_readwrite_before_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,
@@ -1058,9 +1058,9 @@ template<int Level, int Width, int AddrShift> void memory_view_entry_specific<Le
 {
 	auto *cpu = dynamic_cast<cpu_device *>(&m_view.m_device);
 	if (!cpu)
-		fatalerror("Attempted to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-cpu device '%s'\n", m_view.m_device.tag());
 	if (!cpu->cpu_is_interruptible())
-		fatalerror("Attempted to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
+		fatalerror("Attempted set to a waitstate handler on non-interruptible cpu device '%s'\n", m_view.m_device.tag());
 
 	VPRINTF("memory_view::install_readwrite_after_delay(%*x-%*x mirror=%*x ws=%s)\n",
 			m_addrchars, addrstart, m_addrchars, addrend,

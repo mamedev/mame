@@ -130,7 +130,7 @@ out:
 #include "twincobr.h"
 #include "toaplipt.h"
 
-#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms320c1x/tms320c1x.h"
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "sound/ymopl.h"
@@ -251,7 +251,7 @@ void wardner_state::sound_io_map(address_map &map)
 }
 
 
-/***************************** TMS32010 Memory Map **************************/
+/***************************** TMS320C10 Memory Map **************************/
 
 void wardner_state::dsp_program_map(address_map &map)
 {
@@ -405,7 +405,7 @@ void wardner_state::wardner(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &wardner_state::sound_program_map);
 	audiocpu.set_addrmap(AS_IO, &wardner_state::sound_io_map);
 
-	TMS32010(config, m_dsp, XTAL(14'000'000));       // 14MHz Crystal CLKin
+	TMS320C10(config, m_dsp, XTAL(14'000'000));      // 14MHz Crystal CLKin
 	m_dsp->set_addrmap(AS_PROGRAM, &wardner_state::dsp_program_map);
 	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
 	m_dsp->bio().set(FUNC(wardner_state::twincobr_bio_r));

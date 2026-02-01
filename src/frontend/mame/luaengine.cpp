@@ -34,7 +34,9 @@
 #include <algorithm>
 #include <condition_variable>
 #include <cstring>
+#include <locale>
 #include <mutex>
+#include <sstream>
 #include <thread>
 
 
@@ -1351,47 +1353,68 @@ void lua_engine::initialize()
 
 	auto core_options_entry_type = sol().registry().new_usertype<core_options::entry>("core_options_entry", "new", sol::no_constructor);
 	core_options_entry_type.set("value", sol::overload(
-		[this](core_options::entry &e, bool val) {
-			if(e.type() != core_options::option_type::BOOLEAN)
-				luaL_error(m_lua_state, "Cannot set option to wrong type");
+		[] (core_options::entry &e, sol::this_state s, bool val)
+		{
+			if (e.type() != core_options::option_type::BOOLEAN)
+				luaL_error(s, "Cannot set option to wrong type");
 			else
-				e.set_value(val ? "1" : "0", OPTION_PRIORITY_CMDLINE);
+				e.set_value(val ? 1 : 0, OPTION_PRIORITY_CMDLINE);
 		},
-		[this](core_options::entry &e, float val) {
-			if(e.type() != core_options::option_type::FLOAT)
-				luaL_error(m_lua_state, "Cannot set option to wrong type");
-			else
-				e.set_value(string_format("%f", val), OPTION_PRIORITY_CMDLINE);
-		},
-		[this](core_options::entry &e, int val) {
-			if(e.type() != core_options::option_type::INTEGER)
-				luaL_error(m_lua_state, "Cannot set option to wrong type");
-			else
-				e.set_value(string_format("%d", val), OPTION_PRIORITY_CMDLINE);
-		},
-		[this](core_options::entry &e, const char *val) {
-			if(e.type() != core_options::option_type::STRING && e.type() != core_options::option_type::PATH && e.type() != core_options::option_type::MULTIPATH)
-				luaL_error(m_lua_state, "Cannot set option to wrong type");
+		[] (core_options::entry &e, sol::this_state s, int val)
+		{
+			if (e.type() != core_options::option_type::INTEGER)
+				luaL_error(s, "Cannot set option to wrong type");
 			else
 				e.set_value(val, OPTION_PRIORITY_CMDLINE);
 		},
-		[this](core_options::entry &e) -> sol::object {
+		[] (core_options::entry &e, sol::this_state s, float val)
+		{
+			if (e.type() != core_options::option_type::FLOAT)
+				luaL_error(s, "Cannot set option to wrong type");
+			else
+				e.set_value(val, OPTION_PRIORITY_CMDLINE);
+		},
+		[] (core_options::entry &e, sol::this_state s, const char *val)
+		{
+			if (e.type() != core_options::option_type::STRING && e.type() != core_options::option_type::PATH && e.type() != core_options::option_type::MULTIPATH)
+				luaL_error(s, "Cannot set option to wrong type");
+			else
+				e.set_value(val, OPTION_PRIORITY_CMDLINE);
+		},
+		[] (core_options::entry &e, sol::this_state s) -> sol::object
+		{
 			if (e.type() == core_options::option_type::INVALID)
 				return sol::lua_nil;
-			switch(e.type())
+			switch (e.type())
 			{
 				case core_options::option_type::BOOLEAN:
-					return sol::make_object(sol(), atoi(e.value()) != 0);
+					return sol::make_object(s, e.bool_value());
 				case core_options::option_type::INTEGER:
-					return sol::make_object(sol(), atoi(e.value()));
+					return sol::make_object(s, e.int_value());
 				case core_options::option_type::FLOAT:
-					return sol::make_object(sol(), atof(e.value()));
+					return sol::make_object(s, e.float_value());
 				default:
-					return sol::make_object(sol(), e.value());
+					return sol::make_object(s, e.value());
 			}
 		}));
 	core_options_entry_type.set("description", &core_options::entry::description);
-	core_options_entry_type.set("default_value", &core_options::entry::default_value);
+	core_options_entry_type.set("default_value",
+		[](core_options::entry &e, sol::this_state s) -> sol::object
+		{
+			if (e.type() == core_options::option_type::INVALID)
+				return sol::lua_nil;
+			switch (e.type())
+			{
+			case core_options::option_type::BOOLEAN:
+				return sol::make_object(s, e.bool_default_value());
+			case core_options::option_type::INTEGER:
+				return sol::make_object(s, e.int_default_value());
+			case core_options::option_type::FLOAT:
+				return sol::make_object(s, e.float_default_value());
+			default:
+				return sol::make_object(s, e.default_value());
+			}
+		});
 	core_options_entry_type.set("minimum", &core_options::entry::minimum);
 	core_options_entry_type.set("maximum", &core_options::entry::maximum);
 	core_options_entry_type.set("has_range", &core_options::entry::has_range);
@@ -1730,10 +1753,10 @@ void lua_engine::initialize()
 			{
 				float const sc_width(sdev.visible_area().width());
 				float const sc_height(sdev.visible_area().height());
-				x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
-				y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
-				x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
-				y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
+				x1 = std::clamp(x1, 0.0F, sc_width) / sc_width;
+				y1 = std::clamp(y1, 0.0F, sc_height) / sc_height;
+				x2 = std::clamp(x2, 0.0F, sc_width) / sc_width;
+				y2 = std::clamp(y2, 0.0F, sc_height) / sc_height;
 				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
 				if (!fgcolor)
 					fgcolor = ui.colors().text_color();
@@ -1747,10 +1770,10 @@ void lua_engine::initialize()
 			{
 				float const sc_width(sdev.visible_area().width());
 				float const sc_height(sdev.visible_area().height());
-				x1 = std::clamp(x1, 0.0f, sc_width) / sc_width;
-				y1 = std::clamp(y1, 0.0f, sc_height) / sc_height;
-				x2 = std::clamp(x2, 0.0f, sc_width) / sc_width;
-				y2 = std::clamp(y2, 0.0f, sc_height) / sc_height;
+				x1 = std::clamp(x1, 0.0F, sc_width) / sc_width;
+				y1 = std::clamp(y1, 0.0F, sc_height) / sc_height;
+				x2 = std::clamp(x2, 0.0F, sc_width) / sc_width;
+				y2 = std::clamp(y2, 0.0F, sc_height) / sc_height;
 				if (!color)
 					color = mame_machine_manager::instance()->ui().colors().text_color();
 				sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(*color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -1765,7 +1788,7 @@ void lua_engine::initialize()
 				float x = 0;
 				if (xobj.is<float>())
 				{
-					x = std::clamp(xobj.as<float>(), 0.0f, sc_width) / sc_width;
+					x = std::clamp(xobj.as<float>(), 0.0F, sc_width) / sc_width;
 				}
 				else if (xobj.is<char const *>())
 				{
@@ -1782,7 +1805,7 @@ void lua_engine::initialize()
 					luaL_error(m_lua_state, "Error in param 1 to draw_text");
 					return;
 				}
-				y = std::clamp(y, 0.0f, sc_height) / sc_height;
+				y = std::clamp(y, 0.0F, sc_height) / sc_height;
 				mame_ui_manager &ui(mame_machine_manager::instance()->ui());
 				if (!fgcolor)
 					fgcolor = ui.colors().text_color();
@@ -1791,7 +1814,7 @@ void lua_engine::initialize()
 				ui.draw_text_full(
 						sdev.container(),
 						msg,
-						x, y, (1.0f - x),
+						x, y, (1.0F - x),
 						justify, ui::text_layout::word_wrapping::WORD,
 						mame_ui_manager::OPAQUE_, *fgcolor, *bgcolor);
 			});

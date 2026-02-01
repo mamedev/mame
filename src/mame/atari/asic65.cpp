@@ -475,7 +475,7 @@ u16 asic65_device::io_r()
 
 /*************************************
  *
- *  Read/write handlers for TMS32015
+ *  Read/write handlers for TMS320C15
  *
  *************************************/
 
@@ -528,7 +528,7 @@ int asic65_device::get_bio()
 
 /*************************************
  *
- *  Address maps for TMS32015
+ *  Address maps for TMS320C15
  *
  *************************************/
 
@@ -552,7 +552,7 @@ void asic65_device::asic65_io_map(address_map &map)
 void asic65_device::device_add_mconfig(machine_config &config)
 {
 	/* ASIC65 */
-	TMS32010(config, m_ourcpu, 20000000);
+	TMS320C10(config, m_ourcpu, 20'000'000);
 	m_ourcpu->set_addrmap(AS_PROGRAM, &asic65_device::asic65_program_map);
 	m_ourcpu->set_addrmap(AS_IO, &asic65_device::asic65_io_map);
 	m_ourcpu->bio().set(FUNC(asic65_device::get_bio));

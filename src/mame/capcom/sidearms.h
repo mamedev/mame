@@ -5,7 +5,9 @@
 
 #pragma once
 
+#include "machine/timer.h"
 #include "video/bufsprite.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -24,17 +26,16 @@ public:
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_ports(*this, { { "SYSTEM", "P1", "P2", "DSW0", "DSW1" } })
-	{
-	}
+	{ }
 
 	void sidearms(machine_config &config);
 	void turtship(machine_config &config);
 	void whizz(machine_config &config);
 
-	void init_dyger();
-	void init_sidearms();
-	void init_whizz();
-	void init_turtship();
+	void init_sidearms() { m_gameid = 0; }
+	void init_turtship() { m_gameid = 1; }
+	void init_dyger() { m_gameid = 2; }
+	void init_whizz() { m_gameid = 3; }
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -75,8 +76,9 @@ private:
 	void star_scrollx_w(uint8_t data);
 	void star_scrolly_w(uint8_t data);
 
-	uint8_t turtship_ports_r(offs_t offset);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 
+	uint8_t turtship_ports_r(offs_t offset);
 	void whizz_bankswitch_w(uint8_t data);
 
 	virtual void machine_start() override ATTR_COLD;
