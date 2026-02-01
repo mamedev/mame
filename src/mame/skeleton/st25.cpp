@@ -88,6 +88,7 @@ private:
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 
+	void io5_w(uint8_t data);
 	void p2_w(uint8_t data);
 };
 
@@ -105,7 +106,7 @@ void st25_state::program_map(address_map &map)
 	map(0xa0000, 0xbffff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write));
 	// O6 NC
 	map(0xc0000, 0xdffff).noprw();
-	// O7 unpopulated footprint
+	// O7 unpopulated footprint ICE3
 	map(0xe0000, 0xfbfff).noprw();
 	// internal to CPU
 	map(0xfc000, 0xfffff).rom().region("maskrom", 0);
@@ -115,14 +116,19 @@ void st25_state::io_map(address_map &map)
 {
 	///ICC3 74HC138 inputs A13-15
 
-	map(0x0000, 0x1fff).noprw(); // service keyboard strobe
-	map(0x2000, 0x3fff).noprw();
-	map(0x4000, 0x5fff).noprw();
-	map(0x6000, 0x7fff).noprw();
-	map(0x8000, 0x9fff).noprw();
-	map(0xa000, 0xbfff).noprw();
-	map(0xc000, 0xdfff).noprw();
-	map(0xe000, 0xffff).noprw();
+	map(0x0000, 0x1fff).noprw(); // Y0 service keyboard strobe
+	map(0x2000, 0x3fff).noprw(); // Y1 IOS load out
+	map(0x4000, 0x5fff).noprw(); // Y2 IOS load mot
+	map(0x6000, 0x7fff).noprw(); // Y3 IOS load in
+	map(0x8000, 0x9fff).noprw(); // Y4 ICB1B oscillator ?
+	map(0xa000, 0xbfff).rw(FUNC(st25_state::io5_w)); // Y5 Sound ST
+	map(0xc000, 0xdfff).noprw(); // Y6
+	map(0xe000, 0xffff).noprw(); // Y7
+}
+
+void st25_state::io5_w(uint8_t data)
+{
+	m_oki->st_w(1);
 }
 
 void st25_state::p2_w(uint8_t data)
