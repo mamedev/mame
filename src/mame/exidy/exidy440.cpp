@@ -446,6 +446,10 @@ void exidy440_state::machine_start()
 	uint8_t *rom = memregion("maincpu")->base();
 
 	subdevice<nvram_device>("nvram")->set_base(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
+
+	save_item(NAME(m_bank));
+	save_item(NAME(m_showdown_bank_select));
+	save_item(NAME(m_showdown_bank_offset));
 }
 
 void exidy440_state::machine_reset()
@@ -2084,6 +2088,8 @@ void topsecex_state::init_topsecex()
 	m_maincpu->space(AS_PROGRAM).install_read_port(0x2ec7, 0x2ec7, "IN4");
 
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x2ec1, 0x2ec1, write8smo_delegate(*this, FUNC(topsecex_state::topsecex_yscroll_w)));
+
+	save_item(NAME(m_topsecex_yscroll));
 }
 
 
