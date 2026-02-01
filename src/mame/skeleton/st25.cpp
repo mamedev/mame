@@ -85,7 +85,7 @@ public:
 
 private:
 	required_device<v25_device> m_maincpu;
-	required_device<m48t02_device> m_rtc;
+	required_device<m48t58_device> m_rtc;
 	required_device<okim6376_device> m_oki;
 	required_device<scn2681_device> m_duart;
 	required_device<hd44780_device> m_lcd;
@@ -107,8 +107,8 @@ void st25_state::program_map(address_map &map)
 	map(0x20000, 0x7ffff).rom().region("maincpu", 0x20000);
 	// O4, wrapped around
 	map(0x80000, 0x9ffff).rom().region("maincpu", 0x00000);
-	// O5, timekeeper on ROM module
-	map(0xa0000, 0xbffff).rw(m_rtc, FUNC(m48t02_device::read), FUNC(m48t02_device::write));
+	// O5, 8KB timekeeper on ROM module mirrored
+	map(0xa0000, 0xa1fff).rw(m_rtc, FUNC(m48t58_device::read), FUNC(m48t58_device::write)).mirror(0x1e000);
 	// O6 NC
 	map(0xc0000, 0xdffff).noprw();
 	// O7 unpopulated footprint ICE3
@@ -172,7 +172,7 @@ void st25_state::st25(machine_config &config)
 
 	m_maincpu->p2_out_cb().set(FUNC(st25_state::p2_w));
 
-	M48T02(config, m_rtc, 0); // ST M48T18-150PC1
+	M48T58(config, m_rtc, 0); // ST M48T18-150PC1
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL); // Philips SCC2692AC1N28
 
