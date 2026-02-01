@@ -181,14 +181,14 @@ void st25_state::st25(machine_config &config)
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(m_lcd, FUNC(hd44780_device::screen_update));
-	screen.set_size(6*16, 8*2);
+	screen.set_size(6*16, 8*1);
 	screen.set_visarea_full();
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
 
 	HD44780(config, m_lcd, 270'000);
-	m_lcd->set_lcd_size(2, 16);
+	m_lcd->set_lcd_size(1, 16);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
