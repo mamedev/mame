@@ -202,7 +202,7 @@ private:
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define MAIN_CLOCK 		(44.44_MHz_XTAL / 8) /* 5.555 Mhz */
+#define MAIN_CLOCK 		(44.444_MHz_XTAL / 8) /* 5.5555 Mhz */
 #define MASTER_CLOCK	(MAIN_CLOCK * 4)
 #define CTC_CLOCK		(2.4576_MHz_XTAL / 2)
 
