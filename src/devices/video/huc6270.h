@@ -15,6 +15,9 @@
 class huc6270_device : public device_t
 {
 public:
+	static constexpr u16 HUC6270_SPRITE     = 0x0100;    // sprite colour information
+	static constexpr u16 HUC6270_BACKGROUND = 0x0000;    // background colour information
+
 	// construction/destruction
 	huc6270_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
@@ -30,7 +33,7 @@ public:
 	void write16(offs_t offset, u16 data);
 
 	u16 next_pixel();
-	inline u16 time_until_next_event()
+	u16 time_until_next_event()
 	{
 		return m_horz_to_go * 8 + m_horz_steps;
 	}
@@ -38,14 +41,11 @@ public:
 	void vsync_changed(int state);
 	void hsync_changed(int state);
 
-	static const u16 HUC6270_SPRITE     = 0x0100;    // sprite colour information
-	static const u16 HUC6270_BACKGROUND = 0x0000;    // background colour information
-
 	// pcfx can read AR thru some buffer latch
 	u8 get_ar(offs_t offset) { return m_register_index; }
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
