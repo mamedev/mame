@@ -47,6 +47,7 @@ illuminated). The synth is unresponsive while this is happening.
 */
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/7474.h"
 #include "machine/pit8253.h"
@@ -61,7 +62,10 @@ illuminated). The synth is unresponsive while this is happening.
 #include "sound/va_vca.h"
 #include "sound/va_vcf.h"
 #include "video/pwm.h"
+
 #include "speaker.h"
+
+#include "corestr.h"
 
 #include "sequential_prophet5.lh"
 
@@ -145,15 +149,25 @@ public:
 	prophet5_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, device_sound_interface *noise) ATTR_COLD;
 	prophet5_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
 
+	auto volume_changed_cb() { return m_volume_changed_cb.bind(); }
+
+	double volume_trimmer_r() const;
+
 	void gate_w(int state);
 	void filt_sh_w(double cv);
 	void filt_sum_w(double cv);
 	void res_w(double cv);
 
 	DECLARE_INPUT_CHANGED_MEMBER(filter_trimmer_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(volume_trimmer_changed) { m_volume_changed_cb(0); }
+
+	const char *trimmer_name_volume() const ATTR_COLD { return m_volume_name.c_str(); }
+	const char *trimmer_name_filt_scale() const ATTR_COLD { return m_filt_scale_name.c_str(); }
+	const char *trimmer_name_filt_offset() const ATTR_COLD { return m_filt_offset_name.c_str(); }
 
 protected:
 	void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	ioport_constructor device_input_ports() const override ATTR_COLD;
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
 
@@ -162,20 +176,41 @@ protected:
 private:
 	void update_filter_freq();
 
-	const std::string m_filt_scale_tag;
-	const std::string m_filt_offset_tag;
+	const std::string m_volume_name;
+	const std::string m_filt_scale_name;
+	const std::string m_filt_offset_name;
 
 	device_sound_interface *const m_noise;
 	sound_stream *m_stream = nullptr;
 
 	required_device<cem3320_lpf4_device> m_vcf;
 	required_device<ca3280_vca_lin_device> m_vca;
+	required_ioport m_volume;
+	devcb_write8 m_volume_changed_cb;
 	required_ioport m_filt_scale;
 	required_ioport m_filt_offset;
 
 	double m_filt_sh_cv = 0.0;
 	double m_filt_sum_cv = 0.0;
 };
+
+INPUT_PORTS_START(prophet5_voice_trimmers)
+	// Default values are based on the calibration instructions in the service manual.
+
+	const prophet5_voice_device &voice = dynamic_cast<const prophet5_voice_device &>(owner);
+
+	PORT_START("trimmer_volume")
+	PORT_ADJUSTER(100, voice.trimmer_name_volume())
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_voice_device::volume_trimmer_changed), 0);
+
+	PORT_START("trimmer_filt_scale")
+	PORT_ADJUSTER(14, voice.trimmer_name_filt_scale())
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_voice_device::filter_trimmer_changed), 0)
+
+	PORT_START("trimmer_filt_offset")
+	PORT_ADJUSTER(82, voice.trimmer_name_filt_offset())
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(prophet5_voice_device::filter_trimmer_changed), 0)
+INPUT_PORTS_END
 
 }  // anonymous namespace
 
@@ -184,13 +219,16 @@ DEFINE_DEVICE_TYPE(PROPHET5_VOICE, prophet5_voice_device, "prophet5_voice", "Pro
 prophet5_voice_device::prophet5_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, device_sound_interface *noise)
 	: device_t(mconfig, PROPHET5_VOICE, tag, owner, 0)
 	, device_sound_interface(mconfig, *this)
-	, m_filt_scale_tag(util::string_format(":trimmer_%s_filt_scale", basetag()))
-	, m_filt_offset_tag(util::string_format(":trimmer_%s_filt_offset", basetag()))
+	, m_volume_name(util::string_format("%s TRIMMER: VOLUME", strmakeupper(basetag())))
+	, m_filt_scale_name(util::string_format("%s TRIMMER: FILT SCALE", strmakeupper(basetag())))
+	, m_filt_offset_name(util::string_format("%s TRIMMER: FILT OFFSET", strmakeupper(basetag())))
 	, m_noise(noise)
 	, m_vcf(*this, "vcf")
 	, m_vca(*this, "vca")
-	, m_filt_scale(*this, m_filt_scale_tag.c_str())
-	, m_filt_offset(*this, m_filt_offset_tag.c_str())
+	, m_volume(*this, "trimmer_volume")
+	, m_volume_changed_cb(*this)
+	, m_filt_scale(*this, "trimmer_filt_scale")
+	, m_filt_offset(*this, "trimmer_filt_offset")
 {
 }
 
@@ -218,6 +256,11 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 		.add_route(0, *this, 1.0);
 }
 
+ioport_constructor prophet5_voice_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(prophet5_voice_trimmers);
+}
+
 void prophet5_voice_device::device_start()
 {
 	save_item(NAME(m_filt_sh_cv));
@@ -233,6 +276,12 @@ void prophet5_voice_device::device_reset()
 void prophet5_voice_device::sound_stream_update(sound_stream &stream)
 {
 	stream.copy(0, 0);
+}
+
+double prophet5_voice_device::volume_trimmer_r() const
+{
+	constexpr double R_VOL_MAX = RES_K(25);  // trimmer R4529
+	return R_VOL_MAX * normalized(m_volume);
 }
 
 void prophet5_voice_device::gate_w(int state)
@@ -308,7 +357,6 @@ public:
 	void cv_w(offs_t cv_index, double cv);
 
 	DECLARE_INPUT_CHANGED_MEMBER(filter_cv_in_changed) { update_filter_sum_cv(); }
-	DECLARE_INPUT_CHANGED_MEMBER(voice_volume_changed) { update_voice_volume(); }
 	DECLARE_INPUT_CHANGED_MEMBER(master_volume_changed) { update_master_volume(); }
 
 protected:
@@ -327,7 +375,6 @@ private:
 	required_device<filter_rc_device> m_parasitic_filter;  // C4183's "parasitic" effect on the voice outputs.
 	required_device<ca3280_vca_device> m_noise_vca;  // U430B (CA3280)
 	required_device<ca3280_vca_lin_device> m_master_vol_vca;  // U479B (CA3280)
-	required_ioport_array<5> m_voice_vol;  // R4529 on voice 1.
 	required_ioport m_master_vol_pot;  // R113
 	required_ioport m_amp_cv_in_connected;
 	required_ioport m_amp_cv_in;  // J7
@@ -373,7 +420,6 @@ prophet5_audio_device::prophet5_audio_device(const machine_config &mconfig, cons
 	, m_parasitic_filter(*this, "parasitic_filter")
 	, m_noise_vca(*this, "noise_vca")
 	, m_master_vol_vca(*this, "master_volume_vca")
-	, m_voice_vol(*this, ":trimmer_voice_%u_volume", 0U)
 	, m_master_vol_pot(*this, ":pot_volume")
 	, m_amp_cv_in_connected(*this, ":cv_in_amp_connected")
 	, m_amp_cv_in(*this, ":cv_in_amp")
@@ -412,6 +458,7 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 		PROPHET5_VOICE(config, m_voices[i], m_noise_vca)
 			.add_route(0, "voice_summer", 1.0)
 			.add_route(0, "parasitic_filter_mixer", 1.0);
+		m_voices[i]->volume_changed_cb().set([this] (u8 data) { update_voice_volume(); });
 	}
 
 	// A440 tone generator. The LPF's parameters can vary, and are computed in
@@ -602,9 +649,7 @@ void prophet5_audio_device::update_voice_volume()
 	// sources as disconnected and all voltage sources as grounded, and compute
 	// the resistance to ground from the non-grounded side of the capacitor.
 
-	constexpr double R_VOL_MAX = RES_K(25);  // Trimmers: R4529, R4528, R4567, R4526, R4525
 	constexpr double R_VOICE = RES_K(39);  // R4569, R4568, R4567, R4566, R4565
-
 	constexpr double R4498 = RES_K(10);
 	constexpr double R4519 = RES_K(20);
 	constexpr double R_A440 = R4498 + R4519;
@@ -614,7 +659,7 @@ void prophet5_audio_device::update_voice_volume()
 	std::array<double, 5> r_input;  // Resistance from the buffer's input to each voice.
 	for (int i = 0; i < m_voices.size(); ++i)
 	{
-		r_vol[i] = R_VOL_MAX * normalized(m_voice_vol[i]);
+		r_vol[i] = m_voices[i]->volume_trimmer_r();
 		r_input[i] = R_VOICE + r_vol[i];
 	}
 
@@ -1652,35 +1697,6 @@ INPUT_PORTS_START(prophet5)
 	// An input of 0V has the same effect as the input not being connected.
 	PORT_ADJUSTER(0, "CV IN: FILTER")
 		PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::filter_cv_in_changed), 0)
-
-
-	static std::string voice_tag[5];
-	static std::string volume_name[5];
-	static std::string filt_scale_name[5];
-	static std::string filt_offset_name[5];
-
-	for (int i = 0; i < 5; ++i)
-	{
-		voice_tag[i] = util::string_format("%s:voice_%d", AUDIO_TAG, i);
-
-		// Default values are based on the calibration instructions in the
-		// service manual.
-
-		volume_name[i] = util::string_format("TRIMMER: VOICE %d VOLUME", i);
-		PORT_START(util::string_format("trimmer_voice_%d_volume", i).c_str())
-		PORT_ADJUSTER(100, volume_name[i].c_str())
-			PORT_CHANGED_MEMBER(AUDIO_TAG, FUNC(prophet5_audio_device::voice_volume_changed), i);
-
-		filt_scale_name[i] = util::string_format("TRIMMER: VOICE %d FILT SCALE", i);
-		PORT_START(util::string_format("trimmer_voice_%d_filt_scale", i).c_str())
-		PORT_ADJUSTER(14, filt_scale_name[i].c_str())
-			PORT_CHANGED_MEMBER(voice_tag[i].c_str(), FUNC(prophet5_voice_device::filter_trimmer_changed), i)
-
-		filt_offset_name[i] = util::string_format("TRIMMER: VOICE %d FILT OFFSET", i);
-		PORT_START(util::string_format("trimmer_voice_%d_filt_offset", i).c_str())
-		PORT_ADJUSTER(82, filt_offset_name[i].c_str())
-			PORT_CHANGED_MEMBER(voice_tag[i].c_str(), FUNC(prophet5_voice_device::filter_trimmer_changed), i)
-	}
 INPUT_PORTS_END
 
 ROM_START(prophet5rev30)
