@@ -328,7 +328,7 @@ void coco3_state::coco3(machine_config &config)
 
 	// software lists
 	SOFTWARE_LIST(config, "cart_list").set_original("coco_cart").set_filter("COCO3");
-
+	SOFTWARE_LIST(config, "cass_list").set_original("coco_cass").set_filter("COCO3");
 	SOFTWARE_LIST(config, "flop_list").set_original("coco_flop").set_filter("COCO3");
 }
 
