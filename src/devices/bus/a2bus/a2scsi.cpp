@@ -81,7 +81,7 @@ void a2bus_scsi_device::device_add_mconfig(machine_config &config)
 		downcast<ncr5380_device &>(*device).drq_handler().set(*this, FUNC(a2bus_scsi_device::drq_w));
 	});
 
-//	SOFTWARE_LIST(config, "cd_apple_dev").set_original("apple_devcd");
+//  SOFTWARE_LIST(config, "cd_apple_dev").set_original("apple_devcd");
 }
 
 //-------------------------------------------------

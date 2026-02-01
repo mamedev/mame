@@ -10,7 +10,7 @@
 #define LOG_DATA        (1U << 2)
 #define LOG_UNSUPPORTED (1U << 3)
 
-#define VERBOSE 3
+//#define VERBOSE 3
 
 #include "logmacro.h"
 
@@ -26,7 +26,7 @@ nscsi_harddisk_device::nscsi_harddisk_device(const machine_config &mconfig, devi
 {
 	m_default_model_name =
 		" SEAGATE"
-        "          ST225N"
+		"          ST225N"
 		"1.00";
 }
 

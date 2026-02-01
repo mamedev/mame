@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+NOTES:
+- 3DO notoriously has no explicit region lock, but we may still opt-in for a sharedfeat later:
+\- Japanese games may require the kanji ROM (not present on USA/Europe systems);
+\- fz1j also has a switch for 240p mode (also available on other models via DIY mods), some SWs
+   aren't coded with it in mind so will either run at double speed or outright crash during
+   gameplay (e.g. Yuu Yuu Hakusho, Ultraman Powered);
+\- A bunch of PAL games will refuse to run on NTSC systems
+   (e.g. The Way of the Warrior, Wolfenstein 3D)
+\- OS will also boot from CD if it's newer than the one present in BIOS. This can cause issues on
+   later models with Anvil chipset, where the BIOS is newer instead (e.g. Road Rash, Bust a Move)
+- As per https://github.com/mamedev/mame/issues/10308#issuecomment-3779261350 several games have
+  multiple indices over a given track. These are intentionally omitted until we have a solution.
+
+-->
+<softwarelist name="3do" description="3DO CD-ROMs">
+
+	<!-- http://redump.org/disc/13798/ -->
+	<software name="cpquazar" supported="no">
+		<description>Captain Quazar (USA)</description>
+		<year>1996</year>
+		<publisher>The 3DO Company</publisher>
+		<info name="barcode" value="7 90561 02379 1"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="captain quazar (usa)" sha1="89614a3d92d839e50d2f49586a500a7e87550870"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/46905/ -->
+	<software name="cowcasn" supported="no">
+		<description>Cowboy Casino (USA)</description>
+		<year>1994</year>
+		<publisher>IntelliPlay</publisher>
+		<info name="barcode" value="7 69139 84119 8"/>
+		<info name="serial" value="SCC-01-3DO"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="cowboy casino (usa)" sha1="de6bec33f1e71f401be0c166fdb6a8a8129fd6a4"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/47940/ -->
+	<software name="espnfit" supported="no">
+		<description>ESPN Fitness Pros: Step Aerobics (USA)</description>
+		<year>1994</year>
+		<publisher>IntelliPlay</publisher>
+		<info name="alt_title" value="ESPN Step Aerobics"/>
+		<info name="barcode" value="7 69139 84500 4"/>
+		<info name="serial" value="SEF-01-3DO"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="espn fitness pros - step aerobics (usa)" sha1="2edafbf67c30d57b6729e585b44ea513f4057e31"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/58378/ -->
+	<software name="vpreika" supported="no">
+		<description>Virtual Puppet Reika (Japan)</description>
+		<year>1994</year>
+		<publisher>Kuki</publisher>
+		<info name="alt_title" value="バーチャル・パペット レイカ"/>
+		<info name="barcode" value="4 984824 047532"/>
+		<info name="jasrac_id" value="V-941396"/>
+		<info name="release" value="19941007"/>
+		<info name="serial" value="FZ-SJ2451"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="virtual puppet reika (japan)" sha1="4ce00a80bcda8fd6db17c92d60f4bff8f8c2f8d5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<!-- http://redump.org/disc/89371/ -->
+	<software name="virtuoso" supported="no">
+		<description>Virtuoso (USA)</description>
+		<year>1995</year>
+		<publisher>Data East</publisher>
+		<info name="barcode" value="0 13252 01900 3"/>
+		<info name="developer" value="Elite Systems"/>
+		<info name="serial" value="DE1900"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="virtuoso (usa)" sha1="53dae9f7bc34f28aeb27ac4060fdc7c12ca54dd9"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

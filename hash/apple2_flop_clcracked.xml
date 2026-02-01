@@ -2122,19 +2122,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cestlvie">
-		<description>C'est La Vie (cleanly cracked)</description>
-		<year>1983</year>
-		<publisher>Adventure International</publisher>
-		<info name="release" value="2018-04-07"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="c'est la vie (4am crack).dsk" size="143360" crc="b16f4e64" sha1="c491578b32e6d845c80e5331a611ade99510b097" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="chmpbase">
 		<description>Championship Baseball (cleanly cracked)</description>
 		<year>1986</year>
@@ -3526,26 +3513,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="early elementary (compu-tations) (4am crack).dsk" size="143360" crc="746ac193" sha1="80ff53c61ccb7eb6707845dd434991c1c9c1a813" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="equakesf">
-		<description>Earthquake San Francisco 1906 (cleanly cracked)</description>
-		<year>1982</year>
-		<publisher>Adventure International</publisher>
-		<info name="release" value="2018-10-10"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="earthquake san francisco 1906 (4am crack) side a.dsk" size="143360" crc="93119894" sha1="e46eebbd8797f966f1c94277f10df0402b58bc48" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="earthquake san francisco 1906 (4am crack) side b.dsk" size="143360" crc="eab2180c" sha1="f49986c6ab5d57b5a1fa81069a592c621dd30b57" />
 			</dataarea>
 		</part>
 	</software>
@@ -5343,7 +5310,6 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Data East</publisher>
 		<info name="release" value="2018-08-29"/>
-		<!-- "Centauri Alliance" is a 1990 role-playing game by Michael Cranford, Tom Wilcox, Diane Wilcox, Gene Hamm, and Nancy Morris, and distributed by Brøderbund Software. -->
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
@@ -12996,26 +12962,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="kngfcts">
-		<description>The Kingdom of Facts (cleanly cracked)</description>
-		<year>1984</year>
-		<publisher>Adventure International</publisher>
-		<info name="release" value="2017-12-01"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Side A"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the kingdom of facts (4am crack) side a.dsk" size="143360" crc="f406b7d8" sha1="e5f09624fca74adb9478563cbd19d4763be8a3d1" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Side B"/>
-			<dataarea name="flop" size="143360">
-				<rom name="the kingdom of facts (4am crack) side b.dsk" size="143360" crc="e670fc8c" sha1="0d599b1c2d80dfa5a65592a6f0f8314bee961e74" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="scpu10rs">
 		<description>The Science Professor Unit 10: Resources (cleanly cracked)</description>
 		<year>1986</year>
@@ -13711,19 +13657,6 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="witness r13 (4am crack).dsk" size="143360" crc="9b6f2435" sha1="635f4d506d55f6cf0d2ce956efbcc2234f157720" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="crscrowl">
-		<description>The Curse of Crowley Manor (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Adventure International</publisher>
-		<info name="release" value="2018-10-13"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the curse of crowley manor (4am crack).dsk" size="143360" crc="35dffa95" sha1="362bad035efea6e55cdddcb36d08767fb4ced8b5" />
 			</dataarea>
 		</part>
 	</software>
@@ -14612,19 +14545,6 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="labycret">
-		<description>Labyrinth of Crete (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Adventure International</publisher>
-		<info name="release" value="2019-11-15"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="labyrinth of crete (4am crack).dsk" size="143360" crc="cd12d96c" sha1="dab01261a4c4335acd9add607f6b920cdb15cf35" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="advkrist">
 		<description>The Adventures of Kristen and Her Family (cleanly cracked)</description>
 		<year>1985</year>
@@ -14915,19 +14835,6 @@ license:CC0-1.0
 			<feature name="part_id" value="Side B - Boot"/>
 			<dataarea name="flop" size="143360">
 				<rom name="alkemstone (4am crack) side b (boot).dsk" size="143360" crc="cdcbadd6" sha1="8f23bbc5cc9bfe0d36dc2731e645b4a9ce830689"/>
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="esctraam">
-		<description>Other-Venture #3: The Escape from Traam (cleanly cracked)</description>
-		<year>1981</year>
-		<publisher>Adventure International</publisher>
-		<info name="release" value="2020-02-03"/>
-
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="143360">
-				<rom name="the escape from traam (4am crack).dsk" size="143360" crc="2674abc0" sha1="ae85eb448d2ba306131adb3b5d98ac20cbb99a32"/>
 			</dataarea>
 		</part>
 	</software>
@@ -23478,11 +23385,10 @@ license:CC0-1.0
 		<description>Archon: The Light and The Dark (4am and san inc crack)</description>
 		<year>1984</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Anne Westfall" />
-		<info name="programmer" value="Jon Freeman" />
-		<info name="programmer" value="Paul Reiche III" />
+		<info name="author" value="Anne Westfall" />
+		<info name="author" value="Jon Freeman" />
+		<info name="author" value="Paul Reiche III" />
 		<info name="programmer" value="Jim Nitchals" />
-		<info name="programmer" value="Ago Kiss" />
 		<info name="usage" value="Requires an 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-03-02 -->
@@ -23495,11 +23401,12 @@ license:CC0-1.0
 	</software>
 
 	<software name="archon2">
-		<description>Archon II - Adept (4am and san inc crack)</description>
+		<description>Archon II: Adept (4am and san inc crack)</description>
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Jon Freeman" />
-		<info name="programmer" value="Paul Reiche III" />
+		<info name="author" value="Anne Westfall" />
+		<info name="author" value="Jon Freeman" />
+		<info name="author" value="Paul Reiche III" />
 		<info name="programmer" value="Jim Nitchals" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -23519,8 +23426,6 @@ license:CC0-1.0
 		<info name="developer" value="Dynamix Software Development" />
 		<info name="programmer" value="Paul Bowman" />
 		<info name="programmer" value="Damon Slye" />
-		<info name="programmer" value="John Burton" />
-		<info name="programmer" value="Kevin Ryan" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-03-02 -->
@@ -24995,8 +24900,8 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="original_publisher" value="First Star Software" />
-		<info name="programmer" value="Peter Liepa" />
-		<info name="programmer" value="Chris Grey" />
+		<info name="author" value="Peter Liepa" />
+		<info name="author" value="Chris Grey" />
 		<info name="programmer" value="Pat Montelo" />
 		<info name="usage" value="Requires a 48K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
@@ -25031,8 +24936,8 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="original_publisher" value="First Star Software" />
-		<info name="programmer" value="Peter Liepa" />
-		<info name="programmer" value="Chris Grey" />
+		<info name="author" value="Peter Liepa" />
+		<info name="author" value="Chris Grey" />
 		<info name="programmer" value="Pat Montelo" />
 		<info name="usage" value="Requires a 64K Apple ][ or later." />
 		<sharedfeat name="compatibility" value="A2,A2P,A2E,A2EE,A2C,A2GS" />
@@ -25419,6 +25324,23 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="143360">
 				<rom name="buzz bang harvey (4am crack).dsk" size="143360" crc="f5e8445f" sha1="caa19292c9b09a76b2e9b9ec5393098639c526b7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cestlvie">
+		<description>C'est La Vie (4am crack)</description>
+		<year>1983</year>
+		<publisher>Adventure International</publisher>
+		<info name="developer" value="Eastman Computing" />
+		<info name="programmer" value="Gordon Eastman" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-04-07 -->
+		<!-- action game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="c'est la vie (4am crack).dsk" size="143360" crc="b16f4e64" sha1="c491578b32e6d845c80e5331a611ade99510b097" />
 			</dataarea>
 		</part>
 	</software>
@@ -26144,9 +26066,6 @@ license:CC0-1.0
 		<year>1990</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="programmer" value="Michael Cranford" />
-		<info name="programmer" value="Tom Wilcox" />
-		<info name="programmer" value="Diane Wilcox" />
-		<info name="programmer" value="Gene Hamm" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-01-17. Redumped 2021-08-27 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
@@ -27694,14 +27613,14 @@ license:CC0-1.0
 	</software>
 
 	<software name="confviet">
-		<description>Conflict in Vietnam (version 2) (4am and san inc crack)</description>
+		<description>Conflict in Vietnam (version 331.00) (4am and san inc crack)</description>
 		<year>1986</year>
 		<publisher>Microprose Software</publisher>
-		<info name="programmer" value="Sid Meier" />
-		<info name="programmer" value="Ed Bever" />
+		<info name="author" value="Sid Meier" />
+		<info name="author" value="Ed Bever" />
 		<info name="programmer" value="Jim Synoski" />
-		<info name="usage" value="Requires a 128K Apple ][+ or later." />
-		<info name="version" value="2" />
+		<info name="usage" value="Requires a 64K Apple ][+ or later. 128K for hi-res graphics." />
+		<info name="version" value="331.00" />
 		<!-- Option to use double hi-res graphics on 128K machines. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-08-30 -->
@@ -28955,15 +28874,16 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cruseuropv1" cloneof="cruseurop">
+	<software name="cruseuropv1" cloneof="cruseuropv2">
 		<description>Crusade in Europe (version 1) (4am and san inc crack)</description>
 		<year>1985</year>
 		<publisher>Microprose Software</publisher>
-		<info name="programmer" value="Sid Meier" />
-		<info name="programmer" value="Ed Bever" />
+		<info name="author" value="Sid Meier" />
+		<info name="author" value="Ed Bever" />
 		<info name="programmer" value="Jim Synoski" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="1" />
+		<!-- No 128K double hi-res graphics option. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-08-06 -->
 		<!-- simulation game -->
@@ -28974,14 +28894,14 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="cruseurop">
+	<software name="cruseuropv2">
 		<description>Crusade in Europe (version 2) (4am and san inc crack)</description>
 		<year>1985</year>
 		<publisher>Microprose Software</publisher>
-		<info name="programmer" value="Sid Meier" />
-		<info name="programmer" value="Ed Bever" />
+		<info name="author" value="Sid Meier" />
+		<info name="author" value="Ed Bever" />
 		<info name="programmer" value="Jim Synoski" />
-		<info name="usage" value="Requires a 128K Apple ][+ or later." />
+		<info name="usage" value="Requires a 64K Apple ][+ or later. 128K for hi-res graphics." />
 		<info name="version" value="2" />
 		<!-- Option to use double hi-res graphics on 128K machines. -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -30653,7 +30573,7 @@ license:CC0-1.0
 		<description>Dueling Digits (4am and san inc crack)</description>
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Doug Carlston" />
+		<info name="author" value="Doug Carlston" />
 		<info name="programmer" value="Brian Crouch" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -38079,11 +37999,12 @@ license:CC0-1.0
 		<description>Lords of Conquest (4am and san inc crack)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Jack Kittredge" />
-		<info name="programmer" value="Peter Olotka" />
-		<info name="programmer" value="Bill Eberle" />
+		<info name="author" value="Jack Kittredge" />
+		<info name="author" value="Peter Olotka" />
+		<info name="author" value="Bill Eberle" />
+		<info name="developer" value="Eon Productions" />
 		<info name="programmer" value="Ted Schmeckpeper" />
-		<info name="programmer" value="Mark Sutton-Smith" />
+		<info name="programmer" value="Trevor Western" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-03-02 -->
@@ -42788,7 +42709,7 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Futique, Inc." />
-		<info name="programmer" value="Timothy Leary" />
+		<info name="author" value="Timothy Leary" />
 		<info name="programmer" value="Peter van den Beemt" />
 		<info name="programmer" value="Bob Dietz" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
@@ -43546,25 +43467,14 @@ license:CC0-1.0
 		<year>1985</year>
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Interactive Picture Systems" />
-		<info name="programmer" value="Guy Nouri" />
-		<info name="programmer" value="Eric Podietz" />
+		<info name="author" value="Guy Nouri" />
+		<info name="author" value="Eric Podietz" />
 		<info name="programmer" value="Ken Appleman" />
 		<info name="programmer" value="Chuck Beury" />
 		<info name="programmer" value="Chris Rogers" />
 		<info name="programmer" value="Mark Scott" />
 		<info name="programmer" value="Jimmy Snyder" />
 		<info name="programmer" value="Jon Wolfe" />
-		<info name="programmer" value="Arlene Boehm" />
-		<info name="programmer" value="Ed Bakst" />
-		<info name="programmer" value="Janet Benn" />
-		<info name="programmer" value="Yvette Kaplan" />
-		<info name="programmer" value="Bryon Moore" />
-		<info name="programmer" value="Don Poynter" />
-		<info name="programmer" value="Bob Svihovec" />
-		<info name="programmer" value="Jan Svochak" />
-		<info name="programmer" value="Gahan Wilson" />
-		<info name="programmer" value="James Ehlers" />
-		<info name="programmer" value="Deborah Kuhn" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-03-02 -->
@@ -44003,10 +43913,10 @@ license:CC0-1.0
 		<description>Murder on the Zinderneuf (4am and san inc crack)</description>
 		<year>1984</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Paul Reiche" />
-		<info name="programmer" value="Jon Freeman" />
-		<info name="programmer" value="Robert Leyland" />
+		<info name="author" value="Paul Reiche" />
+		<info name="author" value="Jon Freeman" />
 		<info name="programmer" value="Alan Pavlish" />
+		<info name="programmer" value="Robert Leyland" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-03-02 -->
@@ -45143,12 +45053,71 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="ov2curcm">
+		<description>Other-Venture #2: The Curse of Crowley Manor (4am crack)</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="author" value="Jyym Pearson" />
+		<info name="programmer" value="Norm Sailer" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-10-13 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the curse of crowley manor (4am crack).dsk" size="143360" crc="35dffa95" sha1="362bad035efea6e55cdddcb36d08767fb4ced8b5" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ov3etraam">
+		<description>Other-Venture #3: The Escape from Traam (4am crack)</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="author" value="Jyym Pearson" />
+		<info name="programmer" value="Norm Sailer" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2020-02-03 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="the escape from traam (4am crack).dsk" size="143360" crc="2674abc0" sha1="ae85eb448d2ba306131adb3b5d98ac20cbb99a32"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ov4eqsf1906">
+		<description>Other-Venture #4: Earthquake - San Francisco 1906 (4am crack)</description>
+		<year>1982</year>
+		<publisher>Adventure International</publisher>
+		<info name="author" value="Jyym Pearson" />
+		<info name="programmer" value="Norm Sailer" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2018-10-10 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A (Boot)"/>
+			<dataarea name="flop" size="143360">
+				<rom name="earthquake san francisco 1906 (4am crack) side a.dsk" size="143360" crc="93119894" sha1="e46eebbd8797f966f1c94277f10df0402b58bc48" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="earthquake san francisco 1906 (4am crack) side b.dsk" size="143360" crc="eab2180c" sha1="f49986c6ab5d57b5a1fa81069a592c621dd30b57" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="phmpegas">
 		<description>P.H.M. Pegasus (4am and san inc crack)</description>
 		<year>1987</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Larry Holland" />
-		<info name="programmer" value="Edwin Reich" />
+		<info name="author" value="Noah Falstein" />
+		<info name="programmer" value="Larry E. Holland" />
+		<info name="programmer" value="Edwin W. Reich, Jr." />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-10-28 -->
@@ -47587,13 +47556,10 @@ license:CC0-1.0
 		<description>Questprobe featuring The Hulk (version 2.3/127) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Adventure International</publisher>
+		<info name="author" value="Bob Budiansky" />
+		<info name="author" value="John Lindley Byrne" />
 		<info name="programmer" value="Scott Adams" />
-		<info name="programmer" value="John Romita Sr." />
-		<info name="programmer" value="Mark Gruenwald" />
-		<info name="programmer" value="Kem McNair" />
 		<info name="programmer" value="Scott Smith" />
-		<info name="programmer" value="John Byrne" />
-		<info name="programmer" value="Bob Budiansky" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="2.3/127" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -48790,7 +48756,7 @@ license:CC0-1.0
 		<publisher>Electronic Arts</publisher>
 		<info name="alt_title" value="Zombies" />
 		<info name="original_publisher" value="BRAM" />
-		<info name="programmer" value="Mike Edwards" />
+		<info name="author" value="Mike Edwards" />
 		<info name="programmer" value="Marek Popiel" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -49562,10 +49528,8 @@ license:CC0-1.0
 		<description>Robot Rascals (4am and san inc crack)</description>
 		<year>1986</year>
 		<publisher>Electronic Arts</publisher>
-		<info name="programmer" value="Dan Bunten" />
-		<info name="programmer" value="Alan Watson" />
-		<info name="programmer" value="Dave Warhol" />
-		<info name="programmer" value="Mark McElroy" />
+		<info name="author" value="Dan Bunten" />
+		<info name="author" value="Mark McElroy" />
 		<info name="programmer" value="Mark Botner" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -50311,7 +50275,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="saga1alandv20" cloneof="saga1aland">
-		<description>Scott Adams Graphic Adventure 1: Adventureland (version 2.0/416) (4am crack)</description>
+		<description>Scott Adams Graphic Adventure #1: Adventureland (version 2.0/416) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Scott Adams" />
@@ -50335,7 +50299,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="saga1alandv21" cloneof="saga1aland">
-		<description>Scott Adams Graphic Adventure 1: Adventureland (version 2.1/416) (4am crack)</description>
+		<description>Scott Adams Graphic Adventure #1: Adventureland (version 2.1/416) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Scott Adams" />
@@ -50359,7 +50323,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="saga1aland">
-		<description>Scott Adams Graphic Adventure 1: Adventureland (version 2.2/416) (4am crack)</description>
+		<description>Scott Adams Graphic Adventure #1: Adventureland (version 2.2/416) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Scott Adams" />
@@ -50383,7 +50347,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="saga2piradv">
-		<description>Scott Adams Graphic Adventure 2: Pirate Adventure (version 2.1/408) (4am crack)</description>
+		<description>Scott Adams Graphic Adventure #2: Pirate Adventure (version 2.1/408) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Scott Adams" />
@@ -50407,9 +50371,11 @@ license:CC0-1.0
 	</software>
 
 	<software name="saga3misimp">
-		<description>Scott Adams Graphic Adventure 3: Mission Impossible (version 2.1/306) (4am crack)</description>
+		<description>Scott Adams Graphic Adventure #3: Mission Impossible (version 2.1/306) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
+		<info name="alt_title" value="Scott Adams graphic Adventure 3: Secret Mission" />
+		<!-- Was renamed Secret Mission in 1980 for a brief period and then back to its original title to avoid legal action related to the TV show of the same name. -->
 		<info name="programmer" value="Scott Adams" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="2.1/306" />
@@ -50432,7 +50398,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="saga4voocas">
-		<description>Scott Adams Graphic Adventure 4: Voodoo Castle (version 2.1/119) (4am crack)</description>
+		<description>Scott Adams Graphic Adventure #4: Voodoo Castle (version 2.1/119) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Alexis Adams" />
@@ -50456,11 +50422,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="saga5count">
-		<description>Scott Adams Graphic Adventure 5: The Count (version 2.1/115) (4am crack)</description>
+		<description>Scott Adams Graphic Adventure #5: The Count (version 2.1/115) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Scott Adams" />
-		<info name="programmer" value="Kem McNair" />
 		<info name="programmer" value="Norm Sailer" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="2.1/115" />
@@ -50482,7 +50447,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="saga6strody">
-		<description>Scott Adams Graphic Adventure 6: Strange Odyssey (version 2.1/119) (4am crack)</description>
+		<description>Scott Adams Graphic Adventure #6: Strange Odyssey (version 2.1/119) (4am crack)</description>
 		<year>1982</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Scott Adams" />
@@ -50506,7 +50471,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="saga13sorcc">
-		<description>Scott Adams Graphic Adventure 13: The Sorcerer of Claymorgue Castle (version 2.2/122) (4am crack)</description>
+		<description>Scott Adams Graphic Adventure #13: The Sorcerer of Claymorgue Castle (version 2.2/122) (4am crack)</description>
 		<year>1984</year>
 		<publisher>Adventure International</publisher>
 		<info name="programmer" value="Scott Adams" />
@@ -51452,9 +51417,9 @@ license:CC0-1.0
 		<description>Solo Flight (4am crack)</description>
 		<year>1984</year>
 		<publisher>Microprose Software</publisher>
-		<info name="programmer" value="Sid Meier" />
+		<info name="author" value="Sid Meier" />
 		<info name="programmer" value="Andy Hollis" />
-		<info name="usage" value="Requires an Apple ][+ or later." />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2021-09-30 -->
 		<!-- simulation game -->
@@ -52660,10 +52625,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="starblzr">
-		<description>Star Blazer (4am and san inc crack)</description>
+	<software name="starblzrb">
+		<description>Star Blazer (Brøderbund) (4am and san inc crack)</description>
 		<year>1982</year>
 		<publisher>Brøderbund Software</publisher>
+		<info name="original_publisher" value="Star Craft" />
 		<info name="programmer" value="Tony Suzuki" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -55306,6 +55272,32 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="buckbanz">
+		<description>The Adventures of Buckaroo Banzai: Across The 8th Dimension! (version G 397) (4am crack)</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Phillip Case" />
+		<info name="programmer" value="Mak Jukic" />
+		<info name="programmer" value="Scott Adams" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<info name="version" value="G 397" />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2026-01-07 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A" />
+			<dataarea name="flop" size="143360">
+				<rom name="the adventures of buckaroo banzai across the 8th dimension (4am crack) side a.dsk" size="143360" crc="6867caba" sha1="e4724bf9c1802aece4cc3778ba798cd8f8205f32" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B" />
+			<dataarea name="flop" size="143360">
+				<rom name="the adventures of buckaroo banzai across the 8th dimension (4am crack) side b.dsk" size="143360" crc="b2af5b2f" sha1="a8a25e7d1de44850680c4662bf650b3152cb126d" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="amchal">
 		<description>The American Challenge: A Sailing Simulation (trex and 4am crack)</description>
 		<year>1986</year>
@@ -55485,11 +55477,7 @@ license:CC0-1.0
 		<info name="alt_title" value="Tales of the Unknown: The Bard's Tale" />
 		<info name="developer" value="Interplay Productions" />
 		<info name="programmer" value="Michael Cranford" />
-		<info name="programmer" value="Dave Lowery" />
-		<info name="programmer" value="Larry Holland" />
-		<info name="programmer" value="Brian Fargo" />
-		<info name="programmer" value="Becky Heineman" />
-		<info name="programmer" value="Jay Patel" />
+		<info name="programmer" value="Bill Heineman" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-03-04 -->
@@ -55520,8 +55508,6 @@ license:CC0-1.0
 		<publisher>Electronic Arts</publisher>
 		<info name="developer" value="Interplay Productions" />
 		<info name="programmer" value="Michael Cranford" />
-		<info name="programmer" value="Brian Fargo" />
-		<info name="programmer" value="Todd Camasta" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2017-03-06 -->
@@ -56885,6 +56871,46 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="kingfact">
+		<description>The Kingdom of Facts (4am crack)</description>
+		<year>1984</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Anders Beitnes" />
+		<info name="usage" value="Requires a 48K Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2017-12-01 -->
+		<!-- educational program -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the kingdom of facts (4am crack) side a.dsk" size="143360" crc="f406b7d8" sha1="e5f09624fca74adb9478563cbd19d4763be8a3d1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="143360">
+				<rom name="the kingdom of facts (4am crack) side b.dsk" size="143360" crc="e670fc8c" sha1="0d599b1c2d80dfa5a65592a6f0f8314bee961e74" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="labycret">
+		<description>The Labyrinth of Crete (4am crack)</description>
+		<year>1981</year>
+		<publisher>Adventure International</publisher>
+		<info name="programmer" value="Cliff Johnson" />
+		<info name="programmer" value="Allen Pinero" />
+		<info name="usage" value="Requires an Apple ][+ or later." />
+		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
+		<!-- Dump released: 2019-11-15 -->
+		<!-- adventure game -->
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="143360">
+				<rom name="labyrinth of crete (4am crack).dsk" size="143360" crc="cd12d96c" sha1="dab01261a4c4335acd9add607f6b920cdb15cf35" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="lastgladr1" cloneof="lastglad">
 		<description>The Last Gladiator (revision 1) (4am and san inc crack)</description>
 		<year>1983</year>
@@ -57314,14 +57340,13 @@ license:CC0-1.0
 	</software>
 
 	<software name="playroom_525">
-		<description>The Playroom (4am crack)</description>
+		<description>The Playroom (version 1.0) (4am crack)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Leslie Grimm" />
-		<info name="programmer" value="Dennis Caswell" />
-		<info name="programmer" value="Lynn Kirkpatrick" />
-		<info name="programmer" value="D. Buttlaire" />
-		<info name="programmer" value="D. Albrecht" />
+		<info name="author" value="Leslie Grimm" />
+		<info name="author" value="Dennis Caswell" />
+		<info name="author" value="Lynn Kirkpatrick" />
+		<info name="developer" value="Educators' Software" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
@@ -57765,7 +57790,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="serpstar">
-		<description>The Serpent's Star (version 1.0) (4am crack)</description>
+		<description>The Serpent's Star (Brøderbund Software) (version 1.0) (4am crack)</description>
 		<year>1983</year>
 		<publisher>Brøderbund Software</publisher>
 		<info name="developer" value="Ultrasoft" />
@@ -61709,11 +61734,6 @@ license:CC0-1.0
 		<info name="programmer" value="Ken Bull" />
 		<info name="programmer" value="Gene Portwood" />
 		<info name="programmer" value="Lauren Elliott" />
-		<info name="programmer" value="Leila Bronstein" />
-		<info name="programmer" value="Don Albrecht" />
-		<info name="programmer" value="Katherine Bird" />
-		<info name="programmer" value="Susan Meyers" />
-		<info name="programmer" value="Louis Ewens" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2016-08-01. Redumped: 2021-08-28 due to subtle timing difference between Disk II and IWM hardware that resulted in the previous version not working on some machines. -->
@@ -61736,18 +61756,9 @@ license:CC0-1.0
 		<description>Where in North Dakota is Carmen Sandiego? (version 1.0) (4am crack)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood" />
-		<info name="programmer" value="Lauren Elliott" />
+		<info name="author" value="Gene Portwood" />
+		<info name="author" value="Lauren Elliott" />
 		<info name="programmer" value="Ken Bull" />
-		<info name="programmer" value="Katherine Bird" />
-		<info name="programmer" value="Janese Freed" />
-		<info name="programmer" value="Leila Bronstein" />
-		<info name="programmer" value="Rick Incrocci" />
-		<info name="programmer" value="Michelle McBride" />
-		<info name="programmer" value="Roseann Mitchell" />
-		<info name="programmer" value="Arturo Sinclair" />
-		<info name="programmer" value="Diane Wilcox" />
-		<info name="programmer" value="Louis Ewens" />
 		<info name="usage" value="Requires a 64K Apple ][+ or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
@@ -61774,14 +61785,9 @@ license:CC0-1.0
 		<description>Where in Time is Carmen Sandiego? (version 1.0) (4am and trex crack)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood" />
-		<info name="programmer" value="Lauren Elliott" />
+		<info name="author" value="Gene Portwood" />
+		<info name="author" value="Lauren Elliott" />
 		<info name="programmer" value="Rod Nelsen" />
-		<info name="programmer" value="Leila Bronstein" />
-		<info name="programmer" value="Jenny Martin" />
-		<info name="programmer" value="Gail Rathbun" />
-		<info name="programmer" value="Mark Schlichtinng" />
-		<info name="programmer" value="Tom Rettig" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<info name="version" value="1.0" />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
@@ -61817,14 +61823,9 @@ license:CC0-1.0
 		<description>Where in Time is Carmen Sandiego? (version 1.1) (trex crack)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood" />
-		<info name="programmer" value="Lauren Elliott" />
+		<info name="author" value="Gene Portwood" />
+		<info name="author" value="Lauren Elliott" />
 		<info name="programmer" value="Rod Nelsen" />
-		<info name="programmer" value="Leila Bronstein" />
-		<info name="programmer" value="Jenny Martin" />
-		<info name="programmer" value="Gail Rathbun" />
-		<info name="programmer" value="Mark Schlichtinng" />
-		<info name="programmer" value="Tom Rettig" />
 		<info name="usage" value="Requires a 128K Apple //e or later." />
 		<info name="version" value="1.1" />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />
@@ -61860,14 +61861,9 @@ license:CC0-1.0
 		<description>Where in Time is Carmen Sandiego? (version 1.1) (800K 3.5") (trex crack)</description>
 		<year>1989</year>
 		<publisher>Brøderbund Software</publisher>
-		<info name="programmer" value="Gene Portwood" />
-		<info name="programmer" value="Lauren Elliott" />
+		<info name="author" value="Gene Portwood" />
+		<info name="author" value="Lauren Elliott" />
 		<info name="programmer" value="Rod Nelsen" />
-		<info name="programmer" value="Leila Bronstein" />
-		<info name="programmer" value="Jenny Martin" />
-		<info name="programmer" value="Gail Rathbun" />
-		<info name="programmer" value="Mark Schlichtinng" />
-		<info name="programmer" value="Tom Rettig" />
 		<info name="usage" value="Requires an Apple IIgs, //c+, or 128K //e with a compatible drive controller card." />
 		<info name="version" value="1.1" />
 		<sharedfeat name="compatibility" value="A2E,A2EE,A2C,A2GS" />

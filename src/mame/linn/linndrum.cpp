@@ -758,7 +758,8 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// The bass VCF has a cutoff frequency of ~1.4KHz, which transiently
 	// increases to ~100KHz when the voice triggers.
 	LINNDRUM_VCF_EG(config, m_bass_eg, ":trimmer_bass_freq_cv_offset", RES_K(18), RES_K(5.1));  // R135, R133.
-	auto &bass_vcf = CEM3320_LPF4(config, "bass_vcf", CAP_P(150), RES_K(100));
+	auto &bass_vcf = CEM3320_LPF4(config, "bass_vcf", CAP_P(150));
+	bass_vcf.configure_voltage_input(RES_K(91));  // R87.
 	m_mux_volume[MV_BASS]->add_route(0, bass_vcf, 1.0, cem3320_lpf4_device::INPUT_AUDIO);
 	m_bass_eg->add_route(0, bass_vcf, 1.0, cem3320_lpf4_device::INPUT_FREQ);
 
@@ -805,7 +806,8 @@ void linndrum_audio_device::device_add_mconfig(machine_config &config)
 	// The tom VCF has a cutoff frequency of ~650Hz, which transiently
 	// increases to ~46KHz when the voice triggers.
 	LINNDRUM_VCF_EG(config, m_tom_eg, ":trimmer_tom_freq_cv_offset", RES_K(10), RES_K(10));
-	auto &tom_vcf = CEM3320_LPF4(config, "tom_conga_vcf", CAP_P(330), RES_K(100));
+	auto &tom_vcf = CEM3320_LPF4(config, "tom_conga_vcf", CAP_P(330));
+	tom_vcf.configure_voltage_input(RES_K(91));
 	m_tom_dac->add_route(0, tom_vcf, 1.0, cem3320_lpf4_device::INPUT_AUDIO);
 	m_tom_eg->add_route(0, tom_vcf, 1.0, cem3320_lpf4_device::INPUT_FREQ);
 

@@ -35,9 +35,8 @@ protected:
 
 private:
 	template<class BitmapClass>
-	void drawgfx_common(palette_device &palette,BitmapClass &dest_bmp,const rectangle &clip,gfx_element *gfx,
-			u32 code,u32 color,bool flipx,bool flipy,int offsx,int offsy,
-			u8 transparent_color);
+	void drawgfx_common(palette_device &palette, BitmapClass &dest_bmp, const rectangle &clip, gfx_element *gfx,
+			u32 code, u32 color, bool flipx, bool flipy, int offsx, int offsy, u8 transparent_color);
 };
 
 DECLARE_DEVICE_TYPE(JALECO_BLEND, jaleco_blend_device)

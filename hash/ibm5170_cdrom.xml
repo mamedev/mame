@@ -9,12 +9,12 @@ license:CC0-1.0
 	<!--                  Games                  -->
 	<!--                                         -->
 
-	<!-- DOS -->
 	<!-- TODO: after install it returns to DOS with mangled text graphics -->
 	<software name="11hourd" supported="no">
 		<description>The 11th Hour - Der Nachfolger von 7th Guest (Germany)</description>
 		<year>1995</year>
 		<publisher>Virgin</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -51,11 +51,11 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Windows 3.1 / 95 -->
 	<software name="3dupin">
 		<description>3-D Ultra Pinball (Budget Sierra Originals Version)</description>
 		<year>1995</year>
 		<publisher>Sierra</publisher>
+		<info name="required_os" value="Windows 3.1 / 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -77,7 +77,7 @@ Complete Game: "The Blues Brothers"
 Demo/Shareware: "Bodycount", "Zone 66", "Save Our Pizzas", "Dangerous Dave", "Casino Slots"
 ]]></notes>
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -97,7 +97,7 @@ Demo/Shareware: "Bodycount", "Zone 66", "Save Our Pizzas", "Dangerous Dave", "Ca
 Demo/Shareware included: "Back to the Forest", "Electroman", "Christmas Jetpack", "Hugo 3: Jungle of Doom", "Bip Bop 2"
 ]]></notes>
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -119,7 +119,7 @@ Complete Game: "TV Sports Football"
 Demo/Shareware: "Ranger Fox", "Monster Bash", "Onesimus", "Turoid", "Perestroika"
 ]]></notes>
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -142,7 +142,7 @@ Complete Game: "Super Tetris"
 Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Miner"
 ]]></notes>
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -151,13 +151,14 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		</part>
 	</software>
 
-	<!-- Windows 95, Direct X 3.0 -->
+	<!-- Direct X 3.0 -->
 	<!-- disc label: 688i_hk -->
 	<!-- Requires High Color -->
 	<software name="688ihuki" supported="no">
 		<description>688I Hunter-Killer</description>
 		<year>1997</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -166,7 +167,6 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- 486 class with 8MB RAM and 256 colors -->
 	<!-- has some game demos on disc -->
 	<software name="a10cuba" supported="no">
@@ -176,6 +176,7 @@ Demo/Shareware: "Green", "Aldo II Adventure", "Phylox", "Draw Poker", "Space Min
 		<notes><![CDATA[
 black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8514_cmd_w with invalid BitBLT params
 ]]></notes>
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="a-10 cuba (1996)(activision)" sha1="a9bc7e3b7306c46acf33b93ae168862d18734245" />
@@ -195,7 +196,6 @@ black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- http://redump.org/disc/69748/ -->
 	<!-- 486DX2 66 MHz minimum -->
 	<software name="abspinball" supported="partial">
@@ -205,6 +205,7 @@ black screen/hangs when launching a demo play in 640x480 resolution, [8514] ibm8
 		<notes><![CDATA[
 Unsupported optional [Thrustmaster Wizzard] or [Philips Virtual] Pinball controllers
 ]]></notes>
+		<info name="required_os" value="DOS" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="absolute pinball (europe) (1996)" sha1="9758201f0f9d5578b0f72f7e53ab49a71daf7c31" />
@@ -228,11 +229,11 @@ Unsupported optional [Thrustmaster Wizzard] or [Philips Virtual] Pinball control
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<software name="aceventd">
 		<description>Ace Ventura (Germany)</description>
 		<year>1996</year>
 		<publisher>Bomico</publisher>
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -263,13 +264,13 @@ Black colored OEM CD with no id whatsoever
 		</part>
 	</software>
 
-	<!-- Windows 95/98 -->
 	<software name="acatari2">
 		<description>Arcade's Greatest Hits: The Atari Collection 2</description>
 		<year>1998</year>
 		<publisher>GT Interactive</publisher>
 		<info name="developer" value="Atari" />
 		<info name="developer" value="Digital Eclipse, Inc." />
+		<info name="required_os" value="Windows 95/98" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="arcade's greatest hits - the atari collection 2 (1998)" sha1="34775aaab4326c80a9551fcdec8aa0acd2d8ef88" />
@@ -291,8 +292,6 @@ Black colored OEM CD with no id whatsoever
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
-	<!-- According to the readme, running this on Windows 95 causes issues -->
 	<!-- disc label: Actionpack5 -->
 	<!-- Multi-5 language support: English, French, German, Italian, Spanish -->
 	<software name="actatari">
@@ -309,6 +308,8 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="Windows 3.1" />
+		<!-- According to the readme, running this on Windows 95 causes issues -->
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -346,12 +347,12 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: no second disc available -->
 	<software name="add2mc" supported="partial">
 		<description>Advanced Dungeons &amp; Dragons 2nd Edition Masterpiece Collection</description>
 		<year>1995</year>
 		<publisher>Mindscape</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -376,13 +377,13 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	</software>
 
 
-	<!-- DOS (crashes in Windows 95) -->
 	<!-- Disc label: ads -->
 	<!-- TODO: bad color pen (DOS cyan color issue) -->
 	<software name="advdesim">
 		<description>Advanced Destroyer Simulator</description>
 		<year>1996</year>
 		<publisher>Action Sixteen / Futura</publisher>
+		<info name="required_os" value="DOS" /><!-- crashes in Windows 95 -->
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -404,12 +405,12 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
-	<!-- DOS / Windows 3.1 -->
 	<!-- TODO: cannot setup emm386.exe for this in any way or form, might be a bug? -->
 	<software name="aeurope" supported="no">
 		<description>Aces over Europe</description>
 		<year>1995</year>
 		<publisher>Sierra</publisher>
+		<info name="required_os" value="DOS / Windows 3.1" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -418,11 +419,11 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="aftlifeu">
 		<description>Afterlife (USA, v1.1)</description>
 		<year>1996</year>
 		<publisher>LucasArts</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.1" />
 
 		<part name="cdrom" interface="cdrom">
@@ -450,15 +451,14 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
-
-	<!-- Windows 95, Direct X 5.0 -->
-	<!-- Pentium class 90 MHz -->
+	<!-- Pentium class 90 MHz, Direct X 5.0 -->
 	<!-- S3 "software video" is really slow -->
 	<!-- Disc label: Air War 3 -->
 	<software name="airwar3" supported="partial">
 		<description>Air Warrior III</description>
 		<year>1997</year>
 		<publisher>Interactive Magic / Kesmai Corporation</publisher>
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -482,12 +482,12 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
-	<!-- Windows 95 / 98 / ME / 2000 -->
 	<!-- Pentium II class 233 MHz -->
 	<software name="akimboj" supported="no">
 		<description>Kung-Fu Hero Akimbo Lee (Japan)</description>
 		<year>2001</year>
 		<publisher>Iridon / MSD-JAPAN / Salva Corporation</publisher>
+		<info name="required_os" value="Windows 95 / 98 / ME / 2000" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="akimbo" sha1="08e03c5abce6f95582368d1d6734f6f1b323b823" />
@@ -507,7 +507,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
 		<info name="region" value="ver acs 1.0" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -516,7 +516,6 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: weird fade in/out effects at every transition (inverted?) -->
 	<software name="aliencrn_nl" cloneof="aliencrn">
 		<description>Alien Carnage (Netherlands)</description>
@@ -527,7 +526,7 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 		<info name="distributor" value="Multi Media International" />
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -565,7 +564,7 @@ Finnish language is only available in the installation setup
 		<info name="language" value="Finnish" />
 		<info name="region" value="Europe" />
 		<info name="version" value="v1.30" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -585,7 +584,7 @@ Finnish language is only available in the installation setup
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
 		<info name="version" value="v1.01" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -693,7 +692,7 @@ Untested disc swap in game
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="Windows 95" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -734,7 +733,7 @@ Original 1993 release without speech
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="Windows 95" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -774,7 +773,7 @@ Original 1993 release without speech
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -814,7 +813,7 @@ Original 1993 release without speech
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -902,7 +901,7 @@ Includes DOS and Windows installation setup.
 		<info name="language" value="Spanish" />
 		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -986,7 +985,7 @@ Includes DOS and Windows installation setup.
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1071,7 +1070,7 @@ Includes DOS and Windows installation setup.
 		<info name="developer" value="Infogrames" />
 		<info name="language" value="French" />
 		<info name="region" value="France" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1080,12 +1079,12 @@ Includes DOS and Windows installation setup.
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Requires 570KB of conventional memory -->
 	<software name="amazonge">
 		<description>Amazon - Guardians of Eden</description>
 		<year>1993</year>
 		<publisher>Access Software</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1094,12 +1093,12 @@ Includes DOS and Windows installation setup.
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: black screen at game launch -->
 	<software name="animal" supported="no">
 		<description>Animal</description>
 		<year>1997</year>
 		<publisher>Microtime</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1108,12 +1107,12 @@ Includes DOS and Windows installation setup.
 		</part>
 	</software>
 
-	<!-- DOS / Windows 3.1 -->
 	<!-- TODO: cannot setup emm386.exe for this in any way or form, might be a bug? -->
 	<software name="apacific" supported="no">
 		<description>Aces of the Pacific</description>
 		<year>1994</year>
 		<publisher>Sierra</publisher>
+		<info name="required_os" value="DOS / Windows 3.1" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1122,7 +1121,6 @@ Includes DOS and Windows installation setup.
 		</part>
 	</software>
 
-	<!-- DOS (recommended), Windows 95 -->
 	<!-- 486DX2 100 MHz -->
 	<software name="archdyn" supported="no">
 		<!-- 24/10/1996 RE -->
@@ -1134,6 +1132,7 @@ Includes DOS and Windows installation setup.
 Crashes when selecting instant action (at least in FreeDOS, verify)
 Cannot read sound configuration from Windows 95
 ]]></notes>
+		<info name="required_os" value="DOS (recommended), Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ad" sha1="95040b06a50373ef052c37261ca6b91d42fa5af7"/>
@@ -1170,12 +1169,12 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: videos farts/doesn't complete playback, eventually dies with a out of conventional memory error -->
 	<software name="arcappled" supported="no">
 		<description>Archibald Applebrook's Abenteuer (Germany v1.00)</description>
 		<year>1995</year>
 		<publisher>Software 2000</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.00" />
 
 		<part name="cdrom" interface="cdrom">
@@ -1185,12 +1184,12 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: black screen at game launch -->
 	<software name="archonul" supported="no">
 		<description>Archon Ultra (v1.1)</description>
 		<year>1996</year>
 		<publisher>Strategic Simulations</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.1" />
 
 		<part name="cdrom" interface="cdrom">
@@ -1213,11 +1212,11 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="armofist">
 		<description>Armored Fist</description>
 		<year>1994</year>
 		<publisher>Nova Logic</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1226,11 +1225,11 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="ascend">
 		<description>Ascendancy</description>
 		<year>1995</year>
 		<publisher>Virgin / The Logic Factory</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1251,7 +1250,6 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- TODO: Menus are in High color mode -->
 	<software name="atariac1">
 		<description>Atari Arcade Hits 1</description>
@@ -1259,6 +1257,7 @@ Cannot read sound configuration from Windows 95
 		<publisher>Hasbro Interactive</publisher>
 		<info name="developer" value="Atari" />
 		<info name="developer" value="Digital Eclipse Software, Inc." />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1267,13 +1266,13 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<software name="atariac2">
 		<description>Atari Arcade Hits 2</description>
 		<year>2000</year>
 		<publisher>Hasbro Interactive</publisher>
 		<info name="developer" value="Atari" />
 		<info name="developer" value="Digital Eclipse Software, Inc." />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1282,12 +1281,12 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- DOS (won't run in Windows 95) -->
 	<!-- disc label: atf_1_03f-->
 	<software name="atf">
 		<description>A.T.F. - Advanced Tactical Fighters (v1.03f)</description>
 		<year>1996</year>
 		<publisher>Electronic Arts / Jane's Information Group Limited</publisher>
+		<info name="required_os" value="DOS" /><!-- won't run in Windows 95 -->
 		<info name="version" value="1.03f" />
 
 		<part name="cdrom" interface="cdrom">
@@ -1324,13 +1323,13 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- DOS / Windows 95 -->
 	<!-- Pentium class 133 MHz -->
 	<!-- TODO: Under DOS hangs if sb16 is selected, "initialization problem with sound card" if that's disabled -->
 	<software name="atlantisd" supported="partial">
 		<description>Atlantis - Das sagenhafte Abenteuer (Germany)</description>
 		<year>1997</year>
 		<publisher>Cryo</publisher>
+		<info name="required_os" value="DOS / Windows 95" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1354,11 +1353,11 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="aworld80">
 		<description>Around the World in 80 Days</description>
 		<year>1994</year>
 		<publisher>EA Kids</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1367,12 +1366,12 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: hangs when starting mission -->
 	<software name="backbagh" supported="no">
 		<description>Back to Baghdad (v1.00)</description>
 		<year>1996</year>
 		<publisher>Military Simulations</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.00"/>
 
 		<part name="cdrom" interface="cdrom">
@@ -1382,7 +1381,6 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Created from original media. size="1386496" crc="8B00FD46" sha1="5E85EAECDDBBD0D91B01F315F2E040247E36FA5A" -->
 	<!-- Originally released on two PC Booter 5.25" floppies and one 3.5" PC Booter floppy. Reprinted on CD by -->
 	<!-- GT Interactive as a standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. -->
@@ -1392,7 +1390,7 @@ Cannot read sound configuration from Windows 95
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
 		<info name="language" value="English" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1401,7 +1399,6 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
 	<!-- Disc label Bad_mojo_uk -->
 	<!-- TODO: weird installer, missing graphics? -->
 	<!-- TODO: doesn't seem to do anything in game, missing mouse pointer? -->
@@ -1409,6 +1406,7 @@ Cannot read sound configuration from Windows 95
 		<description>Bad Mojo</description>
 		<year>1996</year>
 		<publisher>Acclaim</publisher>
+		<info name="required_os" value="Windows 3.1" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1429,7 +1427,6 @@ Cannot read sound configuration from Windows 95
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- Pentium class 90 MHz -->
 	<software name="banzaib" supported="no">
 		<description>Banzai Bug</description>
@@ -1438,6 +1435,7 @@ Cannot read sound configuration from Windows 95
 		<notes><![CDATA[
 Runs in 16-bit High Color, has [8514] bugs
 ]]></notes>
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1446,12 +1444,12 @@ Runs in 16-bit High Color, has [8514] bugs
 		</part>
 	</software>
 
-	<!-- DOS / Windows -->
 	<!-- TODO: trying to install causes access denied error, game can be run anyway -->
 	<software name="barq">
 		<description>BARQ - The Rise of Freedom</description>
 		<year>1996</year>
 		<publisher>UAV</publisher>
+		<info name="required_os" value="DOS / Windows" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1477,13 +1475,13 @@ Runs in 16-bit High Color, has [8514] bugs
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- English / French / German -->
 	<!-- TODO: Cannot install, get stuck at uncompressing files screen -->
 	<software name="batlbugs" supported="no">
 		<description>Battle Bugs</description>
 		<year>1995</year>
 		<publisher>Sierra</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1505,12 +1503,12 @@ Runs in 16-bit High Color, has [8514] bugs
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
 	<!-- TODO: setup AVI test stalls to a DOS text mode-->
 	<software name="batlisl3" supported="partial">
 		<description>Battle Isle 3 - Shadow of the Emperor</description>
 		<year>1995</year>
 		<publisher>Blue Byte</publisher>
+		<info name="required_os" value="Windows 3.1" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1524,7 +1522,6 @@ Runs in 16-bit High Color, has [8514] bugs
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- 486DX33 -->
 	<!-- Runs off CD, no install -->
 	<software name="bnbhvs" supported="no">
@@ -1535,6 +1532,7 @@ Runs in 16-bit High Color, has [8514] bugs
 Randomly crashes with main sprites going out of screen (verify)
 Some samples have audio crackling [SB16]
 ]]></notes>
+		<info name="required_os" value="Windows 95" />
 		<!-- label: B&B_vs -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1543,13 +1541,13 @@ Some samples have audio crackling [SB16]
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
 	<!-- Pentium class 100 MHz -->
 	<!-- Has Italian strings in installer? -->
 	<software name="beantara">
 		<description>Betrayal in Antara</description>
 		<year>1997</year>
 		<publisher>Sierra</publisher>
+		<info name="required_os" value="Windows 3.1" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1568,11 +1566,11 @@ Some samples have audio crackling [SB16]
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
 	<software name="bermusynd">
 		<description>Bermuda Syndrome (Germany)</description>
 		<year>1995</year>
 		<publisher>Century Interactive / BMG Interactive Entertainment</publisher>
+		<info name="required_os" value="Windows 3.1" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1581,7 +1579,6 @@ Some samples have audio crackling [SB16]
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="bestof2" supported="partial">
 		<description>Best of the Best Shareware Volume 2 (Canada)</description>
 		<year>1994</year>
@@ -1617,6 +1614,7 @@ Skunny Wildwest:
 Tie Fighter:
 Wacky Wheels:
 ]]></notes>
+		<info name="required_os" value="DOS" />
 		<info name="usage" value="Run dosroc.exe for a" />
 
 		<part name="cdrom" interface="cdrom">
@@ -1626,12 +1624,11 @@ Wacky Wheels:
 		</part>
 	</software>
 
-
-	<!-- DOS / Windows 3.1 -->
 	<software name="bfchess">
 		<description>Bobby Fischer Teaches Chess</description>
 		<year>1996</year>
 		<publisher>Interplay / Mission Studios</publisher>
+		<info name="required_os" value="DOS / Windows 3.1" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1640,12 +1637,12 @@ Wacky Wheels:
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- English / French / German -->
 	<software name="bioforge">
 		<description>Bioforge (vf1.01)</description>
 		<year>1995</year>
 		<publisher>Origin</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="f1.01" />
 
 		<part name="cdrom" interface="cdrom">
@@ -1665,7 +1662,7 @@ Wacky Wheels:
 		<notes>CD-ROM includes: "Cadaver", "Cadaver: The Payoff", "Gods", "Magic Pockets", "Speedball 2", "Xenon 2"</notes>
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1686,7 +1683,7 @@ Wacky Wheels:
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1695,13 +1692,13 @@ Wacky Wheels:
 		</part>
 	</software>
 
-	<!-- Windows 95, Direct X 5.0 -->
-	<!-- Pentium class 90 MHz -->
+	<!-- Pentium class 90 MHz, Direct X 5.0 -->
 	<!-- TODO: ESC menu briefly appears then goes back into game mode (btanb due of 486 CPU used?) -->
 	<software name="bladerun">
 		<description>Blade Runner</description>
 		<year>1997</year>
 		<publisher>Virgin</publisher>
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1726,7 +1723,6 @@ Wacky Wheels:
 	</software>
 
 	<!-- Pentium 75 MHz -->
-	<!-- Windows 95 -->
 	<!-- 16 MB RAM, CD-ROM x4, SVGA with 16-bit color depth, SB16 -->
 	<!-- Credits also mentions Mac support, different discs? -->
 	<software name="blindnes" supported="no">
@@ -1740,6 +1736,7 @@ No [SVGA] card supports 16-bit color depth (required by gameplay)
 Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 ]]></notes>
 		<info name="developer" value="DedaloMedia Edizioni" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1760,12 +1757,12 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: "Internal Error: #1004 - out of memory allocating buffer" -->
 	<software name="bloodbwl" supported="no">
 		<description>Blood Bowl</description>
 		<year>1995</year>
 		<publisher>MicroLeague Interactive / Games Workshop</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1774,12 +1771,12 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: selecting SB16 causes hang, using legacy SB driver works tho -->
 	<software name="bloodwng" supported="partial">
 		<description>Bloodwings - Pumpkinhead's Revenge</description>
 		<year>1995</year>
 		<publisher>MPCA Interactive</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1801,12 +1798,12 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Needs 590k of conventional memory -->
 	<software name="blueforc">
 		<description>Blue Force</description>
 		<year>1993</year>
 		<publisher>Tsunami Media</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1815,11 +1812,11 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="bodyvoya">
 		<description>Bodyworks Voyager</description>
 		<year>1994</year>
 		<publisher>Software Marketing Corporation</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1828,7 +1825,7 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- Windows 95, Direct X 7.0 -->
+	<!-- Direct X 7.0 -->
 	<!-- Pentium class 200 MHz -->
 	<!-- TODO: invalid opcode exception after install -->
 	<software name="boorball" supported="no">
@@ -1836,6 +1833,7 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<year>2001</year>
 		<publisher>Xpiral / TSY</publisher>
 		<info name="alt_title" value="ブーアプス　ボール" />
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="booaps" sha1="58d2602ca37c40041a6b504857d4c3057e52e94d" />
@@ -1843,12 +1841,12 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS / Windows 95 -->
 	<!-- 256 colors / High Color Modes -->
 	<software name="braind13d">
 		<description>Brain Dead 13 Starring Fritz (Germany)</description>
 		<year>1995</year>
 		<publisher>Empire</publisher>
+		<info name="required_os" value="DOS / Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1870,13 +1868,13 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- German version of Broken Sword -->
 	<!-- TODO: SB16 sound stops working after intro? -->
 	<software name="brokswdd" supported="partial">
 		<description>Baphomets Fluch (Germany)</description>
 		<year>1997</year>
 		<publisher>Megamedia / Revolution / Virgin</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1944,7 +1942,6 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: 384k of EMS memory? -->
 	<software name="bsdracula" supported="partial">
 		<description>Bram Stoker's Dracula (Europe)</description>
@@ -1956,6 +1953,7 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<info name="language" value="French" />
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -1964,7 +1962,6 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="bssky">
 		<description>Beneath a Steel Sky (Europe)</description>
 		<year>1995</year>
@@ -1976,6 +1973,7 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2000,8 +1998,8 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<info name="language" value="Spanish" />
 		<info name="language" value="Swedish" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="v0.0372" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2019,7 +2017,7 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<publisher>GameTek</publisher>
 		<info name="developer" value="GameTek" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2028,12 +2026,12 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: no sound ingame with SB16, eventually hangs -->
 	<software name="budtdtd" supported="partial">
 		<description>Bud Tucker in Double Trouble (Germany)</description>
 		<year>1997</year>
 		<publisher>TopWare</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2042,12 +2040,12 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
 	<!-- TODO: new game requires disc swap -->
 	<software name="buriedtd" supported="partial">
 		<description>Buried in Time - Verschollen in der Zeit (Germany)</description>
 		<year>1995</year>
 		<publisher>Sanctuary Woods</publisher>
+		<info name="required_os" value="Windows 3.1" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2066,12 +2064,12 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Uses manual copy protection -->
 	<software name="burntimed">
 		<description>Burntime</description>
 		<year>1993</year>
 		<publisher>MAX Design</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2080,12 +2078,12 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS / Windows 95 -->
 	<!-- 28th August 1996 -->
 	<software name="caesar2">
 		<description>Caesar II (CMC v1.2)</description>
 		<year>1996</year>
 		<publisher>Sierra</publisher>
+		<info name="required_os" value="DOS / Windows 95" />
 		<info name="version" value="1.2" />
 
 		<part name="cdrom" interface="cdrom">
@@ -2123,11 +2121,11 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="campaign">
 		<description>Campaign</description>
 		<year>1996</year>
 		<publisher>Empire</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2136,13 +2134,13 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: selecting SB16 causes hang when testing sound / game hangs after install -->
 	<!-- TODO: apache demo throws interrupt 0Dh, general protection fault if not installed to HDD (also MAME fatalerrors) -->
 	<software name="capitald" supported="partial">
 		<description>Capitalism (Germany v1.02)</description>
 		<year>1996</year>
 		<publisher>Interactive Magic / Enlight Software</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.02" />
 
 		<part name="cdrom" interface="cdrom">
@@ -2166,11 +2164,11 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS / Windows 3.1 -->
 	<software name="castledb">
 		<description>Castle of Dr. Brain</description>
 		<year>1996</year>
 		<publisher>Sierra</publisher>
+		<info name="required_os" value="DOS / Windows 3.1" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2179,12 +2177,12 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- At least 2 MB of EMM required -->
 	<software name="centint" supported="partial">
 		<description>Central Intelligence</description>
 		<year>1994</year>
 		<publisher>Ocean</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2193,7 +2191,6 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		</part>
 	</software>
 
-	<!-- DOS 4.0 + Windows 95 setup.exe wrapper (just a copy, goes in DOS mode anyway) -->
 	<!-- 486DX2 66 MHz -->
 	<software name="chasm" supported="partial">
 		<description>Chasm: The Rift (Europe)</description>
@@ -2202,6 +2199,8 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 		<notes><![CDATA[
 https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 ]]></notes>
+		<!-- Windows 95 setup.exe wrapper (just a copy, goes in DOS mode anyway) -->
+		<info name="required_os" value="DOS 4.0 / Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="chasm_-_the_rift_(europe)" sha1="b348f7feae7d5b4dc7288d8f5d2e6186a00c26ab"/>
@@ -2209,12 +2208,12 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		</part>
 	</software>
 
-	<!-- DOS / Windows 3.x -->
 	<!-- TODO: "not enough DOS memory" at launch -->
 	<software name="chewy" supported="partial">
 		<description>Chewy - Esc from F5</description>
 		<year>1997</year>
 		<publisher>Play Byte</publisher>
+		<info name="required_os" value="DOS / Windows 3.x" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2249,12 +2248,12 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: hangs with SB16 -->
 	<software name="chillman" supported="partial">
 		<description>Chill Manor (v1.99)</description>
 		<year>1996</year>
 		<publisher>Simon &amp; Schuster</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.99" />
 
 		<part name="cdrom" interface="cdrom">
@@ -2264,12 +2263,12 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Reportedly uses laserlok protection, which seems to work fine -->
 	<software name="chman2">
 		<description>Championship Manager 2 (v1.37)</description>
 		<year>1995</year>
 		<publisher>Domark</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.37" />
 
 		<part name="cdrom" interface="cdrom">
@@ -2293,12 +2292,12 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: fails reading file system -->
 	<software name="chronomst" supported="no">
 		<description>Chronomaster</description>
 		<year>1995</year>
 		<publisher>Capstone</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2320,12 +2319,12 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		</part>
 	</software>
 
-	<!-- Windows 3.1/95 -->
 	<software name="claimpwr">
 		<description>Claim to Power (Germany, 10 Top Hits: Super Spiele)</description>
 		<year>1995</year>
 		<publisher>Softgold Computerspiele</publisher>
 		<info name="developer" value="Rainbow Arts" />
+		<info name="required_os" value="Windows 3.1/95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="claim_to_power_(germany)" sha1="19da66cecef09fde584b49b09445203e6b2d81e9"/>
@@ -2333,12 +2332,12 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- EMS386 v3.0 required -->
 	<software name="cfootman" supported="partial">
 		<description>Club Football - The Manager</description>
 		<year>1995</year>
 		<publisher>BOMS</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2360,12 +2359,12 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Civilization version is 474.04 (but no Sound Blaster option is available?) -->
 	<software name="civmant">
 		<description>Civilization &amp; Mantis</description>
 		<year>1993</year>
 		<publisher>MicroProse</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2374,7 +2373,6 @@ https://www.pcgamingwiki.com/wiki/Chasm:_The_Rift
 		</part>
 	</software>
 
-	<!-- Windows 3.1 / 95 (WinG) -->
 	<!-- Suggested minimum resolution 800x600 -->
 	<software name="civ2" supported="partial">
 		<description>Sid Meier's Civilization II (Europe)</description>
@@ -2386,6 +2384,7 @@ Offset [CDDA] audio, does not stop when exiting game (including getting to Windo
 		<info name="language" value="English" />
 		<info name="language" value="German" />
 		<info name="language" value="French" />
+		<info name="required_os" value="Windows 3.1 / 95 (WinG)" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2415,7 +2414,7 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 ]]></notes>
 		<info name="version" value="1.1" />
 		<info name="language" value="English" />
-		<sharedfeat name="platform" value="Linux" />
+		<info name="required_os" value="Linux" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2450,11 +2449,11 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="clubdead">
 		<description>Club Dead</description>
 		<year>1994</year>
 		<publisher>MTV</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2463,13 +2462,13 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Wants 582k of free RAM -->
 	<!-- TODO: crashes/hangs at intro or by selecting a mission (loaded without cdrom driver tho) -->
 	<software name="cmdadv" supported="no">
 		<description>Command Adventures: Starship</description>
 		<year>1995</year>
 		<publisher>Merit Studios</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2478,12 +2477,12 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS / Windows 95 -->
 	<!-- TODO: SB16 doesn't playback any sound in install menu, also keyboard eventually stop responding -->
 	<software name="cmdconq" supported="partial">
 		<description>Command &amp; Conquer (v1.07)</description>
 		<year>1995</year>
 		<publisher>Virgin / Westwood Studios</publisher>
+		<info name="required_os" value="DOS / Windows 95" />
 		<info name="version" value="1.07" />
 
 		<part name="cdrom1" interface="cdrom">
@@ -2516,12 +2515,12 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: creating a new game throws "cd-rom not found" message at some point even if disc is in -->
 	<software name="cnwlrddx" supported="no">
 		<description>Conquest of the New World Deluxe Edition</description>
 		<year>1997</year>
 		<publisher>Dice / Interplay</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.01" />
 
 		<part name="cdrom" interface="cdrom">
@@ -2531,11 +2530,11 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="comanche">
 		<description>Comanche CD - White Lightning</description>
 		<year>1993</year>
 		<publisher>Softgold</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2544,13 +2543,13 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS / Windows 95 -->
 	<!-- Pentium class 100 MHz -->
 	<!-- TODO: install screen has gfx issue -->
 	<software name="comanche3">
 		<description>Comanche 3</description>
 		<year>1997</year>
 		<publisher>Nova Logic</publisher>
+		<info name="required_os" value="DOS / Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2571,11 +2570,11 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="combairp">
 		<description>Combat Air Patrol</description>
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2584,11 +2583,11 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
 	<software name="comixzone">
 		<description>Comix Zone</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="required_os" value="Windows 3.1" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2597,12 +2596,12 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: cdrom error when launching game -->
 	<software name="conq1086d" supported="no">
 		<description>Conqueror A.D. 1086 (Germany)</description>
 		<year>1996</year>
 		<publisher>Sierra</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2632,7 +2631,7 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		<publisher>Empire Interactive</publisher>
 		<info name="copy_protection" value="The Cool Croc Twins: Manual required" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2650,7 +2649,7 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		<publisher>Empire Interactive</publisher>
 		<info name="copy_protection" value="The Cool Croc Twins: Manual required" />
 		<info name="region" value="Netherlands" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2659,12 +2658,12 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Multidisc collection featuring Around the World in 80 Days, Jungle Book and Peter Pan -->
 	<software name="creadcol">
 		<description>Creative Reader Collection</description>
 		<year>1995</year>
 		<publisher>Novotrade / Creative Wonders / EA Kids</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2696,11 +2695,11 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="crimec">
 		<description>Crime City</description>
 		<year>1992</year>
 		<publisher>Impressions Games</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2723,11 +2722,11 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS / Windows 3.x -->
 	<software name="crusader2d">
 		<description>Crusader - No Regret (Germany)</description>
 		<year>1996</year>
 		<publisher>Origin</publisher>
+		<info name="required_os" value="DOS / Windows 3.x" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2736,12 +2735,12 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Supports Cybermaxx VR headset -->
 	<software name="cyberbvr">
 		<description>CyberBykes - Shadow Racer VR</description>
 		<year>1995</year>
 		<publisher>GameTek</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2750,11 +2749,11 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="cyberia">
 		<description>Cyberia - Project Description (OEM)</description>
 		<year>1994</year>
 		<publisher>Interplay</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2777,7 +2776,6 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS / Windows 95 -->
 	<!-- 486 class at 50 MHz -->
 	<!-- Doesn't have install options, everything autodetects based off DOS env -->
 	<!-- TODO: cdrom fails loading under Win 95 version -->
@@ -2787,6 +2785,7 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		<year>1995</year>
 		<publisher>Virgin / Xatrix Entertainment</publisher>
 		<info name="version" value="1.26E" />
+		<info name="required_os" value="DOS / Windows 95" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2800,12 +2799,12 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: General protection fault 0Dh at game launch -->
 	<software name="cyberjud" supported="no">
 		<description>Cyber Judas</description>
 		<year>1996</year>
 		<publisher>Multi Media International</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.0" />
 
 		<part name="cdrom" interface="cdrom">
@@ -2815,11 +2814,11 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="cycleman">
 		<description>Cyclemania</description>
 		<year>1994</year>
 		<publisher>Accolade</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2828,12 +2827,12 @@ Full game, but with netplay and map editing disabled. Bundled with Corel Linux O
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: "Disk write failed" on install -->
 	<software name="darker" supported="no">
 		<description>Darker</description>
 		<year>1995</year>
 		<publisher>Psygnosis / S.I.E.E</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2855,8 +2854,8 @@ Crash at the begining
 		<info name="developer" value="Cyberdreams" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.51" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2878,8 +2877,8 @@ Crash at the begining
 		<info name="developer" value="Cyberdreams" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.51" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2899,8 +2898,8 @@ Crash at the begining
 		<info name="language" value="English" />
 		<info name="language" value="German" />
 		<info name="region" value="Germany" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.5" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2920,7 +2919,7 @@ Crash at the begining
 		<info name="language" value="English" />
 		<info name="language" value="German" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2967,7 +2966,7 @@ Crash at the begining
 		<publisher>Gremlin Interactive</publisher>
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -2976,7 +2975,6 @@ Crash at the begining
 		</part>
 	</software>
 
-	<!-- DOS 6.0 / Windows 95 -->
 	<!-- Pentium class 90 MHz -->
 	<!-- DirectDraw 2 -->
 	<!-- Polish version known to exist -->
@@ -2992,6 +2990,7 @@ Unplayable without a Pentium CPU class
 Unemulated optional [Matrox Mystique] GPU
 https://www.pcgamingwiki.com/wiki/Destruction_Derby_2
 ]]></notes>
+		<info name="required_os" value="DOS 6.0 / Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3000,12 +2999,12 @@ https://www.pcgamingwiki.com/wiki/Destruction_Derby_2
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: selecting SB16 hangs on the sound test -->
 	<software name="detritus" supported="partial">
 		<description>Detritus - The Daemon's Quest</description>
 		<year>1996</year>
 		<publisher>Manyk / Myndgaemz</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3014,7 +3013,6 @@ https://www.pcgamingwiki.com/wiki/Destruction_Derby_2
 		</part>
 	</software>
 
-	<!-- Windows 95 / NT 4.0 -->
 	<!-- Pentium class 60 MHz -->
 	<software name="diablo" supported="partial">
 		<description>Diablo (v1.00)</description>
@@ -3024,6 +3022,7 @@ https://www.pcgamingwiki.com/wiki/Destruction_Derby_2
 Reports extremely irrealistic [cdrom] speeds in "Test Your PC" in setup menu
 Untested (and likely unsupported) Spawned Diablo and multi player mode
 ]]></notes>
+		<info name="required_os" value="Windows 95 / NT 4.0" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3041,8 +3040,8 @@ Untested (and likely unsupported) Spawned Diablo and multi player mode
 		<publisher>LucasArts</publisher>
 		<info name="developer" value="LucasArts" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="v1.0" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3051,11 +3050,11 @@ Untested (and likely unsupported) Spawned Diablo and multi player mode
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="discdeep">
 		<description>Discoveries of the Deep</description>
 		<year>1996</year>
 		<publisher>SoftKey</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3078,7 +3077,7 @@ Crash after the copy protection screen (tried with "at486" machine)
 		<info name="developer" value="Vektor Grafix" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3088,13 +3087,13 @@ Crash after the copy protection screen (tried with "at486" machine)
 	</software>
 
 	<!-- Pentium class 166 MHz / Direct X 7.0 -->
-	<!-- Windows 95/98/ME -->
 	<!-- TODO: some transparency issues -->
 	<software name="dobupanic" supported="partial">
 		<description>Doka-chan no Building Panic (Japan)</description>
 		<year>2001</year>
 		<publisher>MSD-JAPAN / Salva Corporation / D-YAMA</publisher>
 		<info name="alt_title" value="どかちゃんのビルパニック" />
+		<info name="required_os" value="Windows 95/98/ME" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="bpanic" sha1="141b67f93b4d96be7c064d3603a5b961ed56f23b" />
@@ -3130,13 +3129,13 @@ Crash after the copy protection screen (tried with "at486" machine)
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- 256 colors minimum -->
 	<software name="doom2j" cloneof="doom2">
 		<description>Doom II for Windows 95 (Japan)</description>
 		<year>1996</year>
 		<publisher>id Software / Imagineer</publisher>
 		<info name="alt_title" value="ドゥームＩＩ" />
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="doom2j" sha1="61dd4c9a81d4d354a14533dcbd257a5bcffd22c6" />
@@ -3181,7 +3180,6 @@ Crash after the copy protection screen (tried with "at486" machine)
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
 	<!-- Rainbow disc (CD-ROM XA / CD-i / VideoCD / CD-DA) -->
 	<!--
 	Origin: redump (http://redump.org/disc/54514/)
@@ -3201,6 +3199,7 @@ Crash after the copy protection screen (tried with "at486" machine)
 		<description>The Cranberries: Doors and Windows (USA)</description>
 		<year>1995</year>
 		<publisher>Philips Media / Island Records</publisher>
+		<info name="required_os" value="Windows 3.1" />
 		<info name="serial" value="310691030-2 / 310691081-2"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3209,7 +3208,6 @@ Crash after the copy protection screen (tried with "at486" machine)
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="duke3d" supported="partial">
 		<description>Duke Nukem 3D (shareware v1.1)</description>
 		<year>1996</year>
@@ -3218,6 +3216,7 @@ Crash after the copy protection screen (tried with "at486" machine)
 Duke Nukem 3d: untested multiplayer options
 Terminal Velocity: incompatible with Windows 95 (verify), has unsupported options for [CH Flight Pro], [Joy/Throt]
 ]]></notes>
+		<info name="required_os" value="DOS" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="3d_realms_-_duke_nukem_3d_(shareware_version)" sha1="60ac890bd8269b2dbaed687bff45aa009b48cab3" />
@@ -3239,7 +3238,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3260,8 +3259,8 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="Netherlands" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="V1.07" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3281,8 +3280,8 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<info name="language" value="English" />
 		<info name="language" value="French" />
 		<info name="language" value="German" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="V1.07" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3301,8 +3300,8 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<info name="developer" value="Westwood Studios" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="V1.07" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3311,11 +3310,11 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="dungkrem">
 		<description>Dungeons of Kremlin (English, Russia)</description>
 		<year>1995</year>
 		<publisher>NewCom</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3350,7 +3349,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3371,7 +3370,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3390,7 +3389,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<info name="developer" value="Andrew Spencer Studios" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3409,7 +3408,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<info name="developer" value="Andrew Spencer Studios" />
 		<info name="language" value="German" />
 		<info name="region" value="Germany" />
-		<sharedfeat name="platform" value="Windows 95" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3428,7 +3427,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		<info name="developer" value="Andrew Spencer Studios" />
 		<info name="language" value="German" />
 		<info name="region" value="Germany" />
-		<sharedfeat name="platform" value="Windows 95" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3464,7 +3463,6 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 		</part>
 	</software>
 
-	<!-- DOS / Windows -->
 	<!-- 486 minimum -->
 	<!-- Earlier Korean and Capcom USA versions known to exist -->
 	<!-- TODO: test with FM Towns -->
@@ -3476,6 +3474,7 @@ Terminal Velocity: incompatible with Windows 95 (verify), has unsupported option
 pc98: incompatible? DOS installer tries to check AT-style keyboard, Windows manages to install but hangs on .exe at DPMI allocation (verify)
 ]]></notes>
 		<info name="alt_title" value="Electronic ぽっぷる" />
+		<info name="required_os" value="DOS / Windows" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="popple" sha1="1132afe937c5d2b914fbb705c90e1ec0c0c9f7ad" />
@@ -3483,12 +3482,12 @@ pc98: incompatible? DOS installer tries to check AT-style keyboard, Windows mana
 		</part>
 	</software>
 
-	<!-- DOS 5.0 -->
 	<!-- 486 class CPU -->
 	<software name="enemystr">
 		<description>Enemy Star</description>
 		<year>1999</year>
 		<publisher>Midas</publisher>
+		<info name="required_os" value="DOS 5.0" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3511,7 +3510,7 @@ Includes 13 tables
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
 		<info name="version" value="2.1" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3534,8 +3533,8 @@ Shareware: "Fire Fight v1.1", "Jazz Jackrabbit: Turtle Terror and Holiday Hare",
 		<info name="developer" value="Epic Megagames" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="2.1" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3544,12 +3543,12 @@ Shareware: "Fire Fight v1.1", "Jazz Jackrabbit: Turtle Terror and Holiday Hare",
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="ericurdy">
 		<description>Eric the Unready</description>
 		<year>1997</year>
 		<publisher>Legend Entertainment</publisher>
 		<info name="version" value="1.0" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3558,12 +3557,12 @@ Shareware: "Fire Fight v1.1", "Jazz Jackrabbit: Turtle Terror and Holiday Hare",
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: sound requires EMM manager -->
 	<software name="escdlrum" supported="partial">
 		<description>Escape from Delirium</description>
 		<year>1997</year>
 		<publisher>Magicom Multimedia / Virtual X-Perience</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3584,8 +3583,8 @@ Shareware: "Fire Fight v1.1", "Jazz Jackrabbit: Turtle Terror and Holiday Hare",
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="3.7" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3606,8 +3605,8 @@ Shareware: "Fire Fight v1.1", "Jazz Jackrabbit: Turtle Terror and Holiday Hare",
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.1" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3629,8 +3628,8 @@ This release doesn't have audio speech.
 		<info name="developer" value="Westwood Studios" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.3" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3652,8 +3651,8 @@ This release doesn't have audio speech.
 		<info name="developer" value="Westwood Studios" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="Spain" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="2.2" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3675,8 +3674,8 @@ This release doesn't have audio speech.
 		<info name="developer" value="Westwood Studios" />
 		<info name="language" value="English" />
 		<info name="region" value="Denmark" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.3" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3698,8 +3697,8 @@ This release doesn't have audio speech.
 		<info name="developer" value="Westwood Studios" />
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.3" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3720,8 +3719,8 @@ This release doesn't have audio speech.
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="3.7" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3742,8 +3741,8 @@ This release doesn't have audio speech.
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="3.7" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3764,8 +3763,8 @@ This release doesn't have audio speech.
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="Asia" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="3.7" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3786,8 +3785,8 @@ This release doesn't have audio speech.
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="Europe/Japan" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="V1.02" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3808,8 +3807,8 @@ This release doesn't have audio speech.
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="UK" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="V1.0A" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3834,7 +3833,6 @@ https://mametesters.org/view.php?id=9334
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- requires 600k of free memory -->
 	<!-- has no manual copy protection -->
 	<software name="f1gp">
@@ -3844,8 +3842,8 @@ https://mametesters.org/view.php?id=9334
 		<info name="developer" value="MicroProse" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.05" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3864,8 +3862,8 @@ https://mametesters.org/view.php?id=9334
 		<info name="developer" value="MicroProse" />
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.05" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3885,7 +3883,7 @@ https://mametesters.org/view.php?id=9334
 		<info name="developer" value="Vivid Image" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3918,7 +3916,7 @@ https://mametesters.org/view.php?id=9334
 		<info name="language" value="English" />
 		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3938,7 +3936,7 @@ https://mametesters.org/view.php?id=9334
 		<info name="language" value="English" />
 		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3958,7 +3956,7 @@ https://mametesters.org/view.php?id=9334
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3977,7 +3975,7 @@ https://mametesters.org/view.php?id=9334
 		<info name="developer" value="Interactive Binary Illusions" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -3986,12 +3984,12 @@ https://mametesters.org/view.php?id=9334
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: several elements are black colored (EGA mode) -->
 	<software name="f29ret" supported="no">
 		<description>F-29 Retaliator</description>
 		<year>1995</year>
 		<publisher>The Hit Squad</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4000,11 +3998,11 @@ https://mametesters.org/view.php?id=9334
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="fpbbal94">
 		<description>Front Page Sports - Baseball '94</description>
 		<year>1994</year>
 		<publisher>Sierra</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4013,12 +4011,12 @@ https://mametesters.org/view.php?id=9334
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- wants 595k of free memory, bootmake.bat doesn't seem to work properly -->
 	<software name="franklod" supported="no">
 		<description>Frankenstein - Life or Death</description>
 		<year>1995</year>
 		<publisher>Merit Studios</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4027,7 +4025,6 @@ https://mametesters.org/view.php?id=9334
 		</part>
 	</software>
 
-	<!-- Windows 3.1/95 -->
 	<!-- http://redump.org/disc/114360/ -->
 	<software name="fulltilt">
 		<description>Full Tilt! Pinball (version 1.1)</description>
@@ -4035,6 +4032,7 @@ https://mametesters.org/view.php?id=9334
 		<publisher>Maxis</publisher>
 		<info name="developer" value="Cinematronics" />
 		<info name="release" value="19960319" />
+		<info name="required_os" value="Windows 3.1/95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="full tilt pinball 1.1" sha1="c9ab5a92a673924ae341fb6f671715ca42bf6f8c" />
@@ -4042,7 +4040,6 @@ https://mametesters.org/view.php?id=9334
 		</part>
 	</software>
 
-	<!-- Windows 3.1/95 -->
 	<!-- http://redump.org/disc/81828/ -->
 	<software name="fulltiltoem1" cloneof="fulltilt">
 		<description>Full Tilt! Pinball (version 1.1) (Scholastic Edition)</description>
@@ -4050,6 +4047,7 @@ https://mametesters.org/view.php?id=9334
 		<publisher>Maxis</publisher>
 		<info name="developer" value="Cinematronics" />
 		<info name="release" value="19960319" />
+		<info name="required_os" value="Windows 3.1/95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="full tilt pinball 1.1 scholastic" sha1="ff4ad114486f372502359271b5e28bae1975d884" />
@@ -4057,7 +4055,6 @@ https://mametesters.org/view.php?id=9334
 		</part>
 	</software>
 
-	<!-- Windows 3.1/95 -->
 	<!-- http://redump.org/disc/15320 -->
 	<software name="fulltiltoem2" cloneof="fulltilt" supported="partial">
 		<description>Full Tilt! Pinball (version 1.1) (Thrustmaster OEM)</description>
@@ -4068,6 +4065,7 @@ Unsupported optional Thrustmaster Wizzard Pinball controller
 ]]></notes>
 		<info name="developer" value="Cinematronics" />
 		<info name="release" value="19960930" />
+		<info name="required_os" value="Windows 3.1/95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="full tilt pinball 1.1 thrustmaster" sha1="0255b26b2de20620569cd35a793ae3c2757cf888" />
@@ -4075,13 +4073,13 @@ Unsupported optional Thrustmaster Wizzard Pinball controller
 		</part>
 	</software>
 
-	<!-- Windows 3.1/95 -->
 	<!-- http://redump.org/disc/114417/ -->
 	<software name="fulltilt2">
 		<description>Full Tilt! 2 Pinball (version 1.0)</description>
 		<year>1996</year>
 		<publisher>Maxis</publisher>
 		<info name="release" value="19961031" />
+		<info name="required_os" value="Windows 3.1/95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="full tilt 2 pinball 1.0" sha1="82c1d64d8b98e170e64622243a3c803a098a61ff" />
@@ -4089,12 +4087,12 @@ Unsupported optional Thrustmaster Wizzard Pinball controller
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: runtime check failure -->
 	<software name="fwmigolf" supported="no">
 		<description>Fuzzy's World of Miniature Space Golf</description>
 		<year>2000</year>
 		<publisher>Manaccom</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.01r" />
 
 		<part name="cdrom" interface="cdrom">
@@ -4104,12 +4102,12 @@ Unsupported optional Thrustmaster Wizzard Pinball controller
 		</part>
 	</software>
 
-	<!-- Windows 95/98 -->
 	<!-- TODO: create character screen is unusable (sets up True Color Mode) -->
 	<software name="geo" supported="no">
 		<description>GEO ~The Iron Age~ (Japan)</description>
 		<year>1999</year>
 		<publisher>Bakuretsukoubou / ASCII</publisher>
+		<info name="required_os" value="Windows 95/98" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="geo" sha1="08458018473f8d6e1ddd98b30c30bd955264fd75" />
@@ -4136,7 +4134,7 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="Italy" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4157,8 +4155,8 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<info name="developer" value="M.D.O." />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.000 10.05.93" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4181,8 +4179,8 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<info name="language" value="German" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.02" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4202,8 +4200,8 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<info name="developer" value="Coktel Vision" />
 		<info name="language" value="Italian" />
 		<info name="region" value="Italy" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.02" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4222,7 +4220,7 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<info name="developer" value="The Bitmap Brothers" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="Windows 95" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4231,7 +4229,6 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		</part>
 	</software>
 
-	<!-- Windows 3.1 / Windows 95 -->
 	<!-- 256 colors minimum -->
 	<!-- TODO: gfx issues -->
 	<software name="gollygoal" supported="partial">
@@ -4239,6 +4236,7 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		<year>1996</year>
 		<publisher>Namco</publisher>
 		<info name="alt_title" value="ゴーリーゴーストゴール!" />
+		<info name="required_os" value="Windows 3.1 / Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ggg" sha1="ab7babc13b5ffb4536fc7a553753a9d12ec41103" />
@@ -4246,7 +4244,6 @@ Playable demos: "Gobliins 2", "Goblins 3", "Inca", "Lost", "Ween"
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- 486 DX2/66 minimum -->
 	<software name="guimode" supported="no">
 		<!-- origin: redump.org -->
@@ -4263,6 +4260,7 @@ Setup level has ENDE text flipping around at set times (btanb?)
 ]]></notes>
 		<info name="barcode" value="9 783896 482662"/>
 		<!-- ISBN: 3-89648-266-1 -->
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4276,7 +4274,7 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<description>Heroes of Might and Magic (USA, DOS, v1.0)</description>
 		<year>1995</year>
 		<publisher>New World Computing</publisher>
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4297,7 +4295,6 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Created from original media. size="1239040" crc="A9510DC8" sha1="609D186B01197D971D0C1A20DC8954F79DAC80D9" -->
 	<!-- Originally released on two 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
 	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
@@ -4306,7 +4303,7 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
 		<info name="language" value="English" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4379,8 +4376,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="developer" value="Moonlite Software" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.1" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4399,8 +4396,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="developer" value="Moonlite Software" />
 		<info name="language" value="English" />
 		<info name="region" value="Germany" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.0" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4419,8 +4416,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="developer" value="Moonlite Software" />
 		<info name="language" value="English" />
 		<info name="region" value="Germany" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="Shareware Version 1.1" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4439,8 +4436,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="developer" value="Moonlite Software" />
 		<info name="language" value="English" />
 		<info name="region" value="Spain" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.0" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4459,8 +4456,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="developer" value="Moonlite Software" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.1" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4479,8 +4476,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="developer" value="Moonlite Software" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.1" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4499,8 +4496,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="developer" value="Moonlite Software" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.1" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4519,8 +4516,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="developer" value="Moonlite Software" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.1" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4543,8 +4540,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="language" value="Spanish" />
 		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="0.2 4/10/93" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4563,8 +4560,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="developer" value="Imagitec Design" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="0.01" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4587,8 +4584,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="language" value="Spanish" />
 		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="0.2 4/10/93" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4611,8 +4608,8 @@ Setup level has ENDE text flipping around at set times (btanb?)
 		<info name="language" value="Spanish" />
 		<info name="language" value="Italian" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="0.2 4/10/93" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4640,7 +4637,7 @@ CD-ROM 4 (mac_cdrom.xml): "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate 
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<sharedfeat name="platform" value="Windows 95" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Vintage"/>
@@ -4675,7 +4672,7 @@ CD-ROM 4 (mac_cdrom.xml): "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate 
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<sharedfeat name="platform" value="Windows 95" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4716,8 +4713,8 @@ CD-ROM 4 (mac_cdrom.xml): "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate 
 		<info name="developer" value="Lucasfilm Games" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="IBM 256 Color 2.0 5/3/90" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4737,12 +4734,12 @@ CD-ROM 4 (mac_cdrom.xml): "DOOM II: Hell on Earth", "Final DOOM", "The Ultimate 
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- 16-bit True Color and 800x600 required -->
 	<software name="iwadejig" supported="partial">
 		<description>Iwatobi Penguin Rocky &amp; Hopper DeJig Puzzle (Japan)</description>
 		<year>199?</year>
 		<publisher>Polygon Pictures</publisher>
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="dejig lite" sha1="1300dbaf3aa961a7b5f490b03884e95124048a7d" />
@@ -4772,7 +4769,6 @@ Untested multiplayer options
 		</part>
 	</software>
 
-	<!-- Windows 98 -->
 	<!-- Intel Celeron 266 MHz class minimum / DirectX 7.0 -->
 	<!-- Korean game, published in Japan by Media Kite -->
 	<!-- ID code: MKW-239 -->
@@ -4780,6 +4776,7 @@ Untested multiplayer options
 		<description>Jaxis (Japan)</description>
 		<year>2002</year>
 		<publisher>Jamie System Development</publisher>
+		<info name="required_os" value="Windows 98" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="jaxis" sha1="749981bb810b64df141c752daf5b47a64ec0acc9" />
@@ -4796,8 +4793,8 @@ Untested multiplayer options
 		<publisher>Project Two Interactive</publisher>
 		<info name="developer" value="Epic MegaGames" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.3" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4815,8 +4812,8 @@ Untested multiplayer options
 		<publisher>ROMWARE</publisher>
 		<info name="developer" value="Epic MegaGames" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.3" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4841,8 +4838,8 @@ Untested multiplayer options
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="Windows 95" />
 		<info name="version" value="1.20" />
-		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4877,8 +4874,8 @@ Untested multiplayer options
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.32" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4913,8 +4910,8 @@ Untested multiplayer options
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="Germany" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.37" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4949,8 +4946,8 @@ Untested multiplayer options
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.37" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -4999,12 +4996,12 @@ Untested multiplayer options
 		</part>
 	</software>
 
-	<!-- DOS 5.0 / Windows 3.1 -->
 	<!-- Pentium class 166 MHz + 32 MB RAM -->
 	<software name="kingsq8i" supported="no">
 		<description>King's Quest - La Maschera dell'Eternità (Italy)</description>
 		<year>1998</year>
 		<publisher>Sierra</publisher>
+		<info name="required_os" value="DOS 5.0 / Windows 3.1" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mask" sha1="07c511088e8b7e5773b3126a72b4781af5c3c5df" />
@@ -5037,7 +5034,6 @@ Untested multiplayer options
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Created from original media. size="931840" crc="25324098" sha1="15C4E7C307CCFC972A73C7C309E4104579D41287" -->
 	<!-- Originally released on PC Booter 5.25" floppies. Reprinted on CD by GT Interactive as a standalone release, -->
 	<!-- and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
@@ -5046,7 +5042,7 @@ Untested multiplayer options
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
 		<info name="language" value="English" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5065,8 +5061,8 @@ Untested multiplayer options
 		<info name="copy_protection" value="Manual required" />
 		<info name="developer" value="Sierra On-line" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.000 September 19, 1995" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5085,8 +5081,8 @@ Untested multiplayer options
 		<info name="copy_protection" value="Some games require manual" />
 		<info name="developer" value="Sierra On-line" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.000 - 12/07/94" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5105,8 +5101,8 @@ Untested multiplayer options
 		<info name="copy_protection" value="Some games require manual" />
 		<info name="developer" value="Sierra On-line" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.000 - 12/07/94" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5115,11 +5111,11 @@ Untested multiplayer options
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
 	<software name="letlaw">
 		<description>Buichi Terasawa's Takeru - Letter of the Law</description>
 		<year>1996</year>
 		<publisher>Sunsoft</publisher>
+		<info name="required_os" value="Windows 3.1" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5142,7 +5138,7 @@ Untested multiplayer options
 		<publisher>Softkey</publisher>
 		<info name="developer" value="Access Software" />
 		<info name="region" value="USA" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5151,7 +5147,6 @@ Untested multiplayer options
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- Pentium class 100 MHz -->
 	<!-- US version known to exist as "The Adventures of Lomax" -->
 	<software name="lomax" supported="no">
@@ -5170,6 +5165,7 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		<info name="language" value="French" />
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5188,8 +5184,8 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		<publisher>LucasArts</publisher>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="CD version (42) (1.0) 10 February 1992" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<feature name="part_id" value="Game Disk"/>
@@ -5209,8 +5205,8 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		<publisher>LucasArts</publisher>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="CD version (42) (1.0) 10 February 1992" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<feature name="part_id" value="Game Disk"/>
@@ -5230,8 +5226,8 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		<publisher>LucasArts</publisher>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="CD version (42) (1.0) 10 February 1992" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<feature name="part_id" value="Game Disk"/>
@@ -5241,13 +5237,13 @@ https://www.pcgamingwiki.com/wiki/The_Adventures_of_Lomax
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Also known as "The Manager", originally released as floppy format in 1991 -->
 	<!-- TODO: choosing a team at new game then pressing the top bar causes shuffled team flags? -->
 	<software name="managerd">
 		<description>Bundesliga Manager Professional (Germany)</description>
 		<year>1996</year>
 		<publisher>Software 2000</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5307,12 +5303,12 @@ Unemulated [Capcom pad]
 		</part>
 	</software>
 
-	<!-- Windows 95/NT4 -->
 	<software name="mfma_addsub">
 		<description>My First Math Adventure: Adding and Subtracting</description>
 		<year>1998</year>
 		<publisher>Global Software Publishing</publisher>
 		<info name="developer" value="Dorling Kindersley" />
+		<info name="required_os" value="Windows 95/NT4" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="my first math adventure - adding and subtracting" sha1="860fe59ec122aff801de2c724e40a5f0045f88be" />
@@ -5320,7 +5316,6 @@ Unemulated [Capcom pad]
 		</part>
 	</software>
 
-	<!-- Windows 3.1/95 -->
 	<!-- Program fails to launch properly on ct486/Win95 -->
 	<software name="mmmsgram" supported="no">
 		<description>Multimedia Middle School Grammar</description>
@@ -5328,6 +5323,7 @@ Unemulated [Capcom pad]
 		<publisher>Pro One</publisher>
 		<info name="developer" value="Sofsource" />
 		<info name="language" value="English" />
+		<info name="required_os" value="Windows 3.1/95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="multimedia middle school grammar" sha1="cc38cae6e47ddebbbffa3e57bd3fbcedac5ed1fe" />
@@ -5403,7 +5399,7 @@ The Curse of Monkey Island (Windows 95 demo version)
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5412,7 +5408,6 @@ The Curse of Monkey Island (Windows 95 demo version)
 		</part>
 	</software>
 
-	<!-- Windows 95/98/NT4 -->
 	<!-- Graphical corruption on svga_s3 (true color bug?), sound not working properly on sblaster_16 -->
 	<software name="mvsbcn10" supported="no">
 		<description>Mavis Beacon Teaches Typing Special Edition 10</description>
@@ -5420,6 +5415,7 @@ The Curse of Monkey Island (Windows 95 demo version)
 		<publisher>Brøderbund</publisher>
 		<info name="developer" value="The Learning Company" />
 		<info name="language" value="English" />
+		<info name="required_os" value="Windows 95/98/NT4" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="mavis beacon teaches typing special edition 10" sha1="5e37dd988b0e0696c3b466c46d8ec471cbc3c5f2" />
@@ -5427,7 +5423,6 @@ The Curse of Monkey Island (Windows 95 demo version)
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
 	<!-- 386DX 33 MHz -->
 	<!-- Later "Masterpiece Edition" known to exist (has 3rd tab for help on status bar) -->
 	<software name="myst" supported="yes">
@@ -5437,6 +5432,7 @@ The Curse of Monkey Island (Windows 95 demo version)
 		<notes><![CDATA[
 https://www.pcgamingwiki.com/wiki/Myst
 ]]></notes>
+		<info name="required_os" value="Windows 3.1" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="myst" sha1="de9e11e5b52753229d64a6940a9de866aaf26791"/>
@@ -5473,7 +5469,7 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 ]]></notes>
 		<info name="language" value="French" />
 		<info name="region" value="France" />
-		<sharedfeat name="platform" value="Windows 95" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5482,12 +5478,12 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		</part>
 	</software>
 
-	<!-- Windows 3.1/95 -->
 	<!-- Simulmondo is credited when you finish the game -->
 	<software name="noiangi">
 		<description>Noi Siamo Angeli (Italy)</description>
 		<year>1997</year>
 		<publisher>Smile Interactive / Simulmondo</publisher>
+		<info name="required_os" value="Windows 3.1/95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<!-- no disc label, arbitrary renamed -->
@@ -5525,11 +5521,11 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<software name="orpheocr">
 		<description>Are You Afraid of the Dark - The Tale of Orpheo's Curse</description>
 		<year>1994</year>
 		<publisher>Viacom New Media / Nickelodeon</publisher>
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5538,11 +5534,11 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
 	<software name="paulymou" supported="partial">
 		<description>Pauly Mouse (Japan)</description>
 		<year>1995</year>
 		<publisher>CDWare / Fuji International Enterprises</publisher>
+		<info name="required_os" value="Windows 3.1" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pmouse" sha1="c135e153fc7f9accfa4d1c2fa9213e8587af24fc" />
@@ -5560,7 +5556,7 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		<info name="developer" value="Digital Dreams Multimedia" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="Windows 95" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5578,7 +5574,7 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		<publisher>Empire Interactive</publisher>
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5596,7 +5592,7 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		<publisher>Multi Media International</publisher>
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5605,7 +5601,6 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Created from an ISO. size="6352896" crc="DCEEEB82" sha1="EA7BE8CB7E91FB97C590D23AEDFA371DC98CF5C0" -->
 	<!-- Originally released on 3.5" and 5.25" floppies. Reprinted on CD by GT Interactive and included in -->
 	<!-- "Arcade Favorites CD-Rom 5 Pak." Game can be run straight from the CD or installed to a hard drive. -->
@@ -5615,7 +5610,7 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		<publisher>GT Interactive</publisher>
 		<info name="alt_title" value="Pipe Dream" />
 		<info name="language" value="English" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5624,11 +5619,11 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		</part>
 	</software>
 
-	<!-- Windows 3.x  / 95 -->
 	<software name="plumber" supported="yes">
-		<description>Plumbers don't Wear Ties</description>
+		<description>Plumbers Don't Wear Ties</description>
 		<year>1993</year>
 		<publisher>Kirin Entertainment</publisher>
+		<info name="required_os" value="Windows 3.1 / 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5637,7 +5632,6 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- TODO: checkout full name -->
 	<!-- Should be Yuugen Gaisha Poipon Kensetsu (有)ポイポン建設 -->
 	<software name="poipon">
@@ -5645,6 +5639,7 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		<year>1997</year>
 		<publisher>Witty Wolf</publisher>
 		<info name="alt_title" value="ポイポン" />
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="poipon" sha1="91c230bd6e14551794a1c28fd65c901187ce7786" />
@@ -5683,8 +5678,8 @@ Warlords III: Darklords Rising
 		<info name="copy_protection" value="Manual required" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="Windows 95" />
 		<info name="version" value="2.0 September 30, 1998" />
-		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5707,8 +5702,8 @@ Playable Demo: Prince of Persia 3D
 		<info name="copy_protection" value="Manual required" />
 		<info name="language" value="English" />
 		<info name="region" value="France" />
+		<info name="required_os" value="Windows 95" />
 		<info name="version" value="1.0" />
-		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5730,7 +5725,7 @@ Prince of Persia 2 - The Shadow and the Flame (v1.0)
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5752,7 +5747,7 @@ Prince of Persia 2 - The Shadow and the Flame (v1.0)
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5781,8 +5776,8 @@ Warlords III: Darklords Rising
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="Windows 95" />
 		<info name="version" value="1.0 September 11, 1998" />
-		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5811,8 +5806,8 @@ Warlords III: Darklords Rising
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="Windows 95" />
 		<info name="version" value="1.0 September 11, 1998" />
-		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5840,8 +5835,8 @@ The Making of Prince of Persia 3D
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="Windows 95" />
 		<info name="version" value="1.0 September 11, 1998" />
-		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5869,8 +5864,8 @@ Warlords III: Darklords Rising
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
+		<info name="required_os" value="Windows 95" />
 		<info name="version" value="1.0 September 11, 1998" />
-		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5898,8 +5893,8 @@ Warlords III: Darklords Rising
 ]]></notes>
 		<info name="language" value="English" />
 		<info name="region" value="Brazil" />
+		<info name="required_os" value="Windows 95" />
 		<info name="version" value="1.0 September 11, 1998" />
-		<sharedfeat name="platform" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5908,7 +5903,6 @@ Warlords III: Darklords Rising
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- 4MB, 8MB and 16MB versions known to exist (?) -->
 	<!-- Win / Mac later release known to exist -->
 	<software name="primrage" supported="partial">
@@ -5920,6 +5914,7 @@ Detects 4MB even if there are 16MB [RAM] installed (verify claim on wiki, this m
 [SVGA] S3 (at least) runs game at 70 Hz
 https://www.pcgamingwiki.com/wiki/Primal_Rage
 ]]></notes>
+		<info name="required_os" value="DOS" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="timewarnerinteractive-primalrage-msdos-eng" sha1="c3e4c2d2ceebe80975d61c6761542dc180031520"/>
@@ -5928,12 +5923,12 @@ https://www.pcgamingwiki.com/wiki/Primal_Rage
 	</software>
 
 
-	<!-- Windows 3.1J / 95J -->
 	<!-- English prototype known to exist -->
 	<software name="prinmak2">
 		<description>Princess Maker 2 (Japan)</description>
 		<year>1995</year>
 		<publisher>Gainax</publisher>
+		<info name="required_os" value="Windows 3.1J / 95J" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="princess_maker_2_(win31)" sha1="5f7d1af8f9f4c9841893c50c48d765d66a84013d"/>
@@ -5969,7 +5964,7 @@ https://www.pcgamingwiki.com/wiki/Primal_Rage
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="USA" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -5978,7 +5973,6 @@ https://www.pcgamingwiki.com/wiki/Primal_Rage
 		</part>
 	</software>
 
-	<!-- DOS 5.0 / Windows 95/98 -->
 	<!-- Pentium class 75 MHz -->
 	<software name="quake" supported="partial">
 		<description>Quake 1.06 (DOS, Windows)</description>
@@ -5990,6 +5984,7 @@ Looks too dark on s3_764 (verify)
 ]]></notes>
 		<info name="developer" value="id Software" />
 		<info name="language" value="English" />
+		<info name="required_os" value="DOS 5.0 / Windows 95/98" />
 		<info name="version" value="1.06" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6080,8 +6075,8 @@ Looks too dark on s3_764 (verify)
 		<info name="developer" value="Cygnus Software" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe/USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="V1.2" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6100,8 +6095,8 @@ Looks too dark on s3_764 (verify)
 		<info name="developer" value="Cygnus Software" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="V1.2" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6120,8 +6115,8 @@ Looks too dark on s3_764 (verify)
 		<info name="developer" value="Cygnus Software" />
 		<info name="language" value="English" />
 		<info name="region" value="Germany" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="V1.1" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6140,8 +6135,8 @@ Looks too dark on s3_764 (verify)
 		<info name="developer" value="Cygnus Software" />
 		<info name="language" value="English" />
 		<info name="region" value="Netherlands" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="V1.2" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6150,12 +6145,12 @@ Looks too dark on s3_764 (verify)
 		</part>
 	</software>
 
-	<!-- DOS 5.0 / Windows 95 -->
 	<!-- TODO: return errno 1 under DOS and MSCDEX -->
 	<software name="rayman" supported="partial">
 		<description>Rayman (US v1.21)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
+		<info name="required_os" value="DOS 5.0 / Windows 95" />
 		<info name="version" value="1.21" />
 
 		<part name="cdrom" interface="cdrom">
@@ -6165,12 +6160,12 @@ Looks too dark on s3_764 (verify)
 		</part>
 	</software>
 
-	<!-- DOS / Windows 95 -->
 	<!-- 486DX2 66 MHz -->
 	<software name="redalert" supported="partial">
 		<description>Command &amp; Conquer - Red Alert</description>
 		<year>1996</year>
 		<publisher>Virgin / Westwood Studios</publisher>
+		<info name="required_os" value="DOS / Windows 95" />
 
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6254,12 +6249,12 @@ Looks too dark on s3_764 (verify)
 		</part>
 	</software>
 
-	<!-- Windows 95/98 -->
 	<software name="robotronx">
 		<description>Robotron X</description>
 		<year>1996</year>
 		<publisher>GT Interactive</publisher>
 		<info name="developer" value="Midway" />
+		<info name="required_os" value="Windows 95/98" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6268,7 +6263,6 @@ Looks too dark on s3_764 (verify)
 		</part>
 	</software>
 
-	<!-- Windows 95 / 98 -->
 	<!-- Pentium class 75 MHz -->
 	<software name="roadrashi" supported="no">
 		<description>Road Rash (Italy)</description>
@@ -6279,6 +6273,7 @@ On 486 has popup and sometimes punts to Windows with no exception (verify)
 Sound mixing menu screen uses [8514] 16bpp
 https://www.pcgamingwiki.com/wiki/Road_Rash
 ]]></notes>
+		<info name="required_os" value="Windows 95/98" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="roadrash" sha1="8029d895fda77b46fa9ca3b34a52dd5cb2a72fad" />
@@ -6312,12 +6307,12 @@ https://www.pcgamingwiki.com/wiki/Road_Rash
 		</part>
 	</software>
 
-	<!-- Windows 95 / NT 4 -->
 	<!-- High Color 16-bit -->
 	<software name="seraphim" supported="partial">
 		<description>Seraphim Saigo No Tenshi (Japan)</description>
 		<year>1997</year>
 		<publisher>Soeishinsha</publisher>
+		<info name="required_os" value="Windows 95 / NT 4" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6326,8 +6321,6 @@ https://www.pcgamingwiki.com/wiki/Road_Rash
 		</part>
 	</software>
 
-	<!-- MS-DOS 6.0 / Windows 3.1 -->
-	<!-- Windows 95 not officially supported but seems to work fine -->
 	<!-- 486 33 MHz -->
 	<software name="shangmom" supported="partial">
 		<description>Shanghai: Great Moments</description>
@@ -6337,6 +6330,8 @@ https://www.pcgamingwiki.com/wiki/Road_Rash
 Install screen has wrong [8514] header text
 Bit of desync when Rosalind Chao starts talking at beginning of an attract cycle (verify)
 ]]></notes>
+		<info name="required_os" value="MS-DOS 6.0 / Windows 3.1" />
+		<!-- Windows 95 not officially supported but seems to work fine -->
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="shanghai" sha1="1d3cd20e23a94c6d5568687da3fc56579e2b6a26" />
@@ -6375,7 +6370,6 @@ Unresponsive [keyboard] on ranking screen
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- Pentium class 133 MHz -->
 	<!-- Direct X 5 -->
 	<software name="silkroad">
@@ -6383,6 +6377,7 @@ Unresponsive [keyboard] on ranking screen
 		<year>1998</year>
 		<publisher>Anjin / Sprite</publisher>
 		<info name="alt_title" value="シルクロード 星の島の物語" />
+		<info name="required_os" value="Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6391,7 +6386,6 @@ Unresponsive [keyboard] on ranking screen
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<software name="simcity" supported="partial">
 		<description>SimCity Classic (v2.0)</description>
 		<year>1995</year>
@@ -6399,6 +6393,7 @@ Unresponsive [keyboard] on ranking screen
 		<notes><![CDATA[
 Minor [8514] issues, cfr. other entries
 ]]></notes>
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sc_classic" sha1="0e76c55926803a3fb9c6de9650902965d025847e" />
@@ -6406,7 +6401,6 @@ Minor [8514] issues, cfr. other entries
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="simcit2k" supported="yes">
 		<!-- unknown version, v1.01 but on CD-ROM?  -->
 		<description>SimCity 2000</description>
@@ -6415,6 +6409,7 @@ Minor [8514] issues, cfr. other entries
 		<notes><![CDATA[
 Seemingly incompatible with Windows 95, tries to read from floppy if launched from desktop, rebooting as DOS will detect just first 1MB from install (verify)
 ]]></notes>
+		<info name="required_os" value="DOS" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="simcity_2000_dos" sha1="a8c90e9cb27d3bb8e265bfc96cd31f4e9a04a034"/>
@@ -6433,8 +6428,8 @@ Seemingly incompatible with Windows 95, tries to read from floppy if launched fr
 		<info name="developer" value="Adventuresoft" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="1.00" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6443,13 +6438,13 @@ Seemingly incompatible with Windows 95, tries to read from floppy if launched fr
 		</part>
 	</software>
 
-	<!-- Windows 3.1 / 3.11 / 95 -->
 	<!-- 486 66 MHz -->
 	<!-- SVGA 256 colors -->
 	<software name="slamdtyp" supported="yes">
 		<description>Slam Dunk Typing</description>
 		<year>1997</year>
 		<publisher>Creative Wonders</publisher>
+		<info name="required_os" value="Windows 3.1 / 3.11 / 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6458,11 +6453,11 @@ Seemingly incompatible with Windows 95, tries to read from floppy if launched fr
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="skynet" supported="partial">
 		<description>SkyNET</description>
 		<year>1996</year>
 		<publisher>Bethesda Softworks</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6471,7 +6466,6 @@ Seemingly incompatible with Windows 95, tries to read from floppy if launched fr
 		</part>
 	</software>
 
-	<!-- Windows 3.1/95/NT 3.51/NT 4.0 -->
 	<!-- A separate Macintosh version known to exist -->
 	<software name="skulcrck" supported="partial">
 		<!-- 7/23/96 -->
@@ -6482,6 +6476,7 @@ Seemingly incompatible with Windows 95, tries to read from floppy if launched fr
 Optional [pc_joy] 4-button joystick, work around by mapping b3 and b4 to player 2 side
 ]]></notes>
 		<info name="developer" value="Cyberflix"/>
+		<info name="required_os" value="Windows 3.1/95/NT 3.51/NT 4.0" />
 		<info name="usage" value="ALT pauses the game (including title screen and videos)"/>
 
 		<part name="cdrom" interface="cdrom">
@@ -6491,7 +6486,6 @@ Optional [pc_joy] 4-button joystick, work around by mapping b3 and b4 to player 
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- Pentium class 75 MHz -->
 	<!-- DirectX 3.0 -->
 	<software name="sk" supported="partial">
@@ -6501,6 +6495,7 @@ Optional [pc_joy] 4-button joystick, work around by mapping b3 and b4 to player 
 		<notes><![CDATA[
 Not extensively tested for the high requirements
 ]]></notes>
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sonic_and_knuckles_collection" sha1="09c2d79046710745bc122b3b326ef572af988b3e"/>
@@ -6547,7 +6542,7 @@ Includes DOS and Windows installation setup.
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -6556,7 +6551,6 @@ Includes DOS and Windows installation setup.
 		</part>
 	</software>
 
-	<!-- Windows 95/98/Me -->
 	<!-- Requires Pentium 75 MHz or better -->
 	<!-- Source: http://redump.org/disc/24559/ -->
 	<!-- <rom name="Sonic CD (USA) (Rerelease) (20000814).cue" size="4501" crc="29cfb958" sha1="381c53deee68714a1d4eae960e7f7b933a093140" /> -->
@@ -6607,6 +6601,7 @@ Includes DOS and Windows installation setup.
 		<year>2000</year>
 		<publisher>Sega / Expert Software</publisher>
 		<info name="language" value="English" />
+		<info name="required_os" value="Windows 95/98/ME" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sonic cd (usa 2000 release)" sha1="e93a6b4da206b06e4094c70eeebb0ae7db980c13" />
@@ -7011,11 +7006,11 @@ Includes DOS and Windows installation setup.
 		</part>
 	</software>
 
-	<!-- Windows 3.1 / 95 -->
 	<software name="spaceinv" supported="yes">
 		<description>Space Invaders for Windows</description>
 		<year>1997</year>
 		<publisher>Wiz / Taito</publisher>
+		<info name="required_os" value="Windows 3.1 / 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7033,7 +7028,7 @@ Includes DOS and Windows installation setup.
 		<publisher>Telstar Fun &amp; Games</publisher>
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7054,7 +7049,7 @@ Includes DOS and Windows installation setup.
 		<info name="language" value="French" />
 		<info name="language" value="German" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="star trek 25th anniversary (europe)" sha1="530032767f5475c9f280ee8edf61c179b510960e" />
@@ -7072,7 +7067,7 @@ Includes DOS and Windows installation setup.
 		<info name="developer" value="Interplay" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Game Disc" />
 			<diskarea name="cdrom">
@@ -7098,7 +7093,7 @@ Includes DOS and Windows installation setup.
 		<info name="developer" value="Dynamix" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7118,7 +7113,7 @@ Includes DOS and Windows installation setup.
 		<info name="developer" value="Dynamix" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7167,7 +7162,6 @@ Includes DOS and Windows installation setup.
 		</part>
 	</software>
 
-	<!-- Windows 3.1 / 95 -->
 	<!-- Runs off CD, no install -->
 	<software name="strmrisk" supported="partial">
 		<description>Sturmtruppen: Risiken? (Italy)</description>
@@ -7176,6 +7170,7 @@ Includes DOS and Windows installation setup.
 		<notes><![CDATA[
 Draws video without colors if run thru autorun in Win95, works if st_95.exe is manually executed and from movie player, [SVGA] palette desync?
 ]]></notes>
+		<info name="required_os" value="Windows 3.1 / 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="sturmtruppen_risiken" sha1="e8b4884c95df5101beee68dbc5b45c92ddc08c3e"/>
@@ -7198,7 +7193,6 @@ Draws video without colors if run thru autorun in Win95, works if st_95.exe is m
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Created from original media. size="1230848" crc="71FF88DB" sha1="5AA5CB751B6236892CF74AB37A8A7E3953E866E0" -->
 	<!-- Originally released on one PC Booter 5.25" floppy disk. Reprinted on CD by GT Interactive as a -->
 	<!-- standalone release, and as part of "Arcade Favorites CD-Rom 5 Pak. Game can be run straight from the CD." -->
@@ -7207,7 +7201,7 @@ Draws video without colors if run thru autorun in Win95, works if st_95.exe is m
 		<year>1995</year>
 		<publisher>GT Interactive</publisher>
 		<info name="language" value="English" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7238,7 +7232,7 @@ Titus the Fox: To Marrakech and Back
 		<info name="alt_title" value="10 Game CD ROM" />
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7247,13 +7241,13 @@ Titus the Fox: To Marrakech and Back
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Low budget CD release of both games. Each can be installed separately. Also contains video demos for -->
 	<!-- Discoveries of the Deep, Eternam, Terminator 2: Chess Wars, Trolls and Wayne's World. -->
 	<software name="t2gmchess" supported="partial">
 		<description>Terminator 2: Judgment Day - Chess Wars / Grandmaster Chess</description>
 		<year>1993</year>
 		<publisher>Capstone Software</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7262,12 +7256,12 @@ Titus the Fox: To Marrakech and Back
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Also contains demos for NCAA: Road to the Final Four 2 and Delta V. -->
 	<software name="term2029dx" supported="partial">
 		<description>The Terminator: 2029 - Deluxe CD Edition</description>
 		<year>1994</year>
 		<publisher>Bethesda Softworks</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7276,12 +7270,12 @@ Titus the Fox: To Marrakech and Back
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Also contains demos for The Elder Scrolls: Daggerfall, Xcar, and PBA Bowling. -->
 	<software name="termfs" supported="partial">
 		<description>The Terminator: Future Shock</description>
 		<year>1995</year>
 		<publisher>Bethesda Softworks</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7290,12 +7284,12 @@ Titus the Fox: To Marrakech and Back
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Also contains video demos for The Elder Scrolls: Arena and Delta V. -->
 	<software name="termramp" supported="partial">
 		<description>The Terminator: Rampage</description>
 		<year>1997</year>
 		<publisher>Bethesda Softworks</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7304,7 +7298,6 @@ Titus the Fox: To Marrakech and Back
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- Pentium class 90 MHz -->
 	<!-- DirectX 3.0 (VESA 2.0)  -->
 	<software name="tplay98" supported="no">
@@ -7317,6 +7310,7 @@ Has serious geometry issues during gameplay
 [SB16] has clicking noises thru the DAC
 Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-player adapter]
 ]]></notes>
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ea-tripleplay98-win95" sha1="304492fab8e65add0ae3516633fcbd4ed7755902"/>
@@ -7366,13 +7360,13 @@ Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-playe
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- Doesn't work in non-Japanese OS -->
 	<software name="twinbeep" supported="no">
 		<description>Twinbee Paradise In Donburi Shima (Japan)</description>
 		<year>1998</year>
 		<publisher>Konami</publisher>
 		<info name="alt_title" value="ツインビー Paradise in どんぶり島" />
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="twinbee_p" sha1="a8b07f5cbbef3f88e4c17a5ec323a0a5bff6a961" />
@@ -7385,11 +7379,11 @@ Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-playe
 		</part>
 	</software>
 
-	<!-- DOS 3.30 -->
 	<software name="ultima7">
 		<description>The Complete Ultima VII</description>
 		<year>1995</year>
 		<publisher>Electronic Arts</publisher>
+		<info name="required_os" value="DOS 3.30" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7450,12 +7444,12 @@ Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-playe
 		</part>
 	</software>
 
-	<!-- Windows 95/98 -->
 	<software name="ultsolitaire">
 		<description>Ultimate Solitaire</description>
 		<year>2003</year>
 		<publisher>ValuSoft</publisher>
 		<info name="developer" value="ValuSoft" />
+		<info name="required_os" value="Windows 95/98" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="ultimate solitaire" sha1="fb3b20a6cefabd2f11ca799de7f43aa9bfab439f" />
@@ -7463,13 +7457,13 @@ Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-playe
 		</part>
 	</software>
 
-	<!-- Windows 3.1 -->
 	<!-- Disc label: Cyberplasm_ -->
 	<!-- TODO: gfx shift issue on 256 color mode -->
 	<software name="vcyondo" supported="partial">
 		<description>Awesome Adventures of Victor Vector &amp; Yondo, The - The Cyberplasm Formula</description>
 		<year>1994</year>
 		<publisher>Sanctuary Woods</publisher>
+		<info name="required_os" value="Windows 3.1" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7478,7 +7472,6 @@ Unemulated optional [Gravis Gamepad], [Gravis Gamepad Pro], [Gravis Grip 4-playe
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- Pentium class 90 MHz -->
 	<software name="vf" supported="no">
 		<!-- alias for Virtua Fighter Remix -->
@@ -7491,6 +7484,7 @@ Does not recognize [pc_joy] joystick in
 Offset [CDDA] audio
 https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 ]]></notes>
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="virtua_fighter_pc" sha1="bfba831a59114475082953ff189b957e8ca1ca96"/>
@@ -7507,8 +7501,8 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		<publisher>Brøderbund Software</publisher>
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="v1.1" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7517,12 +7511,12 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- TODO: playback doesn't work properly, needs mouse left button user pressed? Eventually hangs anyway. -->
 	<software name="whoshoti" supported="no">
 		<description>Who Shot Johnny Rock (Italy)</description>
 		<year>1993</year>
 		<publisher>American Laser Games</publisher>
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7541,8 +7535,8 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		<info name="developer" value="Abstrax" />
 		<info name="language" value="English" />
 		<info name="region" value="USA" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="V1.02 CD-ROM" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7551,12 +7545,12 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<!-- Contains Pressure Drop and Under Pressure games -->
 	<software name="wpressure">
 		<description>W.Pressure (Japan)</description>
 		<year>1995</year>
 		<publisher>Millenium Interactive / Efecto Caos / Starhill Productions</publisher>
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="wpressure" sha1="77b464665b1d827551a3bcd09b4f32c7cb621d17" />
@@ -7564,12 +7558,12 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		</part>
 	</software>
 
-	<!-- Windows required -->
 	<!-- TODO: Pressing F12 in-game supposedly should switch to full screen mode but instead it hardlocks OS by switching to a DOS text mode -->
 	<software name="zombiewrj" supported="partial">
 		<description>Halloween Harry in Zombie Wars (Japan ver 1.0R)</description>
 		<year>1996</year>
 		<publisher>Gee Whiz! Entertainment / G.A.M. Corporation</publisher>
+		<info name="required_os" value="Windows" />
 		<info name="version" value="1.0R" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7587,8 +7581,8 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		<publisher>Gremlin Interactive</publisher>
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
+		<info name="required_os" value="DOS" />
 		<info name="version" value="24/02/94" />
-		<sharedfeat name="platform" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7606,7 +7600,7 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		<publisher>Gremlin Interactive</publisher>
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
-		<sharedfeat name="platform" value="DOS" />
+		<info name="required_os" value="DOS" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7640,7 +7634,6 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Crashes in Windows 95 -->
 	<software name="zyclunt" supported="partial">
 		<description>Zyclunt</description>
@@ -7649,6 +7642,7 @@ https://www.pcgamingwiki.com/wiki/Virtua_Fighter_PC
 		<notes><![CDATA[
 Crashes in Windows 95 (verify)
 ]]></notes>
+		<info name="required_os" value="DOS" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="zyclunt" sha1="cc6e69cdd5bdda70361778c3515571114a97b662" />
@@ -7660,7 +7654,6 @@ Crashes in Windows 95 (verify)
 	<!--               Applications              -->
 	<!--                                         -->
 
-	<!-- Windows 3.1/95 -->
 	<!-- From: https://archive.org/details/bsd-on-windows -->
 	<!-- Some documentation is in Japanese, most is in English -->
 	<software name="bow">
@@ -7670,6 +7663,7 @@ Crashes in Windows 95 (verify)
 		<info name="developer" value="Hiroshi Oota" />
 		<info name="language" value="English" />
 		<info name="language" value="Japanese" />
+		<info name="required_os" value="Windows 3.1/95" />
 		<info name="usage" value="Start installation from the floppy disk \SETUP.EXE" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7685,7 +7679,6 @@ Crashes in Windows 95 (verify)
 		</part>
 	</software>
 
-	<!-- Windows 95 -->
 	<software name="cdraw6" supported="no">
 		<description>Corel DRAW! 6</description>
 		<year>1995</year>
@@ -7698,6 +7691,7 @@ Draw: cannot color fill a bezier shape (verify)
 Photo Paint: cannot fill shapes, has artifacts with drawing [8514]
 Other stuff untested
 ]]></notes>
+		<info name="required_os" value="Windows 95" />
 		<part name="cdrom1" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="corel_draw_6_cd1" sha1="db1f485ff98d9e80bd3c0d4b61945c7f6290ae1f" />
@@ -7727,6 +7721,7 @@ Other stuff untested
 		<publisher>Symantec</publisher>
 		<info name="language" value="English" />
 		<info name="release" value="19960221" />
+		<info name="required_os" value="Windows 95" />
 		<info name="version" value="1.0" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7743,6 +7738,7 @@ Other stuff untested
 		<info name="language=" value="English" />
 		<info name="release" value="19970116" />
 		<info name="version" value="2.0" />
+		<info name="required_os" value="Windows NT 4.0" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="norton utilities for windows nt 4.0" sha1="199cf28b94745ae5536fcad8236da9b377541e8d" />
@@ -7780,7 +7776,6 @@ Other stuff untested
 		</part>
 	</software>
 
-	<!-- Windows 95/98 -->
 	<software name="nuwin40">
 		<description>Norton Utilities 4.0</description>
 		<year>1999</year>
@@ -7792,6 +7787,7 @@ Other stuff untested
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
 		<info name="release" value="19990228" />
+		<info name="required_os" value="Windows 95/98" />
 		<info name="version" value="4.0" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -7870,7 +7866,6 @@ Other stuff untested
 	<!--                Multimedia               -->
 	<!--                                         -->
 
-	<!-- DOS 5.0+, Windows 3.1+ -->
 	<software name="uffvmus" supported="no">
 		<description>Uffizi Virtual Museums</description>
 		<year>1995</year>
@@ -7882,6 +7877,7 @@ Other stuff untested
 Crashes on Windows 95 with Mtb30run general protection fault
 Has setup menu glitch with text [8514]
 ]]></notes>
+		<info name="required_os" value="DOS 5.0+, Windows 3.1+" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="uffizi_e1_09" sha1="5121f95753bdf9ffdc5e564259d153088953ac67" />
@@ -9073,7 +9069,6 @@ Installation and Open Circulation CDs are bootable.
 		</part>
 	</software>
 
-	<!-- Windows 9x/NT -->
 	<software name="dc10plus" supported="no">
 		<description>miroVIDEO Studio DC10 Plus (V. 1.04, 160657)</description>
 		<year>1998</year>
@@ -9086,6 +9081,7 @@ Has an HW tester, DirectDraw fails to enable overlay with [ViRGE] Scenic Highway
 		<info name="language" value="Dutch" />
 		<info name="language" value="English" />
 		<info name="language" value="German" />
+		<info name="required_os" value="Windows 9x/NT" />
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="pinnacle-studio-dc10-plus" sha1="1530776b913e21774ade2b160960f2fe70bf4c6b"/>
@@ -9093,7 +9089,6 @@ Has an HW tester, DirectDraw fails to enable overlay with [ViRGE] Scenic Highway
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<software name="div103b" supported="partial">
 		<description>DIV Games Studio (English, v1.03b)</description>
 		<year>1998</year>
@@ -9105,6 +9100,7 @@ CDiv Player doesn't output any [redbook] sound (verify if access to CD is real)
 IDE not extensively tested
 v2 is OSS at https://github.com/DIVGAMES/DIV-Games-Studio
 ]]></notes>
+		<info name="required_os" value="DOS" />
 		<info name="usage" value="Requires a VESA driver"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -9160,12 +9156,12 @@ EZCDLITE Contains Easy CD Creator Lite ASPI setup
 		</part>
 	</software>
 
-	<!-- DOS -->
 	<!-- Rereleased software, apparently identical to the floppy counterpart -->
 	<software name="keycad">
 		<description>Key CAD Complete Creations (v6.0)</description>
 		<year>1996</year>
 		<publisher>SoftKey</publisher>
+		<info name="required_os" value="DOS" />
 		<info name="version" value="6.0" />
 
 		<part name="cdrom" interface="cdrom">
@@ -9377,7 +9373,7 @@ Wave Studio v3.12
 		<info name="language" value="German" />
 		<info name="language" value="Italian" />
 		<info name="language" value="Spanish" />
-		<sharedfeat name="platform" value="Windows 3.x/Windows 95" />
+		<info name="required_os" value="Windows 3.x/Windows 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -9386,12 +9382,12 @@ Wave Studio v3.12
 		</part>
 	</software>
 
-	<!-- DOS / Windows 3.1 / 95 -->
 	<software name="sb16cda" cloneof="sb16cd">
 		<description>Sound Blaster 16 CD (USA?)</description>
 		<year>1996</year>
 		<publisher>Creative Labs</publisher>
 		<info name="language" value="English" />
+		<info name="required_os" value="DOS / Windows 3.1 / 95" />
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

@@ -216,7 +216,7 @@ void pbo_state::pbo(machine_config &config)
 	m_rs232[1]->dcd_handler().set(m_scc[0], FUNC(scc85c30_device::dcdb_w));
 	m_rs232[1]->rxd_handler().set(m_scc[0], FUNC(scc85c30_device::rxb_w));
 
-	HD63450(config, m_dmac, 8_MHz_XTAL, m_maincpu); // MC68450 compatible
+	HD63450(config, m_dmac, 8_MHz_XTAL, m_maincpu, AS_PROGRAM); // MC68450 compatible
 	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2)); // Guesses
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50)); // Guesses
 	m_dmac->irq_callback().set(FUNC(pbo_state::dma_irq_w));

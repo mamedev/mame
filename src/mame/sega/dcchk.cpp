@@ -103,7 +103,7 @@ void dcchk_state::md_68k_map(address_map &map)
 	map(0xa11100, 0xa11101).lrw16(
 		NAME([this] (offs_t offset, u16 mem_mask) {
 			address_space &space = m_md68kcpu->space(AS_PROGRAM);
-			// TODO: enough for all edge cases but timekill
+			// TODO: as per teradrive
 			u16 open_bus = space.read_word(m_md68kcpu->pc() - 2) & 0xfefe;
 			// printf("%06x -> %04x\n", m_md68kcpu->pc() - 2, open_bus);
 			u16 res = (m_mdz80cpu->busack_r() && !m_z80_reset) ^ 1;

@@ -45,6 +45,7 @@ prav8ckb_device::prav8ckb_device(const machine_config &mconfig, const char *tag,
 	, m_reset_callback(*this)
 	, m_keys(*this, "KEY%u", 0U)
 	, m_fn(*this, "FN")
+	, m_layout(*this, "LAYOUT")
 	, m_power_led(*this, "power_led")
 	, m_caps_led(*this, "caps_led")
 	, m_cl_led(*this, "cl_led")
@@ -82,8 +83,8 @@ u8 prav8ckb_device::misc_r()
 	// Reset line should normally be pulled up
 	u8 result = 0x40 | m_softsw;
 
-	// Bits 4, 3 define operating mode; only this one seems valid
-	result |= 0x08;
+	// Bits 4, 3 define the Cyrillic layout
+	result |= m_layout->read();
 
 	return result;
 }
@@ -209,6 +210,13 @@ static INPUT_PORTS_START(prav8ckb)
 	PORT_START("FN")
 	PORT_BIT(1, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CHAR(UCHAR_MAMEKEY(LALT)) PORT_CODE(KEYCODE_LALT) // to left of space bar
 	PORT_BIT(2, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CHAR(UCHAR_MAMEKEY(RALT)) PORT_CODE(KEYCODE_RALT) // to right of space bar
+
+	PORT_START("LAYOUT")
+	PORT_CONFNAME(0x18, 0x08, "Keyboard layout")
+	PORT_CONFSETTING(0x00, u8"QWERTY/,УЕИШЩ")
+	PORT_CONFSETTING(0x18, u8"QWERTY/ЯВЕРТЪ")
+	PORT_CONFSETTING(0x08, u8"QWERTY/ЙЦУКЕН")
+	PORT_CONFSETTING(0x10, "Test?") // not valid for normal usage
 INPUT_PORTS_END
 
 ioport_constructor prav8ckb_device::device_input_ports() const

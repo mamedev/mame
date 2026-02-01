@@ -49,6 +49,7 @@ private:
 	// object finders
 	required_ioport_array<10> m_keys;
 	required_ioport m_fn;
+	required_ioport m_layout;
 	output_finder<> m_power_led;
 	output_finder<> m_caps_led;
 	output_finder<> m_cl_led;

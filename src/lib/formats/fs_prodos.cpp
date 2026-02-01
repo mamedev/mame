@@ -226,6 +226,7 @@ std::vector<meta_description> prodos_image::file_meta_description() const
 	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
 	res.emplace_back(meta_description(meta_name::rsrc_length, 0, true, nullptr, "Size of the resource fork in bytes"));
 	res.emplace_back(meta_description(meta_name::file_type, "UNK", false, [](const meta_value &m) { return validate_file_type(m.as_string()); }, "File type, 3 letters or hex code preceded by 0x"));
+	res.emplace_back(meta_description(meta_name::loading_address, 0x803, false, nullptr, "Loading address or auxiliary file type"));
 	res.emplace_back(meta_description(meta_name::os_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Creator OS version"));
 	res.emplace_back(meta_description(meta_name::os_minimum_version, 5, false, [](const meta_value &m) { return m.as_number() <= 255; }, "Minimum OS version"));
 
@@ -381,6 +382,7 @@ std::pair<std::error_condition, std::vector<dir_entry>> prodos_impl::directory_c
 					meta.set(meta_name::file_type, file_type_to_string(blk->r8(off + 0x10)));
 				}
 
+				meta.set(meta_name::loading_address, blk->r16l(off + 0x1f));
 				meta.set(meta_name::os_version, blk->r8(off + 0x1c));
 				meta.set(meta_name::os_minimum_version, blk->r8(off + 0x1d));
 				meta.set(meta_name::creation_date, prodos_to_dt(blk->r32l(off + 0x18)));

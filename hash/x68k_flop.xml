@@ -766,11 +766,13 @@ Most info on release dates and Jpn titles come from the following (wonderful) re
 		</part>
 	</software>
 
-	<!-- has minor priority issues -->
-	<software name="aburner2">
-		<description>Afterburner II</description>
+	<software name="aburner2" supported="partial">
+		<description>After Burner II</description>
 		<year>1989</year>
 		<publisher>電波新聞社 (Dempa Shinbunsha)</publisher>
+		<notes><![CDATA[
+Has minor priority issues
+]]></notes>
 		<info name="alt_title" value="アフターバーナーII" />
 		<info name="release" value="19890426" />
 		<info name="usage" value="Supports analog joystick." />

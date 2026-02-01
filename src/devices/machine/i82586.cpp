@@ -1125,25 +1125,27 @@ u16 i82586_device::ru_execute(u8 *buf, int length)
 		m_space->write_word(m_scb_base + m_rbd_offset + 0, actual | RB_F | (remaining ? 0 : RB_EOF));
 
 		// check if buffers exhausted
-		if ((rbd_size & RB_EL))
+		if (rbd_size & RB_EL)
 		{
 			m_rbd_offset = RBD_EMPTY;
 
-			if (remaining)
-			{
-				// set buffers exhausted status
-				status |= RFD_S_BUFFER;
-
-				m_ru_state = RU_NR;
-				m_rnr = true;
-			}
+			m_ru_state = RU_NR;
+			m_rnr = true;
 		}
 		else
 			// fetch next rbd offset
 			m_rbd_offset = m_space->read_word(m_scb_base + m_rbd_offset + 2);
 	}
 
-	if (remaining == 0 || cfg_save_bad_frames())
+	if (remaining)
+	{
+		// set buffer exhausted status
+		status |= RFD_S_BUFFER;
+
+		// increment resource error count
+		m_space->write_word(m_scb_address + 12, m_space->read_word(m_scb_address + 12) + 1);
+	}
+	else
 		// set frame received status
 		status |= RFD_C;
 

@@ -489,6 +489,7 @@ int cbm_iec_device::get_signal(int signal)
 #include "vic1520.h"
 #include "c1526.h"
 #include "mps1200.h"
+#include "c5181.h"
 
 void cbm_iec_devices(device_slot_interface &device)
 {
@@ -526,4 +527,5 @@ void cbm_iec_devices(device_slot_interface &device)
 	device.option_add("msdsd2", MSD_SD2);
 	device.option_add("mps1200", MPS1200);
 	device.option_add("mps1250", MPS1250);
+	device.option_add("c5181", XETEC_C5181);
 }

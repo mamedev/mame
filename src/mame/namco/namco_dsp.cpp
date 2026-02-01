@@ -20,13 +20,13 @@ DEFINE_DEVICE_TYPE(NAMCO_C71, namco_c71_device, "namcoc71", "Namco C71 (TMS320C2
 
 
 namco_c67_device::namco_c67_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	tms32025_device(mconfig, NAMCO_C67, tag, owner, clock)
+	tms320c25_device(mconfig, NAMCO_C67, tag, owner, clock)
 {
 	set_mp_mc(false);
 }
 
 namco_c71_device::namco_c71_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	tms32025_device(mconfig, NAMCO_C71, tag, owner, clock)
+	tms320c25_device(mconfig, NAMCO_C71, tag, owner, clock)
 {
 	set_mp_mc(false);
 }

@@ -831,8 +831,7 @@ void esq5505_state::eps(machine_config &config)
 	WD1772(config, m_fdc, 8_MHz_XTAL);
 	FLOPPY_CONNECTOR(config, m_floppy_connector, esq5505_state::floppy_drives, "35dd", esq5505_state::floppy_formats, true);//.enable_sound(true);
 
-	HD63450(config, m_dmac, 10_MHz_XTAL);   // MC68450 compatible
-	m_dmac->set_cpu_tag(m_maincpu);
+	HD63450(config, m_dmac, 10_MHz_XTAL, m_maincpu, AS_PROGRAM);   // MC68450 compatible
 	m_dmac->set_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_dmac->set_burst_clocks(attotime::from_usec(32), attotime::from_nsec(450), attotime::from_nsec(50), attotime::from_nsec(50));
 	m_dmac->irq_callback().set_inputline(m_maincpu, M68K_IRQ_2);

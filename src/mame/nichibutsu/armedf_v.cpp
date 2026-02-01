@@ -237,9 +237,8 @@ void armedf_state::bg_scrolly_w(offs_t offset, u16 data, u16 mem_mask)
 ***************************************************************************/
 
 /* custom code to handle color cycling effect, handled by m_spr_pal_clut */
-void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color, u32 clut,int flipx,int flipy,int offsx,int offsy,
-							bitmap_ind8 &primap, u32 pmask, int transparent_color)
+void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
+		u32 code, u32 color, u32 clut, int flipx, int flipy, int offsx, int offsy, bitmap_ind8 &primap, u32 pmask, int transparent_color)
 {
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -255,38 +254,42 @@ void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,g
 	x_index_base = flipx ? gfx->width()-1 : 0;
 	y_index = flipy ? gfx->height()-1 : 0;
 
-	/* start coordinates */
+	// start coordinates
 	sx = offsx;
 	sy = offsy;
 
-	/* end coordinates */
+	// end coordinates
 	ex = sx + gfx->width();
 	ey = sy + gfx->height();
 
 	if (sx < clip.min_x)
-	{ /* clip left */
+	{
+		// clip left
 		int pixels = clip.min_x-sx;
 		sx += pixels;
 		x_index_base += xinc*pixels;
 	}
 	if (sy < clip.min_y)
-	{ /* clip top */
+	{
+		// clip top
 		int pixels = clip.min_y-sy;
 		sy += pixels;
 		y_index += yinc*pixels;
 	}
-	/* NS 980211 - fixed incorrect clipping */
 	if (ex > clip.max_x+1)
-	{ /* clip right */
+	{
+		// clip right
 		ex = clip.max_x+1;
 	}
 	if (ey > clip.max_y+1)
-	{ /* clip bottom */
+	{
+		// clip bottom
 		ey = clip.max_y+1;
 	}
 
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
-	{ /* skip if inner loop doesn't draw anything */
+	{
 		for (int y = sy; y < ey; y++)
 		{
 			u8 const *const source = source_base + y_index*gfx->rowbytes();

@@ -75,6 +75,8 @@ constexpr std::pair<char const *, char const *> SOFTWARE_INFO_NAMES[] = {
 		{ "pcb",                N_p("swlist-info", "PCB")                       },
 		{ "programmer",         N_p("swlist-info", "Programmer")                },
 		{ "release",            N_p("swlist-info", "Release Date")              },
+		{ "required_os",        N_p("swlist-info", "Required Operating System") },
+		{ "required_ram",       N_p("swlist-info", "Required System RAM")       },
 		{ "serial",             N_p("swlist-info", "Serial Number")             },
 		{ "usage",              N_p("swlist-info", "Usage Instructions")        },
 		{ "version",            N_p("swlist-info", "Version")                   } };

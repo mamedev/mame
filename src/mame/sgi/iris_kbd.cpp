@@ -16,7 +16,6 @@
  *  -
  *
  * TODO:
- *  - verify mcu part and clock
  *  - break key
  *
  */
@@ -71,7 +70,7 @@ protected:
 	u8 led_r(offs_t offset);
 
 private:
-	required_device<i8748_device> m_mcu;
+	required_device<i8035_device> m_mcu;
 	required_device<beep_device> m_beep;
 
 	required_ioport_array<12> m_matrix;
@@ -84,7 +83,7 @@ private:
 
 void iris_kbd_device::device_add_mconfig(machine_config &config)
 {
-	I8748(config, m_mcu, 4.608_MHz_XTAL);
+	I8035(config, m_mcu, 4.608_MHz_XTAL); // clock: 4608 KSS5F
 	m_mcu->set_addrmap(AS_PROGRAM, &iris_kbd_device::map_mem);
 	m_mcu->set_addrmap(AS_IO, &iris_kbd_device::map_pio);
 	m_mcu->p1_out_cb().set(FUNC(iris_kbd_device::p1_w));
@@ -287,7 +286,7 @@ ioport_constructor iris_kbd_device::device_input_ports() const
 
 ROM_START(iris_kbd)
 	ROM_REGION(0x400, "mcu", 0)
-	ROM_LOAD("iris-kb.bin", 0x0, 0x400, CRC(3a2a6887) SHA1(ed59ef7ad493b686f8f2f764549772b75bbd0735))
+	ROM_LOAD("2758_477__1984__key_tronic.bin", 0x0, 0x400, CRC(3a2a6887) SHA1(ed59ef7ad493b686f8f2f764549772b75bbd0735)) // MM2758Q-A
 ROM_END
 
 tiny_rom_entry const *iris_kbd_device::device_rom_region() const

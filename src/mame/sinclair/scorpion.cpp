@@ -457,6 +457,10 @@ rectangle scorpion_state::get_screen_area()
 INPUT_PORTS_START( scorpion )
 	PORT_INCLUDE( spec_plus )
 
+	PORT_MODIFY("CONFIG")
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+
 	PORT_MODIFY("NMI")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(scorpion_state::on_nmi), 0)
 

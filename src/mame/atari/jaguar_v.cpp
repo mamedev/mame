@@ -785,8 +785,8 @@ uint32_t jaguar_state::cojag_gun_input_r(offs_t offset)
 TIMER_CALLBACK_MEMBER(jaguar_state::blitter_done)
 {
 	m_blitter_status = 1;
-	// TODO: kasumi and nbajamte at least enables the done irq, verify if needed or not
-//	m_gpu->set_input_line(4, ASSERT_LINE);
+	// TODO: kasumi, nbajamte and cojag:area51 at least enables the done irq, verify if needed or not
+//  m_gpu->set_input_line(4, ASSERT_LINE);
 }
 
 void jaguar_state::update_pit_timer()
