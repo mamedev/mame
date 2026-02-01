@@ -154,9 +154,8 @@ private:
 	void grid_dma_w(offs_t offset, uint8_t data);
 	uint8_t grid_dma_r(offs_t offset);
 
-	uint32_t screen_update_110x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_generic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int width, int height);
+	template <int Width>
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void kbd_put(u16 data);
 
@@ -245,15 +244,16 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 	return ret;
 }
 
-uint32_t gridcomp_state::screen_update_generic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int width, int height)
+template <int Width>
+uint32_t gridcomp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < height; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *p = &bitmap.pix(y);
 
-		int const offset = y * (width / 16);
+		int const offset = y * (Width / 16);
 
-		for (int x = offset; x < offset + width / 16; x++)
+		for (int x = offset; x < offset + Width / 16; x++)
 		{
 			uint16_t const gfx = m_videoram[x];
 
@@ -265,16 +265,6 @@ uint32_t gridcomp_state::screen_update_generic(screen_device &screen, bitmap_ind
 	}
 
 	return 0;
-}
-
-uint32_t gridcomp_state::screen_update_110x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return screen_update_generic(screen, bitmap, cliprect, 320, 240);
-}
-
-uint32_t gridcomp_state::screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return screen_update_generic(screen, bitmap, cliprect, 512, 256);
 }
 
 void gridcomp_state::machine_start()
@@ -370,7 +360,7 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // actually a kind of EL display
 	screen.set_color(rgb_t::amber());
-	screen.set_screen_update(FUNC(gridcomp_state::screen_update_110x));
+	screen.set_screen_update(FUNC(gridcomp_state::screen_update<320>));
 	screen.set_raw(XTAL(15'000'000)/2, 424, 0, 320, 262, 0, 240); // XXX 66 Hz refresh
 	screen.screen_vblank().set(m_osp, FUNC(i80130_device::ir3_w));
 	screen.set_palette("palette");
@@ -451,7 +441,7 @@ void gridcomp_state::grid1129(machine_config &config)
 void gridcomp_state::grid1131(machine_config &config)
 {
 	grid1121(config);
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update_113x));
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update<512>));
 	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 256);
 }
 
@@ -459,8 +449,6 @@ void gridcomp_state::grid1139(machine_config &config)
 {
 	grid1131(config);
 	m_ram->set_default_size("512K");
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update_113x));
-	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 256);
 }
 
 
@@ -612,7 +600,7 @@ ROM_START( grid1139 )
 	ROMX_LOAD("1139odd.bin",  0x0001, 0x2000, CRC(13ed4bf0) SHA1(f7087f86dbbc911bee985125bccd2417e0374e8e), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /***************************************************************************
