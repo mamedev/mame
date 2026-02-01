@@ -13,6 +13,9 @@
 
 #include "emuopts.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 
 #define DISABLE_FAST_REGISTERS      1
 
@@ -455,7 +458,7 @@ void adsp21062_device::external_iop_write(uint32_t address, uint32_t data)
 	}
 	else
 	{
-		osd_printf_debug("SHARC IOP write %08X, %08X\n", address, m_core->iop_data);
+		LOG("SHARC IOP write %08X, %08X\n", address, m_core->iop_data);
 		m_data->write_dword(address, m_core->iop_data);
 	}
 }
