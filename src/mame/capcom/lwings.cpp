@@ -2,49 +2,53 @@
 // copyright-holders:Paul Leaman
 /***************************************************************************
 
-  Legendary Wings
-  Section Z
-  Trojan
-  Avengers
+Legendary Wings
+Section Z
+Trojan
+Avengers
 
-  Driver provided by Paul Leaman
+Driver provided by Paul Leaman
 
 TODO:
 - sectionz does "false contacts" on the coin counters, causing them to
   increment twice per coin.
-- accurate music tempo (audiocpu irq freq)
-- accurate video timing, raw params
 - verify avengers MCU comms, and redump internal ROM as well (see note
   in ROM defs under AVENGERS_MCU)
+- palette bus conflicts, real hardware does weird stuff if you write to
+  palette RAM outside of vblank
 
+BTANB:
+- sectionz abrupt sprite popups on left-scrolling levels
 
 Notes:
 
-  Avengers has a protection chip underneath the sound module.
-  The protection is extensive: palette data, calculates player movement,
-  even a hand in the sound.
+Avengers has a protection chip underneath the sound module.
+The protection is extensive: palette data, calculates player movement,
+even a hand in the sound.
 
-  avengers061gre2: corrupted graphics in Avengers' ending not fixed.
-  This bug is not in the Japanese set "Buraiken".
-  It might just be a bug in the original: the tiles for the character
-  image are just not present in the US version, replaced by more tiles
-  for the title animation. The tile map ROM is the same between the two
-  versions.
+avengers061gre2: corrupted graphics in Avengers' ending not fixed.
+This bug is not in the Japanese set "Buraiken".
+It might just be a bug in the original: the tiles for the character
+image are just not present in the US version, replaced by more tiles
+for the title animation. The tile map ROM is the same between the two
+versions.
 
-  trojan37b1gre: stage 2-1 boss x flip glitches not fixed.
-  This could be a side effect of sprite RAM buffering. Suggest buffering
-  on-screen content instead of sprite memory.
+trojan37b1gre: stage 2-1 boss x flip glitches not fixed.
+This could be a side effect of sprite RAM buffering. Suggest buffering
+on-screen content instead of sprite memory.
 
-  Previous clock settings were too low. Sometimes Avengers and Trojan
-  could not finish clearing VRAM before a new frame is drawn and left
-  behind screen artifacts. Avengers' second CPU was forced to pre-empt
-  during soundlatch operations, resulting in double or missing sound
-  effects.
+Previous clock settings were too low. Sometimes Avengers and Trojan
+could not finish clearing VRAM before a new frame is drawn and left
+behind screen artifacts. Avengers' second CPU was forced to pre-empt
+during soundlatch operations, resulting in double or missing sound
+effects.
 
-  Trojan (Romstar) Manual has some bonus live values as well as locations
-  which do no jive with actual emulation.  One can only assume this means
-  the manual is incorrect and software was adjusted later but the game could
-  use some PCB comparisons of DIP selections to be certain.
+Trojan (Romstar) Manual has some bonus live values as well as locations
+which do no jive with actual emulation.  One can only assume this means
+the manual is incorrect and software was adjusted later but the game could
+use some PCB comparisons of DIP selections to be certain.
+
+Video timing: Measured 55.37Hz on Section Z, 15.62kHz & 55.4Hz on Avengers.
 
 ***************************************************************************/
 
@@ -53,7 +57,7 @@ Notes:
 #include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
-#include "machine/watchdog.h"
+#include "machine/timer.h"
 #include "sound/msm5205.h"
 #include "sound/okim6295.h"
 #include "sound/ymopn.h"
@@ -127,22 +131,22 @@ private:
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_bg1_tilemap = nullptr;
 	tilemap_t *m_bg2_tilemap = nullptr;
-	uint8_t   m_bg2_image = 0U;
-	int       m_spr_avenger_hw = 0;
-	uint8_t   m_scroll_x[2]{};
-	uint8_t   m_scroll_y[2]{};
+	uint8_t m_bg2_image = 0U;
+	bool m_spr_avenger_hw = false;
+	uint8_t m_scroll_x[2]{};
+	uint8_t m_scroll_y[2]{};
 
 	// misc
-	uint8_t   m_adpcm = 0U;
-	uint8_t   m_nmi_mask = 0U;
-	int       m_sprbank = 0;
+	uint8_t m_adpcm = 0U;
+	uint8_t m_nmi_mask = 0U;
+	uint8_t m_sprbank = 0;
 
 	// MCU-related (avengers)
-	uint8_t   m_mcu_data[2]{};
-	uint8_t   m_mcu_control = 0xff;
+	uint8_t m_mcu_data[2]{};
+	uint8_t m_mcu_control = 0xff;
 
-	void avengers_adpcm_w(uint8_t data);
-	uint8_t avengers_adpcm_r();
+	void avengers_adpcm_w(uint8_t data) { m_adpcm = data; }
+	uint8_t avengers_adpcm_r() { return m_adpcm; }
 	void lwings_bankswitch_w(uint8_t data);
 	uint8_t avengers_soundlatch_ack_r();
 	void lwings_fgvideoram_w(offs_t offset, uint8_t data);
@@ -151,6 +155,7 @@ private:
 	void lwings_bg1_scrolly_w(offs_t offset, uint8_t data);
 	void trojan_bg2_scrollx_w(uint8_t data);
 	void trojan_bg2_image_w(uint8_t data);
+	void sprite_dma_w(uint8_t data);
 	void msm5205_w(uint8_t data);
 	void fball_oki_bank_w(uint8_t data);
 
@@ -170,11 +175,10 @@ private:
 	DECLARE_VIDEO_START(avengers);
 	uint32_t screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void lwings_interrupt(int state);
-	void avengers_interrupt(int state);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	bool is_sprite_on(uint8_t const *buffered_spriteram, int offs);
-	void lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void lwings_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void trojan_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void avengers_adpcm_io_map(address_map &map) ATTR_COLD;
 	void avengers_map(address_map &map) ATTR_COLD;
@@ -198,16 +202,6 @@ private:
  * a code reflecting the direction (8 angles) from one point to the other.
  */
 
-void lwings_state::avengers_adpcm_w(uint8_t data)
-{
-	m_adpcm = data;
-}
-
-uint8_t lwings_state::avengers_adpcm_r()
-{
-	return m_adpcm;
-}
-
 void lwings_state::lwings_bankswitch_w(uint8_t data)
 {
 	// bit 0 is flip screen
@@ -230,16 +224,21 @@ void lwings_state::lwings_bankswitch_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 7));
 }
 
-void lwings_state::lwings_interrupt(int state)
+TIMER_DEVICE_CALLBACK_MEMBER(lwings_state::scanline)
 {
-	if (state && m_nmi_mask)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* Z80 - RST 10h */
-}
+	const int scanline = param;
 
-void lwings_state::avengers_interrupt(int state)
-{
-	if (state && m_nmi_mask)
+	// note: for lwings, RST 10h also works for vblank interrupt
+	if (scanline == 248 && m_nmi_mask)
 		m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+
+	// mid-screen interrupt on V128 (120 scanlines before vblank interrupt)
+	if (scanline == 128)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+
+	// 4 sound interrupts per frame on V64
+	if ((scanline % 64) == 32)
+		m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -302,14 +301,15 @@ uint8_t lwings_state::avengers_soundlatch_ack_r()
 
 void lwings_state::msm5205_w(uint8_t data)
 {
+	m_msm->s1_w(BIT(data, 6));
 	m_msm->reset_w(BIT(data, 7));
-	m_msm->data_w(data);
-	m_msm->vclk_w(1);
-	m_msm->vclk_w(0);
+
+	m_msm->data_w(data & 0xf);
 }
 
 void lwings_state::buraikenb_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xddff).ram();
@@ -317,14 +317,14 @@ void lwings_state::buraikenb_map(address_map &map)
 	map(0xdf80, 0xdfff).ram();
 	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
 	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
-	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf3ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xf400, 0xf7ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0xf800, 0xf801).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
 	map(0xf802, 0xf803).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
 	map(0xf804, 0xf804).w(FUNC(lwings_state::trojan_bg2_scrollx_w));
 	map(0xf805, 0xf805).w(FUNC(lwings_state::trojan_bg2_image_w));
 
-	map(0xf808, 0xf808).portr("SERVICE").nopw(); // ?
+	map(0xf808, 0xf808).portr("SERVICE").w(FUNC(lwings_state::sprite_dma_w));
 	map(0xf809, 0xf809).portr("P1");
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWB");
@@ -344,14 +344,15 @@ void lwings_state::avengers_map(address_map &map)
 
 void lwings_state::lwings_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xddff).ram();
 	map(0xde00, 0xdfff).ram().share("spriteram");
 	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
 	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
-	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf3ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xf400, 0xf7ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	map(0xf808, 0xf808).portr("SERVICE");
 	map(0xf809, 0xf809).portr("P1");
@@ -360,12 +361,13 @@ void lwings_state::lwings_map(address_map &map)
 	map(0xf80b, 0xf80b).portr("DSWA");
 	map(0xf80a, 0xf80b).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
 	map(0xf80c, 0xf80c).portr("DSWB").w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf80d, 0xf80d).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xf80d, 0xf80d).w(FUNC(lwings_state::sprite_dma_w));
 	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
 }
 
 void lwings_state::trojan_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xddff).ram();
@@ -373,14 +375,14 @@ void lwings_state::trojan_map(address_map &map)
 	map(0xdf80, 0xdfff).ram();
 	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
 	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
-	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf3ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xf400, 0xf7ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	map(0xf800, 0xf801).w(FUNC(lwings_state::lwings_bg1_scrollx_w));
 	map(0xf802, 0xf803).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
 	map(0xf804, 0xf804).w(FUNC(lwings_state::trojan_bg2_scrollx_w));
 	map(0xf805, 0xf805).w(FUNC(lwings_state::trojan_bg2_image_w));
-	map(0xf808, 0xf808).portr("SERVICE").nopw(); // watchdog
+	map(0xf808, 0xf808).portr("SERVICE").w(FUNC(lwings_state::sprite_dma_w));
 	map(0xf809, 0xf809).portr("P1");
 	map(0xf80a, 0xf80a).portr("P2");
 	map(0xf80b, 0xf80b).portr("DSWA");
@@ -402,14 +404,15 @@ void lwings_state::lwings_sound_map(address_map &map)
 
 void lwings_state::fball_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).bankr("bank2");
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xddff).ram();
 	map(0xde00, 0xdfff).ram().share("spriteram");
 	map(0xe000, 0xe7ff).ram().w(FUNC(lwings_state::lwings_fgvideoram_w)).share("fgvideoram");
 	map(0xe800, 0xefff).ram().w(FUNC(lwings_state::lwings_bg1videoram_w)).share("bg1videoram");
-	map(0xf000, 0xf3ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
-	map(0xf400, 0xf7ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
+	map(0xf000, 0xf3ff).writeonly().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
+	map(0xf400, 0xf7ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
 
 	map(0xf808, 0xf808).portr("SERVICE");
 	map(0xf809, 0xf809).portr("P1");
@@ -418,7 +421,7 @@ void lwings_state::fball_map(address_map &map)
 	map(0xf80b, 0xf80b).portr("DSWA");
 	map(0xf80a, 0xf80b).w(FUNC(lwings_state::lwings_bg1_scrolly_w));
 	map(0xf80c, 0xf80c).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0xf80d, 0xf80d).portr("P3").w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0xf80d, 0xf80d).portr("P3").w(FUNC(lwings_state::sprite_dma_w));
 	map(0xf80e, 0xf80e).portr("P4");
 
 	map(0xf80e, 0xf80e).w(FUNC(lwings_state::lwings_bankswitch_w));
@@ -551,13 +554,13 @@ VIDEO_START_MEMBER(lwings_state,trojan)
 	m_bg1_tilemap->set_transmask(0, 0xffff, 0x0001); // split type 0 is totally transparent in front half
 	m_bg1_tilemap->set_transmask(1, 0xf07f, 0x0f81); // split type 1 has pens 7-11 opaque in front half
 
-	m_spr_avenger_hw = 0;
+	m_spr_avenger_hw = false;
 }
 
 VIDEO_START_MEMBER(lwings_state,avengers)
 {
 	VIDEO_START_CALL_MEMBER(trojan);
-	m_spr_avenger_hw = 1;
+	m_spr_avenger_hw = true;
 }
 
 
@@ -606,6 +609,12 @@ void lwings_state::trojan_bg2_image_w(uint8_t data)
 	}
 }
 
+void lwings_state::sprite_dma_w(uint8_t data)
+{
+	if (m_screen->vblank())
+		m_spriteram->copy();
+}
+
 
 /***************************************************************************
 
@@ -621,7 +630,7 @@ inline bool lwings_state::is_sprite_on(uint8_t const *buffered_spriteram, int of
 	return sx || sy;
 }
 
-void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void lwings_state::lwings_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
 
@@ -655,7 +664,7 @@ void lwings_state::lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &c
 	}
 }
 
-void lwings_state::trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void lwings_state::trojan_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t const *const buffered_spriteram = m_spriteram->buffer();
 
@@ -823,7 +832,7 @@ static INPUT_PORTS_START( sectionz )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SWB:2,1")
 	PORT_DIPSETTING(    0x00, "Upright One Player" )
 	PORT_DIPSETTING(    0x40, "Upright Two Players" )
-/*      PORT_DIPSETTING(    0x80, "???" )       probably unused */
+/*  PORT_DIPSETTING(    0x80, "???" )       probably unused */
 	PORT_DIPSETTING(    0xc0, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
@@ -1211,27 +1220,20 @@ void lwings_state::machine_reset()
 void lwings_state::lwings(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 12_MHz_XTAL/2); // verified on PCB
+	Z80(config, m_maincpu, 12_MHz_XTAL / 2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_map);
 
-	Z80(config, m_soundcpu, 12_MHz_XTAL/4); // verified on PCB
+	Z80(config, m_soundcpu, 12_MHz_XTAL / 4); // verified on PCB
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::lwings_sound_map);
-	m_soundcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(222));
-	// above frequency is an approximation from PCB music recording - where is the frequency actually derived from?
 
-	WATCHDOG_TIMER(config, "watchdog");
+	TIMER(config, "scantimer").configure_scanline(FUNC(lwings_state::scanline), "screen", 0, 8);
 
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
+	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 282, 8, 248);
 	m_screen->set_screen_update(FUNC(lwings_state::screen_update_lwings));
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	m_screen->screen_vblank().append(FUNC(lwings_state::lwings_interrupt));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
@@ -1242,13 +1244,13 @@ void lwings_state::lwings(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	ym2203_device &ym2203a(YM2203(config, "2203a", 12_MHz_XTAL/8)); // verified on PCB
+	ym2203_device &ym2203a(YM2203(config, "2203a", 12_MHz_XTAL / 8)); // verified on PCB
 	ym2203a.add_route(0, "mono", 0.20);
 	ym2203a.add_route(1, "mono", 0.20);
 	ym2203a.add_route(2, "mono", 0.20);
 	ym2203a.add_route(3, "mono", 0.10);
 
-	ym2203_device &ym2203b(YM2203(config, "2203b", 12_MHz_XTAL/8)); // verified on PCB
+	ym2203_device &ym2203b(YM2203(config, "2203b", 12_MHz_XTAL / 8)); // verified on PCB
 	ym2203b.add_route(0, "mono", 0.20);
 	ym2203b.add_route(1, "mono", 0.20);
 	ym2203b.add_route(2, "mono", 0.20);
@@ -1259,48 +1261,29 @@ void lwings_state::sectionz(machine_config &config)
 {
 	lwings(config);
 
-	m_maincpu->set_clock(12_MHz_XTAL/4); // XTAL and clock verified on an original PCB and on a bootleg with ROMs matching those of sectionza
-
-	m_screen->set_refresh_hz(55.37); // verified on an original PCB
+	// XTAL and clock verified on an original PCB and on a bootleg with ROMs matching those of sectionza
+	m_maincpu->set_clock(12_MHz_XTAL / 4);
 }
 
 void lwings_state::fball(machine_config &config)
 {
+	lwings(config);
+
 	// basic machine hardware
-	Z80(config, m_maincpu, 12_MHz_XTAL/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_map);
-
-	Z80(config, m_soundcpu, 12_MHz_XTAL/4); // ?
 	m_soundcpu->set_addrmap(AS_PROGRAM, &lwings_state::fball_sound_map);
-	//m_soundcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(222));
 
-	WATCHDOG_TIMER(config, "watchdog");
-
-	// video hardware
-	BUFFERED_SPRITERAM8(config, m_spriteram);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	m_screen->set_size(32*8, 32*8);
-	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1); // the 16-pixel black border on left edge is correct, test mode actually uses that area
-	m_screen->set_screen_update(FUNC(lwings_state::screen_update_lwings));
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	m_screen->screen_vblank().append(FUNC(lwings_state::avengers_interrupt));
-	m_screen->set_palette(m_palette);
-
-	GFXDECODE(config, m_gfxdecode, m_palette, gfx_lwings);
-	PALETTE(config, m_palette).set_format(palette_device::RGBx_444, 1024);
+	// video hardware: the 16-pixel black border on left edge is correct, test mode actually uses that area
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-
-	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL/12, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki.add_route(ALL_OUTPUTS, "mono", 1.0);
 	oki.set_addrmap(0, &lwings_state::fball_oki_map);
+
+	config.device_remove("2203a");
+	config.device_remove("2203b");
 }
 
 void lwings_state::trojan(machine_config &config)
@@ -1308,15 +1291,14 @@ void lwings_state::trojan(machine_config &config)
 	lwings(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(12_MHz_XTAL/4); // verified on PCB
+	m_maincpu->set_clock(12_MHz_XTAL / 4); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::trojan_map);
 
-	m_soundcpu->set_clock(12_MHz_XTAL/4); // verified on PCB
+	m_soundcpu->set_clock(12_MHz_XTAL / 4); // verified on PCB
 
-	Z80(config, m_adpcmcpu, 12_MHz_XTAL/4); // verified on PCB
+	Z80(config, m_adpcmcpu, 12_MHz_XTAL / 4); // verified on PCB
 	m_adpcmcpu->set_addrmap(AS_PROGRAM, &lwings_state::trojan_adpcm_map);
 	m_adpcmcpu->set_addrmap(AS_IO, &lwings_state::trojan_adpcm_io_map);
-	m_adpcmcpu->set_periodic_int(FUNC(lwings_state::irq0_line_hold), attotime::from_hz(4000));
 
 	// video hardware
 	m_gfxdecode->set_info(gfx_trojan);
@@ -1328,7 +1310,8 @@ void lwings_state::trojan(machine_config &config)
 	GENERIC_LATCH_8(config, "soundlatch2");
 
 	MSM5205(config, m_msm, 384_kHz_XTAL); // verified on PCB
-	m_msm->set_prescaler_selector(msm5205_device::SEX_4B); // slave mode
+	m_msm->vck_callback().set_inputline(m_adpcmcpu, 0, HOLD_LINE);
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
@@ -1337,11 +1320,11 @@ void lwings_state::avengers(machine_config &config)
 	trojan(config);
 
 	// basic machine hardware
-	m_maincpu->set_clock(12_MHz_XTAL/2);
+	m_maincpu->set_clock(12_MHz_XTAL / 2);
 	m_maincpu->z80_set_m1_cycles(4+2); // 2 WAIT states per M1? (needed to keep in sync with MCU)
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
 
-	I8751(config, m_mcu, 12_MHz_XTAL/2);
+	I8751(config, m_mcu, 12_MHz_XTAL / 2);
 	m_mcu->port_in_cb<0>().set(FUNC(lwings_state::mcu_p0_r));
 	m_mcu->port_out_cb<0>().set(FUNC(lwings_state::mcu_p0_w));
 	m_mcu->port_in_cb<1>().set(FUNC(lwings_state::mcu_p1_r));
@@ -1359,9 +1342,6 @@ void lwings_state::avengers(machine_config &config)
 	GENERIC_LATCH_8(config, m_mculatch[1]);
 	GENERIC_LATCH_8(config, m_mculatch[2]);
 
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	m_screen->screen_vblank().append(FUNC(lwings_state::avengers_interrupt)); // RST 38h triggered by software
-
 	m_adpcmcpu->set_addrmap(AS_IO, &lwings_state::avengers_adpcm_io_map);
 
 	// video hardware
@@ -1374,6 +1354,7 @@ void lwings_state::buraikenb(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::buraikenb_map);
+
 	config.device_remove("mcu");
 	config.device_remove("mculatch0");
 	config.device_remove("mculatch1");
