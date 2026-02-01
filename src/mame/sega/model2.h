@@ -145,8 +145,6 @@ protected:
 	int m_ctrlmode = 0;
 	u16 m_cmd_data = 0;
 	u8 m_driveio_comm_data = 0;
-	int m_iop_write_num = 0;
-	u32 m_iop_data = 0;
 	emu_timer *m_irq_delay_timer;
 
 	u32 m_geo_read_start_address = 0;
@@ -547,7 +545,6 @@ protected:
 	void copro_function_port_w(offs_t offset, u32 data);
 	u32 copro_fifo_r();
 	void copro_fifo_w(u32 data);
-	void copro_sharc_iop_w(offs_t offset, u32 data);
 	u32 copro_sharc_buffer_r(offs_t offset);
 	void copro_sharc_buffer_w(offs_t offset, u32 data);
 
