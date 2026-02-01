@@ -2477,6 +2477,9 @@ ohmygod
 @source:atlus/patapata.cpp
 patapata
 
+@source:atlus/pitchtry.cpp
+pitchtry
+
 @source:atlus/rallypnt.cpp
 rallypnt2
 
