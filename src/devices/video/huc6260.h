@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include "screen.h"
 
 class huc6260_device :  public device_t,
 						public device_palette_interface,
@@ -24,35 +25,31 @@ public:
 	static constexpr unsigned LPF = 263;    // max number of lines in a single frame
 
 	// construction/destruction
-	huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto next_pixel_data() { return m_next_pixel_data_cb.bind(); }
 	auto time_til_next_event() { return m_time_til_next_event_cb.bind(); }
 	auto vsync_changed() { return m_vsync_changed_cb.bind(); }
 	auto hsync_changed() { return m_hsync_changed_cb.bind(); }
 
-	void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
 
-	uint8_t palette_direct_read(offs_t offset);
-	void palette_direct_write(offs_t offset, uint8_t data);
+	u8 palette_direct_read(offs_t offset);
+	void palette_direct_write(offs_t offset, u8 data);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual uint32_t palette_entries() const noexcept override { return PALETTE_SIZE; }
+	virtual u32 palette_entries() const noexcept override { return PALETTE_SIZE; }
 
 	TIMER_CALLBACK_MEMBER(update_events);
 
 private:
 	void palette_init();
-
-	int     m_last_h;
-	int     m_last_v;
-	int     m_height;
 
 	/* Callback function to retrieve pixel data */
 	devcb_read16                    m_next_pixel_data_cb;
@@ -67,13 +64,17 @@ private:
 	/* Callback function which gets called when hsync changes */
 	devcb_write_line                m_hsync_changed_cb;
 
-	uint16_t  m_palette[512];
-	uint16_t  m_address;
-	uint16_t  m_greyscales;       /* Should the HuC6260 output grey or color graphics */
-	bool      m_blur;             /* Should the edges of graphics be blurred/Select screen height 0=262, 1=263 */
-	uint8_t   m_pixels_per_clock; /* Number of pixels to output per colour clock */
-	uint16_t  m_pixel_data;
-	uint8_t   m_pixel_clock;
+	s32  m_last_h;
+	s32  m_last_v;
+	s32  m_height;
+
+	u16  m_palette[512];
+	u16  m_address;
+	u16  m_greyscales;       /* Should the HuC6260 output grey or color graphics */
+	bool m_blur;             /* Should the edges of graphics be blurred/Select screen height 0=262, 1=263 */
+	u8   m_pixels_per_clock; /* Number of pixels to output per colour clock */
+	u16  m_pixel_data;
+	u8   m_pixel_clock;
 
 	emu_timer   *m_timer;
 	bitmap_ind16 m_bmp;

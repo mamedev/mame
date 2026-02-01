@@ -17,37 +17,48 @@
 #include "video/huc6260.h"
 #include "video/huc6270.h"
 
-#define PCE_MAIN_CLOCK      21477270
-
 class pce_common_state : public driver_device
 {
 public:
+	void init_pce_common() ATTR_COLD;
+
+protected:
+	static constexpr XTAL PCE_MAIN_CLOCK = XTAL(21'477'272);
+
 	pce_common_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_huc6260(*this, "huc6260") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_huc6260(*this, "huc6260")
+		, m_io_joy(*this, "JOY")
+	{ }
 
-	void pce_joystick_w(uint8_t data);
-	uint8_t pce_joystick_r();
+	virtual void machine_start() override ATTR_COLD;
 
-	void init_pce_common();
+	virtual u8 joy_read();
+
+	void pce_joystick_w(u8 data);
+	u8 pce_joystick_r();
+
+	void common_cpu(machine_config &config) ATTR_COLD;
+	void common_video(machine_config &config) ATTR_COLD;
+
+	void common_mem_map(address_map &map) ATTR_COLD;
+	void common_io_map(address_map &map) ATTR_COLD;
 
 	required_device<h6280_device> m_maincpu;
-
-	virtual uint8_t joy_read();
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<huc6260_device> m_huc6260;
+	optional_ioport m_io_joy;
 
 private:
-	uint8_t m_io_port_options = 0;    /*driver-specific options for the PCE*/
-	int m_joystick_port_select = 0; /* internal index of joystick ports */
-	int m_joystick_data_select = 0; /* which nibble of joystick data we want */
+	u8 m_io_port_options = 0;    /*driver-specific options for the PCE*/
+	u8 m_joystick_port_select = 0; /* internal index of joystick ports */
+	u8 m_joystick_data_select = 0; /* which nibble of joystick data we want */
 };
 
 // used by the Arcade bootlegs.
 // Button II is actually on the left of a standard PCE joypad so we need to invert our button layout here.
 #define PCE_STANDARD_INPUT_PORT_P1 \
-	PORT_START( "JOY" ) \
+	PORT_START("JOY") \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button I") PORT_PLAYER(1) \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Button II") PORT_PLAYER(1) \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P1 Select") PORT_PLAYER(1) \
