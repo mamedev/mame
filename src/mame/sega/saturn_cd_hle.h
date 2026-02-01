@@ -170,8 +170,8 @@ private:
 	uint32_t cd_curfad;// = 0;
 	uint32_t cd_fad_seek;
 	uint32_t fadstoplay;// = 0;
-	uint32_t in_buffer;// = 0;    // amount of data in the buffer
 	int buffull, sectorstore, freeblocks;
+	bool buffull_temp_pause;
 	int cur_track;
 	uint8_t cmd_pending;
 	uint8_t cd_speed;

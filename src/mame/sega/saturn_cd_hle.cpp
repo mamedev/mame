@@ -151,7 +151,6 @@ void saturn_cd_hle_device::device_start()
 	save_item(NAME(cd_curfad));
 	save_item(NAME(cd_fad_seek));
 	save_item(NAME(fadstoplay));
-	save_item(NAME(in_buffer));
 	save_item(NAME(buffull));
 	save_item(NAME(sectorstore));
 	save_item(NAME(freeblocks));
@@ -181,6 +180,7 @@ void saturn_cd_hle_device::device_reset()
 	cur_track = 0xff;
 	calcsize = 0;
 	playtype = 0;
+	buffull_temp_pause = false;
 
 	curdir.clear();
 
@@ -231,7 +231,6 @@ void saturn_cd_hle_device::device_reset()
 		cd_stat = CD_STAT_NODISC;
 	}
 
-	in_buffer = 0;
 	buffull = 0;
 	cd_speed = 2;
 	cdda_repeat_count = 0;
@@ -529,8 +528,11 @@ uint16_t saturn_cd_hle_device::dr2_r() { return cr2; }
 uint16_t saturn_cd_hle_device::dr3_r() { return cr3; }
 uint16_t saturn_cd_hle_device::dr4_r()
 {
-	cmd_pending = 0;
-	cd_stat |= CD_STAT_PERI;
+	if (!machine().side_effects_disabled())
+	{
+		cmd_pending = 0;
+		cd_stat |= CD_STAT_PERI;
+	}
 	return cr4;
 }
 
@@ -746,8 +748,8 @@ void saturn_cd_hle_device::cmd_init_cdsystem()
 			//cur_track = 1;
 			fadstoplay = 0;
 		}
-		in_buffer = 0;
 		buffull = 0;
+		buffull_temp_pause = false;
 		hirqreg &= 0xffe5;
 		cd_speed = (cr1 & 0x10) ? 1 : 2;
 
@@ -955,7 +957,6 @@ void saturn_cd_hle_device::cmd_play_disc()
 
 	cr_standard_return(cd_stat);
 	hirqreg |= (CMOK);
-	in_buffer = 0;
 
 	playtype = 0;
 
@@ -1361,6 +1362,7 @@ void saturn_cd_hle_device::cmd_reset_selector()
 		}
 
 		buffull = sectorstore = 0;
+		buffull_temp_pause = false;
 	}
 
 	hirqreg |= (CMOK|ESEL);
@@ -1406,18 +1408,14 @@ void saturn_cd_hle_device::cmd_get_buffer_partition_sector_number()
 	LOGCMD("%s: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4);
 
 	//LOGWARN("%04x\n",cr4);
-	// TODO: shouldn't trigger DRDY in any case?
-	if(cr4 == 0)
-		hirqreg |= (CMOK);
-	else
-		hirqreg |= (CMOK|DRDY);
+	hirqreg |= (CMOK);
 	status_type = 1;
 }
 
 void saturn_cd_hle_device::cmd_calculate_actual_data_size()
 {
 	// calculate actual size
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 	uint32_t sectoffs = cr2;
 	uint32_t numsect = cr4;
 
@@ -1895,8 +1893,6 @@ void saturn_cd_hle_device::cmd_read_file()
 
 	cr_standard_return(cd_stat);
 
-	in_buffer = 0;
-
 	playtype = 1;
 
 	hirqreg |= (CMOK|EHST);
@@ -2140,9 +2136,12 @@ TIMER_CALLBACK_MEMBER( saturn_cd_hle_device::cd_sector_cb )
 
 	// TODO: Saturn refuses to boot with this if a disk isn't in and condition is applied!?
 	// TODO: Check out actual timing of SCDQ acquisition.
-	// (Daytona USA original version definitely wants it to be on).
+	// (daytonau definitely wants it to be on).
 	//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-	hirqreg |= SCDQ;
+	if (!buffull)
+		hirqreg |= SCDQ;
+	else
+		hirqreg &= ~SCDQ;
 
 	if(cd_stat & CD_STAT_PERI)
 	{
@@ -2742,7 +2741,7 @@ saturn_cd_hle_device::partitionT *saturn_cd_hle_device::cd_read_filtered_sector(
 void saturn_cd_hle_device::cd_playdata()
 {
 	if (LIVE_CD_VIEW)
-		popmessage("%04x %d %d (%d)", cd_stat, cd_curfad, fadstoplay, buffull);
+		popmessage("%04x %d %d %04x (%d)", cd_stat, cd_curfad, fadstoplay, hirqreg, buffull);
 
 	switch(cd_stat & 0x0f00)
 	{
@@ -2780,6 +2779,15 @@ void saturn_cd_hle_device::cd_playdata()
 				cd_change_status(CD_STAT_PLAY);
 			}
 
+			break;
+		}
+		case CD_STAT_PAUSE:
+		{
+			if (buffull_temp_pause && !buffull && fadstoplay)
+			{
+				buffull_temp_pause = false;
+				cd_change_status(CD_STAT_PLAY);
+			}
 			break;
 		}
 		case CD_STAT_PLAY:
@@ -2836,6 +2844,13 @@ void saturn_cd_hle_device::cd_playdata()
 								fadstoplay = m_cdrom_image->get_track_start(cur_track) - cd_curfad;
 							}
 						}
+					}
+					else if (buffull)
+					{
+						// TODO: should be correct but somehow still doesn't work
+						buffull_temp_pause = true;
+						// sectorstore = 0;
+						cd_change_status(CD_STAT_PAUSE);
 					}
 				}
 			}

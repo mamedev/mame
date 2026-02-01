@@ -28412,11 +28412,13 @@ Allegedly should enable [VDP2] RGB1 with RGB0 disabled
 		</part>
 	</software>
 
-	<!-- Black screen after Techno Soft logo with -drc option and Machine Config comms hack disabled. -->
 	<software name="blastwnd" supported="no">
 		<description>Blast Wind (Japan)</description>
 		<year>1997</year>
 		<publisher>Technosoft</publisher>
+		<notes><![CDATA[
+Black screen after Techno Soft logo with [-drc] option and Machine Config comms hack disabled.
+]]></notes>
 		<info name="serial" value="T-1810G"/>
 		<info name="release" value="19970117"/>
 		<info name="alt_title" value="ブラストウインド"/>
