@@ -10,6 +10,7 @@
 
 
 #include "emu.h"
+
 #include "cpu/v810/v810.h"
 #include "machine/nvram.h"
 #include "machine/pcfx_intc.h"
@@ -71,7 +72,7 @@ private:
 	emu_timer *m_pad_timers[2]{};
 
 	u8 m_bram_control = 0;
-	std::unique_ptr<u8[]> m_nvram_ptr = nullptr;
+	std::unique_ptr<u8[]> m_nvram_ptr;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<huc6261_device> m_huc6261;
@@ -147,7 +148,7 @@ void pcfx_state::pad_w(offs_t offset, u16 data)
 		---- --x- enable multi-tap
 		---- ---x enable send (0->1 transition)
 		*/
-		if (data & 1 && (!(m_pad.ctrl[Pad] & 1)))
+		if ((data & 1) && !(m_pad.ctrl[Pad] & 1))
 		{
 			m_pad_timers[Pad]->adjust(attotime::from_usec(100)); // TODO: time
 		}
@@ -220,20 +221,20 @@ static INPUT_PORTS_START( pcfx )
 	PORT_START("P1")
 	PORT_BIT( 0xf0000000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ID pad
 	// pcfxga expects latches to go active high on main menu
-	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Button I")
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Button II")
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Button III")
-	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Button IV")
-	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Button V")
-	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Button VI")
-	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1) PORT_NAME("P1 Select Button")
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_START1 ) PORT_PLAYER(1) PORT_NAME("P1 RUN Button")
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_NAME("P1 Up")
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("P1 Button I")
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("P1 Button II")
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("P1 Button III")
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_BUTTON4 )        PORT_PLAYER(1) PORT_NAME("P1 Button IV")
+	PORT_BIT( 0x00000010, IP_ACTIVE_HIGH, IPT_BUTTON5 )        PORT_PLAYER(1) PORT_NAME("P1 Button V")
+	PORT_BIT( 0x00000020, IP_ACTIVE_HIGH, IPT_BUTTON6 )        PORT_PLAYER(1) PORT_NAME("P1 Button VI")
+	PORT_BIT( 0x00000040, IP_ACTIVE_HIGH, IPT_SELECT )         PORT_PLAYER(1) PORT_NAME("P1 Select Button")
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_START1 )         PORT_PLAYER(1) PORT_NAME("P1 RUN Button")
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("P1 Up")
 	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("P1 Right")
-	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_NAME("P1 Down")
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_NAME("P1 Left")
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("P1 Switch 1")
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME("P1 Switch 2")
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("P1 Down")
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("P1 Left")
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_BUTTON7 )        PORT_PLAYER(1) PORT_NAME("P1 Switch 1")
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_BUTTON8 )        PORT_PLAYER(1) PORT_NAME("P1 Switch 2")
 	PORT_BIT( 0x0fffa000, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P2")
@@ -344,7 +345,7 @@ ROM_START( pcfxga )
 	ROM_REGION32_LE( 0x100000, "scsi_rom", ROMREGION_ERASEFF )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /***************************************************************************
