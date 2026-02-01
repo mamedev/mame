@@ -60,7 +60,10 @@ RAM: Mosel-Vitelic V62C518256LL-70P 32Kx8 SRAM
 #include "machine/mc68681.h"
 #include "machine/timekpr.h"
 #include "sound/okim6376.h"
+#include "video/hd44780.h"
 
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
 
@@ -74,7 +77,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_rtc(*this, "nvram"),
 		m_oki(*this, "oki"),
-		m_duart(*this, "duart")
+		m_duart(*this, "duart"),
+		m_lcd(*this, "lcd")
 	{ }
 
 	void st25(machine_config &config) ATTR_COLD;
@@ -84,6 +88,7 @@ private:
 	required_device<m48t02_device> m_rtc;
 	required_device<okim6376_device> m_oki;
 	required_device<scn2681_device> m_duart;
+	required_device<hd44780_device> m_lcd;
 
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
@@ -121,14 +126,16 @@ void st25_state::io_map(address_map &map)
 	map(0x4000, 0x5fff).noprw(); // Y2 IOS load mot
 	map(0x6000, 0x7fff).noprw(); // Y3 IOS load in
 	map(0x8000, 0x9fff).noprw(); // Y4 ICB1B oscillator ?
-	map(0xa000, 0xbfff).rw(FUNC(st25_state::io5_w)); // Y5 Sound ST
+	map(0xa000, 0xbfff).w(FUNC(st25_state::io5_w)); // Y5 Sound ST
 	map(0xc000, 0xdfff).noprw(); // Y6
 	map(0xe000, 0xffff).noprw(); // Y7
 }
 
 void st25_state::io5_w(uint8_t data)
 {
+	// pulse ST line
 	m_oki->st_w(1);
+	m_oki->st_w(0);
 }
 
 void st25_state::p2_w(uint8_t data)
@@ -151,6 +158,20 @@ void st25_state::st25(machine_config &config)
 	M48T02(config, m_rtc, 0); // ST M48T18-150PC1
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL); // Philips SCC2692AC1N28
+
+	// Service (16x2 character LCD)
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen.set_refresh_hz(50);
+	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	screen.set_screen_update(m_lcd, FUNC(hd44780_device::screen_update));
+	screen.set_size(6*16, 8*2);
+	screen.set_visarea_full();
+	screen.set_palette("palette");
+
+	PALETTE(config, "palette", palette_device::MONOCHROME_INVERTED);
+
+	HD44780(config, m_lcd, 270'000);
+	m_lcd->set_lcd_size(2, 16);
 
 	// Sound hardware
 	SPEAKER(config, "mono").front_center();
