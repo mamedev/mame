@@ -15,6 +15,8 @@
 #include "video/huc6271.h"
 #include "video/huc6272.h"
 
+#include "screen.h"
+
 
 class huc6261_device :  public device_t,
 						public device_video_interface
@@ -37,7 +39,7 @@ public:
 	void write(offs_t offset, u16 data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -58,7 +60,7 @@ private:
 	u16  m_control;
 	u8   m_priority[7];
 
-	u8   m_pixels_per_clock; /* Number of pixels to output per colour clock */
+	u8   m_pixels_per_clock; // Number of pixels to output per colour clock
 	u16  m_pixel_data[7]; // for HuC6270 (BG/SPR layer per chips), KING (4 BG layers), RAINBOW
 	u16  m_palette_offset[4];
 	u8   m_pixel_clock;
@@ -67,8 +69,8 @@ private:
 	bitmap_rgb32  m_bmp;
 	s32   m_uv_lookup[65536][3];
 
-	inline u32 yuv2rgb(u32 yuv);
-	inline void apply_pal_offs(u16 &pix_data);
+	u32 yuv2rgb(u32 yuv) const;
+	void apply_pal_offs(u16 &pix_data) const;
 };
 
 
