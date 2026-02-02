@@ -487,7 +487,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lwings_state::scanline)
 	if (scanline == 128)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 
-	// 4 sound interrupts per frame on V64
+	// 4 sound interrupts per frame on V32
 	if ((scanline % 64) == 32)
 		m_soundcpu->set_input_line(0, HOLD_LINE);
 }
