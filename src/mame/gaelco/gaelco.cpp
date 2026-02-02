@@ -1163,6 +1163,12 @@ ROM_START( biomtoy ) // PCB - REF.922804/2
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(0f02de7e) SHA1(a8779370cc36290616794ff11eb3eebfdea5b1a9) )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(914e4bbc) SHA1(ca82b7481621a119f05992ed093b963da70d748a) )
+
+	ROM_REGION( 0x2e5, "pld", 0 )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers
+	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )	
 ROM_END
 
 
@@ -1194,6 +1200,12 @@ ROM_START( biomtoya ) // PCB - REF.922804/2
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
+
+	ROM_REGION( 0x2e5, "pld", 0 )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers
+	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )
 ROM_END
 
 
@@ -1225,6 +1237,12 @@ ROM_START( biomtoyb ) // PCB - REF.922804/2
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
+
+	ROM_REGION( 0x2e5, "pld", 0 )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers
+	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )
 ROM_END
 
 
@@ -1256,6 +1274,12 @@ ROM_START( biomtoyc ) // PCB - REF.922804/1 or REF.922804/2
 	ROM_LOAD( "sound1.c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "sound2.c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
+
+	ROM_REGION( 0x2e5, "pld", 0 )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers
+	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )
 ROM_END
 
 ROM_START( bioplayc ) // PCB - REF.922804/2?? - Spanish version
@@ -1287,6 +1311,12 @@ ROM_START( bioplayc ) // PCB - REF.922804/2?? - Spanish version
 	ROM_LOAD( "c1", 0x000000, 0x080000, BAD_DUMP CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, BAD_DUMP CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
+
+	ROM_REGION( 0x2e5, "pld", 0 )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers (not on the proto, but on the release versions)
+	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )
 ROM_END
 
 ROM_START( lastkm ) // PCB - REF 922804/2
