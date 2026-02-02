@@ -160,10 +160,10 @@ void squash_state::encrypted_w(offs_t offset, u16 data, u16 mem_mask)
 void bigkarnk_state::bigkarnk_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                              // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(bigkarnk_state::vram_w)).share(m_videoram);              // Video RAM
+	map(0x100000, 0x101fff).ram().w(FUNC(bigkarnk_state::vram_w)).share(m_videoram);            // Video RAM
 	map(0x102000, 0x103fff).ram();                                                              // Screen RAM
 	map(0x108000, 0x108007).writeonly().share(m_vregs);                                         // Video Registers
-	map(0x10800c, 0x10800d).w(FUNC(bigkarnk_state::irqack_w));                                    // INT 6 ACK/Watchdog timer
+	map(0x10800c, 0x10800d).w(FUNC(bigkarnk_state::irqack_w));                                  // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
 	map(0x440000, 0x440fff).ram().share(m_spriteram);                                           // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW1");
@@ -247,13 +247,13 @@ void squash_state::squash_map(address_map &map)
 
 void thoop_state::thoop_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(thoop_state::vram_encrypted_w)).share(m_videoram); // Video RAM
-	map(0x102000, 0x103fff).ram().w(FUNC(thoop_state::encrypted_w)).share(m_screenram);     // Screen RAM
-	map(0x108000, 0x108007).writeonly().share(m_vregs);                                            // Video Registers
-	map(0x10800c, 0x10800d).w(FUNC(thoop_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
-	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x440000, 0x440fff).ram().share(m_spriteram);                                              // Sprite RAM
+	map(0x000000, 0x0fffff).rom();                                                              // ROM
+	map(0x100000, 0x101fff).ram().w(FUNC(thoop_state::vram_encrypted_w)).share(m_videoram);     // Video RAM
+	map(0x102000, 0x103fff).ram().w(FUNC(thoop_state::encrypted_w)).share(m_screenram);         // Screen RAM
+	map(0x108000, 0x108007).writeonly().share(m_vregs);                                         // Video Registers
+	map(0x10800c, 0x10800d).w(FUNC(thoop_state::irqack_w));                                     // INT 6 ACK/Watchdog timer
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
+	map(0x440000, 0x440fff).ram().share(m_spriteram);                                           // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
@@ -847,11 +847,11 @@ void gaelco_state::machine_start()
 void bigkarnk_state::bigkarnk(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P10, 12 MHz (verified)
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);   // MC68000P10, 12 MHz (verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bigkarnk_state::bigkarnk_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bigkarnk_state::irq6_line_assert));
 
-	MC6809E(config, m_audiocpu, XTAL(8'000'000)/4);  // 68B09EP, 2 MHz (verified)
+	MC6809E(config, m_audiocpu, 8_MHz_XTAL/4);  // 68B09EP, 2 MHz (verified)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bigkarnk_state::bigkarnk_snd_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
@@ -880,15 +880,15 @@ void bigkarnk_state::bigkarnk(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 
-	YM3812(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "mono", 1.0); // 4 MHz matches PCB recording
+	YM3812(config, "ymsnd", 8_MHz_XTAL/2).add_route(ALL_OUTPUTS, "mono", 1.0); // 4 MHz matches PCB recording
 
-	OKIM6295(config, "oki", XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", 8_MHz_XTAL/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 void gaelco_state::maniacsq(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(24'000'000)/2); // verified on PCB
+	M68000(config, m_maincpu, 24_MHz_XTAL/2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::maniacsq_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
 
@@ -946,7 +946,7 @@ void xorwflat_state::xorwflat(machine_config &config)
 void squash_state::squash(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(20'000'000)/2); // Verified on PCB
+	M68000(config, m_maincpu, 20_MHz_XTAL/2); // Verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &squash_state::squash_map);
 	m_maincpu->set_vblank_int("screen", FUNC(squash_state::irq6_line_assert));
 
@@ -985,7 +985,7 @@ void squash_state::squash(machine_config &config)
 void thoop_state::thoop(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(24'000'000)/2); // Verified on PCB
+	M68000(config, m_maincpu, 24_MHz_XTAL/2); // Verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &thoop_state::thoop_map);
 	m_maincpu->set_vblank_int("screen", FUNC(thoop_state::irq6_line_assert));
 
