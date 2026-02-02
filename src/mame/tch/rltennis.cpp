@@ -98,6 +98,8 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #define RLT_NUM_BLITTER_REGS    8
 #define RLT_NUM_BITMAPS         8
 
+namespace {
+
 enum
 {
 	BLT_X_START = 0,
@@ -118,8 +120,6 @@ enum
 	BITMAP_FG_DISPLAY
 };
 
-namespace {
-
 class rltennis_state : public driver_device
 {
 public:
@@ -136,6 +136,11 @@ public:
 	}
 
 	void rltennis(machine_config &config);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -157,10 +162,6 @@ private:
 	void snd1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void snd2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -62,13 +62,14 @@ lev 7 : 0x7c : 0000 0000 - x
 */
 
 #include "emu.h"
-#include "emupal.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
@@ -136,13 +137,13 @@ private:
 	void oki_map(address_map &map) ATTR_COLD;
 
 	/* video-related */
-	tilemap_t     *m_fgtm = nullptr;
-	tilemap_t     *m_bgtm = nullptr;
-	tilemap_t     *m_bg2tm = nullptr;
+	tilemap_t *m_fgtm = nullptr;
+	tilemap_t *m_bgtm = nullptr;
+	tilemap_t *m_bg2tm = nullptr;
 
 	/* misc */
-	int         m_snd_new = 0;
-	int         m_snd_sam[4]{};
+	int m_snd_new = 0;
+	int m_snd_sam[4]{};
 
 	u8 m_pic_portc = 0;
 	u8 m_pic_portb = 0;
@@ -341,6 +342,7 @@ u32 kickgoal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	return 0;
 }
 
+
 /*
 
 ****************************************************************
@@ -352,7 +354,6 @@ Action Hollywood
 61-63 Melodies Bank 2
 
 */
-
 
 void kickgoal_state::actionhw_snd_w(offs_t offset, u16 data, u16 mem_mask)
 {

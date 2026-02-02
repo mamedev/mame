@@ -42,7 +42,6 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 ***************************************************************************************/
 
 #include "emu.h"
-#include "emupal.h"
 
 #include "cpu/i86/i86.h"
 #include "cpu/nec/nec.h"
@@ -53,6 +52,8 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 #include "sound/sn76496.h"
 #include "sound/ymopm.h"
 #include "sound/ymopl.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 
@@ -81,9 +82,6 @@ public:
 	template <int Player> ioport_value wheelrun_wheel_r();
 
 protected:
-	/* misc */
-	uint8_t    m_nmi_enable = 0;
-
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -98,10 +96,14 @@ protected:
 
 	optional_ioport_array<2> m_wheel;
 
-	void nmi_enable_w(uint8_t data);
-	void soundlatch_w(uint8_t data);
+	/* misc */
+	uint8_t m_nmi_enable = 0;
+
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void nmi_enable_w(uint8_t data);
+	void soundlatch_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
@@ -134,7 +136,15 @@ public:
 
 	void borntofi(machine_config &config);
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
+	/* devices */
+	required_device_array<msm5205_device, 4> m_msm;
+	required_region_ptr<uint8_t> m_adpcm_rom;
+
 	/* misc */
 	int        m_old_x[2]{};
 	int        m_old_y[2]{};
@@ -144,14 +154,8 @@ private:
 	int        m_adpcm_addr[2][4]{};
 	int        m_adpcm_nibble[4]{};
 
-	/* devices */
-	required_device_array<msm5205_device, 4> m_msm;
-	required_region_ptr<uint8_t> m_adpcm_rom;
-
 	uint8_t inputs_r(offs_t offset);
 	void msm5205_w(offs_t offset, uint8_t data);
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	template<int Voice> void adpcm_int(int state);
 	void adpcm_start(int voice);
 	void adpcm_stop(int voice);
