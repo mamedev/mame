@@ -113,7 +113,7 @@ void st25_state::io_map(address_map &map)
 	map(0x6000, 0x7fff).noprw(); // Y3 IOS load in
 	map(0x8000, 0x9fff).noprw(); // Y4 ICB1B oscillator ?
 	map(0xa000, 0xbfff).w(FUNC(st25_state::io5_w)); // Y5 Sound ST
-	map(0xc000, 0xdfff).noprw(); // Y6
+	map(0xc000, 0xdfff).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)); // Y6 DUART
 	map(0xe000, 0xffff).noprw(); // Y7
 }
 
