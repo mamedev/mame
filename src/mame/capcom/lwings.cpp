@@ -1264,7 +1264,7 @@ void lwings_state::avengers(machine_config &config)
 
 	// basic machine hardware
 	m_maincpu->set_clock(12_MHz_XTAL / 2); // verified on PCB
-	m_maincpu->z80_set_memrq_cycles(3+1); // 1 WAIT state per MREQ (but not with RFSH)
+	m_maincpu->z80_set_mreq_cycles(3+1); // 1 WAIT state per MREQ (but not with RFSH)
 	m_maincpu->z80_set_m1_cycles(4+1); // "
 	m_maincpu->set_addrmap(AS_PROGRAM, &lwings_state::avengers_map);
 

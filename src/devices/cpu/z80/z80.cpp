@@ -634,8 +634,8 @@ void z80_device::device_validity_check(validity_checker &valid) const
 
 	if (4 > m_m1_cycles)
 		osd_printf_error("M1 cycles %u is less than minimum 4\n", m_m1_cycles);
-	if (3 > m_memrq_cycles)
-		osd_printf_error("MEMRQ cycles %u is less than minimum 3\n", m_memrq_cycles);
+	if (3 > m_mreq_cycles)
+		osd_printf_error("MREQ cycles %u is less than minimum 3\n", m_mreq_cycles);
 	if (4 > m_iorq_cycles)
 		osd_printf_error("IORQ cycles %u is less than minimum 4\n", m_iorq_cycles);
 }
@@ -915,7 +915,7 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_halt_cb(*this),
 	m_busack_cb(*this),
 	m_m1_cycles(4),
-	m_memrq_cycles(3),
+	m_mreq_cycles(3),
 	m_iorq_cycles(4)
 {
 }
