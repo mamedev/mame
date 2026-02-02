@@ -190,7 +190,7 @@ TIMER_CALLBACK_MEMBER(msm5205_device::update_adpcm)
 	if (!m_vck_legacy_cb.isunset())
 		m_vck_legacy_cb(1);
 
-	// reset check at last hiedge of VCK
+	// reset check at last high edge of VCK
 	if (m_reset)
 	{
 		new_signal = 0;
@@ -262,9 +262,9 @@ void msm5205_device::data_w(uint8_t data)
 int msm5205_device::get_prescaler() const
 {
 	if (m_s1)
-		return m_s2 ? 0 : 64;
+		return m_s2 ? 0 : 48;
 	else
-		return m_s2 ? 48 : 96;
+		return m_s2 ? 64 : 96;
 }
 
 int msm6585_device::get_prescaler() const
@@ -284,8 +284,8 @@ void msm5205_device::playmode_w(int select)
 	{
 		m_stream->update();
 
-		m_s1 = BIT(select, 1);
-		m_s2 = BIT(select, 0);
+		m_s1 = BIT(select, 0);
+		m_s2 = BIT(select, 1);
 
 		/* timer set */
 		notify_clock_changed();

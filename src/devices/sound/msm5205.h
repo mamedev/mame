@@ -5,27 +5,27 @@
 
 #pragma once
 
-/* an interface for the MSM5205 and similar chips */
+// an interface for the MSM5205 and similar chips
 
 class msm5205_device : public device_t, public device_sound_interface
 {
 public:
 	// MSM5205 default master clock is 384KHz
-	static constexpr int S96_3B = 0;     // prescaler 1/96(4KHz) , data 3bit
-	static constexpr int S48_3B = 1;     // prescaler 1/48(8KHz) , data 3bit
-	static constexpr int S64_3B = 2;     // prescaler 1/64(6KHz) , data 3bit
-	static constexpr int SEX_3B = 3;     // VCK slave mode       , data 3bit
-	static constexpr int S96_4B = 4;     // prescaler 1/96(4KHz) , data 4bit
-	static constexpr int S48_4B = 5;     // prescaler 1/48(8KHz) , data 4bit
-	static constexpr int S64_4B = 6;     // prescaler 1/64(6KHz) , data 4bit
-	static constexpr int SEX_4B = 7;     // VCK slave mode       , data 4bit
+	static constexpr int S96_3B = 0; // prescaler 1/96(4KHz), data 3bit
+	static constexpr int S48_3B = 1; // prescaler 1/48(8KHz), data 3bit
+	static constexpr int S64_3B = 2; // prescaler 1/64(6KHz), data 3bit
+	static constexpr int SEX_3B = 3; // VCK slave mode      , data 3bit
+	static constexpr int S96_4B = 4; // prescaler 1/96(4KHz), data 4bit
+	static constexpr int S48_4B = 5; // prescaler 1/48(8KHz), data 4bit
+	static constexpr int S64_4B = 6; // prescaler 1/64(6KHz), data 4bit
+	static constexpr int SEX_4B = 7; // VCK slave mode      , data 4bit
 
 	msm5205_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void set_prescaler_selector(int select)
 	{
-		m_s1 = BIT(select, 1);
-		m_s2 = BIT(select, 0);
+		m_s1 = BIT(select, 0);
+		m_s2 = BIT(select, 1);
 		m_bitwidth = (select & 4) ? 4 : 3;
 	}
 	auto vck_callback() { return m_vck_cb.bind(); }
@@ -88,11 +88,11 @@ protected:
 class msm6585_device : public msm5205_device
 {
 public:
-	/* MSM6585 default master clock is 640KHz */
-	static constexpr int S160  = 4 + 8;  /* prescaler 1/160(4KHz), data 4bit */
-	static constexpr int S40   = 5 + 8;  /* prescaler 1/40(16KHz), data 4bit */
-	static constexpr int S80   = 6 + 8;  /* prescaler 1/80 (8KHz), data 4bit */
-	static constexpr int S20   = 7 + 8;  /* prescaler 1/20(32KHz), data 4bit */
+	// MSM6585 default master clock is 640KHz
+	static constexpr int S160 = 4 + 8; // prescaler 1/160(4KHz), data 4bit
+	static constexpr int S80  = 5 + 8; // prescaler 1/80 (8KHz), data 4bit
+	static constexpr int S40  = 6 + 8; // prescaler 1/40(16KHz), data 4bit
+	static constexpr int S20  = 7 + 8; // prescaler 1/20(32KHz), data 4bit
 
 	msm6585_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
