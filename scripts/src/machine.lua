@@ -1485,6 +1485,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/f82c836.h,MACHINES["F82C836"] = true
+---------------------------------------------------
+
+if MACHINES["F82C836"] then
+	files {
+		MAME_DIR .. "src/devices/machine/f82c836.cpp",
+		MAME_DIR .. "src/devices/machine/f82c836.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/fga002.h,MACHINES["FGA002"] = true
 ---------------------------------------------------
 
