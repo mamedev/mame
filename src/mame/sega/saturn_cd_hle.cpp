@@ -278,7 +278,8 @@ u32 saturn_cd_hle_device::datatrns_r(offs_t offset, uint32_t mem_mask)
 	}
 	else
 	{
-		LOGWARN("CD: Unknown data buffer read with mask = %08x\n", mem_mask);
+		if (!machine().side_effects_disabled())
+			LOGWARN("CD: Unknown data buffer read with mask = %08x\n", mem_mask);
 		rv = 0;
 	}
 	return rv;
@@ -615,15 +616,15 @@ void saturn_cd_hle_device::cr_standard_return(uint16_t cur_status)
 		uint8_t seek_track = m_cdrom_image->get_track(cd_fad_seek-150);
 
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf);
-		cr2 =  (seek_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(seek_track)<<8) | seek_track);
-		cr3 = (get_track_index(cd_fad_seek)<<8) | (cd_fad_seek>>16); //index & 0xff00
+		cr2 =  (seek_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(seek_track)<< 8 ) | seek_track);
+		cr3 = (get_track_index(cd_fad_seek) << 8) | (cd_fad_seek >> 16); //index & 0xff00
 		cr4 = cd_fad_seek;
 	}
 	else
 	{
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
-		cr2 = (cur_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cur_track)<<8) | (m_cdrom_image->get_track(cd_curfad-150)+1));
-		cr3 = (get_track_index(cd_curfad)<<8) | (cd_curfad>>16); //index & 0xff00
+		cr2 = (cur_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cur_track)<<8) | (m_cdrom_image->get_track(cd_curfad - 150) + 1));
+		cr3 = (get_track_index(cd_curfad) << 8) | (cd_curfad >> 16); //index & 0xff00
 		cr4 = cd_curfad;
 	}
 }
@@ -638,8 +639,8 @@ void saturn_cd_hle_device::mpeg_standard_return(uint16_t cur_status)
 
 void saturn_cd_hle_device::cd_change_status(u16 new_status)
 {
-	cd_stat = CD_STAT_BUSY;
-	cd_next_stat = new_status;
+	cd_stat = (cd_stat & 0xf0ff) | CD_STAT_BUSY;
+	cd_next_stat = (cd_stat & 0xf0ff) | new_status;
 }
 
 /*
@@ -884,10 +885,10 @@ void saturn_cd_hle_device::cmd_play_disc()
 		else
 		{
 			// track mode
-			if(((start_pos)>>8) != 0)
+			if((start_pos >> 8) != 0)
 			{
-				cur_track = (start_pos)>>8;
-				cd_fad_seek = m_cdrom_image->get_track_start(cur_track-1);
+				cur_track = start_pos >> 8;
+				cd_fad_seek = m_cdrom_image->get_track_start(cur_track - 1);
 				cd_change_status(CD_STAT_SEEK);
 				m_cdda->pause_audio(0);
 			}
@@ -1166,7 +1167,7 @@ void saturn_cd_hle_device::cmd_set_filter_range()
 	// Set Filter Range
 	// cr1 low + cr2 = FAD0, cr3 low + cr4 = FAD1
 	// cr3 hi = filter num.
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 
 	LOGCMD("%s: Set Filter Range\n",   machine().describe_context());
 
@@ -1189,16 +1190,16 @@ void saturn_cd_hle_device::cmd_get_filter_range()
 void saturn_cd_hle_device::cmd_set_filter_subheader_conditions()
 {
 	// Set Filter Subheader conditions
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 
-	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
+	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1 & 0xff, cr2, cr3 & 0xff, cr4);
 
 	filters[fnum].chan = cr1 & 0xff;
-	filters[fnum].smmask = (cr2>>8)&0xff;
-	filters[fnum].cimask = cr2&0xff;
-	filters[fnum].fid = cr3&0xff;
-	filters[fnum].smval = (cr4>>8)&0xff;
-	filters[fnum].cival = cr4&0xff;
+	filters[fnum].smmask = (cr2 >> 8) & 0xff;
+	filters[fnum].cimask = cr2 & 0xff;
+	filters[fnum].fid = cr3 & 0xff;
+	filters[fnum].smval = (cr4 >> 8) & 0xff;
+	filters[fnum].cival = cr4 & 0xff;
 
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
@@ -1209,9 +1210,9 @@ void saturn_cd_hle_device::cmd_set_filter_subheader_conditions()
 void saturn_cd_hle_device::cmd_get_filter_subheader_conditions()
 {
 	// Get Filter Subheader conditions
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 
-	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
+	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1 & 0xff, cr2, cr3 & 0xff, cr4);
 
 	cr1 = cd_stat | (filters[fnum].chan & 0xff);
 	cr2 = (filters[fnum].smmask << 8) | (filters[fnum].cimask & 0xff);
@@ -1225,7 +1226,7 @@ void saturn_cd_hle_device::cmd_get_filter_subheader_conditions()
 void saturn_cd_hle_device::cmd_set_filter_mode()
 {
 	// Set Filter Mode
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 	uint8_t mode = (cr1 & 0xff);
 
 	// initialize filter?
@@ -1247,7 +1248,7 @@ void saturn_cd_hle_device::cmd_set_filter_mode()
 void saturn_cd_hle_device::cmd_get_filter_mode()
 {
 	// Get Filter Mode
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 
 	cr1 = cd_stat | (filters[fnum].mode & 0xff);
 	cr2 = 0;
@@ -1263,15 +1264,15 @@ void saturn_cd_hle_device::cmd_set_filter_connection()
 	// Set Filter Connection
 	// FIXME: verify usage of cr3 LSB
 	// (false condition?)
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 
 	LOGCMD("%s: Set Filter Connection %x => mode %x parm %04x\n", machine().describe_context(), fnum, cr1 & 0xf, cr2);
 
 	if (cr1 & 1)    // set true condition
-		filters[fnum].condtrue = (cr2>>8)&0xff;
+		filters[fnum].condtrue = (cr2 >> 8) & 0xff;
 
 	if (cr1 & 2)    // set false condition
-		filters[fnum].condfalse = cr2&0xff;
+		filters[fnum].condfalse = cr2 & 0xff;
 
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
@@ -1386,7 +1387,7 @@ void saturn_cd_hle_device::cmd_get_buffer_partition_sector_number()
 {
 	// get # sectors used in a buffer
 
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 
 	cr1 = cd_stat;
 	cr2 = 0;
@@ -1444,7 +1445,7 @@ void saturn_cd_hle_device::cmd_get_actual_data_size()
 {
 	// get actual block size
 	LOGCMD("%s: Get actual block size\n", machine().describe_context());
-	cr1 = cd_stat | ((calcsize>>16)&0xff);
+	cr1 = cd_stat | ((calcsize >> 16) & 0xff);
 	cr2 = (calcsize & 0xffff);
 	cr3 = 0;
 	cr4 = 0;
@@ -1456,7 +1457,7 @@ void saturn_cd_hle_device::cmd_get_sector_information()
 {
 	// get sector info
 	uint32_t sectoffs = cr2 & 0xff;
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 
 	if (bufnum >= MAX_FILTERS || !partitions[bufnum].blocks[sectoffs])
 	{
@@ -1497,7 +1498,7 @@ void saturn_cd_hle_device::cmd_set_sector_length()
 			break;
 	}
 
-	switch ((cr2>>8) & 0xff)
+	switch ((cr2 >> 8) & 0xff)
 	{
 		case 0:
 			sectlenout = 2048;
@@ -1522,7 +1523,7 @@ void saturn_cd_hle_device::cmd_get_sector_data()
 	// get sector data
 	uint32_t sectnum = cr4;
 	uint32_t sectofs = cr2;
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 
 	LOGCMD("%s: Get sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
 
@@ -1565,7 +1566,7 @@ void saturn_cd_hle_device::cmd_delete_sector_data()
 	// delete sector data
 	uint32_t sectnum = cr4;
 	uint32_t sectofs = cr2;
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 	int32_t i;
 
 	LOGCMD("%s: Delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
@@ -1625,7 +1626,7 @@ void saturn_cd_hle_device::cmd_get_and_delete_sector_data()
 
 	uint32_t sectnum = cr4;
 	uint32_t sectofs = cr2;
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 
 	LOGCMD("%s: Get and delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
 
@@ -2478,7 +2479,7 @@ void saturn_cd_hle_device::cd_readTOC(void)
 		if (m_cdrom_image->exists())
 		{
 			//tocbuf[tocptr] = sega_cdrom_get_adr_control(cdrom, i);
-			//HACK: ddsom does not enter ingame with the line above!
+			// HACK: ddsom does not enter ingame with the line above
 			tocbuf[tocptr] = m_cdrom_image->get_adr_control(i)<<4 | 0x01;
 		}
 		else

@@ -376,11 +376,11 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 	uint8_t cd_transfer_flag;
 
 	#if 0
-	if(m_dma[level].src_add == 0 || (m_dma[level].dst_add != 2 && m_dma[level].dst_add != 4))
+	//if(m_dma[level].src_add == 0 || (m_dma[level].dst_add != 2 && m_dma[level].dst_add != 4))
 	{
-	if(LOG_SCU) printf("DMA lv %d transfer START\n"
-							"Start %08x End %08x Size %04x\n",dma_ch,m_scu.src[dma_ch],m_scu.dst[dma_ch],m_scu.size[dma_ch]);
-	if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",m_scu.src_add[dma_ch],m_scu.dst_add[dma_ch]);
+		printf("DMA lv %d transfer START\n"
+							"Start %08x End %08x Size %04x\n",level ,m_dma[level].src,m_dma[level].dst,m_dma[level].size);
+		printf("Start Add %04x Destination Add %04x\n",m_dma[level].src_add,m_dma[level].dst_add);
 	}
 	#endif
 
@@ -400,6 +400,14 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 
 	/* max size */
 	if(m_dma[level].size == 0) { m_dma[level].size  = (level == 0) ? 0x00100000 : 0x1000; }
+
+	// gunblaze: during startup tries to do a max sized DMA transfer to VDP1 that would eventually hit fb/regs
+	if ((m_dma[level].dst & 0x07f0'0000) == 0x05c0'0000 && m_dma[level].size >= 0x80000)
+		m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7fffe);
+
+	// stv:colmns97, which doesn't work right (timing more likely, also ST-V has more soundram)
+//	if ((m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000 && m_dma[level].size >= 0x80000)
+//		m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7ffff);
 
 	tmp_src = tmp_dst = 0;
 
