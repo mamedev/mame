@@ -26,7 +26,7 @@ public:
 	{
 		m_s1 = BIT(select, 0);
 		m_s2 = BIT(select, 1);
-		m_bitwidth = (select & 4) ? 4 : 3;
+		m_bitwidth = BIT(select, 2) ? 4 : 3;
 	}
 	auto vck_callback() { return m_vck_cb.bind(); }
 	auto vck_legacy_callback() { return m_vck_legacy_cb.bind(); }
@@ -34,7 +34,7 @@ public:
 	// reset signal should keep for 2cycle of VCLK
 	void reset_w(int state);
 
-	// adpcmata is latched after vclk_interrupt callback
+	// data is latched after vclk callback
 	void data_w(uint8_t data);
 
 	// VCLK slave mode option
@@ -42,7 +42,7 @@ public:
 	// call vclk_w after data_w and reset_w.
 	void vclk_w(int state);
 
-	// option , selected pin selector
+	// option, sampling pin selector
 	void playmode_w(int select);
 	void s1_w(int state);
 	void s2_w(int state);
@@ -63,7 +63,7 @@ protected:
 
 	void compute_tables();
 	virtual int get_prescaler() const;
-	virtual double adpcm_capture_divisor() const { return 6.0; }
+	virtual int adpcm_capture_divisor() const { return 6; }
 
 	// internal state
 	sound_stream *m_stream;     // number of stream system
@@ -98,7 +98,7 @@ public:
 
 protected:
 	virtual int get_prescaler() const override;
-	virtual double adpcm_capture_divisor() const override { return 2.0; }
+	virtual int adpcm_capture_divisor() const override { return 2; }
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream) override;
