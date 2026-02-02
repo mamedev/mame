@@ -84,19 +84,38 @@ public:
 	void st25(machine_config &config) ATTR_COLD;
 
 private:
+	uint16_t m_service;
 	required_device<v25_device> m_maincpu;
 	required_device<m48t58_device> m_rtc;
 	required_device<okim6376_device> m_oki;
 	required_device<scn2681_device> m_duart;
 	required_device<hd44780_device> m_lcd;
 
-	void program_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
-
+	void program_map(address_map &map) ATTR_COLD;
+	
 	void io5_w(uint8_t data);
 	void p2_w(uint8_t data);
+	void service_strobe_w(uint8_t data);
+	//void txd0_w(uint8_t data);
+	
 };
 
+
+void st25_state::io_map(address_map &map)
+{
+	///ICC3 74HC138 inputs A13-15
+
+	map(0x0000, 0x1fff).w(FUNC(st25_state::service_strobe_w)); // Y0 Service strobe
+	map(0x2000, 0x3fff).noprw(); // Y1 IOS load out
+	map(0x4000, 0x5fff).noprw(); // Y2 IOS load mot
+	map(0x6000, 0x7fff).noprw(); // Y3 IOS load in
+	map(0x8000, 0x9fff).noprw(); // Y4 ICB1B oscillator ?
+	map(0xa000, 0xbfff).w(FUNC(st25_state::io5_w)); // Y5 Sound ST
+	map(0xc000, 0xdfff).noprw(); // Y6
+	map(0xe000, 0xffff).noprw(); // Y7
+}
 
 void st25_state::program_map(address_map &map)
 {
@@ -117,20 +136,6 @@ void st25_state::program_map(address_map &map)
 	map(0xfc000, 0xfffff).rom().region("maskrom", 0);
 }
 
-void st25_state::io_map(address_map &map)
-{
-	///ICC3 74HC138 inputs A13-15
-
-	map(0x0000, 0x1fff).noprw(); // Y0 service keyboard strobe
-	map(0x2000, 0x3fff).noprw(); // Y1 IOS load out
-	map(0x4000, 0x5fff).noprw(); // Y2 IOS load mot
-	map(0x6000, 0x7fff).noprw(); // Y3 IOS load in
-	map(0x8000, 0x9fff).noprw(); // Y4 ICB1B oscillator ?
-	map(0xa000, 0xbfff).w(FUNC(st25_state::io5_w)); // Y5 Sound ST
-	map(0xc000, 0xdfff).noprw(); // Y6
-	map(0xe000, 0xffff).noprw(); // Y7
-}
-
 void st25_state::io5_w(uint8_t data)
 {
 	// pulse ST line
@@ -142,6 +147,24 @@ void st25_state::p2_w(uint8_t data)
 {
 	m_oki->write(data);
 }
+
+void st25_state::service_strobe_w(uint8_t data)
+{
+	m_lcd->e_w((m_service >> 8) & 0x01);
+	m_lcd->rs_w((m_service >> 8) & 0x10);
+	// TODO: 0x04 and 0x08 control the top and bottom halves of the keyboard
+
+	m_lcd->db_w(m_service & 0xff);
+}
+
+/*
+void st25_state::txd0_w(uint8_t data)
+{
+	// m_service is standing in for 2 HEF4094 shift registers
+	// TODO: shifting this by 8 or 1 bits depends on the serial implementation of the V25
+	m_service = m_service << 8 | data;
+}
+*/
 
 static INPUT_PORTS_START(st25)
 	PORT_START("PORT16")
@@ -167,16 +190,18 @@ INPUT_PORTS_END
 void st25_state::st25(machine_config &config)
 {
 	V25(config, m_maincpu, 16_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &st25_state::io_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map);
+	
 
 	m_maincpu->p2_out_cb().set(FUNC(st25_state::p2_w));
+	//m_maincpu->txd0_cb().set(FUNC(st25_state::txd0_w));
 
 	M48T58(config, m_rtc, 0); // ST M48T18-150PC1
 
 	SCN2681(config, m_duart, 3.6864_MHz_XTAL); // Philips SCC2692AC1N28
 
-	// Service (16x2 character LCD)
+	// Service (16x1 character LCD)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
