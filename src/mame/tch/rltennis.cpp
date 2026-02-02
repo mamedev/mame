@@ -74,31 +74,30 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
 #include <algorithm>
 
-#define RLT_REFRESH_RATE   60
-#define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)
-
-#define BLTFLAG_DST_X_DIR   (1<<0)
-#define BLTFLAG_DST_Y_DIR   (1<<1)
-#define BLTFLAG_DST_LR      (1<<2)
-#define BLTFLAG_DST_UD      (1<<3)
-#define BLTFLAG_DISPLAY_UD  (1<<5)
-
-#define BLTFLAG_SRC_X_DIR   (1<<8)
-#define BLTFLAG_SRC_Y_DIR   (1<<9)
-#define BLTFLAG_SRC_LR      (1<<10)
-#define BLTFLAG_SRC_UD      (1<<11)
-
-
-#define BLTSTRT_ROM_MSB     (1<<8)
-#define BLTSTRT_TRIGGER     (1<<14)
-#define BLTSTRT_LAYER       (1<<15)
-
-#define SRC_SHIFT           8
-
-#define RLT_NUM_BLITTER_REGS    8
-#define RLT_NUM_BITMAPS         8
-
 namespace {
+
+constexpr int RLT_REFRESH_RATE   = 60;
+constexpr int RLT_TIMER_FREQ     = RLT_REFRESH_RATE * 256;
+
+constexpr uint16_t BLTFLAG_DST_X_DIR   = 1 << 0;
+constexpr uint16_t BLTFLAG_DST_Y_DIR   = 1 << 1;
+constexpr uint16_t BLTFLAG_DST_LR      = 1 << 2;
+constexpr uint16_t BLTFLAG_DST_UD      = 1 << 3;
+constexpr uint16_t BLTFLAG_DISPLAY_UD  = 1 << 5;
+
+constexpr uint16_t BLTFLAG_SRC_X_DIR   = 1 << 8;
+constexpr uint16_t BLTFLAG_SRC_Y_DIR   = 1 << 9;
+constexpr uint16_t BLTFLAG_SRC_LR      = 1 << 10;
+constexpr uint16_t BLTFLAG_SRC_UD      = 1 << 11;
+
+constexpr uint16_t BLTSTRT_ROM_MSB     = 1 << 8;
+constexpr uint16_t BLTSTRT_TRIGGER     = 1 << 14;
+constexpr uint16_t BLTSTRT_LAYER       = 1 << 15;
+
+constexpr unsigned SRC_SHIFT           = 8;
+
+constexpr unsigned RLT_NUM_BLITTER_REGS    = 8;
+constexpr unsigned RLT_NUM_BITMAPS         = 8;
 
 enum
 {
@@ -135,7 +134,7 @@ public:
 		std::fill(std::begin(m_sample_rom_offset), std::end(m_sample_rom_offset), 0);
 	}
 
-	void rltennis(machine_config &config);
+	void rltennis(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -167,8 +166,9 @@ private:
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(sample_player);
-	void ramdac_map(address_map &map) ATTR_COLD;
+
 	void rltennis_main(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
 };
 
 /****************************************************************************************

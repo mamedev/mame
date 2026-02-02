@@ -670,7 +670,7 @@ void model2_state::render_frame_start()
 	raster->poly_list_index = 0;
 
 	/* reset the sorted z list */
-	std::fill(std::begin(poly_sorted_list), std::end(poly_sorted_list), nullptr);
+	std::fill(std::begin(raster->poly_sorted_list), std::end(raster->poly_sorted_list), nullptr);
 
 	/* reset the min-max sortable Z values */
 	raster->min_z = 0xffff;

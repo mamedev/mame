@@ -50,8 +50,8 @@ Year + Game             Main CPU  Sound CPU  Sound                         Video
 #include "sound/dac.h"
 #include "sound/msm5205.h"
 #include "sound/sn76496.h"
-#include "sound/ymopm.h"
 #include "sound/ymopl.h"
+#include "sound/ymopm.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -75,9 +75,9 @@ public:
 		m_wheel(*this, "WHEEL%u", 0U)
 	{ }
 
-	void fantland(machine_config &config);
-	void wheelrun(machine_config &config);
-	void galaxygn(machine_config &config);
+	void fantland(machine_config &config) ATTR_COLD;
+	void wheelrun(machine_config &config) ATTR_COLD;
+	void galaxygn(machine_config &config) ATTR_COLD;
 
 	template <int Player> ioport_value wheelrun_wheel_r();
 

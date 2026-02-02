@@ -74,6 +74,7 @@ lev 7 : 0x7c : 0000 0000 - x
 #include "speaker.h"
 #include "tilemap.h"
 
+
 namespace {
 
 class kickgoal_state : public driver_device
@@ -96,11 +97,11 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void kickgoal(machine_config &config);
-	void actionhw(machine_config &config);
+	void kickgoal(machine_config &config) ATTR_COLD;
+	void actionhw(machine_config &config) ATTR_COLD;
 
-	void init_kickgoal();
-	void init_actionhw();
+	void init_kickgoal() ATTR_COLD;
+	void init_actionhw() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -136,6 +137,8 @@ private:
 	void program_map(address_map &map) ATTR_COLD;
 	void oki_map(address_map &map) ATTR_COLD;
 
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+
 	/* video-related */
 	tilemap_t *m_fgtm = nullptr;
 	tilemap_t *m_bgtm = nullptr;
@@ -159,8 +162,6 @@ private:
 	int m_bg2_region = 0;
 
 	int m_sprbase = 0;
-
-	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	/* memory pointers */
 	required_shared_ptr<u16> m_fgram;
