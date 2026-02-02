@@ -398,16 +398,16 @@ void saturn_state::vdp1_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		case 0x00/2:
 			vdp1_set_framebuffer_config();
-			if ( VDP1_LOG ) logerror( "VDP1: Access to register TVMR = %1X\n", VDP1_TVMR );
+			if ( VDP1_LOG ) logerror( "VDP1: Access to register TVMR = %1X\n", data );
 
 			break;
 		case 0x02/2:
 			vdp1_set_framebuffer_config();
-			if ( VDP1_LOG ) logerror( "VDP1: Access to register FBCR = %1X\n", VDP1_FBCR );
+			if ( VDP1_LOG ) logerror( "VDP1: Access to register FBCR = %1X\n", data );
 			m_vdp1.fbcr_accessed = 1;
 			break;
 		case 0x04/2:
-			if ( VDP1_LOG ) logerror( "VDP1: Access to register PTMR = %1X\n", VDP1_PTM );
+			if ( VDP1_LOG ) logerror( "VDP1: Access to register PTMR = %1X\n", data );
 			if ( VDP1_PTMR == 1 )
 				vdp1_process_list();
 
