@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /*
 
-    streaming ADPCM driver
+    Streaming ADPCM driver
     by Aaron Giles
 
     Library to transcode from an ADPCM source to raw PCM.
@@ -247,7 +247,7 @@ void msm5205_device::reset_w(int state)
  *    Handle an update of the data to the chip
  */
 
-void msm5205_device::data_w(uint8_t data)
+void msm5205_device::data_w(u8 data)
 {
 	if (m_bitwidth == 4)
 		m_data = data & 0x0f;
@@ -273,11 +273,11 @@ int msm6585_device::get_prescaler() const
  *    Handle a change of the selector
  */
 
-void msm5205_device::playmode_w(int select)
+void msm5205_device::playmode_w(u8 data)
 {
-	bool s1 = BIT(select, 0);
-	bool s2 = BIT(select, 1);
-	u8 bitwidth = BIT(select, 2) ? 4 : 3;
+	bool s1 = BIT(data, 0);
+	bool s2 = BIT(data, 1);
+	u8 bitwidth = BIT(data, 2) ? 4 : 3;
 
 	if (m_s1 != s1 || m_s2 != s2)
 	{

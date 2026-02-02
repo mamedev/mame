@@ -35,7 +35,7 @@ public:
 	void reset_w(int state);
 
 	// data is latched after vclk callback
-	void data_w(uint8_t data);
+	void data_w(u8 data);
 
 	// VCLK slave mode option
 	// if VCLK and reset or data is changed at the same time,
@@ -43,7 +43,7 @@ public:
 	void vclk_w(int state);
 
 	// option, sampling pin selector
-	void playmode_w(int select);
+	void playmode_w(u8 data);
 	void s1_w(int state);
 	void s2_w(int state);
 
