@@ -511,7 +511,7 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 			poly->num_vertices = clipped_verts;
 
 			for (int i = 0; i < clipped_verts; i++)
-				memcpy(&poly->v[i], &verts_out[i], sizeof(poly_vertex));
+				poly->v[i] = verts_out[i];
 
 			/* add to our sorted list */
 			raster->poly_sorted_list[object.z] = poly;
@@ -670,7 +670,7 @@ void model2_state::render_frame_start()
 	raster->poly_list_index = 0;
 
 	/* reset the sorted z list */
-	memset(raster->poly_sorted_list, 0, 0x10000 * sizeof(polygon *));
+	std::fill(std::begin(poly_sorted_list), std::end(poly_sorted_list), nullptr);
 
 	/* reset the min-max sortable Z values */
 	raster->min_z = 0xffff;
