@@ -40768,6 +40768,7 @@ dcdev
 dceu
 dcjp
 dcfish
+dcproto
 dctream
 
 @source:sega/deniam.cpp
