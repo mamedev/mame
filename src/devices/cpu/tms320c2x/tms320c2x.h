@@ -193,8 +193,7 @@ protected:
 	uint16_t POP_STACK();
 	void PUSH_STACK(uint16_t data);
 	void SHIFT_Preg_TO_ALU();
-	template <bool IgnoreARPHack> void GETDATA();
-	void GETDATA(int shift, int signext);
+	template <bool IgnoreARPHack> void GETDATA(int shift, int signext);
 	void PUTDATA(uint16_t data);
 	void PUTDATA_SST(uint16_t data);
 
