@@ -1089,6 +1089,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_chips.h,VIDEOS["PC_VGA_CHIPS"] = true
+--------------------------------------------------
+
+if VIDEOS["PC_VGA_CHIPS"] then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_chips.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_chips.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_cirrus.h,VIDEOS["PC_VGA_CIRRUS"] = true
 --------------------------------------------------
 

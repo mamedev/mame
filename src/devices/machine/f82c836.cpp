@@ -25,11 +25,13 @@ f82c836a_device::f82c836a_device(const machine_config &mconfig, const char *tag,
 	, m_bios(*this, finder_base::DUMMY_TAG)
 	, m_space_mem(nullptr)
 	, m_space_io(nullptr)
+	, m_ram(nullptr)
 	, m_dma(*this, "dma%u", 1U)
 	, m_intc(*this, "intc%u", 1U)
 	, m_pit(*this, "pit")
 	, m_rtc(*this, "rtc")
 	, m_ram_dev(*this, finder_base::DUMMY_TAG)
+	, m_isabus(*this, finder_base::DUMMY_TAG)
 	, m_read_ior(*this, 0)
 	, m_write_iow(*this)
 	, m_write_tc(*this)
@@ -125,7 +127,13 @@ void f82c836a_device::device_start()
 	m_space_mem = &m_cpu->memory().space(AS_PROGRAM);
 	m_space_io = &m_cpu->memory().space(AS_IO);
 
-	// TODO: RAM install here
+	m_ram = m_ram_dev->pointer();
+	u32 ram_size = m_ram_dev->size();
+
+	// install base memory
+	m_space_mem->install_ram(0x000000, 0x09ffff, m_ram);
+	if (ram_size > 0xa0000)
+		m_space_mem->install_ram(0x100000, 0x100000 + ram_size - 0xa0000 - 1, m_ram + 0xa0000);
 
 	m_space_io->install_device(0x0000, 0x03ff, *this, &f82c836a_device::io_map);
 
@@ -149,6 +157,13 @@ void f82c836a_device::device_start()
 //	save_item(NAME(m_emu_gatea20));
 //	save_item(NAME(m_keybc_d1_written));
 //	save_item(NAME(m_keybc_data_blocked));
+
+	save_item(NAME(m_rom_enable));
+	save_item(NAME(m_ram_write_protect));
+	save_item(NAME(m_shadow_ram));
+	save_item(NAME(m_dram_config));
+	save_item(NAME(m_ems_control));
+	save_item(NAME(m_ext_boundary));
 }
 
 void f82c836a_device::device_reset()
@@ -157,6 +172,14 @@ void f82c836a_device::device_reset()
 	// needs to be high at startup (it's more of an AND in this case)
 	m_fast_gatea20 = 1;
 	m_dma_channel = -1;
+
+	m_rom_enable = 0xc0;
+	m_ram_write_protect = 0;
+	m_shadow_ram[0] = m_shadow_ram[1] = m_shadow_ram[2] = 0;
+	m_refresh_toggle = 0;
+	m_portb = 0;
+
+	update_romram_settings();
 }
 
 void f82c836a_device::device_reset_after_children()
@@ -268,17 +291,88 @@ void f82c836a_device::config_map(address_map &map)
 		NAME([this] (offs_t offset) { return (m_nmi_mask << 7) | (m_ext_gatea20 << 6); })
 	);
 //	map(0x46, 0x46) Power Management
-//	map(0x48, 0x48) ROM Enable
-//	map(0x49, 0x49) RAM Write Protect
-//	map(0x4a, 0x4c) Shadow RAM Enable #1, #2, #3
-//	map(0x4d, 0x4d) DRAM Configuration
-//	map(0x4e, 0x4e) Extended Boundary
-//	map(0x4f, 0x4f) EMS Control
+	// ROM enable
+	map(0x48, 0x48).lrw8(
+		NAME([this] (offs_t offset) { return m_rom_enable; }),
+		NAME([this] (offs_t offset, u8 data) { m_rom_enable = data; update_romram_settings(); })
+	);
+	// RAM Write Protect
+	map(0x49, 0x49).lrw8(
+		NAME([this] (offs_t offset) { return m_ram_write_protect; }),
+		NAME([this] (offs_t offset, u8 data) { m_ram_write_protect = data; update_romram_settings(); })
+	);
+	// Shadow RAM #1/#2/#3
+	map(0x4a, 0x4c).lrw8(
+		NAME([this] (offs_t offset) { return m_shadow_ram[offset]; }),
+		NAME([this] (offs_t offset, u8 data) { m_shadow_ram[offset] = data; update_romram_settings(); })
+	);
+	// DRAM Configuration
+	map(0x4d, 0x4d).lrw8(
+		NAME([this] (offs_t offset) { return m_dram_config; }),
+		NAME([this] (offs_t offset, u8 data) { m_dram_config = data; })
+	);
+	// Extended Boundary
+	map(0x4e, 0x4e).lrw8(
+		NAME([this] (offs_t offset) { return m_ext_boundary; }),
+		NAME([this] (offs_t offset, u8 data) { m_ext_boundary = data; })
+	);
+	// EMS control
+	map(0x4f, 0x4f).lrw8(
+		NAME([this] (offs_t offset) { return m_ems_control; }),
+		NAME([this] (offs_t offset, u8 data) { m_ems_control = data; })
+	);
 //	map(0x60, 0x60) Laptop Features
 //	map(0x61, 0x61) Fast Video Control
 //	map(0x62, 0x62) Fast Video RAM Enable
 //	map(0x63, 0x63) High Performance Refresh
 //	map(0x64, 0x64) CAS Timing for DMA/Master
+}
+
+void f82c836a_device::update_romram_settings()
+{
+//	printf("%02x %02x %02x %02x %02x\n", m_rom_enable, m_ram_write_protect, m_shadow_ram[0], m_shadow_ram[1], m_shadow_ram[2]);
+
+	int i;
+
+	m_isabus->remap(AS_PROGRAM, 0, 0xfffff);
+
+	// TODO: optimize, add write only paths
+	for (i = 0; i < 8; i++)
+	{
+		const u32 start_offs = 0xc0000 + i * 0x8000;
+		const u32 end_offs = start_offs + 0x7fff;
+
+		if (BIT(m_rom_enable, i))
+			m_space_mem->install_rom(start_offs, end_offs, m_bios + i * 0x8000 / 2);
+	}
+
+	for (i = 0; i < 8; i++)
+	{
+		const u32 start_offs = 0xa0000 + i * 0x4000;
+		const u32 end_offs = start_offs + 0x3fff;
+
+		if (BIT(m_shadow_ram[0], i))
+			m_space_mem->install_ram(start_offs, end_offs, m_ram + 0xa0000 + i * 0x4000);
+	}
+
+	for (i = 0; i < 8; i++)
+	{
+		const u32 start_offs = 0xc0000 + i * 0x4000;
+		const u32 end_offs = start_offs + 0x3fff;
+
+		if (BIT(m_shadow_ram[1], i))
+			m_space_mem->install_ram(start_offs, end_offs, m_ram + 0xc0000 + i * 0x4000);
+	}
+
+	for (i = 0; i < 8; i++)
+	{
+		const u32 start_offs = 0xe0000 + i * 0x4000;
+		const u32 end_offs = start_offs + 0x3fff;
+
+		if (BIT(m_shadow_ram[2], i))
+			m_space_mem->install_ram(start_offs, end_offs, m_ram + 0xe0000 + i * 0x4000);
+	}
+
 }
 
 /******************

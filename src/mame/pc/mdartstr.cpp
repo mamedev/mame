@@ -7,6 +7,7 @@ Medalist Spectrum HW
 https://www.youtube.com/watch?v=-kxk8UtTeIM
 
 TODO:
+- error 007, bp f85f4,1,{ebp=1234;g} (???)
 - error 033, shadow RAM check between $ffffe and $10fffe
 - Emulate 65535 (S)VGA, same as IBM PC-110;
 - ROM disk, in ISA space;
@@ -44,9 +45,89 @@ Samsung K6T1008C2E-DL70 near mem roms (mixed ROM/RAM disk?)
 #include "machine/f82c836.h"
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_chips.h"
 
 #include "speaker.h"
+
+
+/*
+ *
+ * ISA16 VGA bindings
+ *
+ */
+
+class isa16_f65535_device :
+		public device_t,
+		public device_isa16_card_interface
+{
+public:
+	// construction/destruction
+	isa16_f65535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// optional information overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
+
+	void io_isa_map(address_map &map) ATTR_COLD;
+
+private:
+	required_device<f65535_vga_device> m_vga;
+};
+
+
+DEFINE_DEVICE_TYPE(ISA16_F65535, isa16_f65535_device, "f65535_isa16", "CT-65535 Integrated VGA card")
+
+isa16_f65535_device::isa16_f65535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, ISA16_F65535, tag, owner, clock),
+	device_isa16_card_interface(mconfig, *this),
+	m_vga(*this, "vga")
+{
+}
+
+void isa16_f65535_device::device_add_mconfig(machine_config &config)
+{
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
+	screen.set_screen_update("vga", FUNC(f65535_vga_device::screen_update));
+
+	F65535_VGA(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(512*1024);
+}
+
+void isa16_f65535_device::io_isa_map(address_map &map)
+{
+	map(0x03b0, 0x03df).m(m_vga, FUNC(f65535_vga_device::io_map));
+}
+
+void isa16_f65535_device::device_start()
+{
+	set_isa_device();
+}
+
+void isa16_f65535_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa16_f65535_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(f65535_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(f65535_vga_device::mem_w)));
+	}
+	else if (space_id == AS_IO)
+		m_isa->install_device(0x0000, 0xffff, *this, &isa16_f65535_device::io_isa_map);
+}
+
+
 
 namespace {
 
@@ -75,22 +156,28 @@ private:
 
 void mdartstr_state::main_map(address_map &map)
 {
-	map(0x000000, 0x09ffff).ram();
-	map(0x0a0000, 0x0bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+//	map(0x000000, 0x09ffff).ram();
+//	map(0x0a0000, 0x0bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
 //	map(0x0c0000, 0x0c7fff).rom().region("bios", 0x48000); // VGA BIOS + virtual floppy ISA
-	map(0x0c8000, 0x0cffff).rom().region("bios", 0x48000);
-	map(0x0e0000, 0x0fffff).rom().region("bios", 0x60000);
-	map(0x100000, 0x15ffff).ram();
-	map(0xf80000, 0xffffff).rom().region("bios", 0x00000);
+//	map(0x0c8000, 0x0cffff).rom().region("bios", 0x18000);
+//	map(0x0e0000, 0x0fffff).rom().region("bios", 0x20000);
+//	map(0x100000, 0x15ffff).ram();
+	// TODO: fc0000-fdffff has an optional memory hole in chipset at $4e bit 4
+	map(0xfc0000, 0xffffff).rom().region("bios", 0x00000);
 }
 
 void mdartstr_state::main_io(address_map &map)
 {
-	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
+//	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 }
 
 static INPUT_PORTS_START( mdartstr )
 INPUT_PORTS_END
+
+static void pc_isa_onboard(device_slot_interface &device)
+{
+	device.option_add_internal("vga", ISA16_F65535);
+}
 
 void mdartstr_state::mdartstr(machine_config &config)
 {
@@ -99,7 +186,7 @@ void mdartstr_state::mdartstr(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &mdartstr_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("chipset", FUNC(f82c836a_device::int_ack_r));
 
-	F82C836A(config, m_chipset, XTAL(25'000'000), "maincpu", "bios", "keybc", "ram");
+	F82C836A(config, m_chipset, XTAL(25'000'000), "maincpu", "bios", "keybc", "ram", "isabus");
 	m_chipset->hold().set([this] (int state) {
 		// halt cpu
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
@@ -131,15 +218,6 @@ void mdartstr_state::mdartstr(machine_config &config)
 	// 640 + 384 KB
 	RAM(config, "ram").set_default_size("1M");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
-	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
-
-	// TODO: bump to 65535, move to internal ISA space
-	vga_device &vga(VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(512*1024);
-
 	ISA16(config, m_isabus, 0);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);
 	m_isabus->set_iospace("maincpu", AS_IO);
@@ -163,6 +241,8 @@ void mdartstr_state::mdartstr(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(f82c836a_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(f82c836a_device::dreq7_w));
 
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "vga", true);
+
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(f82c836a_device::kbrst_w));
 	keybc.gate_a20().set(m_chipset, FUNC(f82c836a_device::gatea20_w));
@@ -180,9 +260,13 @@ void mdartstr_state::mdartstr(machine_config &config)
 }
 
 ROM_START( mdartstr )
-	ROM_REGION16_LE( 0x80000, "bios", 0 )
+	ROM_REGION16_LE( 0x80000, "rawbios", 0 )
 	// 0xxxxxxxxxxxxxxxxxx = 0xFF
 	ROM_LOAD( "system rev 1.0.bin", 0x000000, 0x080000, CRC(cdd36a31) SHA1(4ced7065e0923d9cb414b65d2a2d955da080c46b) )
+
+	ROM_REGION16_LE( 0x40000, "bios", ROMREGION_ERASEFF )
+	ROM_COPY( "rawbios", 0x48000, 0x08000, 0x08000 )
+	ROM_COPY( "rawbios", 0x60000, 0x20000, 0x20000 )
 
 	ROM_REGION16_LE( 0x800000, "romdisk", ROMREGION_ERASEFF )
 	// TODO: actual socket positions, verify actual loading

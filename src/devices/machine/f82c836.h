@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "bus/isa/isa.h"
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -17,14 +18,15 @@ class f82c836a_device : public device_t,
 					    public device_memory_interface
 {
 public:
-	template <typename T, typename U, typename V, typename W>
-	f82c836a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cputag, U &&biostag, V &&keybctag, W &&ramtag)
+	template <typename T, typename U, typename V, typename W, typename X>
+	f82c836a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cputag, U &&biostag, V &&keybctag, W &&ramtag, X &&isatag)
 		: f82c836a_device(mconfig, tag, owner, clock)
 	{
 		set_cputag(std::forward<T>(cputag));
 		set_biostag(std::forward<U>(biostag));
 		set_keybctag(std::forward<V>(keybctag));
 		set_ramtag(std::forward<W>(ramtag));
+		set_isatag(std::forward<X>(isatag));
 	}
 
 	f82c836a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -44,6 +46,7 @@ public:
 	template <typename T> void set_biostag(T &&tag) { m_bios.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_keybctag(T &&tag) { m_keybc.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_ramtag(T &&tag) { m_ram_dev.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_isatag(T &&tag) { m_isabus.set_tag(std::forward<T>(tag)); }
 
 	IRQ_CALLBACK_MEMBER(int_ack_r) { return m_intc[0]->acknowledge(); }
 
@@ -133,12 +136,14 @@ private:
 
 	address_space *m_space_mem;
 	address_space *m_space_io;
+	u8 *m_ram;
 
 	required_device_array<am9517a_device, 2> m_dma;
 	required_device_array<pic8259_device, 2> m_intc;
 	required_device<pit8254_device> m_pit;
 	required_device<mc146818_device> m_rtc;
 	required_device<ram_device> m_ram_dev;
+	required_device<isa16_device> m_isabus;
 
 	devcb_read16 m_read_ior;
 	devcb_write16 m_write_iow;
@@ -173,6 +178,13 @@ private:
 
 	u8 m_config_address;
 	u8 m_chan_env;
+	u8 m_rom_enable;
+	u8 m_ram_write_protect;
+	u8 m_shadow_ram[3];
+	u8 m_dram_config;
+	u8 m_ext_boundary;
+	u8 m_ems_control;
+	void update_romram_settings();
 
 	offs_t page_offset();
 	void set_dma_channel(int channel, bool state);
