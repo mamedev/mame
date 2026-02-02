@@ -29,6 +29,8 @@ void v25_common_device::ida_sfr_map(address_map &map)
 	map(0x14c, 0x14c).rw(FUNC(v25_common_device::exic0_r), FUNC(v25_common_device::exic0_w));
 	map(0x14d, 0x14d).rw(FUNC(v25_common_device::exic1_r), FUNC(v25_common_device::exic1_w));
 	map(0x14e, 0x14e).rw(FUNC(v25_common_device::exic2_r), FUNC(v25_common_device::exic2_w));
+	map(0x160, 0x160).rw(FUNC(v25_common_device::rxb0_r), FUNC(v25_common_device::rxb0_w));
+	map(0x162, 0x162).rw(FUNC(v25_common_device::txb0_r), FUNC(v25_common_device::txb0_w));
 	map(0x165, 0x165).rw(FUNC(v25_common_device::srms0_r), FUNC(v25_common_device::srms0_w));
 	map(0x166, 0x166).rw(FUNC(v25_common_device::stms0_r), FUNC(v25_common_device::stms0_w));
 	map(0x168, 0x168).rw(FUNC(v25_common_device::scm0_r), FUNC(v25_common_device::scm0_w));
@@ -38,6 +40,8 @@ void v25_common_device::ida_sfr_map(address_map &map)
 	map(0x16c, 0x16c).rw(FUNC(v25_common_device::seic0_r), FUNC(v25_common_device::seic0_w));
 	map(0x16d, 0x16d).rw(FUNC(v25_common_device::sric0_r), FUNC(v25_common_device::sric0_w));
 	map(0x16e, 0x16e).rw(FUNC(v25_common_device::stic0_r), FUNC(v25_common_device::stic0_w));
+	map(0x170, 0x170).rw(FUNC(v25_common_device::rxb1_r), FUNC(v25_common_device::rxb1_w));
+	map(0x172, 0x172).rw(FUNC(v25_common_device::txb1_r), FUNC(v25_common_device::txb1_w));
 	map(0x175, 0x175).rw(FUNC(v25_common_device::srms1_r), FUNC(v25_common_device::srms1_w));
 	map(0x176, 0x176).rw(FUNC(v25_common_device::stms1_r), FUNC(v25_common_device::stms1_w));
 	map(0x178, 0x178).rw(FUNC(v25_common_device::scm1_r), FUNC(v25_common_device::scm1_w));
@@ -238,6 +242,28 @@ void v25_common_device::exic2_w(uint8_t d)
 	write_irqcontrol(INTP2, d);
 }
 
+uint8_t v25_common_device::rxb0_r()
+{
+	return m_rxb[0];
+}
+
+void v25_common_device::rxb0_w(uint8_t d)
+{
+	logerror("%06x: RXB0 set to %02x\n", PC(), d);
+	m_rxb[0] = d;
+}
+
+uint8_t v25_common_device::txb0_r()
+{
+	return m_txb[0];
+}
+
+void v25_common_device::txb0_w(uint8_t d)
+{
+	logerror("%06x: TXB0 set to %02x\n", PC(), d);
+	m_txb[0] = d;
+}
+
 uint8_t v25_common_device::srms0_r()
 {
 	return m_srms[0];
@@ -332,6 +358,28 @@ void v25_common_device::stic0_w(uint8_t d)
 {
 	write_irqcontrol(INTST0, d);
 	m_priority_ints0 = d & 0x7;
+}
+
+uint8_t v25_common_device::rxb1_r()
+{
+	return m_rxb[1];
+}
+
+void v25_common_device::rxb1_w(uint8_t d)
+{
+	logerror("%06x: RXB1 set to %02x\n", PC(), d);
+	m_rxb[1] = d;
+}
+
+uint8_t v25_common_device::txb1_r()
+{
+	return m_txb[1];
+}
+
+void v25_common_device::txb1_w(uint8_t d)
+{
+	logerror("%06x: TXB1 set to %02x\n", PC(), d);
+	m_txb[1] = d;
 }
 
 uint8_t v25_common_device::srms1_r()

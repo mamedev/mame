@@ -127,6 +127,8 @@ private:
 	emu_timer *m_timers[4];
 
 	// serial interface related
+	uint8_t   m_rxb[2];
+	uint8_t   m_txb[2];
 	uint8_t   m_scm[2];
 	uint8_t   m_scc[2];
 	uint8_t   m_brg[2];
