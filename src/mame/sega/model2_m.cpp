@@ -289,6 +289,7 @@ void model2_state::debug_poly_dump_command(const std::vector<std::string_view> &
 		con.printf("Error: while opening %s for writing\n", params[1]);
 		return;
 	}
+	f.imbue(std::locale::classic());
 
 	for (u32 i = 0; i < m_raster->poly_list_index; i++)
 	{
