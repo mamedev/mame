@@ -41898,10 +41898,13 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 	</software>
 
 
-	<software name="mp3playr">
+	<software name="mp3playr" supported="no">
 		<description>Nintendo MP3 Player (Europe)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>2006</year>
+		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs on health and safety screen
+]]></notes>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="nintendo mp3 player (europe) (en,fr,de,es,it).bin" size="4194304" crc="867bec76" sha1="0c1eb4af684f3b428766b10cdbbe62fd726e5e27"/>
@@ -41911,10 +41914,14 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 
 	<!-- this needs confirmation? -->
 	<!-- This cart supports downloadable video-based mini-games (called "Garage Games"), that can be downloaded here: https://www.nintendo.co.jp/n08/playan/garage/index.html -->
-	<software name="playyan">
+	<!-- also https://www.mariowiki.com/Nintendo_MP3_Player -->
+	<software name="playyan" supported="no">
 		<description>Play-Yan (Japan)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs on title screen
+]]></notes>
 		<info name="serial" value="AGS-A-ZMAJ-JPN"/>
 		<info name="release" value="20050221"/>
 		<info name="alt_title" value="プレイやん"/>
@@ -41943,10 +41950,13 @@ Hangs during cutscene after beating Maxim for best ending path (i.e. before real
 	    The game came bundled (on the deluxe edition) with Panasonic Media Stage 4.2 to allow users to encode their own videos.
 	    There was a free upgrade tp version V4.2L311 (https://panasonic.jp/support/software/mediastage/download/v42_nintendo.html).
 	    It supports SD cards up to 1GB (it won't recognize 2GB SD cards). -->
-	<software name="playyanm">
+	<software name="playyanm" cloneof="mp3playr" supported="no">
 		<description>Play-Yan Micro (Japan)</description>
 		<year>2005</year>
 		<publisher>Nintendo</publisher>
+		<notes><![CDATA[
+Hangs on Nintendo logo
+]]></notes>
 		<info name="serial" value="AGS-006"/>
 		<info name="release" value="20050913"/>
 		<info name="alt_title" value="プレイやん micro"/>
