@@ -639,8 +639,10 @@ void saturn_cd_hle_device::mpeg_standard_return(uint16_t cur_status)
 
 void saturn_cd_hle_device::cd_change_status(u16 new_status)
 {
-	cd_stat = (cd_stat & 0xf0ff) | CD_STAT_BUSY;
-	cd_next_stat = (cd_stat & 0xf0ff) | new_status;
+	// it would make more sense with mask & 0xf0ff
+	// - houkago will chain 0x21 commands due of PERI hook (leading to a crash)
+	cd_stat = CD_STAT_BUSY;
+	cd_next_stat = new_status;
 }
 
 /*

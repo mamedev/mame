@@ -2091,7 +2091,7 @@ void saturn_state::vdp1_process_list()
 					break;
 
 				case 0x0005:
-//              case 0x0007: // mirror? Baroque uses it, crashes for whatever reason
+				case 0x0007: // mirror? baroque/samsho4
 					if (VDP1_LOG) logerror ("Sprite List Polyline\n");
 					current_sprite.ispoly = 1;
 					vdp1_draw_poly_line(*cliprect);
