@@ -25,7 +25,6 @@ f82c836a_device::f82c836a_device(const machine_config &mconfig, const char *tag,
 	, m_bios(*this, finder_base::DUMMY_TAG)
 	, m_space_mem(nullptr)
 	, m_space_io(nullptr)
-	, m_ram(nullptr)
 	, m_dma(*this, "dma%u", 1U)
 	, m_intc(*this, "intc%u", 1U)
 	, m_pit(*this, "pit")
@@ -257,7 +256,7 @@ void f82c836a_device::config_map(address_map &map)
 	// ---- xxxx revision
 	// ---- 0011 82C836A
 	// ---- 0100 82C836B
-	map(0x40, 0x40).lr8(NAME([this] (offs_t offset) { return 0x13; }));
+	map(0x40, 0x40).lr8(NAME([] (offs_t offset) { return 0x13; }));
 	// Channel Environment
 	map(0x41, 0x41).lrw8(
 		NAME([this] (offs_t offset) { return m_chan_env; }),

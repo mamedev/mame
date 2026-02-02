@@ -133,7 +133,6 @@ private:
 
 	address_space *m_space_mem;
 	address_space *m_space_io;
-	u8 *m_ram;
 
 	required_device_array<am9517a_device, 2> m_dma;
 	required_device_array<pic8259_device, 2> m_intc;
