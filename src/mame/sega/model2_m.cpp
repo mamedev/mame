@@ -12,6 +12,7 @@
 #include "debug/debugcon.h"
 #include "debugger.h"
 
+#include <locale>
 #include <fstream>
 
 
@@ -76,6 +77,7 @@ void model2_state::debug_geo_dasm_command(const std::vector<std::string_view> &p
 		con.printf("Error: while opening %s for writing\n", params[1]);
 		return;
 	}
+	f.imbue(std::locale::classic());
 
 	// print some basic info on top
 	util::stream_format(f, "Dump Header info:\n");
