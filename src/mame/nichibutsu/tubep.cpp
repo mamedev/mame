@@ -124,7 +124,6 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
  *
  *************************************/
 
-
 void tubep_state::coin1_counter_w(int state)
 {
 	machine().bookkeeping().coin_counter_w(0, state);
@@ -209,9 +208,10 @@ uint8_t tubep_state::tubep_soundlatch_r()
 	return (m_soundlatch->pending_r() << 7) | (m_soundlatch->read() & 0x7f);
 }
 
-uint8_t tubep_state::tubep_sound_irq_ack()
+uint8_t tubep_state::tubep_sound_irq_ack_r()
 {
-	m_soundcpu->set_input_line(0, CLEAR_LINE);
+	if (!machine().side_effects_disabled())
+		m_soundcpu->set_input_line(0, CLEAR_LINE);
 	return 0;
 }
 
@@ -219,7 +219,7 @@ uint8_t tubep_state::tubep_sound_irq_ack()
 void tubep_state::tubep_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0xd000, 0xd000).r(FUNC(tubep_state::tubep_sound_irq_ack));
+	map(0xd000, 0xd000).r(FUNC(tubep_state::tubep_sound_irq_ack_r));
 	map(0xe000, 0xe7ff).ram();     /* 6116 #3 */
 }
 
@@ -485,7 +485,7 @@ void rjammer_state::voice_startstop_w(uint8_t data)
 {
 	/* bit 0 of data selects voice start/stop (reset pin on MSM5205)*/
 	// 0 -stop; 1-start
-	m_msm->reset_w((data & 1)^1);
+	m_msm->reset_w(~data & 1);
 }
 
 
@@ -493,10 +493,7 @@ void rjammer_state::voice_frequency_select_w(uint8_t data)
 {
 	// bit 0 of data selects voice frequency on MSM5205 (pin 1)
 	// 0 -4 KHz; 1- 8KHz
-	if (data & 1)
-		m_msm->playmode_w(msm5205_device::S48_4B); // 8 KHz
-	else
-		m_msm->playmode_w(msm5205_device::S96_4B); // 4 KHz
+	m_msm->s1_w(data & 1);
 }
 
 
@@ -517,7 +514,6 @@ void rjammer_state::voice_input_w(uint8_t data)
 {
 	/* 8 bits of adpcm data for MSM5205 */
 	/* need to buffer the data, and switch two nibbles on two following interrupts*/
-
 	m_adpcm_mux->ba_w(data);
 
 	/* NOTE: game resets interrupt line on ANY access to ANY I/O port.
@@ -786,20 +782,20 @@ INPUT_PORTS_END
 
 void tubep_state::tubep(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 16000000 / 4);    /* 4 MHz */
+	// basic machine hardware
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4); // 4 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &tubep_state::tubep_main_map);
 	m_maincpu->set_addrmap(AS_IO, &tubep_state::tubep_main_portmap);
 
-	Z80(config, m_slave, 16000000 / 4);     /* 4 MHz */
+	Z80(config, m_slave, 16_MHz_XTAL / 4); // 4 MHz
 	m_slave->set_addrmap(AS_PROGRAM, &tubep_state::tubep_second_map);
 	m_slave->set_addrmap(AS_IO, &tubep_state::tubep_second_portmap);
 
-	Z80(config, m_soundcpu, 19968000 / 8);  /* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	Z80(config, m_soundcpu, 19.968_MHz_XTAL / 8); // X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &tubep_state::tubep_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &tubep_state::tubep_sound_portmap);
 
-	NSC8105(config, m_mcu, 6000000);        /* 6 MHz Xtal - divided internally ??? */
+	NSC8105(config, m_mcu, 6_MHz_XTAL); // 6 MHz Xtal - divided internally ???
 	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
@@ -808,7 +804,7 @@ void tubep_state::tubep(machine_config &config)
 	ls259_device &mainlatch(LS259(config, "mainlatch"));
 	mainlatch.q_out_cb<0>().set(FUNC(tubep_state::coin1_counter_w));
 	mainlatch.q_out_cb<1>().set(FUNC(tubep_state::coin2_counter_w));
-	mainlatch.q_out_cb<5>().set_nop(); //something...
+	mainlatch.q_out_cb<5>().set_nop(); // something...
 	mainlatch.q_out_cb<5>().set(FUNC(tubep_state::screen_flip_w));
 	mainlatch.q_out_cb<6>().set(FUNC(tubep_state::background_romselect_w));
 	mainlatch.q_out_cb<7>().set(FUNC(tubep_state::colorproms_A4_line_w));
@@ -816,30 +812,28 @@ void tubep_state::tubep(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->set_separate_acknowledge(true);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(256, 264);
-	m_screen->set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	m_screen->set_raw(19.968_MHz_XTAL / 4, 320, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(tubep_state::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(tubep_state::palette_init), 32 + 256*64);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", 19968000 / 8 / 2));
+	ay8910_device &ay1(AY8910(config, "ay1", 19.968_MHz_XTAL / 8 / 2));
 	ay1.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_0_w));
 	ay1.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_0_w));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 19968000 / 8 / 2));
+	ay8910_device &ay2(AY8910(config, "ay2", 19.968_MHz_XTAL / 8 / 2));
 	ay2.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_1_w));
 	ay2.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_1_w));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	ay8910_device &ay3(AY8910(config, "ay3", 19968000 / 8 / 2));
+	ay8910_device &ay3(AY8910(config, "ay3", 19.968_MHz_XTAL / 8 / 2));
 	ay3.port_a_write_callback().set(FUNC(tubep_state::ay8910_portA_2_w));
 	ay3.port_b_write_callback().set(FUNC(tubep_state::ay8910_portB_2_w));
 	ay3.add_route(ALL_OUTPUTS, "mono", 0.10);
@@ -849,7 +843,8 @@ void tubep_state::tubepb(machine_config &config)
 {
 	tubep(config);
 
-	M6802(config.replace(), m_mcu, 6000000); /* ? MHz Xtal */
+	// basic machine hardware
+	M6802(config.replace(), m_mcu, 6000000); // ? MHz Xtal
 	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
@@ -858,22 +853,22 @@ void tubep_state::tubepb(machine_config &config)
 
 void rjammer_state::rjammer(machine_config &config)
 {
-	/* basic machine hardware */
-	Z80(config, m_maincpu, 16_MHz_XTAL / 4);   /* 4 MHz */
+	// basic machine hardware
+	Z80(config, m_maincpu, 16_MHz_XTAL / 4); // 4 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &rjammer_state::rjammer_main_map);
 	m_maincpu->set_addrmap(AS_IO, &rjammer_state::rjammer_main_portmap);
 
-	Z80(config, m_slave, 16_MHz_XTAL / 4);     /* 4 MHz */
+	Z80(config, m_slave, 16_MHz_XTAL / 4); // 4 MHz
 	m_slave->set_addrmap(AS_PROGRAM, &rjammer_state::rjammer_second_map);
 	m_slave->set_addrmap(AS_IO, &rjammer_state::rjammer_second_portmap);
 
-	Z80(config, m_soundcpu, 19968000 / 8);  // X2 19968000 Hz (schematic says 20 MHz?) divided by LS669 (on Qc output) (signal RH0)
+	Z80(config, m_soundcpu, 19.968_MHz_XTAL / 8); // X2 19968000 Hz (schematic says 20 MHz?) divided by LS669 (on Qc output) (signal RH0)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &rjammer_state::rjammer_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &rjammer_state::rjammer_sound_portmap);
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	NSC8105(config, m_mcu, 6_MHz_XTAL);    /* 6 MHz Xtal - divided internally ??? */
+	NSC8105(config, m_mcu, 6_MHz_XTAL); // 6 MHz Xtal - divided internally ???
 	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &rjammer_state::nsc_map);
 
@@ -882,35 +877,35 @@ void rjammer_state::rjammer(machine_config &config)
 	mainlatch.q_out_cb<1>().set(FUNC(rjammer_state::coin2_counter_w));
 	mainlatch.q_out_cb<5>().set(FUNC(rjammer_state::screen_flip_w));
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(19968000 / 4, 320, 0, 256, 264, 16, 240);
+	m_screen->set_raw(19.968_MHz_XTAL / 4, 320, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(rjammer_state::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette", FUNC(rjammer_state::palette_init), 64);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &ay1(AY8910(config, "ay1", 19968000 / 8 / 2));
+	ay8910_device &ay1(AY8910(config, "ay1", 19.968_MHz_XTAL / 8 / 2));
 	ay1.port_a_write_callback().set(FUNC(rjammer_state::ay8910_portA_0_w));
 	ay1.port_b_write_callback().set(FUNC(rjammer_state::ay8910_portB_0_w));
 	ay1.add_route(ALL_OUTPUTS, "mono", 0.075);
 
-	ay8910_device &ay2(AY8910(config, "ay2", 19968000 / 8 / 2));
+	ay8910_device &ay2(AY8910(config, "ay2", 19.968_MHz_XTAL / 8 / 2));
 	ay2.port_a_write_callback().set(FUNC(rjammer_state::ay8910_portA_1_w));
 	ay2.port_b_write_callback().set(FUNC(rjammer_state::ay8910_portB_1_w));
 	ay2.add_route(ALL_OUTPUTS, "mono", 0.075);
 
-	ay8910_device &ay3(AY8910(config, "ay3", 19968000 / 8 / 2));
+	ay8910_device &ay3(AY8910(config, "ay3", 19.968_MHz_XTAL / 8 / 2));
 	ay3.port_a_write_callback().set(FUNC(rjammer_state::ay8910_portA_2_w));
 	ay3.port_b_write_callback().set(FUNC(rjammer_state::ay8910_portB_2_w));
 	ay3.add_route(ALL_OUTPUTS, "mono", 0.075);
 
 	MSM5205(config, m_msm, 384_kHz_XTAL);
 	m_msm->vck_callback().set(FUNC(rjammer_state::adpcm_vck_w));
-	m_msm->set_prescaler_selector(msm5205_device::S48_4B);  // 8 KHz (changes at run time)
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B); // 4 KHz (changes at run time)
 	m_msm->add_route(ALL_OUTPUTS, "mono", 0.325);
 
 	LS157(config, m_adpcm_mux).out_callback().set(m_msm, FUNC(msm5205_device::data_w)); // 9G (fed by LS377 @ 10G)

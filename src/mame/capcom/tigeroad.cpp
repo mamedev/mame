@@ -696,7 +696,7 @@ void tigeroad_state::toramich(machine_config &config)
 	// sound hardware
 	MSM5205(config, m_msm, 384_kHz_XTAL);
 	m_msm->vck_callback().set_inputline("sample", 0, HOLD_LINE);
-	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
+	m_msm->set_prescaler_selector(msm5205_device::S96_4B); // 4 KHz
 	m_msm->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
