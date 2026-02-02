@@ -98,7 +98,11 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <locale>
+#include <string>
+#include <sstream>
 #include <type_traits>
+#include <utility>
 
 
 namespace drc {
@@ -1088,9 +1092,21 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
-		std::string filename = std::string("drcbex86_").append(device.shortname()).append(".asm");
-		m_log = x86log_context::create(filename);
-		m_log_asmjit = fopen(std::string("drcbex86_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
+		std::string filename = device.tag();
+		for (auto &ch : filename)
+		{
+			if (':' == ch)
+				ch = '_';
+		}
+		std::ostringstream str;
+		str.imbue(std::locale::classic());
+		str << device.shortname();
+		if ('_' != filename[0])
+			str << '_';
+		str << filename << ".asm";
+		filename = std::move(str).str();
+		m_log = x86log_context::create("drcbex86_" + filename);
+		m_log_asmjit = fopen(("drcbex86_asmjit_" + filename).c_str(), "w");
 	}
 
 	// generate a little bit of glue code to set up the environment
@@ -1347,7 +1363,7 @@ int drcbe_x86::execute(code_handle &entry)
 void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
 	// do this here because device.debug() isn't initialised at construction time
-	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) && m_device.debug())
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)
