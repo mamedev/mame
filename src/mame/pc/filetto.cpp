@@ -269,7 +269,9 @@ void filetto_state::fdc_dor_w(uint8_t data)
 void filetto_state::voice_start_w(uint8_t data)
 {
 	// TODO: accurate pitch frequency
-	m_sample->adjust(attotime::zero, 0, attotime::from_hz(44150));
+	// triggers after game over -> high score
+	// hand tuned, should be between ~30 and 44.1 kHz
+	m_sample->adjust(attotime::zero, 0, attotime::from_hz(44100));
 	m_bit = 7;
 	m_vaddr = ((m_voice & 0xf / 5) | (BIT(m_voice, 4) << 2)) * 0x8000;
 	logerror("%x %x\n",m_voice,m_vaddr);
