@@ -354,9 +354,9 @@ void z8002_device::Interrupt()
 
 	if (m_irq_req & Z8000_RESET)
 	{
+		m_pc = get_reset_pc(); /* get reset m_pc  */
 		m_irq_req &= Z8000_NVI | Z8000_VI;
 		CHANGE_FCW(RDMEM_W(m_program, 2)); /* get reset m_fcw */
-		m_pc = get_reset_pc(); /* get reset m_pc  */
 	}
 	else
 	/* trap ? */
@@ -366,9 +366,9 @@ void z8002_device::Interrupt()
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_op[0]);   /* for internal traps, the 1st word of the instruction is pushed */
+		m_pc = GET_PC(EPU);
 		m_irq_req &= ~Z8000_EPU;
 		CHANGE_FCW(GET_FCW(EPU));
-		m_pc = GET_PC(EPU);
 		LOG("Z8K ext instr trap $%04x\n", m_pc);
 	}
 	else
@@ -378,9 +378,9 @@ void z8002_device::Interrupt()
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_op[0]);   /* for internal traps, the 1st word of the instruction is pushed */
+		m_pc = GET_PC(TRAP);
 		m_irq_req &= ~Z8000_TRAP;
 		CHANGE_FCW(GET_FCW(TRAP));
-		m_pc = GET_PC(TRAP);
 		LOG("Z8K priv instr trap $%04x\n", m_pc);
 	}
 	else
@@ -390,9 +390,9 @@ void z8002_device::Interrupt()
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_op[0]);   /* for internal traps, the 1st word of the instruction is pushed */
+		m_pc = GET_PC(SYSCALL);
 		m_irq_req &= ~Z8000_SYSCALL;
 		CHANGE_FCW(GET_FCW(SYSCALL));
-		m_pc = GET_PC(SYSCALL);
 		LOG("Z8K syscall [$%02x/$%04x]\n", m_op[0] & 0xff, m_pc);
 	}
 	else
@@ -405,9 +405,9 @@ void z8002_device::Interrupt()
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
+		m_pc = GET_PC(SEGTRAP);
 		m_irq_req &= ~Z8000_SEGTRAP;
 		CHANGE_FCW(GET_FCW(SEGTRAP));
-		m_pc = GET_PC(SEGTRAP);
 		LOG("Z8K segtrap $%04x\n", m_pc);
 	}
 	else
@@ -421,9 +421,9 @@ void z8002_device::Interrupt()
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
+		m_pc = GET_PC(NMI);
 		m_irq_req &= ~Z8000_NMI;
 		CHANGE_FCW(GET_FCW(NMI));
-		m_pc = GET_PC(NMI);
 		LOG("Z8K NMI $%04x\n", m_pc);
 	}
 	else
@@ -437,9 +437,9 @@ void z8002_device::Interrupt()
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
+		m_pc = GET_PC(NVI);
 		m_irq_req &= ~Z8000_NVI;
 		CHANGE_FCW(GET_FCW(NVI));
-		m_pc = GET_PC(NVI);
 		LOG("Z8K NVI $%04x\n", m_pc);
 	}
 	else
@@ -453,9 +453,9 @@ void z8002_device::Interrupt()
 		PUSH_PC();
 		PUSHW(SP, fcw);       /* save current m_fcw */
 		PUSHW(SP, m_irq_vec);   /* save interrupt/trap type tag */
+		m_pc = read_irq_vector();
 		m_irq_req &= ~Z8000_VI;
 		CHANGE_FCW(GET_FCW(VI));
-		m_pc = read_irq_vector();
 		LOG("Z8K VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", m_irq_vec, VEC00 + 2 * (m_irq_vec & 0xff), m_fcw, m_pc);
 	}
 }

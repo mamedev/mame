@@ -197,12 +197,14 @@ void z8002_device::WRBX_L(uint8_t reg, uint16_t idx, uint32_t value)
 	WRMEM_L(reg == SP ? m_stack : m_data, addr_add(addr_from_reg(reg), idx), value);
 }
 
+#define ADD_ALIGNED16(x, value) (x) += (value) - ((x) & 1)
+
 void z8002_device::PUSHW(uint8_t dst, uint16_t value)
 {
 	if (get_segmented_mode())
-		RW(dst | 1) -= 2;
+		ADD_ALIGNED16(RW(dst | 1), -2);
 	else
-		RW(dst) -= 2;
+		ADD_ALIGNED16(RW(dst), -2);
 	WRIR_W(dst, value);
 }
 
@@ -210,18 +212,18 @@ uint16_t z8002_device::POPW(uint8_t src)
 {
 	uint16_t result = RDIR_W(src);
 	if (get_segmented_mode())
-		RW(src | 1) += 2;
+		ADD_ALIGNED16(RW(src | 1), 2);
 	else
-		RW(src) += 2;
+		ADD_ALIGNED16(RW(src), 2);
 	return result;
 }
 
 void z8002_device::PUSHL(uint8_t dst, uint32_t value)
 {
 	if (get_segmented_mode())
-		RW(dst | 1) -= 4;
+		ADD_ALIGNED16(RW(dst | 1), -4);
 	else
-		RW(dst) -= 4;
+		ADD_ALIGNED16(RW(dst), -4);
 	WRIR_L(dst, value);
 }
 
@@ -229,9 +231,9 @@ uint32_t z8002_device::POPL(uint8_t src)
 {
 	uint32_t result = RDIR_L(src);
 	if (get_segmented_mode())
-		RW(src | 1) += 4;
+		ADD_ALIGNED16(RW(src | 1), 4);
 	else
-		RW(src) += 4;
+		ADD_ALIGNED16(RW(src), 4);
 	return result;
 }
 

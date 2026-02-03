@@ -183,7 +183,7 @@ const z8000_disassembler::opcode z8000_disassembler::table[] = {
 	{ 0x4c06, 0x4c06,  1, 2, "tsetb   %a1",                     0 },
 	{ 0x4c08, 0x4c08,  1, 2, "clrb    %a1",                     0 },
 	{ 0x4c10, 0x4cf0, 16, 2, "comb    %a1(%rw2)",               0 },
-	{ 0x4c11, 0x4cf1, 16, 3, "cpb     %a1(%rw2),%#b3",          0 },
+	{ 0x4c11, 0x4cf1, 16, 3, "cpb     %a1(%rw2),%#b5",          0 },
 	{ 0x4c12, 0x4cf2, 16, 2, "negb    %a1(%rw2)",               0 },
 	{ 0x4c14, 0x4cf4, 16, 2, "testb   %a1(%rw2)",               0 },
 	{ 0x4c15, 0x4cf5, 16, 3, "ldb     %a1(%rw2),%#b3",          0 },
