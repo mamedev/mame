@@ -432,15 +432,6 @@ TIMER_CALLBACK_MEMBER(rjammer_state::scanline_callback)
 		m_mcu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 
-
-	/* sound CPU interrupt */
-	/* activates whenever line V6 from video part goes lo->hi that is when the scanline becomes 64 and 192 */
-	if ((scanline == 64) || (scanline == 192))
-	{
-		m_soundcpu->set_input_line(0, ASSERT_LINE); /* sound cpu interrupt (music tempo) */
-	}
-
-
 	m_screen->update_partial(m_screen->vpos());
 
 	LOGIRQ("scanline=%3i scrgetvpos(0)=%3i\n", scanline, m_screen->vpos());
@@ -483,7 +474,7 @@ void rjammer_state::machine_reset()
 
 void rjammer_state::voice_startstop_w(uint8_t data)
 {
-	/* bit 0 of data selects voice start/stop (reset pin on MSM5205)*/
+	// bit 0 of data selects voice start/stop (reset pin on MSM5205)
 	// 0 -stop; 1-start
 	m_msm->reset_w(~data & 1);
 }
@@ -505,36 +496,33 @@ void rjammer_state::adpcm_vck_w(int state)
 		m_adpcm_mux->select_w(m_msm5205_toggle);
 
 		if (m_msm5205_toggle)
-			m_soundcpu->set_input_line(0, ASSERT_LINE);
+		{
+			// auto cleared with interrupt acknowledge cycle (M1+IORQ)
+			m_soundcpu->set_input_line(0, HOLD_LINE);
+		}
 	}
 }
 
 
 void rjammer_state::voice_input_w(uint8_t data)
 {
-	/* 8 bits of adpcm data for MSM5205 */
-	/* need to buffer the data, and switch two nibbles on two following interrupts*/
+	// 8 bits of adpcm data for MSM5205
+	// need to buffer the data, and switch two nibbles on two following interrupts
 	m_adpcm_mux->ba_w(data);
-
-	/* NOTE: game resets interrupt line on ANY access to ANY I/O port.
-	        I do it here because this port (0x80) is first one accessed
-	        in the interrupt routine.
-	*/
-	m_soundcpu->set_input_line(0, CLEAR_LINE);
 }
 
 
 void rjammer_state::voice_intensity_control_w(uint8_t data)
 {
-	/* 4 LSB bits select the intensity (analog circuit that alters the output from MSM5205) */
-	/* need to buffer the data */
+	// 4 LSB bits select the intensity (analog circuit that alters the output from MSM5205)
+	// need to buffer the data
 }
 
 
 void rjammer_state::rjammer_sound_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0xe000, 0xe7ff).ram();     /* M5M5117P (M58125P @2C on schematics) */
+	map(0xe000, 0xe7ff).ram(); // M5M5117P (M58125P @2C on schematics)
 }
 
 
@@ -554,32 +542,32 @@ void rjammer_state::rjammer_sound_portmap(address_map &map)
 
 void tubep_state::ay8910_portA_0_w(uint8_t data)
 {
-	//analog sound control
+	// analog sound control
 }
 
 void tubep_state::ay8910_portB_0_w(uint8_t data)
 {
-	//analog sound control
+	// analog sound control
 }
 
 void tubep_state::ay8910_portA_1_w(uint8_t data)
 {
-	//analog sound control
+	// analog sound control
 }
 
 void tubep_state::ay8910_portB_1_w(uint8_t data)
 {
-	//analog sound control
+	// analog sound control
 }
 
 void tubep_state::ay8910_portA_2_w(uint8_t data)
 {
-	//analog sound control
+	// analog sound control
 }
 
 void tubep_state::ay8910_portB_2_w(uint8_t data)
 {
-	//analog sound control
+	// analog sound control
 }
 
 
@@ -602,7 +590,7 @@ static INPUT_PORTS_START( tubep )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -617,7 +605,7 @@ static INPUT_PORTS_START( tubep )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -656,10 +644,8 @@ static INPUT_PORTS_START( tubep )
 	PORT_DIPSETTING(    0x00, "80000" )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x20, 0x20, "Service mode" ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x10, "Cockpit" )
+	PORT_SERVICE_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:1" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -714,7 +700,7 @@ static INPUT_PORTS_START( rjammer )
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -795,7 +781,7 @@ void tubep_state::tubep(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &tubep_state::tubep_sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &tubep_state::tubep_sound_portmap);
 
-	NSC8105(config, m_mcu, 6_MHz_XTAL); // 6 MHz Xtal - divided internally ???
+	NSC8105(config, m_mcu, 6_MHz_XTAL); // 6 MHz Xtal - divided internally
 	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &tubep_state::nsc_map);
 
@@ -868,7 +854,7 @@ void rjammer_state::rjammer(machine_config &config)
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	NSC8105(config, m_mcu, 6_MHz_XTAL); // 6 MHz Xtal - divided internally ???
+	NSC8105(config, m_mcu, 6_MHz_XTAL); // 6 MHz Xtal - divided internally
 	m_mcu->set_ram_enable(false);
 	m_mcu->set_addrmap(AS_PROGRAM, &rjammer_state::nsc_map);
 
