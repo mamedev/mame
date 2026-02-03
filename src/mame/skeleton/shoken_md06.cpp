@@ -269,8 +269,8 @@ ROM_END
 
 // the following runs on the 'ML01MAIN-1' PCB. It's probably missing at least a video PCB, given reference video: https://www.youtube.com/watch?v=eTAPPweARss
 ROM_START( silvrush )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "silver_rush_jp_limit_ver23.08.25.ic6", 0x00000, 0x10000, CRC(ac9e0c52) SHA1(c240a25ddf31913ac82ad7c96cea017890db7b8c) ) // 1xxxxxxxxxxxxxxx = 0xFF
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "silver_rush_jp_limit_ver23.08.25.ic6", 0x00000, 0x20000, CRC(ac9e0c52) SHA1(c240a25ddf31913ac82ad7c96cea017890db7b8c) ) // 1xxxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "type_sr_51f5_ver_1_0.ic55", 0x000000, 0x200000, CRC(d4f1ee94) SHA1(707e3337a18b043b742b64b6561a292f7fa81646) ) // 11xxxxxxxxxxxxxxxxxxx = 0x00
