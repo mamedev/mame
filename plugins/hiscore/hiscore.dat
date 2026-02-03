@@ -8803,6 +8803,10 @@ oigas:
 
 ;@s:misc/gumbo.cpp
 
+dblpoint:
+@:maincpu,program,80000,32,43,0 ; players names
+@:maincpu,program,824b2,1e,0,1 ; all other data
+
 ;******miss puzzle
 mspuzzle:
 mspuzzlea:
@@ -8823,7 +8827,6 @@ gumbo:
 mspuzzleg:
 @:maincpu,program,80000,30,4b,50
 @:maincpu,program,815d2,12,0b,0a
-
 
 ;@s:misc/homedata.cpp
 
