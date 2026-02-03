@@ -4786,10 +4786,10 @@ void z8002_device::Z7D_dddd_0ccc()
 			RW(dst) = m_refresh;
 			break;
 		case 4:
-			RW(dst) = m_psapseg;
+			RW(dst) = m_psapseg & 0x7f00;
 			break;
 		case 5:
-			RW(dst) = m_psapoff;
+			RW(dst) = m_psapoff & 0xff00;
 			break;
 		case 6:
 			RW(dst) = m_nspseg;
@@ -4815,7 +4815,7 @@ void z8002_device::Z7D_ssss_1ccc()
 		case 2:
 			{
 				uint16_t fcw;
-				fcw = RW(src);
+				fcw = RW(src) & 0xd8fc;
 				CHANGE_FCW(fcw); /* check for user/system mode change */
 			}
 			break;
@@ -4823,10 +4823,12 @@ void z8002_device::Z7D_ssss_1ccc()
 			m_refresh = RW(src);
 			break;
 		case 4:
-			m_psapseg = RW(src);
+			m_psapseg &= ~0x7f00;
+			m_psapseg |= RW(src) & 0x7f00;
 			break;
 		case 5:
-			m_psapoff = RW(src);
+			m_psapoff &= ~0xff00;
+			m_psapoff |= RW(src) & 0xff00;
 			break;
 		case 6:
 			m_nspseg = RW(src);
