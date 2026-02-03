@@ -37633,6 +37633,9 @@ quake
 @source:pc/queen.cpp
 queen
 
+@source:pc/scatsx.cpp
+mb1320
+
 @source:pc/seawolfnm.cpp
 seawolfnm
 
