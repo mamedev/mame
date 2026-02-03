@@ -106,7 +106,8 @@ void f82c836a_device::device_add_mconfig(machine_config &config)
 		m_portb = (m_portb & 0xdf) | (state << 5);
 	});
 
-	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	// "MC146818 compatible", but plonking that won't save CMOS in mb1320 at very least
+	DS12885(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_intc[1], FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
 }
@@ -117,7 +118,6 @@ device_memory_interface::space_config_vector f82c836a_device::memory_space_confi
 		std::make_pair(0, &m_space_config)
 	};
 }
-
 
 void f82c836a_device::device_start()
 {
@@ -160,10 +160,14 @@ void f82c836a_device::device_start()
 
 	save_item(NAME(m_rom_enable));
 	save_item(NAME(m_ram_write_protect));
-	save_item(NAME(m_shadow_ram));
+	save_item(NAME(m_shadow_reg));
 	save_item(NAME(m_dram_config));
 	save_item(NAME(m_ems_control));
 	save_item(NAME(m_ext_boundary));
+
+	// assumed being internal to the chipset
+	m_shadow_ram.resize(0x60000);
+	save_item(NAME(m_shadow_ram));
 }
 
 void f82c836a_device::device_reset()
@@ -175,9 +179,11 @@ void f82c836a_device::device_reset()
 
 	m_rom_enable = 0xc0;
 	m_ram_write_protect = 0;
-	m_shadow_ram[0] = m_shadow_ram[1] = m_shadow_ram[2] = 0;
+	m_shadow_reg[0] = m_shadow_reg[1] = m_shadow_reg[2] = 0;
 	m_refresh_toggle = 0;
 	m_portb = 0;
+
+	m_dram_config = 1;
 
 	update_romram_settings();
 }
@@ -208,7 +214,7 @@ void f82c836a_device::io_map(address_map &map)
 
 		m_rtc->address_w(data);
 	}));
-	map(0x0071, 0x0071).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w));
+	map(0x0071, 0x0071).rw(m_rtc, FUNC(ds12885_device::data_r), FUNC(ds12885_device::data_w));
 	map(0x0080, 0x008f).lrw8(
 		NAME([this] (offs_t offset) { return m_dma_page[offset]; }),
 		NAME([this] (offs_t offset, u8 data) { m_dma_page[offset] = data; })
@@ -303,8 +309,8 @@ void f82c836a_device::config_map(address_map &map)
 	);
 	// Shadow RAM #1/#2/#3
 	map(0x4a, 0x4c).lrw8(
-		NAME([this] (offs_t offset) { return m_shadow_ram[offset]; }),
-		NAME([this] (offs_t offset, u8 data) { m_shadow_ram[offset] = data; update_romram_settings(); })
+		NAME([this] (offs_t offset) { return m_shadow_reg[offset]; }),
+		NAME([this] (offs_t offset, u8 data) { m_shadow_reg[offset] = data; update_romram_settings(); })
 	);
 	// DRAM Configuration
 	map(0x4d, 0x4d).lrw8(
@@ -330,7 +336,7 @@ void f82c836a_device::config_map(address_map &map)
 
 void f82c836a_device::update_romram_settings()
 {
-//	printf("%02x %02x %02x %02x %02x\n", m_rom_enable, m_ram_write_protect, m_shadow_ram[0], m_shadow_ram[1], m_shadow_ram[2]);
+//	printf("%02x %02x %02x %02x %02x\n", m_rom_enable, m_ram_write_protect, m_shadow_reg[0], m_shadow_reg[1], m_shadow_reg[2]);
 
 	int i;
 
@@ -351,8 +357,8 @@ void f82c836a_device::update_romram_settings()
 		const u32 start_offs = 0xa0000 + i * 0x4000;
 		const u32 end_offs = start_offs + 0x3fff;
 
-		if (BIT(m_shadow_ram[0], i))
-			m_space_mem->install_ram(start_offs, end_offs, m_ram + 0xa0000 + i * 0x4000);
+		if (BIT(m_shadow_reg[0], i))
+			m_space_mem->install_ram(start_offs, end_offs, &m_shadow_ram[i * 0x4000]);
 	}
 
 	for (i = 0; i < 8; i++)
@@ -360,8 +366,8 @@ void f82c836a_device::update_romram_settings()
 		const u32 start_offs = 0xc0000 + i * 0x4000;
 		const u32 end_offs = start_offs + 0x3fff;
 
-		if (BIT(m_shadow_ram[1], i))
-			m_space_mem->install_ram(start_offs, end_offs, m_ram + 0xc0000 + i * 0x4000);
+		if (BIT(m_shadow_reg[1], i))
+			m_space_mem->install_ram(start_offs, end_offs, &m_shadow_ram[0x20000 + i * 0x4000]);
 	}
 
 	for (i = 0; i < 8; i++)
@@ -369,8 +375,8 @@ void f82c836a_device::update_romram_settings()
 		const u32 start_offs = 0xe0000 + i * 0x4000;
 		const u32 end_offs = start_offs + 0x3fff;
 
-		if (BIT(m_shadow_ram[2], i))
-			m_space_mem->install_ram(start_offs, end_offs, m_ram + 0xe0000 + i * 0x4000);
+		if (BIT(m_shadow_reg[2], i))
+			m_space_mem->install_ram(start_offs, end_offs, &m_shadow_ram[0x40000 + i * 0x4000]);
 	}
 
 }

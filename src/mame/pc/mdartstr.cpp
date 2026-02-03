@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 /**************************************************************************************************
 
 Medalist Spectrum HW
@@ -7,8 +7,7 @@ Medalist Spectrum HW
 https://www.youtube.com/watch?v=-kxk8UtTeIM
 
 TODO:
-- error 007, bp f85f4,1,{ebp=1234;g} (???)
-- error 033, shadow RAM check between $ffffe and $10fffe
+- error 033 (?)
 - Emulate 65535 (S)VGA, same as IBM PC-110;
 - ROM disk, in ISA space;
 - Sound, from parallel ports?
@@ -216,7 +215,7 @@ void mdartstr_state::mdartstr(machine_config &config)
 	m_chipset->spkr().set([this] (int state) { m_speaker->level_w(state); });
 
 	// 640 + 384 KB
-	RAM(config, "ram").set_default_size("1M");
+	RAM(config, "ram").set_default_size("1024K");
 
 	ISA16(config, m_isabus, 0);
 	m_isabus->set_memspace("maincpu", AS_PROGRAM);

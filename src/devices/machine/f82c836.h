@@ -141,7 +141,7 @@ private:
 	required_device_array<am9517a_device, 2> m_dma;
 	required_device_array<pic8259_device, 2> m_intc;
 	required_device<pit8254_device> m_pit;
-	required_device<mc146818_device> m_rtc;
+	required_device<ds12885_device> m_rtc;
 	required_device<ram_device> m_ram_dev;
 	required_device<isa16_device> m_isabus;
 
@@ -180,10 +180,12 @@ private:
 	u8 m_chan_env;
 	u8 m_rom_enable;
 	u8 m_ram_write_protect;
-	u8 m_shadow_ram[3];
+	u8 m_shadow_reg[3];
 	u8 m_dram_config;
 	u8 m_ext_boundary;
 	u8 m_ems_control;
+	std::vector<u8> m_shadow_ram;
+
 	void update_romram_settings();
 
 	offs_t page_offset();
