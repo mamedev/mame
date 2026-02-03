@@ -58,7 +58,7 @@ void dspp_device::code_map(address_map &map)
 	map(0x000, 0x3ff).ram();
 }
 
-// TODO: quick
+// TODO: quickie and incomplete
 void dspp_device::data_clio_map(address_map &map)
 {
 	map(0x000, 0x06f).mirror(0x080).ram().share("eimem"); // EI (read only by DSPP)
