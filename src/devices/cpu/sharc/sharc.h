@@ -270,6 +270,9 @@ private:
 		bool chained;
 	};
 
+	static const uint32_t recips_mantissa_lookup[128];
+	static const uint32_t rsqrts_mantissa_lookup[128];
+
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -612,7 +615,7 @@ private:
 	};
 
 	void execute_run_drc();
-	void flush_cache();
+	void generate_invariant();
 	void compile_block(offs_t pc);
 	void alloc_handle(uml::code_handle *&handleptr, const char *name);
 	void static_generate_entry_point();

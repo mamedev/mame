@@ -87,8 +87,6 @@ adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *ta
 	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2, address_map_constructor(FUNC(adsp21062_device::internal_data), this))
 	, m_boot_mode(BOOT_MODE_HOST)
 	, m_cache(CACHE_SIZE + sizeof(sharc_internal_state))
-	, m_drcuml(nullptr)
-	, m_drcfe(nullptr)
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
 	, m_out_of_cycles(nullptr)
@@ -501,93 +499,98 @@ void adsp21062_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_data = &space(AS_DATA);
 
-	build_opcode_table();
-
-	// init UML generator
-	uint32_t umlflags = 0;
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0);
-
-	// add UML symbols
-	m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
-	m_drcuml->symbol_add(&m_core->icount, sizeof(m_core->icount), "icount");
-
-	for (int i = 0; i < 16; i++)
+	if (!m_enable_drc)
 	{
-		char buf[10];
-
-		snprintf(buf, std::size(buf), "r%d", i);
-		m_drcuml->symbol_add(&m_core->r[i], sizeof(m_core->r[i]), buf);
-
-		SHARC_DAG &dag((i < 8) ? m_core->dag1 : m_core->dag2);
-		snprintf(buf, std::size(buf), "dag_i%d", i);
-		m_drcuml->symbol_add(&dag.i[i & 7], sizeof(dag.i[i & 7]), buf);
-		snprintf(buf, std::size(buf), "dag_m%d", i);
-		m_drcuml->symbol_add(&dag.m[i & 7], sizeof(dag.m[i & 7]), buf);
-		snprintf(buf, std::size(buf), "dag_l%d", i);
-		m_drcuml->symbol_add(&dag.l[i & 7], sizeof(dag.l[i & 7]), buf);
-		snprintf(buf, std::size(buf), "dag_b%d", i);
-		m_drcuml->symbol_add(&dag.b[i & 7], sizeof(dag.b[i & 7]), buf);
+		build_opcode_table();
 	}
-
-	m_drcuml->symbol_add(&m_core->astat, sizeof(m_core->astat), "astat");
-	m_drcuml->symbol_add(&m_core->mode1, sizeof(m_core->mode1), "mode1");
-	m_drcuml->symbol_add(&m_core->mode2, sizeof(m_core->mode2), "mode2");
-	m_drcuml->symbol_add(&m_core->lcntr, sizeof(m_core->lcntr), "lcntr");
-	m_drcuml->symbol_add(&m_core->curlcntr, sizeof(m_core->curlcntr), "curlcntr");
-	m_drcuml->symbol_add(&m_core->imask, sizeof(m_core->imask), "imask");
-	m_drcuml->symbol_add(&m_core->imaskp, sizeof(m_core->imaskp), "imaskp");
-	m_drcuml->symbol_add(&m_core->irptl, sizeof(m_core->irptl), "irptl");
-	m_drcuml->symbol_add(&m_core->ustat1, sizeof(m_core->ustat1), "ustat1");
-	m_drcuml->symbol_add(&m_core->ustat2, sizeof(m_core->ustat2), "ustat2");
-	m_drcuml->symbol_add(&m_core->stky, sizeof(m_core->stky), "stky");
-
-	m_drcuml->symbol_add(&m_core->astat_drc.az, sizeof(m_core->astat_drc.az), "astat_az");
-	m_drcuml->symbol_add(&m_core->astat_drc.ac, sizeof(m_core->astat_drc.ac), "astat_ac");
-	m_drcuml->symbol_add(&m_core->astat_drc.an, sizeof(m_core->astat_drc.an), "astat_an");
-	m_drcuml->symbol_add(&m_core->astat_drc.av, sizeof(m_core->astat_drc.av), "astat_av");
-	m_drcuml->symbol_add(&m_core->astat_drc.ai, sizeof(m_core->astat_drc.ai), "astat_ai");
-	m_drcuml->symbol_add(&m_core->astat_drc.as, sizeof(m_core->astat_drc.as), "astat_as");
-	m_drcuml->symbol_add(&m_core->astat_drc.mv, sizeof(m_core->astat_drc.mv), "astat_mv");
-	m_drcuml->symbol_add(&m_core->astat_drc.mn, sizeof(m_core->astat_drc.mn), "astat_mn");
-	m_drcuml->symbol_add(&m_core->astat_drc.mu, sizeof(m_core->astat_drc.mu), "astat_mu");
-	m_drcuml->symbol_add(&m_core->astat_drc.mi, sizeof(m_core->astat_drc.mi), "astat_mi");
-	m_drcuml->symbol_add(&m_core->astat_drc.sz, sizeof(m_core->astat_drc.sz), "astat_sz");
-	m_drcuml->symbol_add(&m_core->astat_drc.sv, sizeof(m_core->astat_drc.sv), "astat_sv");
-	m_drcuml->symbol_add(&m_core->astat_drc.ss, sizeof(m_core->astat_drc.ss), "astat_ss");
-
-	m_drcuml->symbol_add(&m_core->arg0, sizeof(m_core->arg0), "arg0");
-	m_drcuml->symbol_add(&m_core->arg1, sizeof(m_core->arg1), "arg1");
-	m_drcuml->symbol_add(&m_core->arg2, sizeof(m_core->arg2), "arg2");
-	m_drcuml->symbol_add(&m_core->arg3, sizeof(m_core->arg3), "arg3");
-
-	m_drcuml->symbol_add(&m_core->dreg_temp, sizeof(m_core->dreg_temp), "dreg_temp");
-	m_drcuml->symbol_add(&m_core->lstkp, sizeof(m_core->lstkp), "lstkp");
-	m_drcuml->symbol_add(&m_core->px, sizeof(m_core->px), "px");
-
-	m_drcfe = std::make_unique<sharc_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);
-
-	for (int i = 0; i < 16; i++)
+	else
 	{
-		m_regmap[i] = uml::mem(&m_core->r[i]);
+		// init UML generator
+		uint32_t umlflags = 0;
+		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0);
+
+		// add UML symbols
+		m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
+		m_drcuml->symbol_add(&m_core->icount, sizeof(m_core->icount), "icount");
+
+		for (int i = 0; i < 16; i++)
+		{
+			char buf[10];
+
+			snprintf(buf, std::size(buf), "r%d", i);
+			m_drcuml->symbol_add(&m_core->r[i], sizeof(m_core->r[i]), buf);
+
+			SHARC_DAG &dag((i < 8) ? m_core->dag1 : m_core->dag2);
+			snprintf(buf, std::size(buf), "dag_i%d", i);
+			m_drcuml->symbol_add(&dag.i[i & 7], sizeof(dag.i[i & 7]), buf);
+			snprintf(buf, std::size(buf), "dag_m%d", i);
+			m_drcuml->symbol_add(&dag.m[i & 7], sizeof(dag.m[i & 7]), buf);
+			snprintf(buf, std::size(buf), "dag_l%d", i);
+			m_drcuml->symbol_add(&dag.l[i & 7], sizeof(dag.l[i & 7]), buf);
+			snprintf(buf, std::size(buf), "dag_b%d", i);
+			m_drcuml->symbol_add(&dag.b[i & 7], sizeof(dag.b[i & 7]), buf);
+		}
+
+		m_drcuml->symbol_add(&m_core->astat, sizeof(m_core->astat), "astat");
+		m_drcuml->symbol_add(&m_core->mode1, sizeof(m_core->mode1), "mode1");
+		m_drcuml->symbol_add(&m_core->mode2, sizeof(m_core->mode2), "mode2");
+		m_drcuml->symbol_add(&m_core->lcntr, sizeof(m_core->lcntr), "lcntr");
+		m_drcuml->symbol_add(&m_core->curlcntr, sizeof(m_core->curlcntr), "curlcntr");
+		m_drcuml->symbol_add(&m_core->imask, sizeof(m_core->imask), "imask");
+		m_drcuml->symbol_add(&m_core->imaskp, sizeof(m_core->imaskp), "imaskp");
+		m_drcuml->symbol_add(&m_core->irptl, sizeof(m_core->irptl), "irptl");
+		m_drcuml->symbol_add(&m_core->ustat1, sizeof(m_core->ustat1), "ustat1");
+		m_drcuml->symbol_add(&m_core->ustat2, sizeof(m_core->ustat2), "ustat2");
+		m_drcuml->symbol_add(&m_core->stky, sizeof(m_core->stky), "stky");
+
+		m_drcuml->symbol_add(&m_core->astat_drc.az, sizeof(m_core->astat_drc.az), "astat_az");
+		m_drcuml->symbol_add(&m_core->astat_drc.ac, sizeof(m_core->astat_drc.ac), "astat_ac");
+		m_drcuml->symbol_add(&m_core->astat_drc.an, sizeof(m_core->astat_drc.an), "astat_an");
+		m_drcuml->symbol_add(&m_core->astat_drc.av, sizeof(m_core->astat_drc.av), "astat_av");
+		m_drcuml->symbol_add(&m_core->astat_drc.ai, sizeof(m_core->astat_drc.ai), "astat_ai");
+		m_drcuml->symbol_add(&m_core->astat_drc.as, sizeof(m_core->astat_drc.as), "astat_as");
+		m_drcuml->symbol_add(&m_core->astat_drc.mv, sizeof(m_core->astat_drc.mv), "astat_mv");
+		m_drcuml->symbol_add(&m_core->astat_drc.mn, sizeof(m_core->astat_drc.mn), "astat_mn");
+		m_drcuml->symbol_add(&m_core->astat_drc.mu, sizeof(m_core->astat_drc.mu), "astat_mu");
+		m_drcuml->symbol_add(&m_core->astat_drc.mi, sizeof(m_core->astat_drc.mi), "astat_mi");
+		m_drcuml->symbol_add(&m_core->astat_drc.sz, sizeof(m_core->astat_drc.sz), "astat_sz");
+		m_drcuml->symbol_add(&m_core->astat_drc.sv, sizeof(m_core->astat_drc.sv), "astat_sv");
+		m_drcuml->symbol_add(&m_core->astat_drc.ss, sizeof(m_core->astat_drc.ss), "astat_ss");
+
+		m_drcuml->symbol_add(&m_core->arg0, sizeof(m_core->arg0), "arg0");
+		m_drcuml->symbol_add(&m_core->arg1, sizeof(m_core->arg1), "arg1");
+		m_drcuml->symbol_add(&m_core->arg2, sizeof(m_core->arg2), "arg2");
+		m_drcuml->symbol_add(&m_core->arg3, sizeof(m_core->arg3), "arg3");
+
+		m_drcuml->symbol_add(&m_core->dreg_temp, sizeof(m_core->dreg_temp), "dreg_temp");
+		m_drcuml->symbol_add(&m_core->lstkp, sizeof(m_core->lstkp), "lstkp");
+		m_drcuml->symbol_add(&m_core->px, sizeof(m_core->px), "px");
+
+		m_drcfe = std::make_unique<sharc_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);
+
+		for (int i = 0; i < 16; i++)
+		{
+			m_regmap[i] = uml::mem(&m_core->r[i]);
+		}
+
+		// I0-3 used by the DRC, rest can be assigned to fast registers
+		if (!DISABLE_FAST_REGISTERS)
+		{
+			drcbe_info beinfo;
+			m_drcuml->get_backend_info(beinfo);
+			if (beinfo.direct_iregs > 4)
+				m_regmap[0] = uml::I4;
+			if (beinfo.direct_iregs > 5)
+				m_regmap[1] = uml::I5;
+			if (beinfo.direct_iregs > 6)
+				m_regmap[2] = uml::I6;
+			if (beinfo.direct_iregs > 7)
+				m_regmap[3] = uml::I7;
+		}
+
+		generate_invariant();
+		m_core->cache_dirty = 1;
 	}
-
-	// I0-3 used by the DRC, rest can be assigned to fast registers
-	if (!DISABLE_FAST_REGISTERS)
-	{
-		drcbe_info beinfo;
-		m_drcuml->get_backend_info(beinfo);
-		if (beinfo.direct_iregs > 4)
-			m_regmap[0] = uml::I4;
-		if (beinfo.direct_iregs > 5)
-			m_regmap[1] = uml::I5;
-		if (beinfo.direct_iregs > 6)
-			m_regmap[2] = uml::I6;
-		if (beinfo.direct_iregs > 7)
-			m_regmap[3] = uml::I7;
-	}
-
-	m_core->cache_dirty = 1;
-
 
 	m_core->delayed_iop_timer = timer_alloc(FUNC(adsp21062_device::sharc_iop_delayed_write_callback), this);
 
@@ -957,7 +960,8 @@ void adsp21062_device::device_reset()
 	m_core->iop_write_num = 0;
 	m_core->iop_data = 0;
 
-	m_drcfe->flush();
+	if (m_enable_drc)
+		m_drcfe->flush();
 }
 
 
