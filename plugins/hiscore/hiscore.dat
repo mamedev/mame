@@ -8804,6 +8804,7 @@ oigas:
 ;@s:misc/gumbo.cpp
 
 dblpoint:
+dblpointd:
 @:maincpu,program,80000,32,43,0 ; players names
 @:maincpu,program,824b2,1e,0,1 ; all other data
 
