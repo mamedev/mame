@@ -34663,6 +34663,9 @@ timecrs2v2b
 timecrs2v4a
 timecrs2v5a
 
+@source:namco/namcos6.cpp
+ddflower
+
 @source:namco/namcos86.cpp
 genpeitd
 hopmappy
