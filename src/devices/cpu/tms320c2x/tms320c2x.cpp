@@ -542,7 +542,6 @@ inline void tms320c2x_device::GETDATA(int shift, int signext)
 
 	/* next ARP */
 	if (m_opcode.b.l & 0x80) MODIFY_AR_ARP<IgnoreARPHack>();
-
 }
 
 inline void tms320c2x_device::PUTDATA(uint16_t data)
