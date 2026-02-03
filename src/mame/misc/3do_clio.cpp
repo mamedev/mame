@@ -45,7 +45,10 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 void clio_device::device_add_mconfig(machine_config &config)
 {
 	DSPP(config, m_dspp, DERIVED_CLOCK(1, 1));
-//  m_dspp->int_handler().set([this] (int state) { printf("%d\n", state); });
+	m_dspp->int_handler().set([this] (int state) {
+		if (state)
+			request_fiq<0>(1 << IRQ_DSPPINT);
+	});
 //  m_dspp->dma_read_handler().set(FUNC(m2_bda_device::read_bus8));
 //  m_dspp->dma_write_handler().set(FUNC(m2_bda_device::write_bus8));
 }
@@ -138,7 +141,7 @@ void clio_device::xbus_int_w(int state)
 
 void clio_device::xbus_wr_w(int state)
 {
-//	printf("%d WR %02x\n", state, m_xbus_dev[0]);
+//  printf("%d WR %02x\n", state, m_xbus_dev[0]);
 	if (state)
 	{
 		m_xbus_dev[0] |= 0x20;
@@ -558,17 +561,21 @@ void clio_device::map(address_map &map)
 	// HACK: temporary to allow 3do_gdo101 boot
 	map(0x17d0, 0x17d3).lr32(NAME([] () { return 0x0004'0000; }));
 //  map(0x17d4, 0x17d7) Semaphore ACK
-//  map(0x17e0, 0x17ff) DSPP DMA and state
+//  map(0x17e0, 0x17e3) DSPP DMA
+//  map(0x17e4, 0x17e7) DSPPRST0 (use current reload)
+	// DSPPRST1 (set 568 tick cycle)
 	map(0x17e8, 0x17eb).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			// reset?
-			m_dspp->write(0x6074 >> 2, 1);
-			m_dspp->write(0x6074 >> 2, 0);
+			//m_dspp->write(0x6074 >> 2, 1);
+			//m_dspp->write(0x6074 >> 2, 0);
 			//m_dspp->write((0x1300 + 8) >> 2, 568);
 			//m_dspp->write((0x1340 + 8) >> 2, 568);
 			LOGDSPP("DSPP $17e8 %08x & %08x\n", data, mem_mask);
 		})
 	);
+//  map(0x17f0, 0x17f3) Read noise value (Red only?)
+//  map(0x17f4, 0x17f7) Read DSPP PC (bits 15:0 only)
+//  map(0x17f8, 0x17fb) Read DSPP NR (bits 15:0 only)
 	/*
 	---- x--- DSPPError
 	---- -x-- DSPPReset
@@ -584,54 +591,52 @@ void clio_device::map(address_map &map)
 	map(0x17fc, 0x17ff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGDSPP("DSPP $17fc %08x & %08x\n", data, mem_mask);
-			m_dspp->write(0x6070 >> 2, data);
-			//if (data & 1)
-			//  machine().debug_break();
+			m_dspp->host_gw_control_write(0, data);
 		})
 	);
-	// DSPP N paths (code)
+	// DSPP iNstruction paths (code)
 	map(0x1800, 0x1fff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_16_31)
-				m_dspp->write((offset << 1) + 0, data >> 16);
+				m_dspp->host_n_write((offset << 1) + 0, data >> 16);
 			if (ACCESSING_BITS_0_15)
-				m_dspp->write((offset << 1) + 1, data & 0xffff);
+				m_dspp->host_n_write((offset << 1) + 1, data & 0xffff);
 		})
 	);
 	map(0x2000, 0x2fff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			// code path
 			if (ACCESSING_BITS_0_15)
-				m_dspp->write(offset, data);
+				m_dspp->host_n_write(offset, data);
 		})
 	);
-	// EI paths (data writes)
+	// EI paths (data writes from host)
 	map(0x3000, 0x31ff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_16_31)
-				m_dspp->write(((offset<<1) + 0) | 0x400, data);
+				m_dspp->host_ei_write(((offset<<1) + 0), data);
 			if (ACCESSING_BITS_0_15)
-				m_dspp->write(((offset<<1) + 1) | 0x400, data);
+				m_dspp->host_ei_write(((offset<<1) + 1), data);
 		})
 	);
 	map(0x3400, 0x37ff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_0_15)
-				m_dspp->write(offset | 0x400, data);
+				m_dspp->host_ei_write(offset, data);
 		})
 	);
-	// EO paths (data reads)
+	// EO paths (data reads from host)
 	map(0x3800, 0x39ff).lr32(
 		NAME([this] (offs_t offset) {
 			uint32_t res = 0;
-			res =  m_dspp->read(((offset << 1) + 0) | 0x400) << 16;
-			res |= m_dspp->read(((offset << 1) + 1) | 0x400);
+			res =  m_dspp->host_eo_read(((offset << 1) + 0)) << 16;
+			res |= m_dspp->host_eo_read(((offset << 1) + 1));
 			return res;
 		})
 	);
 	map(0x3c00, 0x3fff).lr32(
 		NAME([this] (offs_t offset) {
-			return m_dspp->read(offset | 0x400);
+			return m_dspp->host_eo_read(offset);
 		})
 	);
 }
