@@ -4197,7 +4197,7 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_LABEL(block, rsqrts_nan);
 						UML_MOV(block, REG(rn), 0xffffffff);
 						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 0);
-						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);
+						if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);
 						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 1);
 						UML_LABEL(block, rsqrts_end);
 #endif
