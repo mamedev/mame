@@ -102,6 +102,8 @@ public:
 		m_rambank(*this, "rambank"),
 		m_cmosram(*this, "cmosram", 0x800, ENDIANNESS_LITTLE),
 		m_nvram(*this, "cmosram"),
+		m_video_ram(*this, "vram", 0x60000, ENDIANNESS_LITTLE),
+		m_vram_bank(*this, "vrambank"),
 		m_char_rom(*this, "chargen"),
 		m_palette(*this, "palette")
 	{
@@ -114,8 +116,6 @@ private:
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-
-	virtual void video_start() override ATTR_COLD;
 
 	void update_memory_mapping();
 
@@ -135,8 +135,6 @@ private:
 	uint8_t get_slave_ack(offs_t offset);
 	uint8_t vram_bank_r();
 	void vram_bank_w(uint8_t data);
-	uint16_t vram_r(offs_t offset);
-	void vram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 
@@ -191,7 +189,8 @@ private:
 	memory_bank_creator m_rambank;
 	memory_share_creator<u8> m_cmosram;
 	required_device<nvram_device> m_nvram;
-	std::unique_ptr<uint16_t[]> m_video_ram;
+	memory_share_creator<uint16_t> m_video_ram;
+	memory_bank_creator m_vram_bank;
 	required_region_ptr<uint8_t> m_char_rom;
 	required_device<palette_device> m_palette;
 
@@ -219,8 +218,8 @@ private:
 	int     m_memprom = 0;
 	int     m_memcmos = 0;
 
+	uint8_t m_vram_bank_val = 0;
 	uint8_t m_color_mode = 0;
-	uint8_t m_vram_bank = 0;
 	uint8_t m_zoom = 0;
 };
 
@@ -694,16 +693,25 @@ uint8_t qx10_state::get_slave_ack(offs_t offset)
 
 uint8_t qx10_state::vram_bank_r()
 {
-	return m_vram_bank;
+	return m_vram_bank_val;
 }
 
 void qx10_state::vram_bank_w(uint8_t data)
 {
+	m_vram_bank_val = data;
+
 	if(m_color_mode)
 	{
-		m_vram_bank = data & 7;
-		if(data != 1 && data != 2 && data != 4)
-			printf("%02x\n",data);
+		int bank = -1;
+
+		if (data & 1)      { bank = 0; } // B
+		else if (data & 2) { bank = 1; } // G
+		else if (data & 4) { bank = 2; } // R
+
+		if (bank >= 0)
+		{
+			m_vram_bank->set_entry(bank);
+		}
 	}
 }
 
@@ -812,6 +820,7 @@ INPUT_PORTS_END
 void qx10_state::machine_start()
 {
 	m_rambank->configure_entries(0, 4, m_ram->pointer(), 0x10000);
+	m_vram_bank->configure_entries(0, 3, &m_video_ram[0], 0x20000);
 	m_bus->set_memview(m_external_view[0]);
 }
 
@@ -836,7 +845,7 @@ void qx10_state::machine_reset()
 
 		/* TODO: is there a bit that sets this up? */
 		m_color_mode = ioport("CONFIG")->read() & 1;
-		m_vram_bank = 0;
+		vram_bank_w(1);
 
 		if(m_color_mode) //color
 		{
@@ -872,42 +881,15 @@ static GFXDECODE_START( gfx_qx10 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, qx10_charlayout, 1, 1 )
 GFXDECODE_END
 
-void qx10_state::video_start()
-{
-	// allocate memory
-	m_video_ram = make_unique_clear<uint16_t[]>(0x30000);
-}
 
 void qx10_state::qx10_palette(palette_device &palette) const
 {
 	// ...
 }
 
-uint16_t qx10_state::vram_r(offs_t offset)
-{
-	int bank = 0;
-
-	if (m_vram_bank & 1)     { bank = 0; } // B
-	else if(m_vram_bank & 2) { bank = 1; } // G
-	else if(m_vram_bank & 4) { bank = 2; } // R
-
-	return m_video_ram[offset + (0x10000 * bank)];
-}
-
-void qx10_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	int bank = 0;
-
-	if (m_vram_bank & 1)     { bank = 0; } // B
-	else if(m_vram_bank & 2) { bank = 1; } // G
-	else if(m_vram_bank & 4) { bank = 2; } // R
-
-	COMBINE_DATA(&m_video_ram[offset + (0x10000 * bank)]);
-}
-
 void qx10_state::upd7220_map(address_map &map)
 {
-	map(0x0000, 0xffff).rw(FUNC(qx10_state::vram_r), FUNC(qx10_state::vram_w)).mirror(0x30000);
+	map(0x0000, 0xffff).bankrw("vrambank").mirror(0x30000);
 }
 
 void qx10_state::qx10(machine_config &config)
