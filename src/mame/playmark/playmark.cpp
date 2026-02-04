@@ -90,7 +90,6 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "emupal.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/mcs51/i80c51.h"
@@ -101,6 +100,7 @@ TODO:
 #include "machine/ticket.h"
 #include "sound/okim6295.h"
 
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
