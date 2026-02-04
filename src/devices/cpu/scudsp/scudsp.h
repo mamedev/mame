@@ -87,17 +87,17 @@ protected:
 
 private:
 	enum {
-		LEF = 15, // program counter transfer enable
-		EXF, // program execute control flag
-		ESF, // step execute control
-		EF, // program end interrupt
-		VF, // oVerflow flag
-		CF, // Carry flag
-		ZF, // Zero flag
-		SF, // Sign flag
-		T0F, // D0-Bus DMA execution flag
-		EPF = 25, // Execute pause flag
-		PRF // Execute Pause Reset flag
+		LEF = 15, // 0000'8000 program counter transfer enable
+		EXF,      // 0001'0000 program execute control flag
+		ESF,      // 0002'0000 step execute control
+		EF,       // 0004'0000 program end interrupt
+		VF,       // 0008'0000 oVerflow flag
+		CF,       // 0010'0000 Carry flag
+		ZF,       // 0020'0000 Zero flag
+		SF,       // 0040'0000 Sign flag
+		T0F,      // 0080'0000 D0-Bus DMA execution flag
+		EPF = 25, // 0200'0000 Execute pause flag
+		PRF       // 0400'0000 Execute Pause Reset flag
 	};
 
 	union SCUDSPREG32 {

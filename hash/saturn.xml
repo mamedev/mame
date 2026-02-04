@@ -8846,11 +8846,13 @@ Crashes after now loading screen, [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Tenchi Muyou! Ryououki Gokuraku CD-ROM for Sega Saturn (Japan) (1M)... -->
 	<software name="tenchryo" supported="no">
 		<description>Tenchi Muyou! Ryououki Gokuraku CD-ROM for Sega Saturn (Japan, 1M)</description>
 		<year>1995</year>
 		<publisher>Yumedia</publisher>
+		<notes><![CDATA[
+Black screen, known to issue a double 0x04 software reset in [CD-Block]
+]]></notes>
 		<info name="serial" value="T-21801G"/>
 		<info name="release" value="19950929"/>
 		<info name="alt_title" value="天地無用!魎皇鬼 ごくらくCD-ROM for SEGA SATURN"/>
@@ -9355,11 +9357,14 @@ Crashes after now loading screen, [CD-Block]
 		</part>
 	</software>
 
-	<!-- Identifying Virtua Fighter 2 (Japan) (Rev B) (39B)... -->
 	<software name="vf2j" cloneof="vf2" supported="no">
 		<description>Virtua Fighter 2 (Japan, rev B, 39B)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+[SCSP] No sound during gameplay
+[CD-Block] redbook doesn't work in options menu
+]]></notes>
 		<info name="serial" value="GS-9079"/>
 		<info name="release" value="19951201"/>
 		<info name="alt_title" value="バーチャファイター2"/>
@@ -17638,11 +17643,14 @@ TODO: how to reload with [mouse]?
 		</part>
 	</software>
 
-	<!-- Hangs at Sega logo, expects [CD-Block] status change from PAUSE (Double PAUSE -> STANDBY?) -->
 	<software name="gametat2" supported="no">
 		<description>Game no Tatsujin 2 (Japan)</description>
 		<year>1996</year>
 		<publisher>Sunsoft</publisher>
+		<notes><![CDATA[
+Crashes often when entering gameplay with [DRC]
+Spurious [SCSP] voice sample playbacks (keeps repeating "i~ni", shouldn't from name entry at very least)
+]]></notes>
 		<info name="serial" value="T-1509G"/>
 		<info name="release" value="19960315"/>
 		<info name="alt_title" value="ゲームの達人2"/>
@@ -38268,11 +38276,13 @@ Not extensively tested
 		</part>
 	</software>
 
-	<!-- Identifying dw-sat-vf2... -->
 	<software name="vf2u" cloneof="vf2" supported="no">
 		<description>Virtua Fighter 2 (USA)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Black screen [CD-Block] keeps pinging command 0x51 with playback already ended
+]]></notes>
 		<info name="serial" value="81014"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">

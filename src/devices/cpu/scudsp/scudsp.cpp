@@ -337,7 +337,7 @@ uint32_t scudsp_cpu_device::program_control_r()
 		m_out_irq_cb(0);
 	}
 
-	return (m_pc & 0xff) | flags;
+	return ((m_pc + 1) & 0xff) | flags;
 }
 
 void scudsp_cpu_device::program_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -348,13 +348,14 @@ void scudsp_cpu_device::program_control_w(offs_t offset, uint32_t data, uint32_t
 	newval = oldval;
 	COMBINE_DATA(&newval);
 
-	m_flags = (newval & 0x0063'8000) | (m_flags & ~0x0063'8000);
+	m_flags = (newval & 0x0063'0000) | (m_flags & ~0x0063'0000);
 
 	if (BIT(m_flags, EPF))
 		popmessage("scudsp.cpp: single step enabled");
 
 	// set new PC if transfer enable is set
-	if (BIT(m_flags, LEF))
+	// NOTE: doesn't get transfered in flags
+	if (BIT(data, LEF) && ACCESSING_BITS_0_15)
 		m_pc = newval & 0xff;
 
 	//printf("%08x PRG CTRL\n",data);
@@ -371,7 +372,7 @@ void scudsp_cpu_device::program_w(uint32_t data)
 void scudsp_cpu_device::ram_address_control_w(uint32_t data)
 {
 	//printf("%02x %08x PRG\n",m_pc,data);
-	// NOTE: RA uploads like CT0 ~ CT3 but is a different register altogether
+	// NOTE: RA has no relationship with CT0 ~ CT3, can upload out of high 2 bits bounds
 	m_ra = data & 0xff;
 }
 
@@ -380,7 +381,7 @@ uint32_t scudsp_cpu_device::ram_address_r()
 	uint32_t data = m_data->read_dword(m_ra);
 
 	if (!machine().side_effects_disabled())
-		m_ra = (m_ra & 0xc0) | ((m_ra + 1) & 0x3f);
+		m_ra = (m_ra + 1) & 0xff;
 
 	return data;
 }
@@ -390,7 +391,7 @@ void scudsp_cpu_device::ram_address_w(uint32_t data)
 //	set_dest_mem_reg( (m_ra & 0xc0) >> 6, data );
 	m_data->write_dword(m_ra, data);
 
-	m_ra = (m_ra & 0xc0) | ((m_ra + 1) & 0x3f);
+	m_ra = (m_ra + 1) & 0xff;
 
 }
 
