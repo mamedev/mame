@@ -371,29 +371,27 @@ void scudsp_cpu_device::program_w(uint32_t data)
 void scudsp_cpu_device::ram_address_control_w(uint32_t data)
 {
 	//printf("%02x %08x PRG\n",m_pc,data);
+	// NOTE: RA uploads like CT0 ~ CT3 but is a different register altogether
 	m_ra = data & 0xff;
-
-	switch((m_ra & 0xc0) >> 6)
-	{
-		case 0: m_ct0 = (m_ra & 0x3f); break;
-		case 1: m_ct1 = (m_ra & 0x3f); break;
-		case 2: m_ct2 = (m_ra & 0x3f); break;
-		case 3: m_ct3 = (m_ra & 0x3f); break;
-	}
 }
 
 uint32_t scudsp_cpu_device::ram_address_r()
 {
-	uint32_t data;
+	uint32_t data = m_data->read_dword(m_ra);
 
-	data = get_source_mem_value( ((m_ra & 0xc0) >> 6) + 4 );
+	if (!machine().side_effects_disabled())
+		m_ra = (m_ra & 0xc0) | ((m_ra + 1) & 0x3f);
 
 	return data;
 }
 
 void scudsp_cpu_device::ram_address_w(uint32_t data)
 {
-	set_dest_mem_reg( (m_ra & 0xc0) >> 6, data );
+//	set_dest_mem_reg( (m_ra & 0xc0) >> 6, data );
+	m_data->write_dword(m_ra, data);
+
+	m_ra = (m_ra & 0xc0) | ((m_ra + 1) & 0x3f);
+
 }
 
 void scudsp_cpu_device::op_alu(uint32_t opcode)
@@ -409,6 +407,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 	{
 		case 0x0:   /* NOP */
 			break;
+
 		case 0x1:   /* AND */
 			i3 = m_acl.si & m_pl.si;
 			m_alu = (uint64_t)(uint32_t)i3;
@@ -416,6 +415,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 			SET_C(0);
 			SET_S(i3 < 0);
 			break;
+
 		case 0x2:   /* OR */
 			i3 = m_acl.si | m_pl.si;
 			m_alu = (uint64_t)(uint32_t)i3;
@@ -427,6 +427,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 				i3 = 0;
 			SET_Z(i3 == 0);
 			break;
+
 		case 0x3:   /* XOR */
 			i3 = m_acl.si ^ m_pl.si;
 			m_alu = (uint64_t)(uint32_t)i3;
@@ -434,6 +435,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 			SET_C(0);
 			SET_S(i3 < 0);
 			break;
+
 		case 0x4:   /* ADD */
 			i3 = m_acl.si + m_pl.si;
 			m_alu = (uint64_t)(uint32_t)i3;
@@ -444,6 +446,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 			SET_C(i3 & s64(0x100000000U));
 			SET_V(((i3) ^ (m_acl.si)) & ((i3) ^ (m_pl.si)) & 0x80000000);
 			break;
+
 		case 0x5:   /* SUB */
 			i3 = m_acl.si - m_pl.si;
 			m_alu = (uint64_t)(uint32_t)i3;
@@ -452,6 +455,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 			SET_S(i3 < 0);
 			SET_V(((m_pl.si) ^ (m_acl.si)) & ((m_pl.si) ^ (i3)) & 0x80000000);
 			break;
+
 		case 0x6:   /* AD2 */
 			i1 = concat_64((int32_t)m_ph.si,m_pl.si);
 			i2 = concat_64((int32_t)m_ach.si,m_acl.si);
@@ -461,9 +465,11 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 			SET_C((m_alu) & s64(0x1000000000000U));
 			SET_V(((m_alu) ^ (i1)) & ((m_alu) ^ (i2)) & s64(0x800000000000U));
 			break;
+
 		case 0x7:   /* ??? */
 			/* Unrecognized opcode */
 			break;
+
 		case 0x8:   /* SR */
 			i3 = (m_acl.si >> 1) | (m_acl.si & 0x80000000);/*MSB does not change*/
 			m_alu = (uint64_t)(uint32_t)i3;
@@ -471,6 +477,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 			SET_S(i3 < 0);
 			SET_C(m_acl.ui & 0x80000000);
 			break;
+
 		case 0x9:   /* RR */
 			i3 = ((m_acl.ui >> 1) & 0x7fffffff) | ((m_acl.ui << 31) & 0x80000000);
 			m_alu = (uint64_t)(uint32_t)i3;
@@ -478,6 +485,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 			SET_S( i3 < 0 );
 			SET_C( m_acl.ui & 0x1 );
 			break;
+
 		case 0xa:   /* SL */
 			i3 = m_acl.si << 1;
 			m_alu = (uint64_t)(uint32_t)i3;
@@ -485,19 +493,22 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 			SET_S( i3 < 0 );
 			SET_C( m_acl.ui & 0x80000000 );
 			break;
-		case 0xB:   /* RL */
+
+		case 0xb:   /* RL */
 			i3 = ((m_acl.si << 1) & 0xfffffffe) | ((m_acl.si >> 31) & 0x1);
 			m_alu = (uint64_t)(uint32_t)i3;
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );
 			SET_C( m_acl.ui & 0x80000000 );
 			break;
+
 		case 0xc:
 		case 0xd:
 		case 0xe:
-			/* Unrecognized opcode */
+			/* Unrecognized opcodes */
 			break;
-		case 0xF:   /* RL8 */
+
+		case 0xf:   /* RL8 */
 			i3 = rotl_32(m_acl.si, 8);
 			m_alu = i3;
 			SET_Z( i3 == 0 );

@@ -8196,15 +8196,14 @@ uint16_t saturn_state::vdp2_regs_r(offs_t offset)
 	return m_vdp2_regs[offset];
 }
 
+// TODO: mode 0 handling
 uint32_t saturn_state::vdp2_cram_r(offs_t offset)
 {
 	offset &= (0xfff) >> (2);
 	return m_vdp2_cram[offset];
 }
 
-
-
-
+// TODO: byte writes are goofy
 void saturn_state::vdp2_cram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r,g,b;
