@@ -131,7 +131,7 @@ public:
 	constexpr u32         get_flags()      const { return flags; }
 	constexpr char const *get_hashdata()   const { return hashdata; }
 	// HACK: avoid warnings about deprecated ROM_OPTIONAL in every source file that includes this header
-	constexpr bool        is_optional()    const { return (flags & ROM_OPTIONALMASK) == /* ROM_OPTIONAL */ fROM_OPTIONALMASK; }
+	constexpr bool        is_optional()    const { return (flags & ROM_OPTIONALMASK) == /* ROM_OPTIONAL */ ROM_OPTIONALMASK; }
 	constexpr u32         get_groupsize()  const { return ((flags & ROM_GROUPMASK) >> 8) + 1; }
 	constexpr u32         get_skipcount()  const { return (flags & ROM_SKIPMASK) >> 12; }
 	constexpr bool        is_reversed()    const { return (flags & ROM_REVERSEMASK) == ROM_REVERSE; }
