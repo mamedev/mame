@@ -20547,6 +20547,11 @@ tpad770z
 @source:ibm/thinkpad8xx.cpp
 tpad850
 
+@source:ice/calchase.cpp
+calchase
+eggsplc
+hostinv
+
 @source:ice/chexx.cpp
 chexx83
 faceoffh
@@ -20588,6 +20593,9 @@ ripribita
 
 @source:ice/schexx4gen.cpp
 schexx
+
+@source:ice/skimaxx.cpp
+skimaxx
 
 @source:ice/vp101.cpp
 jnero
@@ -33231,9 +33239,6 @@ slvrballbu409b
 popshot
 skeetsht
 
-@source:misc/skimaxx.cpp
-skimaxx
-
 @source:misc/skyarmy.cpp
 skyarmy
 
@@ -37412,11 +37417,6 @@ at586x3
 m55hipl
 ficvt503
 ecssi5pi
-
-@source:pc/calchase.cpp
-calchase
-eggsplc
-hostinv
 
 @source:pc/champ2.cpp
 champ2
