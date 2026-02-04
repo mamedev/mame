@@ -139,22 +139,22 @@ private:
 	int m_icount;
 	uint8_t m_update_mul;
 
-	uint32_t scudsp_get_source_mem_reg_value( uint32_t mode );
-	uint32_t scudsp_get_source_mem_value(uint8_t mode);
-	void scudsp_set_dest_mem_reg( uint32_t mode, uint32_t value );
-	void scudsp_set_dest_mem_reg_2( uint32_t mode, uint32_t value );
-	uint32_t scudsp_compute_condition( uint32_t condition );
-	uint32_t scudsp_get_mem_source_dma( uint32_t memcode, uint32_t counter );
-	void scudsp_set_dest_dma_mem( uint32_t memcode, uint32_t value, uint32_t counter );
+	uint32_t get_source_mem_reg_value( uint32_t mode );
+	uint32_t get_source_mem_value(uint8_t mode);
+	void set_dest_mem_reg( uint32_t mode, uint32_t value );
+	void set_dest_mem_reg_2( uint32_t mode, uint32_t value );
+	uint32_t compute_condition( uint32_t condition );
+	uint32_t get_mem_source_dma( uint32_t memcode, uint32_t counter );
+	void set_dest_dma_mem( uint32_t memcode, uint32_t value, uint32_t counter );
 
-	void scudsp_illegal(uint32_t opcode);
-	void scudsp_operation(uint32_t opcode);
-	void scudsp_move_immediate(uint32_t opcode);
-	void scudsp_dma(uint32_t opcode);
-	void scudsp_jump(uint32_t opcode);
-	void scudsp_loop(uint32_t opcode);
-	void scudsp_end(uint32_t opcode);
-	void scudsp_exec_dma();
+	void op_illegal(uint32_t opcode);
+	void op_alu(uint32_t opcode);
+	void op_move_immediate(uint32_t opcode);
+	void op_dma(uint32_t opcode);
+	void op_jump(uint32_t opcode);
+	void op_loop(uint32_t opcode);
+	void op_end(uint32_t opcode);
+	void exec_dma();
 };
 
 
