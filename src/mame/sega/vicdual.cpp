@@ -937,12 +937,12 @@ void vicdual_state::vicdual_root(machine_config &config)
 
 uint8_t vicdual_state::depthch_io_r(offs_t offset)
 {
-	uint8_t ret = 0;
+	uint8_t data = 0xff;
 
-	if (offset & 0x01) ret = m_in0->read();
-	if (offset & 0x08) ret = m_in1->read();
+	if (offset & 0x01) data &= m_in0->read();
+	if (offset & 0x08) data &= m_in1->read();
 
-	return ret;
+	return data;
 }
 
 
@@ -1020,12 +1020,12 @@ void vicdual_state::depthch(machine_config &config)
 
 uint8_t vicdual_state::safari_io_r(offs_t offset)
 {
-	uint8_t ret = 0;
+	uint8_t data = 0xff;
 
-	if (offset & 0x01) ret = m_in0->read();
-	if (offset & 0x08) ret = m_in1->read();
+	if (offset & 0x01) data &= m_in0->read();
+	if (offset & 0x08) data &= m_in1->read();
 
-	return ret;
+	return data;
 }
 
 
@@ -1104,12 +1104,12 @@ void vicdual_state::safari(machine_config &config)
 
 uint8_t vicdual_state::frogs_io_r(offs_t offset)
 {
-	uint8_t ret = 0;
+	uint8_t data = 0xff;
 
-	if (offset & 0x01) ret = m_in0->read();
-	if (offset & 0x08) ret = m_in1->read();
+	if (offset & 0x01) data &= m_in0->read();
+	if (offset & 0x08) data &= m_in1->read();
 
-	return ret;
+	return data;
 }
 
 
@@ -1213,24 +1213,24 @@ void vicdual_state::frogs(machine_config &config)
 
 uint8_t vicdual_state::headon_io_r(offs_t offset)
 {
-	uint8_t ret = 0;
+	uint8_t data = 0xff;
 
-	if (offset & 0x01) ret = m_in0->read();
-	if (offset & 0x08) ret = m_in1->read();
+	if (offset & 0x01) data &= m_in0->read();
+	if (offset & 0x08) data &= m_in1->read();
 
-	return ret;
+	return data;
 }
 
 
 uint8_t vicdual_state::sspaceat_io_r(offs_t offset)
 {
-	uint8_t ret = 0;
+	uint8_t data = 0xff;
 
-	if (offset & 0x01) ret = m_in0->read();
-	if (offset & 0x04) ret = m_in1->read();
-	if (offset & 0x08) ret = m_in2->read();
+	if (offset & 0x01) data &= m_in0->read();
+	if (offset & 0x04) data &= m_in1->read();
+	if (offset & 0x08) data &= m_in2->read();
 
-	return ret;
+	return data;
 }
 
 
@@ -3286,12 +3286,12 @@ void vicdual_state::samurai(machine_config &config)
 
 uint8_t nsub_state::nsub_io_r(offs_t offset)
 {
-	uint8_t ret = 0;
+	uint8_t data = 0xff;
 
-	if (offset & 0x01) ret = m_in0->read();
-	if (offset & 0x08) ret = m_in1->read();
+	if (offset & 0x01) data &= m_in0->read();
+	if (offset & 0x08) data &= m_in1->read();
 
-	return ret;
+	return data;
 }
 
 
@@ -3327,17 +3327,13 @@ void nsub_state::nsub_io_map(address_map &map)
 
 void nsub_state::nsubc_io_w(offs_t offset, uint8_t data)
 {
-	if (offset & 0x01)
-		m_s97271p->port_w(data);
-
+	if (offset & 0x01) m_s97271p->port_w(data);
 	if (offset & 0x02)
 	{
 		palette_bank_w(data);
 		m_s97269pb->palette_bank_w(data);
 	}
-
-	if (offset & 0x08)
-		assert_coin_status();
+	if (offset & 0x08) assert_coin_status();
 }
 
 void nsub_state::nsubc_prot_w(uint8_t data)
@@ -3562,17 +3558,15 @@ MACHINE_START_MEMBER(nsub_state, nsubc)
 
 void nsub_state::nsub(machine_config &config)
 {
+	vicdual_root(config);
+
 	// basic machine hardware
-	Z80(config, m_maincpu, VICDUAL_MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nsub_state::nsub_map);
 	m_maincpu->set_addrmap(AS_IO, &nsub_state::nsub_io_map);
 
-	TIMER(config, m_coinstate_timer).configure_generic(FUNC(nsub_state::clear_coin_status));
 	TIMER(config, m_nsub_coinage_timer).configure_generic(FUNC(nsub_state::nsub_coin_pulse));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART);
 	m_screen->set_screen_update(FUNC(nsub_state::screen_update_color));
 
 	S97269PB(config, m_s97269pb, 0);
@@ -3585,9 +3579,11 @@ void nsub_state::nsubc(machine_config &config)
 {
 	vicdual_root(config);
 
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &nsub_state::nsubc_map);
 	m_maincpu->set_addrmap(AS_IO, &nsub_state::nsubc_io_map);
 
+	// video hardware
 	m_screen->set_screen_update(FUNC(nsub_state::screen_update_color));
 
 	S97269PB(config, m_s97269pb, 0);
@@ -3608,13 +3604,13 @@ void nsub_state::nsubc(machine_config &config)
 
 uint8_t vicdual_state::invinco_io_r(offs_t offset)
 {
-	uint8_t ret = 0;
+	uint8_t data = 0xff;
 
-	if (offset & 0x01) ret = m_in0->read();
-	if (offset & 0x02) ret = m_in1->read();
-	if (offset & 0x08) ret = m_in2->read();
+	if (offset & 0x01) data &= m_in0->read();
+	if (offset & 0x02) data &= m_in1->read();
+	if (offset & 0x08) data &= m_in2->read();
 
-	return ret;
+	return data;
 }
 
 
