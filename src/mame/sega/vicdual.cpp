@@ -3607,7 +3607,7 @@ uint8_t vicdual_state::invinco_io_r(offs_t offset)
 	uint8_t data = 0xff;
 
 	if (offset & 0x01) data &= m_in0->read();
-	if (offset & 0x02) data &= m_in1->read();
+	if (offset & 0x04) data &= m_in1->read();
 	if (offset & 0x08) data &= m_in2->read();
 
 	return data;
