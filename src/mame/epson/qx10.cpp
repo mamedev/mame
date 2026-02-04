@@ -822,6 +822,34 @@ void qx10_state::machine_start()
 	m_rambank->configure_entries(0, 4, m_ram->pointer(), 0x10000);
 	m_vram_bank->configure_entries(0, 3, &m_video_ram[0], 0x20000);
 	m_bus->set_memview(m_external_view[0]);
+
+	// FDD
+	save_item(NAME(m_fdcint));
+	save_item(NAME(m_motor_clk));
+	save_item(NAME(m_counter));
+
+	// Speaker
+	save_item(NAME(m_spkr_enable));
+	save_item(NAME(m_spkr_freq));
+	save_item(NAME(m_pit1_out0));
+
+	// Centronics
+	save_item(NAME(m_centronics_error));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_paper));
+	save_item(NAME(m_centronics_select));
+	save_item(NAME(m_centronics_sense));
+
+	// Memory banking
+	save_item(NAME(m_external_bank));
+	save_item(NAME(m_membank));
+	save_item(NAME(m_memprom));
+	save_item(NAME(m_memcmos));
+
+	// Video
+	save_item(NAME(m_vram_bank_val));
+	save_item(NAME(m_color_mode));
+	save_item(NAME(m_zoom));
 }
 
 void qx10_state::machine_reset()
