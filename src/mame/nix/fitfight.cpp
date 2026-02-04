@@ -84,11 +84,12 @@ Stephh's notes :
 */
 
 #include "emu.h"
-#include "emupal.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/okim6295.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
 #include "speaker.h"
