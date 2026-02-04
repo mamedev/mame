@@ -471,6 +471,22 @@ static INPUT_PORTS_START( 4enraya )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START(spadarts)
+	PORT_START("DSW")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+
+	PORT_START("INPUTS")
+
+	PORT_START("SYSTEM")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( unkpacg )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_NAME("Front Game Coin A")       //  1 credits / initiate minigame
@@ -769,6 +785,61 @@ ROM_START( 4enrayaa )
 	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) ) // system control: used for memory mapping
 ROM_END
 
+
+/* PCB for Spanish Darts (silkscreened as "SUPER VIDEO IDSA"):
+  __________________________________________________________________________________________
+ |                  ___     ___    ___         ___      ___   ___                          |____
+ |  Xtal           |  |    |  |   |  |        |  |     |  |  |  |                            ___|
+ | 8.412MHz        |  |    |  |   |__|        |  |     |  <-SN74LS74AN                       ___|
+ |                 |  |    |  |               |  |     |  |  |  |                            ___|
+ |       SN74LS04N->__|    |__<-SN74LS92N     |__|     |__|  |__<-SN74LS04N                  ___|
+ |                                           _______________                                 ___|
+ |   __________   __________    __________  |              |   __________                    ___|
+ |  |SN74LS393N  |T74LS153??   |_MM2114N_|  |  ROM 91-1    |  |SN74LS166N                    ___|
+ |   __________                             |______________|                    ___          ___|
+ |  |SN74LS08N|                              _______________           DIPSx8->|- |          ___|
+ |   __________   __________    __________  |              |   __________      |- |          ___|
+ |  |SN74LS393N  SN74LS257BN   |_MM2114N_|  |  ROM 91-2    |  |SN74LS166N      |- |          ___|
+ |                                          |______________|                   |__|          ___|
+ |                                           _______________                                 ___|
+ |   __________   __________    __________  |              |   __________                    ___|
+ |  |SN74LS08N|  |SN74LS157N   |_MM2114N_|  |  ROM 91-3    |  |SN74LS166N                   ____|
+ |                              __________  |______________|                               |
+ |                             T74LS125AB1                        ___        __________    |
+ |   __________   __________    __________        __________     |  |       |SN74LS273N    |
+ |  |SN74LS20N|  |GD74LS10_|   |SN74LS32N|       |_74LS241_|     |  |                      |
+ |                              __________   _______________     |  |        __________    |
+ |                             SN74LS139AN  |              |     |__|       |SN74LS273N    |
+ |   __________   __________                | EMPTY        |                               |
+ |  |SN74LS74AN  |SN74LS32N|   ___________  |______________|                 __________    |
+ |                ________    |__________|   _______________     ________   |SN74LS244N    |
+ |   __________  |       |                  |              |    |       |                  |
+ |  |SN74LS74AN  |Z8400A |                  | ROM 91-DB98  |    |       |    __________    |
+ |               |  PS   |      __________  |______________|   AY-3-8910A   |SN74LS244N    |
+ |       ___     | Z80A  |     |SN74LS00N|                      |       |                  |
+ |      |  |     |  CPU  |                   _______________    |       |    __________    |
+ |   SN74LS245N  |       |     ___________  |              |    |       |   |SN74LS244N    |
+ |      |  |     |       |    |_74LS241__|  | MK48Z028     |    |       |                  |
+ |      |__|     |       |      __________  |______________|    |       |                  |
+ |               |_______|     |N82S123N_|                      |_______|                  |
+ |   __________                 __________                     __________    __________    |
+ |  |SN74LS74AN                |SN74LS08N|                    |SN74LS86AN   |_LM380N__|    |
+ |_________________________________________________________________________________________|
+
+*/
+ROM_START( spadarts )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "spanish_darts_idsa_91_db98_27c256.bin", 0x0000, 0x8000, CRC(e47ecdfc) SHA1(8dbbd0e866c9fc044dc4687501944ce4966dc288) )
+	ROM_REGION( 0x6000, "chars", 0 )
+	ROM_LOAD( "spanish_darts_idsa_91-1_27c64.bin",     0x0000, 0x2000, CRC(727cc152) SHA1(cd5bb9427745d898546b7dba04161f3713d7e79f) )
+	ROM_LOAD( "spanish_darts_idsa_91-2_27c64.bin",     0x2000, 0x2000, CRC(148f1edf) SHA1(ea6873164d086058af86e5707468a434ef9ed0cc) )
+	ROM_LOAD( "spanish_darts_idsa_91-3_27c64.bin",     0x4000, 0x2000, CRC(7c1d8910) SHA1(2a7f26cc43b87a8d191ca6d3bd225a8d5e6d8a22) )
+
+	ROM_REGION( 0x0020,  "pal_prom", 0 )
+	ROM_LOAD( "n82s123n.bin",                          0x0000, 0x0020, BAD_DUMP CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) ) // Not dumped, loaned from 4enraya
+ROM_END
+
+
 /*  ________________________________________________________________________________________________________
    |                          __________  __________  ______________  __________  __________ VIDEOGUM/TV   |
    |                         |T74LS14B1| |_74LS74AN| | EPROM 1     | |MC1454BCP| |_TC4023BP|               |
@@ -1043,21 +1114,22 @@ void unk_gambl_enc_state::driver_start()
 *           Game Drivers           *
 ***********************************/
 
-//    YEAR  NAME       PARENT   MACHINE   INPUT     CLASS            INIT        ROT   COMPANY      FULLNAME                                          FLAGS
-GAME( 1990, 4enraya,   0,       _4enraya, 4enraya,  _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 1)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 4enrayaa,  4enraya, _4enraya, 4enraya,  _4enraya_state,  empty_init, ROT0, "IDSA",      "4 En Raya (set 2)",                              MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT   MACHINE   INPUT      CLASS            INIT        ROT   COMPANY          FULLNAME             FLAGS
+GAME( 1990, 4enraya,   0,       _4enraya, 4enraya,   _4enraya_state,  empty_init, ROT0, "IDSA",          "4 En Raya (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enrayaa,  4enraya, _4enraya, 4enraya,   _4enraya_state,  empty_init, ROT0, "IDSA",          "4 En Raya (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, spadarts,  0,       _4enraya, spadarts,  _4enraya_state,  empty_init, ROT0, "IDSA",          "Spanish Darts",     MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 
-GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992?, chicgum,  0,       chicgum,  tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Chic Gum Video", MACHINE_SUPPORTS_SAVE )
-GAME( 1992?, strker,   0,       chicgum,  tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Striker", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 'RAM NO GOOD', if bypassed it resets after coining up
-GAME( 1992?, bowlgum,  0,       chicgum,  tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Bowling Gum", MACHINE_SUPPORTS_SAVE )
+GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum,  unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992?, chicgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Chic Gum Video", MACHINE_SUPPORTS_SAVE )
+GAME( 1992?, strker,   0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Striker",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 'RAM NO GOOD', if bypassed it resets after coining up
+GAME( 1992?, bowlgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Bowling Gum",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,  unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacgb,  unkpacg, unkpacg,  unkpacg,  unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1988, unkpacgc,  unkpacg, unkpacg,  unkpacg,  unk_gambl_state,     empty_init, ROT0, "<unknown>", "Coco Louco",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1988, unkpacgd,  unkpacg, unkpacg,  unkpacg,  unk_gambl_state,     empty_init, ROT0, "<unknown>", "unknown 'Pac Man with cars' gambling game", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacga,  unkpacg, unkpacga, unkpacg,  unk_gambl_enc_state, empty_init, ROT0, "IDI SRL",   "Pucman",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacgb,  unkpacg, unkpacg,  unkpacg,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1988, unkpacgc,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state,     empty_init, ROT0, "<unknown>", "Coco Louco",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1988, unkpacgd,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state,     empty_init, ROT0, "<unknown>", "unknown 'Pac Man with cars' gambling game", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacga,  unkpacg, unkpacga, unkpacg,   unk_gambl_enc_state, empty_init, ROT0, "IDI SRL",   "Pucman",                                    MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, unksig,    0,       unkpacg,  unkfr,    unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,    unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksigb,   unksig,  unkpacg,  unkfr,    unk_gambl_state,     empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (unencrypted)",      MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksig,    0,       unkpacg,  unkfr,     unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,     unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksigb,   unksig,  unkpacg,  unkfr,     unk_gambl_state,     empty_init, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (unencrypted)",      MACHINE_SUPPORTS_SAVE )
