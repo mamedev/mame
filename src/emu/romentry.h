@@ -45,76 +45,76 @@ enum
 
 // ----- per-region constants -----
 
-static constexpr u32 ROMREGION_WIDTHMASK    = 0x00000300;       // native width of region, as power of 2
-static constexpr u32 ROMREGION_8BIT         = 0x00000000;       //    (non-CPU regions only)
-static constexpr u32 ROMREGION_16BIT        = 0x00000100;
-static constexpr u32 ROMREGION_32BIT        = 0x00000200;
-static constexpr u32 ROMREGION_64BIT        = 0x00000300;
+constexpr u32 ROMREGION_WIDTHMASK    = 0x00000300;       // native width of region, as power of 2
+constexpr u32 ROMREGION_8BIT         = 0x00000000;       //    (non-CPU regions only)
+constexpr u32 ROMREGION_16BIT        = 0x00000100;
+constexpr u32 ROMREGION_32BIT        = 0x00000200;
+constexpr u32 ROMREGION_64BIT        = 0x00000300;
 
-static constexpr u32 ROMREGION_ENDIANMASK   = 0x00000400;       // endianness of the region
-static constexpr u32 ROMREGION_LE           = 0x00000000;       //    (non-CPU regions only)
-static constexpr u32 ROMREGION_BE           = 0x00000400;
+constexpr u32 ROMREGION_ENDIANMASK   = 0x00000400;       // endianness of the region
+constexpr u32 ROMREGION_LE           = 0x00000000;       //    (non-CPU regions only)
+constexpr u32 ROMREGION_BE           = 0x00000400;
 
-static constexpr u32 ROMREGION_INVERTMASK   = 0x00000800;       // invert the bits of the region
-static constexpr u32 ROMREGION_NOINVERT     = 0x00000000;
-static constexpr u32 ROMREGION_INVERT       = 0x00000800;
+constexpr u32 ROMREGION_INVERTMASK   = 0x00000800;       // invert the bits of the region
+constexpr u32 ROMREGION_NOINVERT     = 0x00000000;
+constexpr u32 ROMREGION_INVERT       = 0x00000800;
 
-static constexpr u32 ROMREGION_ERASEMASK    = 0x00002000;       // erase the region before loading
-static constexpr u32 ROMREGION_NOERASE      = 0x00000000;
-static constexpr u32 ROMREGION_ERASE        = 0x00002000;
+constexpr u32 ROMREGION_ERASEMASK    = 0x00002000;       // erase the region before loading
+constexpr u32 ROMREGION_NOERASE      = 0x00000000;
+constexpr u32 ROMREGION_ERASE        = 0x00002000;
 
-static constexpr u32 ROMREGION_DATATYPEMASK = 0x00004000;       // type of region (ROM versus disk)
-static constexpr u32 ROMREGION_DATATYPEROM  = 0x00000000;
-static constexpr u32 ROMREGION_DATATYPEDISK = 0x00004000;
+constexpr u32 ROMREGION_DATATYPEMASK = 0x00004000;       // type of region (ROM versus disk)
+constexpr u32 ROMREGION_DATATYPEROM  = 0x00000000;
+constexpr u32 ROMREGION_DATATYPEDISK = 0x00004000;
 
-static constexpr u32 ROMREGION_ERASEVALMASK = 0x00ff0000;       // value to erase the region to
-inline constexpr u32 ROMREGION_ERASEVAL(u8 x) { return (u32(x) << 16) | ROMREGION_ERASE; }
-static constexpr u32 ROMREGION_ERASE00      = ROMREGION_ERASEVAL(0);
-static constexpr u32 ROMREGION_ERASEFF      = ROMREGION_ERASEVAL(0xff);
+constexpr u32 ROMREGION_ERASEVALMASK = 0x00ff0000;       // value to erase the region to
+constexpr u32 ROMREGION_ERASEVAL(u8 x) { return (u32(x) << 16) | ROMREGION_ERASE; }
+constexpr u32 ROMREGION_ERASE00      = ROMREGION_ERASEVAL(0);
+constexpr u32 ROMREGION_ERASEFF      = ROMREGION_ERASEVAL(0xff);
 
 // ----- per-ROM constants -----
 
-static constexpr u32 DISK_READONLYMASK      = 0x00000010;       // is the disk read-only?
-static constexpr u32 DISK_READWRITE         = 0x00000000;
-static constexpr u32 DISK_READONLY          = 0x00000010;
+constexpr u32 DISK_READONLYMASK      = 0x00000010;       // is the disk read-only?
+constexpr u32 DISK_READWRITE         = 0x00000000;
+constexpr u32 DISK_READONLY          = 0x00000010;
 
-static constexpr u32 ROM_OPTIONALMASK       = 0x00000020;       // optional - won't hurt if it's not there
-static constexpr u32 ROM_REQUIRED           = 0x00000000;
+constexpr u32 ROM_OPTIONALMASK       = 0x00000020;       // optional - won't hurt if it's not there
+constexpr u32 ROM_REQUIRED           = 0x00000000;
 [[deprecated("use image devices, slot devices or BIOS options for truly optional files")]]
-static constexpr u32 ROM_OPTIONAL           = 0x00000020;
+constexpr u32 ROM_OPTIONAL           = 0x00000020;
 
-static constexpr u32 ROM_REVERSEMASK        = 0x00000040;       // reverse the byte order within a group
-static constexpr u32 ROM_NOREVERSE          = 0x00000000;
-static constexpr u32 ROM_REVERSE            = 0x00000040;
+constexpr u32 ROM_REVERSEMASK        = 0x00000040;       // reverse the byte order within a group
+constexpr u32 ROM_NOREVERSE          = 0x00000000;
+constexpr u32 ROM_REVERSE            = 0x00000040;
 
-static constexpr u32 ROM_INHERITFLAGSMASK   = 0x00000080;       // inherit all flags from previous definition
-static constexpr u32 ROM_INHERITFLAGS       = 0x00000080;
+constexpr u32 ROM_INHERITFLAGSMASK   = 0x00000080;       // inherit all flags from previous definition
+constexpr u32 ROM_INHERITFLAGS       = 0x00000080;
 
-static constexpr u32 ROM_GROUPMASK          = 0x00000f00;       // load data in groups of this size + 1
-inline constexpr u32 ROM_GROUPSIZE(int n) { return ((n - 1) & 15) << 8; }
-static constexpr u32 ROM_GROUPBYTE          = ROM_GROUPSIZE(1);
-static constexpr u32 ROM_GROUPWORD          = ROM_GROUPSIZE(2);
-static constexpr u32 ROM_GROUPDWORD         = ROM_GROUPSIZE(4);
+constexpr u32 ROM_GROUPMASK          = 0x00000f00;       // load data in groups of this size + 1
+constexpr u32 ROM_GROUPSIZE(unsigned n) { return ((n - 1) & 15) << 8; }
+constexpr u32 ROM_GROUPBYTE          = ROM_GROUPSIZE(1);
+constexpr u32 ROM_GROUPWORD          = ROM_GROUPSIZE(2);
+constexpr u32 ROM_GROUPDWORD         = ROM_GROUPSIZE(4);
 
-static constexpr u32 ROM_SKIPMASK           = 0x0000f000;       // skip this many bytes after each group
-inline constexpr u32 ROM_SKIP(int n) { return (n & 15) << 12; }
-static constexpr u32 ROM_NOSKIP             = ROM_SKIP(0);
+constexpr u32 ROM_SKIPMASK           = 0x0000f000;       // skip this many bytes after each group
+constexpr u32 ROM_SKIP(unsigned n) { return (n & 15) << 12; }
+constexpr u32 ROM_NOSKIP             = ROM_SKIP(0);
 
-static constexpr u32 ROM_BITWIDTHMASK       = 0x000f0000;       // width of data in bits
-static constexpr u32 ROM_BITWIDTH(int n) { return u32(n & 15) << 16; }
-static constexpr u32 ROM_NIBBLE             = ROM_BITWIDTH(4);
-static constexpr u32 ROM_FULLBYTE           = ROM_BITWIDTH(8);
+constexpr u32 ROM_BITWIDTHMASK       = 0x000f0000;       // width of data in bits
+constexpr u32 ROM_BITWIDTH(unsigned n) { return u32(n & 15) << 16; }
+constexpr u32 ROM_NIBBLE             = ROM_BITWIDTH(4);
+constexpr u32 ROM_FULLBYTE           = ROM_BITWIDTH(8);
 
-static constexpr u32 ROM_BITSHIFTMASK       = 0x00f00000;       // left-shift count for the bits */
-inline constexpr u32 ROM_BITSHIFT(int n) { return u32(n & 15) << 20; }
-static constexpr u32 ROM_NOSHIFT            = ROM_BITSHIFT(0);
-static constexpr u32 ROM_SHIFT_NIBBLE_LO    = ROM_BITSHIFT(0);
-static constexpr u32 ROM_SHIFT_NIBBLE_HI    = ROM_BITSHIFT(4);
+constexpr u32 ROM_BITSHIFTMASK       = 0x00f00000;       // left-shift count for the bits
+constexpr u32 ROM_BITSHIFT(unsigned n) { return u32(n & 15) << 20; }
+constexpr u32 ROM_NOSHIFT            = ROM_BITSHIFT(0);
+constexpr u32 ROM_SHIFT_NIBBLE_LO    = ROM_BITSHIFT(0);
+constexpr u32 ROM_SHIFT_NIBBLE_HI    = ROM_BITSHIFT(4);
 
-static constexpr u32 ROM_BIOSFLAGSMASK      = 0xff000000;       // only loaded if value matches device bios value
-inline constexpr u32 ROM_BIOS(int n) { return u32((n + 1) & 255) << 24; }
+constexpr u32 ROM_BIOSFLAGSMASK      = 0xff000000;       // only loaded if value matches device BIOS value
+constexpr u32 ROM_BIOS(unsigned n) { return u32((n + 1) & 255) << 24; }
 
-static constexpr u32 ROM_INHERITEDFLAGS = ROM_GROUPMASK | ROM_SKIPMASK | ROM_REVERSEMASK | ROM_BITWIDTHMASK | ROM_BITSHIFTMASK | ROM_BIOSFLAGSMASK;
+constexpr u32 ROM_INHERITEDFLAGS = ROM_GROUPMASK | ROM_SKIPMASK | ROM_REVERSEMASK | ROM_BITWIDTHMASK | ROM_BITSHIFTMASK | ROM_BIOSFLAGSMASK;
 
 
 // ----- start/stop macros -----
