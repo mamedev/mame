@@ -118,13 +118,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
 ***************************************************************************/
 
 #include "emu.h"
-#include "emupal.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/74259.h"
 #include "machine/ripple_counter.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "tilemap.h"
 #include "speaker.h"
