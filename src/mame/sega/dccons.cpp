@@ -571,9 +571,8 @@ ROM_START( dcjp )
 ROM_END
 
 // VA0 motherboard, case internal marks: 8/98 MULTI
-// doesn't boot retail GD-ROMs
-// boot ROM shows license screen, attempts to load 1stread.bin executables as WinCE binaries and then fall back to BIOS screen
-// net yet sure if it's hardcoded or this ROM version use/require different game header to find out Katana/WinCE game binary format
+// doesn't boot regular retail GD-ROMs
+// use a bit different game header format, for Katana SDK made games require Katana/WinCE flag (offset 0x3e) to be space (0x20), not '0'(0x30)
 ROM_START( dcproto )
 	ROM_REGION(0x200000, "maincpu", 0)
 	// M27C160-100M6 EEPROM
