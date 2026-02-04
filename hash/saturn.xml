@@ -30192,7 +30192,7 @@ Not extensively tested
 		<year>1997</year>
 		<publisher>Nihon Bussan</publisher>
 		<notes><![CDATA[
-Has severe [VDP1] glitches during intro and gameplay (with heavy performance dip)
+Has severe [VDP1] glitches during intro and gameplay, [SCUDSP] related
 ]]></notes>
 		<info name="serial" value="T-7104G"/>
 		<info name="release" value="19971204"/>

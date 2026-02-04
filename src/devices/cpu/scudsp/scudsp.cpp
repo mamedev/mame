@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Mariusz Wojcieszek
-/*****************************************************************************
+/**************************************************************************************************
  *
  * scudsp.c
  * Sega SCUDSP emulator version 1.00
  *
- * copyright Angelo Salese & Mariusz Wojcieszek
  *
  * Changelog:
  * 131010: Angelo Salese
@@ -68,11 +67,12 @@
  * - overworked disassembler
  *
  *  TODO:
- * - Fix INSTA_DMA hack
- * - Fix disassembler
- * - Fix timings (no info available so far)
- * - Add control flags
- * - Croc: has a bug somewhere that never allows it to trip the ENDI opcode.
+ * - Fix INSTA_DMA hack;
+ * - Fix disassembler;
+ * - Fix timings (no info available so far);
+ * - Add control flags;
+ * - Scheduler corrupts a lot in debugger, particularly with DRC enabled;
+ * - croc: has a bug somewhere that never allows it to trip the ENDI opcode.
  *   Snippet of interest is:
  *   08    00823500                                            CLR A     MOV M0,PL
  *   09    08040000    OR                                      MOV ALU,A
@@ -85,10 +85,10 @@
  *   42    D3400042    JMP T0,$42
  *   43    00000000    NOP
  *   44    D0000007    JMP $7
+ * - vkyoute2: heavy glitches with VDP1 vertices going haywire.
  *
  *
- *
- *****************************************************************************/
+ *************************************************************************************************/
 
 #include "emu.h"
 #include "scudsp.h"
@@ -98,21 +98,6 @@
 DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 
 /* FLAGS */
-#define PRF m_flags & 0x04000000
-#define EPF m_flags & 0x02000000
-#define T0F m_flags & 0x00800000
-#define SF  (m_flags & 0x00400000)
-#define ZF  (m_flags & 0x00200000)
-#define CF  m_flags & 0x00100000
-#define VF  m_flags & 0x00080000
-#define EF  m_flags & 0x00040000
-#define ESF m_flags & 0x00020000
-#define EXF m_flags & 0x00010000 // execute flag (basically tied to RESET pin)
-#define LEF m_flags & 0x00008000 // change PC value
-#define T0F_1 m_flags|=0x00800000
-#define T0F_0 m_flags&=~0x00800000
-#define EXF_0 m_flags&=~0x00010000
-#define EF_1  m_flags|=0x00040000
 
 #define SET_C(_val) (m_flags = ((m_flags & ~0x00100000) | ((_val) ? 0x00100000 : 0)))
 #define SET_S(_val) (m_flags = ((m_flags & ~0x00400000) | ((_val) ? 0x00400000 : 0)))
@@ -272,19 +257,19 @@ uint32_t scudsp_cpu_device::scudsp_compute_condition( uint32_t condition )
 	switch( condition & 0xf )
 	{
 		case 0x1:   /* Z */
-			result = ZF;
+			result = BIT(m_flags, ZF);
 			break;
 		case 0x2:   /* S */
-			result = SF;
+			result = BIT(m_flags, SF);
 			break;
 		case 0x3:   /* ZS */
-			result = ZF | SF;
+			result = BIT(m_flags, ZF) | BIT(m_flags, SF);
 			break;
 		case  0x4:  /* C */
-			result = CF;
+			result = BIT(m_flags, CF);
 			break;
 		case 0x8:   /* T0 */
-			result = T0F;
+			result = BIT(m_flags, T0F);
 			break;
 	}
 	if ( !(condition & 0x20) )
@@ -342,7 +327,17 @@ uint32_t scudsp_cpu_device::scudsp_get_mem_source_dma( uint32_t memcode, uint32_
 
 uint32_t scudsp_cpu_device::program_control_r()
 {
-	return (m_pc & 0xff) | (m_flags & FLAGS_MASK);
+	const u32 flags = m_flags & FLAGS_MASK;
+
+	if (!machine().side_effects_disabled())
+	{
+		// clear overflow and end flag on host reads of this port
+		m_flags &= ~(1 << VF);
+		m_flags &= ~(1 << EF);
+		m_out_irq_cb(0);
+	}
+
+	return (m_pc & 0xff) | flags;
 }
 
 void scudsp_cpu_device::program_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -353,13 +348,18 @@ void scudsp_cpu_device::program_control_w(offs_t offset, uint32_t data, uint32_t
 	newval = oldval;
 	COMBINE_DATA(&newval);
 
-	m_flags = newval & FLAGS_MASK;
+	m_flags = (newval & 0x0063'8000) | (m_flags & ~0x0063'8000);
 
-	if(LEF)
+	if (BIT(m_flags, EPF))
+		popmessage("scudsp.cpp: single step enabled");
+
+	// set new PC if transfer enable is set
+	if (BIT(m_flags, LEF))
 		m_pc = newval & 0xff;
 
 	//printf("%08x PRG CTRL\n",data);
-	set_input_line(INPUT_LINE_RESET, (EXF) ? CLEAR_LINE : ASSERT_LINE);
+	// run DSP if EXF is on
+	set_input_line(INPUT_LINE_RESET, (BIT(m_flags, EXF)) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void scudsp_cpu_device::program_w(uint32_t data)
@@ -630,7 +630,7 @@ void scudsp_cpu_device::scudsp_dma( uint32_t opcode )
 	uint32_t dir_from_D0 = (opcode & 0x1000 ) >> 12;
 	uint32_t dsp_mem = (opcode & 0x300) >> 8;
 
-	T0F_1;
+	m_flags |= 1 << T0F;
 
 	if ( opcode & 0x2000 )
 	{
@@ -713,7 +713,7 @@ void scudsp_cpu_device::scudsp_dma( uint32_t opcode )
 		//if(m_dma.count >= m_dma.size)
 		{
 			m_dma.ex = 0;
-			T0F_0;
+			m_flags &= ~(1 << T0F);
 		}
 
 		m_icount -= m_dma.size;
@@ -774,12 +774,13 @@ void scudsp_cpu_device::scudsp_end(uint32_t opcode)
 {
 	if(opcode & 0x08000000)
 	{
-		/*ENDI*/
-		EF_1;
+		// set program end irq flag
+		m_flags |= (1 << EF);
 		m_out_irq_cb(1);
 	}
 
-	EXF_0; /* END / ENDI */
+	// clear the execute control flag (not running anymore)
+	m_flags &= ~(1 << EXF);
 	set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_icount -= 1;
 }
@@ -824,7 +825,7 @@ void scudsp_cpu_device::scudsp_exec_dma()
 	if(m_dma.count >= m_dma.size)
 	{
 		m_dma.ex = 0;
-		T0F_0;
+		m_flags &= ~(1 << T0F);
 	}
 
 	m_icount -= 1;

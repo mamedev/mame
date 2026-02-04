@@ -86,6 +86,20 @@ protected:
 	devcb_write16        m_out_dma_cb;
 
 private:
+	enum {
+		LEF = 15, // program counter transfer enable
+		EXF, // program execute control flag
+		ESF, // step execute control
+		EF, // program end interrupt
+		VF, // oVerflow flag
+		CF, // Carry flag
+		ZF, // Zero flag
+		SF, // Sign flag
+		T0F, // D0-Bus DMA execution flag
+		EPF = 25, // Execute pause flag
+		PRF // Execute Pause Reset flag
+	};
+
 	union SCUDSPREG32 {
 		int32_t  si;
 		uint32_t ui;
