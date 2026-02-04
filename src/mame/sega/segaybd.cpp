@@ -196,6 +196,13 @@ EPR-12028 - 27C256 EPROM
 
 
 #include "emu.h"
+
+#include "315_5296.h"
+#include "sega16sp.h"
+#include "segaic16.h"
+#include "segaic16_m.h"
+#include "segaipt.h"
+
 #include "cpu/m68000/m68000musashi.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
@@ -206,13 +213,7 @@ EPR-12028 - 27C256 EPROM
 #include "sound/segapcm.h"
 #include "sound/ymopm.h"
 
-#include "segaic16.h"
-#include "segaic16_m.h"
-#include "sega16sp.h"
 #include "screen.h"
-#include "segaipt.h"
-
-#include "315_5296.h"
 #include "speaker.h"
 
 #include "pdrift.lh"
@@ -269,17 +270,17 @@ public:
 	{
 	}
 
-	void yboard_deluxe(machine_config &config);
-	void yboard_link(machine_config &config);
-	void yboard(machine_config &config);
+	void yboard_deluxe(machine_config &config) ATTR_COLD;
+	void yboard_link(machine_config &config) ATTR_COLD;
+	void yboard(machine_config &config) ATTR_COLD;
 
 	// game-specific driver init
-	void init_generic();
-	void init_pdrift();
-	void init_r360();
-	void init_gforce2();
-	void init_rchase();
-	void init_gloc();
+	void init_generic() ATTR_COLD;
+	void init_pdrift() ATTR_COLD;
+	void init_r360() ATTR_COLD;
+	void init_gforce2() ATTR_COLD;
+	void init_rchase() ATTR_COLD;
+	void init_gloc() ATTR_COLD;
 
 protected:
 	// device overrides
@@ -288,6 +289,9 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
+	// internal types
+	using output_delegate = delegate<void (uint16_t)>;
+
 	// main CPU read/write handlers
 	void output1_w(uint8_t data);
 	void misc_output_w(uint8_t data);
@@ -326,9 +330,6 @@ private:
 	void sound_portmap(address_map &map) ATTR_COLD;
 	void subx_map(address_map &map) ATTR_COLD;
 	void suby_map(address_map &map) ATTR_COLD;
-
-	// internal types
-	typedef delegate<void (uint16_t)> output_delegate;
 
 	// internal helpers
 	TIMER_CALLBACK_MEMBER(irq2_gen_tick);
