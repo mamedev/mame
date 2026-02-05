@@ -372,7 +372,7 @@ void isa16_xtom3d_io_sound::device_add_mconfig(machine_config &config)
 	m_ymz->add_route(1, "speaker", 0.5, 1);
 }
 
-static INPUT_PORTS_START(xtom3d)
+static INPUT_PORTS_START( xtom3d )
 	PORT_START("SYSTEM")
 	PORT_DIPNAME( 0x0001, 0x0001, "SYSTEM" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

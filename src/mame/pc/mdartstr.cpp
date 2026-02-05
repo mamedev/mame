@@ -7,12 +7,16 @@ Medalist Spectrum HW
 https://www.youtube.com/watch?v=-kxk8UtTeIM
 
 Error 033 is A20 line related (cfr. below)
+Game looks PTS-DOS based
 
 TODO:
-- Emulate 65535 (S)VGA, same as IBM PC-110;
-- ROM disk, in ISA space;
-- Sound, from parallel ports?
-- (very eventually) requires a dartboard layout;
+- Emulate 65535 (S)VGA, same as IBM PC-110 (ETA: looks a very limited use of it, uses EGA mode);
+- Needs optional printer and FDC options (cfr. service mode);
+- Sound;
+- NVRAM, from ROM disk (will "software update" every time is booted atm);
+- Ticket dispenser;
+- Lamps;
+- Requires a dartboard layout;
 
 ===================================================================================================
 
@@ -48,6 +52,333 @@ Samsung K6T1008C2E-DL70 near mem roms (mixed ROM/RAM disk?)
 #include "video/pc_vga_chips.h"
 
 #include "speaker.h"
+
+
+/*
+ * ISA16 Medalist ROM DISK
+ * handles ROM, NVRAM, I/O and sound
+ *
+ */
+
+class isa16_medalist_rom_disk : public device_t, public device_isa16_card_interface
+{
+public:
+	// construction/destruction
+	isa16_medalist_rom_disk(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	template <typename T> void set_rom_tag(T &&tag) { m_rom.set_tag(std::forward<T>(tag)); }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+private:
+	required_memory_region m_rom;
+	required_ioport m_system;
+	// TODO: rename when driver more consolidated
+	required_ioport m_in0;
+	required_ioport m_in1;
+	required_ioport m_in2;
+	required_ioport m_in3;
+	required_ioport m_dsw;
+
+	u32 m_bank_address;
+	bool m_ram_select;
+	std::vector<uint8_t> m_ram;
+
+	void io_map(address_map &map);
+
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+
+	void remap(int space_id, offs_t start, offs_t end) override;
+};
+
+DEFINE_DEVICE_TYPE(ISA16_MEDALIST_ROM_DISK, isa16_medalist_rom_disk, "isa16_medalist_rom_disk", "ISA16 Medalist Spectrum ROM DISK")
+
+isa16_medalist_rom_disk::isa16_medalist_rom_disk(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA16_MEDALIST_ROM_DISK, tag, owner, clock)
+	, device_isa16_card_interface(mconfig, *this)
+	, m_rom(*this, finder_base::DUMMY_TAG)
+	, m_system(*this, "SYSTEM")
+	, m_in0(*this, "IN0")
+	, m_in1(*this, "IN1")
+	, m_in2(*this, "IN2")
+	, m_in3(*this, "IN3")
+	, m_dsw(*this, "DSW")
+{
+}
+
+void isa16_medalist_rom_disk::device_start()
+{
+	set_isa_device();
+	save_item(NAME(m_ram_select));
+	save_item(NAME(m_bank_address));
+	m_ram.resize(0x100000);
+}
+
+void isa16_medalist_rom_disk::device_reset()
+{
+	m_ram_select = false;
+	m_bank_address = 0;
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa16_medalist_rom_disk::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		// C: drive 0xc0000, 0xc7fff
+		// (debug option, will fail for missing COMMAND.COM that is otherwise present in BIOS)
+		// D: drive
+		m_isa->install_memory(0xd0000, 0xdffff, read8sm_delegate(*this, FUNC(isa16_medalist_rom_disk::read)), write8sm_delegate(*this, FUNC(isa16_medalist_rom_disk::write)));
+	}
+	else if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x0000, 0xffff, *this, &isa16_medalist_rom_disk::io_map);
+	}
+}
+
+u8 isa16_medalist_rom_disk::read(offs_t offset)
+{
+	if (m_ram_select)
+		return m_ram[offset | m_bank_address];
+	return m_rom->base()[offset | m_bank_address];
+}
+
+void isa16_medalist_rom_disk::write(offs_t offset, u8 data)
+{
+	if (m_ram_select)
+		m_ram[offset | m_bank_address] = data;
+}
+
+void isa16_medalist_rom_disk::io_map(address_map &map)
+{
+	map(0x0300, 0x0301).lr8(
+		NAME([this] (offs_t offset) {
+			// target segments (as matrix thru $302 writes?)
+			return offset & 1 ? m_in3->read() : m_in2->read();
+		})
+	);
+	map(0x0308, 0x0309).lr8(
+		NAME([this] (offs_t offset) -> u8 {
+			if (offset)
+			{
+				if (!machine().side_effects_disabled())
+					logerror("$309 Unknown read\n");
+				return 0xff;
+			}
+
+			return m_in0->read();
+		})
+	);
+	map(0x030a, 0x030b).lr8(
+		NAME([this] (offs_t offset) -> u8 {
+			if (offset)
+			{
+				if (!machine().side_effects_disabled())
+					logerror("$30b Unknown read\n");
+				return 0xff;
+			}
+
+			return m_in1->read();
+		})
+	);
+	// map(0x0310, 0x0310) to sound chip
+	map(0x0320, 0x0321).lrw8(
+		NAME([this] (offs_t offset) -> u8 {
+			if (offset)
+				return m_system->read();
+
+			if (!machine().side_effects_disabled())
+				logerror("$320 Unknown read\n");
+			return 0;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			if (offset)
+			{
+				m_bank_address = (data & 0xf) * 0x10000;
+				m_ram_select = false;
+				if (BIT(data, 4))
+					logerror("$321 Unknown bit 4 high (%02x)\n", data);
+				// TODO: cleanup, perhaps use address_map_bank
+				switch(data & 0xe0)
+				{
+					case 0x20:
+						m_bank_address += 0x100000;
+						break;
+					case 0x40:
+						m_bank_address += 0x200000;
+						break;
+					case 0x60:
+						m_bank_address += 0x300000;
+						break;
+					case 0x80:
+						m_bank_address += 0x400000;
+						break;
+					case 0xa0:
+						m_bank_address += 0x500000;
+						break;
+					case 0xc0:
+						m_bank_address += 0x600000;
+						break;
+					case 0xe0:
+						m_ram_select = true;
+						break;
+				}
+			}
+			else
+			{
+				logerror("$320 Unknown write %02x\n", data);
+			}
+		})
+	);
+	map(0x0322, 0x0323).lr8(
+		NAME([this] (offs_t offset) -> u8 {
+			if (offset)
+			{
+				if (!machine().side_effects_disabled())
+					logerror("$323 Unknown read\n");
+				return 0xff;
+			}
+
+			return m_dsw->read();
+		})
+	);
+}
+
+static INPUT_PORTS_START( mdartstr )
+	PORT_START("SYSTEM")
+	PORT_DIPNAME( 0x01, 0x00, "SYSA" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Reset?" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Player Change button")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BILL1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, "IN1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN2")
+	PORT_DIPNAME( 0x01, 0x01, "IN2" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN3")
+	PORT_DIPNAME( 0x01, 0x01, "IN3" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW")
+	PORT_SERVICE_DIPLOC(0x01, IP_ACTIVE_LOW, "SW:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW:3" ) // demo sounds?
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW:8" ) // enables "Factory 2" pricing
+INPUT_PORTS_END
+
+ioport_constructor isa16_medalist_rom_disk::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(mdartstr);
+}
 
 
 /*
@@ -152,6 +483,8 @@ private:
 
 	void main_io(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
+
+	static void romdisk_config(device_t *device);
 };
 
 void mdartstr_state::main_map(address_map &map)
@@ -171,12 +504,16 @@ void mdartstr_state::main_io(address_map &map)
 //  map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 }
 
-static INPUT_PORTS_START( mdartstr )
-INPUT_PORTS_END
-
 static void pc_isa_onboard(device_slot_interface &device)
 {
-	device.option_add_internal("vga", ISA16_F65535);
+	device.option_add_internal("vga",  ISA16_F65535);
+	device.option_add_internal("boot", ISA16_MEDALIST_ROM_DISK);
+}
+
+void mdartstr_state::romdisk_config(device_t *device)
+{
+	isa16_medalist_rom_disk &boot = *downcast<isa16_medalist_rom_disk *>(device);
+	boot.set_rom_tag("romdisk");
 }
 
 void mdartstr_state::mdartstr(machine_config &config)
@@ -241,7 +578,9 @@ void mdartstr_state::mdartstr(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(f82c836a_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(f82c836a_device::dreq7_w));
 
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "vga", true);
+	// all on one backplane
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "vga",     true);
+	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa_onboard, "boot",    true).set_option_machine_config("boot", romdisk_config);;
 
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(f82c836a_device::kbrst_w));
@@ -269,7 +608,7 @@ ROM_START( mdartstr )
 	ROM_REGION16_LE( 0x40000, "bios", ROMREGION_ERASEFF )
 	ROM_COPY( "rawbios", 0x40000, 0x00000, 0x40000 )
 
-	ROM_REGION16_LE( 0x800000, "romdisk", ROMREGION_ERASEFF )
+	ROM_REGION16_LE( 0x800000, "board2:romdisk", ROMREGION_ERASEFF )
 	// TODO: actual socket position filename .ext
 	// TODO: verify actual loading
 	ROM_LOAD("mem_0 rev 3.25.bin",  0x000000, 0x100000,  CRC(8fa930f1) SHA1(a898b180678086c730dc059f14ddd34a334625c7) )
@@ -284,4 +623,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 2001, mdartstr, 0, mdartstr, mdartstr, mdartstr_state, empty_init, ROT0, "Medalist Marketing", "Medalist Dart Star (Rev 3.25)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME( 2001, mdartstr, 0, mdartstr, 0, mdartstr_state, empty_init, ROT0, "Medalist Marketing", "Dart Star (Rev 3.25)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_REQUIRES_ARTWORK )
