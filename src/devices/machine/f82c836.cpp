@@ -185,7 +185,9 @@ void f82c836a_device::device_reset()
 
 	m_dram_config = 1;
 
-	update_romram_settings();
+	// map just a base subset, ISA bus slots may not be ready for update_romram_settings
+	// to work properly. Chipset is supposed to remap at POST anyway.
+	m_space_mem->install_rom(0xf0000, 0xfffff, &m_bios[0x30000 / 2]);
 }
 
 void f82c836a_device::device_reset_after_children()
@@ -340,7 +342,11 @@ void f82c836a_device::update_romram_settings()
 
 	int i;
 
-	m_isabus->remap(AS_PROGRAM, 0, 0xfffff);
+	// reconfigure space
+	// Despite what documentation claims shadow RAM actually wins over ROM, it will just map on
+	// top of it (i.e. IBM VGA BIOS will get shadowed while leaving the ROM bit on)
+	m_space_mem->unmap_readwrite(0xa0000, 0xfffff);
+	m_isabus->remap(AS_PROGRAM, 0xa0000, 0xfffff);
 
 	// TODO: optimize, add write only paths
 	for (i = 0; i < 8; i++)
@@ -349,7 +355,7 @@ void f82c836a_device::update_romram_settings()
 		const u32 end_offs = start_offs + 0x7fff;
 
 		if (BIT(m_rom_enable, i))
-			m_space_mem->install_rom(start_offs, end_offs, m_bios + i * 0x8000 / 2);
+			m_space_mem->install_rom(start_offs, end_offs, &m_bios[(i * 0x8000) / 2]);
 	}
 
 	for (i = 0; i < 8; i++)

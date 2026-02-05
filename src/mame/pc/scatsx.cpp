@@ -143,7 +143,7 @@ void scatsx_state::mb1320(machine_config &config)
 	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, "g80_1500"));
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, "ms_naturl"));
 	pc_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
 	pc_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
 
