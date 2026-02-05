@@ -270,6 +270,9 @@ private:
 		bool chained;
 	};
 
+	static const uint32_t recips_mantissa_lookup[128];
+	static const uint32_t rsqrts_mantissa_lookup[128];
+
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
@@ -282,6 +285,7 @@ private:
 		opcode_func handler;
 	};
 	static const SHARC_OP s_sharc_opcode_table[];
+	static const size_t s_num_ops;
 
 	struct ASTAT_DRC
 	{
@@ -332,6 +336,8 @@ private:
 		uint32_t curlcntr;
 		uint32_t lcntr;
 		uint8_t extdma_shift;
+		uint32_t iop_write_num;
+		uint32_t iop_data;
 
 		/* Data Address Generator (DAG) */
 		SHARC_DAG dag1;     // (DM bus)
@@ -609,7 +615,7 @@ private:
 	};
 
 	void execute_run_drc();
-	void flush_cache();
+	void generate_invariant();
 	void compile_block(offs_t pc);
 	void alloc_handle(uml::code_handle *&handleptr, const char *name);
 	void static_generate_entry_point();

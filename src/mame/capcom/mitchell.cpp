@@ -747,7 +747,7 @@ void mitchell_state::mitchell_io_map(address_map &map)
 	map(0x03, 0x03).w("ymsnd", FUNC(ym2413_device::data_w));
 	map(0x04, 0x04).w("ymsnd", FUNC(ym2413_device::address_w));
 	map(0x05, 0x05).r(FUNC(mitchell_state::port5_r)).w(m_oki, FUNC(okim6295_device::write));
-	map(0x06, 0x06).noprw();                     // watchdog? IRQ ack? video buffering?
+	map(0x06, 0x06).noprw(); // TODO: 86S105 sprite DMA
 	map(0x07, 0x07).lw8(NAME([this] (uint8_t data) { m_video_bank = data; }));
 	map(0x08, 0x08).w(FUNC(mitchell_state::eeprom_cs_w));
 	map(0x10, 0x10).w(FUNC(mitchell_state::eeprom_clock_w));
@@ -762,7 +762,7 @@ void spangbl_state::main_map(address_map &map)
 	map(0xc000, 0xc7ff).rw(FUNC(spangbl_state::paletteram_r), FUNC(spangbl_state::paletteram_w)); // Banked palette RAM
 	map(0xc800, 0xcfff).ram().w(FUNC(spangbl_state::colorram_w)).share(m_colorram); // Attribute RAM
 	map(0xd000, 0xdfff).rw(FUNC(spangbl_state::videoram_r), FUNC(spangbl_state::videoram_w)).share(m_videoram); // Banked char / OBJ RAM
-	map(0xe000, 0xffff).ram().share("nvram");     // Work RAM
+	map(0xe000, 0xffff).ram().share("nvram"); // Work RAM
 }
 
 void spangbl_state::spangbl_io_map(address_map &map)
@@ -773,7 +773,7 @@ void spangbl_state::spangbl_io_map(address_map &map)
 	map(0x02, 0x02).w(FUNC(spangbl_state::bankswitch_w));
 	map(0x03, 0x03).portr("DSW1").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x05, 0x05).portr("SYS0");
-	map(0x06, 0x06).nopw();    // watchdog? irq ack?
+	map(0x06, 0x06).nopw(); // TODO: 86S105 sprite DMA
 	map(0x07, 0x07).lw8(NAME([this] (uint8_t data) { m_video_bank = data; }));
 	map(0x08, 0x08).w(FUNC(spangbl_state::eeprom_cs_w));
 	map(0x10, 0x10).w(FUNC(spangbl_state::eeprom_clock_w));
@@ -830,14 +830,14 @@ void mstworld_state::sound_map(address_map &map)
 void mstworld_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).portr("IN0").w(FUNC(mstworld_state::gfxctrl_w));   // Palette bank, layer enable, coin counters, more
+	map(0x00, 0x00).portr("IN0").w(FUNC(mstworld_state::gfxctrl_w)); // Palette bank, layer enable, coin counters, more
 	map(0x01, 0x01).portr("IN1");
 	map(0x02, 0x02).portr("IN2").w(FUNC(mstworld_state::bankswitch_w));
 	map(0x03, 0x03).portr("DSW0").w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x04, 0x04).portr("DSW1");
 	map(0x05, 0x05).portr("SYS0");
 	map(0x06, 0x06).portr("DSW2");
-	map(0x06, 0x06).nopw();        // watchdog? irq ack?
+	map(0x06, 0x06).nopw(); // TODO: 86S105 sprite DMA
 	map(0x07, 0x07).lw8(NAME([this] (uint8_t data) { m_video_bank = data & 0x01; })); // for some reason mstworld freaks out if this isn't masked
 }
 
@@ -850,7 +850,7 @@ void pkladiesbl_state::io_map(address_map &map) // TODO: check everything, where
 	map(0x03, 0x03).portr("DSW0");
 	map(0x04, 0x04).portr("DSW1");
 	map(0x05, 0x05).r(FUNC(pkladiesbl_state::port5_r));
-	map(0x06, 0x06).noprw();                     // watchdog? IRQ ack? video buffering?
+	map(0x06, 0x06).noprw(); // TODO: 86S105 sprite DMA
 	map(0x07, 0x07).lw8(NAME([this] (uint8_t data) { m_video_bank = data; }));
 	map(0x08, 0x08).w(FUNC(pkladiesbl_state::eeprom_cs_w));
 	map(0x09, 0x09).w("ymsnd", FUNC(ym2413_device::data_w));

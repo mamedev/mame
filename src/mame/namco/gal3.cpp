@@ -128,17 +128,21 @@ better notes (complete chip lists) for each board still needed
 
 #include "emu.h"
 
-#include "cpu/m68000/m68000.h"
-#include "cpu/m68000/m68020.h"
-#include "cpu/tms32025/tms32025.h"
-#include "machine/nvram.h"
-#include "sound/c140.h"
-#include "layout/generic.h"
-#include "speaker.h"
-#include "namco_c355spr.h"
 #include "namcos21_dsp_c67.h"
 #include "namcos21_3d.h"
+
+#include "namco_c355spr.h"
+
+#include "cpu/m68000/m68000.h"
+#include "cpu/m68000/m68020.h"
+#include "cpu/tms320c2x/tms320c2x.h"
+#include "machine/nvram.h"
+#include "sound/c140.h"
+
+
 #include "emupal.h"
+#include "layout/generic.h"
+#include "speaker.h"
 
 
 namespace {

@@ -14,6 +14,9 @@ Tiger Electronics K-2-8: Talking Learning Computer (model 7-230/7-231)
 and the 4 year difference, k28o is not a MAME clone set of k28. It's more like
 a predecessor instead of an older revision.
 
+Modes A-O are for internal modes (SPELL until WORD), modes P-X are reserved for
+external modules.
+
 Hardware notes:
 - PCB label: PB-123 WIZARD, TIGER
 - Intel P8021 MCU with 1KB internal ROM

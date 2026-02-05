@@ -16,7 +16,6 @@ This document covers all the known Namco System 10 games, including....
 *Aim For Cash (AFC2 Ver.A)                                                    (C) Namco, 2004
 Ball Pom Line  (no sticker, ROM VER. B0 FEB 09 2005 15:29:02)                 (C) Namco, 2005
 *Dice ROM                                                                     (C) Namco, 2004
-*Dokidoki! Flower                                                             (C) Namco, 2004
 ***Drum Master                                                                (C) Namco, 2001
 ***Drum Master 2                                                              (C) Namco, 2001
 ***Drum Master 3                                                              (C) Namco, 2002
@@ -34,7 +33,7 @@ Hard Puncher Hajime no Ippo: The Fighting (VER.2.02J)                         (C
 Hard Puncher Hajime no Ippo 2 - The Fighting! - Ouja e no chousen (VER.2.00J) (C) Namco/Taito, 2002
 *Honne Hakkenki                                                               (C) Namco, 2001
 Keroro Gunsou Pekopon Shinryaku Shirei De Arimasu! (KRG1 Ver.A)               (C) Namco, 2006
-**Knock Down 2001 / KO2001 (KD11 Ver.B)                                       (C) Namco, 2001
+Knock Down 2001 / KO2001 (KD11 Ver.B)                                         (C) Namco, 2001
 Kono e Tako (RAN Ver.A, 10021 Ver.A reprogrammed Gamshara PCB)                (C) Mitchell 2003
 Kotoba no Puzzle Mojipittan (KPM1 Ver.A)                                      (C) Namco, 2001
 Medal no Tatsujin (MTL1 SPR0B)                                                (C) Namco, 2005

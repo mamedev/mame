@@ -675,7 +675,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( tiki100_state::tape_tick )
 void tiki100_state::busrq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, state);
 	m_exp->busak_w(state);
 }
 

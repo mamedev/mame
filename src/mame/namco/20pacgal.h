@@ -12,13 +12,15 @@
 
 #pragma once
 
+#include "bus/rs232/rs232.h"
 #include "cpu/z180/z180.h"
 #include "machine/eepromser.h"
 #include "machine/intelfsh.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
-#include "bus/rs232/rs232.h"
+
 #include "emupal.h"
+#include "screen.h"
 
 class _20pacgal_state : public driver_device
 {
@@ -40,7 +42,6 @@ public:
 	{ }
 
 	void _20pacgal(machine_config &config);
-	void _20pacgal_video(machine_config &config);
 
 	void init_25pacman();
 	void init_20pacgal();
@@ -78,7 +79,7 @@ protected:
 	uint8_t m_irq_mask = 0;
 	void irqack_w(uint8_t data);
 	void timer_pulse_w(uint8_t data);
-	void _20pacgal_coin_counter_w(uint8_t data);
+	void coin_counter_w(uint8_t data);
 	void ram_bank_select_w(uint8_t data);
 	void ram_48000_w(offs_t offset, uint8_t data);
 	void sprite_gfx_w(offs_t offset, uint8_t data);
@@ -87,16 +88,14 @@ protected:
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_20pacgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void starpal_init(palette_device &palette) const;
 	void get_pens();
-	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_chars(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_stars(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_sprite(bitmap_rgb32 &bitmap, const rectangle &cliprect, int y, int x,
-						uint8_t code, uint8_t color, int flip_y, int flip_x);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_chars(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_stars(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprite(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint8_t code, uint8_t color, int flip_y, int flip_x);
 	void common_save_state();
 
 	void _20pacgal_io_map(address_map &map) ATTR_COLD;
@@ -114,8 +113,6 @@ public:
 	void _25pacman(machine_config &config);
 
 private:
-	uint8_t _25pacman_io_87_r();
-
 	virtual void machine_start() override ATTR_COLD;
 
 	void _25pacman_io_map(address_map &map) ATTR_COLD;

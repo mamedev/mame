@@ -208,8 +208,9 @@ void omti8621_device::floppy_formats(format_registration &fr)
 ROM_START( omti8621 )
 	ROM_REGION(0x4000, OMTI_CPU_REGION, 0)  // disassembles fine as Z8 code
 	ROM_LOAD( "omti_8621_102640-b.bin", 0x000000, 0x004000, CRC(e6f20dbb) SHA1(cf1990ad72eac6b296485410f5fa3309a0d6d078) )
+
 	ROM_REGION(0x1000, OMTI_BIOS_REGION, 0)
-	ROM_LOAD_OPTIONAL("omti_bios", 0x0000, 0x1000, NO_DUMP)
+	ROM_LOAD("omti_bios", 0x0000, 0x1000, NO_DUMP)
 ROM_END
 
 static INPUT_PORTS_START( omti_port )

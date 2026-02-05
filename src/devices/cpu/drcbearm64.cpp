@@ -126,7 +126,11 @@ TODO:
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <locale>
+#include <string>
+#include <sstream>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 
@@ -593,7 +597,7 @@ private:
 	template <a64::Inst::Id Opcode> void op_float_alu(a64::Assembler &a, const uml::instruction &inst);
 	template <a64::Inst::Id Opcode> void op_float_alu2(a64::Assembler &a, const uml::instruction &inst);
 
-	size_t emit(CodeHolder &ch);
+	size_t emit(CodeHolder &ch, bool invariant);
 
 
 	// helper functions
@@ -651,6 +655,7 @@ private:
 	drc_map_variables m_map;
 	FILE *m_log_asmjit;
 	carry_state m_carry_state;
+	bool m_invariant_block;
 
 	arm64_entry_point_func m_entry;
 	drccodeptr m_exit;
@@ -1540,10 +1545,11 @@ inline void drcbe_arm64::calculate_carry_shift_right_imm(a64::Assembler &a, cons
 
 drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits)
 	: drcbe_interface(drcuml, cache, device)
-	, m_hash(cache, modes, addrbits, ignorebits)
+	, m_hash(cache, modes, addrbits, ignorebits, std::align_val_t(1 << 12), std::align_val_t(1 << 12))
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_carry_state(carry_state::POISON)
+	, m_invariant_block(false)
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
@@ -1554,7 +1560,19 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
-		m_log_asmjit = fopen(std::string("drcbearm64_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
+		std::string tag = device.tag();
+		for (auto &ch : tag)
+		{
+			if (':' == ch)
+				ch = '_';
+		}
+		std::ostringstream str;
+		str.imbue(std::locale::classic());
+		str << "drcbearm64_asmjit_" << device.shortname();
+		if ('_' != tag[0])
+			str << '_';
+		str << tag << ".asm";
+		m_log_asmjit = fopen(std::move(str).str().c_str(), "w");
 	}
 
 	// resolve the actual addresses of member functions we need to call
@@ -1578,39 +1596,8 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 			accessors.mask_high_bits = (shiftedmask & (shiftedmask + 1)) != 0;
 		}
 	}
-}
 
-drcbe_arm64::~drcbe_arm64()
-{
-	if (m_log_asmjit)
-		fclose(m_log_asmjit);
-}
-
-size_t drcbe_arm64::emit(CodeHolder &ch)
-{
-	Error err;
-
-	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
-	size_t const code_size = ch.code_size();
-
-	// test if enough room remains in the DRC cache
-	drccodeptr *cachetop = m_cache.begin_codegen(alignment + code_size);
-	if (!cachetop)
-		return 0;
-
-	err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
-	if (err != kErrorOk)
-		throw emu_fatalerror("CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
-
-	// update the drc cache and end codegen
-	*cachetop += alignment + code_size;
-	m_cache.end_codegen();
-
-	return code_size;
-}
-
-void drcbe_arm64::reset()
-{
+	// generate invariant code
 	uint8_t *dst = (uint8_t *)m_cache.top();
 
 	CodeHolder ch;
@@ -1683,13 +1670,46 @@ void drcbe_arm64::reset()
 	call_arm_addr(a, (const void *)entrypoint);
 
 	// emit the generated code
-	emit(ch);
+	emit(ch, true);
+
+	// set the "no code" pointer
+	m_hash.set_default_codeptr(m_nocode);
+}
+
+drcbe_arm64::~drcbe_arm64()
+{
+	if (m_log_asmjit)
+		fclose(m_log_asmjit);
+}
+
+size_t drcbe_arm64::emit(CodeHolder &ch, bool invariant)
+{
+	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
+	size_t const code_size = ch.code_size();
+
+	// try to allocate space from the DRC cache
+	auto space = invariant
+			? m_cache.alloc_invariant(alignment + code_size, std::align_val_t(1))
+			: m_cache.alloc_transient(alignment + code_size, std::align_val_t(1));
+	if (!space)
+		return 0;
+
+	assert(uintptr_t(space) <= ch.base_address());
+	Error const err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
+	if (err != kErrorOk)
+		throw emu_fatalerror("CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
+
+	osd::invalidate_instruction_cache(drccodeptr(ch.base_address()), code_size);
+
+	return code_size;
+}
+
+void drcbe_arm64::reset()
+{
+	m_carry_state = carry_state::POISON;
 
 	// reset our hash tables
 	m_hash.reset();
-	m_hash.set_default_codeptr(m_nocode);
-
-	m_carry_state = carry_state::POISON;
 }
 
 int drcbe_arm64::execute(code_handle &entry)
@@ -1701,7 +1721,7 @@ int drcbe_arm64::execute(code_handle &entry)
 void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
 	// do this here because device.debug() isn't initialised at construction time
-	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) && m_device.debug())
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)
@@ -1712,6 +1732,7 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
 	m_carry_state = carry_state::POISON;
+	m_invariant_block = block.invariant();
 
 	// compute the base by aligning the cache top to a cache line
 	auto [err, linesize] = osd_get_cache_line_size();
@@ -1771,7 +1792,7 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	a.b(m_endofblock);
 
 	// emit the generated code
-	if (!emit(ch))
+	if (!emit(ch, block.invariant()))
 		block.abort();
 
 	// tell all of our utility objects that the block is finished
@@ -1965,11 +1986,17 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 	const parameter &exp = inst.param(2);
 	assert(exp.is_code_handle());
 
-	a.mov(a64::sp, a64::x29);
+	// load non-immediate mode and PC as early as possible
+	const a64::Gp mode = modep.select_register(TEMP_REG1, 8);
+	const a64::Gp pc = pcp.select_register(TEMP_REG2, 8);
+	if (!modep.is_immediate())
+		mov_reg_param(a, 4, mode, modep);
+	if (!pcp.is_immediate())
+		mov_reg_param(a, 4, pc, pcp);
 
-	if (modep.is_immediate() && m_hash.is_mode_populated(modep.immediate()))
+	if (modep.is_immediate() && m_hash.populate_mode(modep.immediate()))
 	{
-		if (pcp.is_immediate())
+		if (pcp.is_immediate() && !m_invariant_block)
 		{
 			const uint32_t l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
 			const uint32_t l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
@@ -1977,71 +2004,51 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 		}
 		else
 		{
-			mov_reg_param(a, 4, TEMP_REG2, pcp);
-
-			get_imm_relative(a, TEMP_REG1, (uintptr_t)&m_hash.base()[modep.immediate()][0]); // TEMP_REG1 = m_base[mode]
-
-			a.ubfx(TEMP_REG3, TEMP_REG2, m_hash.l1shift(), m_hash.l1bits());
-			a.ldr(TEMP_REG3, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3))); // TEMP_REG3 = m_base[mode][(pc >> m_l1shift) & m_l1mask]
-
-			a.ubfx(TEMP_REG2, TEMP_REG2, m_hash.l2shift(), m_hash.l2bits());
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, TEMP_REG2, a64::lsl(3))); // TEMP_REG1 = m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]
+			get_imm_relative(a, TEMP_REG1, uintptr_t(m_hash.base()[modep.immediate()])); // TEMP_REG1 = m_base[mode]
 		}
 	}
 	else
 	{
-		get_imm_relative(a, TEMP_REG2, (uintptr_t)m_hash.base());
+		get_imm_relative(a, TEMP_REG3, uintptr_t(m_hash.base()));
 
 		if (modep.is_immediate())
-		{
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG2, modep.immediate() * 8)); // TEMP_REG1 = m_base[modep]
-		}
+			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, modep.immediate() << 3)); // TEMP_REG1 = m_base[modep]
 		else
-		{
-			const a64::Gp mode = modep.select_register(TEMP_REG1, 8);
-			mov_reg_param(a, 4, mode, modep);
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG2, mode, a64::lsl(3))); // TEMP_REG1 = m_base[modep]
-		}
+			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, mode, a64::lsl(3))); // TEMP_REG1 = m_base[modep]
 
 		if (pcp.is_immediate())
 		{
-			const uint32_t l1val = ((pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask()) * 8;
-			const uint32_t l2val = ((pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask()) * 8;
+			const uint32_t l1val = ((pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask());
+			const uint32_t l2val = ((pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask());
 
-			if (is_valid_immediate(l1val, 15))
-			{
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l1val));
-			}
+			if (!is_valid_immediate(l1val, 12))
+				a.mov(TEMP_REG2, l1val);
+			if (!is_valid_immediate(l2val, 12))
+				a.mov(TEMP_REG3, l2val);
+
+			if (is_valid_immediate(l1val, 12))
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l1val << 3));
 			else
-			{
-				a.mov(SCRATCH_REG1, l1val >> 3);
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, SCRATCH_REG1, a64::lsl(3)));
-			}
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, TEMP_REG2, a64::lsl(3)));
 
-			if (is_valid_immediate(l2val, 15))
-			{
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l2val));
-			}
+			if (is_valid_immediate(l2val, 12))
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, l2val << 3));
 			else
-			{
-				a.mov(SCRATCH_REG1, l2val >> 3);
-				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, SCRATCH_REG1, a64::lsl(3)));
-			}
-		}
-		else
-		{
-			const a64::Gp pc = pcp.select_register(TEMP_REG2, 8);
-			mov_reg_param(a, 4, pc, pcp);
-
-			a.ubfx(TEMP_REG3, pc, m_hash.l1shift(), m_hash.l1bits()); // (pc >> m_l1shift) & m_l1mask
-			a.ldr(TEMP_REG3, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3))); // TEMP_REG3 = m_base[mode][(pc >> m_l1shift) & m_l1mask]
-
-			a.ubfx(TEMP_REG2, pc, m_hash.l2shift(), m_hash.l2bits()); // (pc >> m_l2shift) & m_l2mask
-			a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, TEMP_REG2, a64::lsl(3))); // x25 = m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]
+				a.ldr(TEMP_REG1, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3)));
 		}
 	}
 
+	if (!pcp.is_immediate())
+	{
+		a.ubfx(TEMP_REG3, pc, m_hash.l1shift(), m_hash.l1bits()); // (pc >> m_l1shift) & m_l1mask
+		a.ubfx(TEMP_REG2, pc, m_hash.l2shift(), m_hash.l2bits()); // (pc >> m_l2shift) & m_l2mask
+
+		a.ldr(TEMP_REG3, a64::Mem(TEMP_REG1, TEMP_REG3, a64::lsl(3))); // TEMP_REG3 = m_base[mode][(pc >> m_l1shift) & m_l1mask]
+		a.ldr(TEMP_REG1, a64::Mem(TEMP_REG3, TEMP_REG2, a64::lsl(3))); // TEMP_REG1 = m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]
+	}
+
 	Label lab = a.new_label();
+	a.mov(a64::sp, a64::x29);
 	a.adr(REG_PARAM1, lab);
 	a.br(TEMP_REG1);
 

@@ -50,10 +50,11 @@ TODO:
 - dual boot not yet handled;
 
 TODO (MD side):
-- some games (orunnersj, timekillu, rhythmld and late SGDK games) fails on Z80 bus request stuff;
+- some games (orunnersj, rhythmld and late SGDK games) fails on Z80 bus request stuff (fixed);
+- Needs proper open bus behaviour for Z80 busack in timekillu and others;
 - dashdes: is a flickerfest during gameplay (fixed?);
 - sonic2/combatca: no interlace support in 2-players mode;
-- dheadj: scrolling issues in stage 4-1 (blocks overflowing with );
+- dheadj: scrolling issues in stage 4-1 (tile blocks overflows when scrolling);
 - skitchin: one line off during gameplay;
 - caesar: no sound;
 - gynougj: stray tile on top-left of title screen;
@@ -491,7 +492,7 @@ private:
 	std::unique_ptr<u8[]> m_sound_program;
 
 	bool m_z80_reset = false;
-	bool m_z80_busrq = false;
+	bool m_z80_busreq = false;
 	u32 m_z80_main_address = 0;
 
 	void flush_z80_state();
@@ -564,25 +565,29 @@ void teradrive_state::md_68k_map(address_map &map)
 	map(0xa11100, 0xa11101).lrw16(
 		NAME([this] (offs_t offset, u16 mem_mask) {
 			address_space &space = m_md68kcpu->space(AS_PROGRAM);
-			// TODO: enough for all edge cases but timekill
+			// TODO: enough for all edge cases but timekillu/telebrad/arkagis
+			// - ddragon, beast, superoff, indyheat depends on this
+			// - timekillu is very erratic
+			// - telebrad reads to byte $a11'101 while Z80 is held in reset (should be open bus so 0xfeff mask)
+			// - arkagis does a bad branch displacement when looping for busack (PC=1796 and other places)
 			u16 open_bus = space.read_word(m_md68kcpu->pc() - 2) & 0xfefe;
 			// printf("%06x -> %04x\n", m_md68kcpu->pc() - 2, open_bus);
-			u16 res = (!m_z80_busrq || m_z80_reset) ^ 1;
+			u16 res = (m_mdz80cpu->busack_r() && !m_z80_reset) ^ 1;
 			return (res << 8) | (res) | open_bus;
 		}),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			//printf("%04x %04x\n", data, mem_mask);
 			if (!ACCESSING_BITS_0_7)
 			{
-				m_z80_busrq = !!BIT(~data, 8);
+				m_z80_busreq = !!BIT(~data, 8);
 			}
 			else if (!ACCESSING_BITS_8_15)
 			{
-				m_z80_busrq = !!BIT(~data, 0);
+				m_z80_busreq = !!BIT(~data, 0);
 			}
 			else // word access
 			{
-				m_z80_busrq = !!BIT(~data, 8);
+				m_z80_busreq = !!BIT(~data, 8);
 			}
 			flush_z80_state();
 		})
@@ -691,10 +696,10 @@ void teradrive_state::md_cpu_space_map(address_map &map)
 void teradrive_state::flush_z80_state()
 {
 	m_mdz80cpu->set_input_line(INPUT_LINE_RESET, m_z80_reset ? ASSERT_LINE : CLEAR_LINE);
-	m_mdz80cpu->set_input_line(Z80_INPUT_LINE_BUSRQ, m_z80_busrq ? CLEAR_LINE : ASSERT_LINE);
+	m_mdz80cpu->set_input_line(Z80_INPUT_LINE_BUSREQ, m_z80_busreq ? CLEAR_LINE : ASSERT_LINE);
 	if (m_z80_reset)
 		m_opn->reset();
-	if (m_z80_reset || !m_z80_busrq)
+	if (m_z80_reset || !m_z80_busreq)
 		m_md_68k_sound_view.select(0);
 	else
 		m_md_68k_sound_view.disable();
@@ -858,7 +863,7 @@ void teradrive_state::machine_start()
 	save_pointer(NAME(m_sound_program), 0x4000);
 
 	save_item(NAME(m_z80_reset));
-	save_item(NAME(m_z80_busrq));
+	save_item(NAME(m_z80_busreq));
 	save_item(NAME(m_z80_main_address));
 }
 

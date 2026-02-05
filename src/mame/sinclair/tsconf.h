@@ -61,6 +61,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 
+	virtual void bank3_set_page(u8 page) override;
+
 	virtual TIMER_CALLBACK_MEMBER(irq_off) override;
 	TIMER_CALLBACK_MEMBER(irq_frame);
 	TIMER_CALLBACK_MEMBER(irq_scanline);
@@ -226,7 +228,7 @@ private:
 	u16 m_cache_line_addr; // u13
 
 	required_device<at_keyboard_device> m_keyboard;
-	required_ioport_array<3> m_io_mouse;
+	required_ioport_array<4> m_io_mouse;
 
 	required_device<tsconf_beta_device> m_beta;
 	required_device<tsconfdma_device> m_dma;

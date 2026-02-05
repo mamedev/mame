@@ -17,19 +17,22 @@
 ***************************************************************************/
 
 TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type1)
-{   /* col: 0..63; row: 0..31 */
+{
 	/* armed formation */
+	/* col: 0..63; row: 0..31 */
 	return col * 32 + row;
 }
 
 TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type2)
-{   /* col: 0..63; row: 0..31 */
+{
+	/* col: 0..63; row: 0..31 */
 	return 32 * (31 - row) + (col & 0x1f) + 0x800 * (col / 32);
 }
 
 TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type3)
-{   /* col: 0..63; row: 0..31 */
+{
 	/* legion & legiono */
+	/* col: 0..63; row: 0..31 */
 	return 32 * (col & 0x1f) + row + 0x800 * (col / 32);
 }
 
@@ -237,9 +240,8 @@ void armedf_state::bg_scrolly_w(offs_t offset, u16 data, u16 mem_mask)
 ***************************************************************************/
 
 /* custom code to handle color cycling effect, handled by m_spr_pal_clut */
-void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-							u32 code,u32 color, u32 clut,int flipx,int flipy,int offsx,int offsy,
-							bitmap_ind8 &primap, u32 pmask, int transparent_color)
+void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
+		u32 code, u32 color, u32 clut, int flipx, int flipy, int offsx, int offsy, bitmap_ind8 &primap, u32 pmask, int transparent_color)
 {
 	// high bit of the mask is implicitly on
 	pmask |= 1 << 31;
@@ -255,38 +257,42 @@ void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,g
 	x_index_base = flipx ? gfx->width()-1 : 0;
 	y_index = flipy ? gfx->height()-1 : 0;
 
-	/* start coordinates */
+	// start coordinates
 	sx = offsx;
 	sy = offsy;
 
-	/* end coordinates */
+	// end coordinates
 	ex = sx + gfx->width();
 	ey = sy + gfx->height();
 
 	if (sx < clip.min_x)
-	{ /* clip left */
+	{
+		// clip left
 		int pixels = clip.min_x-sx;
 		sx += pixels;
 		x_index_base += xinc*pixels;
 	}
 	if (sy < clip.min_y)
-	{ /* clip top */
+	{
+		// clip top
 		int pixels = clip.min_y-sy;
 		sy += pixels;
 		y_index += yinc*pixels;
 	}
-	/* NS 980211 - fixed incorrect clipping */
 	if (ex > clip.max_x+1)
-	{ /* clip right */
+	{
+		// clip right
 		ex = clip.max_x+1;
 	}
 	if (ey > clip.max_y+1)
-	{ /* clip bottom */
+	{
+		// clip bottom
 		ey = clip.max_y+1;
 	}
 
+	// skip if inner loop doesn't draw anything
 	if (ex > sx)
-	{ /* skip if inner loop doesn't draw anything */
+	{
 		for (int y = sy; y < ey; y++)
 		{
 			u8 const *const source = source_base + y_index*gfx->rowbytes();
@@ -310,21 +316,21 @@ void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,g
 }
 
 
-void armedf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap )
+void armedf_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap)
 {
-	u16 *buffered_spriteram = m_spriteram->buffer();
+	u16 *spriteram = m_spriteram->buffer();
 
 	for (int offs = (m_spriteram->bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
 		u32 pmask = 0;
-		int code = buffered_spriteram[offs + 1]; /* ??YX?TTTTTTTTTTT */
+		int code = spriteram[offs + 1]; /* ??YX?TTTTTTTTTTT */
 		int flipx = code & 0x2000;
 		int flipy = code & 0x1000;
-		int color = (buffered_spriteram[offs + 2] >> 8) & 0x1f;
-		int clut = (buffered_spriteram[offs + 2]) & 0x7f;
-		int sx = buffered_spriteram[offs + 3];
-		int sy = m_sprite_offy + 240 - (buffered_spriteram[offs + 0] & 0x1ff);
-		int pri = ((buffered_spriteram[offs + 0] & 0x3000) >> 12);
+		int color = (spriteram[offs + 2] >> 8) & 0x1f;
+		int clut = (spriteram[offs + 2]) & 0x7f;
+		int sx = spriteram[offs + 3];
+		int sy = m_sprite_offy + 240 - (spriteram[offs + 0] & 0x1ff);
+		int pri = ((spriteram[offs + 0] & 0x3000) >> 12);
 		if (pri == 3) // mimic previous driver behavior, correct?
 			continue;
 

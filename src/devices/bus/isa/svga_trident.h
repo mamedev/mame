@@ -61,7 +61,7 @@ protected:
 	void io_isa_map(address_map &map) ATTR_COLD;
 
 private:
-	required_device<trident_vga_device> m_vga;
+	required_device<tgui9680_device> m_vga;
 };
 
 

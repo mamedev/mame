@@ -17,6 +17,8 @@ public:
 		virtual void write_data(offs_t addr, u16 data, u16 mem_mask) = 0;
 		virtual u16 read_cpu(offs_t addr, u16 mem_mask) = 0;
 		virtual void set_super(bool super) = 0;
+
+		virtual bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) = 0;
 	};
 
 	m68000_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -40,10 +42,16 @@ public:
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 	virtual space_config_vector memory_space_config() const override;
+	virtual space_config_vector memory_logical_space_config() const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
+	void enable_mmu(bool disable_spaces = true);
 	void set_current_mmu(mmu *m);
+
+	// cpu space map with autovectors
+	void default_autovectors_map(address_map &map) ATTR_COLD;
 
 	template <typename... T> void set_tas_write_callback(T &&... args) { m_tas_write_callback.set(std::forward<T>(args)...); }
 	template <typename... T> void set_cmpild_callback(T &&... args) { m_cmpild_instr_callback.set(std::forward<T>(args)...); }
@@ -53,6 +61,17 @@ public:
 	u32 vpa_after(offs_t address);
 
 protected:
+	struct mmu_disabled : public mmu {
+		u16 read_program(offs_t addr, u16 mem_mask) override;
+		void write_program(offs_t addr, u16 data, u16 mem_mask) override;
+		u16 read_data(offs_t addr, u16 mem_mask) override;
+		void write_data(offs_t addr, u16 data, u16 mem_mask) override;
+		u16 read_cpu(offs_t addr, u16 mem_mask) override;
+		void set_super(bool super) override;
+
+		bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
+	};
+
 	// Processor special states
 	// Must match the states array in m68000gen.py
 	enum {
@@ -141,7 +160,8 @@ protected:
 	// Dynamic specifics, depending on supervisor state
 	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_program, m_opcodes;
 
-	// MMU, if one present
+	// MMU, if one present, plus the default one
+	mmu_disabled m_mmu_disabled;
 	mmu *m_mmu;
 
 	bool m_disable_spaces;
@@ -186,9 +206,6 @@ protected:
 
 	// Wrap up an interruption
 	void do_post_run();
-
-	// cpu space map with autovectors
-	void default_autovectors_map(address_map &map) ATTR_COLD;
 
 	// helper for interrupt vector access
 	void start_interrupt_vector_lookup();

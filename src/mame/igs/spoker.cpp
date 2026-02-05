@@ -986,6 +986,39 @@ static INPUT_PORTS_START( spk306us )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spk305us )
+	PORT_INCLUDE(spk306us)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x20, 0x20, "Hopper" )               PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "System Limit" )                PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, "7500" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game Payout Rate" )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, "75%" )
+	PORT_DIPSETTING(    0x00, "85%" )
+	PORT_DIPNAME( 0x20, 0x20, "Show Discard" )                PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, "Hold" )
+	PORT_DIPSETTING(    0x00, "Discard" )
+	PORT_DIPNAME( 0x40, 0x40, "Password" )                PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x0c, 0x0c, "Box Score" )                   PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPSETTING(    0x0c, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x04, "10x" )
+	PORT_DIPSETTING(    0x00, "10x (duplicate)" )
+	PORT_DIPNAME( 0x10, 0x10, "Payout Select" )                 PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, "Hopper" )
+	PORT_DIPSETTING(    0x00, "Ticket" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( spk203us )
 	PORT_INCLUDE(spoker)
 
@@ -1968,6 +2001,22 @@ ROM_START( spk306us )
 	ROM_LOAD( "mx28f2000p_v306_ussp.u34",   0x0000, 0x40000, BAD_DUMP CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
 ROM_END
 
+ROM_START( spk305us ) // IGS PCB-0308-04-FA
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "super_v305-us.u27", 0x00000, 0x10000, CRC(39c35834) SHA1(924f61e3c063e6dc1cc6e8704d3396d1985d45be) )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "super_v305us_1.u33", 0x00000, 0x40000, CRC(2ff04667) SHA1(05629488deeed76ee10f108e6c01c86e02002ba9) )
+	ROM_LOAD( "super_v305us_2.u32", 0x40000, 0x40000, CRC(15961894) SHA1(838a244acb8632555e5a39bb47b5a6b9d984197a) )
+	ROM_LOAD( "super_v305us_3.u31", 0x80000, 0x40000, CRC(071cef0f) SHA1(8cb4b254f58df3af153bac44ed55ae3e1f0efea9) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )
+	ROM_FILL( 0x00000, 0x30000, 0xff ) // filling the whole bank
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "super_v305ussp.u34", 0x00000, 0x40000, CRC(33e6089d) SHA1(cd1ad01e92c18bbeab3fe3ea9152f8b0a3eb1b29) )
+ROM_END
+
 ROM_START( spk205us )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "27c512_v205_us.u27",   0x0000, 0x10000, CRC(4b743c73) SHA1(bd05db13e27dc441e0483b883b770365b2702254) )
@@ -2799,6 +2848,7 @@ void spoker_state::init_3super8()
 
 //    YEAR   NAME           PARENT    MACHINE   INPUT     STATE           INIT                ROT    COMPANY      FULLNAME                            FLAGS
 GAME( 1996,  spk306us,      0,        spokeru,  spk306us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v306US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1996,  spk305us,      spk306us, spokeru,  spk305us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v305US)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk205us,      spk306us, spokeru,  spk203us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v205US)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk203us,      spk306us, spokeru,  spk203us, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v203US)",             MACHINE_SUPPORTS_SAVE ) // LS1. 8 203US in test mode
 GAME( 1996,  spk201ua,      spk306us, spokeru,  spk201ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v201UA)",             MACHINE_SUPPORTS_SAVE ) // still shows 200UA in test mode

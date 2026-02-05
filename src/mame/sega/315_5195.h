@@ -70,6 +70,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD { update_mapping(); }
 
 private:
 	TIMER_CALLBACK_MEMBER(write_to_sound);
@@ -78,11 +79,11 @@ private:
 	// internal region struct
 	struct region_info
 	{
-		offs_t  size_mask;
-		offs_t  base;
-		offs_t  mirror;
-		offs_t  start;
-		offs_t  end;
+		offs_t size_mask;
+		offs_t base;
+		offs_t mirror;
+		offs_t start;
+		offs_t end;
 	};
 
 	// helper class for tracking banks mapped to ROM regions
