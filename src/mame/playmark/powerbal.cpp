@@ -16,7 +16,7 @@ Magic Sticks:
 */
 
 #include "emu.h"
-#include "pmcommom.h"
+#include "pmcommon.h"
 
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
