@@ -404,6 +404,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 
 
 	/* ALU */
+	// NOTE: anything but AD2 doesn't update upper 16-bit ALU part
 	switch( (opcode & 0x3c000000) >> 26 )
 	{
 		case 0x0:   /* NOP */
@@ -411,7 +412,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 
 		case 0x1:   /* AND */
 			i3 = m_acl.si & m_pl.si;
-			m_alu = (uint64_t)(uint32_t)i3;
+			m_alu = ((uint32_t)i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z(i3 == 0);
 			SET_C(0);
 			SET_S(i3 < 0);
@@ -419,7 +420,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 
 		case 0x2:   /* OR */
 			i3 = m_acl.si | m_pl.si;
-			m_alu = (uint64_t)(uint32_t)i3;
+			m_alu = ((uint32_t)i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_C(0);
 			SET_S(i3 < 0);
 			/* TODO: Croc and some early Psygnosis games wants Z to be 1 when the result of this one is negative.
@@ -431,7 +432,7 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 
 		case 0x3:   /* XOR */
 			i3 = m_acl.si ^ m_pl.si;
-			m_alu = (uint64_t)(uint32_t)i3;
+			m_alu = ((uint32_t)i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z(i3 == 0);
 			SET_C(0);
 			SET_S(i3 < 0);
@@ -439,32 +440,30 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 
 		case 0x4:   /* ADD */
 			i3 = m_acl.si + m_pl.si;
-			m_alu = (uint64_t)(uint32_t)i3;
-			//SET_Z(i3 == 0);
-			SET_Z( (i3 & s64(0xffffffffffffU)) == 0 );
-			//SET_S(i3 < 0);
-			SET_S( i3 & s64(0x1000000000000U));
-			SET_C(i3 & s64(0x100000000U));
-			SET_V(((i3) ^ (m_acl.si)) & ((i3) ^ (m_pl.si)) & 0x80000000);
+			m_alu = ((uint32_t)i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
+			SET_Z( (i3 & s64(0xffff'ffff'ffffU)) == 0 );
+			SET_S( i3 & s64(0x1'0000'0000'0000U));
+			SET_C(i3 & s64(0x1'0000'0000U));
+			SET_V(((i3) ^ (m_acl.si)) & ((i3) ^ (m_pl.si)) & 0x8000'0000);
 			break;
 
 		case 0x5:   /* SUB */
 			i3 = m_acl.si - m_pl.si;
-			m_alu = (uint64_t)(uint32_t)i3;
+			m_alu = ((uint32_t)i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z(i3 == 0);
-			SET_C(i3 & s64(0x100000000U));
+			SET_C(i3 & s64(0x1'0000'0000U));
 			SET_S(i3 < 0);
-			SET_V(((m_pl.si) ^ (m_acl.si)) & ((m_pl.si) ^ (i3)) & 0x80000000);
+			SET_V(((m_pl.si) ^ (m_acl.si)) & ((m_pl.si) ^ (i3)) & 0x8000'0000);
 			break;
 
 		case 0x6:   /* AD2 */
 			i1 = concat_64((int32_t)m_ph.si,m_pl.si);
 			i2 = concat_64((int32_t)m_ach.si,m_acl.si);
 			m_alu = i1 + i2;
-			SET_Z((m_alu & s64(0xffffffffffffU)) == 0);
-			SET_S((m_alu & s64(0x800000000000U)) > 0);
-			SET_C((m_alu) & s64(0x1000000000000U));
-			SET_V(((m_alu) ^ (i1)) & ((m_alu) ^ (i2)) & s64(0x800000000000U));
+			SET_Z((m_alu & s64(0xffff'ffff'ffffU)) == 0);
+			SET_S((m_alu & s64(0x8000'0000'0000U)) > 0);
+			SET_C((m_alu) & s64(0x1'0000'0000'0000U));
+			SET_V(((m_alu) ^ (i1)) & ((m_alu) ^ (i2)) & s64(0x8000'0000'0000U));
 			break;
 
 		case 0x7:   /* ??? */
@@ -472,16 +471,17 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 			break;
 
 		case 0x8:   /* SR */
-			i3 = (m_acl.si >> 1) | (m_acl.si & 0x80000000);/*MSB does not change*/
-			m_alu = (uint64_t)(uint32_t)i3;
+			// MSB does not change
+			i3 = (m_acl.si >> 1) | (m_acl.si & 0x8000'0000);
+			m_alu = ((uint32_t)i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z(i3 == 0);
 			SET_S(i3 < 0);
-			SET_C(m_acl.ui & 0x80000000);
+			SET_C(m_acl.ui & 0x8000'0000);
 			break;
 
 		case 0x9:   /* RR */
-			i3 = ((m_acl.ui >> 1) & 0x7fffffff) | ((m_acl.ui << 31) & 0x80000000);
-			m_alu = (uint64_t)(uint32_t)i3;
+			i3 = ((m_acl.ui >> 1) & 0x7fff'ffff) | ((m_acl.ui << 31) & 0x8000'0000);
+			m_alu = ((uint32_t)i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );
 			SET_C( m_acl.ui & 0x1 );
@@ -489,18 +489,18 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 
 		case 0xa:   /* SL */
 			i3 = m_acl.si << 1;
-			m_alu = (uint64_t)(uint32_t)i3;
+			m_alu = ((uint32_t)i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );
-			SET_C( m_acl.ui & 0x80000000 );
+			SET_C( m_acl.ui & 0x8000'0000 );
 			break;
 
 		case 0xb:   /* RL */
-			i3 = ((m_acl.si << 1) & 0xfffffffe) | ((m_acl.si >> 31) & 0x1);
-			m_alu = (uint64_t)(uint32_t)i3;
+			i3 = ((m_acl.si << 1) & 0xffff'fffe) | ((m_acl.si >> 31) & 0x1);
+			m_alu = ((uint32_t)i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );
-			SET_C( m_acl.ui & 0x80000000 );
+			SET_C( m_acl.ui & 0x8000'0000 );
 			break;
 
 		case 0xc:
@@ -511,10 +511,10 @@ void scudsp_cpu_device::op_alu(uint32_t opcode)
 
 		case 0xf:   /* RL8 */
 			i3 = rotl_32(m_acl.si, 8);
-			m_alu = i3;
+			m_alu = ((uint32_t)i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z( i3 == 0 );
 			SET_S( i3 < 0 );
-			SET_C( m_acl.si & 0x01000000 );
+			SET_C( m_acl.si & 0x0100'0000 );
 			break;
 	}
 
