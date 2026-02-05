@@ -2409,7 +2409,10 @@ void towns_state::driver_start()
 	save_item(NAME(m_pit_out0));
 	save_item(NAME(m_pit_out1));
 	save_item(NAME(m_pit_out2));
+	save_item(NAME(m_timer0));
+	save_item(NAME(m_timer1));
 	save_item(NAME(m_serial_irq_source));
+	save_item(NAME(m_serial_irq_enable));
 
 	save_item(NAME(m_kb_prev));
 	save_item(NAME(m_prev_pad_mask));
