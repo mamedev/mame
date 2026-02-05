@@ -2901,6 +2901,7 @@ if CPUS["TMS320C5X"] then
 		MAME_DIR .. "src/devices/cpu/tms320c5x/tms320c5x.h",
 		MAME_DIR .. "src/devices/cpu/tms320c5x/320c5x_ops.ipp",
 		MAME_DIR .. "src/devices/cpu/tms320c5x/320c5x_optable.cpp",
+    MAME_DIR .. "src/devices/cpu/tms320c5x/taito_e07.cpp",    -- Taito E07 custom ship TAITO JC SYSTEM TYPE-C
 	}
 end
 

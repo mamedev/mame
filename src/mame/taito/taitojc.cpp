@@ -7,13 +7,19 @@
   Driver by Ville Linde, based on the preliminary driver by David Haywood
 
 Taito custom chips on this hardware:
-- TC0640FIO      : I/O
-- TC0770CMU      : Math co-processor?
-- TC0780FPA x 2  : Polygon/Texture renderer?
-- TC0840GLU      : 2D graphics?
-- TC0870HVP      : Vertex processor?
+- TC0640FIO      : I/O controller (Joystick, buttons, coin meters)
+- TC0770CMU      : Math co-processor? This often acts as a bridge or "Communication Management Unit" between the main CPU (usually a 68000 variant) and the DSPs/Sub-CPUs. It manages the data bus flow.
+- TC0780FPA x 2  : Polygon/Texture renderer? Floating Point Accelerator. These work in pairs (hence the x2) to handle the heavy math required for 3D coordinate transformations.
+- TC0840GLU      : Graphics Logic Unit (2D) It typically handles the 2D overlays (HUD, text, sprites) and combines them with the 3D background before outputting to the monitor.
+- TC0870HVP      : Host Video/Vertex Processor. It works with the FPA chips to process vertex data and feed it into the rasterizer to draw the actual polygons
+- E07-11         : DSP : Digital Signal Processing. It's TMS320C51 + internal rom (4096 words) that contains custom Taito code
 
 TODO:
+- Improve TMS320C51 Code
+- Get original E07-11 Dump
+- Check 68040 potential speed/timing problem
+
+ISSUES:
 - Games are running at wrong speed(unthrottled?) compared to pcb recordings, easily noticeable on sidebs/sidebs2,
   for example the selection screens are too fast, and the driving is almost twice as slow. Even slower after
   the m68k fpu/softfloat update since MAME 0.267.
@@ -24,6 +30,13 @@ TODO:
 - landgear has huge 3d problems on gameplay (CPU comms?)
 - dangcurv DSP program crashes very soon, so no 3d is currently shown. - due to undumped rom? maybe not?
 - add idle skips if possible
+
+INFO:
+
+- Taito E07-11 internal rom doesn't seems to be used during gameplay. It may be a copy-protection.
+- Speed/Timing problem comes from 68040, or unsychronised VBLANK
+- dendego gfx bugs : RAM and title screen and managed by TC0840GLU (2D chipset).
+
 
 BTANB:
 - incorrect perspective textures, visible when close to the camera such as sidebs rear-view mirror
@@ -390,6 +403,7 @@ Notes:
 #include "cpu/m68000/m68040.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "cpu/tms320c5x/tms320c5x.h"
+#include "cpu/tms320c5x/taito_e07.h"    // Custom E07 Taito chipset
 #include "machine/eepromser.h"
 #include "sound/es5506.h"
 #include "sound/okim6295.h"
@@ -555,6 +569,10 @@ void taitojc_state::irq_unk_w(uint8_t data)
 
 uint16_t taitojc_state::dsp_shared_r(offs_t offset)
 {
+  // Debugging log
+  if (m_dsp->pc() == 0x205b)
+        logerror("DSP @ 205b reading shared_ram[%03X] = %04X\n", offset, m_dsp_shared_ram[offset]);
+  // This stays here no matter what
 	return m_dsp_shared_ram[offset];
 }
 
@@ -811,6 +829,10 @@ inline uint16_t muldiv(int16_t ma, int16_t mb, int16_t d)
 
 uint16_t taitojc_state::dsp_math_projection_y_r()
 {
+  // Debug log
+  if (m_dsp->pc() == 0x205b)
+        logerror("DSP @ 205b reading projection_y\n");
+  // This stays here
 	return muldiv(m_projection_data[0], m_viewport_data[0], m_projection_data[2]);
 }
 
@@ -1114,7 +1136,9 @@ void taitojc_state::taitojc(machine_config &config)
 	sub.in_an6_callback().set(FUNC(taitojc_state::hc11_analog_r<6>));
 	sub.in_an7_callback().set(FUNC(taitojc_state::hc11_analog_r<7>));
 
-	TMS320C51(config, m_dsp, XTAL(10'000'000)*4); // 40MHz, clock source = CY7C991
+	// TMS320C51(config, m_dsp, XTAL(10'000'000)*4); // 40MHz, clock source = CY7C991
+  TAITO_E07(config, m_dsp, XTAL(10'000'000)*4); // 40MHz, clock source = CY7C991, Custom Taito_E07 - uses reconstructed internal ROM
+
 	m_dsp->set_addrmap(AS_PROGRAM, &taitojc_state::tms_program_map);
 	m_dsp->set_addrmap(AS_DATA, &taitojc_state::tms_data_map);
 
@@ -1199,7 +1223,7 @@ uint16_t dendego_state::dendego2_dsp_idle_skip_r()
 
 void taitojc_state::init_taitojc()
 {
-	m_has_dsp_hack = true;
+	m_has_dsp_hack = false; // False for now benoit FOR SURE
 
 	if (DSP_IDLESKIP)
 		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16smo_delegate(*this, FUNC(taitojc_state::taitojc_dsp_idle_skip_r)));
@@ -1218,6 +1242,16 @@ void taitojc_state::init_dangcurv()
 	init_taitojc();
 
 	m_has_dsp_hack = false;
+
+  // Patch the dead loop at 0x205c (external ROM)
+  logerror("INFO : We are here in the code : init_taitojc() m_has_dsp_hack = false");
+  // This is a workaround until we understand what it's waiting for
+  logerror("INFO : Workaround uint16_t *dsp_rom = (uint16_t *)memregion('dspgfx')->base() NOT activated for now");
+  // uint16_t *dsp_rom = (uint16_t *)memregion("dspgfx")->base();
+  // 0x205c is in program space, which maps to dspgfx region
+  // Need to calculate the exact offset based on how the boot loader copies it
+  // For now, this is a placeholder - the real patch would go here
+  // logerror("DANGCURV: Would patch DSP 0x205c to 0x7F00 here\n");
 }
 
 
