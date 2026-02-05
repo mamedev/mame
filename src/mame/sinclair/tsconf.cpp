@@ -349,7 +349,7 @@ void tsconf_state::tsconf(machine_config &config)
 	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
 
 	SOFTWARE_LIST(config, "betadisc_list_pent").set_original("spectrum_betadisc_flop");
-	SOFTWARE_LIST(config, "betadisc_list_tsconf").set_original("tsconf_betadisc_flop");
+	SOFTWARE_LIST(config, "tsconf_list").set_original("tsconf");
 }
 
 

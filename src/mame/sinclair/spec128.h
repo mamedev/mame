@@ -33,6 +33,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	virtual void bank3_set_page(u8 page) override;
 	virtual void spectrum_128_update_memory() override;
 	virtual rectangle get_screen_area() override;
 
