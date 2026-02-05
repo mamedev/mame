@@ -27,7 +27,7 @@ license:CC0-1.0
     ROAD RASH                           USA         needs proper dump
     SIDE POCKET                         JAPAN/USA   conflict in current info
     SMURFS                              PAL         we have Rev A, Rev 0 needed (does it exist?)
-    SUPER FUTEBOL                       BRAZIL      TecToy rerelease of wcup90
+    SUPER FUTEBOL                       BRAZIL      Tec Toy rerelease of wcup90
     SUMISEI HOME TANMATSU               JAPAN
     VALIS III                           JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
     WONDER MIDI                         JAPAN
@@ -21998,7 +21998,7 @@ Black screen
 		<year>1992</year>
 		<publisher>Electronic Arts</publisher>
 		<notes><![CDATA[
-Intro/tile has wrong graphics
+GFXs have garbage on bottom (mostly works in teradrive, needs DTACK emulation)
 ]]></notes>
 		<info name="alt_title" value="The Legend of Galahad"/> <!-- European box title -->
 		<part name="cart" interface="megadriv_cart">
@@ -33048,7 +33048,8 @@ No BGMs
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<notes><![CDATA[
-Unemulated expansion bus modem.
+Unemulated [cart] based modem connection.
+Hangs with byte reads at $a11101 in both megadrive and teradrive (should read open bus)
 https://segaretro.org/TeleBradesco_Resid%C3%AAncia
 ]]></notes>
 		<info name="language" value="Portuguese (Brazil)"/>
@@ -38833,10 +38834,14 @@ BGM sometimes goes silent (does several [YM2612] 68k writes without bus)
 		</part>
 	</software>
 
-	<software name="narnia3" cloneof="galahad">
+	<software name="narnia3" cloneof="galahad" supported="partial">
 		<description>Narnia 3 (Russia)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+Same as base galahad
+teradrive: hangs, illegal code 04 in VDP
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1220032">
 				<rom name="narnia 3 (unl).bin" size="1220032" crc="ab69bcd3" sha1="1e6a329d4d2e9ea7f94138ef1c96cb573e34e87c"/>
