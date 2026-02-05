@@ -541,7 +541,7 @@ static INPUT_PORTS_START( 4psimasy )
 	PORT_INCLUDE( nbmjctrl_16 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mhhonban )    // I don't have manual for this game.
+static INPUT_PORTS_START( mhhonban )    // I don't have manual for this game.Here you are.
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )         PORT_DIPLOCATION("DSWA:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
