@@ -88,6 +88,23 @@ void specnext_dma_device::do_read()
 
 TIMER_CALLBACK_MEMBER(specnext_dma_device::clock_w)
 {
+	if (m_dma_delay)
+	{
+		if (m_dma_seq == SEQ_WAIT_READY)
+			return;
+
+		if (m_dma_seq == SEQ_TRANS1_WRITE_DEST)
+		{
+			z80dma_device::clock_w(param);
+			if (m_dma_seq == SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS)
+			{
+				set_busrq(CLEAR_LINE);
+				m_dma_seq = SEQ_WAIT_READY;
+				return;
+			}
+		}
+	}
+
 	if (m_dma_seq == SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS)
 	{
 		m_dma_timer_0 = machine().time().as_ticks(unscaled_clock()) * 8;
@@ -115,6 +132,7 @@ void specnext_dma_device::device_start()
 	z80dma_device::device_start();
 
 	save_item(NAME(m_dma_mode));
+	save_item(NAME(m_dma_delay));
 	save_item(NAME(m_r2_portB_preescaler_s));
 	save_item(NAME(m_dma_timer_0));
 }
@@ -124,6 +142,7 @@ void specnext_dma_device::device_reset()
 	z80dma_device::device_reset();
 
 	m_dma_mode = 0;
+	m_dma_delay = 0;
 	m_r2_portB_preescaler_s = 0;
 	m_dma_timer_0 = 0;
 }
