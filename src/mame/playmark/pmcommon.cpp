@@ -2,7 +2,7 @@
 // Video subsystem elements sharedly used by playmark.cpp powerbal.cpp
 // copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
 #include "emu.h"
-#include "playmark.h"
+#include "pmcommon.h"
 #include "screen.h"
 
 
