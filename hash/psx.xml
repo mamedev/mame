@@ -38309,6 +38309,25 @@ Corrupted sound on title menu and during gameplay
 		</part>
 	</software>
 
+	<!-- no boot -->
+	<software name="crimecr" supported="no">
+		<!--
+		redump.org/disc/5729
+		<rom name="Crime Crackers (Japan).bin" size="451856832" crc="769a374d" sha1="b22009a123bf22730af62295a9c13a9f0339b873"/>
+		<rom name="Crime Crackers (Japan).cue" size="88" crc="a46219f3" sha1="7ff074def82d83d1b16889ef056ad4783869730d"/>
+		-->
+		<description>Crime Crackers (Japan)</description>
+		<year>1994</year>
+		<publisher>SCEI</publisher>
+		<info name="alt_title" value="クライムクラッカーズ"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="crime crackers (japan)" sha1="64d397189dd5acb496c9ea2da2398a2201c6c1f9"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- http://redump.org/disc/15743/ -->
 	<software name="depth">
 		<description>Depth (Japan)</description>
@@ -38464,6 +38483,24 @@ Corrupted sound on title menu and during gameplay
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Sampras Extreme Tennis (Japan)" sha1="76dbafcea032d529a5a3fb762121a05f485bec03"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rayblade">
+		<!--
+		redump.org/disc/11517
+		<rom name="Seireiki Rayblade (Japan) (Track 1).bin" size="643965840" crc="6207c863" sha1="cf33a1b9c0d144205a4da0f53b9339a453e9b591"/>
+		<rom name="Seireiki Rayblade (Japan) (Track 2).bin" size="32104800" crc="9b94ea54" sha1="bd1fde88c2b79e3cf8821c969373460d51f3155a"/>
+		<rom name="Seireiki Rayblade (Japan).cue" size="220" crc="c4abe81d" sha1="55ff32e9c35108f70d726bf743757149c8e688b1"/>
+		-->
+		<description>Seireiki RayBlade (Japan)</description>
+		<year>2000</year>
+		<publisher>Winky Soft</publisher>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="seireiki rayblade (japan)" sha1="ff0432e33cdbaf98b6522650a591ff94a9d0569c"/>
 			</diskarea>
 		</part>
 	</software>
