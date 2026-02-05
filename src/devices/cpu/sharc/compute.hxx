@@ -8,10 +8,10 @@
 
 #define SET_FLAG_AZ(r)          { m_core->astat |= (((r) == 0) ? AZ : 0); }
 #define SET_FLAG_AN(r)          { m_core->astat |= (((r) & 0x80000000) ? AN : 0); }
-#define SET_FLAG_AC_ADD(r,a,b)  { m_core->astat |= (((uint32_t)r < (uint32_t)a) ? AC : 0); }
+#define SET_FLAG_AC_ADD(r,a,b)  { m_core->astat |= ((uint32_t(r) < uint32_t(a)) ? AC : 0); }
 #define SET_FLAG_AV_ADD(r,a,b)  { m_core->astat |= (((~((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); }
-#define SET_FLAG_AC_SUB(r,a,b)  { m_core->astat |= ((!((uint32_t)a < (uint32_t)b)) ? AC : 0); }
-#define SET_FLAG_AV_SUB(r,a,b)  { m_core->astat |= ((( ((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); }
+#define SET_FLAG_AC_SUB(r,a,b)  { m_core->astat |= (!(uint32_t(a) < uint32_t(b)) ? AC : 0); }
+#define SET_FLAG_AV_SUB(r,a,b)  { m_core->astat |= (((((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); }
 
 #define IS_FLOAT_ZERO(r)        ((((r) & 0x7fffffff) == 0))
 #define IS_FLOAT_DENORMAL(r)    ((((r) & 0x7f800000) == 0) && (((r) & 0x7fffff) != 0))
@@ -21,10 +21,10 @@
 #define CLEAR_MULTIPLIER_FLAGS()    (m_core->astat &= ~(MN|MV|MU|MI))
 
 #define SET_FLAG_MN(r)          { m_core->astat |= (((r) & 0x80000000) ? MN : 0); }
-#define SET_FLAG_MV(r)          { m_core->astat |= ((((uint32_t)((r) >> 32) != 0) && ((uint32_t)((r) >> 32) != 0xffffffff)) ? MV : 0); }
+#define SET_FLAG_MV(r)          { m_core->astat |= (((uint32_t((r) >> 32) != 0) && (uint32_t((r) >> 32) != 0xffffffff)) ? MV : 0); }
 
 /* TODO: MU needs 80-bit result */
-#define SET_FLAG_MU(r)          { m_core->astat |= ((((uint32_t)((r) >> 32) == 0) && ((uint32_t)(r)) != 0) ? MU : 0); }
+#define SET_FLAG_MU(r)          { m_core->astat |= (((uint32_t((r) >> 32) == 0) && (uint32_t(r)) != 0) ? MU : 0); }
 
 
 #define FLOAT_SIGN          0x80000000
@@ -359,7 +359,7 @@ uint32_t adsp21062_device::SCALB(SHARC_REG rx, int ry)
 	uint32_t sign = rx.r & FLOAT_SIGN;
 
 	int exponent = ((rx.r >> 23) & 0xff) - 127;
-	exponent += (int32_t)(REG(ry));
+	exponent += int32_t(REG(ry));
 
 	if (exponent > 127)
 	{
@@ -410,7 +410,7 @@ void adsp21062_device::compute_fix(int rn, int rx)
 	}
 	else
 	{
-		alu_i = int32_t(lroundf(r_alu.f));
+		alu_i = int32_t(nearbyintf(r_alu.f)); // assume rounding mode is set to FE_TONEAREST
 	}
 
 	CLEAR_ALU_FLAGS();
@@ -440,7 +440,7 @@ void adsp21062_device::compute_fix_scaled(int rn, int rx, int ry)
 	}
 	else
 	{
-		alu_i = int32_t(lroundf(r_alu.f));
+		alu_i = int32_t(nearbyintf(r_alu.f)); // assume rounding mode is set to FE_TONEAREST
 	}
 
 	CLEAR_ALU_FLAGS();
@@ -461,7 +461,7 @@ void adsp21062_device::compute_fix_scaled(int rn, int rx, int ry)
 void adsp21062_device::compute_float_scaled(int rn, int rx, int ry)
 {
 	SHARC_REG x;
-	x.f = (float)(int32_t)(REG(rx));
+	x.f = float(int32_t(REG(rx)));
 
 	// verified
 	CLEAR_ALU_FLAGS();
@@ -1215,7 +1215,7 @@ void adsp21062_device::compute_fmul_float_scaled(int fm, int fxm, int fym, int f
 	SHARC_REG r_mul, r_alu;
 	r_mul.f = FREG(fxm) * FREG(fym);
 
-	x.f = (float)(int32_t)REG(fxa);
+	x.f = float(int32_t(REG(fxa)));
 
 	r_alu.r = SCALB(x, fya);
 

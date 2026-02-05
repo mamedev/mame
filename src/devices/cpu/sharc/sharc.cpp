@@ -121,10 +121,9 @@ adsp21062_device::~adsp21062_device()
 
 device_memory_interface::space_config_vector adsp21062_device::memory_space_config() const
 {
-	return space_config_vector {
-		std::make_pair(AS_PROGRAM, &m_program_config),
-		std::make_pair(AS_DATA,    &m_data_config)
-	};
+	return space_config_vector{
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_DATA,    &m_data_config) };
 }
 
 std::unique_ptr<util::disasm_interface> adsp21062_device::create_disassembler()
@@ -134,6 +133,8 @@ std::unique_ptr<util::disasm_interface> adsp21062_device::create_disassembler()
 
 void adsp21062_device::enable_recompiler()
 {
+	if (has_running_machine() && (machine().phase() > machine_phase::INIT))
+		throw emu_fatalerror("SHARC: enable_recompiler: changing mode after starting\n");
 	m_enable_drc = allow_drc();
 }
 
@@ -176,7 +177,8 @@ TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_iop_delayed_write_callback)
 			break;
 		}
 
-		default:    fatalerror("SHARC: sharc_iop_delayed_write: unknown IOP register %02X\n", m_core->iop_delayed_reg);
+		default:
+			throw emu_fatalerror("SHARC: sharc_iop_delayed_write: unknown IOP register %02X\n", m_core->iop_delayed_reg);
 	}
 
 	m_core->delayed_iop_timer->adjust(attotime::never, 0);
@@ -290,8 +292,8 @@ uint32_t adsp21062_device::iop_r(offs_t offset)
 			return m_core->dma_status;
 		}
 		default:
-		if(!machine().side_effects_disabled())
-			fatalerror("sharc_iop_r: Unimplemented IOP reg %02X at %08X\n", offset, m_core->pc);
+		if (!machine().side_effects_disabled())
+			throw emu_fatalerror("sharc_iop_r: Unimplemented IOP reg %02X at %08X\n", offset, m_core->pc);
 
 		return 0;
 	}
@@ -383,7 +385,8 @@ void adsp21062_device::iop_w(offs_t offset, uint32_t data)
 		case 0x4e: m_core->dma[7].ext_modifier = data; return;
 		case 0x4f: m_core->dma[7].ext_count = data; return;
 
-		default:        fatalerror("sharc_iop_w: Unimplemented IOP reg %02X, %08X at %08X\n", offset, data, m_core->pc);
+		default:
+			throw emu_fatalerror("sharc_iop_w: Unimplemented IOP reg %02X, %08X at %08X\n", offset, data, m_core->pc);
 	}
 }
 
@@ -417,7 +420,7 @@ void adsp21062_device::build_opcode_table()
 			auto &opcode = s_sharc_opcode_table[j++];
 			if ((opcode.op_mask & op) == opcode.op_bits)
 			{
-				fatalerror("build_opcode_table: table already filled! (i=%04X, j=%d)\n", i, j);
+				throw emu_fatalerror("build_opcode_table: table already filled! (i=%04X, j=%d)\n", i, j);
 			}
 		}
 	}
@@ -485,7 +488,7 @@ void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 		}
 		default:
 		{
-			fatalerror("sharc_external_dma_write: unimplemented packing mode %d\n", (m_core->dma[6].control >> 6) & 0x3);
+			throw emu_fatalerror("sharc_external_dma_write: unimplemented packing mode %d\n", (m_core->dma[6].control >> 6) & 0x3);
 		}
 	}
 }
@@ -940,7 +943,7 @@ void adsp21062_device::device_reset()
 		}
 
 		default:
-			fatalerror("SHARC: Unimplemented boot mode %d\n", m_boot_mode);
+			throw emu_fatalerror("SHARC: Unimplemented boot mode %d\n", m_boot_mode);
 	}
 
 	m_core->pc = 0x20004;
@@ -962,6 +965,70 @@ void adsp21062_device::device_reset()
 
 	if (m_enable_drc)
 		m_drcfe->flush();
+}
+
+void adsp21062_device::device_pre_save()
+{
+	cpu_device::device_pre_save();
+
+	if (m_enable_drc)
+	{
+		auto const pack_astat =
+				[] (ASTAT_DRC const &in) -> uint32_t
+				{
+					return
+							((in.az << AZ_SHIFT) & AZ) |
+							((in.av << AV_SHIFT) & AV) |
+							((in.an << AN_SHIFT) & AN) |
+							((in.ac << AC_SHIFT) & AC) |
+							((in.as << AS_SHIFT) & AS) |
+							((in.ai << AI_SHIFT) & AI) |
+							((in.mn << MN_SHIFT) & MN) |
+							((in.mv << MV_SHIFT) & MV) |
+							((in.mu << MU_SHIFT) & MU) |
+							((in.mi << MI_SHIFT) & MI) |
+							((in.sv << SV_SHIFT) & SV) |
+							((in.sz << SZ_SHIFT) & SZ) |
+							((in.ss << SS_SHIFT) & SS) |
+							((in.btf << BTF_SHIFT) & BTF) |
+							((in.af << AF_SHIFT) & AF) |
+							((in.cacc << 24) & 0xff00'0000);
+				};
+
+		m_core->astat = pack_astat(m_core->astat_drc);
+		m_core->astat_old = pack_astat(m_core->astat_drc_copy);
+		m_core->astat_old_old = pack_astat(m_core->astat_delay_copy);
+	}
+}
+
+void adsp21062_device::device_post_load()
+{
+	auto const unpack_astat =
+			[] (ASTAT_DRC &out, uint32_t in)
+			{
+				out.az = BIT(in, AZ_SHIFT);
+				out.av = BIT(in, AV_SHIFT);
+				out.an = BIT(in, AN_SHIFT);
+				out.ac = BIT(in, AC_SHIFT);
+				out.as = BIT(in, AS_SHIFT);
+				out.ai = BIT(in, AI_SHIFT);
+				out.mn = BIT(in, MN_SHIFT);
+				out.mv = BIT(in, MV_SHIFT);
+				out.mu = BIT(in, MU_SHIFT);
+				out.mi = BIT(in, MI_SHIFT);
+				out.sv = BIT(in, SV_SHIFT);
+				out.sz = BIT(in, SZ_SHIFT);
+				out.ss = BIT(in, SS_SHIFT);
+				out.btf = BIT(in, BTF_SHIFT);
+				out.af = BIT(in, AF_SHIFT);
+				out.cacc = BIT(in, 24, 8);
+			};
+
+	cpu_device::device_post_load();
+
+	unpack_astat(m_core->astat_drc, m_core->astat);
+	unpack_astat(m_core->astat_drc_copy, m_core->astat_old);
+	unpack_astat(m_core->astat_delay_copy, m_core->astat_old_old);
 }
 
 
@@ -995,7 +1062,7 @@ void adsp21062_device::set_flag_input(int flag_num, int state)
 		}
 		else
 		{
-			fatalerror("sharc_set_flag_input: flag %d is set output!\n", flag_num);
+			throw emu_fatalerror("sharc_set_flag_input: flag %d is set output!\n", flag_num);
 		}
 	}
 }
@@ -1144,12 +1211,12 @@ void adsp21062_device::execute_run()
 				}
 				case 1:     // counter-based, length 1
 				{
-					//fatalerror("SHARC: counter-based loop, length 1 at %08X\n", m_pc);
+					//throw emu_fatalerror("SHARC: counter-based loop, length 1 at %08X\n", m_pc);
 					//break;
 				}
 				case 2:     // counter-based, length 2
 				{
-					//fatalerror("SHARC: counter-based loop, length 2 at %08X\n", m_pc);
+					//throw emu_fatalerror("SHARC: counter-based loop, length 2 at %08X\n", m_pc);
 					//break;
 				}
 				case 3:     // counter-based, length >2

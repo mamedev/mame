@@ -14,44 +14,6 @@
 #define SHARC_INPUT_FLAG3       6
 
 
-// STKY flags
-#define AUS     0x1         /* ALU floating-point underflow */
-#define AVS     0x2         /* ALU floating-point overflow */
-#define AOS     0x4         /* ALU fixed-point overflow */
-#define AIS     0x20        /* ALU floating-point invalid operation */
-
-// MODE1 flags
-#define MODE1_BR8           0x1         /* Bit-reverse for I8 */
-#define MODE1_BR0           0x2         /* Bit-reverse for I0 */
-#define MODE1_SRCU          0x4         /* Alternate register select for computational units */
-#define MODE1_SRD1H         0x8         /* DAG alternate register select (7-4) */
-#define MODE1_SRD1L         0x10        /* DAG alternate register select (3-0) */
-#define MODE1_SRD2H         0x20        /* DAG alternate register select (15-12) */
-#define MODE1_SRD2L         0x40        /* DAG alternate register select (11-8) */
-#define MODE1_SRRFH         0x80        /* Register file alternate select for R(15-8) */
-#define MODE1_SRRFL         0x400       /* Register file alternate select for R(7-0) */
-#define MODE1_NESTM         0x800       /* Interrupt nesting enable */
-#define MODE1_IRPTEN        0x1000      /* Global interrupt enable */
-#define MODE1_ALUSAT        0x2000      /* Enable ALU fixed-point saturation */
-#define MODE1_SSE           0x4000      /* Enable short word sign extension */
-#define MODE1_TRUNCATE      0x8000      /* (1) Floating-point truncation / (0) round to nearest */
-#define MODE1_RND32         0x10000     /* (1) 32-bit floating-point rounding / (0) 40-bit rounding */
-#define MODE1_CSEL          0x60000     /* CSelect */
-
-// MODE2 flags
-#define MODE2_IRQ0E         0x1         /* IRQ0 (1) Edge sens. / (0) Level sens. */
-#define MODE2_IRQ1E         0x2         /* IRQ1 (1) Edge sens. / (0) Level sens. */
-#define MODE2_IRQ2E         0x4         /* IRQ2 (1) Edge sens. / (0) Level sens. */
-#define MODE2_CADIS         0x10        /* Cache disable */
-#define MODE2_TIMEN         0x20        /* Timer enable */
-#define MODE2_BUSLK         0x40        /* External bus lock */
-#define MODE2_FLG0O         0x8000      /* FLAG0 (1) Output / (0) Input */
-#define MODE2_FLG1O         0x10000     /* FLAG1 (1) Output / (0) Input */
-#define MODE2_FLG2O         0x20000     /* FLAG2 (1) Output / (0) Input */
-#define MODE2_FLG3O         0x40000     /* FLAG3 (1) Output / (0) Input */
-#define MODE2_CAFRZ         0x80000     /* Cache freeze */
-
-
 #define OP_USERFLAG_COUNTER_LOOP            0x00000001
 #define OP_USERFLAG_COND_LOOP               0x00000002
 #define OP_USERFLAG_COND_FIELD              0x000003fc
@@ -128,28 +90,28 @@ public:
 	uint32_t iop_r(offs_t offset);
 	void iop_w(offs_t offset, uint32_t data);
 
-	enum ASTAT_FLAGS
+	enum ASTAT_FLAGS : uint32_t
 	{
 		// ASTAT flags
-		AZ =    0x1,         /* ALU result zero */
-		AV =    0x2,         /* ALU overflow */
-		AN =    0x4,         /* ALU result negative */
-		AC =    0x8,         /* ALU fixed-point carry */
-		AS =    0x10,        /* ALU X input sign */
-		AI =    0x20,        /* ALU floating-point invalid operation */
-		MN =    0x40,        /* Multiplier result negative */
-		MV =    0x80,        /* Multiplier overflow */
-		MU =    0x100,       /* Multiplier underflow */
-		MI =    0x200,       /* Multiplier floating-point invalid operation */
-		AF =    0x400,
-		SV =    0x800,      /* Shifter overflow */
-		SZ =    0x1000,     /* Shifter result zero */
-		SS =    0x2000,     /* Shifter input sign */
-		BTF =   0x40000,    /* Bit Test Flag */
-		FLG0 =  0x80000,    /* FLAG0 */
-		FLG1 =  0x100000,   /* FLAG1 */
-		FLG2 =  0x200000,   /* FLAG2 */
-		FLG3 =  0x400000    /* FLAG3 */
+		AZ =    0x000001,   // ALU result zero
+		AV =    0x000002,   // ALU overflow
+		AN =    0x000004,   // ALU result negative
+		AC =    0x000008,   // ALU fixed-point carry
+		AS =    0x000010,   // ALU X input sign
+		AI =    0x000020,   // ALU floating-point invalid operation
+		MN =    0x000040,   // Multiplier result negative
+		MV =    0x000080,   // Multiplier overflow
+		MU =    0x000100,   // Multiplier underflow
+		MI =    0x000200,   // Multiplier floating-point invalid operation
+		AF =    0x000400,
+		SV =    0x000800,   // Shifter overflow
+		SZ =    0x001000,   // Shifter result zero
+		SS =    0x002000,   // Shifter input sign
+		BTF =   0x040000,   // Bit Test Flag
+		FLG0 =  0x080000,   // FLAG0
+		FLG1 =  0x100000,   // FLAG1
+		FLG2 =  0x200000,   // FLAG2
+		FLG3 =  0x400000    // FLAG3
 	};
 
 	enum ASTAT_SHIFT
@@ -202,24 +164,65 @@ public:
 
 	void internal_data(address_map &map) ATTR_COLD;
 	void internal_pgm(address_map &map) ATTR_COLD;
+
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_pre_save() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override { return 8; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 8; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	// STKY flags
+	static constexpr uint32_t AUS =             0x0000'0001;    // ALU floating-point underflow
+	static constexpr uint32_t AVS =             0x0000'0002;    // ALU floating-point overflow
+	static constexpr uint32_t AOS =             0x0000'0004;    // ALU fixed-point overflow
+	static constexpr uint32_t AIS =             0x0000'0020;    // ALU floating-point invalid operation
+
+	// MODE1 flags
+	static constexpr uint32_t MODE1_BR8 =       0x0000'0001;    // Bit-reverse for I8
+	static constexpr uint32_t MODE1_BR0 =       0x0000'0002;    // Bit-reverse for I0
+	static constexpr uint32_t MODE1_SRCU =      0x0000'0004;    // Alternate register select for computational units
+	static constexpr uint32_t MODE1_SRD1H =     0x0000'0008;    // DAG alternate register select (7-4)
+	static constexpr uint32_t MODE1_SRD1L =     0x0000'0010;    // DAG alternate register select (3-0)
+	static constexpr uint32_t MODE1_SRD2H =     0x0000'0020;    // DAG alternate register select (15-12)
+	static constexpr uint32_t MODE1_SRD2L =     0x0000'0040;    // DAG alternate register select (11-8)
+	static constexpr uint32_t MODE1_SRRFH =     0x0000'0080;    // Register file alternate select for R(15-8)
+	static constexpr uint32_t MODE1_SRRFL =     0x0000'0400;    // Register file alternate select for R(7-0)
+	static constexpr uint32_t MODE1_NESTM =     0x0000'0800;    // Interrupt nesting enable
+	static constexpr uint32_t MODE1_IRPTEN =    0x0000'1000;    // Global interrupt enable
+	static constexpr uint32_t MODE1_ALUSAT =    0x0000'2000;    // Enable ALU fixed-point saturation
+	static constexpr uint32_t MODE1_SSE =       0x0000'4000;    // Enable short word sign extension
+	static constexpr uint32_t MODE1_TRUNCATE =  0x0000'8000;    // (1) Floating-point truncation / (0) round to nearest
+	static constexpr uint32_t MODE1_RND32 =     0x0001'0000;    // (1) 32-bit floating-point rounding / (0) 40-bit rounding
+	static constexpr uint32_t MODE1_CSEL =      0x0006'0000;    // CSelect
+
+	// MODE2 flags
+	static constexpr uint32_t MODE2_IRQ0E =     0x0000'0001;    // IRQ0 (1) Edge sens. / (0) Level sens.
+	static constexpr uint32_t MODE2_IRQ1E =     0x0000'0002;    // IRQ1 (1) Edge sens. / (0) Level sens.
+	static constexpr uint32_t MODE2_IRQ2E =     0x0000'0004;    // IRQ2 (1) Edge sens. / (0) Level sens.
+	static constexpr uint32_t MODE2_CADIS =     0x0000'0010;    // Cache disable
+	static constexpr uint32_t MODE2_TIMEN =     0x0000'0020;    // Timer enable
+	static constexpr uint32_t MODE2_BUSLK =     0x0000'0040;    // External bus lock
+	static constexpr uint32_t MODE2_FLG0O =     0x0000'8000;    // FLAG0 (1) Output / (0) Input
+	static constexpr uint32_t MODE2_FLG1O =     0x0001'0000;    // FLAG1 (1) Output / (0) Input
+	static constexpr uint32_t MODE2_FLG2O =     0x0002'0000;    // FLAG2 (1) Output / (0) Input
+	static constexpr uint32_t MODE2_FLG3O =     0x0004'0000;    // FLAG3 (1) Output / (0) Input
+	static constexpr uint32_t MODE2_CAFRZ =     0x0008'0000;    // Cache freeze
+
+
 	struct alignas(16) SHARC_DAG
 	{
 		uint32_t i[8];
