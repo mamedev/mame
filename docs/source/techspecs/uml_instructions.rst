@@ -283,7 +283,8 @@ HASH
 Associate a location with the specified mode and emulated program
 counter values.  The :ref:`HASHJMP <umlinst-hashjmp>` instruction may be
 used to transfer control to the location associated with a mode and
-emulated program counter value.
+emulated program counter value.  HASH instructions are not permitted in
+invariant code blocks.
 
 This is usually used to mark the location of the generated code for an
 emulated instruction or sequence of instructions.

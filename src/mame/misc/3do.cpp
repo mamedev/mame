@@ -7,14 +7,23 @@
 Driver file to handle emulation of the 3DO systems
 
 TODO:
-- Fix Xbus directions in Clio (takes forever for everything below);
-- Fix DSPP mapping (incompatible with later M2, consider an "opera_host_map" instead);
-- 3do_fz1: draws a tray open CD at top of VRAM space once it throws an error from GetCDType;
-- 3do_hc21: as above plus "Directory /remote not found";
-- 3do_fz10: as above;
+- Incomplete XBus/CD drive semantics
+\- 3do disks fail to be recognized, reads Avatar structure, decides they aren't worth and moves on;
+\- Photo CD bails out at startup with error -8021 (unless A is held on 3do_fz10e & Sanyo based
+   romsets, where first picture is loaded then bails out anyway)
+\- Audio CD black screen (needs DSPP irq), has plenty of Cel, VDLP and sport issues later
+   (reads random port, asks for audio tracks *with* subcode);
+- Incomplete DSPP mapping
+\- Most notably it should restart on counter reloads (bp 38,1,{pc=0;g} to bypass hang in 3do_fz1)
+- Replace ARM7 with ARM60;
+- Fix VRAM size (should be 1 MB, but every single BIOS fails to boot with that, wrong ARM type?);
+- CEL engine should really halt main CPU when running, paused only when irqs are taken;
+- MMU (user programs will need it);
+- 3do_fz1: black screen after insert disk screen (needs DSPP irq);
+- 3do_hc21 (bios 0): some intermediate garbage on top-left of CELs;
 - 3do_gdo101: errors on DSPP semaphore, hacked to make it boot;
-- 3do_try: throws "QueueSport error on cmd 4: xfer across 1M boundary", has issues with layer
-  clearances, never really pings Sport DMA (?);
+- 3do_try, 3do_hc21 (bios 1): throws "QueueSport error on cmd 4: xfer across 1M boundary",
+  has issues with layer clearances, never really pings Sport DMA, needs smaller VRAM?
 - 3do_fc2: same as above
 - 3do_fc1: hangs on OpenDiskFile at PC=2e6dc, path="/rom/system/tasks/shell", will "give up" if
   skipped.
@@ -91,7 +100,7 @@ Models:
 - Creative 3DO Blaster - PC Card (ISA)
 - Panasonic N-1005 "Robo" 3DO (Japan), based on FZ-1 with 5x CD media changer and VCD adapter
   built-in
-- a Scientific Atlanta STT, with a Nicky device in BIGTRACE space
+- a Scientific Atlanta Set Top Terminal, with a Nicky device in BIGTRACE space
 
 ===================================================================================================
 
@@ -138,7 +147,7 @@ void _3do_state::main_mem(address_map &map)
 	map(0x0000'0000, 0x001F'FFFF).view(m_overlay_view);
 	m_overlay_view[0](0x0000'0000, 0x001F'FFFF).rom().region("bios", 0).lw8(NAME([this] (offs_t offset) { m_overlay_view.disable(); }));
 	map(0x0020'0000, 0x003F'FFFF).ram().share(m_vram);                                   /* VRAM */
-	map(0x0300'0000, 0x030F'FFFF).rom().region("bios", 0);                               /* BIOS */
+	map(0x0300'0000, 0x030F'FFFF).m(m_bankdev, FUNC(address_map_bank_device::amap32));   /* BIOS */
 	// slow bus
 	map(0x0310'0000, 0x0313'FFFF).ram();                                                 /* Brooktree? */
 	map(0x0314'0000, 0x0315'FFFF).mirror(0x20000).rw(FUNC(_3do_state::nvarea_r), FUNC(_3do_state::nvarea_w)).umask32(0x000000ff);                /* NVRAM */
@@ -156,6 +165,11 @@ void _3do_state::main_mem(address_map &map)
 //  map(0x0380'0000, 0x03??'????) trace big RAM
 }
 
+void _3do_state::bios_mem(address_map &map)
+{
+	map(0x0000'0000, 0x000F'FFFF).rom().region("bios", 0);
+	map(0x0010'0000, 0x001F'FFFF).rom().region("kanji", 0);
+}
 
 static INPUT_PORTS_START( 3do )
 	PORT_START("P1.0")
@@ -190,8 +204,9 @@ void _3do_state::machine_start()
 
 void _3do_state::machine_reset()
 {
-	/* start with overlay enabled */
+	// start with overlay enabled, and bank pointing at BIOS
 	m_overlay_view.select(0);
+	m_bankdev->set_bank(0);
 }
 
 
@@ -223,6 +238,17 @@ void _3do_state::green_config(machine_config &config)
 		address_space &space = m_maincpu->space();
 		space.write_dword(offset, data, 0xffff'ffff);
 	});
+	// TODO: disregard enable and cmd, those needs to be from xbus
+	m_madam->dma_exp_read_cb().set([this] () {
+		// ... in particular, 3do_fz1j and audio CD player will deselect during a DMA transfer (?)
+		m_cdrom->enable_w(0);
+		m_cdrom->cmd_w(1);
+		u8 res = m_cdrom->read();
+		m_cdrom->cmd_w(0);
+		return res;
+	});
+	m_madam->arm_ctl_cb().set(m_clio, FUNC(clio_device::arm_ctl_w));
+	m_madam->irq_dexp_cb().set(m_clio, FUNC(clio_device::dexp_w));
 	m_madam->playerbus_read_cb().set([this] (offs_t offset) -> u32 {
 		if (offset == 0)
 			return (m_p1_r[0]->read() << 24) | (m_p1_r[1]->read() << 16);
@@ -234,10 +260,14 @@ void _3do_state::green_config(machine_config &config)
 
 	CLIO(config, m_clio, XTAL(50'000'000)/4);
 	m_clio->firq_cb().set([this] (int state) {
-		if (state)
-			m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+		//if (state)
+		//  m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	});
 	m_clio->set_screen_tag("screen");
+	m_clio->xbus_sel_cb().set([this] (u8 data) {
+		m_cdrom->enable_w(data != 0);
+	});
 	m_clio->xbus_read_cb().set([this] (offs_t offset) -> u8 {
 		if (offset == 0)
 		{
@@ -249,16 +279,18 @@ void _3do_state::green_config(machine_config &config)
 	m_clio->xbus_write_cb().set([this] (offs_t offset, u8 data) {
 		if (offset == 0)
 		{
-			m_cdrom->enable_w(0);
 			m_cdrom->cmd_w(0);
 			m_cdrom->write(data);
 			return;
 		}
-		m_cdrom->enable_w(1);
 		m_cdrom->cmd_w(1);
 	});
+	m_clio->exp_dma_enable_cb().set(m_madam, FUNC(madam_device::exp_dma_req_w));
 	m_clio->vsync_cb().set(m_madam, FUNC(madam_device::vdlp_start_w));
 	m_clio->hsync_cb().set(m_madam, FUNC(madam_device::vdlp_continue_w));
+	m_clio->adb_out_cb<2>().set([this] (int state) { m_bankdev->set_bank(state & 1); });
+
+	ADDRESS_MAP_BANK(config, m_bankdev).set_map(&_3do_state::bios_mem).set_options(ENDIANNESS_BIG, 32, (20 + 1), 0x100000);
 
 	AMY(config, m_amy, XTAL(50'000'000)/4);
 	m_amy->set_screen("screen");
@@ -269,9 +301,9 @@ void _3do_state::green_config(machine_config &config)
 	m_cdrom->set_interface("cdrom");
 //  m_cdrom->scor_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
 //  m_cdrom->stch_cb().set(m_clio, FUNC(clio_device::xbus...)).invert();
-//  m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus...));
+//  m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_rdy_w)).invert();
 	m_cdrom->sten_cb().set(m_clio, FUNC(clio_device::xbus_int_w)).invert();
-//  m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus...));
+	m_cdrom->drq_cb().set(m_clio, FUNC(clio_device::xbus_wr_w));
 
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[0], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[1], 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
@@ -293,7 +325,9 @@ void _3do_state::_3do(machine_config &config)
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	// TODO: proper params (mostly running in interlace mode)
-	m_screen->set_raw(X2_CLOCK_NTSC / 2, 1592, 254, 1534, 263, 22, 262);
+	// htotal=1592 according to page 36 of HW spec, this is off wrt 15.734 kHz spec
+	// (half clocks during HSync?)
+	m_screen->set_raw(X2_CLOCK_NTSC / 2, 1560, 254, 1534, 263, 22, 262);
 	m_screen->set_screen_update(m_amy, FUNC(amy_device::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
@@ -314,9 +348,12 @@ void _3do_state::_3do_pal(machine_config &config)
 	green_config(config);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: proper params
-	m_screen->set_raw(X2_CLOCK_PAL / 2, 1592, 254, 1534, 313, 22, 312);
+	// TODO: as above, actual params are unknown
+	// assumed 15.625 kHz as per PAL spec, display range looks a bit off
+	m_screen->set_raw(X2_CLOCK_PAL / 2, 1888, 254, 1790, 313, 22, 312);
 	m_screen->set_screen_update(m_amy, FUNC(amy_device::screen_update));
+	m_amy->set_is_pal(true);
+	m_madam->set_is_pal(true);
 
 	SPEAKER(config, "speaker", 2).front();
 
@@ -341,8 +378,7 @@ ROM_START(3do_fz1)
 	ROM_SYSTEM_BIOS( 2, "deva", "Development FZ-1 USA (later)" )
 	ROMX_LOAD( "panafz1_dev.bin", 0x000000, 0x100000, CRC(e8eba9dd) SHA1(4cb4ee36e0f5bc0995d34992b4f241c420d49b2e), ROM_BIOS(2) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START(3do_fz1e)
@@ -352,8 +388,7 @@ ROM_START(3do_fz1e)
 	ROM_SYSTEM_BIOS( 1, "unencrypted", "Unencrypted FZ-1 Europe" )
 	ROMX_LOAD( "panafz1e-unencrypted.bin", 0x000000, 0x100000, CRC(d3d345df) SHA1(4696951e492e5526772a860ea2c0f35411a80927), ROM_BIOS(1) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START(3do_fz1j)
@@ -363,8 +398,7 @@ ROM_START(3do_fz1j)
 	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-1 Japan with disabled RSA" )
 	ROMX_LOAD( "panafz1j-norsa.bin", 0x000000, 0x100000, CRC(82ce67c6) SHA1(a417587ae3b0b8ef00c830920c21af8bee88e419), ROM_BIOS(1) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "panafz1j-kanji.bin", 0x000000, 0x100000, CRC(45f478b1) SHA1(884515605ee243577ab20767ef8c1a7368e4e407) )
 ROM_END
 
@@ -375,8 +409,7 @@ ROM_START(3do_fz10)
 	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-10 USA with disabled RSA" )
 	ROMX_LOAD( "panafz10-norsa.bin", 0x000000, 0x100000, CRC(230e6feb) SHA1(f05e642322c03694f06a809c0b90fc27ac73c002), ROM_BIOS(1) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START(3do_fz10e)
@@ -386,8 +419,7 @@ ROM_START(3do_fz10e)
 	ROM_SYSTEM_BIOS( 1, "norsa", "FZ-10 Europe with disabled RSA" )
 	ROMX_LOAD( "panafz10e-anvil-norsa.bin", 0x000000, 0x100000, CRC(9a186221) SHA1(2765c7b4557cc838b32567d2428d088980295159), ROM_BIOS(1) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 // TODO: supposedly this is a pre-Anvil model (kanji ROM may not fit)
@@ -396,8 +428,7 @@ ROM_START(3do_fz10j)
 	ROM_SYSTEM_BIOS( 0, "retail", "Retail FZ-10 Japan" )
 	ROMX_LOAD( "panafz10j.bin", 0x000000, 0x100000, CRC(07b50015) SHA1(fe7f9c9c6a98910013bf13f2cf798de9fea52acd), ROM_BIOS(0) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "panafz10ja-anvil-kanji.bin", 0x000000, 0x100000, CRC(ff7393de) SHA1(2e857b957803d0331fd229328df01f3ffab69eee) )
 ROM_END
 
@@ -408,8 +439,7 @@ ROM_START(3do_gdo101)
 	ROM_SYSTEM_BIOS( 0, "gdo101m", "Retail GDO-101M" )
 	ROMX_LOAD( "goldstar.bin", 0x000000, 0x100000, CRC(b6f5028b) SHA1(c4a2e5336f77fb5f743de1eea2cda43675ee2de7), ROM_BIOS(0) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 // NOTE: prints an extra "goldstar-fc1 encrypted" on screen, doesn't ping the logic analyzer
@@ -419,8 +449,7 @@ ROM_START(3do_fc1)
 	ROM_SYSTEM_BIOS( 0, "fc1", "FC-1 (encrypted, retail?)" )
 	ROMX_LOAD( "goldstar_fc1_enc.bin", 0x000000, 0x100000, CRC(5c5b4f98) SHA1(8ef7503c948314d242da47b7fdc272f68dac2aee), ROM_BIOS(0) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 // devstation unit, prints "3DO-NTSC-1.0fc2 encrypted" and Logic Analyzer stuff directly OSD.
@@ -431,8 +460,7 @@ ROM_START(3do_fc2)
 	ROM_SYSTEM_BIOS( 0, "fc2", "FC-2 (1.0 dev kit)" )
 	ROMX_LOAD( "3do_devkit_1.0fc2.bin", 0x000000, 0x100000, CRC(cdb23167) SHA1(bd325c869e1dde8a3872fc21565e0646a3d5b525), ROM_BIOS(0) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START(3do_try)
@@ -440,8 +468,9 @@ ROM_START(3do_try)
 	ROM_SYSTEM_BIOS( 0, "retail", "Retail IMP-21J TRY Japan" )
 	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(0) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	// baddump: the actual kanji ROM for this model needs dumping
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
+	ROM_LOAD( "panafz1j-kanji.bin", 0x000000, 0x100000, BAD_DUMP CRC(45f478b1) SHA1(884515605ee243577ab20767ef8c1a7368e4e407) )
 ROM_END
 
 // model number "MPHC2100USA"
@@ -452,8 +481,7 @@ ROM_START(3do_hc21)
 	ROM_SYSTEM_BIOS( 1, "b3", "b3 unencrypted" )
 	ROMX_LOAD( "sanyo_hc21_b3_unenc.bin", 0x000000, 0x100000, CRC(c4c3db01) SHA1(c389af32bcadf0d86826927dc3d20b7072f90069), ROM_BIOS(1) )
 
-
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 ROM_END
 
 
@@ -469,7 +497,7 @@ ROM_END
 	ROMX_LOAD( "panafz1.bin", 0x000000, 0x100000, CRC(c8c8ff89) SHA1(34bf189111295f74d7b7dfc1f304d98b8d36325a), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 3, "sanyotry", "Sanyo TRY 3DO Interactive Multiplayer" ) \
 	ROMX_LOAD( "sanyotry.bin", 0x000000, 0x100000, CRC(d5cbc509) SHA1(b01c53da256dde43ffec4ad3fc3adfa8d635e943), ROM_BIOS(3) ) \
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 
 
 ROM_START(3dobios)
@@ -488,7 +516,7 @@ ROM_END
 	ROM_REGION32_BE( 0x200000, "bios", 0 ) \
 	/* TC544000AF-150, 1xxxxxxxxxxxxxxxxxx = 0xFF */ \
 	ROM_LOAD( "saot_rom2.bin", 0x000000, 0x80000, CRC(b832da9a) SHA1(520d3d1b5897800af47f92efd2444a26b7a7dead) )  \
-	ROM_REGION32_BE( 0x200000, "kanji", ROMREGION_ERASEFF )
+	ROM_REGION32_BE( 0x100000, "kanji", ROMREGION_ERASEFF )
 
 ROM_START(alg3do)
 	ALG_BIOS

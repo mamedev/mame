@@ -486,7 +486,7 @@ void snesb_state::piratdwb_map(address_map &map)
 	map(0xc00000, 0xc00000).r("latch", FUNC(generic_latch_8_device::read));
 	map(0xc00001, 0xc00001).w("latch", FUNC(generic_latch_8_device::acknowledge_w));
 	map(0xc00002, 0xc00002).portr("C00002");
-//	map(0xc00003, 0xc00003).w // watchdog? (written to on every NMI)
+//  map(0xc00003, 0xc00003).w // watchdog? (written to on every NMI)
 	map(0xc00004, 0xc00004).portr("DSW");
 }
 
@@ -498,9 +498,9 @@ void snesb_state::piratdwb_68k_map(address_map &map)
 	map(0x050000, 0x0503ff).ram();
 
 	map(0x080000, 0x080000).w("latch", FUNC(generic_latch_8_device::write));
-//	map(0x0c0000, 0x0c0000).w // ?
+//  map(0x0c0000, 0x0c0000).w // ?
 	map(0x100000, 0x100001).portr("COIN");
-//	map(0x140000, 0x140000).w // ?
+//  map(0x140000, 0x140000).w // ?
 	map(0x180000, 0x180000).lw8(
 		NAME([this](offs_t, u8) { m_68k->set_input_line(INPUT_LINE_NMI, m_prot_nmi = 0); })
 	);
@@ -1947,4 +1947,4 @@ GAME( 1996, legendsb,     0,        extrainp,     legendsb, snesb_state, init_le
 GAME( 1997, rushbets,     0,        rushbets,     legendsb, snesb_state, init_rushbets,  ROT0, "bootleg",         "Rushing Beat Shura (SNES bootleg)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, venom,        0,        venom,        venom,    snesb_state, init_venom,     ROT0, "bootleg",         "Venom & Spider-Man - Separation Anxiety (SNES bootleg)",        MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, wldgunsb,     0,        wldgunsb,     wldgunsb, snesb_state, init_wldgunsb,  ROT0, "bootleg",         "Wild Guns (SNES bootleg)",                                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // based off Japanese version
-GAME( 199?, piratdwb,     0,        piratdwb,     piratdwb, snesb_state, init_piratdwb,  ROT0, "bootleg (Conny)", "The Pirates of Dark Water (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, piratdwb,     0,        piratdwb,     piratdwb, snesb_state, init_piratdwb,  ROT0, "bootleg (Conny)", "The Pirates of Dark Water (SNES bootleg)",                      MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

@@ -36,8 +36,12 @@ madam_device::madam_device(const machine_config &mconfig, const char *tag, devic
 	, m_dma8_read_cb(*this, 0)
 	, m_dma32_read_cb(*this, 0)
 	, m_dma32_write_cb(*this)
+	, m_dma_exp_read_cb(*this, 0)
+	, m_arm_ctl_cb(*this)
+	, m_irq_dexp_cb(*this)
 	, m_playerbus_read_cb(*this, 0)
 	, m_irq_dply_cb(*this)
+	, m_is_pal(false)
 {
 }
 
@@ -50,8 +54,11 @@ void madam_device::device_start()
 	m_revision = 0x01020200;
 	m_msysbits = 0x51;
 
+	m_dma_exp_timer = timer_alloc(FUNC(madam_device::dma_exp_cb), this);
 	m_dma_playerbus_timer = timer_alloc(FUNC(madam_device::dma_playerbus_cb), this);
 	m_cel_timer = timer_alloc(FUNC(madam_device::cel_tick_cb), this);
+
+	m_display_hclocks = m_is_pal ? 384 : 320;
 
 	// max vcnt x max tlhpcnt, for Packed stuff
 	// TODO: reduce footprint
@@ -110,6 +117,9 @@ void madam_device::device_reset()
 	m_mctl = 0;
 	m_cel.state = IDLE;
 	m_statbits = 0;
+	m_dma_exp_enable = false;
+	m_arm_ctl_cb(1);
+	m_dma_exp_timer->adjust(attotime::never);
 	m_dma_playerbus_timer->adjust(attotime::never);
 	m_cel_timer->adjust(attotime::never);
 }
@@ -177,7 +187,8 @@ void madam_device::map(address_map &map)
 	map(0x0100, 0x0103).w(FUNC(madam_device::cel_start_w));
 	// SPRSTOP - Stop the CEL engine (W)
 	map(0x0104, 0x0107).w(FUNC(madam_device::cel_stop_w));
-//  map(0x0108, 0x010b)  SPRCNTU - Continue the CEL engine (W)
+	// SPRCNTU - Continue the CEL engine (W)
+	map(0x0108, 0x010b).w(FUNC(madam_device::cel_continue_w));
 //  map(0x010c, 0x010f)  SPRPAUS - Pause the CEL engine (W)
 	map(0x0110, 0x0113).lrw32(
 		NAME([this] () { return m_ccobctl0; }),
@@ -220,6 +231,7 @@ void madam_device::map(address_map &map)
 			COMBINE_DATA(&m_regctl3);
 		})
 	);
+	// TODO: these are in 16.16 format
 	map(0x0140, 0x0143).lrw32(
 		NAME([this] () { return m_xyposh; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -248,6 +260,7 @@ void madam_device::map(address_map &map)
 			COMBINE_DATA(&m_linedxyl);
 		})
 	);
+	// TODO: these are in 12.20 format
 	map(0x0150, 0x0153).lrw32(
 		NAME([this] () { return m_dxyh; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
@@ -406,7 +419,7 @@ void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
 			// Madam can access Player bus from DMA only, and the port(s) are daisy chained thru
 			// bidirectional serial i/f (which also handle headphone jack and ROM device transfers)
 			// Smells a lot like an internal MCU doing the job ...
-			m_dma32_write_cb(m_dma[23][2] + 0x4, m_playerbus_read_cb(0));
+			m_dma32_write_cb(m_dma[DMA_CONTROL_PORT][2] + 0x4, m_playerbus_read_cb(0));
 		}
 		if (BIT(m_mctl, 15) && !BIT(data, 15))
 		{
@@ -422,12 +435,18 @@ void madam_device::mctl_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_mctl);
 }
 
+/******************
+ *
+ * Player bus DMA
+ *
+ ******************/
+
 TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 {
 	if (!BIT(m_mctl, 15))
 		return;
 
-	u32 count = m_dma[23][1];
+	u32 count = m_dma[DMA_CONTROL_PORT][1];
 
 	if (BIT(count, 31))
 	{
@@ -438,8 +457,8 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 	}
 
 	// TODO: should cause a privbits exception if mask outside bounds
-	u32 src = m_dma[23][2];
-	u32 dst = m_dma[23][0];
+	u32 src = m_dma[DMA_CONTROL_PORT][2];
+	u32 dst = m_dma[DMA_CONTROL_PORT][0];
 
 	const u32 data = m_dma32_read_cb(src);
 	m_dma32_write_cb(dst, data);
@@ -447,12 +466,70 @@ TIMER_CALLBACK_MEMBER(madam_device::dma_playerbus_cb)
 	count -= 4;
 	src += 4;
 	dst += 4;
-	m_dma[23][0] = dst;
-	m_dma[23][1] = count;
-	m_dma[23][2] = src;
+	m_dma[DMA_CONTROL_PORT][0] = dst;
+	m_dma[DMA_CONTROL_PORT][1] = count;
+	m_dma[DMA_CONTROL_PORT][2] = src;
 
 	m_dma_playerbus_timer->adjust(attotime::from_ticks(2, this->clock()));
 }
+
+/******************
+ *
+ * Exp DMA
+ *
+ ******************/
+
+void madam_device::exp_dma_req_w(int state)
+{
+	// printf("exp_dma_req_w %d\n", state);
+	m_dma_exp_enable = state;
+	m_irq_dexp_cb(0);
+	if (state)
+	{
+		//printf("%08x %08x\n", m_dma[DMA_EXP0][0], m_dma[DMA_EXP0][1]);
+		m_arm_ctl_cb(0);
+		m_dma_exp_timer->adjust(attotime::from_ticks(8, this->clock()));
+	}
+	else
+	{
+		m_arm_ctl_cb(1);
+		m_dma_exp_timer->adjust(attotime::never);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(madam_device::dma_exp_cb)
+{
+	if (!m_dma_exp_enable)
+	{
+		return;
+	}
+
+	u32 count = m_dma[DMA_EXP0][1];
+
+	if (BIT(count, 31))
+	{
+		m_dma_exp_enable = false;
+		m_arm_ctl_cb(1);
+		m_irq_dexp_cb(1);
+		m_dma_exp_timer->adjust(attotime::never);
+		return;
+	}
+
+	u32 dst = m_dma[DMA_EXP0][0];
+
+	// TODO: decrement Clio xfercnt from here
+	u32 data = (m_dma_exp_read_cb() << 24) | (m_dma_exp_read_cb() << 16) | (m_dma_exp_read_cb() << 8) | (m_dma_exp_read_cb() << 0);
+
+	m_dma32_write_cb(dst, data);
+
+	count -= 4;
+	dst += 4;
+	m_dma[DMA_EXP0][0] = dst;
+	m_dma[DMA_EXP0][1] = count;
+
+	m_dma_exp_timer->adjust(attotime::from_ticks(8, this->clock()));
+}
+
 
 /******************
  *
@@ -469,13 +546,16 @@ void madam_device::vdlp_start_w(int state)
 		return;
 	}
 
-//  if (m_vdlp.address == m_dma[24][0])
+//  if (m_vdlp.address == m_dma[DMA_CLUT_MID][0])
 //  {
 //      m_vdlp.fetch = false;
 //      return;
 //  }
 
-	m_vdlp.address = m_dma[24][0];
+	// 0: control
+	// 1: video
+	// 2: mid-line
+	m_vdlp.address = m_dma[DMA_CLUT_MID][0];
 	m_vdlp.scanlines = 0;
 	m_vdlp.fetch = true;
 	m_vdlp.y_dest = 6;
@@ -557,7 +637,7 @@ void madam_device::vdlp_continue_w(int state)
 	{
 		u32 y_base = (m_vdlp.y_src & ~1) * (m_vdlp.modulo);
 		u8 shift = ((m_vdlp.y_src & 1) ^ 1) * 16;
-		for (int x = 0; x < 320; x++)
+		for (int x = 0; x < m_display_hclocks; x++)
 		{
 			const u32 dot = m_dma32_read_cb(m_vdlp.fb_address + ((x + y_base) << 2));
 			m_amy->pixel_xfer(x, m_vdlp.y_dest, dot >> shift);
@@ -635,9 +715,14 @@ void madam_device::cel_start_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGCEL("Start CEL engine\n");
 	m_cel.state = FETCH_PARAMS;
-	m_cel.address = m_dma[26][1];
+	// 0: control
+	// 1: first CCoB
+	// 2: PIP
+	// 3: data start
+	m_cel.address = m_dma[DMA_CEL_CONTROL][1];
 	m_statbits |= 1 << 4;
 	m_statbits &= ~(1 << 6);
+	m_cel.next_ptr = m_cel.source_ptr = m_cel.plut_ptr = 0;
 	m_cel_timer->adjust(attotime::from_ticks(2, this->clock()));
 }
 
@@ -649,8 +734,17 @@ void madam_device::cel_stop_w(offs_t offset, u32 data, u32 mem_mask)
 	m_cel_timer->adjust(attotime::never);
 }
 
-// TODO: is all of this madness burst, cycle steal or a mix of the two?
-// 3do_try alternating Sanyo/3do logos spinning seems that some bus hog is ought to happen ...
+// TODO: just a stub to avoid tanking performance with debugger
+void madam_device::cel_continue_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// ...
+}
+
+// TODO: timings are sketchy and not known
+// ARM lock line is directly tied to Madam, which is raised when CEL engine is running.
+// CEL is paused when any irq is issued at the end of current CEL (so during fetch phase)
+// resumed by triggering SPRCNTU port (manually in SW);
+// cfr. 3do_try alternating Sanyo/3do logos spins (way too fast)
 TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 {
 	u32 tick_time;
@@ -667,11 +761,21 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			LOGCEL("CEL fetch params [%08x] flags=%08x\n", m_cel.address, m_cel.current_ccb);
 			m_cel.skip = !!BIT(m_cel.current_ccb, 31);
 			m_cel.last = !!BIT(m_cel.current_ccb, 30);
+			const bool npabs = !!BIT(m_cel.current_ccb, 29);
+			// FIXME: as below
+			if (!npabs && m_cel.next_ptr && !m_cel.last)
+			{
+				popmessage("CEL actual relative next_ptr use at %08x (current %08x -> %08x)", m_cel.address, m_cel.next_ptr, m_dma32_read_cb(m_cel.address + 0x04));
+				m_statbits |= (1 << 6);
+				cel_stop_w(0, 0, 0xffffffff);
+				return;
+			}
 			m_cel.next_ptr = m_dma32_read_cb(m_cel.address + 0x04);
 
 			if (m_cel.skip && m_cel.last)
 			{
 				LOGCEL("Skip + Last, done\n");
+				m_statbits |= (1 << 6);
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
@@ -689,7 +793,6 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				tick_time += 1;
 			}
 
-			const bool npabs = !!BIT(m_cel.current_ccb, 29);
 			const bool spabs = !!BIT(m_cel.current_ccb, 28);
 			const bool ppabs = !!BIT(m_cel.current_ccb, 27);
 			const bool ldsize = !!BIT(m_cel.current_ccb, 26);
@@ -738,9 +841,11 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			);
 			// FIXME: relative to what?
 			// - 3do_fz1 / 3do_fz10 RGB dots (scaled by hdx/vdy=8.0) are the first & last entry setup, relative to zero?
-			if (!npabs || !spabs || !ppabs)
+			// - ditto for "Welcome To Photo CD Imaging" app startup
+			if ((!spabs && m_cel.source_ptr) || (!ppabs && m_cel.plut_ptr))
 			{
 				popmessage("CEL relative address use at %08x %d|%d|%d", m_cel.address, npabs, spabs, ppabs);
+				m_statbits |= (1 << 6);
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
@@ -751,6 +856,7 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			if (!ldsize || !ldprs || !yoxy || !ldpixc)
 			{
 				popmessage("CEL using existing values at %08x %d|%d|%d|%d", m_cel.address, ldsize, ldprs, yoxy, ldpixc);
+				m_statbits |= (1 << 6);
 				cel_stop_w(0, 0, 0xffffffff);
 				return;
 			}
@@ -760,10 +866,10 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			// TODO: can be in 17.15 format (?)
 			LOGCEL("    xpos=%f ypos=%f\n",  (double)m_cel.xpos / 65536.0, (double)m_cel.ypos / 65536.0);
 
-			m_cel.hdx = m_dma32_read_cb(m_cel.address + 0x18);
-			m_cel.hdy = m_dma32_read_cb(m_cel.address + 0x1c);
-			m_cel.vdx = m_dma32_read_cb(m_cel.address + 0x20);
-			m_cel.vdy = m_dma32_read_cb(m_cel.address + 0x24);
+			m_cel.hdx = (s32)m_dma32_read_cb(m_cel.address + 0x18);
+			m_cel.hdy = (s32)m_dma32_read_cb(m_cel.address + 0x1c);
+			m_cel.vdx = (s32)m_dma32_read_cb(m_cel.address + 0x20);
+			m_cel.vdy = (s32)m_dma32_read_cb(m_cel.address + 0x24);
 			tick_time += 4;
 			LOGCEL("    hdx=%f hdy=%f vdx=%f vdy=%f\n"
 				, (double)m_cel.hdx / 1048576.0, (double)m_cel.hdy / 1048576.0
@@ -844,11 +950,13 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 				, bpp
 				, BPP_VALUES[bpp]
 			);
+			const u16 woffset8 =  ((m_cel.pre1 >> 24) & 0x7f) + 2;
 			const u16 woffset10 = ((m_cel.pre1 >> 16) & 0x3ff) + 2;
+			const u16 woffset = bpp >= 5 ? woffset10 : woffset8;
 			const bool lrform = !!BIT(m_cel.pre1, 11);
 			const u16 tlhpcnt = ((m_cel.pre1 >> 0) & 0x7ff) + 1;
 			LOGCEL("    woffset(8)=%d woffset(10)=%d noswap=%d unclsb=%d lrform=%d tlhpcnt=%d\n"
-				, ((m_cel.pre1 >> 24) & 0x7f) + 2
+				, woffset8
 				, woffset10
 				, BIT(m_cel.pre1, 14)
 				, (m_cel.pre1 >> 12) & 3
@@ -862,12 +970,8 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 			const u16 dst_pitch = m_regis.fb_pitch[1];
 
 			// encode source addressing in an easy to digest inner loop form
-			const u8 actual_src_mode = (m_cel.packed << 1) | lrform;
+			const u8 actual_src_mode = m_cel.packed ? 32 : (bpp << 2) | (uncoded << 1) | lrform;
 
-			// - 3do_gdo101 uses mostly this, with lrform + packed enabled on several elements
-			//   (the 3DO logo)
-			// - 3do_fz1 uses uncoded=0 + bpp=4
-			if ((m_cel.packed && bpp == 3) || (m_cel.packed && bpp == 4) || (bpp == 6))
 			{
 				for (int y = 0; y < vcnt; y++)
 				{
@@ -882,10 +986,10 @@ TIMER_CALLBACK_MEMBER(madam_device::cel_tick_cb)
 						if (xpos != std::clamp<unsigned>(xpos, 0, xclip))
 							continue;
 
-						u16 src_data = (this->*get_pixel_table[actual_src_mode])(x, y, woffset10);
+						u16 src_data = (this->*get_pixel_table[actual_src_mode])(x, y, woffset);
 
 						// opaque check
-						if (!src_data && !m_cel.bgnd)
+						if (!(src_data & 0x7fff) && !m_cel.bgnd)
 							continue;
 
 						u32 dst_address = m_regctl3;
@@ -1051,9 +1155,9 @@ u32 madam_device::cel_decompress()
 		(bpp == 5))
 	{
 		popmessage("3do_madam.cpp: unsupported Packed CEL %d %d %08x", bpp, uncoded, source_ptr);
-		//m_statbits |= (1 << 6);
-		//cel_stop_w(0, 0, 0xffffffff);
-		return 1;
+		m_statbits |= (1 << 6);
+		cel_stop_w(0, 0, 0xffffffff);
+		return 0;
 	}
 
 	u16 tlhpcnt = 1;
@@ -1096,8 +1200,10 @@ u32 madam_device::cel_decompress()
 			switch (packet_type)
 			{
 				// PACK_TRANSPARENT
-				// TODO: untested
-				// Does it write a 0 or it actually 0-fill from PLUT anyway?
+				// TODO: doesn't really work properly, particularly when bgnd is 1
+				// - 3do_fz10 CD overlays uses plenty of these, which currently fills solid black
+				// We could cheat and pull bit 15 high, but then we have to deal accordingly
+				// when writing to framebuffer (that uses it as cornerweight or CLUT selector) ...
 				case 2:
 					for (src = 0; src < num_bytes; src++)
 						m_cel.buffer[yline * pitch + ((src + xpos) % pitch)] = 0;
@@ -1156,15 +1262,119 @@ u32 madam_device::cel_decompress()
  *
  *****************/
 
-const madam_device::get_pixel_func madam_device::get_pixel_table[4] =
+const madam_device::get_pixel_func madam_device::get_pixel_table[32 + 1] =
 {
-	&madam_device::get_uncompressed_16bpp_lrform0,
-	&madam_device::get_uncompressed_16bpp_lrform1,
-	&madam_device::get_compressed_16bpp,
-	&madam_device::get_compressed_16bpp
+	// 0 <invalid>
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 1bpp
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 2bpp
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 4bpp
+	&madam_device::get_pixel_4bpp_coded_lrform0,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 6bpp
+	&madam_device::get_pixel_6bpp_coded_lrform0,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 8bpp
+	&madam_device::get_pixel_8bpp_coded_lrform0,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// 16bpp
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_16bpp_uncoded_lrform0,
+	&madam_device::get_pixel_16bpp_uncoded_lrform1,
+	// 7 <invalid>
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	&madam_device::get_pixel_invalid,
+	// packed handling (directly extended from RLE)
+	&madam_device::get_pixel_packed
 };
 
-u16 madam_device::get_uncompressed_16bpp_lrform0(int x, int y, u16 woffset)
+u16 madam_device::get_pixel_invalid(int x, int y, u16 woffset)
+{
+	// arbitrary mesh pattern so it will be obvious if triggered
+	u16 src_data = BIT(x + y, 0) ? 0x001f : 0x7fe0;
+	return src_data;
+}
+
+// - fz1/fz10 spinning RGB cube drops
+// - Photo CD numerical indices
+u16 madam_device::get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+	u32 plut_address = m_cel.plut_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	cel_address += ((x & ~1) >> 1);
+	u8 src_shift = (x & 1) ^ 1;
+
+//	u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 4)) & 0xf;
+	u16 plut_data = (m_dma8_read_cb(cel_address) >> (src_shift * 4)) & 0xf;
+	plut_data <<= 1;
+
+	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
+	return src_data;
+}
+
+// - 'R' letter in "Welcome to the REAL world" for fz1
+u16 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+	u32 plut_address = m_cel.plut_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	// math would make more sense with / 3 ~ % 3 but the pitch would be off that way (dword boundary?)
+	cel_address += (x / 4) * 3;
+	u8 src_shift = (~x & 3) * 6;
+
+	u16 plut_data = ((m_dma8_read_cb(cel_address + 0) << 16) + (m_dma8_read_cb(cel_address + 1) << 8) + (m_dma8_read_cb(cel_address + 2))) >> (src_shift) & 0x3f;
+	plut_data <<= 1;
+
+	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
+	return src_data;
+}
+
+// - fz10 Storage Managers
+u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
+{
+	u32 cel_address = m_cel.source_ptr;
+	u32 plut_address = m_cel.plut_ptr;
+
+	cel_address += ((y) * woffset) << 2;
+	cel_address += ((x) << 0);
+	//u8 src_shift = (x & 3) ^ 3;
+
+//	u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 8)) & 0xff;
+	u16 plut_data = m_dma8_read_cb(cel_address);
+	plut_data <<= 1;
+
+	u16 src_data = (m_dma8_read_cb(plut_address + plut_data) << 8) + (m_dma8_read_cb(plut_address + plut_data + 1));
+
+	return src_data;
+}
+
+// - BIOSes in general
+u16 madam_device::get_pixel_16bpp_uncoded_lrform0(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
@@ -1177,7 +1387,7 @@ u16 madam_device::get_uncompressed_16bpp_lrform0(int x, int y, u16 woffset)
 	return src_data;
 }
 
-u16 madam_device::get_uncompressed_16bpp_lrform1(int x, int y, u16 woffset)
+u16 madam_device::get_pixel_16bpp_uncoded_lrform1(int x, int y, u16 woffset)
 {
 	u32 cel_address = m_cel.source_ptr;
 
@@ -1190,7 +1400,7 @@ u16 madam_device::get_uncompressed_16bpp_lrform1(int x, int y, u16 woffset)
 	return src_data;
 }
 
-u16 madam_device::get_compressed_16bpp(int x, int y, u16 woffset)
+u16 madam_device::get_pixel_packed(int x, int y, u16 woffset)
 {
 	const u16 pitch = 0x1000;
 

@@ -3254,11 +3254,17 @@ ROM_END
 
 // ***** 386sx motherboards using the Chips SCAMPSX chipset
 
+// a.k.a. Chicony CH-386S-16/20/25G or Chicony 001-0386S-016, Lindata manufactured (1425)
+// TODO: missing keyboard BIOS
+// also doesn't access SCATsx chipset at all even if it has shadow RAM options in BIOS
+// (uses only EMS driver in MS-DOS, later on?)
+
 // ANIX CH-386S-16/20/25G P/N:001-0386S-016 VER 1.0 - Chipset: CHIPS F82C836 - BIOS: AMI 386sx BIOS PLUS S/NO. 141334
 // BIOS-String: 30-0100-D01425-00101111-050591-SCAMPSX-0 - Keyboard-BIOS: Intel/AMI - CPU: Intel (SMD), label not readable - FPU: socket available - ISA16: 6 - OSC: 14.31818 - 32.000 MHz
 ROM_START( anch386s )
 	ROM_REGION16_LE(0x20000, "bios", 0)
-	ROM_LOAD( "386-ch-386s.bin", 0x10000, 0x10000, CRC(8902c64b) SHA1(3234bac6240a3a0bd05302c9ca587f5ae083f2f4))
+	ROM_LOAD( "kbd.bin",             0x00000, 0x10000, NO_DUMP )
+	ROM_LOAD( "386-ch-386s.bin",     0x10000, 0x10000, CRC(8902c64b) SHA1(3234bac6240a3a0bd05302c9ca587f5ae083f2f4))
 ROM_END
 
 // 80386SX-VH-COM - Chipset: VLSI VL82C311 VL82C113 - BIOS: Award 386SX-BIOS - BIOS-String: 386SX Modular BIOS v3.15 Copyright(c)1984-91 Award Software Inc.
@@ -5700,7 +5706,7 @@ COMP( 199?, 386sxvhcom,ibm5170, 0,       at386sx,   0,     at_state,     init_at
 COMP( 199?, 3siud,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "3SIUD-1.1", MACHINE_NOT_WORKING )
 COMP( 199?, alaleolx,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Alaris RYC", "LEOPARD LX", MACHINE_NOT_WORKING )
 COMP( 199?, alim1217,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "386sx motherboards using the ALi M1217 chipset", MACHINE_NOT_WORKING )
-COMP( 199?, anch386s,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "ANIX",        "CH-386S-16/20/25G", MACHINE_NOT_WORKING )
+COMP( 1991, anch386s,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "ANIX",        "CH-386S-16/20/25G", MACHINE_NOT_WORKING )
 COMP( 199?, asc486slc, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Computechnik", "ASC486SLC", MACHINE_NOT_WORKING )
 COMP( 1988, at386sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<generic>",   "PC/AT 386SX (16 MHz, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines", "386SX-16", MACHINE_NOT_WORKING )

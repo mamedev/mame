@@ -99,8 +99,7 @@ const mcs51_disassembler::mem_info mcs51_disassembler::default_names[] = {
 	{ 0x1ae, "ie.6"  },
 	{ 0x1af, "ea"    },
 
-	/* FIXME: port 3 - depends on external circuits and not really
-	 * implemented in the core. TBD */
+	// FIXME: port 3 - depends on external circuits and not really implemented in the core. TBD
 	{ 0x1b0, "rxd"   },
 	{ 0x1b1, "txd"   },
 	{ 0x1b2, "int0"  },
@@ -757,7 +756,7 @@ mcs51_disassembler::mcs51_disassembler()
 
 void mcs51_disassembler::add_names(const mem_info *info)
 {
-	for(unsigned int i=0; info[i].addr >= 0; i++)
+	for (unsigned int i = 0; info[i].addr >= 0; i++)
 		m_names[info[i].addr] = info[i].name;
 }
 
@@ -767,7 +766,7 @@ u32 mcs51_disassembler::opcode_alignment() const
 }
 
 
-std::string mcs51_disassembler::get_data_address( uint8_t arg ) const
+std::string mcs51_disassembler::get_data_address(uint8_t arg) const
 {
 	auto i = m_names.find(arg);
 	if (i == m_names.end())
@@ -776,11 +775,11 @@ std::string mcs51_disassembler::get_data_address( uint8_t arg ) const
 		return i->second;
 }
 
-std::string mcs51_disassembler::get_bit_address( uint8_t arg ) const
+std::string mcs51_disassembler::get_bit_address(uint8_t arg) const
 {
-	if(arg < 0x80)
+	if (arg < 0x80)
 	{
-		//Bit address 0-7F can be referred to as 20.0, 20.1, to 20.7 for address 0, and 2f.0,2f.1 to 2f.7 for address 7f
+		// Bit address 0-7F can be referred to as 20.0, 20.1, to 20.7 for address 0, and 2f.0,2f.1 to 2f.7 for address 7f
 		return util::string_format("$%02X.%d", (arg >> 3) | 0x20, arg & 0x07);
 	}
 	else

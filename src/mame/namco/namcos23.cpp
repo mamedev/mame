@@ -6752,7 +6752,7 @@ static INPUT_PORTS_START(s23)
 
 	PORT_START("JVS_COIN1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_TILT2) PORT_NAME("Counter disconnected")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Counter disconnected")
 
 	/* Dummy so we can easily get the analog ch # */
 	PORT_START("JVS_ANALOG_INPUT1")

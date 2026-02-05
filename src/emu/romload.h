@@ -73,7 +73,8 @@ template <typename T> inline bool ROMREGION_ISDISKDATA(T const &r)     { return 
 template <typename T> inline u32  ROM_GETOFFSET(T const &r)            { return ROMENTRY_UNWRAP(r).get_offset(); }
 template <typename T> inline u32  ROM_GETLENGTH(T const &r)            { return ROMENTRY_UNWRAP(r).get_length(); }
 template <typename T> inline u32  ROM_GETFLAGS(T const &r)             { return ROMENTRY_UNWRAP(r).get_flags(); }
-template <typename T> inline bool ROM_ISOPTIONAL(T const &r)           { return (ROM_GETFLAGS(r) & ROM_OPTIONALMASK) == ROM_OPTIONAL; }
+// HACK: avoid warnings about deprecated ROM_OPTIONAL in every source file that includes this header
+template <typename T> inline bool ROM_ISOPTIONAL(T const &r)           { return (ROM_GETFLAGS(r) & ROM_OPTIONALMASK) == /* ROM_OPTIONAL */ ROM_OPTIONALMASK; }
 template <typename T> inline u32  ROM_GETGROUPSIZE(T const &r)         { return ((ROM_GETFLAGS(r) & ROM_GROUPMASK) >> 8) + 1; }
 template <typename T> inline u32  ROM_GETSKIPCOUNT(T const &r)         { return (ROM_GETFLAGS(r) & ROM_SKIPMASK) >> 12; }
 template <typename T> inline bool ROM_ISREVERSED(T const &r)           { return (ROM_GETFLAGS(r) & ROM_REVERSEMASK) == ROM_REVERSE; }
@@ -129,7 +130,8 @@ public:
 	constexpr u32         get_length()     const { return length; }
 	constexpr u32         get_flags()      const { return flags; }
 	constexpr char const *get_hashdata()   const { return hashdata; }
-	constexpr bool        is_optional()    const { return (flags & ROM_OPTIONALMASK) == ROM_OPTIONAL; }
+	// HACK: avoid warnings about deprecated ROM_OPTIONAL in every source file that includes this header
+	constexpr bool        is_optional()    const { return (flags & ROM_OPTIONALMASK) == /* ROM_OPTIONAL */ ROM_OPTIONALMASK; }
 	constexpr u32         get_groupsize()  const { return ((flags & ROM_GROUPMASK) >> 8) + 1; }
 	constexpr u32         get_skipcount()  const { return (flags & ROM_SKIPMASK) >> 12; }
 	constexpr bool        is_reversed()    const { return (flags & ROM_REVERSEMASK) == ROM_REVERSE; }

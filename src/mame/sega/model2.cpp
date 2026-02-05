@@ -22,10 +22,10 @@
               bypass it by entering then exiting service mode;
     - sgt24h: has input analog issues, steering doesn't center when neutral,
       gas and brake pedals pulses instead of being fixed;
-	- vcop2: stage select has tilemap priority issue, tilemap B (city model) has priority bit set,
-	         yet it should appear underneath tilemap A ("shoot to select") which does not;
-	- srallyc: initial enemy car placement seems to be slightly incorrect for a few cars,
-	           seems to be affected by i960 clock speed, may need wait state emulation to fix
+    - vcop2: stage select has tilemap priority issue, tilemap B (city model) has priority bit set,
+             yet it should appear underneath tilemap A ("shoot to select") which does not;
+    - srallyc: initial enemy car placement seems to be slightly incorrect for a few cars,
+               seems to be affected by i960 clock speed, may need wait state emulation to fix
 
     Notes:
     - some analog games can be calibrated in service mode via volume control item ...
@@ -331,9 +331,6 @@ void model2b_state::machine_reset()
 	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
 	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
-
-	m_iop_data = 0;
-	m_iop_write_num = 0;
 }
 
 void model2c_state::machine_reset()
@@ -662,46 +659,6 @@ void model2b_state::copro_fifo_w(u32 data)
 	else
 	{
 		m_copro_fifo_in->push(u32(data));
-	}
-}
-
-void model2b_state::copro_sharc_iop_w(offs_t offset, u32 data)
-{
-	/* FIXME: clean this mess */
-	if ((strcmp(machine().system().name, "schamp" ) == 0) ||
-		(strcmp(machine().system().name, "sfight" ) == 0) ||
-		(strcmp(machine().system().name, "fvipers" ) == 0) ||
-		(strcmp(machine().system().name, "fvipersb" ) == 0) ||
-		(strcmp(machine().system().name, "vstriker" ) == 0) ||
-		(strcmp(machine().system().name, "vstrikero" ) == 0) ||
-		(strcmp(machine().system().name, "gunblade" ) == 0) ||
-		(strcmp(machine().system().name, "von" ) == 0) ||
-		(strcmp(machine().system().name, "vonj" ) == 0) ||
-		(strcmp(machine().system().name, "vonr" ) == 0) ||
-		(strcmp(machine().system().name, "vonu" ) == 0) ||
-		(strcmp(machine().system().name, "rchase2" ) == 0) ||
-		(strcmp(machine().system().name, "rchase2a" ) == 0))
-	{
-		m_copro_adsp->external_iop_write(offset, data);
-	}
-	else
-	{
-		if(offset == 0x10/4)
-		{
-			m_copro_adsp->external_iop_write(offset, data);
-			return;
-		}
-
-		if ((m_iop_write_num & 1) == 0)
-		{
-			m_iop_data = data & 0xffff;
-		}
-		else
-		{
-			m_iop_data |= (data & 0xffff) << 16;
-			m_copro_adsp->external_iop_write(offset, m_iop_data);
-		}
-		m_iop_write_num++;
 	}
 }
 
@@ -1441,7 +1398,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
 
 	map(0x00880000, 0x00883fff).w(FUNC(model2b_state::copro_function_port_w));
 	map(0x00884000, 0x00887fff).rw(FUNC(model2b_state::copro_fifo_r), FUNC(model2b_state::copro_fifo_w));
-	map(0x008c0000, 0x008c0fff).w(FUNC(model2b_state::copro_sharc_iop_w));
+	map(0x008c0000, 0x008c0fff).w(m_copro_adsp, FUNC(adsp21062_device::external_iop_write));
 
 	map(0x00980000, 0x00980003).rw(FUNC(model2b_state::copro_ctl1_r), FUNC(model2b_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_ctl1_w));
@@ -2918,6 +2875,8 @@ void model2b_state::model2b(machine_config &config)
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
 	config.set_default_layout(layout_segabill);
+
+	//m_copro_adsp->enable_recompiler();
 }
 
 void model2b_state::model2b_5881(machine_config &config)
@@ -7506,16 +7465,16 @@ ROM_START( hpyagu98 ) /* Hanguk Pro Yagu 98, Model 2A, ROM board# 834-11342 REV.
 	ROM_LOAD16_WORD_SWAP( "bb-sn-4.37", 0x600000, 0x200000, CRC(8692fbf3) SHA1(d8e854bba7b54fba85e182d761a9fd02fd13646f) )
 
 	/*
-		hpyagu98 requires certain values to be set in the EEPROM and backup RAM, otherwise it fails with Error #1:
-		- The values 0xfa, 0xe3, 0xa6 and 0x29 at addresses 0x08 through 0x0b respectively in the EEPROM;
-		- The string "98KOREA PRO B.B." at the start of backup RAM;
-		- The 32-bit magic number 0x5042c660 at address 0x398 in backup RAM;
-		- A 16-bit checksum at address 0x1d4 in backup RAM.
+	    hpyagu98 requires certain values to be set in the EEPROM and backup RAM, otherwise it fails with Error #1:
+	    - The values 0xfa, 0xe3, 0xa6 and 0x29 at addresses 0x08 through 0x0b respectively in the EEPROM;
+	    - The string "98KOREA PRO B.B." at the start of backup RAM;
+	    - The 32-bit magic number 0x5042c660 at address 0x398 in backup RAM;
+	    - A 16-bit checksum at address 0x1d4 in backup RAM.
 
-		It is possible that this may be a form of copy protection to prevent simple duplication of the game ROMs.
+	    It is possible that this may be a form of copy protection to prevent simple duplication of the game ROMs.
 
-		In addition, with the other values unchanged the game/coin options are invalid. These partly handcrafted EEPROM and backup RAM
-		files are provided to allow the game to boot with the game/coin options set to match the defaults for dynabb97.
+	    In addition, with the other values unchanged the game/coin options are invalid. These partly handcrafted EEPROM and backup RAM
+	    files are provided to allow the game to boot with the game/coin options set to match the defaults for dynabb97.
 	*/
 	ROM_REGION16_LE(0x80, "eeprom", 0) // EEPROM
 	ROM_LOAD("hpyagu98_nvram", 0x00, 0x80, CRC(3634c60f) SHA1(1ab7b74fd05b2d21496af9b2a477c0d197847c55))

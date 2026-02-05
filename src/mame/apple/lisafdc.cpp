@@ -22,7 +22,7 @@
 
 // lisa2 floppy failure
 //    1db3 = write 10 at +b (fail!)
-// -> 1d8a = 
+// -> 1d8a =
 //    bp 1d7a
 
 // macxl: 149e
@@ -167,7 +167,7 @@ void macxl_fdc_device::device_add_mconfig(machine_config &config)
 	IWM(config, m_iwm, 16_MHz_XTAL / 2);
 	m_iwm->devsel_cb().set(FUNC(macxl_fdc_device::devsel_w));
 	m_iwm->phases_cb().set(FUNC(macxl_fdc_device::phases_w));
-	
+
 	applefdintf_device::add_35_nc(config, m_floppy[0]);
 	applefdintf_device::add_35_sd(config, m_floppy[1]);
 }
@@ -232,7 +232,7 @@ void lisa_original_fdc_device::map(address_map &map)
 	map(0x0407, 0x0407).lr8(NAME([this]() -> u8 { ph3_1();  return 0; })).lw8(NAME([this](u8) { ph3_1();  }));
 	map(0x0408, 0x0408).lr8(NAME([this]() -> u8 { hds_0();  return 0; })).lw8(NAME([this](u8) { hds_0();  }));
 	map(0x0409, 0x0409).lr8(NAME([this]() -> u8 { hds_1();  return 0; })).lw8(NAME([this](u8) { hds_1();  }));
-	
+
 	map(0x0410, 0x0410).lr8(NAME([this]() -> u8 { dr1_0();  return 0; })).lw8(NAME([this](u8) { dr1_0();  }));
 	map(0x0411, 0x0411).lr8(NAME([this]() -> u8 { dr1_1();  return 0; })).lw8(NAME([this](u8) { dr1_1();  }));
 	map(0x0412, 0x0412).lr8(NAME([this]() -> u8 { dr2_0();  return 0; })).lw8(NAME([this](u8) { dr2_0();  }));

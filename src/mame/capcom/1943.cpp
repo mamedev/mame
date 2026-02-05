@@ -36,7 +36,6 @@
       vertical line and has a vblank counter. All this isn't used by the MCU
       program, it only exchanges a value with the main CPU.
 
-
 */
 
 #include "emu.h"
@@ -46,6 +45,22 @@
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
 #include "speaker.h"
+
+
+/* Interrupts */
+
+TIMER_DEVICE_CALLBACK_MEMBER(_1943_state::scanline)
+{
+	const int scanline = param;
+
+	// 2 main interrupts per frame (mid-screen interrupt is 96 scanlines before vblank)
+	if (scanline == 144 || scanline == 240)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+
+	// 4 audio interrupts per frame on 32V
+	if ((scanline % 64) == 32)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
+}
 
 
 /* Protection Handlers */
@@ -77,7 +92,7 @@ void _1943_state::c1943_map(address_map &map)
 	map(0xc007, 0xc007).lr8(NAME([this] () -> u8 { return m_mcu_to_cpu; }));
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0xc804, 0xc804).w(FUNC(_1943_state::control_w)); // ROM bank switch, screen flip
-	map(0xc806, 0xc806).w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request (not watchdog reset)
+	map(0xc806, 0xc806).w(m_spriteram, FUNC(buffered_spriteram8_device::write)); // 86S105 DMA transfer request
 	map(0xc807, 0xc807).lw8(NAME([this] (u8 data) { m_cpu_to_mcu = data; }));
 	map(0xd000, 0xd3ff).ram().w(FUNC(_1943_state::videoram_w)).share("videoram");
 	map(0xd400, 0xd7ff).ram().w(FUNC(_1943_state::colorram_w)).share("colorram");
@@ -121,7 +136,7 @@ static INPUT_PORTS_START( 1943 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM )    // VBLANK
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -272,11 +287,9 @@ void _1943_state::_1943(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(24'000'000)/4); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &_1943_state::c1943_map);
-	m_maincpu->set_vblank_int("screen", FUNC(_1943_state::irq0_line_hold));
 
 	Z80(config, m_audiocpu, XTAL(24'000'000)/8); /* verified on pcb */
 	m_audiocpu->set_addrmap(AS_PROGRAM, &_1943_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(_1943_state::irq0_line_hold), attotime::from_hz(4*60));
 
 	I8751(config, m_mcu, XTAL(24'000'000)/8); /* verified on pcb */
 	m_mcu->port_in_cb<0>().set([this](){ return m_cpu_to_mcu; });
@@ -285,6 +298,8 @@ void _1943_state::_1943(machine_config &config)
 	m_mcu->port_in_cb<2>().set([this](){ return m_audiocpu_to_mcu; });
 	m_mcu->port_out_cb<2>().set([this](u8 data){ m_mcu_p2 = data; });
 	m_mcu->port_out_cb<3>().set(FUNC(_1943_state::mcu_p3_w));
+
+	TIMER(config, "scantimer").configure_scanline(FUNC(_1943_state::scanline), "screen", 0, 16);
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -924,5 +939,6 @@ GAME( 1987, 1943ja,  1943,   _1943,   1943,  _1943_state, init_1943, ROT270, "Ca
 GAME( 1987, 1943jah, 1943,   _1943,   1943,  _1943_state, init_1943, ROT270, "Capcom",  "1943: Midway Kaisen (Japan, no protection hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, 1943b,   1943,   _1943b,  1943,  _1943_state, init_1943, ROT270, "bootleg", "1943: Battle of Midway (bootleg, hack of Japan set)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, 1943bj,  1943,   _1943b,  1943,  _1943_state, init_1943, ROT270, "bootleg", "1943: Midway Kaisen (bootleg)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1987, 1943kai, 0,      _1943,   1943,  _1943_state, init_1943, ROT270, "Capcom",  "1943 Kai: Midway Kaisen (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, 1943mii, 0,      _1943,   1943,  _1943_state, init_1943, ROT270, "Capcom",  "1943: The Battle of Midway Mark II (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, 1943mii, 0,      _1943,   1943,  _1943_state, init_1943, ROT270, "Capcom",  "1943: The Battle of Midway Mark II (US)", MACHINE_SUPPORTS_SAVE ) // prototype?

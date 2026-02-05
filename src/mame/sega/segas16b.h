@@ -5,6 +5,7 @@
     Sega System 16B hardware
 
 ***************************************************************************/
+
 #ifndef MAME_SEGA_SEGAS16B_H
 #define MAME_SEGA_SEGAS16B_H
 
@@ -111,6 +112,7 @@ public:
 	void init_generic_korean();
 	void init_generic_bootleg();
 	void init_lockonph();
+
 	// game-specific driver init
 	void init_isgsm();
 	void init_tturf_5704();
@@ -160,7 +162,7 @@ protected:
 
 	// other callbacks
 	void upd7759_generate_nmi(int state);
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	INTERRUPT_GEN_MEMBER(i8751_main_cpu_vblank);
 	void spin_68k_w(uint8_t data);
 
 	// video updates
@@ -301,7 +303,8 @@ public:
 protected:
 	void sound_control_w(uint8_t data);
 	void dac_data_w(offs_t offset, uint8_t data);
-	INTERRUPT_GEN_MEMBER( soundirq_cb );
+	INTERRUPT_GEN_MEMBER(soundirq_cb);
+
 	bool m_nmi_enable;
 	uint16_t m_dac_data;
 
@@ -329,8 +332,8 @@ public:
 	ioport_value afighter_handl_right_r();
 
 private:
-	required_ioport     m_accel;
-	required_ioport     m_steer;
+	required_ioport m_accel;
+	required_ioport m_steer;
 };
 
 #endif // MAME_SEGA_SEGAS16B_H

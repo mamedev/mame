@@ -42,7 +42,16 @@ public:
 	};
 
 	va_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
-	va_lpf4_device& configure_input_gain(float gain) ATTR_COLD;
+
+	va_lpf4_device &configure_input_gain(float gain) ATTR_COLD;
+
+	// Larger values result in more distortion and more of the (filtered)
+	// signal making it through at full resonance. The "correct" value will
+	// depend on the device being emulated, and finding it might require
+	// experimentation. A decent starting point is: 1 / (PP / 2), where PP is
+	// the peak-to-peak magnitude of the input signal.
+	// TODO: Revisit and/or find a better way to determine this.
+	va_lpf4_device &configure_drive(float drive) ATTR_COLD;
 
 	// The meaning of "CV" depends on the class being instantiated. See the
 	// overview at the top of the file.
@@ -62,17 +71,28 @@ protected:
 	void sound_stream_update(sound_stream &stream) override;
 
 private:
+	void recalc_alpha0();
 	void recalc_filter();
 
 	sound_stream *m_stream;
 
-	float m_input_gain;  // Configuration, not needed in save state.
+	// Configuration, not needed in save state.
+	float m_input_gain;
+	float m_drive;
+	float m_drive_inv;
+
+	// Filter state.
 	float m_fc;  // Cutoff frequency in Hz.
 	float m_res;  // Feedback gain.
-	std::array<float, 5> m_a;
-	std::array<float, 5> m_b;
-	std::array<float, 4> m_x;
-	std::array<float, 4> m_y;
+	struct filter_stage
+	{
+		float alpha = 1;
+		float beta = 0;
+		float state = 0;
+	};
+	std::array<filter_stage, 4> m_stages;
+	float m_alpha0;
+	float m_G4;
 };
 
 
@@ -81,10 +101,8 @@ private:
 // res CV: Voltage applied to resistor R_RC connected to pin 9.
 
 // Known inaccuracies:
-// - Filter implementation is linear.
-// - On the actual device, once self-oscillation is achieved, increasing the
-//   resonance CV will increase the amplitude of the oscillation (up to a limit).
-//   This is not modeled here. The maximum resonance is capped for filter stability.
+// - While the implementation includes distortion, it might not match that of
+//   the real chip.
 // - The resonance CV response was eyeballed from a graph on the datasheet, and
 //   is approximate. Furthermore, that graph only goes up to a control current
 //   of 300 uA. The implementation here extrapolates linearly beyond that.

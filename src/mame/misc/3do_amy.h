@@ -9,7 +9,7 @@
 #include "screen.h"
 
 class amy_device : public device_t
-                 , public device_video_interface
+				 , public device_video_interface
 {
 public:
 	amy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -18,6 +18,9 @@ public:
 	void blank_line(int y);
 	void dac_enable(bool enabled);
 	void clut_write(u32 data);
+
+	// init setter
+	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -32,6 +35,9 @@ private:
 	struct {
 		u8 r, g, b;
 	} m_custom_clut[32];
+
+	bool m_is_pal;
+	u16 m_display_hclocks;
 };
 
 DECLARE_DEVICE_TYPE(AMY, amy_device)

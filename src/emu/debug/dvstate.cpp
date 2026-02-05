@@ -15,6 +15,8 @@
 
 #include "screen.h"
 
+#include <locale>
+
 
 //**************************************************************************
 //  DEBUG VIEW STATE SOURCE
@@ -78,7 +80,7 @@ void debug_view_state::enumerate_sources()
 	{
 		m_source_list.emplace_back(
 				std::make_unique<debug_view_state_source>(
-					util::string_format("%s '%s'", state.device().name(), state.device().tag()),
+					util::string_format(std::locale::classic(), "%s '%s'", state.device().name(), state.device().tag()),
 					state.device()));
 	}
 
@@ -133,9 +135,9 @@ void debug_view_state::recompute()
 	{
 		for (int i = 0; (i < screen_count) && (i < 8); i++, iter++)
 		{
-			m_state_list.emplace_back(REG_BEAMX_S0 - i, string_format("beamx%d", i).c_str(), 4);
-			m_state_list.emplace_back(REG_BEAMY_S0 - i, string_format("beamy%d", i).c_str(), 4);
-			m_state_list.emplace_back(REG_FRAME_S0 - i, string_format("frame%d", i).c_str(), 6);
+			m_state_list.emplace_back(REG_BEAMX_S0 - i, string_format(std::locale::classic(), "beamx%d", i).c_str(), 4);
+			m_state_list.emplace_back(REG_BEAMY_S0 - i, string_format(std::locale::classic(), "beamy%d", i).c_str(), 4);
+			m_state_list.emplace_back(REG_FRAME_S0 - i, string_format(std::locale::classic(), "frame%d", i).c_str(), 6);
 		}
 	}
 
@@ -231,25 +233,25 @@ void debug_view_state::view_update()
 
 			case REG_CYCLES:
 				curitem.update(source.m_execintf ? source.m_execintf->cycles_remaining() : 0, cycles_changed);
-				valstr = string_format("%-8d", curitem.value());
+				valstr = string_format(std::locale::classic(), "%-8d", curitem.value());
 				break;
 
 			case REG_BEAMX_S0: case REG_BEAMX_S1: case REG_BEAMX_S2: case REG_BEAMX_S3:
 			case REG_BEAMX_S4: case REG_BEAMX_S5: case REG_BEAMX_S6: case REG_BEAMX_S7:
 				curitem.update(screen_device_enumerator(machine().root_device()).byindex(-(curitem.index() - REG_BEAMX_S0))->hpos(), cycles_changed);
-				valstr = string_format("%4d", curitem.value());
+				valstr = string_format(std::locale::classic(), "%4d", curitem.value());
 				break;
 
 			case REG_BEAMY_S0: case REG_BEAMY_S1: case REG_BEAMY_S2: case REG_BEAMY_S3:
 			case REG_BEAMY_S4: case REG_BEAMY_S5: case REG_BEAMY_S6: case REG_BEAMY_S7:
 				curitem.update(screen_device_enumerator(machine().root_device()).byindex(-(curitem.index() - REG_BEAMY_S0))->vpos(), cycles_changed);
-				valstr = string_format("%4d", curitem.value());
+				valstr = string_format(std::locale::classic(), "%4d", curitem.value());
 				break;
 
 			case REG_FRAME_S0: case REG_FRAME_S1: case REG_FRAME_S2: case REG_FRAME_S3:
 			case REG_FRAME_S4: case REG_FRAME_S5: case REG_FRAME_S6: case REG_FRAME_S7:
 				curitem.update(screen_device_enumerator(machine().root_device()).byindex(-(curitem.index() - REG_FRAME_S0))->frame_number(), cycles_changed);
-				valstr = string_format("%-6d", curitem.value());
+				valstr = string_format(std::locale::classic(), "%-6d", curitem.value());
 				break;
 
 			default:

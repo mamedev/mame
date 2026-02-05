@@ -47,15 +47,15 @@ public:
 		, m_irqs(*this, "irqs")
 	{ }
 
-	void ggconnie(machine_config &config);
+	void ggconnie(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	void lamp_w(uint8_t data);
-	void output_w(uint8_t data);
-	void oki_bank_w(offs_t offset, uint8_t data);
+	void lamp_w(u8 data);
+	void output_w(u8 data);
+	void oki_bank_w(offs_t offset, u8 data);
 	void sgx_io(address_map &map) ATTR_COLD;
 	void sgx_mem(address_map &map) ATTR_COLD;
 	void oki_map(address_map &map) ATTR_COLD;
@@ -70,18 +70,19 @@ private:
 
 void ggconnie_state::machine_start()
 {
+	pce_common_state::machine_start();
 	m_lamp.resolve();
 
 	for (auto &okibank : m_okibank)
 		okibank->configure_entries(0, 8, memregion("oki")->base(), 0x10000);
 }
 
-void ggconnie_state::lamp_w(uint8_t data)
+void ggconnie_state::lamp_w(u8 data)
 {
 	m_lamp = !BIT(data, 0);
 }
 
-void ggconnie_state::output_w(uint8_t data)
+void ggconnie_state::output_w(u8 data)
 {
 	// written in "Output Test" in test mode
 }
@@ -91,7 +92,7 @@ void ggconnie_state::output_w(uint8_t data)
 // - It definitely uses 4 registers for sound, on a ROM that has 8x sound tables.
 // - Is the ROM dumped correctly? This arrangement can definitely make more sense with a $20000 granularity,
 //   where banks 1-3 just touches data instead.
-void ggconnie_state::oki_bank_w(offs_t offset, uint8_t data)
+void ggconnie_state::oki_bank_w(offs_t offset, u8 data)
 {
 	m_okibank[offset]->set_entry(data & 0x07);
 	// popmessage("offset: %02x, bank: %02x\n", offset, data);
@@ -112,9 +113,9 @@ void ggconnie_state::sgx_mem(address_map &map)
 	map(0x1f7500, 0x1f750f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 	map(0x1f7700, 0x1f7700).portr("IN1");
 	map(0x1f7800, 0x1f7800).w(FUNC(ggconnie_state::output_w));
-	map(0x1fe000, 0x1fe007).rw("huc6270_0", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03e0);
+	map(0x1fe000, 0x1fe007).rw("huc6270_0", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8)).mirror(0x03e0);
 	map(0x1fe008, 0x1fe00f).rw("huc6202", FUNC(huc6202_device::read), FUNC(huc6202_device::write)).mirror(0x03e0);
-	map(0x1fe010, 0x1fe017).rw("huc6270_1", FUNC(huc6270_device::read), FUNC(huc6270_device::write)).mirror(0x03e0);
+	map(0x1fe010, 0x1fe017).rw("huc6270_1", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8)).mirror(0x03e0);
 	map(0x1fe400, 0x1fe7ff).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 }
 
@@ -412,42 +413,40 @@ void ggconnie_state::ggconnie(machine_config &config)
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
-	screen.set_screen_update(FUNC(ggconnie_state::screen_update));
+	screen.set_screen_update(m_huc6260, FUNC(huc6260_device::screen_update));
 	screen.set_palette(m_huc6260);
 
 	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
 	m_huc6260->next_pixel_data().set("huc6202", FUNC(huc6202_device::next_pixel));
 	m_huc6260->time_til_next_event().set("huc6202", FUNC(huc6202_device::time_until_next_event));
-	m_huc6260->vsync_changed().set("huc6202", FUNC(huc6202_device::vsync_changed));
-	m_huc6260->hsync_changed().set("huc6202", FUNC(huc6202_device::hsync_changed));
+	m_huc6260->vsync_changed().set("huc6270_0", FUNC(huc6270_device::vsync_changed));
+	m_huc6260->vsync_changed().append("huc6270_1", FUNC(huc6270_device::vsync_changed));
+	m_huc6260->hsync_changed().set("huc6270_0", FUNC(huc6270_device::hsync_changed));
+	m_huc6260->hsync_changed().append("huc6270_1", FUNC(huc6270_device::hsync_changed));
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, 0);
 
-	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", 0));
+	huc6270_device &huc6270_0(HUC6270(config, "huc6270_0", PCE_MAIN_CLOCK));
 	huc6270_0.set_vram_size(0x10000);
 	huc6270_0.irq().set(m_irqs, FUNC(input_merger_device::in_w<0>));
 
-	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", 0));
+	huc6270_device &huc6270_1(HUC6270(config, "huc6270_1", PCE_MAIN_CLOCK));
 	huc6270_1.set_vram_size(0x10000);
 	huc6270_1.irq().set(m_irqs, FUNC(input_merger_device::in_w<1>));
 
-	huc6202_device &huc6202(HUC6202(config, "huc6202", 0 ));
+	huc6202_device &huc6202(HUC6202(config, "huc6202", PCE_MAIN_CLOCK));
 	huc6202.next_pixel_0_callback().set("huc6270_0", FUNC(huc6270_device::next_pixel));
 	huc6202.time_til_next_event_0_callback().set("huc6270_0", FUNC(huc6270_device::time_until_next_event));
-	huc6202.vsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::vsync_changed));
-	huc6202.hsync_changed_0_callback().set("huc6270_0", FUNC(huc6270_device::hsync_changed));
-	huc6202.read_0_callback().set("huc6270_0", FUNC(huc6270_device::read));
-	huc6202.write_0_callback().set("huc6270_0", FUNC(huc6270_device::write));
+	huc6202.read_0_callback().set("huc6270_0", FUNC(huc6270_device::read8));
+	huc6202.write_0_callback().set("huc6270_0", FUNC(huc6270_device::write8));
 	huc6202.next_pixel_1_callback().set("huc6270_1", FUNC(huc6270_device::next_pixel));
 	huc6202.time_til_next_event_1_callback().set("huc6270_1", FUNC(huc6270_device::time_until_next_event));
-	huc6202.vsync_changed_1_callback().set("huc6270_1", FUNC(huc6270_device::vsync_changed));
-	huc6202.hsync_changed_1_callback().set("huc6270_1", FUNC(huc6270_device::hsync_changed));
-	huc6202.read_1_callback().set("huc6270_1", FUNC(huc6270_device::read));
-	huc6202.write_1_callback().set("huc6270_1", FUNC(huc6270_device::write));
+	huc6202.read_1_callback().set("huc6270_1", FUNC(huc6270_device::read8));
+	huc6202.write_1_callback().set("huc6270_1", FUNC(huc6270_device::write8));
 
 	MSM6242(config, m_rtc, XTAL(32'768));
 
-	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "speaker", 2).front(); // TODO: correct?
 
 	OKIM6295(config, m_oki, 2_MHz_XTAL, okim6295_device::PIN7_HIGH); // 2MHz resonator, pin 7 verified
 	m_oki->set_addrmap(0, &ggconnie_state::oki_map);

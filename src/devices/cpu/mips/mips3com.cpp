@@ -12,6 +12,8 @@
 #include "mips3com.h"
 #include "ps2vu.h"
 
+#include <iostream>
+
 
 void mips3_device::execute_set_input(int inputnum, int state)
 {

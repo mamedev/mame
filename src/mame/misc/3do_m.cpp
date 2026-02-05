@@ -151,14 +151,18 @@ uint32_t _3do_state::svf_r(offs_t offset)
 	uint32_t addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	uint32_t *p = m_vram + addr;
 
-	logerror( "%08X: SVF read offset = %08X\n", m_maincpu->pc(), offset * 4 );
+	if (!machine().side_effects_disabled())
+		logerror( "%08X: SVF read offset = %08X\n", m_maincpu->pc(), offset * 4 );
 
 	switch( offset & ( 0xE000 / 4 ) )
 	{
 	case 0x0000/4:      /* SPORT transfer */
-		for ( int i = 0; i < 512; i++ )
+		if (!machine().side_effects_disabled())
 		{
-			m_svf.sport[i] = p[i];
+			for ( int i = 0; i < 512; i++ )
+			{
+				m_svf.sport[i] = p[i];
+			}
 		}
 		break;
 	case 0x2000/4:      /* Write to color register */

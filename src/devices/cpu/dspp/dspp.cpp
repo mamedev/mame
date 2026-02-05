@@ -58,7 +58,48 @@ void dspp_device::code_map(address_map &map)
 	map(0x000, 0x3ff).ram();
 }
 
-void dspp_device::data_map(address_map &map)
+// TODO: quickie and incomplete
+void dspp_device::data_clio_map(address_map &map)
+{
+	map(0x000, 0x06f).mirror(0x080).ram().share("eimem"); // EI (read only by DSPP)
+//  map(0x0d0, 0x0de) EIFIFO status words
+//  map(0x0e0, 0x0e3) EOFIFO status words
+	map(0x0ea, 0x0ea).r(FUNC(dspp_device::noise_r));
+//  map(0x0eb, 0x0eb) audio output status read
+//  map(0x0ec, 0x0ec) semaphore status read
+//  map(0x0ed, 0x0ed) semaphore data word
+	map(0x0ee, 0x0ee).rw(FUNC(dspp_device::pc_r), FUNC(dspp_device::pc_w));
+	map(0x0ef, 0x0ef).rw(FUNC(dspp_device::clock_r), FUNC(dspp_device::clock_w));
+//  map(0x0f0, 0x0fe) input FIFOs
+//  map(0x070, 0x07e) quick reads from FIFO, without removing them from the queue
+	map(0x100, 0x1ff).ram().share("imem");
+	map(0x200, 0x2ff).ram().share("imem");
+	map(0x300, 0x3ea).ram().share("eomem"); // write only by DSPP
+//  map(0x300, 0x30f) quick-out latches
+//  map(0x3eb, 0x3eb) write AUDLOCK, MSB in this version
+	map(0x3eb, 0x3eb).lw16(
+		NAME([this] (offs_t offset, u16 data) {
+			m_core->m_flag_audlock = BIT(data, 15);
+		})
+	);
+//  map(0x3ec, 0x3ec) semaphore ACK
+//  map(0x3ed, 0x3ed) semaphore write
+	// host CPU irq
+	map(0x3ee, 0x3ee).lw16(NAME([this] (offs_t offset, u16 data) {
+		// TODO: reads word written at $3fb8 on host end
+		m_int_handler(1);
+	}));
+//  map(0x3ef, 0x3ef) clock reload
+	map(0x3ef, 0x3ef).lw16(NAME([] (offs_t offset, u16 data) {
+		// TODO: correct?
+		// output_control_w(1);
+	}));
+//  map(0x3f0, 0x3f3) output FIFO, for audio reverb or data streams
+//  map(0x3fd, 0x3fd) flush output FIFO
+	map(0x3fe, 0x3ff).w(FUNC(dspp_device::output_w));
+}
+
+void dspp_bulldog_device::data_bulldog_map(address_map &map)
 {
 	map(0x000, 0x2df).ram();
 	map(0x2f0, 0x2f1).r(FUNC(dspp_device::input_r));
@@ -82,7 +123,8 @@ void dspp_device::data_map(address_map &map)
 //  DEVICE INTERFACE
 //**************************************************************************
 
-DEFINE_DEVICE_TYPE(DSPP, dspp_device, "dspp", "3DO DSPP")
+DEFINE_DEVICE_TYPE(DSPP, dspp_device, "dspp", "3DO DSPP (Green chipset)")
+DEFINE_DEVICE_TYPE(DSPP_BULLDOG, dspp_bulldog_device, "dspp_bulldog", "3DO DSPP (Bulldog chipset)")
 
 //-------------------------------------------------
 //  dspp_device - constructor
@@ -90,7 +132,13 @@ DEFINE_DEVICE_TYPE(DSPP, dspp_device, "dspp", "3DO DSPP")
 
 dspp_device::dspp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dspp_device(mconfig, DSPP, tag, owner, clock, address_map_constructor(FUNC(dspp_device::code_map), this),
-	address_map_constructor(FUNC(dspp_device::data_map), this))
+	address_map_constructor(FUNC(dspp_device::data_clio_map), this))
+{
+}
+
+dspp_bulldog_device::dspp_bulldog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	dspp_device(mconfig, DSPP_BULLDOG, tag, owner, clock, address_map_constructor(FUNC(dspp_bulldog_device::code_map), this),
+	address_map_constructor(FUNC(dspp_bulldog_device::data_bulldog_map), this))
 {
 }
 
@@ -1907,6 +1955,36 @@ uint16_t dspp_device::noise_r()
 //**************************************************************************
 
 //-------------------------------------------------
+// host CPU accesses for 3DO
+//-------------------------------------------------
+
+void dspp_device::host_n_write(offs_t offset, u16 data)
+{
+	m_code.write_word(offset, data);
+}
+
+u16 dspp_device::host_eo_read(offs_t offset)
+{
+	return m_data.read_word(offset);
+}
+
+void dspp_device::host_ei_write(offs_t offset, u16 data)
+{
+	m_data.write_word(offset, data);
+}
+
+// TODO: remaining bits
+void dspp_device::host_gw_control_write(offs_t offset, u16 data)
+{
+	m_core->m_dspx_control = data;
+
+	if (BIT(data, 0))
+		device_reset();
+	if (data & ~1)
+		logerror("host_gw_control_write: %02x\n", data);
+}
+
+//-------------------------------------------------
 //  read_ext_control -
 //-------------------------------------------------
 
@@ -2298,12 +2376,11 @@ void dspp_device::write_ext_control(offs_t offset, uint32_t data)
 	}
 }
 
-
 //-------------------------------------------------
 //  read - host CPU read from DSPP internals
 //-------------------------------------------------
 
-uint32_t dspp_device::read(offs_t offset)
+uint32_t dspp_bulldog_device::host_read(offs_t offset)
 {
 	if (offset < 0x1000/4)
 	{
@@ -2464,7 +2541,7 @@ void dspp_device::write_dma_stack(offs_t offset, uint32_t data)
 //  write - host CPU write to DSPP internals
 //-------------------------------------------------
 
-void dspp_device::write(offs_t offset, uint32_t data)
+void dspp_bulldog_device::host_write(offs_t offset, uint32_t data)
 {
 	if (offset < 0x1000/4)
 	{

@@ -56,11 +56,11 @@ private:
 	void cmd_seek();
 	void cmd_motor_on();
 	void cmd_motor_off();
-//	void cmd_diag();
+//  void cmd_diag();
 	void cmd_read_status();
 	//void cmd_drawer_open();
 	//void cmd_drawer_close();
-	//void cmd_set_mode();
+	void cmd_set_mode();
 	//void cmd_reset();
 	//void cmd_flush();
 	//void cmd_lock();
@@ -75,25 +75,25 @@ private:
 	void cmd_read_error();
 	void cmd_version();
 	//void cmd_mode_sense();
-	//void cmd_read_capacity();
+	void cmd_read_capacity();
 	//void cmd_read_header();
 	//void cmd_read_subq();
 	//void cmd_read_upc();
 	//void cmd_read_isrc();
 	//void cmd_read_disc_code();
-	//void cmd_read_disc_info();
-	//void cmd_read_toc();
-	//void cmd_read_session_info();
+	void cmd_read_disc_info();
+	void cmd_read_toc();
+	void cmd_read_session_info();
 	//void cmd_read_device_driver();
 
 	// drive status
 	static constexpr uint8_t STATUS_DOOR_CLOSED = 0x80; // unverified, not used
-	static constexpr uint8_t STATUS_MEDIA = 0x40;
-	static constexpr uint8_t STATUS_MOTOR = 0x20;
+	static constexpr uint8_t STATUS_MEDIA = 0x40; // disc in
+	static constexpr uint8_t STATUS_MOTOR = 0x20; // spin up
 	static constexpr uint8_t STATUS_ERROR = 0x10;
-	static constexpr uint8_t STATUS_SUCCESS = 0x08; // last command has successfully executed
-	static constexpr uint8_t STATUS_PLAYING = 0x04;
-	static constexpr uint8_t STATUS_DOOR_LOCKED = 0x02; // unverified, not used
+	static constexpr uint8_t STATUS_SUCCESS = 0x08; // unconfirmed in this implementation
+	static constexpr uint8_t STATUS_PLAYING = 0x04; // unconfirmed in this implementation
+	static constexpr uint8_t STATUS_DOUBLE_SPEED = 0x02;
 	static constexpr uint8_t STATUS_READY = 0x01;
 
 	// audio status
@@ -138,6 +138,8 @@ private:
 
 	bool m_status_ready;
 	bool m_data_ready;
+
+	uint8_t m_cdrom_speed;
 };
 
 // device type declaration

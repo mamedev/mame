@@ -98,6 +98,9 @@ void pc8801_31_device::device_start()
 
 	save_item(NAME(m_clock_hb));
 	save_item(NAME(m_cddrive_enable));
+	save_item(NAME(m_dma_enable));
+	save_item(NAME(m_sasi_sel));
+	save_item(NAME(m_sasi_req));
 }
 
 

@@ -9,6 +9,7 @@
 #ifndef MAME_MISC_3DO_H
 #define MAME_MISC_3DO_H
 
+#include "machine/bankdev.h"
 #include "machine/cr560b.h"
 #include "machine/nvram.h"
 #include "machine/timer.h"
@@ -37,6 +38,7 @@ public:
 		m_screen(*this, "screen"),
 		m_dac(*this, "dac%u", 0U),
 		m_overlay_view(*this, "overlay_view"),
+		m_bankdev(*this, "bankdev"),
 		m_p1_r(*this, "P1.%u", 0)
 	{ }
 
@@ -85,6 +87,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device_array<dac_16bit_r2r_twos_complement_device, 2> m_dac;
 	memory_view m_overlay_view;
+	required_device<address_map_bank_device> m_bankdev;
 	required_ioport_array<2> m_p1_r;
 
 	SLOW2 m_slow2;
@@ -101,6 +104,7 @@ private:
 	void svf_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
 	void main_mem(address_map &map) ATTR_COLD;
+	void bios_mem(address_map &map) ATTR_COLD;
 
 	void m_slow2_init( void );
 };

@@ -27,7 +27,7 @@
  *
  * IRIS Graphics (GL1): GF1, UC3, DC3, BP2
  * Enhanced IRIS Graphics (GL2): GF2, UC4, DC4, BP3
- * 
+ *
  * TODO:
  *  - storage cards (Data Systems Design DSD-5217)
  *  - network cards (Excelan EXOS/101 "nx")

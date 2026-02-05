@@ -198,7 +198,7 @@ namespace {
 class pet_state : public driver_device
 {
 public:
-	pet_state(const machine_config &mconfig, device_type type, const char *tag) :
+	pet_state(const machine_config &mconfig, device_type type, const char *tag, size_t videoram_size = 0x400) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, M6502_TAG),
 		m_via(*this, M6522_TAG),
@@ -219,7 +219,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, M6502_TAG),
 		m_char_rom(*this, "charom"),
-		m_video_ram(*this, "video_ram", 0x800, ENDIANNESS_LITTLE),
+		m_video_ram(*this, "video_ram", videoram_size, ENDIANNESS_LITTLE),
 		m_row(*this, "ROW%u", 0),
 		m_lock(*this, "LOCK"),
 		m_sync_timer(nullptr),
@@ -278,12 +278,12 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_MACHINE_START( pet40 );
-	DECLARE_MACHINE_RESET( pet40 );
-
 	void pet2001_mem(address_map &map) ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via;
 	required_device<pia6821_device> m_pia1;
@@ -309,10 +309,6 @@ protected:
 
 	emu_timer *m_sync_timer;
 	attotime m_sync_period;
-
-	DECLARE_MACHINE_START( pet );
-	DECLARE_MACHINE_START( pet2001 );
-	DECLARE_MACHINE_RESET( pet );
 
 	void update_speaker();
 
@@ -343,7 +339,6 @@ protected:
 	int m_sync;
 	int m_graphic;
 	int m_blanktv;
-	int m_video_ram_size;
 
 	// sound state
 	int m_via_cb2;
@@ -358,8 +353,8 @@ protected:
 class pet2001b_state : public pet_state
 {
 public:
-	pet2001b_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pet_state(mconfig, type, tag)
+	pet2001b_state(const machine_config &mconfig, device_type type, const char *tag, size_t videoram_size = 0x400) :
+		pet_state(mconfig, type, tag, videoram_size)
 	{ }
 
 	void pet2001b(machine_config &config, bool with_b000 = true);
@@ -387,14 +382,11 @@ class pet80_state : public pet2001b_state
 {
 public:
 	pet80_state(const machine_config &mconfig, device_type type, const char *tag) :
-		pet2001b_state(mconfig, type, tag)
+		pet2001b_state(mconfig, type, tag, 0x800)
 	{ }
 
 	void pet80(machine_config &config);
 	void pet8032(machine_config &config);
-
-	DECLARE_MACHINE_START( pet80 );
-	DECLARE_MACHINE_RESET( pet80 );
 
 protected:
 	MC6845_UPDATE_ROW( pet80_update_row );
@@ -404,8 +396,8 @@ protected:
 class superpet_state : public pet80_state
 {
 public:
-	superpet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pet80_state(mconfig, type, tag)
+	superpet_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pet80_state(mconfig, type, tag)
 	{ }
 	void superpet(machine_config &config);
 };
@@ -439,6 +431,9 @@ public:
 
 	MC6845_UPDATE_ROW( cbm8296_update_row );
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	required_memory_region m_basic_rom;
 	required_memory_region m_editor_rom;
@@ -447,8 +442,7 @@ private:
 	required_device<pla_device> m_pla1;
 	required_device<pla_device> m_pla2;
 
-	DECLARE_MACHINE_START( cbm8296 );
-	DECLARE_MACHINE_RESET( cbm8296 );
+	virtual void machine_reset() override ATTR_COLD;
 
 	[[maybe_unused]] void read_pla1(offs_t offset, int phi2, int brw, int noscreen, int noio, int ramsela, int ramsel9, int ramon, int norom,
 						int &cswff, int &cs9, int &csa, int &csio, int &cse, int &cskb, int &fa12, int &casena1);
@@ -527,7 +521,7 @@ uint8_t pet_state::read(offs_t offset)
 	case SEL8:
 		if (!(offset & 0x800))
 		{
-			data = m_video_ram[offset & (m_video_ram_size - 1)];
+			data = m_video_ram[offset & (m_video_ram.length() - 1)];
 		}
 		break;
 
@@ -623,7 +617,7 @@ void pet_state::write(offs_t offset, uint8_t data)
 	case SEL8:
 		if (!(offset & 0x800))
 		{
-			m_video_ram[offset & (m_video_ram_size - 1)] = data;
+			m_video_ram[offset & (m_video_ram.length() - 1)] = data;
 		}
 		break;
 
@@ -1536,7 +1530,7 @@ void cbm8296d_ieee488_devices(device_slot_interface &device)
 //  MACHINE INITIALIZATION
 //**************************************************************************
 
-MACHINE_START_MEMBER( pet_state, pet )
+void pet_state::machine_start()
 {
 	// initialize memory
 	uint8_t data = 0xff;
@@ -1549,7 +1543,7 @@ MACHINE_START_MEMBER( pet_state, pet )
 
 	data = 0xff;
 
-	for (offs_t offset = 0; offset < m_video_ram_size; offset++)
+	for (offs_t offset = 0; offset < m_video_ram.length(); offset++)
 	{
 		m_video_ram[offset] = data;
 		if (!(offset % 64)) data ^= 0xff;
@@ -1566,16 +1560,7 @@ MACHINE_START_MEMBER( pet_state, pet )
 	save_item(NAME(m_user_diag));
 }
 
-
-MACHINE_START_MEMBER( pet_state, pet2001 )
-{
-	m_video_ram_size = 0x400;
-
-	MACHINE_START_CALL_MEMBER(pet);
-}
-
-
-MACHINE_RESET_MEMBER( pet_state, pet )
+void pet_state::machine_reset()
 {
 	m_ieee->host_ren_w(0);
 
@@ -1583,49 +1568,17 @@ MACHINE_RESET_MEMBER( pet_state, pet )
 		m_sync_timer->adjust(machine().time() + m_sync_period, 0, m_sync_period);
 }
 
-
-MACHINE_START_MEMBER( pet_state, pet40 )
+void cbm8296_state::machine_start()
 {
-	m_video_ram_size = 0x400;
-
-	MACHINE_START_CALL_MEMBER(pet);
-}
-
-
-MACHINE_RESET_MEMBER( pet_state, pet40 )
-{
-	MACHINE_RESET_CALL_MEMBER(pet);
-}
-
-
-MACHINE_START_MEMBER( pet80_state, pet80 )
-{
-	m_video_ram_size = 0x800;
-
-	MACHINE_START_CALL_MEMBER(pet);
-}
-
-
-MACHINE_RESET_MEMBER( pet80_state, pet80 )
-{
-	MACHINE_RESET_CALL_MEMBER(pet);
-}
-
-
-MACHINE_START_MEMBER( cbm8296_state, cbm8296 )
-{
-	MACHINE_START_CALL_MEMBER(pet80);
+	pet_state::machine_start();
 
 	// state saving
 	save_item(NAME(m_cr));
 	save_item(NAME(m_via_pa));
 }
 
-
-MACHINE_RESET_MEMBER( cbm8296_state, cbm8296 )
+void cbm8296_state::machine_reset()
 {
-	MACHINE_RESET_CALL_MEMBER(pet80);
-
 	m_cr = 0;
 	m_via_pa = 0xff;
 }
@@ -1701,8 +1654,11 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 	m_ieee->srq_callback().set(m_pia2, FUNC(pia6821_device::cb1_w));
 	m_ieee->atn_callback().set(m_pia2, FUNC(pia6821_device::ca1_w));
 
-	PET_DATASSETTE_PORT(config, PET_DATASSETTE_PORT_TAG, cbm_datassette_devices, "c2n").read_handler().set(m_pia1, FUNC(pia6821_device::ca1_w));
-	PET_DATASSETTE_PORT(config, PET_DATASSETTE_PORT2_TAG, cbm_datassette_devices, nullptr).read_handler().set(M6522_TAG, FUNC(via6522_device::write_cb1));
+	PET_DATASSETTE_PORT(config, m_cassette, cbm_datassette_devices, "c2n");
+	m_cassette->read_handler().set(m_pia1, FUNC(pia6821_device::ca1_w));
+
+	PET_DATASSETTE_PORT(config, m_cassette2, cbm_datassette_devices, nullptr);
+	m_cassette2->read_handler().set(M6522_TAG, FUNC(via6522_device::write_cb1));
 
 	PET_EXPANSION_SLOT(config, m_exp, XTAL(16'000'000)/16, pet_expansion_cards, nullptr);
 	m_exp->dma_read_callback().set(FUNC(pet_state::read));
@@ -1733,9 +1689,6 @@ void pet_state::base_pet_devices(machine_config &config, const char *default_dri
 void pet_state::pet(machine_config &config)
 {
 	base_pet_devices(config, "c4040");
-
-	MCFG_MACHINE_START_OVERRIDE(pet_state, pet2001)
-	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet)
 
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(8'000'000)/8);
@@ -1884,8 +1837,6 @@ void pet2001b_state::pet4032(machine_config &config)
 void pet2001b_state::pet4032f(machine_config &config)
 {
 	pet4000(config);
-	MCFG_MACHINE_START_OVERRIDE(pet_state, pet40)
-	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
 
 	// video hardware
 	m_screen->set_raw(XTAL(16'000'000)/2, 400, 0, 320, 333, 0, 200);
@@ -1937,8 +1888,6 @@ void pet_state::cbm4032(machine_config &config)
 void pet_state::cbm4032f(machine_config &config)
 {
 	cbm4000(config);
-	MCFG_MACHINE_START_OVERRIDE(pet_state, pet40)
-	MCFG_MACHINE_RESET_OVERRIDE(pet_state, pet40)
 
 	// video hardware
 	m_screen->set_raw(XTAL(16'000'000)/2, 400, 0, 320, 400, 0, 200);
@@ -1994,9 +1943,6 @@ void pet2001b_state::cbm4032b(machine_config &config)
 void pet80_state::pet80(machine_config &config)
 {
 	base_pet_devices(config, "c8050");
-
-	MCFG_MACHINE_START_OVERRIDE(pet80_state, pet80)
-	MCFG_MACHINE_RESET_OVERRIDE(pet80_state, pet80)
 
 	// basic machine hardware
 	M6502(config, m_maincpu, XTAL(16'000'000)/16);
@@ -2057,8 +2003,6 @@ void cbm8096_state::cbm8096(machine_config &config)
 void cbm8296_state::cbm8296(machine_config &config)
 {
 	pet80(config);
-	MCFG_MACHINE_START_OVERRIDE(cbm8296_state, cbm8296)
-	MCFG_MACHINE_RESET_OVERRIDE(cbm8296_state, cbm8296)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbm8296_state::cbm8296_mem);
 
@@ -2112,6 +2056,24 @@ ROM_START( pet2001 )
 	ROM_LOAD( "901447-08.a2", 0x000, 0x800, CRC(54f32f45) SHA1(3e067cc621e4beafca2b90cb8f6dba975df2855b) )
 ROM_END
 
+ROM_START( pet2001j )
+	ROM_REGION( 0x7000, M6502_TAG, 0 )
+	ROM_DEFAULT_BIOS( "basic1r" )
+	ROM_SYSTEM_BIOS( 0, "basic1o", "Original" )
+	ROMX_LOAD( "901447-01.h1", 0x3000, 0x0800, CRC(a055e33a) SHA1(831db40324113ee996c434d38b4add3fd1f820bd), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "basic1r", "Revised" )
+	ROMX_LOAD( "901447-09.h1", 0x3000, 0x0800, CRC(03cf16d0) SHA1(1330580c0614d3556a389da4649488ba04a60908), ROM_BIOS(1) )
+	ROM_LOAD( "901447-02.h5", 0x3800, 0x0800, CRC(69fd8a8f) SHA1(70c0f4fa67a70995b168668c957c3fcf2c8641bd) )
+	ROM_LOAD( "901447-03.h2", 0x4000, 0x0800, CRC(d349f2d4) SHA1(4bf2c20c51a63d213886957485ebef336bb803d0) )
+	ROM_LOAD( "901447-04.h6", 0x4800, 0x0800, CRC(850544eb) SHA1(d293972d529023d8fd1f493149e4777b5c253a69) )
+	ROM_LOAD( "901447-05.h3", 0x5000, 0x0800, CRC(9e1c5cea) SHA1(f02f5fb492ba93dbbd390f24c10f7a832dec432a) )
+	ROM_LOAD( "901447-06.h4", 0x6000, 0x0800, CRC(661a814a) SHA1(960717282878e7de893d87242ddf9d1512be162e) )
+	ROM_LOAD( "901447-07.h7", 0x6800, 0x0800, CRC(c4f47ad1) SHA1(d440f2510bc52e20c3d6bc8b9ded9cea7f462a9c) )
+
+	ROM_REGION( 0x800, "charom", 0 )
+	ROM_LOAD( "901447-12.uf10", 0x000, 0x800, CRC(2c9c8d89) SHA1(7443cdc9df326300bb928f2dbfe735d7be6cdfb2) )
+ROM_END
+
 #define rom_pet20018 rom_pet2001
 
 
@@ -2127,7 +2089,7 @@ ROM_START( pet2001n )
 	ROM_LOAD( "901465-03.ud9", 0x6000, 0x1000, CRC(f02238e2) SHA1(38742bdf449f629bcba6276ef24d3daeb7da6e84) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
+	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 ROM_END
 
 #define rom_pet2001n16 rom_pet2001n
@@ -2149,7 +2111,7 @@ ROM_START( pet2001b )
 	ROM_LOAD( "901465-03.ud9", 0x6000, 0x1000, CRC(f02238e2) SHA1(38742bdf449f629bcba6276ef24d3daeb7da6e84) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
+	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 ROM_END
 
 #define rom_pet2001b16 rom_pet2001b
@@ -2174,7 +2136,7 @@ ROM_START( pet4016 )
 	ROM_LOAD( "901465-22.ud9", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
+	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 ROM_END
 
 #define rom_pet4032 rom_pet4016
@@ -2197,7 +2159,7 @@ ROM_START( pet4032f )
 	ROM_LOAD( "901465-22.ud9", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
+	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 ROM_END
 
 
@@ -2218,7 +2180,7 @@ ROM_START( cbm4016 )
 	ROM_LOAD( "901465-22.ud9", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
+	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 ROM_END
 
 #define rom_cbm4032 rom_cbm4016
@@ -2241,7 +2203,7 @@ ROM_START( cbm4032f )
 	ROM_LOAD( "901465-22.ud9", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
+	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 ROM_END
 
 
@@ -2262,7 +2224,7 @@ ROM_START( pet4032b )
 	ROM_LOAD( "901465-22.ud9", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )   // Character Generator
+	ROM_LOAD( "901447-10.uf10", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 ROM_END
 
 #define rom_cbm4032b rom_pet4032b
@@ -2281,7 +2243,7 @@ ROM_START( pet8032 )
 	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.ua3", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
+	ROM_LOAD( "901447-10.ua3", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 ROM_END
 
 
@@ -2298,7 +2260,7 @@ ROM_START( cbm8032 )
 	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-10.ua3", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
+	ROM_LOAD( "901447-10.ua3", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 ROM_END
 
 #define rom_cbm8096 rom_cbm8032
@@ -2313,7 +2275,7 @@ ROM_START( cbm8032_de )
 	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
 	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
-	ROM_LOAD( "german.bin",    0x5000, 0x0800, CRC(1c1e597d) SHA1(7ac75ed73832847623c9f4f197fe7fb1a73bb41c) )
+	ROM_LOAD( "german.ud7",    0x5000, 0x0800, CRC(1c1e597d) SHA1(7ac75ed73832847623c9f4f197fe7fb1a73bb41c) )
 	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
@@ -2330,7 +2292,7 @@ ROM_START( cbm8032_fr )
 	ROM_LOAD( "901465-23.ud10", 0x2000, 0x1000, CRC(ae3deac0) SHA1(975ee25e28ff302879424587e5fb4ba19f403adc) )  // BASIC 4
 	ROM_LOAD( "901465-20.ud9", 0x3000, 0x1000, CRC(0fc17b9c) SHA1(242f98298931d21eaacb55fe635e44b7fc192b0a) )   // BASIC 4
 	ROM_LOAD( "901465-21.ud8", 0x4000, 0x1000, CRC(36d91855) SHA1(1bb236c72c726e8fb029c68f9bfa5ee803faf0a8) )   // BASIC 4
-	ROM_LOAD( "8032_editor_80c_fr_a1ab.ud7", 0x5000, 0x1000, CRC(4d3d9918) SHA1(eedac298a201a28ad86a5939b569a46f9f12c16f) )
+	ROM_LOAD( "901474-04-azerty.ud7", 0x5000, 0x0800, CRC(28bbe4b2) SHA1(fc82ff76eb7224a52f2c88c8ddae93c68b0d194f) )
 	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x1000, "charom", 0 )
@@ -2351,7 +2313,7 @@ ROM_START( cbm8032_se )
 	ROM_LOAD( "901465-22.ud6", 0x6000, 0x1000, CRC(cc5298a1) SHA1(96a0fa56e0c937da92971d9c99d504e44e898806) )   // Kernal
 
 	ROM_REGION( 0x800, "charom", 0 )
-	ROM_LOAD( "901447-14.ua3", 0x0000, 0x800, CRC(48c77d29) SHA1(aa7c8ff844d16ec05e2b32acc586c58d9e35388c) )    // Character Generator
+	ROM_LOAD( "901447-14.ua3", 0x0000, 0x800, CRC(48c77d29) SHA1(aa7c8ff844d16ec05e2b32acc586c58d9e35388c) )
 ROM_END
 
 
@@ -2405,7 +2367,7 @@ ROM_START( cbm8296 )
 	ROM_LOAD( "8296.ue8", 0x000, 0x800, CRC(a3475de6) SHA1(b715db83fd26458dfd254bef5c4aae636753f7f5) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
-	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
+	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 
 	ROM_REGION( 0x20, "prom", 0 )
 	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
@@ -2440,7 +2402,7 @@ ROM_START( cbm8296ed )
 	ROM_LOAD( "execudesk.ue8", 0x0000, 0x1000, CRC(bef0eaa1) SHA1(7ea63a2d651f516e96b8725195c13542ea495ebd) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
-	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
+	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 
 	ROM_REGION( 0x20, "prom", 0 )
 	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
@@ -2473,7 +2435,7 @@ ROM_START( cbm8296d )
 	ROM_LOAD( "324243-01.ue8", 0x0000, 0x1000, CRC(4000e833) SHA1(dafbdf8ba0a1fe7d7b9586ffbfc9e5390c0fcf6f) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
-	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
+	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 
 	ROM_REGION( 0x20, "prom", 0 )
 	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
@@ -2541,7 +2503,7 @@ ROM_START( cbm8296gd )
 	ROM_LOAD( "324243-01.ue8", 0x0000, 0x1000, CRC(4000e833) SHA1(dafbdf8ba0a1fe7d7b9586ffbfc9e5390c0fcf6f) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
-	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )    // Character Generator
+	ROM_LOAD( "901447-10.uc5", 0x000, 0x800, CRC(d8408674) SHA1(0157a2d55b7ac4eaeb38475889ebeea52e2593db) )
 
 	ROM_REGION( 0x20, "prom", 0 )
 	ROM_LOAD( "74s288.uc2", 0x00, 0x20, CRC(06030665) SHA1(19dc91ca49ecc20e66c646ba480d2c3bc70a62e6) ) // video/RAM timing
@@ -2602,6 +2564,7 @@ ROM_END
 
 //    YEAR  NAME           PARENT    COMPAT  MACHINE     INPUT    CLASS           INIT        COMPANY                        FULLNAME        FLAGS
 COMP( 1977, pet2001,       0,        0,      pet2001,    pet,     pet_state,      empty_init, "Commodore Business Machines", "PET 2001-4",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, pet2001j,      pet2001,  0,      pet2001,    pet,     pet_state,      empty_init, "Commodore Business Machines", "PET 2001-4 (Japan)",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1977, pet20018,      pet2001,  0,      pet20018,   pet,     pet_state,      empty_init, "Commodore Business Machines", "PET 2001-8",   MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1979, pet2001n,      0,        0,      pet2001n8,  pet,     pet_state,      empty_init, "Commodore Business Machines", "PET 2001-N8",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1979, pet2001n16,    pet2001n, 0,      pet2001n16, pet,     pet_state,      empty_init, "Commodore Business Machines", "PET 2001-N16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
@@ -2624,7 +2587,7 @@ COMP( 1980, cbm4032b,      pet4032b, 0,      cbm4032b,   petb,    pet2001b_state
 COMP( 1980, pet8032,       0,        0,      pet8032,    petb,    pet80_state,    empty_init, "Commodore Business Machines", "PET 8032",     MACHINE_SUPPORTS_SAVE )
 COMP( 1981, cbm8032,       pet8032,  0,      pet8032,    petb,    pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032",     MACHINE_SUPPORTS_SAVE )
 COMP( 1981, cbm8032_de,    pet8032,  0,      pet8032,    petb_de, pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032 (Germany)",        MACHINE_SUPPORTS_SAVE )
-COMP( 1981, cbm8032_fr,    pet8032,  0,      pet8032,    petb_fr, pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032 (France)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1981, cbm8032_fr,    pet8032,  0,      pet8032,    petb_fr, pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032 (France)",         MACHINE_SUPPORTS_SAVE )
 COMP( 1981, cbm8032_se,    pet8032,  0,      pet8032,    petb_se, pet80_state,    empty_init, "Commodore Business Machines", "CBM 8032 (Sweden/Finland)", MACHINE_SUPPORTS_SAVE )
 COMP( 1981, superpet,      pet8032,  0,      superpet,   petb,    superpet_state, empty_init, "Commodore Business Machines", "SuperPET SP-9000",          MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 COMP( 1981, mmf9000,       pet8032,  0,      superpet,   petb,    superpet_state, empty_init, "Commodore Business Machines", "MicroMainFrame 9000",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
@@ -2634,5 +2597,5 @@ COMP( 1984, cbm8296,       0,        0,      cbm8296,    petb,    cbm8296_state,
 COMP( 1984, cbm8296ed,     cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296 ExecuDesk",        MACHINE_SUPPORTS_SAVE )
 COMP( 1984, cbm8296d,      cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296-D",   MACHINE_SUPPORTS_SAVE )
 COMP( 1984, cbm8296d_de,   cbm8296,  0,      cbm8296d,   petb_de, cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296-D (Germany)",      MACHINE_SUPPORTS_SAVE )
-COMP( 1984, cbm8296gd,     cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296GD",   MACHINE_SUPPORTS_SAVE )
+COMP( 1984, cbm8296gd,     cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296GD",   MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1984, cbm8296dgv_de, cbm8296,  0,      cbm8296d,   petb,    cbm8296_state,  empty_init, "Commodore Business Machines", "CBM 8296-D GV? (Germany)",  MACHINE_SUPPORTS_SAVE )

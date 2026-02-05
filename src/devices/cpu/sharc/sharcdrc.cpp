@@ -14,6 +14,7 @@
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
 
+#define USE_FAST_APPROX 0
 #define USE_SWAPDQ  0
 
 
@@ -292,7 +293,7 @@ void adsp21062_device::static_generate_memory_accessor(MEM_ACCESSOR_TYPE type, c
 	// I0 = read/write data
 	// I1 = address
 
-	drcuml_block &block(m_drcuml->begin_block(1024));
+	drcuml_block &block(m_drcuml->begin_invariant_block(1024));
 
 	// add a global entry for this
 	alloc_handle(handleptr, name);
@@ -338,7 +339,7 @@ void adsp21062_device::static_generate_push_pc()
 	// Trashes I1
 
 	uml::code_label label = 1;
-	drcuml_block &block(m_drcuml->begin_block(32));
+	drcuml_block &block(m_drcuml->begin_invariant_block(32));
 
 	// add a global entry for this
 	alloc_handle(m_push_pc, "push_pc");
@@ -373,7 +374,7 @@ void adsp21062_device::static_generate_pop_pc()
 	// Trashes I1
 
 	uml::code_label label = 1;
-	drcuml_block &block(m_drcuml->begin_block(32));
+	drcuml_block &block(m_drcuml->begin_invariant_block(32));
 
 	// add a global entry for this
 	alloc_handle(m_pop_pc, "pop_pc");
@@ -410,7 +411,7 @@ void adsp21062_device::static_generate_push_loop()
 	// Trashes I2
 
 	uml::code_label label = 1;
-	drcuml_block &block(m_drcuml->begin_block(32));
+	drcuml_block &block(m_drcuml->begin_invariant_block(32));
 
 	// add a global entry for this
 	alloc_handle(m_push_loop, "push_loop");
@@ -446,7 +447,7 @@ void adsp21062_device::static_generate_pop_loop()
 	// Trashes I0,I2
 
 	uml::code_label label = 1;
-	drcuml_block &block(m_drcuml->begin_block(32));
+	drcuml_block &block(m_drcuml->begin_invariant_block(32));
 
 	// add a global entry for this
 	alloc_handle(m_pop_loop, "pop_loop");
@@ -480,7 +481,7 @@ void adsp21062_device::static_generate_push_status()
 	// Trashes I2
 
 	uml::code_label label = 1;
-	drcuml_block &block(m_drcuml->begin_block(32));
+	drcuml_block &block(m_drcuml->begin_invariant_block(32));
 
 	// add a global entry for this
 	alloc_handle(m_push_status, "push_status");
@@ -515,7 +516,7 @@ void adsp21062_device::static_generate_pop_status()
 	// Trashes I2
 
 	uml::code_label label = 1;
-	drcuml_block &block(m_drcuml->begin_block(32));
+	drcuml_block &block(m_drcuml->begin_invariant_block(32));
 
 	// add a global entry for this
 	alloc_handle(m_pop_status, "pop_status");
@@ -555,7 +556,7 @@ void adsp21062_device::static_generate_exception(uint8_t exception, const char *
 	uml::code_label const label_nopush = label++;
 
 	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(1024));
+	drcuml_block &block(m_drcuml->begin_invariant_block(1024));
 
 	/* add a global entry for this */
 	alloc_handle(exception_handle, name);
@@ -593,7 +594,7 @@ void adsp21062_device::static_generate_mode1_ops()
 	// e.g SWAP128 instruction (swap 128 bits between 2 memory locations)
 
 	{
-		drcuml_block &block(m_drcuml->begin_block(128));
+		drcuml_block &block(m_drcuml->begin_invariant_block(128));
 		alloc_handle(m_swap_dag1_0_3, "swap_dag1_0_3");
 		UML_HANDLE(block, *m_swap_dag1_0_3);                                    // handle  name
 #if !USE_SWAPDQ
@@ -626,7 +627,7 @@ void adsp21062_device::static_generate_mode1_ops()
 		block.end();
 	}
 	{
-		drcuml_block &block(m_drcuml->begin_block(128));
+		drcuml_block &block(m_drcuml->begin_invariant_block(128));
 		alloc_handle(m_swap_dag1_4_7, "swap_dag1_4_7");
 		UML_HANDLE(block, *m_swap_dag1_4_7);                                    // handle  name
 #if !USE_SWAPDQ
@@ -659,7 +660,7 @@ void adsp21062_device::static_generate_mode1_ops()
 		block.end();
 	}
 	{
-		drcuml_block &block(m_drcuml->begin_block(128));
+		drcuml_block &block(m_drcuml->begin_invariant_block(128));
 		alloc_handle(m_swap_dag2_0_3, "swap_dag2_0_3");
 		UML_HANDLE(block, *m_swap_dag2_0_3);                                    // handle  name
 #if !USE_SWAPDQ
@@ -692,7 +693,7 @@ void adsp21062_device::static_generate_mode1_ops()
 		block.end();
 	}
 	{
-		drcuml_block &block(m_drcuml->begin_block(128));
+		drcuml_block &block(m_drcuml->begin_invariant_block(128));
 		alloc_handle(m_swap_dag2_4_7, "swap_dag2_4_7");
 		UML_HANDLE(block, *m_swap_dag2_4_7);                                    // handle  name
 #if !USE_SWAPDQ
@@ -725,7 +726,7 @@ void adsp21062_device::static_generate_mode1_ops()
 		block.end();
 	}
 	{
-		drcuml_block &block(m_drcuml->begin_block(64));
+		drcuml_block &block(m_drcuml->begin_invariant_block(64));
 		alloc_handle(m_swap_r0_7, "swap_r0_7");
 		UML_HANDLE(block, *m_swap_r0_7);                                        // handle  name
 #if !USE_SWAPDQ
@@ -744,7 +745,7 @@ void adsp21062_device::static_generate_mode1_ops()
 		block.end();
 	}
 	{
-		drcuml_block &block(m_drcuml->begin_block(64));
+		drcuml_block &block(m_drcuml->begin_invariant_block(64));
 		alloc_handle(m_swap_r8_15, "swap_r8_15");
 		UML_HANDLE(block, *m_swap_r8_15);                                       // handle  name
 #if !USE_SWAPDQ
@@ -777,7 +778,7 @@ void adsp21062_device::execute_run_drc()
 
 	/* reset the cache if dirty */
 	if (m_core->cache_dirty)
-		flush_cache();
+		m_drcuml->reset();
 
 	m_core->cache_dirty = 0;
 	m_core->force_recompile = 0;
@@ -798,7 +799,7 @@ void adsp21062_device::execute_run_drc()
 		}
 		else if (execute_result == EXECUTE_RESET_CACHE)
 		{
-			flush_cache();
+			m_drcuml->reset();
 		}
 	} while (execute_result != EXECUTE_OUT_OF_CYCLES);
 }
@@ -888,17 +889,14 @@ void adsp21062_device::compile_block(offs_t pc)
 		}
 		catch (drcuml_block::abort_compilation &)
 		{
-			flush_cache();
+			m_drcuml->reset();
 		}
 	}
 }
 
 
-void adsp21062_device::flush_cache()
+void adsp21062_device::generate_invariant()
 {
-	/* empty the transient cache contents */
-	m_drcuml->reset();
-
 	try
 	{
 		// generate the entry point and out-of-cycles handlers
@@ -938,7 +936,7 @@ void adsp21062_device::static_generate_entry_point()
 	uml::code_label const skip = 1;
 
 	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(20));
+	drcuml_block &block(m_drcuml->begin_invariant_block(20));
 
 	/* forward references */
 	alloc_handle(m_nocode, "nocode");
@@ -975,7 +973,7 @@ void adsp21062_device::static_generate_entry_point()
 void adsp21062_device::static_generate_nocode_handler()
 {
 	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(10));
+	drcuml_block &block(m_drcuml->begin_invariant_block(10));
 
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(m_nocode, "nocode");
@@ -991,7 +989,7 @@ void adsp21062_device::static_generate_nocode_handler()
 void adsp21062_device::static_generate_out_of_cycles()
 {
 	/* begin generating */
-	drcuml_block &block(m_drcuml->begin_block(10));
+	drcuml_block &block(m_drcuml->begin_invariant_block(10));
 
 	/* generate a hash jump via the current mode and PC */
 	alloc_handle(m_out_of_cycles, "out_of_cycles");
@@ -4071,8 +4069,9 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						return;
 
 					case 0xc4:      // Fn = RECIPS Fx
+					{
+#if USE_FAST_APPROX
 						// TODO: denormals
-						// TODO: use the bit accurate method from interpreter?
 						UML_FSCOPYI(block, F0, REG(rx));
 						if (AN_CALC_REQUIRED || AV_CALC_REQUIRED)
 							UML_FSCMP(block, F0, mem(&m_core->fp0));
@@ -4089,11 +4088,70 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						if (AS_CALC_REQUIRED) UML_MOV(block, ASTAT_AS, 0);
 						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 0);  // TODO
 						UML_ICOPYFS(block, REG(rn), F0);
+#else
+						uml::code_label const recips_finite = compiler.labelnum++;
+						uml::code_label const recips_tozero = compiler.labelnum++;
+						uml::code_label const recips_nan = compiler.labelnum++;
+						uml::code_label const recips_zero = compiler.labelnum++;
+						uml::code_label const recips_notnan = compiler.labelnum++;
+						uml::code_label const recips_end = compiler.labelnum++;
+
+						UML_MOV(block, I0, REG(rx));
+						if (AC_CALC_REQUIRED) UML_MOV(block, ASTAT_AC, 0);
+						if (AS_CALC_REQUIRED) UML_MOV(block, ASTAT_AS, 0);
+						UML_TEST(block, I0, 0x7fffffff);
+						if (AV_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AV);
+						UML_JMPc(block, COND_Z, recips_zero);
+						if (AN_CALC_REQUIRED) UML_BFXU(block, ASTAT_AN, I0, 31, 1);
+						UML_BFXU(block, I1, I0, 23, 8);
+						UML_CMP(block, I1, 0x000000ff);
+						UML_JMPc(block, COND_NE, recips_finite);
+						UML_TEST(block, I0, 0x7fffff);
+						UML_JMPc(block, COND_NZ, recips_nan);
+						UML_LABEL(block, recips_finite);
+						UML_SUB(block, I1, 127 - 1, I1);
+						UML_CMP(block, I1, 125);
+						UML_JMPc(block, COND_G, recips_tozero);
+						UML_CMP(block, I1, -126);
+						UML_JMPc(block, COND_L, recips_tozero);
+						UML_ADD(block, I1, I1, 127);
+						UML_ROLAND(block, I1, I1, 23, 0x7f800000);
+						UML_ROLINS(block, I1, I0, 0, 0x80000000);
+						UML_BFXU(block, I0, I0, 23 - 7, 7);
+						UML_LOAD(block, I0, &recips_mantissa_lookup, I0, SIZE_DWORD, SCALE_x4);
+						UML_OR(block, I0, I0, I1);
+						UML_MOV(block, REG(rn), I0);
+						if (AZ_CALC_REQUIRED)
+						{
+							UML_TEST(block, I0, 0x7fffffff);
+							UML_SETc(block, COND_Z, ASTAT_AZ);
+						}
+						UML_JMP(block, recips_notnan);
+						UML_LABEL(block, recips_tozero);
+						UML_AND(block, REG(rn), I0, 0x80000000);
+						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 1);
+						UML_JMP(block, recips_notnan);
+						UML_LABEL(block, recips_nan);
+						UML_MOV(block, REG(rn), 0xffffffff);
+						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 0);
+						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 1);
+						UML_JMP(block, recips_end);
+						UML_LABEL(block, recips_zero);
+						UML_AND(block, I0, I0, 0x80000000);
+						if (AN_CALC_REQUIRED) UML_SETc(block, COND_NZ, ASTAT_AN);
+						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 0);
+						UML_OR(block, REG(rn), I0, 0x7f800000);
+						UML_LABEL(block, recips_notnan);
+						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 0);
+						UML_LABEL(block, recips_end);
+#endif
 						return;
+					}
 
 					case 0xc5:      // Fn = RSQRTS Fx
+					{
+#if USE_FAST_APPROX
 						// TODO: denormals
-						// TODO: use the bit accurate method from interpreter?
 						UML_FSCOPYI(block, F0, REG(rx));
 						UML_FSCMP(block, F0, mem(&m_core->fp0));
 						UML_JMPc(block, COND_Z, compiler.labelnum);
@@ -4103,7 +4161,48 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						// TODO: flags!
 						if (AC_CALC_REQUIRED) UML_MOV(block, ASTAT_AC, 0);
 						if (AS_CALC_REQUIRED) UML_MOV(block, ASTAT_AS, 0);
+#else
+						uml::code_label const rsqrts_finite = compiler.labelnum++;
+						uml::code_label const rsqrts_nan = compiler.labelnum++;
+						uml::code_label const rsqrts_end = compiler.labelnum++;
+
+						UML_MOV(block, I0, REG(rx));
+						if (AC_CALC_REQUIRED) UML_MOV(block, ASTAT_AC, 0);
+						if (AS_CALC_REQUIRED) UML_MOV(block, ASTAT_AS, 0);
+						UML_CMP(block, I0, 0x80000000);
+						if (AN_CALC_REQUIRED) UML_SETc(block, COND_E, ASTAT_AN);
+						UML_JMPc(block, COND_A, rsqrts_nan);
+						UML_BFXU(block, I1, I0, 23, 8);
+						UML_CMP(block, I1, 0x000000ff);
+						UML_JMPc(block, COND_NE, rsqrts_finite);
+						UML_TEST(block, I0, 0x7fffff);
+						UML_JMPc(block, COND_NZ, rsqrts_nan);
+						UML_LABEL(block, rsqrts_finite);
+						if (AV_CALC_REQUIRED)
+						{
+							UML_TEST(block, I0, 0x7fffffff);
+							UML_SETc(block, COND_Z, ASTAT_AV);
+						}
+						UML_SUB(block, I1, I1, 127);
+						UML_SAR(block, I1, I1, 1);
+						UML_SUB(block, I1, -1 + 127, I1);
+						UML_ROLAND(block, I1, I1, 23, 0x7f800000);
+						UML_ROLINS(block, I1, I0, 0, 0x80000000);
+						UML_BFXU(block, I0, I0, 23 - 6, 6 + 1);
+						UML_LOAD(block, I0, &rsqrts_mantissa_lookup, I0, SIZE_DWORD, SCALE_x4);
+						UML_OR(block, REG(rn), I0, I1);
+						if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
+						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 0);
+						UML_JMP(block, rsqrts_end);
+						UML_LABEL(block, rsqrts_nan);
+						UML_MOV(block, REG(rn), 0xffffffff);
+						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 0);
+						if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);
+						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 1);
+						UML_LABEL(block, rsqrts_end);
+#endif
 						return;
+					}
 
 					case 0xca:      // Fn = FLOAT Rx
 						UML_FSFRINT(block, F0, REG(rx), SIZE_DWORD);
@@ -4121,7 +4220,7 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_FSCOPYI(block, F0, REG(rx));
 						UML_TEST(block, MODE1, MODE1_TRUNCATE);
 						UML_JMPc(block, COND_Z, compiler.labelnum);
-						UML_FSTOINT(block, I0, F0, SIZE_DWORD, ROUND_TRUNC);
+						UML_FSTOINT(block, I0, F0, SIZE_DWORD, ROUND_FLOOR);
 						UML_JMP(block, compiler.labelnum + 1);
 						UML_LABEL(block, compiler.labelnum++);
 						UML_FSTOINT(block, I0, F0, SIZE_DWORD, ROUND_ROUND);
@@ -4159,7 +4258,7 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_FSCOPYI(block, F2, I0);
 						UML_TEST(block, MODE1, MODE1_TRUNCATE);
 						UML_JMPc(block, COND_Z, compiler.labelnum);
-						UML_FSTOINT(block, I0, F2, SIZE_DWORD, ROUND_TRUNC);
+						UML_FSTOINT(block, I0, F2, SIZE_DWORD, ROUND_FLOOR);
 						UML_JMP(block, compiler.labelnum + 1);
 						UML_LABEL(block, compiler.labelnum++);
 						UML_FSTOINT(block, I0, F2, SIZE_DWORD, ROUND_ROUND);

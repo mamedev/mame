@@ -1619,10 +1619,13 @@ void hyperstone_device::device_start()
 		m_drcuml->symbol_add(&m_core->arg0, sizeof(uint32_t), "arg0");
 		m_drcuml->symbol_add(&m_core->arg1, sizeof(uint32_t), "arg1");
 
-		/* initialize the front-end helper */
+		// initialize the front-end helper
 		m_drcfe = std::make_unique<e132xs_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, m_single_instruction_mode ? 1 : COMPILE_MAX_SEQUENCE);
 
-		/* mark the cache dirty so it is updated on next execute */
+		// generate invariant code
+		generate_invariant();
+
+		// mark the cache dirty so it is updated on next execute
 		m_cache_dirty = true;
 	}
 
@@ -1783,7 +1786,7 @@ void gms30c2132_device::device_start()
 
 void hyperstone_device::device_reset()
 {
-	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
+	// TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
 	m_core->tr_clocks_per_tick = 2;
 
