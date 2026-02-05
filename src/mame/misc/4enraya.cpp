@@ -179,7 +179,7 @@ public:
 	{
 	}
 
-	void _4enraya(machine_config &config);
+	void _4enraya(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -188,7 +188,7 @@ protected:
 
 	void videoram_w(offs_t offset, uint8_t data);
 
-	void video(machine_config &config);
+	void video(machine_config &config) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ay8910_device> m_ay;
@@ -226,18 +226,23 @@ class unk_gambl_state : public _4enraya_state
 public:
 	unk_gambl_state(const machine_config &mconfig, device_type type, const char *tag)
 		: _4enraya_state(mconfig, type, tag)
+		, m_nvram(*this, "nvram")
 	{
 	}
 
-	void unkpacg(machine_config &config);
-	void unkpacga(machine_config &config);
-	void tourpgum(machine_config &config);
-	void chicgum(machine_config &config);
+	void unkpacg(machine_config &config) ATTR_COLD;
+	void unkpacga(machine_config &config) ATTR_COLD;
+	void tourpgum(machine_config &config) ATTR_COLD;
+	void chicgum(machine_config &config) ATTR_COLD;
+	void strker(machine_config &config) ATTR_COLD;
 
 private:
+	required_shared_ptr<uint8_t> m_nvram;
+
 	void unkpacg_main_map(address_map &map) ATTR_COLD;
 	void unkpacga_main_map(address_map &map) ATTR_COLD;
 	void tourpgum_main_map(address_map &map) ATTR_COLD;
+	void strker_main_map(address_map &map) ATTR_COLD;
 
 	void unkpacg_main_portmap(address_map &map) ATTR_COLD;
 };
@@ -251,7 +256,7 @@ public:
 	}
 
 private:
-	virtual void driver_start() override;
+	virtual void driver_start() override ATTR_COLD;
 };
 
 
@@ -406,8 +411,17 @@ void unk_gambl_state::unkpacga_main_map(address_map &map)
 void unk_gambl_state::tourpgum_main_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x6000, 0x67ff).ram().share("nvram");
+	map(0x6000, 0x67ff).ram().share(m_nvram);
 	map(0x7000, 0x7fff).w(FUNC(unk_gambl_state::videoram_w));
+}
+
+void unk_gambl_state::strker_main_map(address_map &map)
+{
+	tourpgum_main_map(map);
+
+	// this PCB features flying wires going between the Z80, the GM76C28A-10 RAM and a GD74HCT138 3 to 8 line decoder / demultiplexer
+	// the following reads happen 2 times during RAM test at boot (show "RAM NO GOOD" if wrong value), at coin up and at bet
+	map(0x60f0, 0x60f1).lr8(NAME([this] (offs_t offset) -> uint8_t { return bitswap<8>(m_nvram[offset | 0xf0], 0, 1, 2, 3, 4, 5, 6, 7); }));
 }
 
 void unk_gambl_state::unkpacg_main_portmap(address_map &map)
@@ -629,6 +643,15 @@ static INPUT_PORTS_START( tourpgum )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( strker )
+	PORT_INCLUDE( tourpgum )
+
+	// TODO: identify other switches
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x10, 0x00, "Max Bet")
+	PORT_DIPSETTING(    0x10, "10" )
+	PORT_DIPSETTING(    0x00, "50" )
+INPUT_PORTS_END
 
 /***********************************
 *     GFX Layouts & GFX decode     *
@@ -753,6 +776,13 @@ void unk_gambl_state::chicgum(machine_config &config)
 	PALETTE(config.replace(), m_palette, palette_device::BRG_3BIT);
 }
 
+void unk_gambl_state::strker(machine_config &config)
+{
+	chicgum(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &unk_gambl_state::strker_main_map);
+}
+
 /***********************************
 *             Rom Load             *
 ***********************************/
@@ -830,6 +860,7 @@ ROM_END
 ROM_START( spadarts )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "spanish_darts_idsa_91_db98_27c256.bin", 0x0000, 0x8000, CRC(e47ecdfc) SHA1(8dbbd0e866c9fc044dc4687501944ce4966dc288) )
+
 	ROM_REGION( 0x6000, "chars", 0 )
 	ROM_LOAD( "spanish_darts_idsa_91-1_27c64.bin",     0x0000, 0x2000, CRC(727cc152) SHA1(cd5bb9427745d898546b7dba04161f3713d7e79f) )
 	ROM_LOAD( "spanish_darts_idsa_91-2_27c64.bin",     0x2000, 0x2000, CRC(148f1edf) SHA1(ea6873164d086058af86e5707468a434ef9ed0cc) )
@@ -1121,7 +1152,7 @@ GAME( 1991, spadarts,  0,       _4enraya, spadarts,  _4enraya_state,  empty_init
 
 GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum,  unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992?, chicgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Chic Gum Video", MACHINE_SUPPORTS_SAVE )
-GAME( 1992?, strker,   0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Striker",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 'RAM NO GOOD', if bypassed it resets after coining up
+GAME( 1992?, strker,   0,       strker,   strker,    unk_gambl_state, empty_init, ROT0, "<unknown>",     "Striker",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 'RAM NO GOOD', if bypassed it resets after coining up
 GAME( 1992?, bowlgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Bowling Gum",    MACHINE_SUPPORTS_SAVE )
 
 GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",   MACHINE_SUPPORTS_SAVE )
