@@ -48,7 +48,7 @@ public:
 
 
 	// construction/destruction
-	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~adsp21062_device() override;
 
 	// configuration helpers
@@ -79,14 +79,10 @@ public:
 
 	void enable_recompiler();
 
-	uint64_t pm0_r(offs_t offset);
-	void pm0_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t pm1_r(offs_t offset);
-	void pm1_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint32_t dmw0_r(offs_t offset);
-	void dmw0_w(offs_t offset, uint32_t data);
-	uint32_t dmw1_r(offs_t offset);
-	void dmw1_w(offs_t offset, uint32_t data);
+	template <unsigned N> uint64_t pm_r(offs_t offset);
+	template <unsigned N> void pm_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	template <unsigned N> uint32_t dmw_r(offs_t offset);
+	template <unsigned N> void dmw_w(offs_t offset, uint32_t data);
 	uint32_t iop_r(offs_t offset);
 	void iop_w(offs_t offset, uint32_t data);
 
@@ -162,10 +158,16 @@ public:
 		EXCEPTION_COUNT
 	};
 
-	void internal_data(address_map &map) ATTR_COLD;
-	void internal_pgm(address_map &map) ATTR_COLD;
-
 protected:
+	adsp21062_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			address_map_constructor internal_pgm,
+			address_map_constructor internal_data);
+
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -183,6 +185,11 @@ protected:
 
 	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	void pgm_2m(address_map &map) ATTR_COLD;
+	void pgm_4m(address_map &map) ATTR_COLD;
+	void data_2m(address_map &map) ATTR_COLD;
+	void data_4m(address_map &map) ATTR_COLD;
 
 private:
 	// STKY flags
@@ -461,10 +468,10 @@ private:
 	uml::code_handle *m_swap_r0_7;
 	uml::code_handle *m_swap_r8_15;
 
-	address_space *m_program;
-	address_space *m_data;
+	memory_access<24, 3, -3, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<32, 2, -2, ENDIANNESS_LITTLE>::specific m_data;
 
-	required_shared_ptr<uint32_t> m_block0, m_block1;
+	required_shared_ptr_array<uint32_t, 2> m_blocks;
 
 	opcode_func m_sharc_op[512];
 
@@ -660,6 +667,16 @@ private:
 };
 
 
+class adsp21060_device : public adsp21062_device
+{
+public:
+	// construction/destruction
+	adsp21060_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~adsp21060_device() override;
+};
+
+
 DECLARE_DEVICE_TYPE(ADSP21062, adsp21062_device)
+DECLARE_DEVICE_TYPE(ADSP21060, adsp21060_device)
 
 #endif // MAME_CPU_SHARC_SHARC_H

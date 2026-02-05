@@ -13,6 +13,10 @@
 
 #include "emuopts.h"
 
+#include "endianness.h"
+
+#include <algorithm>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -59,32 +63,73 @@ enum
 };
 
 DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "Analog Devices ADSP21062 \"SHARC\"")
+DEFINE_DEVICE_TYPE(ADSP21060, adsp21060_device, "adsp21060", "Analog Devices ADSP21060 \"SHARC\"")
 
-void adsp21062_device::internal_pgm(address_map &map)
+void adsp21062_device::pgm_2m(address_map &map)
 {
-	map(0x20000, 0x24fff).rw(FUNC(adsp21062_device::pm0_r), FUNC(adsp21062_device::pm0_w));
-	map(0x28000, 0x2cfff).rw(FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
-	map(0x30000, 0x34fff).rw(FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
-	map(0x38000, 0x3cfff).rw(FUNC(adsp21062_device::pm1_r), FUNC(adsp21062_device::pm1_w));
+	map(0x20000, 0x24fff).mirror(0x18000).rw(FUNC(adsp21062_device::pm_r<1>), FUNC(adsp21062_device::pm_w<1>));
+	map(0x20000, 0x24fff).rw(FUNC(adsp21062_device::pm_r<0>), FUNC(adsp21062_device::pm_w<0>));
 }
 
-void adsp21062_device::internal_data(address_map &map)
+void adsp21062_device::pgm_4m(address_map &map)
+{
+	map(0x20000, 0x29fff).rw(FUNC(adsp21062_device::pm_r<0>), FUNC(adsp21062_device::pm_w<0>));
+	map(0x30000, 0x39fff).rw(FUNC(adsp21062_device::pm_r<1>), FUNC(adsp21062_device::pm_w<1>));
+}
+
+void adsp21062_device::data_2m(address_map &map)
 {
 	map(0x00000, 0x000ff).rw(FUNC(adsp21062_device::iop_r), FUNC(adsp21062_device::iop_w));
-	map(0x20000, 0x27fff).ram().share("block0");
-	map(0x28000, 0x2ffff).ram().share("block1");
-	map(0x30000, 0x37fff).ram().share("block1");
-	map(0x38000, 0x3ffff).ram().share("block1");
-	map(0x40000, 0x4ffff).rw(FUNC(adsp21062_device::dmw0_r), FUNC(adsp21062_device::dmw0_w));
-	map(0x50000, 0x5ffff).rw(FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
-	map(0x60000, 0x6ffff).rw(FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
-	map(0x70000, 0x7ffff).rw(FUNC(adsp21062_device::dmw1_r), FUNC(adsp21062_device::dmw1_w));
+	map(0x20000, 0x27fff).mirror(0x18000).ram().share(m_blocks[1]);
+	map(0x20000, 0x27fff).ram().share(m_blocks[0]);
+	map(0x40000, 0x4ffff).mirror(0x30000).rw(FUNC(adsp21062_device::dmw_r<1>), FUNC(adsp21062_device::dmw_w<1>));
+	map(0x40000, 0x4ffff).rw(FUNC(adsp21062_device::dmw_r<0>), FUNC(adsp21062_device::dmw_w<0>));
+}
+
+void adsp21062_device::data_4m(address_map &map)
+{
+	map(0x00000, 0x000ff).rw(FUNC(adsp21062_device::iop_r), FUNC(adsp21062_device::iop_w));
+	map(0x20000, 0x2ffff).ram().share(m_blocks[0]);
+	map(0x30000, 0x3ffff).ram().share(m_blocks[1]);
+	map(0x40000, 0x5ffff).rw(FUNC(adsp21062_device::dmw_r<0>), FUNC(adsp21062_device::dmw_w<0>));
+	map(0x60000, 0x7ffff).rw(FUNC(adsp21062_device::dmw_r<1>), FUNC(adsp21062_device::dmw_w<1>));
 }
 
 adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: adsp21062_device(
+			mconfig,
+			ADSP21062,
+			tag,
+			owner,
+			clock,
+			address_map_constructor(FUNC(adsp21062_device::pgm_2m), this),
+			address_map_constructor(FUNC(adsp21062_device::data_2m), this))
+{
+}
+
+adsp21060_device::adsp21060_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: adsp21062_device(
+			mconfig,
+			ADSP21060,
+			tag,
+			owner,
+			clock,
+			address_map_constructor(FUNC(adsp21060_device::pgm_4m), this),
+			address_map_constructor(FUNC(adsp21060_device::data_4m), this))
+{
+}
+
+adsp21062_device::adsp21062_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		address_map_constructor internal_pgm,
+		address_map_constructor internal_data)
 	: cpu_device(mconfig, ADSP21062, tag, owner, clock)
-	, m_program_config("program", ENDIANNESS_LITTLE, 64, 24, -3, address_map_constructor(FUNC(adsp21062_device::internal_pgm), this))
-	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2, address_map_constructor(FUNC(adsp21062_device::internal_data), this))
+	, m_program_config("program", ENDIANNESS_LITTLE, 64, 24, -3, internal_pgm)
+	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2, internal_data)
 	, m_boot_mode(BOOT_MODE_HOST)
 	, m_cache(CACHE_SIZE + sizeof(sharc_internal_state))
 	, m_entry(nullptr)
@@ -108,14 +153,17 @@ adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *ta
 	, m_swap_dag2_4_7(nullptr)
 	, m_swap_r0_7(nullptr)
 	, m_swap_r8_15(nullptr)
-	, m_block0(*this, "block0")
-	, m_block1(*this, "block1")
+	, m_blocks(*this, "block%u", 0U)
 	, m_enable_drc(false)
 {
 	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
 }
 
 adsp21062_device::~adsp21062_device()
+{
+}
+
+adsp21060_device::~adsp21060_device()
 {
 }
 
@@ -198,86 +246,46 @@ void adsp21062_device::sharc_iop_delayed_w(uint32_t reg, uint32_t data, int cycl
 // 3 ab9 5h 5l 4l
 // 4 cde 6h 6l 7h
 
-uint64_t adsp21062_device::pm0_r(offs_t offset)
+template <unsigned N>
+uint64_t adsp21062_device::pm_r(offs_t offset)
 {
 	offs_t slot = offset >> 12;
 	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);
-	if(slot & 1)
-		return (uint64_t(m_block0[base + 0x2000]) << 16) | (m_block0[base + 0x1000] & 0xffff);
+	if (slot & 1)
+		return (uint64_t(m_blocks[N][base + 0x2000]) << 16) | (m_blocks[N][base + 0x1000] & 0xffff);
 	else
-		return (uint64_t(m_block0[base         ]) << 16) | (m_block0[base + 0x1000] >> 16);
+		return (uint64_t(m_blocks[N][base         ]) << 16) | (m_blocks[N][base + 0x1000] >> 16);
 }
 
-void adsp21062_device::pm0_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+template <unsigned N>
+void adsp21062_device::pm_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	offs_t slot = offset >> 12;
 	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);
-	if(slot & 1) {
-		if(ACCESSING_BITS_0_15)
-			m_block0[base + 0x1000] = (m_block0[base + 0x1000] & 0xffff0000) | (data & 0xffff);
-		m_block0[base + 0x2000] = (m_block0[base + 0x2000] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
-	} else {
-		m_block0[base + 0x0000] = (m_block0[base + 0x0000] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
-		if(ACCESSING_BITS_0_15)
-			m_block0[base + 0x1000] = (m_block0[base + 0x1000] & 0xffff) | ((data & 0xffff) << 16);
+	if (slot & 1)
+	{
+		if (ACCESSING_BITS_0_15)
+			m_blocks[N][base + 0x1000] = (m_blocks[N][base + 0x1000] & 0xffff0000) | (data & 0xffff);
+		m_blocks[N][base + 0x2000] = (m_blocks[N][base + 0x2000] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
+	}
+	else
+	{
+		m_blocks[N][base + 0x0000] = (m_blocks[N][base + 0x0000] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
+		if (ACCESSING_BITS_0_15)
+			m_blocks[N][base + 0x1000] = (m_blocks[N][base + 0x1000] & 0xffff) | ((data & 0xffff) << 16);
 	}
 }
 
-uint64_t adsp21062_device::pm1_r(offs_t offset)
+template <unsigned N>
+uint32_t adsp21062_device::dmw_r(offs_t offset)
 {
-	offs_t slot = offset >> 12;
-	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);
-	if(slot & 1)
-		return (uint64_t(m_block1[base + 0x2000]) << 16) | (m_block1[base + 0x1000] & 0xffff);
-	else
-		return (uint64_t(m_block1[base         ]) << 16) | (m_block1[base + 0x1000] >> 16);
+	return util::little_endian_cast<uint16_t const>(&m_blocks[N][0])[offset];
 }
 
-void adsp21062_device::pm1_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+template <unsigned N>
+void adsp21062_device::dmw_w(offs_t offset, uint32_t data)
 {
-	offs_t slot = offset >> 12;
-	offs_t base = (offset & 0xfff) + (slot >> 1) * (3<<12);
-	if(slot & 1) {
-		if(ACCESSING_BITS_0_15)
-			m_block1[base + 0x1000] = (m_block1[base + 0x1000] & 0xffff0000) | (data & 0xffff);
-		m_block1[base + 0x2000] = (m_block1[base + 0x2000] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
-	} else {
-		m_block1[base + 0x0000] = (m_block1[base + 0x0000] & ~(mem_mask >> 16)) | ((data & mem_mask) >> 16);
-		if(ACCESSING_BITS_0_15)
-			m_block1[base + 0x1000] = (m_block1[base + 0x1000] & 0xffff) | ((data & 0xffff) << 16);
-	}
-}
-
-uint32_t adsp21062_device::dmw0_r(offs_t offset)
-{
-	if(offset & 1)
-		return m_block0[offset >> 1] >> 16;
-	else
-		return m_block0[offset >> 1] & 0xffff;
-}
-
-void adsp21062_device::dmw0_w(offs_t offset, uint32_t data)
-{
-	if(offset & 1)
-		m_block0[offset >> 1] = (m_block0[offset >> 1] & 0xffff) | (data << 16);
-	else
-		m_block0[offset >> 1] = (m_block0[offset >> 1] & 0xffff0000) | (data & 0xffff);
-}
-
-uint32_t adsp21062_device::dmw1_r(offs_t offset)
-{
-	if(offset & 1)
-		return m_block1[offset >> 1] >> 16;
-	else
-		return m_block1[offset >> 1] & 0xffff;
-}
-
-void adsp21062_device::dmw1_w(offs_t offset, uint32_t data)
-{
-	if(offset & 1)
-		m_block1[offset >> 1] = (m_block1[offset >> 1] & 0xffff) | (data << 16);
-	else
-		m_block1[offset >> 1] = (m_block1[offset >> 1] & 0xffff0000) | (data & 0xffff);
+	util::little_endian_cast<uint16_t>(&m_blocks[N][0])[offset] = uint16_t(data);
 }
 
 /* IOP registers */
@@ -457,7 +465,7 @@ void adsp21062_device::external_iop_write(uint32_t address, uint32_t data)
 	else
 	{
 		LOG("SHARC IOP write %08X, %08X\n", address, m_core->iop_data);
-		m_data->write_dword(address, m_core->iop_data);
+		m_data.write_dword(address, m_core->iop_data);
 	}
 }
 
@@ -475,7 +483,7 @@ void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 			int shift = address % 3;
 			uint64_t r = pm_read48((m_core->dma[6].int_index & 0x1ffff) | 0x20000);
 
-			r &= ~((uint64_t)(0xffff) << (shift*16));
+			r &= ~(uint64_t(0xffff) << (shift*16));
 			r |= (data & 0xffff) << (shift*16);
 
 			pm_write48((m_core->dma[6].int_index & 0x1ffff) | 0x20000, r);
@@ -499,8 +507,8 @@ void adsp21062_device::device_start()
 	m_core = m_cache.alloc_near<sharc_internal_state>();
 	memset(m_core, 0, sizeof(sharc_internal_state));
 
-	m_program = &space(AS_PROGRAM);
-	m_data = &space(AS_DATA);
+	space(AS_PROGRAM).specific(m_program);
+	space(AS_DATA).specific(m_data);
 
 	if (!m_enable_drc)
 	{
@@ -908,8 +916,8 @@ void adsp21062_device::device_start()
 
 void adsp21062_device::device_reset()
 {
-	memset(m_block0, 0, 0x8000 * sizeof(uint32_t));
-	memset(m_block1, 0, 0x8000 * sizeof(uint32_t));
+	for (auto &block : m_blocks)
+		std::fill(std::begin(block), std::end(block), 0);
 
 	switch(m_boot_mode)
 	{
@@ -1177,7 +1185,7 @@ void adsp21062_device::execute_run()
 
 			debugger_instruction_hook(m_core->pc);
 
-			m_core->opcode = m_program->read_qword(m_core->pc);
+			m_core->opcode = m_program.read_qword(m_core->pc);
 
 			// handle looping
 			if (m_core->pc == m_core->laddr.addr)
