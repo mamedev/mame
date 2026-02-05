@@ -52,12 +52,12 @@ public:
 
 	void fast_gatea20(int state) {
 		m_fast_gatea20 = state;
-		m_write_a20m(m_fast_gatea20 & m_ext_gatea20);
+		m_write_a20m(m_fast_gatea20 | m_ext_gatea20);
 	}
 
 	void keyboard_gatea20(int state) {
 		m_ext_gatea20 = state;
-		m_write_a20m(m_fast_gatea20 & m_ext_gatea20);
+		m_write_a20m(m_fast_gatea20 | m_ext_gatea20);
 	}
 
 	void irq01_w(int state) { m_intc[0]->ir1_w(state); }
@@ -177,6 +177,8 @@ private:
 	void portb_w(u8 data);
 
 	u8 m_config_address;
+
+	u8 m_dma_ws_control;
 	u8 m_chan_env;
 	u8 m_rom_enable;
 	u8 m_ram_write_protect;
@@ -187,6 +189,7 @@ private:
 	std::vector<u8> m_shadow_ram;
 
 	void update_romram_settings();
+	void update_dma_clock();
 
 	offs_t page_offset();
 	void set_dma_channel(int channel, bool state);

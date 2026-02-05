@@ -5,9 +5,9 @@
 SCATsx based PCs
 
 TODO:
-- Port over anch386s to here;
+- Port over anch386s to here (doesn't use any chipset features tho?);
+- add EMS in chipset (has specific driver for MS-DOS);
 - Add remaining sets;
-- FDC fails loading;
 
 **************************************************************************************************/
 
@@ -42,6 +42,9 @@ public:
 
 	void mb1320(machine_config &config);
 
+protected:
+	void base_config(machine_config &config);
+
 private:
 	required_device<i386sx_device> m_maincpu;
 	required_device<f82c836a_device> m_chipset;
@@ -62,10 +65,10 @@ void scatsx_state::main_io(address_map &map)
 {
 }
 
-static INPUT_PORTS_START( mb1320 )
+static INPUT_PORTS_START( scatsx )
 INPUT_PORTS_END
 
-void scatsx_state::mb1320(machine_config &config)
+void scatsx_state::base_config(machine_config &config)
 {
 	// FSB 16 MHz, 20 MHz or 25 MHz
 	I386SX(config, m_maincpu, 25'000'000);
@@ -128,14 +131,6 @@ void scatsx_state::mb1320(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(f82c836a_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(f82c836a_device::dreq7_w));
 
-	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "vga", false);
-	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, "fdc", false);
-	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, "ide", false);
-	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa6", 0, "isabus", pc_isa16_cards, nullptr, false);
-	ISA16_SLOT(config, "isa7", 0, "isabus", pc_isa16_cards, nullptr, false);
-
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(f82c836a_device::kbrst_w));
 	keybc.gate_a20().set(m_chipset, FUNC(f82c836a_device::gatea20_w));
@@ -159,6 +154,19 @@ void scatsx_state::mb1320(machine_config &config)
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
+void scatsx_state::mb1320(machine_config &config)
+{
+	base_config(config);
+	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "vga", false);
+	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, "fdc", false);
+	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, "ide", false);
+	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa6", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa7", 0, "isabus", pc_isa16_cards, nullptr, false);
+}
+
+
 ROM_START( mb1320 )
 	ROM_REGION16_LE( 0x40000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD( "amd386.bin", 0x030000, 0x010000, CRC(7c5045af) SHA1(64efea383b2a5beb16586d5fd67eced83068c616) )
@@ -166,4 +174,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 1990, mb1320, 0, 0, mb1320,mb1320, scatsx_state, empty_init, "Biostar", "MB-1320/25C-B.5 (SCATsx chipset)", MACHINE_NOT_WORKING )
+COMP( 1990, mb1320,    0, 0, mb1320,    scatsx, scatsx_state, empty_init, "Biostar", "MB-1320/25C-B.5 (SCATsx chipset)", MACHINE_NOT_WORKING )

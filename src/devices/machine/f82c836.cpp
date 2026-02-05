@@ -173,10 +173,13 @@ void f82c836a_device::device_start()
 void f82c836a_device::device_reset()
 {
 	m_cpureset = 0;
-	// needs to be high at startup (it's more of an AND in this case)
-	m_fast_gatea20 = 1;
+	m_ext_gatea20 = 0;
+	m_fast_gatea20 = 0;
 	m_dma_channel = -1;
 
+	m_dma_ws_control = 0;
+	// BUSCLK CXIN/5, Refresh Width 280ns
+	m_chan_env = 4 | 2;
 	m_rom_enable = 0xc0;
 	m_ram_write_protect = 0;
 	m_shadow_reg[0] = m_shadow_reg[1] = m_shadow_reg[2] = 0;
@@ -281,7 +284,16 @@ void f82c836a_device::portb_w(uint8_t data)
 
 void f82c836a_device::config_map(address_map &map)
 {
-//	map(0x01, 0x01) DMA waitstate control
+	// DMA Wait-State Control
+	map(0x01, 0x01).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_dma_ws_control;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_dma_ws_control = data;
+			update_dma_clock();
+		})
+	);
 	// version (r/o)
 	// xxxx ---- family type 0001
 	// ---- xxxx revision
@@ -291,7 +303,7 @@ void f82c836a_device::config_map(address_map &map)
 	// Channel Environment
 	map(0x41, 0x41).lrw8(
 		NAME([this] (offs_t offset) { return m_chan_env; }),
-		NAME([this] (offs_t offset, u8 data) { m_chan_env = data; })
+		NAME([this] (offs_t offset, u8 data) { m_chan_env = data; update_dma_clock(); })
 	);
 //	map(0x44, 0x44) Peripheral Control
 	// Misc. Status
@@ -385,6 +397,28 @@ void f82c836a_device::update_romram_settings()
 			m_space_mem->install_ram(start_offs, end_offs, &m_shadow_ram[0x40000 + i * 0x4000]);
 	}
 
+}
+
+void f82c836a_device::update_dma_clock()
+{
+	// similar concept as the one in cs4031 except smaller set
+	const int busclk_sel_settings[] = { 4, 5, 6, 0 };
+	const int busclk_sel = busclk_sel_settings[(m_chan_env >> 2) & 3];
+
+	if (busclk_sel == 0)
+		return;
+
+	const int dma_clock_sel = BIT(m_dma_ws_control, 0);
+
+	uint32_t dma_clock = clock() / busclk_sel;
+
+	if (!dma_clock_sel)
+		dma_clock /= 2;
+
+	logerror("update_dma_clock: dma clock is now %u (%d %d)\n", dma_clock, busclk_sel, dma_clock_sel);
+
+	m_dma[0]->set_unscaled_clock(dma_clock);
+	m_dma[1]->set_unscaled_clock(dma_clock);
 }
 
 /******************

@@ -6,8 +6,9 @@ Medalist Spectrum HW
 
 https://www.youtube.com/watch?v=-kxk8UtTeIM
 
+Error 033 is A20 line related (cfr. below)
+
 TODO:
-- error 033 (?)
 - Emulate 65535 (S)VGA, same as IBM PC-110;
 - ROM disk, in ISA space;
 - Sound, from parallel ports?
@@ -244,7 +245,9 @@ void mdartstr_state::mdartstr(machine_config &config)
 
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(f82c836a_device::kbrst_w));
-	keybc.gate_a20().set(m_chipset, FUNC(f82c836a_device::gatea20_w));
+	// looks unconnected, the BIOS will just use fast A20 exclusively for driving the line
+	keybc.gate_a20().set_nop();
+//	keybc.gate_a20().set(m_chipset, FUNC(f82c836a_device::gatea20_w));
 	keybc.kbd_irq().set(m_chipset, FUNC(f82c836a_device::irq01_w));
 	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
