@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// For architectural similarities between the machines emulated by playmark.cpp and powerbal.cpp 
 // copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
 #ifndef MAME_PLAYMARK_PLAYMARK_H
 #define MAME_PLAYMARK_PLAYMARK_H
