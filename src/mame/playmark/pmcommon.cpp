@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+// Video subsystem elements sharedly used by playmark.cpp powerbal.cpp
 // copyright-holders:Nicola Salmoria, Pierpaolo Prazzoli, Quench
 #include "emu.h"
 #include "playmark.h"
