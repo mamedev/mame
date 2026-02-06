@@ -2642,7 +2642,7 @@ void cps_state::video_start()
 
 ***************************************************************************/
 
-void cps_state::cps1_build_palette( const uint16_t* const palette_base )
+void cps_state::cps1_build_palette(const uint16_t* const palette_base)
 {
 	int offset, page;
 	const uint16_t *palette_ram = palette_base;
@@ -2662,7 +2662,6 @@ void cps_state::cps1_build_palette( const uint16_t* const palette_base )
 
 				// from my understanding of the schematics, when the 'brightness'
 				// component is set to 0 it should reduce brightness to 1/3
-
 				bright = 0x0f + ((palette >> 12) << 1);
 
 				r = ((palette >> 8) & 0x0f) * 0x11 * bright / 0x2d;
@@ -3072,6 +3071,8 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 
 	// Games use pen 0xbff as background color; this is used in 3wonders,
 	// mtwins (explosion during attract), mercs (intermission).
+	// Depending on what type of monitor is connected, it can be glitchy on
+	// real hardware if 0xbff is not black.
 	bitmap.fill(0xbff, cliprect);
 
 	if (m_region_stars)

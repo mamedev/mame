@@ -662,11 +662,6 @@ public:
 		, m_io_in0(*this, "IN0")
 		, m_io_in1(*this, "IN1")
 		, m_dsw(*this, "DSW%c", 'A')
-		, m_cps2_dial_type(0)
-		, m_ecofghtr_dial_direction0(0)
-		, m_ecofghtr_dial_direction1(0)
-		, m_ecofghtr_dial_last0(0)
-		, m_ecofghtr_dial_last1(0)
 	{ }
 
 	void cps2(machine_config &config) ATTR_COLD;
@@ -737,22 +732,22 @@ private:
 	std::unique_ptr<uint16_t[]> m_cps2_buffered_obj;
 	std::unique_ptr<uint16_t[]> m_gigaman2_dummyqsound_ram;
 
-	/* video-related */
-	int          m_cps2_last_sprite_offset = 0; /* Offset of the last sprite */
-	int          m_pri_ctrl = 0;                /* Sprite layer priorities */
-	int          m_objram_bank = 0;
-	int          m_cps2_obj_size = 0;
+	// video-related
+	int m_cps2_last_sprite_offset = 0; // Offset of the last sprite
+	int m_pri_ctrl = 0; // Sprite layer priorities
+	int m_objram_bank = 0;
+	int m_cps2_obj_size = 0;
 
-	/* misc */
-	int          m_readpaddle = 0;  // pzloop2
-	int          m_cps2digitalvolumelevel = 0;
-	int          m_cps2disabledigitalvolume = 0;
-	emu_timer    *m_digital_volume_timer = nullptr;
-	int          m_cps2_dial_type = 0;
-	int          m_ecofghtr_dial_direction0 = 0;
-	int          m_ecofghtr_dial_direction1 = 0;
-	int          m_ecofghtr_dial_last0 = 0;
-	int          m_ecofghtr_dial_last1 = 0;
+	// misc
+	int m_readpaddle = 0;  // pzloop2
+	int m_cps2digitalvolumelevel = 0;
+	int m_cps2disabledigitalvolume = 0;
+	emu_timer *m_digital_volume_timer = nullptr;
+	int m_cps2_dial_type = 0;
+	int m_ecofghtr_dial_direction0 = 0;
+	int m_ecofghtr_dial_direction1 = 0;
+	int m_ecofghtr_dial_last0 = 0;
+	int m_ecofghtr_dial_last1 = 0;
 };
 
 
@@ -865,7 +860,7 @@ uint16_t *cps2_state::cps2_objbase()
 	if (m_objram_bank & 1)
 		baseptr ^= 0x0080;
 
-//popmessage("%04x %d", cps2_port(machine, CPS2_OBJ_BASE), m_objram_bank & 1);
+	//popmessage("%04x %d", cps2_port(machine, CPS2_OBJ_BASE), m_objram_bank & 1);
 
 	if (baseptr == 0x7000)
 		return m_objram1;
