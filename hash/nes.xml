@@ -29395,6 +29395,62 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="popils" supported="partial">
+		<description>Magical Puzzle Popils (prototype)</description>
+		<year>1989</year>
+		<publisher>Tengen</publisher>
+		<notes><![CDATA[
+The EEPROM chip that contained the sequence data for the music and sound effects could not be found, which means that the game no longer has any audio to play at all.
+]]></notes>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="namcot_3433" />
+			<feature name="pcb" value="TENGEN-800030" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="0x10000">
+				<rom name="popil chr0.bin" size="0x8000" crc="18fa74c0" sha1="64672be98a4745ceca3863759e586a6778e3958a" offset="0x00000" />
+				<rom name="popil chr1.bin" size="0x8000" crc="5980514c" sha1="8f793c1a9d587a2f60eaa22c14eca2fea53fe71b" offset="0x08000" />
+			</dataarea>
+			<dataarea name="prg" size="0x20000">
+				<rom name="popil prg0.bin" size="0x8000" status="nodump" />	<!-- EEPROM chip for the sound data, not found with the others -->
+				<rom name="popil prg1.bin" size="0x8000" crc="2ce83498" sha1="d3fc1b7cadb9be9de1a6028ef59df700a6e8588a" offset="0x08000" />
+				<rom name="popil prg2.bin" size="0x8000" crc="d0a719a8" sha1="bef214d4670df0b5eb44b1760b58a3b1f87f8fb5" offset="0x10000" />
+				<rom name="popil prg3.bin" size="0x8000" crc="b7b8b773" sha1="cb90b4ddfe0e5b7213905301292882be97f5a852" offset="0x18000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="0x2000">
+				<rom value="0x00" size="0x2000" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+	
+	<software name="popilss" cloneof="popils">
+		<description>Magical Puzzle Popils (prototype, with recreated sound)</description>
+		<year>1989</year>
+		<publisher>Tengen</publisher>
+		<notes><![CDATA[
+This mod inserts recreations of the music tracks and sound effects into the prototype. This was done by porting the sequence data of all sounds found in the Game Gear version, along with doing many adjustments (ASDR, vibrato and note transposing edits) to match the audio heard in Jun Amanai’s gameplay videos as closely as possible.
+]]></notes>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="namcot_3433" />
+			<feature name="pcb" value="TENGEN-800030" />
+			<feature name="mirroring" value="vertical" />
+			<dataarea name="chr" size="0x10000">
+				<rom name="popil chr0.bin" size="0x8000" crc="18fa74c0" sha1="64672be98a4745ceca3863759e586a6778e3958a" offset="0x00000" />
+				<rom name="popil chr1.bin" size="0x8000" crc="5980514c" sha1="8f793c1a9d587a2f60eaa22c14eca2fea53fe71b" offset="0x08000" />
+			</dataarea>
+			<dataarea name="prg" size="0x20000">
+				<rom name="prg0" size="0x8000" crc="90da0dd3" sha1="7db3ea71db43d4df7d75851f485d57620d3d57f3" offset="0" status="baddump" /> <!-- EEPROM chip for the sound data, recreated using the Game Gear version's sound data -->
+				<rom name="popil prg1.bin" size="0x8000" crc="2ce83498" sha1="d3fc1b7cadb9be9de1a6028ef59df700a6e8588a" offset="0x08000" />
+				<rom name="popil prg2.bin" size="0x8000" crc="d0a719a8" sha1="bef214d4670df0b5eb44b1760b58a3b1f87f8fb5" offset="0x10000" />
+				<rom name="popil prg3.bin" size="0x8000" crc="b7b8b773" sha1="cb90b4ddfe0e5b7213905301292882be97f5a852" offset="0x18000" />
+			</dataarea>
+			<!-- 8k WRAM on cartridge, battery backed up -->
+			<dataarea name="bwram" size="0x2000">
+				<rom value="0x00" size="0x2000" offset="0" loadflag="fill" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="portopia">
 		<description>Portopia Renzoku Satsujin Jiken (Japan)</description>
 		<year>1985</year>
