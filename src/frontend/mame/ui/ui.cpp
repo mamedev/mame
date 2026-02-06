@@ -834,7 +834,17 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 
 			// loop while we have a handler
 			while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(*this))
-				machine().video().frame_update();
+			{
+				static osd_ticks_t lastupdatetime = 0;
+				osd_ticks_t curtime = osd_ticks();
+
+				// don't update more than 60 times/second
+				if ((curtime - lastupdatetime) > osd_ticks_per_second() / 60)
+				{
+					lastupdatetime = curtime;
+					machine().video().frame_update();
+				}
+			}
 		}
 
 		// clear the handler and force an update
