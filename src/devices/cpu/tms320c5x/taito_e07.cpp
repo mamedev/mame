@@ -16,7 +16,7 @@ taito_e07_device::taito_e07_device(const machine_config &mconfig, const char *ta
     device_t *owner, uint32_t clock)
     : tms320c51_device(mconfig, TAITO_E07, tag, owner, clock,
         address_map_constructor(FUNC(taito_e07_device::taito_e07_internal_pgm), this),
-        address_map_constructor(FUNC(tms320c51_device::tms320c51_internal_data), this))
+        address_map_constructor(FUNC(taito_e07_device::taito_e07_internal_data), this)) // Parent function protected
 {
 }
 
@@ -26,6 +26,17 @@ void taito_e07_device::taito_e07_internal_pgm(address_map &map)
     map(0x1000, 0x1fff).ram();
     map(0x2000, 0x23ff).ram().share("saram");
     map(0xfe00, 0xffff).ram().share("daram_b0");
+}
+
+// Parent function (tms320c51_internal_data) is protected
+void taito_e07_device::taito_e07_internal_data(address_map &map)
+{
+    // Same as tms320c51_internal_data - we don't need to change the data map
+    map(0x0000, 0x005f).rw(FUNC(taito_e07_device::cpuregs_r), FUNC(taito_e07_device::cpuregs_w));
+    map(0x0060, 0x007f).ram();                         // DARAM B2
+    map(0x0100, 0x02ff).ram().share("daram_b0");       // DARAM B0
+    map(0x0300, 0x04ff).ram();                         // DARAM B1
+    map(0x0800, 0x0bff).ram().share("saram");          // SARAM
 }
 
 uint16_t taito_e07_device::internal_rom_r(offs_t offset)
