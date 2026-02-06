@@ -30,7 +30,7 @@ public:
 	void ula_scroll_y_w(u8 ula_scroll_y) { m_ula_scroll_y = ula_scroll_y; }
 	void ula_fine_scroll_x_w (bool ula_fine_scroll_x) { m_ula_fine_scroll_x = ula_fine_scroll_x; }
 
-	void draw_border(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 border_color);
+	void draw_border(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 border_color, u8 pcode = 0);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool flash = 0, u8 pcode = 0);
 
 protected:

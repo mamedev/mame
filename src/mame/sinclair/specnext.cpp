@@ -209,7 +209,6 @@ private:
 	virtual TIMER_CALLBACK_MEMBER(irq_on) override;
 	INTERRUPT_GEN_MEMBER(specnext_interrupt);
 	TIMER_CALLBACK_MEMBER(line_irq_on);
-	void ctc_int_w(int state);
 	INTERRUPT_GEN_MEMBER(line_interrupt);
 	TIMER_CALLBACK_MEMBER(spi_clock);
 	void line_irq_adjust();
@@ -972,18 +971,11 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
 	// background
-	if (ula_en)
-	{
-		m_ula_scr->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
-		bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), clip256x192);
-	}
-	else
-		bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
+	screen.priority().fill(0, cliprect);
+	bitmap.fill(m_palette->pen_color(UTM_FALLBACK_PEN), cliprect);
 
 	if (m_nr_15_layer_priority < 0b110)
 	{
-		screen.priority().fill(0, cliprect);
-
 		static const u8 lcfg[][3] =
 		{
 			// tiles+ula priority; l2 priority; l2 mask
@@ -1000,6 +992,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), l[0]);
 		if (ula_en)
 		{
+			m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
 			if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, l[0]);
 			else m_ula_scr->draw(screen, bitmap, clip256x192, flash, l[0]);
 		}
@@ -1008,18 +1001,11 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	}
 	else // colors mixing case
 	{
-		if (ula_en && (m_nr_68_blend_mode == 0b00 || m_nr_68_blend_mode == 0b10)) // blending with ULA
-		{
-			screen.priority().fill(1, cliprect);
-			screen.priority().fill(0, clip256x192);
-		}
-		else
-			screen.priority().fill(0, cliprect);
-
 		if (m_nr_68_blend_mode == 0b00) // Use ULA as blend layer
 		{
 			if (ula_en)
 			{
+				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 1);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
@@ -1032,6 +1018,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 1);
 			if (ula_en)
 			{
+				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07, 1);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 1);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 1);
 			}
@@ -1044,6 +1031,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (layer2_en) m_layer2->draw_mix(screen, bitmap, m_blendprio_bitmap, clip320x256, m_nr_15_layer_priority & 1);
 			if (ula_en)
 			{
+				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash);
 			}
@@ -1054,6 +1042,7 @@ u32 specnext_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			if (tiles_en) m_tiles->draw(screen, bitmap, clip320x256, TILEMAP_DRAW_CATEGORY(1), 2);
 			if (ula_en)
 			{
+				m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
 				if (m_nr_15_lores_en) m_lores->draw(screen, bitmap, clip256x192, 2);
 				else m_ula_scr->draw(screen, bitmap, clip256x192, flash, 2);
 			}
