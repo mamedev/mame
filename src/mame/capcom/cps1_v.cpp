@@ -3070,22 +3070,9 @@ uint32_t cps_state::screen_update_cps1(screen_device &screen, bitmap_ind16 &bitm
 	m_bg_tilemap[2]->set_scrollx(0, m_scroll3x);
 	m_bg_tilemap[2]->set_scrolly(0, m_scroll3y);
 
-	// Blank screen
-	if (m_cps_version == 1)
-	{
-		// CPS1 games use pen 0xbff as background color; this is used in 3wonders,
-		// mtwins (explosion during attract), mercs (intermission).
-		bitmap.fill(0xbff, cliprect);
-	}
-	else
-	{
-		// CPS2 apparently always forces the background to black. Several games would
-		// show a blue screen during boot if we used the same code as CPS1.
-		// Maybe Capcom changed the background handling due to the problems that
-		// it caused on several monitors (because the background extended into the
-		// blanking area instead of going black, causing the monitor to clip).
-		bitmap.fill(m_palette->black_pen(), cliprect);
-	}
+	// Games use pen 0xbff as background color; this is used in 3wonders,
+	// mtwins (explosion during attract), mercs (intermission).
+	bitmap.fill(0xbff, cliprect);
 
 	if (m_region_stars)
 	{

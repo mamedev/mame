@@ -651,7 +651,7 @@ class cps2_state : public cps_state
 {
 public:
 	cps2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cps_state(mconfig, type, tag, 2)
+		: cps_state(mconfig, type, tag)
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_region_key(*this, "key")
 		, m_qsound(*this, "qsound")
