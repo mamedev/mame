@@ -569,9 +569,12 @@ void taitojc_state::irq_unk_w(uint8_t data)
 
 uint16_t taitojc_state::dsp_shared_r(offs_t offset)
 {
-  // Debugging log
-  if (m_dsp->pc() == 0x205b)
-        logerror("DSP @ 205b reading shared_ram[%03X] = %04X\n", offset, m_dsp_shared_ram[offset]);
+  // Debugging log for 0x205b crash
+  if (m_dsp->pc() == 0x205b || m_dsp->pc() == 0x205c)
+  {
+  	logerror("DSP @ %04X reading shared_ram[%03X] = %04X (main CPU @ %08X)\n", 
+  	         m_dsp->pc(), offset, m_dsp_shared_ram[offset], m_maincpu->pc());
+  }
   // This stays here no matter what
 	return m_dsp_shared_ram[offset];
 }
@@ -579,6 +582,12 @@ uint16_t taitojc_state::dsp_shared_r(offs_t offset)
 void taitojc_state::dsp_shared_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_dsp_shared_ram[offset]);
+  // Log writes to shared RAM (helps understand timing)
+  if (offset < 0x010 || offset == 0x7fe || offset == 0x7ff)
+  {
+  	logerror("Main CPU @ %08X writing shared_ram[%03X] = %04X\n",
+  	         m_maincpu->pc(), offset, m_dsp_shared_ram[offset]);
+  }
 }
 
 
@@ -829,15 +838,22 @@ inline uint16_t muldiv(int16_t ma, int16_t mb, int16_t d)
 
 uint16_t taitojc_state::dsp_math_projection_y_r()
 {
-  // Debug log
-  if (m_dsp->pc() == 0x205b)
-        logerror("DSP @ 205b reading projection_y\n");
+  // Debug log for 0x205b crash
+  if (m_dsp->pc() == 0x205b || m_dsp->pc() == 0x205c)
+  {
+  	logerror("DSP @ %04X reading projection_y (MMIO 701d)\n", m_dsp->pc());
+  }
   // This stays here
 	return muldiv(m_projection_data[0], m_viewport_data[0], m_projection_data[2]);
 }
 
 uint16_t taitojc_state::dsp_math_projection_x_r()
 {
+  // Debug log for 0x205b crash
+  if (m_dsp->pc() == 0x205b || m_dsp->pc() == 0x205c)
+  {
+  	logerror("DSP @ %04X reading projection_x (MMIO 701f)\n", m_dsp->pc());
+  }
 	return muldiv(m_projection_data[1], m_viewport_data[1], m_projection_data[2]);
 }
 
@@ -848,11 +864,21 @@ void taitojc_state::dsp_math_intersection_w(offs_t offset, uint16_t data)
 
 uint16_t taitojc_state::dsp_math_intersection_r()
 {
+  // Debug log for 0x205b crash
+  if (m_dsp->pc() == 0x205b || m_dsp->pc() == 0x205c)
+  {
+  	logerror("DSP @ %04X reading intersection (MMIO 701b)\n", m_dsp->pc());
+  }
 	return muldiv(m_intersection_data[0], m_intersection_data[1], m_intersection_data[2]);
 }
 
 uint16_t taitojc_state::dsp_math_unk_r()
 {
+  // Debug log for 0x205b crash
+  if (m_dsp->pc() == 0x205b || m_dsp->pc() == 0x205c)
+  {
+  	logerror("DSP @ %04X reading math_unk (MMIO 7022)\n", m_dsp->pc());
+  }
 	return 0x7fff;
 }
 
@@ -1223,7 +1249,7 @@ uint16_t dendego_state::dendego2_dsp_idle_skip_r()
 
 void taitojc_state::init_taitojc()
 {
-	m_has_dsp_hack = false; // False for now benoit FOR SURE
+	m_has_dsp_hack = true;
 
 	if (DSP_IDLESKIP)
 		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16smo_delegate(*this, FUNC(taitojc_state::taitojc_dsp_idle_skip_r)));
@@ -1242,6 +1268,12 @@ void taitojc_state::init_dangcurv()
 	init_taitojc();
 
 	m_has_dsp_hack = false;
+  // Workaround : prefill dst with  0x7F00 for bootloader not to go on wrong adress
+  // m_dsp_shared_ram[0x000] = 0x7F00;  // dst
+  m_dsp_shared_ram[0x7C0] = 0x0000; // DSP doesn't clear so we do it
+  // Workaround : adress is 0x4000 instead of 0x7F00 ?
+  // m_dsp_shared_ram[0x000] = 0x4000;  // dst = 0x4000
+  // m_dsp_shared_ram[0x001] = 0x0400;  // length = 1024 word (approximatively)
 
   // Patch the dead loop at 0x205c (external ROM)
   logerror("INFO : We are here in the code : init_taitojc() m_has_dsp_hack = false");
@@ -1251,7 +1283,11 @@ void taitojc_state::init_dangcurv()
   // 0x205c is in program space, which maps to dspgfx region
   // Need to calculate the exact offset based on how the boot loader copies it
   // For now, this is a placeholder - the real patch would go here
-  // logerror("DANGCURV: Would patch DSP 0x205c to 0x7F00 here\n");
+  logerror("DANGCURV: Would patch DSP 0x205c to 0x7F00 here\n");
+  logerror("=============================================================\n");
+  logerror("DANGCURV DEBUG MODE: Logging enabled for 0x205b crash\n");
+  logerror("Watch for repeated reads at PC=205b to identify the wait loop\n");
+  logerror("=============================================================\n");
 }
 
 
