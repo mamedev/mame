@@ -1144,19 +1144,19 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 
 	a.emit_prolog(frame);
 	a.emit_args_assignment(frame, args);
-	a.sub(esp, 24);                                                                     // sub   esp,24
-	a.mov(MABS(&m_hashstacksave), esp);                                                 // mov   [hashstacksave],esp
-	a.sub(esp, 4);                                                                      // sub   esp,4
-	a.mov(MABS(&m_stacksave), esp);                                                     // mov   [stacksave],esp
-	a.fnstcw(MABS(&m_fpumode));                                                         // fstcw [fpumode]
-	a.jmp(eax);                                                                         // jmp   eax
+	a.sub(esp, 24);
+	a.mov(MABS(&m_hashstacksave), esp);
+	a.sub(esp, 4);
+	a.mov(MABS(&m_stacksave), esp);
+	a.fnstcw(MABS(&m_fpumode));
+	a.call(eax);
 
 	// generate an exit point
 	m_exit = dst + a.offset();
 	a.bind(a.new_named_label("exit_point"));
-	a.fldcw(MABS(&m_fpumode));                                                          // fldcw [fpumode]
-	a.mov(esp, MABS(&m_hashstacksave));                                                 // mov   esp,[hashstacksave]
-	a.add(esp, 24);                                                                     // add   esp,24
+	a.fldcw(MABS(&m_fpumode));
+	a.mov(esp, MABS(&m_hashstacksave));
+	a.add(esp, 24);
 	a.emit_epilog(frame);
 
 	// generate a no code point
@@ -2906,14 +2906,14 @@ void drcbe_x86::op_handle(Assembler &a, const instruction &inst)
 
 	// emit a jump around the stack adjust in case code falls through here
 	Label skip = a.new_label();
-	a.short_().jmp(skip);                                                               // jmp   skip
+	a.short_().jmp(skip);
 
 	// register the current pointer for the handle
 	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->base_address() + a.offset()));
 
 	// by default, the handle points to prolog code that moves the stack pointer
-	a.lea(esp, ptr(esp, -28));                                                          // lea   rsp,[rsp-28]
-	a.bind(skip);                                                                   // skip:
+	a.lea(esp, ptr(esp, -28));
+	a.bind(skip);
 	reset_last_upper_lower_reg();
 }
 

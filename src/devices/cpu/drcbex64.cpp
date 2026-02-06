@@ -1162,7 +1162,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	a.sub(rsp, 40);
 	a.mov(MABS(&m_near.stacksave), rsp);
 	a.stmxcsr(MABS(&m_near.ssemode));
-	a.jmp(gpq(REG_PARAM2));
+	a.call(gpq(REG_PARAM2));
 
 	// generate an exit point
 	m_exit = dst + a.offset();
