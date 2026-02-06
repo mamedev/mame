@@ -540,6 +540,14 @@ uint16_t tms320c51_device::cpuregs_r(offs_t offset)
 {
 	switch (offset)
 	{
+    // Registers 0x00-0x03 appear to be reserved/unused in TMS320C5x
+    // Return 0 to prevent fatal error when dangcurv reads them
+    case 0x00:
+    case 0x01:
+    case 0x02:
+    case 0x03:
+      return 0;
+
 		case 0x04:  return m_imr;
 		case 0x06:  return m_ifr;
 
