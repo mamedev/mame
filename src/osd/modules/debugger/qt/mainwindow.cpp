@@ -8,6 +8,7 @@
 #include "debug/debugcpu.h"
 #include "debug/dvdisasm.h"
 #include "debug/points.h"
+#include "debug/dvsourcecode.h"
 
 #include "util/xmlfile.h"
 
@@ -94,6 +95,22 @@ MainWindow::MainWindow(DebuggerQt &debugger, QWidget *parent) :
 	rightActRaw->setChecked(true);
 	connect(rightBarGroup, &QActionGroup::triggered, this, &MainWindow::rightBarChanged);
 
+	// Source-level debugging vs. disassembly
+	QActionGroup *srcdbgGroup = new QActionGroup(this);
+	srcdbgGroup->setObjectName("srcdbggroup");
+	QAction *srcdbgSource = new QAction("Show Source", this);
+	QAction *srcdbgDasm = new QAction("Show Disassembly", this);
+	srcdbgSource->setData(int(MENU_SHOW_SOURCE));
+	srcdbgDasm->setData(int(MENU_SHOW_DISASM));
+	srcdbgSource->setCheckable(true);
+	srcdbgDasm->setCheckable(true);
+	srcdbgSource->setActionGroup(srcdbgGroup);
+	srcdbgDasm->setActionGroup(srcdbgGroup);
+	srcdbgSource->setShortcut(QKeySequence("Ctrl+U"));
+	srcdbgDasm->setShortcut(QKeySequence("Ctrl+Shift+U"));
+	srcdbgDasm->setChecked(true);
+	connect(srcdbgGroup, &QActionGroup::triggered, this, &MainWindow::srcdbgBarChanged);
+
 	// Assemble the options menu
 	QMenu *optionsMenu = menuBar()->addMenu("&Options");
 	optionsMenu->addAction(m_breakpointToggleAct);
@@ -101,6 +118,8 @@ MainWindow::MainWindow(DebuggerQt &debugger, QWidget *parent) :
 	optionsMenu->addAction(m_runToCursorAct);
 	optionsMenu->addSeparator();
 	optionsMenu->addActions(rightBarGroup->actions());
+	optionsMenu->addSeparator();
+	optionsMenu->addActions(srcdbgGroup->actions());
 
 	//
 	// Images menu
@@ -127,16 +146,24 @@ MainWindow::MainWindow(DebuggerQt &debugger, QWidget *parent) :
 	addDockWidget(Qt::LeftDockWidgetArea, cpuDock);
 	dockMenu->addAction(cpuDock->toggleViewAction());
 
-	// The disassembly dock
-	QDockWidget *dasmDock = new QDockWidget("dasm", this);
-	dasmDock->setObjectName("dasmdock");
-	dasmDock->setAllowedAreas(Qt::TopDockWidgetArea);
-	m_dasmFrame = new DasmDockWidget(m_machine, dasmDock);
-	dasmDock->setWidget(m_dasmFrame);
-	connect(m_dasmFrame->view(), &DebuggerView::updated, this, &MainWindow::dasmViewUpdated);
+	// The disassembly / source-level debugging dock
+	m_codeDock = new QDockWidget("code", this);
+	m_codeDock->setObjectName("codedock");
+	m_codeDock->setAllowedAreas(Qt::TopDockWidgetArea);
 
-	addDockWidget(Qt::TopDockWidgetArea, dasmDock);
-	dockMenu->addAction(dasmDock->toggleViewAction());
+	// Disassembly frame
+	m_dasmFrame = new DasmDockWidget(m_machine, m_codeDock);
+	connect(m_dasmFrame->view(), &DebuggerView::updated, this, &MainWindow::codeViewUpdated);
+
+	// Source-level debugging frame
+	m_srcdbgFrame = new SrcdbgDockWidget(m_machine, m_codeDock);
+	connect(m_srcdbgFrame->view(), &DebuggerView::updated, this, &MainWindow::codeViewUpdated);
+
+	m_codeDock->setWidget(m_srcdbgFrame);    // Temporary, so view can initialize its size fields
+	m_codeDock->setWidget(m_dasmFrame);      // Disassembly is the actual view to show on startup
+
+	addDockWidget(Qt::TopDockWidgetArea, m_codeDock);
+	dockMenu->addAction(m_codeDock->toggleViewAction());
 }
 
 
@@ -150,10 +177,12 @@ void MainWindow::setProcessor(device_t *processor)
 	// Cpu swap
 	m_procFrame->view()->view()->set_source(*m_procFrame->view()->view()->source_for_device(processor));
 	m_dasmFrame->view()->view()->set_source(*m_dasmFrame->view()->view()->source_for_device(processor));
+	m_srcdbgFrame->view()->view()->set_source(*m_srcdbgFrame->view()->view()->source_for_device(processor));
 
 	// Scrollbar refresh - seems I should be able to do in the DebuggerView
+	m_procFrame->view()->verticalScrollBar()->setValue(m_procFrame->view()->view()->visible_position().y);
 	m_dasmFrame->view()->verticalScrollBar()->setValue(m_dasmFrame->view()->view()->visible_position().y);
-	m_dasmFrame->view()->verticalScrollBar()->setValue(m_dasmFrame->view()->view()->visible_position().y);
+	m_srcdbgFrame->view()->verticalScrollBar()->setValue(m_srcdbgFrame->view()->view()->visible_position().y);
 
 	// Window title
 	setWindowTitle(string_format("Debug: %s - %s '%s'", m_machine.system().name, processor->name(), processor->tag()).c_str());
@@ -261,60 +290,83 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 {
-	debug_view_disasm *const dasmView = m_dasmFrame->view()->view<debug_view_disasm>();
-	if (dasmView->cursor_visible() && (m_machine.debugger().console().get_visible_cpu() == dasmView->source()->device()))
-	{
-		offs_t const address = dasmView->selected_address();
-		device_debug *const cpuinfo = dasmView->source()->device()->debug();
+	offs_t address;
+	if (!addressFromCursor(address))
+		return;
 
-		// Find an existing breakpoint at this address
-		const debug_breakpoint *bp = cpuinfo->breakpoint_find(address);
+	const debug_breakpoint *bp = breakpointFromAddress(address);
 
-		// If none exists, add a new one
-		std::string command;
-		if (!bp)
-			command = string_format("bpset 0x%X", address);
-		else
-			command = string_format("bpclear 0x%X", bp->index());
-		m_machine.debugger().console().execute_command(command, true);
-		m_machine.debug_view().update_all();
-		m_machine.debugger().refresh_display();
-	}
+	// If none exists, add a new one
+	std::string command;
+	if (!bp)
+		command = string_format("bpset 0x%X", address);
+	else
+		command = string_format("bpclear 0x%X", bp->index());
+	m_machine.debugger().console().execute_command(command, true);
+	m_machine.debug_view().update_all();
+	m_machine.debugger().refresh_display();
 }
 
 
 void MainWindow::enableBreakpointAtCursor(bool changedTo)
 {
-	debug_view_disasm *const dasmView = m_dasmFrame->view()->view<debug_view_disasm>();
-	if (dasmView->cursor_visible() && (m_machine.debugger().console().get_visible_cpu() == dasmView->source()->device()))
-	{
-		offs_t const address = dasmView->selected_address();
-		device_debug *const cpuinfo = dasmView->source()->device()->debug();
+	offs_t address;
+	if (!addressFromCursor(address))
+		return;
 
-		// Find an existing breakpoint at this address
-		const debug_breakpoint *bp = cpuinfo->breakpoint_find(address);
+	const debug_breakpoint *bp = breakpointFromAddress(address);
+	if (bp == nullptr)
+		return;
 
-		if (bp)
-		{
-			int32_t const bpindex = bp->index();
-			std::string command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
-			m_machine.debugger().console().execute_command(command, true);
-			m_machine.debug_view().update_all();
-			m_machine.debugger().refresh_display();
-		}
-	}
+	int32_t const bpindex = bp->index();
+	std::string command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
+	m_machine.debugger().console().execute_command(command, true);
+	m_machine.debug_view().update_all();
+	m_machine.debugger().refresh_display();
 }
 
 
 void MainWindow::runToCursor(bool changedTo)
 {
-	debug_view_disasm *const dasmView = m_dasmFrame->view()->view<debug_view_disasm>();
+	offs_t address;
+	if (!addressFromCursor(address))
+		return;
+
+	std::string command = string_format("go 0x%X", address);
+	m_machine.debugger().console().execute_command(command, true);
+}
+
+
+bool MainWindow::addressFromCursor(offs_t & address) const
+{
+	debug_view_disasm *const dasmView =
+		sourceFrameActive() ?
+			m_srcdbgFrame->view()->view<debug_view_disasm>() :
+			m_dasmFrame->view()->view<debug_view_disasm>();
+
 	if (dasmView->cursor_visible() && (m_machine.debugger().console().get_visible_cpu() == dasmView->source()->device()))
 	{
-		offs_t address = dasmView->selected_address();
-		std::string command = string_format("go 0x%X", address);
-		m_machine.debugger().console().execute_command(command, true);
+		std::optional<offs_t> const opt_address = dasmView->selected_address();
+		if (opt_address.has_value())
+		{
+			address = opt_address.value();
+			return true;
+		}
 	}
+
+	return false;
+}
+
+
+const debug_breakpoint * MainWindow::breakpointFromAddress(offs_t address) const
+{
+	debug_view_disasm *const dasmView =
+		sourceFrameActive() ?
+			m_srcdbgFrame->view()->view<debug_view_disasm>() :
+			m_dasmFrame->view()->view<debug_view_disasm>();
+
+	device_debug *const cpuinfo = dasmView->source()->device()->debug();
+	return cpuinfo->breakpoint_find(address);
 }
 
 
@@ -323,6 +375,20 @@ void MainWindow::rightBarChanged(QAction *changedTo)
 	debug_view_disasm *const dasmView = m_dasmFrame->view()->view<debug_view_disasm>();
 	dasmView->set_right_column(disasm_right_column(changedTo->data().toInt()));
 	m_dasmFrame->view()->viewport()->update();
+}
+
+void MainWindow::srcdbgBarChanged(QAction *changedTo)
+{
+	if (changedTo->data().toInt() == MENU_SHOW_SOURCE)
+	{
+		m_codeDock->setWidget(m_srcdbgFrame);
+		m_machine.debug_view().update_all(DVT_SOURCE);
+	}
+	else
+	{
+		m_codeDock->setWidget(m_dasmFrame);
+		m_machine.debug_view().update_all(DVT_DISASSEMBLY);
+	}
 }
 
 void MainWindow::executeCommandSlot()
@@ -341,7 +407,7 @@ void MainWindow::executeCommand(bool withClear)
 	if (command == "")
 	{
 		// A blank command is a "silent step"
-		m_machine.debugger().console().get_visible_cpu()->debug()->single_step();
+		debugActStepInto();
 		m_inputHistory.reset();
 	}
 	else
@@ -359,6 +425,30 @@ void MainWindow::executeCommand(bool withClear)
 			m_inputHistory.edit();
 		}
 	}
+}
+
+
+bool MainWindow::sourceFrameActive() const
+{
+	 return m_codeDock->widget() == m_srcdbgFrame;
+}
+
+
+void MainWindow::debugActStepInto()
+{
+	m_machine.debugger().console().get_visible_cpu()->debug()->single_step(1, sourceFrameActive());
+}
+
+
+void MainWindow::debugActStepOver()
+{
+	m_machine.debugger().console().get_visible_cpu()->debug()->single_step_over(1, sourceFrameActive());
+}
+
+
+void MainWindow::debugActStepOut()
+{
+	m_machine.debugger().console().get_visible_cpu()->debug()->single_step_out(sourceFrameActive());
 }
 
 
@@ -426,25 +516,31 @@ void MainWindow::unmountImage(bool changedTo)
 }
 
 
-void MainWindow::dasmViewUpdated()
+void MainWindow::codeViewUpdated()
 {
-	debug_view_disasm *const dasmView = m_dasmFrame->view()->view<debug_view_disasm>();
+	debug_view_disasm *const dasmView =
+		sourceFrameActive() ?
+			m_srcdbgFrame->view()->view<debug_view_disasm>() :
+			m_dasmFrame->view()->view<debug_view_disasm>();
 	bool const haveCursor = dasmView->cursor_visible() && (m_machine.debugger().console().get_visible_cpu() == dasmView->source()->device());
 	bool haveBreakpoint = false;
 	bool breakpointEnabled = false;
 	if (haveCursor)
 	{
-		offs_t const address = dasmView->selected_address();
-		device_t *const device = dasmView->source()->device();
-		device_debug *const cpuinfo = device->debug();
-
-		// Find an existing breakpoint at this address
-		const debug_breakpoint *bp = cpuinfo->breakpoint_find(address);
-
-		if (bp)
+		std::optional<offs_t> const address = dasmView->selected_address();
+		if (address.has_value())
 		{
-			haveBreakpoint = true;
-			breakpointEnabled = bp->enabled();
+			device_t *const device = dasmView->source()->device();
+			device_debug *const cpuinfo = device->debug();
+
+			// Find an existing breakpoint at this address
+			const debug_breakpoint *bp = cpuinfo->breakpoint_find(address.value());
+
+			if (bp)
+			{
+				haveBreakpoint = true;
+				breakpointEnabled = bp->enabled();
+			}
 		}
 	}
 
@@ -453,6 +549,11 @@ void MainWindow::dasmViewUpdated()
 	m_breakpointToggleAct->setEnabled(haveCursor);
 	m_breakpointEnableAct->setEnabled(haveBreakpoint);
 	m_runToCursorAct->setEnabled(haveCursor);
+
+	if (sourceFrameActive())
+	{
+		m_srcdbgFrame->updateComboSelection();
+	}
 }
 
 
@@ -508,8 +609,65 @@ DasmDockWidget::~DasmDockWidget()
 {
 }
 
+
+SrcdbgDockWidget::SrcdbgDockWidget(running_machine &machine, QWidget *parent /* = nullptr */) :
+	QWidget(parent),
+	m_machine(machine)
+{
+	m_srcdbgCombo = new QComboBox(this);
+	m_srcdbgView = new DebuggerView(DVT_SOURCE, m_machine, this);
+
+	QVBoxLayout *dvLayout = new QVBoxLayout(this);
+	dvLayout->addWidget(m_srcdbgCombo);
+	dvLayout->addWidget(m_srcdbgView);
+	dvLayout->setContentsMargins(4,0,4,0);
+	dvLayout->setSpacing(3);
+
+	const debug_view_sourcecode *dvSource = downcast<debug_view_sourcecode*>(m_srcdbgView->view());
+	const srcdbg_provider_base * debugInfo = dvSource->srcdbg_provider();
+
+	if (debugInfo == nullptr)
+	{
+		// Nothing else to do if source-level debugging is off
+		return;
+	}
+
+	// populate the combobox with source file paths when present
+	std::size_t numFiles = debugInfo->num_files();
+	for (std::size_t i = 0; i < numFiles; i++)
+	{
+		const char * entryText = debugInfo->file_index_to_path(i).built();
+		m_srcdbgCombo->addItem(entryText);
+	}
+
+	connect(m_srcdbgCombo, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &SrcdbgDockWidget::srcfileChanged);
+}
+
+
+void SrcdbgDockWidget::srcfileChanged(int index)
+{
+	downcast<debug_view_sourcecode*>(m_srcdbgView->view())->set_src_index(u16(index));
+}
+
+
+SrcdbgDockWidget::~SrcdbgDockWidget()
+{
+}
+
+
+// While stepping, if the current file changes, update the
+// combo box to show the new filename
+void SrcdbgDockWidget::updateComboSelection()
+{
+	u16 newIndex = view()->view<debug_view_sourcecode>()->cur_src_index();
+	if (m_srcdbgCombo->currentIndex() != newIndex)
+		m_srcdbgCombo->setCurrentIndex(newIndex);
+}
+
+
 ProcessorDockWidget::~ProcessorDockWidget()
 {
 }
+
 
 } // namespace osd::debugger::qt
