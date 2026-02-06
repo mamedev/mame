@@ -7,7 +7,7 @@ license:CC0-1.0
 
 	<software name="carss" supported="no">
 		<description>Disney/Pixar Cars (Spain)</description>
-		<year>2005</year>
+		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12148"/>
 		<part name="cart" interface="leapfrog_mfleappad_cart">
@@ -77,8 +77,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="joyjetplane" supported="no">
-		<description>Joy Joy - The Jet Plane - High-Flying Adventures (UK)</description>
+	<software name="jayjetplane" supported="no">
+		<description>Jay Jay - The Jet Plane - High-Flying Adventures (UK)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-01121"/>
