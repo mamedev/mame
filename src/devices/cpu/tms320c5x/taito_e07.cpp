@@ -49,7 +49,8 @@ uint16_t taito_e07_device::internal_rom_r(offs_t offset)
 // #define DSP_ROUTINE_LIGHTING   0x0150 // EXAMPLE
 // #define DSP_ROUTINE_CLIP_CHECK 0x0200 // EXAMPLE
 
-// Reconstructed internal ROM based on high-level analysis of the DSP communication. This is a temporary placeholder to allow the driver to boot until a real decap of the E07-11 is available.
+// Reconstructed internal ROM based on high-level analysis of the DSP communication.
+// This is a temporary placeholder to allow the driver to boot until a real decap of the E07-11 is available.
 // Replace s_rom by the dump if chip is dumped one day
 
 const uint16_t taito_e07_device::s_rom[0x1000] =
