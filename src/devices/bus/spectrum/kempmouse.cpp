@@ -14,29 +14,19 @@
 
 **********************************************************************/
 
-
 #include "emu.h"
 #include "kempmouse.h"
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
 DEFINE_DEVICE_TYPE(SPECTRUM_KEMPMOUSE, spectrum_kempmouse_device, "spectrum_kempmouse", "Kempston Mouse Interface")
 
-
-//-------------------------------------------------
-//  INPUT_PORTS( kempmouse )
-//-------------------------------------------------
-
 static INPUT_PORTS_START( kempmouse )
-	PORT_START("mouse_x") /* 0xFBDF */
+	PORT_START("mouse_x")       // 0xFBDF
 	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
 
-	PORT_START("mouse_y") /* 0xFFDF */
+	PORT_START("mouse_y")       // 0xFFDF
 	PORT_BIT(0xff, 0, IPT_MOUSE_Y) PORT_REVERSE PORT_SENSITIVITY(30)
 
-	PORT_START("mouse_buttons") /* 0xFADF */
+	PORT_START("mouse_buttons") // 0xFADF
 	// The right key was the primary key in most implementations in the 1980s–1990s.
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Mouse Button Right") PORT_CODE(MOUSECODE_BUTTON2)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Mouse Button Left") PORT_CODE(MOUSECODE_BUTTON1)
@@ -44,23 +34,10 @@ static INPUT_PORTS_START( kempmouse )
 INPUT_PORTS_END
 
 
-//-------------------------------------------------
-//  input_ports - device-specific input ports
-//-------------------------------------------------
-
 ioport_constructor spectrum_kempmouse_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( kempmouse );
 }
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  spectrum_kempmouse_device - constructor
-//-------------------------------------------------
 
 spectrum_kempmouse_device::spectrum_kempmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SPECTRUM_KEMPMOUSE, tag, owner, clock)
@@ -71,19 +48,9 @@ spectrum_kempmouse_device::spectrum_kempmouse_device(const machine_config &mconf
 {
 }
 
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
 void spectrum_kempmouse_device::device_start()
 {
 }
-
-
-//**************************************************************************
-//  IMPLEMENTATION
-//**************************************************************************
 
 uint8_t spectrum_kempmouse_device::iorq_r(offs_t offset)
 {
