@@ -3850,6 +3850,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/um8498f.h,MACHINES["UM8498F"] = true
+---------------------------------------------------
+
+if MACHINES["UM8498F"] then
+	files {
+		MAME_DIR .. "src/devices/machine/um8498f.cpp",
+		MAME_DIR .. "src/devices/machine/um8498f.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/upc82c710.h,MACHINES["UPC82C710"] = true
 ---------------------------------------------------
 
