@@ -180,7 +180,7 @@ void um8498f_device::device_reset()
 	m_dma_channel = -1;
 	m_config_phase = config_phase_t::LOCK_A0;
 
-	m_space_mem->install_rom(0xf0000, 0xfffff, &m_bios[0x00000 / 4]);
+	m_space_mem->install_rom(0xe0000, 0xfffff, &m_bios[0x00000 / 4]);
 }
 
 void um8498f_device::device_reset_after_children()
@@ -281,30 +281,32 @@ void um8498f_device::config_address_w(offs_t offset, u8 data)
 			if (data == 0xa0)
 				m_config_phase = config_phase_t::LOCK_05;
 			else
-				logerror("config_phase_t::LOCK_A0: unexpected %02x write received\n");
+				logerror("config_phase_t::LOCK_A0: unexpected %02x write received\n", data);
 			break;
 
 		case config_phase_t::LOCK_05:
 			if (data == 0x05)
 				m_config_phase = config_phase_t::UNLOCK_ADDRESS;
 			else
-				logerror("config_phase_t::LOCK_05: unexpected %02x write received\n");
+				logerror("config_phase_t::LOCK_05: unexpected %02x write received\n", data);
 			break;
 
 		case config_phase_t::UNLOCK_ADDRESS:
-			m_config_address = data;
-			m_config_phase = config_phase_t::UNLOCK_DATA;
+			// AMI BIOS writes multiple accesses at same time
+			if (data == 0xa5)
+			{
+				m_config_phase = config_phase_t::LOCK_A0;
+			}
+			else
+			{
+				m_config_address = data;
+				m_config_phase = config_phase_t::UNLOCK_DATA;
+			}
 			break;
 
+		// TODO: AMI BIOS writes multiple addresses during POST
 		case config_phase_t::UNLOCK_DATA:
 			logerror("config_phase_t::UNLOCK_DATA: unexpected %02x write received\n", data);
-			break;
-
-		case config_phase_t::LOCK_A5:
-			if (data == 0xa5)
-				m_config_phase = config_phase_t::LOCK_A0;
-			else
-				logerror("config_phase_t::LOCK_A5: unexpected %02x write received\n");
 			break;
 	}
 }
@@ -316,7 +318,7 @@ u8 um8498f_device::config_data_r(offs_t offset)
 
 	if (m_config_phase == config_phase_t::UNLOCK_DATA)
 	{
-		m_config_phase = config_phase_t::LOCK_A5;
+		m_config_phase = config_phase_t::UNLOCK_ADDRESS;
 		return space().read_byte(m_config_address);
 	}
 
@@ -328,7 +330,7 @@ void um8498f_device::config_data_w(offs_t offset, u8 data)
 {
 	if (m_config_phase == config_phase_t::UNLOCK_DATA)
 	{
-		m_config_phase = config_phase_t::LOCK_A5;
+		m_config_phase = config_phase_t::UNLOCK_ADDRESS;
 		space().write_byte(m_config_address, data);
 		return;
 	}

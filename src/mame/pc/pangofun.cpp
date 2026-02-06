@@ -16,7 +16,7 @@ readme by f205v
 
 Game: Pango Fun
 Year: 1995
-Producer: InfoCube (Pisa-Italy)
+Publisher: InfoCube (Pisa-Italy)
 Revision number: rl00rv00
 
 CPUs:-----------
@@ -63,7 +63,7 @@ Main PCB (it's a standard 486 motherboard):
 1x Keyboard DIN connector (not used)
 
 Video PCB (it's a standard VGA ISA board):
-1x VGA connetctor (to ROMs PCB)
+1x VGA connector (to ROMs PCB)
 1x red/black cable (to ROMs PCB)
 
 Sound PCB (missing, it's a standard ISA 16bit sound card):
@@ -157,7 +157,7 @@ void pangofun_state::main_map(address_map &map)
 //	map(0x00100000, 0x01ffffff).ram();
 	map(0x00100000, 0x03ffffff).noprw();
 //	map(0x02000000, 0xfffeffff).noprw();
-	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 }
 
 void pangofun_state::main_io(address_map &map)
@@ -254,13 +254,12 @@ void pangofun_state::pangofun(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-
 }
 
 
 ROM_START(pangofun)
-	ROM_REGION32_LE(0x10000, "bios", 0 ) /* motherboard bios */
-	ROM_LOAD("bios.bin", 0x000000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
+	ROM_REGION32_LE(0xe0000, "bios", 0 ) /* motherboard bios */
+	ROM_LOAD("bios.bin", 0x010000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
 
 	ROM_REGION32_LE(0x20000, "video_bios", 0 )    /* Trident TVGA9000 BIOS */
 	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )

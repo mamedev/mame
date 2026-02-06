@@ -5047,17 +5047,6 @@ ROM_START( mb1433uiv )
 	ROMX_LOAD( "um498-w4.amw", 0x10000, 0x10000, CRC(12fe6697) SHA1(2506dea874728916dc37f7dad8e8caf214a28525), ROM_BIOS(1))
 ROM_END
 
-// PC-Chips M912 - Chipset: UM8498F, UM8496F - CPU: 486 - BIOS: AMI - ISA16: 4, ISA16/VL: 3
-ROM_START( pccm912 ) // no display
-	ROM_REGION32_LE( 0x20000, "bios", 0)
-	// 0:
-	ROM_SYSTEM_BIOS( 0, "072594", "07/25/94")
-	ROMX_LOAD( "m912.bin", 0x10000, 0x10000, CRC(7784aaf5) SHA1(f54935c5da12160251104d0273040fea22ccbc70), ROM_BIOS(0))
-	// 1:
-	ROM_SYSTEM_BIOS( 1, "120295", "12/02/95")
-	ROMX_LOAD( "m912_12-02-1995x.bin", 0x10000, 0x10000, CRC(28a4a140) SHA1(a58989ab5ad5d040ad4f25888c5b7d77f31a4d82), ROM_BIOS(1))
-ROM_END
-
 // Pine Technology PT-430 - Chipset: UMC UM8498F UM8496F - BIOS: AMI 486DX ISA BIOS AB8906726 28pin - Keyboard-BIOS: silkscreen 8742, but socket empty
 // BIOS-String: - ISA8: 1, ISA16: 3, ISA16/VL: 3 - OSC: 14.31818MHz
 ROM_START( pt430 ) // no display
@@ -5092,22 +5081,6 @@ ROM_START( f4dxluc4 ) // BIOS-String: 40-0E0-008060-00101111-12159-UM498-0 / ADI
 	ROM_LOAD( "486_ab345213.bin", 0x10000, 0x10000, CRC(e5b85a92) SHA1(aade1fb1463b07a616c2594293bf0215c9652511))
 ROM_END
 
-ROM_START( um8498f ) // no display
-	ROM_REGION32_LE(0x20000, "bios", 0)
-	ROM_DEFAULT_BIOS("498gp")
-	// 0: BIOS-String: 40-P101-001437-00101111-072594-GREEN-H - CPU: Socket 3 - RAM: 4xSIMM30, 2xSIMM72, Cache: 9xUM61256AK-15
-	// BIOS: AMI AB9300757
-	ROM_SYSTEM_BIOS(0, "v14", "V1.4") // no display
-	ROMX_LOAD( "4umm001.bin", 0x10000, 0x10000, CRC(a5b768b4) SHA1(904ce2814d6542b65acec0c84532946172f2296d), ROM_BIOS(0))
-	// 1:
-	ROM_SYSTEM_BIOS(1, "um849801", "UM8498 #1") // no display
-	ROMX_LOAD( "um8498.ami", 0x10000, 0x10000, CRC(51f71bc7) SHA1(0986d60081d2c578a66789c0c53fe1d5919c553f),ROM_BIOS(1))
-	// 2: Chipset: UM8498F + UM8496F - BIOS label: Award BIOS ISA 486 485427 - BIOS version: Award Modular BIOS v4.50G - CPU: UMC U55X 486-33F, solder pads for 80486socket
-	// RAM: 4xSIMM30, 2xSIMM72 - ISA8: 1, ISA16: 5
-	// BIOS-String: 12/08/94-UMC-498GP-2C4X6S21-00 / REV A1
-	ROM_SYSTEM_BIOS(2, "498gp", "498GP")
-	ROMX_LOAD( "award_bios_isa_486.bin", 0x10000, 0x10000, CRC(ce3ccaa4) SHA1(3fdc9282d9934e18e45b46b50644022fc0387f33), ROM_BIOS(2))
-ROM_END
 
 
 // ***** 486 motherboards using the UM82C482A UM82C481A chipset
@@ -5930,7 +5903,6 @@ COMP( 199?, ochipvlp,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, op82c392,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the OPTi OPTi 82C392, 82C493 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, pc70iii,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Commodore Business Machines",  "PC 70-III", MACHINE_NOT_WORKING )
 COMP( 199?, pc9486,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Amstrad",     "PC9486", MACHINE_NOT_WORKING )
-COMP( 199?, pccm912,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "PC-Chips", "M912", MACHINE_NOT_WORKING )
 COMP( 199?, pccm915i,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "PC-Chips", "M915i", MACHINE_NOT_WORKING )
 COMP( 199?, pccm919,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "PC-Chips", "M919", MACHINE_NOT_WORKING )
 COMP( 1993, pcd4nd,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
@@ -5965,7 +5937,6 @@ COMP( 199?, um486,     ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, um486v,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM486V-AIO", MACHINE_NOT_WORKING )
 COMP( 199?, um8810paio,ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM8810 PAIO", MACHINE_NOT_WORKING )
 COMP( 199?, um8886,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UMC UM8886/UM8881 chipset", MACHINE_NOT_WORKING )
-COMP( 199?, um8498f,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UMC UM8498F, UM8496F chipset", MACHINE_NOT_WORKING )
 COMP( 199?, uni4800,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UNI4800 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, uniwb4407, ibm5170, 0,       at486,     0,     at_state,     init_at,        "UNICHIP", "486 WB 4407 REV 1.0", MACHINE_NOT_WORKING )
 COMP( 199?, v4p895p3,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "QDI", "V4P895P3/SMT V5.0", MACHINE_NOT_WORKING )

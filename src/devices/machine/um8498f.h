@@ -180,8 +180,7 @@ private:
 		LOCK_A0,
 		LOCK_05,
 		UNLOCK_ADDRESS,
-		UNLOCK_DATA,
-		LOCK_A5
+		UNLOCK_DATA
 	};
 
 	u8 m_config_address;
