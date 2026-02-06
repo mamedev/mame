@@ -729,6 +729,7 @@ void niyanpai_state::zokumahj(machine_config &config)
 }
 
 
+// 娘牌 with furigana にゃんぱい (tōon yomi reading)
 ROM_START( niyanpai )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* TMP68301 main program */
 	ROM_LOAD16_BYTE( "npai_01.bin", 0x00000, 0x20000, CRC(a904e8a1) SHA1(77865d7b48cac96af1e3cac4a702f7de4b5ee82b) )
@@ -824,7 +825,7 @@ ROM_START( zokumahj )
 ROM_END
 
 
-GAME( 1996, niyanpai, 0,        niyanpai, niyanpai, niyanpai_state, init_niyanpai, ROT0, "Nichibutsu",         "Niyanpai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, niyanpai, 0,        niyanpai, niyanpai, niyanpai_state, init_niyanpai, ROT0, "Nichibutsu",         "Nyanpai (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995, musobana, 0,        musobana, musobana, niyanpai_state, init_niyanpai, ROT0, "Nichibutsu / Yubis", "Musoubana (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, 4psimasy, 0,        musobana, 4psimasy, niyanpai_state, init_niyanpai, ROT0, "Sphinx / AV Japan",  "Mahjong 4P Shimasho (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mhhonban, 0,        mhhonban, mhhonban, niyanpai_state, init_niyanpai, ROT0, "Nichibutsu",         "Mahjong Housoukyoku Honbanchuu (Japan)", MACHINE_SUPPORTS_SAVE )
