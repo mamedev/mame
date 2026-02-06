@@ -9,7 +9,7 @@
 #include "machine/upd765.h"
 #include "sound/beep.h"
 
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

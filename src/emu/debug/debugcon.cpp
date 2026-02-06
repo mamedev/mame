@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "debugcon.h"
 
-#include "debugcpu.h"
+#include "debugstate.h"
 #include "debugvw.h"
 #include "textbuf.h"
 
@@ -507,7 +507,7 @@ void debugger_console::process_source_file()
 	std::string buf;
 
 	// loop until the file is exhausted or until we are executing again
-	while (m_machine.debugger().cpu().is_stopped()
+	while (m_machine.debugger().state().is_stopped()
 			&& m_source_file
 			&& std::getline(*m_source_file, buf))
 	{

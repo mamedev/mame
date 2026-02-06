@@ -24,7 +24,7 @@
 #include "emumem_hws.h"
 
 #include "emuopts.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 
 #include "mfpresolve.h"
 

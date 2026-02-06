@@ -13,7 +13,7 @@
 
 #include "debugbuf.h"
 #include "debugcon.h"
-#include "debugcpu.h"
+#include "debugstate.h"
 #include "debughlp.h"
 #include "debugvw.h"
 #include "express.h"
@@ -121,14 +121,14 @@ u64 debugger_commands::cheat_system::read_extended(offs_t address) const
 	return sign_extend(byte_swap(value));
 }
 
-debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu, debugger_console& console)
+debugger_commands::debugger_commands(running_machine& machine, debugger_state& state, debugger_console& console)
 	: m_machine(machine)
 	, m_console(console)
 {
 	using namespace std::placeholders;
 	m_global_array = std::make_unique<global_entry []>(MAX_GLOBALS);
 
-	symbol_table &symtable = cpu.global_symtable();
+	symbol_table &symtable = state.global_symtable();
 
 	// add a few simple global functions
 	symtable.add("min", 2, 2, // lower of two values
@@ -1328,7 +1328,7 @@ void debugger_commands::execute_comment_del(const std::vector<std::string_view> 
 
 void debugger_commands::execute_comment_list(const std::vector<std::string_view> &params)
 {
-	if (!m_machine.debugger().cpu().comment_load(false))
+	if (!m_machine.debugger().state().comment_load(false))
 		m_console.printf("Error while parsing XML file\n");
 }
 
@@ -1350,7 +1350,7 @@ void debugger_commands::execute_comment_commit(const std::vector<std::string_vie
 
 void debugger_commands::execute_comment_save(const std::vector<std::string_view> &params)
 {
-	if (m_machine.debugger().cpu().comment_save())
+	if (m_machine.debugger().state().comment_save())
 		m_console.printf("Comment successfully saved\n");
 	else
 		m_console.printf("Comment not saved\n");
@@ -4296,7 +4296,7 @@ void debugger_commands::execute_trace(const std::vector<std::string_view> &param
 
 void debugger_commands::execute_traceflush(const std::vector<std::string_view> &params)
 {
-	m_machine.debugger().cpu().flush_traces();
+	m_machine.debugger().state().flush_traces();
 }
 
 

@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "dvwpoints.h"
 
-#include "debugcpu.h"
+#include "debugstate.h"
 #include "points.h"
 
 #include <algorithm>

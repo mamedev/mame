@@ -5,7 +5,7 @@
 
 #include "debugger.h"
 #include "debug/debugcon.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "debug/dvdisasm.h"
 #include "debug/points.h"
 

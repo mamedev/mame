@@ -12,7 +12,7 @@
 
 #include "config.h"
 #include "crsshair.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "debug/debugvw.h"
 #include "debugger.h"
 #include "dirtc.h"
@@ -1069,7 +1069,7 @@ void running_machine::stop_all_devices()
 {
 	// first let the debugger save comments
 	if ((debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debugger().cpu().comment_save();
+		debugger().state().comment_save();
 
 	// iterate over devices and stop them
 	for (device_t &device : device_enumerator(root_device()))

@@ -25,7 +25,7 @@
 #include "cycles.h"
 #include "i386ops.h"
 
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "debug/express.h"
 
 #define LOG_MSR             (1U << 1)

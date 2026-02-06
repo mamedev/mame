@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "debugger.h"
 #include "debug/debugcon.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 
 #include "modules/lib/osdobj_common.h"
 

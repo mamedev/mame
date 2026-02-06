@@ -24,7 +24,7 @@
 // emu
 #include "config.h"
 #include "debugger.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 
 #include "util/xmlfile.h"
 
@@ -233,7 +233,7 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 void debugger_windows::debugger_update()
 {
 	// if we're running live, do some checks
-	if (!winwindow_has_focus() && m_machine && !m_machine->debugger().cpu().is_stopped() && (m_machine->phase() == machine_phase::RUNNING))
+	if (!winwindow_has_focus() && m_machine && !m_machine->debugger().state().is_stopped() && (m_machine->phase() == machine_phase::RUNNING))
 	{
 		// check to see if a debugger window has focus
 		HWND const focuswnd = GetFocus();

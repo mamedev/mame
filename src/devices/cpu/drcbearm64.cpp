@@ -116,7 +116,7 @@ TODO:
 #include "drcbeut.h"
 #include "uml.h"
 
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "emuopts.h"
 
 #include "mfpresolve.h"

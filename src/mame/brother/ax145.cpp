@@ -7,7 +7,7 @@
 #include "machine/timer.h"
 #include "video/hd44780.h"
 
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

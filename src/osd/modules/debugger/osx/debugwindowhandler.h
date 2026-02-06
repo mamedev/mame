@@ -8,7 +8,7 @@
 
 #import "debugosx.h"
 
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 
 #import <Cocoa/Cocoa.h>
 

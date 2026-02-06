@@ -23,7 +23,7 @@
 
 #include "debugger.h"
 #include "debug/debugcon.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "debug/points.h"
 
 #include "util/xmlfile.h"

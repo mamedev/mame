@@ -88,7 +88,7 @@
 #include "drcbeut.h"
 #include "x86log.h"
 
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "emuopts.h"
 
 #include "mfpresolve.h"

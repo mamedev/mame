@@ -10,7 +10,7 @@
 #include "debug_module.h"
 
 #include "debug/debugcon.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "debug/points.h"
 #include "debug/textbuf.h"
 #include "debugger.h"
@@ -694,7 +694,7 @@ public:
 		m_state(nullptr),
 		m_memory(nullptr),
 		m_address_space(nullptr),
-		m_debugger_cpu(nullptr),
+		m_debugger_state(nullptr),
 		m_debugger_console(nullptr),
 		m_debugger_host(),
 		m_debugger_port(0),
@@ -789,7 +789,7 @@ private:
 	device_state_interface *m_state;
 	device_memory_interface *m_memory;
 	address_space *m_address_space;
-	debugger_cpu *m_debugger_cpu;
+	debugger_state *m_debugger_state;
 	debugger_console *m_debugger_console;
 	std::string m_debugger_host;
 	int m_debugger_port;
@@ -939,7 +939,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 		assert(m_state != nullptr);
 		m_memory = &m_maincpu->memory();
 		m_address_space = &m_memory->space(AS_PROGRAM);
-		m_debugger_cpu = &m_machine->debugger().cpu();
+		m_debugger_state = &m_machine->debugger().state();
 		m_debugger_console = &m_machine->debugger().console();
 
 		m_is_be = m_address_space->endianness() == ENDIANNESS_BIG;
@@ -1015,7 +1015,7 @@ void debug_gdbstub::wait_for_debugger(device_t &device, bool firststop)
 		}
 	}
 
-	while ( m_debugger_cpu->is_stopped() )
+	while ( m_debugger_state->is_stopped() )
 	{
 		int ch = readchar();
 		if ( ch < 0 )
@@ -1658,7 +1658,7 @@ void debug_gdbstub::handle_character(char ch)
 			}
 			else if ( ch == '\x03' )
 			{
-				m_debugger_cpu->set_execution_stopped();
+				m_debugger_state->set_execution_stopped();
 			}
 			break;
 		case PACKET_DATA:

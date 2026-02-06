@@ -34,14 +34,14 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	debugger_commands &commands() const { return *m_commands; }
-	debugger_cpu &cpu() const { return *m_cpu; }
+	debugger_state &state() const { return *m_state; }
 	debugger_console &console() const { return *m_console; }
 
 private:
 	running_machine &   m_machine;
 
 	std::unique_ptr<debugger_commands> m_commands;
-	std::unique_ptr<debugger_cpu> m_cpu;
+	std::unique_ptr<debugger_state> m_state;
 	std::unique_ptr<debugger_console> m_console;
 };
 

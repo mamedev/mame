@@ -15,7 +15,7 @@
 #include "debug/dvbpoints.h"
 #include "debug/dvwpoints.h"
 #include "debug/debugcon.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "debugger.h"
 #include "render.h"
 #include "ui/uimain.h"
@@ -1616,7 +1616,7 @@ void debug_imgui::debugger_update()
 	if(!view_main_disasm || !view_main_regs || !view_main_console || !m_machine || (m_machine->phase() != machine_phase::RUNNING))
 		return;
 
-	if(!m_machine->debugger().cpu().is_stopped())
+	if(!m_machine->debugger().state().is_stopped())
 	{
 		if(m_take_ui)
 		{

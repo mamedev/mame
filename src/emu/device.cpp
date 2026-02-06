@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "romload.h"
 #include "speaker.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 
 #include <cstring>
 

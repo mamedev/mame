@@ -12,7 +12,7 @@
 #include "dvdisasm.h"
 
 #include "debugbuf.h"
-#include "debugcpu.h"
+#include "debugstate.h"
 
 #include <locale>
 
