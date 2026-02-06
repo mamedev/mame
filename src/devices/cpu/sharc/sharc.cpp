@@ -181,7 +181,7 @@ std::unique_ptr<util::disasm_interface> adsp21062_device::create_disassembler()
 
 void adsp21062_device::enable_recompiler()
 {
-	if (has_running_machine() && (machine().phase() > machine_phase::INIT))
+	if (started())
 		throw emu_fatalerror("SHARC: enable_recompiler: changing mode after starting\n");
 	m_enable_drc = allow_drc();
 }
