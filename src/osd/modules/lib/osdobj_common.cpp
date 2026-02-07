@@ -220,7 +220,11 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, FONT_OSX);
 	REGISTER_MODULE(m_mod_man, FONT_WINDOWS);
 	REGISTER_MODULE(m_mod_man, FONT_DWRITE);
+#ifdef SDLMAME_SDL3
+	REGISTER_MODULE(m_mod_man, FONT_SDL3);
+#else
 	REGISTER_MODULE(m_mod_man, FONT_SDL);
+#endif
 	REGISTER_MODULE(m_mod_man, FONT_NONE);
 
 #if defined(SDLMAME_EMSCRIPTEN)

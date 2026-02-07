@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, R. Belmont, Vas Crabb
 /*
- * font_sdl3.cpp
+ * font_sdl33.cpp
  *
  */
 
@@ -27,18 +27,18 @@
 //  font with the given name
 //-------------------------------------------------
 
-class osd_font_sdl : public osd_font
+class osd_font_sdl3 : public osd_font
 {
 public:
-	osd_font_sdl() : m_font(nullptr, &TTF_CloseFont) { }
-	osd_font_sdl(osd_font_sdl &&obj) : m_font(std::move(obj.m_font)) { }
-	virtual ~osd_font_sdl() { close(); }
+	osd_font_sdl3() : m_font(nullptr, &TTF_CloseFont) { }
+	osd_font_sdl3(osd_font_sdl3 &&obj) : m_font(std::move(obj.m_font)) { }
+	virtual ~osd_font_sdl3() { close(); }
 
 	virtual bool open(std::string const &font_path, std::string const &name, int &height);
 	virtual void close();
 	virtual bool get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs);
 
-	osd_font_sdl & operator=(osd_font_sdl &&obj)
+	osd_font_sdl3 & operator=(osd_font_sdl3 &&obj)
 	{
 		using std::swap;
 		swap(m_font, obj.m_font);
@@ -48,8 +48,8 @@ public:
 private:
 	typedef std::unique_ptr<TTF_Font, void (*)(TTF_Font *)> TTF_Font_ptr;
 
-	osd_font_sdl(osd_font_sdl const &) = delete;
-	osd_font_sdl & operator=(osd_font_sdl const &) = delete;
+	osd_font_sdl3(osd_font_sdl3 const &) = delete;
+	osd_font_sdl3 & operator=(osd_font_sdl3 const &) = delete;
 
 	static constexpr double POINT_SIZE = 144.0;
 
@@ -62,7 +62,7 @@ private:
 	TTF_Font_ptr m_font;
 };
 
-bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, int &height)
+bool osd_font_sdl3::open(std::string const &font_path, std::string const &_name, int &height)
 {
 	bool bakedstyles = false;
 
@@ -142,7 +142,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 //  a given OSD font
 //-------------------------------------------------
 
-void osd_font_sdl::close()
+void osd_font_sdl3::close()
 {
 	m_font.reset();
 }
@@ -155,7 +155,7 @@ void osd_font_sdl::close()
 //  pixel of a black & white font
 //-------------------------------------------------
 
-bool osd_font_sdl::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs)
+bool osd_font_sdl3::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_t &width, std::int32_t &xoffs, std::int32_t &yoffs)
 {
 	SDL_Color const fcol = { 0xff, 0xff, 0xff };
 	char ustr[16];
@@ -188,7 +188,7 @@ bool osd_font_sdl::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 	return bitmap.valid();
 }
 
-osd_font_sdl::TTF_Font_ptr osd_font_sdl::TTF_OpenFont_Magic(std::string const &name, int fsize, long index)
+osd_font_sdl3::TTF_Font_ptr osd_font_sdl3::TTF_OpenFont_Magic(std::string const &name, int fsize, long index)
 {
 	emu_file file(OPEN_FLAG_READ);
 	if (!file.open(name))
@@ -216,7 +216,7 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::TTF_OpenFont_Magic(std::string const &n
 	return TTF_Font_ptr(nullptr, &TTF_CloseFont);
 }
 
-bool osd_font_sdl::BDF_Check_Magic(std::string const &name)
+bool osd_font_sdl3::BDF_Check_Magic(std::string const &name)
 {
 	emu_file file(OPEN_FLAG_READ);
 	if (!file.open(name))
@@ -230,7 +230,7 @@ bool osd_font_sdl::BDF_Check_Magic(std::string const &name)
 }
 
 #if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
-osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &family, std::string const &style, bool &bakedstyles)
+osd_font_sdl3::TTF_Font_ptr osd_font_sdl3::search_font_config(std::string const &family, std::string const &style, bool &bakedstyles)
 {
 	TTF_Font_ptr font(nullptr, &TTF_CloseFont);
 
@@ -296,16 +296,16 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::search_font_config(std::string const &f
 #endif
 
 
-class font_sdl : public osd_module, public font_module
+class font_sdl3 : public osd_module, public font_module
 {
 public:
-	font_sdl() : osd_module(OSD_FONT_PROVIDER, "sdl"), font_module()
+	font_sdl3() : osd_module(OSD_FONT_PROVIDER, "sdl"), font_module()
 	{
 	}
 
 	osd_font::ptr font_alloc() override
 	{
-		return std::make_unique<osd_font_sdl>();
+		return std::make_unique<osd_font_sdl3>();
 	}
 
 	virtual int init(osd_interface &osd, const osd_options &options) override
@@ -327,7 +327,7 @@ public:
 };
 
 
-bool font_sdl::get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result)
+bool font_sdl3::get_font_families(std::string const &font_path, std::vector<std::pair<std::string, std::string> > &result)
 {
 	result.clear();
 
@@ -382,8 +382,8 @@ bool font_sdl::get_font_families(std::string const &font_path, std::vector<std::
 
 #else /* SDLMAME_UNIX */
 
-MODULE_NOT_SUPPORTED(font_sdl, OSD_FONT_PROVIDER, "sdl")
+MODULE_NOT_SUPPORTED(font_sdl3, OSD_FONT_PROVIDER, "sdl")
 
 #endif
 
-MODULE_DEFINITION(FONT_SDL, font_sdl)
+MODULE_DEFINITION(FONT_SDL3, font_sdl3)
