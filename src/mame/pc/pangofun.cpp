@@ -101,9 +101,9 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 #include "emu.h"
 
 #include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-//#include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
 #include "machine/at_keybc.h"
 #include "machine/nvram.h"
@@ -145,8 +145,8 @@ private:
 void pangofun_state::main_map(address_map &map)
 {
 //	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
+//	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+//	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	// boot ROM has four 0xaa55 headers
 	// $00000 has CON/AUX/LPT/COM refs
 	// $08000 contains COMMAND.COM
@@ -167,7 +167,7 @@ void pangofun_state::main_map(address_map &map)
 void pangofun_state::main_io(address_map &map)
 {
 	map(0x00e0, 0x00e3).nopw(); // timestamp stuff?
-	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
+//	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 }
 
 
@@ -234,15 +234,13 @@ void pangofun_state::pangofun(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(um8498f_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(um8498f_device::dreq7_w));
 
-	/* video hardware */
-	// TODO: map to ISA bus, CLGD5401
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
-
-	vga_device &vga(VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
+	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "avga1", false);
+	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa8_cards,  nullptr, false);
+	// TODO: this space will be reserved to the romdisk
+	ISA16_SLOT(config, "isa6", 0, "isabus", pc_isa16_cards, nullptr, false);
 
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(um8498f_device::kbrst_w));
@@ -269,10 +267,6 @@ ROM_START(pangofun)
 	ROM_REGION32_LE(0x20000, "bios", 0 ) /* motherboard bios */
 	ROM_COPY( "romdisk",  0x000000, 0x00000, 0x10000 )
 	ROM_LOAD( "bios.bin", 0x010000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
-
-	ROM_REGION32_LE(0x20000, "video_bios", 0 )    /* Trident TVGA9000 BIOS */
-	ROM_LOAD16_BYTE( "prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
-	ROM_CONTINUE(               0x00001, 0x04000 )
 
 	/* this is what was on the rom board, mapping unknown */
 	ROM_REGION32_LE(0x800000, "game_prg", ROMREGION_ERASEFF )    /* rom board */
