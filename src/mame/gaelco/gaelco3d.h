@@ -13,7 +13,7 @@
 #pragma once
 
 #include "cpu/adsp2100/adsp2100.h"
-#include "cpu/tms32031/tms32031.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "machine/74259.h"
 #include "machine/eepromser.h"
 #include "gaelco3d_m.h"
@@ -111,7 +111,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<adsp21xx_device> m_adsp;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_device<tms32031_device> m_tms;
+	required_device<tms320c31_device> m_tms;
 	required_device_array<dmadac_sound_device, SOUND_CHANNELS> m_dmadac;
 	required_device<gaelco_serial_device> m_serial;
 	required_device<screen_device> m_screen;

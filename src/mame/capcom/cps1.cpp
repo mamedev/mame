@@ -3899,10 +3899,10 @@ static const gfx_layout cps1_layout32x32 =
 };
 
 GFXDECODE_START( gfx_cps1 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8,   0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8_2, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout16x16, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout32x32, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8,   0, 0x80 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8_2, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout16x16, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout32x32, 0, 0x80 )
 GFXDECODE_END
 
 

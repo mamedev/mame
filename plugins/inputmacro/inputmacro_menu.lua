@@ -62,8 +62,10 @@ local input_start_field
 
 local function start_input_menu(handler, start_field)
 	local function supported(f)
-		if f.is_analog or f.is_toggle then
+		if f.is_toggle then
 			return false
+		elseif f.is_analog then
+			return not f.analog_wraps
 		elseif (f.type_class == 'config') or (f.type_class == 'dipswitch') then
 			return false
 		else
@@ -104,7 +106,8 @@ local edit_start_selection
 local edit_start_step
 local edit_menu_active
 local edit_insert_position
-local edit_name_buffer
+local edit_text_item
+local edit_text_buffer
 local edit_items
 local edit_item_delete
 local edit_item_exit
@@ -119,6 +122,25 @@ local function current_macro_complete()
 		return false
 	end
 	return true
+end
+
+local function set_input_field(input, field)
+	input.port = field.port.tag
+	input.mask = field.mask
+	input.type = field.type
+	input.field = field
+	if field.is_analog then
+		local value = input.value
+		if not value then
+			input.value = field.defvalue
+		elseif value < field.minvalue then
+			input.value = field.minvalue
+		elseif value > field.maxvalue then
+			input.value = field.maxvalue
+		end
+	else
+		input.value = nil
+	end
 end
 
 local function handle_edit_items(index, event)
@@ -136,58 +158,63 @@ local function handle_edit_items(index, event)
 
 	local command = edit_items[index]
 
-	local namecancel = false
-	if edit_name_buffer and ((not command) or (command.action ~= 'name')) then
-		edit_name_buffer = nil
-		namecancel = true
+	local textcancel = false
+	if edit_text_buffer and ((not command) or (edit_text_item ~= index)) then
+		edit_text_buffer = nil
+		textcancel = true
 	end
 
 	if not command then
-		return namecancel
+		return textcancel
 	elseif command.action == 'name' then
 		local function namechar()
-			local ch = tonumber(event)
+			local ch = math.tointeger(event)
 			if not ch then
 				return nil
-			elseif (ch >= 0x100) or ((ch & 0x7f) >= 0x20) or (ch == 0x08) then
+			elseif (ch >= 0x100) or ((ch & 0x7f) >= 0x20) or (ch == utf8.codepoint('\b')) then
 				return utf8.char(ch)
 			else
 				return nil
 			end
 		end
 
-		if edit_name_buffer then
+		if edit_text_buffer then
 			if event == 'select' then
-				if #edit_name_buffer > 0 then
-					edit_current_macro.name = edit_name_buffer
+				if #edit_text_buffer > 0 then
+					edit_current_macro.name = edit_text_buffer
 				end
-				edit_name_buffer = nil
+				edit_text_item = nil
+				edit_text_buffer = nil
 				return true
 			elseif event == 'back' then
 				return true -- swallow back while editing text
 			elseif event == 'cancel' then
-				edit_name_buffer = nil
+				edit_text_item = nil
+				edit_text_buffer = nil
 				return true
 			else
 				local char = namechar()
 				if char == '\b' then
-					edit_name_buffer = edit_name_buffer:gsub('[%z\1-\127\192-\255][\128-\191]*$', '')
+					edit_text_buffer = edit_text_buffer:gsub('[%z\1-\127\192-\255][\128-\191]*$', '')
 					return true
 				elseif char then
-					edit_name_buffer = edit_name_buffer .. char
+					edit_text_buffer = edit_text_buffer .. char
 					return true
 				end
 			end
 		elseif event == 'select' then
-			edit_name_buffer = edit_current_macro.name
+			edit_text_item = index
+			edit_text_buffer = edit_current_macro.name
 			return true
 		else
 			local char = namechar()
 			if char == '\b' then
-				edit_name_buffer = ''
+				edit_text_item = index
+				edit_text_buffer = ''
 				return true
 			elseif char then
-				edit_name_buffer = char
+				edit_text_item = index
+				edit_text_buffer = char
 				return true
 			end
 		end
@@ -243,10 +270,7 @@ local function handle_edit_items(index, event)
 		local inputs = edit_current_macro.steps[command.step].inputs
 		if event == 'select' then
 			local function hanlder(field)
-				inputs[command.input].port = field.port.tag
-				inputs[command.input].mask = field.mask
-				inputs[command.input].type = field.type
-				inputs[command.input].field = field
+				set_input_field(inputs[command.input], field)
 			end
 			start_input_menu(hanlder, inputs[command.input].field)
 			edit_start_selection = index
@@ -257,15 +281,76 @@ local function handle_edit_items(index, event)
 				return true
 			end
 		end
+	elseif command.action == 'inputval' then
+		local function valchar()
+			local ch = math.tointeger(event)
+			if not ch then
+				return nil
+			elseif ((ch >= utf8.codepoint('0')) and (ch <= utf8.codepoint('9'))) or (ch == utf8.codepoint('\b')) then
+				return utf8.char(ch)
+			else
+				return nil
+			end
+		end
+		local input = edit_current_macro.steps[command.step].inputs[command.input]
+
+		if edit_text_buffer then
+			if event == 'select' then
+				local newval = math.tointeger(edit_text_buffer)
+				if newval then
+					local field = input.field
+					input.value = ((newval < field.minvalue) and field.minvalue) or ((newval > field.maxvalue) and field.maxvalue) or newval
+				end
+				edit_text_item = nil
+				edit_text_buffer = nil
+				return true
+			elseif event == 'back' then
+				return true -- swallow back while editing text
+			elseif event == 'cancel' then
+				edit_text_item = nil
+				edit_text_buffer = nil
+				return true
+			else
+				local char = valchar()
+				if char == '\b' then
+					edit_text_buffer = edit_text_buffer:gsub('[%z\1-\127\192-\255][\128-\191]*$', '')
+					return true
+				elseif char then
+					edit_text_buffer = edit_text_buffer .. char
+					return true
+				end
+			end
+		elseif event == 'left' then
+			if input.value > input.field.minvalue then
+				input.value = input.value - 1
+				return true
+			end
+		elseif event == 'right' then
+			if input.value < input.field.maxvalue then
+				input.value = input.value + 1
+				return true
+			end
+		elseif event == 'clear' then
+			input.value = input.field.defvalue
+			return true
+		else
+			local char = valchar()
+			if char == '\b' then
+				edit_text_item = index
+				edit_text_buffer = ''
+				return true
+			elseif char then
+				edit_text_item = index
+				edit_text_buffer = char
+				return true
+			end
+		end
 	elseif command.action == 'addinput' then
 		if event == 'select' then
 			local inputs = edit_current_macro.steps[command.step].inputs
 			local function handler(field)
-				local newinput = {
-					port = field.port.tag,
-					mask = field.mask,
-					type = field.type,
-					field = field }
+				local newinput = { }
+				set_input_field(newinput, field)
 				table.insert(inputs, newinput)
 			end
 			start_input_menu(handler)
@@ -344,15 +429,19 @@ local function handle_edit_items(index, event)
 			end
 		end
 	end
-	return namecancel, selection
+	return textcancel, selection
 end
 
 local function add_edit_items(items)
+	local function edit_text_or(s)
+		return (edit_text_buffer and (edit_text_item == (#items + 1)) and (edit_text_buffer .. '_')) or s
+	end
+
 	edit_items = { }
 	local input = manager.machine.input
 	local arrows
 
-	table.insert(items, { _p('plugin-inputmacro', 'Name'), edit_name_buffer and (edit_name_buffer .. '_') or edit_current_macro.name, '' })
+	table.insert(items, { _p('plugin-inputmacro', 'Name'), edit_text_or(edit_current_macro.name), '' })
 	edit_items[#items] = { action = 'name' }
 	if not (edit_start_selection or edit_start_step or edit_menu_active) then
 		edit_start_selection = #items
@@ -406,6 +495,24 @@ local function add_edit_items(items)
 			end
 			table.insert(items, { string.format(_p('plugin-inputmacro', 'Input %d'), j), inputname, '' })
 			edit_items[#items] = { action = 'input', step = i, input = j }
+
+			if input.field and input.field.is_analog then
+				local field = input.field
+				if not input.value then
+					input.value = field.minvalue
+				end
+				arrows = 'lr'
+				if edit_text_buffer then
+					arrows = ''
+				elseif input.value <= field.minvalue then
+					arrows = 'r'
+				elseif input.value >= field.maxvalue then
+					arrows = 'l'
+				end
+				local valtext = edit_text_or(string.format('%u', input.value))
+				table.insert(items, { string.format(_p('plugin-inputmacro', 'Value (%u-%u)'), field.minvalue, field.maxvalue), valtext, arrows })
+				edit_items[#items] = { action = 'inputval', step = i, input = j }
+			end
 		end
 
 		if step.inputs[#step.inputs].field then
@@ -505,7 +612,7 @@ local function populate_add()
 	if edit_switch_poller then
 		return edit_switch_poller:overlay(items, selection, 'lrrepeat')
 	else
-		return items, selection, 'lrrepeat' .. (edit_name_buffer and ' ignorepause' or '')
+		return items, selection, 'lrrepeat' .. (edit_text_buffer and ' ignorepause' or '')
 	end
 end
 
@@ -530,7 +637,7 @@ local function populate_edit()
 	if edit_switch_poller then
 		return edit_switch_poller:overlay(items, selection, 'lrrepeat')
 	else
-		return items, selection, 'lrrepeat' .. (edit_name_buffer and ' ignorepause' or '')
+		return items, selection, 'lrrepeat' .. (edit_text_buffer and ' ignorepause' or '')
 	end
 end
 

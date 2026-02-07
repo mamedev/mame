@@ -11,6 +11,7 @@
 class pvga1a_vga_device : public svga_device
 {
 public:
+	// Untested banked modes, later chipsets add non-working BitBlt
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	pvga1a_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

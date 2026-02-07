@@ -4,7 +4,7 @@
 # macros
 ##########################################################
 macro   nomreq_addr   %addr
-	if (nomemrq_en)
+	if (nomreq_en)
 		m_nomreq_cb(%addr, 0x00, 0xff);
 	+ 1
 
@@ -18,26 +18,26 @@ macro   out   %port
 	m_iorq_cycles !! m_io.write_interruptible(%port, TDAT8);
 
 macro   rm   %addr
-	m_memrq_cycles !! TDAT8 = data_read(%addr);
+	m_mreq_cycles !! TDAT8 = data_read(%addr);
 
 macro   rm_reg   %addr
 	@rm %addr
 	@nomreq_addr %addr
 
 macro   rm16   %addr
-	m_memrq_cycles !! TDAT_L = data_read(%addr);
-	m_memrq_cycles !! TDAT_H = data_read(%addr+1);
+	m_mreq_cycles !! TDAT_L = data_read(%addr);
+	m_mreq_cycles !! TDAT_H = data_read(%addr+1);
 
 macro   wm   %addr
-	m_memrq_cycles !! data_write(%addr, TDAT8);
+	m_mreq_cycles !! data_write(%addr, TDAT8);
 
 macro   wm16   %addr
-	m_memrq_cycles !! data_write(%addr, TDAT_L);
-	m_memrq_cycles !! data_write(%addr+1, TDAT_H);
+	m_mreq_cycles !! data_write(%addr, TDAT_L);
+	m_mreq_cycles !! data_write(%addr+1, TDAT_H);
 
 macro   wm_sp %d
 	SP--;
-	m_memrq_cycles !! stack_write(SP, %d);
+	m_mreq_cycles !! stack_write(SP, %d);
 
 
 macro   wm16_sp %dd
@@ -63,13 +63,13 @@ macro   r800:rop
 	QT = YXF;
 
 macro   arg
-	m_memrq_cycles !! TDAT8 = arg_read();
+	m_mreq_cycles !! TDAT8 = arg_read();
 	PC++;
 
 macro   arg16 %dd
-	m_memrq_cycles !! TDAT_L = arg_read();
+	m_mreq_cycles !! TDAT_L = arg_read();
 	PC++;
-	m_memrq_cycles !! TDAT_H = arg_read();
+	m_mreq_cycles !! TDAT_H = arg_read();
 	PC++;
 	%dd = TDAT;
 
@@ -84,9 +84,9 @@ macro   eay
 	WZ = m_ea;
 
 macro   pop
-	m_memrq_cycles !! TDAT_L = stack_read(SP);
+	m_mreq_cycles !! TDAT_L = stack_read(SP);
 	SP++;
-	m_memrq_cycles !! TDAT_H = stack_read(SP);
+	m_mreq_cycles !! TDAT_H = stack_read(SP);
 	SP++;
 
 macro   push   %d16
@@ -1024,7 +1024,7 @@ macro   nsc800_take_interrupt
 		@wm16_sp PC
 		PC = 0x002c;
 	} else {
-		+ 2 * m_memrq_cycles
+		+ 2 * m_mreq_cycles
 		;
 	}
 	WZ = PC;
@@ -1051,7 +1051,7 @@ ffff
 		return;
 	}
 	if (m_service_attention) {
-		if (m_busrq_state) { // SA_BUSRQ
+		if (m_busreq_state) { // SA_BUSREQ
 			if (!m_busack_state) {
 				m_busack_state = 1;
 				m_busack_cb(1);
@@ -1061,7 +1061,7 @@ ffff
 			m_ref = 0xffff00;
 			return;
 		} else {
-			set_service_attention<SA_BUSRQ, 0>();
+			set_service_attention<SA_BUSREQ, 0>();
 			if (m_busack_state) {
 				m_busack_state = 0;
 				m_busack_cb(0);

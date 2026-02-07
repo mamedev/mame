@@ -4,7 +4,7 @@
 
     formats/c3040_dsk.h
 
-    Commodore 3040 sector disk image format
+    Commodore 2040/3040 sector disk image format
 
 *********************************************************************/
 #ifndef MAME_FORMATS_C3040_DSK_H

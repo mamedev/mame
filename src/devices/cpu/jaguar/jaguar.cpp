@@ -7,12 +7,19 @@
     Written by Aaron Giles
 
     TODO:
-    - Implement pipeline, actually instruction cycles;
-      Currently implementation is similar to single stepping
-      with single cycle
+    - Make the core interruptible so it can cooperate with 68k when it comes
+      to who owns the bus shenanigans;
+    - Implement pipeline, actual instruction cycles
+      (Current implementation is akin to single stepping with single cycle);
     - Implement and acknowlodge remain registers;
-    - Improve delay slot display in debugger (highlight current instruction
-      doesn't work but instruction hook does);
+    - Improve delay slot behaviour display in debugger
+      (highlight current instruction doesn't work but instruction hook does);
+    - Fix interrupt checks, and make sure delay slot doesn't overrun it;
+    - Interrupt acknowledge cycle is iffy
+      (pending irq should really not depend on being masked, and acknowledge
+      should be only if imask is cleared, but that causes more problems than
+      it resolves ...)
+    - Unaligned accesses, which should really belong to an external bus entity.
 
 ***************************************************************************/
 
@@ -75,17 +82,25 @@ inline u8 jaguar_cpu_device::READBYTE(offs_t a)  { return m_program.read_byte(a)
 inline u16 jaguar_cpu_device::READWORD(offs_t a) { return m_program.read_word(a); }
 inline u32 jaguar_cpu_device::READLONG(offs_t a)
 {
-	// - fball95 GPU
-	// - kasumi GPU 0x01e0'34ce (???)
+	// - fball95 GPU $00f0'3b56
+	// - kasumi GPU $01e0'34ce (???)
 	// - sensible DSP $b14689e2 (???)
-	//if (a & 2)
-	//{
-	//	printf("%d: %08x R\n", m_isdsp, a);
-	//	u32 res = READWORD(a) << 16;
-	//	res |= READWORD(a + 2) & 0xffff;
-	//	//machine().debug_break();
-	//	return res;
-	//}
+	// - pdrive $580e
+	if (!DWORD_ALIGNED(a))
+	{
+		if (a == std::clamp(a, (u32)0xf00000, (u32)0xf00fff) || a == std::clamp(a, (u32)0xf10000, (u32)0xf10fff))
+		{
+			//printf("%d: %08x R\n", m_isdsp, a);
+			u32 res = m_program.read_word(a) << 0;
+			res |= m_program.read_word(a + 2) << 16;
+
+			//machine().debug_break();
+			return res;
+		}
+
+		//if (a == std::clamp(a, (u32)0xf03000, (u32)0xf03fff) || a == std::clamp(a, (u32)0xf1b000, (u32)0xf1cfff))
+		//  a &= ~3;
+	}
 
 	return m_program.read_dword(a);
 }
@@ -94,19 +109,30 @@ inline void jaguar_cpu_device::WRITEBYTE(offs_t a, u8 v)  { m_program.write_byte
 inline void jaguar_cpu_device::WRITEWORD(offs_t a, u16 v) { m_program.write_word(a, v); }
 inline void jaguar_cpu_device::WRITELONG(offs_t a, u32 v)
 {
-	// TODO: protect/protctse wants proper alignment at PC=f03004
-	//   (wants to reprogram border color registers, would otherwise hit VMODE)
+	// protect/protctse wants proper alignment for Tom writes at PC=f03004
+	// (wants to reprogram border color registers, would otherwise hit VMODE)
+
+	// Other stuff tries to do unaligned R/Ws which contradicts this, namely:
 	// - atarikrt $06bf 0x0000'0007 (?)
 	// - barkley/bretth/chekflag DSP
 	// - kasumi $f0'34ab 0x0000'0003 (?)
 	// - pdrive $580e (?)
-	//if (a & 2)
-	//{
-	//	printf("%d: %08x %08x W\n", m_isdsp, a, v);
-	//	WRITEWORD(a, v >> 16);
-	//	WRITEWORD(a + 2, v & 0xffff);
-	//  return;
-	//}
+	// We currently narrow by Tom or Jerry accesses only.
+	// TODO: verify what happens on other accesses (just rolls over?)
+	if (!DWORD_ALIGNED(a))
+	{
+		if(a == std::clamp(a, (u32)0xf00000, (u32)0xf00fff) || a == std::clamp(a, (u32)0xf10000, (u32)0xf10fff))
+		{
+			//printf("%d: %08x %08x W\n", m_isdsp, a, v);
+			m_program.write_word(a, v & 0xffff);
+			m_program.write_word(a + 2, v >> 16);
+			return;
+		}
+
+		//if (a == std::clamp(a, (u32)0xf03000, (u32)0xf03fff) || a == std::clamp(a, (u32)0xf1b000, (u32)0xf1cfff))
+		//  a &= ~3;
+	}
+
 	m_program.write_dword(a, v);
 }
 
@@ -182,6 +208,7 @@ jaguar_cpu_device::jaguar_cpu_device(const machine_config &mconfig, device_type 
 	, m_io_config("io", ENDIANNESS_BIG, 32, 8, 0, io_map)
 	, m_version(version) // 1 : Jaguar prototype, 2 : Jaguar first release, 3 : Midsummer prototype, Other : unknown/reserved
 	, m_isdsp(isdsp)
+	, m_branch_hack(false)
 	, m_cpu_interrupt(*this)
 	, m_tables_referenced(false)
 	, table_refcount(0)
@@ -240,8 +267,8 @@ device_memory_interface::space_config_vector jaguar_cpu_device::memory_space_con
 void jaguar_cpu_device::update_register_banks()
 {
 	// - feverpit doesn't want this
-//	if (m_go == false)
-//		return;
+//  if (m_go == false)
+//      return;
 
 	/* pick the bank */
 	u32 bank = m_flags & RPAGEFLAG;
@@ -292,8 +319,8 @@ void jaguar_cpu_device::check_irqs()
 	u8 mask = m_int_mask;
 
 	/* bail if nothing is available */
-//	if (m_isdsp)
-//		printf("%02x %02x\n", latch, mask);
+//  if (m_isdsp)
+//      printf("%02x %02x\n", latch, mask);
 	latch &= mask;
 	if (latch == 0)
 		return;
@@ -314,6 +341,8 @@ void jaguar_cpu_device::check_irqs()
 	/* dispatch */
 	m_pc = m_internal_ram_start;
 	m_pc += which * 0x10;
+	// update R30 (kasumi)
+	m_r[30] = m_pc;
 }
 
 
@@ -324,6 +353,7 @@ void jaguar_cpu_device::execute_set_input(int irqline, int state)
 	// Ignore irq if masked
 	// - barkley, breakout, clubdriv, ironsol2, skyhamm, ultravor all wants to not read a pending
 	//   DSP serial irq *before* JPIT
+	// TODO: should really ack cycle when flipping imask in flags_w
 	if (state != CLEAR_LINE && BIT(m_int_mask, irqline))
 	{
 		m_int_latch |= mask;
@@ -553,7 +583,7 @@ void jaguargpu_cpu_device::execute_run()
 		(this->*gpu_op_table[op >> 10])(op);
 		m_icount--;
 
-	} while (m_icount > 0 || m_icount == m_bankswitch_icount);
+	} while (m_icount > 0 || (m_icount == m_bankswitch_icount && m_branch_hack));
 }
 
 void jaguardsp_cpu_device::execute_run()
@@ -589,7 +619,7 @@ void jaguardsp_cpu_device::execute_run()
 		(this->*dsp_op_table[op >> 10])(op);
 		m_icount--;
 
-	} while (m_icount > 0 || m_icount == m_bankswitch_icount);
+	} while (m_icount > 0 || (m_icount == m_bankswitch_icount && m_branch_hack));
 }
 
 
@@ -600,14 +630,22 @@ void jaguardsp_cpu_device::execute_run()
 void jaguar_cpu_device::abs_rn(u16 op)
 {
 	const u8 dreg = op & 31;
-	u32 res = m_r[dreg];
-	CLR_ZNC();
-	if (res & 0x80000000)
+	s32 res = (s32)m_r[dreg];
+
+	// "does not work for value 800'0000h", assume missing zero typo.
+	// towers2 and chekflag will hit this, unknown purpose
+	if (res == 0x80000000)
 	{
-		m_r[dreg] = res = -res;
-		m_flags |= CFLAG;
+		m_flags |= NFLAG;
 	}
-	SET_Z(res);
+	else
+	{
+		CLR_ZNC();
+		const bool carry_flag = BIT(res, 31);
+		m_flags |= carry_flag << 1;
+		m_r[dreg] = std::abs(res);
+		SET_Z(res);
+	}
 }
 
 void jaguar_cpu_device::add_rn_rn(u16 op)
@@ -749,8 +787,6 @@ void jaguar_cpu_device::imacn_rn_rn(u16 op)
 	const u32 r1 = m_r[(op >> 5) & 31];
 	const u32 r2 = m_r[op & 31];
 	m_accum += (s64)((int16_t)r1 * (int16_t)r2);
-	// TODO: what's really "unexpected"?
-	logerror("Unexpected IMACN instruction!\n");
 }
 
 void jaguar_cpu_device::imult_rn_rn(u16 op)
@@ -771,21 +807,6 @@ void jaguar_cpu_device::imultn_rn_rn(u16 op)
 	const u32 res = (int16_t)r1 * (int16_t)r2;
 	m_accum = (s32)res;
 	CLR_ZN(); SET_ZN(res);
-
-	op = ROPCODE(m_pc);
-	while ((op >> 10) == 20)
-	{
-		r1 = m_r[(op >> 5) & 31];
-		r2 = m_r[op & 31];
-		m_accum += (s64)((int16_t)r1 * (int16_t)r2);
-		m_pc += 2;
-		op = ROPCODE(m_pc);
-	}
-	if ((op >> 10) == 19)
-	{
-		m_pc += 2;
-		m_r[op & 31] = (u32)m_accum;
-	}
 }
 
 void jaguar_cpu_device::jr_cc_n(u16 op)
@@ -810,7 +831,9 @@ void jaguar_cpu_device::jump_cc_rn(u16 op)
 		const u8 reg = (op >> 5) & 31;
 
 		// HACK: kludge for risky code in the cojag DSP interrupt handlers
-		const u32 newpc = (m_icount == m_bankswitch_icount) ? m_a[reg] : m_r[reg];
+		// Pinpoint what cojag game(s) needs this (if it's still a thing ...)
+		// also note: using m_r[reg] only fix wolfn3d and gorf2k current regression (with no sound tho)
+		const u32 newpc = (m_icount == m_bankswitch_icount && m_branch_hack) ? m_a[reg] : m_r[reg];
 		debugger_instruction_hook(m_pc);
 		op = ROPCODE(m_pc);
 		m_pc = newpc;
@@ -906,23 +929,28 @@ void jaguar_cpu_device::mmult_rn_rn(u16 op)
 	const u8 dreg = op & 31;
 	u32 addr = m_mtxaddr;
 	s64 accum = 0;
+	// m_maddw == false:
+	// - ATARI letters on BIOS logo
+	// - superx3d
+	// - ironsol2 DSP (which specifically wants m_b1 rather than m_a, otherwise sound
+	//   overdrive will occur)
+	// - hstrike 3d gameplay renders
+	// TODO: anything that actually uses m_addw == true?
+	u32 address_inc = m_maddw == true ? 4 * count : 4;
 
-	if (m_maddw == false)
+	for (int i = 0; i < count; i++)
 	{
-		for (int i = 0; i < count; i++)
-		{
-			accum += (int16_t)(m_b1[sreg + i/2] >> (16 * ((i & 1) ^ 1))) * (int16_t)READWORD(addr);
-			addr += 2;
-		}
+		s16 a;
+		if (i & 1)
+			a = (s16)(m_b1[sreg + (i >> 1)] >> 16);
+		else
+			a = (s16)(m_b1[sreg + (i >> 1)] & 0xffff);
+		s16 b = (s16)READWORD(addr + 2);
+
+		accum += a * b;
+		addr += address_inc;
 	}
-	else
-	{
-		for (int i = 0; i < count; i++)
-		{
-			accum += (int16_t)(m_b1[sreg + i/2] >> (16 * ((i & 1) ^ 1))) * (int16_t)READWORD(addr);
-			addr += 2 * count;
-		}
-	}
+
 	const u32 res = (u32)accum;
 	m_r[dreg] = res;
 	CLR_ZN(); SET_ZN(res);
@@ -1169,7 +1197,10 @@ void jaguar_cpu_device::sharq_n_rn(u16 op)
 void jaguar_cpu_device::shlq_n_rn(u16 op)
 {
 	const u8 dreg = op & 31;
-	const s32 r1 = convert_zero[(op >> 5) & 31];
+	// NOTE: convert_zero doesn't seem right here, 32 - convert_zero[0] = 0
+	// wolfn3d, nbajamte
+	const s32 r1 = (op >> 5) & 31;
+	//  const s32 r1 = convert_zero[(op >> 5) & 31];
 	const u32 r2 = m_r[dreg];
 	const u32 res = r2 << (32 - r1);
 	m_r[dreg] = res;
@@ -1372,8 +1403,8 @@ void jaguar_cpu_device::flags_w(offs_t offset, u32 data, u32 mem_mask)
 
 		//for (int i = 0; i < 5; i++)
 		//{
-		//	if (BIT(m_flags, 9 + i))
-		//		set_input_line(i, CLEAR_LINE);
+		//  if (BIT(m_flags, 9 + i))
+		//      set_input_line(i, CLEAR_LINE);
 		//}
 
 		// TODO: DMAEN (bit 15)
@@ -1418,7 +1449,9 @@ void jaguar_cpu_device::pc_w(offs_t offset, u32 data, u32 mem_mask)
 	// JTRM warns against changing PC while GPU/DSP is running
 	// - speedst2 does it anyway on DSP side
 	if (m_go == true)
+	{
 		logerror("%s: inflight PC write %08x\n", this->tag(), m_pc);
+	}
 }
 
 /*
@@ -1539,10 +1572,13 @@ void jaguardsp_cpu_device::modulo_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_modulo);
 }
 
+// top 8-bit of accumulator, sign extended
 u32 jaguardsp_cpu_device::high_accum_r()
 {
-	logerror("%s: high 16-bit accumulator read\n", this->tag());
-	return (m_accum >> 32) & 0xff;
+	if (!machine().side_effects_disabled())
+		logerror("%s: high 8-bit accumulator read\n", this->tag());
+
+	return util::sext((m_accum >> 32) & 0xff, 8);
 }
 
 u32 jaguar_cpu_device::iobus_r(offs_t offset, u32 mem_mask)

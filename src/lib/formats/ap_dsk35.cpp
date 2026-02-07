@@ -143,7 +143,7 @@ int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std
 
 	uint8_t h[0x54];
 	auto const [err, actual] = read_at(io, 0, h, 0x54);
-	if (err || (0x54 != actual))
+	if(err || (0x54 != actual))
 		return 0;
 
 	uint32_t const dsize = get_u32be(&h[0x40]);
@@ -152,8 +152,12 @@ int dc42_format::identify(util::random_read &io, uint32_t form_factor, const std
 	uint8_t const encoding = h[0x50];
 	uint8_t const format = h[0x51];
 	// if it's a 1.44MB DC42 image, reject it so the generic PC MFM handler picks it up
-	if ((encoding == 0x03) && (format == 0x02))
+	if((encoding == 0x03) && (format == 0x02))
 		return 0;
+
+	// Twiggy.  Images out there are slightly broken, size-wise
+	if(size == 0xda000 && dsize == 0xd4c00 && tsize == 0x4fc8 && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0)
+		return FIFID_STRUCT;
 
 	return (size == 0x54+tsize+dsize && h[0] < 64 && h[0x52] == 1 && h[0x53] == 0) ? FIFID_STRUCT : 0;
 }
@@ -168,7 +172,7 @@ bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	uint8_t encoding = h[0x50];
 	uint8_t format = h[0x51];
 
-	if((encoding != 0x00 || format != 0x02) && ((encoding != 0x01 && encoding != 0x03) || (format != 0x22 && format != 0x24))) {
+	if((encoding != 0x00 || format != 0x02) && ((encoding != 0x01 && encoding != 0x03) || (format != 0x22 && format != 0x24)) && (encoding != 0x54 || format != 0x01)) {
 		osd_printf_error("dc42: Unsupported encoding/format combination %02x/%02x\n", encoding, format);
 		return false;
 	}
@@ -188,7 +192,7 @@ bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::v
 			break;
 
 		case 871424:    // Apple Twiggy 851KiB
-			image.set_form_variant(floppy_image::FF_525, floppy_image::DSHD);
+			image.set_form_variant(floppy_image::FF_TWIG, floppy_image::DSHD);
 			break;
 
 		default:
@@ -199,39 +203,44 @@ bool dc42_format::load(util::random_read &io, uint32_t form_factor, const std::v
 	uint8_t sector_data[(512+12)*12];
 	memset(sector_data, 0, sizeof(sector_data));
 
-	desc_gcr_sector sectors[12];
+	if(dsize != 871424) {
+		desc_gcr_sector sectors[12];
 
-	int pos_data = 0x54;
-	int pos_tag = 0x54+dsize;
+		int pos_data = 0x54;
+		int pos_tag = 0x54+dsize;
 
-	int head_count = encoding == 1 ? 2 : 1;
+		int head_count = encoding == 1 ? 2 : 1;
 
-	for(int track=0; track < 80; track++) {
-		for(int head=0; head < head_count; head++) {
-			int ns = 12 - (track/16);
-			int si = 0;
-			for(int i=0; i<ns; i++) {
-				uint8_t *data = sector_data + (512+12)*i;
-				sectors[si].track = track;
-				sectors[si].head = head;
-				sectors[si].sector = i;
-				sectors[si].info = format;
-				if(tsize) {
-					read_at(io, pos_tag, data, 12); // FIXME: check for errors and premature EOF
-					sectors[si].tag = data;
-					pos_tag += 12;
-				} else {
-					sectors[si].tag = nullptr;
+		for(int track=0; track < 80; track++) {
+			for(int head=0; head < head_count; head++) {
+				int ns = 12 - (track/16);
+				int si = 0;
+				for(int i=0; i<ns; i++) {
+					uint8_t *data = sector_data + (512+12)*i;
+					sectors[si].track = track;
+					sectors[si].head = head;
+					sectors[si].sector = i;
+					sectors[si].info = format;
+					if(tsize) {
+						read_at(io, pos_tag, data, 12); // FIXME: check for errors and premature EOF
+						sectors[si].tag = data;
+						pos_tag += 12;
+					} else {
+						sectors[si].tag = nullptr;
+					}
+					sectors[si].data = data+12;
+					read_at(io, pos_data, data+12, 512); // FIXME: check for errors and premature EOF
+					pos_data += 512;
+					si = (si + 2) % ns;
+					if(si == 0)
+						si++;
 				}
-				sectors[si].data = data+12;
-				read_at(io, pos_data, data+12, 512); // FIXME: check for errors and premature EOF
-				pos_data += 512;
-				si = (si + 2) % ns;
-				if(si == 0)
-					si++;
+				build_mac_track_gcr(track, head, image, sectors);
 			}
-			build_mac_track_gcr(track, head, image, sectors);
 		}
+	} else {
+		// Twiggy
+		fprintf(stderr, "twiggy\n");
 	}
 	return true;
 }
@@ -434,21 +443,15 @@ int apple_2mg_format::identify(util::random_read &io, uint32_t form_factor, cons
 {
 	uint8_t signature[4];
 	auto const [err, actual] = read_at(io, 0, signature, 4);
-	if (err || (4 != actual))
-	{
+	if(err || (4 != actual))
 		return 0;
-	}
 
-	if (!memcmp(signature, "2IMG", 4))
-	{
+	if(!memcmp(signature, "2IMG", 4))
 		return FIFID_SIGN;
-	}
 
 	// Bernie ][ The Rescue wrote 2MGs with the signature byte-flipped, other fields are valid
-	if (!memcmp(signature, "GMI2", 4))
-	{
+	if(!memcmp(signature, "GMI2", 4))
 		return FIFID_SIGN;
-	}
 
 	return 0;
 }

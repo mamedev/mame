@@ -17,7 +17,7 @@ class fcrash_state : public cps_state
 {
 public:
 	fcrash_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cps_state(mconfig, type, tag, 1)
+		: cps_state(mconfig, type, tag)
 		, m_msm_1(*this, "msm1")
 		, m_msm_2(*this, "msm2")
 		, m_okibank(*this, "okibank")

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    jedutil.c
+    jedutil.cpp
 
     JEDEC file utilities.
 

@@ -1124,7 +1124,7 @@ static const char *const ifslots_sample_names[] =
 static INPUT_PORTS_START( interflip )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )  PORT_NAME("Auxiliary Lever")                     // auxiliary lever
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_GAMBLE_DOOR )                                             // door
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_DOOR )                                                    // door
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM )  PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))  // payout
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME("Lever")                               // lever
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )                                                   // unused

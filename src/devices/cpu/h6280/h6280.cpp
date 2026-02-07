@@ -66,7 +66,7 @@
         - Turrican: Allows the game to start
 
         Changed PLX and PLY to set NZ flags. Fixes:
-        - Afterburner: Graphics unpacking
+        - After Burner: Graphics unpacking
         - Aoi Blink: Collision detection with background
 
         Fixed the decimal version of ADC/SBC to *not* update the V flag,
