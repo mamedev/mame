@@ -133,6 +133,7 @@ void psxcd_device::device_start()
 	save_item(NAME(next_sector_t));
 	save_item(NAME(autopause_sector));
 	save_item(NAME(m_param_count));
+	save_item(NAME(m_timerinuse));
 }
 
 void psxcd_device::device_stop()
