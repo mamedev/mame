@@ -6,6 +6,8 @@ UMC UM8498F/8496 based IBM compatibles
 
 TODO:
 - Port over remaining targets from pc/at.cpp
+- tku5s throws "Incompatible Keyboard Controller" in BIOS color set submenu.
+  May require specific AMIKEY BIOS there?
 
 **************************************************************************************************/
 
@@ -65,6 +67,7 @@ void pc486vl_state::main_map(address_map &map)
 
 void pc486vl_state::main_io(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x00e0, 0x00e3).nopw(); // timestamp stuff?
 }
 
@@ -105,7 +108,7 @@ void pc486vl_state::base_config(machine_config &config)
 	// speaker
 	m_chipset->spkr().set([this] (int state) { m_speaker->level_w(state); });
 
-	// unknown, not provided. Chipset can go up to 32M, but will go "memory fail" with that (?)
+	// TODO: Chipset can go up to 32M, but will go "memory fail" with that (?)
 	RAM(config, "ram").set_default_size("64M");
 
 	ISA16(config, m_isabus, 0);
@@ -138,14 +141,12 @@ void pc486vl_state::base_config(machine_config &config)
 	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	// Temporary default
 	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, "ms_naturl"));
 	pc_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
 	pc_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-
 }
 
 void pc486vl_state::pccm912(machine_config &config)
@@ -212,5 +213,5 @@ ROM_END
 } // anonymous namespace
 
 COMP( 1994, pccm912,   0, 0,       pccm912,     0,     pc486vl_state,     empty_init,        "PC-Chips", "M912 (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING )
-COMP( 199?, sy019s,    0, 0,       pc486vl,     0,     pc486vl_state,     empty_init,         "Soyo", "SY-019S (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING )
-COMP( 1994, tku5s,     0, 0,       pc486vl,     0,     pc486vl_state,     empty_init,        "TK", "U5S-TK-V03A (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING )
+COMP( 199?, sy019s,    0, 0,       pc486vl,     0,     pc486vl_state,     empty_init,        "Soyo",     "SY-019S (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING )
+COMP( 1994, tku5s,     0, 0,       pc486vl,     0,     pc486vl_state,     empty_init,        "TK",       "U5S-TK-V03A (UMC UM8498F & UM8496 chipset)", MACHINE_NOT_WORKING )

@@ -192,7 +192,7 @@ private:
 
 	std::vector<u8> m_shadow_ram;
 
-//	void update_romram_settings();
+	void update_romram_settings();
 //	void update_dma_clock();
 
 	offs_t page_offset();
