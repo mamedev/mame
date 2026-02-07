@@ -2,7 +2,7 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-Countertop Champ II? (c) 1993 U.S. Games
+Countertop Champion II (c) 1993 U.S. Games
 
 Bartop style multigame/quiz/fortune teller
 Dump contains a MS-DOS 3.3 ROM disk, ebay auction shows a Pine Technology PT-319A
@@ -222,5 +222,4 @@ void champ2_state::init_at()
 
 
 //GAME( 1993, champ,  0, champ2,  champ2, champ2_state, empty_init, ROT0,  "U.S. Games", "Countertop Champion", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-// Title assumed by "Champ II" ROM labels
 GAME( 1994, champ2,  0, champ2,  champ2, champ2_state, init_at, ROT0,  "U.S. Games", "Countertop Champion 2 (ver 2.11)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
