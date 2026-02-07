@@ -2,14 +2,14 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-Countertop Champ II? (c) 1993 U.S. Games
+Countertop Champion II (c) 1993 U.S. Games
 
 Bartop style multigame/quiz/fortune teller
-Dump contains a MS-DOS 3.3 ROM disk, ebay auction shows a Pine Technology PT-319A
+Dump contains an incomplete MS-DOS 3.3 ROM disk, ebay auction shows a Pine Technology PT-319A
 (SARC RC2016A5 chipset) + 2 other populated ISA16 cards out of 6.
 
 TODO:
-- Does extensive checks to COM1, towards what it claims to be `mtv1` (MicroTouch?)
+- Wants a MicroTouch touch screen connected to COM1 (IO=3F8; IRQ=4) w/ 9600 8N1
 - ROM disk banking incomplete, meaning of $ca000 writes unknown;
 
 **************************************************************************************************/
@@ -172,9 +172,10 @@ ROM_START( champ2 )
 	// borrowed from pc/at.cpp pt319a
 	ROM_LOAD( "3sam001.bin", 0x10000, 0x10000, BAD_DUMP CRC(cad22030) SHA1(85bb6027579a87bfe7ea0f7df3676fdaa64920ac))
 
-	ROM_REGION( 0x100000, "game_prg", 0 )
-	ROM_LOAD( "champ2.u2", 0x00000, 0x80000, CRC(058bd1a4) SHA1(e4c0db329cda0cdcab7c7b4d130f1c38fa32385f) )
-	ROM_LOAD( "champ2.u3", 0x80000, 0x80000, CRC(3bb1951f) SHA1(8057327285f57787cc7da678427767ee7f979a64) )
+	ROM_REGION( 0x180000, "game_prg", 0 )
+	ROM_LOAD( "champ2.u2", 0x000000, 0x80000, CRC(058bd1a4) SHA1(e4c0db329cda0cdcab7c7b4d130f1c38fa32385f) )
+	ROM_LOAD( "champ2.u3", 0x080000, 0x80000, CRC(3bb1951f) SHA1(8057327285f57787cc7da678427767ee7f979a64) )
+	ROM_LOAD( "champ2.u4", 0x100000, 0x80000, NO_DUMP )
 
 	ROM_REGION( 0x1caf, "pal", 0 )
 	ROM_LOAD( "champ2.u7",  0x00000, 0x1caf, BAD_DUMP CRC(bd70e89b) SHA1(3567d22057e366a439ffce2dd35180f5df80d47c) )
@@ -203,5 +204,4 @@ void champ2_state::init_at()
 
 
 //GAME( 1993, champ,  0, champ2,  champ2, champ2_state, empty_init, ROT0,  "U.S. Games", "Countertop Champion", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-// Title assumed by "Champ II" ROM labels
 GAME( 1994, champ2,  0, champ2,  champ2, champ2_state, init_at, ROT0,  "U.S. Games", "Countertop Champion 2 (ver 2.11)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
