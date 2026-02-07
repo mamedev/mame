@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, R. Belmont, Vas Crabb
 /*
- * font_sdl33.cpp
+ * font_sdl3.cpp - Font handling using SDL3_ttf
  *
  */
 
