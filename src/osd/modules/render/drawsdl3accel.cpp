@@ -2,11 +2,11 @@
 // copyright-holders: Couriersud, Olivier Galibert, R. Belmont
 //============================================================
 //
-//  draw13.cpp - SDL 2.0 drawing implementation
+//  drawsdl3accel.cpp - SDL accelerated drawing using SDL's renderer API
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
-//  SDL 2.0 renderer by Couriersud
+//  renderer_sdl2 by Couriersud
 //
 //============================================================
 
@@ -14,7 +14,7 @@
 
 #include "modules/osdmodule.h"
 
-#if defined(OSD_SDL) && !defined(SDLMAME_SDL3)
+#if defined(OSD_SDL) && defined (SDLMAME_SDL3)
 
 // OSD headers
 #include "sdlopts.h"
@@ -28,7 +28,7 @@
 #include "render.h"
 
 // standard SDL headers
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 // standard C headers
 #include <algorithm>
@@ -36,8 +36,6 @@
 #include <cstdio>
 #include <iterator>
 #include <list>
-
-
 namespace osd {
 
 namespace {
@@ -327,7 +325,7 @@ void texture_info::set_coloralphamode(SDL_Texture *texture_id, const render_colo
 
 void texture_info::render_quad(const render_primitive &prim, const int x, const int y)
 {
-	SDL_Rect target_rect;
+	SDL_FRect target_rect;
 
 	target_rect.x = x;
 	target_rect.y = y;
@@ -337,15 +335,15 @@ void texture_info::render_quad(const render_primitive &prim, const int x, const 
 	SDL_SetTextureBlendMode(m_texture_id, m_sdl_blendmode);
 	set_coloralphamode(m_texture_id, &prim.color);
 	//printf("%d %d %d %d\n", target_rect.x, target_rect.y, target_rect.w, target_rect.h);
-	// Arghhh .. Just another bug. SDL_RenderCopy has severe issues with scaling ...
-	SDL_RenderCopy(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, &target_rect);
-	//SDL_RenderCopyEx(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, &target_rect, 0, nullptr, SDL_FLIP_NONE);
-	//SDL_RenderCopyEx(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
+	// Arghhh .. Just another bug. SDL_RenderTexture has severe issues with scaling ...
+	SDL_RenderTexture(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, &target_rect);
+	//SDL_RenderTextureRotated(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, &target_rect, 0, nullptr, SDL_FLIP_NONE);
+	//SDL_RenderTextureRotated(m_renderer->m_sdl_renderer,  m_texture_id, nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
 }
 
 void renderer_sdl2::render_quad(texture_info *texture, const render_primitive &prim, const int x, const int y)
 {
-	SDL_Rect target_rect;
+	SDL_FRect target_rect;
 
 	target_rect.x = x;
 	target_rect.y = y;
@@ -393,7 +391,7 @@ int renderer_sdl2::RendererSupportsFormat(Uint32 format, Uint32 access, const ch
 	/* not tested yet */
 	fmt_support[i].format = format;
 	fmt_support[i + 1].format = 0;
-	SDL_Texture *texid = SDL_CreateTexture(m_sdl_renderer, format, access, 16, 16);
+	SDL_Texture *texid = SDL_CreateTexture(m_sdl_renderer, SDL_PixelFormat(format), SDL_TextureAccess(access), 16, 16);
 	if (texid)
 	{
 		fmt_support[i].status = 1;
@@ -410,76 +408,43 @@ int renderer_sdl2::RendererSupportsFormat(Uint32 format, Uint32 access, const ch
 //============================================================
 //  sdl_info::create
 //============================================================
-
-static void drawsdl_show_info(struct SDL_RendererInfo *render_info)
-{
-#define RF_ENTRY(x) {x, #x }
-	static struct {
-		int flag;
-		const char *name;
-	} rflist[] =
-		{
-#if 0
-			RF_ENTRY(SDL_RENDERER_SINGLEBUFFER),
-			RF_ENTRY(SDL_RENDERER_PRESENTCOPY),
-			RF_ENTRY(SDL_RENDERER_PRESENTFLIP2),
-			RF_ENTRY(SDL_RENDERER_PRESENTFLIP3),
-			RF_ENTRY(SDL_RENDERER_PRESENTDISCARD),
-#endif
-			RF_ENTRY(SDL_RENDERER_SOFTWARE),
-			RF_ENTRY(SDL_RENDERER_PRESENTVSYNC),
-			RF_ENTRY(SDL_RENDERER_ACCELERATED),
-			RF_ENTRY(SDL_RENDERER_TARGETTEXTURE),
-			{-1, nullptr}
-		};
-	int i;
-
-	osd_printf_verbose("window: using renderer %s\n", render_info->name ? render_info->name : "<unknown>");
-	for (i = 0; rflist[i].name != nullptr; i++)
-		if (render_info->flags & rflist[i].flag)
-			osd_printf_verbose("renderer: flag %s\n", rflist[i].name);
-}
-
-
 int renderer_sdl2::create()
 {
+	osd_printf_verbose("Enter renderer_sdl2::create\n");
+
 	// create renderer
-
-	/* Enable bilinear filtering in case it is supported.
-	 * This applies to all texture operations. However, artwort is pre-scaled
-	 * and thus shouldn't be affected.
-	 */
-	if (video_config.filter)
-	{
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-	}
-	else
-	{
-		SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
-	}
-
-	if (video_config.waitvsync)
-		m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-	else
-		m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_ACCELERATED);
+	m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), nullptr);
 
 	if (!m_sdl_renderer)
 	{
 		fatalerror("Error on creating renderer: %s\n", SDL_GetError());
 	}
 
-	//SDL_SelectRenderer(window().sdl_window);
+	if (video_config.waitvsync)
+	{
+		SDL_SetRenderVSync(m_sdl_renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
+	}
 
+	/* Enable bilinear filtering in case it is supported.
+	 * This applies to all texture operations. However, artwort is pre-scaled
+	 * and thus shouldn't be affected.
+	 */
+#if SDL_VERSION_ATLEAST(3, 3, 2)
+	if (video_config.filter)
+	{
+		SDL_SetDefaultTextureScaleMode(m_sdl_renderer, SDL_SCALEMODE_LINEAR);
+	}
+	else
+	{
+		SDL_SetDefaultTextureScaleMode(m_sdl_renderer, SDL_SCALEMODE_NEAREST);
+	}
+#endif
 	m_blittimer = 3;
 
-	//SDL_RenderPresent(m_sdl_renderer);
+	const auto props = SDL_GetRendererProperties(m_sdl_renderer);
+	osd_printf_verbose("SDL renderer using driver %s\n", SDL_GetStringProperty(props, SDL_PROP_RENDERER_NAME_STRING, "Unknown"));
+
 	osd_printf_verbose("Leave renderer_sdl2::create\n");
-
-	struct SDL_RendererInfo render_info;
-
-	SDL_GetRendererInfo(m_sdl_renderer, &render_info);
-	drawsdl_show_info(&render_info);
-
 	return 0;
 }
 
@@ -532,7 +497,7 @@ int renderer_sdl2::draw(int update)
 		destroy_all_textures();
 		m_width = wdim.width();
 		m_height = wdim.height();
-		SDL_RenderSetViewport(m_sdl_renderer, nullptr);
+		SDL_SetRenderViewport(m_sdl_renderer, nullptr);
 		m_blittimer = 3;
 		clear_flags(FI_CHANGED);
 	}
@@ -589,7 +554,7 @@ int renderer_sdl2::draw(int update)
 
 				SDL_SetRenderDrawBlendMode(m_sdl_renderer, map_blendmode(PRIMFLAG_GET_BLENDMODE(prim.flags)));
 				SDL_SetRenderDrawColor(m_sdl_renderer, sr, sg, sb, sa);
-				SDL_RenderDrawLine(m_sdl_renderer, prim.bounds.x0 + hofs, prim.bounds.y0 + vofs,
+				SDL_RenderLine(m_sdl_renderer, prim.bounds.x0 + hofs, prim.bounds.y0 + vofs,
 						prim.bounds.x1 + hofs, prim.bounds.y1 + vofs);
 				break;
 			case render_primitive::QUAD:
@@ -730,7 +695,6 @@ texture_info::texture_info(renderer_sdl2 *renderer, const render_texinfo &texsou
 	else
 		m_is_rotated = false;
 
-	//m_sdl_access = SDL_TEXTUREACCESS_STATIC;
 	m_sdl_access = SDL_TEXTUREACCESS_STREAMING;
 
 	// Watch out for 0x0 textures ...
@@ -738,15 +702,25 @@ texture_info::texture_info(renderer_sdl2 *renderer, const render_texinfo &texsou
 		osd_printf_warning("Trying to create texture with zero dim\n");
 
 	// set copy_info
-
 	m_copyinfo = compute_size_type();
 
-	m_texture_id = SDL_CreateTexture(m_renderer->m_sdl_renderer, m_copyinfo->dst_fmt, m_sdl_access,
+	m_texture_id = SDL_CreateTexture(m_renderer->m_sdl_renderer, SDL_PixelFormat(m_copyinfo->dst_fmt), SDL_TextureAccess(m_sdl_access),
 			m_setup.rotwidth, m_setup.rotheight);
 
 	if (!m_texture_id)
 		osd_printf_error("Error creating texture: %d x %d, pixelformat %s error: %s\n", m_setup.rotwidth, m_setup.rotheight,
 				m_copyinfo->dstname, SDL_GetError());
+
+#if !SDL_VERSION_ATLEAST(3, 3, 2)
+	if (video_config.filter)
+	{
+		SDL_SetTextureScaleMode(m_texture_id, SDL_SCALEMODE_LINEAR);
+	}
+	else
+	{
+		SDL_SetTextureScaleMode(m_texture_id, SDL_SCALEMODE_NEAREST);
+	}
+#endif
 
 	if (m_sdl_access == SDL_TEXTUREACCESS_STATIC)
 	{
@@ -955,17 +929,17 @@ render_primitive_list *renderer_sdl2::get_primitives()
 }
 
 
-class video_sdl2 : public osd_module, public render_module
+class video_sdl3_accel : public osd_module, public render_module
 {
 public:
-	video_sdl2()
+	video_sdl3_accel()
 		: osd_module(OSD_RENDERER_PROVIDER, "accel")
 		, m_blit_info_initialized(false)
 		, m_gllib_loaded(false)
 	{
 		std::fill(std::begin(m_blit_info), std::end(m_blit_info), nullptr);
 	}
-	~video_sdl2()
+	~video_sdl3_accel()
 	{
 		free_copy_info();
 	}
@@ -993,9 +967,9 @@ private:
 	static copy_info_t const s_blit_info_default[];
 };
 
-int video_sdl2::init(osd_interface &osd, osd_options const &options)
+int video_sdl3_accel::init(osd_interface &osd, osd_options const &options)
 {
-	osd_printf_verbose("Using SDL native texturing driver (SDL 2.0+)\n");
+	osd_printf_verbose("Using SDL native texturing driver (SDL 3.2+)\n");
 
 	// Load the GL library now - else MT will fail
 	char const *libname = nullptr;
@@ -1022,7 +996,7 @@ int video_sdl2::init(osd_interface &osd, osd_options const &options)
 	return 0;
 }
 
-std::unique_ptr<osd_renderer> video_sdl2::create(osd_window &window)
+std::unique_ptr<osd_renderer> video_sdl3_accel::create(osd_window &window)
 {
 	if (!m_blit_info_initialized)
 	{
@@ -1035,7 +1009,7 @@ std::unique_ptr<osd_renderer> video_sdl2::create(osd_window &window)
 	return std::make_unique<renderer_sdl2>(window, m_blit_info);
 }
 
-void video_sdl2::expand_copy_info()
+void video_sdl3_accel::expand_copy_info()
 {
 	for (const copy_info_t *bi = s_blit_info_default; bi->src_fmt != -1; bi++)
 	{
@@ -1053,7 +1027,7 @@ void video_sdl2::expand_copy_info()
 	}
 }
 
-void video_sdl2::free_copy_info()
+void video_sdl3_accel::free_copy_info()
 {
 	if (m_blit_info_initialized)
 	{
@@ -1080,7 +1054,7 @@ void video_sdl2::free_copy_info()
 	}
 }
 
-void video_sdl2::add_list(copy_info_t const *&head, copy_info_t const &element, Uint32 bm)
+void video_sdl3_accel::add_list(copy_info_t const *&head, copy_info_t const &element, Uint32 bm)
 {
 	copy_info_t *const newci = new copy_info_t(element);
 
@@ -1098,81 +1072,81 @@ void video_sdl2::add_list(copy_info_t const *&head, copy_info_t const &element, 
 #define ENTRY_BM(a,b,f,bm) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, bm, #a, #b, 0, 0, 0, 0}
 #define ENTRY_LR(a,b,f) { SDL_TEXFORMAT_ ## a, SDL_PIXELFORMAT_ ## b, &texcopy_ ## f, BM_ALL, #a, #b, 0, 0, 0, -1}
 
-copy_info_t const video_sdl2::s_blit_info_default[] =
+copy_info_t const video_sdl3_accel::s_blit_info_default[] =
 {
 	/* no rotation */
 	ENTRY(ARGB32,           ARGB8888,   argb32_argb32),
-	ENTRY_LR(ARGB32,        RGB888,     argb32_rgb32),
+	ENTRY_LR(ARGB32,        XRGB8888,   argb32_rgb32),
 	/* Entry primarily for directfb */
-	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_ADD),
-	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_MOD),
-	ENTRY_BM(ARGB32,        RGB888,     argb32_rgb32, SDL_BLENDMODE_NONE),
+	ENTRY_BM(ARGB32,        XRGB8888,     argb32_rgb32, SDL_BLENDMODE_ADD),
+	ENTRY_BM(ARGB32,        XRGB8888,     argb32_rgb32, SDL_BLENDMODE_MOD),
+	ENTRY_BM(ARGB32,        XRGB8888,     argb32_rgb32, SDL_BLENDMODE_NONE),
 
 	ENTRY(RGB32,            ARGB8888,   rgb32_argb32),
-	ENTRY(RGB32,            RGB888,     rgb32_rgb32),
+	ENTRY(RGB32,            XRGB8888,   rgb32_rgb32),
 
 	ENTRY(RGB32_PALETTED,   ARGB8888,   rgb32pal_argb32),
-	ENTRY(RGB32_PALETTED,   RGB888,     rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   XRGB8888,   rgb32pal_argb32),
 
 	ENTRY(YUY16,            UYVY,       yuv16_uyvy),
 	ENTRY(YUY16,            YUY2,       yuv16_yuy2),
 	ENTRY(YUY16,            YVYU,       yuv16_yvyu),
 	ENTRY(YUY16,            ARGB8888,   yuv16_argb32),
-	ENTRY(YUY16,            RGB888,     yuv16_argb32),
+	ENTRY(YUY16,            XRGB8888,   yuv16_argb32),
 
 	ENTRY(YUY16_PALETTED,   UYVY,       yuv16pal_uyvy),
 	ENTRY(YUY16_PALETTED,   YUY2,       yuv16pal_yuy2),
 	ENTRY(YUY16_PALETTED,   YVYU,       yuv16pal_yvyu),
 	ENTRY(YUY16_PALETTED,   ARGB8888,   yuv16pal_argb32),
-	ENTRY(YUY16_PALETTED,   RGB888,     yuv16pal_argb32),
+	ENTRY(YUY16_PALETTED,   XRGB8888,   yuv16pal_argb32),
 
 	ENTRY(PALETTE16,        ARGB8888,   pal16_argb32),
-	ENTRY(PALETTE16,        RGB888,     pal16_argb32),
+	ENTRY(PALETTE16,        XRGB8888,   pal16_argb32),
 
-	ENTRY(RGB15,            RGB555,     rgb15_rgb555),
+	ENTRY(RGB15,            XRGB1555,     rgb15_rgb555),
 	ENTRY(RGB15,            ARGB1555,   rgb15_argb1555),
 	ENTRY(RGB15,            ARGB8888,   rgb15_argb32),
-	ENTRY(RGB15,            RGB888,     rgb15_argb32),
+	ENTRY(RGB15,            XRGB8888,   rgb15_argb32),
 
 	ENTRY(RGB15_PALETTED,   ARGB8888,   rgb15pal_argb32),
-	ENTRY(RGB15_PALETTED,   RGB888,     rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   XRGB8888,   rgb15pal_argb32),
 
 	ENTRY(PALETTE16A,       ARGB8888,   pal16a_argb32),
-	ENTRY(PALETTE16A,       RGB888,     pal16a_rgb32),
+	ENTRY(PALETTE16A,       XRGB8888,   pal16a_rgb32),
 
 	/* rotation */
 	ENTRY(ARGB32,           ARGB8888,   rot_argb32_argb32),
-	ENTRY_LR(ARGB32,        RGB888,     rot_argb32_rgb32),
+	ENTRY_LR(ARGB32,        XRGB8888,     rot_argb32_rgb32),
 	/* Entry primarily for directfb */
-	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_ADD),
-	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_MOD),
-	ENTRY_BM(ARGB32,        RGB888,     rot_argb32_rgb32, SDL_BLENDMODE_NONE),
+	ENTRY_BM(ARGB32,        XRGB8888,     rot_argb32_rgb32, SDL_BLENDMODE_ADD),
+	ENTRY_BM(ARGB32,        XRGB8888,     rot_argb32_rgb32, SDL_BLENDMODE_MOD),
+	ENTRY_BM(ARGB32,        XRGB8888,     rot_argb32_rgb32, SDL_BLENDMODE_NONE),
 
 	ENTRY(RGB32,            ARGB8888,   rot_rgb32_argb32),
-	ENTRY(RGB32,            RGB888,     rot_argb32_argb32),
+	ENTRY(RGB32,            XRGB8888,     rot_argb32_argb32),
 
 	ENTRY(RGB32_PALETTED,   ARGB8888,   rot_rgb32pal_argb32),
-	ENTRY(RGB32_PALETTED,   RGB888,     rot_rgb32pal_argb32),
+	ENTRY(RGB32_PALETTED,   XRGB8888,     rot_rgb32pal_argb32),
 
 	ENTRY(YUY16,            ARGB8888,   rot_yuv16_argb32rot),
-	ENTRY(YUY16,            RGB888,     rot_yuv16_argb32rot),
+	ENTRY(YUY16,            XRGB8888,     rot_yuv16_argb32rot),
 
 	ENTRY(YUY16_PALETTED,   ARGB8888,   rot_yuv16pal_argb32rot),
-	ENTRY(YUY16_PALETTED,   RGB888,     rot_yuv16pal_argb32rot),
+	ENTRY(YUY16_PALETTED,   XRGB8888,     rot_yuv16pal_argb32rot),
 
 	ENTRY(PALETTE16,        ARGB8888,   rot_pal16_argb32),
-	ENTRY(PALETTE16,        RGB888,     rot_pal16_argb32),
+	ENTRY(PALETTE16,        XRGB8888,     rot_pal16_argb32),
 
-	ENTRY(RGB15,            RGB555,     rot_rgb15_argb1555),
+	ENTRY(RGB15,            XRGB1555,     rot_rgb15_argb1555),
 	ENTRY(RGB15,            ARGB1555,   rot_rgb15_argb1555),
 	ENTRY(RGB15,            ARGB8888,   rot_rgb15_argb32),
-	ENTRY(RGB15,            RGB888,     rot_rgb15_argb32),
+	ENTRY(RGB15,            XRGB8888,     rot_rgb15_argb32),
 
 	ENTRY(RGB15_PALETTED,   ARGB8888,   rot_rgb15pal_argb32),
-	ENTRY(RGB15_PALETTED,   RGB888,     rot_rgb15pal_argb32),
+	ENTRY(RGB15_PALETTED,   XRGB8888,     rot_rgb15pal_argb32),
 
 	ENTRY(PALETTE16A,       ARGB8888,   rot_pal16a_argb32),
-	ENTRY(PALETTE16A,       RGB888,     rot_pal16a_rgb32),
+	ENTRY(PALETTE16A,       XRGB8888,     rot_pal16a_rgb32),
 
 	{ -1 },
 };
@@ -1181,10 +1155,11 @@ copy_info_t const video_sdl2::s_blit_info_default[] =
 
 } // namespace osd
 
-#else // defined(OSD_SDL) && !defined(SDLMAME_SDL3)
 
-namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl2, OSD_RENDERER_PROVIDER, "accel") } }
+#else // defined(OSD_SDL) && defined (SDLMAME_SDL3)
 
-#endif // defined(OSD_SDL) && !defined(SDLMAME_SDL3)
+namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl3_accel, OSD_RENDERER_PROVIDER, "accel") } }
 
-MODULE_DEFINITION(RENDERER_SDL2, osd::video_sdl2)
+#endif // defined(OSD_SDL) && defined (SDLMAME_SDL3)
+
+MODULE_DEFINITION(RENDERER_SDL3ACCEL, osd::video_sdl3_accel)

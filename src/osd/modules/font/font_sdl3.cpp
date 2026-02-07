@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, R. Belmont, Vas Crabb
 /*
- * font_sdl.cpp
+ * font_sdl3.cpp
  *
  */
 
 #include "font_module.h"
 
-#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID) && !defined(SDLMAME_SDL3)
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID) && defined(SDLMAME_SDL3)
 
 #include "corestr.h"
 #include "emucore.h"
@@ -15,7 +15,7 @@
 #include "unicode.h"
 #include "osdcore.h"
 
-#include <SDL2/SDL_ttf.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 #if !defined(SDLMAME_HAIKU) && !defined(SDLMAME_EMSCRIPTEN)
 #include <fontconfig/fontconfig.h>
@@ -123,7 +123,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 	}
 	styleflags |= underline ? TTF_STYLE_UNDERLINE : 0;
 	// SDL_ttf 2.0.9 and earlier does not define TTF_STYLE_STRIKETHROUGH
-#if SDL_VERSIONNUM(TTF_MAJOR_VERSION, TTF_MINOR_VERSION, TTF_PATCHLEVEL) > SDL_VERSIONNUM(2,0,9)
+#if SDL_VERSIONNUM(SDL_TTF_MAJOR_VERSION, SDL_TTF_MINOR_VERSION, SDL_TTF_MICRO_VERSION) > SDL_VERSIONNUM(2,0,9)
 	styleflags |= strike ? TTF_STYLE_STRIKETHROUGH : 0;
 #else
 	if (strike)
@@ -131,7 +131,7 @@ bool osd_font_sdl::open(std::string const &font_path, std::string const &_name, 
 #endif // PATCHLEVEL
 	TTF_SetFontStyle(font.get(), styleflags);
 
-	height = TTF_FontLineSkip(font.get());
+	height = TTF_GetFontLineSkip(font.get());
 
 	m_font = std::move(font);
 	return true;
@@ -160,7 +160,7 @@ bool osd_font_sdl::get_bitmap(char32_t chnum, bitmap_argb32 &bitmap, std::int32_
 	SDL_Color const fcol = { 0xff, 0xff, 0xff };
 	char ustr[16];
 	ustr[utf8_from_uchar(ustr, std::size(ustr), chnum)] = '\0';
-	std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)> const drawsurf(TTF_RenderUTF8_Solid(m_font.get(), ustr, fcol), &SDL_FreeSurface);
+	std::unique_ptr<SDL_Surface, void (*)(SDL_Surface *)> const drawsurf(TTF_RenderText_Solid(m_font.get(), ustr, 0, fcol), &SDL_DestroySurface);
 
 	// was nothing returned?
 	if (drawsurf)
@@ -203,7 +203,15 @@ osd_font_sdl::TTF_Font_ptr osd_font_sdl::TTF_OpenFont_Magic(std::string const &n
 		if (((bytes_read >= sizeof(ttf_magic)) && !std::memcmp(buffer, ttf_magic, sizeof(ttf_magic))) ||
 			((bytes_read >= sizeof(ttc1_magic)) && !std::memcmp(buffer, ttc1_magic, sizeof(ttc1_magic))) ||
 			((bytes_read >= sizeof(ttc2_magic)) && !std::memcmp(buffer, ttc2_magic, sizeof(ttc2_magic))))
-			return TTF_Font_ptr(TTF_OpenFontIndex(name.c_str(), POINT_SIZE, index), &TTF_CloseFont);
+		{
+			SDL_PropertiesID props = SDL_CreateProperties();
+
+			SDL_SetStringProperty(props, TTF_PROP_FONT_CREATE_FILENAME_STRING, name.c_str());
+			SDL_SetNumberProperty(props, TTF_PROP_FONT_CREATE_FACE_NUMBER, index);
+			SDL_SetFloatProperty(props, TTF_PROP_FONT_CREATE_SIZE_FLOAT, POINT_SIZE);
+
+			return TTF_Font_ptr(TTF_OpenFontWithProperties(props), &TTF_CloseFont);
+		}
 	}
 	return TTF_Font_ptr(nullptr, &TTF_CloseFont);
 }
@@ -302,9 +310,9 @@ public:
 
 	virtual int init(osd_interface &osd, const osd_options &options) override
 	{
-		if (TTF_Init() == -1)
+		if (!TTF_Init())
 		{
-			osd_printf_error("SDL_ttf failed: %s\n", TTF_GetError());
+			osd_printf_error("SDL_ttf failed: %s\n", SDL_GetError());
 			return -1;
 		}
 		return 0;

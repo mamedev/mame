@@ -2,7 +2,7 @@
 // copyright-holders:Couriersud, Olivier Galibert, R. Belmont
 //============================================================
 //
-//  drawsdl.cpp - SDL software and OpenGL implementation
+//  drawsdl3soft.cpp - SDL3 software renderer
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
 //
@@ -14,7 +14,7 @@
 
 #include "modules/osdmodule.h"
 
-#if defined(OSD_SDL) && !defined(SDLMAME_SDL3)
+#if defined(OSD_SDL) && defined (SDLMAME_SDL3)
 
 // from specific OSD implementation
 #include "sdlopts.h"
@@ -28,9 +28,7 @@
 #include "render.h"
 #include "rendersw.hxx"
 
-//#include "ui/uimain.h"
-
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 // standard C headers
 #include <cmath>
@@ -92,8 +90,6 @@ public:
 	virtual render_primitive_list *get_primitives() override;
 
 private:
-	void show_info(struct SDL_RendererInfo *render_info);
-
 	void destroy_all_textures();
 	void yuv_init();
 	void setup_texture(const osd_dim &size);
@@ -141,15 +137,12 @@ static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pi
 
 void renderer_sdl1::setup_texture(const osd_dim &size)
 {
-	SDL_DisplayMode mode;
+	const SDL_DisplayMode *mode = SDL_GetCurrentDisplayMode(window().monitor()->oshandle());
 	uint32_t fmt;
-
-	// Determine preferred pixelformat and set up yuv if necessary
-	SDL_GetCurrentDisplayMode(window().monitor()->oshandle(), &mode);
 
 	m_yuv_bitmap.reset();
 
-	fmt = (m_scale_mode.pixel_format ? m_scale_mode.pixel_format : mode.format);
+	fmt = (m_scale_mode.pixel_format ? m_scale_mode.pixel_format : mode->format);
 
 	if (m_scale_mode.is_scale)
 	{
@@ -171,104 +164,34 @@ void renderer_sdl1::setup_texture(const osd_dim &size)
 		int w = m_hw_scale_width * m_scale_mode.mult_w;
 		int h = m_hw_scale_height * m_scale_mode.mult_h;
 
-		m_texture_id = SDL_CreateTexture(m_sdl_renderer, fmt, SDL_TEXTUREACCESS_STREAMING, w, h);
-
+		m_texture_id = SDL_CreateTexture(m_sdl_renderer, SDL_PixelFormat(fmt), SDL_TEXTUREACCESS_STREAMING, w, h);
 	}
 	else
 	{
-		m_texture_id = SDL_CreateTexture(m_sdl_renderer,fmt, SDL_TEXTUREACCESS_STREAMING,
+		m_texture_id = SDL_CreateTexture(m_sdl_renderer, SDL_PixelFormat(fmt), SDL_TEXTUREACCESS_STREAMING,
 				size.width(), size.height());
 	}
 }
 
 //============================================================
-//  drawsdl_show_info
-//============================================================
-
-void renderer_sdl1::show_info(struct SDL_RendererInfo *render_info)
-{
-#define RF_ENTRY(x) {x, #x }
-	static struct
-	{
-		int flag;
-		const char *name;
-	} rflist[] =
-		{
-#if 0
-			RF_ENTRY(SDL_RENDERER_SINGLEBUFFER),
-			RF_ENTRY(SDL_RENDERER_PRESENTCOPY),
-			RF_ENTRY(SDL_RENDERER_PRESENTFLIP2),
-			RF_ENTRY(SDL_RENDERER_PRESENTFLIP3),
-			RF_ENTRY(SDL_RENDERER_PRESENTDISCARD),
-#endif
-			RF_ENTRY(SDL_RENDERER_PRESENTVSYNC),
-			RF_ENTRY(SDL_RENDERER_ACCELERATED),
-			{-1, nullptr}
-		};
-
-	osd_printf_verbose("window: using renderer %s\n", render_info->name ? render_info->name : "<unknown>");
-	for (int i = 0; rflist[i].name != nullptr; i++)
-		if (render_info->flags & rflist[i].flag)
-			osd_printf_verbose("renderer: flag %s\n", rflist[i].name);
-}
-
-//============================================================
-//  renderer_sdl2::create
+//  renderer_sdl1::create
 //============================================================
 
 int renderer_sdl1::create()
 {
 	// create renderer
-
-	/* set hints ... */
-	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, m_scale_mode.sdl_scale_mode_hint);
-
+	osd_printf_verbose("Enter renderer_sdl1::create()\n");
+	SDL_Window *sdl_window = dynamic_cast<sdl_window_info &>(window()).platform_window();
+	m_sdl_renderer = SDL_CreateRenderer(sdl_window, "software");
+	if (!m_sdl_renderer)
+	{
+		fatalerror("Error creating renderer: %s\n", SDL_GetError());
+	}
 
 	if (video_config.waitvsync)
-		m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-	else
-		m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_ACCELERATED);
-
-	if (!m_sdl_renderer)
 	{
-		if (video_config.waitvsync)
-			m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_SOFTWARE);
-		else
-			m_sdl_renderer = SDL_CreateRenderer(dynamic_cast<sdl_window_info &>(window()).platform_window(), -1, SDL_RENDERER_SOFTWARE);
+		SDL_SetRenderVSync(m_sdl_renderer, SDL_RENDERER_VSYNC_ADAPTIVE);
 	}
-
-	if (!m_sdl_renderer)
-	{
-		fatalerror("Error on creating renderer: %s\n", SDL_GetError());
-	}
-
-	struct SDL_RendererInfo render_info;
-
-	SDL_GetRendererInfo(m_sdl_renderer, &render_info);
-	show_info(&render_info);
-
-	// Check scale mode
-
-	if (m_scale_mode.pixel_format)
-	{
-		int i;
-		int found = 0;
-
-		for (i=0; i < render_info.num_texture_formats; i++)
-			if (m_scale_mode.pixel_format == render_info.texture_formats[i])
-				found = 1;
-
-		if (!found)
-		{
-			fatalerror("window: Scale mode %s not supported!", m_scale_mode.name);
-		}
-	}
-
-#if 0
-	int w = 0, h = 0;
-	window().get_size(w, h);
-	setup_texture(w, h);
-#endif
 
 	m_yuv_lookup = nullptr;
 	m_blittimer = 0;
@@ -335,7 +258,7 @@ int renderer_sdl1::draw(int update)
 		clear_flags(FI_CHANGED);
 		m_blittimer = 3;
 		m_last_dim = wdim;
-		SDL_RenderSetViewport(m_sdl_renderer, nullptr);
+		SDL_SetRenderViewport(m_sdl_renderer, nullptr);
 		if (m_texture_id != nullptr)
 			SDL_DestroyTexture(m_texture_id);
 		setup_texture(m_blit_dim);
@@ -343,23 +266,18 @@ int renderer_sdl1::draw(int update)
 	}
 
 	// lock it if we need it
+	const auto props = SDL_GetTextureProperties(m_texture_id);
+	const SDL_PixelFormat format = (SDL_PixelFormat)SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_FORMAT_NUMBER, 0);
 
-	{
-		Uint32 format;
-		int access, w, h;
-
-		SDL_QueryTexture(m_texture_id, &format, &access, &w, &h);
-		SDL_PixelFormatEnumToMasks(format, &bpp, &rmask, &gmask, &bmask, &amask);
-		bpp = bpp / 8; /* convert to bytes per pixels */
-	}
+	SDL_GetMasksForPixelFormat(format, &bpp, &rmask, &gmask, &bmask, &amask);
+	bpp = bpp / 8; /* convert to bytes per pixels */
 
 	// Clear if necessary
 	if (m_blittimer > 0)
 	{
 		/* SDL Underlays need alpha = 0 ! */
-		SDL_SetRenderDrawColor(m_sdl_renderer,0,0,0,0);
-		SDL_RenderFillRect(m_sdl_renderer,nullptr);
-		//SDL_RenderFill(0,0,0,0 /*255*/,nullptr);
+		SDL_SetRenderDrawColor(m_sdl_renderer, 0, 0, 0, 0);
+		SDL_RenderFillRect(m_sdl_renderer, nullptr);
 		m_blittimer--;
 	}
 
@@ -376,7 +294,7 @@ int renderer_sdl1::draw(int update)
 	// do not crash if the window's smaller than the blit area
 	if (blitheight > ch)
 	{
-			blitheight = ch;
+		blitheight = ch;
 	}
 	else if (video_config.centerv)
 	{
@@ -385,7 +303,7 @@ int renderer_sdl1::draw(int update)
 
 	if (blitwidth > cw)
 	{
-			blitwidth = cw;
+		blitwidth = cw;
 	}
 	else if (video_config.centerh)
 	{
@@ -397,14 +315,11 @@ int renderer_sdl1::draw(int update)
 
 	window().m_primlist->acquire_lock();
 
-	int mamewidth, mameheight;
+	auto mamewidth = SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_WIDTH_NUMBER, 0);
+	auto mameheight = SDL_GetNumberProperty(props, SDL_PROP_TEXTURE_HEIGHT_NUMBER, 0);
 
-		Uint32 fmt = 0;
-		int access = 0;
-		SDL_QueryTexture(m_texture_id, &fmt, &access, &mamewidth, &mameheight);
-		mamewidth /= m_scale_mode.mult_w;
-		mameheight /= m_scale_mode.mult_h;
-	//printf("w h %d %d %d %d\n", mamewidth, mameheight, blitwidth, blitheight);
+	mamewidth /= m_scale_mode.mult_w;
+	mameheight /= m_scale_mode.mult_h;
 
 	// rescale bounds
 	float fw = (float) mamewidth / (float) blitwidth;
@@ -468,15 +383,13 @@ int renderer_sdl1::draw(int update)
 	// unlock and flip
 	SDL_UnlockTexture(m_texture_id);
 	{
-		SDL_Rect r;
+		SDL_FRect r;
 
 		r.x=hofs;
 		r.y=vofs;
 		r.w=blitwidth;
 		r.h=blitheight;
-		//printf("blitwidth %d %d - %d %d\n", blitwidth, blitheight, window().width, window().height);
-		//SDL_UpdateTexture(sdltex, nullptr, sdlsurf->pixels, pitch);
-		SDL_RenderCopy(m_sdl_renderer,m_texture_id, nullptr, &r);
+		SDL_RenderTexture(m_sdl_renderer, m_texture_id, nullptr, (const SDL_FRect *)&r);
 		SDL_RenderPresent(m_sdl_renderer);
 	}
 	return 0;
@@ -702,10 +615,10 @@ render_primitive_list *renderer_sdl1::get_primitives()
 }
 
 
-class video_sdl1 : public osd_module, public render_module
+class video_sdl3soft : public osd_module, public render_module
 {
 public:
-	video_sdl1()
+	video_sdl3soft()
 		: osd_module(OSD_RENDERER_PROVIDER, "soft")
 		, m_scale_mode(-1)
 	{
@@ -727,9 +640,9 @@ private:
 	static sdl_scale_mode const s_scale_modes[];
 };
 
-int video_sdl1::init(osd_interface &osd, osd_options const &options)
+int video_sdl3soft::init(osd_interface &osd, osd_options const &options)
 {
-	osd_printf_verbose("Using SDL multi-window soft driver (SDL 2.0+)\n");
+	osd_printf_verbose("Using SDL multi-window soft driver (SDL 3.2+)\n");
 
 	// yuv settings ...
 	char const *const modestr = dynamic_cast<sdl_options const &>(options).scale_mode();
@@ -743,12 +656,12 @@ int video_sdl1::init(osd_interface &osd, osd_options const &options)
 	return 0;
 }
 
-std::unique_ptr<osd_renderer> video_sdl1::create(osd_window &window)
+std::unique_ptr<osd_renderer> video_sdl3soft::create(osd_window &window)
 {
 	return std::make_unique<renderer_sdl1>(window, s_scale_modes[m_scale_mode]);
 }
 
-int video_sdl1::get_scale_mode(char const *modestr)
+int video_sdl3soft::get_scale_mode(char const *modestr)
 {
 	const sdl_scale_mode *sm = s_scale_modes;
 	int index = 0;
@@ -762,7 +675,7 @@ int video_sdl1::get_scale_mode(char const *modestr)
 	return -1;
 }
 
-sdl_scale_mode const video_sdl1::s_scale_modes[] = {
+sdl_scale_mode const video_sdl3soft::s_scale_modes[] = {
 		{ "none",    0, 0, 1, 1, DRAW2_SCALEMODE_NEAREST, 0,                    nullptr },
 		{ "hwblit",  1, 0, 1, 1, DRAW2_SCALEMODE_LINEAR,  0,                    nullptr },
 		{ "hwbest",  1, 0, 1, 1, DRAW2_SCALEMODE_BEST,    0,                    nullptr },
@@ -777,10 +690,11 @@ sdl_scale_mode const video_sdl1::s_scale_modes[] = {
 
 } // namespace osd
 
-#else // defined(OSD_SDL) && !defined(SDLMAME_SDL3)
+#else // defined(OSD_SDL) && defined (SDLMAME_SDL3)
 
-namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl1, OSD_RENDERER_PROVIDER, "soft") } }
+namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl3soft, OSD_RENDERER_PROVIDER, "soft") } }
 
-#endif // defined(OSD_SDL) && !defined(SDLMAME_SDL3)
+#endif // defined(OSD_SDL) && defined (SDLMAME_SDL3)
 
-MODULE_DEFINITION(RENDERER_SDL1, osd::video_sdl1)
+MODULE_DEFINITION(RENDERER_SDL3SOFT, osd::video_sdl3soft)
+
