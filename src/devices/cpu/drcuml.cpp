@@ -41,7 +41,10 @@
 
 #include "emuopts.h"
 
+#include <iostream>
 #include <fstream>
+#include <locale>
+#include <sstream>
 
 
 
@@ -73,6 +76,29 @@
 #define MAKE_DRCBE_IMPL(name) make_##name
 #define MAKE_DRCBE(name) MAKE_DRCBE_IMPL(name)
 #define make_drcbe_native MAKE_DRCBE(NATIVE_DRC)
+
+
+
+namespace {
+
+std::string uml_log_name(device_t &device)
+{
+	std::string tag = device.tag();
+	for (auto &ch : tag)
+	{
+		if (':' == ch)
+			ch = '_';
+	}
+	std::ostringstream str;
+	str.imbue(std::locale::classic());
+	str << "drcuml_" << device.shortname();
+	if ('_' != tag[0])
+		str << '_';
+	str << tag << ".asm";
+	return std::move(str).str();
+}
+
+} // anonymous namespace
 
 
 
@@ -135,12 +161,14 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, u32 flags, int mo
 			? drc::make_drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits)
 			: drc::make_drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits))
 	, m_umllog(device.machine().options().drc_log_uml()
-			? new std::ofstream(util::string_format("drcuml_%s.asm", device.shortname()))
+			? new std::ofstream(uml_log_name(device))
 			: nullptr)
 	, m_blocklist()
 	, m_handlelist()
 	, m_symlist()
 {
+	if (m_umllog)
+		m_umllog->imbue(std::locale::classic());
 }
 
 

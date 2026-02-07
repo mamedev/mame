@@ -42,13 +42,11 @@ private:
 		int oneshotplaying = 0;
 	};
 
-
 	// data about the sound system
 	sound_channel m_channel_list[MAX_VOICES];
 
 	// global sound parameters
 	required_region_ptr<uint8_t> m_sound_rom;
-	bool m_sound_enable;
 	sound_stream *m_stream;
 
 	// mixer tables and internal buffers

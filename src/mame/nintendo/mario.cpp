@@ -326,7 +326,7 @@ void mario_state::mario_base(machine_config &config)
 
 	/* devices */
 	Z80DMA(config, m_z80dma, Z80_CLOCK);
-	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_z80dma->in_mreq_callback().set(FUNC(mario_state::memory_read_byte));
 	m_z80dma->out_mreq_callback().set(FUNC(mario_state::memory_write_byte));
 

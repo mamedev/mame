@@ -49,8 +49,9 @@ Dumper's info (Raine)
     TC0240PBJ - motion objects ??
     TC0250SCR - piv tilemaps ?? [TC0280GRD was a rotatable tilemap chip in DonDokoD, also 1989]
     TC0260DAR - color related, paired with TC0360PRI in many F2 games
-    TC0330CHL - ? (perhaps lan related)
-This game has LAN interface board, it uses uPD72105C.
+    TC0330CHL - ? (perhaps lan related) [This game has LAN interface board, it uses uPD72105C.]
+
+    2*MC68000P12F, Z80-A, 16MHz & 26.686MHz XTALs
 
 Video Map
 ---------
@@ -849,14 +850,14 @@ void wgp_state::machine_start()
 void wgp_state::wgp(machine_config &config)
 {
 	/* basic machine hardware */
-	M68000(config, m_maincpu, 12000000);    /* 12 MHz ??? */
+	M68000(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &wgp_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(wgp_state::irq4_line_hold));
 
-	Z80(config, m_audiocpu, 16000000/4);    /* 4 MHz ??? */
+	Z80(config, m_audiocpu, 16_MHz_XTAL / 4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wgp_state::z80_sound_map);
 
-	M68000(config, m_subcpu, 12000000);     /* 12 MHz ??? */
+	M68000(config, m_subcpu, 16_MHz_XTAL);
 	m_subcpu->set_addrmap(AS_PROGRAM, &wgp_state::cpu2_map);
 	m_subcpu->set_vblank_int("screen", FUNC(wgp_state::cpub_interrupt));
 
@@ -897,7 +898,7 @@ void wgp_state::wgp(machine_config &config)
 	/* sound hardware */
 	SPEAKER(config, "speaker", 2).front();
 
-	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16000000/2));
+	ym2610_device &ymsnd(YM2610(config, "ymsnd", 16_MHz_XTAL / 2));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0); // assumes Z80 sandwiched between 68Ks
 	ymsnd.add_route(0, "speaker", 0.75, 0);
 	ymsnd.add_route(0, "speaker", 0.75, 1);

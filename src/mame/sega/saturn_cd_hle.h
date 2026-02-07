@@ -1,29 +1,26 @@
-// license:LGPL-2.1+
-// copyright-holders:Angelo Salese, R. Belmont
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Angelo Salese
 
-#ifndef MAME_SEGA_STVCD_H
-#define MAME_SEGA_STVCD_H
+#ifndef MAME_SEGA_SATURN_CD_HLE_H
+#define MAME_SEGA_SATURN_CD_HLE_H
 
 #pragma once
 
 #include "cdrom.h"
 #include "imagedev/cdromimg.h"
-#include "machine/timer.h"
 #include "sound/cdda.h"
 
-class stvcd_device : public device_t,
-					 public device_mixer_interface,
-					 public device_memory_interface
+class saturn_cd_hle_device : public device_t,
+							 public device_mixer_interface
 {
 	static constexpr unsigned MAX_FILTERS = 24;
 	static constexpr unsigned MAX_BLOCKS = 200;
 	static constexpr uint32_t MAX_DIR_SIZE = 256*1024;
 
 public:
-	stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	saturn_cd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	uint32_t stvcd_r(offs_t offset, uint32_t mem_mask = ~0);
-	void stvcd_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	void amap(address_map &map);
 
 	void set_tray_open();
 	void set_tray_close();
@@ -33,15 +30,15 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
-	virtual space_config_vector memory_space_config() const override;
 
 private:
-	const address_space_config      m_space_config;
+	required_device<cdrom_image_device> m_cdrom_image;
+	required_device<cdda_device> m_cdda;
 
-	void io_regs(address_map &map) ATTR_COLD;
-
-	TIMER_DEVICE_CALLBACK_MEMBER( stv_sector_cb );
-	TIMER_DEVICE_CALLBACK_MEMBER( stv_sh1_sim );
+	emu_timer *m_sh1_timer;
+	emu_timer *m_sector_timer;
+	TIMER_CALLBACK_MEMBER( sh1_command_cb );
+	TIMER_CALLBACK_MEMBER( cd_sector_cb );
 
 	struct direntryT
 	{
@@ -169,12 +166,12 @@ private:
 	uint8_t status_type;
 	uint16_t hirqmask, hirqreg;
 	uint16_t cd_stat;
+	uint16_t cd_next_stat;
 	uint32_t cd_curfad;// = 0;
 	uint32_t cd_fad_seek;
 	uint32_t fadstoplay;// = 0;
-	uint32_t in_buffer;// = 0;    // amount of data in the buffer
-	int oddframe;// = 0;
 	int buffull, sectorstore, freeblocks;
+	bool buffull_temp_pause;
 	int cur_track;
 	uint8_t cmd_pending;
 	uint8_t cd_speed;
@@ -188,10 +185,8 @@ private:
 	int numfiles;            // # of entries in current directory
 	int firstfile;           // first non-directory file
 
-	required_device<cdrom_image_device> m_cdrom_image;
-	required_device<timer_device> m_sector_timer;
-	required_device<timer_device> m_sh1_timer;
-	required_device<cdda_device> m_cdda;
+
+	void cd_change_status(u16 new_status);
 
 	// CDC commands
 	// 0x00
@@ -259,10 +254,10 @@ private:
 	inline u32 dataxfer_long_r();
 	inline u16 dataxfer_word_r();
 	inline void dataxfer_long_w(u32 data);
-	uint16_t cr1_r();
-	uint16_t cr2_r();
-	uint16_t cr3_r();
-	uint16_t cr4_r();
+	uint16_t dr1_r();
+	uint16_t dr2_r();
+	uint16_t dr3_r();
+	uint16_t dr4_r();
 	void cr1_w(uint16_t data);
 	void cr2_w(uint16_t data);
 	void cr3_w(uint16_t data);
@@ -275,6 +270,6 @@ private:
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(STVCD, stvcd_device)
+DECLARE_DEVICE_TYPE(SATURN_CD_HLE, saturn_cd_hle_device)
 
-#endif // MAME_SEGA_STVCD_H
+#endif // MAME_SEGA_SATURN_CD_HLE_H

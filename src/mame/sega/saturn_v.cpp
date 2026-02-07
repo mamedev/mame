@@ -272,8 +272,8 @@ uint16_t saturn_state::vdp1_regs_r(offs_t offset)
 			modr |= VDP1_DIE << 6; // DIE
 			modr |= VDP1_DIL << 5; // DIL
 			modr |= VDP1_FCM << 4; //FCM
-			modr |= VDP1_VBE << 3; //VBE
-			modr |= VDP1_TVM & 7; //TVM
+			modr |= VDP1_VBE() << 3; //VBE
+			modr |= VDP1_TVM() & 7; //TVM
 
 			return modr;
 		default:
@@ -291,13 +291,13 @@ void saturn_state::vdp1_clear_framebuffer( int which_framebuffer )
 {
 	int start_x, end_x, start_y, end_y;
 
-	start_x = VDP1_EWLR_X1 * ((VDP1_TVM & 1) ? 16 : 8);
+	start_x = VDP1_EWLR_X1 * ((VDP1_TVM() & 1) ? 16 : 8);
 	start_y = VDP1_EWLR_Y1 * (m_vdp1.framebuffer_double_interlace+1);
-	end_x = VDP1_EWRR_X3 * ((VDP1_TVM & 1) ? 16 : 8);
+	end_x = VDP1_EWRR_X3 * ((VDP1_TVM() & 1) ? 16 : 8);
 	end_y = (VDP1_EWRR_Y3+1) * (m_vdp1.framebuffer_double_interlace+1);
 //  popmessage("%d %d %d %d %d",VDP1_EWLR_X1,VDP1_EWLR_Y1,VDP1_EWRR_X3,VDP1_EWRR_Y3,m_vdp1.framebuffer_double_interlace);
 
-	if(VDP1_TVM & 1)
+	if(VDP1_TVM() & 1)
 	{
 		for(int y=start_y;y<end_y;y++)
 			for(int x=start_x;x<end_x;x++)
@@ -361,18 +361,18 @@ void saturn_state::vdp1_change_framebuffers()
 	m_vdp1.framebuffer_current_display ^= 1;
 	m_vdp1.framebuffer_current_draw ^= 1;
 	// "this bit is reset to 0 when the frame buffers are changed"
-	CEF_0;
+	CEF_0();
 	if ( VDP1_LOG ) logerror( "Changing framebuffers: %d - draw, %d - display\n", m_vdp1.framebuffer_current_draw, m_vdp1.framebuffer_current_display );
 	vdp1_prepare_framebuffers();
 }
 
 void saturn_state::vdp1_set_framebuffer_config()
 {
-	if ( m_vdp1.framebuffer_mode == VDP1_TVM &&
+	if ( m_vdp1.framebuffer_mode == VDP1_TVM() &&
 			m_vdp1.framebuffer_double_interlace == VDP1_DIE ) return;
 
 	if ( VDP1_LOG ) logerror( "Setting framebuffer config\n" );
-	m_vdp1.framebuffer_mode = VDP1_TVM;
+	m_vdp1.framebuffer_mode = VDP1_TVM();
 	m_vdp1.framebuffer_double_interlace = VDP1_DIE;
 	switch( m_vdp1.framebuffer_mode )
 	{
@@ -381,7 +381,7 @@ void saturn_state::vdp1_set_framebuffer_config()
 		case 2: m_vdp1.framebuffer_width = 512; m_vdp1.framebuffer_height = 256; break;
 		case 3: m_vdp1.framebuffer_width = 512; m_vdp1.framebuffer_height = 512; break;
 		case 4: m_vdp1.framebuffer_width = 512; m_vdp1.framebuffer_height = 256; break;
-		default: logerror( "Invalid framebuffer config %x\n", VDP1_TVM ); m_vdp1.framebuffer_width = 512; m_vdp1.framebuffer_height = 256; break;
+		default: logerror( "Invalid framebuffer config %x\n", VDP1_TVM() ); m_vdp1.framebuffer_width = 512; m_vdp1.framebuffer_height = 256; break;
 	}
 	if ( VDP1_DIE ) m_vdp1.framebuffer_height *= 2; /* double interlace */
 
@@ -398,16 +398,16 @@ void saturn_state::vdp1_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	{
 		case 0x00/2:
 			vdp1_set_framebuffer_config();
-			if ( VDP1_LOG ) logerror( "VDP1: Access to register TVMR = %1X\n", VDP1_TVMR );
+			if ( VDP1_LOG ) logerror( "VDP1: Access to register TVMR = %1X\n", data );
 
 			break;
 		case 0x02/2:
 			vdp1_set_framebuffer_config();
-			if ( VDP1_LOG ) logerror( "VDP1: Access to register FBCR = %1X\n", VDP1_FBCR );
+			if ( VDP1_LOG ) logerror( "VDP1: Access to register FBCR = %1X\n", data );
 			m_vdp1.fbcr_accessed = 1;
 			break;
 		case 0x04/2:
-			if ( VDP1_LOG ) logerror( "VDP1: Access to register PTMR = %1X\n", VDP1_PTM );
+			if ( VDP1_LOG ) logerror( "VDP1: Access to register PTMR = %1X\n", data );
 			if ( VDP1_PTMR == 1 )
 				vdp1_process_list();
 
@@ -462,7 +462,7 @@ void saturn_state::vdp1_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 void saturn_state::vdp1_framebuffer0_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	//popmessage ("STV VDP1 Framebuffer 0 WRITE offset %08x data %08x",offset, data);
-	if ( VDP1_TVM & 1 )
+	if ( VDP1_TVM() & 1 )
 	{
 		/* 8-bit mode */
 		//printf("VDP1 8-bit mode %08x %02x\n",offset,data);
@@ -505,7 +505,7 @@ uint32_t saturn_state::vdp1_framebuffer0_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t result = 0;
 	//popmessage ("STV VDP1 Framebuffer 0 READ offset %08x",offset);
-	if ( VDP1_TVM & 1 )
+	if ( VDP1_TVM() & 1 )
 	{
 		/* 8-bit mode */
 		//printf("VDP1 8-bit mode %08x\n",offset);
@@ -1886,7 +1886,7 @@ void saturn_state::vdp1_draw_normal_sprite(const rectangle &cliprect, int sprite
 TIMER_CALLBACK_MEMBER(saturn_state::vdp1_draw_end )
 {
 	/* set CEF to 1*/
-	CEF_1;
+	CEF_1();
 
 	// TODO: temporary for Batman Forever, presumably anonymous timer not behaving well.
 	#if 0
@@ -1918,7 +1918,7 @@ void saturn_state::vdp1_process_list()
 	clear_gouraud_shading();
 
 	/*Set CEF bit to 0*/
-	CEF_0;
+	CEF_0();
 
 	// TODO: is there an actual limit for this?
 	while (spritecount < 16383) // max 16383 with texture or max 16384 without texture - virtually unlimited
@@ -2091,7 +2091,7 @@ void saturn_state::vdp1_process_list()
 					break;
 
 				case 0x0005:
-//              case 0x0007: // mirror? Baroque uses it, crashes for whatever reason
+				case 0x0007: // mirror? baroque/samsho4
 					if (VDP1_LOG) logerror ("Sprite List Polyline\n");
 					current_sprite.ispoly = 1;
 					vdp1_draw_poly_line(*cliprect);
@@ -2168,9 +2168,9 @@ void saturn_state::vdp1_video_update()
 	if (VDP1_LOG) logerror( "FBCR = %0x, accessed = %d\n", VDP1_FBCR, m_vdp1.fbcr_accessed );
 
 	if(VDP1_CEF)
-		BEF_1;
+		BEF_1();
 	else
-		BEF_0;
+		BEF_0();
 
 	if ( m_vdp1.framebuffer_clear_on_next_frame )
 	{
@@ -2192,16 +2192,16 @@ void saturn_state::vdp1_video_update()
 		case 1: /* Setting prohibited */
 			break;
 		case 2: /* Manual mode - erase */
-			if ( m_vdp1.fbcr_accessed )
+			if (m_vdp1.fbcr_accessed)
 			{
 				m_vdp1.framebuffer_clear_on_next_frame = 1;
 			}
 			break;
 		case 3: /* Manual mode - change */
-			if ( m_vdp1.fbcr_accessed )
+			if (m_vdp1.fbcr_accessed)
 			{
 				vdp1_change_framebuffers();
-				if ( VDP1_VBE )
+				if (VDP1_VBE())
 				{
 					vdp1_clear_framebuffer(m_vdp1.framebuffer_current_draw);
 				}
@@ -2213,18 +2213,18 @@ void saturn_state::vdp1_video_update()
 	}
 	m_vdp1.fbcr_accessed = 0;
 
-	if (VDP1_LOG) logerror( "PTM = %0x, TVM = %x\n", VDP1_PTM, VDP1_TVM );
+	if (VDP1_LOG) logerror("PTM = %0x, TVM = %x\n", VDP1_PTM, VDP1_TVM());
 	/*Set CEF bit to 0*/
-	//CEF_0;
-	switch(VDP1_PTM & 3)
+	//CEF_0();
+	switch (VDP1_PTM & 3)
 	{
 		case 0:/*Idle Mode*/
 			/*Set CEF bit to 0*/
-			//CEF_0;
+			//CEF_0();
 			break;
 		case 1:/*Draw by request*/
 			/*Set CEF bit to 0*/
-			//CEF_0;
+			//CEF_0();
 			break;
 		case 2:/*Automatic Draw*/
 			if ( framebuffer_changed || VDP1_LOG )
@@ -6769,24 +6769,24 @@ void saturn_state::vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cli
 //      if(VDP2_SCXDN0 || VDP2_SCXDN1 || VDP2_SCYDN0 || VDP2_SCYDN1)
 //          popmessage("Fractional part scrolling write");
 
-		/* Pukunpa */
+		/* pukunpa */
 		//if(VDP2_SPWINEN)
 		//  popmessage("Sprite Window enabled");
 
-		/* Capcom Collection Dai 2 - Choh Makaimura (Duh!) */
+		/* capgen2 - Choh Makaimura (obviously) */
 		if(VDP2_MZCTL & 0x1f && POPMESSAGE_DEBUG)
 			popmessage("Mosaic control enabled = %04x\n",VDP2_MZCTL);
 
-		/* Bio Hazard bit 1 */
-		/* Airs Adventure 0x3e */
-		/* Bakuretsu Hunter */
+		/* revil/biohaz bit 1 */
+		/* airsadve 0x3e */
+		/* bakhunt */
 		if(VDP2_LNCLEN & ~2 && POPMESSAGE_DEBUG)
 			popmessage("Line Colour screen enabled %04x %08x",VDP2_LNCLEN,VDP2_LCTAU<<16|VDP2_LCTAL);
 
-		/* Bio Hazard 0x400 = extended color calculation enabled */
-		/* Advanced World War 0x200 = color calculation ratio mode */
-		/* Whizz = 0x8100 */
-		/* Dark Saviour = 0x9051 on save select screen (the one with a Saturn in the background) */
+		/* revil/biohaz 0x400 = extended color calculation enabled */
+		/* aww 0x200 = color calculation ratio mode */
+		/* whizz/whizzj = 0x8100 */
+		/* darksavu = 0x9051 on save select screen (the one with a Saturn in the background) */
 		if(VDP2_CCCR & 0x6000)
 			popmessage("Gradation enabled %04x",VDP2_CCCR);
 
@@ -6794,49 +6794,49 @@ void saturn_state::vdp2_check_tilemap(bitmap_rgb32 &bitmap, const rectangle &cli
 		if(VDP2_SFCCMD && POPMESSAGE_DEBUG)
 			popmessage("Special Color Calculation enable %04x",VDP2_SFCCMD);
 
-		/* Cleopatra Fortune Transparent Shadow */
-		/* Pretty Fighter X Back & Transparent Shadow*/
+		/* cleopatr Transparent Shadow */
+		/* prettyx Back & Transparent Shadow*/
 		//if(VDP2_SDCTL & 0x0120)
 		//  popmessage("%s shadow select bit enabled",VDP2_SDCTL & 0x100 ? "Transparent" : "Back");
 
-		/* Langrisser III bit 3 normal, bit 1 during battle field */
-		/* Metal Slug bit 0 during gameplay */
-		/* Bug! Sega Away Logo onward 0x470 */
-		/* Command & Conquer 0x0004 0xc000 */
+		/* lengris3 bit 3 normal, bit 1 during battle field */
+		/* mslug bit 0 during gameplay */
+		/* bugu Sega Away Logo onward 0x470 */
+		/* cncu 0x0004 0xc000 */
 		if(VDP2_SFSEL & ~0x47f)
 			popmessage("Special Function Code Select enable %04x %04x",VDP2_SFSEL,VDP2_SFCODE);
 
-		/* Albert Odyssey Gaiden 0x0001 */
-		/* Asuka 120% 0x0101 */
-		/* Slam n Jam 96 0x0003 */
+		/* albodys 0x0001 */
+		/* asuka120 0x0101 */
+		/* slamnjamu 0x0003 */
 		if(VDP2_ZMCTL & 0x0200)
 			popmessage("Reduction enable %04x",VDP2_ZMCTL);
 
-		/* Burning Rangers and friends FMV, J.League Pro Soccer Club Wo Tsukurou!! backgrounds */
+		/* burningru based FMVs, jltsuk backgrounds */
 		if(VDP2_SCRCTL & 0x0101 && POPMESSAGE_DEBUG)
 			popmessage("Vertical cell scroll enable %04x",VDP2_SCRCTL);
 
-		/* Magical Drop III 0x200 -> color calculation window */
-		/* Ide Yousuke Meijin No Shin Jissen Mahjong 0x0303 */
-		/* Decathlete 0x088 */
-		/* Sexy Parodius 0x2300 */
+		/* magdrop3 0x200 -> color calculation window */
+		/* ideyusmj 0x0303 */
+		/* decathlt 0x088 */
+		/* sexyparo 0x2300 */
 //      if(VDP2_WCTLD & 0x2000)
 //          popmessage("Special window enabled %04x",VDP2_WCTLD);
 
-		/* Shining Force III, After Burner 2 (doesn't make a proper use tho?) */
-		/* Layer Section */
+		/* shinfrc3u, aburner2 (doesn't make a proper use tho?) */
+		/* layersec */
 		//if(VDP2_W0LWE || VDP2_W1LWE)
 		//  popmessage("Line Window %s %08x enabled",VDP2_W0LWE ? "0" : "1",VDP2_W0LWTA);
 
-		/* Akumajou Dracula, bits 2-4 */
-		/* Arcana Strikes bit 5 */
-		/* Choh Makai Mura 0x0055 */
-		/* Sega Rally 0x0155 */
-		/* Find Love  0x4400 */
-		/* Dragon Ball Z 0x3800 - 0x2c00 */
-		/* Assault Suit Leynos 2 0x0200*/
-		/* Bug! 0x8800 */
-		/* Wonder 3 0x0018 */
+		/* draculax bits 2-4 */
+		/* acstrike bit 5 */
+		/* capgen2 - Choh Makaimura 0x0055 */
+		/* srallycu 0x0155 */
+		/* findlove 0x4400 */
+		/* dbzsbuto 0x3800 - 0x2c00 */
+		/* leynos2 0x0200*/
+		/* bugu 0x8800 */
+		/* wonder3 0x0018 */
 		if(VDP2_SFPRMD & ~0xff7f)
 			popmessage("Special Priority Mode enabled %04x",VDP2_SFPRMD);
 	}
@@ -8196,15 +8196,14 @@ uint16_t saturn_state::vdp2_regs_r(offs_t offset)
 	return m_vdp2_regs[offset];
 }
 
+// TODO: mode 0 handling
 uint32_t saturn_state::vdp2_cram_r(offs_t offset)
 {
 	offset &= (0xfff) >> (2);
 	return m_vdp2_cram[offset];
 }
 
-
-
-
+// TODO: byte writes are goofy
 void saturn_state::vdp2_cram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	int r,g,b;
@@ -8327,7 +8326,7 @@ void saturn_state::vdp2_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 
 	if(VDP2_VRAMSZ)
-		printf("VDP2 sets up 8 Mbit VRAM!\n");
+		logerror("VDP2 sets up 8 Mbit VRAM!\n");
 }
 
 int saturn_state::get_hblank_duration()
@@ -8976,7 +8975,7 @@ void saturn_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 
 	/*Guess:Some games needs that the horizontal sprite size to be doubled
 	  (TODO: understand the proper settings,it might not work like this)*/
-	if(VDP1_TVM == 0 && VDP2_HRES & 2) // astrass & findlove
+	if(VDP1_TVM() == 0 && VDP2_HRES & 2) // astrass & findlove
 		double_x = 1;
 	else
 		double_x = 0;

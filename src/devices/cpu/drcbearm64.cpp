@@ -29,7 +29,7 @@ r21     callee-saved        UML register I2
 r22     callee-saved        UML register I3
 r23     callee-saved        UML register I4
 r24     callee-saved        UML register I5
-r35     callee-saved        UML register I6
+r25     callee-saved        UML register I6
 r26     callee-saved        UML register I7
 r27     callee-saved        near cache pointer
 r28     callee-saved        emulated flags
@@ -126,7 +126,11 @@ TODO:
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <locale>
+#include <string>
+#include <sstream>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 
@@ -1556,7 +1560,19 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
-		m_log_asmjit = fopen(std::string("drcbearm64_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
+		std::string tag = device.tag();
+		for (auto &ch : tag)
+		{
+			if (':' == ch)
+				ch = '_';
+		}
+		std::ostringstream str;
+		str.imbue(std::locale::classic());
+		str << "drcbearm64_asmjit_" << device.shortname();
+		if ('_' != tag[0])
+			str << '_';
+		str << tag << ".asm";
+		m_log_asmjit = fopen(std::move(str).str().c_str(), "w");
 	}
 
 	// resolve the actual addresses of member functions we need to call
@@ -1627,7 +1643,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 
 	a.emit_args_assignment(frame, args);
 
-	a.br(REG_PARAM1);
+	a.blr(REG_PARAM1);
 
 	// generate exit point
 	m_exit = dst + a.offset();
@@ -1705,7 +1721,7 @@ int drcbe_arm64::execute(code_handle &entry)
 void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
 	// do this here because device.debug() isn't initialised at construction time
-	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) && m_device.debug())
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)

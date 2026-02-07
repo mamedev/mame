@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <locale>
 #include <tuple>
 
 
@@ -172,7 +173,7 @@ void debug_view_memory::enumerate_sources()
 				const address_space_config *config(memintf.logical_space_config(spacenum));
 				m_source_list.emplace_back(
 						std::make_unique<debug_view_memory_source>(
-							util::string_format("%s '%s' %s space memory", memintf.device().name(), memintf.device().tag(), config->name()),
+							util::string_format(std::locale::classic(), "%s '%s' %s space memory", memintf.device().name(), memintf.device().tag(), config->name()),
 							&memintf, spacenum));
 			}
 		}
@@ -630,9 +631,9 @@ void debug_view_memory::recompute()
 	{
 		maxbyte = m_maxaddr = (source.m_blocklength * source.m_numblocks) - 1;
 		if (m_address_radix == 8)
-			addrchars = string_format("%o", m_maxaddr).size();
+			addrchars = string_format(std::locale::classic(), "%o", m_maxaddr).size();
 		else
-			addrchars = string_format("%X", m_maxaddr).size();
+			addrchars = string_format(std::locale::classic(), "%X", m_maxaddr).size();
 	}
 
 	// generate an 8-byte aligned format for the address
@@ -640,9 +641,9 @@ void debug_view_memory::recompute()
 	{
 	case 8:
 		if (!m_reverse_view)
-			m_addrformat = string_format("%*s%%0%do", 11 - addrchars, "", addrchars);
+			m_addrformat = string_format(std::locale::classic(), "%*s%%0%do", 11 - addrchars, "", addrchars);
 		else
-			m_addrformat = string_format("%%0%do%*s", addrchars, 11 - addrchars, "");
+			m_addrformat = string_format(std::locale::classic(), "%%0%do%*s", addrchars, 11 - addrchars, "");
 		break;
 
 	case 10:
@@ -652,9 +653,9 @@ void debug_view_memory::recompute()
 
 	case 16:
 		if (!m_reverse_view)
-			m_addrformat = string_format("%*s%%0%dX", 8 - addrchars, "", addrchars);
+			m_addrformat = string_format(std::locale::classic(), "%*s%%0%dX", 8 - addrchars, "", addrchars);
 		else
-			m_addrformat = string_format("%%0%dX%*s", addrchars, 8 - addrchars, "");
+			m_addrformat = string_format(std::locale::classic(), "%%0%dX%*s", addrchars, 8 - addrchars, "");
 		break;
 	}
 

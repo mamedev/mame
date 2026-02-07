@@ -1,8 +1,8 @@
-// license:LGPL-2.1+
-// copyright-holders:Angelo Salese, R. Belmont
+// license:BSD-3-Clause
+// copyright-holders:R. Belmont, Angelo Salese
 /***************************************************************************
 
-  sega/stvcd.cpp - Sega Saturn and ST-V CD-ROM handling
+  sega/saturn_cd_hle.cpp - Sega Saturn and ST-V CD-ROM handling
 
   Another tilt at the windmill in 2011 by R. Belmont.
 
@@ -41,7 +41,7 @@ DASM notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "stvcd.h"
+#include "saturn_cd_hle.h"
 
 #include "coreutil.h"
 #include "multibyte.h"
@@ -97,27 +97,20 @@ DASM notes:
 #define CD_STAT_WAIT     0x8000     // waiting for command if set, else executed immediately
 #define CD_STAT_REJECT   0xff00     // ultra-fatal error.
 
-DEFINE_DEVICE_TYPE(STVCD, stvcd_device, "stvcd", "Sega Saturn/ST-V CD Block HLE")
+DEFINE_DEVICE_TYPE(SATURN_CD_HLE, saturn_cd_hle_device, "saturn_cd_hle", "Sega Saturn/ST-V CD Block HLE")
 
-stvcd_device::stvcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, STVCD, tag, owner, clock)
+saturn_cd_hle_device::saturn_cd_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SATURN_CD_HLE, tag, owner, clock)
 	, device_mixer_interface(mconfig, *this)
-	, device_memory_interface(mconfig, *this)
-	, m_space_config("regs", ENDIANNESS_LITTLE, 32, 20, 0, address_map_constructor(FUNC(stvcd_device::io_regs), this))
 	, m_cdrom_image(*this, "cdrom")
-	, m_sector_timer(*this, "sector_timer")
-	, m_sh1_timer(*this, "sh1_cmd")
 	, m_cdda(*this, "cdda")
 {
 }
 
 
-void stvcd_device::device_add_mconfig(machine_config &config)
+void saturn_cd_hle_device::device_add_mconfig(machine_config &config)
 {
 	CDROM(config, "cdrom").set_interface("cdrom");
-
-	TIMER(config, m_sector_timer).configure_generic(FUNC(stvcd_device::stv_sector_cb));
-	TIMER(config, m_sh1_timer).configure_generic(FUNC(stvcd_device::stv_sh1_sim));
 
 	CDDA(config, m_cdda);
 	m_cdda->add_route(0, *this, 1.0, 0);
@@ -125,8 +118,11 @@ void stvcd_device::device_add_mconfig(machine_config &config)
 	m_cdda->set_cdrom_tag("cdrom");
 }
 
-void stvcd_device::device_start()
+void saturn_cd_hle_device::device_start()
 {
+	m_sh1_timer = timer_alloc(FUNC(saturn_cd_hle_device::sh1_command_cb), this);
+	m_sector_timer = timer_alloc(FUNC(saturn_cd_hle_device::cd_sector_cb), this);
+
 	save_item(NAME(sectlenin));
 	save_item(NAME(sectlenout));
 	save_item(NAME(lastbuf));
@@ -151,11 +147,10 @@ void stvcd_device::device_start()
 	save_item(NAME(hirqmask));
 	save_item(NAME(hirqreg));
 	save_item(NAME(cd_stat));
+	save_item(NAME(cd_next_stat));
 	save_item(NAME(cd_curfad));
 	save_item(NAME(cd_fad_seek));
 	save_item(NAME(fadstoplay));
-	save_item(NAME(in_buffer));
-	save_item(NAME(oddframe));
 	save_item(NAME(buffull));
 	save_item(NAME(sectorstore));
 	save_item(NAME(freeblocks));
@@ -169,29 +164,35 @@ void stvcd_device::device_start()
 	save_item(NAME(firstfile));
 }
 
-void stvcd_device::device_reset()
+void saturn_cd_hle_device::device_reset()
 {
 	int32_t i, j;
 
-	hirqmask = 0xffff;
-	hirqreg = 0xffff;
+	hirqmask = 0;
+	hirqreg = 0;
 	cr1 = 'C';
 	cr2 = ('D'<<8) | 'B';
 	cr3 = ('L'<<8) | 'O';
 	cr4 = ('C'<<8) | 'K';
 	cd_stat = CD_STAT_PAUSE;
 	cd_stat |= CD_STAT_PERI;
+	cd_next_stat = CD_STAT_PAUSE;
 	cur_track = 0xff;
+	calcsize = 0;
+	playtype = 0;
+	buffull_temp_pause = false;
 
 	curdir.clear();
 
 	xfertype = XFERTYPE_INVALID;
 	xfertype32 = XFERTYPE32_INVALID;
+	xfercount = 0;
+	xferoffs = 0;
 
 	// reset flag vars
 	buffull = sectorstore = 0;
 
-	freeblocks = 200;
+	freeblocks = MAX_BLOCKS;
 
 	sectlenin = sectlenout = 2048;
 
@@ -222,12 +223,15 @@ void stvcd_device::device_reset()
 	{
 		LOG("Opened CD-ROM successfully, reading root directory\n");
 		read_new_dir(0xffffff);    // read root directory
+		cd_curfad = 150;
+		fadstoplay = -1;
 	}
 	else
 	{
 		cd_stat = CD_STAT_NODISC;
 	}
 
+	buffull = 0;
 	cd_speed = 2;
 	cdda_repeat_count = 0;
 	tray_is_closed = 1;
@@ -236,34 +240,27 @@ void stvcd_device::device_reset()
 }
 
 
-device_memory_interface::space_config_vector stvcd_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
-}
-
 /*
  * Block interface
  */
 
-void stvcd_device::io_regs(address_map &map)
+void saturn_cd_hle_device::amap(address_map &map)
 {
-	map(0x18000, 0x18003).rw(FUNC(stvcd_device::datatrns_r), FUNC(stvcd_device::datatrns_w));
-	map(0x90000, 0x90003).mirror(0x08000).rw(FUNC(stvcd_device::datatrns_r), FUNC(stvcd_device::datatrns_w));
-	map(0x90008, 0x9000b).mirror(0x08000).rw(FUNC(stvcd_device::hirq_r), FUNC(stvcd_device::hirq_w)).umask32(0xffffffff);
-	map(0x9000c, 0x9000f).mirror(0x08000).rw(FUNC(stvcd_device::hirqmask_r), FUNC(stvcd_device::hirqmask_w)).umask32(0xffffffff);
-	map(0x90018, 0x9001b).mirror(0x08000).rw(FUNC(stvcd_device::cr1_r), FUNC(stvcd_device::cr1_w)).umask32(0xffffffff);
-	map(0x9001c, 0x9001f).mirror(0x08000).rw(FUNC(stvcd_device::cr2_r), FUNC(stvcd_device::cr2_w)).umask32(0xffffffff);
-	map(0x90020, 0x90023).mirror(0x08000).rw(FUNC(stvcd_device::cr3_r), FUNC(stvcd_device::cr3_w)).umask32(0xffffffff);
-	map(0x90024, 0x90027).mirror(0x08000).rw(FUNC(stvcd_device::cr4_r), FUNC(stvcd_device::cr4_w)).umask32(0xffffffff);
+	map(0x18000, 0x18003).rw(FUNC(saturn_cd_hle_device::datatrns_r), FUNC(saturn_cd_hle_device::datatrns_w));
+	map(0x90000, 0x90003).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::datatrns_r), FUNC(saturn_cd_hle_device::datatrns_w));
+	map(0x90008, 0x9000b).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::hirq_r), FUNC(saturn_cd_hle_device::hirq_w)).umask32(0xffffffff);
+	map(0x9000c, 0x9000f).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::hirqmask_r), FUNC(saturn_cd_hle_device::hirqmask_w)).umask32(0xffffffff);
+	map(0x90018, 0x9001b).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::dr1_r), FUNC(saturn_cd_hle_device::cr1_w)).umask32(0xffffffff);
+	map(0x9001c, 0x9001f).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::dr2_r), FUNC(saturn_cd_hle_device::cr2_w)).umask32(0xffffffff);
+	map(0x90020, 0x90023).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::dr3_r), FUNC(saturn_cd_hle_device::cr3_w)).umask32(0xffffffff);
+	map(0x90024, 0x90027).mirror(0x08000).rw(FUNC(saturn_cd_hle_device::dr4_r), FUNC(saturn_cd_hle_device::cr4_w)).umask32(0xffffffff);
 
 	// NetLink access
 	// dragndrm expects this value, most likely for status
 	map(0x8502a, 0x8502a).lr8(NAME([] () -> u8 { return 0x11; }));
 }
 
-u32 stvcd_device::datatrns_r(offs_t offset, uint32_t mem_mask)
+u32 saturn_cd_hle_device::datatrns_r(offs_t offset, uint32_t mem_mask)
 {
 	u32 rv;
 
@@ -281,13 +278,14 @@ u32 stvcd_device::datatrns_r(offs_t offset, uint32_t mem_mask)
 	}
 	else
 	{
-		LOGWARN("CD: Unknown data buffer read with mask = %08x\n", mem_mask);
+		if (!machine().side_effects_disabled())
+			LOGWARN("CD: Unknown data buffer read with mask = %08x\n", mem_mask);
 		rv = 0;
 	}
 	return rv;
 }
 
-void stvcd_device::datatrns_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void saturn_cd_hle_device::datatrns_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (mem_mask == 0xffffffff)
 		dataxfer_long_w(data);
@@ -295,9 +293,12 @@ void stvcd_device::datatrns_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		LOGWARN("CD: Unknown data buffer write with mask = %08x\n", mem_mask);
 }
 
-inline u32 stvcd_device::dataxfer_long_r()
+inline u32 saturn_cd_hle_device::dataxfer_long_r()
 {
-	uint32_t rv = 0;
+	uint32_t rv = 0xffff'ffff;
+
+	if (machine().side_effects_disabled())
+		return rv;
 
 	switch (xfertype32)
 	{
@@ -351,14 +352,14 @@ inline u32 stvcd_device::dataxfer_long_r()
 			break;
 
 		default:
-			LOGWARN("CD: unhandled 32-bit transfer type %d\n", (int)xfertype32);
-			break;
+			// punt in particular if SH-2 or SCU DMA try to go overboard ...
+			throw emu_fatalerror("CD: attempting to read 32-bit data port with invalid transfer mode %d", (int)xfertype32);
 	}
 
 	return rv;
 }
 
-inline void stvcd_device::dataxfer_long_w(u32 data)
+inline void saturn_cd_hle_device::dataxfer_long_w(u32 data)
 {
 	switch (xfertype32)
 	{
@@ -394,7 +395,7 @@ inline void stvcd_device::dataxfer_long_w(u32 data)
 	}
 }
 
-inline u16 stvcd_device::dataxfer_word_r()
+inline u16 saturn_cd_hle_device::dataxfer_word_r()
 {
 	u16 rv;
 
@@ -481,7 +482,7 @@ inline u16 stvcd_device::dataxfer_word_r()
 			break;
 
 		default:
-			LOGWARN("STVCD: Unhandled xfer type %d\n", (int)xfertype);
+			LOGWARN("SATURN_CD_HLE: Unhandled xfer type %d\n", (int)xfertype);
 			rv = 0;
 			break;
 	}
@@ -489,7 +490,7 @@ inline u16 stvcd_device::dataxfer_word_r()
 	return rv;
 }
 
-uint16_t stvcd_device::hirq_r()
+uint16_t saturn_cd_hle_device::hirq_r()
 {
 	// TODO: this member must return the register only
 	u16 rv;
@@ -508,33 +509,36 @@ uint16_t stvcd_device::hirq_r()
 	return rv;
 }
 
-void stvcd_device::hirq_w(uint16_t data) { hirqreg &= data; }
+void saturn_cd_hle_device::hirq_w(uint16_t data) { hirqreg &= data; }
 
 // TODO: these two are actually never read or written to by host?
-uint16_t stvcd_device::hirqmask_r()
+uint16_t saturn_cd_hle_device::hirqmask_r()
 {
 	LOGWARN("RW HIRM: %04x\n", hirqmask);
 	return hirqmask;
 }
 
-void stvcd_device::hirqmask_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void saturn_cd_hle_device::hirqmask_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	LOGWARN("WW HIRM: %04x => %04x\n", hirqmask, data);
 	COMBINE_DATA(&hirqmask);
 }
 
-uint16_t stvcd_device::cr1_r() { return cr1; }
-uint16_t stvcd_device::cr2_r() { return cr2; }
-uint16_t stvcd_device::cr3_r() { return cr3; }
-uint16_t stvcd_device::cr4_r()
+uint16_t saturn_cd_hle_device::dr1_r() { return cr1; }
+uint16_t saturn_cd_hle_device::dr2_r() { return cr2; }
+uint16_t saturn_cd_hle_device::dr3_r() { return cr3; }
+uint16_t saturn_cd_hle_device::dr4_r()
 {
-	cmd_pending = 0;
-	cd_stat |= CD_STAT_PERI;
+	if (!machine().side_effects_disabled())
+	{
+		cmd_pending = 0;
+		cd_stat |= CD_STAT_PERI;
+	}
 	return cr4;
 }
 
 // TODO: understand how dual-port interface really works out
-void stvcd_device::cr1_w(uint16_t data)
+void saturn_cd_hle_device::cr1_w(uint16_t data)
 {
 	cr1 = data;
 	cd_stat &= ~CD_STAT_PERI;
@@ -542,39 +546,30 @@ void stvcd_device::cr1_w(uint16_t data)
 	m_sh1_timer->adjust(attotime::never);
 }
 
-void stvcd_device::cr2_w(uint16_t data)
+void saturn_cd_hle_device::cr2_w(uint16_t data)
 {
 	cr2 = data;
 	cmd_pending |= 2;
 }
 
-void stvcd_device::cr3_w(uint16_t data)
+void saturn_cd_hle_device::cr3_w(uint16_t data)
 {
 	cr3 = data;
 	cmd_pending |= 4;
 }
 
-void stvcd_device::cr4_w(uint16_t data)
+void saturn_cd_hle_device::cr4_w(uint16_t data)
 {
 	cr4 = data;
 	cmd_pending |= 8;
 	m_sh1_timer->adjust(attotime::from_hz(get_timing_command()));
 }
 
-uint32_t stvcd_device::stvcd_r(offs_t offset, uint32_t mem_mask)
-{
-	return this->space().read_dword(offset<<2, mem_mask);
-}
-
-void stvcd_device::stvcd_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	this->space().write_dword(offset<<2,data, mem_mask);
-}
 
 /*
  * CDC command helpers
  */
-int stvcd_device::get_timing_command(void)
+int saturn_cd_hle_device::get_timing_command(void)
 {
 	// TODO: calculate timings based off command params
 	// given the CMOK returns it looks like SH2 expects way slower responses
@@ -583,7 +578,7 @@ int stvcd_device::get_timing_command(void)
 }
 
 /* FIXME: assume Saturn CD-ROMs to have a 2 secs pre-gap for now. */
-int stvcd_device::get_track_index(uint32_t fad)
+int saturn_cd_hle_device::get_track_index(uint32_t fad)
 {
 	uint32_t rel_fad;
 	uint8_t track;
@@ -601,12 +596,12 @@ int stvcd_device::get_track_index(uint32_t fad)
 	return 1;
 }
 
-int stvcd_device::sega_cdrom_get_adr_control(int track)
+int saturn_cd_hle_device::sega_cdrom_get_adr_control(int track)
 {
 	return bitswap<8>(m_cdrom_image->get_adr_control(cur_track),3,2,1,0,7,6,5,4);
 }
 
-void stvcd_device::cr_standard_return(uint16_t cur_status)
+void saturn_cd_hle_device::cr_standard_return(uint16_t cur_status)
 {
 	if (!m_cdrom_image->exists())
 	{
@@ -621,20 +616,20 @@ void stvcd_device::cr_standard_return(uint16_t cur_status)
 		uint8_t seek_track = m_cdrom_image->get_track(cd_fad_seek-150);
 
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf);
-		cr2 =  (seek_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(seek_track)<<8) | seek_track);
-		cr3 = (get_track_index(cd_fad_seek)<<8) | (cd_fad_seek>>16); //index & 0xff00
+		cr2 =  (seek_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(seek_track)<< 8 ) | seek_track);
+		cr3 = (get_track_index(cd_fad_seek) << 8) | (cd_fad_seek >> 16); //index & 0xff00
 		cr4 = cd_fad_seek;
 	}
 	else
 	{
 		cr1 = cur_status | (playtype << 7) | 0x00 | (cdda_repeat_count & 0xf); //options << 4 | repeat & 0xf
-		cr2 = (cur_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cur_track)<<8) | (m_cdrom_image->get_track(cd_curfad-150)+1));
-		cr3 = (get_track_index(cd_curfad)<<8) | (cd_curfad>>16); //index & 0xff00
+		cr2 = (cur_track == 0xff) ? 0xffff : ((sega_cdrom_get_adr_control(cur_track)<<8) | (m_cdrom_image->get_track(cd_curfad - 150) + 1));
+		cr3 = (get_track_index(cd_curfad) << 8) | (cd_curfad >> 16); //index & 0xff00
 		cr4 = cd_curfad;
 	}
 }
 
-void stvcd_device::mpeg_standard_return(uint16_t cur_status)
+void saturn_cd_hle_device::mpeg_standard_return(uint16_t cur_status)
 {
 	cr1 = cur_status | 0x01;
 	cr2 = 0; // V-Counter
@@ -642,11 +637,19 @@ void stvcd_device::mpeg_standard_return(uint16_t cur_status)
 	cr4 = 0x1000; // video status
 }
 
+void saturn_cd_hle_device::cd_change_status(u16 new_status)
+{
+	// it would make more sense with mask & 0xf0ff
+	// - houkago will chain 0x21 commands due of PERI hook (leading to a crash)
+	cd_stat = CD_STAT_BUSY;
+	cd_next_stat = new_status;
+}
+
 /*
  * CDC commands
  */
 
-void stvcd_device::cmd_get_status()
+void saturn_cd_hle_device::cmd_get_status()
 {
 	//LOGCMD("%s: Get Status\n", machine().describe_context();
 	hirqreg |= CMOK;
@@ -663,7 +666,7 @@ void stvcd_device::cmd_get_status()
 	//LOG("   = %04x %04x %04x %04x %04x\n", hirqreg, cr1, cr2, cr3, cr4);
 }
 
-void stvcd_device::cmd_get_hw_info()
+void saturn_cd_hle_device::cmd_get_hw_info()
 {
 	LOGCMD("%s: Get Hardware Info\n", machine().describe_context());
 	hirqreg |= CMOK;
@@ -674,11 +677,11 @@ void stvcd_device::cmd_get_hw_info()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_toc()
+void saturn_cd_hle_device::cmd_get_toc()
 {
 	LOGCMD("%s: Get TOC\n", machine().describe_context());
 	cd_readTOC();
-	cd_stat = CD_STAT_TRANS|CD_STAT_PAUSE;
+	cd_stat = CD_STAT_TRANS | CD_STAT_PAUSE;
 	cr1 = cd_stat;
 	cr2 = 102*2;    // TOC length in words (102 entries @ 2 words/4bytes each)
 	cr3 = 0;
@@ -688,7 +691,7 @@ void stvcd_device::cmd_get_toc()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_session_info()
+void saturn_cd_hle_device::cmd_get_session_info()
 {
 	// get session info (lower byte = session # to get?)
 	// bios is interested in returns in cr3 and cr4
@@ -700,7 +703,7 @@ void stvcd_device::cmd_get_session_info()
 	switch (cr1 & 0xff)
 	{
 		case 0: // get total session info / disc end
-			cd_stat = CD_STAT_PAUSE;
+			cd_change_status(CD_STAT_PAUSE);
 			cr1 = cd_stat;
 			cr2 = 0;
 			cr3 = 0x0100 | tocbuf[(101*4)+1];
@@ -708,7 +711,7 @@ void stvcd_device::cmd_get_session_info()
 			break;
 
 		case 1: // get total session info / disc start
-			cd_stat = CD_STAT_PAUSE;
+			cd_change_status(CD_STAT_PAUSE);
 			cr1 = cd_stat;
 			cr2 = 0;
 			cr3 = 0x0100;   // sessions in high byte, session start in lower
@@ -728,7 +731,7 @@ void stvcd_device::cmd_get_session_info()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_init_cdsystem()
+void saturn_cd_hle_device::cmd_init_cdsystem()
 {
 	// TODO: double check this
 	// initialize CD system
@@ -738,18 +741,19 @@ void stvcd_device::cmd_init_cdsystem()
 	// CR1 & 8 = retry reading mode 2 sectors
 	// CR1 & 10 = force single-speed
 	// CR1 & 80 = no change flag (done by Assault Suit Leynos 2)
-	LOGCMD("%s: Initialize CD system\n", machine().describe_context());
+	LOGCMD("%s: Initialize CD system %02x\n", machine().describe_context(), cr1);
+
 	//if((cr1 & 0x81) == 0x00) //guess TODO: nope, Choice Cuts doesn't like it, it crashes if you try to skip the FMV otherwise.
 	{
 		if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
 		{
-			cd_stat = CD_STAT_PAUSE;
+			cd_change_status(CD_STAT_PAUSE);
 			cd_curfad = 150;
 			//cur_track = 1;
 			fadstoplay = 0;
 		}
-		in_buffer = 0;
 		buffull = 0;
+		buffull_temp_pause = false;
 		hirqreg &= 0xffe5;
 		cd_speed = (cr1 & 0x10) ? 1 : 2;
 
@@ -780,7 +784,7 @@ void stvcd_device::cmd_init_cdsystem()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_end_data_transfer()
+void saturn_cd_hle_device::cmd_end_data_transfer()
 {
 	// end data transfer (TODO: needs to be worked on!)
 	// returns # of bytes transferred (24 bits) in
@@ -836,7 +840,7 @@ void stvcd_device::cmd_end_data_transfer()
 				transpart->size -= xferdnum;
 				transpart->numblks -= xfersectnum;
 
-				if (freeblocks == 200)
+				if (freeblocks == MAX_BLOCKS)
 				{
 					sectorstore = 0;
 				}
@@ -857,14 +861,14 @@ void stvcd_device::cmd_end_data_transfer()
 	status_type = 1;
 }
 
-void stvcd_device::cmd_play_disc()
+void saturn_cd_hle_device::cmd_play_disc()
 {
 	// Play Disc. FAD is in lowest 7 bits of cr1 and all of cr2.
 	uint32_t start_pos, end_pos;
 	uint8_t play_mode;
 
 	LOGCMD("%s: Play Disc\n",   machine().describe_context());
-	cd_stat = CD_STAT_PLAY;
+	cd_change_status(CD_STAT_PLAY);
 
 	play_mode = (cr3 >> 8) & 0x7f;
 
@@ -884,11 +888,11 @@ void stvcd_device::cmd_play_disc()
 		else
 		{
 			// track mode
-			if(((start_pos)>>8) != 0)
+			if((start_pos >> 8) != 0)
 			{
-				cur_track = (start_pos)>>8;
-				cd_fad_seek = m_cdrom_image->get_track_start(cur_track-1);
-				cd_stat = CD_STAT_SEEK;
+				cur_track = start_pos >> 8;
+				cd_fad_seek = m_cdrom_image->get_track_start(cur_track - 1);
+				cd_change_status(CD_STAT_SEEK);
 				m_cdda->pause_audio(0);
 			}
 			else
@@ -957,8 +961,6 @@ void stvcd_device::cmd_play_disc()
 
 	cr_standard_return(cd_stat);
 	hirqreg |= (CMOK);
-	oddframe = 0;
-	in_buffer = 0;
 
 	playtype = 0;
 
@@ -979,7 +981,7 @@ void stvcd_device::cmd_play_disc()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_seek_disc()
+void saturn_cd_hle_device::cmd_seek_disc()
 {
 	uint32_t temp;
 
@@ -994,7 +996,7 @@ void stvcd_device::cmd_seek_disc()
 
 		if (temp == 0xffffff)
 		{
-			cd_stat = CD_STAT_PAUSE;
+			cd_change_status(CD_STAT_PAUSE);
 			m_cdda->pause_audio(1);
 		}
 		else
@@ -1008,7 +1010,7 @@ void stvcd_device::cmd_seek_disc()
 		// is it a valid track?
 		if (cr2 >> 8)
 		{
-			cd_stat = CD_STAT_PAUSE;
+			cd_change_status(CD_STAT_PAUSE);
 			cur_track = cr2>>8;
 			cd_curfad = m_cdrom_image->get_track_start(cur_track-1);
 			m_cdda->pause_audio(1);
@@ -1016,7 +1018,7 @@ void stvcd_device::cmd_seek_disc()
 		}
 		else // error!
 		{
-			cd_stat = CD_STAT_STANDBY;
+			cd_change_status(CD_STAT_STANDBY);
 			cd_curfad = 0xffffffff;
 			cur_track = 0xff;
 			m_cdda->stop_audio(); //stop any pending CD-DA
@@ -1029,7 +1031,7 @@ void stvcd_device::cmd_seek_disc()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_ffwd_rew_disc()
+void saturn_cd_hle_device::cmd_ffwd_rew_disc()
 {
 	// FFWD / REW
 	// cr1 bit 0 determines if this is a Fast Forward (0) or a Rewind (1) command
@@ -1037,7 +1039,7 @@ void stvcd_device::cmd_ffwd_rew_disc()
 	// ...
 }
 
-void stvcd_device::cmd_get_subcode_q_rw_channel()
+void saturn_cd_hle_device::cmd_get_subcode_q_rw_channel()
 {
 	// Get SubCode Q / RW Channel
 	switch(cr1 & 0xff)
@@ -1111,7 +1113,7 @@ void stvcd_device::cmd_get_subcode_q_rw_channel()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_set_cddevice_connection()
+void saturn_cd_hle_device::cmd_set_cddevice_connection()
 {
 	// Set CD Device connection
 	uint8_t param;
@@ -1140,7 +1142,7 @@ void stvcd_device::cmd_set_cddevice_connection()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_cddevice_connection()
+void saturn_cd_hle_device::cmd_get_cddevice_connection()
 {
 	LOGCMD("%s: Get CD Device Connection filter\n",   machine().describe_context());
 	cr1 = cd_stat | 0;
@@ -1152,7 +1154,7 @@ void stvcd_device::cmd_get_cddevice_connection()
 	hirqreg |= CMOK;
 }
 
-void stvcd_device::cmd_last_buffer_destination()
+void saturn_cd_hle_device::cmd_last_buffer_destination()
 {
 	// Last Buffer Destination
 	cr1 = cd_stat | 0;
@@ -1163,12 +1165,12 @@ void stvcd_device::cmd_last_buffer_destination()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_set_filter_range()
+void saturn_cd_hle_device::cmd_set_filter_range()
 {
 	// Set Filter Range
 	// cr1 low + cr2 = FAD0, cr3 low + cr4 = FAD1
 	// cr3 hi = filter num.
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 
 	LOGCMD("%s: Set Filter Range\n",   machine().describe_context());
 
@@ -1182,25 +1184,25 @@ void stvcd_device::cmd_set_filter_range()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_filter_range()
+void saturn_cd_hle_device::cmd_get_filter_range()
 {
 	popmessage("Get Filter Range");
 	hirqreg |= CMOK;
 }
 
-void stvcd_device::cmd_set_filter_subheader_conditions()
+void saturn_cd_hle_device::cmd_set_filter_subheader_conditions()
 {
 	// Set Filter Subheader conditions
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 
-	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
+	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1 & 0xff, cr2, cr3 & 0xff, cr4);
 
 	filters[fnum].chan = cr1 & 0xff;
-	filters[fnum].smmask = (cr2>>8)&0xff;
-	filters[fnum].cimask = cr2&0xff;
-	filters[fnum].fid = cr3&0xff;
-	filters[fnum].smval = (cr4>>8)&0xff;
-	filters[fnum].cival = cr4&0xff;
+	filters[fnum].smmask = (cr2 >> 8) & 0xff;
+	filters[fnum].cimask = cr2 & 0xff;
+	filters[fnum].fid = cr3 & 0xff;
+	filters[fnum].smval = (cr4 >> 8) & 0xff;
+	filters[fnum].cival = cr4 & 0xff;
 
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
@@ -1208,12 +1210,12 @@ void stvcd_device::cmd_set_filter_subheader_conditions()
 }
 
 
-void stvcd_device::cmd_get_filter_subheader_conditions()
+void saturn_cd_hle_device::cmd_get_filter_subheader_conditions()
 {
 	// Get Filter Subheader conditions
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 
-	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1&0xff, cr2, cr3&0xff, cr4);
+	LOGCMD("%s: Set Filter Subheader conditions %x => chan %x masks %x fid %x vals %x\n", machine().describe_context(), fnum, cr1 & 0xff, cr2, cr3 & 0xff, cr4);
 
 	cr1 = cd_stat | (filters[fnum].chan & 0xff);
 	cr2 = (filters[fnum].smmask << 8) | (filters[fnum].cimask & 0xff);
@@ -1224,10 +1226,10 @@ void stvcd_device::cmd_get_filter_subheader_conditions()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_set_filter_mode()
+void saturn_cd_hle_device::cmd_set_filter_mode()
 {
 	// Set Filter Mode
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 	uint8_t mode = (cr1 & 0xff);
 
 	// initialize filter?
@@ -1246,10 +1248,10 @@ void stvcd_device::cmd_set_filter_mode()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_filter_mode()
+void saturn_cd_hle_device::cmd_get_filter_mode()
 {
 	// Get Filter Mode
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 
 	cr1 = cd_stat | (filters[fnum].mode & 0xff);
 	cr2 = 0;
@@ -1260,36 +1262,37 @@ void stvcd_device::cmd_get_filter_mode()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_set_filter_connection()
+void saturn_cd_hle_device::cmd_set_filter_connection()
 {
 	// Set Filter Connection
 	// FIXME: verify usage of cr3 LSB
 	// (false condition?)
-	uint8_t fnum = (cr3>>8)&0xff;
+	uint8_t fnum = (cr3 >> 8) & 0xff;
 
 	LOGCMD("%s: Set Filter Connection %x => mode %x parm %04x\n", machine().describe_context(), fnum, cr1 & 0xf, cr2);
 
 	if (cr1 & 1)    // set true condition
-		filters[fnum].condtrue = (cr2>>8)&0xff;
+		filters[fnum].condtrue = (cr2 >> 8) & 0xff;
 
 	if (cr1 & 2)    // set false condition
-		filters[fnum].condfalse = cr2&0xff;
+		filters[fnum].condfalse = cr2 & 0xff;
 
 	hirqreg |= (CMOK|ESEL);
 	cr_standard_return(cd_stat);
 	status_type = 0;
 }
 
-void stvcd_device::cmd_reset_selector()
+void saturn_cd_hle_device::cmd_reset_selector()
 {
 	int i,j;
 	// Reset Selector
 
-	LOGCMD("%s: Reset Selector\n",   machine().describe_context());
+	LOGCMD("%s: Reset Selector %02x\n", machine().describe_context(), cr1);
 
 	if((cr1 & 0xff) == 0x00)
 	{
-		uint8_t bufnum = cr3>>8;
+		uint8_t bufnum = cr3 >> 8;
+		LOGCMD("\tbufnum %02x\n", bufnum);
 
 		if(bufnum < MAX_FILTERS)
 		{
@@ -1306,7 +1309,7 @@ void stvcd_device::cmd_reset_selector()
 
 		// TODO: buffer full flag
 
-		if (freeblocks == 200) { sectorstore = 0; }
+		if (freeblocks == MAX_BLOCKS) { sectorstore = 0; }
 
 		hirqreg |= (CMOK|ESEL);
 		cr_standard_return(cd_stat);
@@ -1363,6 +1366,7 @@ void stvcd_device::cmd_reset_selector()
 		}
 
 		buffull = sectorstore = 0;
+		buffull_temp_pause = false;
 	}
 
 	hirqreg |= (CMOK|ESEL);
@@ -1370,11 +1374,11 @@ void stvcd_device::cmd_reset_selector()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_buffer_size()
+void saturn_cd_hle_device::cmd_get_buffer_size()
 {
 	// get Buffer Size
 	cr1 = cd_stat;
-	cr2 = (freeblocks > 200) ? 200 : freeblocks;
+	cr2 = (freeblocks > MAX_BLOCKS) ? MAX_BLOCKS : freeblocks;
 	cr3 = 0x1800;
 	cr4 = 200;
 	LOG("Get Buffer Size = %d\n", cr2);
@@ -1382,11 +1386,11 @@ void stvcd_device::cmd_get_buffer_size()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_buffer_partition_sector_number()
+void saturn_cd_hle_device::cmd_get_buffer_partition_sector_number()
 {
 	// get # sectors used in a buffer
 
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 
 	cr1 = cd_stat;
 	cr2 = 0;
@@ -1408,17 +1412,14 @@ void stvcd_device::cmd_get_buffer_partition_sector_number()
 	LOGCMD("%s: Get Sector Number (bufno %d) = %d blocks\n",   machine().describe_context(), bufnum, cr4);
 
 	//LOGWARN("%04x\n",cr4);
-	if(cr4 == 0)
-		hirqreg |= (CMOK);
-	else
-		hirqreg |= (CMOK|DRDY);
+	hirqreg |= (CMOK);
 	status_type = 1;
 }
 
-void stvcd_device::cmd_calculate_actual_data_size()
+void saturn_cd_hle_device::cmd_calculate_actual_data_size()
 {
 	// calculate actual size
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 	uint32_t sectoffs = cr2;
 	uint32_t numsect = cr4;
 
@@ -1443,11 +1444,11 @@ void stvcd_device::cmd_calculate_actual_data_size()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_actual_data_size()
+void saturn_cd_hle_device::cmd_get_actual_data_size()
 {
 	// get actual block size
 	LOGCMD("%s: Get actual block size\n", machine().describe_context());
-	cr1 = cd_stat | ((calcsize>>16)&0xff);
+	cr1 = cd_stat | ((calcsize >> 16) & 0xff);
 	cr2 = (calcsize & 0xffff);
 	cr3 = 0;
 	cr4 = 0;
@@ -1455,11 +1456,12 @@ void stvcd_device::cmd_get_actual_data_size()
 	status_type = 1;
 }
 
-void stvcd_device::cmd_get_sector_information()
+// falcom2
+void saturn_cd_hle_device::cmd_get_sector_information()
 {
 	// get sector info
 	uint32_t sectoffs = cr2 & 0xff;
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 
 	if (bufnum >= MAX_FILTERS || !partitions[bufnum].blocks[sectoffs])
 	{
@@ -1479,7 +1481,7 @@ void stvcd_device::cmd_get_sector_information()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_set_sector_length()
+void saturn_cd_hle_device::cmd_set_sector_length()
 {
 	// set sector length
 	LOGCMD("%s: Set sector length\n",   machine().describe_context());
@@ -1500,7 +1502,7 @@ void stvcd_device::cmd_set_sector_length()
 			break;
 	}
 
-	switch ((cr2>>8) & 0xff)
+	switch ((cr2 >> 8) & 0xff)
 	{
 		case 0:
 			sectlenout = 2048;
@@ -1520,12 +1522,12 @@ void stvcd_device::cmd_set_sector_length()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_sector_data()
+void saturn_cd_hle_device::cmd_get_sector_data()
 {
 	// get sector data
 	uint32_t sectnum = cr4;
 	uint32_t sectofs = cr2;
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 
 	LOGCMD("%s: Get sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
 
@@ -1563,12 +1565,12 @@ void stvcd_device::cmd_get_sector_data()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_delete_sector_data()
+void saturn_cd_hle_device::cmd_delete_sector_data()
 {
 	// delete sector data
 	uint32_t sectnum = cr4;
 	uint32_t sectofs = cr2;
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 	int32_t i;
 
 	LOGCMD("%s: Delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
@@ -1611,7 +1613,7 @@ void stvcd_device::cmd_delete_sector_data()
 
 	partitions[bufnum].numblks -= sectnum;
 
-	if (freeblocks == 200)
+	if (freeblocks == MAX_BLOCKS)
 	{
 		sectorstore = 0;
 	}
@@ -1622,13 +1624,13 @@ void stvcd_device::cmd_delete_sector_data()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_and_delete_sector_data()
+void saturn_cd_hle_device::cmd_get_and_delete_sector_data()
 {
 	// get then delete sector data
 
 	uint32_t sectnum = cr4;
 	uint32_t sectofs = cr2;
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 
 	LOGCMD("%s: Get and delete sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
 
@@ -1641,7 +1643,7 @@ void stvcd_device::cmd_get_and_delete_sector_data()
 		return;
 	}
 
-	/* Yoshimoto Mahjong uses the REJECT status to verify when the data is ready. */
+	/* yoshimj uses the REJECT status to verify when the data is ready. */
 	// TODO: verify again if it's really REJECT or something else
 	if (partitions[bufnum].numblks < sectnum)
 	{
@@ -1667,14 +1669,14 @@ void stvcd_device::cmd_get_and_delete_sector_data()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_put_sector_data()
+void saturn_cd_hle_device::cmd_put_sector_data()
 {
-	// put sector data
-	/* After Burner 2, Out Run, Fantasy Zone and Dungeon Master Nexus trips this */
+	// aburner2, outrun, fantzone and dmastnx needs this
+	// TODO: transfer shouldn't be here
 
 	uint32_t sectnum = cr4 & 0xff;
 	uint32_t sectofs = cr2;
-	uint32_t bufnum = cr3>>8;
+	uint32_t bufnum = cr3 >> 8;
 
 	LOGCMD("%s: Put sector data (SN %d SO %d BN %d)\n",   machine().describe_context(), sectnum, sectofs, bufnum);
 
@@ -1708,19 +1710,18 @@ void stvcd_device::cmd_put_sector_data()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_move_sector_data()
+void saturn_cd_hle_device::cmd_move_sector_data()
 {
 	popmessage("Move Sector data");
 	hirqreg |= (CMOK);
 }
 
-void stvcd_device::cmd_copy_sector_data()
+void saturn_cd_hle_device::cmd_copy_sector_data()
 {
-	// copy sector data
-	/* Sword & Sorcery / Riglord Saga 2 uses this */
+	// swordsor and riglord2 uses this
 	// TODO: incomplete
-	uint32_t src_filter = (cr3>>8)&0xff;
-	uint32_t dst_filter = cr1&0xff;
+	uint32_t src_filter = (cr3 >> 8) & 0xff;
+	uint32_t dst_filter = cr1 & 0xff;
 	uint32_t sectnum = cr4 & 0xff;
 
 	//cd_stat |= CD_STAT_TRANS;
@@ -1751,7 +1752,7 @@ void stvcd_device::cmd_copy_sector_data()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_sector_data_copy_or_move_error()
+void saturn_cd_hle_device::cmd_get_sector_data_copy_or_move_error()
 {
 	// get copy error
 	LOGCMD("%s: Get copy error\n",   machine().describe_context());
@@ -1764,14 +1765,14 @@ void stvcd_device::cmd_get_sector_data_copy_or_move_error()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_change_directory()
+void saturn_cd_hle_device::cmd_change_directory()
 {
 	uint32_t temp;
 	// change directory
 	LOGCMD("%s: Change Directory\n",   machine().describe_context());
 	hirqreg |= (CMOK|EFLS);
 
-	temp = (cr3&0xff)<<16;
+	temp = (cr3 & 0xff) << 16;
 	temp |= cr4;
 
 	read_new_dir(temp);
@@ -1779,7 +1780,7 @@ void stvcd_device::cmd_change_directory()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_read_directory()
+void saturn_cd_hle_device::cmd_read_directory()
 {
 	// Read directory entry
 	LOGCMD("%s: Read Directory Entry\n",   machine().describe_context());
@@ -1800,7 +1801,7 @@ void stvcd_device::cmd_read_directory()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_file_scope()
+void saturn_cd_hle_device::cmd_get_file_scope()
 {
 	// Get file system scope
 	LOGCMD("%s: Get file system scope\n", machine().describe_context());
@@ -1813,7 +1814,7 @@ void stvcd_device::cmd_get_file_scope()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_target_file_info()
+void saturn_cd_hle_device::cmd_get_target_file_info()
 {
 	uint32_t temp;
 
@@ -1821,6 +1822,7 @@ void stvcd_device::cmd_get_target_file_info()
 	LOGCMD("%s: Get File Info\n",   machine().describe_context());
 	cd_stat |= CD_STAT_TRANS;
 	cd_stat &= 0xff00;      // clear top byte of return value
+
 	playtype = 0;
 	cdda_repeat_count = 0;
 	hirqreg |= (CMOK|DRDY);
@@ -1853,8 +1855,6 @@ void stvcd_device::cmd_get_target_file_info()
 		cr3 = 0;
 		cr4 = 0;
 
-		// TODO: chaossd and sengblad does this
-		// (iso9660 parsing doesn't read beyond the first sector)
 		if (curdir[temp].firstfad == 0 || curdir[temp].length == 0)
 			throw emu_fatalerror("File ID not found in XFERTYPE_FILEINFO_1");
 //      LOGWARN("%08x %08x\n",curdir[temp].firstfad,curdir[temp].length);
@@ -1875,7 +1875,7 @@ void stvcd_device::cmd_get_target_file_info()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_read_file()
+void saturn_cd_hle_device::cmd_read_file()
 {
 	// Read File
 	LOGCMD("%s: Read File\n",   machine().describe_context());
@@ -1886,7 +1886,7 @@ void stvcd_device::cmd_read_file()
 	file_id = ((cr3 & 0xff) << 16)|(cr4);
 	file_size = ((curdir[file_id].length + sectlenin - 1) / sectlenin) - file_offset;
 
-	cd_stat = CD_STAT_PLAY|0x80;    // set "cd-rom" bit
+	cd_change_status(CD_STAT_PLAY | 0x80);  // set "cd-rom" bit
 	cd_curfad = (curdir[file_id].firstfad + file_offset);
 	fadstoplay = file_size;
 	if(file_filter < MAX_FILTERS)
@@ -1898,16 +1898,13 @@ void stvcd_device::cmd_read_file()
 
 	cr_standard_return(cd_stat);
 
-	oddframe = 0;
-	in_buffer = 0;
-
 	playtype = 1;
 
 	hirqreg |= (CMOK|EHST);
 	status_type = 0;
 }
 
-void stvcd_device::cmd_abort_file()
+void saturn_cd_hle_device::cmd_abort_file()
 {
 	LOGCMD("%s: Abort File\n",   machine().describe_context());
 	// bios expects "2bc" mask to work against this
@@ -1916,17 +1913,18 @@ void stvcd_device::cmd_abort_file()
 	xfertype32 = XFERTYPE32_INVALID;
 	xferdnum = 0;
 	if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-		cd_stat = CD_STAT_PAUSE;    // force to pause
+		cd_change_status(CD_STAT_PAUSE); // force to pause
+
 	cr_standard_return(cd_stat);
 	status_type = 0;
 }
 
-void stvcd_device::cmd_check_copy_protection()
+void saturn_cd_hle_device::cmd_check_copy_protection()
 {
 	// appears to be copy protection check.  needs only to return OK.
 	LOGCMD("%s: Verify copy protection\n",   machine().describe_context());
 	if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-		cd_stat = CD_STAT_PAUSE;
+		cd_change_status(CD_STAT_PAUSE);
 
 //   cr1 = cd_stat;  // necessary to pass
 //   cr2 = 0x4;
@@ -1944,12 +1942,13 @@ void stvcd_device::cmd_check_copy_protection()
 	status_type = 0;
 }
 
-void stvcd_device::cmd_get_disc_region()
+void saturn_cd_hle_device::cmd_get_disc_region()
 {
 	// get disc region
 	LOGCMD("%s: Get disc region\n",   machine().describe_context());
 	if(cd_stat != CD_STAT_NODISC && cd_stat != CD_STAT_OPEN)
-		cd_stat = CD_STAT_PAUSE;
+		cd_change_status(CD_STAT_PAUSE);
+
 	cr1 = cd_stat;  // necessary to pass
 	if(cr2 == 0x0001) // MPEG card
 		cr2 = 0x2;
@@ -1963,7 +1962,7 @@ void stvcd_device::cmd_get_disc_region()
 
 }
 
-void stvcd_device::cmd_get_mpeg_card_boot_rom()
+void saturn_cd_hle_device::cmd_get_mpeg_card_boot_rom()
 {
 	// Get MPEG Card Boot ROM
 	// TODO: incomplete, needs to actually retrieve from MPEG ROM, just silence popmessage for now.
@@ -1972,7 +1971,7 @@ void stvcd_device::cmd_get_mpeg_card_boot_rom()
 	hirqreg |= (CMOK|MPED);
 }
 
-void stvcd_device::cmd_mpeg_get_status()
+void saturn_cd_hle_device::cmd_mpeg_get_status()
 {
 	// MPEG Get Status
 	// ...
@@ -1980,7 +1979,7 @@ void stvcd_device::cmd_mpeg_get_status()
 	hirqreg |= (CMOK);
 }
 
-void stvcd_device::cmd_mpeg_get_irq()
+void saturn_cd_hle_device::cmd_mpeg_get_irq()
 {
 	// MPEG get IRQ
 	// ...
@@ -1992,7 +1991,7 @@ void stvcd_device::cmd_mpeg_get_irq()
 }
 
 
-void stvcd_device::cmd_mpeg_set_irq_mask()
+void saturn_cd_hle_device::cmd_mpeg_set_irq_mask()
 {
 	// MPEG Set IRQ Mask
 	// ...
@@ -2000,7 +1999,7 @@ void stvcd_device::cmd_mpeg_set_irq_mask()
 	hirqreg |= (CMOK);
 }
 
-void stvcd_device::cmd_mpeg_set_mode()
+void saturn_cd_hle_device::cmd_mpeg_set_mode()
 {
 	// MPEG Set Mode
 	// ...
@@ -2009,7 +2008,7 @@ void stvcd_device::cmd_mpeg_set_mode()
 }
 
 
-void stvcd_device::cmd_mpeg_init()
+void saturn_cd_hle_device::cmd_mpeg_init()
 {
 	// MPEG init
 	// ...
@@ -2024,7 +2023,7 @@ void stvcd_device::cmd_mpeg_init()
 
 }
 
-void stvcd_device::cd_exec_command()
+void saturn_cd_hle_device::cd_exec_command()
 {
 	if(cr1 != 0 &&
 		((cr1 & 0xff00) != 0x5100) &&
@@ -2118,13 +2117,13 @@ void stvcd_device::cd_exec_command()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sh1_sim )
+TIMER_CALLBACK_MEMBER( saturn_cd_hle_device::sh1_command_cb )
 {
 	if((cmd_pending == 0xf) && (!(hirqreg & CMOK)))
 		cd_exec_command();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sector_cb )
+TIMER_CALLBACK_MEMBER( saturn_cd_hle_device::cd_sector_cb )
 {
 	if(!m_cdrom_image->exists())
 		return;
@@ -2142,9 +2141,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sector_cb )
 
 	// TODO: Saturn refuses to boot with this if a disk isn't in and condition is applied!?
 	// TODO: Check out actual timing of SCDQ acquisition.
-	// (Daytona USA original version definitely wants it to be on).
+	// (daytonau definitely wants it to be on).
 	//if(((cd_stat & 0x0f00) != CD_STAT_NODISC) && ((cd_stat & 0x0f00) != CD_STAT_OPEN))
-	hirqreg |= SCDQ;
+	if (!buffull)
+		hirqreg |= SCDQ;
+	else
+		hirqreg &= ~SCDQ;
 
 	if(cd_stat & CD_STAT_PERI)
 	{
@@ -2152,12 +2154,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( stvcd_device::stv_sector_cb )
 	}
 }
 
-stvcd_device::blockT *stvcd_device::cd_alloc_block(uint8_t *blknum)
+saturn_cd_hle_device::blockT *saturn_cd_hle_device::cd_alloc_block(uint8_t *blknum)
 {
 	int32_t i;
 
 	// search the 200 available blocks for a free one
-	for (i = 0; i < 200; i++)
+	for (i = 0; i < MAX_BLOCKS; i++)
 	{
 		if (blocks[i].size == -1)
 		{
@@ -2181,7 +2183,7 @@ stvcd_device::blockT *stvcd_device::cd_alloc_block(uint8_t *blknum)
 	return (blockT *)nullptr;
 }
 
-void stvcd_device::cd_free_block(blockT *blktofree)
+void saturn_cd_hle_device::cd_free_block(blockT *blktofree)
 {
 	int32_t i;
 
@@ -2192,7 +2194,7 @@ void stvcd_device::cd_free_block(blockT *blktofree)
 		return;
 	}
 
-	for (i = 0; i < 200; i++)
+	for (i = 0; i < MAX_BLOCKS; i++)
 	{
 		if (&blocks[i] == blktofree)
 		{
@@ -2206,7 +2208,7 @@ void stvcd_device::cd_free_block(blockT *blktofree)
 	hirqreg &= ~BFUL;
 }
 
-void stvcd_device::cd_getsectoroffsetnum(uint32_t bufnum, uint32_t *sectoffs, uint32_t *sectnum)
+void saturn_cd_hle_device::cd_getsectoroffsetnum(uint32_t bufnum, uint32_t *sectoffs, uint32_t *sectnum)
 {
 	if (*sectoffs == 0xffff)
 	{
@@ -2219,15 +2221,15 @@ void stvcd_device::cd_getsectoroffsetnum(uint32_t bufnum, uint32_t *sectoffs, ui
 	}
 }
 
-void stvcd_device::cd_defragblocks(partitionT *part)
+void saturn_cd_hle_device::cd_defragblocks(partitionT *part)
 {
 	uint32_t i, j;
 	blockT *temp;
 	uint8_t temp2;
 
-	for (i = 0; i < (MAX_BLOCKS-1); i++)
+	for (i = 0; i < (MAX_BLOCKS - 1); i++)
 	{
-		for (j = i+1; j < MAX_BLOCKS; j++)
+		for (j = i + 1; j < MAX_BLOCKS; j++)
 		{
 			if ((part->blocks[i] == (blockT *)nullptr) && (part->blocks[j] != (blockT *)nullptr))
 			{
@@ -2244,7 +2246,7 @@ void stvcd_device::cd_defragblocks(partitionT *part)
 }
 
 // iso9660 parsing
-void stvcd_device::read_new_dir(uint32_t fileno)
+void saturn_cd_hle_device::read_new_dir(uint32_t fileno)
 {
 	int foundpd, i;
 	uint32_t cfad;//, dirfad;
@@ -2270,14 +2272,14 @@ void stvcd_device::read_new_dir(uint32_t fileno)
 					case 0: // boot record
 						break;
 
-					case 1: // primary vol. desc
+					case 1: // primary volume descriptor
 						foundpd = 1;
 						break;
 
-					case 2: // secondary vol desc
+					case 2: // secondary volume descriptor
 						break;
 
-					case 3: // vol. section descriptor
+					case 3: // volume section descriptor
 						break;
 
 					case 0xff:
@@ -2287,7 +2289,7 @@ void stvcd_device::read_new_dir(uint32_t fileno)
 			}
 		}
 
-		// got primary vol. desc.
+		// got primary volume descriptor
 		if (foundpd)
 		{
 			//dirfad = get_u32le(&sect[140]);
@@ -2325,7 +2327,8 @@ void stvcd_device::read_new_dir(uint32_t fileno)
 }
 
 // makes the directory pointed to by FAD current
-void stvcd_device::make_dir_current(uint32_t fad)
+// https://wiki.osdev.org/ISO_9660 for a detailed reference
+void saturn_cd_hle_device::make_dir_current(uint32_t fad)
 {
 	uint32_t i;
 	uint32_t nextent, numentries;
@@ -2343,6 +2346,11 @@ void stvcd_device::make_dir_current(uint32_t fad)
 
 	nextent = 0;
 	numentries = 0;
+
+	// on directories bigger than 1 FAD we have to keep track of gaps
+	// i.e. a sector will end with a 0 marker but continues in the next sector.
+	// cfr. chaossd and sengblad
+	u32 sector_number = 0;
 	while (nextent < MAX_DIR_SIZE)
 	{
 		if (sect[nextent])
@@ -2352,7 +2360,13 @@ void stvcd_device::make_dir_current(uint32_t fad)
 		}
 		else
 		{
-			nextent = MAX_DIR_SIZE;
+			if (sector_number < curroot.length)
+			{
+				sector_number += 0x800;
+				nextent = sector_number;
+			}
+			else
+				nextent = MAX_DIR_SIZE;
 		}
 	}
 
@@ -2360,6 +2374,7 @@ void stvcd_device::make_dir_current(uint32_t fad)
 	curentry = &curdir[0];
 	numfiles = numentries;
 
+	sector_number = 0;
 	nextent = 0;
 	while (numentries)
 	{
@@ -2384,6 +2399,13 @@ void stvcd_device::make_dir_current(uint32_t fad)
 		// [32] name character size
 		// [33+ ...] file name
 
+		if (!sect[nextent+0] && sector_number < curroot.length)
+		{
+			sector_number += 0x800;
+			nextent = sector_number;
+			continue;
+		}
+
 		curentry->record_size = sect[nextent+0];
 		curentry->xa_record_size = sect[nextent+1];
 		curentry->firstfad = get_u32le(&sect[nextent+2]);
@@ -2406,7 +2428,7 @@ void stvcd_device::make_dir_current(uint32_t fad)
 			curentry->name[i] = sect[nextent+33+i];
 		}
 		curentry->name[i] = '\0';   // terminate
-		//LOGWARN("%08x %08x %s %d/%d/%d\n",curentry->firstfad,curentry->length,curentry->name,curentry->year,curentry->month,curentry->day);
+		//printf("%d: %08x %08x %s %d/%d/%d\n", nextent, curentry->firstfad,curentry->length,curentry->name,curentry->year,curentry->month,curentry->day);
 
 		nextent += sect[nextent];
 		curentry++;
@@ -2423,12 +2445,12 @@ void stvcd_device::make_dir_current(uint32_t fad)
 	}
 }
 
-void stvcd_device::device_stop()
+void saturn_cd_hle_device::device_stop()
 {
 	curdir.clear();
 }
 
-void stvcd_device::cd_readTOC(void)
+void saturn_cd_hle_device::cd_readTOC(void)
 {
 	int i, ntrks, tocptr, fad;
 
@@ -2461,7 +2483,7 @@ void stvcd_device::cd_readTOC(void)
 		if (m_cdrom_image->exists())
 		{
 			//tocbuf[tocptr] = sega_cdrom_get_adr_control(cdrom, i);
-			//HACK: ddsom does not enter ingame with the line above!
+			// HACK: ddsom does not enter ingame with the line above
 			tocbuf[tocptr] = m_cdrom_image->get_adr_control(i)<<4 | 0x01;
 		}
 		else
@@ -2516,7 +2538,7 @@ void stvcd_device::cd_readTOC(void)
 	put_u24be(&tocbuf[tocptr+9], fad);
 }
 
-stvcd_device::partitionT *stvcd_device::cd_filterdata(filterT *flt, int trktype, uint8_t *p_ok)
+saturn_cd_hle_device::partitionT *saturn_cd_hle_device::cd_filterdata(filterT *flt, int trktype, uint8_t *p_ok)
 {
 	int match, keepgoing;
 	partitionT *filterprt;
@@ -2672,7 +2694,7 @@ stvcd_device::partitionT *stvcd_device::cd_filterdata(filterT *flt, int trktype,
 }
 
 // read a single sector off the CD, applying the current filter(s) as necessary
-stvcd_device::partitionT *stvcd_device::cd_read_filtered_sector(int32_t fad, uint8_t *p_ok)
+saturn_cd_hle_device::partitionT *saturn_cd_hle_device::cd_read_filtered_sector(int32_t fad, uint8_t *p_ok)
 {
 	int trktype;
 
@@ -2721,103 +2743,130 @@ stvcd_device::partitionT *stvcd_device::cd_read_filtered_sector(int32_t fad, uin
 }
 
 // loads in data set up by a CD-block PLAY command
-void stvcd_device::cd_playdata()
+void saturn_cd_hle_device::cd_playdata()
 {
-	if ((cd_stat & 0x0f00) == CD_STAT_SEEK)
-	{
-		int32_t fad_diff;
-		LOGSEEK("PRE %08x %08x %08x %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad);
-
-		fad_diff = (cd_fad_seek - cd_curfad);
-
-		/* Zero Divide wants this TODO: timings. */
-		if(fad_diff > (750*cd_speed))
-		{
-			LOGSEEK("PRE FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad,750*cd_speed);
-			cd_curfad += (750*cd_speed);
-			LOGSEEK("POST FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, 750*cd_speed);
-		}
-		else if(fad_diff < (-750*cd_speed))
-		{
-			LOGSEEK("PRE REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
-			cd_curfad -= (750*cd_speed);
-			LOGSEEK("POST REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
-		}
-		else
-		{
-			LOGSEEK("Ready\n");
-			cd_curfad = cd_fad_seek;
-			cd_stat = CD_STAT_PLAY;
-		}
-
-		return;
-	}
-
 	if (LIVE_CD_VIEW)
-		popmessage("%04x %d %d", cd_stat, cd_curfad, fadstoplay);
+		popmessage("%04x %d %d %04x (%d)", cd_stat, cd_curfad, fadstoplay, hirqreg, buffull);
 
-	if ((cd_stat & 0x0f00) == CD_STAT_PLAY)
+	switch(cd_stat & 0x0f00)
 	{
-		if (fadstoplay)
+		case CD_STAT_BUSY:
 		{
-			LOGXFER("STVCD: Reading FAD %d\n", cd_curfad);
+			// accept the previously chained command
+			// amagishi wants this at startup
+			cd_stat = cd_next_stat;
+			break;
+		}
+		case CD_STAT_SEEK:
+		{
+			int32_t fad_diff;
+			LOGSEEK("PRE %08x %08x %08x %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad);
 
-			if (m_cdrom_image->exists())
+			fad_diff = (cd_fad_seek - cd_curfad);
+
+			/* Zero Divide wants this TODO: timings. */
+			if(fad_diff > (750*cd_speed))
 			{
-				uint8_t p_ok;
+				LOGSEEK("PRE FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad,750*cd_speed);
+				cd_curfad += (750*cd_speed);
+				LOGSEEK("POST FFWD %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, 750*cd_speed);
+			}
+			else if(fad_diff < (-750*cd_speed))
+			{
+				LOGSEEK("PRE REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
+				cd_curfad -= (750*cd_speed);
+				LOGSEEK("POST REW %08x %08x %08x %d %d\n",cd_curfad,cd_fad_seek,cd_stat,cd_fad_seek - cd_curfad, -750*cd_speed);
+			}
+			else
+			{
+				LOGSEEK("Ready\n");
+				cd_curfad = cd_fad_seek;
+				cd_change_status(CD_STAT_PLAY);
+			}
 
-				if(m_cdrom_image->get_track_type(m_cdrom_image->get_track(cd_curfad)) != cdrom_file::CD_TRACK_AUDIO)
-				{
-					cd_read_filtered_sector(cd_curfad,&p_ok);
-					m_cdda->stop_audio(); //stop any pending CD-DA
-				}
-				else
-				{
-					 // TODO: pinpoint cases when this isn't okay
-					 // (out of bounds disc for example)
-					p_ok = 1;
-					m_cdda->start_audio(cd_curfad, 1);
-				}
+			break;
+		}
+		case CD_STAT_PAUSE:
+		{
+			if (buffull_temp_pause && !buffull && fadstoplay)
+			{
+				buffull_temp_pause = false;
+				cd_change_status(CD_STAT_PLAY);
+			}
+			break;
+		}
+		case CD_STAT_PLAY:
+		{
+			if (fadstoplay)
+			{
+				LOGXFER("SATURN_CD_HLE: Reading FAD %d\n", cd_curfad);
 
-				if(p_ok)
+				if (m_cdrom_image->exists())
 				{
-					cd_curfad++;
-					fadstoplay--;
-					hirqreg |= CSCT;
-					sectorstore = 1;
+					uint8_t p_ok;
 
-					if (!fadstoplay)
+					if(m_cdrom_image->get_track_type(m_cdrom_image->get_track(cd_curfad)) != cdrom_file::CD_TRACK_AUDIO)
 					{
-						if(cdda_repeat_count >= cdda_maxrepeat)
+						cd_read_filtered_sector(cd_curfad,&p_ok);
+						m_cdda->stop_audio(); //stop any pending CD-DA
+					}
+					else
+					{
+						// TODO: pinpoint cases when this isn't okay
+						// (out of bounds disc for example)
+						p_ok = 1;
+						m_cdda->start_audio(cd_curfad, 1);
+					}
+
+					if(p_ok)
+					{
+						cd_curfad++;
+						fadstoplay--;
+						hirqreg |= CSCT;
+						sectorstore = 1;
+
+						if (!fadstoplay)
 						{
-							LOG("cd_playdata: playback ended\n");
-							cd_stat = CD_STAT_PAUSE;
-
-							hirqreg |= PEND;
-
-							if (playtype == 1)
+							if(cdda_repeat_count >= cdda_maxrepeat)
 							{
-								LOG("cd_playdata: setting EFLS\n");
-								hirqreg |= EFLS;
+								LOG("cd_playdata: playback ended\n");
+								cd_change_status(CD_STAT_PAUSE);
+
+								hirqreg |= PEND;
+
+								if (playtype == 1)
+								{
+									LOG("cd_playdata: setting EFLS\n");
+									hirqreg |= EFLS;
+								}
+							}
+							else
+							{
+								if(cdda_repeat_count < 0xe)
+									cdda_repeat_count++;
+
+								cd_curfad = m_cdrom_image->get_track_start(cur_track-1) + 150;
+								fadstoplay = m_cdrom_image->get_track_start(cur_track) - cd_curfad;
 							}
 						}
-						else
-						{
-							if(cdda_repeat_count < 0xe)
-								cdda_repeat_count++;
-
-							cd_curfad = m_cdrom_image->get_track_start(cur_track-1) + 150;
-							fadstoplay = m_cdrom_image->get_track_start(cur_track) - cd_curfad;
-						}
+					}
+					else if (buffull)
+					{
+						// TODO: should be correct but somehow still doesn't work
+						buffull_temp_pause = true;
+						// sectorstore = 0;
+						cd_change_status(CD_STAT_PAUSE);
 					}
 				}
 			}
+
+			break;
 		}
 	}
 }
 
 // loads a single sector off the CD, anywhere from FAD 150 on up
-void stvcd_device::cd_readblock(uint32_t fad, uint8_t *dat)
+void saturn_cd_hle_device::cd_readblock(uint32_t fad, uint8_t *dat)
 {
 	if (m_cdrom_image->exists())
 	{
@@ -2825,13 +2874,14 @@ void stvcd_device::cd_readblock(uint32_t fad, uint8_t *dat)
 	}
 }
 
-void stvcd_device::set_tray_open()
+void saturn_cd_hle_device::set_tray_open()
 {
 	if(!tray_is_closed)
 		return;
 
 	hirqreg |= DCHG;
-	cd_stat = CD_STAT_OPEN;
+
+	cd_change_status(CD_STAT_OPEN);
 
 	// unmount the existing image, pretend that's what user wants if we are there.
 	m_cdrom_image->unload();
@@ -2841,7 +2891,7 @@ void stvcd_device::set_tray_open()
 	popmessage("Tray Open");
 }
 
-void stvcd_device::set_tray_close()
+void saturn_cd_hle_device::set_tray_close()
 {
 	/* avoid user attempts to load a CD-ROM without opening the tray first (emulation asserts anyway with current framework) */
 	if(tray_is_closed)
@@ -2853,11 +2903,11 @@ void stvcd_device::set_tray_close()
 	{
 		LOG("Opened CD-ROM successfully, reading root directory\n");
 		//read_new_dir(0xffffff);  // read root directory
-		cd_stat = CD_STAT_PAUSE;
+		cd_change_status(CD_STAT_PAUSE);
 	}
 	else
 	{
-		cd_stat = CD_STAT_NODISC;
+		cd_change_status(CD_STAT_NODISC);
 	}
 
 	cd_speed = 2;

@@ -256,7 +256,7 @@ void exedexes_state::video_start()
 
 void exedexes_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const u8 *buffered_spriteram = m_spriteram->buffer();
+	const u8 *spriteram = m_spriteram->buffer();
 
 	if (!m_objon)
 		return;
@@ -264,15 +264,15 @@ void exedexes_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	for (int offs = 0; offs < m_spriteram->bytes(); offs += 32)
 	{
 		u32 primask = 0;
-		if (buffered_spriteram[offs + 1] & 0x40)
+		if (spriteram[offs + 1] & 0x40)
 			primask |= GFX_PMASK_2;
 
-		const u32 code = buffered_spriteram[offs];
-		const u32 color = buffered_spriteram[offs + 1] & 0x0f;
-		const bool flipx = buffered_spriteram[offs + 1] & 0x10;
-		const bool flipy = buffered_spriteram[offs + 1] & 0x20;
-		const int sx = buffered_spriteram[offs + 3] - ((buffered_spriteram[offs + 1] & 0x80) << 1);
-		const int sy = buffered_spriteram[offs + 2];
+		const u32 code = spriteram[offs];
+		const u32 color = spriteram[offs + 1] & 0x0f;
+		const bool flipx = spriteram[offs + 1] & 0x10;
+		const bool flipy = spriteram[offs + 1] & 0x20;
+		const int sx = spriteram[offs + 3] - ((spriteram[offs + 1] & 0x80) << 1);
+		const int sy = spriteram[offs + 2];
 
 		m_gfxdecode->gfx(3)->prio_transpen(bitmap, cliprect,
 				code,
@@ -335,15 +335,15 @@ void exedexes_state::main_map(address_map &map)
 	map(0xc003, 0xc003).portr("DSW0");
 	map(0xc004, 0xc004).portr("DSW1");
 	map(0xc800, 0xc800).w("soundlatch", FUNC(generic_latch_8_device::write));
-	map(0xc804, 0xc804).w(FUNC(exedexes_state::control_w));                       // coin counters + text layer enable
-	map(0xc806, 0xc806).nopw();                                                // watchdog ??
+	map(0xc804, 0xc804).w(FUNC(exedexes_state::control_w)); // coin counters + text layer enable
+	map(0xc806, 0xc806).w(m_spriteram, FUNC(buffered_spriteram8_device::write));
 	map(0xd000, 0xd3ff).ram().w(FUNC(exedexes_state::videoram_w)).share(m_videoram);
 	map(0xd400, 0xd7ff).ram().w(FUNC(exedexes_state::colorram_w)).share(m_colorram);
 	map(0xd800, 0xd801).writeonly().share(m_nbg_yscroll);
 	map(0xd802, 0xd803).writeonly().share(m_nbg_xscroll);
 	map(0xd804, 0xd805).writeonly().share(m_bg_scroll);
-	map(0xd807, 0xd807).w(FUNC(exedexes_state::gfxctrl_w));                    // layer enables
-	map(0xe000, 0xefff).ram();                                                 // work RAM
+	map(0xd807, 0xd807).w(FUNC(exedexes_state::gfxctrl_w)); // layer enables
+	map(0xe000, 0xefff).ram();
 	map(0xf000, 0xffff).ram().share("spriteram");
 }
 
@@ -516,7 +516,6 @@ void exedexes_state::exedexes(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 262, 16, 240); // measured 59.6Hz
 	screen.set_screen_update(FUNC(exedexes_state::screen_update));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_exedexes);

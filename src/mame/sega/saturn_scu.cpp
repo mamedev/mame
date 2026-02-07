@@ -376,15 +376,16 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 	uint8_t cd_transfer_flag;
 
 	#if 0
-	if(m_dma[level].src_add == 0 || (m_dma[level].dst_add != 2 && m_dma[level].dst_add != 4))
+	//if(m_dma[level].src_add == 0 || (m_dma[level].dst_add != 2 && m_dma[level].dst_add != 4))
 	{
-	if(LOG_SCU) printf("DMA lv %d transfer START\n"
-							"Start %08x End %08x Size %04x\n",dma_ch,m_scu.src[dma_ch],m_scu.dst[dma_ch],m_scu.size[dma_ch]);
-	if(LOG_SCU) printf("Start Add %04x Destination Add %04x\n",m_scu.src_add[dma_ch],m_scu.dst_add[dma_ch]);
+		printf("DMA lv %d transfer START\n"
+							"Start %08x End %08x Size %04x\n",level ,m_dma[level].src,m_dma[level].dst,m_dma[level].size);
+		printf("Start Add %04x Destination Add %04x\n",m_dma[level].src_add,m_dma[level].dst_add);
 	}
 	#endif
 
-	// Game Basic, World Cup 98 and Batman Forever trips this, according to the docs the SCU can't transfer from BIOS area (can't communicate from/to that bus)
+	// gamebas, wc98 and batmanfu trips this
+	// according to the docs the SCU can't transfer from BIOS area (can't communicate from/to that bus)
 	if((m_dma[level].src & 0x07f00000) == 0)
 	{
 		//popmessage("Warning: SCU transfer from BIOS area, contact MAMEdev");
@@ -400,9 +401,17 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 	/* max size */
 	if(m_dma[level].size == 0) { m_dma[level].size  = (level == 0) ? 0x00100000 : 0x1000; }
 
+	// gunblaze: during startup tries to do a max sized DMA transfer to VDP1 that would eventually hit fb/regs
+	if ((m_dma[level].dst & 0x07f0'0000) == 0x05c0'0000 && m_dma[level].size >= 0x80000)
+		m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7fffe);
+
+	// stv:colmns97, which doesn't work right (timing more likely, also ST-V has more soundram)
+//	if ((m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000 && m_dma[level].size >= 0x80000)
+//		m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7ffff);
+
 	tmp_src = tmp_dst = 0;
 
-	total_size = m_dma[level].size ;
+	total_size = m_dma[level].size;
 	if(m_dma[level].rup == false) tmp_src = m_dma[level].src;
 	if(m_dma[level].wup == false) tmp_dst = m_dma[level].dst;
 
@@ -417,7 +426,9 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 		else
 			m_dma[level].dst_add <<= 1;
 
-		for (i = 0; i < m_dma[level].size;i+=m_dma[level].dst_add)
+		//printf("%d: %08x %08x %d\n", level, m_dma[level].dst, m_dma[level].size, m_dma[level].dst_add);
+
+		for (i = 0; i < m_dma[level].size; i+=m_dma[level].dst_add)
 		{
 			m_hostspace->write_dword(m_dma[level].dst,m_hostspace->read_dword(m_dma[level].src));
 			if(m_dma[level].dst_add == 8)
@@ -439,14 +450,14 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 			dma_single_transfer(m_dma[level].src, m_dma[level].dst, &src_shift);
 
 			if(src_shift)
-				m_dma[level].src+= m_dma[level].src_add ;
+				m_dma[level].src+= m_dma[level].src_add;
 
-			/* if target is Work RAM H, the add value is fixed, behaviour confirmed by Final Romance 2, Virtual Mahjong and Burning Rangers */
+			// if target is Work RAM H, the add value is fixed, behaviour confirmed by fromanc2, stv:vmahjong and burningru
 			m_dma[level].dst += ((m_dma[level].dst & 0x07000000) == 0x06000000) ? 2 : m_dma[level].dst_add;
 		}
 	}
 
-	/* Burning Rangers doesn't agree with this. */
+	// burningru doesn't want to zero existing size
 //  m_scu.size[dma_ch] = 0;
 	if(m_dma[level].rup == false) m_dma[level].src = tmp_src;
 	if(m_dma[level].wup == false) m_dma[level].dst = tmp_dst;

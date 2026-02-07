@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde
+
+#include "emu.h"
 #include "sharc.h"
 
 const adsp21062_device::SHARC_OP adsp21062_device::s_sharc_opcode_table[] =

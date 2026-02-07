@@ -489,7 +489,8 @@ void DebuggerMemView::addItemsToContextMenu(QMenu *menu)
 	{
 		debug_view_memory &memView = *view<debug_view_memory>();
 		debug_view_memory_source const &source = downcast<debug_view_memory_source const &>(*memView.source());
-		auto [mintf, spacenum] = source.space();
+		auto const [mintf, spacenum] = source.space();
+		assert(!mintf || ((0 <= spacenum) && mintf->has_space(spacenum)));
 		if (mintf)
 		{
 			const address_space_config *config = mintf->logical_space_config(spacenum);

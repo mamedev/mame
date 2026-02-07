@@ -4,8 +4,6 @@
 
     Bondwell 12/14
 
-    12/05/2009 Skeleton driver.
-
     - Z80A CPU 4MHz
     - 64KB RAM (BW 12), 128KB RAM (BW 14)
     - 4KB ROM System
@@ -26,58 +24,126 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "bw12.h"
+#include "bus/centronics/ctronics.h"
 #include "bus/rs232/rs232.h"
+#include "cpu/z80/z80.h"
+#include "formats/bw12_dsk.h"
+#include "imagedev/floppy.h"
+#include "machine/74259.h"
+#include "machine/6821pia.h"
+#include "machine/kb3600.h"
+#include "machine/pit8253.h"
+#include "machine/ram.h"
+#include "machine/rescap.h"
+#include "machine/timer.h"
+#include "machine/upd765.h"
+#include "machine/z80sio.h"
 #include "sound/dac.h"
-#include "screen.h"
+#include "video/mc6845.h"
+#include "emupal.h"
+#include "machine/input_merger.h"
 #include "softlist_dev.h"
 #include "speaker.h"
-#include "utf8.h"
 
-/*
+#define SCREEN_TAG          "screen"
+#define Z80_TAG             "ic35"
+#define MC6845_TAG          "ic14"
+#define UPD765_TAG          "ic45"
+#define Z80SIO_TAG          "ic15"
+#define PIT8253_TAG         "ic34"
+#define PIA6821_TAG         "ic16"
+#define AY3600PRO002_TAG    "ic74"
+#define CENTRONICS_TAG      "centronics"
+#define FLOPPY_TIMER_TAG    "motor_off"
+#define RS232_A_TAG         "rs232a"
+#define RS232_B_TAG         "rs232b"
 
-    TODO:
+namespace {
 
-    - floppy motor off timer
-
-*/
-
-void bw12_state::bankswitch()
+class bw12_state : public driver_device
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
+public:
+	bw12_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, Z80_TAG),
+		m_latch(*this, "latch"),
+		m_pia(*this, PIA6821_TAG),
+		m_sio(*this, Z80SIO_TAG),
+		m_fdc(*this, UPD765_TAG),
+		m_kbc(*this, AY3600PRO002_TAG),
+		m_crtc(*this, MC6845_TAG),
+		m_pit(*this, PIT8253_TAG),
+		m_palette(*this, "palette"),
+		m_centronics(*this, CENTRONICS_TAG),
+		m_floppy(*this, UPD765_TAG ":%u:525dd", 1U),
+		m_floppy_timer(*this, FLOPPY_TIMER_TAG),
+		m_char_rom(*this, "chargen"),
+		m_video_ram(*this, "video_ram"),
+		m_view(*this, "ram")
+	{ }
 
-	switch (m_curbank)
-	{
-	case 0: /* ROM */
-		program.install_read_bank(0x0000, 0x7fff, m_bank);
-		program.unmap_write(0x0000, 0x7fff);
-		break;
+	void bw12(machine_config &config);
+	void bw14(machine_config &config);
 
-	case 1: /* BK0 */
-		program.install_readwrite_bank(0x0000, 0x7fff, m_bank);
-		break;
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
-	case 2: /* BK1 */
-	case 3: /* BK2 */
-		if (m_ram->size() > 64*1024)
-		{
-			program.install_readwrite_bank(0x0000, 0x7fff, m_bank);
-		}
-		else
-		{
-			program.unmap_readwrite(0x0000, 0x7fff);
-		}
-		break;
-	}
+private:
+	void ls138_a0_w(int state);
+	void ls138_a1_w(int state);
+	void motor0_w(int state);
+	void motor1_w(int state);
 
-	m_bank->set_entry(m_curbank);
-}
+	uint8_t ls259_r(offs_t offset);
+	void pia_cb2_w(int state);
+	void ay3600_data_ready_w(int state);
+	MC6845_UPDATE_ROW( crtc_update_row );
+
+	void floppy_motor_on_off();
+	TIMER_DEVICE_CALLBACK_MEMBER(floppy_motor_off_tick);
+	static void bw12_floppy_formats(format_registration &fr);
+	static void bw14_floppy_formats(format_registration &fr);
+
+	void common(machine_config &config);
+	void bw12_io(address_map &map) ATTR_COLD;
+	void bw12_mem(address_map &map) ATTR_COLD;
+	void bw14_mem(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_maincpu;
+	required_device<ls259_device> m_latch;
+	required_device<pia6821_device> m_pia;
+	required_device<z80sio_device> m_sio;
+	required_device<upd765a_device> m_fdc;
+	required_device<ay3600_device> m_kbc;
+	required_device<mc6845_device> m_crtc;
+	required_device<pit8253_device> m_pit;
+	required_device<palette_device> m_palette;
+	required_device<centronics_device> m_centronics;
+	required_device_array<floppy_image_device, 2> m_floppy;
+	required_device<timer_device> m_floppy_timer;
+	required_memory_region m_char_rom;
+	required_shared_ptr<uint8_t> m_video_ram;
+	memory_view m_view;
+
+	void bankswitch() { m_view.select(m_curbank); }
+
+	/* memory state */
+	int m_curbank = 0;
+
+	/* keyboard state */
+	int m_key_data[9]{};
+	int m_key_shift = 0;
+
+	/* floppy state */
+	int m_motor0 = 0;
+	int m_motor1 = 0;
+};
 
 void bw12_state::floppy_motor_on_off()
 {
 	if (m_motor0 || m_motor1)
 	{
-		m_motor_on = 1;
+		m_pia->pa3_w(1);
 		m_floppy[0]->mon_w(0);
 		m_floppy[1]->mon_w(0);
 		m_floppy_timer->adjust(attotime::never);
@@ -93,7 +159,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bw12_state::floppy_motor_off_tick)
 	m_floppy[0]->mon_w(1);
 	m_floppy[1]->mon_w(1);
 
-	m_motor_on = 0;
+	m_pia->pa3_w(0);
 }
 
 void bw12_state::ls138_a0_w(int state)
@@ -106,10 +172,6 @@ void bw12_state::ls138_a1_w(int state)
 {
 	m_curbank = (state << 1) | (m_curbank & 0x01);
 	bankswitch();
-}
-
-void bw12_state::init_w(int state)
-{
 }
 
 void bw12_state::motor0_w(int state)
@@ -136,9 +198,20 @@ uint8_t bw12_state::ls259_r(offs_t offset)
 
 void bw12_state::bw12_mem(address_map &map)
 {
-	map(0x0000, 0x7fff).bankrw("bank");
+	map(0x0000, 0x7fff).view(m_view);
+	m_view[0](0x0000, 0x0fff).mirror(0x7000).rom().region(Z80_TAG, 0);
+	m_view[1](0x0000, 0x7fff).ram();
+	m_view[2](0x0000, 0x7fff).noprw();
+	m_view[3](0x0000, 0x7fff).noprw();
 	map(0x8000, 0xf7ff).ram();
-	map(0xf800, 0xffff).ram().share("video_ram");
+	map(0xf800, 0xffff).ram().share(m_video_ram);
+}
+
+void bw12_state::bw14_mem(address_map &map)
+{
+	bw12_mem(map);
+	m_view[2](0x0000, 0x7fff).ram();
+	m_view[3](0x0000, 0x7fff).ram();
 }
 
 void bw12_state::bw12_io(address_map &map)
@@ -234,16 +307,16 @@ static INPUT_PORTS_START( bw12 )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("F6") PORT_CODE(KEYCODE_F6) PORT_CHAR(UCHAR_MAMEKEY(F6))
 
 	PORT_START("X4")
-	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_LEFT) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_RIGHT) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xe2\x86\x90") PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xe2\x86\x92") PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BS") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('@') PORT_CHAR('\\')
 	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_UP) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME(UTF8_DOWN) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xe2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("\xe2\x86\x93") PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 
 	PORT_START("X5")
 	PORT_BIT( 0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD)
@@ -293,9 +366,11 @@ static INPUT_PORTS_START( bw12 )
 	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 4") PORT_CODE(KEYCODE_4_PAD)
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Keypad 5") PORT_CODE(KEYCODE_5_PAD)
 
-	PORT_START("MODIFIERS")
+	PORT_START("SHIFT")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	
+	PORT_START("CTRL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 INPUT_PORTS_END
 
 /* Video */
@@ -306,9 +381,9 @@ MC6845_UPDATE_ROW( bw12_state::crtc_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		uint8_t const code = m_video_ram[((ma + column) & BW12_VIDEORAM_MASK)];
+		uint8_t const code = m_video_ram[((ma + column) & 0x7ff)];
 		uint16_t const addr = code << 4 | (ra & 0x0f);
-		uint8_t data = m_char_rom->base()[addr & BW12_CHARROM_MASK];
+		uint8_t data = m_char_rom->base()[addr & 0xfff];
 
 		if (column == cursor_x)
 		{
@@ -327,54 +402,7 @@ MC6845_UPDATE_ROW( bw12_state::crtc_update_row )
 	}
 }
 
-
 /* PIA6821 Interface */
-
-void bw12_state::write_centronics_busy(int state)
-{
-	m_centronics_busy = state;
-}
-
-void bw12_state::write_centronics_fault(int state)
-{
-	m_centronics_fault = state;
-}
-
-void bw12_state::write_centronics_perror(int state)
-{
-	m_centronics_perror = state;
-}
-
-uint8_t bw12_state::pia_pa_r()
-{
-	/*
-
-	    bit     description
-
-	    PA0     Input from Centronics BUSY status
-	    PA1     Input from Centronics ERROR status
-	    PA2     Input from Centronics PAPER OUT status
-	    PA3     Input from FDC MOTOR
-	    PA4     Input from PIT OUT2
-	    PA5     Input from keyboard strobe
-	    PA6     Input from keyboard serial data
-	    PA7     Input from FDC interrupt
-
-	*/
-
-	uint8_t data = 0;
-
-	data |= m_centronics_busy;
-	data |= (m_centronics_fault << 1);
-	data |= (m_centronics_perror << 2);
-	data |= (m_motor_on << 3);
-	data |= (m_pit_out2 << 4);
-	data |= (m_key_stb << 5);
-	data |= (m_key_sin << 6);
-	data |= (m_fdc->get_irq() ? 1 : 0) << 7;
-
-	return data;
-}
 
 void bw12_state::pia_cb2_w(int state)
 {
@@ -385,34 +413,16 @@ void bw12_state::pia_cb2_w(int state)
 
 		if (m_key_shift < 9)
 		{
-			m_key_sin = m_key_data[m_key_shift];
+			m_pia->pa6_w(m_key_data[m_key_shift]);
 		}
 	}
 }
 
-/* PIT8253 Interface */
-
-void bw12_state::pit_out2_w(int state)
-{
-	m_pit_out2 = state;
-}
-
 /* AY-5-3600-PRO-002 Interface */
-
-int bw12_state::ay3600_shift_r()
-{
-	return BIT(m_modifiers->read(), 0);
-}
-
-int bw12_state::ay3600_control_r()
-{
-	return BIT(m_modifiers->read(), 1);
-}
 
 void bw12_state::ay3600_data_ready_w(int state)
 {
-	m_key_stb = state;
-
+	m_pia->pa5_w(state);
 	m_pia->cb1_w(state);
 
 	if (state)
@@ -430,7 +440,7 @@ void bw12_state::ay3600_data_ready_w(int state)
 		m_key_data[8] = BIT(data, 8);
 
 		m_key_shift = 0;
-		m_key_sin = m_key_data[m_key_shift];
+		m_pia->pa6_w(m_key_data[m_key_shift]);
 	}
 }
 
@@ -438,31 +448,13 @@ void bw12_state::ay3600_data_ready_w(int state)
 
 void bw12_state::machine_start()
 {
-	/* setup memory banking */
-	m_bank->configure_entry(0, m_rom->base());
-	m_bank->configure_entry(1, m_ram->pointer());
-	m_bank->configure_entries(2, 2, m_ram->pointer() + 0x10000, 0x8000);
-
 	/* register for state saving */
 	save_item(NAME(m_curbank));
-	save_item(NAME(m_pit_out2));
 	save_item(NAME(m_key_data));
-	save_item(NAME(m_key_sin));
-	save_item(NAME(m_key_stb));
-	save_item(NAME(m_key_shift));
-	save_item(NAME(m_motor_on));
 	save_item(NAME(m_motor0));
 	save_item(NAME(m_motor1));
-	save_item(NAME(m_centronics_busy));
-	save_item(NAME(m_centronics_fault));
-	save_item(NAME(m_centronics_perror));
-	machine().save().register_postload(save_prepost_delegate(FUNC(bw12_state::bankswitch), this));
-}
 
-void bw12_state::machine_reset()
-{
-	m_key_stb = 0;
-	m_key_shift = 0;
+	machine().save().register_postload(save_prepost_delegate(FUNC(bw12_state::bankswitch), this));
 }
 
 static void bw12_floppies(device_slot_interface &device)
@@ -511,15 +503,17 @@ GFXDECODE_END
 void bw12_state::common(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, 16_MHz_XTAL / 4);
+	Z80(config, m_maincpu, XTAL(16'000'000)/4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bw12_state::bw12_mem);
 	m_maincpu->set_addrmap(AS_IO, &bw12_state::bw12_io);
+
+	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	LS259(config, m_latch); // IC18
 	m_latch->q_out_cb<0>().set(FUNC(bw12_state::ls138_a0_w)); // LS138 A0
 	m_latch->q_out_cb<1>().set(FUNC(bw12_state::ls138_a1_w)); // LS138 A1
 	// Q2 not connected
-	m_latch->q_out_cb<3>().set(FUNC(bw12_state::init_w)); // _INIT
+	m_latch->q_out_cb<3>().set(m_centronics, FUNC(centronics_device::write_init));
 	m_latch->q_out_cb<4>().set_output("led0"); // CAP LOCK
 	m_latch->q_out_cb<5>().set(FUNC(bw12_state::motor0_w)); // MOTOR 0
 	m_latch->q_out_cb<6>().set(FUNC(bw12_state::motor1_w)); // MOTOR 1
@@ -527,16 +521,13 @@ void bw12_state::common(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER, rgb_t::amber()));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
+	screen.set_raw(XTAL(16'000'000), 904, 0, 640, 271, 0, 225);
 	screen.set_screen_update(MC6845_TAG, FUNC(mc6845_device::screen_update));
-	screen.set_size(640, 200);
-	screen.set_visarea(0, 640-1, 0, 200-1);
 
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_bw12);
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
-	MC6845(config, m_crtc, 16_MHz_XTAL / 8);
+	MC6845(config, m_crtc, XTAL(16'000'000)/8);
 	m_crtc->set_screen(SCREEN_TAG);
 	m_crtc->set_show_border_area(true);
 	m_crtc->set_char_width(8);
@@ -548,35 +539,35 @@ void bw12_state::common(machine_config &config)
 
 	/* devices */
 	TIMER(config, FLOPPY_TIMER_TAG).configure_generic(FUNC(bw12_state::floppy_motor_off_tick));
-	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, false, true);
+	UPD765A(config, m_fdc, XTAL(16'000'000)/4, false, true);
+	m_fdc->intrq_wr_callback().set(m_pia, FUNC(pia6821_device::pa7_w));
 
 	PIA6821(config, m_pia);
-	m_pia->readpa_handler().set(FUNC(bw12_state::pia_pa_r));
 	m_pia->writepb_handler().set("cent_data_out", FUNC(output_latch_device::write));
 	m_pia->ca2_handler().set(CENTRONICS_TAG, FUNC(centronics_device::write_strobe));
 	m_pia->cb2_handler().set(FUNC(bw12_state::pia_cb2_w));
-	m_pia->irqa_handler().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
-	m_pia->irqb_handler().set_inputline(Z80_TAG, INPUT_LINE_IRQ0);
+	m_pia->irqa_handler().set("irqs", FUNC(input_merger_device::in_w<0>));
+	m_pia->irqb_handler().set("irqs", FUNC(input_merger_device::in_w<1>));
 
-	Z80SIO(config, m_sio, 16_MHz_XTAL / 4); // SIO/0
+	Z80SIO(config, m_sio, XTAL(16'000'000)/4); // SIO/0
 	m_sio->out_txda_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtra_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsa_callback().set(RS232_A_TAG, FUNC(rs232_port_device::write_rts));
 	m_sio->out_txdb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
 	m_sio->out_dtrb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_dtr));
 	m_sio->out_rtsb_callback().set(RS232_B_TAG, FUNC(rs232_port_device::write_rts));
-	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_sio->out_int_callback().set("irqs", FUNC(input_merger_device::in_w<2>));
 
 	PIT8253(config, m_pit);
-	m_pit->set_clk<0>(1.8432_MHz_XTAL);
+	m_pit->set_clk<0>(XTAL(1'843'200));
 	m_pit->out_handler<0>().set(m_sio, FUNC(z80sio_device::rxca_w));
 	m_pit->out_handler<0>().append(m_sio, FUNC(z80sio_device::txca_w));
 	m_pit->out_handler<0>().append(RS232_A_TAG, FUNC(rs232_port_device::write_etc));
-	m_pit->set_clk<1>(1.8432_MHz_XTAL);
+	m_pit->set_clk<1>(XTAL(1'843'200));
 	m_pit->out_handler<1>().set(m_sio, FUNC(z80sio_device::rxtxcb_w));
 	m_pit->out_handler<1>().append(RS232_B_TAG, FUNC(rs232_port_device::write_etc));
-	m_pit->set_clk<2>(1.8432_MHz_XTAL);
-	m_pit->out_handler<2>().set(FUNC(bw12_state::pit_out2_w));
+	m_pit->set_clk<2>(XTAL(1'843'200));
+	m_pit->out_handler<2>().set(m_pia, FUNC(pia6821_device::pa4_w));
 
 	AY3600(config, m_kbc, 0);
 	m_kbc->x0().set_ioport("X0");
@@ -588,8 +579,8 @@ void bw12_state::common(machine_config &config)
 	m_kbc->x6().set_ioport("X6");
 	m_kbc->x7().set_ioport("X7");
 	m_kbc->x8().set_ioport("X8");
-	m_kbc->shift().set(FUNC(bw12_state::ay3600_shift_r));
-	m_kbc->control().set(FUNC(bw12_state::ay3600_control_r));
+	m_kbc->shift().set_ioport("SHIFT");
+	m_kbc->control().set_ioport("CTRL");
 	m_kbc->data_ready().set(FUNC(bw12_state::ay3600_data_ready_w));
 
 	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
@@ -605,9 +596,9 @@ void bw12_state::common(machine_config &config)
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_pia, FUNC(pia6821_device::ca1_w));
-	m_centronics->busy_handler().set(FUNC(bw12_state::write_centronics_busy));
-	m_centronics->fault_handler().set(FUNC(bw12_state::write_centronics_fault));
-	m_centronics->perror_handler().set(FUNC(bw12_state::write_centronics_perror));
+	m_centronics->busy_handler().set(m_pia, FUNC(pia6821_device::pa0_w));
+	m_centronics->fault_handler().set(m_pia, FUNC(pia6821_device::pa1_w));
+	m_centronics->perror_handler().set(m_pia, FUNC(pia6821_device::pa2_w));
 
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
@@ -616,50 +607,50 @@ void bw12_state::common(machine_config &config)
 void bw12_state::bw12(machine_config &config)
 {
 	common(config);
+
 	/* floppy drives */
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", bw12_floppies, "525dd", bw12_state::bw12_floppy_formats).enable_sound(true);
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("bw12");
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("64K");
 }
 
 void bw12_state::bw14(machine_config &config)
 {
 	common(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &bw12_state::bw14_mem);
+
 	/* floppy drives */
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats);
-	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":1", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, UPD765_TAG ":2", bw14_floppies, "525dd", bw12_state::bw14_floppy_formats).enable_sound(true);
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("bw14");
-
-	/* internal ram */
-	RAM(config, RAM_TAG).set_default_size("128K");
-	}
+}
 
 /* ROMs */
 
 ROM_START( bw12 )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_LOAD( "bw14boot.ic41", 0x0000, 0x1000, CRC(782fe341) SHA1(eefe5ad6b1ef77a1caf0af743b74de5fa1c4c19d) )
 
 	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "bw14char.ic1",  0x0000, 0x1000, CRC(f9dd68b5) SHA1(50132b759a6d84c22c387c39c0f57535cd380411) )
+	ROM_LOAD( "bw14char.ic1", 0x0000, 0x1000, CRC(f9dd68b5) SHA1(50132b759a6d84c22c387c39c0f57535cd380411) )
 ROM_END
 
 #define rom_bw14 rom_bw12
 
 ROM_START( bw14d )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x1000, Z80_TAG, 0 )
 	ROM_LOAD( "bw14boot.ic41", 0x0000, 0x1000, CRC(782fe341) SHA1(eefe5ad6b1ef77a1caf0af743b74de5fa1c4c19d) )
 
 	ROM_REGION(0x1000, "chargen", 0)
-	ROM_LOAD( "gcrd.bin",  0x0000, 0x1000, CRC(638f3e1d) SHA1(5a0b2f47c66fe8db6f58d348ac29074a4db51258) )
+	ROM_LOAD( "gcrd.bin", 0x0000, 0x1000, CRC(638f3e1d) SHA1(5a0b2f47c66fe8db6f58d348ac29074a4db51258) )
 ROM_END
+
+} // anonymous namespace
 
 /* System Drivers */
 

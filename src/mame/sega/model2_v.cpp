@@ -50,10 +50,10 @@
     previous polygon that had that same z value:
 
         z-value index   linked list of polygons
-            0000        triangle3->triangle2->triangle1
-            0001        triangle22->triangle8->triangle7
+            0000        polygon3->polygon2->polygon1
+            0001        polygon22->polygon8->polygon7
             ....
-            FFFF        triangle33->triangle11->triangle9
+            FFFF        polygon33->polygon11->polygon9
 
     As we add polygons to the array, we also keep track of the minimum and maximum z-value indexes seen this frame.
     When it's time to render, we start and the max z-value seen, and iterate through the array going down to the minimum
@@ -280,13 +280,13 @@ void model2_state::raster_init(memory_region *texture_rom)
 
 	save_item(NAME(m_raster->min_z));
 	save_item(NAME(m_raster->max_z));
-//  save_item(NAME(m_raster->tri_list));
-	save_item(NAME(m_raster->tri_list_index));
+//  save_item(NAME(m_raster->poly_list));
+	save_item(NAME(m_raster->poly_list_index));
 	save_item(NAME(m_raster->command_buffer));
 	save_item(NAME(m_raster->command_index));
 	save_item(NAME(m_raster->cur_command));
 	save_item(NAME(m_raster->master_z_clip));
-	save_item(NAME(m_raster->triangle_z));
+	save_item(NAME(m_raster->polygon_z));
 	save_item(NAME(m_raster->z_adjust));
 	save_item(NAME(m_raster->reverse));
 	save_item(NAME(m_raster->viewport));
@@ -311,9 +311,9 @@ void model2_state::model2_3d_zclip_w(u32 data)
 // TODO: only Sky Target seems to use this for unknown purpose
 u32 model2_state::polygon_count_r()
 {
-//  printf("%08x\n",m_raster->tri_list_index);
+//  printf("%08x\n",m_raster->poly_list_index);
 
-	return m_raster->tri_list_index;
+	return m_raster->poly_list_index;
 }
 
 /*******************************************
@@ -420,21 +420,21 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 	/* update the address */
 	raster->command_buffer[1] += tho * 4;
 
-	/* set the luma value of this quad */
+	/* set the luma value of this polygon */
 	object.luma = (raster->command_buffer[9] >> 15) & 0xff;
 
-	/* set the texture LOD of this quad */
+	/* set the texture LOD of this polygon */
 	object.texlod = ((raster->command_buffer[10] >> 8) & 0x7f80) - 0x3f80;
 	object.texlod += raster->log_ram[raster->command_buffer[10] & 0x7fff];
 
-	/* determine whether we can cull this quad */
+	/* determine whether we can cull this polygon */
 	cull = check_culling(raster,attr,min_z,max_z);
 
 	/* set the object's z value */
 	switch ((attr >> 10) & 3)
 	{
 		case 0: // old value
-			zvalue = raster->triangle_z;
+			zvalue = raster->polygon_z;
 			break;
 		case 1: // min z
 			zvalue = min_z;
@@ -448,12 +448,12 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 			break;
 	}
 
-	raster->triangle_z = zvalue;
+	raster->polygon_z = zvalue;
 
 	if (cull == false)
 	{
 		int32_t clipped_verts;
-		poly_vertex verts_in[10], verts_out[10];
+		poly_vertex verts_in[8], verts_out[8];
 
 		for (int i = 0; i < NumVerts; i++)
 			verts_in[i] = object.v[i];
@@ -470,57 +470,53 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 
 		if (clipped_verts > 2)
 		{
-			triangle *ztri;
+			polygon *zpoly;
 
 			/* adjust and set the object z-sort value */
 			object.z = float_to_zval(zvalue, raster->z_adjust);
 
-			/* get our list read to add the triangles */
-			ztri = raster->tri_sorted_list[object.z];
+			/* get our list read to add the polygons */
+			zpoly = raster->poly_sorted_list[object.z];
 
-			/* go through the clipped vertex list, adding triangles */
-			for (i = 2; i < clipped_verts; i++)
+			/* go through the clipped vertex list, adding polygons */
+			polygon *poly = &raster->poly_list[raster->poly_list_index++];
+
+			if (raster->poly_list_index >= MAX_POLYGONS)
 			{
-				triangle    *tri;
-
-				tri = &raster->tri_list[raster->tri_list_index++];
-
-				if (raster->tri_list_index >= MAX_TRIANGLES)
-				{
-					fatalerror("SEGA 3D: Max triangle limit exceeded\n");
-				}
-
-				/* copy the object information */
-				tri->z = object.z;
-				tri->texheader[0] = object.texheader[0];
-				tri->texheader[1] = object.texheader[1];
-				tri->texheader[2] = object.texheader[2];
-				tri->texheader[3] = object.texheader[3];
-				tri->luma = object.luma;
-				tri->texlod = object.texlod;
-
-				/* set the viewport */
-				tri->viewport[0] = raster->viewport[0];
-				tri->viewport[1] = raster->viewport[1];
-				tri->viewport[2] = raster->viewport[2];
-				tri->viewport[3] = raster->viewport[3];
-
-				/* set the center */
-				tri->center[0] = raster->center[raster->center_sel][0];
-				tri->center[1] = raster->center[raster->center_sel][1];
-
-				/* set the window */
-				tri->window = raster->cur_window;
-
-				memcpy(&tri->v[0], &verts_out[0], sizeof(poly_vertex));
-				memcpy(&tri->v[1], &verts_out[i-1], sizeof(poly_vertex));
-				memcpy(&tri->v[2], &verts_out[i], sizeof(poly_vertex));
-
-				/* add to our sorted list */
-				raster->tri_sorted_list[object.z] = tri;
-				tri->next = ztri;
-				ztri = tri;
+				fatalerror("SEGA 3D: Max polygon limit exceeded\n");
 			}
+
+			/* copy the object information */
+			poly->z = object.z;
+			poly->texheader[0] = object.texheader[0];
+			poly->texheader[1] = object.texheader[1];
+			poly->texheader[2] = object.texheader[2];
+			poly->texheader[3] = object.texheader[3];
+			poly->luma = object.luma;
+			poly->texlod = object.texlod;
+
+			/* set the viewport */
+			poly->viewport[0] = raster->viewport[0];
+			poly->viewport[1] = raster->viewport[1];
+			poly->viewport[2] = raster->viewport[2];
+			poly->viewport[3] = raster->viewport[3];
+
+			/* set the center */
+			poly->center[0] = raster->center[raster->center_sel][0];
+			poly->center[1] = raster->center[raster->center_sel][1];
+
+			/* set the window */
+			poly->window = raster->cur_window;
+
+			poly->num_vertices = clipped_verts;
+
+			for (int i = 0; i < clipped_verts; i++)
+				poly->v[i] = verts_out[i];
+
+			/* add to our sorted list */
+			raster->poly_sorted_list[object.z] = poly;
+			poly->next = zpoly;
+			zpoly = poly;
 
 			/* keep around the min and max z values for this frame */
 			if (object.z < raster->min_z) raster->min_z = object.z;
@@ -562,60 +558,63 @@ void model2_state::model2_3d_process_polygon(raster_state *raster, u32 attr)
 
 /***********************************************************************************************/
 
-void model2_renderer::model2_3d_render(triangle *tri, const rectangle &cliprect)
+void model2_renderer::model2_3d_render(polygon *poly, const rectangle &cliprect)
 {
-	model2_renderer *poly = m_state.m_poly.get();
-	m2_poly_extra_data& extra = poly->object_data().next();
-	u8 renderer;
+	m2_poly_extra_data& extra = object_data().next();
 
 	/* select renderer based on attributes (bit14 = textured, bit13 = transparent) */
-	renderer = (tri->texheader[0] >> 13) & 3;
+	u8 renderer = (poly->texheader[0] >> 13) & 3;
 
 	/* calculate and clip to viewport */
-	rectangle vp(tri->viewport[0] + m_xoffs, tri->viewport[2] + m_xoffs, (384-tri->viewport[3]) + m_yoffs, (384-tri->viewport[1]) + m_yoffs);
+	rectangle vp(poly->viewport[0] + m_xoffs, poly->viewport[2] + m_xoffs, (384-poly->viewport[3]) + m_yoffs, (384-poly->viewport[1]) + m_yoffs);
 	vp &= cliprect;
 
 	extra.state = &m_state;
-	extra.checker = (tri->texheader[0] >> 15) & 1;
-	extra.lumabase = (tri->texheader[1] & 0xff) << 7;
-	extra.colorbase = (tri->texheader[3] >> 6) & 0x3ff;
-	extra.luma = tri->luma;
-	extra.texlod = tri->texlod;
+	extra.checker = (poly->texheader[0] >> 15) & 1;
+	extra.lumabase = (poly->texheader[1] & 0xff) << 7;
+	extra.colorbase = (poly->texheader[3] >> 6) & 0x3ff;
+	extra.luma = poly->luma;
+	extra.texlod = poly->texlod;
 
 	if (renderer & 2)
 	{
-		extra.texmirrorx = (tri->texheader[0] >> 8) & 1;
-		extra.texmirrory = (tri->texheader[0] >> 9) & 1;
+		extra.texmirrorx = (poly->texheader[0] >> 8) & 1;
+		extra.texmirrory = (poly->texheader[0] >> 9) & 1;
 
 		// disable smooth wrapping if mirroring is enabled
-		extra.texwrapx = (tri->texheader[0] >> 6) & 1 & ~extra.texmirrorx;
-		extra.texwrapy = (tri->texheader[0] >> 7) & 1 & ~extra.texmirrory;
+		extra.texwrapx = (poly->texheader[0] >> 6) & 1 & ~extra.texmirrorx;
+		extra.texwrapy = (poly->texheader[0] >> 7) & 1 & ~extra.texmirrory;
 
-		extra.texsheet[0] = (tri->texheader[2] & 0x1000) ? m_state.m_textureram1 : m_state.m_textureram0;
-		extra.texsheet[1] = (tri->texheader[2] & 0x1000) ? m_state.m_textureram0 : m_state.m_textureram1;
-		extra.texwidth = 32 << ((tri->texheader[0] >> 0) & 0x7);
-		extra.texheight = 32 << ((tri->texheader[0] >> 3) & 0x7);
-		extra.texx = 32 * ((tri->texheader[2] >> 0) & 0x3f);
-		extra.texy = 32 * ((tri->texheader[2] >> 6) & 0x1f);
+		extra.texsheet[0] = (poly->texheader[2] & 0x1000) ? m_state.m_textureram1 : m_state.m_textureram0;
+		extra.texsheet[1] = (poly->texheader[2] & 0x1000) ? m_state.m_textureram0 : m_state.m_textureram1;
+		extra.texwidth = 32 << ((poly->texheader[0] >> 0) & 0x7);
+		extra.texheight = 32 << ((poly->texheader[0] >> 3) & 0x7);
+		extra.texx = 32 * ((poly->texheader[2] >> 0) & 0x3f);
+		extra.texy = 32 * ((poly->texheader[2] >> 6) & 0x1f);
 
 		// microtexture parameters
-		extra.utex = (tri->texheader[0] >> 12) & 1;
-		extra.utexminlod = (tri->texheader[0] >> 10) & 3;
-		extra.utexx = ((tri->texheader[2] >> 13) & 1) * 128;
-		extra.utexy = ((tri->texheader[2] >> 14) & 3) * 128;
+		extra.utex = (poly->texheader[0] >> 12) & 1;
+		extra.utexminlod = (poly->texheader[0] >> 10) & 3;
+		extra.utexx = ((poly->texheader[2] >> 13) & 1) * 128;
+		extra.utexy = ((poly->texheader[2] >> 14) & 3) * 128;
 
-		tri->v[0].pz = 1.0f / (tri->v[0].pz + std::numeric_limits<float>::min());
-		tri->v[0].pu = tri->v[0].pu * tri->v[0].pz * (1.0f / 8.0f);
-		tri->v[0].pv = tri->v[0].pv * tri->v[0].pz * (1.0f / 8.0f);
-		tri->v[1].pz = 1.0f / (tri->v[1].pz + std::numeric_limits<float>::min());
-		tri->v[1].pu = tri->v[1].pu * tri->v[1].pz * (1.0f / 8.0f);
-		tri->v[1].pv = tri->v[1].pv * tri->v[1].pz * (1.0f / 8.0f);
-		tri->v[2].pz = 1.0f / (tri->v[2].pz + std::numeric_limits<float>::min());
-		tri->v[2].pu = tri->v[2].pu * tri->v[2].pz * (1.0f / 8.0f);
-		tri->v[2].pv = tri->v[2].pv * tri->v[2].pz * (1.0f / 8.0f);
+		for (int i = 0; i < poly->num_vertices; i++)
+		{
+			poly->v[i].pz = 1.0f / (poly->v[i].pz + std::numeric_limits<float>::min());
+			poly->v[i].pu = poly->v[i].pu * poly->v[i].pz * (1.0f / 8.0f);
+			poly->v[i].pv = poly->v[i].pv * poly->v[i].pz * (1.0f / 8.0f);
+		}
 	}
 
-	render_triangle<3>(vp, m_render_callbacks[renderer], tri->v[0], tri->v[1], tri->v[2]);
+	switch (poly->num_vertices)
+	{
+	case 3: render_triangle<3>(vp, m_render_callbacks[renderer], poly->v[0], poly->v[1], poly->v[2]); break;
+	case 4: render_polygon<4, 3>(vp, m_render_callbacks[renderer], poly->v); break;
+	case 5: render_polygon<5, 3>(vp, m_render_callbacks[renderer], poly->v); break;
+	case 6: render_polygon<6, 3>(vp, m_render_callbacks[renderer], poly->v); break;
+	case 7: render_polygon<7, 3>(vp, m_render_callbacks[renderer], poly->v); break;
+	case 8: render_polygon<8, 3>(vp, m_render_callbacks[renderer], poly->v); break;
+	}
 }
 
 /*
@@ -641,26 +640,24 @@ void model2_state::horizontal_sync_w(u16 data)
 {
 	m_crtc_xoffset = 84 + (int16_t)data;
 //  printf("H %04x %d %d\n",data,(int16_t)data,m_crtc_xoffset);
-	m_poly->set_xoffset(m_crtc_xoffset);
+	m_renderer->set_xoffset(m_crtc_xoffset);
 }
 
 void model2_state::vertical_sync_w(u16 data)
 {
 	m_crtc_yoffset = 130 + (int16_t)data;
 //  printf("V %04x %d %d\n",data,(int16_t)data,m_crtc_yoffset);
-	m_poly->set_yoffset(m_crtc_yoffset);
+	m_renderer->set_yoffset(m_crtc_yoffset);
 }
 
-/* 3D Rasterizer projection: projects a triangle into screen coordinates */
-inline void model2_state::model2_3d_project(triangle *tri)
+/* 3D Rasterizer projection: projects a polygon into screen coordinates */
+inline void model2_state::model2_3d_project(polygon *poly)
 {
-	u16  i;
-
-	for (i = 0; i < 3; i++)
+	for (int i = 0; i < poly->num_vertices; i++)
 	{
 		/* project the vertices */
-		tri->v[i].x = m_crtc_xoffset + tri->center[0] + (tri->v[i].x / (tri->v[i].pz + std::numeric_limits<float>::min()));
-		tri->v[i].y = ((384 - tri->center[1])+m_crtc_yoffset) - (tri->v[i].y / (tri->v[i].pz + std::numeric_limits<float>::min()));
+		poly->v[i].x = m_crtc_xoffset + poly->center[0] + (poly->v[i].x / (poly->v[i].pz + std::numeric_limits<float>::min()));
+		poly->v[i].y = ((384 - poly->center[1])+m_crtc_yoffset) - (poly->v[i].y / (poly->v[i].pz + std::numeric_limits<float>::min()));
 	}
 }
 
@@ -669,20 +666,20 @@ void model2_state::render_frame_start()
 {
 	raster_state *raster = m_raster.get();
 
-	/* reset the triangle list index */
-	raster->tri_list_index = 0;
+	/* reset the polygon list index */
+	raster->poly_list_index = 0;
 
 	/* reset the sorted z list */
-	memset(raster->tri_sorted_list, 0, 0x10000 * sizeof(triangle *));
+	std::fill(std::begin(raster->poly_sorted_list), std::end(raster->poly_sorted_list), nullptr);
 
 	/* reset the min-max sortable Z values */
 	raster->min_z = 0xffff;
 	raster->max_z = 0;
 
-	/* reset the triangle z value */
+	/* reset the polygon z value */
 	// Zero Gunner sets backgrounds with "previous z value" mode at the start of the display list,
 	// needs this to be this big in order to work properly
-	raster->triangle_z = 1e10;
+	raster->polygon_z = 1e10;
 
 	raster->cur_window = 0;
 
@@ -697,16 +694,16 @@ void model2_state::render_polygons(bitmap_rgb32 &bitmap, const rectangle &clipre
 	// if the geometrizer hasn't presented a new frame, just copy the previous frame and bail
 	if (m_render_done)
 	{
-		copybitmap_trans(bitmap, m_poly->destmap(), 0, 0, 0, 0, cliprect, 0x00000000);
+		copybitmap_trans(bitmap, m_renderer->destmap(), 0, 0, 0, 0, cliprect, 0x00000000);
 		return;
 	}
 
 	/* if we have nothing to render, bail */
-	if (raster->tri_list_index == 0)
+	if (raster->poly_list_index == 0)
 		return;
 
-	m_poly->destmap().fill(0x00000000, cliprect);
-	m_poly->fillmap().fill(0x00, cliprect);
+	m_renderer->destmap().fill(0x00000000, cliprect);
+	m_renderer->fillmap().fill(0x00, cliprect);
 
 	for (int window = raster->cur_window; window >= 0; window--)
 	{
@@ -714,29 +711,29 @@ void model2_state::render_polygons(bitmap_rgb32 &bitmap, const rectangle &clipre
 		for (z = raster->min_z; z <= raster->max_z; z++)
 		{
 			/* see if we have items at this z level */
-			if (raster->tri_sorted_list[z] != nullptr)
+			if (raster->poly_sorted_list[z] != nullptr)
 			{
-				/* get a pointer to the first triangle */
-				triangle *tri = raster->tri_sorted_list[z];
+				/* get a pointer to the first polygon */
+				polygon *poly = raster->poly_sorted_list[z];
 
-				/* and loop clipping and rendering each triangle */
-				while (tri != nullptr)
+				/* and loop clipping and rendering each polygon */
+				while (poly != nullptr)
 				{
-					if (tri->window == window)
+					if (poly->window == window)
 					{
 						/* project and render */
-						model2_3d_project(tri);
-						m_poly->model2_3d_render(tri, cliprect);
+						model2_3d_project(poly);
+						m_renderer->model2_3d_render(poly, cliprect);
 					}
 
-					tri = (triangle *)tri->next;
+					poly = (polygon *)poly->next;
 				}
 			}
 		}
 	}
-	m_poly->wait("End of frame");
+	m_renderer->wait("End of frame");
 
-	copybitmap_trans(bitmap, m_poly->destmap(), 0, 0, 0, 0, cliprect, 0x00000000);
+	copybitmap_trans(bitmap, m_renderer->destmap(), 0, 0, 0, 0, cliprect, 0x00000000);
 
 	m_render_done = true;
 }
@@ -2370,7 +2367,7 @@ void model2_state::video_start()
 
 	m_sys24_bitmap.allocate(width, height+4);
 
-	m_poly = std::make_unique<model2_renderer>(*this);
+	m_renderer = std::make_unique<model2_renderer>(*this);
 
 	/* initialize the hardware rasterizer */
 	raster_init(memregion("textures"));
@@ -2450,37 +2447,4 @@ u32 model2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, con
 	copybitmap_trans(bitmap, m_sys24_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
-}
-
-// called from machine/model2.cpp trilist command
-// TODO: fix forward declaration mess and move this function there instead
-void model2_state::tri_list_dump(FILE *dst)
-{
-	u32 i;
-	for (i = 0; i < m_raster->tri_list_index; i++)
-	{
-		fprintf(dst, "index: %d\n", i);
-		fprintf(dst, "v0.x = %f, v0.y = %f, v0.z = %f\n", m_raster->tri_list[i].v[0].x, m_raster->tri_list[i].v[0].y, m_raster->tri_list[i].v[0].pz);
-		fprintf(dst, "v1.x = %f, v1.y = %f, v1.z = %f\n", m_raster->tri_list[i].v[1].x, m_raster->tri_list[i].v[1].y, m_raster->tri_list[i].v[1].pz);
-		fprintf(dst, "v2.x = %f, v2.y = %f, v2.z = %f\n", m_raster->tri_list[i].v[2].x, m_raster->tri_list[i].v[2].y, m_raster->tri_list[i].v[2].pz);
-
-		fprintf(dst, "tri z: %04x\n", m_raster->tri_list[i].z);
-		fprintf(dst, "texheader - 0: %04x\n", m_raster->tri_list[i].texheader[0]);
-		fprintf(dst, "texheader - 1: %04x\n", m_raster->tri_list[i].texheader[1]);
-		fprintf(dst, "texheader - 2: %04x\n", m_raster->tri_list[i].texheader[2]);
-		fprintf(dst, "texheader - 3: %04x\n", m_raster->tri_list[i].texheader[3]);
-		fprintf(dst, "luma: %02x\n", m_raster->tri_list[i].luma);
-		fprintf(dst, "texlod: %08x\n", m_raster->tri_list[i].texlod);
-		fprintf(dst, "vp.sx: %04x\n", m_raster->tri_list[i].viewport[0]);
-		fprintf(dst, "vp.sy: %04x\n", m_raster->tri_list[i].viewport[1]);
-		fprintf(dst, "vp.ex: %04x\n", m_raster->tri_list[i].viewport[2]);
-		fprintf(dst, "vp.ey: %04x\n", m_raster->tri_list[i].viewport[3]);
-		fprintf(dst, "vp.swx: %04x\n", m_raster->tri_list[i].center[0]);
-		fprintf(dst, "vp.swy: %04x\n", m_raster->tri_list[i].center[1]);
-		fprintf(dst, "\n---\n\n");
-	}
-
-	fprintf(dst, "min_z = %04x, max_z = %04x\n", m_raster->min_z, m_raster->max_z);
-
-	fclose(dst);
 }
