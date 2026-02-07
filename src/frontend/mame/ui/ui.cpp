@@ -838,11 +838,11 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 			// loop while we have a handler
 			while (m_handler_callback_type == ui_callback_type::MODAL && !machine().scheduled_event_pending() && !ui::menu::stack_has_special_main_menu(*this))
 			{
-				osd_sleep(osd_ticks_per_second() / 1000);
-
 				// don't update more than 60 times per second
 				if ((osd_ticks() - m_last_frame_update) > (osd_ticks_per_second() / screen_device::DEFAULT_FRAME_RATE))
 					machine().video().frame_update();
+				else
+					osd_sleep(osd_ticks_per_second() / 1000);
 			}
 		}
 
@@ -867,11 +867,11 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 		// loop while we have a handler
 		while (m_handler_callback_type != ui_callback_type::GENERAL && !machine().scheduled_event_pending())
 		{
-			osd_sleep(osd_ticks_per_second() / 1000);
-
 			// don't update more than 60 times per second
 			if ((osd_ticks() - m_last_frame_update) > (osd_ticks_per_second() / screen_device::DEFAULT_FRAME_RATE))
 				machine().video().frame_update();
+			else
+				osd_sleep(osd_ticks_per_second() / 1000);
 		}
 	}
 }
