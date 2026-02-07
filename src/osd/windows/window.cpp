@@ -226,6 +226,7 @@ win_window_info::win_window_info(
 	, m_resize_state(RESIZE_STATE_NORMAL)
 	, m_main(nullptr)
 	, m_attached_mode(false)
+	, m_cursor_clipped(false)
 	, m_pointer_mask(0)
 	, m_next_pointer(0)
 	, m_next_ptrdev(0)
@@ -253,11 +254,16 @@ void win_window_info::capture_pointer()
 	ClientToScreen(platform_window(), &reinterpret_cast<POINT *>(&bounds)[0]);
 	ClientToScreen(platform_window(), &reinterpret_cast<POINT *>(&bounds)[1]);
 	ClipCursor(&bounds);
+	m_cursor_clipped = true;
 }
 
 void win_window_info::release_pointer()
 {
-	ClipCursor(nullptr);
+	if (m_cursor_clipped)
+	{
+		ClipCursor(nullptr);
+		m_cursor_clipped = false;
+	}
 }
 
 void win_window_info::hide_pointer()
