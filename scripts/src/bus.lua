@@ -5377,6 +5377,8 @@ if BUSES["SPECTRUM"] then
 		MAME_DIR .. "src/devices/bus/spectrum/fuller.h",
 		MAME_DIR .. "src/devices/bus/spectrum/kempjoy.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/kempjoy.h",
+		MAME_DIR .. "src/devices/bus/spectrum/kempmouse.cpp",
+		MAME_DIR .. "src/devices/bus/spectrum/kempmouse.h",
 		MAME_DIR .. "src/devices/bus/spectrum/kempdisc.cpp",
 		MAME_DIR .. "src/devices/bus/spectrum/kempdisc.h",
 		MAME_DIR .. "src/devices/bus/spectrum/logitek.cpp",
