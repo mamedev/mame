@@ -650,7 +650,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  PADDLE,              N_p("input-name", "Paddle"),                 input_seq(MOUSECODE_X_INDEXED(0)), input_seq(KEYCODE_LEFT), input_seq(KEYCODE_RIGHT) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  PADDLE,              N_p("input-name", "Paddle 2"),               input_seq(MOUSECODE_X_INDEXED(1)), input_seq(KEYCODE_D), input_seq(KEYCODE_G) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  PADDLE,              N_p("input-name", "Paddle 3"),               input_seq(MOUSECODE_X_INDEXED(2)), input_seq(KEYCODE_J), input_seq(KEYCODE_L) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  PADDLE,              N_p("input-name", "Paddle 4"),               input_seq(MOUSECODE_X_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  PADDLE,              N_p("input-name", "Paddle 4"),               input_seq(MOUSECODE_X_INDEXED(3)), input_seq(KEYCODE_4_PAD), input_seq(KEYCODE_6_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  PADDLE,              N_p("input-name", "Paddle 5"),               input_seq(MOUSECODE_X_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  PADDLE,              N_p("input-name", "Paddle 6"),               input_seq(MOUSECODE_X_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  PADDLE,              N_p("input-name", "Paddle 7"),               input_seq(MOUSECODE_X_INDEXED(6)), input_seq(), input_seq() ) \
@@ -664,7 +664,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  PADDLE_V,            N_p("input-name", "Paddle V"),               input_seq(MOUSECODE_Y_INDEXED(0)), input_seq(KEYCODE_UP), input_seq(KEYCODE_DOWN) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  PADDLE_V,            N_p("input-name", "Paddle V 2"),             input_seq(MOUSECODE_Y_INDEXED(1)), input_seq(KEYCODE_R), input_seq(KEYCODE_F) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  PADDLE_V,            N_p("input-name", "Paddle V 3"),             input_seq(MOUSECODE_Y_INDEXED(2)), input_seq(KEYCODE_I), input_seq(KEYCODE_K) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  PADDLE_V,            N_p("input-name", "Paddle V 4"),             input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  PADDLE_V,            N_p("input-name", "Paddle V 4"),             input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(KEYCODE_8_PAD), input_seq(KEYCODE_2_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  PADDLE_V,            N_p("input-name", "Paddle V 5"),             input_seq(MOUSECODE_Y_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  PADDLE_V,            N_p("input-name", "Paddle V 6"),             input_seq(MOUSECODE_Y_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  PADDLE_V,            N_p("input-name", "Paddle V 7"),             input_seq(MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() ) \
@@ -678,7 +678,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  POSITIONAL,          N_p("input-name", "Positional"),             input_seq(MOUSECODE_X_INDEXED(0)), input_seq(KEYCODE_LEFT), input_seq(KEYCODE_RIGHT) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  POSITIONAL,          N_p("input-name", "Positional 2"),           input_seq(MOUSECODE_X_INDEXED(1)), input_seq(KEYCODE_D), input_seq(KEYCODE_G) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  POSITIONAL,          N_p("input-name", "Positional 3"),           input_seq(MOUSECODE_X_INDEXED(2)), input_seq(KEYCODE_J), input_seq(KEYCODE_L) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  POSITIONAL,          N_p("input-name", "Positional 4"),           input_seq(MOUSECODE_X_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  POSITIONAL,          N_p("input-name", "Positional 4"),           input_seq(MOUSECODE_X_INDEXED(3)), input_seq(KEYCODE_4_PAD), input_seq(KEYCODE_6_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  POSITIONAL,          N_p("input-name", "Positional 5"),           input_seq(MOUSECODE_X_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  POSITIONAL,          N_p("input-name", "Positional 6"),           input_seq(MOUSECODE_X_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  POSITIONAL,          N_p("input-name", "Positional 7"),           input_seq(MOUSECODE_X_INDEXED(6)), input_seq(), input_seq() ) \
@@ -692,7 +692,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  POSITIONAL_V,        N_p("input-name", "Positional V"),           input_seq(MOUSECODE_Y_INDEXED(0)), input_seq(KEYCODE_UP), input_seq(KEYCODE_DOWN) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  POSITIONAL_V,        N_p("input-name", "Positional V 2"),         input_seq(MOUSECODE_Y_INDEXED(1)), input_seq(KEYCODE_R), input_seq(KEYCODE_F) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  POSITIONAL_V,        N_p("input-name", "Positional V 3"),         input_seq(MOUSECODE_Y_INDEXED(2)), input_seq(KEYCODE_I), input_seq(KEYCODE_K) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  POSITIONAL_V,        N_p("input-name", "Positional V 4"),         input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  POSITIONAL_V,        N_p("input-name", "Positional V 4"),         input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(KEYCODE_8_PAD), input_seq(KEYCODE_2_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  POSITIONAL_V,        N_p("input-name", "Positional V 5"),         input_seq(MOUSECODE_Y_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  POSITIONAL_V,        N_p("input-name", "Positional V 6"),         input_seq(MOUSECODE_Y_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  POSITIONAL_V,        N_p("input-name", "Positional V 7"),         input_seq(MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() ) \
@@ -706,7 +706,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  DIAL,                N_p("input-name", "Dial"),                   input_seq(MOUSECODE_X_INDEXED(0)), input_seq(KEYCODE_LEFT), input_seq(KEYCODE_RIGHT) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  DIAL,                N_p("input-name", "Dial 2"),                 input_seq(MOUSECODE_X_INDEXED(1)), input_seq(KEYCODE_D), input_seq(KEYCODE_G) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  DIAL,                N_p("input-name", "Dial 3"),                 input_seq(MOUSECODE_X_INDEXED(2)), input_seq(KEYCODE_J), input_seq(KEYCODE_L) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  DIAL,                N_p("input-name", "Dial 4"),                 input_seq(MOUSECODE_X_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  DIAL,                N_p("input-name", "Dial 4"),                 input_seq(MOUSECODE_X_INDEXED(3)), input_seq(KEYCODE_4_PAD), input_seq(KEYCODE_6_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  DIAL,                N_p("input-name", "Dial 5"),                 input_seq(MOUSECODE_X_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  DIAL,                N_p("input-name", "Dial 6"),                 input_seq(MOUSECODE_X_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  DIAL,                N_p("input-name", "Dial 7"),                 input_seq(MOUSECODE_X_INDEXED(6)), input_seq(), input_seq() ) \
@@ -720,7 +720,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  DIAL_V,              N_p("input-name", "Dial V"),                 input_seq(MOUSECODE_Y_INDEXED(0)), input_seq(KEYCODE_UP), input_seq(KEYCODE_DOWN) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  DIAL_V,              N_p("input-name", "Dial V 2"),               input_seq(MOUSECODE_Y_INDEXED(1)), input_seq(KEYCODE_R), input_seq(KEYCODE_F) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  DIAL_V,              N_p("input-name", "Dial V 3"),               input_seq(MOUSECODE_Y_INDEXED(2)), input_seq(KEYCODE_I), input_seq(KEYCODE_K) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  DIAL_V,              N_p("input-name", "Dial V 4"),               input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  DIAL_V,              N_p("input-name", "Dial V 4"),               input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(KEYCODE_8_PAD), input_seq(KEYCODE_2_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  DIAL_V,              N_p("input-name", "Dial V 5"),               input_seq(MOUSECODE_Y_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  DIAL_V,              N_p("input-name", "Dial V 6"),               input_seq(MOUSECODE_Y_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  DIAL_V,              N_p("input-name", "Dial V 7"),               input_seq(MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() ) \
@@ -734,7 +734,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  TRACKBALL_X,         N_p("input-name", "Trackball X"),            input_seq(MOUSECODE_X_INDEXED(0)), input_seq(KEYCODE_LEFT), input_seq(KEYCODE_RIGHT) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  TRACKBALL_X,         N_p("input-name", "Trackball X 2"),          input_seq(MOUSECODE_X_INDEXED(1)), input_seq(KEYCODE_D), input_seq(KEYCODE_G) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  TRACKBALL_X,         N_p("input-name", "Trackball X 3"),          input_seq(MOUSECODE_X_INDEXED(2)), input_seq(KEYCODE_J), input_seq(KEYCODE_L) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  TRACKBALL_X,         N_p("input-name", "Trackball X 4"),          input_seq(MOUSECODE_X_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  TRACKBALL_X,         N_p("input-name", "Trackball X 4"),          input_seq(MOUSECODE_X_INDEXED(3)), input_seq(KEYCODE_4_PAD), input_seq(KEYCODE_6_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  TRACKBALL_X,         N_p("input-name", "Trackball X 5"),          input_seq(MOUSECODE_X_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  TRACKBALL_X,         N_p("input-name", "Trackball X 6"),          input_seq(MOUSECODE_X_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  TRACKBALL_X,         N_p("input-name", "Trackball X 7"),          input_seq(MOUSECODE_X_INDEXED(6)), input_seq(), input_seq() ) \
@@ -748,7 +748,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  TRACKBALL_Y,         N_p("input-name", "Trackball Y"),            input_seq(MOUSECODE_Y_INDEXED(0)), input_seq(KEYCODE_UP), input_seq(KEYCODE_DOWN) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 2"),          input_seq(MOUSECODE_Y_INDEXED(1)), input_seq(KEYCODE_R), input_seq(KEYCODE_F) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 3"),          input_seq(MOUSECODE_Y_INDEXED(2)), input_seq(KEYCODE_I), input_seq(KEYCODE_K) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 4"),          input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 4"),          input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(KEYCODE_8_PAD), input_seq(KEYCODE_2_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 5"),          input_seq(MOUSECODE_Y_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 6"),          input_seq(MOUSECODE_Y_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  TRACKBALL_Y,         N_p("input-name", "Trackball Y 7"),          input_seq(MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() ) \
@@ -762,7 +762,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  AD_STICK_X,          N_p("input-name", "AD Stick X"),             input_seq(MOUSECODE_X_INDEXED(0)), input_seq(KEYCODE_LEFT), input_seq(KEYCODE_RIGHT) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  AD_STICK_X,          N_p("input-name", "AD Stick X 2"),           input_seq(MOUSECODE_X_INDEXED(1)), input_seq(KEYCODE_D), input_seq(KEYCODE_G) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  AD_STICK_X,          N_p("input-name", "AD Stick X 3"),           input_seq(MOUSECODE_X_INDEXED(2)), input_seq(KEYCODE_J), input_seq(KEYCODE_L) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  AD_STICK_X,          N_p("input-name", "AD Stick X 4"),           input_seq(MOUSECODE_X_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  AD_STICK_X,          N_p("input-name", "AD Stick X 4"),           input_seq(MOUSECODE_X_INDEXED(3)), input_seq(KEYCODE_4_PAD), input_seq(KEYCODE_6_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  AD_STICK_X,          N_p("input-name", "AD Stick X 5"),           input_seq(MOUSECODE_X_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  AD_STICK_X,          N_p("input-name", "AD Stick X 6"),           input_seq(MOUSECODE_X_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  AD_STICK_X,          N_p("input-name", "AD Stick X 7"),           input_seq(MOUSECODE_X_INDEXED(6)), input_seq(), input_seq() ) \
@@ -776,7 +776,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  AD_STICK_Y,          N_p("input-name", "AD Stick Y"),             input_seq(MOUSECODE_Y_INDEXED(0)), input_seq(KEYCODE_UP), input_seq(KEYCODE_DOWN) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  AD_STICK_Y,          N_p("input-name", "AD Stick Y 2"),           input_seq(MOUSECODE_Y_INDEXED(1)), input_seq(KEYCODE_R), input_seq(KEYCODE_F) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  AD_STICK_Y,          N_p("input-name", "AD Stick Y 3"),           input_seq(MOUSECODE_Y_INDEXED(2)), input_seq(KEYCODE_I), input_seq(KEYCODE_K) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  AD_STICK_Y,          N_p("input-name", "AD Stick Y 4"),           input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  AD_STICK_Y,          N_p("input-name", "AD Stick Y 4"),           input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(KEYCODE_8_PAD), input_seq(KEYCODE_2_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  AD_STICK_Y,          N_p("input-name", "AD Stick Y 5"),           input_seq(MOUSECODE_Y_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  AD_STICK_Y,          N_p("input-name", "AD Stick Y 6"),           input_seq(MOUSECODE_Y_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  AD_STICK_Y,          N_p("input-name", "AD Stick Y 7"),           input_seq(MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() ) \
@@ -804,7 +804,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  LIGHTGUN_X,          N_p("input-name", "Lightgun X"),             input_seq(GUNCODE_X_INDEXED(0), input_seq::or_code, MOUSECODE_X_INDEXED(0)), input_seq(KEYCODE_LEFT), input_seq(KEYCODE_RIGHT) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  LIGHTGUN_X,          N_p("input-name", "Lightgun X 2"),           input_seq(GUNCODE_X_INDEXED(1), input_seq::or_code, MOUSECODE_X_INDEXED(1)), input_seq(KEYCODE_D), input_seq(KEYCODE_G) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  LIGHTGUN_X,          N_p("input-name", "Lightgun X 3"),           input_seq(GUNCODE_X_INDEXED(2), input_seq::or_code, MOUSECODE_X_INDEXED(2)), input_seq(KEYCODE_J), input_seq(KEYCODE_L) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  LIGHTGUN_X,          N_p("input-name", "Lightgun X 4"),           input_seq(GUNCODE_X_INDEXED(3), input_seq::or_code, MOUSECODE_X_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  LIGHTGUN_X,          N_p("input-name", "Lightgun X 4"),           input_seq(GUNCODE_X_INDEXED(3), input_seq::or_code, MOUSECODE_X_INDEXED(3)), input_seq(KEYCODE_4_PAD), input_seq(KEYCODE_6_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  LIGHTGUN_X,          N_p("input-name", "Lightgun X 5"),           input_seq(GUNCODE_X_INDEXED(4), input_seq::or_code, MOUSECODE_X_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  LIGHTGUN_X,          N_p("input-name", "Lightgun X 6"),           input_seq(GUNCODE_X_INDEXED(5), input_seq::or_code, MOUSECODE_X_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  LIGHTGUN_X,          N_p("input-name", "Lightgun X 7"),           input_seq(GUNCODE_X_INDEXED(6), input_seq::or_code, MOUSECODE_X_INDEXED(6)), input_seq(), input_seq() ) \
@@ -818,7 +818,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  LIGHTGUN_Y,          N_p("input-name", "Lightgun Y"),             input_seq(GUNCODE_Y_INDEXED(0), input_seq::or_code, MOUSECODE_Y_INDEXED(0)), input_seq(KEYCODE_UP), input_seq(KEYCODE_DOWN) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  LIGHTGUN_Y,          N_p("input-name", "Lightgun Y 2"),           input_seq(GUNCODE_Y_INDEXED(1), input_seq::or_code, MOUSECODE_Y_INDEXED(1)), input_seq(KEYCODE_R), input_seq(KEYCODE_F) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  LIGHTGUN_Y,          N_p("input-name", "Lightgun Y 3"),           input_seq(GUNCODE_Y_INDEXED(2), input_seq::or_code, MOUSECODE_Y_INDEXED(2)), input_seq(KEYCODE_I), input_seq(KEYCODE_K) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  LIGHTGUN_Y,          N_p("input-name", "Lightgun Y 4"),           input_seq(GUNCODE_Y_INDEXED(3), input_seq::or_code, MOUSECODE_Y_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  LIGHTGUN_Y,          N_p("input-name", "Lightgun Y 4"),           input_seq(GUNCODE_Y_INDEXED(3), input_seq::or_code, MOUSECODE_Y_INDEXED(3)), input_seq(KEYCODE_8_PAD), input_seq(KEYCODE_2_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  LIGHTGUN_Y,          N_p("input-name", "Lightgun Y 5"),           input_seq(GUNCODE_Y_INDEXED(4), input_seq::or_code, MOUSECODE_Y_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  LIGHTGUN_Y,          N_p("input-name", "Lightgun Y 6"),           input_seq(GUNCODE_Y_INDEXED(5), input_seq::or_code, MOUSECODE_Y_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  LIGHTGUN_Y,          N_p("input-name", "Lightgun Y 7"),           input_seq(GUNCODE_Y_INDEXED(6), input_seq::or_code, MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() ) \
@@ -832,7 +832,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  MOUSE_X,             N_p("input-name", "Mouse X"),                input_seq(MOUSECODE_X_INDEXED(0)), input_seq(KEYCODE_LEFT), input_seq(KEYCODE_RIGHT) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  MOUSE_X,             N_p("input-name", "Mouse X 2"),              input_seq(MOUSECODE_X_INDEXED(1)), input_seq(KEYCODE_D), input_seq(KEYCODE_G) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  MOUSE_X,             N_p("input-name", "Mouse X 3"),              input_seq(MOUSECODE_X_INDEXED(2)), input_seq(KEYCODE_J), input_seq(KEYCODE_L) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  MOUSE_X,             N_p("input-name", "Mouse X 4"),              input_seq(MOUSECODE_X_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  MOUSE_X,             N_p("input-name", "Mouse X 4"),              input_seq(MOUSECODE_X_INDEXED(3)), input_seq(KEYCODE_4_PAD), input_seq(KEYCODE_6_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  MOUSE_X,             N_p("input-name", "Mouse X 5"),              input_seq(MOUSECODE_X_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  MOUSE_X,             N_p("input-name", "Mouse X 6"),              input_seq(MOUSECODE_X_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  MOUSE_X,             N_p("input-name", "Mouse X 7"),              input_seq(MOUSECODE_X_INDEXED(6)), input_seq(), input_seq() ) \
@@ -846,7 +846,7 @@ namespace {
 		INPUT_PORT_ANALOG_TYPE(   1, PLAYER1,  MOUSE_Y,             N_p("input-name", "Mouse Y"),                input_seq(MOUSECODE_Y_INDEXED(0)), input_seq(KEYCODE_UP), input_seq(KEYCODE_DOWN) ) \
 		INPUT_PORT_ANALOG_TYPE(   2, PLAYER2,  MOUSE_Y,             N_p("input-name", "Mouse Y 2"),              input_seq(MOUSECODE_Y_INDEXED(1)), input_seq(KEYCODE_R), input_seq(KEYCODE_F) ) \
 		INPUT_PORT_ANALOG_TYPE(   3, PLAYER3,  MOUSE_Y,             N_p("input-name", "Mouse Y 3"),              input_seq(MOUSECODE_Y_INDEXED(2)), input_seq(KEYCODE_I), input_seq(KEYCODE_K) ) \
-		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  MOUSE_Y,             N_p("input-name", "Mouse Y 4"),              input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(), input_seq() ) \
+		INPUT_PORT_ANALOG_TYPE(   4, PLAYER4,  MOUSE_Y,             N_p("input-name", "Mouse Y 4"),              input_seq(MOUSECODE_Y_INDEXED(3)), input_seq(KEYCODE_8_PAD), input_seq(KEYCODE_2_PAD) ) \
 		INPUT_PORT_ANALOG_TYPE(   5, PLAYER5,  MOUSE_Y,             N_p("input-name", "Mouse Y 5"),              input_seq(MOUSECODE_Y_INDEXED(4)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   6, PLAYER6,  MOUSE_Y,             N_p("input-name", "Mouse Y 6"),              input_seq(MOUSECODE_Y_INDEXED(5)), input_seq(), input_seq() ) \
 		INPUT_PORT_ANALOG_TYPE(   7, PLAYER7,  MOUSE_Y,             N_p("input-name", "Mouse Y 7"),              input_seq(MOUSECODE_Y_INDEXED(6)), input_seq(), input_seq() ) \
