@@ -2,12 +2,9 @@
 // copyright-holders:Olivier Galibert, R. Belmont, Brad Hughes, Vas Crabb
 //============================================================
 //
-//  input_sdl.cpp - SDL 3 implementation of MAME input routines
+//  input_sdl3.cpp - SDL 3 implementation of MAME input routines
 //
 //  SDLMAME by Olivier Galibert and R. Belmont
-//
-//  SixAxis info: left analog is axes 0 & 1, right analog is axes 2 & 3,
-//                analog L2 is axis 12 and analog L3 is axis 13
 //
 //============================================================
 
@@ -577,7 +574,7 @@ public:
 		switch (event.type)
 		{
 		case SDL_EVENT_KEY_DOWN:
-			// TODO: when we add proper multi-keyboard support
+			// TODO: when we add proper multi-keyboard support.  Also below for the KEY_UP case.
 			if (1) // event.key.which == m_keyboard_id)
 			{
 				if (event.key.scancode == SDL_SCANCODE_CAPSLOCK)
@@ -588,7 +585,7 @@ public:
 			break;
 
 		case SDL_EVENT_KEY_UP:
-			if (event.key.which == m_keyboard_id)
+			if (1) // event.key.which == m_keyboard_id)
 			{
 #ifdef SDL_PLATFORM_APPLE
 				if (event.key.scancode == SDL_SCANCODE_CAPSLOCK)
