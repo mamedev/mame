@@ -447,6 +447,9 @@ superslv
 @source:adds/adds2020.cpp
 adds2020
 
+@source:adds/multivision.cpp
+multivision
+
 @source:adds/vp60.cpp
 vp60
 
