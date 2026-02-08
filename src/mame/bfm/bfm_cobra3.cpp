@@ -50,8 +50,8 @@ public:
 	std::unique_ptr<uint16_t[]> m_mainram;
 
 	void volume_control(uint8_t direction, uint8_t clock);
-	uint16_t bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask = ~0);
-	void bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t mem_r(offs_t offset, uint16_t mem_mask = ~0);
+	void mem_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -114,7 +114,7 @@ void bfm_cobra3_state::volume_control(uint8_t direction, uint8_t clock)
 	}
 }
 
-uint16_t bfm_cobra3_state::bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask)
+uint16_t bfm_cobra3_state::mem_r(offs_t offset, uint16_t mem_mask)
 {
 	int cs = m_maincpu->get_cs(offset * 2);
 
@@ -182,7 +182,7 @@ uint16_t bfm_cobra3_state::bfm_cobra3_mem_r(offs_t offset, uint16_t mem_mask)
 	return 0x0000;
 }
 
-void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void bfm_cobra3_state::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	int cs = m_maincpu->get_cs(offset * 2);
 
@@ -301,7 +301,7 @@ void bfm_cobra3_state::bfm_cobra3_mem_w(offs_t offset, uint16_t data, uint16_t m
 
 void bfm_cobra3_state::bfm_cobra3_map(address_map &map)
 {
-	map(0x00000000, 0xffffffff).rw(FUNC(bfm_cobra3_state::bfm_cobra3_mem_r), FUNC(bfm_cobra3_state::bfm_cobra3_mem_w));
+	map(0x00000000, 0xffffffff).rw(FUNC(bfm_cobra3_state::mem_r), FUNC(bfm_cobra3_state::mem_w));
 	map(0x00800000, 0x009fffff).m(m_scc66470, FUNC(scc66470_device::map)).cswidth(16);
 }
 
@@ -445,11 +445,9 @@ uint32_t bfm_cobra3_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 					*dest++ = m_palette->pen(*src++);
 				}
 			}
-			if(*src == 254)
-			{
-				// finally 32 pixels of mpeg border colour when it's mixed in
-			}
-			else
+			// TODO: MPEG image will write a border of 32 pixels of mpeg border colour here when it's mixed in, see above.
+
+			if(*src != 254)
 			{
 				std::fill_n(dest, 32, m_palette->pen(*src));
 			}
