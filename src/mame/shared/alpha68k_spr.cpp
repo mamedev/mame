@@ -47,7 +47,7 @@
 #include "emu.h"
 #include "alpha68k_spr.h"
 
-DEFINE_DEVICE_TYPE(ALPHA68K_SPR, alpha68k_sprite_device, "alpha68k_spr", "Alpha Denshi 68K Sprite system")
+DEFINE_DEVICE_TYPE(ALPHA68K_SPR, alpha68k_sprite_device, "alpha68k_spr", "Alpha Denshi 68K Sprite System")
 
 alpha68k_sprite_device::alpha68k_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ALPHA68K_SPR, tag, owner, clock)
