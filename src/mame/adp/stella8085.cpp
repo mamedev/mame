@@ -160,8 +160,8 @@ void stella8085_state::program_4109_map(address_map &map)
 void stella8085_state::io_4040_map(address_map &map)
 {
 	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
-	map(0x70, 0x73).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x80, 0x81).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x70, 0x73).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write)).mirror(0x0c);
+	map(0x80, 0x81).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write)).mirror(0x0e);
 	map(0x90, 0x9f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 }
 
@@ -169,13 +169,12 @@ void stella8085_state::io_4087_map(address_map &map)
 {
 	// ICF5 74LS42
 	map(0x00, 0x4f).noprw();
-	map(0x50, 0x5f).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
+	map(0x50, 0x51).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write)).mirror(0x0e);
 	map(0x60, 0x6f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 	// 7x handled by ICH5 74LS138
-	map(0x70, 0x70).rw(FUNC(stella8085_state::io70r),FUNC(stella8085_state::io70w));
-	map(0x71, 0x71).rw(FUNC(stella8085_state::io71r),FUNC(stella8085_state::io71w));
-	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
-	map(0x73, 0x7f).noprw();
+	map(0x70, 0x70).rw(FUNC(stella8085_state::io70r),FUNC(stella8085_state::io70w)).mirror(0x0c);
+	map(0x71, 0x71).rw(FUNC(stella8085_state::io71r),FUNC(stella8085_state::io71w)).mirror(0x0c);
+	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev)).mirror(0x0c);
 	map(0x80, 0x8f).noprw(); //Y8 ICC5 empty socket
 }
 
