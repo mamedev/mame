@@ -1951,7 +1951,6 @@ protected:
 
 	u32 m_main_irqcause;
 
-	bool m_odd_frame;
 	bool m_ctl_vbl_active;
 	u8 m_ctl_led;
 	u16 m_ctl_inp_buffer[2];
@@ -4961,7 +4960,6 @@ void namcos23_state::subcpu_irq1_update(int state)
 
 void namcos23_state::vblank(int state)
 {
-	m_odd_frame = !m_odd_frame;
 	if (state)
 	{
 		m_ctl_vbl_active = true;
@@ -5963,7 +5961,7 @@ u32 namcoss23_gmen_state::mips_sh2_unk_r(offs_t offset, u32 mem_mask)
 
 u32 namcoss23_gmen_state::sh2_vpxstate_r(offs_t offset, u32 mem_mask)
 {
-	//const u32 data = 0x01000000 | (m_odd_frame ? 0x00000100 : 0x00000000);
+	//const u32 data = 0x01000000 | (odd_frame ? 0x00000100 : 0x00000000);
 	const u32 data = m_sh2_unk;
 	LOGMASKED(LOG_SH2_VPX, "%s: sh2_vpxstate_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	return data;
@@ -6291,7 +6289,6 @@ void namcos23_state::machine_start()
 	save_item(NAME(m_jvs_sense));
 	save_item(NAME(m_main_irqcause));
 
-	save_item(NAME(m_odd_frame));
 	save_item(NAME(m_ctl_vbl_active));
 	save_item(NAME(m_ctl_led));
 	save_item(NAME(m_ctl_inp_buffer));
@@ -6422,7 +6419,6 @@ void namcos23_state::machine_reset()
 
 	m_jvs_sense = 1;
 	m_main_irqcause = 0;
-	m_odd_frame = false;
 	m_ctl_vbl_active = false;
 	m_ctl_led = 0;
 	m_ctl_inp_buffer[0] = m_ctl_inp_buffer[1] = 0;
