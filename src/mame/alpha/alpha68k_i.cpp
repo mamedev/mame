@@ -4,7 +4,7 @@
 
     SNK/Alpha 68000 I board based games
 
-    derived from alpha68k.cpp
+    derived from alpha/alpha68k.cpp
 
     TODO:
     - Both POST screens are X offset by a large margin,
@@ -98,14 +98,14 @@ void thenextspace_state::tnextspc_soundlatch_w(u8 data)
 
 void thenextspace_state::tnextspc_coin_counters_w(offs_t offset, u16 data)
 {
-	machine().bookkeeping().coin_counter_w(offset, data & 0x01);
+	machine().bookkeeping().coin_counter_w(offset, BIT(data, 0));
 }
 
 void thenextspace_state::tnextspc_unknown_w(offs_t offset, u16 data)
 {
-	logerror("tnextspc_unknown_w : PC = %04x - offset = %04x - data = %04x\n", m_maincpu->pc(), offset, data);
+	logerror("%s: tnextspc_unknown_w : offset = %04x - data = %04x\n", machine().describe_context(), offset, data);
 	if (offset == 0)
-		m_flipscreen = data & 0x100;
+		m_flipscreen = BIT(data, 8);
 }
 
 // TODO: check me
@@ -122,7 +122,7 @@ void paddlemania_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();                    // main program
 	map(0x080000, 0x083fff).ram();                    // work RAM
-	map(0x100000, 0x103fff).ram().share("spriteram"); // video RAM
+	map(0x100000, 0x103fff).ram().share(m_spriteram); // video RAM
 	map(0x180000, 0x180001).portr(m_in[3]).nopw();    // LSB: DSW0, MSB: watchdog(?)
 	map(0x180008, 0x180009).portr(m_in[4]);           // LSB: DSW1
 	map(0x300000, 0x300001).portr(m_in[0]);           // joy1, joy2
@@ -135,14 +135,14 @@ void thenextspace_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x070000, 0x073fff).ram();
-	map(0x0a0000, 0x0a3fff).ram().share("spriteram");
+	map(0x0a0000, 0x0a3fff).ram().share(m_spriteram);
 	map(0x0d0000, 0x0d0001).nopw(); // unknown write port (0)
-	map(0x0e0000, 0x0e0001).portr(m_p1);
-	map(0x0e0002, 0x0e0003).portr(m_p2);
+	map(0x0e0000, 0x0e0001).portr(m_io_p[0]);
+	map(0x0e0002, 0x0e0003).portr(m_io_p[1]);
 	map(0x0e0004, 0x0e0005).portr(m_system);
 	map(0x0e0006, 0x0e0007).nopw(); // unknown write port (0)
-	map(0x0e0008, 0x0e0009).portr(m_dsw1);
-	map(0x0e000a, 0x0e000b).portr(m_dsw2);
+	map(0x0e0008, 0x0e0009).portr(m_dsw[0]);
+	map(0x0e000a, 0x0e000b).portr(m_dsw[1]);
 	map(0x0e000e, 0x0e000f).nopw(); // unknown write port (0)
 	map(0x0e0018, 0x0e0019).r(FUNC(thenextspace_state::sound_cpu_r));
 	map(0x0f0000, 0x0f0001).w(FUNC(thenextspace_state::tnextspc_unknown_w));
@@ -197,7 +197,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( gfx_alpha68k_I )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,  0, 64 )
+	GFXDECODE_ENTRY( "sprites", 0, charlayout,  0, 64 )
 GFXDECODE_END
 
 
@@ -450,7 +450,7 @@ ROM_START( paddlema )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "padlem.18c", 0x000000, 0x10000, CRC(9269778d) SHA1(bdc9100827f2e018db943d9f7d81b7936c155bf0) )
 
-	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_REGION( 0x80000, "sprites", 0 )
 	ROM_LOAD16_BYTE( "padlem.9m",       0x00001, 0x10000, CRC(4ee4970d) SHA1(d57d9178129236dfb3a18688e8544e5e555ce559) )
 	ROM_LOAD16_BYTE( "padlem.16m",      0x00000, 0x10000, CRC(0984fb4d) SHA1(6bc529db93fad277f286e4a380812c40c7f42301) )
 	ROM_LOAD16_BYTE( "padlem.9n",       0x20001, 0x10000, CRC(a1756f15) SHA1(1220075e34c482e38eead9ea5e63b53b822e87de) )
@@ -482,7 +482,7 @@ ROM_START( tnextspc )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "ns_1.1", 0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) // Silkscreened "1" @ 18B
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "ns_5678.bin", 0x000000, 0x80000, CRC(22756451) SHA1(ce1d58a75ef4b09feb6fd9b3dd2de48b986070c0) ) // single mask ROM for gfx
 
 	ROM_REGION( 0x300, "proms", 0 )
@@ -506,7 +506,7 @@ ROM_START( tnextspc2 ) // two bootleg PCBs have been found with the same ROMs as
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "ns_1.1",    0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) // == b1.ic129
 
-	ROM_REGION( 0x080000, "gfx1", 0 ) // EPROMs, graphics are odd/even interleaved
+	ROM_REGION( 0x080000, "sprites", 0 ) // EPROMs, graphics are odd/even interleaved
 	ROM_LOAD16_BYTE( "b3.ic49",  0x00001, 0x10000, CRC(2bddf94d) SHA1(e064f48d0e3bb089753c1b59c863bb46bfa2bcee) )
 	ROM_LOAD16_BYTE( "b7.ic53",  0x00000, 0x10000, CRC(a8b13a9a) SHA1(2f808c17e97a272be14099c53b287e665dd90b14) )
 	ROM_LOAD16_BYTE( "b4.ic50",  0x20001, 0x10000, CRC(80c6c841) SHA1(ab0aa4cad6dcadae62f849e53c3c5cd909f77971) )
@@ -537,7 +537,7 @@ ROM_START( tnextspcj )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sound CPU
 	ROM_LOAD( "ns_1.1", 0x000000, 0x10000, CRC(fc26853c) SHA1(0118b048046a6125bba20dec081b936486eb1597) ) // Silkscreened "1" @ 18B
 
-	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_REGION( 0x080000, "sprites", 0 )
 	ROM_LOAD16_WORD_SWAP( "ns_5678.bin", 0x000000, 0x80000, CRC(22756451) SHA1(ce1d58a75ef4b09feb6fd9b3dd2de48b986070c0) ) // single mask ROM for gfx
 
 	ROM_REGION( 0x300, "proms", 0 )
@@ -555,14 +555,14 @@ ROM_END
 
 void paddlemania_state::init_paddlema()
 {
-	m_invert_controls = 0;
+	m_invert_controls = false;
 	m_microcontroller_id = 0;
 	m_game_id = 0;
 }
 
 void thenextspace_state::init_tnextspc()
 {
-	m_invert_controls = 0;
+	m_invert_controls = false;
 	m_microcontroller_id = 0x890a;
 	m_game_id = 0;
 }

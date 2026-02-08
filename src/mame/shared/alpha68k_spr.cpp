@@ -45,28 +45,27 @@
  */
 
 #include "emu.h"
-#include "snk68_spr.h"
+#include "alpha68k_spr.h"
 
-DEFINE_DEVICE_TYPE(SNK68_SPR, snk68_spr_device, "snk68_spr", "SNK68 Sprites")
+DEFINE_DEVICE_TYPE(ALPHA68K_SPR, alpha68k_sprite_device, "alpha68k_spr", "Alpha Denshi 68K Sprite System")
 
-snk68_spr_device::snk68_spr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SNK68_SPR, tag, owner, clock)
-	, m_newtilecb(*this, FUNC(snk68_spr_device::tile_callback_noindirect))
-	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
-	, m_spriteram(*this, "^spriteram")
-	, m_screen(*this, "^screen")
+alpha68k_sprite_device::alpha68k_sprite_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, ALPHA68K_SPR, tag, owner, clock)
+	, device_gfx_interface(mconfig, *this)
+	, device_video_interface(mconfig, *this)
+	, m_newtilecb(*this, FUNC(alpha68k_sprite_device::tile_callback_noindirect))
+	, m_spriteram(*this, finder_base::DUMMY_TAG)
 	, m_flipscreen(false)
-	, m_partialupdates(1)
+	, m_partialupdates(true)
 	, m_xpos_shift(0)
-	, m_color_entry_mask(0)
 {
 }
 
-void snk68_spr_device::tile_callback_noindirect(int &tile, int& fx, int& fy, int& region)
+void alpha68k_sprite_device::tile_callback_noindirect(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color)
 {
 }
 
-void snk68_spr_device::device_start()
+void alpha68k_sprite_device::device_start()
 {
 	save_item(NAME(m_flipscreen));
 
@@ -74,11 +73,11 @@ void snk68_spr_device::device_start()
 	m_newtilecb.resolve();
 }
 
-void snk68_spr_device::device_reset()
+void alpha68k_sprite_device::device_reset()
 {
 }
 
-u16 snk68_spr_device::spriteram_r(offs_t offset)
+u16 alpha68k_sprite_device::spriteram_r(offs_t offset)
 {
 	// streetsj expects the MSB of every 32-bit word to be FF. Presumably RAM
 	// exists only for 3 bytes out of 4 and the fourth is unmapped.
@@ -88,9 +87,9 @@ u16 snk68_spr_device::spriteram_r(offs_t offset)
 		return m_spriteram[offset];
 }
 
-void snk68_spr_device::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
+void alpha68k_sprite_device::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	uint16_t newword = m_spriteram[offset];
+	u16 newword = m_spriteram[offset];
 
 	if (!(offset & 1))
 		data |= 0xff00;
@@ -99,18 +98,18 @@ void snk68_spr_device::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 
 	if (m_spriteram[offset] != newword)
 	{
-		int vpos = m_screen->vpos();
+		int vpos = screen().vpos();
 
 		if (vpos > 0)
-			if (m_partialupdates) m_screen->update_partial(vpos - 1);
+			if (m_partialupdates) screen().update_partial(vpos - 1);
 
 		m_spriteram[offset] = newword;
 	}
 }
 
-void snk68_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int group, u16 start_offset, u16 end_offset)
+void alpha68k_sprite_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int group, u16 start_offset, u16 end_offset)
 {
-	const uint16_t* tiledata = &m_spriteram[0x800*group + start_offset];
+	const u16* tiledata = &m_spriteram[0x800*group + start_offset];
 
 	bool const flip = m_flipscreen;
 
@@ -142,17 +141,12 @@ void snk68_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 
 			if (my <= cliprect.max_y && my + 15 >= cliprect.min_y)
 			{
-				int color = *(tiledata++) & m_color_entry_mask;
-				int tile = *(tiledata++);
-				int fx = 0,fy = 0;
-				int region = 0;
+				u32 color = tiledata[0] & 0xff;
+				u32 tile = tiledata[1];
+				bool fx = false, fy = false;
+				u8 region = 0;
 
-				m_newtilecb(tile, fx, fy, region);
-
-				// the black touch '96 cloned hardware has some tiles
-				// as 8bpp, we need to shift the colour bits in those cases
-				int depth = m_gfxdecode->gfx(region)->depth();
-				if (depth == 256) color >>= 4;
+				m_newtilecb(tile, fx, fy, region, color);
 
 				if (flip)
 				{
@@ -160,16 +154,13 @@ void snk68_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 					fy = !fy;
 				}
 
-				m_gfxdecode->gfx(region)->transpen(bitmap,cliprect,
+				gfx(region)->transpen(bitmap,cliprect,
 						tile,
 						color,
 						fx, fy,
 						mx, my, 0);
 			}
-			else
-			{
-				tiledata += 2;
-			}
+			tiledata += 2;
 
 			if (flip)
 				my -= 16;
@@ -179,7 +170,7 @@ void snk68_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 	}
 }
 
-void snk68_spr_device::draw_sprites_all(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void alpha68k_sprite_device::draw_sprites_all(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* This appears to be the correct priority order */
 	draw_sprites(bitmap, cliprect, 2, 0, 0x800);
@@ -187,7 +178,7 @@ void snk68_spr_device::draw_sprites_all(bitmap_ind16 &bitmap, const rectangle &c
 	draw_sprites(bitmap, cliprect, 1, 0, 0x800);
 }
 
-void snk68_spr_device::draw_sprites_alt(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void alpha68k_sprite_device::draw_sprites_alt(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// TODO: alpha68k priority, different vram accessors? Special meaning of bit 0 for my variable?
 	draw_sprites(bitmap, cliprect, 1, 0x7c0, 0x800);
@@ -196,7 +187,7 @@ void snk68_spr_device::draw_sprites_alt(bitmap_ind16 &bitmap, const rectangle &c
 	draw_sprites(bitmap, cliprect, 1, 0x000, 0x7c0);
 }
 
-void snk68_spr_device::set_flip(bool flip)
+void alpha68k_sprite_device::set_flip(bool flip)
 {
 	m_flipscreen = flip;
 }
