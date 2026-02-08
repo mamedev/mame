@@ -24968,7 +24968,7 @@ boot OK
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment America</publisher>
 		<notes><![CDATA[
-boot OK, crashes at victory screen of first battle (MT #07057)
+boot OK, crashes at victory screen of first battle (MT07057)
 ]]></notes>
 		<info name="serial" value="SCUS-94421 / SCUS-94421"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
@@ -38590,6 +38590,7 @@ this image doesn't boot
 		<description>Seireiki RayBlade (Japan)</description>
 		<year>2000</year>
 		<publisher>Winky Soft</publisher>
+		<info name="alt_title" value="聖霊機ライブレード"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -56611,7 +56612,7 @@ boot OK
 		<year>2000</year>
 		<publisher>Bandai</publisher>
 		<notes><![CDATA[
-crashes after first FMV, MT #07365
+crashes after first FMV, MT07365
 ]]></notes>
 		<info name="serial" value="SLPS-02736" />
 		<info name="release" value="20000629" />

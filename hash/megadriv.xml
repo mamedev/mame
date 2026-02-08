@@ -11756,7 +11756,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<description>Alien Cat 2 (demo)</description>
 		<year>2020</year>
 		<publisher>PSCD Games</publisher>
-		<info name="release" value="20-08-2020" />
+		<info name="release" value="20200820" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="AlienCatDemo001.bin" size="1048576" crc="31d4c399" sha1="2e7e32ae7b11d1606d62d5be177772eafc015f36" />
@@ -11937,7 +11937,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<info name="language" value="English" />
 		<info name="language" value="French" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2020-03-04" />
+		<info name="release" value="20200304" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
 				<rom name="Arkagis Revolution - Trial Version (Rev 00).bin" size="786432" crc="c839231e" sha1="ad2e9e1dfc82f687b9bdb5b972a340990ea577f6" />
@@ -11953,7 +11953,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<info name="language" value="English" />
 		<info name="language" value="French" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2020-02-21" />
+		<info name="release" value="20200221" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
 				<rom name="Arkagis Revolution (World) (En,Fr,Es) (Prerelease) (2019-02-21) (Unl).bin" size="786432" crc="662c4a59" sha1="cf2b2478a018875309456bc84fae1cc55393a57e" />
@@ -11968,7 +11968,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<info name="developer" value="Sik" />
 		<info name="language" value="English" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2019-07-29" />
+		<info name="release" value="20190729" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
 				<rom name="Arkagis Revolution (World) (En,Es) (Prerelease) (2019-07-29) (Unl).bin" size="786432" crc="8b33e732" sha1="42392820a4a215b249891c56011dfdc8fa733dd5" />
@@ -11983,7 +11983,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<info name="developer" value="Sik" />
 		<info name="language" value="English" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2019-09-02" />
+		<info name="release" value="20190902" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
 				<rom name="Arkagis Revolution (World) (En,Es) (Prerelease) (2019-09-02) (Unl).bin" size="786432" crc="e4e7f232" sha1="fbd3a97fc2950c1fffbdb3142241697ce5933130" />
@@ -11998,7 +11998,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<info name="developer" value="Sik" />
 		<info name="language" value="English" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2019-09-16" />
+		<info name="release" value="20190916" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
 				<rom name="Arkagis Revolution (World) (En,Es) (Prerelease) (2019-09-16) (Unl).bin" size="786432" crc="53d271fd" sha1="6dfc4be845ca5488a7923f810556f1522b7682c6" />
@@ -12014,7 +12014,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<info name="language" value="English" />
 		<info name="language" value="French" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2019-11-28" />
+		<info name="release" value="20191128" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="786432">
 				<rom name="Arkagis Revolution (World) (En,Fr,Es) (Prerelease) (2019-11-28) (Unl).bin" size="786432" crc="980e247e" sha1="42f84dade57eead360dd4e4df949bfaf1415886c" />
@@ -12030,7 +12030,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<info name="language" value="English" />
 		<info name="language" value="Japanese" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2023-01-23" />
+		<info name="release" value="20230123" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="Arkagis Escape - Trial Version (Rev WX).bin" size="1048576" crc="3ff3d8d9" sha1="87753a222f3ccaaac459ca04de8d56b22d1261a1" />
@@ -12046,7 +12046,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<info name="language" value="English" />
 		<info name="language" value="Japanese" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2021-11-06" />
+		<info name="release" value="20211106" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="Arkagis Escape - Trial Version (Rev YW).bin" size="1048576" crc="da0a4587" sha1="b6f2f9124afde22fe2fe2bd92c953c19372145dc" />
@@ -12062,7 +12062,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<info name="language" value="English" />
 		<info name="language" value="Japanese" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2022-04-29" />
+		<info name="release" value="20220429" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="Arkagis Escape - Trial Version (Rev ZZ).bin" size="1048576" crc="c2a2c208" sha1="5a48561f868b49159a4533afaf6867e1bcd9910c" />
@@ -12175,7 +12175,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<description>Astebros (demo v2.1, English)</description>
 		<year>2022</year>
 		<publisher>NeoFID Studios</publisher>
-		<info name="release" value="2022-08-23" />
+		<info name="release" value="20220823" />
 		<info name="version" value="demo v2.1" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -12191,7 +12191,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<description>Astebros (demo v2.1, French)</description>
 		<year>2022</year>
 		<publisher>NeoFID Studios</publisher>
-		<info name="release" value="2022-08-23" />
+		<info name="release" value="20220823" />
 		<info name="version" value="demo v2.1" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
@@ -12438,7 +12438,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<description>Attack of the Petscii Robots (shareware v1.2)</description>
 		<year>2022</year>
 		<publisher>The 8-Bit Guy</publisher>
-		<info name="release" value="2022-06-16" />
+		<info name="release" value="20220616" />
 		<info name="version" value="shareware 1.2" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1441792">
@@ -12451,7 +12451,7 @@ Black screen after starting a game, access $be1040-3 for a 0x524e4302 value (?)
 		<description>Attack of the Petscii Robots (shareware v1.0)</description>
 		<year>2022</year>
 		<publisher>The 8-Bit Guy</publisher>
-		<info name="release" value="2022-05-15" />
+		<info name="release" value="20220515" />
 		<info name="version" value="shareware 1.0" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1441792">
@@ -17162,7 +17162,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="Italian" />
 		<info name="language" value="Portuguese (Brazil)" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2020-09-13" />
+		<info name="release" value="20200913" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="ssf_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
@@ -17177,7 +17177,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<year>2019</year>
 		<publisher>Neofid Studios</publisher>
 		<info name="language" value="English" />
-		<info name="release" value="12-10-2019" />
+		<info name="release" value="20191012" />
 		<info name="version" value="demo 0.1" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1441792">
@@ -17191,7 +17191,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<year>2019</year>
 		<publisher>Neofid Studios</publisher>
 		<info name="language" value="French" />
-		<info name="release" value="12-10-2019" />
+		<info name="release" value="20191012" />
 		<info name="version" value="demo 0.1" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1441792">
@@ -17204,7 +17204,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<description>Demons of Asteborg (demo 20200721)</description>
 		<year>2020</year>
 		<publisher>Neofid Studios</publisher>
-		<info name="release" value="2020-07-21" />
+		<info name="release" value="20200721" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3407872">
 				<rom name="Demons_of_Asteborg_DEMO_v21072020.bin" size="3407872" crc="8163415e" sha1="be4b6e1e627fbfdf0c25df7496a053a0289691a9" />
@@ -17222,7 +17222,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="Italian" />
 		<info name="language" value="Portuguese (Brazil)" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2021-08-27" />
+		<info name="release" value="20210827" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="ssf_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
@@ -17242,7 +17242,7 @@ https://bootleggames.fandom.com/wiki/Chaoji_Dafuweng
 		<info name="language" value="Italian" />
 		<info name="language" value="Portuguese (Brazil)" />
 		<info name="language" value="Spanish" />
-		<info name="release" value="2021-09-03" />
+		<info name="release" value="20210903" />
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="ssf_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="0x1000000">
@@ -20672,7 +20672,7 @@ Patches protection checks, original uses Super Bubble Bobble MD cart scheme
 		<description>Insane Pain (demo v1.0)</description>
 		<year>2020</year>
 		<publisher>Blast Process Games</publisher>
-		<info name="release" value="14-06-2020" />
+		<info name="release" value="20200614" />
 		<info name="version" value="demo 1.0" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="3589120">
@@ -20685,7 +20685,7 @@ Patches protection checks, original uses Super Bubble Bobble MD cart scheme
 		<description>Insane Pain (demo v3.0)</description>
 		<year>2021</year>
 		<publisher>Blast Process Games</publisher>
-		<info name="release" value="21-11-2021" />
+		<info name="release" value="20211121" />
 		<info name="version" value="demo 3.0" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="4194304">
@@ -21162,7 +21162,7 @@ Patches protection checks, original uses Super Bubble Bobble MD cart scheme
 		<description>Jessie Jaeger in Cleopatra's Curse (demo)</description>
 		<year>2020</year>
 		<publisher>Bold Game Studio</publisher>
-		<info name="release" value="14-09-2020" />
+		<info name="release" value="20200914" />
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" width="16" endianness="big" size="1441792">
 				<rom name="CleoCurse_Demo.gen" size="1441792" crc="fb462934" sha1="605974ba964def28b8c6a221aa13b5730a67f330" />

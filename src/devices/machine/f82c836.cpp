@@ -353,8 +353,6 @@ void f82c836a_device::update_romram_settings()
 {
 //	printf("%02x %02x %02x %02x %02x\n", m_rom_enable, m_ram_write_protect, m_shadow_reg[0], m_shadow_reg[1], m_shadow_reg[2]);
 
-	int i;
-
 	// reconfigure space
 	// Despite what documentation claims shadow RAM actually wins over ROM, it will just map on
 	// top of it (i.e. IBM VGA BIOS will get shadowed while leaving the ROM bit on)
@@ -362,7 +360,7 @@ void f82c836a_device::update_romram_settings()
 	m_isabus->remap(AS_PROGRAM, 0xa0000, 0xfffff);
 
 	// TODO: optimize, add write only paths
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		const u32 start_offs = 0xc0000 + i * 0x8000;
 		const u32 end_offs = start_offs + 0x7fff;
@@ -371,7 +369,7 @@ void f82c836a_device::update_romram_settings()
 			m_space_mem->install_rom(start_offs, end_offs, &m_bios[(i * 0x8000) / 2]);
 	}
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		const u32 start_offs = 0xa0000 + i * 0x4000;
 		const u32 end_offs = start_offs + 0x3fff;
@@ -380,7 +378,7 @@ void f82c836a_device::update_romram_settings()
 			m_space_mem->install_ram(start_offs, end_offs, &m_shadow_ram[i * 0x4000]);
 	}
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		const u32 start_offs = 0xc0000 + i * 0x4000;
 		const u32 end_offs = start_offs + 0x3fff;
@@ -389,7 +387,7 @@ void f82c836a_device::update_romram_settings()
 			m_space_mem->install_ram(start_offs, end_offs, &m_shadow_ram[0x20000 + i * 0x4000]);
 	}
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		const u32 start_offs = 0xe0000 + i * 0x4000;
 		const u32 end_offs = start_offs + 0x3fff;

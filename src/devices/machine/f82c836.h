@@ -118,15 +118,16 @@ public:
 
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_reset_after_children() override;
-
-	virtual space_config_vector memory_space_config() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_reset_after_children() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	void io_map(address_map &map);
-	void config_map(address_map &map);
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
+
+	void io_map(address_map &map) ATTR_COLD;
+	void config_map(address_map &map) ATTR_COLD;
+
 private:
 	const address_space_config m_space_config;
 
