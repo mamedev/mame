@@ -84,7 +84,7 @@ Connectors:
  P3  - Monitor
  P6  - Lightpen
 
-Sound  and I/O board:
+Sound and I/O board:
 ---------------------
 "Steuereinheit 68000"
  _________________________________________________________________________________
@@ -97,7 +97,7 @@ Sound  and I/O board:
  |*   L4974A         ||| |SCN68681C1N40 |                     |||               *|
  |*                  ||| |______________|   74HC32   74AC138  |||               *|
  |P7                 |||                                      |||              P8|
- |*                        TC428CPA                                             *|
+ |*                        TC428CPA                     SN75176                 *|
  |*                                                                             *|
  |*    P11  P12    P13    P14       P15   P16   P17      P18   P19   P20  P21   *|
  |P9   **** *****  *****  ****  OO  ****  ****  *******  ****  ****  ***  *** P10|
@@ -111,6 +111,7 @@ Parts:
  MX7224KN        - Maxim CMOS 8-bit DAC with Output Amplifier
  TL7705ACP       - Supply Voltage Supervisor
  TC428CPA        - Dual CMOS High-speed Driver
+ SN75176		 - RS-485 Differential Bus Transceiver
  L4974A          - ST 3.5A Switching Regulator
  OO              - LEDs (red); "Fehlerdiagnose siehe Fehlertable"
 
@@ -550,7 +551,7 @@ void adp_state::quickjac(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::quickjac_mem);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &adp_state::fc7_map);
 
-	MC68681(config, m_duart, XTAL(8'664'000) / 2);
+	MC68681(config, m_duart, 3'686'400);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_duart->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
 	m_duart->inport_cb().set_ioport("DSW1");

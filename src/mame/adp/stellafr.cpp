@@ -32,7 +32,7 @@ Parts:
  X                    - 8MHz xtal
  3V Bat             - Lithium 3V power module
 
-Sound  and I/O board:
+Sound and I/O board:
 ---------------------
 "Steuereinheit 68000"
  _________________________________________________________________________________
