@@ -1529,6 +1529,7 @@ private:
 
 	namcos23_state& m_state;
 	std::unique_ptr<u32[]> m_tmrom_decoded;
+	std::unique_ptr<u8[]> m_texattr_decoded;
 	const u8 *m_texrom;
 	const u16 *m_texram;
 	u32 m_tileid_mask;
@@ -2272,12 +2273,14 @@ namcos23_renderer::namcos23_renderer(namcos23_state &state, const u16 *tmlrom, c
 	: poly_manager<float, namcos23_render_data, 4>(state.machine()),
 	m_state(state),
 	m_tmrom_decoded(nullptr),
+	m_texattr_decoded(nullptr),
 	m_texrom(texrom),
 	m_texram(texram),
 	m_tileid_mask(tileid_mask),
 	m_tile_mask(tile_mask)
 {
 	m_tmrom_decoded = std::make_unique<u32[]>((m_tileid_mask | 0xff) + 1);
+	m_texattr_decoded = std::make_unique<u8[]>((m_tileid_mask | 0xff) + 1);
 	for (u32 tileid = 0; tileid <= m_tileid_mask; tileid++)
 	{
 		u8 attr = tmhrom[tileid >> 1];
@@ -2285,7 +2288,8 @@ namcos23_renderer::namcos23_renderer(namcos23_state &state, const u16 *tmlrom, c
 			attr &= 15;
 		else
 			attr >>= 4;
-		m_tmrom_decoded[tileid] = ((tmlrom[tileid] | (attr << 16)) & m_tile_mask) << 8;
+		m_tmrom_decoded[tileid] = ((tmlrom[tileid] | ((attr & 1) << 16)) & m_tile_mask) << 8;
+		m_texattr_decoded[tileid] = attr >> 1;
 	}
 }
 
@@ -3397,9 +3401,13 @@ u32 namcos23_renderer::texture_lookup(const pen_t *pens, int penshift, int penma
 {
 	const u32 tileid = ((u >> 4) & 0xff) | ((v << 4) & m_tileid_mask);
 	const u32 tile = m_tmrom_decoded[tileid];
-
-	// Probably swapx/swapy to add on bits 2-3 of attr
-	// Bits used by motoxgo at least
+	const u32 attr = m_texattr_decoded[tileid];
+	if (BIT(attr, 0))
+		v = ~v;
+	if (BIT(attr, 1))
+		u = ~u;
+	if (BIT(attr, 2))
+		std::swap(u, v);
 	pen = m_texrom[tile | ((v << 4) & 0xf0) | (u & 0x0f)];
 	return pens[(pen >> penshift) & penmask];
 }
