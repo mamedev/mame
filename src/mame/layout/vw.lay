@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+debugging display for Digijet ECU
+-->
+
+<mamelayout version="2">
+
+	<element name="led" defstate="0">
+		<disk state="0"> <color red="0.1" green="0.1" blue="0.1" /> </disk>
+		<disk state="1"> <color red="1.0" green="1.0" blue="0.1" /> </disk>
+	</element>
+
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="10" bottom="10" />
+			<color red="0.2" green="0.2" blue="0.2" />
+		</rect>
+	</element>
+
+	<element name="label_fuel">
+		<text string="Fuel pump">
+			<bounds left="0" top="0" right="1" bottom="0.4" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="label_inject">
+		<text string="Injectors">
+			<bounds left="0" top="0" right="1" bottom="0.4" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+	<element name="label_check">
+		<text string="CHECK">
+			<bounds left="0" top="0" right="1" bottom="0.4" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+		<text string="ENGINE">
+			<bounds left="0" top="0.5" right="1" bottom="1" />
+			<color red="1.0" green="1.0" blue="1.0" />
+		</text>
+	</element>
+
+	<view name="Main">
+		<element ref="background"> <bounds left="0" right="7" top="0" bottom="5" /> </element>
+
+		<element ref="led" name="led_fuel"> <bounds left="1" right="2" top="1" bottom="2" /> </element>
+		<element ref="label_fuel"> <bounds left="1" right="2" top="2.2" bottom="2.6" /> </element>
+		<element ref="led" name="led_inject"> <bounds left="3" right="4" top="1" bottom="2" /> </element>
+		<element ref="label_inject"> <bounds left="3" right="4" top="2.2" bottom="2.6" /> </element>
+        <element ref="led" name="led_check"> <bounds left="5" right="6" top="1" bottom="2" /> </element>
+		<element ref="label_check"> <bounds left="5" right="6" top="2.2" bottom="2.6" /> </element>
+	</view>
+
+</mamelayout>
