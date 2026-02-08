@@ -662,17 +662,17 @@ protected:
 private:
 	u8 m_val = 0;
 
-	void reset_w(u8 data);
-	void inc_w(u8 data);
-	void bitswap_w(u8 data);
+	void reset_w();
+	void inc_w();
+	void bitswap_w();
 };
 
 u8 igs_incalt_device::result_r()
 {
 	u8 res;
 
-	if ((((m_val & 1) == 0) && ((m_val & 4) == 0)) || (m_val & 2))
-		res = 1 << 1;
+	if ((!BIT(m_val, 0) && !BIT(m_val, 2)) || BIT(m_val, 1))
+		res = 2;
 	else
 		res = 0;
 
@@ -685,13 +685,13 @@ void igs_incalt_device::byte_w(u8 data)
 	switch (data)
 	{
 		case 0x21:
-			bitswap_w(data);
+			bitswap_w();
 			break;
 		case 0x55:
-			inc_w(data);
+			inc_w();
 			break;
 		case 0xff:
-			reset_w(data);
+			reset_w();
 			break;
 
 		default:
@@ -699,21 +699,21 @@ void igs_incalt_device::byte_w(u8 data)
 	}
 }
 
-void igs_incalt_device::reset_w(u8 data)
+void igs_incalt_device::reset_w()
 {
-	m_val = 0x00;
+	m_val = 0;
 	LOGMASKED(LOG_PROT_INCALT, "%s: reset -> %02x\n", machine().describe_context(), m_val);
 }
 
-void igs_incalt_device::inc_w(u8 data)
+void igs_incalt_device::inc_w()
 {
 	m_val++;
 	LOGMASKED(LOG_PROT_INCALT, "%s: inc -> %02x\n", machine().describe_context(), m_val);
 }
 
-void igs_incalt_device::bitswap_w(u8 data)
+void igs_incalt_device::bitswap_w()
 {
-	m_val = ((m_val >> 1) & m_val & 1) | ((((m_val >> 2) & 1) << 1) & 2) | (((~(m_val & 1) | ((m_val >> 1) & 1)) << 2) & 4);
+	m_val = (BIT(m_val, 1) & BIT(m_val, 0)) | (BIT(m_val, 2) << 1) | ((BIT(~m_val, 0) | BIT(m_val, 1)) << 2);
 	LOGMASKED(LOG_PROT_INCALT, "%s: bitswap -> %02x\n", machine().describe_context(), m_val);
 }
 
@@ -868,6 +868,9 @@ private:
 	u8 m_igs029_send_buf[256], m_igs029_recv_buf[256];
 	int m_igs029_send_len, m_igs029_recv_len;
 	u32 m_igs029_reg[0x60];
+	void igs029_get_reg(u8 reg_offset);
+	void igs029_get_ret(u32 ret);
+	void igs029_set_reg(u8 reg_offset, u8 data_offset);
 	void common_igs029_run();
 
 	void dsw_select_w(u8 data);
@@ -974,9 +977,6 @@ private:
 	u8 mgdh_boot_r(offs_t offset);
 
 	void sdmg2_keys_hopper_w(u8 data);
-	u16 sdmg2_checksum2_r(offs_t offset);
-	void sdmg2_checksum2_w(offs_t offset, u8 data);
-	void sdmg2_checksum();
 
 	void sdmg2p_counter_w(u8 data);
 	void sdmg2p_sound_hopper_w(u8 data);
@@ -1120,40 +1120,49 @@ u8 igs017_state::dsw_r()
 	return ret;
 }
 
+void igs017_state::igs029_get_reg(u8 reg_offset)
+{
+		put_u32be(m_igs029_recv_buf, m_igs029_reg[reg_offset]);
+
+		m_igs029_recv_len = 4;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+}
+
+void igs017_state::igs029_get_ret(u32 ret)
+{
+		put_u32be(m_igs029_recv_buf, ret);
+
+		m_igs029_recv_len = 4;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+}
+
+void igs017_state::igs029_set_reg(u8 reg_offset, u8 data_offset)
+{
+		m_igs029_reg[reg_offset] = get_u32le(&m_igs029_send_buf[data_offset]);
+
+		m_igs029_recv_len = 0;
+		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
+}
+
 void igs017_state::common_igs029_run()
 {
 	if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x04)
 	{
 		LOGMASKED(LOG_PROT_IGS029, "GET 050 cmd\n");
 
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x50] >> 24;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x50] >> 16;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x50] >> 8;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x50];
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+		igs029_get_reg(0x50);
 	}
 	else if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x0f)
 	{
 		LOGMASKED(LOG_PROT_IGS029, "GET 010 cmd\n");
 
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x10] >> 24;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x10] >> 16;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x10] >> 8;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x10];
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+		igs029_get_reg(0x10);
 	}
 	else if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x19)
 	{
 		LOGMASKED(LOG_PROT_IGS029, "GET 055 cmd\n");
 
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x55] >> 24;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x55] >> 16;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x55] >> 8;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x55];
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+		igs029_get_reg(0x55);
 	}
 	else if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x1c)
 	{
@@ -1189,23 +1198,13 @@ void igs017_state::common_igs029_run()
 	{
 		LOGMASKED(LOG_PROT_IGS029, "GET 058 cmd\n");
 
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x58] >> 24;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x58] >> 16;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x58] >> 8;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x58];
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+		igs029_get_reg(0x58);
 	}
 	else if (m_igs029_send_buf[0] == 0x03 && m_igs029_send_buf[1] == 0x55)
 	{
 		LOGMASKED(LOG_PROT_IGS029, "GET 020 cmd\n");
 
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x20] >> 24;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x20] >> 16;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x20] >> 8;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[0x20];
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+		igs029_get_reg(0x20);
 	}
 	else if (m_igs029_send_buf[0] == 0x04 && m_igs029_send_buf[1] == 0x02)
 	{
@@ -1227,30 +1226,19 @@ void igs017_state::common_igs029_run()
 
 		u8 offset = m_igs029_send_buf[2];
 
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[offset] >> 24;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[offset] >> 16;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[offset] >> 8;
-		m_igs029_recv_buf[m_igs029_recv_len++] = m_igs029_reg[offset];
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+		igs029_get_reg(offset);
 	}
 	else if (m_igs029_send_buf[0] == 0x07 && m_igs029_send_buf[1] == 0x15)
 	{
 		LOGMASKED(LOG_PROT_IGS029, "SET 050 cmd\n");
 
-		m_igs029_reg[0x50] = (m_igs029_send_buf[5] << 24) | (m_igs029_send_buf[4] << 16) | (m_igs029_send_buf[3] << 8) | m_igs029_send_buf[2];
-
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
+		igs029_set_reg(0x50, 2);
 	}
 	else if (m_igs029_send_buf[0] == 0x07 && m_igs029_send_buf[1] == 0x21)
 	{
 		LOGMASKED(LOG_PROT_IGS029, "SET 010 cmd\n");
 
-		m_igs029_reg[0x10] = (m_igs029_send_buf[5] << 24) | (m_igs029_send_buf[4] << 16) | (m_igs029_send_buf[3] << 8) | m_igs029_send_buf[2];
-
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
+		igs029_set_reg(0x10, 2);
 	}
 	else if (m_igs029_send_buf[0] == 0x07 && m_igs029_send_buf[1] == 0x2c)
 	{
@@ -1264,12 +1252,7 @@ void igs017_state::common_igs029_run()
 		{
 			u32 ret = m_igs029_reg[m_igs029_send_buf[3]] + m_igs029_reg[m_igs029_send_buf[4]];
 
-			m_igs029_recv_len = 0;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 24;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 16;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 8;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret;
-			m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+			igs029_get_ret(ret);
 
 			no_ret = false;
 		}
@@ -1277,12 +1260,7 @@ void igs017_state::common_igs029_run()
 		{
 			u32 ret = m_igs029_reg[m_igs029_send_buf[4]] - m_igs029_reg[m_igs029_send_buf[3]];
 
-			m_igs029_recv_len = 0;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 24;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 16;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 8;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret;
-			m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+			igs029_get_ret(ret);
 
 			no_ret = false;
 		}
@@ -1292,12 +1270,7 @@ void igs017_state::common_igs029_run()
 		{
 			u32 ret = m_igs029_reg[m_igs029_send_buf[5]] + 1;
 
-			m_igs029_recv_len = 0;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 24;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 16;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 8;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret;
-			m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+			igs029_get_ret(ret);
 
 			no_ret = false;
 		}
@@ -1332,12 +1305,7 @@ void igs017_state::common_igs029_run()
 
 			u32 ret = m_igs029_reg[m_igs029_send_buf[5]];
 
-			m_igs029_recv_len = 0;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 24;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 16;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 8;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret;
-			m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+			igs029_get_ret(ret);
 
 			no_ret = false;
 		}
@@ -1347,12 +1315,7 @@ void igs017_state::common_igs029_run()
 		{
 			u32 ret = m_igs029_reg[m_igs029_send_buf[4]] + 1;
 
-			m_igs029_recv_len = 0;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 24;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 16;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret >> 8;
-			m_igs029_recv_buf[m_igs029_recv_len++] = ret;
-			m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
+			igs029_get_ret(ret);
 
 			no_ret = false;
 		}
@@ -1373,28 +1336,19 @@ void igs017_state::common_igs029_run()
 	{
 		LOGMASKED(LOG_PROT_IGS029, "SET 020 cmd\n");
 
-		m_igs029_reg[0x20] = (m_igs029_send_buf[5] << 24) | (m_igs029_send_buf[4] << 16) | (m_igs029_send_buf[3] << 8) | m_igs029_send_buf[2];
-
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
+		igs029_set_reg(0x20, 2);
 	}
 	else if (m_igs029_send_buf[0] == 0x07 && m_igs029_send_buf[1] == 0x50)
 	{
 		LOGMASKED(LOG_PROT_IGS029, "SET 055 cmd\n");
 
-		m_igs029_reg[0x55] = (m_igs029_send_buf[5] << 24) | (m_igs029_send_buf[4] << 16) | (m_igs029_send_buf[3] << 8) | m_igs029_send_buf[2];
-
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
+		igs029_set_reg(0x55, 2);
 	}
 	else if (m_igs029_send_buf[0] == 0x07 && m_igs029_send_buf[1] == 0x64)
 	{
 		LOGMASKED(LOG_PROT_IGS029, "SET 058 cmd\n");
 
-		m_igs029_reg[0x58] = (m_igs029_send_buf[5] << 24) | (m_igs029_send_buf[4] << 16) | (m_igs029_send_buf[3] << 8) | m_igs029_send_buf[2];
-
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
+		igs029_set_reg(0x58, 2);
 	}
 	else if (m_igs029_send_buf[0] == 0x08 && m_igs029_send_buf[1] == 0x23)
 	{
@@ -1402,10 +1356,7 @@ void igs017_state::common_igs029_run()
 
 		u8 offset = m_igs029_send_buf[6];
 
-		m_igs029_reg[offset] = (m_igs029_send_buf[5] << 24) | (m_igs029_send_buf[4] << 16) | (m_igs029_send_buf[3] << 8) | m_igs029_send_buf[2];
-
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
+		igs029_set_reg(offset, 2);
 	}
 	else if (m_igs029_send_buf[0] == 0x08 && m_igs029_send_buf[1] == 0x73)
 	{
@@ -1413,10 +1364,7 @@ void igs017_state::common_igs029_run()
 
 		u8 offset = m_igs029_send_buf[2];
 
-		m_igs029_reg[offset + 0x30] = (m_igs029_send_buf[6] << 24) | (m_igs029_send_buf[5] << 16) | (m_igs029_send_buf[4] << 8) | m_igs029_send_buf[3];
-
-		m_igs029_recv_len = 0;
-		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
+		igs029_set_reg(offset + 0x30, 3);
 	}
 	else
 	{
@@ -3373,20 +3321,7 @@ void igs017_state::sdmg2_map(address_map &map)
 	map(0x00200b, 0x00200b).r(m_igs_incdec, FUNC(igs_incdec_device::result_r));
 
 	// incalt protection
-	map(0x010140, 0x010140).w(m_igs_incalt, FUNC(igs_incalt_device::byte_w));
-	map(0x010250, 0x010250).w(m_igs_incalt, FUNC(igs_incalt_device::byte_w));
-	map(0x010348, 0x010348).w(m_igs_incalt, FUNC(igs_incalt_device::byte_w));
-	map(0x010456, 0x010456).w(m_igs_incalt, FUNC(igs_incalt_device::byte_w));
-	map(0x0104ec, 0x0104ec).w(m_igs_incalt, FUNC(igs_incalt_device::byte_w));
-	map(0x0105d0, 0x0105d0).w(m_igs_incalt, FUNC(igs_incalt_device::byte_w));
-	map(0x010632, 0x010632).r(m_igs_incalt, FUNC(igs_incalt_device::result_r));
-	map(0x0106a8, 0x0106a8).r(m_igs_incalt, FUNC(igs_incalt_device::result_r));
-	map(0x0106aa, 0x0106aa).r(m_igs_incalt, FUNC(igs_incalt_device::result_r));
-	map(0x0106bc, 0x0106bc).r(m_igs_incalt, FUNC(igs_incalt_device::result_r));
-	map(0x010704, 0x010704).r(m_igs_incalt, FUNC(igs_incalt_device::result_r));
-	map(0x01073e, 0x01073e).r(m_igs_incalt, FUNC(igs_incalt_device::result_r));
-	map(0x0107c0, 0x0107c0).r(m_igs_incalt, FUNC(igs_incalt_device::result_r));
-	map(0x0107ce, 0x0107ce).r(m_igs_incalt, FUNC(igs_incalt_device::result_r));
+	map(0x010000, 0x0107ff).rw(m_igs_incalt, FUNC(igs_incalt_device::result_r), FUNC(igs_incalt_device::byte_w));
 
 	map(0x1f0000, 0x1fffff).ram().share("nvram");
 
@@ -3429,7 +3364,7 @@ void igs017_state::sdmg2_mux_map(address_map &map)
 
 u8 igs017_state::mgdh_boot_r(offs_t offset)
 {
-	u8 mgdh_boot_table[4] = {0, 1, 2, 0};
+	static constexpr u8 mgdh_boot_table[4] = {0, 1, 2, 0};
 
 	u8 ret = mgdh_boot_table[m_mgdh_boot_ptr];
 
@@ -4054,7 +3989,7 @@ void igs017_state::jking302us_sound_scramble_w(u8 data)
 
 u8 igs017_state::jking302us_scramble_coin_r()
 {
-	u8 ret = ((bitswap<8>(((m_scramble_data + 1) & 3), 7,6,5,4,0,1,2,3) & 0xf) << 4) | (m_io_coins->read() & 0xf);
+	u8 ret = ((bitswap<4>(((m_scramble_data + 1) & 3), 0, 1, 2, 3) & 0xf) << 4) | (m_io_coins->read() & 0xf);
 	LOGMASKED(LOG_PROT_SCRAMBLE, "%s: reading scrambled data %02x from igs_mux\n", machine().describe_context(), ret);
 	return ret;
 }
