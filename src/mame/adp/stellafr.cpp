@@ -388,7 +388,7 @@ INPUT_PORTS_END
 
 void stellafr_state::stellafr(machine_config &config)
 {
-	M68000(config, m_maincpu, 10'000'000 ); //?
+	M68000(config, m_maincpu, 8'000'000 );
 	m_maincpu->set_addrmap(AS_PROGRAM, &stellafr_state::mem_map);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &stellafr_state::fc7_map);
 
@@ -404,7 +404,7 @@ void stellafr_state::stellafr(machine_config &config)
 	m_dac->add_route(ALL_OUTPUTS, "mono", 0.85);
 
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, m_aysnd, 1'000'000);
+	YM2149(config, m_aysnd, 3'686'400/2);
 	m_aysnd->add_route(ALL_OUTPUTS, "mono", 0.85);
 	m_aysnd->port_a_read_callback().set_ioport("IN0");
 	m_aysnd->port_b_write_callback().set(FUNC(stellafr_state::ay8910_portb_w));
