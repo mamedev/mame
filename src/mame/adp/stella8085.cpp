@@ -167,15 +167,16 @@ void stella8085_state::io_4040_map(address_map &map)
 
 void stella8085_state::io_4087_map(address_map &map)
 {
-	map(0x00, 0x00).w(FUNC(stella8085_state::io00));
-	map(0x50, 0x51).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
+	// ICF5 74LS42
+	map(0x00, 0x4f).noprw();
+	map(0x50, 0x5f).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write));
 	map(0x60, 0x6f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
+	// 7x handled by ICH5 74LS138
 	map(0x70, 0x70).rw(FUNC(stella8085_state::io70r),FUNC(stella8085_state::io70w));
 	map(0x71, 0x71).rw(FUNC(stella8085_state::io71r),FUNC(stella8085_state::io71w));
 	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev));
-	map(0x73, 0x77).nopw();
-	// map(0x80, 0x8f) //Y8 ICC5 empty socket
-	//Y9 wired to rtc circuits but somehow memory mapped in hardware
+	map(0x73, 0x7f).noprw();
+	map(0x80, 0x8f).noprw(); //Y8 ICC5 empty socket
 }
 
 /*********************************************
@@ -258,7 +259,7 @@ uint8_t stella8085_state::kbd_rl_r()
 
 void stella8085_state::disp_w(uint8_t data)
 {
-	if (m_kbd_sl < 8) //SL3 is inverted for the display outs
+	if (m_kbd_sl < 8) // SL3 is inverted for the display outs
 	{
 		for (int i = 0; i < 8; i++)
 		{
