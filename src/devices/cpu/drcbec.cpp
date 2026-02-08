@@ -18,6 +18,8 @@
 #include <cfenv>
 #include <cmath>
 
+#pragma STDC FENV_ACCESS ON
+
 
 namespace drc {
 
@@ -753,12 +755,14 @@ int drcbe_c::execute(code_handle &entry)
 	int shift;
 	uint8_t flags = 0;
 	uint8_t sp = 0;
-	while (true)
+	try
 	{
-		uint32_t opcode = (inst++)->i;
-
-		switch (OPCODE_GET_SHORT(opcode))
+		while (true)
 		{
+			uint32_t opcode = (inst++)->i;
+
+			switch (OPCODE_GET_SHORT(opcode))
+			{
 			// ----------------------- Control Flow Operations -----------------------
 
 			case MAKE_OPCODE_SHORT(OP_HANDLE, 4, 0):    // HANDLE  handle
@@ -766,9 +770,8 @@ int drcbe_c::execute(code_handle &entry)
 			case MAKE_OPCODE_SHORT(OP_LABEL, 4, 0):     // LABEL   imm
 			case MAKE_OPCODE_SHORT(OP_COMMENT, 4, 0):   // COMMENT string
 			case MAKE_OPCODE_SHORT(OP_MAPVAR, 4, 0):    // MAPVAR  mapvar,value
-
 				// these opcodes should be processed at compile-time only
-				fatalerror("Unexpected opcode %08x %d %d %d\n", opcode, OPCODE_GET_SHORT(opcode) >> 2, BIT(opcode, 0) ? 8 : 4, BIT(opcode, 1));
+				throw emu_fatalerror("Unexpected opcode %08x %d %d %d\n", opcode, OPCODE_GET_SHORT(opcode) >> 2, BIT(opcode, 0) ? 8 : 4, BIT(opcode, 1));
 
 			case MAKE_OPCODE_SHORT(OP_BREAK, 4, 0):
 				osd_break_into_debugger("break from drc");
@@ -2192,7 +2195,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4R, 4, 0):    // FSTOI4R dst,src1
-				*inst[0].pint32 = lroundf(FSPARAM1);
+				*inst[0].pint32 = lroundf(FSPARAM1); // FIXME: rounds midpoint away from zero, should round to even
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4F, 4, 0):    // FSTOI4F dst,src1
@@ -2204,22 +2207,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4, 4, 0):     // FSTOI4  dst,src1
-				switch (m_state.fmod)
-				{
-				default:
-				case ROUND_TRUNC:
-					*inst[0].pint32 = int32_t(FSPARAM1);
-					break;
-				case ROUND_ROUND:
-					*inst[0].pint32 = lroundf(FSPARAM1);
-					break;
-				case ROUND_FLOOR:
-					*inst[0].pint32 = int32_t(floorf(FSPARAM1));
-					break;
-				case ROUND_CEIL:
-					*inst[0].pint32 = int32_t(ceilf(FSPARAM1));
-					break;
-				}
+				*inst[0].pint32 = int32_t(nearbyintf(FSPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8T, 4, 0):    // FSTOI8T dst,src1
@@ -2227,7 +2215,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8R, 4, 0):    // FSTOI8R dst,src1
-				*inst[0].pint64 = llroundf(FSPARAM1);
+				*inst[0].pint64 = llroundf(FSPARAM1); // FIXME: rounds midpoint away from zero, should round to even
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8F, 4, 0):    // FSTOI8F dst,src1
@@ -2239,22 +2227,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8, 4, 0):     // FSTOI8  dst,src1
-				switch (m_state.fmod)
-				{
-				default:
-				case ROUND_TRUNC:
-					*inst[0].pint64 = int64_t(FSPARAM1);
-					break;
-				case ROUND_ROUND:
-					*inst[0].pint64 = llroundf(FSPARAM1);
-					break;
-				case ROUND_FLOOR:
-					*inst[0].pint64 = int64_t(floorf(FSPARAM1));
-					break;
-				case ROUND_CEIL:
-					*inst[0].pint64 = int64_t(ceilf(FSPARAM1));
-					break;
-				}
+				*inst[0].pint64 = int64_t(nearbyintf(FSPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FFRI4, 4, 0):     // FSFRI4  dst,src1
@@ -2305,11 +2278,11 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FRECIP, 4, 0):    // FSRECIP dst,src1
-				FSPARAM0 = 1.0f / FSPARAM1;
+				FSPARAM0 = 1.0F / FSPARAM1;
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FRSQRT, 4, 0):    // FSRSQRT dst,src1
-				FSPARAM0 = 1.0f / sqrtf(FSPARAM1);
+				FSPARAM0 = 1.0F / sqrtf(FSPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FCOPYI, 4, 0):    // FSCOPYI dst,src
@@ -2353,7 +2326,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4R, 8, 0):    // FDTOI4R dst,src1
-				*inst[0].pint32 = lround(FDPARAM1);
+				*inst[0].pint32 = lround(FDPARAM1); // FIXME: rounds midpoint away from zero, should round to even
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4F, 8, 0):    // FDTOI4F dst,src1
@@ -2365,22 +2338,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI4, 8, 0):     // FDTOI4  dst,src1
-				switch (m_state.fmod)
-				{
-				default:
-				case ROUND_TRUNC:
-					*inst[0].pint32 = int32_t(FDPARAM1);
-					break;
-				case ROUND_ROUND:
-					*inst[0].pint32 = lround(FDPARAM1);
-					break;
-				case ROUND_FLOOR:
-					*inst[0].pint32 = int32_t(floor(FDPARAM1));
-					break;
-				case ROUND_CEIL:
-					*inst[0].pint32 = int32_t(ceil(FDPARAM1));
-					break;
-				}
+				*inst[0].pint32 = int32_t(nearbyint(FDPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8T, 8, 0):    // FDTOI8T dst,src1
@@ -2388,7 +2346,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8R, 8, 0):    // FDTOI8R  dst,src1
-				*inst[0].pint64 = llround(FDPARAM1);
+				*inst[0].pint64 = llround(FDPARAM1); // FIXME: rounds midpoint away from zero, should round to even
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8F, 8, 0):    // FDTOI8F dst,src1
@@ -2400,22 +2358,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FTOI8, 8, 0):     // FDTOI8  dst,src1
-				switch (m_state.fmod)
-				{
-				default:
-				case ROUND_TRUNC:
-					*inst[0].pint64 = int64_t(FDPARAM1);
-					break;
-				case ROUND_ROUND:
-					*inst[0].pint64 = llround(FDPARAM1);
-					break;
-				case ROUND_FLOOR:
-					*inst[0].pint64 = int64_t(floor(FDPARAM1));
-					break;
-				case ROUND_CEIL:
-					*inst[0].pint64 = int64_t(ceil(FDPARAM1));
-					break;
-				}
+				*inst[0].pint64 = int64_t(nearbyint(FDPARAM1));
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FFRI4, 8, 0):     // FDFRI4  dst,src1
@@ -2431,7 +2374,7 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FRNDS, 8, 0):     // FDRNDS  dst,src1
-				FDPARAM0 = (float)FDPARAM1;
+				FDPARAM0 = float(FDPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_FADD, 8, 0):      // FDADD   dst,src1,src2
@@ -2486,11 +2429,17 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			default:
-				fatalerror("Unexpected opcode! %08x %d %d %d\n", opcode, OPCODE_GET_SHORT(opcode) >> 2, BIT(opcode, 0) ? 8 : 4, BIT(opcode, 1));
-		}
+				throw emu_fatalerror("Unexpected opcode! %08x %d %d %d\n", opcode, OPCODE_GET_SHORT(opcode) >> 2, BIT(opcode, 0) ? 8 : 4, BIT(opcode, 1));
+			}
 
-		// advance past the parameters and immediates
-		inst += OPCODE_GET_PWORDS(opcode);
+			// advance past the parameters and immediates
+			inst += OPCODE_GET_PWORDS(opcode);
+		}
+	}
+	catch (...)
+	{
+		std::fesetround(feround);
+		throw;
 	}
 
 	// never executed
@@ -2578,7 +2527,7 @@ void drcbe_c::output_parameter(drcbec_instruction **dstptr, void *immed, int imm
 			break;
 
 		default:
-			fatalerror("Unexpected param->type\n");
+			throw emu_fatalerror("Unexpected param->type\n");
 	}
 
 	*dstptr = dst;

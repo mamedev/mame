@@ -1152,7 +1152,7 @@ GAME( 1991, spadarts,  0,       _4enraya, spadarts,  _4enraya_state,  empty_init
 
 GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum,  unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992?, chicgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Chic Gum Video", MACHINE_SUPPORTS_SAVE )
-GAME( 1992?, strker,   0,       strker,   strker,    unk_gambl_state, empty_init, ROT0, "<unknown>",     "Striker",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 'RAM NO GOOD', if bypassed it resets after coining up
+GAME( 1992?, strker,   0,       strker,   strker,    unk_gambl_state, empty_init, ROT0, "<unknown>",     "Striker",        MACHINE_SUPPORTS_SAVE )
 GAME( 1992?, bowlgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Bowling Gum",    MACHINE_SUPPORTS_SAVE )
 
 GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,   unk_gambl_enc_state, empty_init, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",   MACHINE_SUPPORTS_SAVE )

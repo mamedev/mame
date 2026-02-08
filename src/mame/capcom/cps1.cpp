@@ -680,8 +680,8 @@ void cps_state::qsound_main_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
-void cps_state::qsound_sub_map(address_map &map)
-{   // used by cps2.c too
+void cps_state::qsound_sub_map(address_map &map) // used by cps2.c too
+{
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");    /* banked (contains music data) */
 	map(0xc000, 0xcfff).ram().share("qsound_ram1");
@@ -767,10 +767,10 @@ void cps_state::varthb3_map(address_map &map) // TODO: check everything
 	map(0xff0000, 0xffffff).ram().share("mainram");
 }
 
+
 /***********************************************************
              INPUT PORTS, DIPs
 ***********************************************************/
-
 
 #define CPS1_COINAGE_1(diploc) \
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION(diploc ":1,2,3") \
@@ -3899,10 +3899,10 @@ static const gfx_layout cps1_layout32x32 =
 };
 
 GFXDECODE_START( gfx_cps1 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8,   0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8_2, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout16x16, 0, 0x100 )
-	GFXDECODE_ENTRY( "gfx", 0, cps1_layout32x32, 0, 0x100 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8,   0, 0x80 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout8x8_2, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout16x16, 0, 0x80 )
+	GFXDECODE_ENTRY( "gfx", 0, cps1_layout32x32, 0, 0x80 )
 GFXDECODE_END
 
 
@@ -4017,10 +4017,12 @@ void cps_state::qsound(machine_config &config)
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cps_state::qsound_main_map);
 
-	Z80(config.replace(), m_audiocpu, XTAL(8'000'000));  /* verified on pcb */
+	Z80(config.replace(), m_audiocpu, XTAL(8'000'000)); // verified on pcb
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps_state::qsound_sub_map);
 	m_audiocpu->set_addrmap(AS_OPCODES, &cps_state::qsound_decrypted_opcodes_map);
-	m_audiocpu->set_periodic_int(FUNC(cps_state::irq0_line_hold), attotime::from_hz(250)); // measured (cps2.cpp)
+
+	const attotime audio_irq_period = attotime::from_hz(XTAL(8'000'000) / 32000); // measured 250Hz (cps2.cpp)
+	m_audiocpu->set_periodic_int(FUNC(cps_state::irq0_line_hold), audio_irq_period);
 
 	MCFG_MACHINE_START_OVERRIDE(cps_state, qsound)
 

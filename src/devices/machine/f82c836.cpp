@@ -7,7 +7,8 @@ Chips & Technologies SCATsx single chipset
 Based over later CS4031 chipset
 
 TODO:
-- the actual specific stuff of this chipset;
+- EMS;
+- Other misc features missing;
 
 **************************************************************************************************/
 
@@ -148,7 +149,6 @@ void f82c836a_device::device_start()
 	save_item(NAME(m_dma_channel));
 
 	save_item(NAME(m_config_address));
-	save_item(NAME(m_chan_env));
 
 	save_item(NAME(m_cpureset));
 	save_item(NAME(m_kbrst));
@@ -162,6 +162,7 @@ void f82c836a_device::device_start()
 	save_item(NAME(m_ram_write_protect));
 	save_item(NAME(m_shadow_reg));
 	save_item(NAME(m_dram_config));
+	save_item(NAME(m_chan_env));
 	save_item(NAME(m_ems_control));
 	save_item(NAME(m_ext_boundary));
 

@@ -29,7 +29,7 @@ r21     callee-saved        UML register I2
 r22     callee-saved        UML register I3
 r23     callee-saved        UML register I4
 r24     callee-saved        UML register I5
-r35     callee-saved        UML register I6
+r25     callee-saved        UML register I6
 r26     callee-saved        UML register I7
 r27     callee-saved        near cache pointer
 r28     callee-saved        emulated flags
@@ -1643,7 +1643,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 
 	a.emit_args_assignment(frame, args);
 
-	a.br(REG_PARAM1);
+	a.blr(REG_PARAM1);
 
 	// generate exit point
 	m_exit = dst + a.offset();

@@ -117,41 +117,22 @@ void specnext_layer2_device::draw_256(screen_device &screen, bitmap_rgb32 &bitma
 	const u16 (&info)[5] = LAYER2_INFO[m_resolution];
 
 	rectangle clip = rectangle{ m_clip_x1 << res, (std::min<u16>(m_clip_x2 + 1, info[0]) << res) - 1, m_clip_y1, std::min<u8>(m_clip_y2, info[1] - 1) };
-	u16 offset_h = m_offset_h - (info[2] << 1);
-	u16 offset_v = m_offset_v - info[2];
+	const u16 offset_h = m_offset_h - (info[2] << 1);
+	const u16 offset_v = m_offset_v - info[2];
 	clip.offset(offset_h, offset_v);
 	clip &= cliprect;
 	clip.setx(clip.left() & ~1, clip.right() | 1);
 
-	if (clip.empty())
-		return;
-
-	const u16 pen_base = (m_layer2_palette_select ? m_palette_alt_offset : m_palette_base_offset) | (m_palette_offset << 4);
-	const u16 x_min = (((clip.left() - offset_h) >> 1) + m_scroll_x) % info[0];
-	const bool x_overscan = m_scroll_x >= info[0] && info[3] == 256;
-	for (u16 vpos = clip.top(); vpos <= clip.bottom(); vpos++)
-	{
-		const u16 y = (vpos - offset_v + m_scroll_y) % info[1];
-		u16 x = x_min;
-		const u8 *scr = m_host_ram_ptr + (m_layer2_active_bank << 14) + (y * info[4]) + (x * info[3]);
-		u32 *pix = &(bitmap.pix(vpos, clip.left()));
-		u8 *prio = &(screen.priority().pix(vpos, clip.left()));
-		u32 *bprio = &(blendprio.pix(vpos, clip.left()));
-		for (u16 hpos = clip.left(); hpos <= clip.right(); hpos += 2, pix += 2, prio += 2, bprio += 2)
-		{
-			const u16 idx = pen_base + (*scr);
-			const rgb_t pen = palette().pen_color(idx);
-			const bool is_prio_color = m_pen_priority[idx];
-			blend_op(prio[0], pix[0], bprio[0], pen, is_prio_color);
-			blend_op(prio[1], pix[1], bprio[1], pen, is_prio_color);
-
-			++x %= info[0];
-			if (x == 0 && !x_overscan)
-				scr = m_host_ram_ptr + (m_layer2_active_bank << 14) + (y * info[4]);
-			else
-				scr += info[3];
-		}
-	}
+	do_draw(
+			screen, bitmap, blendprio, clip, info, offset_h, offset_v,
+			[this, &blend_op] (u16 pen_base, const u8 *scr, u32 *pix, u8 *prio, u32 *bprio, u16 &hpos, u16 &vpos)
+			{
+				const u16 idx = pen_base + (*scr);
+				const rgb_t pen = palette().pen_color(idx);
+				const bool is_prio_color = m_pen_priority[idx];
+				blend_op(prio[0], pix[0], bprio[0], pen, is_prio_color);
+				blend_op(prio[1], pix[1], bprio[1], pen, is_prio_color);
+			});
 }
 
 template <typename FunctionClass>
@@ -161,11 +142,37 @@ void specnext_layer2_device::draw_16(screen_device &screen, bitmap_rgb32 &bitmap
 
 	rectangle clip = rectangle{ m_clip_x1 << 2, (std::min<u16>(m_clip_x2 + 1, info[0]) << 2) - 1, m_clip_y1, std::min<u8>(m_clip_y2, info[1] - 1) };
 
-	u16 offset_h = m_offset_h - (info[2] << 1);
-	u16 offset_v = m_offset_v - info[2];
+	const u16 offset_h = m_offset_h - (info[2] << 1);
+	const u16 offset_v = m_offset_v - info[2];
 	clip.offset(offset_h, offset_v);
 	clip &= cliprect;
 
+	do_draw(
+			screen, bitmap, blendprio, clip, info, offset_h, offset_v,
+			[this, &blend_op] (u16 pen_base, const u8 *scr, u32 *pix, u8 *prio, u32 *bprio, u16 &hpos, u16 &vpos)
+			{
+				if (hpos & 1)
+					hpos ^= 1;
+				else
+				{
+					const u16 idx = pen_base + (*scr >> 4);
+					const rgb_t pen = palette().pen_color(idx);
+					const bool is_prio_color = m_pen_priority[idx];
+					blend_op(prio[0], pix[0], bprio[0], pen, is_prio_color);
+				}
+
+				{
+					const u16 idx = pen_base + (*scr & 0x0f);
+					const rgb_t pen = palette().pen_color(idx);
+					const bool is_prio_color = m_pen_priority[idx];
+					blend_op(prio[1], pix[1], bprio[1], pen, is_prio_color);
+				}
+			});
+}
+
+template <typename FunctionClass>
+void specnext_layer2_device::do_draw(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_rgb32 &blendprio, const rectangle &clip, const u16 (&info)[5], u16 offset_h, u16 offset_v, FunctionClass plot_op)
+{
 	if (clip.empty())
 		return;
 
@@ -182,22 +189,7 @@ void specnext_layer2_device::draw_16(screen_device &screen, bitmap_rgb32 &bitmap
 		u32 *bprio = &(blendprio.pix(vpos, clip.left()));
 		for (u16 hpos = clip.left(); hpos <= clip.right(); hpos += 2, pix += 2, prio += 2, bprio += 2)
 		{
-			if (hpos & 1)
-				hpos ^= 1;
-			else
-			{
-				const u16 idx = pen_base + (*scr >> 4);
-				const rgb_t pen = palette().pen_color(idx);
-				const bool is_prio_color = m_pen_priority[idx];
-				blend_op(prio[0], pix[0], bprio[0], pen, is_prio_color);
-			}
-
-			{
-				const u16 idx = pen_base + (*scr & 0x0f);
-				const rgb_t pen = palette().pen_color(idx);
-				const bool is_prio_color = m_pen_priority[idx];
-				blend_op(prio[1], pix[1], bprio[1], pen, is_prio_color);
-			}
+			plot_op(pen_base, scr, pix, prio, bprio, hpos, vpos);
 
 			++x %= info[0];
 			if (x == 0  && !x_overscan)

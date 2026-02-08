@@ -6072,7 +6072,7 @@ ROM_START( shpeng )
 	/* this rom doesn't belong here, it is from Dragon Punch, but shpeng hardware and game code is a hack
 	   of dragon punch.  This rom is better than the bad dump above for the sprite colours, although the
 	   colours on the intro/cutscenes are wrong */
-	ROM_LOAD_OPTIONAL( "1.17g", 0x200, 0x200, CRC(324fa9cf) SHA1(a03e23d9a9687dec4c23a8e41254a3f4b70c7e25) )
+	ROM_LOAD( "1.17g", 0x200, 0x200, CRC(324fa9cf) SHA1(a03e23d9a9687dec4c23a8e41254a3f4b70c7e25) )
 ROM_END
 
 /*

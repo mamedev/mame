@@ -47,7 +47,7 @@ u8 screen_ula_device::screen_mode()
 	return ((m_ula_type == ULA_TYPE_NEXT) && m_ula_shadow_en) ? 0b000 : (m_port_ff_reg & 7);
 }
 
-void screen_ula_device::draw_border(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 border_color)
+void screen_ula_device::draw_border(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 border_color, u8 pcode)
 {
 	u8 pap_attr = border_color << 3;
 	if ((m_ula_type == ULA_TYPE_NEXT) && m_ulanext_en)
@@ -60,18 +60,28 @@ void screen_ula_device::draw_border(bitmap_rgb32 &bitmap, const rectangle &clipr
 	const rgb_t gt1 = rgbexpand<3,3,3>((m_global_transparent << 1) | 1, 6, 3, 0);
 	if (pap != gt0 && pap != gt1)
 	{
-		bitmap.fill(pap, cliprect);
+		rectangle scr = { SCREEN_AREA.left() << 1, (SCREEN_AREA.right() << 1) | 1, SCREEN_AREA.top(), SCREEN_AREA.bottom() };
+		scr.offset(m_offset_h, m_offset_v);
 
-		rectangle clip = { SCREEN_AREA.left() << 1, (SCREEN_AREA.right() << 1) | 1, SCREEN_AREA.top(), SCREEN_AREA.bottom() };
-		clip.offset(m_offset_h, m_offset_v);
-		clip &= cliprect;
-
-		if (!clip.empty())
-			bitmap.fill(palette().pen_color(UTM_FALLBACK_PEN), clip);
+		const rectangle vis = screen.visible_area();
+		rectangle bsides[4] =
+		{
+			rectangle(vis.left(),      vis.right(),    vis.top(),        scr.top() - 1),
+			rectangle(vis.left(),      scr.left() - 1, scr.top(),        scr.bottom()),
+			rectangle(scr.right() + 1, vis.right(),    scr.top(),        scr.bottom()),
+			rectangle(vis.left(),      vis.right(),    scr.bottom() + 1, vis.bottom())
+		};
+		for (auto i = 0; i < 4; i++)
+		{
+			const rectangle border = bsides[i] & cliprect;
+			if (!border.empty())
+			{
+				if (pcode)
+					screen.priority().fill(pcode, border);
+				bitmap.fill(pap, border);
+			}
+		}
 	}
-	else
-		bitmap.fill(palette().pen_color(UTM_FALLBACK_PEN), cliprect);
-
 }
 
 void screen_ula_device::draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool flash, u8 pcode)

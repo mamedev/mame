@@ -10,11 +10,12 @@
 
 #include "emu.h"
 
-#include "machine/mos6530.h"
+#include "tia.h"
+
 #include "cpu/m6502/m6507.h"
+#include "machine/mos6530.h"
 #include "machine/watchdog.h"
 #include "sound/tiaintf.h"
-#include "tia.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -35,10 +36,10 @@ public:
 		m_leds(*this, "led%u", 0U)
 	{ }
 
-	void tourtabl(machine_config &config);
+	void tourtabl(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override { m_leds.resolve(); }
+	virtual void machine_start() override ATTR_COLD { m_leds.resolve(); }
 
 private:
 	required_device<cpu_device> m_maincpu;

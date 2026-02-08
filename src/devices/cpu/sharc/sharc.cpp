@@ -127,7 +127,7 @@ adsp21062_device::adsp21062_device(
 		uint32_t clock,
 		address_map_constructor internal_pgm,
 		address_map_constructor internal_data)
-	: cpu_device(mconfig, ADSP21062, tag, owner, clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 24, -3, internal_pgm)
 	, m_data_config("data", ENDIANNESS_LITTLE, 32, 32, -2, internal_data)
 	, m_boot_mode(BOOT_MODE_HOST)
@@ -181,7 +181,7 @@ std::unique_ptr<util::disasm_interface> adsp21062_device::create_disassembler()
 
 void adsp21062_device::enable_recompiler()
 {
-	if (has_running_machine() && (machine().phase() > machine_phase::INIT))
+	if (started())
 		throw emu_fatalerror("SHARC: enable_recompiler: changing mode after starting\n");
 	m_enable_drc = allow_drc();
 }

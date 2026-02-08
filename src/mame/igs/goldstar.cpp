@@ -17876,14 +17876,14 @@ ROM_END
 ROM_START( cb3i )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dyna.ic5", 0x0000, 0x1000, CRC(89924713) SHA1(f1334772f4855b492f3de6621803c02f018331a5) )
-	ROM_CONTINUE(         0x7000, 0x1000)  // 1000 to 7000
-	ROM_CONTINUE(         0x1000, 0x1000)  // 2000 to 1000 ok
-	ROM_CONTINUE(         0x5000, 0x1000)  // 3000 to 5000 ok
-	ROM_CONTINUE(         0x2000, 0x1000)  // 4000 to 2000 ok
-	ROM_CONTINUE(         0x4000, 0x1000)  // 5000 to 4000
-	ROM_CONTINUE(         0x3000, 0x1000)  // 6000 to 3000 ok
-	ROM_CONTINUE(         0x6000, 0x1000)  // 7000 to 6000 ok
-	ROM_CONTINUE(         0x8000, 0x8000)
+    ROM_CONTINUE(         0x4000, 0x1000)  // 1000-1fff to 4000-4fff
+    ROM_CONTINUE(         0x1000, 0x1000)  // 2000-2fff to 1000-1fff
+    ROM_CONTINUE(         0x5000, 0x1000)  // 3000-3fff to 5000-5fff
+    ROM_CONTINUE(         0x2000, 0x1000)  // 4000-4fff to 2000-2fff
+    ROM_CONTINUE(         0x6000, 0x1000)  // 5000-5fff to 6000-6fff
+    ROM_CONTINUE(         0x3000, 0x1000)  // 6000-6fff to 3000-3fff
+    ROM_CONTINUE(         0x7000, 0x1000)  // 7000-7fff to 7000-7fff (unscrambled)
+    ROM_CONTINUE(         0x8000, 0x8000)  // 8000-ffff to 8000-ffff (unscrambled)
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "dyna.h7",  0x00000, 0x08000, CRC(83650a94) SHA1(e79420ab559d3f74013708767ca3f238fd333fb7) )
@@ -17912,23 +17912,31 @@ ROM_END
   Cherry Bonus III
   v2.20
 
-  Main + daughterbord
+  Original Blue Dyna PCB + original Dyna daughterboard
+  silkscreened DYNA D9005 with:
 
-  Same daughterboard from the V.30
-  DYNA D9005
+  - Unknown DIL-40 IC (maybe a Z80) (IC4)
+  - 68-pins Xilinx XC.... (IC3)
+  - 1x 27C512 ROM (IC5)
+  - 1x Sanyo LC3517AS-12 (IC6)
+  - 1x empty DIL-8 socket (IC1)
+
+  - 1x Battery
+  - 1x 8-DIP switches bank (SW5)
+  - 1x Reset switch
 
 */
 ROM_START( cb3j )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // daughterboard
 	ROM_LOAD( "cb3s_v2.20.ic5", 0x0000, 0x1000, CRC(a8379120) SHA1(b31a2f65d610bd24a714e9455d917a8b9c9c452d) )
-	ROM_CONTINUE(         0x7000, 0x1000)  // 1000 to 7000
-	ROM_CONTINUE(         0x1000, 0x1000)  // 2000 to 1000
-	ROM_CONTINUE(         0x5000, 0x1000)  // 3000 to 5000
-	ROM_CONTINUE(         0x2000, 0x1000)  // 4000 to 2000
-	ROM_CONTINUE(         0x4000, 0x1000)  // 5000 to 4000
-	ROM_CONTINUE(         0x3000, 0x1000)  // 6000 to 3000
-	ROM_CONTINUE(         0x6000, 0x1000)  // 7000 to 6000
-	ROM_CONTINUE(         0x8000, 0x8000)
+    ROM_CONTINUE(         0x4000, 0x1000)  // 1000-1fff to 4000-4fff
+    ROM_CONTINUE(         0x1000, 0x1000)  // 2000-2fff to 1000-1fff
+    ROM_CONTINUE(         0x5000, 0x1000)  // 3000-3fff to 5000-5fff
+    ROM_CONTINUE(         0x2000, 0x1000)  // 4000-4fff to 2000-2fff
+    ROM_CONTINUE(         0x6000, 0x1000)  // 5000-5fff to 6000-6fff
+    ROM_CONTINUE(         0x3000, 0x1000)  // 6000-6fff to 3000-3fff
+    ROM_CONTINUE(         0x7000, 0x1000)  // 7000-7fff to 7000-7fff (unscrambled)
+    ROM_CONTINUE(         0x8000, 0x8000)  // 8000-ffff to 8000-ffff (unscrambled)
 
 	ROM_REGION( 0x18000, "gfx1", 0 )
 	ROM_LOAD( "rom5.bin",  0x00000, 0x08000, CRC(83650a94) SHA1(e79420ab559d3f74013708767ca3f238fd333fb7) )
@@ -33676,8 +33684,8 @@ GAMEL( 199?, cb3e,       ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e
 GAMEL( 199?, cb3f,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3f,      ROT0, "bootleg (Cleco)",   "Cherry Bonus III (set 5, encrypted bootleg)", MACHINE_NOT_WORKING, layout_chrygld ) // partially decrypted, stops at 'call attendant'
 GAMEL( 199?, cb3g,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 6)",          0,                   layout_cherryb3 )
 GAMEL( 199?, cb3h,       ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3,       ROT0, "Dyna",              "Cherry Bonus III (ver.1.40, set 7)",          0,                   layout_cherryb3 )
-GAMEL( 1992, cb3i,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.3.0)",                  MACHINE_NOT_WORKING, layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx.
-GAMEL( 199?, cb3j,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.2.20)",                 MACHINE_NOT_WORKING, layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx.
+GAMEL( 1992, cb3i,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.3.0)",                  0,                   layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx. 
+GAMEL( 199?, cb3j,       ncb3,     ncb3,     ncb3,     cb3_state,      empty_init,     ROT0, "Dyna",              "Cherry Bonus III (ver.2.20)",                 0,                   layout_cherryb3 ) // dated 1992 when Dyna CB3 seems to be from 1996 approx. 
 GAMEL( 199?, cb3s51,     ncb3,     ncb3,     ncb3,     cb3_state,      init_cb3g,      ROT0, "Dyna",              "Cherry Bonus III (ver.5.1)",                  0,                   layout_cherryb3 )
 GAMEL( 199?, chryglda,   ncb3,     cb3e,     chrygld,  cb3_state,      init_cb3e,      ROT0, "bootleg",           "Cherry Gold I (set 2, encrypted bootleg)",    0,                   layout_chrygld )  // Runs in CB3e hardware.
 GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chryangla, ROT0, "bootleg (G.C.I.)",  "Cherry Angel (encrypted, W-4 hardware)",      MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // DYNA CB3  V1.40 string, playable, but still has protections
