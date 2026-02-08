@@ -2,18 +2,18 @@
 // copyright-holders:David Haywood
 /*
 
-Stella
+ADP / Stella
 German Fruit Machines / Gambling Machines
 
-CPU Board:
+CPU Board, called Spiel- und Speicher Modul (SUS):
 ----------
  ____________________________________________________________
  |           ______________  ______________     ___________ |
- | 74HC245N  | t1 i       |  |KM681000ALP7|     |+        | |
+ | 74HC245N  | 27C4001    |  |KM681000ALP7|     |+        | |
  | 74HC573   |____________|  |____________|     |  3V Bat | |
  |                                              |         | |
  |           ______________  ______________     |        -| |
- |           | t1 ii      |  |KM681000ALP7|     |_________| |
+ |           | 27C4001    |  |KM681000ALP7|     |_________| |
  |     |||   |____________|  |____________| |||             |
  |     |||   ___________                    |||  M62X42B    |
  | X   |||   |         |                    |||             |
@@ -45,7 +45,7 @@ Sound  and I/O board:
  |*   L4974A         ||| |SCN68681C1N40 |                     |||               *|
  |*                  ||| |______________|   74HC32   74AC138  |||               *|
  |P7                 |||                                      |||              P8|
- |*                        TC428CPA                                             *|
+ |*                        TC428CPA                     SN75176                 *|
  |*                                                                             *|
  |*    P11  P12    P13    P14       P15   P16   P17      P18   P19   P20  P21   *|
  |P9   **** *****  *****  ****  OO  ****  ****  *******  ****  ****  ***  *** P10|
@@ -59,6 +59,7 @@ Parts:
  MX7224KN        - Maxim CMOS 8-bit DAC with Output Amplifier
  TL7705ACP       - Supply Voltage Supervisor
  TC428CPA        - Dual CMOS High-speed Driver
+ SN75176		 - RS-485 Differential Bus Transceiver
  L4974A          - ST 3.5A Switching Regulator
  OO              - LEDs (red); "Fehlerdiagnose siehe Fehlertable"
 
@@ -156,7 +157,7 @@ enum
 // outputs
 enum
 {
-	U1_1MA, //shared with output to service keyboard
+	U1_1MA, //shared with service keyboard
 	U1_2MA,
 	U1_ME,
 	U1_D3OUT,
@@ -168,13 +169,13 @@ enum
 
 enum
 {
-	U5_EN1MA, //shared with output to coin unit 1
+	U5_EN1MA, //shared with coin unit 1
 	U5_EN2MA,
 	U5_AW1,
 	U5_AW2,
-	U5_ENANZ1, //shared with output to service keyboard
+	U5_ENANZ1, //shared with service keyboard
 	U5_ENMUX1,
-	U5_ENANZ2, //shared with output to coin unit 2
+	U5_ENANZ2, //shared with coin unit 2
 	U5_ENMUX2
 };
 
