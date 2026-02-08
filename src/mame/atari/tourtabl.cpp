@@ -31,7 +31,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_riot(*this, "riot%u", 0),
 		m_tia(*this, "tia_video"),
-		m_tia_inputs(*this, { "PADDLE4", "PADDLE3", "PADDLE2", "PADDLE1", "TIA_IN4", "TIA_IN5" }),
+		m_tia_inputs(*this, { "PADDLE1", "PADDLE2", "PADDLE3", "PADDLE4", "TIA_IN4", "TIA_IN5" }),
 		m_screen(*this, "screen"),
 		m_leds(*this, "led%u", 0U)
 	{ }
