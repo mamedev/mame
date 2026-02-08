@@ -30,11 +30,11 @@
 
     Offset:     Bits:                   Value:
 
-    0.w         fe-- ---- ---- ---      Priority
+    0.w         fe-- ---- ---- ----     Priority
                 --dc ba98 ---- ----     Color
-                ---- ---- 7654 3210
+                ---- ---- 7654 3210     Code hi bits (8x8 only?)
 
-    2.w                                 Code
+    2.w                                 Code low bits
 
 
     When a row-scroll / row-select effect is enabled, the scroll values are
