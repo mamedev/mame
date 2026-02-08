@@ -61,7 +61,7 @@ float vector_options::s_beam_dot_size = 0.0f;
 float vector_options::s_beam_intensity_weight = 0.0f;
 
 namespace {
-vector_device::hook_callback s_hook_callback;
+    vector_device::hook_callback s_hook_callback;
 }
 
 void vector_options::init(emu_options& options)
