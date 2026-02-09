@@ -4,6 +4,20 @@
 
 Mario Bros driver by Mirko Buffoni
 
+TODO:
+- How were the US revisions determined? Judging from hex comparison, the
+  order is F->G->E (revision letters taken from MAME sets). The marioj set
+  looks newer than the G revision. The F/G revisions also have gfx2 bugs:
+  a gap in Mario/Luigi's cap when he jumps, and a wrong color eye pixel
+  (Luigi's pupil flashes green when he walks). This looks fine in marioe
+  and marioj. It's more likely a production error and not a bad dump.
+
+The sound MCU can be easily replaced with a ROMless one such as I8039
+(or just force EA high), by doing a 1-byte patch to the external ROM:
+
+offset $01: change $00 to $01 (call $100 -> call $101)
+
+============================================================================
 
 Memory map (preliminary):
 
@@ -63,12 +77,6 @@ I/O ports
 
 write:
 00        Z80 DMA
-
-
-The sound MCU can be easily replaced with a ROMless one such as I8039
-(or just force EA high), by doing a 1-byte patch to the external ROM:
-
-offset $01: change $00 to $01 (call $100 -> call $101)
 
 ***************************************************************************/
 
@@ -403,7 +411,7 @@ ROM_START( mario )
 	ROM_LOAD( "tma1-c-4p.4p",   0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
 
 	ROM_REGION( 0x0020, "decoder_prom", 0 )
-	ROM_LOAD( "tma1-c-5p.5p",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
+	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
 ROM_END
 
 ROM_START( mariof )
@@ -435,7 +443,7 @@ ROM_START( mariof )
 	ROM_LOAD( "tma1-c-4p_1.4p", 0x0000, 0x0200, CRC(8187d286) SHA1(8a6d8e622599f1aacaeb10f7b1a39a23c8a840a0) ) /* BPROM was a MB7124E read as 82S147 */
 
 	ROM_REGION( 0x0020, "decoder_prom", 0 )
-	ROM_LOAD( "tma1-c-5p.5p",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
+	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
 ROM_END
 
 ROM_START( marioe )
@@ -467,15 +475,15 @@ ROM_START( marioe )
 	ROM_LOAD( "tma1-c-4p_1.4p",   0x0000, 0x0200, CRC(8187d286) SHA1(8a6d8e622599f1aacaeb10f7b1a39a23c8a840a0) ) /* BPROM was a MB7124E read as 82S147 */
 
 	ROM_REGION( 0x0020, "decoder_prom", 0 )
-	ROM_LOAD( "tma1-c-5p.5p",     0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
+	ROM_LOAD( "tma1-c-5b.5b",     0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
 ROM_END
 
 ROM_START( marioj )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tma1c-a1.7f",    0x0000, 0x2000, CRC(b64b6330) SHA1(f7084251ac325bbfa3fb804da16a50622e1fd213) )
-	ROM_LOAD( "tma1c-a2.7e",    0x2000, 0x2000, CRC(290c4977) SHA1(5af266be0ddc883c6548c90e4a9084024a1e91a0) )
-	ROM_LOAD( "tma1c-a1.7d",    0x4000, 0x2000, CRC(f8575f31) SHA1(710d0e72fcfce700ed2a22fb9c7c392cc76b250b) )
-	ROM_LOAD( "tma1c-a2.7c",    0xf000, 0x1000, CRC(a3c11e9e) SHA1(d0612b0f8c2ea4e798f551922a04a324f4ed5f3d) )
+	ROM_LOAD( "tma1-c-a1.7f",   0x0000, 0x2000, CRC(b64b6330) SHA1(f7084251ac325bbfa3fb804da16a50622e1fd213) )
+	ROM_LOAD( "tma1-c-a2.7e",   0x2000, 0x2000, CRC(290c4977) SHA1(5af266be0ddc883c6548c90e4a9084024a1e91a0) )
+	ROM_LOAD( "tma1-c-a1.7d",   0x4000, 0x2000, CRC(f8575f31) SHA1(710d0e72fcfce700ed2a22fb9c7c392cc76b250b) )
+	ROM_LOAD( "tma1-c-a2.7c",   0xf000, 0x1000, CRC(a3c11e9e) SHA1(d0612b0f8c2ea4e798f551922a04a324f4ed5f3d) )
 
 	ROM_REGION( 0x0800, "audiocpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "m58715-051p.5l", 0x0000, 0x0800, NO_DUMP ) // internal rom
@@ -484,22 +492,22 @@ ROM_START( marioj )
 	ROM_LOAD( "tma1c-a.6k",     0x0000, 0x1000, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "tma1v-a.3f",     0x0000, 0x1000, CRC(adf49ee0) SHA1(11fc2cd197bfe3ecb6af55c3c7a326c94988d2bd) )
-	ROM_LOAD( "tma1v-a.3j",     0x1000, 0x1000, CRC(a5318f2d) SHA1(e42f5e51804195c64a56addb18b7ad12c57bb09a) )
+	ROM_LOAD( "tma1-v-a.3f",    0x0000, 0x1000, CRC(adf49ee0) SHA1(11fc2cd197bfe3ecb6af55c3c7a326c94988d2bd) )
+	ROM_LOAD( "tma1-v-a.3j",    0x1000, 0x1000, CRC(a5318f2d) SHA1(e42f5e51804195c64a56addb18b7ad12c57bb09a) )
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "tma1v-a.7m",     0x0000, 0x1000, CRC(186762f8) SHA1(711fdd37392656bdd5027e020d51d083ccd7c407) )
-	ROM_LOAD( "tma1v-a.7n",     0x1000, 0x1000, CRC(e0e08bba) SHA1(315eba2c10d426c9c0bb4e36987bf8ebed7df9a0) )
-	ROM_LOAD( "tma1v-a.7p",     0x2000, 0x1000, CRC(7b27c8c1) SHA1(3fb2613ce19e353fbcc77b6817927794fb35810f) )
-	ROM_LOAD( "tma1v-a.7s",     0x3000, 0x1000, CRC(912ba80a) SHA1(351fb5b160216eb10e281815d05a7165ca0e5909) )
-	ROM_LOAD( "tma1v-a.7t",     0x4000, 0x1000, CRC(5cbb92a5) SHA1(a78a378e6d3060143dc456e9c33a5068da648331) )
-	ROM_LOAD( "tma1v-a.7u",     0x5000, 0x1000, CRC(13afb9ed) SHA1(b29dcd91cf5e639ee50b734afc7a3afce79634df) )
+	ROM_LOAD( "tma1-v-a.7m",    0x0000, 0x1000, CRC(186762f8) SHA1(711fdd37392656bdd5027e020d51d083ccd7c407) )
+	ROM_LOAD( "tma1-v-a.7n",    0x1000, 0x1000, CRC(e0e08bba) SHA1(315eba2c10d426c9c0bb4e36987bf8ebed7df9a0) )
+	ROM_LOAD( "tma1-v-a.7p",    0x2000, 0x1000, CRC(7b27c8c1) SHA1(3fb2613ce19e353fbcc77b6817927794fb35810f) )
+	ROM_LOAD( "tma1-v-a.7s",    0x3000, 0x1000, CRC(912ba80a) SHA1(351fb5b160216eb10e281815d05a7165ca0e5909) )
+	ROM_LOAD( "tma1-v-a.7t",    0x4000, 0x1000, CRC(5cbb92a5) SHA1(a78a378e6d3060143dc456e9c33a5068da648331) )
+	ROM_LOAD( "tma1-v-a.7u",    0x5000, 0x1000, CRC(13afb9ed) SHA1(b29dcd91cf5e639ee50b734afc7a3afce79634df) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "tma1-c-4p.4p",   0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
 
 	ROM_REGION( 0x0020, "decoder_prom", 0 )
-	ROM_LOAD( "tma1-c-5p.5p",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
+	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
 ROM_END
 
 ROM_START( masao )
@@ -517,12 +525,12 @@ ROM_START( masao )
 	ROM_LOAD( "masao-7.rom",  0x1000, 0x1000, CRC(747c1349) SHA1(54674f78edf86953b7d500b66393483d1a5ce8ab) )
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "tma1v-a.7m",   0x0000, 0x1000, CRC(186762f8) SHA1(711fdd37392656bdd5027e020d51d083ccd7c407) )
+	ROM_LOAD( "tma1-v-a.7m",  0x0000, 0x1000, CRC(186762f8) SHA1(711fdd37392656bdd5027e020d51d083ccd7c407) )
 	ROM_LOAD( "masao-9.rom",  0x1000, 0x1000, CRC(50be3918) SHA1(73e22eee67a03732ff57e523f900f20c6aee0491) )
 	ROM_LOAD( "mario.7p",     0x2000, 0x1000, CRC(56be6ccd) SHA1(15a6e16c189d45f72761ebcbe9db5001bdecd659) )
-	ROM_LOAD( "tma1v-a.7s",   0x3000, 0x1000, CRC(912ba80a) SHA1(351fb5b160216eb10e281815d05a7165ca0e5909) )
-	ROM_LOAD( "tma1v-a.7t",   0x4000, 0x1000, CRC(5cbb92a5) SHA1(a78a378e6d3060143dc456e9c33a5068da648331) )
-	ROM_LOAD( "tma1v-a.7u",   0x5000, 0x1000, CRC(13afb9ed) SHA1(b29dcd91cf5e639ee50b734afc7a3afce79634df) )
+	ROM_LOAD( "tma1-v-a.7s",  0x3000, 0x1000, CRC(912ba80a) SHA1(351fb5b160216eb10e281815d05a7165ca0e5909) )
+	ROM_LOAD( "tma1-v-a.7t",  0x4000, 0x1000, CRC(5cbb92a5) SHA1(a78a378e6d3060143dc456e9c33a5068da648331) )
+	ROM_LOAD( "tma1-v-a.7u",  0x5000, 0x1000, CRC(13afb9ed) SHA1(b29dcd91cf5e639ee50b734afc7a3afce79634df) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "tma1-c-4p.4p", 0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
