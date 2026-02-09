@@ -306,7 +306,12 @@ void cem3394_device::sound_stream_update(sound_stream &stream)
 
 void cem3394_device::device_add_mconfig(machine_config &config)
 {
-	VA_LPF4(config, m_vcf).configure_drive(1.0).configure_bass_gain_comp(0.5);
+	VA_LPF4(config, m_vcf).configure_drive(1.0);
+
+	// According to the datasheet, the filter maintains the apparent loudness
+	// constant as resonance increases. The value below was selected by trial
+	// and error, to qualitatively match the preceding statement.
+	m_vcf->configure_bass_gain_comp(0.2);
 }
 
 void cem3394_device::device_start()
