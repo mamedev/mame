@@ -1854,6 +1854,11 @@ void psxcpu_device::device_start()
 	save_item(NAME(m_cp0r));
 	save_item(NAME(m_gte.m_cp2cr));
 	save_item(NAME(m_gte.m_cp2dr));
+	save_item(NAME(m_sf));
+	save_item(NAME(m_mac0));
+	save_item(NAME(m_mac1));
+	save_item(NAME(m_mac2));
+	save_item(NAME(m_mac3));
 	save_item(NAME(m_icacheTag));
 	save_item(NAME(m_icache));
 	save_item(NAME(m_dcache));
