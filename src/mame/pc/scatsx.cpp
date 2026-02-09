@@ -5,9 +5,9 @@
 SCATsx based PCs
 
 TODO:
-- Port over anch386s to here (doesn't use any chipset features tho?);
 - add EMS in chipset (has specific driver for MS-DOS);
-- Add remaining sets;
+- Several remaining sets;
+- Check earlier SCAT chipset(s), consider moving here;
 
 **************************************************************************************************/
 
@@ -41,6 +41,7 @@ public:
 	{ }
 
 	void mb1320(machine_config &config);
+	void scsxaio(machine_config &config);
 
 protected:
 	void base_config(machine_config &config);
@@ -64,9 +65,6 @@ void scatsx_state::main_map(address_map &map)
 void scatsx_state::main_io(address_map &map)
 {
 }
-
-static INPUT_PORTS_START( scatsx )
-INPUT_PORTS_END
 
 void scatsx_state::base_config(machine_config &config)
 {
@@ -166,12 +164,34 @@ void scatsx_state::mb1320(machine_config &config)
 	ISA16_SLOT(config, "isa7", 0, "isabus", pc_isa16_cards, nullptr, false);
 }
 
+void scatsx_state::scsxaio(machine_config &config)
+{
+	// TODO: Acer M5105, COM / LPT / IDE ports actually as connectors on MB
+	base_config(config);
+	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "vga", false);
+	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, "fdc", false);
+	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, "ide", false);
+	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, "lpt", false);
+	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa16_cards, "com", false);
+	ISA16_SLOT(config, "isa6", 0, "isabus", pc_isa16_cards, nullptr, false);
+}
+
+
 
 ROM_START( mb1320 )
 	ROM_REGION16_LE( 0x40000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD( "amd386.bin", 0x030000, 0x010000, CRC(7c5045af) SHA1(64efea383b2a5beb16586d5fd67eced83068c616) )
 ROM_END
 
+// SCsxAIO - Chipset: Chips 82C236 (SCATsx), Acer M5105 A3E - On board: 2xCOM, Floppy, ISA
+// BIOS-String: Peacock 386sx Ver. 2.0 24.03.92 30-0000-D01131-00101111-070791-SCATsx-0 - ISA16: 6
+ROM_START( scsxaio )
+	ROM_REGION16_LE(0x40000, "bios", 0)
+	ROM_LOAD( "ami_1131.bin", 0x20000, 0x10000, NO_DUMP ) // keyboard BIOS
+	ROM_LOAD( "386-peacock_scsxaio.bin", 0x30000, 0x10000, CRC(54c3cacd) SHA1(b3c821b30052d0c771b5004a3746eb2cfd186c79))
+ROM_END
+
 } // anonymous namespace
 
-COMP( 1990, mb1320,    0, 0, mb1320,    scatsx, scatsx_state, empty_init, "Biostar", "MB-1320/25C-B.5 (SCATsx chipset)", MACHINE_NOT_WORKING )
+COMP( 1990, mb1320,    0, 0,    mb1320,    0, scatsx_state, empty_init, "Biostar",                 "MB-1320/25C-B.5 (SCATsx chipset)", MACHINE_NOT_WORKING )
+COMP( 1991, scsxaio,   0, 0,    scsxaio,   0, scatsx_state, empty_init, "ECS / Peacock Computer",  "SCsxAIO (SCATsx chipset)", MACHINE_NOT_WORKING )

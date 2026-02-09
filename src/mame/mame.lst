@@ -37353,7 +37353,6 @@ qi900
 samdm286
 sarcpc
 scamp386sx
-scsxaio
 sh386sx20
 sis85c471
 sisrabb
@@ -37644,6 +37643,7 @@ queen
 
 @source:pc/scatsx.cpp
 mb1320
+scsxaio
 
 @source:pc/seawolfnm.cpp
 seawolfnm
