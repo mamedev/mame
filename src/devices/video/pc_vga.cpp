@@ -1938,16 +1938,18 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				curr_addr = 0;
 			uint32_t *const bitmapline = &bitmap.pix(line + yi);
 			addr %= vga.svga_intf.vram_size;
-			for (int pos=curr_addr, c=0, column=0; column < VGA_COLUMNS; column++, c+=8, pos+=0x8)
+			for (int pos = curr_addr, c = 0, column = 0; column < VGA_COLUMNS; column++, c+=8, pos+=0x8)
 			{
 				if(pos + 0x08 >= vga.svga_intf.vram_size)
 					return;
 
-				for (int xi=0;xi<8;xi++)
+				for (int xi = 0; xi < 8; xi++)
 				{
-					if(!screen().visible_area().contains(c+xi, line + yi))
+					const int dest_x = c + xi;
+
+					if(!screen().visible_area().contains(dest_x, line + yi))
 						continue;
-					bitmapline[c+xi] = pen(vga.memory[(pos+(xi))]);
+					bitmapline[dest_x] = pen(vga.memory[pos + xi]);
 				}
 			}
 		}
@@ -1970,23 +1972,25 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
-		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=0x10)
+		for (int pos = addr, c = 0, column = 0; column < TGA_COLUMNS; column++, c+=8, pos+=0x10)
 		{
 			if(pos + 0x10 >= vga.svga_intf.vram_size)
 				return;
 			for(int xi = 0, xm = 0; xi < 8; xi++, xm+=2)
 			{
-				if(!screen().visible_area().contains(c + xi, line + yi))
+				const int dest_x = c + xi;
+
+				if(!screen().visible_area().contains(dest_x, line + yi))
 					continue;
 
 				const u16 MV = (vga.memory[pos + xm] + (vga.memory[pos + xm + 1] << 8));
-				int r = (MV & 0x7c00)>> 10;
-				int g = (MV & 0x03e0)>> 5;
-				int b = (MV & 0x001f)>> 0;
+				int r = (MV & 0x7c00) >> 10;
+				int g = (MV & 0x03e0) >> 5;
+				int b = (MV & 0x001f) >> 0;
 				r = (r << 3) | (r & 0x7);
 				g = (g << 3) | (g & 0x7);
 				b = (b << 3) | (b & 0x7);
-				bitmapline[c + xi] = IV|(r << 16)|(g << 8)|(b << 0);
+				bitmapline[dest_x] = IV | (r << 16) | (g << 8) | (b << 0);
 			}
 		}
 	}
@@ -2004,7 +2008,7 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int curr_addr = 0;
 	int yi = 0;
 
-	for (int addr = vga.crtc.start_addr << 2, line=0; line < TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line += height, addr += offset(), curr_addr += offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2012,9 +2016,11 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 		{
 			if(pos + 0x10 >= vga.svga_intf.vram_size)
 				return;
-			for (int xi=0,xm=0;xi<8;xi++,xm+=2)
+			for (int xi = 0, xm = 0; xi < 8; xi++, xm+=2)
 			{
-				if(!screen().visible_area().contains(c+xi, line + yi))
+				const int dest_x = c + xi;
+
+				if(!screen().visible_area().contains(dest_x, line + yi))
 					continue;
 
 				const u16 MV = (vga.memory[pos + xm] + (vga.memory[pos + xm + 1] << 8));
@@ -2024,7 +2030,7 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				r = (r << 3) | (r & 0x7);
 				g = (g << 2) | (g & 0x3);
 				b = (b << 3) | (b & 0x7);
-				bitmapline[c + xi] = IV|(r << 16)|(g << 8)|(b << 0);
+				bitmapline[dest_x] = IV | (r << 16) | (g << 8) | (b << 0);
 			}
 		}
 	}
@@ -2042,17 +2048,19 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int curr_addr = 0;
 	int yi = 0;
 
-	for (int addr = vga.crtc.start_addr << 3, line=0; line < TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+	for (int addr = vga.crtc.start_addr << 3, line=0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
-		for (int pos=addr, c=0, column=0; column<TGA_COLUMNS; column++, c+=8, pos+=24)
+		for (int pos = addr, c = 0, column = 0; column < TGA_COLUMNS; column++, c+=8, pos+=24)
 		{
 			if(pos + 24 >= vga.svga_intf.vram_size)
 				return;
 			for (int xi = 0, xm = 0; xi < 8; xi++, xm+=3)
 			{
-				if(!screen().visible_area().contains(c+xi, line + yi))
+				const int dest_x = c + xi;
+
+				if(!screen().visible_area().contains(dest_x, line + yi))
 					continue;
 
 				const u32 MD = (vga.memory[pos + xm] + (vga.memory[pos + xm + 1] << 8)+(vga.memory[pos + xm + 2] << 16));
@@ -2060,7 +2068,7 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				int r = (MD & 0xff0000) >> 16;
 				int g = (MD & 0x00ff00) >> 8;
 				int b = (MD & 0x0000ff) >> 0;
-				bitmapline[c + xi] = ID |(r << 16)|(g << 8)|(b << 0);
+				bitmapline[dest_x] = ID | (r << 16) | (g << 8) | (b << 0);
 			}
 		}
 	}
@@ -2080,7 +2088,7 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int curr_addr = 0;
 	int yi = 0;
 
-	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line+=height, addr+=(offset()), curr_addr+=(offset()))
+	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2097,7 +2105,7 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				int r = (MD & 0xff0000) >> 16;
 				int g = (MD & 0x00ff00) >> 8;
 				int b = (MD & 0x0000ff) >> 0;
-				bitmapline[c+xi] = ID|(r << 16)|(g << 8)|(b << 0);
+				bitmapline[c+xi] = ID | (r << 16) | (g << 8) | (b << 0);
 			}
 		}
 	}
