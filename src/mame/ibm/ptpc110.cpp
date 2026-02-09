@@ -37,6 +37,8 @@ Components:
 
 #include "screen.h"
 
+namespace {
+
 class ptpc110_state : public driver_device
 {
 public:
@@ -98,6 +100,6 @@ ROM_START( ptpc110 )
 	ROM_LOAD( "pc110-flash.bin", 0, 0x40000, CRC(d68bb7a4) SHA1(b5c075842b60accae06bc78ddbf6454d9127de4f) )
 ROM_END
 
+}  // anonymous namespace
 
 COMP( 1995, ptpc110, 0, 0, ptpc110, 0, ptpc110_state, empty_init, "International Business Machines", "Palm Top PC-110 (Japan)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
