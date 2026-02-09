@@ -173,13 +173,31 @@ private:
 	void portb_w(u8 data);
 
 	u8 m_config_address;
+	bool m_config_unlock;
+	u8 m_ramtmg;
+	u8 m_ramcfg[2];
+	u8 m_ramset;
+	u8 m_ntbref;
+	u8 m_clkctl;
+	u8 m_miscset;
+	u8 m_dmactl;
+	u8 m_busctl;
+	u8 m_fbcr;
+	u8 m_romset;
+	u8 m_segment_access[6];
+	u8 m_segment_cache[6];
+	u8 m_cachctl;
+	u8 m_pmra[2];
+	u8 m_pmre[2];
+	u8 m_xctl;
+
 	void config_address_w(offs_t offset, u8 data);
 	u8 config_data_r(offs_t offset);
 	void config_data_w(offs_t offset, u8 data);
 
 //	std::vector<u8> m_shadow_ram;
 
-//	void update_romram_settings();
+	void update_segment_settings();
 //	void update_dma_clock();
 
 	offs_t page_offset();

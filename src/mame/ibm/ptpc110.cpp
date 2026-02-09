@@ -6,7 +6,15 @@ IBM Palm Top PC-110
 
 TODO:
 - Skeleton-ish, needs SCAMP chipset and Super I/O to proceed;
-- Hookup specific SW list (4 system disks) once this do anything worth;
+- Hookup specific SW list (4 system disks) once this do anything worthwhile;
+- Error 104 (protected mode, tries to r/w $0100'0000)
+- Error 8081 (PCMCIA)
+- Error 161 (CMOS)
+- Error 2401 (video problem, r/w extended VGA regs)
+- Error 301 (keyboard)
+- Error 604 (floppy disk error)
+- Error 163 (date and time not set/bad)
+- I9990303 "not OK -> IBM" (may be related to above)
 
 ===================================================================================================
 
