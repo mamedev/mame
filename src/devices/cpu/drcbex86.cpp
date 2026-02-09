@@ -10,6 +10,8 @@
 
    Future improvements/changes:
 
+    * Restore floating point environment when calling out to C code
+
     * Optimize to avoid unnecessary reloads
         - especially EDX for 64-bit operations
         - also FCMP/FLAGS has unnecessary PUSHF/POP EAX
