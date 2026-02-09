@@ -1557,8 +1557,6 @@ struct c417_t
 
 struct c412_t
 {
-	u16 unk0;
-	u16 unk1;
 	u16 sdram_a[0x100000]; // Framebuffers, probably
 	u16 sdram_b[0x100000];
 	u16 sram[0x20000];     // Ram-based tiles for alpha-cutout drawing
@@ -1785,15 +1783,11 @@ protected:
 	u16 c417_ptrom_lsw_r();
 	void c417_irq_ack_w(offs_t offset, u16 data);
 
-	u16 c412_unk0_r();
-	u16 c412_unk1_r();
 	u16 c412_flags_r(); // offset 0x06
 	u16 c412_addr_lsw_r(); // offset 0x10
 	u16 c412_addr_msw_r(); // offset 0x12
 	u16 c412_ram_r(); // offset 0x14
 	u16 c412_status_r(); // offset 0x18
-	void c412_unk0_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	void c412_unk1_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void c412_flags_w(offs_t offset, u16 data, u16 mem_mask = ~0); // offset 0x04
 	void c412_addr_lsw_w(offs_t offset, u16 data, u16 mem_mask = ~0); // offset 0x10
 	void c412_addr_msw_w(offs_t offset, u16 data, u16 mem_mask = ~0); // offset 0x12
@@ -2175,7 +2169,6 @@ public:
 	void gmen(machine_config &config);
 	void gunwars(machine_config &config);
 	void raceon(machine_config &config);
-	void finfurl2(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2208,6 +2201,36 @@ private:
 
 	int m_vpx_sdao;
 	u32 m_sh2_unk;
+};
+
+class finfurl2_state : public namcoss23_gmen_state
+{
+public:
+	finfurl2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcoss23_gmen_state(mconfig, type, tag),
+		m_handle(*this, "JVS_ANALOG_INPUT2")
+	{
+	}
+
+	void finfurl2(machine_config &config)
+	{
+		gmen(config);
+		m_jvs->set_default_option("namco_asca3a");
+	}
+
+protected:
+	virtual void configure_jvs(device_jvs_interface &io) override
+	{
+		namcoss23_state::configure_jvs(io);
+		io.analog_input<1>().set(*this, FUNC(finfurl2_state::handle_r));
+	}
+
+	uint16_t handle_r()
+	{
+		return m_handle->read() + 0xc000;
+	}
+
+	required_ioport m_handle;
 };
 
 class crszone_state : public namcoss23_state
@@ -5130,29 +5153,10 @@ void crszone_state::c450_dma_size_w(address_space &space, offs_t offset, u32 dat
 
 // C412
 
-u16 namcos23_state::c412_unk0_r()
-{
-	LOGMASKED(LOG_C412_UNK, "%s: c412_unk0_r: %04x\n", machine().describe_context(), m_c412.unk0);
-	return m_c412.unk0;
-}
-
-void namcos23_state::c412_unk0_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	LOGMASKED(LOG_C412_UNK, "%s: c412_unk0_w: %04x\n", machine().describe_context(), data);
-	m_c412.unk0 = data;
-}
-
-u16 namcos23_state::c412_unk1_r()
-{
-	LOGMASKED(LOG_C412_UNK, "%s: c412_unk1_r: %04x\n", machine().describe_context(), m_c412.unk1);
-	return m_c412.unk1;
-}
-
-void namcos23_state::c412_unk1_w(offs_t offset, u16 data, u16 mem_mask)
-{
-	LOGMASKED(LOG_C412_UNK, "%s: c412_unk1_w: %04x\n", machine().describe_context(), data);
-	m_c412.unk1 = data;
-}
+// Offsets 0x00 and 0x02 are written to and read from, but it's not clear what they do.
+// Simply returning the values written to them causes glitchy polygons instead of a background
+// to appear in the gun-adjust screen of timecrs2v1b, as well as missing background graphics
+// in some places in finfurl2/finfurl2j.
 
 u16 namcos23_state::c412_flags_r() // offset 0x06
 {
@@ -5783,8 +5787,6 @@ void namcos23_state::mips_map(address_map &map)
 	map(0x08000000, 0x08ffffff).rom().region("data", 0x0000000).mirror(0x1000000); // data ROMs
 	map(0x0a000000, 0x0affffff).rom().region("data", 0x1000000).mirror(0x1000000);
 
-	map(0x0c000000, 0x0c000001).rw(FUNC(namcos23_state::c412_unk0_r), FUNC(namcos23_state::c412_unk0_w));
-	map(0x0c000002, 0x0c000003).rw(FUNC(namcos23_state::c412_unk1_r), FUNC(namcos23_state::c412_unk1_w));
 	map(0x0c000004, 0x0c000005).w(FUNC(namcos23_state::c412_flags_w));
 	map(0x0c000006, 0x0c000007).r(FUNC(namcos23_state::c412_flags_r));
 	map(0x0c000010, 0x0c000011).rw(FUNC(namcos23_state::c412_addr_lsw_r), FUNC(namcos23_state::c412_addr_lsw_w));
@@ -6278,8 +6280,6 @@ void namcos23_state::machine_start()
 	save_item(NAME(m_c417.pointrom_adr));
 	save_item(NAME(m_c417.test_mode));
 
-	save_item(NAME(m_c412.unk0));
-	save_item(NAME(m_c412.unk1));
 	save_item(NAME(m_c412.sdram_a));
 	save_item(NAME(m_c412.sdram_b));
 	save_item(NAME(m_c412.sram));
@@ -6727,12 +6727,6 @@ void namcoss23_gmen_state::raceon(machine_config &config)
 {
 	gmen(config);
 	m_jvs->set_default_option("namco_asca5");
-}
-
-void namcoss23_gmen_state::finfurl2(machine_config &config)
-{
-	gmen(config);
-	m_jvs->set_default_option("namco_asca3a");
 }
 
 void crszone_state::crszone(machine_config &config)
@@ -8716,8 +8710,8 @@ GAME( 1998, raceon,      0,        raceon,      raceon,    namcoss23_gmen_state,
 GAME( 1998, raceonj,     raceon,   raceon,      raceon,    namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Race On! (Japan, RO1 Ver. B)",          GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, 500gp,       0,        _500gp,      500gp,     namcoss23_state,      empty_init,  ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",              GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, aking,       0,        aking,       aking,     namcoss23_state,      empty_init,  ROT0, "Namco", "Angler King (Japan, AG1 Ver. A)",       GAME_FLAGS )
-GAME( 1998, finfurl2,    0,        finfurl2,    finfurl2,  namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Final Furlong 2 (World, FFS2 Ver. A)",  GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:08:47 Overseas
-GAME( 1998, finfurl2j,   finfurl2, finfurl2,    finfurl2,  namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Final Furlong 2 (Japan, FFS1 Ver. A)",  GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:03:14 Japanese
+GAME( 1998, finfurl2,    0,        finfurl2,    finfurl2,  finfurl2_state,       empty_init,  ROT0, "Namco", "Final Furlong 2 (World, FFS2 Ver. A)",  GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:08:47 Overseas
+GAME( 1998, finfurl2j,   finfurl2, finfurl2,    finfurl2,  finfurl2_state,       empty_init,  ROT0, "Namco", "Final Furlong 2 (Japan, FFS1 Ver. A)",  GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:03:14 Japanese
 GAME( 1999, crszone,     0,        crszone,     crszone,   crszone_state,        empty_init,  ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. B)",     GAME_FLAGS )
 GAME( 1999, crszonev4a,  crszone,  crszone,     crszone,   crszone_state,        empty_init,  ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. A)",     GAME_FLAGS )
 GAME( 1999, crszonev3b,  crszone,  crszone,     crszone,   crszone_state,        empty_init,  ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 1)", GAME_FLAGS )
