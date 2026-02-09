@@ -244,12 +244,12 @@ void um8498f_device::io_map(address_map &map)
 	);
 }
 
-uint8_t um8498f_device::portb_r()
+u8 um8498f_device::portb_r()
 {
 	return m_portb;
 }
 
-void um8498f_device::portb_w(uint8_t data)
+void um8498f_device::portb_w(u8 data)
 {
 	m_portb = (m_portb & 0xf0) | (data & 0x0f);
 
@@ -390,7 +390,7 @@ void um8498f_device::update_romram_settings()
 //
 //	const int dma_clock_sel = BIT(m_dma_ws_control, 0);
 //
-//	uint32_t dma_clock = clock() / busclk_sel;
+//	u32 dma_clock = clock() / busclk_sel;
 //
 //	if (!dma_clock_sel)
 //		dma_clock /= 2;
@@ -424,7 +424,7 @@ offs_t um8498f_device::page_offset()
 	return 0xff0000;
 }
 
-uint8_t um8498f_device::dma_read_byte(offs_t offset)
+u8 um8498f_device::dma_read_byte(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -432,7 +432,7 @@ uint8_t um8498f_device::dma_read_byte(offs_t offset)
 	return m_space_mem->read_byte(page_offset() + offset);
 }
 
-void um8498f_device::dma_write_byte(offs_t offset, uint8_t data)
+void um8498f_device::dma_write_byte(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;
@@ -440,7 +440,7 @@ void um8498f_device::dma_write_byte(offs_t offset, uint8_t data)
 	m_space_mem->write_byte(page_offset() + offset, data);
 }
 
-uint8_t um8498f_device::dma_read_word(offs_t offset)
+u8 um8498f_device::dma_read_word(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -451,7 +451,7 @@ uint8_t um8498f_device::dma_read_word(offs_t offset)
 	return result;
 }
 
-void um8498f_device::dma_write_word(offs_t offset, uint8_t data)
+void um8498f_device::dma_write_word(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;

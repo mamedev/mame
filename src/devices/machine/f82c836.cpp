@@ -255,12 +255,12 @@ void f82c836a_device::io_map(address_map &map)
 //	map(0x0218, 0x021a) alt of above (depends on a register setting)
 }
 
-uint8_t f82c836a_device::portb_r()
+u8 f82c836a_device::portb_r()
 {
 	return m_portb;
 }
 
-void f82c836a_device::portb_w(uint8_t data)
+void f82c836a_device::portb_w(u8 data)
 {
 	m_portb = (m_portb & 0xf0) | (data & 0x0f);
 
@@ -409,7 +409,7 @@ void f82c836a_device::update_dma_clock()
 
 	const int dma_clock_sel = BIT(m_dma_ws_control, 0);
 
-	uint32_t dma_clock = clock() / busclk_sel;
+	u32 dma_clock = clock() / busclk_sel;
 
 	if (!dma_clock_sel)
 		dma_clock /= 2;
@@ -443,7 +443,7 @@ offs_t f82c836a_device::page_offset()
 	return 0xff0000;
 }
 
-uint8_t f82c836a_device::dma_read_byte(offs_t offset)
+u8 f82c836a_device::dma_read_byte(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -451,7 +451,7 @@ uint8_t f82c836a_device::dma_read_byte(offs_t offset)
 	return m_space_mem->read_byte(page_offset() + offset);
 }
 
-void f82c836a_device::dma_write_byte(offs_t offset, uint8_t data)
+void f82c836a_device::dma_write_byte(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;
@@ -459,18 +459,18 @@ void f82c836a_device::dma_write_byte(offs_t offset, uint8_t data)
 	m_space_mem->write_byte(page_offset() + offset, data);
 }
 
-uint8_t f82c836a_device::dma_read_word(offs_t offset)
+u8 f82c836a_device::dma_read_word(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
 
-	uint16_t result = m_space_mem->read_word((page_offset() & 0xfe0000) | (offset << 1));
+	u16 result = m_space_mem->read_word((page_offset() & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result >> 8;
 
 	return result;
 }
 
-void f82c836a_device::dma_write_word(offs_t offset, uint8_t data)
+void f82c836a_device::dma_write_word(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;
