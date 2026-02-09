@@ -4031,6 +4031,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/vl82c420.h,MACHINES["VL82C420"] = true
+---------------------------------------------------
+
+if MACHINES["VL82C420"] then
+	files {
+		MAME_DIR .. "src/devices/machine/vl82c420.cpp",
+		MAME_DIR .. "src/devices/machine/vl82c420.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/wd_fdc.h,MACHINES["WD_FDC"] = true
 ---------------------------------------------------
 
