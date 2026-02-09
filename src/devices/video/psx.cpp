@@ -626,6 +626,8 @@ void psxgpu_device::psx_gpu_init( int n_gputype )
 	save_item(NAME(n_gpuinfo));
 	save_item(NAME(n_lightgun_x));
 	save_item(NAME(n_lightgun_y));
+	save_item(NAME(n_screenwidth));
+	save_item(NAME(n_screenheight));
 	save_item(NAME(m_n_tx));
 	save_item(NAME(m_n_ty));
 	save_item(NAME(n_abr));
