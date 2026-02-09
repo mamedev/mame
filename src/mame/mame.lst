@@ -20531,6 +20531,9 @@ ibm5550
 @source:ibm/ibm6580.cpp
 ibm6580
 
+@source:ibm/ptpc110.cpp
+ptpc110
+
 @source:ibm/rs6000_type7xxx.cpp
 rs6k7009
 
