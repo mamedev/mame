@@ -5,8 +5,6 @@
 IBM Palm Top PC-110
 
 TODO:
-- Hookup specific SW list (4 system disks) once this do anything worthwhile;
-- Needs a soft reset to reach below (triggers an halt), randomly not working;
 - Error 104 (protected mode, tries to r/w $0100'0000)
 - Error 8081 (PCMCIA)
 - Error 161 (CMOS)
@@ -56,8 +54,8 @@ Components:
 #include "video/pc_vga_chips.h"
 
 #include "screen.h"
-//#include "softlist.h"
-//#include "softlist_dev.h"
+#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 /*
@@ -168,19 +166,19 @@ private:
 
 void ptpc110_state::main_map(address_map &map)
 {
-	map(0x0000'0000, 0x0009'ffff).ram();
-//	map(0x000a'0000, 0x000b'ffff).rw(m_vga, FUNC(f65535_vga_device::mem_r), FUNC(f65535_vga_device::mem_w));
-//	map(0x000c'0000, 0x000f'ffff).rom().region("bios", 0);
+//	map(0x0000'0000, 0x0009'ffff).ram();
+//  map(0x000a'0000, 0x000b'ffff).rw(m_vga, FUNC(f65535_vga_device::mem_r), FUNC(f65535_vga_device::mem_w));
+//  map(0x000c'0000, 0x000f'ffff).rom().region("bios", 0);
 	map(0xfffc'0000, 0xffff'ffff).rom().region("bios", 0);
 }
 
 void ptpc110_state::main_io(address_map &map)
 {
-//	map.unmap_value_high();
+//  map.unmap_value_high();
 	map(0x0024, 0x0027).nopw(); // noisy on $26
-//	map(0x03b0, 0x03df).m(m_vga, FUNC(f65535_vga_device::io_map));
-//	map(0x15ec, 0x15ef) PCMCIA?
-//	map(0x35e8, 0x35eb) ^
+//  map(0x03b0, 0x03df).m(m_vga, FUNC(f65535_vga_device::io_map));
+//  map(0x15ec, 0x15ef) PCMCIA?
+//  map(0x35e8, 0x35eb) ^
 }
 
 static void pc_isa_onboard(device_slot_interface &device)
@@ -264,20 +262,32 @@ void ptpc110_state::ptpc110(machine_config &config)
 	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "vga",     true);
 	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa_onboard, "superio", true).set_option_machine_config("superio", superio_config);
 
-	// TODO: should not fit
-	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
+	// TODO: should not fit BIOS wise
+	ps2_keyboard_controller_device &keybc(PS2_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(vl82c420_device::kbrst_w));
 	keybc.gate_a20().set(m_chipset, FUNC(vl82c420_device::gatea20_w));
 	keybc.kbd_irq().set(m_chipset, FUNC(vl82c420_device::irq01_w));
 	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
 	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
+	keybc.aux_irq().set(m_chipset, FUNC(vl82c420_device::irq04_w));
+	keybc.aux_clk().set("aux", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.aux_data().set("aux", FUNC(pc_kbdc_device::data_write_from_mb));
 
-	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, "ms_naturl"));
+	// TODO: wrong type
+	// throws "AB 301" with ms_naturl
+	// refuses to run with pcat101 ("102" timer error)
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, "pcat"));
 	pc_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
 	pc_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
 
+	pc_kbdc_device &aux_kbdc(PC_KBDC(config, "aux", ps2_mice, nullptr));
+	aux_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
+	aux_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
+
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("ibmpc110");
 }
 
 
