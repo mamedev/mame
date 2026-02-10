@@ -38,6 +38,7 @@
 #define DEBUG_STRICT_VERIFY 0
 
 
+
 /***************************************************************************
     MACROS
 ***************************************************************************/
@@ -1366,9 +1367,15 @@ void mips3_device::generate_sequence_instruction(drcuml_block &block, compiler_s
 	/* if we are debugging, call the debugger */
 	if (debugger_enabled())
 	{
+		uml::code_label skip_reload = compiler.labelnum++;
 		UML_MOV(block, mem(&m_core->pc), desc->pc);                              // mov     [pc],desc->pc
 		save_fast_iregs(block);
-		UML_DEBUG(block, desc->pc);                                         // debug   desc->pc
+		UML_DEBUG(block, desc->pc);                                              // debug   desc->pc
+		UML_TEST(block, mem(&m_drc_iregs_dirty), 1);                        // test    [debugger_iregs_dirty],1
+		UML_JMPc(block, COND_Z, skip_reload);                                    // jmp     skip_reload,Z
+		UML_MOV(block, mem(&m_drc_iregs_dirty), 0);                         // mov     [debugger_iregs_dirty],0
+		load_fast_iregs(block);                                                  // <load fast integer registers>
+		UML_LABEL(block, skip_reload);                                           // skip_reload:
 	}
 
 	/* if we hit an unmapped address, fatal error */
