@@ -2352,7 +2352,7 @@ void adsp21062_device::sharcop_rti()
 /* do until counter expired, LCNTR immediate */
 void adsp21062_device::sharcop_do_until_counter_imm()
 {
-	uint16_t data = (uint16_t)(m_core->opcode >> 24);
+	uint16_t data = uint16_t(m_core->opcode >> 24);
 	int offset = util::sext(m_core->opcode & 0xffffff, 24);
 	uint32_t address = m_core->pc + offset;
 	int type;

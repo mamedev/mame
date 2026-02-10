@@ -220,6 +220,15 @@ private:
 	static constexpr uint32_t MODE2_CAFRZ =     0x0008'0000;    // Cache freeze
 
 
+	using opcode_func = void (adsp21062_device::*)();
+	struct SHARC_OP
+	{
+		uint32_t op_mask;
+		uint32_t op_bits;
+		opcode_func handler;
+	};
+
+
 	struct alignas(16) SHARC_DAG
 	{
 		uint32_t i[8];
@@ -270,22 +279,15 @@ private:
 		bool chained;
 	};
 
+	static const SHARC_OP s_sharc_opcode_table[];
+	static const size_t s_num_ops;
+
 	static const uint32_t recips_mantissa_lookup[128];
 	static const uint32_t rsqrts_mantissa_lookup[128];
 
 
 	address_space_config m_program_config;
 	address_space_config m_data_config;
-
-	typedef void (adsp21062_device::*opcode_func)();
-	struct SHARC_OP
-	{
-		uint32_t op_mask;
-		uint32_t op_bits;
-		opcode_func handler;
-	};
-	static const SHARC_OP s_sharc_opcode_table[];
-	static const size_t s_num_ops;
 
 	struct ASTAT_DRC
 	{
@@ -439,6 +441,7 @@ private:
 	uml::code_handle *m_entry;                      /* entry point */
 	uml::code_handle *m_nocode;                     /* nocode exception handler */
 	uml::code_handle *m_out_of_cycles;              /* out of cycles exception handler */
+	uml::code_handle *m_reset_cache;
 	uml::code_handle *m_pm_read48;
 	uml::code_handle *m_pm_write48;
 	uml::code_handle *m_pm_read32;
@@ -622,6 +625,7 @@ private:
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
+	void static_generate_reset_cache();
 	void static_generate_memory_accessors();
 	void static_generate_exception(uint8_t exception, const char *name);
 	void static_generate_push_pc();

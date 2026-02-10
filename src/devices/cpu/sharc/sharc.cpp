@@ -135,6 +135,7 @@ adsp21062_device::adsp21062_device(
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
 	, m_out_of_cycles(nullptr)
+	, m_reset_cache(nullptr)
 	, m_pm_read48(nullptr)
 	, m_pm_write48(nullptr)
 	, m_pm_read32(nullptr)
@@ -583,9 +584,7 @@ void adsp21062_device::device_start()
 		m_drcfe = std::make_unique<sharc_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);
 
 		for (int i = 0; i < 16; i++)
-		{
 			m_regmap[i] = uml::mem(&m_core->r[i]);
-		}
 
 		// I0-3 used by the DRC, rest can be assigned to fast registers
 		if (!DISABLE_FAST_REGISTERS)
