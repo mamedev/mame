@@ -481,7 +481,7 @@ private:
 	u16 m_piv_scrollx[3]{};
 	u16 m_piv_scrolly[3]{};
 	u16 m_rotate_ctrl[8]{};
-	u8 m_dislayer[4]{};
+	[[maybe_unused]] u8 m_dislayer[4]{};
 
 	// misc
 	u16 m_cpua_ctrl = 0;
