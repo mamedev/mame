@@ -45,6 +45,11 @@ Components:
 #include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/at_keybc.h"
 #include "machine/fdc37c665ir.h"
@@ -188,11 +193,31 @@ static void pc_isa_onboard(device_slot_interface &device)
 	// TODO: everything else
 }
 
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
 void ptpc110_state::superio_config(device_t *device)
 {
 	fdc37c665ir_device &fdc = *downcast<fdc37c665ir_device *>(device);
 	fdc.fintr().set(":isabus", FUNC(isa16_device::irq6_w));
-
+	fdc.pintr1().set(":isabus", FUNC(isa16_device::irq7_w));
+	fdc.irq3().set(":isabus", FUNC(isa16_device::irq3_w));
+	fdc.irq4().set(":isabus", FUNC(isa16_device::irq4_w));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
 
@@ -264,6 +289,7 @@ void ptpc110_state::ptpc110(machine_config &config)
 
 	// TODO: should not fit BIOS wise
 	ps2_keyboard_controller_device &keybc(PS2_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
+	//keybc.set_default_bios_tag("compaq");
 	keybc.hot_res().set(m_chipset, FUNC(vl82c420_device::kbrst_w));
 	keybc.gate_a20().set(m_chipset, FUNC(vl82c420_device::gatea20_w));
 	keybc.kbd_irq().set(m_chipset, FUNC(vl82c420_device::irq01_w));
@@ -283,6 +309,20 @@ void ptpc110_state::ptpc110(machine_config &config)
 	pc_kbdc_device &aux_kbdc(PC_KBDC(config, "aux", ps2_mice, nullptr));
 	aux_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
 	aux_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
+
+	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set("board2:superio", FUNC(fdc37c665ir_device::rxd1_w));
+	serport0.dcd_handler().set("board2:superio", FUNC(fdc37c665ir_device::ndcd1_w));
+	serport0.dsr_handler().set("board2:superio", FUNC(fdc37c665ir_device::ndsr1_w));
+	serport0.ri_handler().set("board2:superio", FUNC(fdc37c665ir_device::nri1_w));
+	serport0.cts_handler().set("board2:superio", FUNC(fdc37c665ir_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board2:superio", FUNC(fdc37c665ir_device::rxd2_w));
+	serport1.dcd_handler().set("board2:superio", FUNC(fdc37c665ir_device::ndcd2_w));
+	serport1.dsr_handler().set("board2:superio", FUNC(fdc37c665ir_device::ndsr2_w));
+	serport1.ri_handler().set("board2:superio", FUNC(fdc37c665ir_device::nri2_w));
+	serport1.cts_handler().set("board2:superio", FUNC(fdc37c665ir_device::ncts2_w));
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
