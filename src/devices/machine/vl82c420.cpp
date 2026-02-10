@@ -464,14 +464,14 @@ void vl82c420_device::update_segment_settings()
 	m_space_mem->unmap_readwrite(0xa0000, 0xfffff);
 	m_isabus->remap(AS_PROGRAM, 0xa0000, 0xfffff);
 
-	// TODO: unknown enable/disable
-	// writes 0x19 at startup, then 0x09, then back to 0x19
-	// Clearly wants VGA BIOS (from $e0000) at $c0000,
-	// others TBD (and needs to be in driver not here)
-	m_space_mem->install_rom(0xe8000, 0xfffff, &m_bios[0x28000 / 4]);
-	m_space_mem->install_rom(0xe0000, 0xe7fff, &m_bios[0x00000 / 4]);
-	m_space_mem->install_rom(0xc8000, 0xdffff, &m_bios[0x08000 / 4]);
-	m_space_mem->install_rom(0xc0000, 0xc7fff, &m_bios[0x20000 / 4]);
+	m_space_mem->install_rom(0xe0000, 0xfffff, &m_bios[0x20000 / 4]);
+	// TODO: attempts to read from here, the existing bank fails several string comparisons
+	// (and checksum)
+//	m_space_mem->install_rom(0xd0000, 0xdffff, &m_bios[0x00000 / 4]);
+
+	// VGA BIOS is copied from $e0000 to $c0000
+	// TODO: shadow RAM is disabled, what's really holding this data?
+	m_space_mem->install_ram(0xc0000, 0xcffff, m_ram + 0xc0000);
 
 	for (int reg = 0; reg < 6; reg++)
 	{

@@ -8,9 +8,6 @@ TODO:
 - Error 104 (protected mode, tries to r/w $0100'0000, A20? DRAM configuration?)
 - Error 8081 (PCMCIA)
 - Error 161 or 173 (CMOS)
-- Error 2401 (video problem)
-\- 1x long beep 2x short beeps, tries to read stuff in VGA space without waking it up or
-   even setting the right IOAS bit (???)
 - Error 301 (keyboard)
 - Error 604 (floppy disk error)
 - Error 163 (date and time not set/bad)
