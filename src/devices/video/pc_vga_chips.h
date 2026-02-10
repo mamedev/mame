@@ -33,6 +33,29 @@ private:
 
 	u8 m_ext_index;
 	u8 m_chip_version;
+
+	u8 m_cpu_interface_1;
+	u8 m_memory_control_1;
+	u8 m_memory_control_2;
+	u8 m_palette_control;
+	u8 m_cpu_paging;
+	u8 m_start_address_top;
+	u8 m_software_flags_0;
+	u8 m_horizontal_overflow;
+	u8 m_alt_h_panel_size;
+
+	u8 m_video_interface;
+	u8 m_software_flags_1;
+
+	u8 m_clock_control[4];
+	u8 m_software_flags_2;
+
+	u8 m_display_type;
+	u8 m_h_compensation, m_v_compensation;
+	u8 m_v_line_replication;
+	u8 m_output_drive;
+
+	void flush_true_color_mode();
 };
 
 DECLARE_DEVICE_TYPE(F65535_VGA, f65535_vga_device)

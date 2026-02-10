@@ -5,10 +5,12 @@
 IBM Palm Top PC-110
 
 TODO:
-- Error 104 (protected mode, tries to r/w $0100'0000)
+- Error 104 (protected mode, tries to r/w $0100'0000, A20? DRAM configuration?)
 - Error 8081 (PCMCIA)
-- Error 161 (CMOS)
-- Error 2401 (video problem, r/w extended VGA regs)
+- Error 161 or 173 (CMOS)
+- Error 2401 (video problem)
+\- 1x long beep 2x short beeps, tries to read stuff in VGA space without waking it up or
+   even setting the right IOAS bit (???)
 - Error 301 (keyboard)
 - Error 604 (floppy disk error)
 - Error 163 (date and time not set/bad)
@@ -16,16 +18,21 @@ TODO:
 
 ===================================================================================================
 
+PCB marked "Monolith 1992"
+
 Components:
 - Intel Flash ROM (unknown type);
 - RIOS 89G6403 (Intel 486SX-33);
 - RIOS 89G6402 (VLSI VL82C420 "SCAMP IV");
 - SMC FDC37C665IR Super I/O;
-- Chips and Technologies F55535 VGA chip, 512 KiB RAM;
-- ESS488 AudioDrive;
+- Chips and Technologies F65535 VGA chip, 512 KiB RAM;
+- ESS488F AudioDrive;
 - Ricoh RB5C396 (PCMCIA interface, Intel 82365 compatible?). Type-3 Slot, or two Type-1;
 - TI TPS2201 (PC Card Power);
-- LCD display for time and battery level;
+- LCD display showing time and battery level;
+- NEC uPD17137A MCU + undumped 1MB mask ROM below it;
+- Mitsubishi M38223E4HP + M38813M4 MCUs;
+- Two custom RIOS ASICs "Pluto" and "Bowman";
 - Modem board, tied to 128KiB SRAM (Samsung KM610000) and 29F040A-12 flash firmware (undumped).
   2400bps Data, 9600bps FAX;
 - Keyboard 89-key Compact JIS with Fn key;
@@ -174,6 +181,7 @@ void ptpc110_state::main_map(address_map &map)
 //	map(0x0000'0000, 0x0009'ffff).ram();
 //  map(0x000a'0000, 0x000b'ffff).rw(m_vga, FUNC(f65535_vga_device::mem_r), FUNC(f65535_vga_device::mem_w));
 //  map(0x000c'0000, 0x000f'ffff).rom().region("bios", 0);
+//	map(0x0100'0000, 0x0107'ffff).ram();
 	map(0xfffc'0000, 0xffff'ffff).rom().region("bios", 0);
 }
 
