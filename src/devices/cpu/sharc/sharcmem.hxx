@@ -10,6 +10,7 @@ uint32_t adsp21062_device::pm_read32(uint32_t address)
 
 void adsp21062_device::pm_write32(uint32_t address, uint32_t data)
 {
+	// TODO: mask should probably be set to all ones
 	m_program.write_qword(address, uint64_t(data) << 16, 0x0000ffff'ffff0000U);
 }
 

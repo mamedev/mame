@@ -2844,6 +2844,7 @@ void model2b_state::model2b(machine_config &config)
 	ADSP21062(config, m_copro_adsp, 32_MHz_XTAL);
 	m_copro_adsp->set_boot_mode(adsp21062_device::BOOT_MODE_HOST);
 	m_copro_adsp->set_addrmap(AS_DATA, &model2b_state::copro_sharc_map);
+	m_copro_adsp->enable_recompiler();
 
 	//ADSP21062(config, m_dsp2, 40000000);
 	//m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_HOST);
@@ -2875,8 +2876,6 @@ void model2b_state::model2b(machine_config &config)
 	SEGA_BILLBOARD(config, m_billboard, 0);
 
 	config.set_default_layout(layout_segabill);
-
-	//m_copro_adsp->enable_recompiler();
 }
 
 void model2b_state::model2b_5881(machine_config &config)

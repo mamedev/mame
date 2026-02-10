@@ -142,16 +142,6 @@ public:
 		MODE1_TOGGLE,
 	};
 
-	enum MEM_ACCESSOR_TYPE
-	{
-		MEM_ACCESSOR_PM_READ48,
-		MEM_ACCESSOR_PM_WRITE48,
-		MEM_ACCESSOR_PM_READ32,
-		MEM_ACCESSOR_PM_WRITE32,
-		MEM_ACCESSOR_DM_READ32,
-		MEM_ACCESSOR_DM_WRITE32
-	};
-
 	enum
 	{
 		EXCEPTION_INTERRUPT = 0,
@@ -431,11 +421,12 @@ private:
 		float fp0;
 		float fp1;
 
+		uint32_t m_max_sram_pc[2];
 		uint32_t force_recompile;
 		uint32_t cache_dirty;
 	};
 
-	sharc_internal_state* m_core;
+	sharc_internal_state *m_core;
 
 	sharc_boot_mode m_boot_mode;
 
@@ -610,17 +601,17 @@ private:
 	inline void compute_fmul_dual_fadd_fsub(int fm, int fxm, int fym, int fa, int fs, int fxa, int fya);
 	void build_opcode_table();
 
-	/* internal compiler state */
+	// internal compiler state
 	struct compiler_state
 	{
-		uint32_t cycles;                             /* accumulated cycles */
-		uint8_t  checkints;                          /* need to check interrupts before next instruction */
-		uml::code_label  labelnum;                 /* index for local labels */
+		uint32_t        cycles = 0;     // accumulated cycles
+		uint8_t         checkints = 0;  // need to check interrupts before next instruction
+		uml::code_label labelnum = 1;   // index for local labels
 		struct
 		{
-			int counter;
-			int mode;
-			uint32_t data;
+			int         counter = 0;
+			int         mode = 0;
+			uint32_t    data = 0;
 		} mode1_delay;
 	};
 
@@ -631,7 +622,7 @@ private:
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
-	void static_generate_memory_accessor(MEM_ACCESSOR_TYPE type, const char *name, uml::code_handle *&handleptr);
+	void static_generate_memory_accessors();
 	void static_generate_exception(uint8_t exception, const char *name);
 	void static_generate_push_pc();
 	void static_generate_pop_pc();
