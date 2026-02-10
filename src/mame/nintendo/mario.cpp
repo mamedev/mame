@@ -4,17 +4,25 @@
 
 Mario Bros driver by Mirko Buffoni
 
-TODO:
-- How were the US revisions determined? Judging from hex comparison, the
-  order is F->G->E (revision letters taken from MAME sets). The marioj set
-  looks newer than the G revision. The F/G revisions also have gfx2 bugs:
-  a gap in Mario/Luigi's cap when he jumps, and a wrong color eye pixel
-  (Luigi's pupil flashes green when he walks). This looks fine in marioe
-  and marioj. It's more likely a production error and not a bad dump.
+US revision letter is from the ROM labels, but chronology does not appear
+to match letter ordering according to hex compare.
+
+F: Looks like the oldest revision of the three.
+
+F->G: 2 bytes difference (at $30A4 and $30E9).
+
+G->E: Adds patches to $F710 area (jumps to there from $31DA and $324C), and
+an additional 2 bytes different. Does one of the patches introduce a bug
+with coins (2nd coin doesn't work), or is it deliberate?
+
+Revision E also fixes glitches in gfx2 that look like a production error
+(not a bad dump): a gap in Mario/Luigi's hat when he jumps, and a wrong eye
+color in one of the walk animations that's visible on Luigi.
+
+The Japan revision C is from around the same time as US revision E.
 
 The sound MCU can be easily replaced with a ROMless one such as I8039
 (or just force EA high), by doing a 1-byte patch to the external ROM:
-
 offset $01: change $00 to $01 (call $100 -> call $101)
 
 ============================================================================
@@ -175,7 +183,7 @@ void mario_state::mario_io_map(address_map &map)
  *
  *************************************/
 
-static INPUT_PORTS_START( mario )
+static INPUT_PORTS_START( mariof )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
@@ -208,10 +216,9 @@ static INPUT_PORTS_START( mario )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
-	PORT_DIPSETTING(    0x00, "20k only" )
-	PORT_DIPSETTING(    0x10, "30k only" )
-	PORT_DIPSETTING(    0x20, "40k only" )
-	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x00, "20k 40k 20k+" )
+	PORT_DIPSETTING(    0x10, "30k 50k 20k+" )
+	PORT_DIPSETTING(    0x20, "40k 60k 20k+" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!7,!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
@@ -223,32 +230,31 @@ static INPUT_PORTS_START( mario )
 	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
 	PORT_CONFSETTING(    0x00, "Nintendo" )
 	PORT_CONFSETTING(    0x01, "Std 15.72Khz" )
-
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mariof )
-	PORT_INCLUDE( mario )
+static INPUT_PORTS_START( mariog )
+	PORT_INCLUDE( mariof )
 
-	PORT_MODIFY( "DSW" )
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
-	PORT_DIPSETTING(    0x00, "20k 40k 20k+" )
-	PORT_DIPSETTING(    0x10, "30k 50k 20k+" )
-	PORT_DIPSETTING(    0x20, "40k 60k 20k+" )
+	PORT_DIPSETTING(    0x00, "20k only" )
+	PORT_DIPSETTING(    0x10, "30k only" )
+	PORT_DIPSETTING(    0x20, "40k only" )
+	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( marioe )
-	PORT_INCLUDE( mario )
+	PORT_INCLUDE( mariog )
 
-	PORT_MODIFY ( "IN1" )
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )  /* doesn't work in game, but does in service mode */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // doesn't work in game, but does in service mode
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( marioj )
 	PORT_INCLUDE( marioe )
 
-	PORT_MODIFY( "DSW" )
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
@@ -384,7 +390,7 @@ void mario_state::masao(machine_config &config)
 
 ROM_START( mario )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tma1-c-7f_g.7f", 0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) ) /* Unknown revision */
+	ROM_LOAD( "tma1-c-7f_g.7f", 0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) )
 	ROM_LOAD( "tma1-c-7e_g.7e", 0x2000, 0x2000, CRC(116b3856) SHA1(e372f846d0e5a2b9b47ebd0330293fcc8a12363f) )
 	ROM_LOAD( "tma1-c-7d_g.7d", 0x4000, 0x2000, CRC(dcceb6c1) SHA1(b19804e69ce2c98cf276c6055c3a250316b96b45) )
 	ROM_LOAD( "tma1-c-7c_g.7c", 0xf000, 0x1000, CRC(4a63d96b) SHA1(b09060b2c84ab77cc540a27b8f932cb60ec8d442) )
@@ -410,8 +416,8 @@ ROM_START( mario )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "tma1-c-4p.4p",   0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
 
-	ROM_REGION( 0x0020, "decoder_prom", 0 )
-	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
+	ROM_REGION( 0x0020, "decoder_prom", 0 ) // main cpu memory map decoding prom
+	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) )
 ROM_END
 
 ROM_START( mariof )
@@ -440,10 +446,10 @@ ROM_START( mariof )
 	ROM_LOAD( "tma1-v-7u.7u",   0x5000, 0x1000, CRC(7baf5309) SHA1(d9194ff7b89a18273d37b47228fc7fb7e2a0ed1f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "tma1-c-4p_1.4p", 0x0000, 0x0200, CRC(8187d286) SHA1(8a6d8e622599f1aacaeb10f7b1a39a23c8a840a0) ) /* BPROM was a MB7124E read as 82S147 */
+	ROM_LOAD( "tma1-c-4p_1.4p", 0x0000, 0x0200, CRC(8187d286) SHA1(8a6d8e622599f1aacaeb10f7b1a39a23c8a840a0) ) // BPROM was a MB7124E read as 82S147
 
-	ROM_REGION( 0x0020, "decoder_prom", 0 )
-	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
+	ROM_REGION( 0x0020, "decoder_prom", 0 ) // main cpu memory map decoding prom
+	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) // BPROM was a TBP18S030N read as 82S123
 ROM_END
 
 ROM_START( marioe )
@@ -472,10 +478,10 @@ ROM_START( marioe )
 	ROM_LOAD( "tma1-v.7u",        0x5000, 0x1000, CRC(d2dbeb75) SHA1(676cf3e15252cd0d9e926ca15c3aa0caa39be269) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "tma1-c-4p_1.4p",   0x0000, 0x0200, CRC(8187d286) SHA1(8a6d8e622599f1aacaeb10f7b1a39a23c8a840a0) ) /* BPROM was a MB7124E read as 82S147 */
+	ROM_LOAD( "tma1-c-4p_1.4p",   0x0000, 0x0200, CRC(8187d286) SHA1(8a6d8e622599f1aacaeb10f7b1a39a23c8a840a0) )
 
-	ROM_REGION( 0x0020, "decoder_prom", 0 )
-	ROM_LOAD( "tma1-c-5b.5b",     0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
+	ROM_REGION( 0x0020, "decoder_prom", 0 ) // main cpu memory map decoding prom
+	ROM_LOAD( "tma1-c-5b.5b",     0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) )
 ROM_END
 
 ROM_START( marioj )
@@ -506,8 +512,8 @@ ROM_START( marioj )
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "tma1-c-4p.4p",   0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
 
-	ROM_REGION( 0x0020, "decoder_prom", 0 )
-	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) /* BPROM was a TBP18S030N read as 82S123, main cpu memory map decoding prom */
+	ROM_REGION( 0x0020, "decoder_prom", 0 ) // main cpu memory map decoding prom
+	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) )
 ROM_END
 
 ROM_START( masao )
@@ -543,8 +549,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,  0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mario,  0,     mario, mariog, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mariof, mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, marioe, mario, mario, marioe, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, marioj, mario, mario, marioj, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, masao,  mario, masao, mario,  mario_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, masao,  mario, masao, mariog, mario_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )
