@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 
 #ifndef MAME_MACHINE_VL82C420_H
 #define MAME_MACHINE_VL82C420_H
@@ -8,10 +8,10 @@
 
 #include "bus/isa/isa.h"
 #include "machine/am9517a.h"
+#include "machine/at_keybc.h"
+#include "machine/ds128x.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/ds128x.h"
-#include "machine/at_keybc.h"
 #include "machine/ram.h"
 
 class vl82c420_device : public device_t,

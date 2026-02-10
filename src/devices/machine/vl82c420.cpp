@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 /**************************************************************************************************
 
 VLSI VL82C420 Scamp IV System Controller chipset

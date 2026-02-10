@@ -5,8 +5,8 @@
 IBM Palm Top PC-110
 
 TODO:
-- Skeleton-ish, needs SCAMP chipset and Super I/O to proceed;
 - Hookup specific SW list (4 system disks) once this do anything worthwhile;
+- Needs a soft reset to reach below (triggers an halt), randomly not working;
 - Error 104 (protected mode, tries to r/w $0100'0000)
 - Error 8081 (PCMCIA)
 - Error 161 (CMOS)
@@ -26,15 +26,16 @@ Components:
 - Chips and Technologies F55535 VGA chip, 512 KiB RAM;
 - ESS488 AudioDrive;
 - Ricoh RB5C396 (PCMCIA interface, Intel 82365 compatible?). Type-3 Slot, or two Type-1;
-- Dallas DS1669S;
 - TI TPS2201 (PC Card Power);
 - LCD display for time and battery level;
-- Modem board, tied to 128KiB SRAM (Samsung KM610000) and 29F040A-12 flash firmware (undumped). 2400bps Data, 9600bps FAX;
+- Modem board, tied to 128KiB SRAM (Samsung KM610000) and 29F040A-12 flash firmware (undumped).
+  2400bps Data, 9600bps FAX;
+- Keyboard 89-key Compact JIS with Fn key;
 - Infra-red port;
+- Dallas DS1669S;
 - Maxim 786CAI (PSU Controller);
 - 4 or 8 MiB RAM, can go up to 28 MiB thru patches. 1 expansion slot;
 - 1 port replicator connector;
-- Keyboard 89-key Compact JIS with Fn key;
 - "Smart-Pico" Flash Card Slot;
 - Headphone jack;
 
@@ -48,6 +49,7 @@ Components:
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i386/i386.h"
 #include "machine/at_keybc.h"
+#include "machine/fdc37c665ir.h"
 #include "machine/ram.h"
 #include "machine/vl82c420.h"
 #include "sound/spkrdev.h"
@@ -159,6 +161,8 @@ private:
 
 	void main_io(address_map &map) ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
+
+	static void superio_config(device_t *device);
 };
 
 
@@ -181,8 +185,16 @@ void ptpc110_state::main_io(address_map &map)
 
 static void pc_isa_onboard(device_slot_interface &device)
 {
-	device.option_add_internal("vga",  ISA16_F65535_LCD);
+	device.option_add_internal("superio", FDC37C665IR);
+	device.option_add_internal("vga",     ISA16_F65535_LCD);
 	// TODO: everything else
+}
+
+void ptpc110_state::superio_config(device_t *device)
+{
+	fdc37c665ir_device &fdc = *downcast<fdc37c665ir_device *>(device);
+	fdc.fintr().set(":isabus", FUNC(isa16_device::irq6_w));
+
 }
 
 
@@ -249,7 +261,8 @@ void ptpc110_state::ptpc110(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(vl82c420_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(vl82c420_device::dreq7_w));
 
-	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "vga", true);
+	ISA16_SLOT(config, "board1", 0, "isabus", pc_isa_onboard, "vga",     true);
+	ISA16_SLOT(config, "board2", 0, "isabus", pc_isa_onboard, "superio", true).set_option_machine_config("superio", superio_config);
 
 	// TODO: should not fit
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));

@@ -4537,6 +4537,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/fdc37c665ir.h,MACHINES["FDC37C665IR"] = true
+---------------------------------------------------
+
+if MACHINES["FDC37C665IR"] then
+	files {
+		MAME_DIR .. "src/devices/machine/fdc37c665ir.cpp",
+		MAME_DIR .. "src/devices/machine/fdc37c665ir.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pci9050.h,MACHINES["PCI9050"] = true
 ---------------------------------------------------
 
