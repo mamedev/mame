@@ -154,9 +154,9 @@ void f82c836a_device::device_start()
 	save_item(NAME(m_kbrst));
 	save_item(NAME(m_ext_gatea20));
 	save_item(NAME(m_fast_gatea20));
-//	save_item(NAME(m_emu_gatea20));
-//	save_item(NAME(m_keybc_d1_written));
-//	save_item(NAME(m_keybc_data_blocked));
+//  save_item(NAME(m_emu_gatea20));
+//  save_item(NAME(m_keybc_d1_written));
+//  save_item(NAME(m_keybc_data_blocked));
 
 	save_item(NAME(m_rom_enable));
 	save_item(NAME(m_ram_write_protect));
@@ -177,6 +177,8 @@ void f82c836a_device::device_reset()
 	m_ext_gatea20 = 0;
 	m_fast_gatea20 = 0;
 	m_dma_channel = -1;
+
+	m_kbrst = 1;
 
 	m_dma_ws_control = 0;
 	// BUSCLK CXIN/5, Refresh Width 280ns
@@ -251,8 +253,8 @@ void f82c836a_device::io_map(address_map &map)
 		NAME([this] (offs_t offset) { return m_dma[1]->read(offset >> 1); }),
 		NAME([this] (offs_t offset, u8 data) { m_dma[1]->write(offset >> 1, data); })
 	);
-//	map(0x0208, 0x020a) PnP EMS paging
-//	map(0x0218, 0x021a) alt of above (depends on a register setting)
+//  map(0x0208, 0x020a) PnP EMS paging
+//  map(0x0218, 0x021a) alt of above (depends on a register setting)
 }
 
 u8 f82c836a_device::portb_r()
@@ -306,12 +308,12 @@ void f82c836a_device::config_map(address_map &map)
 		NAME([this] (offs_t offset) { return m_chan_env; }),
 		NAME([this] (offs_t offset, u8 data) { m_chan_env = data; update_dma_clock(); })
 	);
-//	map(0x44, 0x44) Peripheral Control
+//  map(0x44, 0x44) Peripheral Control
 	// Misc. Status
 	map(0x45, 0x45).lr8(
 		NAME([this] (offs_t offset) { return (m_nmi_mask << 7) | (m_ext_gatea20 << 6); })
 	);
-//	map(0x46, 0x46) Power Management
+//  map(0x46, 0x46) Power Management
 	// ROM enable
 	map(0x48, 0x48).lrw8(
 		NAME([this] (offs_t offset) { return m_rom_enable; }),
@@ -342,16 +344,16 @@ void f82c836a_device::config_map(address_map &map)
 		NAME([this] (offs_t offset) { return m_ems_control; }),
 		NAME([this] (offs_t offset, u8 data) { m_ems_control = data; })
 	);
-//	map(0x60, 0x60) Laptop Features
-//	map(0x61, 0x61) Fast Video Control
-//	map(0x62, 0x62) Fast Video RAM Enable
-//	map(0x63, 0x63) High Performance Refresh
-//	map(0x64, 0x64) CAS Timing for DMA/Master
+//  map(0x60, 0x60) Laptop Features
+//  map(0x61, 0x61) Fast Video Control
+//  map(0x62, 0x62) Fast Video RAM Enable
+//  map(0x63, 0x63) High Performance Refresh
+//  map(0x64, 0x64) CAS Timing for DMA/Master
 }
 
 void f82c836a_device::update_romram_settings()
 {
-//	printf("%02x %02x %02x %02x %02x\n", m_rom_enable, m_ram_write_protect, m_shadow_reg[0], m_shadow_reg[1], m_shadow_reg[2]);
+//  printf("%02x %02x %02x %02x %02x\n", m_rom_enable, m_ram_write_protect, m_shadow_reg[0], m_shadow_reg[1], m_shadow_reg[2]);
 
 	// reconfigure space
 	// Despite what documentation claims shadow RAM actually wins over ROM, it will just map on

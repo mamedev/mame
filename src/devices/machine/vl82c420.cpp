@@ -176,6 +176,8 @@ void vl82c420_device::device_reset()
 	m_fast_gatea20 = 0;
 	m_dma_channel = -1;
 
+	m_kbrst = 1;
+
 	m_config_unlock = false;
 
 	m_ramtmg = 0xff;
@@ -264,12 +266,12 @@ void vl82c420_device::io_map(address_map &map)
 	);
 	map(0x00ec, 0x00ec).w(FUNC(vl82c420_device::config_address_w));
 	map(0x00ed, 0x00ed).rw(FUNC(vl82c420_device::config_data_r), FUNC(vl82c420_device::config_data_w));
-//	map(0x00ee, 0x00ee) dummy read enable Fast A20, dummy write disables it
-//	map(0x00ef, 0x00ef) dummy read reset CPU
-//	map(0x00f0, 0x00f0) Coprocessor Busy
-//	map(0x00f1, 0x00f1) Coprocessor Reset
-//	map(0x00f4, 0x00f4) Slow CPU
-//	map(0x00f5, 0x00f5) Fast CPU
+//  map(0x00ee, 0x00ee) dummy read enable Fast A20, dummy write disables it
+//  map(0x00ef, 0x00ef) dummy read reset CPU
+//  map(0x00f0, 0x00f0) Coprocessor Busy
+//  map(0x00f1, 0x00f1) Coprocessor Reset
+//  map(0x00f4, 0x00f4) Slow CPU
+//  map(0x00f5, 0x00f5) Fast CPU
 	// dummy writes to $f9 / $fb disables/enables config access
 	map(0x00f9, 0x00f9).lw8(NAME([this] (u8 data) { (void)data; m_config_unlock = false; }));
 	map(0x00fb, 0x00fb).lw8(NAME([this] (u8 data) { (void)data; m_config_unlock = true; }));
@@ -333,7 +335,7 @@ void vl82c420_device::config_data_w(offs_t offset, u8 data)
 
 void vl82c420_device::config_map(address_map &map)
 {
-//	map(0x00, 0x00) Version, 0x90 for VL82C481
+//  map(0x00, 0x00) Version, 0x90 for VL82C481
 	map(0x01, 0x01).lrw8(
 		NAME([this] (offs_t offset) { return m_ramtmg; }),
 		NAME([this] (offs_t offset, u8 data) {
@@ -390,7 +392,7 @@ void vl82c420_device::config_map(address_map &map)
 			m_busctl = data;
 		})
 	);
-//	map(0x0a, 0x0a) <unknown>
+//  map(0x0a, 0x0a) <unknown>
 	map(0x0b, 0x0b).lrw8(
 		NAME([this] (offs_t offset) { return m_fbcr; }),
 		NAME([this] (offs_t offset, u8 data) {
@@ -429,8 +431,8 @@ void vl82c420_device::config_map(address_map &map)
 		})
 	);
 
-//	map(0x1c, 0x1c) <unknown>
-//	map(0x1c, 0x1d) <unknown>
+//  map(0x1c, 0x1c) <unknown>
+//  map(0x1c, 0x1d) <unknown>
 
 	map(0x20, 0x20).select(2).lrw8(
 		NAME([this] (offs_t offset) { return m_pmra[offset]; }),
@@ -454,7 +456,7 @@ void vl82c420_device::config_map(address_map &map)
 		})
 	);
 
-//	map(0x37, 0x37) <unknown>
+//  map(0x37, 0x37) <unknown>
 }
 
 void vl82c420_device::update_segment_settings()
