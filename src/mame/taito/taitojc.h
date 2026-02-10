@@ -94,6 +94,9 @@ protected:
 
 	bool m_has_dsp_hack = false;
 
+  // Timer for dangcurv ROM patch
+	emu_timer *m_dangcurv_patch_timer = nullptr;
+
 	void coin_control_w(uint8_t data);
 
 	uint8_t mcu_comm_r(offs_t offset);
@@ -139,6 +142,9 @@ protected:
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t w1, uint32_t w2, uint8_t bank_type);
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t bank_type, uint8_t pri);
 
+  TIMER_CALLBACK_MEMBER(dangcurv_patch_timer_callback);
+
+  
 	void hc11_pgm_map(address_map &map) ATTR_COLD;
 	void taitojc_map(address_map &map) ATTR_COLD;
 	void tms_data_map(address_map &map) ATTR_COLD;
