@@ -410,7 +410,7 @@ Notes:
 
 #include "speaker.h"
 
-#include "dendego.lh"
+#include "dendego.lh" // Not Included ??? Include error on VS Code, and no file found
 
 
 // lookup tables for densha de go analog controls/meters
@@ -1107,6 +1107,14 @@ void taitojc_state::machine_reset()
 
 	// hold the TMS in reset until we have code
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+
+  // Lance le timer seulement pour dangcurv
+	if (strcmp(machine().system().name, "dangcurv") == 0)
+	{
+		printf("DANGCURV RESET: Starting 15-second timer for ROM patch\n");
+		m_dangcurv_patch_timer->adjust(attotime::from_seconds(15));
+	}
+
 }
 
 void taitojc_state::machine_start()
@@ -1126,6 +1134,9 @@ void taitojc_state::machine_start()
 	m_lamps.resolve();
 	m_counters.resolve();
 	m_wheel_motor.resolve();
+
+ 	m_dangcurv_patch_timer = timer_alloc(FUNC(taitojc_state::dangcurv_patch_timer_callback), this);
+
 }
 
 void dendego_state::machine_start()
@@ -1249,10 +1260,12 @@ uint16_t dendego_state::dendego2_dsp_idle_skip_r()
 
 void taitojc_state::init_taitojc()
 {
+  logerror("INFO init_taitojc function entered");
 	m_has_dsp_hack = true;
 
 	if (DSP_IDLESKIP)
 		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16smo_delegate(*this, FUNC(taitojc_state::taitojc_dsp_idle_skip_r)));
+  logerror("INFO : IDLE SKIP PASSED");
 }
 
 void dendego_state::init_dendego2()
@@ -1263,22 +1276,103 @@ void dendego_state::init_dendego2()
 		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16smo_delegate(*this, FUNC(dendego_state::dendego2_dsp_idle_skip_r)));
 }
 
+
+// Callback for dangcurv
+TIMER_CALLBACK_MEMBER(taitojc_state::dangcurv_patch_timer_callback)
+{
+	printf("DANGCURV TIMER: Applying patch now (15 seconds after boot)\n");
+	
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	uint32_t word_offset = 0x09B766 / 2;
+	
+	printf("DANGCURV TIMER: Before patch: %04X\n", rom[word_offset]);
+	
+	rom[word_offset] = 0x4E71;  // NOP
+	
+	printf("DANGCURV TIMER: After patch: %04X\n", rom[word_offset]);
+}
+
 void taitojc_state::init_dangcurv()
 {
+  printf("INFO init_dangcurv");
 	init_taitojc();
+  printf("INFO init_tautijc for init_dangcurv passed");
+  
 
 	m_has_dsp_hack = false;
+
+  printf("INFO dsp hack is off");
+
+	printf("DANGCURV INIT: Will patch ROM in 15 seconds\n");
+
+
+  // printf("=============================================================\n");
+	// printf("DANGCURV INIT: Patching main CPU ROM to skip wait loop\n");
+	// printf("=============================================================\n");
+	
+  // Patch via memory write instead of ROM patch
+	// uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	
+	// PC 0x809B766 → offset in region = 0x09B766
+	// Divided by 2 for uint16_t array = 0x04DBB3
+	// uint32_t word_offset = 0x09B766 / 2;
+	
+	// printf("DANGCURV: Patching at word offset %08X\n", word_offset);
+	// printf("DANGCURV: Before patch: %04X\n", rom[word_offset]);
+	
+	// rom[word_offset] = 0x4E71;  // NOP
+	
+	// printf("DANGCURV: After patch: %04X\n", rom[word_offset]);
+
+	// Patch the infinite loop at 0x809B766
+	// Original: 66 F8 (bne $809b760)
+	// Patched:  4E 71 (nop)
+	
+	// uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
+	
+	// ROM offset for PC 0x809B766
+	// PC addresses in 68040 start from 0x00000000 in ROM
+	// So 0x809B766 - 0x00000000 = 0x809B766
+	// uint32_t offset = 0x09B766 / 2;  // Divide by 2 because rom is uint16_t array
+	
+	// printf("DANGCURV: Patching ROM at offset %08X\n", offset * 2);
+	// printf("DANGCURV: Before patch: %04X\n", rom[offset]);
+	
+	// rom[offset] = 0x4E71;  // NOP
+	
+	// printf("DANGCURV: After patch: %04X\n", rom[offset]);
+	// printf("DANGCURV: Main CPU will no longer loop at 0x809B760\n");
+	// printf("=============================================================\n");
+
+  
+
+  // logerror("=============================================================\n");
+	// logerror("DANGCURV INIT: Starting workarounds\n");
+	// logerror("=============================================================\n");
+	
+	// CRITICAL: The main CPU loops at 0x809B760 waiting for shared_ram[0xFE0] to be 0
+	// Address 0x10001FC0 = base 0x10000000 + offset 0x1FC0 (bytes)
+	// In the m_dsp_shared_ram array: 0x1FC0 / 2 = 0xFE0 (word index)
+	
+	// logerror("DANGCURV: Before workaround, shared_ram[0xFE0] = %04X\n", m_dsp_shared_ram[0xFE0]);
+	
+	// m_dsp_shared_ram[0xFE0] = 0x0000;  // Clear the flag the DSP never clears
+	
+	// logerror("DANGCURV: After workaround, shared_ram[0xFE0] = %04X\n", m_dsp_shared_ram[0xFE0]);
+	// logerror("DANGCURV: Main CPU should now pass the loop at 0x809B760\n");
+	// logerror("=============================================================\n");
+
   // Workaround : prefill dst with  0x7F00 for bootloader not to go on wrong adress
   // m_dsp_shared_ram[0x000] = 0x7F00;  // dst
-  m_dsp_shared_ram[0x7C0] = 0x0000; // DSP doesn't clear so we do it
+
+  // m_dsp_shared_ram[0x7C0] = 0x0000; // DSP doesn't clear so we do it // wrong adress ?
+
   // Workaround : adress is 0x4000 instead of 0x7F00 ?
   // m_dsp_shared_ram[0x000] = 0x4000;  // dst = 0x4000
   // m_dsp_shared_ram[0x001] = 0x0400;  // length = 1024 word (approximatively)
 
   // Patch the dead loop at 0x205c (external ROM)
-  logerror("INFO : We are here in the code : init_taitojc() m_has_dsp_hack = false");
-  // This is a workaround until we understand what it's waiting for
-  logerror("INFO : Workaround uint16_t *dsp_rom = (uint16_t *)memregion('dspgfx')->base() NOT activated for now");
+  // This is a workaround until we understand what it's waiting for :
   // uint16_t *dsp_rom = (uint16_t *)memregion("dspgfx")->base();
   // 0x205c is in program space, which maps to dspgfx region
   // Need to calculate the exact offset based on how the boot loader copies it
