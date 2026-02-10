@@ -71,9 +71,6 @@ void psxmdec_device::device_start()
 	save_item(NAME(p_n_quantize_y));
 	save_item(NAME(p_n_quantize_uv));
 	save_item(NAME(p_n_cos));
-	save_item(NAME(p_n_quantize_y));
-	save_item(NAME(p_n_quantize_uv));
-	save_item(NAME(p_n_cos));
 	save_item(NAME(n_decoded));
 	save_item(NAME(n_offset));
 	save_item(NAME(p_n_output));
