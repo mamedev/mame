@@ -617,37 +617,37 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
 
 /***************************** 68000 Memory Map *****************************/
 
-void toaplan1_state::bcu_map(address_map &map, offs_t offset)
+void toaplan1_state::bcu_map(address_map &map)
 {
-	map(offset + 0x01, offset + 0x01).w(FUNC(toaplan1_state::bcu_flipscreen_w));
-	map(offset + 0x02, offset + 0x03).rw(FUNC(toaplan1_state::tileram_offs_r), FUNC(toaplan1_state::tileram_offs_w));
-	map(offset + 0x04, offset + 0x07).rw(FUNC(toaplan1_state::tileram_r), FUNC(toaplan1_state::tileram_w));
-	map(offset + 0x10, offset + 0x1f).rw(FUNC(toaplan1_state::scroll_regs_r), FUNC(toaplan1_state::scroll_regs_w));
+	map(0x01, 0x01).w(FUNC(toaplan1_state::bcu_flipscreen_w));
+	map(0x02, 0x03).rw(FUNC(toaplan1_state::tileram_offs_r), FUNC(toaplan1_state::tileram_offs_w));
+	map(0x04, 0x07).rw(FUNC(toaplan1_state::tileram_r), FUNC(toaplan1_state::tileram_w));
+	map(0x10, 0x1f).rw(FUNC(toaplan1_state::scroll_regs_r), FUNC(toaplan1_state::scroll_regs_w));
 }
 
-void toaplan1_state::fcu_map(address_map &map, offs_t offset)
+void toaplan1_state::fcu_map(address_map &map)
 {
-	map(offset + 0x0, offset + 0x1).r(FUNC(toaplan1_state::frame_done_r));
-//  map(offset + 0x0, offset + 0x1).w(?? disable sprite refresh ??)
-	map(offset + 0x2, offset + 0x3).rw(FUNC(toaplan1_state::spriteram_offs_r), FUNC(toaplan1_state::spriteram_offs_w));
-	map(offset + 0x4, offset + 0x5).rw(FUNC(toaplan1_state::spriteram_r), FUNC(toaplan1_state::spriteram_w));
-	map(offset + 0x6, offset + 0x7).rw(FUNC(toaplan1_state::spritesizeram_r), FUNC(toaplan1_state::spritesizeram_w));
+	map(0x0, 0x1).r(FUNC(toaplan1_state::frame_done_r));
+//  map(0x0, 0x1).w(?? disable sprite refresh ??)
+	map(0x2, 0x3).rw(FUNC(toaplan1_state::spriteram_offs_r), FUNC(toaplan1_state::spriteram_offs_w));
+	map(0x4, 0x5).rw(FUNC(toaplan1_state::spriteram_r), FUNC(toaplan1_state::spriteram_w));
+	map(0x6, 0x7).rw(FUNC(toaplan1_state::spritesizeram_r), FUNC(toaplan1_state::spritesizeram_w));
 }
 
-void toaplan1_state::int_palette_map(address_map &map, offs_t offset)
+void toaplan1_state::int_palette_map(address_map &map)
 {
-	map(offset + 0x0000, offset + 0x0001).portr("VBLANK");
-//  map(offset + 0x0000, offset + 0x0001).w(?? video frame related ??)
-	map(offset + 0x0003, offset + 0x0003).w(FUNC(toaplan1_state::intenable_w));
-	map(offset + 0x0008, offset + 0x000f).w(FUNC(toaplan1_state::bcu_control_w));
-	map(offset + 0x4000, offset + 0x47ff).ram().w(FUNC(toaplan1_state::bgpalette_w)).share(m_bgpaletteram);
-	map(offset + 0x6000, offset + 0x67ff).ram().w(FUNC(toaplan1_state::fgpalette_w)).share(m_fgpaletteram);
+	map(0x0000, 0x0001).portr("VBLANK");
+//  map(0x0000, 0x0001).w(?? video frame related ??)
+	map(0x0003, 0x0003).w(FUNC(toaplan1_state::intenable_w));
+	map(0x0008, 0x000f).w(FUNC(toaplan1_state::bcu_control_w));
+	map(0x4000, 0x47ff).ram().w(FUNC(toaplan1_state::bgpalette_w)).share(m_bgpaletteram);
+	map(0x6000, 0x67ff).ram().w(FUNC(toaplan1_state::fgpalette_w)).share(m_fgpaletteram);
 }
 
-void toaplan1_state::tile_offset_fcu_flip_map(address_map &map, offs_t offset)
+void toaplan1_state::tile_offset_fcu_flip_map(address_map &map)
 {
-	map(offset + 0x0, offset + 0x3).w(FUNC(toaplan1_state::tile_offsets_w));
-	map(offset + 0x6, offset + 0x6).w(FUNC(toaplan1_state::fcu_flipscreen_w));
+	map(0x0, 0x3).w(FUNC(toaplan1_state::tile_offsets_w));
+	map(0x6, 0x6).w(FUNC(toaplan1_state::fcu_flipscreen_w));
 }
 
 void toaplan1_rallybik_state::rallybik_main_map(address_map &map)
@@ -656,8 +656,8 @@ void toaplan1_rallybik_state::rallybik_main_map(address_map &map)
 	map(0x040000, 0x07ffff).rom();
 	map(0x080000, 0x083fff).ram();
 	map(0x0c0000, 0x0c0fff).ram().share("spriteram");
-	bcu_map(map, 0x100000);
-	int_palette_map(map, 0x140000);
+	map(0x100000, 0x10001f).m(*this, FUNC(toaplan1_rallybik_state::bcu_map));
+	map(0x140000, 0x147fff).m(*this, FUNC(toaplan1_rallybik_state::int_palette_map));
 	map(0x180000, 0x180fff).rw(FUNC(toaplan1_rallybik_state::shared_r), FUNC(toaplan1_rallybik_state::shared_w)).umask16(0x00ff);
 	map(0x1c0000, 0x1c0003).w(FUNC(toaplan1_rallybik_state::tile_offsets_w));
 	map(0x1c8001, 0x1c8001).w(FUNC(toaplan1_rallybik_state::reset_sound_w));
@@ -667,11 +667,11 @@ void toaplan1_state::truxton_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x080000, 0x083fff).ram();
-	fcu_map(map, 0x0c0000);
-	bcu_map(map, 0x100000);
-	int_palette_map(map, 0x140000);
+	map(0x0c0000, 0x0c0007).m(*this, FUNC(toaplan1_state::fcu_map));
+	map(0x100000, 0x10001f).m(*this, FUNC(toaplan1_state::bcu_map));
+	map(0x140000, 0x147fff).m(*this, FUNC(toaplan1_state::int_palette_map));
 	map(0x180000, 0x180fff).rw(FUNC(toaplan1_state::shared_r), FUNC(toaplan1_state::shared_w)).umask16(0x00ff);
-	tile_offset_fcu_flip_map(map, 0x1c0000);
+	map(0x1c0000, 0x1c0007).m(*this, FUNC(toaplan1_state::tile_offset_fcu_flip_map));
 	map(0x1d0001, 0x1d0001).w(FUNC(toaplan1_state::reset_sound_w));
 }
 
@@ -679,11 +679,11 @@ void toaplan1_state::hellfire_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x047fff).ram();
-	int_palette_map(map, 0x080000);
+	map(0x080000, 0x087fff).m(*this, FUNC(toaplan1_state::int_palette_map));
 	map(0x0c0000, 0x0c0fff).rw(FUNC(toaplan1_state::shared_r), FUNC(toaplan1_state::shared_w)).umask16(0x00ff);
-	bcu_map(map, 0x100000);
-	fcu_map(map, 0x140000);
-	tile_offset_fcu_flip_map(map, 0x180000);
+	map(0x100000, 0x10001f).m(*this, FUNC(toaplan1_state::bcu_map));
+	map(0x140000, 0x140007).m(*this, FUNC(toaplan1_state::fcu_map));
+	map(0x180000, 0x180007).m(*this, FUNC(toaplan1_state::tile_offset_fcu_flip_map));
 	map(0x180009, 0x180009).w(FUNC(toaplan1_state::reset_sound_w));
 }
 
@@ -692,22 +692,22 @@ void toaplan1_state::zerowing_main_map(address_map &map)
 	map(0x000000, 0x00ffff).rom();
 	map(0x040000, 0x07ffff).rom();
 	map(0x080000, 0x087fff).ram();
-	tile_offset_fcu_flip_map(map, 0x0c0000);
-	int_palette_map(map, 0x400000);
+	map(0x0c0000, 0x0c0007).m(*this, FUNC(toaplan1_state::tile_offset_fcu_flip_map));
+	map(0x400000, 0x407fff).m(*this, FUNC(toaplan1_state::int_palette_map));
 	map(0x440000, 0x440fff).rw(FUNC(toaplan1_state::shared_r), FUNC(toaplan1_state::shared_w)).umask16(0x00ff);
-	bcu_map(map, 0x480000);
-	fcu_map(map, 0x4c0000);
+	map(0x480000, 0x48001f).m(*this, FUNC(toaplan1_state::bcu_map));
+	map(0x4c0000, 0x4c0007).m(*this, FUNC(toaplan1_state::fcu_map));
 }
 
 void toaplan1_demonwld_state::main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	int_palette_map(map, 0x400000);
+	map(0x400000, 0x407fff).m(*this, FUNC(toaplan1_demonwld_state::int_palette_map));
 	map(0x600000, 0x600fff).rw(FUNC(toaplan1_demonwld_state::shared_r), FUNC(toaplan1_demonwld_state::shared_w)).umask16(0x00ff);
-	bcu_map(map, 0x800000);
-	fcu_map(map, 0xa00000);
+	map(0x800000, 0x80001f).m(*this, FUNC(toaplan1_demonwld_state::bcu_map));
+	map(0xa00000, 0xa00007).m(*this, FUNC(toaplan1_demonwld_state::fcu_map));
 	map(0xc00000, 0xc03fff).ram();
-	tile_offset_fcu_flip_map(map, 0xe00000);
+	map(0xe00000, 0xe00007).m(*this, FUNC(toaplan1_demonwld_state::tile_offset_fcu_flip_map));
 	map(0xe00009, 0xe00009).w(FUNC(toaplan1_demonwld_state::reset_sound_w));
 	map(0xe0000b, 0xe0000b).w(FUNC(toaplan1_demonwld_state::dsp_ctrl_w));  // DSP Comms control
 }
@@ -716,9 +716,9 @@ void toaplan1_samesame_state::main_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom();
 	map(0x040000, 0x07ffff).rom();
-	tile_offset_fcu_flip_map(map, 0x080000);
+	map(0x080000, 0x080007).m(*this, FUNC(toaplan1_samesame_state::tile_offset_fcu_flip_map));
 	map(0x0c0000, 0x0c3fff).ram();         /* Frame done at $c1ada */
-	int_palette_map(map, 0x100000);
+	map(0x100000, 0x107fff).m(*this, FUNC(toaplan1_samesame_state::int_palette_map));
 	map(0x140000, 0x140001).portr("P1");
 	map(0x140002, 0x140003).portr("P2");
 	map(0x140004, 0x140005).portr("DSWA");
@@ -728,19 +728,19 @@ void toaplan1_samesame_state::main_map(address_map &map)
 	map(0x14000d, 0x14000d).w(FUNC(toaplan1_samesame_state::coin_w));  /* Coin counter/lockout */
 //  map(0x14000e, 0x14000f).nopr(); // irq ack?
 	map(0x14000f, 0x14000f).w(m_soundlatch, FUNC(generic_latch_8_device::write));   /* Commands sent to HD647180 */
-	bcu_map(map, 0x180000);
-	fcu_map(map, 0x1c0000);
+	map(0x180000, 0x18001f).m(*this, FUNC(toaplan1_samesame_state::bcu_map));
+	map(0x1c0000, 0x1c0007).m(*this, FUNC(toaplan1_samesame_state::fcu_map));
 }
 
 void toaplan1_state::outzone_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	fcu_map(map, 0x100000);
+	map(0x100000, 0x100007).m(*this, FUNC(toaplan1_state::fcu_map));
 	map(0x140000, 0x140fff).rw(FUNC(toaplan1_state::shared_r), FUNC(toaplan1_state::shared_w)).umask16(0x00ff);
-	bcu_map(map, 0x200000);
+	map(0x200000, 0x20001f).m(*this, FUNC(toaplan1_state::bcu_map));
 	map(0x240000, 0x243fff).ram();
-	int_palette_map(map, 0x300000);
-	tile_offset_fcu_flip_map(map, 0x340000);
+	map(0x300000, 0x307fff).m(*this, FUNC(toaplan1_state::int_palette_map));
+	map(0x340000, 0x340007).m(*this, FUNC(toaplan1_state::tile_offset_fcu_flip_map));
 }
 
 void toaplan1_state::outzonecv_main_map(address_map &map)
@@ -748,22 +748,22 @@ void toaplan1_state::outzonecv_main_map(address_map &map)
 	map(0x000000, 0x03ffff).rom();
 //  map(0x040000, 0x07ffff).rom();
 	map(0x080000, 0x087fff).ram();
-	tile_offset_fcu_flip_map(map, 0x0c0000);
-	int_palette_map(map, 0x400000);
+	map(0x0c0000, 0x0c0007).m(*this, FUNC(toaplan1_state::tile_offset_fcu_flip_map));
+	map(0x400000, 0x407fff).m(*this, FUNC(toaplan1_state::int_palette_map));
 	map(0x440000, 0x440fff).rw(FUNC(toaplan1_state::shared_r), FUNC(toaplan1_state::shared_w)).umask16(0x00ff);
-	bcu_map(map, 0x480000);
-	fcu_map(map, 0x4c0000);
+	map(0x480000, 0x48001f).m(*this, FUNC(toaplan1_state::bcu_map));
+	map(0x4c0000, 0x4c0007).m(*this, FUNC(toaplan1_state::fcu_map));
 }
 
 void toaplan1_state::vimana_main_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	tile_offset_fcu_flip_map(map, 0x080000);
-	fcu_map(map, 0x0c0000);
-	int_palette_map(map, 0x400000);
+	map(0x080000, 0x080007).m(*this, FUNC(toaplan1_state::tile_offset_fcu_flip_map));
+	map(0x0c0000, 0x0c0007).m(*this, FUNC(toaplan1_state::fcu_map));
+	map(0x400000, 0x407fff).m(*this, FUNC(toaplan1_state::int_palette_map));
 	map(0x440000, 0x4407ff).rw(FUNC(toaplan1_state::shared_r), FUNC(toaplan1_state::shared_w)).umask16(0x00ff); /* inputs, coins and sound handled by 647180 MCU via this space */
 	map(0x480000, 0x487fff).ram();
-	bcu_map(map, 0x4c0000);
+	map(0x4c0000, 0x4c001f).m(*this, FUNC(toaplan1_state::bcu_map));
 }
 
 

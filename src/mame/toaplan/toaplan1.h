@@ -147,10 +147,10 @@ protected:
 	virtual void reset_sound();
 	void reset_callback(int state);
 
-	void bcu_map(address_map &map, offs_t offset) ATTR_COLD;
-	void fcu_map(address_map &map, offs_t offset) ATTR_COLD;
-	void int_palette_map(address_map &map, offs_t offset) ATTR_COLD;
-	void tile_offset_fcu_flip_map(address_map &map, offs_t offset) ATTR_COLD;
+	void bcu_map(address_map &map) ATTR_COLD;
+	void fcu_map(address_map &map) ATTR_COLD;
+	void int_palette_map(address_map &map) ATTR_COLD;
+	void tile_offset_fcu_flip_map(address_map &map) ATTR_COLD;
 
 	void hellfire_main_map(address_map &map) ATTR_COLD;
 	void hellfire_sound_io_map(address_map &map) ATTR_COLD;
