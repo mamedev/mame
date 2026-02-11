@@ -31429,19 +31429,6 @@ gl_wywh24
 gl_wywh24p
 gl_wywhp
 
-@source:misc/globalvr.cpp
-bhead2k
-bhead2k2
-bhead2k3
-bhead2ka
-gvrxpsup
-gvrxpsys
-hyperv2
-hyperv2a
-nfs
-nfsgt
-nfsug
-
 @source:misc/gluck2.cpp
 gluck2
 sise7
@@ -37466,6 +37453,25 @@ pcherc
 pcmda
 pcvga
 pcv20
+
+@source:pc/globalvr.cpp
+alienex
+alex10
+alex101
+amermy
+bhead2k
+bhead2k2
+bhead2k3
+bhead2ka
+blzingel
+gvrxpsup
+gvrxpsys
+hyperv2
+hyperv2a
+multirec
+nfs
+nfsgt
+nfsug
 
 @source:pc/ibmpc.cpp
 ibm5140
