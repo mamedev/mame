@@ -16,7 +16,9 @@ va_lpf4_device::va_lpf4_device(const machine_config &mconfig, device_type type, 
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_stream(nullptr)
+	, m_streamless_sample_rate(0)
 	, m_input_gain(1)
+	, m_gain_comp(0)
 	, m_drive(1)
 	, m_drive_inv(1)
 	, m_fc(0)
@@ -27,9 +29,21 @@ va_lpf4_device::va_lpf4_device(const machine_config &mconfig, device_type type, 
 {
 }
 
+va_lpf4_device &va_lpf4_device::configure_streamless(u32 sample_rate)
+{
+	m_streamless_sample_rate = sample_rate;
+	return *this;
+}
+
 va_lpf4_device &va_lpf4_device::configure_input_gain(float gain)
 {
 	m_input_gain = gain;
+	return *this;
+}
+
+va_lpf4_device &va_lpf4_device::configure_bass_gain_comp(float comp)
+{
+	m_gain_comp = comp;
 	return *this;
 }
 
@@ -42,8 +56,6 @@ va_lpf4_device &va_lpf4_device::va_lpf4_device::configure_drive(float drive)
 
 void va_lpf4_device::set_fixed_freq_cv(float freq_cv)
 {
-	if (!m_stream)
-		fatalerror("%s: set_fixed_freq_cv() cannot be called before device_start()\n", tag());
 	if (BIT(get_sound_requested_inputs_mask(), INPUT_FREQ))
 		fatalerror("%s: Cannot set a fixed frequency CV when streaming it.\n", tag());
 
@@ -51,15 +63,15 @@ void va_lpf4_device::set_fixed_freq_cv(float freq_cv)
 	if (fc == m_fc)
 		return;
 
-	m_stream->update();
+	if (m_stream)
+		m_stream->update();
+
 	m_fc = fc;
 	recalc_filter();
 }
 
 void va_lpf4_device::set_fixed_res_cv(float res_cv)
 {
-	if (!m_stream)
-		fatalerror("%s: set_fixed_res_cv() cannot be called before device_start()\n", tag());
 	if (BIT(get_sound_requested_inputs_mask(), INPUT_RES))
 		fatalerror("%s: Cannot set a fixed resonance CV when streaming it.\n", tag());
 
@@ -67,7 +79,9 @@ void va_lpf4_device::set_fixed_res_cv(float res_cv)
 	if (res == m_res)
 		return;
 
-	m_stream->update();
+	if (m_stream)
+		m_stream->update();
+
 	m_res = res;
 	recalc_alpha0();
 }
@@ -98,10 +112,23 @@ float va_lpf4_device::cv_to_res(float res_cv) const
 
 void va_lpf4_device::device_start()
 {
-	if (!BIT(get_sound_requested_inputs_mask(), INPUT_AUDIO))
-		fatalerror("%s: requires input 0 to be connected.\n", tag());
-	if (get_sound_requested_inputs_mask() & ~u64(7))
-		fatalerror("%s: can only have inputs 0-2 connected.\n", tag());
+	if (get_sound_requested_outputs() > 0)
+	{
+		if (!BIT(get_sound_requested_inputs_mask(), INPUT_AUDIO))
+			fatalerror("%s: requires input 0 to be connected.\n", tag());
+		if (get_sound_requested_inputs_mask() & ~u64(7))
+			fatalerror("%s: can only have inputs 0-2 connected.\n", tag());
+		if (m_streamless_sample_rate > 0)
+			fatalerror("%s: configured as streamless, but the output stream is connected.\n", tag());
+
+		// Using a minimum of 96KHz to reduce aliasing due to distortion.
+		m_stream = stream_alloc(get_sound_requested_inputs(), 1, std::max(96000, machine().sample_rate()));
+	}
+	else if (m_streamless_sample_rate == 0)
+	{
+		fatalerror("%s: not configured properly. Should either have streams connected, "
+		           "or be configured as streamless.\n", tag());
+	}
 
 	save_item(NAME(m_fc));
 	save_item(NAME(m_res));
@@ -111,8 +138,6 @@ void va_lpf4_device::device_start()
 	save_item(NAME(m_alpha0));
 	save_item(NAME(m_G4));
 
-	// Using a minimum of 96KHz to reduce aliasing due to distortion.
-	m_stream = stream_alloc(get_sound_requested_inputs(), 1, std::max(96000, machine().sample_rate()));
 	recalc_filter();
 }
 
@@ -143,6 +168,38 @@ void va_lpf4_device::device_start()
         in his book: "Designing Software Synthesizer Plugins in C++")
     [3] "The Art of VA Filter Design", V Zavalishin, Chapter 5.3.
 */
+sound_stream::sample_t va_lpf4_device::process_sample_internal(sound_stream::sample_t s)
+{
+	float sigma = 0;
+	for (const filter_stage &stage : m_stages)
+		sigma += stage.beta * stage.state;
+
+	// Adding a tiny amount of noise to the input signal, to ensure the
+	// filter can self-oscillate even when there is no input.
+	const float noise = 2 * (float(machine().rand()) / std::numeric_limits<u32>::max() - 0.5F);  // [-1, 1]
+	float x = s * m_input_gain + 0.000001F * noise;
+	x *= 1.0F + m_gain_comp * m_res;
+
+	float u = (x - m_res * sigma) * m_alpha0;
+	u = m_drive_inv * tanhf(u * m_drive);
+
+	for (filter_stage &stage : m_stages)
+	{
+		const float vn = (u - stage.state) * stage.alpha;
+		u = vn + stage.state;
+		stage.state = vn + u;
+	}
+
+	return u;
+}
+
+sound_stream::sample_t va_lpf4_device::process_sample(sound_stream::sample_t s)
+{
+	if (get_sound_requested_outputs() > 0)
+		fatalerror("%s: process_sample() can only be used when in streamless mode.\n", tag());
+	return process_sample_internal(s);
+}
+
 void va_lpf4_device::sound_stream_update(sound_stream &stream)
 {
 	const bool streaming_freq = BIT(get_sound_requested_inputs_mask(), INPUT_FREQ);
@@ -160,7 +217,6 @@ void va_lpf4_device::sound_stream_update(sound_stream &stream)
 				recalc_filter();
 			}
 		}
-
 		if (streaming_res)
 		{
 			const float res = cv_to_res(stream.get(INPUT_RES, i));
@@ -170,27 +226,16 @@ void va_lpf4_device::sound_stream_update(sound_stream &stream)
 				recalc_alpha0();
 			}
 		}
-
-		float sigma = 0;
-		for (const filter_stage &stage : m_stages)
-			sigma += stage.beta * stage.state;
-
-		// Adding a tiny amount of noise to the input signal, to ensure the
-		// filter can self-oscillate even when there is no input.
-		const float noise = 2 * (float(machine().rand()) / std::numeric_limits<u32>::max() - 0.5F);  // [-1, 1]
-		const float x = stream.get(INPUT_AUDIO, i) * m_input_gain + 0.000001F * noise;
-
-		float u = (x - m_res * sigma) * m_alpha0;
-		u = m_drive_inv * tanhf(u * m_drive);
-
-		for (filter_stage &stage : m_stages)
-		{
-			const float vn = (u - stage.state) * stage.alpha;
-			u = vn + stage.state;
-			stage.state = vn + u;
-		}
-		stream.put(0, i, u);
+		stream.put(0, i, process_sample_internal(stream.get(INPUT_AUDIO, i)));
 	}
+}
+
+u32 va_lpf4_device::sample_rate() const
+{
+	if (m_stream)
+		return m_stream->sample_rate();
+	else
+		return m_streamless_sample_rate;
 }
 
 void va_lpf4_device::recalc_alpha0()
@@ -200,7 +245,7 @@ void va_lpf4_device::recalc_alpha0()
 
 void va_lpf4_device::recalc_filter()
 {
-	const float T = 1.0F / m_stream->sample_rate();
+	const float T = 1.0F / sample_rate();
 	const float w = 2 * float(M_PI) * m_fc;
 
 	// Using the "bounded cutoff prewarping" strategy described in Zavalishin's
@@ -213,7 +258,7 @@ void va_lpf4_device::recalc_filter()
 	// does not work well with standard cutoff prewarping.
 	// Here, we set the max at 16KHz (same as in the book). But for low sample
 	// rates, we use a fraction of Nyquist instead.
-	const float w_max = 2 * float(M_PI) * std::min(0.75F * m_stream->sample_rate() / 2, 16'000.0F);
+	const float w_max = 2 * float(M_PI) * std::min(0.75F * sample_rate() / 2, 16'000.0F);
 	float g = 0;
 	if (w <= w_max)
 		g = tanf(w * T / 2);

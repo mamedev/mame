@@ -43,7 +43,22 @@ public:
 
 	va_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
+	// Disables streams. Intended for using this filter in sound_stream_update()
+	// of other devices. The device that embeds this should call process_sample()
+	// for each sample in its stream, possibly after calling set_fixed_freq_cv()
+	// and set_fixed_res_cv().
+	va_lpf4_device &configure_streamless(u32 sample_rate) ATTR_COLD;
+
 	va_lpf4_device &configure_input_gain(float gain) ATTR_COLD;
+
+	// Bass gain compensation vs. resonance.
+	// 0 - No compensation. Gain at lower frequencies will drop as resonance increases.
+	// 1 - Gain at lower frequencies will remain constant as resonance increases.
+	// The value, which can be between 0 and 1, will depend on the device being
+	// emulated. The original moog filter and older ICs (e.g. CEM3320) do not
+	// compensate. Newer designs and ICs (e.g. CEM3394, CEM3328) provide fixed
+	// or configurable compensation.
+	va_lpf4_device &configure_bass_gain_comp(float comp) ATTR_COLD;
 
 	// Larger values result in more distortion and more of the (filtered)
 	// signal making it through at full resonance. The "correct" value will
@@ -61,6 +76,10 @@ public:
 	float get_freq();  // Returns the cutoff frequency, in Hz.
 	float get_res();  // Returns the feedback gain (0-4).
 
+	// Processes a sample through the filter.
+	// This only works when in "streamless" mode. See configure_streamless().
+	sound_stream::sample_t process_sample(sound_stream::sample_t s);
+
 protected:
 	va_lpf4_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) ATTR_COLD;
 
@@ -71,13 +90,18 @@ protected:
 	void sound_stream_update(sound_stream &stream) override;
 
 private:
+	sound_stream::sample_t process_sample_internal(sound_stream::sample_t s);
+
+	u32 sample_rate() const;
 	void recalc_alpha0();
 	void recalc_filter();
 
 	sound_stream *m_stream;
 
 	// Configuration, not needed in save state.
+	u32 m_streamless_sample_rate;  // Ignored (and 0) when in streaming mode.
 	float m_input_gain;
+	float m_gain_comp;
 	float m_drive;
 	float m_drive_inv;
 
