@@ -187,6 +187,7 @@ protected:
 	uint8_t m_cursor_offset_horizontal;
 	uint8_t m_cursor_offset_vertical;
 
+	virtual void refresh_bank() override;
 };
 
 /*

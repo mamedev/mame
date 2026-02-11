@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 
 #ifndef MAME_VIDEO_PC_VGA_CHIPS_H
 #define MAME_VIDEO_PC_VGA_CHIPS_H

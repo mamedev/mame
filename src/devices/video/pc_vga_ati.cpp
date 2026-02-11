@@ -43,6 +43,7 @@ void ati_vga_device::device_add_mconfig(machine_config &config)
 	EEPROM_93C46_16BIT(config, "ati_eeprom");
 }
 
+// TODO: fails VBETEST (after UNIVBE load)
 uint16_t ati_vga_device::offset()
 {
 	//popmessage("Offset: %04x  %s %s %s %s",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",(ati.ext_reg[0x33] & 0x40) ? "PEL" : "---",(ati.ext_reg[0x30] & 0x20) ? "256" : "---");
@@ -235,7 +236,7 @@ void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 		switch(ati.ext_reg_select)
 		{
 		case 0x23:
-			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xfffdffff) | ((data & 0x10) << 13);
+			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & ~0x10000) | (BIT(data, 4) << 16);
 			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffdffff) | ((data & 0x08) << 14);
 			ati.ext_reg[ati.ext_reg_select] = data & 0x1f;
 			LOG( "ATI: ATI23 write %02x\n",data);
@@ -257,8 +258,14 @@ void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 			}
 			LOG( "ATI: ATI2D (extensions) write %02x\n",data);
 			break;
+		case 0x2e:
+			ati.ext_reg[ati.ext_reg_select] = data;
+			// N/A for this core, matters for MACH32
+			// TODO: lift me on actual ext_space handling
+			refresh_bank();
+			break;
 		case 0x30:
-			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xfffeffff) | ((data & 0x40) << 10);
+			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & ~0x20000) | (BIT(data, 6) << 17);
 			vga.crtc.cursor_addr = (vga.crtc.cursor_addr & 0xfffeffff) | ((data & 0x04) << 14);
 			ati.ext_reg[ati.ext_reg_select] = data & 0x7d;
 			LOG( "ATI: ATI30 write %02x\n",data);
@@ -268,16 +275,7 @@ void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 			LOG( "ATI: ATI31 write %02x\n",data);
 			break;
 		case 0x32:  // memory page select
-			if(ati.ext_reg[0x3e] & 0x08)
-			{
-				svga.bank_r = ((data & 0x01) << 3) | ((data & 0xe0) >> 5);
-				svga.bank_w = ((data & 0x1e) >> 1);
-			}
-			else
-			{
-				svga.bank_r = ((data & 0x1e) >> 1);
-				svga.bank_w = ((data & 0x1e) >> 1);
-			}
+			refresh_bank();
 			//LOG( "ATI: Memory Page Select write %02x (read: %i write %i)\n",data,svga.bank_r,svga.bank_w);
 			break;
 		case 0x33:  // EEPROM
@@ -319,6 +317,7 @@ void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 			break;
 		case 0x3e:
 			ati.ext_reg[ati.ext_reg_select] = data & 0x1f;
+			refresh_bank();
 			LOG( "ATI: ATI3E write %02x\n",data);
 			break;
 		case 0x3f:
@@ -332,4 +331,19 @@ void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 		break;
 	}
 	ati_define_video_mode();
+}
+
+void ati_vga_device::refresh_bank()
+{
+	u8 bank = ati.ext_reg[0x32];
+	if(ati.ext_reg[0x3e] & 0x08)
+	{
+		svga.bank_r = ((bank & 0x01) << 3) | ((bank & 0xe0) >> 5);
+		svga.bank_w = ((bank & 0x1e) >> 1);
+	}
+	else
+	{
+		svga.bank_r = ((bank & 0x1e) >> 1);
+		svga.bank_w = svga.bank_r;
+	}
 }

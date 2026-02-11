@@ -43,6 +43,8 @@ protected:
 		uint8_t vga_chip_id;
 	} ati;
 
+	virtual void refresh_bank();
+
 private:
 	mach8_device* m_8514;
 };

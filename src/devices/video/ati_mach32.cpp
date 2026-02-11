@@ -318,6 +318,26 @@ void mach32_device::mach32_cursor_offset_w(offs_t offset, uint16_t data, uint16_
 	}
 }
 
+void mach32_device::refresh_bank()
+{
+	const u8 ati32 = ati.ext_reg[0x32];
+	const u8 ati3e = ati.ext_reg[0x3e];
+	const u8 ati2e = ati.ext_reg[0x2e];
+	if(ati3e & 0x08)
+	{
+		svga.bank_r = ((ati32 & 0x01) << 3) | ((ati32 & 0xe0) >> 5);
+		svga.bank_r|= (ati2e & 0xc) << 2;
+		svga.bank_w = ((ati32 & 0x1e) >> 1);
+		svga.bank_w|= (ati2e & 0x3) << 4;
+	}
+	else
+	{
+		svga.bank_r = (ati32 & 0x1e) >> 1;
+		svga.bank_r|= (ati2e & 3) << 4;
+		svga.bank_w = svga.bank_r;
+	}
+}
+
 /*
  *   mach64
  */
