@@ -350,8 +350,8 @@ ROM_START(multirec)
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
-	DISK_REGION("ide:1:cdrom")
-	DISK_IMAGE_READONLY("multirec", 0, SHA1(52e850a015c7c8d3cf242741ba708ccdad562e95))
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("multirec", 0, SHA1(7472050d6c7255156c910917204ab1c155f05af4))
 ROM_END
 
 ROM_START(alienex)
@@ -376,6 +376,14 @@ ROM_START(alex101)
 
 	DISK_REGION("ide:1:cdrom")
 	DISK_IMAGE_READONLY("alex101", 0, SHA1(41c1c8b936cbc21a09cbfda90af7f7934647b5f9))
+ROM_END
+
+ROM_START(amermy)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("amermy", 0, SHA1(075173400c519ffcb14fbb133d58c035dc4ca9e0))
 ROM_END
 
 ROM_START(bhead2k)
@@ -408,6 +416,14 @@ ROM_START(bhead2k3)
 
 	DISK_REGION("ide:1:cdrom")
 	DISK_IMAGE_READONLY("beachhead2003desertwar_5-27-2003", 0, SHA1(fed23a6496836050eb1d4f69b91da09adbd9d973))
+ROM_END
+
+ROM_START(blzingel)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("blzingel", 0, SHA1(f61c8816b6b17906f0257780ed021f0b3de6f140))
 ROM_END
 
 ROM_START(nfs)
@@ -476,3 +492,4 @@ GAME( 2005, nfsug,    0,       globalvr, globalvr, globalvr_state, empty_init, R
 GAME( 2006, alienex,  0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Aliens Extermination (v1.0.3)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2006, alex10,   alienex, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Aliens Extermination (v1.0.0)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2006, alex101,  alienex, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Aliens Extermination (v1.0.1)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, amermy,   0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "America's Army (v1.01.82)",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
