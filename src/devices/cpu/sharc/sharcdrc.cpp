@@ -3441,7 +3441,28 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 		{
 			case 0x00:          // Rn = MRxx
 			{
-				generate_unimplemented_compute(block, compiler, desc);
+				int ai = rs;
+				switch (ai)
+				{
+				case 0x00:  // MR0F
+					UML_AND(block, REG(rn), MRF, 0xffffffff);
+					break;
+				case 0x01:  // MR1F
+					UML_SHR(block, REG(rn), MRF, 32);
+					break;
+				case 0x04:  // MR0B
+					UML_AND(block, REG(rn), MRB, 0xffffffff);
+					break;
+				case 0x05:  // MR1B
+					UML_SHR(block, REG(rn), MRB, 32);
+					break;
+
+				case 0x02:  // MR2F
+				case 0x06:  // MR2B
+				default:
+					generate_unimplemented_compute(block, compiler, desc);
+					return;
+				}
 				return;
 			}
 
@@ -3494,10 +3515,6 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 			case 0x14:          // Rm = MRF - R3-0 * R7-4 (SSFR),   Ra = R11-8 + R15-12
 			case 0x15:          // Rm = MRF - R3-0 * R7-4 (SSFR),   Ra = R11-8 - R15-12
 			case 0x16:          // Rm = MRF - R3-0 * R7-4 (SSFR),   Ra = (R11-8 + R15-12) / 2
-				generate_unimplemented_compute(block, compiler, desc);
-				return;
-
-			case 0x1c:          // Fm = F3-0 * F7-4,   Fa = (F11-8 + F15-12) / 2
 				generate_unimplemented_compute(block, compiler, desc);
 				return;
 
@@ -3751,6 +3768,36 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 				UML_MOV(block, REG(fa), I0);
 				return;
 			}
+
+			case 0x1c:          // Fm = F3-0 * F7-4,   Fa = (F11-8 + F15-12) / 2
+				// TODO: denormals
+				UML_FSCOPYI(block, F0, REG(fxm));
+				UML_FSCOPYI(block, F1, REG(fym));
+				UML_FSCOPYI(block, F2, REG(fxa));
+				UML_FSCOPYI(block, F3, REG(fya));
+				UML_FSMUL(block, F0, F0, F1);
+				UML_FSADD(block, F2, F2, F3);
+				UML_MOV(block, I0, 0x3f000000);
+				UML_FSCOPYI(block, F4, I0);
+				UML_FSMUL(block, F2, F2, F4);
+
+				if (AZ_CALC_REQUIRED || AN_CALC_REQUIRED)
+					UML_FSCMP(block, F2, mem(&m_core->fp0));
+				if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
+				if (AN_CALC_REQUIRED) UML_SETc(block, COND_C, ASTAT_AN);
+				if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);  // TODO
+				if (AC_CALC_REQUIRED) UML_MOV(block, ASTAT_AC, 0);
+				if (AS_CALC_REQUIRED) UML_MOV(block, ASTAT_AS, 0);
+				if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 0);  // TODO
+
+				if (MN_CALC_REQUIRED)
+					UML_FSCMP(block, F0, mem(&m_core->fp0));
+				if (MN_CALC_REQUIRED) UML_SETc(block, COND_C, ASTAT_MN);
+				// TODO: MV, MU, MI flags
+
+				UML_ICOPYFS(block, REG(fm), F0);
+				UML_ICOPYFS(block, REG(fa), F2);
+				return;
 
 			case 0x1d:          // Fm = F3-0 * F7-4,   Fa = ABS F11-8
 				UML_FSCOPYI(block, F0, REG(fxm));
