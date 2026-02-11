@@ -58,8 +58,6 @@ public:
 	void pwrkick(machine_config &config);
 
 protected:
-	virtual void video_start() override ATTR_COLD;
-
 	void common_mem(address_map &map) ATTR_COLD;
 	void pwrkick_68k_mem(address_map &map) ATTR_COLD;
 	void othldrby_68k_mem(address_map &map) ATTR_COLD;
@@ -67,7 +65,7 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
-	void sw_oki_bankswitch_w(u8 data);
+	void oki_bankswitch_w(u8 data);
 
 private:
 	void pwrkick_coin_w(u8 data);
@@ -81,21 +79,13 @@ private:
 	required_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	bitmap_ind8 m_custom_priority_bitmap;
 };
-
-void sunwise_state::video_start()
-{
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-}
-
 
 u32 sunwise_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -107,7 +97,7 @@ void sunwise_state::screen_vblank(int state)
 	}
 }
 
-void sunwise_state::sw_oki_bankswitch_w(u8 data)
+void sunwise_state::oki_bankswitch_w(u8 data)
 {
 	m_oki->set_rom_bank(data & 1);
 }
@@ -419,7 +409,7 @@ void sunwise_state::common_mem(address_map &map)
 	map(0x700004, 0x700005).portr("DSWA");
 	map(0x700008, 0x700009).portr("DSWB");
 	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700031, 0x700031).w(FUNC(sunwise_state::sw_oki_bankswitch_w));
+	map(0x700031, 0x700031).w(FUNC(sunwise_state::oki_bankswitch_w));
 }
 
 void sunwise_state::pwrkick_68k_mem(address_map &map)

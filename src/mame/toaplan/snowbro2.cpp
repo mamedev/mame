@@ -40,14 +40,12 @@ public:
 	void snowbro2b3(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void video_start() override ATTR_COLD;
-
 	void snowbro2_68k_mem(address_map &map) ATTR_COLD;
 	void snowbro2b3_68k_mem(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
-	void sb2_oki_bankswitch_w(u8 data);
+	void oki_bankswitch_w(u8 data);
 
 private:
 	required_device<m68000_base_device> m_maincpu;
@@ -55,21 +53,14 @@ private:
 	required_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	bitmap_ind8 m_custom_priority_bitmap;
 };
 
-
-void snowbro2_state::video_start()
-{
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-}
 
 u32 snowbro2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -81,7 +72,7 @@ void snowbro2_state::screen_vblank(int state)
 	}
 }
 
-void snowbro2_state::sb2_oki_bankswitch_w(u8 data)
+void snowbro2_state::oki_bankswitch_w(u8 data)
 {
 	m_oki->set_rom_bank(data & 1);
 }
@@ -293,7 +284,7 @@ void snowbro2_state::snowbro2_68k_mem(address_map &map)
 	map(0x700014, 0x700015).portr("IN3");
 	map(0x700018, 0x700019).portr("IN4");
 	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700031, 0x700031).w(FUNC(snowbro2_state::sb2_oki_bankswitch_w));
+	map(0x700031, 0x700031).w(FUNC(snowbro2_state::oki_bankswitch_w));
 	map(0x700035, 0x700035).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
 }
 
@@ -311,7 +302,7 @@ void snowbro2_state::snowbro2b3_68k_mem(address_map &map)
 	map(0x700014, 0x700015).portr("IN3");
 	map(0x700018, 0x700019).portr("IN4");
 	map(0x700035, 0x700035).w("coincounter", FUNC(toaplan_coincounter_device::coin_w));
-	map(0x700041, 0x700041).w(FUNC(snowbro2_state::sb2_oki_bankswitch_w));
+	map(0x700041, 0x700041).w(FUNC(snowbro2_state::oki_bankswitch_w));
 	map(0xff0000, 0xff2fff).rw(m_vdp, FUNC(gp9001vdp_device::bootleg_videoram16_r), FUNC(gp9001vdp_device::bootleg_videoram16_w));
 	map(0xff3000, 0xff37ff).rw(m_vdp, FUNC(gp9001vdp_device::bootleg_spriteram16_r), FUNC(gp9001vdp_device::bootleg_spriteram16_w));
 	map(0xff8000, 0xff800f).w(m_vdp, FUNC(gp9001vdp_device::bootleg_scroll_w));
