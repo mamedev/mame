@@ -574,10 +574,11 @@ void adsp21062_device::compute_fadd(int rn, int rx, int ry)
 	m_core->astat |= AF;
 }
 
+/* Fn = (Fx + Fy) / 2 */
 void adsp21062_device::compute_favg(int rn, int rx, int ry)
 {
 	SHARC_REG r;
-	r.f = (FREG(rx) + FREG(ry)) / (float) 2.0f;
+	r.f = (FREG(rx) + FREG(ry)) / 2.0f;
 
 	CLEAR_ALU_FLAGS();
 	// AN
@@ -676,7 +677,7 @@ void adsp21062_device::compute_fcomp(int rx, int ry)
 void adsp21062_device::compute_fabs_plus(int rn, int rx, int ry)
 {
 	SHARC_REG r;
-	r.f = fabs(FREG(rx) + FREG(ry));
+	r.f = fabsf(FREG(rx) + FREG(ry));
 
 	CLEAR_ALU_FLAGS();
 	// AZ
@@ -916,13 +917,24 @@ void adsp21062_device::compute_fpass(int rn, int rx)
 void adsp21062_device::compute_fabs(int rn, int rx)
 {
 	SHARC_REG r;
-	r.f = fabs(FREG(rx));
+	if (IS_FLOAT_NAN(REG(rx)))
+	{
+		r.r = 0xffffffff;
+	}
+	else if (IS_FLOAT_DENORMAL(REG(rx)))
+	{
+		r.r = 0;
+	}
+	else
+	{
+		r.r = REG(rx) & 0x7fffffff;
+	}
 
 	CLEAR_ALU_FLAGS();
-	// AN
-	m_core->astat |= (r.f < 0.0f) ? AN : 0;
 	// AZ
-	m_core->astat |= (IS_FLOAT_ZERO(r.r)) ? AZ : 0;
+	m_core->astat |= IS_FLOAT_ZERO(r.r) ? AZ : 0;
+	// AS
+	m_core->astat |= (REG(rx) < 0.0f) ? AS : 0;
 	// AI
 	m_core->astat |= (IS_FLOAT_NAN(REG(rx))) ? AI : 0;
 
@@ -1006,11 +1018,11 @@ void adsp21062_device::compute_multi_mr_to_reg(int ai, int rk)
 {
 	switch(ai)
 	{
-		case 0:     SET_UREG(rk, (uint32_t)(m_core->mrf)); break;
-		case 1:     SET_UREG(rk, (uint32_t)(m_core->mrf >> 32)); break;
+		case 0:     SET_UREG(rk, uint32_t(m_core->mrf)); break;
+		case 1:     SET_UREG(rk, uint32_t(m_core->mrf >> 32)); break;
 		case 2:     fatalerror("SHARC: tried to load MR2F\n"); break;
-		case 4:     SET_UREG(rk, (uint32_t)(m_core->mrb)); break;
-		case 5:     SET_UREG(rk, (uint32_t)(m_core->mrb >> 32)); break;
+		case 4:     SET_UREG(rk, uint32_t(m_core->mrb)); break;
+		case 5:     SET_UREG(rk, uint32_t(m_core->mrb >> 32)); break;
 		case 6:     fatalerror("SHARC: tried to load MR2B\n"); break;
 		default:    fatalerror("SHARC: unknown ai %d in mr_to_reg\n", ai);
 	}
@@ -1279,20 +1291,9 @@ void adsp21062_device::compute_fmul_fix_scaled(int fm, int fxm, int fym, int fa,
 
 void adsp21062_device::compute_fmul_avg(int fm, int fxm, int fym, int fa, int fxa, int fya)
 {
-	int32_t alu_i;
 	SHARC_REG r_mul, r_alu;
 	r_mul.f = FREG(fxm) * FREG(fym);
-	r_alu.f = (FREG(fxa) + FREG(fya))/((float) 2.0);
-
-	// TODO: are flags right for this?
-	if (m_core->mode1 & MODE1_TRUNCATE)
-	{
-		alu_i = (int32_t)(r_alu.f);
-	}
-	else
-	{
-		alu_i = (int32_t)(r_alu.f < 0 ? (r_alu.f - 0.5f) : (r_alu.f + 0.5f));
-	}
+	r_alu.f = (FREG(fxa) + FREG(fya)) / 2.0f;
 
 	CLEAR_MULTIPLIER_FLAGS();
 	SET_FLAG_MN(r_mul.r);
@@ -1301,35 +1302,36 @@ void adsp21062_device::compute_fmul_avg(int fm, int fxm, int fym, int fa, int fx
 	/* TODO: MI flag */
 
 	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(alu_i);
+	// AN
+	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
 	// AZ
-	SET_FLAG_AZ(alu_i);
-	// AU
+	m_core->astat |= (IS_FLOAT_DENORMAL(r_alu.r) || IS_FLOAT_ZERO(r_alu.r)) ? AZ : 0;
+	// AUS
 	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
 	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(fxa))) ? AI : 0;
+	m_core->astat |= (IS_FLOAT_NAN(REG(fxa)) || IS_FLOAT_NAN(REG(fya))) ? AI : 0;
 	/* TODO: AV flag */
 
 	FREG(fm) = r_mul.f;
-	REG(fa) = alu_i;
+	FREG(fa) = r_alu.f;
 	m_core->astat |= AF;
 }
 
 void adsp21062_device::compute_fmul_abs(int fm, int fxm, int fym, int fa, int fxa, int fya)
 {
-	int32_t alu_i;
 	SHARC_REG r_mul, r_alu;
 	r_mul.f = FREG(fxm) * FREG(fym);
-	r_alu.f = (float) fabs(FREG(fxa));
-
-	// TODO: are flags right for this?
-	if (m_core->mode1 & MODE1_TRUNCATE)
+	if (IS_FLOAT_NAN(REG(fxa)))
 	{
-		alu_i = (int32_t)(r_alu.f);
+		r_alu.r = 0xffffffff;
+	}
+	else if (IS_FLOAT_DENORMAL(REG(fxa)))
+	{
+		r_alu.r = 0;
 	}
 	else
 	{
-		alu_i = (int32_t)(r_alu.f < 0 ? (r_alu.f - 0.5f) : (r_alu.f + 0.5f));
+		r_alu.r = REG(fxa) & 0x7fffffff;
 	}
 
 	CLEAR_MULTIPLIER_FLAGS();
@@ -1339,17 +1341,15 @@ void adsp21062_device::compute_fmul_abs(int fm, int fxm, int fym, int fa, int fx
 	/* TODO: MI flag */
 
 	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(alu_i);
 	// AZ
-	SET_FLAG_AZ(alu_i);
-	// AU
-	m_core->stky |= (IS_FLOAT_DENORMAL(r_alu.r)) ? AUS : 0;
+	m_core->astat |= IS_FLOAT_ZERO(r_alu.r) ? AZ : 0;
+	// AS
+	m_core->astat |= (REG(fxa) < 0.0f) ? AS : 0;
 	// AI
 	m_core->astat |= (IS_FLOAT_NAN(REG(fxa))) ? AI : 0;
-	/* TODO: AV flag */
 
 	FREG(fm) = r_mul.f;
-	REG(fa) = alu_i;
+	FREG(fa) = r_alu.f;
 	m_core->astat |= AF;
 }
 

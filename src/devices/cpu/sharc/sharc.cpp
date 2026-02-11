@@ -695,8 +695,10 @@ void adsp21062_device::device_start()
 	m_core->astat_old_old = 0;
 	m_core->astat_old_old_old = 0;
 
-	m_core->fp0 = 0.0f;
-	m_core->fp1 = 1.0f;
+	m_core->fp_const.k0_0 = 0.0F;
+	m_core->fp_const.k0_5 = 0.5F;
+	m_core->fp_const.k1_0 = 1.0F;
+	m_core->fp_const.k2_0 = 2.0F;
 
 	save_pointer(NAME(&m_core->r[0].r), std::size(m_core->r));
 	save_pointer(NAME(&m_core->reg_alt[0].r), std::size(m_core->reg_alt));

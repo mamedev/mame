@@ -420,8 +420,13 @@ private:
 		uint32_t jmpdest;
 		uint32_t temp_return;
 
-		float fp0;
-		float fp1;
+		struct
+		{
+			float k0_0;
+			float k0_5;
+			float k1_0;
+			float k2_0;
+		} fp_const;
 
 		uint32_t m_max_sram_pc[2];
 		uint32_t force_recompile;

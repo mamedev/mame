@@ -727,15 +727,13 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 				break;
 			}
 
-			// TODO: verify this (last bronx)
-			case 0x1c:
+			case 0x1c:      /* Fm = Fxm * Fym,   Fa = (Fxa + Fya) / 2 */
 			{
 				compute_fmul_avg(fm, fxm, fym, fa, fxa, fya);
 				break;
 			}
 
-			// TODO: verify this (Gunblade NY Score Attack Remix mode)
-			case 0x1d:
+			case 0x1d:      /* Fm = Fxm * Fym,   Fa = ABS Fxa */
 			{
 				compute_fmul_abs(fm, fxm, fym, fa, fxa, fya);
 				break;
