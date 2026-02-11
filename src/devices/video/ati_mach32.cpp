@@ -35,7 +35,9 @@ mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, const ch
 }
 
 mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: mach8_device(mconfig, type, tag, owner, clock), m_chip_ID(0), m_membounds(0)
+	: mach8_device(mconfig, type, tag, owner, clock)
+	, m_chip_ID(0)
+	, m_membounds(0)
 {
 }
 
@@ -47,7 +49,9 @@ mach32_device::mach32_device(const machine_config &mconfig, const char *tag, dev
 }
 
 mach32_device::mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: ati_vga_device(mconfig, type, tag, owner, clock), m_8514a(*this,"8514a"), m_cursor_enable(false)
+	: ati_vga_device(mconfig, type, tag, owner, clock)
+	, m_8514a(*this, "8514a")
+	, m_cursor_enable(false)
 {
 }
 
@@ -104,6 +108,9 @@ void mach32_8514a_device::mach32_ge_ext_config_w(offs_t offset, uint16_t data, u
 	if(offset == 1)
 	{
 		COMBINE_DATA(&mach8.ge_ext_config);
+
+		if ((data & 0x0030) != (mach8.ge_ext_config & 0x0030))
+			display_mode_change = true;
 		if(data & 0x0800)
 			display_mode_change = true;
 		if(!(data & 0x8000) && (!(data & 0x0800)))
@@ -138,14 +145,12 @@ void mach32_device::ati_define_video_mode()
 {
 	uint16_t config = m_8514a->get_ext_config();
 
-	if(ati.ext_reg[0x30] & 0x20)
+	// SDD disagrees with this
+	//if(ati.ext_reg[0x30] & 0x20)
 	{
 		if(m_8514a->has_display_mode_changed())
 		{
-			svga.rgb8_en = 0;
-			svga.rgb15_en = 0;
-			svga.rgb16_en = 0;
-			svga.rgb32_en = 0;
+			svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = svga.rgb32_en = 0;
 
 			switch(config & 0x0030)  // pixel depth
 			{
@@ -155,19 +160,33 @@ void mach32_device::ati_define_video_mode()
 					svga.rgb8_en = 1;
 					break;
 				case 0x0020:
-					svga.rgb15_en = 1;
+				{
+					switch(config & 0xc0)
+					{
+						case 0x00: svga.rgb15_en = 1; break;
+						case 0x40: svga.rgb16_en = 1; break;
+						default:
+							// TODO: should be possible to tell depending how it's used
+							popmessage("ati_mach32.cpp: unemulated pixel mode 664RGB/655RGB");
+							break;
+					}
 					break;
+				}
 				case 0x0030:
-					svga.rgb32_en = 1;
+					if (BIT(config, 9))
+						svga.rgb32_en = 1;
+					else
+						svga.rgb24_en = 1;
 					break;
 			}
 		}
 	}
-	else
-	{
-		ati_vga_device::ati_define_video_mode();
-		return;
-	}
+	//else
+	//{
+	//	ati_vga_device::ati_define_video_mode();
+	//	return;
+	//}
+	ati_vga_device::ati_define_video_mode();
 
 	set_dot_clock();
 }

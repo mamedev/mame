@@ -43,7 +43,6 @@ protected:
 	uint16_t m_chip_ID;
 	uint16_t m_membounds;
 	bool display_mode_change;
-
 };
 
 // main SVGA device
