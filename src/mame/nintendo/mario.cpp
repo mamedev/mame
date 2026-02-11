@@ -12,8 +12,10 @@ F: Looks like the oldest revision of the three.
 F->G: 2 bytes difference (at $30A4 and $30E9).
 
 G->E: Adds patches to $F710 area (jumps to there from $31DA and $324C), and
-an additional 2 bytes different. Does one of the patches introduce a bug
-with coins (2nd coin doesn't work), or is it deliberate?
+an additional 2 bytes different. A Nintendo service bulletin mentions they
+updated the program due to coin detection problems, where they shortened the
+required duration the coin switch needs to be active. And indeed, if you try
+PORT_IMPULSE(1), it works fine on revision E, but not on the other revisions.
 
 Revision E also fixes glitches in gfx2 that look like a production error
 (not a bad dump): a gap in Mario/Luigi's hat when he jumps, and a wrong eye
@@ -24,6 +26,10 @@ The Japan revision C is from around the same time as US revision E.
 The sound MCU can be easily replaced with a ROMless one such as I8039
 (or just force EA high), by doing a 1-byte patch to the external ROM:
 offset $01: change $00 to $01 (call $100 -> call $101)
+
+TODO:
+- coin 2 doesn't work in marioe and marioj (though it works in service mode),
+  is it a bug or deliberate?
 
 ============================================================================
 
@@ -91,9 +97,10 @@ write:
 #include "emu.h"
 #include "mario.h"
 
-#include "cpu/z80/z80.h"
 #include "machine/74259.h"
+#include "machine/nvram.h"
 #include "machine/z80dma.h"
+
 #include "screen.h"
 
 
@@ -141,7 +148,8 @@ void mario_state::coin_counter_2_w(int state)
 void mario_state::mario_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x6fff).ram();
+	map(0x6000, 0x67ff).ram();
+	map(0x6800, 0x6fff).ram().share("nvram");
 	map(0x7000, 0x73ff).ram().share("spriteram"); /* physical sprite ram */
 	map(0x7400, 0x77ff).ram().w(FUNC(mario_state::mario_videoram_w)).share("videoram");
 	map(0x7c00, 0x7c00).portr("IN0").w(FUNC(mario_state::mario_sh1_w)); /* Mario run sample */
@@ -157,7 +165,8 @@ void mario_state::mario_map(address_map &map)
 void mario_state::masao_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x6fff).ram();
+	map(0x6000, 0x67ff).ram();
+	map(0x6800, 0x6fff).ram().share("nvram");
 	map(0x7000, 0x73ff).ram().share("spriteram"); /* physical sprite ram */
 	map(0x7400, 0x77ff).ram().w(FUNC(mario_state::mario_videoram_w)).share("videoram");
 	map(0x7c00, 0x7c00).portr("IN0");
@@ -183,12 +192,12 @@ void mario_state::mario_io_map(address_map &map)
  *
  *************************************/
 
-static INPUT_PORTS_START( mariof )
+static INPUT_PORTS_START( mario )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
@@ -197,12 +206,12 @@ static INPUT_PORTS_START( mariof )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!1,!2")
@@ -216,9 +225,9 @@ static INPUT_PORTS_START( mariof )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_3C ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
-	PORT_DIPSETTING(    0x00, "20k 40k 20k+" )
-	PORT_DIPSETTING(    0x10, "30k 50k 20k+" )
-	PORT_DIPSETTING(    0x20, "40k 60k 20k+" )
+	PORT_DIPSETTING(    0x00, "20k only" )
+	PORT_DIPSETTING(    0x10, "30k only" )
+	PORT_DIPSETTING(    0x20, "40k only" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!7,!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
@@ -232,27 +241,19 @@ static INPUT_PORTS_START( mariof )
 	PORT_CONFSETTING(    0x01, "Std 15.72Khz" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mariog )
-	PORT_INCLUDE( mariof )
+static INPUT_PORTS_START( mariof )
+	PORT_INCLUDE( mario )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:!5,!6")
-	PORT_DIPSETTING(    0x00, "20k only" )
-	PORT_DIPSETTING(    0x10, "30k only" )
-	PORT_DIPSETTING(    0x20, "40k only" )
+	PORT_DIPSETTING(    0x00, "20k 40k 20k+" )
+	PORT_DIPSETTING(    0x10, "30k 50k 20k+" )
+	PORT_DIPSETTING(    0x20, "40k 60k 20k+" )
 	PORT_DIPSETTING(    0x30, DEF_STR( None ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( marioe )
-	PORT_INCLUDE( mariog )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // doesn't work in game, but does in service mode
-INPUT_PORTS_END
-
 static INPUT_PORTS_START( marioj )
-	PORT_INCLUDE( marioe )
+	PORT_INCLUDE( mario )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!1,!2")
@@ -336,7 +337,7 @@ void mario_state::mario_base(machine_config &config)
 	Z80(config, m_maincpu, Z80_CLOCK); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mario_state::mario_map);
 	m_maincpu->set_addrmap(AS_IO, &mario_state::mario_io_map);
-	downcast<z80_device &>(*m_maincpu).busack_cb().set(m_z80dma, FUNC(z80dma_device::bai_w));
+	m_maincpu->busack_cb().set(m_z80dma, FUNC(z80dma_device::bai_w));
 
 	/* devices */
 	Z80DMA(config, m_z80dma, Z80_CLOCK);
@@ -351,8 +352,10 @@ void mario_state::mario_base(machine_config &config)
 	mainlatch.q_out_cb<3>().set(FUNC(mario_state::palette_bank_w));     // CREF 0
 	mainlatch.q_out_cb<4>().set(FUNC(mario_state::nmi_mask_w));         // NMI EI
 	mainlatch.q_out_cb<5>().set("z80dma", FUNC(z80dma_device::rdy_w));  // DMA SET
-	mainlatch.q_out_cb<6>().set(FUNC(mario_state::coin_counter_1_w));   // COUNTER 2 (misnumbered on schematic)
-	mainlatch.q_out_cb<7>().set(FUNC(mario_state::coin_counter_2_w));   // COUNTER 1 (misnumbered on schematic)
+	mainlatch.q_out_cb<6>().set(FUNC(mario_state::coin_counter_2_w));   // COUNTER 2
+	mainlatch.q_out_cb<7>().set(FUNC(mario_state::coin_counter_1_w));   // COUNTER 1
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -452,7 +455,7 @@ ROM_START( mariof )
 	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) // BPROM was a TBP18S030N read as 82S123
 ROM_END
 
-ROM_START( marioe )
+ROM_START( marioe ) // TMA1-05 CPU, TMA1-03-VIDEO
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tma1-c-7f_e-1.7f", 0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) )
 	ROM_LOAD( "tma1-c-7e_e-3.7e", 0x2000, 0x2000, CRC(b09ab857) SHA1(35b91cd1c4c3dd2d543a1ea8ff7b951715727792) )
@@ -531,12 +534,12 @@ ROM_START( masao )
 	ROM_LOAD( "masao-7.rom",  0x1000, 0x1000, CRC(747c1349) SHA1(54674f78edf86953b7d500b66393483d1a5ce8ab) )
 
 	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "tma1-v-a.7m",  0x0000, 0x1000, CRC(186762f8) SHA1(711fdd37392656bdd5027e020d51d083ccd7c407) )
+	ROM_LOAD( "masao-8.rom",  0x0000, 0x1000, CRC(186762f8) SHA1(711fdd37392656bdd5027e020d51d083ccd7c407) )
 	ROM_LOAD( "masao-9.rom",  0x1000, 0x1000, CRC(50be3918) SHA1(73e22eee67a03732ff57e523f900f20c6aee0491) )
-	ROM_LOAD( "mario.7p",     0x2000, 0x1000, CRC(56be6ccd) SHA1(15a6e16c189d45f72761ebcbe9db5001bdecd659) )
-	ROM_LOAD( "tma1-v-a.7s",  0x3000, 0x1000, CRC(912ba80a) SHA1(351fb5b160216eb10e281815d05a7165ca0e5909) )
-	ROM_LOAD( "tma1-v-a.7t",  0x4000, 0x1000, CRC(5cbb92a5) SHA1(a78a378e6d3060143dc456e9c33a5068da648331) )
-	ROM_LOAD( "tma1-v-a.7u",  0x5000, 0x1000, CRC(13afb9ed) SHA1(b29dcd91cf5e639ee50b734afc7a3afce79634df) )
+	ROM_LOAD( "masao-10.rom", 0x2000, 0x1000, CRC(56be6ccd) SHA1(15a6e16c189d45f72761ebcbe9db5001bdecd659) )
+	ROM_LOAD( "masao-11.rom", 0x3000, 0x1000, CRC(912ba80a) SHA1(351fb5b160216eb10e281815d05a7165ca0e5909) )
+	ROM_LOAD( "masao-12.rom", 0x4000, 0x1000, CRC(5cbb92a5) SHA1(a78a378e6d3060143dc456e9c33a5068da648331) )
+	ROM_LOAD( "masao-13.rom", 0x5000, 0x1000, CRC(13afb9ed) SHA1(b29dcd91cf5e639ee50b734afc7a3afce79634df) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "tma1-c-4p.4p", 0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
@@ -549,8 +552,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,  0,     mario, mariog, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mario,  0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mariof, mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioe, mario, mario, marioe, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioe, mario, mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, marioj, mario, mario, marioj, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, masao,  mario, masao, mariog, mario_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, masao,  mario, masao, mario,  mario_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )

@@ -5,8 +5,10 @@
 
 #pragma once
 
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/z80dma.h"
+
 #include "emupal.h"
 #include "tilemap.h"
 
@@ -81,7 +83,7 @@ public:
 
 private:
 	/* devices */
-	required_device<cpu_device> m_maincpu;
+	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
