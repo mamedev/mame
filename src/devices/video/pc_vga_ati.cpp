@@ -21,6 +21,10 @@ ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, d
 
 ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
+	, m_eeprom_data_in(*this, 0)
+	, m_eeprom_data_out(*this)
+	, m_eeprom_clock_out(*this)
+	, m_eeprom_chip_select_out(*this)
 {
 }
 
@@ -40,7 +44,6 @@ void ati_vga_device::device_start()
 void ati_vga_device::device_add_mconfig(machine_config &config)
 {
 	MACH8(config, "8514a", 0).set_vga_owner();
-	EEPROM_93C46_16BIT(config, "ati_eeprom");
 }
 
 // TODO: fails VBETEST (after UNIVBE load)
@@ -202,11 +205,11 @@ uint8_t ati_vga_device::ati_port_ext_r(offs_t offset)
 			ret = ati.vga_chip_id;  // Chip revision (6 for the 28800-6, 5 for the 28800-5) This register is not listed in ATI's mach32 docs
 			LOG( "ATI2A (VGA ID) read\n");
 			break;
+		// EEPROM interface read
 		case 0x37:
 			{
-				eeprom_serial_93cxx_device* eep = subdevice<eeprom_serial_93cxx_device>("ati_eeprom");
-				ret = 0x00;
-				ret |= eep->do_read() << 3;
+				ret = 0;
+				ret |= m_eeprom_data_in() << 3;
 			}
 			break;
 		case 0x3d:
@@ -279,16 +282,21 @@ void ati_vga_device::ati_port_ext_w(offs_t offset, uint8_t data)
 			//LOG( "ATI: Memory Page Select write %02x (read: %i write %i)\n",data,svga.bank_r,svga.bank_w);
 			break;
 		case 0x33:  // EEPROM
+			// bit 4: <reserved>
+			// bit 5: ISA bus 8/16-bit memory operation (depends on RMCE1B config pin)
+			// bit 6: 4-bit PEL (mode 55h)
+			// bit 7: Double Scan Enable
 			ati.ext_reg[ati.ext_reg_select] = data & 0xef;
-			if(data & 0x04)
+			// EEPROM Interface Enable
+			// TODO: does it also pull reading high?
+			if(BIT(data, 2))
 			{
-				eeprom_serial_93cxx_device* eep = subdevice<eeprom_serial_93cxx_device>("ati_eeprom");
-				if(eep != nullptr)
-				{
-					eep->di_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
-					eep->clk_write((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
-					eep->cs_write((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-				}
+				// CS
+				m_eeprom_chip_select_out(BIT(data, 3));
+				// CLK
+				m_eeprom_clock_out(BIT(data, 1));
+				// DI
+				m_eeprom_data_out(BIT(data, 0));
 			}
 			else
 			{

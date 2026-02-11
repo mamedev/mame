@@ -58,7 +58,6 @@ mach32_device::mach32_device(const machine_config &mconfig, device_type type, co
 void mach32_device::device_add_mconfig(machine_config &config)
 {
 	ATIMACH32_8514A(config, "8514a", 0).set_vga(DEVICE_SELF);
-	EEPROM_93C56_16BIT(config, "ati_eeprom");
 }
 
 void mach32_8514a_device::device_start()
@@ -141,13 +140,17 @@ void mach32_device::device_reset()
 	ati_vga_device::device_reset();
 }
 
+// TODO: has issues in SDD 15bpp tests and onward, MACH64 doesn't work at all
 void mach32_device::ati_define_video_mode()
 {
 	uint16_t config = m_8514a->get_ext_config();
 
+	ati_vga_device::ati_define_video_mode();
+
 	// SDD disagrees with this
 	//if(ati.ext_reg[0x30] & 0x20)
 	{
+		// TODO: use devcb instead of this goofy handling
 		if(m_8514a->has_display_mode_changed())
 		{
 			svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = svga.rgb32_en = 0;
@@ -186,7 +189,6 @@ void mach32_device::ati_define_video_mode()
 	//	ati_vga_device::ati_define_video_mode();
 	//	return;
 	//}
-	ati_vga_device::ati_define_video_mode();
 
 	set_dot_clock();
 }
@@ -387,7 +389,6 @@ mach64_device::mach64_device(const machine_config &mconfig, device_type type, co
 void mach64_device::device_add_mconfig(machine_config &config)
 {
 	ATIMACH64_8514A(config, "8514a", 0).set_vga(DEVICE_SELF);
-	EEPROM_93C56_16BIT(config, "ati_eeprom");
 }
 
 void mach64_8514a_device::device_start()

@@ -83,9 +83,15 @@ void isa16_vga_gfxultra_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(ati_vga_device::screen_update));
 
+	EEPROM_93C46_16BIT(config, m_eeprom);
+
 	ATI_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x100000);
+	m_vga->eeprom_data_in_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read));
+	m_vga->eeprom_data_out_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write));
+	m_vga->eeprom_clock_out_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write));
+	m_vga->eeprom_chip_select_out_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write));
 }
 
 void isa16_vga_gfxultrapro_device::device_add_mconfig(machine_config &config)
@@ -94,9 +100,15 @@ void isa16_vga_gfxultrapro_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(mach32_device::screen_update));
 
+	EEPROM_93C56_16BIT(config, m_eeprom);
+
 	ATIMACH32(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x400000);
+	m_vga->eeprom_data_in_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read));
+	m_vga->eeprom_data_out_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write));
+	m_vga->eeprom_clock_out_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write));
+	m_vga->eeprom_chip_select_out_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write));
 }
 
 void isa16_vga_mach64_device::device_add_mconfig(machine_config &config)
@@ -105,9 +117,15 @@ void isa16_vga_mach64_device::device_add_mconfig(machine_config &config)
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(mach64_device::screen_update));
 
+	EEPROM_93C56_16BIT(config, m_eeprom);
+
 	ATIMACH64(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(0x400000);
+	m_vga->eeprom_data_in_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read));
+	m_vga->eeprom_data_out_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write));
+	m_vga->eeprom_clock_out_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write));
+	m_vga->eeprom_chip_select_out_cb().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write));
 }
 
 
@@ -141,21 +159,25 @@ const tiny_rom_entry *isa16_vga_mach64_device::device_rom_region() const
 isa16_vga_gfxultra_device::isa16_vga_gfxultra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA16_VGA_GFXULTRA, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
-	m_vga(*this, "vga"), m_8514(*this, "vga:8514a")
+	m_vga(*this, "vga"),
+	m_8514(*this, "vga:8514a"),
+	m_eeprom(*this, "eeprom")
 {
 }
 
 isa16_vga_gfxultrapro_device::isa16_vga_gfxultrapro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA16_SVGA_GFXULTRAPRO, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
-	m_vga(*this, "vga")
+	m_vga(*this, "vga"),
+	m_eeprom(*this, "eeprom")
 {
 }
 
 isa16_vga_mach64_device::isa16_vga_mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA16_SVGA_MACH64, tag, owner, clock),
 	device_isa16_card_interface(mconfig, *this),
-	m_vga(*this, "vga")
+	m_vga(*this, "vga"),
+	m_eeprom(*this, "eeprom")
 {
 }
 
