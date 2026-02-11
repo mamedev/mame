@@ -28,6 +28,7 @@ void pc9801_state::video_start()
 	save_item(NAME(m_video_ff));
 	save_item(NAME(m_ex_video_ff));
 	save_item(NAME(m_font_line));
+	save_pointer(NAME(m_tvram), sizeof(uint16_t)*0x2000);
 	save_item(NAME(m_gfx_ff));
 	save_item(NAME(m_txt_scroll_reg));
 	save_item(NAME(m_pal_clut));
