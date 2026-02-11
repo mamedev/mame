@@ -288,12 +288,12 @@ void toaplan1_state::tile_offsets_w(offs_t offset, u16 data, u16 mem_mask)
 	if (offset == 0)
 	{
 		COMBINE_DATA(&m_tiles_offsetx);
-		logerror("Tiles_offsetx now = %08x\n", m_tiles_offsetx);
+		logerror("%s: Tiles_offsetx now = %08x\n", machine().describe_context(), m_tiles_offsetx);
 	}
 	else
 	{
 		COMBINE_DATA(&m_tiles_offsety);
-		logerror("Tiles_offsety now = %08x\n", m_tiles_offsety);
+		logerror("%s: Tiles_offsety now = %08x\n", machine().describe_context(), m_tiles_offsety);
 	}
 	set_scrolls();
 }
@@ -302,7 +302,7 @@ void toaplan1_state::bcu_flipscreen_w(u8 data)
 {
 	if (data != m_bcu_flipscreen)
 	{
-		logerror("Setting BCU controller flipscreen port to %02x\n", data);
+		logerror("%s: Setting BCU controller flipscreen port to %02x\n", machine().describe_context(), data);
 		m_bcu_flipscreen = BIT(data, 0);     /* 0x0001 = flip, 0x0000 = no flip */
 		machine().tilemap().set_flip_all((data ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0));
 
@@ -312,7 +312,7 @@ void toaplan1_state::bcu_flipscreen_w(u8 data)
 
 void toaplan1_state::fcu_flipscreen_w(u8 data)
 {
-	logerror("Setting FCU controller flipscreen port to %02x\n", data);
+	logerror("%s: Setting FCU controller flipscreen port to %02x\n", machine().describe_context(), data);
 	m_fcu_flipscreen = BIT(data, 7);   /* 0x80 = flip, 0x00 = no flip */
 }
 
@@ -354,7 +354,7 @@ void toaplan1_state::spriteram_w(offs_t offset, u16 data, u16 mem_mask)
 #ifdef MAME_DEBUG
 	if (m_spriteram_offs >= (TOAPLAN1_SPRITERAM_SIZE / 2))
 	{
-		logerror("Sprite_RAM_word_w, %08x out of range !\n", m_spriteram_offs);
+		logerror("%s: Sprite_RAM_word_w, %08x out of range !\n", machine().describe_context(), m_spriteram_offs);
 		return;
 	}
 #endif
@@ -374,7 +374,7 @@ void toaplan1_state::spritesizeram_w(offs_t offset, u16 data, u16 mem_mask)
 #ifdef MAME_DEBUG
 	if (m_spriteram_offs >= (TOAPLAN1_SPRITESIZERAM_SIZE / 2))
 	{
-		logerror("Sprite_Size_RAM_word_w, %08x out of range !\n", m_spriteram_offs);
+		logerror("%s: Sprite_Size_RAM_word_w, %08x out of range !\n", machine().describe_context(), m_spriteram_offs);
 		return;
 	}
 #endif
@@ -386,7 +386,7 @@ void toaplan1_state::spritesizeram_w(offs_t offset, u16 data, u16 mem_mask)
 
 void toaplan1_state::bcu_control_w(offs_t offset, u16 data)
 {
-	logerror("BCU tile controller register:%02x now = %04x\n", offset, data);
+	logerror("%s: BCU tile controller register:%02x now = %04x\n", machine().describe_context(), offset, data);
 }
 
 u16 toaplan1_state::tileram_offs_r()
@@ -397,7 +397,7 @@ u16 toaplan1_state::tileram_offs_r()
 void toaplan1_state::tileram_offs_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (data >= 0x4000)
-		logerror("Hmmm, unknown video layer being selected (%08x)\n", data);
+		logerror("%s: Hmmm, unknown video layer being selected (%04x & %04x)\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_pf_voffs);
 }
 
@@ -415,13 +415,13 @@ u16 toaplan1_state::tileram_r(offs_t offset)
 		case 0x2:
 		case 0x3:
 		{
-			offs_t vram_offset = ((offs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE / 2) - 1);
+			const offs_t vram_offset = ((offs * 2) + offset) & ((TOAPLAN1_TILEVRAM_SIZE / 2) - 1);
 			video_data = m_tilevram[layer][vram_offset];
 			break;
 		}
 		default:
 			if (!machine().side_effects_disabled())
-				logerror("Hmmm, reading %04x from unknown playfield layer address %06x  Offset:%01x !!!\n", video_data, m_pf_voffs, offset);
+				logerror("%s: Hmmm, reading %04x from unknown playfield layer address %06x  Offset:%01x !!!\n", machine().describe_context(), video_data, m_pf_voffs, offset);
 			break;
 	}
 
@@ -458,7 +458,7 @@ void toaplan1_state::tileram_w(offs_t offset, u16 data, u16 mem_mask)
 			break;
 		}
 		default:
-			logerror("Hmmm, writing %04x to unknown playfield layer address %06x  Offset:%01x\n", data, m_pf_voffs, offset);
+			logerror("%s: Hmmm, writing %04x to unknown playfield layer address %06x  Offset:%01x\n", machine().describe_context(), data, m_pf_voffs, offset);
 			break;
 	}
 }
@@ -482,7 +482,7 @@ u16 toaplan1_state::scroll_regs_r(offs_t offset)
 		case 07: scroll = m_scrolly[layer]; break;
 		default:
 			if (!machine().side_effects_disabled())
-				logerror("Hmmm, reading unknown video scroll register (%02x) !!!\n",offset);
+				logerror("%s: Hmmm, reading unknown video scroll register (%02x) !!!\n", machine().describe_context(), offset);
 			break;
 	}
 	return scroll;
@@ -508,7 +508,7 @@ void toaplan1_state::scroll_regs_w(offs_t offset, u16 data, u16 mem_mask)
 			COMBINE_DATA(&m_scrolly[layer]);
 			m_tilemap[layer]->set_scrolly(0, (m_scrolly[layer] >> 7) - m_tiles_offsety);
 			break;
-		default: logerror("Hmmm, writing %04x to unknown video scroll register (%02x) !!!\n",data ,offset);
+		default: logerror("%s: Hmmm, writing %04x to unknown video scroll register (%02x) !!!\n", machine().describe_context(), data ,offset);
 			break;
 	}
 }
