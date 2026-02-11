@@ -426,6 +426,33 @@ ROM_START(blzingel)
 	DISK_IMAGE_READONLY("blzingel", 0, SHA1(f61c8816b6b17906f0257780ed021f0b3de6f140))
 ROM_END
 
+ROM_START(gvnascar)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("gvnascar", 0, SHA1(cb0d1df7a88fb0f02c61a858aaeab38356616eeb))
+ROM_END
+
+ROM_START(nascar10)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("nascar10", 0, SHA1(cf7d02c19fd76ef33b2e0690645b0d5318cdde48))
+ROM_END
+
+ROM_START(nascar11)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("nascar11", 0, SHA1(35fd6d692c25858f29d53f417a75a9d6d5a67f6d))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("nascarec", 0, SHA1(b6d72317f511c90ec356c1cfa498622cba889bd4))
+ROM_END
+
 ROM_START(nfs)
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
@@ -471,26 +498,80 @@ ROM_START(nfsug)
 	DISK_IMAGE_READONLY("nfsug-recovery", 0, SHA1(e306bacb3498582a025706ff81a665776b8a18da))
 ROM_END
 
+ROM_START(paralost)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("paralost", 0, SHA1(f4d240f5b0237fd994555af22736430a0723d481))
+ROM_END
+
+ROM_START(sin)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("sin", 0, SHA1(31fe4bd11f0e1000aabd5f8251bb6885dbc9dd82))
+ROM_END
+
+ROM_START(theswarm)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("swarm", 0, SHA1(156a639b9bab61b49fa99f21ba17fbc8ddc21df9))
+ROM_END
+
+ROM_START(swarm134)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("swarm134", 0, SHA1(c39022dd54f2f158ebd301621f6b88d8c3aa3476))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("swarmrec", 0, SHA1(5961b3677fcab4dd68e1c1f562c31024e95bbcd4))
+ROM_END
+
+ROM_START(ultrapin)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("ultrapin", 0, SHA1(3e07cd1546f368fe4b6e905c5ad40dae834c14e4))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("uprec", 0, SHA1(bd4848761740fc09fa459cb3150d0b0e46a4e411))
+ROM_END
+
 } // anonymous namespace
 
 
 // OS/Global VR specific Setup Installers
-GAME( 2002, hyperv2,  0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 06/12/02",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, hyperv2a, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 09/30/01",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, gvrxpsys, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Global VR XP OS Install - 09/30/01",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2002, gvrxpsup, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Global VR XP OS Update/Install - 06/11/02", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, multirec, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "System Recovery Multi (050-0233-01)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, hyperv2,  0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",                  "Hyper V2 (Global VR) Install - 06/12/02",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, hyperv2a, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",                  "Hyper V2 (Global VR) Install - 09/30/01",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, gvrxpsys, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",                  "Global VR XP OS Install - 09/30/01",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, gvrxpsup, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",                  "Global VR XP OS Update/Install - 06/11/02", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, multirec, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",                  "System Recovery Multi (050-0233-01)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Game Installer CDs
-GAME( 2000, bhead2k,  0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2000 Install - 05/27/03",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, bhead2ka, 0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2000 Install - 09/16/01",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2002, bhead2k2, 0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2002 Install - 05/27/03",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2003, bhead2k3, 0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2003 Desert War Install - 05/27/03",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2003, nfs,      0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Need for Speed - 4 Cab Link (2 Discs) (v1.0.1 Rev B)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004, nfsgt,    0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Need for Speed GT (Hard Drive+2 Discs) (v1.1.0 Rev C)",MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, nfsug,    0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Need For Speed: Underground Install (2 Discs) (v1.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, alienex,  0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Aliens Extermination (v1.0.3)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, alex10,   alienex, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Aliens Extermination (v1.0.0)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2006, alex101,  alienex, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Aliens Extermination (v1.0.1)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, amermy,   0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "America's Army (v1.01.82)",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2008, blzingel, 0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Blazing Angels",                                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, sin,      0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Ritual Entertainment", "SiN",                                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, bhead2k,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Beach Head 2000 Install - 05/27/03",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, bhead2ka, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Beach Head 2000 Install - 09/16/01",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, bhead2k2, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Beach Head 2002 Install - 05/27/03",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, bhead2k3, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Beach Head 2003 Desert War Install - 05/27/03",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, nfs,      0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Need for Speed - 4 Cab Link (2 Discs) (v1.0.1 Rev B)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, nfsgt,    0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Need for Speed GT (Hard Drive+2 Discs) (v1.1.0 Rev C)",MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, nfsug,    0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Need For Speed: Underground Install (2 Discs) (v1.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, alienex,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Aliens Extermination (v1.0.3)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, alex10,   alienex,  globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Aliens Extermination (v1.0.0)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, alex101,  alienex,  globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Aliens Extermination (v1.0.1)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, ultrapin, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "UltraPin (12 tables)",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, amermy,   0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "America's Army (v1.01.82)",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, paralost, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Far Cry: Paradise Lost",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, blzingel, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Blazing Angels",                                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, gvnascar, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (2.0.2.068)",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, nascar10, gvnascar, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (1.0)",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, nascar11, gvnascar, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (1.1)",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2013, theswarm, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "The Swarm (v1.01.139)",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2013, swarm134, theswarm, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "The Swarm (v1.01.134)",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
