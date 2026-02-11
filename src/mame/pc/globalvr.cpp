@@ -493,3 +493,4 @@ GAME( 2006, alienex,  0,       globalvr, globalvr, globalvr_state, empty_init, R
 GAME( 2006, alex10,   alienex, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Aliens Extermination (v1.0.0)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2006, alex101,  alienex, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Aliens Extermination (v1.0.1)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, amermy,   0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "America's Army (v1.01.82)",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, blzingel, 0,       globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Blazing Angels",                                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
