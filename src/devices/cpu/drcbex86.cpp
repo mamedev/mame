@@ -10,6 +10,8 @@
 
    Future improvements/changes:
 
+    * Restore floating point environment when calling out to C code
+
     * Optimize to avoid unnecessary reloads
         - especially EDX for 64-bit operations
         - also FCMP/FLAGS has unnecessary PUSHF/POP EAX
@@ -98,7 +100,11 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <locale>
+#include <string>
+#include <sstream>
 #include <type_traits>
+#include <utility>
 
 
 namespace drc {
@@ -1088,9 +1094,21 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
-		std::string filename = std::string("drcbex86_").append(device.shortname()).append(".asm");
-		m_log = x86log_context::create(filename);
-		m_log_asmjit = fopen(std::string("drcbex86_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
+		std::string filename = device.tag();
+		for (auto &ch : filename)
+		{
+			if (':' == ch)
+				ch = '_';
+		}
+		std::ostringstream str;
+		str.imbue(std::locale::classic());
+		str << device.shortname();
+		if ('_' != filename[0])
+			str << '_';
+		str << filename << ".asm";
+		filename = std::move(str).str();
+		m_log = x86log_context::create("drcbex86_" + filename);
+		m_log_asmjit = fopen(("drcbex86_asmjit_" + filename).c_str(), "w");
 	}
 
 	// generate a little bit of glue code to set up the environment
@@ -1128,19 +1146,19 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 
 	a.emit_prolog(frame);
 	a.emit_args_assignment(frame, args);
-	a.sub(esp, 24);                                                                     // sub   esp,24
-	a.mov(MABS(&m_hashstacksave), esp);                                                 // mov   [hashstacksave],esp
-	a.sub(esp, 4);                                                                      // sub   esp,4
-	a.mov(MABS(&m_stacksave), esp);                                                     // mov   [stacksave],esp
-	a.fnstcw(MABS(&m_fpumode));                                                         // fstcw [fpumode]
-	a.jmp(eax);                                                                         // jmp   eax
+	a.sub(esp, 24);
+	a.mov(MABS(&m_hashstacksave), esp);
+	a.sub(esp, 4);
+	a.mov(MABS(&m_stacksave), esp);
+	a.fnstcw(MABS(&m_fpumode));
+	a.call(eax);
 
 	// generate an exit point
 	m_exit = dst + a.offset();
 	a.bind(a.new_named_label("exit_point"));
-	a.fldcw(MABS(&m_fpumode));                                                          // fldcw [fpumode]
-	a.mov(esp, MABS(&m_hashstacksave));                                                 // mov   esp,[hashstacksave]
-	a.add(esp, 24);                                                                     // add   esp,24
+	a.fldcw(MABS(&m_fpumode));
+	a.mov(esp, MABS(&m_hashstacksave));
+	a.add(esp, 24);
 	a.emit_epilog(frame);
 
 	// generate a no code point
@@ -1347,7 +1365,7 @@ int drcbe_x86::execute(code_handle &entry)
 void drcbe_x86::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
 	// do this here because device.debug() isn't initialised at construction time
-	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) && m_device.debug())
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)
@@ -2890,14 +2908,14 @@ void drcbe_x86::op_handle(Assembler &a, const instruction &inst)
 
 	// emit a jump around the stack adjust in case code falls through here
 	Label skip = a.new_label();
-	a.short_().jmp(skip);                                                               // jmp   skip
+	a.short_().jmp(skip);
 
 	// register the current pointer for the handle
 	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->base_address() + a.offset()));
 
 	// by default, the handle points to prolog code that moves the stack pointer
-	a.lea(esp, ptr(esp, -28));                                                          // lea   rsp,[rsp-28]
-	a.bind(skip);                                                                   // skip:
+	a.lea(esp, ptr(esp, -28));
+	a.bind(skip);
 	reset_last_upper_lower_reg();
 }
 

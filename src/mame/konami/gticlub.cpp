@@ -224,6 +224,12 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 */
 
 #include "emu.h"
+
+#include "k001005.h"
+#include "k001006.h"
+#include "k001604.h"
+#include "konppc.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
@@ -231,12 +237,8 @@ Hang Pilot (uses an unknown but similar video board)                12W         
 #include "machine/eepromser.h"
 #include "machine/k033906.h"
 #include "machine/k056230.h"
-#include "konppc.h"
 #include "sound/k056800.h"
 #include "sound/rf5c400.h"
-#include "k001005.h"
-#include "k001006.h"
-#include "k001604.h"
 #include "video/voodoo.h"
 
 #include "emupal.h"
@@ -286,6 +288,17 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
+	uint8_t sysreg_r(offs_t offset);
+	void sysreg_w(offs_t offset, uint8_t data);
+	void soundtimer_en_w(uint16_t data);
+	void soundtimer_ack_w(uint16_t data);
+
+	INTERRUPT_GEN_MEMBER(sound_irq);
+
+	int adc1038_input_callback(int input);
+
+	void sound_memmap(address_map &map) ATTR_COLD;
+
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device_array<adsp21062_device, 2> m_dsp;
@@ -306,17 +319,6 @@ protected:
 	memory_view m_cg_view;
 
 	bool m_sound_irq_enabled = false;
-
-	uint8_t sysreg_r(offs_t offset);
-	void sysreg_w(offs_t offset, uint8_t data);
-	void soundtimer_en_w(uint16_t data);
-	void soundtimer_ack_w(uint16_t data);
-
-	INTERRUPT_GEN_MEMBER(sound_irq);
-
-	int adc1038_input_callback(int input);
-
-	void sound_memmap(address_map &map) ATTR_COLD;
 };
 
 // with GN678 Video board
@@ -329,19 +331,17 @@ public:
 		, m_k001006(*this, "k001006%u", 1U)
 	{ }
 
-	void slrasslt(machine_config &config);
-	void gticlub(machine_config &config);
-
-	void init_gticlub();
+	void slrasslt(machine_config &config) ATTR_COLD;
+	void gticlub(machine_config &config) ATTR_COLD;
 
 protected:
-	required_device<k001005_device> m_k001005;
-	required_device_array<k001006_device, 2> m_k001006;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void gticlub_map(address_map &map) ATTR_COLD;
 	void sharc_map(address_map &map) ATTR_COLD;
+
+	required_device<k001005_device> m_k001005;
+	required_device_array<k001006_device, 2> m_k001006;
 
 #if DEBUG_GTI
 	uint8_t m_tick = 0;
@@ -359,14 +359,14 @@ public:
 		, m_gn680(*this, "gn680")
 	{ }
 
-	void thunderh(machine_config &config);
+	void thunderh(machine_config &config) ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_gn680;
-
 	void gn680_sysctrl_w(uint16_t data);
 
 	void gn680_memmap(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_gn680;
 };
 
 // with Voodoo based video board
@@ -378,19 +378,19 @@ public:
 		, m_voodoo(*this, "voodoo%u", 0U)
 	{ }
 
-	void hangplt(machine_config &config);
+	void hangplt(machine_config &config) ATTR_COLD;
 
-	void init_hangplt_common();
-	void init_hangplt();
-	void init_hangpltu();
+	void init_hangplt_common() ATTR_COLD;
+	void init_hangplt() ATTR_COLD;
+	void init_hangpltu() ATTR_COLD;
 
 private:
-	required_device_array<generic_voodoo_device, 2> m_voodoo;
-
 	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void hangplt_map(address_map &map) ATTR_COLD;
 	template <unsigned Board> void hangplt_sharc_map(address_map &map) ATTR_COLD;
+
+	required_device_array<generic_voodoo_device, 2> m_voodoo;
 };
 
 
@@ -885,6 +885,7 @@ void gticlub_state::gticlub(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(gticlub_state::sound_irq), attotime::from_hz(33.8688_MHz_XTAL / 2 / 384 / 128)); // 344.5Hz (44100 / 128)
 
 	ADSP21062(config, m_dsp[0], 36_MHz_XTAL);
+	m_dsp[0]->enable_recompiler();
 	m_dsp[0]->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp[0]->set_addrmap(AS_DATA, &gticlub_state::sharc_map);
 
@@ -1379,11 +1380,6 @@ ROM_START( hangpltu ) // USA version UAA
 ROM_END
 
 
-void gticlub_state::init_gticlub()
-{
-	m_dsp[0]->enable_recompiler();
-}
-
 void hangplt_state::init_hangplt_common()
 {
 	m_cgboard_bank[0]->configure_entries(0, 2, memregion("cgboard_0")->base(), 0x800000);
@@ -1408,19 +1404,19 @@ void hangplt_state::init_hangpltu()
 	rom[(0x15428^4) / 4] = 0x4e800020;
 }
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*************************************************************************/
 
-GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state,  init_gticlub,  ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state,  init_gticlub,  ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state,  init_gticlub,  ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state,  init_gticlub,  ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 1997, thunderh,   0,        thunderh, thunderh, thunderh_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, thunderh_state, init_gticlub,  ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
-GAME( 1997, slrasslt,   0,        slrasslt, slrasslt, gticlub_state,  init_gticlub,  ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Based on Revised code
-GAME( 1997, slrassltj,  slrasslt, slrasslt, slrasslt, gticlub_state,  init_gticlub,  ROT0, "Konami", "Solar Assault Revised (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, slrassltj1, slrasslt, slrasslt, slrasslt, gticlub_state,  init_gticlub,  ROT0, "Konami", "Solar Assault (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, gticlub,    0,        gticlub,  gticlub,  gticlub_state,  empty_init,    ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver EAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticlubu,   gticlub,  gticlub,  gticlub,  gticlub_state,  empty_init,    ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticluba,   gticlub,  gticlub,  gticlub,  gticlub_state,  empty_init,    ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver AAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1996, gticlubj,   gticlub,  gticlub,  gticlub,  gticlub_state,  empty_init,    ROT0, "Konami", "GTI Club: Rally Cote D'Azur (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1997, thunderh,   0,        thunderh, thunderh, thunderh_state, empty_init,    ROT0, "Konami", "Operation Thunder Hurricane (ver EAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1997, thunderhu,  thunderh, thunderh, thunderh, thunderh_state, empty_init,    ROT0, "Konami", "Operation Thunder Hurricane (ver UAA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_LAN )
+GAME( 1997, slrasslt,   0,        slrasslt, slrasslt, gticlub_state,  empty_init,    ROT0, "Konami", "Solar Assault (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // Based on Revised code
+GAME( 1997, slrassltj,  slrasslt, slrasslt, slrasslt, gticlub_state,  empty_init,    ROT0, "Konami", "Solar Assault Revised (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, slrassltj1, slrasslt, slrasslt, slrasslt, gticlub_state,  empty_init,    ROT0, "Konami", "Solar Assault (ver JAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAMEL(1997, hangplt,    0,        hangplt,  hangplt,  hangplt_state,  init_hangplt,  ROT0, "Konami", "Hang Pilot (ver JAB)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_dualhovu )
 GAMEL(1997, hangpltu,   hangplt,  hangplt,  hangplt,  hangplt_state,  init_hangpltu, ROT0, "Konami", "Hang Pilot (ver UAA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_dualhovu )

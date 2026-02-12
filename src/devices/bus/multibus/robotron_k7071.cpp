@@ -200,7 +200,7 @@ void robotron_k7071_device::kgs_host_w(offs_t offset, uint8_t data)
 void robotron_k7071_device::hrq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
-	m_cpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_cpu->set_input_line(Z80_INPUT_LINE_BUSREQ, state);
 	m_cpu->set_input_line(INPUT_LINE_HALT, state); // do we need this?
 	m_dma->hlda_w(state);
 }

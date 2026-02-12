@@ -75,12 +75,6 @@ uint8_t isa8_vga_device::input_port_0_r() { return 0xff; } //return machine().ro
 void isa8_vga_device::device_start()
 {
 	set_isa_device();
-
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, "ibm_vga");
-
-	m_isa->install_device(0x03b0, 0x03df, *this, &isa8_vga_device::io_isa_map);
-
-	m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(vga_device::mem_w)));
 }
 
 //-------------------------------------------------
@@ -89,4 +83,20 @@ void isa8_vga_device::device_start()
 
 void isa8_vga_device::device_reset()
 {
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
 }
+
+void isa8_vga_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(vga_device::mem_w)));
+		m_isa->install_rom(this, 0xc0000, 0xc7fff, "ibm_vga");
+	}
+	else if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x03b0, 0x03df, *this, &isa8_vga_device::io_isa_map);
+	}
+}
+

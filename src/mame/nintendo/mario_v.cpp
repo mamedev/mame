@@ -138,7 +138,7 @@ void mario_state::video_start()
 
 /*
  * Erratic line at top when scrolling down "Marios Bros" Title
- * confirmed on mametests.org as being present on real PCB as well.
+ * confirmed on mametesters.org as being present on real PCB as well.
  */
 
 void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)

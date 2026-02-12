@@ -20,12 +20,18 @@ TODO:
 #include "emu.h"
 #include "3do_amy.h"
 
+#define VERBOSE (0)
+//#define LOG_OUTPUT_FUNC osd_printf_warning
+
+#include "logmacro.h"
+
 // a.k.a. Brooktree Bt9103
 DEFINE_DEVICE_TYPE(AMY, amy_device, "amy", "3DO DA9103KPJ-XN \"Amy\" Digital Color Encoder")
 
 amy_device::amy_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, AMY, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
+	, m_is_pal(false)
 {
 }
 
@@ -37,6 +43,8 @@ void amy_device::device_start()
 	save_item(STRUCT_MEMBER(m_custom_clut, r));
 	save_item(STRUCT_MEMBER(m_custom_clut, g));
 	save_item(STRUCT_MEMBER(m_custom_clut, b));
+
+	m_display_hclocks = (m_is_pal ? 384 : 320) * 4;
 }
 
 void amy_device::device_reset()
@@ -48,12 +56,12 @@ void amy_device::clut_write(u32 data)
 {
 	const u8 reg = data >> 24;
 
-	//printf("%02x %06x\n",reg, data & 0xffffff);
-
 	// to color CLUT
 	if (!BIT(reg, 7))
 	{
 		const u8 which = reg & 0x1f;
+
+		LOG("Color CLUT %d mode %02x %06x\n", which, reg & 0x60, data & 0xff'ffff);
 
 		switch(reg & 0x60)
 		{
@@ -75,8 +83,20 @@ void amy_device::clut_write(u32 data)
 	}
 	else
 	{
-		// TODO: background color (0xe0) & control word (0xc0)
-		// 0xe1: NULLOP
+		switch (reg)
+		{
+			// NULLOP
+			case 0xe1: break;
+			case 0xe0:
+				LOG("0xe0: background color %06x\n", data & 0xff'ffff);
+				break;
+			case 0xc0:
+				LOG("0xc0: display-control word %06x\n", data & 0xff'ffff);
+				break;
+			default:
+				LOG("%02x: unknown word set! %06x\n", data & 0xff'ffff);
+				break;
+		}
 	}
 }
 
@@ -88,7 +108,6 @@ void amy_device::pixel_xfer(int x, int y, u16 dot)
 	r = m_custom_clut[(dot & 0x7c00) >> 10].r;
 	g = m_custom_clut[(dot & 0x03e0) >> 5].g;
 	b = m_custom_clut[(dot & 0x001f) >> 0].b;
-
 
 	//r = (dot & 0x7c00) >> 10;
 	//g = (dot & 0x03e0) >> 5;
@@ -105,7 +124,7 @@ void amy_device::pixel_xfer(int x, int y, u16 dot)
 
 void amy_device::blank_line(int y)
 {
-	const rectangle clip(0, y, 1592, y + 1);
+	const rectangle clip(0, y, m_display_hclocks, y + 1);
 
 	// TODO: vblank color really
 	m_bitmap.fill(rgb_t::black(), clip);

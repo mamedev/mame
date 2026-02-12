@@ -17,6 +17,7 @@
 #include "ui/ui.h"
 
 #include "imagedev/cassette.h"
+#include "video/vector.h"
 
 #include "debugger.h"
 #include "drivenum.h"
@@ -818,6 +819,10 @@ void lua_engine::initialize()
  * emu.register_frame_done(callback) - register callback after frame is drawn to screen (for overlays)
  * emu.register_sound_update(callback) - register callback after sound update has generated new samples
  * emu.register_periodic(callback) - register periodic callback while program is running
+ * emu.register_vector_begin(callback) - register callback before each vector screen render
+ * emu.register_vector_move_to(callback) - register callback for each vector move operation
+ * emu.register_vector_line_to(callback) - register callback for each vector line operation
+ * emu.register_vector_end(callback) - register callback after each vector screen render
  * emu.register_callback(callback, name) - register callback to be used by MAME via lua_engine::call_plugin()
  * emu.register_menu(event_callback, populate_callback, name) - register callbacks for plugin menu
  * emu.register_mandatory_file_manager_override(callback) - register callback invoked to override mandatory file manager
@@ -831,6 +836,28 @@ void lua_engine::initialize()
  */
 
 	sol::table emu = sol().create_named_table("emu");
+	vector_device::set_hook_callback(
+			[this] (running_machine &machine, vector_device::hook_data const &data)
+			{
+				if (!m_machine || (&machine != m_machine))
+					return;
+
+				switch (data.event)
+				{
+				case vector_device::hook_event::FRAME_BEGIN:
+					execute_function("LUA_ON_VECTOR_BEGIN", data.width, data.height);
+					break;
+				case vector_device::hook_event::MOVE_TO:
+					execute_function("LUA_ON_VECTOR_MOVE_TO", data.x1, data.y1);
+					break;
+				case vector_device::hook_event::LINE_TO:
+					execute_function("LUA_ON_VECTOR_LINE_TO", data.x0, data.y0, data.x1, data.y1, data.intensity, uint32_t(data.color));
+					break;
+				case vector_device::hook_event::FRAME_END:
+					execute_function("LUA_ON_VECTOR_END");
+					break;
+				}
+			});
 	emu["wait"] = sol::yielding(
 			[this] (sol::this_state s, sol::object duration, sol::variadic_args args)
 			{
@@ -940,6 +967,10 @@ void lua_engine::initialize()
 	emu["register_frame_done"] = [this] (sol::function func) { register_function(func, "LUA_ON_FRAME_DONE"); };
 	emu["register_sound_update"] = [this] (sol::function func) { register_function(func, "LUA_ON_SOUND_UPDATE"); };
 	emu["register_periodic"] = [this] (sol::function func) { register_function(func, "LUA_ON_PERIODIC"); };
+	emu["register_vector_begin"] = [this] (sol::function func) { register_function(func, "LUA_ON_VECTOR_BEGIN"); };
+	emu["register_vector_move_to"] = [this] (sol::function func) { register_function(func, "LUA_ON_VECTOR_MOVE_TO"); };
+	emu["register_vector_line_to"] = [this] (sol::function func) { register_function(func, "LUA_ON_VECTOR_LINE_TO"); };
+	emu["register_vector_end"] = [this] (sol::function func) { register_function(func, "LUA_ON_VECTOR_END"); };
 	emu["register_mandatory_file_manager_override"] = [this] (sol::function func) { register_function(func, "LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE"); };
 	emu["register_before_load_settings"] = [this](sol::function func) { register_function(func, "LUA_ON_BEFORE_LOAD_SETTINGS"); };
 	emu["register_menu"] =
@@ -2266,6 +2297,7 @@ bool lua_engine::frame_hook()
 
 void lua_engine::close()
 {
+	vector_device::set_hook_callback(vector_device::hook_callback());
 	m_notifiers.reset();
 	m_menu.clear();
 	m_update_tasks.clear();

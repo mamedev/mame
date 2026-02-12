@@ -430,6 +430,31 @@ ROM_START( matet100 )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( lxpc )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(31fa6b7a) SHA1(3d186804b6605b7fa23f315ca6b5d28cc6e67745) )
+ROM_END
+
+ROM_START( lxpcs )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(5415ef11) SHA1(55eb4243d6d02595e233390a31986e0acc43dc3d) )
+ROM_END
+
+ROM_START( lxpcg )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(760f3a46) SHA1(65ade3b3ee24cf6701fcbfa736497ddd1fc66a22) )
+ROM_END
+
+ROM_START( lxpcdp )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(87361d0b) SHA1(29749192654522a434b3ec627077c3a54b64ae51) )
+ROM_END
+
+ROM_START( lxpcgp )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(2ae7a6f6) SHA1(c16fcf28fad85799fa331ca4ff3c4a1d3560d3f1) )
+ROM_END
+
 ROM_START( lxpcsp )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl512n11tfi02.u2", 0x00000, 0x4000000, CRC(113e22f2) SHA1(c57184131db3f3c82d09d7757f0977223698f62c) )
@@ -521,16 +546,24 @@ CONS( 2021, matet100,  0,        0,  nes_vt32_32mb,      nes_vt32, nes_vt32_unk_
 // Uses DIPs switch to select console or cartridge, as cartridge is fake and just toggles a GPIO
 CONS( 2016, fcpocket,  0,  0,  nes_vt32_4x16mb,   nes_vt32_fp, nes_vt32_unk_state, empty_init, "<unknown>",   "FC Pocket 600 in 1", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )  // has external banking (2x 32mbyte banks)
 
-// aside from the boot screens these have no theming and all contain a barely disguised bootleg version of Nintendo's Pinball in the Games section
-CONS( 2020, lxpcsp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man", MACHINE_NOT_WORKING )
-CONS( 2020, lxpcli,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Lilo & Stitch", MACHINE_NOT_WORKING )
-CONS( 2020, lxpcpp,    0,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Paw Patrol", MACHINE_NOT_WORKING )
-// Power Console - Gabby's Dollhouse
-// Power Console - Disney Princess
-// Power Console - Frozen
-// Power Console - Generic EN/FR model
-// Power Console - Generic EN/ES model
-// Power Console - Generic EN/DE model
+// all Power Consoles contain a barely disguised bootleg version of Nintendo's Pinball in the Games section
+// these are the generic unthemed units
+CONS( 2020, lxpc,      0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console (JCG100i1, English/French)", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcs,     lxpc,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console (JCG100i2, English/Spanish)", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcg,     lxpc,  0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console (JCG100i3, English/German)", MACHINE_NOT_WORKING )
+
+// aside from the boot screens these have no theming
+// there are likely many more language combinations for each
+CONS( 2020, lxpcsp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Marvel Spider-Man (JCG100SPi1, English/French)", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcli,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Lilo & Stitch (JCG100Di1, English/French)", MACHINE_NOT_WORKING )
+// Power Console - Lilo & Stitch (JCG100i2, English/Spanish)
+// Power Console - Lilo & Stitch (JCG100i3, English/German)
+CONS( 2020, lxpcpp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Paw Patrol (JCG100PAi1, English/French)", MACHINE_NOT_WORKING )
+// Power Console - Paw Patrol (JCG100PAi5, English/Italian)
+CONS( 2020, lxpcdp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Disney Princess (JCG100DPi1, English/French)", MACHINE_NOT_WORKING )
+CONS( 2020, lxpcgp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Gabby's Dollhouse (JCG100GDHi1, English/French)", MACHINE_NOT_WORKING )
+// Power Console - Frozen (JCG100FZi1, English/French) 
+// Power Console - Frozen (JCG100FZi12, English/Czech)
 
 // unclear SoC types maybe even different
 // Rush'n Attack has the raster split in the wrong place on the 5 language version (mountains in first stage) when using real hardware

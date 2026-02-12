@@ -45,14 +45,16 @@
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
 // standard windows headers
 #include <windows.h>
-#if defined(SDLMAME_WIN32)
+#if defined(SDLMAME_WIN32) && !defined(SDLMAME_SDL3)
 #include <SDL2/SDL_syswm.h>
 #endif
 #else
 #if defined(OSD_MAC)
 extern void *GetOSWindow(void *wincontroller);
 #else
+#ifndef SDLMAME_SDL3
 #include <SDL2/SDL_syswm.h>
+#endif
 #endif
 #endif
 
@@ -385,7 +387,60 @@ bool video_bgfx::init_bgfx_library(osd_window &window)
 //============================================================
 //  Utility for setting up window handle
 //============================================================
+#ifdef SDLMAME_SDL3
+bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window const &window)
+{
+#if defined(OSD_WINDOWS)
+	platform_data.ndt = nullptr;
+	platform_data.nwh = dynamic_cast<win_window_info const &>(window).platform_window();
+#elif defined(OSD_MAC)
+	platform_data.ndt = nullptr;
+	platform_data.nwh = GetOSWindow(dynamic_cast<mac_window_info const &>(window).platform_window());
+#elif defined(SDLMAME_EMSCRIPTEN)
+	platform_data.ndt = nullptr;
+	platform_data.nwh = (void *)"#canvas"; // HTML5 target selector
+#else // defined(OSD_*)
+	const auto winProps = SDL_GetWindowProperties(dynamic_cast<sdl_window_info const &>(window).platform_window());
+#if defined(SDL_PLATFORM_WINDOWS)
+							  platform_data.ndt = nullptr;
+	platform_data.nwh = (HWND)SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL);
+#endif
+#if defined(SDL_PLATFORM_MACOS)
+	platform_data.ndt = nullptr;
+	platform_data.nwh = SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL);
+#endif
+#if defined(SDL_PLATFORM_LINUX)
+	if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0)
+	{
+		platform_data.ndt = (void *)SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_X11_DISPLAY_POINTER, NULL);
+		platform_data.nwh = (void *)SDL_GetNumberProperty(winProps, SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0);
+	}
+	else if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0)
+	{
+		platform_data.ndt = (struct wl_display *)SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, NULL);
+		platform_data.nwh = (struct wl_surface *)SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL);
+		if (!platform_data.nwh)
+		{
+			osd_printf_error("BGFX: Error creating a Wayland window\n");
+			return false;
+		}
+		platform_data.type = bgfx::NativeWindowHandleType::Wayland;
+	}
+#endif
+#if defined(SDL_PLATFORM_ANDROID)
+	platform_data.ndt = nullptr;
+	platform_data.nwh = SDL_GetPointerProperty(winProps, SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER, NULL);
+#endif
+#endif // defined(OSD_*)
 
+	platform_data.context = nullptr;
+	platform_data.backBuffer = nullptr;
+	platform_data.backBufferDS = nullptr;
+	bgfx::setPlatformData(platform_data);
+
+	return true;
+}
+#else
 bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window const &window)
 {
 #if defined(OSD_WINDOWS)
@@ -457,6 +512,7 @@ bool video_bgfx::set_platform_data(bgfx::PlatformData &platform_data, osd_window
 
 	return true;
 }
+#endif
 
 } // anonymous namespace
 
@@ -501,6 +557,31 @@ uint32_t renderer_bgfx::s_height[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 //============================================================
 
 #ifdef OSD_SDL
+#ifdef SDLMAME_SDL3
+static std::pair<void *, bool> sdlNativeWindowHandle(SDL_Window *window)
+{
+#if defined(SDL_PLATFORM_WIN32)
+	return std::make_pair((HWND)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WIN32_HWND_POINTER, NULL), true);
+#endif
+#if defined(SDLMAME_MACOSX)
+	return std::make_pair(SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, NULL), true);
+#endif
+#if defined(SDL_PLATFORM_LINUX)
+	if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "x11") == 0)
+	{
+		return std::make_pair((void *)uintptr_t(SDL_GetNumberProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_X11_WINDOW_NUMBER, 0)), true);
+	}
+	else if (SDL_strcmp(SDL_GetCurrentVideoDriver(), "wayland") == 0)
+	{
+		return std::make_pair((struct wl_surface *)SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, NULL), true);
+	}
+#endif
+#if defined(SDL_PLATFORM_ANDROID)
+		return std::make_pair(SDL_GetPointerProperty(SDL_GetWindowProperties(window), SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER, NULL), true);
+#endif
+		return std::make_pair(nullptr, false);
+}
+#else
 static std::pair<void *, bool> sdlNativeWindowHandle(SDL_Window *window)
 {
 	SDL_SysWMinfo wmi;
@@ -534,6 +615,7 @@ static std::pair<void *, bool> sdlNativeWindowHandle(SDL_Window *window)
 		return std::make_pair(nullptr, false);
 	}
 }
+#endif
 #endif // OSD_SDL
 
 

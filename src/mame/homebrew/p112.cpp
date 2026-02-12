@@ -13,7 +13,10 @@ similar operating system, it provides a Z80182 (Z-80 upgrade) CPU with up to
 not including disk drives) with a 16MHz CPU clock. Clock speeds up to 24.576MHz
 are possible.
 
-http://members.iinet.net.au/~daveb/p112/p112.html
+http://members.iinet.net.au/~daveb/p112/p112.html (dead link)
+http://cpmarchives.classiccmp.org/cpm/mirrors/members.iinet.net.au/~daveb/p112/usergide.pdf
+https://web.archive.org/web/20160203175148if_/http://members.iinet.net.au/~daveb/p112/sheet1.pdf
+https://web.archive.org/web/20160203175127if_/http://members.iinet.net.au/~daveb/p112/sheet2.pdf
 
 Some of the parts:
  32kHz crystal          1       Y2              (RTC crystal)
@@ -51,11 +54,14 @@ public:
 
 	void p112(machine_config &config);
 
-private:
+
+protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
-	uint32_t screen_update_p112(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+private:
 	required_device<cpu_device> m_maincpu;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void io_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 };
@@ -64,13 +70,25 @@ private:
 void p112_state::mem_map(address_map &map)
 {
 	map(0x00000, 0x07fff).rom();
+	// TODO: unlikely RAM config
 	map(0x08000, 0xfffff).ram();
 }
 
 void p112_state::io_map(address_map &map)
 {
-	map.unmap_value_high();
+	map.unmap_value_low();
 	map.global_mask(0xff);
+//	map(0x40, 0x7f) expansion bus
+//	map(0x8c, 0x8f) LPT
+//	map(0x90, 0x91) Super I/O
+//	map(0x90, 0x97) FDC
+//	map(0x98, 0x9f) COM
+	map(0x9d, 0x9d).lr8(NAME([] () { return 0x40; }));
+//	map(0xa0, 0xbf) floppy DMA
+//	map(0xc0, 0xd7) expansion bus
+	map(0xe0, 0xe0).lr8(NAME([] () { return 0x04; })); // ready bit for video
+	// logic analyzer ping, actually using Z180 serial i/f for video?
+//	map(0xe0, 0xe1).lw8(NAME([] (u8 data) { printf("%c", data); }));
 }
 
 /* Input ports */
@@ -86,7 +104,7 @@ void p112_state::machine_start()
 {
 }
 
-uint32_t p112_state::screen_update_p112(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t p112_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -104,7 +122,7 @@ void p112_state::p112(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(240, 320);
 	screen.set_visarea(0, 240-1, 0, 320-1);
-	screen.set_screen_update(FUNC(p112_state::screen_update_p112));
+	screen.set_screen_update(FUNC(p112_state::screen_update));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME);

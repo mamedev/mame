@@ -26,7 +26,7 @@ TODO:
 #include "emu.h"
 #include "stv.h"
 
-#include "stvcd.h"
+#include "saturn_cd_hle.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
@@ -1026,7 +1026,7 @@ void stv_state::hopper_mem(address_map &map)
 void stv_state::stvcd_mem(address_map &map)
 {
 	stv_mem(map);
-	map(0x05800000, 0x0589ffff).rw("stvcd", FUNC(stvcd_device::stvcd_r), FUNC(stvcd_device::stvcd_w));
+	map(0x05800000, 0x0589ffff).m("saturn_cd_hle", FUNC(saturn_cd_hle_device::amap));
 }
 
 void stv_state::sound_mem(address_map &map)
@@ -1109,7 +1109,7 @@ void stv_state::stv(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &stv_state::sound_mem);
 	m_audiocpu->reset_cb().set(FUNC(stv_state::m68k_reset_callback));
 
-	SATURN_SCU(config, m_scu, 0);
+	SATURN_SCU(config, m_scu, XTAL(57'272'727) / 4);
 	m_scu->set_hostcpu(m_maincpu);
 
 	SMPC_HLE(config, m_smpc_hle, XTAL(4'000'000));
@@ -1193,7 +1193,7 @@ void stv_state::stvcd(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stv_state::stvcd_mem);
 	m_slave->set_addrmap(AS_PROGRAM, &stv_state::stvcd_mem);
 
-	stvcd_device &stvcd(STVCD(config, "stvcd", 0));
+	saturn_cd_hle_device &stvcd(SATURN_CD_HLE(config, "saturn_cd_hle", 0));
 	stvcd.add_route(0, "scsp", 1.0, 0);
 	stvcd.add_route(1, "scsp", 1.0, 1);
 }
@@ -2985,7 +2985,7 @@ ROM_START( sfish2 )
 	ROM_LOAD16_WORD_SWAP( "mpr-18274.ic3",    0x0800000, 0x0400000, CRC(a6d76d23) SHA1(eee8c824eff4485d1b3af93a4fd5b21262eec803) ) // good
 	ROM_LOAD16_WORD_SWAP( "mpr-18275.ic4",    0x0c00000, 0x0200000, CRC(7691deca) SHA1(aabb6b098963caf51f66aefa0a97aed7eb86c308) ) // good
 
-	DISK_REGION( "stvcd" )
+	DISK_REGION( "saturn_cd_hle" )
 	DISK_IMAGE_READONLY( "cdp-00428", 0, SHA1(166cb5518fa5e0ab15d40dade70fa8913089dcd2) )
 
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */
@@ -3004,7 +3004,7 @@ ROM_START( sfish2j )
 	ROM_LOAD16_WORD_SWAP( "mpr-18273.ic2",    0x0400000, 0x0400000, CRC(6fec0193) SHA1(5bbda289a5ca58c5bf57307360b07f0bb98f7356) ) // good
 	ROM_LOAD16_WORD_SWAP( "mpr-18274.ic3",    0x0800000, 0x0400000, CRC(a6d76d23) SHA1(eee8c824eff4485d1b3af93a4fd5b21262eec803) ) // good
 
-	DISK_REGION( "stvcd" )
+	DISK_REGION( "saturn_cd_hle" )
 	DISK_IMAGE_READONLY( "cdp-00386b", 0, SHA1(2cb357a930bb7fa668949717ec6daaad2669d137) )
 
 	ROM_REGION32_BE( 0x3000000, "abus", ROMREGION_ERASE00 ) /* SH2 code */

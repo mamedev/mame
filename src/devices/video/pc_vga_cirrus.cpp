@@ -28,11 +28,42 @@
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
+// NOTE: use gd54xx shortname here, clgd54xx for ISA16 cards to avoid validation clashing
+DEFINE_DEVICE_TYPE(CIRRUS_GD5401_VGA, cirrus_gd5401_vga_device, "gd5401", "Cirrus Logic GD5401 / Acumos AVGA1 i/f")
+DEFINE_DEVICE_TYPE(CIRRUS_GD5428_VGA, cirrus_gd5428_vga_device, "gd5428", "Cirrus Logic GD5428 VGA i/f")
+DEFINE_DEVICE_TYPE(CIRRUS_GD5430_VGA, cirrus_gd5430_vga_device, "gd5430", "Cirrus Logic GD5430 VGA i/f")
+DEFINE_DEVICE_TYPE(CIRRUS_GD5446_VGA, cirrus_gd5446_vga_device, "gd5446", "Cirrus Logic GD5446 VGA i/f")
 
-DEFINE_DEVICE_TYPE(CIRRUS_GD5428_VGA, cirrus_gd5428_vga_device, "clgd5428", "Cirrus Logic GD5428 VGA i/f")
-DEFINE_DEVICE_TYPE(CIRRUS_GD5430_VGA, cirrus_gd5430_vga_device, "clgd5430", "Cirrus Logic GD5430 VGA i/f")
-DEFINE_DEVICE_TYPE(CIRRUS_GD5446_VGA, cirrus_gd5446_vga_device, "clgd5446", "Cirrus Logic GD5446 VGA i/f")
+/*
+ * Acumos AVGA1
+ *
+ * Bog standard VGA interface, with 132-char text mode (cfr. page 64),
+ * provision to feature connector and actually defined external video clocks.
+ *
+ */
 
+cirrus_gd5401_vga_device::cirrus_gd5401_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: vga_device(mconfig, CIRRUS_GD5401_VGA, tag, owner, clock)
+{
+}
+
+// TODO: also can select external video clock modes thru strapped CF(5) = 0
+// cfr. page 63
+void cirrus_gd5401_vga_device::recompute_params()
+{
+	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
+	int xtal;
+
+	switch(xtal_select & 3)
+	{
+		case 0: xtal = XTAL(25'174'800).value(); break;
+		case 1: xtal = XTAL(28'636'363).value(); break;
+		case 2: xtal = XTAL(41'164'000).value(); break;
+		case 3: xtal = XTAL(35'795'000).value(); break;
+	}
+
+	recompute_params_clock(1, xtal);
+}
 
 
 cirrus_gd5428_vga_device::cirrus_gd5428_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

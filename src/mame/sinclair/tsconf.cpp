@@ -257,6 +257,10 @@ void tsconf_state::device_post_load()
 INPUT_PORTS_START( tsconf )
 	PORT_INCLUDE( spec_plus )
 
+	PORT_MODIFY("CONFIG")
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+
 	PORT_START("mouse_input1")
 	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
 
@@ -345,7 +349,7 @@ void tsconf_state::tsconf(machine_config &config)
 	AT_KEYB(config, m_keyboard, pc_keyboard_device::KEYBOARD_TYPE::AT, 3);
 
 	SOFTWARE_LIST(config, "betadisc_list_pent").set_original("spectrum_betadisc_flop");
-	SOFTWARE_LIST(config, "betadisc_list_tsconf").set_original("tsconf_betadisc_flop");
+	SOFTWARE_LIST(config, "tsconf_list").set_original("tsconf");
 }
 
 

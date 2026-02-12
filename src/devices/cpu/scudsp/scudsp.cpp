@@ -1,11 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese, Mariusz Wojcieszek
-/*****************************************************************************
+/**************************************************************************************************
  *
  * scudsp.c
  * Sega SCUDSP emulator version 1.00
  *
- * copyright Angelo Salese & Mariusz Wojcieszek
  *
  * Changelog:
  * 131010: Angelo Salese
@@ -68,11 +67,12 @@
  * - overworked disassembler
  *
  *  TODO:
- * - Fix INSTA_DMA hack
- * - Fix disassembler
- * - Fix timings (no info available so far)
- * - Add control flags
- * - Croc: has a bug somewhere that never allows it to trip the ENDI opcode.
+ * - Fix INSTA_DMA hack;
+ * - Fix disassembler;
+ * - Fix timings (no info available so far);
+ * - Add control flags;
+ * - Scheduler corrupts a lot in debugger, particularly with DRC enabled;
+ * - croc: has a bug somewhere that never allows it to trip the ENDI opcode.
  *   Snippet of interest is:
  *   08    00823500                                            CLR A     MOV M0,PL
  *   09    08040000    OR                                      MOV ALU,A
@@ -85,10 +85,10 @@
  *   42    D3400042    JMP T0,$42
  *   43    00000000    NOP
  *   44    D0000007    JMP $7
+ * - vkyoute2: heavy glitches with VDP1 vertices going haywire.
  *
  *
- *
- *****************************************************************************/
+ *************************************************************************************************/
 
 #include "emu.h"
 #include "scudsp.h"
@@ -98,21 +98,6 @@
 DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 
 /* FLAGS */
-#define PRF m_flags & 0x04000000
-#define EPF m_flags & 0x02000000
-#define T0F m_flags & 0x00800000
-#define SF  (m_flags & 0x00400000)
-#define ZF  (m_flags & 0x00200000)
-#define CF  m_flags & 0x00100000
-#define VF  m_flags & 0x00080000
-#define EF  m_flags & 0x00040000
-#define ESF m_flags & 0x00020000
-#define EXF m_flags & 0x00010000 // execute flag (basically tied to RESET pin)
-#define LEF m_flags & 0x00008000 // change PC value
-#define T0F_1 m_flags|=0x00800000
-#define T0F_0 m_flags&=~0x00800000
-#define EXF_0 m_flags&=~0x00010000
-#define EF_1  m_flags|=0x00040000
 
 #define SET_C(_val) (m_flags = ((m_flags & ~0x00100000) | ((_val) ? 0x00100000 : 0)))
 #define SET_S(_val) (m_flags = ((m_flags & ~0x00400000) | ((_val) ? 0x00400000 : 0)))
@@ -121,7 +106,7 @@ DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 
 
 #define FLAGS_MASK 0x06ff8000
-#define INSTA_DMA 1
+#define INSTA_DMA_HACK 1
 
 #define scudsp_readop(A) m_program->read_dword(A)
 #define scudsp_writeop(A, B) m_program->write_dword(A, B)
@@ -130,11 +115,11 @@ DEFINE_DEVICE_TYPE(SCUDSP, scudsp_cpu_device, "scudsp", "Sega SCUDSP")
 
 constexpr uint64_t concat_64(uint32_t hi, uint32_t lo) { return (uint64_t(hi) << 32) | lo; }
 
-uint32_t scudsp_cpu_device::scudsp_get_source_mem_reg_value( uint32_t mode )
+uint32_t scudsp_cpu_device::get_source_mem_reg_value( uint32_t mode )
 {
 	if ( mode < 0x8 )
 	{
-		return scudsp_get_source_mem_value( mode );
+		return get_source_mem_value( mode );
 	}
 	else
 	{
@@ -149,7 +134,7 @@ uint32_t scudsp_cpu_device::scudsp_get_source_mem_reg_value( uint32_t mode )
 	return 0;
 }
 
-uint32_t scudsp_cpu_device::scudsp_get_source_mem_value(uint8_t mode)
+uint32_t scudsp_cpu_device::get_source_mem_value(uint8_t mode)
 {
 	uint32_t value = 0;
 
@@ -188,7 +173,7 @@ uint32_t scudsp_cpu_device::scudsp_get_source_mem_value(uint8_t mode)
 	return value;
 }
 
-void scudsp_cpu_device::scudsp_set_dest_mem_reg( uint32_t mode, uint32_t value )
+void scudsp_cpu_device::set_dest_mem_reg( uint32_t mode, uint32_t value )
 {
 	switch( mode )
 	{
@@ -246,11 +231,11 @@ void scudsp_cpu_device::scudsp_set_dest_mem_reg( uint32_t mode, uint32_t value )
 	}
 }
 
-void scudsp_cpu_device::scudsp_set_dest_mem_reg_2( uint32_t mode, uint32_t value )
+void scudsp_cpu_device::set_dest_mem_reg_2( uint32_t mode, uint32_t value )
 {
 	if ( mode < 0xb )
 	{
-		scudsp_set_dest_mem_reg( mode, value );
+		set_dest_mem_reg( mode, value );
 	}
 	else
 	{
@@ -265,26 +250,26 @@ void scudsp_cpu_device::scudsp_set_dest_mem_reg_2( uint32_t mode, uint32_t value
 	}
 }
 
-uint32_t scudsp_cpu_device::scudsp_compute_condition( uint32_t condition )
+uint32_t scudsp_cpu_device::compute_condition( uint32_t condition )
 {
 	uint32_t result = 0;
 
 	switch( condition & 0xf )
 	{
 		case 0x1:   /* Z */
-			result = ZF;
+			result = BIT(m_flags, ZF);
 			break;
 		case 0x2:   /* S */
-			result = SF;
+			result = BIT(m_flags, SF);
 			break;
 		case 0x3:   /* ZS */
-			result = ZF | SF;
+			result = BIT(m_flags, ZF) | BIT(m_flags, SF);
 			break;
 		case  0x4:  /* C */
-			result = CF;
+			result = BIT(m_flags, CF);
 			break;
 		case 0x8:   /* T0 */
-			result = T0F;
+			result = BIT(m_flags, T0F);
 			break;
 	}
 	if ( !(condition & 0x20) )
@@ -295,7 +280,7 @@ uint32_t scudsp_cpu_device::scudsp_compute_condition( uint32_t condition )
 	return result;
 }
 
-void scudsp_cpu_device::scudsp_set_dest_dma_mem( uint32_t memcode, uint32_t value, uint32_t counter )
+void scudsp_cpu_device::set_dest_dma_mem( uint32_t memcode, uint32_t value, uint32_t counter )
 {
 	if ( memcode < 4 )
 	{
@@ -317,13 +302,13 @@ void scudsp_cpu_device::scudsp_set_dest_dma_mem( uint32_t memcode, uint32_t valu
 	}
 	else if ( memcode == 4 )
 	{
-		fatalerror("scudsp_set_dest_dma_mem == 4");
+		fatalerror("set_dest_dma_mem == 4");
 		/* caused a stack overflow for sure ... */
 		//dsp_reg.internal_prg[ counter & 0x100 ] = value;
 	}
 }
 
-uint32_t scudsp_cpu_device::scudsp_get_mem_source_dma( uint32_t memcode, uint32_t counter )
+uint32_t scudsp_cpu_device::get_mem_source_dma( uint32_t memcode, uint32_t counter )
 {
 	switch( memcode & 0x3 )
 	{
@@ -342,7 +327,17 @@ uint32_t scudsp_cpu_device::scudsp_get_mem_source_dma( uint32_t memcode, uint32_
 
 uint32_t scudsp_cpu_device::program_control_r()
 {
-	return (m_pc & 0xff) | (m_flags & FLAGS_MASK);
+	const u32 flags = m_flags & FLAGS_MASK;
+
+	if (!machine().side_effects_disabled())
+	{
+		// clear overflow and end flag on host reads of this port
+		m_flags &= ~(1 << VF);
+		m_flags &= ~(1 << EF);
+		m_out_irq_cb(0);
+	}
+
+	return ((m_pc + 1) & 0xff) | flags;
 }
 
 void scudsp_cpu_device::program_control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -353,13 +348,19 @@ void scudsp_cpu_device::program_control_w(offs_t offset, uint32_t data, uint32_t
 	newval = oldval;
 	COMBINE_DATA(&newval);
 
-	m_flags = newval & FLAGS_MASK;
+	m_flags = (newval & 0x0063'0000) | (m_flags & ~0x0063'0000);
 
-	if(LEF)
+	if (BIT(m_flags, EPF))
+		popmessage("scudsp.cpp: single step enabled");
+
+	// set new PC if transfer enable is set
+	// NOTE: doesn't get transfered in flags
+	if (BIT(data, LEF) && ACCESSING_BITS_0_15)
 		m_pc = newval & 0xff;
 
 	//printf("%08x PRG CTRL\n",data);
-	set_input_line(INPUT_LINE_RESET, (EXF) ? CLEAR_LINE : ASSERT_LINE);
+	// run DSP if EXF is on
+	set_input_line(INPUT_LINE_RESET, (BIT(m_flags, EXF)) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void scudsp_cpu_device::program_w(uint32_t data)
@@ -371,32 +372,30 @@ void scudsp_cpu_device::program_w(uint32_t data)
 void scudsp_cpu_device::ram_address_control_w(uint32_t data)
 {
 	//printf("%02x %08x PRG\n",m_pc,data);
+	// NOTE: RA has no relationship with CT0 ~ CT3, can upload out of high 2 bits bounds
 	m_ra = data & 0xff;
-
-	switch((m_ra & 0xc0) >> 6)
-	{
-		case 0: m_ct0 = (m_ra & 0x3f); break;
-		case 1: m_ct1 = (m_ra & 0x3f); break;
-		case 2: m_ct2 = (m_ra & 0x3f); break;
-		case 3: m_ct3 = (m_ra & 0x3f); break;
-	}
 }
 
 uint32_t scudsp_cpu_device::ram_address_r()
 {
-	uint32_t data;
+	uint32_t data = m_data->read_dword(m_ra);
 
-	data = scudsp_get_source_mem_value( ((m_ra & 0xc0) >> 6) + 4 );
+	if (!machine().side_effects_disabled())
+		m_ra = (m_ra + 1) & 0xff;
 
 	return data;
 }
 
 void scudsp_cpu_device::ram_address_w(uint32_t data)
 {
-	scudsp_set_dest_mem_reg( (m_ra & 0xc0) >> 6, data );
+//	set_dest_mem_reg( (m_ra & 0xc0) >> 6, data );
+	m_data->write_dword(m_ra, data);
+
+	m_ra = (m_ra + 1) & 0xff;
+
 }
 
-void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
+void scudsp_cpu_device::op_alu(uint32_t opcode)
 {
 	int64_t i1,i2;
 	int32_t i3;
@@ -405,20 +404,23 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 
 
 	/* ALU */
+	// NOTE: anything but AD2 doesn't update upper 16-bit ALU part
 	switch( (opcode & 0x3c000000) >> 26 )
 	{
 		case 0x0:   /* NOP */
 			break;
+
 		case 0x1:   /* AND */
 			i3 = m_acl.si & m_pl.si;
-			m_alu = (uint64_t)(uint32_t)i3;
+			m_alu = uint32_t(i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z(i3 == 0);
 			SET_C(0);
 			SET_S(i3 < 0);
 			break;
+
 		case 0x2:   /* OR */
 			i3 = m_acl.si | m_pl.si;
-			m_alu = (uint64_t)(uint32_t)i3;
+			m_alu = uint32_t(i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_C(0);
 			SET_S(i3 < 0);
 			/* TODO: Croc and some early Psygnosis games wants Z to be 1 when the result of this one is negative.
@@ -427,99 +429,109 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 				i3 = 0;
 			SET_Z(i3 == 0);
 			break;
+
 		case 0x3:   /* XOR */
 			i3 = m_acl.si ^ m_pl.si;
-			m_alu = (uint64_t)(uint32_t)i3;
+			m_alu = uint32_t(i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z(i3 == 0);
 			SET_C(0);
 			SET_S(i3 < 0);
 			break;
+
 		case 0x4:   /* ADD */
 			i3 = m_acl.si + m_pl.si;
-			m_alu = (uint64_t)(uint32_t)i3;
-			//SET_Z(i3 == 0);
-			SET_Z( (i3 & s64(0xffffffffffffU)) == 0 );
-			//SET_S(i3 < 0);
-			SET_S( i3 & s64(0x1000000000000U));
-			SET_C(i3 & s64(0x100000000U));
-			SET_V(((i3) ^ (m_acl.si)) & ((i3) ^ (m_pl.si)) & 0x80000000);
+			m_alu = uint32_t(i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
+			SET_Z( (i3 & s64(0xffff'ffff'ffffU)) == 0 );
+			SET_S( i3 & s64(0x1'0000'0000'0000U));
+			SET_C(i3 & s64(0x1'0000'0000U));
+			SET_V((i3 ^ m_acl.si) & (i3 ^ m_pl.si) & 0x8000'0000);
 			break;
+
 		case 0x5:   /* SUB */
 			i3 = m_acl.si - m_pl.si;
-			m_alu = (uint64_t)(uint32_t)i3;
+			m_alu = uint32_t(i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z(i3 == 0);
-			SET_C(i3 & s64(0x100000000U));
+			SET_C(i3 & s64(0x1'0000'0000U));
 			SET_S(i3 < 0);
-			SET_V(((m_pl.si) ^ (m_acl.si)) & ((m_pl.si) ^ (i3)) & 0x80000000);
+			SET_V(((m_pl.si) ^ (m_acl.si)) & ((m_pl.si) ^ (i3)) & 0x8000'0000);
 			break;
+
 		case 0x6:   /* AD2 */
-			i1 = concat_64((int32_t)m_ph.si,m_pl.si);
-			i2 = concat_64((int32_t)m_ach.si,m_acl.si);
+			i1 = concat_64(int32_t(m_ph.si), m_pl.si);
+			i2 = concat_64(int32_t(m_ach.si), m_acl.si);
 			m_alu = i1 + i2;
-			SET_Z((m_alu & s64(0xffffffffffffU)) == 0);
-			SET_S((m_alu & s64(0x800000000000U)) > 0);
-			SET_C((m_alu) & s64(0x1000000000000U));
-			SET_V(((m_alu) ^ (i1)) & ((m_alu) ^ (i2)) & s64(0x800000000000U));
+			SET_Z((m_alu & s64(0xffff'ffff'ffffU)) == 0);
+			SET_S((m_alu & s64(0x8000'0000'0000U)) > 0);
+			SET_C(m_alu & s64(0x1'0000'0000'0000U));
+			SET_V((m_alu ^ i1) & (m_alu ^ i2) & s64(0x8000'0000'0000U));
 			break;
+
 		case 0x7:   /* ??? */
 			/* Unrecognized opcode */
 			break;
+
 		case 0x8:   /* SR */
-			i3 = (m_acl.si >> 1) | (m_acl.si & 0x80000000);/*MSB does not change*/
-			m_alu = (uint64_t)(uint32_t)i3;
+			// MSB does not change
+			i3 = (m_acl.si >> 1) | (m_acl.si & 0x8000'0000);
+			m_alu = uint32_t(i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
 			SET_Z(i3 == 0);
 			SET_S(i3 < 0);
-			SET_C(m_acl.ui & 0x80000000);
+			SET_C(m_acl.ui & 0x8000'0000);
 			break;
+
 		case 0x9:   /* RR */
-			i3 = ((m_acl.ui >> 1) & 0x7fffffff) | ((m_acl.ui << 31) & 0x80000000);
-			m_alu = (uint64_t)(uint32_t)i3;
-			SET_Z( i3 == 0 );
-			SET_S( i3 < 0 );
-			SET_C( m_acl.ui & 0x1 );
+			i3 = ((m_acl.ui >> 1) & 0x7fff'ffff) | ((m_acl.ui << 31) & 0x8000'0000);
+			m_alu = uint32_t(i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
+			SET_Z(i3 == 0);
+			SET_S(i3 < 0);
+			SET_C(m_acl.ui & 0x1);
 			break;
+
 		case 0xa:   /* SL */
 			i3 = m_acl.si << 1;
-			m_alu = (uint64_t)(uint32_t)i3;
-			SET_Z( i3 == 0 );
-			SET_S( i3 < 0 );
-			SET_C( m_acl.ui & 0x80000000 );
+			m_alu = uint32_t(i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
+			SET_Z(i3 == 0);
+			SET_S(i3 < 0);
+			SET_C(m_acl.ui & 0x8000'0000);
 			break;
-		case 0xB:   /* RL */
-			i3 = ((m_acl.si << 1) & 0xfffffffe) | ((m_acl.si >> 31) & 0x1);
-			m_alu = (uint64_t)(uint32_t)i3;
-			SET_Z( i3 == 0 );
-			SET_S( i3 < 0 );
-			SET_C( m_acl.ui & 0x80000000 );
+
+		case 0xb:   /* RL */
+			i3 = ((m_acl.si << 1) & 0xffff'fffe) | ((m_acl.si >> 31) & 0x1);
+			m_alu = uint32_t(i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
+			SET_Z(i3 == 0);
+			SET_S(i3 < 0);
+			SET_C(m_acl.ui & 0x8000'0000);
 			break;
+
 		case 0xc:
 		case 0xd:
 		case 0xe:
-			/* Unrecognized opcode */
+			/* Unrecognized opcodes */
 			break;
-		case 0xF:   /* RL8 */
+
+		case 0xf:   /* RL8 */
 			i3 = rotl_32(m_acl.si, 8);
-			m_alu = i3;
-			SET_Z( i3 == 0 );
-			SET_S( i3 < 0 );
-			SET_C( m_acl.si & 0x01000000 );
+			m_alu = uint32_t(i3 & 0xffff'ffff) | (m_alu & 0xffff'0000'0000);
+			SET_Z(i3 == 0);
+			SET_S(i3 < 0);
+			SET_C(m_acl.si & 0x0100'0000);
 			break;
 	}
 
 	/* X-Bus */
-	if ( opcode & 0x2000000 )
+	if (opcode & 0x2000000)
 	{
 		/* MOV [s],X */
 		dsp_mem = (opcode & 0x700000) >> 20;
-		if ( dsp_mem & 4 )
+		if (dsp_mem & 4)
 		{
 			dsp_mem &= 3;
 			update_ct[dsp_mem] = 1;
 		}
-		m_rx.ui = scudsp_get_source_mem_value( dsp_mem );
+		m_rx.ui = get_source_mem_value( dsp_mem );
 		m_update_mul = 1;
 	}
-	switch( (opcode & 0x1800000) >> 23 )
+	switch ((opcode & 0x1800000) >> 23)
 	{
 		case 0x0:   /* NOP */
 		case 0x1:   /* NOP ? */
@@ -530,18 +542,18 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 			break;
 		case 0x3:   /* MOV [s],P */
 			dsp_mem = (opcode & 0x700000) >> 20;
-			if ( dsp_mem & 4 )
+			if (dsp_mem & 4)
 			{
 				dsp_mem &= 3;
 				update_ct[dsp_mem] = 1;
 			}
-			m_pl.ui = scudsp_get_source_mem_value(  dsp_mem );
+			m_pl.ui = get_source_mem_value(  dsp_mem );
 			m_ph.si = (m_pl.si < 0) ? -1 : 0;
 			break;
 	}
 
 	/* Y-Bus */
-	if ( opcode & 0x80000 )
+	if (opcode & 0x80000)
 	{
 		/* MOV [s],Y */
 		dsp_mem = (opcode & 0x1C000 ) >> 14;
@@ -550,10 +562,10 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 			dsp_mem &= 3;
 			update_ct[dsp_mem] = 1;
 		}
-		m_ry.ui = scudsp_get_source_mem_value( dsp_mem );
+		m_ry.ui = get_source_mem_value( dsp_mem );
 		m_update_mul = 1;
 	}
-	switch( (opcode & 0x60000) >> 17 )
+	switch ((opcode & 0x60000) >> 17)
 	{
 		case 0x0:   /* NOP */
 			break;
@@ -572,16 +584,16 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 				dsp_mem &= 3;
 				update_ct[dsp_mem] = 1;
 			}
-			m_acl.ui = scudsp_get_source_mem_value( dsp_mem );
+			m_acl.ui = get_source_mem_value( dsp_mem );
 			m_ach.si = ((m_acl.si < 0) ? -1 : 0);
 			break;
 	}
 
 	/* update CT registers */
-	if ( update_ct[0] ) { m_ct0++; m_ct0 &= 0x3f; };
-	if ( update_ct[1] ) { m_ct1++; m_ct1 &= 0x3f; };
-	if ( update_ct[2] ) { m_ct2++; m_ct2 &= 0x3f; };
-	if ( update_ct[3] ) { m_ct3++; m_ct3 &= 0x3f; };
+	if (update_ct[0]) { m_ct0++; m_ct0 &= 0x3f; };
+	if (update_ct[1]) { m_ct1++; m_ct1 &= 0x3f; };
+	if (update_ct[2]) { m_ct2++; m_ct2 &= 0x3f; };
+	if (update_ct[3]) { m_ct3++; m_ct3 &= 0x3f; };
 
 
 	/* D1-Bus */
@@ -590,51 +602,51 @@ void scudsp_cpu_device::scudsp_operation(uint32_t opcode)
 		case 0x0:   /* NOP */
 			break;
 		case 0x1:   /* MOV SImm,[d] */
-			scudsp_set_dest_mem_reg( (opcode & 0xf00) >> 8, (int32_t)(int8_t)(opcode & 0xff) );
+			set_dest_mem_reg((opcode & 0xf00) >> 8, int32_t(int8_t(opcode & 0xff)));
 			break;
 		case 0x2:
 			/* ??? */
 			break;
 		case 0x3:   /* MOV [s],[d] */
-			scudsp_set_dest_mem_reg( (opcode & 0xf00) >> 8, scudsp_get_source_mem_reg_value( opcode & 0xf ) );
+			set_dest_mem_reg((opcode & 0xf00) >> 8, get_source_mem_reg_value(opcode & 0xf));
 			break;
 	}
 
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_move_immediate( uint32_t opcode )
+void scudsp_cpu_device::op_move_immediate( uint32_t opcode )
 {
 	uint32_t value;
 
 	if ( opcode & 0x2000000 )
 	{
-		if ( scudsp_compute_condition( (opcode & 0x3F80000 ) >> 19 ) )
+		if ( compute_condition( (opcode & 0x3F80000 ) >> 19 ) )
 		{
 			value = util::sext( opcode, 19 );
-			scudsp_set_dest_mem_reg_2( (opcode & 0x3C000000) >> 26, value );
+			set_dest_mem_reg_2( (opcode & 0x3C000000) >> 26, value );
 		}
 	}
 	else
 	{
 		value = util::sext( opcode, 25 );
-		scudsp_set_dest_mem_reg_2( (opcode & 0x3C000000) >> 26, value );
+		set_dest_mem_reg_2( (opcode & 0x3C000000) >> 26, value );
 	}
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_dma( uint32_t opcode )
+void scudsp_cpu_device::op_dma( uint32_t opcode )
 {
 	uint8_t hold = (opcode &  0x4000) >> 14;
 	uint32_t add = (opcode & 0x38000) >> 15;
 	uint32_t dir_from_D0 = (opcode & 0x1000 ) >> 12;
 	uint32_t dsp_mem = (opcode & 0x300) >> 8;
 
-	T0F_1;
+	m_flags |= 1 << T0F;
 
 	if ( opcode & 0x2000 )
 	{
-		m_dma.size = scudsp_get_source_mem_value( opcode & 0xf );
+		m_dma.size = get_source_mem_value( opcode & 0xf );
 		switch ( add & 0x7 )
 		{
 			case 0: m_dma.add = 0; break;
@@ -673,8 +685,10 @@ void scudsp_cpu_device::scudsp_dma( uint32_t opcode )
 	m_dma.update = ( hold == 0 );
 	m_dma.ex = 1;
 	m_dma.count = 0;
-	/* HACK ALERT: It looks like that scheduling craps out the m_dma parameters, why this happens I don't know ... */
-	#if INSTA_DMA
+	// HACK: It looks like that scheduling craps out the m_dma parameters
+	// this can be verified with stv:vfremix, where the DMA transfers are very small
+	// and no T0F is checked (?)
+	#if INSTA_DMA_HACK
 	{
 		uint32_t data;
 		if ( m_dma.dir == 0 )
@@ -682,7 +696,7 @@ void scudsp_cpu_device::scudsp_dma( uint32_t opcode )
 			for(m_dma.count = 0;m_dma.count < m_dma.size; m_dma.count++)
 			{
 				data = (m_in_dma_cb(m_dma.src)<<16) | m_in_dma_cb(m_dma.src+2);
-				scudsp_set_dest_dma_mem( m_dma.dst, data, m_dma.count );
+				set_dest_dma_mem( m_dma.dst, data, m_dma.count );
 
 				m_dma.src += m_dma.add;
 
@@ -696,7 +710,7 @@ void scudsp_cpu_device::scudsp_dma( uint32_t opcode )
 		{
 			for(m_dma.count = 0;m_dma.count < m_dma.size; m_dma.count++)
 			{
-				data = scudsp_get_mem_source_dma( m_dma.src, m_dma.count );
+				data = get_mem_source_dma( m_dma.src, m_dma.count );
 
 				m_out_dma_cb(m_dma.dst, data >> 16 );
 				m_out_dma_cb(m_dma.dst+2, data & 0xffff );
@@ -713,7 +727,7 @@ void scudsp_cpu_device::scudsp_dma( uint32_t opcode )
 		//if(m_dma.count >= m_dma.size)
 		{
 			m_dma.ex = 0;
-			T0F_0;
+			m_flags &= ~(1 << T0F);
 		}
 
 		m_icount -= m_dma.size;
@@ -726,11 +740,11 @@ void scudsp_cpu_device::scudsp_dma( uint32_t opcode )
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_jump( uint32_t opcode )
+void scudsp_cpu_device::op_jump( uint32_t opcode )
 {
 	if ( opcode & 0x3f80000 )
 	{
-		if ( scudsp_compute_condition( (opcode & 0x3f80000) >> 19 ) )
+		if ( compute_condition( (opcode & 0x3f80000) >> 19 ) )
 		{
 			m_delay = m_pc;
 			m_pc = opcode & 0xff;
@@ -745,7 +759,7 @@ void scudsp_cpu_device::scudsp_jump( uint32_t opcode )
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_loop(uint32_t opcode)
+void scudsp_cpu_device::op_loop(uint32_t opcode)
 {
 	if ( opcode & 0x8000000 )
 	{
@@ -770,33 +784,35 @@ void scudsp_cpu_device::scudsp_loop(uint32_t opcode)
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_end(uint32_t opcode)
+void scudsp_cpu_device::op_end(uint32_t opcode)
 {
 	if(opcode & 0x08000000)
 	{
-		/*ENDI*/
-		EF_1;
+		// set program end irq flag
+		m_flags |= (1 << EF);
 		m_out_irq_cb(1);
 	}
 
-	EXF_0; /* END / ENDI */
+	// clear the execute control flag (not running anymore)
+	m_flags &= ~(1 << EXF);
 	set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_illegal(uint32_t opcode)
+void scudsp_cpu_device::op_illegal(uint32_t opcode)
 {
 	fatalerror("scudsp illegal opcode at 0x%04x\n", m_pc);
 	m_icount -= 1;
 }
 
-void scudsp_cpu_device::scudsp_exec_dma()
+// TODO: unused really
+void scudsp_cpu_device::exec_dma()
 {
 	uint32_t data;
 	if ( m_dma.dir == 0 )
 	{
 		data = (m_in_dma_cb(m_dma.src)<<16) | m_in_dma_cb(m_dma.src+2);
-		scudsp_set_dest_dma_mem( m_dma.dst, data, m_dma.count );
+		set_dest_dma_mem( m_dma.dst, data, m_dma.count );
 
 		m_dma.src += m_dma.add;
 
@@ -807,7 +823,7 @@ void scudsp_cpu_device::scudsp_exec_dma()
 	}
 	else
 	{
-		data = scudsp_get_mem_source_dma( m_dma.src, m_dma.count );
+		data = get_mem_source_dma( m_dma.src, m_dma.count );
 
 		m_out_dma_cb(m_dma.dst, data >> 16 );
 		m_out_dma_cb(m_dma.dst+2, data & 0xffff );
@@ -824,7 +840,7 @@ void scudsp_cpu_device::scudsp_exec_dma()
 	if(m_dma.count >= m_dma.size)
 	{
 		m_dma.ex = 0;
-		T0F_0;
+		m_flags &= ~(1 << T0F);
 	}
 
 	m_icount -= 1;
@@ -855,28 +871,28 @@ void scudsp_cpu_device::execute_run()
 		switch( (opcode & 0xc0000000) >> 30 )
 		{
 			case 0x00: /* 00 */
-				scudsp_operation(opcode);
+				op_alu(opcode);
 				break;
 			case 0x01: /* 01 */
-				scudsp_illegal(opcode);
+				op_illegal(opcode);
 				break;
 			case 0x02: /* 10 */
-				scudsp_move_immediate(opcode);
+				op_move_immediate(opcode);
 				break;
 			case 0x03: /* 11 */
 				switch( (opcode & 0x30000000) >> 28 )
 				{
 					case 0x00:
-						scudsp_dma(opcode);
+						op_dma(opcode);
 						break;
 					case 0x01:
-						scudsp_jump(opcode);
+						op_jump(opcode);
 						break;
 					case 0x02:
-						scudsp_loop(opcode);
+						op_loop(opcode);
 						break;
 					case 0x03:
-						scudsp_end(opcode);
+						op_end(opcode);
 						break;
 				}
 				break;
@@ -890,7 +906,7 @@ void scudsp_cpu_device::execute_run()
 
 		if (m_dma.ex == 1)
 		{
-			scudsp_exec_dma();
+			exec_dma();
 		}
 
 	} while( m_icount > 0 );
@@ -994,11 +1010,12 @@ void scudsp_cpu_device::device_reset()
 {
 }
 
+// TODO: do we need this?
 void scudsp_cpu_device::execute_set_input(int irqline, int state)
 {
 	switch(irqline)
 	{
-		case SCUDSP_RESET:
+		case INPUT_LINE_RESET:
 			//m_reset_state = state;
 			break;
 	}

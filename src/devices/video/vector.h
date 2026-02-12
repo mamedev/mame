@@ -5,8 +5,11 @@
 
 #pragma once
 
+#include <functional>
+
 
 class vector_device;
+class running_machine;
 
 class vector_options
 {
@@ -30,11 +33,35 @@ public:
 	template <typename T> static constexpr rgb_t color222(T c) { return rgb_t(pal2bit(c >> 4), pal2bit(c >> 2), pal2bit(c >> 0)); }
 	template <typename T> static constexpr rgb_t color444(T c) { return rgb_t(pal4bit(c >> 8), pal4bit(c >> 4), pal4bit(c >> 0)); }
 
+	enum class hook_event
+	{
+		FRAME_BEGIN,
+		MOVE_TO,
+		LINE_TO,
+		FRAME_END
+	};
+
+	struct hook_data
+	{
+		hook_event event;
+		int x0;
+		int y0;
+		int x1;
+		int y1;
+		rgb_t color;
+		int intensity;
+		int width;
+		int height;
+	};
+
+	using hook_callback = std::function<void (running_machine &, hook_data const &)>;
+
 	// construction/destruction
 	vector_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void clear_list();
+	static void set_hook_callback(hook_callback callback);
 
 	void add_point(int x, int y, rgb_t color, int intensity);
 

@@ -129,23 +129,30 @@ class uapce_state : public pce_common_state
 {
 public:
 	uapce_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pce_common_state(mconfig, type, tag),
-		m_discrete(*this, "discrete") { }
+		: pce_common_state(mconfig, type, tag)
+		, m_discrete(*this, "discrete")
+		, m_io_dsw(*this, "DSW")
+	{ }
 
-	void uapce(machine_config &config);
+	void uapce(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	uint8_t m_jamma_if_control_latch = 0;
-	void jamma_if_control_latch_w(uint8_t data);
-	uint8_t jamma_if_control_latch_r();
-	uint8_t jamma_if_read_dsw(offs_t offset);
-	virtual uint8_t joy_read() override;
-	virtual void machine_reset() override ATTR_COLD;
-	required_device<discrete_device> m_discrete;
+	void jamma_if_control_latch_w(u8 data);
+	u8 jamma_if_control_latch_r();
+	u8 jamma_if_read_dsw(offs_t offset);
+	virtual u8 joy_read() override;
 
-	void pce_io(address_map &map) ATTR_COLD;
 	void pce_mem(address_map &map) ATTR_COLD;
 	void z80_map(address_map &map) ATTR_COLD;
+
+	required_device<discrete_device> m_discrete;
+	required_ioport m_io_dsw;
+
+	u8 m_jamma_if_control_latch = 0;
 };
 
 #define UAPCE_SOUND_EN  NODE_10
@@ -158,9 +165,9 @@ static DISCRETE_SOUND_START(uapce_discrete)
 DISCRETE_SOUND_END
 
 
-void uapce_state::jamma_if_control_latch_w(uint8_t data)
+void uapce_state::jamma_if_control_latch_w(u8 data)
 {
-	uint8_t diff = data ^ m_jamma_if_control_latch;
+	const u8 diff = data ^ m_jamma_if_control_latch;
 	m_jamma_if_control_latch = data;
 
 /*  D7 : Controls relay which connects the PCE R-AUDIO output to the common audio path.
@@ -170,9 +177,9 @@ void uapce_state::jamma_if_control_latch_w(uint8_t data)
 /* D6 : Output to JAMMA connector KEY pin. Connected to /RESET on the PCE backplane connector.
     (1= /RESET not asserted, 0= /RESET asserted) */
 
-	if ( diff & 0x40 )
+	if (BIT(diff, 6))
 	{
-		m_maincpu->set_input_line(INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 /* D5 : Connected to a TIP31 which may control the coin meter:
@@ -182,7 +189,7 @@ void uapce_state::jamma_if_control_latch_w(uint8_t data)
 
    Pin 'z' is a normally ground connection, but on this board it is isolated from ground.
    The wiring harness also has the corresponding wire separate from the others. */
-	machine().bookkeeping().coin_counter_w(0, BIT(data,5));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 5));
 
 /* D4 : Connects the START1 switch input from the JAMMA connector to the
     "RUN" key input of the control pad multiplexer.
@@ -192,7 +199,7 @@ void uapce_state::jamma_if_control_latch_w(uint8_t data)
       752 Hz (D-3) square wave to be output on the common audio path.
       (1= Tone output ON, 0= Tone output OFF) */
 
-	m_discrete->write(UAPCE_SOUND_EN, BIT(data,3));
+	m_discrete->write(UAPCE_SOUND_EN, BIT(data, 3));
 
 /* D2 : Not latched, though software writes to this bit like it is. */
 
@@ -201,46 +208,44 @@ void uapce_state::jamma_if_control_latch_w(uint8_t data)
 /* D0 : Not latched. */
 }
 
-uint8_t uapce_state::jamma_if_control_latch_r()
+u8 uapce_state::jamma_if_control_latch_r()
 {
 	return m_jamma_if_control_latch & 0x08;
 }
 
-uint8_t uapce_state::jamma_if_read_dsw(offs_t offset)
+u8 uapce_state::jamma_if_read_dsw(offs_t offset)
 {
-	uint8_t dsw_val;
+	u8 dsw_val = m_io_dsw->read();
 
-	dsw_val = ioport("DSW" )->read();
-
-	if ( BIT( offset, 7 ) == 0 )
+	if (BIT(offset, 7) == 0)
 	{
 		dsw_val >>= 7;
 	}
-	else if ( BIT( offset, 6 ) == 0 )
+	else if (BIT(offset, 6) == 0)
 	{
 		dsw_val >>= 6;
 	}
-	else if ( BIT( offset, 5 ) == 0 )
+	else if (BIT(offset, 5) == 0)
 	{
 		dsw_val >>= 5;
 	}
-	else if ( BIT( offset, 4 ) == 0 )
+	else if (BIT(offset, 4) == 0)
 	{
 		dsw_val >>= 4;
 	}
-	else if ( BIT( offset, 3 ) == 0 )
+	else if (BIT(offset, 3) == 0)
 	{
 		dsw_val >>= 3;
 	}
-	else if ( BIT( offset, 2 ) == 0 )
+	else if (BIT(offset, 2) == 0)
 	{
 		dsw_val >>= 2;
 	}
-	else if ( BIT( offset, 1 ) == 0 )
+	else if (BIT(offset, 1) == 0)
 	{
 		dsw_val >>= 1;
 	}
-	else if ( BIT( offset, 0 ) == 0 )
+	else if (BIT(offset, 0) == 0)
 	{
 		dsw_val >>= 0;
 	}
@@ -248,16 +253,22 @@ uint8_t uapce_state::jamma_if_read_dsw(offs_t offset)
 	return dsw_val & 1;
 }
 
-uint8_t uapce_state::joy_read()
+u8 uapce_state::joy_read()
 {
-	if ( m_jamma_if_control_latch & 0x10 )
+	if (BIT(m_jamma_if_control_latch, 4))
 	{
-		return ioport("JOY" )->read();
+		return m_io_joy->read();
 	}
 	else
 	{
-		return ioport("JOY" )->read() | 0x08;
+		return m_io_joy->read() | 0x08;
 	}
+}
+
+void uapce_state::machine_start()
+{
+	pce_common_state::machine_start();
+	save_item(NAME(m_jamma_if_control_latch));
 }
 
 void uapce_state::machine_reset()
@@ -267,12 +278,12 @@ void uapce_state::machine_reset()
 
 void uapce_state::z80_map(address_map &map)
 {
-	map(0x0000, 0x07FF).rom();
-	map(0x0800, 0x0FFF).ram();
-	map(0x1000, 0x17FF).w(FUNC(uapce_state::jamma_if_control_latch_w));
-	map(0x1800, 0x1FFF).r(FUNC(uapce_state::jamma_if_read_dsw));
-	map(0x2000, 0x27FF).portr("COIN");
-	map(0x2800, 0x2FFF).r(FUNC(uapce_state::jamma_if_control_latch_r));
+	map(0x0000, 0x07ff).rom();
+	map(0x0800, 0x0fff).ram();
+	map(0x1000, 0x17ff).w(FUNC(uapce_state::jamma_if_control_latch_w));
+	map(0x1800, 0x1fff).r(FUNC(uapce_state::jamma_if_read_dsw));
+	map(0x2000, 0x27ff).portr("COIN");
+	map(0x2800, 0x2fff).r(FUNC(uapce_state::jamma_if_control_latch_r));
 }
 
 
@@ -311,26 +322,16 @@ INPUT_PORTS_END
 
 void uapce_state::pce_mem(address_map &map)
 {
-	map(0x000000, 0x09FFFF).rom();
-	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
-	map(0x1FE000, 0x1FE3FF).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
-	map(0x1FE400, 0x1FE7FF).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
-}
-
-void uapce_state::pce_io(address_map &map)
-{
-	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x000000, 0x09ffff).rom();
+	common_mem_map(map);
 }
 
 
 void uapce_state::uapce(machine_config &config)
 {
 	/* basic machine hardware */
-	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
+	common_cpu(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &uapce_state::pce_mem);
-	m_maincpu->set_addrmap(AS_IO, &uapce_state::pce_io);
-	m_maincpu->port_in_cb().set(FUNC(uapce_state::pce_joystick_r));
-	m_maincpu->port_out_cb().set(FUNC(uapce_state::pce_joystick_w));
 	m_maincpu->add_route(0, "speaker", 0.5, 0);
 	m_maincpu->add_route(1, "speaker", 0.5, 1);
 
@@ -340,22 +341,9 @@ void uapce_state::uapce(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PCE_MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
-	screen.set_screen_update(FUNC(pce_common_state::screen_update));
-	screen.set_palette("huc6260");
+	common_video(config);
 
-	HUC6260(config, m_huc6260, PCE_MAIN_CLOCK);
-	m_huc6260->next_pixel_data().set("huc6270", FUNC(huc6270_device::next_pixel));
-	m_huc6260->time_til_next_event().set("huc6270", FUNC(huc6270_device::time_until_next_event));
-	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
-	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
-
-	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
-	huc6270.set_vram_size(0x10000);
-	huc6270.irq().set_inputline(m_maincpu, 0);
-
-	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "speaker", 2).front(); // TODO: correct?
 
 	DISCRETE(config, m_discrete, uapce_discrete).add_route(0, "speaker", 1.00, 1);
 }

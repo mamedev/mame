@@ -35,6 +35,9 @@ public:
 	uint16_t read(offs_t offset, uint16_t mem_mask = 0xffff);
 	void write(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
+	// has issues booting with no HDD on PC version (at least)
+	static constexpr feature_type imperfect_features() { return feature::DISK; }
+
 protected:
 	static constexpr unsigned OMTI_MAX_LUN = 1;
 	static constexpr unsigned CDB_SIZE = 10;
@@ -52,6 +55,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
@@ -72,6 +76,7 @@ protected:
 	std::string cpu_context() const;
 
 private:
+	void sw_reset();
 	void fdc_irq_w(int state);
 	void fdc_drq_w(int state);
 	static void floppy_formats(format_registration &fr);
@@ -116,7 +121,9 @@ private:
 
 	uint8_t m_moten;
 
-	bool m_installed;
+	bool m_bios_enable;
+	uint32_t m_bios_base;
+	uint16_t m_esdi_base, m_fdc_base;
 
 	void clear_sense_data();
 	void set_sense_data(uint8_t code, const uint8_t * cdb);

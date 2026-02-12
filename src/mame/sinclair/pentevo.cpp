@@ -708,6 +708,10 @@ void pentevo_state::video_start()
 INPUT_PORTS_START( pentevo )
 	PORT_INCLUDE( spec_plus )
 
+	PORT_MODIFY("CONFIG")
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+
 	PORT_START("mouse_input1")
 	PORT_BIT(0xff, 0, IPT_MOUSE_X) PORT_SENSITIVITY(30)
 

@@ -17,8 +17,8 @@ public:
 
 	enum error_type : unsigned
 	{
-		MMU_DEFER = 0, // invalid multibus access
-		MMU_ERROR = 1, // bus error (system space, segment protection, nonexistent page)
+		MMU_ERROR = 0, // bus error (context, protection, Multibus absent)
+		MMU_FAULT = 1, // page fault
 	};
 	auto error() { return m_error.bind(); }
 
@@ -47,7 +47,7 @@ protected:
 	virtual u16 read_cpu(offs_t addr, u16 mem_mask) override;
 	virtual void set_super(bool super) override;
 
-	std::optional<std::pair<unsigned, offs_t>> translate(offs_t const address, unsigned const mode);
+	std::optional<std::pair<unsigned, offs_t>> translate(offs_t const address, int const intention);
 	template <bool Execute> u16 mmu_read(offs_t logical, u16 mem_mask);
 	void mmu_write(offs_t logical, u16 data, u16 mem_mask);
 	virtual bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;

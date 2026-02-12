@@ -33,19 +33,19 @@ std::vector<submenu::option> submenu::misc_options()
 {
 	return std::vector<option>{
 			{ option_type::HEAD, N_("Miscellaneous Options") },
-			{ option_type::UI,   N_("Skip imperfect emulation warnings"),       OPTION_SKIP_WARNINGS },
-			{ option_type::UI,   N_("Re-select last system launched"),          OPTION_REMEMBER_LAST },
-			{ option_type::UI,   N_("Enlarge images in the right panel"),       OPTION_ENLARGE_SNAPS },
-			{ option_type::EMU,  N_("Cheats"),                                  OPTION_CHEAT },
-			{ option_type::EMU,  N_("Show mouse pointer"),                      OPTION_UI_MOUSE },
-			{ option_type::EMU,  N_("Confirm quit from emulation"),             OPTION_CONFIRM_QUIT },
-			{ option_type::EMU,  N_("Skip system information screen"),          OPTION_SKIP_GAMEINFO },
-			{ option_type::UI,   N_("Force 4:3 aspect for snapshot display"),   OPTION_FORCED4X3 },
-			{ option_type::UI,   N_("Use image as background"),                 OPTION_USE_BACKGROUND },
-			{ option_type::UI,   N_("Skip BIOS selection menu"),                OPTION_SKIP_BIOS_MENU },
-			{ option_type::UI,   N_("Skip software part selection menu"),       OPTION_SKIP_PARTS_MENU },
-			{ option_type::UI,   N_("Info auto audit"),                         OPTION_INFO_AUTO_AUDIT },
-			{ option_type::UI,   N_("Hide romless machine from available list"),OPTION_HIDE_ROMLESS } };
+			{ option_type::UI,   N_("Skip imperfect emulation warnings"),                        OPTION_SKIP_WARNINGS },
+			{ option_type::UI,   N_("Re-select last system launched"),                           OPTION_REMEMBER_LAST },
+			{ option_type::UI,   N_("Enlarge images in the right panel"),                        OPTION_ENLARGE_SNAPS },
+			{ option_type::EMU,  N_("Cheats"),                                                   OPTION_CHEAT },
+			{ option_type::EMU,  N_("Show mouse pointer"),                                       OPTION_UI_MOUSE },
+			{ option_type::EMU,  N_("Confirm quit from emulation"),                              OPTION_CONFIRM_QUIT },
+			{ option_type::EMU,  N_("Skip system information screen"),                           OPTION_SKIP_GAMEINFO },
+			{ option_type::UI,   N_("Force 4:3 aspect for snapshot display"),                    OPTION_FORCED4X3 },
+			{ option_type::UI,   N_("Use image as background"),                                  OPTION_USE_BACKGROUND },
+			{ option_type::UI,   N_("Skip BIOS selection menu"),                                 OPTION_SKIP_BIOS_MENU },
+			{ option_type::UI,   N_("Skip software part selection menu"),                        OPTION_SKIP_PARTS_MENU },
+			{ option_type::UI,   N_("Info auto audit"),                                          OPTION_INFO_AUTO_AUDIT },
+			{ option_type::UI,   N_("Hide systems that don't require ROMs in available filter"), OPTION_HIDE_ROMLESS } };
 }
 
 std::vector<submenu::option> submenu::advanced_options()

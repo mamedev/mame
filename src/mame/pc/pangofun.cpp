@@ -1,26 +1,27 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-  It's a standard 486 PC motherboard, gfx card etc. with expansion ROM board
+Pango Fun
 
-  probably impossible to emulate right now due to the bad / missing (blank when read) rom
-  although it would be a good idea if somebody checked for sure
+MS-DOS 5.0 based
 
 TODO:
-- Doesn't detect proper CPU type;
-- "Memory test fail" at POST, needs um8498f "memory controller" emulation
-  (non-PCI with shadow RAM?), also cfr. correlated at.cpp romsets;
-- Sometimes POST will trip an invalid groupFF_16 modrm FF at 000F00B2, causing an hang;
-- bp 932d1, ROM banking that reads at 0xffffe? Is um8498f ROM boot capable?
+- Needs um8498f chipset improvements;
+- Move stuff to ISA bus (4 ISA16 + 1 ISA8 + 1 ISA16);
+- Hookup GD5401 "AVGA1" properly;
+- Understand what's the use of the goofy rig between AVGA1 DCLK and EVIDEO pins to feature
+  connector of the romdisk card, just a bypass to avoid showing text mode GFXs?
+  Also note an extra VGA connector on romdisk card.
+- Hookup jadarom romdisk, understand why it "cannot load program";
 
 ===================================================================================================
 readme by f205v
 
 Game: Pango Fun
-Anno: 1995
-Produttore: InfoCube (Pisa-Italy)
-N.revisione: rl00rv00
+Year: 1995
+Publisher: InfoCube (Pisa-Italy)
+Revision number: rl00rv00
 
 CPUs:-----------
 
@@ -66,13 +67,13 @@ Main PCB (it's a standard 486 motherboard):
 1x Keyboard DIN connector (not used)
 
 Video PCB (it's a standard VGA ISA board):
-1x VGA connetctor (to ROMs PCB)
+1x VGA connector (to ROMs PCB)
 1x red/black cable (to ROMs PCB)
 
 Sound PCB (missing, it's a standard ISA 16bit sound card):
 1x stereo audio out (to ROMs PCB)
 
-ROMs PCB (it's a custom PCB, with ISA connector to motherboard on one side and JAMMA connetcor on the other side):
+ROMs PCB (it's a custom PCB, with ISA connector to motherboard on one side and JAMMA connector on the other side):
 1x ISA connector (into motherboard)
 1x JAMMA edge connector
 1x VGA in connector (from Video PCB)
@@ -99,101 +100,183 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 
 #include "emu.h"
 
-#include "pcshare.h"
-
+#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
+#include "bus/pc_kbd/keyboards.h"
+#include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i386/i386.h"
+#include "machine/at_keybc.h"
+#include "machine/nvram.h"
+#include "machine/ram.h"
+#include "machine/um8498f.h"
+#include "sound/spkrdev.h"
 #include "video/pc_vga.h"
+
 #include "screen.h"
+#include "speaker.h"
 
 
 namespace {
 
-class pangofun_state : public pcat_base_state
+class pangofun_state : public driver_device
 {
 public:
 	pangofun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_chipset(*this, "chipset")
+		, m_isabus(*this, "isabus")
+		, m_speaker(*this, "speaker")
+	{ }
 
 	void pangofun(machine_config &config);
 
-	void init_pangofun();
-
 private:
-	virtual void machine_start() override ATTR_COLD;
-	void pcat_io(address_map &map) ATTR_COLD;
-	void pcat_map(address_map &map) ATTR_COLD;
+	required_device<i486_device> m_maincpu;
+	required_device<um8498f_device> m_chipset;
+	required_device<isa16_device> m_isabus;
+	required_device<speaker_sound_device> m_speaker;
+
+	void main_io(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
 };
 
 
-void pangofun_state::pcat_map(address_map &map)
+void pangofun_state::main_map(address_map &map)
 {
-	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
-	map(0x000e0000, 0x000effff).rom().region("game_prg", 0);
-	map(0x000f0000, 0x000fffff).rom().region("bios", 0);
-	/* TODO: correct RAM mapping/size? */
-	map(0x00100000, 0x01ffffff).ram();
-	map(0x02000000, 0xfffeffff).noprw();
-	map(0xffff0000, 0xffffffff).rom().region("bios", 0);
+//	map(0x00000000, 0x0009ffff).ram();
+//	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+//	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
+	// boot ROM has four 0xaa55 headers
+	// $00000 has CON/AUX/LPT/COM refs
+	// $08000 contains COMMAND.COM
+	// $10000 and $18000 are mostly similar copies, with shifted pointers.
+	// former looks involved in copying stuff of latter, wants reading at $e0000,
+	// moves in conventional memory and jumps to PC=700
+	map(0x000d0000, 0x000d7fff).rom().region("romdisk", 0x10000);
+	map(0x000d8000, 0x000dffff).rom().region("romdisk", 0x18000);
+//	map(0x000e0000, 0x000e7fff).rom().region("romdisk", 0x00000);
+//	map(0x000e8000, 0x000effff).rom().region("romdisk", 0x08000);
+//	map(0x000f0000, 0x000fffff).rom().region("bios", 0);
+//	map(0x00100000, 0x01ffffff).ram();
+	map(0x00100000, 0x03ffffff).noprw();
+//	map(0x02000000, 0xfffeffff).noprw();
+	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 }
 
-void pangofun_state::pcat_io(address_map &map)
+void pangofun_state::main_io(address_map &map)
 {
-	pcat32_io_common(map);
-	map(0x00e0, 0x00e3).nopw();
-	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
+	map(0x00e0, 0x00e3).nopw(); // timestamp stuff?
+//	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 }
 
-static INPUT_PORTS_START( pangofun )
-INPUT_PORTS_END
-
-void pangofun_state::machine_start()
-{
-}
 
 void pangofun_state::pangofun(machine_config &config)
 {
 	/* basic machine hardware */
 	I486(config, m_maincpu, XTAL(40'000'000)); // um486sxlc-40
-	m_maincpu->set_addrmap(AS_PROGRAM, &pangofun_state::pcat_map);
-	m_maincpu->set_addrmap(AS_IO, &pangofun_state::pcat_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
+	m_maincpu->set_addrmap(AS_PROGRAM, &pangofun_state::main_map);
+	m_maincpu->set_addrmap(AS_IO, &pangofun_state::main_io);
+	m_maincpu->set_irq_acknowledge_callback("chipset", FUNC(um8498f_device::int_ack_r));
 
-	/* video hardware */
-	// TODO: map to ISA bus, CLGD5401
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
+	UM8498F(config, m_chipset, XTAL(25'000'000), "maincpu", "bios", "keybc", "ram", "isabus");
+	m_chipset->hold().set([this] (int state) {
+		// halt cpu
+		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
-	vga_device &vga(VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
+		// and acknowledge hold
+		m_chipset->hlda_w(state);
+	});
+	m_chipset->nmi().set_inputline("maincpu", INPUT_LINE_NMI);
+	m_chipset->intr().set_inputline("maincpu", INPUT_LINE_IRQ0);
+	m_chipset->cpureset().set_inputline("maincpu", INPUT_LINE_RESET);
+	m_chipset->a20m().set_inputline("maincpu", INPUT_LINE_A20);
+	// isa dma
+	m_chipset->ior().set([this] (offs_t offset) -> u16 {
+		if (offset < 4)
+			return m_isabus->dack_r(offset);
+		else
+			return m_isabus->dack16_r(offset);
+	});
+	m_chipset->iow().set([this] (offs_t offset, u16 data) {
+		if (offset < 4)
+			m_isabus->dack_w(offset, data);
+		else
+			m_isabus->dack16_w(offset, data);
+	});
+	m_chipset->tc().set([this] (offs_t offset, u8 data) { m_isabus->eop_w(offset, data); });
+	// speaker
+	m_chipset->spkr().set([this] (int state) { m_speaker->level_w(state); });
 
-	pcat_common(config);
+	// unknown, not provided. Chipset can go up to 32M, but will go "memory fail" with that (?)
+	RAM(config, "ram").set_default_size("64M");
 
-	// TODO: um8498f
+	ISA16(config, m_isabus, 0);
+	m_isabus->set_memspace("maincpu", AS_PROGRAM);
+	m_isabus->set_iospace("maincpu", AS_IO);
+	m_isabus->iochck_callback().set(m_chipset, FUNC(um8498f_device::iochck_w));
+	m_isabus->irq2_callback().set(m_chipset, FUNC(um8498f_device::irq09_w));
+	m_isabus->irq3_callback().set(m_chipset, FUNC(um8498f_device::irq03_w));
+	m_isabus->irq4_callback().set(m_chipset, FUNC(um8498f_device::irq04_w));
+	m_isabus->irq5_callback().set(m_chipset, FUNC(um8498f_device::irq05_w));
+	m_isabus->irq6_callback().set(m_chipset, FUNC(um8498f_device::irq06_w));
+	m_isabus->irq7_callback().set(m_chipset, FUNC(um8498f_device::irq07_w));
+	m_isabus->irq10_callback().set(m_chipset, FUNC(um8498f_device::irq10_w));
+	m_isabus->irq11_callback().set(m_chipset, FUNC(um8498f_device::irq11_w));
+	m_isabus->irq12_callback().set(m_chipset, FUNC(um8498f_device::irq12_w));
+	m_isabus->irq14_callback().set(m_chipset, FUNC(um8498f_device::irq14_w));
+	m_isabus->irq15_callback().set(m_chipset, FUNC(um8498f_device::irq15_w));
+	m_isabus->drq0_callback().set(m_chipset, FUNC(um8498f_device::dreq0_w));
+	m_isabus->drq1_callback().set(m_chipset, FUNC(um8498f_device::dreq1_w));
+	m_isabus->drq2_callback().set(m_chipset, FUNC(um8498f_device::dreq2_w));
+	m_isabus->drq3_callback().set(m_chipset, FUNC(um8498f_device::dreq3_w));
+	m_isabus->drq5_callback().set(m_chipset, FUNC(um8498f_device::dreq5_w));
+	m_isabus->drq6_callback().set(m_chipset, FUNC(um8498f_device::dreq6_w));
+	m_isabus->drq7_callback().set(m_chipset, FUNC(um8498f_device::dreq7_w));
+
+	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "avga1", false);
+	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa8_cards,  nullptr, false);
+	// TODO: this space will be reserved to the romdisk
+	ISA16_SLOT(config, "isa6", 0, "isabus", pc_isa16_cards, nullptr, false);
+
+	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
+	keybc.hot_res().set(m_chipset, FUNC(um8498f_device::kbrst_w));
+	keybc.gate_a20().set(m_chipset, FUNC(um8498f_device::gatea20_w));
+	keybc.kbd_irq().set(m_chipset, FUNC(um8498f_device::irq01_w));
+	keybc.kbd_clk().set("kbd", FUNC(pc_kbdc_device::clock_write_from_mb));
+	keybc.kbd_data().set("kbd", FUNC(pc_kbdc_device::data_write_from_mb));
+
+	// Temporary default
+	pc_kbdc_device &pc_kbdc(PC_KBDC(config, "kbd", pc_at_keyboards, "ms_naturl"));
+	pc_kbdc.out_clock_cb().set(keybc, FUNC(at_kbc_device_base::kbd_clk_w));
+	pc_kbdc.out_data_cb().set(keybc, FUNC(at_kbc_device_base::kbd_data_w));
+
+	SPEAKER(config, "mono").front_center();
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 
 ROM_START(pangofun)
-	ROM_REGION32_LE(0x10000, "bios", 0) /* motherboard bios */
-	ROM_LOAD("bios.bin", 0x000000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
+	ROM_REGION32_LE(0x20000, "romdisk", 0 )
+	ROM_LOAD("bank8.u39", 0x000000, 0x20000, CRC(72422c66) SHA1(40b8cca3f99925cf019053921165f6a4a30d784d) )
+	/*bank8.u19 , NOT POPULATED */
 
-	ROM_REGION32_LE(0x20000, "video_bios", 0)    /* Trident TVGA9000 BIOS */
-	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
-	ROM_CONTINUE(               0x00001, 0x04000 )
+	ROM_REGION32_LE(0x20000, "bios", 0 ) /* motherboard bios */
+	ROM_COPY( "romdisk",  0x000000, 0x00000, 0x10000 )
+	ROM_LOAD( "bios.bin", 0x010000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
 
 	/* this is what was on the rom board, mapping unknown */
-	ROM_REGION32_LE(0xa00000, "game_prg", 0)    /* rom board */
-	ROM_LOAD("bank8.u39", 0x000000, 0x20000, CRC(72422c66) SHA1(40b8cca3f99925cf019053921165f6a4a30d784d) )
-	ROM_LOAD16_BYTE("bank0.u11", 0x100001, 0x80000, CRC(6ce951d7) SHA1(1dd09491c651920a8a507bdc6584400367e5a292) )
-	ROM_LOAD16_BYTE("bank0.u31", 0x100000, 0x80000, CRC(b6c06baf) SHA1(79074b086d24737d629272d98f17de6e1e650485) )
-	/* Following two references to a SB Pro clone sound card. */
-	ROM_LOAD16_BYTE("bank1.u12", 0x200001, 0x80000, CRC(5adc1f2e) SHA1(17abde7a2836d042a698661339eefe242dd9af0d) )
-	ROM_LOAD16_BYTE("bank1.u32", 0x200000, 0x80000, CRC(5647cbf6) SHA1(2e53a74b5939b297fa1a77441017cadc8a19ddef) )
-	ROM_LOAD16_BYTE("bank2.u13", 0x300001, 0x80000, BAD_DUMP CRC(504bf849) SHA1(13a184ec9e176371808938015111f8918cb4df7d) ) // EMPTY! (Definitely Bad, interleaves with the next ROM)
-	ROM_LOAD16_BYTE("bank2.u33", 0x300000, 0x80000, CRC(272ecfb6) SHA1(6e1b6bdef62d953de102784ba0148fb20182fa87) )
+	ROM_REGION32_LE(0x800000, "game_prg", ROMREGION_ERASEFF )    /* rom board */
+	ROM_LOAD16_BYTE( "bank0.u11", 0x000001, 0x80000, CRC(6ce951d7) SHA1(1dd09491c651920a8a507bdc6584400367e5a292) )
+	ROM_LOAD16_BYTE( "bank0.u31", 0x000000, 0x80000, CRC(b6c06baf) SHA1(79074b086d24737d629272d98f17de6e1e650485) )
+	/* Following two  references to a SB Pro clone sound card. */
+	ROM_LOAD16_BYTE( "bank1.u12", 0x100001, 0x80000, CRC(5adc1f2e) SHA1(17abde7a2836d042a698661339eefe242dd9af0d) )
+	ROM_LOAD16_BYTE( "bank1.u32", 0x100000, 0x80000, CRC(5647cbf6) SHA1(2e53a74b5939b297fa1a77441017cadc8a19ddef) )
+	ROM_LOAD16_BYTE( "bank2.u13", 0x200001, 0x80000, BAD_DUMP CRC(504bf849) SHA1(13a184ec9e176371808938015111f8918cb4df7d) ) // EMPTY! (Definitely Bad, interleaves with the next ROM)
+	ROM_LOAD16_BYTE( "bank2.u33", 0x200000, 0x80000, CRC(272ecfb6) SHA1(6e1b6bdef62d953de102784ba0148fb20182fa87) )
 					/*bank3.u14 , NOT POPULATED */
 					/*bank3.u34 , NOT POPULATED */
 					/*bank4.u15 , NOT POPULATED */
@@ -204,14 +287,9 @@ ROM_START(pangofun)
 					/*bank6.u37 , NOT POPULATED */
 					/*bank7.u18 , NOT POPULATED */
 					/*bank7.u37 , NOT POPULATED */
-					/*bank8.u19 , NOT POPULATED */
 ROM_END
-
-void pangofun_state::init_pangofun()
-{
-}
 
 } // anonymous namespace
 
 
-GAME( 1995, pangofun,  0,   pangofun, pangofun, pangofun_state, init_pangofun, ROT0, "InfoCube", "Pango Fun (Italy)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 1995, pangofun,  0,   pangofun, 0, pangofun_state, empty_init, ROT0, "InfoCube", "Pango Fun (Italy)", MACHINE_NOT_WORKING )

@@ -75,7 +75,7 @@ private:
 	std::unique_ptr<u8[]> m_sound_program;
 
 	bool m_z80_reset = false;
-	bool m_z80_busrq = false;
+	bool m_z80_busreq = false;
 	u32 m_z80_main_address = 0;
 
 	void flush_z80_state();
@@ -113,15 +113,15 @@ void dcchk_state::md_68k_map(address_map &map)
 			//printf("%04x %04x\n", data, mem_mask);
 			if (!ACCESSING_BITS_0_7)
 			{
-				m_z80_busrq = !!BIT(~data, 8);
+				m_z80_busreq = !!BIT(~data, 8);
 			}
 			else if (!ACCESSING_BITS_8_15)
 			{
-				m_z80_busrq = !!BIT(~data, 0);
+				m_z80_busreq = !!BIT(~data, 0);
 			}
 			else // word access
 			{
-				m_z80_busrq = !!BIT(~data, 8);
+				m_z80_busreq = !!BIT(~data, 8);
 			}
 			flush_z80_state();
 		})
@@ -179,10 +179,10 @@ void dcchk_state::md_cpu_space_map(address_map &map)
 void dcchk_state::flush_z80_state()
 {
 	m_mdz80cpu->set_input_line(INPUT_LINE_RESET, m_z80_reset ? ASSERT_LINE : CLEAR_LINE);
-	m_mdz80cpu->set_input_line(Z80_INPUT_LINE_BUSRQ, m_z80_busrq ? CLEAR_LINE : ASSERT_LINE);
+	m_mdz80cpu->set_input_line(Z80_INPUT_LINE_BUSREQ, m_z80_busreq ? CLEAR_LINE : ASSERT_LINE);
 	if (m_z80_reset)
 		m_opn->reset();
-	if (m_z80_reset || !m_z80_busrq)
+	if (m_z80_reset || !m_z80_busreq)
 		m_md_68k_sound_view.select(0);
 	else
 		m_md_68k_sound_view.disable();
@@ -259,7 +259,7 @@ void dcchk_state::machine_start()
 	save_pointer(NAME(m_sound_program), 0x2000);
 
 	save_item(NAME(m_z80_reset));
-	save_item(NAME(m_z80_busrq));
+	save_item(NAME(m_z80_busreq));
 	save_item(NAME(m_z80_main_address));
 }
 

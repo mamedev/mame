@@ -2,11 +2,11 @@
 // copyright-holders: Takahiro Nogi, David Haywood
 /******************************************************************************
 
-    Gomoku Narabe Renju
-    (c)1981 Nihon Bussan Co.,Ltd.
+Gomoku Narabe Renju
+(c)1981 Nihon Bussan Co.,Ltd.
 
-    Driver by Takahiro Nogi 1999/11/06 -
-    Updated to compile again by David Haywood 19th Oct 2002
+Driver by Takahiro Nogi 1999/11/06 -
+Updated to compile again by David Haywood 19th Oct 2002
 
 TODO:
 - Refactor sound emulation.
@@ -84,7 +84,7 @@ private:
 
 /******************************************************************************
 
-    palette RAM
+    Palette RAM
 
 ******************************************************************************/
 

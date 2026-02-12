@@ -16,6 +16,7 @@
 
 #include <algorithm>
 #include <iomanip>
+#include <locale>
 
 
 
@@ -127,7 +128,7 @@ void debug_view_exceptionpoints::enumerate_sources()
 	{
 		m_source_list.emplace_back(
 				std::make_unique<debug_view_source>(
-					util::string_format("%s '%s'", dasm.device().name(), dasm.device().tag()),
+					util::string_format(std::locale::classic(), "%s '%s'", dasm.device().name(), dasm.device().tag()),
 					&dasm.device()));
 	}
 
@@ -226,6 +227,7 @@ void debug_view_exceptionpoints::view_update()
 	// Draw
 	debug_view_char     *dest = &m_viewdata[0];
 	util::ovectorstream linebuf;
+	linebuf.imbue(std::locale::classic());
 	linebuf.reserve(std::size(tableBreaks) - 1);
 
 	// Header

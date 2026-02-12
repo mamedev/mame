@@ -331,9 +331,6 @@ void model2b_state::machine_reset()
 	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
 	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
-
-	m_iop_data = 0;
-	m_iop_write_num = 0;
 }
 
 void model2c_state::machine_reset()
@@ -662,46 +659,6 @@ void model2b_state::copro_fifo_w(u32 data)
 	else
 	{
 		m_copro_fifo_in->push(u32(data));
-	}
-}
-
-void model2b_state::copro_sharc_iop_w(offs_t offset, u32 data)
-{
-	/* FIXME: clean this mess */
-	if ((strcmp(machine().system().name, "schamp" ) == 0) ||
-		(strcmp(machine().system().name, "sfight" ) == 0) ||
-		(strcmp(machine().system().name, "fvipers" ) == 0) ||
-		(strcmp(machine().system().name, "fvipersb" ) == 0) ||
-		(strcmp(machine().system().name, "vstriker" ) == 0) ||
-		(strcmp(machine().system().name, "vstrikero" ) == 0) ||
-		(strcmp(machine().system().name, "gunblade" ) == 0) ||
-		(strcmp(machine().system().name, "von" ) == 0) ||
-		(strcmp(machine().system().name, "vonj" ) == 0) ||
-		(strcmp(machine().system().name, "vonr" ) == 0) ||
-		(strcmp(machine().system().name, "vonu" ) == 0) ||
-		(strcmp(machine().system().name, "rchase2" ) == 0) ||
-		(strcmp(machine().system().name, "rchase2a" ) == 0))
-	{
-		m_copro_adsp->external_iop_write(offset, data);
-	}
-	else
-	{
-		if(offset == 0x10/4)
-		{
-			m_copro_adsp->external_iop_write(offset, data);
-			return;
-		}
-
-		if ((m_iop_write_num & 1) == 0)
-		{
-			m_iop_data = data & 0xffff;
-		}
-		else
-		{
-			m_iop_data |= (data & 0xffff) << 16;
-			m_copro_adsp->external_iop_write(offset, m_iop_data);
-		}
-		m_iop_write_num++;
 	}
 }
 
@@ -1441,7 +1398,7 @@ void model2b_state::model2b_crx_mem(address_map &map)
 
 	map(0x00880000, 0x00883fff).w(FUNC(model2b_state::copro_function_port_w));
 	map(0x00884000, 0x00887fff).rw(FUNC(model2b_state::copro_fifo_r), FUNC(model2b_state::copro_fifo_w));
-	map(0x008c0000, 0x008c0fff).w(FUNC(model2b_state::copro_sharc_iop_w));
+	map(0x008c0000, 0x008c0fff).w(m_copro_adsp, FUNC(adsp21062_device::external_iop_write));
 
 	map(0x00980000, 0x00980003).rw(FUNC(model2b_state::copro_ctl1_r), FUNC(model2b_state::copro_ctl1_w));
 	map(0x00980008, 0x0098000b).w(FUNC(model2b_state::geo_ctl1_w));
@@ -2887,6 +2844,7 @@ void model2b_state::model2b(machine_config &config)
 	ADSP21062(config, m_copro_adsp, 32_MHz_XTAL);
 	m_copro_adsp->set_boot_mode(adsp21062_device::BOOT_MODE_HOST);
 	m_copro_adsp->set_addrmap(AS_DATA, &model2b_state::copro_sharc_map);
+	m_copro_adsp->enable_recompiler();
 
 	//ADSP21062(config, m_dsp2, 40000000);
 	//m_dsp2->set_boot_mode(adsp21062_device::BOOT_MODE_HOST);

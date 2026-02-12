@@ -359,7 +359,7 @@ static void mm2_floppies(device_slot_interface &device)
 void mm2_state::mm2(machine_config &config)
 {
 	// SBC186
-	I80186(config, m_maincpu, 16_MHz_XTAL);
+	I80186(config, m_maincpu, XTAL(16'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm2_map);
 	m_maincpu->set_addrmap(AS_IO, &mm2_state::mm2_io_map);
 	m_maincpu->irmx_irq_cb().set(m_pic, FUNC(pic8259_device::ir7_w));
@@ -370,14 +370,14 @@ void mm2_state::mm2(machine_config &config)
 	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
 
 	PIT8253(config, m_pit);
-	m_pit->set_clk<0>(16_MHz_XTAL/8);
-	m_pit->set_clk<1>(16_MHz_XTAL/8);
-	m_pit->set_clk<2>(16_MHz_XTAL/8);
+	m_pit->set_clk<0>(XTAL(16'000'000)/8);
+	m_pit->set_clk<1>(XTAL(16'000'000)/8);
+	m_pit->set_clk<2>(XTAL(16'000'000)/8);
 	m_pit->out_handler<0>().set(FUNC(mm2_state::ir0_w));
 	m_pit->out_handler<1>().set(m_mpsc, FUNC(i8274_device::rxtxcb_w));
 	m_pit->out_handler<2>().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
-	I8274(config, m_mpsc, 16_MHz_XTAL/4);
+	I8274(config, m_mpsc, XTAL(16'000'000)/4);
 	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
 	m_mpsc->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
 	m_mpsc->out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
@@ -400,7 +400,7 @@ void mm2_state::mm2(machine_config &config)
 
 	// CRTC186
 	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(71);
+	screen.set_refresh_hz(71.77);
 	screen.set_screen_update(FUNC(mm2_state::screen_update));
 	screen.set_size(640, 420);
 	screen.set_visarea(0, 640-1, 0, 420-1);
@@ -409,7 +409,7 @@ void mm2_state::mm2(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_mm2);
 	PALETTE(config, m_palette, FUNC(mm2_state::palette), 3);
 
-	CRT9007(config, m_vpac, 35.4525_MHz_XTAL/8);
+	CRT9007(config, m_vpac, XTAL(35'452'500)/8);
 	m_vpac->set_addrmap(0, &mm2_state::vpac_mem);
 	m_vpac->set_character_width(10);
 	m_vpac->int_callback().set(FUNC(mm2_state::vpac_int_w));
@@ -419,12 +419,20 @@ void mm2_state::mm2(machine_config &config)
 
 	CRT9212(config, m_drb1, 0);
 
-	I8251(config, m_sio, 16_MHz_XTAL/4);
+	clock_device &sio_clock(CLOCK(config, "sio_clock", XTAL(16'000'000)/4/26));
+	sio_clock.signal_handler().set(m_sio, FUNC(i8251_device::write_txc));
+	sio_clock.signal_handler().append(m_sio, FUNC(i8251_device::write_rxc));
+
+	I8251(config, m_sio, 0);
 	m_sio->rxrdy_handler().set(FUNC(mm2_state::sio_rxrdy_w));
 	m_sio->txrdy_handler().set(FUNC(mm2_state::sio_txrdy_w));
+	m_sio->txd_handler().set(m_kb, FUNC(mm2_keyboard_device::rxd_w));
+
+	NOKIA_MM2_KBD(config, m_kb, 0);
+	m_kb->txd_handler().set(m_sio, FUNC(i8251_device::write_rxd));
 
 	// MMC186
-	AM9517A(config, m_dmac, 16_MHz_XTAL/4);
+	AM9517A(config, m_dmac, XTAL(16'000'000)/4);
 	m_dmac->in_memr_callback().set(FUNC(mm2_state::dmac_mem_r));
 	m_dmac->out_memw_callback().set(FUNC(mm2_state::dmac_mem_w));
 	m_dmac->in_ior_callback<0>().set(FUNC(mm2_state::sasi_data_r));
@@ -432,7 +440,7 @@ void mm2_state::mm2(machine_config &config)
 	m_dmac->in_ior_callback<1>().set(m_fdc, FUNC(upd765_family_device::dma_r));
 	m_dmac->out_iow_callback<1>().set(m_fdc, FUNC(upd765_family_device::dma_w));
 
-	UPD765A(config, m_fdc, 16_MHz_XTAL/2, true, true);
+	UPD765A(config, m_fdc, XTAL(16'000'000)/2, true, true);
 	m_fdc->intrq_wr_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 	m_fdc->drq_wr_callback().set(m_dmac, FUNC(am9517a_device::dreq1_w));
 
@@ -474,9 +482,6 @@ ROM_START( mm2m35d )
 
 	ROM_REGION( 0x100, "timing", 0 )
 	ROM_LOAD( "739025b.ic8", 0x000, 0x100, CRC(c538b10a) SHA1(9810732a52ee6b8313d27462b27acc7e4d5badeb) )
-
-	ROM_REGION( 0x400, "keyboard", 0 )
-	ROM_LOAD( "keyboard", 0x000, 0x400, NO_DUMP )
 ROM_END
 
 COMP( 1983, mm2m35d,  0,     0,      mm2,   mm2,   mm2_state, empty_init, "Nokia Data", "MikroMikko 2 M35D", MACHINE_NOT_WORKING )

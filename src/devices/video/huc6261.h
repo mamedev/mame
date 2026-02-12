@@ -12,7 +12,10 @@
 #pragma once
 
 #include "video/huc6270.h"
+#include "video/huc6271.h"
 #include "video/huc6272.h"
+
+#include "screen.h"
 
 
 class huc6261_device :  public device_t,
@@ -24,50 +27,50 @@ public:
 	static constexpr unsigned LPF = 263;    // max number of lines in a single frame
 
 	// construction/destruction
-	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	template <typename T> void set_vdc1_tag(T &&tag) { m_huc6270_a.set_tag(std::forward<T>(tag)); }
-	template <typename T> void set_vdc2_tag(T &&tag) { m_huc6270_b.set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_vdc1_tag(T &&tag) { m_huc6270[0].set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_vdc2_tag(T &&tag) { m_huc6270[1].set_tag(std::forward<T>(tag)); }
+	template <typename T> void set_rainbow_tag(T &&tag) { m_huc6271.set_tag(std::forward<T>(tag)); }
 	template <typename T> void set_king_tag(T &&tag) { m_huc6272.set_tag(std::forward<T>(tag)); }
 
-	void video_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint16_t read(offs_t offset);
-	void write(offs_t offset, uint16_t data);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	u16 read(offs_t offset);
+	void write(offs_t offset, u16 data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(update_events);
 
 private:
-	required_device<huc6270_device> m_huc6270_a;
-	required_device<huc6270_device> m_huc6270_b;
+	required_device_array<huc6270_device, 2> m_huc6270;
+	required_device<huc6271_device> m_huc6271;
 	required_device<huc6272_device> m_huc6272;
-	int     m_last_h;
-	int     m_last_v;
-	int     m_height;
+	s32  m_last_h;
+	s32  m_last_v;
+	s32  m_height;
 
-	uint16_t  m_palette[512];
-	uint16_t  m_address;
-	uint16_t  m_palette_latch;
-	uint16_t  m_register;
-	uint16_t  m_control;
-	uint8_t   m_priority[7];
+	u16  m_palette[512];
+	u16  m_address;
+	u16  m_palette_latch;
+	u16  m_register;
+	u16  m_control;
+	u8   m_priority[7];
 
-	uint8_t   m_pixels_per_clock; /* Number of pixels to output per colour clock */
-	uint16_t  m_pixel_data_a;
-	uint16_t  m_pixel_data_b;
-	uint16_t  m_palette_offset[4];
-	uint8_t   m_pixel_clock;
+	u8   m_pixels_per_clock; // Number of pixels to output per colour clock
+	u16  m_pixel_data[7]; // for HuC6270 (BG/SPR layer per chips), KING (4 BG layers), RAINBOW
+	u16  m_palette_offset[4];
+	u8   m_pixel_clock;
 
 	emu_timer   *m_timer;
-	std::unique_ptr<bitmap_rgb32>  m_bmp;
-	int32_t   m_uv_lookup[65536][3];
+	bitmap_rgb32  m_bmp;
+	s32   m_uv_lookup[65536][3];
 
-	inline uint32_t yuv2rgb(uint32_t yuv);
-	inline void apply_pal_offs(uint16_t *pix_data);
+	u32 yuv2rgb(u32 yuv) const;
+	void apply_pal_offs(u16 &pix_data) const;
 };
 
 
