@@ -47,19 +47,6 @@ static constexpr double EXTERNAL_VOLUME = PULSE_VOLUME;
 #define ENABLE_EXTERNAL     1
 
 
-// pulse shaping parameters
-// can be enabled with configure_limit_pw(true)
-// examples:
-//    hat trick - skidding ice sounds too loud if minimum width is too big
-//    snake pit - melody during first level too soft if minimum width is too small
-//    snake pit - bonus counter at the end of level
-//    snacks'n jaxson - laugh at end of level is too soft if minimum width is too small
-
-#define LIMIT_WIDTH         1
-#define MINIMUM_WIDTH       0.2
-#define MAXIMUM_WIDTH       0.8
-
-
 /********************************************************************************
 
     From the datasheet:
@@ -140,7 +127,6 @@ cem3394_device::cem3394_device(const machine_config &mconfig, const char *tag, d
 	m_vco_zero_freq(500.0),
 	m_filter_zero_freq(1300.0),
 	m_hpf_k(0),
-	m_limit_pw(false),
 	m_values{-1}, // will be initialized in device_start()
 	m_wave_select(0),
 	m_volume(0),
@@ -178,12 +164,6 @@ cem3394_device &cem3394_device::configure(double r_vco, double c_vco, double c_v
 
 	LOGMASKED(LOG_CONFIG, "CEM3394 config - vco zero freq: %f, filter zero freq: %f, sample rate: %d\n",
 			  m_vco_zero_freq, m_filter_zero_freq, int(sample_rate));
-	return *this;
-}
-
-cem3394_device &cem3394_device::configure_limit_pw(bool limit_pw)
-{
-	m_limit_pw = limit_pw;
 	return *this;
 }
 
@@ -436,8 +416,6 @@ void cem3394_device::set_voltage_internal(int input, double voltage)
 			else
 			{
 				m_pulse_width = voltage * 0.5;
-				if (LIMIT_WIDTH && m_limit_pw)
-					m_pulse_width = MINIMUM_WIDTH + (MAXIMUM_WIDTH - MINIMUM_WIDTH) * m_pulse_width;
 				m_wave_select |= WAVE_PULSE;
 			}
 			LOGMASKED(LOG_CONTROL_CHANGES, "PULSE_WI=%6.3fV -> raw=%f adj=%f\n", voltage, voltage * 0.5, m_pulse_width);

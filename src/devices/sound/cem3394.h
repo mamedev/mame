@@ -37,8 +37,6 @@ public:
 	// c_ac: Pin 17 - AC-coupling capacitor on the VCF output.
 	cem3394_device &configure(double r_vco, double c_vco, double c_vcf, double c_ac) ATTR_COLD;
 
-	cem3394_device &configure_limit_pw(bool limit_pw) ATTR_COLD;
-
 protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -83,7 +81,6 @@ private:
 	double m_vco_zero_freq;           // frequency of VCO at 0.0V
 	double m_filter_zero_freq;        // frequency of filter at 0.0V
 	double m_hpf_k;                   // RC filter coefficient for AC coupling
-	bool m_limit_pw;                  // whether to clamp the pulse width.
 
 	// device state
 
