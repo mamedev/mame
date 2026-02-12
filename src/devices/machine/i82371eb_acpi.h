@@ -15,6 +15,8 @@ class i82371eb_acpi_device : public pci_device
 public:
 	i82371eb_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto apmc_en() { return m_apmc_en_w.bind(); }
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -33,6 +35,8 @@ private:
 	required_device<lpc_acpi_device> m_acpi;
 	required_device<smbus_device> m_smbus;
 
+	devcb_write_line m_apmc_en_w;
+
 	u8 pmregmisc_r();
 	void pmregmisc_w(u8 data);
 
@@ -41,6 +45,9 @@ private:
 
 	u32 pmba_r();
 	void pmba_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+
+	u32 devactb_r();
+	void devactb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	u32 devresa_r();
 	void devresa_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -52,6 +59,7 @@ private:
 	u32 m_pmba = 0;
 	u32 m_smbba = 0;
 	u8 m_smbus_host_config = 0;
+	u32 m_devactb = 0;
 	u32 m_devresa = 0;
 
 	u8 unmap_log_r(offs_t offset);

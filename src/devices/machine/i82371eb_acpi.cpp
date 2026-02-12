@@ -31,7 +31,7 @@ i82371eb_acpi_device::i82371eb_acpi_device(const machine_config &mconfig, const 
 	: pci_device(mconfig, I82371EB_ACPI, tag, owner, clock)
 	, m_acpi(*this, "acpi")
 	, m_smbus(*this, "smbus")
-
+	, m_apmc_en_w(*this)
 {
 	// 0x068000 - Bridge devices, other bridge device
 	// rev 0x02 for PIIX4E A-0, rev 0x03 for PIIX4M
@@ -51,6 +51,7 @@ void i82371eb_acpi_device::config_map(address_map &map)
 	map(0x10, 0xd7).rw(FUNC(i82371eb_acpi_device::unmap_log_r), FUNC(i82371eb_acpi_device::unmap_log_w));
 	// I/O space
 	map(0x40, 0x43).rw(FUNC(i82371eb_acpi_device::pmba_r), FUNC(i82371eb_acpi_device::pmba_w));
+	map(0x58, 0x5b).rw(FUNC(i82371eb_acpi_device::devactb_r), FUNC(i82371eb_acpi_device::devactb_w));
 	map(0x5c, 0x5f).rw(FUNC(i82371eb_acpi_device::devresa_r), FUNC(i82371eb_acpi_device::devresa_w));
 	map(0x80, 0x80).rw(FUNC(i82371eb_acpi_device::pmregmisc_r), FUNC(i82371eb_acpi_device::pmregmisc_w));
 	// SMBus space
@@ -94,6 +95,8 @@ void i82371eb_acpi_device::map_extra(uint64_t memory_window_start, uint64_t memo
 void i82371eb_acpi_device::device_start()
 {
 	pci_device::device_start();
+
+	intr_pin = 1;
 
 #if 0
 	memory_window_start = 0;
@@ -141,6 +144,21 @@ void i82371eb_acpi_device::pmba_w(offs_t offset, u32 data, u32 mem_mask)
 	m_pmba &= 0xffc0;
 	remap_cb();
 }
+
+u32 i82371eb_acpi_device::devactb_r()
+{
+	return m_devactb;
+}
+
+void i82371eb_acpi_device::devactb_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_devactb);
+	LOGIO("devactb w %08x\n", m_devactb);
+	if (ACCESSING_BITS_24_31)
+		m_apmc_en_w(BIT(data, 25));
+//  remap_cb();
+}
+
 
 u32 i82371eb_acpi_device::devresa_r()
 {

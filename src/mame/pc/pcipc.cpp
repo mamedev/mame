@@ -65,6 +65,7 @@ public:
 	void pcipctx(machine_config &config);
 	void pcinv3(machine_config &config);
 	void pciagp(machine_config &config);
+	void se440bx2(machine_config &config);
 
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
 
@@ -82,6 +83,7 @@ private:
 	virtual void machine_reset() override ATTR_COLD;
 
 	static void smc_superio_config(device_t *device);
+	static void smc707_superio_config(device_t *device);
 	static void winbond_superio_config(device_t *device);
 };
 
@@ -503,6 +505,7 @@ void pcipc_state::boot_state_award_w(uint8_t data)
 static void isa_internal_devices(device_slot_interface &device)
 {
 	device.option_add("fdc37c93x", FDC37C93X);
+	device.option_add("fdc37m707", FDC37M707);
 	device.option_add("w83977tf", W83977TF);
 }
 
@@ -526,6 +529,22 @@ void pcipc_state::smc_superio_config(device_t *device)
 	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
 	fdc.irq1().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371sb_isa_device::pc_irq8n_w));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
+
+void pcipc_state::smc707_superio_config(device_t *device)
+{
+	fdc37m707_device &fdc = *downcast<fdc37m707_device *>(device);
+	fdc.set_sysopt_pin(1);
+	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
+	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
 	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
 	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
@@ -703,13 +722,74 @@ void pcipc_state::pciagp(machine_config &config)
 	// FIXME: int mapping is unchecked for all slots
 	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "riva128");
 
-	PCI_SLOT(config, "pci:1", pci_cards, 9,  0, 1, 2, 3,  nullptr);
+	PCI_SLOT(config, "pci:1", pci_cards, 9,  0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 12, 3, 0, 1, 2, nullptr);
 
 	x86_softlists(config);
 }
+
+void pcipc_state::se440bx2(machine_config &config)
+{
+	// Slot 1
+	// P3 supported with later BIOS variants
+	pentium2_device &maincpu(PENTIUM2(config, "maincpu", 90'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &pcipc_state::pcipc_map);
+	maincpu.set_addrmap(AS_IO, &pcipc_state::pcipc_map_io);
+	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.smiact().set("pci:00.0", FUNC(i82443bx_host_device::smi_act_w));
+
+	PCI_ROOT(config, "pci", 0);
+	// Max 768MB
+	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
+	I82443BX_BRIDGE(config, "pci:01.0", 0 );
+
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
+	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
+	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+
+	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, "maincpu"));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
+
+	I82371EB_USB (config, "pci:07.2", 0);
+	I82371EB_ACPI(config, "pci:07.3", 0);
+//	i82371eb_acpi_device &acpi(I82371EB_ACPI(config, "pci:07.3", 0));
+//	acpi.apmc_en().set("pci:07.0", FUNC(i82371eb_isa_device::apmc_en_w));
+	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	SMBUS        (config, "pci:07.3:smbus", 0);
+
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37m707", true).set_option_machine_config("fdc37m707", smc707_superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::rxd1_w));
+	serport0.dcd_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::ndsr1_w));
+	serport0.ri_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::nri1_w));
+	serport0.cts_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::rxd2_w));
+	serport1.dcd_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::ndsr2_w));
+	serport1.ri_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::nri2_w));
+	serport1.cts_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::ncts2_w));
+
+	// FIXME: int mapping is unchecked for all slots
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "laguna3d");
+
+	// TODO: 0c is for YMF740 audio
+	PCI_SLOT(config, "pci:1", pci_cards, 13, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 14, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 15, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 16, 3, 0, 1, 2, nullptr);
+
+	x86_softlists(config);
+}
+
 
 ROM_START(pcipc)
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
@@ -725,6 +805,8 @@ ROM_START(pcipc)
 //  ROM_REGION(0x8000,"ibm_vga", 0)
 //  ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
+
+#define rom_pcipcs7    rom_pcipc
 
 ROM_START(pcipctx)
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
@@ -742,15 +824,19 @@ ROM_START(pciagp)
 	ROMX_LOAD( "p2xbl_award_451pg.bin", 0x00000, 0x040000, CRC(37d0030e) SHA1(c6773d0e02325116f95c497b9953f59a9ac81317), ROM_BIOS(0) )
 ROM_END
 
-#define rom_pcipcs7    rom_pcipc
+// same MB type as midqslvr.cpp
+ROM_START(se440bx2)
+	ROM_REGION32_LE(0x80000, "pci:07.0", ROMREGION_ERASEFF) /* PC bios */
+	ROM_SYSTEM_BIOS(0, "p02", "Micron OEM")
+	ROMX_LOAD( "440bx2.p02", 0x60000, 0x020000, CRC(4d654233) SHA1(9eca5c0c9c0beb93ebfe125e24e12ee07c502634), ROM_BIOS(0) )
+ROM_END
 
-static INPUT_PORTS_START(pcipc)
-INPUT_PORTS_END
 
 } // anonymous namespace
 
 
-COMP(1998, pcipc,    0,     0, pcipc,   pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND )
-COMP(1998, pcipcs7,  pcipc, 0, pcipcs7, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX, Socket 7 CPU)", MACHINE_NO_SOUND ) // alternative of above, for running already installed OSes at their nominal speed + fiddling with MMX
-COMP(1998, pcipctx,  0,     0, pcipctx, pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // unemulated super I/O
-COMP(1999, pciagp,   0,     0, pciagp,  pcipc, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // errors out with ISA state $05 (keyboard, blame 8042kbdc.cpp) bp e140c,1,{eax&=~1;g}) does stuff if bypassed but eventually PnP breaks OS booting
+COMP(1998, pcipc,    0,     0, pcipc,   0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND )
+COMP(1998, pcipcs7,  pcipc, 0, pcipcs7, 0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX, Socket 7 CPU)", MACHINE_NO_SOUND ) // alternative of above, for running already installed OSes at their nominal speed + fiddling with MMX
+COMP(1998, pcipctx,  0,     0, pcipctx, 0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // unemulated super I/O
+COMP(1999, pciagp,   0,     0, pciagp,  0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // eventually PnP breaks OS booting, AGP cards aren't good enough
+COMP(1998, se440bx2, 0,     0, se440bx2,0, pcipc_state, empty_init, "Intel",     "SE440BX-2 \"Seattle 2\"", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Initial rev '98. Black screen, never wake up video card after SMI.
