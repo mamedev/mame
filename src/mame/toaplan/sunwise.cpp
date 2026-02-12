@@ -57,7 +57,7 @@ public:
 	void othldrby(machine_config &config) ATTR_COLD;
 	void pwrkick(machine_config &config) ATTR_COLD;
 
-	void init_monchich() ATTR_COLD; 
+	void init_monchich() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -464,10 +464,10 @@ void sunwise_state::pwrkick_coin_lockout_w(u8 data)
 u8 sunwise_state::bypass_oki_state_r()
 {
 	// When you complete a level on monchich it first polls the VDP at 0x30000d waiting for a specific state.
-	// 
+	//
 	// It then checks 0x600001 (the OKI state) and loops the above unless it gets what it wants, which never
 	// happens, no sounds are playing at the time.
-	// 
+	//
 	// is this a problem with the OKI status (some megasys1 games have issues with it too) or the VDP?
 	return 0x00;
 }
@@ -483,7 +483,7 @@ void sunwise_state::common_mem(address_map &map)
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x600001, 0x600001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	
+
 	map(0x700000, 0x700001).r(m_vdp, FUNC(gp9001vdp_device::vdpcount_r));
 	map(0x700004, 0x700005).portr("DSWA");
 	map(0x700008, 0x700009).portr("DSWB");
