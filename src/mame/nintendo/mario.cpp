@@ -92,6 +92,9 @@ I/O ports
 write:
 00        Z80 DMA
 
+Video generation is like dkong/dkongjr. However, pixel clock is 24MHZ.
+7C -> 100 => 256 - 124 = 132 ==> 264 Scanlines
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -334,13 +337,13 @@ void mario_state::vblank_irq(int state)
 void mario_state::mario_base(machine_config &config)
 {
 	/* basic machine hardware */
-	Z80(config, m_maincpu, Z80_CLOCK); /* verified on pcb */
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2); /* verified on pcb */
 	m_maincpu->set_addrmap(AS_PROGRAM, &mario_state::mario_map);
 	m_maincpu->set_addrmap(AS_IO, &mario_state::mario_io_map);
 	m_maincpu->busack_cb().set(m_z80dma, FUNC(z80dma_device::bai_w));
 
 	/* devices */
-	Z80DMA(config, m_z80dma, Z80_CLOCK);
+	Z80DMA(config, m_z80dma, 8_MHz_XTAL / 2);
 	m_z80dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_z80dma->in_mreq_callback().set(FUNC(mario_state::memory_read_byte));
 	m_z80dma->out_mreq_callback().set(FUNC(mario_state::memory_write_byte));
@@ -359,7 +362,7 @@ void mario_state::mario_base(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(mario_state::screen_update));
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(mario_state::vblank_irq));
@@ -377,7 +380,7 @@ void mario_state::mario(machine_config &config)
 void mario_state::masao(machine_config &config)
 {
 	mario_base(config);
-	m_maincpu->set_clock(4000000); /* 4.000 MHz (?) */
+	m_maincpu->set_clock(4'000'000); // 4MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &mario_state::masao_map);
 
 	/* sound hardware */

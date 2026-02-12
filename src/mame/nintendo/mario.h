@@ -21,33 +21,6 @@
 #include "sound/discrete.h"
 #endif
 
-/*
- * From the schematics:
- *
- * Video generation like dkong/dkongjr. However, clock is 24MHZ
- * 7C -> 100 => 256 - 124 = 132 ==> 264 Scanlines
- */
-
-#define MASTER_CLOCK        XTAL(24'000'000)
-#define PIXEL_CLOCK         (MASTER_CLOCK / 4)
-#define CLOCK_1H            (MASTER_CLOCK / 8)
-#define CLOCK_16H           (CLOCK_1H / 16)
-#define CLOCK_1VF           ((CLOCK_16H) / 12 / 2)
-#define CLOCK_2VF           ((CLOCK_1VF) / 2)
-
-#define HTOTAL              (384)
-#define HBSTART             (256)
-#define HBEND               (0)
-#define VTOTAL              (264)
-#define VBSTART             (240)
-#define VBEND               (16)
-
-#define Z80_MASTER_CLOCK    XTAL(8'000'000)
-#define Z80_CLOCK           (Z80_MASTER_CLOCK / 2) /* verified on pcb */
-
-#define MCU_MASTER_CLOCK    XTAL(11'000'000) /* verified on pcb: 730Khz */
-#define MCU_CLOCK           (MCU_MASTER_CLOCK)
-
 class mario_state : public driver_device
 {
 public:

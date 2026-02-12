@@ -598,7 +598,7 @@ void mario_state::masao_sound_map(address_map &map)
 
 void mario_state::mario_audio(machine_config &config)
 {
-	m58715_device &audiocpu(M58715(config, m_audiocpu, MCU_CLOCK)); /* 730 kHz */
+	m58715_device &audiocpu(M58715(config, m_audiocpu, 11_MHz_XTAL));
 	audiocpu.set_addrmap(AS_PROGRAM, &mario_state::mario_sound_map);
 	audiocpu.set_addrmap(AS_IO, &mario_state::mario_sound_io_map);
 	audiocpu.p1_in_cb().set(FUNC(mario_state::mario_sh_p1_r));
@@ -633,14 +633,14 @@ void mario_state::mario_audio(machine_config &config)
 
 void mario_state::masao_audio(machine_config &config)
 {
-	Z80(config, m_audiocpu, 24576000/16);  /* ???? */
+	Z80(config, m_audiocpu, 14'318'181 / 8); // 1.79MHz?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &mario_state::masao_sound_map);
 
 	SPEAKER(config, "mono").front_center();
 
 	GENERIC_LATCH_8(config, m_soundlatch[0]);
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 14318000/6));
+	ay8910_device &aysnd(AY8910(config, "aysnd", 14'318'181 / 8)); // 1.79MHz?
 	aysnd.port_a_read_callback().set(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
