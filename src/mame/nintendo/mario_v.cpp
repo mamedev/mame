@@ -2,8 +2,6 @@
 // copyright-holders:Mirko Buffoni
 /***************************************************************************
 
-  video.c
-
   Functions to emulate the video hardware of the machine.
 
 ***************************************************************************/
@@ -64,18 +62,24 @@ static const res_net_info mario_net_info_std =
   bit 0 -- 470 ohm resistor -- inverter  -- BLUE
 
 ***************************************************************************/
-void mario_state::mario_palette(palette_device &palette) const
+
+void mario_state::set_palette(int monitor)
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
 
 	std::vector<rgb_t> rgb;
-	if (m_monitor == 0)
+	if (monitor == 0)
 		compute_res_net_all(rgb, color_prom, mario_decode_info, mario_net_info);
 	else
 		compute_res_net_all(rgb, color_prom + 256, mario_decode_info, mario_net_info_std);
 
-	palette.set_pen_colors(0, rgb);
-	palette.palette()->normalize_range(0, 255);
+	m_palette->set_pen_colors(0, rgb);
+	m_palette->palette()->normalize_range(0, 255);
+}
+
+void mario_state::mario_palette(palette_device &palette)
+{
+	set_palette(0);
 }
 
 void mario_state::mario_videoram_w(offs_t offset, uint8_t data)
@@ -98,17 +102,7 @@ void mario_state::palette_bank_w(int state)
 
 void mario_state::mario_scroll_w(uint8_t data)
 {
-	m_gfx_scroll = data + 17;
-}
-
-void mario_state::flip_w(int state)
-{
-	m_flip = state;
-	if (m_flip)
-		machine().tilemap().set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
-	else
-		machine().tilemap().set_flip_all(0);
-	machine().tilemap().mark_all_dirty();
+	m_bg_tilemap->set_scrolly(0, data + 17);
 }
 
 TILE_GET_INFO_MEMBER(mario_state::get_bg_tile_info)
@@ -126,14 +120,8 @@ void mario_state::video_start()
 
 	m_gfxdecode->gfx(0)->set_granularity(8);
 
-	m_gfx_bank = 0;
-	m_palette_bank = 0;
-	m_gfx_scroll = 0;
-	m_flip = 0;
 	save_item(NAME(m_gfx_bank));
 	save_item(NAME(m_palette_bank));
-	save_item(NAME(m_gfx_scroll));
-	save_item(NAME(m_flip));
 }
 
 /*
@@ -146,38 +134,29 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	/* TODO: draw_sprites should adopt the scanline logic from dkong.c
 	 * The schematics have the same logic for sprite buffering.
 	 */
-	int offs;
 
-	int start, end, inc;
+	const bool flip = flip_screen();
+	int offs = 0;
 
-	start = 0;
-	end = m_spriteram.bytes();
-	inc = 4;
-
-	offs = start;
-
-	while (offs != end)
+	while (offs != m_spriteram.bytes())
 	{
 		if (m_spriteram[offs])
 		{
-			int x, y;
-			int code, color, flipx, flipy;
-
 			// from schematics ....
-			y = (m_spriteram[offs + 0] + (m_flip ? 0xF7 : 0xF9) + 1) & 0xFF;
-			x = m_spriteram[offs + 3];
+			int y = (m_spriteram[offs + 0] + (flip ? 0xf7 : 0xf9) + 1) & 0xff;
+			int x = m_spriteram[offs + 3];
 			// sprite will be drawn if (y + scanline) & 0xF0 = 0xF0
 			y = 240 - y; /* logical screen position */
 
-			y = y ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
-			x = x ^ (m_flip ? 0xFF : 0x00); /* physical screen location */
+			y = y ^ (flip ? 0xff : 0x00); /* physical screen location */
+			x = x ^ (flip ? 0xff : 0x00); /* physical screen location */
 
-			code = m_spriteram[offs + 2];
-			color = (m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank;
-			flipx = (m_spriteram[offs + 1] & 0x80);
-			flipy = (m_spriteram[offs + 1] & 0x40);
+			int code = m_spriteram[offs + 2];
+			int color = (m_spriteram[offs + 1] & 0x0f) + 16 * m_palette_bank;
+			int flipx = (m_spriteram[offs + 1] & 0x80);
+			int flipy = (m_spriteram[offs + 1] & 0x40);
 
-			if (m_flip)
+			if (flip)
 			{
 				y -= 14;
 				x -= 7;
@@ -188,7 +167,7 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 				x -= 8;
 			}
 
-			if (m_flip)
+			if (flip)
 			{
 				m_gfxdecode->gfx(1)->transpen(bitmap, cliprect,
 					code,
@@ -206,22 +185,13 @@ void mario_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			}
 		}
 
-		offs += inc;
+		offs += 4;
 	}
 }
 
 uint32_t mario_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int const t = ioport("MONITOR")->read();
-	if (t != m_monitor)
-	{
-		m_monitor = t;
-		mario_palette(*m_palette);
-	}
-
-	m_bg_tilemap->set_scrolly(0, m_gfx_scroll);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
 	draw_sprites(bitmap, cliprect);
 
 	return 0;

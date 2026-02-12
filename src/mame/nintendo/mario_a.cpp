@@ -19,13 +19,13 @@
 
 #define ACTIVEHIGH_PORT_BIT(P,A,D) ((P & (~(1 << A))) | (D << A))
 
-#define MCU_T_R(N) ((m_soundlatch2->read() >> (N)) & 1)
-#define MCU_T_W_AH(N,D) do { m_portT = ACTIVEHIGH_PORT_BIT(m_portT,N,D); m_soundlatch2->write(m_portT); } while (0)
+#define MCU_T_R(N) ((m_soundlatch[1]->read() >> (N)) & 1)
+#define MCU_T_W_AH(N,D) do { m_portT = ACTIVEHIGH_PORT_BIT(m_portT,N,D); m_soundlatch[1]->write(m_portT); } while (0)
 
-#define MCU_P1_R() (m_soundlatch3->read())
-#define MCU_P2_R() (m_soundlatch4->read())
-#define MCU_P1_W(D) m_soundlatch3->write(D)
-#define MCU_P2_W(D) do { set_ea(((D) & 0x20) ? 0 : 1); m_soundlatch4->write(D); } while (0)
+#define MCU_P1_R() (m_soundlatch[2]->read())
+#define MCU_P2_R() (m_soundlatch[3]->read())
+#define MCU_P1_W(D) m_soundlatch[2]->write(D)
+#define MCU_P2_W(D) do { set_ea(((D) & 0x20) ? 0 : 1); m_soundlatch[3]->write(D); } while (0)
 
 #define MCU_P1_W_AH(B,D) MCU_P1_W(ACTIVEHIGH_PORT_BIT(MCU_P1_R(),B,(D)))
 
@@ -419,10 +419,10 @@ void mario_state::sound_start()
 
 void mario_state::sound_reset()
 {
-	m_soundlatch->clear_w();
-	if (m_soundlatch2) m_soundlatch2->clear_w();
-	if (m_soundlatch3) m_soundlatch3->clear_w();
-	if (m_soundlatch4) m_soundlatch4->clear_w();
+	m_soundlatch[0]->clear_w();
+	if (m_soundlatch[1]) m_soundlatch[1]->clear_w();
+	if (m_soundlatch[2]) m_soundlatch[2]->clear_w();
+	if (m_soundlatch[3]) m_soundlatch[3]->clear_w();
 
 	m_last = 0;
 }
@@ -458,7 +458,7 @@ uint8_t mario_state::mario_sh_tune_r(offs_t offset)
 	uint8_t p2 = MCU_P2_R();
 
 	if ((p2 >> 7) & 1)
-		return m_soundlatch->read();
+		return m_soundlatch[0]->read();
 	else
 		return m_soundrom[(p2 & 0x0f) << 8 | offset];
 }
@@ -490,18 +490,18 @@ void mario_state::mario_sh_p2_w(uint8_t data)
 
 void mario_state::masao_sh_irqtrigger_w(uint8_t data)
 {
-	if (m_last == 1 && data == 0)
-	{
-		/* setting bit 0 high then low triggers IRQ on the sound CPU */
-		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
-	}
+	data &= 1;
+
+	// setting bit 0 high then low triggers IRQ on the sound CPU
+	if (m_last && !data)
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 
 	m_last = data;
 }
 
 void mario_state::mario_sh_tuneselect_w(uint8_t data)
 {
-	m_soundlatch->write(data);
+	m_soundlatch[0]->write(data);
 }
 
 /* Sound 0 and 1 are pulsed !*/
@@ -610,10 +610,8 @@ void mario_state::mario_audio(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
-	GENERIC_LATCH_8(config, m_soundlatch2);
-	GENERIC_LATCH_8(config, m_soundlatch3);
-	GENERIC_LATCH_8(config, m_soundlatch4);
+	for (int i = 0; i < 4; i++)
+		GENERIC_LATCH_8(config, m_soundlatch[i]);
 
 #if OLD_SOUND
 	DISCRETE(config, m_discrete);
@@ -640,9 +638,9 @@ void mario_state::masao_audio(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	GENERIC_LATCH_8(config, m_soundlatch);
+	GENERIC_LATCH_8(config, m_soundlatch[0]);
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 14318000/6));
-	aysnd.port_a_read_callback().set(m_soundlatch, FUNC(generic_latch_8_device::read));
+	aysnd.port_a_read_callback().set(m_soundlatch[0], FUNC(generic_latch_8_device::read));
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 }

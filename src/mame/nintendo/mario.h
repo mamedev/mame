@@ -59,10 +59,7 @@ public:
 		m_palette(*this, "palette"),
 		m_z80dma(*this, "z80dma"),
 		m_soundrom(*this, "soundrom"),
-		m_soundlatch(*this, "soundlatch"),
-		m_soundlatch2(*this, "soundlatch2"),
-		m_soundlatch3(*this, "soundlatch3"),
-		m_soundlatch4(*this, "soundlatch4"),
+		m_soundlatch(*this, "soundlatch%u", 0),
 #if OLD_SOUND
 		m_discrete(*this, "discrete"),
 #else
@@ -81,6 +78,13 @@ public:
 	void mario(machine_config &config);
 	void mario_audio(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(adjust_palette) { set_palette(newval); }
+
+protected:
+	virtual void video_start() override ATTR_COLD;
+	virtual void sound_start() override ATTR_COLD;
+	virtual void sound_reset() override ATTR_COLD;
+
 private:
 	/* devices */
 	required_device<z80_device> m_maincpu;
@@ -89,10 +93,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<z80dma_device> m_z80dma;
 	optional_region_ptr<uint8_t> m_soundrom;
-	optional_device<generic_latch_8_device> m_soundlatch;
-	optional_device<generic_latch_8_device> m_soundlatch2;
-	optional_device<generic_latch_8_device> m_soundlatch3;
-	optional_device<generic_latch_8_device> m_soundlatch4;
+	optional_device_array<generic_latch_8_device, 4> m_soundlatch;
 #if OLD_SOUND
 	optional_device<discrete_sound_device> m_discrete;
 #else
@@ -113,10 +114,7 @@ private:
 	/* video state */
 	uint8_t m_gfx_bank = 0;
 	uint8_t m_palette_bank = 0;
-	uint16_t m_gfx_scroll = 0;
-	uint8_t m_flip = 0;
 	tilemap_t *m_bg_tilemap = nullptr;
-	int m_monitor = 0;
 
 	bool m_nmi_mask = false;
 	void nmi_mask_w(int state);
@@ -126,7 +124,6 @@ private:
 	void gfx_bank_w(int state);
 	void palette_bank_w(int state);
 	void mario_scroll_w(uint8_t data);
-	void flip_w(int state);
 	uint8_t mario_sh_p1_r();
 	uint8_t mario_sh_p2_r();
 	int mario_sh_t0_r();
@@ -138,10 +135,8 @@ private:
 	void mario_sh_tuneselect_w(uint8_t data);
 	void mario_sh3_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	virtual void video_start() override ATTR_COLD;
-	virtual void sound_start() override;
-	virtual void sound_reset() override;
-	void mario_palette(palette_device &palette) const;
+	void set_palette(int monitor);
+	void mario_palette(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void mario_sh_sound_w(uint8_t data);

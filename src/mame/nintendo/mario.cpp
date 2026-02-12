@@ -13,7 +13,7 @@ F->G: 2 bytes difference (at $30A4 and $30E9).
 
 G->E: Adds patches to $F710 area (jumps to there from $31DA and $324C), and
 an additional 2 bytes different. A Nintendo service bulletin mentions they
-updated the program due to coin detection problems, where they shortened the
+updated the program due to coin detection problems, the update shortens the
 required duration the coin switch needs to be active. And indeed, if you try
 PORT_IMPULSE(1), it works fine on revision E, but not on the other revisions.
 
@@ -172,7 +172,7 @@ void mario_state::masao_map(address_map &map)
 	map(0x7c00, 0x7c00).portr("IN0");
 	map(0x7c80, 0x7c80).portr("IN1");
 	map(0x7d00, 0x7d00).w(FUNC(mario_state::mario_scroll_w));
-	map(0x7e00, 0x7e00).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0x7e00, 0x7e00).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0x7e80, 0x7e87).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x7f00, 0x7f00).w(FUNC(mario_state::masao_sh_irqtrigger_w));
 	map(0x7f80, 0x7f80).portr("DSW");    /* DSW */
@@ -236,7 +236,7 @@ static INPUT_PORTS_START( mario )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Hardest ) )
 
 	PORT_START("MONITOR")
-	PORT_CONFNAME( 0x01, 0x00, "Monitor" )
+	PORT_CONFNAME( 0x01, 0x00, "Monitor" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mario_state::adjust_palette), 0)
 	PORT_CONFSETTING(    0x00, "Nintendo" )
 	PORT_CONFSETTING(    0x01, "Std 15.72Khz" )
 INPUT_PORTS_END
@@ -348,7 +348,7 @@ void mario_state::mario_base(machine_config &config)
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2L (7E80H)
 	mainlatch.q_out_cb<0>().set(FUNC(mario_state::gfx_bank_w));         // ~T ROM
 	mainlatch.q_out_cb<1>().set_nop();                                  // 2 PSL
-	mainlatch.q_out_cb<2>().set(FUNC(mario_state::flip_w));             // FLIP
+	mainlatch.q_out_cb<2>().set(FUNC(mario_state::flip_screen_set));    // FLIP
 	mainlatch.q_out_cb<3>().set(FUNC(mario_state::palette_bank_w));     // CREF 0
 	mainlatch.q_out_cb<4>().set(FUNC(mario_state::nmi_mask_w));         // NMI EI
 	mainlatch.q_out_cb<5>().set("z80dma", FUNC(z80dma_device::rdy_w));  // DMA SET
