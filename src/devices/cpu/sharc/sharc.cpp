@@ -10,6 +10,7 @@
 
 #include "sharcdsm.h"
 #include "sharcfe.h"
+#include "sharcinternal.ipp"
 
 #include "emuopts.h"
 
@@ -148,6 +149,8 @@ adsp21062_device::adsp21062_device(
 	, m_pop_loop(nullptr)
 	, m_push_status(nullptr)
 	, m_pop_status(nullptr)
+	, m_loop_check(nullptr)
+	, m_call_loop_check(nullptr)
 	, m_swap_dag1_0_3(nullptr)
 	, m_swap_dag1_4_7(nullptr)
 	, m_swap_dag2_0_3(nullptr)
@@ -400,7 +403,6 @@ void adsp21062_device::iop_w(offs_t offset, uint32_t data)
 }
 
 
-#include "sharcmem.hxx"
 #include "sharcdma.hxx"
 #include "sharcops.hxx"
 
@@ -535,7 +537,7 @@ void adsp21062_device::device_start()
 			snprintf(buf, std::size(buf), "r%d", i);
 			m_drcuml->symbol_add(&m_core->r[i], sizeof(m_core->r[i]), buf);
 
-			SHARC_DAG &dag((i < 8) ? m_core->dag1 : m_core->dag2);
+			auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
 			snprintf(buf, std::size(buf), "dag_i%d", i);
 			m_drcuml->symbol_add(&dag.i[i & 7], sizeof(dag.i[i & 7]), buf);
 			snprintf(buf, std::size(buf), "dag_m%d", i);
@@ -923,7 +925,7 @@ void adsp21062_device::device_reset()
 	for (auto &block : m_blocks)
 		std::fill(std::begin(block), std::end(block), 0);
 
-	switch(m_boot_mode)
+	switch (m_boot_mode)
 	{
 		case BOOT_MODE_EPROM:
 		{
@@ -976,7 +978,10 @@ void adsp21062_device::device_reset()
 	m_core->iop_data = 0;
 
 	if (m_enable_drc)
-		m_drcfe->flush();
+	{
+		m_core->cache_dirty = 1;
+		m_drcuml->reset();
+	}
 }
 
 void adsp21062_device::device_pre_save()
@@ -985,62 +990,19 @@ void adsp21062_device::device_pre_save()
 
 	if (m_enable_drc)
 	{
-		auto const pack_astat =
-				[] (ASTAT_DRC const &in) -> uint32_t
-				{
-					return
-							((in.az << AZ_SHIFT) & AZ) |
-							((in.av << AV_SHIFT) & AV) |
-							((in.an << AN_SHIFT) & AN) |
-							((in.ac << AC_SHIFT) & AC) |
-							((in.as << AS_SHIFT) & AS) |
-							((in.ai << AI_SHIFT) & AI) |
-							((in.mn << MN_SHIFT) & MN) |
-							((in.mv << MV_SHIFT) & MV) |
-							((in.mu << MU_SHIFT) & MU) |
-							((in.mi << MI_SHIFT) & MI) |
-							((in.sv << SV_SHIFT) & SV) |
-							((in.sz << SZ_SHIFT) & SZ) |
-							((in.ss << SS_SHIFT) & SS) |
-							((in.btf << BTF_SHIFT) & BTF) |
-							((in.af << AF_SHIFT) & AF) |
-							((in.cacc << 24) & 0xff00'0000);
-				};
-
-		m_core->astat = pack_astat(m_core->astat_drc);
-		m_core->astat_old = pack_astat(m_core->astat_drc_copy);
-		m_core->astat_old_old = pack_astat(m_core->astat_delay_copy);
+		m_core->astat = m_core->astat_drc.pack();
+		m_core->astat_old = m_core->astat_drc_copy.pack();
+		m_core->astat_old_old = m_core->astat_delay_copy.pack();
 	}
 }
 
 void adsp21062_device::device_post_load()
 {
-	auto const unpack_astat =
-			[] (ASTAT_DRC &out, uint32_t in)
-			{
-				out.az = BIT(in, AZ_SHIFT);
-				out.av = BIT(in, AV_SHIFT);
-				out.an = BIT(in, AN_SHIFT);
-				out.ac = BIT(in, AC_SHIFT);
-				out.as = BIT(in, AS_SHIFT);
-				out.ai = BIT(in, AI_SHIFT);
-				out.mn = BIT(in, MN_SHIFT);
-				out.mv = BIT(in, MV_SHIFT);
-				out.mu = BIT(in, MU_SHIFT);
-				out.mi = BIT(in, MI_SHIFT);
-				out.sv = BIT(in, SV_SHIFT);
-				out.sz = BIT(in, SZ_SHIFT);
-				out.ss = BIT(in, SS_SHIFT);
-				out.btf = BIT(in, BTF_SHIFT);
-				out.af = BIT(in, AF_SHIFT);
-				out.cacc = BIT(in, 24, 8);
-			};
-
 	cpu_device::device_post_load();
 
-	unpack_astat(m_core->astat_drc, m_core->astat);
-	unpack_astat(m_core->astat_drc_copy, m_core->astat_old);
-	unpack_astat(m_core->astat_delay_copy, m_core->astat_old_old);
+	m_core->astat_drc.unpack(m_core->astat);
+	m_core->astat_drc_copy.unpack(m_core->astat_old);
+	m_core->astat_delay_copy.unpack(m_core->astat_old_old);
 }
 
 

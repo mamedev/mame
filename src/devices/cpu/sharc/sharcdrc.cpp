@@ -9,10 +9,14 @@
 
 #include "emu.h"
 #include "sharc.h"
+
 #include "sharcfe.h"
+#include "sharcinternal.ipp"
+
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
+
 
 #define USE_FAST_APPROX 0
 #define USE_SWAPDQ  0
@@ -90,18 +94,28 @@
 #define AF_CALC_REQUIRED                ((desc->regreq[0] & 0x40000000) || desc->flags & OPFLAG_IN_DELAY_SLOT)
 
 
-#define IRAM_BLOCK0_START               0x20000
-#define IRAM_BLOCK0_END                 0x27fff
-#define IRAM_BLOCK1_START               0x28000
-#define IRAM_BLOCK1_END                 0x3ffff
-#define IRAM_SHORT_BLOCK0_START         0x40000
-#define IRAM_SHORT_BLOCK0_END           0x4ffff
-#define IRAM_SHORT_BLOCK1_START         0x50000
-#define IRAM_SHORT_BLOCK1_END           0x7ffff
-#define IOP_REGISTER_START              0x00000
-#define IOP_REGISTER_END                0x000ff
-#define IRAM_END                        0x7ffff
+namespace {
 
+// must stay in sync with field order in ASTAT_DRC
+const uint32_t loop_cond_map[16] = {
+		0,     // EQ
+		~0U,   // (LT)
+		~0U,   // (LE)
+		3,     // AC
+		1,     // AV
+		7,     // MV
+		6,     // MS
+		10,    // SV
+		11,    // SZ
+		~0U,   // (FLAG0_IN)
+		~0U,   // (FLAG1_IN)
+		~0U,   // (FLAG2_IN)
+		~0U,   // (FLAG3_IN)
+		13,    // TF
+		~0U,   // (BM)
+		~0U }; // (LCE)
+
+} // anonymous namespace
 
 inline void adsp21062_device::alloc_handle(uml::code_handle *&handleptr, const char *name)
 {
@@ -112,55 +126,55 @@ inline void adsp21062_device::alloc_handle(uml::code_handle *&handleptr, const c
 
 
 
-static void cfunc_unimplemented(void *param)
+void adsp21062_device::cfunc_unimplemented(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
 	sharc->sharc_cfunc_unimplemented();
 }
 
-static void cfunc_pcstack_overflow(void *param)
+void adsp21062_device::cfunc_pcstack_overflow(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
 	sharc->sharc_cfunc_pcstack_overflow();
 }
 
-static void cfunc_pcstack_underflow(void *param)
+void adsp21062_device::cfunc_pcstack_underflow(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
 	sharc->sharc_cfunc_pcstack_underflow();
 }
 
-static void cfunc_loopstack_overflow(void *param)
+void adsp21062_device::cfunc_loopstack_overflow(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
 	sharc->sharc_cfunc_loopstack_overflow();
 }
 
-static void cfunc_loopstack_underflow(void *param)
+void adsp21062_device::cfunc_loopstack_underflow(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
 	sharc->sharc_cfunc_loopstack_underflow();
 }
 
-static void cfunc_statusstack_overflow(void *param)
+void adsp21062_device::cfunc_statusstack_overflow(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
 	sharc->sharc_cfunc_statusstack_overflow();
 }
 
-static void cfunc_statusstack_underflow(void *param)
+void adsp21062_device::cfunc_statusstack_underflow(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
 	sharc->sharc_cfunc_statusstack_underflow();
 }
 
-static void cfunc_unimplemented_compute(void *param)
+void adsp21062_device::cfunc_unimplemented_compute(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
 	sharc->sharc_cfunc_unimplemented_compute();
 }
 
-static void cfunc_unimplemented_shiftimm(void *param)
+void adsp21062_device::cfunc_unimplemented_shiftimm(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
 	sharc->sharc_cfunc_unimplemented_shiftimm();
@@ -646,6 +660,177 @@ void adsp21062_device::static_generate_pop_status()
 }
 
 
+void adsp21062_device::static_generate_loop_check()
+{
+	alloc_handle(m_loop_check, "loop_check");
+
+	drcuml_block &block(m_drcuml->begin_invariant_block(1024));
+
+	UML_HANDLE(block, *m_loop_check);
+
+	static_generate_loop_check_body(block, false);
+
+	block.end();
+}
+
+
+void adsp21062_device::static_generate_call_loop_check()
+{
+	alloc_handle(m_call_loop_check, "call_loop_check");
+
+	drcuml_block &block(m_drcuml->begin_invariant_block(1024));
+
+	UML_HANDLE(block, *m_call_loop_check);
+
+	static_generate_loop_check_body(block, true);
+
+	block.end();
+}
+
+void adsp21062_device::static_generate_loop_check_body(drcuml_block &block, bool is_call)
+{
+	// I0 = pc/cycles
+	// Trashes I1,I2
+
+	uml::code_label label = 1;
+	uml::code_label const astat_flag = label++;
+	uml::code_label const lt_ge = label++;
+	uml::code_label const le_gt = label++;
+	uml::code_label const flag_in = label++;
+	uml::code_label const bm = label++;
+	uml::code_label const lce = label++;
+	uml::code_label const counter = label++;
+	uml::code_label const loop = label++;
+	uml::code_label const terminate = label++;
+
+	// check that the loop stack isn't empty and this is the end of the loop
+	UML_TEST(block, STKY, 0x4000000);
+	UML_RETc(block, COND_NZ);
+	UML_LOAD(block, I1, m_core->lastack, LSTKP, SIZE_DWORD, SCALE_x4);
+	UML_AND(block, I2, I1, 0xffffff);
+	UML_CMP(block, I0, I2);
+	UML_RETc(block, COND_NE);
+
+	// check for counter loop first
+	UML_TEST(block, I1, 0xc0000000);
+	UML_JMPc(block, COND_NZ, counter);
+
+	// check condition
+	UML_BFXU(block, I2, I1, 24, 4);
+	UML_CMP(block, I2, 0x01); // LT/GE
+	UML_JMPc(block, COND_E, lt_ge);
+	UML_CMP(block, I2, 0x02); // LE/GT
+	UML_JMPc(block, COND_E, le_gt);
+	UML_CMP(block, I2, 0x08); // ASTAT flags
+	UML_JMPc(block, COND_BE, astat_flag);
+	UML_CMP(block, I2, 0x0c); // flag inputs
+	UML_JMPc(block, COND_BE, flag_in);
+	UML_CMP(block, I2, 0x0e); // BM/NBM
+	UML_JMPc(block, COND_E, bm);
+	UML_CMP(block, I2, 0x0f); // LCE/FOREVER
+	UML_JMPc(block, COND_E, lce);
+	// TF falls through
+
+	// ASTAT flag tests
+	UML_LABEL(block, astat_flag);
+	UML_LOAD(block, I2, loop_cond_map, I2, SIZE_DWORD, SCALE_x4);
+	UML_BFXU(block, I1, I1, 28, 1);
+	UML_LOAD(block, I2, &m_core->astat_delay_copy, I2, SIZE_DWORD, SCALE_x4);
+	UML_XOR(block, I2, I2, I1);
+	UML_JMPc(block, COND_NZ, terminate);
+	UML_JMP(block, loop);
+
+	// LT and GE
+	// TODO: should do different things depending on AF
+	UML_LABEL(block, lt_ge);
+	UML_XOR(block, I2, mem(&m_core->astat_delay_copy.az), 1);
+	UML_AND(block, I2, I2, mem(&m_core->astat_delay_copy.an));
+	UML_BFXU(block, I1, I1, 28, 1);
+	UML_XOR(block, I2, I2, I1);
+	UML_JMPc(block, COND_NZ, terminate);
+	UML_JMP(block, loop);
+
+	// LE and GT
+	// TODO: should do different things depending on AF
+	UML_LABEL(block, le_gt);
+	UML_OR(block, I2, mem(&m_core->astat_delay_copy.az), mem(&m_core->astat_delay_copy.an));
+	UML_BFXU(block, I1, I1, 28, 1);
+	UML_XOR(block, I2, I2, I1);
+	UML_JMPc(block, COND_NZ, terminate);
+	UML_JMP(block, loop);
+
+	// flag input tests
+	UML_LABEL(block, flag_in);
+	UML_SUB(block, I2, I2, 0x09);
+	UML_LOAD(block, I2, m_core->flag, I2, SIZE_DWORD, SCALE_x4);
+	UML_BFXU(block, I1, I1, 28, 1);
+	UML_XOR(block, I2, I2, I1);
+	UML_JMPc(block, COND_NZ, terminate);
+	UML_JMP(block, loop);
+
+	// bus master (not implemented)
+	UML_LABEL(block, bm);
+	UML_TEST(block, I1, 0x10000000);
+	UML_JMPc(block, COND_NZ, terminate);
+	UML_JMP(block, loop);
+
+	// LCE and FOREVER
+	UML_LABEL(block, lce);
+	UML_TEST(block, I1, 0x10000000);
+	UML_JMPc(block, COND_NZ, loop);
+	UML_CMP(block, CURLCNTR, 1);
+	UML_JMPc(block, COND_E, terminate);
+	UML_JMP(block, loop);
+
+	// counter-based loop
+	UML_LABEL(block, counter);
+	UML_LOAD(block, I1, m_core->lcstack, LSTKP, SIZE_DWORD, SCALE_x4);
+	UML_SUB(block, I1, I1, 1);
+	UML_STORE(block, m_core->lcstack, LSTKP, I1, SIZE_DWORD, SCALE_x4);
+	UML_SUB(block, CURLCNTR, CURLCNTR, 1);
+	UML_JMPc(block, COND_Z, terminate);
+
+	// update cycles and hash jump
+	UML_LABEL(block, loop);
+	UML_LOAD(block, I2, m_core->pcstack, PCSTKP, SIZE_DWORD, SCALE_x4);
+	if (is_call)
+	{
+		UML_MOV(block, mem(&m_core->temp_return), I2);
+		UML_RET(block);
+	}
+	else
+	{
+		UML_DSHR(block, I1, I0, 32);
+
+		uml::code_label const no_int = label++;
+		UML_CMP(block, mem(&m_core->irq_pending), 0);
+		UML_JMPc(block, COND_E, no_int);
+		UML_CMP(block, mem(&m_core->interrupt_active), 0);
+		UML_JMPc(block, COND_NE, no_int);
+		UML_TEST(block, mem(&m_core->irq_pending), IMASK);
+		UML_JMPc(block, COND_Z, no_int);
+		UML_TEST(block, mem(&m_core->mode1), MODE1_IRPTEN);
+		UML_JMPc(block, COND_Z, no_int);
+		UML_CALLH(block, *m_exception[EXCEPTION_INTERRUPT]);
+		UML_LABEL(block, no_int);
+
+		UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I1);
+		UML_EXHc(block, COND_S, *m_out_of_cycles, I2);
+		UML_HASHJMP(block, 0, I2, *m_nocode);
+	}
+
+	// terminate the loop - pop the pc and loop stacks
+	UML_LABEL(block, terminate);
+	UML_CALLH(block, *m_pop_pc);
+	UML_CALLH(block, *m_pop_loop);
+	if (is_call)
+	{
+		UML_ADD(block, mem(&m_core->temp_return), I0, 1);
+	}
+	UML_RET(block);
+}
+
+
 void adsp21062_device::static_generate_exception(uint8_t exception, const char *name)
 {
 	uml::code_handle *&exception_handle = m_exception[exception];
@@ -873,9 +1058,7 @@ void adsp21062_device::execute_run_drc()
 	if (m_core->cache_dirty)
 	{
 		//printf("SHARC cache reset\n");
-		m_core->m_max_sram_pc[0] = m_core->m_max_sram_pc[1] = 0;
-		m_drcuml->reset();
-		m_core->cache_dirty = 0;
+		flush_drc_cache();
 	}
 
 	// execute
@@ -895,8 +1078,7 @@ void adsp21062_device::execute_run_drc()
 		}
 		else if (execute_result == EXECUTE_RESET_CACHE)
 		{
-			m_core->m_max_sram_pc[0] = m_core->m_max_sram_pc[1] = 0;
-			m_drcuml->reset();
+			flush_drc_cache();
 			if (m_core->icount <= 0)
 				execute_result = EXECUTE_OUT_OF_CYCLES;
 		}
@@ -904,6 +1086,14 @@ void adsp21062_device::execute_run_drc()
 	while (execute_result != EXECUTE_OUT_OF_CYCLES);
 }
 
+
+void adsp21062_device::flush_drc_cache()
+{
+	m_core->m_max_sram_pc[0] = m_core->m_max_sram_pc[1] = 0;
+	//m_drcfe->flush(); not safe to do this as you can get a cache flush in the middle of a loop
+	m_drcuml->reset();
+	m_core->cache_dirty = 0;
+}
 
 void adsp21062_device::compile_block(offs_t pc)
 {
@@ -986,8 +1176,7 @@ void adsp21062_device::compile_block(offs_t pc)
 		}
 		catch (drcuml_block::abort_compilation &)
 		{
-			m_core->m_max_sram_pc[0] = m_core->m_max_sram_pc[1] = 0;
-			m_drcuml->reset();
+			flush_drc_cache();
 		}
 	}
 }
@@ -1010,6 +1199,8 @@ void adsp21062_device::generate_invariant()
 		static_generate_pop_loop();
 		static_generate_push_status();
 		static_generate_pop_status();
+		static_generate_loop_check();
+		static_generate_call_loop_check();
 		static_generate_mode1_ops();
 
 		// generate exception handlers
@@ -1145,55 +1336,10 @@ void adsp21062_device::generate_sequence_instruction(drcuml_block &block, compil
 	}
 
 	// handle a special case where call is used as the last operation in a loop
-	if (desc->userflags & OP_USERFLAG_CALL && desc->userflags & (OP_USERFLAG_COND_LOOP | OP_USERFLAG_COUNTER_LOOP))
+	if ((desc->userflags & OP_USERFLAG_CALL) && (desc->userflags & OP_USERFLAG_LOOP))
 	{
-		if (desc->userflags & OP_USERFLAG_COUNTER_LOOP)
-		{
-			uml::code_label const label_expire = compiler.labelnum++;
-			uml::code_label const end = compiler.labelnum++;
-
-			UML_LOAD(block, I0, m_core->lastack, LSTKP, SIZE_DWORD, SCALE_x4);
-			UML_CMP(block, I0, desc->pc);
-			UML_JMPc(block, COND_NE, end);
-
-			UML_MOV(block, I1, mem(&m_core->lstkp));                            // mov     i1,[m_core->lstkp]
-			UML_LOAD(block, I0, m_core->lcstack, I1, SIZE_DWORD, SCALE_x4);     // load    i0,m_core->lcstack,i1,dword,scale_x4
-			UML_SUB(block, I0, I0, 1);                                          // sub     i0,1
-			UML_STORE(block, m_core->lcstack, I1, I0, SIZE_DWORD, SCALE_x4);    // store   m_core->lcstack,i1,i0,dword,scale_x4
-			UML_SUB(block, CURLCNTR, CURLCNTR, 1);                              // sub     CURLCNTR,1
-			UML_JMPc(block, COND_E, label_expire);                              // je      label_expire
-
-			UML_MOV(block, mem(&m_core->temp_return), desc->userdata0);
-			UML_JMP(block, end);
-
-			UML_LABEL(block, label_expire);                                     // label_expire:
-			UML_CALLH(block, *m_pop_pc);                                        // callh   m_pop_pc
-			UML_CALLH(block, *m_pop_loop);                                      // callh   m_pop_loop
-			UML_MOV(block, mem(&m_core->temp_return), desc->pc + 1);
-
-			UML_LABEL(block, end);
-		}
-		if (desc->userflags & OP_USERFLAG_COND_LOOP)
-		{
-			uml::code_label const label_expire = compiler.labelnum++;
-			uml::code_label const end = compiler.labelnum++;
-
-			UML_LOAD(block, I0, m_core->lastack, LSTKP, SIZE_DWORD, SCALE_x4);
-			UML_CMP(block, I0, desc->pc);
-			UML_JMPc(block, COND_NE, end);
-
-			int condition = (desc->userflags & OP_USERFLAG_COND_FIELD) >> OP_USERFLAG_COND_FIELD_SHIFT;
-			generate_do_condition(block, compiler, desc, condition, label_expire, m_core->astat_delay_copy);
-			UML_MOV(block, mem(&m_core->temp_return), desc->userdata0);
-			UML_JMP(block, end);
-
-			UML_LABEL(block, label_expire);
-			UML_CALLH(block, *m_pop_pc);
-			UML_CALLH(block, *m_pop_loop);
-			UML_MOV(block, mem(&m_core->temp_return), desc->pc + 1);
-
-			UML_LABEL(block, end);
-		}
+		UML_MOV(block, I0, desc->pc);
+		UML_CALLH(block, *m_call_loop_check);
 	}
 
 	/* if this is an invalid opcode, generate the exception now */
@@ -1247,49 +1393,10 @@ void adsp21062_device::generate_sequence_instruction(drcuml_block &block, compil
 
 
 	// insert loop check at this instruction if needed
-	if (desc->userflags & OP_USERFLAG_COUNTER_LOOP)
+	if (desc->userflags & OP_USERFLAG_LOOP)
 	{
-		uml::code_label const label_expire = compiler.labelnum++;
-		uml::code_label const label_skip_loop = compiler.labelnum++;
-
-		UML_LOAD(block, I0, m_core->lastack, LSTKP, SIZE_DWORD, SCALE_x4);
-		UML_CMP(block, I0, desc->pc);
-		UML_JMPc(block, COND_NE, label_skip_loop);
-
-		UML_MOV(block, I1, mem(&m_core->lstkp));                            // mov     i1,[m_core->lstkp]
-		UML_LOAD(block, I0, m_core->lcstack, I1, SIZE_DWORD, SCALE_x4);     // load    i0,m_core->lcstack,i1,dword,scale_x4
-		UML_SUB(block, I0, I0, 1);                                          // sub     i0,1
-		UML_STORE(block, m_core->lcstack, I1, I0, SIZE_DWORD, SCALE_x4);    // store   m_core->lcstack,i1,i0,dword,scale_x4
-		UML_SUB(block, CURLCNTR, CURLCNTR, 1);                              // sub     CURLCNTR,1
-		UML_JMPc(block, COND_E, label_expire);                              // jne     label_expire
-
-		generate_loop_jump(block, compiler, desc);
-
-		UML_LABEL(block, label_expire);                                     // label_expire:
-		UML_CALLH(block, *m_pop_pc);                                        // callh   m_pop_pc
-		UML_CALLH(block, *m_pop_loop);                                      // callh   m_pop_loop
-
-		UML_LABEL(block, label_skip_loop);
-	}
-	if (desc->userflags & OP_USERFLAG_COND_LOOP)
-	{
-		uml::code_label const label_expire = compiler.labelnum++;
-		uml::code_label const label_skip_loop = compiler.labelnum++;
-
-		UML_LOAD(block, I0, m_core->lastack, LSTKP, SIZE_DWORD, SCALE_x4);
-		UML_CMP(block, I0, desc->pc);
-		UML_JMPc(block, COND_NE, label_skip_loop);
-
-		int condition = (desc->userflags & OP_USERFLAG_COND_FIELD) >> OP_USERFLAG_COND_FIELD_SHIFT;
-		generate_do_condition(block, compiler, desc, condition, label_expire, m_core->astat_delay_copy);
-
-		generate_loop_jump(block, compiler, desc);
-
-		UML_LABEL(block, label_expire);
-		UML_CALLH(block, *m_pop_pc);
-		UML_CALLH(block, *m_pop_loop);
-
-		UML_LABEL(block, label_skip_loop);
+		UML_DMOV(block, I0, (uint64_t(compiler.cycles) << 32) | desc->pc);
+		UML_CALLH(block, *m_loop_check);
 	}
 
 	// copy ASTAT bits over for conditional loop
@@ -1582,7 +1689,7 @@ void adsp21062_device::generate_call(drcuml_block &block, compiler_state &compil
 	}
 
 	// if this is the last instruction of a loop, we need to use the return PC from the resolved loop
-	if (desc->userflags & OP_USERFLAG_CALL && desc->userflags & (OP_USERFLAG_COND_LOOP | OP_USERFLAG_COUNTER_LOOP))
+	if (desc->userflags & OP_USERFLAG_CALL && desc->userflags & OP_USERFLAG_LOOP)
 	{
 		UML_MOV(block, I0, mem(&m_core->temp_return));
 	}
@@ -1671,23 +1778,6 @@ void adsp21062_device::generate_jump(drcuml_block &block, compiler_state &compil
 
 	// update compiler label
 	compiler.labelnum = compiler_temp.labelnum;
-
-	/* reset the mapvar to the current cycles and account for skipped slots */
-	compiler.cycles += desc->skipslots;
-	UML_MAPVAR(block, MAPVAR_CYCLES, compiler.cycles);                                 // mapvar  CYCLES,compiler.cycles
-}
-
-void adsp21062_device::generate_loop_jump(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
-{
-	// update cycles and hash jump
-	generate_update_cycles(block, compiler, desc->userdata0, true);
-	/*
-	if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
-	    UML_JMP(block, desc->targetpc | 0x80000000);                                // jmp      targetpc | 0x80000000
-	else
-	    UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);                           // hashjmp  0,targetpc,nocode
-	    */
-	UML_HASHJMP(block, 0, desc->userdata0, *m_nocode);
 
 	/* reset the mapvar to the current cycles and account for skipped slots */
 	compiler.cycles += desc->skipslots;
@@ -2411,7 +2501,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 						// push loop
 						UML_MOV(block, I0, data);
-						UML_MOV(block, I1, address);
+						UML_MOV(block, I1, 0xcf000000 | address);
 						UML_CALLH(block, *m_push_loop);
 					}
 					return true;
@@ -2434,13 +2524,14 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 					// push loop
 					UML_MOV(block, I0, I3);
-					UML_MOV(block, I1, address);
+					UML_MOV(block, I1, 0xcf000000 | address);
 					UML_CALLH(block, *m_push_loop);
 					return true;
 				}
 
 				case 0x0e:          // do until                             |000|01110|
 				{
+					uint32_t cond = (opcode >> 33) & 0x1f;
 					int offset = util::sext(opcode & 0xffffff, 24);
 					uint32_t address = desc->pc + offset;
 
@@ -2450,7 +2541,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 					// push loop
 					UML_MOV(block, I0, 0);
-					UML_MOV(block, I1, address);
+					UML_MOV(block, I1, (cond << 24) | address);
 					UML_CALLH(block, *m_push_loop);
 					return true;
 				}
@@ -5238,155 +5329,6 @@ void adsp21062_device::generate_if_condition(drcuml_block &block, compiler_state
 			break;
 		case 0x1f:                                    /* true */
 			fatalerror("generate_if_condition 0x1f"); // should not happen
-			break;
-	}
-}
-
-void adsp21062_device::generate_do_condition(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int condition, int skip_label, ASTAT_DRC &astat)
-{
-	// Jump to skip_label if condition is true
-	uml::code_label not_skip;
-
-	switch (condition)
-	{
-		case 0x00:                                    /* EQ */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
-			UML_JMPc(block, COND_NZ, skip_label);
-			break;
-		case 0x01:                                    /* LT */
-			not_skip = compiler.labelnum++;
-			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
-			UML_JMPc(block, COND_NZ, not_skip);
-			UML_TEST(block, mem(&m_core->astat_delay_copy.an), 1);
-			UML_JMPc(block, COND_Z, not_skip);
-			UML_JMP(block, skip_label);
-			UML_LABEL(block, not_skip);
-			break;
-		case 0x02:                                    /* LE */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
-			UML_JMPc(block, COND_NZ, skip_label);
-			UML_TEST(block, mem(&m_core->astat_delay_copy.an), 1);
-			UML_JMPc(block, COND_NZ, skip_label);
-			break;
-		case 0x03:                                    /* AC */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.ac), 1);
-			UML_JMPc(block, COND_NZ, skip_label);
-			break;
-		case 0x04:                                    /* AV */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.av), 1);
-			UML_JMPc(block, COND_NZ, skip_label);
-			break;
-		case 0x05:                                    /* MV */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.mv), 1);
-			UML_JMPc(block, COND_NZ, skip_label);
-			break;
-		case 0x06:                                    /* MS */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.mn), 1);
-			UML_JMPc(block, COND_NZ, skip_label);
-			break;
-		case 0x07:                                    /* SV */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.sv), 1);
-			UML_JMPc(block, COND_NZ, skip_label);
-			break;
-		case 0x08:                                    /* SZ */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.sz), 1);
-			UML_JMPc(block, COND_NZ, skip_label);
-			break;
-		case 0x09:                                    /* FLAG0 */
-			UML_CMP(block, FLAG0, 0);
-			UML_JMPc(block, COND_NE, skip_label);
-			break;
-		case 0x0a:                                    /* FLAG1 */
-			UML_CMP(block, FLAG1, 0);
-			UML_JMPc(block, COND_NE, skip_label);
-			break;
-		case 0x0b:                                    /* FLAG2 */
-			UML_CMP(block, FLAG2, 0);
-			UML_JMPc(block, COND_NE, skip_label);
-			break;
-		case 0x0c:                                    /* FLAG3 */
-			UML_CMP(block, FLAG3, 0);
-			UML_JMPc(block, COND_NE, skip_label);
-			break;
-		case 0x0d:                                    /* TF */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.btf), 1);
-			UML_JMPc(block, COND_NZ, skip_label);
-			break;
-		case 0x0e:                                    /* BM */
-			// infinite loop
-			break;
-		case 0x0f:                                    /* LCE */
-			fatalerror("generate_do_condition 0x0f");   // this should only be used with counter loops
-			break;
-		case 0x10:                                    /* NOT EQUAL */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
-			UML_JMPc(block, COND_Z, skip_label);
-			break;
-		case 0x11:                                    /* GE */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
-			UML_JMPc(block, COND_NZ, skip_label);
-			UML_TEST(block, mem(&m_core->astat_delay_copy.an), 1);
-			UML_JMPc(block, COND_Z, skip_label);
-			break;
-		case 0x12:                                    /* GT */
-			not_skip = compiler.labelnum++;
-			UML_TEST(block, mem(&m_core->astat_delay_copy.az), 1);
-			UML_JMPc(block, COND_NZ, not_skip);
-			UML_TEST(block, mem(&m_core->astat_delay_copy.an), 1);
-			UML_JMPc(block, COND_NZ, not_skip);
-			UML_JMP(block, skip_label);
-			UML_LABEL(block, not_skip);
-			break;
-		case 0x13:                                    /* NOT AC */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.ac), 1);
-			UML_JMPc(block, COND_Z, skip_label);
-			break;
-		case 0x14:                                    /* NOT AV */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.av), 1);
-			UML_JMPc(block, COND_Z, skip_label);
-			break;
-		case 0x15:                                    /* NOT MV */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.mv), 1);
-			UML_JMPc(block, COND_Z, skip_label);
-			break;
-		case 0x16:                                    /* NOT MS */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.mn), 1);
-			UML_JMPc(block, COND_Z, skip_label);
-			break;
-		case 0x17:                                    /* NOT SV */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.sv), 1);
-			UML_JMPc(block, COND_Z, skip_label);
-			break;
-		case 0x18:                                    /* NOT SZ */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.sz), 1);
-			UML_JMPc(block, COND_Z, skip_label);
-			break;
-		case 0x19:                                    /* NOT FLAG0 */
-			UML_CMP(block, FLAG0, 0);
-			UML_JMPc(block, COND_E, skip_label);
-			break;
-		case 0x1a:                                    /* NOT FLAG1 */
-			UML_CMP(block, FLAG1, 0);
-			UML_JMPc(block, COND_E, skip_label);
-			break;
-		case 0x1b:                                    /* NOT FLAG2 */
-			UML_CMP(block, FLAG2, 0);
-			UML_JMPc(block, COND_E, skip_label);
-			break;
-		case 0x1c:                                    /* NOT FLAG3 */
-			UML_CMP(block, FLAG3, 0);
-			UML_JMPc(block, COND_E, skip_label);
-			break;
-		case 0x1d:                                    /* NOT TF */
-			UML_TEST(block, mem(&m_core->astat_delay_copy.btf), 1);
-			UML_JMPc(block, COND_Z, skip_label);
-			break;
-		case 0x1e:                                    /* NOT BM */
-			// always true
-			UML_JMP(block, skip_label);
-			break;
-		case 0x1f:                                    /* false (FOREVER) */
-			// infinite loop
 			break;
 	}
 }

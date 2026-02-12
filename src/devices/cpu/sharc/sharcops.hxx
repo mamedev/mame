@@ -1178,6 +1178,7 @@ void adsp21062_device::POP_STATUS_STACK()
 
 int adsp21062_device::IF_CONDITION_CODE(int cond)
 {
+	// TODO: implement AF flag and correct conditions that depend on it (LT, LE, GE, GT)
 	switch(cond)
 	{
 		case 0x00:  return m_core->astat & AZ;        /* EQ */
@@ -1218,6 +1219,7 @@ int adsp21062_device::IF_CONDITION_CODE(int cond)
 
 int adsp21062_device::DO_CONDITION_CODE(int cond)
 {
+	// TODO: implement AF flag and correct conditions that depend on it (LT, LE, GE, GT)
 	switch(cond)
 	{
 		case 0x00:  return m_core->astat & AZ;        /* EQ */

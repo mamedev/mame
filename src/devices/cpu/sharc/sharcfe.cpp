@@ -10,6 +10,9 @@
 #include "emu.h"
 #include "sharcfe.h"
 
+#include "sharcinternal.ipp"
+
+
 #define REG_USED(desc,x)            do { (desc).regin[0] |= 1 << (x); } while(0)
 #define REG_MODIFIED(desc,x)        do { (desc).regout[0] |= 1 << (x); } while(0)
 
@@ -69,8 +72,8 @@
 
 
 sharc_frontend::sharc_frontend(adsp21062_device *sharc, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
-	: drc_frontend(*sharc, window_start, window_end, max_sequence),
-		m_sharc(sharc)
+	: drc_frontend(*sharc, window_start, window_end, max_sequence)
+	, m_sharc(sharc)
 {
 	m_loopmap = std::make_unique<LOOP_ENTRY[]>(0x20000);
 }
@@ -84,7 +87,7 @@ void sharc_frontend::flush()
 	memset(map, 0, sizeof(LOOP_ENTRY) * 0x20000);
 }
 
-void sharc_frontend::add_loop_entry(uint32_t pc, uint8_t type, uint32_t start_pc, uint8_t looptype, uint8_t condition)
+void sharc_frontend::add_loop_entry(uint32_t pc, uint8_t type, uint32_t userflags)
 {
 	uint32_t l2 = pc >> 17;
 	uint32_t l1 = pc & 0x1ffff;
@@ -94,31 +97,34 @@ void sharc_frontend::add_loop_entry(uint32_t pc, uint8_t type, uint32_t start_pc
 
 	LOOP_ENTRY* map = m_loopmap.get();
 	uint32_t current_type = map[l1].entrytype;
-	if (current_type & type)
-	{
-		// check for mismatch if the entry is already used
-		if (map[l1].start_pc != start_pc ||
-			map[l1].looptype != looptype ||
-			map[l1].condition != condition)
-		{
-			fatalerror("sharc_frontend::add_loop_entry: existing entry does not match: start_pc %08X/%08X, looptype %02X/%02X, cond %02X/%02X", start_pc, map[l1].start_pc, looptype, map[l1].looptype, condition, map[l1].condition);
-		}
-	}
+	uint32_t current_userflags = map[l1].userflags;
 
 	current_type |= type;
+	current_userflags |= userflags;
 
 	map[l1].entrytype = current_type;
-	map[l1].looptype = looptype;
-	map[l1].condition = condition;
-	map[l1].start_pc = start_pc;
+	map[l1].userflags = current_userflags;
 }
 
 void sharc_frontend::insert_loop(const LOOP_DESCRIPTOR &loopdesc)
 {
-	add_loop_entry(loopdesc.start_pc, LOOP_ENTRY_START, loopdesc.start_pc, loopdesc.type, loopdesc.condition);
-	add_loop_entry(loopdesc.end_pc, LOOP_ENTRY_EVALUATION, loopdesc.start_pc, loopdesc.type, loopdesc.condition);
+	add_loop_entry(loopdesc.start_pc, LOOP_ENTRY_START, 0);
+	add_loop_entry(loopdesc.end_pc, LOOP_ENTRY_EVALUATION, 0);
 	if (loopdesc.astat_check_pc != 0xffffffff)
-		add_loop_entry(loopdesc.astat_check_pc, LOOP_ENTRY_ASTAT_CHECK, loopdesc.start_pc, loopdesc.type, loopdesc.condition);
+	{
+		uint32_t flags = m_sharc->do_condition_astat_bits(loopdesc.condition);
+		uint32_t userflags = 0;
+		if (flags & adsp21062_device::ASTAT_FLAGS::AZ) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AZ; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::AN) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AN; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::AV) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AV; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::AC) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AC; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::MN) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MN; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::MV) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MV; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::SV) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SV; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::SZ) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SZ; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::BTF) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_BTF; }
+		add_loop_entry(loopdesc.astat_check_pc, LOOP_ENTRY_ASTAT_CHECK, userflags);
+	}
 }
 
 bool sharc_frontend::is_loop_evaluation(uint32_t pc)
@@ -179,20 +185,16 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	{
 		LOOP_ENTRY* map = m_loopmap.get();
 		int index = desc.pc & 0x1ffff;
-
-		if (map[index].looptype == LOOP_TYPE_CONDITIONAL)
-		{
-			uint32_t flags = m_sharc->do_condition_astat_bits(map[index].condition);
-			if (flags & adsp21062_device::ASTAT_FLAGS::AZ) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AZ; AZ_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::AN) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AN; AN_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::AV) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AV; AV_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::AC) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AC; AC_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::MN) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MN; MN_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::MV) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MV; MV_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::SV) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SV; SV_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::SZ) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SZ; SZ_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::BTF) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_BTF; BTF_USED(desc); }
-		}
+		desc.userflags |= map[index].userflags;
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_AZ) { AZ_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_AN) { AN_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_AV) { AV_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_AC) { AC_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_MN) { MN_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_MV) { MV_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_SV) { SV_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_SZ) { SZ_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_BTF) { BTF_USED(desc); }
 	}
 
 	if (is_loop_start(desc.pc))
@@ -202,20 +204,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 	if (is_loop_evaluation(desc.pc))
 	{
-		LOOP_ENTRY* map = m_loopmap.get();
-		int index = desc.pc & 0x1ffff;
-
 		desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
-		desc.userdata0 = map[index].start_pc;
-		if (map[index].looptype == LOOP_TYPE_COUNTER)
-		{
-			desc.userflags |= OP_USERFLAG_COUNTER_LOOP;
-		}
-		else if (map[index].looptype == LOOP_TYPE_CONDITIONAL)
-		{
-			desc.userflags |= OP_USERFLAG_COND_LOOP;
-			desc.userflags |= (map[index].condition << 2) & OP_USERFLAG_COND_FIELD;
-		}
+		desc.userflags |= OP_USERFLAG_LOOP;
 	}
 
 
