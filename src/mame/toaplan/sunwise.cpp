@@ -25,7 +25,7 @@ pwrkick     SW931201-1    Sunwise       Power Kick
 burgkids    SW931201-1    Sunwise       Burger Kids
 pyutakun    SW931201-1    Sunwise       Pyuuta-kun
 othldrby    S951060-VGP   Sunwise       Othello Derby
-
+monchich    S951060-VGP   Sunwise       Monchichi Fluffy Puzzle   (has a subboard instead of mask ROMs)
 
 Notes on Power Kick coin inputs:
 - The 10 yen input is "Key In" according to the bookkeeping screen, but is
