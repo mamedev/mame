@@ -144,7 +144,6 @@ void sente6vb_device::device_add_mconfig(machine_config &config)
 	{
 		CEM3394(config, cem_device, 0);
 		cem_device->configure(RES_K(301), CAP_U(0.002), CAP_U(0.033), CAP_U(10)); // R1, C1, C11, C3 on voice 0 (U1)
-		cem_device->configure_limit_pw(true);
 		cem_device->add_route(ALL_OUTPUTS, "mono", 0.50);
 		ac_noise.add_route(0, *cem_device, 1.0);
 	}
