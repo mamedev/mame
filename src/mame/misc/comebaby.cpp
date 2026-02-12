@@ -327,7 +327,9 @@ ROM_START(comebaby)
 	ROM_LOAD("b1120iag.bin", 0x000000, 0x40000, CRC(9b6f95f1) SHA1(65d6a2fea9911593f093b2e2a43d1534b54d60b3) )
 
 	DISK_REGION( "pci:07.1:ide1:0:hdd" )
-	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
+//	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
+	// rebuilt image with -chs 16383,16,63
+	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(85ced9e63dd10ef39449d3ea997b2200aa06562d) )
 ROM_END
 
 } // anonymous namespace
