@@ -190,6 +190,14 @@ TODO:
 
 
 #include "emu.h"
+
+#include "bus/isa/isa_cards.h"
+#include "bus/pci/virge_pci.h"
+//#include "bus/rs232/hlemouse.h"
+//#include "bus/rs232/null_modem.h"
+//#include "bus/rs232/rs232.h"
+//#include "bus/rs232/sun_kbd.h"
+//#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
@@ -198,14 +206,7 @@ TODO:
 #include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
 #include "machine/i82371eb_usb.h"
-#include "bus/isa/isa_cards.h"
-#include "bus/pci/virge_pci.h"
-//#include "bus/rs232/hlemouse.h"
-//#include "bus/rs232/null_modem.h"
-//#include "bus/rs232/rs232.h"
-//#include "bus/rs232/sun_kbd.h"
-//#include "bus/rs232/terminal.h"
-#include "machine/fdc37c93x.h"
+#include "machine/it8671f.h"
 #include "video/voodoo_pci.h"
 
 #define ENABLE_VOODOO 0
@@ -245,26 +246,23 @@ INPUT_PORTS_END
 
 static void isa_internal_devices(device_slot_interface &device)
 {
-	device.option_add("fdc37c93x", FDC37C93X);
+	device.option_add("it8671f", IT8671F);
 }
 
 void comebaby_state::superio_config(device_t *device)
 {
-	// TODO: wrong super I/O type
-	// It's an ITE 8671 "Giga I/O", unemulated
-	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
-	fdc.set_sysopt_pin(0);
-	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
-	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
-	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+	it8671f_device &ite = *downcast<it8671f_device *>(device);
+	ite.krst_gpio2().set_inputline(":maincpu", INPUT_LINE_RESET);
+	ite.ga20_gpio6().set_inputline(":maincpu", INPUT_LINE_A20);
+	ite.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	ite.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 #if 0
-	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+	ite.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	ite.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	ite.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	ite.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	ite.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	ite.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 #endif
 }
 
@@ -295,7 +293,7 @@ void comebaby_state::comebaby(machine_config &config)
 	LPC_ACPI     (config, "pci:07.3:acpi", 0);
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
