@@ -12,14 +12,8 @@
 #include "emupal.h"
 #include "tilemap.h"
 
-#define OLD_SOUND   (0)
-
-#if !OLD_SOUND
 #include "machine/netlist.h"
 #include "netlist/devices/net_lib.h"
-#else
-#include "sound/discrete.h"
-#endif
 
 class mario_state : public driver_device
 {
@@ -33,14 +27,10 @@ public:
 		m_z80dma(*this, "z80dma"),
 		m_soundrom(*this, "soundrom"),
 		m_soundlatch(*this, "soundlatch%u", 0),
-#if OLD_SOUND
-		m_discrete(*this, "discrete"),
-#else
 		m_audio_snd0(*this, "snd_nl:snd0"),
 		m_audio_snd1(*this, "snd_nl:snd1"),
 		m_audio_snd7(*this, "snd_nl:snd7"),
 		m_audio_dac(*this, "snd_nl:dac"),
-#endif
 		m_spriteram(*this, "spriteram"),
 		m_videoram(*this, "videoram")
 	{ }
@@ -67,14 +57,10 @@ private:
 	required_device<z80dma_device> m_z80dma;
 	optional_region_ptr<uint8_t> m_soundrom;
 	optional_device_array<generic_latch_8_device, 4> m_soundlatch;
-#if OLD_SOUND
-	optional_device<discrete_sound_device> m_discrete;
-#else
 	optional_device<netlist_mame_logic_input_device> m_audio_snd0;
 	optional_device<netlist_mame_logic_input_device> m_audio_snd1;
 	optional_device<netlist_mame_logic_input_device> m_audio_snd7;
 	optional_device<netlist_mame_int_input_device> m_audio_dac;
-#endif
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_spriteram;
