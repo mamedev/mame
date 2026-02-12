@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mirko Buffoni
+// copyright-holders:Mirko Buffoni, Couriersud
 /***************************************************************************
 
 Mario Bros driver by Mirko Buffoni
@@ -32,6 +32,7 @@ TODO:
   is it a bug or deliberate?
 - draw_sprites should adopt the scanline logic from dkong, the schematics have
   the same logic for sprite buffering
+- a lot of soundlatch warnings in error.log, it's probably harmless
 
 BTANB:
 - erratic line at top when scrolling down "Mario Bros" title is confirmed
@@ -210,11 +211,13 @@ private:
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 
-	void mario_io_map(address_map &map) ATTR_COLD;
+	void base_map(address_map &map) ATTR_COLD;
 	void mario_map(address_map &map) ATTR_COLD;
-	void mario_sound_io_map(address_map &map) ATTR_COLD;
-	void mario_sound_map(address_map &map) ATTR_COLD;
 	void masao_map(address_map &map) ATTR_COLD;
+	void mario_io_map(address_map &map) ATTR_COLD;
+
+	void mario_sound_map(address_map &map) ATTR_COLD;
+	void mario_sound_io_map(address_map &map) ATTR_COLD;
 	void masao_sound_map(address_map &map) ATTR_COLD;
 };
 
@@ -261,7 +264,7 @@ uint8_t mario_state::mario_sh_tune_r(offs_t offset)
 {
 	uint8_t p2 = m_soundlatch[2]->read();
 
-	if ((p2 >> 7) & 1)
+	if (BIT(p2, 7))
 		return m_soundlatch[0]->read();
 	else
 		return m_soundrom[(p2 & 0x0f) << 8 | offset];
@@ -567,24 +570,7 @@ void mario_state::vblank_irq(int state)
  *
  *************************************/
 
-void mario_state::mario_map(address_map &map)
-{
-	map(0x0000, 0x5fff).rom();
-	map(0x6000, 0x67ff).ram();
-	map(0x6800, 0x6fff).ram().share("nvram");
-	map(0x7000, 0x73ff).ram().share("spriteram");
-	map(0x7400, 0x77ff).ram().w(FUNC(mario_state::mario_videoram_w)).share("videoram");
-	map(0x7c00, 0x7c00).portr("IN0").w(FUNC(mario_state::mario_sh1_w)); // Mario run sample
-	map(0x7c80, 0x7c80).portr("IN1").w(FUNC(mario_state::mario_sh2_w)); // Luigi run sample
-	map(0x7d00, 0x7d00).w(FUNC(mario_state::mario_scroll_w));
-	map(0x7e00, 0x7e00).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
-	map(0x7e80, 0x7e87).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x7f00, 0x7f07).w(FUNC(mario_state::mario_sh3_w)); // misc samples
-	map(0x7f80, 0x7f80).portr("DSW");
-	map(0xf000, 0xffff).rom();
-}
-
-void mario_state::masao_map(address_map &map)
+void mario_state::base_map(address_map &map)
 {
 	map(0x0000, 0x5fff).rom();
 	map(0x6000, 0x67ff).ram();
@@ -596,9 +582,22 @@ void mario_state::masao_map(address_map &map)
 	map(0x7d00, 0x7d00).w(FUNC(mario_state::mario_scroll_w));
 	map(0x7e00, 0x7e00).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0x7e80, 0x7e87).w("mainlatch", FUNC(ls259_device::write_d0));
-	map(0x7f00, 0x7f00).w(FUNC(mario_state::masao_sh_irqtrigger_w));
 	map(0x7f80, 0x7f80).portr("DSW");
 	map(0xf000, 0xffff).rom();
+}
+
+void mario_state::mario_map(address_map &map)
+{
+	base_map(map);
+	map(0x7c00, 0x7c00).w(FUNC(mario_state::mario_sh1_w)); // Mario run sample
+	map(0x7c80, 0x7c80).w(FUNC(mario_state::mario_sh2_w)); // Luigi run sample
+	map(0x7f00, 0x7f07).w(FUNC(mario_state::mario_sh3_w)); // misc samples
+}
+
+void mario_state::masao_map(address_map &map)
+{
+	base_map(map);
+	map(0x7f00, 0x7f00).w(FUNC(mario_state::masao_sh_irqtrigger_w));
 }
 
 void mario_state::mario_io_map(address_map &map)
