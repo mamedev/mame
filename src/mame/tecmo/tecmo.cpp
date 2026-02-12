@@ -11,8 +11,7 @@ TODO:
   a real board and maybe waitstate penalties;
 
 BTANB:
-- missing drums in backfirt, there isn't any ADPCM / rom that makes that to happen
-  (code still tries to writes on that, but it's just nop'ed);
+- missing drums in backfirtb, there isn't any ADPCM ROM on the bootleg
 - silkworm bgm drum samples are cut off abruptly, it does this deliberately
 
 
@@ -1316,6 +1315,40 @@ ROM_START( silkwormb2 ) // 2-PCB stack, no markings
 	ROM_LOAD( "280100_pc-17.17", 0x38000, 0x08000, CRC(7ec93873) SHA1(0993a3b3e5ca84ef0ea32159825e379ba4cc5fbb) )
 ROM_END
 
+
+ROM_START( backfirt )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "4.s5",    0x00000, 0x10000, CRC(0ab3bd4d) SHA1(2653d099c894304d3f9c2b2de9a7fed67be7b6dc) )  // c000-ffff is not used
+	ROM_LOAD( "5.s6",    0x10000, 0x10000, CRC(150b6949) SHA1(31870a2f471b71d79a4daa0b5baca0d941de12e4) )  // banked at f000-f7ff
+
+	ROM_REGION( 0x20000, "soundcpu", 0 )
+	ROM_LOAD( "3.j5",   0x00000, 0x08000, CRC(eb932b62) SHA1(967657e70d5fdbaba5e00ff45ca50676dc7d1d9c) )
+
+	ROM_REGION( 0x08000, "txtiles", 0 )
+	ROM_LOAD( "2.j3",   0x00000, 0x08000, CRC(08ce729f) SHA1(8e426251b20edfb10f0837b3106b4f333bc114a4) )  // characters
+
+	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_LOAD( "6.2b",   0x00000, 0x10000, CRC(c8c25e45) SHA1(d771d5e7d2d8082680f73b778ef2d88f2e9b8591) )   // sprites
+	ROM_LOAD( "7.2d",   0x10000, 0x10000, CRC(25fb6a57) SHA1(7f411af7417fa901d65194c348ecec58c61b7cf7) )   // sprites
+	ROM_LOAD( "8.2e",   0x20000, 0x10000, CRC(6bccac4e) SHA1(e042d049761affe4d3d0eac3c7a24f428643a9cf) )   // sprites
+	ROM_LOAD( "9.2h",   0x30000, 0x10000, CRC(566a99b8) SHA1(a78825f0a85235399e66906cffafda98445a89a2) )   // sprites
+
+	ROM_REGION( 0x40000, "fgtiles", 0 )
+	ROM_LOAD( "10.1p",  0x00000, 0x10000, CRC(8c7138bb) SHA1(0cfd69fa77d5b546f7dad80537d8d2497ae758bc) )   // tiles #1
+	ROM_LOAD( "11.2p",  0x10000, 0x10000, CRC(6c03c476) SHA1(79ad800a2f4ba6d44ba5a31210cbd8566bb357b6) )   // tiles #1
+	ROM_LOAD( "12.3p",  0x20000, 0x10000, CRC(0bc84b4b) SHA1(599041108d09fd61aab2b0aeac0e07715887476c) )   // tiles #1
+	ROM_LOAD( "13.4p",  0x30000, 0x10000, CRC(ec149ec3) SHA1(7817dc2659fe4ba3bb810df278378d51d97065b3) )   // tiles #1
+
+	ROM_REGION( 0x40000, "bgtiles", 0 )
+	ROM_LOAD( "14.1s",  0x00000, 0x10000, CRC(409df64b) SHA1(cada970bf9cc8f6522e7a71e00fe873568852873) )   // tiles #2
+	ROM_LOAD( "15.2s",  0x10000, 0x10000, CRC(6e4052c9) SHA1(e2e3d7221b75cb044449a25a076a93c3def1f11b) )   // tiles #2
+	ROM_LOAD( "16.3s",  0x20000, 0x10000, CRC(2b6cc20e) SHA1(4815819288753400935836cc1b0b69f4c4b43ddc) )   // tiles #2
+	ROM_LOAD( "17.4s",  0x30000, 0x10000, CRC(afea5323) SHA1(cf4c07b2566067cf00665ed927f2c8e4a4c9c0c9) )   // tiles #2
+
+	ROM_REGION( 0x8000, "adpcm", 0 )
+	ROM_LOAD( "1.b6",   0x0000, 0x8000, CRC(7d25ad01) SHA1(7fb34546f70b888d16a2ac5b395b5542daca674d) )
+ROM_END
+
 /*
 
 main cpu Z80A
@@ -1345,9 +1378,11 @@ RAMs:
 6116 background
 4164 x20 object/sprites
 
+compared to the original the final "bgtiles" ROM is half size, there's no ADPCM ROM, and the soundcpu code is different
+
 */
 
-ROM_START( backfirt )
+ROM_START( backfirtb )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b5-e3.bin",    0x00000, 0x10000, CRC(0ab3bd4d) SHA1(2653d099c894304d3f9c2b2de9a7fed67be7b6dc) )  // c000-ffff is not used
 	ROM_LOAD( "b4-f3.bin",    0x10000, 0x10000, CRC(150b6949) SHA1(31870a2f471b71d79a4daa0b5baca0d941de12e4) )  // banked at f000-f7ff
@@ -1520,4 +1555,5 @@ GAME( 1988, silkwormp,  silkworm, silkwormp, silkwormp, tecmo_state, init_silkwo
 GAME( 1988, silkwormb,  silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "bootleg", "Silk Worm (bootleg, set 1)",    MACHINE_SUPPORTS_SAVE ) // bootleg of (a different?) prototype
 GAME( 1988, silkwormb2, silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "bootleg", "Silk Worm (bootleg, set 2)",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, backfirt,   0,        backfirt,  backfirt,  tecmo_state, init_gemini,   ROT0,  "Tecmo",   "Back Fire (Tecmo, bootleg)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, backfirt,   0,        gemini,    backfirt,  tecmo_state, init_gemini,   ROT0,  "Tecmo",   "Back Fire (Tecmo)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1988, backfirtb,  backfirt, backfirt,  backfirt,  tecmo_state, init_gemini,   ROT0,  "bootleg", "Back Fire (Tecmo, bootleg)",    MACHINE_SUPPORTS_SAVE )
