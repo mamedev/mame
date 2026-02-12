@@ -1556,4 +1556,4 @@ GAME( 1988, silkwormb,  silkworm, silkwormp, silkwormp, tecmo_state, init_silkwo
 GAME( 1988, silkwormb2, silkworm, silkwormp, silkwormp, tecmo_state, init_silkworm, ROT0,  "bootleg", "Silk Worm (bootleg, set 2)",    MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, backfirt,   0,        gemini,    backfirt,  tecmo_state, init_gemini,   ROT0,  "Tecmo",   "Back Fire (Tecmo)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1988, backfirtb,  backfirt, backfirt,  backfirt,  tecmo_state, init_gemini,   ROT0,  "Tecmo",   "Back Fire (Tecmo, bootleg)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1988, backfirtb,  backfirt, backfirt,  backfirt,  tecmo_state, init_gemini,   ROT0,  "bootleg", "Back Fire (Tecmo, bootleg)",    MACHINE_SUPPORTS_SAVE )
