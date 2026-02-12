@@ -158,7 +158,7 @@ void mario_state::mario_map(address_map &map)
 	map(0x7c00, 0x7c00).portr("IN0").w(FUNC(mario_state::mario_sh1_w)); /* Mario run sample */
 	map(0x7c80, 0x7c80).portr("IN1").w(FUNC(mario_state::mario_sh2_w)); /* Luigi run sample */
 	map(0x7d00, 0x7d00).w(FUNC(mario_state::mario_scroll_w));
-	map(0x7e00, 0x7e00).w(FUNC(mario_state::mario_sh_tuneselect_w));
+	map(0x7e00, 0x7e00).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0x7e80, 0x7e87).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x7f00, 0x7f07).w(FUNC(mario_state::mario_sh3_w)); /* Sound port */
 	map(0x7f80, 0x7f80).portr("DSW");    /* DSW */

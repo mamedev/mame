@@ -68,7 +68,6 @@ private:
 
 	/* sound state */
 	uint8_t m_last = 0;
-	uint8_t m_portT = 0;
 
 	/* video state */
 	uint8_t m_gfx_bank = 0;
@@ -83,15 +82,8 @@ private:
 	void gfx_bank_w(int state);
 	void palette_bank_w(int state);
 	void mario_scroll_w(uint8_t data);
-	uint8_t mario_sh_p1_r();
-	uint8_t mario_sh_p2_r();
-	int mario_sh_t0_r();
-	int mario_sh_t1_r();
 	uint8_t mario_sh_tune_r(offs_t offset);
-	void mario_sh_p1_w(uint8_t data);
-	void mario_sh_p2_w(uint8_t data);
 	void masao_sh_irqtrigger_w(uint8_t data);
-	void mario_sh_tuneselect_w(uint8_t data);
 	void mario_sh3_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void set_palette(int monitor);
@@ -99,12 +91,11 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void mario_sh_sound_w(uint8_t data);
-	void mario_sh1_w(uint8_t data);
-	void mario_sh2_w(uint8_t data);
+	void mario_sh1_w(uint8_t data) { m_audio_snd0->write(data); }
+	void mario_sh2_w(uint8_t data) { m_audio_snd1->write(data); }
 	uint8_t memory_read_byte(offs_t offset);
 	void memory_write_byte(offs_t offset, uint8_t data);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void set_ea(int ea);
 	void mario_io_map(address_map &map) ATTR_COLD;
 	void mario_map(address_map &map) ATTR_COLD;
 	void mario_sound_io_map(address_map &map) ATTR_COLD;
