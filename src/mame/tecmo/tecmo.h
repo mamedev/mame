@@ -40,7 +40,7 @@ public:
 	void silkworm(machine_config &config);
 	void silkwormj(machine_config &config);
 	void silkwormp(machine_config &config);
-	void backfirt(machine_config &config);
+	void backfirtb(machine_config &config);
 
 	void init_silkworm();
 	void init_rygar();

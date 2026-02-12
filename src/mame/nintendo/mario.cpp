@@ -183,7 +183,7 @@ private:
 	tilemap_t *m_bg_tilemap = nullptr;
 
 	// misc
-	uint8_t m_last = 0;
+	uint8_t m_irq_clock = 0;
 	bool m_nmi_mask = false;
 
 	// handlers
@@ -196,14 +196,14 @@ private:
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	void set_palette(int monitor);
-	void mario_palette(palette_device &palette);
+	void palette(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void mario_videoram_w(offs_t offset, uint8_t data);
+	void videoram_w(offs_t offset, uint8_t data);
 	void gfx_bank_w(int state);
 	void palette_bank_w(int state);
-	void mario_scroll_w(uint8_t data);
+	void scroll_w(uint8_t data);
 	void nmi_mask_w(int state);
 	void coin_counter_1_w(int state);
 	void coin_counter_2_w(int state);
@@ -240,7 +240,7 @@ void mario_state::sound_start()
 		SND[0x0002] = 0x00;
 	}
 
-	save_item(NAME(m_last));
+	save_item(NAME(m_irq_clock));
 }
 
 void mario_state::sound_reset()
@@ -250,7 +250,7 @@ void mario_state::sound_reset()
 	if (m_soundlatch[2]) m_soundlatch[2]->clear_w();
 	if (m_soundlatch[3]) m_soundlatch[3]->clear_w();
 
-	m_last = 0;
+	m_irq_clock = 0;
 }
 
 
@@ -280,10 +280,10 @@ void mario_state::masao_sh_irqtrigger_w(uint8_t data)
 	data &= 1;
 
 	// setting bit 0 high then low triggers IRQ on the sound CPU
-	if (m_last && !data)
+	if (m_irq_clock && !data)
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 
-	m_last = data;
+	m_irq_clock = data;
 }
 
 
@@ -415,7 +415,7 @@ void mario_state::set_palette(int monitor)
 	m_palette->palette()->normalize_range(0, 255);
 }
 
-void mario_state::mario_palette(palette_device &palette)
+void mario_state::palette(palette_device &palette)
 {
 	set_palette(0);
 }
@@ -427,7 +427,7 @@ void mario_state::mario_palette(palette_device &palette)
  *
  *************************************/
 
-void mario_state::mario_videoram_w(offs_t offset, uint8_t data)
+void mario_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -445,7 +445,7 @@ void mario_state::palette_bank_w(int state)
 	machine().tilemap().mark_all_dirty();
 }
 
-void mario_state::mario_scroll_w(uint8_t data)
+void mario_state::scroll_w(uint8_t data)
 {
 	m_bg_tilemap->set_scrolly(0, data + 17);
 }
@@ -576,10 +576,10 @@ void mario_state::base_map(address_map &map)
 	map(0x6000, 0x67ff).ram();
 	map(0x6800, 0x6fff).ram().share("nvram");
 	map(0x7000, 0x73ff).ram().share("spriteram");
-	map(0x7400, 0x77ff).ram().w(FUNC(mario_state::mario_videoram_w)).share("videoram");
+	map(0x7400, 0x77ff).ram().w(FUNC(mario_state::videoram_w)).share("videoram");
 	map(0x7c00, 0x7c00).portr("IN0");
 	map(0x7c80, 0x7c80).portr("IN1");
-	map(0x7d00, 0x7d00).w(FUNC(mario_state::mario_scroll_w));
+	map(0x7d00, 0x7d00).w(FUNC(mario_state::scroll_w));
 	map(0x7e00, 0x7e00).w(m_soundlatch[0], FUNC(generic_latch_8_device::write));
 	map(0x7e80, 0x7e87).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x7f80, 0x7f80).portr("DSW");
@@ -799,7 +799,7 @@ void mario_state::mario_base(machine_config &config)
 	screen.screen_vblank().set(FUNC(mario_state::vblank_irq));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mario);
-	PALETTE(config, m_palette, FUNC(mario_state::mario_palette), 256);
+	PALETTE(config, m_palette, FUNC(mario_state::palette), 256);
 }
 
 void mario_state::mario(machine_config &config)
