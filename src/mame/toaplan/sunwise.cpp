@@ -699,4 +699,5 @@ GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    sunwise_state,  empty
 GAME( 1995, burgkids,    0,        pwrkick,    burgkids,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Burger Kids (Japan)",   0 )
 GAME( 1995, pyutakun,    0,        pwrkick,    pyutakun,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Pyuuta-kun (Japan)",    0 )
 GAME( 1995, othldrby,    0,        othldrby,   othldrby,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
-GAME( 1997, monchich,    0,        othldrby,   monchich,   sunwise_state,  init_monchich,   ROT0,   "Sunwise",  "Monchichi Fluffy Puzzle (Japan)", 0 ) // maybe a prototype
+GAME( 1995, monchich,    0,        othldrby,   monchich,   sunwise_state,  init_monchich,   ROT0,   "Sunwise",  "Monchichi Fluffy Puzzle (Japan)", 0 ) // maybe a prototype
+// a later version of monchich, reworked as "Dakko-chan no Fuwa-Fuwa Puzzle" was shown in 1997
