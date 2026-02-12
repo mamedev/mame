@@ -448,6 +448,14 @@ ROM_START(fflands)
 	DISK_IMAGE_READONLY("flandrec", 0, SHA1(1524bc0d6ec6b069c59de70fdcbb30cf39696e5e))
 ROM_END
 
+ROM_START(gasguzle)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("gasguzle", 0, SHA1(2a60df0727ed491cb0b4bdafbda1a3c8a7a88978))
+ROM_END
+
 ROM_START(gvnascar)
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
@@ -544,6 +552,14 @@ ROM_START(paralost)
 	DISK_IMAGE_READONLY("paralost", 0, SHA1(f4d240f5b0237fd994555af22736430a0723d481))
 ROM_END
 
+ROM_START(puckoff)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("puckoff", 0, SHA1(a18e09cf88bf99e1f61fad8dc9d6afe740865290))
+ROM_END
+
 ROM_START(sin)
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
@@ -569,6 +585,17 @@ ROM_START(swarm134)
 
 	DISK_REGION("recovery")
 	DISK_IMAGE_READONLY("swarmrec", 0, SHA1(5961b3677fcab4dd68e1c1f562c31024e95bbcd4))
+ROM_END
+
+ROM_START(twisted)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("twisted", 0, SHA1(791df9817c7cfca6329a84a2438b9acf3e98d475))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("twistrec", 0, SHA1(3078e29438f51f1e8691d16a6cd7e9d26beb47be))
 ROM_END
 
 ROM_START(ultrapin)
@@ -609,7 +636,9 @@ GAME( 2006, alex101,  alienex,  globalvr, globalvr, globalvr_state, empty_init, 
 GAME( 2006, ultrapin, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "UltraPin (12 tables)",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, amermy,   0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "America's Army (v1.01.82)",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, paralost, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Far Cry: Paradise Lost",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, puckoff,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Puck Off",                                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2008, blzingel, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Blazing Angels",                                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, twisted,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Twisted: Nitro Stunt Racing",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2010, gvnascar, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (2.0.2.068)",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2010, nascar10, gvnascar, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (1.0)",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2010, nascar11, gvnascar, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (1.1)",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
@@ -617,3 +646,4 @@ GAME( 2011, fearland, 0,        globalvr, globalvr, globalvr_state, empty_init, 
 GAME( 2011, fflands,  fearland, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Frightfearland (SVGA video output)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2013, theswarm, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "The Swarm (v1.01.139)",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2013, swarm134, theswarm, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "The Swarm (v1.01.134)",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2014, gasguzle, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Redline Rampage: Gas Guzzlers",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
