@@ -426,12 +426,42 @@ ROM_START(blzingel)
 	DISK_IMAGE_READONLY("blzingel", 0, SHA1(f61c8816b6b17906f0257780ed021f0b3de6f140))
 ROM_END
 
+ROM_START(fearland)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("fearland", 0, SHA1(78d69470e6a2bc0bde9011d5afff0aceac4ec0a5))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("flandrec", 0, SHA1(1524bc0d6ec6b069c59de70fdcbb30cf39696e5e))
+ROM_END
+
+ROM_START(fflands)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("fflands", 0, SHA1(63daf4f07332beb728fab6b796855d2f9fc4a987))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("flandrec", 0, SHA1(1524bc0d6ec6b069c59de70fdcbb30cf39696e5e))
+ROM_END
+
 ROM_START(gvnascar)
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
 	DISK_REGION("ide:1:dvdrom")
 	DISK_IMAGE_READONLY("gvnascar", 0, SHA1(cb0d1df7a88fb0f02c61a858aaeab38356616eeb))
+ROM_END
+
+ROM_START(incoming)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("incoming", 0, SHA1(da424d60ff6ac3770a2450577befbabcd26dee89))
 ROM_END
 
 ROM_START(nascar10)
@@ -498,6 +528,14 @@ ROM_START(nfsug)
 	DISK_IMAGE_READONLY("nfsug-recovery", 0, SHA1(e306bacb3498582a025706ff81a665776b8a18da))
 ROM_END
 
+ROM_START(opblock)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("opblock", 0, SHA1(9a3d1470048b512aaf2487f791ba8f13e508d8f3))
+ROM_END
+
 ROM_START(paralost)
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
@@ -556,6 +594,8 @@ GAME( 200?, multirec, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "
 
 // Game Installer CDs
 GAME( 1999, sin,      0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Ritual Entertainment", "SiN",                                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, incoming, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Incoming",                                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, opblock,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Operation Blockade (Rev D)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2000, bhead2k,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Beach Head 2000 Install - 05/27/03",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2000, bhead2ka, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Beach Head 2000 Install - 09/16/01",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2002, bhead2k2, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Beach Head 2002 Install - 05/27/03",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
@@ -573,5 +613,7 @@ GAME( 2008, blzingel, 0,        globalvr, globalvr, globalvr_state, empty_init, 
 GAME( 2010, gvnascar, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (2.0.2.068)",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2010, nascar10, gvnascar, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (1.0)",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2010, nascar11, gvnascar, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (1.1)",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2011, fearland, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Frightfearland (HD video output)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2011, fflands,  fearland, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Frightfearland (SVGA video output)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2013, theswarm, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "The Swarm (v1.01.139)",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2013, swarm134, theswarm, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "The Swarm (v1.01.134)",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
