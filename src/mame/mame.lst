@@ -32940,11 +32940,6 @@ quizoa
 quizpun
 quizpun2
 
-@source:misc/rawthrillspc.cpp
-doodljmp
-fnf
-gtrhroac
-
 @source:misc/rcorsair.cpp
 rcorsair
 
@@ -37643,6 +37638,15 @@ quake
 
 @source:pc/queen.cpp
 queen
+
+@source:pc/rawthrills.cpp
+doodljmp
+fnf
+fnf1106
+fnf17
+fnf202
+fnf306
+gtrhroac
 
 @source:pc/scatsx.cpp
 mb1320
