@@ -1665,7 +1665,7 @@ RAMs:
 6116 background
 4164 x20 object/sprites
 
-compared to the original the final "bgtiles" ROM is half size, there's no ADPCM ROM, and the soundcpu code is different
+compared to the original the bootleg "bgtiles" ROM is half size, there's no ADPCM ROM, and the soundcpu code is different
 
 */
 
