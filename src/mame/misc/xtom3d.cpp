@@ -15,6 +15,10 @@ TODO:
 - pumpit1: MSCDEX hangs often when Voodoo is disabled, related to above?
 - Voodoo Banshee doesn't handle VGA legacy modes correctly (including PCI VGA control),
   so these will currently black screen until they completes bootstrap;
+- xtom3d: regression with GCC 14+ builds causes erratic gameplay logic:
+  - shooting from right side makes bullet to go to the right instead of go straight;
+  - plane can't tilt to the left, stays still;
+  - camera eventually rotates the game orientation (???);
 - xtom3d: fog wraps around instead of being more linear;
 - pumpit1: flickers at start of any song without any feedback, abruptly throws steps with working
   playback, ends with silence and steps still going;
@@ -372,7 +376,7 @@ void isa16_xtom3d_io_sound::device_add_mconfig(machine_config &config)
 	m_ymz->add_route(1, "speaker", 0.5, 1);
 }
 
-static INPUT_PORTS_START(xtom3d)
+static INPUT_PORTS_START( xtom3d )
 	PORT_START("SYSTEM")
 	PORT_DIPNAME( 0x0001, 0x0001, "SYSTEM" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -522,7 +526,7 @@ void isa16_xtom3d_io_sound::remap(int space_id, offs_t start, offs_t end)
  * ISA16 Oksan Virtual LPC
  *
  * Doesn't really accesses a Super I/O, which implies that the Holtek keyboard
- * and the RTC chips are motherboard ISA resources.
+ * is a motherboard ISA resource.
  *
  */
 
@@ -532,7 +536,6 @@ public:
 	// construction/destruction
 	isa16_oksan_lpc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	required_device<mc146818_device> m_rtc;
 	required_device<kbdc8042_device> m_kbdc;
 
 protected:
@@ -551,17 +554,12 @@ DEFINE_DEVICE_TYPE(ISA16_OKSAN_LPC, isa16_oksan_lpc, "isa16_oksan_lpc", "ISA16 O
 isa16_oksan_lpc::isa16_oksan_lpc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISA16_OKSAN_LPC, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
-	, m_rtc(*this, "rtc")
 	, m_kbdc(*this, "kbdc")
 {
 }
 
 void isa16_oksan_lpc::device_add_mconfig(machine_config &config)
 {
-	MC146818(config, m_rtc, 32.768_kHz_XTAL);
-	//m_rtc->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
-	m_rtc->set_century_index(0x32);
-
 	KBDC8042(config, m_kbdc, 0);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
@@ -589,14 +587,14 @@ void isa16_oksan_lpc::device_reset()
 void isa16_oksan_lpc::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
-		m_isa->install_device(0x60, 0x7f, *this, &isa16_oksan_lpc::device_map);
+		m_isa->install_device(0x60, 0x6f, *this, &isa16_oksan_lpc::device_map);
 }
 
 void isa16_oksan_lpc::device_map(address_map &map)
 {
 	map(0x00, 0x0f).rw(m_kbdc, FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
-	map(0x10, 0x1f).w(m_rtc, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
-	map(0x10, 0x1f).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
+//	map(0x10, 0x1f).w(m_rtc, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
+//	map(0x10, 0x1f).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
 }
 
 

@@ -1005,7 +1005,7 @@ ROM_START( empcityj )
 ROM_END
 
 // this is a very weird set: original S-0086-002-B0 + S-0086-002A-A0 PCB set with unpopulated M68705 (however the game code expects it,
-// so probably just removed - PCB is not working). The program ROMs are pre-decrypted. Like the current parent, it only shows Seibu at start,
+// so probably just removed - PCB is not working). The program ROMs are unencrypted. Like the current parent, it only shows Seibu at start,
 // every other copyright is removed. Marking it as a bootleg, but not sure. Marking it as US as it checks for the US code in the MCU and because
 // the PCB was found in the USA, but not sure.
 ROM_START( empcityubl )

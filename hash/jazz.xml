@@ -5,22 +5,20 @@ license:CC0-1.0
 -->
 <softwarelist name="jazz" description="Jazz software">
 
-	<!-- can't install yet
 	<software name="winnt31">
-	    <description>Windows NT Version 3.1</description>
-	    <year>1993</year>
-	    <publisher>Microsoft</publisher>
+		<description>Windows NT 3.1</description>
+		<year>1994</year>
+		<publisher>Microsoft</publisher>
 
-	    <part name="hdd" interface="scsi_hdd">
-	        <diskarea name="harddriv">
-	            <disk name="jazz_winnt31" sha1="" writeable="yes" status="nodump" />
-	        </diskarea>
-	    </part>
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="jazz_winnt31" sha1="efaf73e45eca35e45f447d41d12bbd091c298d8e" writeable="yes" />
+			</diskarea>
+		</part>
 	</software>
-	-->
 
 	<software name="winnt35">
-		<description>Windows NT Workstation Version 3.5</description>
+		<description>Windows NT Workstation 3.5</description>
 		<year>1994</year>
 		<publisher>Microsoft</publisher>
 
@@ -32,25 +30,25 @@ license:CC0-1.0
 	</software>
 
 	<software name="winnt351">
-		<description>Windows NT Workstation Version 3.51</description>
+		<description>Windows NT Workstation 3.51</description>
 		<year>1995</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
-				<disk name="jazz_winnt351" sha1="b60bea66e2187cc2406778a26fc9ca4b661ff71f" writeable="yes" />
+				<disk name="jazz_winnt351" sha1="5df584a05972371d2133b03809066b2cdc4a5438" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="winnt4sp1">
-		<description>Windows NT Workstation Version 4.0 Service Pack 1</description>
+	<software name="winnt40">
+		<description>Windows NT Workstation 4.0 with Service Pack 1</description>
 		<year>1996</year>
 		<publisher>Microsoft</publisher>
 
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
-				<disk name="jazz_winnt4sp1" sha1="a988e57e021174f859e972c50786656e408fb18a" writeable="yes" />
+				<disk name="jazz_winnt40" sha1="e8241ac72bb61e8fb2ca4b5b3827edb06e8b4595" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>

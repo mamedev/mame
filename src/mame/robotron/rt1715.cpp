@@ -817,7 +817,7 @@ void rt1715_state::rt1715w(machine_config &config)
 	FLOPPY_CONNECTOR(config, "i8272:1", rt1715w_floppies, "525qd", rt1715_state::floppy_formats);
 
 	Z80DMA(config, m_dma, 15.9744_MHz_XTAL / 4);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set(FUNC(rt1715_state::tc_w));
 	m_dma->in_mreq_callback().set(FUNC(rt1715_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(rt1715_state::memory_write_byte));

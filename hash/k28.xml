@@ -29,6 +29,9 @@ For the 2nd series, the first 4 are (C) Tiger Electronics, modules 5 and 6 are
 It is assumed that the 1st series Spelling modules are the same as the Expansion
 modules. CM62215 and CM62087 were confirmed same, CM62214 and CM62086 too.
 
+Spelling 2 and Spelling 3 are indeed CM62216 and CM62215, this swapped ordering
+is not an error.
+
 -->
 
 <softwarelist name="k28" description="K-2-8 (model 7-232) modules">

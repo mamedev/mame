@@ -224,8 +224,7 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 
 	// TODO: MC68440 is function and pin compatible with MC68450/HD63450, but
 	// has only two DMA channels instead of four.
-	HD63450(config, m_scc_dma, 10'000'000); // MC68440FN10
-	m_scc_dma->set_cpu_tag(m_cpu);
+	HD63450(config, m_scc_dma, 10'000'000, m_cpu, AS_PROGRAM); // MC68440FN10
 	m_scc_dma->irq_callback().set(m_cio[0], FUNC(z8036_device::pa2_w));
 
 	// VME control and status CIO

@@ -9,7 +9,7 @@ license:CC0-1.0
 	<software name="dogonlog">
 		<description>A Dog on a Log</description>
 		<year>1980</year>
-		<publisher>Texas Instruments</publisher>
+		<publisher>Scott Foresman and Company</publisher>
 		<info name="serial" value="CD3534"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
@@ -21,7 +21,7 @@ license:CC0-1.0
 	<software name="ghouse">
 		<description>A Ghost in the House</description>
 		<year>1981</year>
-		<publisher>Texas Instruments</publisher>
+		<publisher>Scott Foresman and Company</publisher>
 		<info name="serial" value="CD3536"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
@@ -33,7 +33,7 @@ license:CC0-1.0
 	<software name="ontrack">
 		<description>On the Track</description>
 		<year>1981</year>
-		<publisher>Texas Instruments</publisher>
+		<publisher>Scott Foresman and Company</publisher>
 		<info name="serial" value="CD3538"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
@@ -57,7 +57,7 @@ license:CC0-1.0
 	<software name="mknight">
 		<description>The Millionth Knight</description>
 		<year>1981</year>
-		<publisher>Texas Instruments</publisher>
+		<publisher>Scott Foresman and Company</publisher>
 		<info name="serial" value="CD3540"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
@@ -69,7 +69,7 @@ license:CC0-1.0
 	<software name="sealfly">
 		<description>The Seal That Could Fly</description>
 		<year>1981</year>
-		<publisher>Texas Instruments</publisher>
+		<publisher>Scott Foresman and Company</publisher>
 		<info name="serial" value="CD3535"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">
@@ -81,7 +81,7 @@ license:CC0-1.0
 	<software name="3circle">
 		<description>The Third Circle</description>
 		<year>1981</year>
-		<publisher>Texas Instruments</publisher>
+		<publisher>Scott Foresman and Company</publisher>
 		<info name="serial" value="CD3539"/>
 		<part name="cart" interface="snread">
 			<dataarea name="rom" size="0x4000">

@@ -836,6 +836,18 @@ ROM_START( xavpkjr )
 	ROM_LOAD( "s-24cs64a.u1", 0x0000, 0x2000, CRC(3a7637f7) SHA1(df5b5903900ae8488a44e3449dd2757d1dc35bc2) )
 ROM_END
 
+ROM_START( xavpowrk )
+	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58fvm6b5b.u2", 0x0000000, 0x0800000, CRC(5fb55dba) SHA1(0c4d370d258a15712dd323739fe23106d00bc04a) )
+
+	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
+	ROM_LOAD( "tc58fvm6b5b.u3", 0x0000000, 0x0800000, CRC(4d8dd940) SHA1(5816ecf14771afb5d41e18042cd72ef5cdcfb95f) )
+
+	ROM_REGION( 0x2000, "i2cmem", ROMREGION_ERASE00 )
+	ROM_LOAD( "s-24cs64a.u1", 0x0000, 0x2000, CRC(23b77570) SHA1(9e1d5b266a884791bcc56d2700b6cbb162d20d53) )
+ROM_END
+
+
 // Domyos DiS (XaviX 2002 based titles)
 ROM_START( domfitex )
 	ROM_REGION( 0x0800000, "bios", ROMREGION_ERASE00 )
@@ -1093,7 +1105,7 @@ CONS( 2004, xavboxj,  xavbox,  0, superxavix_i2c_jmat,  xavix_box,  superxavix_i
 // Bass Fishing PCB is just like Tennis except with an RF daughterboard.
 CONS( 2004, xavbassf, 0,       0, superxavix_i2c_24c08, xavix_i2c,  superxavix_i2c_state,      init_xavix, "SSD Company LTD",         "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// TODO: check SEEPROM type and hookup, banking!
+// TODO: check SEEPROM type and hookup
 CONS( 2005, xavjmat,  0,       0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2005, xavaero,  xavjmat, 0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Aerostep J-Mat (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 CONS( 2007, xavmusic, 0,       0, superxavix_i2c_jmat_24c64,  xavix,      superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Music & Circuit (XaviXPORT)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
@@ -1101,6 +1113,7 @@ CONS( 2007, xavmusicj,xavmusic,0, superxavix_i2c_jmat_24c64,  xavix,      superx
 CONS( 2006, xavcheck, 0,       0, superxavix_i2c_jmat_24c64,  xavix_jmat, superxavix_i2c_jmat_state, init_xavmusic, "SSD Company LTD",         "XaviX Aero Check & Balance (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 // xavpkjr has U6 = S-35390A REAL-TIME CLOCK
 CONS( 2007, xavpkjr,  0, 0, superxavix_i2c_jmat_24c64, xavix, superxavix_i2c_jmat_state,      init_xavix,    "SSD Company LTD",         "PowerKIDS Jr. (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2007, xavpowrk, 0, 0, superxavix_i2c_jmat_24c64, xavix, superxavix_i2c_jmat_state,      init_xavix,    "SSD Company LTD",         "PowerKIDS (XaviXPORT, Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // https://arnaudmeyer.wordpress.com/domyos-interactive-system/
 // Domyos Fitness Adventure

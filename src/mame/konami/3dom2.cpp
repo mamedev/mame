@@ -291,7 +291,7 @@ void m2_bda_device::device_add_mconfig(machine_config &config)
 	M2_MPEG(config, m_mpeg, DERIVED_CLOCK(1, 1));
 //  m_mpeg->int_handler().set(m_powerbus, FUNC(m2_powerbus_device::int_line<BDAINT_MPEG_LINE>));
 
-	DSPP(config, m_dspp, DERIVED_CLOCK(1, 1));
+	DSPP_BULLDOG(config, m_dspp, DERIVED_CLOCK(1, 1));
 	m_dspp->int_handler().set(m_powerbus, FUNC(m2_powerbus_device::int_line<BDAINT_DSP_LINE>));
 	m_dspp->dma_read_handler().set(FUNC(m2_bda_device::read_bus8));
 	m_dspp->dma_write_handler().set(FUNC(m2_bda_device::write_bus8));
@@ -461,7 +461,7 @@ void m2_bda_device::configure_ppc_address_map(address_space &space)
 	space.install_readwrite_handler(MEMCTL_BASE,    MEMCTL_BASE + DEVICE_MASK,  read32s_delegate(*m_memctl,    FUNC(m2_memctl_device::read)),      write32s_delegate(*m_memctl,    FUNC(m2_memctl_device::write)),      0xffffffffffffffffULL);
 	space.install_readwrite_handler(VDU_BASE,       VDU_BASE + DEVICE_MASK,     read32s_delegate(*m_vdu,       FUNC(m2_vdu_device::read)),         write32s_delegate(*m_vdu,       FUNC(m2_vdu_device::write)),         0xffffffffffffffffULL);
 	space.install_readwrite_handler(TE_BASE,        TE_BASE + DEVICE_MASK,      read32sm_delegate(*m_te,       FUNC(m2_te_device::read)),          write32sm_delegate(*m_te,       FUNC(m2_te_device::write)),          0xffffffffffffffffULL);
-	space.install_readwrite_handler(DSP_BASE,       DSP_BASE + DEVICE_MASK,     read32sm_delegate(*m_dspp,     FUNC(dspp_device::read)),           write32sm_delegate(*m_dspp,     FUNC(dspp_device::write)),           0xffffffffffffffffULL);
+	space.install_readwrite_handler(DSP_BASE,       DSP_BASE + DEVICE_MASK,     read32sm_delegate(*m_dspp,     FUNC(dspp_bulldog_device::host_read)), write32sm_delegate(*m_dspp,     FUNC(dspp_bulldog_device::host_write)), 0xffffffffffffffffULL);
 	space.install_readwrite_handler(CTRLPORT_BASE,  CTRLPORT_BASE + DEVICE_MASK,read32sm_delegate(*m_ctrlport, FUNC(m2_ctrlport_device::read)),    write32sm_delegate(*m_ctrlport, FUNC(m2_ctrlport_device::write)),    0xffffffffffffffffULL);
 	space.install_readwrite_handler(MPEG_BASE,      MPEG_BASE + DEVICE_MASK,    read32sm_delegate(*m_mpeg,     FUNC(m2_mpeg_device::read)),        write32sm_delegate(*m_mpeg,     FUNC(m2_mpeg_device::write)),        0xffffffffffffffffULL);
 

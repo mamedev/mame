@@ -396,7 +396,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/m68000/m68020.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/tms32031/tms32031.h"
+#include "cpu/tms320c3x/tms320c3x.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
@@ -1848,10 +1848,10 @@ void drivedge_state::drivedge(machine_config &config)
 	nvram_device &nvram(NVRAM(config, "nvram32"));
 	nvram.set_custom_handler(FUNC(drivedge_state::nvram_init));
 
-	TMS32031(config, m_dsp[0], TMS_CLOCK);
+	TMS320C31(config, m_dsp[0], TMS_CLOCK);
 	m_dsp[0]->set_addrmap(AS_PROGRAM, &drivedge_state::tms1_map);
 
-	TMS32031(config, m_dsp[1], TMS_CLOCK);
+	TMS320C31(config, m_dsp[1], TMS_CLOCK);
 	m_dsp[1]->set_addrmap(AS_PROGRAM, &drivedge_state::tms2_map);
 
 	base_devices(config);

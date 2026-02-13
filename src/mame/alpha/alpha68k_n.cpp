@@ -4,7 +4,7 @@
 
     SNK/Alpha 68000 N based board games
 
-    derived from alpha68k.cpp
+    derived from alpha/alpha68k.cpp
 
     TODO:
     - Super Stingray MCU irq controls timer speed. The MCU has been
@@ -168,11 +168,10 @@ void alpha68k_N_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 			// TODO: not convinced by this either, must be transmask instead of transpen somehow
 			if (data != m_tile_transchar)
 			{
-				u8 color, bank;
-				u16 tile;
+				u8 color;
 
-				bank = data >> 10 & 3;
-				tile = data & 0x3ff;
+				u8 bank = data >> 10 & 3;
+				u16 tile = data & 0x3ff;
 				if (m_is_super_stingray)
 					color = (data >> 7 & 0x18) | (data >> 13 & 7);
 				else
@@ -185,8 +184,8 @@ void alpha68k_N_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 				// can't be 0xff in super stingray
 				if (color != 0xff || !m_is_super_stingray)
 				{
-					int fy = ((data & 0x1000) >> 12) ^ m_flipscreen;
-					int fx = m_flipscreen;
+					bool fy = ((data & 0x1000) >> 12) ^ m_flipscreen;
+					bool fx = m_flipscreen;
 
 					m_gfxdecode->gfx(bank)->transpen(bitmap,cliprect, tile, color, fx, fy, mx, my, 0);
 				}
@@ -225,73 +224,76 @@ u16 alpha68k_N_state::kyros_alpha_trigger_r(offs_t offset)
 	*/
 	static const u8 coinage1[8][2] = {{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
 	static const u8 coinage2[8][2] = {{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
-	const u16 source = m_shared_ram[offset];
 
-	switch (offset)
+	if (!machine().side_effects_disabled())
 	{
-	case 0x22: /* Coin value */
-		m_shared_ram[0x22] = (source & 0xff00) | (m_credits & 0x00ff);
-		return 0;
-	case 0x29: /* Query microcontroller for coin insert */
-		m_trigstate++;
-		if ((m_in[2]->read() & 0x3) == 3)
-			m_latch = 0;
-		if ((m_in[2]->read() & 0x1) == 0 && !m_latch)
+		const u16 source = m_shared_ram[offset];
+		switch (offset)
 		{
-			m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id & 0xff);    // coinA
-			m_shared_ram[0x22] = (source & 0xff00) | 0x0;
-			m_latch = 1;
+		case 0x22: /* Coin value */
+			m_shared_ram[0x22] = (source & 0xff00) | (m_credits & 0x00ff);
+			return 0;
+		case 0x29: /* Query microcontroller for coin insert */
+			m_trigstate++;
+			if ((m_in[2]->read() & 0x3) == 3)
+				m_latch = false;
+			if ((m_in[2]->read() & 0x1) == 0 && !m_latch)
+			{
+				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id & 0xff);    // coinA
+				m_shared_ram[0x22] = (source & 0xff00) | 0x0;
+				m_latch = true;
 
-			m_coinvalue = (~m_in[1]->read() >> 1) & 7;
-			m_deposits1++;
-			if (m_deposits1 == coinage1[m_coinvalue][0])
-			{
-				m_credits = coinage1[m_coinvalue][1];
-				m_deposits1 = 0;
-			}
-			else
-				m_credits = 0;
-		}
-		else if ((m_in[2]->read() & 0x2) == 0 && !m_latch)
-		{
-			m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id >> 8);  // coinB
-			m_shared_ram[0x22] = (source & 0xff00) | 0x0;
-			m_latch = 1;
-
-			m_coinvalue = (~m_in[1]->read() >>1 ) & 7;
-			m_deposits2++;
-			if (m_deposits2 == coinage2[m_coinvalue][0])
-			{
-				m_credits = coinage2[m_coinvalue][1];
-				m_deposits2 = 0;
-			}
-			else
-				m_credits = 0;
-		}
-		else
-		{
-			if (m_microcontroller_id == 0x00ff || m_game_id == ALPHA68K_JONGBOU)     /* Super Stingry */
-			{
-				if (m_trigstate >= 12 || m_game_id == ALPHA68K_JONGBOU) /* arbitrary value ! */
+				m_coinvalue = (~m_in[1]->read() >> 1) & 7;
+				m_deposits1++;
+				if (m_deposits1 == coinage1[m_coinvalue][0])
 				{
-					m_trigstate = 0;
-					m_microcontroller_data = 0x21;          // timer
+					m_credits = coinage1[m_coinvalue][1];
+					m_deposits1 = 0;
+				}
+				else
+					m_credits = 0;
+			}
+			else if ((m_in[2]->read() & 0x2) == 0 && !m_latch)
+			{
+				m_shared_ram[0x29] = (source & 0xff00) | (m_coin_id >> 8);  // coinB
+				m_shared_ram[0x22] = (source & 0xff00) | 0x0;
+				m_latch = true;
+
+				m_coinvalue = (~m_in[1]->read() >>1 ) & 7;
+				m_deposits2++;
+				if (m_deposits2 == coinage2[m_coinvalue][0])
+				{
+					m_credits = coinage2[m_coinvalue][1];
+					m_deposits2 = 0;
+				}
+				else
+					m_credits = 0;
+			}
+			else
+			{
+				if (m_microcontroller_id == 0x00ff || m_game_id == ALPHA68K_JONGBOU)     /* Super Stingry */
+				{
+					if (m_trigstate >= 12 || m_game_id == ALPHA68K_JONGBOU) /* arbitrary value ! */
+					{
+						m_trigstate = 0;
+						m_microcontroller_data = 0x21;          // timer
+					}
+					else
+						m_microcontroller_data = 0x00;
 				}
 				else
 					m_microcontroller_data = 0x00;
+
+				m_shared_ram[0x29] = (source & 0xff00) | m_microcontroller_data;
 			}
-			else
-				m_microcontroller_data = 0x00;
-
-			m_shared_ram[0x29] = (source & 0xff00) | m_microcontroller_data;
+			return 0;
+		case 0xff:  /* Custom check, only used at bootup */
+			m_shared_ram[0xff] = (source & 0xff00) | m_microcontroller_id;
+			break;
 		}
-		return 0;
-	case 0xff:  /* Custom check, only used at bootup */
-		m_shared_ram[0xff] = (source & 0xff00) | m_microcontroller_id;
-		break;
-	}
 
-	logerror("%04x:  Alpha read trigger at %04x\n", m_maincpu->pc(), offset);
+		logerror("%s: Alpha read trigger at %04x\n", machine().describe_context(), offset);
+	}
 
 	return 0; /* Values returned don't matter */
 }
@@ -374,9 +376,9 @@ u16 jongbou_state::dial_inputs_r()
 void sstingray_state::main_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();                       // main program
-	map(0x020000, 0x020fff).ram().share("shared_ram");  // work RAM
-	map(0x040000, 0x041fff).ram().share("spriteram"); // sprite RAM
-	map(0x060000, 0x060001).ram().share("videoram");  // MSB: watchdog, LSB: BGC
+	map(0x020000, 0x020fff).ram().share(m_shared_ram);  // work RAM
+	map(0x040000, 0x041fff).ram().share(m_spriteram); // sprite RAM
+	map(0x060000, 0x060001).ram().share(m_videoram);  // MSB: watchdog, LSB: BGC
 	map(0x080000, 0x0801ff).rw(FUNC(sstingray_state::alpha8511_command_r), FUNC(sstingray_state::alpha8511_command_w)).umask16(0x00ff);
 	map(0x0c0000, 0x0c0001).portr(m_in[0]);
 	map(0x0e0000, 0x0e0000).lr8(NAME([this] () -> u8 { return m_in[1]->read(); })).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -385,9 +387,9 @@ void sstingray_state::main_map(address_map &map)
 void alpha68k_N_state::main_map(address_map &map)
 {
 	map(0x000000, 0x01ffff).rom();                       // main program
-	map(0x020000, 0x020fff).ram().share("shared_ram");  // work RAM
-	map(0x040000, 0x041fff).ram().share("spriteram"); // sprite RAM
-	map(0x060000, 0x060001).ram().share("videoram");  // MSB: watchdog, LSB: BGC
+	map(0x020000, 0x020fff).ram().share(m_shared_ram);  // work RAM
+	map(0x040000, 0x041fff).ram().share(m_spriteram); // sprite RAM
+	map(0x060000, 0x060001).ram().share(m_videoram);  // MSB: watchdog, LSB: BGC
 	map(0x080000, 0x0801ff).rw(FUNC(kyros_state::kyros_alpha_trigger_r), FUNC(kyros_state::alpha_microcontroller_w));
 	map(0x0c0000, 0x0c0001).portr(m_in[0]);
 	map(0x0e0000, 0x0e0000).lr8(NAME([this] () -> u8 { return m_in[1]->read(); })).w(m_soundlatch, FUNC(generic_latch_8_device::write));
@@ -535,32 +537,32 @@ static const gfx_layout jongbou_layout2 =
 };
 
 static GFXDECODE_START( gfx_sstingry )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, sstingry_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, sstingry_layout2,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x10000, sstingry_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x10000, sstingry_layout3,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x00000, sstingry_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x00000, sstingry_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x10000, sstingry_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x10000, sstingry_layout3,  0, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_kyros )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, kyros_char_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, kyros_char_layout2,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x18000, kyros_char_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x18000, kyros_char_layout2,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x30000, kyros_char_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x30000, kyros_char_layout2,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x48000, kyros_char_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x48000, kyros_char_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x00000, kyros_char_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x00000, kyros_char_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x18000, kyros_char_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x18000, kyros_char_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x30000, kyros_char_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x30000, kyros_char_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x48000, kyros_char_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x48000, kyros_char_layout2,  0, 32 )
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_jongbou )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, jongbou_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, jongbou_layout2,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x18000, jongbou_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x18000, jongbou_layout2,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x04000, jongbou_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x04000, jongbou_layout2,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x1c000, jongbou_layout1,  0, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0x1c000, jongbou_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x00000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x00000, jongbou_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x18000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x18000, jongbou_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x04000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x04000, jongbou_layout2,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x1c000, jongbou_layout1,  0, 32 )
+	GFXDECODE_ENTRY( "sprites", 0x1c000, jongbou_layout2,  0, 32 )
 GFXDECODE_END
 
 /*
@@ -846,7 +848,7 @@ ROM_START( sstingry )
 	// Was this dumped from a bootleg? The original "ALPHA-8511" MCU appears to be some sort of Hitachi part.
 	ROM_LOAD( "d8748.bin",       0x0000, 0x0400, CRC(7fcbfc30) SHA1(6d087a3d44e475b6c8260a5134952097f26459b7) )
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "sprites", 0 )
 	ROM_LOAD( "ss_12.rom",       0x00000, 0x4000, CRC(74caa9e9) SHA1(9f0874b2fcdf45acb941bd56b44bf2b9b08641e9) )
 	ROM_LOAD( "ss_08.rom",       0x08000, 0x4000, CRC(32368925) SHA1(af26f73d33936410063de3164ec80f45bed487c7) )
 	ROM_LOAD( "ss_13.rom",       0x10000, 0x4000, CRC(13da6203) SHA1(afa778c26da1adfdc8b2e2a1c7b2b46944b5d008) )
@@ -884,7 +886,7 @@ ROM_START( kyros )
 	ROM_LOAD( "kyros_68705u3.bin",    0x0000, 0x1000, CRC(c20880b7) SHA1(b041c36cbc4f348d74e0548df5cb14727f2d353b) ) // this one is from a bootleg PCB, program code *might* be compatible.
 	ROM_LOAD( "kyros_mcu.bin",    0x0800, 0x0800,  BAD_DUMP CRC(3a902a19) SHA1(af1be8894c899b27b1106663ffaf2ab43fa1cdaa) ) // original MCU? (HD6805U1) zero-page ROM not dumped
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "sprites", 0 )
 	ROM_LOAD( "8.9pr",  0x00000, 0x8000, CRC(c5290944) SHA1(ec97482dc59220002780ae4d02be4cd172cf65ac) )
 	ROM_LOAD( "11.11m", 0x08000, 0x8000, CRC(fbd44f1e) SHA1(d095544ea76674a7ad17c1b8c88614e65890281c) )
 	ROM_LOAD( "12.11n", 0x10000, 0x8000, CRC(10fed501) SHA1(71c0b4b94f86046745105307938f6e2c5661e2a1) )
@@ -930,7 +932,7 @@ ROM_START( kyrosj )
 	ROM_LOAD( "kyros_68705u3.bin",    0x0000, 0x1000, BAD_DUMP CRC(c20880b7) SHA1(b041c36cbc4f348d74e0548df5cb14727f2d353b) ) // this one is from a bootleg PCB, program code *might* be compatible.
 	ROM_LOAD( "kyros_mcu.bin",    0x0800, 0x0800,  BAD_DUMP CRC(3a902a19) SHA1(af1be8894c899b27b1106663ffaf2ab43fa1cdaa) ) // original MCU? (HD6805U1)
 
-	ROM_REGION( 0x60000, "gfx1", 0 )
+	ROM_REGION( 0x60000, "sprites", 0 )
 	ROM_LOAD( "8.9r",   0x00000, 0x8000, CRC(d8203284) SHA1(7dede410239be6b674644fa76c91dd01837f841f) )
 	ROM_LOAD( "11.12m", 0x08000, 0x8000, CRC(a2f9738c) SHA1(31be81274bf70674bf0c32fcddbacf0f58d8f897) )
 	ROM_LOAD( "12.11n", 0x10000, 0x8000, CRC(10fed501) SHA1(71c0b4b94f86046745105307938f6e2c5661e2a1) )
@@ -968,7 +970,7 @@ ROM_START( jongbou )
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_REGION( 0x30000, "sprites", 0 )
 	ROM_LOAD( "p6.l15", 0x00000, 0x08000, CRC(1facee65) SHA1(6c98338c616e53106960063d0d31483131b492b0) )
 	ROM_CONTINUE(0x18000,0x8000)
 	ROM_LOAD( "p5.k15", 0x20000, 0x10000, CRC(db0ad6bb) SHA1(c2ce0e78a4be9314f4f14ea87f521a79bab3697c) )
@@ -998,7 +1000,7 @@ ROM_START( jongbou2 )
 	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "alpha.mcu", 0x000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_REGION( 0x30000, "sprites", 0 )
 	ROM_LOAD( "j.b6.16l.27c512",  0x00000, 0x08000, CRC(71c53f95) SHA1(0e12d03f2bbcff14816f739026e40939c9f68bab) )
 	ROM_CONTINUE(0x18000,0x8000)
 	ROM_LOAD( "j.b5.16k.27c512",  0x20000, 0x10000, CRC(d68b6412) SHA1(6734f5eb31fbf7b5b3edf1d8c4369cc74aea74ab) )
@@ -1021,7 +1023,7 @@ ROM_END
 
 void sstingray_state::init_sstingry()
 {
-	m_invert_controls = 0;
+	m_invert_controls = false;
 	m_microcontroller_id = 0x00ff;
 	m_coin_id = 0x22 | (0x22 << 8);
 	m_game_id = 0;
@@ -1034,7 +1036,7 @@ void sstingray_state::init_sstingry()
 
 void kyros_state::init_kyros()
 {
-	m_invert_controls = 0;
+	m_invert_controls = false;
 	m_microcontroller_id = 0x0012;
 	m_coin_id = 0x22 | (0x22 << 8);
 	m_game_id = ALPHA68K_KYROS;
@@ -1042,7 +1044,7 @@ void kyros_state::init_kyros()
 
 void jongbou_state::init_jongbou()
 {
-	m_invert_controls = 0;
+	m_invert_controls = false;
 	m_microcontroller_id = 0x00ff;
 	m_coin_id = 0x23 | (0x24 << 8);
 	m_game_id = ALPHA68K_JONGBOU;

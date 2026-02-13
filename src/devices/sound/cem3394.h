@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "sound/va_vcf.h"
 
 class cem3394_device : public device_t, public device_sound_interface
 {
@@ -36,10 +37,9 @@ public:
 	// c_ac: Pin 17 - AC-coupling capacitor on the VCF output.
 	cem3394_device &configure(double r_vco, double c_vco, double c_vcf, double c_ac) ATTR_COLD;
 
-	cem3394_device &configure_limit_pw(bool limit_pw) ATTR_COLD;
-
 protected:
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
@@ -71,8 +71,9 @@ private:
 
 	void set_voltage_internal(int input, double voltage);
 
-	double filter(double input, double cutoff);
 	double hpf(double input);
+
+	required_device<va_lpf4_device> m_vcf;
 
 	// device configuration, not needed in save state
 	sound_stream *m_stream;           // our stream
@@ -80,7 +81,6 @@ private:
 	double m_vco_zero_freq;           // frequency of VCO at 0.0V
 	double m_filter_zero_freq;        // frequency of filter at 0.0V
 	double m_hpf_k;                   // RC filter coefficient for AC coupling
-	bool m_limit_pw;                  // whether to clamp the pulse width.
 
 	// device state
 
@@ -97,8 +97,6 @@ private:
 	double m_filter_frequency;        // baseline filter frequency
 	double m_filter_modulation;       // depth of modulation (up to 1.0)
 	double m_filter_resonance;        // depth of modulation (up to 1.0)
-	double m_filter_in[4];            // filter input history
-	double m_filter_out[4];           // filter output history
 
 	double m_pulse_width;             // fractional pulse width
 

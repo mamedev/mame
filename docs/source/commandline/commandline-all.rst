@@ -3276,24 +3276,6 @@ Core Input Options
 
             mame apple2e -ui_active
 
-.. _mame-commandline-nooffscreenreload:
-
-**-[no]offscreen_reload** / **-[no]reload**
-
-    Controls whether or not MAME treats a second button input from a lightgun as
-    a reload signal.  In this case, MAME will report the gun's position as
-    (0,MAX) with the trigger held, which is equivalent to an offscreen reload.
-
-    This is only needed for games that required you to shoot offscreen to
-    reload, and then only if your gun does not support off screen reloads.
-
-    The default is OFF (**-nooffscreen_reload**).
-
-    Example:
-        .. code-block:: bash
-
-            mame lethalen -offscreen_reload
-
 .. _mame-commandline-joystickmap:
 
 **-joystick_map** *<map>* / **-joymap** *<map>*

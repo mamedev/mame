@@ -1,423 +1,206 @@
 <?xml version="1.0"?>
 <!--
 license:CC0-1.0
-authors:hap
+authors:David Haywood, hap
 -->
 <mamelayout version="2">
 
 <!-- define elements -->
 
-	<element name="static_blue"><rect><color red="0" green="0.13333" blue="0.86666" /></rect></element>
-	<element name="static_yellow"><rect><color red="1" green="0.86666" blue="0" /></rect></element>
-	<element name="static_pink"><rect><color red="0.73333" green="0.33333" blue="0.33333" /></rect></element>
-	<element name="static_brown"><rect><color red="0.46666" green="0.33333" blue="0.26666" /></rect></element>
-	<element name="static_white"><rect><color red="0.92" green="0.92" blue="0.92" /></rect></element>
-	<element name="static_black"><rect><color red="0" green="0" blue="0" /></rect></element>
-	<element name="disk_black"><disk><color red="0" green="0" blue="0" /></disk></element>
+	<element name="blue"><rect><color red="0.1" green="0.25" blue="0.85" /></rect></element>
+	<element name="yellow"><rect><color red="1" green="0.85" blue="0.1" /></rect></element>
+	<element name="pink"><rect><color red="0.7" green="0.3" blue="0.4" /></rect></element>
+	<element name="white"><rect><color red="0.92" green="0.92" blue="0.92" /></rect></element>
+	<element name="black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="blackd"><disk><color red="0" green="0" blue="0" /></disk></element>
 
 	<element name="powerled" defstate="0">
-		<rect state = "0">
+		<rect state="0">
 			<color red="0.2" green="0.0" blue="0.0" />
 		</rect>
-		<rect state = "1">
-			<color red="1.0" green="0.2" blue="0.2" />
+		<rect state="1">
+			<color red="1.0" green="0.1" blue="0.1" />
 		</rect>
 	</element>
 
 	<element name="startbutton" defstate="0">
-		<disk state = "0">
+		<disk state="0">
 			<color red="0.7" green="0.7" blue="0.7" />
 		</disk>
-		<disk state = "1">
+		<disk state="1">
 			<color red="1.0" green="1.0" blue="1.0" />
 		</disk>
 	</element>
 
 	<element name="text_level_l">
-		<rect><color red="0" green="0.13333" blue="0.86666" /></rect>
-		<text string="LEVEL GAUGE" align="2"><color red="1" green="0.86666" blue="0" /></text>
+		<text string="LEVEL GAUGE" align="2"><color red="1" green="0.85" blue="0.1" /></text>
 	</element>
 	<element name="text_level_r">
-		<rect><color red="0" green="0.13333" blue="0.86666" /></rect>
-		<text string="LEVEL GAUGE" align="1"><color red="1" green="0.86666" blue="0" /></text>
+		<text string="LEVEL GAUGE" align="1"><color red="1" green="0.85" blue="0.1" /></text>
 	</element>
 	<element name="text_ryu">
-		<rect><color red="0.92" green="0.92" blue="0.92" /></rect>
 		<text string="Ryu"><color red="0" green="0" blue="0" /></text>
 	</element>
 	<element name="text_chunli">
-		<rect><color red="0.92" green="0.92" blue="0.92" /></rect>
 		<text string="Chun-Li"><color red="0" green="0" blue="0" /></text>
 	</element>
 	<element name="text_start">
-		<rect><color red="0.92" green="0.92" blue="0.92" /></rect>
-		<text string="Start"><color red="0.3" green="0.3" blue="0.3" /></text>
+		<text string="Start"><color red="0" green="0" blue="0" /></text>
 	</element>
 
 	<element name="mole_sim_red" defstate="0">
-		<disk state = "0"><color blue="0.05" green="0.05" red="0.20" /></disk>
-		<disk state = "1"><color blue="0.05" green="0.05" red="0.21" /></disk>
-		<disk state = "2"><color blue="0.05" green="0.05" red="0.22" /></disk>
-		<disk state = "3"><color blue="0.05" green="0.05" red="0.23" /></disk>
-		<disk state = "4"><color blue="0.05" green="0.05" red="0.24" /></disk>
-		<disk state = "5"><color blue="0.05" green="0.05" red="0.25" /></disk>
-		<disk state = "6"><color blue="0.05" green="0.05" red="0.26" /></disk>
-		<disk state = "7"><color blue="0.05" green="0.05" red="0.27" /></disk>
-		<disk state = "8"><color blue="0.05" green="0.05" red="0.28" /></disk>
-		<disk state = "9"><color blue="0.05" green="0.05" red="0.29" /></disk>
-		<disk state ="10"><color blue="0.05" green="0.05" red="0.30" /></disk>
-		<disk state ="11"><color blue="0.05" green="0.05" red="0.31" /></disk>
-		<disk state ="12"><color blue="0.05" green="0.05" red="0.32" /></disk>
-		<disk state ="13"><color blue="0.05" green="0.05" red="0.33" /></disk>
-		<disk state ="14"><color blue="0.05" green="0.05" red="0.34" /></disk>
-		<disk state ="15"><color blue="0.05" green="0.05" red="0.35" /></disk>
-		<disk state ="16"><color blue="0.05" green="0.05" red="0.36" /></disk>
-		<disk state ="17"><color blue="0.05" green="0.05" red="0.37" /></disk>
-		<disk state ="18"><color blue="0.05" green="0.05" red="0.38" /></disk>
-		<disk state ="19"><color blue="0.05" green="0.05" red="0.39" /></disk>
-		<disk state ="20"><color blue="0.05" green="0.05" red="0.40" /></disk>
-		<disk state ="21"><color blue="0.05" green="0.05" red="0.41" /></disk>
-		<disk state ="22"><color blue="0.05" green="0.05" red="0.42" /></disk>
-		<disk state ="23"><color blue="0.05" green="0.05" red="0.43" /></disk>
-		<disk state ="24"><color blue="0.06" green="0.06" red="0.44" /></disk>
-		<disk state ="25"><color blue="0.06" green="0.06" red="0.45" /></disk>
-		<disk state ="26"><color blue="0.06" green="0.06" red="0.46" /></disk>
-		<disk state ="27"><color blue="0.06" green="0.06" red="0.47" /></disk>
-		<disk state ="28"><color blue="0.07" green="0.07" red="0.48" /></disk>
-		<disk state ="29"><color blue="0.07" green="0.07" red="0.49" /></disk>
-		<disk state ="30"><color blue="0.07" green="0.07" red="0.50" /></disk>
-		<disk state ="31"><color blue="0.07" green="0.07" red="0.51" /></disk>
-		<disk state ="32"><color blue="0.08" green="0.08" red="0.52" /></disk>
-		<disk state ="33"><color blue="0.08" green="0.08" red="0.53" /></disk>
-		<disk state ="34"><color blue="0.08" green="0.08" red="0.54" /></disk>
-		<disk state ="35"><color blue="0.08" green="0.08" red="0.55" /></disk>
-		<disk state ="36"><color blue="0.09" green="0.09" red="0.56" /></disk>
-		<disk state ="37"><color blue="0.09" green="0.09" red="0.57" /></disk>
-		<disk state ="38"><color blue="0.09" green="0.09" red="0.58" /></disk>
-		<disk state ="39"><color blue="0.09" green="0.09" red="0.59" /></disk>
-		<disk state ="40"><color blue="0.10" green="0.10" red="0.60" /></disk>
-		<disk state ="41"><color blue="0.10" green="0.10" red="0.61" /></disk>
-		<disk state ="42"><color blue="0.10" green="0.10" red="0.62" /></disk>
-		<disk state ="43"><color blue="0.10" green="0.10" red="0.63" /></disk>
-		<disk state ="44"><color blue="0.11" green="0.11" red="0.64" /></disk>
-		<disk state ="45"><color blue="0.11" green="0.11" red="0.65" /></disk>
-		<disk state ="46"><color blue="0.11" green="0.11" red="0.66" /></disk>
-		<disk state ="47"><color blue="0.11" green="0.11" red="0.67" /></disk>
-		<disk state ="48"><color blue="0.12" green="0.12" red="0.68" /></disk>
-		<disk state ="49"><color blue="0.12" green="0.12" red="0.69" /></disk>
-		<disk state ="50"><color blue="0.12" green="0.12" red="0.70" /></disk>
-		<disk state ="51"><color blue="0.12" green="0.12" red="0.71" /></disk>
-		<disk state ="52"><color blue="0.13" green="0.13" red="0.72" /></disk>
-		<disk state ="53"><color blue="0.13" green="0.13" red="0.73" /></disk>
-		<disk state ="54"><color blue="0.13" green="0.13" red="0.74" /></disk>
-		<disk state ="55"><color blue="0.13" green="0.13" red="0.75" /></disk>
-		<disk state ="56"><color blue="0.14" green="0.14" red="0.76" /></disk>
-		<disk state ="57"><color blue="0.14" green="0.14" red="0.77" /></disk>
-		<disk state ="58"><color blue="0.14" green="0.14" red="0.78" /></disk>
-		<disk state ="59"><color blue="0.14" green="0.14" red="0.79" /></disk>
-		<disk state ="60"><color blue="0.15" green="0.15" red="0.80" /></disk>
-		<disk state ="61"><color blue="0.15" green="0.15" red="0.81" /></disk>
-		<disk state ="62"><color blue="0.15" green="0.15" red="0.82" /></disk>
-		<disk state ="63"><color blue="0.15" green="0.15" red="0.83" /></disk>
-		<disk state ="64"><color blue="0.16" green="0.16" red="0.84" /></disk>
-		<disk state ="65"><color blue="0.16" green="0.16" red="0.85" /></disk>
-		<disk state ="66"><color blue="0.16" green="0.16" red="0.86" /></disk>
-		<disk state ="67"><color blue="0.16" green="0.16" red="0.87" /></disk>
-		<disk state ="68"><color blue="0.17" green="0.17" red="0.88" /></disk>
-		<disk state ="69"><color blue="0.17" green="0.17" red="0.89" /></disk>
-		<disk state ="70"><color blue="0.17" green="0.17" red="0.90" /></disk>
-		<disk state ="71"><color blue="0.17" green="0.17" red="0.91" /></disk>
-		<disk state ="72"><color blue="0.18" green="0.18" red="0.92" /></disk>
-		<disk state ="73"><color blue="0.18" green="0.18" red="0.93" /></disk>
-		<disk state ="74"><color blue="0.18" green="0.18" red="0.94" /></disk>
-		<disk state ="75"><color blue="0.18" green="0.18" red="0.95" /></disk>
-		<disk state ="76"><color blue="0.19" green="0.19" red="0.96" /></disk>
-		<disk state ="77"><color blue="0.19" green="0.19" red="0.97" /></disk>
-		<disk state ="78"><color blue="0.19" green="0.19" red="0.98" /></disk>
-		<disk state ="79"><color blue="0.19" green="0.19" red="0.99" /></disk>
-		<disk state ="80"><color blue="0.20" green="0.20" red="1.00" /></disk>
+		<disk state="0"><color blue="0.3" green="0.2" red="1.0" alpha="0.2" /></disk>
+		<disk state="1"><color blue="0.3" green="0.2" red="1.0" /></disk>
 	</element>
 
-	<element name="mole_sim_blu" defstate="0">
-		<disk state = "0"><color red="0.05" green="0.05" blue="0.20" /></disk>
-		<disk state = "1"><color red="0.05" green="0.05" blue="0.21" /></disk>
-		<disk state = "2"><color red="0.05" green="0.05" blue="0.22" /></disk>
-		<disk state = "3"><color red="0.05" green="0.05" blue="0.23" /></disk>
-		<disk state = "4"><color red="0.05" green="0.05" blue="0.24" /></disk>
-		<disk state = "5"><color red="0.05" green="0.05" blue="0.25" /></disk>
-		<disk state = "6"><color red="0.05" green="0.05" blue="0.26" /></disk>
-		<disk state = "7"><color red="0.05" green="0.05" blue="0.27" /></disk>
-		<disk state = "8"><color red="0.05" green="0.05" blue="0.28" /></disk>
-		<disk state = "9"><color red="0.05" green="0.05" blue="0.29" /></disk>
-		<disk state ="10"><color red="0.05" green="0.05" blue="0.30" /></disk>
-		<disk state ="11"><color red="0.05" green="0.05" blue="0.31" /></disk>
-		<disk state ="12"><color red="0.05" green="0.05" blue="0.32" /></disk>
-		<disk state ="13"><color red="0.05" green="0.05" blue="0.33" /></disk>
-		<disk state ="14"><color red="0.05" green="0.05" blue="0.34" /></disk>
-		<disk state ="15"><color red="0.05" green="0.05" blue="0.35" /></disk>
-		<disk state ="16"><color red="0.05" green="0.05" blue="0.36" /></disk>
-		<disk state ="17"><color red="0.05" green="0.05" blue="0.37" /></disk>
-		<disk state ="18"><color red="0.05" green="0.05" blue="0.38" /></disk>
-		<disk state ="19"><color red="0.05" green="0.05" blue="0.39" /></disk>
-		<disk state ="20"><color red="0.05" green="0.05" blue="0.40" /></disk>
-		<disk state ="21"><color red="0.05" green="0.05" blue="0.41" /></disk>
-		<disk state ="22"><color red="0.05" green="0.05" blue="0.42" /></disk>
-		<disk state ="23"><color red="0.05" green="0.05" blue="0.43" /></disk>
-		<disk state ="24"><color red="0.06" green="0.06" blue="0.44" /></disk>
-		<disk state ="25"><color red="0.06" green="0.06" blue="0.45" /></disk>
-		<disk state ="26"><color red="0.06" green="0.06" blue="0.46" /></disk>
-		<disk state ="27"><color red="0.06" green="0.06" blue="0.47" /></disk>
-		<disk state ="28"><color red="0.07" green="0.07" blue="0.48" /></disk>
-		<disk state ="29"><color red="0.07" green="0.07" blue="0.49" /></disk>
-		<disk state ="30"><color red="0.07" green="0.07" blue="0.50" /></disk>
-		<disk state ="31"><color red="0.07" green="0.07" blue="0.51" /></disk>
-		<disk state ="32"><color red="0.08" green="0.08" blue="0.52" /></disk>
-		<disk state ="33"><color red="0.08" green="0.08" blue="0.53" /></disk>
-		<disk state ="34"><color red="0.08" green="0.08" blue="0.54" /></disk>
-		<disk state ="35"><color red="0.08" green="0.08" blue="0.55" /></disk>
-		<disk state ="36"><color red="0.09" green="0.09" blue="0.56" /></disk>
-		<disk state ="37"><color red="0.09" green="0.09" blue="0.57" /></disk>
-		<disk state ="38"><color red="0.09" green="0.09" blue="0.58" /></disk>
-		<disk state ="39"><color red="0.09" green="0.09" blue="0.59" /></disk>
-		<disk state ="40"><color red="0.10" green="0.10" blue="0.60" /></disk>
-		<disk state ="41"><color red="0.10" green="0.10" blue="0.61" /></disk>
-		<disk state ="42"><color red="0.10" green="0.10" blue="0.62" /></disk>
-		<disk state ="43"><color red="0.10" green="0.10" blue="0.63" /></disk>
-		<disk state ="44"><color red="0.11" green="0.11" blue="0.64" /></disk>
-		<disk state ="45"><color red="0.11" green="0.11" blue="0.65" /></disk>
-		<disk state ="46"><color red="0.11" green="0.11" blue="0.66" /></disk>
-		<disk state ="47"><color red="0.11" green="0.11" blue="0.67" /></disk>
-		<disk state ="48"><color red="0.12" green="0.12" blue="0.68" /></disk>
-		<disk state ="49"><color red="0.12" green="0.12" blue="0.69" /></disk>
-		<disk state ="50"><color red="0.12" green="0.12" blue="0.70" /></disk>
-		<disk state ="51"><color red="0.12" green="0.12" blue="0.71" /></disk>
-		<disk state ="52"><color red="0.13" green="0.13" blue="0.72" /></disk>
-		<disk state ="53"><color red="0.13" green="0.13" blue="0.73" /></disk>
-		<disk state ="54"><color red="0.13" green="0.13" blue="0.74" /></disk>
-		<disk state ="55"><color red="0.13" green="0.13" blue="0.75" /></disk>
-		<disk state ="56"><color red="0.14" green="0.14" blue="0.76" /></disk>
-		<disk state ="57"><color red="0.14" green="0.14" blue="0.77" /></disk>
-		<disk state ="58"><color red="0.14" green="0.14" blue="0.78" /></disk>
-		<disk state ="59"><color red="0.14" green="0.14" blue="0.79" /></disk>
-		<disk state ="60"><color red="0.15" green="0.15" blue="0.80" /></disk>
-		<disk state ="61"><color red="0.15" green="0.15" blue="0.81" /></disk>
-		<disk state ="62"><color red="0.15" green="0.15" blue="0.82" /></disk>
-		<disk state ="63"><color red="0.15" green="0.15" blue="0.83" /></disk>
-		<disk state ="64"><color red="0.16" green="0.16" blue="0.84" /></disk>
-		<disk state ="65"><color red="0.16" green="0.16" blue="0.85" /></disk>
-		<disk state ="66"><color red="0.16" green="0.16" blue="0.86" /></disk>
-		<disk state ="67"><color red="0.16" green="0.16" blue="0.87" /></disk>
-		<disk state ="68"><color red="0.17" green="0.17" blue="0.88" /></disk>
-		<disk state ="69"><color red="0.17" green="0.17" blue="0.89" /></disk>
-		<disk state ="70"><color red="0.17" green="0.17" blue="0.90" /></disk>
-		<disk state ="71"><color red="0.17" green="0.17" blue="0.91" /></disk>
-		<disk state ="72"><color red="0.18" green="0.18" blue="0.92" /></disk>
-		<disk state ="73"><color red="0.18" green="0.18" blue="0.93" /></disk>
-		<disk state ="74"><color red="0.18" green="0.18" blue="0.94" /></disk>
-		<disk state ="75"><color red="0.18" green="0.18" blue="0.95" /></disk>
-		<disk state ="76"><color red="0.19" green="0.19" blue="0.96" /></disk>
-		<disk state ="77"><color red="0.19" green="0.19" blue="0.97" /></disk>
-		<disk state ="78"><color red="0.19" green="0.19" blue="0.98" /></disk>
-		<disk state ="79"><color red="0.19" green="0.19" blue="0.99" /></disk>
-		<disk state ="80"><color red="0.20" green="0.20" blue="1.00" /></disk>
+	<element name="mole_sim_blue" defstate="0">
+		<disk state="0"><color red="0.1" green="0.65" blue="1.0" alpha="0.2" /></disk>
+		<disk state="1"><color red="0.1" green="0.65" blue="1.0" /></disk>
 	</element>
 
 
-	<view name="Internal Layout">
-		<bounds left="0" top="0" right="320" bottom="373" />
+<!-- level gauge -->
 
-		<screen index="0">
-			<bounds left="0" top="0" right="320" bottom="240" />
-		</screen>
+	<group name="level1">
+		<bounds x="0" y="0" width="105" height="20" />
 
-		<element ref="static_black">
-			<bounds x="0" y="240" width="320" height="5" />
-		</element>
-		<element ref="static_yellow">
-			<bounds x="0" y="243" width="320" height="5" />
-		</element>
-		<element ref="static_blue">
-			<bounds x="0" y="246" width="320" height="40" />
-		</element>
+		<element ref="black"><bounds x="0" y="0" width="105" height="8" /></element>
+		<element ref="text_level_l"><bounds x="51" y="10" width="50" height="8" /></element>
 
-		<element ref="static_white">
-			<bounds x="115" y="246" width="90" height="40" />
-		</element>
-		<element ref="static_yellow">
-			<bounds x="115" y="275" width="90" height="5" />
-		</element>
+		<repeat count="10">
+			<param name="x" start="4" increment="10" />
+			<param name="i" start="1" increment="1" />
 
-		<element ref="static_pink">
-			<bounds x="0" y="278" width="320" height="95" />
-		</element>
+			<element name="lamp~i~" ref="powerled">
+				<bounds x="~x~" y="2" width="7" height="4"/>
+			</element>
+		</repeat>
+	</group>
 
-		<element ref="static_yellow">
-			<bounds x="0" y="243" width="2" height="130" />
-		</element>
-		<element ref="static_yellow">
-			<bounds x="318" y="243" width="2" height="130" />
-		</element>
+	<group name="level2">
+		<bounds x="0" y="0" width="105" height="20" />
 
-		<element ref="static_brown">
-			<bounds x="130" y="290" width="60" height="3" />
-		</element>
-		<element ref="static_brown">
-			<bounds x="130" y="313" width="60" height="3" />
-		</element>
-		<element ref="static_brown">
-			<bounds x="130" y="336" width="60" height="3" />
-		</element>
-		<element ref="static_brown">
-			<bounds x="130" y="359" width="60" height="3" />
-		</element>
+		<element ref="black"><bounds x="0" y="0" width="105" height="8" /></element>
+		<element ref="text_level_r"><bounds x="4" y="10" width="50" height="8" /></element>
+
+		<repeat count="10">
+			<param name="x" start="4" increment="10" />
+			<param name="i" start="20" increment="-1" />
+
+			<element name="lamp~i~" ref="powerled">
+				<bounds x="~x~" y="2" width="7" height="4"/>
+			</element>
+		</repeat>
+	</group>
+
+
+<!-- mole cpanel -->
+
+	<group name="cpanel1">
+		<bounds x="2" y="0" width="116" height="92" />
+
+		<element ref="blackd"><bounds xc= "20" yc="35" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc= "60" yc="20" width="38" height="38" /></element>
+		<element ref="blackd"><bounds xc="100" yc="35" width="33" height="33" /></element>
+
+		<element ref="blackd"><bounds xc= "20" yc="75" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc= "60" yc="70" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc="100" yc="75" width="33" height="33" /></element>
+
+		<element name="molea_1" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x02" ><bounds xc= "20" yc="35" width="25" height="25"/></element>
+		<element name="molea_0" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x01" ><bounds xc= "60" yc="20" width="30" height="30"/></element> <!-- big mole -->
+		<element name="molea_2" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x04" ><bounds xc="100" yc="35" width="25" height="25"/></element>
+
+		<element name="molea_3" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x08" ><bounds xc= "20" yc="75" width="25" height="25"/></element>
+		<element name="molea_4" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x10" ><bounds xc= "60" yc="70" width="25" height="25"/></element>
+		<element name="molea_5" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x20" ><bounds xc="100" yc="75" width="25" height="25"/></element>
+	</group>
+
+	<group name="cpanel2">
+		<bounds x="2" y="0" width="116" height="92" />
+
+		<element ref="blackd"><bounds xc= "20" yc="35" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc= "60" yc="20" width="38" height="38" /></element>
+		<element ref="blackd"><bounds xc="100" yc="35" width="33" height="33" /></element>
+
+		<element ref="blackd"><bounds xc= "20" yc="75" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc= "60" yc="70" width="33" height="33" /></element>
+		<element ref="blackd"><bounds xc="100" yc="75" width="33" height="33" /></element>
+
+		<element name="moleb_1" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x02" ><bounds xc= "20" yc="35" width="25" height="25"/></element>
+		<element name="moleb_0" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x01" ><bounds xc= "60" yc="20" width="30" height="30"/></element> <!-- big mole -->
+		<element name="moleb_2" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x04" ><bounds xc="100" yc="35" width="25" height="25"/></element>
+
+		<element name="moleb_3" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x08" ><bounds xc= "20" yc="75" width="25" height="25"/></element>
+		<element name="moleb_4" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x10" ><bounds xc= "60" yc="70" width="25" height="25"/></element>
+		<element name="moleb_5" ref="mole_sim_blue" inputtag="MOLEB" inputmask="0x20" ><bounds xc="100" yc="75" width="25" height="25"/></element>
+	</group>
+
+
+<!-- build screen -->
+
+	<group name="common">
+		<bounds left="0" top="0" right="320" bottom="400" />
+
+		<screen index="0"><bounds left="0" top="0" right="320" bottom="240" /></screen>
+
+		<element ref="yellow"><bounds x="0" y="242" width="320" height="150" /></element>
+		<element ref="blue"><bounds xc="160" y="244" width="316" height="40" /></element>
 
 		<!-- two "level gauge" powerbars on the bottom of the bezel -->
+		<group ref="level1"><bounds x="8" y="247" width="105" height="20" /></group>
+		<group ref="level2"><bounds x="207" y="247" width="105" height="20" /></group>
 
-		<!-- left powerbar -->
-		<element ref="static_black">
-			<bounds x="6" y="254" width="105" height="8" />
-		</element>
-		<element ref="text_level_l">
-			<bounds x="7" y="263" width="100" height="8" />
-		</element>
-
-		<element name="lamp1" ref="powerled">
-			<bounds x="10" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp2" ref="powerled">
-			<bounds x="20" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp3" ref="powerled">
-			<bounds x="30" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp4" ref="powerled">
-			<bounds x="40" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp5" ref="powerled">
-			<bounds x="50" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp6" ref="powerled">
-			<bounds x="60" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp7" ref="powerled">
-			<bounds x="70" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp8" ref="powerled">
-			<bounds x="80" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp9" ref="powerled">
-			<bounds x="90" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp10" ref="powerled">
-			<bounds x="100" y="256" width="7" height="4"/>
-		</element>
-
-		<!-- right powerbar -->
-		<element ref="static_black">
-			<bounds x="209" y="254" width="105" height="8" />
-		</element>
-		<element ref="text_level_r">
-			<bounds x="213" y="263" width="100" height="8" />
-		</element>
-
-		<element name="lamp11" ref="powerled">
-			<bounds x="303" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp12" ref="powerled">
-			<bounds x="293" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp13" ref="powerled">
-			<bounds x="283" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp14" ref="powerled">
-			<bounds x="273" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp15" ref="powerled">
-			<bounds x="263" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp16" ref="powerled">
-			<bounds x="253" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp17" ref="powerled">
-			<bounds x="243" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp18" ref="powerled">
-			<bounds x="233" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp19" ref="powerled">
-			<bounds x="223" y="256" width="7" height="4"/>
-		</element>
-		<element name="lamp20" ref="powerled">
-			<bounds x="213" y="256" width="7" height="4"/>
-		</element>
-
-		<!-- NOTE: on real cab, start buttons are on the front panel -->
 		<!-- start buttons -->
-		<element ref="text_ryu">
-			<bounds x="120" y="254" width="18" height="6"/>
-		</element>
-		<element ref="text_start">
-			<bounds x="120" y="261" width="18" height="6"/>
-		</element>
+		<!-- NOTE: on real cab, start buttons are on the front panel -->
+		<element ref="white"><bounds xc="160" y="244" width="80" height="36" /></element>
+		<element ref="yellow"><bounds xc="160" y="266" width="80" height="5" /></element>
 
-		<element ref="disk_black">
-			<bounds x="138" y="251" width="19" height="19" />
-		</element>
-		<element name="startlamp1" ref="startbutton" inputtag="CAB-IN" inputmask="0x02" >
-			<bounds x="140" y="253" width="15" height="15"/>
-		</element>
+		<element ref="blackd"><bounds xc="149" yc="255" width="15" height="15" /></element>
+		<element name="startlamp1" ref="startbutton" inputtag="CAB-IN" inputmask="0x02" ><bounds xc="149" yc="255" width="11" height="11"/></element>
+		<element ref="blackd"><bounds xc="171" yc="255" width="15" height="15" /></element>
+		<element name="startlamp2" ref="startbutton" inputtag="CAB-IN" inputmask="0x04"><bounds xc="171" yc="255" width="11" height="11"/></element>
 
-		<element ref="text_chunli">
-			<bounds x="183" y="254" width="18" height="6"/>
-		</element>
-		<element ref="text_start">
-			<bounds x="183" y="261" width="18" height="6"/>
-		</element>
+		<element ref="text_ryu"><bounds xc="131" y="249" width="18" height="6"/></element>
+		<element ref="text_start"><bounds xc="131" y="254" width="18" height="6"/></element>
+		<element ref="text_chunli"><bounds xc="189" y="249" width="18" height="6"/></element>
+		<element ref="text_start"><bounds xc="189" y="254" width="18" height="6"/></element>
+	</group>
 
-		<element ref="disk_black">
-			<bounds x="163" y="251" width="19" height="19" />
-		</element>
-		<element name="startlamp2" ref="startbutton" inputtag="CAB-IN" inputmask="0x04">
-			<bounds x="165" y="253" width="15" height="15"/>
-		</element>
+	<view name="Internal Layout (Lamps+Moles)">
+		<bounds left="0" top="0" right="320" bottom="368" />
 
-		<!-- cpanel left moles -->
-		<element ref="static_brown"><bounds x="30" y="320" width="50" height="25" /></element>
+		<group ref="common"><bounds x="0" y="0" width="320" height="400" /></group>
 
-		<element ref="disk_black"><bounds x="10.0" y="300" width="35" height="35" /></element>
-		<element ref="disk_black"><bounds x="35.0" y="285" width="40" height="40" /></element>
-		<element ref="disk_black"><bounds x="65.0" y="300" width="35" height="35" /></element>
+		<!-- moles -->
+		<element ref="yellow"><bounds xc="160" y="268" width="320" height="110" /></element>
+		<element ref="pink"><bounds xc="160" y="268" width="316" height="110" /></element>
 
-		<element ref="disk_black"><bounds x="10.0" y="330" width="35" height="35" /></element>
-		<element ref="disk_black"><bounds x="37.5" y="325" width="35" height="35" /></element>
-		<element ref="disk_black"><bounds x="65.0" y="330" width="35" height="35" /></element>
+		<group ref="cpanel1"><bounds x="5" y="272" width="116" height="92" /></group>
+		<group ref="cpanel2"><bounds x="199" y="272" width="116" height="92" /></group>
 
-		<element name="molea_1" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x02" ><bounds x="15.0" y="305" width="25" height="25"/></element>
-		<element name="molea_0" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x01" ><bounds x="40.0" y="290" width="30" height="30"/></element> <!-- big mole -->
-		<element name="molea_2" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x04" ><bounds x="70.0" y="305" width="25" height="25"/></element>
+		<element ref="black"><bounds xc="125" y="268" width="2" height="110" /><color alpha="0.25" /></element>
+		<element ref="black"><bounds xc="195" y="268" width="2" height="110" /><color alpha="0.25" /></element>
 
-		<element name="molea_3" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x08" ><bounds x="15.0" y="335" width="25" height="25"/></element>
-		<element name="molea_4" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x10" ><bounds x="42.5" y="330" width="25" height="25"/></element>
-		<element name="molea_5" ref="mole_sim_red" inputtag="MOLEA" inputmask="0x20" ><bounds x="70.0" y="335" width="25" height="25"/></element>
-
-		<!-- cpanel right moles -->
-		<element ref="static_brown"><bounds x="240" y="320" width="50" height="25" /></element>
-
-		<element ref="disk_black"><bounds x="220.0" y="300" width="35" height="35" /></element>
-		<element ref="disk_black"><bounds x="245.0" y="285" width="40" height="40" /></element>
-		<element ref="disk_black"><bounds x="275.0" y="300" width="35" height="35" /></element>
-
-		<element ref="disk_black"><bounds x="220.0" y="330" width="35" height="35" /></element>
-		<element ref="disk_black"><bounds x="247.5" y="325" width="35" height="35" /></element>
-		<element ref="disk_black"><bounds x="275.0" y="330" width="35" height="35" /></element>
-
-		<element name="moleb_1" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x02" ><bounds x="225.0" y="305" width="25" height="25"/></element>
-		<element name="moleb_0" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x01" ><bounds x="250.0" y="290" width="30" height="30"/></element> <!-- big mole -->
-		<element name="moleb_2" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x04" ><bounds x="280.0" y="305" width="25" height="25"/></element>
-
-		<element name="moleb_3" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x08" ><bounds x="225.0" y="335" width="25" height="25"/></element>
-		<element name="moleb_4" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x10" ><bounds x="252.5" y="330" width="25" height="25"/></element>
-		<element name="moleb_5" ref="mole_sim_blu" inputtag="MOLEB" inputmask="0x20" ><bounds x="280.0" y="335" width="25" height="25"/></element>
-
+		<element ref="black"><bounds xc="160" y="368" width="330" height="100" /></element>
 	</view>
+
+	<view name="Internal Layout (Lamps)">
+		<bounds left="0" top="0" right="320" bottom="268" />
+
+		<group ref="common"><bounds x="0" y="0" width="320" height="400" /></group>
+		<element ref="black"><bounds xc="160" y="268" width="330" height="200" /></element>
+	</view>
+
+	<!-- separate views for moles, so they can be detached with -numscreens n -->
+	<view name="Internal Layout (P1 Moles Only)">
+		<element ref="pink"><bounds xc="0" yc="0" width="125" height="100" /></element>
+		<group ref="cpanel1"><bounds xc="0" yc="0" width="116" height="92" /></group>
+	</view>
+
+	<view name="Internal Layout (P2 Moles Only)">
+		<element ref="pink"><bounds xc="0" yc="0" width="125" height="100" /></element>
+		<group ref="cpanel2"><bounds xc="0" yc="0" width="116" height="92" /></group>
+	</view>
+
 </mamelayout>

@@ -14,7 +14,7 @@
 
 #include "modules/osdmodule.h"
 
-#if defined(OSD_SDL)
+#if defined(OSD_SDL) && !defined(SDLMAME_SDL3)
 
 // OSD headers
 #include "sdlopts.h"
@@ -1181,12 +1181,10 @@ copy_info_t const video_sdl2::s_blit_info_default[] =
 
 } // namespace osd
 
-
-#else // defined(OSD_SDL)
+#else // defined(OSD_SDL) && !defined(SDLMAME_SDL3)
 
 namespace osd { namespace { MODULE_NOT_SUPPORTED(video_sdl2, OSD_RENDERER_PROVIDER, "accel") } }
 
-#endif // defined(OSD_SDL)
-
+#endif // defined(OSD_SDL) && !defined(SDLMAME_SDL3)
 
 MODULE_DEFINITION(RENDERER_SDL2, osd::video_sdl2)

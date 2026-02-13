@@ -43,6 +43,9 @@
 //#define VERBOSE (LOG_GENERAL|LOG_DOG)
 #include "logmacro.h"
 
+
+namespace {
+
 enum irq_mask : u8
 {
 	WATCHDOG = 0x80,
@@ -94,6 +97,10 @@ protected:
 	virtual void write_data(offs_t logical, u16 data, u16 mem_mask) override { m_cpu_mem.write_word(logical, data, mem_mask); }
 	virtual u16 read_cpu(offs_t logical, u16 mem_mask) override { return m_cpu_spc.read_word(logical, mem_mask); }
 	virtual void set_super(bool super) override {}
+	virtual bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override {
+		target_space = &m_cpu->space(spacenum);
+		return true;
+	}
 
 	bool boot() const { return m_boot.entry().has_value(); }
 
@@ -111,8 +118,6 @@ protected:
 	bool m_watchdog;
 	bool m_parity;
 };
-
-DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_SUN1, device_multibus_interface, multibus_sun1_device, "sun1_cpu", "Sun Microsystems Sun-1 CPU board")
 
 void multibus_sun1_device::device_start()
 {
@@ -480,8 +485,6 @@ protected:
 private:
 };
 
-DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_SGI_PM1, device_multibus_interface, multibus_sgi_pm1_device, "sgi_pm1", "Silicon Graphics PM1")
-
 void multibus_sgi_pm1_device::device_reset()
 {
 	multibus_sun1_device::device_reset();
@@ -522,3 +525,9 @@ ioport_constructor multibus_sgi_pm1_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME(sgi_pm1);
 }
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_SUN1,    device_multibus_interface, multibus_sun1_device,    "sun1_cpu", "Sun Microsystems Sun-1 CPU board")
+DEFINE_DEVICE_TYPE_PRIVATE(MULTIBUS_SGI_PM1, device_multibus_interface, multibus_sgi_pm1_device, "sgi_pm1",  "Silicon Graphics PM1")

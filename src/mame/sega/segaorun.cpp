@@ -277,24 +277,356 @@ Notes:
 ***************************************************************************/
 
 #include "emu.h"
-#include "segaorun.h"
+
+#include "315_5195.h"
+#include "fd1089.h"
+
+#include "sega16sp.h"
+#include "segaic16.h"
+#include "segaic16_road.h"
 #include "segaipt.h"
 
-#include "fd1089.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
+#include "machine/adc0804.h"
+#include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "machine/timer.h"
+#include "machine/watchdog.h"
 #include "sound/segapcm.h"
 #include "sound/ymopm.h"
+
+#include "screen.h"
 #include "speaker.h"
 
 #include "outrun.lh"
 
 
+namespace {
+
+class segaorun_state : public sega_16bit_common_base
+{
+public:
+	// construction/destruction
+	segaorun_state(const machine_config &mconfig, device_type type, const char *tag) :
+		sega_16bit_common_base(mconfig, type, tag),
+		m_mapper(*this, "mapper"),
+		m_maincpu(*this, "maincpu"),
+		m_subcpu(*this, "subcpu"),
+		m_soundcpu(*this, "soundcpu"),
+		m_i8255(*this, "i8255"),
+		m_adc(*this, "adc"),
+		m_nvram(*this, "nvram"),
+		m_watchdog(*this, "watchdog"),
+		m_screen(*this, "screen"),
+		m_sprites(*this, "sprites"),
+		m_segaic16vid(*this, "segaic16vid"),
+		m_segaic16road(*this, "segaic16road"),
+		m_bankmotor_timer(*this, "bankmotor"),
+		m_digital_ports(*this, { { "SERVICE", "UNKNOWN", "COINAGE", "DSW" } }),
+		m_adc_ports(*this, "ADC.%u", 0),
+		m_bank_motor_direction(*this, "Bank_Motor_Direction"),
+		m_bank_motor_speed(*this, "Bank_Motor_Speed"),
+		m_vibration_motor(*this, "Vibration_motor"),
+		m_start_lamp(*this, "Start_lamp"),
+		m_brake_lamp(*this, "Brake_lamp"),
+		m_workram(*this, "workram"),
+		m_custom_io_r(*this),
+		m_custom_io_w(*this),
+		m_custom_map(nullptr),
+		m_shangon_video(false),
+		m_scanline_timer(nullptr),
+		m_irq2_gen_timer(nullptr),
+		m_irq2_state(0),
+		m_adc_select(0),
+		m_vblank_irq_state(0),
+		m_bankmotor_pos(0x8000),
+		m_bankmotor_delta(0)
+	{ }
+
+	void shangon_fd1089b(machine_config &config) ATTR_COLD;
+	void outrun_fd1094(machine_config &config) ATTR_COLD;
+	void outrundx(machine_config &config) ATTR_COLD;
+	void shangon(machine_config &config) ATTR_COLD;
+	void outrun_fd1089a(machine_config &config) ATTR_COLD;
+	void outrun(machine_config &config) ATTR_COLD;
+	void outrun_base(machine_config &config) ATTR_COLD;
+
+	// game-specific driver init
+	void init_generic() ATTR_COLD;
+	void init_outrun() ATTR_COLD;
+	void init_outrunb() ATTR_COLD;
+	void init_shangon() ATTR_COLD;
+
+	ioport_value bankmotor_pos_r();
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	// PPI read/write handlers
+	uint8_t unknown_porta_r();
+	uint8_t unknown_portb_r();
+	uint8_t unknown_portc_r();
+	void unknown_porta_w(uint8_t data);
+	void unknown_portb_w(uint8_t data);
+	void video_control_w(uint8_t data);
+	uint8_t bankmotor_limit_r();
+	void bankmotor_control_w(uint8_t data);
+
+	// memory mapping
+	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
+
+	// main CPU read/write handlers
+	uint16_t misc_io_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	void misc_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void nop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	// video updates
+	uint32_t screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_shangon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->tileram_w(offset,data,mem_mask); }
+	void textram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16vid->textram_w(offset,data,mem_mask); }
+	uint16_t sega_road_control_0_r(address_space &space, offs_t offset, uint16_t mem_mask = ~0) { return m_segaic16road->segaic16_road_control_0_r(); }
+	void sega_road_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { m_segaic16road->segaic16_road_control_0_w(offset,data,mem_mask); }
+
+	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
+
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void outrun_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void sub_map(address_map &map) ATTR_COLD;
+
+	TIMER_CALLBACK_MEMBER(irq2_gen_tick);
+	TIMER_CALLBACK_MEMBER(scanline_tick);
+
+	// internal helpers
+	void update_main_irqs();
+	void m68k_reset_callback(int state);
+
+	// custom I/O
+	uint16_t outrun_custom_io_r(address_space &space, offs_t offset);
+	void outrun_custom_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t shangon_custom_io_r(address_space &space, offs_t offset);
+	void shangon_custom_io_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint8_t analog_r();
+
+	// devices
+	required_device<sega_315_5195_mapper_device> m_mapper;
+	required_device<m68000_device> m_maincpu;
+	required_device<m68000_device> m_subcpu;
+	required_device<z80_device> m_soundcpu;
+	required_device<i8255_device> m_i8255;
+	required_device<adc0804_device> m_adc;
+	optional_device<nvram_device> m_nvram;
+	required_device<watchdog_timer_device> m_watchdog;
+	required_device<screen_device> m_screen;
+	required_device<sega_16bit_sprite_device> m_sprites;
+	required_device<segaic16_video_device> m_segaic16vid;
+	required_device<segaic16_road_device> m_segaic16road;
+	optional_device<timer_device> m_bankmotor_timer;
+
+	// input ports
+	required_ioport_array<4> m_digital_ports;
+	optional_ioport_array<8> m_adc_ports;
+
+	// outputs
+	output_finder<> m_bank_motor_direction;
+	output_finder<> m_bank_motor_speed;
+	output_finder<> m_vibration_motor;
+	output_finder<> m_start_lamp;
+	output_finder<> m_brake_lamp;
+
+	// memory
+	required_shared_ptr<uint16_t> m_workram;
+
+	// configuration
+	read16m_delegate    m_custom_io_r;
+	write16s_delegate   m_custom_io_w;
+	const uint8_t *     m_custom_map;
+	bool                m_shangon_video;
+
+	// internal state
+	emu_timer *         m_scanline_timer;
+	emu_timer *         m_irq2_gen_timer;
+	uint8_t             m_irq2_state;
+	uint8_t             m_adc_select;
+	uint8_t             m_vblank_irq_state;
+	int                 m_bankmotor_pos;
+	int                 m_bankmotor_delta;
+};
+
+
 //**************************************************************************
-//  CONSTANTS
+//  VIDEO STARTUP
 //**************************************************************************
 
-const auto MASTER_CLOCK = XTAL(40'000'000);
-const auto SOUND_CLOCK = XTAL(16'000'000);
-const auto MASTER_CLOCK_25MHz = XTAL(25'174'800);
+void segaorun_state::video_start()
+{
+	if (m_shangon_video)
+	{
+		// initialize the tile/text layers
+		m_segaic16vid->tilemap_init(0, segaic16_video_device::TILEMAP_16B_ALT, 0x000, 0, 2);
+
+		// initialize the road
+		m_segaic16road->segaic16_road_init(0, segaic16_road_device::ROAD_OUTRUN, 0x7f6, 0x7c0, 0x7c0, 0);
+	}
+	else
+	{
+		// initialize the tile/text layers
+		m_segaic16vid->tilemap_init(0, segaic16_video_device::TILEMAP_16B, 0x000, 0, 2);
+
+		// initialize the road
+		m_segaic16road->segaic16_road_init(0, segaic16_road_device::ROAD_OUTRUN, 0x400, 0x420, 0x780, 0);
+	}
+}
+
+
+
+//**************************************************************************
+//  VIDEO UPDATE
+//**************************************************************************
+
+uint32_t segaorun_state::screen_update_shangon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// start the sprites drawing
+	m_sprites->draw_async(cliprect);
+
+	// reset priorities
+	screen.priority().fill(0, cliprect);
+
+	// draw the low priority road layer
+	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, segaic16_road_device::ROAD_BACKGROUND);
+
+	// draw background
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0, 0x01);
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1, 0x02);
+
+	// draw foreground
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 0, 0x02);
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 1, 0x04);
+
+	// draw the high priority road
+	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, segaic16_road_device::ROAD_FOREGROUND);
+
+	// text layer
+	// note that we inflate the priority of the text layer to prevent sprites
+	// from drawing over the high scores
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 0, 0x08);
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 1, 0x08);
+
+	// mix in sprites
+	bitmap_ind16 &sprites = m_sprites->bitmap();
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
+			{
+				for (int y = rect.min_y; y <= rect.max_y; y++)
+				{
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					uint8_t const *const pri = &screen.priority().pix(y);
+					for (int x = rect.min_x; x <= rect.max_x; x++)
+					{
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// compare sprite priority against tilemap priority
+							int const priority = (pix >> 10) & 3;
+							if ((1 << priority) > pri[x])
+							{
+								// if the color is set to maximum, shadow pixels underneath us
+								if ((pix & 0x03f0) == 0x03f0)
+									dest[x] += m_palette_entries;
+
+								// otherwise, just add in sprite palette base
+								else
+									dest[x] = 0x400 | (pix & 0x3ff);
+							}
+						}
+					}
+				}
+			});
+
+	return 0;
+}
+
+uint32_t segaorun_state::screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// if no drawing is happening, fill with black and get out
+	if (!m_segaic16vid->m_display_enable)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+
+	// start the sprites drawing
+	m_sprites->draw_async(cliprect);
+
+	// reset priorities
+	screen.priority().fill(0, cliprect);
+
+	// draw the low priority road layer
+	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, segaic16_road_device::ROAD_BACKGROUND);
+
+	// draw background
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 0, 0x01);
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_BACKGROUND, 1, 0x02);
+
+	// draw foreground
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 0, 0x02);
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_FOREGROUND, 1, 0x04);
+
+	// draw the high priority road
+	m_segaic16road->segaic16_road_draw(0, bitmap, cliprect, segaic16_road_device::ROAD_FOREGROUND);
+
+	// text layer
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 0, 0x04);
+	m_segaic16vid->tilemap_draw(screen, bitmap, cliprect, 0, segaic16_video_device::TILEMAP_TEXT, 1, 0x08);
+
+	// mix in sprites
+	bitmap_ind16 &sprites = m_sprites->bitmap();
+	m_sprites->iterate_dirty_rects(
+			cliprect,
+			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
+			{
+				for (int y = rect.min_y; y <= rect.max_y; y++)
+				{
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					uint8_t *const pri = &screen.priority().pix(y);
+					for (int x = rect.min_x; x <= rect.max_x; x++)
+					{
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// compare sprite priority against tilemap priority
+							int const priority = (pix >> 12) & 3;
+							if ((1 << priority) > pri[x])
+							{
+								// if the shadow flag is set, this triggers shadow/hilight for pen 0xa
+								if ((pix & 0x400f) == 0x400a)
+									dest[x] += m_palette_entries;
+
+								// otherwise, just add in sprite palette base
+								else
+									dest[x] = 0x800 | (pix & 0x7ff);
+							}
+						}
+					}
+				}
+			});
+
+	return 0;
+}
+
+
 
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS
@@ -870,6 +1202,8 @@ void segaorun_state::decrypted_opcodes_map(address_map &map)
 	map(0x00000, 0xfffff).bankr("fd1094_decrypted_opcodes");
 }
 
+
+
 //**************************************************************************
 //  SECOND CPU MEMORY MAP
 //**************************************************************************
@@ -1159,14 +1493,14 @@ GFXDECODE_END
 void segaorun_state::outrun_base(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, MASTER_CLOCK/4);
+	M68000(config, m_maincpu, 40_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 
-	M68000(config, m_subcpu, MASTER_CLOCK/4);
+	M68000(config, m_subcpu, 40_MHz_XTAL / 4);
 	m_subcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sub_map);
 
-	Z80(config, m_soundcpu, SOUND_CLOCK/4);
+	Z80(config, m_soundcpu, 16_MHz_XTAL / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segaorun_state::sound_map);
 	m_soundcpu->set_addrmap(AS_IO, &segaorun_state::sound_portmap);
 
@@ -1182,10 +1516,10 @@ void segaorun_state::outrun_base(machine_config &config)
 	m_i8255->in_pc_callback().set(FUNC(segaorun_state::unknown_portc_r));
 	m_i8255->out_pc_callback().set(FUNC(segaorun_state::video_control_w));
 
-	ADC0804(config, m_adc, MASTER_CLOCK_25MHz/4/6);
+	ADC0804(config, m_adc, 25.1748_MHz_XTAL / 4 / 6);
 	m_adc->vin_callback().set(FUNC(segaorun_state::analog_r));
 
-	SEGA_315_5195_MEM_MAPPER(config, m_mapper, MASTER_CLOCK/4, m_maincpu);
+	SEGA_315_5195_MEM_MAPPER(config, m_mapper, 40_MHz_XTAL / 4, m_maincpu);
 	m_mapper->set_mapper(FUNC(segaorun_state::memory_mapper));
 	m_mapper->pbf().set_inputline(m_soundcpu, INPUT_LINE_NMI);
 
@@ -1194,7 +1528,7 @@ void segaorun_state::outrun_base(machine_config &config)
 	PALETTE(config, m_palette).set_entries(4096*2);
 
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_raw(25.1748_MHz_XTAL / 4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segaorun_state::screen_update_outrun));
 	m_screen->set_palette(m_palette);
 
@@ -1204,11 +1538,11 @@ void segaorun_state::outrun_base(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
-	ym2151_device &ymsnd(YM2151(config, "ymsnd", SOUND_CLOCK/4));
+	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4));
 	ymsnd.add_route(0, "speaker", 0.30, 0);
 	ymsnd.add_route(1, "speaker", 0.30, 1);
 
-	segapcm_device &pcm(SEGAPCM(config, "pcm", SOUND_CLOCK/4));
+	segapcm_device &pcm(SEGAPCM(config, "pcm", 16_MHz_XTAL / 4));
 	pcm.set_bank(segapcm_device::BANK_512);
 	pcm.add_route(0, "speaker", 0.70, 0);
 	pcm.add_route(1, "speaker", 0.70, 1);
@@ -1243,7 +1577,7 @@ void segaorun_state::outrun_fd1094(machine_config &config)
 	outrun(config);
 
 	// basic machine hardware
-	FD1094(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	FD1094(config.replace(), m_maincpu, 40_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &segaorun_state::decrypted_opcodes_map);
 	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
@@ -1254,7 +1588,7 @@ void segaorun_state::outrun_fd1089a(machine_config &config)
 	outrun(config);
 
 	// basic machine hardware
-	FD1089A(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	FD1089A(config.replace(), m_maincpu, 40_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
@@ -1274,7 +1608,7 @@ void segaorun_state::shangon(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	m_screen->set_raw(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224);
+	m_screen->set_raw(25.1748_MHz_XTAL / 4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segaorun_state::screen_update_shangon));
 
 	SEGA_SYS16B_SPRITES(config, m_sprites, 0);
@@ -1285,7 +1619,7 @@ void segaorun_state::shangon_fd1089b(machine_config &config)
 	shangon(config);
 
 	// basic machine hardware
-	FD1089B(config.replace(), m_maincpu, MASTER_CLOCK/4);
+	FD1089B(config.replace(), m_maincpu, 40_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &segaorun_state::outrun_map);
 	m_maincpu->reset_cb().set(FUNC(segaorun_state::m68k_reset_callback));
 }
@@ -3105,6 +3439,8 @@ void segaorun_state::init_shangon()
 	m_custom_io_r = read16m_delegate(*this, FUNC(segaorun_state::shangon_custom_io_r));
 	m_custom_io_w = write16s_delegate(*this, FUNC(segaorun_state::shangon_custom_io_w));
 }
+
+} // anonymous namespace
 
 
 

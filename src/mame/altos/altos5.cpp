@@ -224,7 +224,7 @@ void altos5_state::io_write_byte(offs_t offset, uint8_t data)
 
 void altos5_state::busreq_w(int state)
 {
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, state);
 	setup_banks(state); // adjust banking for dma or cpu
 }
 

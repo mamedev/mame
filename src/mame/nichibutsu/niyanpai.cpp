@@ -4,7 +4,7 @@
 
     Game Driver for Nichibutsu Mahjong series.
 
-    Niyanpai
+    Nyanpai
     (c)1996 Nihon Bussan Co.,Ltd.
 
     Musoubana
@@ -52,46 +52,37 @@ void niyanpai_state::init_niyanpai()
 	// initialize sound rom bank
 	//membank("soundbank")->configure_entries(0, 3, memregion("nichisnd:audiorom")->base() + 0x8000, 0x8000);
 	//membank("soundbank")->set_entry(0);
-
-	// initialize out coin flag (musobana)
-	m_musobana_outcoin_flag = 1;
 }
 
 
 uint16_t niyanpai_state::dipsw_r()
 {
-	uint8_t dipsw_a = ioport("DSWA")->read();
-	uint8_t dipsw_b = ioport("DSWB")->read();
+	uint8_t dipsw_a = m_io_dipsw[0]->read();
+	uint8_t dipsw_b = m_io_dipsw[1]->read();
 
 	dipsw_a = bitswap<8>(dipsw_a,0,1,2,3,4,5,6,7);
 	dipsw_b = bitswap<8>(dipsw_b,0,1,2,3,4,5,6,7);
 
-	return ((dipsw_a << 8) | dipsw_b);
+	return (uint16_t(dipsw_a) << 8) | dipsw_b;
 }
 
-MACHINE_START_MEMBER(niyanpai_state, musobana)
+void musobana_state::machine_start()
 {
-	save_item(NAME(m_motor_on));
+	niyanpai_state::machine_start();
+
 	save_item(NAME(m_musobana_inputport));
-	save_item(NAME(m_musobana_outcoin_flag));
 }
 
-uint16_t niyanpai_state::musobana_inputport_0_r()
+uint16_t musobana_state::musobana_inputport_0_r()
 {
-	int portdata;
-
-	switch ((m_musobana_inputport ^ 0xff00) >> 8)
+	uint16_t portdata = 0xffff;
+	for (unsigned i = 0; 5 > i; ++i)
 	{
-		case 0x01:  portdata = ioport("KEY0")->read(); break;
-		case 0x02:  portdata = ioport("KEY1")->read(); break;
-		case 0x04:  portdata = ioport("KEY2")->read(); break;
-		case 0x08:  portdata = ioport("KEY3")->read(); break;
-		case 0x10:  portdata = ioport("KEY4")->read(); break;
-		default:    portdata = ioport("KEY0")->read() & ioport("KEY1")->read() & ioport("KEY2")->read()
-								& ioport("KEY3")->read() & ioport("KEY4")->read(); break;
+		if (!BIT(m_musobana_inputport, 8 + i))
+			portdata &= m_io_key[i]->read();
 	}
 
-	return (portdata);
+	return portdata;
 }
 
 void niyanpai_state::tmp68301_parallel_port_w(uint16_t data)
@@ -102,170 +93,118 @@ void niyanpai_state::tmp68301_parallel_port_w(uint16_t data)
 	//  bit 3   coin lock
 	//  bit 8-9 video page select?
 
-	m_motor_on = data & 4;
-	machine().bookkeeping().coin_counter_w(0,data & 1);
-	machine().bookkeeping().coin_lockout_w(0,data & 0x08);
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_lockout_w(0, BIT(data, 3));
 }
 
-int niyanpai_state::musobana_outcoin_flag_r()
+void musobana_state::musobana_tmp68301_parallel_port_w(uint16_t data)
 {
-	if (m_motor_on) m_musobana_outcoin_flag ^= 1;
-	else m_musobana_outcoin_flag = 1;
+	tmp68301_parallel_port_w(data);
 
-	return m_musobana_outcoin_flag & 0x01;
+	m_hopper->motor_w(BIT(data, 2));
 }
 
-void niyanpai_state::musobana_inputport_w(uint16_t data)
+void musobana_state::musobana_inputport_w(uint16_t data)
 {
 	m_musobana_inputport = data;
 }
 
+void niyanpai_state::video_sound_map(address_map &map)
+{
+	map(0x200000, 0x200000).w("nichisnd", FUNC(nichisnd_device::sound_host_command_w));
+
+	map(0x240400, 0x240403).umask16(0x00ff).r(FUNC(musobana_state::blitter_0_r));
+	map(0x240400, 0x24041f).umask16(0x00ff).w(FUNC(musobana_state::blitter_0_w));
+	map(0x240420, 0x24043f).umask16(0x00ff).w(FUNC(musobana_state::clut_0_w));
+
+	map(0x240600, 0x240603).umask16(0x00ff).r(FUNC(musobana_state::blitter_1_r));
+	map(0x240600, 0x24061f).umask16(0x00ff).w(FUNC(musobana_state::blitter_1_w));
+	map(0x240620, 0x24063f).umask16(0x00ff).w(FUNC(musobana_state::clut_1_w));
+
+	map(0x240800, 0x240803).umask16(0x00ff).r(FUNC(musobana_state::blitter_2_r));
+	map(0x240800, 0x24081f).umask16(0x00ff).w(FUNC(musobana_state::blitter_2_w));
+	map(0x240820, 0x24083f).umask16(0x00ff).w(FUNC(musobana_state::clut_2_w));
+
+	map(0x240a01, 0x240a01).w(FUNC(musobana_state::clutsel_0_w));
+	map(0x240c01, 0x240c01).w(FUNC(musobana_state::clutsel_1_w));
+	map(0x240e01, 0x240e01).w(FUNC(musobana_state::clutsel_2_w));
+}
+
 void niyanpai_state::niyanpai_map(address_map &map)
 {
+	video_sound_map(map);
+
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x040fff).ram().share("nvram");
 
 	map(0x0a0000, 0x0a08ff).rw(FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
-	map(0x0a0900, 0x0a11ff).ram(); // palette work ram?
+	map(0x0a0900, 0x0a11ff).ram(); // palette work RAM?
 
 	map(0x0bf800, 0x0bffff).ram();
-
-	map(0x200000, 0x200000).w("nichisnd", FUNC(nichisnd_device::sound_host_command_w));
 
 	map(0x200200, 0x200201).nopw();            // unknown
 	map(0x240000, 0x240009).nopw();            // unknown
 	map(0x240200, 0x2403ff).nopw();            // unknown
 
-	map(0x240400, 0x240403).r(FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
-	map(0x240400, 0x24041f).w(FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
-	map(0x240420, 0x24043f).w(FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
-	map(0x240600, 0x240603).r(FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
-	map(0x240600, 0x24061f).w(FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
-	map(0x240620, 0x24063f).w(FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
-	map(0x240800, 0x240803).r(FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
-	map(0x240800, 0x24081f).w(FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
-	map(0x240820, 0x24083f).w(FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
 	map(0x280000, 0x280001).r(FUNC(niyanpai_state::dipsw_r));
-
 	map(0x280200, 0x280201).portr("P1_P2");
 	map(0x280400, 0x280401).portr("SYSTEM");
-	map(0x240a01, 0x240a01).w(FUNC(niyanpai_state::clutsel_0_w));
-	map(0x240c01, 0x240c01).w(FUNC(niyanpai_state::clutsel_1_w));
-	map(0x240e01, 0x240e01).w(FUNC(niyanpai_state::clutsel_2_w));
 }
 
-void niyanpai_state::musobana_map(address_map &map)
+void musobana_state::musobana_common_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();
-	map(0x040000, 0x040fff).ram();
+	video_sound_map(map);
 
-	map(0x0a0000, 0x0a08ff).rw(FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
-	map(0x0a0900, 0x0a11ff).ram();             // palette work ram?
-
-	map(0x0a8000, 0x0a87ff).ram().share("nvram");
-	map(0x0bf800, 0x0bffff).ram();
-
-	map(0x200000, 0x200000).w("nichisnd", FUNC(nichisnd_device::sound_host_command_w));
-
-	map(0x200200, 0x200201).w(FUNC(niyanpai_state::musobana_inputport_w)); // inputport select
+	map(0x200200, 0x200201).w(FUNC(musobana_state::musobana_inputport_w)); // inputport select
 	map(0x240000, 0x240009).nopw();            // unknown
 	map(0x240200, 0x2403ff).nopw();            // unknown
 
-	map(0x240400, 0x240403).r(FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
-	map(0x240400, 0x24041f).w(FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
-	map(0x240420, 0x24043f).w(FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
-
-	map(0x240600, 0x240603).r(FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
-	map(0x240600, 0x24061f).w(FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
-	map(0x240620, 0x24063f).w(FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
-
-	map(0x240800, 0x240803).r(FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
-	map(0x240800, 0x24081f).w(FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
-	map(0x240820, 0x24083f).w(FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
-	map(0x240a01, 0x240a01).w(FUNC(niyanpai_state::clutsel_0_w));
-	map(0x240c01, 0x240c01).w(FUNC(niyanpai_state::clutsel_1_w));
-	map(0x240e01, 0x240e01).w(FUNC(niyanpai_state::clutsel_2_w));
-
-	map(0x280000, 0x280001).r(FUNC(niyanpai_state::dipsw_r));
-	map(0x280200, 0x280201).r(FUNC(niyanpai_state::musobana_inputport_0_r));
+	map(0x280000, 0x280001).r(FUNC(musobana_state::dipsw_r));
+	map(0x280200, 0x280201).r(FUNC(musobana_state::musobana_inputport_0_r));
 	map(0x280400, 0x280401).portr("SYSTEM");
 }
 
-void niyanpai_state::mhhonban_map(address_map &map)
+void musobana_state::musobana_map(address_map &map)
 {
+	musobana_common_map(map);
+
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x040fff).ram();
 
-	map(0x060000, 0x0608ff).rw(FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
-	map(0x060900, 0x0611ff).ram();             // palette work ram?
+	map(0x0a0000, 0x0a08ff).rw(FUNC(musobana_state::palette_r), FUNC(musobana_state::palette_w));
+	map(0x0a0900, 0x0a11ff).ram();             // palette work RAM?
+
+	map(0x0a8000, 0x0a87ff).ram().share("nvram");
+	map(0x0bf800, 0x0bffff).ram();
+}
+
+void musobana_state::mhhonban_map(address_map &map)
+{
+	musobana_common_map(map);
+
+	map(0x000000, 0x03ffff).rom();
+	map(0x040000, 0x040fff).ram();
+
+	map(0x060000, 0x0608ff).rw(FUNC(musobana_state::palette_r), FUNC(musobana_state::palette_w));
+	map(0x060900, 0x0611ff).ram();             // palette work RAM?
 	map(0x07f800, 0x07ffff).ram();
 
 	map(0x0a8000, 0x0a87ff).ram().share("nvram");
 	map(0x0bf000, 0x0bffff).ram();
-
-	map(0x200000, 0x200000).w("nichisnd", FUNC(nichisnd_device::sound_host_command_w));
-
-	map(0x200200, 0x200201).w(FUNC(niyanpai_state::musobana_inputport_w)); // inputport select
-	map(0x240000, 0x240009).nopw();            // unknown
-	map(0x240200, 0x2403ff).nopw();            // unknown
-
-	map(0x240400, 0x240403).r(FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
-	map(0x240400, 0x24041f).w(FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
-	map(0x240420, 0x24043f).w(FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
-
-	map(0x240600, 0x240603).r(FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
-	map(0x240600, 0x24061f).w(FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
-	map(0x240620, 0x24063f).w(FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
-
-	map(0x240800, 0x240803).r(FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
-	map(0x240800, 0x24081f).w(FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
-	map(0x240820, 0x24083f).w(FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
-
-	map(0x240a01, 0x240a01).w(FUNC(niyanpai_state::clutsel_0_w));
-	map(0x240c01, 0x240c01).w(FUNC(niyanpai_state::clutsel_1_w));
-	map(0x240e01, 0x240e01).w(FUNC(niyanpai_state::clutsel_2_w));
-
-	map(0x280000, 0x280001).r(FUNC(niyanpai_state::dipsw_r));
-	map(0x280200, 0x280201).r(FUNC(niyanpai_state::musobana_inputport_0_r));
-	map(0x280400, 0x280401).portr("SYSTEM");
 }
 
-void niyanpai_state::zokumahj_map(address_map &map)
+void musobana_state::zokumahj_map(address_map &map)
 {
+	musobana_common_map(map);
+
 	map(0x000000, 0x03ffff).rom();
 	map(0x0ff000, 0x0fffff).ram();
 
-	map(0x0e0000, 0x0e08ff).rw(FUNC(niyanpai_state::palette_r), FUNC(niyanpai_state::palette_w));
-	map(0x0e0900, 0x0e11ff).ram();             // palette work ram?
+	map(0x0e0000, 0x0e08ff).rw(FUNC(musobana_state::palette_r), FUNC(musobana_state::palette_w));
+	map(0x0e0900, 0x0e11ff).ram();             // palette work RAM?
 
 	map(0x0a8000, 0x0a87ff).ram().share("nvram");
 	map(0x0c0000, 0x0cffff).ram();
-
-	map(0x200000, 0x200000).w("nichisnd", FUNC(nichisnd_device::sound_host_command_w));
-
-	map(0x200200, 0x200201).w(FUNC(niyanpai_state::musobana_inputport_w)); // inputport select
-	map(0x240000, 0x240009).nopw();            // unknown
-	map(0x240200, 0x2403ff).nopw();            // unknown
-
-	map(0x240400, 0x240403).r(FUNC(niyanpai_state::blitter_0_r)).umask16(0x00ff);
-	map(0x240400, 0x24041f).w(FUNC(niyanpai_state::blitter_0_w)).umask16(0x00ff);
-	map(0x240420, 0x24043f).w(FUNC(niyanpai_state::clut_0_w)).umask16(0x00ff);
-
-	map(0x240600, 0x240603).r(FUNC(niyanpai_state::blitter_1_r)).umask16(0x00ff);
-	map(0x240600, 0x24061f).w(FUNC(niyanpai_state::blitter_1_w)).umask16(0x00ff);
-	map(0x240620, 0x24063f).w(FUNC(niyanpai_state::clut_1_w)).umask16(0x00ff);
-
-	map(0x240800, 0x240803).r(FUNC(niyanpai_state::blitter_2_r)).umask16(0x00ff);
-	map(0x240800, 0x24081f).w(FUNC(niyanpai_state::blitter_2_w)).umask16(0x00ff);
-	map(0x240820, 0x24083f).w(FUNC(niyanpai_state::clut_2_w)).umask16(0x00ff);
-
-	map(0x240a01, 0x240a01).w(FUNC(niyanpai_state::clutsel_0_w));
-	map(0x240c01, 0x240c01).w(FUNC(niyanpai_state::clutsel_1_w));
-	map(0x240e01, 0x240e01).w(FUNC(niyanpai_state::clutsel_2_w));
-
-	map(0x280000, 0x280001).r(FUNC(niyanpai_state::dipsw_r));
-	map(0x280200, 0x280201).r(FUNC(niyanpai_state::musobana_inputport_0_r));
-	map(0x280400, 0x280401).portr("SYSTEM");
 }
 
 
@@ -274,28 +213,28 @@ static INPUT_PORTS_START( niyanpai )
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )           // ?
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START2 )           // START2
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      // ANALYZER
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START1 )           // START1
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )          // ?
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
 	PORT_START("P1_P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 )                  PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 )                  PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON2 )                  PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 )                  PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -479,8 +418,8 @@ static INPUT_PORTS_START( musobana )    // I don't have manual for this game.
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(niyanpai_state::musobana_outcoin_flag_r))   // OUT COIN
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      // ANALYZER
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
@@ -533,74 +472,77 @@ static INPUT_PORTS_START( 4psimasy )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(niyanpai_state::musobana_outcoin_flag_r))   // OUT COIN
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      // ANALYZER
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
 	PORT_INCLUDE( nbmjctrl_16 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( mhhonban )    // I don't have manual for this game.
+static INPUT_PORTS_START( mhhonban )
+	// Manual only shows six switches for DipSw[A]
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )         PORT_DIPLOCATION("DSWA:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )         PORT_DIPLOCATION("DSWA:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )         PORT_DIPLOCATION("DSWA:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSWA:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIPSW 1-5" )         PORT_DIPLOCATION("DSWA:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSWA:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )         PORT_DIPLOCATION("DSWA:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPSW 1-8" )         PORT_DIPLOCATION("DSWA:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x04, DEF_STR(Difficulty) )   PORT_DIPLOCATION("DSWA:1,2,3")  // 難易度
+	PORT_DIPSETTING(    0x07, "1 (Easy)" )                                            // 弱い
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Hard)" )                                            // 強い
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Coinage) )      PORT_DIPLOCATION("DSWA:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(1C_1C) )                                        // 1コイン1クレジット
+	PORT_DIPSETTING(    0x00, DEF_STR(1C_2C) )                                        // 1コイン2クレジット
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Unused) )       PORT_DIPLOCATION("DSWA:5")      // 未使用
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR(Flip_Screen) )  PORT_DIPLOCATION("DSWA:6")      // 画面反転
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )                                          // 正
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                           // 逆
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Unknown) )      PORT_DIPLOCATION("DSWA:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR(Unknown) )      PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
+	// The manual does not describe DipSw[B] settings individually, it just has the following note:
+	// *原則として未使用、ただし8番をONにしてリセットするとテストモードに入り脱衣シーンなどを確認するにとができます。
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )         PORT_DIPLOCATION("DSWB:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )         PORT_DIPLOCATION("DSWB:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )         PORT_DIPLOCATION("DSWB:3")
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )         PORT_DIPLOCATION("DSWB:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )         PORT_DIPLOCATION("DSWB:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )         PORT_DIPLOCATION("DSWB:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )         PORT_DIPLOCATION("DSWB:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Option Test" )       PORT_DIPLOCATION("DSWB:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Unused) )       PORT_DIPLOCATION("DSWB:1")
+	PORT_DIPSETTING(    0x01, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Unused) )       PORT_DIPLOCATION("DSWB:2")
+	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR(Unused) )       PORT_DIPLOCATION("DSWB:3")
+	PORT_DIPSETTING(    0x04, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR(Unused) )       PORT_DIPLOCATION("DSWB:4")
+	PORT_DIPSETTING(    0x08, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR(Unused) )       PORT_DIPLOCATION("DSWB:5")
+	PORT_DIPSETTING(    0x10, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR(Unused) )       PORT_DIPLOCATION("DSWB:6")
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR(Unused) )       PORT_DIPLOCATION("DSWB:7")
+	PORT_DIPSETTING(    0x40, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPNAME( 0x80, 0x80, "Option Test" )         PORT_DIPLOCATION("DSWB:8")
+	PORT_DIPSETTING(    0x80, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )            // COIN1
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(niyanpai_state::musobana_outcoin_flag_r))   // OUT COIN
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      // ANALYZER
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
@@ -665,8 +607,8 @@ static INPUT_PORTS_START( zokumahj )    // I don't have manual for this game.
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )            // COIN2
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START3 )           // CREDIT CLEAR
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_MEMORY_RESET )     // MEMORY RESET
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )         // ANALYZER
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(niyanpai_state::musobana_outcoin_flag_r))   // OUT COIN
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )      // ANALYZER
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))   // OUT COIN
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )                   // TEST
 
@@ -699,33 +641,35 @@ void niyanpai_state::niyanpai(machine_config &config)
 	NICHISND(config, "nichisnd", 0);
 }
 
-void niyanpai_state::musobana(machine_config &config)
+void musobana_state::musobana(machine_config &config)
 {
 	niyanpai(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &niyanpai_state::musobana_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &musobana_state::musobana_map);
+	m_maincpu->parallel_w_cb().set(FUNC(musobana_state::musobana_tmp68301_parallel_port_w));
 
-	MCFG_MACHINE_START_OVERRIDE(niyanpai_state, musobana)
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
-void niyanpai_state::mhhonban(machine_config &config)
+void musobana_state::mhhonban(machine_config &config)
 {
 	musobana(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &niyanpai_state::mhhonban_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &musobana_state::mhhonban_map);
 }
 
-void niyanpai_state::zokumahj(machine_config &config)
+void musobana_state::zokumahj(machine_config &config)
 {
 	musobana(config);
 
 	/* basic machine hardware */
-	m_maincpu->set_addrmap(AS_PROGRAM, &niyanpai_state::zokumahj_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &musobana_state::zokumahj_map);
 }
 
 
+// 娘牌 with furigana にゃんぱい (tōon yomi reading)
 ROM_START( niyanpai )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* TMP68301 main program */
 	ROM_LOAD16_BYTE( "npai_01.bin", 0x00000, 0x20000, CRC(a904e8a1) SHA1(77865d7b48cac96af1e3cac4a702f7de4b5ee82b) )
@@ -785,6 +729,7 @@ ROM_START( 4psimasy )
 	ROM_LOAD( "11.109", 0x380000, 0x80000, CRC(1659f8d0) SHA1(daa5a2c5c7b5dc362581268fe98897164ccaa316) )
 ROM_END
 
+// 麻雀放送局 本番中
 ROM_START( mhhonban )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* TMP68301 main program */
 	ROM_LOAD16_BYTE( "u209.bin", 0x00000, 0x20000, CRC(121c861f) SHA1(70a6b695998904dccb8791ea5d9acbf7484bd812) )
@@ -820,8 +765,8 @@ ROM_START( zokumahj )
 ROM_END
 
 
-GAME( 1996, niyanpai, 0,        niyanpai, niyanpai, niyanpai_state, init_niyanpai, ROT0, "Nichibutsu",         "Niyanpai (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, musobana, 0,        musobana, musobana, niyanpai_state, init_niyanpai, ROT0, "Nichibutsu / Yubis", "Musoubana (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, 4psimasy, 0,        musobana, 4psimasy, niyanpai_state, init_niyanpai, ROT0, "Sphinx / AV Japan",  "Mahjong 4P Shimasho (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mhhonban, 0,        mhhonban, mhhonban, niyanpai_state, init_niyanpai, ROT0, "Nichibutsu",         "Mahjong Housoukyoku Honbanchuu (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, zokumahj, mhhonban, zokumahj, zokumahj, niyanpai_state, init_niyanpai, ROT0, "Nichibutsu?",        "Zoku Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, niyanpai, 0,        niyanpai, niyanpai, niyanpai_state, init_niyanpai, ROT0, "Nichibutsu",         "Nyanpai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, musobana, 0,        musobana, musobana, musobana_state, init_niyanpai, ROT0, "Nichibutsu / Yubis", "Musoubana (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, 4psimasy, 0,        musobana, 4psimasy, musobana_state, init_niyanpai, ROT0, "Sphinx / AV Japan",  "Mahjong 4P Shimasho (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mhhonban, 0,        mhhonban, mhhonban, musobana_state, init_niyanpai, ROT0, "Nichibutsu",         "Mahjong Housoukyoku Honbanchuu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, zokumahj, mhhonban, zokumahj, zokumahj, musobana_state, init_niyanpai, ROT0, "Nichibutsu?",        "Zoku Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )

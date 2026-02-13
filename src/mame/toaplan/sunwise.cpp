@@ -25,7 +25,7 @@ pwrkick     SW931201-1    Sunwise       Power Kick
 burgkids    SW931201-1    Sunwise       Burger Kids
 pyutakun    SW931201-1    Sunwise       Pyuuta-kun
 othldrby    S951060-VGP   Sunwise       Othello Derby
-
+monkichi    S951060-VGP   Sunwise       Monkichicchi no Fuwafuwa Puzzle  (has a subboard instead of mask ROMs)
 
 Notes on Power Kick coin inputs:
 - The 10 yen input is "Key In" according to the bookkeeping screen, but is
@@ -54,8 +54,10 @@ public:
 		, m_palette(*this, "palette")
 	{ }
 
-	void othldrby(machine_config &config);
-	void pwrkick(machine_config &config);
+	void othldrby(machine_config &config) ATTR_COLD;
+	void pwrkick(machine_config &config) ATTR_COLD;
+
+	void init_monkichi() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -72,6 +74,7 @@ protected:
 private:
 	void pwrkick_coin_w(u8 data);
 	void pwrkick_coin_lockout_w(u8 data);
+	u8 bypass_oki_state_r();
 
 	required_device<upd4992_device> m_rtc;
 	optional_device<ticket_dispenser_device> m_hopper; // pwrkick only
@@ -387,6 +390,61 @@ static INPUT_PORTS_START( othldrby )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( monkichi )
+	PORT_INCLUDE( base )
+
+	PORT_MODIFY("SYS")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Time") // based on first level
+	PORT_DIPSETTING(    0x00, "5 Minutes" )
+	PORT_DIPSETTING(    0x02, "3 Minutes" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
 
 void sunwise_state::pwrkick_coin_w(u8 data)
 {
@@ -403,12 +461,23 @@ void sunwise_state::pwrkick_coin_lockout_w(u8 data)
 	machine().bookkeeping().coin_lockout_w(2, BIT(~data, 1));
 }
 
+u8 sunwise_state::bypass_oki_state_r()
+{
+	// When you complete a level on monkichi it first polls the VDP at 0x30000d waiting for a specific state.
+	//
+	// It then checks 0x600001 (the OKI state) and loops the above unless it gets what it wants, which never
+	// happens, no sounds are playing at the time.
+	//
+	// is this a problem with the OKI status (some megasys1 games have issues with it too) or the VDP?
+	return 0x00;
+}
 
 void sunwise_state::common_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	map(0x100000, 0x103fff).ram().share("nvram"); // Only 10022C-10037B is actually saved as NVRAM
-	map(0x104000, 0x10ffff).ram();
+	// mirror assumed for monkichi as there are a few accesses outside of the usual range
+	map(0x100000, 0x103fff).mirror(0x010000).ram().share("nvram"); // Only 10022C-10037B is actually saved as NVRAM
+	map(0x104000, 0x10ffff).mirror(0x010000).ram();
 
 	map(0x200000, 0x20000f).rw(m_rtc, FUNC(upd4992_device::read), FUNC(upd4992_device::write)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
@@ -605,9 +674,30 @@ ROM_START( othldrby ) // Sunwise S951060-VGP PCB - JAMMA compliant (components i
 	ROM_LOAD( "sunwise_db0_4.u33", 0x00000, 0x80000, CRC(a9701868) SHA1(9ee89556666d358e8d3915622573b3ba660048b8) )
 ROM_END
 
+ROM_START( monkichi )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom1.u61", 0x00000, 0x80000, CRC(0d5085f5) SHA1(11885bc501b12aafd10a83599d6036e259383620) )
+
+	ROM_REGION( 0x200000, "gp9001", 0 )
+	ROM_LOAD( "rom21.c4", 0x000000, 0x080000, CRC(eb0c113d) SHA1(ecbbb94c9bdddc3f5c76d478997d895a2d91024a) )
+	ROM_LOAD( "rom22.c3", 0x080000, 0x080000, CRC(643f02c8) SHA1(555594332330c3e8bc01af2c757b7e4728e64589) )
+	ROM_LOAD( "rom31.c6", 0x100000, 0x080000, CRC(8757ce90) SHA1(cffa4e16d09d2205939b3a26f15a410c7548c8ec) )
+	ROM_LOAD( "rom32.c5", 0x180000, 0x080000, CRC(c5985dba) SHA1(b20c8429f3314dfcb8f8ce66647f4ef0bff9b030) )
+
+	ROM_REGION( 0x080000, "oki", 0 )
+	ROM_LOAD( "rom4.u33", 0x00000, 0x80000, CRC(b148f4d0) SHA1(e53aef6460f1be730396bd3940aeaead215a8378) )
+ROM_END
+
 } // anonymous namespace
+
+void sunwise_state::init_monkichi()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x600001, 0x600001, read8smo_delegate(*this, FUNC(sunwise_state::bypass_oki_state_r)));
+}
 
 GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Power Kick (Japan)",    0 )
 GAME( 1995, burgkids,    0,        pwrkick,    burgkids,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Burger Kids (Japan)",   0 )
 GAME( 1995, pyutakun,    0,        pwrkick,    pyutakun,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Pyuuta-kun (Japan)",    0 )
 GAME( 1995, othldrby,    0,        othldrby,   othldrby,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
+GAME( 1995, monkichi,    0,        othldrby,   monkichi,   sunwise_state,  init_monkichi,   ROT0,   "Sunwise",  "Monkichicchi no Fuwafuwa Puzzle (Japan, prototype?)", 0 ) // maybe a prototype
+// a later version of monkichi, reworked as "Dakko-chan no Fuwafuwa Puzzle" was shown in 1997

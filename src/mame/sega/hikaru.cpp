@@ -1407,6 +1407,10 @@ ROM_START( sgnascaro )
 	ROM_PARAMETER( ":rom_board:key", "56dedf33" )
 ROM_END
 
+// known to exists
+// factory release v7.5: Rev C ic29/30 and no rev ic31/32
+// v7.6 update: Rev D ic29/30 and ??? ic31/32
+ 
 // ROM board: 834-14247, main board: 833-14246-01 VOF
 ROM_START( von4 )
 	HIKARU_BIOS

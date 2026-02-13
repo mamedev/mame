@@ -3,11 +3,16 @@
 /*******************************************************************
 
 R2D Tank (c) 1980 Sigma Ent. Inc.
-
 driver by: David Haywood & Pierpaolo Prazzoli
 
+It's a cost-reduced 'sequel' to "Red Tank", Sigma probably contracted
+Orca to simplify the hardware.
 
-from the readme
+The first version (Red Tank) is on 2 PCBs labeled 富士電子工業株式会社,
+with "FUJIDENSHI" on the EPROM labels. Sigma's "The Goku" is on the
+same earlier hardware as Red Tank.
+
+R2D Tank PCB notes from the readme:
 ----------------------------------------------------
 Orca board number OVG-17A
 
@@ -30,13 +35,12 @@ other = HD46802
 other = M5L8226 (x2)
 RAM = 4116 (x11)
 
-----------------------------------------------------
-
 XTAL values appear to be 3579.545 (X1) and 11.200 (X2).
 
 ********************************************************************/
 
 #include "emu.h"
+
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
@@ -46,6 +50,7 @@ XTAL values appear to be 3579.545 (X1) and 11.200 (X2).
 #include "machine/rescap.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -57,10 +62,6 @@ XTAL values appear to be 3579.545 (X1) and 11.200 (X2).
 
 
 namespace {
-
-#define MAIN_CPU_MASTER_CLOCK   (11.2_MHz_XTAL)
-#define PIXEL_CLOCK             (MAIN_CPU_MASTER_CLOCK / 2)
-#define CRTC_CLOCK              (MAIN_CPU_MASTER_CLOCK / 16)
 
 class r2dtank_state : public driver_device
 {
@@ -416,7 +417,7 @@ INPUT_PORTS_END
 
 void r2dtank_state::r2dtank(machine_config &config)
 {
-	MC6809(config, m_maincpu, MAIN_CPU_MASTER_CLOCK / 4); // divider guessed
+	MC6809(config, m_maincpu, 11.2_MHz_XTAL / 4); // divider guessed
 	m_maincpu->set_addrmap(AS_PROGRAM, &r2dtank_state::r2dtank_main_map);
 
 	M6802(config, m_audiocpu, 3.579545_MHz_XTAL);
@@ -426,12 +427,12 @@ void r2dtank_state::r2dtank(machine_config &config)
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(PIXEL_CLOCK, 360, 0, 256, 276, 0, 224);
+	screen.set_raw(11.2_MHz_XTAL / 2, 360, 0, 256, 276, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::BGR_3BIT);
 
-	mc6845_device &crtc(MC6845(config, "crtc", CRTC_CLOCK));
+	mc6845_device &crtc(MC6845(config, "crtc", 11.2_MHz_XTAL / 16));
 	crtc.set_screen("screen");
 	crtc.set_show_border_area(false);
 	crtc.set_char_width(8);

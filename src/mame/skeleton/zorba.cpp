@@ -267,7 +267,7 @@ void zorba_state::zorba(machine_config &config)
 
 	/* devices */
 	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set("irq0", FUNC(input_merger_device::in_w<0>));
 	//ba0 - not connected
 	m_dma->in_mreq_callback().set(FUNC(zorba_state::memory_read_byte));

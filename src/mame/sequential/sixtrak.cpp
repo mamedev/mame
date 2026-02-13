@@ -40,7 +40,6 @@ Known hardware revisions:
   Contrast sixtrak_rev_a() and sixtrak_rev_b() for the differences. In summary:
     * MM5837 noise generator replaced with a transistor-based noise source.
     * Improved autotune circuit.
-
  - Model 610 Rev C: serial numbers ?-?.
     * No known differences.
 
@@ -395,9 +394,6 @@ void sixtrak_state::update_cvs()
 	{
 		"pitch", "gain", "resonance", "cutoff", "mixer", "mod", "PW", "waveform"
 	};
-
-	if ((m_sh_voices & 0x3f) == 0x3f)
-		return;  // Exit early if no voice S&Hs are activated.
 
 	assert(m_sh_param < 8);
 	const int cv_input = PARAM2CVIN[m_sh_param];
@@ -842,7 +838,7 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 	m_tune_control->bit_handler<1>().set(FUNC(sixtrak_state::tuning_counter_gate_w));
 	m_tune_control->bit_handler<2>().set(m_tuning_ff, FUNC(ttl7474_device::preset_w));
 	m_tune_control->bit_handler<4>().set(m_tuning_ff, FUNC(ttl7474_device::clear_w));
-	m_tune_control->bit_handler<5>().set("nmiff", FUNC(ttl7474_device::preset_w));
+	m_tune_control->bit_handler<5>().set("nmiff", FUNC(ttl7474_device::preset_w));  // NMI disable.
 
 	auto &u102 = OUTPUT_LATCH(config, "led_latch_0");  // 74LS174
 	u102.bit_handler<0>().set_output("led_track_1").invert();
@@ -941,7 +937,7 @@ void sixtrak_state::sixtrak_rev_a(machine_config &config)
 	// component values from the Sente voice board, which is based on the
 	// Six-Trak.
 
-	auto &noise = MM5837_STREAM(config, "noise", 0);
+	auto &noise = MM5837_STREAM(config, "noise");
 	// The actual VDD is -6.5. But according to comments on sente6vb.cpp, that
 	// sounds too low, and it is possible the mapping in mm5837 is wrong. Using
 	// -8.0 as per sente6vb.cpp.

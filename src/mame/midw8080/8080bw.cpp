@@ -1637,13 +1637,15 @@ static INPUT_PORTS_START( mraker )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:3" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPSETTING(    0x04, "7000" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
 	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPSETTING(    0x10, "Upright (Normal)" )
 	PORT_DIPSETTING(    0x20, "Upright (Flip Screen)" )
-	PORT_DIPSETTING(    0x30, "Single (2 Coins/1 Credit)" )
+	PORT_DIPSETTING(    0x30, "Deluxe (2 Coins/1 Credit)" )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
@@ -5575,7 +5577,7 @@ ROM_START( mraker )
 	// l5 position for rom 12 unpopulated
 
 	ROM_REGION( 0x0400, "stars", 0 )
-	ROM_LOAD( "2708",        0x0000, 0x0400, NO_DUMP ) // unknown label
+	ROM_LOAD( "star",        0x0000, 0x0400, CRC(c87a42dd) SHA1(efb841aa85ba88e2aefd3d93b01a0db899a5440d) )
 ROM_END
 
 ROM_START( schaser )

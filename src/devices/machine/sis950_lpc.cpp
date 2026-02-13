@@ -689,7 +689,7 @@ void sis950_lpc_device::nmi_control_w(uint8_t data)
 void sis950_lpc_device::rtc_index_w(uint8_t data)
 {
 	m_rtc_index = data & 0x7f;
-	// bit 7: NMI enable
+	// TODO: bit 7: NMI enable
 }
 
 u8 sis950_lpc_device::rtc_data_r()

@@ -20,7 +20,8 @@ Notes:
 - Increased "sprites" to address 0x400 sprites, to avoid Ghosts'n Goblins
   drawing a bad sprite. (18/08/2005 Pierpaolo Prazzoli)
 
- Notes by Jose Tejada (jotego)
+
+Notes by Jose Tejada (jotego):
 
 There is no watchdog in GnG, as previously stated in the MAME driver.
 Instead, there is a DMA circuit that copies object data from the CPU RAM to a buffer,
@@ -191,14 +192,14 @@ void gng_state::bgscrolly_w(offs_t offset, uint8_t data)
 
 void gng_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint8_t *buffered_spriteram = m_spriteram->buffer();
+	uint8_t *spriteram = m_spriteram->buffer();
 	gfx_element *gfx = m_gfxdecode->gfx(2);
 
 	for (int offs = m_spriteram->bytes() - 4; offs >= 0; offs -= 4)
 	{
-		uint8_t attributes = buffered_spriteram[offs + 1];
-		int sx = buffered_spriteram[offs + 3] - 0x100 * (attributes & 0x01);
-		int sy = buffered_spriteram[offs + 2];
+		uint8_t attributes = spriteram[offs + 1];
+		int sx = spriteram[offs + 3] - 0x100 * (attributes & 0x01);
+		int sy = spriteram[offs + 2];
 		int flipx = attributes & 0x04;
 		int flipy = attributes & 0x08;
 
@@ -211,7 +212,7 @@ void gng_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		}
 
 		gfx->transpen(bitmap,cliprect,
-				buffered_spriteram[offs] + ((attributes << 2) & 0x300),
+				spriteram[offs] + ((attributes << 2) & 0x300),
 				(attributes >> 4) & 3,
 				flipx, flipy,
 				sx, sy, 15);
@@ -266,7 +267,7 @@ void gng_state::gng_main_map(address_map &map)
 	map(0x3a00, 0x3a00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x3b08, 0x3b09).w(FUNC(gng_state::bgscrollx_w));
 	map(0x3b0a, 0x3b0b).w(FUNC(gng_state::bgscrolly_w));
-	// 0x3c00 is the DMA trigger. Not emulated.
+	map(0x3c00, 0x3c00).w(m_spriteram, FUNC(buffered_spriteram8_device::write));
 	map(0x3d00, 0x3d07).w("mainlatch", FUNC(ls259_device::write_d0));
 	map(0x3e00, 0x3e00).w(FUNC(gng_state::bankswitch_w));
 	map(0x4000, 0x5fff).bankr(m_mainbank);
@@ -290,7 +291,7 @@ void gng_state::diamrun_main_map(address_map &map)
 	map(0x3a00, 0x3a00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x3b08, 0x3b09).w(FUNC(gng_state::bgscrollx_w));
 	map(0x3b0a, 0x3b0b).w(FUNC(gng_state::bgscrolly_w));
-	map(0x3c00, 0x3c00).noprw(); // watchdog?
+	map(0x3c00, 0x3c00).w(m_spriteram, FUNC(buffered_spriteram8_device::write));
 	map(0x3d00, 0x3d00).nopw(); // ? (writes $01 and $0F)
 	map(0x3d01, 0x3d01).nopw(); // ?
 	map(0x3e00, 0x3e00).w(FUNC(gng_state::bankswitch_w));
@@ -590,7 +591,6 @@ void gng_state::gng(machine_config &config)
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
 	screen.set_screen_update(FUNC(gng_state::screen_update));
-	screen.screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_gng);
@@ -1124,4 +1124,5 @@ GAME( 1985, makaimurb,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "C
 GAME( 1985, makaimurbbl, gng, gng,     makaimur, gng_state, empty_init, ROT0, "bootleg",  "Makaimura (Japan revision B bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1985, makaimurc,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision C)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1985, makaimurg,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision G)",                MACHINE_SUPPORTS_SAVE )
+
 GAME( 1989, diamrun,     0,   diamrun, diamrun,  gng_state, empty_init, ROT0, "KH Video", "Diamond Run",                                 MACHINE_SUPPORTS_SAVE ) // Kyle Hodgetts

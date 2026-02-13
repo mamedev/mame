@@ -61,7 +61,7 @@ void e9161_state::e9161(machine_config &config)
 	M68000(config, m_maincpu, 8'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &e9161_state::mem_map);
 
-	HD63450(config, m_dmac, 8'000'000, m_maincpu);
+	HD63450(config, m_dmac, 8'000'000, m_maincpu, AS_PROGRAM);
 
 	AM8052(config, "crtc", 8'000'000);
 

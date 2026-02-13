@@ -479,7 +479,7 @@ private:
 
 	void execute_run_drc();
 	void flush_drc_cache();
-	void code_flush_cache();
+	void generate_invariant();
 	void code_compile_block(uint8_t mode, offs_t pc);
 	//void load_fast_iregs(drcuml_block &block);
 	//void save_fast_iregs(drcuml_block &block);
