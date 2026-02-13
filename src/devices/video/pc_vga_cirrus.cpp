@@ -871,7 +871,8 @@ void cirrus_gd5428_vga_device::recompute_params()
 					break;
 				default:
 					// TODO: 0xff in pciagp (alias for a DAC power down?)
-					popmessage("pc_vga_cirrus: reserved mode selected %02x", m_hidden_dac_mode);
+					if (m_hidden_dac_mode != 0xff)
+						popmessage("pc_vga_cirrus: reserved mode selected %02x", m_hidden_dac_mode);
 					break;
 			}
 		}

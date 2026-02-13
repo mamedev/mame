@@ -136,7 +136,8 @@ void i82371eb_isa_device::map_extra(
 		// 10 $72-$73
 		// 01 $70-$71, with aliases at $72/$74/$76
 		// 00 unmapped
-		if (BIT(m_rtccfg, 0))
+		const bool base_rtc = !!BIT(m_rtccfg, 0);
+		if (base_rtc)
 		{
 			io_space->install_readwrite_handler(0x70, 0x70,
 				read8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_index_r<0>)),
@@ -159,6 +160,21 @@ void i82371eb_isa_device::map_extra(
 			//	read8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_data_r<1>)),
 			//	write8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_data_w<1>))
 			//);
+		}
+		else if (base_rtc)
+		{
+			// comebaby BIOS checks often at $74
+			for (u16 port = 0x72; port < 0x78; port += 2)
+			{
+				io_space->install_readwrite_handler(port | 0, port | 0,
+					read8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_index_r<0>)),
+					write8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_index_w<0>))
+				);
+				io_space->install_readwrite_handler(port | 1, port | 1,
+					read8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_data_r<0>)),
+					write8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_data_w<0>))
+				);
+			}
 		}
 	}
 }

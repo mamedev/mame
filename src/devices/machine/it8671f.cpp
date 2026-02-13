@@ -4,10 +4,11 @@
 
 ITE IT8671F Giga I/O
 ITE IT8673F Advanced I/O
+ITE IT8680F Super AT I/O Chipset (& IT8680RF)
 
 TODO:
-- Emulate the other flavour here (probably more of them with some digging);
-- IT8687R looks to be a transceiver chip, tied with 8671;
+- Emulate the other flavours here (probably more of them with some digging);
+- IT8687R looks to be a transceiver chip, tied with 8671 and 8680;
 - GPIO;
 - Keyboard A20 doesn't work right (most likely needs own BIOS);
 - SMI source;
@@ -188,11 +189,10 @@ void it8671f_device::device_add_mconfig(machine_config &config)
 	m_ps2_con->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
 	m_ps2_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
-	// TODO: doesn't work (wrong PS/2 BIOS?), worked around by disabling for now
-	PC_KBDC(config, m_aux_con, ps2_mice, nullptr);
+	// TODO: verify if it doesn't give problems later on
+	PC_KBDC(config, m_aux_con, ps2_mice, STR_HLE_PS2_MOUSE);
 	m_aux_con->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
 	m_aux_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_data_w));
-
 }
 
 
@@ -371,7 +371,7 @@ void it8671f_device::config_map(address_map &map)
 			// TODO: bit 0 for global reset
 		})
 	);
-//	map(0x03, 0x03) (ISA PnP) Serial isolation
+//	map(0x03, 0x03) (ISA PnP) Wake[CSN]
 //	map(0x04, 0x04) (ISA PnP) Resource Data
 //	map(0x05, 0x05) (ISA PnP) Status
 //	map(0x06, 0x06) (ISA PnP) Card Select Number
