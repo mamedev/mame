@@ -159,6 +159,11 @@ private:
 
 	void cpu_reset_w(int state);
 	void cpu_a20_w(int state);
+	void irq_keyboard_w(int state);
+	void irq_mouse_w(int state);
+
+	u8 m_key_irq_line;
+	u8 m_aux_irq_line;
 };
 
 DECLARE_DEVICE_TYPE(IT8671F, it8671f_device);
