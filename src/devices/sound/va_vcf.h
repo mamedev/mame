@@ -93,7 +93,7 @@ private:
 	sound_stream::sample_t process_sample_internal(sound_stream::sample_t s);
 
 	u32 sample_rate() const;
-	void recalc_alpha0();
+	void recalc_res();
 	void recalc_filter();
 
 	sound_stream *m_stream;
@@ -103,7 +103,6 @@ private:
 	float m_input_gain;
 	float m_gain_comp;
 	float m_drive;
-	float m_drive_inv;
 
 	// Filter state.
 	float m_fc;  // Cutoff frequency in Hz.
@@ -117,6 +116,7 @@ private:
 	std::array<filter_stage, 4> m_stages;
 	float m_alpha0;
 	float m_G4;
+	float m_gain_comp_scale;
 };
 
 

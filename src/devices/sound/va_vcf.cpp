@@ -20,12 +20,12 @@ va_lpf4_device::va_lpf4_device(const machine_config &mconfig, device_type type, 
 	, m_input_gain(1)
 	, m_gain_comp(0)
 	, m_drive(1)
-	, m_drive_inv(1)
 	, m_fc(0)
 	, m_res(0)
 	, m_stages()
 	, m_alpha0(1)
 	, m_G4(1)
+	, m_gain_comp_scale(1)
 {
 }
 
@@ -50,7 +50,6 @@ va_lpf4_device &va_lpf4_device::configure_bass_gain_comp(float comp)
 va_lpf4_device &va_lpf4_device::va_lpf4_device::configure_drive(float drive)
 {
 	m_drive = drive;
-	m_drive_inv = 1.0F / drive;
 	return *this;
 }
 
@@ -83,7 +82,7 @@ void va_lpf4_device::set_fixed_res_cv(float res_cv)
 		m_stream->update();
 
 	m_res = res;
-	recalc_alpha0();
+	recalc_res();
 }
 
 float va_lpf4_device::get_freq()
@@ -137,6 +136,7 @@ void va_lpf4_device::device_start()
 	save_item(STRUCT_MEMBER(m_stages, state));
 	save_item(NAME(m_alpha0));
 	save_item(NAME(m_G4));
+	save_item(NAME(m_gain_comp_scale));
 
 	recalc_filter();
 }
@@ -170,18 +170,41 @@ void va_lpf4_device::device_start()
 */
 sound_stream::sample_t va_lpf4_device::process_sample_internal(sound_stream::sample_t s)
 {
+	// The chapter references below are for the book "The Art of VA Filter Design".
+	// Most of the implementation below is based on Chapter 5.3.
+
 	float sigma = 0;
 	for (const filter_stage &stage : m_stages)
 		sigma += stage.beta * stage.state;
 
-	// Adding a tiny amount of noise to the input signal, to ensure the
-	// filter can self-oscillate even when there is no input.
+	float x = s * m_input_gain;
+
+	// Adding a tiny amount of noise to the input signal, to ensure the filter
+	// can self-oscillate even when there is no input. See chapter 6, footnote 4.
 	const float noise = 2 * (float(machine().rand()) / std::numeric_limits<u32>::max() - 0.5F);  // [-1, 1]
-	float x = s * m_input_gain + 0.000001F * noise;
-	x *= 1.0F + m_gain_comp * m_res;
+	x += 0.000001F * noise;
+
+	// 'drive' will scale the signal before entering the filter. The scaling
+	// will be undone at the output. This is used to fine-tune the balance
+	// between self-oscillation and input signal. See chapter 6.3, section
+	// "Effects of transient response", including the summary in the last paragraph.
+	x *= m_drive;
+
+	// Apply low frequency gain compensation. See first paragraph in chapter 5.4
+	// ("feedback shaping"). But instead of scaling by (1 + k), we scale by
+	// (1 + a * k) (stored in m_gain_comp_scale) to make the compensation
+	// configurable by changing `a`, as per the W. Pirkle book in the function
+	// comments above.
+	x *= m_gain_comp_scale;
 
 	float u = (x - m_res * sigma) * m_alpha0;
-	u = m_drive_inv * tanhf(u * m_drive);
+
+	// Saturation is required for stability at high resonance settings. As a
+	// bonus, it better matches analog filters. See intro to chapter 6, and
+	// chapter 6.3. Here, we implement "feedforward path saturation" (chapter 6.3).
+	// Applying saturation accurately is expensive (chapters 6.4 and 6.5), so we
+	// use the "linearization at zero" approximation (chapter 6.6), for now.
+	u = tanhf(u);
 
 	for (filter_stage &stage : m_stages)
 	{
@@ -190,7 +213,7 @@ sound_stream::sample_t va_lpf4_device::process_sample_internal(sound_stream::sam
 		stage.state = vn + u;
 	}
 
-	return u;
+	return u / m_drive;
 }
 
 sound_stream::sample_t va_lpf4_device::process_sample(sound_stream::sample_t s)
@@ -223,7 +246,7 @@ void va_lpf4_device::sound_stream_update(sound_stream &stream)
 			if (res != m_res)
 			{
 				m_res = res;
-				recalc_alpha0();
+				recalc_res();
 			}
 		}
 		stream.put(0, i, process_sample_internal(stream.get(INPUT_AUDIO, i)));
@@ -238,9 +261,10 @@ u32 va_lpf4_device::sample_rate() const
 		return m_streamless_sample_rate;
 }
 
-void va_lpf4_device::recalc_alpha0()
+void va_lpf4_device::recalc_res()
 {
 	m_alpha0 = 1.0F / (1.0F + m_res * m_G4);
+	m_gain_comp_scale = 1.0F + m_gain_comp * m_res;
 }
 
 void va_lpf4_device::recalc_filter()
@@ -269,7 +293,7 @@ void va_lpf4_device::recalc_filter()
 	const float G = g / gp1;
 	const float G2 = G * G;
 	m_G4 = G2 * G2;
-	recalc_alpha0();
+	recalc_res();
 
 	for (filter_stage &stage : m_stages)
 		stage.alpha = G;
