@@ -160,10 +160,10 @@ void squash_state::encrypted_w(offs_t offset, u16 data, u16 mem_mask)
 void bigkarnk_state::bigkarnk_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();                                                              // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(bigkarnk_state::vram_w)).share(m_videoram);              // Video RAM
+	map(0x100000, 0x101fff).ram().w(FUNC(bigkarnk_state::vram_w)).share(m_videoram);            // Video RAM
 	map(0x102000, 0x103fff).ram();                                                              // Screen RAM
 	map(0x108000, 0x108007).writeonly().share(m_vregs);                                         // Video Registers
-	map(0x10800c, 0x10800d).w(FUNC(bigkarnk_state::irqack_w));                                    // INT 6 ACK/Watchdog timer
+	map(0x10800c, 0x10800d).w(FUNC(bigkarnk_state::irqack_w));                                  // INT 6 ACK/Watchdog timer
 	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
 	map(0x440000, 0x440fff).ram().share(m_spriteram);                                           // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW1");
@@ -247,13 +247,13 @@ void squash_state::squash_map(address_map &map)
 
 void thoop_state::thoop_map(address_map &map)
 {
-	map(0x000000, 0x0fffff).rom();                                                                 // ROM
-	map(0x100000, 0x101fff).ram().w(FUNC(thoop_state::vram_encrypted_w)).share(m_videoram); // Video RAM
-	map(0x102000, 0x103fff).ram().w(FUNC(thoop_state::encrypted_w)).share(m_screenram);     // Screen RAM
-	map(0x108000, 0x108007).writeonly().share(m_vregs);                                            // Video Registers
-	map(0x10800c, 0x10800d).w(FUNC(thoop_state::irqack_w));                                       // INT 6 ACK/Watchdog timer
-	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");    // Palette
-	map(0x440000, 0x440fff).ram().share(m_spriteram);                                              // Sprite RAM
+	map(0x000000, 0x0fffff).rom();                                                              // ROM
+	map(0x100000, 0x101fff).ram().w(FUNC(thoop_state::vram_encrypted_w)).share(m_videoram);     // Video RAM
+	map(0x102000, 0x103fff).ram().w(FUNC(thoop_state::encrypted_w)).share(m_screenram);         // Screen RAM
+	map(0x108000, 0x108007).writeonly().share(m_vregs);                                         // Video Registers
+	map(0x10800c, 0x10800d).w(FUNC(thoop_state::irqack_w));                                     // INT 6 ACK/Watchdog timer
+	map(0x200000, 0x2007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette"); // Palette
+	map(0x440000, 0x440fff).ram().share(m_spriteram);                                           // Sprite RAM
 	map(0x700000, 0x700001).portr("DSW2");
 	map(0x700002, 0x700003).portr("DSW1");
 	map(0x700004, 0x700005).portr("P1");
@@ -847,11 +847,11 @@ void gaelco_state::machine_start()
 void bigkarnk_state::bigkarnk(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(24'000'000)/2);   // MC68000P10, 12 MHz (verified)
+	M68000(config, m_maincpu, 24_MHz_XTAL/2);   // MC68000P10, 12 MHz (verified)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bigkarnk_state::bigkarnk_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bigkarnk_state::irq6_line_assert));
 
-	MC6809E(config, m_audiocpu, XTAL(8'000'000)/4);  // 68B09EP, 2 MHz (verified)
+	MC6809E(config, m_audiocpu, 8_MHz_XTAL/4);  // 68B09EP, 2 MHz (verified)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bigkarnk_state::bigkarnk_snd_map);
 
 	config.set_maximum_quantum(attotime::from_hz(600));
@@ -880,15 +880,15 @@ void bigkarnk_state::bigkarnk(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 
-	YM3812(config, "ymsnd", XTAL(8'000'000)/2).add_route(ALL_OUTPUTS, "mono", 1.0); // 4 MHz matches PCB recording
+	YM3812(config, "ymsnd", 8_MHz_XTAL/2).add_route(ALL_OUTPUTS, "mono", 1.0); // 4 MHz matches PCB recording
 
-	OKIM6295(config, "oki", XTAL(8'000'000)/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
+	OKIM6295(config, "oki", 8_MHz_XTAL/8, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock frequency & pin 7 not verified
 }
 
 void gaelco_state::maniacsq(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(24'000'000)/2); // verified on PCB
+	M68000(config, m_maincpu, 24_MHz_XTAL/2); // verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaelco_state::maniacsq_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gaelco_state::irq6_line_assert));
 
@@ -946,7 +946,7 @@ void xorwflat_state::xorwflat(machine_config &config)
 void squash_state::squash(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(20'000'000)/2); // Verified on PCB
+	M68000(config, m_maincpu, 20_MHz_XTAL/2); // Verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &squash_state::squash_map);
 	m_maincpu->set_vblank_int("screen", FUNC(squash_state::irq6_line_assert));
 
@@ -985,7 +985,7 @@ void squash_state::squash(machine_config &config)
 void thoop_state::thoop(machine_config &config)
 {
 	// Basic machine hardware
-	M68000(config, m_maincpu, XTAL(24'000'000)/2); // Verified on PCB
+	M68000(config, m_maincpu, 24_MHz_XTAL/2); // Verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &thoop_state::thoop_map);
 	m_maincpu->set_vblank_int("screen", FUNC(thoop_state::irq6_line_assert));
 
@@ -1163,6 +1163,12 @@ ROM_START( biomtoy ) // PCB - REF.922804/2
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(0f02de7e) SHA1(a8779370cc36290616794ff11eb3eebfdea5b1a9) )
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(914e4bbc) SHA1(ca82b7481621a119f05992ed093b963da70d748a) )
+
+	ROM_REGION( 0x2e5, "plds", 0 )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers
+	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )	
 ROM_END
 
 
@@ -1194,6 +1200,12 @@ ROM_START( biomtoya ) // PCB - REF.922804/2
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
+
+	ROM_REGION( 0x2e5, "plds", 0 )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers
+	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )
 ROM_END
 
 
@@ -1225,6 +1237,12 @@ ROM_START( biomtoyb ) // PCB - REF.922804/2
 	ROM_LOAD( "c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
+
+	ROM_REGION( 0x2e5, "plds", 0 )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers
+	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )
 ROM_END
 
 
@@ -1256,6 +1274,12 @@ ROM_START( biomtoyc ) // PCB - REF.922804/1 or REF.922804/2
 	ROM_LOAD( "sound1.c1", 0x000000, 0x080000, CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "sound2.c3", 0x080000, 0x080000, CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
+
+	ROM_REGION( 0x2e5, "plds", 0 )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers
+	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )
 ROM_END
 
 ROM_START( bioplayc ) // PCB - REF.922804/2?? - Spanish version
@@ -1287,6 +1311,12 @@ ROM_START( bioplayc ) // PCB - REF.922804/2?? - Spanish version
 	ROM_LOAD( "c1", 0x000000, 0x080000, BAD_DUMP CRC(edf77532) SHA1(cf198b14c25e1b242a65af8ce23538404cd2b12d) ) // sldh
 	// 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs
 	ROM_LOAD( "c3", 0x080000, 0x080000, BAD_DUMP CRC(c3aea660) SHA1(639d4195391e2608e94759e8a4385b518872263a) ) // sldh
+
+	ROM_REGION( 0x2e5, "plds", 0 )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers (not on the proto, but on the release versions)
+	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )
 ROM_END
 
 ROM_START( lastkm ) // PCB - REF 922804/2
