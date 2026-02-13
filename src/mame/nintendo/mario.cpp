@@ -28,7 +28,7 @@ The sound MCU can be easily replaced with a ROMless one such as I8039
 offset $01: change $00 to $01 (call $100 -> call $101)
 
 TODO:
-- coin 2 doesn't work in marioe and marioj (though it works in service mode),
+- coin 2 doesn't work in mario and marioj (though it works in service mode),
   is it a bug or deliberate?
 - draw_sprites should adopt the scanline logic from dkong, the schematics have
   the same logic for sprite buffering
@@ -891,7 +891,39 @@ void mario_state::masao(machine_config &config)
  *
  *************************************/
 
-ROM_START( mario )
+ROM_START( mario ) // TMA1-05 CPU, TMA1-03-VIDEO
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tma1-c-7f_e-1.7f", 0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) )
+	ROM_LOAD( "tma1-c-7e_e-3.7e", 0x2000, 0x2000, CRC(b09ab857) SHA1(35b91cd1c4c3dd2d543a1ea8ff7b951715727792) )
+	ROM_LOAD( "tma1-c-7d_e-1.7d", 0x4000, 0x2000, CRC(dcceb6c1) SHA1(b19804e69ce2c98cf276c6055c3a250316b96b45) )
+	ROM_LOAD( "tma1-c-7c_e-3.7c", 0xf000, 0x1000, CRC(0d31bd1c) SHA1(a2e238470ba2ea3c81225fec687f61f047c68c59) )
+
+	ROM_REGION( 0x0800, "audiocpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "m58715-051p.5l",   0x0000, 0x0800, NO_DUMP ) // internal rom
+
+	ROM_REGION( 0x1000, "soundrom", 0 )
+	ROM_LOAD( "tma1-c-6k_e.6k",   0x0000, 0x1000, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "tma1-v-3f.3f",     0x0000, 0x1000, CRC(28b0c42c) SHA1(46749568aff88a28c3b6a1ac423abd1b90742a4d) )
+	ROM_LOAD( "tma1-v-3j.3j",     0x1000, 0x1000, CRC(0c8cc04d) SHA1(15fae47d701dc1ef15c943cee6aa991776ecffdf) )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "tma1-v.7m.7m",     0x0000, 0x1000, CRC(d01c0e2c) SHA1(cd6cc9d69c36db15543601f5da2abf109cde43c9) )
+	ROM_LOAD( "tma1-v-7n.7n",     0x1000, 0x1000, CRC(4f3a1f47) SHA1(0747d693b9482f6dd28b0bc484fd1d3e29d35654) )
+	ROM_LOAD( "tma1-v-7p.7p",     0x2000, 0x1000, CRC(56be6ccd) SHA1(15a6e16c189d45f72761ebcbe9db5001bdecd659) )
+	ROM_LOAD( "tma1-v.7s.7s",     0x3000, 0x1000, CRC(ff856e6f) SHA1(2bc9ff18bb1842e8de2bc61ac828f1b175290bed) )
+	ROM_LOAD( "tma1-v-7t.7t",     0x4000, 0x1000, CRC(641f0008) SHA1(589fe108c7c11278fd897f2ded8f0498bc149cfd) )
+	ROM_LOAD( "tma1-v.7u.7u",     0x5000, 0x1000, CRC(d2dbeb75) SHA1(676cf3e15252cd0d9e926ca15c3aa0caa39be269) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tma1-c-4p.4p",     0x0000, 0x0200, CRC(afc9bd41) SHA1(90b739c4c7f24a88b6ac5ca29b06c032906a2801) )
+
+	ROM_REGION( 0x0020, "decoder_prom", 0 ) // main cpu memory map decoding prom
+	ROM_LOAD( "tma1-c-5b.5b",     0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) )
+ROM_END
+
+ROM_START( mariog )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "tma1-c-7f_g.7f", 0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) )
 	ROM_LOAD( "tma1-c-7e_g.7e", 0x2000, 0x2000, CRC(116b3856) SHA1(e372f846d0e5a2b9b47ebd0330293fcc8a12363f) )
@@ -953,38 +985,6 @@ ROM_START( mariof )
 
 	ROM_REGION( 0x0020, "decoder_prom", 0 ) // main cpu memory map decoding prom
 	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) ) // BPROM was a TBP18S030N read as 82S123
-ROM_END
-
-ROM_START( marioe ) // TMA1-05 CPU, TMA1-03-VIDEO
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "tma1-c-7f_e-1.7f", 0x0000, 0x2000, CRC(c0c6e014) SHA1(36a04f9ca1c2a583477cb8a6f2ef94e044e08296) )
-	ROM_LOAD( "tma1-c-7e_e-3.7e", 0x2000, 0x2000, CRC(b09ab857) SHA1(35b91cd1c4c3dd2d543a1ea8ff7b951715727792) )
-	ROM_LOAD( "tma1-c-7d_e-1.7d", 0x4000, 0x2000, CRC(dcceb6c1) SHA1(b19804e69ce2c98cf276c6055c3a250316b96b45) )
-	ROM_LOAD( "tma1-c-7c_e-3.7c", 0xf000, 0x1000, CRC(0d31bd1c) SHA1(a2e238470ba2ea3c81225fec687f61f047c68c59) )
-
-	ROM_REGION( 0x0800, "audiocpu", ROMREGION_ERASE00 )
-	ROM_LOAD( "m58715-051p.5l",   0x0000, 0x0800, NO_DUMP ) // internal rom
-
-	ROM_REGION( 0x1000, "soundrom", 0 )
-	ROM_LOAD( "tma1-c-6k_e.6k",   0x0000, 0x1000, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
-
-	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "tma1-v-3f.3f",     0x0000, 0x1000, CRC(28b0c42c) SHA1(46749568aff88a28c3b6a1ac423abd1b90742a4d) )
-	ROM_LOAD( "tma1-v-3j.3j",     0x1000, 0x1000, CRC(0c8cc04d) SHA1(15fae47d701dc1ef15c943cee6aa991776ecffdf) )
-
-	ROM_REGION( 0x6000, "gfx2", 0 )
-	ROM_LOAD( "tma1-v.7m",        0x0000, 0x1000, CRC(d01c0e2c) SHA1(cd6cc9d69c36db15543601f5da2abf109cde43c9) )
-	ROM_LOAD( "tma1-v-7n.7n",     0x1000, 0x1000, CRC(4f3a1f47) SHA1(0747d693b9482f6dd28b0bc484fd1d3e29d35654) )
-	ROM_LOAD( "tma1-v-7p.7p",     0x2000, 0x1000, CRC(56be6ccd) SHA1(15a6e16c189d45f72761ebcbe9db5001bdecd659) )
-	ROM_LOAD( "tma1-v.7s",        0x3000, 0x1000, CRC(ff856e6f) SHA1(2bc9ff18bb1842e8de2bc61ac828f1b175290bed) )
-	ROM_LOAD( "tma1-v-7t.7t",     0x4000, 0x1000, CRC(641f0008) SHA1(589fe108c7c11278fd897f2ded8f0498bc149cfd) )
-	ROM_LOAD( "tma1-v.7u",        0x5000, 0x1000, CRC(d2dbeb75) SHA1(676cf3e15252cd0d9e926ca15c3aa0caa39be269) )
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "tma1-c-4p_1.4p",   0x0000, 0x0200, CRC(8187d286) SHA1(8a6d8e622599f1aacaeb10f7b1a39a23c8a840a0) )
-
-	ROM_REGION( 0x0020, "decoder_prom", 0 ) // main cpu memory map decoding prom
-	ROM_LOAD( "tma1-c-5b.5b",     0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) )
 ROM_END
 
 ROM_START( marioj )
@@ -1054,8 +1054,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,  0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mario,  0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE ) // newest
+GAME( 1983, mariog, mario, mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, mariof, mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioe, mario, mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1983, marioj, mario, mario, marioj, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, masao,  mario, masao, mario,  mario_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )
