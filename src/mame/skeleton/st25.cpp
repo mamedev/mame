@@ -152,7 +152,7 @@ void st25_state::program_map_st25_3(address_map &map)
 	// O6 NC
 	map(0xc0000, 0xdffff).noprw();
 	// O7 unpopulated footprint ICE3
-	map(0xe0000, 0xfbfff).noprw();
+	map(0xe0000, 0xfbfff).rom().region("onboard", 0);
 	// internal to CPU
 	map(0xfc000, 0xfffff).rom().region("maskrom", 0);
 }
@@ -261,9 +261,16 @@ void st25_state::st25_1(machine_config &config)
 	OKIM6376(config, m_oki, 128000).add_route(ALL_OUTPUTS, "mono", 0.8); // clock adjustable by a glued pot
 }
 
-void st25_state::st25_3(machine_config &config)
+void st25_state::st25_2(machine_config &config)
 {
 	st25_1(config);
+
+	// ATMEGA8515 on the ROM module
+}
+
+void st25_state::st25_3(machine_config &config)
+{
+	st25_2(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &st25_state::program_map_st25_3);
 }
 
@@ -278,8 +285,9 @@ ROM_START(alphar)
 	ROM_LOAD("w27e40.ic1",   0x00000, 0x80000, CRC(f893b557) SHA1(194135c0cbcb270ebeb297c2f2e26e6101b44daf))
 	ROM_RELOAD(0x100000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 ROM_START(amarillo)
@@ -295,8 +303,9 @@ ROM_START(amarillo)
 	ROM_LOAD("27c4001_snd", 0x80000, 0x80000, CRC(2ccf9464) SHA1(02b16fe7465ad28ce96f38390fafbceafca2d23c))
 	ROM_RELOAD(0x180000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 ROM_START(arenau)
@@ -323,8 +332,9 @@ ROM_START(avanti)
 	ROM_LOAD("avantie_w27e040.ic1", 0x00000, 0x80000, CRC(47defe53) SHA1(65c246e9051fa1b0f9a855331d55282c6b4ccbc0))
 	ROM_RELOAD(0x100000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 ROM_START(ballermn)
@@ -366,8 +376,9 @@ ROM_START(bigkick)
 	ROM_LOAD("w27e040_big_kick_st25.ic1", 0x00000, 0x80000, CRC(fa752fed) SHA1(5da6f37ebe0095fc74a1c54df86bb3ca492e92f4))
 	ROM_RELOAD(0x100000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 ROM_START(blizzard)
@@ -399,8 +410,9 @@ ROM_START(boosters)
 	ROM_LOAD("lowen_165126_14.08.02.icf5", 0x80000, 0x80000, NO_DUMP )
 	ROM_RELOAD(0x180000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 ROM_START(cttower)
@@ -429,8 +441,9 @@ ROM_START(colossos)
 	ROM_LOAD("w27c40.ic1", 0x00000, 0x80000, CRC(11c8eead) SHA1(2bac833eb0d894fa54c01311b7dbf35b16e1f984))
 	ROM_RELOAD(0x100000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 ROM_START(galaktca)
@@ -444,8 +457,9 @@ ROM_START(galaktca)
 	ROM_LOAD("galaktica_124461.ic1_w27e040_12.ic1", 0x00000, 0x80000, CRC(0e8acf71) SHA1(184472d62e094a724cd21954459e872f8d1b30c8))
 	ROM_RELOAD(0x100000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 ROM_START(jamaica)
@@ -471,8 +485,9 @@ ROM_START(macaor)
 	ROM_LOAD("123623.ic1", 0x00000, 0x80000, CRC(dccc242f) SHA1(9c0df10dc0028286a02dada673fa56bd6f137f67))
 	ROM_RELOAD(0x100000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 ROM_START(majesto)
@@ -507,8 +522,9 @@ ROM_START(matrixx)
 	ROM_LOAD("winbondw27e040_12_sound_10_08_02", 0x80000, 0x80000, CRC(2ccf9464) SHA1(02b16fe7465ad28ce96f38390fafbceafca2d23c))
 	ROM_RELOAD(0x180000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 ROM_START(mtclssic)
@@ -530,8 +546,9 @@ ROM_START(mtclssic)
 	ROM_LOAD("w27e040_tsop32_123775_02.07.2004_back_panel.icf5", 0x80000, 0x80000, CRC(633d0f1e) SHA1(1ba518c5fb7367bf2a43b079a8f8b8db5c6fc5af))
 	ROM_RELOAD(0x180000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 ROM_START(purpurr)
@@ -587,8 +604,9 @@ ROM_START(spasch)
 	ROM_LOAD("124254.ic1",   0x00000, 0x80000, CRC(f893b557) SHA1(194135c0cbcb270ebeb297c2f2e26e6101b44daf))
 	ROM_RELOAD(0x100000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 ROM_START(tango)
@@ -630,8 +648,9 @@ ROM_START(xeno)
 	ROM_LOAD("w27e040_xeno_125228.ic5", 0x80000, 0x80000, CRC(f3475039) SHA1(62e7a132d88976249ec2c047bf47d39a60636ec9))
 	ROM_RELOAD(0x180000, 0x80000)
 
-	ROM_REGION(0x10000, "onboard", 0)
+	ROM_REGION(0x20000, "onboard", 0)
 	ROM_LOAD("ste25.3_09.06.01.ice3", 0x00000, 0x10000, CRC(9518b025) SHA1(e7a1928e17d70e0fd04e45e3a125967c55e9b813))
+	ROM_RELOAD(0x10000, 0x10000)
 ROM_END
 
 
