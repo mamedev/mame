@@ -463,10 +463,10 @@ void adsp21062_device::static_generate_push_pc()
 	UML_LABEL(block, no_overflow);                                          // no_overflow:
 	UML_CMP(block, I1, 0);                                                  // cmp     i1,0
 	UML_JMPc(block, COND_E, empty);                                         // je      empty
-	UML_AND(block, STKY, STKY, ~0x400000);                                  // and     STKY,~0x400000
+	UML_AND(block, STKY, STKY, ~PCEM);                                      // and     STKY,~0x400000
 	UML_JMP(block, do_store);                                               // jmp     do_store
 	UML_LABEL(block, empty);                                                // empty:
-	UML_OR(block, STKY, STKY, 0x400000);                                    // or      STKY,0x400000
+	UML_OR(block, STKY, STKY, PCEM);                                        // or      STKY,0x400000
 
 	UML_LABEL(block, do_store);                                             // do_store:
 	UML_MOV(block, PCSTK, I0);                                              // mov     PCSTK,pc
@@ -500,10 +500,10 @@ void adsp21062_device::static_generate_pop_pc()
 	UML_SUB(block, I1, I1, 1);                                              // sub     i1,i1,1
 	UML_CMP(block, I1, 0);                                                  // cmp     i1,0
 	UML_JMPc(block, COND_E, label);                                         // je      label2
-	UML_AND(block, STKY, STKY, ~0x400000);                                  // and     STKY,~0x400000
+	UML_AND(block, STKY, STKY, ~PCEM);                                      // and     STKY,~0x400000
 	UML_JMP(block, label + 1);                                              // jmp     label3
 	UML_LABEL(block, label++);                                              // label2:
-	UML_OR(block, STKY, STKY, 0x400000);                                    // or      STKY,0x400000
+	UML_OR(block, STKY, STKY, PCEM);                                        // or      STKY,0x400000
 
 	UML_LABEL(block, label++);                                              // label3:
 	UML_MOV(block, PCSTKP, I1);                                             // mov     PCSTKP,i1
@@ -539,10 +539,10 @@ void adsp21062_device::static_generate_push_loop()
 	UML_LABEL(block, no_overflow);                                          // no_overflow:
 	UML_CMP(block, I2, 0);                                                  // cmp     i2,0
 	UML_JMPc(block, COND_E, empty);                                         // je      empty
-	UML_AND(block, STKY, STKY, ~0x4000000);                                 // and     STKY,~0x4000000
+	UML_AND(block, STKY, STKY, ~LSEM);                                      // and     STKY,~0x4000000
 	UML_JMP(block, do_store);                                               // jmp     do_store
 	UML_LABEL(block, empty);                                                // empty:
-	UML_OR(block, STKY, STKY, 0x4000000);                                   // or      STKY,0x4000000
+	UML_OR(block, STKY, STKY, LSEM);                                        // or      STKY,0x4000000
 
 	UML_LABEL(block, do_store);                                             // do_store:
 	UML_STORE(block, m_core->lcstack, I2, I0, SIZE_DWORD, SCALE_x4);        // store   m_core->lcstack,i2,i0,dword,scale_x4
@@ -574,10 +574,10 @@ void adsp21062_device::static_generate_pop_loop()
 	UML_LABEL(block, label++);                                              // label1:
 	UML_SUB(block, I2, I2, 1);                                              // sub     i2,i2,1
 	UML_JMPc(block, COND_Z, label);                                         // jz      label2
-	UML_AND(block, STKY, STKY, ~0x4000000);                                 // and     STKY,~0x4000000
+	UML_AND(block, STKY, STKY, ~LSEM);                                      // and     STKY,~0x4000000
 	UML_JMP(block, label + 1);                                              // jmp     label3
 	UML_LABEL(block, label++);                                              // label2:
-	UML_OR(block, STKY, STKY, 0x4000000);                                   // or      STKY,0x4000000
+	UML_OR(block, STKY, STKY, LSEM);                                        // or      STKY,0x4000000
 
 	UML_LABEL(block, label++);                                              // label3:
 	UML_LOAD(block, I0, m_core->lcstack, I2, SIZE_DWORD, SCALE_x4);         // load    i0,m_core->lcstack,i2,dword,scale_x4
@@ -608,10 +608,10 @@ void adsp21062_device::static_generate_push_status()
 	UML_LABEL(block, label++);                                              // label1:
 	UML_CMP(block, I2, 0);                                                  // cmp     i2,0
 	UML_JMPc(block, COND_E, label);                                         // je      label2
-	UML_AND(block, STKY, STKY, ~0x1000000);                                 // and     STKY,~0x1000000
+	UML_AND(block, STKY, STKY, ~SSEM);                                      // and     STKY,~0x1000000
 	UML_JMP(block, label + 1);                                              // jmp     label3
 	UML_LABEL(block, label++);                                              // label2:
-	UML_OR(block, STKY, STKY, 0x1000000);                                   // or      STKY,0x1000000
+	UML_OR(block, STKY, STKY, SSEM);                                        // or      STKY,0x1000000
 
 	UML_LABEL(block, label++);                                              // label3:
 	UML_MOV(block, mem(&m_core->status_stkp), I2);                          // mov     [status_stkp],i2
@@ -646,10 +646,10 @@ void adsp21062_device::static_generate_pop_status()
 	UML_LABEL(block, label++);                                              // label1:
 	UML_SUB(block, I2, I2, 1);                                              // sub     i2,1
 	UML_JMPc(block, COND_Z, label);                                         // jz      label2
-	UML_AND(block, STKY, STKY, ~0x1000000);                                 // and     STKY,~0x1000000
+	UML_AND(block, STKY, STKY, ~SSEM);                                      // and     STKY,~0x1000000
 	UML_JMP(block, label + 1);                                              // jmp     label3
 	UML_LABEL(block, label++);                                              // label2:
-	UML_OR(block, STKY, STKY, 0x1000000);                                   // or      STKY,0x1000000
+	UML_OR(block, STKY, STKY, SSEM);                                        // or      STKY,0x1000000
 
 	UML_LABEL(block, label++);                                              // label3:
 	UML_MOV(block, mem(&m_core->status_stkp), I2);                          // mov     [status_stkp],i2
@@ -704,7 +704,7 @@ void adsp21062_device::static_generate_loop_check_body(drcuml_block &block, bool
 	uml::code_label const terminate = label++;
 
 	// check that the loop stack isn't empty and this is the end of the loop
-	UML_TEST(block, STKY, 0x4000000);
+	UML_TEST(block, STKY, LSEM);
 	UML_RETc(block, COND_NZ);
 	UML_LOAD(block, I1, m_core->lastack, LSTKP, SIZE_DWORD, SCALE_x4);
 	UML_AND(block, I2, I1, 0xffffff);
@@ -725,10 +725,10 @@ void adsp21062_device::static_generate_loop_check_body(drcuml_block &block, bool
 	UML_JMPc(block, COND_BE, astat_flag);
 	UML_CMP(block, I2, 0x0c); // flag inputs
 	UML_JMPc(block, COND_BE, flag_in);
-	UML_CMP(block, I2, 0x0e); // BM/NBM
-	UML_JMPc(block, COND_E, bm);
 	UML_CMP(block, I2, 0x0f); // LCE/FOREVER
 	UML_JMPc(block, COND_E, lce);
+	UML_CMP(block, I2, 0x0e); // BM/NBM
+	UML_JMPc(block, COND_E, bm);
 	// TF falls through
 
 	// ASTAT flag tests
@@ -2114,7 +2114,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 	{
 		case 0:             // subops
 		{
-			uint32_t subop = (opcode >> 40) & 0x1f;
+			uint32_t const subop = op_get_subop(opcode);
 			switch (subop)
 			{
 				case 0x00:          // NOP / idle                       |000|00000|
@@ -2134,9 +2134,9 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x01:          // compute                              |000|00001|
 				{
-					int cond = (opcode >> 33) & 0x1f;
+					int const cond = op_get_cond(opcode);
 
-					bool has_condition = !if_condition_always_true(cond);
+					bool const has_condition = !if_condition_always_true(cond);
 					int skip_label = 0;
 
 					if (has_condition)
@@ -2154,13 +2154,13 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x02:          // immediate shift                      |000|00010|
 				{
-					int shiftop = (opcode >> 16) & 0x3f;
-					int rn = (opcode >> 4) & 0xf;
-					int rx = (opcode & 0xf);
-					int cond = (opcode >> 33) & 0x1f;
-					int data = ((opcode >> 8) & 0xff) | ((opcode >> 19) & 0xf00);
+					int const shiftop = (opcode >> 16) & 0x3f;
+					int const rn = (opcode >> 4) & 0xf;
+					int const rx = (opcode & 0xf);
+					int const cond = op_get_cond(opcode);
+					int const data = ((opcode >> 8) & 0xff) | ((opcode >> 19) & 0xf00);
 
-					bool has_condition = !if_condition_always_true(cond);
+					bool const has_condition = !if_condition_always_true(cond);
 					int skip_label = 0;
 
 					if (has_condition)
@@ -2178,12 +2178,12 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x04:          // compute / modify                     |000|00100|
 				{
-					int cond = (opcode >> 33) & 0x1f;
-					int g = (opcode >> 38) & 0x1;
-					int m = (opcode >> 27) & 0x7;
-					int i = (opcode >> 30) & 0x7;
+					int const cond = op_get_cond(opcode);
+					int const g = (opcode >> 38) & 0x1;
+					int const m = (opcode >> 27) & 0x7;
+					int const i = (opcode >> 30) & 0x7;
 
-					bool has_condition = !if_condition_always_true(cond);
+					bool const has_condition = !if_condition_always_true(cond);
 					int skip_label = 0;
 
 					if (has_condition)
@@ -2215,13 +2215,13 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x06:          // direct jump|call                     |000|00110|
 				{
-					int b = (opcode >> 39) & 0x1;
-					int j = (opcode >> 26) & 0x1;
-					int la = (opcode >> 38) & 0x1;
-					int ci = (opcode >> 24) & 0x1;
-					int cond = (opcode >> 33) & 0x1f;
+					int const b = op_get_jump_b(opcode);
+					int const j = op_get_jump_j(opcode);
+					int const la = op_get_jump_la(opcode);
+					int const ci = op_get_jump_ci(opcode);
+					int const cond = op_get_cond(opcode);
 
-					bool has_condition = !if_condition_always_true(cond);
+					bool const has_condition = !if_condition_always_true(cond);
 					int skip_label = 0;
 
 					if (has_condition)
@@ -2244,13 +2244,13 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x07:          // direct jump|call                     |000|00111|
 				{
-					int b = (opcode >> 39) & 0x1;
-					int j = (opcode >> 26) & 0x1;
-					int la = (opcode >> 38) & 0x1;
-					int ci = (opcode >> 24) & 0x1;
-					int cond = (opcode >> 33) & 0x1f;
+					int const b = op_get_jump_b(opcode);
+					int const j = op_get_jump_j(opcode);
+					int const la = op_get_jump_la(opcode);
+					int const ci = op_get_jump_ci(opcode);
+					int const cond = op_get_cond(opcode);
 
-					bool has_condition = !if_condition_always_true(cond);
+					bool const has_condition = !if_condition_always_true(cond);
 					int skip_label = 0;
 
 					if (has_condition)
@@ -2273,20 +2273,20 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x08:          // indirect jump|call / compute         |000|01000|
 				{
-					int la = (opcode >> 38) & 0x1;
-					int ci = (opcode >> 24) & 0x1;
-					int b = (opcode >> 39) & 0x1;
-					int j = (opcode >> 26) & 0x1;
-					int e = (opcode >> 25) & 0x1;
-					int pmi = (opcode >> 30) & 0x7;
-					int pmm = (opcode >> 27) & 0x7;
-					int cond = (opcode >> 33) & 0x1f;
+					int const la = op_get_jump_la(opcode);
+					int const ci = op_get_jump_ci(opcode);
+					int const b = op_get_jump_b(opcode);
+					int const j = op_get_jump_j(opcode);
+					int const e = op_get_jump_e(opcode);
+					int const pmi = op_get_pmi(opcode);
+					int const pmm = op_get_pmm(opcode);
+					int const cond = op_get_cond(opcode);
 
 					if (e)
 					{
 						// IF ... ELSE
 
-						int label_else = compiler.labelnum++;
+						int const label_else = compiler.labelnum++;
 						generate_if_condition(block, compiler, desc, cond, label_else);
 
 						UML_ADD(block, I0, PM_I(pmi), PM_M(pmm));
@@ -2306,7 +2306,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 					else
 					{
 						// IF
-						bool has_condition = !if_condition_always_true(cond);
+						bool const has_condition = !if_condition_always_true(cond);
 						int skip_label = 0;
 
 						if (has_condition)
@@ -2336,18 +2336,18 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x09:          // indirect jump|call / compute         |000|01001|
 				{
-					int la = (opcode >> 38) & 0x1;
-					int ci = (opcode >> 24) & 0x1;
-					int b = (opcode >> 39) & 0x1;
-					int j = (opcode >> 26) & 0x1;
-					int e = (opcode >> 25) & 0x1;
-					int cond = (opcode >> 33) & 0x1f;
+					int const la = op_get_jump_la(opcode);
+					int const ci = op_get_jump_ci(opcode);
+					int const b = op_get_jump_b(opcode);
+					int const j = op_get_jump_j(opcode);
+					int const e = op_get_jump_e(opcode);
+					int const cond = op_get_cond(opcode);
 
 					if (e)
 					{
 						// IF ... ELSE
 
-						int label_else = compiler.labelnum++;
+						int const label_else = compiler.labelnum++;
 						generate_if_condition(block, compiler, desc, cond, label_else);
 
 						if (b) // call
@@ -2365,7 +2365,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 					else
 					{
 						// IF
-						bool has_condition = !if_condition_always_true(cond);
+						bool const has_condition = !if_condition_always_true(cond);
 						int skip_label = 0;
 
 						if (has_condition)
@@ -2393,10 +2393,10 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x0a:          // return from subroutine / compute     |000|01010|
 				{
-					int cond = (opcode >> 33) & 0x1f;
-					int j = (opcode >> 26) & 0x1;
-					int e = (opcode >> 25) & 0x1;
-					//int lr = (opcode >> 24) & 0x1;
+					int const cond = op_get_cond(opcode);
+					int const j = op_get_jump_j(opcode);
+					int const e = op_get_jump_e(opcode);
+					//int const lr = (opcode >> 24) & 0x1;
 
 					// TODO: loop re-entry
 
@@ -2404,7 +2404,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 					{
 						// IF ... ELSE
 
-						int label_else = compiler.labelnum++;
+						int const label_else = compiler.labelnum++;
 						generate_if_condition(block, compiler, desc, cond, label_else);
 
 						UML_CALLH(block, *m_pop_pc);
@@ -2416,7 +2416,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 					else
 					{
 						// IF
-						bool has_condition = !if_condition_always_true(cond);
+						bool const has_condition = !if_condition_always_true(cond);
 						int skip_label = 0;
 
 						if (has_condition)
@@ -2438,7 +2438,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x0b:          // return from interrupt / compute      |000|01011|
 				{
-					int cond = (opcode >> 33) & 0x1f;
+					int cond = op_get_cond(opcode);
 					int j = BIT(opcode, 26);
 					int e = BIT(opcode, 25);
 
@@ -2531,7 +2531,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x0e:          // do until                             |000|01110|
 				{
-					uint32_t cond = (opcode >> 33) & 0x1f;
+					uint32_t cond = op_get_cond(opcode);
 					int offset = util::sext(opcode & 0xffffff, 24);
 					uint32_t address = desc->pc + offset;
 
@@ -2949,15 +2949,15 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 		case 1:             // compute / dreg <-> DM / dreg <-> PM                                  |001|
 		{
-			int pm_dreg = (opcode >> 23) & 0xf;
-			int pmm = (opcode >> 27) & 0x7;
-			int pmi = (opcode >> 30) & 0x7;
-			int dm_dreg = (opcode >> 33) & 0xf;
-			int dmm = (opcode >> 38) & 0x7;
-			int dmi = (opcode >> 41) & 0x7;
-			int pmd = (opcode >> 37) & 0x1;
-			int dmd = (opcode >> 44) & 0x1;
-			int compute = opcode & 0x7fffff;
+			int const pm_dreg = (opcode >> 23) & 0xf;
+			int const pmm = op_get_pmm(opcode);
+			int const pmi = op_get_pmi(opcode);
+			int const dm_dreg = (opcode >> 33) & 0xf;
+			int const dmm = op_get_dmm(opcode);
+			int const dmi = op_get_dmi(opcode);
+			int const pmd = (opcode >> 37) & 0x1;
+			int const dmd = (opcode >> 44) & 0x1;
+			int const compute = op_get_compute(opcode);
 
 			bool temp_pm_dreg = false;
 			if (compute != 0 && pmd && desc->regout[0] & (1 << pm_dreg))
@@ -3024,17 +3024,17 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 		case 2:             // compute / ureg <-> DM|PM, register modify                            |010|
 		{
-			int u = BIT(opcode, 44);
-			int i = (opcode >> 41) & 0x7;
-			int m = (opcode >> 38) & 0x7;
-			int cond = (opcode >> 33) & 0x1f;
-			int g = BIT(opcode, 32);
-			int d = BIT(opcode, 31);
-			int ureg = (opcode >> 23) & 0xff;
-			int compute = opcode & 0x7fffff;
+			int const u = BIT(opcode, 44);
+			int const i = (opcode >> 41) & 0x7;
+			int const m = (opcode >> 38) & 0x7;
+			int const cond = op_get_cond(opcode);
+			int const g = BIT(opcode, 32);
+			int const d = BIT(opcode, 31);
+			int const ureg = (opcode >> 23) & 0xff;
+			int const compute = op_get_compute(opcode);
 
-			bool ureg_is_dreg = (ureg >= 0 && ureg < 16);
-			bool has_condition = !if_condition_always_true(cond);
+			bool const ureg_is_dreg = (ureg >= 0 && ureg < 16);
+			bool const has_condition = !if_condition_always_true(cond);
 			int skip_label = 0;
 
 			bool ureg_is_astat = (ureg == 0x7c);
@@ -3117,16 +3117,16 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 		{
 			if (opcode & 0x100000000000U)   // compute / ureg <-> ureg                          |011|1|
 			{
-				int src_ureg = (opcode >> 36) & 0xff;
-				int dst_ureg = (opcode >> 23) & 0xff;
-				int cond = (opcode >> 31) & 0x1f;
-				int compute = opcode & 0x7fffff;
+				int const src_ureg = op_get_ureg_src(opcode);
+				int const dst_ureg = op_get_ureg_dst(opcode);
+				int const cond = op_get_cond_ureg(opcode);
+				int const compute = op_get_compute(opcode);
 
-				bool has_condition = !if_condition_always_true(cond);
-				bool src_is_dreg = (src_ureg >= 0 && src_ureg < 16);
+				bool const has_condition = !if_condition_always_true(cond);
+				bool const src_is_dreg = (src_ureg >= 0 && src_ureg < 16);
 				int skip_label = 0;
 
-				bool src_ureg_is_astat = (src_ureg == 0x7c);
+				bool const src_ureg_is_astat = (src_ureg == 0x7c);
 
 				if (has_condition)
 				{
@@ -3165,16 +3165,16 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 			}
 			else                                // compute / dreg <-> DM|PM, immediate modify       |011|0|
 			{
-				int cond = (opcode >> 33) & 0x1f;
-				int u = BIT(opcode, 38);
-				int d = BIT(opcode, 39);
-				int g = BIT(opcode, 40);
-				int dreg = (opcode >> 23) & 0xf;
-				int i = (opcode >> 41) & 0x7;
-				int mod = util::sext((opcode >> 27) & 0x3f, 6);
-				int compute = opcode & 0x7fffff;
+				int const cond = op_get_cond(opcode);
+				int const u = BIT(opcode, 38);
+				int const d = BIT(opcode, 39);
+				int const g = BIT(opcode, 40);
+				int const dreg = (opcode >> 23) & 0xf;
+				int const i = (opcode >> 41) & 0x7;
+				int const mod = op_get_reladdr(opcode);
+				int const compute = op_get_compute(opcode);
 
-				bool has_condition = !if_condition_always_true(cond);
+				bool const has_condition = !if_condition_always_true(cond);
 				int skip_label = 0;
 
 				if (has_condition)
@@ -3275,7 +3275,7 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 				int g = BIT(opcode, 32);
 				int d = BIT(opcode, 31);
 				int dreg = (opcode >> 23) & 0xf;
-				int cond = (opcode >> 33) & 0x1f;
+				int cond = op_get_cond(opcode);
 				int data = ((opcode >> 8) & 0xff) | ((opcode >> 19) & 0xf00);
 				int shiftop = (opcode >> 16) & 0x3f;
 				int rn = (opcode >> 4) & 0xf;
@@ -3377,13 +3377,13 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 		case 6:                             // indirect jump / compute / dreg <-> DM                |110|
 		{
-			int d = (opcode >> 44) & 0x1;
-			int dmi = (opcode >> 41) & 0x7;
-			int dmm = (opcode >> 38) & 0x7;
-			int pmi = (opcode >> 30) & 0x7;
-			int pmm = (opcode >> 27) & 0x7;
-			int cond = (opcode >> 33) & 0x1f;
-			int dreg = (opcode >> 23) & 0xf;
+			int const d = (opcode >> 44) & 0x1;
+			int const dmi = op_get_dmi(opcode);
+			int const dmm = op_get_dmm(opcode);
+			int const pmi = op_get_pmi(opcode);
+			int const pmm = op_get_pmm(opcode);
+			int const cond = op_get_cond(opcode);
+			int const dreg = (opcode >> 23) & 0xf;
 
 			uml::code_label const label_else = compiler.labelnum++;
 			generate_if_condition(block, compiler, desc, cond, label_else);
@@ -3438,11 +3438,11 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 		case 7:                             // indirect jump / compute / dreg <-> DM                |111|
 		{
-			int d = BIT(opcode, 44);
-			int dmi = (opcode >> 41) & 0x7;
-			int dmm = (opcode >> 38) & 0x7;
-			int cond = (opcode >> 33) & 0x1f;
-			int dreg = (opcode >> 23) & 0xf;
+			int const d = BIT(opcode, 44);
+			int const dmi = op_get_dmi(opcode);
+			int const dmm = op_get_dmm(opcode);
+			int const cond = op_get_cond(opcode);
+			int const dreg = (opcode >> 23) & 0xf;
 
 			uml::code_label const label_else = compiler.labelnum++;
 			generate_if_condition(block, compiler, desc, cond, label_else);
@@ -3507,26 +3507,26 @@ void adsp21062_device::generate_unimplemented_compute(drcuml_block &block, compi
 
 void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	uint64_t opcode = desc->opptr.q[0];
-	if ((opcode & 0x7fffff) == 0)
+	uint64_t const opcode = desc->opptr.q[0];
+	if (op_get_compute(opcode) == 0)
 		return;
 
-	int rs = (opcode >> 12) & 0xf;
-	int rn = (opcode >> 8) & 0xf;
-	int ra = rn;
-	int rx = (opcode >> 4) & 0xf;
-	int ry = (opcode >> 0) & 0xf;
-	int ps = (opcode >> 16) & 0xf;
+	int const rs = op_get_rs(opcode);
+	int const rn = (opcode >> 8) & 0xf;
+	int const ra = rn;
+	int const rx = (opcode >> 4) & 0xf;
+	int const ry = (opcode >> 0) & 0xf;
+	int const ps = (opcode >> 16) & 0xf;
 
 	if (opcode & 0x400000)      // multi-function operation
 	{
-		uint32_t multiop = (opcode >> 16) & 0x3f;
-		int fm = rs;
-		int fa = rn;
-		int fxm = (opcode >> 6) & 0x3;          // registers 0 - 3
-		int fym = ((opcode >> 4) & 0x3) + 4;    // registers 4 - 7
-		int fxa = ((opcode >> 2) & 0x3) + 8;    // registers 8 - 11
-		int fya = (opcode & 0x3) + 12;          // registers 12 - 15
+		uint32_t const multiop = (opcode >> 16) & 0x3f;
+		int const fm = rs;
+		int const fa = rn;
+		int const fxm = (opcode >> 6) & 0x3;          // registers 0 - 3
+		int const fym = ((opcode >> 4) & 0x3) + 4;    // registers 4 - 7
+		int const fxa = ((opcode >> 2) & 0x3) + 8;    // registers 8 - 11
+		int const fya = (opcode & 0x3) + 12;          // registers 12 - 15
 
 		switch (multiop)
 		{
@@ -3763,16 +3763,16 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 
 				UML_FSFRINT(block, F2, REG(fxa), SIZE_DWORD);
 				UML_ICOPYFS(block, I1, F2);
-				UML_BFXU(block, I0, I1, 23, 8);
-				UML_AND(block, I1, I1, 0x807fffff);
-				UML_SUB(block, I0, I0, 127);
+				UML_BFXU(block, I0, I1, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS);
+				UML_AND(block, I1, I1, FLOAT_SIGN_MASK | FLOAT_MANTISSA_MASK);
+				UML_SUB(block, I0, I0, FLOAT_EXPONENT_BIAS);
 				UML_ADD(block, I0, I0, REG(fya));
 				UML_CMP(block, I0, -126);
 				UML_JMPc(block, COND_L, denormal);
 
-				UML_ADD(block, I0, I0, 127);
+				UML_ADD(block, I0, I0, FLOAT_EXPONENT_BIAS);
 				UML_AND(block, I0, I0, 0xff);
-				UML_SHL(block, I0, I0, 23);
+				UML_SHL(block, I0, I0, FLOAT_EXPONENT_SHIFT);
 				UML_OR(block, I0, I0, I1);
 				if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
 				if (AN_CALC_REQUIRED) UML_SETc(block, COND_S, ASTAT_AN);
@@ -3783,7 +3783,7 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 				UML_JMP(block, end);
 
 				UML_LABEL(block, denormal);
-				UML_AND(block, I0, I1, 0x80000000);
+				UML_AND(block, I0, I1, FLOAT_SIGN_MASK);
 				if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 1);
 				if (AN_CALC_REQUIRED) UML_MOV(block, ASTAT_AN, 0);
 				if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);   // TODO
@@ -3814,16 +3814,16 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 				UML_FSMUL(block, F0, F0, F1);
 
 				UML_MOV(block, I1, REG(fxa));
-				UML_BFXU(block, I0, I1, 23, 8);
-				UML_AND(block, I1, I1, 0x807fffff);
-				UML_SUB(block, I0, I0, 127);
+				UML_BFXU(block, I0, I1, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS);
+				UML_AND(block, I1, I1, FLOAT_SIGN_MASK | FLOAT_MANTISSA_MASK);
+				UML_SUB(block, I0, I0, FLOAT_EXPONENT_BIAS);
 				UML_ADD(block, I0, I0, REG(fya));
 				UML_CMP(block, I0, -126);
 				UML_JMPc(block, COND_L, denormal);
 
-				UML_ADD(block, I0, I0, 127);
+				UML_ADD(block, I0, I0, FLOAT_EXPONENT_BIAS);
 				UML_AND(block, I0, I0, 0xff);
-				UML_SHL(block, I0, I0, 23);
+				UML_SHL(block, I0, I0, FLOAT_EXPONENT_SHIFT);
 				UML_OR(block, I0, I0, I1);
 				if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
 				if (AN_CALC_REQUIRED) UML_SETc(block, COND_S, ASTAT_AN);
@@ -3834,7 +3834,7 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 				UML_JMP(block, end);
 
 				UML_LABEL(block, denormal);
-				UML_AND(block, I0, I1, 0x80000000);
+				UML_AND(block, I0, I1, FLOAT_SIGN_MASK);
 				if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 1);
 				if (AN_CALC_REQUIRED) UML_MOV(block, ASTAT_AN, 0);
 				if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);   // TODO
@@ -3898,9 +3898,9 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 				UML_FSCOPYI(block, F1, REG(fym));
 				UML_MOV(block, I0, REG(fxa));
 				if (AS_CALC_REQUIRED)
-					UML_BFXU(block, ASTAT_AS, I0, 31, 1);
-				UML_AND(block, I0, I0, 0x7fffffff); // clear sign
-				UML_TEST(block, I0, 0x7f800000); // flush denormals to zero
+					UML_BFXU(block, ASTAT_AS, I0, FLOAT_SIGN_SHIFT, 1);
+				UML_AND(block, I0, I0, ~FLOAT_SIGN_MASK); // clear sign
+				UML_TEST(block, I0, FLOAT_EXPONENT_MASK); // flush denormals to zero
 				if (AZ_CALC_REQUIRED)
 					UML_SETc(block, COND_Z, ASTAT_AZ);
 				UML_MOVc(block, COND_Z, I0, 0);
@@ -4312,9 +4312,9 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						// TODO: confirm AS for NaN input with sign bit
 						UML_MOV(block, I0, REG(rx));
 						if (AS_CALC_REQUIRED)
-							UML_BFXU(block, ASTAT_AS, I0, 31, 1);
-						UML_AND(block, I0, I0, 0x7fffffff); // clear sign
-						UML_TEST(block, I0, 0x7f800000); // flush denormals to zero
+							UML_BFXU(block, ASTAT_AS, I0, FLOAT_SIGN_SHIFT, 1);
+						UML_AND(block, I0, I0, ~FLOAT_SIGN_MASK); // clear sign
+						UML_TEST(block, I0, FLOAT_EXPONENT_MASK); // flush denormals to zero
 						if (AZ_CALC_REQUIRED)
 							UML_SETc(block, COND_Z, ASTAT_AZ);
 						UML_MOVc(block, COND_Z, I0, 0);
@@ -4329,13 +4329,13 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 					case 0xbd:      // Fn = SCALB Fx BY Ry
 						// TODO: source = nan, result = denormal
 						UML_MOV(block, I1, REG(rx));
-						UML_BFXU(block, I0, I1, 23, 8);
-						UML_AND(block, I1, I1, 0x807fffff);
-						UML_SUB(block, I0, I0, 127);
+						UML_BFXU(block, I0, I1, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS);
+						UML_AND(block, I1, I1, FLOAT_SIGN_MASK | FLOAT_MANTISSA_MASK);
+						UML_SUB(block, I0, I0, FLOAT_EXPONENT_BIAS);
 						UML_ADD(block, I0, I0, REG(ry));
-						UML_ADD(block, I0, I0, 127);
+						UML_ADD(block, I0, I0, FLOAT_EXPONENT_BIAS);
 						UML_AND(block, I0, I0, 0xff);
-						UML_SHL(block, I0, I0, 23);
+						UML_SHL(block, I0, I0, FLOAT_EXPONENT_SHIFT);
 						UML_OR(block, REG(rn), I0, I1);
 						if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
 						if (AN_CALC_REQUIRED) UML_SETc(block, COND_S, ASTAT_AN);
@@ -4347,8 +4347,8 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 
 					case 0xc1:      // Rn = LOGB Fx
 						// TODO: source = zero, infinity, nan
-						UML_BFXU(block, I0, REG(rx), 23, 8);
-						UML_SUB(block, REG(rn), I0, 127);
+						UML_BFXU(block, I0, REG(rx), FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS);
+						UML_SUB(block, REG(rn), I0, FLOAT_EXPONENT_BIAS);
 						if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
 						if (AN_CALC_REQUIRED) UML_SETc(block, COND_S, ASTAT_AN);
 						if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);   // TODO
@@ -4388,36 +4388,36 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_MOV(block, I0, REG(rx));
 						if (AC_CALC_REQUIRED) UML_MOV(block, ASTAT_AC, 0);
 						if (AS_CALC_REQUIRED) UML_MOV(block, ASTAT_AS, 0);
-						UML_TEST(block, I0, 0x7fffffff);
+						UML_TEST(block, I0, FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK);
 						if (AV_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AV);
 						UML_JMPc(block, COND_Z, recips_zero);
-						if (AN_CALC_REQUIRED) UML_BFXU(block, ASTAT_AN, I0, 31, 1);
-						UML_BFXU(block, I1, I0, 23, 8);
+						if (AN_CALC_REQUIRED) UML_BFXU(block, ASTAT_AN, I0, FLOAT_SIGN_SHIFT, 1);
+						UML_BFXU(block, I1, I0, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS);
 						UML_CMP(block, I1, 0x000000ff);
 						UML_JMPc(block, COND_NE, recips_finite);
-						UML_TEST(block, I0, 0x7fffff);
+						UML_TEST(block, I0, FLOAT_MANTISSA_MASK);
 						UML_JMPc(block, COND_NZ, recips_nan);
 						UML_LABEL(block, recips_finite);
-						UML_SUB(block, I1, 127 - 1, I1);
+						UML_SUB(block, I1, FLOAT_EXPONENT_BIAS - 1, I1);
 						UML_CMP(block, I1, 125);
 						UML_JMPc(block, COND_G, recips_tozero);
 						UML_CMP(block, I1, -126);
 						UML_JMPc(block, COND_L, recips_tozero);
-						UML_ADD(block, I1, I1, 127);
-						UML_ROLAND(block, I1, I1, 23, 0x7f800000);
-						UML_ROLINS(block, I1, I0, 0, 0x80000000);
+						UML_ADD(block, I1, I1, FLOAT_EXPONENT_BIAS);
+						UML_ROLAND(block, I1, I1, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_MASK);
+						UML_ROLINS(block, I1, I0, 0, FLOAT_SIGN_MASK);
 						UML_BFXU(block, I0, I0, 23 - 7, 7);
 						UML_LOAD(block, I0, &recips_mantissa_lookup, I0, SIZE_DWORD, SCALE_x4);
 						UML_OR(block, I0, I0, I1);
 						UML_MOV(block, REG(rn), I0);
 						if (AZ_CALC_REQUIRED)
 						{
-							UML_TEST(block, I0, 0x7fffffff);
+							UML_TEST(block, I0, FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK);
 							UML_SETc(block, COND_Z, ASTAT_AZ);
 						}
 						UML_JMP(block, recips_notnan);
 						UML_LABEL(block, recips_tozero);
-						UML_AND(block, REG(rn), I0, 0x80000000);
+						UML_AND(block, REG(rn), I0, FLOAT_SIGN_MASK);
 						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 1);
 						UML_JMP(block, recips_notnan);
 						UML_LABEL(block, recips_nan);
@@ -4426,10 +4426,10 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 1);
 						UML_JMP(block, recips_end);
 						UML_LABEL(block, recips_zero);
-						UML_AND(block, I0, I0, 0x80000000);
+						UML_AND(block, I0, I0, FLOAT_SIGN_MASK);
 						if (AN_CALC_REQUIRED) UML_SETc(block, COND_NZ, ASTAT_AN);
 						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 0);
-						UML_OR(block, REG(rn), I0, 0x7f800000);
+						UML_OR(block, REG(rn), I0, FLOAT_EXPONENT_MASK);
 						UML_LABEL(block, recips_notnan);
 						if (AI_CALC_REQUIRED) UML_MOV(block, ASTAT_AI, 0);
 						UML_LABEL(block, recips_end);
@@ -4461,22 +4461,22 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_CMP(block, I0, 0x80000000);
 						if (AN_CALC_REQUIRED) UML_SETc(block, COND_E, ASTAT_AN);
 						UML_JMPc(block, COND_A, rsqrts_nan);
-						UML_BFXU(block, I1, I0, 23, 8);
+						UML_BFXU(block, I1, I0, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS);
 						UML_CMP(block, I1, 0x000000ff);
 						UML_JMPc(block, COND_NE, rsqrts_finite);
-						UML_TEST(block, I0, 0x7fffff);
+						UML_TEST(block, I0, FLOAT_MANTISSA_MASK);
 						UML_JMPc(block, COND_NZ, rsqrts_nan);
 						UML_LABEL(block, rsqrts_finite);
 						if (AV_CALC_REQUIRED)
 						{
-							UML_TEST(block, I0, 0x7fffffff);
+							UML_TEST(block, I0, FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK);
 							UML_SETc(block, COND_Z, ASTAT_AV);
 						}
-						UML_SUB(block, I1, I1, 127);
+						UML_SUB(block, I1, I1, FLOAT_EXPONENT_BIAS);
 						UML_SAR(block, I1, I1, 1);
-						UML_SUB(block, I1, -1 + 127, I1);
-						UML_ROLAND(block, I1, I1, 23, 0x7f800000);
-						UML_ROLINS(block, I1, I0, 0, 0x80000000);
+						UML_SUB(block, I1, -1 + FLOAT_EXPONENT_BIAS, I1);
+						UML_ROLAND(block, I1, I1, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_MASK);
+						UML_ROLINS(block, I1, I0, 0, FLOAT_SIGN_MASK);
 						UML_BFXU(block, I0, I0, 23 - 6, 6 + 1);
 						UML_LOAD(block, I0, &rsqrts_mantissa_lookup, I0, SIZE_DWORD, SCALE_x4);
 						UML_OR(block, REG(rn), I0, I1);
@@ -4532,16 +4532,16 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						uml::code_label const end = compiler.labelnum++;
 
 						UML_MOV(block, I1, REG(rx));
-						UML_BFXU(block, I0, I1, 23, 8);
-						UML_AND(block, I1, I1, 0x807fffff);
-						UML_SUB(block, I0, I0, 127);
+						UML_BFXU(block, I0, I1, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS);
+						UML_AND(block, I1, I1, FLOAT_SIGN_MASK | FLOAT_MANTISSA_MASK);
+						UML_SUB(block, I0, I0, FLOAT_EXPONENT_BIAS);
 						UML_ADD(block, I0, I0, REG(ry));
 						UML_CMP(block, I0, -126);
 						UML_JMPc(block, COND_L, denormal);
 
-						UML_ADD(block, I0, I0, 127);
+						UML_ADD(block, I0, I0, FLOAT_EXPONENT_BIAS);
 						UML_AND(block, I0, I0, 0xff);
-						UML_SHL(block, I0, I0, 23);
+						UML_SHL(block, I0, I0, FLOAT_EXPONENT_SHIFT);
 						UML_OR(block, I0, I0, I1);
 
 						UML_FSCOPYI(block, F2, I0);
@@ -4565,7 +4565,7 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_JMP(block, end);
 
 						UML_LABEL(block, denormal);
-						UML_AND(block, I0, I1, 0x80000000);
+						UML_AND(block, I0, I1, FLOAT_SIGN_MASK);
 						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 1);
 						if (AN_CALC_REQUIRED) UML_MOV(block, ASTAT_AN, 0);
 						if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);   // TODO
@@ -4584,16 +4584,16 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						uml::code_label const end = compiler.labelnum++;
 						UML_FSFRINT(block, F0, REG(rx), SIZE_DWORD);
 						UML_ICOPYFS(block, I1, F0);
-						UML_BFXU(block, I0, I1, 23, 8);
-						UML_AND(block, I1, I1, 0x807fffff);
-						UML_SUB(block, I0, I0, 127);
+						UML_BFXU(block, I0, I1, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS);
+						UML_AND(block, I1, I1, FLOAT_SIGN_MASK | FLOAT_MANTISSA_MASK);
+						UML_SUB(block, I0, I0, FLOAT_EXPONENT_BIAS);
 						UML_ADD(block, I0, I0, REG(ry));
 						UML_CMP(block, I0, -126);
 						UML_JMPc(block, COND_L, denormal);
 
-						UML_ADD(block, I0, I0, 127);
+						UML_ADD(block, I0, I0, FLOAT_EXPONENT_BIAS);
 						UML_AND(block, I0, I0, 0xff);
-						UML_SHL(block, I0, I0, 23);
+						UML_SHL(block, I0, I0, FLOAT_EXPONENT_SHIFT);
 						UML_OR(block, REG(rn), I0, I1);
 						if (AZ_CALC_REQUIRED) UML_SETc(block, COND_Z, ASTAT_AZ);
 						if (AN_CALC_REQUIRED) UML_SETc(block, COND_S, ASTAT_AN);
@@ -4604,7 +4604,7 @@ void adsp21062_device::generate_compute(drcuml_block &block, compiler_state &com
 						UML_JMP(block, end);
 
 						UML_LABEL(block, denormal);
-						UML_AND(block, I0, I1, 0x80000000);
+						UML_AND(block, I0, I1, FLOAT_SIGN_MASK);
 						if (AZ_CALC_REQUIRED) UML_MOV(block, ASTAT_AZ, 1);
 						if (AN_CALC_REQUIRED) UML_MOV(block, ASTAT_AN, 0);
 						if (AV_CALC_REQUIRED) UML_MOV(block, ASTAT_AV, 0);   // TODO

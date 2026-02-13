@@ -4,66 +4,62 @@
 
 #include <cmath>
 
-#define CLEAR_ALU_FLAGS()       (m_core->astat &= ~(AZ|AN|AV|AC|AS|AI))
+#define CLEAR_ALU_FLAGS()           do { m_core->astat &= ~(AZ|AN|AV|AC|AS|AI); } while (false)
 
-#define SET_FLAG_AZ(r)          { m_core->astat |= (((r) == 0) ? AZ : 0); }
-#define SET_FLAG_AN(r)          { m_core->astat |= (((r) & 0x80000000) ? AN : 0); }
-#define SET_FLAG_AC_ADD(r,a,b)  { m_core->astat |= ((uint32_t(r) < uint32_t(a)) ? AC : 0); }
-#define SET_FLAG_AV_ADD(r,a,b)  { m_core->astat |= (((~((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); }
-#define SET_FLAG_AC_SUB(r,a,b)  { m_core->astat |= (!(uint32_t(a) < uint32_t(b)) ? AC : 0); }
-#define SET_FLAG_AV_SUB(r,a,b)  { m_core->astat |= (((((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); }
+#define SET_FLAG_AZ(r)              do { m_core->astat |= (((r) == 0) ? AZ : 0); } while (false)
+#define SET_FLAG_AN(r)              do { m_core->astat |= (((r) & 0x80000000) ? AN : 0); } while (false)
+#define SET_FLAG_AC_ADD(r,a,b)      do { m_core->astat |= ((uint32_t(r) < uint32_t(a)) ? AC : 0); } while (false)
+#define SET_FLAG_AV_ADD(r,a,b)      do { m_core->astat |= (((~((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); } while (false)
+#define SET_FLAG_AC_SUB(r,a,b)      do { m_core->astat |= (!(uint32_t(a) < uint32_t(b)) ? AC : 0); } while (false)
+#define SET_FLAG_AV_SUB(r,a,b)      do { m_core->astat |= (((((a) ^ (b)) & ((a) ^ (r))) & 0x80000000) ? AV : 0); } while (false)
 
-#define IS_FLOAT_ZERO(r)        ((((r) & 0x7fffffff) == 0))
-#define IS_FLOAT_DENORMAL(r)    ((((r) & 0x7f800000) == 0) && (((r) & 0x7fffff) != 0))
-#define IS_FLOAT_NAN(r)         ((((r) & 0x7f800000) == 0x7f800000) && (((r) & 0x7fffff) != 0))
-#define IS_FLOAT_INFINITY(r)    (((r) & 0x7fffffff) == 0x7f800000)
+#define CLEAR_MULTIPLIER_FLAGS()    do { m_core->astat &= ~(MN|MV|MU|MI); } while (false)
 
-#define CLEAR_MULTIPLIER_FLAGS()    (m_core->astat &= ~(MN|MV|MU|MI))
-
-#define SET_FLAG_MN(r)          { m_core->astat |= (((r) & 0x80000000) ? MN : 0); }
-#define SET_FLAG_MV(r)          { m_core->astat |= (((uint32_t((r) >> 32) != 0) && (uint32_t((r) >> 32) != 0xffffffff)) ? MV : 0); }
+#define SET_FLAG_MN(r)              do { m_core->astat |= (((r) & 0x80000000) ? MN : 0); } while (false)
+#define SET_FLAG_MV(r)              do { m_core->astat |= (((uint32_t((r) >> 32) != 0) && (uint32_t((r) >> 32) != 0xffffffff)) ? MV : 0); } while (false)
 
 /* TODO: MU needs 80-bit result */
-#define SET_FLAG_MU(r)          { m_core->astat |= (((uint32_t((r) >> 32) == 0) && (uint32_t(r)) != 0) ? MU : 0); }
+#define SET_FLAG_MU(r)              do { m_core->astat |= (((uint32_t((r) >> 32) == 0) && (uint32_t(r)) != 0) ? MU : 0); } while (false)
 
+constexpr bool IS_FLOAT_ZERO(uint32_t r)        { return (r & (FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK)) == 0; }
+constexpr bool IS_FLOAT_DENORMAL(uint32_t r)    { return ((r & FLOAT_EXPONENT_MASK) == 0) && ((r & FLOAT_MANTISSA_MASK) != 0); }
+constexpr bool IS_FLOAT_NAN(uint32_t r)         { return ((r & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK) && ((r & FLOAT_MANTISSA_MASK) != 0); }
+constexpr bool IS_FLOAT_INFINITY(uint32_t r)    { return (r & (FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK)) == FLOAT_INFINITY; }
 
-#define FLOAT_SIGN          0x80000000
-#define FLOAT_INFINITY      0x7f800000
-#define FLOAT_MANTISSA      0x007fffff
 
 /*****************************************************************************/
 
 // Mantissa lookup-table for RECIPS opcode
 const uint32_t adsp21062_device::recips_mantissa_lookup[128] =
 {
-	0x007F8000, 0x007E0000, 0x007C0000, 0x007A0000,
+	0x007f8000, 0x007e0000, 0x007c0000, 0x007a0000,
 	0x00780000, 0x00760000, 0x00740000, 0x00720000,
-	0x00700000, 0x006F0000, 0x006D0000, 0x006B0000,
-	0x006A0000, 0x00680000, 0x00660000, 0x00650000,
-	0x00630000, 0x00610000, 0x00600000, 0x005E0000,
-	0x005D0000, 0x005B0000, 0x005A0000, 0x00590000,
+	0x00700000, 0x006f0000, 0x006d0000, 0x006b0000,
+	0x006a0000, 0x00680000, 0x00660000, 0x00650000,
+	0x00630000, 0x00610000, 0x00600000, 0x005e0000,
+	0x005d0000, 0x005b0000, 0x005a0000, 0x00590000,
 	0x00570000, 0x00560000, 0x00540000, 0x00530000,
-	0x00520000, 0x00500000, 0x004F0000, 0x004E0000,
-	0x004C0000, 0x004B0000, 0x004A0000, 0x00490000,
+	0x00520000, 0x00500000, 0x004f0000, 0x004e0000,
+	0x004c0000, 0x004b0000, 0x004a0000, 0x00490000,
 	0x00470000, 0x00460000, 0x00450000, 0x00440000,
-	0x00430000, 0x00410000, 0x00400000, 0x003F0000,
-	0x003E0000, 0x003D0000, 0x003C0000, 0x003B0000,
-	0x003A0000, 0x00390000, 0x00380000, 0x00370000,
+	0x00430000, 0x00410000, 0x00400000, 0x003f0000,
+	0x003e0000, 0x003d0000, 0x003c0000, 0x003b0000,
+	0x003a0000, 0x00390000, 0x00380000, 0x00370000,
 	0x00360000, 0x00350000, 0x00340000, 0x00330000,
-	0x00320000, 0x00310000, 0x00300000, 0x002F0000,
-	0x002E0000, 0x002D0000, 0x002C0000, 0x002B0000,
-	0x002A0000, 0x00290000, 0x00280000, 0x00280000,
+	0x00320000, 0x00310000, 0x00300000, 0x002f0000,
+	0x002e0000, 0x002d0000, 0x002c0000, 0x002b0000,
+	0x002a0000, 0x00290000, 0x00280000, 0x00280000,
 	0x00270000, 0x00260000, 0x00250000, 0x00240000,
 	0x00230000, 0x00230000, 0x00220000, 0x00210000,
-	0x00200000, 0x001F0000, 0x001F0000, 0x001E0000,
-	0x001D0000, 0x001C0000, 0x001C0000, 0x001B0000,
-	0x001A0000, 0x00190000, 0x00190000, 0x00180000,
+	0x00200000, 0x001f0000, 0x001f0000, 0x001e0000,
+	0x001d0000, 0x001c0000, 0x001c0000, 0x001b0000,
+	0x001a0000, 0x00190000, 0x00190000, 0x00180000,
 	0x00170000, 0x00170000, 0x00160000, 0x00150000,
 	0x00140000, 0x00140000, 0x00130000, 0x00120000,
 	0x00120000, 0x00110000, 0x00100000, 0x00100000,
-	0x000F0000, 0x000F0000, 0x000E0000, 0x000D0000,
-	0x000D0000, 0x000C0000, 0x000C0000, 0x000B0000,
-	0x000A0000, 0x000A0000, 0x00090000, 0x00090000,
+	0x000f0000, 0x000f0000, 0x000e0000, 0x000d0000,
+	0x000d0000, 0x000c0000, 0x000c0000, 0x000b0000,
+	0x000a0000, 0x000a0000, 0x00090000, 0x00090000,
 	0x00080000, 0x00070000, 0x00070000, 0x00060000,
 	0x00060000, 0x00050000, 0x00050000, 0x00040000,
 	0x00040000, 0x00030000, 0x00030000, 0x00020000,
@@ -74,36 +70,36 @@ const uint32_t adsp21062_device::recips_mantissa_lookup[128] =
 const uint32_t adsp21062_device::rsqrts_mantissa_lookup[128] =
 {
 	0x00350000, 0x00330000, 0x00320000, 0x00300000,
-	0x002F0000, 0x002E0000, 0x002D0000, 0x002B0000,
-	0x002A0000, 0x00290000, 0x00280000, 0x00270000,
+	0x002f0000, 0x002e0000, 0x002d0000, 0x002b0000,
+	0x002a0000, 0x00290000, 0x00280000, 0x00270000,
 	0x00260000, 0x00250000, 0x00230000, 0x00220000,
-	0x00210000, 0x00200000, 0x001F0000, 0x001E0000,
-	0x001E0000, 0x001D0000, 0x001C0000, 0x001B0000,
-	0x001A0000, 0x00190000, 0x00180000, 0x00170000,
+	0x00210000, 0x00200000, 0x001f0000, 0x001e0000,
+	0x001e0000, 0x001d0000, 0x001c0000, 0x001b0000,
+	0x001a0000, 0x00190000, 0x00180000, 0x00170000,
 	0x00160000, 0x00160000, 0x00150000, 0x00140000,
 	0x00130000, 0x00130000, 0x00120000, 0x00110000,
-	0x00100000, 0x00100000, 0x000F0000, 0x000E0000,
-	0x000E0000, 0x000D0000, 0x000C0000, 0x000B0000,
-	0x000B0000, 0x000A0000, 0x000A0000, 0x00090000,
+	0x00100000, 0x00100000, 0x000f0000, 0x000e0000,
+	0x000e0000, 0x000d0000, 0x000c0000, 0x000b0000,
+	0x000b0000, 0x000a0000, 0x000a0000, 0x00090000,
 	0x00080000, 0x00080000, 0x00070000, 0x00070000,
 	0x00060000, 0x00050000, 0x00050000, 0x00040000,
 	0x00040000, 0x00030000, 0x00030000, 0x00020000,
 	0x00020000, 0x00010000, 0x00010000, 0x00000000,
-	0x007F8000, 0x007E0000, 0x007C0000, 0x007A0000,
+	0x007f8000, 0x007e0000, 0x007c0000, 0x007a0000,
 	0x00780000, 0x00760000, 0x00740000, 0x00730000,
-	0x00710000, 0x006F0000, 0x006E0000, 0x006C0000,
-	0x006A0000, 0x00690000, 0x00670000, 0x00660000,
+	0x00710000, 0x006f0000, 0x006e0000, 0x006c0000,
+	0x006a0000, 0x00690000, 0x00670000, 0x00660000,
 	0x00640000, 0x00630000, 0x00620000, 0x00600000,
-	0x005F0000, 0x005E0000, 0x005C0000, 0x005B0000,
-	0x005A0000, 0x00590000, 0x00570000, 0x00560000,
+	0x005f0000, 0x005e0000, 0x005c0000, 0x005b0000,
+	0x005a0000, 0x00590000, 0x00570000, 0x00560000,
 	0x00550000, 0x00540000, 0x00530000, 0x00520000,
-	0x00510000, 0x004F0000, 0x004E0000, 0x004D0000,
-	0x004C0000, 0x004B0000, 0x004A0000, 0x00490000,
+	0x00510000, 0x004f0000, 0x004e0000, 0x004d0000,
+	0x004c0000, 0x004b0000, 0x004a0000, 0x00490000,
 	0x00480000, 0x00470000, 0x00460000, 0x00450000,
 	0x00450000, 0x00440000, 0x00430000, 0x00420000,
-	0x00410000, 0x00400000, 0x003F0000, 0x003E0000,
-	0x003E0000, 0x003D0000, 0x003C0000, 0x003B0000,
-	0x003A0000, 0x003A0000, 0x00390000, 0x00380000,
+	0x00410000, 0x00400000, 0x003f0000, 0x003e0000,
+	0x003e0000, 0x003d0000, 0x003c0000, 0x003b0000,
+	0x003a0000, 0x003a0000, 0x00390000, 0x00380000,
 	0x00370000, 0x00370000, 0x00360000, 0x00350000,
 };
 
@@ -355,10 +351,10 @@ void adsp21062_device::compute_not(int rn, int rx)
 
 uint32_t adsp21062_device::SCALB(SHARC_REG rx, int ry)
 {
-	uint32_t mantissa = rx.r & FLOAT_MANTISSA;
-	uint32_t sign = rx.r & FLOAT_SIGN;
+	uint32_t mantissa = rx.r & FLOAT_MANTISSA_MASK;
+	uint32_t sign = rx.r & FLOAT_SIGN_MASK;
 
-	int exponent = ((rx.r >> 23) & 0xff) - 127;
+	int exponent = float_get_unbiased_exponent(rx.r);
 	exponent += int32_t(REG(ry));
 
 	if (exponent > 127)
@@ -375,7 +371,7 @@ uint32_t adsp21062_device::SCALB(SHARC_REG rx, int ry)
 	}
 	else
 	{
-		return sign | (((exponent + 127) & 0xff) << 23) | mantissa;
+		return sign | float_make_biased_exponent(exponent) | mantissa;
 	}
 }
 
@@ -494,7 +490,7 @@ void adsp21062_device::compute_logb(int rn, int rx)
 	}
 	else if (IS_FLOAT_ZERO(REG(rx)))
 	{
-		REG(rn) = FLOAT_SIGN | FLOAT_INFINITY;
+		REG(rn) = FLOAT_SIGN_MASK | FLOAT_INFINITY;
 
 		m_core->astat |= AV;
 	}
@@ -507,8 +503,7 @@ void adsp21062_device::compute_logb(int rn, int rx)
 	}
 	else
 	{
-		int exponent = (r >> 23) & 0xff;
-		exponent -= 127;
+		int exponent = float_get_unbiased_exponent(r);
 
 		// AN
 		SET_FLAG_AN(exponent);
@@ -650,10 +645,10 @@ void adsp21062_device::compute_fcomp(int rx, int ry)
 
 	CLEAR_ALU_FLAGS();
 	// AZ
-	if( FREG(rx) == FREG(ry) )
+	if (FREG(rx) == FREG(ry))
 		m_core->astat |= AZ;
 	// AN
-	if( FREG(rx) < FREG(ry) )
+	if (FREG(rx) < FREG(ry))
 		m_core->astat |= AN;
 	// AI
 	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
@@ -742,7 +737,7 @@ void adsp21062_device::compute_fcopysign(int rn, int rx, int ry)
 {
 	SHARC_REG r_alu;
 
-	r_alu.r = (REG(rx) & 0x7fffffff) | (REG(ry) & 0x80000000); // TODO DENORM and NAN cases ?
+	r_alu.r = (REG(rx) & (FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK)) | (REG(ry) & FLOAT_SIGN_MASK); // TODO DENORM and NAN cases ?
 
 	CLEAR_ALU_FLAGS();
 	m_core->astat |= (r_alu.f < 0.0f) ? AN : 0;
@@ -812,19 +807,19 @@ void adsp21062_device::compute_recips(int rn, int rx)
 	else if (IS_FLOAT_ZERO(REG(rx)))
 	{
 		// +- Zero
-		r = (REG(rx) & FLOAT_SIGN) | FLOAT_INFINITY;
+		r = (REG(rx) & FLOAT_SIGN_MASK) | FLOAT_INFINITY;
 
 		m_core->astat |= AV;
 	}
 	else
 	{
-		uint32_t mantissa = REG(rx) & 0x7fffff;
-		uint32_t exponent = (REG(rx) >> 23) & 0xff;
-		uint32_t sign = REG(rx) & FLOAT_SIGN;
+		uint32_t mantissa = REG(rx) & FLOAT_MANTISSA_MASK;
+		uint32_t sign = REG(rx) & FLOAT_SIGN_MASK;
+
+		int res_exponent = -float_get_unbiased_exponent(REG(rx)) - 1;
 
 		uint32_t res_mantissa = recips_mantissa_lookup[mantissa >> 16];
 
-		int res_exponent = -(exponent - 127) - 1;
 		if (res_exponent > 125 || res_exponent < -126)
 		{
 			res_exponent = 0;
@@ -832,10 +827,10 @@ void adsp21062_device::compute_recips(int rn, int rx)
 		}
 		else
 		{
-			res_exponent = (res_exponent + 127) & 0xff;
+			res_exponent = (res_exponent + FLOAT_EXPONENT_BIAS) & 0xff;
 		}
 
-		r = sign | (res_exponent << 23) | res_mantissa;
+		r = sign | (uint32_t(res_exponent) << FLOAT_EXPONENT_SHIFT) | res_mantissa;
 
 		SET_FLAG_AN(REG(rx));
 		// AZ
@@ -867,15 +862,13 @@ void adsp21062_device::compute_rsqrts(int rn, int rx)
 	else
 	{
 		uint32_t mantissa = REG(rx) & 0xffffff;   // mantissa + LSB of biased exponent
-		uint32_t exponent = (REG(rx) >> 23) & 0xff;
-		uint32_t sign = REG(rx) & FLOAT_SIGN;
+		uint32_t sign = REG(rx) & FLOAT_SIGN_MASK;
+
+		int32_t res_exponent = -(float_get_unbiased_exponent(REG(rx)) >> 1) - 1;
 
 		uint32_t res_mantissa = rsqrts_mantissa_lookup[mantissa >> 17];
 
-		int32_t res_exponent = -((int32_t(exponent) - 127) >> 1) - 1;
-		res_exponent = (res_exponent + 127) & 0xff;
-
-		r = sign | (res_exponent << 23) | res_mantissa;
+		r = sign | float_make_biased_exponent(res_exponent) | res_mantissa;
 	}
 
 	CLEAR_ALU_FLAGS();
@@ -885,7 +878,7 @@ void adsp21062_device::compute_rsqrts(int rn, int rx)
 	m_core->astat |= (IS_FLOAT_ZERO(r)) ? AZ : 0;
 	m_core->astat |= (IS_FLOAT_ZERO(REG(rx))) ? AV : 0;
 	// AI
-	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || (REG(rx) & 0x80000000)) ? AI : 0;
+	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || (REG(rx) & FLOAT_SIGN_MASK)) ? AI : 0;
 	// AIS
 	if (m_core->astat & AI)   m_core->stky |= AIS;
 	// AF
@@ -951,11 +944,11 @@ void adsp21062_device::compute_mul_uuin(int rn, int rx, int ry)
 	uint64_t r = mulu_32x32(REG(rx), REG(ry));
 
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN((uint32_t)r);
+	SET_FLAG_MN(uint32_t(r));
 	SET_FLAG_MV(r);
 	SET_FLAG_MU(r);
 
-	REG(rn) = (uint32_t)(r);
+	REG(rn) = uint32_t(r);
 }
 
 /* Rn = (signed)Rx * (signed)Ry, integer, no rounding */
@@ -964,11 +957,11 @@ void adsp21062_device::compute_mul_ssin(int rn, int rx, int ry)
 	uint64_t r = mul_32x32(REG(rx), REG(ry));
 
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN((uint32_t)r);
+	SET_FLAG_MN(uint32_t(r));
 	SET_FLAG_MV(r);
 	SET_FLAG_MU(r);
 
-	REG(rn) = (uint32_t)(r);
+	REG(rn) = uint32_t(r);
 }
 
 /* MRF + (signed)Rx * (signed)Ry, integer, no rounding */
@@ -977,11 +970,11 @@ uint32_t adsp21062_device::compute_mrf_plus_mul_ssin(int rx, int ry)
 	uint64_t r = m_core->mrf + mul_32x32(REG(rx), REG(ry));
 
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN((uint32_t)r);
+	SET_FLAG_MN(uint32_t(r));
 	SET_FLAG_MV(r);
 	SET_FLAG_MU(r);
 
-	return (uint32_t)(r);
+	return uint32_t(r);
 }
 
 /* MRB + (signed)Rx * (signed)Ry, integer, no rounding */
@@ -990,11 +983,11 @@ uint32_t adsp21062_device::compute_mrb_plus_mul_ssin(int rx, int ry)
 	int64_t r = m_core->mrb + mul_32x32(REG(rx), REG(ry));
 
 	CLEAR_MULTIPLIER_FLAGS();
-	SET_FLAG_MN((uint32_t)r);
+	SET_FLAG_MN(uint32_t(r));
 	SET_FLAG_MV(r);
 	SET_FLAG_MU(r);
 
-	return (uint32_t)(r);
+	return uint32_t(r);
 }
 
 /* Fn = Fx * Fy */
@@ -1016,7 +1009,7 @@ void adsp21062_device::compute_fmul(int rn, int rx, int ry)
 /* integer*/
 void adsp21062_device::compute_multi_mr_to_reg(int ai, int rk)
 {
-	switch(ai)
+	switch (ai)
 	{
 		case 0:     SET_UREG(rk, uint32_t(m_core->mrf)); break;
 		case 1:     SET_UREG(rk, uint32_t(m_core->mrf >> 32)); break;
@@ -1032,13 +1025,13 @@ void adsp21062_device::compute_multi_mr_to_reg(int ai, int rk)
 
 void adsp21062_device::compute_multi_reg_to_mr(int ai, int rk)
 {
-	switch(ai)
+	switch (ai)
 	{
 		case 0:     m_core->mrf &= ~0xffffffff; m_core->mrf |= GET_UREG(rk); break;
-		case 1:     m_core->mrf &= 0xffffffff; m_core->mrf |= (uint64_t)(GET_UREG(rk)) << 32; break;
+		case 1:     m_core->mrf &= 0xffffffff; m_core->mrf |= uint64_t(GET_UREG(rk)) << 32; break;
 		case 2:     fatalerror("SHARC: tried to write MR2F\n"); break;
 		case 4:     m_core->mrb &= ~0xffffffff; m_core->mrb |= GET_UREG(rk); break;
-		case 5:     m_core->mrb &= 0xffffffff; m_core->mrb |= (uint64_t)(GET_UREG(rk)) << 32; break;
+		case 5:     m_core->mrb &= 0xffffffff; m_core->mrb |= uint64_t(GET_UREG(rk)) << 32; break;
 		case 6:     fatalerror("SHARC: tried to write MR2B\n"); break;
 		default:    fatalerror("SHARC: unknown ai %d in reg_to_mr\n", ai);
 	}
@@ -1261,11 +1254,11 @@ void adsp21062_device::compute_fmul_fix_scaled(int fm, int fxm, int fym, int fa,
 
 	if (m_core->mode1 & MODE1_TRUNCATE)
 	{
-		alu_i = (int32_t)(r_alu.f);
+		alu_i = int32_t(r_alu.f);
 	}
 	else
 	{
-		alu_i = (int32_t)(r_alu.f < 0 ? (r_alu.f - 0.5f) : (r_alu.f + 0.5f));
+		alu_i = int32_t(nearbyintf(r_alu.f)); // assume rounding mode is set to FE_TONEAREST
 	}
 
 	CLEAR_MULTIPLIER_FLAGS();

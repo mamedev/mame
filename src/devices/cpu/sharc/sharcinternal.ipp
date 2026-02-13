@@ -6,18 +6,30 @@
 #include "sharc.h"
 
 
-constexpr uint32_t OP_USERFLAG_LOOP                 = 0x00000001;
-constexpr uint32_t OP_USERFLAG_ASTAT_DELAY_COPY_AZ  = 0x00001000;
-constexpr uint32_t OP_USERFLAG_ASTAT_DELAY_COPY_AN  = 0x00002000;
-constexpr uint32_t OP_USERFLAG_ASTAT_DELAY_COPY_AC  = 0x00004000;
-constexpr uint32_t OP_USERFLAG_ASTAT_DELAY_COPY_AV  = 0x00008000;
-constexpr uint32_t OP_USERFLAG_ASTAT_DELAY_COPY_MV  = 0x00010000;
-constexpr uint32_t OP_USERFLAG_ASTAT_DELAY_COPY_MN  = 0x00020000;
-constexpr uint32_t OP_USERFLAG_ASTAT_DELAY_COPY_SV  = 0x00040000;
-constexpr uint32_t OP_USERFLAG_ASTAT_DELAY_COPY_SZ  = 0x00080000;
-constexpr uint32_t OP_USERFLAG_ASTAT_DELAY_COPY_BTF = 0x00100000;
-constexpr uint32_t OP_USERFLAG_ASTAT_DELAY_COPY     = 0x001ff000;
-constexpr uint32_t OP_USERFLAG_CALL                 = 0x10000000;
+// DRC instruction description flags
+constexpr uint32_t  OP_USERFLAG_LOOP                     = 0x00000001;
+constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AZ      = 0x00001000;
+constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AN      = 0x00002000;
+constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AC      = 0x00004000;
+constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AV      = 0x00008000;
+constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_MV      = 0x00010000;
+constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_MN      = 0x00020000;
+constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_SV      = 0x00040000;
+constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_SZ      = 0x00080000;
+constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_BTF     = 0x00100000;
+constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY         = 0x001ff000;
+constexpr uint32_t  OP_USERFLAG_CALL                     = 0x10000000;
+
+
+// constants for IEEE754 single-precision float format
+constexpr uint32_t  FLOAT_INFINITY          = 0x7f800000;
+constexpr uint32_t  FLOAT_SIGN_MASK         = 0x80000000;
+constexpr uint32_t  FLOAT_EXPONENT_MASK     = 0x7f800000;
+constexpr uint32_t  FLOAT_MANTISSA_MASK     = 0x007fffff;
+constexpr unsigned  FLOAT_SIGN_SHIFT        = 31;
+constexpr unsigned  FLOAT_EXPONENT_SHIFT    = 23;
+constexpr unsigned  FLOAT_EXPONENT_BITS     = 8;
+constexpr int       FLOAT_EXPONENT_BIAS     = 127;
 
 
 struct alignas(16) adsp21062_device::sharc_internal_state
@@ -255,5 +267,46 @@ inline void adsp21062_device::dm_write32(uint32_t address, uint32_t data)
 {
 	m_data.write_dword(address, data);
 }
+
+
+// helper functions
+
+constexpr int float_get_unbiased_exponent(uint32_t f)
+{
+	return int(int32_t(BIT(f, FLOAT_EXPONENT_SHIFT, FLOAT_EXPONENT_BITS)) - FLOAT_EXPONENT_BIAS);
+}
+
+constexpr uint32_t float_make_biased_exponent(int exponent)
+{
+	return uint32_t((exponent + FLOAT_EXPONENT_BIAS) & util::make_bitmask<int>(FLOAT_EXPONENT_BITS)) << FLOAT_EXPONENT_SHIFT;
+}
+
+
+// opcode fields
+
+constexpr unsigned  op_get_subop(uint64_t opcode)     { return unsigned(BIT(opcode, 40, 5)); }
+constexpr uint32_t  op_get_compute(uint64_t opcode)   { return uint32_t(BIT(opcode, 0, 23)); }
+
+constexpr unsigned  op_get_cond(uint64_t opcode)      { return unsigned(BIT(opcode, 33, 5)); }
+
+constexpr unsigned  op_get_ureg_src(uint64_t opcode)  { return unsigned(BIT(opcode, 36, 8)); }
+constexpr unsigned  op_get_cond_ureg(uint64_t opcode) { return unsigned(BIT(opcode, 31, 5)); }
+constexpr unsigned  op_get_ureg_dst(uint64_t opcode)  { return unsigned(BIT(opcode, 23, 8)); }
+
+constexpr int       op_get_reladdr(uint64_t opcode)   { return util::sext(unsigned(opcode >> 27), 6); }
+
+constexpr unsigned  op_get_dmi(uint64_t opcode)       { return unsigned(BIT(opcode, 41, 3)); }
+constexpr unsigned  op_get_dmm(uint64_t opcode)       { return unsigned(BIT(opcode, 38, 3)); }
+constexpr unsigned  op_get_pmi(uint64_t opcode)       { return unsigned(BIT(opcode, 30, 3)); }
+constexpr unsigned  op_get_pmm(uint64_t opcode)       { return unsigned(BIT(opcode, 27, 3)); }
+
+constexpr unsigned  op_get_jump_b(uint64_t opcode)    { return unsigned(BIT(opcode, 39)); }
+constexpr unsigned  op_get_jump_la(uint64_t opcode)   { return unsigned(BIT(opcode, 38)); }
+constexpr unsigned  op_get_jump_j(uint64_t opcode)    { return unsigned(BIT(opcode, 26)); }
+constexpr unsigned  op_get_jump_e(uint64_t opcode)    { return unsigned(BIT(opcode, 25)); }
+constexpr unsigned  op_get_jump_ci(uint64_t opcode)   { return unsigned(BIT(opcode, 24)); }
+
+constexpr unsigned  op_get_rs(uint64_t opcode)        { return unsigned(BIT(opcode, 12, 4)); }
+constexpr unsigned  op_get_ra(uint64_t opcode)        { return unsigned(BIT(opcode, 8, 4)); }
 
 #endif // MAME_CPU_SHARC_SHARCINTERNAL_IPP

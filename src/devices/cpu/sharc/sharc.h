@@ -156,6 +156,16 @@ private:
 	static constexpr uint32_t AVS =             0x0000'0002;    // ALU floating-point overflow
 	static constexpr uint32_t AOS =             0x0000'0004;    // ALU fixed-point overflow
 	static constexpr uint32_t AIS =             0x0000'0020;    // ALU floating-point invalid operation
+	static constexpr uint32_t MOS =             0x0000'0040;    // Multiplier fixed-point overflow
+	static constexpr uint32_t MVS =             0x0000'0080;    // Multiplier floating-point overflow
+	static constexpr uint32_t MUS =             0x0000'0100;    // Multiplier underflow
+	static constexpr uint32_t MIS =             0x0000'0200;    // Multiplier floating-point invalid operation
+	static constexpr uint32_t PCFL =            0x0020'0000;    // PC stack full
+	static constexpr uint32_t PCEM =            0x0040'0000;    // PC stack empty
+	static constexpr uint32_t SSOV =            0x0080'0000;    // Status stack overflow
+	static constexpr uint32_t SSEM =            0x0100'0000;    // Status stack empty
+	static constexpr uint32_t LSOV =            0x0200'0000;    // Loop stacks overflow
+	static constexpr uint32_t LSEM =            0x0400'0000;    // Loop stacks empty
 
 	// MODE1 flags
 	static constexpr uint32_t MODE1_BR8 =       0x0000'0001;    // Bit-reverse for I8
@@ -305,7 +315,6 @@ private:
 	void sharc_dma_exec(int channel);
 	void dma_run_cycle(int channel);
 	void add_systemreg_write_latency_effect(int sysreg, uint32_t data, uint32_t prev_data);
-	inline void swap_register(uint32_t *a, uint32_t *b);
 	void systemreg_write_latency_effect();
 	uint32_t GET_UREG(int ureg);
 	void SET_UREG(int ureg, uint32_t data);
