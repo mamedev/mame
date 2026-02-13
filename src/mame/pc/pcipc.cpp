@@ -779,7 +779,7 @@ void pcipc_state::se440bx2(machine_config &config)
 	serport1.cts_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::ncts2_w));
 
 	// FIXME: int mapping is unchecked for all slots
-	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "laguna3d");
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "laguna3d");
 
 	// TODO: 0c is for YMF740 audio
 	PCI_SLOT(config, "pci:1", pci_cards, 13, 0, 1, 2, 3, nullptr);

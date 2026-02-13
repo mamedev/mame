@@ -6,12 +6,12 @@
 TODO:
 - Throws "Primary master hard disk fail" in shutms11. Disk has a non canonical -chs of 524,255,63.
   winimage will throw plenty of errors on manual file extraction (related to Korean paths?).
-- Currently needs enabled_logical true in super I/O handling (needs the real
-  ITE Giga I/O to fix);
-- In this driver with a manually rebuilt image will loop during the fake "now loading" screen
-  (customized Win 98 splash screen);
+  Currently rebuilt with a canonical -chs, see below;
+- In this driver will try to install a few things then throw a BSoD with a fatal error 0e while
+  trying to install the BX AGP controller, tied with Super I/O wait for key handing?
+- Cannot do much without actual Voodoo 3 BIOS + text mode/VGA support;
 - In pcipc with a manually rebuilt image will throw an exception in "Internat" module once it loads
-  Windows 98 (and installs the diff drivers).
+  Windows 98 (and installs the diff drivers);
 
 ===================================================================================================
 
@@ -312,11 +312,14 @@ void comebaby_state::comebaby(machine_config &config)
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
 	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_3_pci_device::screen_update));
 #else
-	// "pci:0d.0" J4D2
-	// "pci:0e.0" J4D1
-	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "virge").set_fixed(true);
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
 #endif
-
+	PCI_SLOT(config, "pci:1", pci_cards, 13, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 14, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 15, 2, 3, 0, 1, nullptr);
+	// has an ESS .com in autoexec.bat (unknown position)
+	// TODO: tries to install its driver in Windows 98, wrong one
+	PCI_SLOT(config, "pci:4", pci_cards, 16, 3, 0, 1, 2, "ess_solo1");
 }
 
 
