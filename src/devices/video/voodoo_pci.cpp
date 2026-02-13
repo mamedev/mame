@@ -321,7 +321,7 @@ const tiny_rom_entry *voodoo_banshee_x86_pci_device::device_rom_region() const
 }
 
 voodoo_3000_x86_pci_device::voodoo_3000_x86_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: voodoo_3_pci_device(mconfig, VOODOO_3_PCI, tag, owner, clock)
+	: voodoo_3_pci_device(mconfig, VOODOO_3000_X86_PCI, tag, owner, clock)
 	, m_vga_rom(*this, "vga_rom")
 {
 }
