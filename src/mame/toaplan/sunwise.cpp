@@ -25,7 +25,7 @@ pwrkick     SW931201-1    Sunwise       Power Kick
 burgkids    SW931201-1    Sunwise       Burger Kids
 pyutakun    SW931201-1    Sunwise       Pyuuta-kun
 othldrby    S951060-VGP   Sunwise       Othello Derby
-monchich    S951060-VGP   Sunwise       Monchichi Fluffy Puzzle   (has a subboard instead of mask ROMs)
+monkichi    S951060-VGP   Sunwise       Monkichicchi no Fuwafuwa Puzzle  (has a subboard instead of mask ROMs)
 
 Notes on Power Kick coin inputs:
 - The 10 yen input is "Key In" according to the bookkeeping screen, but is
@@ -57,7 +57,7 @@ public:
 	void othldrby(machine_config &config) ATTR_COLD;
 	void pwrkick(machine_config &config) ATTR_COLD;
 
-	void init_monchich() ATTR_COLD;
+	void init_monkichi() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -390,7 +390,7 @@ static INPUT_PORTS_START( othldrby )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( monchich )
+static INPUT_PORTS_START( monkichi )
 	PORT_INCLUDE( base )
 
 	PORT_MODIFY("SYS")
@@ -463,7 +463,7 @@ void sunwise_state::pwrkick_coin_lockout_w(u8 data)
 
 u8 sunwise_state::bypass_oki_state_r()
 {
-	// When you complete a level on monchich it first polls the VDP at 0x30000d waiting for a specific state.
+	// When you complete a level on monkichi it first polls the VDP at 0x30000d waiting for a specific state.
 	//
 	// It then checks 0x600001 (the OKI state) and loops the above unless it gets what it wants, which never
 	// happens, no sounds are playing at the time.
@@ -475,7 +475,7 @@ u8 sunwise_state::bypass_oki_state_r()
 void sunwise_state::common_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-	// mirror assumed for monchich as there are a few accesses outside of the usual range
+	// mirror assumed for monkichi as there are a few accesses outside of the usual range
 	map(0x100000, 0x103fff).mirror(0x010000).ram().share("nvram"); // Only 10022C-10037B is actually saved as NVRAM
 	map(0x104000, 0x10ffff).mirror(0x010000).ram();
 
@@ -674,7 +674,7 @@ ROM_START( othldrby ) // Sunwise S951060-VGP PCB - JAMMA compliant (components i
 	ROM_LOAD( "sunwise_db0_4.u33", 0x00000, 0x80000, CRC(a9701868) SHA1(9ee89556666d358e8d3915622573b3ba660048b8) )
 ROM_END
 
-ROM_START( monchich )
+ROM_START( monkichi )
 	ROM_REGION( 0x080000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "rom1.u61", 0x00000, 0x80000, CRC(0d5085f5) SHA1(11885bc501b12aafd10a83599d6036e259383620) )
 
@@ -690,7 +690,7 @@ ROM_END
 
 } // anonymous namespace
 
-void sunwise_state::init_monchich()
+void sunwise_state::init_monkichi()
 {
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x600001, 0x600001, read8smo_delegate(*this, FUNC(sunwise_state::bypass_oki_state_r)));
 }
@@ -699,5 +699,5 @@ GAME( 1994, pwrkick,     0,        pwrkick,    pwrkick,    sunwise_state,  empty
 GAME( 1995, burgkids,    0,        pwrkick,    burgkids,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Burger Kids (Japan)",   0 )
 GAME( 1995, pyutakun,    0,        pwrkick,    pyutakun,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Pyuuta-kun (Japan)",    0 )
 GAME( 1995, othldrby,    0,        othldrby,   othldrby,   sunwise_state,  empty_init,      ROT0,   "Sunwise",  "Othello Derby (Japan)", 0 )
-GAME( 1995, monchich,    0,        othldrby,   monchich,   sunwise_state,  init_monchich,   ROT0,   "Sunwise",  "Monkichicchi no Fuwafuwa Puzzle (Japan, prototype?)", 0 ) // maybe a prototype
-// a later version of monchich, reworked as "Dakko-chan no Fuwafuwa Puzzle" was shown in 1997
+GAME( 1995, monkichi,    0,        othldrby,   monkichi,   sunwise_state,  init_monkichi,   ROT0,   "Sunwise",  "Monkichicchi no Fuwafuwa Puzzle (Japan, prototype?)", 0 ) // maybe a prototype
+// a later version of monkichi, reworked as "Dakko-chan no Fuwafuwa Puzzle" was shown in 1997
