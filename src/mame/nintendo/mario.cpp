@@ -21,7 +21,13 @@ Revision E also fixes glitches in gfx2 that look like a production error
 (not a bad dump): a gap in Mario/Luigi's hat when he jumps, and a wrong eye
 color in one of the walk animations that's visible on Luigi.
 
-The Japan revision C is from around the same time as US revision E.
+The newer revisions also changed the 2nd half of the color PROM. It's much
+darker, for some reason they removed the blue text shadowing, and Mario's
+overall was changed from blue to black. The 1st half of the color PROM is
+unchanged (in other words, it looks the same with the default monitor).
+
+Japan revision C is from around the same time as US revision E. marioja is
+a very early version.
 
 The sound MCU can be easily replaced with a ROMless one such as I8039
 (or just force EA high), by doing a 1-byte patch to the external ROM:
@@ -1019,6 +1025,38 @@ ROM_START( marioj )
 	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) )
 ROM_END
 
+ROM_START( marioja ) // TMA1-02 CPU, TMA1-02-VIDEO
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tma1-c-7f.7f",   0x0000, 0x2000, CRC(797770a3) SHA1(3b6cbac3338487d596c2f21f9fb9fb7080601fe0) )
+	ROM_LOAD( "tma1-c-7e.7e",   0x2000, 0x2000, CRC(35ef2dc6) SHA1(b8d28e0a2983ee5a71d12e1411bef3015cd4942f) )
+	ROM_LOAD( "tma1-c-7d.7d",   0x4000, 0x2000, CRC(6e25d1a8) SHA1(4b1d80aa86545d450bb384231d9ea25c60532689) )
+	ROM_LOAD( "tma1-c-7c.7c",   0xf000, 0x1000, CRC(4b588f4b) SHA1(26066b9987c536a0f54e51a459d02eef0be582fb) )
+
+	ROM_REGION( 0x0800, "audiocpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "m58715-051p.5l", 0x0000, 0x0800, NO_DUMP ) // internal rom
+
+	ROM_REGION( 0x1000, "soundrom", 0 )
+	ROM_LOAD( "tma1-c-6k.6k",   0x0000, 0x1000, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "tma1-v-3f_c.3f", 0x0000, 0x1000, CRC(adf49ee0) SHA1(11fc2cd197bfe3ecb6af55c3c7a326c94988d2bd) )
+	ROM_LOAD( "tma1-v-3j_c.3j", 0x1000, 0x1000, CRC(a5318f2d) SHA1(e42f5e51804195c64a56addb18b7ad12c57bb09a) )
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "tma1-v-7m_c.7m", 0x0000, 0x1000, CRC(eacc5bfa) SHA1(ef5ceca3416c95314816e725fb32cc9fa1659d34) )
+	ROM_LOAD( "tma1-v-7n_c.7n", 0x1000, 0x1000, CRC(e0e08bba) SHA1(315eba2c10d426c9c0bb4e36987bf8ebed7df9a0) )
+	ROM_LOAD( "tma1-v-7p_c.7p", 0x2000, 0x1000, CRC(7b27c8c1) SHA1(3fb2613ce19e353fbcc77b6817927794fb35810f) )
+	ROM_LOAD( "tma1-v-7s_c.7s", 0x3000, 0x1000, CRC(385f1076) SHA1(5a6f55709d7b607318c61e2f403128143d5658ff) )
+	ROM_LOAD( "tma1-v-7t_c.7t", 0x4000, 0x1000, CRC(5cbb92a5) SHA1(a78a378e6d3060143dc456e9c33a5068da648331) )
+	ROM_LOAD( "tma1-v-7u_c.7u", 0x5000, 0x1000, CRC(badb0191) SHA1(7dcb31dcdfe0b68f4e74a8678e4a5cfd82d8f0fe) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tma1-c-4p.4p",   0x0000, 0x0200, CRC(8187d286) SHA1(8a6d8e622599f1aacaeb10f7b1a39a23c8a840a0) )
+
+	ROM_REGION( 0x0020, "decoder_prom", 0 ) // main cpu memory map decoding prom
+	ROM_LOAD( "tma1-c-5b.5b",   0x0000, 0x0020, CRC(58d86098) SHA1(d654995004b9052b12d3b682a2b39530e70030fc) )
+ROM_END
+
 ROM_START( masao )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "masao-4.rom",  0x0000, 0x2000, CRC(07a75745) SHA1(acc760242a8862d177e3cff90aa32c4f3dac4e65) )
@@ -1054,8 +1092,9 @@ ROM_END
  *
  *************************************/
 
-GAME( 1983, mario,  0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision E)",    MACHINE_SUPPORTS_SAVE ) // newest
-GAME( 1983, mariog, mario, mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision G)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, mariof, mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, Revision F)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1983, marioj, mario, mario, marioj, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, Revision C)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, masao,  mario, masao, mario,  mario_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mario,   0,     mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, revision E)",    MACHINE_SUPPORTS_SAVE ) // newest US revision
+GAME( 1983, mariog,  mario, mario, mario,  mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, revision G)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, mariof,  mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo of America", "Mario Bros. (US, revision F)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1983, marioj,  mario, mario, marioj, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, revision C)", MACHINE_SUPPORTS_SAVE ) // probably newer than US revision E
+GAME( 1983, marioja, mario, mario, mariof, mario_state, empty_init, ROT0, "Nintendo",            "Mario Bros. (Japan, older)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1983, masao,   mario, masao, mario,  mario_state, empty_init, ROT0, "bootleg",             "Masao",                           MACHINE_SUPPORTS_SAVE )
