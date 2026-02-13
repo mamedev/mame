@@ -155,6 +155,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(adjust_palette) { set_palette(newval); }
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	virtual void sound_start() override ATTR_COLD;
 	virtual void sound_reset() override ATTR_COLD;
@@ -185,6 +187,7 @@ private:
 	// misc
 	uint8_t m_irq_clock = 0;
 	bool m_nmi_mask = false;
+	bool m_z80_sync = false;
 
 	// handlers
 	uint8_t mario_sh_tune_r(offs_t offset);
@@ -224,6 +227,25 @@ private:
 
 /*************************************
  *
+ *  Machine initialization
+ *
+ *************************************/
+
+void mario_state::machine_start()
+{
+	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_z80_sync));
+}
+
+void mario_state::machine_reset()
+{
+	m_nmi_mask = false;
+	m_z80_sync = false;
+}
+
+
+/*************************************
+ *
  *  Sound initialization
  *
  *************************************/
@@ -247,7 +269,6 @@ void mario_state::sound_reset()
 {
 	m_soundlatch[0]->clear_w();
 	if (m_soundlatch[1]) m_soundlatch[1]->clear_w();
-	if (m_soundlatch[2]) m_soundlatch[2]->clear_w();
 	if (m_soundlatch[3]) m_soundlatch[3]->clear_w();
 
 	m_irq_clock = 0;
@@ -262,7 +283,16 @@ void mario_state::sound_reset()
 
 uint8_t mario_state::mario_sh_tune_r(offs_t offset)
 {
-	uint8_t p2 = m_soundlatch[2]->read();
+	if (!machine().side_effects_disabled())
+	{
+		// retry_access() forces the MCU to catch up before Z80 does the read
+		if (!m_z80_sync)
+			m_maincpu->retry_access();
+
+		m_z80_sync = !m_z80_sync;
+	}
+
+	const uint8_t p2 = m_soundlatch[2]->read();
 
 	if (BIT(p2, 7))
 		return m_soundlatch[0]->read();
@@ -811,7 +841,6 @@ void mario_state::mario(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &mario_state::mario_sound_map);
 	audiocpu.set_addrmap(AS_IO, &mario_state::mario_sound_io_map);
 	audiocpu.p1_in_cb().set(m_soundlatch[1], FUNC(generic_latch_8_device::read));
-	audiocpu.p1_out_cb().set(m_soundlatch[1], FUNC(generic_latch_8_device::write));
 	audiocpu.p2_in_cb().set(m_soundlatch[2], FUNC(generic_latch_8_device::read)).mask(0xef); // bit 4 is GND!
 	audiocpu.p2_out_cb().set(m_soundlatch[2], FUNC(generic_latch_8_device::write));
 	audiocpu.p2_out_cb().append_inputline(m_audiocpu, MCS48_INPUT_EA).bit(5).invert();
