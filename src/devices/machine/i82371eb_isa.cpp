@@ -129,7 +129,8 @@ void i82371eb_isa_device::map_extra(
 {
 	i82371sb_isa_device::map_extra(memory_window_start, memory_window_end, memory_offset, memory_space, io_window_start, io_window_end, io_offset, io_space);
 
-	if (BIT(command, 0) && m_rtccfg & 5)
+	// NOTE: ISA don't care about PCI command bit 0
+	if (m_rtccfg & 5)
 	{
 		// 11 $70-$73
 		// 10 $72-$73

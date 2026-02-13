@@ -827,8 +827,35 @@ ROM_END
 // same MB type as midqslvr.cpp
 ROM_START(se440bx2)
 	ROM_REGION32_LE(0x80000, "pci:07.0", ROMREGION_ERASEFF) /* PC bios */
-	ROM_SYSTEM_BIOS(0, "p02", "Micron OEM")
-	ROMX_LOAD( "440bx2.p02", 0x60000, 0x020000, CRC(4d654233) SHA1(9eca5c0c9c0beb93ebfe125e24e12ee07c502634), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(0, "p17", "P17-0024")
+	ROMX_LOAD( "440bx2.p17", 0x00000, 0x080000, CRC(0af597e3) SHA1(362c8385678e4f9f998877bde15409566ca134fb), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS(1,  "p16", "P15-0023")
+	ROMX_LOAD( "440bx2.p16", 0x00000, 0x080000, CRC(1cf74bbb) SHA1(dfa026db04599db43f33294aeccfa3f26f9cbd40), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2,  "p15", "P15-0022")
+	ROMX_LOAD( "440bx2.p15", 0x00000, 0x080000, CRC(fe183bd9) SHA1(4270b874d6206d7f06954d2d775c00b2894a72f3), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(3,  "p14", "P14-0021")
+	ROMX_LOAD( "440bx2.p14", 0x00000, 0x080000, CRC(2686f5b3) SHA1(cbe1b54701d637c3b0883d33c34ca538024a18a6), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(4,  "p13", "P13-0020")
+	ROMX_LOAD( "440bx2.p13", 0x00000, 0x080000, CRC(3152b122) SHA1(4c7ac23cacc8858eb0120a032719d0e1cb19eabc), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS(5,  "p12", "P12-0019")
+	ROMX_LOAD( "440bx2.p12", 0x00000, 0x080000, CRC(28c49d2d) SHA1(532c48503967f10d5bc1bc10454dde7edd316c74), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS(6,  "p11", "P11-0018")
+	ROMX_LOAD( "440bx2.p11", 0x00000, 0x080000, CRC(5f21b044) SHA1(52cbf7658f8beacae1f237ded8ca55b2313a5cc0), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS(7,  "p10", "P10-0017")
+	ROMX_LOAD( "440bx2.p10", 0x00000, 0x080000, CRC(3ed2c8b0) SHA1(885bcde959ccb0d794551456ccdd3e5db08271ed), ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS(8,  "p09", "P09-0016")
+	ROMX_LOAD( "440bx2.p09", 0x00000, 0x080000, CRC(e1ac9425) SHA1(4025983c34ddfe8ee2fd182e2b6158607b7694d8), ROM_BIOS(8) )
+	ROM_SYSTEM_BIOS(9,  "p08", "P08-0015")
+	ROMX_LOAD( "440bx2.p08", 0x00000, 0x080000, CRC(495b5266) SHA1(2f96dae386717e8bc6cfd8a92926a9c74e165666), ROM_BIOS(9) )
+	ROM_SYSTEM_BIOS(10, "p07", "P07-0014")
+	ROMX_LOAD( "440bx2.p07", 0x00000, 0x080000, CRC(34a64311) SHA1(c18045d35a5cb70f406d97d2758246f715a99b35), ROM_BIOS(10) )
+	ROM_SYSTEM_BIOS(11, "p06", "P06-0013")
+	ROMX_LOAD( "440bx2.p06", 0x00000, 0x080000, CRC(b1fbc69b) SHA1(2af7e0ac79202ef98cd8895e3f9a5665725a47fb), ROM_BIOS(11) )
+	ROM_SYSTEM_BIOS(12, "p05", "P05-0012")
+	ROMX_LOAD( "440bx2.p05", 0x00000, 0x080000, CRC(71a08469) SHA1(9399dd10a55780fe8423522c5b2be774ee647325), ROM_BIOS(12) )
+	ROM_SYSTEM_BIOS(13, "p02", "P02-0003 (Micron OEM)")
+	// BAD_DUMP: incomplete
+	ROMX_LOAD( "440bx2.p02", 0x60000, 0x020000, BAD_DUMP CRC(4d654233) SHA1(9eca5c0c9c0beb93ebfe125e24e12ee07c502634), ROM_BIOS(13) )
 ROM_END
 
 
@@ -839,4 +866,4 @@ COMP(1998, pcipc,    0,     0, pcipc,   0, pcipc_state, empty_init, "Hack Inc.",
 COMP(1998, pcipcs7,  pcipc, 0, pcipcs7, 0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX, Socket 7 CPU)", MACHINE_NO_SOUND ) // alternative of above, for running already installed OSes at their nominal speed + fiddling with MMX
 COMP(1998, pcipctx,  0,     0, pcipctx, 0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // unemulated super I/O
 COMP(1999, pciagp,   0,     0, pciagp,  0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // eventually PnP breaks OS booting, AGP cards aren't good enough
-COMP(1998, se440bx2, 0,     0, se440bx2,0, pcipc_state, empty_init, "Intel",     "SE440BX-2 \"Seattle 2\"", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Initial rev '98. Black screen, never wake up video card after SMI.
+COMP(1998, se440bx2, 0,     0, se440bx2,0, pcipc_state, empty_init, "Intel",     "SE440BX-2 \"Seattle 2\"", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Initial rev '98. Black screen, never wake up video card after SMI. Wants better ACPI, eventually do the same SMBus loop as midqslvr.cpp
