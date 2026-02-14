@@ -596,7 +596,7 @@ void stella8085_state::boards_common(machine_config &config, XTAL clock)
 	config.set_default_layout(layout_adpservice);
 
 	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0)
+	BEEP(config, m_beep, 0)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
