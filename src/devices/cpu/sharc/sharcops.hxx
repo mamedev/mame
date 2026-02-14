@@ -304,9 +304,9 @@ uint32_t adsp21062_device::GET_UREG(int ureg)
 			switch(reg)
 			{
 				/* PX needs to be handled separately if the whole 48 bits are needed */
-				case 0xb:   return (uint32_t)(m_core->px);          /* PX */
-				case 0xc:   return (uint16_t)(m_core->px);          /* PX1 */
-				case 0xd:   return (uint32_t)(m_core->px >> 16);    /* PX2 */
+				case 0xb:   return uint32_t(m_core->px);            /* PX */
+				case 0xc:   return uint16_t(m_core->px);            /* PX1 */
+				case 0xd:   return uint32_t(m_core->px >> 16);      /* PX2 */
 				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
@@ -391,23 +391,22 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 				case 0x9:   m_core->irptl = data; break;      /* IRPTL */
 				case 0xa:   m_core->mode2 = data; break;      /* MODE2 */
 
-				case 0xb:                                   /* MODE1 */
-				{
+				case 0xb:                                     /* MODE1 */
 					add_systemreg_write_latency_effect(reg, data, m_core->mode1);
 					m_core->mode1 = data;
 					break;
-				}
 
 				case 0xc:   m_core->astat = data; break;      /* ASTAT */
 
-				case 0xd:                                   /* IMASK */
-				{
+				case 0xd:                                     /* IMASK */
 					check_interrupts();
 					m_core->imask = data;
 					break;
-				}
 
-				case 0xe:   m_core->stky = data; break;       /* STKY */
+				case 0xe:                                     /* STKY */
+					m_core->stky = (m_core->stky & (LSEM | LSOV | SSEM | SSOV | PCEM | PCFL)) | (data & ~(LSEM | LSOV | SSEM | SSOV | PCEM | PCFL));
+					break;
+
 				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
@@ -1018,7 +1017,7 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 	}
 }
 
-void adsp21062_device::PUSH_PC(uint32_t pc)
+inline void adsp21062_device::PUSH_PC(uint32_t pc)
 {
 	m_core->pcstkp++;
 	if (m_core->pcstkp >= 32)
@@ -1033,7 +1032,7 @@ void adsp21062_device::PUSH_PC(uint32_t pc)
 	m_core->pcstack[m_core->pcstkp] = pc;
 }
 
-uint32_t adsp21062_device::POP_PC()
+inline uint32_t adsp21062_device::POP_PC()
 {
 	m_core->pcstk = m_core->pcstack[m_core->pcstkp];
 
@@ -1050,12 +1049,12 @@ uint32_t adsp21062_device::POP_PC()
 	return m_core->pcstk;
 }
 
-uint32_t adsp21062_device::TOP_PC()
+inline uint32_t adsp21062_device::TOP_PC()
 {
 	return m_core->pcstack[m_core->pcstkp];
 }
 
-void adsp21062_device::PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, uint32_t count)
+inline void adsp21062_device::PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, uint32_t count)
 {
 	m_core->lstkp++;
 	if (m_core->lstkp >= 6)
@@ -1075,7 +1074,7 @@ void adsp21062_device::PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, ui
 	m_core->laddr.loop_type = type;
 }
 
-void adsp21062_device::POP_LOOP()
+inline void adsp21062_device::POP_LOOP()
 {
 	if (m_core->lstkp == 0)
 		fatalerror("SHARC: Loop Stack underflow!\n");
@@ -1094,7 +1093,7 @@ void adsp21062_device::POP_LOOP()
 	m_core->laddr.loop_type = (m_core->lastack[m_core->lstkp] >> 30) & 0x3;
 }
 
-void adsp21062_device::PUSH_STATUS_STACK()
+inline void adsp21062_device::PUSH_STATUS_STACK()
 {
 	m_core->status_stkp++;
 	if (m_core->status_stkp >= 5)
@@ -1109,7 +1108,7 @@ void adsp21062_device::PUSH_STATUS_STACK()
 	m_core->status_stack[m_core->status_stkp].astat = GET_UREG(REG_ASTAT);
 }
 
-void adsp21062_device::POP_STATUS_STACK()
+inline void adsp21062_device::POP_STATUS_STACK()
 {
 	SET_UREG(REG_MODE1, m_core->status_stack[m_core->status_stkp].mode1);
 	SET_UREG(REG_ASTAT, m_core->status_stack[m_core->status_stkp].astat);
@@ -1124,7 +1123,7 @@ void adsp21062_device::POP_STATUS_STACK()
 		m_core->stky &= ~SSEM;
 }
 
-int adsp21062_device::IF_CONDITION_CODE(int cond)
+inline int adsp21062_device::IF_CONDITION_CODE(int cond)
 {
 	// TODO: implement AF flag and correct conditions that depend on it (LT, LE, GE, GT)
 	switch (cond)
@@ -1143,8 +1142,8 @@ int adsp21062_device::IF_CONDITION_CODE(int cond)
 		case 0x0b:  return (m_core->flag[2] != 0);    /* FLAG2 */
 		case 0x0c:  return (m_core->flag[3] != 0);    /* FLAG3 */
 		case 0x0d:  return (m_core->astat & BTF);     /* TF */
-		case 0x0e:  return 0;                       /* BM */
-		case 0x0f:  return (m_core->curlcntr!=1);     /* NOT LCE */
+		case 0x0e:  return 0;                         /* BM */
+		case 0x0f:  return (m_core->curlcntr != 1);   /* NOT LCE */
 		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
 		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
 		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
@@ -1159,13 +1158,13 @@ int adsp21062_device::IF_CONDITION_CODE(int cond)
 		case 0x1b:  return (m_core->flag[2] == 0);    /* NOT FLAG2 */
 		case 0x1c:  return (m_core->flag[3] == 0);    /* NOT FLAG3 */
 		case 0x1d:  return !(m_core->astat & BTF);    /* NOT TF */
-		case 0x1e:  return 1;                       /* NOT BM */
-		case 0x1f:  return 1;                       /* TRUE */
+		case 0x1e:  return 1;                         /* NOT BM */
+		case 0x1f:  return 1;                         /* TRUE */
 	}
 	return 1;
 }
 
-int adsp21062_device::DO_CONDITION_CODE(int cond)
+inline int adsp21062_device::DO_CONDITION_CODE(int cond)
 {
 	// TODO: implement AF flag and correct conditions that depend on it (LT, LE, GE, GT)
 	switch (cond)
@@ -1184,8 +1183,8 @@ int adsp21062_device::DO_CONDITION_CODE(int cond)
 		case 0x0b:  return (m_core->flag[2] != 0);    /* FLAG2 */
 		case 0x0c:  return (m_core->flag[3] != 0);    /* FLAG3 */
 		case 0x0d:  return (m_core->astat & BTF);     /* TF */
-		case 0x0e:  return 0;                       /* BM */
-		case 0x0f:  return (m_core->curlcntr==1);     /* LCE */
+		case 0x0e:  return 0;                         /* BM */
+		case 0x0f:  return (m_core->curlcntr == 1);   /* LCE */
 		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
 		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
 		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
@@ -1200,8 +1199,8 @@ int adsp21062_device::DO_CONDITION_CODE(int cond)
 		case 0x1b:  return (m_core->flag[2] == 0);    /* NOT FLAG2 */
 		case 0x1c:  return (m_core->flag[3] == 0);    /* NOT FLAG3 */
 		case 0x1d:  return !(m_core->astat & BTF);    /* NOT TF */
-		case 0x1e:  return 1;                       /* NOT BM */
-		case 0x1f:  return 0;                       /* FALSE (FOREVER) */
+		case 0x1e:  return 1;                         /* NOT BM */
+		case 0x1f:  return 0;                         /* FALSE (FOREVER) */
 	}
 	return 1;
 }

@@ -1193,6 +1193,7 @@ void adsp21062_device::generate_invariant()
 		static_generate_reset_cache();
 
 		// generate utility functions
+		static_generate_mode1_ops();
 		static_generate_push_pc();
 		static_generate_pop_pc();
 		static_generate_push_loop();
@@ -1201,7 +1202,6 @@ void adsp21062_device::generate_invariant()
 		static_generate_pop_status();
 		static_generate_loop_check();
 		static_generate_call_loop_check();
-		static_generate_mode1_ops();
 
 		// generate exception handlers
 		static_generate_exception(EXCEPTION_INTERRUPT, "exception_interrupt");
@@ -1707,14 +1707,14 @@ void adsp21062_device::generate_call(drcuml_block &block, compiler_state &compil
 	{
 		generate_update_cycles(block, compiler_temp, desc->targetpc, true);
 		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
-			UML_JMP(block, desc->targetpc | 0x80000000);                                // jmp      targetpc | 0x80000000
+			UML_JMP(block, desc->targetpc | 0x80000000);
 		else
-			UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);                           // hashjmp  0,targetpc,nocode
+			UML_HASHJMP(block, 0, desc->targetpc, *m_nocode);
 	}
 	else
 	{
 		generate_update_cycles(block, compiler_temp, uml::mem(&m_core->jmpdest), true);
-		UML_HASHJMP(block, 0, mem(&m_core->jmpdest), *m_nocode);                        // hashjmp  0,jmpdest,nocode
+		UML_HASHJMP(block, 0, mem(&m_core->jmpdest), *m_nocode);
 	}
 
 	// update compiler label
@@ -2026,6 +2026,7 @@ void adsp21062_device::generate_write_ureg(drcuml_block &block, compiler_state &
 		case 0x68:      // LCNTR
 			UML_MOV(block, LCNTR, imm ? data : I0);
 			break;
+
 		case 0x70:      // USTAT1
 			UML_MOV(block, mem(&m_core->ustat1), imm ? data : I0);
 			break;
@@ -2061,8 +2062,9 @@ void adsp21062_device::generate_write_ureg(drcuml_block &block, compiler_state &
 			UML_MOV(block, mem(&m_core->imask), imm ? data : I0);
 			break;
 		case 0x7e:      // STKY
-			UML_MOV(block, mem(&m_core->stky), imm ? data : I0);
+			UML_ROLINS(block, mem(&m_core->stky), imm ? data : I0, 0, ~(LSEM | LSOV | SSEM | SSOV | PCEM | PCFL));
 			break;
+
 		case 0xdb:      // PX
 			if (imm)
 			{

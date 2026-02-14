@@ -631,15 +631,9 @@ void adsp21062_device::device_start()
 	}
 	m_core->mrf = 0;
 	m_core->mrb = 0;
-	for (auto & elem : m_core->pcstack)
-	{
-		elem = 0;
-	}
-	for (int i=0; i < 6; i++)
-	{
-		m_core->lcstack[i] = 0;
-		m_core->lastack[i] = 0;
-	}
+	std::fill(std::begin(m_core->pcstack), std::end(m_core->pcstack), 0);
+	std::fill(std::begin(m_core->lcstack), std::end(m_core->lcstack), 0);
+	std::fill(std::begin(m_core->lastack), std::end(m_core->lastack), 0);
 	m_core->pcstk = 0;
 	m_core->laddr.addr = m_core->laddr.code = m_core->laddr.loop_type = 0;
 	m_core->curlcntr = 0;
@@ -813,7 +807,7 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->astat_old_old));
 	save_item(NAME(m_core->astat_old_old_old));
 
-	state_add( SHARC_PC,     "PC", m_core->pc).formatstr("%08X");
+	state_add( SHARC_PC,     "PC", m_core->pc).mask(0x00ffffff).formatstr("%06X");
 	state_add( SHARC_PCSTK,  "PCSTK", m_core->pcstk).formatstr("%08X");
 	state_add( SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).formatstr("%08X");
 	state_add( SHARC_LSTKP,  "LSTKP", m_core->lstkp).formatstr("%08X");
@@ -967,18 +961,29 @@ void adsp21062_device::device_reset()
 	m_core->nfaddr = m_core->faddr+1;
 
 	m_core->idle = 0;
-	m_core->stky = 0x5400000;
+	m_core->mode1 = 0x00000000;
+	m_core->mode2 &= 0xf0000000;
+	m_core->astat &= FLG0 | FLG1 | FLG2 | FLG3;
+	m_core->stky = PCEM | SSEM | LSEM;
+	m_core->irptl = 0x0000;
+	m_core->imask = 0x0003;
+	m_core->ustat1 = 0x0000;
+	m_core->ustat2 = 0x0000;
 
 	m_core->lstkp = 0;
 	m_core->pcstkp = 0;
+	m_core->status_stkp = 0;
 	m_core->interrupt_active = 0;
 
-	m_core->syscon = 0x10;
+	m_core->syscon = 0x00000010;
+	m_core->sysstat &= 0x00000ff0;
 	m_core->iop_write_num = 0;
 	m_core->iop_data = 0;
 
 	if (m_enable_drc)
 	{
+		m_core->astat_drc.clear();
+
 		m_core->cache_dirty = 1;
 		m_drcuml->reset();
 	}
@@ -1056,35 +1061,26 @@ void adsp21062_device::write_stall(int state)
 
 void adsp21062_device::check_interrupts()
 {
-	int i;
 	if ((m_core->imask & m_core->irq_pending) && (m_core->mode1 & MODE1_IRPTEN) && !m_core->interrupt_active &&
 		m_core->pc != m_core->delay_slot1 && m_core->pc != m_core->delay_slot2)
 	{
 		int which = 0;
-		for (i=0; i < 32; i++)
+		for (int i = 0; i < 32; i++)
 		{
-			if (m_core->irq_pending & (1 << i))
-			{
+			if (BIT(m_core->irq_pending, i))
 				break;
-			}
 			which++;
 		}
 
 		if (m_core->idle)
-		{
 			PUSH_PC(m_core->pc+1);
-		}
 		else
-		{
 			PUSH_PC(m_core->daddr);
-		}
 
 		m_core->irptl |= 1 << which;
 
 		if (which >= 6 && which <= 8)
-		{
 			PUSH_STATUS_STACK();
-		}
 
 		CHANGE_PC(0x20000 + (which * 0x4));
 
