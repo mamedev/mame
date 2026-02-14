@@ -107,7 +107,6 @@ private:
 	uint8_t snd_r();
 	void snd_w(uint8_t data);
 	uint8_t switches_r(offs_t offset);
-	uint8_t cassette_r();
 	void color_w(int state);
 	void motor_a_w(int state);
 	void motor_b_w(int state);
@@ -149,6 +148,7 @@ void tk2000_state::machine_start()
 	// setup video pointers
 	m_video->set_ram_pointers(m_ram_ptr, m_ram_ptr);
 	m_video->set_char_pointer(nullptr, 0);  // no text modes on this machine
+	m_video->set_hgr2(0xa000);
 }
 
 void tk2000_state::machine_reset()
@@ -202,7 +202,7 @@ uint8_t tk2000_state::kbin_r()
 	if (m_ctrl_key)
 		kbin |= m_kbspecial->read();
 
-	return kbin | (m_printer_busy ? 0x40 : 0);
+	return kbin | (m_printer_busy ? 0x40 : 0) | (m_cassette->input() > 0.0 ? 0x80 : 0);
 }
 
 uint8_t tk2000_state::casout_r()
@@ -237,11 +237,6 @@ uint8_t tk2000_state::switches_r(offs_t offset)
 	if (!machine().side_effects_disabled())
 		m_softlatch->write_bit((offset & 0x0e) >> 1, offset & 0x01);
 	return uFloatingBus;
-}
-
-uint8_t tk2000_state::cassette_r()
-{
-	return (m_cassette->input() > 0.0 ? 0x80 : 0) | (read_floatingbus() & 0x7f);
 }
 
 void tk2000_state::color_w(int state)
@@ -399,8 +394,8 @@ uint8_t tk2000_state::read_floatingbus()
 		// Y: insert hires only address bits
 		//
 		address |= v_C << 12; // a12
-		address |= (1 ^ (Page2 & (1 ^ _80Store))) << 13; // a13
-		address |= (Page2 & (1 ^ _80Store)) << 14; // a14
+		address |= 1 << 13; // a13
+		address |= (Page2 & (1 ^ _80Store)) << 15; // a15, from a000
 	}
 	else
 	{
@@ -447,7 +442,6 @@ void tk2000_state::apple2_map(address_map &map)
 	map(0xc020, 0xc020).rw(FUNC(tk2000_state::casout_r), FUNC(tk2000_state::casout_w));
 	map(0xc030, 0xc030).rw(FUNC(tk2000_state::snd_r), FUNC(tk2000_state::snd_w));
 	map(0xc050, 0xc05f).r(FUNC(tk2000_state::switches_r)).w(m_softlatch, FUNC(addressable_latch_device::write_a0));
-	map(0xc060, 0xc060).mirror(8).r(FUNC(tk2000_state::cassette_r));
 	map(0xc080, 0xc0ff).rw(FUNC(tk2000_state::c080_r), FUNC(tk2000_state::c080_w));
 	map(0xc100, 0xffff).m(m_upperbank, FUNC(address_map_bank_device::amap8));
 }

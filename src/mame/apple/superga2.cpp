@@ -9,7 +9,7 @@
 
     Only one game is known (a Mario Bros. hack/translation patch).
 
-    Info: http://agatcomp.ru/Pravetz/SuperGames.shtml
+    Info: http://agatcomp.ru/Pravetz/Hard/SuperGames.shtml
 
     To do:
     - verify palette, pixel and cpu clocks
