@@ -571,6 +571,7 @@ void stella8085_state::dicemstr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4109_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4087_map);
 	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
+	m_maincpu->in_sid_func().set(true);	// connected through opamp to battery voltage
 
 	I8256(config, m_uart, 10.240_MHz_XTAL / 2); // divider not verified
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
@@ -601,6 +602,7 @@ void stella8085_state::board4087(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4087_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4087_map);
 	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
+	m_maincpu->in_sid_func().set(true);	// connected through opamp to battery voltage
 
 	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
@@ -635,6 +637,7 @@ void stella8085_state::board4040(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4040_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
 	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
+	m_maincpu->in_sid_func().set(true);	// connected through opamp to battery voltage
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(stella8085_state::io70w));
