@@ -252,26 +252,8 @@ license:CC0-1.0
        x="20"
        y="54" 
     /></element>
-	 <!-- unused. -->
-
-	 <!-- 
-
-       <element name="led32"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="40"
-       y="54" 
-    /></element>
-       <element name="led33"
-	   	   ref="led"><bounds
-       width="17.702967"
-       height="15.612738"
-       x="60"
-       y="54" 
-    /></element>
- -->
- <element name="digit14"
+	
+<element name="digit14"
  	   		ref="digit"><bounds 
 
        width="9.9822998"
@@ -411,17 +393,5 @@ license:CC0-1.0
        x="12.351883"
        y="116.74464" 
     /></element>
-
-<!-- unused -->
-
-<!-- 
- <element name="digit27"
-	   		ref="digit"><bounds 
-       width="9.9822998"
-       height="9.9840002"
-       x="0.35392699"
-       y="116.74464" 
-    /></element>
--->	
 	</view>
 </mamelayout>
