@@ -40,12 +40,6 @@
   ld32 - led  
   ds14 ds15 2x  7 segment display 2 digit.
  
-  Unused layout element:
-  digit27. only used to display 10 during k0
-  ay2 output
-  led32 - bit 6 Unused - only used during led test - K1
-  led33 - bit 7 Unused - only used during led test - K1. after start the roulette will start to blink. special bonus led?
-  
   Todo: 
   Need Accurate layout.
   Meter In and Out.
