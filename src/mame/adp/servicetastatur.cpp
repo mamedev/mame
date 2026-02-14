@@ -199,7 +199,7 @@ void servicet_state::machine_reset()
 	m_port1 = 0xff;
 	m_port3 = 0xff;
 
-	m_input = 0xffff;
+	m_input = 0xdfbf;
 	m_output = 0xff;
 }
 
