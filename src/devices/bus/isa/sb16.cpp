@@ -787,6 +787,37 @@ void sb16_lle_device::device_start()
 	m_isa->set_dma_channel(1, this, false);
 	m_isa->set_dma_channel(5, this, false);
 	m_timer = timer_alloc(FUNC(sb16_lle_device::timer_tick), this);
+
+	save_item(NAME(m_data_in));
+	save_item(NAME(m_data_out));
+	save_item(NAME(m_in_byte));
+	save_item(NAME(m_out_byte));
+	save_item(NAME(m_freq));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_dac_fifo_ctrl));
+	save_item(NAME(m_adc_fifo_ctrl));
+	save_item(NAME(m_ctrl8));
+	save_item(NAME(m_ctrl16));
+	save_item(NAME(m_mpu_byte));
+	save_item(NAME(m_dma8_len));
+	save_item(NAME(m_dma16_len));
+	save_item(NAME(m_dma8_cnt));
+	save_item(NAME(m_dma16_cnt));
+	//save_item(NAME(m_adc_fifo)); /*temporarely decision*/
+	//save_item(NAME(m_dac_fifo));
+	save_item(NAME(m_adc_fifo_head));
+	save_item(NAME(m_adc_fifo_tail));
+	save_item(NAME(m_dac_fifo_head));
+	save_item(NAME(m_dac_fifo_tail));
+	save_item(NAME(m_adc_r));
+	save_item(NAME(m_dac_r));
+	save_item(NAME(m_adc_h));
+	save_item(NAME(m_dac_h));
+	save_item(NAME(m_irq8));
+	save_item(NAME(m_irq16));
+	save_item(NAME(m_irq_midi));
+	save_item(NAME(m_dma8_done));
+	save_item(NAME(m_dma16_done));
 }
 
 
