@@ -16,8 +16,6 @@ TODO:
 - Needs optional printer and FDC options (cfr. service mode "File");
 - Sensor test (for out of board darts?), seems tied to an irq or NMI;
 - "Dart Star" title GFX can glitch out if coin is inserted at wrong time (verify);
-- Emulate 65535 (S)VGA, same as IBM PC-110
-  ETA: looks a very limited use of it, uses a mix of standard VGA modes;
 
 ===================================================================================================
 

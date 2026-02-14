@@ -79,7 +79,7 @@ void wd7600_device::device_add_mconfig(machine_config & config)
 }
 
 
-wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+wd7600_device::wd7600_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, WD7600, tag, owner, clock),
 	m_read_ior(*this, 0),
 	m_write_iow(*this),
@@ -245,7 +245,7 @@ void wd7600_device::keyboard_gatea20(int state)
 	a20m();
 }
 
-void wd7600_device::rtc_nmi_w(uint8_t data)
+void wd7600_device::rtc_nmi_w(u8 data)
 {
 	m_nmi_mask = !BIT(data, 7);
 	data &= 0x7f;
@@ -253,7 +253,7 @@ void wd7600_device::rtc_nmi_w(uint8_t data)
 	m_rtc->address_w(data);
 }
 
-uint8_t wd7600_device::pic1_slave_ack_r(offs_t offset)
+u8 wd7600_device::pic1_slave_ack_r(offs_t offset)
 {
 	if (offset == 2) // IRQ 2
 		return m_pic2->acknowledge();
@@ -275,36 +275,36 @@ void wd7600_device::ctc_out2_w(int state)
 }
 
 // Keyboard
-void wd7600_device::keyb_data_w(uint8_t data)
+void wd7600_device::keyb_data_w(u8 data)
 {
 //  LOG("WD7600: keyboard data write %02x\n", data);
 	m_keybc->data_w(data);
 }
 
-uint8_t wd7600_device::keyb_data_r()
+u8 wd7600_device::keyb_data_r()
 {
-	uint8_t ret = m_keybc->data_r();
+	u8 ret = m_keybc->data_r();
 //  LOG("WD7600: keyboard data read %02x\n", ret);
 	return ret;
 }
 
-void wd7600_device::keyb_cmd_w(uint8_t data)
+void wd7600_device::keyb_cmd_w(u8 data)
 {
 //  LOG("WD7600: keyboard command %02x\n", data);
 	m_keybc->command_w(data);
 }
 
-uint8_t wd7600_device::keyb_status_r()
+u8 wd7600_device::keyb_status_r()
 {
 	return m_keybc->status_r();
 }
 
-uint8_t wd7600_device::portb_r()
+u8 wd7600_device::portb_r()
 {
 	return m_portb;
 }
 
-void wd7600_device::portb_w(uint8_t data)
+void wd7600_device::portb_w(u8 data)
 {
 	m_portb = (m_portb & 0xf0) | (data & 0x0f);
 
@@ -339,7 +339,7 @@ offs_t wd7600_device::page_offset()
 	return 0xff0000;
 }
 
-uint8_t wd7600_device::dma_read_byte(offs_t offset)
+u8 wd7600_device::dma_read_byte(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -347,7 +347,7 @@ uint8_t wd7600_device::dma_read_byte(offs_t offset)
 	return m_space->read_byte(page_offset() + offset);
 }
 
-void wd7600_device::dma_write_byte(offs_t offset, uint8_t data)
+void wd7600_device::dma_write_byte(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;
@@ -355,18 +355,18 @@ void wd7600_device::dma_write_byte(offs_t offset, uint8_t data)
 	m_space->write_byte(page_offset() + offset, data);
 }
 
-uint8_t wd7600_device::dma_read_word(offs_t offset)
+u8 wd7600_device::dma_read_word(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
 
-	uint16_t result = m_space->read_word((page_offset() & 0xfe0000) | (offset << 1));
+	u16 result = m_space->read_word((page_offset() & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result >> 8;
 
 	return result;
 }
 
-void wd7600_device::dma_write_word(offs_t offset, uint8_t data)
+void wd7600_device::dma_write_word(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;
@@ -414,7 +414,7 @@ void wd7600_device::gatea20_w(int state)
 
 void wd7600_device::kbrst_w(int state)
 {
-	// convert to active low signal (gets inverted in at_keybc.c)
+	// convert to active low signal (gets inverted in at_keybc.cpp)
 	state = (state == ASSERT_LINE ? 0 : 1);
 
 	// detect transition
@@ -427,7 +427,7 @@ void wd7600_device::kbrst_w(int state)
 	m_kbrst = state;
 }
 
-void wd7600_device::a20_reset_w(uint8_t data)
+void wd7600_device::a20_reset_w(u8 data)
 {
 	m_alt_a20 = BIT(data,1);
 	a20m();
@@ -440,21 +440,21 @@ void wd7600_device::a20_reset_w(uint8_t data)
 	}
 }
 
-uint8_t wd7600_device::a20_reset_r()
+u8 wd7600_device::a20_reset_r()
 {
-	uint8_t ret = 0;
+	u8 ret = 0;
 	if(m_alt_a20)
 		ret |= 0x02;
 	return ret;
 }
 
 // port 0x2072 - Refresh Control, and serial/parallel port address select
-uint16_t wd7600_device::refresh_r()
+u16 wd7600_device::refresh_r()
 {
 	return m_refresh_ctrl;
 }
 
-void wd7600_device::refresh_w(uint16_t data)
+void wd7600_device::refresh_w(u16 data)
 {
 	// TODO: select serial/parallel I/O port location
 	m_refresh_ctrl = data;
@@ -462,36 +462,36 @@ void wd7600_device::refresh_w(uint16_t data)
 }
 
 // port 0x2872 - chip select
-uint16_t wd7600_device::chipsel_r()
+u16 wd7600_device::chipsel_r()
 {
 	return m_chip_sel;
 }
 
-void wd7600_device::chipsel_w(uint16_t data)
+void wd7600_device::chipsel_w(u16 data)
 {
 	m_chip_sel = data;
 	LOG("WD7600: Chip Select write %04x\n", data);
 }
 
 // port 0x3872 - Memory Control
-uint16_t wd7600_device::mem_ctrl_r()
+u16 wd7600_device::mem_ctrl_r()
 {
 	return m_memory_ctrl;
 }
 
-void wd7600_device::mem_ctrl_w(uint16_t data)
+void wd7600_device::mem_ctrl_w(u16 data)
 {
 	m_memory_ctrl = data;
 	LOG("WD7600: Memory Control write %04x\n", data);
 }
 
 // port 0x4872 - Bank 0 and 1 start address
-uint16_t wd7600_device::bank_01_start_r(offs_t offset, uint16_t mem_mask)
+u16 wd7600_device::bank_01_start_r(offs_t offset, u16 mem_mask)
 {
 	return (m_bank_start[1] << 8) | m_bank_start[0];
 }
 
-void wd7600_device::bank_01_start_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void wd7600_device::bank_01_start_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -506,12 +506,12 @@ void wd7600_device::bank_01_start_w(offs_t offset, uint16_t data, uint16_t mem_m
 }
 
 // port 0x5072 - Bank 2 and 3 start address
-uint16_t wd7600_device::bank_23_start_r(offs_t offset, uint16_t mem_mask)
+u16 wd7600_device::bank_23_start_r(offs_t offset, u16 mem_mask)
 {
 	return (m_bank_start[3] << 8) | m_bank_start[2];
 }
 
-void wd7600_device::bank_23_start_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void wd7600_device::bank_23_start_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -526,24 +526,24 @@ void wd7600_device::bank_23_start_w(offs_t offset, uint16_t data, uint16_t mem_m
 }
 
 // port 0x5872 - split starting address (used for BIOS shadowing)
-uint16_t wd7600_device::split_addr_r()
+u16 wd7600_device::split_addr_r()
 {
 	return m_split_start;
 }
 
-void wd7600_device::split_addr_w(uint16_t data)
+void wd7600_device::split_addr_w(u16 data)
 {
 	m_split_start = data;
 	LOG("WD7600: Split start address write %04x\n", data);
 }
 
 // port 0x9872 - Diagnostic
-uint16_t wd7600_device::diag_r()
+u16 wd7600_device::diag_r()
 {
 	return m_diagnostic | 0xe080;
 }
 
-void wd7600_device::diag_w(uint16_t data)
+void wd7600_device::diag_w(u16 data)
 {
 	m_diagnostic = data;
 	LOG("WD7600: Diagnostic write %04x\n", data);

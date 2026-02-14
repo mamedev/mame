@@ -24,9 +24,6 @@
 #include "emu.h"
 #include "pc_vga_tseng.h"
 
-// TODO: refactor this macro
-#define GRAPHIC_MODE (vga.gc.alpha_dis) /* else text mode */
-
 DEFINE_DEVICE_TYPE(TSENG_VGA,    tseng_vga_device,    "tseng_vga",    "Tseng Labs ET4000AX VGA i/f")
 DEFINE_DEVICE_TYPE(ET4KW32I_VGA, et4kw32i_vga_device, "et4kw32i_vga", "Tseng Labs ET4000/W32i TC6167HF VGA i/f")
 
@@ -330,7 +327,7 @@ void tseng_vga_device::recompute_params()
 			xtal *= 2.0f/3.0f;
 			break;
 		default:
-			svga.rgb8_en = (!(vga.sequencer.data[1] & 8) && (vga.sequencer.data[4] & 8) && vga.gc.shift256 && vga.crtc.div2 && GRAPHIC_MODE);
+			svga.rgb8_en = (!(vga.sequencer.data[1] & 8) && (vga.sequencer.data[4] & 8) && vga.gc.shift256 && vga.crtc.div2 && vga.gc.alpha_dis);
 			divisor = 1;
 			break;
 	}

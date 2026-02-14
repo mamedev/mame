@@ -1282,6 +1282,7 @@ ROM_START( c386sx16 )
 	// actual VGA BIOS not dumped - uses a WD Paradise according to http://www.cbmhardware.de/pc/pc.php
 	// complains "Time-of-day clock stopped"
 	// photos of the system show one ISA16 slot for a riser card, an Acumos AVGA2 chip, a VLSI 82C311 IC, one other VLSI and an Acer chip.
+	// ETA: Paradise or Cirrus Logic VGA then? Multiple configs?
 	ROM_SYSTEM_BIOS(0, "c386sxv100", "SL 386SX V1.00") // Commodore 80386SX BIOS Rev. 1.00 - 390914-01/390915-01 - continuous beeps after POST
 	ROMX_LOAD( "cbm-sl386sx-bios-lo-v1.0-390914-01.bin", 0x10000, 0x8000, CRC(03e00583) SHA1(8be8478cabd9de3d547a08207ffdcd39bf1bcd94), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "cbm-sl386sx-bios-hi-v1.0-390915-01.bin", 0x10001, 0x8000, CRC(cbe31594) SHA1(d6ace0b5ae4a0f63d047c2918210188f4c77c0c0), ROM_SKIP(1) | ROM_BIOS(0))
@@ -3016,13 +3017,6 @@ ROM_START( uni386w )
 	ROMX_LOAD( "3ucm002.bin", 0x10000, 0x10000, CRC(9f2e19da) SHA1(ef64c6ad9d02db849d29e3b998ca42b663656bad), ROM_BIOS(1))
 ROM_END
 
-// SCsxAIO - Chipset: Chips 82C236 (SCATsx), Acer M5105 A3E - On board: 2xCOM, Floppy, ISA
-// BIOS-String: Peacock 386sx Ver. 2.0 24.03.92 30-0000-D01131-00101111-070797-SCATsx-8 - ISA16: 6
-ROM_START( scsxaio )
-	ROM_REGION16_LE(0x20000, "bios", 0)
-	ROM_LOAD( "386-peacock_scsxaio.bin", 0x10000, 0x10000, CRC(54c3cacd) SHA1(b3c821b30052d0c771b5004a3746eb2cfd186c79))
-ROM_END
-
 // Shuttle 386SX REV 2.0A - Chipset: KU82335 SX042, Intel N82230-2 (Zymos); Intel N82231-2 (Zymos), BIOS: AMI 80386SX BIOS PLUS Ser #039747
 // BIOS-String: - DINT-1216-073089-K0 / 386-BIOS AMI for MORSE 386SX Personal Computer
 // Keyboard-BIOS: AMI 386 Keyboard BIOS PLUS Ser.# 039747, CPU: unreadable (SMD), FPU: empty socket - OSC: 32.000 MHz, 14.31818 - ISA8: 2, ISA16: 6
@@ -3252,18 +3246,13 @@ ROM_START( ges9051n )
 ROM_END
 
 
-// ***** 386sx motherboards using the Chips SCAMPSX chipset
+// ***** 386sx motherboards using the VLSI SCAMPSX chipset
 
-// a.k.a. Chicony CH-386S-16/20/25G or Chicony 001-0386S-016, Lindata manufactured (1425)
-// TODO: missing keyboard BIOS
-// also doesn't access SCATsx chipset at all even if it has shadow RAM options in BIOS
-// (uses only EMS driver in MS-DOS, later on?)
-
-// ANIX CH-386S-16/20/25G P/N:001-0386S-016 VER 1.0 - Chipset: CHIPS F82C836 - BIOS: AMI 386sx BIOS PLUS S/NO. 141334
+// ANIX CH-386S-16/20/25G P/N:001-0386S-016 VER 1.0 - Chipset: VLSI VL82C311 - BIOS: AMI 386sx BIOS PLUS S/NO. 141334
 // BIOS-String: 30-0100-D01425-00101111-050591-SCAMPSX-0 - Keyboard-BIOS: Intel/AMI - CPU: Intel (SMD), label not readable - FPU: socket available - ISA16: 6 - OSC: 14.31818 - 32.000 MHz
+// Lindata manufactured (1425)
 ROM_START( anch386s )
 	ROM_REGION16_LE(0x20000, "bios", 0)
-	ROM_LOAD( "kbd.bin",             0x00000, 0x10000, NO_DUMP )
 	ROM_LOAD( "386-ch-386s.bin",     0x10000, 0x10000, CRC(8902c64b) SHA1(3234bac6240a3a0bd05302c9ca587f5ae083f2f4))
 ROM_END
 
@@ -5716,7 +5705,6 @@ COMP( 199?, php3239,   ibm5170, 0,       at386sx,   0,     at_state,     init_at
 COMP( 199?, ppm3333p,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "DTK Computer", "PPM-3333P", MACHINE_NOT_WORKING )
 COMP( 199?, pt319a,    ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Pine",        "PT-319A", MACHINE_NOT_WORKING )
 COMP( 199?, scamp386sx,ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "386sx motherboards using the SCAMPSX chipset", MACHINE_NOT_WORKING )
-COMP( 199?, scsxaio,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Peacock",     "386sx Ver. 2.0 motherboard SCsxAIO", MACHINE_NOT_WORKING )
 COMP( 199?, sh386sx20, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Shuttle", "386SX REV 2.0A", MACHINE_NOT_WORKING )
 COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
 COMP( 199?, td70a,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "TD70A and TD70AN", MACHINE_NOT_WORKING )

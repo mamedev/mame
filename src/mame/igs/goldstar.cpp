@@ -689,6 +689,7 @@ public:
 	void init_lucky8p() ATTR_COLD;
 	void init_lucky8r() ATTR_COLD;
 	void init_lucky8s() ATTR_COLD;
+	void init_lucky8w() ATTR_COLD;
 	void init_magoddsc() ATTR_COLD;
 	void init_mbs2() ATTR_COLD;
 	void init_mgln() ATTR_COLD;
@@ -22495,7 +22496,6 @@ ROM_START( lucky8s )
 	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
-
 /*
 
   Lucky 8 Lines with Tetris front game.
@@ -22534,109 +22534,6 @@ ROM_START( lucky8tet )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
-ROM_END
-
-
-/*
-Super Dragon by OCT
-
-PCB is etched
-VIEW SONIC 803 SAYNAX CO.,LTD. ALL RIGHTS RESERVED MADE IN JAPAN
-
-Main components
-- Z0840008PSC CPU
-- 12.000 MHz XTAL
-- 2x 44-pin square chips stickered OCT
-- 68-pin square chips stickered OCT
-- YM2413
-- SN76489AN
-- 2x I8255 (TODO: verify, they are stickered)
-- HM6264ALP-12
-- HM6116LP-3
-- 5x bank of 8 switches
-
-This game shares the same programmer / programming team as Ichi Ban Jian by Excel.
-It seems to use a similar split opcodes / data ROM arrangement.
-*/
-
-ROM_START( superdrg )
-	ROM_REGION( 0x60000, "maincpu", 0 )
-	ROM_LOAD( "oct1.u20", 0x00000, 0x20000, CRC(0f350eaf) SHA1(36018ec122c96d14f871c1db6517eb090f2d2b65) )
-
-	ROM_REGION( 0x20000, "gfx1", 0 )
-	ROM_LOAD( "oct3.u39", 0x00000, 0x20000, CRC(c0dd7453) SHA1(8782aec795c6d7a96c81ad04ddb8adbc044e4194) )
-
-	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "oct2.u32", 0x00000, 0x20000, CRC(03386ec2) SHA1(9eddb2fcfca402d8790bc10507023018b303ffcd) )
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "sudr.u", 0x000, 0x200, NO_DUMP ) // AM27S29APC. TODO: verify location
-
-	ROM_REGION( 0x200, "proms2", 0 )
-	ROM_LOAD( "dra.u49",  0x000, 0x200, CRC(2da522a7) SHA1(432a6463d1ad39644a9e7094dd6d2d9e604dfc55) ) // AM27S13PC
-ROM_END
-
-
-ROM_START( animalw ) // big CPU block marked GPS Game Power System
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom9.u91",  0x0000, 0x8000, CRC(beaeafe5) SHA1(58c9ab7559a346d55dbd679b583abd1ebe2d9fae) )
-
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "rom7.u22",  0x00000, 0x8000, CRC(4b7613da) SHA1(7a0384f24f8fb5e8722b559b7b82d922ed781139) )
-	ROM_LOAD( "rom5.u21",  0x08000, 0x8000, CRC(dfae0bd4) SHA1(b64cf45e1a0ab14995b4e0cc3d5931d81192d5cf) )
-	ROM_LOAD( "rom6.u20",  0x10000, 0x8000, CRC(fd214376) SHA1(5c9227a4aafe3a6119ee197f53fd067ab215acd1) )
-
-	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "rom4.u26",  0x0000, 0x2000, CRC(cff7c18b) SHA1(bb99be34a04623063916127ab0b1cdbe649f4609) )
-	ROM_IGNORE(                    0x6000 )
-	ROM_LOAD( "rom2.u25",  0x2000, 0x2000, CRC(5342ec28) SHA1(7188f36cc55fc202f06b35f201cfe01d2ad60fc1) )
-	ROM_IGNORE(                    0x6000 )
-	ROM_LOAD( "rom1.u24",  0x4000, 0x2000, CRC(87303bc8) SHA1(7ba0d9127c743ebbd273dad7d1010ccfd8848163) )
-	ROM_IGNORE(                    0x6000 )
-	ROM_LOAD( "rom3.u23",  0x6000, 0x2000, CRC(7d366bcf) SHA1(b3b208ff9433efe62510352b98861d03673c53b4) )
-	ROM_IGNORE(                    0x6000 )
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "82s129.u28", 0x0000, 0x0100, CRC(14f47fc9) SHA1(fda1bd524e6281a47e9ca348b1b13de25242ef04) )
-	ROM_LOAD( "82s129.u27", 0x0100, 0x0100, CRC(58ec5baf) SHA1(79f29c26c2747f3baeb0fe309d4e0f1eb01c6a79) )
-
-	ROM_REGION( 0x40, "proms2", 0 )
-	ROM_LOAD( "dm74s288.u68", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
-
-	ROM_REGION( 0x100, "unkprom", 0 )
-	ROM_LOAD( "82s129.u51",  0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
-
-	ROM_REGION( 0x20, "unkprom2", 0 )
-	ROM_LOAD( "dm74s288.u69", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
-ROM_END
-
-ROM_START( animalwbl )  // according to the dumper: runs on the same HW as lucky8 but at the two 8255 has some shorts
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "rom8.bin",  0x0000, 0x8000, CRC(8826e4e7) SHA1(70cff8c5ce75ab0f568e8cdf39ef9165b73fa2c0) )
-
-	ROM_REGION( 0x18000, "gfx1", 0 )
-	ROM_LOAD( "rom5.bin",  0x00000, 0x8000, CRC(516def6d) SHA1(8602dc1b9ebdb4c1982d82aee4590dbba70cd873) )
-	ROM_LOAD( "rom6.bin",  0x08000, 0x8000, CRC(71f2e1d0) SHA1(64e6ce53b34df1d6c59577c26e77c01f00f376bc) )
-	ROM_LOAD( "rom7.bin",  0x10000, 0x8000, CRC(b837e59e) SHA1(dd9b4bb774ce8d9af94f5b97c0fbc1cd0a92874f) )
-
-	ROM_REGION( 0x8000, "gfx2", 0 )
-	ROM_LOAD( "rom1.bin",  0x0000, 0x2000, CRC(ccec731b) SHA1(25e17bb1be0098f660e719c561523bc6a4e6f466) )
-	ROM_LOAD( "rom2.bin",  0x2000, 0x2000, CRC(d795f697) SHA1(ee5f6277d79704984ce946fead676ea425dc3df0) )
-	ROM_LOAD( "rom3.bin",  0x4000, 0x2000, CRC(adcee626) SHA1(48051e6e476d1b013c7c6f06a75ed27488675eae) )
-	ROM_LOAD( "rom4.bin",  0x6000, 0x2000, CRC(a6c87bb3) SHA1(073b19e7892dec52dd7cf1b7573f4dc3b2f8142c) )
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "13-g.bin", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
-	ROM_LOAD( "14-g.bin", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
-
-	ROM_REGION( 0x40, "proms2", 0 )
-	ROM_LOAD( "13-d.bin", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
-
-	ROM_REGION( 0x100, "unkprom", 0 )
-	ROM_LOAD( "3-f.bin",  0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
-
-	ROM_REGION( 0x20, "unkprom2", 0 )
-	ROM_LOAD( "12-d.bin", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /*
@@ -22765,6 +22662,146 @@ ROM_START( lucky8v )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "g13", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+/*
+  Lucky 8 Lines
+  encrypted bootleg
+
+  3 boards found. All with the same program/gfx.
+
+*/
+ROM_START( lucky8w )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "prg.bin",   0x0000, 0x8000, CRC(719ff450) SHA1(3f5ec8f02df87d23e3abe5fe2eb043fd66353ef8) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "gfx3.bin",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "gfx2.bin",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "gfx1.bin",  0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "gfx7.bin",  0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "gfx6.bin",  0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "gfx5.bin",  0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "gfx4.bin",  0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	// all PROMS are from the parent, since this board has the same gfx set.
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12",   0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13",   0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "g14",   0x0000, 0x0100, CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13",   0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+
+/*
+Super Dragon by OCT
+
+PCB is etched
+VIEW SONIC 803 SAYNAX CO.,LTD. ALL RIGHTS RESERVED MADE IN JAPAN
+
+Main components
+- Z0840008PSC CPU
+- 12.000 MHz XTAL
+- 2x 44-pin square chips stickered OCT
+- 68-pin square chips stickered OCT
+- YM2413
+- SN76489AN
+- 2x I8255 (TODO: verify, they are stickered)
+- HM6264ALP-12
+- HM6116LP-3
+- 5x bank of 8 switches
+
+This game shares the same programmer / programming team as Ichi Ban Jian by Excel.
+It seems to use a similar split opcodes / data ROM arrangement.
+*/
+
+ROM_START( superdrg )
+	ROM_REGION( 0x60000, "maincpu", 0 )
+	ROM_LOAD( "oct1.u20", 0x00000, 0x20000, CRC(0f350eaf) SHA1(36018ec122c96d14f871c1db6517eb090f2d2b65) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "oct3.u39", 0x00000, 0x20000, CRC(c0dd7453) SHA1(8782aec795c6d7a96c81ad04ddb8adbc044e4194) )
+
+	ROM_REGION( 0x20000, "gfx2", 0 )
+	ROM_LOAD( "oct2.u32", 0x00000, 0x20000, CRC(03386ec2) SHA1(9eddb2fcfca402d8790bc10507023018b303ffcd) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "sudr.u", 0x000, 0x200, NO_DUMP ) // AM27S29APC. TODO: verify location
+
+	ROM_REGION( 0x200, "proms2", 0 )
+	ROM_LOAD( "dra.u49",  0x000, 0x200, CRC(2da522a7) SHA1(432a6463d1ad39644a9e7094dd6d2d9e604dfc55) ) // AM27S13PC
+ROM_END
+
+
+ROM_START( animalw ) // big CPU block marked GPS Game Power System
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rom9.u91",  0x0000, 0x8000, CRC(beaeafe5) SHA1(58c9ab7559a346d55dbd679b583abd1ebe2d9fae) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom7.u22",  0x00000, 0x8000, CRC(4b7613da) SHA1(7a0384f24f8fb5e8722b559b7b82d922ed781139) )
+	ROM_LOAD( "rom5.u21",  0x08000, 0x8000, CRC(dfae0bd4) SHA1(b64cf45e1a0ab14995b4e0cc3d5931d81192d5cf) )
+	ROM_LOAD( "rom6.u20",  0x10000, 0x8000, CRC(fd214376) SHA1(5c9227a4aafe3a6119ee197f53fd067ab215acd1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom4.u26",  0x0000, 0x2000, CRC(cff7c18b) SHA1(bb99be34a04623063916127ab0b1cdbe649f4609) )
+	ROM_IGNORE(                    0x6000 )
+	ROM_LOAD( "rom2.u25",  0x2000, 0x2000, CRC(5342ec28) SHA1(7188f36cc55fc202f06b35f201cfe01d2ad60fc1) )
+	ROM_IGNORE(                    0x6000 )
+	ROM_LOAD( "rom1.u24",  0x4000, 0x2000, CRC(87303bc8) SHA1(7ba0d9127c743ebbd273dad7d1010ccfd8848163) )
+	ROM_IGNORE(                    0x6000 )
+	ROM_LOAD( "rom3.u23",  0x6000, 0x2000, CRC(7d366bcf) SHA1(b3b208ff9433efe62510352b98861d03673c53b4) )
+	ROM_IGNORE(                    0x6000 )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u28", 0x0000, 0x0100, CRC(14f47fc9) SHA1(fda1bd524e6281a47e9ca348b1b13de25242ef04) )
+	ROM_LOAD( "82s129.u27", 0x0100, 0x0100, CRC(58ec5baf) SHA1(79f29c26c2747f3baeb0fe309d4e0f1eb01c6a79) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "dm74s288.u68", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "82s129.u51",  0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "dm74s288.u69", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+ROM_START( animalwbl )  // according to the dumper: runs on the same HW as lucky8 but at the two 8255 has some shorts
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "rom8.bin",  0x0000, 0x8000, CRC(8826e4e7) SHA1(70cff8c5ce75ab0f568e8cdf39ef9165b73fa2c0) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "rom5.bin",  0x00000, 0x8000, CRC(516def6d) SHA1(8602dc1b9ebdb4c1982d82aee4590dbba70cd873) )
+	ROM_LOAD( "rom6.bin",  0x08000, 0x8000, CRC(71f2e1d0) SHA1(64e6ce53b34df1d6c59577c26e77c01f00f376bc) )
+	ROM_LOAD( "rom7.bin",  0x10000, 0x8000, CRC(b837e59e) SHA1(dd9b4bb774ce8d9af94f5b97c0fbc1cd0a92874f) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "rom1.bin",  0x0000, 0x2000, CRC(ccec731b) SHA1(25e17bb1be0098f660e719c561523bc6a4e6f466) )
+	ROM_LOAD( "rom2.bin",  0x2000, 0x2000, CRC(d795f697) SHA1(ee5f6277d79704984ce946fead676ea425dc3df0) )
+	ROM_LOAD( "rom3.bin",  0x4000, 0x2000, CRC(adcee626) SHA1(48051e6e476d1b013c7c6f06a75ed27488675eae) )
+	ROM_LOAD( "rom4.bin",  0x6000, 0x2000, CRC(a6c87bb3) SHA1(073b19e7892dec52dd7cf1b7573f4dc3b2f8142c) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "13-g.bin", 0x0000, 0x0100, CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "14-g.bin", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x40, "proms2", 0 )
+	ROM_LOAD( "13-d.bin", 0x0000, 0x0020, CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "3-f.bin",  0x0000, 0x0100, CRC(1d668d4a) SHA1(459117f78323ea264d3a29f1da2889bbabe9e4be) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "12-d.bin", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 
@@ -32304,6 +32341,31 @@ void wingco_state::init_lucky8s()
 	rom[0x473f] = 0x28;  // skip checksum;
 }
 
+void wingco_state::init_lucky8w()
+{
+	// program ROM data/address decryption
+
+	uint8_t *rom = memregion("maincpu")->base();
+	int size = memregion("maincpu")->bytes();
+	int start = 0;
+
+	// data lines swap: 76543210 -> 06543217
+	for (int i = start; i < size; i++)
+	{
+		rom[i] = bitswap<8>(rom[i], 0, 6, 5, 4, 3, 2, 1, 7);
+	}
+
+	std::vector<uint8_t> buffer(size);
+	memcpy(&buffer[0], rom, size);
+
+	// address lines swap: fedcba9876543210 -> fedcba9806543217
+	for (int i = start; i < size; i++)
+	{
+		int a = bitswap<16>(i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 6, 5, 4, 3, 2, 1, 7);
+		rom[a] = buffer[i];
+	}
+}
+
 
 void wingco_state::init_nd8lines()
 {
@@ -33851,6 +33913,7 @@ GAMEL( 1988, lucky8s,    lucky8,   lucky8,   lucky8,   wingco_state,   init_luck
 GAME(  1997, lucky8t,    lucky8,   lucky8t,  lucky8t,  wingco_state,   empty_init,     ROT0, "bootleg (Bigico)",  "New Lucky 8 Lines (A900 2nd gen, Cross and Bell Bonus)",   0 )                                        // only 1 control set, no lamps except 2 leftovers...
 GAMEL( 1989, lucky8u,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 19, W-4)",                          0,                      layout_lucky8 )    // 2 control sets...
 GAMEL( 1988, lucky8v,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "New Lucky 8 Lines (set 20, W-4, 58%)",                     0,                      layout_lucky8 )    // 2 control sets...
+GAMEL( 1988, lucky8w,    lucky8,   lucky8,   lucky8d,  wingco_state,   init_lucky8w,   ROT0, "bootleg",           "New Lucky 8 Lines (set 21, encrypted bootleg)",            0,                      layout_lucky8 )    // 2 control sets...
 GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                      layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",  "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                      layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,   ns8lines, lucky8t,  ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",         "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                      layout_lucky8 )    // 2 control sets...

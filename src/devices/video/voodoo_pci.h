@@ -147,6 +147,8 @@ public:
 	voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 protected:
+	voodoo_3_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
@@ -155,10 +157,34 @@ protected:
 	required_device<voodoo_3_device> m_voodoo;
 };
 
+class voodoo_3000_x86_pci_device : public voodoo_3_pci_device
+{
+public:
+	template <typename T, typename U>
+	voodoo_3000_x86_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cpu_tag, U &&screen_tag)
+		: voodoo_3000_x86_pci_device(mconfig, tag, owner, clock)
+	{
+		set_cpu(std::forward<T>(cpu_tag));
+		set_screen(std::forward<U>(screen_tag));
+	}
+
+	voodoo_3000_x86_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+private:
+	required_memory_region m_vga_rom;
+};
+
+
 DECLARE_DEVICE_TYPE(VOODOO_1_PCI, voodoo_1_pci_device)
 DECLARE_DEVICE_TYPE(VOODOO_2_PCI, voodoo_2_pci_device)
 DECLARE_DEVICE_TYPE(VOODOO_BANSHEE_PCI, voodoo_banshee_pci_device)
 DECLARE_DEVICE_TYPE(VOODOO_BANSHEE_X86_PCI, voodoo_banshee_x86_pci_device)
 DECLARE_DEVICE_TYPE(VOODOO_3_PCI, voodoo_3_pci_device)
+DECLARE_DEVICE_TYPE(VOODOO_3000_X86_PCI, voodoo_3000_x86_pci_device)
 
 #endif // MAME_VIDEO_VOODOO_PCI_H

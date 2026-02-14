@@ -154,18 +154,18 @@ void um8498f_device::device_start()
 	save_item(NAME(m_kbrst));
 	save_item(NAME(m_ext_gatea20));
 	save_item(NAME(m_fast_gatea20));
-//	save_item(NAME(m_emu_gatea20));
-//	save_item(NAME(m_keybc_d1_written));
-//	save_item(NAME(m_keybc_data_blocked));
+//  save_item(NAME(m_emu_gatea20));
+//  save_item(NAME(m_keybc_d1_written));
+//  save_item(NAME(m_keybc_data_blocked));
 
 	save_item(NAME(m_config_reg));
-// 	save_item(NAME(m_chan_env));
-//	save_item(NAME(m_rom_enable));
-//	save_item(NAME(m_ram_write_protect));
-//	save_item(NAME(m_shadow_reg));
-//	save_item(NAME(m_dram_config));
-//	save_item(NAME(m_ems_control));
-//	save_item(NAME(m_ext_boundary));
+//  save_item(NAME(m_chan_env));
+//  save_item(NAME(m_rom_enable));
+//  save_item(NAME(m_ram_write_protect));
+//  save_item(NAME(m_shadow_reg));
+//  save_item(NAME(m_dram_config));
+//  save_item(NAME(m_ems_control));
+//  save_item(NAME(m_ext_boundary));
 
 	// assumed being internal to the chipset
 	m_shadow_ram.resize(0x60000);
@@ -179,6 +179,9 @@ void um8498f_device::device_reset()
 	m_ext_gatea20 = 0;
 	m_fast_gatea20 = 0;
 	m_dma_channel = -1;
+
+	m_kbrst = 1;
+
 	m_config_phase = config_phase_t::LOCK_A0;
 
 	m_space_mem->install_rom(0xe0000, 0xfffff, &m_bios[0x00000 / 4]);
@@ -244,12 +247,12 @@ void um8498f_device::io_map(address_map &map)
 	);
 }
 
-uint8_t um8498f_device::portb_r()
+u8 um8498f_device::portb_r()
 {
 	return m_portb;
 }
 
-void um8498f_device::portb_w(uint8_t data)
+void um8498f_device::portb_w(u8 data)
 {
 	m_portb = (m_portb & 0xf0) | (data & 0x0f);
 
@@ -361,7 +364,7 @@ void um8498f_device::update_romram_settings()
 {
 	// TODO: avoid using ISA bus remapping until we have a better grasp of this
 	m_space_mem->unmap_readwrite(0xe0000, 0xfffff);
-//	m_isabus->remap(AS_PROGRAM, 0xe0000, 0xfffff);
+//  m_isabus->remap(AS_PROGRAM, 0xe0000, 0xfffff);
 
 
 	// TODO: guesswork
@@ -382,23 +385,23 @@ void um8498f_device::update_romram_settings()
 
 //void um8498f_device::update_dma_clock()
 //{
-//	const int busclk_sel_settings[] = { 4, 5, 6, 0 };
-//	const int busclk_sel = busclk_sel_settings[(m_chan_env >> 2) & 3];
+//  const int busclk_sel_settings[] = { 4, 5, 6, 0 };
+//  const int busclk_sel = busclk_sel_settings[(m_chan_env >> 2) & 3];
 //
-//	if (busclk_sel == 0)
-//		return;
+//  if (busclk_sel == 0)
+//      return;
 //
-//	const int dma_clock_sel = BIT(m_dma_ws_control, 0);
+//  const int dma_clock_sel = BIT(m_dma_ws_control, 0);
 //
-//	uint32_t dma_clock = clock() / busclk_sel;
+//  u32 dma_clock = clock() / busclk_sel;
 //
-//	if (!dma_clock_sel)
-//		dma_clock /= 2;
+//  if (!dma_clock_sel)
+//      dma_clock /= 2;
 //
-//	logerror("update_dma_clock: dma clock is now %u (%d %d)\n", dma_clock, busclk_sel, dma_clock_sel);
+//  logerror("update_dma_clock: dma clock is now %u (%d %d)\n", dma_clock, busclk_sel, dma_clock_sel);
 //
-//	m_dma[0]->set_unscaled_clock(dma_clock);
-//	m_dma[1]->set_unscaled_clock(dma_clock);
+//  m_dma[0]->set_unscaled_clock(dma_clock);
+//  m_dma[1]->set_unscaled_clock(dma_clock);
 //}
 
 /******************
@@ -424,7 +427,7 @@ offs_t um8498f_device::page_offset()
 	return 0xff0000;
 }
 
-uint8_t um8498f_device::dma_read_byte(offs_t offset)
+u8 um8498f_device::dma_read_byte(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -432,7 +435,7 @@ uint8_t um8498f_device::dma_read_byte(offs_t offset)
 	return m_space_mem->read_byte(page_offset() + offset);
 }
 
-void um8498f_device::dma_write_byte(offs_t offset, uint8_t data)
+void um8498f_device::dma_write_byte(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;
@@ -440,7 +443,7 @@ void um8498f_device::dma_write_byte(offs_t offset, uint8_t data)
 	m_space_mem->write_byte(page_offset() + offset, data);
 }
 
-uint8_t um8498f_device::dma_read_word(offs_t offset)
+u8 um8498f_device::dma_read_word(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -451,7 +454,7 @@ uint8_t um8498f_device::dma_read_word(offs_t offset)
 	return result;
 }
 
-void um8498f_device::dma_write_word(offs_t offset, uint8_t data)
+void um8498f_device::dma_write_word(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;

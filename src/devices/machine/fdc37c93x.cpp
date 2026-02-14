@@ -988,6 +988,8 @@ void fdc37c93x_device::device_start()
 	m_isa->set_dma_channel(2, this, true);
 	m_isa->set_dma_channel(3, this, true);
 	remap(AS_IO, 0, 0x400);
+
+	save_item(NAME(enabled_logical));
 }
 
 void fdc37c93x_device::device_reset()

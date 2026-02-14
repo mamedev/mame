@@ -988,7 +988,7 @@ protected:
 
 	void set_instance(SDL_JoystickID instance)
 	{
-		assert(0 > m_instance);
+		assert(-1 == m_instance);
 		assert(0 <= instance);
 
 		m_instance = instance;

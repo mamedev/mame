@@ -66,6 +66,7 @@ public:
 
 	void set_ram_pointers(u8 *main, u8 *aux)    { m_ram_ptr = main; m_aux_ptr = aux; }
 	void set_aux_mask(u16 aux_mask)             { m_aux_mask = aux_mask; }
+	void set_hgr2(u16 hgr2)                     { m_hgr2 = hgr2; }
 	void set_char_pointer(u8 *charptr, int size) { m_char_ptr = charptr; m_char_size = size; }
 	void setup_GS_graphics() { m_8bit_graphics = std::make_unique<bitmap_ind16>(560, 192); }
 
@@ -114,6 +115,7 @@ private:
 
 	u8 *m_ram_ptr = nullptr, *m_aux_ptr = nullptr, *m_char_ptr = nullptr;
 	u16 m_aux_mask = 0xffff;
+	u16 m_hgr2 = 0x4000;
 	int m_char_size = 0;
 	bool m_page2 = false;
 	bool m_flash = false;

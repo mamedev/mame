@@ -154,9 +154,9 @@ void f82c836a_device::device_start()
 	save_item(NAME(m_kbrst));
 	save_item(NAME(m_ext_gatea20));
 	save_item(NAME(m_fast_gatea20));
-//	save_item(NAME(m_emu_gatea20));
-//	save_item(NAME(m_keybc_d1_written));
-//	save_item(NAME(m_keybc_data_blocked));
+//  save_item(NAME(m_emu_gatea20));
+//  save_item(NAME(m_keybc_d1_written));
+//  save_item(NAME(m_keybc_data_blocked));
 
 	save_item(NAME(m_rom_enable));
 	save_item(NAME(m_ram_write_protect));
@@ -177,6 +177,8 @@ void f82c836a_device::device_reset()
 	m_ext_gatea20 = 0;
 	m_fast_gatea20 = 0;
 	m_dma_channel = -1;
+
+	m_kbrst = 1;
 
 	m_dma_ws_control = 0;
 	// BUSCLK CXIN/5, Refresh Width 280ns
@@ -251,16 +253,16 @@ void f82c836a_device::io_map(address_map &map)
 		NAME([this] (offs_t offset) { return m_dma[1]->read(offset >> 1); }),
 		NAME([this] (offs_t offset, u8 data) { m_dma[1]->write(offset >> 1, data); })
 	);
-//	map(0x0208, 0x020a) PnP EMS paging
-//	map(0x0218, 0x021a) alt of above (depends on a register setting)
+//  map(0x0208, 0x020a) PnP EMS paging
+//  map(0x0218, 0x021a) alt of above (depends on a register setting)
 }
 
-uint8_t f82c836a_device::portb_r()
+u8 f82c836a_device::portb_r()
 {
 	return m_portb;
 }
 
-void f82c836a_device::portb_w(uint8_t data)
+void f82c836a_device::portb_w(u8 data)
 {
 	m_portb = (m_portb & 0xf0) | (data & 0x0f);
 
@@ -306,12 +308,12 @@ void f82c836a_device::config_map(address_map &map)
 		NAME([this] (offs_t offset) { return m_chan_env; }),
 		NAME([this] (offs_t offset, u8 data) { m_chan_env = data; update_dma_clock(); })
 	);
-//	map(0x44, 0x44) Peripheral Control
+//  map(0x44, 0x44) Peripheral Control
 	// Misc. Status
 	map(0x45, 0x45).lr8(
 		NAME([this] (offs_t offset) { return (m_nmi_mask << 7) | (m_ext_gatea20 << 6); })
 	);
-//	map(0x46, 0x46) Power Management
+//  map(0x46, 0x46) Power Management
 	// ROM enable
 	map(0x48, 0x48).lrw8(
 		NAME([this] (offs_t offset) { return m_rom_enable; }),
@@ -342,18 +344,16 @@ void f82c836a_device::config_map(address_map &map)
 		NAME([this] (offs_t offset) { return m_ems_control; }),
 		NAME([this] (offs_t offset, u8 data) { m_ems_control = data; })
 	);
-//	map(0x60, 0x60) Laptop Features
-//	map(0x61, 0x61) Fast Video Control
-//	map(0x62, 0x62) Fast Video RAM Enable
-//	map(0x63, 0x63) High Performance Refresh
-//	map(0x64, 0x64) CAS Timing for DMA/Master
+//  map(0x60, 0x60) Laptop Features
+//  map(0x61, 0x61) Fast Video Control
+//  map(0x62, 0x62) Fast Video RAM Enable
+//  map(0x63, 0x63) High Performance Refresh
+//  map(0x64, 0x64) CAS Timing for DMA/Master
 }
 
 void f82c836a_device::update_romram_settings()
 {
-//	printf("%02x %02x %02x %02x %02x\n", m_rom_enable, m_ram_write_protect, m_shadow_reg[0], m_shadow_reg[1], m_shadow_reg[2]);
-
-	int i;
+//  printf("%02x %02x %02x %02x %02x\n", m_rom_enable, m_ram_write_protect, m_shadow_reg[0], m_shadow_reg[1], m_shadow_reg[2]);
 
 	// reconfigure space
 	// Despite what documentation claims shadow RAM actually wins over ROM, it will just map on
@@ -362,7 +362,7 @@ void f82c836a_device::update_romram_settings()
 	m_isabus->remap(AS_PROGRAM, 0xa0000, 0xfffff);
 
 	// TODO: optimize, add write only paths
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		const u32 start_offs = 0xc0000 + i * 0x8000;
 		const u32 end_offs = start_offs + 0x7fff;
@@ -371,7 +371,7 @@ void f82c836a_device::update_romram_settings()
 			m_space_mem->install_rom(start_offs, end_offs, &m_bios[(i * 0x8000) / 2]);
 	}
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		const u32 start_offs = 0xa0000 + i * 0x4000;
 		const u32 end_offs = start_offs + 0x3fff;
@@ -380,7 +380,7 @@ void f82c836a_device::update_romram_settings()
 			m_space_mem->install_ram(start_offs, end_offs, &m_shadow_ram[i * 0x4000]);
 	}
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		const u32 start_offs = 0xc0000 + i * 0x4000;
 		const u32 end_offs = start_offs + 0x3fff;
@@ -389,7 +389,7 @@ void f82c836a_device::update_romram_settings()
 			m_space_mem->install_ram(start_offs, end_offs, &m_shadow_ram[0x20000 + i * 0x4000]);
 	}
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		const u32 start_offs = 0xe0000 + i * 0x4000;
 		const u32 end_offs = start_offs + 0x3fff;
@@ -411,7 +411,7 @@ void f82c836a_device::update_dma_clock()
 
 	const int dma_clock_sel = BIT(m_dma_ws_control, 0);
 
-	uint32_t dma_clock = clock() / busclk_sel;
+	u32 dma_clock = clock() / busclk_sel;
 
 	if (!dma_clock_sel)
 		dma_clock /= 2;
@@ -445,7 +445,7 @@ offs_t f82c836a_device::page_offset()
 	return 0xff0000;
 }
 
-uint8_t f82c836a_device::dma_read_byte(offs_t offset)
+u8 f82c836a_device::dma_read_byte(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -453,7 +453,7 @@ uint8_t f82c836a_device::dma_read_byte(offs_t offset)
 	return m_space_mem->read_byte(page_offset() + offset);
 }
 
-void f82c836a_device::dma_write_byte(offs_t offset, uint8_t data)
+void f82c836a_device::dma_write_byte(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;
@@ -461,18 +461,18 @@ void f82c836a_device::dma_write_byte(offs_t offset, uint8_t data)
 	m_space_mem->write_byte(page_offset() + offset, data);
 }
 
-uint8_t f82c836a_device::dma_read_word(offs_t offset)
+u8 f82c836a_device::dma_read_word(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
 
-	uint16_t result = m_space_mem->read_word((page_offset() & 0xfe0000) | (offset << 1));
+	u16 result = m_space_mem->read_word((page_offset() & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result >> 8;
 
 	return result;
 }
 
-void f82c836a_device::dma_write_word(offs_t offset, uint8_t data)
+void f82c836a_device::dma_write_word(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;

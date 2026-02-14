@@ -8274,6 +8274,72 @@ Installation and Open Circulation CDs are bootable.
 		</part>
 	</software>
 
+	<software name="rhapsody" supported="no">
+		<description>Rhapsody (Developer Release 2)</description>
+		<year>1998</year>
+		<publisher>Apple</publisher>
+		<notes><![CDATA[
+Cannot login on ct486. Kernel panics on pcipc.
+]]></notes>
+		<info name="langauge" value="English" />
+		<info name="langauge" value="French" />
+		<info name="langauge" value="German" />
+		<info name="langauge" value="Italian" />
+		<info name="langauge" value="Spanish" />
+		<info name="langauge" value="Swedish" />
+		<info name="version" value="5.1" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rhapsody dr2" sha1="ef2d6aee8f2f148832328d74532e62f8c5abaee3" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation" />
+			<dataarea name="flop" size="1474560">
+				<rom name="rhapsody dr2 installation.img" size="1474560" crc="b825379d" sha1="392949114d98371123553e4696e02e57103e75a1" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Device Drivers" />
+			<dataarea name="flop" size="1474560">
+				<rom name="rhapsody dr2 device drivers.img" size="1474560" crc="7afa324c" sha1="1d24dc5bda110585196ca25910b4b05ee1dbeae7" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rhapsody1" cloneof="rhapsody" supported="no">
+		<description>Rhapsody (Developer Release 1)</description>
+		<year>1997</year>
+		<publisher>Apple</publisher>
+		<notes><![CDATA[
+Ends with “Workspace Manager Error” and cannot login.
+]]></notes>
+		<info name="langauge" value="English" />
+		<info name="langauge" value="French" />
+		<info name="langauge" value="German" />
+		<info name="langauge" value="Italian" />
+		<info name="langauge" value="Spanish" />
+		<info name="langauge" value="Swedish" />
+		<info name="version" value="5.0" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rhapsody dr1" sha1="0b4185d3dc509a0055f3cf18b8183242eafb9d13" />
+			</diskarea>
+		</part>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation" />
+			<dataarea name="flop" size="1474560">
+				<rom name="rhapsody dr1 installation.img" size="1474560" crc="c0541e18" sha1="5c6a622706bfea16c046e6f0334600a41274395e" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Device Drivers" />
+			<dataarea name="flop" size="1474560">
+				<rom name="rhapsody dr1 device drivers.img" size="1474560" crc="b174ae3d" sha1="b80fb03e131bb22ba10d8bd38af00be31b2bb593" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="win95">
 		<description>Windows 95 (en 4.00.950)</description>
 		<year>1995</year>
@@ -9508,6 +9574,46 @@ Wave Studio v3.12
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="en-us win32 sdk 3.51.1057.1" sha1="56b0e2b3ec8976bac7f702dcb504cc788ba3edeb" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="yellowbox" supported="partial">
+		<description>Rhapsody Yellow Box (Developer Release 2)</description>
+		<year>1998</year>
+		<publisher>Apple</publisher>
+		<notes><![CDATA[
+GUI applications crash, bash works. Tested in pcipc with ibm5170_hdd/win98se.
+]]></notes>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Japanese" />
+		<info name="version" value="5.1" />
+		<sharedfeat name="platform" value="Windows 95" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rhapsody yellow box dr2" sha1="578d4ab9febb23c07b8440e982280f6e8757a59b" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="yellowbox1" cloneof="yellowbox" supported="partial">
+		<description>Rhapsody Yellow Box (Developer Release 1)</description>
+		<year>1997</year>
+		<publisher>Apple</publisher>
+		<notes><![CDATA[
+GUI applications crash, bash works. Tested in pcipc with ibm5170_hdd/win98se.
+]]></notes>
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Japanese" />
+		<info name="version" value="5.0" />
+		<sharedfeat name="platform" value="Windows 95" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rhapsody yellow box dr1" sha1="92d0b880f77f5b22f6869fac52b5a88d472d2a7f" />
 			</diskarea>
 		</part>
 	</software>

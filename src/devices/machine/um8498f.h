@@ -19,7 +19,7 @@ class um8498f_device : public device_t,
 {
 public:
 	template <typename T, typename U, typename V, typename W, typename X>
-	um8498f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&cputag, U &&biostag, V &&keybctag, W &&ramtag, X &&isatag)
+	um8498f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&cputag, U &&biostag, V &&keybctag, W &&ramtag, X &&isatag)
 		: um8498f_device(mconfig, tag, owner, clock)
 	{
 		set_cputag(std::forward<T>(cputag));
@@ -98,7 +98,7 @@ public:
 	}
 	void gatea20_w(int state) { keyboard_gatea20(state); }
 	void kbrst_w(int state) {
-		// convert to active low signal (gets inverted in at_keybc.c)
+		// convert to active low signal (gets inverted in at_keybc.cpp)
 		state = (state == ASSERT_LINE ? 0 : 1);
 
 		// external kbreset is ignored when emulation enabled
@@ -118,15 +118,15 @@ public:
 
 
 protected:
-	virtual void device_start() override;
-	virtual void device_reset() override;
-	virtual void device_reset_after_children() override;
-
-	virtual space_config_vector memory_space_config() const override;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_reset_after_children() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	void io_map(address_map &map);
-	void config_map(address_map &map);
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
+
+	void io_map(address_map &map) ATTR_COLD;
+	void config_map(address_map &map) ATTR_COLD;
 private:
 	const address_space_config m_space_config;
 
