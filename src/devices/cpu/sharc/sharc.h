@@ -321,15 +321,15 @@ private:
 	void SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx);
 	void COMPUTE(uint32_t opcode);
 	void check_interrupts();
-	void PUSH_PC();
-	uint32_t POP_PC();
-	uint32_t TOP_PC();
-	void PUSH_LOOP();
-	void POP_LOOP();
-	void PUSH_STATUS_STACK();
-	void POP_STATUS_STACK();
-	int IF_CONDITION_CODE(int cond);
-	int DO_CONDITION_CODE(int cond);
+	inline void PUSH_PC(uint32_t pc);
+	inline uint32_t POP_PC();
+	inline uint32_t TOP_PC();
+	inline void PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, uint32_t count);
+	inline void POP_LOOP();
+	inline void PUSH_STATUS_STACK();
+	inline void POP_STATUS_STACK();
+	inline int IF_CONDITION_CODE(int cond);
+	inline int DO_CONDITION_CODE(int cond);
 	void sharcop_compute_dreg_dm_dreg_pm();
 	void sharcop_compute();
 	void sharcop_compute_ureg_dmpm_premod();
@@ -494,7 +494,9 @@ private:
 	void sharc_cfunc_read_iop();
 	void sharc_cfunc_write_iop();
 	void sharc_cfunc_pcstack_overflow();
+	void sharc_cfunc_pcstack_underflow();
 	void sharc_cfunc_loopstack_overflow();
+	void sharc_cfunc_loopstack_underflow();
 	void sharc_cfunc_statusstack_overflow();
 	void sharc_cfunc_statusstack_underflow();
 
@@ -504,7 +506,9 @@ private:
 
 	static void cfunc_unimplemented(void *param);
 	static void cfunc_pcstack_overflow(void *param);
+	static void cfunc_pcstack_underflow(void *param);
 	static void cfunc_loopstack_overflow(void *param);
+	static void cfunc_loopstack_underflow(void *param);
 	static void cfunc_statusstack_overflow(void *param);
 	static void cfunc_statusstack_underflow(void *param);
 	static void cfunc_unimplemented_compute(void *param);

@@ -5,8 +5,6 @@
 
 #include "sharc.h"
 
-#include <algorithm>
-
 
 // DRC instruction description flags
 constexpr uint32_t  OP_USERFLAG_LOOP                     = 0x00000001;
@@ -77,11 +75,6 @@ struct alignas(16) adsp21062_device::sharc_internal_state
 			uint64_t flags64[8];
 		};
 
-		void clear()
-		{
-			std::fill(std::begin(flags64), std::end(flags64), 0);
-		}
-
 		uint32_t pack() const
 		{
 			return
@@ -132,7 +125,7 @@ struct alignas(16) adsp21062_device::sharc_internal_state
 	uint64_t mrf;
 	uint64_t mrb;
 
-	uint32_t pcstack[30];
+	uint32_t pcstack[32];
 	uint32_t lcstack[6];
 	uint32_t lastack[6];
 	uint32_t lstkp;

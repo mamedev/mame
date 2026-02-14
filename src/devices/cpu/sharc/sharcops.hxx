@@ -267,10 +267,7 @@ uint32_t adsp21062_device::GET_UREG(int ureg)
 		{
 			switch(reg)
 			{
-				case 0x4:   return m_core->pcstk;                       /* PCSTK */
-				case 0x5:   return m_core->pcstkp;                      /* PCSTKP */
-				case 0x7:   return m_core->curlcntr;                    /* CURLCNTR */
-				case 0x8:   return m_core->lcntr;                       /* LCNTR */
+				case 0x4:   return m_core->pcstack[m_core->pcstkp];     /* PCSTK */
 				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
@@ -307,9 +304,9 @@ uint32_t adsp21062_device::GET_UREG(int ureg)
 			switch(reg)
 			{
 				/* PX needs to be handled separately if the whole 48 bits are needed */
-				case 0xb:   return uint32_t(m_core->px);          /* PX */
-				case 0xc:   return uint16_t(m_core->px);          /* PX1 */
-				case 0xd:   return uint32_t(m_core->px >> 16);    /* PX2 */
+				case 0xb:   return (uint32_t)(m_core->px);          /* PX */
+				case 0xc:   return (uint16_t)(m_core->px);          /* PX1 */
+				case 0xd:   return (uint32_t)(m_core->px >> 16);    /* PX2 */
 				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
@@ -378,57 +375,9 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 		case 0x6:
 			switch (reg)
 			{
-				case 0x4:                                     /* PCSTK */
-					if ((m_core->pcstkp > 0) && (m_core->pcstkp < 31))
-						m_core->pcstk = data & 0x00ffffff;
-					break;
-
-				case 0x5:                                     /* PCSTKP */
-					if (m_core->pcstkp < 31)
-					{
-						// TODO: this should take effect with a one-cycle delay
-						uint32_t const prev = std::exchange(m_core->pcstkp, data & 0x1f);
-
-						if (prev > 0)
-							m_core->pcstack[prev - 1] = m_core->pcstk;
-
-						if (prev < m_core->pcstkp)
-						{
-							if (m_core->pcstkp < 31)
-								m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
-							// TODO: what should pcstk read as when overflowed?
-
-							m_core->stky &= ~PCEM;
-							if (m_core->pcstkp >= 30)
-								m_core->stky |= PCFL;
-						}
-						else if (prev > m_core->pcstkp)
-						{
-							if (m_core->pcstkp > 0)
-							{
-								m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
-							}
-							else
-							{
-								m_core->pcstk = 0x00ffffff;
-								m_core->stky |= PCEM;
-							}
-
-							m_core->stky &= ~PCFL;
-						}
-					}
-					break;
-
-				case 0x7:                                     /* CURLCNTR */
-					if ((m_core->lstkp > 0) && (m_core->lstkp < 7))
-						m_core->curlcntr = data;
-					break;
-
-				case 0x8:                                     /* LCNTR */
-					if (m_core->lstkp < 6)
-						m_core->lcntr = data;
-					break;
-
+				case 0x5:   m_core->pcstkp = data; break;     /* PCSTKP */
+				case 0x7:   m_core->curlcntr = data; break;   /* CURLCNTR (Zero Gunner 2B) */
+				case 0x8:   m_core->lcntr = data; break;      /* LCNTR */
 				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
@@ -442,22 +391,23 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 				case 0x9:   m_core->irptl = data; break;      /* IRPTL */
 				case 0xa:   m_core->mode2 = data; break;      /* MODE2 */
 
-				case 0xb:                                     /* MODE1 */
+				case 0xb:                                   /* MODE1 */
+				{
 					add_systemreg_write_latency_effect(reg, data, m_core->mode1);
 					m_core->mode1 = data;
 					break;
+				}
 
 				case 0xc:   m_core->astat = data; break;      /* ASTAT */
 
-				case 0xd:                                     /* IMASK */
+				case 0xd:                                   /* IMASK */
+				{
 					check_interrupts();
 					m_core->imask = data;
 					break;
+				}
 
-				case 0xe:                                     /* STKY */
-					m_core->stky = (m_core->stky & (LSEM | LSOV | SSEM | SSOV | PCEM | PCFL)) | (data & ~(LSEM | LSOV | SSEM | SSOV | PCEM | PCFL));
-					break;
-
+				case 0xe:   m_core->stky = data; break;       /* STKY */
 				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
@@ -1068,128 +1018,113 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 	}
 }
 
-inline void adsp21062_device::PUSH_PC()
+void adsp21062_device::PUSH_PC(uint32_t pc)
 {
-	if (m_core->pcstkp >= 30)
-		fatalerror("SHARC: PC Stack overflow!\n"); // TODO: what actually happens on overflow?
+	m_core->pcstkp++;
+	if (m_core->pcstkp >= 32)
+		fatalerror("SHARC: PC Stack overflow!\n");
 
-	if (m_core->pcstkp > 0)
-		m_core->pcstack[m_core->pcstkp - 1] = m_core->pcstk;
+	if (m_core->pcstkp == 0)
+		m_core->stky |= PCEM;
+	else
+		m_core->stky &= ~PCEM;
 
-	m_core->pcstk = m_core->pcstack[m_core->pcstkp++];
-
-	m_core->stky &= ~PCEM;
-	if (m_core->pcstkp >= 30)
-		m_core->stky |= PCFL;
+	m_core->pcstk = pc;
+	m_core->pcstack[m_core->pcstkp] = pc;
 }
 
-inline uint32_t adsp21062_device::POP_PC()
+uint32_t adsp21062_device::POP_PC()
 {
-	uint32_t const result = m_core->pcstk;
+	m_core->pcstk = m_core->pcstack[m_core->pcstkp];
 
-	if (m_core->pcstkp > 0)
-	{
-		if (--m_core->pcstkp > 0)
-		{
-			m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
-		}
-		else
-		{
-			m_core->pcstk = 0x00ffffff;
-			m_core->stky |= PCEM;
-		}
-	}
+	if (m_core->pcstkp == 0)
+		fatalerror("SHARC: PC Stack underflow!\n");
 
-	m_core->stky &= ~PCFL;
+	m_core->pcstkp--;
 
-	return result;
-}
+	if (m_core->pcstkp == 0)
+		m_core->stky |= PCEM;
+	else
+		m_core->stky &= ~PCEM;
 
-inline uint32_t adsp21062_device::TOP_PC()
-{
 	return m_core->pcstk;
 }
 
-inline void adsp21062_device::PUSH_LOOP()
+uint32_t adsp21062_device::TOP_PC()
 {
-	if (m_core->lstkp >= 6)
-		fatalerror("SHARC: Loop Stack overflow!\n"); // TODO: what actually happens on overflow?
+	return m_core->pcstack[m_core->pcstkp];
+}
 
-	if (m_core->lstkp > 0)
-	{
-		m_core->lcstack[m_core->lstkp - 1] = m_core->curlcntr;
-		m_core->lastack[m_core->lstkp - 1] = (m_core->laddr.loop_type << 30) | (m_core->laddr.code << 24) | m_core->laddr.addr;
-	}
-	m_core->curlcntr = m_core->lcntr;
-	m_core->laddr.addr = BIT(m_core->lastack[m_core->lstkp], 0, 24);
-	m_core->laddr.code = BIT(m_core->lastack[m_core->lstkp], 24, 5);
-	m_core->laddr.loop_type = BIT(m_core->lastack[m_core->lstkp], 30, 2);
-
+void adsp21062_device::PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, uint32_t count)
+{
 	m_core->lstkp++;
+	if (m_core->lstkp >= 6)
+		fatalerror("SHARC: Loop Stack overflow!\n");
 
-	if (m_core->lstkp < 6)
-		m_core->lcntr = m_core->lcstack[m_core->lstkp];
+	if (m_core->lstkp == 0)
+		m_core->stky |= LSEM;
 	else
-		m_core->lcntr = 0xffffffff;
+		m_core->stky &= ~LSEM;
 
-	m_core->stky &= ~LSEM;
+	m_core->lcstack[m_core->lstkp] = count;
+	m_core->lastack[m_core->lstkp] = (type << 30) | (code << 24) | addr;
+	m_core->curlcntr = count;
+
+	m_core->laddr.addr = addr;
+	m_core->laddr.code = code;
+	m_core->laddr.loop_type = type;
 }
 
-inline void adsp21062_device::POP_LOOP()
+void adsp21062_device::POP_LOOP()
 {
-	if (m_core->lstkp > 0)
-	{
-		if (--m_core->lstkp > 0)
-		{
-			m_core->curlcntr = m_core->lcstack[m_core->lstkp - 1];
-			m_core->laddr.addr = BIT(m_core->lastack[m_core->lstkp - 1], 0, 24);
-			m_core->laddr.code = BIT(m_core->lastack[m_core->lstkp - 1], 24, 5);
-			m_core->laddr.loop_type = BIT(m_core->lastack[m_core->lstkp - 1], 30, 2);
-		}
-		else
-		{
-			m_core->curlcntr = 0xffffffff;
-			m_core->laddr.addr = 0x00ffffff;
-			m_core->laddr.code = 0x1f;
-			m_core->laddr.loop_type = 0x3;
-			m_core->stky |= LSEM;
-		}
-		m_core->lcntr = m_core->lcstack[m_core->lstkp];
-	}
+	if (m_core->lstkp == 0)
+		fatalerror("SHARC: Loop Stack underflow!\n");
+
+	m_core->lstkp--;
+
+	if (m_core->lstkp == 0)
+		m_core->stky |= LSEM;
+	else
+		m_core->stky &= ~LSEM;
+
+	m_core->curlcntr = m_core->lcstack[m_core->lstkp];
+
+	m_core->laddr.addr = m_core->lastack[m_core->lstkp] & 0xffffff;
+	m_core->laddr.code = (m_core->lastack[m_core->lstkp] >> 24) & 0x1f;
+	m_core->laddr.loop_type = (m_core->lastack[m_core->lstkp] >> 30) & 0x3;
 }
 
-inline void adsp21062_device::PUSH_STATUS_STACK()
+void adsp21062_device::PUSH_STATUS_STACK()
 {
 	m_core->status_stkp++;
 	if (m_core->status_stkp >= 5)
 		fatalerror("SHARC: Status stack overflow!\n");
 
-	m_core->status_stack[m_core->status_stkp - 1].mode1 = GET_UREG(REG_MODE1);
-	m_core->status_stack[m_core->status_stkp - 1].astat = GET_UREG(REG_ASTAT);
-
 	if (m_core->status_stkp == 0)
 		m_core->stky |= SSEM;
 	else
 		m_core->stky &= ~SSEM;
+
+	m_core->status_stack[m_core->status_stkp].mode1 = GET_UREG(REG_MODE1);
+	m_core->status_stack[m_core->status_stkp].astat = GET_UREG(REG_ASTAT);
 }
 
-inline void adsp21062_device::POP_STATUS_STACK()
+void adsp21062_device::POP_STATUS_STACK()
 {
-	if (m_core->status_stkp <= 0)
-		fatalerror("SHARC: Status stack underflow!\n");
-
-	m_core->status_stkp--;
-
 	SET_UREG(REG_MODE1, m_core->status_stack[m_core->status_stkp].mode1);
 	SET_UREG(REG_ASTAT, m_core->status_stack[m_core->status_stkp].astat);
 
+	m_core->status_stkp--;
+	if (m_core->status_stkp < 0)
+		fatalerror("SHARC: Status stack underflow!\n");
+
 	if (m_core->status_stkp == 0)
 		m_core->stky |= SSEM;
 	else
 		m_core->stky &= ~SSEM;
 }
 
-inline int adsp21062_device::IF_CONDITION_CODE(int cond)
+int adsp21062_device::IF_CONDITION_CODE(int cond)
 {
 	// TODO: implement AF flag and correct conditions that depend on it (LT, LE, GE, GT)
 	switch (cond)
@@ -1208,8 +1143,8 @@ inline int adsp21062_device::IF_CONDITION_CODE(int cond)
 		case 0x0b:  return (m_core->flag[2] != 0);    /* FLAG2 */
 		case 0x0c:  return (m_core->flag[3] != 0);    /* FLAG3 */
 		case 0x0d:  return (m_core->astat & BTF);     /* TF */
-		case 0x0e:  return 0;                         /* BM */
-		case 0x0f:  return (m_core->curlcntr != 1);   /* NOT LCE */
+		case 0x0e:  return 0;                       /* BM */
+		case 0x0f:  return (m_core->curlcntr!=1);     /* NOT LCE */
 		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
 		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
 		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
@@ -1224,13 +1159,13 @@ inline int adsp21062_device::IF_CONDITION_CODE(int cond)
 		case 0x1b:  return (m_core->flag[2] == 0);    /* NOT FLAG2 */
 		case 0x1c:  return (m_core->flag[3] == 0);    /* NOT FLAG3 */
 		case 0x1d:  return !(m_core->astat & BTF);    /* NOT TF */
-		case 0x1e:  return 1;                         /* NOT BM */
-		case 0x1f:  return 1;                         /* TRUE */
+		case 0x1e:  return 1;                       /* NOT BM */
+		case 0x1f:  return 1;                       /* TRUE */
 	}
 	return 1;
 }
 
-inline int adsp21062_device::DO_CONDITION_CODE(int cond)
+int adsp21062_device::DO_CONDITION_CODE(int cond)
 {
 	// TODO: implement AF flag and correct conditions that depend on it (LT, LE, GE, GT)
 	switch (cond)
@@ -1249,8 +1184,8 @@ inline int adsp21062_device::DO_CONDITION_CODE(int cond)
 		case 0x0b:  return (m_core->flag[2] != 0);    /* FLAG2 */
 		case 0x0c:  return (m_core->flag[3] != 0);    /* FLAG3 */
 		case 0x0d:  return (m_core->astat & BTF);     /* TF */
-		case 0x0e:  return 0;                         /* BM */
-		case 0x0f:  return (m_core->curlcntr == 1);   /* LCE */
+		case 0x0e:  return 0;                       /* BM */
+		case 0x0f:  return (m_core->curlcntr==1);     /* LCE */
 		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
 		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
 		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
@@ -1265,8 +1200,8 @@ inline int adsp21062_device::DO_CONDITION_CODE(int cond)
 		case 0x1b:  return (m_core->flag[2] == 0);    /* NOT FLAG2 */
 		case 0x1c:  return (m_core->flag[3] == 0);    /* NOT FLAG3 */
 		case 0x1d:  return !(m_core->astat & BTF);    /* NOT TF */
-		case 0x1e:  return 1;                         /* NOT BM */
-		case 0x1f:  return 0;                         /* FALSE (FOREVER) */
+		case 0x1e:  return 1;                       /* NOT BM */
+		case 0x1f:  return 0;                       /* FALSE (FOREVER) */
 	}
 	return 1;
 }
@@ -1709,17 +1644,16 @@ void adsp21062_device::sharcop_direct_call()
 
 	if (IF_CONDITION_CODE(cond))
 	{
-		PUSH_PC();
 		if (j)
 		{
-			//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
-			m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
+			//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+			PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
 			CHANGE_PC_DELAYED(address);
 		}
 		else
 		{
-			//m_core->pcstk = m_core->pc + 1;
-			m_core->pcstk = m_core->daddr;
+			//PUSH_PC(m_core->pc+1);
+			PUSH_PC(m_core->daddr);
 			CHANGE_PC(address);
 		}
 	}
@@ -1772,15 +1706,14 @@ void adsp21062_device::sharcop_relative_call()
 
 	if (IF_CONDITION_CODE(cond))
 	{
-		PUSH_PC();
 		if (j)
 		{
-			m_core->pcstk = m_core->pc + 3;  /* 1 instruction + 2 delayed instructions */
+			PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
 			CHANGE_PC_DELAYED(m_core->pc + util::sext(address, 24));
 		}
 		else
 		{
-			m_core->pcstk = m_core->pc + 1;
+			PUSH_PC(m_core->pc+1);
 			CHANGE_PC(m_core->pc + util::sext(address, 24));
 		}
 	}
@@ -1903,17 +1836,16 @@ void adsp21062_device::sharcop_indirect_call()
 	{
 		if (IF_CONDITION_CODE(cond))
 		{
-			PUSH_PC();
 			if (j)
 			{
-				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
-				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
+				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 			else
 			{
-				//m_core->pcstk = m_core->pc + 1;
-				m_core->pcstk = m_core->daddr;
+				//PUSH_PC(m_core->pc+1);
+				PUSH_PC(m_core->daddr);
 				CHANGE_PC(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 		}
@@ -1930,17 +1862,16 @@ void adsp21062_device::sharcop_indirect_call()
 			if (compute)
 				COMPUTE(compute);
 
-			PUSH_PC();
 			if (j)
 			{
-				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
-				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
+				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 			else
 			{
-				//m_core->pcstk = m_core->pc + 1;
-				m_core->pcstk = m_core->daddr;
+				//PUSH_PC(m_core->pc+1);
+				PUSH_PC(m_core->daddr);
 				CHANGE_PC(PM_REG_I(pmi) + PM_REG_M(pmm));
 			}
 		}
@@ -2025,17 +1956,16 @@ void adsp21062_device::sharcop_relative_call_compute()
 	{
 		if (IF_CONDITION_CODE(cond))
 		{
-			PUSH_PC();
 			if (j)
 			{
-				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
-				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
+				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 			else
 			{
-				//m_core->pcstk = m_core->pc + 1;
-				m_core->pcstk = m_core->daddr;
+				//PUSH_PC(m_core->pc+1);
+				PUSH_PC(m_core->daddr);
 				CHANGE_PC(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 		}
@@ -2052,17 +1982,16 @@ void adsp21062_device::sharcop_relative_call_compute()
 			if (compute)
 				COMPUTE(compute);
 
-			PUSH_PC();
 			if (j)
 			{
-				//m_core->pcstk = m_core->pc + 3;     /* 1 instruction + 2 delayed instructions */
-				m_core->pcstk = m_core->nfaddr;     /* 1 instruction + 2 delayed instructions */
+				//PUSH_PC(m_core->pc+3);  /* 1 instruction + 2 delayed instructions */
+				PUSH_PC(m_core->nfaddr);    /* 1 instruction + 2 delayed instructions */
 				CHANGE_PC_DELAYED(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 			else
 			{
-				//m_core->pcstk = m_core->pc + 1;
-				m_core->pcstk = m_core->daddr;
+				//PUSH_PC(m_core->pc+1);
+				PUSH_PC(m_core->daddr);
 				CHANGE_PC(m_core->pc + op_get_reladdr(m_core->opcode));
 			}
 		}
@@ -2268,12 +2197,11 @@ void adsp21062_device::sharcop_do_until_counter_imm()
 		type = 3;
 
 	m_core->lcntr = data;
-	PUSH_PC();
-	PUSH_LOOP();
-	m_core->pcstk = m_core->pc + 1;
-	m_core->laddr.addr = address;
-	m_core->laddr.code = cond;
-	m_core->laddr.loop_type = type;
+	if (m_core->lcntr > 0)
+	{
+		PUSH_PC(m_core->pc+1);
+		PUSH_LOOP(address, cond, type, m_core->lcntr);
+	}
 }
 
 /*****************************************************************************/
@@ -2297,12 +2225,11 @@ void adsp21062_device::sharcop_do_until_counter_ureg()
 		type = 3;
 
 	m_core->lcntr = GET_UREG(ureg);
-	PUSH_PC();
-	PUSH_LOOP();
-	m_core->pcstk = m_core->pc + 1;
-	m_core->laddr.addr = address;
-	m_core->laddr.code = cond;
-	m_core->laddr.loop_type = type;
+	if (m_core->lcntr > 0)
+	{
+		PUSH_PC(m_core->pc+1);
+		PUSH_LOOP(address, cond, type, m_core->lcntr);
+	}
 }
 
 /*****************************************************************************/
@@ -2315,12 +2242,8 @@ void adsp21062_device::sharcop_do_until()
 	int const offset = util::sext(m_core->opcode & 0xffffff, 24);
 	uint32_t const address = (m_core->pc + offset);
 
-	PUSH_PC();
-	PUSH_LOOP();
-	m_core->pcstk = m_core->pc + 1;
-	m_core->laddr.addr = address;
-	m_core->laddr.code = cond;
-	m_core->laddr.loop_type = 0;
+	PUSH_PC(m_core->pc+1);
+	PUSH_LOOP(address, cond, 0, 0);
 }
 
 /*****************************************************************************/
@@ -2548,11 +2471,11 @@ void adsp21062_device::sharcop_push_pop_stacks()
 {
 	if (m_core->opcode & 0x008000000000U)
 	{
-		PUSH_LOOP();
+		fatalerror("sharcop_push_pop_stacks: push loop not implemented\n");
 	}
 	if (m_core->opcode & 0x004000000000U)
 	{
-		POP_LOOP();
+		fatalerror("sharcop_push_pop_stacks: pop loop not implemented\n");
 	}
 	if (m_core->opcode & 0x002000000000U)
 	{
@@ -2566,7 +2489,7 @@ void adsp21062_device::sharcop_push_pop_stacks()
 	}
 	if (m_core->opcode & 0x000800000000U)
 	{
-		PUSH_PC();
+		PUSH_PC(m_core->pcstk);
 	}
 	if (m_core->opcode & 0x000400000000U)
 	{

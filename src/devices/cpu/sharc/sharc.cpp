@@ -631,9 +631,15 @@ void adsp21062_device::device_start()
 	}
 	m_core->mrf = 0;
 	m_core->mrb = 0;
-	std::fill(std::begin(m_core->pcstack), std::end(m_core->pcstack), 0);
-	std::fill(std::begin(m_core->lcstack), std::end(m_core->lcstack), 0);
-	std::fill(std::begin(m_core->lastack), std::end(m_core->lastack), 0);
+	for (auto & elem : m_core->pcstack)
+	{
+		elem = 0;
+	}
+	for (int i=0; i < 6; i++)
+	{
+		m_core->lcstack[i] = 0;
+		m_core->lastack[i] = 0;
+	}
 	m_core->pcstk = 0;
 	m_core->laddr.addr = m_core->laddr.code = m_core->laddr.loop_type = 0;
 	m_core->curlcntr = 0;
@@ -709,7 +715,13 @@ void adsp21062_device::device_start()
 
 	save_item(NAME(m_core->faddr));
 	save_item(NAME(m_core->daddr));
+	save_item(NAME(m_core->pcstk));
 	save_item(NAME(m_core->pcstkp));
+	save_item(NAME(m_core->laddr.addr));
+	save_item(NAME(m_core->laddr.code));
+	save_item(NAME(m_core->laddr.loop_type));
+	save_item(NAME(m_core->curlcntr));
+	save_item(NAME(m_core->lcntr));
 	save_item(NAME(m_core->iop_write_num));
 	save_item(NAME(m_core->iop_data));
 
@@ -801,10 +813,10 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->astat_old_old));
 	save_item(NAME(m_core->astat_old_old_old));
 
-	state_add( SHARC_PC,     "PC", m_core->pc).mask(0x00ffffff).formatstr("%06X");
-	state_add( SHARC_PCSTK,  "PCSTK", m_core->pcstk).mask(0x00ffffff).formatstr("%06X");
-	state_add( SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).mask(0x1f).formatstr("%02X");
-	state_add( SHARC_LSTKP,  "LSTKP", m_core->lstkp).mask(0x07).formatstr("%01X");
+	state_add( SHARC_PC,     "PC", m_core->pc).formatstr("%08X");
+	state_add( SHARC_PCSTK,  "PCSTK", m_core->pcstk).formatstr("%08X");
+	state_add( SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).formatstr("%08X");
+	state_add( SHARC_LSTKP,  "LSTKP", m_core->lstkp).formatstr("%08X");
 	state_add( SHARC_FADDR,  "FADDR", m_core->faddr).formatstr("%08X");
 	state_add( SHARC_DADDR,  "DADDR", m_core->daddr).formatstr("%08X");
 	state_add( SHARC_MODE1,  "MODE1", m_core->mode1).formatstr("%08X");
@@ -955,35 +967,18 @@ void adsp21062_device::device_reset()
 	m_core->nfaddr = m_core->faddr+1;
 
 	m_core->idle = 0;
-	m_core->mode1 = 0x00000000;
-	m_core->mode2 &= 0xf0000000;
-	m_core->astat &= FLG0 | FLG1 | FLG2 | FLG3;
-	m_core->stky = PCEM | SSEM | LSEM;
-	m_core->irptl = 0x0000;
-	m_core->imask = 0x0003;
-	m_core->ustat1 = 0x0000;
-	m_core->ustat2 = 0x0000;
+	m_core->stky = 0x5400000;
 
-	m_core->pcstkp = 0;
 	m_core->lstkp = 0;
-	m_core->pcstk = 0x00ffffff;
-	m_core->curlcntr = 0xffffffff;
-	m_core->lcntr = m_core->lcstack[0];
-	m_core->laddr.addr = 0x00ffffff;
-	m_core->laddr.code = 0x1f;
-	m_core->laddr.loop_type = 0x3;
-	m_core->status_stkp = 0;
+	m_core->pcstkp = 0;
 	m_core->interrupt_active = 0;
 
-	m_core->syscon = 0x00000010;
-	m_core->sysstat &= 0x00000ff0;
+	m_core->syscon = 0x10;
 	m_core->iop_write_num = 0;
 	m_core->iop_data = 0;
 
 	if (m_enable_drc)
 	{
-		m_core->astat_drc.clear();
-
 		m_core->cache_dirty = 1;
 		m_drcuml->reset();
 	}
@@ -992,18 +987,6 @@ void adsp21062_device::device_reset()
 void adsp21062_device::device_pre_save()
 {
 	cpu_device::device_pre_save();
-
-	if ((m_core->pcstkp > 0) && (m_core->pcstkp < 31))
-		m_core->pcstack[m_core->pcstkp - 1] = m_core->pcstk;
-
-	if ((m_core->lstkp > 0) && (m_core->lstkp < 7))
-	{
-		m_core->lcstack[m_core->lstkp - 1] = m_core->curlcntr;
-		m_core->lastack[m_core->lstkp - 1] = (m_core->laddr.loop_type << 30) | (m_core->laddr.code << 24) | m_core->laddr.addr;
-	}
-
-	if (m_core->lstkp < 6)
-		m_core->lcstack[m_core->lstkp] = m_core->lcntr;
 
 	if (m_enable_drc)
 	{
@@ -1016,52 +999,6 @@ void adsp21062_device::device_pre_save()
 void adsp21062_device::device_post_load()
 {
 	cpu_device::device_post_load();
-
-	for (auto &pcstk : m_core->pcstack)
-		pcstk &= 0x00ffffff;
-
-	m_core->pcstkp &= 0x1f;
-	m_core->lstkp &= 0x07;
-
-	if ((m_core->pcstkp > 0) && (m_core->pcstkp < 31))
-		m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
-	else
-		m_core->pcstk = 0x00ffffff;
-
-	if ((m_core->lstkp > 0) && (m_core->lstkp < 7))
-	{
-		m_core->curlcntr = m_core->lcstack[m_core->lstkp - 1];
-		m_core->laddr.addr = BIT(m_core->lastack[m_core->lstkp - 1], 0, 24);
-		m_core->laddr.code = BIT(m_core->lastack[m_core->lstkp - 1], 24, 5);
-		m_core->laddr.loop_type = BIT(m_core->lastack[m_core->lstkp - 1], 30, 2);
-	}
-	else
-	{
-		m_core->curlcntr = 0xffffffff;
-		m_core->laddr.addr = 0x00ffffff;
-		m_core->laddr.code = 0x1f;
-		m_core->laddr.loop_type = 0x3;
-	}
-
-	if (m_core->lstkp < 6)
-		m_core->lcntr = m_core->lcstack[m_core->lstkp];
-	else
-		m_core->lcntr = 0xffffffff;
-
-	if (m_core->pcstkp > 0)
-		m_core->stky &= ~PCEM;
-	else
-		m_core->stky |= PCEM;
-
-	if (m_core->pcstkp >= 30)
-		m_core->stky |= PCFL;
-	else
-		m_core->stky &= ~PCFL;
-
-	if (m_core->lstkp > 0)
-		m_core->stky &= ~LSEM;
-	else
-		m_core->stky |= LSEM;
 
 	m_core->astat_drc.unpack(m_core->astat);
 	m_core->astat_drc_copy.unpack(m_core->astat_old);
@@ -1119,27 +1056,35 @@ void adsp21062_device::write_stall(int state)
 
 void adsp21062_device::check_interrupts()
 {
+	int i;
 	if ((m_core->imask & m_core->irq_pending) && (m_core->mode1 & MODE1_IRPTEN) && !m_core->interrupt_active &&
 		m_core->pc != m_core->delay_slot1 && m_core->pc != m_core->delay_slot2)
 	{
 		int which = 0;
-		for (int i = 0; i < 32; i++)
+		for (i=0; i < 32; i++)
 		{
-			if (BIT(m_core->irq_pending, i))
+			if (m_core->irq_pending & (1 << i))
+			{
 				break;
+			}
 			which++;
 		}
 
-		PUSH_PC();
 		if (m_core->idle)
-			m_core->pcstk = m_core->pc + 1;
+		{
+			PUSH_PC(m_core->pc+1);
+		}
 		else
-			m_core->pcstk = m_core->daddr;
+		{
+			PUSH_PC(m_core->daddr);
+		}
 
 		m_core->irptl |= 1 << which;
 
 		if (which >= 6 && which <= 8)
+		{
 			PUSH_STATUS_STACK();
+		}
 
 		CHANGE_PC(0x20000 + (which * 0x4));
 
@@ -1209,18 +1154,23 @@ void adsp21062_device::execute_run()
 			m_core->opcode = m_program.read_qword(m_core->pc);
 
 			// handle looping
-			if (!(m_core->stky & LSEM) && (m_core->pc == m_core->laddr.addr))
+			if (m_core->pc == m_core->laddr.addr)
 			{
 				switch (m_core->laddr.loop_type)
 				{
 				case 0:     // arithmetic condition-based
 				{
-					if ((m_core->pc - TOP_PC()) > 2)
+					int condition = m_core->laddr.code;
+
 					{
-						m_core->astat = m_core->astat_old_old_old;
+						uint32_t looptop = TOP_PC();
+						if (m_core->pc - looptop > 2)
+						{
+							m_core->astat = m_core->astat_old_old_old;
+						}
 					}
 
-					if (DO_CONDITION_CODE(m_core->laddr.code))
+					if (DO_CONDITION_CODE(condition))
 					{
 						POP_LOOP();
 						POP_PC();
@@ -1245,6 +1195,7 @@ void adsp21062_device::execute_run()
 				}
 				case 3:     // counter-based, length >2
 				{
+					--m_core->lcstack[m_core->lstkp];
 					--m_core->curlcntr;
 					if (m_core->curlcntr == 0)
 					{
