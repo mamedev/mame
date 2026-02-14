@@ -95,6 +95,7 @@ private:
 	void program_4109_map(address_map &map) ATTR_COLD;
 	void io_4040_map(address_map &map) ATTR_COLD;
 	void io_4087_map(address_map &map) ATTR_COLD;
+	void io_4109_map(address_map &map) ATTR_COLD;
 
 	// I8256 ports
 	uint8_t lw_r(); //P1.0-P1.3
@@ -172,6 +173,21 @@ void stella8085_state::io_4087_map(address_map &map)
 {
 	// ICF5 74LS42
 	map(0x00, 0x4f).noprw();
+	map(0x50, 0x51).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write)).mirror(0x0e);
+	map(0x60, 0x6f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
+	// 7x handled by ICH5 74LS138
+	map(0x70, 0x70).rw(FUNC(stella8085_state::io70r),FUNC(stella8085_state::io70w)).mirror(0x0c);
+	map(0x71, 0x71).rw(FUNC(stella8085_state::io71r),FUNC(stella8085_state::io71w)).mirror(0x0c);
+	map(0x72, 0x72).w(FUNC(stella8085_state::sounddev)).mirror(0x0c);
+	map(0x73, 0x73).nopw();
+	map(0x80, 0x8f).noprw(); //Y8 ICC5 empty socket
+}
+
+void stella8085_state::io_4109_map(address_map &map)
+{
+	// ICF5 74LS42
+	map(0x00, 0x0f).rw("rtc", FUNC(rtc62421_device::read), FUNC(rtc62421_device::write));
+	map(0x10, 0x4f).noprw();
 	map(0x50, 0x51).rw(m_kdc, FUNC(i8279_device::read), FUNC(i8279_device::write)).mirror(0x0e);
 	map(0x60, 0x6f).rw(m_uart, FUNC(i8256_device::read), FUNC(i8256_device::write));
 	// 7x handled by ICH5 74LS138
@@ -626,9 +642,9 @@ void stella8085_state::board4109(machine_config &config)
 {
 	boards_common(config, 10.240_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4109_map);
-	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4087_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4109_map);
 
-	MC146818(config, "rtc", 32.768_kHz_XTAL);
+	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 }
 
 void stella8085_state::board4382(machine_config &config)
