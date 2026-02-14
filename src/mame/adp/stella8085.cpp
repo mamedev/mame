@@ -63,9 +63,10 @@ public:
 		m_beep(*this, "beeper")
 	{ }
 
-	void dicemstr(machine_config &config);
 	void board4040(machine_config &config);
 	void board4087(machine_config &config);
+	void board4109(machine_config &config);
+	void dicemstr(machine_config &config);
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -566,22 +567,32 @@ static INPUT_PORTS_START( disc )
 	PORT_INCLUDE(stella8085_tatatur)
 INPUT_PORTS_END
 
-void stella8085_state::dicemstr(machine_config &config)
+void stella8085_state::board4040(machine_config &config)
 {
-	I8085A(config, m_maincpu, 10.240_MHz_XTAL / 2); // divider not verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4109_map);
-	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4087_map);
+	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4040_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
 	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
 	m_maincpu->in_sid_func().set_constant(0);	// connected through opamp to battery voltage
 
-	I8256(config, m_uart, 10.240_MHz_XTAL / 2); // divider not verified
+	i8255_device &ppi(I8255(config, "ppi"));
+	ppi.out_pa_callback().set(FUNC(stella8085_state::io70w));
+	ppi.in_pb_callback().set(FUNC(stella8085_state::io70r));
+	ppi.out_pc_callback().set(FUNC(stella8085_state::sounddev));
+	ppi.tri_pc_callback().set_constant(0);
+
+	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
+	m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
+	m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
+	m_uart->in_p2_callback().set(FUNC(stella8085_state::machine_r));
+	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w)); //M1-4
 	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
 
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
 
-	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
+	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
 	m_kdc->out_bd_callback().set(FUNC(stella8085_state::kbd_bd_w));
 	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
@@ -589,8 +600,6 @@ void stella8085_state::dicemstr(machine_config &config)
 	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
 
 	config.set_default_layout(layout_adpservice);
-
-	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 0)
@@ -632,19 +641,13 @@ void stella8085_state::board4087(machine_config &config)
 		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void stella8085_state::board4040(machine_config &config)
+void stella8085_state::board4109(machine_config &config)
 {
 	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4040_map);
-	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4109_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4087_map);
 	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
 	m_maincpu->in_sid_func().set_constant(0);	// connected through opamp to battery voltage
-
-	i8255_device &ppi(I8255(config, "ppi"));
-	ppi.out_pa_callback().set(FUNC(stella8085_state::io70w));
-	ppi.in_pb_callback().set(FUNC(stella8085_state::io70r));
-	ppi.out_pc_callback().set(FUNC(stella8085_state::sounddev));
-	ppi.tri_pc_callback().set_constant(0);
 
 	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
@@ -665,6 +668,39 @@ void stella8085_state::board4040(machine_config &config)
 	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
 
 	config.set_default_layout(layout_adpservice);
+
+	MC146818(config, "rtc", 32.768_kHz_XTAL);
+
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 0)
+		.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void stella8085_state::dicemstr(machine_config &config)
+{
+	I8085A(config, m_maincpu, 10.240_MHz_XTAL / 2); // divider not verified
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4109_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4087_map);
+	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
+	m_maincpu->in_sid_func().set_constant(0);	// connected through opamp to battery voltage
+
+	I8256(config, m_uart, 10.240_MHz_XTAL / 2); // divider not verified
+	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
+	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
+
+	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
+	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
+	m_kdc->out_bd_callback().set(FUNC(stella8085_state::kbd_bd_w));
+	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
+	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
+	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
+
+	config.set_default_layout(layout_adpservice);
+
+	RTC62421(config, "rtc", 32.768_kHz_XTAL);
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, "beeper", 0)
@@ -963,14 +999,14 @@ GAMEL( 1987, herzas,     herzasf1, board4087, dicemstr, stella8085_state, empty_
 GAMEL( 1987, herzasf8,   herzasf1, board4087, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F8)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1987, herzasf1,          0, board4087, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F10)",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1987, kniffi,            0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, rasant,            0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Venus",  "Rasant",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, rasant,            0, board4109, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Rasant",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1987, sesam,             0, board4087, disc,     stella8085_state, empty_init, ROT0, "Merkur", "Sesam",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1987, sprmlti,    sprmltib, board4087, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1987, sprmltib,          0, board4087, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi (DOB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1988, extrbltt,          0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1988, juwel,             0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Juwel",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1988, mastro,            0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Merkur Astro",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1988, sherzas,           0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Super Herz AS",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, sherzas,           0, board4109, dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Super Herz AS",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 GAMEL( 1989, disc3000,          0, board4087, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1989, discryl,    discrylb, board4087, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Royal",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
 GAMEL( 1989, discrylb,          0, board4087, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Royal (DOB)",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
