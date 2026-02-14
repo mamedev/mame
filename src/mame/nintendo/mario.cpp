@@ -26,8 +26,9 @@ darker, for some reason they removed the blue text shadowing, and Mario's
 overall was changed from blue to black. The 1st half of the color PROM is
 unchanged (in other words, it looks the same with the default monitor).
 
-Japan revision C is from around the same time as US revision E. marioja is
-a very early version.
+Japan revision C is from around the same time as US revision E. The marioja
+set is a very early version, eg. it has a different demonstration screen, and
+Mario continues running when letting go of the joystick.
 
 The sound MCU can be easily replaced with a ROMless one such as I8039
 (or just force EA high), by doing a 1-byte patch to the external ROM:
@@ -72,7 +73,7 @@ read:
  *
 *
  * IN1 (bits NOT inverted)
- * bit 7 : ?
+ * bit 7 : ? SL 2
  * bit 6 : COIN 2
  * bit 5 : COIN 1
  * bit 4 : JUMP player 2
@@ -688,7 +689,7 @@ static INPUT_PORTS_START( mario )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:!1,!2")
