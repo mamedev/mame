@@ -88,6 +88,8 @@ private:
 	required_device<beep_device> m_beep;
 	emu_timer *m_sound_timer;
 
+	void boards_common(machine_config &config, XTAL clock);
+
 	void program_4040_map(address_map &map) ATTR_COLD;
 	void program_4087_map(address_map &map) ATTR_COLD;
 	void program_4109_map(address_map &map) ATTR_COLD;
@@ -567,144 +569,71 @@ static INPUT_PORTS_START( disc )
 	PORT_INCLUDE(stella8085_tatatur)
 INPUT_PORTS_END
 
-void stella8085_state::board4040(machine_config &config)
+void stella8085_state::boards_common(machine_config &config, XTAL clock)
 {
-	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4040_map);
-	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
+	I8085A(config, m_maincpu, clock);
 	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
 	m_maincpu->in_sid_func().set_constant(0);	// connected through opamp to battery voltage
+
+	I8256(config, m_uart, clock / 2);
+	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
+	m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
+	m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
+	m_uart->in_p2_callback().set(FUNC(stella8085_state::machine_r));
+	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w)); //M1-4
+	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
+
+	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
+	rs232.rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
+
+	I8279(config, m_kdc, clock / 2);
+	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
+	m_kdc->out_bd_callback().set(FUNC(stella8085_state::kbd_bd_w));
+	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
+	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
+	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
+
+	config.set_default_layout(layout_adpservice);
+
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, "beeper", 0)
+		.add_route(ALL_OUTPUTS, "mono", 0.50);
+}
+
+void stella8085_state::board4040(machine_config &config)
+{
+	boards_common(config, 6.144_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4040_map);
+	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4040_map);
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(stella8085_state::io70w));
 	ppi.in_pb_callback().set(FUNC(stella8085_state::io70r));
 	ppi.out_pc_callback().set(FUNC(stella8085_state::sounddev));
 	ppi.tri_pc_callback().set_constant(0);
-
-	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
-	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
-	m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
-	m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
-	m_uart->in_p2_callback().set(FUNC(stella8085_state::machine_r));
-	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w)); //M1-4
-	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
-
-	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
-	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
-	m_kdc->out_bd_callback().set(FUNC(stella8085_state::kbd_bd_w));
-	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
-	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
-	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
-
-	config.set_default_layout(layout_adpservice);
-
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0)
-		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void stella8085_state::board4087(machine_config &config)
 {
-	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	boards_common(config, 6.144_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4087_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4087_map);
-	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
-	m_maincpu->in_sid_func().set_constant(0);	// connected through opamp to battery voltage
-
-	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
-	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
-	m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
-	m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
-	m_uart->in_p2_callback().set(FUNC(stella8085_state::machine_r));
-	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w)); //M1-4
-	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
-
-	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
-	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
-	m_kdc->out_bd_callback().set(FUNC(stella8085_state::kbd_bd_w));
-	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
-	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
-	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
-
-	config.set_default_layout(layout_adpservice);
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
-
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0)
-		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void stella8085_state::board4109(machine_config &config)
 {
-	I8085A(config, m_maincpu, 10.240_MHz_XTAL);
+	boards_common(config, 10.240_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4109_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4087_map);
-	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
-	m_maincpu->in_sid_func().set_constant(0);	// connected through opamp to battery voltage
-
-	I8256(config, m_uart, 10.240_MHz_XTAL / 2);
-	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
-	m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
-	m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
-	m_uart->in_p2_callback().set(FUNC(stella8085_state::machine_r));
-	m_uart->out_p2_callback().set(FUNC(stella8085_state::machine1_w)); //M1-4
-	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
-
-	I8279(config, m_kdc, 10.240_MHz_XTAL / 2);
-	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
-	m_kdc->out_bd_callback().set(FUNC(stella8085_state::kbd_bd_w));
-	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
-	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
-	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
-
-	config.set_default_layout(layout_adpservice);
 
 	MC146818(config, "rtc", 32.768_kHz_XTAL);
-
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0)
-		.add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void stella8085_state::board4382(machine_config &config)
 {
-	I8085A(config, m_maincpu, 10.240_MHz_XTAL / 2); // divider not verified
-	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4109_map);
-	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4087_map);
-	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
-	m_maincpu->in_sid_func().set_constant(0);	// connected through opamp to battery voltage
-
-	I8256(config, m_uart, 10.240_MHz_XTAL / 2); // divider not verified
-	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
-	m_uart->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
-
-	I8279(config, m_kdc, 10.240_MHz_XTAL / 4); // divider not verified
-	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
-	m_kdc->out_bd_callback().set(FUNC(stella8085_state::kbd_bd_w));
-	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
-	m_kdc->in_rl_callback().set(FUNC(stella8085_state::kbd_rl_r));
-	m_kdc->out_irq_callback().set(FUNC(stella8085_state::rst65_w));
-
-	config.set_default_layout(layout_adpservice);
-
-	RTC62421(config, "rtc", 32.768_kHz_XTAL);
-
-	SPEAKER(config, "mono").front_center();
-	BEEP(config, "beeper", 0)
-		.add_route(ALL_OUTPUTS, "mono", 0.50);
+	board4109(config);
 }
 
 ROM_START( bahia )
