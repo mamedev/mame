@@ -31694,16 +31694,6 @@ ppchampa
 @source:misc/gsspade.cpp
 gsspade
 
-@source:misc/gumbo.cpp
-dblpoint
-dblpointd
-gumbo
-msbingo
-mspuzzle
-mspuzzlea
-mspuzzleb
-mspuzzleg
-
 @source:misc/gunpey.cpp
 gunpey
 
@@ -32131,6 +32121,16 @@ mil4000a
 mil4000b
 mil4000c
 top21
+
+@source:misc/mincorp.cpp
+dblpoint
+dblpointd
+gumbo
+msbingo
+mspuzzle
+mspuzzlea
+mspuzzleb
+mspuzzleg
 
 @source:misc/mindset.cpp
 mindset
