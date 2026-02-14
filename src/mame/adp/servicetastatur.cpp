@@ -149,6 +149,7 @@ void servicet_state::servicet_data(address_map &map)
 	map(0x0072, 0x0072).w(m_lcd, FUNC(hd44780_device::data_w));
 	map(0x0073, 0x0073).r(m_lcd, FUNC(hd44780_device::data_r));
 	map(0x4000, 0x4000).nopw();
+	map(0x8000, 0x8001).nopw();
 }
 
 static INPUT_PORTS_START( servicet )
