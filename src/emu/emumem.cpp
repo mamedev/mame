@@ -53,6 +53,19 @@ void handler_entry::dump_map(std::vector<memory_entry> &map) const
 	fatalerror("dump_map called on non-dispatching class\n");
 }
 
+bool handler_entry::is_handler_in_map(std::vector<memory_entry> &map, offs_t begin, offs_t end, handler_entry *handler) const
+{
+	auto it = std::find_if(map.begin(), map.end(), [handler,begin,end](const memory_entry& e) {
+		return (e.entry == handler) && (e.start == begin) && (e.end == end);
+	} );
+
+	if(it == map.end()) {
+		return false;
+	}
+
+	return true;
+}
+
 void handler_entry::select_a(int slot)
 {
 	fatalerror("select_a called on non-view\n");
@@ -328,7 +341,7 @@ memory_region *memory_manager::region_alloc(std::string name, u32 length, u8 wid
 		fatalerror("region_alloc called with duplicate region name \"%s\"\n", name);
 
 	// allocate the region
-	return m_regionlist.emplace(name, std::make_unique<memory_region>(machine(), name, length, width, endian)).first->second.get();
+	return m_regionlist.emplace(name, std::make_unique<memory_region>(name, length, width, endian)).first->second.get();
 }
 
 
@@ -600,7 +613,7 @@ void address_space_installer::check_optimize_all(const char *function, int width
 				}
 		}
 
-		// 4. Ajusting the mirror
+		// 4. Adjusting the mirror
 		nmirror &= ~default_lowbits_mask;
 
 		// 5. Recompute changing_bits, it matters for the next optimization.  No need to round up through
@@ -1084,15 +1097,18 @@ void memory_bank::configure_entries(int startentry, int numentries, void *base, 
 //  memory_region - constructor
 //-------------------------------------------------
 
-memory_region::memory_region(running_machine &machine, std::string name, u32 length, u8 width, endianness_t endian)
-	: m_machine(machine),
-		m_name(std::move(name)),
-		m_buffer(length),
-		m_endianness(endian),
-		m_bitwidth(width * 8),
-		m_bytewidth(width)
+memory_region::memory_region(std::string name, u32 length, u8 width, endianness_t endian) :
+	m_name(std::move(name)),
+	m_buffer(length ? std::malloc(length) : nullptr),
+	m_length(length),
+	m_endianness(endian),
+	m_bitwidth(width * 8),
+	m_bytewidth(width)
 {
-	assert(width == 1 || width == 2 || width == 4 || width == 8);
+	assert((width == 1) || (width == 2) || (width == 4) || (width == 8));
+	assert(!(length % width));
+	if (length && !m_buffer)
+		throw std::bad_alloc();
 }
 
 std::string memory_share::compare(u8 width, size_t bytes, endianness_t endianness) const

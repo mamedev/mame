@@ -105,7 +105,7 @@ void cexpert_state::mux_w(u8 data)
 
 void cexpert_state::control_w(u8 data)
 {
-	// d0-d2: clock?
+	// d0-d2: clock
 
 	// d3: enable beeper
 	m_beeper->set_state(BIT(data, 3));

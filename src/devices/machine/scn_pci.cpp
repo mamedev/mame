@@ -1207,23 +1207,22 @@ void scn_pci_device::write_mode(u8 data)
 				logerror("%s: Invalid synchronous mode configured\n", machine().describe_context());
 		}
 
-		m_mode[0] = data;
-
-		// Write MR2 after MR1
-		m_mode_pointer = 1;
+		// Old value of MR1 is transferred to MR2 (undocumented but verified on HW)
+		std::swap(m_mode[0], data);
 	}
-	else
+
+	if (!m_is_enhanced)
 	{
-		assert(m_mode_pointer == 1);
+		if (data >= 0x50 && m_mode_pointer == 1)
+			logerror("Warning: incompatible EPCI TxC/RxC mode selected (MR2 = %02X)\n", data);
 
-		if (!m_is_enhanced)
-		{
-			if (data >= 0x50)
-				logerror("Warning: incompatible EPCI TxC/RxC mode selected (MR2 = %02X)\n", data);
-			data &= 0x3f;
-		}
+		// TBD: Are MR27 and MR26 really always zero on SCN2651?
+		data &= 0x3f;
+	}
 
-		if (m_mode[1] != data)
+	if (m_mode[1] != data)
+	{
+		if (m_mode_pointer == 1 && !machine().side_effects_disabled())
 		{
 			bool sync_mode = (m_mode[0] & 0x03) == 0;
 			double baud_rate = clocks_to_attotime(m_br_div[data & 0x0f] * (sync_mode ? 1 : 16)).as_hz();
@@ -1240,10 +1239,6 @@ void scn_pci_device::write_mode(u8 data)
 									BIT(data, 5) ? "Internal TxC/" : "External TxC, internal ",
 									baud_rate,
 									BIT(data, 7) ? "BKDET" : BIT(data, 6) ? "16X" : "1X");
-
-				// BKDET output
-				if (BIT(data, 7))
-					m_rxc_callback(m_rcvr_state == rcvr_state::BREAK_DETECT ? 1 : 0);
 			}
 			else if (BIT(data, 5))
 			{
@@ -1253,21 +1248,25 @@ void scn_pci_device::write_mode(u8 data)
 			}
 			else
 				LOGMASKED(LOG_INIT, "External TxC, external RxC (may be indepedent)\n");
-
-			if ((data & 0x30) == 0)
-				m_brg_timer->enable(false);
-			else
-			{
-				attotime brg_period = clocks_to_attotime(m_br_div[data & 0x0f]);
-				m_brg_timer->adjust(brg_period / 2, 0, brg_period / 2);
-			}
 		}
 
-		m_mode[1] = data;
+		// BKDET output
+		if ((data & 0x90) == 0x90)
+			m_rxc_callback(m_rcvr_state == rcvr_state::BREAK_DETECT ? 1 : 0);
 
-		// Write MR1 after MR2
-		m_mode_pointer = 0;
+		if ((data & 0x30) == 0)
+			m_brg_timer->enable(false);
+		else
+		{
+			attotime brg_period = clocks_to_attotime(m_br_div[data & 0x0f]);
+			m_brg_timer->adjust(brg_period / 2, 0, brg_period / 2);
+		}
 	}
+
+	m_mode[1] = data;
+
+	if (!machine().side_effects_disabled())
+		m_mode_pointer = (m_mode_pointer == 0) ? 1 : 0;
 }
 
 //**************************************************************************

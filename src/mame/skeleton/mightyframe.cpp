@@ -47,7 +47,7 @@ void mightyframe_state::mightyframe(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &mightyframe_state::mem_map);
 }
 
-ROM_START( mightyframe )
+ROM_START( mightfrm )
 	ROM_REGION( 0x8000, "maincpu", 0 )
 	ROM_LOAD( "72-01231.26c", 0x0000, 0x8000, CRC(41faf884) SHA1(d0c6f35394b4006bbe9a3f81b658ded37f41d86f) )
 ROM_END
@@ -55,4 +55,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1985?, mightyframe, 0, 0, mightyframe, mightyframe, mightyframe_state, empty_init, "Convergent Technologies", "Mightyframe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1985?, mightfrm, 0, 0, mightyframe, mightyframe, mightyframe_state, empty_init, "Convergent Technologies", "Mightyframe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

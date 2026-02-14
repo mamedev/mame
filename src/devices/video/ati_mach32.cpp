@@ -35,7 +35,9 @@ mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, const ch
 }
 
 mach32_8514a_device::mach32_8514a_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: mach8_device(mconfig, type, tag, owner, clock), m_chip_ID(0), m_membounds(0)
+	: mach8_device(mconfig, type, tag, owner, clock)
+	, m_chip_ID(0)
+	, m_membounds(0)
 {
 }
 
@@ -47,14 +49,15 @@ mach32_device::mach32_device(const machine_config &mconfig, const char *tag, dev
 }
 
 mach32_device::mach32_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: ati_vga_device(mconfig, type, tag, owner, clock), m_8514a(*this,"8514a"), m_cursor_enable(false)
+	: ati_vga_device(mconfig, type, tag, owner, clock)
+	, m_8514a(*this, "8514a")
+	, m_cursor_enable(false)
 {
 }
 
 void mach32_device::device_add_mconfig(machine_config &config)
 {
 	ATIMACH32_8514A(config, "8514a", 0).set_vga(DEVICE_SELF);
-	EEPROM_93C56_16BIT(config, "ati_eeprom");
 }
 
 void mach32_8514a_device::device_start()
@@ -104,6 +107,9 @@ void mach32_8514a_device::mach32_ge_ext_config_w(offs_t offset, uint16_t data, u
 	if(offset == 1)
 	{
 		COMBINE_DATA(&mach8.ge_ext_config);
+
+		if ((data & 0x0030) != (mach8.ge_ext_config & 0x0030))
+			display_mode_change = true;
 		if(data & 0x0800)
 			display_mode_change = true;
 		if(!(data & 0x8000) && (!(data & 0x0800)))
@@ -134,18 +140,20 @@ void mach32_device::device_reset()
 	ati_vga_device::device_reset();
 }
 
+// TODO: has issues in SDD 15bpp tests and onward, MACH64 doesn't work at all
 void mach32_device::ati_define_video_mode()
 {
 	uint16_t config = m_8514a->get_ext_config();
 
-	if(ati.ext_reg[0x30] & 0x20)
+	ati_vga_device::ati_define_video_mode();
+
+	// SDD disagrees with this
+	//if(ati.ext_reg[0x30] & 0x20)
 	{
+		// TODO: use devcb instead of this goofy handling
 		if(m_8514a->has_display_mode_changed())
 		{
-			svga.rgb8_en = 0;
-			svga.rgb15_en = 0;
-			svga.rgb16_en = 0;
-			svga.rgb32_en = 0;
+			svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = svga.rgb32_en = 0;
 
 			switch(config & 0x0030)  // pixel depth
 			{
@@ -155,19 +163,32 @@ void mach32_device::ati_define_video_mode()
 					svga.rgb8_en = 1;
 					break;
 				case 0x0020:
-					svga.rgb15_en = 1;
+				{
+					switch(config & 0xc0)
+					{
+						case 0x00: svga.rgb15_en = 1; break;
+						case 0x40: svga.rgb16_en = 1; break;
+						default:
+							// TODO: should be possible to tell depending how it's used
+							popmessage("ati_mach32.cpp: unemulated pixel mode 664RGB/655RGB");
+							break;
+					}
 					break;
+				}
 				case 0x0030:
-					svga.rgb32_en = 1;
+					if (BIT(config, 9))
+						svga.rgb32_en = 1;
+					else
+						svga.rgb24_en = 1;
 					break;
 			}
 		}
 	}
-	else
-	{
-		ati_vga_device::ati_define_video_mode();
-		return;
-	}
+	//else
+	//{
+	//	ati_vga_device::ati_define_video_mode();
+	//	return;
+	//}
 
 	set_dot_clock();
 }
@@ -318,6 +339,26 @@ void mach32_device::mach32_cursor_offset_w(offs_t offset, uint16_t data, uint16_
 	}
 }
 
+void mach32_device::refresh_bank()
+{
+	const u8 ati32 = ati.ext_reg[0x32];
+	const u8 ati3e = ati.ext_reg[0x3e];
+	const u8 ati2e = ati.ext_reg[0x2e];
+	if(ati3e & 0x08)
+	{
+		svga.bank_r = ((ati32 & 0x01) << 3) | ((ati32 & 0xe0) >> 5);
+		svga.bank_r|= (ati2e & 0xc) << 2;
+		svga.bank_w = ((ati32 & 0x1e) >> 1);
+		svga.bank_w|= (ati2e & 0x3) << 4;
+	}
+	else
+	{
+		svga.bank_r = (ati32 & 0x1e) >> 1;
+		svga.bank_r|= (ati2e & 3) << 4;
+		svga.bank_w = svga.bank_r;
+	}
+}
+
 /*
  *   mach64
  */
@@ -348,7 +389,6 @@ mach64_device::mach64_device(const machine_config &mconfig, device_type type, co
 void mach64_device::device_add_mconfig(machine_config &config)
 {
 	ATIMACH64_8514A(config, "8514a", 0).set_vga(DEVICE_SELF);
-	EEPROM_93C56_16BIT(config, "ati_eeprom");
 }
 
 void mach64_8514a_device::device_start()

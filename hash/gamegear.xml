@@ -3604,7 +3604,7 @@ a certain item) -->
 	</software>
 
 	<software name="ironman1" cloneof="ironman">
-		<description>Iron Man X-O Manowar in Heavy Metal (USA, Alt)</description>
+		<description>Iron Man X-O Manowar in Heavy Metal (USA, alt)</description>
 		<year>1996</year>
 		<publisher>Acclaim Entertainment</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8759,7 +8759,7 @@ a certain item) -->
 	</software>
 
 	<software name="sheroa" cloneof="shero">
-		<description>Street Hero (USA, prototype Alt, SMS mode)</description>
+		<description>Street Hero (USA, prototype alt, SMS mode)</description>
 		<year>1993</year>
 		<publisher>Innovation Tech</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -9935,7 +9935,7 @@ a certain item) -->
 	</software>
 
 	<software name="wagyana" cloneof="wagyan">
-		<description>Wagyan Land (Japan, Alt)</description>
+		<description>Wagyan Land (Japan, alt)</description>
 		<year>1991</year>
 		<publisher>Namcot</publisher>
 		<info name="serial" value="T-14047"/>

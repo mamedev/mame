@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "ergoline.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 
 
 //**************************************************************************
@@ -27,7 +27,7 @@ void ergoline_keyboard_device::kbd_mem(address_map &map)
 	map(0x0000, 0x0fff).rom().region("firmware", 0);
 }
 
-void ergoline_keyboard_device::kbd_io(address_map &map)
+void ergoline_keyboard_device::kbd_data(address_map &map)
 {
 }
 
@@ -62,7 +62,7 @@ void ergoline_keyboard_device::device_add_mconfig(machine_config &config)
 {
 	i8031_device &maincpu(I8031(config, "maincpu", XTAL(5'529'600)));
 	maincpu.set_addrmap(AS_PROGRAM, &ergoline_keyboard_device::kbd_mem);
-	maincpu.set_addrmap(AS_IO, &ergoline_keyboard_device::kbd_io);
+	maincpu.set_addrmap(AS_DATA, &ergoline_keyboard_device::kbd_data);
 }
 
 

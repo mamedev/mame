@@ -16,7 +16,6 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
 
 /*
 Name        Board No      Maker         Game name

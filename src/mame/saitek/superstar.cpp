@@ -10,7 +10,7 @@ brand, and they added the "Kasparov" prefix to titles shortly afterwards.
 
 Hardware notes (Superstar 28K):
 - PCB label: YO1C-PE-017 REV2
-- R6502AP @ ~2MHz (no XTAL, clock from RC circuit?)
+- R6502AP @ ~1.8MHz (no XTAL, clock from RC circuit)
 - 4KB RAM (2*HM6116P-4)
 - 24KB ROM (3*M5L2764K)
 - TTL, buzzer, 28 LEDs, 8*8 chessboard buttons
@@ -37,7 +37,6 @@ and named it Turbostar 540+. The ROM is unmodified, so the internal chess
 clock would run too fast.
 
 TODO:
-- verify sstar28k CPU speed
 - do other I.C.D. Turbostar overclocked versions exist? there are references
   online for 540, 640, 740, but no evidence that they exist
 
@@ -226,10 +225,10 @@ INPUT_PORTS_END
 void star_state::sstar28k(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 2'000'000); // no XTAL
+	M6502(config, m_maincpu, 1'800'000); // no XTAL
 	m_maincpu->set_addrmap(AS_PROGRAM, &star_state::sstar28k_map);
 
-	CLOCK(config, m_nmi_clock, 2'000'000 / 0x2000); // 4020 Q13
+	CLOCK(config, m_nmi_clock, 1'800'000 / 0x2000); // 4020 Q13
 	m_nmi_clock->signal_handler().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	SENSORBOARD(config, m_board).set_type(sensorboard_device::BUTTONS);

@@ -228,16 +228,16 @@ private:
 //  palexpand - expand a palette value to 8 bits
 //-------------------------------------------------
 
-template<int _NumBits>
+template <int NumBits>
 constexpr uint8_t palexpand(uint8_t bits)
 {
-	if (_NumBits == 1) { return (bits & 1) ? 0xff : 0x00; }
-	if (_NumBits == 2) { bits &= 3; return (bits << 6) | (bits << 4) | (bits << 2) | bits; }
-	if (_NumBits == 3) { bits &= 7; return (bits << 5) | (bits << 2) | (bits >> 1); }
-	if (_NumBits == 4) { bits &= 0xf; return (bits << 4) | bits; }
-	if (_NumBits == 5) { bits &= 0x1f; return (bits << 3) | (bits >> 2); }
-	if (_NumBits == 6) { bits &= 0x3f; return (bits << 2) | (bits >> 4); }
-	if (_NumBits == 7) { bits &= 0x7f; return (bits << 1) | (bits >> 6); }
+	if (NumBits == 1) { return (bits & 0x01) ? 0xff : 0x00; }
+	if (NumBits == 2) { bits &= 0x03; return (bits << 6) | (bits << 4) | (bits << 2) | bits; }
+	if (NumBits == 3) { bits &= 0x07; return (bits << 5) | (bits << 2) | (bits >> 1); }
+	if (NumBits == 4) { bits &= 0x0f; return (bits << 4) | bits; }
+	if (NumBits == 5) { bits &= 0x1f; return (bits << 3) | (bits >> 2); }
+	if (NumBits == 6) { bits &= 0x3f; return (bits << 2) | (bits >> 4); }
+	if (NumBits == 7) { bits &= 0x7f; return (bits << 1) | (bits >> 6); }
 	return bits;
 }
 
@@ -260,16 +260,16 @@ constexpr uint8_t pal7bit(uint8_t bits) { return palexpand<7>(bits); }
 //  RGB
 //-------------------------------------------------
 
-template<int _RBits, int _GBits, int _BBits>
+template <int RBits, int GBits, int BBits>
 constexpr rgb_t rgbexpand(uint32_t data, uint8_t rshift, uint8_t gshift, uint8_t bshift)
 {
-	return rgb_t(palexpand<_RBits>(data >> rshift), palexpand<_GBits>(data >> gshift), palexpand<_BBits>(data >> bshift));
+	return rgb_t(palexpand<RBits>(data >> rshift), palexpand<GBits>(data >> gshift), palexpand<BBits>(data >> bshift));
 }
 
-template<int _ABits, int _RBits, int _GBits, int _BBits>
+template <int ABits, int RBits, int GBits, int BBits>
 constexpr rgb_t argbexpand(uint32_t data, uint8_t ashift, uint8_t rshift, uint8_t gshift, uint8_t bshift)
 {
-	return rgb_t(palexpand<_ABits>(data >> ashift), palexpand<_RBits>(data >> rshift), palexpand<_GBits>(data >> gshift), palexpand<_BBits>(data >> bshift));
+	return rgb_t(palexpand<ABits>(data >> ashift), palexpand<RBits>(data >> rshift), palexpand<GBits>(data >> gshift), palexpand<BBits>(data >> bshift));
 }
 
 

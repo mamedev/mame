@@ -3,7 +3,7 @@
 /***************************************************************************
 
     Mr. Jong
-    (c)1983 Kiwako (This game is distributed by Sanritsu.)
+    (c)1983 Kiwako
 
     Crazy Blocks
     (c)1983 Kiwako/ECI
@@ -12,6 +12,8 @@
 
     Block Buster
     (c)1983 Kiwako/ECI
+
+    Developed by Sanritsu and licensed to Kiwako and ECI.
 
 
 PCB Layout

@@ -313,7 +313,7 @@ void nes_vt42xx_state::nes_vt42xx(machine_config &config)
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_read_412d_callback().set(FUNC(nes_vt42xx_state::upper_412d_r));
 	dynamic_cast<nes_vt09_soc_device&>(*m_soc).upper_write_412c_callback().set(FUNC(nes_vt42xx_state::upper_412c_w));
 
-	m_soc->set_default_palette_mode(PAL_MODE_NEW_RGB12);
+	m_soc->set_default_palette_mode(PAL_MODE_VT0x);
 	m_soc->force_bad_dma();
 }
 
@@ -420,14 +420,24 @@ ROM_START( rfcp168 )
 	ROM_LOAD( "winbond_w29gl128c.bin", 0x00000, 0x1000000, CRC(d11caf71) SHA1(64b269cee30a51549a2d0491bbeed07751771559) ) // ROM verified on 2 units
 ROM_END
 
-ROM_START( g9_666 )
-	ROM_REGION( 0x1000000, "mainrom", 0 )
-	ROM_LOAD( "666in1.u1", 0x00000, 0x1000000, CRC(e3a98465) SHA1(dfec3e74e36aef9bfa57ec530c37642015569dc5) )
-ROM_END
-
 ROM_START( g5_500 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl128.u1", 0x00000, 0x1000000, CRC(de779dd7) SHA1(ac6d3fa6f18ceb795532ba9e85edffc040d74347) )
+ROM_END
+
+ROM_START( g6_666 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "g6_666.bin", 0x00000, 0x1000000, CRC(0f443cbe) SHA1(25c4d59e65b05f1255f18c802d72e4cf308ba49b) )
+ROM_END
+
+ROM_START( g7_666 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "g7_666.u1", 0x00000, 0x1000000, CRC(d2bbc3ab) SHA1(19d3326c30b048dd8483f6336656e0301b5aec8a) )
+ROM_END
+
+ROM_START( g9_666 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "666in1.u1", 0x00000, 0x1000000, CRC(e3a98465) SHA1(dfec3e74e36aef9bfa57ec530c37642015569dc5) )
 ROM_END
 
 ROM_START( hhgc319 )
@@ -459,6 +469,11 @@ ROM_END
 ROM_START( gbox2019 )
 	ROM_REGION( 0x1000000, "mainrom", 0 )
 	ROM_LOAD( "fgb2019.bin", 0x00000, 0x1000000, CRC(7ef130d5) SHA1(00f45974494707fdac78153b13d8cfb503716ad0) ) // flash ROM
+ROM_END
+
+ROM_START( gbox2022 )
+	ROM_REGION( 0x1000000, "mainrom", 0 )
+	ROM_LOAD( "sup400.bin", 0x00000, 0x1000000, CRC(56ea270d) SHA1(0949ed9d2aacfaa46f7399fda6d4d29e903cbe61) )
 ROM_END
 
 ROM_START( gprnrs1 )
@@ -497,6 +512,16 @@ ROM_END
 ROM_START( fapocket )
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "s29gl512n.bin", 0x00000, 0x4000000, CRC(37d0fb06) SHA1(0146a2fae32e23b65d4032c508f0d12cedd399c3) )
+ROM_END
+
+ROM_START( wol260 )
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "js28f256m29ewh.u1", 0x00000, 0x2000000, CRC(ccb08b50) SHA1(089335c001085cfae94db6ea39e31388674581ed) )
+ROM_END
+
+ROM_START( g3_800 )
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "g3_800in1.bin", 0x00000, 0x4000000, CRC(df326924) SHA1(38c26ea96fbf3ba80526072d07209f19b04812e9) )
 ROM_END
 
 void nes_vt42xx_state::init_rfcp168()
@@ -564,11 +589,15 @@ void nes_vt42xx_state::init_bl339()
 
 CONS( 201?, rfcp168,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_rfcp168, "<unknown>", "Retro FC Plus 168 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS ) // "RETRO_FC_V3.5"
 
-// many duplicates, real game count to be confirmed, graphical issues in some games
+
+// these share the same bitswap, many duplicates, real game counts to be confirmed, graphical issues in some games
+CONS( 201?, g5_500,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G5 500 in 1 Handheld", MACHINE_NOT_WORKING )
+CONS( 201?, g6_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G6 666 in 1 Handheld", MACHINE_NOT_WORKING )
+CONS( 201?, g7_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G7 666 in 1 Handheld", MACHINE_NOT_WORKING )
 CONS( 202?, g9_666,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G9 Game Box 666 Games", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-// same bitswap as above
-CONS( 201?, g5_500,   0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_g9_666, "<unknown>", "G5 500 in 1 Handheld", MACHINE_NOT_WORKING )
+// 64Mbytes, same banking as fapocket, but no fake cart switch / port
+CONS( 202?, g3_800,   0,  0,  nes_vt42xx_fa, nes_vt42xx, nes_vt42xx_fapocket_state, empty_init, "<unknown>", "G3 800 in 1 Handheld", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // highly scrambled
 CONS( 201?, hhgc319,  0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, init_hhgc319, "<unknown>", "Handheld Game Console 319-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
@@ -585,10 +614,13 @@ CONS( 201?, mc_hh210, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, emp
 
 CONS( 201?, retro400, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "Retro FC 400-in-1", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2019, gbox2019, 0,  0,  nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "Sup", "Game Box 400 in 1 (2019 PCB)", MACHINE_NOT_WORKING )
+CONS( 2019, gbox2019, 0,        0, nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "Sup", "Game Box 400 in 1 (2019 PCB)", MACHINE_NOT_WORKING )
+// ZY003-V8.9 090322 on PCB
+CONS( 2022, gbox2022, gbox2019, 0, nes_vt42xx_16mb, nes_vt42xx, nes_vt42xx_state, empty_init, "Sup", "Game Box 400 in 1 (2022 PCB)", MACHINE_NOT_WORKING )
 
 CONS( 200?, gprnrs1,  0,  0,  nes_vt42xx_8mb,  nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "Game Prince RS-1", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, gprnrs16, 0,  0,  nes_vt42xx_gprnrs16_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "<unknown>", "Game Prince RS-16", MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, wol260,   gprnrs16, 0, nes_vt42xx_gprnrs16_2x16mb, nes_vt42xx, nes_vt42xx_bitboy_state, empty_init, "Wolsen", "260 in 1 Handheld Game (Wolsen)", MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, mc_9x6ss, 0,        0, nes_vt42xx_4mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "999999 in 1 (PXP2 Slim Station)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, mc_9x6sa, mc_9x6ss, 0, nes_vt42xx_2mb, nes_vt42xx, nes_vt42xx_state, empty_init, "<unknown>", "999999 in 1 (8 bit Slim Station, NEWPXP-DVT22-A PCB)", MACHINE_IMPERFECT_GRAPHICS )

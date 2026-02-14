@@ -78,22 +78,18 @@ MEMORY MAP
 The 16k dynamic RAM holds the BASIC program and the video/gfx etc
 but is banked out of view of a BASIC program.
 
-
-ToDo:
-- Joysticks (no info)
-
 ****************************************************************************/
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "bus/centronics/ctronics.h"
+#include "bus/coleco/cartridge/exp.h"
+#include "bus/coleco/controller/ctrl.h"
+#include "bus/pencil2/slot.h"
 #include "imagedev/cassette.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
-
-#include "bus/centronics/ctronics.h"
-#include "bus/generic/slot.h"
-#include "bus/generic/carts.h"
 
 #include "softlist_dev.h"
 #include "speaker.h"
@@ -107,9 +103,20 @@ public:
 	pencil2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
+		, m_view_m0(*this, "view_m0")
 		, m_centronics(*this, "centronics")
 		, m_cass(*this, "cassette")
-		, m_cart(*this, "cartslot")
+		, m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG)
+		, m_port_e0(*this, "E0")
+		, m_port_e1(*this, "E1")
+		, m_port_e3(*this, "E3")
+		, m_port_e4(*this, "E4")
+		, m_port_e6(*this, "E6")
+		, m_port_e8(*this, "E8")
+		, m_port_ea(*this, "EA")
+		, m_port_f0(*this, "F0")
+		, m_port_f2(*this, "F2")
+		, m_joy(*this, "joy%u", 1U)
 	{}
 
 	void pencil2(machine_config &config);
@@ -117,34 +124,54 @@ public:
 	int printer_ready_r();
 	int printer_ack_r();
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+
 private:
 	void port10_w(u8 data);
 	void port30_w(u8 data);
 	void port80_w(u8 data);
 	void portc0_w(u8 data);
+	u8 porte0_r(offs_t offset);
 	u8 porte2_r();
 	void write_centronics_ack(int state);
 	void write_centronics_busy(int state);
+
 	void io_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 
-	virtual void machine_start() override ATTR_COLD;
+	required_device<cpu_device> m_maincpu;
+	memory_view m_view_m0;
+	required_device<centronics_device> m_centronics;
+	required_device<cassette_image_device> m_cass;
+	required_device<colecovision_cartridge_slot_device> m_cart;
+	required_ioport m_port_e0;
+	required_ioport m_port_e1;
+	required_ioport m_port_e3;
+	required_ioport m_port_e4;
+	required_ioport m_port_e6;
+	required_ioport m_port_e8;
+	required_ioport m_port_ea;
+	required_ioport m_port_f0;
+	required_ioport m_port_f2;
+	required_device_array<colecovision_control_port_device, 2> m_joy;
+
 	int m_centronics_busy = 0;
 	int m_centronics_ack = 0;
 	bool m_cass_state = false;
-	required_device<cpu_device> m_maincpu;
-	required_device<centronics_device> m_centronics;
-	required_device<cassette_image_device> m_cass;
-	required_device<generic_slot_device> m_cart;
 };
 
 void pencil2_state::mem_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).rom();
-	map(0x2000, 0x5fff).nopw();  // stop error log filling up
+	map(0x0000, 0x1fff).rw("memexp", FUNC(pencil2_memexp_slot_device::m0_r), FUNC(pencil2_memexp_slot_device::m0_w));
+	map(0x0000, 0x1fff).view(m_view_m0);
+	m_view_m0[0](0x0000, 0x1fff).rom().region("maincpu", 0);
+	map(0x2000, 0x3fff).rw("memexp", FUNC(pencil2_memexp_slot_device::m2_r), FUNC(pencil2_memexp_slot_device::m2_w));
+	map(0x4000, 0x5fff).rw("memexp", FUNC(pencil2_memexp_slot_device::m4_r), FUNC(pencil2_memexp_slot_device::m4_w));
 	map(0x6000, 0x67ff).mirror(0x1800).ram();
-	//map(0x8000, 0xffff)      // mapped by the cartslot
+	map(0x8000, 0xffff).lr8(NAME([this](offs_t offset) { return m_cart->read(offset, 0, 0, 0, 0); }));
+	map(0x8000, 0xffff).lw8(NAME([this](offs_t offset, uint8_t data) { m_cart->write(offset, data, 0, 0, 0, 0); }));
 }
 
 void pencil2_state::io_map(address_map &map)
@@ -155,19 +182,9 @@ void pencil2_state::io_map(address_map &map)
 	map(0x10, 0x1f).w(FUNC(pencil2_state::port10_w));
 	map(0x30, 0x3f).w(FUNC(pencil2_state::port30_w));
 	map(0x80, 0x9f).w(FUNC(pencil2_state::port80_w));
-	map(0xa0, 0xa1).mirror(0x1e).rw("tms9928a", FUNC(tms9928a_device::read), FUNC(tms9928a_device::write));
+	map(0xa0, 0xa1).mirror(0x1e).rw("vdp", FUNC(tms9929a_device::read), FUNC(tms9929a_device::write));
 	map(0xc0, 0xdf).w(FUNC(pencil2_state::portc0_w));
-	map(0xe0, 0xff).w("sn76489a", FUNC(sn76489a_device::write));
-	map(0xe0, 0xe0).portr("E0");
-	map(0xe1, 0xe1).portr("E1");
-	map(0xe2, 0xe2).r(FUNC(pencil2_state::porte2_r));
-	map(0xe3, 0xe3).portr("E3");
-	map(0xe4, 0xe4).portr("E4");
-	map(0xe6, 0xe6).portr("E6");
-	map(0xe8, 0xe8).portr("E8");
-	map(0xea, 0xea).portr("EA");
-	map(0xf0, 0xf0).portr("F0");
-	map(0xf2, 0xf2).portr("F2");
+	map(0xe0, 0xff).r(FUNC(pencil2_state::porte0_r)).w("sn76489a", FUNC(sn76489a_device::write));
 }
 
 u8 pencil2_state::porte2_r()
@@ -188,10 +205,41 @@ void pencil2_state::port30_w(u8 data)
 
 void pencil2_state::port80_w(u8 data)
 {
+	// keypad mode
+	m_joy[0]->common0_w(1);
+	m_joy[0]->common1_w(0);
+	m_joy[1]->common0_w(1);
+	m_joy[1]->common1_w(0);
 }
 
 void pencil2_state::portc0_w(u8 data)
 {
+	// joystick mode
+	m_joy[0]->common0_w(0);
+	m_joy[0]->common1_w(1);
+	m_joy[1]->common0_w(0);
+	m_joy[1]->common1_w(1);
+}
+
+u8 pencil2_state::porte0_r(offs_t offset)
+{
+	u8 data = 0x80 | m_joy[BIT(offset, 1)]->read();
+
+	switch (offset)
+	{
+	case 0x00: data &= m_port_e0->read(); break;
+	case 0x01: data &= m_port_e1->read(); break;
+	case 0x02: data &= porte2_r();        break;
+	case 0x03: data &= m_port_e3->read(); break;
+	case 0x04: data &= m_port_e4->read(); break;
+	case 0x06: data &= m_port_e6->read(); break;
+	case 0x08: data &= m_port_e8->read(); break;
+	case 0x0a: data &= m_port_ea->read(); break;
+	case 0x10: data &= m_port_f0->read(); break;
+	case 0x12: data &= m_port_f2->read(); break;
+	}
+
+	return data;
 }
 
 void pencil2_state::write_centronics_busy(int state)
@@ -312,12 +360,11 @@ INPUT_PORTS_END
 
 void pencil2_state::machine_start()
 {
+	m_view_m0.select(0);
+
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_ack));
 	save_item(NAME(m_cass_state));
-
-	if (m_cart->exists())
-		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8000, 0xffff, read8sm_delegate(*m_cart, FUNC(generic_slot_device::read_rom)));
 }
 
 void pencil2_state::pencil2(machine_config &config)
@@ -328,13 +375,13 @@ void pencil2_state::pencil2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pencil2_state::io_map);
 
 	/* video hardware */
-	tms9929a_device &vdp(TMS9929A(config, "tms9928a", XTAL(10'738'635)));
+	tms9929a_device &vdp(TMS9929A(config, "vdp", XTAL(10'738'635)));
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
 
-	// sound hardware
+	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
 	SN76489A(config, "sn76489a", XTAL(10'738'635)/3).add_route(ALL_OUTPUTS, "mono", 1.00); // guess
 
@@ -342,9 +389,16 @@ void pencil2_state::pencil2(machine_config &config)
 	CASSETTE(config, m_cass);
 	m_cass->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cass->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cass->set_interface("pencil2_cass");
 
 	/* cartridge */
-	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "pencil2_cart");
+	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
+
+	/* controllers */
+	COLECOVISION_CONTROL_PORT(config, m_joy[0], colecovision_control_port_devices, "hand");
+	//m_joy[0]->irq().set(FUNC(pencil2_state::joy_irq_w<0>));
+	COLECOVISION_CONTROL_PORT(config, m_joy[1], colecovision_control_port_devices, nullptr);
+	//m_joy[1]->irq().set(FUNC(pencil2_state::joy_irq_w<1>));
 
 	/* printer */
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
@@ -354,8 +408,15 @@ void pencil2_state::pencil2(machine_config &config)
 	output_latch_device &cent_data_out(OUTPUT_LATCH(config, "cent_data_out"));
 	m_centronics->set_output_latch(cent_data_out);
 
+	/* memory expansion */
+	pencil2_memexp_slot_device &memexp(PENCIL2_MEMEXP_SLOT(config, "memexp", pencil2_memexp_devices, nullptr));
+	memexp.romdis_handler().set([this](int state) { if (state) m_view_m0.disable(); });
+
 	/* Software lists */
 	SOFTWARE_LIST(config, "cart_list").set_original("pencil2");
+	SOFTWARE_LIST(config, "cass_list").set_original("pencil2_cass");
+	SOFTWARE_LIST(config, "cart_list_c").set_compatible("coleco");
+	SOFTWARE_LIST(config, "cart_list_ch").set_compatible("coleco_homebrew");
 }
 
 /* ROM definition */

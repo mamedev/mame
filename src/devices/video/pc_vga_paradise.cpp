@@ -18,6 +18,7 @@ TODO:
 
 - 'C31A difference compared to 'C31 (just "reserved" PR35?);
 - Emulate new features of 'C31 & 'C33;
+\- Extended I/O ports are just enough scaffolding for not make FreeDOS to lock up during bootup;
 - win95 can't draw with 'C33 properly when in VESA modes;
 - Memory Data pins (MD) a.k.a. CNF (64 of them across the device tree)
 - /EBROM signal (for enabling ROM readback)
@@ -755,6 +756,9 @@ u16 wd90c30_vga_device::line_compare_mask()
 wd90c31_vga_device::wd90c31_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: wd90c30_vga_device(mconfig, type, tag, owner, clock)
 {
+	m_sysctrl_space_config = address_space_config("sysctrl_regs", ENDIANNESS_LITTLE, 16, 4, -1, address_map_constructor(FUNC(wd90c31_vga_device::sysctrl_map), this));
+	m_bitblt_space_config = address_space_config("bitblt_regs", ENDIANNESS_LITTLE, 16, 4, -1, address_map_constructor(FUNC(wd90c31_vga_device::bitblt_map), this));
+	m_cursor_space_config = address_space_config("cursor_regs", ENDIANNESS_LITTLE, 16, 4, -1, address_map_constructor(FUNC(wd90c31_vga_device::cursor_map), this));
 }
 
 wd90c31_vga_device::wd90c31_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -762,15 +766,37 @@ wd90c31_vga_device::wd90c31_vga_device(const machine_config &mconfig, const char
 {
 }
 
+void wd90c31_vga_device::device_start()
+{
+	wd90c30_vga_device::device_start();
+	save_item(NAME(m_ext_noautoinc));
+	save_item(NAME(m_ext_index));
+	save_item(NAME(m_ext_device));
+	save_item(NAME(m_ext_invalid));
+}
+
+void wd90c31_vga_device::device_reset()
+{
+	wd90c30_vga_device::device_reset();
+	m_ext_index = 0;
+	m_ext_device = 0xf;
+	m_ext_noautoinc = false;
+	m_ext_invalid = true;
+}
+
+device_memory_interface::space_config_vector wd90c31_vga_device::memory_space_config() const
+{
+	auto r = svga_device::memory_space_config();
+	r.emplace_back(std::make_pair(EXT_REG,     &m_sysctrl_space_config));
+	r.emplace_back(std::make_pair(EXT_REG + 1, &m_bitblt_space_config));
+	r.emplace_back(std::make_pair(EXT_REG + 2, &m_cursor_space_config));
+	return r;
+}
+
+
 // maps at $23c0 in normal conditions, 16-bit
 void wd90c31_vga_device::ext_io_map(address_map &map)
 {
-//  map(0x00, 0x01) Index Control register
-//  map(0x02, 0x03) Register Access port
-//  map(0x04, 0x05) BITBLT I/O Port
-//  map(0x06, 0x07) <reserved>
-}
-
 /*
  * Index Control register
  *
@@ -784,10 +810,71 @@ void wd90c31_vga_device::ext_io_map(address_map &map)
  * ---- ---- 0000 0010 HW Cursor
  *
  */
+	map(0x00, 0x01).lrw16(
+		NAME([this] (offs_t offset) {
+			return (m_ext_invalid << 13) | (m_ext_noautoinc << 12) | (m_ext_index << 8) | m_ext_device;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			if (ACCESSING_BITS_8_15)
+			{
+				m_ext_index = (data >> 8) & 0xf;
+				m_ext_noautoinc = !!BIT(data, 12);
+			}
+			if (ACCESSING_BITS_0_7)
+				m_ext_device = data & 0xff;
+		})
+	);
+	// Register Access port
+	map(0x02, 0x03).lrw16(
+		NAME([this] (offs_t offset, u16 mem_mask) {
+			u16 res = m_ext_index << 12;
+
+			if (!machine().side_effects_disabled())
+			{
+				if (m_ext_device < 3)
+				{
+					res |= space(EXT_REG + m_ext_device).read_word(m_ext_index, mem_mask) & 0xfff;
+					m_ext_invalid = false;
+					if (!m_ext_noautoinc)
+					{
+						m_ext_index ++;
+						m_ext_index &= 0xf;
+					}
+				}
+				else
+				{
+					LOGWARN("Invalid read device %d offset %02x & %04x\n", m_ext_device, m_ext_index, mem_mask);
+					m_ext_invalid = true;
+				}
+			}
+			return res;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			if (m_ext_device < 3)
+			{
+				space(EXT_REG + m_ext_device).write_word(data >> 12, data & 0xfff, mem_mask);
+				m_ext_invalid = false;
+			}
+			else
+			{
+				LOGWARN("Invalid write device %d offset %02x data %04x & %04x\n", m_ext_device, data >> 12, data, mem_mask);
+				m_ext_invalid = true;
+			}
+		})
+	);
+//  map(0x04, 0x05) BITBLT I/O Port
+//  map(0x06, 0x07) <reserved>
+}
 
 // System Control Register Block
+void wd90c31_vga_device::sysctrl_map(address_map &map)
+{
 // ext_io_view[0](0x00, 0x00) IRQ status
+}
+
 // BITBLT
+void wd90c31_vga_device::bitblt_map(address_map &map)
+{
 // ext_io_view[1](0x00, 0x01) Control
 // ext_io_view[1](0x02, 0x03) Source
 // ext_io_view[1](0x04, 0x05) Destination
@@ -799,7 +886,11 @@ void wd90c31_vga_device::ext_io_map(address_map &map)
 // ext_io_view[1](0x0c, 0x0c) Transparency Color
 // ext_io_view[1](0x0d, 0x0d) Transparency Mask
 // ext_io_view[1](0x0e, 0x0e) Map and Plane Mask
+}
+
 // HW Cursor
+void wd90c31_vga_device::cursor_map(address_map &map)
+{
 // ext_io_view[2](0x00, 0x00) Control
 // ext_io_view[2](0x01, 0x02) Pattern Address
 // ext_io_view[2](0x03, 0x03) Primary Color
@@ -808,6 +899,7 @@ void wd90c31_vga_device::ext_io_map(address_map &map)
 // ext_io_view[2](0x06, 0x07) Display Position X/Y
 // ext_io_view[2](0x08, 0x08) Auxiliary Color
 // NOTE: on shutdown Win 95 will try to read HW Cursor Control even if disabled (?)
+}
 
 /**************************************
  *

@@ -178,7 +178,7 @@ public:
 	{
 		CPU_STATE,         // CPU registers, etc.
 		BUILTIN_GLOBALS,   // Built-in MAME global symbols (e.g., beamx, beamy, frame, etc.)
-						   // (also used for tables outside debugger: lua scripts, cheat engine)
+		                   // (also used for tables outside debugger: lua scripts, cheat engine)
 	};
 
 	// construction/destruction

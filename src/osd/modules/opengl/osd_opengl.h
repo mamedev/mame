@@ -9,15 +9,15 @@
  *
  ***************************************************************/
 
-	#ifndef _OSD_OPENGL_H
-	#define _OSD_OPENGL_H
+	#ifndef MAME_OSD_OPENGL_OSD_OPENGL_H
+	#define MAME_OSD_OPENGL_OSD_OPENGL_H
 
 	#if USE_OPENGL
 
 	/* equivalent to #include <GL/gl.h>
 	 * #include <GL/glext.h>
 	 */
-	#ifdef OSD_WINDOWS
+	#if defined(OSD_WINDOWS)
 		#ifdef _MSC_VER
 			#include <windows.h>
 			#include "GL/GL.h"
@@ -35,6 +35,9 @@
 	#elif defined(OSD_MAC)
 		#include <OpenGL/gl.h>
 		#include <OpenGL/glext.h>
+	#elif defined(SDLMAME_SDL3)
+		#include <SDL3/SDL_version.h>
+		#include <SDL3/SDL_opengl.h>
 	#else
 		#include <SDL2/SDL_version.h>
 		#include <SDL2/SDL_opengl.h>
@@ -114,7 +117,7 @@
 
 	#endif /* USE_OPENGL */
 
-	#endif /* _OSD_OPENGL_H */
+	#endif /* MAME_OSD_OPENGL_OSD_OPENGL_H */
 
 #else /* MANGLE */
 	/***************************************************************

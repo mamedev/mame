@@ -1083,16 +1083,17 @@ void sh7604_device::vcrwdt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	sh2_recalc_irq();
 }
 
+// VCRDIV is a word register where bits 6-0 have a meaning, reads back written word value
 uint32_t sh7604_device::vcrdiv_r()
 {
-	return m_vcrdiv & 0x7f;
+	return m_vcrdiv & 0xffff;
 }
 
 void sh7604_device::vcrdiv_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_vcrdiv);
 	// TODO: unemulated, level is seemingly not documented/settable?
-	m_irq_vector.divu = data & 0x7f;
+	m_irq_vector.divu = m_vcrdiv & 0x7f;
 	sh2_recalc_irq();
 }
 
@@ -1356,6 +1357,8 @@ void sh7604_device::ccr_w(uint8_t data)
 	m_ccr = data;
 }
 
+// BCR1/BCR2 are really 16-bit wide, when accessed as dword the upper part is used as unlock
+// method (0xa55axxxx) and reads back 0.
 uint32_t sh7604_device::bcr1_r()
 {
 	return (m_bcr1 & ~0xe008) | (m_is_slave ? 0x8000 : 0);
@@ -1363,7 +1366,16 @@ uint32_t sh7604_device::bcr1_r()
 
 void sh7604_device::bcr1_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_bcr1);
+	if (ACCESSING_BITS_0_31)
+	{
+		if ((data & 0xffff0000) == 0xa55a0000)
+		{
+			COMBINE_DATA(&m_bcr1);
+			m_bcr1 &= 0xffff;
+		}
+	}
+	else if (ACCESSING_BITS_0_15)
+		COMBINE_DATA(&m_bcr1);
 }
 
 uint32_t sh7604_device::bcr2_r()
@@ -1373,7 +1385,16 @@ uint32_t sh7604_device::bcr2_r()
 
 void sh7604_device::bcr2_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_bcr2);
+	if (ACCESSING_BITS_0_31)
+	{
+		if ((data & 0xffff0000) == 0xa55a0000)
+		{
+			COMBINE_DATA(&m_bcr2);
+			m_bcr2 &= 0xffff;
+		}
+	}
+	else if (ACCESSING_BITS_0_15)
+		COMBINE_DATA(&m_bcr2);
 }
 
 uint32_t sh7604_device::wcr_r()

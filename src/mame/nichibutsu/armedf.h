@@ -64,7 +64,6 @@ protected:
 	void video_config(machine_config &config, int hchar_start, int vstart, int vend);
 	void sound_config_common(machine_config &config);
 	void sound_config(machine_config &config);
-	void sound_config_3812(machine_config &config);
 	void sound_config_legion(machine_config &config);
 	void sound_config_legion_3812(machine_config &config);
 
@@ -90,19 +89,19 @@ protected:
 	u16 m_legion_cmd[4]; // legionjb only!
 
 	// video-related
-	tilemap_t  *m_bg_tilemap = nullptr;
-	tilemap_t  *m_fg_tilemap = nullptr;
-	tilemap_t  *m_tx_tilemap = nullptr;
-	u16   m_scroll_msb = 0;
-	u16   m_vreg = 0;
-	u16   m_fg_scrollx = 0;
-	u16   m_fg_scrolly = 0;
-	u16   m_bg_scrollx = 0;
-	u16   m_bg_scrolly = 0;
-	int   m_scroll_type = 0;
-	int   m_sprite_offy = 0;
-	int   m_old_mcu_mode = 0;
-	int   m_waiting_msb = 0;
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+	tilemap_t *m_tx_tilemap = nullptr;
+	u16 m_scroll_msb = 0;
+	u16 m_vreg = 0;
+	u16 m_fg_scrollx = 0;
+	u16 m_fg_scrolly = 0;
+	u16 m_bg_scrollx = 0;
+	u16 m_bg_scrolly = 0;
+	int m_scroll_type = 0;
+	int m_sprite_offy = 0;
+	int m_old_mcu_mode = 0;
+	int m_waiting_msb = 0;
 
 	// read/write handlers
 	void terraf_io_w(offs_t offset, u16 data, u16 mem_mask);
@@ -115,12 +114,12 @@ protected:
 
 	// video handlers
 	void legionjb_fg_scroll_w(offs_t offset, u8 data);
-	void blitter_txram_w(offs_t offset, u8 data);
 	void terrafjb_fg_scrollx_w(u8 data);
 	void terrafjb_fg_scrolly_w(u8 data);
 	void terrafjb_fg_scroll_msb_w(u8 data);
 	u8 text_videoram_r(offs_t offset);
-	void text_videoram_w(offs_t offset, u8 data);
+	void armedf_text_videoram_w(offs_t offset, u8 data);
+	void terraf_text_videoram_w(offs_t offset, u8 data);
 	void fg_videoram_w(offs_t offset, u16 data, u16 mem_mask);
 	void bg_videoram_w(offs_t offset, u16 data, u16 mem_mask);
 	void terrafb_fg_scrolly_w(u8 data);
@@ -147,9 +146,7 @@ protected:
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap);
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-						u32 code, u32 color, u32 clut, int flipx, int flipy, int offsx, int offsy,
-						bitmap_ind8 &primap, u32 pmask, int transparent_color);
-	void common_map(address_map &map) ATTR_COLD;
+			u32 code, u32 color, u32 clut, int flipx, int flipy, int offsx, int offsy, bitmap_ind8 &primap, u32 pmask, int transparent_color);
 	void armedf_map(address_map &map) ATTR_COLD;
 	void cclimbr2_map(address_map &map) ATTR_COLD;
 	void cclimbr2_soundmap(address_map &map) ATTR_COLD;
@@ -191,7 +188,7 @@ private:
 	void mcu_spritelist_w(offs_t offset, u8 data);
 
 	void bigfghtr_map(address_map &map) ATTR_COLD;
-	void bigfghtr_mcu_io_map(address_map &map) ATTR_COLD;
+	void bigfghtr_mcu_data_map(address_map &map) ATTR_COLD;
 	void bigfghtr_mcu_map(address_map &map) ATTR_COLD;
 };
 

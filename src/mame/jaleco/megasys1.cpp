@@ -101,6 +101,8 @@ RAM             RW      0e0000-0effff*        <               <
                                 Issues / To Do
                                 --------------
 
+- Hook up microcontroller for peekaboo (connected differently to other games).
+
 - Making the M6295 status register return 0 fixes the music tempo in
   avspirit, 64street, astyanax etc. but makes most of the effects in
   hachoo disappear! Define SOUND_HACK to 0 to turn this hack off
@@ -2318,34 +2320,34 @@ ff9df8.w    *** level ***
 
 ROM_START( 64street )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* Main CPU Code */
-	ROM_LOAD16_BYTE( "64th_03.rom", 0x000000, 0x040000, CRC(ed6c6942) SHA1(f610b31548ed4889a43d77be286b9bfabf700064) )
-	ROM_LOAD16_BYTE( "64th_02.rom", 0x000001, 0x040000, CRC(0621ed1d) SHA1(97d3e84cced23865157c5a15cbf5b7671c1dbae1) )
+	ROM_LOAD16_BYTE( "rb-91105_3_ver_e1.1.ic53", 0x000000, 0x040000, CRC(ed6c6942) SHA1(f610b31548ed4889a43d77be286b9bfabf700064) )
+	ROM_LOAD16_BYTE( "rb-91105_2_ver_e1.1.ic52", 0x000001, 0x040000, CRC(0621ed1d) SHA1(97d3e84cced23865157c5a15cbf5b7671c1dbae1) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 )        /* Sound CPU Code */
-	ROM_LOAD16_BYTE( "64th_08.rom", 0x000000, 0x010000, CRC(632be0c1) SHA1(626073037249d96ac70b2d11b2dd72b22bac49c7) )
-	ROM_LOAD16_BYTE( "64th_07.rom", 0x000001, 0x010000, CRC(13595d01) SHA1(e730a530ca232aab883217fa12804075cb2aa640) )
+	ROM_LOAD16_BYTE( "rb-91105_8.ic99", 0x000000, 0x010000, CRC(632be0c1) SHA1(626073037249d96ac70b2d11b2dd72b22bac49c7) )
+	ROM_LOAD16_BYTE( "rb-91105.7.ic98", 0x000001, 0x010000, CRC(13595d01) SHA1(e730a530ca232aab883217fa12804075cb2aa640) )
 
 	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
 	ROM_LOAD( "mo-91009.mcu", 0x00000, 0x04000, CRC(c6f509ac) SHA1(6920bfed0df68452497ae755f0e031387360f356) )
 
 	ROM_REGION( 0x80000, "scroll0", 0 ) /* Scroll 0 */
-	ROM_LOAD( "64th_01.rom", 0x000000, 0x080000, CRC(06222f90) SHA1(52b6cb88b9d2209c16d1633c83c0224b6ebf29dc) )
+	ROM_LOAD( "rb-91105_1_rev_a.ic17", 0x000000, 0x080000, CRC(06222f90) SHA1(52b6cb88b9d2209c16d1633c83c0224b6ebf29dc) )
 
 	ROM_REGION( 0x80000, "scroll1", 0 ) /* Scroll 1 */
-	ROM_LOAD( "64th_06.rom", 0x000000, 0x080000, CRC(2bfcdc75) SHA1(f49f92f1ff58dccf72e05ecf80761c7b65a25ba3) )
+	ROM_LOAD( "rb-91105_6_rev_a.ic67", 0x000000, 0x080000, CRC(2bfcdc75) SHA1(f49f92f1ff58dccf72e05ecf80761c7b65a25ba3) )
 
 	ROM_REGION( 0x20000, "scroll2", 0 ) /* Scroll 2 */
-	ROM_LOAD( "64th_09.rom", 0x000000, 0x020000, CRC(a4a97db4) SHA1(1179457a6f33b3b44fac6056f6245f3aaae6afd5) )
+	ROM_LOAD( "rb-91105_9_rev_a.ic125", 0x000000, 0x020000, CRC(a4a97db4) SHA1(1179457a6f33b3b44fac6056f6245f3aaae6afd5) )
 
 	ROM_REGION( 0x100000, "sprites", 0 ) /* Sprites */
-	ROM_LOAD( "64th_05.rom", 0x000000, 0x080000, CRC(a89a7020) SHA1(be36e58e9314688ee39249944c5a6c201e0249ee) )
-	ROM_LOAD( "64th_04.rom", 0x080000, 0x080000, CRC(98f83ef6) SHA1(e9b72487695ac7cdc4fbf595389c4b8781ed207e) )
+	ROM_LOAD( "rb-91105_5_rev_a.ic61", 0x000000, 0x080000, CRC(a89a7020) SHA1(be36e58e9314688ee39249944c5a6c201e0249ee) )
+	ROM_LOAD( "rb-91105_4_rev_a.ic60", 0x080000, 0x080000, CRC(98f83ef6) SHA1(e9b72487695ac7cdc4fbf595389c4b8781ed207e) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )        /* Samples */
-	ROM_LOAD( "64th_11.rom", 0x000000, 0x020000, CRC(b0b8a65c) SHA1(b7e42d9083d0bbfe160fc73a7317d696e90d83d6) )
+	ROM_LOAD( "rb-91105_11_rev_a.ic.132", 0x000000, 0x020000, CRC(b0b8a65c) SHA1(b7e42d9083d0bbfe160fc73a7317d696e90d83d6) )
 
 	ROM_REGION( 0x40000, "oki2", 0 )        /* Samples */
-	ROM_LOAD( "64th_10.rom", 0x000000, 0x040000, CRC(a3390561) SHA1(f86d5c61e3e80d30408535c2203940ca1e95ac18) )
+	ROM_LOAD( "rb-91105_10_rev_a.ic131", 0x000000, 0x040000, CRC(a3390561) SHA1(f86d5c61e3e80d30408535c2203940ca1e95ac18) )
 
 	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM */
 	ROM_LOAD( "pr91009.12",  0x0000, 0x0200, CRC(c69423d6) SHA1(ba9644a9899df2d73a5a16bf7ceef1954c2e25f3) ) // same as pr-91044 on hayaosi1
@@ -3170,6 +3172,45 @@ ROM_START( edfa )
 	ROM_LOAD16_BYTE( "5.b5", 0x00000, 0x20000, CRC(6edd3c53) SHA1(53fd42f417be7ca57bd941abe343e2730a7b3ba9) )
 	ROM_CONTINUE (           0x80000, 0x20000 )
 	ROM_LOAD16_BYTE( "6.b3", 0x00001, 0x20000, CRC(4d8bfa8f) SHA1(9d61f035e7c73a26b5de5380030c511eebeb7ece) )
+	ROM_CONTINUE (           0x80001, 0x20000 )
+
+	// rest from edf:
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Sound CPU Code */
+	ROM_LOAD16_BYTE( "edf1.f5",  0x000000, 0x020000, CRC(2290ea19) SHA1(64c9394bd4d5569d68833d2e57abaf2f1af5be97) )
+	ROM_LOAD16_BYTE( "edf2.f3",  0x000001, 0x020000, CRC(ce93643e) SHA1(686bf0ec104af8c97624a782e0d60afe170fd945) )
+
+	ROM_REGION( 0x4000, "iomcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "edf.mcu", 0x00000, 0x04000, CRC(1503026d) SHA1(5ff63cc5aa58b7a805c019612ddd6d5191a92333) )
+
+	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
+	ROM_LOAD( "edf_m04.rom",  0x000000, 0x080000, CRC(6744f406) SHA1(3b8f13ca968456186d9ad61f34611b7eab62ea86) )
+
+	ROM_REGION( 0x080000, "scroll1", 0 ) /* Scroll 1 */
+	ROM_LOAD( "edf_m05.rom",  0x000000, 0x080000, CRC(6f47e456) SHA1(823baa9dc4cb2425c64e9332c6ed4678e49d0c7b) )
+
+	ROM_REGION( 0x020000, "scroll2", 0 ) /* Scroll 2 */
+	ROM_LOAD( "edf_09.rom",   0x000000, 0x020000, CRC(96e38983) SHA1(a4fb94f15d9a9f7df1645be66fe3e179d0ebf765) )
+
+	ROM_REGION( 0x080000, "sprites", 0 ) /* Sprites */
+	ROM_LOAD( "edf_m03.rom",  0x000000, 0x080000, CRC(ef469449) SHA1(bc591e56c5478383eb4bd29f16133c6ba407c22f) )
+
+	ROM_REGION( 0x040000, "oki1", 0 )       /* Samples */
+	ROM_LOAD( "edf_m02.rom",  0x000000, 0x040000, CRC(fc4281d2) SHA1(67ea324ff359a5d9e7538c08865b5eeebd16704b) )
+
+	ROM_REGION( 0x040000, "oki2", 0 )       /* Samples */
+	ROM_LOAD( "edf_m01.rom",  0x000000, 0x040000, CRC(9149286b) SHA1(f6c66c5cd50b72c4d401a263c65a8d4ef8cf9221) )
+
+	ROM_REGION( 0x0200, "proms", 0 )        /* Priority PROM  (N82S131N compatible type PROM) */
+	ROM_LOAD( "rd.20n",    0x0000, 0x0200, CRC(1d877538) SHA1(a5be0dc65dcfc36fbba10d1fddbe155e24b6122f) )
+ROM_END
+
+
+ROM_START( edfb )
+	ROM_REGION( 0xc0000, "maincpu", 0 )     /* Main CPU Code: 00000-3ffff & 80000-bffff */
+	ROM_LOAD16_BYTE( "edf_5_ver1.b5", 0x00000, 0x20000, CRC(1a5958a9) SHA1(e1f9a9690ece609545b885fdb99a9f4ab0ebd154) )
+	ROM_CONTINUE (           0x80000, 0x20000 )
+	ROM_LOAD16_BYTE( "edf_6_ver1.b3", 0x00001, 0x20000, CRC(b1987203) SHA1(edd4cf55ff91d2918f9f8104a7d8565621d44eea) )
 	ROM_CONTINUE (           0x80001, 0x20000 )
 
 	// rest from edf:
@@ -4379,8 +4420,8 @@ ROM_START( peekaboo )
 	ROM_LOAD16_BYTE( "peek a boo j ver 1.1 - 3.ic29", 0x000000, 0x020000, CRC(f5f4cf33) SHA1(f135f2b627347255bb0811e9a4a213e3b447c199) )
 	ROM_LOAD16_BYTE( "peek a boo j ver 1.1 - 2.ic28", 0x000001, 0x020000, CRC(7b3d430d) SHA1(8b48101929da4938a61dfd0eda845368c4184831) )
 
-	ROM_REGION( 0x4000, "mcu", 0 ) /* MCU Internal Code - probably TMP91640 */
-	ROM_LOAD( "mo-92033.mcu", 0x000000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x4000, "mcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "mo-92033.mcu", 0x000000, 0x4000, CRC(9dfba11b) SHA1(f3159a190aa7afea5c8daa8e65a0ca1d813d8e4f) )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "5",       0x000000, 0x080000, CRC(34fa07bb) SHA1(0f688acf302fd56701ee4fcc1d692adb7bf86ce4) )
@@ -4403,8 +4444,8 @@ ROM_START( peekaboou )
 	ROM_LOAD16_BYTE( "pb92127a_3_ver1.0.ic29", 0x000000, 0x020000, CRC(4603176a) SHA1(bbdc3fa439b32bdaaef5ca374af89e25fc4d9c1a) )
 	ROM_LOAD16_BYTE( "pb92127a_2_ver1.0.ic28", 0x000001, 0x020000, CRC(7bf4716b) SHA1(f2c0bfa32426c9816d9d3fbd73560566a497912d) )
 
-	ROM_REGION( 0x4000, "mcu", 0 ) /* MCU Internal Code - probably TMP91640 */
-	ROM_LOAD( "mo-92033.mcu", 0x000000, 0x4000, NO_DUMP )
+	ROM_REGION( 0x4000, "mcu", 0 ) /* TMP91640 Internal Code */
+	ROM_LOAD( "mo-92033.mcu", 0x000000, 0x4000, CRC(9dfba11b) SHA1(f3159a190aa7afea5c8daa8e65a0ca1d813d8e4f) )
 
 	ROM_REGION( 0x080000, "scroll0", 0 ) /* Scroll 0 */
 	ROM_LOAD( "5",       0x000000, 0x080000, CRC(34fa07bb) SHA1(0f688acf302fd56701ee4fcc1d692adb7bf86ce4) )
@@ -5327,6 +5368,7 @@ GAME( 1991, avspirit,   0,        system_B_iosim,           avspirit, megasys1_b
 GAME( 1990, monkelf,    avspirit, system_B_monkelf,         avspirit, megasys1_state,              init_monkelf,      ROT0,   "bootleg","Monky Elf (Korean bootleg of Avenging Spirit)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edf,        0,        system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edfa,       edf,      system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, edfb,       edf,      system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edfu,       edf,      system_B_iomcu,           edf,      megasys1_bc_iomcu_state,     empty_init,        ROT0,   "Jaleco", "E.D.F.: Earth Defense Force (North America)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, edfbl,      edf,      system_Bbl,               edf,      megasys1_state,              empty_init,        ROT0,   "bootleg","E.D.F.: Earth Defense Force (bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, hayaosi1,   0,        system_B_hayaosi1,        hayaosi1, megasys1_bc_iosim_state,     init_hayaosi1,     ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen: The King Of Quiz", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

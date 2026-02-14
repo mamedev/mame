@@ -45,6 +45,7 @@ BTANB:
   the bottom of the screen for 1 frame
 
 Notes by Jose Tejada (jotego):
+
 The main CPU frequency is 3 MHz, after a two-stage FF clock divider.
 The CPU clock is gated by bus arbitration logic. The CPU clock is halted until
 video hardware has an opening in memory access, then the CPU is allowed to access
@@ -1054,7 +1055,7 @@ void commando_state::init_spaceinv()
 GAME( 1985, commando,   0,        commando, commando, commando_state, init_commando, ROT270, "Capcom",                         "Commando (World)",                 MACHINE_SUPPORTS_SAVE )
 GAME( 1985, commandou,  commando, commando, commandou,commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 1)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1985, commandou2, commando, commando, commando, commando_state, init_commando, ROT270, "Capcom (Data East USA license)", "Commando (US set 2)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1985, commandoj,  commando, commando, commando, commando_state, init_commando, ROT270, "Capcom",                         "Senjou no Ookami",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1985, commandoj,  commando, commando, commando, commando_state, init_commando, ROT270, "Capcom",                         "Senjou no Ookami (Japan)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1985, commandob,  commando, commando, commando, commando_state, init_spaceinv, ROT270, "bootleg",                        "Commando (bootleg set 1)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1985, commandob2, commando, commando, commando, commando_state, init_commando, ROT270, "bootleg",                        "Commando (bootleg set 2)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1985, commandob3, commando, commando, commando, commando_state, init_commando, ROT270, "bootleg",                        "Commando (bootleg set 3)",         MACHINE_SUPPORTS_SAVE )

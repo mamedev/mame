@@ -499,18 +499,14 @@ void xavix2_state::pio_update()
 
 void naruto_state::pio_update()
 {
-	if (BIT(m_pio_mask_out, 21))
-		m_i2cmem->write_sda(BIT(m_pio_dataw, 21));
-	if (BIT(m_pio_mask_out, 20))
-		m_i2cmem->write_scl(BIT(m_pio_dataw, 20));
+	m_i2cmem->write_sda(BIT(m_pio_mask_out, 21) ? BIT(m_pio_dataw, 21) : 1);
+	m_i2cmem->write_scl(BIT(m_pio_mask_out, 20) ? BIT(m_pio_dataw, 20) : 0);
 }
 
 void domyos_state::pio_update()
 {
-	if (BIT(m_pio_mask_out, 16))
-		m_i2cmem->write_sda(BIT(m_pio_dataw, 16));
-	if (BIT(m_pio_mask_out, 17))
-		m_i2cmem->write_scl(BIT(m_pio_dataw, 17));
+	m_i2cmem->write_sda(BIT(m_pio_mask_out, 16) ? BIT(m_pio_dataw, 16) : 1);
+	m_i2cmem->write_scl(BIT(m_pio_mask_out, 17) ? BIT(m_pio_dataw, 17) : 0);
 }
 
 void xavix2_state::pio_w(offs_t offset, u32 data, u32 mem_mask)
@@ -826,7 +822,7 @@ ROM_END
 } // anonymous namespace
 
 // Let's!TVプレイ　ＮＡＲＵＴＯ－ナルト－ 忍者体感～だってばよ～ / バンダイ / 日本
-CONS( 2006, ban_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Naruto (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+CONS( 2006, ban_naru, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Naruto Ninja Taikan - Dattebayo! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 // Let's!TVプレイ 影発動体感! ブルードラゴン -極めろ!ファイヤークライシス!-
 CONS( 2006, ban_bldj, 0, 0, config, naruto, naruto_state, empty_init, "Bandai / SSD Company LTD", "Let's! TV Play Kage Hatsudou Taikan! Blue Dragon - Kiwamero! Fire Crisis! (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

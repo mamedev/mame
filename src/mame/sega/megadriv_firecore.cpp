@@ -216,6 +216,10 @@ ROM_START( mateta )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( mypacgld )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "am29lv160db.u2", 0x000000, 0x200000, CRC(7a01cf42) SHA1(c9fb66f1d38710aae6b94c1fbc99a8763730cfce) )
+ROM_END
 
 ROM_START( mypac )
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -231,6 +235,11 @@ ROM_END
 ROM_START( mympac )
 	ROM_REGION( 0x800000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "m29w640ft.bin", 0x000000, 0x800000, CRC(d6ceda9e) SHA1(c897f8d5661fea0c030daf9c5e92524eb4e71d52) )
+ROM_END
+
+ROM_START( mympaca )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "s29gl064n90tfi04.u2", 0x000000, 0x800000, CRC(0a16c487) SHA1(f6f32ae43e42c16a39a81bff7e7167833d4e738a) )
 ROM_END
 
 ROM_START( mygalag )
@@ -249,6 +258,10 @@ ROM_START( mysinv )
 	ROM_IGNORE(0x100)
 ROM_END
 
+ROM_START( mysf2 )
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "s29gl128.u2", 0x000000, 0x1000000, CRC(7938a212) SHA1(306cffd048fb271fa26cd2f61cbd2c3a94116292) )
+ROM_END
 
 
 /*
@@ -425,7 +438,7 @@ void megadriv_firecore_state::init_dcat()
 void megadriv_firecore_state::init_mdhh100()
 {
 	m_romsize = memregion("maincpu")->bytes();
-	m_externalbank = 0x7800000;
+	m_externalbank = m_romsize-0x800000;
 	init_megadriv();
 }
 
@@ -445,16 +458,21 @@ void megadriv_firecore_state::init_mdhh100()
 // due to differences in the SoC compared to real MD hardware (including sound + new video modes) these have been left
 // as NOT WORKING for now although some games run to a degree
 
+CONS( 2020, mypacgld,  0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Pac-Man 40th Anniversary (DGUNL-3290 / TUV-01, Micro Player)", MACHINE_NOT_WORKING )
+
 CONS( 2021, mypac,     0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Pac-Man (DGUNL-4198, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 CONS( 2021, mypaca,    mypac,    0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Pac-Man (DGUNL-4194, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
 CONS( 2021, mympac,    0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mympaca,   mympac,   0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Ms. Pac-Man (DGUNL-7023, Nano Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
 // menu uses unsupported extended mode
 CONS( 2021, mygalag,   0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Galaga (DGUNL-4195, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 CONS( 2021, mygalaga,  mygalag,  0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Galaga (DGUNL-4199, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
 CONS( 2021, mysinv,    0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Space Invaders (DGUNL-7006, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT90 )
+
+CONS( 2021, mysf2,     0,        0, megadriv_firecore_6button_ntsc,  msi_6button, megadriv_firecore_state, init_mdhh100,       "dreamGEAR", "My Arcade Street Fighter II (DGUNL-4184, Nano Player Pro)", MACHINE_NOT_WORKING )
 
 CONS( 2012, atgame40,  0,        0, megadriv_firecore_3button_pal,   firecore_3button, megadriv_firecore_state, init_atgame40, "AtGames",   "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
 

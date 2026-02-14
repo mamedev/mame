@@ -313,7 +313,7 @@ void hds200_state::hds200(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	Z80DMA(config, m_dma, 8_MHz_XTAL / 2); // divider not verified
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->in_mreq_callback().set(FUNC(hds200_state::dma_mreq_r));
 	m_dma->out_mreq_callback().set(FUNC(hds200_state::dma_mreq_w));
 

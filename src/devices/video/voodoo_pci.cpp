@@ -50,6 +50,7 @@ DEFINE_DEVICE_TYPE(VOODOO_BANSHEE_PCI, voodoo_banshee_pci_device, "voodoo_banshe
 DEFINE_DEVICE_TYPE(VOODOO_3_PCI, voodoo_3_pci_device, "voodoo_3_pci", "Voodoo 3 PCI")
 
 DEFINE_DEVICE_TYPE(VOODOO_BANSHEE_X86_PCI, voodoo_banshee_x86_pci_device, "banshee_x86", "Voodoo Banshee PCI (x86)")
+DEFINE_DEVICE_TYPE(VOODOO_3000_X86_PCI, voodoo_3000_x86_pci_device, "voodoo_3000_x86", "Voodoo 3000 PCI (x86)")
 
 
 void voodoo_pci_device::config_map(address_map &map)
@@ -84,10 +85,17 @@ voodoo_banshee_pci_device::voodoo_banshee_pci_device(const machine_config &mconf
 {
 }
 
-voodoo_3_pci_device::voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: voodoo_pci_device(mconfig, VOODOO_3_PCI, tag, owner, clock), m_voodoo(*this, "voodoo")
+voodoo_3_pci_device::voodoo_3_pci_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: voodoo_pci_device(mconfig, type, tag, owner, clock), m_voodoo(*this, "voodoo")
 {
 }
+
+voodoo_3_pci_device::voodoo_3_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: voodoo_3_pci_device(mconfig, VOODOO_3_PCI, tag, owner, clock)
+{
+}
+
+
 
 void voodoo_pci_device::device_start()
 {
@@ -311,3 +319,33 @@ const tiny_rom_entry *voodoo_banshee_x86_pci_device::device_rom_region() const
 {
 	return ROM_NAME(voodoo_banshee);
 }
+
+voodoo_3000_x86_pci_device::voodoo_3000_x86_pci_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: voodoo_3_pci_device(mconfig, VOODOO_3000_X86_PCI, tag, owner, clock)
+	, m_vga_rom(*this, "vga_rom")
+{
+}
+
+void voodoo_3000_x86_pci_device::device_start()
+{
+	voodoo_3_pci_device::device_start();
+
+	add_rom((u8 *)m_vga_rom->base(), 0x10000);
+	expansion_rom_base = 0xc0000;
+}
+
+ROM_START( voodoo_3000 )
+	ROM_REGION32_LE( 0x10000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS( 0, "agp", "3dfx Voodoo 3000 AGP" )
+	ROMX_LOAD( "3dfxagp.vbi", 0x000000, 0x00a000, CRC(147b99de) SHA1(e9a1c90886b55a49e4455487d913a35fec05f6ae), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "pci", "3dfx Voodoo 3000 PCI" )
+	ROMX_LOAD( "voodoo33000.bin", 0x000000, 0x010000, CRC(a5a70b84) SHA1(4d512bcf5a3f062fd54066f50902f8c9c74b31ed), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "powercolor", "PowerColor EvilKing 3 PRO C355A" )
+	ROMX_LOAD( "powercolor.vbi",  0x000000, 0x00a000, CRC(d9da0337) SHA1(298b305c38bda9d5848894dfd6aabcc5af8c61bf), ROM_BIOS(2) )
+ROM_END
+
+const tiny_rom_entry *voodoo_3000_x86_pci_device::device_rom_region() const
+{
+	return ROM_NAME(voodoo_3000);
+}
+

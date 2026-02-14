@@ -14,6 +14,7 @@
 class nvidia_nv3_vga_device :  public svga_device
 {
 public:
+	// Throws DDC issues when tested in SDD
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
 	// construction/destruction

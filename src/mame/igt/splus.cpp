@@ -22,7 +22,7 @@
 ***********************************************************************************/
 #include "emu.h"
 
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c52.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -93,7 +93,7 @@ private:
 	void i2c_nvram_w(uint8_t data);
 	uint8_t splus_reel_optics_r();
 
-	void splus_iomap(address_map &map) ATTR_COLD;
+	void splus_datamap(address_map &map) ATTR_COLD;
 	void splus_map(address_map &map) ATTR_COLD;
 
 	// EEPROM States
@@ -593,7 +593,7 @@ void splus_state::splus_map(address_map &map)
 	map(0x0000, 0xffff).rom();
 }
 
-void splus_state::splus_iomap(address_map &map)
+void splus_state::splus_datamap(address_map &map)
 {
 	// Serial I/O
 	map(0x0000, 0x0000).r(FUNC(splus_state::splus_serial_r)).w(FUNC(splus_state::splus_serial_w));
@@ -683,7 +683,7 @@ void splus_state::splus(machine_config &config) // basic machine hardware
 {
 	I80C32(config, m_maincpu, CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &splus_state::splus_map);
-	m_maincpu->set_addrmap(AS_IO, &splus_state::splus_iomap);
+	m_maincpu->set_addrmap(AS_DATA, &splus_state::splus_datamap);
 	m_maincpu->port_out_cb<1>().set(FUNC(splus_state::splus_p1_w));
 	m_maincpu->port_in_cb<3>().set(FUNC(splus_state::splus_p3_r));
 

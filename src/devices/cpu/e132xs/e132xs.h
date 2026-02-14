@@ -337,8 +337,8 @@ private:
 	uint32_t get_global_register(uint8_t code);
 
 	// words interpreted as pairs of signed half-words (HS)
-	static int get_lhs(uint32_t val) { return int16_t(val & 0xffff); }
-	static int get_rhs(uint32_t val) { return int16_t(val >> 16); }
+	static int get_lhs(uint32_t val) { return int16_t(uint16_t(val & 0xffff)); }
+	static int get_rhs(uint32_t val) { return int16_t(uint16_t(val >> 16)); }
 
 	uint32_t get_emu_code_addr(uint8_t num);
 	int32_t get_instruction_length(uint16_t op);
@@ -467,6 +467,8 @@ private:
 	uml::code_handle *m_io_write32;
 	uml::code_handle *m_exception;
 
+	internal_hyperstone_state m_local_core; // for non-DRC mode
+
 	uint32_t m_debug_local_regs[16];
 
 	bool m_enable_drc;
@@ -477,7 +479,7 @@ private:
 
 	void execute_run_drc();
 	void flush_drc_cache();
-	void code_flush_cache();
+	void generate_invariant();
 	void code_compile_block(uint8_t mode, offs_t pc);
 	//void load_fast_iregs(drcuml_block &block);
 	//void save_fast_iregs(drcuml_block &block);

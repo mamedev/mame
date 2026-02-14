@@ -19,7 +19,7 @@ class a2_video_device : public device_t, public device_palette_interface, public
 {
 public:
 	// Models with different text-mode behavior. II includes the II+ and IIE includes the IIc and IIc Plus.
-	enum class model { II, IIE, IIGS, II_J_PLUS, IVEL_ULTRA };
+	enum class model { II, IIE, PRAVETZ_8C, IIGS, II_J_PLUS, IVEL_ULTRA };
 
 	// construction/destruction
 	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -31,8 +31,8 @@ public:
 	void mix_w(int state);
 	void scr_w(int state);
 	void res_w(int state);
-	void dhires_w(int state);
 	void an2_w(int state);
+	void an3_w(int state);
 
 	bool get_graphics() const   { return m_graphics; }
 	bool get_hires() const      { return m_hires; }
@@ -47,7 +47,7 @@ public:
 	void a80col_w(bool b80Col);
 	void a80store_w(bool b80Store)  { m_80store = b80Store; }
 	void page2_w(bool page2)        { m_page2 = page2; }
-	void altcharset_w(bool altch)   { m_altcharset = altch; }
+	void altcharset_w(bool altch);
 	void monohgr_w(bool mono)       { m_monohgr = mono; }
 
 	// IIgs-specific accessors
@@ -59,15 +59,14 @@ public:
 	const u8 get_newvideo()         { return m_newvideo; }
 	void set_newvideo(u8 newvideo)  { m_newvideo = newvideo; }
 	u8 get_GS_langsel()             { return m_GS_langsel; }
-	u8 get_GS_language()            { return (m_GS_langsel >> 5) & 0x07; }
-	bool is_pal_video_mode()        { return (m_GS_langsel >> 4) & 0x01; }
-	bool get_language_switch()      { return (m_GS_langsel >> 3) & 0x01; }
-	void set_GS_langsel(u8 langsel) { m_GS_langsel = langsel; }
+	bool is_pal_video_mode()        { return BIT(m_GS_langsel, 4); }
+	void set_GS_langsel(u8 langsel);
 	void set_SHR_color(u8 color, u32 rgb) { m_shr_palette[color] = rgb; }
 	void set_GS_border_color(u8 color, u32 rgb) { m_GSborder_colors[color] = rgb; }
 
 	void set_ram_pointers(u8 *main, u8 *aux)    { m_ram_ptr = main; m_aux_ptr = aux; }
 	void set_aux_mask(u16 aux_mask)             { m_aux_mask = aux_mask; }
+	void set_hgr2(u16 hgr2)                     { m_hgr2 = hgr2; }
 	void set_char_pointer(u8 *charptr, int size) { m_char_ptr = charptr; m_char_size = size; }
 	void setup_GS_graphics() { m_8bit_graphics = std::make_unique<bitmap_ind16>(560, 192); }
 
@@ -116,6 +115,7 @@ private:
 
 	u8 *m_ram_ptr = nullptr, *m_aux_ptr = nullptr, *m_char_ptr = nullptr;
 	u16 m_aux_mask = 0xffff;
+	u16 m_hgr2 = 0x4000;
 	int m_char_size = 0;
 	bool m_page2 = false;
 	bool m_flash = false;

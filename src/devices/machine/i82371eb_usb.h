@@ -30,6 +30,14 @@ protected:
 private:
 	u8 unmap_log_r(offs_t offset);
 	void unmap_log_w(offs_t offset, u8 data);
+
+	u16 m_usbcmd;
+	u16 m_usbsts;
+	u16 m_usbintr;
+	u16 m_frnum;
+	u32 m_flbaseadd;
+	u8 m_sofmod;
+	u16 m_portsc[2];
 };
 
 DECLARE_DEVICE_TYPE(I82371EB_USB, i82371eb_usb_device)

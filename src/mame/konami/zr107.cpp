@@ -7,7 +7,7 @@
     Driver by Ville Linde
 
     TODO:
-    - segfaults on soft reset;
+    - SHARC PC stack underflow on soft reset;
     - jetwave motors/sensors
 
     Hardware overview:
@@ -224,16 +224,28 @@ public:
 		m_out4(*this, "OUT4"),
 		m_eepromout(*this, "EEPROMOUT"),
 		m_analog(*this, "ANALOG%u", 1U),
-		m_pcb_digit(*this, "pcbdigit%u", 0U)
+		m_pcb_digit(*this, "pcbdigit%u", 0U),
+		m_wheel_motor(*this, "wheel_motor")
 	{ }
-
-	void zr107(machine_config &config);
-
-	void driver_init();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void zr107(machine_config &config) ATTR_COLD;
+
+	uint8_t sysreg_r(offs_t offset);
+	void sysreg_w(offs_t offset, uint8_t data);
+	uint32_t ccu_r(offs_t offset, uint32_t mem_mask = ~0);
+	void ccu_w(uint32_t data);
+	void sound_ctrl_w(uint8_t data);
+
+	void vblank(int state);
+	void k054539_irq_gen(int state);
+	double adc0838_callback(uint8_t input);
+
+	void sharc_memmap(address_map &map) ATTR_COLD;
+	void sound_memmap(address_map &map) ATTR_COLD;
 
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -252,24 +264,12 @@ protected:
 	required_ioport m_out4, m_eepromout;
 	optional_ioport_array<3> m_analog;
 	output_finder<2> m_pcb_digit;
+	output_finder<> m_wheel_motor;
 
 	int32_t m_ccu_vcth = 0;
 	int32_t m_ccu_vctl = 0;
 	uint8_t m_sound_ctrl = 0;
 	uint8_t m_sound_intck = 0;
-
-	uint8_t sysreg_r(offs_t offset);
-	void sysreg_w(offs_t offset, uint8_t data);
-	uint32_t ccu_r(offs_t offset, uint32_t mem_mask = ~0);
-	void ccu_w(uint32_t data);
-	void sound_ctrl_w(uint8_t data);
-
-	void vblank(int state);
-	void k054539_irq_gen(int state);
-	double adc0838_callback(uint8_t input);
-
-	void sharc_memmap(address_map &map) ATTR_COLD;
-	void sound_memmap(address_map &map) ATTR_COLD;
 };
 
 class midnrun_state : public zr107_state
@@ -280,7 +280,7 @@ public:
 		m_k056832(*this, "k056832")
 	{ }
 
-	void midnrun(machine_config &config);
+	void midnrun(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -304,7 +304,7 @@ public:
 		m_k001006_2(*this, "k001006_2")
 	{ }
 
-	void jetwave(machine_config &config);
+	void jetwave(machine_config &config) ATTR_COLD;
 
 private:
 	void main_memmap(address_map &map) ATTR_COLD;
@@ -331,7 +331,7 @@ uint32_t jetwave_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 K056832_CB_MEMBER(midnrun_state::tile_callback)
 {
-	*color += layer * 0x40;
+	color += layer * 0x40;
 }
 
 void midnrun_state::video_start()
@@ -404,6 +404,7 @@ void zr107_state::sysreg_w(offs_t offset, uint8_t data)
 
 		case 2: // Parallel data register
 			LOGSYSREG("Parallel data = %02X\n", data);
+			m_wheel_motor = data;
 			break;
 
 		case 3: // System Register 0
@@ -491,6 +492,7 @@ void zr107_state::ccu_w(uint32_t data)
 void zr107_state::machine_start()
 {
 	m_pcb_digit.resolve();
+	m_wheel_motor.resolve();
 
 	// set conservative DRC options
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
@@ -753,6 +755,7 @@ void zr107_state::zr107(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &zr107_state::sound_memmap);
 
 	ADSP21062(config, m_dsp, XTAL(36'000'000));
+	m_dsp->enable_recompiler();
 	m_dsp->set_boot_mode(adsp21062_device::BOOT_MODE_EPROM);
 	m_dsp->set_addrmap(AS_DATA, &zr107_state::sharc_memmap);
 
@@ -841,13 +844,6 @@ void jetwave_state::jetwave(machine_config &config)
 	m_k001006_2->set_gfx_region("textures");
 
 	m_konppc->set_cgboard_type(konppc_device::CGBOARD_TYPE_GTICLUB);
-}
-
-/*****************************************************************************/
-
-void zr107_state::driver_init()
-{
-	m_dsp->enable_recompiler();
 }
 
 /*****************************************************************************/
@@ -1138,19 +1134,19 @@ ROM_START( jetwavej )
 	ROM_LOAD( "678a10.5n", 0x400000, 0x200000, CRC(0508280e) SHA1(a36c5dc377b0ba597f131bd9dfc6019e7fc2d243) )
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*****************************************************************************/
 
-GAME( 1995, midnrun,   0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1995, midnrunj,  midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1995, midnruna,  midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10, older sound program)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1995, midnruna2, midnrun,  midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10, newer sound program)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheat,  0,        midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheatu, windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheatj, windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, windheata, windheat, midnrun, midnrun,  midnrun_state, driver_init,  ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, jetwave,   0,        jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, waveshrk,  jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
-GAME( 1996, jetwavej,  jetwave,  jetwave, jetwave,  jetwave_state, driver_init,  ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnrun,   0,        midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (EAA, Euro v1.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnrunj,  midnrun,  midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (JAD, Japan v1.10)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnruna,  midnrun,  midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10, older sound program)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1995, midnruna2, midnrun,  midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Midnight Run: Road Fighter 2 (AAA, Asia v1.10, newer sound program)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheat,  0,        midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Winding Heat (EAA, Euro v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatu, windheat, midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Winding Heat (UBC, USA v2.22)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheatj, windheat, midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Winding Heat (JAA, Japan v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, windheata, windheat, midnrun, midnrun,  midnrun_state, empty_init,  ROT0, "Konami", "Winding Heat (AAA, Asia v2.11)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwave,   0,        jetwave, jetwave,  jetwave_state, empty_init,  ROT0, "Konami", "Jet Wave (EAB, Euro v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, waveshrk,  jetwave,  jetwave, jetwave,  jetwave_state, empty_init,  ROT0, "Konami", "Wave Shark (UAB, USA v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )
+GAME( 1996, jetwavej,  jetwave,  jetwave, jetwave,  jetwave_state, empty_init,  ROT0, "Konami", "Jet Wave (JAB, Japan v1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN )

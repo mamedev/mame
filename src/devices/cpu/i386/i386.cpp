@@ -3312,8 +3312,23 @@ void pentium2_device::device_reset()
 	m_cpuid_max_input_value_eax = 0x02;
 	m_cpu_version = REG32(EDX);
 
-	// [ 0:0] FPU on chip
-	m_feature_flags = 0x008081bf;       // TODO: enable relevant flags here
+	// [ 0: 0] FPU on chip
+	// [ 1: 1] VME Virtual 8086 Mode Enhancements
+	// [ 2: 2] DE Debugging Extensions
+	// [ 3: 3] PSE Page Size Extension
+	// [ 4: 4] TSC Time Stamp Counter
+	// [ 5: 5] MSR Model Specific Registers
+	// [ 6: 6] PAE Physical Address Extension
+	// [ 7: 7] MCE Machine Check Exception
+	// [ 8: 8] CMPXCHG8B opcode supported
+	// [11:11] SEP SYSENTER and SYSEXIT opcodes
+	// [12:12] MTRR Memory type range register
+	// [13:13] PGE Page Global Enable
+	// [14:14] MCA Machine Check Architecture
+	// [15:15] CMOV Conditional Move instructions
+	// [23:23] MMX instructions
+//	m_feature_flags = 0x0080f9ff;
+	m_feature_flags = 0x008081bf;  // TODO: enable missing flags
 
 	CHANGE_PC(m_eip);
 }
@@ -3396,7 +3411,7 @@ void pentium3_device::opcode_cpuid()
 		{
 			// TODO: lower part of 96 bits s/n for Pentium III processors only (ditched in 4)
 			// (upper 32-bits part is in EAX=1 EAX return)
-			// NB: if this is triggered from an Arcade system then there's a very good chance
+			// NOTE: if this is triggered from an Arcade system then there's a very good chance
 			// that is trying to tie the serial as a form of copy protection cfr. gamecstl
 			LOGMASKED(LOG_MSR, "CPUID with EAX=00000003 (Pentium III PSN?) at %08x!\n", m_eip);
 			REG32(EAX) = 0x00000000;

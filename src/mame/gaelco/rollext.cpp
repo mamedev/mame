@@ -118,11 +118,13 @@
 */
 
 #include "emu.h"
-#include "cpu/tms32082/tms32082.h"
-#include "video/poly.h"
-#include "video/rgbutil.h"
+
+#include "cpu/tms320c82/tms320c82.h"
 #include "machine/eepromser.h"
+#include "video/poly.h"
+
 #include "screen.h"
+#include "video/rgbutil.h"
 
 
 namespace {
@@ -425,7 +427,7 @@ public:
 	void init_rollext();
 
 private:
-	required_device<tms32082_mp_device> m_maincpu;
+	required_device<tms320c82_mp_device> m_maincpu;
 	required_shared_ptr<uint32_t> m_disp_ram;
 	required_device<screen_device> m_screen;
 
@@ -751,12 +753,12 @@ void rollext_state::machine_start()
 
 void rollext_state::rollext(machine_config &config)
 {
-	TMS32082_MP(config, m_maincpu, 60000000);
+	TMS320C82_MP(config, m_maincpu, 60'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rollext_state::memmap);
 	m_maincpu->set_vblank_int("screen", FUNC(rollext_state::vblank_interrupt));
 	//m_maincpu->set_periodic_int(FUNC(rollext_state::irq3_line_assert), attotime::from_hz(500));
 
-	tms32082_pp_device &pp0(TMS32082_PP(config, "pp0", 60000000));
+	tms320c82_pp_device &pp0(TMS320C82_PP(config, "pp0", 60'000'000));
 	pp0.set_addrmap(AS_PROGRAM, &rollext_state::memmap);
 
 	config.set_maximum_quantum(attotime::from_hz(100));
@@ -774,7 +776,7 @@ void rollext_state::rollext(machine_config &config)
 
 INTERRUPT_GEN_MEMBER(rollext_state::vblank_interrupt)
 {
-	m_maincpu->set_input_line(tms32082_mp_device::INPUT_X1, ASSERT_LINE);
+	m_maincpu->set_input_line(tms320c82_mp_device::INPUT_X1, ASSERT_LINE);
 }
 
 void rollext_state::init_rollext()

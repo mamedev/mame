@@ -9,6 +9,10 @@ Novag's first Xiangqi computer, mainly sold in Hong Kong. Model 8710 (棋王, Ch
 King) was distributed by Yorter Electronics for the local market. It's the same
 hardware as model 866. The newer model 9300 is also presumed to be the same.
 
+NOTE: If internal artwork Chinese text is not visible (either fontprovider or OS
+doesn't support character substitution), manually set the -artfont option to a
+CJK font.
+
 Hardware notes:
 - PCB label: 100054
 - Hitachi HD6305Y0P @ ~8MHz (LC oscillator)

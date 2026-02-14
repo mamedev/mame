@@ -2443,7 +2443,12 @@ void dc_state::naomi_aw_base(machine_config &config)
 	screen.set_screen_update("powervr2", FUNC(powervr2_device::screen_update));
 
 	POWERVR2(config, m_powervr2, 0);
-	m_powervr2->irq_callback().set(FUNC(dc_state::pvr_irq));
+	m_powervr2->set_cpu(m_maincpu);
+	m_powervr2->set_texture_ram(dc_texture_ram);
+	m_powervr2->set_framebuffer_ram(dc_framebuffer_ram);
+	m_powervr2->set_cpu_space(m_maincpu, AS_PROGRAM);
+	m_powervr2->maple_trigger_callback().set(FUNC(naomi_state::maple_trigger));
+	m_powervr2->irq_callback().set(FUNC(naomi_state::pvr_irq));
 
 	SPEAKER(config, "speaker", 2).front();
 
@@ -2611,7 +2616,12 @@ void naomi2_state::naomi2(machine_config &config)
 void naomi2_state::naomi2_base(machine_config &config)
 {
 	POWERVR2(config, m_powervr2_slave, 0);
-	m_powervr2_slave->irq_callback().set(FUNC(dc_state::pvr_irq));
+	m_powervr2_slave->set_cpu(m_maincpu);
+	m_powervr2_slave->set_texture_ram(dc_texture_ram);
+	m_powervr2_slave->set_framebuffer_ram(dc_framebuffer_ram);
+	m_powervr2_slave->set_cpu_space(m_maincpu, AS_PROGRAM);
+	m_powervr2->maple_trigger_callback().set(FUNC(naomi2_state::maple_trigger));
+	m_powervr2_slave->irq_callback().set(FUNC(naomi2_state::pvr_irq));
 
 	// TODO: ELAN device
 }
@@ -2979,7 +2989,7 @@ EPR-23605B - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
 EPR-23607B - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
 EPR-23608B - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
 EPR-23609B - NAOMI BOOT ROM 2001 09/10  1.70 (Korea)
-EPR-23610B - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
+EPR-23610B - NAOMI BOOT ROM 2001 09/10  1.70 (Australia)
 
 version text at 0x1ffd60 / version shown in test mode
 EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- / NAOMI2 GAME BOOT ROM Ver 2.01 (Japan)
@@ -5978,7 +5988,7 @@ ROM_START( sambaa )
 	ROM_PARAMETER( ":rom_board:segam2crypt:key", "280a8b5d" )
 ROM_END
 
-// prototype - boots on USA BIOS only, have fewer regular songs, but have several sound tracks from Sega games instead (Afterburner, Outrun, Sonic, etc)
+// prototype - boots on USA BIOS only, have fewer regular songs, but have several sound tracks from Sega games instead (After Burner, Outrun, Sonic, etc)
 ROM_START( sambap )
 	NAOMI_BIOS
 	NAOMI_DEFAULT_EEPROM

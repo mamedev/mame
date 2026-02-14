@@ -6,12 +6,12 @@
 TODO:
 - Throws "Primary master hard disk fail" in shutms11. Disk has a non canonical -chs of 524,255,63.
   winimage will throw plenty of errors on manual file extraction (related to Korean paths?).
-- Currently needs enabled_logical true in super I/O handling (needs the real
-  ITE Giga I/O to fix);
-- In this driver with a manually rebuilt image will loop during the fake "now loading" screen
-  (customized Win 98 splash screen);
+  Currently rebuilt with a canonical -chs, see below;
+- In this driver will try to install a few things then throw a BSoD with a fatal error 0e while
+  trying to install the BX AGP controller, tied with Super I/O wait for key handing?
+- Cannot do much without actual Voodoo 3 BIOS + text mode/VGA support;
 - In pcipc with a manually rebuilt image will throw an exception in "Internat" module once it loads
-  Windows 98 (and installs the diff drivers).
+  Windows 98 (and installs the diff drivers);
 
 ===================================================================================================
 
@@ -190,6 +190,14 @@ TODO:
 
 
 #include "emu.h"
+
+#include "bus/isa/isa_cards.h"
+#include "bus/pci/virge_pci.h"
+//#include "bus/rs232/hlemouse.h"
+//#include "bus/rs232/null_modem.h"
+//#include "bus/rs232/rs232.h"
+//#include "bus/rs232/sun_kbd.h"
+//#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
@@ -198,14 +206,7 @@ TODO:
 #include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
 #include "machine/i82371eb_usb.h"
-#include "bus/isa/isa_cards.h"
-#include "bus/pci/virge_pci.h"
-//#include "bus/rs232/hlemouse.h"
-//#include "bus/rs232/null_modem.h"
-//#include "bus/rs232/rs232.h"
-//#include "bus/rs232/sun_kbd.h"
-//#include "bus/rs232/terminal.h"
-#include "machine/fdc37c93x.h"
+#include "machine/it8671f.h"
 #include "video/voodoo_pci.h"
 
 #define ENABLE_VOODOO 0
@@ -245,26 +246,23 @@ INPUT_PORTS_END
 
 static void isa_internal_devices(device_slot_interface &device)
 {
-	device.option_add("fdc37c93x", FDC37C93X);
+	device.option_add("it8671f", IT8671F);
 }
 
 void comebaby_state::superio_config(device_t *device)
 {
-	// TODO: wrong super I/O type
-	// It's an ITE 8671 "Giga I/O", unemulated
-	fdc37c93x_device &fdc = *downcast<fdc37c93x_device *>(device);
-	fdc.set_sysopt_pin(0);
-	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
-	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
-	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+	it8671f_device &ite = *downcast<it8671f_device *>(device);
+	ite.krst_gpio2().set_inputline(":maincpu", INPUT_LINE_RESET);
+	ite.ga20_gpio6().set_inputline(":maincpu", INPUT_LINE_A20);
+	ite.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	ite.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 #if 0
-	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+	ite.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	ite.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	ite.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	ite.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	ite.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	ite.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 #endif
 }
 
@@ -292,10 +290,10 @@ void comebaby_state::comebaby(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi", 0);
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37c93x", true).set_option_machine_config("fdc37c93x", superio_config);
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
@@ -303,7 +301,7 @@ void comebaby_state::comebaby(machine_config &config)
 	// Expansion slots, mapping SVGA for debugging
 	// TODO: all untested, check clock
 #if ENABLE_VOODOO
-	VOODOO_3_PCI(config, m_voodoo3, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
+	VOODOO_3000_X86_PCI(config, m_voodoo3, 0, m_maincpu, "screen"); // "pci:0d.0" J4D2
 	m_voodoo3->set_fbmem(16);
 	m_voodoo3->set_status_cycles(1000);
 
@@ -314,11 +312,14 @@ void comebaby_state::comebaby(machine_config &config)
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
 	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_3_pci_device::screen_update));
 #else
-	// "pci:0d.0" J4D2
-	// "pci:0e.0" J4D1
-	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "virge").set_fixed(true);
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
 #endif
-
+	PCI_SLOT(config, "pci:1", pci_cards, 13, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 14, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 15, 2, 3, 0, 1, nullptr);
+	// has an ESS .com in autoexec.bat (unknown position)
+	// TODO: tries to install its driver in Windows 98, wrong one
+	PCI_SLOT(config, "pci:4", pci_cards, 16, 3, 0, 1, 2, "ess_solo1");
 }
 
 
@@ -327,7 +328,9 @@ ROM_START(comebaby)
 	ROM_LOAD("b1120iag.bin", 0x000000, 0x40000, CRC(9b6f95f1) SHA1(65d6a2fea9911593f093b2e2a43d1534b54d60b3) )
 
 	DISK_REGION( "pci:07.1:ide1:0:hdd" )
-	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
+//	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
+	// rebuilt image with -chs 16383,16,63
+	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(85ced9e63dd10ef39449d3ea997b2200aa06562d) )
 ROM_END
 
 } // anonymous namespace

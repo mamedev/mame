@@ -12,7 +12,7 @@
 
 #include "modules/osdmodule.h"
 
-#if (defined(OSD_SDL) || defined(USE_SDL_SOUND))
+#if (defined(OSD_SDL) || defined(USE_SDL_SOUND)) && !defined(SDLMAME_SDL3)
 
 #include "modules/lib/osdobj_common.h"
 #include "osdcore.h"
@@ -251,8 +251,7 @@ void sound_sdl::sink_callback(void *userdata, uint8_t *data, int len)
 
 } // namespace osd
 
-
-#else // (defined(OSD_SDL) || defined(USE_SDL_SOUND))
+#else // (defined(OSD_SDL) || defined(USE_SDL_SOUND)) && !defined(SDLMAME_SDL3)
 
 namespace osd { namespace { MODULE_NOT_SUPPORTED(sound_sdl, OSD_SOUND_PROVIDER, "sdl") } }
 

@@ -84,16 +84,18 @@ DEFINE_DEVICE_TYPE(C4040, c4040_device, "c4040", "Commodore 4040")
 //  ROM( c2040 )
 //-------------------------------------------------
 
-ROM_START( c2040 ) // schematic 320806, DOS 1.0
+ROM_START( c2040 ) // schematic 320806, DOS 1.0/1.2
 	ROM_REGION( 0x3000, M6502_TAG, 0 )
-	ROM_LOAD( "901468-xx.ul1", 0x1000, 0x1000, NO_DUMP )
-	ROM_LOAD( "901468-xx.uh1", 0x2000, 0x1000, NO_DUMP )
+	ROM_DEFAULT_BIOS("dos12")
+	ROM_SYSTEM_BIOS( 0, "dos10", "DOS 1.0" )
+	ROMX_LOAD( "901468-xx.ul1", 0x1000, 0x1000, NO_DUMP, ROM_BIOS(0) )
+	ROMX_LOAD( "901468-xx.uh1", 0x2000, 0x1000, NO_DUMP, ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "dos12", "DOS 1.2" )
+	ROMX_LOAD( "901468-06.ul1", 0x1000, 0x1000, CRC(25b5eed5) SHA1(4d9658f2e6ff3276e5c6e224611a66ce44b16fc7), ROM_BIOS(1) )
+	ROMX_LOAD( "901468-07.uh1", 0x2000, 0x1000, CRC(9b09ae83) SHA1(6a51c7954938439ca8342fc295bda050c06e1791), ROM_BIOS(1) )
 
 	ROM_REGION( 0x400, M6504_TAG, 0 )
 	ROM_LOAD( "901466-01.uk3", 0x000, 0x400, CRC(9d1e25ce) SHA1(d539858f839f96393f218307df7394362a84a26a) )
-
-	ROM_REGION( 0x800, "gcr", 0)
-	ROM_LOAD( "901467.uk6",    0x000, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
 ROM_END
 
 
@@ -118,9 +120,6 @@ ROM_START( c3040 ) // schematic 320806, DOS 1.2
 
 	ROM_REGION( 0x400, M6504_TAG, 0 )
 	ROM_LOAD( "901466-02.uk3", 0x000, 0x400, CRC(9d1e25ce) SHA1(d539858f839f96393f218307df7394362a84a26a) )
-
-	ROM_REGION( 0x800, "gcr", 0)
-	ROM_LOAD( "901467.uk6",    0x000, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
 ROM_END
 
 
@@ -138,7 +137,7 @@ const tiny_rom_entry *c3040_device::device_rom_region() const
 //  ROM( c4040 )
 //-------------------------------------------------
 
-ROM_START( c4040 ) // schematic ?
+ROM_START( c4040 ) // schematic 320806
 	ROM_REGION( 0x3000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS("dos20r2")
 	ROM_SYSTEM_BIOS( 0, "dos20r1", "DOS 2.0 Revision 1" )
@@ -151,11 +150,7 @@ ROM_START( c4040 ) // schematic ?
 	ROMX_LOAD( "901468-16.uh1", 0x2000, 0x1000, CRC(1f5eefb7) SHA1(04b918cf4adeee8015b43383d3cea7288a7d0aa8), ROM_BIOS(1) )
 
 	ROM_REGION( 0x400, M6504_TAG, 0 )
-	// RIOT DOS 2
-	ROM_LOAD( "901466-04.uk3", 0x000, 0x400, CRC(0ab338dc) SHA1(6645fa40b81be1ff7d1384e9b52df06a26ab0bfb) )
-
-	ROM_REGION( 0x800, "gcr", 0)
-	ROM_LOAD( "901467.uk6",    0x000, 0x800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
+	ROM_LOAD( "901466-04.uk3", 0x000, 0x400, CRC(0ab338dc) SHA1(6645fa40b81be1ff7d1384e9b52df06a26ab0bfb) ) // RIOT DOS 2
 ROM_END
 
 
@@ -203,51 +198,6 @@ void c2040_device::c2040_fdc_mem(address_map &map)
 	map(0x0c00, 0x0fff).ram().share("share3");
 	map(0x1000, 0x13ff).ram().share("share4");
 	map(0x1c00, 0x1fff).rom().region(M6504_TAG, 0);
-}
-
-
-//-------------------------------------------------
-//  riot6532 uc1
-//-------------------------------------------------
-
-uint8_t c2040_device::dio_r()
-{
-	/*
-
-	    bit     description
-
-	    PA0     DI0
-	    PA1     DI1
-	    PA2     DI2
-	    PA3     DI3
-	    PA4     DI4
-	    PA5     DI5
-	    PA6     DI6
-	    PA7     DI7
-
-	*/
-
-	return m_bus->dio_r();
-}
-
-void c2040_device::dio_w(uint8_t data)
-{
-	/*
-
-	    bit     description
-
-	    PB0     DO0
-	    PB1     DO1
-	    PB2     DO2
-	    PB3     DO3
-	    PB4     DO4
-	    PB5     DO5
-	    PB6     DO6
-	    PB7     DO7
-
-	*/
-
-	m_bus->dio_w(this, data);
 }
 
 
@@ -502,22 +452,22 @@ void c2040_device::add_common_devices(machine_config &config)
 void c2040_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
-	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c2040_device::floppy_formats, true);
-	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c2040_device::floppy_formats, true);
+	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c2040_device::floppy_formats, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c2040_device::floppy_formats, true).enable_sound(true);
 }
 
 void c3040_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
-	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c3040_device::floppy_formats, true);
-	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c3040_device::floppy_formats, true);
+	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c3040_device::floppy_formats, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c3040_device::floppy_formats, true).enable_sound(true);
 }
 
 void c4040_device::device_add_mconfig(machine_config &config)
 {
 	add_common_devices(config);
-	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c4040_device::floppy_formats, true);
-	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c4040_device::floppy_formats, true);
+	FLOPPY_CONNECTOR(config, FDC_TAG":0", c2040_floppies, "525ssqd", c4040_device::floppy_formats, true).enable_sound(true);
+	FLOPPY_CONNECTOR(config, FDC_TAG":1", c2040_floppies, "525ssqd", c4040_device::floppy_formats, true).enable_sound(true);
 }
 
 
@@ -590,7 +540,6 @@ c2040_device::c2040_device(const machine_config &mconfig, device_type type, cons
 	m_floppy0(*this, FDC_TAG":0:525ssqd"),
 	m_floppy1(*this, FDC_TAG":1:525ssqd"),
 	m_fdc(*this, FDC_TAG),
-	m_gcr(*this, "gcr"),
 	m_address(*this, "ADDRESS"),
 	m_leds(*this, "led%u", 0U),
 	m_rfdo(1),
@@ -650,19 +599,11 @@ void c2040_device::device_start()
 
 void c2040_device::device_reset()
 {
-	m_maincpu->reset();
-
 	// toggle M6502 SO
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);
 
-	m_fdccpu->reset();
-
-	m_riot0->reset();
-	m_riot1->reset();
-	m_miot->reset();
-	m_via->reset();
-
+	// release ATN
 	m_riot1->pa_bit_w<7>(0);
 
 	// turn off spindle motors

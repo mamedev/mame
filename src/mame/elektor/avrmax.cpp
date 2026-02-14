@@ -80,7 +80,7 @@ private:
 	// devices/pointers
 	required_device<atmega88_device> m_maincpu;
 	optional_device<pwm_display_device> m_digit_pwm;
-	optional_device<hd44780_device> m_lcd;
+	optional_device<hd44780u_device> m_lcd;
 	required_ioport_array<4> m_inputs;
 
 	u8 m_inp_mux = 0;

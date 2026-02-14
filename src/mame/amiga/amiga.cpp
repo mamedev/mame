@@ -22,6 +22,7 @@
 #include "bus/amiga/zorro/zorro.h"
 #include "bus/ata/ataintf.h"
 #include "bus/pccard/sram.h"
+#include "cpu/lc6500/lc6554.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6525tpi.h"
@@ -31,9 +32,12 @@
 #include "machine/i2cmem.h"
 #include "machine/cr511b.h"
 #include "machine/rp5c01.h"
+#include "video/pwm.h"
 
 #include "softlist.h"
 #include "speaker.h"
+
+#include "cdtv.lh"
 
 
 //**************************************************************************
@@ -344,6 +348,15 @@ public:
 		, m_dmac(*this, "u36")
 		, m_tpi(*this, "u32")
 		, m_cdrom(*this, "cdrom")
+		, m_lcdcpu(*this, "lcdcpu")
+		, m_vfd_display(*this, "vfd")
+		, m_frontpanel_power(*this, "frontpanel_power")
+		, m_frontpanel_buttons(*this, "frontpanel_kst%u", 0U)
+		, m_vfd_ampm(*this, "ampm%u", 0U)
+		, m_vfd_digits(*this, "digit%u", 0U)
+		, m_vfd_colon(*this, "colon%u", 0U)
+		, m_vfd_volume(*this, "vol%u", 0U)
+		, m_cd_led(*this, "cd_led")
 		, m_dmac_irq(0)
 		, m_tpi_irq(0)
 	{ }
@@ -372,20 +385,57 @@ private:
 	void dmac_int_w(int state);
 
 	void tpi_portb_w(uint8_t data);
+	void tpi_portc_w(uint8_t data);
 	void tpi_int_w(int state);
 
 	void sten_w(int state);
 	void drq_w(int state);
 
+	uint8_t lcdcpu_frontpanel_key_r();
+	void lcdcpu_frontpanel_select_w(uint8_t data);
+	uint8_t lcdcpu_rtc_data_r();
+	void lcdcpu_rtc_data_w(uint8_t data);
+	void lcdcpu_rtc_addr_w(uint8_t data);
+	void lcdcpu_portg_w(uint8_t data);
+	uint8_t lcdcpu_porti_r();
+	void lcdcpu_porti_w(uint8_t data);
+	uint8_t lcdcpu_portj_r();
+	void lcdcpu_portj_w(uint8_t data);
+	void lcdcpu_portk_w(uint8_t data);
+	void lcdcpu_portl_w(uint8_t data);
+	void lcdcpu_portm_w(uint8_t data);
+	void lcdcpu_portn_w(uint8_t data);
+	void lcdcpu_porto_w(uint8_t data);
+	void lcdcpu_portp_w(uint8_t data);
+	void vfd_update(offs_t offset, uint64_t data);
+
 	required_device<msm6242_device> m_rtc;
 	required_device<amiga_dmac_rev2_device> m_dmac;
 	required_device<tpi6525_device> m_tpi;
 	required_device<cr511b_device> m_cdrom;
+	required_device<lc6554_cpu_device> m_lcdcpu;
+	required_device<pwm_display_device> m_vfd_display;
+	required_ioport m_frontpanel_power;
+	required_ioport_array<4> m_frontpanel_buttons;
+	output_finder<2> m_vfd_ampm;
+	output_finder<6> m_vfd_digits;
+	output_finder<2> m_vfd_colon;
+	output_finder<8> m_vfd_volume;
+	output_finder<> m_cd_led;
 
 	// internal state
 	int m_dmac_irq;
 	int m_tpi_irq;
 	bool m_sten;
+	uint8_t m_genlock_mode_select = 0; // ms0 and ms1
+
+	uint8_t m_frontpanel_select = 0;
+	uint8_t m_rtc_data = 0;
+	uint8_t m_rtc_addr = 0;
+	uint8_t m_lcd_porti = 0;
+	uint8_t m_lcd_portp = 0;
+	uint8_t m_vfd_seg = 0;
+	uint8_t m_vfd_grid = 0;
 };
 
 class a3000_state : public amiga_state
@@ -912,6 +962,13 @@ void cdtv_state::machine_start()
 	// setup dmac
 	m_dmac->set_address_space(&m_maincpu->space(AS_PROGRAM));
 	m_dmac->ramsz_w(0);
+
+	// resolve outputs
+	m_vfd_ampm.resolve();
+	m_vfd_digits.resolve();
+	m_vfd_colon.resolve();
+	m_vfd_volume.resolve();
+	m_cd_led.resolve();
 }
 
 void cdtv_state::machine_reset()
@@ -945,6 +1002,19 @@ void cdtv_state::tpi_portb_w(uint8_t data)
 	m_cdrom->cmd_w(BIT(data, 0));
 }
 
+void cdtv_state::tpi_portc_w(uint8_t data)
+{
+	// 76------  genlock mode select
+	// --5-----  int2 (handled in tpi_int_w)
+	// ---4----  drq (input)
+	// ----3---  sten (input)
+	// -----2--  stch (input)
+	// ------1-  scor (input)
+	// -------0  subcode clock
+
+	m_genlock_mode_select = (data >> 6) & 0x03;
+}
+
 void cdtv_state::tpi_int_w(int state)
 {
 	m_tpi_irq = state;
@@ -960,6 +1030,151 @@ void cdtv_state::drq_w(int state)
 {
 	if (m_sten)
 		m_dmac->xdreq_w(state);
+}
+
+uint8_t cdtv_state::lcdcpu_frontpanel_key_r()
+{
+	uint8_t data = 0x07;
+
+	for (unsigned i = 0; i < 4; i++)
+		if (BIT(m_frontpanel_select, i) == 0)
+			data &= m_frontpanel_buttons[i]->read();
+
+	data |= 0x08; // pb3 connected to vcc
+
+	return data;
+}
+
+void cdtv_state::lcdcpu_frontpanel_select_w(uint8_t data)
+{
+	m_frontpanel_select = data;
+}
+
+uint8_t cdtv_state::lcdcpu_rtc_data_r()
+{
+	return m_rtc_data;
+}
+
+void cdtv_state::lcdcpu_rtc_data_w(uint8_t data)
+{
+	m_rtc_data = data;
+}
+
+void cdtv_state::lcdcpu_rtc_addr_w(uint8_t data)
+{
+	m_rtc_addr = data;
+}
+
+void cdtv_state::lcdcpu_portg_w(uint8_t data)
+{
+	// 3---  kbreset
+	// -2--  volume data
+	// --1-  volume clock
+	// ---0  volume strobe
+
+	kbreset_w(BIT(data, 3));
+}
+
+uint8_t cdtv_state::lcdcpu_porti_r()
+{
+	// 3---  auply (cd audio play)
+	// -2--  rtc wt (output)
+	// --1-  ms1
+	// ---0  ms0
+
+	return m_genlock_mode_select;
+}
+
+void cdtv_state::lcdcpu_porti_w(uint8_t data)
+{
+	// rtc write strobe
+	if ((BIT(m_lcd_porti, 2) == 0) && (BIT(data, 2) == 1))
+		m_rtc->write(m_rtc_addr, m_rtc_data);
+
+	m_lcd_porti = data;
+}
+
+uint8_t cdtv_state::lcdcpu_portj_r()
+{
+	// 3---  aus1 to 6500/1
+	// -2--  aus0 to 6500/1
+	// --1-  vcc (power sense)
+	// ---0  aus2 to 6500/1
+
+	return m_frontpanel_power->read() << 1;
+}
+
+void cdtv_state::lcdcpu_portj_w(uint8_t data)
+{
+}
+
+void cdtv_state::lcdcpu_portk_w(uint8_t data)
+{
+	// 3---  tv/cd switch and cd led
+	// -2--  gms0
+	// --1-  gms1
+	// ---0  power
+
+	m_cd_led = BIT(~data, 3);
+}
+
+void cdtv_state::lcdcpu_portl_w(uint8_t data)
+{
+	m_vfd_seg = (m_vfd_seg & 0xf0) | (data << 0);
+}
+
+void cdtv_state::lcdcpu_portm_w(uint8_t data)
+{
+	m_vfd_seg = (data << 4) | (m_vfd_seg & 0x0f);
+}
+
+void cdtv_state::lcdcpu_portn_w(uint8_t data)
+{
+	m_vfd_grid = (m_vfd_grid & 0xf0) | (data << 0);
+}
+
+void cdtv_state::lcdcpu_porto_w(uint8_t data)
+{
+	m_vfd_grid = (data << 4) | (m_vfd_grid & 0x0f);
+
+	if (m_vfd_grid)
+		m_vfd_display->matrix(m_vfd_grid, m_vfd_seg);
+}
+
+void cdtv_state::lcdcpu_portp_w(uint8_t data)
+{
+	// rtc read strobe
+	if ((BIT(m_lcd_portp, 0) == 0) && (BIT(data, 0) == 1))
+		m_rtc_data = m_rtc->read(m_rtc_addr);
+
+	m_lcd_portp = data;
+}
+
+void cdtv_state::vfd_update(offs_t offset, uint64_t data)
+{
+	m_vfd_volume[offset] = BIT(data, 7);
+
+	switch (offset)
+	{
+	case 7:
+		m_vfd_ampm[0] = BIT(data, 5);
+		m_vfd_ampm[1] = BIT(data, 4);
+		break;
+	case 6:
+	case 5:
+		m_vfd_digits[offset - 1] = data & 0x7f;
+		break;
+	case 4:
+		m_vfd_colon[0] = BIT(data, 5);
+		m_vfd_colon[1] = BIT(data, 4);
+		break;
+	case 3:
+	case 2:
+	case 1:
+	case 0:
+		m_vfd_digits[offset] = data & 0x7f;
+		break;
+	}
 }
 
 u32 a3000_state::scsi_r(offs_t offset, u32 mem_mask)
@@ -1638,6 +1853,33 @@ static INPUT_PORTS_START( amiga )
 	PORT_BIT(0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( cdtv )
+	PORT_INCLUDE(amiga)
+
+	PORT_START("frontpanel_power")
+	PORT_BIT(0x01, 0x01, IPT_OTHER) PORT_NAME("Front Panel Power") PORT_TOGGLE
+
+	PORT_START("frontpanel_kst0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Play/Stop/Backward/Forward (KST0)")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Reset")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("frontpanel_kst1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Play/Stop/Backward/Forward (KST1)")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Volume Up")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("frontpanel_kst2")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Play/Stop/Backward/Forward (KST2)")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Volume Down")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("frontpanel_kst3")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel Play/Stop/Backward/Forward (KST3)")
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Front Panel TV/CD")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
 INPUT_PORTS_START( cd32 )
 	PORT_INCLUDE(amiga)
 
@@ -1947,10 +2189,28 @@ void cdtv_state::cdtv(machine_config &config)
 	u75.set_disable();
 
 	// lcd controller
-#if 0
-	lc6554_device &u62(LC6554(config, "u62", XTAL(4'000'000))); // device isn't emulated yet
-	u62.set_addrmap(AS_PROGRAM, &cdtv_state::lcd_mem);
-#endif
+	LC6554(config, m_lcdcpu, 4_MHz_XTAL); // U62
+	m_lcdcpu->pb_in_cb().set(FUNC(cdtv_state::lcdcpu_frontpanel_key_r));
+	m_lcdcpu->pc_out_cb().set(FUNC(cdtv_state::lcdcpu_frontpanel_select_w));
+	m_lcdcpu->pd_in_cb().set(FUNC(cdtv_state::lcdcpu_rtc_data_r));
+	m_lcdcpu->pd_out_cb().set(FUNC(cdtv_state::lcdcpu_rtc_data_w));
+	m_lcdcpu->pe_out_cb().set(FUNC(cdtv_state::lcdcpu_rtc_addr_w));
+	m_lcdcpu->pg_out_cb().set(FUNC(cdtv_state::lcdcpu_portg_w));
+	m_lcdcpu->pi_in_cb().set(FUNC(cdtv_state::lcdcpu_porti_r));
+	m_lcdcpu->pi_out_cb().set(FUNC(cdtv_state::lcdcpu_porti_w));
+	m_lcdcpu->pj_in_cb().set(FUNC(cdtv_state::lcdcpu_portj_r));
+	m_lcdcpu->pj_out_cb().set(FUNC(cdtv_state::lcdcpu_portj_w));
+	m_lcdcpu->pk_out_cb().set(FUNC(cdtv_state::lcdcpu_portk_w));
+	m_lcdcpu->pl_out_cb().set(FUNC(cdtv_state::lcdcpu_portl_w));
+	m_lcdcpu->pm_out_cb().set(FUNC(cdtv_state::lcdcpu_portm_w));
+	m_lcdcpu->pn_out_cb().set(FUNC(cdtv_state::lcdcpu_portn_w));
+	m_lcdcpu->po_out_cb().set(FUNC(cdtv_state::lcdcpu_porto_w));
+	m_lcdcpu->pp_out_cb().set(FUNC(cdtv_state::lcdcpu_portp_w));
+
+	PWM_DISPLAY(config, m_vfd_display);
+	m_vfd_display->set_size(8, 8);
+	m_vfd_display->set_segmask(0xff, 0xff);
+	m_vfd_display->output_digit().set(FUNC(cdtv_state::vfd_update));
 
 	ADDRESS_MAP_BANK(config, m_overlay).set_map(&cdtv_state::overlay_1mb_map).set_options(ENDIANNESS_BIG, 16, 22, 0x200000);
 	// FIXME: CDTV is actually ECS Agnus but OCS Denise
@@ -1976,6 +2236,7 @@ void cdtv_state::cdtv(machine_config &config)
 	TPI6525(config, m_tpi, 0);
 	m_tpi->out_irq_cb().set(FUNC(cdtv_state::tpi_int_w));
 	m_tpi->out_pb_cb().set(FUNC(cdtv_state::tpi_portb_w));
+	m_tpi->out_pc_cb().set(FUNC(cdtv_state::tpi_portc_w));
 
 	CR511B(config, m_cdrom, 0);
 	m_cdrom->add_route(0, "speaker", 1.0, 0);
@@ -1988,6 +2249,8 @@ void cdtv_state::cdtv(machine_config &config)
 	m_cdrom->drq_cb().append(FUNC(cdtv_state::drq_w));
 
 	SOFTWARE_LIST(config, "cd_list").set_original("cdtv");
+
+	config.set_default_layout(layout_cdtv);
 }
 
 void cdtv_state::cdtvn(machine_config &config)
@@ -2474,7 +2737,7 @@ ROM_START( cdtv )
 	ROM_LOAD("v1.3-1990-10-01", 0x0000, 0x1000, CRC(3c7cb7bb) SHA1(958e799897ac044fcc0f0c74c3cb5d83f3edd0c7)) // this was dumped from a pre-production CD-1000 player which had the program in external EPROM
 
 	// lcd controller, sanyo lc6554h
-	ROM_REGION(0x2000, "lcd", 0)
+	ROM_REGION(0x2000, "lcdcpu", 0)
 	ROM_LOAD("252608-01.u62", 0x0000, 0x2000, NO_DUMP) // internal ROM of the final version hasn't been dumped yet
 	ROM_LOAD("v1.20-1990-09-26", 0x0000, 0x2000, CRC(9d69c439) SHA1(74354818ffc4d897801be705ae223717f522f8d4)) // this was dumped from a pre-production CD-1000 player which had the program in external EPROM
 ROM_END
@@ -2639,8 +2902,8 @@ COMP( 1987, a2000,    0,      0, a2000,    amiga, a2000_state, init_pal,  "Commo
 COMP( 1987, a2000n,   a2000,  0, a2000n,   amiga, a2000_state, init_ntsc, "Commodore", "Amiga 2000 (NTSC)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1987, a500,     0,      0, a500,     amiga, a500_state,  init_pal,  "Commodore", "Amiga 500 (PAL)",       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 COMP( 1987, a500n,    a500,   0, a500n,    amiga, a500_state,  init_ntsc, "Commodore", "Amiga 500 (NTSC)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1990, cdtv,     0,      0, cdtv,     amiga, cdtv_state,  init_pal,  "Commodore", "CDTV (PAL)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
-COMP( 1990, cdtvn,    cdtv,   0, cdtvn,    amiga, cdtv_state,  init_ntsc, "Commodore", "CDTV (NTSC)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1990, cdtv,     0,      0, cdtv,     cdtv,  cdtv_state,  init_pal,  "Commodore", "CDTV (PAL)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1990, cdtvn,    cdtv,   0, cdtvn,    cdtv,  cdtv_state,  init_ntsc, "Commodore", "CDTV (NTSC)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 
 // ECS Chipset
 COMP( 1990, a3000,    0,      0, a3000,    amiga, a3000_state, init_pal,  "Commodore", "Amiga 3000 (PAL)",      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

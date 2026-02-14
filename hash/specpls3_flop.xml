@@ -990,7 +990,7 @@ Disk 2 - Side B - Game 5: Star Warrior (Visions Software Factory)
 	</software>
 
 	<software name="aburner">
-		<description>Afterburner</description>
+		<description>After Burner</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<part name="flop1" interface="floppy_3">
@@ -1006,7 +1006,7 @@ Disk 2 - Side B - Game 5: Star Warrior (Visions Software Factory)
 	</software>
 
 	<software name="aburnera" cloneof="aburner">
-		<description>Afterburner (alt)</description>
+		<description>After Burner (alt)</description>
 		<year>1988</year>
 		<publisher>Activision</publisher>
 		<part name="flop1" interface="floppy_3">

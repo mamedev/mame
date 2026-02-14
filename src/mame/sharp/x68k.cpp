@@ -1043,13 +1043,13 @@ void x68k_state::x68000_base(machine_config &config)
 	m_ppi->in_pc_callback().set(FUNC(x68k_state::ppi_port_c_r));
 	m_ppi->out_pc_callback().set(FUNC(x68k_state::ppi_port_c_w));
 
-	HD63450(config, m_hd63450, 40_MHz_XTAL / 4, "maincpu");
+	HD63450(config, m_hd63450, 40_MHz_XTAL / 4, "maincpu", AS_PROGRAM);
 	m_hd63450->set_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_usec(4), attotime::from_hz(15625/2));
 	m_hd63450->set_burst_clocks(attotime::from_usec(2), attotime::from_nsec(450), attotime::from_nsec(450), attotime::from_nsec(50));
 	m_hd63450->irq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
 	m_hd63450->dma_end().set(FUNC(x68k_state::dma_end));
-	m_hd63450->dma_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));
-	m_hd63450->dma_write<0>().set("upd72065", FUNC(upd72065_device::dma_w));
+	m_hd63450->dma8_read<0>().set("upd72065", FUNC(upd72065_device::dma_r));
+	m_hd63450->dma8_write<0>().set("upd72065", FUNC(upd72065_device::dma_w));
 
 	SCC8530(config, m_scc, 40_MHz_XTAL / 8);
 	m_scc->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ5);
@@ -1101,6 +1101,7 @@ void x68k_state::x68000_base(machine_config &config)
 	FLOPPY_CONNECTOR(config, "upd72065:3", x68k_floppies, "525hd", x68k_state::floppy_formats);
 
 	SOFTWARE_LIST(config, "flop_list").set_original("x68k_flop");
+	SOFTWARE_LIST(config, "flop_generic_list").set_compatible("generic_flop_525").set_filter("x68k");
 
 	input_merger_any_high_device &nmi(INPUT_MERGER_ANY_HIGH(config, "nmi"));
 	nmi.output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ7);

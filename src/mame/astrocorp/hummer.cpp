@@ -12,6 +12,28 @@ Astro ROHS (GFX?)
 4x LY61L25616ML-20 SRAM
 2x LY621024SL-70LL SRAM
 4-DIP bank
+
++*** ASTRO PASSWORDS ***
+pengprty : Funny Penguins / Penguin Party
+  → Taken from manual, Version: USA-20111216
++------------+---------+------------+---------+------------+---------+
+| Password # | Code    | Password # | Code    | Password # | Code    |
++------------+---------+------------+---------+------------+---------+
+| OFF (0)    | No use  | 1          | 724670  | 2          | 540810  |
+| 3          | 167008  | 4          | 281630  | 5          | 403432  |
+| 6          | 685640  | 7          | 961012  |            |         |
++------------+---------+------------+---------+------------+---------+
+
+jackvent : Jack's Venture / Inca Treasure
+  → Taken from manual, Version: USA-090728
++------------+---------+------------+---------+------------+---------+
+| Password # | Code    | Password # | Code    | Password # | Code    |
++------------+---------+------------+---------+------------+---------+
+| OFF (0)    | No use  | 1          | 548516  | 2          | 754248  |
+| 3          | 936415  | 4          | 864578  | 5          | 102647  |
+| 6          | 748652  | 7          | 664852  |            |         |
++------------+---------+------------+---------+------------+---------+
+
 */
 
 #include "emu.h"
@@ -202,9 +224,9 @@ ROM_END
 void hummer_state::decrypt_rom(const decryption_info &table)
 {
 	const u32 size = memregion("maincpu")->bytes();
-	u16 * const rom = (u16 *)memregion("encrypted_rom")->base();
-	u16 * const decrypted = (u16 *)memregion("maincpu")->base();
-	std::unique_ptr<u16[]> tmp = std::make_unique<u16[]>(size/2);
+	u16 const* const rom = &memregion("encrypted_rom")->as_u16();
+	u16 *const decrypted = &memregion("maincpu")->as_u16();
+	std::unique_ptr<u16[]> tmp = std::make_unique<u16 []>(size/2);
 
 	// Pass 1: decrypt high and low byte independently.  They go
 	// through a bitswap and an xor, choosing between 8 possibilities

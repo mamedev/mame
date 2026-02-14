@@ -115,7 +115,7 @@ void gt913_sound_device::sound_stream_update(sound_stream& stream)
 				mix_sample(voice, left, right);
 		}
 
-		stream.put_int_clamp(0, i, (left * m_gain) >> 27, 32678);
+		stream.put_int_clamp(0, i, (left * m_gain) >> 27, 32768);
 		stream.put_int_clamp(1, i, (right * m_gain) >> 27, 32768);
 	}
 }

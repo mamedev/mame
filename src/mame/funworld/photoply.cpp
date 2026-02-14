@@ -233,7 +233,7 @@ void photoply_state::photoply(machine_config &config)
 //      .erase_all_time(attotime::from_usec(10));
 }
 
-// We asume that every Photo Play from 1999 onwards use a DX4 100MHz instead of a 75MHz one (both were compatible, the latter were recommended)
+// We assume that every Photo Play from 1999 onwards use a DX4 100MHz instead of a 75MHz one (both were compatible, the latter were recommended)
 void photoply_state::photoply_dx4_100(machine_config &config)
 {
 	photoply(config);

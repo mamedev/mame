@@ -317,7 +317,7 @@ Notes:
 #include "armedf.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i8051.h"
 #include "cpu/z80/z80.h"
 #include "machine/rescap.h"
 #include "sound/dac.h"
@@ -415,11 +415,13 @@ void armedf_state::irq_lv2_ack_w(u16 data)
  *
  *************************************/
 
-void armedf_state::common_map(address_map &map)
+void armedf_state::terraf_common_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
+	map(0x060000, 0x0605ff).ram().share("spriteram");
+	map(0x060600, 0x063fff).ram();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
 	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
@@ -428,19 +430,11 @@ void armedf_state::common_map(address_map &map)
 	map(0x078002, 0x078003).portr("P2");
 	map(0x078004, 0x078005).portr("DSW1");
 	map(0x078006, 0x078007).portr("DSW2");
-//  map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w)); handled in DRIVER_INIT
 	map(0x07c002, 0x07c003).w(FUNC(armedf_state::bg_scrollx_w));
 	map(0x07c004, 0x07c005).w(FUNC(armedf_state::bg_scrolly_w));
 	map(0x07c00b, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
-	map(0x07c00c, 0x07c00d).nopw();                    /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	map(0x07c00c, 0x07c00d).nopw(); // watchdog? cycle 0000 -> 0100 -> 0200 back to 0000
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv1_ack_w));
-}
-
-void armedf_state::terraf_common_map(address_map &map)
-{
-	common_map(map);
-	map(0x060000, 0x0603ff).ram().share("spriteram");
-	map(0x060400, 0x063fff).ram();
 }
 
 void armedf_state::terraf_map(address_map &map)
@@ -466,10 +460,7 @@ void armedf_state::terrafjb_map(address_map &map)
 
 void armedf_state::kozure_map(address_map &map)
 {
-	common_map(map);
-	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x061000, 0x063fff).ram();
-	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w));
+	terraf_map(map);
 //  map(0x0c0000, 0x0c0001).nopw(); /* watchdog? */
 //  map(0xffd000, 0xffd001).nopw(); /* passes crc ROM information to MCU, I guess */
 }
@@ -477,10 +468,10 @@ void armedf_state::kozure_map(address_map &map)
 void armedf_state::cclimbr2_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x061000, 0x063fff).ram();
+	map(0x060000, 0x0605ff).ram().share("spriteram");
+	map(0x060600, 0x063fff).ram();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
 	map(0x070000, 0x070fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
@@ -493,15 +484,15 @@ void armedf_state::cclimbr2_map(address_map &map)
 	map(0x07c002, 0x07c003).w(FUNC(armedf_state::bg_scrollx_w));
 	map(0x07c004, 0x07c005).w(FUNC(armedf_state::bg_scrolly_w));
 	map(0x07c00b, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
-	map(0x07c00c, 0x07c00d).nopw(); /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	map(0x07c00c, 0x07c00d).nopw(); // watchdog? cycle 0000 -> 0100 -> 0200 back to 0000
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
 }
 
 void armedf_state::legion_common_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x061000, 0x063fff).ram();
+	map(0x060000, 0x0605ff).ram().share("spriteram");
+	map(0x060600, 0x063fff).ram();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
@@ -514,7 +505,7 @@ void armedf_state::legion_common_map(address_map &map)
 	map(0x07c002, 0x07c003).w(FUNC(armedf_state::bg_scrollx_w));
 	map(0x07c004, 0x07c005).w(FUNC(armedf_state::bg_scrolly_w));
 	map(0x07c00b, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
-	map(0x07c00c, 0x07c00d).nopw();        /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	map(0x07c00c, 0x07c00d).nopw(); // watchdog? cycle 0000 -> 0100 -> 0200 back to 0000
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
 }
 
@@ -522,7 +513,7 @@ void armedf_state::legion_map(address_map &map)
 {
 	legion_common_map(map);
 
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w));
 }
 
@@ -540,7 +531,7 @@ void armedf_state::legionjb_map(address_map &map)
 	legion_common_map(map);
 
 	map(0x040000, 0x04003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::armedf_io_w));
 }
 
@@ -549,7 +540,7 @@ void armedf_state::legionjb2_map(address_map &map)
 	legion_common_map(map);
 
 	map(0x000000, 0x00003f).w(FUNC(armedf_state::legionjb_fg_scroll_w)).umask16(0x00ff);
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x07c000, 0x07c001).w(FUNC(armedf_state::armedf_io_w));
 	//also writes to 7c0010 / 70c020 / 70c030. These could possibly be the scroll registers on this bootleg and the writes to 000000 - 00003f could just be leftovers.
 }
@@ -557,11 +548,11 @@ void armedf_state::legionjb2_map(address_map &map)
 void armedf_state::armedf_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x061000, 0x065fff).ram();
+	map(0x060000, 0x0605ff).ram().share("spriteram");
+	map(0x060600, 0x065fff).ram();
 	map(0x066000, 0x066fff).ram().w(FUNC(armedf_state::bg_videoram_w)).share("bg_videoram");
 	map(0x067000, 0x067fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
-	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::text_videoram_w)).umask16(0x00ff);
+	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::armedf_text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06afff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x06b000, 0x06bfff).ram().share("spr_pal_clut");
 	map(0x06c000, 0x06c7ff).ram();
@@ -575,7 +566,7 @@ void armedf_state::armedf_map(address_map &map)
 	map(0x06d006, 0x06d007).w(FUNC(armedf_state::fg_scrollx_w));
 	map(0x06d008, 0x06d009).w(FUNC(armedf_state::fg_scrolly_w));
 	map(0x06d00b, 0x06d00b).w(FUNC(armedf_state::sound_command_w));
-	map(0x06d00c, 0x06d00d).nopw(); //watchdog?
+	map(0x06d00c, 0x06d00d).nopw(); // watchdog?
 	map(0x06d00e, 0x06d00f).w(FUNC(armedf_state::irq_lv1_ack_w));
 }
 
@@ -610,20 +601,20 @@ void bigfghtr_state::bigfghtr_map(address_map &map)
 	map(0x084000, 0x085fff).ram(); //work ram
 	map(0x086000, 0x086fff).ram().w(FUNC(bigfghtr_state::bg_videoram_w)).share("bg_videoram");
 	map(0x087000, 0x087fff).ram().w(FUNC(bigfghtr_state::fg_videoram_w)).share("fg_videoram");
-	map(0x088000, 0x089fff).rw(FUNC(bigfghtr_state::text_videoram_r), FUNC(bigfghtr_state::text_videoram_w)).umask16(0x00ff);
+	map(0x088000, 0x089fff).rw(FUNC(bigfghtr_state::text_videoram_r), FUNC(bigfghtr_state::armedf_text_videoram_w)).umask16(0x00ff);
 	map(0x08a000, 0x08afff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x08b000, 0x08bfff).ram().share("spr_pal_clut");
 	map(0x08c000, 0x08c001).portr("P1");
 	map(0x08c002, 0x08c003).portr("P2");
 	map(0x08c004, 0x08c005).portr("DSW0");
 	map(0x08c006, 0x08c007).portr("DSW1");
-	map(0x08d000, 0x08d001).w(FUNC(bigfghtr_state::armedf_io_w));  //807b0
+	map(0x08d000, 0x08d001).w(FUNC(bigfghtr_state::armedf_io_w)); // 807b0
 	map(0x08d002, 0x08d003).w(FUNC(bigfghtr_state::bg_scrollx_w));
 	map(0x08d004, 0x08d005).w(FUNC(bigfghtr_state::bg_scrolly_w));
 	map(0x08d006, 0x08d007).w(FUNC(bigfghtr_state::fg_scrollx_w));
 	map(0x08d008, 0x08d009).w(FUNC(bigfghtr_state::fg_scrolly_w));
 	map(0x08d00b, 0x08d00b).w(FUNC(bigfghtr_state::sound_command_w));
-	map(0x08d00c, 0x08d00d).nopw(); //watchdog
+	map(0x08d00c, 0x08d00d).nopw(); // watchdog
 	map(0x08d00e, 0x08d00f).w(FUNC(bigfghtr_state::irq_lv1_ack_w));
 
 	map(0x400000, 0x400001).r(FUNC(bigfghtr_state::latch_r));
@@ -634,9 +625,9 @@ void bigfghtr_state::bigfghtr_mcu_map(address_map &map)
 	map(0x0000, 0x0fff).rom();
 }
 
-void bigfghtr_state::bigfghtr_mcu_io_map(address_map &map)
+void bigfghtr_state::bigfghtr_mcu_data_map(address_map &map)
 {
-	map(0x00000, 0x005ff).w(FUNC(bigfghtr_state::mcu_spritelist_w)); //Sprite RAM, guess shared as well
+	map(0x00000, 0x005ff).w(FUNC(bigfghtr_state::mcu_spritelist_w)); // Sprite RAM, guess shared as well
 	map(0x00600, 0x03fff).ram().share("sharedram");
 }
 
@@ -652,13 +643,6 @@ void armedf_state::cclimbr2_soundmap(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
 	map(0xc000, 0xffff).ram();
-}
-
-void armedf_state::blitter_txram_w(offs_t offset, u8 data)
-{
-	m_text_videoram[offset] = data;
-	if (offset < 0x1000)
-		m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 void armedf_state::terrafjb_fg_scrollx_w(u8 data)
@@ -681,7 +665,7 @@ void armedf_state::terrafjb_fg_scroll_msb_w(u8 data)
 void armedf_state::terrafjb_extraz80_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x4fff).ram().w(FUNC(armedf_state::blitter_txram_w)).share("text_videoram");
+	map(0x4000, 0x4fff).ram().w(FUNC(armedf_state::terraf_text_videoram_w)).share("text_videoram");
 	map(0x5000, 0x5fff).ram();
 	map(0x8000, 0x87ff).ram();
 }
@@ -1152,17 +1136,7 @@ void armedf_state::sound_config_common(machine_config &config) // common amongst
 	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, m_dacfilter2, 0.4); // SIP R2R DAC @ G11-2 with 74HC374P latch
 }
 
-void armedf_state::sound_config(machine_config &config) // 3526, used on almost all non-bootlegs
-{
-	sound_config_common(config);
-
-	m_audiocpu->set_addrmap(AS_PROGRAM, &armedf_state::sound_map);
-	m_audiocpu->set_addrmap(AS_IO, &armedf_state::sound_3526_portmap);
-
-	YM3526(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.2);
-}
-
-void armedf_state::sound_config_3812(machine_config &config) // 3812, used on bootlegs and skyrobo/bigfghtr
+void armedf_state::sound_config(machine_config &config) // 3812, used on all pcbs and bootlegs except for legion (and maybe cclimbr2)
 {
 	sound_config_common(config);
 
@@ -1172,7 +1146,7 @@ void armedf_state::sound_config_3812(machine_config &config) // 3812, used on bo
 	YM3812(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.2);
 }
 
-void armedf_state::sound_config_legion(machine_config &config) // 3526, used on non-bootleg legion and cclimbr2
+void armedf_state::sound_config_legion(machine_config &config) // 3526, used on non-bootleg legion and maybe cclimbr2, needs verification
 {
 	sound_config_common(config);
 
@@ -1182,7 +1156,7 @@ void armedf_state::sound_config_legion(machine_config &config) // 3526, used on 
 	YM3526(config, "ymsnd", XTAL(24'000'000)/6).add_route(ALL_OUTPUTS, m_ymfilter, 0.2);
 }
 
-void armedf_state::sound_config_legion_3812(machine_config &config) // 3812, used on legion bootlegs
+void armedf_state::sound_config_legion_3812(machine_config &config) // 3812, used on legion bootlegs and maybe cclimbr2, needs verification
 {
 	sound_config_common(config);
 
@@ -1224,7 +1198,7 @@ void armedf_state::terrafjb(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
 	/* sound hardware */
-	sound_config_3812(config);
+	sound_config(config);
 }
 
 void armedf_state::terrafb(machine_config &config)
@@ -1247,7 +1221,7 @@ void armedf_state::kozure(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,terraf)
 
 	/* sound hardware */
-	sound_config_3812(config);
+	sound_config(config);
 }
 
 void armedf_state::armedf(machine_config &config)
@@ -1327,14 +1301,14 @@ void bigfghtr_state::bigfghtr(machine_config &config)
 
 	i8751_device &mcu(I8751(config, "mcu", XTAL(16'000'000)/2));   // verified
 	mcu.set_addrmap(AS_PROGRAM, &bigfghtr_state::bigfghtr_mcu_map);
-	mcu.set_addrmap(AS_IO, &bigfghtr_state::bigfghtr_mcu_io_map);
+	mcu.set_addrmap(AS_DATA, &bigfghtr_state::bigfghtr_mcu_data_map);
 	mcu.port_in_cb<1>().set_constant(0xdf); // bit 5: bus contention related?
 
 	video_config(config, 12, 8, 248);
 
 	MCFG_VIDEO_START_OVERRIDE(bigfghtr_state,armedf)
 
-	sound_config_3812(config);
+	sound_config(config);
 }
 
 
@@ -1949,6 +1923,51 @@ ROM_START( bigfghtr )
 	ROM_LOAD( "tf.13h", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* Prom is a N82S129AN type */
 ROM_END
 
+// bootleg 2-PCB set with CPU riser board. Very minor changes to the original, but uses a D8748 instead of the C8751
+// MCU check can be bypassed with bp 3f07e,{PC=3f080},g
+ROM_START( skyrobobl )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // all on top board, but the last two which are on the CPU riser board
+	ROM_LOAD16_BYTE( "d3", 0x00000, 0x10000, CRC(f29e3c2f) SHA1(6be6f4c8a3dca66ac2a91e1ddfb42488870e615f) )
+	ROM_LOAD16_BYTE( "f3", 0x00001, 0x10000, CRC(b8f2ea33) SHA1(5c0a6836224cc5fb933d43785aa22d5d3f364854) )
+	ROM_LOAD16_BYTE( "d5", 0x20000, 0x10000, CRC(7a01c2cd) SHA1(ad0b7c11bf1e7fafffcb934aab05e1ce2d5b7977) )
+	ROM_LOAD16_BYTE( "f5", 0x20001, 0x10000, CRC(070ab490) SHA1(7b5a0204fbb287e2301ee3ad7e9938ca604aed75) )
+	ROM_LOAD16_BYTE( "d6", 0x40000, 0x10000, CRC(509b4bbd) SHA1(6913a0d8b8898955665e6a91c6e3b70b11a1169d) )
+	ROM_LOAD16_BYTE( "f6", 0x40001, 0x10000, CRC(8fa134a3) SHA1(f1aeeeced945e04f0370ff5f0f6b1f3ca3cccf6a) )
+	ROM_LOAD16_BYTE( "r",  0x60000, 0x10000, CRC(efcacce6) SHA1(9a0c6ddab33aa15fcba7a231514a5036a32b28c8) )
+	ROM_LOAD16_BYTE( "l",  0x60001, 0x10000, CRC(eb53ab48) SHA1(013cef0fba5740a556238532e88c69143cbf32ef) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // same as the original
+	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
+
+	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASE00 ) // read protected
+	ROM_LOAD( "d8748hd", 0x000, 0x400, NO_DUMP )
+
+	ROM_REGION( 0x08000, "text", 0 ) // same as the original
+	ROM_LOAD( "7", 0x00000, 0x08000, CRC(f556ef28) SHA1(2acb83cdf23356091056f2cfbbc2b9828ee25b6f) )
+
+	ROM_REGION( 0x30000, "foreground", 0 )
+	ROM_LOAD( "5.13f", 0x00000, 0x20000, CRC(c9015e2e) SHA1(1545c67bd9023f8df4a4da55b8417a7f732a4e57) ) // slight changes from the original
+	ROM_LOAD( "6.15f", 0x20000, 0x10000, CRC(27469a76) SHA1(ebf2c60e1f70a589680c05adf10771ac2097b9d0) )
+
+	ROM_REGION( 0x20000, "background", 0 ) // same as the original
+	ROM_LOAD( "12.8a", 0x00000, 0x10000, CRC(a5694ea9) SHA1(ea94174495b3a65b3797932074a94df3b55fa0a2) )
+	ROM_LOAD( "11.6a", 0x10000, 0x10000, CRC(10b74e2c) SHA1(e3ec68726e7f277dc2043424f2e4d863eb01b3dc) )
+
+	ROM_REGION( 0x40000, "sprite", 0 ) // same as the original
+	ROM_LOAD16_BYTE( "9.8d",  0x00000, 0x20000, CRC(fe67800e) SHA1(0d3c4c3cb185270260fa691a97cddf082d6a056e) )
+	ROM_LOAD16_BYTE( "10.9d", 0x00001, 0x20000, CRC(dcb828c4) SHA1(607bc86580a6fe6e15e91131532b0eecd8b7a0cb) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tf.13h",     0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) // on top board
+	ROM_LOAD( "82s129.cpu", 0x0100, 0x0100, CRC(9cc0933c) SHA1(dc90541170c4c21b92a351f5894712e4e2b29c64) ) // on CPU riser board
+
+	ROM_REGION( 0x800, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "pal16l8.b1", 0x000, 0x104, CRC(c3af3134) SHA1(464a2fd5b13138a680f130d683e863460267c35b) ) // on top board
+	ROM_LOAD( "pal16r8.b3", 0x200, 0x104, CRC(e57b5f18) SHA1(7edc28e6ed92ddc667bf7a05f70f341b3e9e0528) ) // on top board
+	ROM_LOAD( "pal16l8.b6", 0x400, 0x104, CRC(0cd264f8) SHA1(93db1ae7fdf82baaca0b0767c3a7d0b2e821ea34) ) // on top board
+	ROM_LOAD( "pal16r4.e6", 0x600, 0x104, CRC(d5575cc0) SHA1(a078be6c61deba2fcba11fe2b47b6b2094b6999c) ) // on bottom board
+ROM_END
+
 /*************************************
  *
  *  Driver initialization
@@ -2040,3 +2059,4 @@ GAME( 1988, armedff,   armedf,   armedf,    armedf,   armedf_state,   init_armed
 
 GAME( 1989, skyrobo,   0,        bigfghtr,  bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, bigfghtr,  skyrobo,  bigfghtr,  bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyrobobl, skyrobo,  bigfghtr,  bigfghtr, bigfghtr_state, init_armedf,   ROT0,   "bootleg",                       "Sky Robo (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // undumped MCU

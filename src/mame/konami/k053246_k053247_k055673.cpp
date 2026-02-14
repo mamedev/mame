@@ -385,7 +385,7 @@ void k053247_device::k053247_sprites_draw_common(BitmapClass &bitmap, const rect
 		shadow = color = m_ram[offs + 6];
 		primask = 0;
 
-		m_k053247_cb(&code, &color, &primask);
+		m_k053247_cb(code, color, primask);
 
 		k053247_draw_single_sprite_gxcore(bitmap, cliprect,
 				nullptr, nullptr,
@@ -871,7 +871,7 @@ void k053247_device::device_reset()
         0x00-0xff = zcode to ignore
 */
 
-void k053247_device::k053247_set_z_rejection(int zcode)
+void k053247_device::k053247_set_z_rejection(s32 zcode)
 {
 	m_z_rejection = zcode;
 }

@@ -29,12 +29,11 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override
 	{
-		SPEAKER(config, "outl").front_left();
-		SPEAKER(config, "outr").front_right();
+		SPEAKER(config, "out", 2).front();
 
-		SPEAKER_SOUND(config, m_left_speaker, 0).add_route(ALL_OUTPUTS, "outl", 0.50);
+		SPEAKER_SOUND(config, m_left_speaker, 0).add_route(ALL_OUTPUTS, "out", 0.50, 0);
 
-		SPEAKER_SOUND(config, m_right_speaker, 0).add_route(ALL_OUTPUTS, "outr", 0.50);
+		SPEAKER_SOUND(config, m_right_speaker, 0).add_route(ALL_OUTPUTS, "out", 0.50, 1);
 	}
 
 	virtual void device_start() override

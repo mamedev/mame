@@ -10244,6 +10244,27 @@ ROM_START( galaktron )
 	ROM_LOAD( "galaktron_pr.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+ROM_START( galaktrons3 )
+	ROM_REGION( 0x4000, "maincpu", 0 ) // all 2708
+	ROM_LOAD( "1b.1b",   0x0000, 0x0400, CRC(7fa16c70) SHA1(4dcfe25deb822a4de5014e2c1e013405efde4612) )
+	ROM_LOAD( "2b.2b",   0x0400, 0x0400, CRC(afec8adb) SHA1(ca97a6919452958c8f33181e0be3f9c6f1bdf7ab) )
+	ROM_LOAD( "3b.3b",   0x0800, 0x0400, CRC(770988b5) SHA1(c347d5725d9eb089464022a4528a3fef86a1284f) )
+	ROM_LOAD( "4b.4b",   0x0c00, 0x0400, CRC(de7e7770) SHA1(b06043a1d898eb323ddabffd3d2a3b1f63df0e5e) )
+	ROM_LOAD( "5b.5b",   0x1000, 0x0400, CRC(8718391e) SHA1(8763dd428158ea79f4a64294acbf3be8e7dfb882) )
+	ROM_LOAD( "6b.6b",   0x1400, 0x0400, CRC(9175882b) SHA1(d9943efcb9245af7f01aecc533a699bdefc7d283) )
+	ROM_LOAD( "7a.7a",   0x1800, 0x0400, CRC(6a57f9e8) SHA1(7970d059679384833083a99ea7f59d14417eccc3) )
+	ROM_LOAD( "8a.8a",   0x1c00, 0x0400, CRC(8eeb4c6f) SHA1(77140ea63677356624d12c399ea89f552a27bff1) )
+	ROM_LOAD( "9a.9a",   0x2000, 0x0400, CRC(7bd2befa) SHA1(7976471c314cf72b313f79727dc14ad2507f6e4d) )
+	ROM_LOAD( "10a.10a", 0x2400, 0x0400, CRC(05bf58ed) SHA1(d00e36bb6277fc8139ad6c6b8ee22bf34cc4daca) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 ) // all 2716
+	ROM_LOAD( "7.7a", 0x0000, 0x0800, CRC(833e112c) SHA1(ef5180936a54d7496f6004fdec78e17950d1cbbd) )
+	ROM_LOAD( "9.9a", 0x0800, 0x0800, CRC(eca21395) SHA1(cb17f5d1e554b77224396af6e40b7667843013d5) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "ims5610.bin",    0x0000, 0x0020, CRC(24652bc4) SHA1(d89575f3749c75dc963317fe451ffeffd9856e4d) )
+ROM_END
+
 ROM_START( galkamika )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "3.bin",   0x0000, 0x0800, CRC(51ba70ac) SHA1(970070328f6e63f65c68270d0520cc3d26439132) )
@@ -10895,6 +10916,22 @@ ROM_START( tdpgal )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "bprom.bin",       0x0000, 0x0020, CRC(2b4cf53f) SHA1(8d7eb0453173b9821eea32419b67559bfb4578d0) )
+ROM_END
+
+ROM_START( tdpgala )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "g8", 0x0000, 0x0800, CRC(7be819fe) SHA1(ab5a332914546692f9976e243daf3040f0d9952e) ) // matches tdpgal
+	ROM_LOAD( "f8", 0x0800, 0x0800, CRC(d6641a10) SHA1(d576eda7c47b3e0eba9fadbff9266b095daf4be3) )
+	ROM_LOAD( "e8", 0x1000, 0x0800, CRC(e6c85dca) SHA1(159cd711f012d29ed80007eeb9ab18fd8d943069) )
+	ROM_LOAD( "d8", 0x1800, 0x0800, CRC(a7dfcfe7) SHA1(75fc517bf4dd36f67c11fb5bc9ed7d48ed626ea5) )
+	ROM_LOAD( "c8", 0x2000, 0x1000, CRC(01484c16) SHA1(ea55578c330a40b0881f7b5eeeffb24b7bbb9741) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "j1", 0x0000, 0x0800, CRC(39eec13f) SHA1(5cd8045eaded0008a5aaec555c3841fd0f29b2a8) )
+	ROM_LOAD( "k1", 0x0800, 0x0800, CRC(3113bcfd) SHA1(e2792e5fe7d7f27bb329e3104dee3ca29d72ef48) ) // matches tdpgal
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "74s472.gg", 0x0000, 0x0020, CRC(2b4cf53f) SHA1(8d7eb0453173b9821eea32419b67559bfb4578d0) ) // matches tdpgal
 ROM_END
 
 ROM_START( kamakazi3 ) // Hack of Video Games (UK) Ltd. version???? flyer spells it Kamakaze III, also no year or (c)
@@ -16747,6 +16784,7 @@ GAME( 1979, galap2,      galaxian, galaxian,   superg,     galaxian_state, init_
 GAME( 1979, galap4,      galaxian, galaxian,   superg,     galaxian_state, init_galaxian,   ROT90,  "hack (G.G.I)",                               "Galaxian Part 4 (hack)",                                                                       MACHINE_SUPPORTS_SAVE )
 GAME( 1979, zerotime,    galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg? (Petaco S.A.)",                     "Zero Time (Petaco S.A.)",                                                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galaktron,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Petaco S.A.)",                      "Galaktron (Petaco S.A.)",                                                                      MACHINE_SUPPORTS_SAVE )
+GAME( 1979, galaktrons3, galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Sede 3)",                           "Galaktron (Sede 3)",                                                                           MACHINE_SUPPORTS_SAVE )
 GAME( 1979, galkamika,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Electrogame)",                      "Kamikaze (Electrogame, Spanish bootleg of Galaxian)",                                          MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // Imperfect graphics because of missing ROM
 GAME( 1979, zerotimed,   galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Datamat)",                          "Zero Time (Datamat)",                                                                          MACHINE_SUPPORTS_SAVE ) // a 1994 bootleg of the Petaco bootleg
 GAME( 1979, zerotimemc,  galaxian, galaxian,   zerotime,   galaxian_state, init_galaxian,   ROT90,  "bootleg (Marti Colls)",                      "Zero Time (Marti Colls)",                                                                      MACHINE_SUPPORTS_SAVE )
@@ -16816,7 +16854,8 @@ GAME( 1981, redufob,     redufo,   galaxian,   redufob,    galaxian_state, init_
 GAME( 1981, redufob2,    redufo,   galaxian,   redufob,    galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 2)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1981, redufob3,    redufo,   galaxian,   redufob3,   galaxian_state, init_nolock,     ROT90,  "bootleg",                         "Defend the Terra Attack on the Red UFO (bootleg, set 3)",             MACHINE_SUPPORTS_SAVE )
 GAME( 19??, exodus,      redufo,   galaxian,   redufo,     galaxian_state, init_nolock,     ROT90,  "bootleg? (Subelectro)",           "Exodus (bootleg?)",                                                   MACHINE_SUPPORTS_SAVE )
-GAME( 1983, tdpgal,      0,        galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker",                                                   MACHINE_SUPPORTS_SAVE )
+GAME( 1983, tdpgal,      0,        galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Design Labs / Thomas Automatics", "Triple Draw Poker (Design Labs / Thomas Automatics)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tdpgala,     tdpgal,   galaxian,   tdpgal,     galaxian_state, init_nolock,     ROT90,  "Video Village",                   "Triple Draw Poker (Video Village)",                                   MACHINE_SUPPORTS_SAVE )
 GAME( 1979, kamakazi3,   galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "hack",                            "Kamakazi III (hack of 'Super Galaxians')",                            MACHINE_SUPPORTS_SAVE ) // Hack of a hack (superg)
 GAME( 1979, spacian2,    galaxian, galaxian,   superg,     galaxian_state, init_nolock,     ROT90,  "Namco / Taito",                   "T.T Spacian Part-2",                                                  MACHINE_SUPPORTS_SAVE ) // endorsed by Namco, or bootleg?
 

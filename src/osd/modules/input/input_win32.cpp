@@ -271,9 +271,6 @@ public:
 	{
 		wininput_module<win32_mouse_device>::input_init(machine);
 
-		if (!options()->mouse())
-			return;
-
 		// allocate a device
 		create_device<win32_mouse_device>(DEVICE_CLASS_MOUSE, "Win32 Mouse 1", "Win32 Mouse 1");
 	}

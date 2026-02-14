@@ -190,17 +190,17 @@
 static struct sprite_entry
 {
 	int pri;
-	uint32_t adr;
+	u32 adr;
 } sprites[0x100];
 
-void konamigx_state::generate_sprites(address_space &space, uint32_t src, uint32_t spr, int count)
+void konamigx_state::generate_sprites(address_space &space, u32 src, u32 spr, int count)
 {
 	int scount = 0;
 	int ecount = 0;
 
 	for (int i = 0; i < count; i++)
 	{
-		uint32_t adr = src + 0x100*i;
+		u32 adr = src + 0x100*i;
 		int pri;
 		if (!space.read_word(adr+2))
 			continue;
@@ -217,22 +217,22 @@ void konamigx_state::generate_sprites(address_space &space, uint32_t src, uint32
 
 	for (int i = 0; i < ecount; i++)
 	{
-		uint32_t adr = sprites[i].adr;
+		u32 adr = sprites[i].adr;
 		if (adr)
 		{
-			uint32_t set =(space.read_word(adr) << 16)|space.read_word(adr+2);
-			uint16_t glob_x = space.read_word(adr+4);
-			uint16_t glob_y = space.read_word(adr+8);
-			uint16_t flip_x = space.read_word(adr+12) ? 0x1000 : 0x0000;
-			uint16_t flip_y = space.read_word(adr+14) ? 0x2000 : 0x0000;
-			uint16_t glob_f = flip_x | (flip_y ^ 0x2000);
-			uint16_t zoom_x = space.read_word(adr+20);
-			uint16_t zoom_y = space.read_word(adr+22);
-			uint16_t color_val    = 0x0000;
-			uint16_t color_mask   = 0xffff;
-			uint16_t color_set    = 0x0000;
-			uint16_t color_rotate = 0x0000;
-			uint16_t v;
+			u32 set =(space.read_word(adr) << 16)|space.read_word(adr+2);
+			u16 glob_x = space.read_word(adr+4);
+			u16 glob_y = space.read_word(adr+8);
+			u16 flip_x = space.read_word(adr+12) ? 0x1000 : 0x0000;
+			u16 flip_y = space.read_word(adr+14) ? 0x2000 : 0x0000;
+			u16 glob_f = flip_x | (flip_y ^ 0x2000);
+			u16 zoom_x = space.read_word(adr+20);
+			u16 zoom_y = space.read_word(adr+22);
+			u16 color_val    = 0x0000;
+			u16 color_mask   = 0xffff;
+			u16 color_set    = 0x0000;
+			u16 color_rotate = 0x0000;
+			u16 v;
 
 			v = space.read_word(adr+24);
 			if (v & 0x8000)
@@ -268,14 +268,14 @@ void konamigx_state::generate_sprites(address_space &space, uint32_t src, uint32
 
 			if (set >= 0x200000 && set < 0xd00000)
 			{
-				uint16_t count2 = space.read_word(set);
+				u16 count2 = space.read_word(set);
 
 				set += 2;
 				while(count2)
 				{
-					uint16_t idx  = space.read_word(set);
-					uint16_t flip = space.read_word(set+2);
-					uint16_t col  = space.read_word(set+4);
+					u16 idx  = space.read_word(set);
+					u16 flip = space.read_word(set+2);
+					u16 col  = space.read_word(set+4);
 					short y = space.read_word(set+6);
 					short x = space.read_word(set+8);
 
@@ -339,22 +339,22 @@ void konamigx_state::generate_sprites(address_space &space, uint32_t src, uint32
 	}
 }
 
-void konamigx_state::tkmmpzdm_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
+void konamigx_state::tkmmpzdm_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
 {
 	konamigx_esc_alert(m_workram, 0x0142, 0x100, 0);
 }
 
-void konamigx_state::dragoonj_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
+void konamigx_state::dragoonj_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
 {
 	konamigx_esc_alert(m_workram, 0x5c00, 0x100, 0);
 }
 
-void konamigx_state::sal2_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
+void konamigx_state::sal2_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
 {
 	konamigx_esc_alert(m_workram, 0x1c8c, 0x172, 1);
 }
 
-void konamigx_state::sexyparo_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
+void konamigx_state::sexyparo_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
 {
 	// The d20000 should probably be p3
 	// TODO: debugging bootcamp, remove once finished
@@ -367,20 +367,20 @@ void konamigx_state::sexyparo_esc(address_space &space, uint32_t p1, uint32_t p2
 	generate_sprites(space, 0xc00604, 0xd20000, 0xfc);
 }
 
-void konamigx_state::tbyahhoo_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
+void konamigx_state::tbyahhoo_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
 {
 	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
-void konamigx_state::daiskiss_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4)
+void konamigx_state::daiskiss_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4)
 {
 	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
-void konamigx_state::esc_w(address_space &space, uint32_t data)
+void konamigx_state::esc_w(address_space &space, u32 data)
 {
-	uint32_t opcode;
-	uint32_t params;
+	u32 opcode;
+	u32 params;
 
 	/* ignore nullptr writes to the ESC (these appear to be "keepalives" on the real hardware) */
 	if (!data)
@@ -428,10 +428,10 @@ void konamigx_state::esc_w(address_space &space, uint32_t data)
 		case 1: // Run program
 			if (m_esc_cb)
 			{
-				uint32_t p1 = (space.read_word(params+0)<<16) | space.read_word(params+2);
-				uint32_t p2 = (space.read_word(params+4)<<16) | space.read_word(params+6);
-				uint32_t p3 = (space.read_word(params+8)<<16) | space.read_word(params+10);
-				uint32_t p4 = (space.read_word(params+12)<<16) | space.read_word(params+14);
+				u32 p1 = (space.read_word(params+0)<<16) | space.read_word(params+2);
+				u32 p2 = (space.read_word(params+4)<<16) | space.read_word(params+6);
+				u32 p3 = (space.read_word(params+8)<<16) | space.read_word(params+10);
+				u32 p4 = (space.read_word(params+12)<<16) | space.read_word(params+14);
 				(this->*m_esc_cb)(space, p1, p2, p3, p4);
 			}
 			break;
@@ -469,9 +469,9 @@ ioport_value konamigx_state::gx_rdport1_3_r()
 	return (m_gx_rdport1_3 >> 1);
 }
 
-void konamigx_state::eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void konamigx_state::eeprom_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	uint32_t odata;
+	u32 odata;
 
 	if (ACCESSING_BITS_24_31)
 	{
@@ -517,10 +517,10 @@ void konamigx_state::eeprom_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	}
 }
 
-void konamigx_state::control_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+void konamigx_state::control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	// TODO: derive from reported PCB XTALs
-	const uint32_t pixclock[4] = { 6'000'000, 8'000'000, 12'000'000, 16'000'000 };
+	const u32 pixclock[4] = { 6'000'000, 8'000'000, 12'000'000, 16'000'000 };
 	//logerror("write %x to control register (mask=%x)\n", data, mem_mask);
 
 	// known controls:
@@ -736,7 +736,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
 
 /* National Semiconductor ADC0834 4-channel serial ADC emulation */
 
-double konamigx_state::adc0834_callback(uint8_t input)
+double konamigx_state::adc0834_callback(u8 input)
 {
 	switch (input)
 	{
@@ -751,7 +751,7 @@ double konamigx_state::adc0834_callback(uint8_t input)
 }
 
 
-uint32_t konamigx_state::le2_gun_H_r()
+u32 konamigx_state::le2_gun_H_r()
 {
 	int p1x = m_light0_x->read()* 290 /0xff + 20;
 	int p2x = m_light1_x->read()* 290 /0xff + 20;
@@ -759,7 +759,7 @@ uint32_t konamigx_state::le2_gun_H_r()
 	return (p1x << 16) | p2x;
 }
 
-uint32_t konamigx_state::le2_gun_V_r()
+u32 konamigx_state::le2_gun_V_r()
 {
 	int p1y = m_light0_y->read() * 224 / 0xff;
 	int p2y = m_light1_y->read() * 224 / 0xff;
@@ -774,23 +774,23 @@ uint32_t konamigx_state::le2_gun_V_r()
 /**********************************************************************************/
 /* system or game dependent handlers */
 
-uint32_t konamigx_state::type1_roz_r1(offs_t offset)
+u32 konamigx_state::type1_roz_r1(offs_t offset)
 {
-	uint32_t *ROM = (uint32_t *)memregion("gfx3")->base();
+	u32 *ROM = (u32 *)memregion("gfx3")->base();
 
 	return ROM[offset];
 }
 
-uint32_t konamigx_state::type1_roz_r2(offs_t offset)
+u32 konamigx_state::type1_roz_r2(offs_t offset)
 {
-	uint32_t *ROM = (uint32_t *)memregion("gfx3")->base();
+	u32 *ROM = (u32 *)memregion("gfx3")->base();
 
 	ROM += (0x600000/2);
 
 	return ROM[offset];
 }
 
-uint32_t konamigx_state::type3_sync_r()
+u32 konamigx_state::type3_sync_r()
 {
 	if (m_konamigx_current_frame == 0)
 		return -1; // return 0xfffffffe | 1;
@@ -875,7 +875,7 @@ uint32_t konamigx_state::type3_sync_r()
     move.l  #$C10400,($C102EC).l       move.l  #$C10400,($C102EC).l
 */
 
-void konamigx_state::type4_prot_w(address_space &space, offs_t offset, uint32_t data)
+void konamigx_state::type4_prot_w(address_space &space, offs_t offset, u32 data)
 {
 	int clk;
 	int i;
@@ -1028,7 +1028,7 @@ void konamigx_state::type4_prot_w(address_space &space, offs_t offset, uint32_t 
 }
 
 // cabinet lamps for type 1 games
-void konamigx_state::type1_cablamps_w(uint32_t data)
+void konamigx_state::type1_cablamps_w(u32 data)
 {
 	m_lamp = BIT(data, 24);
 }
@@ -1158,14 +1158,14 @@ void konamigx_state::sexyparoebl_map(address_map &map) // TODO: verify everythin
 /**********************************************************************************/
 /* Sound handling */
 
-uint16_t konamigx_state::tms57002_status_word_r()
+u16 konamigx_state::tms57002_status_word_r()
 {
 	return (m_dasp->dready_r() ? 4 : 0) |
 		(m_dasp->pc0_r() ? 2 : 0) |
 		(m_dasp->empty_r() ? 1 : 0);
 }
 
-void konamigx_state::tms57002_control_word_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void konamigx_state::tms57002_control_word_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -3080,7 +3080,7 @@ ROM_START( soccerssu )
 	ROM_LOAD( "soccerssu.nv", 0x0000, 0x080, CRC(812f6878) SHA1(fc4975211720a7eb413bceda8109231cb1c00834) )
 ROM_END
 
-/* Soccer Superstars (94.12.19 - Japan ver JAC) Writes JAB to EEPROM and reports as JAC */
+/* Soccer Superstars (94.12.09 - Japan ver JAC) Writes JAB to EEPROM and reports as JAC */
 ROM_START( soccerssj )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3223,7 +3223,7 @@ ROM_END
 
 /* Vs. Net Soccer TODO: Hook up ROM tests. */
 
-/* Vs. Net Soccer (ver EAD) */
+/* Vs. Net Soccer (ver EAD) 1996.11.27 */
 ROM_START( vsnetscr )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3261,7 +3261,7 @@ ROM_START( vsnetscr )
 	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, CRC(d70c59dd) SHA1(c33caca20611202fb489d9416083f41754b1d6e1) )
 ROM_END
 
-/* Vs. Net Soccer (ver EAB) */
+/* Vs. Net Soccer (ver EAB)  1996.11.27 */
 ROM_START( vsnetscreb )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3299,7 +3299,7 @@ ROM_START( vsnetscreb )
 	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, CRC(d70c59dd) SHA1(c33caca20611202fb489d9416083f41754b1d6e1) )
 ROM_END
 
-/* Vs. Net Soccer (ver UAB) */
+/* Vs. Net Soccer (ver UAB) 1996.11.27 */
 ROM_START( vsnetscru )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3463,7 +3463,7 @@ Notes:
            PAL5: PALCE16V8 stamped 000143
 */
 
-/* Vs. Net Soccer (ver JAB) */
+/* Vs. Net Soccer (ver JAB) 1996.11.25 */
 ROM_START( vsnetscrj )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -3501,7 +3501,7 @@ ROM_START( vsnetscrj )
 	ROM_LOAD( "627a23.7r", 0x000000, 0x400000, CRC(d70c59dd) SHA1(c33caca20611202fb489d9416083f41754b1d6e1) )
 ROM_END
 
-/* Vs. Net Soccer (ver AAA) */
+/* Vs. Net Soccer (ver AAA) 1996.11.27 */
 ROM_START( vsnetscra )
 	/* main program */
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -4033,9 +4033,9 @@ MACHINE_RESET_MEMBER(konamigx_state,konamigx)
 struct GXGameInfoT
 {
 	const char *romname;
-	uint32_t cfgport;
-	uint32_t special;
-	uint32_t readback;
+	u32 cfgport;
+	u32 special;
+	u32 readback;
 };
 
 #define BPP4  0
@@ -4089,7 +4089,7 @@ static const GXGameInfoT gameDefs[] =
 	{ "",        0xff,0xff,0xff },
 };
 
-uint32_t konamigx_state::k_6bpp_rom_long_r(offs_t offset, uint32_t mem_mask)
+u32 konamigx_state::k_6bpp_rom_long_r(offs_t offset, u32 mem_mask)
 {
 	return m_k056832->k_6bpp_rom_long_r(offset, mem_mask);
 }
@@ -4123,7 +4123,7 @@ void konamigx_state::init_konamigx()
 					break;
 				case 2: // tkmmpzdm hack
 				{
-					uint32_t *rom = (uint32_t*)memregion("maincpu")->base();
+					u32 *rom = (u32*)memregion("maincpu")->base();
 
 					// The display is initialized after POST but the copyright screen disabled
 					// planes B,C,D and didn't bother restoring them. I've spent a good

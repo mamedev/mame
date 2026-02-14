@@ -121,7 +121,7 @@ public:
 		, m_inputs(*this, { "IN0", "IN1", "IN2", "DSW2", "DSW1" })
 	{ }
 
-	void battlera(machine_config &config);
+	void battlera(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -136,17 +136,15 @@ private:
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport_array<5> m_inputs;
 
-	uint8_t m_control_port_select = 0;
-	uint8_t m_msm5205next = 0;
-	uint8_t m_toggle = 0;
+	u8 m_control_port_select = 0;
+	u8 m_msm5205next = 0;
+	u8 m_toggle = 0;
 
-	void control_data_w(uint8_t data);
-	uint8_t control_data_r();
-	void adpcm_data_w(uint8_t data);
-	void adpcm_reset_w(uint8_t data);
+	void control_data_w(u8 data);
+	u8 control_data_r();
+	void adpcm_data_w(u8 data);
+	void adpcm_reset_w(u8 data);
 	void adpcm_int(int state);
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_prg_map(address_map &map) ATTR_COLD;
 	void main_portmap(address_map &map) ATTR_COLD;
@@ -170,14 +168,14 @@ void battlera_state::machine_reset()
 
 /******************************************************************************/
 
-void battlera_state::control_data_w(uint8_t data)
+void battlera_state::control_data_w(u8 data)
 {
 	m_control_port_select = data;
 }
 
-uint8_t battlera_state::control_data_r()
+u8 battlera_state::control_data_r()
 {
-	uint8_t data = 0xff;
+	u8 data = 0xff;
 
 	for (int i = 0; i < 5; i++)
 		if (!BIT(m_control_port_select, i))
@@ -194,13 +192,13 @@ void battlera_state::main_prg_map(address_map &map)
 	map(0x1e0800, 0x1e0800).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x1e1000, 0x1e13ff).rw(m_huc6260, FUNC(huc6260_device::palette_direct_read), FUNC(huc6260_device::palette_direct_write)).share("paletteram");
 	map(0x1f0000, 0x1f1fff).ram(); // Main RAM
-	map(0x1fe000, 0x1fe3ff).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x1fe000, 0x1fe3ff).rw("huc6270", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8));
 	map(0x1fe400, 0x1fe7ff).rw(m_huc6260, FUNC(huc6260_device::read), FUNC(huc6260_device::write));
 }
 
 void battlera_state::main_portmap(address_map &map)
 {
-	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read), FUNC(huc6270_device::write));
+	map(0x00, 0x03).rw("huc6270", FUNC(huc6270_device::read8), FUNC(huc6270_device::write8));
 }
 
 /******************************************************************************/
@@ -215,12 +213,12 @@ void battlera_state::adpcm_int(int state)
 		m_audiocpu->set_input_line(1, HOLD_LINE);
 }
 
-void battlera_state::adpcm_data_w(uint8_t data)
+void battlera_state::adpcm_data_w(u8 data)
 {
 	m_msm5205next = data;
 }
 
-void battlera_state::adpcm_reset_w(uint8_t data)
+void battlera_state::adpcm_reset_w(u8 data)
 {
 	m_msm->reset_w(0);
 }
@@ -302,13 +300,6 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-uint32_t battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	m_huc6260->video_update(bitmap, cliprect);
-	return 0;
-}
-
-
 void battlera_state::battlera(machine_config &config)
 {
 	// basic machine hardware
@@ -328,7 +319,7 @@ void battlera_state::battlera(machine_config &config)
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(21.477272_MHz_XTAL, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
-	m_screen->set_screen_update(FUNC(battlera_state::screen_update));
+	m_screen->set_screen_update(m_huc6260, FUNC(huc6260_device::screen_update));
 	m_screen->set_palette(m_huc6260);
 
 	HUC6260(config, m_huc6260, 21.477272_MHz_XTAL);
@@ -337,7 +328,7 @@ void battlera_state::battlera(machine_config &config)
 	m_huc6260->vsync_changed().set("huc6270", FUNC(huc6270_device::vsync_changed));
 	m_huc6260->hsync_changed().set("huc6270", FUNC(huc6270_device::hsync_changed));
 
-	huc6270_device &huc6270(HUC6270(config, "huc6270", 0));
+	huc6270_device &huc6270(HUC6270(config, "huc6270", 21.477272_MHz_XTAL));
 	huc6270.set_vram_size(0x20000);
 	huc6270.irq().set_inputline(m_maincpu, 0);
 
@@ -411,6 +402,27 @@ ROM_START( bldwolfj ) // note, ROM codes are ER not ES even if the content of so
 	ROM_LOAD( "er11-.tpg",   0x00000, 0x10000, CRC(f5b29c9c) SHA1(44dcdf96f8deb9a29aa9d94a8b9cf91a0ed808d4) )
 ROM_END
 
+ROM_START( miade )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "es-00.e1",   0x00000, 0x10000, CRC(e0e7d6a6) SHA1(fdbb0407320cd1adbde6ffa3bba6d0e9eb85edf6) )
+	ROM_LOAD( "es-01.e3",   0x10000, 0x10000, CRC(9fea3189) SHA1(0692df6df533dfe55f61df8aa0c5c11944ba3ae3) )
+	ROM_LOAD( "es-02.e4",   0x20000, 0x10000, CRC(798b6400) SHA1(02a644fd6f11e9118ba926cf18c1de263808c06e) )
+	// these were present in the sockets for 0x30000/0x40000, but appear to be unused?
+	ROM_LOAD( "backmap.e5", 0x30000, 0x10000, CRC(49b9cdd6) SHA1(9eca546196e4da469448dd38a0656e604f558da4) )
+	ROM_LOAD( "data.h1",    0x40000, 0x10000, CRC(6231b10e) SHA1(8b436da15e1602b34f0fad7653d9a1689ca32c96) )
+	// Rom sockets 0x50000 - 0x70000 are unused
+	ROM_LOAD( "es-05.j1",   0x80000, 0x10000, CRC(551fa331) SHA1(a70c627c572ba1b8029f61eae6eaad9825c56339) )
+	ROM_LOAD( "es-06.j3",   0x90000, 0x10000, CRC(ab91aac8) SHA1(81d820c8b70281a4a52f7ec75a3c54377011d9d9) )
+	ROM_LOAD( "es-07.j4",   0xa0000, 0x10000, CRC(8d15a3d0) SHA1(afae081ee5e0de359cae6a7ea8401237c5ab7095) )
+	ROM_LOAD( "es-08.j5",   0xb0000, 0x10000, CRC(38f06039) SHA1(cc394f161b2c4423cd2da763701ceaad7d27f741) )
+	ROM_LOAD( "es-09.l1",   0xc0000, 0x10000, CRC(b718c47d) SHA1(1d5b2ec819b0848e5b883373887445a63ebddb06) )
+	ROM_LOAD( "es-10.l3",   0xd0000, 0x10000, CRC(08507b27) SHA1(fb5109e7ed7a0c010a33a7334e32d9d89f3c823e) )
+	// Rom sockets 0xe0000 - 0x100000 are unused
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "es-11.d10",   0x00000, 0x10000, CRC(f5b29c9c) SHA1(44dcdf96f8deb9a29aa9d94a8b9cf91a0ed808d4) )
+ROM_END
+
 } // Anonymous namespace
 
 
@@ -419,3 +431,5 @@ ROM_END
 GAME( 1988, battlera, 0,        battlera, battlera, battlera_state, empty_init, ROT0, "Data East Corporation", "Battle Rangers (World)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bldwolf,  battlera, battlera, battlera, battlera_state, empty_init, ROT0, "Data East USA",         "Bloody Wolf (US)",                           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1988, bldwolfj, battlera, battlera, battlera, battlera_state, empty_init, ROT0, "Data East Corporation", "Narazumono Sentoubutai Bloody Wolf (Japan)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// VCOK16AM92UC046AU691 written on PCB, ROMSTAR label, serial "NO. BW 0234"
+GAME( 1988, miade,    battlera, battlera, battlera, battlera_state, empty_init, ROT0, "Data East USA",         "M.I.A. - Missing in Action (Data East, 12/22/88, US, prototype?)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

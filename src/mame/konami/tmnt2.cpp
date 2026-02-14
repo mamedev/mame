@@ -686,30 +686,30 @@ TILE_GET_INFO_MEMBER(prmrsocr_state::prmrsocr_get_roz_tile_info)
 
 K052109_CB_MEMBER(tmnt2_base_state::tile_callback)
 {
-	*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
-	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x03) << 8) | ((color & 0x10) << 6) | ((color & 0x0c) << 9) | (bank << 13);
+	color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 K052109_CB_MEMBER(sunsetbl_state::ssbl_tile_callback)
 {
 	if (layer == 0)
 	{
-		*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
+		code |= ((color & 0x03) << 8) | ((color & 0x10) << 6) | ((color & 0x0c) << 9) | (bank << 13);
 	}
 	else
 	{
-		*code |= ((*color & 0x03) << 8) | ((*color & 0x10) << 6) | ((*color & 0x0c) << 9) | (bank << 13);
+		code |= ((color & 0x03) << 8) | ((color & 0x10) << 6) | ((color & 0x0c) << 9) | (bank << 13);
 		//osd_printf_debug("L%d: bank %d code %x color %x\n", layer, bank, *code, *color);
 	}
 
-	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 K052109_CB_MEMBER(blswhstl_state::blswhstl_tile_callback)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
-	*code |= ((*color & 0x01) << 8) | ((*color & 0x10) << 5) | ((*color & 0x0c) << 8) | (bank << 12) | m_blswhstl_rombank << 14;
-	*color = m_layer_colorbase[layer] + ((*color & 0xe0) >> 5);
+	code |= ((color & 0x01) << 8) | ((color & 0x10) << 5) | ((color & 0x0c) << 8) | (bank << 12) | m_blswhstl_rombank << 14;
+	color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
 
@@ -722,33 +722,33 @@ K052109_CB_MEMBER(blswhstl_state::blswhstl_tile_callback)
 
 K051960_CB_MEMBER(punkshot_state::punkshot_sprite_callback)
 {
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*code |= (*color & 0x10) << 9;
-	*color = m_sprite_colorbase + (*color & 0x0f);
+	code |= (color & 0x10) << 9;
+	color = m_sprite_colorbase + (color & 0x0f);
 }
 
 K051960_CB_MEMBER(punkshot_state::thndrx2_sprite_callback)
 {
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x0f);
+	color = m_sprite_colorbase + (color & 0x0f);
 }
 
 
@@ -760,17 +760,17 @@ K051960_CB_MEMBER(punkshot_state::thndrx2_sprite_callback)
 
 K053244_CB_MEMBER(tmnt2_k053245_base_state::lgtnfght_sprite_callback)
 {
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x1f);
+	color = m_sprite_colorbase + (color & 0x1f);
 }
 
 K053244_CB_MEMBER(blswhstl_state::blswhstl_sprite_callback)
@@ -781,33 +781,33 @@ K053244_CB_MEMBER(blswhstl_state::blswhstl_sprite_callback)
 	if (machine().input().code_pressed(KEYCODE_E) && (*color & 0x80)) *color = machine().rand();
 #endif
 
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*color = m_sprite_colorbase + (*color & 0x1f);
+	color = m_sprite_colorbase + (color & 0x1f);
 }
 
 K053244_CB_MEMBER(prmrsocr_state::prmrsocr_sprite_callback)
 {
-	int pri = 0x20 | ((*color & 0x60) >> 2);
+	int pri = 0x20 | ((color & 0x60) >> 2);
 	if (pri <= m_layerpri[2])
-		*priority = 0;
+		priority = 0;
 	else if (pri > m_layerpri[2] && pri <= m_layerpri[1])
-		*priority = 0xf0;
+		priority = 0xf0;
 	else if (pri > m_layerpri[1] && pri <= m_layerpri[0])
-		*priority = 0xf0 | 0xcc;
+		priority = 0xf0 | 0xcc;
 	else
-		*priority = 0xf0 | 0xcc | 0xaa;
+		priority = 0xf0 | 0xcc | 0xaa;
 
-	*code |= m_sprite_bank << 14;
-	*color = m_sprite_colorbase + (*color & 0x1f);
+	code |= m_sprite_bank << 14;
+	color = m_sprite_colorbase + (color & 0x1f);
 }
 
 
@@ -1461,7 +1461,7 @@ void tmnt2_state::tmnt2_put_word( uint32_t addr, uint16_t data )
 void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
-	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, i;
+	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, f1, f2;
 	uint16_t *mcu;
 	uint16_t src[4], mod[24];
 	uint8_t keepaspect, xlock, ylock, zlock;
@@ -1480,30 +1480,30 @@ void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	mod_addr = (mcu[4] | (mcu[5] & 0xff) << 16) >> 1;
 	zlock    = (mcu[8] & 0xff) == 0x0001;
 
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 		src[i] = tmnt2_get_word(src_addr + i);
-	for (i = 0; i < 24; i++) mod[i] =
+	for (int i = 0; i < 24; i++) mod[i] =
 		tmnt2_get_word(mod_addr + i);
 
-	code = src[0];          // code
+	code = src[0];            // code
 
-	i = src[1];
-	attr1 = i >> 2 & 0x3f00;    // flip y, flip x and sprite size
-	attr2 = i & 0x380;      // mirror y, mirror x, shadow
-	cbase = i & 0x01f;      // base color
+	f1 = src[1];
+	attr1 = f1 >> 2 & 0x3f00; // flip y, flip x and sprite size
+	attr2 = f1 & 0x380;       // mirror y, mirror x, shadow
+	cbase = f1 & 0x01f;       // base color
 	cmod  = mod[0x2a / 2] >> 8;
 	color = (cbase != 0x0f && cmod <= 0x1f && !zlock) ? cmod : cbase;
 
 	xoffs = (int16_t)src[2];  // local x
 	yoffs = (int16_t)src[3];  // local y
 
-	i = mod[0];
-	attr2 |= i & 0x0060;    // priority
-	keepaspect = (i & 0x0014) == 0x0014;
-	if (i & 0x8000) { attr1 |= 0x8000; }    // active
+	f2 = mod[0];
+	attr2 |= f2 & 0x0060;     // priority
+	keepaspect = (f2 & 0x0014) == 0x0014;
+	if (f2 & 0x8000) { attr1 |= 0x8000; }   // active
 	if (keepaspect) { attr1 |= 0x4000; }    // keep aspect
-//  if (i & 0x????) { attr1 ^= 0x2000; yoffs = -yoffs; }    // flip y (not used?)
-	if (i & 0x4000) { attr1 ^= 0x1000; xoffs = -xoffs; }    // flip x
+//  if (f2 & 0x????) { attr1 ^= 0x2000; yoffs = -yoffs; }    // flip y (not used?)
+	if (f2 & 0x4000) { attr1 ^= 0x1000; xoffs = -xoffs; }    // flip x
 
 	xmod = (int16_t)mod[6];   // global x
 	ymod = (int16_t)mod[7];   // global y
@@ -1511,7 +1511,7 @@ void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	xzoom = mod[0x1c / 2];
 	yzoom = (keepaspect) ? xzoom : mod[0x1e / 2];
 
-	ylock = xlock = (i & 0x0020 && (!xzoom || xzoom == 0x100));
+	ylock = xlock = (f2 & 0x0020 && (!xzoom || xzoom == 0x100));
 
 	/*
 	    Scale factor is non-linear. The zoom vales are looked-up from
@@ -1540,30 +1540,30 @@ void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	*/
 	if (!xlock)
 	{
-		i = xzoom - 0x4f00;
-		if (i > 0)
+		int z = xzoom - 0x4f00;
+		if (z > 0)
 		{
-			i >>= 8;
-			xoffs += (int)(pow(i, /*1.898461*/1.891292) * xoffs / 599.250121);
+			z >>= 8;
+			xoffs += (int)(pow(z, /*1.898461*/1.891292) * xoffs / 599.250121);
 		}
-		else if (i < 0)
+		else if (z < 0)
 		{
-			i = (i >> 3) + (i >> 4) + (i >> 5) + (i >> 6) + xzoom;
-			xoffs = (i > 0) ? (xoffs * i / 0x4f00) : 0;
+			z = (z >> 3) + (z >> 4) + (z >> 5) + (z >> 6) + xzoom;
+			xoffs = (z > 0) ? (xoffs * z / 0x4f00) : 0;
 		}
 	}
 	if (!ylock)
 	{
-		i = yzoom - 0x4f00;
-		if (i > 0)
+		int z = yzoom - 0x4f00;
+		if (z > 0)
 		{
-			i >>= 8;
-			yoffs += (int)(pow(i, /*1.898461*/1.891292) * yoffs / 599.250121);
+			z >>= 8;
+			yoffs += (int)(pow(z, /*1.898461*/1.891292) * yoffs / 599.250121);
 		}
-		else if (i < 0)
+		else if (z < 0)
 		{
-			i = (i >> 3) + (i >> 4) + (i >> 5) + (i >> 6) + yzoom;
-			yoffs = (i > 0) ? (yoffs * i / 0x4f00) : 0;
+			z = (z >> 3) + (z >> 4) + (z >> 5) + (z >> 6) + yzoom;
+			yoffs = (z > 0) ? (yoffs * z / 0x4f00) : 0;
 		}
 
 	}
@@ -1577,6 +1577,7 @@ void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	tmnt2_put_word(dst_addr +  6, (uint32_t)xoffs);
 	tmnt2_put_word(dst_addr + 12, attr2 | color);
 }
+
 #else // for reference; do not remove
 void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -1592,7 +1593,7 @@ void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		CellVar = m_protram[0x04] | (m_protram[0x05] << 16 );
 		dst = m_protram[0x02] | (m_protram[0x03] << 16 );
 		CellSrc = m_protram[0x00] | (m_protram[0x01] << 16 );
-//        if (CellDest >= 0x180000 && CellDest < 0x183fe0) {
+		//if (CellDest >= 0x180000 && CellDest < 0x183fe0) {
 		CellVar -= 0x104000;
 		src = (uint16_t *)(memregion("maincpu")->base() + CellSrc);
 
@@ -1629,38 +1630,38 @@ void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			y += m_workram[CellVar + 0x08];
 		write_word(dst + 0x08, y);
 #if 0
-logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers %08x:%04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x\n",
-	m_protram[0x05],
-	CellDest,CellSrc,
-	src[0], src[1], src[2], src[3],
-	CellVar*2,
-	m_workram[CellVar + 0x00],
-	m_workram[CellVar + 0x01],
-	m_workram[CellVar + 0x02],
-	m_workram[CellVar + 0x03],
-	m_workram[CellVar + 0x04],
-	m_workram[CellVar + 0x05],
-	m_workram[CellVar + 0x06],
-	m_workram[CellVar + 0x07],
-	m_workram[CellVar + 0x08],
-	m_workram[CellVar + 0x09],
-	m_workram[CellVar + 0x0a],
-	m_workram[CellVar + 0x0b],
-	m_workram[CellVar + 0x0c],
-	m_workram[CellVar + 0x0d],
-	m_workram[CellVar + 0x0e],
-	m_workram[CellVar + 0x0f],
-	m_workram[CellVar + 0x10],
-	m_workram[CellVar + 0x11],
-	m_workram[CellVar + 0x12],
-	m_workram[CellVar + 0x13],
-	m_workram[CellVar + 0x14],
-	m_workram[CellVar + 0x15],
-	m_workram[CellVar + 0x16],
-	m_workram[CellVar + 0x17]
-	);
+		logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers %08x:%04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x\n",
+			m_protram[0x05],
+			CellDest,CellSrc,
+			src[0], src[1], src[2], src[3],
+			CellVar*2,
+			m_workram[CellVar + 0x00],
+			m_workram[CellVar + 0x01],
+			m_workram[CellVar + 0x02],
+			m_workram[CellVar + 0x03],
+			m_workram[CellVar + 0x04],
+			m_workram[CellVar + 0x05],
+			m_workram[CellVar + 0x06],
+			m_workram[CellVar + 0x07],
+			m_workram[CellVar + 0x08],
+			m_workram[CellVar + 0x09],
+			m_workram[CellVar + 0x0a],
+			m_workram[CellVar + 0x0b],
+			m_workram[CellVar + 0x0c],
+			m_workram[CellVar + 0x0d],
+			m_workram[CellVar + 0x0e],
+			m_workram[CellVar + 0x0f],
+			m_workram[CellVar + 0x10],
+			m_workram[CellVar + 0x11],
+			m_workram[CellVar + 0x12],
+			m_workram[CellVar + 0x13],
+			m_workram[CellVar + 0x14],
+			m_workram[CellVar + 0x15],
+			m_workram[CellVar + 0x16],
+			m_workram[CellVar + 0x17]
+			);
 #endif
-//        }
+		//}
 	}
 }
 #endif

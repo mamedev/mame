@@ -28,7 +28,6 @@ gomoku_sound_device::gomoku_sound_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, GOMOKU_SOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, m_sound_rom(*this, DEVICE_SELF)
-	, m_sound_enable(0)
 	, m_stream(nullptr)
 {
 	std::fill(std::begin(m_soundregs1), std::end(m_soundregs1), 0);
@@ -51,9 +50,6 @@ void gomoku_sound_device::device_start()
 	// allocate a buffer to mix into - 1 second's worth should be more than enough
 	m_mixer_buffer.resize(clock());
 
-	// start with sound enabled, many games don't have a sound enable register
-	m_sound_enable = 1;
-
 	// reset all the voices
 	for (ch = 0, voice = std::begin(m_channel_list); voice < std::end(m_channel_list); ch++, voice++)
 	{
@@ -66,7 +62,6 @@ void gomoku_sound_device::device_start()
 
 	save_item(NAME(m_soundregs1));
 	save_item(NAME(m_soundregs2));
-	// save_item(NAME(m_sound_enable)); // set to 1 at device start and never updated?
 	save_item(STRUCT_MEMBER(m_channel_list, channel));
 	save_item(STRUCT_MEMBER(m_channel_list, frequency));
 	save_item(STRUCT_MEMBER(m_channel_list, counter));
@@ -84,10 +79,6 @@ void gomoku_sound_device::sound_stream_update(sound_stream &stream)
 	sound_channel *voice;
 	short *mix;
 	int ch;
-
-	// if no sound, we're done
-	if (m_sound_enable == 0)
-		return;
 
 	// zap the contents of the mixer buffer
 	std::fill_n(&m_mixer_buffer[0], stream.samples(), 0);
@@ -207,11 +198,11 @@ void gomoku_sound_device::sound2_w(offs_t offset, uint8_t data)
 		voice = &m_channel_list[3];
 		voice->channel = 3;
 
-		// oneshot frequency is hand tune...
+		// oneshot frequency is hand tuned...
 		if ((m_soundregs2[0x1d] & 0x0f) < 0x0c)
-			voice->frequency = (18'432'000 / 96000);           // ichi, ni, san, yon, go
+			voice->frequency = (18'432'000 / 96000); // ichi, ni, san, yon, go
 		else
-			voice->frequency = (18'432'000 / 48000);           // shoot
+			voice->frequency = (18'432'000 / 48000); // shoot
 
 		voice->volume = 8;
 		voice->counter = 0;

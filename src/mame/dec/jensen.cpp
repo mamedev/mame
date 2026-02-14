@@ -45,6 +45,8 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
+#include "softlist_dev.h"
+
 namespace {
 
 class jensen_state : public driver_device
@@ -229,6 +231,9 @@ void jensen_state::jensen(machine_config &config)
 
 	// Optional
 	// DE422-SA Digital EISA Ethernet Controller (10 Mbps TP and BNC connectors)
+
+	// software lists
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("alpha");
 }
 
 void jensen_state::d2k300axp(machine_config &config)
