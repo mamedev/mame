@@ -230,7 +230,7 @@ INPUT_CHANGED_MEMBER(servicet_state::en_w)
 
 uint8_t servicet_state::port3_r()
 {
-	uint8_t data = m_io_keys[3]->read();
+	uint8_t data = ioport("P3")->read();
 
 	uint8_t const SDA = m_i2cmem->read_sda();
 
