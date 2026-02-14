@@ -119,6 +119,9 @@ Color bar check background in VJ for example enables the video stream so will sh
 
 #include <algorithm>
 
+#define PL_MPEG_IMPLEMENTATION
+#include "pl_mpeg/pl_mpeg.h"
+
 #define LOG_VIDEO              (1U << 1)
 #define LOG_DMA                (1U << 2)
 #define LOG_VERBOSE_VIDEO      (1U << 3)
@@ -140,12 +143,16 @@ static constexpr unsigned DMA_BURST_SIZE = 128U;
 
 
 jaleco_vj_qtaro_device::jaleco_vj_qtaro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, JALECO_VJ_QTARO, tag, owner, clock)
+	device_t(mconfig, JALECO_VJ_QTARO, tag, owner, clock),
+	m_buffer_size(0x100000)
 {
 }
 
 void jaleco_vj_qtaro_device::device_start()
 {
+	m_plm_video = nullptr;
+	m_plm_buffer = nullptr;
+
 	save_item(NAME(m_int));
 	save_item(NAME(m_mix_level));
 }
@@ -154,6 +161,22 @@ void jaleco_vj_qtaro_device::device_reset()
 {
 	m_int = 0;
 	m_mix_level = 0;
+
+	reset_video();
+}
+
+void jaleco_vj_qtaro_device::reset_video()
+{
+	m_video_frame = bitmap_rgb32(352, 240);
+
+	if (m_plm_video != nullptr)
+		plm_video_destroy(m_plm_video);
+
+	if (m_plm_buffer != nullptr)
+		plm_buffer_destroy(m_plm_buffer);
+
+	m_plm_buffer = plm_buffer_create_with_capacity(m_buffer_size);
+	m_plm_video = plm_video_create_with_buffer(m_plm_buffer, false);
 }
 
 void jaleco_vj_qtaro_device::video_mix_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -175,6 +198,7 @@ void jaleco_vj_qtaro_device::reg_w(offs_t offset, uint8_t data)
 	// Bit 7 is set when starting DMA for an entirely new video, then unset when video is ended
 	if (BIT(data, 7) && !BIT(m_int, 7))  {
 		LOGMASKED(LOG_VIDEO, "[%s] DMA transfer thread started %02x\n", tag(), data);
+		reset_video();
 	} else if (!BIT(data, 7) && BIT(m_int, 7))  {
 		LOGMASKED(LOG_VIDEO, "[%s] DMA transfer thread ended %02x\n", tag(), data);
 	}
@@ -203,6 +227,80 @@ void jaleco_vj_qtaro_device::reg3_w(offs_t offset, uint32_t data)
 void jaleco_vj_qtaro_device::write(uint8_t *data, uint32_t len)
 {
 	LOGMASKED(LOG_VERBOSE_VIDEO_DATA, "[%s] video data write %02x\n", tag(), data);
+	plm_buffer_write(m_plm_buffer, data, len);
+}
+
+void jaleco_vj_qtaro_device::update_frame()
+{
+	plm_frame_t *frame = plm_video_decode(m_plm_video);
+
+	if (frame == nullptr)
+		return;
+
+	LOGMASKED(LOG_VIDEO,
+		"[%s] video frame generated %lf %d %08lx %08lx %08lx\n",
+		tag(),
+		plm_video_get_time(m_plm_video),
+		frame != nullptr,
+		plm_buffer_get_size(m_plm_buffer),
+		plm_buffer_get_remaining(m_plm_buffer),
+		get_remaining_memory_size()
+	);
+
+	if (m_video_frame.width() != frame->width || m_video_frame.height() != frame->height) {
+		m_video_frame = bitmap_rgb32(frame->width, frame->height);
+	}
+
+	plm_frame_to_bgra(frame, reinterpret_cast<uint8_t *>(m_video_frame.raw_pixptr(0)), m_video_frame.rowbytes());
+}
+
+void jaleco_vj_qtaro_device::render_video_frame(bitmap_rgb32& base)
+{
+	// The mix level has been confirmed to only apply to the sprite layer.
+	// Due to a presumed bug in the game's code, Stepping Stage will animate the
+	// mix level from 0 to 15 whenever a video stops playing. This causes the credits
+	// text to immediately disappear and then slowly fade back in at the end of songs
+	// (visible in every gameplay video on Youtube).
+	// Also received videos from a cab owner that shows the same fade issue on the attract
+	// screen at certain times, where it'll clear out all sprites on the screen and then
+	// slowly fade them back in right before ending the video it was playing.
+	// VJ will set the mix level to 0 when no sprites are on screen, 8 when overlays appear
+	// while playing a song, and 15 when showing UI elements during menus. And it will also do
+	// the same 0-15 fade in at the end of a song.
+
+	assert(base.width() >= m_video_frame.width());
+	assert(base.height() >= m_video_frame.height());
+
+	if (m_mix_level == 0) {
+		// Copy full movie frame
+		copybitmap(
+			base,
+			m_video_frame,
+			0, 0, 0, 0,
+			m_video_frame.cliprect()
+		);
+		return;
+	}
+
+	for (int y = 0; y < m_video_frame.height(); y++) {
+		for (int x = 0; x < m_video_frame.width(); x++) {
+			const uint32_t v = m_video_frame.pix(y, x);
+			uint32_t *p = &base.pix(y, x);
+			double a = (BIT(*p, 24, 8) / 255.0) * (m_mix_level / 15.0);
+			const double movie_blend = 1.0 - a;
+			uint8_t r = uint8_t(std::min(255.0, BIT(v, 16, 8) * movie_blend + BIT(*p, 16, 8) * a));
+			uint8_t g = uint8_t(std::min(255.0, BIT(v, 8, 8) * movie_blend + BIT(*p, 8, 8) * a));
+			uint8_t b = uint8_t(std::min(255.0, BIT(v, 0, 8) * movie_blend + BIT(*p, 0, 8) * a));
+			*p = 0xff000000 | (r << 16) | (g << 8) | b;
+		}
+	}
+}
+
+uint32_t jaleco_vj_qtaro_device::get_remaining_memory_size()
+{
+	// Helper function for burst DMAs
+	auto rem = plm_buffer_get_remaining(m_plm_buffer);
+	return rem < m_buffer_size ? m_buffer_size - rem : 0;
 }
 
 /////////////////////////////////////////////
@@ -212,8 +310,14 @@ void jaleco_vj_king_qtaro_device::video_control_w(offs_t offset, uint16_t data, 
 	// Speed controlled by IRQ 4 on subboard CPU
 	LOGMASKED(LOG_VIDEO, "video_control_w %04x\n", data);
 
-	// Bits 0, 2, 4 change when a video frame should or shouldn't be decoded
-	// Bits 1, 3, 5 are always set?
+	for (int i = 0; i < 3; i++) {
+		// Bits 0, 2, 4 change when a video frame should or shouldn't be decoded
+		// Bits 1, 3, 5 are always set?
+		bool video_decode_frame = BIT(data, i * 2, 1) == 0;
+
+		if (video_decode_frame)
+			m_qtaro[i]->update_frame();
+	}
 }
 
 uint32_t jaleco_vj_king_qtaro_device::qtaro_fpga_firmware_status_r(offs_t offset)
@@ -399,7 +503,10 @@ TIMER_CALLBACK_MEMBER(jaleco_vj_king_qtaro_device::video_dma_callback)
 
 		const uint32_t dmaLength = dma_space.read_dword(m_dma_descriptor_addr[device_id] + 4);
 		const uint32_t bufferPhysAddr = dma_space.read_dword(m_dma_descriptor_addr[device_id] + 8);
-		const uint32_t burstLength = std::min(dmaLength - m_dma_descriptor_length[device_id], DMA_BURST_SIZE);
+		const uint32_t burstLength = std::min(
+			m_qtaro[device_id]->get_remaining_memory_size(),
+			std::min(dmaLength - m_dma_descriptor_length[device_id], DMA_BURST_SIZE)
+		);
 
 		if (burstLength == 0)
 			continue;
