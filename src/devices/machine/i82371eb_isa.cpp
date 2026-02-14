@@ -130,6 +130,7 @@ void i82371eb_isa_device::map_extra(
 	i82371sb_isa_device::map_extra(memory_window_start, memory_window_end, memory_offset, memory_space, io_window_start, io_window_end, io_offset, io_space);
 
 	// NOTE: ISA don't care about PCI command bit 0
+	// TODO: savquest pukes on this, uses the one in Super I/O
 	if (m_rtccfg & 5)
 	{
 		// 11 $70-$73

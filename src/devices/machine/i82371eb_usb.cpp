@@ -190,7 +190,6 @@ void i82371eb_usb_device::io_map(address_map &map)
 					m_portsc[offset] &= ~(1 << 3);
 				if (BIT(data, 1))
 					m_portsc[offset] &= ~(1 << 1);
-
 			}
 			LOG("PORTSC%d %04x & %04x -> %04x\n", offset, data, mem_mask, m_portsc[offset]);
 			if (mem_mask != 0xffff)
