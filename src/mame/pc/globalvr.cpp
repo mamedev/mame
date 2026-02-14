@@ -472,6 +472,14 @@ ROM_START(incoming)
 	DISK_IMAGE_READONLY("incoming", 0, SHA1(da424d60ff6ac3770a2450577befbabcd26dee89))
 ROM_END
 
+ROM_START(jlhu)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("jlhu", 0, SHA1(09cc767df6699d1cc5f6218a69cdc0453c0ab16a))
+ROM_END
+
 ROM_START(nascar10)
 	ROM_REGION32_LE(0x80000, "bios", 0)
 	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
@@ -638,6 +646,7 @@ GAME( 2007, amermy,   0,        globalvr, globalvr, globalvr_state, empty_init, 
 GAME( 2007, paralost, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Far Cry: Paradise Lost",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2007, puckoff,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Puck Off",                                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2008, blzingel, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Blazing Angels",                                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, jlhu,     0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Justice League: Heroes United",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2009, twisted,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Twisted: Nitro Stunt Racing",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2010, gvnascar, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (2.0.2.068)",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 2010, nascar10, gvnascar, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (1.0)",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
