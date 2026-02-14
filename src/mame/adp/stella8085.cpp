@@ -643,13 +643,13 @@ void stella8085_state::board4087(machine_config &config)
 
 void stella8085_state::board4109(machine_config &config)
 {
-	I8085A(config, m_maincpu, 6.144_MHz_XTAL);
+	I8085A(config, m_maincpu, 10.240_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &stella8085_state::program_4109_map);
 	m_maincpu->set_addrmap(AS_IO, &stella8085_state::io_4087_map);
 	m_maincpu->in_inta_func().set(m_uart, FUNC(i8256_device::acknowledge));
 	m_maincpu->in_sid_func().set_constant(0);	// connected through opamp to battery voltage
 
-	I8256(config, m_uart, 6.144_MHz_XTAL / 2);
+	I8256(config, m_uart, 10.240_MHz_XTAL / 2);
 	m_uart->int_callback().set_inputline(m_maincpu, I8085_INTR_LINE);
 	m_uart->in_p1_callback().set(FUNC(stella8085_state::lw_r));
 	m_uart->out_p1_callback().set(FUNC(stella8085_state::machine2_w));
@@ -660,7 +660,7 @@ void stella8085_state::board4109(machine_config &config)
 	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
 	rs232.rxd_handler().set(m_uart, FUNC(i8256_device::write_rxd));
 
-	I8279(config, m_kdc, 6.144_MHz_XTAL / 2);
+	I8279(config, m_kdc, 10.240_MHz_XTAL / 2);
 	m_kdc->out_sl_callback().set(FUNC(stella8085_state::kbd_sl_w));
 	m_kdc->out_bd_callback().set(FUNC(stella8085_state::kbd_bd_w));
 	m_kdc->out_disp_callback().set(FUNC(stella8085_state::disp_w));
