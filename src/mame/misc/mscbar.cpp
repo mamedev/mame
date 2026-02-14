@@ -179,8 +179,6 @@ void mscbar_state::ay2_port_b_w(uint8_t data)
 {
 	for (uint8_t i = 0; i < 6; i++)
     m_leds[i + 24] = BIT(~data, i);
-//  m_leds[32] = BIT(data, 6);
-//	m_leds[33] = BIT(data, 7);
 }
 void mscbar_state::p1_port_w(uint8_t data)
 {
