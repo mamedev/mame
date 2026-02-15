@@ -526,8 +526,7 @@ void isa16_xtom3d_io_sound::remap(int space_id, offs_t start, offs_t end)
  * ISA16 Oksan Virtual LPC
  *
  * Doesn't really accesses a Super I/O, which implies that the Holtek keyboard
- * is a motherboard ISA resource.
- *
+ * and the RTC chips are motherboard ISA resources.
  */
 
 class isa16_oksan_lpc : public device_t, public device_isa16_card_interface
@@ -536,6 +535,7 @@ public:
 	// construction/destruction
 	isa16_oksan_lpc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	required_device<mc146818_device> m_rtc;
 	required_device<kbdc8042_device> m_kbdc;
 
 protected:
@@ -554,12 +554,17 @@ DEFINE_DEVICE_TYPE(ISA16_OKSAN_LPC, isa16_oksan_lpc, "isa16_oksan_lpc", "ISA16 O
 isa16_oksan_lpc::isa16_oksan_lpc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISA16_OKSAN_LPC, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
+	, m_rtc(*this, "rtc")
 	, m_kbdc(*this, "kbdc")
 {
 }
 
 void isa16_oksan_lpc::device_add_mconfig(machine_config &config)
 {
+	MC146818(config, m_rtc, 32.768_kHz_XTAL);
+	//m_rtc->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
+	m_rtc->set_century_index(0x32);
+
 	KBDC8042(config, m_kbdc, 0);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
@@ -587,14 +592,14 @@ void isa16_oksan_lpc::device_reset()
 void isa16_oksan_lpc::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
-		m_isa->install_device(0x60, 0x6f, *this, &isa16_oksan_lpc::device_map);
+		m_isa->install_device(0x60, 0x7f, *this, &isa16_oksan_lpc::device_map);
 }
 
 void isa16_oksan_lpc::device_map(address_map &map)
 {
 	map(0x00, 0x0f).rw(m_kbdc, FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
-//	map(0x10, 0x1f).w(m_rtc, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
-//	map(0x10, 0x1f).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
+	map(0x10, 0x17).w(m_rtc, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
+	map(0x10, 0x17).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
 }
 
 

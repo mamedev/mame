@@ -280,7 +280,7 @@ void comebaby_state::comebaby(machine_config &config)
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
-	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu, true));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 

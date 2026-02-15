@@ -6,7 +6,8 @@ TODO:
 - Jumps to PC=0xfb000 after the first 2 PCI dword configs, which points to empty 0xff opcodes.
   $3a000 contains an "= Award Decompression BIOS =" header.
   Original ASUS CUBX BIOSes actually have valid opcodes in that range, the dump should be bad.
-- ASUS CUBX fails reading RTC, needs virtualizing thru ISA.
+- ASUS CUBX fails reading RTC, oddly tries to access stuff outside ISA 10-bit address map
+  (mirror by default?)
 
 - In pcipc ez2d2m HDD boots to a Korean Windows 98SE, it will error out with a
   "Error 7 : Set up the system correctly." after driver installation. Follows dump heuristics:
@@ -154,7 +155,7 @@ void ez2d_state::cubx(machine_config &config)
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
-	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu", true));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 

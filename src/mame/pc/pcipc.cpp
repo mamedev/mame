@@ -745,7 +745,7 @@ void pcipc_state::se440bx2(machine_config &config)
 	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
 	I82443BX_BRIDGE(config, "pci:01.0", 0 );
 
-	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu", true));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 

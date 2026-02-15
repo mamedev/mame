@@ -199,6 +199,7 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ROMX_LOAD("test.bin",   0x00000, 0x20000, CRC(ddbd94f4) SHA1(60ad74e56265a7936cf19e8480c657223d11f2d0), ROM_BIOS(18)) /* 06/18/1998-EQ82C6618A-ET-2A5LDS2FC-29 */ \
 	ROM_RELOAD( 0x20000, 0x20000 )
 
+
 ROM_START(slvrball)
 	SILVERBALL_BIOS
 	ROM_DEFAULT_BIOS("bios33")

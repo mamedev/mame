@@ -176,7 +176,7 @@ void quakeat_state::ga6la7(machine_config &config)
 	I82443LX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443LX_AGP   (config, "pci:01.0:00.0");
 
-	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu", true));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
@@ -211,7 +211,7 @@ void quakeat_state::quake(machine_config &config)
 {
 	ga6la7(config);
 	// TODO: has problems mapping a VGA
-	// (different control method?)
+	// (different legacy control method?)
 //	config.device_remove(PCI_AGP_ID);
 //	config.device_remove("screen");
 //	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
