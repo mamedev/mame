@@ -54,8 +54,8 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void screen_vblank(int state);
+
 	void tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void truxton2_68k_mem(address_map &map) ATTR_COLD;
 
@@ -68,9 +68,7 @@ private:
 	required_device<toaplan_txtilemap_device> m_tx_tilemap;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	bitmap_ind8 m_custom_priority_bitmap;
 };
-
 
 
 void truxton2_state::screen_vblank(int state)
@@ -82,12 +80,11 @@ void truxton2_state::screen_vblank(int state)
 }
 
 
-
 u32 truxton2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect, screen.priority());
 	m_tx_tilemap->draw_tilemap(screen, bitmap, cliprect);
 	return 0;
 }
@@ -104,9 +101,6 @@ void truxton2_state::tx_gfxram_w(offs_t offset, u16 data, u16 mem_mask)
 
 void truxton2_state::video_start()
 {
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-
 	m_tx_tilemap->gfx(0)->set_source(reinterpret_cast<u8 *>(m_tx_gfxram.target()));
 }
 
