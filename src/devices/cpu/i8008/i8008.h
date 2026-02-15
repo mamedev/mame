@@ -16,6 +16,8 @@ public:
 	// construction/destruction
 	i8008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	uint8_t halt_r() { return m_HALT; }
+
 protected:
 	enum
 	{
