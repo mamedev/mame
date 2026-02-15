@@ -50,6 +50,7 @@ protected:
 private:
 	template <typename FunctionClass> void draw_256(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_rgb32 &blendprio, const rectangle &cliprect, FunctionClass blend_op);
 	template <typename FunctionClass> void draw_16(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_rgb32 &blendprio, const rectangle &cliprect, FunctionClass blend_op);
+	template <typename FunctionClass> void do_draw(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_rgb32 &blendprio, const rectangle &clip, const u16 (&info)[5], u16 offset_h, u16 offset_v, FunctionClass plot_op);
 
 	u16 m_offset_h, m_offset_v;
 	const u8 *m_host_ram_ptr;

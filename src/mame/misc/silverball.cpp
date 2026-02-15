@@ -2,32 +2,33 @@
 // copyright-holders:
 /**************************************************************************************************
 
-    Skeleton driver for TAB Austria "Silverball" PC-based touch games
+TAB Austria "Silverball" PC-based touch games
 
+TODO:
+- Existing dumps all punts at dongle checks, requiring an emulation of the parallel port device.
+- i440zx BIOSes crashes when writing Flash ROM sequences at PC=61C51 onward (by saving in CMOS).
+- slvrball806: crashes in vmm32.vxd loading, doesn't check the dongle, -chs mismatch with the comment;
 
-    Hardware overview for "Silverball (8.01)":
-    Motherboard: Soyo 5EAS / Soyo SY-7IZB+ / Acorp 694XT-694XT1 / others
-    32768K RAM (4 x 8MB)
-    Intel Pentium-S CPU 133 MHz (A80502133)
+===================================================================================================
 
-    MicroTouch (external)
-    ESS AudioDrive ES1869FC ISA sound card
-    S3 Trio64V2/DX PCI VGA (86C775, 512KB RAM)
-    I/O Controller Silverball 3 (ISA card, Actel A40MX04-F PL84, DB50 external connector)
+Hardware overview for "Silverball (8.01)":
+Motherboard: Soyo 5EAS / Soyo SY-7IZB+ / Acorp 694XT-694XT1 / others
+32768K RAM (4 x 8MB)
+Intel Pentium-S CPU 133 MHz (A80502133)
 
-    HDD Samsung Maxtor G1021U2 or other IDE HDD with similar capacity.
+MicroTouch (external)
+ESS AudioDrive ES1869FC ISA sound card
+S3 Trio64V2/DX PCI VGA (86C775, 512KB RAM)
+I/O Controller Silverball 3 (ISA card, Actel A40MX04-F PL84, DB50 external connector)
 
-    The manual points to a HardLock parallel port security dongle, but it was missing
-    from the dumped machine.
+HDD Samsung Maxtor G1021U2 or other IDE HDD with similar capacity.
 
-    Acorp 694XT-694XT1 is based off VIA Apollo Pro133 (VT82C694 + VT82C686B)
-    Soyo SY-7IZB is based off Intel 82440ZX
-    SiS 5600/SiS 5595 is a Slot 1 Pentium II MB, the earlier version of what is in sis630.cpp
+The manual points to a HardLock parallel port security dongle, but it was missing
+from the dumped machine.
 
-    TODO:
-    - Existing dumps all punts at dongle checks in sis630.cpp, requiring an emulation of the
-      parallel port device.
-    - i440zx BIOSes crashes when writing Flash ROM sequences at PC=61C51 onward.
+Acorp 694XT-694XT1 is based off VIA Apollo Pro133 (VT82C694 + VT82C686B)
+Soyo SY-7IZB is based off Intel 82440ZX
+SiS 5600/SiS 5595 is a Slot 1 Pentium II MB, the earlier version of what is in sis630.cpp
 
 **************************************************************************************************/
 
@@ -131,14 +132,14 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
 
-	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
-//  ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_fixed(true);
+	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("hdd");
+	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_fixed(true);
 
 	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi", 0);
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", i440zx_superio_config);
@@ -206,7 +207,7 @@ ROM_START(slvrball806)
 //  ROM_DEFAULT_BIOS("bios29") // The one dumped from the actual machine
 	ROM_DEFAULT_BIOS("bios33")
 
-	DISK_REGION( PCI_IDE_ID"ide:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
+	DISK_REGION( PCI_IDE_ID":ide1:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
 	DISK_IMAGE("silverball_8.06", 0, BAD_DUMP SHA1(4bd03240229a2f59d457e95e04837422c423111b)) // May contain operator data
 ROM_END
 
@@ -215,7 +216,7 @@ ROM_START(slvrball720)
 //  ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 	ROM_DEFAULT_BIOS("bios33")
 
-	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )
+	DISK_REGION( PCI_IDE_ID":ide1:0:hdd" )
 	DISK_IMAGE("silverball_7.20", 0, BAD_DUMP SHA1(008d0146b579793f9ba2aa2e43ffa7ec1401f752)) // May contain operator data
 ROM_END
 
@@ -224,7 +225,7 @@ ROM_START(slvrball632)
 //  ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 	ROM_DEFAULT_BIOS("bios33")
 
-	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )
+	DISK_REGION( PCI_IDE_ID":ide1:0:hdd" )
 	DISK_IMAGE("silverball_6.32", 0, BAD_DUMP SHA1(0193fbc3b27e0b3ad6139830dfec04172eb3089a)) // May contain operator data
 ROM_END
 
@@ -234,7 +235,7 @@ ROM_START(slvrballbu409)
 //  ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 	ROM_DEFAULT_BIOS("bios33")
 
-	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )
+	DISK_REGION( PCI_IDE_ID":ide1:0:hdd" )
 	DISK_IMAGE("silverball_bulova_4.09_1", 0, BAD_DUMP SHA1(da838ddccf285fb4e06d7f752949e745e6b4e2e7)) // May contain operator data
 ROM_END
 
@@ -245,16 +246,16 @@ ROM_START(slvrballbu409b)
 //  ROM_DEFAULT_BIOS("bios29") // Not sure what PCB this HD was dumped from
 	ROM_DEFAULT_BIOS("bios33")
 
-	DISK_REGION( PCI_IDE_ID"ide:0:hdd" )
+	DISK_REGION( PCI_IDE_ID":ide1:0:hdd" )
 	DISK_IMAGE("silverball_bulova_4.09_2", 0, BAD_DUMP SHA1(86bf947b39cabcd207f79b7d6132199819e1fed7)) // May contain operator data
 ROM_END
 
 
 } // Anonymous namespace
 
-GAME(1997?, slvrball806,    0,           silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME(1997?, slvrball720,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME(1997?, slvrball632,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1997?, slvrball806,    0,           silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
+GAME(1997?, slvrball720,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
+GAME(1997?, slvrball632,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
 
-GAME(199?,  slvrballbu409,  slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME(199?,  slvrballbu409b, slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Probably the same as set 1
+GAME(199?,  slvrballbu409,  slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
+GAME(199?,  slvrballbu409b, slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING) // Probably the same as set 1

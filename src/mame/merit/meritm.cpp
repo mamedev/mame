@@ -1363,6 +1363,18 @@ ROM_START( pitbosssa )
 	ROM_LOAD( "9221-10_u16-0.u16",  0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pitboss2
 ROM_END
 
+ROM_START( pitbosssac ) /* ROMs at U9 and U11 are localized for California, denoted by the "-1" in the label */
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "9221-10_u9-1a.u9",   0x00000, 0x10000, CRC(18d59f8c) SHA1(9d4ed8eaef253ea017f0992d0291d523dea6cade) ) /* 9221-10-01A  094090 */
+	ROM_LOAD( "9221-10_u10-0.u10",  0x10000, 0x10000, CRC(853a1a99) SHA1(45e33442aa7e51c05c9ac8b8458937ee3ff4c21d) )
+	ROM_LOAD( "9221-10_u11-1a.u11", 0x20000, 0x10000, CRC(1582287a) SHA1(6f393c3a93c0243cdeb5f390a3dc574f6631ea06) )
+	ROM_LOAD( "9221-10_u12-0.u12",  0x30000, 0x10000, CRC(3577a203) SHA1(80f9c827ad9dea2c6af788bd3b46ab65e8c594eb) )
+	ROM_LOAD( "9221-10_u13-0.u13",  0x40000, 0x10000, CRC(466f81f9) SHA1(88429d9ff53d27bf639200852a7bf61768c8fd1b) )
+	ROM_LOAD( "9221-10_u14-0.u14",  0x50000, 0x10000, CRC(0a928852) SHA1(c6c623f63a73b3de6298f436a4ca339c1447888d) )
+	ROM_LOAD( "9221-10_u15-0.u15",  0x60000, 0x10000, CRC(c302b4c2) SHA1(d62d4bb33a9ccb95d1e550f9e439be3316b94c99) )
+	ROM_LOAD( "9221-10_u16-0.u16",  0x70000, 0x10000, CRC(574fb3c7) SHA1(213741df3055b97ddd9889c2aa3d3e863e2c86d3) ) // matches pitboss2
+ROM_END
+
 ROM_START( pitbosssb )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "9221-10_u9-0.u9",   0x00000, 0x10000, CRC(2aad4fa6) SHA1(9c3f0eb510f6adb6bc2f0a1cd9c2aab7f297d07f) ) /* 9221-10-00  091120 */
@@ -2548,18 +2560,19 @@ void meritm_state::init_megat3te()
 
 
 /* CRT-250 */
-GAME( 1987, americna,  0,        crt250, americna,  meritm_state, empty_init, ROT0, "Merit", "Americana (9131-01)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1987, americnaa, americna, crt250, americna,  meritm_state, empty_init, ROT0, "Merit", "Americana (9131-00)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, meritjp,   0,        crt250, americna,  meritm_state, empty_init, ROT0, "Merit", "Merit Joker Poker (9131-09)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, dodgecty,  0,        crt250, dodgecty,  meritm_state, empty_init, ROT0, "Merit", "Dodge City (9131-02, U9-2T)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, dodgectya, dodgecty, crt250, dodgecty,  meritm_state, empty_init, ROT0, "Merit", "Dodge City (9131-02, U9-2B)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, pitboss2,  0,        crt250, pitboss2,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss II (9221-01C)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1988, spitboss,  0,        crt250, spitboss,  meritm_state, empty_init, ROT0, "Merit", "Super Pit Boss (9221-02A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, pitbosss,  0,        crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00B)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, pitbosssa, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1990, pitbosssb, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, pitbosssc, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-12-01, California version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, pitbosssm, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-12-02, Minnesota version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, americna,   0,        crt250, americna,  meritm_state, empty_init, ROT0, "Merit", "Americana (9131-01)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, americnaa,  americna, crt250, americna,  meritm_state, empty_init, ROT0, "Merit", "Americana (9131-00)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, meritjp,    0,        crt250, americna,  meritm_state, empty_init, ROT0, "Merit", "Merit Joker Poker (9131-09)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, dodgecty,   0,        crt250, dodgecty,  meritm_state, empty_init, ROT0, "Merit", "Dodge City (9131-02, U9-2T)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, dodgectya,  dodgecty, crt250, dodgecty,  meritm_state, empty_init, ROT0, "Merit", "Dodge City (9131-02, U9-2B)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, pitboss2,   0,        crt250, pitboss2,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss II (9221-01C)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1988, spitboss,   0,        crt250, spitboss,  meritm_state, empty_init, ROT0, "Merit", "Super Pit Boss (9221-02A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosss,   0,        crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00B)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosssa,  pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosssac, pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-01A, California version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1990, pitbosssb,  pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-10-00)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, pitbosssc,  pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-12-01, California version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, pitbosssm,  pitbosss, crt250, pitbosss,  meritm_state, empty_init, ROT0, "Merit", "Pit Boss Superstar (9221-12-02, Minnesota version)", MACHINE_IMPERFECT_GRAPHICS )
 
 /* CRT-250 + CRT-252 + CRT-256 + CRT-258 */
 GAME( 1994, mtjpoker,  0,        crt250_crt252_crt258, mtjpoker,   meritm_state, empty_init, ROT0, "Merit", "Merit Touch Joker Poker (9132-00)", MACHINE_IMPERFECT_GRAPHICS )

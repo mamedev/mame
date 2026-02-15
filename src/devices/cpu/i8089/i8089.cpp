@@ -36,7 +36,6 @@ DEFINE_DEVICE_TYPE(I8089, i8089_device, "i8089", "Intel 8089 I/O Processor")
 
 i8089_device::i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, I8089, tag, owner, clock),
-	m_icount(0),
 	m_ch1(*this, "1"),
 	m_ch2(*this, "2"),
 	m_write_sintr1(*this),

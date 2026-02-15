@@ -4031,6 +4031,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/vl82c420.h,MACHINES["VL82C420"] = true
+---------------------------------------------------
+
+if MACHINES["VL82C420"] then
+	files {
+		MAME_DIR .. "src/devices/machine/vl82c420.cpp",
+		MAME_DIR .. "src/devices/machine/vl82c420.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/wd_fdc.h,MACHINES["WD_FDC"] = true
 ---------------------------------------------------
 
@@ -4525,6 +4537,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/fdc37c665ir.h,MACHINES["FDC37C665IR"] = true
+---------------------------------------------------
+
+if MACHINES["FDC37C665IR"] then
+	files {
+		MAME_DIR .. "src/devices/machine/fdc37c665ir.cpp",
+		MAME_DIR .. "src/devices/machine/fdc37c665ir.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pci9050.h,MACHINES["PCI9050"] = true
 ---------------------------------------------------
 
@@ -4580,6 +4604,18 @@ if MACHINES["FDC37C93X"] then
 	files {
 		MAME_DIR .. "src/devices/machine/fdc37c93x.cpp",
 		MAME_DIR .. "src/devices/machine/fdc37c93x.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/it8671f.h,MACHINES["IT8671F"] = true
+---------------------------------------------------
+
+if MACHINES["IT8671F"] then
+	files {
+		MAME_DIR .. "src/devices/machine/it8671f.cpp",
+		MAME_DIR .. "src/devices/machine/it8671f.h",
 	}
 end
 

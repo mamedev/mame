@@ -428,7 +428,7 @@ void mm2_state::mm2(machine_config &config)
 	m_sio->txrdy_handler().set(FUNC(mm2_state::sio_txrdy_w));
 	m_sio->txd_handler().set(m_kb, FUNC(mm2_keyboard_device::rxd_w));
 
-	MM2_KEYBOARD(config, m_kb, 0);
+	NOKIA_MM2_KBD(config, m_kb, 0);
 	m_kb->txd_handler().set(m_sio, FUNC(i8251_device::write_rxd));
 
 	// MMC186

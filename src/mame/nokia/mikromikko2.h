@@ -5,10 +5,8 @@
 
 #pragma once
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
 #include "mm2kb.h"
+
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
 #include "bus/scsi/s1410.h"
@@ -21,14 +19,18 @@
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_cb.h"
 #include "machine/nvram.h"
-#include "machine/pit8253.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/upd765.h"
-#include "machine/z80sio.h"
 #include "machine/x2212.h"
+#include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 #include "video/crt9007.h"
 #include "video/crt9212.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define I80186_TAG      "maincpu"
 #define UPD765_TAG      "upd765"

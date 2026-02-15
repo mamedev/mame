@@ -4,9 +4,6 @@
 
     Pencil 2 Coleco Cartridge Adaptor
 
-    TODO:
-    - dump actual ROM, currently uses official Coleco ROM.
-
 *******************************************************************************/
 
 #include "emu.h"
@@ -44,7 +41,7 @@ private:
 
 ROM_START(coleco)
 	ROM_REGION(0x2000, "bios", 0)
-	ROM_LOAD( "r72114a_8317.bin", 0x0000, 0x2000, BAD_DUMP CRC(d393c0cc) SHA1(160077afb139943725c634d6539898db59f33657) ) // official Coleco (PAL)
+	ROM_LOAD( "621.bin", 0x0000, 0x2000, CRC(fac06ff4) SHA1(ca889d41ea41a781edde7eb004ab530043fbc1a7) )
 ROM_END
 
 const tiny_rom_entry *pencil2_coleco_device::device_rom_region() const

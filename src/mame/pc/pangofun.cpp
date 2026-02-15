@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders: Angelo Salese
 /**************************************************************************************************
 
 Pango Fun
@@ -8,8 +8,12 @@ MS-DOS 5.0 based
 
 TODO:
 - Needs um8498f chipset improvements;
-- Currently hangs at PC=700 due of invalid boot sector copy;
-- Move stuff to ISA bus;
+- Move stuff to ISA bus (4 ISA16 + 1 ISA8 + 1 ISA16);
+- Hookup GD5401 "AVGA1" properly;
+- Understand what's the use of the goofy rig between AVGA1 DCLK and EVIDEO pins to feature
+  connector of the romdisk card, just a bypass to avoid showing text mode GFXs?
+  Also note an extra VGA connector on romdisk card.
+- Hookup jadarom romdisk, understand why it "cannot load program";
 
 ===================================================================================================
 readme by f205v
@@ -69,7 +73,7 @@ Video PCB (it's a standard VGA ISA board):
 Sound PCB (missing, it's a standard ISA 16bit sound card):
 1x stereo audio out (to ROMs PCB)
 
-ROMs PCB (it's a custom PCB, with ISA connector to motherboard on one side and JAMMA connetcor on the other side):
+ROMs PCB (it's a custom PCB, with ISA connector to motherboard on one side and JAMMA connector on the other side):
 1x ISA connector (into motherboard)
 1x JAMMA edge connector
 1x VGA in connector (from Video PCB)
@@ -97,9 +101,9 @@ Arcade Version (Coin-Op) by InfoCube (Pisa, Italy)
 #include "emu.h"
 
 #include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
-//#include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
 #include "machine/at_keybc.h"
 #include "machine/nvram.h"
@@ -141,18 +145,18 @@ private:
 void pangofun_state::main_map(address_map &map)
 {
 //	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
+//	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+//	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	// boot ROM has four 0xaa55 headers
 	// $00000 has CON/AUX/LPT/COM refs
 	// $08000 contains COMMAND.COM
 	// $10000 and $18000 are mostly similar copies, with shifted pointers.
 	// former looks involved in copying stuff of latter, wants reading at $e0000,
-	// moves in conventional memory
-	map(0x000d0000, 0x000d7fff).rom().region("romdisk", 0x18000);
-	map(0x000d8000, 0x000dffff).rom().region("romdisk", 0x10000);
-	map(0x000e0000, 0x000e7fff).rom().region("romdisk", 0x08000);
-	map(0x000e8000, 0x000effff).rom().region("romdisk", 0x00000);
+	// moves in conventional memory and jumps to PC=700
+	map(0x000d0000, 0x000d7fff).rom().region("romdisk", 0x10000);
+	map(0x000d8000, 0x000dffff).rom().region("romdisk", 0x18000);
+//	map(0x000e0000, 0x000e7fff).rom().region("romdisk", 0x00000);
+//	map(0x000e8000, 0x000effff).rom().region("romdisk", 0x08000);
 //	map(0x000f0000, 0x000fffff).rom().region("bios", 0);
 //	map(0x00100000, 0x01ffffff).ram();
 	map(0x00100000, 0x03ffffff).noprw();
@@ -163,7 +167,7 @@ void pangofun_state::main_map(address_map &map)
 void pangofun_state::main_io(address_map &map)
 {
 	map(0x00e0, 0x00e3).nopw(); // timestamp stuff?
-	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
+//	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 }
 
 
@@ -230,15 +234,13 @@ void pangofun_state::pangofun(machine_config &config)
 	m_isabus->drq6_callback().set(m_chipset, FUNC(um8498f_device::dreq6_w));
 	m_isabus->drq7_callback().set(m_chipset, FUNC(um8498f_device::dreq7_w));
 
-	/* video hardware */
-	// TODO: map to ISA bus, CLGD5401
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
-
-	vga_device &vga(VGA(config, "vga", 0));
-	vga.set_screen("screen");
-	vga.set_vram_size(0x100000);
+	ISA16_SLOT(config, "isa1", 0, "isabus", pc_isa16_cards, "avga1", false);
+	ISA16_SLOT(config, "isa2", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4", 0, "isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa5", 0, "isabus", pc_isa8_cards,  nullptr, false);
+	// TODO: this space will be reserved to the romdisk
+	ISA16_SLOT(config, "isa6", 0, "isabus", pc_isa16_cards, nullptr, false);
 
 	at_kbc_device_base &keybc(AT_KEYBOARD_CONTROLLER(config, "keybc", XTAL(12'000'000)));
 	keybc.hot_res().set(m_chipset, FUNC(um8498f_device::kbrst_w));
@@ -258,26 +260,23 @@ void pangofun_state::pangofun(machine_config &config)
 
 
 ROM_START(pangofun)
-	ROM_REGION32_LE(0xe0000, "bios", 0 ) /* motherboard bios */
-	ROM_LOAD("bios.bin", 0x010000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
-
-	ROM_REGION32_LE(0x20000, "video_bios", 0 )    /* Trident TVGA9000 BIOS */
-	ROM_LOAD16_BYTE("prom.vid", 0x00000, 0x04000, CRC(ad7eadaf) SHA1(ab379187914a832284944e81e7652046c7d938cc) )
-	ROM_CONTINUE(               0x00001, 0x04000 )
-
 	ROM_REGION32_LE(0x20000, "romdisk", 0 )
 	ROM_LOAD("bank8.u39", 0x000000, 0x20000, CRC(72422c66) SHA1(40b8cca3f99925cf019053921165f6a4a30d784d) )
 	/*bank8.u19 , NOT POPULATED */
 
+	ROM_REGION32_LE(0x20000, "bios", 0 ) /* motherboard bios */
+	ROM_COPY( "romdisk",  0x000000, 0x00000, 0x10000 )
+	ROM_LOAD( "bios.bin", 0x010000, 0x10000, CRC(e70168ff) SHA1(4a0d985c218209b7db2b2d33f606068aae539020) )
+
 	/* this is what was on the rom board, mapping unknown */
 	ROM_REGION32_LE(0x800000, "game_prg", ROMREGION_ERASEFF )    /* rom board */
-	ROM_LOAD16_BYTE("bank0.u11", 0x000001, 0x80000, CRC(6ce951d7) SHA1(1dd09491c651920a8a507bdc6584400367e5a292) )
-	ROM_LOAD16_BYTE("bank0.u31", 0x000000, 0x80000, CRC(b6c06baf) SHA1(79074b086d24737d629272d98f17de6e1e650485) )
-	/* Following two references to a SB Pro clone sound card. */
-	ROM_LOAD16_BYTE("bank1.u12", 0x100001, 0x80000, CRC(5adc1f2e) SHA1(17abde7a2836d042a698661339eefe242dd9af0d) )
-	ROM_LOAD16_BYTE("bank1.u32", 0x100000, 0x80000, CRC(5647cbf6) SHA1(2e53a74b5939b297fa1a77441017cadc8a19ddef) )
-	ROM_LOAD16_BYTE("bank2.u13", 0x200001, 0x80000, BAD_DUMP CRC(504bf849) SHA1(13a184ec9e176371808938015111f8918cb4df7d) ) // EMPTY! (Definitely Bad, interleaves with the next ROM)
-	ROM_LOAD16_BYTE("bank2.u33", 0x200000, 0x80000, CRC(272ecfb6) SHA1(6e1b6bdef62d953de102784ba0148fb20182fa87) )
+	ROM_LOAD16_BYTE( "bank0.u11", 0x000001, 0x80000, CRC(6ce951d7) SHA1(1dd09491c651920a8a507bdc6584400367e5a292) )
+	ROM_LOAD16_BYTE( "bank0.u31", 0x000000, 0x80000, CRC(b6c06baf) SHA1(79074b086d24737d629272d98f17de6e1e650485) )
+	/* Following two  references to a SB Pro clone sound card. */
+	ROM_LOAD16_BYTE( "bank1.u12", 0x100001, 0x80000, CRC(5adc1f2e) SHA1(17abde7a2836d042a698661339eefe242dd9af0d) )
+	ROM_LOAD16_BYTE( "bank1.u32", 0x100000, 0x80000, CRC(5647cbf6) SHA1(2e53a74b5939b297fa1a77441017cadc8a19ddef) )
+	ROM_LOAD16_BYTE( "bank2.u13", 0x200001, 0x80000, BAD_DUMP CRC(504bf849) SHA1(13a184ec9e176371808938015111f8918cb4df7d) ) // EMPTY! (Definitely Bad, interleaves with the next ROM)
+	ROM_LOAD16_BYTE( "bank2.u33", 0x200000, 0x80000, CRC(272ecfb6) SHA1(6e1b6bdef62d953de102784ba0148fb20182fa87) )
 					/*bank3.u14 , NOT POPULATED */
 					/*bank3.u34 , NOT POPULATED */
 					/*bank4.u15 , NOT POPULATED */

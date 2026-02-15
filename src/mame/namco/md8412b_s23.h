@@ -4,21 +4,23 @@
 
     Fujifilm Microdevices MD8412B IEEE-1394 Link Layer Controller
 
-    Skeleton device
+    Customized device specifically for Namco System 23
 
 ***************************************************************************/
 
-#ifndef MAME_NAMCO_MD8412B_H
-#define MAME_NAMCO_MD8412B_H
+#ifndef MAME_NAMCO_MD8412B_S23_H
+#define MAME_NAMCO_MD8412B_S23_H
 
 #pragma once
 
-class md8412b_device : public device_t
+class md8412b_s23_device : public device_t
 {
 public:
-	md8412b_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	md8412b_s23_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void map(address_map &map);
+
+	auto int_callback() { return m_int_cb.bind(); }
 
 protected:
 	virtual void device_start() override;
@@ -50,8 +52,8 @@ protected:
 	void sync_config_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void atf_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 arf_data_r();
-	u32 sync_data_r();
-	void sync_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 itrf_data_r();
+	void itf_data_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 irf_data_r();
 	u32 buf_status_ctrl_r();
 	void buf_status_ctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -118,6 +120,15 @@ protected:
 		PACKET_CTRL_BUSYCTRL_WIDTH      = 3,
 		PACKET_CTRL_WRITE_PEND          = 12,
 
+		DIAG_STATUS_BUSY_STATE			= 2,
+		DIAG_STATUS_AT_ACK				= 8,
+		DIAG_STATUS_AT_ACK_MASK			= 0x00000f00,
+		DIAG_STATUS_ACK_STATUS			= 12,
+		DIAG_STATUS_ACK_STATUS_MASK		= 0x00003000,
+		DIAG_STATUS_RETRY_TIME_MAX		= 15,
+		DIAG_STATUS_AT_BUSY				= 24,
+		DIAG_STATUS_IT_BUSY				= 25,
+
 		PHY_CTRL_MASK                   = 0x00000fff,
 		PHY_CTRL_REG_DATA               = 0,
 		PHY_CTRL_REG_DATA_WIDTH         = 8,
@@ -139,8 +150,10 @@ protected:
 		CYCLE_TIMER_OFFSET_WIDTH        = 12,
 		CYCLE_TIMER_COUNT               = 12,
 		CYCLE_TIMER_COUNT_WIDTH         = 13,
+		CYCLE_TIMER_COUNT_MASK          = 0x01fff000,
 		CYCLE_TIMER_SECONDS             = 25,
 		CYCLE_TIMER_SECONDS_WIDTH       = 7,
+		CYCLE_TIMER_SECONDS_MASK		= 0xfe000000,
 
 		SYNC_LENGTH_MASK                = 0x0fff0000,
 		SYNC_LENGTH_VAL                 = 16,
@@ -222,15 +235,90 @@ protected:
 	};
 
 private:
+	void update_interrupt();
+
+	void cycle_tick(s32 param);
+
+	void handle_async_tx();
+	void handle_iso_tx();
+
+	void push_async_rx_word(const u32 data);
+	u32 pop_async_rx_word();
+	void push_async_tx_word(const u32 data);
+	u32 pop_async_tx_word();
+	void push_iso_rx_word(const u32 data);
+	u32 pop_iso_rx_word();
+	void push_iso_tx_word(const u32 data);
+	u32 pop_iso_tx_word();
+	void push_iso_flight_word(const u32 data);
+	u32 pop_iso_flight_word();
+
+	void recv_self_id();
+
+	devcb_write_line m_int_cb;
+	bool m_int_active;
+
+	emu_timer *m_cycle_timer;
+	bool m_async_active;
+	bool m_cycle_started;
+	bool m_iso_going;
+
+	struct fifo_t
+	{
+		void init(const u32 _limit)
+		{
+			std::fill_n(buf, std::size(buf), 0);
+			wr_idx = 0;
+			rd_idx = 0;
+			count = 0;
+			limit = _limit;
+		}
+
+		void push(const u32 data)
+		{
+			buf[wr_idx] = data;
+			wr_idx = (wr_idx + 1) % limit;
+			count++;
+		}
+
+		u32 pop()
+		{
+			if (count == 0)
+				return 0;
+
+			const u32 data = buf[rd_idx];
+			rd_idx = (rd_idx + 1) % limit;
+			count--;
+			return data;
+		}
+
+		u32 peek()
+		{
+			return buf[rd_idx];
+		}
+
+		u32 buf[512];
+		u32 wr_idx;
+		u32 rd_idx;
+		u32 count;
+		u32 limit;
+	};
+
+	fifo_t m_async_rx;
+	fifo_t m_async_tx;
+	fifo_t m_iso_rx;
+	fifo_t m_iso_tx;
+
 	u32 m_ctrl;
 	u32 m_node_id;
 	u32 m_async_bufsize;
 	u32 m_sync_bufsize;
 	u32 m_packet_ctrl;
+	u32 m_diag_status;
 	u32 m_phy_ctrl;
 	u8 m_phy_regs[7];
 	u32 m_at_retries_ctrl;
-	u32 m_cycle_timer;
+	u32 m_cycle_timer_reg;
 	u32 m_sync_packet_len;
 	u32 m_sync_config[4];
 	u32 m_buf_status_ctrl;
@@ -241,6 +329,6 @@ private:
 	u32 m_at_retries;
 };
 
-DECLARE_DEVICE_TYPE(MD8412B, md8412b_device)
+DECLARE_DEVICE_TYPE(MD8412B_S23, md8412b_s23_device)
 
-#endif // MAME_NAMCO_MD8412B_H
+#endif // MAME_NAMCO_MD8412B_S23_H

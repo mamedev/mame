@@ -154,18 +154,18 @@ void um8498f_device::device_start()
 	save_item(NAME(m_kbrst));
 	save_item(NAME(m_ext_gatea20));
 	save_item(NAME(m_fast_gatea20));
-//	save_item(NAME(m_emu_gatea20));
-//	save_item(NAME(m_keybc_d1_written));
-//	save_item(NAME(m_keybc_data_blocked));
+//  save_item(NAME(m_emu_gatea20));
+//  save_item(NAME(m_keybc_d1_written));
+//  save_item(NAME(m_keybc_data_blocked));
 
 	save_item(NAME(m_config_reg));
-// 	save_item(NAME(m_chan_env));
-//	save_item(NAME(m_rom_enable));
-//	save_item(NAME(m_ram_write_protect));
-//	save_item(NAME(m_shadow_reg));
-//	save_item(NAME(m_dram_config));
-//	save_item(NAME(m_ems_control));
-//	save_item(NAME(m_ext_boundary));
+//  save_item(NAME(m_chan_env));
+//  save_item(NAME(m_rom_enable));
+//  save_item(NAME(m_ram_write_protect));
+//  save_item(NAME(m_shadow_reg));
+//  save_item(NAME(m_dram_config));
+//  save_item(NAME(m_ems_control));
+//  save_item(NAME(m_ext_boundary));
 
 	// assumed being internal to the chipset
 	m_shadow_ram.resize(0x60000);
@@ -174,13 +174,20 @@ void um8498f_device::device_start()
 
 void um8498f_device::device_reset()
 {
+	std::fill_n(m_config_reg, std::size(m_config_reg), 0);
 	m_cpureset = 0;
 	m_ext_gatea20 = 0;
 	m_fast_gatea20 = 0;
 	m_dma_channel = -1;
+
+	m_kbrst = 1;
+
 	m_config_phase = config_phase_t::LOCK_A0;
 
 	m_space_mem->install_rom(0xe0000, 0xfffff, &m_bios[0x00000 / 4]);
+
+	m_dma[0]->set_unscaled_clock(2'500'000);
+	m_dma[1]->set_unscaled_clock(2'500'000);
 }
 
 void um8498f_device::device_reset_after_children()
@@ -238,16 +245,14 @@ void um8498f_device::io_map(address_map &map)
 		NAME([this] (offs_t offset) { return m_dma[1]->read(offset >> 1); }),
 		NAME([this] (offs_t offset, u8 data) { m_dma[1]->write(offset >> 1, data); })
 	);
-//	map(0x0208, 0x020a) PnP EMS paging
-//	map(0x0218, 0x021a) alt of above (depends on a register setting)
 }
 
-uint8_t um8498f_device::portb_r()
+u8 um8498f_device::portb_r()
 {
 	return m_portb;
 }
 
-void um8498f_device::portb_w(uint8_t data)
+void um8498f_device::portb_w(u8 data)
 {
 	m_portb = (m_portb & 0xf0) | (data & 0x0f);
 
@@ -292,7 +297,7 @@ void um8498f_device::config_address_w(offs_t offset, u8 data)
 			break;
 
 		case config_phase_t::UNLOCK_ADDRESS:
-			// AMI BIOS writes multiple accesses at same time
+			// AMI BIOS writes multiple addresses at same time
 			if (data == 0xa5)
 			{
 				m_config_phase = config_phase_t::LOCK_A0;
@@ -304,7 +309,7 @@ void um8498f_device::config_address_w(offs_t offset, u8 data)
 			}
 			break;
 
-		// TODO: AMI BIOS writes multiple addresses during POST
+		// TODO: AMI BIOS also writes several consecutive address writes
 		case config_phase_t::UNLOCK_DATA:
 			logerror("config_phase_t::UNLOCK_DATA: unexpected %02x write received\n", data);
 			break;
@@ -349,78 +354,54 @@ void um8498f_device::config_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			logerror("config reg W [%02x] %02x\n", offset, data);
 			m_config_reg[offset] = data;
+			if (offset == 0x35 || offset == 0x36)
+				update_romram_settings();
 		})
 	);
 }
 
-//void um8498f_device::update_romram_settings()
-//{
-////	printf("%02x %02x %02x %02x %02x\n", m_rom_enable, m_ram_write_protect, m_shadow_reg[0], m_shadow_reg[1], m_shadow_reg[2]);
-//
-//	int i;
-//
-//	m_space_mem->unmap_readwrite(0xa0000, 0xfffff);
-//	m_isabus->remap(AS_PROGRAM, 0xa0000, 0xfffff);
-//
-//	// TODO: optimize, add write only paths
-//	for (i = 0; i < 8; i++)
-//	{
-//		const u32 start_offs = 0xc0000 + i * 0x8000;
-//		const u32 end_offs = start_offs + 0x7fff;
-//
-//		if (BIT(m_rom_enable, i))
-//			m_space_mem->install_rom(start_offs, end_offs, &m_bios[(i * 0x8000) / 2]);
-//	}
-//
-//	for (i = 0; i < 8; i++)
-//	{
-//		const u32 start_offs = 0xa0000 + i * 0x4000;
-//		const u32 end_offs = start_offs + 0x3fff;
-//
-//		if (BIT(m_shadow_reg[0], i))
-//			m_space_mem->install_ram(start_offs, end_offs, &m_shadow_ram[i * 0x4000]);
-//	}
-//
-//	for (i = 0; i < 8; i++)
-//	{
-//		const u32 start_offs = 0xc0000 + i * 0x4000;
-//		const u32 end_offs = start_offs + 0x3fff;
-//
-//		if (BIT(m_shadow_reg[1], i))
-//			m_space_mem->install_ram(start_offs, end_offs, &m_shadow_ram[0x20000 + i * 0x4000]);
-//	}
-//
-//	for (i = 0; i < 8; i++)
-//	{
-//		const u32 start_offs = 0xe0000 + i * 0x4000;
-//		const u32 end_offs = start_offs + 0x3fff;
-//
-//		if (BIT(m_shadow_reg[2], i))
-//			m_space_mem->install_ram(start_offs, end_offs, &m_shadow_ram[0x40000 + i * 0x4000]);
-//	}
-//
-//}
-//
+void um8498f_device::update_romram_settings()
+{
+	// TODO: avoid using ISA bus remapping until we have a better grasp of this
+	m_space_mem->unmap_readwrite(0xe0000, 0xfffff);
+//  m_isabus->remap(AS_PROGRAM, 0xe0000, 0xfffff);
+
+
+	// TODO: guesswork
+	m_space_mem->install_rom(0xe0000, 0xfffff, &m_bios[0x00000 / 4]);
+
+	if (BIT(m_config_reg[0x35], 6))
+		m_space_mem->install_ram(0xe0000, 0xeffff, &m_shadow_ram[0x40000]);
+	else if (BIT(m_config_reg[0x35], 4))
+		m_space_mem->install_writeonly(0xe0000, 0xeffff, &m_shadow_ram[0x40000]);
+
+	// TODO: m_config_reg[0x36] bit 5 (used by AMI BIOS)
+	// 2 bits settings per bank?
+	if (BIT(m_config_reg[0x36], 6))
+		m_space_mem->install_ram(0xf0000, 0xfffff, &m_shadow_ram[0x50000]);
+	else if (BIT(m_config_reg[0x36], 4))
+		m_space_mem->install_writeonly(0xf0000, 0xfffff, &m_shadow_ram[0x50000]);
+}
+
 //void um8498f_device::update_dma_clock()
 //{
-//	// similar concept as the one in cs4031 except smaller set
-//	const int busclk_sel_settings[] = { 4, 5, 6, 0 };
-//	const int busclk_sel = busclk_sel_settings[(m_chan_env >> 2) & 3];
+//  const int busclk_sel_settings[] = { 4, 5, 6, 0 };
+//  const int busclk_sel = busclk_sel_settings[(m_chan_env >> 2) & 3];
 //
-//	if (busclk_sel == 0)
-//		return;
+//  if (busclk_sel == 0)
+//      return;
 //
-//	const int dma_clock_sel = BIT(m_dma_ws_control, 0);
+//  const int dma_clock_sel = BIT(m_dma_ws_control, 0);
 //
-//	uint32_t dma_clock = clock() / busclk_sel;
+//  u32 dma_clock = clock() / busclk_sel;
 //
-//	if (!dma_clock_sel)
-//		dma_clock /= 2;
+//  if (!dma_clock_sel)
+//      dma_clock /= 2;
 //
-//	logerror("update_dma_clock: dma clock is now %u (%d %d)\n", dma_clock, busclk_sel, dma_clock_sel);
+//  logerror("update_dma_clock: dma clock is now %u (%d %d)\n", dma_clock, busclk_sel, dma_clock_sel);
 //
-//	m_dma[0]->set_unscaled_clock(dma_clock);
-//	m_dma[1]->set_unscaled_clock(dma_clock);
+//  m_dma[0]->set_unscaled_clock(dma_clock);
+//  m_dma[1]->set_unscaled_clock(dma_clock);
 //}
 
 /******************
@@ -446,7 +427,7 @@ offs_t um8498f_device::page_offset()
 	return 0xff0000;
 }
 
-uint8_t um8498f_device::dma_read_byte(offs_t offset)
+u8 um8498f_device::dma_read_byte(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -454,7 +435,7 @@ uint8_t um8498f_device::dma_read_byte(offs_t offset)
 	return m_space_mem->read_byte(page_offset() + offset);
 }
 
-void um8498f_device::dma_write_byte(offs_t offset, uint8_t data)
+void um8498f_device::dma_write_byte(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;
@@ -462,7 +443,7 @@ void um8498f_device::dma_write_byte(offs_t offset, uint8_t data)
 	m_space_mem->write_byte(page_offset() + offset, data);
 }
 
-uint8_t um8498f_device::dma_read_word(offs_t offset)
+u8 um8498f_device::dma_read_word(offs_t offset)
 {
 	if (m_dma_channel == -1)
 		return 0xff;
@@ -473,7 +454,7 @@ uint8_t um8498f_device::dma_read_word(offs_t offset)
 	return result;
 }
 
-void um8498f_device::dma_write_word(offs_t offset, uint8_t data)
+void um8498f_device::dma_write_word(offs_t offset, u8 data)
 {
 	if (m_dma_channel == -1)
 		return;

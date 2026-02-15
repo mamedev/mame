@@ -447,6 +447,9 @@ superslv
 @source:adds/adds2020.cpp
 adds2020
 
+@source:adds/multivision.cpp
+multivision
+
 @source:adds/vp60.cpp
 vp60
 
@@ -17805,6 +17808,7 @@ ultrchmph
 blktouch
 cdracula
 drgpunch
+drgpunchbl
 gekisha
 gekishap2
 hanamai
@@ -20547,6 +20551,9 @@ ibm5550
 @source:ibm/ibm6580.cpp
 ibm6580
 
+@source:ibm/ptpc110.cpp
+ptpc110
+
 @source:ibm/rs6000_type7xxx.cpp
 rs6k7009
 
@@ -20862,6 +20869,7 @@ lucky8s
 lucky8t
 lucky8u
 lucky8v
+lucky8w
 lucky8tet
 luckybar
 luckylad
@@ -24900,6 +24908,7 @@ giclassvr
 @source:konami/gijoe.cpp
 gijoe
 gijoea
+gijoeaa
 gijoeea
 gijoej
 gijoeu
@@ -28256,6 +28265,7 @@ pitbossma
 pitbossmb
 pitbosss
 pitbosssa
+pitbosssac
 pitbosssb
 pitbosssc
 pitbosssm
@@ -32050,6 +32060,7 @@ magtouch
 
 @source:misc/majorpkr.cpp
 majorpkr
+majorpkr20
 majorpkra
 majorpkrb
 majorpkrc
@@ -35500,6 +35511,7 @@ iemotom
 kaguya
 kaguya2
 kaguya2f
+kaguyaa
 kanatuen
 korinai
 korinaim
@@ -35792,9 +35804,10 @@ robotech
 
 @source:nintendo/mario.cpp
 mario
-marioe
 mariof
+mariog
 marioj
+marioja
 masao
 
 @source:nintendo/mmagic.cpp
@@ -36303,6 +36316,7 @@ excitebko
 excitebkj
 goonies
 hogalley
+hogalleyi
 iceclimb
 iceclimba
 iceclmrd
@@ -36879,6 +36893,7 @@ alibaba
 alibabab
 baracuda
 beastfp
+beastfpa
 bigbucks
 birdiy
 bucaner
@@ -37366,7 +37381,6 @@ qi900
 samdm286
 sarcpc
 scamp386sx
-scsxaio
 sh386sx20
 sis85c471
 sisrabb
@@ -37607,6 +37621,7 @@ pciagp
 pcipc
 pcipcs7
 pcipctx
+se440bx2
 
 @source:pc/pcipc_sis.cpp
 atc1425a
@@ -37657,6 +37672,7 @@ queen
 
 @source:pc/scatsx.cpp
 mb1320
+scsxaio
 
 @source:pc/seawolfnm.cpp
 seawolfnm
@@ -46293,6 +46309,7 @@ warriorb
 @source:taito/wgp.cpp
 wgp
 wgp2
+wgp2j
 wgpj
 wgpjoy
 wgpjoya
@@ -46627,6 +46644,7 @@ tbowlp
 
 @source:tecmo/tecmo.cpp
 backfirt
+backfirtb
 gemini
 geminib
 geminij
@@ -47090,6 +47108,7 @@ snowbro2ny
 
 @source:toaplan/sunwise.cpp
 burgkids
+monkichi
 othldrby
 pwrkick
 pyutakun

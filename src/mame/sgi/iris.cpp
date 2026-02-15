@@ -45,6 +45,8 @@
 #include "ip2.h"
 #include "pm2.h"
 
+#include "gl1.h"
+
 #include "iris1400.lh"
 
 namespace {
@@ -81,6 +83,9 @@ void iris_state::machine_reset()
 }
 
 static DEVICE_INPUT_DEFAULTS_START(dsd)
+	// winchester drive class 5
+	DEVICE_INPUT_DEFAULTS("W6", 0x1c, 0x14)
+
 	// wake-up address 0x7f00
 	DEVICE_INPUT_DEFAULTS("W7", 0x01, 0x01)
 	DEVICE_INPUT_DEFAULTS("W7", 0x02, 0x02)
@@ -138,6 +143,7 @@ static void iris_p_cards(device_slot_interface &device)
 static void iris_g_cards(device_slot_interface &device)
 {
 	// graphics side cards
+	device.option_add("gl1", SGI_GL1);
 }
 
 // 20-slot chassis, card positions assumed from 2xxx
@@ -167,7 +173,7 @@ void iris_state::common(machine_config &config)
 	MULTIBUS_SLOT(config, m_slot[16], m_bus, iris_g_cards, nullptr, false); // bit plane
 	MULTIBUS_SLOT(config, m_slot[17], m_bus, iris_g_cards, nullptr, false); // display controller
 	MULTIBUS_SLOT(config, m_slot[18], m_bus, iris_g_cards, nullptr, false); // update controller
-	MULTIBUS_SLOT(config, m_slot[19], m_bus, iris_g_cards, nullptr, false); // frame buffer
+	MULTIBUS_SLOT(config, m_slot[19], m_bus, iris_g_cards, nullptr, false); // graphics processor/frame buffer controller
 }
 
 void iris_state::iris1400(machine_config &config)
@@ -175,7 +181,10 @@ void iris_state::iris1400(machine_config &config)
 	common(config);
 
 	m_slot[1]->set_default_option("pm2");
+	m_slot[2]->set_default_option("nex");
 	m_slot[3]->set_default_option("dsd");
+
+	m_slot[19]->set_default_option("gl1");
 
 	config.set_default_layout(layout_iris1400);
 }
@@ -185,6 +194,7 @@ void iris_state::iris3130(machine_config &config)
 	common(config);
 
 	m_slot[1]->set_default_option("ip2");
+	m_slot[2]->set_default_option("nex");
 	m_slot[3]->set_default_option("dsd");
 }
 

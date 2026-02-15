@@ -78,6 +78,8 @@ HDD image contains remnants of an Actua Soccer Arcade installation.
 */
 
 #include "emu.h"
+
+#include "bus/pci/pci_slot.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
@@ -114,7 +116,7 @@ public:
 
 private:
 	required_device<pentium2_device> m_maincpu;
-	required_device<voodoo_banshee_pci_device> m_voodoo;
+	optional_device<voodoo_banshee_pci_device> m_voodoo;
 
 	void ga6la7_map(address_map &map) ATTR_COLD;
 	void ga6la7_io(address_map &map) ATTR_COLD;
@@ -184,7 +186,7 @@ void quakeat_state::ga6la7(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi", 0);
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
@@ -208,7 +210,11 @@ void quakeat_state::ga6la7(machine_config &config)
 void quakeat_state::quake(machine_config &config)
 {
 	ga6la7(config);
-	// ...
+	// TODO: has problems mapping a VGA
+	// (different control method?)
+//	config.device_remove(PCI_AGP_ID);
+//	config.device_remove("screen");
+//	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
 }
 
 ROM_START( ga6la7 )
@@ -226,6 +232,7 @@ ROM_START(quake)
 
 	// Hitachi DK237A-21 A/A0A0, IDE/ATA 2.5" 2.1GB 4000 RPM
 	// WS03131880
+	// TODO: fix mapping
 	DISK_REGION( "disks" )
 	// wrong chs 263,255,63
 //  DISK_IMAGE( "quakeat", 0, BAD_DUMP SHA1(c44695b9d521273c9d3c0e18c88f0dca0185bd7b) )
@@ -238,5 +245,5 @@ ROM_END
 
 COMP( 1999, ga6la7,  0,  0, ga6la7, 0, quakeat_state, empty_init, "Gigabyte", "GA-6LA7", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // errors out with ISA state 0x05 (keyboard), then wants flash ROM i/f to work properly
 
-GAME( 1998, quake,  0,      quake,  quake, quakeat_state, empty_init, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1998, quake,  0,      quake,  quake, quakeat_state, empty_init, ROT0, "Lazer-Tron / iD Software", "Quake Arcade Tournament (Release Beta 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
 // Actua Soccer Arcade
