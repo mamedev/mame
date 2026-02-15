@@ -867,6 +867,7 @@ void adsp21062_device::static_generate_loop_check_body(drcuml_block &block, bool
 		UML_JMPc(block, COND_Z, no_int);
 		UML_TEST(block, mem(&m_core->mode1), MODE1_IRPTEN);
 		UML_JMPc(block, COND_Z, no_int);
+		UML_MOV(block, I0, I2);
 		UML_CALLH(block, *m_exception[EXCEPTION_INTERRUPT]);
 		UML_LABEL(block, no_int);
 
