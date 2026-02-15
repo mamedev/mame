@@ -27,6 +27,8 @@ pyutakun    SW931201-1    Sunwise       Pyuuta-kun
 othldrby    S951060-VGP   Sunwise       Othello Derby
 monkichi    S951060-VGP   Sunwise       Monkichicchi no Fuwafuwa Puzzle  (has a subboard instead of mask ROMs)
 
+The medal games run in a cabinet named "JOYM" (ジョイム).
+
 Notes on Power Kick coin inputs:
 - The 10 yen input is "Key In" according to the bookkeeping screen, but is
   an otherwise normal coin input with a counter and a lockout (sharing the
@@ -466,8 +468,7 @@ void sunwise_state::common_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	// mirror assumed for monkichi as there are a few accesses outside of the usual range
-	map(0x100000, 0x103fff).mirror(0x010000).ram().share("nvram"); // Only 10022C-10037B is actually saved as NVRAM
-	map(0x104000, 0x10ffff).mirror(0x010000).ram();
+	map(0x100000, 0x10ffff).mirror(0x010000).ram().share("nvram"); // Only a small portion (game-dependent) is actually preserved on reset
 
 	map(0x200000, 0x20000f).rw(m_rtc, FUNC(upd4992_device::read), FUNC(upd4992_device::write)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
@@ -510,7 +511,7 @@ void sunwise_state::pwrkick(machine_config &config) // Sunwise SW931201-1 PCB (2
 
 	UPD4992(config, m_rtc, 32.768_kHz_XTAL);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x HM62256BLP-8 or equivalent + battery
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50)); // duration is probably wrong
 
