@@ -82,6 +82,7 @@ public:
 	{ }
 
 	void st25_1(machine_config &config) ATTR_COLD;
+	void st25_2(machine_config &config) ATTR_COLD;
 	void st25_3(machine_config &config) ATTR_COLD;
 
 private:
@@ -668,8 +669,8 @@ GAME(1998, jamaica,   0,     st25_1, st25, st25_state, empty_init, ROT0, u8"Löw
 GAME(1998, majesto,   0,     st25_1, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Majesto",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(1998, purpurr,   0,     st25_1, st25, st25_state, empty_init, ROT0, "Panther",  "Pur Pur Royal",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(1999, robin,     0,     st25_1, st25, st25_state, empty_init, ROT0, "Panther",  "Robin",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2000, bgaction,  0,     st25_1, st25, st25_state, empty_init, ROT0, "Panther",  "Big Action 3000 E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
-GAME(2001, stakeoff,  0,     st25_1, st25, st25_state, empty_init, ROT0, "Panther",  "Super Take Off E",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2000, bgaction,  0,     st25_2, st25, st25_state, empty_init, ROT0, "Panther",  "Big Action 3000 E", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
+GAME(2001, stakeoff,  0,     st25_2, st25, st25_state, empty_init, ROT0, "Panther",  "Super Take Off E",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2002, boosters,  0,     st25_3, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Booster Speed",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2003, colossos,  0,     st25_3, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Colossos",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
 GAME(2003, matrixx,   0,     st25_3, st25, st25_state, empty_init, ROT0, u8"Löwen",  "Matrixx",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK)
