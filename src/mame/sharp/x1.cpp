@@ -2275,7 +2275,7 @@ void x1turbo_state::x1turbo(machine_config &config)
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dma, MAIN_CLOCK/4);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(x1turbo_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(x1turbo_state::memory_write_byte));

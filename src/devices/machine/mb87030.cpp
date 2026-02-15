@@ -311,10 +311,8 @@ void mb87030_device::step(bool timeout)
 
 	switch (m_state) {
 	case State::Idle:
-		if (ctrl == 0 && (m_pctl & PCTL_BUS_FREE_IE)) {
-			m_ints |= INTS_DISCONNECTED;
-			update_ints();
-		}
+		if (ctrl == 0 && (m_pctl & PCTL_BUS_FREE_IE))
+			scsi_disconnect();
 		break;
 
 	case State::WaitNewState:

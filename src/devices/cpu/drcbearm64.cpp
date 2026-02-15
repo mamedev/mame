@@ -29,7 +29,7 @@ r21     callee-saved        UML register I2
 r22     callee-saved        UML register I3
 r23     callee-saved        UML register I4
 r24     callee-saved        UML register I5
-r35     callee-saved        UML register I6
+r25     callee-saved        UML register I6
 r26     callee-saved        UML register I7
 r27     callee-saved        near cache pointer
 r28     callee-saved        emulated flags
@@ -126,7 +126,11 @@ TODO:
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <locale>
+#include <string>
+#include <sstream>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 
@@ -593,7 +597,7 @@ private:
 	template <a64::Inst::Id Opcode> void op_float_alu(a64::Assembler &a, const uml::instruction &inst);
 	template <a64::Inst::Id Opcode> void op_float_alu2(a64::Assembler &a, const uml::instruction &inst);
 
-	size_t emit(CodeHolder &ch);
+	size_t emit(CodeHolder &ch, bool invariant);
 
 
 	// helper functions
@@ -651,6 +655,7 @@ private:
 	drc_map_variables m_map;
 	FILE *m_log_asmjit;
 	carry_state m_carry_state;
+	bool m_invariant_block;
 
 	arm64_entry_point_func m_entry;
 	drccodeptr m_exit;
@@ -1219,6 +1224,7 @@ void drcbe_arm64::emit_narrow_memread(a64::Assembler &a, const be_parameter &add
 		a.lsr(REG_PARAM1.w(), REG_PARAM1.w(), FLAGS_REG.w());
 	else
 		a.lsr(REG_PARAM1, REG_PARAM1, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
 }
 
 void drcbe_arm64::emit_narrow_memwrite(a64::Assembler &a, const be_parameter &addrp, const parameter &spacesizep, const memory_accessors &accessors) const
@@ -1544,6 +1550,7 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_carry_state(carry_state::POISON)
+	, m_invariant_block(false)
 	, m_entry(nullptr)
 	, m_exit(nullptr)
 	, m_nocode(nullptr)
@@ -1554,7 +1561,19 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
-		m_log_asmjit = fopen(std::string("drcbearm64_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
+		std::string tag = device.tag();
+		for (auto &ch : tag)
+		{
+			if (':' == ch)
+				ch = '_';
+		}
+		std::ostringstream str;
+		str.imbue(std::locale::classic());
+		str << "drcbearm64_asmjit_" << device.shortname();
+		if ('_' != tag[0])
+			str << '_';
+		str << tag << ".asm";
+		m_log_asmjit = fopen(std::move(str).str().c_str(), "w");
 	}
 
 	// resolve the actual addresses of member functions we need to call
@@ -1578,39 +1597,8 @@ drcbe_arm64::drcbe_arm64(drcuml_state &drcuml, device_t &device, drc_cache &cach
 			accessors.mask_high_bits = (shiftedmask & (shiftedmask + 1)) != 0;
 		}
 	}
-}
 
-drcbe_arm64::~drcbe_arm64()
-{
-	if (m_log_asmjit)
-		fclose(m_log_asmjit);
-}
-
-size_t drcbe_arm64::emit(CodeHolder &ch)
-{
-	Error err;
-
-	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
-	size_t const code_size = ch.code_size();
-
-	// test if enough room remains in the DRC cache
-	drccodeptr *cachetop = m_cache.begin_codegen(alignment + code_size);
-	if (!cachetop)
-		return 0;
-
-	err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
-	if (err != kErrorOk)
-		throw emu_fatalerror("CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
-
-	// update the drc cache and end codegen
-	*cachetop += alignment + code_size;
-	m_cache.end_codegen();
-
-	return code_size;
-}
-
-void drcbe_arm64::reset()
-{
+	// generate invariant code
 	uint8_t *dst = (uint8_t *)m_cache.top();
 
 	CodeHolder ch;
@@ -1656,7 +1644,7 @@ void drcbe_arm64::reset()
 
 	a.emit_args_assignment(frame, args);
 
-	a.br(REG_PARAM1);
+	a.blr(REG_PARAM1);
 
 	// generate exit point
 	m_exit = dst + a.offset();
@@ -1683,13 +1671,46 @@ void drcbe_arm64::reset()
 	call_arm_addr(a, (const void *)entrypoint);
 
 	// emit the generated code
-	emit(ch);
+	emit(ch, true);
+
+	// set the "no code" pointer
+	m_hash.set_default_codeptr(m_nocode);
+}
+
+drcbe_arm64::~drcbe_arm64()
+{
+	if (m_log_asmjit)
+		fclose(m_log_asmjit);
+}
+
+size_t drcbe_arm64::emit(CodeHolder &ch, bool invariant)
+{
+	size_t const alignment = ch.base_address() - uint64_t(m_cache.top());
+	size_t const code_size = ch.code_size();
+
+	// try to allocate space from the DRC cache
+	auto space = invariant
+			? m_cache.alloc_invariant(alignment + code_size, std::align_val_t(1))
+			: m_cache.alloc_transient(alignment + code_size, std::align_val_t(1));
+	if (!space)
+		return 0;
+
+	assert(uintptr_t(space) <= ch.base_address());
+	Error const err = ch.copy_flattened_data(drccodeptr(ch.base_address()), code_size, CopySectionFlags::kPadTargetBuffer);
+	if (err != kErrorOk)
+		throw emu_fatalerror("CodeHolder::copy_flattened_data() error %u", std::underlying_type_t<Error>(err));
+
+	osd::invalidate_instruction_cache(drccodeptr(ch.base_address()), code_size);
+
+	return code_size;
+}
+
+void drcbe_arm64::reset()
+{
+	m_carry_state = carry_state::POISON;
 
 	// reset our hash tables
 	m_hash.reset();
-	m_hash.set_default_codeptr(m_nocode);
-
-	m_carry_state = carry_state::POISON;
 }
 
 int drcbe_arm64::execute(code_handle &entry)
@@ -1701,7 +1722,7 @@ int drcbe_arm64::execute(code_handle &entry)
 void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uint32_t numinst)
 {
 	// do this here because device.debug() isn't initialised at construction time
-	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) && m_device.debug())
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)
@@ -1712,6 +1733,7 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
 	m_carry_state = carry_state::POISON;
+	m_invariant_block = block.invariant();
 
 	// compute the base by aligning the cache top to a cache line
 	auto [err, linesize] = osd_get_cache_line_size();
@@ -1771,7 +1793,7 @@ void drcbe_arm64::generate(drcuml_block &block, const instruction *instlist, uin
 	a.b(m_endofblock);
 
 	// emit the generated code
-	if (!emit(ch))
+	if (!emit(ch, block.invariant()))
 		block.abort();
 
 	// tell all of our utility objects that the block is finished
@@ -1922,15 +1944,22 @@ void drcbe_arm64::op_debug(a64::Assembler &a, const uml::instruction &inst)
 
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);
 
-		Label skip = a.new_label();
+		Label const skip = a.new_label();
 
 		emit_ldr_mem(a, temp, &m_device.machine().debug_flags);
 		a.tbz(temp, 1, skip); // DEBUG_FLAG_CALL_HOOK
+
+		emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+		a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+		a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
 
 		get_imm_relative(a, REG_PARAM1, m_debug_cpu_instruction_hook.obj);
 		mov_reg_param(a, 4, REG_PARAM2, pcp);
 
 		call_arm_addr(a, m_debug_cpu_instruction_hook.func);
+
+		a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+		a.mov(FLAGS_REG, a64::xzr);
 
 		a.bind(skip);
 	}
@@ -1975,7 +2004,7 @@ void drcbe_arm64::op_hashjmp(a64::Assembler &a, const uml::instruction &inst)
 
 	if (modep.is_immediate() && m_hash.populate_mode(modep.immediate()))
 	{
-		if (pcp.is_immediate())
+		if (pcp.is_immediate() && !m_invariant_block)
 		{
 			const uint32_t l1val = (pcp.immediate() >> m_hash.l1shift()) & m_hash.l1mask();
 			const uint32_t l2val = (pcp.immediate() >> m_hash.l2shift()) & m_hash.l2mask();
@@ -2214,9 +2243,16 @@ void drcbe_arm64::op_callc(a64::Assembler &a, const uml::instruction &inst)
 	Label skip;
 	emit_skip(a, inst.condition(), skip);
 
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+
 	get_imm_relative(a, REG_PARAM1, (uintptr_t)paramp.memory());
 	get_imm_relative(a, TEMP_REG1, (uintptr_t)funcp.cfunc());
 	a.blr(TEMP_REG1);
+
+	a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
 
 	if (inst.condition() != uml::COND_ALWAYS)
 		a.bind(skip);
@@ -2672,6 +2708,11 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
 
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	if (!have_specific || ((1 << spacesizep.size()) >= accessors.specific.native_bytes))
+		a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+
 	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
 		emit_memaccess_setup(a, addrp, accessors, accessors.specific.read);
@@ -2737,6 +2778,20 @@ void drcbe_arm64::op_read(a64::Assembler &a, const uml::instruction &inst)
 	{
 		mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
 	}
+
+	if (!have_specific || ((1 << spacesizep.size()) >= accessors.specific.native_bytes))
+	{
+		a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+		a.mov(FLAGS_REG, a64::xzr);
+	}
+	else
+	{
+		emit_ldrb_mem(a, SCRATCH_REG1.w(), &m_state.fmod);
+		a.mrs(SCRATCH_REG2, a64::Predicate::SysReg::kFPCR);
+		a.sub(SCRATCH_REG1.w(), SCRATCH_REG1.w(), 1);
+		a.bfi(SCRATCH_REG2, SCRATCH_REG1, 22, 2);
+		a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG2);
+	}
 }
 
 void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
@@ -2755,6 +2810,11 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
+
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	if (!have_specific || ((1 << spacesizep.size()) >= accessors.specific.native_bytes))
+		a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
 
 	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
@@ -2823,6 +2883,20 @@ void drcbe_arm64::op_readm(a64::Assembler &a, const uml::instruction &inst)
 	{
 		mov_param_reg(a, inst.size(), dstp, REG_PARAM1);
 	}
+
+	if (!have_specific || ((1 << spacesizep.size()) >= accessors.specific.native_bytes))
+	{
+		a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+		a.mov(FLAGS_REG, a64::xzr);
+	}
+	else
+	{
+		emit_ldrb_mem(a, SCRATCH_REG1.w(), &m_state.fmod);
+		a.mrs(SCRATCH_REG2, a64::Predicate::SysReg::kFPCR);
+		a.sub(SCRATCH_REG1.w(), SCRATCH_REG1.w(), 1);
+		a.bfi(SCRATCH_REG2, SCRATCH_REG1, 22, 2);
+		a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG2);
+	}
 }
 
 void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
@@ -2840,6 +2914,10 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
+
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
 
 	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
@@ -2888,6 +2966,9 @@ void drcbe_arm64::op_write(a64::Assembler &a, const uml::instruction &inst)
 			call_arm_addr(a, accessors.resolved.write_qword.func);
 		}
 	}
+
+	a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
 }
 
 void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
@@ -2907,6 +2988,10 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 	// set up a call to the write handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.write.function) || accessors.specific.write.is_virtual;
+
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
 
 	if (have_specific && ((1 << spacesizep.size()) == accessors.specific.native_bytes))
 	{
@@ -2956,6 +3041,9 @@ void drcbe_arm64::op_writem(a64::Assembler &a, const uml::instruction &inst)
 			call_arm_addr(a, accessors.resolved.write_qword_masked.func);
 		}
 	}
+
+	a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
 }
 
 void drcbe_arm64::op_carry(a64::Assembler &a, const uml::instruction &inst)
@@ -5144,6 +5232,10 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 
 	if (inst.size() == 4)
@@ -5160,6 +5252,9 @@ void drcbe_arm64::op_fread(a64::Assembler &a, const uml::instruction &inst)
 
 		mov_float_param_int_reg(a, inst.size(), dstp, REG_PARAM1);
 	}
+
+	a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
 }
 
 void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
@@ -5178,6 +5273,10 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 
+	emit_ldr_mem(a, SCRATCH_REG1, &m_near.saved_fpcr);
+	a.mrs(FLAGS_REG, a64::Predicate::SysReg::kFPCR); // flags are clobbered anyway - save FP control here
+	a.msr(a64::Predicate::SysReg::kFPCR, SCRATCH_REG1);
+
 	mov_reg_param(a, 4, REG_PARAM2, addrp);
 	mov_float_reg_param(a, inst.size(), TEMPF_REG1, srcp);
 
@@ -5193,6 +5292,9 @@ void drcbe_arm64::op_fwrite(a64::Assembler &a, const uml::instruction &inst)
 		get_imm_relative(a, REG_PARAM1, accessors.resolved.write_qword.obj);
 		call_arm_addr(a, accessors.resolved.write_qword.func);
 	}
+
+	a.msr(a64::Predicate::SysReg::kFPCR, FLAGS_REG);
+	a.mov(FLAGS_REG, a64::xzr);
 }
 
 void drcbe_arm64::op_fmov(a64::Assembler &a, const uml::instruction &inst)

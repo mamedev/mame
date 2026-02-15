@@ -3936,7 +3936,7 @@ static INPUT_PORTS_START( mjvegasa )
 	PORT_DIPSETTING(    0x00, DEF_STR(On) )                                                         // 有り
 	PORT_DIPNAME( 0x40, 0x00, "Time Service Frequency" )        PORT_DIPLOCATION("DIP-SW 4:7")      // タイム・サービスの頻度
 	PORT_DIPSETTING(    0x00, DEF_STR(Normal) )                                                     // 普通
-	PORT_DIPSETTING(    0x80, DEF_STR(High) )                                                       // 多い
+	PORT_DIPSETTING(    0x40, DEF_STR(High) )                                                       // 多い
 	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DIP-SW 4:8")                                                // ＯＦＦ固定
 
 	PORT_START("DSWTOP")    // 6814

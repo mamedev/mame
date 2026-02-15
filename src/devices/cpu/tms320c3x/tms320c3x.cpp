@@ -971,9 +971,9 @@ void tms320c3x_device::execute_run()
 		return;
 	}
 
-	// non-debug case
 	if (!debugger_enabled())
 	{
+		// non-debug case
 		while (m_icount > 0)
 		{
 			if ((IREG(TMR_ST) & RMFLAG) && m_pc == IREG(TMR_RE) + 1)
@@ -999,10 +999,9 @@ void tms320c3x_device::execute_run()
 			execute_one();
 		}
 	}
-
-	// debugging case
 	else
 	{
+		// debugging case
 		while (m_icount > 0)
 		{
 			// watch for out-of-range stack pointers

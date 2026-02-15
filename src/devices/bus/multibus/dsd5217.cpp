@@ -19,9 +19,11 @@
 #include "bus/qic02/qic02.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/floppy.h"
+#include "imagedev/harddriv.h"
 #include "machine/am2910.h"
 #include "machine/am9517a.h"
 #include "machine/i8155.h"
+#include "machine/input_merger.h"
 
 #include "multibyte.h"
 
@@ -30,10 +32,12 @@
 
 namespace {
 
-enum port20_mask : unsigned
+enum port20_mask : u8
 {
+	P20_WRDY   = 0x01, // winchester ready
 	P20_WTRK0  = 0x02, // winchester track 0
 	P20_WWFLT  = 0x04, // winchester write fault
+	P20_WSEEK  = 0x08, // winchester seek complete
 	P20_FIDX   = 0x10, // floppy index
 	P20_FTRK0  = 0x20, // floppy track 0
 	P20_FWPT   = 0x40, // floppy write protect
@@ -50,8 +54,11 @@ enum port78_bits : unsigned
 
 enum portB_bits : unsigned
 {
-	PB_SIDE  = 4, // floppy side select
-	PB_HS0   = 4, // winchester head select 0
+	PB_WDS0  = 0, // winchester drive select 1
+	PB_WDS1  = 1, // winchester drive select 2
+	PB_FDS0  = 2, // floppy drive select 1
+	PB_FDS1  = 3, // floppy drive select 2
+	PB_HS0   = 4, // winchester head select 0/floppy side select
 	PB_HS1   = 5, // winchester head select 1
 	PB_HS2   = 6, // winchester head select 2
 	PB_MOTOR = 7, // floppy motor
@@ -62,6 +69,7 @@ enum portC_bits : unsigned
 	PC_DIR  = 1, // step direction
 	PC_HS3  = 2, // winchester head select 3/reduced write current
 	PC_RWC  = 3, // winchester reduced write current
+	// clear after rwc wait timeout: rwc reset?
 	PC_WUA  = 5, // wake-up address
 };
 
@@ -78,7 +86,9 @@ public:
 		, m_rio(*this, "rio")
 		, m_dma(*this, "dma")
 		, m_fdc(*this, "fdc%u", 0U)
+		, m_hdd(*this, "hdd%u", 0U)
 		, m_qic(*this, "qic")
+		, m_xfr(*this, "xfr")
 		, m_w6(*this, "W6")
 		, m_w7(*this, "W7")
 		, m_w9(*this, "W9")
@@ -106,19 +116,27 @@ protected:
 	void cmd_w(u8 data);
 
 	// handlers
+	void rwc_w(offs_t offset, u8 data);
 	u8 bus_r(offs_t offset);
 	void bus_w(offs_t offset, u8 data);
 	template <bool High> void ctr_w(offs_t offset, u8 data);
-	template <unsigned Port> u8 buf_r();
-	template <unsigned Port> void buf_w(u8 data);
+	u8 buf_r();
+	void buf_w(u8 data);
 	void mua_w(u8 data);
 	u8 port20_r();
 	void port78_w(u8 data);
 	void port7c_w(u8 data);
 
+	void pa_w(u8 data);
+	void pb_w(u8 data);
+	void pc_w(u8 data);
+
 	// helpers
+	floppy_image_device *selected_fdd() const;
+	std::optional<unsigned> selected_hdd() const;
 	void append_crc();
 	void interrupt(bool assert);
+	void dump_iopb();
 
 private:
 	required_device<i8085a_cpu_device> m_cpu;
@@ -127,7 +145,10 @@ private:
 	required_device<am9517a_device> m_dma;
 
 	required_device_array<floppy_connector, 2> m_fdc;
+	required_device_array<harddisk_image_device, 2> m_hdd;
 	required_device<qic02_connector_device> m_qic;
+
+	required_device<input_merger_any_high_device> m_xfr;
 
 	required_ioport m_w6;
 	required_ioport m_w7;
@@ -140,15 +161,16 @@ private:
 	u8 m_port70;
 	u8 m_port78;
 	u8 m_port7c;
-	u8 m_scratch[4];
+	u8 m_rwc_ram[4];
 
 	u8 m_pa; // i8155 port A
 	u8 m_pb; // i8155 port B
 	u8 m_pc; // i8155 port C
 
-	std::unique_ptr<u8[]> m_buf;
+	std::unique_ptr<u8[]> m_buf; // LC3517A-12 x2 (2048x8 static RAM)
 	u16 m_ctr[2]; // buffer counters (AM25LS2569PC x6)
 
+	u16 m_hdd_cyl[2]; // current cylinder
 	std::unique_ptr<u32[]> m_crc;
 
 	bool m_interrupt;
@@ -157,19 +179,24 @@ private:
 
 void multibus_dsd5217_device::device_start()
 {
-	m_buf = std::make_unique<u8[]>(4096); // LC3517A-12 x2 (2048x8 static RAM)
+	m_buf = std::make_unique<u8[]>(4096);
 	m_crc = std::make_unique<u32[]>(256);
 
 	save_item(NAME(m_wua));
 	save_item(NAME(m_mua));
+	save_item(NAME(m_port70));
 	save_item(NAME(m_port78));
-	save_item(NAME(m_scratch));
+	save_item(NAME(m_port7c));
+	save_item(NAME(m_rwc_ram));
+
 	save_item(NAME(m_pa));
 	save_item(NAME(m_pb));
 	save_item(NAME(m_pc));
-	save_item(NAME(m_ctr));
 
 	save_pointer(NAME(m_buf), 4096);
+	save_item(NAME(m_ctr));
+
+	save_item(NAME(m_hdd_cyl));
 
 	m_led.resolve();
 
@@ -211,7 +238,13 @@ void multibus_dsd5217_device::device_reset()
 	m_ctr[0] = 0;
 	m_ctr[1] = 0;
 
+	m_hdd_cyl[0] = 0;
+	m_hdd_cyl[1] = 0;
+
 	interrupt(false);
+
+	m_xfr->in_w<0>(0);
+	m_xfr->in_w<1>(0);
 }
 
 void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
@@ -224,73 +257,68 @@ void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
 	AM2910(config, m_rwc, 0); // TODO: clocked at disk data rate
 	// TODO: 1K words of prom
 
-	I8155(config, m_rio, 10_MHz_XTAL / 2);
+	I8155(config, m_rio, 10_MHz_XTAL / 4);
 	m_rio->out_to_callback().set_inputline(m_cpu, I8085_TRAP_LINE);
-	m_rio->out_pa_callback().set(
-		[this](u8 data)
-		{
-			if (m_pa ^ data)
-				LOG("%s: port A 0x%02x\n", machine().describe_context(), data);
-			m_pa = data;
-		});
-	m_rio->out_pb_callback().set(
-		[this](u8 data)
-		{
-			if (m_pb ^ data)
-				LOG("%s: port B 0x%02x\n", machine().describe_context(), data);
-
-			if (floppy_image_device *f = m_fdc[0]->get_device())
-			{
-				if (BIT(m_pb ^ data, PB_MOTOR))
-					f->mon_w(!BIT(data, PB_MOTOR));
-				if (BIT(m_pb ^ data, PB_SIDE))
-					f->ss_w(BIT(data, PB_SIDE));
-			}
-
-			m_pb = data;
-		});
-
-	m_rio->out_pc_callback().set(
-		[this](u8 data)
-		{
-			if (m_pc ^ data)
-				LOG("%s: port C 0x%02x\n", machine().describe_context(), data);
-
-			if (BIT(data, PC_WUA))
-			{
-				if (BIT(m_port78, P78_CR1))
-					m_wua <<= 1;
-				else
-					m_wua = (m_w7->read() << 8) | m_w9->read();
-			}
-
-			if (floppy_image_device *f = m_fdc[0]->get_device())
-			{
-				if (BIT(m_pc ^ data, PC_DIR))
-					f->dir_w(!BIT(data, PC_DIR));
-
-				if (BIT(m_pc ^ data, PC_STEP) && BIT(m_pb, PB_MOTOR))
-					f->stp_w(BIT(data, PC_STEP));
-			}
-
-			m_pc = data;
-		});
+	m_rio->out_pa_callback().set(FUNC(multibus_dsd5217_device::pa_w));
+	m_rio->out_pb_callback().set(FUNC(multibus_dsd5217_device::pb_w));
+	m_rio->out_pc_callback().set(FUNC(multibus_dsd5217_device::pc_w));
 
 	AM9517A(config, m_dma, 10_MHz_XTAL / 2);
-	// ch0: tape, ch1: buffer
-	m_dma->out_hreq_callback().set(m_dma, FUNC(am9517a_device::hack_w));
+	m_dma->out_hreq_callback().set_inputline(m_cpu, INPUT_LINE_HALT);
+	m_dma->out_hreq_callback().append(m_xfr, FUNC(input_merger_any_high_device::in_w<0>));
+	m_dma->out_hreq_callback().append(m_dma, FUNC(am9517a_device::hack_w));
+
 	m_dma->in_memr_callback().set([this](offs_t offset) { return m_cpu->space(AS_PROGRAM).read_byte(offset); });
 	m_dma->out_memw_callback().set([this](offs_t offset, u8 data) { m_cpu->space(AS_PROGRAM).write_byte(offset, data); });
-	m_dma->in_ior_callback<1>().set([this](offs_t offset) { return m_buf[offset & 0xfff]; });
-	m_dma->out_iow_callback<1>().set([this](offs_t offset, u8 data) { m_buf[offset & 0xfff] = data; });
+
+	m_dma->in_ior_callback<0>().set(FUNC(multibus_dsd5217_device::buf_r));
+	m_dma->out_iow_callback<0>().set(FUNC(multibus_dsd5217_device::buf_w));
+	m_dma->in_ior_callback<1>().set(FUNC(multibus_dsd5217_device::buf_r));
+	m_dma->out_iow_callback<1>().set(FUNC(multibus_dsd5217_device::buf_w));
 
 	// floppy: 250Kbps MFM, 80 tracks, 2 sides, 8 sectors/track, 512 byte sectors,
 	FLOPPY_CONNECTOR(config, m_fdc[0], "525qd", FLOPPY_525_QD, true,  floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_fdc[1], "525qd", FLOPPY_525_QD, false, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
+	HARDDISK(config, m_hdd[0]);
+	HARDDISK(config, m_hdd[1]);
+
 	QIC02_CONNECTOR(config, m_qic);
+	m_qic->ack().set(m_dma, FUNC(am9517a_device::dreq0_w));
 	m_qic->rdy().set([this](int state) { if (!state) m_port70 |= 0x80; else m_port70 &= ~0x80; });
 	m_qic->exc().set_inputline(m_cpu, I8085_RST65_LINE).invert();
+	//m_qic->dir();
+
+	INPUT_MERGER_ANY_HIGH(config, m_xfr);
+	m_xfr->output_handler().set(
+		[this](int state)
+		{
+			if (BIT(m_port7c, 1))
+				m_qic->xfr_w(state ? 0 : 1);
+			else
+				m_qic->xfr_w(1);
+		}
+	);
+}
+
+floppy_image_device *multibus_dsd5217_device::selected_fdd() const
+{
+	if (BIT(m_pb, PB_FDS0))
+		return m_fdc[0]->get_device();
+	else if (BIT(m_pb, PB_FDS1))
+		return m_fdc[1]->get_device();
+
+	return nullptr;
+}
+
+std::optional<unsigned> multibus_dsd5217_device::selected_hdd() const
+{
+	if (BIT(m_pb, PB_WDS0) && m_hdd[0]->exists())
+		return 0;
+	else if (BIT(m_pb, PB_WDS1) && m_hdd[1]->exists())
+		return 1;
+
+	return std::nullopt;
 }
 
 void multibus_dsd5217_device::append_crc()
@@ -322,29 +350,8 @@ void multibus_dsd5217_device::cpu_mem(address_map &map)
 
 	// read/write controller crc/ecc
 	map(0x6000, 0x6000).lr8([]() { return 4; }, "rwc_r");
-	map(0x6000, 0x6003).lw8(
-		[this](offs_t offset, u8 data)
-		{
-			LOG("%s: scratch_%x data 0x%02x\n", machine().describe_context(), offset, data);
-
-			// TODO: fd: sector,head,cyl,flags
-			m_scratch[offset] = data;
-
-			// HACK: this code allows diagnostic to pass, but is probably wrong
-			if (offset == 0)
-			{
-				append_crc();
-
-				// append scratch data
-				for (size_t i = 0; i < std::size(m_scratch); i++)
-					m_buf[m_ctr[0]++] = m_scratch[i];
-
-				// append one more byte (valid values 0x52..0x5f)?
-				m_buf[m_ctr[0]++] = 0x53;
-			}
-		}, "crc_w");
-
-	map(0x7000, 0x7000).lrw8([this]() { return ~m_qic->data_r(); }, "qic_r", [this](u8 data) { m_qic->data_w(~data); }, "qic_w");
+	map(0x6000, 0x6003).w(FUNC(multibus_dsd5217_device::rwc_w));
+	map(0x7000, 0x7000).rw(m_qic, FUNC(qic02_connector_device::data_r), FUNC(qic02_connector_device::data_w)).mirror(0xfff);
 	map(0x8000, 0xffff).rw(FUNC(multibus_dsd5217_device::bus_r), FUNC(multibus_dsd5217_device::bus_w));
 }
 
@@ -354,7 +361,7 @@ void multibus_dsd5217_device::cpu_pio(address_map &map)
 	map(0x20, 0x20).r(FUNC(multibus_dsd5217_device::port20_r));
 	map(0x40, 0x47).rw(m_rio, FUNC(i8155_device::io_r), FUNC(i8155_device::io_w));
 
-	map(0x60, 0x60).rw(FUNC(multibus_dsd5217_device::buf_r<0>), FUNC(multibus_dsd5217_device::buf_w<0>));
+	map(0x60, 0x60).rw(FUNC(multibus_dsd5217_device::buf_r), FUNC(multibus_dsd5217_device::buf_w));
 	map(0x64, 0x64).lw8([this](u8 data) { multibus_dsd5217_device::ctr_w<true>(0, data); }, "ctr0h_w");
 	map(0x68, 0x68).lw8([this](u8 data) { multibus_dsd5217_device::ctr_w<false>(0, data); }, "ctr0l_w");
 	map(0x6c, 0x6c).lw8([this](u8 data) { multibus_dsd5217_device::ctr_w<true>(1, data); }, "ctr1h_w");
@@ -377,6 +384,8 @@ void multibus_dsd5217_device::cmd_w(u8 data)
 		break;
 	case 0x01:
 		LOG("Start\n");
+		if (VERBOSE & LOG_GENERAL)
+			dump_iopb();
 		m_cpu->set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 		m_cpu->set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 		break;
@@ -387,64 +396,128 @@ void multibus_dsd5217_device::cmd_w(u8 data)
 	}
 }
 
+void multibus_dsd5217_device::rwc_w(offs_t offset, u8 data)
+{
+	LOG("%s: rwc_w[%u] data 0x%02x\n", machine().describe_context(), offset, data);
+
+	m_rwc_ram[offset] = data;
+
+	// writing to offset 0 triggers operation?
+	if (offset == 0)
+	{
+		if (std::optional<unsigned> hdd = selected_hdd())
+		{
+			harddisk_image_device &hid = *m_hdd[hdd.value()];
+
+			unsigned const c = m_hdd_cyl[hdd.value()];
+			unsigned const h = BIT(m_pb, PB_HS0, 3) + BIT(m_pc, PC_HS3) * 8;
+			unsigned const s = m_rwc_ram[0];
+
+			hard_disk_file::info const info = hid.get_info();
+			unsigned const lba = ((c * info.heads) + h) * info.sectors + s;
+
+			static char const *const type[] = { "format", "read", "write", "unknown" };
+			LOG("hd%u: %s cylinder=%u head=%u sector=%u lba=%u ctr0=0x%04x ctr1=0x%04x\n",
+				hdd.value(), type[BIT(m_pa, 1, 2)], c, h, s, lba, m_ctr[0], m_ctr[1]);
+
+			if (BIT(m_pa, 1))
+			{
+				u16 &ctr = m_ctr[1];
+				hid.read(lba, &m_buf[ctr]);
+				ctr = (ctr + 0x200) & 0xfff;
+			}
+			else if (BIT(m_pa, 2))
+			{
+				u16 &ctr = m_ctr[1];
+				hid.write(lba, &m_buf[ctr]);
+				ctr = (ctr + 0x200) & 0xfff;
+			}
+		}
+		else
+		{
+			// HACK: this code allows diagnostic to pass, but is probably wrong
+			append_crc();
+
+			// append scratch data
+			for (size_t i = 0; i < std::size(m_rwc_ram); i++)
+				m_buf[m_ctr[0]++] = m_rwc_ram[i];
+
+			// append one more byte (valid values 0x52..0x5f)?
+			m_buf[m_ctr[0]++] = 0x53;
+		}
+	}
+}
+
 u8 multibus_dsd5217_device::bus_r(offs_t offset)
 {
-	offs_t const address = (u32(m_mua) << 16) | (BIT(m_port78, P78_MBA15) << 15) | offset;
+	offs_t const address = (offs_t(m_mua) << 16) | (BIT(m_port78, P78_MBA15) << 15) | offset;
 
 	return m_bus->space(AS_PROGRAM).read_byte(address);
 }
 
 void multibus_dsd5217_device::bus_w(offs_t offset, u8 data)
 {
-	offs_t const address = (u32(m_mua) << 16) | (BIT(m_port78, P78_MBA15) << 15) | offset;
+	offs_t const address = (offs_t(m_mua) << 16) | (BIT(m_port78, P78_MBA15) << 15) | offset;
 
 	m_bus->space(AS_PROGRAM).write_byte(address, data);
 }
 
 template <bool High> void multibus_dsd5217_device::ctr_w(offs_t offset, u8 data)
 {
+	u16 &ctr = m_ctr[offset];
+
 	if (High)
-		m_ctr[offset] = (m_ctr[offset] & 0x00ffU) | u16(data & 0x0f) << 8;
+		ctr = (ctr & 0x00ffU) | u16(data & 0x0f) << 8;
 	else
-		m_ctr[offset] = (m_ctr[offset] & 0x0f00U) | data;
+		ctr = (ctr & 0x0f00U) | data;
 }
 
-template <unsigned Port> u8 multibus_dsd5217_device::buf_r()
+u8 multibus_dsd5217_device::buf_r()
 {
-	u8 const data = m_buf[m_ctr[Port]];
+	u8 const data = m_buf[m_ctr[0]];
 
 	if (!machine().side_effects_disabled())
-		m_ctr[Port] = (m_ctr[Port] + 1) & 0x0fffU;
+		m_ctr[0] = (m_ctr[0] + 1) & 0x0fffU;
 
 	return data;
 }
 
-template <unsigned Port> void multibus_dsd5217_device::buf_w(u8 data)
+void multibus_dsd5217_device::buf_w(u8 data)
 {
-	m_buf[m_ctr[Port]] = data;
+	if (!machine().side_effects_disabled())
+		m_buf[m_ctr[0]] = data;
 
-	m_ctr[Port] = (m_ctr[Port] + 1) & 0x0fffU;
+	m_ctr[0] = (m_ctr[0] + 1) & 0x0fffU;
 }
 
 void multibus_dsd5217_device::mua_w(u8 data)
 {
 	if (m_mua ^ data)
 		LOG("%s: mua_w 0x%02x\n", machine().describe_context(), data);
+
 	m_mua = data;
 }
 
 u8 multibus_dsd5217_device::port20_r()
 {
-	// TODO: drive ready, seek complete
-	u8 data = 0x09;
+	u8 data = 0;
 
-	if (floppy_image_device *f = m_fdc[0]->get_device())
+	if (std::optional<unsigned> hdd = selected_hdd())
 	{
-		if (f->idx_r())
+		data |= P20_WRDY;
+		data |= P20_WSEEK;
+
+		if (m_hdd_cyl[hdd.value()] == 0)
+			data |= P20_WTRK0;
+	}
+
+	if (floppy_image_device *fdd = selected_fdd())
+	{
+		if (fdd->idx_r())
 			data |= P20_FIDX;
-		if (!f->trk00_r())
+		if (!fdd->trk00_r())
 			data |= P20_FTRK0;
-		if (f->wpt_r())
+		if (fdd->wpt_r())
 			data |= P20_FWPT;
 	}
 
@@ -466,19 +539,86 @@ void multibus_dsd5217_device::port78_w(u8 data)
 
 void multibus_dsd5217_device::port7c_w(u8 data)
 {
-	if (m_port7c ^ data)
+	u8 const delta = m_port7c ^ data;
+
+	if (delta)
 		LOG("%s: port7c_w 0x%02x\n", machine().describe_context(), data);
 
-	if (BIT(m_port7c ^ data, 7))
-		m_qic->onl_w(!BIT(data, 7));
-	if (BIT(m_port7c ^ data, 6))
-		m_qic->req_w(!BIT(data, 6));
-	if (BIT(m_port7c ^ data, 5))
-		m_qic->rst_w(!BIT(data, 5));
-	if (BIT(m_port7c ^ data, 0))
-		m_qic->xfr_w(!BIT(data, 0));
-
 	m_port7c = data;
+
+	if (BIT(delta, 7))
+		m_qic->onl_w(!BIT(data, 7));
+	if (BIT(delta, 6))
+		m_qic->req_w(!BIT(data, 6));
+	if (BIT(delta, 5))
+		m_qic->rst_w(!BIT(data, 5));
+	if (BIT(delta, 0, 2))
+		m_xfr->in_w<1>(BIT(data, 1) && BIT(data, 0));
+}
+
+void multibus_dsd5217_device::pa_w(u8 data)
+{
+	if (m_pa ^ data)
+		LOG("%s: port A 0x%02x\n", machine().describe_context(), data);
+
+	m_pa = data;
+}
+
+void multibus_dsd5217_device::pb_w(u8 data)
+{
+	if (m_pb ^ data)
+		LOG("%s: port B 0x%02x\n", machine().describe_context(), data);
+
+	if (data & PB_MOTOR)
+	{
+		if (floppy_image_device *fdd = selected_fdd())
+		{
+			if (BIT(m_pb ^ data, PB_MOTOR))
+				fdd->mon_w(!BIT(data, PB_MOTOR));
+			if (BIT(m_pb ^ data, PB_HS0))
+				fdd->ss_w(BIT(data, PB_HS0));
+		}
+	}
+
+	m_pb = data;
+}
+
+void multibus_dsd5217_device::pc_w(u8 data)
+{
+	if (m_pc ^ data)
+		LOG("%s: port C 0x%02x\n", machine().describe_context(), data);
+
+	if (BIT(data, PC_WUA))
+	{
+		if (BIT(m_port78, P78_CR1))
+			m_wua <<= 1;
+		else
+			m_wua = (m_w7->read() << 8) | m_w9->read();
+	}
+
+	if (floppy_image_device *fdd = selected_fdd())
+	{
+		if (BIT(m_pc ^ data, PC_DIR))
+			fdd->dir_w(!BIT(data, PC_DIR));
+
+		if (BIT(m_pc ^ data, PC_STEP) && BIT(m_pb, PB_MOTOR))
+			fdd->stp_w(BIT(data, PC_STEP));
+	}
+
+	if (std::optional<unsigned> hdd = selected_hdd())
+	{
+		if (!BIT(m_pc, PC_STEP) && BIT(data, PC_STEP))
+		{
+			u16 &cyl = m_hdd_cyl[hdd.value()];
+
+			if (BIT(data, PC_DIR))
+				cyl++;
+			else
+				cyl--;
+		}
+	}
+
+	m_pc = data;
 }
 
 void multibus_dsd5217_device::interrupt(bool state)
@@ -500,6 +640,62 @@ void multibus_dsd5217_device::interrupt(bool state)
 		}
 
 		m_interrupt = state;
+	}
+}
+
+void multibus_dsd5217_device::dump_iopb()
+{
+	auto const suppressor(machine().disable_side_effects());
+
+	offs_t const wua = ((m_w7->read() << 8) | m_w9->read()) << 4;
+	address_space &s = m_bus->space(AS_PROGRAM);
+	//offs_t const mua = offs_t(m_mua) << 16;
+
+	offs_t const ccb = s.read_dword(wua + 2);
+	logerror("wub 0x%04x: extension=%u ccb=0x%x\n", wua, s.read_byte(wua + 0), ccb);
+
+	offs_t const cib = s.read_dword_unaligned(ccb + 2);
+	logerror("ccb 0x%06x: cib=0x%06x cp=0x%06x\n", ccb, cib, s.read_dword_unaligned(ccb + 10));
+
+	if (s.read_byte(ccb + 1) == 00)
+	{
+		offs_t const iopb = s.read_dword_unaligned(cib + 4);
+		logerror("cib 0x%06x: iopb=0x%06x\n", cib, iopb);
+
+		u16 const device = s.read_word(iopb + 8);
+		u8 const unit = s.read_byte(iopb + 10);
+		u8 const function = s.read_byte(iopb + 11);
+		offs_t const buffer = s.read_dword_unaligned(iopb + 18);
+		logerror("iopb device=%u unit=%u function=0x%02x modifier=%u cylinder=%u head=%u sector=%u buffer=0x%06x count=%u\n",
+			device, unit, function,
+			s.read_word(iopb + 12), s.read_word(iopb + 14), s.read_byte(iopb + 16), s.read_byte(iopb + 17),
+			buffer, s.read_dword_unaligned(iopb + 22));
+
+		switch (function)
+		{
+		case 0x00: // initialize
+			if (device == 4)
+			{
+				logerror("initialize: tpb=0x%02x\n", s.read_byte(buffer + 0));
+				s.write_byte(buffer + 0, 0x01);
+			}
+			else
+				logerror("initialize: cylinders=%u fixed_heads=%u removable_heads=%u sectors=%u sector_size=%u alternate_cylinders=%u\n",
+					s.read_word(buffer + 0), s.read_byte(buffer + 2), s.read_byte(buffer + 3),
+					s.read_byte(buffer + 4), s.read_word_unaligned(buffer + 5), s.read_byte(buffer + 7));
+			break;
+		case 0x02: // format
+			switch (s.read_byte(buffer + 0))
+			{
+			case 0x00: logerror("format: data track, user pattern=0x%02x 0x%02x 0x%02x 0x%02x interleave=%u\n",
+				s.read_byte(buffer + 1), s.read_byte(buffer + 2), s.read_byte(buffer + 3), s.read_byte(buffer + 4), s.read_byte(buffer + 5)); break;
+			case 0x40: logerror("format: alternative track, user pattern=0x%02x 0x%02x 0x%02x 0x%02x interleave=%u\n",
+				s.read_byte(buffer + 1), s.read_byte(buffer + 2), s.read_byte(buffer + 3), s.read_byte(buffer + 4), s.read_byte(buffer + 5)); break;
+			case 0x80: logerror("format: defective track, cylinder=%u head=%u interleave=%u\n",
+				s.read_word_unaligned(buffer + 1), s.read_byte(buffer + 3), s.read_byte(buffer + 5)); break;
+			}
+			break;
+		}
 	}
 }
 

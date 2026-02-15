@@ -88,7 +88,7 @@ bool nscsi_cdrom_pc8801_30_device::scsi_command_done(u8 command, u8 length)
 
 //attotime nscsi_cdrom_pc8801_30_device::scsi_data_command_delay()
 //{
-//  return attotime::from_msec(1'000'000 / 44'150);
+//  return attotime::from_msec(1'000'000 / 44'100);
 //}
 //
 

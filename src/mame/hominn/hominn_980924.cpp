@@ -267,7 +267,7 @@ void hominn_980924_state::qxjl(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
-	screen.set_visarea(0*8, 64*8-1, 0, 32*8-1);
+	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
 	screen.set_screen_update(FUNC(hominn_980924_state::screen_update));
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx);

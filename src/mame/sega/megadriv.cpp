@@ -446,7 +446,7 @@ TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
 		m_z80snd->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 
 		/* Check if z80 has the bus */
-		m_z80snd->set_input_line(Z80_INPUT_LINE_BUSRQ, m_genz80.z80_has_bus ? CLEAR_LINE : ASSERT_LINE);
+		m_z80snd->set_input_line(Z80_INPUT_LINE_BUSREQ, m_genz80.z80_has_bus ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 

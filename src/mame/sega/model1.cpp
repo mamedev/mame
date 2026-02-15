@@ -1715,7 +1715,8 @@ void model1_state::model1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &model1_state::model1_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(model1_state::irq_callback));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x MB84256A-70LL + battery
+	// vf (at least) depends on default being 1-filled for ranking to initialize properly
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1); // 2x MB84256A-70LL + battery
 
 	GENERIC_FIFO_U32(config, "copro_fifo_in", 0);
 	GENERIC_FIFO_U32(config, "copro_fifo_out", 0);

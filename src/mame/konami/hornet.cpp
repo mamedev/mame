@@ -418,20 +418,36 @@ public:
 		m_cg_view(*this, "cg_view")
 	{ }
 
-	void hornet(machine_config &config);
-	void hornet_x76(machine_config &config);
-	void hornet_lan(machine_config &config);
-	void nbapbp(machine_config &config);
-	void sscope(machine_config &config);
-	void sscope_voodoo2(machine_config& config);
+	void hornet(machine_config &config) ATTR_COLD;
+	void hornet_x76(machine_config &config) ATTR_COLD;
+	void hornet_lan(machine_config &config) ATTR_COLD;
+	void gradius4(machine_config &config) ATTR_COLD;
+	void nbapbp(machine_config &config) ATTR_COLD;
+	void sscope(machine_config &config) ATTR_COLD;
+	void sscope_voodoo2(machine_config& config) ATTR_COLD;
 
-	void init_hornet();
-	void init_sscope();
-	void init_gradius4();
+	void init_hornet() ATTR_COLD;
+	void init_sscope() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	uint8_t sysreg_r(offs_t offset);
+	void sysreg_w(offs_t offset, uint8_t data);
+	void soundtimer_en_w(uint16_t data);
+	void soundtimer_ack_w(uint16_t data);
+	double adc12138_input_callback(uint8_t input);
+	void jamma_jvs_w(uint8_t data);
+
+	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(sound_irq);
+
+	void hornet_map(address_map &map) ATTR_COLD;
+	void hornet_lan_map(address_map &map) ATTR_COLD;
+	void sscope_map(address_map &map) ATTR_COLD;
+	template <unsigned Board> void sharc_map(address_map &map) ATTR_COLD;
+	void sound_memmap(address_map &map) ATTR_COLD;
 
 	required_shared_ptr<uint32_t> m_workram;
 	optional_shared_ptr_array<uint32_t, 2> m_sharc_dataram;
@@ -459,22 +475,6 @@ protected:
 
 	bool m_sound_irq_enabled = false;
 	bool m_sndres = false;
-
-	uint8_t sysreg_r(offs_t offset);
-	void sysreg_w(offs_t offset, uint8_t data);
-	void soundtimer_en_w(uint16_t data);
-	void soundtimer_ack_w(uint16_t data);
-	double adc12138_input_callback(uint8_t input);
-	void jamma_jvs_w(uint8_t data);
-
-	template <uint8_t Which> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_irq);
-
-	void hornet_map(address_map &map) ATTR_COLD;
-	void hornet_lan_map(address_map &map) ATTR_COLD;
-	void sscope_map(address_map &map) ATTR_COLD;
-	template <unsigned Board> void sharc_map(address_map &map) ATTR_COLD;
-	void sound_memmap(address_map &map) ATTR_COLD;
 };
 
 // with GN680 I/O board
@@ -486,21 +486,13 @@ public:
 		m_gn680(*this, "gn680")
 	{ }
 
-	void terabrst(machine_config &config);
+	void terabrst(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_gn680;
-
-	uint16_t m_gn680_latch = 0;
-	uint16_t m_gn680_ret0 = 0;
-	uint16_t m_gn680_ret1 = 0;
-	uint16_t m_gn680_check = 0;
-	uint16_t m_gn680_reg0e = 0;
-
 	uint16_t gun_r(offs_t offset);
 	void gun_w(offs_t offset, uint16_t data);
 	void gn680_sysctrl(uint16_t data);
@@ -509,6 +501,14 @@ private:
 
 	void terabrst_map(address_map &map) ATTR_COLD;
 	void gn680_memmap(address_map &map) ATTR_COLD;
+
+	required_device<cpu_device> m_gn680;
+
+	uint16_t m_gn680_latch = 0;
+	uint16_t m_gn680_ret0 = 0;
+	uint16_t m_gn680_ret1 = 0;
+	uint16_t m_gn680_check = 0;
+	uint16_t m_gn680_reg0e = 0;
 };
 
 // with GQ931 LAN board
@@ -523,21 +523,16 @@ public:
 		m_comm_bank(*this, "comm_bank")
 	{ }
 
-	void sscope2(machine_config &config);
-	void sscope2_voodoo1(machine_config& config);
+	void sscope2(machine_config &config) ATTR_COLD;
+	void sscope2_voodoo1(machine_config& config) ATTR_COLD;
 
-	void init_sscope2();
+	void init_sscope2() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<eeprom_serial_93cxx_device> m_lan_eeprom;
-	required_device<ds2401_device> m_lan_ds2401;
-	required_region_ptr<uint32_t> m_comm_board_rom;
-	required_memory_bank m_comm_bank;
-
 	void comm1_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void comm_rombank_w(uint32_t data);
 	uint32_t comm0_unk_r(offs_t offset, uint32_t mem_mask = ~0);
@@ -545,6 +540,11 @@ private:
 	void comm_eeprom_w(uint8_t data);
 
 	void sscope2_map(address_map &map) ATTR_COLD;
+
+	required_device<eeprom_serial_93cxx_device> m_lan_eeprom;
+	required_device<ds2401_device> m_lan_ds2401;
+	required_region_ptr<uint32_t> m_comm_board_rom;
+	required_memory_bank m_comm_bank;
 };
 
 
@@ -1405,6 +1405,13 @@ void hornet_state::hornet_lan(machine_config &config)
 	KONAMI_GN676A_LAN(config, m_gn676_lan, 0);
 }
 
+void hornet_state::gradius4(machine_config &config)
+{
+	hornet_x76(config);
+
+	m_dsp[0]->enable_recompiler();
+}
+
 void hornet_state::nbapbp(machine_config &config)
 {
 	hornet_x76(config);
@@ -1542,13 +1549,6 @@ void hornet_state::init_hornet()
 	m_maincpu->ppc4xx_spu_set_tx_handler(write8smo_delegate(*this, FUNC(hornet_state::jamma_jvs_w)));
 
 	//m_dsp[0]->enable_recompiler();
-}
-
-void hornet_state::init_gradius4()
-{
-	init_hornet();
-
-	m_dsp[0]->enable_recompiler();
 }
 
 void hornet_state::init_sscope()
@@ -3588,17 +3588,17 @@ ROM_START(thrilldgkk)
 ROM_END
 
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /*************************************************************************/
 
-GAME(  1998, gradius4,   0,        hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4u,  gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver UAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4a,  gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver AAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4ja, gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4ua, gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver UAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4aa, gradius4, hornet_x76, gradius4, hornet_state, init_gradius4, ROT0, "Konami", "Gradius IV (ver AAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4,   0,        gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4u,  gradius4, gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver UAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4a,  gradius4, gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver AAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4ja, gradius4, gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4ua, gradius4, gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver UAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4aa, gradius4, gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver AAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME(  1998, nbapbp,   0,      nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver UAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbpa,  nbapbp, nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

@@ -1485,6 +1485,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/f82c836.h,MACHINES["F82C836"] = true
+---------------------------------------------------
+
+if MACHINES["F82C836"] then
+	files {
+		MAME_DIR .. "src/devices/machine/f82c836.cpp",
+		MAME_DIR .. "src/devices/machine/f82c836.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/fga002.h,MACHINES["FGA002"] = true
 ---------------------------------------------------
 
@@ -3838,6 +3850,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/um8498f.h,MACHINES["UM8498F"] = true
+---------------------------------------------------
+
+if MACHINES["UM8498F"] then
+	files {
+		MAME_DIR .. "src/devices/machine/um8498f.cpp",
+		MAME_DIR .. "src/devices/machine/um8498f.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/upc82c710.h,MACHINES["UPC82C710"] = true
 ---------------------------------------------------
 
@@ -4002,6 +4026,18 @@ if MACHINES["VOTRAXTNT"] then
 	files {
 		MAME_DIR .. "src/devices/machine/votraxtnt.cpp",
 		MAME_DIR .. "src/devices/machine/votraxtnt.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/vl82c420.h,MACHINES["VL82C420"] = true
+---------------------------------------------------
+
+if MACHINES["VL82C420"] then
+	files {
+		MAME_DIR .. "src/devices/machine/vl82c420.cpp",
+		MAME_DIR .. "src/devices/machine/vl82c420.h",
 	}
 end
 
@@ -4501,6 +4537,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/fdc37c665ir.h,MACHINES["FDC37C665IR"] = true
+---------------------------------------------------
+
+if MACHINES["FDC37C665IR"] then
+	files {
+		MAME_DIR .. "src/devices/machine/fdc37c665ir.cpp",
+		MAME_DIR .. "src/devices/machine/fdc37c665ir.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pci9050.h,MACHINES["PCI9050"] = true
 ---------------------------------------------------
 
@@ -4556,6 +4604,18 @@ if MACHINES["FDC37C93X"] then
 	files {
 		MAME_DIR .. "src/devices/machine/fdc37c93x.cpp",
 		MAME_DIR .. "src/devices/machine/fdc37c93x.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/it8671f.h,MACHINES["IT8671F"] = true
+---------------------------------------------------
+
+if MACHINES["IT8671F"] then
+	files {
+		MAME_DIR .. "src/devices/machine/it8671f.cpp",
+		MAME_DIR .. "src/devices/machine/it8671f.h",
 	}
 end
 

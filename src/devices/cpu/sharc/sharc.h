@@ -14,61 +14,6 @@
 #define SHARC_INPUT_FLAG3       6
 
 
-// STKY flags
-#define AUS     0x1         /* ALU floating-point underflow */
-#define AVS     0x2         /* ALU floating-point overflow */
-#define AOS     0x4         /* ALU fixed-point overflow */
-#define AIS     0x20        /* ALU floating-point invalid operation */
-
-// MODE1 flags
-#define MODE1_BR8           0x1         /* Bit-reverse for I8 */
-#define MODE1_BR0           0x2         /* Bit-reverse for I0 */
-#define MODE1_SRCU          0x4         /* Alternate register select for computational units */
-#define MODE1_SRD1H         0x8         /* DAG alternate register select (7-4) */
-#define MODE1_SRD1L         0x10        /* DAG alternate register select (3-0) */
-#define MODE1_SRD2H         0x20        /* DAG alternate register select (15-12) */
-#define MODE1_SRD2L         0x40        /* DAG alternate register select (11-8) */
-#define MODE1_SRRFH         0x80        /* Register file alternate select for R(15-8) */
-#define MODE1_SRRFL         0x400       /* Register file alternate select for R(7-0) */
-#define MODE1_NESTM         0x800       /* Interrupt nesting enable */
-#define MODE1_IRPTEN        0x1000      /* Global interrupt enable */
-#define MODE1_ALUSAT        0x2000      /* Enable ALU fixed-point saturation */
-#define MODE1_SSE           0x4000      /* Enable short word sign extension */
-#define MODE1_TRUNCATE      0x8000      /* (1) Floating-point truncation / (0) round to nearest */
-#define MODE1_RND32         0x10000     /* (1) 32-bit floating-point rounding / (0) 40-bit rounding */
-#define MODE1_CSEL          0x60000     /* CSelect */
-
-// MODE2 flags
-#define MODE2_IRQ0E         0x1         /* IRQ0 (1) Edge sens. / (0) Level sens. */
-#define MODE2_IRQ1E         0x2         /* IRQ1 (1) Edge sens. / (0) Level sens. */
-#define MODE2_IRQ2E         0x4         /* IRQ2 (1) Edge sens. / (0) Level sens. */
-#define MODE2_CADIS         0x10        /* Cache disable */
-#define MODE2_TIMEN         0x20        /* Timer enable */
-#define MODE2_BUSLK         0x40        /* External bus lock */
-#define MODE2_FLG0O         0x8000      /* FLAG0 (1) Output / (0) Input */
-#define MODE2_FLG1O         0x10000     /* FLAG1 (1) Output / (0) Input */
-#define MODE2_FLG2O         0x20000     /* FLAG2 (1) Output / (0) Input */
-#define MODE2_FLG3O         0x40000     /* FLAG3 (1) Output / (0) Input */
-#define MODE2_CAFRZ         0x80000     /* Cache freeze */
-
-
-#define OP_USERFLAG_COUNTER_LOOP            0x00000001
-#define OP_USERFLAG_COND_LOOP               0x00000002
-#define OP_USERFLAG_COND_FIELD              0x000003fc
-#define OP_USERFLAG_COND_FIELD_SHIFT        2
-#define OP_USERFLAG_ASTAT_DELAY_COPY_AZ     0x00001000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_AN     0x00002000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_AC     0x00004000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_AV     0x00008000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_MV     0x00010000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_MN     0x00020000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_SV     0x00040000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_SZ     0x00080000
-#define OP_USERFLAG_ASTAT_DELAY_COPY_BTF    0x00100000
-#define OP_USERFLAG_ASTAT_DELAY_COPY        0x001ff000
-#define OP_USERFLAG_CALL                    0x10000000
-
-
 class sharc_frontend;
 
 class adsp21062_device : public cpu_device
@@ -86,7 +31,7 @@ public:
 
 
 	// construction/destruction
-	adsp21062_device(const machine_config &mconfig, const char *_tag, device_t *_owner, uint32_t _clock);
+	adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~adsp21062_device() override;
 
 	// configuration helpers
@@ -101,55 +46,37 @@ public:
 
 	void write_stall(int state);
 
-	void sharc_cfunc_unimplemented();
-	void sharc_cfunc_read_iop();
-	void sharc_cfunc_write_iop();
-	void sharc_cfunc_pcstack_overflow();
-	void sharc_cfunc_pcstack_underflow();
-	void sharc_cfunc_loopstack_overflow();
-	void sharc_cfunc_loopstack_underflow();
-	void sharc_cfunc_statusstack_overflow();
-	void sharc_cfunc_statusstack_underflow();
-
-	void sharc_cfunc_unimplemented_compute();
-	void sharc_cfunc_unimplemented_shiftimm();
-	void sharc_cfunc_write_snoop();
-
 	void enable_recompiler();
 
-	uint64_t pm0_r(offs_t offset);
-	void pm0_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint64_t pm1_r(offs_t offset);
-	void pm1_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	uint32_t dmw0_r(offs_t offset);
-	void dmw0_w(offs_t offset, uint32_t data);
-	uint32_t dmw1_r(offs_t offset);
-	void dmw1_w(offs_t offset, uint32_t data);
+	template <unsigned N> uint64_t pm_r(offs_t offset);
+	template <unsigned N> void pm_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
+	template <unsigned N> uint32_t dmw_r(offs_t offset);
+	template <unsigned N> void dmw_w(offs_t offset, uint32_t data);
 	uint32_t iop_r(offs_t offset);
 	void iop_w(offs_t offset, uint32_t data);
 
-	enum ASTAT_FLAGS
+	enum ASTAT_FLAGS : uint32_t
 	{
 		// ASTAT flags
-		AZ =    0x1,         /* ALU result zero */
-		AV =    0x2,         /* ALU overflow */
-		AN =    0x4,         /* ALU result negative */
-		AC =    0x8,         /* ALU fixed-point carry */
-		AS =    0x10,        /* ALU X input sign */
-		AI =    0x20,        /* ALU floating-point invalid operation */
-		MN =    0x40,        /* Multiplier result negative */
-		MV =    0x80,        /* Multiplier overflow */
-		MU =    0x100,       /* Multiplier underflow */
-		MI =    0x200,       /* Multiplier floating-point invalid operation */
-		AF =    0x400,
-		SV =    0x800,      /* Shifter overflow */
-		SZ =    0x1000,     /* Shifter result zero */
-		SS =    0x2000,     /* Shifter input sign */
-		BTF =   0x40000,    /* Bit Test Flag */
-		FLG0 =  0x80000,    /* FLAG0 */
-		FLG1 =  0x100000,   /* FLAG1 */
-		FLG2 =  0x200000,   /* FLAG2 */
-		FLG3 =  0x400000    /* FLAG3 */
+		AZ =    0x000001,   // ALU result zero
+		AV =    0x000002,   // ALU overflow
+		AN =    0x000004,   // ALU result negative
+		AC =    0x000008,   // ALU fixed-point carry
+		AS =    0x000010,   // ALU X input sign
+		AI =    0x000020,   // ALU floating-point invalid operation
+		MN =    0x000040,   // Multiplier result negative
+		MV =    0x000080,   // Multiplier overflow
+		MU =    0x000100,   // Multiplier underflow
+		MI =    0x000200,   // Multiplier floating-point invalid operation
+		AF =    0x000400,
+		SV =    0x000800,   // Shifter overflow
+		SZ =    0x001000,   // Shifter result zero
+		SS =    0x002000,   // Shifter input sign
+		BTF =   0x040000,   // Bit Test Flag
+		FLG0 =  0x080000,   // FLAG0
+		FLG1 =  0x100000,   // FLAG1
+		FLG2 =  0x200000,   // FLAG2
+		FLG3 =  0x400000    // FLAG3
 	};
 
 	enum ASTAT_SHIFT
@@ -184,49 +111,102 @@ public:
 		MODE1_TOGGLE,
 	};
 
-	enum MEM_ACCESSOR_TYPE
-	{
-		MEM_ACCESSOR_PM_READ48,
-		MEM_ACCESSOR_PM_WRITE48,
-		MEM_ACCESSOR_PM_READ32,
-		MEM_ACCESSOR_PM_WRITE32,
-		MEM_ACCESSOR_DM_READ32,
-		MEM_ACCESSOR_DM_WRITE32
-	};
-
 	enum
 	{
 		EXCEPTION_INTERRUPT = 0,
 		EXCEPTION_COUNT
 	};
 
-	void internal_data(address_map &map) ATTR_COLD;
-	void internal_pgm(address_map &map) ATTR_COLD;
 protected:
-	// device-level overrides
+	adsp21062_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			address_map_constructor internal_pgm,
+			address_map_constructor internal_data);
+
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_pre_save() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override { return 8; }
 	virtual uint32_t execute_max_cycles() const noexcept override { return 8; }
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	void pgm_2m(address_map &map) ATTR_COLD;
+	void pgm_4m(address_map &map) ATTR_COLD;
+	void data_2m(address_map &map) ATTR_COLD;
+	void data_4m(address_map &map) ATTR_COLD;
+
 private:
-	struct alignas(16) SHARC_DAG
+	// STKY flags
+	static constexpr uint32_t AUS =             0x0000'0001;    // ALU floating-point underflow
+	static constexpr uint32_t AVS =             0x0000'0002;    // ALU floating-point overflow
+	static constexpr uint32_t AOS =             0x0000'0004;    // ALU fixed-point overflow
+	static constexpr uint32_t AIS =             0x0000'0020;    // ALU floating-point invalid operation
+	static constexpr uint32_t MOS =             0x0000'0040;    // Multiplier fixed-point overflow
+	static constexpr uint32_t MVS =             0x0000'0080;    // Multiplier floating-point overflow
+	static constexpr uint32_t MUS =             0x0000'0100;    // Multiplier underflow
+	static constexpr uint32_t MIS =             0x0000'0200;    // Multiplier floating-point invalid operation
+	static constexpr uint32_t PCFL =            0x0020'0000;    // PC stack full
+	static constexpr uint32_t PCEM =            0x0040'0000;    // PC stack empty
+	static constexpr uint32_t SSOV =            0x0080'0000;    // Status stack overflow
+	static constexpr uint32_t SSEM =            0x0100'0000;    // Status stack empty
+	static constexpr uint32_t LSOV =            0x0200'0000;    // Loop stacks overflow
+	static constexpr uint32_t LSEM =            0x0400'0000;    // Loop stacks empty
+
+	// MODE1 flags
+	static constexpr uint32_t MODE1_BR8 =       0x0000'0001;    // Bit-reverse for I8
+	static constexpr uint32_t MODE1_BR0 =       0x0000'0002;    // Bit-reverse for I0
+	static constexpr uint32_t MODE1_SRCU =      0x0000'0004;    // Alternate register select for computational units
+	static constexpr uint32_t MODE1_SRD1H =     0x0000'0008;    // DAG alternate register select (7-4)
+	static constexpr uint32_t MODE1_SRD1L =     0x0000'0010;    // DAG alternate register select (3-0)
+	static constexpr uint32_t MODE1_SRD2H =     0x0000'0020;    // DAG alternate register select (15-12)
+	static constexpr uint32_t MODE1_SRD2L =     0x0000'0040;    // DAG alternate register select (11-8)
+	static constexpr uint32_t MODE1_SRRFH =     0x0000'0080;    // Register file alternate select for R(15-8)
+	static constexpr uint32_t MODE1_SRRFL =     0x0000'0400;    // Register file alternate select for R(7-0)
+	static constexpr uint32_t MODE1_NESTM =     0x0000'0800;    // Interrupt nesting enable
+	static constexpr uint32_t MODE1_IRPTEN =    0x0000'1000;    // Global interrupt enable
+	static constexpr uint32_t MODE1_ALUSAT =    0x0000'2000;    // Enable ALU fixed-point saturation
+	static constexpr uint32_t MODE1_SSE =       0x0000'4000;    // Enable short word sign extension
+	static constexpr uint32_t MODE1_TRUNCATE =  0x0000'8000;    // (1) Floating-point truncation / (0) round to nearest
+	static constexpr uint32_t MODE1_RND32 =     0x0001'0000;    // (1) 32-bit floating-point rounding / (0) 40-bit rounding
+	static constexpr uint32_t MODE1_CSEL =      0x0006'0000;    // CSelect
+
+	// MODE2 flags
+	static constexpr uint32_t MODE2_IRQ0E =     0x0000'0001;    // IRQ0 (1) Edge sens. / (0) Level sens.
+	static constexpr uint32_t MODE2_IRQ1E =     0x0000'0002;    // IRQ1 (1) Edge sens. / (0) Level sens.
+	static constexpr uint32_t MODE2_IRQ2E =     0x0000'0004;    // IRQ2 (1) Edge sens. / (0) Level sens.
+	static constexpr uint32_t MODE2_CADIS =     0x0000'0010;    // Cache disable
+	static constexpr uint32_t MODE2_TIMEN =     0x0000'0020;    // Timer enable
+	static constexpr uint32_t MODE2_BUSLK =     0x0000'0040;    // External bus lock
+	static constexpr uint32_t MODE2_FLG0O =     0x0000'8000;    // FLAG0 (1) Output / (0) Input
+	static constexpr uint32_t MODE2_FLG1O =     0x0001'0000;    // FLAG1 (1) Output / (0) Input
+	static constexpr uint32_t MODE2_FLG2O =     0x0002'0000;    // FLAG2 (1) Output / (0) Input
+	static constexpr uint32_t MODE2_FLG3O =     0x0004'0000;    // FLAG3 (1) Output / (0) Input
+	static constexpr uint32_t MODE2_CAFRZ =     0x0008'0000;    // Cache freeze
+
+
+	using opcode_func = void (adsp21062_device::*)();
+	struct SHARC_OP
 	{
-		uint32_t i[8];
-		uint32_t m[8];
-		uint32_t b[8];
-		uint32_t l[8];
+		uint32_t op_mask;
+		uint32_t op_bits;
+		opcode_func handler;
 	};
+
 
 	union SHARC_REG
 	{
@@ -247,13 +227,6 @@ private:
 		uint32_t ext_count;
 	};
 
-	struct SHARC_LADDR
-	{
-		uint32_t addr;
-		uint32_t code;
-		uint32_t loop_type;
-	};
-
 	struct SHARC_DMA_OP
 	{
 		uint32_t src;
@@ -270,156 +243,19 @@ private:
 		bool chained;
 	};
 
+	struct alignas(16) sharc_internal_state;
 
-	address_space_config m_program_config;
-	address_space_config m_data_config;
-
-	typedef void (adsp21062_device::*opcode_func)();
-	struct SHARC_OP
-	{
-		uint32_t op_mask;
-		uint32_t op_bits;
-		opcode_func handler;
-	};
 	static const SHARC_OP s_sharc_opcode_table[];
+	static const size_t s_num_ops;
 
-	struct ASTAT_DRC
-	{
-		union
-		{
-			struct
-			{
-				uint32_t az;
-				uint32_t av;
-				uint32_t an;
-				uint32_t ac;
-				uint32_t as;
-				uint32_t ai;
-				uint32_t mn;
-				uint32_t mv;
-				uint32_t mu;
-				uint32_t mi;
-				uint32_t sv;
-				uint32_t sz;
-				uint32_t ss;
-				uint32_t btf;
-				uint32_t af;
-				uint32_t cacc;
-			};
-			uint64_t flags64[8];
-		};
-	};
+	static const uint32_t recips_mantissa_lookup[128];
+	static const uint32_t rsqrts_mantissa_lookup[128];
 
-	struct alignas(16) sharc_internal_state
-	{
-		SHARC_REG r[16];
-		SHARC_REG reg_alt[16];
 
-		uint32_t pc;
-		uint64_t mrf;
-		uint64_t mrb;
+	const address_space_config m_program_config;
+	const address_space_config m_data_config;
 
-		uint32_t pcstack[32];
-		uint32_t lcstack[6];
-		uint32_t lastack[6];
-		uint32_t lstkp;
-
-		uint32_t faddr;
-		uint32_t daddr;
-		uint32_t pcstk;
-		uint32_t pcstkp;
-		SHARC_LADDR laddr;
-		uint32_t curlcntr;
-		uint32_t lcntr;
-		uint8_t extdma_shift;
-
-		/* Data Address Generator (DAG) */
-		SHARC_DAG dag1;     // (DM bus)
-		SHARC_DAG dag2;     // (PM bus)
-		SHARC_DAG dag1_alt;
-		SHARC_DAG dag2_alt;
-
-		SHARC_DMA_REGS dma[12];
-
-		/* System registers */
-		uint32_t mode1;
-		uint32_t mode2;
-		uint32_t astat;
-		uint32_t stky;
-		uint32_t irptl;
-		uint32_t imask;
-		uint32_t imaskp;
-		uint32_t ustat1;
-		uint32_t ustat2;
-
-		uint32_t flag[4];
-
-		uint32_t syscon;
-		uint32_t sysstat;
-
-		struct
-		{
-			uint32_t mode1;
-			uint32_t astat;
-		} status_stack[5];
-		int32_t status_stkp;
-
-		uint64_t px;
-
-		int icount;
-		uint64_t opcode;
-
-		uint32_t nfaddr;
-
-		int32_t idle;
-		int32_t irq_pending;
-		int32_t active_irq_num;
-
-		SHARC_DMA_OP dma_op[12];
-		uint32_t dma_status;
-		bool write_stalled;
-
-		int32_t interrupt_active;
-
-		uint32_t iop_delayed_reg;
-		uint32_t iop_delayed_data;
-		emu_timer *delayed_iop_timer;
-
-		uint32_t delay_slot1, delay_slot2;
-
-		int32_t systemreg_latency_cycles;
-		int32_t systemreg_latency_reg;
-		uint32_t systemreg_latency_data;
-		uint32_t systemreg_previous_data;
-
-		uint32_t astat_old;
-		uint32_t astat_old_old;
-		uint32_t astat_old_old_old;
-
-		uint32_t arg0;
-		uint32_t arg1;
-		uint32_t arg2;
-		uint32_t arg3;
-
-		uint64_t arg64;
-		uint32_t mode1_delay_data;
-
-		ASTAT_DRC astat_drc;
-		ASTAT_DRC astat_drc_copy;
-		ASTAT_DRC astat_delay_copy;
-		uint32_t dreg_temp;
-		uint32_t dreg_temp2;
-		uint32_t jmpdest;
-		uint32_t temp_return;
-
-		float fp0;
-		float fp1;
-
-		uint32_t force_recompile;
-		uint32_t cache_dirty;
-	};
-
-	sharc_internal_state* m_core;
+	sharc_internal_state *m_core;
 
 	sharc_boot_mode m_boot_mode;
 
@@ -429,9 +265,10 @@ private:
 	std::unique_ptr<sharc_frontend> m_drcfe;
 	uml::parameter   m_regmap[16];
 
-	uml::code_handle *m_entry;                      /* entry point */
-	uml::code_handle *m_nocode;                     /* nocode exception handler */
-	uml::code_handle *m_out_of_cycles;              /* out of cycles exception handler */
+	uml::code_handle *m_entry;
+	uml::code_handle *m_nocode;
+	uml::code_handle *m_out_of_cycles;
+	uml::code_handle *m_reset_cache;
 	uml::code_handle *m_pm_read48;
 	uml::code_handle *m_pm_write48;
 	uml::code_handle *m_pm_read32;
@@ -444,7 +281,9 @@ private:
 	uml::code_handle *m_pop_loop;
 	uml::code_handle *m_push_status;
 	uml::code_handle *m_pop_status;
-	uml::code_handle *m_exception[EXCEPTION_COUNT];     // exception handlers
+	uml::code_handle *m_loop_check;
+	uml::code_handle *m_call_loop_check;
+	uml::code_handle *m_exception[EXCEPTION_COUNT];
 	uml::code_handle *m_swap_dag1_0_3;
 	uml::code_handle *m_swap_dag1_4_7;
 	uml::code_handle *m_swap_dag2_0_3;
@@ -452,10 +291,10 @@ private:
 	uml::code_handle *m_swap_r0_7;
 	uml::code_handle *m_swap_r8_15;
 
-	address_space *m_program;
-	address_space *m_data;
+	memory_access<24, 3, -3, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<32, 2, -2, ENDIANNESS_LITTLE>::specific m_data;
 
-	required_shared_ptr<uint32_t> m_block0, m_block1;
+	required_shared_ptr_array<uint32_t, 2> m_blocks;
 
 	opcode_func m_sharc_op[512];
 
@@ -476,7 +315,6 @@ private:
 	void sharc_dma_exec(int channel);
 	void dma_run_cycle(int channel);
 	void add_systemreg_write_latency_effect(int sysreg, uint32_t data, uint32_t prev_data);
-	inline void swap_register(uint32_t *a, uint32_t *b);
 	void systemreg_write_latency_effect();
 	uint32_t GET_UREG(int ureg);
 	void SET_UREG(int ureg, uint32_t data);
@@ -594,28 +432,30 @@ private:
 	inline void compute_fmul_dual_fadd_fsub(int fm, int fxm, int fym, int fa, int fs, int fxa, int fya);
 	void build_opcode_table();
 
-	/* internal compiler state */
+	// internal compiler state
 	struct compiler_state
 	{
-		uint32_t cycles;                             /* accumulated cycles */
-		uint8_t  checkints;                          /* need to check interrupts before next instruction */
-		uml::code_label  labelnum;                 /* index for local labels */
+		uint32_t        cycles = 0;     // accumulated cycles
+		uint8_t         checkints = 0;  // need to check interrupts before next instruction
+		uml::code_label labelnum = 1;   // index for local labels
 		struct
 		{
-			int counter;
-			int mode;
-			uint32_t data;
+			int         counter = 0;
+			int         mode = 0;
+			uint32_t    data = 0;
 		} mode1_delay;
 	};
 
 	void execute_run_drc();
-	void flush_cache();
+	void generate_invariant();
+	void flush_drc_cache();
 	void compile_block(offs_t pc);
 	void alloc_handle(uml::code_handle *&handleptr, const char *name);
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
-	void static_generate_memory_accessor(MEM_ACCESSOR_TYPE type, const char *name, uml::code_handle *&handleptr);
+	void static_generate_reset_cache();
+	void static_generate_memory_accessors();
 	void static_generate_exception(uint8_t exception, const char *name);
 	void static_generate_push_pc();
 	void static_generate_pop_pc();
@@ -623,6 +463,9 @@ private:
 	void static_generate_pop_loop();
 	void static_generate_push_status();
 	void static_generate_pop_status();
+	void static_generate_loop_check();
+	void static_generate_call_loop_check();
+	void static_generate_loop_check_body(drcuml_block &block, bool is_call);
 	void static_generate_mode1_ops();
 	void load_fast_iregs(drcuml_block &block);
 	void save_fast_iregs(drcuml_block &block);
@@ -632,11 +475,9 @@ private:
 	void generate_unimplemented_compute(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_compute(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_if_condition(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int condition, int skip_label);
-	void generate_do_condition(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int condition, int skip_label, ASTAT_DRC &astat);
 	void generate_shift_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, int data, int shiftop, int rn, int rx);
 	void generate_call(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, bool delayslot);
 	void generate_jump(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, bool delayslot, bool loopabort, bool clearint);
-	void generate_loop_jump(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_write_mode1_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t data);
 	void generate_set_mode1_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t data);
 	void generate_clear_mode1_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t data);
@@ -648,9 +489,43 @@ private:
 
 	bool if_condition_always_true(int condition);
 	uint32_t do_condition_astat_bits(int condition);
+
+	void sharc_cfunc_unimplemented();
+	void sharc_cfunc_read_iop();
+	void sharc_cfunc_write_iop();
+	void sharc_cfunc_pcstack_overflow();
+	void sharc_cfunc_pcstack_underflow();
+	void sharc_cfunc_loopstack_overflow();
+	void sharc_cfunc_loopstack_underflow();
+	void sharc_cfunc_statusstack_overflow();
+	void sharc_cfunc_statusstack_underflow();
+
+	void sharc_cfunc_unimplemented_compute();
+	void sharc_cfunc_unimplemented_shiftimm();
+	void sharc_cfunc_write_snoop();
+
+	static void cfunc_unimplemented(void *param);
+	static void cfunc_pcstack_overflow(void *param);
+	static void cfunc_pcstack_underflow(void *param);
+	static void cfunc_loopstack_overflow(void *param);
+	static void cfunc_loopstack_underflow(void *param);
+	static void cfunc_statusstack_overflow(void *param);
+	static void cfunc_statusstack_underflow(void *param);
+	static void cfunc_unimplemented_compute(void *param);
+	static void cfunc_unimplemented_shiftimm(void *param);
+};
+
+
+class adsp21060_device : public adsp21062_device
+{
+public:
+	// construction/destruction
+	adsp21060_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~adsp21060_device() override;
 };
 
 
 DECLARE_DEVICE_TYPE(ADSP21062, adsp21062_device)
+DECLARE_DEVICE_TYPE(ADSP21060, adsp21060_device)
 
 #endif // MAME_CPU_SHARC_SHARC_H

@@ -62,13 +62,287 @@ lev 7 : 0x7c : 0000 0000 - x
 */
 
 #include "emu.h"
-#include "kickgoal.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 #include "machine/eepromser.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+
+#include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+#include "tilemap.h"
+
+
+namespace {
+
+class kickgoal_state : public driver_device
+{
+public:
+	kickgoal_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_fgram(*this, "fgram"),
+		m_bgram(*this, "bgram"),
+		m_bg2ram(*this, "bg2ram"),
+		m_scrram(*this, "scrram"),
+		m_spriteram(*this, "spriteram"),
+		m_eeprom(*this, "eeprom") ,
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_oki(*this, "oki"),
+		m_okibank(*this, "okibank"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
+	{ }
+
+	void kickgoal(machine_config &config) ATTR_COLD;
+	void actionhw(machine_config &config) ATTR_COLD;
+
+	void init_kickgoal() ATTR_COLD;
+	void init_actionhw() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	void fgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bgram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bg2ram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void actionhw_snd_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+	void soundio_port_a_w(u8 data);
+	u8 soundio_port_b_r();
+	void soundio_port_b_w(u8 data);
+	u8 soundio_port_c_r();
+	void soundio_port_c_w(u8 data);
+	void to_pic_w(u16 data);
+
+	TILE_GET_INFO_MEMBER(get_kickgoal_fg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	TILE_GET_INFO_MEMBER(get_actionhw_fg_tile_info);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_8x8);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_16x16);
+	TILEMAP_MAPPER_MEMBER(tilemap_scan_32x32);
+	DECLARE_VIDEO_START(kickgoal);
+	DECLARE_VIDEO_START(actionhw);
+
+	INTERRUPT_GEN_MEMBER(kickgoal_interrupt);
+
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void program_map(address_map &map) ATTR_COLD;
+	void oki_map(address_map &map) ATTR_COLD;
+
+	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
+
+	/* video-related */
+	tilemap_t *m_fgtm = nullptr;
+	tilemap_t *m_bgtm = nullptr;
+	tilemap_t *m_bg2tm = nullptr;
+
+	/* misc */
+	int m_snd_new = 0;
+	int m_snd_sam[4]{};
+
+	u8 m_pic_portc = 0;
+	u8 m_pic_portb = 0;
+	int m_sound_command_sent = 0;
+
+	int m_fg_base = 0;
+
+	int m_bg_base = 0;
+	int m_bg_mask = 0;
+
+	int m_bg2_base = 0;
+	int m_bg2_mask = 0;
+	int m_bg2_region = 0;
+
+	int m_sprbase = 0;
+
+	/* memory pointers */
+	required_shared_ptr<u16> m_fgram;
+	required_shared_ptr<u16> m_bgram;
+	required_shared_ptr<u16> m_bg2ram;
+	required_shared_ptr<u16> m_scrram;
+	required_shared_ptr<u16> m_spriteram;
+
+	/* devices */
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<cpu_device> m_maincpu;
+	required_device<pic16c57_device> m_audiocpu;
+	required_device<okim6295_device> m_oki;
+	required_memory_bank m_okibank;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+};
+
+void kickgoal_state::fgram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_fgram[offset]);
+	m_fgtm->mark_tile_dirty(offset / 2);
+}
+
+void kickgoal_state::bgram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_bgram[offset]);
+	m_bgtm->mark_tile_dirty(offset / 2);
+}
+
+void kickgoal_state::bg2ram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_bg2ram[offset]);
+	m_bg2tm->mark_tile_dirty(offset / 2);
+}
+
+/* FG */
+TILE_GET_INFO_MEMBER(kickgoal_state::get_kickgoal_fg_tile_info)
+{
+	u16 const tileno = m_fgram[tile_index * 2] & 0x0fff;
+	u16 const color  = m_fgram[tile_index * 2 + 1] & 0x000f;
+
+	tileinfo.set(BIT(tile_index, 5) ? 3 : 0, tileno + m_fg_base, color + 0x00, 0); // similar 8x8 gfx behavior as CPS1
+}
+
+TILE_GET_INFO_MEMBER(kickgoal_state::get_actionhw_fg_tile_info)
+{
+	u16 const tileno = m_fgram[tile_index * 2] & 0x0fff;
+	u16 const color  = m_fgram[tile_index * 2 + 1] & 0x000f;
+
+	tileinfo.set(0, tileno + m_fg_base, color + 0x00, 0);
+}
+
+/* BG */
+TILE_GET_INFO_MEMBER(kickgoal_state::get_bg_tile_info)
+{
+	u16 const tileno = m_bgram[tile_index * 2] & m_bg_mask;
+	u16 const color  = m_bgram[tile_index * 2 + 1] & 0x000f;
+	bool const flipx = m_bgram[tile_index * 2 + 1] & 0x0020;
+	bool const flipy = m_bgram[tile_index * 2 + 1] & 0x0040;
+
+	tileinfo.set(1, tileno + m_bg_base, color + 0x10, (flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
+}
+
+/* BG 2 */
+TILE_GET_INFO_MEMBER(kickgoal_state::get_bg2_tile_info)
+{
+	u16 const tileno = m_bg2ram[tile_index * 2] & m_bg2_mask;
+	u16 const color  = m_bg2ram[tile_index * 2 + 1] & 0x000f;
+	bool const flipx = m_bg2ram[tile_index * 2 + 1] & 0x0020;
+	bool const flipy = m_bg2ram[tile_index * 2 + 1] & 0x0040;
+
+	tileinfo.set(m_bg2_region, tileno + m_bg2_base, color + 0x20, (flipx ? TILE_FLIPX : 0) | (flipy ? TILE_FLIPY : 0));
+}
+
+
+TILEMAP_MAPPER_MEMBER(kickgoal_state::tilemap_scan_8x8)
+{
+	/* logical (col,row) -> memory offset */
+	return (row & 0x1f) | ((col & 0x3f) << 5) | ((row & 0x20) << 6);
+}
+
+TILEMAP_MAPPER_MEMBER(kickgoal_state::tilemap_scan_16x16)
+{
+	/* logical (col,row) -> memory offset */
+	return (row & 0xf) | ((col & 0x3f) << 4) | ((row & 0x30) << 6);
+}
+
+TILEMAP_MAPPER_MEMBER(kickgoal_state::tilemap_scan_32x32)
+{
+	/* logical (col,row) -> memory offset */
+	return (row & 0x7) | ((col & 0x3f) << 3) | ((row & 0x38) << 6);
+}
+
+
+void kickgoal_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
+{
+	for (int offs = 0; offs < m_spriteram.bytes() / 2; offs += 4)
+	{
+		int xpos         = m_spriteram[offs + 3];
+		int ypos         = m_spriteram[offs + 0] & 0x00ff;
+		u16 const tileno = m_spriteram[offs + 2] & 0x3fff;
+		bool const flipx = m_spriteram[offs + 1] & 0x0020;
+		u16 const color  = m_spriteram[offs + 1] & 0x000f;
+
+		if (m_spriteram[offs + 0] & 0x0100) break;
+
+		ypos = 0x110 - ypos;
+
+		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
+				tileno + m_sprbase,
+				0x30 + color,
+				flipx,0,
+				xpos-16+4,ypos-32,15);
+	}
+}
+
+
+VIDEO_START_MEMBER(kickgoal_state,kickgoal)
+{
+	m_sprbase = 0x0000;
+
+	m_fg_base = 0x7000;
+	m_bg_base = 0x1000;
+	m_bg_mask = 0x0fff;
+
+	m_bg2_region = 2; // 32x32 tile source
+	m_bg2_base = 0x2000 / 4;
+	m_bg2_mask = (0x2000/4) - 1;
+
+	m_fgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_kickgoal_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_8x8)), 8, 8, 64, 64);
+	m_bgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_16x16)), 16, 16, 64, 64);
+	m_bg2tm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_32x32)), 32, 32, 64, 64);
+
+	m_fgtm->set_transparent_pen(15);
+	m_bgtm->set_transparent_pen(15);
+}
+
+VIDEO_START_MEMBER(kickgoal_state,actionhw)
+{
+	m_sprbase = 0x4000;
+	m_fg_base = 0x7000 * 2;
+
+	m_bg_base = 0x0000;
+	m_bg_mask = 0x1fff;
+
+	m_bg2_region = 1; // 16x16 tile source
+	m_bg2_base = 0x2000;
+	m_bg2_mask = 0x2000 - 1;
+
+	m_fgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_actionhw_fg_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_8x8)), 8, 8, 64, 64);
+	m_bgtm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_bg_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_16x16)), 16, 16, 64, 64);
+	m_bg2tm = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(kickgoal_state::get_bg2_tile_info)), tilemap_mapper_delegate(*this, FUNC(kickgoal_state::tilemap_scan_16x16)), 16, 16, 64, 64);
+
+	m_fgtm->set_transparent_pen(15);
+	m_bgtm->set_transparent_pen(15);
+}
+
+
+u32 kickgoal_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	/* set scroll */
+	m_fgtm->set_scrollx(0, m_scrram[0]);
+	m_fgtm->set_scrolly(0, m_scrram[1]);
+	m_bgtm->set_scrollx(0, m_scrram[2]);
+	m_bgtm->set_scrolly(0, m_scrram[3]);
+	m_bg2tm->set_scrollx(0, m_scrram[4]);
+	m_bg2tm->set_scrolly(0, m_scrram[5]);
+
+	/* draw */
+	m_bg2tm->draw(screen, bitmap, cliprect, 0, 0);
+	m_bgtm->draw(screen, bitmap, cliprect, 0, 0);
+
+	draw_sprites(bitmap, cliprect);
+
+	m_fgtm->draw(screen, bitmap, cliprect, 0, 0);
+
+	return 0;
+}
+
 
 /*
 
@@ -81,7 +355,6 @@ Action Hollywood
 61-63 Melodies Bank 2
 
 */
-
 
 void kickgoal_state::actionhw_snd_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -556,6 +829,8 @@ void kickgoal_state::init_actionhw()
 {
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x800004, 0x800005, write16s_delegate(*this, FUNC(kickgoal_state::actionhw_snd_w)));
 }
+
+} // anonymous namespace
 
 GAME( 1995, kickgoal,  0,        kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH / Proyesel", "Kick Goal (set 1)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1995, kickgoala, kickgoal, kickgoal, kickgoal, kickgoal_state, init_kickgoal, ROT0, "TCH / Proyesel", "Kick Goal (set 2)",        MACHINE_SUPPORTS_SAVE )

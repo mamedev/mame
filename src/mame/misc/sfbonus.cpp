@@ -5771,7 +5771,7 @@ ROM_START( fbdeluxe )
 	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x80000, CRC(ec47c758) SHA1(f8cb7f8cadc6d6b0b98bb71e78adcd9239ec734f) )
 
 	ROM_REGION( 0x1000, "nvram", 0 ) // default settings
-	ROM_LOAD_OPTIONAL( "fbdeluxe.id", 0x00, 0x1000, CRC(4a4ab8f6) SHA1(12710cb4e5f94449a4899daac0ab9687dabd82cd) )
+	ROM_LOAD( "fbdeluxe.id", 0x00, 0x1000, CRC(4a4ab8f6) SHA1(12710cb4e5f94449a4899daac0ab9687dabd82cd) )
 ROM_END
 
 ROM_START( fbdeluxeo )
@@ -5790,7 +5790,7 @@ ROM_START( fbdeluxeo )
 	ROM_LOAD16_BYTE( "fbrom6.bin", 0x00001, 0x80000, CRC(ec47c758) SHA1(f8cb7f8cadc6d6b0b98bb71e78adcd9239ec734f) )
 
 	ROM_REGION( 0x1000, "nvram", 0 ) // default settings
-	ROM_LOAD_OPTIONAL( "fbdeluxe.id", 0x00, 0x1000, CRC(4a4ab8f6) SHA1(12710cb4e5f94449a4899daac0ab9687dabd82cd) )
+	ROM_LOAD( "fbdeluxe.id", 0x00, 0x1000, CRC(4a4ab8f6) SHA1(12710cb4e5f94449a4899daac0ab9687dabd82cd) )
 ROM_END
 
 /* Fruit Bonus 3G

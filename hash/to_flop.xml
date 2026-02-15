@@ -134,7 +134,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="analpist">
 		<description>ANALPIST</description>
 		<year>1990</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -146,7 +146,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="anima3d">
 		<description>Anima 3D</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -486,7 +486,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="compgen">
-		<description>Comptabilite Generale</description>
+		<description>Comptabilité Générale</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
@@ -574,7 +574,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="copconf2">
 		<description>Copie Conforme 2</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -596,7 +596,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="cuisinfr">
-		<description>La Cuisine Francaise</description>
+		<description>La Cuisine Française</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -608,7 +608,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="cuisinfra" cloneof="cuisinfr">
-		<description>La Cuisine Francaise (SAP format)</description>
+		<description>La Cuisine Française (SAP format)</description>
 		<year>1985</year>
 		<publisher>Free Game Blot</publisher>
 
@@ -862,7 +862,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="gestiona" cloneof="gestion" supported="no">
+	<software name="gestiona" cloneof="gestion">
 		<description>Gestion FIL (640K disk)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
@@ -986,6 +986,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Initiation au BASIC 512 + Multidos</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
+		<info name="serial" value="9909326100"/>
 		<info name="usage" value="Can be booted with BASIC 512 or BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -999,6 +1000,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Initiation au BASIC 512 + Multidos (alt)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
+		<info name="serial" value="9909326100"/>
 		<info name="usage" value="Can be booted with BASIC 512 or BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1012,6 +1014,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Initiation au BASIC 512 + Multidos (SAP format)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
+		<info name="serial" value="9909326100"/>
 		<info name="usage" value="Can be booted with BASIC 512 or BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1025,6 +1028,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Initiation au BASIC 512 + Multidos (SAP format, alt)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
+		<info name="serial" value="9909326100"/>
 		<info name="usage" value="Can be booted with BASIC 512 or BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1038,6 +1042,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Initiation au BASIC 512 + Multidos (SAP format, alt 2)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
+		<info name="serial" value="9909326100"/>
 		<info name="usage" value="Can be booted with BASIC 512 or BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -1470,6 +1475,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Parole</description>
 		<year>1985</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="660 4175"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -1482,6 +1488,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Parole (SAP format)</description>
 		<year>1985</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="660 4175"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -1815,7 +1822,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="servsti">
 		<description>Serveur STI</description>
 		<year>1991?</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -2017,7 +2024,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="sysppmb" cloneof="sysppm" supported="no">
+	<software name="sysppmb" cloneof="sysppm">
 		<description>Systeme P.P.M. (v8.0, 640K disks)</description>
 		<year>2002</year>
 		<publisher>Bledor-Soft</publisher>
@@ -2094,7 +2101,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="tabledes">
-		<description>Table a Dessin</description>
+		<description>Table à Dessin</description>
 		<year>1986</year>
 		<publisher>Cobrasoft</publisher>
 
@@ -2259,6 +2266,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>TO7 Disk BASIC (v1.2)</description>
 		<year>1985</year>
 		<publisher>Microsoft</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
@@ -2350,7 +2358,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="to9pappsc" cloneof="to9papps" supported="no">
+	<software name="to9pappsc" cloneof="to9papps">
 		<description>TO9+ Applications (640K Disk)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
@@ -2400,7 +2408,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="to9pinitb" cloneof="to9pinit" supported="no">
+	<software name="to9pinitb" cloneof="to9pinit">
 		<description>TO9+ Initiations (640K disk)</description>
 		<year>1986</year>
 		<publisher>Thomson</publisher>
@@ -2415,7 +2423,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="traceur">
 		<description>Le Traceur</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -2427,7 +2435,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="traceura" cloneof="traceur">
 		<description>Le Traceur (alt)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -2440,6 +2448,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Typo-7</description>
 		<year>1988</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="554842" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -2452,6 +2461,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Typo-7 (alt)</description>
 		<year>1988</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="554842" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -2529,7 +2539,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascicmp2">
 		<description>Compilation no.2</description>
 		<year>19??</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -2628,7 +2638,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="trucsast">
 		<description>Trucs &amp; Astuces</description>
 		<year>19??</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -2722,7 +2732,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 <!-- Compilations (Educational) -->
 
 	<software name="edilfran">
-		<description>Collection Francais</description>
+		<description>Collection Français</description>
 		<year>1986</year>
 		<publisher>Edition Informatique Logiciel (EDIL)</publisher>
 
@@ -2758,7 +2768,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="compfra1">
-		<description>Compile Francais 1</description>
+		<description>Compile Français 1</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -2777,7 +2787,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="compfra2">
-		<description>Compile Francais 2</description>
+		<description>Compile Français 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 
@@ -3518,6 +3528,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Classiques Volume 1</description>
 		<year>1987</year>
 		<publisher>Titus Software</publisher>
+		<info name="contents" value="Envahisseurs, Glouton, Infernal Breakout"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -3530,6 +3541,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Classiques Volume 1 (SAP format)</description>
 		<year>1987</year>
 		<publisher>Titus Software</publisher>
+		<info name="contents" value="Envahisseurs, Glouton, Infernal Breakout"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -3543,6 +3555,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Classiques Volume 2</description>
 		<year>1987</year>
 		<publisher>Titus Software</publisher>
+		<info name="contents" value="Penggo, Arnold, Grand Prix"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3557,6 +3570,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Classiques Volume 3</description>
 		<year>1987</year>
 		<publisher>Titus Software</publisher>
+		<info name="contents" value="Worms Madness, Betadroid, Dragon's Fire"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3571,6 +3585,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Classiques Volume 4</description>
 		<year>1987</year>
 		<publisher>Titus Software</publisher>
+		<info name="contents" value="Tibert, Krystal Zone, Gribouy"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -3584,6 +3599,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Coffret Cadeau</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="contents" value="Super Tennis, Green Beret, Runaway"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -3596,6 +3612,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Coffret Cadeau (SAP format)</description>
 		<year>1986</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="contents" value="Super Tennis, Green Beret, Runaway"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -3622,6 +3639,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Coktel Vision Compilation 1</description>
 		<year>198?</year>
 		<publisher>Coktel Vision</publisher>
+		<info name="contents" value="Cap sur Dakar, Duel 2000, Fantôme City, La Malédiction de Thaar, Le Mystère de l'Île Perdue, Opération Némo"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -3670,6 +3688,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Coktel Vision Compilation 2</description>
 		<year>198?</year>
 		<publisher>Coktel Vision</publisher>
+		<info name="contents" value="La Malédiction de Thaar, Le Grand Saut, Cap sur Dakar"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -3682,6 +3701,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Coktel Vision Compilation 2 (SAP format)</description>
 		<year>198?</year>
 		<publisher>Coktel Vision</publisher>
+		<info name="contents" value="La Malédiction de Thaar, Le Grand Saut, Cap sur Dakar"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -3708,6 +3728,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Coktel Vision Compilation 3</description>
 		<year>198?</year>
 		<publisher>Coktel Vision</publisher>
+		<info name="contents" value="Dakar 4*4, Le Mystère de Paris, La Planète Inconnue, Opération Némo"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -3720,6 +3741,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Coktel Vision Compilation 3 (SAP format)</description>
 		<year>198?</year>
 		<publisher>Coktel Vision</publisher>
+		<info name="contents" value="Dakar 4*4, Le Mystère de Paris, La Planète Inconnue, Opération Némo"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -3807,6 +3829,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Compilation Titus</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="contents" value="Balthazar, Magic, Glouton, Crazy Cars"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -3819,6 +3842,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Compilation TO 9</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<info name="contents" value="Le Trésor des Rats d'Égout, Alien"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -3883,7 +3907,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="afpafran">
-		<description>Francais - AFPA Auvergne</description>
+		<description>Français - AFPA Auvergne</description>
 		<year>198?</year>
 		<publisher>CFPA</publisher>
 
@@ -3895,7 +3919,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="afpafrana" cloneof="afpafran">
-		<description>Francais - AFPA Auvergne (alt)</description>
+		<description>Français - AFPA Auvergne (alt)</description>
 		<year>198?</year>
 		<publisher>CFPA</publisher>
 
@@ -3945,7 +3969,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="futuristc" cloneof="futurist" supported="no">
+	<software name="futuristc" cloneof="futurist">
 		<description>Les Futuristes (640K disk)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
@@ -4383,14 +4407,15 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="jeuxto8">
+	<software name="jeuxto8" supported="no">
 		<description>Jeux TO8</description>
 		<year>198?</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
-				<rom name="jeux to8 (198x)(fil)(fr).sap" size="335426" crc="19881dde" sha1="e166e7a665ab335b6c962a4f10febd12f55b0884"/>
+				<!-- Some sectors contain invalid data (protected or corrupt?) -->
+				<rom name="jeux to8 (198x)(fil)(fr).sap" size="335426" crc="19881dde" sha1="e166e7a665ab335b6c962a4f10febd12f55b0884" status="baddump"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4647,6 +4672,8 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>MGT - Sapiens - Mach 3</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="Copyright LORICIELS SEPTEMBRE 1988"/>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -4661,10 +4688,12 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<!-- can also be found in mo6_flop.xml -->
-	<software name="lori1988a" cloneof="lori1988" supported="no">
+	<software name="lori1988a" cloneof="lori1988">
 		<description>MGT - Sapiens - Mach 3 (640K disk)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="Copyright LORICIELS SEPTEMBRE 1988"/>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -4790,7 +4819,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="privesc" cloneof="prives" supported="no">
+	<software name="privesc" cloneof="prives">
 		<description>Les Prives (640K disk)</description>
 		<year>1988</year>
 		<publisher>Infogrames</publisher>
@@ -4864,7 +4893,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="simhitsa" cloneof="simhits" supported="no">
+	<software name="simhitsa" cloneof="simhits">
 		<description>Simulation Hits (640K disk)</description>
 		<year>1989</year>
 		<publisher>Loriciels</publisher>
@@ -4881,6 +4910,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Simulation Pack</description>
 		<year>1988</year>
 		<publisher>Microïds</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -4911,10 +4941,11 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<!-- can also be found in mo6_flop.xml -->
-	<software name="simpackb" cloneof="simpack" supported="no">
+	<software name="simpackb" cloneof="simpack">
 		<description>Simulation Pack (640K disk)</description>
 		<year>1988</year>
 		<publisher>Microïds</publisher>
+		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -4940,7 +4971,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="stars1a" cloneof="stars1" supported="no">
+	<software name="stars1a" cloneof="stars1">
 		<description>Stars Volume 1 (640K disk)</description>
 		<year>1989</year>
 		<publisher>Infogrames</publisher>
@@ -5004,7 +5035,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<!-- selection menu only says "Tetris", but title screen says "Tetris II" -->
-	<software name="tet2sokoa" cloneof="tet2soko" supported="no">
+	<software name="tet2sokoa" cloneof="tet2soko">
 		<description>Tetris II &amp; Sokoban (640K disk)</description>
 		<year>19??</year>
 		<publisher>John Breaker?</publisher>
@@ -5446,7 +5477,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame1">
 		<description>Teo-Games no.1</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -5458,7 +5489,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame1a" cloneof="teogame1">
 		<description>Teo-Games no.1 (SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -5470,7 +5501,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame2">
 		<description>Teo-Games no.2</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -5489,7 +5520,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame2a" cloneof="teogame2">
 		<description>Teo-Games no.2 (SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -5505,10 +5536,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="teogame2b" cloneof="teogame2" supported="no">
+	<software name="teogame2b" cloneof="teogame2">
 		<description>Teo-Games no.2 (640K disk)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -5520,7 +5551,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame3">
 		<description>Teo-Games no.3</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -5539,7 +5570,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame3a" cloneof="teogame3">
 		<description>Teo-Games no.3 (SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -5558,7 +5589,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame3b" cloneof="teogame3">
 		<description>Teo-Games no.3 (640K disk)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -5570,7 +5601,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame4">
 		<description>Teo-Games no.4</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -5582,7 +5613,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame4a" cloneof="teogame4">
 		<description>Teo-Games no.4 (SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -5594,7 +5625,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame5">
 		<description>Teo-Games no.5</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -5625,7 +5656,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame5a" cloneof="teogame5">
 		<description>Teo-Games no.5 (Disk 1 SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -5656,7 +5687,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame6">
 		<description>Teo-Games no.6</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -5687,7 +5718,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teogame6a" cloneof="teogame6">
 		<description>Teo-Games no.6 (Disk 1 SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop5" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -5719,7 +5750,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="tdrvdemo" cloneof="teodriv3">
 		<description>TEODRIVE Demos - Mots Croises + Anima 3D (from Teo-Drive no.3)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -6069,7 +6100,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="chineseb" cloneof="chinese" supported="no">
+	<software name="chineseb" cloneof="chinese">
 		<description>Chinese Stack (640K disk)</description>
 		<year>2004</year>
 		<publisher>Puls</publisher>
@@ -6330,7 +6361,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="lotusa" cloneof="lotus" supported="no">
+	<software name="lotusa" cloneof="lotus">
 		<description>Lotus Esprit Turbo Challenge (640K disk)</description>
 		<year>19??</year>
 		<publisher>BC 109 Soft</publisher>
@@ -6385,7 +6416,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="megara" cloneof="megar" supported="no">
+	<software name="megara" cloneof="megar">
 		<description>Megar Demo #1 - Ruiz (640K disk)</description>
 		<year>2007</year>
 		<publisher>Megar</publisher>
@@ -6722,7 +6753,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="spacprojb" cloneof="spacproj" supported="no">
+	<software name="spacprojb" cloneof="spacproj">
 		<description>Space Project (640K disks)</description>
 		<year>2007</year>
 		<publisher>Puls</publisher>
@@ -6791,7 +6822,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="sorceryda" cloneof="sorceryd" supported="no">
+	<software name="sorceryda" cloneof="sorceryd">
 		<description>Sorcery Demo (640K disk)</description>
 		<year>19??</year>
 		<publisher>Thomtest</publisher>
@@ -6972,7 +7003,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="truc216ib" cloneof="truc216i" supported="no">
+	<software name="truc216ib" cloneof="truc216i">
 		<description>TruC216i (tele) (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
@@ -7022,7 +7053,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="truc216ieb" cloneof="truc216i" supported="no">
+	<software name="truc216ieb" cloneof="truc216i">
 		<description>TruC216i (emul) (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
@@ -7072,7 +7103,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="truc40b" cloneof="truc40" supported="no">
+	<software name="truc40b" cloneof="truc40">
 		<description>TruC40 (tele) (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
@@ -7122,7 +7153,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="truc40eb" cloneof="truc40" supported="no">
+	<software name="truc40eb" cloneof="truc40">
 		<description>TruC40 (emul) (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
@@ -7172,7 +7203,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="truc70b" cloneof="truc70" supported="no">
+	<software name="truc70b" cloneof="truc70">
 		<description>TruC70 (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
@@ -7222,7 +7253,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="truc80ib" cloneof="truc80i" supported="no">
+	<software name="truc80ib" cloneof="truc80i">
 		<description>TruC80i (640K disk)</description>
 		<year>2010</year>
 		<publisher>Puls</publisher>
@@ -7287,7 +7318,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew1">
 		<description>ASCINEWS no.1</description>
 		<year>1992</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -7304,7 +7335,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew1a" cloneof="ascinew1">
 		<description>ASCINEWS no.1 (SAP format)</description>
 		<year>1992</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -7320,10 +7351,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="ascinew1b" cloneof="ascinew1" supported="no">
+	<software name="ascinew1b" cloneof="ascinew1">
 		<description>ASCINEWS no.1 (640K disk)</description>
 		<year>1992</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -7335,7 +7366,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew2">
 		<description>ASCINEWS no.2</description>
 		<year>1992</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -7347,7 +7378,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew2a" cloneof="ascinew2">
 		<description>ASCINEWS no.2 (SAP format)</description>
 		<year>1992</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -7359,7 +7390,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew3">
 		<description>ASCINEWS no.3</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -7376,7 +7407,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew3a" cloneof="ascinew3">
 		<description>ASCINEWS no.3 (SAP format)</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -7392,10 +7423,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="ascinew3b" cloneof="ascinew3" supported="no">
+	<software name="ascinew3b" cloneof="ascinew3">
 		<description>ASCINEWS no.3 (640K disk)</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -7407,7 +7438,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew4">
 		<description>ASCINEWS no.4</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -7424,7 +7455,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew4a" cloneof="ascinew4">
 		<description>ASCINEWS no.4 (SAP format)</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -7440,10 +7471,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="ascinew4b" cloneof="ascinew4" supported="no">
+	<software name="ascinew4b" cloneof="ascinew4">
 		<description>ASCINEWS no.4 (640K disk)</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -7455,7 +7486,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew5">
 		<description>ASCINEWS no.5</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -7472,7 +7503,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew5a" cloneof="ascinew5">
 		<description>ASCINEWS no.5 (SAP format)</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -7488,10 +7519,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="ascinew5b" cloneof="ascinew5" supported="no">
+	<software name="ascinew5b" cloneof="ascinew5">
 		<description>ASCINEWS no.5 (640K disk)</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -7503,7 +7534,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew6">
 		<description>ASCINEWS no.6</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -7520,7 +7551,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="ascinew6a" cloneof="ascinew6">
 		<description>ASCINEWS no.6 (SAP format)</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -7536,10 +7567,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="ascinew6b" cloneof="ascinew6" supported="no">
+	<software name="ascinew6b" cloneof="ascinew6">
 		<description>ASCINEWS no.6 (640K disk)</description>
 		<year>1993</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -7584,7 +7615,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="ascinew7b" cloneof="ascinew7" supported="no">
+	<software name="ascinew7b" cloneof="ascinew7">
 		<description>ASCINEWS no.7 (640K disk)</description>
 		<year>1994</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
@@ -7632,7 +7663,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="ascinew8b" cloneof="ascinew8" supported="no">
+	<software name="ascinew8b" cloneof="ascinew8">
 		<description>ASCINEWS no.8 (640K disk)</description>
 		<year>1994</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
@@ -7680,7 +7711,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="ascinew9b" cloneof="ascinew9" supported="no">
+	<software name="ascinew9b" cloneof="ascinew9">
 		<description>ASCINEWS no.9 (640K disk)</description>
 		<year>1995</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
@@ -7728,7 +7759,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="ascinw10b" cloneof="ascinw10" supported="no">
+	<software name="ascinw10b" cloneof="ascinw10">
 		<description>ASCINEWS no.10 (640K disk)</description>
 		<year>1995</year>
 		<publisher>Association des Correspondants Thomsonistes (A.C.T.)</publisher>
@@ -7915,7 +7946,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv1">
 		<description>Teo-Drive no.1</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -7927,7 +7958,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv1a" cloneof="teodriv1">
 		<description>Teo-Drive no.1 (SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -7939,7 +7970,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv2">
 		<description>Teo-Drive no.2</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -7958,7 +7989,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv2a" cloneof="teodriv2">
 		<description>Teo-Drive no.2 (SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -7974,10 +8005,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="teodriv2b" cloneof="teodriv2" supported="no">
+	<software name="teodriv2b" cloneof="teodriv2">
 		<description>Teo-Drive no.2 (640K disk)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -7989,7 +8020,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv3">
 		<description>Teo-Drive no.3</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8008,7 +8039,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv3a" cloneof="teodriv3">
 		<description>Teo-Drive no.3 (SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8024,10 +8055,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="teodriv3b" cloneof="teodriv3" supported="no">
+	<software name="teodriv3b" cloneof="teodriv3">
 		<description>Teo-Drive no.3 (640K disk)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -8039,7 +8070,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv4">
 		<description>Teo-Drive no.4</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8058,7 +8089,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv4a" cloneof="teodriv4">
 		<description>Teo-Drive no.4 (SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8074,10 +8105,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="teodriv4b" cloneof="teodriv4" supported="no">
+	<software name="teodriv4b" cloneof="teodriv4">
 		<description>Teo-Drive no.4 (640K disk)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -8089,7 +8120,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv5">
 		<description>Teo-Drive no.5</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8108,7 +8139,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv5a" cloneof="teodriv5">
 		<description>Teo-Drive no.5 (SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8124,10 +8155,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="teodriv5b" cloneof="teodriv5" supported="no">
+	<software name="teodriv5b" cloneof="teodriv5">
 		<description>Teo-Drive no.5 (640K disk)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -8139,7 +8170,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv6">
 		<description>Teo-Drive no.6</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8170,7 +8201,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv6a" cloneof="teodriv6">
 		<description>Teo-Drive no.6 (Disk 1 SAP format)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8202,7 +8233,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="teodriv6b" cloneof="teodriv6">
 		<description>Teo-Drive no.6 (Disk 1 640K)</description>
 		<year>1991</year>
-		<publisher>L'Association pour les Services Connexes a l'Informatique (A.S.C.I.)</publisher>
+		<publisher>L'Association pour les Services Connexes à l'Informatique (A.S.C.I.)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
@@ -8326,9 +8357,12 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="algebre">
-		<description>Algebre</description>
+		<description>Algèbre</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="author" value="Stéphane Rethore" />
+		<info name="author" value="Jean-Philippe Rethore" />
+		<info name="serial" value="7116142" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -8343,6 +8377,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Allemand Volume 2 - Pratique de la langue (1)</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="6604326" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -8398,9 +8433,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="appcomp">
-		<description>Apprends-moi a Compter</description>
+		<description>Apprends-moi à Compter</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="6604227" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -8410,9 +8446,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="appcompa" cloneof="appcomp">
-		<description>Apprends-moi a Compter (SAP format)</description>
+		<description>Apprends-moi à Compter (SAP format)</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="6604227" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -8422,7 +8459,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="applire">
-		<description>Apprends-moi a Lire</description>
+		<description>Apprends-moi à Lire</description>
 		<year>1988</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -8434,7 +8471,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="applirea" cloneof="applire">
-		<description>Apprends-moi a Lire (SAP format)</description>
+		<description>Apprends-moi à Lire (SAP format)</description>
 		<year>1988</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -8447,9 +8484,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- works only on to9 -->
 	<software name="appecrir">
-		<description>Apprends-moi a Ecrire</description>
+		<description>Apprends-moi à Écrire (1 et 2)</description>
 		<year>1986</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="60.4223" />
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -8539,7 +8577,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="clesmicr">
-		<description>Cles pour la micro</description>
+		<description>Clés pour la micro</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan?</publisher>
 
@@ -8838,7 +8876,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="enigmeox">
-		<description>Enigme a Oxford</description>
+		<description>Enigme à Oxford</description>
 		<year>1986</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -8890,7 +8928,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="gramfra1">
-		<description>Grammaire - Langue Francaise Volume 1</description>
+		<description>Grammaire - Langue Française Volume 1</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -8902,7 +8940,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="gramfra2">
-		<description>Grammaire - Langue Francaise Volume 2</description>
+		<description>Grammaire - Langue Française Volume 2</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -8914,7 +8952,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="gramf651">
-		<description>Grammaire - Langue Francaise 6eme/5eme Volume 1</description>
+		<description>Grammaire - Langue Française 6eme/5eme Volume 1</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -8926,7 +8964,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="gramf652">
-		<description>Grammaire - Langue Francaise 6eme/5eme Volume 2</description>
+		<description>Grammaire - Langue Française 6eme/5eme Volume 2</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -9010,7 +9048,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="langfce1">
-		<description>Langue Francaise CE1</description>
+		<description>Langue Française CE1</description>
 		<year>1989</year>
 		<publisher>Nathan Logiciels</publisher>
 
@@ -9029,7 +9067,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="langfcm1">
-		<description>Langue Francaise CM1</description>
+		<description>Langue Française CM1</description>
 		<year>1989</year>
 		<publisher>Nathan Logiciels</publisher>
 
@@ -9072,7 +9110,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="gr4e3ev1">
-		<description>Logiciels Nathan Colleges - Grammaire langue francaise 4e/3e volume 1</description>
+		<description>Logiciels Nathan Colleges - Grammaire Langue Française 4e/3e volume 1</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -9084,7 +9122,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="gr6e">
-		<description>Logiciels Nathan Colleges - Grammaire langue francaise 6e</description>
+		<description>Logiciels Nathan Colleges - Grammaire Langue Française 6e</description>
 		<year>1988</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -9133,7 +9171,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- these disks were distributed as one set, but there are two disk 1's and two disk 2's with different content -->
 	<software name="ecolefra">
-		<description>Logiciels Nathan Ecoles - Francais</description>
+		<description>Logiciels Nathan Ecoles - Français</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
 
@@ -9360,9 +9398,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="ecrire1">
-		<description>Ortho Graphie - Ecrire sans Fautes Volume 1</description>
+		<description>Orthographe - Écrire sans Fautes Volume 1</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="6626022"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -9372,9 +9411,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="ecrire1a" cloneof="ecrire1">
-		<description>Ortho Graphie - Ecrire sans Fautes Volume 1 (SAP format)</description>
+		<description>Orthographe - Écrire sans Fautes Volume 1 (SAP format)</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="6626022"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -9384,9 +9424,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="ecrire2">
-		<description>Ortho Graphie - Ecrire sans Fautes Volume 2</description>
+		<description>Orthographe - Écrire sans Fautes Volume 2</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="6626023"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -9396,9 +9437,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="ecrire3">
-		<description>Ortho Graphie - Ecrire sans Fautes Volume 3</description>
+		<description>Orthographe - Écrire sans Fautes Volume 3</description>
 		<year>1987</year>
 		<publisher>Cedic/Nathan</publisher>
+		<info name="serial" value="6626024"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -9566,7 +9608,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="20kavant">
-		<description>20000 Avant J.C.</description>
+		<description>Les Aventures du Ka 3 - 20000 Avant J.C.</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -9579,7 +9621,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="20kavantmo6" cloneof="20kavant">
-		<description>20000 Avant J.C. (includes MO6 version)</description>
+		<description>Les Aventures du Ka 3 - 20000 Avant J.C. (includes MO6 version)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -9592,7 +9634,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="20kavantmo6a" cloneof="20kavant">
-		<description>20000 Avant J.C. (includes MO6 version, alt)</description>
+		<description>Les Aventures du Ka 3 - 20000 Avant J.C. (includes MO6 version, alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -9605,7 +9647,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="20kavantmo6b" cloneof="20kavant">
-		<description>20000 Avant J.C. (includes MO6 version, SAP format)</description>
+		<description>Les Aventures du Ka 3 - 20000 Avant J.C. (includes MO6 version, SAP format)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -9629,9 +9671,12 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="5emeaxe">
-		<description>Le 5eme Axe</description>
-		<year>1985</year>
+		<description>Le 5ème Axe</description>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Didier et Olivier Guillion"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Février 1986"/>
+		<info name="serial" value="120"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -9642,9 +9687,11 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="5emeaxea" cloneof="5emeaxe">
-		<description>Le 5eme Axe (SAP format)</description>
-		<year>1985</year>
+		<description>Le 5ème Axe (SAP format)</description>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Didier et Olivier Guillion"/>
+		<info name="serial" value="120"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -9692,8 +9739,11 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<software name="aigleor">
 		<description>L'Aigle d'Or</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Janvier 1986"/>
+		<info name="serial" value="111"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -9704,8 +9754,11 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<software name="aigleora" cloneof="aigleor">
 		<description>L'Aigle d'Or (alt)</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Janvier 1986"/>
+		<info name="serial" value="111"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -9716,8 +9769,11 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<software name="aigleorb" cloneof="aigleor">
 		<description>L'Aigle d'Or (alt 2)</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Janvier 1986"/>
+		<info name="serial" value="111"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -9728,8 +9784,11 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<software name="aigleorc" cloneof="aigleor">
 		<description>L'Aigle d'Or (SAP format)</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Janvier 1986"/>
+		<info name="serial" value="111"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -9740,8 +9799,11 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<software name="aigleord" cloneof="aigleor">
 		<description>L'Aigle d'Or (SAP format, alt)</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Janvier 1986"/>
+		<info name="serial" value="111"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -9752,8 +9814,9 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<software name="airatt">
 		<description>Air Attack</description>
-		<year>1985</year>
-		<publisher>Loriciels</publisher>
+		<year>1986</year>
+		<publisher>Microïds</publisher>
+		<info name="serial" value="M 909 D"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -9765,8 +9828,9 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<software name="airatta" cloneof="airatt">
 		<description>Air Attack (SAP format)</description>
-		<year>1985</year>
-		<publisher>Loriciels</publisher>
+		<year>1986</year>
+		<publisher>Microïds</publisher>
+		<info name="serial" value="M 909 D"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -10390,6 +10454,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Bob Winner</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="L 550 D"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -10410,6 +10475,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Bob Winner (SAP format)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="L 550 D"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -10426,10 +10492,11 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="bobwinnrb" cloneof="bobwinnr" supported="no">
+	<software name="bobwinnrb" cloneof="bobwinnr">
 		<description>Bob Winner (640K disk)</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="L 550 D"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -10560,9 +10627,9 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="thenebe">
-		<description>Les Cavernes de Thenebe</description>
+		<description>Les Cavernes de Thénèbé</description>
 		<year>198?</year>
-		<publisher>Loriciels</publisher>
+		<publisher>Softbook</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -10572,7 +10639,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="thenebea" cloneof="thenebe">
-		<description>Les Cavernes de Thenebe (Compilation Top Arcade)</description>
+		<description>Les Cavernes de Thénèbé (Compilation Top Arcade)</description>
 		<year>198?</year>
 		<publisher>Loriciels</publisher>
 
@@ -10669,7 +10736,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="chevalib" cloneof="chevali" supported="no">
+	<software name="chevalib" cloneof="chevali">
 		<description>Les Chevaliers de l'An Mil (640K disk)</description>
 		<year>1989</year>
 		<publisher>Ubisoft</publisher>
@@ -10711,6 +10778,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Cobra</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="C. Cabillic"/>
+		<info name="author" value="B. Masson"/>
+		<info name="author" value="O. Lahonde"/>
+		<info name="serial" value="L 547 D"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -10742,7 +10813,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
         <part name="flop1" interface="floppy_3_5">
             <dataarea name="flop" size="52212">
-                <rom name="cobra.sap" size="52212" crc="0d0e47df" sha1="d22f5439816c7fe51917705b4f13adff07c7894c" status="baddump" />
+                <rom name="cobra.sap" size="52212" crc="0d0e47df" sha1="d22f5439816c7fe51917705b4f13adff07c7894c" status="baddump"/>
             </dataarea>
         </part>
     </software>
@@ -10751,8 +10822,9 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<!-- You MUST use TO9 to run this! -->
 	<software name="coliseum">
 		<description>Coliseum</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="123"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -10763,8 +10835,9 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<software name="coliseuma" cloneof="coliseum">
 		<description>Coliseum (alt)</description>
-		<year>1985</year>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="123"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -10846,7 +10919,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="crepuscu">
-		<description>Le Crepuscule du Naja</description>
+		<description>Les Aventures du Ka 1 - Le Crépuscule du Naja</description>
 		<year>198?</year>
 		<publisher>Chip</publisher>
 
@@ -10859,7 +10932,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="crepuscumo6" cloneof="crepuscu">
-		<description>Le Crepuscule du Naja (includes MO6 version)</description>
+		<description>Les Aventures du Ka 1 - Le Crépuscule du Naja (includes MO6 version)</description>
 		<year>198?</year>
 		<publisher>Chip</publisher>
 
@@ -10872,7 +10945,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="crepuscumo6a" cloneof="crepuscu">
-		<description>Le Crepuscule du Naja (includes MO6 version, alt)</description>
+		<description>Les Aventures du Ka 1 - Le Crépuscule du Naja (includes MO6 version, alt)</description>
 		<year>198?</year>
 		<publisher>Chip</publisher>
 
@@ -10885,7 +10958,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="crepuscumo6b" cloneof="crepuscu">
-		<description>Le Crepuscule du Naja (includes MO6 version, SAP format)</description>
+		<description>Les Aventures du Ka 1 - Le Crépuscule du Naja (includes MO6 version, SAP format)</description>
 		<year>198?</year>
 		<publisher>Chip</publisher>
 
@@ -10909,9 +10982,9 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="crystann">
-		<description>Crystann</description>
-		<year>1985</year>
-		<publisher>Loriciels</publisher>
+		<description>Crystann (disk conversion)</description>
+		<year>2015</year>
+		<publisher>hack (dcmoto.free.fr)</publisher>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -11142,6 +11215,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Enduro Racer</description>
 		<year>1988</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="DU 9179"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -11154,6 +11228,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Enduro Racer (SAP format)</description>
 		<year>1988</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="DU 9179"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -11216,6 +11291,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>F-15 Strike Eagle</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="FS 9130"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -11228,6 +11304,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>F-15 Strike Eagle (alt)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="FS 9130"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -11807,7 +11884,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="lemmingsb" cloneof="lemmings" supported="no">
+	<software name="lemmingsb" cloneof="lemmings">
 		<description>Lemmings (640K disk)</description>
 		<year>2006</year>
 		<publisher>YRprod</publisher>
@@ -11917,7 +11994,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="malefatl">
-		<description>Le Malefice des Atlantes</description>
+		<description>Les Aventures du Ka 4 - Le Maléfice des Atlantes</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -11930,7 +12007,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="malefatla" cloneof="malefatl">
-		<description>Le Malefice des Atlantes (Compilation Top Arcade)</description>
+		<description>Les Aventures du Ka 4 - Le Maléfice des Atlantes (Compilation Top Arcade)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -11966,7 +12043,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="marchomb">
-		<description>Marche a l'Ombre</description>
+		<description>Marche à l'Ombre</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -11978,7 +12055,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="marchomba" cloneof="marchomb">
-		<description>Marche a l'Ombre (SAP format)</description>
+		<description>Marche à l'Ombre (SAP format)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -11990,7 +12067,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="marchombb" cloneof="marchomb">
-		<description>Marche a l'Ombre (SAP format, alt)</description>
+		<description>Marche à l'Ombre (SAP format, alt)</description>
 		<year>1987</year>
 		<publisher>Infogrames</publisher>
 
@@ -12186,7 +12263,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 -->
 
 	<software name="menacarc">
-		<description>Menace sur l'Arctique</description>
+		<description>Les Aventures du Ka 6 - Menace sur l'Arctique</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -12199,7 +12276,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="menacarcmo6" cloneof="menacarc">
-		<description>Menace sur l'Arctique (includes MO6 version)</description>
+		<description>Les Aventures du Ka 6 - Menace sur l'Arctique (includes MO6 version)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -12212,7 +12289,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="menacarcmo6a" cloneof="menacarc">
-		<description>Menace sur l'Arctique (includes MO6 version, alt)</description>
+		<description>Les Aventures du Ka 6 - Menace sur l'Arctique (includes MO6 version, alt)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -12225,7 +12302,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="menacarcmo6b" cloneof="menacarc">
-		<description>Menace sur l'Arctique (includes MO6 version, SAP format)</description>
+		<description>Les Aventures du Ka 6 - Menace sur l'Arctique (includes MO6 version, SAP format)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -12345,9 +12422,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="scrabble">
-		<description>Micro-Scrabble</description>
+		<description>Micro Scrabble</description>
 		<year>1985</year>
-		<publisher>France Image Logiciel (FIL)</publisher>
+		<publisher>Leisure Genius</publisher>
+		<info name="serial" value="LG 190"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -12492,7 +12570,8 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="monopoly">
 		<description>Monopoly</description>
 		<year>1986</year>
-		<publisher>France Image Logiciel (FIL)</publisher>
+		<publisher>Leisure Genius</publisher>
+		<info name="serial" value="LGD350"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -12504,7 +12583,8 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	<software name="monopolya" cloneof="monopoly">
 		<description>Monopoly (SAP format)</description>
 		<year>1986</year>
-		<publisher>France Image Logiciel (FIL)</publisher>
+		<publisher>Leisure Genius</publisher>
+		<info name="serial" value="LGD350"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -12517,7 +12597,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
     <software name="monopolyb" cloneof="monopoly">
         <description>Monopoly (SAP format, bad)</description>
         <year>1986</year>
-        <publisher>France Image Logiciel (FIL)</publisher>
+        <publisher>Leisure Genius</publisher>
 
         <part name="flop1" interface="floppy_3_5">
             <dataarea name="flop" size="83723">
@@ -12540,7 +12620,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="mysparis">
-		<description>Le Mystere de Paris</description>
+		<description>Le Mystère de Paris</description>
 		<year>1988</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -12552,7 +12632,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="mysparisa" cloneof="mysparis">
-		<description>Le Mystere de Paris (alt)</description>
+		<description>Le Mystère de Paris (alt)</description>
 		<year>1988</year>
 		<publisher>Coktel Vision</publisher>
 
@@ -12565,7 +12645,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 <!--
     <software name="mysparisb" cloneof="mysparis">
-        <description>Le Mystere de Paris (bad)</description>
+        <description>Le Mystère de Paris (bad)</description>
         <year>1988</year>
         <publisher>Coktel Vision</publisher>
 
@@ -12758,7 +12838,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="planetbl">
-		<description>La Planete Bleue</description>
+		<description>La Planète Bleue</description>
 		<year>1986</year>
 		<publisher>CFCF</publisher>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
@@ -12882,8 +12962,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<software name="pulsar2">
 		<description>Pulsar II</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Janvier 1984"/>
+		<info name="serial" value="114"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -12894,8 +12976,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<software name="pulsar2a" cloneof="pulsar2">
 		<description>Pulsar II (SAP format)</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Janvier 1984"/>
+		<info name="serial" value="114"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -12909,6 +12993,8 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Quad</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
+		<info name="notice" value="COPYRIGHT MICROÏDS Octobre 1987"/>
+		<info name="serial" value="M 913 D"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -12923,6 +13009,8 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Quad (alt)</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
+		<info name="notice" value="COPYRIGHT MICROÏDS Octobre 1987"/>
+		<info name="serial" value="M 913 D"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -12937,6 +13025,8 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Quad (SAP format)</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
+		<info name="notice" value="COPYRIGHT MICROÏDS Octobre 1987"/>
+		<info name="serial" value="M 913 D"/>
 		<info name="usage" value="Load with Microsoft BASIC 1.0"/>
 
 		<part name="flop1" interface="floppy_3_5">
@@ -12974,6 +13064,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Ranger 3</description>
 		<year>1987</year>
 		<publisher>Loriciels</publisher>
+		<info name="serial" value="L545D"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -13268,6 +13359,9 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Sapiens</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Didier et Olivier Guillion"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1986"/>
+		<info name="serial" value="150"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -13280,6 +13374,9 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Sapiens (SAP format)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Didier et Olivier Guillion"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1986"/>
+		<info name="serial" value="150"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -13292,6 +13389,9 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Sapiens (SAP format, alt)</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Didier et Olivier Guillion"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Juillet 1986"/>
+		<info name="serial" value="150"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -13567,6 +13667,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Space Racer</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mai 1988"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -13579,6 +13680,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Space Racer (SAP format)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mai 1988"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -13591,6 +13693,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Space Racer (SAP format, alt)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Mai 1988"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -13615,8 +13718,10 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<software name="sshuttle">
 		<description>Space Shuttle Simulator</description>
-		<year>1984</year>
+		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="notice" value="COPYRIGHT LORICIELS Avril 1986"/>
+		<info name="serial" value="131"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -13792,6 +13897,8 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Super Ski</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
+		<info name="notice" value="COPYRIGHT MICROÏDS Novembre 1987"/>
+		<info name="serial" value="M 914 D"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -13806,6 +13913,8 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Super Ski (640K disk)</description>
 		<year>1987</year>
 		<publisher>Microïds</publisher>
+		<info name="notice" value="COPYRIGHT MICROÏDS Novembre 1987"/>
+		<info name="serial" value="M 914 D"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -13851,7 +13960,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="talisman">
-		<description>Le Talisman d'Osiris</description>
+		<description>Les Aventures du Ka 2 - Le Talisman d'Osiris</description>
 		<year>1986</year>
 		<publisher>Chip</publisher>
 
@@ -13864,7 +13973,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="talismanmo6" cloneof="talisman">
-		<description>Le Talisman d'Osiris (includes MO6 version)</description>
+		<description>Les Aventures du Ka 2 - Le Talisman d'Osiris (includes MO6 version)</description>
 		<year>1986</year>
 		<publisher>Chip</publisher>
 
@@ -13877,7 +13986,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="talismanmo6a" cloneof="talisman">
-		<description>Le Talisman d'Osiris (includes MO6 version, non-bootable)</description>
+		<description>Les Aventures du Ka 2 - Le Talisman d'Osiris (includes MO6 version, non-bootable)</description>
 		<year>1986</year>
 		<publisher>Chip</publisher>
 
@@ -13892,6 +14001,9 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Le Temple de Quauhtli</description>
 		<year>1986</year>
 		<publisher>Loriciels</publisher>
+		<info name="author" value="Louis-Marie Rocques"/>
+		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1986"/>
+		<info name="serial" value="151"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -14125,6 +14237,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Tout Schuss</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="TS 9116"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
@@ -14137,6 +14250,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		<description>Tout Schuss (SAP format)</description>
 		<year>1987</year>
 		<publisher>France Image Logiciel (FIL)</publisher>
+		<info name="serial" value="TS 9116"/>
 
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="335426">
@@ -14147,7 +14261,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="traitbzz">
-		<description>Traitement Bzzz</description>
+		<description>Les Aventures du Ka 5 - Traitement Bzzz</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -14161,7 +14275,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="traitbzza" cloneof="traitbzz">
-		<description>Traitement Bzzz (SAP format)</description>
+		<description>Les Aventures du Ka 5 - Traitement Bzzz (SAP format)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -14174,7 +14288,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 
 	<!-- can also be found in mo6_flop.xml -->
 	<software name="traitbzzb" cloneof="traitbzz">
-		<description>Traitement Bzzz (Compilation Top Arcade)</description>
+		<description>Les Aventures du Ka 5 - Traitement Bzzz (Compilation Top Arcade)</description>
 		<year>1987</year>
 		<publisher>Chip</publisher>
 
@@ -14186,7 +14300,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="tresbask">
-		<description>Le Tresor des Baskerville</description>
+		<description>Le Trésor des Baskerville</description>
 		<year>198?</year>
 		<publisher>Chip</publisher>
 
@@ -14198,7 +14312,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 	</software>
 
 	<software name="tresbaska" cloneof="tresbask">
-		<description>Le Tresor des Baskerville (alt)</description>
+		<description>Le Trésor des Baskerville (alt)</description>
 		<year>198?</year>
 		<publisher>Chip</publisher>
 
@@ -14362,7 +14476,7 @@ FIXME: Some images should be 5.25" rather than 3.5", though TO8/TO9/TO9+ softwar
 		</part>
 	</software>
 
-	<software name="turbocupb" cloneof="turbocup" supported="no">
+	<software name="turbocupb" cloneof="turbocup">
 		<description>Turbo Cup (640K disk)</description>
 		<year>1988</year>
 		<publisher>Loriciels</publisher>

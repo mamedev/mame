@@ -129,11 +129,11 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	/* memory pointers */
+	// memory pointers
 	required_shared_ptr<uint16_t> m_spriteram;
 	required_shared_ptr<uint16_t> m_workram;
 
-	/* video-related */
+	// video-related
 	int32_t     m_avac_bits[4]{};
 	int32_t     m_avac_occupancy[4]{};
 	uint16_t    m_layer_colorbase[4]{};
@@ -141,11 +141,11 @@ private:
 	int32_t     m_avac_vrc = 0;
 	uint16_t    m_sprite_colorbase = 0;
 
-	/* misc */
+	// misc
 	uint16_t    m_cur_control2 = 0U;
 	emu_timer   *m_dmadelay_timer = nullptr;
 
-	/* devices */
+	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<k054539_device> m_k054539;
@@ -488,7 +488,7 @@ static INPUT_PORTS_START( gijoe )
 	PORT_DIPSETTING(      0x0080, "2" )
 	PORT_DIPSETTING(      0x0000, "4" )
 	KONAMI16_MSB_40(4, IPT_BUTTON3 )
-	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW1:4" )    /* Listed as "Unused" */
+	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW1:4" )    // Listed as "Unused"
 INPUT_PORTS_END
 
 void gijoe_state::machine_start()
@@ -505,7 +505,7 @@ void gijoe_state::machine_reset()
 
 void gijoe_state::gijoe(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	M68000(config, m_maincpu, 32_MHz_XTAL / 2); // 16MHz Confirmed
 	m_maincpu->set_addrmap(AS_PROGRAM, &gijoe_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(gijoe_state::interrupt));
@@ -515,7 +515,7 @@ void gijoe_state::gijoe(machine_config &config)
 
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 24, 312, 262, 16, 240); // measured 59.637Hz
 	screen.set_screen_update(FUNC(gijoe_state::screen_update));
@@ -536,7 +536,7 @@ void gijoe_state::gijoe(machine_config &config)
 
 	K053251(config, m_k053251, 0);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	K054321(config, m_k054321, "speaker");
@@ -571,16 +571,16 @@ ROM_START( gijoe )
 	ROM_REGION( 0x200000, "k054539", 0 )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(a0d50a79) SHA1(972533ea45a0e84d9dd14c55f58cd7247926792e) )
 ROM_END
 
-// this set is strange, instead of showing program OK it shows the location and checksums of the ROMs
-// this doesn't indicate failure, as if you hack the parent set it will show the checksum and the word 'BAD' and refuse to boot
-// It will boot as whatever version string is in the EEPROM.  If no version string is in the EEPROM it just shows a blank string
-// If you factory default it you get the string 'EB8'
-// the roms had no proper labels
-// maybe it's some interim / test revision
+/* This set is strange, instead of showing program OK it shows the location and checksums of the ROMs.
+   This doesn't indicate failure, as if you hack the parent set it will show the checksum and the word 'BAD' and refuse to boot.
+   It will boot as whatever version string is in the EEPROM.  If no version string is in the EEPROM it just shows a blank string
+   If you factory default it you get the string 'EB8'
+   The ROMs had no proper labels.
+   Maybe it's some interim / test revision. */
 ROM_START( gijoeea )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom3.14e",   0x000000,  0x40000, CRC(0a11f63a) SHA1(06174682907e718017146665b8636be20843b119) )
@@ -604,7 +604,7 @@ ROM_START( gijoeea )
 	ROM_REGION( 0x200000, "k054539", 0 )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(64f5c87b) SHA1(af81abc54eb59ef7d2250b5ab6cc9642fbd9bfb2) ) // sldh
 ROM_END
 
@@ -631,7 +631,7 @@ ROM_START( gijoeu )
 	ROM_REGION( 0x200000, "k054539", 0 )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(ca966023) SHA1(6f07ece0f95213bc12387192986f468d23dfdfc8) ) // sldh
 ROM_END
 
@@ -695,7 +695,7 @@ ROM_START( gijoeua ) // this uses a standard GX069 main PCB, but the GFX ROMs ar
 	// overlay standard ROM for now
 	ROM_LOAD( "069a04a.1e", 0x000000, 0x200000, BAD_DUMP CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(33b07813) SHA1(aa4df1b4265e24cb79d1405dfdf5998689f6561e) ) // sldh
 ROM_END
 
@@ -722,11 +722,38 @@ ROM_START( gijoej )
 	ROM_REGION( 0x200000, "k054539", 0 )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM to prevent game booting upside down with error
 	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(c914fcf2) SHA1(b4f0a0b5d6d4075b004b061336d162336ce1a754) ) // sldh
 ROM_END
 
 ROM_START( gijoea )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "069aab03.14e", 0x000000, 0x40000, CRC(60434367) SHA1(240d6c6f6f44811f367b13b960c731a74c6d9b2a) )
+	ROM_LOAD16_BYTE( "069aab02.18e", 0x000001, 0x40000, CRC(1ab8727f) SHA1(5574d2bea0e0daa98258e1e240c97dd0b96da010) )
+	ROM_LOAD16_BYTE( "069a12.13e",   0x080000, 0x40000, CRC(75a7585c) SHA1(443d6dee99edbe81ab1b7289e6cad403fe01cc0d) )
+	ROM_LOAD16_BYTE( "069a11.16e",   0x080001, 0x40000, CRC(3153e788) SHA1(fde4543eac707ef24b431e64011cf0f923d4d3ac) )
+
+	ROM_REGION( 0x010000, "audiocpu", 0 )
+	ROM_LOAD( "069a01.7c", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
+
+	ROM_REGION( 0x200000, "k056832", 0 )
+	ROM_LOAD32_WORD( "069a10.18j", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
+	ROM_LOAD32_WORD( "069a09.16j", 0x000002, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
+
+	ROM_REGION( 0x400000, "k053246", 0 )
+	ROM_LOAD64_WORD( "069a08.6h", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
+	ROM_LOAD64_WORD( "069a05.1h", 0x000002, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
+	ROM_LOAD64_WORD( "069a07.4h", 0x000004, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
+	ROM_LOAD64_WORD( "069a06.2h", 0x000006, 0x100000, CRC(63eba8e1) SHA1(aa318d356c2580765452106ea0d2228273a90523) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )
+	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM
+	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(e5676727) SHA1(48965da3dc10382152f172adc0992484203671e1) ) // sldh
+ROM_END
+
+ROM_START( gijoeaa )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "069aa03.14e", 0x000000,  0x40000, CRC(74355c6e) SHA1(01d7b5994c5b9b6e87fb9a35ffed9cc540cfcd05) )
 	ROM_LOAD16_BYTE( "069aa02.18e", 0x000001,  0x40000, CRC(d3dd0397) SHA1(6caac73d259ff6707ded2457b4968d3d0a3c4eb3) )
@@ -749,16 +776,18 @@ ROM_START( gijoea )
 	ROM_REGION( 0x200000, "k054539", 0 )
 	ROM_LOAD( "069a04.1e", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
 
-	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom
+	ROM_REGION( 0x80, "eeprom", 0 ) // default EEPROM
 	ROM_LOAD( "er5911.7d", 0x0000, 0x080, CRC(6363513c) SHA1(181cbf2bd4960740d437c714dc70bb7e64c95348) ) // sldh
 ROM_END
+
 
 } // anonymous namespace
 
 
-GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EAB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoe,   0,     gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EAB)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1992, gijoeea, gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoeu,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (US, UAB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoeua, gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (US, UAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoej,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (Japan, JAA)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gijoea,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (Asia, AA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeu,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (US, UAB)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeua, gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (US, UAA)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoej,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (Japan, JAA)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoea,  gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (Asia, AAB)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gijoeaa, gijoe, gijoe, gijoe, gijoe_state, empty_init, ROT0, "Konami", "G.I. Joe (Asia, AA)",               MACHINE_SUPPORTS_SAVE )

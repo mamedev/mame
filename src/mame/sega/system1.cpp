@@ -570,7 +570,7 @@ void system1_state::mcu_control_w(u8 data)
 {
 	/*
 	    Bit 7 -> connects to TD62003 pins 5 & 6 @ IC151
-	    Bit 6 -> via PLS153, when high, asserts the BUSRQ signal, halting the Z80
+	    Bit 6 -> via PLS153, when high, asserts the BUSREQ signal, halting the Z80
 	    Bit 5 -> n/c
 	    Bit 4 -> (with bit 3) Memory select: 0=Z80 program space, 1=banked ROM, 2=Z80 I/O space, 3=watchdog?
 	    Bit 3 ->
@@ -579,12 +579,12 @@ void system1_state::mcu_control_w(u8 data)
 	    Bit 0 -> Directly connected to Z80 /INT line
 	*/
 
-	// boost interleave to ensure that the MCU can break the Z80 out of BUSRQ
+	// boost interleave to ensure that the MCU can break the Z80 out of BUSREQ
 	if (!BIT(m_mcu_control, 6) && BIT(data, 6))
 		machine().scheduler().perfect_quantum(attotime::from_usec(10));
 
 	m_mcu_control = data;
-	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 

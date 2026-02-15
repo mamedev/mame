@@ -263,26 +263,26 @@ if opt_tool(CPUS, "ADSP21XX") then
 end
 
 --------------------------------------------------
--- Analog Devices "Sharc" ADSP21062
---@src/devices/cpu/sharc/sharc.h,CPUS["ADSP21062"] = true
+-- Analog Devices "SHARC" ADSP2106x
+--@src/devices/cpu/sharc/sharc.h,CPUS["ADSP2106X"] = true
 --------------------------------------------------
 
-if CPUS["ADSP21062"] then
+if CPUS["ADSP2106X"] then
 	files {
+		MAME_DIR .. "src/devices/cpu/sharc/compute.hxx",
 		MAME_DIR .. "src/devices/cpu/sharc/sharc.cpp",
 		MAME_DIR .. "src/devices/cpu/sharc/sharc.h",
-		MAME_DIR .. "src/devices/cpu/sharc/compute.hxx",
 		MAME_DIR .. "src/devices/cpu/sharc/sharcdma.hxx",
-		MAME_DIR .. "src/devices/cpu/sharc/sharcmem.hxx",
-		MAME_DIR .. "src/devices/cpu/sharc/sharcops.h",
-		MAME_DIR .. "src/devices/cpu/sharc/sharcops.hxx",
 		MAME_DIR .. "src/devices/cpu/sharc/sharcdrc.cpp",
 		MAME_DIR .. "src/devices/cpu/sharc/sharcfe.cpp",
 		MAME_DIR .. "src/devices/cpu/sharc/sharcfe.h",
+		MAME_DIR .. "src/devices/cpu/sharc/sharcinternal.ipp",
+		MAME_DIR .. "src/devices/cpu/sharc/sharcops.hxx",
+		MAME_DIR .. "src/devices/cpu/sharc/sharcops_table.cpp",
 	}
 end
 
-if opt_tool(CPUS, "ADSP21062") then
+if opt_tool(CPUS, "ADSP2106X") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sharc/sharcdsm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sharc/sharcdsm.h")
 end

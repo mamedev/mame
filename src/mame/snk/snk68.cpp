@@ -46,7 +46,7 @@ Notes:
 #include "emu.h"
 
 #include "alpha68k_palette.h"
-#include "snk68_spr.h"
+#include "alpha68k_spr.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -78,17 +78,16 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_spriteram(*this, "spriteram"),
-		m_p1_io(*this, "P1"),
-		m_p2_io(*this, "P2"),
+		m_p_io(*this, "P%u", 1U),
 		m_system_io(*this, "SYSTEM")
 	{
 	}
 
-	void streetsm(machine_config &config);
-	void pow(machine_config &config);
-	void powbl(machine_config &config);
+	void streetsm(machine_config &config) ATTR_COLD;
+	void pow(machine_config &config) ATTR_COLD;
+	void powbl(machine_config &config) ATTR_COLD;
 
-	void init_powbl();
+	void init_powbl() ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -96,45 +95,44 @@ protected:
 	optional_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
-	required_device<snk68_spr_device> m_sprites;
+	required_device<alpha68k_sprite_device> m_sprites;
 	required_device<alpha68k_palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<uint16_t> m_fg_videoram;
-	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<u16> m_fg_videoram;
+	required_shared_ptr<u16> m_spriteram;
 
-	required_ioport m_p1_io;
-	required_ioport m_p2_io;
+	required_ioport_array<2> m_p_io;
 	required_ioport m_system_io;
 
-	bool m_sprite_flip_axis;
-	tilemap_t *m_fg_tilemap;
+	bool m_sprite_flip_axis = false;
+	tilemap_t *m_fg_tilemap = nullptr;
 
 	// common
-	void sound_w(uint8_t data);
-	void d7759_write_port_0_w(uint8_t data);
+	void sound_w(u8 data);
+	void d7759_write_port_0_w(u8 data);
 
 	virtual void video_start() override ATTR_COLD;
 	void common_video_start();
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	void tile_callback_notpow(int &tile, int &fx, int &fy, int &region);
+	void tile_callback_notpow(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color);
 
 	void sound_io_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 
 private:
-	uint32_t m_fg_tile_offset;
+	u32 m_fg_tile_offset = 0;
 
 	// pow and streetsm
-	uint16_t fg_videoram_r(offs_t offset);
-	void fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void flipscreen_w(uint8_t data);
+	u16 fg_videoram_r(offs_t offset);
+	void fg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void flipscreen_w(u8 data);
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void tile_callback_pow(int &tile, int &fx, int &fy, int &region);
+	void tile_callback_pow(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color);
 
 	void program_map(address_map &map) ATTR_COLD;
 	void powbl_sound_io_map(address_map &map) ATTR_COLD;
@@ -149,7 +147,7 @@ public:
 	{
 	}
 
-	void searchar(machine_config &config);
+	void searchar(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -158,14 +156,14 @@ protected:
 private:
 	optional_ioport_array<2> m_rotary_io;
 
-	uint8_t m_invert_controls = 0;
+	u8 m_invert_controls = 0;
 
 	// searchar and ikari3
-	void fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void flipscreen_w(uint8_t data);
-	uint16_t rotary_1_r();
-	uint16_t rotary_2_r();
-	uint16_t rotary_lsb_r();
+	void fg_videoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void flipscreen_w(u8 data);
+	u16 rotary_1_r();
+	u16 rotary_2_r();
+	u16 rotary_lsb_r();
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
@@ -206,7 +204,7 @@ TILE_GET_INFO_MEMBER(searchar_state::get_tile_info)
 	int const color = (data & 0x7000) >> 12;
 
 	// used in the ikari3 intro
-	int const flags = (data & 0x8000) ? TILE_FORCE_LAYER0 : 0;
+	int const flags = BIT(data, 15) ? TILE_FORCE_LAYER0 : 0;
 
 	tileinfo.set(0, tile, color, flags);
 }
@@ -246,27 +244,27 @@ void searchar_state::video_start()
 
 ***************************************************************************/
 
-uint16_t snk68_state::fg_videoram_r(offs_t offset)
+u16 snk68_state::fg_videoram_r(offs_t offset)
 {
 	// RAM is only 8-bit
 	return m_fg_videoram[offset] | 0xff00;
 }
 
-void snk68_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void snk68_state::fg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data |= 0xff00;
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-void searchar_state::fg_videoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void searchar_state::fg_videoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	// RAM is full 16-bit, though only half of it is used by the hardware
 	COMBINE_DATA(&m_fg_videoram[offset]);
 	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-void snk68_state::flipscreen_w(uint8_t data)
+void snk68_state::flipscreen_w(u8 data)
 {
 	flip_screen_set(BIT(data, 3));
 	m_sprites->set_flip(BIT(data, 3));
@@ -279,7 +277,7 @@ void snk68_state::flipscreen_w(uint8_t data)
 	}
 }
 
-void searchar_state::flipscreen_w(uint8_t data)
+void searchar_state::flipscreen_w(u8 data)
 {
 	flip_screen_set(BIT(data, 3));
 	m_sprites->set_flip(BIT(data, 3));
@@ -294,7 +292,7 @@ void searchar_state::flipscreen_w(uint8_t data)
 ***************************************************************************/
 
 
-uint32_t snk68_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 snk68_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->get_backdrop_pen(), cliprect);
 
@@ -307,7 +305,7 @@ uint32_t snk68_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 /******************************************************************************/
 
-void snk68_state::sound_w(uint8_t data)
+void snk68_state::sound_w(u8 data)
 {
 	m_soundlatch->write(data);
 	m_soundcpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero); // caused by 74123
@@ -319,8 +317,8 @@ void snk68_state::program_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram();
-	map(0x080000, 0x080000).lr8(NAME([this] () -> u8 { return m_p2_io->read(); }));
-	map(0x080001, 0x080001).lr8(NAME([this] () -> u8 { return m_p1_io->read(); }));
+	map(0x080000, 0x080000).lr8(NAME([this] () -> u8 { return m_p_io[1]->read(); }));
+	map(0x080001, 0x080001).lr8(NAME([this] () -> u8 { return m_p_io[0]->read(); }));
 	map(0x080000, 0x080000).w(FUNC(snk68_state::sound_w));
 	map(0x0c0000, 0x0c0001).portr("SYSTEM");
 	map(0x0c0001, 0x0c0001).w(FUNC(snk68_state::flipscreen_w));   // + char bank
@@ -329,8 +327,8 @@ void snk68_state::program_map(address_map &map)
 	map(0x0f0000, 0x0f0001).portr("DSW1");
 	map(0x0f0008, 0x0f0009).portr("DSW2");
 //  map(0x0f0008, 0x0f0009).nopw();    // ??
-	map(0x100000, 0x100fff).rw(FUNC(snk68_state::fg_videoram_r), FUNC(snk68_state::fg_videoram_w)).mirror(0x1000).share("fg_videoram");   // 8-bit
-	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");   // only partially populated
+	map(0x100000, 0x100fff).rw(FUNC(snk68_state::fg_videoram_r), FUNC(snk68_state::fg_videoram_w)).mirror(0x1000).share(m_fg_videoram);   // 8-bit
+	map(0x200000, 0x207fff).rw(m_sprites, FUNC(alpha68k_sprite_device::spriteram_r), FUNC(alpha68k_sprite_device::spriteram_w)).share(m_spriteram);   // only partially populated
 	map(0x400000, 0x400fff).rw(m_palette, FUNC(alpha68k_palette_device::read), FUNC(alpha68k_palette_device::write));
 }
 
@@ -341,17 +339,17 @@ void searchar_state::machine_start()
 	save_item(NAME(m_invert_controls));
 }
 
-uint16_t searchar_state::rotary_1_r()
+u16 searchar_state::rotary_1_r()
 {
 	return ((~(1 << m_rotary_io[0]->read())) << 8) & 0xff00;
 }
 
-uint16_t searchar_state::rotary_2_r()
+u16 searchar_state::rotary_2_r()
 {
 	return ((~(1 << m_rotary_io[1]->read())) << 8) & 0xff00;
 }
 
-uint16_t searchar_state::rotary_lsb_r()
+u16 searchar_state::rotary_lsb_r()
 {
 	return (((~(1 << m_rotary_io[1]->read())) << 4) & 0xf000)
 			+ (((~(1 << m_rotary_io[0]->read()))) & 0x0f00);
@@ -363,8 +361,8 @@ void searchar_state::program_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
 	map(0x040000, 0x043fff).ram();
-	map(0x080001, 0x080001).lr8(NAME([this] () -> u8 { return m_p1_io->read() ^ m_invert_controls; }));
-	map(0x080003, 0x080003).lr8(NAME([this] () -> u8 { return m_p2_io->read() ^ m_invert_controls; }));
+	map(0x080001, 0x080001).lr8(NAME([this] () -> u8 { return m_p_io[0]->read() ^ m_invert_controls; }));
+	map(0x080003, 0x080003).lr8(NAME([this] () -> u8 { return m_p_io[1]->read() ^ m_invert_controls; }));
 	map(0x080005, 0x080005).lr8(NAME([this] () -> u8 { return m_system_io->read() ^ m_invert_controls; }));
 	map(0x080000, 0x080000).w(FUNC(searchar_state::sound_w));
 	// top byte unknown, bottom is protection in ikari3 and streetsm
@@ -379,8 +377,8 @@ void searchar_state::program_map(address_map &map)
 	map(0x0f0000, 0x0f0001).portr("DSW1");
 	map(0x0f0008, 0x0f0009).portr("DSW2");
 	map(0x0f8000, 0x0f8000).r("soundlatch2", FUNC(generic_latch_8_device::read));
-	map(0x100000, 0x107fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");   // only partially populated
-	map(0x200000, 0x200fff).ram().w(FUNC(searchar_state::fg_videoram_w)).mirror(0x1000).share("fg_videoram"); // Mirror is used by Ikari 3
+	map(0x100000, 0x107fff).rw(m_sprites, FUNC(alpha68k_sprite_device::spriteram_r), FUNC(alpha68k_sprite_device::spriteram_w)).share(m_spriteram);   // only partially populated
+	map(0x200000, 0x200fff).ram().w(FUNC(searchar_state::fg_videoram_w)).mirror(0x1000).share(m_fg_videoram); // Mirror is used by Ikari 3
 	map(0x300000, 0x33ffff).rom().region("maincpu", 0x40000); // Extra code bank
 	map(0x400000, 0x400fff).rw(m_palette, FUNC(alpha68k_palette_device::read), FUNC(alpha68k_palette_device::write));
 }
@@ -394,7 +392,7 @@ void snk68_state::sound_map(address_map &map)
 	map(0xf800, 0xf800).r(m_soundlatch, FUNC(generic_latch_8_device::read)).w("soundlatch2", FUNC(generic_latch_8_device::write));
 }
 
-void snk68_state::d7759_write_port_0_w(uint8_t data)
+void snk68_state::d7759_write_port_0_w(u8 data)
 {
 	m_upd7759->port_w(data);
 	m_upd7759->start_w(0);
@@ -801,8 +799,11 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( gfx_pow )
-	GFXDECODE_ENTRY( "tiles",   0, charlayout,   0,  0x80 >> 4 )
-	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0, 0x800 >> 4 )
+	GFXDECODE_ENTRY( "tiles", 0, charlayout, 0, 8 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_pow_spr )
+	GFXDECODE_ENTRY( "sprites", 0, spritelayout, 0, 128 )
 GFXDECODE_END
 
 /******************************************************************************/
@@ -810,15 +811,16 @@ GFXDECODE_END
 // pow has 0x4000 tiles and independent x/y flipping
 // the other games have > 0x4000 tiles and flipping in only one direction
 // (globally selected)
-void snk68_state::tile_callback_pow(int &tile, int &fx, int &fy, int &region)
+void snk68_state::tile_callback_pow(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color)
 {
 	fx = tile & 0x4000;
 	fy = tile & 0x8000;
 	tile &= 0x3fff;
-	region = 1;
+	region = 0;
+	color &= 0x7f;
 }
 
-void snk68_state::tile_callback_notpow(int &tile, int &fx, int &fy, int &region)
+void snk68_state::tile_callback_notpow(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color)
 {
 	if (m_sprite_flip_axis)
 	{
@@ -831,7 +833,8 @@ void snk68_state::tile_callback_notpow(int &tile, int &fx, int &fy, int &region)
 		fy = 0;
 	}
 	tile &= 0x7fff;
-	region = 1;
+	region = 0;
+	color &= 0x7f;
 }
 
 void snk68_state::pow(machine_config &config)
@@ -859,11 +862,11 @@ void snk68_state::pow(machine_config &config)
 	ALPHA68K_PALETTE(config, m_palette, 0);
 	m_palette->set_entries(2048);
 
-	SNK68_SPR(config, m_sprites, 0);
-	m_sprites->set_gfxdecode_tag(m_gfxdecode);
+	ALPHA68K_SPR(config, m_sprites, XTAL(24'000'000), m_palette, gfx_pow_spr);
+	m_sprites->set_screen(m_screen);
+	m_sprites->set_spriteram_tag(m_spriteram);
 	m_sprites->set_tile_indirect_cb(FUNC(snk68_state::tile_callback_pow));
 	m_sprites->set_xpos_shift(12);
-	m_sprites->set_color_entry_mask(0x7f);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -1533,7 +1536,7 @@ ROM_END
 
 void snk68_state::init_powbl()
 {
-	uint8_t *gfx2 = memregion("sprites")->base();
+	u8 *gfx2 = memregion("sprites")->base();
 
 	// rearrange sprites to what the driver expects
 	for (int i = 0; i < 0x200000; i++)

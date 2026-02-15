@@ -169,6 +169,10 @@ void menu_confswitch::populate()
 		}
 	}
 
+	// menu can be empty if all fields were masked by PORT_CONDITION
+	if (!prev_owner)
+		item_append(_("[currently n/a]"), FLAG_DISABLE, nullptr);
+
 	item_append(menu_item_type::SEPARATOR);
 	item_append(_("Reset System"), 0, (void *)1);
 }

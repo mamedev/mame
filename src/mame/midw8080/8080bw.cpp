@@ -5577,7 +5577,7 @@ ROM_START( mraker )
 	// l5 position for rom 12 unpopulated
 
 	ROM_REGION( 0x0400, "stars", 0 )
-	ROM_LOAD( "2708",        0x0000, 0x0400, NO_DUMP ) // unknown label
+	ROM_LOAD( "star",        0x0000, 0x0400, CRC(c87a42dd) SHA1(efb841aa85ba88e2aefd3d93b01a0db899a5440d) )
 ROM_END
 
 ROM_START( schaser )

@@ -1270,6 +1270,28 @@ Utility disk file "BMENU." sports ugly GFX cyan fills (especially noticeable whe
 		</part>
 	</software>
 
+	<software name="win95bem">
+		<description>Windows 95 OSR2 (Emergency Boot Disk)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft windows 95 osr2 (emergency boot disk).hdm" size="1261568" crc="d4e9cccb" sha1="e8c0c231435c0602dbf111342d041d66d004fab9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win98sem">
+		<description>Windows 98 Second Edition (Emergency Boot Disk)</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft windows 98se (emergency boot disk).hdm" size="1261568" crc="a4ea5398" sha1="0f70dc3683ca0d84ea97a06ca6addf1d31a3d3c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Programming IDEs -->
 
 	<software name="cobol">

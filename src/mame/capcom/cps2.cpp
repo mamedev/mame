@@ -141,7 +141,7 @@ Notes:
                              * pin 71 - INT (I): erratic, active during qsound writes
                    DL-0921 \
                    DL-0311 / CPS-A/B Graphics Processors (QFP160)
-                   DL-1625 - Custom 68000 CPU, running at 16.000MHz (QFP128)
+                   DL-1625 - DRAM interface (QFP128)
                    DL-2227 - DRAM Refresh Controller (QFP64)
                    DL-1123 - I/O Controller (QFP136)
 
@@ -275,11 +275,12 @@ Notes:
                   board)
 
       Custom IC's -
-                   DL-1827 CIF (QFP160)
-                   DL-1525 SPA (QFP208)
-                   DL-1727 MIF (QFP120)
-                   DL-2027 CGD (QFP120)
-                   DL-1927 CGA (QFP120)
+                   DL-1827 CIF - Fujitsu CG24 series gate array (QFP160)
+                   DL-1525 SPA - Motorola H4C series model 057 gate array with 68000 CPU,
+                                 Running at 16MHz. (QFP208)
+                   DL-1727 MIF - Fujitsu CG24 series gate array (QFP120)
+                   DL-2027 CGD - Fujitsu CG24 series gate array (QFP120)
+                   DL-1927 CGA - Fujitsu CG24 series gate array (QFP120)
 
       ROMs -
             Note, the ROM names shown on the above layout are generic. Each EPROM on every game has
@@ -650,7 +651,7 @@ class cps2_state : public cps_state
 {
 public:
 	cps2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cps_state(mconfig, type, tag, 2)
+		: cps_state(mconfig, type, tag)
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_region_key(*this, "key")
 		, m_qsound(*this, "qsound")
@@ -661,11 +662,6 @@ public:
 		, m_io_in0(*this, "IN0")
 		, m_io_in1(*this, "IN1")
 		, m_dsw(*this, "DSW%c", 'A')
-		, m_cps2_dial_type(0)
-		, m_ecofghtr_dial_direction0(0)
-		, m_ecofghtr_dial_direction1(0)
-		, m_ecofghtr_dial_last0(0)
-		, m_ecofghtr_dial_last1(0)
 	{ }
 
 	void cps2(machine_config &config) ATTR_COLD;
@@ -736,22 +732,22 @@ private:
 	std::unique_ptr<uint16_t[]> m_cps2_buffered_obj;
 	std::unique_ptr<uint16_t[]> m_gigaman2_dummyqsound_ram;
 
-	/* video-related */
-	int          m_cps2_last_sprite_offset = 0; /* Offset of the last sprite */
-	int          m_pri_ctrl = 0;                /* Sprite layer priorities */
-	int          m_objram_bank = 0;
-	int          m_cps2_obj_size = 0;
+	// video-related
+	int m_cps2_last_sprite_offset = 0; // Offset of the last sprite
+	int m_pri_ctrl = 0; // Sprite layer priorities
+	int m_objram_bank = 0;
+	int m_cps2_obj_size = 0;
 
-	/* misc */
-	int          m_readpaddle = 0;  // pzloop2
-	int          m_cps2digitalvolumelevel = 0;
-	int          m_cps2disabledigitalvolume = 0;
-	emu_timer    *m_digital_volume_timer = nullptr;
-	int          m_cps2_dial_type = 0;
-	int          m_ecofghtr_dial_direction0 = 0;
-	int          m_ecofghtr_dial_direction1 = 0;
-	int          m_ecofghtr_dial_last0 = 0;
-	int          m_ecofghtr_dial_last1 = 0;
+	// misc
+	int m_readpaddle = 0; // pzloop2
+	int m_cps2digitalvolumelevel = 0;
+	int m_cps2disabledigitalvolume = 0;
+	emu_timer *m_digital_volume_timer = nullptr;
+	int m_cps2_dial_type = 0;
+	int m_ecofghtr_dial_direction0 = 0;
+	int m_ecofghtr_dial_direction1 = 0;
+	int m_ecofghtr_dial_last0 = 0;
+	int m_ecofghtr_dial_last1 = 0;
 };
 
 
@@ -761,10 +757,10 @@ private:
  *
  *************************************/
 
-#define CPS2_OBJ_BASE   0x00    // Unknown (not base address of objects). Could be bass address of bank used when object swap bit set?
-#define CPS2_OBJ_UK1    0x02    // Unknown (nearly always 0x807d, or 0x808e when screen flipped)
-#define CPS2_OBJ_PRI    0x04    // Layers priorities
-#define CPS2_OBJ_UK2    0x06    // Unknown (usually 0x0000, 0x1101 in ssf2, 0x0001 in 19XX)
+#define CPS2_OBJ_BASE   0x00    // Unknown (not base address of objects). Could be base address of bank used when object swap bit set?
+#define CPS2_OBJ_UNK1   0x02    // Unknown (nearly always 0x807d, or 0x808e when screen flipped)
+#define CPS2_OBJ_PRI    0x04    // Layer priorities
+#define CPS2_OBJ_UNK2   0x06    // Unknown (usually 0x0000, 0x1101 in ssf2, 0x0001 in 19XX)
 #define CPS2_OBJ_XOFFS  0x08    // X offset (usually 0x0040)
 #define CPS2_OBJ_YOFFS  0x0a    // Y offset (always 0x0010)
 
@@ -864,7 +860,7 @@ uint16_t *cps2_state::cps2_objbase()
 	if (m_objram_bank & 1)
 		baseptr ^= 0x0080;
 
-//popmessage("%04x %d", cps2_port(machine, CPS2_OBJ_BASE), m_objram_bank & 1);
+	//popmessage("%04x %d", cps2_port(machine, CPS2_OBJ_BASE), m_objram_bank & 1);
 
 	if (baseptr == 0x7000)
 		return m_objram1;
@@ -892,6 +888,7 @@ void cps2_state::find_last_sprite()    /* Find the offset of last sprite */
 
 		offset += 4;
 	}
+
 	/* Sprites must use full sprite RAM */
 	m_cps2_last_sprite_offset = m_cps2_obj_size / 2 - 4;
 }
@@ -1058,13 +1055,13 @@ void cps2_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 #if 0
 	if ((m_output[CPS2_OBJ_BASE / 2] != 0x7080 && m_output[CPS2_OBJ_BASE / 2] != 0x7000) ||
-			m_output[CPS2_OBJ_UK1 / 2] != 0x807d ||
-			(m_output[CPS2_OBJ_UK2 / 2] != 0x0000 && m_output[CPS2_OBJ_UK2 / 2] != 0x1101 && m_output[CPS2_OBJ_UK2 / 2] != 0x0001))
+			m_output[CPS2_OBJ_UNK1 / 2] != 0x807d ||
+			(m_output[CPS2_OBJ_UNK2 / 2] != 0x0000 && m_output[CPS2_OBJ_UNK2 / 2] != 0x1101 && m_output[CPS2_OBJ_UNK2 / 2] != 0x0001))
 	{
 		popmessage("base %04x uk1 %04x uk2 %04x",
 				m_output[CPS2_OBJ_BASE / 2],
-				m_output[CPS2_OBJ_UK1 / 2],
-				m_output[CPS2_OBJ_UK2 / 2]);
+				m_output[CPS2_OBJ_UNK1 / 2],
+				m_output[CPS2_OBJ_UNK2 / 2]);
 	}
 
 	if (0 && machine().input().code_pressed(KEYCODE_Z))
@@ -1222,9 +1219,7 @@ uint16_t cps2_state::cps2_qsound_volume_r()
 		0xe050, 0xe048, 0xe044, 0xe042, 0xe041, 0xe030, 0xe028, 0xe024, 0xe022, 0xe021
 	};
 
-	uint16_t result;
-
-	result = cps2_vol_states[m_cps2digitalvolumelevel];
+	uint16_t result = cps2_vol_states[m_cps2digitalvolumelevel];
 
 	// Extra adapter memory (0x660000-0x663fff) available when bit 14 = 0
 	// Network adapter (ssf2tb) present when bit 15 = 0
@@ -1817,7 +1812,7 @@ void cps2_state::cps2(machine_config &config)
 	Z80(config, m_audiocpu, 8_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps2_state::qsound_sub_map);
 
-	const attotime audio_irq_period = attotime::from_hz(8_MHz_XTAL / 32000); // measured
+	const attotime audio_irq_period = attotime::from_hz(8_MHz_XTAL / 32000); // measured 250Hz
 	m_audiocpu->set_periodic_int(FUNC(cps2_state::irq0_line_hold), audio_irq_period);
 
 	EEPROM_93C46_16BIT(config, "eeprom");

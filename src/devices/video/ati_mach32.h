@@ -43,7 +43,6 @@ protected:
 	uint16_t m_chip_ID;
 	uint16_t m_membounds;
 	bool display_mode_change;
-
 };
 
 // main SVGA device
@@ -187,6 +186,7 @@ protected:
 	uint8_t m_cursor_offset_horizontal;
 	uint8_t m_cursor_offset_vertical;
 
+	virtual void refresh_bank() override;
 };
 
 /*

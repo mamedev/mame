@@ -652,7 +652,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjr_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-    // On the PC Jr the input for clock 1 seems to be selectable based on bit 4(/5?) written to output port A0h.
+	// On the PC Jr the input for clock 1 seems to be selectable based on bit 4(/5?) written to output port A0h.
 	// This is not supported yet.
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(XTAL(14'318'181)/12);

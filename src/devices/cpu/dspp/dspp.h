@@ -39,10 +39,6 @@ public:
 	auto dma_read_handler() { return m_dma_read_handler.bind(); }
 	auto dma_write_handler() { return m_dma_write_handler.bind(); }
 
-	// Public interfaces
-	uint32_t read(offs_t offset);
-	void write(offs_t offset, uint32_t data);
-
 	uint16_t read_output_fifo();
 
 	void dump_state(); // TODO: DEBUG REMOVE ME
@@ -71,6 +67,11 @@ public:
 	void print_value() { printf("Value is %08x\n", m_core->m_arg0); }
 	void print_addr() { printf("New value is %08x from %08x\n", m_core->m_arg0, m_core->m_arg1); }
 
+	void host_n_write(offs_t offset, u16 data);
+	u16 host_eo_read(offs_t offset);
+	void host_ei_write(offs_t offset, u16 data);
+	void host_gw_control_write(offs_t offset, u16 data);
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -93,7 +94,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	void code_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
+	void data_clio_map(address_map &map) ATTR_COLD;
 
 	enum
 	{
@@ -187,6 +188,7 @@ private:
 	uint32_t get_interrupt_state();
 	void update_host_interrupt();
 
+protected:
 	uint32_t read_dma_stack(offs_t offset);
 	void write_dma_stack(offs_t offset, uint32_t data);
 
@@ -202,6 +204,7 @@ private:
 	memory_access<10, 1, -1, ENDIANNESS_BIG>::specific m_code;
 	memory_access<10, 1, -1, ENDIANNESS_BIG>::specific m_data;
 
+private:
 	struct dspp_internal_state
 	{
 		// Internal state
@@ -376,6 +379,19 @@ public: // TODO
 	uml::code_handle *m_dm_write16;
 };
 
+class dspp_bulldog_device : public dspp_device
+{
+public:
+	dspp_bulldog_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// Public interfaces
+	// TODO: convert to address_map
+	uint32_t host_read(offs_t offset);
+	void host_write(offs_t offset, uint32_t data);
+
+protected:
+	void data_bulldog_map(address_map &map) ATTR_COLD;
+};
 
 /***************************************************************************
  COMPILER-SPECIFIC OPTIONS
@@ -389,6 +405,6 @@ public: // TODO
 
 // device type definition
 DECLARE_DEVICE_TYPE(DSPP, dspp_device);
-
+DECLARE_DEVICE_TYPE(DSPP_BULLDOG, dspp_bulldog_device);
 
 #endif // MAME_CPU_DSPP_DSPP_H
