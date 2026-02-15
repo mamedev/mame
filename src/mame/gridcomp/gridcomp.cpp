@@ -111,6 +111,7 @@ public:
 		, m_modem(*this, "modem")
 		, m_uart8274(*this, "uart8274")
 		, m_speaker(*this, "speaker")
+		, m_speaker_levels(new double[256])
 		, m_ram(*this, RAM_TAG)
 		, m_tms9914(*this, "hpib")
 	{ }
@@ -135,6 +136,7 @@ private:
 	required_device<i8255_device> m_modem;
 	optional_device<i8274_device> m_uart8274;
 	required_device<speaker_sound_device> m_speaker;
+	std::unique_ptr<double[]> m_speaker_levels;
 	required_device<ram_device> m_ram;
 	required_device<tms9914_device> m_tms9914;
 
@@ -150,6 +152,9 @@ private:
 	uint8_t grid_modem_r(offs_t offset);
 	void grid_keyb_w(offs_t offset, uint16_t data);
 	void grid_modem_w(offs_t offset, uint8_t data);
+
+	void setup_speaker_levels();
+	void grid_sound_w(offs_t offset, uint8_t data);
 
 	void grid_dma_w(offs_t offset, uint8_t data);
 	uint8_t grid_dma_r(offs_t offset);
@@ -231,6 +236,27 @@ void gridcomp_state::grid_modem_w(offs_t offset, uint8_t data)
 	LOG("MDM %02x <- %02x\n", 0xdfec0 + (offset << 1), data);
 }
 
+void gridcomp_state::setup_speaker_levels()
+{
+	for (double i = 0; i < 256; i++)
+	{
+		m_speaker_levels[i] = i / (256 - 1);
+	}
+	m_speaker->set_levels(256, m_speaker_levels.get());
+}
+
+void gridcomp_state::grid_sound_w(offs_t offset, uint8_t data)
+{
+	if (offset & 0b01) {
+		LOG("VOLUME DAC <- %02x\n", data);
+		// Not supported.
+	}
+	if (offset & 0b10) {
+		LOG("SOUND DAC <- %02x\n", data);
+		m_speaker->level_w(data);
+	}
+}
+
 void gridcomp_state::grid_dma_w(offs_t offset, uint8_t data)
 {
 	m_tms9914->write(7, data);
@@ -290,6 +316,8 @@ IRQ_CALLBACK_MEMBER(gridcomp_state::irq_callback)
 void gridcomp_state::grid1101_map(address_map &map)
 {
 	map.unmap_value_high();
+	map(0xdfe40, 0xdfe42).w(FUNC(gridcomp_state::grid_sound_w));
+	map(0xdfe44, 0xdfe4f).unmaprw(); // modem controller??
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
@@ -309,7 +337,8 @@ void gridcomp_state::grid1121_map(address_map &map)
 	map(0xc0000, 0xcffff).unmaprw(); // ?? ROM slot -- signature expected: 0x4554, 0x5048
 	map(0xdfa00, 0xdfdff).rw(FUNC(gridcomp_state::grid_dma_r), FUNC(gridcomp_state::grid_dma_w)); // DMA
 	map(0xdfe00, 0xdfe1f).unmaprw(); // .rw("uart8274", FUNC(i8274_device::ba_cd_r), FUNC(i8274_device::ba_cd_w)).umask16(0x00ff);
-	map(0xdfe40, 0xdfe4f).unmaprw(); // ?? diagnostic 8274
+	map(0xdfe40, 0xdfe42).w(FUNC(gridcomp_state::grid_sound_w));
+	map(0xdfe44, 0xdfe4f).unmaprw(); // modem controller??
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
@@ -357,6 +386,7 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 1.00);
+	setup_speaker_levels();
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // actually a kind of EL display
 	screen.set_color(rgb_t::amber());
@@ -610,9 +640,9 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY           FULLNAME           FLAGS
-COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_NO_SOUND_HW | MACHINE_IMPERFECT_CONTROLS )
-COMP( 1982, grid1109, grid1101, 0,      grid1109, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1109",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 1984, grid1121, 0,        0,      grid1121, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1121", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 1984, grid1129, grid1121, 0,      grid1129, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1129", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 1984, grid1131, grid1121, 0,      grid1131, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1131", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 1984, grid1139, grid1121, 0,      grid1139, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1139", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 1982, grid1101, 0,        0,      grid1101, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1101",    MACHINE_IMPERFECT_CONTROLS )
+COMP( 1982, grid1109, grid1101, 0,      grid1109, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass 1109",    MACHINE_IMPERFECT_CONTROLS )
+COMP( 1984, grid1121, 0,        0,      grid1121, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1121", MACHINE_IMPERFECT_CONTROLS )
+COMP( 1984, grid1129, grid1121, 0,      grid1129, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1129", MACHINE_IMPERFECT_CONTROLS )
+COMP( 1984, grid1131, grid1121, 0,      grid1131, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1131", MACHINE_IMPERFECT_CONTROLS )
+COMP( 1984, grid1139, grid1121, 0,      grid1139, gridcomp, gridcomp_state, empty_init, "GRiD Computers", "Compass II 1139", MACHINE_IMPERFECT_CONTROLS )
