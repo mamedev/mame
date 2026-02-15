@@ -1,6 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:A. Lenard
+/***************************************************************************
 
+    Zilog Z8010 Memory Management Unit
+
+***************************************************************************/
+
+#include "emu.h"
 #include "z8010.h"
 #include "cpu/z8000/z8000.h"	// For ST_* status codes
 
@@ -31,7 +37,7 @@ DEFINE_DEVICE_TYPE(Z8010, z8010_device, "z8010", "Zilog Z8010 MMU")
 
 inline void z8010_device::INC_SAR()
 {
-	if(m_sar < (SDR_MAX_SEGMENTS-1))
+	if (m_sar < (SDR_MAX_SEGMENTS-1))
 		++m_sar;
 }
 
@@ -41,7 +47,7 @@ inline void z8010_device::INC_SAR()
 
 inline void z8010_device::INC_DSC(const uint8_t max_dsc = DSC_SDR_ATTR)
 {
-	if(m_dsc < max_dsc)
+	if (m_dsc < max_dsc)
 		++m_dsc;
 }
 
@@ -51,11 +57,11 @@ inline void z8010_device::INC_DSC(const uint8_t max_dsc = DSC_SDR_ATTR)
 
 inline void z8010_device::INC_DSC_SAR(const uint8_t max_dsc = DSC_SDR_ATTR)
 {
-	if(m_dsc < max_dsc)
+	if (m_dsc < max_dsc)
 	{
 		++m_dsc;
 	}
-	else if(m_sar < (SDR_MAX_SEGMENTS-1))
+	else if (m_sar < (SDR_MAX_SEGMENTS-1))
 	{
 		m_dsc = DSC_SDR_BAH;
 		++m_sar;
@@ -130,7 +136,7 @@ void z8010_device::device_reset()
 
 uint16_t z8010_device::segtack_r()
 {
-	if(m_vtype)
+	if (m_vtype)
 	{
 		m_out_segt(CLEAR_LINE);
 		return (uint16_t)(1 << (8 + (m_mode & MODE_ID_MASK)));
@@ -147,7 +153,7 @@ uint8_t z8010_device::read(offs_t offset)
 {
 	LOG("%s read cmd: %02x\n", machine().describe_context(), offset);
 
-	switch(offset)
+	switch (offset)
 	{
 	/* control registers */
 	case 0x00: return m_mode;
@@ -158,7 +164,7 @@ uint8_t z8010_device::read(offs_t offset)
 	case 0x08:
 		{
 		uint8_t value;
-		if(m_dsc > DSC_SDR_BAL)
+		if (m_dsc > DSC_SDR_BAL)
 			m_dsc = DSC_SDR_BAH;
 		value = CUR_SDR_FIELD;
 		INC_DSC(DSC_SDR_BAL);
@@ -179,7 +185,7 @@ uint8_t z8010_device::read(offs_t offset)
 	case 0x0c:
 		{
 		uint8_t value;
-		if(m_dsc > DSC_SDR_BAL)
+		if (m_dsc > DSC_SDR_BAL)
 			m_dsc = DSC_SDR_BAH;
 		value = CUR_SDR_FIELD;
 		INC_DSC_SAR(DSC_SDR_BAL);
@@ -229,7 +235,7 @@ void z8010_device::write(offs_t offset, uint8_t data)
 {
 	LOG("%s write cmd: %02x = %02x\n", machine().describe_context(), offset, data);
 
-	switch(offset)
+	switch (offset)
 	{
 	/* control registers */
 	case 0x00: m_mode = data; break;
@@ -238,7 +244,7 @@ void z8010_device::write(offs_t offset, uint8_t data)
 
 	/* segment descriptor registers */
 	case 0x08:
-		if(m_dsc > DSC_SDR_BAL)
+		if (m_dsc > DSC_SDR_BAL)
 			m_dsc = DSC_SDR_BAH;
 		CUR_SDR_FIELD = data;
 		INC_DSC(DSC_SDR_BAL);
@@ -256,7 +262,7 @@ void z8010_device::write(offs_t offset, uint8_t data)
 		INC_DSC();
 		break;
 	case 0x0c:
-		if(m_dsc > DSC_SDR_BAL)
+		if (m_dsc > DSC_SDR_BAL)
 			m_dsc = DSC_SDR_BAH;
 		CUR_SDR_FIELD = data;
 		INC_DSC_SAR(DSC_SDR_BAL);
@@ -277,7 +283,7 @@ void z8010_device::write(offs_t offset, uint8_t data)
 		break;
 	case 0x15:
 		{
-		for(int i=0; i<SDR_MAX_SEGMENTS; i++)
+		for (int i = 0; i < SDR_MAX_SEGMENTS; i++)
 		{
 			uint8_t &value = SDR_ENTRY(i).attr;
 			value = (data ? (value | SDR_ATTR_CPUI) :
@@ -287,7 +293,7 @@ void z8010_device::write(offs_t offset, uint8_t data)
 		break;
 	case 0x16:
 		{
-		for(int i=0; i<SDR_MAX_SEGMENTS; i++)
+		for (int i = 0; i < SDR_MAX_SEGMENTS; i++)
 		{
 			uint8_t &value = SDR_ENTRY(i).attr;
 			value = (data ? (value | SDR_ATTR_DMAI) :
@@ -304,8 +310,6 @@ void z8010_device::write(offs_t offset, uint8_t data)
 		logerror("%s ERROR invalid write cmd %02x = %02x\n", machine().describe_context(), offset, data);
 		break;
 	}
-
-	//m_mode |= MODE_MSEN;	// Any command sets the master enable
 }
 
 //-------------------------------------------------
@@ -314,7 +318,7 @@ void z8010_device::write(offs_t offset, uint8_t data)
 
 bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int st)
 {
-	bool sup = false;
+	bool nsup = true;
 	bool exec;
 
 	st &= BCS_CPU_MASK;
@@ -322,16 +326,16 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 
 	m_bcs = (sys * BCS_N_S) | (write * BCS_R_W) | (st);
 
-	if(!(m_mode & MODE_MSEN) ||	// Master enable?
-		(((m_mode & MODE_URS) != 0) != ((offset & 0x400000) != 0)) ||	// Upper range select?
+	if (!(m_mode & MODE_MSEN) ||										// Master enable?
+		(((m_mode & MODE_URS) != 0) != BIT(offset, 22)) ||				// Upper range select?
 		((m_mode & MODE_MST) && (((m_mode & MODE_NMS) == 0) != sys)))	// System/normal mode?
 	{
 		offset = 0;
-		LOG("%s: !!! INVALID MMU STATE !!! offset: %06x, mode: %02x, sys: %01x\n", machine().describe_context(), offset, m_mode, sys);
-		return true;
+		LOG("%s: INVALID MMU STATE! offset: %06x, mode: %02x, sys: %01x\n", machine().describe_context(), offset, m_mode, sys);
+		return false;
 	}
 
-	if(m_mode & MODE_TRNS)	// Is translation on?
+	if (m_mode & MODE_TRNS)	// Is translation on?
 	{
 		uint8_t sn = ((uint8_t)(offset >> 16)) & 0x3f;
 		uint8_t so = (uint8_t)(offset >> 8);
@@ -347,41 +351,41 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 		viol &= s.attr;
 
 		// Length violation?
-		if(is_stack)
+		if (is_stack)
 		{
-			if(so < s.limit)
+			if (so < s.limit)
 			{
 				viol |= VTYPE_SLV;
 			}
 		}
-		else if(so > s.limit)
+		else if (so > s.limit)
 		{
 			viol |= VTYPE_SLV;
 		}
 
-		if( viol ||
-			(dma && (s.attr & SDR_ATTR_DMAI)) )	// DMA-inhibit violaiton?
+		if (viol ||
+			(dma && (s.attr & SDR_ATTR_DMAI)))	// DMA-inhibit violaiton?
 		{
-			sup = true;
+			nsup = false;
 		}
 
 		// Check write warnings
-		if(write && is_stack && (so == s.limit))
+		if (write && is_stack && (so == s.limit))
 		{
-			if(m_vtype == 0)	// Primary write warning?
+			if (m_vtype == 0)	// Primary write warning?
 				viol |= VTYPE_PWW;
-			else if((m_vtype < VTYPE_SWW) && sys)	// Secondary write warning?
+			else if ((m_vtype < VTYPE_SWW) && sys)	// Secondary write warning?
 				viol |= VTYPE_SWW;
-			else if(!sys)	// Fatal?
+			else if (!sys)	// Fatal?
 			{
-				sup = true;
+				nsup = false;
 				viol |= VTYPE_FATL;
 			}
 		}
 
-		if(viol)
+		if (viol)
 		{
-			if(m_vtype && !(viol & VTYPE_SWW))	// Fatal?
+			if (m_vtype && !(viol & VTYPE_SWW))	// Fatal?
 			{
 				viol |= VTYPE_FATL;
 			}
@@ -390,7 +394,7 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 			m_vhoffs = so;
 
 			// No trap if in DMA mode or repeated SWW and FATL violations
-			if((!dma) && ((m_vtype & viol) & (VTYPE_SWW | VTYPE_FATL)) == 0)
+			if ((!dma) && ((m_vtype & viol) & (VTYPE_SWW | VTYPE_FATL)) == 0)
 			{
 				// Generate Segment Trap
 				m_out_segt(ASSERT_LINE);
@@ -399,13 +403,13 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 			m_vtype |= viol;
 		}
 
-		if(!m_vtype || ((m_vtype >= VTYPE_PWW) && !(m_vtype & VTYPE_FATL)))
+		if (!m_vtype || ((m_vtype >= VTYPE_PWW) && !(m_vtype & VTYPE_FATL)))
 		{
-			if(write)
+			if (write)
 			{
 				s.attr |= SDR_ATTR_CHG;
 			}
-			else if(st == z8002_device::ST_IFETCH_1)
+			else if (st == z8002_device::ST_IFETCH_1)
 			{
 				// Save high address of successfully fetched instruction
 				m_iseg = sn;
@@ -419,8 +423,8 @@ bool z8010_device::translate(offs_t &offset, bool write, bool sys, bool dma, int
 		offset &= 0xffff;
 		offset += ((offs_t)(s.bah) << 16) | ((offs_t)(s.bal) << 8);
 
-		LOG("SUCCESSFUL TRNS: new offs %06x, seg: %02x, viol: %02x, sup: %01x\n", offset, sn, viol, sup);
+		LOG("MMU TRNS: new offs %06x, seg: %02x, viol: %02x, sup: %01x\n", offset, sn, viol, !nsup);
 	}
 
-	return sup;
+	return nsup;
 }

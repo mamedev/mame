@@ -25,8 +25,9 @@
 
 ***************************************************************************/
 
+//TODO: Series Two (HPCPU) Models
+
 #include "emu.h"
-#include "ioport.h"
 
 #include "bus/rs232/rs232.h"
 #include "bus/centronics/ctronics.h"
@@ -37,6 +38,8 @@
 #include "machine/z80sio.h"
 #include "machine/z80pio.h"
 #include "machine/ram.h"
+
+#include "ioport.h"
 
 #include "s8k.lh"
 
@@ -56,7 +59,7 @@ public:
 	}
 
 	void reti_w(uint8_t data)
-		{ if(data == 0x4d) daisy_call_reti_device(); }
+		{ if (data == 0x4d) daisy_call_reti_device(); }
 
 protected:
 	void device_start() override
@@ -244,7 +247,7 @@ INPUT_PORTS_END
 
 void s8k_state::start_btn_w(int state)
 {
-	if(state & (m_nmi_code == 0))
+	if (state & (m_nmi_code == 0))
 	{
 		m_nmi_code = S8K_NMI_MANUAL;
 		m_maincpu->set_input_line(z8001_device::NMI_LINE, ASSERT_LINE);
@@ -257,7 +260,7 @@ void s8k_state::start_btn_w(int state)
 
 uint8_t s8k_state::ecc_reg_r()
 {
-	LOG("%s -> ECC REGISTER READ! \n");
+	LOG("%s -> ECC REGISTER READ! \n", machine().describe_context());
 	return m_ecc_reg;
 }
 
@@ -278,9 +281,9 @@ void s8k_state::reg_scr_w(uint8_t data)
 
 	LOG("%s reg_scr_w: %02x\n", machine().describe_context(), data);
 
-	if(diff & S8K_SCR_BD_MEMON)
+	if (diff & S8K_SCR_BD_MEMON)
 	{
-		if(data & S8K_SCR_BD_MEMON)
+		if (data & S8K_SCR_BD_MEMON)
 		{
 			m_view_code.disable();
 			m_view_data.disable();
@@ -294,14 +297,14 @@ void s8k_state::reg_scr_w(uint8_t data)
 		}
 	}
 
-	if(diff & S8K_SCR_MMU_ONH)
+	if (diff & S8K_SCR_MMU_ONH)
 	{
 		m_maincpu->space(AS_PROGRAM).invalidate_caches(read_or_write::READWRITE);
 		m_maincpu->space(AS_DATA).invalidate_caches(read_or_write::READWRITE);
 		m_maincpu->space(z8001_device::AS_STACK).invalidate_caches(read_or_write::READWRITE);
 	}
 
-	if(diff & S8K_SCR_SEG_USER)
+	if (diff & S8K_SCR_SEG_USER)
 	{
 		m_is_seg_user = data & S8K_SCR_SEG_USER;
 	}
@@ -348,11 +351,11 @@ uint8_t s8k_state::reg_if1l_r()
 
 uint8_t s8k_state::comms_r(offs_t offset)
 {
-	if((offset & 1) == 0)
+	if (!BIT(offset, 0))
 	{
 		offset >>= 1;
 
-		switch(offset & 0xfc)
+		switch (offset & 0xfc)
 		{
 		case 0x00: return m_sio[0]->cd_ba_r(offset);
 		case 0x04: return m_sio[1]->cd_ba_r(offset);
@@ -372,11 +375,11 @@ uint8_t s8k_state::comms_r(offs_t offset)
 
 void s8k_state::comms_w(offs_t offset, uint8_t data)
 {
-	if((offset & 1) == 0)
+	if (!BIT(offset, 0))
 	{
 		offset >>= 1;
 
-		switch(offset & 0xfc)
+		switch (offset & 0xfc)
 		{
 		case 0x00: m_sio[0]->cd_ba_w(offset, data); break;
 		case 0x04: m_sio[1]->cd_ba_w(offset, data); break;
@@ -394,16 +397,13 @@ void s8k_state::comms_w(offs_t offset, uint8_t data)
 
 uint8_t s8k_state::mmu_cmd_r(offs_t offset)
 {
-	if((offset & 1) == 0)
+	if (!BIT(offset, 0))
 	{
 		uint8_t reg = (uint8_t)(offset >> 8);
 
-		if((offset & 0x2) == 0)
-			return m_mmu_code->read(reg);
-		if((offset & 0x4) == 0)
-			return m_mmu_data->read(reg);
-		if((offset & 0x8) == 0)
-			return m_mmu_stck->read(reg);
+		if (!BIT(offset, 1)) return m_mmu_code->read(reg);
+		if (!BIT(offset, 2)) return m_mmu_data->read(reg);
+		if (!BIT(offset, 3)) return m_mmu_stck->read(reg);
 	}
 
 	return 0xff;
@@ -411,16 +411,13 @@ uint8_t s8k_state::mmu_cmd_r(offs_t offset)
 
 void s8k_state::mmu_cmd_w(offs_t offset, uint8_t data)
 {
-	if((offset & 1) == 0)
+	if (!BIT(offset, 0))
 	{
 		uint8_t reg = (uint8_t)(offset >> 8);
 
-		if((offset & 0x2) == 0)
-			m_mmu_code->write(reg, data);
-		if((offset & 0x4) == 0)
-			m_mmu_data->write(reg, data);
-		if((offset & 0x8) == 0)
-			m_mmu_stck->write(reg, data);
+		if (!BIT(offset, 1)) m_mmu_code->write(reg, data);
+		if (!BIT(offset, 2)) m_mmu_data->write(reg, data);
+		if (!BIT(offset, 3)) m_mmu_stck->write(reg, data);
 
 		m_maincpu->space(AS_PROGRAM).invalidate_caches(read_or_write::READWRITE);
 		m_maincpu->space(AS_DATA).invalidate_caches(read_or_write::READWRITE);
@@ -500,11 +497,11 @@ z8010_device *s8k_state::select_code_mmu(offs_t offset)
 
 	LOG("%s CODE MMU SELECT, offset: %06x\n", machine().describe_context(), offset);
 
-	if(m_is_seg_os)
+	if (m_is_seg_os)
 	{
-		if(m_is_seg_user && m_normal_led)	//Use normal LED as N/S indicator
+		if (m_is_seg_user && m_normal_led)	//Use normal LED as N/S indicator
 		{
-			if(seg < 64)
+			if (seg < 64)
 				mmu = m_mmu_data;
 			else
 				mmu = m_mmu_stck;
@@ -512,9 +509,9 @@ z8010_device *s8k_state::select_code_mmu(offs_t offset)
 	}
 	else	// Non-seg OS
 	{
-		if((seg & 0x3f) < 2)	// OS segs 0,1,64,65
+		if ((seg & 0x3f) < 2)	// OS segs 0,1,64,65
 		{
-			if(m_normal_led)	// Trying to access in normal mode?
+			if (m_normal_led)	// Trying to access in normal mode?
 			{
 				// SEGTRAP!
 				m_reg_snvr = seg;
@@ -523,9 +520,9 @@ z8010_device *s8k_state::select_code_mmu(offs_t offset)
 				segt_interrupt(1);
 			}
 		}
-		else if(m_is_seg_user)
+		else if (m_is_seg_user)
 		{
-			if(seg < 64)
+			if (seg < 64)
 				mmu = m_mmu_data;
 			else
 				mmu = m_mmu_stck;
@@ -543,29 +540,29 @@ z8010_device *s8k_state::select_data_mmu(offs_t offset)
 
 	LOG("%s DATA MMU SELECT, offset: %06x\n", machine().describe_context(), offset);
 
-	if(m_is_seg_os)
+	if (m_is_seg_os)
 	{
-		if(!m_normal_led)	// System mode
+		if (!m_normal_led)	// System mode
 		{
 			mmu = m_mmu_code;
 		}
-		else if(m_is_seg_user)
+		else if (m_is_seg_user)
 		{
-			if(seg < 64)
+			if (seg < 64)
 			{
 				mmu = m_mmu_data;
 			}
 		}
-		else if(seg_offs < m_reg_nbr)
+		else if (seg_offs < m_reg_nbr)
 		{
 			mmu = m_mmu_data;
 		}
 	}
 	else	// Non-seg OS
 	{
-		if((seg & 0x3f) < 2)	// OS segs 0,1,64,65
+		if ((seg & 0x3f) < 2)	// OS segs 0,1,64,65
 		{
-			if(m_normal_led)	// Trying to access in normal mode?
+			if (m_normal_led)	// Trying to access in normal mode?
 			{
 				// SEGTRAP!
 				m_reg_snvr = seg;
@@ -573,19 +570,19 @@ z8010_device *s8k_state::select_data_mmu(offs_t offset)
 				mmu = nullptr;
 				segt_interrupt(1);
 			}
-			else if(seg_offs < m_reg_sbr)
+			else if (seg_offs < m_reg_sbr)
 			{
 				mmu = m_mmu_data;
 			}
 		}
-		else if(m_is_seg_user)
+		else if (m_is_seg_user)
 		{
-			if(seg < 64)
+			if (seg < 64)
 			{
 				mmu = m_mmu_data;
 			}
 		}
-		else if(seg_offs < m_reg_nbr)
+		else if (seg_offs < m_reg_nbr)
 		{
 			mmu = m_mmu_data;
 		}
@@ -600,19 +597,19 @@ bool s8k_state::translate_addr(int spacenum, bool write, offs_t &offset)
 
 	offset <<= 1;
 
-	if(stack_access)
+	if (stack_access)
 	{
 		m_ctc[0]->trg3(1);
 		m_ctc[0]->trg3(0);
 	}
 
-	if(m_reg_scr & S8K_SCR_MMU_ONH)
+	if (m_reg_scr & S8K_SCR_MMU_ONH)
 	{
 		bool code_access = (spacenum == AS_PROGRAM);
 		z8010_device *mmu = code_access ?
 							select_code_mmu(offset) : select_data_mmu(offset);
 
-		if(mmu)
+		if (mmu)
 		{
 			int st = code_access ?
 						(m_maincpu->is_ifetch1() ?
@@ -624,12 +621,12 @@ bool s8k_state::translate_addr(int spacenum, bool write, offs_t &offset)
 
 			LOG("%s MMU MEM REQ (space %d): %06x\n", machine().describe_context(), spacenum, offset);
 
-			offset &= 0x3fffff;	// Mask off seg bit 7 to disable URS checking in MMUs
+			offset &= 0x3f'ffff;	// Mask off seg bit 7 to disable URS checking in MMUs
 
-			return !mmu->translate(offset, write, true, m_busack_led, st);
+			return mmu->translate(offset, write, true, m_busack_led, st);
 		}
 	}
-	else if(offset < m_ram->size())
+	else if (offset < m_ram->size())
 	{
 		return true;
 	}
@@ -639,13 +636,13 @@ bool s8k_state::translate_addr(int spacenum, bool write, offs_t &offset)
 
 uint16_t s8k_state::ram_r(address_space &space, offs_t offset, uint16_t mask)
 {
-	if(translate_addr(space.spacenum(), false, offset))
+	if (translate_addr(space.spacenum(), false, offset))
 	{
 		const uint8_t *memptr = m_ram->pointer() + offset;
 
 		return (mask & big_endianize_int16(reinterpret_cast<const uint16_t*>(memptr)[0]));
 	}
-	else if(space.spacenum() == AS_PROGRAM)
+	else if (space.spacenum() == AS_PROGRAM)
 		return 0x8d07;	// NOP instruction
 	else
 		return 0;
@@ -653,13 +650,13 @@ uint16_t s8k_state::ram_r(address_space &space, offs_t offset, uint16_t mask)
 
 void s8k_state::ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mask)
 {
-	if(translate_addr(space.spacenum(), true, offset))
+	if (translate_addr(space.spacenum(), true, offset))
 	{
 		uint8_t *memptr = m_ram->pointer() + offset;
 
-		if(mask & 0xff00)
+		if (mask & 0xff00)
 			memptr[0] = (uint8_t)(data >> 8);
-		if(mask & 0x00ff)
+		if (mask & 0x00ff)
 			memptr[1] = (uint8_t)(data);
 	}
 }
@@ -674,11 +671,11 @@ void s8k_state::install_memory()
 	address_space& sspace = m_maincpu->space(z8001_device::AS_STACK);
 
 	// Install handlers over entire address space
-	pspace.install_readwrite_handler(0x000000, 0x7fffff,
+	pspace.install_readwrite_handler(0x00'0000, 0x7f'ffff,
 		read16_delegate(*this, FUNC(s8k_state::ram_r)), write16_delegate(*this, FUNC(s8k_state::ram_w)));
-	dspace.install_readwrite_handler(0x000000, 0x7fffff,
+	dspace.install_readwrite_handler(0x00'0000, 0x7f'ffff,
 		read16_delegate(*this, FUNC(s8k_state::ram_r)), write16_delegate(*this, FUNC(s8k_state::ram_w)));
-	sspace.install_readwrite_handler(0x000000, 0x7fffff,
+	sspace.install_readwrite_handler(0x00'0000, 0x7f'ffff,
 		read16_delegate(*this, FUNC(s8k_state::ram_r)), write16_delegate(*this, FUNC(s8k_state::ram_w)));
 
 	pspace.install_view(0x0000, 0x7fff, m_view_code);
@@ -691,7 +688,6 @@ void s8k_state::install_memory()
 	m_view_data[0].install_rom(0x0000, 0x3fff, LROM);
 	m_view_data[0].install_ram(0x4000, 0x47ff, LRAM);
 	m_view_stck[0].install_ram(0x4000, 0x47ff, LRAM);
-	//m_view_data[0].install_ram(0x7800, 0x7fff, LRAM);
 }
 
 //**************************************************************************
@@ -710,7 +706,7 @@ uint16_t s8k_state::segtack_r()
 					 m_mmu_stck->segtack_r());
 
 	// Locally triggered?
-	if(code == 0)
+	if (code == 0)
 	{
 		segt_interrupt(0);
 	}
@@ -725,18 +721,6 @@ uint16_t s8k_state::nmiack_r()
 	uint16_t code = m_nmi_code;
 
 	m_nmi_code = 0;
-	//if(m_start_btn.read())
-	//	code = S8K_NMI_MANUAL;
-	//else if(/* power failure */)
-	//	code = NMI_SRC_PWRFAIL;
-	//else if(/* ECC error */)
-	//	code = NMI_SRC_ECCERR;
-	//else
-	//{
-	//	// Get code from ZBI bus
-	//	code = m_zbi->read();
-	//}
-
 	m_maincpu->set_input_line(z8001_device::NMI_LINE, CLEAR_LINE);
 
 	return code;
@@ -911,11 +895,11 @@ void s8k_state::s8k(machine_config &config)
 	rs232_port_device &rs232_0(RS232_PORT(config, "sio0:cha:tty0", default_rs232_devices, nullptr));
 	rs232_0.rxd_handler().set(m_sio[0], FUNC(z80sio_device::rxa_w));
 	rs232_0.cts_handler().set(m_sio[0], FUNC(z80sio_device::ctsa_w));
+	rs232_0.dcd_handler().set(m_sio[0], FUNC(z80sio_device::dcda_w));
 	rs232_port_device &rs232_1(RS232_PORT(config, "sio0:chb:console", default_rs232_devices, "terminal"));
 	rs232_1.rxd_handler().set(m_sio[0], FUNC(z80sio_device::rxb_w));
 	rs232_1.cts_handler().set(m_sio[0], FUNC(z80sio_device::ctsb_w));
-	//rs232_1.dcd_handler().set(m_sio0, FUNC(z80sio_device::dcdb_w));
-	//rs232_1.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
+	rs232_1.dcd_handler().set(m_sio[0], FUNC(z80sio_device::dcdb_w));
 
 	Z80SIO(config, m_sio[1], MAIN_CLOCK);
 	m_sio[1]->out_txda_callback().set("sio1:cha:tty2", FUNC(rs232_port_device::write_txd));
@@ -929,9 +913,11 @@ void s8k_state::s8k(machine_config &config)
 	rs232_port_device &rs232_2(RS232_PORT(config, "sio1:cha:tty2", default_rs232_devices, nullptr));
 	rs232_2.rxd_handler().set(m_sio[1], FUNC(z80sio_device::rxa_w));
 	rs232_2.cts_handler().set(m_sio[1], FUNC(z80sio_device::ctsa_w));
+	rs232_2.dcd_handler().set(m_sio[1], FUNC(z80sio_device::dcda_w));
 	rs232_port_device &rs232_3(RS232_PORT(config, "sio1:chb:tty3", default_rs232_devices, nullptr));
 	rs232_3.rxd_handler().set(m_sio[1], FUNC(z80sio_device::rxb_w));
 	rs232_3.cts_handler().set(m_sio[1], FUNC(z80sio_device::ctsb_w));
+	rs232_3.dcd_handler().set(m_sio[1], FUNC(z80sio_device::dcdb_w));
 
 	Z80SIO(config, m_sio[2], MAIN_CLOCK);
 	m_sio[2]->out_txda_callback().set("sio2:cha:tty4", FUNC(rs232_port_device::write_txd));
@@ -945,9 +931,11 @@ void s8k_state::s8k(machine_config &config)
 	rs232_port_device &rs232_4(RS232_PORT(config, "sio2:cha:tty4", default_rs232_devices, nullptr));
 	rs232_4.rxd_handler().set(m_sio[2], FUNC(z80sio_device::rxa_w));
 	rs232_4.cts_handler().set(m_sio[2], FUNC(z80sio_device::ctsa_w));
+	rs232_4.dcd_handler().set(m_sio[2], FUNC(z80sio_device::dcda_w));
 	rs232_port_device &rs232_5(RS232_PORT(config, "sio2:chb:tty5", default_rs232_devices, nullptr));
 	rs232_5.rxd_handler().set(m_sio[2], FUNC(z80sio_device::rxb_w));
 	rs232_5.cts_handler().set(m_sio[2], FUNC(z80sio_device::ctsb_w));
+	rs232_5.dcd_handler().set(m_sio[2], FUNC(z80sio_device::dcdb_w));
 
 	Z80SIO(config, m_sio[3], MAIN_CLOCK);
 	m_sio[3]->out_txda_callback().set("sio3:cha:tty6", FUNC(rs232_port_device::write_txd));
@@ -961,9 +949,11 @@ void s8k_state::s8k(machine_config &config)
 	rs232_port_device &rs232_6(RS232_PORT(config, "sio3:cha:tty6", default_rs232_devices, nullptr));
 	rs232_6.rxd_handler().set(m_sio[3], FUNC(z80sio_device::rxa_w));
 	rs232_6.cts_handler().set(m_sio[3], FUNC(z80sio_device::ctsa_w));
+	rs232_6.dcd_handler().set(m_sio[3], FUNC(z80sio_device::dcda_w));
 	rs232_port_device &rs232_7(RS232_PORT(config, "sio3:chb:tty7", default_rs232_devices, nullptr));
 	rs232_7.rxd_handler().set(m_sio[3], FUNC(z80sio_device::rxb_w));
 	rs232_7.cts_handler().set(m_sio[3], FUNC(z80sio_device::ctsb_w));
+	rs232_7.dcd_handler().set(m_sio[3], FUNC(z80sio_device::dcdb_w));
 
 	Z80CTC(config, m_ctc[0], MAIN_CLOCK);
 	m_ctc[0]->set_clk<0>(CTC_CLOCK);
@@ -1004,7 +994,6 @@ void s8k_state::s8k(machine_config &config)
 	Z80PIO(config, m_pio, MAIN_CLOCK);
 	m_pio->in_pa_callback().set(FUNC(s8k_state::pa_data_r));
 	m_pio->out_pb_callback().set("pio0:printer1:data_out", FUNC(output_latch_device::write));
-	//m_pio->out_brdy_callback().set("pio0:printer1:data_out", FUNC(output_latch_device::write));
 	m_pio->out_int_callback().set(FUNC(s8k_state::daisy_interrupt));
 
 	centronics_device &centronics(CENTRONICS(config, "pio0:printer1", centronics_devices, nullptr));
@@ -1038,17 +1027,6 @@ ROM_START( s8000 )
 	ROMX_LOAD("cpu-22.u76", 0x0000, 0x1000, CRC(198ce8ee) SHA1(743d75dab6f4ea85b2f95ec1b620134f4416a351), ROM_SKIP(1) | ROM_BIOS(1))
 	ROMX_LOAD("cpu-22.u77", 0x2000, 0x1000, CRC(43660a81) SHA1(8398d1998384ea0a95fcad58f791d9657e023b83), ROM_SKIP(1) | ROM_BIOS(1))
 ROM_END
-
-//TODO: Series Two (HPCPU) Models
-/*
-ROM_START( s8000_s2 )
-	ROM_REGION16_BE(0x4000, "maincpu", 0)
-
-	ROM_SYSTEM_BIOS(0, "v101", "Version 10.1")
-	ROMX_LOAD("cpu-101.19e", 0x0000, 0x2000, CRC(a77055c8) SHA1(f1268c6b163f9e4151d425ccc2f5cb4c9c0af8c8), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("cpu-101.21e", 0x0001, 0x2000, CRC(610e8b0c) SHA1(bc804e09cf6905c9f0ccc502a15c98841ee4b087), ROM_SKIP(1) | ROM_BIOS(0))
-ROM_END
-*/
 
 } // anonymous namespace
 
