@@ -203,7 +203,7 @@ public:
 		m_nvram(*this, "nvram"),
 		m_dac(*this, "dac"),
 		m_digits(*this, "digit%u", 0U),
-		m_lamps(*this, "lamp%u", 0U),
+		m_lamps(*this, "lamp%u%u", 0U, 0U),
 		m_leds(*this, "led%u", 0U),
 		m_in0(*this, "IN0")
 	{ }
@@ -221,7 +221,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<ad7224_device> m_dac;
 	output_finder<8> m_digits;
-	output_finder<128> m_lamps;
+	output_finder<8,12> m_lamps;
 	output_finder<2> m_leds;
 	required_ioport m_in0;
 
@@ -239,7 +239,7 @@ private:
 	void mux2_w(uint8_t data);
 	void duart_output_w(uint8_t data);
 	void ym2149_portb_w(uint8_t data);
-	void lamps_w(uint8_t row, uint16_t data);
+	void lamps_w(uint16_t data);
 
 	void mem_map(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
@@ -272,14 +272,16 @@ uint8_t stellafr_state::mux_r()
 	return data;
 }
 
-void stellafr_state::lamps_w(uint8_t row, uint16_t data)
+void stellafr_state::lamps_w(uint16_t data)
 {
-	//LOG("Row %d\n",row);
+	uint16_t row_data = m_mux1 & 0x0fff;
+	uint8_t column = (m_mux1 >> 12) & 0x07;
+	//bool ensdap = BIT(m_mux1, 15);
+
 	for (int i = 0; i < 8; i++)
 	{
-		uint8_t lamp_index = (row * 10) + i;
-		bool lamp_value = BIT(data, i);
-		m_lamps[lamp_index] = lamp_value;
+		bool lamp_value = BIT(row_data, i);
+		m_lamps[column][i] = lamp_value;
 	}
 }
 
@@ -305,7 +307,7 @@ void stellafr_state::mux_w(uint8_t data)
 	if (enanz1)
 		; // LOG("ST %d\n",m_ma1);
 	if (enmux1)
-		lamps_w((m_mux1 >> 12) & 0x07, m_mux1 & 0x0FFF); //main lamps out
+		lamps_w(m_mux1); //main lamps out
 	if (enanz2)
 		; // LOG("ANZ2 %d\n",m_anz2);
 	if (enmux2)
