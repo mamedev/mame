@@ -4,6 +4,8 @@
 #ifndef MAME_BUS_ISA_SB16_H
 #define MAME_BUS_ISA_SB16_H
 
+#pragma once
+
 #include "isa.h"
 #include "bus/pc_joy/pc_joy.h"
 #include "cpu/mcs51/i80c52.h"
