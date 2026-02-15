@@ -33230,15 +33230,6 @@ version4v
 version4v2
 version4v3
 
-@source:misc/shangkid.cpp
-chinhero
-chinhero2
-chinhero3
-chinherot
-dynamski
-hiryuken
-shangkid
-
 @source:misc/silverball.cpp
 slvrball806
 slvrball720
@@ -33367,6 +33358,15 @@ pushover
 @source:misc/sumt8035.cpp
 sm_ngacc
 sm_ultng
+
+@source:misc/taiyo.cpp
+chinhero
+chinhero2
+chinhero3
+chinherot
+dynamski
+hiryuken
+shangkid
 
 @source:misc/tapatune.cpp
 smartoss
