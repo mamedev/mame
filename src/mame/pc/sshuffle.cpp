@@ -11,7 +11,7 @@ Based on an Asus "M2N68-AM PLUS" PCB:
 -GeForce 7025 / nForce 630a.
 
 Arachnid I/O PCB (P/N 42688):
--PIC18F4520 near a 40MHz cristal.
+-PIC18F4520 near a 40MHz crystal.
 -DB9 serial port (controlled by a MAX232A).
 -Buttons for reset and service.
 -Two custom connectors for left (blue) and right (yellow) laser sensors.
