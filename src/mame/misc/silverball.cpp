@@ -7,7 +7,8 @@ TAB Austria "Silverball" PC-based touch games
 TODO:
 - Existing dumps all punts at dongle checks, requiring an emulation of the parallel port device.
 - i440zx BIOSes crashes when writing Flash ROM sequences at PC=61C51 onward (by saving in CMOS).
-- slvrball806: crashes in vmm32.vxd loading, doesn't check the dongle, -chs mismatch with the comment;
+- slvrball806: crashes in vmm32.vxd loading, doesn't check the dongle, -chs mismatch with the
+  comment. Commented out for now;
 
 ===================================================================================================
 
@@ -81,9 +82,6 @@ void silverball_state::silverball_io(address_map &map)
 	map.unmap_value_high();
 }
 
-
-static INPUT_PORTS_START(silverball)
-INPUT_PORTS_END
 
 static void isa_internal_devices(device_slot_interface &device)
 {
@@ -201,15 +199,19 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ROMX_LOAD("test.bin",   0x00000, 0x20000, CRC(ddbd94f4) SHA1(60ad74e56265a7936cf19e8480c657223d11f2d0), ROM_BIOS(18)) /* 06/18/1998-EQ82C6618A-ET-2A5LDS2FC-29 */ \
 	ROM_RELOAD( 0x20000, 0x20000 )
 
-
-ROM_START(slvrball806)
+ROM_START(slvrball)
 	SILVERBALL_BIOS
-//  ROM_DEFAULT_BIOS("bios29") // The one dumped from the actual machine
 	ROM_DEFAULT_BIOS("bios33")
-
-	DISK_REGION( PCI_IDE_ID":ide1:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
-	DISK_IMAGE("silverball_8.06", 0, BAD_DUMP SHA1(4bd03240229a2f59d457e95e04837422c423111b)) // May contain operator data
 ROM_END
+
+//ROM_START(slvrball806)
+//	SILVERBALL_BIOS
+//  ROM_DEFAULT_BIOS("bios29") // The one dumped from the actual machine
+//	ROM_DEFAULT_BIOS("bios33")
+//
+//	DISK_REGION( PCI_IDE_ID":ide1:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
+//	DISK_IMAGE("silverball_8.06", 0, BAD_DUMP SHA1(4bd03240229a2f59d457e95e04837422c423111b)) // May contain operator data
+//ROM_END
 
 ROM_START(slvrball720)
 	SILVERBALL_BIOS
@@ -253,9 +255,11 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(1997?, slvrball806,    0,           silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
-GAME(1997?, slvrball720,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
-GAME(1997?, slvrball632,    slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
+GAME(199?, slvrball, 0, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball BIOS", MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
 
-GAME(199?,  slvrballbu409,  slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
-GAME(199?,  slvrballbu409b, slvrball806, silverball_i440zx, silverball, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING) // Probably the same as set 1
+//GAME(1997?, slvrball806,    slvrball, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
+GAME(1997?, slvrball720,    slvrball, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
+GAME(1997?, slvrball632,    slvrball, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
+
+GAME(199?,  slvrballbu409,  slvrball,      silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
+GAME(199?,  slvrballbu409b, slvrballbu409, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING) // Probably the same as set 1
