@@ -25,10 +25,10 @@
     - 24C02 EPROM
     - Modem serial interface.
     - The rear serial port (prise péri-informatique).
+    - Sound output.
 
     What is not yet implemented :
 
-    - Sound output.
     - Screen should go blank when switched off
 
     The original firmware and the experimental demo ROM are currently both working.
@@ -74,10 +74,13 @@
 #include "emupal.h"
 #include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "logmacro.h"
 
 namespace {
+
+const int MODEM_SAMPLE_RATE = 48000;
 
 // 14174 Control register bits definition
 enum
@@ -111,11 +114,12 @@ enum
 	PORT_3_SER_RDY = 1 << 5,
 };
 
-class minitel_state : public driver_device
+class minitel_state : public driver_device, public device_sound_interface
 {
 public:
 	minitel_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
+		, device_sound_interface(mconfig, *this)
 		, m_maincpu(*this, "maincpu")
 		, m_romslot(*this, "romslot")
 		, m_ts9347(*this, "ts9347")
@@ -131,6 +135,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	required_device<i80c32_device> m_maincpu;
@@ -150,12 +155,17 @@ private:
 
 	uint8_t last_ctrl_reg = 0;
 
-	int lineconnected = 0;
-	int tonedetect = 0;
+	sound_stream *modem_stream;
+	double modem_dtmf_phase1 = 0, modem_dtmf_phase2 = 0, modem_beep_phase = 0;
+	uint8_t modem_input_reg = 0;
+	uint8_t modem_rdtmf_reg = 0;
+	uint8_t modem_rwlo_reg = 0xF;
+	uint8_t modem_rptf_reg = 0;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(minitel_scanline);
 
-	void update_modem_state();
+	void modem_exec_command();
+	void update_modem_txd();
 
 	void port1_w(uint8_t data);
 	void port3_w(uint8_t data);
@@ -187,6 +197,67 @@ void minitel_state::machine_start()
 
 	if (m_romslot->exists())
 		m_maincpu->space(AS_PROGRAM).install_read_handler(0x0000, 0xffff, emu::rw_delegate(*m_romslot, FUNC(generic_slot_device::read_rom)));
+
+	modem_stream = stream_alloc(0, 1, MODEM_SAMPLE_RATE);
+}
+
+void minitel_state::sound_stream_update(sound_stream &stream)
+{
+	// In real hardware, DTMF tones are emitted on the phone line if DTMF=0,
+	// MCBC=1 and RTS=0. Given we only emulate the monitor output on the
+	// speaker, we also require that the transmit signal is selected for
+	// monitoring in RWLO.
+	bool dtmf_active =
+		(last_ctrl_reg & CTRL_REG_DTMF) == 0 &&
+		(last_ctrl_reg & CTRL_REG_MCBC) != 0 &&
+		(port1 & PORT_1_MDM_RTS) == 0 &&
+		modem_rwlo_reg <= 3;
+
+	// Tests if the "signalling-frequency" is selected for monitoring in RWLO.
+	// Note that "beep_active" and "dtmf_active" are mutually exclusive due to
+	// the different RWLO ranges.
+	bool beep_active = 8 <= modem_rwlo_reg && modem_rwlo_reg <= 11;
+
+	if (dtmf_active)
+	{
+		// Generate the two frequencies selected by RDTMF.
+		const double LOW_FREQS[4] = { 697, 770, 852, 941 };
+		const double HIGH_FREQS[4] = { 1209, 1336, 1477, 1633 };
+		const double rate1 = 2.0 * M_PI * LOW_FREQS[bitswap<2>(modem_rdtmf_reg, 1, 0)] / MODEM_SAMPLE_RATE;
+		const double rate2 = 2.0 * M_PI * HIGH_FREQS[bitswap<2>(modem_rdtmf_reg, 3, 2)] / MODEM_SAMPLE_RATE;
+		for (s32 i = 0; i < stream.samples(); i++)
+		{
+			double val = 0;
+			if (modem_rptf_reg != 0x8) // unless high-only filtered
+				val += sin(modem_dtmf_phase1);
+			if (modem_rptf_reg != 0x4) // unless low-only filtered
+				val += sin(modem_dtmf_phase2);
+			stream.put(0, i, 0.5 * val); // mixed sine waves
+			modem_dtmf_phase1 = fmod(modem_dtmf_phase1 + rate1, 2.0 * M_PI);
+			modem_dtmf_phase2 = fmod(modem_dtmf_phase2 + rate2, 2.0 * M_PI);
+		}
+	}
+	else
+	{
+		modem_dtmf_phase1 = 0;
+		modem_dtmf_phase2 = 0;
+	}
+
+	if (beep_active)
+	{
+		// Generate the fixed frequency.
+		const double BEEP_FREQ = 2982;
+		const double rate = 2.0 * M_PI * BEEP_FREQ / MODEM_SAMPLE_RATE;
+		for (s32 i = 0; i < stream.samples(); i++)
+		{
+			stream.put(0, i, modem_beep_phase >= M_PI ? +1 : -1); // square wave
+			modem_beep_phase = fmod(modem_beep_phase + rate, 2.0 * M_PI);
+		}
+	}
+	else
+	{
+		modem_beep_phase = 0;
+	}
 }
 
 void minitel_state::port1_w(uint8_t data)
@@ -213,14 +284,20 @@ void minitel_state::port1_w(uint8_t data)
 		LOG("PORT_1_MDM_TXD : %d \n", data & PORT_1_MDM_TXD );
 	}
 
-	if(lineconnected)
-	{
-		m_modem->write_txd(!!(data & PORT_1_MDM_TXD));
-	}
-
 	if( (port1 ^ data) & PORT_1_MDM_RTS )
 	{
 		LOG("PORT_1_MDM_RTS : %d \n", data & PORT_1_MDM_RTS );
+
+		// Generate audio until now using the old RTS value.
+		modem_stream->update();
+
+		// If the modem is in control mode (DTMF=MCBC=0), PRD feeds the input
+		// shift register (clocked by RTS) that receives the next command to
+		// execute.
+		bool in_control_mode = (last_ctrl_reg & (CTRL_REG_DTMF | CTRL_REG_MCBC)) == 0;
+		bool rts_falling_edge = (data & PORT_1_MDM_RTS) == 0;
+		if (in_control_mode && rts_falling_edge)
+			modem_input_reg = ((data & PORT_1_MDM_PRD) ? 0x80 : 0) | (modem_input_reg >> 1);
 	}
 
 	if( (port1 ^ data) & PORT_1_KBLOAD )
@@ -246,6 +323,7 @@ void minitel_state::port1_w(uint8_t data)
 	}
 
 	port1 = data;
+	update_modem_txd();
 }
 
 void minitel_state::port3_w(uint8_t data)
@@ -265,27 +343,38 @@ void minitel_state::serial_rxd(int state)
 		port3 &= ~PORT_3_SER_RXD;
 }
 
-
-void minitel_state::update_modem_state()
+void minitel_state::modem_exec_command()
 {
-	// 1300 Hz tone detection :  PORT_1_MDM_RTS = 1, CTRL_REG_DTMF = 0, CTRL_REG_MCBC = 0
-	if(  ( last_ctrl_reg & CTRL_REG_LINERELAY ) &&
-		 ( port1 & PORT_1_MDM_RTS ) &&
-		!( last_ctrl_reg & CTRL_REG_DTMF ) &&
-		!( last_ctrl_reg & CTRL_REG_MCBC ) )
-	{
-		tonedetect = 1;
-	}
-	else
-	{
-		tonedetect = 0;
-	}
+	LOG("modem_exec_command: %02x\n", modem_input_reg);
 
-	// Main transmission mode :  PORT_1_MDM_RTS = 0, CTRL_REG_DTMF = 1, CTRL_REG_MCBC = 0
-	if( last_ctrl_reg & CTRL_REG_LINERELAY )
-		lineconnected = 1;
+	uint8_t addr = (modem_input_reg >> 4) & 0x7;
+	uint8_t val = modem_input_reg & 0xf;
+
+	switch (addr)
+	{
+		case 0x1:
+			LOG("Setting RDTMF: %X\n", val);
+			modem_rdtmf_reg = val;
+			break;
+		case 0x3:
+			LOG("Setting RWLO: %X\n", val);
+			modem_rwlo_reg = val;
+			break;
+		case 0x4:
+			LOG("Setting RPTF: %X\n", val);
+			modem_rptf_reg = val;
+			break;
+		default:
+			logerror("Unimplemented TS7514 addr: %X val: %X\n", addr, val);
+	}
+}
+
+void minitel_state::update_modem_txd()
+{
+	if (last_ctrl_reg & CTRL_REG_LINERELAY)
+		m_modem->write_txd(!!(port1 & PORT_1_MDM_TXD));
 	else
-		lineconnected = 0;
+		m_modem->write_txd(1); // keep simulated rs232 at idle level.
 };
 
 uint8_t minitel_state::port1_r()
@@ -297,9 +386,8 @@ uint8_t minitel_state::port1_r()
 	data = ( ( (port1 & (0xFE & ~PORT_1_SDA) ) | ( (keyboard_x_row_reg>>7)&1) ) );
 	data |= (m_i2cmem->read_sda() ? PORT_1_SDA : 0);
 
-	update_modem_state();
-
-	if( lineconnected )
+	// If the relay is closed, report the line as connected.
+	if (last_ctrl_reg & CTRL_REG_LINERELAY)
 		data &= ~PORT_1_MDM_DCDn;
 	else
 		data |=  PORT_1_MDM_DCDn;
@@ -313,8 +401,6 @@ uint8_t minitel_state::port3_r()
 
 	LOG("port_r: read %02X from PORT3\n", port3);
 
-	update_modem_state();
-
 	data = (port3 & ~(PORT_3_SER_RDY)); // External port ready state
 
 	return data;
@@ -326,14 +412,18 @@ void minitel_state::dev_ctrl_reg_w(offs_t offset, uint8_t data)
 	{
 		LOG("minitel_state::hw_ctrl_reg : %x %x\n",offset, data);
 
-		if( (last_ctrl_reg ^ data) & CTRL_REG_DTMF )
+		if( (last_ctrl_reg ^ data) & (CTRL_REG_DTMF | CTRL_REG_MCBC) )
 		{
-			LOG("CTRL_REG_DTMF : %d \n", data & CTRL_REG_DTMF );
-		}
+			LOG("CTRL_REG_DTMF : %d  CTRL_REG_MCBC : %d\n", data & CTRL_REG_DTMF, data & CTRL_REG_MCBC );
 
-		if( (last_ctrl_reg ^ data) & CTRL_REG_MCBC )
-		{
-			LOG("CTRL_REG_MCBC : %d \n", data & CTRL_REG_MCBC );
+			// Generate audio until now using the old DTMF and MCBC values.
+			modem_stream->update();
+
+			// If leaving control mode (no longer DTMF=MCBC=0), execute the
+			// command that was shifted in.
+			bool was_control_mode = (last_ctrl_reg & (CTRL_REG_DTMF | CTRL_REG_MCBC)) == 0;
+			if (was_control_mode)
+				modem_exec_command();
 		}
 
 		if( (last_ctrl_reg ^ data) & CTRL_REG_OPTO )
@@ -350,9 +440,10 @@ void minitel_state::dev_ctrl_reg_w(offs_t offset, uint8_t data)
 		{
 			LOG("CTRL_REG_CRTON : %d \n", data & CTRL_REG_CRTON );
 		}
-	}
 
-	last_ctrl_reg = data;
+		last_ctrl_reg = data;
+		update_modem_txd();
+	}
 }
 
 uint8_t minitel_state::dev_keyb_ser_r(offs_t offset)
@@ -548,6 +639,9 @@ void minitel_state::minitel2(machine_config &config)
 
 	TIMER(config, "minitel_sl", 0).configure_scanline(FUNC(minitel_state::minitel_scanline), "screen", 0, 10);
 
+	SPEAKER(config, "speaker").front_center();
+	add_route(ALL_OUTPUTS, "speaker", 0.05);
+
 	RS232_PORT(config, m_modem, default_rs232_devices, nullptr);
 	m_modem->rxd_handler().set_inputline(m_maincpu, MCS51_INT1_LINE).invert();
 	m_modem->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(m_modem));
@@ -557,8 +651,6 @@ void minitel_state::minitel2(machine_config &config)
 	m_serport->rxd_handler().set(FUNC(minitel_state::serial_rxd));
 	m_serport->set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(m_serport));
 	m_serport->set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(m_serport));
-
-	lineconnected = 0;
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -600,4 +692,4 @@ ROM_END
 
 } // anonymous namespace
 
-COMP( 1989, minitel2, 0, 0, minitel2, minitel2, minitel_state, empty_init, "Philips", "Minitel 2 NFZ 400", MACHINE_NO_SOUND )
+COMP( 1989, minitel2, 0, 0, minitel2, minitel2, minitel_state, empty_init, "Philips", "Minitel 2 NFZ 400", 0 )
