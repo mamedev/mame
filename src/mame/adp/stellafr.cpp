@@ -221,7 +221,7 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_device<ad7224_device> m_dac;
 	output_finder<8> m_digits;
-	output_finder<8,12> m_lamps;
+	output_finder<16,12> m_lamps;
 	output_finder<2> m_leds;
 	required_ioport m_in0;
 
@@ -245,7 +245,7 @@ private:
 	void anz_en(uint8_t data);
 	void muenzspeicher_en(uint16_t data);
 	void serienspeicher_en(uint16_t data);
-	void lamps_en(uint16_t data);
+	void lamps_en(uint16_t data, bool second);
 	void service_en(uint16_t data);
 
 	uint8_t mux_r();
@@ -343,16 +343,16 @@ void stellafr_state::service_en(uint16_t data)
 	m_service = data;
 }
 
-void stellafr_state::lamps_en(uint16_t data)
+void stellafr_state::lamps_en(uint16_t data, bool second)
 {
-	uint16_t row_data = m_mux1 & 0x0fff;
-	uint8_t column = (m_mux1 >> 12) & 0x07;
-	//bool ensdap = BIT(m_mux1, 15);
+	uint16_t row_data = data & 0x0fff;
+	uint8_t column = (data >> 12) & 0x07;
+	//bool ensdap = BIT(data, 15);
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < 12; i++)
 	{
 		bool lamp_value = BIT(row_data, i);
-		m_lamps[column][i] = lamp_value;
+		m_lamps[second ? 8 + column : column][i] = lamp_value;
 	}
 }
 
@@ -378,11 +378,11 @@ void stellafr_state::mux_w(uint8_t data)
 	if (enanz1)
 		service_en(m_ma1); //service out
 	if (enmux1)
-		lamps_en(m_mux1); //main lamps out
+		lamps_en(m_mux1, false); //main lamps out
 	if (enanz2)
 		; // LOG("ANZ2 %d\n",m_anz2);
 	if (enmux2)
-		; // LOG("MUX2 %d\n",m_mux2);
+		lamps_en(m_mux2, true); //second lamps out
 	if (aw1)
 		;
 	if (aw2)
