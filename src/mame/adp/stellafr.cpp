@@ -234,7 +234,18 @@ private:
 	uint8_t m_anz2;
 	uint8_t m_mux2;
 
+	uint16_t m_anz_serienspeicher; // Anzout3
+	uint8_t  m_anz_einwurf; // Anzout4
+	uint16_t m_anz_muenzspeicher; // Anzout5
+
+	uint8_t m_count_ensda;
+
 	uint8_t mux_r();
+	void anz_w(uint8_t data);
+	void muenzspeicher_en(uint16_t data);
+	void serienspeicher_en(uint16_t data);
+	void anz_en(uint8_t data);
+
 	void mux_w(uint8_t data);
 	void mux2_w(uint8_t data);
 	void duart_output_w(uint8_t data);
@@ -272,6 +283,51 @@ uint8_t stellafr_state::mux_r()
 	return data;
 }
 
+void stellafr_state::anz_w(uint8_t data)
+{
+	m_anz_serienspeicher = (m_anz_serienspeicher << 1) | !BIT(data, 3);
+	m_anz_einwurf        = (m_anz_einwurf << 1) | BIT(data, 4);
+	m_anz_muenzspeicher  = (m_anz_muenzspeicher << 1)  | !BIT(data, 5);
+
+	m_count_ensda = m_count_ensda + 1;
+	if (m_count_ensda == 16)
+	{
+		m_count_ensda = 0;
+		serienspeicher_en(m_anz_serienspeicher);
+		muenzspeicher_en(m_anz_muenzspeicher);
+	}
+}
+
+void stellafr_state::muenzspeicher_en(uint16_t data)
+{
+	// dp,g,f,e,d,c,b,a
+	if (BIT(data, 8)) //100er & 1er
+	{
+		m_digits[4] = bitswap(data, 8, 3, 4, 2, 1, 0, 6, 5);
+		m_digits[2] = bitswap(data, 8, 12, 9, 14, 13, 15, 11, 10);
+	}
+	else
+	{
+		m_digits[3] = bitswap(data, 8, 12, 9, 14, 13, 15, 11, 10);
+		m_digits[1] = bitswap(data, 8, 3, 4, 2, 1, 0, 6, 5);
+	}
+}
+
+void stellafr_state::serienspeicher_en(uint16_t data)
+{
+	// dp,g,f,e,d,c,b,a
+	if (BIT(data, 8)) //100er & 1er
+	{
+		m_digits[7] = bitswap(data, 8, 3, 4, 2, 1, 0, 6, 5);
+		m_digits[5] = bitswap(data, 8, 12, 9, 14, 13, 15, 11, 10);
+	}
+	else
+	{
+		m_digits[6] = bitswap(data, 8, 12, 9, 14, 13, 15, 11, 10);
+		m_digits[0] = bitswap(data, 8, 3, 4, 2, 1, 0, 6, 5); // 0,01 muenz
+	}
+}
+
 void stellafr_state::lamps_w(uint16_t data)
 {
 	uint16_t row_data = m_mux1 & 0x0fff;
@@ -303,7 +359,7 @@ void stellafr_state::mux_w(uint8_t data)
 	if (enma2)
 		; // LOG("2MA %d\n",m_ma2);
 	if (enanz1)
-		; // LOG("ANZ1 %d\n",m_anz1); //main 7seg led out
+		anz_w(m_anz1); // LOG("ANZ1 %d\n",m_anz1); //main 7seg led out
 	if (enanz1)
 		; // LOG("ST %d\n",m_ma1);
 	if (enmux1)
@@ -370,7 +426,12 @@ void stellafr_state::machine_start()
 	m_digits.resolve();
 	m_lamps.resolve();
 	m_leds.resolve();
+	save_item(NAME(m_anz1));
 	save_item(NAME(m_mux1));
+	save_item(NAME(m_anz_serienspeicher));
+	save_item(NAME(m_anz_einwurf));
+	save_item(NAME(m_anz_muenzspeicher));
+
 }
 
 void stellafr_state::machine_reset()
