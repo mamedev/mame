@@ -1099,28 +1099,24 @@ inline void adsp21062_device::PUSH_STATUS_STACK()
 	if (m_core->status_stkp >= 5)
 		fatalerror("SHARC: Status stack overflow!\n");
 
-	if (m_core->status_stkp == 0)
-		m_core->stky |= SSEM;
-	else
-		m_core->stky &= ~SSEM;
+	m_core->status_stack[m_core->status_stkp - 1].mode1 = GET_UREG(REG_MODE1);
+	m_core->status_stack[m_core->status_stkp - 1].astat = GET_UREG(REG_ASTAT);
 
-	m_core->status_stack[m_core->status_stkp].mode1 = GET_UREG(REG_MODE1);
-	m_core->status_stack[m_core->status_stkp].astat = GET_UREG(REG_ASTAT);
+	m_core->stky &= ~SSEM;
 }
 
 inline void adsp21062_device::POP_STATUS_STACK()
 {
+	if (m_core->status_stkp <= 0)
+		fatalerror("SHARC: Status stack underflow!\n");
+
+	m_core->status_stkp--;
+
 	SET_UREG(REG_MODE1, m_core->status_stack[m_core->status_stkp].mode1);
 	SET_UREG(REG_ASTAT, m_core->status_stack[m_core->status_stkp].astat);
 
-	m_core->status_stkp--;
-	if (m_core->status_stkp < 0)
-		fatalerror("SHARC: Status stack underflow!\n");
-
 	if (m_core->status_stkp == 0)
 		m_core->stky |= SSEM;
-	else
-		m_core->stky &= ~SSEM;
 }
 
 inline int adsp21062_device::IF_CONDITION_CODE(int cond)
@@ -1667,13 +1663,13 @@ void adsp21062_device::sharcop_direct_jump()
 	int const cond = op_get_cond(m_core->opcode);
 	uint32_t const address = m_core->opcode & 0xffffff;
 
-	if(IF_CONDITION_CODE(cond))
+	if (IF_CONDITION_CODE(cond))
 	{
 		// Clear Interrupt
 		if (ci)
 		{
-			// TODO: anything else?
-			if (m_core->status_stkp > 0)
+			// TODO: timer and VIRPT interrupts also push the status stack
+			if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 				POP_STATUS_STACK();
 
 			m_core->interrupt_active = 0;
@@ -1732,8 +1728,8 @@ void adsp21062_device::sharcop_relative_jump()
 		// Clear Interrupt
 		if (ci)
 		{
-			// TODO: anything else?
-			if (m_core->status_stkp > 0)
+			// TODO: timer and VIRPT interrupts also push the status stack
+			if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 				POP_STATUS_STACK();
 
 			m_core->interrupt_active = 0;
@@ -1771,8 +1767,8 @@ void adsp21062_device::sharcop_indirect_jump()
 	// Clear Interrupt
 	if (ci)
 	{
-		// TODO: anything else?
-		if (m_core->status_stkp > 0)
+		// TODO: timer and VIRPT interrupts also push the status stack
+		if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 			POP_STATUS_STACK();
 
 		m_core->interrupt_active = 0;
@@ -1893,8 +1889,8 @@ void adsp21062_device::sharcop_relative_jump_compute()
 	// Clear Interrupt
 	if (ci)
 	{
-		// TODO: anything else?
-		if (m_core->status_stkp > 0)
+		// TODO: timer and VIRPT interrupts also push the status stack
+		if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 			POP_STATUS_STACK();
 
 		m_core->interrupt_active = 0;
@@ -2168,7 +2164,8 @@ void adsp21062_device::sharcop_rti()
 		}
 	}
 
-	if (m_core->status_stkp > 0)
+	// TODO: timer and VIRPT interrupts also push the status stack
+	if (m_core->active_irq_num >= 6 && m_core->active_irq_num <= 8)
 		POP_STATUS_STACK();
 
 	m_core->interrupt_active = 0;

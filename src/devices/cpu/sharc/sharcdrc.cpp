@@ -591,33 +591,43 @@ void adsp21062_device::static_generate_pop_loop()
 
 void adsp21062_device::static_generate_push_status()
 {
-	// Trashes I2
+	// Trashes I0,I2
 
 	uml::code_label label = 1;
+	uml::code_label const no_overflow = label++;
+
 	drcuml_block &block(m_drcuml->begin_invariant_block(32));
 
 	// add a global entry for this
 	alloc_handle(m_push_status, "push_status");
-	UML_HANDLE(block, *m_push_status);                                      // handle  *m_push_status
+	UML_HANDLE(block, *m_push_status);
 
-	UML_ADD(block, I2, mem(&m_core->status_stkp), 1);                       // add     i2,[status_stkp],1
-	UML_CMP(block, I2, 5);                                                  // cmp     i2,5
-	UML_JMPc(block, COND_L, label);                                         // jl      label1
-	UML_CALLC(block, cfunc_statusstack_overflow, this);                     // callc   cfunc_statusstack_overflow
+	UML_ADD(block, I2, mem(&m_core->status_stkp), 1);
+	UML_CMP(block, I2, 5);
+	UML_JMPc(block, COND_B, no_overflow);
+	UML_CALLC(block, cfunc_statusstack_overflow, this);
+	UML_LABEL(block, no_overflow);
+	UML_MOV(block, mem(&m_core->status_stkp), I2);
+	UML_AND(block, STKY, STKY, ~SSEM);
 
-	UML_LABEL(block, label++);                                              // label1:
-	UML_CMP(block, I2, 0);                                                  // cmp     i2,0
-	UML_JMPc(block, COND_E, label);                                         // je      label2
-	UML_AND(block, STKY, STKY, ~SSEM);                                      // and     STKY,~0x1000000
-	UML_JMP(block, label + 1);                                              // jmp     label3
-	UML_LABEL(block, label++);                                              // label2:
-	UML_OR(block, STKY, STKY, SSEM);                                        // or      STKY,0x1000000
-
-	UML_LABEL(block, label++);                                              // label3:
-	UML_MOV(block, mem(&m_core->status_stkp), I2);                          // mov     [status_stkp],i2
-
-	//TODO: load MODE1
-	//TODO: load ASTAT
+	UML_STORE(block, &m_core->status_stack[0].mode1 - 2, I2, MODE1, SIZE_DWORD, SCALE_x8);
+	UML_SHL(block, I0, mem(&m_core->astat_drc.cacc), 24);
+	UML_ROLINS(block, I0, ASTAT_AF, AF_SHIFT, 1 << AF_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_BTF, BTF_SHIFT, 1 << BTF_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_SS, SS_SHIFT, 1 << SS_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_SZ, SZ_SHIFT, 1 << SZ_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_SV, SV_SHIFT, 1 << SV_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_MI, MI_SHIFT, 1 << MI_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_MU, MU_SHIFT, 1 << MU_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_MV, MV_SHIFT, 1 << MV_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_MN, MN_SHIFT, 1 << MN_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_AI, AI_SHIFT, 1 << AI_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_AS, AS_SHIFT, 1 << AS_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_AC, AC_SHIFT, 1 << AC_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_AN, AN_SHIFT, 1 << AN_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_AV, AV_SHIFT, 1 << AV_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_AZ, AZ_SHIFT, 1 << AZ_SHIFT);
+	UML_STORE(block, &m_core->status_stack[0].astat - 2, I2, I0, SIZE_DWORD, SCALE_x8);
 
 	UML_RET(block);
 
@@ -626,33 +636,72 @@ void adsp21062_device::static_generate_push_status()
 
 void adsp21062_device::static_generate_pop_status()
 {
-	// Trashes I2
+	// Trashes I0,I1,I2
 
 	uml::code_label label = 1;
-	drcuml_block &block(m_drcuml->begin_invariant_block(32));
+	uml::code_label const no_underflow = label++;
+	uml::code_label const do_load = label++;
+
+	drcuml_block &block(m_drcuml->begin_invariant_block(64));
 
 	// add a global entry for this
 	alloc_handle(m_pop_status, "pop_status");
-	UML_HANDLE(block, *m_pop_status);                                       // handle  *m_pop_status
+	UML_HANDLE(block, *m_pop_status);
 
-	//TODO: store MODE1
-	//TODO: store ASTAT
+	UML_SUB(block, I2, mem(&m_core->status_stkp), 1);
+	UML_JMPc(block, COND_NS, no_underflow);
+	UML_CALLC(block, cfunc_statusstack_underflow, this);
+	UML_LABEL(block, no_underflow);
+	UML_MOV(block, mem(&m_core->status_stkp), I2);
+	UML_JMPc(block, COND_NZ, do_load);
+	UML_OR(block, STKY, STKY, SSEM);
+	UML_LABEL(block, do_load);
 
-	UML_MOV(block, I2, mem(&m_core->status_stkp));                          // mov     i2,[status_stkp]
-	UML_CMP(block, I2, 0);                                                  // cmp     i2,0
-	UML_JMPc(block, COND_NE, label);                                        // jl      label1
-	UML_CALLC(block, cfunc_statusstack_underflow, this);                    // callc   cfunc_statusstack_underflow
+	UML_LOAD(block, I0, &m_core->status_stack[0].astat, I2, SIZE_DWORD, SCALE_x8);
+	UML_BFXU(block, mem(&m_core->astat_drc.cacc), I0, 24, 8);
+	UML_BFXU(block, ASTAT_AF, I0, AF_SHIFT, 1);
+	UML_BFXU(block, ASTAT_BTF, I0, BTF_SHIFT, 1);
+	UML_BFXU(block, ASTAT_SS, I0, SS_SHIFT, 1);
+	UML_BFXU(block, ASTAT_SZ, I0, SZ_SHIFT, 1);
+	UML_BFXU(block, ASTAT_SV, I0, SV_SHIFT, 1);
+	UML_BFXU(block, ASTAT_MI, I0, MI_SHIFT, 1);
+	UML_BFXU(block, ASTAT_MU, I0, MU_SHIFT, 1);
+	UML_BFXU(block, ASTAT_MV, I0, MV_SHIFT, 1);
+	UML_BFXU(block, ASTAT_MN, I0, MN_SHIFT, 1);
+	UML_BFXU(block, ASTAT_AI, I0, AI_SHIFT, 1);
+	UML_BFXU(block, ASTAT_AS, I0, AS_SHIFT, 1);
+	UML_BFXU(block, ASTAT_AC, I0, AC_SHIFT, 1);
+	UML_BFXU(block, ASTAT_AN, I0, AN_SHIFT, 1);
+	UML_BFXU(block, ASTAT_AV, I0, AV_SHIFT, 1);
+	UML_BFXU(block, ASTAT_AZ, I0, AZ_SHIFT, 1);
 
-	UML_LABEL(block, label++);                                              // label1:
-	UML_SUB(block, I2, I2, 1);                                              // sub     i2,1
-	UML_JMPc(block, COND_Z, label);                                         // jz      label2
-	UML_AND(block, STKY, STKY, ~SSEM);                                      // and     STKY,~0x1000000
-	UML_JMP(block, label + 1);                                              // jmp     label3
-	UML_LABEL(block, label++);                                              // label2:
-	UML_OR(block, STKY, STKY, SSEM);                                        // or      STKY,0x1000000
+	UML_LOAD(block, I0, &m_core->status_stack[0].mode1, I2, SIZE_DWORD, SCALE_x8);
+	UML_XOR(block, I2, I0, MODE1);
+	UML_MOV(block, MODE1, I0);
 
-	UML_LABEL(block, label++);                                              // label3:
-	UML_MOV(block, mem(&m_core->status_stkp), I2);                          // mov     [status_stkp],i2
+	// DAG1 regs 4-7
+	UML_TEST(block, I2, 0x8);        // don't swap if the bits are same
+	UML_CALLHc(block, COND_NZ, *m_swap_dag1_4_7);
+
+	// DAG1 regs 0-3
+	UML_TEST(block, I2, 0x10);        // don't swap if the bits are same
+	UML_CALLHc(block, COND_NZ, *m_swap_dag1_0_3);
+
+	// DAG2 regs 4-7
+	UML_TEST(block, I2, 0x20);        // don't swap if the bits are same
+	UML_CALLHc(block, COND_NZ, *m_swap_dag2_4_7);
+
+	// DAG2 regs 0-3
+	UML_TEST(block, I2, 0x40);        // don't swap if the bits are same
+	UML_CALLHc(block, COND_NZ, *m_swap_dag2_0_3);
+
+	// REG 8-15
+	UML_TEST(block, I2, 0x80);        // don't swap if the bits are same
+	UML_CALLHc(block, COND_NZ, *m_swap_r8_15);
+
+	// REG 0-7
+	UML_TEST(block, I2, 0x400);       // don't swap if the bits are same
+	UML_CALLHc(block, COND_NZ, *m_swap_r0_7);
 
 	UML_RET(block);
 
@@ -857,11 +906,11 @@ void adsp21062_device::static_generate_exception(uint8_t exception, const char *
 
 	UML_CALLH(block, *m_push_pc);                                           // callh   m_push_pc
 
+	// TODO: timer and VIRPT interrupts also push status
 	UML_CMP(block, I3, 6);                                                  // cmp     i3,6
 	UML_JMPc(block, COND_L, label_nopush);                                  // jl      label_nopush
 	UML_CMP(block, I3, 8);                                                  // cmp     i3,8
-	UML_JMPc(block, COND_G, label_nopush);                                  // jg      label_nopush
-	UML_CALLH(block, *m_push_status);                                       // callh   m_push_status
+	UML_CALLHc(block, COND_LE, *m_push_status);                             // callhle m_push_status
 
 	UML_LABEL(block, label_nopush);                                         // label_nopush:
 	UML_SHL(block, I0, I3, 2);                                              // shl     i0,i3,2
@@ -1460,8 +1509,6 @@ void adsp21062_device::generate_update_cycles(drcuml_block &block, compiler_stat
 
 void adsp21062_device::generate_write_mode1_imm(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t data)
 {
-	uml::code_label skip;
-
 	// TODO: swap effects
 	if (data & 0x1)
 		fatalerror("generate_write_mode1_imm: tried to enable I8 bit reversing");
@@ -1471,46 +1518,28 @@ void adsp21062_device::generate_write_mode1_imm(drcuml_block &block, compiler_st
 		fatalerror("generate_write_mode1_imm: tried to enable MR alternate");
 
 	// DAG1 regs 4-7
-	skip = compiler.labelnum++;
-	UML_TEST(block, MODE1, 0x8);
-	UML_JMPc(block, (data & 0x8) ? COND_NZ : COND_Z, skip);         // don't swap if the bits are same
-	UML_CALLH(block, *m_swap_dag1_4_7);
-	UML_LABEL(block, skip);
+	UML_TEST(block, MODE1, 0x8);         // don't swap if the bits are same
+	UML_CALLHc(block, (data & 0x8) ? COND_Z : COND_NZ, *m_swap_dag1_4_7);
 
 	// DAG1 regs 0-3
-	skip = compiler.labelnum++;
-	UML_TEST(block, MODE1, 0x10);
-	UML_JMPc(block, (data & 0x10) ? COND_NZ : COND_Z, skip);        // don't swap if the bits are same
-	UML_CALLH(block, *m_swap_dag1_0_3);
-	UML_LABEL(block, skip);
+	UML_TEST(block, MODE1, 0x10);        // don't swap if the bits are same
+	UML_CALLHc(block, (data & 0x10) ? COND_Z : COND_NZ, *m_swap_dag1_0_3);
 
 	// DAG2 regs 4-7
-	skip = compiler.labelnum++;
-	UML_TEST(block, MODE1, 0x20);
-	UML_JMPc(block, (data & 0x20) ? COND_NZ : COND_Z, skip);        // don't swap if the bits are same
-	UML_CALLH(block, *m_swap_dag2_4_7);
-	UML_LABEL(block, skip);
+	UML_TEST(block, MODE1, 0x20);        // don't swap if the bits are same
+	UML_CALLHc(block, (data & 0x20) ? COND_Z : COND_NZ, *m_swap_dag2_4_7);
 
 	// DAG2 regs 0-3
-	skip = compiler.labelnum++;
-	UML_TEST(block, MODE1, 0x40);
-	UML_JMPc(block, (data & 0x40) ? COND_NZ : COND_Z, skip);        // don't swap if the bits are same
-	UML_CALLH(block, *m_swap_dag2_0_3);
-	UML_LABEL(block, skip);
+	UML_TEST(block, MODE1, 0x40);        // don't swap if the bits are same
+	UML_CALLHc(block, (data & 0x40) ? COND_Z : COND_NZ, *m_swap_dag2_0_3);
 
 	// REG 8-15
-	skip = compiler.labelnum++;
-	UML_TEST(block, MODE1, 0x80);
-	UML_JMPc(block, (data & 0x80) ? COND_NZ : COND_Z, skip);        // don't swap if the bits are same
-	UML_CALLH(block, *m_swap_r8_15);
-	UML_LABEL(block, skip);
+	UML_TEST(block, MODE1, 0x80);        // don't swap if the bits are same
+	UML_CALLHc(block, (data & 0x80) ? COND_Z : COND_NZ, *m_swap_r8_15);
 
 	// REG 0-7
-	skip = compiler.labelnum++;
-	UML_TEST(block, MODE1, 0x400);
-	UML_JMPc(block, (data & 0x400) ? COND_NZ : COND_Z, skip);       // don't swap if the bits are same
-	UML_CALLH(block, *m_swap_r0_7);
-	UML_LABEL(block, skip);
+	UML_TEST(block, MODE1, 0x400);       // don't swap if the bits are same
+	UML_CALLHc(block, (data & 0x400) ? COND_Z : COND_NZ, *m_swap_r0_7);
 
 	UML_MOV(block, MODE1, data);
 }
@@ -1747,11 +1776,19 @@ void adsp21062_device::generate_jump(drcuml_block &block, compiler_state &compil
 	// clear interrupt
 	if (clearint)
 	{
-		UML_MOV(block, mem(&m_core->interrupt_active), 0);                      // mov     [interrupt_active],0
-		UML_SHL(block, I1, 1, mem(&m_core->active_irq_num));                    // shl     i1,1,[active_irq_num]
-		UML_XOR(block, IRPTL, IRPTL, I1);                                       // xor     IRPTL,i1
-		UML_CMP(block, mem(&m_core->status_stkp), 0);                           // cmp     [status_stkp],0
-		UML_CALLHc(block, COND_NZ, *m_pop_status);                              // callh   m_pop_status,nz
+		uml::code_label const label_nopop = compiler_temp.labelnum++;
+
+		UML_MOV(block, I0, mem(&m_core->active_irq_num));
+		UML_MOV(block, mem(&m_core->interrupt_active), 0);
+		UML_SHL(block, I1, 1, I0);
+		UML_XOR(block, IRPTL, IRPTL, I1);
+
+		// TODO: timer and VIRPT interrupts also push status
+		UML_CMP(block, I0, 6);
+		UML_JMPc(block, COND_L, label_nopop);
+		UML_CMP(block, I0, 8);
+		UML_CALLHc(block, COND_LE, *m_pop_status);
+		UML_LABEL(block, label_nopop);
 	}
 
 	// loop abort
@@ -2440,15 +2477,23 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 				case 0x0b:          // return from interrupt / compute      |000|01011|
 				{
-					int cond = op_get_cond(opcode);
-					int j = BIT(opcode, 26);
-					int e = BIT(opcode, 25);
+					int const cond = op_get_cond(opcode);
+					int const j = BIT(opcode, 26);
+					int const e = BIT(opcode, 25);
 
-					UML_MOV(block, mem(&m_core->interrupt_active), 0);          // mov     [interrupt_active],0
-					UML_SHL(block, I0, 1, mem(&m_core->active_irq_num));        // shl     i0,1,[active_irq_num]
-					UML_XOR(block, IRPTL, IRPTL, I0);                           // xor     IRPTL,i0
-					UML_CMP(block, mem(&m_core->status_stkp), 0);               // cmp     [status_stkp],0
-					UML_CALLHc(block, COND_NZ, *m_pop_status);                  // callh   m_pop_status,nz
+					uml::code_label const label_nopop = compiler.labelnum++;
+
+					UML_MOV(block, I0, mem(&m_core->active_irq_num));
+					UML_MOV(block, mem(&m_core->interrupt_active), 0);
+					UML_SHL(block, I1, 1, I0);
+					UML_XOR(block, IRPTL, IRPTL, I1);
+
+					// TODO: timer and VIRPT interrupts also push status
+					UML_CMP(block, I0, 6);
+					UML_JMPc(block, COND_L, label_nopop);
+					UML_CMP(block, I0, 8);
+					UML_CALLHc(block, COND_LE, *m_pop_status);
+					UML_LABEL(block, label_nopop);
 
 					// TODO: check interrupts
 

@@ -1079,6 +1079,7 @@ void adsp21062_device::check_interrupts()
 
 		m_core->irptl |= 1 << which;
 
+		// TODO: timer and VIRPT interrupts also push the status stack
 		if (which >= 6 && which <= 8)
 			PUSH_STATUS_STACK();
 
