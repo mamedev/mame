@@ -241,7 +241,6 @@ private:
 	uint16_t m_anz_serienspeicher; // Anzout3
 	uint8_t  m_anz_einwurf; // Anzout4
 	uint16_t m_anz_muenzspeicher; // Anzout5
-	uint8_t m_count_ensda;
 
 	uint16_t m_service;
 	
@@ -293,6 +292,8 @@ void stellafr_state::anz_en(uint8_t data)
 {
 	// data from 74HC4094 on lamp driver board is split ->
 	// anzout1,2,6,7 are NC
+
+	//LOG("ANZ1 %d%d%d%d%d%d%d%d\n",BIT(data,7),BIT(data,6),BIT(data,5),BIT(data,4),BIT(data,3),BIT(data,2),BIT(data,1),BIT(data,0));
 
 	m_anz_serienplan     = (m_anz_einwurf << 1) | !BIT(data, 0);
 	// 2x74HC4094 chained
@@ -383,7 +384,7 @@ void stellafr_state::mux_w(uint8_t data)
 	if (enma2)
 		; // LOG("2MA %d\n",m_ma2);
 	if (enanz1)
-		anz_en(m_anz1); // LOG("ANZ1 %d\n",m_anz1); //main 7seg led out
+		anz_en(m_anz1); //main 7seg led out
 	if (enanz1)
 		service_en(m_ma1); //service out
 	if (enmux1)
@@ -450,15 +451,28 @@ void stellafr_state::machine_start()
 	m_leds.resolve();
 	save_item(NAME(m_anz1));
 	save_item(NAME(m_mux1));
+	save_item(NAME(m_anz2));
+	save_item(NAME(m_mux2));
 	save_item(NAME(m_anz_serienspeicher));
 	save_item(NAME(m_anz_einwurf));
 	save_item(NAME(m_anz_muenzspeicher));
 	save_item(NAME(m_service));
+	save_item(NAME(m_muxout1));
 }
 
 void stellafr_state::machine_reset()
 {
 	m_mux1 = 0;
+	m_mux2 = 0;
+	m_anz1 = 0;
+	m_anz2 = 0;
+
+	m_anz_serienspeicher = 0;
+	m_anz_einwurf = 0;
+	m_anz_muenzspeicher = 0;
+	m_service = 0;
+	
+	m_muxout1 = 0;
 }
 
 static INPUT_PORTS_START( stellafr )
