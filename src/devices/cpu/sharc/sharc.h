@@ -321,7 +321,7 @@ private:
 	void SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx);
 	void COMPUTE(uint32_t opcode);
 	void check_interrupts();
-	void PUSH_PC(uint32_t pc);
+	void PUSH_PC();
 	uint32_t POP_PC();
 	uint32_t TOP_PC();
 	void PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, uint32_t count);

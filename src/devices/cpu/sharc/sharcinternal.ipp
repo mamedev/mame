@@ -132,7 +132,7 @@ struct alignas(16) adsp21062_device::sharc_internal_state
 	uint64_t mrf;
 	uint64_t mrb;
 
-	uint32_t pcstack[32];
+	uint32_t pcstack[30];
 	uint32_t lcstack[6];
 	uint32_t lastack[6];
 	uint32_t lstkp;

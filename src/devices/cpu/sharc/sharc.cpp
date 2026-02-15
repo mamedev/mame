@@ -709,7 +709,6 @@ void adsp21062_device::device_start()
 
 	save_item(NAME(m_core->faddr));
 	save_item(NAME(m_core->daddr));
-	save_item(NAME(m_core->pcstk));
 	save_item(NAME(m_core->pcstkp));
 	save_item(NAME(m_core->laddr.addr));
 	save_item(NAME(m_core->laddr.code));
@@ -808,8 +807,8 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->astat_old_old_old));
 
 	state_add( SHARC_PC,     "PC", m_core->pc).mask(0x00ffffff).formatstr("%06X");
-	state_add( SHARC_PCSTK,  "PCSTK", m_core->pcstk).formatstr("%08X");
-	state_add( SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).formatstr("%08X");
+	state_add( SHARC_PCSTK,  "PCSTK", m_core->pcstk).mask(0x00ffffff).formatstr("%06X");
+	state_add( SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).mask(0x1f).formatstr("%02X");
 	state_add( SHARC_LSTKP,  "LSTKP", m_core->lstkp).formatstr("%08X");
 	state_add( SHARC_FADDR,  "FADDR", m_core->faddr).formatstr("%08X");
 	state_add( SHARC_DADDR,  "DADDR", m_core->daddr).formatstr("%08X");
@@ -970,8 +969,9 @@ void adsp21062_device::device_reset()
 	m_core->ustat1 = 0x0000;
 	m_core->ustat2 = 0x0000;
 
-	m_core->lstkp = 0;
 	m_core->pcstkp = 0;
+	m_core->lstkp = 0;
+	m_core->pcstk = 0x00ffffff;
 	m_core->status_stkp = 0;
 	m_core->interrupt_active = 0;
 
@@ -993,6 +993,9 @@ void adsp21062_device::device_pre_save()
 {
 	cpu_device::device_pre_save();
 
+	if ((m_core->pcstkp > 0) && (m_core->pcstkp < 31))
+		m_core->pcstack[m_core->pcstkp - 1] = m_core->pcstk;
+
 	if (m_enable_drc)
 	{
 		m_core->astat = m_core->astat_drc.pack();
@@ -1004,6 +1007,26 @@ void adsp21062_device::device_pre_save()
 void adsp21062_device::device_post_load()
 {
 	cpu_device::device_post_load();
+
+	for (auto &pcstk : m_core->pcstack)
+		pcstk &= 0x00ffffff;
+
+	m_core->pcstkp &= 0x1f;
+
+	if ((m_core->pcstkp > 0) && (m_core->pcstkp < 31))
+		m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
+	else
+		m_core->pcstk = 0x00ffffff;
+
+	if (m_core->pcstkp > 0)
+		m_core->stky &= ~PCEM;
+	else
+		m_core->stky |= PCEM;
+
+	if (m_core->pcstkp >= 30)
+		m_core->stky |= PCFL;
+	else
+		m_core->stky &= ~PCFL;
 
 	m_core->astat_drc.unpack(m_core->astat);
 	m_core->astat_drc_copy.unpack(m_core->astat_old);
@@ -1072,10 +1095,11 @@ void adsp21062_device::check_interrupts()
 			which++;
 		}
 
+		PUSH_PC();
 		if (m_core->idle)
-			PUSH_PC(m_core->pc+1);
+			m_core->pcstk = m_core->pc + 1;
 		else
-			PUSH_PC(m_core->daddr);
+			m_core->pcstk = m_core->daddr;
 
 		m_core->irptl |= 1 << which;
 
