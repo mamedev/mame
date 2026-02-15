@@ -120,7 +120,7 @@ void cadr_state::mem_map(address_map &map)
 	map(017377760, 017377767).m(m_tv_control, FUNC(cadr_tv_control_device::map));
 
 	// Disk controllers
-	map(017377770, 017377777).m(m_disk_controller, FUNC(cadr_disk_device::map)).umask32(0xffffffff).cswidth(32);
+	map(017377770, 017377777).m(m_disk_controller, FUNC(cadr_disk_device::map));
 
 	// Unibus - 16 bit bus - 17400000 - 17777777 / 3e0000 - 3fffff
 	map(017400000, 017777777).m(FUNC(cadr_state::unibus_map));
