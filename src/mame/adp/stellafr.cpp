@@ -205,7 +205,7 @@ public:
 		m_digits(*this, "digit%u", 0U),
 		m_lamps(*this, "lamp%u%u", 0U, 0U),
 		m_leds(*this, "led%u", 0U),
-		m_in0(*this, "IN0")
+		m_tz(*this, "IN%u", 0U)
 	{ }
 
 	void stellafr(machine_config &config);
@@ -223,7 +223,7 @@ private:
 	output_finder<8> m_digits;
 	output_finder<16,12> m_lamps;
 	output_finder<2> m_leds;
-	required_ioport m_in0;
+	required_ioport_array<8> m_tz;
 
 	uint16_t m_ma1;
 	uint16_t m_ma2;
@@ -231,8 +231,11 @@ private:
 	uint8_t m_data3;
 	uint8_t m_anz1;
 	uint16_t m_mux1;
+	uint8_t m_muxout1;
 	uint8_t m_anz2;
 	uint16_t m_mux2;
+
+	uint8_t m_lz; // Lampenzeile = lamp row
 
 	uint8_t  m_anz_serienplan; // Anzout0
 	uint16_t m_anz_serienspeicher; // Anzout3
@@ -266,7 +269,8 @@ uint8_t stellafr_state::mux_r()
 	bool emp = false;
 	bool ma = false;
 	bool st = false;
-	bool t = false; // main buttons in
+	bool t = m_muxout1 & 0x01;
+	m_muxout1 = m_muxout1 >> 1;
 	bool t2 = false;
 	bool emp2 = false;
 	bool li2 = false;
@@ -297,15 +301,6 @@ void stellafr_state::anz_en(uint8_t data)
 	m_anz_einwurf        = (m_anz_einwurf << 1) | BIT(data, 4);
 	// 2x74HC4094 chained
 	m_anz_muenzspeicher  = (m_anz_muenzspeicher << 1)  | !BIT(data, 5);
-
-	// TODO: measure U6 74HC123 if this is correct (probably not)
-	m_count_ensda = m_count_ensda + 1;
-	if (m_count_ensda == 10)
-	{
-		m_count_ensda = 0;
-		serienspeicher_en(m_anz_serienspeicher);
-		muenzspeicher_en(m_anz_muenzspeicher);
-	}
 }
 
 void stellafr_state::muenzspeicher_en(uint16_t data)
@@ -345,15 +340,29 @@ void stellafr_state::service_en(uint16_t data)
 
 void stellafr_state::lamps_en(uint16_t data, bool second)
 {
-	uint16_t row_data = data & 0x0fff;
-	uint8_t column = (data >> 12) & 0x07;
-	//bool ensdap = BIT(data, 15);
+	uint16_t col_data = data & 0x0fff;
+	m_lz = (data >> 12) & 0x07;
+	bool ensdap = BIT(data, 15);
 
 	for (int i = 0; i < 12; i++)
 	{
-		bool lamp_value = BIT(row_data, i);
-		m_lamps[second ? 8 + column : column][i] = lamp_value;
+		bool lamp_value = BIT(col_data, i);
+		m_lamps[second ? 8 + m_lz : m_lz][i] = lamp_value;
 	}
+
+	if (second)
+	{
+		// NC
+	}
+	else
+	{
+		if (ensdap)
+		{
+			serienspeicher_en(m_anz_serienspeicher);
+			muenzspeicher_en(m_anz_muenzspeicher);
+		}
+		m_muxout1 = m_tz[m_lz]->read();
+	}	
 }
 
 void stellafr_state::mux_w(uint8_t data)
@@ -454,11 +463,22 @@ void stellafr_state::machine_reset()
 
 static INPUT_PORTS_START( stellafr )
 	PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_GAMBLE_HIGH ) // Left
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_START )
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_SLOT_STOP1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_SLOT_STOP2 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_GAMBLE_LOW ) // Right
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("IN4")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("IN5")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("IN6")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_START("IN7")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
