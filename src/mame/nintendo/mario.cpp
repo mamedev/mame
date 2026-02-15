@@ -31,7 +31,7 @@ set is a very early version, eg. it has a different demonstration screen, and
 Mario continues running when letting go of the joystick.
 
 The sound MCU can be easily replaced with a ROMless one such as I8039
-(or just force EA high), by doing a 1-byte patch to the external ROM:
+(or just force EA high), by doing a 1-byte patch to the external ROM 6K:
 offset $01: change $00 to $01 (call $100 -> call $101)
 
 TODO:
