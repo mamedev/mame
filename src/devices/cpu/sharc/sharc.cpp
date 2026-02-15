@@ -10,6 +10,7 @@
 
 #include "sharcdsm.h"
 #include "sharcfe.h"
+#include "sharcinternal.ipp"
 
 #include "emuopts.h"
 
@@ -135,6 +136,7 @@ adsp21062_device::adsp21062_device(
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
 	, m_out_of_cycles(nullptr)
+	, m_reset_cache(nullptr)
 	, m_pm_read48(nullptr)
 	, m_pm_write48(nullptr)
 	, m_pm_read32(nullptr)
@@ -147,6 +149,8 @@ adsp21062_device::adsp21062_device(
 	, m_pop_loop(nullptr)
 	, m_push_status(nullptr)
 	, m_pop_status(nullptr)
+	, m_loop_check(nullptr)
+	, m_call_loop_check(nullptr)
 	, m_swap_dag1_0_3(nullptr)
 	, m_swap_dag1_4_7(nullptr)
 	, m_swap_dag2_0_3(nullptr)
@@ -399,7 +403,6 @@ void adsp21062_device::iop_w(offs_t offset, uint32_t data)
 }
 
 
-#include "sharcmem.hxx"
 #include "sharcdma.hxx"
 #include "sharcops.hxx"
 
@@ -534,7 +537,7 @@ void adsp21062_device::device_start()
 			snprintf(buf, std::size(buf), "r%d", i);
 			m_drcuml->symbol_add(&m_core->r[i], sizeof(m_core->r[i]), buf);
 
-			SHARC_DAG &dag((i < 8) ? m_core->dag1 : m_core->dag2);
+			auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
 			snprintf(buf, std::size(buf), "dag_i%d", i);
 			m_drcuml->symbol_add(&dag.i[i & 7], sizeof(dag.i[i & 7]), buf);
 			snprintf(buf, std::size(buf), "dag_m%d", i);
@@ -583,9 +586,7 @@ void adsp21062_device::device_start()
 		m_drcfe = std::make_unique<sharc_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);
 
 		for (int i = 0; i < 16; i++)
-		{
 			m_regmap[i] = uml::mem(&m_core->r[i]);
-		}
 
 		// I0-3 used by the DRC, rest can be assigned to fast registers
 		if (!DISABLE_FAST_REGISTERS)
@@ -630,15 +631,9 @@ void adsp21062_device::device_start()
 	}
 	m_core->mrf = 0;
 	m_core->mrb = 0;
-	for (auto & elem : m_core->pcstack)
-	{
-		elem = 0;
-	}
-	for (int i=0; i < 6; i++)
-	{
-		m_core->lcstack[i] = 0;
-		m_core->lastack[i] = 0;
-	}
+	std::fill(std::begin(m_core->pcstack), std::end(m_core->pcstack), 0);
+	std::fill(std::begin(m_core->lcstack), std::end(m_core->lcstack), 0);
+	std::fill(std::begin(m_core->lastack), std::end(m_core->lastack), 0);
 	m_core->pcstk = 0;
 	m_core->laddr.addr = m_core->laddr.code = m_core->laddr.loop_type = 0;
 	m_core->curlcntr = 0;
@@ -696,8 +691,10 @@ void adsp21062_device::device_start()
 	m_core->astat_old_old = 0;
 	m_core->astat_old_old_old = 0;
 
-	m_core->fp0 = 0.0f;
-	m_core->fp1 = 1.0f;
+	m_core->fp_const.k0_0 = 0.0F;
+	m_core->fp_const.k0_5 = 0.5F;
+	m_core->fp_const.k1_0 = 1.0F;
+	m_core->fp_const.k2_0 = 2.0F;
 
 	save_pointer(NAME(&m_core->r[0].r), std::size(m_core->r));
 	save_pointer(NAME(&m_core->reg_alt[0].r), std::size(m_core->reg_alt));
@@ -810,7 +807,7 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->astat_old_old));
 	save_item(NAME(m_core->astat_old_old_old));
 
-	state_add( SHARC_PC,     "PC", m_core->pc).formatstr("%08X");
+	state_add( SHARC_PC,     "PC", m_core->pc).mask(0x00ffffff).formatstr("%06X");
 	state_add( SHARC_PCSTK,  "PCSTK", m_core->pcstk).formatstr("%08X");
 	state_add( SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).formatstr("%08X");
 	state_add( SHARC_LSTKP,  "LSTKP", m_core->lstkp).formatstr("%08X");
@@ -922,7 +919,7 @@ void adsp21062_device::device_reset()
 	for (auto &block : m_blocks)
 		std::fill(std::begin(block), std::end(block), 0);
 
-	switch(m_boot_mode)
+	switch (m_boot_mode)
 	{
 		case BOOT_MODE_EPROM:
 		{
@@ -964,18 +961,32 @@ void adsp21062_device::device_reset()
 	m_core->nfaddr = m_core->faddr+1;
 
 	m_core->idle = 0;
-	m_core->stky = 0x5400000;
+	m_core->mode1 = 0x00000000;
+	m_core->mode2 &= 0xf0000000;
+	m_core->astat &= FLG0 | FLG1 | FLG2 | FLG3;
+	m_core->stky = PCEM | SSEM | LSEM;
+	m_core->irptl = 0x0000;
+	m_core->imask = 0x0003;
+	m_core->ustat1 = 0x0000;
+	m_core->ustat2 = 0x0000;
 
 	m_core->lstkp = 0;
 	m_core->pcstkp = 0;
+	m_core->status_stkp = 0;
 	m_core->interrupt_active = 0;
 
-	m_core->syscon = 0x10;
+	m_core->syscon = 0x00000010;
+	m_core->sysstat &= 0x00000ff0;
 	m_core->iop_write_num = 0;
 	m_core->iop_data = 0;
 
 	if (m_enable_drc)
-		m_drcfe->flush();
+	{
+		m_core->astat_drc.clear();
+
+		m_core->cache_dirty = 1;
+		m_drcuml->reset();
+	}
 }
 
 void adsp21062_device::device_pre_save()
@@ -984,62 +995,19 @@ void adsp21062_device::device_pre_save()
 
 	if (m_enable_drc)
 	{
-		auto const pack_astat =
-				[] (ASTAT_DRC const &in) -> uint32_t
-				{
-					return
-							((in.az << AZ_SHIFT) & AZ) |
-							((in.av << AV_SHIFT) & AV) |
-							((in.an << AN_SHIFT) & AN) |
-							((in.ac << AC_SHIFT) & AC) |
-							((in.as << AS_SHIFT) & AS) |
-							((in.ai << AI_SHIFT) & AI) |
-							((in.mn << MN_SHIFT) & MN) |
-							((in.mv << MV_SHIFT) & MV) |
-							((in.mu << MU_SHIFT) & MU) |
-							((in.mi << MI_SHIFT) & MI) |
-							((in.sv << SV_SHIFT) & SV) |
-							((in.sz << SZ_SHIFT) & SZ) |
-							((in.ss << SS_SHIFT) & SS) |
-							((in.btf << BTF_SHIFT) & BTF) |
-							((in.af << AF_SHIFT) & AF) |
-							((in.cacc << 24) & 0xff00'0000);
-				};
-
-		m_core->astat = pack_astat(m_core->astat_drc);
-		m_core->astat_old = pack_astat(m_core->astat_drc_copy);
-		m_core->astat_old_old = pack_astat(m_core->astat_delay_copy);
+		m_core->astat = m_core->astat_drc.pack();
+		m_core->astat_old = m_core->astat_drc_copy.pack();
+		m_core->astat_old_old = m_core->astat_delay_copy.pack();
 	}
 }
 
 void adsp21062_device::device_post_load()
 {
-	auto const unpack_astat =
-			[] (ASTAT_DRC &out, uint32_t in)
-			{
-				out.az = BIT(in, AZ_SHIFT);
-				out.av = BIT(in, AV_SHIFT);
-				out.an = BIT(in, AN_SHIFT);
-				out.ac = BIT(in, AC_SHIFT);
-				out.as = BIT(in, AS_SHIFT);
-				out.ai = BIT(in, AI_SHIFT);
-				out.mn = BIT(in, MN_SHIFT);
-				out.mv = BIT(in, MV_SHIFT);
-				out.mu = BIT(in, MU_SHIFT);
-				out.mi = BIT(in, MI_SHIFT);
-				out.sv = BIT(in, SV_SHIFT);
-				out.sz = BIT(in, SZ_SHIFT);
-				out.ss = BIT(in, SS_SHIFT);
-				out.btf = BIT(in, BTF_SHIFT);
-				out.af = BIT(in, AF_SHIFT);
-				out.cacc = BIT(in, 24, 8);
-			};
-
 	cpu_device::device_post_load();
 
-	unpack_astat(m_core->astat_drc, m_core->astat);
-	unpack_astat(m_core->astat_drc_copy, m_core->astat_old);
-	unpack_astat(m_core->astat_delay_copy, m_core->astat_old_old);
+	m_core->astat_drc.unpack(m_core->astat);
+	m_core->astat_drc_copy.unpack(m_core->astat_old);
+	m_core->astat_delay_copy.unpack(m_core->astat_old_old);
 }
 
 
@@ -1093,35 +1061,27 @@ void adsp21062_device::write_stall(int state)
 
 void adsp21062_device::check_interrupts()
 {
-	int i;
 	if ((m_core->imask & m_core->irq_pending) && (m_core->mode1 & MODE1_IRPTEN) && !m_core->interrupt_active &&
 		m_core->pc != m_core->delay_slot1 && m_core->pc != m_core->delay_slot2)
 	{
 		int which = 0;
-		for (i=0; i < 32; i++)
+		for (int i = 0; i < 32; i++)
 		{
-			if (m_core->irq_pending & (1 << i))
-			{
+			if (BIT(m_core->irq_pending, i))
 				break;
-			}
 			which++;
 		}
 
 		if (m_core->idle)
-		{
 			PUSH_PC(m_core->pc+1);
-		}
 		else
-		{
 			PUSH_PC(m_core->daddr);
-		}
 
 		m_core->irptl |= 1 << which;
 
+		// TODO: timer and VIRPT interrupts also push the status stack
 		if (which >= 6 && which <= 8)
-		{
 			PUSH_STATUS_STACK();
-		}
 
 		CHANGE_PC(0x20000 + (which * 0x4));
 

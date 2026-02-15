@@ -43,9 +43,7 @@ public:
 	struct LOOP_ENTRY
 	{
 		uint16_t entrytype;
-		uint8_t looptype;
-		uint8_t condition;
-		uint32_t start_pc;
+		uint32_t userflags;
 	};
 
 	struct LOOP_DESCRIPTOR
@@ -68,7 +66,7 @@ private:
 	void describe_if_condition(opcode_desc &desc, int condition);
 
 	void insert_loop(const LOOP_DESCRIPTOR &loopdesc);
-	void add_loop_entry(uint32_t pc, uint8_t type, uint32_t start_pc, uint8_t looptype, uint8_t condition);
+	void add_loop_entry(uint32_t pc, uint8_t type, uint32_t userflags);
 	bool is_loop_evaluation(uint32_t pc);
 	bool is_loop_start(uint32_t pc);
 	bool is_astat_delay_check(uint32_t pc);

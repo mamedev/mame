@@ -313,8 +313,8 @@ void fdc37c665ir_device::config_map(address_map &map)
 
 void fdc37c665ir_device::irq_floppy_w(int state)
 {
-//	if (!BIT(m_cr[0], 4))
-//		return;
+	if (!BIT(m_cr[0], 4))
+		return;
 
 	// TODO: m_cr[1] bit 4 for IRQ polarity
 	m_fintr_callback(state);
@@ -322,19 +322,25 @@ void fdc37c665ir_device::irq_floppy_w(int state)
 
 void fdc37c665ir_device::drq_floppy_w(int state)
 {
-//	if (!BIT(m_cr[0], 4))
-//		return;
+	if (!BIT(m_cr[0], 4))
+		return;
 
 	m_isa->drq2_w(state);
 }
 
 void fdc37c665ir_device::irq_parallel_w(int state)
 {
+	if ((m_cr[1] & 3) == 0)
+		return;
+
 	m_pintr1_callback(state);
 }
 
 void fdc37c665ir_device::irq_serial1_w(int state)
 {
+	if (!BIT(m_cr[2], 2))
+		return;
+
 	if (BIT(m_cr[2], 0))
 	{
 		// COM2 ~ COM4
@@ -349,6 +355,9 @@ void fdc37c665ir_device::irq_serial1_w(int state)
 
 void fdc37c665ir_device::irq_serial2_w(int state)
 {
+	if (!BIT(m_cr[2], 6))
+		return;
+
 	if (BIT(m_cr[2], 4))
 	{
 		// COM1 ~ COM3

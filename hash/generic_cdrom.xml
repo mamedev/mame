@@ -1213,7 +1213,7 @@ ISO file CRC32 hash is not 0xffffffff.  Microsoft actually shipped this image, i
 	</software>
 
 	<software name="winnt40srk" cloneof="winnt40rk" supported="partial">
-		<description>Windows NT Server Resource Kit (version 3.1)</description>
+		<description>Windows NT Server Resource Kit (version 4.0)</description>
 		<year>1996</year>
 		<publisher>Microsoft</publisher>
 		<info name="language" value="English" />

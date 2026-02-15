@@ -1,11 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:
+// copyright-holders: Angelo Salese
 /**************************************************************************************************
 
 1st Generation Chips & Technologies VGA cores, up to F65548
 
-(F65550+ looks very different, where they ditched the exclusive $3d6/$3d7 address spacing for
-inheriting them in regular VGA spaces)
+(F65550+ "HiQVision" looks very different and will go in a separate file / structure,
+where they ditched the exclusive $3d6/$3d7 address spacing for inheriting them in regular
+VGA spaces)
 
 **************************************************************************************************/
 

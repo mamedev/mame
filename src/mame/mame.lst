@@ -24888,6 +24888,7 @@ giclassvr
 @source:konami/gijoe.cpp
 gijoe
 gijoea
+gijoeaa
 gijoeea
 gijoej
 gijoeu
@@ -28244,6 +28245,7 @@ pitbossma
 pitbossmb
 pitbosss
 pitbosssa
+pitbosssac
 pitbosssb
 pitbosssc
 pitbosssm
@@ -32038,6 +32040,7 @@ magtouch
 
 @source:misc/majorpkr.cpp
 majorpkr
+majorpkr20
 majorpkra
 majorpkrb
 majorpkrc
@@ -35488,6 +35491,7 @@ iemotom
 kaguya
 kaguya2
 kaguya2f
+kaguyaa
 kanatuen
 korinai
 korinaim
@@ -35780,9 +35784,10 @@ robotech
 
 @source:nintendo/mario.cpp
 mario
-marioe
 mariof
+mariog
 marioj
+marioja
 masao
 
 @source:nintendo/mmagic.cpp
@@ -37596,6 +37601,7 @@ pciagp
 pcipc
 pcipcs7
 pcipctx
+se440bx2
 
 @source:pc/pcipc_sis.cpp
 atc1425a
@@ -46644,6 +46650,7 @@ tbowlp
 
 @source:tecmo/tecmo.cpp
 backfirt
+backfirtb
 gemini
 geminib
 geminij
@@ -47107,6 +47114,7 @@ snowbro2ny
 
 @source:toaplan/sunwise.cpp
 burgkids
+monkichi
 othldrby
 pwrkick
 pyutakun
