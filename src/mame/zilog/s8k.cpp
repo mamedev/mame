@@ -21,7 +21,7 @@
 	Model 31 Plus   A       Y        SMD
 	Model 32        H       Y        SMD
 
-	(CPU A = 5.5 Mhz; CPU H = 11 Mhz + 32 kB cache)
+	(CPU A = 5.5 Mhz; CPU H = 11.1 Mhz + 32 KB cache)
 
 ***************************************************************************/
 
@@ -46,10 +46,10 @@
 //#define VERBOSE 1
 #include "logmacro.h"
 
-class s8k_16_daisy_device : public device_t, public z80_daisy_chain_interface
+class s8k_daisy_device : public device_t, public z80_daisy_chain_interface
 {
 public:
-	s8k_16_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	s8k_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	uint16_t viack_r()
 	{
@@ -66,10 +66,10 @@ protected:
 		{ }
 };
 
-DEFINE_DEVICE_TYPE(S8K_16_DAISY, s8k_16_daisy_device, "s8k_16_daisy", "S8000 16-bit daisy chain device")
+DEFINE_DEVICE_TYPE(S8K_DAISY, s8k_daisy_device, "s8k_daisy", "S8000 daisy chain device")
 
-s8k_16_daisy_device::s8k_16_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, S8K_16_DAISY, tag, owner, clock),
+s8k_daisy_device::s8k_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, S8K_DAISY, tag, owner, clock),
 	z80_daisy_chain_interface(mconfig, *this)
 	{ }
 
@@ -82,14 +82,14 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ram(*this, RAM_TAG),
-		m_local_ram(*this, "local_ram", 0x800, ENDIANNESS_BIG),
+		m_local_ram(*this, "local_ram", 0x800, ENDIANNESS_BIG),	// 2 KB
 		m_view_code(*this, "memview_code"),
 		m_view_data(*this, "memview_data"),
 		m_view_stck(*this, "memview_stck"),
 		m_mmu_code(*this, "mmu0_code"),
 		m_mmu_data(*this, "mmu1_data"),
 		m_mmu_stck(*this, "mmu2_stck"),
-		m_daisy(*this, "s8k_16_daisy"),
+		m_daisy(*this, "daisy"),
 		m_sio(*this, "sio%u", 0U),
 		m_ctc(*this, "ctc%u", 0U),
 		m_pio(*this, "pio0"),
@@ -114,7 +114,7 @@ protected:
 	memory_share_creator<uint16_t> m_local_ram;
 	memory_view m_view_code, m_view_data, m_view_stck;
 	required_device<z8010_device> m_mmu_code, m_mmu_data, m_mmu_stck;
-	required_device<s8k_16_daisy_device> m_daisy;
+	required_device<s8k_daisy_device> m_daisy;
 	required_device_array<z80sio_device, 4> m_sio;
 	required_device_array<z80ctc_device, 3> m_ctc;
 	required_device<z80pio_device> m_pio;
@@ -229,20 +229,20 @@ static INPUT_PORTS_START( s8k )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Start")  PORT_CODE(KEYCODE_PLUS_PAD) PORT_WRITE_LINE_MEMBER(FUNC(s8k_state::start_btn_w))
 
 	PORT_START("JP_SEG")
-	PORT_CONFNAME(0x01, 0x00, "Support segmented OS")
+	PORT_CONFNAME(0x01, 0x00, "Support Segmented OS (v2.2+ Only)")
 	PORT_CONFSETTING(	0x00, DEF_STR( No ) )
 	PORT_CONFSETTING(	0x01, DEF_STR( Yes ) )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x30, 0x20, "Serial console baud rate" )	PORT_DIPLOCATION("U70:1,4")
+	PORT_DIPNAME( 0x30, 0x20, "Serial Console Baud Rate" )	PORT_DIPLOCATION("U70:1,4")
 	PORT_DIPSETTING(	0x00, "300 baud" )
 	PORT_DIPSETTING(	0x10, "1200 baud" )
 	PORT_DIPSETTING(	0x20, "9600 baud" )
 	PORT_DIPSETTING(	0x30, "19200 baud" )
-	PORT_DIPNAME( 0xC0, 0xC0, "Primary boot device" )		PORT_DIPLOCATION("U70:2,3")
-	PORT_DIPSETTING(	0xC0, "8 inch disk")
-	PORT_DIPSETTING(	0x80, "5.25 inch disk")
-	PORT_DIPSETTING(	0x40, "SMD disk")
+	PORT_DIPNAME( 0xC0, 0xC0, "Primary Boot Device" )		PORT_DIPLOCATION("U70:2,3")
+	PORT_DIPSETTING(	0xC0, "8-inch Disk")
+	PORT_DIPSETTING(	0x80, "5.25-inch Disk")
+	PORT_DIPSETTING(	0x40, "SMD Disk")
 INPUT_PORTS_END
 
 void s8k_state::start_btn_w(int state)
@@ -460,7 +460,7 @@ void s8k_state::io_map(address_map &map)
 	map(0xffc9, 0xffc9).rw(FUNC(s8k_state::reg_sbr_r), FUNC(s8k_state::reg_sbr_w));
 	map(0xffd1, 0xffd1).rw(FUNC(s8k_state::reg_nbr_r), FUNC(s8k_state::reg_nbr_w));
 	map(0xffd9, 0xffd9).r(FUNC(s8k_state::reg_snvr_r));
-	map(0xffe1, 0xffe1).w("s8k_16_daisy", FUNC(s8k_16_daisy_device::reti_w));
+	map(0xffe1, 0xffe1).w(m_daisy, FUNC(s8k_daisy_device::reti_w));
 	//map(0xffe9, 0xffe9).w(FUNC(s8k_state::reset());
 	map(0xfff1, 0xfff1).r(FUNC(s8k_state::reg_trpl_r));
 	map(0xfff9, 0xfff9).r(FUNC(s8k_state::reg_if1l_r));
@@ -799,7 +799,7 @@ void s8k_state::daisy_interrupt(int state)
 	m_maincpu->set_input_line(z8001_device::VI_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const z80_daisy_config s8k_16_daisy_chain[] =
+static const z80_daisy_config s8k_daisy_chain[] =
 {
 	{ "ctc0" },
 	{ "ctc1" },
@@ -865,13 +865,13 @@ void s8k_state::s8k(machine_config &config)
 	m_maincpu->set_addrmap(z8001_device::AS_SIO, &s8k_state::spec_io_map);
 	m_maincpu->segtack().set(FUNC(s8k_state::segtack_r));
 	m_maincpu->nmiack().set(FUNC(s8k_state::nmiack_r));
-	m_maincpu->viack().set("s8k_16_daisy", FUNC(s8k_16_daisy_device::viack_r));
+	m_maincpu->viack().set("daisy", FUNC(s8k_daisy_device::viack_r));
 	m_maincpu->ns().set(FUNC(s8k_state::normal_led_w));
 
 	RAM(config, m_ram).set_default_size("1M").set_default_value(0).set_extra_options("256K,512K,768K,1M,2M,3M,4M,5M,6M,7M");
 
-	S8K_16_DAISY(config, m_daisy, 0);
-	m_daisy->set_daisy_config(s8k_16_daisy_chain);
+	S8K_DAISY(config, m_daisy, 0);
+	m_daisy->set_daisy_config(s8k_daisy_chain);
 
 	Z8010(config, m_mmu_code, MAIN_CLOCK);
 	m_mmu_code->out_segt_cb().set(FUNC(s8k_state::segt_interrupt));
@@ -1011,21 +1011,34 @@ void s8k_state::s8k(machine_config &config)
 //  ROMS
 //**************************************************************************
 
+// ROM size: 4x4KB
 ROM_START( s8000 )
 	ROM_REGION16_BE(0x4000, "maincpu", 0)
-	ROM_DEFAULT_BIOS("v22")
+	ROM_DEFAULT_BIOS("v30")
 
 	ROM_SYSTEM_BIOS(0, "v12", "Version 1.2")
-	ROMX_LOAD("cpu-12.u74", 0x0001, 0x1000, CRC(ab2ca534) SHA1(25857479801397f1f18c55b40f81cb5ba7a01a55), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("cpu-12.u75", 0x2001, 0x1000, CRC(c8d3be3b) SHA1(efbca6fcbf53565075b67a14096d0f725839494a), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("cpu-12.u76", 0x0000, 0x1000, CRC(81a4cac6) SHA1(9e74883a365f1034610b1c4681ca3611362d62ea), ROM_SKIP(1) | ROM_BIOS(0))
-	ROMX_LOAD("cpu-12.u77", 0x2000, 0x1000, CRC(6b8b4536) SHA1(85ff7c9be0f51e299d4f9406064cd32df08b8f16), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("cpu_34-0715-01a.u76", 0x0000, 0x1000, CRC(81a4cac6) SHA1(9e74883a365f1034610b1c4681ca3611362d62ea), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("cpu_34-0716-01a.u74", 0x0001, 0x1000, CRC(ab2ca534) SHA1(25857479801397f1f18c55b40f81cb5ba7a01a55), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("cpu_34-0718-01a.u77", 0x2000, 0x1000, CRC(6b8b4536) SHA1(85ff7c9be0f51e299d4f9406064cd32df08b8f16), ROM_SKIP(1) | ROM_BIOS(0))
+	ROMX_LOAD("cpu_34-0717-01a.u75", 0x2001, 0x1000, CRC(c8d3be3b) SHA1(efbca6fcbf53565075b67a14096d0f725839494a), ROM_SKIP(1) | ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "v22", "Version 2.2")
-	ROMX_LOAD("cpu-22.u74", 0x0001, 0x1000, CRC(8a3ea482) SHA1(0572b21ac5aeb24cec01d7682f1ad7eef08cb070), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("cpu-22.u75", 0x2001, 0x1000, CRC(8ddb6479) SHA1(93eec5a59a7856d19e32f526dddb4f21c1864373), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("cpu-22.u76", 0x0000, 0x1000, CRC(198ce8ee) SHA1(743d75dab6f4ea85b2f95ec1b620134f4416a351), ROM_SKIP(1) | ROM_BIOS(1))
-	ROMX_LOAD("cpu-22.u77", 0x2000, 0x1000, CRC(43660a81) SHA1(8398d1998384ea0a95fcad58f791d9657e023b83), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("cpu_34-0715-02_v_2.2.u76", 0x0000, 0x1000, CRC(198ce8ee) SHA1(743d75dab6f4ea85b2f95ec1b620134f4416a351), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("cpu_34-0716-02_v_2.2.u74", 0x0001, 0x1000, CRC(8a3ea482) SHA1(0572b21ac5aeb24cec01d7682f1ad7eef08cb070), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("cpu_34-0718-02_v_2.2.u77", 0x2000, 0x1000, CRC(43660a81) SHA1(8398d1998384ea0a95fcad58f791d9657e023b83), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD("cpu_34-0717-02_v_2.2.u75", 0x2001, 0x1000, CRC(8ddb6479) SHA1(93eec5a59a7856d19e32f526dddb4f21c1864373), ROM_SKIP(1) | ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS(2, "v30a", "Version 3.0 (8 users)")
+	ROMX_LOAD("cpu_34-0715-03a.u76",       0x0000, 0x1000, CRC(addc3e4f) SHA1(86e013450d23ab7a39b50bffa6113a0a060f1650), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("cpu_34-0716-03a_8user.u74", 0x0001, 0x1000, CRC(645dd24b) SHA1(f123684c604a971ade5ed229538403989be7cc2a), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("cpu_34-0718-03a.u77",       0x2000, 0x1000, CRC(f2341d8e) SHA1(574e6d1dd4e5211c0c83cad21e6e1b53810c699b), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD("cpu_34-0717-03a.u75",       0x2001, 0x1000, CRC(3a0370b3) SHA1(4660c1c58202ebaaf1200f92de719e1811860fd9), ROM_SKIP(1) | ROM_BIOS(2))
+
+	ROM_SYSTEM_BIOS(3, "v30", "Version 3.0")
+	ROMX_LOAD("cpu_34-0715-03a.u76", 0x0000, 0x1000, CRC(addc3e4f) SHA1(86e013450d23ab7a39b50bffa6113a0a060f1650), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("cpu_34-0716-03a.u74", 0x0001, 0x1000, CRC(9a315ba4) SHA1(c2ab2bfaf21d60f69ea7ede01a929ac46511061b), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("cpu_34-0718-03a.u77", 0x2000, 0x1000, CRC(f2341d8e) SHA1(574e6d1dd4e5211c0c83cad21e6e1b53810c699b), ROM_SKIP(1) | ROM_BIOS(3))
+	ROMX_LOAD("cpu_34-0717-03a.u75", 0x2001, 0x1000, CRC(3a0370b3) SHA1(4660c1c58202ebaaf1200f92de719e1811860fd9), ROM_SKIP(1) | ROM_BIOS(3))
 ROM_END
 
 } // anonymous namespace
