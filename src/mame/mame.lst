@@ -17659,6 +17659,10 @@ aviion_4600
 @source:dgrm/blackt96.cpp
 blackt96
 
+@source:dgrm/onetwo.cpp
+onetwo
+onetwoe
+
 @source:dgrm/pokechmp.cpp
 billlist
 pokechmp
@@ -32698,10 +32702,6 @@ maddonna
 komocomo
 maddonnab
 oneshot
-
-@source:misc/onetwo.cpp
-onetwo
-onetwoe
 
 @source:misc/opercoin.cpp
 multibaby
