@@ -8,19 +8,19 @@
 
 #include "video/pc_vga.h"
 
-class sis6236_vga_device : public svga_device
+class sis6326_vga_device : public svga_device
 {
 public:
 	// Chipset for AGP card, enough for BIOS checks and nothing else (cfr. SDD tests)
 	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
 
-	sis6236_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sis6326_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual uint8_t mem_r(offs_t offset) override;
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 protected:
-	sis6236_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	sis6326_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -49,7 +49,7 @@ protected:
 //  bool m_dual_seg_mode = false;
 };
 
-class sis630_vga_device : public sis6236_vga_device
+class sis630_vga_device : public sis6326_vga_device
 {
 public:
 	sis630_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -62,7 +62,7 @@ protected:
 	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 };
 
-DECLARE_DEVICE_TYPE(SIS6236_VGA, sis6236_vga_device)
+DECLARE_DEVICE_TYPE(SIS6326_VGA, sis6326_vga_device)
 DECLARE_DEVICE_TYPE(SIS630_VGA, sis630_vga_device)
 
 #endif // MAME_VIDEO_PC_VGA_SIS_H

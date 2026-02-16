@@ -34,28 +34,28 @@ TODO:
 
 // TODO: later variant of 5598
 // (definitely doesn't have dual segment mode for instance)
-DEFINE_DEVICE_TYPE(SIS6236_VGA, sis6236_vga_device, "sis6236_vga", "SiS 6236 VGA i/f")
+DEFINE_DEVICE_TYPE(SIS6326_VGA, sis6326_vga_device, "sis6326_vga", "SiS 6326 VGA i/f")
 DEFINE_DEVICE_TYPE(SIS630_VGA, sis630_vga_device, "sis630_vga", "SiS 630 VGA i/f")
 
-sis6236_vga_device::sis6236_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sis6236_vga_device(mconfig, SIS6236_VGA, tag, owner, clock)
+sis6326_vga_device::sis6326_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: sis6326_vga_device(mconfig, SIS6326_VGA, tag, owner, clock)
 {
-	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(sis6236_vga_device::sequencer_map), this));
+	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(sis6326_vga_device::sequencer_map), this));
 }
 
-sis6236_vga_device::sis6236_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+sis6326_vga_device::sis6326_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
 {
 }
 
 sis630_vga_device::sis630_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: sis6236_vga_device(mconfig, SIS630_VGA, tag, owner, clock)
+	: sis6326_vga_device(mconfig, SIS630_VGA, tag, owner, clock)
 {
 	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(sis630_vga_device::crtc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(sis630_vga_device::sequencer_map), this));
 }
 
-void sis6236_vga_device::device_start()
+void sis6326_vga_device::device_start()
 {
 	svga_device::device_start();
 	zero();
@@ -69,7 +69,7 @@ void sis6236_vga_device::device_start()
 
 }
 
-void sis6236_vga_device::device_reset()
+void sis6326_vga_device::device_reset()
 {
 	svga_device::device_reset();
 
@@ -77,7 +77,7 @@ void sis6236_vga_device::device_reset()
 	//m_dual_seg_mode = false;
 }
 
-void sis6236_vga_device::io_3cx_map(address_map &map)
+void sis6326_vga_device::io_3cx_map(address_map &map)
 {
 	svga_device::io_3cx_map(map);
 	// TODO: for '630 it's always with dual segment enabled?
@@ -89,7 +89,7 @@ void sis6236_vga_device::io_3cx_map(address_map &map)
 			return svga.bank_r;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			svga.bank_r = data;
+			svga.bank_r = data & 0x3f;
 		})
 	);
 	map(0x0d, 0x0d).lrw8(
@@ -102,7 +102,7 @@ void sis6236_vga_device::io_3cx_map(address_map &map)
 	);
 }
 
-void sis6236_vga_device::sequencer_map(address_map &map)
+void sis6326_vga_device::sequencer_map(address_map &map)
 {
 	svga_device::sequencer_map(map);
 	// extended ID register
@@ -271,7 +271,7 @@ void sis6236_vga_device::sequencer_map(address_map &map)
 	);
 }
 
-std::tuple<u8, u8> sis6236_vga_device::flush_true_color_mode()
+std::tuple<u8, u8> sis6326_vga_device::flush_true_color_mode()
 {
 	// punt if extended or true color is off
 	if ((m_ramdac_mode & 0x12) != 0x12)
@@ -282,7 +282,7 @@ std::tuple<u8, u8> sis6236_vga_device::flush_true_color_mode()
 	return std::make_tuple(res, res ^ 1);
 }
 
-void sis6236_vga_device::recompute_params()
+void sis6326_vga_device::recompute_params()
 {
 	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
 	int xtal;
@@ -301,21 +301,21 @@ void sis6236_vga_device::recompute_params()
 	recompute_params_clock(1, xtal);
 }
 
-uint16_t sis6236_vga_device::offset()
+uint16_t sis6326_vga_device::offset()
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 		return vga.crtc.offset << 3;
 	return svga_device::offset();
 }
 
-uint8_t sis6236_vga_device::mem_r(offs_t offset)
+uint8_t sis6326_vga_device::mem_r(offs_t offset)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 		return svga_device::mem_linear_r(offset + svga.bank_r * 0x10000);
 	return svga_device::mem_r(offset);
 }
 
-void sis6236_vga_device::mem_w(offs_t offset, uint8_t data)
+void sis6326_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
 	{
@@ -332,7 +332,7 @@ void sis6236_vga_device::mem_w(offs_t offset, uint8_t data)
 // Page 144
 void sis630_vga_device::crtc_map(address_map &map)
 {
-	sis6236_vga_device::crtc_map(map);
+	sis6326_vga_device::crtc_map(map);
 	// CR19/CR1A Extended Signature Read-Back 0/1
 	// CR1B CRT horizontal counter (r/o)
 	// CR1C CRT vertical counter (r/o)
@@ -369,7 +369,7 @@ void sis630_vga_device::crtc_map(address_map &map)
 
 void sis630_vga_device::sequencer_map(address_map &map)
 {
-	sis6236_vga_device::sequencer_map(map);
+	sis6326_vga_device::sequencer_map(map);
 	map(0x0a, 0x0a).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_ext_vert_overflow;
