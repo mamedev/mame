@@ -636,14 +636,14 @@ template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, f
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	unsigned const start_address = use_page_2() ? 0x4000 : 0x2000;
+	unsigned const start_address = use_page_2() ? m_hgr2 : 0x2000;
 
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
 	int const startcol = (cliprect.left() / 14);
 	int const stopcol = (cliprect.right() / 14) + 1;
 
-	// B&W/Green/Amber monitor, CEC mono HGR mode, or IIgs $C021 monochrome HGR
+	// B&W/Green/Amber monitor, CEC/tk2000 mono HGR mode, or IIgs $C021 monochrome HGR
 	bool const monochrome = monochrome_monitor() || m_monohgr || (m_monochrome & 0x80);
 
 	// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
@@ -689,7 +689,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int const page = use_page_2() ? 0x4000 : 0x2000;
+	int const page = use_page_2() ? m_hgr2 : 0x2000;
 	int const rgbmode = rgb_monitor() ? m_rgbmode : -1;
 
 	beginrow = (std::max)(beginrow, cliprect.top());

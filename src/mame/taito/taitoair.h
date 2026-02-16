@@ -10,24 +10,14 @@
 
 #pragma once
 
-#include "cpu/tms32025/tms32025.h"
 #include "taitoio.h"
 #include "taitoio_yoke.h"
 #include "tc0080vco.h"
+
+#include "cpu/tms320c2x/tms320c2x.h"
+
 #include "emupal.h"
 #include "screen.h"
-
-enum { TAITOAIR_FRAC_SHIFT = 16, TAITOAIR_POLY_MAX_PT = 16 };
-
-struct taitoair_spoint {
-	s32 x = 0, y = 0;
-};
-
-struct taitoair_poly {
-	struct taitoair_spoint p[TAITOAIR_POLY_MAX_PT];
-	int pcount = 0;
-	u16 header = 0;
-};
 
 
 class taitoair_state : public driver_device
@@ -52,13 +42,26 @@ public:
 		, m_z80bank(*this, "z80bank")
 	{ }
 
-	void airsys(machine_config &config);
+	void airsys(machine_config &config) ATTR_COLD;
 
 private:
+	enum { TAITOAIR_FRAC_SHIFT = 16, TAITOAIR_POLY_MAX_PT = 16 };
+
+	struct taitoair_spoint {
+		s32 x = 0, y = 0;
+	};
+
+	struct taitoair_poly {
+		struct taitoair_spoint p[TAITOAIR_POLY_MAX_PT];
+		int pcount = 0;
+		u16 header = 0;
+	};
+
+
 	/* memory pointers */
 	required_shared_ptr<u16> m_m68000_mainram;
 	required_shared_ptr<u16> m_line_ram;
-	required_shared_ptr<u16> m_dsp_ram;          // Shared 68000/TMS32025 RAM
+	required_shared_ptr<u16> m_dsp_ram;          // Shared 68000/TMS320C25 RAM
 	required_shared_ptr<u16> m_paletteram;
 	required_shared_ptr<u16> m_gradram;
 	required_shared_ptr<u16> m_tc0430grw;
@@ -72,7 +75,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_device<tms32025_device> m_dsp;
+	required_device<tms320c25_device> m_dsp;
 	required_device<tc0080vco_device> m_tc0080vco;
 	required_device<tc0220ioc_device> m_tc0220ioc;
 	required_device<taitoio_yoke_device> m_yoke;

@@ -258,7 +258,7 @@ void thinkpad600_state::thinkpad600_base(machine_config &config)
 	mcu.set_addrmap(AS_PROGRAM, &thinkpad600_state::mcu_map);
 //  mcu.set_disable();
 
-	DS17485(config, "rtc", 16'000'000); // Dallas DS17485S-5, unknown clock
+	DS17485(config, "rtc", XTAL(32'768)); // Dallas DS17485S-5, unknown clock
 }
 
 void thinkpad600_state::thinkpad600e(machine_config &config)
@@ -281,7 +281,7 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi", 0);
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 //  TODO: modem at "pci:10.0"

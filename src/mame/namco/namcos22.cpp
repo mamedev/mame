@@ -1094,7 +1094,8 @@ Notes:
 #include "namco_dsp.h"
 
 #include "cpu/m68000/m68020.h"
-#include "cpu/tms32025/tms32025.h"
+#include "cpu/tms320c2x/tms320c2x.h"
+
 #include "speaker.h"
 
 // 51.2MHz XTAL on video board, pixel clock of 12.8MHz (doubled in MAME because of unemulated interlacing)
@@ -2363,7 +2364,7 @@ u16 namcos22_state::master_serial_io_r()
 INTERRUPT_GEN_MEMBER(namcos22_state::dsp_vblank_irq)
 {
 	if (m_dsp_irq_enabled)
-		device.execute().set_input_line(TMS32025_INT0, HOLD_LINE);
+		device.execute().set_input_line(TMS320C2X_INT0, HOLD_LINE);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_serial_pulse)
@@ -2372,10 +2373,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_serial_pulse)
 	{
 		m_SerialDataSlaveToMasterCurrent = m_SerialDataSlaveToMasterNext;
 
-		m_master->set_input_line(TMS32025_RINT, HOLD_LINE);
-		m_master->set_input_line(TMS32025_XINT, HOLD_LINE);
-		m_slave->set_input_line(TMS32025_RINT, HOLD_LINE);
-		m_slave->set_input_line(TMS32025_XINT, HOLD_LINE);
+		m_master->set_input_line(TMS320C2X_RINT, HOLD_LINE);
+		m_master->set_input_line(TMS320C2X_XINT, HOLD_LINE);
+		m_slave->set_input_line(TMS320C2X_RINT, HOLD_LINE);
+		m_slave->set_input_line(TMS320C2X_XINT, HOLD_LINE);
 	}
 }
 

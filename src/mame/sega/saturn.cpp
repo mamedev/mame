@@ -426,7 +426,7 @@ test1f diagnostic hacks:
 #include "saturn.h"
 
 #include "saturn_cdb.h"
-#include "stvcd.h"
+#include "saturn_cd_hle.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/scudsp/scudsp.h"
@@ -451,7 +451,7 @@ public:
 		: saturn_state(mconfig, type, tag)
 		, m_exp(*this, "exp")
 		, m_nvram(*this, "nvram")
-		, m_stvcd(*this, "stvcd")
+		, m_saturn_cd_hle(*this, "saturn_cd_hle")
 		, m_ctrl1(*this, "ctrl1")
 		, m_ctrl2(*this, "ctrl2")
 	{ }
@@ -517,7 +517,7 @@ private:
 
 	required_device<sat_cart_slot_device> m_exp;
 	required_device<nvram_device> m_nvram;
-	required_device<stvcd_device> m_stvcd;
+	required_device<saturn_cd_hle_device> m_saturn_cd_hle;
 
 	required_device<saturn_control_port_device> m_ctrl1;
 	required_device<saturn_control_port_device> m_ctrl2;
@@ -556,7 +556,7 @@ void sat_console_state::saturn_mem(address_map &map)
 //  map(0x04000000, 0x047fffff).ram(); // External Battery RAM area
 	map(0x04ffffff, 0x04ffffff).r(FUNC(sat_console_state::saturn_cart_type_r));
 	map(0x05000000, 0x057fffff).r(FUNC(sat_console_state::abus_dummy_r));
-	map(0x05800000, 0x0589ffff).rw(m_stvcd, FUNC(stvcd_device::stvcd_r), FUNC(stvcd_device::stvcd_w));
+	map(0x05800000, 0x0589ffff).m(m_saturn_cd_hle, FUNC(saturn_cd_hle_device::amap));
 	/* Sound */
 	map(0x05a00000, 0x05a7ffff).rw(FUNC(sat_console_state::soundram_r), FUNC(sat_console_state::soundram_w));
 	map(0x05b00000, 0x05b00fff).rw(m_scsp, FUNC(scsp_device::read), FUNC(scsp_device::write));
@@ -589,13 +589,13 @@ void sat_console_state::scsp_mem(address_map &map)
 INPUT_CHANGED_MEMBER(sat_console_state::tray_open)
 {
 	if(newval)
-		m_stvcd->set_tray_open();
+		m_saturn_cd_hle->set_tray_open();
 }
 
 INPUT_CHANGED_MEMBER(sat_console_state::tray_close)
 {
 	if(newval)
-		m_stvcd->set_tray_close();
+		m_saturn_cd_hle->set_tray_close();
 }
 
 static INPUT_PORTS_START( saturn )
@@ -825,7 +825,7 @@ void sat_console_state::saturn(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &sat_console_state::sound_mem);
 	m_audiocpu->reset_cb().set(FUNC(sat_console_state::m68k_reset_callback));
 
-	SATURN_SCU(config, m_scu, 0);
+	SATURN_SCU(config, m_scu, XTAL(57'272'727) / 4);
 	m_scu->set_hostcpu(m_maincpu);
 
 //  SH-1
@@ -872,9 +872,9 @@ void sat_console_state::saturn(machine_config &config)
 	m_scsp->add_route(0, "speaker", 1.0, 0);
 	m_scsp->add_route(1, "speaker", 1.0, 1);
 
-	stvcd_device &stvcd(STVCD(config, "stvcd", 0));
-	stvcd.add_route(0, "scsp", 1.0, 0);
-	stvcd.add_route(1, "scsp", 1.0, 1);
+	SATURN_CD_HLE(config, m_saturn_cd_hle, 0);
+	m_saturn_cd_hle->add_route(0, "scsp", 1.0, 0);
+	m_saturn_cd_hle->add_route(1, "scsp", 1.0, 1);
 
 	SATURN_CONTROL_PORT(config, "ctrl1", saturn_controls, "joypad");
 	SATURN_CONTROL_PORT(config, "ctrl2", saturn_controls, "joypad");

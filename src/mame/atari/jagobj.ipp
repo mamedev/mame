@@ -979,6 +979,7 @@ void jaguar_state::process_object_list(int vc, uint16_t *scanline)
 				// mutntpng, atarikrt YPOS = 0
 				// kasumi YPOS = 0x7ff
 				// valdiser variable, depends on raster split
+				// defender YPOS = 0 (2k), YPOS=2047 (classic & plus)
 				// TODO: is YPOS really used?
 				uint16_t ypos = (objdata[1] >> 3) & 0x7ff;
 

@@ -131,6 +131,8 @@ DEFINE_DEVICE_TYPE(Z8611,   z8611_device,   "z8611",   "Zilog Z8611")
 DEFINE_DEVICE_TYPE(Z8671,   z8671_device,   "z8671",   "Zilog Z8671")
 DEFINE_DEVICE_TYPE(Z8681,   z8681_device,   "z8681",   "Zilog Z8681")
 DEFINE_DEVICE_TYPE(Z8682,   z8682_device,   "z8682",   "Zilog Z8682")
+DEFINE_DEVICE_TYPE(Z8691,   z8691_device,   "z8691",   "Zilog Z8691")
+DEFINE_DEVICE_TYPE(Z86C91,  z86c91_device,  "z86c91",  "Zilog Z86C91")
 DEFINE_DEVICE_TYPE(Z86E02,  z86e02_device,  "z86e02",  "Zilog Z86E02")
 
 
@@ -156,7 +158,7 @@ void z8_device::register_map(address_map &map)
 	map(0x01, 0x01).rw(FUNC(z8_device::p1_read), FUNC(z8_device::p1_write));
 	map(0x02, 0x02).rw(FUNC(z8_device::p2_read), FUNC(z8_device::p2_write));
 	map(0x03, 0x03).rw(FUNC(z8_device::p3_read), FUNC(z8_device::p3_write));
-	map(0x04, 0x7f).ram();
+	map(0x04, m_gpr_top).ram();
 	map(0xf0, 0xf0).rw(FUNC(z8_device::sio_read), FUNC(z8_device::sio_write));
 	map(0xf1, 0xf1).rw(FUNC(z8_device::tmr_read), FUNC(z8_device::tmr_write));
 	map(0xf2, 0xf2).rw(FUNC(z8_device::t1_read), FUNC(z8_device::t1_write));
@@ -176,7 +178,7 @@ void z8_device::register_map(address_map &map)
 }
 
 
-z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, bool preprogrammed)
+z8_device::z8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t rom_size, uint8_t gpr_top, bool preprogrammed, bool external_bus_reset)
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0, preprogrammed ? address_map_constructor(FUNC(z8_device::preprogrammed_map), this) : address_map_constructor(FUNC(z8_device::program_map), this))
 	, m_data_config("data", ENDIANNESS_BIG, 8, 16, 0)
@@ -184,6 +186,8 @@ z8_device::z8_device(const machine_config &mconfig, device_type type, const char
 	, m_input_cb(*this, 0xff)
 	, m_output_cb(*this)
 	, m_rom_size(rom_size)
+	, m_gpr_top(gpr_top)
+	, m_external_bus_reset(external_bus_reset)
 	, m_input{0xff, 0xff, 0xff, 0x0f}
 {
 	assert(((rom_size - 1) & rom_size) == 0);
@@ -191,25 +195,25 @@ z8_device::z8_device(const machine_config &mconfig, device_type type, const char
 
 
 z8601_device::z8601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8601, tag, owner, clock, 0x800, false)
+	: z8_device(mconfig, Z8601, tag, owner, clock, 0x800, 0x7f, false, false)
 {
 }
 
 
 ub8830d_device::ub8830d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, UB8830D, tag, owner, clock, 0x800, false)
+	: z8_device(mconfig, UB8830D, tag, owner, clock, 0x800, 0x7f, false, false)
 {
 }
 
 
 z8611_device::z8611_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8611, tag, owner, clock, 0x1000, false)
+	: z8_device(mconfig, Z8611, tag, owner, clock, 0x1000, 0x7f, false, false)
 {
 }
 
 
 z8671_device::z8671_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8671, tag, owner, clock, 0x800, true)
+	: z8_device(mconfig, Z8671, tag, owner, clock, 0x800, 0x7f, true, false)
 {
 }
 
@@ -225,13 +229,13 @@ const tiny_rom_entry *z8671_device::device_rom_region() const
 
 
 z8681_device::z8681_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8681, tag, owner, clock, 0, false)
+	: z8_device(mconfig, Z8681, tag, owner, clock, 0, 0x7f, false, false)
 {
 }
 
 
 z8682_device::z8682_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z8682, tag, owner, clock, 0x800, true)
+	: z8_device(mconfig, Z8682, tag, owner, clock, 0x800, 0x7f, true, false)
 {
 }
 
@@ -247,8 +251,20 @@ const tiny_rom_entry *z8682_device::device_rom_region() const
 }
 
 
+z8691_device::z8691_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z8_device(mconfig, Z8691, tag, owner, clock, 0, 0x7f, false, true)
+{
+}
+
+
+z86c91_device::z86c91_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: z8_device(mconfig, Z86C91, tag, owner, clock, 0, 0xef, false, true)
+{
+}
+
+
 z86e02_device::z86e02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: z8_device(mconfig, Z86E02, tag, owner, clock, 0x200, false)
+	: z8_device(mconfig, Z86E02, tag, owner, clock, 0x200, 0x7f, false, false)
 {
 }
 
@@ -1526,7 +1542,7 @@ void z8_device::device_reset()
 	timer_stop<1>();
 
 	m_output[3] = 0xf0;
-	p01m_write(0x4d);
+	p01m_write(m_external_bus_reset ? 0x96 : m_rom_size == 0 ? 0x55 : 0x4d);
 	p2m_write(0xff);
 	p3m_write(0x00);
 }

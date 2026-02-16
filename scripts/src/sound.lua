@@ -1202,6 +1202,18 @@ if SOUNDS["VA_EG"] then
 end
 
 --------------------------------------------------
+-- Virtual analog operations
+--@src/devices/sound/va_ops.h,SOUNDS["VA_OPS"] = true
+--------------------------------------------------
+
+if SOUNDS["VA_OPS"] then
+	files {
+		MAME_DIR .. "src/devices/sound/va_ops.cpp",
+		MAME_DIR .. "src/devices/sound/va_ops.h",
+	}
+end
+
+--------------------------------------------------
 -- Virtual analog voltage-controlled amplifiers (VCAs)
 --@src/devices/sound/va_vca.h,SOUNDS["VA_VCA"] = true
 --------------------------------------------------

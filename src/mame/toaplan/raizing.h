@@ -51,7 +51,6 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	// used by bgaregga + batrider etc.
-	void bgaregga_common_video_start();
 	void raizing_z80_bankswitch_w(u8 data);
 	void raizing_oki_bankswitch_w(offs_t offset, u8 data);
 	void install_raizing_okibank(int chip);
@@ -97,7 +96,6 @@ protected:
 	optional_device_array<generic_latch_8_device, 4> m_soundlatch; // tekipaki, batrider, bgaregga, batsugun
 	optional_region_ptr_array<u8, 2> m_oki_rom;
 	required_device<toaplan_coincounter_device> m_coincounter;
-	bitmap_ind8 m_custom_priority_bitmap;
 };
 
 #endif // MAME_TOAPLAN_RAIZING_H

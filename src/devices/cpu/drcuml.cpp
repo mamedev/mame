@@ -41,7 +41,10 @@
 
 #include "emuopts.h"
 
+#include <iostream>
 #include <fstream>
+#include <locale>
+#include <sstream>
 
 
 
@@ -73,6 +76,29 @@
 #define MAKE_DRCBE_IMPL(name) make_##name
 #define MAKE_DRCBE(name) MAKE_DRCBE_IMPL(name)
 #define make_drcbe_native MAKE_DRCBE(NATIVE_DRC)
+
+
+
+namespace {
+
+std::string uml_log_name(device_t &device)
+{
+	std::string tag = device.tag();
+	for (auto &ch : tag)
+	{
+		if (':' == ch)
+			ch = '_';
+	}
+	std::ostringstream str;
+	str.imbue(std::locale::classic());
+	str << "drcuml_" << device.shortname();
+	if ('_' != tag[0])
+		str << '_';
+	str << tag << ".asm";
+	return std::move(str).str();
+}
+
+} // anonymous namespace
 
 
 
@@ -135,12 +161,14 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, u32 flags, int mo
 			? drc::make_drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits)
 			: drc::make_drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits))
 	, m_umllog(device.machine().options().drc_log_uml()
-			? new std::ofstream(util::string_format("drcuml_%s.asm", device.shortname()))
+			? new std::ofstream(uml_log_name(device))
 			: nullptr)
 	, m_blocklist()
 	, m_handlelist()
 	, m_symlist()
 {
+	if (m_umllog)
+		m_umllog->imbue(std::locale::classic());
 }
 
 
@@ -166,16 +194,19 @@ void drcuml_state::reset()
 		// flush the cache
 		m_cache.flush();
 
-		// reset all handle code pointers
+		// reset all transient handle code pointers
 		for (uml::code_handle &handle : m_handlelist)
-			*handle.codeptr_addr() = nullptr;
+		{
+			if (*handle.codeptr_addr() >= m_cache.top())
+				*handle.codeptr_addr() = nullptr;
+		}
 
 		// call the backend to reset
 		m_beintf->reset();
 	}
-	catch (drcuml_block::abort_compilation &)
+	catch (drcuml_block::abort_compilation const &)
 	{
-		fatalerror("Out of cache space in drcuml_state::reset\n");
+		throw emu_fatalerror("Out of cache space in drcuml_state::reset\n");
 	}
 }
 
@@ -184,22 +215,24 @@ void drcuml_state::reset()
 //  begin_block - begin a new code block
 //-------------------------------------------------
 
-drcuml_block &drcuml_state::begin_block(uint32_t maxinst)
+drcuml_block &drcuml_state::begin_block(uint32_t maxinst, bool invariant)
 {
 	// find an inactive block that matches our qualifications
-	drcuml_block *bestblock(nullptr);
-	for (drcuml_block &block : m_blocklist)
+	block_impl *bestblock(nullptr);
+	for (block_impl &block : m_blocklist)
 	{
 		if (!block.inuse() && (block.maxinst() >= maxinst) && (!bestblock || (block.maxinst() < bestblock->maxinst())))
 			bestblock = &block;
 	}
 
 	// if we failed to find one, allocate a new one
+	// TODO: over-allocation was supposed to be * 3 / 2 but it was getting squared, and now things depend on it
+	// every use of begin_block needs to be reviewed to ensure maxinst is reasonable
 	if (!bestblock)
-		bestblock = &*m_blocklist.emplace(m_blocklist.end(), *this, maxinst * 3 / 2);
+		bestblock = &*m_blocklist.emplace(m_blocklist.end(), *this, maxinst * 9 / 4);
 
 	// start the block
-	bestblock->begin();
+	bestblock->begin(invariant);
 	return *bestblock;
 }
 
@@ -281,9 +314,10 @@ void drcuml_state::log_vprintf(util::format_argument_pack<char> const &args)
 
 drcuml_block::drcuml_block(drcuml_state &drcuml, u32 maxinst)
 	: m_drcuml(drcuml)
+	, m_maxinst(maxinst)
 	, m_nextinst(0)
-	, m_maxinst(maxinst * 3/2)
-	, m_inst(m_maxinst)
+	, m_inst(new uml::instruction[m_maxinst])
+	, m_invariant(false)
 	, m_inuse(false)
 {
 }
@@ -302,11 +336,12 @@ drcuml_block::~drcuml_block()
 //  begin - begin code generation
 //-------------------------------------------------
 
-void drcuml_block::begin()
+void drcuml_block::begin(bool invariant)
 {
-	// set up the block information and return it
-	m_inuse = true;
+	// set up the block information
 	m_nextinst = 0;
+	m_invariant = invariant;
+	m_inuse = true;
 }
 
 
@@ -354,14 +389,9 @@ void drcuml_block::abort()
 //  append - append an opcode to the block
 //-------------------------------------------------
 
-uml::instruction &drcuml_block::append()
+void drcuml_block::overrun()
 {
-	// get a pointer to the next instruction
-	uml::instruction &curinst(m_inst[m_nextinst++]);
-	if (m_nextinst > m_maxinst)
-		fatalerror("Overran maxinst in drcuml_block_append\n");
-
-	return curinst;
+	throw emu_fatalerror("Overran maxinst in drcuml_block_append\n");
 }
 
 

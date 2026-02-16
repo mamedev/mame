@@ -122,6 +122,7 @@ Access [cart] EEPROM
 Optionally uses [UART] JagLink
 ]]></notes>
 
+		<info name="developer" value="Midnite Entertainment Group" />
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
 				<!-- The original dump, released in a custom .j01 format, was the following one
@@ -145,6 +146,7 @@ Access [cart] EEPROM
 Optionally uses [UART] JagLink
 ]]></notes>
 
+		<info name="developer" value="Midnite Entertainment Group" />
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="0x200000" width="32" endianness="big">
 				<rom name="aircars94.u1" size="0x100000" crc="bbd4c4bd" sha1="4f9c914b43208eb100fb25b8be87dec370fd205d" offset="0x000002" loadflag="load32_word_swap"/>
@@ -165,6 +167,7 @@ Randomly crashes during gameplay
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="Rebellion" />
 		<info name="serial" value="J9008E 800108-022"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -184,9 +187,10 @@ Heavy color issues
 Randomly crashes by going in main menu again after pressing A button
 No sound (fixed, serial clock)
 No SFXs/voices
-Runs too fast?
+Runs too fast (depends on waitstates)
 ]]></notes>
 
+		<info name="developer" value="V-Real Interactive"/>
 		<info name="serial" value="J9003E 800108-006"/>
 		<part name="cart" interface="jaguar_cart">
 			<!-- 4MB Alpine ROM with Universal Header -->
@@ -210,6 +214,7 @@ Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
 
+		<info name="developer" value="Miracle Designs" />
 		<info name="serial" value="J9091E 705091-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -230,6 +235,7 @@ Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
 
+		<info name="developer" value="Sunrise Games"/>
 		<info name="serial" value="J9072E 705072-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -245,12 +251,13 @@ Uses [GPU] irq 3
 		<notes><![CDATA[
 No sound (fixed, [DSP] irq priority)
 Bad BGM on title screen (fixed, depends on wave ROM)
-Runs at extremely fast speed
+Runs at extremely fast speed (depends on waitstates)
 Can randomly black screen after loading a stage/during gameplay
 Access [cart] EEPROM
 Title screen has black dots of garbage on top (btanb)
 ]]></notes>
 
+		<info name="developer" value="Accolade"/>
 		<info name="serial" value="J9018E 705018-001"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -289,6 +296,7 @@ Access [paddle] interface
 		<publisher>ScatoLOGIC</publisher>
 		<notes><![CDATA[
 Same as battlesp
+Boot looks timing sensitive, fails to boot after 68k waitstate handling without skipping Jaguar BIOS
 ]]></notes>
 
 		<info name="serial" value="J0201G"/>
@@ -306,9 +314,11 @@ Same as battlesp
 		<notes><![CDATA[
 Has severe RMW issues in both versions of the game when breaking blocks (fixed, [blitter] pitch)
 No sound (fixed, [DSP] irq priority)
+Sometimes BGM stops working after clearing a stage
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="MP Games"/>
 		<info name="serial" value="J9093E"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -329,6 +339,7 @@ No sound (fixed, serial clock)
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="Accolade"/>
 		<info name="serial" value="J9021E 705021-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -347,6 +358,7 @@ Rightmost column of gameplay has odd "overscan" area, visible on horizontal scro
 ]]></notes>
 		<!-- cover title, NOTE: different than all the other versions -->
 		<info name="alt_title" value="Brutal Sports Football" />
+		<info name="developer" value="Millennium Teque"/>
 		<info name="serial" value="JA100"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -365,6 +377,7 @@ Randomly crashes on title screen animation
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
+		<info name="developer" value="Accolade"/>
 		<info name="serial" value="J9020E 700720-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -381,6 +394,8 @@ Uses [GPU] irq 3
 Selecting Hi-Res in options menu causes cutoff GFXs
 Access [cart] EEPROM
 ]]></notes>
+		<info name="developer" value="Sensible Software"/>
+		<info name="developer" value="The Dome"/>
 		<info name="serial" value="02763-00162"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -417,6 +432,7 @@ Access [cart] EEPROM
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
 [DSP] always do an in-flight PC change at startup
+Buggy transfer routine at PC=807edc for [DSP]
 No sound (check [DSP] serial/JPIT)
 Reads [Jerry] ASISTAT
 Title screen cuts off background (triggers unhandled [object] pitch = 0 16bpp)
@@ -481,6 +497,7 @@ Access [cart] EEPROM
 Uses [GPU] irqs 0 and 3
 ]]></notes>
 
+		<info name="developer" value="Electronic Games"/>
 		<info name="serial" value="J9041E 705041-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -510,12 +527,13 @@ Uses [GPU] irq 3
 		</part>
 	</software>
 
-	<software name="ddragon5" supported="partial">
+	<software name="ddragon5" supported="no">
 		<description>Double Dragon V - The Shadow Falls</description>
 		<year>1995</year>
 		<publisher>Tradewest</publisher>
 		<notes><![CDATA[
 No sound (fixed, serial clock)
+Randomly crashes during gameplay
 Access [cart] EEPROM
 ]]></notes>
 
@@ -527,7 +545,7 @@ Access [cart] EEPROM
 		</part>
 	</software>
 
-	<software name="dragon" supported="partial">
+	<software name="dragon" supported="no">
 		<description>Dragon - The Bruce Lee Story</description>
 		<year>1994</year>
 		<publisher>Virgin Interactibe</publisher>
@@ -960,6 +978,7 @@ Ranking screen cuts off text on 9th and 10th places (fixed)
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="Imagitec Design"/>
 		<info name="serial" value="J9005E 700705-2"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -977,6 +996,7 @@ Ranking screen cuts off text on 9th and 10th places (fixed)
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="Imagitec Design"/>
 		<info name="serial" value="J9005 700705-1"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1022,7 +1042,7 @@ Black screen, 68k reads [GPU] PC
 	</software>
 
 	<software name="sensible" supported="no">
-		<description>Sensible Soccer - International Edition</description>
+		<description>Sensible Soccer: International Edition</description>
 		<year>1995</year>
 		<publisher>Telegames</publisher>
 		<notes><![CDATA[
@@ -1033,6 +1053,8 @@ Access [cart] EEPROM
 ]]></notes>
 
 		<info name="alt_title" value="International Sensible Soccer (box, cart); Soccer (manual)"/>
+		<info name="developer" value="Renegade"/>
+		<info name="developer" value="Sensible Software"/>
 		<info name="serial" value="JA250"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1051,6 +1073,7 @@ Hangs after loading a stage, no sound (fixed, [DSP] irq priority)
 Access [cart] EEPROM
 ]]></notes>
 
+		<info name="developer" value="Rebellion"/>
 		<info name="serial" value="CF3001"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="4194304" width="32" endianness="big">
@@ -1141,7 +1164,7 @@ Same as spacewar
 		</part>
 	</software>
 
-	<!-- TODO: Arcade game, not a real Jaguar cart -->
+	<!-- TODO: Arcade game in a Jaguar cart, consider moving or duplicating in driver -->
 	<!-- version in service mode -->
 	<software name="speedst2" supported="no">
 		<description>Speedster II (6.02C)</description>
@@ -1397,18 +1420,18 @@ RSoD on Jaguar logo
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<notes><![CDATA[
-Sound farts (fixed?)
 Missing/wrong GFXs on menus (fixed)
 Heavy flickering on gameplay (fixed)
 Overstretched pixel width
 Submerged objects during gameplay, depends on [object] suspend behaviour (fixed)
-Hangs at "out of time" during gameplay, reads the line buffer for a zoom effect while keeping [object] stalled
+Garbage effect at "out of time" during gameplay, reads the line buffer for a zoom effect while keeping [object] stalled
 Triggers [object] pitch = 0 8bpp at start of gameplay
 Reads back [object] processor data during gameplay
 Access [cart] EEPROM
 Uses [GPU] irq 3
 ]]></notes>
 
+		<info name="developer" value="Virtual Studio"/>
 		<info name="serial" value="J9060E 700760-002"/>
 		<part name="cart" interface="jaguar_cart">
 			<dataarea name="rom" size="2097152" width="32" endianness="big">
@@ -1443,7 +1466,7 @@ No sound (fixed, [DSP] irq priority)
 		<notes><![CDATA[
 Black screen with buzz, regression regarding [DSP] serial irqs triggers
 Also cfr. delay slot hack note in CPU core
-Playfield fills with black stripes, probably missing [object] pitch drawing
+Playfield fills with black stripes, [object] or [blitter]
 Access [cart] EEPROM
 ]]></notes>
 

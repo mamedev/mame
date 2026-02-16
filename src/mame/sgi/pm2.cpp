@@ -8,7 +8,6 @@
  *  -
  *
  * TODO:
- *  - keyboard
  *  - mouse
  *  - memory parity
  *  - serial flow control
@@ -20,11 +19,14 @@
 
 #include "pm2.h"
 #include "pm2_mmu.h"
+#include "iris_kbd.h"
 
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/input_merger.h"
 #include "machine/mc68681.h"
+
+#include "emupal.h"
 
 //#define VERBOSE (LOG_GENERAL)
 #include "logmacro.h"
@@ -68,7 +70,7 @@ public:
 		, m_cpu(*this, "cpu")
 		, m_mmu(*this, "mmu")
 		, m_duart(*this, "duart%u", 0U)
-		, m_port(*this, "port%u", 0U)
+		, m_port(*this, "port%u", 1U)
 		, m_ram(*this, "ram")
 		, m_config(*this, "CONFIG")
 		, m_led(*this, "led")
@@ -109,9 +111,6 @@ private:
 	required_ioport m_config;
 	output_finder<> m_led;
 
-	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_mem;
-	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_spc;
-
 	u16 m_status;
 	u16 m_exception;
 	u16 m_map[240]; // AM2148-55DC 1Kx4 SRAM (x3)?
@@ -124,9 +123,6 @@ void sgi_pm2_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_exception));
 	save_item(NAME(m_map));
-
-	m_cpu->space(AS_PROGRAM).specific(m_cpu_mem);
-	m_cpu->space(m68000_device::AS_CPU_SPACE).specific(m_cpu_spc);
 
 	m_led.resolve();
 }
@@ -147,8 +143,13 @@ void sgi_pm2_device::device_reset()
 		m_installed = true;
 	}
 
-	m_status = 0;
+	m_status = STATUS_EN0 | STATUS_EN1;
 	m_exception = 0x0f;
+}
+
+void keyboard_devices(device_slot_interface &device)
+{
+	device.option_add("kbd", IRIS_KBD);
 }
 
 void sgi_pm2_device::device_add_mconfig(machine_config &config)
@@ -162,9 +163,9 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	m_cpu->set_current_mmu(m_mmu);
 
 	// Multibus interrupts
-	int_callback<1>().set_inputline(m_cpu, INPUT_LINE_IRQ1);
-	int_callback<2>().set_inputline(m_cpu, INPUT_LINE_IRQ2);
-	int_callback<5>().set_inputline(m_cpu, INPUT_LINE_IRQ5);
+	int_callback<1>().set_inputline(m_cpu, INPUT_LINE_IRQ1).invert();
+	int_callback<2>().set_inputline(m_cpu, INPUT_LINE_IRQ2).invert();
+	int_callback<5>().set_inputline(m_cpu, INPUT_LINE_IRQ5).invert();
 
 	input_merger_any_high_device &irq6(INPUT_MERGER_ANY_HIGH(config, "irq6"));
 	irq6.output_handler().set_inputline(m_cpu, INPUT_LINE_IRQ6);
@@ -186,8 +187,8 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	MC68681(config, m_duart[0], 3.6864_MHz_XTAL).irq_cb().set(irq6, FUNC(input_merger_any_high_device::in_w<0>));
 	MC68681(config, m_duart[1], 3.6864_MHz_XTAL).irq_cb().set(irq6, FUNC(input_merger_any_high_device::in_w<1>));
 
-	RS232_PORT(config, m_port[0], default_rs232_devices, nullptr); // TODO: keyboard
-	RS232_PORT(config, m_port[1], default_rs232_devices, "terminal");
+	RS232_PORT(config, m_port[0], keyboard_devices, "kbd");
+	RS232_PORT(config, m_port[1], default_rs232_devices, nullptr);
 	RS232_PORT(config, m_port[2], default_rs232_devices, nullptr);
 	RS232_PORT(config, m_port[3], default_rs232_devices, nullptr);
 
@@ -215,8 +216,12 @@ void sgi_pm2_device::mem_map(address_map &map)
 	// TODO: was there a 2M PM2 variant?
 	map(0x00'0000, 0x17'ffff).ram().share("ram"); // mt4264-15 64kx1 DRAM (8x9) + 1M on PM2M board
 
+	map(0x18'0000, 0xf7'ffff).noprw(); // HACK: silence ram sizing
+
 	map(0xf8'0000, 0xf8'7fff).rom().region("prom0", 0);
 	map(0xf9'0000, 0xf9'7fff).rom().region("prom1", 0);
+	// 0xfa'0000 prom2
+	// 0xfb'0000 prom3 - DC4?
 
 	map(0xfc'0000, 0xfc'1fff).rw(m_mmu, FUNC(pm2_mmu_device::page_r), FUNC(pm2_mmu_device::page_w));
 	map(0xfc'2000, 0xfc'3fff).rw(m_mmu, FUNC(pm2_mmu_device::prot_r), FUNC(pm2_mmu_device::prot_w));
@@ -274,7 +279,8 @@ u16 sgi_pm2_device::mem_r(offs_t offset, u16 mem_mask)
 		offs_t const physical = map(offset);
 		data = m_ram[physical];
 
-		LOG("%s: mem_r 0x%06x physical 0x%06x data 0x%04x\n", machine().describe_context(), offset << 1, physical << 1, data);
+		if (!machine().side_effects_disabled())
+			LOG("%s: mem_r 0x%06x physical 0x%06x data 0x%04x\n", machine().describe_context(), offset << 1, physical << 1, data);
 
 		if ((offset < 0x8000) && (m_status & STATUS_MBOX))
 			irq4_w<EXCEPTION_MBOX>(1);
@@ -291,7 +297,8 @@ void sgi_pm2_device::mem_w(offs_t offset, u16 data, u16 mem_mask)
 	{
 		offs_t const physical = map(offset);
 
-		LOG("%s: mem_w 0x%06x physical 0x%06x data 0x%04x\n", machine().describe_context(), offset << 1, physical << 1, data);
+		if (!machine().side_effects_disabled())
+			LOG("%s: mem_w 0x%06x physical 0x%06x data 0x%04x\n", machine().describe_context(), offset << 1, physical << 1, data);
 
 		COMBINE_DATA(&m_ram[physical]);
 

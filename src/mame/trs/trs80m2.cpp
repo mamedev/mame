@@ -739,7 +739,7 @@ void trs80m2_state::trs80m2(machine_config &config)
 	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
 
 	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
-	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dmac->in_mreq_callback().set(FUNC(trs80m2_state::read));
 	m_dmac->out_mreq_callback().set(FUNC(trs80m2_state::write));
@@ -833,7 +833,7 @@ void trs80m16_state::trs80m16(machine_config &config)
 	m_ctc->zc_callback<2>().set(Z80SIO_TAG, FUNC(z80sio_device::rxtxcb_w));
 
 	Z80DMA(config, m_dmac, 8_MHz_XTAL / 2);
-	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dmac->in_mreq_callback().set(FUNC(trs80m2_state::read));
 	m_dmac->out_mreq_callback().set(FUNC(trs80m2_state::write));

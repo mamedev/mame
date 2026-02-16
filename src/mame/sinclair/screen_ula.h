@@ -9,10 +9,10 @@ class screen_ula_device : public device_t, public device_gfx_interface
 {
 
 public:
-	screen_ula_device &set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h; m_offset_v = offset_v; return *this; }
 	screen_ula_device &set_host_ram_ptr(const u8 *host_ram_ptr) { m_host_ram_ptr = host_ram_ptr; return *this; }
 	screen_ula_device &set_palette(const char *tag, u16 base_offset, u16 alt_offset);
 
+	void set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h; m_offset_v = offset_v; }
 	void set_global_transparent(u8 global_transparent) { m_global_transparent = global_transparent; }
 	void ula_palette_select_w(bool ula_palette_select) { m_ula_palette_select = ula_palette_select; }
 
@@ -30,7 +30,7 @@ public:
 	void ula_scroll_y_w(u8 ula_scroll_y) { m_ula_scroll_y = ula_scroll_y; }
 	void ula_fine_scroll_x_w (bool ula_fine_scroll_x) { m_ula_fine_scroll_x = ula_fine_scroll_x; }
 
-	void draw_border(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 border_color);
+	void draw_border(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 border_color, u8 pcode = 0);
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool flash = 0, u8 pcode = 0);
 
 protected:

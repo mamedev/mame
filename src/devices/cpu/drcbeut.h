@@ -34,7 +34,14 @@ class drc_hash_table
 {
 public:
 	// construction/destruction
-	drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbits, uint8_t ignorebits);
+	drc_hash_table(
+			drc_cache &cache,
+			uint32_t modes,
+			uint8_t addrbits,
+			uint8_t ignorebits,
+			std::align_val_t modealign = std::align_val_t(alignof(drccodeptr **)),
+			std::align_val_t l1align = std::align_val_t(alignof(drccodeptr **)),
+			std::align_val_t l2align = std::align_val_t(alignof(drccodeptr *)));
 
 	// getters
 	drccodeptr ***base() const noexcept { return m_base; }
@@ -45,17 +52,19 @@ public:
 	offs_t l1mask() const noexcept { return m_l1mask; }
 	offs_t l2mask() const noexcept { return m_l2mask; }
 	bool is_mode_populated(uint32_t mode) const noexcept { return m_base[mode] != m_emptyl1; }
+	bool is_l1_populated(uint32_t mode, uint32_t l1) const noexcept { return m_base[mode][l1] != m_emptyl2; }
 
 	// set up and configuration
-	bool reset();
-	void set_default_codeptr(drccodeptr code);
+	bool reset() noexcept;
+	void set_default_codeptr(drccodeptr code) noexcept;
+	bool populate_mode(uint32_t mode) noexcept;
 
 	// block begin/end
 	void block_begin(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst);
 	void block_end(drcuml_block &block);
 
 	// code pointer access
-	bool set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code);
+	bool set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept;
 	drccodeptr get_codeptr(uint32_t mode, uint32_t pc) const noexcept { assert(mode < m_modes); return m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]; }
 	bool code_exists(uint32_t mode, uint32_t pc) const noexcept { return get_codeptr(mode, pc) != m_nocodeptr; }
 
@@ -65,25 +74,31 @@ private:
 
 	std::vector<drccodeptr **> m_l1blocks;
 	std::vector<drccodeptr *> m_l2blocks;
-	size_t m_next_l1_block;
-	size_t m_next_l2_block;
+	std::vector<bool> m_invariant_modes;
+	uint32_t m_next_l1_block;
+	uint32_t m_next_l2_block;
+	uint32_t m_invariant_mode_count;
 
 	// internal state
-	drc_cache &     m_cache;                // cache where allocations come from
-	uint32_t const  m_modes;                // number of modes supported
+	drc_cache &             m_cache;                // cache where allocations come from
+	std::align_val_t const  m_modealign;            // desired alignment for mode table
+	std::align_val_t const  m_l1align;              // desired alignment for L1 tables
+	std::align_val_t const  m_l2align;              // desired alignment for L2 tables
+	drccodeptr              m_nocodeptr;            // pointer to code which will handle missing entries
+	uint32_t const          m_modes;                // number of modes supported
 
-	drccodeptr      m_nocodeptr;            // pointer to code which will handle missing entries
+	uint8_t const           m_l1bits;               // bits worth of entries in L1 hash tables
+	uint8_t const           m_l2bits;               // bits worth of entries in L2 hash tables
+	uint8_t const           m_l1shift;              // shift to apply to the PC to get the L1 hash entry
+	uint8_t const           m_l2shift;              // shift to apply to the PC to get the L2 hash entry
+	offs_t const            m_l1mask;               // mask to apply after shifting
+	offs_t const            m_l2mask;               // mask to apply after shifting
 
-	uint8_t const   m_l1bits;               // bits worth of entries in L1 hash tables
-	uint8_t const   m_l2bits;               // bits worth of entries in L2 hash tables
-	uint8_t const   m_l1shift;              // shift to apply to the PC to get the L1 hash entry
-	uint8_t const   m_l2shift;              // shift to apply to the PC to get the L2 hash entry
-	offs_t const    m_l1mask;               // mask to apply after shifting
-	offs_t const    m_l2mask;               // mask to apply after shifting
-
-	drccodeptr ***  m_base;                 // pointer to the L1 table for each mode
-	drccodeptr **   m_emptyl1;              // pointer to empty L1 hash table
-	drccodeptr *    m_emptyl2;              // pointer to empty L2 hash table
+	drccodeptr *** const    m_base;                 // pointer to the L1 table for each mode
+	drccodeptr ** const     m_emptyl1;              // pointer to empty L1 hash table
+	drccodeptr * const      m_emptyl2;              // pointer to empty L2 hash table
+	std::size_t const       m_l1alloc;              // bytes to allocate for L1 tables
+	std::size_t const       m_l2alloc;              // bytes to allocate for L2 tables
 };
 
 
@@ -116,10 +131,11 @@ private:
 	using map_entry_vector = std::vector<map_entry>;
 
 	// internal state
-	drc_cache &         m_cache;            // pointer to the cache
-	uint64_t            m_uniquevalue;      // unique value used to find the table
-	uint32_t            m_mapvalue[uml::MAPVAR_END - uml::MAPVAR_M0]; // array of current values
-	map_entry_vector    m_entry_list;       // list of entries
+	drc_cache &             m_cache;            // pointer to the cache
+	uint64_t                m_uniquevalue;      // unique value used to find the table
+	uint32_t                m_mapvalue[uml::MAPVAR_END - uml::MAPVAR_M0]; // array of current values
+	map_entry_vector        m_entry_list;       // list of entries
+	std::vector<uint32_t>   m_out_temp;         // buffer for building output
 };
 
 
@@ -132,7 +148,7 @@ class drc_label_list
 {
 public:
 	// construction/destruction
-	drc_label_list(drc_cache &cache);
+	drc_label_list();
 	~drc_label_list();
 
 	// block begin/end
@@ -154,6 +170,7 @@ private:
 	struct label_fixup
 	{
 		label_entry *       label;          // the label in question
+		void *              param;          // user parameter value
 		drc_label_fixup_delegate callback;  // callback
 	};
 	using label_fixup_list = std::list<label_fixup>;
@@ -161,13 +178,10 @@ private:
 	// internal helpers
 	void reset(bool fatal_on_leftovers);
 	label_entry &find_or_allocate(uml::code_label label);
-	void oob_callback(drccodeptr *codeptr, void *param1, void *param2);
 
 	// internal state
-	drc_cache &         m_cache;            // pointer to the cache
 	label_entry_list    m_list;             // head of the live list
-	label_fixup_list    m_fixup_list;       // list of pending oob fixups
-	drc_oob_delegate    m_oob_callback_delegate; // pre-computed delegate
+	label_fixup_list    m_fixup_list;       // list of pending fixups
 	label_entry_list    m_free_labels;
 	label_fixup_list    m_free_fixups;
 };

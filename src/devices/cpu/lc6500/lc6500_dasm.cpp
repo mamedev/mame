@@ -12,7 +12,16 @@
 
 #define P std::ostream &stream, u32 opcode, const data_buffer &opcodes, u32 pc
 
-const lc6500_disassembler::instruction lc6500_disassembler::instructions[]
+struct lc6500_disassembler::instruction
+{
+	using handler = uint32_t (*)(P);
+
+	uint8_t value;
+	uint8_t mask;
+	handler cb;
+};
+
+const lc6500_disassembler::instruction lc6500_disassembler::s_instructions[]
 {
 	{ 0x00, 0xff, [](P) -> uint32_t { util::stream_format(stream, "nop"); return 1; } },
 	{ 0x01, 0xff, [](P) -> uint32_t { util::stream_format(stream, "ral"); return 1; } },
@@ -104,7 +113,7 @@ const lc6500_disassembler::instruction lc6500_disassembler::instructions[]
 
 	{ 0xe0, 0xf3, [](P) -> uint32_t { util::stream_format(stream, "xa%x", (opcode >> 2) & 3); return 1; } },
 
-	{ 0x68, 0xf8, [](P) -> uint32_t { uint16_t p = ((opcode & 0x07) << 8) | opcodes.r8(pc + 1); util::stream_format(stream, "jmp $%03x", p); return 2; } },
+	{ 0x68, 0xf8, [](P) -> uint32_t { uint16_t p = (pc & 0x800) | ((opcode & 0x07) << 8) | opcodes.r8(pc + 1); util::stream_format(stream, "jmp $%03x", p); return 2; } },
 
 	{ 0xa0, 0xf8, [](P) -> uint32_t { util::stream_format(stream, "xm #$%x", opcode & 7); return 1; } },
 
@@ -128,6 +137,7 @@ const lc6500_disassembler::instruction lc6500_disassembler::instructions[]
 
 #undef P
 
+
 uint32_t lc6500_disassembler::opcode_alignment() const
 {
 	return 1;
@@ -137,9 +147,9 @@ offs_t lc6500_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 {
 	uint8_t opcode = opcodes.r8(pc);
 
-	for (unsigned i = 0;; i++)
-		if ((opcode & instructions[i].mask) == instructions[i].value)
-			return instructions[i].cb(stream, opcode, opcodes, pc) | SUPPORTED;
+	for (unsigned i = 0; i < std::size(s_instructions); i++)
+		if ((opcode & s_instructions[i].mask) == s_instructions[i].value)
+			return s_instructions[i].cb(stream, opcode, opcodes, pc) | SUPPORTED;
 
 	return 0;
 }

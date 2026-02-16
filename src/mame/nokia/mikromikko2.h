@@ -5,28 +5,32 @@
 
 #pragma once
 
-#include "emupal.h"
-#include "screen.h"
-#include "speaker.h"
+#include "mm2kb.h"
+
 #include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
 #include "bus/scsi/s1410.h"
 #include "bus/scsi/scsihd.h"
 #include "cpu/i86/i186.h"
 #include "imagedev/floppy.h"
-#include "machine/nvram.h"
 #include "machine/am9517a.h"
+#include "machine/clock.h"
 #include "machine/i8251.h"
 #include "machine/nscsi_bus.h"
 #include "machine/nscsi_cb.h"
-#include "machine/pit8253.h"
+#include "machine/nvram.h"
 #include "machine/pic8259.h"
+#include "machine/pit8253.h"
 #include "machine/upd765.h"
-#include "machine/z80sio.h"
 #include "machine/x2212.h"
+#include "machine/z80sio.h"
 #include "sound/spkrdev.h"
 #include "video/crt9007.h"
 #include "video/crt9212.h"
+
+#include "emupal.h"
+#include "screen.h"
+#include "speaker.h"
 
 #define I80186_TAG      "maincpu"
 #define UPD765_TAG      "upd765"
@@ -53,6 +57,7 @@ public:
 		m_sasi(*this, "sasi:7:scsicb"),
 		m_rs232a(*this, "rs232a"),
 		m_rs232b(*this, "rs232b"),
+		m_kb(*this, "kb"),
 		m_palette(*this, "palette")
 	{ }
 
@@ -79,6 +84,7 @@ private:
 	required_device<nscsi_callback_device> m_sasi;
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
+	required_device<mm2_keyboard_device> m_kb;
 	required_device<palette_device> m_palette;
 
 	void mm2_map(address_map &map) ATTR_COLD;

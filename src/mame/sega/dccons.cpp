@@ -570,6 +570,22 @@ ROM_START( dcjp )
 	ROM_LOAD( "dcjp_ntsc.bin", 0x020000, 0x020000, CRC(306023ab) SHA1(5fb66adb6d1b54a552fe9c2bb736e4c6960e447d) ) // from refurbished VA0 with 1.004 BIOS
 ROM_END
 
+// VA0 motherboard, case internal marks: 8/98 MULTI
+// doesn't boot regular retail GD-ROMs
+// use a bit different game header format, for Katana SDK made games require Katana/WinCE flag (offset 0x3e) to be space (0x20), not '0'(0x30)
+ROM_START( dcproto )
+	ROM_REGION(0x200000, "maincpu", 0)
+	// M27C160-100M6 EEPROM
+	// printed label:
+	// BTR
+	// 0.822
+	// 9160
+	ROM_LOAD( "btr_0822.ic501", 0x000000, 0x200000, CRC(543fc14f) SHA1(c55242a444137d38059579f495a9d0b1be7ea41a) )
+
+	ROM_REGION64_LE(0x040000, "dcflash", ROMREGION_ERASEFF)
+	ROM_LOAD( "dc_flash.bin", 0x020000, 0x020000, CRC(97ae2693) SHA1(f009353e75d0832383d33d706775e5eaa1593753) ) // VA0
+ROM_END
+
 // unauthorised portable modification
 ROM_START( dctream )
 	ROM_REGION(0x200000, "maincpu", 0)
@@ -611,6 +627,7 @@ ROM_END
 CONS( 1999, dc,      dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (USA, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1998, dcjp,    0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (Japan, NTSC)", MACHINE_NOT_WORKING )
 CONS( 1999, dceu,    dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (Europe, PAL)", MACHINE_NOT_WORKING )
+CONS( 1998, dcproto, dcjp,   0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "Dreamcast (prototype)", MACHINE_NOT_WORKING )
 CONS( 200?, dctream, dcjp,   0,      dc,      dc,    dc_cons_state, init_tream,"<unknown>", "Treamcast", MACHINE_NOT_WORKING )
 CONS( 1998, dcdev,   0,      0,      dc,      dc,    dc_cons_state, init_dc,   "Sega", "HKT-0120 Sega Dreamcast Development Box", MACHINE_NOT_WORKING )
 

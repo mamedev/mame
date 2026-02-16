@@ -632,15 +632,15 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 	1<<17 : double to 200%
 	*/
 
-	/* force clip to bitmap boundary */
+	// force clip to bitmap boundary
 	rectangle myclip = clip;
 	myclip &= dest_bmp.cliprect();
 
-	/* 32-bit ONLY */
+	// 32-bit ONLY
 	{
 		if (gfx)
 		{
-//          const pen_t *pal = &gfx->colortable[gfx->granularity() * (color % gfx->colors())];
+			//const pen_t *pal = &gfx->colortable[gfx->granularity() * (color % gfx->colors())];
 			u32 palbase = (gfx->granularity() * color) & 0x1ffff;
 			const pen_t *pal = &m_mame_colours[palbase];
 			const u8 *source_base = gfx->get_data(code % gfx->elements());
@@ -650,7 +650,7 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 
 			if (sprite_screen_width && sprite_screen_height)
 			{
-				/* compute sprite increment per screen pixel */
+				// compute sprite increment per screen pixel
 				int dx = (gfx->width()<<16)/sprite_screen_width;
 				int dy = (gfx->height()<<16)/sprite_screen_height;
 
@@ -681,30 +681,35 @@ inline void cps3_state::cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle 
 				}
 
 				if (sx < myclip.left())
-				{ /* clip left */
+				{
+					// clip left
 					int pixels = myclip.left()-sx;
 					sx += pixels;
 					x_index_base += pixels*dx;
 				}
 				if (sy < myclip.top())
-				{ /* clip top */
+				{
+					// clip top
 					int pixels = myclip.top()-sy;
 					sy += pixels;
 					y_index += pixels*dy;
 				}
 				if (ex > myclip.right()+1)
-				{ /* clip right */
+				{
+					// clip right
 					int pixels = ex-myclip.right()-1;
 					ex -= pixels;
 				}
 				if (ey > myclip.bottom()+1)
-				{ /* clip bottom */
+				{
+					// clip bottom
 					int pixels = ey-myclip.bottom()-1;
 					ey -= pixels;
 				}
 
+				// skip if inner loop doesn't draw anything
 				if (ex > sx)
-				{ /* skip if inner loop doesn't draw anything */
+				{
 					if (transparency == CPS3_TRANSPARENCY_NONE)
 					{
 						for (int y = sy; y < ey; y++)
@@ -1344,16 +1349,16 @@ void cps3_state::cram_bank_w(offs_t offset, u32 data, u32 mem_mask)
 		if (m_cram_bank != data)
 		{
 			m_cram_bank = data;
-		//if (data & 0xfffffff0)
-		//bank_w 00000000, ffff0000
-		//bank_w 00000001, ffff0000
-		//bank_w 00000002, ffff0000
-		//bank_w 00000003, ffff0000
-		//bank_w 00000004, ffff0000
-		//bank_w 00000005, ffff0000
-		//bank_w 00000006, ffff0000
-		//bank_w 00000007, ffff0000
-		// during CHARACTER RAM test..
+			//if (data & 0xfffffff0)
+			//bank_w 00000000, ffff0000
+			//bank_w 00000001, ffff0000
+			//bank_w 00000002, ffff0000
+			//bank_w 00000003, ffff0000
+			//bank_w 00000004, ffff0000
+			//bank_w 00000005, ffff0000
+			//bank_w 00000006, ffff0000
+			//bank_w 00000007, ffff0000
+			// during CHARACTER RAM test..
 			if (DEBUG_PRINTF) logerror("bank_w %08x, %08x\n",data,mem_mask);
 
 		}
@@ -1456,8 +1461,7 @@ void cps3_state::gfxflash_w(offs_t offset, u32 data, u32 mem_mask)
 	if (chip0 == nullptr || chip1 == nullptr)
 		return;
 
-//  if (DEBUG_PRINTF) logerror("gfxflash_w %08x %08x %08x\n", offset *2, data, mem_mask);
-
+	//if (DEBUG_PRINTF) logerror("gfxflash_w %08x %08x %08x\n", offset *2, data, mem_mask);
 
 	if (ACCESSING_BITS_24_31)   // GFX Flash 1
 	{
@@ -1495,7 +1499,7 @@ void cps3_state::gfxflash_w(offs_t offset, u32 data, u32 mem_mask)
 					(chip1->read_raw(((offset*2) & 0xfffffffe)+0)<<0)  |
 					(chip1->read_raw(((offset*2) & 0xfffffffe)+1)<<16));
 
-//      logerror("flashcrap %08x %08x %08x\n", offset *2, romdata[real_offset/4], newdata);
+		//logerror("flashcrap %08x %08x %08x\n", offset *2, romdata[real_offset/4], newdata);
 		romdata[real_offset/4] = newdata;
 	}
 }
@@ -1530,7 +1534,7 @@ u32 cps3_state::flashmain_r(int which, u32 offset, u32 mem_mask)
 		result |= (m_simm[which][3]->read(offset)<<0);
 	}
 
-//  if (base==4) logerror("read flash chips addr %02x returning %08x\n", offset*4, result );
+	//if (base==4) logerror("read flash chips addr %02x returning %08x\n", offset*4, result );
 
 	return result;
 }
@@ -1837,14 +1841,9 @@ void cps3_state::palettedma_w(offs_t offset, u32 data, u32 mem_mask)
 }
 
 
-//static u8* current_table;
-
-
-
-
 u32 cps3_state::process_byte( u8 real_byte, u32 destination, int max_length )
 {
-	u8* dest       = (u8*)m_char_ram.get();
+	u8* dest = (u8*)m_char_ram.get();
 
 	//logerror("process byte for destination %08x\n", destination);
 
@@ -1871,8 +1870,7 @@ u32 cps3_state::process_byte( u8 real_byte, u32 destination, int max_length )
 
 			if ((destination+tranfercount) > 0x7fffff)  return max_length;
 
-
-	//      if (max_length==0) return max_length; // this is meant to abort the transfer if we exceed dest length,, not working
+			//if (max_length==0) return max_length; // this is meant to abort the transfer if we exceed dest length,, not working
 		}
 		return tranfercount;
 	}
@@ -1933,7 +1931,7 @@ void cps3_state::do_char_dma( u32 real_source, u32 real_destination, u32 real_le
 			if (length_remaining<=0) return;  // if we've expired, exit
 		}
 
-//      length_remaining--;
+		//length_remaining--;
 	}
 }
 
@@ -2327,7 +2325,6 @@ void cps3_state::copy_from_nvram()
 		//logerror("%08x %08x %08x %08x\n",romdata[i/4],data, romdata2[i/4], data ^ cps3_mask(i+0x6000000, m_key1, m_key2));
 		romdata[i/4] = data;
 		romdata2[i/4] = data ^ cps3_mask(i+0x6000000, m_key1, m_key2);
-
 	}
 
 	romdata  += 0x800000/4;

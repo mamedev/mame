@@ -78,19 +78,19 @@ license:CC0-1.0
 		</part>
 	</software>
 
-    <software name="basic2v10b" cloneof="basic2">
-        <description>BASIC Level 2 (Japan, version 1.0b)</description>
-        <year>1985</year>
-        <publisher>Sega</publisher>
-        <part name="cart" interface="sg1000_cart">
-            <feature name="slot" value="othello" />
-            <dataarea name="rom" size="32768">
-                <rom name="basic2v10b.bin" size="32768" crc="cdf7bdf3" sha1="e8c66630b018ba5fd2ab245c152436934ab44391" offset="000000" />
-            </dataarea>
-            <dataarea name="ram" size="2048">
-            </dataarea>
-        </part>
-    </software>
+	<software name="basic2v10b" cloneof="basic2">
+		<description>BASIC Level 2 (Japan, version 1.0b)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<feature name="slot" value="othello" />
+			<dataarea name="rom" size="32768">
+				<rom name="basic2v10b.bin" size="32768" crc="cdf7bdf3" sha1="e8c66630b018ba5fd2ab245c152436934ab44391" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="2048">
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- SC-3000 Educational carts -->
 

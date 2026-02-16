@@ -184,23 +184,27 @@ private:
 	uint8_t m_serial_smode = 0;
 	uint8_t m_dsp_irq_state = 0;
 	emu_timer *m_serial_timer = nullptr;
-
-	// blitter variables
-	uint32_t m_blitter_regs[0x40]{};
-	uint16_t m_gpu_regs[0x100/2]{};
-	emu_timer *m_object_timer = nullptr;
-	emu_timer *m_blitter_done_timer = nullptr;
-	emu_timer *m_pit_timer = nullptr;
-	emu_timer *m_gpu_sync_timer = nullptr;
 	emu_timer *m_jpit_timer[2] = {};
+
+	// Tom
+	uint16_t m_gpu_regs[0x100/2]{};
+	emu_timer *m_pit_timer = nullptr;
 	uint8_t m_cpu_irq_state = 0;
-	bitmap_rgb32 m_screen_bitmap;
-	uint8_t m_blitter_status = 0;
 	pen_t m_pen_table[65536]{};
 	uint8_t m_blend_y[65536]{};
 	uint8_t m_blend_cc[65536]{};
-	u32 m_suspend_object_pointer;
+	bitmap_rgb32 m_screen_bitmap;
 	u16 m_line_buffer[760];
+
+	// Object processor
+	emu_timer *m_object_timer = nullptr;
+	emu_timer *m_gpu_sync_timer = nullptr;
+	u32 m_suspend_object_pointer;
+
+	// Blitter
+	uint32_t m_blitter_regs[0x40]{};
+	emu_timer *m_blitter_done_timer = nullptr;
+	uint8_t m_blitter_status = 0;
 
 	static void (jaguar_state::*const bitmap4[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
 	static void (jaguar_state::*const bitmap8[8])(uint16_t *, int32_t, int32_t, uint32_t *, int32_t, uint16_t *);
@@ -343,8 +347,8 @@ private:
 	void bitmap_8_5(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase);
 	void bitmap_8_6(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase);
 	void bitmap_8_7(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint16_t *clutbase);
-//	void bitmap_16_draw(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint8_t flags, int32_t dxpos);
-//	void bitmap_32_draw(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint8_t flags, int32_t dxpos);
+//  void bitmap_16_draw(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint8_t flags, int32_t dxpos);
+//  void bitmap_32_draw(uint16_t *scanline, int32_t firstpix, int32_t iwidth, uint32_t *src, int32_t xpos, uint8_t flags, int32_t dxpos);
 
 	// from jagblit.ipp
 	void generic_blitter(uint32_t command, uint32_t a1flags, uint32_t a2flags);
@@ -357,7 +361,10 @@ private:
 	void blitter_01800001_xxxxxx_xxxxxx(uint32_t command, uint32_t a1flags, uint32_t a2flags);
 	void blitter_x1800x01_xxxxxx_xxxxxx(uint32_t command, uint32_t a1flags, uint32_t a2flags);
 
+protected:
+	// TODO: protected because reused (differently) by jaguarcd
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+private:
 	optional_device<vt83c461_device> m_ide;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -383,10 +390,10 @@ protected:
 private:
 	uint16_t butch_regs_r16(offs_t offset);
 	void butch_regs_w16(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint32_t butch_regs_r(offs_t offset);
+	uint32_t butch_regs_r(offs_t offset, uint32_t mem_mask = ~0);
 	void butch_regs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
-	uint32_t cd_bios_r(offs_t offset);
+	uint32_t cd_bios_r(address_space &space, offs_t offset);
 
 	void jaguarcd_map(address_map &map) ATTR_COLD;
 	void jagcd_gpu_dsp_map(address_map &map) ATTR_COLD;

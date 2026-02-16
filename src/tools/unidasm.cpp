@@ -186,12 +186,12 @@ using util::BIT;
 #include "cpu/tlcs90/tlcs90d.h"
 #include "cpu/tlcs900/dasm900.h"
 #include "cpu/tms1000/tms1k_dasm.h"
-#include "cpu/tms32010/32010dsm.h"
-#include "cpu/tms32025/32025dsm.h"
-#include "cpu/tms32031/dis32031.h"
-#include "cpu/tms32051/dis32051.h"
-#include "cpu/tms32082/dis_mp.h"
-#include "cpu/tms32082/dis_pp.h"
+#include "cpu/tms320c1x/tms320c1x_dasm.h"
+#include "cpu/tms320c2x/tms320c2x_dasm.h"
+#include "cpu/tms320c3x/tms320c3x_dasm.h"
+#include "cpu/tms320c5x/tms320c5x_dasm.h"
+#include "cpu/tms320c82/mp_dasm.h"
+#include "cpu/tms320c82/pp_dasm.h"
 #include "cpu/tms34010/34010dsm.h"
 #include "cpu/tms57002/57002dsm.h"
 #include "cpu/tms7000/7000dasm.h"
@@ -660,12 +660,12 @@ static const dasm_table_entry dasm_table[] =
 	{ "tms1400",         le,  0, []() -> util::disasm_interface * { return new tms1400_disassembler; } },
 	{ "tms2100",         le,  0, []() -> util::disasm_interface * { return new tms2100_disassembler; } },
 	{ "tms2400",         le,  0, []() -> util::disasm_interface * { return new tms2400_disassembler; } },
-	{ "tms32010",        be, -1, []() -> util::disasm_interface * { return new tms32010_disassembler; } },
-	{ "tms32025",        be, -1, []() -> util::disasm_interface * { return new tms32025_disassembler; } },
-	{ "tms32031",        le, -2, []() -> util::disasm_interface * { return new tms32031_disassembler; } },
-	{ "tms32051",        le, -1, []() -> util::disasm_interface * { return new tms32051_disassembler; } },
-	{ "tms32082_mp",     be,  0, []() -> util::disasm_interface * { return new tms32082_mp_disassembler; } },
-	{ "tms32082_pp",     be,  0, []() -> util::disasm_interface * { return new tms32082_pp_disassembler; } },
+	{ "tms320c1x",       be, -1, []() -> util::disasm_interface * { return new tms320c1x_disassembler; } },
+	{ "tms320c2x",       be, -1, []() -> util::disasm_interface * { return new tms320c2x_disassembler; } },
+	{ "tms320c3x",       le, -2, []() -> util::disasm_interface * { return new tms320c3x_disassembler; } },
+	{ "tms320c5x",       le, -1, []() -> util::disasm_interface * { return new tms320c5x_disassembler; } },
+	{ "tms320c82_mp",    be,  0, []() -> util::disasm_interface * { return new tms320c82_mp_disassembler; } },
+	{ "tms320c82_pp",    be,  0, []() -> util::disasm_interface * { return new tms320c82_pp_disassembler; } },
 	{ "tms34010",        le,  3, []() -> util::disasm_interface * { return new tms34010_disassembler(false); } },
 	{ "tms34020",        le,  3, []() -> util::disasm_interface * { return new tms34010_disassembler(true); } },
 	{ "tms57002",        le, -2, []() -> util::disasm_interface * { return new tms57002_disassembler; } },

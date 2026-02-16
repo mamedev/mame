@@ -1,6 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
 
+#include "cpu/z80/z80.h"
 #include "machine/input_merger.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
@@ -81,8 +82,8 @@ private:
 	required_ioport m_in2;
 	optional_ioport_array<2> m_gear;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_audiocpu;
+	required_device<z80_device> m_maincpu;
+	required_device<z80_device> m_audiocpu;
 	optional_device<taito_sj_security_mcu_device> m_mcu;
 	required_device_array<input_merger_device, 2> m_soundnmi;
 	required_device<dac_8bit_r2r_device> m_dac;
@@ -92,8 +93,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	typedef void (taitosj_state::*copy_layer_func_t)(bitmap_ind16 &,
-									const rectangle &, int, int *, rectangle *);
+	typedef void (taitosj_state::*copy_layer_func_t)(bitmap_ind16 &, const rectangle &, int, int *, rectangle *);
 	uint8_t m_input_port_4_f0 = 0;
 	uint8_t m_kikstart_gears[2]{};
 
@@ -126,7 +126,6 @@ private:
 	uint8_t mcu_mem_r(offs_t offset);
 	void mcu_mem_w(offs_t offset, uint8_t data);
 	void mcu_intrq_w(int state);
-	void mcu_busrq_w(int state);
 	uint8_t spacecr_prot_r();
 	void alpine_protection_w(uint8_t data);
 	void alpinea_bankswitch_w(uint8_t data);

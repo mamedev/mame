@@ -611,10 +611,10 @@ static INPUT_PORTS_START( reliefs1 )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_REVERSE PORT_PLAYER(2)
 
 	PORT_START("F60000")    // F60000
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("screen", FUNC(screen_device::vblank))
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
@@ -917,11 +917,11 @@ void atarisy1_state::reliefs1(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy1_state::main_map_noslapstic);
 
 	// Hall-effect analog joysticks
-	m_adc->in_callback<4>().set_ioport("IN2"); // not having this mapped shows more service mode tests 
-	m_adc->in_callback<5>().set_ioport("IN3"); // but is correct according to the joystick test?
+	m_adc->in_callback<4>().set_ioport("IN0");
+	m_adc->in_callback<5>().set_ioport("IN1");
 
-	m_adc->in_callback<6>().set_ioport("IN0");
-	m_adc->in_callback<7>().set_ioport("IN1");
+	m_adc->in_callback<6>().set_ioport("IN2");
+	m_adc->in_callback<7>().set_ioport("IN3");
 }
 
 
@@ -2552,6 +2552,7 @@ ROM_START( reliefs1 ) // LSI CART 2
 	ROM_LOAD16_BYTE( "rp-pgm-30k-hi-c72.bin", 0x030000, 0x008000, CRC(da0d7a9c) SHA1(4dd5829a9d4f4946d1d71c0b06bf9b7daf84133a) )
 	ROM_LOAD16_BYTE( "rp-pgm-30k-lo-c71.bin", 0x030001, 0x008000, CRC(247faea5) SHA1(96bf19fd57522b28dbcb421321bdc3404aeb2673) )
 
+	// Service mode says these ROMs are bad but this is a false positive.  The error also appears on original hardware.
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for 6502 code */
 	ROM_LOAD( "rp-snd-4k-c68.bin", 0x4000, 0x4000, CRC(f6ff3d90) SHA1(ea93ea4331d6f38d67665b6b4c788a0d24309f56) )
 	ROM_LOAD( "rp-snd-8k-c73.bin", 0x8000, 0x4000, CRC(932b3ca0) SHA1(d1b8a2137a889cc4df5336a050f509f4edc23917) )
@@ -2560,7 +2561,7 @@ ROM_START( reliefs1 ) // LSI CART 2
 	ROM_REGION( 0x2000, "alpha", 0 )
 	MOTHERBOARD_ALPHA
 
-  	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
+	ROM_REGION( 0x380000, "tiles", ROMREGION_INVERT | ROMREGION_ERASEFF )
 	ROM_LOAD( "rp-p0-1.c14.bin",  0x000000, 0x008000, CRC(fe82b82d) SHA1(56319cc7df1ac368443335a4ce9ef97b3585c6a9) )  /* bank 1, plane 0 */
 	ROM_LOAD( "rp-p1-1.c36.bin",  0x010000, 0x008000, CRC(8ebbbd7b) SHA1(d8c3a438d0416e81ce74dc870e1519ade858ae86) )  /* bank 1, plane 1 */
 	ROM_LOAD( "rp-p2-1.c16.bin",  0x020000, 0x008000, CRC(bdffa7ea) SHA1(33d8de21d0b8a1eddfce97bf7304ec2a416f2816) )  /* bank 1, plane 2 */
@@ -2682,6 +2683,7 @@ GAME( 1985, indytemp4,  indytemp, indytemp, indytemp, atarisy1_state, init_indyt
 GAME( 1985, indytempd,  indytemp, indytemp, indytemp, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", MACHINE_IMPERFECT_SOUND )
 GAME( 1985, indytempc,  indytemp, indytemp, indytemc, atarisy1_state, init_indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL)
 
+// atarisy1r_state is used because hardware to generate interrupt 3 only exists on LSI Cart 2, 3, 4 & cockpit boards, it is missing on TTL, LSI
 GAME( 1985, roadrunn,   atarisy1, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
 GAME( 1985, roadrunn2,  roadrunn, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )
 GAME( 1985, roadrunn1,  roadrunn, roadrunn, roadrunn, atarisy1r_state, init_roadrunn, ROT0, "Atari Games", "Road Runner (rev 1)", 0 )
@@ -2699,4 +2701,5 @@ GAME( 1987, roadblstc1, roadblst, roadb109, roadblst, atarisy1r_state, init_road
 GAME( 1987, roadblstgu, roadblst, roadb109, roadblst, atarisy1r_state, init_roadblst, ROT0, "Atari Games", "Road Blasters (upright, German, rev ?)", 0 )
 
 // not a clone of relief because it needs to be a clone of atarisy1 BIOS and it's more like an unreleased prequel than a version of the released title
-GAME( 1986, reliefs1,   atarisy1, reliefs1, reliefs1, atarisy1_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", MACHINE_NOT_WORKING )
+// joystick inputs don't work in test mode if service mode is accessed from ingame, only if the emulation is started with the test switch on (is real hardware the same?)
+GAME( 1986, reliefs1,   atarisy1, reliefs1, reliefs1, atarisy1r_state,  init_reliefs1, ROT0, "Atari Games", "Relief Pitcher (System 1, prototype)", 0 )

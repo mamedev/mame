@@ -6,7 +6,8 @@ TODO:
 - Jumps to PC=0xfb000 after the first 2 PCI dword configs, which points to empty 0xff opcodes.
   $3a000 contains an "= Award Decompression BIOS =" header.
   Original ASUS CUBX BIOSes actually have valid opcodes in that range, the dump should be bad.
-- ASUS CUBX fails reading RTC, needs virtualizing thru ISA.
+- ASUS CUBX fails reading RTC, oddly tries to access stuff outside ISA 10-bit address map
+  (mirror by default?)
 
 - In pcipc ez2d2m HDD boots to a Korean Windows 98SE, it will error out with a
   "Error 7 : Set up the system correctly." after driver installation. Follows dump heuristics:
@@ -154,7 +155,7 @@ void ez2d_state::cubx(machine_config &config)
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
-	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu", true));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
@@ -164,7 +165,7 @@ void ez2d_state::cubx(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi", 0);
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
@@ -227,4 +228,4 @@ ROM_END
 
 COMP( 2000, asuscubx, 0,   0, cubx, 0, ez2d_state, empty_init, "ASUS",        "CUBX", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 
-GAME( 2001, ez2d2m, 0, ez2d, ez2d, ez2d_state, empty_init, ROT0,   "Amuse World", "Ez2dancer 2nd Move",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2001, ez2d2m, 0, ez2d, ez2d, ez2d_state, empty_init, ROT0, "Amuse World", "Ez2dancer 2nd Move",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

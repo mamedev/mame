@@ -1242,12 +1242,13 @@ It can also be used with Final Furlong when wired correctly.
 #include "machine/rtc4543.h"
 #include "sound/c352.h"
 #include "video/poly.h"
+#include "video/rgbutil.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
-#include "md8412b.h"
+#include "md8412b_s23.h"
 #include "namco_settings.h"
 #include "vpx3220a.h"
 
@@ -1299,11 +1300,13 @@ It can also be used with Final Furlong when wired correctly.
 #define LOG_RS232           (1ULL << 44)
 #define LOG_IRQ_STATUS      (1ULL << 45)
 #define LOG_C451            (1ULL << 46)
+#define LOG_SH2_VPX         (1ULL << 47)
+#define LOG_DIRECT          (1ULL << 48)
 #define LOG_ALL ( LOG_PROJ_MAT | LOG_3D_STATE_ERR | LOG_3D_STATE_UNK | LOG_VEC_ERR | LOG_VEC_UNK | LOG_RENDER_ERR | LOG_RENDER_INFO | LOG_MODEL_ERR | \
 				LOG_MODEL_INFO | LOG_MODELS | LOG_C435_PIO_UNK | LOG_C435_UNK | LOG_C417_UNK | LOG_C417_ACK | LOG_C412_UNK | LOG_C421_UNK | \
 				LOG_C422_IRQ | LOG_C422_UNK | LOG_C361_UNK | LOG_CTL_UNK | LOG_C417_IRQ | LOG_C361_IRQ | LOG_MATRIX_INFO | LOG_VEC_INFO | \
 				LOG_CTL_REG | LOG_C435_REG | LOG_C361_REG | LOG_C417_REG | LOG_C412_RAM | LOG_C421_RAM | LOG_C404_REGS | LOG_C404_RAM | LOG_GMEN | \
-				LOG_GENERAL | LOG_RS232 | LOG_IRQ_STATUS | LOG_C451 | LOG_MATRIX_UNK | LOG_VEC_UNK | LOG_MCU_PORTS )
+				LOG_GENERAL | LOG_RS232 | LOG_IRQ_STATUS | LOG_C451 | LOG_MATRIX_UNK | LOG_VEC_UNK | LOG_MCU_PORTS | LOG_DIRECT )
 
 #define VERBOSE ( 0 )
 #include "logmacro.h"
@@ -1441,8 +1444,8 @@ struct namcos23_render_entry
 	u16 tx;
 	u16 ty;
 	u16 model_blend_factor;
-	u16 camera_power;
-	u16 camera_ambient;
+	u16 light_power;
+	u16 light_ambient;
 	u8 poly_fade_r;
 	u8 poly_fade_g;
 	u8 poly_fade_b;
@@ -1526,6 +1529,7 @@ private:
 
 	namcos23_state& m_state;
 	std::unique_ptr<u32[]> m_tmrom_decoded;
+	std::unique_ptr<u8[]> m_texattr_decoded;
 	const u8 *m_texrom;
 	const u16 *m_texram;
 	u32 m_tileid_mask;
@@ -1691,8 +1695,8 @@ public:
 		m_tx(0),
 		m_ty(0),
 		m_model_blend_factor(0x4000),
-		m_camera_power(0),
-		m_camera_ambient(0),
+		m_light_power(0),
+		m_light_ambient(0),
 		m_proj_matrix_line(0),
 		m_scaling(0x4000),
 		m_c361_irqnum(0),
@@ -1848,13 +1852,15 @@ protected:
 	void c435_matrix_set();
 	void c435_vector_set();
 	void c435_state_set();
-	void c435_scaling_set();
-	void c435_model_blend_factor_set();
+	void c435_unk_set0();
 	void c435_absolute_priority_set();
 	void c435_tx_set();
 	void c435_ty_set();
-	void c435_camera_power_set();
-	void c435_camera_ambient_set();
+	void c435_scaling_set();
+	void c435_model_blend_factor_set();
+	void c435_unk_set6();
+	void c435_light_power_set();
+	void c435_light_ambient_set();
 	void c435_render();
 	void c435_flush();
 
@@ -1956,8 +1962,8 @@ protected:
 	u16 m_tx;
 	u16 m_ty;
 	u16 m_model_blend_factor;
-	u16 m_camera_power;
-	u16 m_camera_ambient;
+	u16 m_light_power;
+	u16 m_light_ambient;
 	float m_proj_matrix[8*3];
 	u8 m_proj_matrix_line;
 
@@ -2163,7 +2169,6 @@ public:
 	void gmen(machine_config &config);
 	void gunwars(machine_config &config);
 	void raceon(machine_config &config);
-	void finfurl2(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -2172,19 +2177,17 @@ protected:
 	u32 sh2_trigger_r();
 	u32 sh2_shared_r(offs_t offset, u32 mem_mask = ~0);
 	void sh2_shared_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 mips_to_sh2_shared_r(offs_t offset, u32 mem_mask = ~0);
+	void mips_to_sh2_shared_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 sh2_dsw_r(offs_t offset, u32 mem_mask = ~0);
 	u32 mips_sh2_unk_r(offs_t offset, u32 mem_mask = ~0);
-	u32 sh2_unk_r(offs_t offset, u32 mem_mask = ~0);
-	void sh2_unk_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u32 sh2_vpxstate_r(offs_t offset, u32 mem_mask = ~0);
+	void sh2_vpxstate_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 sh2_unk6200000_r(offs_t offset, u32 mem_mask = ~0);
-	u32 sh2_kludge_r();
+	u32 vpx_line_r(offs_t offset, u32 mem_mask = ~0);
 	void vpx_i2c_sdao_w(int state);
 	u8 vpx_i2c_r();
 	void vpx_i2c_w(u8 data);
-
-	TIMER_CALLBACK_MEMBER(sh2_irq_off);
-	int m_sh2_irq;
-	emu_timer *m_sh2_irq_timer;
 
 private:
 	void mips_map(address_map &map) ATTR_COLD;
@@ -2192,12 +2195,42 @@ private:
 
 	required_device<sh7604_device> m_sh2;
 	required_device<vpx3220a_device> m_vpx;
-	required_device<md8412b_device> m_firewire;
+	required_device<md8412b_s23_device> m_firewire;
 	memory_share_creator<u32> m_sh2_shared;
 	required_ioport m_dsw;
 
 	int m_vpx_sdao;
 	u32 m_sh2_unk;
+};
+
+class finfurl2_state : public namcoss23_gmen_state
+{
+public:
+	finfurl2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		namcoss23_gmen_state(mconfig, type, tag),
+		m_handle(*this, "JVS_ANALOG_INPUT2")
+	{
+	}
+
+	void finfurl2(machine_config &config)
+	{
+		gmen(config);
+		m_jvs->set_default_option("namco_asca3a");
+	}
+
+protected:
+	virtual void configure_jvs(device_jvs_interface &io) override
+	{
+		namcoss23_state::configure_jvs(io);
+		io.analog_input<1>().set(*this, FUNC(finfurl2_state::handle_r));
+	}
+
+	uint16_t handle_r()
+	{
+		return m_handle->read() + 0xc000;
+	}
+
+	required_ioport m_handle;
 };
 
 class crszone_state : public namcoss23_state
@@ -2263,12 +2296,14 @@ namcos23_renderer::namcos23_renderer(namcos23_state &state, const u16 *tmlrom, c
 	: poly_manager<float, namcos23_render_data, 4>(state.machine()),
 	m_state(state),
 	m_tmrom_decoded(nullptr),
+	m_texattr_decoded(nullptr),
 	m_texrom(texrom),
 	m_texram(texram),
 	m_tileid_mask(tileid_mask),
 	m_tile_mask(tile_mask)
 {
 	m_tmrom_decoded = std::make_unique<u32[]>((m_tileid_mask | 0xff) + 1);
+	m_texattr_decoded = std::make_unique<u8[]>((m_tileid_mask | 0xff) + 1);
 	for (u32 tileid = 0; tileid <= m_tileid_mask; tileid++)
 	{
 		u8 attr = tmhrom[tileid >> 1];
@@ -2276,7 +2311,8 @@ namcos23_renderer::namcos23_renderer(namcos23_state &state, const u16 *tmlrom, c
 			attr &= 15;
 		else
 			attr >>= 4;
-		m_tmrom_decoded[tileid] = ((tmlrom[tileid] | (attr << 16)) & m_tile_mask) << 8;
+		m_tmrom_decoded[tileid] = ((tmlrom[tileid] | ((attr & 1) << 16)) & m_tile_mask) << 8;
+		m_texattr_decoded[tileid] = attr >> 1;
 	}
 }
 
@@ -2700,18 +2736,6 @@ void namcos23_state::c435_vector_set() // 0.5
 	LOGMASKED(LOG_VEC_INFO, "c435_vector_set (%04x): Vector %d = %08x %08x %08x\n", m_c435.buffer[0], m_c435.buffer[1], t[0], t[1], t[2]);
 }
 
-void namcos23_state::c435_scaling_set() // 4.4
-{
-	if ((m_c435.buffer[0] & 0xff) != 1)
-	{
-		LOGMASKED(LOG_VEC_ERR, "%s: WARNING: c435_scaling_set with size %d\n", machine().describe_context(), m_c435.buffer[0] & 0xff);
-		return;
-	}
-
-	LOGMASKED(LOG_MATRIX_INFO, "c435_scaling_set (%04x): %04x\n", m_c435.buffer[0], m_c435.buffer[1]);
-	m_scaling = m_c435.buffer[1];
-}
-
 void namcos23_state::c435_state_set(u16 type, const u16 *param)
 {
 	LOGMASKED(LOG_3D_STATE_UNK, "%s: c435_state_set, type %04x, header %04x\n", machine().describe_context(), type, m_c435.buffer[0]);
@@ -2737,8 +2761,8 @@ void namcos23_state::c435_state_set(u16 type, const u16 *param)
 		re->model_blend_factor = 0;
 		re->tx = 0;
 		re->ty = 0;
-		re->camera_power = m_camera_power;
-		re->camera_ambient = m_camera_ambient;
+		re->light_power = m_light_power;
+		re->light_ambient = m_light_ambient;
 		if (m_c435.buffer[0] == 0x4f38)
 		{
 			re->immediate.type  =  param[ 0];
@@ -2818,8 +2842,8 @@ void namcos23_state::c435_state_set(u16 type, const u16 *param)
 		re->model_blend_factor = 0;
 		re->tx = 0;
 		re->ty = 0;
-		re->camera_power = m_camera_power;
-		re->camera_ambient = m_camera_ambient;
+		re->light_power = m_light_power;
+		re->light_ambient = m_light_ambient;
 		/*
 		3-e0: 1110 0000, has shade+tex+pos
 		3-a0: 1010 0000, has tex+pos
@@ -2900,8 +2924,8 @@ void namcos23_state::c435_state_set(u16 type, const u16 *param)
 		re->model_blend_factor = 0;
 		re->tx = 0;
 		re->ty = 0;
-		re->camera_power = m_camera_power;
-		re->camera_ambient = m_camera_ambient;
+		re->light_power = m_light_power;
+		re->light_ambient = m_light_ambient;
 		re->immediate.type  =  param[ 0];
 		re->immediate.h     = (param[ 1] << 16) | param[ 2];
 		re->immediate.pal   = (param[ 3] << 16) | param[ 4];
@@ -2975,6 +2999,11 @@ void namcos23_state::c435_state_set() // 4.f
 	c435_state_set(m_c435.buffer[1], m_c435.buffer + 2);
 }
 
+void namcos23_state::c435_unk_set0() // 4.0
+{
+	LOGMASKED(LOG_3D_STATE_UNK, "%s: Unknown state-set type 40xx: %04x %04x\n", machine().describe_context(), m_c435.buffer[0], m_c435.buffer[1]);
+}
+
 void namcos23_state::c435_absolute_priority_set() // 4.1
 {
 	m_absolute_priority = m_c435.buffer[1];
@@ -2990,19 +3019,36 @@ void namcos23_state::c435_ty_set() // 4.3
 	m_ty = m_c435.buffer[1];
 }
 
+void namcos23_state::c435_scaling_set() // 4.4
+{
+	if ((m_c435.buffer[0] & 0xff) != 1)
+	{
+		LOGMASKED(LOG_VEC_ERR, "%s: WARNING: c435_scaling_set with size %d\n", machine().describe_context(), m_c435.buffer[0] & 0xff);
+		return;
+	}
+
+	LOGMASKED(LOG_MATRIX_INFO, "c435_scaling_set (%04x): %04x\n", m_c435.buffer[0], m_c435.buffer[1]);
+	m_scaling = m_c435.buffer[1];
+}
+
 void namcos23_state::c435_model_blend_factor_set() // 4.5
 {
 	m_model_blend_factor = m_c435.buffer[1];
 }
 
-void namcos23_state::c435_camera_power_set() // 4.7
+void namcos23_state::c435_unk_set6() // 4.6
 {
-	m_camera_power = m_c435.buffer[1];
+	LOGMASKED(LOG_3D_STATE_UNK, "%s: Unknown state-set type 46xx: %04x %04x\n", machine().describe_context(), m_c435.buffer[0], m_c435.buffer[1]);
 }
 
-void namcos23_state::c435_camera_ambient_set() // 4.8
+void namcos23_state::c435_light_power_set() // 4.7
 {
-	m_camera_ambient = m_c435.buffer[1];
+	m_light_power = m_c435.buffer[1];
+}
+
+void namcos23_state::c435_light_ambient_set() // 4.8
+{
+	m_light_ambient = m_c435.buffer[1];
 }
 
 void namcos23_state::c435_render() // 8
@@ -3035,8 +3081,8 @@ void namcos23_state::c435_render() // 8
 	re->model_blend_factor = m_model_blend_factor;
 	re->tx = scroll ? m_tx : 0;
 	re->ty = scroll ? m_ty : 0;
-	re->camera_power = m_camera_power;
-	re->camera_ambient = m_camera_ambient;
+	re->light_power = m_light_power;
+	re->light_ambient = m_light_ambient;
 	re->model.light_vector[0] = m_light_vector[0];
 	re->model.light_vector[1] = m_light_vector[1];
 	re->model.light_vector[2] = m_light_vector[2];
@@ -3139,6 +3185,9 @@ void namcos23_state::c435_pio_w(offs_t offset, u16 data)
 	case 0x4000:
 		switch (h & 0x3f00)
 		{
+		case 0x0000:
+			c435_unk_set0();
+			break;
 		case 0x0100:
 			c435_absolute_priority_set();
 			break;
@@ -3154,11 +3203,14 @@ void namcos23_state::c435_pio_w(offs_t offset, u16 data)
 		case 0x0500:
 			c435_model_blend_factor_set();
 			break;
+		case 0x0600:
+			c435_unk_set6();
+			break;
 		case 0x0700:
-			c435_camera_power_set();
+			c435_light_power_set();
 			break;
 		case 0x0800:
-			c435_camera_ambient_set();
+			c435_light_ambient_set();
 			break;
 		case 0x0f00:
 			c435_state_set();
@@ -3365,20 +3417,20 @@ bool namcos23_renderer::stencil_lookup(u32 x, u32 y)
 {
 	u32 bit = (x & 15) ^ 15;
 	u32 offs = ((y << 6) | (x >> 4)) & 0x1ffff;
-	if (!BIT(m_texram[offs], bit))
-	{
-		return true;
-	}
-	return false;
+	return !BIT(m_texram[offs], bit);
 }
 
 u32 namcos23_renderer::texture_lookup(const pen_t *pens, int penshift, int penmask, u32 u, u32 v, u8 &pen)
 {
 	const u32 tileid = ((u >> 4) & 0xff) | ((v << 4) & m_tileid_mask);
 	const u32 tile = m_tmrom_decoded[tileid];
-
-	// Probably swapx/swapy to add on bits 2-3 of attr
-	// Bits used by motoxgo at least
+	const u32 attr = m_texattr_decoded[tileid];
+	if (BIT(attr, 0))
+		v = ~v;
+	if (BIT(attr, 1))
+		u = ~u;
+	if (BIT(attr, 2))
+		std::swap(u, v);
 	pen = m_texrom[tile | ((v << 4) & 0xf0) | (u & 0x0f)];
 	return pens[(pen >> penshift) & penmask];
 }
@@ -4037,7 +4089,7 @@ void namcos23_state::render_model(const namcos23_render_entry *re)
 				if (lsi < 0)
 					lsi = 0;
 
-				pv[i].p[3] = std::clamp(re->camera_ambient + re->camera_power * lsi, 0.f, 64.f);
+				pv[i].p[3] = std::clamp(re->light_ambient + re->light_power * lsi, 0.f, 64.f);
 			}   break;
 			}
 		}
@@ -5101,6 +5153,11 @@ void crszone_state::c450_dma_size_w(address_space &space, offs_t offset, u32 dat
 
 // C412
 
+// Offsets 0x00 and 0x02 are written to and read from, but it's not clear what they do.
+// Simply returning the values written to them causes glitchy polygons instead of a background
+// to appear in the gun-adjust screen of timecrs2v1b, as well as missing background graphics
+// in some places in finfurl2/finfurl2j.
+
 u16 namcos23_state::c412_flags_r() // offset 0x06
 {
 	LOGMASKED(LOG_C412_UNK, "%s: c412_flags_r: %04x\n", machine().describe_context(), 0x0002);
@@ -5121,7 +5178,7 @@ u16 namcos23_state::c412_addr_msw_r() // offset 0x12
 
 u16 namcos23_state::c412_ram_r() // offset 0x14
 {
-	//  logerror("c412_ram_r %06x\n", m_c412.adr);
+	LOGMASKED(LOG_C412_UNK, "%s: c412_ram_r: %06x\n", machine().describe_context(), m_c412.adr);
 	if (m_c412.adr < 0x100000)
 		return m_c412.sdram_a[m_c412.adr & 0xfffff];
 	else if (m_c412.adr < 0x200000)
@@ -5139,6 +5196,7 @@ u16 namcos23_state::c412_status_r() // offset 0x18
 	// unknown status, 500gp reads it and waits for a transition
 	// no other games use it?
 	m_c412.status_c ^= 1;
+	LOGMASKED(LOG_C412_UNK, "%s: c412_status_r: %06x\n", machine().describe_context(), m_c412.status_c);
 	return m_c412.status_c;
 }
 
@@ -5194,6 +5252,7 @@ void namcos23_state::c412_ram_w(offs_t offset, u16 data, u16 mem_mask)
 u16 namcos23_state::c421_ram_r()
 {
 	offs_t offset = m_c421.adr & 0xfffff;
+	LOGMASKED(LOG_C412_UNK, "%s: c421_ram_r: %06x\n", machine().describe_context(), offset);
 	if (offset < 0x40000)
 		return m_c421.dram_a[offset & 0x3ffff];
 	else if (offset < 0x80000)
@@ -5367,6 +5426,7 @@ u16 namcos23_state::c361_vblank_r()
 
 void namcos23_state::direct_buf_start_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	LOGMASKED(LOG_DIRECT, "%s: direct_buf_start_w: %04x\n", machine().describe_context(), data);
 	m_c435.direct_buf_open = (bool)data;
 	m_c435.direct_buf_pos = 0;
 	return;
@@ -5377,6 +5437,7 @@ void namcos23_state::direct_buf_w(offs_t offset, u16 data, u16 mem_mask)
 	if (!m_c435.direct_buf_open)
 		return;
 
+	LOGMASKED(LOG_DIRECT, "%s: direct_buf_w: %04x\n", machine().describe_context(), data);
 	if (m_c435.direct_buf_pos == 0)
 	{
 		m_c435.direct_buf_pos++;
@@ -5470,6 +5531,7 @@ void namcos23_state::ctl_vbl_ack_w(offs_t offset, u16 data)
 void namcos23_state::ctl_direct_poly_w(offs_t offset, u16 data)
 {
 	// gmen wars spams this heavily with 0 prior to starting the GMEN board test
+	LOGMASKED(LOG_DIRECT, "%s: ctl_direct_poly_w: %04x\n", machine().describe_context(), data);
 	m_c435.direct_buf[m_c435.direct_buf_pos++] = data;
 	if (data)
 		m_c435.direct_buf_nonempty = true;
@@ -5867,12 +5929,33 @@ u32 namcoss23_gmen_state::sh2_trigger_r()
 
 u32 namcoss23_gmen_state::sh2_shared_r(offs_t offset, u32 mem_mask)
 {
-	return m_sh2_shared[offset];
+	const u32 data = m_sh2_shared[offset];
+	// Command responses go out at offset 0x0020
+	return data;
 }
 
 void namcoss23_gmen_state::sh2_shared_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_sh2_shared[offset]);
+	// Commands come in at offset 0x0020
+	if ((offset << 2) == 0x20 && (mem_mask & 0xffff0000) == 0xffff0000 && (data & 0xffff0000) == 0)
+	{
+		m_sh2->set_input_line(6, CLEAR_LINE);
+	}
+}
+
+u32 namcoss23_gmen_state::mips_to_sh2_shared_r(offs_t offset, u32 mem_mask)
+{
+	return m_sh2_shared[offset];
+}
+
+void namcoss23_gmen_state::mips_to_sh2_shared_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_sh2_shared[offset]);
+	if ((offset << 2) == 0x20 && (mem_mask & 0xffff0000) == 0xffff0000 && (data & 0xffff0000) < 0x01000000)
+	{
+		m_sh2->set_input_line(6, ASSERT_LINE);
+	}
 }
 
 u32 namcoss23_gmen_state::sh2_dsw_r(offs_t offset, u32 mem_mask)
@@ -5882,23 +5965,32 @@ u32 namcoss23_gmen_state::sh2_dsw_r(offs_t offset, u32 mem_mask)
 
 u32 namcoss23_gmen_state::mips_sh2_unk_r(offs_t offset, u32 mem_mask)
 {
-	logerror("%s: mips_sh2_unk_r: %08x & %08x\n", machine().describe_context().c_str(), m_sh2_unk, mem_mask);
-	return m_sh2_unk;
+	//logerror("%s: mips_sh2_unk_r: %08x & %08x\n", machine().describe_context().c_str(), 0x00000001, mem_mask);
+	return 0x00000001;
 }
 
-u32 namcoss23_gmen_state::sh2_unk_r(offs_t offset, u32 mem_mask)
+u32 namcoss23_gmen_state::sh2_vpxstate_r(offs_t offset, u32 mem_mask)
 {
-	return 0;
+	//const u32 data = 0x01000000 | (odd_frame ? 0x00000100 : 0x00000000);
+	const u32 data = m_sh2_unk;
+	LOGMASKED(LOG_SH2_VPX, "%s: sh2_vpxstate_r: %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	return data;
 }
 
-void namcoss23_gmen_state::sh2_unk_w(offs_t offset, u32 data, u32 mem_mask)
+void namcoss23_gmen_state::sh2_vpxstate_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	LOGMASKED(LOG_SH2_VPX, "%s: sh2_vpxstate_w: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	COMBINE_DATA(&m_sh2_unk);
 }
 
 u32 namcoss23_gmen_state::sh2_unk6200000_r(offs_t offset, u32 mem_mask)
 {
 	return 0x04000000;
+}
+
+u32 namcoss23_gmen_state::vpx_line_r(offs_t offset, u32 mem_mask)
+{
+	return 0x7fff0000;
 }
 
 void namcoss23_gmen_state::vpx_i2c_sdao_w(int state)
@@ -5908,20 +6000,15 @@ void namcoss23_gmen_state::vpx_i2c_sdao_w(int state)
 
 u8 namcoss23_gmen_state::vpx_i2c_r()
 {
-	//LOGMASKED(LOG_GMEN, "%s: vpx_i2c_r: %02x\n", machine().describe_context().c_str(), m_vpx_sdao);
+	LOGMASKED(LOG_GMEN, "%s: vpx_i2c_r: %02x\n", machine().describe_context().c_str(), m_vpx_sdao);
 	return m_vpx_sdao;
 }
 
 void namcoss23_gmen_state::vpx_i2c_w(u8 data)
 {
-	//LOGMASKED(LOG_GMEN, "%s: vpx_i2c_w: %02x\n", machine().describe_context().c_str(), data);
+	LOGMASKED(LOG_GMEN, "%s: vpx_i2c_w: %02x\n", machine().describe_context().c_str(), data);
 	m_vpx->sda_write(BIT(data, 0));
 	m_vpx->scl_write(BIT(data, 1));
-}
-
-u32 namcoss23_gmen_state::sh2_kludge_r()
-{
-	return 0x22115566;
 }
 
 void namcoss23_gmen_state::mips_map(address_map &map)
@@ -5929,21 +6016,23 @@ void namcoss23_gmen_state::mips_map(address_map &map)
 	namcoss23_state::mips_map(map);
 	map(0x0e400000, 0x0e400003).r(FUNC(namcoss23_gmen_state::sh2_trigger_r));
 	map(0x0e600000, 0x0e600003).r(FUNC(namcoss23_gmen_state::mips_sh2_unk_r));
-	map(0x0e700000, 0x0e70ffff).rw(FUNC(namcoss23_gmen_state::sh2_shared_r), FUNC(namcoss23_gmen_state::sh2_shared_w));
-	map(0x0e70c000, 0x0e70c003).r(FUNC(namcoss23_gmen_state::sh2_kludge_r));
+	map(0x0e700000, 0x0e70ffff).rw(FUNC(namcoss23_gmen_state::mips_to_sh2_shared_r), FUNC(namcoss23_gmen_state::mips_to_sh2_shared_w));
 }
 
 void namcoss23_gmen_state::sh2_map(address_map &map)
 {
 	map(0x00000000, 0x0000ffff).mirror(0x01000000).rw(FUNC(namcoss23_gmen_state::sh2_shared_r), FUNC(namcoss23_gmen_state::sh2_shared_w));
-	map(0x04000000, 0x043fffff).ram(); // SH-2 main work RAM (SDRAM)
+	map(0x01400000, 0x014003ff).r(FUNC(namcoss23_gmen_state::vpx_line_r));
 	map(0x01800000, 0x01bfffff).ram();
-	map(0x02800000, 0x02800003).rw(FUNC(namcoss23_gmen_state::sh2_unk_r), FUNC(namcoss23_gmen_state::sh2_unk_w));
+	map(0x02800000, 0x02800003).rw(FUNC(namcoss23_gmen_state::sh2_vpxstate_r), FUNC(namcoss23_gmen_state::sh2_vpxstate_w));
 	map(0x03000000, 0x03000003).r(FUNC(namcoss23_gmen_state::sh2_dsw_r));
+	map(0x04000000, 0x043fffff).ram(); // SH-2 main work RAM (SDRAM)
 	map(0x06000000, 0x06000003).umask32(0xff000000).rw(FUNC(namcoss23_gmen_state::vpx_i2c_r), FUNC(namcoss23_gmen_state::vpx_i2c_w));
 	map(0x06200000, 0x06200003).r(FUNC(namcoss23_gmen_state::sh2_unk6200000_r));
-	//map(0x06600000, 0x06600003).nopw();
-	map(0x00c00000, 0x00c0006b).m(m_firewire, FUNC(md8412b_device::map));
+	map(0x06200000, 0x06200003).nopw();
+	map(0x06600000, 0x06600003).nopw();
+	map(0x06a00000, 0x06a00003).nopw();
+	map(0x00c00000, 0x00c0006b).m(m_firewire, FUNC(md8412b_s23_device::map));
 }
 
 
@@ -6236,8 +6325,8 @@ void namcos23_state::machine_start()
 	save_item(NAME(m_tx));
 	save_item(NAME(m_ty));
 	save_item(NAME(m_model_blend_factor));
-	save_item(NAME(m_camera_power));
-	save_item(NAME(m_camera_ambient));
+	save_item(NAME(m_light_power));
+	save_item(NAME(m_light_ambient));
 	save_item(NAME(m_matrices));
 	save_item(NAME(m_vectors));
 	save_item(NAME(m_light_vector));
@@ -6307,8 +6396,8 @@ void namcos23_state::machine_reset()
 	m_tx = 0;
 	m_ty = 0;
 	m_model_blend_factor = 0x4000;
-	m_camera_power = 0;
-	m_camera_ambient = 0;
+	m_light_power = 0;
+	m_light_ambient = 0;
 	memset(m_proj_matrix, 0, sizeof(m_proj_matrix));
 	m_proj_matrix_line = 0;
 
@@ -6361,7 +6450,6 @@ void namcoss23_gmen_state::machine_start()
 {
 	namcos23_state::machine_start();
 
-	m_sh2_irq_timer = timer_alloc(FUNC(namcoss23_gmen_state::sh2_irq_off), this);
 	save_item(NAME(m_vpx_sdao));
 }
 
@@ -6371,17 +6459,9 @@ void namcoss23_gmen_state::machine_reset()
 
 	// halt the SH-2 until we need it
 	m_sh2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-	m_sh2_irq_timer->adjust(attotime::never);
 
-	m_sh2_irq = -1;
 	m_sh2_unk = 0;
 	m_vpx_sdao = 0;
-}
-
-TIMER_CALLBACK_MEMBER(namcoss23_gmen_state::sh2_irq_off)
-{
-	m_sh2->set_input_line(m_sh2_irq, CLEAR_LINE);
-	m_sh2_irq = -1;
 }
 
 
@@ -6626,13 +6706,15 @@ void namcoss23_gmen_state::gmen(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcoss23_gmen_state::mips_map);
 
-	SH7604(config, m_sh2, XTAL(28'700'000));
+	SH7604(config, m_sh2, XTAL(20'000'000));
 	m_sh2->set_addrmap(AS_PROGRAM, &namcoss23_gmen_state::sh2_map);
 
 	VPX3220A(config, m_vpx, 0);
 	m_vpx->sda_callback().set(FUNC(namcoss23_gmen_state::vpx_i2c_sdao_w));
+	m_vpx->vref_callback().set_inputline(m_sh2, 4);
 
-	MD8412B(config, m_firewire, 0);
+	MD8412B_S23(config, m_firewire, 0);
+	m_firewire->int_callback().set_inputline(m_sh2, 8);
 }
 
 void namcoss23_gmen_state::gunwars(machine_config &config)
@@ -6645,12 +6727,6 @@ void namcoss23_gmen_state::raceon(machine_config &config)
 {
 	gmen(config);
 	m_jvs->set_default_option("namco_asca5");
-}
-
-void namcoss23_gmen_state::finfurl2(machine_config &config)
-{
-	gmen(config);
-	m_jvs->set_default_option("namco_asca3a");
 }
 
 void crszone_state::crszone(machine_config &config)
@@ -6752,7 +6828,7 @@ static INPUT_PORTS_START(s23)
 
 	PORT_START("JVS_COIN1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_TILT2) PORT_NAME("Counter disconnected")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Counter disconnected")
 
 	/* Dummy so we can easily get the analog ch # */
 	PORT_START("JVS_ANALOG_INPUT1")
@@ -6829,28 +6905,28 @@ static INPUT_PORTS_START(gmen)
 	PORT_INCLUDE(s23)
 
 	PORT_START("GMENDSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x01, "SH-2 DIP Bit 0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, "SH-2 DIP Bit 1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "SH-2 DIP Bit 2" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x08, "SH-2 DIP Bit 3" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, "SH-2 DIP Bit 4" )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, "SH-2 DIP Bit 5" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x40, "SH-2 DIP Bit 6" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "SH-2 DIP Bit 7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -7022,6 +7098,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START(raceon)
 	PORT_INCLUDE(gmen)
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME(0x10, 0x00, "Activate Wheel Test") PORT_DIPLOCATION("DIP:4")
+	PORT_DIPSETTING(0x10, DEF_STR(On))
+	PORT_DIPSETTING(0x00, DEF_STR(Off))
 
 	PORT_MODIFY("JVS_PLAYER1")
 	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_NAME("Select Up")
@@ -8629,8 +8710,8 @@ GAME( 1998, raceon,      0,        raceon,      raceon,    namcoss23_gmen_state,
 GAME( 1998, raceonj,     raceon,   raceon,      raceon,    namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Race On! (Japan, RO1 Ver. B)",          GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, 500gp,       0,        _500gp,      500gp,     namcoss23_state,      empty_init,  ROT0, "Namco", "500 GP (US, 5GP3 Ver. C)",              GAME_FLAGS | MACHINE_NODEVICE_LAN )
 GAME( 1998, aking,       0,        aking,       aking,     namcoss23_state,      empty_init,  ROT0, "Namco", "Angler King (Japan, AG1 Ver. A)",       GAME_FLAGS )
-GAME( 1998, finfurl2,    0,        finfurl2,    finfurl2,  namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Final Furlong 2 (World, FFS2 Ver. A)",  GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:08:47 Overseas
-GAME( 1998, finfurl2j,   finfurl2, finfurl2,    finfurl2,  namcoss23_gmen_state, empty_init,  ROT0, "Namco", "Final Furlong 2 (Japan, FFS1 Ver. A)",  GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:03:14 Japanese
+GAME( 1998, finfurl2,    0,        finfurl2,    finfurl2,  finfurl2_state,       empty_init,  ROT0, "Namco", "Final Furlong 2 (World, FFS2 Ver. A)",  GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:08:47 Overseas
+GAME( 1998, finfurl2j,   finfurl2, finfurl2,    finfurl2,  finfurl2_state,       empty_init,  ROT0, "Namco", "Final Furlong 2 (Japan, FFS1 Ver. A)",  GAME_FLAGS | MACHINE_NODEVICE_LAN ) // 99/02/26  15:03:14 Japanese
 GAME( 1999, crszone,     0,        crszone,     crszone,   crszone_state,        empty_init,  ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. B)",     GAME_FLAGS )
 GAME( 1999, crszonev4a,  crszone,  crszone,     crszone,   crszone_state,        empty_init,  ROT0, "Namco", "Crisis Zone (World, CSZO4 Ver. A)",     GAME_FLAGS )
 GAME( 1999, crszonev3b,  crszone,  crszone,     crszone,   crszone_state,        empty_init,  ROT0, "Namco", "Crisis Zone (US, CSZO3 Ver. B, set 1)", GAME_FLAGS )

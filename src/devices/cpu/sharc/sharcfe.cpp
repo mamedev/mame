@@ -10,6 +10,9 @@
 #include "emu.h"
 #include "sharcfe.h"
 
+#include "sharcinternal.ipp"
+
+
 #define REG_USED(desc,x)            do { (desc).regin[0] |= 1 << (x); } while(0)
 #define REG_MODIFIED(desc,x)        do { (desc).regout[0] |= 1 << (x); } while(0)
 
@@ -69,8 +72,8 @@
 
 
 sharc_frontend::sharc_frontend(adsp21062_device *sharc, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
-	: drc_frontend(*sharc, window_start, window_end, max_sequence),
-		m_sharc(sharc)
+	: drc_frontend(*sharc, window_start, window_end, max_sequence)
+	, m_sharc(sharc)
 {
 	m_loopmap = std::make_unique<LOOP_ENTRY[]>(0x20000);
 }
@@ -84,7 +87,7 @@ void sharc_frontend::flush()
 	memset(map, 0, sizeof(LOOP_ENTRY) * 0x20000);
 }
 
-void sharc_frontend::add_loop_entry(uint32_t pc, uint8_t type, uint32_t start_pc, uint8_t looptype, uint8_t condition)
+void sharc_frontend::add_loop_entry(uint32_t pc, uint8_t type, uint32_t userflags)
 {
 	uint32_t l2 = pc >> 17;
 	uint32_t l1 = pc & 0x1ffff;
@@ -94,31 +97,34 @@ void sharc_frontend::add_loop_entry(uint32_t pc, uint8_t type, uint32_t start_pc
 
 	LOOP_ENTRY* map = m_loopmap.get();
 	uint32_t current_type = map[l1].entrytype;
-	if (current_type & type)
-	{
-		// check for mismatch if the entry is already used
-		if (map[l1].start_pc != start_pc ||
-			map[l1].looptype != looptype ||
-			map[l1].condition != condition)
-		{
-			fatalerror("sharc_frontend::add_loop_entry: existing entry does not match: start_pc %08X/%08X, looptype %02X/%02X, cond %02X/%02X", start_pc, map[l1].start_pc, looptype, map[l1].looptype, condition, map[l1].condition);
-		}
-	}
+	uint32_t current_userflags = map[l1].userflags;
 
 	current_type |= type;
+	current_userflags |= userflags;
 
 	map[l1].entrytype = current_type;
-	map[l1].looptype = looptype;
-	map[l1].condition = condition;
-	map[l1].start_pc = start_pc;
+	map[l1].userflags = current_userflags;
 }
 
 void sharc_frontend::insert_loop(const LOOP_DESCRIPTOR &loopdesc)
 {
-	add_loop_entry(loopdesc.start_pc, LOOP_ENTRY_START, loopdesc.start_pc, loopdesc.type, loopdesc.condition);
-	add_loop_entry(loopdesc.end_pc, LOOP_ENTRY_EVALUATION, loopdesc.start_pc, loopdesc.type, loopdesc.condition);
+	add_loop_entry(loopdesc.start_pc, LOOP_ENTRY_START, 0);
+	add_loop_entry(loopdesc.end_pc, LOOP_ENTRY_EVALUATION, 0);
 	if (loopdesc.astat_check_pc != 0xffffffff)
-		add_loop_entry(loopdesc.astat_check_pc, LOOP_ENTRY_ASTAT_CHECK, loopdesc.start_pc, loopdesc.type, loopdesc.condition);
+	{
+		uint32_t flags = m_sharc->do_condition_astat_bits(loopdesc.condition);
+		uint32_t userflags = 0;
+		if (flags & adsp21062_device::ASTAT_FLAGS::AZ) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AZ; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::AN) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AN; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::AV) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AV; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::AC) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AC; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::MN) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MN; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::MV) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MV; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::SV) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SV; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::SZ) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SZ; }
+		if (flags & adsp21062_device::ASTAT_FLAGS::BTF) { userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_BTF; }
+		add_loop_entry(loopdesc.astat_check_pc, LOOP_ENTRY_ASTAT_CHECK, userflags);
+	}
 }
 
 bool sharc_frontend::is_loop_evaluation(uint32_t pc)
@@ -179,20 +185,16 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	{
 		LOOP_ENTRY* map = m_loopmap.get();
 		int index = desc.pc & 0x1ffff;
-
-		if (map[index].looptype == LOOP_TYPE_CONDITIONAL)
-		{
-			uint32_t flags = m_sharc->do_condition_astat_bits(map[index].condition);
-			if (flags & adsp21062_device::ASTAT_FLAGS::AZ) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AZ; AZ_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::AN) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AN; AN_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::AV) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AV; AV_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::AC) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_AC; AC_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::MN) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MN; MN_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::MV) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_MV; MV_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::SV) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SV; SV_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::SZ) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_SZ; SZ_USED(desc); }
-			if (flags & adsp21062_device::ASTAT_FLAGS::BTF) { desc.userflags |= OP_USERFLAG_ASTAT_DELAY_COPY_BTF; BTF_USED(desc); }
-		}
+		desc.userflags |= map[index].userflags;
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_AZ) { AZ_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_AN) { AN_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_AV) { AV_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_AC) { AC_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_MN) { MN_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_MV) { MV_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_SV) { SV_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_SZ) { SZ_USED(desc); }
+		if (map[index].userflags & OP_USERFLAG_ASTAT_DELAY_COPY_BTF) { BTF_USED(desc); }
 	}
 
 	if (is_loop_start(desc.pc))
@@ -202,20 +204,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 	if (is_loop_evaluation(desc.pc))
 	{
-		LOOP_ENTRY* map = m_loopmap.get();
-		int index = desc.pc & 0x1ffff;
-
 		desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
-		desc.userdata0 = map[index].start_pc;
-		if (map[index].looptype == LOOP_TYPE_COUNTER)
-		{
-			desc.userflags |= OP_USERFLAG_COUNTER_LOOP;
-		}
-		else if (map[index].looptype == LOOP_TYPE_CONDITIONAL)
-		{
-			desc.userflags |= OP_USERFLAG_COND_LOOP;
-			desc.userflags |= (map[index].condition << 2) & OP_USERFLAG_COND_FIELD;
-		}
+		desc.userflags |= OP_USERFLAG_LOOP;
 	}
 
 
@@ -223,7 +213,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 	{
 		case 0:             // subops
 		{
-			uint32_t subop = (opcode >> 40) & 0x1f;
+			uint32_t const subop = op_get_subop(opcode);
 			switch (subop)
 			{
 				case 0x00:          // NOP / idle                       |000|00000|
@@ -240,7 +230,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x01:          // compute                              |000|00001|
 				{
-					int cond = (opcode >> 33) & 0x1f;
+					int cond = op_get_cond(opcode);
 					describe_if_condition(desc, cond);
 
 					if (!describe_compute(desc, opcode))
@@ -250,10 +240,10 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x02:          // immediate shift                      |000|00010|
 				{
-					int shiftop = (opcode >> 16) & 0x3f;
-					int rn = (opcode >> 4) & 0xf;
-					int rx = (opcode & 0xf);
-					int cond = (opcode >> 33) & 0x1f;
+					int const shiftop = (opcode >> 16) & 0x3f;
+					int const rn = (opcode >> 4) & 0xf;
+					int const rx = (opcode & 0xf);
+					int const cond = op_get_cond(opcode);
 
 					describe_if_condition(desc, cond);
 
@@ -264,10 +254,10 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x04:          // compute / modify                     |000|00100|
 				{
-					int g = (opcode >> 38) & 0x1;
-					int m = (opcode >> 27) & 0x7;
-					int i = (opcode >> 30) & 0x7;
-					int cond = (opcode >> 33) & 0x1f;
+					int const g = (opcode >> 38) & 0x1;
+					int const m = (opcode >> 27) & 0x7;
+					int const i = (opcode >> 30) & 0x7;
+					int const cond = op_get_cond(opcode);
 
 					describe_if_condition(desc, cond);
 
@@ -293,10 +283,10 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x06:          // direct jump|call                     |000|00110|
 				{
-					int j = (opcode >> 26) & 0x1;
-					int b = (opcode >> 39) & 0x1;
-					int cond = (opcode >> 33) & 0x1f;
-					uint32_t address = opcode & 0xffffff;
+					int const j = op_get_jump_j(opcode);
+					int const b = op_get_jump_b(opcode);
+					int const cond = op_get_cond(opcode);
+					uint32_t const address = opcode & 0xffffff;
 
 					if (m_sharc->if_condition_always_true(cond))
 						desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
@@ -314,10 +304,10 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x07:          // direct jump|call                     |000|00111|
 				{
-					int j = (opcode >> 26) & 0x1;
-					int b = (opcode >> 39) & 0x1;
-					int cond = (opcode >> 33) & 0x1f;
-					uint32_t address = opcode & 0xffffff;
+					int const j = op_get_jump_j(opcode);
+					int const b = op_get_jump_b(opcode);
+					int const cond = op_get_cond(opcode);
+					uint32_t const address = opcode & 0xffffff;
 
 					if (m_sharc->if_condition_always_true(cond))
 						desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
@@ -335,11 +325,11 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x08:          // indirect jump|call / compute         |000|01000|
 				{
-					int j = (opcode >> 26) & 0x1;
-					int b = (opcode >> 39) & 0x1;
-					int pmi = (opcode >> 30) & 0x7;
-					int pmm = (opcode >> 27) & 0x7;
-					int cond = (opcode >> 33) & 0x1f;
+					int const j = op_get_jump_j(opcode);
+					int const b = op_get_jump_b(opcode);
+					int const pmi = op_get_pmi(opcode);
+					int const pmm = op_get_pmm(opcode);
+					int const cond = op_get_cond(opcode);
 
 					if (!describe_compute(desc, opcode))
 						return false;
@@ -363,9 +353,9 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x09:          // indirect jump|call / compute         |000|01001|
 				{
-					int j = (opcode >> 26) & 0x1;
-					int b = (opcode >> 39) & 0x1;
-					int cond = (opcode >> 33) & 0x1f;
+					int const j = op_get_jump_j(opcode);
+					int const b = op_get_jump_b(opcode);
+					int const cond = op_get_cond(opcode);
 
 					if (!describe_compute(desc, opcode))
 						return false;
@@ -377,7 +367,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 					describe_if_condition(desc, cond);
 
-					desc.targetpc = desc.pc + util::sext((opcode >> 27) & 0x3f, 6);
+					desc.targetpc = desc.pc + op_get_reladdr(opcode);
 					desc.delayslots = (j) ? 2 : 0;
 
 					desc.userflags |= (b) ? OP_USERFLAG_CALL : 0;
@@ -386,8 +376,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x0a:          // return from subroutine / compute     |000|01010|
 				{
-					int cond = (opcode >> 33) & 0x1f;
-					int j = (opcode >> 26) & 0x1;
+					int const cond = op_get_cond(opcode);
+					int const j = op_get_jump_j(opcode);
 
 					if (!describe_compute(desc, opcode))
 						return false;
@@ -406,8 +396,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x0b:          // return from interrupt / compute      |000|01011|
 				{
-					int cond = (opcode >> 33) & 0x1f;
-					int j = (opcode >> 26) & 0x1;
+					int const cond = op_get_cond(opcode);
+					int const j = op_get_jump_j(opcode);
 
 					if (!describe_compute(desc, opcode))
 						return false;
@@ -426,7 +416,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x0c:          // do until counter expired             |000|01100|
 				{
-					int offset = util::sext(opcode & 0xffffff, 24);
+					int const offset = util::sext(opcode & 0xffffff, 24);
 
 					LOOP_DESCRIPTOR loop;
 					loop.start_pc = desc.pc + 1;
@@ -441,11 +431,11 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x0d:          // do until counter expired             |000|01101|
 				{
-					int ureg = (opcode >> 32) & 0xff;
+					int const ureg = (opcode >> 32) & 0xff;
 					if (!describe_ureg_access(desc, ureg, UREG_READ))
 						return false;
 
-					int offset = util::sext(opcode & 0xffffff, 24);
+					int const offset = util::sext(opcode & 0xffffff, 24);
 
 					LOOP_DESCRIPTOR loop;
 					loop.start_pc = desc.pc + 1;
@@ -460,8 +450,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x0e:          // do until                             |000|01110|
 				{
-					int offset = util::sext(opcode & 0xffffff, 24);
-					int cond = (opcode >> 33) & 0x1f;
+					int const offset = util::sext(opcode & 0xffffff, 24);
+					int const cond = op_get_cond(opcode);
 
 					LOOP_DESCRIPTOR loop;
 					loop.start_pc = desc.pc + 1;
@@ -490,7 +480,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x0f:          // immediate data -> ureg               |000|01111|
 				{
-					int ureg = (opcode >> 32) & 0xff;
+					int const ureg = (opcode >> 32) & 0xff;
 					if (!describe_ureg_access(desc, ureg, UREG_WRITE))
 						return false;
 					break;
@@ -501,8 +491,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				case 0x12:
 				case 0x13:
 				{
-					int ureg = (opcode >> 32) & 0xff;
-					int d = (opcode >> 40) & 1;
+					int const ureg = (opcode >> 32) & 0xff;
+					int const d = (opcode >> 40) & 1;
 					if (d)
 					{
 						if (!describe_ureg_access(desc, ureg, UREG_READ))
@@ -520,9 +510,9 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x14:          // system register bit manipulation     |000|10100|
 				{
-					int bop = (opcode >> 37) & 0x7;
-					int sreg = (opcode >> 32) & 0xf;
-					uint32_t data = (uint32_t)(opcode);
+					int const bop = (opcode >> 37) & 0x7;
+					int const sreg = (opcode >> 32) & 0xf;
+					uint32_t const data = uint32_t(opcode);
 
 					switch (bop)
 					{
@@ -614,8 +604,8 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 					}
 					else            // modify
 					{
-						int g = (opcode >> 38) & 0x1;
-						int i = (opcode >> 32) & 0x7;
+						int const g = (opcode >> 38) & 0x1;
+						int const i = (opcode >> 32) & 0x7;
 
 						if (g)
 							PM_I_USED(desc, i);
@@ -648,14 +638,14 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			if (!describe_compute(desc, opcode))
 				return false;
 
-			int pm_dreg = (opcode >> 23) & 0xf;
-			int pmm = (opcode >> 27) & 0x7;
-			int pmi = (opcode >> 30) & 0x7;
-			int dm_dreg = (opcode >> 33) & 0xf;
-			int dmm = (opcode >> 38) & 0x7;
-			int dmi = (opcode >> 41) & 0x7;
-			int pmd = (opcode >> 37) & 0x1;
-			int dmd = (opcode >> 44) & 0x1;
+			int const pm_dreg = (opcode >> 23) & 0xf;
+			int const pmm = op_get_pmm(opcode);
+			int const pmi = op_get_pmi(opcode);
+			int const dm_dreg = (opcode >> 33) & 0xf;
+			int const dmm = op_get_dmm(opcode);
+			int const dmi = op_get_dmi(opcode);
+			int const pmd = (opcode >> 37) & 0x1;
+			int const dmd = (opcode >> 44) & 0x1;
 
 			PM_I_USED(desc, pmi);
 			PM_I_MODIFIED(desc, pmi);
@@ -694,12 +684,12 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			if (!describe_compute(desc, opcode))
 				return false;
 
-			int i = (opcode >> 41) & 0x7;
-			int m = (opcode >> 38) & 0x7;
-			int cond = (opcode >> 33) & 0x1f;
-			int g = (opcode >> 32) & 0x1;
-			int d = (opcode >> 31) & 0x1;
-			int ureg = (opcode >> 23) & 0xff;
+			int const i = (opcode >> 41) & 0x7;
+			int const m = (opcode >> 38) & 0x7;
+			int const cond = op_get_cond(opcode);
+			int const g = (opcode >> 32) & 0x1;
+			int const d = (opcode >> 31) & 0x1;
+			int const ureg = (opcode >> 23) & 0xff;
 
 			describe_if_condition(desc, cond);
 
@@ -739,9 +729,9 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 			if (opcode & 0x100000000000U)   // compute / ureg <-> ureg                          |011|1|
 			{
-				int src_ureg = (opcode >> 36) & 0xff;
-				int dst_ureg = (opcode >> 23) & 0xff;
-				int cond = (opcode >> 31) & 0x1f;
+				int const src_ureg = op_get_ureg_src(opcode);
+				int const dst_ureg = op_get_ureg_dst(opcode);
+				int const cond = op_get_cond_ureg(opcode);
 
 				describe_if_condition(desc, cond);
 
@@ -752,12 +742,12 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			}
 			else                                // compute / dreg <-> DM|PM, immediate modify       |011|0|
 			{
-				int u = (opcode >> 38) & 0x1;
-				int d = (opcode >> 39) & 0x1;
-				int g = (opcode >> 40) & 0x1;
-				int dreg = (opcode >> 23) & 0xf;
-				int i = (opcode >> 41) & 0x7;
-				int cond = (opcode >> 33) & 0x1f;
+				int const u = (opcode >> 38) & 0x1;
+				int const d = (opcode >> 39) & 0x1;
+				int const g = (opcode >> 40) & 0x1;
+				int const dreg = (opcode >> 23) & 0xf;
+				int const i = (opcode >> 41) & 0x7;
+				int const cond = op_get_cond(opcode);
 
 				describe_if_condition(desc, cond);
 
@@ -800,9 +790,9 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		{
 			if (opcode & 0x100000000000U)   // immediate data -> DM|PM                          |100|1|
 			{
-				int i = (opcode >> 41) & 0x7;
-				int m = (opcode >> 38) & 0x7;
-				int g = (opcode >> 37) & 0x1;
+				int const i = (opcode >> 41) & 0x7;
+				int const m = (opcode >> 38) & 0x7;
+				int const g = (opcode >> 37) & 0x1;
 
 				desc.flags |= OPFLAG_WRITES_MEMORY;
 
@@ -823,15 +813,15 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			}
 			else                                // immediate shift / dreg <-> DM|PM                 |100|0|
 			{
-				int i = (opcode >> 41) & 0x7;
-				int m = (opcode >> 38) & 0x7;
-				int g = (opcode >> 32) & 0x1;
-				int d = (opcode >> 31) & 0x1;
-				int dreg = (opcode >> 23) & 0xf;
-				int shiftop = (opcode >> 16) & 0x3f;
-				int rn = (opcode >> 4) & 0xf;
-				int rx = (opcode & 0xf);
-				int cond = (opcode >> 33) & 0x1f;
+				int const i = (opcode >> 41) & 0x7;
+				int const m = (opcode >> 38) & 0x7;
+				int const g = (opcode >> 32) & 0x1;
+				int const d = (opcode >> 31) & 0x1;
+				int const dreg = (opcode >> 23) & 0xf;
+				int const shiftop = (opcode >> 16) & 0x3f;
+				int const rn = (opcode >> 4) & 0xf;
+				int const rx = (opcode & 0xf);
+				int const cond = op_get_cond(opcode);
 
 				describe_if_condition(desc, cond);
 
@@ -869,10 +859,10 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 		case 5:                             // ureg <-> DM|PM (indirect)                            |101|
 		{
-			int ureg = (opcode >> 32) & 0xff;
-			int d = (opcode >> 40) & 1;
-			int i = (opcode >> 41) & 0x7;
-			int g = (opcode >> 44) & 1;
+			int const ureg = (opcode >> 32) & 0xff;
+			int const d = (opcode >> 40) & 1;
+			int const i = (opcode >> 41) & 0x7;
+			int const g = (opcode >> 44) & 1;
 
 			if (d)
 			{
@@ -896,13 +886,13 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 		case 6:                             // indirect jump / compute / dreg <-> DM                |110|
 		{
-			int d = (opcode >> 44) & 0x1;
-			int dmi = (opcode >> 41) & 0x7;
-			int dmm = (opcode >> 38) & 0x7;
-			int pmi = (opcode >> 30) & 0x7;
-			int pmm = (opcode >> 27) & 0x7;
-			int cond = (opcode >> 33) & 0x1f;
-			int dreg = (opcode >> 23) & 0xf;
+			int const d = (opcode >> 44) & 0x1;
+			int const dmi = op_get_dmi(opcode);
+			int const dmm = op_get_dmm(opcode);
+			int const pmi = op_get_pmi(opcode);
+			int const pmm = op_get_pmm(opcode);
+			int const cond = op_get_cond(opcode);
+			int const dreg = (opcode >> 23) & 0xf;
 
 			if (!describe_compute(desc, opcode))
 				return false;
@@ -938,11 +928,11 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 		case 7:                             // indirect jump / compute / dreg <-> DM                |111|
 		{
-			int d = (opcode >> 44) & 0x1;
-			int dmi = (opcode >> 41) & 0x7;
-			int dmm = (opcode >> 38) & 0x7;
-			int cond = (opcode >> 33) & 0x1f;
-			int dreg = (opcode >> 23) & 0xf;
+			int const d = (opcode >> 44) & 0x1;
+			int const dmi = op_get_dmi(opcode);
+			int const dmm = op_get_dmm(opcode);
+			int const cond = op_get_cond(opcode);
+			int const dreg = (opcode >> 23) & 0xf;
 
 			if (!describe_compute(desc, opcode))
 				return false;
@@ -969,7 +959,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 				desc.flags |= OPFLAG_READS_MEMORY;
 			}
 
-			desc.targetpc = desc.pc + util::sext((opcode >> 27) & 0x3f, 6);
+			desc.targetpc = desc.pc + op_get_reladdr(opcode);
 			desc.delayslots = 0;
 			break;
 		}
@@ -984,21 +974,21 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, uint64_t opcode)
 	if ((opcode & 0x7fffff) == 0)
 		return true;
 
-	int rs = (opcode >> 12) & 0xf;
-	int rn = (opcode >> 8) & 0xf;
-	int ra = rn;
-	int rx = (opcode >> 4) & 0xf;
-	int ry = (opcode >> 0) & 0xf;
+	int const rs = (opcode >> 12) & 0xf;
+	int const rn = (opcode >> 8) & 0xf;
+	int const ra = rn;
+	int const rx = (opcode >> 4) & 0xf;
+	int const ry = (opcode >> 0) & 0xf;
 
 	if (opcode & 0x400000)      // multi-function operation
 	{
-		uint32_t multiop = (opcode >> 16) & 0x3f;
-		int fm = rs;
-		int fa = rn;
-		int fxm = (opcode >> 6) & 0x3;          // registers 0 - 3
-		int fym = ((opcode >> 4) & 0x3) + 4;    // registers 4 - 7
-		int fxa = ((opcode >> 2) & 0x3) + 8;    // registers 8 - 11
-		int fya = (opcode & 0x3) + 12;          // registers 12 - 15
+		uint32_t const multiop = (opcode >> 16) & 0x3f;
+		int const fm = rs;
+		int const fa = rn;
+		int const fxm = (opcode >> 6) & 0x3;          // registers 0 - 3
+		int const fym = ((opcode >> 4) & 0x3) + 4;    // registers 4 - 7
+		int const fxa = ((opcode >> 2) & 0x3) + 8;    // registers 8 - 11
+		int const fya = (opcode & 0x3) + 12;          // registers 12 - 15
 
 		switch (multiop)
 		{
@@ -1141,7 +1131,7 @@ bool sharc_frontend::describe_compute(opcode_desc &desc, uint64_t opcode)
 	}
 	else                            // single-function operation
 	{
-		uint32_t operation = (opcode >> 12) & 0xff;
+		uint32_t const operation = (opcode >> 12) & 0xff;
 
 		switch ((opcode >> 20) & 3)
 		{
