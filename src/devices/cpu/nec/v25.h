@@ -127,6 +127,8 @@ private:
 	emu_timer *m_timers[4];
 
 	// serial interface related
+	uint8_t   m_rxb[2];
+	uint8_t   m_txb[2];
 	uint8_t   m_scm[2];
 	uint8_t   m_scc[2];
 	uint8_t   m_brg[2];
@@ -224,6 +226,10 @@ private:
 	void exic1_w(uint8_t d);
 	uint8_t exic2_r();
 	void exic2_w(uint8_t d);
+	uint8_t rxb0_r();
+	void rxb0_w(uint8_t d);
+	uint8_t txb0_r();
+	void txb0_w(uint8_t d);
 	uint8_t srms0_r();
 	void srms0_w(uint8_t d);
 	uint8_t stms0_r();
@@ -241,6 +247,10 @@ private:
 	void sric0_w(uint8_t d);
 	uint8_t stic0_r();
 	void stic0_w(uint8_t d);
+	uint8_t rxb1_r();
+	void rxb1_w(uint8_t d);
+	uint8_t txb1_r();
+	void txb1_w(uint8_t d);
 	uint8_t srms1_r();
 	void srms1_w(uint8_t d);
 	uint8_t stms1_r();
