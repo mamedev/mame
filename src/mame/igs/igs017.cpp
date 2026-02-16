@@ -1103,7 +1103,6 @@ void igs017_state::machine_reset()
 	m_scramble_data = 0;
 
 	m_igs029_send_len = m_igs029_recv_len = 0;
-
 }
 
 void igs017_state::dsw_select_w(u8 data)
@@ -1120,7 +1119,7 @@ u8 igs017_state::dsw_r()
 	return ret;
 }
 
-void igs017_state::igs029_get_reg(u8 reg_offset)
+inline void igs017_state::igs029_get_reg(u8 reg_offset)
 {
 		put_u32be(m_igs029_recv_buf, m_igs029_reg[reg_offset]);
 
@@ -1128,7 +1127,7 @@ void igs017_state::igs029_get_reg(u8 reg_offset)
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
 }
 
-void igs017_state::igs029_get_ret(u32 ret)
+inline void igs017_state::igs029_get_ret(u32 ret)
 {
 		put_u32be(m_igs029_recv_buf, ret);
 
@@ -1136,7 +1135,7 @@ void igs017_state::igs029_get_ret(u32 ret)
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x05;
 }
 
-void igs017_state::igs029_set_reg(u8 reg_offset, u8 data_offset)
+inline void igs017_state::igs029_set_reg(u8 reg_offset, u8 data_offset)
 {
 		m_igs029_reg[reg_offset] = get_u32le(&m_igs029_send_buf[data_offset]);
 
@@ -1185,9 +1184,9 @@ void igs017_state::common_igs029_run()
 		u8 ret = 0xff;
 		if (!BIT(m_dsw_select, 0))
 			ret &= m_io_dsw[0]->read();
-		else if (!BIT(m_dsw_select, 1))
+		if (!BIT(m_dsw_select, 1))
 			ret &= m_io_dsw[1]->read();
-		else
+		if (BIT(m_dsw_select, 0) && BIT(m_dsw_select, 1))
 			logerror("%s: warning, reading dsw with dsw_select = %02x\n", machine().describe_context(), m_dsw_select);
 
 		m_igs029_recv_len = 0;
@@ -1247,7 +1246,9 @@ void igs017_state::common_igs029_run()
 		bool no_ret = true;
 
 		if (m_igs029_send_buf[2] == 0x03)
+		{
 			m_igs029_reg[m_igs029_send_buf[5]] = m_igs029_reg[m_igs029_send_buf[3]] & m_igs029_reg[m_igs029_send_buf[4]];
+		}
 		else if (m_igs029_send_buf[2] == 0x15)
 		{
 			u32 ret = m_igs029_reg[m_igs029_send_buf[3]] + m_igs029_reg[m_igs029_send_buf[4]];
@@ -1275,15 +1276,25 @@ void igs017_state::common_igs029_run()
 			no_ret = false;
 		}
 		else if (m_igs029_send_buf[2] == 0x67)
+		{
 			m_igs029_reg[m_igs029_send_buf[4]] = m_igs029_reg[m_igs029_send_buf[5]];    //unconfirmed
+		}
 		else if (m_igs029_send_buf[2] == 0xc2)
+		{
 			m_igs029_reg[m_igs029_send_buf[3]] = m_igs029_reg[m_igs029_send_buf[4]] + m_igs029_reg[m_igs029_send_buf[5]];
+		}
 		else if (m_igs029_send_buf[2] == 0xe8)
+		{
 			m_igs029_reg[m_igs029_send_buf[4]] = m_igs029_reg[m_igs029_send_buf[3]] - m_igs029_reg[m_igs029_send_buf[5]];
+		}
 		else if (m_igs029_send_buf[2] == 0xf2)
+		{
 			m_igs029_reg[m_igs029_send_buf[5]] = m_igs029_reg[m_igs029_send_buf[4]];
+		}
 		else
+		{
 			logerror("07 2C cmd %02x %02x %02x %02x %02x %02x\n", m_igs029_send_buf[0], m_igs029_send_buf[1], m_igs029_send_buf[2], m_igs029_send_buf[3], m_igs029_send_buf[4], m_igs029_send_buf[5]);
+		}
 
 		if (no_ret)
 		{
@@ -1298,7 +1309,9 @@ void igs017_state::common_igs029_run()
 		bool no_ret = true;
 
 		if  (m_igs029_send_buf[2] == 0x00)
+		{
 			m_igs029_reg[m_igs029_send_buf[3]] = m_igs029_reg[m_igs029_send_buf[5]] >> m_igs029_reg[m_igs029_send_buf[4]];
+		}
 		else if (m_igs029_send_buf[2] == 0x34)
 		{
 			m_igs029_reg[m_igs029_send_buf[5]] = m_igs029_reg[m_igs029_send_buf[4]] - 1;
@@ -1310,7 +1323,9 @@ void igs017_state::common_igs029_run()
 			no_ret = false;
 		}
 		else if (m_igs029_send_buf[2] == 0x71)
+		{
 			m_igs029_reg[m_igs029_send_buf[3]] = m_igs029_reg[m_igs029_send_buf[5]] + 1;
+		}
 		else if (m_igs029_send_buf[2] == 0x9c)
 		{
 			u32 ret = m_igs029_reg[m_igs029_send_buf[4]] + 1;
@@ -1320,11 +1335,17 @@ void igs017_state::common_igs029_run()
 			no_ret = false;
 		}
 		else if (m_igs029_send_buf[2] == 0xa5)
+		{
 			m_igs029_reg[m_igs029_send_buf[4]] = m_igs029_reg[m_igs029_send_buf[5]] + 1;    //unconfirmed
+		}
 		else if (m_igs029_send_buf[2] == 0xb6)
+		{
 			m_igs029_reg[m_igs029_send_buf[5]] = m_igs029_reg[m_igs029_send_buf[3]] * m_igs029_reg[m_igs029_send_buf[4]];
+		}
 		else
+		{
 			logerror("07 3B cmd %02x %02x %02x %02x %02x %02x\n", m_igs029_send_buf[0], m_igs029_send_buf[1], m_igs029_send_buf[2], m_igs029_send_buf[3], m_igs029_send_buf[4], m_igs029_send_buf[5]);
+		}
 
 		if (no_ret)
 		{
@@ -3079,7 +3100,9 @@ void igs017_state::mgcs_igs029_run()
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
 	}
 	else
+	{
 		common_igs029_run();
+	}
 
 	m_igs029_send_len = 0;
 }
@@ -3364,11 +3387,12 @@ void igs017_state::sdmg2_mux_map(address_map &map)
 
 u8 igs017_state::mgdh_boot_r(offs_t offset)
 {
-	static constexpr u8 mgdh_boot_table[4] = {0, 1, 2, 0};
+	constexpr u8 mgdh_boot_table[4] = {0, 1, 2, 0};
 
 	u8 ret = mgdh_boot_table[m_mgdh_boot_ptr];
 
-	m_mgdh_boot_ptr = (m_mgdh_boot_ptr + 1) & 3;
+	if (!machine().side_effects_disabled())
+		m_mgdh_boot_ptr = (m_mgdh_boot_ptr + 1) & 3;
 
 	return ret;
 }
@@ -3582,7 +3606,8 @@ void igs017_state::lhzb2_keys_hopper_w(u8 data)
 u8 igs017_state::lhzb2_scramble_data_r()
 {
 	u8 ret = bitswap<8>(m_scramble_data, 0,1,2,3,4,5,6,7);
-	LOGMASKED(LOG_PROT_SCRAMBLE, "%s: reading scrambled data %02x from igs_mux\n", machine().describe_context(), ret);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PROT_SCRAMBLE, "%s: reading scrambled data %02x from igs_mux\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -3934,7 +3959,9 @@ void igs017_state::jking302us_igs029_run()
 		m_igs029_recv_buf[m_igs029_recv_len++] = 0x01;
 	}
 	else
+	{
 		common_igs029_run();
+	}
 
 	m_igs029_send_len = 0;
 }
@@ -3989,8 +4016,9 @@ void igs017_state::jking302us_sound_scramble_w(u8 data)
 
 u8 igs017_state::jking302us_scramble_coin_r()
 {
-	u8 ret = ((bitswap<4>(((m_scramble_data + 1) & 3), 0, 1, 2, 3) & 0xf) << 4) | (m_io_coins->read() & 0xf);
-	LOGMASKED(LOG_PROT_SCRAMBLE, "%s: reading scrambled data %02x from igs_mux\n", machine().describe_context(), ret);
+	u8 ret = (bitswap<4>((m_scramble_data + 1) & 3, 0, 1, 2, 3) << 4) | (m_io_coins->read() & 0xf);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PROT_SCRAMBLE, "%s: reading scrambled data %02x from igs_mux\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -5263,10 +5291,10 @@ static INPUT_PORTS_START( cpoker2 )
 	PORT_DIPNAME( 0x02, 0x02, "System Limit" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING( 0x02, "Unlimited" )
 	PORT_DIPSETTING( 0x00, "Limited" )
-	PORT_DIPNAME( 0x04, 0x04, "W-Up Game" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x04, "Double Up Game" ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING( 0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "W-Up Type" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x08, 0x08, "Double Up Game Type" ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING( 0x08, "Big-Small" )
 	PORT_DIPSETTING( 0x00, "Red-Black" )
 	PORT_DIPNAME( 0x10, 0x10, "Game Speed" ) PORT_DIPLOCATION("SW1:5")
@@ -5324,16 +5352,16 @@ static INPUT_PORTS_START( jking302us )
 	PORT_DIPNAME( 0x40, 0x40, "Password" )            PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "In Mode" )             PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x80, 0x80, "Credit Mode" )         PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING( 0x80, "Coin Acceptor" )
 	PORT_DIPSETTING( 0x00, "Key-In" )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, "Out Mode" )            PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, "Payout Mode" )         PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING( 0x03, "Hopper" )
 	PORT_DIPSETTING( 0x02, "Ticket" )
-	PORT_DIPSETTING( 0x01, "KeyDown" )
-	PORT_DIPSETTING( 0x00, "KeyDown" )
+	PORT_DIPSETTING( 0x01, "Key-Out" )
+	PORT_DIPSETTING( 0x00, "Key-Out" )
 	PORT_DIPUNUSED_DIPLOC(0x04, 0x04, "SW2:3")
 	PORT_DIPUNUSED_DIPLOC(0x08, 0x08, "SW2:4")
 	PORT_DIPUNUSED_DIPLOC(0x10, 0x10, "SW2:5")
@@ -5844,7 +5872,6 @@ void igs017_state::lhzb2b(machine_config &config)
 
 	// video
 	m_igs017_igs031->set_palette_scramble_cb(FUNC(igs017_state::lhzb2a_palette_bitswap));
-
 }
 
 void igs017_state::lhzb2c(machine_config &config)
