@@ -61,9 +61,6 @@ void sshuffle_state::sshuffle_io(address_map &map)
 {
 }
 
-static INPUT_PORTS_START(sshuffle)
-INPUT_PORTS_END
-
 void sshuffle_state::sshuffle(machine_config &config)
 {
 	PENTIUM4(config, m_maincpu, 100'000'000); // Actually an AMD Sempron SDX140HBK13GQ
@@ -89,4 +86,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2011, sshuffle, 0, sshuffle, sshuffle, sshuffle_state, empty_init, ROT0, "Arachnid", "Super Shuffle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2011, sshuffle, 0, sshuffle, 0, sshuffle_state, empty_init, ROT0, "Arachnid", "Super Shuffle", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
