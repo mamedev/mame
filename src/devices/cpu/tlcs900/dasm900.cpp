@@ -1437,7 +1437,17 @@ u32 tlcs900_disassembler::opcode_alignment() const
 tlcs900_disassembler::tlcs900_disassembler()
 	: m_symbols(nullptr)
 	, m_symbol_count(0)
+	, m_cr_symbols(nullptr)
+	, m_cr_symbol_count(0)
 {
+}
+
+char const *tlcs900_disassembler::cr_name(u8 size, u8 encoding) const
+{
+	for (std::size_t i = 0; i < m_cr_symbol_count; i++)
+		if (m_cr_symbols[i].size == size && m_cr_symbols[i].encoding == encoding)
+			return m_cr_symbols[i].name;
+	return nullptr;
 }
 
 offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
@@ -1925,79 +1935,34 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_CR8:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
 		{
-		case 0x22:
-			util::stream_format(stream, " DMAM0");
-			break;
-		case 0x26:
-			util::stream_format(stream, " DMAM1");
-			break;
-		case 0x2a:
-			util::stream_format(stream, " DMAM2");
-			break;
-		case 0x2e:
-			util::stream_format(stream, " DMAM3");
-			break;
-		default:
-			util::stream_format(stream, " unknown");
-			break;
+			char const *name = cr_name(8, imm);
+			if (name)
+				util::stream_format(stream, " %s", name);
+			else
+				util::stream_format(stream, " unknown");
 		}
 		break;
 
 	case O_CR16:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
 		{
-		case 0x20:
-			util::stream_format(stream, " DMAC0");
-			break;
-		case 0x24:
-			util::stream_format(stream, " DMAC1");
-			break;
-		case 0x28:
-			util::stream_format(stream, " DMAC2");
-			break;
-		case 0x2c:
-			util::stream_format(stream, " DMAC3");
-			break;
-		default:
-			util::stream_format(stream, " unknown");
-			break;
+			char const *name = cr_name(16, imm);
+			if (name)
+				util::stream_format(stream, " %s", name);
+			else
+				util::stream_format(stream, " unknown");
 		}
 		break;
 
 	case O_CR32:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
 		{
-		case 0x00:
-			util::stream_format(stream, " DMAS0");
-			break;
-		case 0x04:
-			util::stream_format(stream, " DMAS1");
-			break;
-		case 0x08:
-			util::stream_format(stream, " DMAS2");
-			break;
-		case 0x0c:
-			util::stream_format(stream, " DMAS3");
-			break;
-		case 0x10:
-			util::stream_format(stream, " DMAD0");
-			break;
-		case 0x14:
-			util::stream_format(stream, " DMAD1");
-			break;
-		case 0x18:
-			util::stream_format(stream, " DMAD2");
-			break;
-		case 0x1c:
-			util::stream_format(stream, " DMAD3");
-			break;
-		default:
-			util::stream_format(stream, " unknown");
-			break;
+			char const *name = cr_name(32, imm);
+			if (name)
+				util::stream_format(stream, " %s", name);
+			else
+				util::stream_format(stream, " unknown");
 		}
 		break;
 
@@ -2113,79 +2078,34 @@ offs_t tlcs900_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 
 	case O_CR8:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
 		{
-		case 0x22:
-			util::stream_format(stream, ",DMAM0");
-			break;
-		case 0x26:
-			util::stream_format(stream, ",DMAM1");
-			break;
-		case 0x2a:
-			util::stream_format(stream, ",DMAM2");
-			break;
-		case 0x2e:
-			util::stream_format(stream, ",DMAM3");
-			break;
-		default:
-			util::stream_format(stream, ",unknown");
-			break;
+			char const *name = cr_name(8, imm);
+			if (name)
+				util::stream_format(stream, ",%s", name);
+			else
+				util::stream_format(stream, ",unknown");
 		}
 		break;
 
 	case O_CR16:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
 		{
-		case 0x20:
-			util::stream_format(stream, ",DMAC0");
-			break;
-		case 0x24:
-			util::stream_format(stream, ",DMAC1");
-			break;
-		case 0x28:
-			util::stream_format(stream, ",DMAC2");
-			break;
-		case 0x2c:
-			util::stream_format(stream, ",DMAC3");
-			break;
-		default:
-			util::stream_format(stream, ",unknown");
-			break;
+			char const *name = cr_name(16, imm);
+			if (name)
+				util::stream_format(stream, ",%s", name);
+			else
+				util::stream_format(stream, ",unknown");
 		}
 		break;
 
 	case O_CR32:
 		imm = opcodes.r8( pos++ );
-		switch( imm )
 		{
-		case 0x00:
-			util::stream_format(stream, ",DMAS0");
-			break;
-		case 0x04:
-			util::stream_format(stream, ",DMAS1");
-			break;
-		case 0x08:
-			util::stream_format(stream, ",DMAS2");
-			break;
-		case 0x0c:
-			util::stream_format(stream, ",DMAS3");
-			break;
-		case 0x10:
-			util::stream_format(stream, ",DMAD0");
-			break;
-		case 0x14:
-			util::stream_format(stream, ",DMAD1");
-			break;
-		case 0x18:
-			util::stream_format(stream, ",DMAD2");
-			break;
-		case 0x1c:
-			util::stream_format(stream, ",DMAD3");
-			break;
-		default:
-			util::stream_format(stream, ",unknown");
-			break;
+			char const *name = cr_name(32, imm);
+			if (name)
+				util::stream_format(stream, ",%s", name);
+			else
+				util::stream_format(stream, ",unknown");
 		}
 		break;
 
