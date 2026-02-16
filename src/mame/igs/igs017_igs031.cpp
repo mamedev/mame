@@ -26,7 +26,7 @@ void igs017_igs031_device::map(address_map &map)
 	map(0x2012, 0x2012).w(FUNC(igs017_igs031_device::video_disable_w));
 
 	map(0x2014, 0x2014).w(FUNC(igs017_igs031_device::nmi_enable_w));
-	map(0x2015, 0x2015).w(FUNC(igs017_igs031_device::irq_enable_w));
+	map(0x2015, 0x2015).nopr().w(FUNC(igs017_igs031_device::irq_enable_w)); // clr.w dummy read
 
 	map(0x4000, 0x5fff).ram().w(FUNC(igs017_igs031_device::fg_w)).share("fg_videoram");
 	map(0x6000, 0x7fff).ram().w(FUNC(igs017_igs031_device::bg_w)).share("bg_videoram");
@@ -644,6 +644,20 @@ void igs017_igs031_device::lhzb2_decrypt_sprites()
 	{
 		u16 data = get_u16le(&rom[i]); // x-22222-11111-00000
 		data = bitswap<16>(data, 15, 7,6,5,4,3, 2,1,0,14,13, 12,11,10,9,8);
+		put_u16le(&rom[i], data);
+	}
+}
+
+void igs017_igs031_device::jking302us_decrypt_sprites()
+{
+	const int rom_size = memregion("sprites")->bytes();
+	u8 * const rom = memregion("sprites")->base();
+
+	// data lines swap
+	for (int i = 0; i < rom_size; i+=2)
+	{
+		u16 data = get_u16le(&rom[i]);
+		data = bitswap<16>(data, 0, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 );
 		put_u16le(&rom[i], data);
 	}
 }
