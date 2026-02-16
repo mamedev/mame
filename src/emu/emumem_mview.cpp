@@ -530,10 +530,7 @@ void memory_view::disable()
 
 void memory_view::select(int slot)
 {
-	if (slot < 0)
-		fatalerror("memory_view %s: select of unknown slot %d\n", m_name, slot);
-
-	if (slot != m_cur_slot) {
+	if (slot != m_cur_slot || m_cur_id == -1) {
 		auto i = m_entry_mapping.find(slot);
 		if (i == m_entry_mapping.end())
 			fatalerror("memory_view %s: select of unknown slot %d\n", m_name, slot);
@@ -555,7 +552,7 @@ int memory_view::id_to_slot(int id) const
 void memory_view::initialize_from_address_map(offs_t addrstart, offs_t addrend, const address_space_config &config)
 {
 	if (m_config)
-		fatalerror("A memory_view can be present in only one address map.\n");
+		fatalerror("A memory_view can be present in only one address map.");
 
 	m_config = &config;
 	m_addrstart = addrstart;
