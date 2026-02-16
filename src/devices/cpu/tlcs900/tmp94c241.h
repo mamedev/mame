@@ -13,7 +13,6 @@
 
 #include "tlcs900.h"
 
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -125,6 +124,8 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 private:
+	int tlcs900_process_hdma(int channel);
+	void tlcs900_process_software_dma(int channel);
 	void change_timer_flipflop(uint8_t flipflop, uint8_t operation);
 
 	// Ports
@@ -195,6 +196,7 @@ private:
 	void iimc_w(uint8_t data);
 	void intclr_w(uint8_t data);
 	void dmav_w(offs_t offset, uint8_t data);
+	void dmar_w(uint8_t data);
 	uint8_t drefcr1_r();
 	void drefcr1_w(uint8_t data);
 	uint8_t dmemcr1_r();
