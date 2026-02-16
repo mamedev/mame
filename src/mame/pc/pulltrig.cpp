@@ -1,28 +1,39 @@
 // license:BSD-3-Clause
 // copyright-holders:
-/*
-Games Family P4-4P (Pentium 4 - 4 Players)
+/**************************************************************************************************
 
-PC with Chinese Windows 2000 Pro and several emulators, including (programs may change on other revisions):
- -MAME v0.78 (Dec 30 2003)
- -MAME v0.96u3 (May 25 2005)
- -MAME v0.106 (May 16 2006)
- -Nebula 2.1.5
- -FB Alpha v0.2.94.98
- -ZiNc 1.1
-
-SiS651/SiS962 based chipset plus an additional PCB for JAMMA, inputs and basic config (and protection) with:
- Atmel AT89C2051 (near a 4 dipswitches bank and a 6.000 MHz xtal)
- Microchip CF745 (near another 4 dipswitches bank and a 4.000 MHz xtal)
- 2 x Microchip PIC12F508
- Altera Max EPM7128SQC100-10 CPLD
+"Pull The Trigger"
+developed by the Korean company "Digital Silkroad Co. Ltd." and distributed by Covielsa.
 
 TODO:
-- Upgrade '630 to '651 variants;
-- Hangs at ISA $c1 the first time around, soft reset makes it to go further;
-- Hangs on CPU check;
+- Needs bump to SiS651;
+- At startup it needs a missing soft reset trigger;
+- It then draw a basic Phoenix BIOS but afterwards it accesses a missing BAR I/O
+  which craps out the flash memory somehow;
+- In shutms11 HDD image just resets during loading;
 
-*/
+===================================================================================================
+
+Standard PC with:
+-Elitegroup L4S5MG/651+ V5.0 motherboard.
+-512MB RAM, DDR PC2100 (one SIMM).
+-Wibu Systems WibuKey USB security dongle.
+-GeForce 4 MX440 8X 64MB DDR TV-OUT video card.
+-Exact CPU model and speed unknown.
+-Samsung SP0411N/OMD 40GB HDD.
+
+And an external PCB for inputs (guns, etc.) with:
+-ATF1502AS
+-AT89C51
+-AT89C2051
+-11.0592 MHz xtal near the AT89C2051
+-11.0592 MHz xtal near the AT89C51
+-4.9152 MHz xtal near the ATF1502AS.
+
+Also, the machine allows players to keep their scores on military dogtag like cards with a SEEPROM,
+named "DSR-PT1 MEMORY" (they were probably for sale).
+
+**************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
@@ -45,31 +56,29 @@ TODO:
 #include "machine/sis950_lpc.h"
 #include "machine/sis950_smbus.h"
 
+
 namespace {
 
-class gfamily_state : public driver_device
+class pulltrig_state : public driver_device
 {
 public:
-	gfamily_state(const machine_config &mconfig, device_type type, const char *tag)
+	pulltrig_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_ide_00_1(*this, "pci:00.1")
 		, m_lpc_01_0(*this, "pci:01.0")
 	{ }
 
-	void gfamily(machine_config &config);
+
+	void pulltrig(machine_config &config);
 
 private:
-
 	required_device<pentium4_device> m_maincpu;
 	required_device<sis5513_ide_device> m_ide_00_1;
 	required_device<sis950_lpc_device> m_lpc_01_0;
 
-//  void main_io(address_map &map) ATTR_COLD;
-//  void main_map(address_map &map) ATTR_COLD;
 	static void ite_superio_config(device_t *device);
 };
-
 
 static void isa_com(device_slot_interface &device)
 {
@@ -88,7 +97,7 @@ static void isa_internal_devices(device_slot_interface &device)
 	device.option_add("it8705f", IT8705F);
 }
 
-void gfamily_state::ite_superio_config(device_t *device)
+void pulltrig_state::ite_superio_config(device_t *device)
 {
 	it8705f_device &fdc = *downcast<it8705f_device *>(device);
 //  fdc.set_sysopt_pin(1);
@@ -103,21 +112,19 @@ void gfamily_state::ite_superio_config(device_t *device)
 }
 
 
-void gfamily_state::gfamily(machine_config &config)
+
+void pulltrig_state::pulltrig(machine_config &config)
 {
-	// Socket 478
-	// Actually an Intel Celeron SL6SC 1.7GHz (with the config found with the default BIOS)
-	PENTIUM4(config, m_maincpu, 100'000'000); //1'700'000'000);
+	PENTIUM4(config, m_maincpu, 100'000'000); // Exact CPU and frequency unknown
 	m_maincpu->set_irq_acknowledge_callback("pci:01.0:pic_master", FUNC(pic8259_device::inta_cb));
 //  m_maincpu->smiact().set("pci:00.0", FUNC(sis950_lpc_device::smi_act_w));
 
 	// TODO: everything below needs upgrading to SiS651
-	// TODO: unknown flash ROM types
-	// Needs a $80000 sized ROM
+	// TODO: unknown flash ROM type (wrong one)
+	// Needs a $40000 sized ROM, not $80000
 	AMD_29F400T(config, "flash");
 
 	PCI_ROOT(config, "pci", 0);
-	// up to 512MB, 2 x DIMM sockets
 	SIS630_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 	SIS5513_IDE(config, m_ide_00_1, 0, "maincpu");
 	// TODO: both on same line as default, should also trigger towards LPC
@@ -147,7 +154,9 @@ void gfamily_state::gfamily(machine_config &config)
 	// This will be correctly identified as bus #1-dev #0-func #0 by the Award BIOS
 	SIS630_GUI(config, "pci:02.0:00.0", 0);
 
-	// TODO: looks different
+	// TODO: 3 PCI slots, 1 AGP, whatever is CNR slot
+
+	// confirmed IT8705F
 	ISA16_SLOT(config, "superio", 0, "pci:01.0:isabus", isa_internal_devices, "it8705f", true).set_option_machine_config("it8705f", ite_superio_config);
 
 	rs232_port_device& serport0(RS232_PORT(config, "serport0", isa_com, "microsoft_mouse"));
@@ -165,42 +174,21 @@ void gfamily_state::gfamily(machine_config &config)
 	serport1.cts_handler().set("superio:it8705f", FUNC(it8705f_device::ncts2_w));
 }
 
-/***************************************************************************
 
-  Game drivers
+ROM_START(pulltrig)
+	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASE00)
+	ROM_LOAD("51402.bin",    0x00000, 0x40000, CRC(33bed7c0) SHA1(169374b6dac5bbba335e113a97ac34dc830c2599))
+	ROM_COPY("flash",        0x00000, 0x40000, 0x40000 )
 
-***************************************************************************/
+	ROM_REGION(0x50000, "io", 0)
+	ROM_LOAD("at89c51.bin",  0x00000, 0x01000, NO_DUMP) // AT89C51, protected
+	ROM_LOAD("at89c2051.u3", 0x10000, 0x04000, NO_DUMP) // 2 Kbytes internal ROM
 
-ROM_START( gmfamily )
-
-	/* Different PC motherboards with different configurations.
-	   By now, we're throwing all known BIOSes here. */
-	ROM_REGION32_LE(0x80000, "flash", ROMREGION_ERASEFF)
-
-	/* CPU: Intel Celeron 1.7GHz / 128kb / 400MHz SL6SC
-	   RAM: 256MB-DDR400
-	   PCB: Realtec ALC655 audio, Realtec RTL8201BL Ethernet (25.000 MHz xtal), Winbond W83194BG-648 (14.31818 MHz xtal) */
-	ROM_SYSTEM_BIOS(0, "ay36_8897", "04/082006-SiS-651-6A6IXRMAC-00")
-	ROMX_LOAD("686_amibios_ay36_8897.bin", 0x00000, 0x80000, CRC(e04c5750) SHA1(240ca6b270bdebf129e4ce43e79275aa067b6ada), ROM_BIOS(0))
-
-	/* CPU: Pentium 4 2.40GHz/512/533 SL6DV
-	   RAM: 512MB
-	   PCB: ECS (Elitegroup) 651-M v2.4. Seems like a later low-cost version of the consumer v2.0 motherboard. */
-	ROM_SYSTEM_BIOS(1, "sy_sis651", "05/13/2005-SiS-651-6A6IXE19C-00")
-	ROMX_LOAD("award_i6a6ixe19.bin",       0x40000, 0x40000, CRC(95fa392c) SHA1(40f557339649c47e6c3d941670604e0559edf8db), ROM_BIOS(1)) // Winbond W49F002UP12N
-
-	// PICs and MCUs from the I/O board, all of them protected
-	ROM_REGION(0x10000, "unsorted", 0)
-	ROM_LOAD("at89c2051.u3", 0x0000, 0x4000, NO_DUMP) // 2 Kbytes internal ROM
-	ROM_LOAD("cf745.u2",     0x4000, 0x2000, NO_DUMP) // 1 Kbytes internal ROM
-	ROM_LOAD("pic12f508.u0", 0x6000, 0x2000, NO_DUMP) // 1 Kbytes internal ROM
-	ROM_LOAD("pic12f508.u6", 0x8000, 0x2000, NO_DUMP) // 1 Kbytes internal ROM
-
-	DISK_REGION( "pci:00.1:ide1:0:hdd" ) // From a Norton Ghost recovery image
-	DISK_IMAGE( "gamesfamily_1.1", 0, SHA1(0410c24cea2a5dc816f4972df65cb1cb0bf1d730) )
+	DISK_REGION("pci:00.1:ide1:0:hdd")
+	DISK_IMAGE("pullthetrigger", 0, SHA1(438d57499e435e9e4e4a5980e9b1ca0df4f4ccca))
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
-GAME( 200?, gmfamily, 0, gfamily, 0, gfamily_state, empty_init, ROT0, "bootleg", "Games Family", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(2003, pulltrig, 0, pulltrig, 0, pulltrig_state, empty_init, ROT0, "Digital Silkroad", "Pull The Trigger", MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)

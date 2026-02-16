@@ -2,36 +2,36 @@
 // copyright-holders:
 /**************************************************************************************************
 
-    Skeleton driver for "EuroByte Electronics & Multimedia IASA" PC-based touch
-    games, sold in Spain by Sleic / Petaco.
+Skeleton driver for "EuroByte Electronics & Multimedia IASA" PC-based touch
+games, sold in Spain by Sleic / Petaco.
 
-    -----+----------------------------+------+----------------------------------
-    Dump | Game                       | Year | Notes
-    -----+----------------------------+------+----------------------------------
-    NO   | Superchip                  | 1999 |
-    NO   | Star Touch                 | 2000 |
-    YES  | Star Touch / EuroPlay 2001 | 2001 | Original Game: http://www.eurobyte.com.gr/gb_europlay.htm
+-----+----------------------------+------+----------------------------------
+Dump | Game                       | Year | Notes
+-----+----------------------------+------+----------------------------------
+NO   | Superchip                  | 1999 |
+NO   | Star Touch                 | 2000 |
+YES  | Star Touch / EuroPlay 2001 | 2001 | Original Game: http://www.eurobyte.com.gr/gb_europlay.htm
 
-    Hardware overview:
-    MB Soyo M5EH or similar (e.g. Biostar M5ATD)
-    16384 KB RAM
-    Intel Pentium MMX 233 MHz or compatible (e.g. Cyrix M II-300GP 66MHz Bus 3.5x 2.9V)
+Hardware overview:
+MB Soyo M5EH or similar (e.g. Biostar M5ATD)
+16384 KB RAM
+Intel Pentium MMX 233 MHz or compatible (e.g. Cyrix M II-300GP 66MHz Bus 3.5x 2.9V)
 
-    Soyo M5EH uses a VIA Apollo MVP3 chipset with VT82C597 + VT82C586B
+Soyo M5EH uses a VIA Apollo MVP3 chipset with VT82C597 + VT82C586B
 
-    MicroTouch ISA
-    ExpertColor Med3931 ISA sound card or other 82C931-based similar card (e.g. BTC 1817DS OPTi ISA)
-    PCI VGA ExpertColor M50-02 (S3, Trio64V2/DX 86C775, 512KB RAM)
-    Parallel port dongle HASP4
-    Creative Video Blaster camera (parallel port)
-    HDD Samsung SV0322A or other IDE HDD with similar capacity (e.g. Seagate ST32122A).
+MicroTouch ISA
+ExpertColor Med3931 ISA sound card or other 82C931-based similar card (e.g. BTC 1817DS OPTi ISA)
+PCI VGA ExpertColor M50-02 (S3, Trio64V2/DX 86C775, 512KB RAM)
+Parallel port dongle HASP4
+Creative Video Blaster camera (parallel port)
+HDD Samsung SV0322A or other IDE HDD with similar capacity (e.g. Seagate ST32122A).
 
-    TODO:
-    - europl01 boots Windows 3.11 fine in pcipc & shutms11 but will:
-    1. "could not find sound card" in C:\wingk\audio\sndinit (which has a poor attempt at
-       suppressing the log, should be NUL but it's NULL instead)
-    2. Fails loading windows for "video device conflict" (s3vcp64.drv)
-    Note that the underlying .ini files will also load a Greek driver keyboard ...
+TODO:
+- europl01 boots Windows 3.11 fine in pcipc & shutms11 but will:
+1. "could not find sound card" in C:\wingk\audio\sndinit (which has a poor attempt at
+   suppressing the log, should be NUL but it's NULL instead)
+2. Fails loading windows for "video device conflict" (s3vcp64.drv)
+- Note that the underlying .ini files will also load a Greek driver keyboard ...
 
 **************************************************************************************************/
 

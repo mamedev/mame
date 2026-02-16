@@ -37643,6 +37643,9 @@ i8555081
 i8580071
 i8580111
 
+@source:pc/pulltrig.cpp
+pulltrig
+
 @source:pc/quakeat.cpp
 ga6la7
 quake
@@ -44293,9 +44296,6 @@ pt68k4
 
 @source:skeleton/ptcsol.cpp
 sol20
-
-@source:skeleton/pullttrigger.cpp
-pullttrig
 
 @source:skeleton/pv9234.cpp
 pv9234

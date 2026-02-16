@@ -77,7 +77,7 @@ static INPUT_PORTS_START(rt1000b)
 	PORT_CONFSETTING(0x06, "D800h")
 	PORT_CONFSETTING(0x07, "DC00h")
 	// J4
-	// TODO: what's this exactly, is "floptical" a typo?
+	// TODO: "floptical" is a LS-120 SuperDisk
 	PORT_CONFNAME(0x08, 0x08, "Drive A: setting")
 	PORT_CONFSETTING( 0x00, "Floptical drive") // closed
 	PORT_CONFSETTING( 0x08, "Other drive") // open
