@@ -9,10 +9,10 @@
 
 #pragma once
 
+#include "toaplan_dsp.h"
 #include "toaplan_scu.h"
 
 #include "cpu/m68000/m68000.h"
-#include "cpu/tms320c1x/tms320c1x.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopl.h"
 
@@ -122,7 +122,7 @@ protected:
 	void bcu_control_w(offs_t offset, u16 data);
 	u16 tileram_offs_r();
 	void tileram_offs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 tileram_r(offs_t offset);
+	virtual u16 tileram_r(offs_t offset);
 	void tileram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 scroll_regs_r(offs_t offset);
 	void scroll_regs_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -146,6 +146,11 @@ protected:
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void reset_sound();
 	void reset_callback(int state);
+
+	void bcu_map(address_map &map) ATTR_COLD;
+	void fcu_map(address_map &map) ATTR_COLD;
+	void int_palette_map(address_map &map) ATTR_COLD;
+	void tile_offset_fcu_flip_map(address_map &map) ATTR_COLD;
 
 	void hellfire_main_map(address_map &map) ATTR_COLD;
 	void hellfire_sound_io_map(address_map &map) ATTR_COLD;
@@ -176,6 +181,8 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 
+	virtual u16 tileram_r(offs_t offset) override;
+
 private:
 	required_device<toaplan_scu_device> m_spritegen;
 
@@ -183,7 +190,6 @@ private:
 	void coin_counter_2_w(int state);
 	void coin_lockout_1_w(int state);
 	void coin_lockout_2_w(int state);
-	u16 tileram_r(offs_t offset);
 	void pri_cb(u8 priority, u32 &pri_mask);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
@@ -203,31 +209,15 @@ public:
 
 	void demonwld(machine_config &config);
 
-protected:
-	virtual void device_post_load() override;
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 private:
-	required_device<tms320c10_device> m_dsp;
+	required_device<toaplan_dsp_device> m_dsp;
 
-	/* Demon world */
-	s32 m_dsp_on = 0;
-	s32 m_dsp_bio = 0;
-	bool m_dsp_execute = false;
-	u32 m_dsp_addr_w = 0;
-	u32 m_main_ram_seg = 0;
-
-	void dsp_addrsel_w(u16 data);
-	u16 dsp_r();
-	void dsp_w(u16 data);
-	void dsp_bio_w(u16 data);
-	int bio_r();
 	void dsp_ctrl_w(u8 data);
-	void dsp_int_w(int enable);
 
-	void dsp_io_map(address_map &map) ATTR_COLD;
-	void dsp_program_map(address_map &map) ATTR_COLD;
+	void dsp_host_addr_cb(u16 data, u32 &seg, u32 &addr);
+	u16 dsp_host_read_cb(u32 seg, u32 addr);
+	bool dsp_host_write_cb(u32 seg, u32 addr, u16 data);
+
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_io_map(address_map &map) ATTR_COLD;
 };

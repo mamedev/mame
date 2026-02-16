@@ -21,7 +21,7 @@ void toaplan1_state::intenable_w(u8 data)
 }
 
 
-void toaplan1_demonwld_state::dsp_addrsel_w(u16 data)
+void toaplan1_demonwld_state::dsp_host_addr_cb(u16 data, u32 &seg, u32 &addr)
 {
 	/* This sets the main CPU RAM address the DSP should */
 	/*  read/write, via the DSP IO port 0 */
@@ -31,112 +31,60 @@ void toaplan1_demonwld_state::dsp_addrsel_w(u16 data)
 	/* Lower thirteen bits of this data is shifted left one position */
 	/*  to move it to an even address word boundary */
 
-	m_main_ram_seg = ((data & 0xe000) << 9);
-	m_dsp_addr_w   = ((data & 0x1fff) << 1);
-	logerror("DSP PC:%04x IO write %04x (%08x) at port 0\n", m_dsp->pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
+	seg  = ((data & 0xe000) << 9);
+	addr = ((data & 0x1fff) << 1);
 }
 
-u16 toaplan1_demonwld_state::dsp_r()
+u16 toaplan1_demonwld_state::dsp_host_read_cb(u32 seg, u32 addr)
 {
-	/* DSP can read data from main CPU RAM via DSP IO port 1 */
-
 	u16 input_data = 0;
 
-	switch (m_main_ram_seg)
+	switch (seg)
 	{
-		case 0xc00000: {address_space &mainspace = m_maincpu->space(AS_PROGRAM);
-						input_data = mainspace.read_word(m_main_ram_seg + m_dsp_addr_w);
-						break;}
+		case 0xc00000:
+		{
+			address_space &mainspace = m_maincpu->space(AS_PROGRAM);
+			input_data = mainspace.read_word(seg + addr);
+			break;
+		}
 		default:
 			if (!machine().side_effects_disabled())
-				logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n", m_dsp->pcbase(), m_main_ram_seg + m_dsp_addr_w);
+				logerror("%s: Warning !!! IO reading from %08x (port 1)\n", machine().describe_context(), seg + addr);
 			break;
 	}
-	if (!machine().side_effects_disabled())
-		logerror("DSP PC:%04x IO read %04x at %08x (port 1)\n", m_dsp->pcbase(), input_data, m_main_ram_seg + m_dsp_addr_w);
 	return input_data;
 }
 
-void toaplan1_demonwld_state::dsp_w(u16 data)
+bool toaplan1_demonwld_state::dsp_host_write_cb(u32 seg, u32 addr, u16 data)
 {
-	/* Data written to main CPU RAM via DSP IO port 1 */
-	m_dsp_execute = false;
-	switch (m_main_ram_seg)
+	bool execute = false;
+
+	switch (seg)
 	{
-		case 0xc00000: {if ((m_dsp_addr_w < 3) && (data == 0)) m_dsp_execute = true;
-						address_space &mainspace = m_maincpu->space(AS_PROGRAM);
-						mainspace.write_word(m_main_ram_seg + m_dsp_addr_w, data);
-						break;}
-		default:        logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n", m_dsp->pcbase(), m_main_ram_seg + m_dsp_addr_w);
-	}
-	logerror("DSP PC:%04x IO write %04x at %08x (port 1)\n", m_dsp->pcbase(), data, m_main_ram_seg + m_dsp_addr_w);
-}
-
-void toaplan1_demonwld_state::dsp_bio_w(u16 data)
-{
-	/* data 0xffff  means inhibit BIO line to DSP and enable */
-	/*              communication to main processor */
-	/*              Actually only DSP data bit 15 controls this */
-	/* data 0x0000  means set DSP BIO line active and disable */
-	/*              communication to main processor*/
-
-	logerror("DSP PC:%04x IO write %04x at port 3\n", m_dsp->pcbase(), data);
-	if (BIT(data, 15))
-		m_dsp_bio = CLEAR_LINE;
-
-	if (data == 0)
-	{
-		if (m_dsp_execute)
+		case 0xc00000:
 		{
-			logerror("Turning 68000 on\n");
-			m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-			m_dsp_execute = false;
+			if ((addr < 3) && (data == 0)) execute = true;
+			address_space &mainspace = m_maincpu->space(AS_PROGRAM);
+			mainspace.write_word(seg + addr, data);
+			break;
 		}
-		m_dsp_bio = ASSERT_LINE;
+		default:
+			logerror("%s: Warning !!! IO writing to %08x (port 1)\n", machine().describe_context(), seg + addr);
+			break;
 	}
-}
-
-int toaplan1_demonwld_state::bio_r()
-{
-	return m_dsp_bio;
-}
-
-
-void toaplan1_demonwld_state::dsp_int_w(int enable)
-{
-	m_dsp_on = enable;
-	if (enable)
-	{
-		logerror("Turning DSP on and 68000 off\n");
-		m_dsp->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
-		m_dsp->set_input_line(0, ASSERT_LINE); /* TMS32010 INT */
-		m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	}
-	else
-	{
-		logerror("Turning DSP off\n");
-		m_dsp->set_input_line(0, CLEAR_LINE); /* TMS32010 INT */
-		m_dsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
-	}
-}
-
-void toaplan1_demonwld_state::device_post_load()
-{
-	dsp_int_w(m_dsp_on);
+	return execute;
 }
 
 void toaplan1_demonwld_state::dsp_ctrl_w(u8 data)
 {
 #if 0
-	logerror("68000:%08x  Writing %02x to $e0000b.\n", m_maincpu->pc(), data);
+	logerror("%s: Writing %02x to $e0000b.\n", machine().describe_context(), data);
 #endif
 
-	switch (data)
-	{
-		case 0x00:  dsp_int_w(1); break;  /* Enable the INT line to the DSP */
-		case 0x01:  dsp_int_w(0); break;  /* Inhibit the INT line to the DSP */
-		default:    logerror("68000:%08x  Writing unknown command %02x to $e0000b\n", m_maincpu->pcbase(), data); break;
-	}
+	if (data & ~0x01)
+		logerror("%s: Writing unknown command %02x to $e0000b\n", machine().describe_context(), data);
+	else
+		m_dsp->dsp_int_w(BIT(~data, 0));
 }
 
 
@@ -219,26 +167,7 @@ void toaplan1_state::machine_reset()
 	machine().bookkeeping().coin_lockout_global_w(0);
 }
 
-void toaplan1_demonwld_state::machine_reset()
-{
-	toaplan1_state::machine_reset();
-	m_dsp_addr_w = 0;
-	m_main_ram_seg = 0;
-	m_dsp_execute = false;
-}
-
-
 void toaplan1_state::machine_start()
 {
 	save_item(NAME(m_intenable));
-}
-
-void toaplan1_demonwld_state::machine_start()
-{
-	toaplan1_state::machine_start();
-	save_item(NAME(m_dsp_on));
-	save_item(NAME(m_dsp_addr_w));
-	save_item(NAME(m_main_ram_seg));
-	save_item(NAME(m_dsp_bio));
-	save_item(NAME(m_dsp_execute));
 }
