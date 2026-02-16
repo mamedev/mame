@@ -2074,6 +2074,7 @@ void tlcs900_device::op_EI()
 {
 	m_sr.b.h = ( m_sr.b.h & 0x8f ) | ( ( m_imm1.b.l & 0x07 ) << 4 );
 	m_check_irqs = 1;
+	m_irq_inhibit = true;  /* defer interrupt acceptance by 1 instruction */
 }
 
 
@@ -3040,6 +3041,7 @@ void tlcs900_device::op_RETI()
 	m_xssp.d += 4;
 	m_regbank = m_sr.b.h & 0x03;
 	m_check_irqs = 1;
+	m_irq_inhibit = true;  /* defer interrupt acceptance by 1 instruction */
 	m_prefetch_clear = true;
 }
 

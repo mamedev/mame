@@ -108,6 +108,7 @@ protected:
 	uint8_t   m_timer_8[6];
 	int     m_timer_change[8];
 	bool    m_prefetch_clear;
+	bool    m_irq_inhibit;  /* interrupt shadow after EI/RETI - defer IRQ acceptance by 1 instruction */
 	uint8_t   m_prefetch_index;
 	uint8_t   m_prefetch[4];
 
