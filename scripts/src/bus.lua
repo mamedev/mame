@@ -3313,6 +3313,25 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/mm2/exp.h,BUSES["MM2"] = true
+---------------------------------------------------
+
+if BUSES["MM2"] then
+	files {
+		MAME_DIR .. "src/devices/bus/mm2/exp.cpp",
+		MAME_DIR .. "src/devices/bus/mm2/exp.h",
+		MAME_DIR .. "src/devices/bus/mm2/crtc186.cpp",
+		MAME_DIR .. "src/devices/bus/mm2/crtc186.h",
+		MAME_DIR .. "src/devices/bus/mm2/mm2kb.cpp",
+		MAME_DIR .. "src/devices/bus/mm2/mm2kb.h",
+		MAME_DIR .. "src/devices/bus/mm2/mmc186.cpp",
+		MAME_DIR .. "src/devices/bus/mm2/mmc186.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/mpf1/slot.h,BUSES["MPF1"] = true
 ---------------------------------------------------
 
