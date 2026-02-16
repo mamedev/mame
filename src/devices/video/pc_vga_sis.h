@@ -33,7 +33,18 @@ protected:
 	virtual void recompute_params() override;
 
 	u8 m_ramdac_mode = 0;
-	u8 m_ext_misc_ctrl[10]{};
+	u8 m_ext_sr07;
+	u8 m_ext_sr0b;
+	u8 m_ext_sr0c;
+	u8 m_ext_sr23;
+	u8 m_ext_sr33;
+	u8 m_ext_sr34;
+	u8 m_ext_sr35;
+	u8 m_ext_sr38;
+	u8 m_ext_sr39;
+	u8 m_ext_sr3c;
+	u8 m_ext_ge26;
+	u8 m_ext_ge27;
 	//u16 m_ext_config_status = 0;
 	u8 m_ext_scratch[5]{};
 	u8 m_ext_vert_overflow = 0;
@@ -45,8 +56,10 @@ protected:
 	u8 m_ext_clock_source_select = 0;
 	bool m_unlock_reg = false;
 
-	std::tuple<u8, u8> flush_true_color_mode();
-//  bool m_dual_seg_mode = false;
+	virtual uint32_t latch_start_addr() override;
+	virtual std::tuple<u8, u8> flush_true_color_mode();
+	// TODO: 1024x768x16bpp wants it, mapped odd/even
+//	virtual bool get_interlace_mode() override { return BIT(m_ramdac_mode, 5); }
 };
 
 class sis630_vga_device : public sis6326_vga_device
@@ -60,6 +73,8 @@ protected:
 
 	virtual void crtc_map(address_map &map) override ATTR_COLD;
 	virtual void sequencer_map(address_map &map) override ATTR_COLD;
+
+	virtual std::tuple<u8, u8> flush_true_color_mode() override;
 };
 
 DECLARE_DEVICE_TYPE(SIS6326_VGA, sis6326_vga_device)
