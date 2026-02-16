@@ -7,8 +7,8 @@
 
 Konami 'Hornet' Hardware, Konami, 1997-2000
 Hardware info by Guru
-Last updated: 22nd April 2021
------------------------------
+Last updated: 17th February, 2026
+---------------------------------
 
 Known games on this hardware include....
 
@@ -56,11 +56,11 @@ Game              KONAMI ID  CPU PCB    GFX Board(s)  notes
 Gradius 4         GX837      GN715(A)   GN715(B)
 NBA Play By Play  GX778      GN715(A)   GN715(B)
 Teraburst         GX715      GN715(A)   GN715(B)      GN680(E) I/O board
-Thrill Drive      GE713UF    GN715(A)   GN715(B)      GN676-PWB(H)A LAN PCB
+Thrill Drive      GE713UF    GN715(A)   GN715(B)      GN676-PWB(H)A LAN PCB (also used for protection)
 Silent Scope      GQ830      GN715(A)   2x GN715(B)
 Silent Scope      GQ830      GN715(A)   2x GQ871(B)
-Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H) LAN PCB
-Silent Scope 2    GQ931      GN715(A)   2x GN715(B)   GQ931(H) LAN PCB
+Silent Scope 2    GQ931      GN715(A)   2x GQ871(B)   GQ931(H) LAN PCB \ Also used for protection and
+Silent Scope 2    GQ931      GN715(A)   2x GN715(B)   GQ931(H) LAN PCB / mandatory (no boot if missing)
 
 
 PCB Layouts
@@ -97,22 +97,26 @@ GN715 PWB(A)A
 | E9825    058232           CN2                                |
 |                                                     50.000MHz|
 |    RESET_SW               CN5                    JP1  JP2    |
-|M48T58Y-70PC1  CN4                 CN6               64.000MHz|
+|M48T58Y-70PC1.35D  CN4             CN6               64.000MHz|
 |--------------------------------------------------------------|
 Notes:
       DRM1M4SJ8 - Fujitsu 81C4256 256Kx4 DRAM (SOJ24)
        SRAM256K - Cypress CY7C199 32kx8 SRAM (SOJ28)
       DRAM16X16 - Fujitsu 8118160A-60 16megx16 DRAM (SOJ42)
-  0038323 E9825 - SOIC8 (Secured PIC?). I've seen a similar chip in the security cart of System573
-  M48T58Y-70PC1 - ST Timekeeper RAM
+  0038323 E9825 - SOIC8 Secured X76F041 EEPROM. There is a similar chip in the security cart of System573.
+  M48T58Y-70PC1 - 8192-byte ST Timekeeper NVRAM with Real-Time Clock. Used for protection but also saves settings, book-keeping and high score datas.
         RF5C400 - Ricoh RF5C400 PCM 32Ch, 44.1 kHz Stereo, 3D Effect Spatializer, clock input 16.9344MHz
-         056800 - Konami Custom (QFP80)
-         058232 - Konami Custom Ceramic Package (SIL14)
+                  Sample clock 44.1kHz [16.9344/384], bit clock 2.1168MHz [16.9344/8]
+         056800 - Konami Custom (QFP80). PowerPC to 68000 communication, reads DIP switches, read/write NVRAM and protection device
+                  control including providing an 8-bit databus to the network board so that the network board has access to the NVRAM
+                  and X76F041 Secured EEPROM on the main PCB.
+         058232 - Konami Custom Ceramic Package (SIL14). Provides master reset, coin counter signals
+                  and watchdog reset. Also known as 058460.
        ADC12138 - National Semiconductor ADC12138 A/D Converter, 12-bit + Serial I/O With MUX (SOP28)
         MACH111 - AMD MACH111 CPLD (Stamped 'N676A1', PLCC44)
         68EC000 - Motorola MC68EC000, running at 16.0MHz (64/4)
        PPC403GA - IBM PowerPC 403GA CPU, clock input 32.0MHz (QFP160)
-       SM5877AM - Nippon Precision Circuits 3rd Order 2-Channel D/A Converter (SOIC24)
+       SM5877AM - Nippon Precision Circuits 3rd Order 2-Channel D/A Converter. Clock input 16.9344MHz (SOIC24)
           4AK16 - Hitachi 4AK16 Silicon N-Channel Power MOS FET Array (SIL10)
        NE5532AN - Philips, Dual Low-Noise High-Speed Audio OP Amp (DIP8)
         SP485CS - Sipex SP485CS Low Power Half Duplex RS485 Transceiver (DIP8)
@@ -123,8 +127,8 @@ Notes:
             JP1 -       25M O O-O 32M
             JP2 -       25M O O-O 32M
             JP3 -        RW O O O RO
-            JP4 - PROG  32M O O-O 16M
-            JP5 - DATA  32M O-O O 16M
+            JP4 - PROG  32M O O-O 16M (Used to set size of main program EPROMs)
+            JP5 - DATA  32M O-O O 16M (Used to set size of data ROMs)
             JP6 - BOOT   16 O-O O 32
             JP7 - SRC DOUT2 O O-O 0
             JP8 -   64M&32M O-O O 16M
@@ -133,7 +137,7 @@ Notes:
            JP11 -       64M O O-O 32M&16M
            JP12 -   through O-O O SP
            JP13 -   through O-O O SP
-           JP14 - WDT       O O
+           JP14 - WDT       O O       (Used to disable watchdog when shorted)
            JP15 -      MONO O-O O SURR
            JP16 -      HIGH O O O MID (N/C LOW)
     CN1 to  CN3 - Multi-pin Flat Cable Connector
@@ -159,6 +163,7 @@ Teraburst    -       715l02  715l03  715A09  715A10  -       778A12  715A04  715
 Thrill Drive 713AB01 -       -       713A09  713A10  -       -       713A04  713A05  -    -   713A08
 S/Scope      830B01  -       -       830A09  830A10  -       -       -       -       -    -   830A08
 S/Scope 2    931D01  -       -       931A09  931A10  931A11  -       931A04  -       -    -   931A08
+S/Scope 2    931C01  -       -       931A09  931A10  931A11  -       931A04  -       -    -   931A08
 
 
 Bottom Board
@@ -198,9 +203,12 @@ Notes:
       4M_EDO - Silicon Magic SM81C256K16CJ-35 EDO DRAM 66MHz (SOJ40)
       1MSRAM - Cypress CY7C109-25VC 1Meg SRAM (SOJ32)
     256KSRAM - Winbond W24257AJ-15 256K SRAM (SOJ28)
-     TEXELFX - 3DFX 500-0004-02 BD0665.1 TMU (QFP208)
-     PIXELFX - 3DFX 500-0003-03 F001701.1 FBI (QFP240)
-  0000037122 - Konami Custom (QFP208)
+     TEXELFX - 3DFX 500-0004-02 BD0665.1 Voodoo 1 Texture Mapping Unit    (QFP208) \
+     PIXELFX - 3DFX 500-0003-03 F001701.1 Voodoo 1 Frame Buffer Interface (QFP240) / Both tied directly to 50MHz OSC.
+       37122 - Konami 0000037122 Custom 2D Tilemap Generator (QFP208)
+       33906 - Konami 0000033906 Custom PCI Bridge (QFP160)
+  ADSP-21062 - Analog Devices ADSP-21062 'SHARC' Digital Signal Processor. Clock input 36MHz.
+               This chip is also marked 'KS-160'
    MC44200FT - Motorola MC44200FT 3 Channel Video D/A Converter (QFP44)
      MACH111 - AMD MACH111 CPLD (Stamped 'N715B1', PLCC44)
       AV9170 - Integrated Circuit Systems Inc. Clock Multiplier (SOIC8)
@@ -235,10 +243,91 @@ S/Scope      830A13  -       830A14  -
 S/Scope 2    -       -       -       -      (no ROMs, not used)
 
 
-Teraburst uses a different variation of the I/O board used in Operation: Thunder Hurricane (see gticlub.cpp). Analog inputs are controlled by
-two CCD cameras, one from each gun. This specific variation uses a K056800 which normally acts as a sound interface controller. Perhaps this
-either sends analog inputs to the main pcb or isn't used at all. No network connection is involved in this setup as this board directly connects
-to the main pcb via joining connector.
+Bottom Board (Voodoo 2 version used in twin configuration with 2 of these PCBs)
+GQ871 PWB(B)A
+|--------------------------------------------------------------|
+|CN4        CN2    CN8                                      CN5|
+|U110                |---------|         4M_EDO 4M_EDO         |
+|                    |         |     |----------|      PQ30RV21|
+|  4M_EDO 4M_EDO     | TEXELFX2|     |          |              |
+|                    |         |     | PIXELFX2 |       4M_EDO |
+|  4M_EDO 4M_EDO     |         |     |          |       4M_EDO |
+|                    |---------|     |          | |--------|   |
+|  4M_EDO 4M_EDO                     |----------| |KONAMI  |   |
+|CN11                               64MHz  U7     |33906   |   |
+|  4M_EDO 4M_EDO                             U39  |        |   |
+|                       256KSRAM 256KSRAM         |--------|   |
+|CN10                                                          |
+|         AV9170      74CBT3383(x7)      1MSRAM 1MSRAM         |
+| MC44200                                                      |
+|                       256KSRAM 256KSRAM                      |
+|                                        1MSRAM 1MSRAM         |
+|  |-------|                                    MASKROM.24U    |
+|  |KONAMI |  XC9536   |-------------|              MASKROM.24V|
+|  |37122  |           |ANALOG       |   1MSRAM 1MSRAM         |
+|  |       |           |DEVICES      |                         |
+|  |-------|       U91 |ADSP-21062   |   36.00MHz              |
+|1MSRAM                |SHARC        |   1MSRAM 1MSRAM         |
+|CN9                   |             |                         |
+|1MSRAM                |KS-160       |                         |
+|           256KSRAM   |-------------|          MASKROM.32U    |
+|1MSRAM     256KSRAM                                MASKROM.32V|
+|           256KSRAM     PAL1  PAL2            U36             |
+|1MSRAM                                                        |
+|           37D                 CN1            U88             |
+|--------------------------------------------------------------|
+Notes:
+      4M_EDO - Silicon Magic SM81C256K16CJ-35 EDO DRAM 66MHz (SOJ40)
+      1MSRAM - Cypress CY7C109-25VC 1Meg SRAM (SOJ32)
+    256KSRAM - Winbond W24257AJ-15 256K SRAM (SOJ28)
+    TEXELFX2 - 3DFX 500-0010-01 F008221.1 BE (BRUCE) Voodoo 2 Texture Mapping Unit   (QFP208) \
+    PIXELFX2 - 3DFX 500-0009-01 D21472.00 CK (CHUCK) Voodoo 2 Frame Buffer Interface (QFP240) / Both tied directly to 64MHz OSC.
+       37122 - Konami 0000037122 Custom 2D Tilemap Generator (QFP208)
+       33906 - Konami 0000033906 Custom PCI Bridge (QFP160)
+  ADSP-21062 - Analog Devices ADSP-21062 'SHARC' Digital Signal Processor. Clock input 36MHz.
+               This chip is also marked 'KS-160'
+   MC44200FT - Motorola MC44200FT 3 Channel Video D/A Converter (QFP44)
+      XC9536 - XILINX XC9536 CPLD (PLCC44), stamped 'Q830B1'
+      AV9170 - Integrated Circuit Systems Inc. Clock Multiplier (SOIC8)
+   74CBT3383 - Texas Instruments 74CBT3383 10-bit FET Bus Exchange Switch (TSSOP24)
+        PAL1 - AMD PALCE16V8 (stamped 'N676B4', DIP20)
+        PAL2 - AMD PALCE16V8 (stamped 'N676B5', DIP20)
+        U110 - JUMPER   SLV O O-O MST,TWN
+         37D - JUMPER   MASTER O-O O SLAVE (upper board set to MASTER, lower board set to SLAVE)
+         U36 - JUMPER   32M O-O O 16M
+                              O\ 32M
+         U88 - JUMPER   16M O O/ O DEV (set to middle vertical setting 32M)
+         U91 - JUMPER   ASYNC O O-O SYNC
+                              O\ ADCK
+         U7  - JUMPER   DSP O O/ O PCI (set to middle vertical setting ADCK)
+         U39 - JUMPER   MCK O-O O SCK
+         CN1 - 96 Pin To Lower PCB, Joining Connector
+         CN2 - 8-Pin RGB OUT (not populated)
+         CN4 - 6-Pin Power Connector
+         CN5 - 4-Pin Power Connector
+         CN8 - 6-Pin Connector (not populated)
+         CN9 - 5-Pin Connector (not populated)
+        CN11 - 15-Pin DSUB VGA Video SUB OUT (not populated)
+        CN10 - 15-Pin DSUB VGA Video MAIN OUT
+
+ROM Usage
+---------
+             |------ ROM Locations -------|
+Game         24U     24V     32U     32V
+-------------------------------------------
+S/Scope 2    -       -       -       -      (no ROMs, not used)
+
+
+I/O PCB
+-------
+This exact same PCB is used on Teraburst and Operation: Thunder Hurricane. Teraburst has some parts
+on the I/O board not populated that are used on Operation: Thunder Hurricane and some parts used on
+Operation: Thunder Hurricane are not populated on the version used with Teraburst (also see
+gticlub.cpp). Analog inputs are controlled by two CCD cameras, one from each gun. This specific
+variation uses a K056800 which normally acts as a sound interface controller but on this PCB it is
+used to communicate with the main PCB through CN1. No network connection is involved in this setup
+as this board directly connects to the main PCB via joining connector CN1, hence the use of the
+056800 chip. The entire network section of the PCB is not populated.
 
 GN680 PWB(E)403381B
 |------------------------------------------|
@@ -258,91 +347,76 @@ GN680 PWB(E)403381B
 |   CN1                                    |
 |------------------------------------------|
 Notes:
-  68EC000 @ 16MHz (32/2)
+  68EC000 - Clock input 16MHz (32/2)
+     8464 - Fujitsu MB8464 64K SRAM
   CN11/12 - Power connectors
-  CN8/9   - 6-pin analog control connectors (to CCD cameras)
-  CN1     - Lower joining connector to main pcb
-  NRPS11  - Idec NRPS11 PC Board circuit protector
-  LM1881  - Video sync separator (DIP8)
-  056800  - Konami Custom (QFP80)
+ CN8/9/10 - 6-pin analog control connectors (to CCD cameras)
+      CN1 - Lower joining connector to main PCB
+   NRPS11 - Idec NRPS11 PC Board circuit protector
+   LM1881 - Video sync separator (DIP8)
+   056800 - Konami Custom (QFP80)
+
+This specific PCB is only used on Teraburst.
 
 
-LAN PCB: GQ931 PWB(H)      (C) 1999 Konami
-------------------------------------------
+Network PCB
+-----------
 
-2 x LAN ports, LANC(1) & LANC(2)
-1 x 32.0000MHz Oscillator
+GQ931 PWB(H)
+KONAMI 1999
+|----------------------------|
+|*ADM232  *LH28F016(TSOP40x4)|
+|*CN6   *19.6608MHz          |
+|                 931A20.6E  |
+|        *PC16552            |
+|                            |
+|      93C46A.8B  931A19.8E  |
+|*CN2                        |
+|    UPC2933                 |
+|    *10B                    |
+|            XCS10XL         |
+|*CN3  CY7C199      XC9536   |
+|                            |
+|     HYC2485S     DS2401.16G|
+|CN5    LS245  LS245  LS245  |
+|CN4  32MHz   CN1       *TR1 |
+|----------------------------|
+Notes: (*= these parts not populated)
+931A19/A20 - DIP42 32meg mask ROM (graphics data). These are programmed in BYTE mode and only D0-D7
+             are connected. Read as 27C322 with D15/A-1 pulled high/low (2 reads), even byte 00's
+             removed then interleaved together. These are the same type of mask ROMs used on some
+             other Konami games for sound data and also used on Namco Super System 22 and System 11
+             for the WAVE ROM.
+             The data in these ROMs is read through the Konami 056800 custom IC on the CPU board and
+             copied to RAM on the video boards.
+    XC9536 - Xilinx XC9535 CPLD (PLCC44), stamped 'Q931H1'
+   XCS10XL - Xilinx Spartan-XL XCS10XL FPGA (QFP100), stamped '4C'
+   CY7C199 - Cypress 256K (32kx8) SRAM (equivalent to 62256 etc)
+     93C46 - Atmel 93C46A 1K (128x8-bit) Serial EEPROM (SOIC8 150mil). Contains region security data
+             and Lan ID that must match the data in the DS2401 and Timekeeper NVRAM otherwise Error -8B.
+       10B - Alternative not populated location for 93C46 EEPROM in TSSOP8 package
+  HYC2485S - SMC ARCNET Media Transceiver, RS485 5Mbps-2.5Mbps in custom SIL8 package with ceramic coating
+    DS2401 - Dallas DS2401 64-bit 1-Wire Silicon Serial Number (TSOC6)
+       TR1 - Alternative not populated location for DS2401 in TO92 package
+   UPC2933 - 3.3V Linear Voltage Regulator
+       CN1 - 68-pin connector joining to main board. This connector has the following signals on it....
+             MDB0..7, A0..5, A9..12, A30, A31, 5 signals tied to N676A1 CPLD, PPC INT2, NVRAM RW,
+             NVRAM ENABLE, 68KCLK, 32M_VIDCLK.
+   CN4/CN5 - RCA connector used for network send/receive connections to 2nd arcade cabinet
 
-     HYC2485S  SMC ARCNET Media Transceiver, RS485 5Mbps-2.5Mbps
-8E   931A19    Konami 32meg masked ROM, ROM0 (compressed GFX data)
-6E   931A20    Konami 32meg masked ROM, ROM1 (compressed GFX data)
-12F  XC9536    Xilinx  CPLD,  44 pin PLCC, Konami no. Q931H1
-12C  XCS10XL   Xilinx  FPGA, 100 pin PQFP, Konami no. 4C
-12B  CY7C199   Cypress 32kx8 SRAM
-8B   AT93C46   Atmel 1K serial EEPROM, 8 pin SOP
-16G  DS2401    Dallas Silicon Serial Number IC, 6 pin SOP
-
-Note: This PCB does more than just networking. The serial eeprom is used as a means to prevent region change.
-The timekeeper region has to match the serial eeprom. The two mask roms serve as GFX roms as the game "downloads"
-the data from those two roms.
-
-
-GFX PCB: GQ871 PWB(B)A (C) 1999 Konami
---------------------------------------
-
-There are no ROMs on the two GFX PCBs, all sockets are empty. They are located on the LAN PCB.
-Prior to the game starting there is a message saying downloading data.
-
-Jumpers set on GFX PCB to main monitor:
-4A   set to TWN (twin GFX PCBs)
-37D  set to Master
-
-Jumpers set on GFX PCB to scope monitor:
-4A   set to TWN (twin GFX PCBs)
-37D  set to Slave
-
-1x 64.0000MHz
-1x 36.0000MHz  (to 27L, ADSP)
-
-21E  AV9170           ICS, Clock synchroniser and multiplier
-27L  ADSP-21062       Analog Devices SHARC ADSP, 512k flash, Konami no. 022M16C
-15T  0000033906       Konami Custom, 160 pin PQFP
-19R  W241024AI-20     Winbond, 1Meg SRAM
-22R  W241024AI-20     Winbond, 1Meg SRAM
-25R  W241024AI-20     Winbond, 1Meg SRAM
-29R  W241024AI-20     Winbond, 1Meg SRAM
-19P  W241024AI-20     Winbond, 1Meg SRAM
-22P  W241024AI-20     Winbond, 1Meg SRAM
-25P  W241024AI-20     Winbond, 1Meg SRAM
-29P  W241024AI-20     Winbond, 1Meg SRAM
-18N  W24257AJ-15      Winbond, 256K SRAM
-14N  W24257AJ-15      Winbond, 256K SRAM
-18M  W24257AJ-15      Winbond, 256K SRAM
-14M  W24257AJ-15      Winbond, 256K SRAM
-28D  000037122        Konami Custom, 208 pin PQFP
-33E  W24257AJ-15      Winbond, 256K SRAM
-33D  W24257AJ-15      Winbond, 256K SRAM
-33C  W24257AJ-15      Winbond, 256K SRAM
-27A  W241024AI-20     Winbond, 1Meg SRAM
-30A  W241024AI-20     Winbond, 1Meg SRAM
-32A  W241024AI-20     Winbond, 1Meg SRAM
-35A  W241024AI-20     Winbond, 1Meg SRAM
-7K   500-0010-01      3DFX, Texture processor
-16F  SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-13F  SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-9F   SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-5F   SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-16D  SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-13D  SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-9D   SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-5D   SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-9P   500-0009-01      3DFX, Pixel processor
-10U  SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-7U   SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-3S   SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-3R   SM81C256K16CJ-25 Silicon Magic 100MHz EDO RAM, 4Meg
-27G  XC9536           Xilinx, CPLD, Konami no. Q830B1
-21C  MC44200FT        Motorola, 3 Channel video D/A converter
+Note: This PCB is used only on Silent Scope 2 and does more than just networking. The game will not
+boot at all (just black screen) if the network board is not connected to the main board (LED ERROR
+F0 12). The serial EEPROM is used to prevent changing the region. The EEPROM data hand-crafted for
+MAME does not work on real hardware because the LAN ID (held in the DS2401) is different on each
+PCB. The timekeeper region and DS2401 LAN ID has to match the serial EEPROM otherwise at the end of
+the POST it will show HARDWARE ERROR(-8B). The data in the serial EEPROM is not just a direct copy
+of the data in the NVRAM although it is very similar in some areas and to make it work on real
+hardware the LAN ID of the real PCB must be updated in the serial EEPROM and the checksum
+recalculated. The two mask ROMs are graphics ROMs. After the POST completes, there are a couple of
+multi-colored screens (similar to the start-up screens) then 'PLEASE WAIT' and 'Now Loading'
+messages for about 35 seconds while the game transfers the data from those two ROMs and stores the
+data in RAM on the video boards. The reason for doing that is because the network board connector
+only has an 8-bit data bus and 12-bit address bus.
 
 ***************************************************************************/
 
@@ -2060,7 +2134,7 @@ ROM_START(sscope2)
 	ROM_LOAD( "ds2401_gk830.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a) ) // hand built
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD( "at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
+	ROM_LOAD( "at93c46.8b", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
 ROM_END
 
 ROM_START(sscope2e)
@@ -2092,7 +2166,7 @@ ROM_START(sscope2e)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8g", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8b", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
 ROM_END
 
 ROM_START(sscope2j)
@@ -2124,7 +2198,7 @@ ROM_START(sscope2j)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8g", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8b", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
 ROM_END
 
 ROM_START(sscope2a)
@@ -2156,7 +2230,7 @@ ROM_START(sscope2a)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8g", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8b", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
 ROM_END
 
 ROM_START(sscope2uc)
@@ -2165,7 +2239,7 @@ ROM_START(sscope2uc)
 	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
-	ROM_LOAD32_WORD_SWAP("931a04_c.16t", 0x000000, 0x200000, CRC(a05446e3) SHA1(67aef3cfe217223aea53dbc5cccd8d706eae8864) ) // Only 2 bytes are different from the other 931a04.16t (CRC 4f5917e6) and both are only off by 1 bit. Bad dump?
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
 
 	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
@@ -2188,7 +2262,7 @@ ROM_START(sscope2uc)
 	ROM_LOAD( "ds2401_gk830.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a) ) // hand built
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD( "at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
+	ROM_LOAD( "at93c46.8b", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
 ROM_END
 
 ROM_START(sscope2ec)
@@ -2197,7 +2271,7 @@ ROM_START(sscope2ec)
 	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
-	ROM_LOAD32_WORD_SWAP("931a04_c.16t", 0x000000, 0x200000, CRC(a05446e3) SHA1(67aef3cfe217223aea53dbc5cccd8d706eae8864) )
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
 
 	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
@@ -2220,7 +2294,7 @@ ROM_START(sscope2ec)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8g", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8b", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
 ROM_END
 
 ROM_START(sscope2jc)
@@ -2229,7 +2303,7 @@ ROM_START(sscope2jc)
 	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
-	ROM_LOAD32_WORD_SWAP("931a04_c.16t", 0x000000, 0x200000, CRC(a05446e3) SHA1(67aef3cfe217223aea53dbc5cccd8d706eae8864) )
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
 
 	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
@@ -2252,7 +2326,7 @@ ROM_START(sscope2jc)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8g", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8b", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
 ROM_END
 
 ROM_START(sscope2ac)
@@ -2261,7 +2335,7 @@ ROM_START(sscope2ac)
 	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
-	ROM_LOAD32_WORD_SWAP("931a04_c.16t", 0x000000, 0x200000, CRC(a05446e3) SHA1(67aef3cfe217223aea53dbc5cccd8d706eae8864) )
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
 
 	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
@@ -2284,7 +2358,7 @@ ROM_START(sscope2ac)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8g", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8b", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
 ROM_END
 
 ROM_START(sscope2ub)
@@ -2316,7 +2390,7 @@ ROM_START(sscope2ub)
 	ROM_LOAD( "ds2401_gk830.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a) ) // hand built
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD( "at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
+	ROM_LOAD( "at93c46.8b", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
 ROM_END
 
 ROM_START(sscope2eb)
@@ -2348,7 +2422,7 @@ ROM_START(sscope2eb)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8g", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8b", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
 ROM_END
 
 ROM_START(sscope2jb)
@@ -2380,7 +2454,7 @@ ROM_START(sscope2jb)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8g", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8b", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
 ROM_END
 
 ROM_START(sscope2ab)
@@ -2412,7 +2486,7 @@ ROM_START(sscope2ab)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8g", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8b", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
 ROM_END
 
 ROM_START(sscope2vd1)
@@ -2444,7 +2518,7 @@ ROM_START(sscope2vd1)
 	ROM_LOAD( "ds2401_gk830.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a) ) // hand built
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD( "at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
+	ROM_LOAD( "at93c46.8b", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
 ROM_END
 
 ROM_START(sscope2evd1)
@@ -2476,7 +2550,7 @@ ROM_START(sscope2evd1)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8g", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8b", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
 ROM_END
 
 ROM_START(sscope2jvd1)
@@ -2508,7 +2582,7 @@ ROM_START(sscope2jvd1)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8g", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8b", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
 ROM_END
 
 ROM_START(sscope2avd1)
@@ -2540,7 +2614,7 @@ ROM_START(sscope2avd1)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8g", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8b", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
 ROM_END
 
 ROM_START(sscope2ucvd1)
@@ -2549,7 +2623,7 @@ ROM_START(sscope2ucvd1)
 	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
-	ROM_LOAD32_WORD_SWAP("931a04_c.16t", 0x000000, 0x200000, CRC(a05446e3) SHA1(67aef3cfe217223aea53dbc5cccd8d706eae8864) )
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
 
 	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
@@ -2572,7 +2646,7 @@ ROM_START(sscope2ucvd1)
 	ROM_LOAD( "ds2401_gk830.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a) ) // hand built
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD( "at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
+	ROM_LOAD( "at93c46.8b", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
 ROM_END
 
 ROM_START(sscope2ecvd1)
@@ -2581,7 +2655,7 @@ ROM_START(sscope2ecvd1)
 	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
-	ROM_LOAD32_WORD_SWAP("931a04_c.16t", 0x000000, 0x200000, CRC(a05446e3) SHA1(67aef3cfe217223aea53dbc5cccd8d706eae8864) )
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
 
 	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
@@ -2604,7 +2678,7 @@ ROM_START(sscope2ecvd1)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8g", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8b", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
 ROM_END
 
 ROM_START(sscope2jcvd1)
@@ -2613,7 +2687,7 @@ ROM_START(sscope2jcvd1)
 	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
-	ROM_LOAD32_WORD_SWAP("931a04_c.16t", 0x000000, 0x200000, CRC(a05446e3) SHA1(67aef3cfe217223aea53dbc5cccd8d706eae8864) )
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
 
 	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
@@ -2636,7 +2710,7 @@ ROM_START(sscope2jcvd1)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8g", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8b", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
 ROM_END
 
 ROM_START(sscope2acvd1)
@@ -2645,7 +2719,7 @@ ROM_START(sscope2acvd1)
 	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "datarom", 0)   // Data roms
-	ROM_LOAD32_WORD_SWAP("931a04_c.16t", 0x000000, 0x200000, CRC(a05446e3) SHA1(67aef3cfe217223aea53dbc5cccd8d706eae8864) )
+	ROM_LOAD32_WORD_SWAP("931a04.16t", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814) )
 
 	ROM_REGION32_BE(0x800000, "comm_board", 0)   // Comm board roms
 	ROM_LOAD("931a19.8e", 0x000000, 0x400000, CRC(0417b528) SHA1(ebd7f06b83256b94784de164f9d0642bfb2c94d4) )
@@ -2668,7 +2742,7 @@ ROM_START(sscope2acvd1)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8g", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8b", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
 ROM_END
 
 ROM_START(sscope2ubvd1)
@@ -2700,7 +2774,7 @@ ROM_START(sscope2ubvd1)
 	ROM_LOAD( "ds2401_gk830.16g", 0x000000, 0x000008, BAD_DUMP CRC(bae36d0b) SHA1(4dd5915888d5718356b40bbe897f2470e410176a) ) // hand built
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD( "at93c46.8g", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
+	ROM_LOAD( "at93c46.8b", 0x000000, 0x000080, BAD_DUMP CRC(cc63c213) SHA1(fb20e56fb73a887dc7b6db49efd1f8a18b959152) ) // hand built
 ROM_END
 
 ROM_START(sscope2ebvd1)
@@ -2732,7 +2806,7 @@ ROM_START(sscope2ebvd1)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8g", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ea.8b", 0x000000, 0x000080, BAD_DUMP CRC(b6da86a4) SHA1(3a6570ac25748fb5e6b8a0dd6b832ee2d463cc7b) ) // hand built
 ROM_END
 
 ROM_START(sscope2jbvd1)
@@ -2764,7 +2838,7 @@ ROM_START(sscope2jbvd1)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8g", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_ja.8b", 0x000000, 0x000080, BAD_DUMP CRC(6613c091) SHA1(101a15afc27d5b4b5e846dc6823c14656132b26b) ) // hand built
 ROM_END
 
 ROM_START(sscope2abvd1)
@@ -2796,7 +2870,7 @@ ROM_START(sscope2abvd1)
 	ROM_LOAD( "ds2401.16g", 0x000000, 0x000008, CRC(908da6dd) SHA1(f7c1a2ebe05f4bc403a6154d724f8f6f6eeeff15) )
 
 	ROM_REGION16_BE(0x80, "lan_eeprom", 0)       // LAN Board AT93C46
-	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8g", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
+	ROM_LOAD16_WORD_SWAP( "at93c46_aa.8b", 0x000000, 0x000080, BAD_DUMP CRC(026b0ea5) SHA1(5ab63b88caeb9dc53732b1a432f884d85bcc222c) ) // hand built
 ROM_END
 
 ROM_START(gradius4)
