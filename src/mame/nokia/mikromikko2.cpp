@@ -149,7 +149,6 @@ void mm2_state::mm2_mem(address_map &map)
 
 void mm2_state::mm2_io(address_map &map)
 {
-	// SBC16
 	map(0xf800, 0xf803).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
 	map(0xf880, 0xf887).rw(m_mpsc, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0xf884, 0xf885).r(FUNC(mm2_state::status_r)).umask16(0xff00);
@@ -170,12 +169,6 @@ void mm2_state::mm2_io(address_map &map)
 	map(0xf974, 0xf975).w(FUNC(mm2_state::dtrb_w)).umask16(0xff00);
 	//map(0xf97d, 0xf97d) ???
 	map(0xf97e, 0xf97f).w(FUNC(mm2_state::novram_recall)).umask16(0xff00);
-
-	// CRTC186
-	//map(0xf980, 0xf9ff).m(m_crtc, FUNC(crtc186_device::map));
-
-	// MMC186
-	//map(0xfa00, 0xfaff).m(m_mmc, FUNC(mmc186_device::map));
 }
 
 static INPUT_PORTS_START( mm2 )

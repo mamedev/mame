@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_NOKIA_MMC186_H
-#define MAME_NOKIA_MMC186_H
+#ifndef MAME_BUS_MM2_MMC186_H
+#define MAME_BUS_MM2_MMC186_H
 
 #pragma once
 
@@ -64,4 +64,4 @@ private:
 	u8 m_sasi_data;
 };
 
-#endif // MAME_NOKIA_MMC186_H
+#endif // MAME_BUS_MM2_MMC186_H

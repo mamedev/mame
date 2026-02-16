@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_NOKIA_MM2KB_H
-#define MAME_NOKIA_MM2KB_H
+#ifndef MAME_BUS_MM2_MM2KB_H
+#define MAME_BUS_MM2_MM2KB_H
 
 #pragma once
 
@@ -35,4 +35,4 @@ private:
 	devcb_write_line m_write_txd;
 };
 
-#endif // MAME_NOKIA_MM2KB_H
+#endif // MAME_BUS_MM2_MM2KB_H

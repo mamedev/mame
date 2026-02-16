@@ -6,8 +6,8 @@
 
 *********************************************************************/
 
-#ifndef MAME_NOKIA_CRTC186_H
-#define MAME_NOKIA_CRTC186_H
+#ifndef MAME_BUS_MM2_CRTC186_H
+#define MAME_BUS_MM2_CRTC186_H
 
 #pragma once
 
@@ -93,4 +93,4 @@ private:
 	bool m_crb;
 };
 
-#endif // MAME_NOKIA_CRTC186_H
+#endif // MAME_BUS_MM2_CRTC186_H
