@@ -269,6 +269,8 @@ uint32_t adsp21062_device::GET_UREG(int ureg)
 			{
 				case 0x4:   return m_core->pcstk;                       /* PCSTK */
 				case 0x5:   return m_core->pcstkp;                      /* PCSTKP */
+				case 0x7:   return m_core->curlcntr;                    /* CURLCNTR */
+				case 0x8:   return m_core->lcntr;                       /* LCNTR */
 				default:    fatalerror("SHARC: GET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
@@ -417,8 +419,16 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 					}
 					break;
 
-				case 0x7:   m_core->curlcntr = data; break;   /* CURLCNTR (Zero Gunner 2B) */
-				case 0x8:   m_core->lcntr = data; break;      /* LCNTR */
+				case 0x7:                                     /* CURLCNTR */
+					if ((m_core->lstkp > 0) && (m_core->lstkp < 7))
+						m_core->curlcntr = data;
+					break;
+
+				case 0x8:                                     /* LCNTR */
+					if (m_core->lstkp < 6)
+						m_core->lcntr = data;
+					break;
+
 				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
@@ -1105,24 +1115,27 @@ inline uint32_t adsp21062_device::TOP_PC()
 	return m_core->pcstk;
 }
 
-inline void adsp21062_device::PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, uint32_t count)
+inline void adsp21062_device::PUSH_LOOP()
 {
-	m_core->lstkp++;
 	if (m_core->lstkp >= 6)
 		fatalerror("SHARC: Loop Stack overflow!\n");
 
-	if (m_core->lstkp == 0)
-		m_core->stky |= LSEM;
+	if (m_core->lstkp > 0)
+	{
+		m_core->lcstack[m_core->lstkp - 1] = m_core->curlcntr;
+		m_core->lastack[m_core->lstkp - 1] = m_core->laddr.pack();
+	}
+	m_core->curlcntr = m_core->lcntr;
+	m_core->laddr.unpack(m_core->lastack[m_core->lstkp]);
+
+	m_core->lstkp++;
+
+	if (m_core->lstkp < 6)
+		m_core->lcntr = m_core->lcstack[m_core->lstkp];
 	else
-		m_core->stky &= ~LSEM;
+		m_core->lcntr = 0xffffffff;
 
-	m_core->lcstack[m_core->lstkp] = count;
-	m_core->lastack[m_core->lstkp] = (type << 30) | (code << 24) | addr;
-	m_core->curlcntr = count;
-
-	m_core->laddr.addr = addr;
-	m_core->laddr.code = code;
-	m_core->laddr.loop_type = type;
+	m_core->stky &= ~LSEM;
 }
 
 inline void adsp21062_device::POP_LOOP()
@@ -1132,16 +1145,21 @@ inline void adsp21062_device::POP_LOOP()
 
 	m_core->lstkp--;
 
-	if (m_core->lstkp == 0)
-		m_core->stky |= LSEM;
+	m_core->lcntr = m_core->curlcntr;
+	m_core->lastack[m_core->lstkp] = m_core->laddr.pack();
+
+	if (m_core->lstkp > 0)
+	{
+		m_core->curlcntr = m_core->lcstack[m_core->lstkp - 1];
+		m_core->laddr.unpack(m_core->lastack[m_core->lstkp - 1]);
+	}
 	else
-		m_core->stky &= ~LSEM;
+	{
+		m_core->curlcntr = 0xffffffff;
+		m_core->laddr.unpack(0xffffffff);
 
-	m_core->curlcntr = m_core->lcstack[m_core->lstkp];
-
-	m_core->laddr.addr = m_core->lastack[m_core->lstkp] & 0xffffff;
-	m_core->laddr.code = (m_core->lastack[m_core->lstkp] >> 24) & 0x1f;
-	m_core->laddr.loop_type = (m_core->lastack[m_core->lstkp] >> 30) & 0x3;
+		m_core->stky |= LSEM;
+	}
 }
 
 inline void adsp21062_device::PUSH_STATUS_STACK()
@@ -2251,8 +2269,11 @@ void adsp21062_device::sharcop_do_until_counter_imm()
 
 	m_core->lcntr = data;
 	PUSH_PC();
+	PUSH_LOOP();
 	m_core->pcstk = m_core->pc + 1;
-	PUSH_LOOP(address, cond, type, m_core->lcntr);
+	m_core->laddr.addr = address;
+	m_core->laddr.code = cond;
+	m_core->laddr.loop_type = type;
 }
 
 /*****************************************************************************/
@@ -2277,8 +2298,11 @@ void adsp21062_device::sharcop_do_until_counter_ureg()
 
 	m_core->lcntr = GET_UREG(ureg);
 	PUSH_PC();
+	PUSH_LOOP();
 	m_core->pcstk = m_core->pc + 1;
-	PUSH_LOOP(address, cond, type, m_core->lcntr);
+	m_core->laddr.addr = address;
+	m_core->laddr.code = cond;
+	m_core->laddr.loop_type = type;
 }
 
 /*****************************************************************************/
@@ -2292,8 +2316,11 @@ void adsp21062_device::sharcop_do_until()
 	uint32_t const address = (m_core->pc + offset);
 
 	PUSH_PC();
+	PUSH_LOOP();
 	m_core->pcstk = m_core->pc + 1;
-	PUSH_LOOP(address, cond, 0, 0);
+	m_core->laddr.addr = address;
+	m_core->laddr.code = cond;
+	m_core->laddr.loop_type = 0;
 }
 
 /*****************************************************************************/
@@ -2521,11 +2548,11 @@ void adsp21062_device::sharcop_push_pop_stacks()
 {
 	if (m_core->opcode & 0x008000000000U)
 	{
-		fatalerror("sharcop_push_pop_stacks: push loop not implemented\n");
+		PUSH_LOOP();
 	}
 	if (m_core->opcode & 0x004000000000U)
 	{
-		fatalerror("sharcop_push_pop_stacks: pop loop not implemented\n");
+		POP_LOOP();
 	}
 	if (m_core->opcode & 0x002000000000U)
 	{

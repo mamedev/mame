@@ -523,40 +523,50 @@ void adsp21062_device::static_generate_pop_pc()
 
 void adsp21062_device::static_generate_push_loop()
 {
-	// I0 = counter
-	// I1 = type/condition/addr
-	// Trashes I2
+	// Trashes I1,I2
+	// Caller's responsibility to update laddr
 
 	uml::code_label label = 1;
 	uml::code_label const no_overflow = label++;
 	uml::code_label const empty = label++;
-	uml::code_label const do_store = label++;
+	uml::code_label const full = label++;
 
 	drcuml_block &block(m_drcuml->begin_invariant_block(32));
 
 	// add a global entry for this
 	alloc_handle(m_push_loop, "push_loop");
-	UML_HANDLE(block, *m_push_loop);                                        // handle  *m_push_loop
+	UML_HANDLE(block, *m_push_loop);
 
-	UML_ADD(block, I2, LSTKP, 1);                                           // add     i2,LSTKP,1
-	UML_CMP(block, I2, 6);                                                  // cmp     i2,6
-	UML_JMPc(block, COND_L, no_overflow);                                   // jl      no_overflow
-	UML_CALLC(block, cfunc_loopstack_overflow, this);                       // callc   cfunc_loopstack_overflow
+	// check for stack overflow
+	UML_MOV(block, I1, LSTKP);
+	UML_CMP(block, I1, 6);
+	UML_JMPc(block, COND_B, no_overflow);
+	UML_CALLC(block, cfunc_loopstack_overflow, this);
+	UML_LABEL(block, no_overflow);
 
-	UML_LABEL(block, no_overflow);                                          // no_overflow:
-	UML_CMP(block, I2, 0);                                                  // cmp     i2,0
-	UML_JMPc(block, COND_E, empty);                                         // je      empty
-	UML_AND(block, STKY, STKY, ~LSEM);                                      // and     STKY,~0x4000000
-	UML_JMP(block, do_store);                                               // jmp     do_store
-	UML_LABEL(block, empty);                                                // empty:
-	UML_OR(block, STKY, STKY, LSEM);                                        // or      STKY,0x4000000
+	// store the top-of-stack pseudo-registers if the stack isn't empty
+	UML_TEST(block, I1, I1);
+	UML_JMPc(block, COND_Z, empty);
+	UML_STORE(block, m_core->lcstack - 1, I1, CURLCNTR, SIZE_DWORD, SCALE_x4);
+	UML_MOV(block, I2, mem(&m_core->laddr.addr));
+	UML_ROLINS(block, I2, mem(&m_core->laddr.code), 24, 0x1f000000);
+	UML_ROLINS(block, I2, mem(&m_core->laddr.loop_type), 30, 0xc0000000);
+	UML_STORE(block, m_core->lastack - 1, I1, I2, SIZE_DWORD, SCALE_x4);
+	UML_LABEL(block, empty);
 
-	UML_LABEL(block, do_store);                                             // do_store:
-	UML_STORE(block, m_core->lcstack, I2, I0, SIZE_DWORD, SCALE_x4);        // store   m_core->lcstack,i2,i0,dword,scale_x4
-	UML_STORE(block, m_core->lastack, I2, I1, SIZE_DWORD, SCALE_x4);        // store   m_core->lastack,i2,i1,dword,scale_x4
-	UML_MOV(block, CURLCNTR, I0);                                           // mov     CURLCNTR,i0
-	UML_MOV(block, LSTKP, I2);                                              // mov     LSTKP,i2
+	// increment stack pointer and update sticky flags
+	UML_ADD(block, I1, I1, 1);
+	UML_MOV(block, LSTKP, I1);
+	UML_AND(block, STKY, STKY, ~LSEM);
 
+	// update the top-of-stack pseudo-registers
+	UML_MOV(block, CURLCNTR, LCNTR);
+	UML_CMP(block, I1, 6);
+	UML_JMPc(block, COND_E, full);
+	UML_LOAD(block, LCNTR, m_core->lcstack, I1, SIZE_DWORD, SCALE_x4);
+	UML_RET(block);
+	UML_LABEL(block, full);
+	UML_MOV(block, LCNTR, 0xffffffff);
 	UML_RET(block);
 
 	block.end();
@@ -567,30 +577,42 @@ void adsp21062_device::static_generate_pop_loop()
 	// Trashes I0,I2
 
 	uml::code_label label = 1;
+	uml::code_label const no_underflow = label++;
+	uml::code_label const empty = label++;
+	uml::code_label const set_laddr = label++;
+
 	drcuml_block &block(m_drcuml->begin_invariant_block(32));
 
 	// add a global entry for this
 	alloc_handle(m_pop_loop, "pop_loop");
-	UML_HANDLE(block, *m_pop_loop);                                         // handle  *m_pop_loop
+	UML_HANDLE(block, *m_pop_loop);
 
-	UML_MOV(block, I2, LSTKP);                                              // mov     i2,LSTKP
-	UML_CMP(block, I2, 0);                                                  // cmp     i2,0
-	UML_JMPc(block, COND_NE, label);                                        // jne     label1
-	UML_CALLC(block, cfunc_loopstack_underflow, this);                      // callc   cfunc_loopstack_underflow
+	// check for stack underflow
+	UML_SUB(block, I0, LSTKP, 1);
+	UML_JMPc(block, COND_NS, no_underflow);
+	UML_CALLC(block, cfunc_loopstack_underflow, this);
+	UML_LABEL(block, no_underflow);
+	UML_MOV(block, LSTKP, I0);
 
-	UML_LABEL(block, label++);                                              // label1:
-	UML_SUB(block, I2, I2, 1);                                              // sub     i2,i2,1
-	UML_JMPc(block, COND_Z, label);                                         // jz      label2
-	UML_AND(block, STKY, STKY, ~LSEM);                                      // and     STKY,~0x4000000
-	UML_JMP(block, label + 1);                                              // jmp     label3
-	UML_LABEL(block, label++);                                              // label2:
-	UML_OR(block, STKY, STKY, LSEM);                                        // or      STKY,0x4000000
-
-	UML_LABEL(block, label++);                                              // label3:
-	UML_LOAD(block, I0, m_core->lcstack, I2, SIZE_DWORD, SCALE_x4);         // load    i0,m_core->lcstack,i2,dword,scale_x4
-	UML_MOV(block, CURLCNTR, I0);                                           // mov     CURLCNTR,i0
-	UML_MOV(block, LSTKP, I2);                                              // mov     LSTKP,i2
-
+	// update the top-of-stack pseudo-registers and sticky flags
+	UML_MOV(block, LCNTR, CURLCNTR);
+	UML_MOV(block, I2, mem(&m_core->laddr.addr));
+	UML_ROLINS(block, I2, mem(&m_core->laddr.code), 24, 0x1f000000);
+	UML_ROLINS(block, I2, mem(&m_core->laddr.loop_type), 30, 0xc0000000);
+	UML_STORE(block, m_core->lastack, I0, I2, SIZE_DWORD, SCALE_x4);
+	UML_TEST(block, I0, I0);
+	UML_JMPc(block, COND_Z, empty);
+	UML_LOAD(block, CURLCNTR, m_core->lcstack - 1, I0, SIZE_DWORD, SCALE_x4);
+	UML_LOAD(block, I0, m_core->lastack - 1, I0, SIZE_DWORD, SCALE_x4);
+	UML_JMP(block, set_laddr);
+	UML_LABEL(block, empty);
+	UML_OR(block, STKY, STKY, LSEM);
+	UML_MOV(block, I0, 0xffffffff);
+	UML_MOV(block, CURLCNTR, I0);
+	UML_LABEL(block, set_laddr);
+	UML_BFXU(block, mem(&m_core->laddr.addr), I0, 0, 24);
+	UML_BFXU(block, mem(&m_core->laddr.code), I0, 24, 5);
+	UML_BFXU(block, mem(&m_core->laddr.loop_type), I0, 30, 2);
 	UML_RET(block);
 
 	block.end();
@@ -762,17 +784,16 @@ void adsp21062_device::static_generate_loop_check_body(drcuml_block &block, bool
 	// check that the loop stack isn't empty and this is the end of the loop
 	UML_TEST(block, STKY, LSEM);
 	UML_RETc(block, COND_NZ);
-	UML_LOAD(block, I1, m_core->lastack, LSTKP, SIZE_DWORD, SCALE_x4);
-	UML_AND(block, I2, I1, 0xffffff);
-	UML_CMP(block, I0, I2);
+	UML_CMP(block, I0, mem(&m_core->laddr.addr));
 	UML_RETc(block, COND_NE);
 
 	// check for counter loop first
-	UML_TEST(block, I1, 0xc0000000);
+	UML_TEST(block, mem(&m_core->laddr.loop_type), 0x3);
 	UML_JMPc(block, COND_NZ, counter);
 
 	// check condition
-	UML_BFXU(block, I2, I1, 24, 4);
+	UML_MOV(block, I1, mem(&m_core->laddr.code));
+	UML_BFXU(block, I2, I1, 0, 4);
 	UML_CMP(block, I2, 0x01); // LT/GE
 	UML_JMPc(block, COND_E, lt_ge);
 	UML_CMP(block, I2, 0x02); // LE/GT
@@ -790,7 +811,7 @@ void adsp21062_device::static_generate_loop_check_body(drcuml_block &block, bool
 	// ASTAT flag tests
 	UML_LABEL(block, astat_flag);
 	UML_LOAD(block, I2, loop_cond_map, I2, SIZE_DWORD, SCALE_x4);
-	UML_BFXU(block, I1, I1, 28, 1);
+	UML_BFXU(block, I1, I1, 4, 1);
 	UML_LOAD(block, I2, &m_core->astat_delay_copy, I2, SIZE_DWORD, SCALE_x4);
 	UML_XOR(block, I2, I2, I1);
 	UML_JMPc(block, COND_NZ, terminate);
@@ -801,7 +822,7 @@ void adsp21062_device::static_generate_loop_check_body(drcuml_block &block, bool
 	UML_LABEL(block, lt_ge);
 	UML_XOR(block, I2, mem(&m_core->astat_delay_copy.az), 1);
 	UML_AND(block, I2, I2, mem(&m_core->astat_delay_copy.an));
-	UML_BFXU(block, I1, I1, 28, 1);
+	UML_BFXU(block, I1, I1, 4, 1);
 	UML_XOR(block, I2, I2, I1);
 	UML_JMPc(block, COND_NZ, terminate);
 	UML_JMP(block, loop);
@@ -810,7 +831,7 @@ void adsp21062_device::static_generate_loop_check_body(drcuml_block &block, bool
 	// TODO: should do different things depending on AF
 	UML_LABEL(block, le_gt);
 	UML_OR(block, I2, mem(&m_core->astat_delay_copy.az), mem(&m_core->astat_delay_copy.an));
-	UML_BFXU(block, I1, I1, 28, 1);
+	UML_BFXU(block, I1, I1, 4, 1);
 	UML_XOR(block, I2, I2, I1);
 	UML_JMPc(block, COND_NZ, terminate);
 	UML_JMP(block, loop);
@@ -819,20 +840,20 @@ void adsp21062_device::static_generate_loop_check_body(drcuml_block &block, bool
 	UML_LABEL(block, flag_in);
 	UML_SUB(block, I2, I2, 0x09);
 	UML_LOAD(block, I2, m_core->flag, I2, SIZE_DWORD, SCALE_x4);
-	UML_BFXU(block, I1, I1, 28, 1);
+	UML_BFXU(block, I1, I1, 4, 1);
 	UML_XOR(block, I2, I2, I1);
 	UML_JMPc(block, COND_NZ, terminate);
 	UML_JMP(block, loop);
 
 	// bus master (not implemented)
 	UML_LABEL(block, bm);
-	UML_TEST(block, I1, 0x10000000);
+	UML_TEST(block, I1, 0x10);
 	UML_JMPc(block, COND_NZ, terminate);
 	UML_JMP(block, loop);
 
 	// LCE and FOREVER
 	UML_LABEL(block, lce);
-	UML_TEST(block, I1, 0x10000000);
+	UML_TEST(block, I1, 0x10);
 	UML_JMPc(block, COND_NZ, loop);
 	UML_CMP(block, CURLCNTR, 1);
 	UML_JMPc(block, COND_E, terminate);
@@ -840,9 +861,6 @@ void adsp21062_device::static_generate_loop_check_body(drcuml_block &block, bool
 
 	// counter-based loop
 	UML_LABEL(block, counter);
-	UML_LOAD(block, I1, m_core->lcstack, LSTKP, SIZE_DWORD, SCALE_x4);
-	UML_SUB(block, I1, I1, 1);
-	UML_STORE(block, m_core->lcstack, LSTKP, I1, SIZE_DWORD, SCALE_x4);
 	UML_SUB(block, CURLCNTR, CURLCNTR, 1);
 	UML_JMPc(block, COND_Z, terminate);
 
@@ -1885,6 +1903,12 @@ void adsp21062_device::generate_read_ureg(drcuml_block &block, compiler_state &c
 		case 0x65:      // PCSTKP
 			UML_MOV(block, I0, PCSTKP);
 			break;
+		case 0x67:      // CURLCNTR
+			UML_MOV(block, I0, CURLCNTR);
+			break;
+		case 0x68:      // LCNTR
+			UML_MOV(block, I0, LCNTR);
+			break;
 
 		case 0x70:      // USTAT1
 			UML_MOV(block, I0, mem(&m_core->ustat1));
@@ -2140,10 +2164,19 @@ void adsp21062_device::generate_write_ureg(drcuml_block &block, compiler_state &
 			break;
 		}
 		case 0x67:      // CURLCNTR
-			UML_MOV(block, CURLCNTR, imm ? data : I0);
+		{
+			uml::code_label const skip = compiler.labelnum++;
+
+			UML_OR(block, I1, LSTKP, 0);
+			UML_JMPc(block, COND_Z, skip);
+			UML_CMP(block, I1, 7);
+			UML_MOVc(block, COND_B, CURLCNTR, imm ? data : I0);
+			UML_LABEL(block, skip);
 			break;
+		}
 		case 0x68:      // LCNTR
-			UML_MOV(block, LCNTR, imm ? data : I0);
+			UML_CMP(block, LSTKP, 6);
+			UML_MOVc(block, COND_B, LCNTR, imm ? data : I0);
 			break;
 
 		case 0x70:      // USTAT1
@@ -2628,9 +2661,10 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 					UML_MOV(block, PCSTK, desc->pc + 1);
 
 					// push loop
-					UML_MOV(block, I0, data);
-					UML_MOV(block, I1, 0xcf000000 | address);
 					UML_CALLH(block, *m_push_loop);
+					UML_MOV(block, mem(&m_core->laddr.addr), address);
+					UML_MOV(block, mem(&m_core->laddr.code), 0x0f);
+					UML_MOV(block, mem(&m_core->laddr.loop_type), 0x3); // TODO: support small loops
 					return true;
 				}
 
@@ -2642,17 +2676,17 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 
 					generate_read_ureg(block, compiler, desc, ureg, false);
 
-					UML_MOV(block, I3, I0);
-					UML_MOV(block, LCNTR, I3);
+					UML_MOV(block, LCNTR, I0);
 
 					// push pc
 					UML_CALLH(block, *m_push_pc);
 					UML_MOV(block, PCSTK, desc->pc + 1);
 
 					// push loop
-					UML_MOV(block, I0, I3);
-					UML_MOV(block, I1, 0xcf000000 | address);
 					UML_CALLH(block, *m_push_loop);
+					UML_MOV(block, mem(&m_core->laddr.addr), address);
+					UML_MOV(block, mem(&m_core->laddr.code), 0x0f);
+					UML_MOV(block, mem(&m_core->laddr.loop_type), 0x3); // TODO: support small loops
 					return true;
 				}
 
@@ -2667,9 +2701,10 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 					UML_MOV(block, PCSTK, desc->pc + 1);
 
 					// push loop
-					UML_MOV(block, I0, 0);
-					UML_MOV(block, I1, (cond << 24) | address);
 					UML_CALLH(block, *m_push_loop);
+					UML_MOV(block, mem(&m_core->laddr.addr), address);
+					UML_MOV(block, mem(&m_core->laddr.code), cond);
+					UML_MOV(block, mem(&m_core->laddr.loop_type), 0x0);
 					return true;
 				}
 
@@ -3036,11 +3071,15 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 				{
 					if (opcode & 0x008000000000U)
 					{
-						fatalerror("sharcdrc: push/pop stacks: push loop not implemented\n");
+						UML_CALLH(block, *m_push_loop);
+						UML_LOAD(block, I0, m_core->lastack - 1, LSTKP, SIZE_DWORD, SCALE_x4);
+						UML_BFXU(block, mem(&m_core->laddr.addr), I0, 0, 24);
+						UML_BFXU(block, mem(&m_core->laddr.code), I0, 24, 5);
+						UML_BFXU(block, mem(&m_core->laddr.loop_type), I0, 30, 2);
 					}
 					if (opcode & 0x004000000000U)
 					{
-						fatalerror("sharcdrc: push/pop stacks: pop loop not implemented\n");
+						UML_CALLH(block, *m_pop_loop);
 					}
 					if (opcode & 0x002000000000U)
 					{

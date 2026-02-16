@@ -324,7 +324,7 @@ private:
 	void PUSH_PC();
 	uint32_t POP_PC();
 	uint32_t TOP_PC();
-	void PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, uint32_t count);
+	void PUSH_LOOP();
 	void POP_LOOP();
 	void PUSH_STATUS_STACK();
 	void POP_STATUS_STACK();
