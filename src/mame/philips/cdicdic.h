@@ -186,8 +186,7 @@ private:
 	bool m_decoding_audio_map;
 	uint16_t m_decode_addr;
 
-	// Audio Attenuation (L->L, L->R, R->R, R->L)
-	uint8_t m_atten[4];
+	// Should eventually have Audio Attenuation (L->L, L->R, R->R, R->L) here
 	int16_t m_xa_last[4];
 	std::unique_ptr<uint8_t[]> m_ram;
 	std::unique_ptr<int16_t[]> m_samples[2];

@@ -1,13 +1,10 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz, Vincent Halver
 /******************************************************************************
 
 
     CD-i Mono-I CDIC MCU simulation
     -------------------
-
-    written by Ryan Holtz
-
 
 *******************************************************************************
 
@@ -363,7 +360,7 @@ void cdicdic_device::play_cdda_sector(const uint8_t *data)
 	m_dmadac[0]->set_volume(0x100);
 	m_dmadac[1]->set_volume(0x100);
 
-	const int16_t NUM_SAMPLES = SECTOR_SIZE / 4;
+	const uint16_t NUM_SAMPLES = SECTOR_SIZE / 4;
 	int16_t samples[2][NUM_SAMPLES];
 	for (uint16_t i = 0; i < NUM_SAMPLES; i++)
 	{
@@ -1316,7 +1313,6 @@ void cdicdic_device::device_start()
 	save_item(NAME(m_decoding_audio_map));
 	save_item(NAME(m_decode_addr));
 
-	save_item(NAME(m_atten));
 	save_item(NAME(m_xa_last));
 
 	m_audio_timer = timer_alloc(FUNC(cdicdic_device::audio_tick), this);
@@ -1364,7 +1360,6 @@ void cdicdic_device::device_reset()
 	m_dmadac[0]->enable(1);
 	m_dmadac[1]->enable(1);
 
-	std::fill_n(m_atten, 4, 0);
 	std::fill_n(m_xa_last, 4, 0);
 }
 
