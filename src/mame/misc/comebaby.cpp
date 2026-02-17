@@ -193,11 +193,11 @@ TODO:
 
 #include "bus/isa/isa_cards.h"
 #include "bus/pci/virge_pci.h"
-//#include "bus/rs232/hlemouse.h"
-//#include "bus/rs232/null_modem.h"
-//#include "bus/rs232/rs232.h"
-//#include "bus/rs232/sun_kbd.h"
-//#include "bus/rs232/terminal.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
 #include "machine/pci-ide.h"
@@ -241,12 +241,21 @@ void comebaby_state::comebaby_map(address_map &map)
 	map.unmap_value_high();
 }
 
-static INPUT_PORTS_START( comebaby )
-INPUT_PORTS_END
-
 static void isa_internal_devices(device_slot_interface &device)
 {
 	device.option_add("it8671f", IT8671F);
+}
+
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
 
 void comebaby_state::superio_config(device_t *device)
@@ -256,14 +265,12 @@ void comebaby_state::superio_config(device_t *device)
 	ite.ga20_gpio6().set_inputline(":maincpu", INPUT_LINE_A20);
 	ite.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	ite.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
-#if 0
 	ite.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
 	ite.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
 	ite.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
 	ite.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
 	ite.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
 	ite.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
-#endif
 }
 
 // TODO: unverified PCI config space
@@ -320,6 +327,21 @@ void comebaby_state::comebaby(machine_config &config)
 	// has an ESS .com in autoexec.bat (unknown position)
 	// TODO: tries to install its driver in Windows 98, wrong one
 	PCI_SLOT(config, "pci:4", pci_cards, 16, 3, 0, 1, 2, "ess_solo1");
+
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd1_w));
+	serport0.dcd_handler().set("board4:it8671f", FUNC(it8671f_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:it8671f", FUNC(it8671f_device::ndsr1_w));
+	serport0.ri_handler().set("board4:it8671f", FUNC(it8671f_device::nri1_w));
+	serport0.cts_handler().set("board4:it8671f", FUNC(it8671f_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd2_w));
+	serport1.dcd_handler().set("board4:it8671f", FUNC(it8671f_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:it8671f", FUNC(it8671f_device::ndsr2_w));
+	serport1.ri_handler().set("board4:it8671f", FUNC(it8671f_device::nri2_w));
+	serport1.cts_handler().set("board4:it8671f", FUNC(it8671f_device::ncts2_w));
+
 }
 
 
@@ -336,4 +358,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, comebaby, 0, comebaby, comebaby, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, comebaby, 0, comebaby, 0, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
