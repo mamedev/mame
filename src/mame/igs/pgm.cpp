@@ -2014,8 +2014,8 @@ ROM_START( kovgsyx ) // cart with 2010--04--16 main PCB and 2009-09-01 ROM PCB
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "27c322.u3", 0x100000, 0x400000, CRC(4018559f) SHA1(e7e97ce89e1f563e8e08501ec3c2be6d81107253) ) // V300CN V302CN Dec 29 2010 16:31:32
 
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom (NXP LPC2132 ARM7 TDMI-S CPU with 64kB internal flash ROM on main PCB)  */
-	ROM_LOAD( "qhsg_prot.c51", 0x000000, 0x04000, BAD_DUMP CRC(0f09a5c1) SHA1(621b38c05f33277608d58b49822aebc930ae4870) ) // not dumped for this set
+	ROM_REGION( 0x10000, "prot", 0 ) /* ARM protection ASIC - internal rom (NXP LPC2132 ARM7 TDMI-S CPU with 64kB internal flash ROM on main PCB)  */
+	ROM_LOAD( "gsyx_prot.c51", 0x000000, 0x10000, CRC(0c381ff4) SHA1(8aa69bc1a520be17b71a5159e96f366132e87328) )
 
 	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles, on main PCB */
 	PGM_VIDEO_BIOS
@@ -2030,12 +2030,35 @@ ROM_START( kovgsyx ) // cart with 2010--04--16 main PCB and 2009-09-01 ROM PCB
 	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes, on ROM PCB */
 	ROM_LOAD( "b01.u6", 0x0000000, 0x1000000, CRC(779825d3) SHA1(eb179111eb4f0c98d502622f094b1e5aa1f98225) )
 
-	ROM_REGION( 0xc00000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) -, on ROM PCB */
+	ROM_REGION( 0x1800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) -, on ROM PCB */
 	PGM_AUDIO_BIOS
-	ROM_LOAD( "m01.u5",0x400000, 0x400000, CRC(af5e9be0) SHA1(be9da327f2a26bf14a6bc1c0b2dd114ac13b8c74) )
-	ROM_IGNORE(                  0x400000 )  // 400000-7fffff almost completely empty
-	ROM_CONTINUE(      0x800000, 0x400000 )
-	ROM_IGNORE(                  0x400000 )  // c00000-ffffff almost completely empty
+	ROM_LOAD( "m01.u5",0x800000, 0x1000000, CRC(af5e9be0) SHA1(be9da327f2a26bf14a6bc1c0b2dd114ac13b8c74) )
+ROM_END
+
+ROM_START( kovzscs )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "27c322.u3",0x100000, 0x400000, CRC(8F58939B) SHA1(9BB2C056A00A3F135DC2CC3A1AB30191A4A831EF) )
+
+	ROM_REGION( 0x10000, "prot", 0 ) /* ARM protection ASIC - internal rom (NXP LPC2132 ARM7 TDMI-S CPU with 64kB internal flash ROM on main PCB)  */
+	ROM_LOAD( "gsyx_prot.c51", 0x000000, 0x10000, CRC(0c381ff4) SHA1(8aa69bc1a520be17b71a5159e96f366132e87328) )
+
+	ROM_REGION( 0xa00000, "igs023",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t01.u8",0x180000, 0x800000, CRC(d498d97f) SHA1(97a7b6d2ed1170449e7c2899448af7cbbca4c94f) )
+	ROM_IGNORE( 0x800000 )  // second half identical
+
+	ROM_REGION16_LE( 0x4000000, "igs023:sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a01.u8", 0x0000000, 0x1000000, CRC(25ae3efd) SHA1(083d977602ddb5ad54fbdcba000cd4287de8d463) )
+	ROM_LOAD( "a23.u9", 0x1000000, 0x1000000, CRC(1F51C140) SHA1(638A7449449716A2AE862A11B4333C09D369050A) )
+	ROM_LOAD( "a45.u10", 0x2000000, 0x1000000, CRC(5E44FD82) SHA1(BB7B9258A37A7FC7CAF14AC5B606DD0CE6D43135) )
+
+	ROM_REGION16_LE( 0x1000000, "igs023:sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b01.u6", 0x0000000, 0x1000000, CRC(779825D3) SHA1(EB179111EB4F0C98D502622F094B1E5AA1F98225) )
+
+	ROM_REGION( 0x1800000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m01.u5",0x800000, 0x1000000, CRC(AF5E9BE0) SHA1(BE9DA327F2A26BF14A6BC1C0B2DD114AC13B8C74) )
 ROM_END
 
 
@@ -5817,8 +5840,10 @@ GAME( 200?, kovlsqh2,     kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_
 GAME( 200?, kovlsjb,      kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 200?, kovlsjba,     kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2010, kovgsyx,      kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovqhsgs, ROT0,   "bootleg (WDF)", "Gaishi Xingxiong Tebie Ban (bootleg of Knights of Valour Super Heroes Plus, V302CN, Dec 29 2010 16:31:32)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // needs decryption and IGS027A simulation adaptation
+GAME( 2010, kovgsyx,      kovshp,    pgm_arm_type1_kovgsyx,  kovsh,     pgm_arm_type1_state, init_kovgsyx,  ROT0,   "bootleg (WDF)", "Gaishi Yingxiong Jiaqiang Ban (bootleg of Knights of Valour Super Heroes Plus, V302CN, Dec 29 2010 16:31:32)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 199?, kovbl,        kov,       pgm_arm_type1_sim,      sango,     pgm_arm_type1_state, init_kov,      ROT0,   "bootleg", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (bootleg, ver. 112CN?)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, kovplusbl,    kovplus,   pgm_arm_type1_sim,      sango,     pgm_arm_type1_state,  init_kov,     ROT0,   "bootleg", "Knights of Valour Plus / Sanguo Zhan Ji Zhengzong Plus / Sangoku Senki Masamune Plus (bootleg, ver. 117CN?)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, kovplusbl,    kovplus,   pgm_arm_type1_sim,      sango,     pgm_arm_type1_state, init_kov,      ROT0,   "bootleg", "Knights of Valour Plus / Sanguo Zhan Ji Zhengzong Plus / Sangoku Senki Masamune Plus (bootleg, ver. 117CN?)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+
+GAME( 2010, kovzscs,      kovshp,    pgm_arm_type1_kovgsyx,  kovsh,     pgm_arm_type1_state, init_kovzscs,  ROT0,   "bootleg (WDF)", "Zhan Shen Chuan Shuo 2 Tebie Ban (bootleg of Knights of Valour Super Heroes Plus, V201CN, May 17 2010 10:43:09)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

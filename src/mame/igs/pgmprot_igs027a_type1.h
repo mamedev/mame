@@ -2,6 +2,9 @@
 // copyright-holders:David Haywood, ElSemi, Xing Xing
 #include "pgm.h"
 
+#include "cpu/arm7/arm7.h"
+#include "machine/lpc2132_vic.h"
+
 class pgm_arm_type1_state : public pgm_state
 {
 public:
@@ -9,6 +12,7 @@ public:
 		: pgm_state(mconfig, type, tag)
 		, m_arm7_shareram(*this, "arm7_shareram")
 		, m_prot(*this, "prot")
+		, m_lpc2132_vic(*this, "lpc2132_vic")
 	{
 		m_curslots = 0;
 		m_puzzli_54_trigger = 0;
@@ -30,13 +34,17 @@ public:
 	void init_kov();
 	void init_kovboot();
 	void init_oldsplus();
+	void init_kovgsyx();
+	void init_kovzscs();
 
 	void pgm_arm_type1_sim(machine_config &config);
 	void pgm_arm_type1_cave(machine_config &config);
 	void pgm_arm_type1(machine_config &config);
+	void pgm_arm_type1_kovgsyx(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	/////////////// simulations
@@ -70,6 +78,7 @@ private:
 	optional_shared_ptr<u32> m_arm7_shareram;
 
 	optional_device<cpu_device> m_prot;
+	optional_device<lpc2132_vic_device> m_lpc2132_vic;
 
 	u32 arm7_type1_protlatch_r();
 	void arm7_type1_protlatch_w(offs_t offset, u32 data, u32 mem_mask);
@@ -89,6 +98,9 @@ private:
 	void pgm_decode_kovlsqh2_samples();
 	void pgm_decode_kovqhsgs_program();
 	void pgm_decode_kovqhsgs2_program();
+	void pgm_decode_kovgsyx_samples();
+	void pgm_decode_kovgsyx_program();
+	void pgm_decode_kovzscs_program();
 	u16 arm7_type1_sim_r(offs_t offset);
 	void command_handler_ddp3(int pc);
 	void command_handler_puzzli2(int pc);
@@ -100,6 +112,15 @@ private:
 	u16 arm7_type1_sim_protram_r(offs_t offset);
 	u16 pstars_arm7_type1_sim_protram_r(offs_t offset);
 	int m_simregion = 0;
+
+	void kovgsyx_asic27a_write_word(offs_t offset, u16 data);
+	u16 kovgsyx_asic27a_read_word(offs_t offset);
+	u32 kovgsyx_lpc2132_read_long(offs_t offset);
+	u8 kovgsyx_lpc2132_read_byte(offs_t offset);
+	u16 kovgsyx_lpc2132_read_word(offs_t offset);
+	void kovgsyx_lpc2132_write_long(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void kovgsyx_lpc2132_write_byte(offs_t offset, u8 data);
+	void kovgsyx_handshake_callback(u32 data);
 
 	/* puzzli2 protection internal state stuff */
 	int stage = 0;
@@ -133,12 +154,27 @@ private:
 	// the maximum level size returned or read by the device appears to be this size
 	u16 level_structure[8][10]{};
 
+	// kovgsyx protection
+	u16 m_kovgsyx_highlatch_arm_w;
+	u16 m_kovgsyx_lowlatch_arm_w;
+	u16 m_kovgsyx_highlatch_68k_w;
+	u16 m_kovgsyx_lowlatch_68k_w;
+	u32 m_kovgsyx_pll_lock_timer;
+	u8  m_kovgsyx_pll_enabled;
+	u8  m_kovgsyx_pll_config;
+	u32 m_kovgsyx_i2c1sclh;
+	u32 m_kovgsyx_i2c1conset;
+	u32 m_kovgsyx_i2c1dat;
+	u32 m_kovgsyx_i2c1_status;
+	u8  m_kovgsyx_handshake_done;
 
 	int puzzli2_take_leveldata_value(u8 datvalue);
 	void _55857E_arm7_map(address_map &map) ATTR_COLD;
 	void cavepgm_mem(address_map &map) ATTR_COLD;
 	void kov_map(address_map &map) ATTR_COLD;
 	void kov_sim_map(address_map &map) ATTR_COLD;
+	void kovgsyx_map(address_map &map) ATTR_COLD;
+	void kovgsyx_arm7_map(address_map &map) ATTR_COLD;
 };
 
 INPUT_PORTS_EXTERN( sango );

@@ -5580,3 +5580,18 @@ if MACHINES["QUADMOUSE"] then
 		MAME_DIR .. "src/devices/machine/quadmouse.h",
 	}
 end
+
+---------------------------------------------------
+
+--
+--@src/devices/machine/lpc2132_vic.h,MACHINES["LPC2132_VIC"] = true
+---------------------------------------------------
+
+if (MACHINES["LPC2132_VIC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/lpc2132_vic.cpp",
+		MAME_DIR .. "src/devices/machine/lpc2132_vic.h",
+	}
+end
+
+
