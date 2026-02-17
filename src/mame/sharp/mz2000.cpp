@@ -863,7 +863,11 @@ u8 mz80b_state::ppi_portb_r()
 
 	if (m_cassette->get_image() != nullptr)
 	{
-		res |= (m_cassette->input() > 0.0038) ? 0x40 : 0x00;
+		// Bit 6: Tape data - gate with motor state. When motor stops, real hardware
+		// fades to 0V (Low); MAME freezes the waveform, so force Low to allow
+		// the loader's "wait for silence" loop (e.g. at $04BD) to succeed.
+		bool motor_active = (m_cassette->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED;
+		res |= (motor_active && m_cassette->input() > 0.0038) ? 0x40 : 0x00;
 		res |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x10 : 0x30;
 		res |= (m_cassette->get_position() >= m_cassette->get_length()) ? 0x08 : 0x00;
 	}
