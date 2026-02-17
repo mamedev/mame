@@ -1643,33 +1643,11 @@ void toaplan1_state::outzone(machine_config &config)
 
 void toaplan1_state::outzonecv(machine_config &config)
 {
+	outzone(config);
+
 	/* basic machine hardware */
-	M68000(config, m_maincpu, XTAL(10'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &toaplan1_state::outzonecv_main_map);
-	m_maincpu->reset_cb().set(FUNC(toaplan1_state::reset_callback));
-
-	Z80(config, m_audiocpu, XTAL(28'000'000) / 8);
-	m_audiocpu->set_addrmap(AS_PROGRAM, &toaplan1_state::sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &toaplan1_state::zerowing_sound_io_map);
-
-	config.set_maximum_quantum(attotime::from_hz(600));
-
-	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
-	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL55, VBEND, VBSTART); //  Same as parent set
-	m_screen->set_screen_update(FUNC(toaplan1_state::screen_update));
-	m_screen->screen_vblank().set(m_fcu, FUNC(toaplan_fcu_device::vblank));
-	m_screen->screen_vblank().append(FUNC(toaplan1_state::screen_vblank));
-
-	common_video_config(config);
-
-	/* sound hardware */
-	SPEAKER(config, "mono").front_center();
-
-	YM3812(config, m_ymsnd, XTAL(28'000'000) / 8);
-	m_ymsnd->irq_handler().set_inputline(m_audiocpu, 0);
-	m_ymsnd->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 void toaplan1_state::vimana(machine_config &config)
