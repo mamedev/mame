@@ -46,6 +46,7 @@ psxgpu_device::psxgpu_device(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
+	, m_native_display_range(false)
 	, m_vblank_handler(*this)
 {
 }
@@ -473,6 +474,23 @@ void psxgpu_device::updatevisiblearea()
 		break;
 	}
 
+	if (m_native_display_range && n_screenwidth > 0)
+	{
+		int dot_clock_divider;
+		switch (n_screenwidth)
+		{
+			case 256:  dot_clock_divider = 10; break;
+			case 320:  dot_clock_divider = 8;  break;
+			case 368:  dot_clock_divider = 7;  break;
+			case 384:  dot_clock_divider = 7;  break;
+			case 512:  dot_clock_divider = 5;  break;
+			case 640:  dot_clock_divider = 4;  break;
+			default:    dot_clock_divider = 1;  break;
+		}
+		n_horiz_disstart = (n_horiz_disstart / dot_clock_divider) * dot_clock_divider;
+		n_horiz_disend = (n_horiz_disend / dot_clock_divider) * dot_clock_divider;
+	}
+
 #if PSXGPU_DEBUG_VIEWER
 	if( m_debug.b_mesh || m_debug.b_texture )
 	{
@@ -685,7 +703,12 @@ uint32_t psxgpu_device::update_screen(screen_device &screen, bitmap_rgb32 &bitma
 			n_displaystartx = m_n_displaystartx;
 		}
 
-		if( ( n_gpustatus & ( 1 << 0x14 ) ) != 0 )
+		if( m_native_display_range )
+		{
+			n_overscantop = n_vert_disstart;
+			n_overscanleft = n_horiz_disstart; 
+		}
+		else if( ( n_gpustatus & ( 1 << 0x14 ) ) != 0 )
 		{
 			/* pal */
 			n_overscantop = 0x23;
@@ -729,8 +752,26 @@ uint32_t psxgpu_device::update_screen(screen_device &screen, bitmap_rgb32 &bitma
 			bitmap.fill(0, clip);
 		}
 
-		n_left = ( ( (int32_t)n_horiz_disstart - n_overscanleft ) * (int32_t)n_screenwidth ) / 2560;
-		n_columns = ( ( ( (int32_t)n_horiz_disend - n_horiz_disstart ) * (int32_t)n_screenwidth ) / 2560 );
+		if (m_native_display_range && n_screenwidth > 0)
+		{
+			/* use dot clock divider directly for pixel alignment */
+			int dot_clock_divider;
+			switch (n_screenwidth)
+			{
+				case 256:  dot_clock_divider = 10; break;
+				case 320:  dot_clock_divider = 8;  break;
+				case 512:  dot_clock_divider = 5;  break;
+				case 640:  dot_clock_divider = 4;  break;
+				default:    dot_clock_divider = 1;  break;
+			}
+			n_left = (n_horiz_disstart - n_overscanleft) / dot_clock_divider;
+			n_columns = ((n_horiz_disend - n_horiz_disstart) / dot_clock_divider);
+		}
+		else
+		{
+			n_left = ( ( (int32_t)n_horiz_disstart - n_overscanleft ) * (int32_t)n_screenwidth ) / 2560;
+			n_columns = ( ( ( (int32_t)n_horiz_disend - n_horiz_disstart ) * (int32_t)n_screenwidth ) / 2560 );
+		}
 		if( n_left < 0 )
 		{
 			n_x = -n_left;

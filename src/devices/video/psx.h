@@ -29,6 +29,7 @@ public:
 	// configuration helpers
 	auto vblank_callback() { return m_vblank_handler.bind(); }
 	int vram_size() { return vramSize; }
+	void set_native_display_range(bool native) { m_native_display_range = native; }
 
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
@@ -257,6 +258,7 @@ private:
 	uint32_t n_screenheight;
 	bool m_draw_stp;
 	bool m_check_stp;
+	bool m_native_display_range;
 
 	PACKET m_packet;
 

@@ -1115,6 +1115,7 @@ public:
 
 		/* video hardware */
 		CXD8654Q(config, m_gpu, 53.693175_MHz_XTAL, 0x200000, m_maincpu.target()).set_screen("screen"); // 2x KM4132G271Qs
+		m_gpu->set_native_display_range(true);
 
 		namcos12_base(config);
 	}
@@ -1138,6 +1139,7 @@ public:
 
 		/* video hardware */
 		CXD8561CQ(config, m_gpu, 53.693175_MHz_XTAL, 0x200000, m_maincpu.target()).set_screen("screen"); // 2x 54V25632As
+		m_gpu->set_native_display_range(true);
 
 		namcos12_base(config);
 
