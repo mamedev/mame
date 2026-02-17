@@ -29,7 +29,7 @@ Word Bit                 Description
 ** 16 color unit
 *** Unmarked bits are unused/unknown
 
-Sprite size LUT RAM format: (2 nibbles per entry)
+Sprite size LUT RAM format: (2 nibbles per entry, Only LSB is used)
 
 Bit       Description
 7654 3210 
