@@ -55,12 +55,12 @@ illuminated). The synth is unresponsive while this is happening.
 #include "machine/output_latch.h"
 #include "machine/rescap.h"
 #include "machine/timer.h"
+#include "sound/cem3320.h"
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
 #include "sound/mixer.h"
 #include "sound/mm5837.h"
 #include "sound/va_vca.h"
-#include "sound/va_vcf.h"
 #include "video/pwm.h"
 
 #include "speaker.h"
