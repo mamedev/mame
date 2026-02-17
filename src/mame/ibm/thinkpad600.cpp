@@ -271,6 +271,7 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 	// TODO: PCI config space guessed from a Fujitsu Lifebook, confirm me for ThinkPad
 	PCI_ROOT(config, "pci", 0);
 	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
+
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);

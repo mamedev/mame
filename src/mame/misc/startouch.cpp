@@ -13,11 +13,12 @@ NO   | Star Touch                 | 2000 |
 YES  | Star Touch / EuroPlay 2001 | 2001 | Original Game: http://www.eurobyte.com.gr/gb_europlay.htm
 
 Hardware overview:
-MB Soyo M5EH or similar (e.g. Biostar M5ATD)
+MB Soyo SY-5EH5 or similar (e.g. Biostar M5ATD)
 16384 KB RAM
 Intel Pentium MMX 233 MHz or compatible (e.g. Cyrix M II-300GP 66MHz Bus 3.5x 2.9V)
 
-Soyo M5EH uses a VIA Apollo MVP3 chipset with VT82C597 + VT82C586B
+- Soyo SY-5EH5 uses a VIA Apollo MVP3 chipset with VT82C597 + VT82C586B
+- Biostar M5ATD uses an ALi ALADDiN IV+ M1531B + M1543
 
 MicroTouch ISA
 ExpertColor Med3931 ISA sound card or other 82C931-based similar card (e.g. BTC 1817DS OPTi ISA)
@@ -66,9 +67,6 @@ void startouch_state::mem_map(address_map &map)
 }
 
 
-static INPUT_PORTS_START(europl01)
-INPUT_PORTS_END
-
 void startouch_state::europl01(machine_config &config)
 {
 	// Super Socket 7
@@ -80,8 +78,8 @@ void startouch_state::europl01(machine_config &config)
 }
 
 ROM_START(europl01)
-
 	// Sleic used different motherboards for this machine. By now, we're adding all the known BIOSes here
+	// TODO: needs separating, incompatible chipsets
 	ROM_REGION32_LE(0x20000, "bios", 0)
 	ROM_SYSTEM_BIOS(0, "soyo_5ehm13_1aa1", "Soyo 5EHM (Award BIOS 5EH V1.3-1AA1)")                                                                 // Soyo 5EHM V1.3
 	ROMX_LOAD("award_1998_pci-pnp_586_223123413.bin", 0x00000, 0x20000, CRC(d30fe6c2) SHA1(022cf24d982b82e4c13ebbe974adae3a1638d1cd), ROM_BIOS(0)) //   39SF010
@@ -104,4 +102,4 @@ ROM_END
 
 } // Anonymous namespace
 
-GAME(2001, europl01, 0, europl01, europl01, startouch_state, empty_init, ROT0, "Sleic / Petaco", "EuroPlay 2001", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2001, europl01, 0, europl01, 0, startouch_state, empty_init, ROT0, "Sleic / Petaco", "EuroPlay 2001", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
