@@ -80,8 +80,8 @@
 #include "bus/a2bus/agat840k_hle.h"
 #include "bus/a2bus/agat_fdc.h"
 #include "bus/a2bus/nippelclock.h"
+#include "bus/a2gameio/gameio.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/m6502/r65c02.h"
 #include "imagedev/cassette.h"
 #include "machine/bankdev.h"
 #include "machine/timer.h"
@@ -110,11 +110,7 @@ public:
 		, m_maincpu(*this, A7_CPU_TAG)
 		, m_ram(*this, RAM_TAG)
 		, m_a2bus(*this, "a2bus")
-		, m_joy1x(*this, "joystick_1_x")
-		, m_joy1y(*this, "joystick_1_y")
-		, m_joy2x(*this, "joystick_2_x")
-		, m_joy2y(*this, "joystick_2_y")
-		, m_joybuttons(*this, "joystick_buttons")
+		, m_gameio(*this, "gameio")
 		, m_speaker(*this, A7_SPEAKER_TAG)
 		, m_cassette(*this, A7_CASSETTE_TAG)
 		, m_upperbank(*this, A7_UPPERBANK_TAG)
@@ -159,7 +155,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<a2bus_device> m_a2bus;
-	required_ioport m_joy1x, m_joy1y, m_joy2x, m_joy2y, m_joybuttons;
+	required_device<apple2_gameio_device> m_gameio;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
@@ -544,31 +540,37 @@ void agat_base_state::interrupts_off_w(uint8_t data)
 
 uint8_t agat_base_state::flags_r(offs_t offset)
 {
+	const u8 uFloatingBus7 = read_floatingbus() & 0x7f;
+
 	switch (offset)
 	{
 	case 0: // cassette in
 		return m_cassette->input() > 0.0 ? 0x80 : 0;
 
 	case 1: // button 0
-		return (m_joybuttons->read() & 0x10) ? 0x80 : 0;
+		return (m_gameio->sw0_r() ? 0x80 : 0) | uFloatingBus7;
 
 	case 2: // button 1
-		return (m_joybuttons->read() & 0x20) ? 0x80 : 0;
+		return (m_gameio->sw1_r() ? 0x80 : 0) | uFloatingBus7;
 
 	case 3: // meta key
 		return m_meta ? 0 : 0x80;
 
-	case 4: // joy 1 X axis
-		return (machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0;
+	case 4:  // joy 1 X axis
+		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+		return ((machine().time().as_double() < m_joystick_x1_time) ? 0x80 : 0) | uFloatingBus7;
 
-	case 5: // joy 1 Y axis
-		return (machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0;
+	case 5:  // joy 1 Y axis
+		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+		return ((machine().time().as_double() < m_joystick_y1_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 6: // joy 2 X axis
-		return (machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0;
+		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+		return ((machine().time().as_double() < m_joystick_x2_time) ? 0x80 : 0) | uFloatingBus7;
 
 	case 7: // joy 2 Y axis
-		return (machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0;
+		if (!m_gameio->is_device_connected()) return 0x80 | uFloatingBus7;
+		return ((machine().time().as_double() < m_joystick_y2_time) ? 0x80 : 0) | uFloatingBus7;
 	}
 
 	// this is never reached
@@ -587,19 +589,19 @@ void agat_base_state::controller_strobe_w(uint8_t data)
 	// 555 monostable one-shot timers; a running timer cannot be restarted
 	if (machine().time().as_double() >= m_joystick_x1_time)
 	{
-		m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_joy1x->read();
+		m_joystick_x1_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl0_r();
 	}
 	if (machine().time().as_double() >= m_joystick_y1_time)
 	{
-		m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_joy1y->read();
+		m_joystick_y1_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl1_r();
 	}
 	if (machine().time().as_double() >= m_joystick_x2_time)
 	{
-		m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_joy2x->read();
+		m_joystick_x2_time = machine().time().as_double() + m_x_calibration * m_gameio->pdl2_r();
 	}
 	if (machine().time().as_double() >= m_joystick_y2_time)
 	{
-		m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_joy2y->read();
+		m_joystick_y2_time = machine().time().as_double() + m_y_calibration * m_gameio->pdl3_r();
 	}
 
 }
@@ -1231,7 +1233,7 @@ static void agat9_cards(device_slot_interface &device)
 
 void agat7_state::agat7(machine_config &config)
 {
-	M6502(config, m_maincpu, XTAL(14'300'000) / 14);
+	M6502(config, m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &agat7_state::agat7_map);
 	m_maincpu->set_vblank_int(A7_VIDEO_TAG ":a7screen", FUNC(agat_base_state::agat_vblank));
 
@@ -1247,6 +1249,8 @@ void agat7_state::agat7(machine_config &config)
 
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat7_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x3000);
+
+	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::joystick_options, nullptr);
 
 	agat_keyboard_device &keyboard(AGAT_KEYBOARD(config, "keyboard", 0));
 	keyboard.out_callback().set(FUNC(agat_base_state::kbd_put));
@@ -1277,7 +1281,7 @@ void agat7_state::agat7(machine_config &config)
 
 void agat9_state::agat9(machine_config &config)
 {
-	R65C02(config, m_maincpu, XTAL(14'300'000) / 14);
+	M6502(config, m_maincpu, 1021800);
 	m_maincpu->set_addrmap(AS_PROGRAM, &agat9_state::agat9_map);
 	m_maincpu->set_vblank_int(A9_VIDEO_TAG ":a9screen", FUNC(agat_base_state::agat_vblank));
 
@@ -1293,6 +1297,8 @@ void agat9_state::agat9(machine_config &config)
 
 	/* /INH banking */
 	ADDRESS_MAP_BANK(config, m_upperbank).set_map(&agat9_state::inhbank_map).set_options(ENDIANNESS_LITTLE, 8, 32, 0x10000);
+
+	APPLE2_GAMEIO(config, m_gameio, apple2_gameio_device::joystick_options, nullptr);
 
 	agat_keyboard_device &keyboard(AGAT_KEYBOARD(config, "keyboard", 0));
 	keyboard.out_callback().set(FUNC(agat_base_state::kbd_put));
@@ -1370,5 +1376,5 @@ ROM_END
 
 
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY  FULLNAME  FLAGS
-COMP( 1983, agat7, apple2, 0,      agat7,   agat7, agat7_state, empty_init, "Agat",  "Agat-7", MACHINE_IMPERFECT_GRAPHICS)
-COMP( 1988, agat9, apple2, 0,      agat9,   agat7, agat9_state, empty_init, "Agat",  "Agat-9", MACHINE_NOT_WORKING)
+COMP( 1983, agat7, 0,      0,      agat7,   agat7, agat7_state, empty_init, "Agat",  "Agat-7", MACHINE_IMPERFECT_GRAPHICS)
+COMP( 1988, agat9, 0,      0,      agat9,   agat7, agat9_state, empty_init, "Agat",  "Agat-9", MACHINE_NOT_WORKING)
