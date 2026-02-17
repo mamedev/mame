@@ -36,9 +36,6 @@ Bit       Description
 xxxx ---- Sprite height (1 tile unit)
 ---- xxxx Sprite width (1 tile unit)
 
-TODO:
-* mentioned in outzone schematics
-
 ***************************************************************************/
 
 
