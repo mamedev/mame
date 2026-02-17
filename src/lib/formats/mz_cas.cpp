@@ -301,13 +301,26 @@ static int fill_wave(int16_t *buffer, int length, const uint8_t *code, int)
 
 
 
+// MZ-700/MZ-80A/MZ-700/MZ-800: 1200 baud Sharp PWM
 static const cassette_image::LegacyWaveFiller mz700_legacy_fill_wave =
 {
 	fill_wave,                  /* fill_wave */
 	1,                          /* chunk_size */
 	2 * BYTE_SAMPLES,           /* chunk_samples */
-	nullptr,                       /* chunk_sample_calc */
-	4400,                       // sample_frequency (tested ok with MZ-80K, MZ-80A, MZ-700, MZ-800, MZ-1500)
+	nullptr,                    /* chunk_sample_calc */
+	4400,                       /* sample_frequency (1200 baud) */
+	MZ700_WAVESAMPLES_HEADER,   /* header_samples */
+	1                           /* trailer_samples */
+};
+
+// MZ-80B / MZ-2000: 1800 baud Sharp PWM (Logic 0=332.75µs, Logic 1=667µs; CPU read @ 255µs)
+static const cassette_image::LegacyWaveFiller mz80b_legacy_fill_wave =
+{
+	fill_wave,                  /* fill_wave */
+	1,                          /* chunk_size */
+	2 * BYTE_SAMPLES,           /* chunk_samples */
+	nullptr,                    /* chunk_sample_calc */
+	6000,                       /* sample_frequency: 2 samples=333.3µs, 4 samples=666.6µs */
 	MZ700_WAVESAMPLES_HEADER,   /* header_samples */
 	1                           /* trailer_samples */
 };
@@ -328,6 +341,20 @@ static cassette_image::error mz700_cas_load(cassette_image *cassette)
 
 
 
+static cassette_image::error mz80b_cas_identify(cassette_image *cassette, cassette_image::Options *opts)
+{
+	return cassette->legacy_identify(opts, &mz80b_legacy_fill_wave);
+}
+
+
+
+static cassette_image::error mz80b_cas_load(cassette_image *cassette)
+{
+	return cassette->legacy_construct(&mz80b_legacy_fill_wave);
+}
+
+
+
 static const cassette_image::Format mz700_cas_format =
 {
 	"m12,mzf,mzt",
@@ -338,6 +365,20 @@ static const cassette_image::Format mz700_cas_format =
 
 
 
+static const cassette_image::Format mz80b_cas_format =
+{
+	"m12,mzf,mzt",
+	mz80b_cas_identify,
+	mz80b_cas_load,
+	nullptr
+};
+
+
+
 CASSETTE_FORMATLIST_START(mz700_cassette_formats)
 	CASSETTE_FORMAT(mz700_cas_format)
+CASSETTE_FORMATLIST_END
+
+CASSETTE_FORMATLIST_START(mz80b_cassette_formats)
+	CASSETTE_FORMAT(mz80b_cas_format)
 CASSETTE_FORMATLIST_END

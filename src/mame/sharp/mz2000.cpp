@@ -116,10 +116,10 @@ protected:
 	bitmap_ind16 m_text_bitmap;
 	bitmap_ind16 m_graphic_bitmap;
 
+	required_device<cassette_image_device> m_cassette;
+
 private:
 	static void floppy_formats(format_registration &fr);
-
-	required_device<cassette_image_device> m_cassette;
 	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -1397,7 +1397,7 @@ void mz80b_state::mz80b(machine_config &config)
 
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(mz700_cassette_formats);
+	m_cassette->set_formats(mz80b_cassette_formats);  // MZ-80B uses 1800 baud (vs MZ-700's 1200)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mz_cass");
@@ -1426,6 +1426,7 @@ void mz80b_state::mz80b(machine_config &config)
 void mz2000_state::mz2000(machine_config &config)
 {
 	mz80b(config);
+	// MZ-2000 also uses 1800 baud (same as MZ-80B), so mz80b_cassette_formats is correct
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz2000_state::mz2000_map);
 	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
 
