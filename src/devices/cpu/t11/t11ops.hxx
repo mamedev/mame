@@ -485,6 +485,12 @@ int t11_device::_ashc(int source, int source1, int dest, int *psw)
 
 void t11_device::trap_to(uint16_t vector)
 {
+	if (c_insn_set & IS_VM2)
+	{
+		EPSW &= ~HFLAG;
+		m_out_bankswitch_func(0);
+	}
+
 	PUSH(PSW);
 	PUSH(PC);
 	PC = RWORD(vector);
@@ -498,11 +504,42 @@ void t11_device::op_0000(uint16_t op)
 	{
 		case 0x00:  /* HALT  */ halt(op); break;
 		case 0x01:  /* WAIT  */ m_icount = 0; m_wait_state = 1; break;
-		case 0x02:  /* RTI   */ m_icount -= 24; PC = POP(); PSW = POP(); if (GET_T) m_trace_trap = true; m_check_irqs = true; break;
+		case 0x02:  /* RTI   */
+			m_icount -= 24;
+			if (c_insn_set & IS_VM2)
+			{
+				SET_CPC(POP());
+				if (PC >= 0160000) SET_CPSW(POP()); else SET_CPSW((EPSW & HFLAG) | (POP() & 255));
+				m_out_bankswitch_func(BIT(EPSW, 8));
+			}
+			else
+			{
+				PC = POP(); PSW = POP();
+			}
+			if (GET_T) m_trace_trap = true;
+			m_check_irqs = true;
+			break;
 		case 0x03:  /* BPT   */ m_icount -= 48; trap_to(T11_BPT); break;
 		case 0x04:  /* IOT   */ m_icount -= 48; trap_to(T11_IOT); break;
 		case 0x05:  /* RESET */ m_out_reset_func(ASSERT_LINE); m_out_reset_func(CLEAR_LINE); m_icount -= 110; break;
-		case 0x06:  /* RTT   */ if (c_insn_set & IS_LEIS) { m_icount -= 33; PC = POP(); PSW = POP(); m_check_irqs = true; } else illegal(op); break;
+		case 0x06:  /* RTT   */
+			if (!(c_insn_set & IS_LEIS))
+			{
+				illegal(op); break;
+			}
+			m_icount -= 33;
+			if (c_insn_set & IS_VM2)
+			{
+				SET_CPC(POP());
+				if (PC >= 0160000) SET_CPSW(POP()); else SET_CPSW((EPSW & HFLAG) | (POP() & 255));
+				m_out_bankswitch_func(BIT(EPSW, 8));
+			}
+			else
+			{
+				PC = POP(); PSW = POP();
+			}
+			m_check_irqs = true;
+			break;
 		case 0x07:  /* MFPT  */ if (c_insn_set & IS_MFPT) REGB(0) = 4; else illegal(op); break;
 
 		default:    illegal(op); break;
@@ -511,24 +548,125 @@ void t11_device::op_0000(uint16_t op)
 
 void t11_device::op_0001(uint16_t op)
 {
-	CHECK_IS(IS_VM1);
+	CHECK_IS(IS_VM1|IS_VM2);
 
-	switch (op & 014)
+	if (c_insn_set & IS_VM1)
 	{
-		case 010: // START
-			m_icount -= 24;
-			PC = RWORD(VM1_STACK);
-			PSW = RWORD(VM1_STACK + 2);
-			WWORD(VM1_SEL1, RWORD(VM1_SEL1) & ~SEL1_HALT);
-			break;
-		case 014: // STEP
-			m_icount -= 24;
-			PC = RWORD(VM1_STACK);
-			PSW = RWORD(VM1_STACK + 2);
-			WWORD(VM1_SEL1, RWORD(VM1_SEL1) & ~SEL1_HALT);
-			PC += 2;
-			break;
+		switch (op & 014)
+		{
+			case 010: // START
+				m_icount -= 24;
+				PC = RWORD(VM1_STACK);
+				PSW = RWORD(VM1_STACK + 2);
+				WWORD(VM1_SEL1, RWORD(VM1_SEL1) & ~SEL1_HALT);
+				break;
+			case 014: // STEP
+				m_icount -= 24;
+				PC = RWORD(VM1_STACK);
+				PSW = RWORD(VM1_STACK + 2);
+				WWORD(VM1_SEL1, RWORD(VM1_SEL1) & ~SEL1_HALT);
+				PC += 2;
+				break;
+			default:    illegal(op); break;
+		}
+	}
 
+	// commands are valid only in HALT mode
+	else if (c_insn_set & IS_VM2)
+	{
+		if (!BIT(EPSW, 8))
+		{
+			illegal(op);
+			return;
+		}
+		switch (op & 014)
+		{
+			case 010: // START
+				m_icount -= 24;
+				PC = CPC;
+				EPSW = CPSW;
+				m_out_bankswitch_func(BIT(EPSW, 8));
+				m_check_irqs = true;
+				break;
+			case 014: // STEP
+				m_icount -= 24;
+				PC = CPC;
+				EPSW = CPSW;
+				m_out_bankswitch_func(BIT(EPSW, 8));
+				// force execution of next insn
+				m_check_irqs = false;
+				break;
+			default:    illegal(op); break;
+		}
+	}
+}
+
+void t11_device::op_0002(uint16_t op)
+{
+	CHECK_IS(IS_VM2);
+
+	if (!BIT(EPSW, 8))
+	{
+		illegal(op);
+		return;
+	}
+	switch (op & 0x3f)
+	{
+		case 020:	/* RSEL */
+			m_icount -= 24;
+			REGW(0) = c_initial_mode | (m_in_sel1_func(0) & 0xff);
+			break;
+		case 021:	/* MFUS */
+			m_icount -= 24;
+			m_out_bankswitch_func(0);
+			REGW(0) = RWORD(REGW(5));
+			REGW(5) += 2;
+			m_out_bankswitch_func(1);
+			m_check_irqs = true;
+			break;
+		case 022:	/* RCPC */
+		case 023:
+			m_icount -= 24;
+			REGW(0) = CPC;
+			break;
+		case 024:	/* RCPS */
+		case 025: case 026: case 027:
+			m_icount -= 24;
+			REGW(0) = CPSW;
+			break;
+		default:    illegal(op); break;
+	}
+}
+
+void t11_device::op_0003(uint16_t op)
+{
+	CHECK_IS(IS_VM2);
+
+	if (!BIT(EPSW, 8))
+	{
+		illegal(op);
+		return;
+	}
+	switch (op & 0x3f)
+	{
+		case 031:	/* MTUS */
+			m_icount -= 24;
+			m_out_bankswitch_func(0);
+			REGW(5) -= 2;
+			WWORD(REGW(5), REGW(0));
+			m_out_bankswitch_func(1);
+			m_check_irqs = true;
+			break;
+		case 032:	/* WCPC */
+		case 033:
+			m_icount -= 24;
+			CPC = REGW(0);
+			break;
+		case 034:	/* WCPS */
+		case 035: case 036: case 037:
+			m_icount -= 24;
+			CPSW = REGW(0);
+			break;
 		default:    illegal(op); break;
 	}
 }
@@ -543,6 +681,7 @@ void t11_device::halt(uint16_t op)
 	}
 	else if (c_insn_set & IS_VM2)
 	{
+		if (BIT(EPSW, 8)) return;
 		m_mcir = MCIR_HALT;
 		m_vsel = VM2_HALT;
 		m_check_irqs = true;
@@ -554,6 +693,16 @@ void t11_device::halt(uint16_t op)
 		PC = m_initial_pc + 4;
 		PSW = 0340;
 	}
+	m_check_irqs = true;
+}
+
+void t11_device::op_7a00(uint16_t op)
+{
+	CHECK_IS(IS_VM2);
+
+	m_icount -= 48;
+	m_mcir = MCIR_HALT;
+	m_vsel = T11_ILLINST;
 	m_check_irqs = true;
 }
 

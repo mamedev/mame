@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="ms120101_rom" description="MS 1201.01 roms">
+	<software name="basic">
+		<description>BASIC interpreter (013)</description>
+		<year>1985</year>
+		<publisher>Elektronika</publisher>
+		<part name="cart" interface="ms120101_rom">
+			<dataarea name="rom" size="0x2000">
+				<rom name="013.dat" size="0x2000" crc="93211ee0" sha1="f5914b62061674c44dd281ccc829eb1e347faa38" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="focal">
+		<description>FOCAL interpreter (058)</description>
+		<year>1985</year>
+		<publisher>Elektronika</publisher>
+		<part name="cart" interface="ms120101_rom">
+			<dataarea name="rom" size="0x2000">
+				<rom name="058.dat" size="0x2000" crc="64ad598a" sha1="4475ec055ceb45d368e1494af020049f2d2d0bd7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
