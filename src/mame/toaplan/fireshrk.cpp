@@ -121,9 +121,9 @@ public:
 	void fireshrk(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD {}
 	virtual void machine_reset() override ATTR_COLD;
 
+private:
 	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<ym3812_device> m_ymsnd;
@@ -141,7 +141,6 @@ protected:
 
 	required_ioport m_tjump_io;
 
-	void reset_sound_w(u8 data);
 	void coin_w(u8 data);
 
 	u8 cmdavailable_r();
@@ -165,7 +164,7 @@ protected:
 void fireshrk_state::pri_cb(u8 priority, u32 &pri_mask)
 {
 	// ~0 for behind tilemap in same priority
-	pri_mask = u32(~0) << priority;
+	pri_mask = (~u32(0)) << priority;
 }
 
 

@@ -560,17 +560,420 @@ Stephh's and AWJ's notes (based on the games M68000 and Z80 code and some tests)
     This is why I've disabled all regions which aren't related to Japan.
   - Sound routines at 0x01792c and 0x0179ba.
 
+***************************************************************************/
+
+/***************************************************************************
+
+- Video hardware docs (original docs from toaplan/toaplan1_v.cpp)
+
+  Functions to emulate the video hardware of some Toaplan games,
+  which use the BCU-2 tile controller, and the FCU-2 Sprite controller -
+  and SCU Sprite controller (Only Rally Bike uses the SCU controller).
+
+
+  There are 4 scrolling layers of graphics, stored in planes of 64x64 tiles.
+  Each tile in each plane is assigned a priority between 1 and 15, higher
+  numbers have greater priority.
+
+ BCU controller. Each tile takes up 32 bits - the format is:
+
+  0         1         2         3
+  ---- ---- ---- ---- -ttt tttt tttt tttt = Tile number (0 - $7fff)
+  ---- ---- ---- ---- h--- ---- ---- ---- = Hidden
+  ---- ---- --cc cccc ---- ---- ---- ---- = Color (0 - $3f)
+  pppp ---- ---- ---- ---- ---- ---- ---- = Priority (0-$f)
+  ---- ???? ??-- ---- ---- ---- ---- ---- = Unknown / Unused
+
+  Scroll Reg
+
+  0         1         2         3
+  xxxx xxxx x--- ---- ---- ---- ---- ---- = X position
+  ---- ---- ---- ---- yyyy yyyy y--- ---- = Y position
+  ---- ---- -??? ???? ---- ---- -??? ???? = Unknown / Unused
+
+
+
+ FCU controller. Sprite RAM format  (except Rally Bike)
+
+  0         1         2         3
+  -sss ssss ssss ssss ---- ---- ---- ---- = Sprite number (0 - $7fff)
+  h--- ---- ---- ---- ---- ---- ---- ---- = Hidden
+  ---- ---- ---- ---- ---- ---- --cc cccc = Color (0 - $3f)
+  ---- ---- ---- ---- ---- dddd dd-- ---- = Dimension (pointer to Size RAM)
+  ---- ---- ---- ---- pppp ---- ---- ---- = Priority (0-$f)
+
+  4         5         6         7
+  ---- ---- ---- ---- xxxx xxxx x--- ---- = X position
+  yyyy yyyy y--- ---- ---- ---- ---- ---- = Y position
+  ---- ---- -??? ???? ---- ---- -??? ???? = Unknown
+
+
+
+ SCU controller. Sprite RAM format  (Rally Bike)
+
+  0         1         2         3
+  ---- -sss ssss ssss ---- ---- ---- ---- = Sprite number (0 - $7FF)
+  ---- ---- ---- ---- ---- ---- --cc cccc = Color (0 - $3F)
+  ---- ---- ---- ---- ---- ---x ---- ---- = Flip X
+  ---- ---- ---- ---- ---- --y- ---- ---- = Flip Y
+  ---- ---- ---- ---- ---- pp-- ---- ---- = Priority (0h,4h,8h,Ch (shifted < 2 places))
+  ???? ?--- ---- ---- ???? ---- ??-- ---- = Unknown / Unused
+
+  4         5         6         7
+  xxxx xxxx x--- ---- ---- ---- ---- ---- = X position
+  ---- ---- ---- ---- yyyy yyyy y--- ---- = Y position
+  ---- ---- -??? ???? ---- ---- -??? ???? = Unknown
+
+
+
+  The tiles use a palette of 1024 colors, the sprites use a different palette
+  of 1024 colors.
+
+
+           BCU Controller writes                Tile Offsets
+ Game      reg0  reg1  reg2  reg3         X     Y     flip-X  flip-Y
+RallyBik   41e0  2e1e  148c  0f09        01e6  00fc     <- same --*
+Truxton    41e0  2717  0e86  0c06        01b7  00f2     0188  01fd
+HellFire   41e0  2717  0e86  0c06        01b7  0102     0188  000d
+ZeroWing   41e0  2717  0e86  0c06        01b7  0102     0188  000d
+DemonWld   41e0  2e1e  148c  0f09        01a9  00fc     0196  0013
+FireShrk   41e0  2717  0e86  0c06        01b7  00f2     0188  01fd**
+Out-Zone   41e0  2e1e  148c  0f09        01a9  00ec     0196  0003
+Vimana     41e0  2717  0e86  0c06        01b7  00f2     0188  01fd
+
+* see toaplan/rallybik.cpp
+** see toaplan/fireshrk.cpp
+
+Sprites are of varying sizes between 8x8 and 128x128 with any variation
+in between, in multiples of 8 either way.
+Here we draw the first 8x8 part of the sprite, then by using the sprite
+dimensions, we draw the rest of the 8x8 parts to produce the complete
+sprite.
+
+
+Abnormalities:
+ How/when do priority 0 Tile layers really get displayed ?
+
+ What are the video PROMs for ? Priority maybe ?
+
+ Zerowing flashes red when an enemy is shot, and this is done by flipping
+ layer 2 into its oversized second half which is all red. In flipscreen
+ mode, this doesn't work properly as the flip scroll value doesn't equate
+ properly.
+ Possibly a bug with the game itself using a wrong scroll value ??
+ Here's some notes:
+ First values are non red flash scrolls. Second values are red flash scrolls.
+
+ Scrolls    PF1-X  PF1-Y    PF2-X  PF2-Y    PF3-X  PF3-Y    PF4-X  PF4-Y
+ ------>    #4180  #f880    #1240  #f880    #4380  #f880    #e380  #f880
+ -flip->    #1500  #7f00    #e8c0  #7f00    #1300  #7f00    #bb00  #7f00
+
+ ------>    #4100  #f880    #1200  #7880    #4300  #f880    #e380  #f880
+ -flip->    #1500  #7f00    #e8c0  #8580??  #1300  #7f00    #bb00  #7f00
+                                      |
+                                      |
+                                    f880 = 111110001xxxxxxx -> 1f1 scroll
+                                    7f00 = 011111110xxxxxxx -> 0fe scroll
+                                    7880 = 011110001xxxxxxx -> 0f1 scroll
+                                    8580 = 100001011xxxxxxx -> 10b scroll
+
+ So a snapshot of the scroll equations become: (from the functions below)
+    1f1 - (102 - 101) == 1f0   star background
+    0fe - (00d - 1ef) == 0e0   star background (flipscreen)
+    0f1 - (102 - 101) == 0f0   red  background
+    10b - (00d - 1ef) == 0ed   red  background (flipscreen) wrong!
+    10b - (00d - 0ef) == 1ed   red  background (flipscreen) should somehow equate to this
+
 
 ***************************************************************************/
 
 #include "emu.h"
-#include "toaplan1.h"
+#include "toaplan_bcu.h"
+#include "toaplan_dsp.h"
+#include "toaplan_fcu.h"
+#include "toaplan_video_controller.h"
 #include "toaplipt.h"
 
+#include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/hd647180x.h"
+#include "sound/ymopl.h"
+
+#include "emupal.h"
+#include "screen.h"
 #include "speaker.h"
 
+namespace {
+
+class toaplan1_state : public driver_device
+{
+public:
+	toaplan1_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
+		m_ymsnd(*this, "ymsnd"),
+		m_fcu(*this, "fcu"),
+		m_bcu(*this, "bcu"),
+		m_vctrl(*this, "vctrl"),
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette_%u", 0U),
+		m_paletteram(*this, "paletteram_%u", 0U, 0x800U, ENDIANNESS_BIG),
+		m_sharedram(*this, "sharedram"),
+		m_spriteram(*this, "spriteram", 0x800, ENDIANNESS_BIG),
+		m_spritesizeram(*this, "spritesizeram", 0x80, ENDIANNESS_BIG),
+		m_dswb_io(*this, "DSWB"),
+		m_tjump_io(*this, "TJUMP")
+	{ }
+
+	void truxton(machine_config &config) ATTR_COLD;
+	void outzone(machine_config &config) ATTR_COLD;
+	void vimana(machine_config &config) ATTR_COLD;
+	void outzonecv(machine_config &config) ATTR_COLD;
+	void hellfire(machine_config &config) ATTR_COLD;
+	void zerowing(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+	required_device<m68000_device> m_maincpu;
+	required_device<cpu_device> m_audiocpu;
+	required_device<ym3812_device> m_ymsnd;
+	required_device<toaplan_fcu_device> m_fcu;
+	required_device<toaplan_bcu_device> m_bcu;
+	required_device<toaplan_video_controller_device> m_vctrl;
+	required_device<screen_device> m_screen;
+	required_device_array<palette_device, 2> m_palette;
+
+	memory_share_array_creator<u16, 2> m_paletteram;
+
+	required_shared_ptr<u8> m_sharedram;
+	memory_share_creator<u16> m_spriteram;
+	memory_share_creator<u16> m_spritesizeram;
+
+	optional_ioport m_dswb_io;
+	optional_ioport m_tjump_io;
+
+	u8 shared_r(offs_t offset);
+	void shared_w(offs_t offset, u8 data);
+	void reset_sound_w(u8 data);
+	void coin_w(u8 data);
+
+	u8 vimana_dswb_invert_r();
+	u8 vimana_tjump_invert_r();
+
+	void pri_cb(u8 priority, u32 &pri_mask);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
+
+	void reset_sound();
+	void reset_callback(int state);
+
+	void common_video_config(machine_config &config) ATTR_COLD;
+
+	void tile_offset_fcu_flip_map(address_map &map) ATTR_COLD;
+
+	void hellfire_main_map(address_map &map) ATTR_COLD;
+	void hellfire_sound_io_map(address_map &map) ATTR_COLD;
+	void outzone_main_map(address_map &map) ATTR_COLD;
+	void outzone_sound_io_map(address_map &map) ATTR_COLD;
+	void outzonecv_main_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void truxton_main_map(address_map &map) ATTR_COLD;
+	void truxton_sound_io_map(address_map &map) ATTR_COLD;
+	void vimana_hd647180_io_map(address_map &map) ATTR_COLD;
+	void vimana_hd647180_mem_map(address_map &map) ATTR_COLD;
+	void vimana_main_map(address_map &map) ATTR_COLD;
+	void zerowing_main_map(address_map &map) ATTR_COLD;
+	void zerowing_sound_io_map(address_map &map) ATTR_COLD;
+};
+
+class toaplan1_demonwld_state : public toaplan1_state
+{
+public:
+	toaplan1_demonwld_state(const machine_config &mconfig, device_type type, const char *tag) :
+		toaplan1_state(mconfig, type, tag),
+		m_dsp(*this, "dsp")
+	{
+	}
+
+	void demonwld(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<toaplan_dsp_device> m_dsp;
+
+	void dsp_ctrl_w(u8 data);
+
+	void dsp_host_addr_cb(u16 data, u32 &seg, u32 &addr);
+	u16 dsp_host_read_cb(u32 seg, u32 addr);
+	bool dsp_host_write_cb(u32 seg, u32 addr, u16 data);
+
+	void main_map(address_map &map) ATTR_COLD;
+	void sound_io_map(address_map &map) ATTR_COLD;
+};
+
+/***************************** Video handlers *****************************/
+
+/***************************************************************************
+    Sprite Handlers
+***************************************************************************/
+
+void toaplan1_state::pri_cb(u8 priority, u32 &pri_mask)
+{
+	// ~0 for behind tilemap in same priority
+	pri_mask = (~u32(0)) << priority;
+}
+
+
+/***************************************************************************
+    Draw the game screen in the given bitmap.
+***************************************************************************/
+
+u32 toaplan1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	screen.priority().fill(0, cliprect);
+
+	// first draw everything, including "disabled" tiles and priority 0
+	m_bcu->draw_background(screen, bitmap, cliprect, 0, 0);
+
+	// then draw the higher priority layers in order
+	for (int priority = 1; priority < 16; priority++)
+	{
+		m_bcu->draw_tilemap(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(priority), priority, 0);
+	}
+
+	m_fcu->draw_sprites(screen, bitmap, cliprect);
+	return 0;
+}
+
+/****************************************************************************
+    Interrupt request
+****************************************************************************/
+
+void toaplan1_state::screen_vblank(int state)
+{
+	// rising edge
+	if (state)
+	{
+		if (m_vctrl->intenable())
+			m_maincpu->set_input_line(4, HOLD_LINE);
+	}
+}
+
+
+/***************************** DSP callbacks *****************************/
+
+void toaplan1_demonwld_state::dsp_host_addr_cb(u16 data, u32 &seg, u32 &addr)
+{
+	/* This sets the main CPU RAM address the DSP should */
+	/*  read/write, via the DSP IO port 0 */
+	/* Top three bits of data need to be shifted left 9 places */
+	/*  to select which memory bank from main CPU address */
+	/*  space to use */
+	/* Lower thirteen bits of this data is shifted left one position */
+	/*  to move it to an even address word boundary */
+
+	seg  = ((data & 0xe000) << 9);
+	addr = ((data & 0x1fff) << 1);
+}
+
+u16 toaplan1_demonwld_state::dsp_host_read_cb(u32 seg, u32 addr)
+{
+	u16 input_data = 0;
+
+	switch (seg)
+	{
+		case 0xc00000:
+		{
+			address_space &mainspace = m_maincpu->space(AS_PROGRAM);
+			input_data = mainspace.read_word(seg + addr);
+			break;
+		}
+		default:
+			if (!machine().side_effects_disabled())
+				logerror("%s: Warning !!! IO reading from %08x (port 1)\n", machine().describe_context(), seg + addr);
+			break;
+	}
+	return input_data;
+}
+
+bool toaplan1_demonwld_state::dsp_host_write_cb(u32 seg, u32 addr, u16 data)
+{
+	bool execute = false;
+
+	switch (seg)
+	{
+		case 0xc00000:
+		{
+			if ((addr < 3) && (data == 0)) execute = true;
+			address_space &mainspace = m_maincpu->space(AS_PROGRAM);
+			mainspace.write_word(seg + addr, data);
+			break;
+		}
+		default:
+			logerror("%s: Warning !!! IO writing to %08x (port 1)\n", machine().describe_context(), seg + addr);
+			break;
+	}
+	return execute;
+}
+
+/***************************** Sound handlers *****************************/
+
+void toaplan1_state::reset_sound()
+{
+	/* Reset the secondary CPU and sound chip */
+	/* truxton, hellfire, demonwld write to a port to cause a reset */
+	/* zerowing, fireshrk, outzone, vimana use a RESET instruction instead */
+	m_ymsnd->reset();
+	m_audiocpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+}
+
+/***************************** Read/Write handlers *****************************/
+
+void toaplan1_demonwld_state::dsp_ctrl_w(u8 data)
+{
+#if 0
+	logerror("%s: Writing %02x to $e0000b.\n", machine().describe_context(), data);
+#endif
+
+	if (data & ~0x01)
+		logerror("%s: Writing unknown command %02x to $e0000b\n", machine().describe_context(), data);
+	else
+		m_dsp->dsp_int_w(BIT(~data, 0));
+}
+
+
+u8 toaplan1_state::shared_r(offs_t offset)
+{
+	return m_sharedram[offset];
+}
+
+void toaplan1_state::shared_w(offs_t offset, u8 data)
+{
+	m_sharedram[offset] = data;
+}
+
+
+void toaplan1_state::reset_sound_w(u8 data)
+{
+	if (data == 0)
+		reset_sound();
+}
+
+
+void toaplan1_state::coin_w(u8 data)
+{
+	// Upper 4 bits are junk (normally 1110 or 0000, which are artifacts of sound command processing)
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
+	machine().bookkeeping().coin_lockout_w(0, !BIT(data, 2));
+	machine().bookkeeping().coin_lockout_w(1, !BIT(data, 3));
+}
+
+void toaplan1_state::reset_callback(int state)
+{
+	reset_sound();
+}
 
 /***************************** 68000 Memory Map *****************************/
 
@@ -1441,6 +1844,11 @@ static GFXDECODE_START( gfx_fcu )
 	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0, 64 )
 GFXDECODE_END
 
+
+void toaplan1_state::machine_reset()
+{
+	machine().bookkeeping().coin_lockout_global_w(0);
+}
 
 static constexpr XTAL PIXEL_CLOCK = XTAL(28'000'000) / 4;
 
@@ -2358,6 +2766,7 @@ ROM_START( vimanaj )
 	ROM_LOAD( "019rom10.prom10.4h", 0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) // N82S123AN BPROM - ???
 ROM_END
 
+} // Anonymous namespace
 
 //    YEAR  NAME        PARENT    MACHINE   INPUT      CLASS                    INIT        ROT     COMPANY                                       FULLNAME                                                FLAGS
 GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1_state,          empty_init, ROT270, "Toaplan / Taito Corporation",                "Truxton (Europe, US) / Tatsujin (Japan)",              0 )

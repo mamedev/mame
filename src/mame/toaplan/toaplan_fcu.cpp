@@ -172,8 +172,8 @@ void toaplan_fcu_device::spritesizeram_w(offs_t offset, u16 data, u16 mem_mask)
 template<class BitmapClass>
 void toaplan_fcu_device::draw_sprites_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect)
 {
-	u16 const *const source = (u16 *)m_buffered_spriteram.get();
-	u16 const *const size   = (u16 *)m_buffered_spritesizeram.get();
+	u16 const *const source = m_buffered_spriteram.get();
+	u16 const *const size   = m_buffered_spritesizeram.get();
 	const rectangle &visarea = screen.visible_area();
 
 	for (int offs = m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
@@ -245,6 +245,12 @@ void toaplan_fcu_device::draw_sprites(screen_device &screen, bitmap_rgb32 &bitma
 	draw_sprites_common(screen, bitmap, cliprect);
 }
 
+
+/****************************************************************************
+    Spriteram is always 1 frame ahead, suggesting spriteram buffering.
+    There are no CPU output registers that control this so we
+    assume it happens automatically every frame, at the end of vblank
+****************************************************************************/
 
 void toaplan_fcu_device::vblank(int state)
 {

@@ -96,7 +96,6 @@ public:
 	void rallybik(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD {}
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
