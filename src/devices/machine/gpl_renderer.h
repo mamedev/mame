@@ -13,6 +13,10 @@ class gpl_renderer_device : public device_t
 public:
 	gpl_renderer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto space_read_callback() { return m_space_read_cb.bind(); }
+	template <typename T> void set_video_space(T &&tag, int no) { m_cpuspace.set_tag(std::forward<T>(tag), no); }
+	template <typename T> void set_cs_video_space(T &&tag, int no, uint32_t csbase) { m_cs_space.set_tag(std::forward<T>(tag), no); m_csbase = csbase; }
+
 	void draw_sprites(bool read_from_csspace, int extended_sprites_mode, uint32_t palbank, bool highres, const rectangle &cliprect, uint32_t scanline, int priority, uint32_t spritegfxdata_addr, address_space &spc, uint16_t *paletteram, uint16_t *spriteram);
 	void draw_page(bool read_from_csspace, uint32_t palbank, const rectangle &cliprect, uint32_t scanline, int priority, uint16_t tilegfxdata_addr_msb, uint16_t tilegfxdata_addr, uint16_t *scrollregs, uint16_t *tilemapregs, address_space &spc, uint16_t *paletteram, uint16_t *scrollram, uint32_t which);
 	void new_line(const rectangle &cliprect);
@@ -38,22 +42,18 @@ public:
 		m_video_regs_3c = val;
 	}
 
-	uint16_t get_video_reg_1c(void) { return m_video_regs_1c; }
-	uint16_t get_video_reg_1d(void) { return m_video_regs_1d; }
-	uint16_t get_video_reg_1e(void) { return m_video_regs_1e; }
-	uint16_t get_video_reg_2a(void) { return m_video_regs_2a; }
-	uint16_t get_video_reg_30(void) { return m_video_regs_30; }
-	uint16_t get_video_reg_3c(void) { return m_video_regs_3c; }
+	uint16_t get_video_reg_1c() { return m_video_regs_1c; }
+	uint16_t get_video_reg_1d() { return m_video_regs_1d; }
+	uint16_t get_video_reg_1e() { return m_video_regs_1e; }
+	uint16_t get_video_reg_2a() { return m_video_regs_2a; }
+	uint16_t get_video_reg_30() { return m_video_regs_30; }
+	uint16_t get_video_reg_3c() { return m_video_regs_3c; }
 
 	void set_video_reg_42(uint16_t val) { m_video_regs_42 = val; }
-	uint16_t get_video_reg_42(void) { return m_video_regs_42; }
+	uint16_t get_video_reg_42() { return m_video_regs_42; }
 
 	void set_video_reg_7f(uint16_t val) { m_video_regs_7f = val; }
-	uint16_t get_video_reg_7f(void) { return m_video_regs_7f; }
-
-	auto space_read_callback() { return m_space_read_cb.bind(); }
-	void set_video_spaces(address_space *cpuspace) { m_cpuspace = cpuspace; }
-	void set_cs_video_spaces(address_space *cs_space, uint32_t csbase) { m_cs_space = cs_space; m_csbase = csbase; }
+	uint16_t get_video_reg_7f() { return m_video_regs_7f; }
 
 protected:
 	gpl_renderer_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
@@ -69,11 +69,17 @@ private:
 	virtual void draw_linemap(const rectangle &cliprect, uint32_t scanline, int priority, uint32_t tilegfxdata_addr, uint16_t *scrollregs, uint16_t *tilemapregs, address_space &spc, uint16_t *paletteram);
 	inline uint8_t mix_channel(uint8_t a, uint8_t b, uint8_t alpha);
 	void update_vcmp_table();
-	void update_palette_lookup(void);
+	void update_palette_lookup();
+
+	// config
+	devcb_read16 m_space_read_cb;
+	required_address_space m_cpuspace;
+	optional_address_space m_cs_space;
+	uint32_t m_csbase;
 
 	uint8_t m_rgb5_to_rgb8[32];
-	uint32_t m_rgb555_to_rgb888[0x8000];
-	uint32_t m_rgb555_to_rgb888_current[0x8000];
+	std::unique_ptr<uint32_t []> m_rgb555_to_rgb888;
+	std::unique_ptr<uint32_t []> m_rgb555_to_rgb888_current;
 
 	// for vcmp
 	uint16_t m_video_regs_1c;
@@ -91,18 +97,10 @@ private:
 
 	uint32_t m_ycmp_table[480];
 
-	devcb_read16 m_space_read_cb;
-	address_space *m_cpuspace;
-
 	bool m_brightness_or_saturation_dirty;
 	uint16_t m_linebuf[640];
-
-	// config
-	address_space *m_cs_space;
-	uint32_t m_csbase;
 };
 
 DECLARE_DEVICE_TYPE(GPL_RENDERER, gpl_renderer_device)
-
 
 #endif // MAME_MACHINE_GPL_RENDERER_H

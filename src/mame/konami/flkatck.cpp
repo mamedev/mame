@@ -20,9 +20,9 @@ TODO:
 
 #include "emu.h"
 
-#include "konamipt.h"
 #include "k007452.h"
 #include "k007121.h"
+#include "konamipt.h"
 
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
@@ -58,7 +58,7 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void flkatck(machine_config &config);
+	void flkatck(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -114,22 +114,22 @@ private:
 
 TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_a)
 {
-	uint8_t ctrl_0 = m_k007121->ctrl_r(0);
-	uint8_t ctrl_2 = m_k007121->ctrl_r(2);
-	uint8_t ctrl_3 = m_k007121->ctrl_r(3);
-	uint8_t ctrl_4 = m_k007121->ctrl_r(4);
-	uint8_t ctrl_5 = m_k007121->ctrl_r(5);
-	int attr = m_vram[tile_index];
-	int code = m_vram[tile_index + 0x400];
-	int bit0 = (ctrl_5 >> 0) & 0x03;
-	int bit1 = (ctrl_5 >> 2) & 0x03;
-	int bit2 = (ctrl_5 >> 4) & 0x03;
-	int bit3 = (ctrl_5 >> 6) & 0x03;
+	uint8_t const ctrl_0 = m_k007121->ctrl_r(0);
+	uint8_t const ctrl_2 = m_k007121->ctrl_r(2);
+	uint8_t const ctrl_3 = m_k007121->ctrl_r(3);
+	uint8_t const ctrl_4 = m_k007121->ctrl_r(4);
+	uint8_t const ctrl_5 = m_k007121->ctrl_r(5);
+	int const attr = m_vram[tile_index];
+	int const code = m_vram[tile_index + 0x400];
+	int const bit0 = (ctrl_5 >> 0) & 0x03;
+	int const bit1 = (ctrl_5 >> 2) & 0x03;
+	int const bit2 = (ctrl_5 >> 4) & 0x03;
+	int const bit3 = (ctrl_5 >> 6) & 0x03;
 	int bank = ((attr >> (bit0 + 3)) & 0x01) |
 			((attr >> (bit1 + 2)) & 0x02) |
 			((attr >> (bit2 + 1)) & 0x04) |
 			((attr >> (bit3 + 0)) & 0x08);
-	int mask = (ctrl_4 & 0xf0) >> 4;
+	int const mask = (ctrl_4 & 0xf0) >> 4;
 	bank = (bank & ~mask) | (ctrl_4 & mask);
 	bank = ((attr & 0x80) >> 7) | (bank << 1) | ((ctrl_3 & 0x01) << 5);
 
@@ -145,8 +145,8 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_a)
 
 TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_b)
 {
-	int attr = m_vram[tile_index + 0x800];
-	int code = m_vram[tile_index + 0xc00];
+	int const attr = m_vram[tile_index + 0x800];
+	int const code = m_vram[tile_index + 0xc00];
 
 	tileinfo.set(0, code, (attr & 0x0f) + 16, 0);
 }
@@ -216,8 +216,8 @@ uint32_t flkatck_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	clip[1] &= cliprect;
 
 	// set scroll registers
-	int scrollx = m_k007121->ctrl_r(0);
-	int scrolly = m_k007121->ctrl_r(2);
+	int const scrollx = m_k007121->ctrl_r(0);
+	int const scrolly = m_k007121->ctrl_r(2);
 
 	if (!scrollx && !scrolly)
 		machine().tilemap().mark_all_dirty();
@@ -370,8 +370,8 @@ void flkatck_state::volume_callback(uint8_t data)
 
 void flkatck_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	m_mainbank->configure_entries(0, 3, &ROM[0x0000], 0x2000);
+	uint8_t *rom = memregion("maincpu")->base();
+	m_mainbank->configure_entries(0, 3, &rom[0x0000], 0x2000);
 }
 
 void flkatck_state::machine_reset()
@@ -425,8 +425,22 @@ void flkatck_state::flkatck(machine_config &config)
 }
 
 
-
 ROM_START( mx5000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )  // 6309 code
+	ROM_LOAD( "669_u01.16c", 0x00000, 0x10000, CRC(cef39f97) SHA1(6b754563b40815895ff3c07d53d71d470722c805) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "669_m02.16b", 0x0000, 0x8000, CRC(7e11e6b9) SHA1(7a7d65a458b15842a6345388007c8f682aec20a7) )
+
+	ROM_REGION( 0x80000, "gfx", 0 )  // tiles + sprites
+	ROM_LOAD16_WORD_SWAP( "gx669f03.5e", 0x00000, 0x80000, CRC(ff1d718b) SHA1(d44fe3ed5a3ba1b3036264e37f9cd3500b706635) ) // MASK4M
+
+	ROM_REGION( 0x40000, "k007232", 0 )
+	ROM_LOAD( "gx669f04.11a", 0x00000, 0x40000, CRC(6d1ea61c) SHA1(9e6eb9ac61838df6e1f74e74bb72f3edf1274aed) ) // MASK2M
+ROM_END
+
+
+ROM_START( mx5000r )
 	ROM_REGION( 0x10000, "maincpu", 0 )  // 6309 code
 	ROM_LOAD( "669_r01.16c", 0x00000, 0x10000, CRC(79b226fc) SHA1(3bc4d93717230fecd54bd08a0c3eeedc1c8f571d) )
 
@@ -479,6 +493,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1987, mx5000,   0,      flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "MX5000", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatck,  mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, flkatcka, mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mx5000,   0,      flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "MX5000 (version U)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mx5000r,  mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "MX5000 (version R)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatck,  mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan, version P)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, flkatcka, mx5000, flkatck, flkatck, flkatck_state, empty_init, ROT90, "Konami", "Flak Attack (Japan, version P, PWB 450593 sub-board)", MACHINE_SUPPORTS_SAVE )

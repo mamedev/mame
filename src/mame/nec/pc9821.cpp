@@ -513,16 +513,15 @@ void pc9821_state::pc9821_io(address_map &map)
 	map(0x0070, 0x007f).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
 //  map(0x0070, 0x007f).rw(FUNC(pc9821_state::grcg_r), FUNC(pc9821_state::grcg_w)).umask32(0x00ff00ff); //display registers "GRCG" / i8253 pit
 	map(0x0090, 0x0093).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
-	// TODO: check me, should derive from templated fn instead
-	map(0x0094, 0x0094).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
+	map(0x0094, 0x0094).rw(FUNC(pc9821_state::fdc_2hd_2dd_ctrl_r<1>), FUNC(pc9821_state::fdc_2hd_2dd_ctrl_w<1>));
 	map(0x00a0, 0x00af).rw(FUNC(pc9821_state::pc9821_a0_r), FUNC(pc9821_state::pc9821_a0_w)); //upd7220 bitmap ports / display registers
 //  map(0x00b0, 0x00b3) PC9861k (serial port?)
 //  map(0x00b9, 0x00b9) PC9861k
 //  map(0x00bb, 0x00bb) PC9861k
 //  map(0x00bc, 0x00bf).rw(FUNC(pc9821_state::fdc_mode_ctrl_r), FUNC(pc9821_state::fdc_mode_ctrl_w));
 	map(0x00c8, 0x00cb).m(m_fdc_2hd, FUNC(upd765a_device::map)).umask32(0x00ff00ff);
-//  map(0x00cc, 0x00cc).rw(FUNC(pc9821_state::fdc_2hd_ctrl_r), FUNC(pc9821_state::fdc_2hd_ctrl_w));
-	//  map(0x00d8, 0x00df) AMD98 (sound?) board
+	map(0x00cc, 0x00cc).rw(FUNC(pc9821_state::fdc_2hd_2dd_ctrl_r<0>), FUNC(pc9821_state::fdc_2hd_2dd_ctrl_w<0>));
+//  map(0x00d8, 0x00df) AMD98 sound board, N/A for PC-9821
 //  map(0x00f0, 0x00ff).rw(FUNC(pc9821_state::a20_ctrl_r), FUNC(pc9821_state::a20_ctrl_w)).umask32(0x00ff00ff);
 //  map(0x0188, 0x018f).rw(FUNC(pc9821_state::pc9801_opn_r), FUNC(pc9821_state::pc9801_opn_w)); //ym2203 opn / <undefined>
 //  map(0x018c, 0x018f) YM2203 OPN extended ports / <undefined>
@@ -909,7 +908,7 @@ void pc9821_state::pc9821(machine_config &config)
 	m_pit->set_clk<1>(MAIN_CLOCK_X2);
 	m_pit->set_clk<2>(MAIN_CLOCK_X2);
 
-	PC98_CBUS_SLOT(config.replace(), "cbus0", 0, "cbus_root", pc98_cbus_devices, "pc9801_86");
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, "pc9801_86");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_state, pc9821)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_state, pc9821)
@@ -1002,7 +1001,8 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 //  m_ram->set_extra_options("6M,8M,14M,15M");
 
 	// pc9801-86 (built-in)
-	PC98_CBUS_SLOT(config.replace(), "cbus0", 0, "cbus_root", pc98_cbus_devices, "sound_pc9821ce", true);
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821ce", true);
 
 	// 3.5 x2
 	config_floppy_35hd(config);
@@ -1029,7 +1029,8 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
-	PC98_CBUS_SLOT(config.replace(), "cbus0", 0, "cbus_root", pc98_cbus_devices, "sound_pc9821cx3", true);
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821cx3", true);
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_canbe_state, pc9821_canbe);
@@ -1422,7 +1423,7 @@ ROM_START( pc9821ce )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_ce2.rom", 0x00000, 0x046800, BAD_DUMP CRC(d1c2702a) SHA1(e7781e9d35b6511d12631641d029ad2ba3f7daef) )
 
-	ROM_REGION( 0x4000, "cbus0:sound_pc9821ce:bios", ROMREGION_ERASE00 )
+	ROM_REGION( 0x4000, "cbus:mb1:sound_pc9821ce:bios", ROMREGION_ERASE00 )
 	ROM_COPY( "biosrom", 0x0c000, 0x00000, 0x04000 )
 
 	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
@@ -1507,7 +1508,7 @@ ROM_START( pc9821cx3 )
 	// cfr. $afe00 and $ad400 range
 	LOAD_KANJI_ROMS(ROMREGION_ERASE00)
 
-	ROM_REGION( 0x4000, "cbus0:sound_pc9821cx3:bios", 0)
+	ROM_REGION( 0x4000, "cbus:mb1:sound_pc9821cx3:bios", 0)
 	ROM_COPY( "biosrom", 0x54000, 0x00000, 0x04000 )
 
 	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
@@ -1823,3 +1824,5 @@ COMP( 1997, pc9821nw150, pc9821nr15,   0, pc9821nw150, pc9821,   pc9821_note_lav
 
 // 98FiNE
 // ...
+
+// PS-98 (client-server system based on late PC-9821s)

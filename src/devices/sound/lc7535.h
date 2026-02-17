@@ -27,53 +27,49 @@
 #pragma once
 
 
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-#define LC7535_VOLUME_CHANGED(name) void name(int attenuation_right, int attenuation_left, bool loudness)
-
-class lc7535_device : public device_t
+class lc7535_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
 	lc7535_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	typedef device_delegate<void (int attenuation_right, int attenuation_left, bool loudness)> volume_delegate;
-
-	auto select() { return m_select_cb.bind(); }
-	template <typename... T> void set_volume_callback(T &&... args) { m_volume_cb.set(std::forward<T>(args)...); }
+	auto select_cb() { return m_select_cb.bind(); }
 
 	// serial interface
 	void ce_w(int state);
 	void di_w(int state);
 	void clk_w(int state);
 
-	float normalize(int attenuation);
-
 protected:
-	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
+
+	// device_sound_interface overrides
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
+	float attenuation_to_gain(int attenuation);
+
 	// maximum attenuation is -98 dB for infinity
 	enum { MAX = -98 };
 
 	static constexpr int m_5db[16] = { -75, -70, -65, -60, -55, -50, -45, -40, -35, -30, -25, -20, -15, -10, -5, -0 };
 	static constexpr int m_1db[8] = { MAX, MAX, -4, -3, -2, -1, 0, MAX };
 
-	// callbacks
 	devcb_read_line m_select_cb;
-	volume_delegate m_volume_cb;
+
+	sound_stream *m_stream;
 
 	// state
 	uint8_t m_addr;
 	uint16_t m_data;
-	int m_count, m_ce, m_di, m_clk;
+	uint8_t m_count;
+	bool m_ce, m_di, m_clk;
+
+	bool m_loudness;
+	float m_volume[2];
 };
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(LC7535, lc7535_device)
 
 #endif // MAME_SOUND_LC7535_H

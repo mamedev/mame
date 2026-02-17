@@ -100,7 +100,6 @@ public:
 
 	void init_xavix();
 	void init_xavix_slowenv();
-	void init_no_timer() { init_xavix(); m_disable_timer_irq_hack = true; }
 
 	uint8_t sound_current_page() const;
 
@@ -191,8 +190,6 @@ protected:
 	optional_device<nvram_device> m_nvram;
 	required_device<screen_device> m_screen;
 	address_space* m_cpuspace = nullptr;
-
-	bool m_disable_timer_irq_hack = false; // hack for epo_mini which floods timer IRQs to the point it won't do anything else
 
 	virtual void xavix_extbus_map(address_map &map) ATTR_COLD;
 
@@ -394,8 +391,10 @@ protected:
 	uint8_t timer_freq_r();
 	void timer_freq_w(uint8_t data);
 	uint8_t timer_curval_r();
+	void timer_start();
 	uint8_t m_timer_control = 0;
 	uint8_t m_timer_freq = 0;
+	uint8_t m_timer_currentval = 0;
 	TIMER_CALLBACK_MEMBER(freq_timer_done);
 	emu_timer *m_freq_timer = nullptr;
 

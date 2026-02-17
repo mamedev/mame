@@ -17,17 +17,17 @@
       game videos)
     - verify controls
     - implement game linking (after MAME supports network)
-    - current implementation of 68010 <-> tms32010 is a little bit hacky, after
-      tms32010 is started by 68010, 68010 is suspended until tms32010 reads command
+    - current implementation of 68010 <-> TMS320C10 is a little bit hacky, after
+      TMS320C10 is started by 68010, 68010 is suspended until TMS320C10 reads command
       and starts executing
-    - hook up tms5220 - it is currently not used at all
+    - hook up TMS5220 - it is currently not used at all
 
 */
 
 #include "emu.h"
 
 #include "cpu/m68000/m68010.h"
-#include "cpu/tms32010/tms32010.h"
+#include "cpu/tms320c1x/tms320c1x.h"
 #include "cpu/m6502/m6502.h"
 #include "video/avgdvg.h"
 #include "video/vector.h"
@@ -91,7 +91,7 @@ private:
 	int m_dsp_idle = 0;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<tms32010_device> m_dsp;
+	required_device<tms320c10_device> m_dsp;
 	required_device<adc0808_device> m_adc;
 	required_device<ls259_device> m_mainlatch;
 };
@@ -318,7 +318,7 @@ void tomcat_state::tomcat(machine_config &config)
 	m_maincpu->set_periodic_int(FUNC(tomcat_state::irq1_line_assert), attotime::from_hz(5*60));
 	//m_maincpu->set_periodic_int(FUNC(tomcat_state::irq1_line_assert), attotime::from_hz(12.096_MHz_XTAL / 16 / 16 / 16 / 12));
 
-	TMS32010(config, m_dsp, 16_MHz_XTAL);
+	TMS320C10(config, m_dsp, 16_MHz_XTAL);
 	m_dsp->set_addrmap(AS_PROGRAM, &tomcat_state::dsp_map);
 	m_dsp->bio().set(FUNC(tomcat_state::dsp_bio_r));
 

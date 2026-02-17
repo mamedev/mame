@@ -86,9 +86,10 @@ private:
 
 	uint64_t m_regs[REGS_PER_VOICE][NUM_VOICES];
 
-	address_space_config m_mem_config;
+	address_space_config m_mem_config, m_rom_config;
 
 	memory_access<25, 1, 0, ENDIANNESS_LITTLE>::cache m_cache;
+	memory_access<25, 1, 0, ENDIANNESS_LITTLE>::cache m_rom_cache;
 
 	void voice_select_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t voiceregs_r(offs_t offset);

@@ -100,7 +100,6 @@ private:
 	u8 eeprom_r();
 	void eeprom_w(u8 data);
 
-
 	u8 dt7_shared_ram_hack_r(offs_t offset);
 	void shared_ram_w(offs_t offset, u8 data);
 	void shared_ram_audio_w(offs_t offset, u8 data);
@@ -110,8 +109,6 @@ private:
 	u8 m_ioport_state;
 
 	tilemap_t *m_tx_tilemap[2];    /* Tilemap for extra-text-layer */
-
-	bitmap_ind8 m_custom_priority_bitmap;
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<m68000_base_device> m_subcpu;
@@ -151,13 +148,15 @@ void dt7_state::dt7_irq(int state)
 // this is conditional on the unknown type of branch (see #define G_B0 in the table0
 u8 dt7_state::read_port_t()
 {
-	logerror("%s: read port t\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+		logerror("%s: read port t\n", machine().describe_context());
 	return machine().rand();
 }
 
 u8 dt7_state::eeprom_r()
 {
-	logerror("%s: eeprom_r\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+		logerror("%s: eeprom_r\n", machine().describe_context());
 	// if you allow eeprom hookup at the moment (remove the ram hack reads)
 	// the game will init it the first time but then 2nd boot will be upside
 	// down as Japan region, and hang after the region warning
@@ -177,7 +176,8 @@ u8 dt7_state::read_port_2()
 	// it's probably latched by toggling bit 2 low->high and shifted by toggling bit 3
 	// it gets put in RAM then worked on by the external interrupt
 
-	logerror("%s: read port 2\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+		logerror("%s: read port 2\n", machine().describe_context());
 	return m_ioport_state;
 }
 
@@ -273,7 +273,8 @@ u8 dt7_state::dt7_shared_ram_hack_r(offs_t offset)
 	if (addr == 0x061f006) { return m_p2port->read(); } // P2 inputs
 	//if (addr == 0x061f00e) { return machine().rand(); } // P2 coin / start
 
-	logerror("%08x: dt7_shared_ram_hack_r address %08x ret %02x\n", pc, addr, ret);
+	if (!machine().side_effects_disabled())
+		logerror("%08x: dt7_shared_ram_hack_r address %08x ret %02x\n", pc, addr, ret);
 
 	return ret;
 }
@@ -338,13 +339,15 @@ void dt7_state::dt7_68k_1_mem(address_map &map)
 
 u8 dt7_state::unmapped_v25_io1_r()
 {
-	logerror("%s: 0x58008 unknown read\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+		logerror("%s: 0x58008 unknown read\n", machine().describe_context());
 	return machine().rand();
 }
 
 u8 dt7_state::unmapped_v25_io2_r()
 {
-	logerror("%s: 0x5800a unknown read\n", machine().describe_context());
+	if (!machine().side_effects_disabled())
+		logerror("%s: 0x5800a unknown read\n", machine().describe_context());
 	return machine().rand();
 }
 
@@ -507,11 +510,6 @@ TILE_GET_INFO_MEMBER(dt7_state::get_tx_dt7_tile_info)
 
 void dt7_state::video_start()
 {
-	/* our current VDP implementation needs this bitmap to work with */
-	m_screen[0]->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp[0]->custom_priority_bitmap = &m_custom_priority_bitmap;
-	m_vdp[1]->custom_priority_bitmap = &m_custom_priority_bitmap;
-
 	// a different part of this tilemap is displayed on each screen
 	// each screen has a different palette and uses a ROM in a different location on the PCB
 	m_tx_tilemap[0] = &machine().tilemap().create(*m_gfxdecode[0], tilemap_get_info_delegate(*this, FUNC(dt7_state::get_tx_dt7_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 64);
@@ -558,8 +556,8 @@ void dt7_state::draw_tx_tilemap(screen_device& screen, bitmap_ind16& bitmap, con
 u32 dt7_state::screen_update_dt7_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp[0]->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp[0]->render_vdp(bitmap, cliprect, screen.priority());
 	draw_tx_tilemap(screen, bitmap, cliprect, 0);
 	return 0;
 }
@@ -568,8 +566,8 @@ u32 dt7_state::screen_update_dt7_1(screen_device &screen, bitmap_ind16 &bitmap, 
 u32 dt7_state::screen_update_dt7_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp[1]->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp[1]->render_vdp(bitmap, cliprect, screen.priority());
 	draw_tx_tilemap(screen, bitmap, cliprect, 2);
 	return 0;
 }
@@ -586,7 +584,7 @@ ROM_START( dt7 )
 	ROM_REGION( 0x080000, "maincpu", 0 )            /* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "main.11", 0x000000, 0x080000, CRC(01646c22) SHA1(4b87f00dc99e1206b3b9eaee425fc05e1a033bee) )
 
-	ROM_REGION( 0x080000, "subcpu", 0 )            /* Main 68K code */
+	ROM_REGION( 0x080000, "subcpu", 0 )            /* Sub 68K code */
 	ROM_LOAD16_WORD_SWAP( "2.21", 0x000000, 0x080000, CRC(a08e25ed) SHA1(db10c64ce305477442b35e7624052aae9fb6e412) )
 
 	/* Secondary CPU is a Toaplan marked chip, (TS-007-Spy  TOA PLAN) */

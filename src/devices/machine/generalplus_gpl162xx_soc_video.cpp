@@ -28,17 +28,19 @@ DEFINE_DEVICE_TYPE(GCM394_VIDEO, gcm394_video_device, "gcm394_video", "GeneralPl
 gcm394_base_video_device::gcm394_base_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_video_interface(mconfig, *this),
+	m_rowscroll(*this, "^rowscroll"), // FIXME: assumption about surrounding system
+	m_rowzoom(*this, "^rowzoom"), // FIXME: assumption about surrounding system
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_screen(*this, finder_base::DUMMY_TAG),
-	m_video_irq_cb(*this),
+	m_renderer(*this, "renderer"),
 	m_palette(*this, "palette"),
 	m_gfxdecode(*this, "gfxdecode"),
 	m_space_read_cb(*this, 0),
-	m_rowscroll(*this, "^rowscroll"),
-	m_rowzoom(*this, "^rowzoom"),
+	m_video_irq_cb(*this),
+	m_cpuspace(*this, finder_base::DUMMY_TAG, -1),
+	m_cs_space(*this, finder_base::DUMMY_TAG, -1),
 	m_use_legacy_mode(false),
-	m_disallow_resolution_control(false),
-	m_renderer(*this, "renderer")
+	m_disallow_resolution_control(false)
 {
 }
 
@@ -314,9 +316,6 @@ void gcm394_base_video_device::device_reset()
 	m_page2_addr_msb = 0;
 	m_page3_addr_lsb = 0;
 	m_page3_addr_msb = 0;
-
-	m_renderer->set_video_spaces(m_cpuspace);
-	m_renderer->set_cs_video_spaces(m_cs_space, m_csbase);
 }
 
 uint32_t gcm394_base_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

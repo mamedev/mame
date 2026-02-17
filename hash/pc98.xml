@@ -1270,6 +1270,28 @@ Utility disk file "BMENU." sports ugly GFX cyan fills (especially noticeable whe
 		</part>
 	</software>
 
+	<software name="win95bem">
+		<description>Windows 95 OSR2 (Emergency Boot Disk)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft windows 95 osr2 (emergency boot disk).hdm" size="1261568" crc="d4e9cccb" sha1="e8c0c231435c0602dbf111342d041d66d004fab9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win98sem">
+		<description>Windows 98 Second Edition (Emergency Boot Disk)</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft windows 98se (emergency boot disk).hdm" size="1261568" crc="a4ea5398" sha1="0f70dc3683ca0d84ea97a06ca6addf1d31a3d3c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Programming IDEs -->
 
 	<software name="cobol">
@@ -2940,6 +2962,20 @@ Fails two CONFIG.SYS lines, errors out when executing N88BASIC /F:12 /T:RUN"INIT
 			<feature name="part_id" value="Disk 4"/>
 			<dataarea name="flop" size="1261568">
 				<rom name="horse_racing_investment_4.hdm" size="1261568" crc="a1227daf" sha1="c8d2799819d31321521f09a05c3c2e6e269b271f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="versalnk" supported="no">
+		<description>Versa-Link</description>
+		<year>1986</year>
+		<publisher>Cosmo Sys. Lab.</publisher>
+		<notes><![CDATA[
+[Serial] and [modem] application
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="versa_link.hdm" size="1261568" crc="6d05987c" sha1="e3dd6b3d1c36bf4a82ad05d747917a3556d06bd8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -12781,6 +12817,7 @@ Fails to boot with "E4" error, access [FDC] chrn=(0, 0, 1, 512)
 Throws "E>" error with chrn=(0, 1, 1, 512) in 2dd mode
 ]]></notes>
 		<info name="alt_title" value="クルーズ チェイサー ブラスティー" />
+		<info name="release" value="198611xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="741376">
@@ -15683,12 +15720,15 @@ Is it really game like intended? [FDC] investigation required
 		</part>
 	</software>
 
+	<!-- TODO: Krugman set is two disks, huh? -->
 	<software name="dennosui">
 		<description>Dennou Suikoden</description>
 		<year>1987</year>
 		<publisher>HOT・B</publisher>
 		<info name="alt_title" value="電脳水滸伝" />
 		<info name="release" value="19870112" />
+		<!-- GA夢 -->
+		<info name="developer" value="Gamu" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="dennou suikoden.hdm" size="1261568" crc="b12425f4" sha1="69ad2baaf14261ade4b3fba70c75cd587440cecf" offset="0" />
@@ -19046,11 +19086,13 @@ Disk swaps doesn't work, [FDC] keeps recalibrate and sense interrupt status
 		</part>
 	</software>
 
-	<!-- Can't create the player disk -->
 	<software name="elysion" supported="no">
 		<description>Elysion (2HD version)</description>
 		<year>1986</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Can't create the player disk
+]]></notes>
 		<info name="alt_title" value="エリュシオン" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -19064,6 +19106,9 @@ Disk swaps doesn't work, [FDC] keeps recalibrate and sense interrupt status
 		<description>Elysion (2DD version)</description>
 		<year>1986</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Hangs while booting
+]]></notes>
 		<info name="alt_title" value="エリュシオン" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
@@ -21949,12 +21994,12 @@ Non-functional in gameplay, random tileset (verify, should be fixed)
 		</part>
 	</software>
 
-	<software name="gaiflame" supported="partial">
+	<software name="gaiflame" supported="yes">
 		<description>Gai Flame</description>
 		<year>1987</year>
 		<publisher>NCS</publisher>
 		<notes><![CDATA[
-No sound? (verify)
+No sound (btanb)
 ]]></notes>
 		<info name="alt_title" value="ガイフレーム" />
 		<info name="release" value="19871216" />
@@ -43802,11 +43847,16 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt, tests
 		</part>
 	</software>
 
-	<software name="sbest9py">
+	<software name="sbest9py" supported="no">
 		<description>Shin Best Nine Pro Yakyuu</description>
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+Crashes when selecting game, executes code in [GVRAM]
+Never completes a make data disk, does it need an undumped data disk?
+]]></notes>
 		<info name="alt_title" value="新ベストナインプロ野球" />
+		<info name="usage" value="Needs 2DD set in options" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
 				<rom name="new_best_nine_baseball.d88" size="697008" crc="99ff784b" sha1="be37e0e68ed180aeb564e49c50ee7ef2d6b579d2" offset="0" />
@@ -44719,6 +44769,20 @@ hand repaired copy protection, looks for deleted sector -8 and -9 on track 76
 			<feature name="part_id" value="Disk 3"/>
 			<dataarea name="flop" size="1086448">
 				<rom name="smllobd3.d88" size="1086448" crc="cef320fb" sha1="9a7f0bf6b09dbe02945a483e54a44c24700ab976" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="soapstry">
+		<description>Soapland Story</description>
+		<year>1987</year>
+		<publisher>ハード (Hard)</publisher>
+		<info name="alt_title" value="ソープランドストーリー" />
+		<info name="release" value="198709xx" />
+		<info name="usage" value="Boot in BASIC and set MEMSW SSW3 to 05 thru MON (will otherwise throw an overflow error at bootstrap)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1187040">
+				<rom name="soapland story.d88" size="1187040" crc="9dbb2392" sha1="21cd5846770f62c37a4b5118fad7bb2ad25d1f3a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -48499,10 +48563,14 @@ Eventually hangs with stuck [PC9801-26] sound note (verify, should be fixed)
 		</part>
 	</software>
 
-	<software name="tforce">
+	<software name="tforce" supported="no">
 		<description>Thunder Force</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 0 head 1, expected_size=100000, current_size=124448"
+May require [PC80S31] interface?
+]]></notes>
 		<info name="alt_title" value="サンダーフォース" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="351024">
@@ -51225,17 +51293,6 @@ doesn't boot when converted to d88 (2DD)
 		</part>
 	</software>
 
-	<software name="versalnk" supported="no">
-		<description>Versa-Link</description>
-		<year>1986</year>
-		<publisher>Cosmo Sys. Lab.</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="versa_link.hdm" size="1261568" crc="6d05987c" sha1="e3dd6b3d1c36bf4a82ad05d747917a3556d06bd8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vipev16d">
 		<description>Viper V16 Demo</description>
 		<year>1995?</year>
@@ -53819,11 +53876,12 @@ Is this a data disk for missing main game dump?
 	</software>
 
 	<software name="yuutoden">
-		<description>Yuutoden</description>
+		<description>Youtoden</description>
 		<year>1989</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="遊兎伝" />
 		<info name="release" value="198906xx" />
+		<!-- TODO: Krugman claims Program Disk and Data Disk labels -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -70203,6 +70261,74 @@ Driver disk for a PC-9801-86-compatible PCMCIA sound card
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="computer technica fmc-98 sound card driver utility.hdm" size="1261568" crc="7bc24877" sha1="50e0bd8568c3705c7911c1f66d80dd9c7d9b4bca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mslan21c" supported="no">
+		<!-- Origin: PC-9800 Series Central -->
+		<description>Microsoft LAN Manager for MS-DOS (v2.1c)</description>
+		<year>1997</year>
+		<publisher>マイクロソフト (Microsoft)</publisher>
+		<notes><![CDATA[
+Driver disks for [C-Bus] network cards
+]]></notes>
+		<!-- TODO: likely 3.5" -->
+		<part name="flop1" interface="floppy_5_25">
+			<!-- DOS SETUP -->
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk1.hdm" size="1261568" crc="415787c1" sha1="2fe41958ac8e905453bf57c412da1220e40a15f1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<!-- DOS WORKSTATION -->
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk2.hdm" size="1261568" crc="55547c26" sha1="a7a03e09e510d669d8f22bea01f3ea898f341229" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<!-- DOS DRIVERS -->
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk3.hdm" size="1261568" crc="dfe8260a" sha1="328ba94b6ab07b54d8d263137c267fbd53828808" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<!-- NETWARE client -->
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk4.hdm" size="1261568" crc="840eba05" sha1="b68040f17d677a523df2882634990c74bbbf1f3c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<!-- Windows 3.1 related -->
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk5.hdm" size="1261568" crc="c5fd9f25" sha1="bb421c7af54c91d377535876fd11d80362a73c42" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<!-- Windows 3.1 related? -->
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk6.hdm" size="1261568" crc="6b45307b" sha1="3ad3124069a074dc84e62454908007ffe9517e0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcfxga" supported="no">
+		<description>PC-FXGA (C-Bus version)</description>
+		<year>1995</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Install disk for [PC-FXGA]
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk" />
+			<dataarea name="flop" size="1265664">
+				<rom name="pc-fxga.fdi" size="1265664" crc="f2547992" sha1="1bcb715d02acfa89f75578bfa655b01db5726206" offset="0" />
 			</dataarea>
 		</part>
 	</software>

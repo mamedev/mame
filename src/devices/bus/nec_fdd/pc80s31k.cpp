@@ -254,7 +254,7 @@ void pc80s31_device::fdc_io(address_map &map)
 static void pc88_floppies(device_slot_interface &device)
 {
 	device.option_add("525sd", FLOPPY_525_SD);
-	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525dd", TEAC_FD_55F);
 	device.option_add("525hd", FLOPPY_525_HD);
 	// TODO: eventually needs inheriting for pc88va3 (2TD with 9.3 MB capacity)
 }
@@ -271,7 +271,7 @@ static void pc88_floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_XDF_FORMAT);
 	fr.add(FLOPPY_PC98FDI_FORMAT);
 	// eventually ...
-//	fr.add(FLOPPY_HFE_FORMAT);
+//  fr.add(FLOPPY_HFE_FORMAT);
 }
 
 void pc80s31_device::device_add_mconfig(machine_config &config)
@@ -546,6 +546,11 @@ void pc88va2_fd_if_device::device_start()
 	floppy = m_floppy[1]->get_device();
 	if(floppy)
 		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va2_fd_if_device::fdc_update_ready, this));
+
+	save_item(NAME(m_fdc_ctrl_2));
+	save_item(NAME(m_fdc_mode));
+	save_item(NAME(m_xtmask));
+	save_item(NAME(m_dmae));
 }
 
 void pc88va2_fd_if_device::device_reset()

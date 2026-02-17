@@ -1012,6 +1012,8 @@ void y8950::write_data(uint8_t data)
 	{
 		case 0x04:  // IRQ control
 			m_fm.write(m_address, data);
+			if ((data & STATUS_ADPCM_B_EOS) != 0)
+				m_adpcm_b.clear_status(adpcm_b_channel::STATUS_EOS);
 			read_status();
 			break;
 

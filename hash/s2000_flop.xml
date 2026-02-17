@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="s2000_flop" description="Akai S2000 and S3000 floppies">
+	<software name="s2000v2" supported="yes">
+		<description>S2000 OS 2.00</description>
+		<year>1994</year>
+		<publisher>Akai</publisher>
+		<info name="usage" value="Use to boot S2000"/>
+		<part name="disk1" interface="floppy_3_5">
+			<dataarea name="flop" size="215408">
+				<rom name="os316.imd" size="215408" crc="23540a48" sha1="195d9893b490032fbdd665fc06c0cd3730b28843"/>
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

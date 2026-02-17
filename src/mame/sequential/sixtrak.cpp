@@ -40,7 +40,6 @@ Known hardware revisions:
   Contrast sixtrak_rev_a() and sixtrak_rev_b() for the differences. In summary:
     * MM5837 noise generator replaced with a transistor-based noise source.
     * Improved autotune circuit.
-
  - Model 610 Rev C: serial numbers ?-?.
     * No known differences.
 
@@ -53,10 +52,10 @@ and is intended as an educational tool.
 If the NVRAM images are present in the .zip file, the synth will be initialized
 to factory settings. The initialization steps below will not be required.
 
-The NVRAM images are optional. If not present, all programs will be silent, the
-synth will be out of tune, and the pitch wheel will not be calibrated. To tune
-and calibrate, see below. In this case, patches will need to be programmed
-manually or configured via MIDI SYSEX.
+Without default NVRAM content, all programs will be silent, the synth will be
+out of tune, and the pitch wheel will not be calibrated. To tune and calibrate,
+see below. In this case, patches will need to be programmed manually or
+configured via MIDI SYSEX.
 
 A basic test patch can be configured by pressing:
 CONTROL RECORD + SELECT 8 (C + NUMPAD 8)
@@ -395,9 +394,6 @@ void sixtrak_state::update_cvs()
 	{
 		"pitch", "gain", "resonance", "cutoff", "mixer", "mod", "PW", "waveform"
 	};
-
-	if ((m_sh_voices & 0x3f) == 0x3f)
-		return;  // Exit early if no voice S&Hs are activated.
 
 	assert(m_sh_param < 8);
 	const int cv_input = PARAM2CVIN[m_sh_param];
@@ -842,7 +838,7 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 	m_tune_control->bit_handler<1>().set(FUNC(sixtrak_state::tuning_counter_gate_w));
 	m_tune_control->bit_handler<2>().set(m_tuning_ff, FUNC(ttl7474_device::preset_w));
 	m_tune_control->bit_handler<4>().set(m_tuning_ff, FUNC(ttl7474_device::clear_w));
-	m_tune_control->bit_handler<5>().set("nmiff", FUNC(ttl7474_device::preset_w));
+	m_tune_control->bit_handler<5>().set("nmiff", FUNC(ttl7474_device::preset_w));  // NMI disable.
 
 	auto &u102 = OUTPUT_LATCH(config, "led_latch_0");  // 74LS174
 	u102.bit_handler<0>().set_output("led_track_1").invert();
@@ -941,7 +937,7 @@ void sixtrak_state::sixtrak_rev_a(machine_config &config)
 	// component values from the Sente voice board, which is based on the
 	// Six-Trak.
 
-	auto &noise = MM5837_STREAM(config, "noise", 0);
+	auto &noise = MM5837_STREAM(config, "noise");
 	// The actual VDD is -6.5. But according to comments on sente6vb.cpp, that
 	// sounds too low, and it is possible the mapping in mm5837 is wrong. Using
 	// -8.0 as per sente6vb.cpp.
@@ -1158,12 +1154,12 @@ ROM_START(sixtrak)
 	ROMX_LOAD("trak-9.bin", 0x000000, 0x004000, CRC(d1e6261c) SHA1(bdad57290c24a9ce02c3a5161f8d12f8f96fc74a), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "nvram_a", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0) | ROM_OPTIONAL)
-	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0))
+	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1))
 
 	ROM_REGION(0x800, "nvram_b", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0) | ROM_OPTIONAL)
-	ROMX_LOAD("nvram_b-9.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(1) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0))
+	ROMX_LOAD("nvram_b-9.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(1))
 ROM_END
 
 // Firmware versions V11 and V9 are compatible with both Rev A and Rev B / C of
@@ -1178,12 +1174,12 @@ ROM_START(sixtraka)
 	ROMX_LOAD("trak-9.bin", 0x000000, 0x004000, CRC(d1e6261c) SHA1(bdad57290c24a9ce02c3a5161f8d12f8f96fc74a), ROM_BIOS(1))
 
 	ROM_REGION(0x1000, "nvram_a", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0) | ROM_OPTIONAL)
-	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_a-11.bin", 0x000000, 0x001000, CRC(e36e5a14) SHA1(e31fc4fb23ddb34374c785233980023e01a4bffa), ROM_BIOS(0))
+	ROMX_LOAD("nvram_a-9.bin", 0x000000, 0x001000, CRC(4dac5eea) SHA1(7afd40b7a79ac0d9e8f081766391232354fb7028), ROM_BIOS(1))
 
 	ROM_REGION(0x800, "nvram_b", ROMREGION_ERASE00)
-	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0) | ROM_OPTIONAL)
-	ROMX_LOAD("nvram_b-9.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(1) | ROM_OPTIONAL)
+	ROMX_LOAD("nvram_b-11.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(0))
+	ROMX_LOAD("nvram_b-9.bin", 0x000000, 0x000800, CRC(ea2e2fb9) SHA1(d70bf42adf33b2e9970ffd5f1ef3e57217ce349d), ROM_BIOS(1))
 ROM_END
 
 }  // anonymous namespace

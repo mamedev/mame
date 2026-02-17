@@ -38,6 +38,7 @@ Year + Game                Main Board   Sub Board    CPU   Sound                
 91 Mj Angels               D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205       RAM
 91 Mj Comic Gekijou V.1    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
 91 Mj Tenkaigen                                      TLCS  AY8910        YM2413       M6242 RAM   Protection, Battery
+91 Mj Tokkyu Kaitenban P2  D5902258L-0               TLCS  AY8910        YM2413                   Various scratched off devices
 91 Mj Ougon no Pai         D6209038L1-0              TLCS  AY8910        YM2413             RAM   Undumped TMP91P640 Code, Battery
 92 Quiz TV Gassyuukoku     D5512068L1-2 D6410288L-1  Z80   AY8912        YM2413 M5205       RAM
 92 Hanafuda Hana Tengoku   D6502208L1   D6107068L-1  Z80   AY8910        YM2413       M6242 RAM
@@ -4793,7 +4794,7 @@ Dynax 1989
 ROM_START( drgpunch )
 	ROM_REGION( 0x90000, "maincpu", 0 ) // Z80 Code
 	ROM_LOAD( "2401.3d", 0x00000, 0x10000, CRC(b310709c) SHA1(6ad6cfb54856f65a888ac44e694890f32f26e049) )
-	ROM_LOAD( "2402.6d", 0x28000, 0x10000, CRC(d21ed237) SHA1(7e1c7b40c300578132ebd79cbad9f7976cc85947) )
+	ROM_LOAD( "2402.6d", 0x28000, 0x10000, CRC(d21ed237) SHA1(7e1c7b40c300578132ebd79cbad9f7976cc85947) ) // 01xxxxxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x100000, "blitter", 0 )    // blitter data
 	ROM_LOAD( "2403.6c", 0x00000, 0x20000, CRC(b936f202) SHA1(4920d29a814ebdd74ce6f780cf821c8cb8142d9f) )
@@ -4804,6 +4805,30 @@ ROM_START( drgpunch )
 	ROM_LOAD( "2408.5a", 0xa0000, 0x20000, CRC(3a91e2b9) SHA1(b762c38ff2ebbd4ed832ca772973a15dd4a4ad73) )
 
 	ROM_REGION( 0x400, "proms", 0 ) // Color PROMs
+	ROM_LOAD( "2.18g", 0x000, 0x200, CRC(9adccc33) SHA1(acf4d5a28430378dbccc1b9fa0b6391cc8149fee) ) // FIXED BITS (0xxxxxxx)
+	ROM_LOAD( "1.17g", 0x200, 0x200, CRC(324fa9cf) SHA1(a03e23d9a9687dec4c23a8e41254a3f4b70c7e25) )
+ROM_END
+
+ROM_START( drgpunchbl ) // bootleg PCB with 'Nevada SRL' sticker
+	ROM_REGION( 0x90000, "maincpu", 0 ) // Z80 Code
+	ROM_LOAD( "1.o", 0x00000, 0x10000, CRC(b310709c) SHA1(6ad6cfb54856f65a888ac44e694890f32f26e049) ) // same as original
+	ROM_LOAD( "2.q", 0x30000, 0x08000, CRC(17f646c4) SHA1(07528756b61ee4219deb56319518fdb6e38bf3f3) ) // same as the second half of the original ROM (1xxxxxxxxxxxxxx = 0xFF)
+
+	ROM_REGION( 0x100000, "blitter", 0 )
+	ROM_LOAD( "3.j",  0x00000, 0x10000, CRC(cb90f576) SHA1(5399d3c7bdf68445dcb8c61b9fb5f199720d548a) )
+	ROM_LOAD( "4.k",  0x10000, 0x10000, CRC(ccf52f85) SHA1(fb9678c9a8f72f627b5c25dd00fb43b5582f1a96) )
+	ROM_LOAD( "5.l",  0x20000, 0x10000, CRC(7f716bec) SHA1(4b55f4548b3eccf63bf70f72007431f6788753ca) )
+	ROM_LOAD( "6.m",  0x30000, 0x10000, CRC(d0b22c51) SHA1(82eec2b7115e54718e10a84f72d97b78fc148733) )
+	ROM_LOAD( "7.e",  0x40000, 0x10000, CRC(72024013) SHA1(35a57455d48f119006d38ec1d3ef62883de48a79) )
+	ROM_LOAD( "8.f",  0x50000, 0x10000, CRC(19f2fe4c) SHA1(793b50f82c0a6dc3d121d624da7bed38d412628a) )
+	ROM_LOAD( "9.g",  0x60000, 0x10000, CRC(b5cffb81) SHA1(5c0024726dac8f59ffaa3945430420da7ba537a6) )
+	ROM_LOAD( "10.h", 0x70000, 0x10000, CRC(2b66b23f) SHA1(394c968f6d2c23b4993068d3ce61a9021d6cf5bd) )
+	ROM_LOAD( "11.a", 0x80000, 0x10000, CRC(97e35f87) SHA1(5d6b521e806065a01c1d326a91cc0e39d26f08ff) )
+	ROM_LOAD( "12.b", 0x90000, 0x10000, CRC(f29f0e2b) SHA1(eaf93d168383e7d9a38881f814393146f0c75662) )
+	ROM_LOAD( "13.c", 0xa0000, 0x10000, CRC(01707705) SHA1(83750be8e09317bef6f2f71fbe7281be4c9ad004) )
+	ROM_LOAD( "14.d", 0xb0000, 0x10000, CRC(2109af86) SHA1(1cd65a7e6d595665fca55c8d31aa47f7b56ab9fb) ) // only ROM with different content from the original
+
+	ROM_REGION( 0x400, "proms", 0 ) // Color, weren't dumped for this set but given the GFX data mostly matches, they are believed correct
 	ROM_LOAD( "2.18g", 0x000, 0x200, CRC(9adccc33) SHA1(acf4d5a28430378dbccc1b9fa0b6391cc8149fee) ) // FIXED BITS (0xxxxxxx)
 	ROM_LOAD( "1.17g", 0x200, 0x200, CRC(324fa9cf) SHA1(a03e23d9a9687dec4c23a8e41254a3f4b70c7e25) )
 ROM_END
@@ -6071,7 +6096,7 @@ ROM_START( shpeng )
 	/* this rom doesn't belong here, it is from Dragon Punch, but shpeng hardware and game code is a hack
 	   of dragon punch.  This rom is better than the bad dump above for the sprite colours, although the
 	   colours on the intro/cutscenes are wrong */
-	ROM_LOAD_OPTIONAL( "1.17g", 0x200, 0x200, CRC(324fa9cf) SHA1(a03e23d9a9687dec4c23a8e41254a3f4b70c7e25) )
+	ROM_LOAD( "1.17g", 0x200, 0x200, CRC(324fa9cf) SHA1(a03e23d9a9687dec4c23a8e41254a3f4b70c7e25) )
 ROM_END
 
 /*
@@ -6892,6 +6917,30 @@ ROM_START( mjcomv1 )
 ROM_END
 
 
+/*
+特急回転盤 Part 2 - Mahjong Tokkyū Kaiten-ban Part 2
+Dynax 1991
+*/
+
+ROM_START( mjtkp2 )
+	ROM_REGION( 0x50000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "5909c_dynax.5a", 0x00000, 0x20000, CRC(61916017) SHA1(2f39749512a3e36966e3bd787f1fa3378e96b4bb) )
+	ROM_RELOAD(                 0x10000, 0x20000 )
+	ROM_LOAD( "tmp90840.2c",    0x00000, 0x02000, NO_DUMP ) // chip type guessed (scratched off). MCU has pins  9, 10, 13, 14, 15, 16 stripped out
+	ROM_FILL(                   0x00000, 0x02000, 0xff ) // avoid fatal error due to random crap in the first 0x2000 of the external ROM. TODO: remove it once internal ROM is dumped
+
+	ROM_REGION( 0x100000, "blitter", 0 )
+	ROM_LOAD( "5908_dynax.6a",  0x00000, 0x20000, CRC(7ef47e7b) SHA1(15d05b8c52b82f1b43f0cc03979b2f2e8dd05ddd) )
+	ROM_LOAD( "5907_dynax.7a",  0x20000, 0x20000, CRC(f36baf94) SHA1(8474404a4137f7448c66a5adf507b474a97443a2) )
+	ROM_LOAD( "5906_dynax.8a",  0x40000, 0x20000, CRC(283935b1) SHA1(6af14310e44dfd7102f3c649c0c729ef406545e6) )
+	ROM_LOAD( "5905a_dynax.9a", 0x60000, 0x20000, CRC(62f9f922) SHA1(b75978db127fa24b28ac2c7c2587f3a5a360df6d) )
+	ROM_LOAD( "5904_dynax.10a", 0x80000, 0x20000, CRC(098a15dc) SHA1(4cc3313ca56c9c9a42e294e6d837c24c00463f73) )
+	ROM_LOAD( "5903_dynax.12a", 0xa0000, 0x20000, CRC(20f68aa7) SHA1(e18d39962caefb22c1ff39fd0fda0563877fa79c) )
+	ROM_LOAD( "5902_dynax.13a", 0xc0000, 0x20000, CRC(c053ba24) SHA1(76524a5a8f727c50be13adbca5eb9388c1f9887c) )
+	ROM_LOAD( "5901_dynax.15a", 0xe0000, 0x20000, CRC(8b9d0192) SHA1(77ba366c87d3f1eb5549de30a1d066684950622a) )
+ROM_END
+
+
 /***************************************************************************
 
 華仁義 Hana Jingi
@@ -7083,7 +7132,8 @@ GAME( 1989, hnkochou,   hanamai,  hanamai,    hnkochou, dynax_adpcm_state, empty
 GAME( 1990, hjingi,     0,        hjingi,     hjingi,   dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana Jingi (Japan set 1)",                                      MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
 GAME( 1990, hjingia,    hjingi,   hjingi,     hjingi,   dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana Jingi (Japan set 2)",                                      MACHINE_SUPPORTS_SAVE ) // 1990 05/01 11:58:24
 GAME( 1989, hnoridur,   hjingi,   hnoridur,   hnoridur, dynax_adpcm_state, empty_init,    ROT180, "Dynax",                     "Hana Oriduru (Japan)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1989, drgpunch,   0,        sprtmtch,   drgpunch, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Dragon Punch (Japan)",                                          MACHINE_SUPPORTS_SAVE )
+GAME( 1989, drgpunch,   0,        sprtmtch,   drgpunch, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Dragon Punch (Japan, ver. 1.30)",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1989, drgpunchbl, drgpunch, sprtmtch,   drgpunch, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Dragon Punch (Japan, ver. 1.30, bootleg)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1989, sprtmtch,   drgpunch, sprtmtch,   sprtmtch, dynax_state,       empty_init,    ROT0,   "Dynax (Fabtek license)",    "Sports Match",                                                  MACHINE_SUPPORTS_SAVE )
 // these 3 are Korean hacks / bootlegs of Dragon Punch / Sports Match
 GAME( 1994, maya,       0,        sprtmtch,   drgpunch, blktouch_state,    init_maya,     ROT0,   "Promat",                    "Maya (set 1)",                                                  MACHINE_SUPPORTS_SAVE ) // this set has backgrounds blacked out in attract
@@ -7129,6 +7179,7 @@ GAME( 1991, ougonhai,   0,        ougonhai,   ougonhai, dynax_state,       empty
 GAME( 1991, ougonhaib1, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 1, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib2, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 2, medal)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Ougon no Pai (Japan bootleg set 3, medal)",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, mjtkp2,     0,        ougonhai,   ougonhai, dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tokkyu Kaiten-ban Part 2 (Japan)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing internal ROM dump
 GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreacha,   mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 2)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg)",                            MACHINE_SUPPORTS_SAVE )

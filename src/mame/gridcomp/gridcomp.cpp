@@ -65,12 +65,14 @@
 
 #include "emu.h"
 
+#include "gridkeyb.h"
+
 #include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i86.h"
-#include "gridkeyb.h"
 #include "machine/i7220.h"
 #include "machine/i80130.h"
+#include "machine/i8087.h"
 #include "machine/i8255.h"
 #include "machine/mm58174.h"
 #include "machine/ram.h"
@@ -115,19 +117,19 @@ public:
 
 	static constexpr feature_type unemulated_features() { return feature::WAN; }
 
-	void grid1129(machine_config &config);
-	void grid1131(machine_config &config);
-	void grid1121(machine_config &config);
-	void grid1139(machine_config &config);
-	void grid1109(machine_config &config);
-	void grid1101(machine_config &config);
+	void grid1129(machine_config &config) ATTR_COLD;
+	void grid1131(machine_config &config) ATTR_COLD;
+	void grid1121(machine_config &config) ATTR_COLD;
+	void grid1139(machine_config &config) ATTR_COLD;
+	void grid1109(machine_config &config) ATTR_COLD;
+	void grid1101(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<i8086_cpu_device> m_maincpu;
 	required_device<i80130_device> m_osp;
 	required_device<mm58174_device> m_rtc;
 	required_device<i8255_device> m_modem;
@@ -135,6 +137,11 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
 	required_device<tms9914_device> m_tms9914;
+
+	bool m_kbd_ready = false;
+	uint16_t m_kbd_data = 0;
+
+	uint16_t *m_videoram = nullptr;
 
 	IRQ_CALLBACK_MEMBER(irq_callback);
 
@@ -147,20 +154,14 @@ private:
 	void grid_dma_w(offs_t offset, uint8_t data);
 	uint8_t grid_dma_r(offs_t offset);
 
-	uint32_t screen_update_110x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_generic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int px);
+	template <int Width>
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void kbd_put(u16 data);
 
 	void grid1101_io(address_map &map) ATTR_COLD;
 	void grid1101_map(address_map &map) ATTR_COLD;
 	void grid1121_map(address_map &map) ATTR_COLD;
-
-	bool m_kbd_ready = false;
-	uint16_t m_kbd_data = 0;
-
-	uint16_t *m_videoram = nullptr;
 };
 
 
@@ -243,15 +244,16 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 	return ret;
 }
 
-uint32_t gridcomp_state::screen_update_generic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int px)
+template <int Width>
+uint32_t gridcomp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y < 240; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *p = &bitmap.pix(y);
 
-		int const offset = y * (px / 16);
+		int const offset = y * (Width / 16);
 
-		for (int x = offset; x < offset + px / 16; x++)
+		for (int x = offset; x < offset + Width / 16; x++)
 		{
 			uint16_t const gfx = m_videoram[x];
 
@@ -263,16 +265,6 @@ uint32_t gridcomp_state::screen_update_generic(screen_device &screen, bitmap_ind
 	}
 
 	return 0;
-}
-
-uint32_t gridcomp_state::screen_update_110x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return screen_update_generic(screen, bitmap, cliprect, 320);
-}
-
-uint32_t gridcomp_state::screen_update_113x(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	return screen_update_generic(screen, bitmap, cliprect, 512);
 }
 
 void gridcomp_state::machine_start()
@@ -351,6 +343,12 @@ void gridcomp_state::grid1101(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &gridcomp_state::grid1101_map);
 	m_maincpu->set_addrmap(AS_IO, &gridcomp_state::grid1101_io);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(gridcomp_state::irq_callback));
+	m_maincpu->esc_opcode_handler().set("i8087", FUNC(i8087_device::insn_w));
+	m_maincpu->esc_data_handler().set("i8087", FUNC(i8087_device::addr_w));
+
+	i8087_device &i8087(I8087(config, "i8087", XTAL(15'000'000) / 3));
+	i8087.set_space_86(m_maincpu, AS_PROGRAM);
+	i8087.busy().set_inputline(m_maincpu, INPUT_LINE_TEST);
 
 	I80130(config, m_osp, XTAL(15'000'000)/3);
 	m_osp->irq().set_inputline("maincpu", 0);
@@ -362,7 +360,7 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // actually a kind of EL display
 	screen.set_color(rgb_t::amber());
-	screen.set_screen_update(FUNC(gridcomp_state::screen_update_110x));
+	screen.set_screen_update(FUNC(gridcomp_state::screen_update<320>));
 	screen.set_raw(XTAL(15'000'000)/2, 424, 0, 320, 262, 0, 240); // XXX 66 Hz refresh
 	screen.screen_vblank().set(m_osp, FUNC(i80130_device::ir3_w));
 	screen.set_palette("palette");
@@ -443,7 +441,7 @@ void gridcomp_state::grid1129(machine_config &config)
 void gridcomp_state::grid1131(machine_config &config)
 {
 	grid1121(config);
-	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update_113x));
+	subdevice<screen_device>("screen")->set_screen_update(FUNC(gridcomp_state::screen_update<512>));
 	subdevice<screen_device>("screen")->set_raw(XTAL(15'000'000)/2, 720, 0, 512, 262, 0, 256);
 }
 
@@ -602,7 +600,7 @@ ROM_START( grid1139 )
 	ROMX_LOAD("1139odd.bin",  0x0001, 0x2000, CRC(13ed4bf0) SHA1(f7087f86dbbc911bee985125bccd2417e0374e8e), ROM_SKIP(1) | ROM_BIOS(0))
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 
 /***************************************************************************

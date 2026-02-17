@@ -12,9 +12,21 @@
 
 #include "video/pc_vga.h"
 
+class cirrus_gd5401_vga_device : public vga_device
+{
+public:
+	cirrus_gd5401_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void recompute_params() override;
+};
+
 class cirrus_gd5428_vga_device :  public svga_device
 {
 public:
+	// MT09345 / MT09374, SDD can crash at higher res
+	static constexpr feature_type imperfect_features() { return feature::GRAPHICS; }
+
 	// construction/destruction
 	cirrus_gd5428_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -141,6 +153,7 @@ protected:
 
 
 // device type definition
+DECLARE_DEVICE_TYPE(CIRRUS_GD5401_VGA, cirrus_gd5401_vga_device)
 DECLARE_DEVICE_TYPE(CIRRUS_GD5428_VGA, cirrus_gd5428_vga_device)
 DECLARE_DEVICE_TYPE(CIRRUS_GD5430_VGA, cirrus_gd5430_vga_device)
 DECLARE_DEVICE_TYPE(CIRRUS_GD5446_VGA, cirrus_gd5446_vga_device)

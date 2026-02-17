@@ -15,7 +15,7 @@ TODO:
 - cassette support;
 - refactor memory banking to use address maps & views;
 - waitstates (relevant for V1 mode);
-- hook Z80_INPUT_LINE_BUSRQ to DMA interactions in place of HALT (common with pc8001);
+- hook Z80_INPUT_LINE_BUSREQ to DMA interactions in place of HALT (common with pc8001);
 - complete support for partial palette updates (pretty off in p8suite analog RGB test);
 - understand why i8214 needs a dis hack setter (depends on attached i8212?);
 - slotify extended work RAM, make sure that p8suite memtest88 detects it properly;
@@ -1079,7 +1079,7 @@ void pc8801mc_state::main_io(address_map &map)
 void pc8801fh_state::opna_map(address_map &map)
 {
 	// TODO: confirm it really is ROMless
-	// TODO: confirm size
+	// TODO: confirm size (should be 256K according to p8suite memtest88)
 	map(0x000000, 0x1fffff).ram();
 }
 

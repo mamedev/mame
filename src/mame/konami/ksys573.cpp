@@ -810,12 +810,6 @@ public:
 
 	void init_pnchmn();
 
-	// FIXME: leaking because a konami573_cassette_xi_device member uses it
-	double m_pad_position[6] = { };
-	int m_pad_motor_direction[6] = { };
-	attotime m_last_pad_update;
-	required_ioport m_pads;
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -823,6 +817,12 @@ protected:
 private:
 	void punchmania_cassette_install(device_t *device);
 	void punchmania_output_callback(offs_t offset, uint8_t data);
+	double punchmania_inputs_callback(uint8_t input);
+
+	double m_pad_position[6] = { };
+	int m_pad_motor_direction[6] = { };
+	attotime m_last_pad_update;
+	required_ioport m_pads;
 };
 
 
@@ -2150,9 +2150,8 @@ void ksys573_state::mamboagg_lamps_b5(int state)
 
 void pnchmn_state::punchmania_cassette_install(device_t *device)
 {
-	auto game = downcast<konami573_cassette_xi_device *>(device);
 	auto adc0838 = device->subdevice<adc083x_device>("adc0838");
-	adc0838->set_input_callback(*game, FUNC(konami573_cassette_xi_device::punchmania_inputs_callback));
+	adc0838->set_input_callback(*this, FUNC(pnchmn_state::punchmania_inputs_callback));
 }
 
 void pnchmn_state::punchmania_output_callback(offs_t offset, uint8_t data)
@@ -6232,7 +6231,7 @@ ROM_END
 
 // FIXME: dependency hell strikes again
 // this shouldn't be here at all, but the spaghetti is so tangled
-double konami573_cassette_xi_device::punchmania_inputs_callback(uint8_t input)
+double pnchmn_state::punchmania_inputs_callback(uint8_t input)
 {
 	// The values 50 and 150 come from the game's internal I/O simulation mode.
 	// Set DIPSW 2 ("Screen Flip") to ON and press select left + start on the I/O test screen to see the simulated I/O in action.
@@ -6241,12 +6240,11 @@ double konami573_cassette_xi_device::punchmania_inputs_callback(uint8_t input)
 	constexpr double POT_RANGE = POT_MAX - POT_MIN;
 	constexpr int MOTOR_SPEED_MUL = 2;
 
-	pnchmn_state *state = machine().driver_data<pnchmn_state>();
-	double *pad_position = state->m_pad_position;
-	int *pad_motor_direction = state->m_pad_motor_direction;
-	int pads = state->m_pads->read();
+	double *pad_position = m_pad_position;
+	int *pad_motor_direction = m_pad_motor_direction;
+	int pads = m_pads->read();
 	attotime curtime = machine().time();
-	double elapsed = ( curtime - state->m_last_pad_update ).as_double();
+	double elapsed = ( curtime - m_last_pad_update ).as_double();
 	double diff = POT_RANGE * elapsed * MOTOR_SPEED_MUL;
 
 	for( int i = 0; i < 6; i++ )
@@ -6268,7 +6266,7 @@ double konami573_cassette_xi_device::punchmania_inputs_callback(uint8_t input)
 	machine().output().set_value( "right middle pad", pad_position[ 4 ] );
 	machine().output().set_value( "right bottom pad", pad_position[ 5 ] );
 
-	state->m_last_pad_update = curtime;
+	m_last_pad_update = curtime;
 
 	switch( input )
 	{

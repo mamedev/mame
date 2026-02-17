@@ -39,7 +39,7 @@ class model2_state : public driver_device
 public:
 	struct plane;
 	struct texture_parameter;
-	struct triangle;
+	struct polygon;
 	struct quad_m2;
 	struct raster_state;
 	struct geo_state;
@@ -72,7 +72,8 @@ public:
 		m_copro_data(*this, "copro_data"),
 		m_in0(*this, "IN0"),
 		m_gears(*this, "GEARS"),
-		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"})
+		m_lightgun_ports(*this, {"P1_Y", "P1_X", "P2_Y", "P2_X"}),
+		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
 	/* Public for access by the rendering functions */
@@ -82,13 +83,12 @@ public:
 	std::unique_ptr<u16[]> m_colorxlat;
 	std::unique_ptr<u8[]> m_lumaram;
 	u8 m_gamma_table[256]{};
-	std::unique_ptr<model2_renderer> m_poly;
+	std::unique_ptr<model2_renderer> m_renderer;
 
 	/* Public for access by the ioports */
 	ioport_value daytona_gearbox_r();
 
 	/* Public for access by MCFG */
-	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
 	u16 crypt_read_callback(u32 addr);
 
 
@@ -102,6 +102,7 @@ public:
 	void init_sgt24h();
 	void init_srallyc();
 	void init_powsledm();
+	void lamp_output_w(u8 data);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -136,6 +137,7 @@ protected:
 	required_ioport m_in0;
 	optional_ioport m_gears;
 	optional_ioport_array<4> m_lightgun_ports;
+	output_finder<6> m_lamps;
 
 	u32 m_timervals[4]{};
 	u32 m_timerorig[4]{};
@@ -143,8 +145,7 @@ protected:
 	int m_ctrlmode = 0;
 	u16 m_cmd_data = 0;
 	u8 m_driveio_comm_data = 0;
-	int m_iop_write_num = 0;
-	u32 m_iop_data = 0;
+	emu_timer *m_irq_delay_timer;
 
 	u32 m_geo_read_start_address = 0;
 	u32 m_geo_write_start_address = 0;
@@ -176,7 +177,7 @@ protected:
 	void colorxlat_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void eeprom_w(u8 data);
 	u8 in0_r();
-	u32 fifo_control_2a_r();
+	u32 fifo_control_r();
 	u32 videoctl_r();
 	void videoctl_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u8 rchase2_drive_board_r();
@@ -220,15 +221,16 @@ protected:
 	void driveio_port_w(u8 data);
 	void push_geo_data(u32 data);
 	void reset_model2_scsp();
-	u32 screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-//  void screen_vblank_model2(int state);
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
 	void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
 	void scsp_irq(offs_t offset, u8 data);
+	TIMER_CALLBACK_MEMBER(irq_mask_delayed_update);
 
-	void model2_3d_frame_start();
+	void render_frame_start();
 	void geo_parse();
-	void model2_3d_frame_end( bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	void render_polygons( bitmap_rgb32 &bitmap, const rectangle &cliprect );
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
 	void model2_timers(machine_config &config);
@@ -249,7 +251,7 @@ protected:
 	void debug_init();
 	void debug_commands(const std::vector<std::string_view> &params);
 	void debug_geo_dasm_command(const std::vector<std::string_view> &params);
-	void debug_tri_dump_command(const std::vector<std::string_view> &params);
+	void debug_poly_dump_command(const std::vector<std::string_view> &params);
 	void debug_help_command(const std::vector<std::string_view> &params);
 
 	virtual void video_start() override ATTR_COLD;
@@ -263,15 +265,15 @@ protected:
 	virtual void copro_boot() = 0;
 
 private:
-	void tri_list_dump(FILE *dst);
-
 	u32 m_geoctl = 0;
 	u32 m_geocnt = 0;
 	u32 m_videocontrol = 0;
+	u32 m_framenum = 0;
 
 	bool m_render_unk = false;
 	bool m_render_mode = false;
 	bool m_render_test_mode = false;
+	bool m_render_done = false;
 	int16_t m_crtc_xoffset = 0, m_crtc_yoffset = 0;
 	bool m_palette_dirty = false;
 
@@ -307,13 +309,13 @@ private:
 	// raster functions
 	// main data input port
 	void model2_3d_push( raster_state *raster, u32 input );
-	// quad & triangle push paths
-	void model2_3d_process_quad( raster_state *raster, u32 attr );
-	void model2_3d_process_triangle( raster_state *raster, u32 attr );
+	// polygon push path
+	template <unsigned NumVerts>
+	void model2_3d_process_polygon( raster_state *raster, u32 attr );
 
 	// inliners
-	inline void model2_3d_project( triangle *tri );
-	inline u16 float_to_zval( float floatval );
+	inline void model2_3d_project( polygon *poly );
+	inline u16 float_to_zval( float floatval, s32 z_adjust );
 	inline bool check_culling( raster_state *raster, u32 attr, float min_z, float max_z );
 };
 
@@ -398,7 +400,6 @@ public:
 	void vcop(machine_config &config);
 
 protected:
-	u32 fifo_control_2o_r();
 	void daytona_output_w(u8 data);
 	void desert_output_w(u8 data);
 	void vcop_output_w(u8 data);
@@ -438,6 +439,7 @@ class model2o_gtx_state : public model2o_state
 public:
 	model2o_gtx_state(const machine_config &mconfig, device_type type, const char *tag)
 		: model2o_state(mconfig, type, tag)
+		, m_prot_data(*this, "prot_data")
 	{}
 
 	void daytona_gtx(machine_config &config);
@@ -446,6 +448,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	required_region_ptr<u32> m_prot_data;
 	int m_gtx_state = 0;
 
 	u8 gtx_r(offs_t offset);
@@ -525,7 +528,6 @@ public:
 	void model2b_0229(machine_config &config);
 	void model2b_5881(machine_config &config);
 	void indy500(machine_config &config);
-	void overrev2b(machine_config &config);
 	void powsled(machine_config &config);
 	void rchase2(machine_config &config);
 	void gunblade(machine_config &config);
@@ -541,7 +543,6 @@ protected:
 	void copro_function_port_w(offs_t offset, u32 data);
 	u32 copro_fifo_r();
 	void copro_fifo_w(u32 data);
-	void copro_sharc_iop_w(offs_t offset, u32 data);
 	u32 copro_sharc_buffer_r(offs_t offset);
 	void copro_sharc_buffer_w(offs_t offset, u32 data);
 
@@ -662,11 +663,11 @@ static inline u16 get_texel( u32 base_x, u32 base_y, int x, int y, u32 *sheet )
 	return (texel & 0x0f);
 }
 
-// 0x10000 = size of the tri_sorted_list array
+// 0x10000 = size of the poly_sorted_list array
 class model2_renderer : public poly_manager<float, m2_poly_extra_data, 4>
 {
 public:
-	using triangle = model2_state::triangle;
+	using polygon = model2_state::polygon;
 
 	model2_renderer(model2_state& state) :
 		poly_manager<float, m2_poly_extra_data, 4>(state.machine()),
@@ -686,7 +687,7 @@ public:
 	bitmap_rgb32 &destmap() { return m_destmap; }
 	bitmap_ind8 &fillmap() { return m_fillmap; }
 
-	void model2_3d_render(triangle *tri, const rectangle &cliprect);
+	void model2_3d_render(polygon *poly, const rectangle &cliprect);
 	void set_xoffset(int16_t xoffs) { m_xoffs = xoffs; }
 	void set_yoffset(int16_t yoffs) { m_yoffs = yoffs; }
 
@@ -736,16 +737,18 @@ struct model2_state::texture_parameter
 	float           specular_scale = 0;
 };
 
-struct model2_state::triangle
+struct model2_state::polygon
 {
-	triangle() : v{ { 0, 0 }, { 0, 0 }, { 0, 0 } }
+	polygon() : v{ { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 },
+				   { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }
 	{
 		for (poly_vertex &vertex : v)
 			std::fill(std::begin(vertex.p), std::end(vertex.p), 0);
 	}
 
 	void *          next = nullptr;
-	poly_vertex     v[3];
+	poly_vertex     v[8];
+	u8              num_vertices = 3;
 	u16             z = 0;
 	u16             texheader[4] = { 0, 0, 0, 0 };
 	u8              luma = 0;
@@ -776,14 +779,14 @@ struct model2_state::quad_m2
  *
  *******************************************/
 
-#define MAX_TRIANGLES       32768
+#define MAX_POLYGONS       32768
 
 struct model2_state::raster_state
 {
 	raster_state()
 	{
 		std::fill(std::begin(command_buffer), std::end(command_buffer), 0);
-		std::fill(std::begin(tri_sorted_list), std::end(tri_sorted_list), nullptr);
+		std::fill(std::begin(poly_sorted_list), std::end(poly_sorted_list), nullptr);
 		std::fill(std::begin(texture_ram), std::end(texture_ram), 0);
 		std::fill(std::begin(log_ram), std::end(log_ram), 0);
 	}
@@ -795,15 +798,15 @@ struct model2_state::raster_state
 	int16_t         center[4][2] = { { 0, 0 }, { 0, 0 }, { 0, 0 }, { 0, 0 } }; // Centers (eye 0[x,y],1[x,y],2[x,y],3[x,y])
 	u16             center_sel = 0;                 // Selected center
 	u32             reverse = 0;                    // Left/Right Reverse
-	float           z_adjust = 0;                   // ZSort Mode
-	float           triangle_z = 0;                 // Current Triangle z value
+	s32             z_adjust = 0;                   // ZSort Mode
+	float           polygon_z = 0;                  // Current polygon z value
 	u8              master_z_clip = 0;              // Master Z-Clip value
 	u32             cur_command = 0;                // Current command
 	u32             command_buffer[32];             // Command buffer
 	u32             command_index = 0;              // Command buffer index
-	triangle        tri_list[MAX_TRIANGLES];        // Triangle list
-	u32             tri_list_index = 0;             // Triangle list index
-	triangle *      tri_sorted_list[0x10000];       // Sorted Triangle list
+	polygon         poly_list[MAX_POLYGONS];        // Polygon list
+	u32             poly_list_index = 0;            // Polygon list index
+	polygon *       poly_sorted_list[0x10000];      // Sorted polygon list
 	u16             min_z = 0;                      // Minimum sortable Z value
 	u16             max_z = 0;                      // Maximum sortable Z value
 	u16             texture_ram[0x10000];           // Texture RAM pointer

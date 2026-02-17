@@ -310,7 +310,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
 
 	void palette_init(palette_device &palette);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void apple2gs_map(address_map &map) ATTR_COLD;
 	void vectors_map(address_map &map) ATTR_COLD;
@@ -473,7 +472,7 @@ private:
 
 	// clock/BRAM
 	u8 m_clkdata = 0, m_clock_control = 0;
-	u8 m_clock_frame = 0;
+	void rtc_vgc(int cko);
 
 	void lcrom_update();
 	void do_io(int offset);
@@ -772,7 +771,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_textcol));
 	save_item(NAME(m_clock_control));
 	save_item(NAME(m_clkdata));
-	save_item(NAME(m_clock_frame));
 	save_item(NAME(m_motors_active));
 	save_item(NAME(m_slotromsel));
 	save_item(NAME(m_diskreg));
@@ -833,7 +831,6 @@ void apple2gs_state::machine_reset()
 	m_ramrd = false;
 	m_ramwrt = false;
 	m_video->set_newvideo(0x01); // verified on ROM03 hardware
-	m_clock_frame = 0;
 	m_slot_irq = false;
 	m_clkdata = 0;
 	m_clock_control = 0;
@@ -1053,18 +1050,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 
 		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, ASSERT_LINE);
 
-		m_clock_frame++;
-
-		// quarter second?
-		if ((m_clock_frame % 15) == 0)
-		{
-			m_intflag |= INTFLAG_QUARTER;
-			if (m_inten & 0x10)
-			{
-				raise_irq(IRQS_QTRSEC);
-			}
-		}
-
 		// 3.5 motor off timeout
 		if (m_motoroff_time > 0)
 		{
@@ -1075,24 +1060,37 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_interrupt)
 				if (m_floppy[3]->get_device()) m_floppy[3]->get_device()->tfsel_w(0);
 			}
 		}
-
-		// one second
-		if (m_clock_frame >= 60)
-		{
-			//printf("one sec, vgcint = %02x\n", m_vgcint);
-			m_clock_frame = 0;
-
-			m_vgcint |= VGCINT_SECOND;
-			if (m_vgcint & VGCINT_SECONDENABLE)
-			{
-				m_vgcint |= VGCINT_ANYVGCINT;
-				raise_irq(IRQS_SECOND);
-			}
-		}
 	}
 	else if (scanline == (192+BORDER_TOP+1))
 	{
 		m_adbmicro->set_input_line(m5074x_device::M5074X_INT1_LINE, CLEAR_LINE);
+	}
+	else if (scanline == ((256+BORDER_TOP) % m_screen->height()))
+	{
+		// TODO: latch LANGSEL here to toggle NTSC/PAL
+
+		// "quarter" second IRQ occurs every 16 frames, ~3.75 Hz (NTSC)
+		if ((m_screen->frame_number() & 0xf) == 0)
+		{
+			m_intflag |= INTFLAG_QUARTER;
+			if (m_inten & 0x10)
+			{
+				raise_irq(IRQS_QTRSEC);
+			}
+		}
+	}
+}
+
+void apple2gs_state::rtc_vgc(int cko)
+{
+	if (cko) // one second IRQ
+	{
+		m_vgcint |= VGCINT_SECOND;
+		if (m_vgcint & VGCINT_SECONDENABLE)
+		{
+			m_vgcint |= VGCINT_ANYVGCINT;
+			raise_irq(IRQS_SECOND);
+		}
 	}
 }
 
@@ -1127,11 +1125,6 @@ void apple2gs_state::palette_init(palette_device &palette)
 
 		m_video->set_GS_border_color(i, rgb_t(apple2gs_palette[(3*i)]*17, apple2gs_palette[(3*i)+1]*17, apple2gs_palette[(3*i)+2]*17));
 	}
-}
-
-u32 apple2gs_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return m_video->screen_update_GS(screen, bitmap, cliprect);
 }
 
 /***************************************************************************
@@ -1463,16 +1456,17 @@ void apple2gs_state::do_io(int offset)
 	}
 }
 
-// apple2gs_get_vpos - return the correct vertical counter value for the current scanline.
+// return the correct vertical counter per IIgs Tech Note #39
 int apple2gs_state::get_vpos()
 {
-	// as per IIgs Tech Note #39, this is simply scanline + 250 on NTSC (262 lines),
-	// or scanline + 200 on PAL (312 lines)
-	int vpos = m_screen->vpos() + (511 - BORDER_TOP + 6);
+	int vpos = m_screen->vpos();
+
+	if (vpos < BORDER_TOP)
+		vpos += m_screen->height(); // remap top border to bottom of VBL
+	vpos += 256 - BORDER_TOP;
 	if (vpos > 511)
-	{
-		vpos -= (511 - 250);
-	}
+		vpos -= m_screen->height(); // reset scanline 256 to 250 (NTSC) or 200 (PAL)
+
 	return vpos;
 }
 
@@ -1524,9 +1518,9 @@ u8 apple2gs_state::c000_r(offs_t offset)
 	}
 
 	slow_cycle();
-	u8 uFloatingBus7 = read_floatingbus() & 0x7f;
-	u8 uKeyboard = keyglu_816_read(GLU_C000);
-	u8 uKeyboardC010 = keyglu_816_read(GLU_C010);
+	const u8 uFloatingBus = read_floatingbus(); // video side-effects latch after reading
+	const u8 uFloatingBus7 = uFloatingBus & 0x7f;
+	const u8 uKeyboard = keyglu_816_read(GLU_C000);
 
 	switch (offset)
 	{
@@ -1538,52 +1532,52 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x10:  // read any key down, reset keyboard strobe
 			keyglu_816_write(GLU_C010, 0);
-			return uKeyboardC010 | (uKeyboard & 0x7f);
+			return keyglu_816_read(GLU_C010) | (uKeyboard & 0x7f);
 
 		case 0x11:  // read LCRAM2 (LC Dxxx bank)
-			return (uKeyboardC010 & 0x7f) | (m_lcram2 ? 0x80 : 0x00);
+			return m_lcram2 ? 0x80 : 0x00;
 
 		case 0x12:  // read LCRAM (is LC readable?)
-			return (uKeyboardC010 & 0x7f) | (m_lcram ? 0x80 : 0x00);
+			return m_lcram ? 0x80 : 0x00;
 
 		case 0x13:  // read RAMRD
-			return (uKeyboardC010 & 0x7f) | (m_ramrd ? 0x80 : 0x00);
+			return m_ramrd ? 0x80 : 0x00;
 
 		case 0x14:  // read RAMWRT
-			return (uKeyboardC010 & 0x7f) | (m_ramwrt ? 0x80 : 0x00);
+			return m_ramwrt ? 0x80 : 0x00;
 
 		case 0x15:  // read INTCXROM
-			return (uKeyboardC010 & 0x7f) | (m_intcxrom ? 0x80 : 0x00);
+			return m_intcxrom ? 0x80 : 0x00;
 
 		case 0x16:  // read ALTZP
-			return (uKeyboardC010 & 0x7f) | (m_altzp ? 0x80 : 0x00);
+			return m_altzp ? 0x80 : 0x00;
 
 		case 0x17:  // read SLOTC3ROM
-			return (uKeyboardC010 & 0x7f) | (m_slotc3rom ? 0x80 : 0x00);
+			return m_slotc3rom ? 0x80 : 0x00;
 
 		case 0x18:  // read 80STORE
-			return (uKeyboardC010 & 0x7f) | (m_video->get_80store() ? 0x80 : 0x00);
+			return m_video->get_80store() ? 0x80 : 0x00;
 
 		case 0x19:  // read VBL (not VBLBAR, see Apple IIGS Technical Note #40)
-			return (uKeyboardC010 & 0x7f) | (m_vbl ? 0x80 : 0x00);
+			return m_vbl ? 0x80 : 0x00;
 
 		case 0x1a:  // read TEXT
-			return (uKeyboardC010 & 0x7f) | (m_video->get_graphics() ? 0x00 : 0x80);
+			return m_video->get_graphics() ? 0x00 : 0x80;
 
 		case 0x1b:  // read MIXED
-			return (uKeyboardC010 & 0x7f) | (m_video->get_mix() ? 0x80 : 0x00);
+			return m_video->get_mix() ? 0x80 : 0x00;
 
 		case 0x1c:  // read PAGE2
-			return (uKeyboardC010 & 0x7f) | (m_video->get_page2() ? 0x80 : 0x00);
+			return m_video->get_page2() ? 0x80 : 0x00;
 
 		case 0x1d:  // read HIRES
-			return (uKeyboardC010 & 0x7f) | (m_video->get_hires() ? 0x80 : 0x00);
+			return m_video->get_hires() ? 0x80 : 0x00;
 
 		case 0x1e:  // read ALTCHARSET
-			return (uKeyboardC010 & 0x7f) | (m_video->get_altcharset() ? 0x80 : 0x00);
+			return m_video->get_altcharset() ? 0x80 : 0x00;
 
 		case 0x1f:  // read 80COL
-			return (uKeyboardC010 & 0x7f) | (m_video->get_80col() ? 0x80 : 0x00);
+			return m_video->get_80col() ? 0x80 : 0x00;
 
 		case 0x22:  // TEXTCOL
 			return m_textcol;
@@ -1638,7 +1632,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_diskreg;
 
 		case 0x32: // VGCINTCLEAR
-			return read_floatingbus();
+			return uFloatingBus;
 
 		case 0x33: // CLOCKDATA
 			return m_clkdata;
@@ -1693,6 +1687,10 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x41:  // INTEN
 			return m_inten;
+
+		case 0x44: // MMDELTAX
+		case 0x45: // MMDELTAY
+			return 0; // read by AppleTalk to detect SCC activity
 
 		case 0x46:  // INTFLAG
 			return (m_an3 ? INTFLAG_AN3 : 0x00) | m_intflag;
@@ -1776,13 +1774,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			break;
 	}
 
-	// assume all $C00X returns the keyboard, like on the IIe
-	if ((offset & 0xf0) == 0x00)
-	{
-		return uKeyboard;
-	}
-
-	return read_floatingbus();
+	return uFloatingBus;
 }
 
 void apple2gs_state::c000_w(offs_t offset, u8 data)
@@ -1930,7 +1922,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 		case 0x2d:  // SLOTROMSEL
 			m_slotromsel = data;
 			break;
-		case 0x31:  //
+
+		case 0x31:  // DISKREG
 			if (!BIT(data, DISKREG_35SEL))
 			{
 				m_motoroff_time = 30;
@@ -3771,6 +3764,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_macadb->adb_data_callback().set(FUNC(apple2gs_state::set_adb_line));
 
 	RTC3430042(config, m_rtc, XTAL(32'768));
+	m_rtc->cko_cb().set(FUNC(apple2gs_state::rtc_vgc));
 
 	APPLE2_VIDEO(config, m_video, A2GS_14M).set_screen(m_screen);
 
@@ -3786,7 +3780,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(704, 262);  // 640+32+32 for the borders
 	m_screen->set_visarea(0,703,0,230);
-	m_screen->set_screen_update(FUNC(apple2gs_state::screen_update));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update_GS)));
 
 	PALETTE(config, "palette", FUNC(apple2gs_state::palette_init), 256);
 

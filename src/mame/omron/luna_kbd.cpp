@@ -226,11 +226,13 @@ void luna_keyboard_device::tra_complete()
 
 void luna_keyboard_device::key_make(u8 row, u8 column)
 {
+	logerror("tx %02x\n", 0x00 | (row << 4) | column);
 	transmit_byte(0x00 | (row << 4) | column);
 }
 
 void luna_keyboard_device::key_break(u8 row, u8 column)
 {
+	logerror("tx %02x\n", 0x80 | (row << 4) | column);
 	transmit_byte(0x80 | (row << 4) | column);
 }
 

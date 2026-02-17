@@ -1299,9 +1299,9 @@ void pc88va_state::pc88va_cbus(machine_config &config)
 	m_maincpu->out_iow_cb<0>().set([this] (u8 data) { m_cbus_root->dack_w(0, data); });
 
 	// should be 3 slots for each iteration here
-	PC98_CBUS_SLOT(config, "cbus0", 0, "cbus_root", pc88va_cbus_devices, nullptr);
-	PC98_CBUS_SLOT(config, "cbus1", 0, "cbus_root", pc88va_cbus_devices, nullptr);
-	PC98_CBUS_SLOT(config, "cbus2", 0, "cbus_root", pc88va_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:0", 0, "cbus", pc88va_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:1", 0, "cbus", pc88va_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:2", 0, "cbus", pc88va_cbus_devices, nullptr);
 }
 
 void pc88va_state::pc88va(machine_config &config)
@@ -1324,7 +1324,7 @@ void pc88va_state::pc88va(machine_config &config)
 	m_maincpu->out_dack_cb<0>().set([this] (int state) { if (!state) m_dack = 0; });
 	m_maincpu->out_dack_cb<1>().set([this] (int state) { if (!state) m_dack = 1; });
 	m_maincpu->out_dack_cb<2>().set([this] (int state) { if (!state) m_dack = 2; });
-	m_maincpu->out_dack_cb<3>().set([this] (int state) { if (!state) m_dack = 3;});
+	m_maincpu->out_dack_cb<3>().set([this] (int state) { if (!state) m_dack = 3; });
 
 	pc88va_cbus(config);
 

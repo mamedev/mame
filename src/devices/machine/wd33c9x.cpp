@@ -770,10 +770,14 @@ void wd33c9x_base_device::start_command()
 
 	case COMMAND_CC_NEGATE_ACK:
 		LOGMASKED(LOG_COMMANDS, "Negate ACK Command\n");
-		// FIXME - This is causing problems, so ignore for now.
-		//if (m_mode != MODE_I) {
-		//  fatalerror("NEGATE_ACK command only valid in the Initiator state.");
-		//}
+		if (m_mode != MODE_I) {
+			// PC-98 controllers explicitly want to clear FIFO and send an irq, cfr. #14532
+			data_fifo_reset();
+
+			irq_fifo_push(SCSI_STATUS_DISCONNECT);
+
+			update_irq();
+		}
 		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
 		return;
 

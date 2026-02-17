@@ -8,8 +8,6 @@
 // The envelope is considered completed after this many time constants.
 static constexpr const float TIME_CONSTANTS_TO_END = 10;
 
-DEFINE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device, "va_rc_eg", "RC-based Envelope Generator")
-
 va_rc_eg_device::va_rc_eg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VA_RC_EG, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
@@ -130,7 +128,7 @@ void va_rc_eg_device::sound_stream_update(sound_stream &stream)
 	assert(stream.input_count() == 0 && stream.output_count() == 1);
 	attotime t = stream.start_time();
 
-	if (t >= m_t_end_approx)
+	if (converged(t))
 	{
 		// Avoid expensive get_v() calls if the envelope stage has completed.
 		stream.fill(0, m_v_end);
@@ -158,3 +156,5 @@ void va_rc_eg_device::snapshot()
 	}
 	m_t_end_approx = m_t_start + attotime::from_double(TIME_CONSTANTS_TO_END * m_r * m_c);
 }
+
+DEFINE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device, "va_rc_eg", "RC-based Envelope Generator")

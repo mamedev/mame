@@ -55,6 +55,7 @@ public:
 		m_pit8253(*this, "pit8253"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
+		m_sn76496(*this, "sn76496"),
 		m_cart1(*this, "cartslot1"),
 		m_cart2(*this, "cartslot2"),
 		m_ram(*this, RAM_TAG),
@@ -84,6 +85,7 @@ private:
 	required_device<pit8253_device> m_pit8253;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
+	required_device<sn76496_device> m_sn76496;
 	required_device<generic_slot_device> m_cart1;
 	required_device<generic_slot_device> m_cart2;
 	required_device<ram_device> m_ram;
@@ -115,7 +117,7 @@ private:
 	uint8_t m_pcjx_1ff_count = 0;
 	uint8_t m_pcjx_1ff_val = 0;
 	uint8_t m_pcjx_1ff_bankval = 0;
-	uint8_t m_pcjx_1ff_bank[20][2]{};
+	uint8_t m_pcjx_1ff_bank[0x20][2]{};
 	int m_ppi_portc_switch_high = 0;
 	uint8_t m_ppi_portb = 0;
 
@@ -234,7 +236,7 @@ TIMER_CALLBACK_MEMBER(pcjr_state::kb_signal)
 void pcjr_state::pic8259_set_int_line(int state)
 {
 	uint32_t pc = m_maincpu->pc();
-	if ( (pc == 0xF0453) || (pc == 0xFF196) )
+	if ( (pc == 0xf0453) || (pc == 0xff196) )
 	{
 		m_pc_int_delay_timer->adjust( m_maincpu->cycles_to_attotime(20), state );
 	}
@@ -364,6 +366,15 @@ void pcjr_state::pcjr_ppi_portb_w(uint8_t data)
 	pc_speaker_set_spkrdata(data & 0x02);
 
 	m_cassette->change_state((data & 0x08) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+
+	// PB5 & PB6 control MC14529B Dual 4-Channel Analog Data Selector:
+	// X0 - TIMER AUDIO
+	// X1 - CASS AUDIO TO MUX
+	// X2 - AUDIO INPUT
+	// X3 - SN76496N AUDIO
+	m_speaker->set_output_gain(0, (data & 0x60) == 0x00 ? 1.0 : 0.0);
+	m_cassette->set_output_gain(0, (data & 0x60) == 0x20 ? 1.0 : 0.0);
+	m_sn76496->set_output_gain(0, (data & 0x60) == 0x60 ? 1.0 : 0.0);
 }
 
 /*
@@ -607,7 +618,7 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x00a0, 0x00a0).rw(FUNC(pcjr_state::pcjr_nmi_enable_r), FUNC(pcjr_state::pc_nmi_enable_w));
-	map(0x00c0, 0x00c0).w("sn76496", FUNC(sn76496_device::write));
+	map(0x00c0, 0x00c0).w(m_sn76496, FUNC(sn76496_device::write));
 	map(0x00f2, 0x00f2).w(FUNC(pcjr_state::pcjr_fdc_dor_w));
 	map(0x00f4, 0x00f5).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
@@ -641,11 +652,8 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pcjr_state::ibmpcjr_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259", FUNC(pic8259_device::inta_cb));
 
-/*
-  On the PC Jr the input for clock 1 seems to be selectable
-  based on bit 4(/5?) written to output port A0h. This is not
-  supported yet.
- */
+	// On the PC Jr the input for clock 1 seems to be selectable based on bit 4(/5?) written to output port A0h.
+	// This is not supported yet.
 	PIT8253(config, m_pit8253, 0);
 	m_pit8253->set_clk<0>(XTAL(14'318'181)/12);
 	m_pit8253->out_handler<0>().set(m_pic8259, FUNC(pic8259_device::ir0_w));
@@ -684,8 +692,8 @@ void pcjr_state::ibmpcjr(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 0.80);
-	SN76496(config, "sn76496", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
+	SN76496(config, m_sn76496, XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	/* printer */
 	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
@@ -698,7 +706,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
-	UPD765A(config, m_fdc, 8'000'000, false, false);
+	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, false, false); // clocked through SED9420C
 
 	FLOPPY_CONNECTOR(config, "fdc:0", pcjr_floppies, "525dd", isa8_fdc_device::floppy_formats, true);
 
@@ -743,7 +751,6 @@ void pcjr_state::ibmpcjx(machine_config &config)
 
 	/* Software lists */
 	SOFTWARE_LIST(config, "jx_list").set_original("ibmpcjx");
-
 }
 
 
@@ -780,4 +787,4 @@ ROM_END
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT    CLASS       INIT        COMPANY                            FULLNAME           FLAGS
 COMP( 1983, ibmpcjr, ibm5150, 0,      ibmpcjr, ibmpcjr, pcjr_state, empty_init, "International Business Machines", "IBM PCjr (4860)", MACHINE_IMPERFECT_COLORS )
-COMP( 1985, ibmpcjx, ibm5150, 0,      ibmpcjx, ibmpcjr, pcjr_state, empty_init, "International Business Machines", "IBM JX (5510)",   MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING)
+COMP( 1985, ibmpcjx, ibm5150, 0,      ibmpcjx, ibmpcjr, pcjr_state, empty_init, "International Business Machines", "IBM JX (5510)",   MACHINE_IMPERFECT_COLORS | MACHINE_NOT_WORKING )

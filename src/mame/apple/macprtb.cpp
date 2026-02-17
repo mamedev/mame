@@ -464,10 +464,10 @@ void macportable_state::field_interrupts()
 
 void macportable_state::machine_start()
 {
-	m_ram_ptr = (u16*)m_ram->pointer();
+	m_ram_ptr = m_ram->pointer<u16>();
 	m_ram_size = m_ram->size()>>1;
 	m_ram_mask = m_ram_size - 1;
-	m_rom_ptr = (u16*)memregion("bootrom")->base();
+	m_rom_ptr = &memregion("bootrom")->as_u16();
 	m_rom_size = memregion("bootrom")->bytes();
 	m_via_cycles = -50;
 

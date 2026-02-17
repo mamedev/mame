@@ -359,11 +359,11 @@ void adsp21xx_device::write_reg0(int regnum, int32_t val)
 		case 0x06:  m_core.my0.s = val;                 break;
 		case 0x07:  m_core.my1.s = val;                 break;
 		case 0x08:  m_core.si.s = val;                  break;
-		case 0x09:  m_core.se.s = (int8_t)val;            break;
+		case 0x09:  m_core.se.s = (int8_t)val;          break;
 		case 0x0a:  m_core.ar.s = val;                  break;
 		case 0x0b:  m_core.mr.mrx.mr0.s = val;          break;
 		case 0x0c:  m_core.mr.mrx.mr1.s = val; m_core.mr.mrx.mr2.s = (int16_t)val >> 15;  break;
-		case 0x0d:  m_core.mr.mrx.mr2.s = (int8_t)val;    break;
+		case 0x0d:  m_core.mr.mrx.mr2.s = (int8_t)val;  break;
 		case 0x0e:  m_core.sr.srx.sr0.s = val;          break;
 		case 0x0f:  m_core.sr.srx.sr1.s = val;          break;
 	}

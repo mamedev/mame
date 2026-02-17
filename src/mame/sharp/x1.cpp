@@ -2197,7 +2197,9 @@ void x1_state::x1(machine_config &config)
 	ctc.zc_callback<1>().set("ctc", FUNC(z80ctc_device::trg1));
 	ctc.zc_callback<2>().set("ctc", FUNC(z80ctc_device::trg2));
 
-	X1_KEYBOARD(config, "x1kb", 0);
+	auto &x1kb(X1_KEYBOARD(config, "x1kb", 0));
+	x1kb.flag_cb().set(FUNC(x1_state::key_irq_flag_r));
+	x1kb.ack_cb().set(FUNC(x1_state::key_irq_ack_r));
 
 	i8255_device &ppi(I8255A(config, "ppi8255_0"));
 	ppi.in_pa_callback().set(FUNC(x1_state::x1_porta_r));
@@ -2273,7 +2275,7 @@ void x1turbo_state::x1turbo(machine_config &config)
 	sio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dma, MAIN_CLOCK/4);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(x1turbo_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(x1turbo_state::memory_write_byte));

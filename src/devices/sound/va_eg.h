@@ -6,6 +6,8 @@
 
 #pragma once
 
+DECLARE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device)
+
 // Building block for emulating envelope generators (EGs) based on a single RC
 // circuit. The controlling source sets a target voltage and the device
 // interpolates up or down to it through a RC circuit. The voltage is published
@@ -53,6 +55,9 @@ public:
 	// impossible to reach.
 	attotime get_dt(float v) const;
 
+	// Returns true if the voltage converged to the target by time `t`.
+	bool converged(const attotime &t) const { return t >= m_t_end_approx; }
+
 protected:
 	void device_start() override ATTR_COLD;
 	void sound_stream_update(sound_stream &stream) override;
@@ -71,7 +76,5 @@ private:
 	attotime m_t_start;
 	attotime m_t_end_approx;
 };
-
-DECLARE_DEVICE_TYPE(VA_RC_EG, va_rc_eg_device)
 
 #endif  // MAME_SOUND_VA_EG_H

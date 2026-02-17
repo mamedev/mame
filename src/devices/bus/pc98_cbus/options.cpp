@@ -7,6 +7,8 @@
 #include "amd98.h"
 #include "fdd_2dd.h"
 #include "fdd_2hd.h"
+#include "lgy98.h"
+#include "lha201.h"
 #include "pc9801_02.h"
 #include "pc9801_14.h"
 #include "pc9801_26.h"
@@ -61,10 +63,16 @@ void pc98_cbus_devices(device_slot_interface &device)
 	device.option_add("pc9801_27",  PC9801_27);
 
 	// SCSI
-//	device_option_add("pc9801_55",  PC9801_55);
+	// NEC
+//  device_option_add("pc9801_55",  PC9801_55);
 	device.option_add("pc9801_55u", PC9801_55U);
 	device.option_add("pc9801_55l", PC9801_55L);
-//	device.option_add("pc9801_92",  PC9801_92);
+//  device.option_add("pc9801_92",  PC9801_92);
+	// Logitec
+	device.option_add("lha201", LHA201);
+
+	// Ethernet
+	device.option_add("lgy98", LGY98);
 
 	// internal sound options
 	device.option_add_internal("sound_pc9821ce",  SOUND_PC9821CE);
@@ -91,11 +99,17 @@ void pc88va_cbus_devices(device_slot_interface &device)
 }
 
 // https://man.openbsd.org/cbus.4
-// Add the known options only
+// Add the known options only for now
 void luna88k2_cbus_devices(device_slot_interface &device)
 {
+	// testable thru diagnostic
+	// a 4MB EMS board (I/O Data PIO-9X34P-2M/4M? Pokes port $e8 bit 7 in-between A20 gate enabling)
+	// PC9861K serial (access port $00b0, unless that's a red herring and is related to above)
+
 	// Allied Telesis CentreCOM LA-98
 	device.option_add("pc9801_86",  PC9801_86);
 	// PCMCIA options
+	// I/O Data RSA-98 & RSA-98III/S
+	// https://gist.github.com/ao-kenji/6cef238e2b327585225e80ac563af0cf
 }
 

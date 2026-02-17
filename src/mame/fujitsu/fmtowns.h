@@ -36,8 +36,6 @@
 #include "formats/fmtowns_dsk.h"
 
 
-#define IRQ_LOG 0  // set to 1 to log IRQ line activity
-
 struct towns_cdrom_controller
 {
 	uint8_t command = 0;
@@ -129,17 +127,25 @@ public:
 		, m_serial(*this,"serial")
 	{ }
 
-	void towns_base(machine_config &config);
-	void towns(machine_config &config);
-	void townsftv(machine_config &config);
-	void townshr(machine_config &config);
-	void townsmx(machine_config &config);
-	void townssj(machine_config &config);
+	void towns(machine_config &config) ATTR_COLD;
+	void townsftv(machine_config &config) ATTR_COLD;
+	void townshr(machine_config &config) ATTR_COLD;
+	void townsmx(machine_config &config) ATTR_COLD;
+	void townssj(machine_config &config) ATTR_COLD;
 
 	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
 
 protected:
 	uint16_t m_towns_machine_id;  // default is 0x0101
+
+	required_device<ram_device> m_ram;
+	required_device<cpu_device> m_maincpu;
+
+	required_device_array<upd71071_device, 2> m_dma;
+	optional_device<fmscsi_device> m_scsi;
+	required_device_array<floppy_connector, 2> m_flop;
+
+	required_device_array<msx_general_purpose_port_device, 2U> m_pad_ports;
 
 	void marty_mem(address_map &map) ATTR_COLD;
 	void pcm_mem(address_map &map) ATTR_COLD;
@@ -151,19 +157,12 @@ protected:
 	void towns_mem(address_map &map) ATTR_COLD;
 	void ux_mem(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override;
+	virtual void driver_start() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	required_device<ram_device> m_ram;
-	required_device<cpu_device> m_maincpu;
-
-	required_device_array<upd71071_device, 2> m_dma;
-	optional_device<fmscsi_device> m_scsi;
-	required_device_array<floppy_connector, 2> m_flop;
-
-	required_device_array<msx_general_purpose_port_device, 2U> m_pad_ports;
+	void towns_base(machine_config &config) ATTR_COLD;
 
 	static void floppy_formats(format_registration &fr);
 
@@ -193,6 +192,13 @@ private:
 	required_memory_bank m_bank_cb000_w;
 	required_memory_bank m_bank_f8000_r;
 	required_memory_bank m_bank_f8000_w;
+
+	optional_shared_ptr<uint32_t> m_nvram;
+	optional_shared_ptr<uint16_t> m_nvram16;
+
+	required_ioport_array<4> m_kb_ports;
+	required_memory_region m_user;
+	optional_memory_region m_serial;
 
 	uint16_t m_ftimer = 0;
 	uint16_t m_freerun_timer = 0;
@@ -243,8 +249,9 @@ private:
 
 	uint8_t m_serial_irq_source = 0;
 	uint8_t m_serial_irq_enable = 0;  // RS232 interrupt control
+	uint8_t m_serial_irq_state = 0;
 
-	enum
+	enum : uint8_t
 	{
 		TXC_EXTERNAL      = 0x80,
 		RXC_EXTERNAL      = 0x40,
@@ -268,8 +275,10 @@ private:
 	uint8_t m_prev_x = 0;
 	uint8_t m_prev_y = 0;
 
-	optional_shared_ptr<uint32_t> m_nvram;
-	optional_shared_ptr<uint16_t> m_nvram16;
+	u8 m_rtc_d = 0;
+	bool m_rtc_busy = false;
+	u8 m_vram_mask[4]{};
+	u8 m_vram_mask_addr = 0;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -362,10 +371,6 @@ private:
 	uint8_t towns_cdrom_read_byte_software();
 	void cdda_db_to_gain(float db);
 
-	required_ioport_array<4> m_kb_ports;
-	required_memory_region m_user;
-	optional_memory_region m_serial;
-
 	TIMER_CALLBACK_MEMBER(freerun_inc);
 	TIMER_CALLBACK_MEMBER(intervaltimer2_timeout);
 	TIMER_CALLBACK_MEMBER(poll_keyboard);
@@ -377,11 +382,6 @@ private:
 	TIMER_CALLBACK_MEMBER(towns_cd_status_ready);
 	TIMER_CALLBACK_MEMBER(towns_delay_cdda);
 	TIMER_CALLBACK_MEMBER(towns_delay_seek);
-
-	u8 m_rtc_d = 0;
-	bool m_rtc_busy = false;
-	u8 m_vram_mask[4]{};
-	u8 m_vram_mask_addr = 0;
 
 	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
 	TIMER_CALLBACK_MEMBER(towns_vblank_end);
@@ -415,24 +415,25 @@ private:
 
 class towns16_state : public towns_state
 {
-	public:
+public:
 	towns16_state(const machine_config &mconfig, device_type type, const char *tag)
 		: towns_state(mconfig, type, tag)
 	{ }
-	void townsux(machine_config &config);
+
+	void townsux(machine_config &config) ATTR_COLD;
 };
 
 class marty_state : public towns_state
 {
-	public:
+public:
 	marty_state(const machine_config &mconfig, device_type type, const char *tag)
 		: towns_state(mconfig, type, tag)
 	{ }
 
-	void marty(machine_config &config);
+	void marty(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void driver_start() override;
+	virtual void driver_start() override ATTR_COLD;
 };
 
 #endif // MAME_FUJITSU_FMTOWNS_H

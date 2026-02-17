@@ -123,6 +123,8 @@ DEFINE_DEVICE_TYPE(M6805U3, m6805u3_device, "m6805u3", "Motorola MC6805U3")
 DEFINE_DEVICE_TYPE(HD6805S1, hd6805s1_device, "hd6805s1", "Hitachi HD6805S1")
 DEFINE_DEVICE_TYPE(HD6805U1, hd6805u1_device, "hd6805u1", "Hitachi HD6805U1")
 
+DEFINE_DEVICE_TYPE(M146805E2, m146805e2_device, "m146805e2", "Motorola MC146805E2")
+
 /****************************************************************************
  * M68705 base device
  ****************************************************************************/
@@ -215,8 +217,8 @@ Ux Parts:
 
 */
 
-m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size)
-	: m6805_base_device(mconfig, tag, owner, clock, type, { addr_width > 13 ? s_hmos_b_ops : s_hmos_s_ops, s_hmos_cycles, addr_width, 0x007f, 0x0060, M6805_VECTOR_SWI }, address_map_constructor(FUNC(m6805_hmos_device::map), this))
+m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, configuration_params const &params, unsigned ram_size)
+	: m6805_base_device(mconfig, tag, owner, clock, type, params, address_map_constructor(FUNC(m6805_hmos_device::map), this))
 	, m_timer(*this)
 	, m_port_open_drain{ false, false, false, false }
 	, m_port_mask{ 0x00, 0x00, 0x00, 0x00 }
@@ -230,6 +232,11 @@ m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *
 {
 }
 
+m6805_hmos_device::m6805_hmos_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size)
+	: m6805_hmos_device(mconfig, tag, owner, clock, type, { addr_width > 13 ? s_hmos_b_ops : s_hmos_s_ops, s_hmos_cycles, addr_width, 0x007f, 0x0060, M6805_VECTOR_SWI }, ram_size)
+{
+}
+
 m68705_device::m68705_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size)
 	: m6805_hmos_device(mconfig, tag, owner, clock, type, addr_width, ram_size)
 	, device_nvram_interface(mconfig, *this)
@@ -240,6 +247,12 @@ m68705_device::m68705_device(machine_config const &mconfig, char const *tag, dev
 	, m_pl_addr(0xffff)
 {
 }
+
+m146805_device::m146805_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, device_type type, u32 addr_width, unsigned ram_size)
+	: m6805_hmos_device(mconfig, tag, owner, clock, type, { addr_width > 13 ? s_cmos_b_ops : s_cmos_s_ops, s_cmos_cycles, addr_width, 0x007f, 0x0060, M6805_VECTOR_SWI }, ram_size)
+{
+}
+
 
 template <offs_t B> u8 m68705_device::eprom_r(offs_t offset)
 {
@@ -881,20 +894,34 @@ hd6805u1_device::hd6805u1_device(machine_config const &mconfig, char const *tag,
 	m_timer.set_options(m6805_timer::TIMER_PGM | m6805_timer::TIMER_NPC);
 }
 
+m146805e2_device::m146805e2_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	: m146805_device(mconfig, tag, owner, clock, M146805E2, 13, 112)
+{
+	m_timer.set_options(m6805_timer::TIMER_PGM);
+
+	set_port_mask<2>(0xff); // Port C isn't present
+	set_port_mask<3>(0xff); // Port D isn't present
+}
+
 void m6805_hmos_device::internal_map(address_map &map)
 {
 	map.unmap_value_high();
 
 	map(0x0000, 0x0000).rw(FUNC(m6805_hmos_device::port_r<0>), FUNC(m6805_hmos_device::port_latch_w<0>));
 	map(0x0001, 0x0001).rw(FUNC(m6805_hmos_device::port_r<1>), FUNC(m6805_hmos_device::port_latch_w<1>));
-	map(0x0002, 0x0002).rw(FUNC(m6805_hmos_device::port_r<2>), FUNC(m6805_hmos_device::port_latch_w<2>));
 
 	map(0x0004, 0x0004).w(FUNC(m6805_hmos_device::port_ddr_w<0>));
 	map(0x0005, 0x0005).w(FUNC(m6805_hmos_device::port_ddr_w<1>));
-	map(0x0006, 0x0006).w(FUNC(m6805_hmos_device::port_ddr_w<2>));
 
 	map(0x0008, 0x0008).lrw8(NAME([this]() { return m_timer.tdr_r(); }), NAME([this](u8 data) { m_timer.tdr_w(data); }));
 	map(0x0009, 0x0009).lrw8(NAME([this]() { return m_timer.tcr_r(); }), NAME([this](u8 data) { m_timer.tcr_w(data); }));
+
+	// M146805Ex devices don't have Port C or D
+	if (m_port_mask[2] != 0xff)
+	{
+		map(0x0002, 0x0002).rw(FUNC(m6805_hmos_device::port_r<2>), FUNC(m6805_hmos_device::port_latch_w<2>));
+		map(0x0006, 0x0006).w(FUNC(m6805_hmos_device::port_ddr_w<2>));
+	}
 
 	// M68?05Px devices don't have Port D or the Miscellaneous register
 	if (m_port_mask[3] != 0xff)

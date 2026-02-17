@@ -127,6 +127,7 @@ void mb87030_device::device_reset()
 	m_fifo.clear();
 	m_dreq_handler(false);
 	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+	m_delay_state = State::Idle;
 	update_state(State::Idle, 0);
 	scsi_set_ctrl(0, S_ALL);
 	scsi_bus->data_w(scsi_refid, 0);
@@ -139,6 +140,8 @@ auto mb87030_device::get_state_name(State state) const
 	switch (state) {
 	case State::Idle:
 		return "Idle";
+	case State::WaitNewState:
+		return "WaitNewState";
 	case State::ArbitrationWaitBusFree:
 		return "ArbitrationWaitBusFree";
 	case State::ArbitrationAssertBSY:
@@ -170,6 +173,8 @@ auto mb87030_device::get_state_name(State state) const
 		return "TransferWaitDeassertREQ";
 	case State::TransferDeassertACK:
 		return "TransferDeassertACK";
+	case State::TransferWaitFifoEmpty:
+		return "TransferWaitFifoEmpty";
 	}
 	return "Unknown state";
 }
@@ -178,11 +183,16 @@ void mb87030_device::update_state(mb87030_device::State new_state, int delay, in
 {
 	LOG("new state: %s -> %s (delay %d, timeout %d, %s)\n", get_state_name(m_state),
 			get_state_name(new_state), delay, timeout, machine().time().to_string());
-	m_state = new_state;
-	if (delay)
+
+	if (delay) {
+		m_delay_state = new_state;
+		m_state = State::WaitNewState;
 		m_delay_timer->adjust(clocks_to_attotime(delay));
-	else
+	} else {
+		m_state = new_state;
 		m_delay_timer->reset();
+	}
+
 	if (timeout)
 		m_timer->adjust(clocks_to_attotime(timeout));
 	else
@@ -197,8 +207,19 @@ TIMER_CALLBACK_MEMBER(mb87030_device::timeout)
 
 TIMER_CALLBACK_MEMBER(mb87030_device::delay_timeout)
 {
+	m_state = m_delay_state;
 	m_delay_timer->reset();
 	step(false);
+}
+
+TIMER_CALLBACK_MEMBER(mb87030_device::bus_free_timeout)
+{
+	if(!(m_ssts & SSTS_INIT_CONNECTED))
+		return;
+
+	LOG("SCSI disconnect\n");
+	scsi_disconnect();
+	scsi_set_ctrl(0, S_ALL);
 }
 
 void mb87030_device::scsi_command_complete()
@@ -218,6 +239,7 @@ void mb87030_device::scsi_disconnect()
 	update_ints();
 	update_state(State::Idle);
 }
+
 
 void mb87030_device::scsi_set_ctrl(uint32_t value, uint32_t mask)
 {
@@ -273,6 +295,12 @@ void mb87030_device::step(bool timeout)
 			timeout ? " timeout" : "", data,
 					ctrl, m_tc);
 
+	if ((ctrl & (S_BSY|S_SEL)) == 0) {
+		if ((m_ssts & SSTS_INIT_CONNECTED) && m_bus_free_timer->remaining() == attotime::never)
+			m_bus_free_timer->adjust(attotime::from_msec(10));
+	} else
+		m_bus_free_timer->adjust(attotime::never);
+
 	if ((m_sctl & SCTL_RESET_AND_DISABLE) && m_state != State::Idle) {
 		scsi_set_ctrl(0, S_ALL);
 		m_ssts &= ~SSTS_SPC_BUSY;
@@ -281,19 +309,13 @@ void mb87030_device::step(bool timeout)
 		return;
 	}
 
-	// FIXME: bus free and disconnected interrupt logic is not correct
-	if ((m_ssts & SSTS_INIT_CONNECTED) && !(ctrl & S_BSY) && (m_state != State::SelectionAssertID) && (m_state != State::SelectionAssertSEL) && (m_state != State::SelectionWaitBSY)) {
-		LOG("SCSI disconnect\n");
-		scsi_disconnect();
-		scsi_set_ctrl(0, S_ALL);
-	}
-
 	switch (m_state) {
 	case State::Idle:
-		if (ctrl == 0 && (m_pctl & PCTL_BUS_FREE_IE)) {
-			m_ints |= INTS_DISCONNECTED;
-			update_ints();
-		}
+		if (ctrl == 0 && (m_pctl & PCTL_BUS_FREE_IE))
+			scsi_disconnect();
+		break;
+
+	case State::WaitNewState:
 		break;
 
 	case State::ArbitrationWaitBusFree:
@@ -371,20 +393,14 @@ void mb87030_device::step(bool timeout)
 		break;
 
 	case State::TransferWaitReq:
-		if (!m_tc && !(m_scmd & SCMD_TERM_MODE)) {
-			// transfer command completes only when fifo is empty
-			if (!m_fifo.empty())
-				break;
-
-			LOG("TransferWaitReq: tc == 0\n");
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_command_complete();
+		if (!(ctrl & S_REQ)) {
+			scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 			break;
 		}
 
 		if (m_scsi_phase != (ctrl & S_PHASE_MASK)) {
 			LOG("SCSI phase change during transfer\n");
-			m_ints |= INTS_SERVICE_REQUIRED | INTS_COMMAND_COMPLETE;
+			m_ints |= INTS_SERVICE_REQUIRED;
 			m_ssts &= ~SSTS_SPC_BUSY;
 			scsi_bus->data_w(scsi_refid, 0);
 			update_ints();
@@ -392,15 +408,19 @@ void mb87030_device::step(bool timeout)
 			break;
 		}
 
-		if (!(ctrl & S_REQ)) {
-			scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+		if (!m_tc && !(m_scmd & SCMD_TERM_MODE)) {
+			// This is a size 0 transfer, it only checks the phase in
+			// practice
+
+			scsi_bus->data_w(scsi_refid, 0);
+			scsi_command_complete();
 			break;
 		}
 
+		update_state((ctrl & S_INP) ? State::TransferRecvData : State::TransferSendData);
 		if (m_dma_transfer && m_tc && !(ctrl & S_INP) && !m_fifo.full())
 			m_dreq_handler(true);
-
-		update_state((ctrl & S_INP) ? State::TransferRecvData : State::TransferSendData, 1);
+		step(false);
 		break;
 
 	case State::TransferRecvData:
@@ -414,8 +434,6 @@ void mb87030_device::step(bool timeout)
 
 		LOG("pushing read data: %02X (%d filled)\n", data, m_fifo.queue_length() + 1);
 		m_fifo.enqueue(data);
-		if (m_dma_transfer)
-			m_dreq_handler(true);
 
 		if (m_sdgc & SDGC_XFER_ENABLE) {
 			m_serr |= SERR_XFER_OUT;
@@ -423,6 +441,9 @@ void mb87030_device::step(bool timeout)
 		}
 
 		update_state(State::TransferSendAck, 10);
+
+		if (m_dma_transfer)
+			m_dreq_handler(true);
 		break;
 
 	case State::TransferSendData:
@@ -448,7 +469,7 @@ void mb87030_device::step(bool timeout)
 
 	case State::TransferSendAck:
 		if (!(m_scmd & SCMD_TERM_MODE) && !(ctrl & S_INP))
-				m_temp = data;
+			m_temp = data;
 
 		scsi_set_ctrl(S_ACK, S_ACK);
 		scsi_bus->ctrl_wait(scsi_refid, 0, S_REQ);
@@ -462,7 +483,10 @@ void mb87030_device::step(bool timeout)
 
 	case State::TransferDeassertACK:
 		m_tc--;
-		update_state(State::TransferWaitReq, 10);
+		if(m_tc)
+			update_state(State::TransferWaitReq, 10);
+		else
+			update_state(State::TransferWaitFifoEmpty, 10);
 		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
 
 		// deassert ATN after last byte of message out phase
@@ -473,6 +497,12 @@ void mb87030_device::step(bool timeout)
 			scsi_set_ctrl(0, S_ACK);
 		break;
 
+	case State::TransferWaitFifoEmpty:
+		if (!m_fifo.empty())
+			break;
+		scsi_bus->data_w(scsi_refid, 0);
+		scsi_command_complete();
+		break;
 	}
 }
 
@@ -480,6 +510,7 @@ void mb87030_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(mb87030_device::timeout), this);
 	m_delay_timer = timer_alloc(FUNC(mb87030_device::delay_timeout), this);
+	m_bus_free_timer = timer_alloc(FUNC(mb87030_device::bus_free_timeout), this);
 
 	save_item(NAME(m_bdid));
 	save_item(NAME(m_sctl));
@@ -503,14 +534,15 @@ void mb87030_device::device_start()
 	save_item(NAME(m_scsi_ctrl));
 	save_item(NAME(m_dma_transfer));
 	save_item(NAME(m_state));
+	save_item(NAME(m_delay_state));
 	save_item(NAME(m_irq_state));
 }
 
 void mb87030_device::scsi_ctrl_changed()
 {
-	LOG("%s: %02x\n", __FUNCTION__, scsi_bus->ctrl_r());
-	if (m_delay_timer->remaining() == attotime::never)
-		step(false);
+	const auto value = scsi_bus->ctrl_r();
+	LOG("%s: %02x\n", __FUNCTION__, value);
+	step(false);
 }
 
 void mb87030_device::reset_w(int state)
@@ -887,13 +919,12 @@ uint8_t mb87030_device::dma_r()
 	if (machine().side_effects_disabled())
 		return m_fifo.peek();
 
-	if (!m_fifo.empty()) {
+	if (!m_fifo.empty())
 		m_dreg = m_fifo.dequeue();
-		if (m_fifo.empty())
-			m_dreq_handler(false);
-	}
 
 	LOG("dma_r: %02X (%d left)\n", m_dreg, m_fifo.queue_length());
+	if (m_fifo.empty())
+		m_dreq_handler(false);
 	step(false);
 	return m_dreg;
 }

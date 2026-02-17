@@ -48,7 +48,6 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 private:
 	void ghox_68k_mem(address_map &map) ATTR_COLD;
@@ -70,22 +69,14 @@ private:
 	required_device<gp9001vdp_device> m_vdp;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	bitmap_ind8 m_custom_priority_bitmap;
 };
-
-
-void ghox_state::video_start()
-{
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-}
 
 
 u32 ghox_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect, screen.priority());
 	return 0;
 }
 

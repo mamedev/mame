@@ -6,6 +6,10 @@
 
 *************************************************************************/
 
+#include "vicdual_a.h"
+#include "vicdual-97271p.h"
+#include "vicdual-97269pb.h"
+
 #include "cpu/mcs48/mcs48.h"
 #include "machine/pit8253.h"
 #include "machine/timer.h"
@@ -13,10 +17,8 @@
 #include "sound/dac.h"
 #include "sound/discrete.h"
 #include "sound/samples.h"
+
 #include "screen.h"
-#include "vicdual_a.h"
-#include "vicdual-97271p.h"
-#include "vicdual-97269pb.h"
 
 class vicdual_state : public driver_device
 {
@@ -140,19 +142,14 @@ protected:
 	uint8_t invinco_io_r(offs_t offset);
 	void invinco_io_w(offs_t offset, uint8_t data);
 
-	/*----------- defined in audio/vicdual.cpp -----------*/
-	void headon_audio_w(uint8_t data);
-	void invho2_audio_w(uint8_t data);
-
-	/*----------- defined in audio/depthch.cpp -----------*/
 	void depthch_audio_w(uint8_t data);
-
-	/*----------- defined in audio/invinco.cpp -----------*/
 	void invinco_audio_w(uint8_t data);
-
-	/*----------- defined in audio/pulsar.cpp -----------*/
 	void pulsar_audio_1_w(uint8_t data);
 	void pulsar_audio_2_w(uint8_t data);
+
+	//----------- defined in audio/vicdual.cpp -----------
+	void headon_audio_w(uint8_t data);
+	void invho2_audio_w(uint8_t data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(clear_coin_status);
 
@@ -300,12 +297,11 @@ protected:
 	void carnival_io_map(address_map &map) ATTR_COLD;
 	void mboard_map(address_map &map) ATTR_COLD;
 
-	int m_musicData = 0;
-	int m_musicBus = 0;
+	int m_musicdata = 0;
+	int m_musicbus = 0;
 
 	void carnival_io_w(offs_t offset, uint8_t data);
 
-	/*----------- defined in audio/carnival.cpp -----------*/
 	void carnival_audio_1_w(uint8_t data);
 	void carnival_audio_2_w(uint8_t data);
 	int carnival_music_port_t1_r();

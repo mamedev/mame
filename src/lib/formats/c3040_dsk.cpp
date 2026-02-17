@@ -4,7 +4,7 @@
 
     formats/c3040_dsk.cpp
 
-    Commodore 3040 sector disk image format
+    Commodore 2040/3040 sector disk image format
 
 *********************************************************************/
 

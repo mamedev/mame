@@ -1,6 +1,6 @@
 # Brazilian Portuguese translation for the MAME Project.
 # Tradução pro Português Brasileiro para o Projeto MAME.
-# Copyright (C) 1997-2025  MAMEDev and contributors
+# Copyright (C) 1997-2026  MAMEDev and contributors
 # This file is distributed under the same license as the MAME Project.
 # Automatically generated, 2023.
 #

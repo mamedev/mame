@@ -2872,6 +2872,55 @@ ROM_START( xeviousc )
 	ROM_LOAD( "xvi-1.5n",     0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
 ROM_END
 
+ROM_START( xeviousd ) // original Atari PCBs A039785 + A039787 (both PCBs had a 21 handwritten with a black marker)
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* 64k for the first CPU */
+	ROM_LOAD( "1983_atari_8309_136018_218.1m", 0x0000, 0x2000, CRC(cf690308) SHA1(f036c2c9ce161becf24e3fa336c1ee3926bdc6ca) )
+	ROM_LOAD( "1983_atari_8307_136018_219.1l", 0x2000, 0x2000, CRC(408c4b64) SHA1(91cbb46334d2c8e7d0e1281197092ccd2e45035b) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
+	ROM_LOAD( "1983_atari_8306_136018_120.4c", 0x0000, 0x2000, CRC(14d8fa03) SHA1(e8114141394adda86184b146f2497cfeef7fc2eb) )
+
+	ROM_REGION( 0x10000, "sub2", 0 )
+	ROM_LOAD( "1983_atari_8306_136018_127.2c", 0x0000, 0x1000, CRC(dd35cf1c) SHA1(f8d1f8e019d8198308443c2e7e815d0d04b23d14) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "1983_atari_8307_136018_104.3b", 0x0000, 0x1000, CRC(088c8b26) SHA1(9c3b61dfca2f84673a78f7f66e363777a8f47a59) )    /* foreground characters */
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "1983_atari_8307_136018_105.3c", 0x0000, 0x1000, CRC(de60ba25) SHA1(32bc09be5ff8b52ee3a26e0ac3ebc2d4107badb7) )    /* bg pattern B0 */
+	ROM_LOAD( "1983_atari_8307_136018_106.3d", 0x1000, 0x1000, CRC(535cdbbc) SHA1(fb9ffe5fc43e0213231267e98d605d43c15f61e8) )    /* bg pattern B1 */
+
+	ROM_REGION( 0xa000, "gfx3", 0 )
+	ROM_LOAD( "1983_atari_8307_136018_107.4m", 0x0000, 0x2000, CRC(dc2c0ecb) SHA1(19ddbd9805f77f38c9a9a1bb30dba6c720b8609f) )    /* sprite set #1, planes 0/1 */
+	ROM_LOAD( "1983_atari_8307_136018_109.4p", 0x2000, 0x2000, CRC(dfb587ce) SHA1(acff2bf5cde85a16cdc98a52cdea11f77fadf25a) )    /* sprite set #2, planes 0/1 */
+	ROM_LOAD( "1983_atari_8307_136018_108.4n", 0x4000, 0x1000, CRC(605ca889) SHA1(3bf380ef76c03822a042ecc73b5edd4543c268ce) )    /* sprite set #3, planes 0/1 */
+	ROM_LOAD( "1983_atari_8307_136018_110.4r", 0x5000, 0x2000, CRC(02417d19) SHA1(b5f830dd2cf25cf154308d2e640f0ecdcda5d8cd) )    /* sprite set #1, plane 2, set #2, plane 2 */
+	/* 0x7000-0x8fff  will be unpacked from 0x5000-0x6fff */
+	ROM_FILL(                                  0x9000, 0x1000, 0x00 )    // empty space to decode sprite set #3 as 3 bits per pixel
+
+	ROM_REGION( 0x4000, "gfx4", 0 ) /* background tilemaps */
+	ROM_LOAD( "1983_atari_8307_136018_101.2a", 0x0000, 0x1000, CRC(57ed9879) SHA1(3106d1aacff06cf78371bd19967141072b32b7d7) )
+	ROM_LOAD( "1983_atari_8307_136018_102.2b", 0x1000, 0x2000, CRC(ae3ba9e5) SHA1(49064b25667ffcd81137cd5e800df4b78b182a46) )
+	ROM_LOAD( "1983_atari_8307_136018_103.2c", 0x3000, 0x1000, CRC(31e244dd) SHA1(3f7eac12863697a98e1122111801606759e44b2a) )
+
+	// from here on nothing was dumped for this set. They all probably match, given similarity.
+	ROM_REGION( 0x0b00, "proms", 0 )
+	ROM_LOAD( "1983_atari_136018_115.6a", 0x0000, 0x0100, CRC(5cc2727f) SHA1(0dc1e63a47a4cb0ba75f6f1e0c15e408bb0ee2a1) ) /* palette red component */
+	ROM_LOAD( "1983_atari_136018_116.6d", 0x0100, 0x0100, CRC(5c8796cc) SHA1(63015e3c0874afc6b1ca032f1ffb8f90562c77c8) ) /* palette green component */
+	ROM_LOAD( "1983_atari_136018_117.6e", 0x0200, 0x0100, CRC(3cb60975) SHA1(c94d5a5dd4d8a08d6d39c051a4a722581b903f45) ) /* palette blue component */
+	ROM_LOAD( "1983_atari_136018_114.4h", 0x0300, 0x0200, CRC(22d98032) SHA1(ec6626828c79350417d08b98e9631ad35edd4a41) ) /* bg tiles lookup table low bits */
+	ROM_LOAD( "1983_atari_136018_113.4f", 0x0500, 0x0200, CRC(3a7599f0) SHA1(a4bdf58c190ca16fc7b976c97f41087a61fdb8b8) ) /* bg tiles lookup table high bits */
+	ROM_LOAD( "1983_atari_136018_111.3l", 0x0700, 0x0200, CRC(fd8b9d91) SHA1(87ddf0b9d723aabb422d6d416aa9ec6bc246bf34) ) /* sprite lookup table low bits */
+	ROM_LOAD( "1983_atari_136018_112.3m", 0x0900, 0x0200, CRC(bf906d82) SHA1(776168a73d3b9f0ce05610acc8a623deae0a572b) ) /* sprite lookup table high bits */
+
+	ROM_REGION( 0x0200, "pals_vidbd", 0) /* PAL's located on the video board */
+	ROM_LOAD( "n82s153n.1f", 0x0000, 0x0117, CRC(9192d57a) SHA1(5f36db93b6083767f93aa3a0e4bc2d4fc7e27f9c) )
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "1983_atari_136018_129.8m", 0x0000, 0x0100, CRC(550f06bc) SHA1(816a0fafa0b084ac11ae1af70a5186539376fc2a) )
+	ROM_LOAD( "1983_atari_136018_128.6m", 0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
+ROM_END
+
 /*
     Xevious Bootleg
 
@@ -3535,6 +3584,7 @@ GAME( 1982, xevious,   0,        xevious, xevious,  xevious_state, init_xevious,
 GAME( 1982, xeviousa,  xevious,  xevious, xeviousa, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari, harder)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, xeviousb,  xevious,  xevious, xeviousb, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, xeviousc,  xevious,  xevious, xeviousa, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari, Namco PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, xeviousd,  xevious,  xevious, xeviousa, xevious_state, init_xevious, ROT90,  "Namco (Atari license)", "Xevious (Atari, set 4)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, sxevious,  0,        xevious, sxevious, xevious_state, init_xevious, ROT90,  "Namco", "Super Xevious", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, sxeviousj, sxevious, xevious, sxevious, xevious_state, init_xevious, ROT90,  "Namco", "Super Xevious (Japan)", MACHINE_SUPPORTS_SAVE )

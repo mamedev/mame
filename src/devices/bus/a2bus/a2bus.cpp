@@ -20,7 +20,7 @@
     /INH  32  19  N.C.
     -12V  33  18  R/W
      -5V  34  17  A15
-    N.C.  35  16  A14
+    CREF  35  16  A14
       7M  36  15  A13
       Q3  37  14  A12
      PH1  38  13  A11
@@ -52,9 +52,17 @@
            it will cause bus contention.
     -12V - negative 12 volts DC power
      -5V - negative 5 volts DC power
+    CREF - 3.58 MHz color reference signal, only present on slot 7 of PAL models.
+           IIgs redefines this exclusively for slot 3 as M2B0, Mega II bank 0 select.
       7M - 7 MHz clock (1/4th of the master clock on the IIgs, 1/2 on 8-bit IIs)
       Q3 - 2 MHz asymmetrical clock
      PH1 - 6502 phase 1 clock
+  USER 1 - On the II and II+, this officially unspecified signal is tied to an unmarked jumper
+           pad that, if connected, disables /DEVSEL and /IOSEL for all slots when pulled low.
+           On the IIe, this is µPSYNC, output high by the 6502 during opcode fetch cycles.
+           On the IIgs, this is /M2SEL, output low when the 128K Mega II RAM area is accessed.
+     PH0 - 6502 phase 0 clock.  The phase 2 or E clock input required by 6800 or 6500 family
+           peripherals must be regenerated from this signal using additional logic.
  /DEVSEL - asserted on an access to C0nX, where n = the slot number plus 8.
    D0-D7 - 8-bit data bus
      +5V - 5 volts DC power
@@ -63,10 +71,25 @@
     /DMA - pulling this low disconnects the 6502 from the bus and halts it
      RDY - 6502 RDY input.  Pulling this low when PH1 is active will halt the
            6502 and latch the current address bus value.
-  /IOSTB - asserted on an access between C800 and CFFF.
+  /IOSTB - asserted on an access between C800 and CFFF.  To avoid contention,
+           all cards should relinquish the use of this space upon any access
+           to CFFF.
   A0-A15 - 16-bit address bus
   /IOSEL - asserted on accesses to CnXX where n is the slot number.
            Not present on slot 0.
+
+  Though most card firmwares are programmed to work in any slot from 1 to 7,
+  Apple II operating systems often associate slot numbers with particular
+  interface types.  Some of the conventional patterns are as follows:
+
+  - Slot 0 is reserved for a "language" RAM or firmware card (mapping its
+    memory by asserting /INH rather than using /IOSEL and /IOSTB).
+  - Slot 1 is standard for parallel or serial printer interfaces.
+  - Slot 2 can be used for generic parallel or serial I/O.
+  - Slot 3 is generally used by 80-column display interfaces.
+  - Slot 4 or Slot 7 may be used by Z80 coprocessor cards.
+  - Slot 5 may be a secondary disk controller.
+  - Slot 6 is normally occupied by the primary bootable disk controller.
 
 ***************************************************************************/
 

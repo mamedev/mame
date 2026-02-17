@@ -316,6 +316,9 @@ sound_stream::sound_stream(device_t &device, u32 inputs, u32 outputs, u32 sample
 	if(outputs == 0)
 		m_output_adaptive = false;
 
+	if(m_sample_rate && m_sample_rate < 1000)
+		fatalerror("Device %s requiring to create a stream with too low samplerate %d\n", device.tag(), m_sample_rate);
+
 	// create a name
 	m_name = m_device.name();
 	m_name += " '";
@@ -489,6 +492,9 @@ void sound_stream::internal_set_sample_rate(u32 new_rate)
 		return;
 
 	if(m_started) {
+		if(m_samples_to_update > 0)
+			fatalerror("Error: set_sample_rate called while in stream_update\n");
+
 		update();
 		m_output_buffer.resample(m_sample_rate, new_rate, m_sync_time, m_device.machine().time());
 		m_sample_rate = new_rate;
@@ -582,7 +588,7 @@ u64 sound_stream::get_current_sample_index() const
 
 void sound_stream::update()
 {
-	if(!is_active() || m_in_update || m_device.machine().phase() <= machine_phase::RESET)
+	if(!is_active() || m_in_update || m_device.machine().time().is_zero())
 		return;
 
 	// Find out where we are and how much we have to do
@@ -604,7 +610,7 @@ void sound_stream::update()
 
 void sound_stream::update_nodeps()
 {
-	if(!is_active() || m_in_update || m_device.machine().phase() <= machine_phase::RESET)
+	if(!is_active() || m_in_update || m_device.machine().time().is_zero())
 		return;
 
 	// Find out where we are and how much we have to do
@@ -2732,8 +2738,7 @@ void sound_manager::streams_update()
 	}
 
 	for(sound_stream *stream : m_ordered_streams)
-		if(stream->device().type() != SPEAKER)
-			stream->sync(now);
+		stream->sync(now);
 
 	for(osd_input_stream &stream : m_osd_input_streams)
 		stream.m_buffer.sync();
