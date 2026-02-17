@@ -285,14 +285,15 @@ uint32_t adsp21062_device::GET_UREG(int ureg)
 				case 0x9:   return m_core->irptl;         /* IRPTL */
 				case 0xa:   return m_core->mode2;         /* MODE2 */
 				case 0xb:   return m_core->mode1;         /* MODE1 */
-				case 0xc:                               /* ASTAT */
+				case 0xc:                                 /* ASTAT */
 				{
 					uint32_t r = m_core->astat;
-					r &= ~0x00780000;
-					r |= (m_core->flag[0] << 19);
-					r |= (m_core->flag[1] << 20);
-					r |= (m_core->flag[2] << 21);
-					r |= (m_core->flag[3] << 22);
+					r &= (BIT(m_core->mode2, 15, 4) << FLG0_SHIFT) | ~(FLG0 | FLG1 | FLG2 | FLG3);
+					for (unsigned i = 0; 4 > i; ++i)
+					{
+						if (!BIT(m_core->mode2, i + 15))
+							r |= m_core->flag[i] << (FLG0_SHIFT + i);
+					}
 					return r;
 				}
 				case 0xd:   return m_core->imask;         /* IMASK */
@@ -1181,8 +1182,9 @@ inline void adsp21062_device::POP_STATUS_STACK()
 
 	m_core->status_stkp--;
 
+	uint32_t const flags_mask = FLG0 | FLG1 | FLG2 | FLG3;
 	SET_UREG(REG_MODE1, m_core->status_stack[m_core->status_stkp].mode1);
-	SET_UREG(REG_ASTAT, m_core->status_stack[m_core->status_stkp].astat);
+	SET_UREG(REG_ASTAT, (m_core->astat & flags_mask) | (m_core->status_stack[m_core->status_stkp].astat & ~flags_mask));
 
 	if (m_core->status_stkp == 0)
 		m_core->stky |= SSEM;

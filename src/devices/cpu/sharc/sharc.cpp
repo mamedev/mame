@@ -17,6 +17,7 @@
 #include "endianness.h"
 
 #include <algorithm>
+#include <cstdio>
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -182,6 +183,32 @@ std::unique_ptr<util::disasm_interface> adsp21062_device::create_disassembler()
 {
 	return std::make_unique<sharc_disassembler>();
 }
+
+void adsp21062_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case SHARC_ASTAT:
+			if (m_enable_drc)
+				m_core->astat_drc.unpack(m_core->astat);
+			break;
+	}
+}
+
+void adsp21062_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case SHARC_ASTAT:
+			if (m_enable_drc)
+			{
+				uint32_t const flags_mask = FLG0 | FLG1 | FLG2 | FLG3;
+				m_core->astat = (m_core->astat & flags_mask) | m_core->astat_drc.pack();
+			}
+			break;
+	}
+}
+
 
 void adsp21062_device::enable_recompiler()
 {
@@ -508,19 +535,23 @@ void adsp21062_device::device_start()
 	assert(m_blocks[0].length() == m_blocks[1].length());
 	assert(!(m_blocks[0].length() & (m_blocks[0].length() - 1)));
 
-	m_cache.allocate_cache(mconfig().options().drc_rwx());
-	m_core = m_cache.alloc_near<sharc_internal_state>();
-	memset(m_core, 0, sizeof(sharc_internal_state));
-
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_DATA).specific(m_data);
 
 	if (!m_enable_drc)
 	{
+		m_heap_core = std::make_unique<sharc_internal_state>();
+		m_core = m_heap_core.get();
+		memset(m_core, 0, sizeof(sharc_internal_state));
+
 		build_opcode_table();
 	}
 	else
 	{
+		m_cache.allocate_cache(mconfig().options().drc_rwx());
+		m_core = m_cache.alloc_near<sharc_internal_state>();
+		memset(m_core, 0, sizeof(sharc_internal_state));
+
 		// init UML generator
 		uint32_t umlflags = 0;
 		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0);
@@ -529,22 +560,22 @@ void adsp21062_device::device_start()
 		m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
 		m_drcuml->symbol_add(&m_core->icount, sizeof(m_core->icount), "icount");
 
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; 16 > i; ++i)
 		{
 			char buf[10];
 
-			snprintf(buf, std::size(buf), "r%d", i);
+			std::snprintf(buf, std::size(buf), "r%d", i);
 			m_drcuml->symbol_add(&m_core->r[i], sizeof(m_core->r[i]), buf);
 
 			auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
-			snprintf(buf, std::size(buf), "dag_i%d", i);
-			m_drcuml->symbol_add(&dag.i[i & 7], sizeof(dag.i[i & 7]), buf);
-			snprintf(buf, std::size(buf), "dag_m%d", i);
-			m_drcuml->symbol_add(&dag.m[i & 7], sizeof(dag.m[i & 7]), buf);
-			snprintf(buf, std::size(buf), "dag_l%d", i);
-			m_drcuml->symbol_add(&dag.l[i & 7], sizeof(dag.l[i & 7]), buf);
-			snprintf(buf, std::size(buf), "dag_b%d", i);
-			m_drcuml->symbol_add(&dag.b[i & 7], sizeof(dag.b[i & 7]), buf);
+			std::snprintf(buf, std::size(buf), "dag_i%d", i);
+			m_drcuml->symbol_add(&dag.i[i & 7], sizeof(dag.i[i & 0x07]), buf);
+			std::snprintf(buf, std::size(buf), "dag_m%d", i);
+			m_drcuml->symbol_add(&dag.m[i & 7], sizeof(dag.m[i & 0x07]), buf);
+			std::snprintf(buf, std::size(buf), "dag_l%d", i);
+			m_drcuml->symbol_add(&dag.l[i & 7], sizeof(dag.l[i & 0x07]), buf);
+			std::snprintf(buf, std::size(buf), "dag_b%d", i);
+			m_drcuml->symbol_add(&dag.b[i & 7], sizeof(dag.b[i & 0x07]), buf);
 		}
 
 		m_drcuml->symbol_add(&m_core->astat, sizeof(m_core->astat), "astat");
@@ -808,7 +839,7 @@ void adsp21062_device::device_start()
 	state_add( SHARC_DADDR,  "DADDR", m_core->daddr).formatstr("%08X");
 	state_add( SHARC_MODE1,  "MODE1", m_core->mode1).formatstr("%08X");
 	state_add( SHARC_MODE2,  "MODE2", m_core->mode2).formatstr("%08X");
-	state_add( SHARC_ASTAT,  "ASTAT", m_core->astat).formatstr("%08X");
+	state_add( SHARC_ASTAT,  "ASTAT", m_core->astat).formatstr("%08X").callimport().callexport();
 	state_add( SHARC_IRPTL,  "IRPTL", m_core->irptl).formatstr("%08X");
 	state_add( SHARC_IMASK,  "IMASK", m_core->imask).formatstr("%08X");
 	state_add( SHARC_USTAT1, "USTAT1", m_core->ustat1).formatstr("%08X");
@@ -816,90 +847,36 @@ void adsp21062_device::device_start()
 	state_add( SHARC_CURLCNTR, "CURLCNTR", m_core->curlcntr).formatstr("%08X");
 	state_add( SHARC_STSTKP, "STSTKP", m_core->status_stkp).formatstr("%08X");
 
-	state_add( SHARC_R0,     "R0", m_core->r[0].r).formatstr("%08X");
-	state_add( SHARC_R1,     "R1", m_core->r[1].r).formatstr("%08X");
-	state_add( SHARC_R2,     "R2", m_core->r[2].r).formatstr("%08X");
-	state_add( SHARC_R3,     "R3", m_core->r[3].r).formatstr("%08X");
-	state_add( SHARC_R4,     "R4", m_core->r[4].r).formatstr("%08X");
-	state_add( SHARC_R5,     "R5", m_core->r[5].r).formatstr("%08X");
-	state_add( SHARC_R6,     "R6", m_core->r[6].r).formatstr("%08X");
-	state_add( SHARC_R7,     "R7", m_core->r[7].r).formatstr("%08X");
-	state_add( SHARC_R8,     "R8", m_core->r[8].r).formatstr("%08X");
-	state_add( SHARC_R9,     "R9", m_core->r[9].r).formatstr("%08X");
-	state_add( SHARC_R10,    "R10", m_core->r[10].r).formatstr("%08X");
-	state_add( SHARC_R11,    "R11", m_core->r[11].r).formatstr("%08X");
-	state_add( SHARC_R12,    "R12", m_core->r[12].r).formatstr("%08X");
-	state_add( SHARC_R13,    "R13", m_core->r[13].r).formatstr("%08X");
-	state_add( SHARC_R14,    "R14", m_core->r[14].r).formatstr("%08X");
-	state_add( SHARC_R15,    "R15", m_core->r[15].r).formatstr("%08X");
-
-	state_add( SHARC_I0,     "I0", m_core->dag1.i[0]).formatstr("%08X");
-	state_add( SHARC_I1,     "I1", m_core->dag1.i[1]).formatstr("%08X");
-	state_add( SHARC_I2,     "I2", m_core->dag1.i[2]).formatstr("%08X");
-	state_add( SHARC_I3,     "I3", m_core->dag1.i[3]).formatstr("%08X");
-	state_add( SHARC_I4,     "I4", m_core->dag1.i[4]).formatstr("%08X");
-	state_add( SHARC_I5,     "I5", m_core->dag1.i[5]).formatstr("%08X");
-	state_add( SHARC_I6,     "I6", m_core->dag1.i[6]).formatstr("%08X");
-	state_add( SHARC_I7,     "I7", m_core->dag1.i[7]).formatstr("%08X");
-	state_add( SHARC_I8,     "I8", m_core->dag2.i[0]).formatstr("%08X");
-	state_add( SHARC_I9,     "I9", m_core->dag2.i[1]).formatstr("%08X");
-	state_add( SHARC_I10,    "I10", m_core->dag2.i[2]).formatstr("%08X");
-	state_add( SHARC_I11,    "I11", m_core->dag2.i[3]).formatstr("%08X");
-	state_add( SHARC_I12,    "I12", m_core->dag2.i[4]).formatstr("%08X");
-	state_add( SHARC_I13,    "I13", m_core->dag2.i[5]).formatstr("%08X");
-	state_add( SHARC_I14,    "I14", m_core->dag2.i[6]).formatstr("%08X");
-	state_add( SHARC_I15,    "I15", m_core->dag2.i[7]).formatstr("%08X");
-
-	state_add( SHARC_M0,     "M0", m_core->dag1.m[0]).formatstr("%08X");
-	state_add( SHARC_M1,     "M1", m_core->dag1.m[1]).formatstr("%08X");
-	state_add( SHARC_M2,     "M2", m_core->dag1.m[2]).formatstr("%08X");
-	state_add( SHARC_M3,     "M3", m_core->dag1.m[3]).formatstr("%08X");
-	state_add( SHARC_M4,     "M4", m_core->dag1.m[4]).formatstr("%08X");
-	state_add( SHARC_M5,     "M5", m_core->dag1.m[5]).formatstr("%08X");
-	state_add( SHARC_M6,     "M6", m_core->dag1.m[6]).formatstr("%08X");
-	state_add( SHARC_M7,     "M7", m_core->dag1.m[7]).formatstr("%08X");
-	state_add( SHARC_M8,     "M8", m_core->dag2.m[0]).formatstr("%08X");
-	state_add( SHARC_M9,     "M9", m_core->dag2.m[1]).formatstr("%08X");
-	state_add( SHARC_M10,    "M10", m_core->dag2.m[2]).formatstr("%08X");
-	state_add( SHARC_M11,    "M11", m_core->dag2.m[3]).formatstr("%08X");
-	state_add( SHARC_M12,    "M12", m_core->dag2.m[4]).formatstr("%08X");
-	state_add( SHARC_M13,    "M13", m_core->dag2.m[5]).formatstr("%08X");
-	state_add( SHARC_M14,    "M14", m_core->dag2.m[6]).formatstr("%08X");
-	state_add( SHARC_M15,    "M15", m_core->dag2.m[7]).formatstr("%08X");
-
-	state_add( SHARC_L0,     "L0", m_core->dag1.l[0]).formatstr("%08X");
-	state_add( SHARC_L1,     "L1", m_core->dag1.l[1]).formatstr("%08X");
-	state_add( SHARC_L2,     "L2", m_core->dag1.l[2]).formatstr("%08X");
-	state_add( SHARC_L3,     "L3", m_core->dag1.l[3]).formatstr("%08X");
-	state_add( SHARC_L4,     "L4", m_core->dag1.l[4]).formatstr("%08X");
-	state_add( SHARC_L5,     "L5", m_core->dag1.l[5]).formatstr("%08X");
-	state_add( SHARC_L6,     "L6", m_core->dag1.l[6]).formatstr("%08X");
-	state_add( SHARC_L7,     "L7", m_core->dag1.l[7]).formatstr("%08X");
-	state_add( SHARC_L8,     "L8", m_core->dag2.l[0]).formatstr("%08X");
-	state_add( SHARC_L9,     "L9", m_core->dag2.l[1]).formatstr("%08X");
-	state_add( SHARC_L10,    "L10", m_core->dag2.l[2]).formatstr("%08X");
-	state_add( SHARC_L11,    "L11", m_core->dag2.l[3]).formatstr("%08X");
-	state_add( SHARC_L12,    "L12", m_core->dag2.l[4]).formatstr("%08X");
-	state_add( SHARC_L13,    "L13", m_core->dag2.l[5]).formatstr("%08X");
-	state_add( SHARC_L14,    "L14", m_core->dag2.l[6]).formatstr("%08X");
-	state_add( SHARC_L15,    "L15", m_core->dag2.l[7]).formatstr("%08X");
-
-	state_add( SHARC_B0,     "B0", m_core->dag1.b[0]).formatstr("%08X");
-	state_add( SHARC_B1,     "B1", m_core->dag1.b[1]).formatstr("%08X");
-	state_add( SHARC_B2,     "B2", m_core->dag1.b[2]).formatstr("%08X");
-	state_add( SHARC_B3,     "B3", m_core->dag1.b[3]).formatstr("%08X");
-	state_add( SHARC_B4,     "B4", m_core->dag1.b[4]).formatstr("%08X");
-	state_add( SHARC_B5,     "B5", m_core->dag1.b[5]).formatstr("%08X");
-	state_add( SHARC_B6,     "B6", m_core->dag1.b[6]).formatstr("%08X");
-	state_add( SHARC_B7,     "B7", m_core->dag1.b[7]).formatstr("%08X");
-	state_add( SHARC_B8,     "B8", m_core->dag2.b[0]).formatstr("%08X");
-	state_add( SHARC_B9,     "B9", m_core->dag2.b[1]).formatstr("%08X");
-	state_add( SHARC_B10,    "B10", m_core->dag2.b[2]).formatstr("%08X");
-	state_add( SHARC_B11,    "B11", m_core->dag2.b[3]).formatstr("%08X");
-	state_add( SHARC_B12,    "B12", m_core->dag2.b[4]).formatstr("%08X");
-	state_add( SHARC_B13,    "B13", m_core->dag2.b[5]).formatstr("%08X");
-	state_add( SHARC_B14,    "B14", m_core->dag2.b[6]).formatstr("%08X");
-	state_add( SHARC_B15,    "B15", m_core->dag2.b[7]).formatstr("%08X");
+	char namebuf[8];
+	for (int i = 0; 16 > i; ++i)
+	{
+		std::snprintf(namebuf, std::size(namebuf), "R%d", i);
+		state_add(SHARC_R0 + i, namebuf, m_core->r[i].r).formatstr("%08X");
+	}
+	for (int i = 0; 16 > i; ++i)
+	{
+		std::snprintf(namebuf, std::size(namebuf), "I%d", i);
+		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
+		state_add(SHARC_I0 + i, namebuf, dag.i[i]).formatstr("%08X");
+	}
+	for (int i = 0; 16 > i; ++i)
+	{
+		std::snprintf(namebuf, std::size(namebuf), "M%d", i);
+		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
+		state_add(SHARC_M0 + i, namebuf, dag.m[i]).formatstr("%08X");
+	}
+	for (int i = 0; 16 > i; ++i)
+	{
+		std::snprintf(namebuf, std::size(namebuf), "L%d", i);
+		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
+		state_add(SHARC_L0 + i, namebuf, dag.l[i]).formatstr("%08X");
+	}
+	for (int i = 0; 16 > i; ++i)
+	{
+		std::snprintf(namebuf, std::size(namebuf), "B%d", i);
+		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
+		state_add(SHARC_B0 + i, namebuf, dag.b[i]).formatstr("%08X");
+	}
 
 	state_add( STATE_GENPC, "GENPC", m_core->pc).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
@@ -1004,7 +981,7 @@ void adsp21062_device::device_pre_save()
 
 	if (m_enable_drc)
 	{
-		m_core->astat = m_core->astat_drc.pack();
+		m_core->astat = (m_core->astat & (FLG0 | FLG1 | FLG2 | FLG3)) | m_core->astat_drc.pack();
 		m_core->astat_old = m_core->astat_drc_copy.pack();
 		m_core->astat_old_old = m_core->astat_delay_copy.pack();
 	}
@@ -1086,7 +1063,7 @@ void adsp21062_device::set_flag_input(int flag_num, int state)
 	if (flag_num >= 0 && flag_num < 4)
 	{
 		// Check if flag is set to input in MODE2 (bit == 0)
-		if ((m_core->mode2 & (1 << (flag_num+15))) == 0)
+		if (!BIT(m_core->mode2, flag_num + 15))
 		{
 			m_core->flag[flag_num] = state ? 1 : 0;
 		}

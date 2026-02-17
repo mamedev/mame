@@ -641,21 +641,21 @@ void adsp21062_device::static_generate_push_status()
 
 	UML_STORE(block, &m_core->status_stack[0].mode1 - 2, I2, MODE1, SIZE_DWORD, SCALE_x8);
 	UML_SHL(block, I0, mem(&m_core->astat_drc.cacc), 24);
-	UML_ROLINS(block, I0, ASTAT_AF, AF_SHIFT, 1 << AF_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_BTF, BTF_SHIFT, 1 << BTF_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_SS, SS_SHIFT, 1 << SS_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_SZ, SZ_SHIFT, 1 << SZ_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_SV, SV_SHIFT, 1 << SV_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_MI, MI_SHIFT, 1 << MI_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_MU, MU_SHIFT, 1 << MU_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_MV, MV_SHIFT, 1 << MV_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_MN, MN_SHIFT, 1 << MN_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_AI, AI_SHIFT, 1 << AI_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_AS, AS_SHIFT, 1 << AS_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_AC, AC_SHIFT, 1 << AC_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_AN, AN_SHIFT, 1 << AN_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_AV, AV_SHIFT, 1 << AV_SHIFT);
-	UML_ROLINS(block, I0, ASTAT_AZ, AZ_SHIFT, 1 << AZ_SHIFT);
+	UML_ROLINS(block, I0, ASTAT_AF, AF_SHIFT, AF);
+	UML_ROLINS(block, I0, ASTAT_BTF, BTF_SHIFT, BTF);
+	UML_ROLINS(block, I0, ASTAT_SS, SS_SHIFT, SS);
+	UML_ROLINS(block, I0, ASTAT_SZ, SZ_SHIFT, SZ);
+	UML_ROLINS(block, I0, ASTAT_SV, SV_SHIFT, SV);
+	UML_ROLINS(block, I0, ASTAT_MI, MI_SHIFT, MI);
+	UML_ROLINS(block, I0, ASTAT_MU, MU_SHIFT, MU);
+	UML_ROLINS(block, I0, ASTAT_MV, MV_SHIFT, MV);
+	UML_ROLINS(block, I0, ASTAT_MN, MN_SHIFT, MN);
+	UML_ROLINS(block, I0, ASTAT_AI, AI_SHIFT, AI);
+	UML_ROLINS(block, I0, ASTAT_AS, AS_SHIFT, AS);
+	UML_ROLINS(block, I0, ASTAT_AC, AC_SHIFT, AC);
+	UML_ROLINS(block, I0, ASTAT_AN, AN_SHIFT, AN);
+	UML_ROLINS(block, I0, ASTAT_AV, AV_SHIFT, AV);
+	UML_ROLINS(block, I0, ASTAT_AZ, AZ_SHIFT, AZ);
 	UML_STORE(block, &m_core->status_stack[0].astat - 2, I2, I0, SIZE_DWORD, SCALE_x8);
 
 	UML_RET(block);
@@ -1930,91 +1930,54 @@ void adsp21062_device::generate_read_ureg(drcuml_block &block, compiler_state &c
 			if (!has_compute)
 			{
 				// no compute, just read normally from ASTAT
-				UML_MOV(block, I0, 0);
-				UML_OR(block, I0, I0, ASTAT_AZ);
-				UML_SHL(block, I1, ASTAT_AV, 1);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_AN, 2);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_AC, 3);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_AS, 4);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_AI, 5);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_MN, 6);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_MV, 7);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_MU, 8);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_MI, 9);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_AF, 10);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_SV, 11);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_SZ, 12);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_SS, 13);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, ASTAT_BTF, 18);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, FLAG0, 19);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, FLAG1, 20);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, FLAG2, 21);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, FLAG3, 22);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc.cacc), 24);
-				UML_OR(block, I0, I0, I1);
+				UML_SHL(block, I0, mem(&m_core->astat_drc.cacc), 24);
+				UML_ROLINS(block, I0, ASTAT_AF, AF_SHIFT, AF);
+				UML_ROLINS(block, I0, ASTAT_BTF, BTF_SHIFT, BTF);
+				UML_ROLINS(block, I0, ASTAT_SS, SS_SHIFT, SS);
+				UML_ROLINS(block, I0, ASTAT_SZ, SZ_SHIFT, SZ);
+				UML_ROLINS(block, I0, ASTAT_SV, SV_SHIFT, SV);
+				UML_ROLINS(block, I0, ASTAT_MI, MI_SHIFT, MI);
+				UML_ROLINS(block, I0, ASTAT_MU, MU_SHIFT, MU);
+				UML_ROLINS(block, I0, ASTAT_MV, MV_SHIFT, MV);
+				UML_ROLINS(block, I0, ASTAT_MN, MN_SHIFT, MN);
+				UML_ROLINS(block, I0, ASTAT_AI, AI_SHIFT, AI);
+				UML_ROLINS(block, I0, ASTAT_AS, AS_SHIFT, AS);
+				UML_ROLINS(block, I0, ASTAT_AC, AC_SHIFT, AC);
+				UML_ROLINS(block, I0, ASTAT_AN, AN_SHIFT, AN);
+				UML_ROLINS(block, I0, ASTAT_AV, AV_SHIFT, AV);
+				UML_ROLINS(block, I0, ASTAT_AZ, AZ_SHIFT, AZ);
 			}
 			else
 			{
 				// read from ASTAT copy if this opcode also does compute
-				UML_MOV(block, I0, 0);
-				UML_OR(block, I0, I0, mem(&m_core->astat_drc_copy.az));
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.av), 1);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.an), 2);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.ac), 3);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.as), 4);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.ai), 5);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.mn), 6);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.mv), 7);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.mu), 8);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.mi), 9);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.af), 10);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.sv), 11);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.sz), 12);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.ss), 13);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.btf), 18);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, FLAG0, 19);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, FLAG1, 20);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, FLAG2, 21);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, FLAG3, 22);
-				UML_OR(block, I0, I0, I1);
-				UML_SHL(block, I1, mem(&m_core->astat_drc_copy.cacc), 24);
-				UML_OR(block, I0, I0, I1);
+				UML_SHL(block, I0, mem(&m_core->astat_drc_copy.cacc), 24);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.af), AF_SHIFT, AF);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.btf), BTF_SHIFT, BTF);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.ss), SS_SHIFT, SS);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.sz), SZ_SHIFT, SZ);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.sv), SV_SHIFT, SV);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.mi), MI_SHIFT, MI);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.mu), MU_SHIFT, MU);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.mv), MV_SHIFT, MV);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.mn), MN_SHIFT, MN);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.ai), AI_SHIFT, AI);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.as), AS_SHIFT, AS);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.ac), AC_SHIFT, AC);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.an), AN_SHIFT, AN);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.av), AV_SHIFT, AV);
+				UML_ROLINS(block, I0, mem(&m_core->astat_drc_copy.az), AZ_SHIFT, AZ);
 			}
+			// copy flags depending whether they're inputs or outputs
+			UML_ROLAND(block, I2, MODE2, FLG0_SHIFT - 15, FLG0 | FLG1 | FLG2 | FLG3);
+			UML_AND(block, I1, I2, mem(&m_core->astat));
+			UML_OR(block, I0, I0, I1);
+			UML_ROLAND(block, I1, FLAG0, FLG0_SHIFT, FLG0);
+			UML_ROLINS(block, I1, FLAG1, FLG1_SHIFT, FLG1);
+			UML_ROLINS(block, I1, FLAG2, FLG2_SHIFT, FLG2);
+			UML_ROLINS(block, I1, FLAG3, FLG3_SHIFT, FLG3);
+			UML_XOR(block, I2, I2, FLG0 | FLG1 | FLG2 | FLG3);
+			UML_AND(block, I1, I1, I2);
+			UML_OR(block, I0, I0, I1);
 			break;
 		case 0x7d:      // IMASK
 			UML_MOV(block, I0, mem(&m_core->imask));
@@ -2207,8 +2170,23 @@ void adsp21062_device::generate_write_ureg(drcuml_block &block, compiler_state &
 			}
 			break;
 		case 0x7c:      // ASTAT
-			// TODO: needs bit break up
-			fatalerror("generate_write_ureg: ASTAT");
+			UML_AND(block, mem(&m_core->astat), I0, FLG0 | FLG1 | FLG2 | FLG3);
+			UML_BFXU(block, mem(&m_core->astat_drc.cacc), I0, 24, 8);
+			UML_BFXU(block, ASTAT_AF, I0, AF_SHIFT, 1);
+			UML_BFXU(block, ASTAT_BTF, I0, BTF_SHIFT, 1);
+			UML_BFXU(block, ASTAT_SS, I0, SS_SHIFT, 1);
+			UML_BFXU(block, ASTAT_SZ, I0, SZ_SHIFT, 1);
+			UML_BFXU(block, ASTAT_SV, I0, SV_SHIFT, 1);
+			UML_BFXU(block, ASTAT_MI, I0, MI_SHIFT, 1);
+			UML_BFXU(block, ASTAT_MU, I0, MU_SHIFT, 1);
+			UML_BFXU(block, ASTAT_MV, I0, MV_SHIFT, 1);
+			UML_BFXU(block, ASTAT_MN, I0, MN_SHIFT, 1);
+			UML_BFXU(block, ASTAT_AI, I0, AI_SHIFT, 1);
+			UML_BFXU(block, ASTAT_AS, I0, AS_SHIFT, 1);
+			UML_BFXU(block, ASTAT_AC, I0, AC_SHIFT, 1);
+			UML_BFXU(block, ASTAT_AN, I0, AN_SHIFT, 1);
+			UML_BFXU(block, ASTAT_AV, I0, AV_SHIFT, 1);
+			UML_BFXU(block, ASTAT_AZ, I0, AZ_SHIFT, 1);
 			break;
 		case 0x7d:      // IMASK
 			UML_MOV(block, mem(&m_core->imask), imm ? data : I0);

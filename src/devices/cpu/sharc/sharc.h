@@ -145,6 +145,10 @@ protected:
 	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
+	// device_state_interface implementation
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
+
 	void pgm_2m(address_map &map) ATTR_COLD;
 	void pgm_4m(address_map &map) ATTR_COLD;
 	void data_2m(address_map &map) ATTR_COLD;
@@ -298,6 +302,7 @@ private:
 
 	opcode_func m_sharc_op[512];
 
+	std::unique_ptr<sharc_internal_state> m_heap_core;
 	bool m_enable_drc;
 
 	inline void CHANGE_PC(uint32_t newpc);
