@@ -60,7 +60,7 @@ void it8705f_device::device_start()
 	m_isa->set_dma_channel(1, this, true);
 	m_isa->set_dma_channel(2, this, true);
 	m_isa->set_dma_channel(3, this, true);
-	save_pointer(NAME(m_activate), 9);
+	save_item(NAME(m_activate));
 }
 
 void it8705f_device::device_reset()

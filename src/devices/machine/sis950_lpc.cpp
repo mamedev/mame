@@ -129,7 +129,7 @@ void sis950_lpc_device::device_add_mconfig(machine_config &config)
 	m_pit->set_clk<2>(lpc_pit_clock / 12);
 	m_pit->out_handler<2>().set(FUNC(sis950_lpc_device::pit_out2));
 
-	// TODO: unknown part #
+	// TODO: unknown part # and clock (perhaps too fast?)
 	AM9517A(config, m_dmac_master, lpc_pit_clock / 3);
 	m_dmac_master->out_hreq_callback().set(m_dmac_slave, FUNC(am9517a_device::dreq0_w));
 	m_dmac_master->out_eop_callback().set(FUNC(sis950_lpc_device::at_dma8237_out_eop));

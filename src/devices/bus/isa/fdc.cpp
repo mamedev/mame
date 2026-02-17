@@ -103,6 +103,7 @@ void isa8_upd765_fdc_device::device_start()
 void isa8_upd765_fdc_device::device_reset()
 {
 	dor_w(0x00);
+	remap(AS_IO, 0, 0xffff);
 }
 
 // Bits 0-1 select one of the 4 drives, but only if the associated
@@ -204,10 +205,17 @@ void isa8_fdc_xt_device::device_add_mconfig(machine_config &config)
 void isa8_fdc_xt_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x03f0, 0x03f7, *this, &isa8_fdc_xt_device::map);
 	m_isa->set_dma_channel(2, this, true);
 
 	isa8_upd765_fdc_device::device_start();
+}
+
+void isa8_fdc_xt_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x03f0, 0x03f7, *this, &isa8_fdc_xt_device::map);
+	}
 }
 
 // The schematics show address decoding is minimal
@@ -251,10 +259,17 @@ void isa8_fdc_at_device::map(address_map &map)
 void isa8_fdc_at_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x03f0, 0x03f7, *this, &isa8_fdc_at_device::map);
 	m_isa->set_dma_channel(2, this, true);
 
 	isa8_upd765_fdc_device::device_start();
+}
+
+void isa8_fdc_at_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x03f0, 0x03f7, *this, &isa8_fdc_at_device::map);
+	}
 }
 
 isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_SMC, tag, owner, clock)
@@ -273,8 +288,15 @@ void isa8_fdc_smc_device::device_add_mconfig(machine_config &config)
 void isa8_fdc_smc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x03f0, 0x03f7, downcast<smc37c78_device &>(*m_fdc), &smc37c78_device::map);
 	m_isa->set_dma_channel(2, this, true);
+}
+
+void isa8_fdc_smc_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x03f0, 0x03f7, downcast<smc37c78_device &>(*m_fdc), &smc37c78_device::map);
+	}
 }
 
 isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_PS2, tag, owner, clock)
@@ -294,8 +316,15 @@ void isa8_fdc_ps2_device::device_add_mconfig(machine_config &config)
 void isa8_fdc_ps2_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x03f0, 0x03f7, downcast<n82077aa_device &>(*m_fdc), &n82077aa_device::map);
 	m_isa->set_dma_channel(2, this, true);
+}
+
+void isa8_fdc_ps2_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x03f0, 0x03f7, downcast<n82077aa_device &>(*m_fdc), &n82077aa_device::map);
+	}
 }
 
 isa8_fdc_superio_device::isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_SUPERIO, tag, owner, clock)
@@ -314,8 +343,15 @@ void isa8_fdc_superio_device::device_add_mconfig(machine_config &config)
 void isa8_fdc_superio_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x03f0, 0x03f7, downcast<pc_fdc_superio_device &>(*m_fdc), &pc_fdc_superio_device::map);
 	m_isa->set_dma_channel(2, this, true);
+}
+
+void isa8_fdc_superio_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x03f0, 0x03f7, downcast<pc_fdc_superio_device &>(*m_fdc), &pc_fdc_superio_device::map);
+	}
 }
 
 isa8_ec1841_0003_device::isa8_ec1841_0003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -327,8 +363,17 @@ isa8_ec1841_0003_device::isa8_ec1841_0003_device(const machine_config &mconfig, 
 void isa8_ec1841_0003_device::device_start()
 {
 	isa8_fdc_xt_device::device_start();
-	m_isa->install_device(0x023c, 0x023f, *m_bus_mouse, &bus_mouse_device::map);
 }
+
+void isa8_ec1841_0003_device::remap(int space_id, offs_t start, offs_t end)
+{
+	isa8_fdc_xt_device::remap(space_id, start, end);
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x023c, 0x023f, *m_bus_mouse, &bus_mouse_device::map);
+	}
+}
+
 
 void isa8_ec1841_0003_device::device_add_mconfig(machine_config &config)
 {

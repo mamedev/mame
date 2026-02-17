@@ -20,7 +20,6 @@
 //**************************************************************************
 
 // ======================> isa8_fdc_device
-
 class isa8_fdc_device :
 	public device_t,
 	public device_isa8_card_interface
@@ -80,6 +79,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	void map(address_map &map) ATTR_COLD;
 	void dor_fifo_w(uint8_t data);
@@ -93,6 +93,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	void map(address_map &map) ATTR_COLD;
 };
@@ -105,6 +106,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 };
 
 class isa8_fdc_ps2_device : public isa8_fdc_device {
@@ -115,6 +117,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 };
 
 class isa8_fdc_superio_device : public isa8_fdc_device {
@@ -125,6 +128,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 };
 
 class isa8_ec1841_0003_device : public isa8_fdc_xt_device {
@@ -132,8 +136,9 @@ public:
 	isa8_ec1841_0003_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	required_device<bus_mouse_device> m_bus_mouse;
 };
