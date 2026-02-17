@@ -8,7 +8,7 @@ Main components:
 
 HD647180 (undumped internal ROM)
 12 MHz XTAL
-HM6264P-15 (with a second unpopulated socket)
+HM6264P-15 (with a second unpopulated socket - possibly removed)
 4x scratched off chip (I8255?)
 YM2203C
 3x bank of 8 switches
