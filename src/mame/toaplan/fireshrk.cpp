@@ -8,6 +8,7 @@
         Technical info: Carl-Henrik Skarstedt  &  Magnus Danielsson
         Driver updates: Quench
         Video updates : SUZ
+        Driven from toaplan/toaplan1.cpp
 
 
 Hardware info by Guru

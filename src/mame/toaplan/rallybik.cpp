@@ -8,7 +8,7 @@
         Technical info: Carl-Henrik Skarstedt  &  Magnus Danielsson
         Driver updates: Quench
         Video updates : SUZ
-		Driven from toaplan/toaplan1.cpp
+        Driven from toaplan/toaplan1.cpp
 
 
 Supported games:
