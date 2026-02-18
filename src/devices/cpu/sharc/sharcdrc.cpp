@@ -1130,6 +1130,12 @@ void adsp21062_device::static_generate_mode1_ops()
 
 void adsp21062_device::execute_run_drc()
 {
+	if (m_core->write_stalled)
+	{
+		m_core->icount = 0;
+		return;
+	}
+
 	// reset the cache if dirty
 	if (m_core->cache_dirty)
 	{

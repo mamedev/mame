@@ -1130,13 +1130,24 @@ TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_update_inputs)
 
 	if (m_write_stalled_pending)
 	{
-		m_core->write_stalled = m_write_stalled_pending_val;
-		if (m_enable_drc)
+		if (m_core->write_stalled != m_write_stalled_pending_val)
 		{
-			if (m_core->write_stalled)
-				spin_until_trigger(45757);
-			else
-				machine().scheduler().trigger(45757);
+			m_core->write_stalled = m_write_stalled_pending_val;
+			if (m_enable_drc)
+			{
+				if (m_core->write_stalled)
+				{
+					m_core->dma_op[6].timer->adjust(attotime::never, 0);
+					m_core->dma_op[7].timer->adjust(attotime::never, 0);
+				}
+				else
+				{
+					if (m_core->dma_status & (1 << 6))
+						m_core->dma_op[6].timer->adjust(cycles_to_attotime(m_core->dma_op[6].src_count / 4), 6);
+					if (m_core->dma_status & (1 << 7))
+						m_core->dma_op[7].timer->adjust(cycles_to_attotime(m_core->dma_op[7].src_count / 4), 7);
+				}
+			}
 		}
 		m_write_stalled_pending = false;
 	}
@@ -1202,7 +1213,7 @@ void adsp21062_device::execute_run()
 			int dma_count = m_core->icount;
 
 			// run active DMAs even while idling
-			while (dma_count > 0 && m_core->dma_status & ((1 << 6) | (1 << 7)))
+			while ((dma_count > 0) && (m_core->dma_status & ((1 << 6) | (1 << 7))))
 			{
 				if (!m_core->write_stalled)
 				{
