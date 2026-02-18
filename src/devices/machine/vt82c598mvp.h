@@ -32,7 +32,7 @@ protected:
 	virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
-   	virtual void config_map(address_map &map) override ATTR_COLD;
+	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_host_cpu;
@@ -77,8 +77,42 @@ private:
 	u8 m_agp_control;
 };
 
-// TODO: bridge
+class vt82c598mvp_bridge_device : public pci_bridge_device
+{
+public:
+	/*template <typename T> vt82c598mvp_bridge_device(
+	    const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock,
+	    T &&gui_tag
+	) : vt82c598mvp_bridge_device(mconfig, tag, owner, clock)
+	{
+	    set_ids_bridge(xxxxxxxx, 0x00);
+	    //set_multifunction_device(true);
+	    //m_vga.set_tag(std::forward<T>(gui_tag));
+	}*/
 
-DECLARE_DEVICE_TYPE(VT82C598MVP_HOST, vt82c598mvp_host_device)
+	vt82c598mvp_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	//vt82c598mvp_bridge_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+//  virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+//                         uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
+
+	virtual void config_map(address_map &map) override ATTR_COLD;
+private:
+	//required_device<sis630_gui_device> m_vga;
+
+	//virtual void bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
+
+	u8 m_pci2_flow_control[2];
+	u8 m_pci2_master_control;
+};
+
+
+DECLARE_DEVICE_TYPE(VT82C598MVP_HOST,   vt82c598mvp_host_device)
+DECLARE_DEVICE_TYPE(VT82C598MVP_BRIDGE, vt82c598mvp_bridge_device)
 
 #endif // MAME_MACHINE_VT82C598MVP_H

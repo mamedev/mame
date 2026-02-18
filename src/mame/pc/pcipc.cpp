@@ -755,8 +755,8 @@ void pcipc_state::se440bx2(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-//	i82371eb_acpi_device &acpi(I82371EB_ACPI(config, "pci:07.3", 0));
-//	acpi.apmc_en().set("pci:07.0", FUNC(i82371eb_isa_device::apmc_en_w));
+//  i82371eb_acpi_device &acpi(I82371EB_ACPI(config, "pci:07.3", 0));
+//  acpi.apmc_en().set("pci:07.0", FUNC(i82371eb_isa_device::apmc_en_w));
 	ACPI_PIIX4   (config, "pci:07.3:acpi", 0);
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
@@ -779,7 +779,7 @@ void pcipc_state::se440bx2(machine_config &config)
 	serport1.cts_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::ncts2_w));
 
 	// FIXME: int mapping is unchecked for all slots
-	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "laguna3d");
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "laguna3d");
 
 	// TODO: 0c is for YMF740 audio
 	PCI_SLOT(config, "pci:1", pci_cards, 13, 0, 1, 2, 3, nullptr);

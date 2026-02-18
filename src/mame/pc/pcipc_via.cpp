@@ -101,14 +101,17 @@ void mvp3_state::mvp3(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 	// Max 768 MB
 	VT82C598MVP_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
+	VT82C598MVP_BRIDGE(config, "pci:01.0", 0 );
 
 	vt82c586b_isa_device &isa(VT82C586B_ISA(config, "pci:07.0", XTAL(33'000'000), m_maincpu));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
-//	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+//  isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
 	// TODO: IDE, USB, ACPI
 
-	// TODO: 1 AGP slot, 4 PCI slots
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "sis6326_agp");
+
+	// TODO: 4 PCI slots
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8661f", true).set_option_machine_config("it8661f", ite_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);

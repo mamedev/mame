@@ -14,7 +14,7 @@
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VT82C598MVP_HOST, vt82c598mvp_host_device, "vt82c598mvp_host", "Via VT82C598MVP \"Apollo MVP3\"")
+DEFINE_DEVICE_TYPE(VT82C598MVP_HOST, vt82c598mvp_host_device, "vt82c598mvp_host", "Via VT82C598MVP \"Apollo MVP3\" Host")
 
 vt82c598mvp_host_device::vt82c598mvp_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, VT82C598MVP_HOST, tag, owner, clock)
@@ -36,7 +36,7 @@ void vt82c598mvp_host_device::device_start()
 
 	m_ram.resize(m_ram_size/4);
 	// TODO: special, uses register 84h to define the size
-//	add_map(256 * 1024 * 1024, M_MEM | M_PREF, FUNC(vt82c598mvp_host_device::aperture_map));
+//  add_map(256 * 1024 * 1024, M_MEM | M_PREF, FUNC(vt82c598mvp_host_device::aperture_map));
 
 	save_item(NAME(m_cache_control_1));
 	save_item(NAME(m_cache_control_2));
@@ -458,3 +458,62 @@ void vt82c598mvp_host_device::map_extra(
 
 }
 
+/*
+ *
+ * VT82C598MVP Bridge section
+ *
+ */
+
+DEFINE_DEVICE_TYPE(VT82C598MVP_BRIDGE, vt82c598mvp_bridge_device, "vt82c598mvp_bridge", "Via VT82C598MVP \"Apollo MVP3\" PCI-to-PCI Bridge")
+
+vt82c598mvp_bridge_device::vt82c598mvp_bridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pci_bridge_device(mconfig, VT82C598MVP_BRIDGE, tag, owner, clock)
+//  , m_vga(*this, finder_base::DUMMY_TAG)
+{
+	set_ids_bridge(0x11068598, 0x00);
+}
+
+void vt82c598mvp_bridge_device::device_start()
+{
+	pci_bridge_device::device_start();
+
+	save_item(NAME(m_pci2_flow_control));
+	save_item(NAME(m_pci2_master_control));
+}
+
+void vt82c598mvp_bridge_device::device_reset()
+{
+	pci_bridge_device::device_reset();
+
+	std::fill(std::begin(m_pci2_flow_control), std::end(m_pci2_flow_control), 0);
+	m_pci2_master_control = 0;
+}
+
+void vt82c598mvp_bridge_device::config_map(address_map &map)
+{
+	pci_bridge_device::config_map(map);
+	map(0x40, 0x40).lrw8(
+		NAME([this] () { return m_pci2_flow_control[0]; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pci2_flow_control[0] = data;
+			LOG("40h: CPU-to-PCI#2 Flow Control 1 %02x\n", data);
+		})
+	);
+	map(0x41, 0x41).lrw8(
+		NAME([this] () { return m_pci2_flow_control[1]; }),
+		NAME([this] (offs_t offset, u8 data) {
+			if (BIT(data, 7))
+				m_pci2_flow_control[1] &= ~(1 << 7);
+			m_pci2_flow_control[1] &= ~0x7e;
+			m_pci2_flow_control[1] |= (data & 0x7e);
+			LOG("41h: CPU-to-PCI#2 Flow Control 2 %02x -> %02x\n", data, m_pci2_flow_control[1]);
+		})
+	);
+	map(0x42, 0x42).lrw8(
+		NAME([this] () { return m_pci2_master_control; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pci2_master_control = data;
+			LOG("42h: CPU-to-PCI#2 Master Control %02x\n", data);
+		})
+	);
+}

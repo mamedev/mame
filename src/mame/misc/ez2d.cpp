@@ -187,7 +187,7 @@ void ez2d_state::cubx(machine_config &config)
 	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
 #endif
 
-	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "rivatnt").set_fixed(true);
 }
 
 void ez2d_state::ez2d(machine_config &config)

@@ -13,9 +13,15 @@ TODO:
 - In pcipc with a manually rebuilt image will throw an exception in "Internat" module once it loads
   Windows 98 (and installs the diff drivers);
 
+Notes:
+- Game is in cob folder (as "cobdemo.exe"), said folder also has a EEP.ROM that probably needs to
+  be removed;
+- Recycled bin has plenty of .vue and .3ds files;
+
 ===================================================================================================
 
-  There also appears to be a sequel which may be running on the same hardware, but which does not seem to have been released.
+  There also appears to be a sequel which may be running on the same hardware, but which does
+  not seem to have been released.
   Come On Baby - Ballympic Heroes!  (c) 2001
 
   Other games in this series include:
@@ -319,7 +325,7 @@ void comebaby_state::comebaby(machine_config &config)
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
 	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_3_pci_device::screen_update));
 #else
-	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "rivatnt").set_fixed(true);
 #endif
 	PCI_SLOT(config, "pci:1", pci_cards, 13, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 14, 1, 2, 3, 0, nullptr);
@@ -350,7 +356,7 @@ ROM_START(comebaby)
 	ROM_LOAD("b1120iag.bin", 0x000000, 0x40000, CRC(9b6f95f1) SHA1(65d6a2fea9911593f093b2e2a43d1534b54d60b3) )
 
 	DISK_REGION( "pci:07.1:ide1:0:hdd" )
-//	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
+//  DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
 	// rebuilt image with -chs 16383,16,63
 	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(85ced9e63dd10ef39449d3ea997b2200aa06562d) )
 ROM_END

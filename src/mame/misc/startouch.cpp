@@ -17,7 +17,7 @@ MB Soyo SY-5EH5 or similar (e.g. Biostar M5ATD)
 16384 KB RAM
 Intel Pentium MMX 233 MHz or compatible (e.g. Cyrix M II-300GP 66MHz Bus 3.5x 2.9V)
 
-- Soyo SY-5EH5 uses a VIA Apollo MVP3 chipset with VT82C597 + VT82C586B
+- Soyo SY-5EH5 uses a VIA Apollo MVP3 chipset with VT82C598 + VT82C586B
 - Biostar M5ATD uses an ALi ALADDiN IV+ M1531B + M1543
 
 MicroTouch ISA
