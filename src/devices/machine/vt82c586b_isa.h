@@ -38,11 +38,22 @@ public:
 	vt82c586b_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto boot_state_hook() { return m_boot_state_hook.bind(); }
+	auto a20m() { return m_write_a20m.bind(); }
+	auto cpureset() { return m_write_cpureset.bind(); }
 
 	void pc_irq1_w(int state);
 	void pc_irq8n_w(int state);
+	// TODO: remaps externally for IDE, cfr. config $4a
 	void pc_irq14_w(int state);
 	void pc_irq15_w(int state);
+
+	void pc_pirqa_w(int state);
+	void pc_pirqb_w(int state);
+	void pc_pirqc_w(int state);
+	void pc_pirqd_w(int state);
+	void pc_mirq0_w(int state);
+	void pc_mirq1_w(int state);
+	void pc_mirq2_w(int state);
 
 	template <typename T> void set_cpu_tag(T &&tag) { m_host_cpu.set_tag(std::forward<T>(tag)); }
 
@@ -61,8 +72,6 @@ protected:
 	void internal_io_map(address_map &map) ATTR_COLD;
 
 private:
-	devcb_write8 m_boot_state_hook;
-
 	required_device<cpu_device> m_host_cpu;
 	required_device_array<pic8259_device, 2> m_pic;
 	required_device_array<am9517a_device, 2> m_dma;
@@ -73,16 +82,37 @@ private:
 	required_device<ds12885ext_device> m_rtc;
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
+	devcb_write_line m_write_a20m;
+	devcb_write_line m_write_cpureset;
+	devcb_write8 m_boot_state_hook;
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 
+	u8 m_isa_bus_control;
+	u8 m_isa_test_mode;
+	u8 m_isa_clock_control;
+	u8 m_rom_decode_control;
+	u8 m_keybc_control;
+	u8 m_dma_control_typef;
+	u8 m_misc_control[3];
+	u8 m_ide_irq_routing;
+	u8 m_pci_memory_hole_bottom;
+	u8 m_pci_memory_hole_top;
+	u8 m_pci_memory_access_control_3;
+
+	u8 m_rtc_test_mode;
 	u8 m_xd_power_on;
+	u8 m_dma_linebuffer_disable;
+	u16 m_ddma_control[8];
 
 	template <unsigned E> u8 rtc_index_r(offs_t offset);
 	template <unsigned E> void rtc_index_w(offs_t offset, u8 data);
 
 	template <unsigned E> u8 rtc_data_r(offs_t offset);
 	template <unsigned E> void rtc_data_w(offs_t offset, u8 data);
+
+	u8 port92_r(offs_t offset);
+	void port92_w(offs_t offset, u8 data);
 
 	// Southbridge common stuff
 	void at_pit8254_out0_changed(int state);
@@ -148,7 +178,22 @@ private:
 	uint8_t m_channel_check = 0;
 	bool m_nmi_enabled = false;
 
+	void keyboard_gatea20(int state);
+	void fast_gatea20(int state);
+	int m_ext_gatea20, m_fast_gatea20;
+	u8 m_port92;
+
 	u8 m_rtc_index;
+
+	void redirect_irq(int irq, int state);
+
+	int pin_mapper(int pin);
+	void irq_handler(int line, int state);
+
+	u8 m_pirqrc[4];
+	u8 m_pirq_select;
+	u8 m_mirq[3];
+	u8 m_mirq_pin_config;
 };
 
 DECLARE_DEVICE_TYPE(VT82C586B_ISA, vt82c586b_isa_device)

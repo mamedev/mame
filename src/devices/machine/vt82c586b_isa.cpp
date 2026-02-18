@@ -24,7 +24,6 @@ vt82c586b_isa_device::vt82c586b_isa_device(const machine_config &mconfig, const 
 //  , m_smi_callback(*this)
 //  , m_nmi_callback(*this)
 //  , m_stpclk_callback(*this)
-	, m_boot_state_hook(*this)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
 	, m_pic(*this, "pic%u", 0U)
 	, m_dma(*this, "dma%u", 0U)
@@ -35,6 +34,9 @@ vt82c586b_isa_device::vt82c586b_isa_device(const machine_config &mconfig, const 
 	, m_rtc(*this, "rtc")
 	, m_isabus(*this, "isabus")
 	, m_speaker(*this, "speaker")
+	, m_write_a20m(*this)
+	, m_write_cpureset(*this)
+	, m_boot_state_hook(*this)
 {
 }
 
@@ -101,7 +103,7 @@ void vt82c586b_isa_device::device_add_mconfig(machine_config &config)
 	PS2_KEYBOARD_CONTROLLER(config, m_keybc, DERIVED_CLOCK(1, 4));
 	m_keybc->set_default_bios_tag("compaq");
 	m_keybc->hot_res().set([this] (int state) { m_host_cpu->set_input_line(INPUT_LINE_RESET, state); });
-	m_keybc->gate_a20().set([this] (int state) { m_host_cpu->set_input_line(INPUT_LINE_A20, state); });
+	m_keybc->gate_a20().set(FUNC(vt82c586b_isa_device::keyboard_gatea20));
 	m_keybc->kbd_irq().set(m_pic[0], FUNC(pic8259_device::ir1_w));
 	m_keybc->kbd_clk().set(m_ps2_con, FUNC(pc_kbdc_device::clock_write_from_mb));
 	m_keybc->kbd_data().set(m_ps2_con, FUNC(pc_kbdc_device::data_write_from_mb));
@@ -141,8 +143,6 @@ void vt82c586b_isa_device::device_add_mconfig(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
-
-	// TODO: integrated Keyboard Controller
 }
 
 void vt82c586b_isa_device::device_config_complete()
@@ -158,9 +158,27 @@ void vt82c586b_isa_device::device_start()
 {
 	pci_device::device_start();
 
-	save_item(NAME(m_nmi_enabled));
+	m_pci_root->set_pin_mapper(pci_pin_mapper(*this, FUNC(vt82c586b_isa_device::pin_mapper)));
+	m_pci_root->set_irq_handler(pci_irq_handler(*this, FUNC(vt82c586b_isa_device::irq_handler)));
 
+	save_item(NAME(m_isa_bus_control));
+	save_item(NAME(m_isa_test_mode));
+	save_item(NAME(m_isa_clock_control));
+	save_item(NAME(m_rom_decode_control));
+	save_item(NAME(m_keybc_control));
+	save_item(NAME(m_dma_control_typef));
+	save_item(NAME(m_misc_control));
+	save_item(NAME(m_ide_irq_routing));
 	save_item(NAME(m_xd_power_on));
+	save_item(NAME(m_rtc_test_mode));
+	save_item(NAME(m_dma_linebuffer_disable));
+
+	save_item(NAME(m_nmi_enabled));
+	save_item(NAME(m_port92));
+
+	save_item(NAME(m_pirqrc));
+	save_item(NAME(m_mirq));
+	save_item(NAME(m_mirq_pin_config));
 }
 
 void vt82c586b_isa_device::device_reset()
@@ -174,16 +192,188 @@ void vt82c586b_isa_device::device_reset()
 	// medium DEVSEL#
 	status = 0x0200;
 
+	m_isa_bus_control = 0;
+	m_isa_test_mode = 0;
+	m_isa_clock_control = 0;
+	m_rom_decode_control = 0;
+	m_keybc_control = 0;
+	m_dma_control_typef = 0;
+	std::fill(std::begin(m_misc_control), std::end(m_misc_control), 0);
+	m_ide_irq_routing = 0x00 | (1 << 2) | (0 << 0);
+	std::fill(std::begin(m_pirqrc), std::end(m_pirqrc), 0);
+	std::fill(std::begin(m_mirq), std::end(m_mirq), 0);
+	m_mirq_pin_config = 0;
+
 	// TODO: strapped
 	m_xd_power_on = 0xb7;
+
 	m_nmi_enabled = false;
+	m_port92 = 0;
 	remap_cb();
 }
 
 void vt82c586b_isa_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	// ...
+	map(0x40, 0x40).lrw8(
+		NAME([this] () { return m_isa_bus_control; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_isa_bus_control = data;
+			LOG("40h: ISA Bus Control %02x\n", data);
+		})
+	);
+	map(0x41, 0x41).lrw8(
+		NAME([this] () { return m_isa_test_mode; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_isa_test_mode = data;
+			LOG("41h: ISA Test Mode %02x\n", data);
+			remap_cb();
+			// TODO: bit 3 for Double DMA clock
+		})
+	);
+	map(0x42, 0x42).lrw8(
+		NAME([this] () { return m_isa_clock_control; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_isa_clock_control = data & 0xaf;
+			LOG("42h: ISA Clock Control %02x\n", data);
+			// TODO: reprogram ISA bus clock
+		})
+	);
+	map(0x43, 0x43).lrw8(
+		NAME([this] () { return m_rom_decode_control; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_rom_decode_control = data & 0xaf;
+			LOG("43h: ROM Decode Control %02x\n", data);
+			// TODO: remap cb here
+		})
+	);
+	map(0x44, 0x44).lrw8(
+		NAME([this] () { return m_keybc_control; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_keybc_control = data & 0x88;
+			LOG("44h: Keyboard Controller Control %02x\n", data);
+		})
+	);
+	map(0x45, 0x45).lrw8(
+		NAME([this] () { return m_dma_control_typef; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_dma_control_typef = data;
+			LOG("45h: Type F DMA Control %02x\n", data);
+		})
+	);
+	map(0x46, 0x46).lrw8(
+		NAME([this] () { return m_misc_control[0]; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_misc_control[0] = data & 0xf3;
+			LOG("46h: Miscellaneous Control 1 %02x\n", data);
+		})
+	);
+	// bit 5 EISA $4d0/$4d1 enable
+	// bit 3 <reserved> but can be written to
+	// bit 0 PCI reset
+	map(0x47, 0x47).lrw8(
+		NAME([this] () { return m_misc_control[1]; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_misc_control[1] = data;
+			LOG("47h: Miscellaneous Control 2 %02x\n", data);
+			// TODO: remap cb for EISA port
+		})
+	);
+	// --x- ---- MASTER# Pin function (3041 silicon)
+	// ---x ---- IRQ8# source
+	// ---- x--- Extra RTC ports $74/$75
+	// ---- -x-- Integrated USB Controller Disable
+	// ---- --x- Integrated IDE Controller Disable
+	// ---- ---x 512K PCI Memory Decode
+	map(0x48, 0x48).lrw8(
+		NAME([this] () { return m_misc_control[2]; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_misc_control[2] = data & 0x3f;
+			LOG("48h: Miscellaneous Control 3 %02x\n", data);
+			// TODO: remap cb for bit 3
+		})
+	);
+	map(0x4a, 0x4a).lrw8(
+		NAME([this] () { return m_ide_irq_routing; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_ide_irq_routing = data;
+			LOG("4Ah: IDE Interrupt Routing %02x\n", data);
+		})
+	);
+	map(0x4c, 0x4c).lrw8(
+		NAME([this] () { return m_pci_memory_hole_bottom; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pci_memory_hole_bottom = data;
+			LOG("4Ch: ISA DMA/Master Memory Access Control 1 (Bottom) %02x\n", data << 16);
+		})
+	);
+	map(0x4d, 0x4d).lrw8(
+		NAME([this] () { return m_pci_memory_hole_top; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pci_memory_hole_top = data;
+			LOG("4Dh: ISA DMA/Master Memory Access Control 2 (Top) %02x\n", data << 16);
+		})
+	);
+	map(0x4e, 0x4f).lrw16(
+		NAME([this] () { return m_pci_memory_access_control_3; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_pci_memory_access_control_3);
+			LOG("4Eh: ISA DMA/Master Memory Access Control 3 %04x & %04x\n", data, mem_mask);
+		})
+	);
+
+	// PnP Control
+	// port 50 reserved (default 0x04)
+	map(0x54, 0x54).lrw8(
+		NAME([this] () { return m_pirq_select; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pirq_select = data & 0xf;
+			LOG("54h: PCI IRQ Edge / Level Select\n");
+			// TODO: unclear what this really does (edge would invert the line?)
+			LOG("\tPIRQA# %s\n", BIT(data, 3) ? "edge" : "level");
+			LOG("\tPIRQB# %s\n", BIT(data, 2) ? "edge" : "level");
+			LOG("\tPIRQC# %s\n", BIT(data, 1) ? "edge" : "level");
+			LOG("\tPIRQD# %s\n", BIT(data, 0) ? "edge" : "level");
+		})
+	);
+	map(0x55, 0x55).lrw8(
+		NAME([this] () { return (m_pirqrc[3] << 4) | (m_mirq[0]); }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pirqrc[3] = (data & 0xf0) >> 4;
+			m_mirq[0] = data & 0xf;
+			LOG("55h: PnP IRQ Routing 1 PIRQD# %d MIRQ0 %d\n", m_pirqrc[3], m_mirq[0]);
+		})
+	);
+	map(0x56, 0x56).lrw8(
+		NAME([this] () { return (m_pirqrc[0] << 4) | (m_pirqrc[1]); }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pirqrc[0] = (data & 0xf0) >> 4;
+			m_pirqrc[1] = data & 0xf;
+			LOG("56h: PnP IRQ Routing 2 PIRQA# %d PIRQB# %d\n", m_pirqrc[0], m_pirqrc[1]);
+		})
+	);
+	map(0x57, 0x57).lrw8(
+		NAME([this] () { return (m_pirqrc[2] << 4) | (m_mirq[1]); }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pirqrc[2] = (data & 0xf0) >> 4;
+			m_mirq[1] = data & 0xf;
+			LOG("57h: PnP IRQ Routing 3 PIRQC# %d MIRQ1 %d\n", m_pirqrc[2], m_mirq[1]);
+		})
+	);
+	map(0x58, 0x58).lrw8(
+		NAME([this] () { return m_mirq[2]; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_mirq[2] = data & 0xf;
+			LOG("58h: PnP IRQ Routing 4 MIRQ2 %d\n", m_mirq[2]);
+		})
+	);
+	map(0x59, 0x59).lrw8(
+		NAME([this] () { return m_mirq_pin_config; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_mirq_pin_config = data & 0xf;
+			LOG("59h: MIRQ Pin configuration %02x\n", data);
+		})
+	);
 	map(0x5a, 0x5a).lrw8(
 		NAME([this] () { return m_xd_power_on; }),
 		NAME([this] (offs_t offset, u8 data) {
@@ -192,6 +382,42 @@ void vt82c586b_isa_device::config_map(address_map &map)
 			remap_cb();
 		})
 	);
+	map(0x5b, 0x5b).lrw8(
+		NAME([this] () { return m_rtc_test_mode; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_rtc_test_mode = data & 7;
+			LOG("5Bh: Internal RTC Test Mode %02x\n", data);
+		})
+	);
+	// NOTE: on 3041 Silicon Only
+	map(0x5c, 0x5c).lrw8(
+		NAME([this] () { return m_dma_linebuffer_disable; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_dma_linebuffer_disable = BIT(data, 0);
+			LOG("5Ch: DMA Control %02x\n", data);
+		})
+	);
+	map(0x60, 0x6f).lrw16(
+		NAME([this] (offs_t offset) -> u16 {
+			if (offset == 4)
+				return 0;
+			return m_ddma_control[offset]; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			if (offset == 4)
+				return;
+			COMBINE_DATA(&m_ddma_control[offset]);
+			m_ddma_control[offset] &= 0xfff8;
+			LOG("%02X: Distributed DMA Ch. %d %04x & %04x -> Base %04x Enable %d\n"
+				, (offset * 2) + 0x60
+				, offset
+				, data
+				, mem_mask
+				, m_ddma_control[offset] >> 4
+				, BIT(m_ddma_control[offset], 3)
+			);
+		})
+	);
+	// 0x70 ~ 0x73 Subsystem ID
 }
 
 void vt82c586b_isa_device::internal_io_map(address_map &map)
@@ -204,17 +430,7 @@ void vt82c586b_isa_device::internal_io_map(address_map &map)
 //	map(0x0064, 0x0064) keyboard
 //	map(0x0070, 0x0073) RTC
 	map(0x0080, 0x008f).rw(FUNC(vt82c586b_isa_device::at_page8_r), FUNC(vt82c586b_isa_device::at_page8_w));
-//	map(0x0092, 0x0092).lrw8(
-//		NAME([this] () {
-//			//LOG("Fast init $92 read\n");
-//			return m_fast_init;
-//		}),
-//		NAME([this] (u8 data) {
-//			LOG("Fast init $92 write %02x\n", data);
-//			m_host_cpu->set_input_line(INPUT_LINE_A20, BIT(data, 1));
-//			m_fast_init = data;
-//		})
-//	);
+//	map(0x0092, 0x0092) System Control
 	map(0x00a0, 0x00a1).rw(m_pic[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(FUNC(vt82c586b_isa_device::at_dma8237_2_r), FUNC(vt82c586b_isa_device::at_dma8237_2_w));
 
@@ -240,6 +456,7 @@ void vt82c586b_isa_device::map_extra(
 {
 	// assume that map_extra of the southbridge is called before the one of the northbridge
 	m_isabus->remap(AS_PROGRAM, 0, 1 << 24);
+	// TODO: really dictated by ROM Decode Control
 	map_bios(memory_space, 0xffffffff - m_region->bytes() + 1, 0xffffffff);
 	map_bios(memory_space, 0x000e0000, 0x000fffff);
 	m_isabus->remap(AS_IO, 0, 0xffff);
@@ -273,6 +490,14 @@ void vt82c586b_isa_device::map_extra(
 			write8sm_delegate(*this, FUNC(vt82c586b_isa_device::rtc_data_w<1>))
 		);
 		// TODO: ports $74-$75
+	}
+
+	if (BIT(m_isa_test_mode, 5))
+	{
+		io_space->install_readwrite_handler(0x92, 0x92,
+			read8sm_delegate(*this, FUNC(vt82c586b_isa_device::port92_r)),
+			write8sm_delegate(*this, FUNC(vt82c586b_isa_device::port92_w))
+		);
 	}
 }
 
@@ -309,6 +534,31 @@ template <unsigned E> void vt82c586b_isa_device::rtc_data_w(offs_t offset, u8 da
 {
 	const u8 rtc_address = m_rtc_index & (E ? 0xff : 0x7f);
 	m_rtc->write_direct(rtc_address, data);
+}
+
+/*
+ * xx-- ---- HDD Activity LED Status (0) off, any other setting On
+ * ---- x--- Power-On Password Bytes Inaccessible
+ * ---- --x- Fast A20
+ * ---- ---x Fast Reset
+ */
+u8 vt82c586b_isa_device::port92_r(offs_t offset)
+{
+	return m_port92;
+}
+
+void vt82c586b_isa_device::port92_w(offs_t offset, u8 data)
+{
+	fast_gatea20(BIT(data, 1));
+
+	if (!BIT(m_port92, 0) && BIT(data, 0))
+	{
+		// pulse reset line
+		m_write_cpureset(1);
+		m_write_cpureset(0);
+	}
+
+	m_port92 = data & 0xcb;
 }
 
 /*
@@ -553,4 +803,151 @@ void vt82c586b_isa_device::at_dma8237_2_w(offs_t offset, uint8_t data)
 	m_dma[1]->write(offset / 2, data);
 }
 
+void vt82c586b_isa_device::fast_gatea20(int state)
+{
+	m_fast_gatea20 = state;
+	m_write_a20m(m_fast_gatea20 | m_ext_gatea20);
+}
+
+void vt82c586b_isa_device::keyboard_gatea20(int state)
+{
+	m_ext_gatea20 = state;
+	m_write_a20m(m_fast_gatea20 | m_ext_gatea20);
+}
+
+/*
+ * Pin Mapper
+ */
+
+void vt82c586b_isa_device::redirect_irq(int irq, int state)
+{
+	switch (irq)
+	{
+	case 0:
+	case 2:
+	case 8:
+	case 13:
+		break;
+	// Claims irq 1 to be selectable vs. other PCI ISAs
+	case 1:
+		m_pic[0]->ir1_w(state);
+		break;
+	case 3:
+		m_pic[0]->ir3_w(state);
+		break;
+	case 4:
+		m_pic[0]->ir4_w(state);
+		break;
+	case 5:
+		m_pic[0]->ir5_w(state);
+		break;
+	case 6:
+		m_pic[0]->ir6_w(state);
+		break;
+	case 7:
+		m_pic[0]->ir7_w(state);
+		break;
+	case 9:
+		m_pic[1]->ir1_w(state);
+		break;
+	case 10:
+		m_pic[1]->ir2_w(state);
+		break;
+	case 11:
+		m_pic[1]->ir3_w(state);
+		break;
+	case 12:
+		m_pic[1]->ir4_w(state);
+		break;
+	case 14:
+		m_pic[1]->ir6_w(state);
+		break;
+	case 15:
+		m_pic[1]->ir7_w(state);
+		break;
+	}
+}
+
+// NOTE: doesn't seem to have a disable method
+int vt82c586b_isa_device::pin_mapper(int pin)
+{
+	if(pin < 0 || pin >= 4)
+		return -1;
+	return m_pirqrc[pin];
+}
+
+void vt82c586b_isa_device::irq_handler(int line, int state)
+{
+	if(line < 0 || line >= 16)
+		return;
+
+	logerror("irq_handler %d %d\n", line, state);
+	redirect_irq(line, state);
+}
+
+void vt82c586b_isa_device::pc_pirqa_w(int state)
+{
+	int irq = m_pirqrc[0] & 15;
+
+//	if (m_pirqrc[0] & 128)
+//		return;
+	redirect_irq(irq, state);
+}
+
+void vt82c586b_isa_device::pc_pirqb_w(int state)
+{
+	int irq = m_pirqrc[1] & 15;
+
+//	if (m_pirqrc[1] & 128)
+//		return;
+	redirect_irq(irq, state);
+}
+
+void vt82c586b_isa_device::pc_pirqc_w(int state)
+{
+	int irq = m_pirqrc[2] & 15;
+
+//	if (m_pirqrc[2] & 128)
+//		return;
+	redirect_irq(irq, state);
+}
+
+void vt82c586b_isa_device::pc_pirqd_w(int state)
+{
+	int irq = m_pirqrc[3] & 15;
+
+//	if (m_pirqrc[3] & 128)
+//		return;
+	redirect_irq(irq, state);
+}
+
+void vt82c586b_isa_device::pc_mirq0_w(int state)
+{
+	int irq = m_mirq[0] & 15;
+
+	// selects APICCS# if '1'
+	if (BIT(m_mirq_pin_config, 0))
+		return;
+	redirect_irq(irq, state);
+}
+
+void vt82c586b_isa_device::pc_mirq1_w(int state)
+{
+	int irq = m_mirq[1] & 15;
+
+	// selects KEYLOCK if '1'
+	if (BIT(m_mirq_pin_config, 1))
+		return;
+	redirect_irq(irq, state);
+}
+
+void vt82c586b_isa_device::pc_mirq2_w(int state)
+{
+	int irq = m_mirq[2] & 15;
+
+	// selects MASTER# if '1'
+	if (BIT(m_mirq_pin_config, 2))
+		return;
+	redirect_irq(irq, state);
+}
 
