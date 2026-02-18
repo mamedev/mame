@@ -22,8 +22,6 @@
 #include "sound/dac.h"
 #include "sound/ymopl.h"
 
-#include "speaker.h"
-
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -42,10 +40,11 @@ DEFINE_DEVICE_TYPE(NICHISND, nichisnd_device, "nichisnd", "Nichibutsu Sound Devi
 //-------------------------------------------------
 
 nichisnd_device::nichisnd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, NICHISND, tag, owner, clock),
-	m_soundlatch(*this, "soundlatch"),
-	m_sound_rom(*this, "audiorom"),
-	m_soundbank(*this, "soundbank")
+	: device_t(mconfig, NICHISND, tag, owner, clock)
+	, device_mixer_interface(mconfig, *this)
+	, m_soundlatch(*this, "soundlatch")
+	, m_sound_rom(*this, "audiorom")
+	, m_soundbank(*this, "soundbank")
 {
 }
 
@@ -100,14 +99,12 @@ void nichisnd_device::device_add_mconfig(machine_config &config)
 	audiocpu.zc0_callback().set("audiocpu", FUNC(tmpz84c011_device::trg3));
 
 	/* sound hardware */
-	SPEAKER(config, "speaker").front_center();
-
 	GENERIC_LATCH_8(config, m_soundlatch);
 
-	YM3812(config, "ymsnd", 4000000).add_route(ALL_OUTPUTS, "speaker", 1.0);
+	YM3812(config, "ymsnd", 4000000).add_route(ALL_OUTPUTS, *this, 1.0, 0);
 
-	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, "speaker", 0.37); // unknown DAC
-	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, "speaker", 0.37); // unknown DAC
+	DAC_8BIT_R2R(config, "dac1", 0).add_route(ALL_OUTPUTS, *this, 0.37, 0); // unknown DAC
+	DAC_8BIT_R2R(config, "dac2", 0).add_route(ALL_OUTPUTS, *this, 0.37, 0); // unknown DAC
 }
 
 

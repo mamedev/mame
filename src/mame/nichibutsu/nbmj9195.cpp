@@ -28,6 +28,7 @@ Notes:
 
 #include "machine/nvram.h"
 
+#include "speaker.h"
 
 void nbmj9195_state::machine_start()
 {
@@ -1701,7 +1702,10 @@ void nbmj9195_state::nbmjtype1(machine_config &config)
 	PALETTE(config, m_palette).set_entries(256);
 
 	// sound hardware
-	NICHISND(config, "nichisnd", 0);
+	SPEAKER(config, "speaker").front_center();
+
+	nichisnd_device &nichisnd(NICHISND(config, "nichisnd", 0));
+	nichisnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void nbmj9195_state::nbmjtype2(machine_config &config)
@@ -1732,7 +1736,10 @@ void nbmj9195_state::nbmjtype2(machine_config &config)
 	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state, nb22090)
 
 	// sound hardware
-	NICHISND(config, "nichisnd", 0);
+	SPEAKER(config, "speaker").front_center();
+
+	nichisnd_device &nichisnd(NICHISND(config, "nichisnd", 0));
+	nichisnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void nbmj9195_state::mjuraden(machine_config &config)
