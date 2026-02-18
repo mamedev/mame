@@ -68,9 +68,9 @@ void nyanpai_state::nyanpai_layer::layer_w(offs_t offset, u8 data)
 		case 0x00:  m_blitter_direction_x = BIT(data, 0);
 					m_blitter_direction_y = BIT(data, 1);
 					m_clutmode = BIT(data, 2);
-				//  if (data & 0x08) popmessage("Unknown GFX Flag!! (0x08)");
+				//  if (data & 0x08) m_host.popmessage("Unknown GFX Flag!! (0x08)");
 					m_transparency = BIT(data, 4);
-				//  if (data & 0x20) popmessage("Unknown GFX Flag!! (0x20)");
+				//  if (data & 0x20) m_host.popmessage("Unknown GFX Flag!! (0x20)");
 					m_flipscreen = BIT(~data, 6);
 					m_dispflag = BIT(data, 7);
 					vramflip();
@@ -193,8 +193,8 @@ void nyanpai_state::nyanpai_layer::gfxdraw()
 			if ((gfxaddr > (gfxlen - 1)))
 			{
 #ifdef MAME_DEBUG
-				popmessage("GFXROM ADDR OVER:%08X DX,%d,DY:%d,SX:%d,SY:%d", gfxaddr, startx, starty, sizex,sizey);
-				logerror("GFXROM ADDR OVER:%08X DX,%d,DY:%d,SX:%d,SY:%d\n", gfxaddr, startx, starty, sizex,sizey);
+				m_host.popmessage("GFXROM ADDR OVER:%08X DX,%d,DY:%d,SX:%d,SY:%d", gfxaddr, startx, starty, sizex,sizey);
+				m_host.logerror("GFXROM ADDR OVER:%08X DX,%d,DY:%d,SX:%d,SY:%d\n", gfxaddr, startx, starty, sizex,sizey);
 #endif
 				gfxaddr &= (gfxlen - 1);
 			}
