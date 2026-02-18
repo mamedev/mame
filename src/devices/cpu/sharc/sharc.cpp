@@ -159,6 +159,11 @@ adsp21062_device::adsp21062_device(
 	, m_swap_r0_7(nullptr)
 	, m_swap_r8_15(nullptr)
 	, m_blocks(*this, "block%u", 0U)
+	, m_flag_pending_val{ 0, 0, 0, 0 }
+	, m_write_stalled_pending_val{ false }
+	, m_flag_pending{ false, false, false, false }
+	, m_write_stalled_pending(false)
+	, m_input_update_pending(false)
 	, m_enable_drc(false)
 {
 	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
@@ -965,6 +970,8 @@ void adsp21062_device::device_reset()
 
 void adsp21062_device::device_pre_save()
 {
+	assert(!m_input_update_pending);
+
 	cpu_device::device_pre_save();
 
 	if ((m_core->pcstkp > 0) && (m_core->pcstkp < 31))
@@ -1052,40 +1059,89 @@ void adsp21062_device::execute_set_input(int irqline, int state)
 			m_core->irq_pending &= ~(1 << (8-irqline));
 		}
 	}
-	else if (irqline >= SHARC_INPUT_FLAG0 && irqline <= SHARC_INPUT_FLAG3)
-	{
-		set_flag_input(irqline - SHARC_INPUT_FLAG0, state);
-	}
 }
 
 void adsp21062_device::set_flag_input(int flag_num, int state)
 {
-	if (flag_num >= 0 && flag_num < 4)
+	assert((flag_num >= 0) && (flag_num < 4));
+
+	// Check if flag is set to input in MODE2 (bit == 0)
+	if (BIT(m_core->mode2, flag_num + 15))
+		throw emu_fatalerror("sharc_set_flag_input: flag %d is set output!\n", flag_num);
+
+	state = state ? 1 : 0;
+	device_execute_interface *const current = machine().scheduler().currently_executing();
+	bool const not_executing = current && (current != static_cast<device_execute_interface *>(this));
+	if (not_executing || m_flag_pending[flag_num])
 	{
-		// Check if flag is set to input in MODE2 (bit == 0)
-		if (!BIT(m_core->mode2, flag_num + 15))
+		if (m_flag_pending[flag_num] || (m_core->flag[flag_num] != state))
 		{
-			m_core->flag[flag_num] = state ? 1 : 0;
+			m_flag_pending_val[flag_num] = state;
+			m_flag_pending[flag_num] = true;
+			if (!m_input_update_pending)
+			{
+				m_input_update_pending = true;
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(adsp21062_device::sharc_update_inputs), this));
+			}
 		}
-		else
-		{
-			throw emu_fatalerror("sharc_set_flag_input: flag %d is set output!\n", flag_num);
-		}
+	}
+	else
+	{
+		m_core->flag[flag_num] = state ? 1 : 0;
 	}
 }
 
 void adsp21062_device::write_stall(int state)
 {
-	m_core->write_stalled = (state == 0) ? false : true;
-
-	if (m_enable_drc)
+	bool const stall = state != 0;
+	device_execute_interface *const current = machine().scheduler().currently_executing();
+	bool const not_executing = current && (current != static_cast<device_execute_interface *>(this));
+	if (m_enable_drc || not_executing || m_write_stalled_pending)
 	{
-		if (m_core->write_stalled)
-			spin_until_trigger(45757);
-		else
-			machine().scheduler().trigger(45757);
+		if (m_write_stalled_pending || (m_core->write_stalled != stall))
+		{
+			m_write_stalled_pending_val = stall;
+			m_write_stalled_pending = true;
+			if (!m_input_update_pending)
+			{
+				m_input_update_pending = true;
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(adsp21062_device::sharc_update_inputs), this));
+			}
+		}
+	}
+	else
+	{
+		m_core->write_stalled = stall;
 	}
 }
+
+TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_update_inputs)
+{
+	m_input_update_pending = false;
+
+	for (unsigned i = 0; 4 > i; ++i)
+	{
+		if (m_flag_pending[i])
+		{
+			m_core->flag[i] = m_flag_pending_val[i];
+			m_flag_pending[i] = false;
+		}
+	}
+
+	if (m_write_stalled_pending)
+	{
+		m_core->write_stalled = m_write_stalled_pending_val;
+		if (m_enable_drc)
+		{
+			if (m_core->write_stalled)
+				spin_until_trigger(45757);
+			else
+				machine().scheduler().trigger(45757);
+		}
+		m_write_stalled_pending = false;
+	}
+}
+
 
 void adsp21062_device::check_interrupts()
 {

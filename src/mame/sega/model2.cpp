@@ -347,9 +347,9 @@ void model2b_state::machine_reset()
 	m_copro_adsp->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 
 	// set FIFOIN empty flag on SHARC
-	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
+	m_copro_adsp->set_flag_input(0, 1);
 	// clear FIFOOUT buffer full flag on SHARC
-	m_copro_adsp->set_input_line(SHARC_INPUT_FLAG1, CLEAR_LINE);
+	m_copro_adsp->set_flag_input(1, 0);
 }
 
 void model2c_state::machine_reset()

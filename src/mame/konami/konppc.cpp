@@ -227,7 +227,6 @@ void konppc_device::dsp_comm_sharc_w(int board, int offset, uint32_t data)
 		case CGBOARD_TYPE_ZR107:
 		case CGBOARD_TYPE_GTICLUB:
 		{
-			//m_dsp[board]->set_input_line(SHARC_INPUT_FLAG0, ASSERT_LINE);
 			m_dsp[board]->set_flag_input(0, ASSERT_LINE);
 
 			if (offset == 1)

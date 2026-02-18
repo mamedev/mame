@@ -847,7 +847,6 @@ uint32_t gticlub_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	}
 #endif
 
-	//m_dsp[0]->set_input_line(SHARC_INPUT_FLAG1, ASSERT_LINE);
 	m_dsp[0]->set_flag_input(1, ASSERT_LINE);
 	return 0;
 }

@@ -495,7 +495,6 @@ public:
 	void hornet(machine_config &config) ATTR_COLD;
 	void hornet_x76(machine_config &config) ATTR_COLD;
 	void hornet_lan(machine_config &config) ATTR_COLD;
-	void gradius4(machine_config &config) ATTR_COLD;
 	void nbapbp(machine_config &config) ATTR_COLD;
 	void sscope(machine_config &config) ATTR_COLD;
 	void sscope_voodoo2(machine_config& config) ATTR_COLD;
@@ -1467,6 +1466,9 @@ void hornet_state::hornet(machine_config &config)
 void hornet_state::hornet_x76(machine_config &config)
 {
 	hornet(config);
+
+	m_dsp[0]->enable_recompiler();
+
 	X76F041(config, m_x76f041);
 }
 
@@ -1476,14 +1478,9 @@ void hornet_state::hornet_lan(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &hornet_state::hornet_lan_map);
 
-	KONAMI_GN676A_LAN(config, m_gn676_lan, 0);
-}
-
-void hornet_state::gradius4(machine_config &config)
-{
-	hornet_x76(config);
-
 	m_dsp[0]->enable_recompiler();
+
+	KONAMI_GN676A_LAN(config, m_gn676_lan, 0);
 }
 
 void hornet_state::nbapbp(machine_config &config)
@@ -1502,6 +1499,8 @@ void terabrst_state::terabrst(machine_config &config) // TODO: add K056800 from 
 	hornet(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &terabrst_state::terabrst_map);
+
+	m_dsp[0]->enable_recompiler();
 
 	M68000(config, m_gn680, 32_MHz_XTAL / 2); // 16MHz
 	m_gn680->set_addrmap(AS_PROGRAM, &terabrst_state::gn680_memmap);
@@ -3667,12 +3666,12 @@ ROM_END
 
 /*************************************************************************/
 
-GAME(  1998, gradius4,   0,        gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4u,  gradius4, gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver UAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4a,  gradius4, gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver AAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4ja, gradius4, gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4ua, gradius4, gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver UAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME(  1998, gradius4aa, gradius4, gradius4, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver AAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4,   0,        hornet_x76, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAC)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4u,  gradius4, hornet_x76, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver UAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4a,  gradius4, hornet_x76, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver AAC)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4ja, gradius4, hornet_x76, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV: Fukkatsu (ver JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4ua, gradius4, hornet_x76, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver UAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME(  1998, gradius4aa, gradius4, hornet_x76, gradius4, hornet_state, init_hornet, ROT0, "Konami", "Gradius IV (ver AAA)",           MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME(  1998, nbapbp,   0,      nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver UAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME(  1998, nbapbpa,  nbapbp, nbapbp, nbapbp, hornet_state, init_hornet, ROT0, "Konami", "NBA Play By Play (ver AAB)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

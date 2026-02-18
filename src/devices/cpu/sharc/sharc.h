@@ -8,11 +8,6 @@
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 
-#define SHARC_INPUT_FLAG0       3
-#define SHARC_INPUT_FLAG1       4
-#define SHARC_INPUT_FLAG2       5
-#define SHARC_INPUT_FLAG3       6
-
 
 class sharc_frontend;
 
@@ -36,17 +31,13 @@ public:
 
 	// configuration helpers
 	void set_boot_mode(const sharc_boot_mode boot_mode) { m_boot_mode = boot_mode; }
+	void enable_recompiler();
 
-	void set_flag_input(int flag_num, int state);
 	void external_iop_write(uint32_t address, uint32_t data);
 	void external_dma_write(uint32_t address, uint64_t data);
 
-	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
-	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
-
+	void set_flag_input(int flag_num, int state);
 	void write_stall(int state);
-
-	void enable_recompiler();
 
 	template <unsigned N> uint64_t pm_r(offs_t offset);
 	template <unsigned N> void pm_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -303,7 +294,16 @@ private:
 	opcode_func m_sharc_op[512];
 
 	std::unique_ptr<sharc_internal_state> m_heap_core;
+	uint8_t m_flag_pending_val[4];
+	bool m_write_stalled_pending_val;
+	bool m_flag_pending[4];
+	bool m_write_stalled_pending;
+	bool m_input_update_pending;
 	bool m_enable_drc;
+
+	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
+	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
+	TIMER_CALLBACK_MEMBER(sharc_update_inputs);
 
 	inline void CHANGE_PC(uint32_t newpc);
 	inline void CHANGE_PC_DELAYED(uint32_t newpc);
