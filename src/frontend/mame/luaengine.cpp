@@ -1024,6 +1024,9 @@ void lua_engine::initialize()
 	emu["slot_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<slot_interface_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<slot_interface_enumerator>(dev, maxdepth); });
+	emu["vector_device_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<vector_device_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<vector_device_enumerator>(dev, maxdepth); });
 
 
 	auto notifier_subscription_type = sol().registry().new_usertype<util::notifier_subscription>("notifier_subscription", sol::no_constructor);
@@ -1527,6 +1530,7 @@ void lua_engine::initialize()
 	machine_type["exit_pending"] = sol::property(&running_machine::exit_pending);
 	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
 	machine_type["devices"] = sol::property([] (running_machine &m) { return devenum<device_enumerator>(m.root_device()); });
+	machine_type["vector_devices"] = sol::property([] (running_machine &m) { return devenum<vector_device_enumerator>(m.root_device()); });
 	machine_type["palettes"] = sol::property([] (running_machine &m) { return devenum<palette_interface_enumerator>(m.root_device()); });
 	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
@@ -1937,6 +1941,67 @@ void lua_engine::initialize()
 	screen_dev_type["frame_number"] = &screen_device::frame_number;
 	screen_dev_type["container"] = sol::property(&screen_device::container);
 	screen_dev_type["palette"] = sol::property([] (screen_device const &sdev) { return sdev.has_palette() ? &sdev.palette() : nullptr; });
+
+	auto vector_dev_type = sol().registry().new_usertype<vector_device>(
+			"vector_dev",
+			sol::no_constructor,
+			sol::base_classes, sol::bases<device_t, device_video_interface>());
+	vector_dev_type.set_function("add_frame_begin_notifier",
+			[this] (vector_device &v, sol::protected_function cb)
+			{
+				return v.add_frame_begin_notifier(
+						[this, cbfunc = sol::protected_function(m_lua_state, cb)] (int)
+						{
+							auto status(invoke(cbfunc, 0));
+							if (!status.valid())
+							{
+								auto err(status.template get<sol::error>());
+								osd_printf_error("[LUA ERROR] error in vector frame-begin callback: %s\n", err.what());
+							}
+						});
+			});
+	vector_dev_type.set_function("add_frame_end_notifier",
+			[this] (vector_device &v, sol::protected_function cb)
+			{
+				return v.add_frame_end_notifier(
+						[this, cbfunc = sol::protected_function(m_lua_state, cb)] (void)
+						{
+							auto status(invoke(cbfunc));
+							if (!status.valid())
+							{
+								auto err(status.template get<sol::error>());
+								osd_printf_error("[LUA ERROR] error in vector frame-end callback: %s\n", err.what());
+							}
+						});
+			});
+	vector_dev_type.set_function("add_move_notifier",
+			[this] (vector_device &v, sol::protected_function cb)
+			{
+				return v.add_move_notifier(
+						[this, cbfunc = sol::protected_function(m_lua_state, cb)] (int x, int y, uint32_t color, int vis_x, int vis_y)
+						{
+							auto status(invoke(cbfunc, x, y, color, vis_x, vis_y));
+							if (!status.valid())
+							{
+								auto err(status.template get<sol::error>());
+								osd_printf_error("[LUA ERROR] error in vector move callback: %s\n", err.what());
+							}
+						});
+			});
+	vector_dev_type.set_function("add_line_notifier",
+			[this] (vector_device &v, sol::protected_function cb)
+			{
+				return v.add_line_notifier(
+						[this, cbfunc = sol::protected_function(m_lua_state, cb)] (int prev_x, int prev_y, int x, int y, uint32_t color, int intensity, int vis_x, int vis_y)
+						{
+							auto status(invoke(cbfunc, prev_x, prev_y, x, y, color, intensity, vis_x, vis_y));
+							if (!status.valid())
+							{
+								auto err(status.template get<sol::error>());
+								osd_printf_error("[LUA ERROR] error in vector line callback: %s\n", err.what());
+							}
+						});
+			});
 
 
 	auto cass_type = sol().registry().new_usertype<cassette_image_device>(

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "notifier.h"
 #include <functional>
 
 
@@ -68,7 +69,30 @@ public:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
+	// notifiers
+	util::notifier_subscription add_frame_begin_notifier(delegate<void (int)> &&n);
+	template <typename T>
+	util::notifier_subscription add_frame_begin_notifier(T &&n)
+	{ return add_frame_begin_notifier(delegate<void (int)>(std::forward<T>(n))); }
+
+	util::notifier_subscription add_frame_end_notifier(delegate<void (void)> &&n);
+	template <typename T>
+	util::notifier_subscription add_frame_end_notifier(T &&n)
+	{ return add_frame_end_notifier(delegate<void (void)>(std::forward<T>(n))); }
+
+	util::notifier_subscription add_move_notifier(delegate<void (int, int, uint32_t, int, int)> &&n);
+	template <typename T>
+	util::notifier_subscription add_move_notifier(T &&n)
+	{ return add_move_notifier(delegate<void (int, int, uint32_t, int, int)>(std::forward<T>(n))); }
+
+	util::notifier_subscription add_line_notifier(delegate<void (int, int, int, int, uint32_t, int, int, int)> &&n);
+	template <typename T>
+	util::notifier_subscription add_line_notifier(T &&n)
+	{ return add_line_notifier(delegate<void (int, int, int, int, uint32_t, int, int, int)>(std::forward<T>(n))); }
+
 private:
+	float normalized_sigmoid(float n, float k);
+
 	/* The vertices are buffered here */
 	struct point
 	{
@@ -84,10 +108,17 @@ private:
 	int m_min_intensity;
 	int m_max_intensity;
 
-	float normalized_sigmoid(float n, float k);
+	// notify interested parties about vector-drawing activities
+	util::notifier<int> m_frame_begin_notifier;
+	util::notifier<> m_frame_end_notifier;
+	util::notifier<int, int, uint32_t, int, int> m_move_notifier;
+	util::notifier<int, int, int, int, uint32_t, int, int, int> m_line_notifier;
 };
 
 // device type definition
 DECLARE_DEVICE_TYPE(VECTOR, vector_device)
+
+// device iterator
+typedef device_type_enumerator<vector_device> vector_device_enumerator;
 
 #endif // MAME_VIDEO_VECTOR_H

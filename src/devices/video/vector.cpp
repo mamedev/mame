@@ -95,9 +95,52 @@ void vector_device::device_start()
 	m_vector_list = std::make_unique<point[]>(MAX_POINTS);
 }
 
-/*
- * www.dinodini.wordpress.com/2010/04/05/normalized-tunable-sigmoid-functions/
- */
+
+//-------------------------------------------------
+//  subscribe for frame-begin notifications
+//-------------------------------------------------
+
+util::notifier_subscription vector_device::add_frame_begin_notifier(delegate<void (int)> &&n)
+{
+	printf("b\n"); fflush(stdout);
+	return m_frame_begin_notifier.subscribe(std::move(n));
+}
+
+
+//-------------------------------------------------
+//  subscribe for frame-end notifications
+//-------------------------------------------------
+
+util::notifier_subscription vector_device::add_frame_end_notifier(delegate<void (void)> &&n)
+{
+	return m_frame_end_notifier.subscribe(std::move(n));
+}
+
+
+//-------------------------------------------------
+//  subscribe for hidden-move notifications
+//-------------------------------------------------
+
+util::notifier_subscription vector_device::add_move_notifier(delegate<void (int, int, uint32_t, int, int)> &&n)
+{
+	return m_move_notifier.subscribe(std::move(n));
+}
+
+
+//-------------------------------------------------
+//  subscribe for visible-line notifications
+//-------------------------------------------------
+
+util::notifier_subscription vector_device::add_line_notifier(delegate<void (int, int, int, int, uint32_t, int, int, int)> &&n)
+{
+	return m_line_notifier.subscribe(std::move(n));
+}
+
+
+//-------------------------------------------------
+// www.dinodini.wordpress.com/2010/04/05/normalized-tunable-sigmoid-functions/
+//-------------------------------------------------
+
 float vector_device::normalized_sigmoid(float n, float k)
 {
 	// valid for n and k in range of -1.0 and 1.0
@@ -105,10 +148,11 @@ float vector_device::normalized_sigmoid(float n, float k)
 }
 
 
-/*
- * Adds a line end point to the vertices list. The vector processor emulation
- * needs to call this.
- */
+//-------------------------------------------------
+// Adds a line end point to the vertices list. The vector processor emulation
+// needs to call this.
+//-------------------------------------------------
+
 void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 {
 	point *newpoint;
@@ -142,11 +186,12 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 }
 
 
-/*
- * The vector CPU creates a new display list. We save the old display list,
- * but only once per refresh.
- */
-void vector_device::clear_list(void)
+//-------------------------------------------------
+// The vector CPU creates a new display list. We save the old display list,
+// but only once per refresh.
+//-------------------------------------------------
+
+void vector_device::clear_list()
 {
 	m_vector_index = 0;
 }
@@ -156,6 +201,9 @@ void vector_device::set_hook_callback(hook_callback callback)
 	s_hook_callback = std::move(callback);
 }
 
+//-------------------------------------------------
+// Update the screen container with queued vectors.
+//-------------------------------------------------
 
 uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -174,6 +222,8 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	screen.container().empty();
 	screen.container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTORBUF(1));
+
+	m_frame_begin_notifier(0);
 
 	if (s_hook_callback)
 	{
