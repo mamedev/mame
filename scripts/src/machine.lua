@@ -2948,6 +2948,8 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/sis85c496.h",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.cpp",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.h",
+		MAME_DIR .. "src/devices/machine/vt82c586b_ide.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c586b_ide.h",
 		MAME_DIR .. "src/devices/machine/vt82c586b_isa.cpp",
 		MAME_DIR .. "src/devices/machine/vt82c586b_isa.h",
 		MAME_DIR .. "src/devices/machine/vt82c598mvp.cpp",
