@@ -9,6 +9,7 @@ VT82C586B PCIC ISA portion
 #include "emu.h"
 #include "vt82c586b_isa.h"
 
+#include "bus/pc_kbd/keyboards.h"
 #include "speaker.h"
 
 #define VERBOSE (LOG_GENERAL)
@@ -25,10 +26,13 @@ vt82c586b_isa_device::vt82c586b_isa_device(const machine_config &mconfig, const 
 //  , m_stpclk_callback(*this)
 	, m_boot_state_hook(*this)
 	, m_host_cpu(*this, finder_base::DUMMY_TAG)
-//	, m_kbdc(*this, "kbdc")
 	, m_pic(*this, "pic%u", 0U)
 	, m_dma(*this, "dma%u", 0U)
 	, m_pit(*this, "pit")
+	, m_keybc(*this, "keybc")
+	, m_ps2_con(*this, "ps2_con")
+	, m_aux_con(*this, "aux_con")
+	, m_rtc(*this, "rtc")
 	, m_isabus(*this, "isabus")
 	, m_speaker(*this, "speaker")
 {
@@ -88,6 +92,32 @@ void vt82c586b_isa_device::device_add_mconfig(machine_config &config)
 	m_pic[1]->out_int_callback().set(m_pic[0], FUNC(pic8259_device::ir2_w));
 	m_pic[1]->in_sp_callback().set_constant(0);
 
+	// TODO: VT82887
+	DS12885EXT(config, m_rtc, XTAL(32'768));
+	m_rtc->irq().set(m_pic[1], FUNC(pic8259_device::ir0_w));
+	m_rtc->set_century_index(0x32);
+
+	// TODO: VT82C42, clock configurable
+	PS2_KEYBOARD_CONTROLLER(config, m_keybc, DERIVED_CLOCK(1, 4));
+	m_keybc->set_default_bios_tag("compaq");
+	m_keybc->hot_res().set([this] (int state) { m_host_cpu->set_input_line(INPUT_LINE_RESET, state); });
+	m_keybc->gate_a20().set([this] (int state) { m_host_cpu->set_input_line(INPUT_LINE_A20, state); });
+	m_keybc->kbd_irq().set(m_pic[0], FUNC(pic8259_device::ir1_w));
+	m_keybc->kbd_clk().set(m_ps2_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_keybc->kbd_data().set(m_ps2_con, FUNC(pc_kbdc_device::data_write_from_mb));
+	m_keybc->aux_irq().set(m_pic[1], FUNC(pic8259_device::ir4_w));
+	m_keybc->aux_clk().set(m_aux_con, FUNC(pc_kbdc_device::clock_write_from_mb));
+	m_keybc->aux_data().set(m_aux_con, FUNC(pc_kbdc_device::data_write_from_mb));
+
+	PC_KBDC(config, m_ps2_con, pc_at_keyboards, STR_KBD_MICROSOFT_NATURAL);
+	m_ps2_con->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
+	m_ps2_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
+
+	// TODO: verify me, probably doesn't work
+	PC_KBDC(config, m_aux_con, ps2_mice, nullptr);
+	m_aux_con->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
+	m_aux_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_data_w));
+
 	ISA16(config, m_isabus, 0);
 	m_isabus->irq3_callback().set(FUNC(vt82c586b_isa_device::pc_irq3_w));
 	m_isabus->irq4_callback().set(FUNC(vt82c586b_isa_device::pc_irq4_w));
@@ -127,6 +157,10 @@ void vt82c586b_isa_device::device_config_complete()
 void vt82c586b_isa_device::device_start()
 {
 	pci_device::device_start();
+
+	save_item(NAME(m_nmi_enabled));
+
+	save_item(NAME(m_xd_power_on));
 }
 
 void vt82c586b_isa_device::device_reset()
@@ -139,12 +173,25 @@ void vt82c586b_isa_device::device_reset()
 	command_mask = 0x000f;
 	// medium DEVSEL#
 	status = 0x0200;
+
+	// TODO: strapped
+	m_xd_power_on = 0xb7;
+	m_nmi_enabled = false;
+	remap_cb();
 }
 
 void vt82c586b_isa_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
 	// ...
+	map(0x5a, 0x5a).lrw8(
+		NAME([this] () { return m_xd_power_on; }),
+		NAME([this] (offs_t offset, u8 data) {
+			// TODO: XD0 ~ XD2 / XD4 ~ XD7 strap configurations
+			m_xd_power_on = data;
+			remap_cb();
+		})
+	);
 }
 
 void vt82c586b_isa_device::internal_io_map(address_map &map)
@@ -152,23 +199,10 @@ void vt82c586b_isa_device::internal_io_map(address_map &map)
 	map(0x0000, 0x001f).rw(m_dma[0], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x0021).rw(m_pic[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-//	map(0x0060, 0x0060).rw(m_kbdc, FUNC(kbdc8042_device::port60_r), FUNC(kbdc8042_device::port60_w));
+//	map(0x0060, 0x0060) keyboard
 	map(0x0061, 0x0061).rw(FUNC(vt82c586b_isa_device::at_portb_r), FUNC(vt82c586b_isa_device::at_portb_w));
-//	map(0x0064, 0x0064).rw(m_kbdc, FUNC(kbdc8042_device::port64_r), FUNC(kbdc8042_device::port64_w));
-//	map(0x0070, 0x0070).lw8(
-//		NAME([this] (u8 data) {
-//			m_nmi_enabled = BIT(data, 7);
-//			m_rtcale(data);
-//		})
-//	);
-//	map(0x0071, 0x0071).lrw8(
-//		NAME([this] () {
-//			return m_rtccs_read();
-//		}),
-//		NAME([this] (u8 data) {
-//			m_rtccs_write(data);
-//		})
-//	);
+//	map(0x0064, 0x0064) keyboard
+//	map(0x0070, 0x0073) RTC
 	map(0x0080, 0x008f).rw(FUNC(vt82c586b_isa_device::at_page8_r), FUNC(vt82c586b_isa_device::at_page8_w));
 //	map(0x0092, 0x0092).lrw8(
 //		NAME([this] () {
@@ -210,6 +244,71 @@ void vt82c586b_isa_device::map_extra(
 	map_bios(memory_space, 0x000e0000, 0x000fffff);
 	m_isabus->remap(AS_IO, 0, 0xffff);
 	io_space->install_device(0, 0xffff, *this, &vt82c586b_isa_device::internal_io_map);
+
+	// Internal PS/2
+	// TODO: BIT 1 enables internal AUX too
+	if (BIT(m_xd_power_on, 0))
+	{
+		m_isabus->install_device(0x60, 0x60, read8smo_delegate(*m_keybc, FUNC(ps2_keyboard_controller_device::data_r)), write8smo_delegate(*m_keybc, FUNC(ps2_keyboard_controller_device::data_w)));
+		m_isabus->install_device(0x64, 0x64, read8smo_delegate(*m_keybc, FUNC(ps2_keyboard_controller_device::status_r)), write8smo_delegate(*m_keybc, FUNC(ps2_keyboard_controller_device::command_w)));
+	}
+
+	// Internal RTC
+	if (BIT(m_xd_power_on, 2))
+	{
+		io_space->install_readwrite_handler(0x70, 0x70,
+			read8sm_delegate(*this, FUNC(vt82c586b_isa_device::rtc_index_r<0>)),
+			write8sm_delegate(*this, FUNC(vt82c586b_isa_device::rtc_index_w<0>))
+		);
+		io_space->install_readwrite_handler(0x71, 0x71,
+			read8sm_delegate(*this, FUNC(vt82c586b_isa_device::rtc_data_r<0>)),
+			write8sm_delegate(*this, FUNC(vt82c586b_isa_device::rtc_data_w<0>))
+		);
+		io_space->install_readwrite_handler(0x72, 0x72,
+			read8sm_delegate(*this, FUNC(vt82c586b_isa_device::rtc_index_r<1>)),
+			write8sm_delegate(*this, FUNC(vt82c586b_isa_device::rtc_index_w<1>))
+		);
+		io_space->install_readwrite_handler(0x73, 0x73,
+			read8sm_delegate(*this, FUNC(vt82c586b_isa_device::rtc_data_r<1>)),
+			write8sm_delegate(*this, FUNC(vt82c586b_isa_device::rtc_data_w<1>))
+		);
+		// TODO: ports $74-$75
+	}
+}
+
+template <unsigned E> u8 vt82c586b_isa_device::rtc_index_r(offs_t offset)
+{
+	if (E)
+		return m_rtc_index;
+
+	// supposedly w/o but ls5amvp3 still reads it for timestamp needs
+	return m_rtc_index & 0x7f;
+}
+
+template <unsigned E> void vt82c586b_isa_device::rtc_index_w(offs_t offset, u8 data)
+{
+	m_rtc_index = data & 0x7f;
+	// NOTE: active low
+	if (!E)
+	{
+		m_nmi_enabled = BIT(~data, 7);
+		if (!m_nmi_enabled)
+			m_host_cpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
+	}
+	else
+		m_rtc_index |= data & 0x80;
+}
+
+template <unsigned E> u8 vt82c586b_isa_device::rtc_data_r(offs_t offset)
+{
+	const u8 rtc_address = m_rtc_index & (E ? 0xff : 0x7f);
+	return m_rtc->read_direct(rtc_address);
+}
+
+template <unsigned E> void vt82c586b_isa_device::rtc_data_w(offs_t offset, u8 data)
+{
+	const u8 rtc_address = m_rtc_index & (E ? 0xff : 0x7f);
+	m_rtc->write_direct(rtc_address, data);
 }
 
 /*

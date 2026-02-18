@@ -8,12 +8,13 @@
 
 #include "pci.h"
 #include "bus/isa/isa.h"
+#include "bus/pc_kbd/pc_kbdc.h"
+#include "cpu/i386/i386.h"
 #include "machine/am9517a.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-//#include "machine/ds128x.h"
-//#include "machine/at_keybc.h"
-//#include "machine/ram.h"
+#include "machine/ds128x.h"
+#include "machine/at_keybc.h"
 #include "sound/spkrdev.h"
 
 
@@ -66,11 +67,24 @@ private:
 	required_device_array<pic8259_device, 2> m_pic;
 	required_device_array<am9517a_device, 2> m_dma;
 	required_device<pit8254_device> m_pit;
+	required_device<ps2_keyboard_controller_device> m_keybc;
+	required_device<pc_kbdc_device> m_ps2_con;
+	required_device<pc_kbdc_device> m_aux_con;
+	required_device<ds12885ext_device> m_rtc;
 	required_device<isa16_device> m_isabus;
 	required_device<speaker_sound_device> m_speaker;
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
 
+	u8 m_xd_power_on;
+
+	template <unsigned E> u8 rtc_index_r(offs_t offset);
+	template <unsigned E> void rtc_index_w(offs_t offset, u8 data);
+
+	template <unsigned E> u8 rtc_data_r(offs_t offset);
+	template <unsigned E> void rtc_data_w(offs_t offset, u8 data);
+
+	// Southbridge common stuff
 	void at_pit8254_out0_changed(int state);
 	void at_pit8254_out1_changed(int state);
 	void at_pit8254_out2_changed(int state);
@@ -134,7 +148,7 @@ private:
 	uint8_t m_channel_check = 0;
 	bool m_nmi_enabled = false;
 
-
+	u8 m_rtc_index;
 };
 
 DECLARE_DEVICE_TYPE(VT82C586B_ISA, vt82c586b_isa_device)
