@@ -1278,6 +1278,8 @@ if BUSES["BK_PARALLEL"] then
 		MAME_DIR .. "src/devices/bus/bk/joystick.h",
 		MAME_DIR .. "src/devices/bus/bk/loopback.cpp",
 		MAME_DIR .. "src/devices/bus/bk/loopback.h",
+		MAME_DIR .. "src/devices/bus/bk/menestrel.cpp",
+		MAME_DIR .. "src/devices/bus/bk/menestrel.h",
 		MAME_DIR .. "src/devices/bus/bk/printer.cpp",
 		MAME_DIR .. "src/devices/bus/bk/printer.h",
 	}
