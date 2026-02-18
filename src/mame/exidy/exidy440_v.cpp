@@ -56,6 +56,15 @@ void exidy440_state::video_start()
 
 	for (int i = 0; i < 128; i++)
 		m_collide_firq_timer[i] = timer_alloc(FUNC(exidy440_state::collide_firq_callback), this);
+
+	save_item(NAME(m_firq_vblank));
+	save_item(NAME(m_firq_beam));
+	save_item(NAME(m_latched_x));
+	save_item(NAME(m_firq_enable));
+	save_item(NAME(m_firq_select));
+	save_item(NAME(m_palettebank_io));
+	save_item(NAME(m_palettebank_vis));
+	save_item(NAME(m_beam_firq_count));
 }
 
 
