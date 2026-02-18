@@ -38,12 +38,43 @@ private:
 	required_device<cpu_device> m_host_cpu;
 	std::vector<uint32_t> m_ram;
 
+	virtual uint8_t capptr_r() override;
+
 	u32 m_ram_size = 0;
 
 	void map_shadowram(address_space *memory_space, offs_t start_offs, offs_t end_offs, u8 setting);
 
+	u8 m_cache_control_1;
+	u8 m_cache_control_2;
+	u8 m_noncache_control;
+	u8 m_system_perf_control;
+	u16 m_noncache_region[2];
+
+	u16 m_dram_ma_map_type;
+	u8 m_bank_ending[6];
 	u8 m_dram_type;
 	u8 m_shadow_ram_control[3];
+	u8 m_dram_timing[3];
+	u8 m_dram_control;
+	u8 m_refresh_counter;
+	u8 m_dram_arbitration_control;
+	u8 m_sdram_control;
+	u8 m_dram_drive_strength;
+	u8 m_ecc_control;
+	u8 m_ecc_status;
+
+	u8 m_pci_buffer_control;
+	u8 m_pci_flow_control[2];
+	u8 m_pci_master_control[2];
+	u8 m_pci_arbitration[2];
+	u8 m_pmu_control;
+
+	u32 m_gart_control;
+	u8 m_aperture_size;
+	u32 m_ga_translation_table_base;
+
+	u32 m_agp_command;
+	u8 m_agp_control;
 };
 
 // TODO: bridge
