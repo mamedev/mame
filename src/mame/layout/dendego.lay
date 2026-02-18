@@ -30,13 +30,13 @@ authors:hap
 <!-- panel text -->
 
 	<element name="text_door">
-		<text string="doors">
-			<color red="0.0" green="0.0" blue="0.0" />
+		<text string="車内信号">
+			<color red="1.0" green="0.0" blue="0.0" />
 		</text>
 	</element>
 
 	<element name="text_lets">
-		<text string="LET'S GO BY TRAIN!">
+		<text string="電車でGO!">
 			<color red="0.3" green="0.6" blue="0.9" />
 		</text>
 	</element>
@@ -45,7 +45,7 @@ authors:hap
 <!-- throttle -->
 
 	<element name="text_throttle">
-		<text string="THROTTLE:" align="1">
+		<text string="マスコン:" align="1">
 			<color red="0.8" green="0.8" blue="0.8" />
 		</text>
 	</element>
@@ -80,12 +80,12 @@ authors:hap
 <!-- brake -->
 
 	<element name="text_brake">
-		<text string="BRAKE:" align="1">
+		<text string="ブレーキ:" align="1">
 			<color red="0.8" green="0.8" blue="0.8" />
 		</text>
 	</element>
 	<element name="text_kpa">
-		<text string="kPa" align="1">
+		<text string="kg/cm2" align="1">
 			<color red="1.0" green="1.0" blue="0.0" />
 		</text>
 	</element>
@@ -112,7 +112,7 @@ authors:hap
 	<element name="lamp_power" defstate="0">
 		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
-		<text string=" PWR ">
+		<text string="三相">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.333" width="1.0" height="0.333" />
 		</text>
@@ -121,7 +121,7 @@ authors:hap
 	<element name="lamp_normal" defstate="0">
 		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
 		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
-		<text string=" OK ">
+		<text string="常用">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.333" width="1.0" height="0.333" />
 		</text>
@@ -130,18 +130,18 @@ authors:hap
 	<element name="lamp_emergency" defstate="0">
 		<rect state="1"><color red="1.0" green="0.1" blue="0.1" /></rect>
 		<rect state="0"><color red="0.3" green="0.0" blue="0.0" /></rect>
-		<text string=" EME ">
+		<text string="非常">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.333" width="1.0" height="0.333" />
 		</text>
 	</element>
 
-	<element name="lamp_disk_white" defstate="0">
-		<disk state="1"><color red="1.0" green="1.0" blue="1.0" /></disk>
+	<element name="lamp_door" defstate="0">
+		<disk state="1"><color red="1.0" green="0.8" blue="0.5" /></disk>
 		<disk state="0"><color red="0.2" green="0.2" blue="0.2" /></disk>
 	</element>
 
-	<element name="lamp_disk_yellow" defstate="0">
+	<element name="lamp_start" defstate="0">
 		<disk state="1"><color red="1.0" green="1.0" blue="0.3" /></disk>
 		<disk state="0"><color red="0.2" green="0.2" blue="0.0" /></disk>
 	</element>
@@ -212,7 +212,7 @@ authors:hap
 			<bounds x="54" y="304" width="17" height="24" />
 		</element>
 
-		<element name="lamp1" ref="lamp_disk_white">
+		<element name="lamp1" ref="lamp_door">
 			<bounds x="86" y="314" width="14" height="14" />
 		</element>
 		<element ref="text_door">
@@ -222,7 +222,7 @@ authors:hap
 		<element name="lamp7" ref="lamp_rect_white">
 			<bounds x="230.5" y="311" width="9" height="4" />
 		</element>
-		<element name="lamp0" ref="lamp_disk_yellow">
+		<element name="lamp0" ref="lamp_start">
 			<bounds x="230.5" y="317" width="9" height="9" />
 		</element>
 
