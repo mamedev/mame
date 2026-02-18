@@ -41,7 +41,7 @@ public:
 	~device_debug();
 
 	// getters
-	symbol_table &symtable() { return *m_symtable; }
+	symbol_table &symtable();
 
 	// commonly-used pass-throughs
 	int logaddrchars() const { return (m_memory != nullptr && m_memory->has_space(AS_PROGRAM)) ? m_memory->space(AS_PROGRAM).logaddrchars() : 8; }
