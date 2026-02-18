@@ -575,16 +575,21 @@ device_debug::device_debug(device_t &device)
 		}
 
 		// Use own table for CPU and the global for others
-		symbol_table *symtable = m_symtable != nullptr ? m_symtable.get() : &device.machine().debugger().cpu().global_symtable();
+		const bool is_exec_syms = m_symtable != nullptr;
+		symbol_table *symtable = is_exec_syms ? m_symtable.get() : &device.machine().debugger().cpu().global_symtable();
 
 		// add all registers into it
+		std::string sym_name_prefix = "";
+		for (auto d = &device; !is_exec_syms && d->owner() != nullptr; d = d->owner())
+			sym_name_prefix = std::string(d->tag()).substr(1) + "_" + sym_name_prefix;
+
 		for (const auto &entry : m_state->state_entries())
 		{
 			// TODO: floating point registers
 			if (!entry->is_float())
 			{
 				using namespace std::placeholders;
-				std::string tempstr(strmakelower(entry->symbol()));
+				std::string tempstr(sym_name_prefix + strmakelower(entry->symbol()));
 				symtable->add(
 						tempstr.c_str(),
 						std::bind(&device_state_entry::value, entry.get()),
