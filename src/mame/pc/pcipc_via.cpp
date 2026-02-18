@@ -75,17 +75,12 @@ static void isa_com(device_slot_interface &device)
 
 static void isa_internal_devices(device_slot_interface &device)
 {
-	// TODO: downgrade to ITE IT8661F
-	device.option_add("it8671f", IT8671F);
+	device.option_add("it8661f", IT8661F);
 }
 
 void mvp3_state::ite_superio_config(device_t *device)
 {
-	it8671f_device &ite = *downcast<it8671f_device *>(device);
-	ite.krst_gpio2().set_inputline(":maincpu", INPUT_LINE_RESET);
-	ite.ga20_gpio6().set_inputline(":maincpu", INPUT_LINE_A20);
-//	ite.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
-//	ite.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+	it8661f_device &ite = *downcast<it8661f_device *>(device);
 	ite.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
 	ite.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
 	ite.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
@@ -107,7 +102,7 @@ void mvp3_state::mvp3(machine_config &config)
 	// Max 768 MB
 	VT82C598MVP_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 
-	vt82c586b_isa_device &isa(VT82C586B_ISA(config, "pci:07.0", 0, m_maincpu));
+	vt82c586b_isa_device &isa(VT82C586B_ISA(config, "pci:07.0", XTAL(33'000'000), m_maincpu));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 //	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
@@ -115,24 +110,24 @@ void mvp3_state::mvp3(machine_config &config)
 
 	// TODO: 1 AGP slot, 4 PCI slots
 
-	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", ite_superio_config);
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8661f", true).set_option_machine_config("it8661f", ite_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
-	serport0.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd1_w));
-	serport0.dcd_handler().set("board4:it8671f", FUNC(it8671f_device::ndcd1_w));
-	serport0.dsr_handler().set("board4:it8671f", FUNC(it8671f_device::ndsr1_w));
-	serport0.ri_handler().set("board4:it8671f", FUNC(it8671f_device::nri1_w));
-	serport0.cts_handler().set("board4:it8671f", FUNC(it8671f_device::ncts1_w));
+	serport0.rxd_handler().set("board4:it8661f", FUNC(it8661f_device::rxd1_w));
+	serport0.dcd_handler().set("board4:it8661f", FUNC(it8661f_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:it8661f", FUNC(it8661f_device::ndsr1_w));
+	serport0.ri_handler().set("board4:it8661f", FUNC(it8661f_device::nri1_w));
+	serport0.cts_handler().set("board4:it8661f", FUNC(it8661f_device::ncts1_w));
 
 	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
-	serport1.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd2_w));
-	serport1.dcd_handler().set("board4:it8671f", FUNC(it8671f_device::ndcd2_w));
-	serport1.dsr_handler().set("board4:it8671f", FUNC(it8671f_device::ndsr2_w));
-	serport1.ri_handler().set("board4:it8671f", FUNC(it8671f_device::nri2_w));
-	serport1.cts_handler().set("board4:it8671f", FUNC(it8671f_device::ncts2_w));
+	serport1.rxd_handler().set("board4:it8661f", FUNC(it8661f_device::rxd2_w));
+	serport1.dcd_handler().set("board4:it8661f", FUNC(it8661f_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:it8661f", FUNC(it8661f_device::ndsr2_w));
+	serport1.ri_handler().set("board4:it8661f", FUNC(it8661f_device::nri2_w));
+	serport1.cts_handler().set("board4:it8661f", FUNC(it8661f_device::ncts2_w));
 
 	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
 	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");

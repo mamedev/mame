@@ -116,16 +116,32 @@ void vt82c598mvp_host_device::map_extra(
 
 	// TODO: config port for PCI Arbiter Disable at $22
 
-	// TODO: two other Memory Hole settings, mutually exclusive
-	const u8 memory_hole_lower = (m_shadow_ram_control[2] & 0xc) == 4;
+	const u8 memory_hole = m_shadow_ram_control[2] & 0xc;
 
-	if(memory_hole_lower)
+	if(memory_hole == 0x4)
 		memory_space->install_ram      (0x00000000, 0x0007ffff, &m_ram[0x00000000/4]);
 	else
 		memory_space->install_ram      (0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
 
-	memory_space->install_ram      (0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
+	// upper memory hole settings
+	memory_space->install_ram          (0x00100000, 0x00dfffff, &m_ram[0x00100000/4]);
+	switch(memory_hole)
+	{
+		// 15M-16M
+		case 0x8:
+			memory_space->install_ram  (0x00e00000, 0x00efffff, &m_ram[0x00e00000/4]);
+			break;
+		// 14M-16M
+		case 0xc:
+			break;
+		default:
+			memory_space->install_ram  (0x00e00000, 0x00ffffff, &m_ram[0x00e00000/4]);
+			break;
+	}
 
+	memory_space->install_ram          (0x01000000, m_ram_size-1, &m_ram[0x01000000/4]);
+
+	// Shadow RAM section
 	int i;
 
 	// handle both $c0000 / $d0000
@@ -141,6 +157,5 @@ void vt82c598mvp_host_device::map_extra(
 	map_shadowram(memory_space, 0xe0000, 0xeffff, (m_shadow_ram_control[2] >> 6) & 3);
 	map_shadowram(memory_space, 0xf0000, 0xfffff, (m_shadow_ram_control[2] >> 4) & 3);
 
-	memory_space->install_ram(0x00100000, m_ram_size - 1, &m_ram[0x00100000/4]);
 }
 
