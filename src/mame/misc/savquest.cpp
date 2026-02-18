@@ -79,7 +79,6 @@
 #include "machine/i82371sb.h"
 #include "machine/i82443bx_host.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/w83977tf.h"
 #include "video/voodoo_2.h"
 #include "video/voodoo_pci.h"

@@ -169,7 +169,6 @@ Hardware for the 770Z model.
 #include "cpu/i386/i386.h"
 #include "machine/ds17x85.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/i82443bx_host.h"
 #include "machine/i82371eb_isa.h"
 #include "machine/i82371eb_ide.h"

@@ -37,7 +37,6 @@
 #include "machine/i82439tx.h"
 #include "machine/i82443bx_host.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/w83977tf.h"
 
 #include "softlist_dev.h"
@@ -662,7 +661,6 @@ void pcipc_state::pcipctx(machine_config &config)
 
 	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
-//  IDE_PCI(config, "pci:07.1", 0, 0x80867010, 0x03, 0x00000000);
 
 	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);

@@ -20,9 +20,9 @@
 #include "cpu/i386/i386.h"
 #include "machine/it8671f.h"
 #include "machine/pci.h"
+#include "machine/vt82c586b_ide.h"
 #include "machine/vt82c586b_isa.h"
 #include "machine/vt82c598mvp.h"
-//#include "machine/w83787f.h"
 //#include "video/voodoo_pci.h"
 
 #include "softlist.h"
@@ -109,7 +109,12 @@ void mvp3_state::mvp3(machine_config &config)
 	isa.cpureset().set_inputline("maincpu", INPUT_LINE_RESET);
 //  isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
-	// TODO: IDE, USB, ACPI
+	vt82c586b_ide_device &ide(VT82C586B_IDE(config, "pci:07.1", 0, m_maincpu));
+	// TODO: use ad-hoc remapping from ISA
+	ide.irq_pri().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_irq15_w));
+
+	// TODO: USB, ACPI
 
 	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "sis6326_agp");
 

@@ -31,8 +31,6 @@ when actually playing the games because otherwise you'll be sending inputs to th
 #include "emu.h"
 #include "jaleco_vj_pc.h"
 
-#include "jaleco_vj_ups.h"
-
 #include "bus/isa/isa_cards.h"
 #include "bus/pci/virge_pci.h"
 #include "bus/rs232/rs232.h"
@@ -40,8 +38,9 @@ when actually playing the games because otherwise you'll be sending inputs to th
 #include "machine/i82371sb.h"
 #include "machine/i82439hx.h"
 #include "machine/i82439tx.h"
-#include "machine/pci-ide.h"
 #include "machine/pci.h"
+
+#include "jaleco_vj_ups.h"
 
 
 jaleco_vj_pc_device::jaleco_vj_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :

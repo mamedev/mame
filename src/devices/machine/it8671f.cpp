@@ -869,8 +869,8 @@ void it8671f_device::device_add_mconfig(machine_config &config)
 	m_ps2_con->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_clk_w));
 	m_ps2_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::kbd_data_w));
 
-	// TODO: verify if it doesn't give problems later on
-	PC_KBDC(config, m_aux_con, ps2_mice, STR_HLE_PS2_MOUSE);
+	// TODO: gives problems as usual ...
+	PC_KBDC(config, m_aux_con, ps2_mice, nullptr);
 	m_aux_con->out_clock_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_clk_w));
 	m_aux_con->out_data_cb().set(m_keybc, FUNC(ps2_keyboard_controller_device::aux_data_w));
 

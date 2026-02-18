@@ -127,7 +127,6 @@ HS3PIN  Unpopulated header near A40MX04
 
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/pci-smbus.h"
 #include "machine/i82443bx_host.h"
 #include "machine/i82371eb_isa.h"

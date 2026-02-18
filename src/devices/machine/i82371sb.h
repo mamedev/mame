@@ -7,11 +7,11 @@
 #pragma once
 
 #include "pci.h"
-#include "machine/pci-ide.h"
 
 #include "bus/ata/ataintf.h"
 #include "bus/isa/isa.h"
 
+#include "machine/idectrl.h"
 #include "machine/ins8250.h"
 #include "machine/ds128x.h"
 #include "machine/pic8259.h"

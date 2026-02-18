@@ -26,16 +26,15 @@
 #include "xbox_pci.h"
 
 #include "bus/ata/atadev.h"
+#include "bus/isa/isa.h"
+#include "bus/pci/virge_pci.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/athlon.h"
-#include "machine/pci-ide.h"
 #include "machine/pckeybrd.h"
-#include "bus/isa/isa.h"
-#include "bus/pci/virge_pci.h"
 
 #include "formats/naslite_dsk.h"
 

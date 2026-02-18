@@ -36,7 +36,6 @@ SiS 5600/SiS 5595 is a Slot 1 Pentium II MB, the earlier version of what is in s
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/pci-smbus.h"
 #include "machine/i82443bx_host.h"
 #include "machine/i82371eb_isa.h"

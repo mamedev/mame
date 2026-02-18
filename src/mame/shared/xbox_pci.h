@@ -8,8 +8,8 @@
 #include "xbox_nv2a.h"
 #include "xbox_usb.h"
 
+#include "machine/idectrl.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ds128x.h"
