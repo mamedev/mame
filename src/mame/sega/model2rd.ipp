@@ -11,6 +11,32 @@
 #pragma once
 
 
+inline u16 model2_renderer::get_texel(u32 base_x, u32 base_y, int x, int y, const u32 *sheet)
+{
+	int x2 = base_x + x;
+	int y2 = base_y + y;
+	if (x2 >= 1024)
+	{
+		// texture sheets are mapped as 2048x1024 but stored in RAM as 1024x2048
+		x2 -= 1024;
+		y2 ^= 1024;
+	}
+	u32  offset = ((y2 / 2) * 512) + (x2 / 2);
+	u32  texel = sheet[offset>>1];
+
+	if (offset & 1)
+		texel >>= 16;
+
+	if ((y & 1) == 0)
+		texel >>= 8;
+
+	if ((x & 1) == 0)
+		texel >>= 4;
+
+	return texel & 0x0f;
+}
+
+
 // non-textured render path
 template <bool Translucent>
 void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
@@ -75,7 +101,7 @@ constexpr u32 LERP(u32 x, u32 y, unsigned a)
 }
 
 template <bool Translucent>
-u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, const s32 miplevel, s32 u, s32 v)
+u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, s32 miplevel, s32 u, s32 v)
 {
 	u32 tex_wrap_x = object.texwrapx;
 	u32 tex_wrap_y = object.texwrapy;
