@@ -179,6 +179,10 @@ void virge_pci_device::device_start()
 	// medium DEVSELB
 	status = 0x0200;
 
+	// INTA#
+	intr_pin = 1;
+	// TODO: min_gnt 0x04, max_lat = 0xff
+
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virge_pci_device::postload), this));
 }
@@ -200,6 +204,10 @@ void virgevx_pci_device::device_start()
 	// medium DEVSELB
 	status = 0x0200;
 
+	// INTA#
+	intr_pin = 1;
+	// TODO: min_gnt 0x04, max_lat = 0xff (assumed same as regular ViRGE)
+
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virgevx_pci_device::postload), this));
 }
@@ -220,6 +228,10 @@ void virgedx_pci_device::device_start()
 	command_mask = 0x27;
 	// medium DEVSELB
 	status = 0x0200;
+
+	// INTA#
+	intr_pin = 1;
+	// TODO: min_gnt 0x04, max_lat = 0xff (assumed same as regular ViRGE)
 
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virgedx_pci_device::postload), this));
