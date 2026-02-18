@@ -9,15 +9,19 @@
 class toaplan_scu_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
-	toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	using pri_cb_delegate = device_delegate<void (u8 priority, u32 &pri_mask)>;
 
-	typedef device_delegate<void (u8 priority, u32 &pri_mask)> pri_cb_delegate;
+	toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
 	void set_xoffsets(int xoffs, int xoffs_flipped)
 	{
 		m_xoffs = xoffs;
 		m_xoffs_flipped = xoffs_flipped;
+	}
+	void set_colorbase(u16 base)
+	{
+		m_colbase = base;
 	}
 	template <typename... T> void set_pri_callback(T &&... args) { m_pri_cb.set(std::forward<T>(args)...); }
 
@@ -37,6 +41,7 @@ private:
 	pri_cb_delegate m_pri_cb;
 	int m_xoffs = 0;
 	int m_xoffs_flipped = 0;
+	u16 m_colbase = 0;
 };
 
 DECLARE_DEVICE_TYPE(TOAPLAN_SCU, toaplan_scu_device)
