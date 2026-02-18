@@ -1283,7 +1283,6 @@ ROM_START( hp48gx )
 
 	ROM_SYSTEM_BIOS( 4, "r", "Version R" )
 	ROMX_LOAD( "gxrom-r", 0x00000, 0x80000, CRC(00ee1a62) SHA1(5705fc9ea791916c4456ac35e22275862411db9b), ROM_BIOS(4) )
-
 ROM_END
 
 #define rom_hp48g  rom_hp48gx
@@ -1294,7 +1293,6 @@ ROM_START( hp48gp )
 
 	ROM_SYSTEM_BIOS( 0, "r", "Version R" )
 	ROM_LOAD( "gxrom-r", 0x00000, 0x80000, CRC(00ee1a62) SHA1(5705fc9ea791916c4456ac35e22275862411db9b) )
-
 ROM_END
 
 /* These ROMS are common to the S and SX models.
@@ -1328,7 +1326,6 @@ ROM_START( hp48sx )
 	ROMX_LOAD( "sxrom-j", 0x00000, 0x40000, CRC(1a6378ef) SHA1(5235f5379f1fd7edfe9bb6bf466b60d279163e73), ROM_BIOS(5) )
 
 	/* no F, G, H, I revisions? */
-
 ROM_END
 
 #define rom_hp48s rom_hp48sx

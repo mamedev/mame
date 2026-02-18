@@ -68,11 +68,11 @@ Supported games:
     --------------------------------------------------
     fireshrk    TP-O17      Fire Shark (World)           [1990]
     fireshrka   TP-O17      Fire Shark (World)           [1989]
-	fireshrkd   TP-O17      Fire Shark (Korea)           [1990] (Easier set)
-	fireshrkdh  TP-O17      Fire Shark (Korea)           [1990] (Harder set)
+    fireshrkd   TP-O17      Fire Shark (Korea)           [1990] (Easier set)
+    fireshrkdh  TP-O17      Fire Shark (Korea)           [1990] (Harder set)
     samesame    TP-O17      Same! Same! Same! (Japan)    [1989] (1 Player version)
     samesame2   TP-O17      Same! Same! Same! (Japan)    [1989] (2 Player version)
-	samesamecn  TP-O17      Jiao! Jiao! Jiao! (China)    [1990]
+    samesamecn  TP-O17      Jiao! Jiao! Jiao! (China)    [1990]
 
 
 Notes:

@@ -24,7 +24,7 @@ Used at:
 Input pixel format:
 
 Bit                 Description
-fedc ba98 7654 3210 
+fedc ba98 7654 3210
 xxxx ---- ---- ---- Priority*
 ---- xxxx xxxx xxxx Color**
 
@@ -34,7 +34,7 @@ xxxx ---- ---- ---- Priority*
 Palette RAM address format:
 
 Bit                 Description
-fedc ba98 7654 3210 
+fedc ba98 7654 3210
 ---x ---- ---- ---- Layer*
 ---- xxxx xxxx xxxx Color**
 
@@ -44,7 +44,7 @@ fedc ba98 7654 3210
 Video timing register format:
 
 Word Bit                 Description
-     fedc ba98 7654 3210 
+     fedc ba98 7654 3210
 0    ---- ---- xxxx xxxx Horizontal total (Added by 1 then multiplied by 2)
 1    ---- ---- ---- ----
 2    ---- ---- xxxx xxxx Vertical total (Added by 1 then multiplied by 2)

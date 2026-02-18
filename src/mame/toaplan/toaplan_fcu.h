@@ -13,7 +13,7 @@ Toaplan 'FCU' sprite generator
 class toaplan_fcu_device : public device_t, public device_gfx_interface
 {
 public:
-	using pri_cb_delegate = device_delegate<void (u8 priority, u32 &pri_mask)> ;
+	using pri_cb_delegate = device_delegate<void (u8 priority, u32 &pri_mask)>;
 
 	toaplan_fcu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	template <typename T> toaplan_fcu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock, T &&palette_tag, const gfx_decode_entry *gfxinfo)

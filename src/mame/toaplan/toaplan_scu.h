@@ -9,9 +9,9 @@
 class toaplan_scu_device : public device_t, public device_gfx_interface, public device_video_interface
 {
 public:
-	toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	using pri_cb_delegate = device_delegate<void (u8 priority, u32 &pri_mask)>;
 
-	typedef device_delegate<void (u8 priority, u32 &pri_mask)> pri_cb_delegate;
+	toaplan_scu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// configuration
 	void set_xoffsets(int xoffs, int xoffs_flipped)

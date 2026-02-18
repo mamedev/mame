@@ -32,7 +32,7 @@ Word Bit                 Description
 Sprite size LUT RAM format: (2 nibbles per entry, Only LSB is used)
 
 Bit       Description
-7654 3210 
+7654 3210
 xxxx ---- Sprite height (1 tile unit)
 ---- xxxx Sprite width (1 tile unit)
 

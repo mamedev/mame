@@ -19,8 +19,8 @@ Word Bit                 Description
 0    ---- -xxx xxxx xxxx Tile index
 1    ---- xx-- ---- ---- Priority*
      ---- --x- ---- ---- Flip Y
-	 ---- ---x ---- ---- Flip X
-	 ---- ---- --xx xxxx Color index**
+     ---- ---x ---- ---- Flip X
+     ---- ---- --xx xxxx Color index**
 2    xxxx xxxx x--- ---- X position
 3    xxxx xxxx x--- ---- Y position
 
