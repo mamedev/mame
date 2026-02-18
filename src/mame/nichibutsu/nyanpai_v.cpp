@@ -19,9 +19,7 @@
 void nyanpai_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	const u16 oldword = m_paletteram[offset];
-	u16 newword;
-
-	newword = COMBINE_DATA(&m_paletteram[offset]);
+	const u16 newword = COMBINE_DATA(&m_paletteram[offset]);
 
 	if (oldword != newword)
 	{
@@ -48,25 +46,72 @@ void nyanpai_state::palette_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 }
 
+u8 nyanpai_state::nyanpai_layer::layer_r(offs_t offset)
+{
+	u8 ret = 0xff;
+
+	switch (offset)
+	{
+		// NB19010 Busy Flag
+		case 0x00: ret &= 0xfe | ((m_host.m_nb19010_busyflag & 0x01) ^ 0x01); break;
+		// NB19010 GFX-ROM Read
+		case 0x01: ret &= m_host.m_gfx[m_blitter_src_addr]; break;
+	}
+
+	return ret;
+}
+
+void nyanpai_state::nyanpai_layer::layer_w(offs_t offset, u8 data)
+{
+	switch (offset)
+	{
+		case 0x00:  m_blitter_direction_x = BIT(data, 0);
+					m_blitter_direction_y = BIT(data, 1);
+					m_clutmode = BIT(data, 2);
+				//  if (data & 0x08) popmessage("Unknown GFX Flag!! (0x08)");
+					m_transparency = BIT(data, 4);
+				//  if (data & 0x20) popmessage("Unknown GFX Flag!! (0x20)");
+					m_flipscreen = BIT(~data, 6);
+					m_dispflag = BIT(data, 7);
+					vramflip();
+					break;
+		case 0x01:  m_scrollx = (m_scrollx & 0x0100) | data; break;
+		case 0x02:  m_scrollx = (m_scrollx & 0x00ff) | ((data << 8) & 0x0100); break;
+		case 0x03:  m_scrolly = (m_scrolly & 0x0100) | data; break;
+		case 0x04:  m_scrolly = (m_scrolly & 0x00ff) | ((data << 8) & 0x0100); break;
+		case 0x05:  m_blitter_src_addr = (m_blitter_src_addr & 0xffff00) | data; break;
+		case 0x06:  m_blitter_src_addr = (m_blitter_src_addr & 0xff00ff) | (data << 8); break;
+		case 0x07:  m_blitter_src_addr = (m_blitter_src_addr & 0x00ffff) | (data << 16); break;
+		case 0x08:  m_blitter_sizex = data; break;
+		case 0x09:  m_blitter_sizey = data; break;
+		case 0x0a:  m_blitter_destx = (m_blitter_destx & 0xff00) | data; break;
+		case 0x0b:  m_blitter_destx = (m_blitter_destx & 0x00ff) | (data << 8); break;
+		case 0x0c:  m_blitter_desty = (m_blitter_desty & 0xff00) | data; break;
+		case 0x0d:  m_blitter_desty = (m_blitter_desty & 0x00ff) | (data << 8);
+					gfxdraw();
+					break;
+		default:    break;
+	}
+}
 /******************************************************************************
 
 
 ******************************************************************************/
-void nyanpai_state::vramflip(nyanpai_layer &layer)
+void nyanpai_state::nyanpai_layer::vramflip()
 {
-	const int width = m_screen->width();
-	const int height = m_screen->height();
+	const int width = m_screen_width;
+	const int height = m_screen_height;
 
-	if (layer.m_flipscreen == layer.m_flipscreen_old) return;
+	if (m_flipscreen == m_flipscreen_old) return;
 
 	for (int y = 0; y < (height / 2); y++)
 	{
 		for (int x = 0; x < width; x++)
 		{
-			const u16 color1 = layer.m_videoram[(y * width) + x];
-			const u16 color2 = layer.m_videoram[((y ^ 0x1ff) * width) + (x ^ 0x3ff)];
-			layer.m_videoram[(y * width) + x] = color2;
-			layer.m_videoram[((y ^ 0x1ff) * width) + (x ^ 0x3ff)] = color1;
+			const u16 color1 = m_videoram[(y * width) + x];
+			const u16 color2 = m_videoram[((y ^ 0x1ff) * width) + (x ^ 0x3ff)];
+			m_videoram[(y * width) + x] = color2;
+			m_videoram[((y ^ 0x1ff) * width) + (x ^ 0x3ff)] = color1;
 		}
 	}
 
@@ -74,20 +119,20 @@ void nyanpai_state::vramflip(nyanpai_layer &layer)
 	{
 		for (int x = 0; x < width; x++)
 		{
-			const u16 color1 = layer.m_videoworkram[(y * width) + x];
-			const u16 color2 = layer.m_videoworkram[((y ^ 0x1ff) * width) + (x ^ 0x3ff)];
-			layer.m_videoworkram[(y * width) + x] = color2;
-			layer.m_videoworkram[((y ^ 0x1ff) * width) + (x ^ 0x3ff)] = color1;
+			const u16 color1 = m_videoworkram[(y * width) + x];
+			const u16 color2 = m_videoworkram[((y ^ 0x1ff) * width) + (x ^ 0x3ff)];
+			m_videoworkram[(y * width) + x] = color2;
+			m_videoworkram[((y ^ 0x1ff) * width) + (x ^ 0x3ff)] = color1;
 		}
 	}
 
-	layer.m_flipscreen_old = layer.m_flipscreen;
-	m_screen_refresh = 1;
+	m_flipscreen_old = m_flipscreen;
+	m_host.m_screen_refresh = 1;
 }
 
-void nyanpai_state::update_pixel(int vram, int x, int y)
+void nyanpai_state::nyanpai_layer::update_pixel(int x, int y)
 {
-	m_layer[vram].m_tmpbitmap.pix(y, x) = m_layer[vram].m_videoram[(y * m_screen->width()) + x];
+	m_tmpbitmap.pix(y, x) = m_videoram[(y * m_screen_width) + x];
 }
 
 TIMER_CALLBACK_MEMBER(nyanpai_state::clear_busy_flag)
@@ -95,51 +140,51 @@ TIMER_CALLBACK_MEMBER(nyanpai_state::clear_busy_flag)
 	m_nb19010_busyflag = 1;
 }
 
-void nyanpai_state::gfxdraw(int vram)
+void nyanpai_state::nyanpai_layer::gfxdraw()
 {
-	nyanpai_layer &layer = m_layer[vram];
-	const int width = m_screen->width();
+	const int width = m_screen_width;
+	const size_t gfxlen = m_host.m_gfx.bytes();
+	const u8 *gfx = m_host.m_gfx;
 
-	m_nb19010_busyctr = 0;
+	m_host.m_nb19010_busyctr = 0;
 
-	if (layer.m_clutmode)
+	if (m_clutmode)
 	{
 		// NB22090 clut256 mode
-		layer.m_blitter_sizex = m_gfx[((layer.m_blitter_src_addr + 0) & 0x00ffffff)];
-		layer.m_blitter_sizey = m_gfx[((layer.m_blitter_src_addr + 1) & 0x00ffffff)];
+		m_blitter_sizex = gfx[((m_blitter_src_addr + 0) & 0x00ffffff)];
+		m_blitter_sizey = gfx[((m_blitter_src_addr + 1) & 0x00ffffff)];
 	}
 
 	int startx, starty;
 	int sizex, sizey;
 	int skipx, skipy;
-	if (layer.m_blitter_direction_x)
+	if (m_blitter_direction_x)
 	{
-		startx = layer.m_blitter_destx;
-		sizex = layer.m_blitter_sizex;
+		startx = m_blitter_destx;
+		sizex = m_blitter_sizex;
 		skipx = 1;
 	}
 	else
 	{
-		startx = layer.m_blitter_destx + layer.m_blitter_sizex;
-		sizex = layer.m_blitter_sizex;
+		startx = m_blitter_destx + m_blitter_sizex;
+		sizex = m_blitter_sizex;
 		skipx = -1;
 	}
 
-	if (layer.m_blitter_direction_y)
+	if (m_blitter_direction_y)
 	{
-		starty = layer.m_blitter_desty;
-		sizey = layer.m_blitter_sizey;
+		starty = m_blitter_desty;
+		sizey = m_blitter_sizey;
 		skipy = 1;
 	}
 	else
 	{
-		starty = layer.m_blitter_desty + layer.m_blitter_sizey;
-		sizey = layer.m_blitter_sizey;
+		starty = m_blitter_desty + m_blitter_sizey;
+		sizey = m_blitter_sizey;
 		skipy = -1;
 	}
 
-	const size_t gfxlen = m_gfx.bytes();
-	u32 gfxaddr = ((layer.m_blitter_src_addr + 2) & 0x00ffffff);
+	u32 gfxaddr = ((m_blitter_src_addr + 2) & 0x00ffffff);
 
 	for (int y = starty, ctry = sizey; ctry >= 0; y += skipy, ctry--)
 	{
@@ -154,13 +199,13 @@ void nyanpai_state::gfxdraw(int vram)
 				gfxaddr &= (gfxlen - 1);
 			}
 
-			const u8 color = m_gfx[gfxaddr++];
+			const u8 color = gfx[gfxaddr++];
 
 			int dx1 = (2 * x + 0) & 0x3ff;
 			int dx2 = (2 * x + 1) & 0x3ff;
 			int dy = y & 0x1ff;
 
-			if (!layer.m_flipscreen)
+			if (!m_flipscreen)
 			{
 				dx1 ^= 0x3ff;
 				dx2 ^= 0x3ff;
@@ -168,7 +213,7 @@ void nyanpai_state::gfxdraw(int vram)
 			}
 
 			u16 color1, color2;
-			if (layer.m_blitter_direction_x)
+			if (m_blitter_direction_x)
 			{
 				// flip
 				color1 = (color & 0x0f) >> 0;
@@ -181,68 +226,68 @@ void nyanpai_state::gfxdraw(int vram)
 				color2 = (color & 0x0f) >> 0;
 			}
 
-			if (layer.m_clutmode)
+			if (m_clutmode)
 			{
 				// clut256 mode
 
-				if (layer.m_clutsel & 0x80)
+				if (m_clutsel & 0x80)
 				{
 					// clut256 mode 1st(low)
-					layer.m_videoworkram[(dy * width) + dx1] &= 0x00f0;
-					layer.m_videoworkram[(dy * width) + dx1] |= color1 & 0x0f;
-					layer.m_videoworkram[(dy * width) + dx2] &= 0x00f0;
-					layer.m_videoworkram[(dy * width) + dx2] |= color2 & 0x0f;
+					m_videoworkram[(dy * width) + dx1] &= 0x00f0;
+					m_videoworkram[(dy * width) + dx1] |= color1 & 0x0f;
+					m_videoworkram[(dy * width) + dx2] &= 0x00f0;
+					m_videoworkram[(dy * width) + dx2] |= color2 & 0x0f;
 
 					continue;
 				}
 				else
 				{
 					// clut256 mode 2nd(high)
-					layer.m_videoworkram[(dy * width) + dx1] &= 0x000f;
-					layer.m_videoworkram[(dy * width) + dx1] |= (color1 & 0x0f) << 4;
-					layer.m_videoworkram[(dy * width) + dx2] &= 0x000f;
-					layer.m_videoworkram[(dy * width) + dx2] |= (color2 & 0x0f) << 4;
+					m_videoworkram[(dy * width) + dx1] &= 0x000f;
+					m_videoworkram[(dy * width) + dx1] |= (color1 & 0x0f) << 4;
+					m_videoworkram[(dy * width) + dx2] &= 0x000f;
+					m_videoworkram[(dy * width) + dx2] |= (color2 & 0x0f) << 4;
 
-		//          layer.m_videoworkram[(dy * width) + dx1] += layer.m_clut[(layer.m_clutsel * 0x10)];
-		//          layer.m_videoworkram[(dy * width) + dx2] += layer.m_clut[(layer.m_clutsel * 0x10)];
+		//          m_videoworkram[(dy * width) + dx1] += m_clut[(m_clutsel * 0x10)];
+		//          m_videoworkram[(dy * width) + dx2] += m_clut[(m_clutsel * 0x10)];
 				}
 
-				color1 = layer.m_videoworkram[(dy * width) + dx1];
-				color2 = layer.m_videoworkram[(dy * width) + dx2];
+				color1 = m_videoworkram[(dy * width) + dx1];
+				color2 = m_videoworkram[(dy * width) + dx2];
 			}
 			else
 			{
 				// clut16 mode
-				color1 = layer.m_clut[(layer.m_clutsel * 0x10) + color1];
-				color2 = layer.m_clut[(layer.m_clutsel * 0x10) + color2];
+				color1 = m_clut[(m_clutsel * 0x10) + color1];
+				color2 = m_clut[(m_clutsel * 0x10) + color2];
 			}
 
-			color1 |= (0x0100 * vram);
-			color2 |= (0x0100 * vram);
+			color1 |= m_colbase;
+			color2 |= m_colbase;
 
-			if (((color1 & 0x00ff) != 0x00ff) || (!layer.m_transparency))
+			if (((color1 & 0x00ff) != 0x00ff) || (!m_transparency))
 			{
-				layer.m_videoram[(dy * width) + dx1] = color1;
-				update_pixel(vram, dx1, dy);
+				m_videoram[(dy * width) + dx1] = color1;
+				update_pixel(dx1, dy);
 			}
-			if (((color2 & 0x00ff) != 0x00ff) || (!layer.m_transparency))
+			if (((color2 & 0x00ff) != 0x00ff) || (!m_transparency))
 			{
-				layer.m_videoram[(dy * width) + dx2] = color2;
-				update_pixel(vram, dx2, dy);
+				m_videoram[(dy * width) + dx2] = color2;
+				update_pixel(dx2, dy);
 			}
 
-			m_nb19010_busyctr++;
+			m_host.m_nb19010_busyctr++;
 		}
 	}
 
-	if (layer.m_clutmode)
+	if (m_clutmode)
 	{
 		// NB22090 clut256 mode
-		layer.m_blitter_src_addr = gfxaddr;
+		m_blitter_src_addr = gfxaddr;
 	}
 
-	m_nb19010_busyflag = 0;
-	m_blitter_timer->adjust(attotime::from_nsec(1000 * m_nb19010_busyctr));
+	m_host.m_nb19010_busyflag = 0;
+	m_host.m_blitter_timer->adjust(attotime::from_nsec(1000 * m_host.m_nb19010_busyctr));
 }
 
 /******************************************************************************
@@ -254,9 +299,14 @@ void nyanpai_state::video_start()
 	const int width = m_screen->width();
 	const int height = m_screen->height();
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < VRAM_MAX; i++)
 	{
 		nyanpai_layer &layer = m_layer[i];
+
+		layer.m_screen_width = width;
+		layer.m_screen_height = height;
+		layer.m_colbase = i << 8;
+
 		m_screen->register_screen_bitmap(layer.m_tmpbitmap);
 		layer.m_videoram = make_unique_clear<u16[]>(width * height);
 		layer.m_videoworkram = make_unique_clear<u16[]>(width * height);
@@ -309,24 +359,25 @@ u32 nyanpai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 		{
 			for (int x = 0; x < width; x++)
 			{
-				update_pixel(0, x, y);
-				update_pixel(1, x, y);
-				update_pixel(2, x, y);
+				for (int l = 0; l < VRAM_MAX; l++)
+				{
+					m_layer[l].update_pixel(x, y);
+				}
 			}
 		}
 	}
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < VRAM_MAX; i++)
 	{
 		nyanpai_layer &layer = m_layer[i];
 		if (layer.m_flipscreen)
 		{
-			scrollx[i] = (((-layer.m_scrollx) - 0x4e)  & 0x1ff) << 1;
+			scrollx[i] = (((-layer.m_scrollx) - 0x4e) & 0x1ff) << 1;
 			scrolly[i] = (-layer.m_scrolly) & 0x1ff;
 		}
 		else
 		{
-			scrollx[i] = (((-layer.m_scrollx) - 0x4e)  & 0x1ff) << 1;
+			scrollx[i] = (((-layer.m_scrollx) - 0x4e) & 0x1ff) << 1;
 			scrolly[i] = layer.m_scrolly & 0x1ff;
 		}
 	}

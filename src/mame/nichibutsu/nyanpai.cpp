@@ -51,65 +51,25 @@ Memo:
 template <unsigned Layer>
 void nyanpai_state::blitter_w(offs_t offset, u8 data)
 {
-	nyanpai_layer &layer = m_layer[Layer];
-	switch (offset)
-	{
-		case 0x00:  layer.m_blitter_direction_x = (data & 0x01) ? 1 : 0;
-					layer.m_blitter_direction_y = (data & 0x02) ? 1 : 0;
-					layer.m_clutmode = (data & 0x04) ? 1 : 0;
-				//  if (data & 0x08) popmessage("Unknown GFX Flag!! (0x08)");
-					layer.m_transparency = (data & 0x10) ? 1 : 0;
-				//  if (data & 0x20) popmessage("Unknown GFX Flag!! (0x20)");
-					layer.m_flipscreen = (data & 0x40) ? 0 : 1;
-					layer.m_dispflag = (data & 0x80) ? 1 : 0;
-					vramflip(layer);
-					break;
-		case 0x01:  layer.m_scrollx = (layer.m_scrollx & 0x0100) | data; break;
-		case 0x02:  layer.m_scrollx = (layer.m_scrollx & 0x00ff) | ((data << 8) & 0x0100); break;
-		case 0x03:  layer.m_scrolly = (layer.m_scrolly & 0x0100) | data; break;
-		case 0x04:  layer.m_scrolly = (layer.m_scrolly & 0x00ff) | ((data << 8) & 0x0100); break;
-		case 0x05:  layer.m_blitter_src_addr = (layer.m_blitter_src_addr & 0xffff00) | data; break;
-		case 0x06:  layer.m_blitter_src_addr = (layer.m_blitter_src_addr & 0xff00ff) | (data << 8); break;
-		case 0x07:  layer.m_blitter_src_addr = (layer.m_blitter_src_addr & 0x00ffff) | (data << 16); break;
-		case 0x08:  layer.m_blitter_sizex = data; break;
-		case 0x09:  layer.m_blitter_sizey = data; break;
-		case 0x0a:  layer.m_blitter_destx = (layer.m_blitter_destx & 0xff00) | data; break;
-		case 0x0b:  layer.m_blitter_destx = (layer.m_blitter_destx & 0x00ff) | (data << 8); break;
-		case 0x0c:  layer.m_blitter_desty = (layer.m_blitter_desty & 0xff00) | data; break;
-		case 0x0d:  layer.m_blitter_desty = (layer.m_blitter_desty & 0x00ff) | (data << 8);
-					gfxdraw(Layer);
-					break;
-		default:    break;
-	}
+	m_layer[Layer].layer_w(offset, data);
 }
 
 template <unsigned Layer>
 u8 nyanpai_state::blitter_r(offs_t offset)
 {
-	nyanpai_layer &layer = m_layer[Layer];
-	u8 ret;
-
-	switch (offset)
-	{
-		case 0x00:  ret = 0xfe | ((m_nb19010_busyflag & 0x01) ^ 0x01); break;    // NB19010 Busy Flag
-		case 0x01:  ret = m_gfx[layer.m_blitter_src_addr]; break;           // NB19010 GFX-ROM Read
-		default:    ret = 0xff; break;
-	}
-
-	return ret;
+	return m_layer[Layer].layer_r(offset);
 }
 
 template <unsigned Layer>
 void nyanpai_state::clut_w(offs_t offset, u8 data)
 {
-	nyanpai_layer &layer = m_layer[Layer];
-	layer.m_clut[((layer.m_clutsel & 0xff) * 0x10) + (offset & 0x0f)] = data;
+	m_layer[Layer].clut_w(offset, data);
 }
 
 template <unsigned Layer>
 void nyanpai_state::clutsel_w(u8 data)
 {
-	m_layer[Layer].m_clutsel = data;
+	m_layer[Layer].clutsel_w(data);
 }
 
 /******************************************************************************
@@ -135,8 +95,8 @@ u16 nyanpai_state::dipsw_r()
 	u8 dipsw_a = m_io_dipsw[0]->read();
 	u8 dipsw_b = m_io_dipsw[1]->read();
 
-	dipsw_a = bitswap<8>(dipsw_a,0,1,2,3,4,5,6,7);
-	dipsw_b = bitswap<8>(dipsw_b,0,1,2,3,4,5,6,7);
+	dipsw_a = bitswap<8>(dipsw_a, 0, 1, 2, 3, 4, 5, 6, 7);
+	dipsw_b = bitswap<8>(dipsw_b, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	return (u16(dipsw_a) << 8) | dipsw_b;
 }

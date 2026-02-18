@@ -25,7 +25,8 @@ public:
 		m_palette(*this, "palette"),
 		m_paletteram(*this, "paletteram"),
 		m_gfx(*this, "gfx"),
-		m_io_dipsw(*this, "DSW%c", 'A')
+		m_io_dipsw(*this, "DSW%c", 'A'),
+		m_layer{*this, *this, *this}
 	{ }
 
 	void nyanpai(machine_config &config) ATTR_COLD;
@@ -44,6 +45,47 @@ protected:
 
 	struct nyanpai_layer
 	{
+		nyanpai_layer(nyanpai_state &host)
+			: m_host(host)
+			, m_screen_width(1)
+			, m_screen_height(1)
+			, m_colbase(0)
+			, m_scrollx(0)
+			, m_scrolly(0)
+			, m_blitter_destx(0)
+			, m_blitter_desty(0)
+			, m_blitter_sizex(0)
+			, m_blitter_sizey(0)
+			, m_blitter_src_addr(0)
+			, m_blitter_direction_x(0)
+			, m_blitter_direction_y(0)
+			, m_dispflag(0)
+			, m_flipscreen(0)
+			, m_clutmode(0)
+			, m_transparency(0)
+			, m_clutsel(0)
+			, m_flipscreen_old(-1)
+		{
+		}
+
+		u8 layer_r(offs_t offset);
+		void layer_w(offs_t offset, u8 data);
+		void clut_w(offs_t offset, u8 data)
+		{
+			m_clut[((m_clutsel & 0xff) * 0x10) + (offset & 0x0f)] = data;
+		}
+		void clutsel_w(u8 data) { m_clutsel = data; }
+		void update_pixel(int x, int y);
+		void vramflip();
+		void gfxdraw();
+
+		// configurations
+		nyanpai_state &m_host;
+		s32 m_screen_width;
+		s32 m_screen_height;
+		u16 m_colbase;
+
+		// internal states
 		s32 m_scrollx;
 		s32 m_scrolly;
 		s32 m_blitter_destx;
@@ -51,12 +93,12 @@ protected:
 		s32 m_blitter_sizex;
 		s32 m_blitter_sizey;
 		s32 m_blitter_src_addr;
-		s32 m_blitter_direction_x;
-		s32 m_blitter_direction_y;
-		s32 m_dispflag;
-		s32 m_flipscreen;
-		s32 m_clutmode;
-		s32 m_transparency;
+		u8 m_blitter_direction_x;
+		u8 m_blitter_direction_y;
+		u8 m_dispflag;
+		u8 m_flipscreen;
+		u8 m_clutmode;
+		u8 m_transparency;
 		s32 m_clutsel;
 		bitmap_ind16 m_tmpbitmap;
 		std::unique_ptr<u16[]> m_videoram;
@@ -82,8 +124,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void vramflip(nyanpai_layer &layer);
-	void update_pixel(int vram, int x, int y);
-	void gfxdraw(int vram);
+	void gfxdraw(nyanpai_layer &layer);
 
 	void vblank_irq(int state);
 
