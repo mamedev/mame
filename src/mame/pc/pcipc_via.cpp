@@ -107,6 +107,10 @@ void mvp3_state::mvp3(machine_config &config)
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 	isa.cpureset().set_inputline("maincpu", INPUT_LINE_RESET);
+	isa.pcirst().set([this] (int state) {
+		if (state)
+			machine().schedule_soft_reset();
+	});
 //  isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
 	vt82c586b_ide_device &ide(VT82C586B_IDE(config, "pci:07.1", 0, m_maincpu));

@@ -36,6 +36,7 @@ vt82c586b_isa_device::vt82c586b_isa_device(const machine_config &mconfig, const 
 	, m_speaker(*this, "speaker")
 	, m_write_a20m(*this)
 	, m_write_cpureset(*this)
+	, m_write_pcirst(*this)
 	, m_boot_state_hook(*this)
 {
 }
@@ -276,6 +277,13 @@ void vt82c586b_isa_device::config_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			m_misc_control[1] = data;
 			LOG("47h: Miscellaneous Control 2 %02x\n", data);
+			// after saving to CMOS
+			if (BIT(data, 0))
+			{
+				m_write_pcirst(1);
+				m_write_pcirst(0);
+			}
+
 			// TODO: remap cb for EISA port
 		})
 	);
@@ -430,7 +438,7 @@ void vt82c586b_isa_device::internal_io_map(address_map &map)
 //	map(0x0064, 0x0064) keyboard
 //	map(0x0070, 0x0073) RTC
 	map(0x0080, 0x008f).rw(FUNC(vt82c586b_isa_device::at_page8_r), FUNC(vt82c586b_isa_device::at_page8_w));
-//	map(0x0092, 0x0092) System Control
+	map(0x0092, 0x0092).rw(FUNC(vt82c586b_isa_device::port92_r), FUNC(vt82c586b_isa_device::port92_w));
 	map(0x00a0, 0x00a1).rw(m_pic[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(FUNC(vt82c586b_isa_device::at_dma8237_2_r), FUNC(vt82c586b_isa_device::at_dma8237_2_w));
 
@@ -491,14 +499,6 @@ void vt82c586b_isa_device::map_extra(
 		);
 		// TODO: ports $74-$75
 	}
-
-	if (BIT(m_isa_test_mode, 5))
-	{
-		io_space->install_readwrite_handler(0x92, 0x92,
-			read8sm_delegate(*this, FUNC(vt82c586b_isa_device::port92_r)),
-			write8sm_delegate(*this, FUNC(vt82c586b_isa_device::port92_w))
-		);
-	}
 }
 
 template <unsigned E> u8 vt82c586b_isa_device::rtc_index_r(offs_t offset)
@@ -540,7 +540,7 @@ template <unsigned E> void vt82c586b_isa_device::rtc_data_w(offs_t offset, u8 da
  * xx-- ---- HDD Activity LED Status (0) off, any other setting On
  * ---- x--- Power-On Password Bytes Inaccessible
  * ---- --x- Fast A20
- * ---- ---x Fast Reset
+ * ---- ---x Fast Reset (if bit 5 of ISA Test Mode is also on)
  */
 u8 vt82c586b_isa_device::port92_r(offs_t offset)
 {
@@ -551,7 +551,7 @@ void vt82c586b_isa_device::port92_w(offs_t offset, u8 data)
 {
 	fast_gatea20(BIT(data, 1));
 
-	if (!BIT(m_port92, 0) && BIT(data, 0))
+	if (!BIT(m_port92, 0) && BIT(data, 0) && BIT(m_isa_test_mode, 5))
 	{
 		// pulse reset line
 		m_write_cpureset(1);

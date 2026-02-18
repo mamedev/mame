@@ -66,6 +66,16 @@ private:
 	void ide1_write_cs1_w(uint8_t data);
 	uint8_t ide2_read_cs1_r();
 	void ide2_write_cs1_w(uint8_t data);
+
+	u8 m_chip_enable;
+	u8 m_ide_config;
+	u8 m_fifo_config;
+	u8 m_misc_control[3];
+	u32 m_drive_timing_control;
+	u8 m_address_setup_time;
+	u8 m_control_port_access_time[2];
+	u8 m_udma_timing_control[4];
+	u16 m_sector_size[2];
 };
 
 DECLARE_DEVICE_TYPE(VT82C586B_IDE, vt82c586b_ide_device)
