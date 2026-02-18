@@ -19,6 +19,10 @@ public:
 		m_xoffs = xoffs;
 		m_xoffs_flipped = xoffs_flipped;
 	}
+	void set_colorbase(u16 base)
+	{
+		m_colbase = base;
+	}
 	template <typename... T> void set_pri_callback(T &&... args) { m_pri_cb.set(std::forward<T>(args)...); }
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, u16* spriteram, u32 bytes);
@@ -37,6 +41,7 @@ private:
 	pri_cb_delegate m_pri_cb;
 	int m_xoffs = 0;
 	int m_xoffs_flipped = 0;
+	u16 m_colbase = 0;
 };
 
 DECLARE_DEVICE_TYPE(TOAPLAN_SCU, toaplan_scu_device)
