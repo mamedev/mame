@@ -7,30 +7,20 @@ authors:hap
 
 <!-- define elements -->
 
-	<element name="static_black">
+	<element name="black">
 		<rect><color red="0.0" green="0.0" blue="0.0" /></rect>
 	</element>
-	<element name="static_darkgray">
+	<element name="darkgray">
 		<rect><color red="0.25" green="0.25" blue="0.25" /></rect>
 	</element>
-	<element name="static_lightgray">
+	<element name="lightgray">
 		<rect><color red="0.6" green="0.6" blue="0.6" /></rect>
 	</element>
-	<element name="static_white">
-		<rect><color red="0.85" green="0.85" blue="0.85" /></rect>
-	</element>
-	<element name="static_yellow">
+	<element name="yellow">
 		<rect><color red="0.8" green="0.8" blue="0.1" /></rect>
 	</element>
-	<element name="static_blue">
+	<element name="blue">
 		<rect><color red="0.2" green="0.5" blue="0.8" /></rect>
-	</element>
-
-	<element name="text_lets">
-		<text string="LET'S GO BY TRAIN!"><color red="0.3" green="0.6" blue="0.9" /></text>
-	</element>
-	<element name="text_lets_j">
-		<text string="電車でGO！"><color red="0.3" green="0.6" blue="0.9" /></text>
 	</element>
 
 
@@ -135,6 +125,16 @@ authors:hap
 		<text string="車内信号"><color red="0.9" green="0.1" blue="0.1" /></text>
 	</element>
 
+	<element name="text_1">
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_2">
+		<text string="2"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="text_3">
+		<text string="3"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
 	<element name="lamp_door" defstate="0">
 		<disk state="1"><color red="1.0" green="0.8" blue="0.5" /></disk>
 		<disk state="0"><color red="0.2" green="0.16" blue="0.1" /></disk>
@@ -169,33 +169,33 @@ authors:hap
 		</screen>
 
 		<!-- static background -->
-		<element ref="static_black">
+		<element ref="black">
 			<bounds left="0" right="400" top="300" bottom="330" />
 		</element>
-		<element ref="static_lightgray">
+		<element ref="lightgray">
 			<bounds left="0" right="113" top="302" bottom="330" />
 		</element>
-		<element ref="static_yellow">
+		<element ref="yellow">
 			<bounds left="113" right="400" top="302" bottom="330" />
 		</element>
-		<element ref="static_darkgray">
+		<element ref="darkgray">
 			<bounds left="115" right="227" top="304" bottom="328" />
 		</element>
-		<element ref="static_white">
+		<element ref="lightgray">
 			<bounds left="245" right="380" top="302" bottom="330" />
 		</element>
-		<element ref="static_black">
+		<element ref="black">
 			<bounds left="244.75" right="245.5" top="302" bottom="330" />
 		</element>
-		<element ref="static_black">
+		<element ref="black">
 			<bounds left="379.25" right="380.5" top="302" bottom="330" />
 		</element>
-		<element ref="static_blue">
+		<element ref="blue">
 			<bounds left="360" right="380" top="302" bottom="330" />
 		</element>
 
 		<!-- lamps -->
-		<element name="lamp4" ref="lamp_white">
+		<element name="lamp7" ref="lamp_white">
 			<bounds x="8" y="304" width="17" height="24" />
 		</element>
 		<element name="lamp2" ref="lamp_white">
@@ -208,12 +208,31 @@ authors:hap
 		<element name="lamp1" ref="lamp_door">
 			<bounds x="86" y="314" width="14" height="14" />
 		</element>
-
-		<element name="lamp7" ref="lamp_white">
-			<bounds x="231.5" y="311" width="9" height="4" />
-		</element>
 		<element name="lamp0" ref="lamp_start">
 			<bounds x="231.5" y="317" width="9" height="9" />
+		</element>
+
+		<element name="lamp4" ref="lamp_white">
+			<bounds x="258.5" y="304" width="17" height="24" />
+		</element>
+		<element name="lamp4" ref="lamp_white">
+			<bounds x="281.5" y="304" width="17" height="24" />
+		</element>
+		<element name="lamp4" ref="lamp_white">
+			<bounds x="304.5" y="304" width="17" height="24" />
+		</element>
+		<element ref="lamp_white">
+			<bounds x="327.5" y="304" width="17" height="24" />
+		</element>
+
+		<element ref="text_1">
+			<bounds xc="267" yc="316" width="14" height="10" />
+		</element>
+		<element ref="text_2">
+			<bounds xc="290" yc="316" width="14" height="10" />
+		</element>
+		<element ref="text_3">
+			<bounds xc="313" yc="316" width="14" height="10" />
 		</element>
 
 		<element name="lamp5" ref="lamp_redd">
@@ -256,10 +275,6 @@ authors:hap
 		<bounds left="0" right="400" top="0" bottom="330" />
 		<group ref="shared"><bounds left="0" right="400" top="0" bottom="330" /></group>
 
-		<element ref="text_lets">
-			<bounds xc="302.75" y="306" width="75" height="10" />
-		</element>
-
 		<!-- lamp labels -->
 		<element ref="text_pwr">
 			<bounds xc="16.5" yc="316" width="14" height="8" />
@@ -296,10 +311,6 @@ authors:hap
 	<view name="Internal Layout (Japanese)"> <!-- original labels -->
 		<bounds left="0" right="400" top="0" bottom="330" />
 		<group ref="shared"><bounds left="0" right="400" top="0" bottom="330" /></group>
-
-		<element ref="text_lets_j">
-			<bounds xc="302.75" y="306" width="75" height="10" />
-		</element>
 
 		<!-- lamp labels -->
 		<element ref="text_pwr_j">
