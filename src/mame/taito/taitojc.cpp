@@ -14,19 +14,29 @@ Taito custom chips on this hardware:
 - TC0870HVP      : Vertex processor?
 
 TODO:
-- Games are running at wrong speed(unthrottled?) compared to pcb recordings, easily noticeable on sidebs/sidebs2,
-  for example the selection screens are too fast, and the driving is almost twice as slow. Even slower after
-  the m68k fpu/softfloat update since MAME 0.267.
+- Games are running at wrong speed(unthrottled?) compared to pcb recordings,
+  easily noticeable on sidebs/sidebs2. For example the selection screens are
+  too fast, and the driving is almost twice as slow. Even slower after the
+  m68k fpu/softfloat update since MAME 0.267.
 - dendego intro object RAM usage has various gfx bugs (check video file)
 - dendego title screen builds up and it shouldn't
-- dendego attract mode train doesn't ride, demo mode doesn't set the throttle, but it does set the brake pressure
-- landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
+- dendego attract mode train doesn't ride, demo mode doesn't set the throttle,
+  but it does set the brake pressure
+- landgear has some weird crashes (after playing one round, after a couple of
+  loops in attract mode) (needs testing -AS)
 - landgear has huge 3d problems on gameplay (CPU comms?)
-- dangcurv DSP program crashes very soon, so no 3d is currently shown. - due to undumped rom? maybe not?
+- dangcurv DSP program crashes very soon, so no 3d is currently shown. Is it
+  due to undumped rom? maybe not?
 - add idle skips if possible
 
 BTANB:
-- incorrect perspective textures, visible when close to the camera such as sidebs rear-view mirror
+- incorrect perspective textures, visible when close to the camera such as
+  sidebs rear-view mirror
+
+The train games were only released in Japan. Change the internal artwork view
+to Japanese to see the original text labels. If the Japanese text is not visible
+(either fontprovider or OS doesn't support character substitution), manually set
+the -artfont option to a CJK font.
 
 --------------------------------------------------------------------------
 
@@ -679,7 +689,8 @@ void dendego_state::brakemeter_w(uint8_t data)
 	if (m_brake_meter != pressure_table[data])
 	{
 		m_brake_meter = pressure_table[data];
-		m_counters[4] = m_brake_meter;
+		m_counters[4] = m_brake_meter / 100;
+		m_counters[5] = (m_brake_meter % 100) / 10;
 	}
 }
 
