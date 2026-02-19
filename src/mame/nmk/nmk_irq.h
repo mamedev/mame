@@ -1,14 +1,13 @@
 // license: BSD-3-Clause
-// copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
-// thanks-to:Richard Bush
+// copyright-holders:Sergio Galiano
 /***************************************************************************
 
   NMK IRQ Generator
 
 ***************************************************************************/
 
-#ifndef MAME_DATAEAST_NMK_IRQ_H
-#define MAME_DATAEAST_NMK_IRQ_H
+#ifndef MAME_NMK_NMK_IRQ_H
+#define MAME_NMK_NMK_IRQ_H
 
 #pragma once
 
@@ -35,7 +34,7 @@ public:
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -64,4 +63,4 @@ private:
 DECLARE_DEVICE_TYPE(NMK_IRQ, nmk_irq_device)
 
 
-#endif // MAME_DATAEAST_NMK_IRQ_H
+#endif // MAME_NMK_NMK_IRQ_H

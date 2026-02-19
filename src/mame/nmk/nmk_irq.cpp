@@ -1,6 +1,5 @@
 // license: BSD-3-Clause
-// copyright-holders:Mirko Buffoni,Nicola Salmoria,Bryan McPhail,David Haywood,R. Belmont,Alex Marshall,Angelo Salese,Luca Elia
-// thanks-to:Richard Bush
+// copyright-holders:Sergio Galiano
 /***************************************************************************
 
   NMK IRQ Generator
