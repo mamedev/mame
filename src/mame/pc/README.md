@@ -41,3 +41,10 @@ ISA debug port $80, `wpiset 0x80,1,w,1,{printf "%02x",wpdata;g}`.
 | 34 | Relocate shadow RAM if configured |
 | 36 | Configure EMS system |
 | 38 | Configure wait states |
+
+## Troubleshooting
+
+### Award BIOSes
+
+- Booting in Award BootBlock: implement shadow RAM;
+- PCI targets with OHCI (and probably EHCI) may crash at startup: implement USB chipset, requires relocatable BAR that will default to RAM $0 if not implemented;
