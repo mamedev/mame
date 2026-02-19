@@ -96,9 +96,9 @@ u16 pgm_arm_type1_kovgsyx_state::kovgsyx_asic27a_read_word(offs_t offset)
 
 u32 pgm_arm_type1_kovgsyx_state::kovgsyx_lpc2132_read_long(offs_t offset)
 {
-	if ((offset & 0x3FFFC0) == 0x7F000)
+	if ((offset & 0x3fffc0) == 0x7f000)
 	{
-		switch (offset & 0x3F)
+		switch (offset & 0x3f)
 		{
 			case 0x20:
 				return m_kovgsyx_pll_enabled;
@@ -121,7 +121,7 @@ u32 pgm_arm_type1_kovgsyx_state::kovgsyx_lpc2132_read_long(offs_t offset)
 				}
 
 				status |= (m_kovgsyx_pll_enabled & 0x03) << 8;
-				status |= (m_kovgsyx_pll_config & 0x1F);
+				status |= (m_kovgsyx_pll_config & 0x1f);
 
 				return status;
 			}
@@ -131,9 +131,9 @@ u32 pgm_arm_type1_kovgsyx_state::kovgsyx_lpc2132_read_long(offs_t offset)
 		}
 	}
 
-	if ((offset & 0x3FFFC0) == 0xA000)
+	if ((offset & 0x3fffc0) == 0xa000)
 	{
-		switch (offset & 0x3F)
+		switch (offset & 0x3f)
 		{
 			case 0x00:
 				return m_kovgsyx_i2c1conset;
@@ -157,9 +157,9 @@ u32 pgm_arm_type1_kovgsyx_state::kovgsyx_lpc2132_read_long(offs_t offset)
 
 void pgm_arm_type1_kovgsyx_state::kovgsyx_lpc2132_write_long(offs_t offset, u32 data, u32 mem_mask)
 {
-	if ((offset & 0x3FFFC0) == 0x7F000 || (offset & 0x3FFFC0) == 0x7F040)
+	if ((offset & 0x3fffc0) == 0x7f000 || (offset & 0x3fffc0) == 0x7f040)
 	{
-		switch (offset & 0x7F)
+		switch (offset & 0x7f)
 		{
 			case 0x20:
 			{
@@ -169,7 +169,7 @@ void pgm_arm_type1_kovgsyx_state::kovgsyx_lpc2132_write_long(offs_t offset, u32 
 				break;
 			}
 			case 0x21:
-				m_kovgsyx_pll_config = data & 0xFF;
+				m_kovgsyx_pll_config = data & 0xff;
 				break;
 			case 0x23:
 				break;
@@ -182,9 +182,9 @@ void pgm_arm_type1_kovgsyx_state::kovgsyx_lpc2132_write_long(offs_t offset, u32 
 		}
 	}
 
-	if ((offset & 0x3FFFC0) == 0xA000)
+	if ((offset & 0x3fffc0) == 0xa000)
 	{
-		switch (offset & 0x3F)
+		switch (offset & 0x3f)
 		{
 			case 0x00:
 			{
