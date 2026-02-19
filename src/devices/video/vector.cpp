@@ -2,30 +2,10 @@
 // copyright-holders:Brad Oliver,Aaron Giles,Bernd Wiebelt,Allard van der Bas
 /******************************************************************************
  *
- * vector.c
+ * vector.cpp
  *
  *        anti-alias code by Andrew Caldwell
  *        (still more to add)
- *
- * 040227 Fixed miny clip scaling which was breaking in mhavoc. AREK
- * 010903 added support for direct RGB modes MLR
- * 980611 use translucent vectors. Thanks to Peter Hirschberg
- *        and Neil Bradley for the inspiration. BW
- * 980307 added cleverer dirty handling. BW, ASG
- *        fixed antialias table .ac
- * 980221 rewrote anti-alias line draw routine
- *        added inline assembly multiply fuction for 8086 based machines
- *        beam diameter added to draw routine
- *        beam diameter is accurate in anti-alias line draw (Tcosin)
- *        flicker added .ac
- * 980203 moved LBO's routines for drawing into a buffer of vertices
- *        from avgdvg.c to this location. Scaling is now initialized
- *        by calling vector_init(...). BW
- * 980202 moved out of msdos.c ASG
- * 980124 added anti-alias line draw routine
- *        modified avgdvg.c and sega.c to support new line draw routine
- *        added two new tables Tinten and Tmerge (for 256 color support)
- *        added find_color routine to build above tables .ac
  *
  * Vector Team
  *
@@ -60,7 +40,7 @@ float vector_options::s_beam_width_max = 0.0f;
 float vector_options::s_beam_dot_size = 0.0f;
 float vector_options::s_beam_intensity_weight = 0.0f;
 
-void vector_options::init(emu_options& options)
+void vector_options::init(emu_options &options)
 {
 	s_beam_width_min = options.beam_width_min();
 	s_beam_width_max = options.beam_width_max();
@@ -96,7 +76,7 @@ void vector_device::device_start()
 //  subscribe for frame-begin notifications
 //-------------------------------------------------
 
-util::notifier_subscription vector_device::add_frame_begin_notifier(delegate<void (void)> &&n)
+util::notifier_subscription vector_device::add_frame_begin_notifier(frame_begin_delegate &&n)
 {
 	return m_frame_begin_notifier.subscribe(std::move(n));
 }
@@ -106,7 +86,7 @@ util::notifier_subscription vector_device::add_frame_begin_notifier(delegate<voi
 //  subscribe for frame-end notifications
 //-------------------------------------------------
 
-util::notifier_subscription vector_device::add_frame_end_notifier(delegate<void (void)> &&n)
+util::notifier_subscription vector_device::add_frame_end_notifier(frame_end_delegate &&n)
 {
 	return m_frame_end_notifier.subscribe(std::move(n));
 }
@@ -116,7 +96,7 @@ util::notifier_subscription vector_device::add_frame_end_notifier(delegate<void 
 //  subscribe for hidden-move notifications
 //-------------------------------------------------
 
-util::notifier_subscription vector_device::add_move_notifier(delegate<void (int, int, uint32_t, int, int)> &&n)
+util::notifier_subscription vector_device::add_move_notifier(move_delegate &&n)
 {
 	return m_move_notifier.subscribe(std::move(n));
 }
@@ -126,7 +106,7 @@ util::notifier_subscription vector_device::add_move_notifier(delegate<void (int,
 //  subscribe for visible-line notifications
 //-------------------------------------------------
 
-util::notifier_subscription vector_device::add_line_notifier(delegate<void (int, int, int, int, uint32_t, int, int, int)> &&n)
+util::notifier_subscription vector_device::add_line_notifier(line_delegate &&n)
 {
 	return m_line_notifier.subscribe(std::move(n));
 }
@@ -159,9 +139,9 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 
 	if (vector_options::s_flicker && (intensity > 0))
 	{
-		float random = (float)(machine().rand() & 255) / 255.0f; // random value between 0.0 and 1.0
+		float random = float(machine().rand() & 255) / 255.0f; // random value between 0.0 and 1.0
 
-		intensity -= (int)(intensity * random * vector_options::s_flicker);
+		intensity -= int(intensity * random * vector_options::s_flicker);
 
 		intensity = std::clamp(intensity, 0, 255);
 	}
@@ -234,18 +214,18 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		if (lastx == curpoint->x && lasty == curpoint->y)
 			beam_width *= vector_options::s_beam_dot_size;
 
-		coords.x0 = ((float)lastx - xoffs) * xscale;
-		coords.y0 = ((float)lasty - yoffs) * yscale;
-		coords.x1 = ((float)curpoint->x - xoffs) * xscale;
-		coords.y1 = ((float)curpoint->y - yoffs) * yscale;
+		coords.x0 = (float(lastx) - xoffs) * xscale;
+		coords.y0 = (float(lasty) - yoffs) * yscale;
+		coords.x1 = (float(curpoint->x) - xoffs) * xscale;
+		coords.y1 = (float(curpoint->y) - yoffs) * yscale;
 
 		if (curpoint->intensity != 0)
 		{
 			screen.container().add_line(
-				coords.x0, coords.y0, coords.x1, coords.y1,
-				beam_width,
-				(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
-				flags);
+					coords.x0, coords.y0, coords.x1, coords.y1,
+					beam_width,
+					(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
+					flags);
 			m_line_notifier(lastx, lasty, curpoint->x, curpoint->y, curpoint->col, curpoint->intensity, visarea.width(), visarea.height());
 		}
 		else
