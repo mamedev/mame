@@ -32,7 +32,6 @@
 #include "sol/sol.hpp"
 
 struct lua_State;
-class vector_device;
 
 class lua_engine
 {

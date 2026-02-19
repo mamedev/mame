@@ -494,10 +494,10 @@ vector:add_line_notifier(callback)
     between two points with a non-zero beam intensity.  The callback is
     passed the following arguments, in order:  
     
-    - **lastx:** The old horizontal beam position, scaled by 65536.
-    - **lasty:** The old vertical beam position, scaled by 65536.
-    - **x:** The current horizontal beam position, scaled by 65536.
-    - **y:** The current vertical beam position, scaled by 65536.
+    - **lastx:** The old horizontal beam position.
+    - **lasty:** The old vertical beam position.
+    - **x:** The current horizontal beam position.
+    - **y:** The current vertical beam position.
     - **color:** The beam color, as a 24-bit RGB value.
     - **intensity:** The beam intensity, as an 8-bit value.
     - **width:** The configured pixel width of the virtual vector display.
@@ -511,8 +511,8 @@ vector:add_move_notifier(callback)
     when "jumping" the vector beam.  The callback is passed the following
     arguments, in order:  
     
-    - **x:** The current horizontal beam position, scaled by 65536.
-    - **y:** The current vertical beam position, scaled by 65536.
+    - **x:** The current horizontal beam position.
+    - **y:** The current vertical beam position.
     - **color:** The beam color, as a 24-bit RGB value.
     - **width:** The configured pixel width of the virtual vector display.
     - **height:** The configured pixel width of the virtual vector display.

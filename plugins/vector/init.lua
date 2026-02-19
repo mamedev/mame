@@ -22,15 +22,11 @@ function vector.startplugin()
 	end
 
 	local function vector_move(x, y, color, width, height)
-		local xscale = 1.0 / 65536;
-		local yscale = 1.0 / 65536;
-		print(string.format("beam move, x:%.1f y:%.1f color:%08x width:%d height:%d", x * xscale, y * yscale, color, width, height));
+		print(string.format("beam move, x:%.1f y:%.1f color:%08x width:%d height:%d", x, y, color, width, height));
 	end
 
 	local function vector_line(lastx, lasty, x, y, color, intensity, width, height)
-		local xscale = 1.0 / 65536;
-		local yscale = 1.0 / 65536;
-		print(string.format("line, from x:%.1f y:%.1f, to x:%.1f y:%.1f, color:%08x intensity:%d width:%d height:%d", lastx * xscale, lasty * yscale, x * xscale, y * yscale, color, intensity, width, height));
+		print(string.format("line, from x:%.1f y:%.1f, to x:%.1f y:%.1f, color:%08x intensity:%d width:%d height:%d", lastx, lasty, x, y, color, intensity, width, height));
 	end
 
 	local function start()

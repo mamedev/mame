@@ -1950,7 +1950,7 @@ void lua_engine::initialize()
 				return v.add_move_notifier(
 						[this, cbfunc = sol::protected_function(m_lua_state, cb)] (int x, int y, uint32_t color, int vis_x, int vis_y)
 						{
-							auto status(invoke(cbfunc, x, y, color, vis_x, vis_y));
+							auto status(invoke(cbfunc, x / 65536.0, y / 65536.0, color, vis_x, vis_y));
 							if (!status.valid())
 							{
 								auto err(status.template get<sol::error>());
@@ -1964,7 +1964,7 @@ void lua_engine::initialize()
 				return v.add_line_notifier(
 						[this, cbfunc = sol::protected_function(m_lua_state, cb)] (int prev_x, int prev_y, int x, int y, uint32_t color, int intensity, int vis_x, int vis_y)
 						{
-							auto status(invoke(cbfunc, prev_x, prev_y, x, y, color, intensity, vis_x, vis_y));
+							auto status(invoke(cbfunc, prev_x / 65536.0, prev_y / 65536.0, x / 65536.0, y / 65536.0, color, intensity, vis_x, vis_y));
 							if (!status.valid())
 							{
 								auto err(status.template get<sol::error>());
