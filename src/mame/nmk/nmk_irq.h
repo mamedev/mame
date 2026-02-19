@@ -31,12 +31,12 @@ public:
 	void set_prom_frame_offset(u32 offset) { m_prom_frame_offset = offset; }
 	void set_vtiming_prom_usage(u32 usage) { m_vtiming_prom_usage = usage; }
 
-	TIMER_CALLBACK_MEMBER(scanline_callback);
-
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	TIMER_CALLBACK_MEMBER(scanline_callback);
 
 private:
 	// memory pointers
