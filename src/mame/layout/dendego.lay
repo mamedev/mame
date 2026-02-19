@@ -243,7 +243,7 @@ authors:hap
 		<element ref="text_dot">
 			<bounds x="187.5" y="316" width="3" height="10" />
 		</element>
-		<element name="counter4" ref="counter_pressure2">
+		<element name="counter5" ref="counter_pressure2">
 			<bounds x="190.5" y="316" width="4.25" height="10" />
 		</element>
 
