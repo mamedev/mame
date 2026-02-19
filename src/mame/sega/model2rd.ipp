@@ -294,7 +294,7 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 		if (fill[x] > 0)
 			continue;
 
-		float z = recip_approx(ooz);
+		float z = 1.0f / ooz;
 
 		s32 mml = -object.texlod + fast_log2(z);    // equivalent to log2(z^2)
 		s32 level = std::clamp(mml >> 7, 0, max_level);
