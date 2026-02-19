@@ -60,10 +60,6 @@ float vector_options::s_beam_width_max = 0.0f;
 float vector_options::s_beam_dot_size = 0.0f;
 float vector_options::s_beam_intensity_weight = 0.0f;
 
-namespace {
-    vector_device::hook_callback s_hook_callback;
-}
-
 void vector_options::init(emu_options& options)
 {
 	s_beam_width_min = options.beam_width_min();
@@ -100,9 +96,8 @@ void vector_device::device_start()
 //  subscribe for frame-begin notifications
 //-------------------------------------------------
 
-util::notifier_subscription vector_device::add_frame_begin_notifier(delegate<void (int)> &&n)
+util::notifier_subscription vector_device::add_frame_begin_notifier(delegate<void (void)> &&n)
 {
-	printf("b\n"); fflush(stdout);
 	return m_frame_begin_notifier.subscribe(std::move(n));
 }
 
@@ -196,11 +191,6 @@ void vector_device::clear_list()
 	m_vector_index = 0;
 }
 
-void vector_device::set_hook_callback(hook_callback callback)
-{
-	s_hook_callback = std::move(callback);
-}
-
 //-------------------------------------------------
 // Update the screen container with queued vectors.
 //-------------------------------------------------
@@ -223,13 +213,7 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	screen.container().empty();
 	screen.container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTORBUF(1));
 
-	m_frame_begin_notifier(0);
-
-	if (s_hook_callback)
-	{
-		hook_data begin = { hook_event::FRAME_BEGIN, 0, 0, 0, 0, rgb_t(0xff, 0x00, 0x00, 0x00), 0, visarea.width(), visarea.height() };
-		s_hook_callback(machine(), begin);
-	}
+	m_frame_begin_notifier();
 
 	for (int i = 0; i < m_vector_index; i++)
 	{
@@ -262,23 +246,11 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 				beam_width,
 				(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
 				flags);
+			m_line_notifier(lastx, lasty, curpoint->x, curpoint->y, curpoint->col, curpoint->intensity, visarea.width(), visarea.height());
 		}
-
-		if (s_hook_callback)
+		else
 		{
-			hook_data point_data =
-			{
-				(curpoint->intensity != 0) ? hook_event::LINE_TO : hook_event::MOVE_TO,
-				lastx,
-				lasty,
-				curpoint->x,
-				curpoint->y,
-				curpoint->col,
-				curpoint->intensity,
-				visarea.width(),
-				visarea.height()
-			};
-			s_hook_callback(machine(), point_data);
+			m_move_notifier(curpoint->x, curpoint->y, curpoint->col, visarea.width(), visarea.height());
 		}
 
 		lastx = curpoint->x;
@@ -287,11 +259,7 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		curpoint++;
 	}
 
-	if (s_hook_callback)
-	{
-		hook_data end = { hook_event::FRAME_END, 0, 0, 0, 0, rgb_t(0xff, 0x00, 0x00, 0x00), 0, visarea.width(), visarea.height() };
-		s_hook_callback(machine(), end);
-	}
+	m_frame_end_notifier();
 
 	return 0;
 }
