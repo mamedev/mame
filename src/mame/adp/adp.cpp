@@ -84,7 +84,7 @@ Connectors:
  P3  - Monitor
  P6  - Lightpen
 
-Sound  and I/O board:
+Sound and I/O board:
 ---------------------
 "Steuereinheit 68000"
  _________________________________________________________________________________
@@ -97,7 +97,7 @@ Sound  and I/O board:
  |*   L4974A         ||| |SCN68681C1N40 |                     |||               *|
  |*                  ||| |______________|   74HC32   74AC138  |||               *|
  |P7                 |||                                      |||              P8|
- |*                        TC428CPA                                             *|
+ |*                        TC428CPA                     SN75176                 *|
  |*                                                                             *|
  |*    P11  P12    P13    P14       P15   P16   P17      P18   P19   P20  P21   *|
  |P9   **** *****  *****  ****  OO  ****  ****  *******  ****  ****  ***  *** P10|
@@ -111,6 +111,7 @@ Parts:
  MX7224KN        - Maxim CMOS 8-bit DAC with Output Amplifier
  TL7705ACP       - Supply Voltage Supervisor
  TC428CPA        - Dual CMOS High-speed Driver
+ SN75176		 - RS-485 Differential Bus Transceiver
  L4974A          - ST 3.5A Switching Regulator
  OO              - LEDs (red); "Fehlerdiagnose siehe Fehlertable"
 
@@ -159,6 +160,7 @@ Quick Jack administration/service mode:
 */
 
 #include "emu.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/mc68681.h"
 #include "machine/microtch.h"
@@ -167,6 +169,7 @@ Quick Jack administration/service mode:
 #include "sound/ay8910.h"
 #include "video/hd63484.h"
 #include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -208,10 +211,10 @@ private:
 	required_device<nvram_device> m_nvram;
 	required_ioport m_in0;
 
-	/* misc */
+	// misc
 	uint8_t m_mux_data;
 
-	/* devices */
+	// devices
 	uint16_t input_r();
 	void input_w(uint16_t data);
 	void adp_palette(palette_device &device) const;
@@ -274,11 +277,11 @@ void adp_state::adp_palette(palette_device &palette) const
 {
 	for (int i = 0; i < palette.entries(); i++)
 	{
-		int const r = 0x21 * BIT(i, 0) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 0);
-		int const g = 0x21 * BIT(i, 1) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 1);
-		int const b = 0x21 * BIT(i, 2) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 2);
+		int const R = 0x21 * BIT(i, 0) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 0);
+		int const G = 0x21 * BIT(i, 1) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 1);
+		int const B = 0x21 * BIT(i, 2) + 0x47 * BIT(i, 3) + 0x97 * BIT(i, 2);
 
-		palette.set_pen_color(i, rgb_t(r, g, b));
+		palette.set_pen_color(i, rgb_t(R, G, B));
 	}
 }
 
@@ -548,7 +551,7 @@ void adp_state::quickjac(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::quickjac_mem);
 	m_maincpu->set_addrmap(m68000_device::AS_CPU_SPACE, &adp_state::fc7_map);
 
-	MC68681(config, m_duart, XTAL(8'664'000) / 2);
+	MC68681(config, m_duart, 3'686'400);
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_duart->a_tx_cb().set(m_microtouch, FUNC(microtouch_device::rx));
 	m_duart->inport_cb().set_ioport("DSW1");
@@ -629,18 +632,135 @@ void adp_state::fstation(machine_config &config)
 }
 
 
+ROM_START( fashiong )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "fashion_gambler_s6_i.u2", 0x00000, 0x80000, CRC(827a164d) SHA1(dc16380226cabdefbfd893cb50cbfca9e134be40) )
+	ROM_LOAD16_BYTE( "fashion_gambler_s6_ii.u6", 0x00001, 0x80000, CRC(5a2466d1) SHA1(c113a2295beed2011c70887a1f2fcdec00b055cb) )
+
+	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_i.u2", 0x00000, 0x80000, CRC(d1ee9133) SHA1(e5fdfa303a3317f8f5fbdc03438ee97415afff4b) )
+	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_ii.u5", 0x00001, 0x80000, CRC(07b1e722) SHA1(594cbe9edfea6b04a4e49d1c1594f1c3afeadef5) )
+
+	ROM_REGION( 0x4000, "nvram", 0 )
+	ROM_LOAD16_BYTE( "m48z08post.bin", 0x0000, 0x2000, CRC(2d317a04) SHA1(c690c0d4b2259231d642ab5a30fcf389ba987b70) )
+	ROM_LOAD16_BYTE( "m48z08posz.bin", 0x0001, 0x2000, CRC(7c5a4b78) SHA1(262d0d7f5b24e356ab54eb2450bbaa90e3fb5464) )
+ROM_END
+
+ROM_START( fashiong2 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "fashion_gambler_f3_i.u2", 0x00000, 0x80000, CRC(2939279a) SHA1(75798ea41dd713d294ea341cbcdb73a76d9f63f4) )
+	ROM_LOAD16_BYTE( "fashion_gambler_f3_ii.u6", 0x00001, 0x80000, CRC(7d48e9ab) SHA1(603e946b95c53ee75c9ca10751316e723242424f) )
+
+	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fashion_gambler_video_f2_i.u2", 0x00000, 0x80000, CRC(54ea6f10) SHA1(a1284ec34e4e78acba08dc00d5ba47c3457531f8) )
+	ROM_LOAD16_BYTE( "fashion_gambler_video_f2_ii.u5", 0x00001, 0x80000, CRC(c292a278) SHA1(9f66531ae9f202d364f47c7ed3551483fc9d27b0) )
+
+	ROM_REGION( 0x4000, "nvram", 0 )
+	// taken from parent
+	ROM_LOAD16_BYTE( "m48z08post.bin", 0x0000, 0x2000, CRC(2d317a04) SHA1(c690c0d4b2259231d642ab5a30fcf389ba987b70) )
+	ROM_LOAD16_BYTE( "m48z08posz.bin", 0x0001, 0x2000, CRC(7c5a4b78) SHA1(262d0d7f5b24e356ab54eb2450bbaa90e3fb5464) )
+ROM_END
+
+ROM_START( funcpro )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "fun_city_pro_1.u2", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "fun_city_pro_2.u6", 0x00001, 0x80000, NO_DUMP )
+
+	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "fun_city_pro_video_f1_i.u2", 0x00000, 0x80000, CRC(5f633e2c) SHA1(3f21d5aa992d06c481ee33047e8a1c715e267935) )
+	ROM_LOAD16_BYTE( "fun_city_pro_video_f1_ii.u5", 0x00001, 0x80000, CRC(921d9ff1) SHA1(85bff2fc8997b90c70f1135f2881f58da39af2c7) )
+ROM_END
+
+ROM_START( funlddlx )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "fldl_f6_1.bin", 0x00001, 0x80000, CRC(85c74040) SHA1(24a7d3e6acbaf73ef9817379bef64c38a9ff7896) )
+	ROM_LOAD16_BYTE( "fldl_f6_2.bin", 0x00000, 0x80000, CRC(93bf1a4b) SHA1(5b4353feba1e0d4402cd26f4855e3803e6be43b9) )
+
+	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "flv_f1_i.u2", 0x00000, 0x80000, CRC(286fccdc) SHA1(dd23deda625e486a7cfe1f3268731d10053a96e9) )
+	ROM_LOAD16_BYTE( "flv_f1_ii.u5", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
+
+	ROM_REGION( 0x40000, "nvram", 0 )
+	// taken from parent
+	ROM_LOAD16_BYTE( "v62c5181024ll.u5", 0x0000, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
+	ROM_LOAD16_BYTE( "v62c5181024ll.u8", 0x0001, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
+ROM_END
+
+ROM_START( funlddlx2 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "funny_land_dlx_w2.p1", 0x00000, 0x80000, CRC(d51abc1d) SHA1(e9c30efc36cf754fe8aa369c83ead6a8f4b300f4) )
+	ROM_LOAD16_BYTE( "funny_land_dlx_w2.p2", 0x00001, 0x80000, CRC(44691005) SHA1(faf88d6e5e67a4f789f5535a1f2eb2eb93d0f9fd) )
+
+	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "flv_f1_i.u2", 0x00000, 0x80000, CRC(286fccdc) SHA1(dd23deda625e486a7cfe1f3268731d10053a96e9) )
+	ROM_LOAD16_BYTE( "flv_f1_ii.u5", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
+
+	ROM_REGION( 0x40000, "nvram", 0 )
+	// taken from parent
+	ROM_LOAD16_BYTE( "v62c5181024ll.u5", 0x0000, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
+	ROM_LOAD16_BYTE( "v62c5181024ll.u8", 0x0001, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
+ROM_END
+
+ROM_START( funlddlx4 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "fldl_w4_1.u2", 0x00000, 0x80000, CRC(dc64234e) SHA1(4bdcb6b54095307939118cc479aa89db66e02757) )
+	ROM_LOAD16_BYTE( "fldl_w4_2.u6", 0x00001, 0x80000, CRC(fde4caa0) SHA1(0db9e8c16c86d005b2f0957f0a42a947b24890a9) )
+
+	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "flv_f1_i.u2", 0x00000, 0x80000, CRC(286fccdc) SHA1(dd23deda625e486a7cfe1f3268731d10053a96e9) )
+	ROM_LOAD16_BYTE( "flv_f1_ii.u5", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
+
+	ROM_REGION( 0x40000, "nvram", 0 )
+	// generated by running 0x188dc
+	ROM_LOAD16_BYTE( "v62c5181024ll.u5", 0x0000, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
+	ROM_LOAD16_BYTE( "v62c5181024ll.u8", 0x0001, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
+ROM_END
+
+ROM_START( fstation7 )
+    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_i.u2", 0x00000, 0x80000, CRC(bbf4bbd9) SHA1(80e785cb04213f8cc2f580b523e20b4825ba45e5))
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_ii.u6", 0x00001, 0x80000, CRC(cd8ab9e3) SHA1(cb9206d0367f00bec278cee0a4115594ba715fcd))
+
+    ROM_REGION16_BE( 0x100000, "gfx1", 0)
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_i.u2", 0x00000, 0x80000, CRC(dcddb25a) SHA1(7c54bd7a368fd57e3eb995a26462b3d2d589b0db))
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_ii.u5", 0x00001, 0x80000, CRC(400f9b8f) SHA1(4c4a9f46016eee805653b5fae65680225ac71436))
+ROM_END
+
+ROM_START( fstation8 )
+    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_8_sp_f1_i.u2", 0x00000, 0x80000, CRC(f9c792ab) SHA1(30ab7352cce22340be87ddae80e4b3c2f69ea778))
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_8_sp_f1_ii.u5", 0x00001, 0x80000, CRC(0cb7b719) SHA1(e87bc67da903d9514dd97a6abf2d4e2171e15dbd))
+
+	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "spielekoffer_8_sp_video_1.u2", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "spielekoffer_8_sp_video_2.u6", 0x00001, 0x80000, NO_DUMP )
+ROM_END
+
+ROM_START( fstation9 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "spielekoffer_9_sp_fun_station_f1_i.u2", 0x00000, 0x80000, CRC(4572efbd) SHA1(e0a91d32ab4096767cafb743523d038f5e0d3238) )
+	ROM_LOAD16_BYTE( "spielekoffer_9_sp_fun_station_f1_ii.u6", 0x00001, 0x80000, CRC(a972184d) SHA1(1849e71e696039f07b7b67c4172c7999e81664c3) )
+
+	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1_i.u2", 0x00000, 0x80000, CRC(b6eb971e) SHA1(14e3272c66a82db0f77123974eea28f308209b1b) )
+	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1_ii.u5", 0x00001, 0x80000, CRC(64138dcb) SHA1(1b629915cba32f8f6164ae5075c175b522b4a323) )
+
+	ROM_REGION( 0x4000, "nvram", 0 )
+	ROM_LOAD("m48t08_150pc1", 0x00000, 0x02000, CRC(75ec002e) SHA1(1fcc82646b10e6f3ffbf054fc7991fe2943327db))
+ROM_END
+
 ROM_START( quickjac )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "quick_jack_index_a.1.u2.bin", 0x00000, 0x10000, CRC(c2fba6fe) SHA1(f79e5913f9ded1e370cc54dd55860263b9c51d61) )
-	ROM_LOAD16_BYTE( "quick_jack_index_a.2.u6.bin", 0x00001, 0x10000, CRC(210cb89b) SHA1(8eac60d40b60e845f9c02fee6c447f125ba5d1ab) )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "quick_jack_1.u2", 0x00000, 0x10000, CRC(c2fba6fe) SHA1(f79e5913f9ded1e370cc54dd55860263b9c51d61) )
+	ROM_LOAD16_BYTE( "quick_jack_2.u6", 0x00001, 0x10000, CRC(210cb89b) SHA1(8eac60d40b60e845f9c02fee6c447f125ba5d1ab) )
 
 	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "quick_jack_video_inde_a.1.u2.bin", 0x00000, 0x20000, CRC(73c27fc6) SHA1(12429bc0009b7754e08d2b6a5e1cd8251ab66e2d) )
-	ROM_LOAD16_BYTE( "quick_jack_video_inde_a.2.u6.bin", 0x00001, 0x20000, CRC(61d55be2) SHA1(bc17dc91fd1ef0f862eb0d7dbbbfa354a8403eb8) )
+	ROM_LOAD16_BYTE( "quick_jack_video_1.u2", 0x00000, 0x20000, CRC(73c27fc6) SHA1(12429bc0009b7754e08d2b6a5e1cd8251ab66e2d) )
+	ROM_LOAD16_BYTE( "quick_jack_video_2.u6", 0x00001, 0x20000, CRC(61d55be2) SHA1(bc17dc91fd1ef0f862eb0d7dbbbfa354a8403eb8) )
 ROM_END
 
 ROM_START( skattv )
-	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "f2_i.bin", 0x00000, 0x20000, CRC(3cb8b431) SHA1(e7930876b6cd4cba837c3da05d6948ef9167daea) )
 	ROM_LOAD16_BYTE( "f2_ii.bin", 0x00001, 0x20000, CRC(0db1d2d5) SHA1(a29b0299352e0b2b713caf02aa7978f2a4b34e37) )
 
@@ -650,98 +770,23 @@ ROM_START( skattv )
 ROM_END
 
 ROM_START( skattva )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "skat_tv_version_ts3.1.u2.bin", 0x00000, 0x20000, CRC(68f82fe8) SHA1(d5f9cb600531cdd748616d8c042b6a151ebe205a) )
-	ROM_LOAD16_BYTE( "skat_tv_version_ts3.2.u6.bin", 0x00001, 0x20000, CRC(4f927832) SHA1(bbe013005fd00dd42d12939eab5c80ec44a54b71) )
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "skat_tv_version_ts3.1.u2", 0x00000, 0x20000, CRC(68f82fe8) SHA1(d5f9cb600531cdd748616d8c042b6a151ebe205a) )
+	ROM_LOAD16_BYTE( "skat_tv_version_ts3.2.u6", 0x00001, 0x20000, CRC(4f927832) SHA1(bbe013005fd00dd42d12939eab5c80ec44a54b71) )
 
 	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.1.u2.bin", 0x00000, 0x20000, CRC(de6f275b) SHA1(0c396fa4d1975c8ccc4967d330b368c0697d2124) )
-	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.2.u5.bin", 0x00001, 0x20000, CRC(af3e60f9) SHA1(c88976ea42cf29a092fdee18377b32ffe91e9f33) )
+	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.1.u2", 0x00000, 0x20000, CRC(de6f275b) SHA1(0c396fa4d1975c8ccc4967d330b368c0697d2124) )
+	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.2.u5", 0x00001, 0x20000, CRC(af3e60f9) SHA1(c88976ea42cf29a092fdee18377b32ffe91e9f33) )
 ROM_END
 
-ROM_START( fashiong )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "fashion_gambler_s6_i.bin", 0x00000, 0x80000, CRC(827a164d) SHA1(dc16380226cabdefbfd893cb50cbfca9e134be40) )
-	ROM_LOAD16_BYTE( "fashion_gambler_s6_ii.bin", 0x00001, 0x80000, CRC(5a2466d1) SHA1(c113a2295beed2011c70887a1f2fcdec00b055cb) )
+ROM_START(trumpfas)
+    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+    ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr1.u2", 0x00000, 0x20000, CRC(542b1517) SHA1(fcddb31b4b429c8d67161037d356861413567bb8))
+    ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr2.u6", 0x00001, 0x20000, CRC(d39bbd88) SHA1(64f47fd0076845ed3f9f3e84aca3504c110ad8ad))
 
-	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_i.bin", 0x00000, 0x80000, CRC(d1ee9133) SHA1(e5fdfa303a3317f8f5fbdc03438ee97415afff4b) )
-	ROM_LOAD16_BYTE( "fashion_gambler_video_s2_ii.bin", 0x00001, 0x80000, CRC(07b1e722) SHA1(594cbe9edfea6b04a4e49d1c1594f1c3afeadef5) )
-
-	ROM_REGION( 0x4000, "user1", 0 )
-	//nvram - 16 bit
-	ROM_LOAD16_BYTE( "m48z08post.bin", 0x0000, 0x2000, CRC(2d317a04) SHA1(c690c0d4b2259231d642ab5a30fcf389ba987b70) )
-	ROM_LOAD16_BYTE( "m48z08posz.bin", 0x0001, 0x2000, CRC(7c5a4b78) SHA1(262d0d7f5b24e356ab54eb2450bbaa90e3fb5464) )
-ROM_END
-
-ROM_START( fashiong2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "fashion_gambler_f3_i.u2", 0x00000, 0x80000, CRC(2939279a) SHA1(75798ea41dd713d294ea341cbcdb73a76d9f63f4) )
-	ROM_LOAD16_BYTE( "fashion_gambler_f3_ii.u6.bin", 0x00001, 0x80000, CRC(7d48e9ab) SHA1(603e946b95c53ee75c9ca10751316e723242424f) )
-
-	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "fashion_gambler_video_f2_i.u2", 0x00000, 0x80000, CRC(54ea6f10) SHA1(a1284ec34e4e78acba08dc00d5ba47c3457531f8) )
-	ROM_LOAD16_BYTE( "fashion_gambler_video_f2_ii.u5", 0x00001, 0x80000, CRC(c292a278) SHA1(9f66531ae9f202d364f47c7ed3551483fc9d27b0) )
-
-	ROM_REGION( 0x4000, "user1", 0 )
-	//nvram - 16 bit - taken from parent
-	ROM_LOAD16_BYTE( "m48z08post.bin", 0x0000, 0x2000, CRC(2d317a04) SHA1(c690c0d4b2259231d642ab5a30fcf389ba987b70) )
-	ROM_LOAD16_BYTE( "m48z08posz.bin", 0x0001, 0x2000, CRC(7c5a4b78) SHA1(262d0d7f5b24e356ab54eb2450bbaa90e3fb5464) )
-ROM_END
-
-ROM_START( funlddlx )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "fldl_f6_1.bin", 0x00001, 0x80000, CRC(85c74040) SHA1(24a7d3e6acbaf73ef9817379bef64c38a9ff7896) )
-	ROM_LOAD16_BYTE( "fldl_f6_2.bin", 0x00000, 0x80000, CRC(93bf1a4b) SHA1(5b4353feba1e0d4402cd26f4855e3803e6be43b9) )
-
-	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "flv_f1_i.bin", 0x00000, 0x80000, CRC(286fccdc) SHA1(dd23deda625e486a7cfe1f3268731d10053a96e9) )
-	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
-
-	ROM_REGION( 0x40000, "nvram", 0 )
-	//nvram - 16 bit - taken from parent
-	ROM_LOAD16_BYTE( "v62c5181024ll.u5", 0x0000, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
-	ROM_LOAD16_BYTE( "v62c5181024ll.u8", 0x0001, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
-ROM_END
-
-ROM_START( funlddlx2 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "funny_land_dlx_w2.p1", 0x00000, 0x80000, CRC(d51abc1d) SHA1(e9c30efc36cf754fe8aa369c83ead6a8f4b300f4) )
-	ROM_LOAD16_BYTE( "funny_land_dlx_w2.p2", 0x00001, 0x80000, CRC(44691005) SHA1(faf88d6e5e67a4f789f5535a1f2eb2eb93d0f9fd) )
-
-	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "flv_f1_i.bin", 0x00000, 0x80000, CRC(286fccdc) SHA1(dd23deda625e486a7cfe1f3268731d10053a96e9) )
-	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
-
-	ROM_REGION( 0x40000, "nvram", 0 )
-	//nvram - 16 bit - taken from parent
-	ROM_LOAD16_BYTE( "v62c5181024ll.u5", 0x0000, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
-	ROM_LOAD16_BYTE( "v62c5181024ll.u8", 0x0001, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
-ROM_END
-
-ROM_START( funlddlx4 )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "fldl_w4_1.bin", 0x00000, 0x80000, CRC(dc64234e) SHA1(4bdcb6b54095307939118cc479aa89db66e02757) )
-	ROM_LOAD16_BYTE( "fldl_w4_2.bin", 0x00001, 0x80000, CRC(fde4caa0) SHA1(0db9e8c16c86d005b2f0957f0a42a947b24890a9) )
-
-	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "flv_f1_i.bin", 0x00000, 0x80000, CRC(286fccdc) SHA1(dd23deda625e486a7cfe1f3268731d10053a96e9) )
-	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
-
-	ROM_REGION( 0x40000, "nvram", 0 )
-	//nvram - 16 bit - generated by running 0x188dc
-	ROM_LOAD16_BYTE( "v62c5181024ll.u5", 0x0000, 0x20000, CRC(66e00617) SHA1(74abbf8fae63f88f9dcbe9c72ff3d2f2fbf9cd87) )
-	ROM_LOAD16_BYTE( "v62c5181024ll.u8", 0x0001, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
-ROM_END
-
-ROM_START( fstation )
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "spielekoffer_9_sp_fun_station_f1.i", 0x00000, 0x80000, CRC(4572efbd) SHA1(e0a91d32ab4096767cafb743523d038f5e0d3238) )
-	ROM_LOAD16_BYTE( "spielekoffer_9_sp_fun_station_f1.ii", 0x00001, 0x80000, CRC(a972184d) SHA1(1849e71e696039f07b7b67c4172c7999e81664c3) )
-
-	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.i", 0x00000, 0x80000, CRC(b6eb971e) SHA1(14e3272c66a82db0f77123974eea28f308209b1b) )
-	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.ii", 0x00001, 0x80000, CRC(64138dcb) SHA1(1b629915cba32f8f6164ae5075c175b522b4a323) )
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "trumpf_as_video_1.u2", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "trumpf_as_video_2.u6", 0x00001, 0x20000, NO_DUMP )
 ROM_END
 
 } // Anonymous namespace
@@ -749,10 +794,13 @@ ROM_END
 
 GAME( 1993, quickjac,  0,        quickjac, quickjac, adp_state, empty_init, ROT0, "ADP",     "Quick Jack",                        0 )
 GAME( 1994, skattv,    0,        skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat TV",                           0 )
+GAME( 1994, trumpfas,  skattv,   skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Trumpf As",             			  MACHINE_NOT_WORKING ) // throws FOUL error on startup
 GAME( 1995, skattva,   skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (version TS3)",             0 )
 GAME( 1997, fashiong,  0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 1)",           0 )
 GAME( 1997, fashiong2, fashiong, fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 2)",           0 )
 GAME( 1999, funlddlx,  funlddlx4,funland,  skattv,   adp_state, empty_init, ROT0, "Stella",  "Funny Land de Luxe",                MACHINE_NOT_WORKING )
-GAME( 2000, fstation,  0,        fstation, fstation, adp_state, empty_init, ROT0, "ADP",     "Fun Station Spielekoffer 9 Spiele", MACHINE_NOT_WORKING ) // suntris crashes when executing HD63484 paint commands
+GAME( 2000, fstation7, fstation9,fstation, fstation, adp_state, empty_init, ROT0, "ADP",     "Fun Station Spielekoffer 7 Spiele", MACHINE_NOT_WORKING ) // suntris crashes when executing HD63484 paint commands
+GAME( 2000, fstation8, fstation9,fstation, fstation, adp_state, empty_init, ROT0, "ADP",     "Fun Station Spielekoffer 8 Spiele", MACHINE_NOT_WORKING ) // suntris crashes when executing HD63484 paint commands
+GAME( 2000, fstation9, 0,        fstation, fstation, adp_state, empty_init, ROT0, "ADP",     "Fun Station Spielekoffer 9 Spiele", MACHINE_NOT_WORKING ) // suntris crashes when executing HD63484 paint commands
 GAME( 2001, funlddlx2, funlddlx4,funland,  skattv,   adp_state, empty_init, ROT0, "Stella",  "Funny Land de Luxe (W2 set)",       MACHINE_NOT_WORKING )
 GAME( 2001, funlddlx4, 0,        funland,  skattv,   adp_state, empty_init, ROT0, "Stella",  "Funny Land de Luxe (W4 set)",       MACHINE_NOT_WORKING )
