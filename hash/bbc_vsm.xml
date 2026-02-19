@@ -30,4 +30,51 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="vm61003">
+		<description>VM61003 (Weather)</description>
+		<year>1982</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="rom" interface="bbc_vsm">
+			<feature name="bank" value="1" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="vm61003.bin" size="0x4000" crc="2a4e6f17" sha1="aa3bbb28fbdb848d609ec47ef8c250d4ff0d8e53" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vm61004">
+		<description>VM61004 (Military)</description>
+		<year>1982</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="rom" interface="bbc_vsm">
+			<feature name="bank" value="2" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="vm61004.bin" size="0x4000" crc="45ec7dcd" sha1="24b88d0127a52eccc579d4ea90b39cb90da7fd39" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vm61005">
+		<description>VM61005 (Avionic)</description>
+		<year>1982</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="rom" interface="bbc_vsm">
+			<feature name="bank" value="3" />
+			<dataarea name="rom" size="0x4000">
+				<rom name="vm61005.bin" size="0x4000" crc="09efc37f" sha1="5cf785153dcce406e9a8f5d166af50e288b33126" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vm71003a">
+		<description>VM71003A (Female Clock)</description>
+		<year>1981</year>
+		<publisher>Texas Instruments</publisher>
+		<part name="rom" interface="bbc_vsm">
+			<dataarea name="rom" size="0x1000">
+				<rom name="vm71003a.bin" size="0x1000" crc="d1d5a1dc" sha1="164dae26500d9ef01c591686f13078d51254c4e1" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
