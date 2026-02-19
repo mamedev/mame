@@ -31,6 +31,8 @@
 
 #include "emu.h"
 
+#include "nmk_irq.h"
+
 #include "cpu/m68000/m68000.h"
 #include "cpu/tlcs90/tlcs90.h"
 #include "machine/timer.h"
@@ -57,9 +59,9 @@ public:
 		m_work_ram(*this, "work_ram"),
 		m_mcu_shared_ram(*this, "mcu_shared_ram"),
 		m_in0_io(*this, "IN0"),
-		m_vtiming_prom(*this, "vtiming"),
 		m_maincpu(*this, "maincpu"),
 		m_protcpu(*this, "protcpu"),
+		m_nmk_irq(*this, "nmk_irq"),
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")
@@ -91,10 +93,10 @@ private:
 	void draw_video_layer(u16* vreg_base, tilemap_t *tmap, screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	void main_irq_cb(u8 data);
+
 	void ddealer_map(address_map &map) ATTR_COLD;
 	void prot_map(address_map &map) ATTR_COLD;
-
-	TIMER_DEVICE_CALLBACK_MEMBER(ddealer_scanline);
 
 	// memory pointers
 	required_shared_ptr<u16> m_vregs;
@@ -103,11 +105,11 @@ private:
 	required_shared_ptr<u16> m_work_ram;
 	required_shared_ptr<u16> m_mcu_shared_ram;
 	required_ioport m_in0_io;
-	required_memory_region m_vtiming_prom;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<tlcs90_device> m_protcpu;
+	required_device<nmk_irq_device> m_nmk_irq;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -120,19 +122,16 @@ private:
 	tilemap_t  *m_fg_tilemap_right;
 
 	u8 m_bus_status = 0;
-	u8 m_interrupt_trigger = 0;
 };
 
 void ddealer_state::machine_start()
 {
 	save_item(NAME(m_bus_status));
-	save_item(NAME(m_interrupt_trigger));
 }
 
 void ddealer_state::machine_reset()
 {
 	m_bus_status = 0x04;
-	m_interrupt_trigger = 0x01;
 }
 
 void ddealer_state::mcu_port6_w(u8 data)
@@ -432,55 +431,24 @@ GFXDECODE_END
 
   Refer to nmk16.cpp for a more thorough description.
 */
-TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_scanline)
+
+void ddealer_state::main_irq_cb(u8 data)
 {
-//  constexpr int SPRDMA_INDEX = 0;  // no sprite system in this hardware
-//  constexpr int VSYNC_INDEX  = 1;  // not used in emulation
-//  constexpr int VBLANK_INDEX = 2;  // not used in emulation
-//  constexpr int NOT_USED     = 3;  // not used in emulation
-	constexpr int IPL0_INDEX   = 4;
-	constexpr int IPL1_INDEX   = 5;
-	constexpr int IPL2_INDEX   = 6;
-	constexpr int TRIGG_INDEX  = 7;
-
-	constexpr int PROM_START_OFFSET = 0x75;  // previous entries are never addressed
-	constexpr int PROM_FRAME_OFFSET = 0x0b;  // first 11 "used" entries (from 0x75 to 0x7f: 0xb entries) are prior to start of frame, which occurs on 0x80 address (128 entry)
-
-	u8 *prom = m_vtiming_prom->base();
-	int len = m_vtiming_prom->bytes();
-
-	int scanline = param;
-
-	// every PROM entry is addressed each 2 scanlines, so only even lines are actually addressing it:
-	if ((scanline & 0x1) == 0x0)
-	{
-		int promAddress = (((scanline / 2) + PROM_FRAME_OFFSET) % (len - PROM_START_OFFSET)) + PROM_START_OFFSET;
-
-		LOG("ddealer_scanline: Scanline: %03d - Current PROM entry: %03d\n", scanline, promAddress);
-
-		u8 val = prom[promAddress];
-
-		// Interrupt requests are triggered at raising edge of bit 7:
-		u8 trigger = BIT(val, TRIGG_INDEX);
-		if (m_interrupt_trigger == 0 && trigger == 1)
-		{
-			u8 int_level = bitswap<3>(val, IPL2_INDEX, IPL1_INDEX, IPL0_INDEX);
-			if (int_level > 0)
-			{
-				LOG("ddealer_scanline: Triggered interrupt: IRQ%d at scanline: %03d\n", int_level, scanline);
-				m_maincpu->set_input_line(int_level, HOLD_LINE);
-			}
-		}
-
-		m_interrupt_trigger = trigger;
-	}
+	if (data != 0)
+		m_maincpu->set_input_line(data, HOLD_LINE);
 }
 
 void ddealer_state::ddealer(machine_config &config)
 {
 	M68000(config, m_maincpu, 16_MHz_XTAL/2); // 8MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &ddealer_state::ddealer_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(ddealer_state::ddealer_scanline), "screen", 0, 1);
+	
+	NMK_IRQ(config, m_nmk_irq, 0);
+	m_nmk_irq->set_screen(m_screen);
+	m_nmk_irq->irq_callback().set(FUNC(ddealer_state::main_irq_cb));
+	m_nmk_irq->set_prom_start_offset(0x75); // previous entries are never addressed
+	m_nmk_irq->set_prom_frame_offset(0x0b); // first 11 "used" entries (from 0x75 to 0x7f: 0xb entries) are prior to start of frame, which occurs on 0x80 address (128 entry)
+	m_nmk_irq->set_vtiming_prom_usage(0x100);
 
 	TMP91640(config, m_protcpu, 16_MHz_XTAL/4); // Toshiba TMP91640 marked as NMK-110, with 16Kbyte internal ROM, 512bytes internal RAM
 	m_protcpu->set_addrmap(AS_PROGRAM, &ddealer_state::prot_map);
@@ -517,10 +485,10 @@ ROM_START( ddealer )
 	ROM_REGION( 0x80000, "fgrom", 0 ) // FG
 	ROM_LOAD( "3.ic64", 0x00000, 0x80000, CRC(660e367c) SHA1(54827a8998c58c578c594126d5efc18a92363eaa))
 
-	ROM_REGION( 0x0100, "htiming", 0 )
+	ROM_REGION( 0x0100, "nmk_irq:htiming", 0 )
 	ROM_LOAD( "6.ic86", 0x0000, 0x0100, CRC(435653a2) SHA1(575b4a46ea65179de3042614da438d2f6d8b572e) ) // 82S129
 
-	ROM_REGION( 0x0100, "vtiming", 0 )
+	ROM_REGION( 0x0100, "nmk_irq:vtiming", 0 )
 	ROM_LOAD( "5.ic67", 0x0000, 0x0100, CRC(1d3d7e17) SHA1(b5aa0d024f0c0b5f72a2d0a23d1576775a7b3826) ) // 82S135
 ROM_END
 
