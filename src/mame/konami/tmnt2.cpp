@@ -269,10 +269,9 @@ protected:
 	void ssriders_main_map(address_map &map) ATTR_COLD;
 
 	// video-related
-	int32_t m_lastdim = 0;
-	int32_t m_lasten = 0;
-	int32_t m_dim_c = 0;
-	int32_t m_dim_v = 0;
+	double m_lastdim[8] = { };
+	uint8_t m_dim_c = 0;
+	uint8_t m_dim_v = 0;
 };
 
 // with another approach of protection
@@ -844,12 +843,9 @@ void ssriders_state::video_start()
 {
 	lgtnfght_state::video_start();
 
-	m_dim_c = m_dim_v = m_lastdim = m_lasten = 0;
-
+	save_item(NAME(m_lastdim));
 	save_item(NAME(m_dim_c));
 	save_item(NAME(m_dim_v));
-	save_item(NAME(m_lastdim));
-	save_item(NAME(m_lasten));
 }
 
 void tmnt2_roz_base_state::video_start()
@@ -1222,49 +1218,62 @@ uint32_t tmnt2_roz_base_state::screen_update(screen_device &screen, bitmap_ind16
 
 uint32_t ssriders_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const int newdim = m_dim_v | ((~m_dim_c & 0x10) >> 1);
-	const int newen  = (m_k053251->get_priority(5) && m_k053251->get_priority(5) != 0x3e);
+	// toggle shadow/highlight
+	m_palette->set_shadow_mode(BIT(~m_dim_c, 4));
 
-	if (newdim != m_lastdim || newen != m_lasten)
+	// screen_update before palette dimming
+	screen_update_lgtnfght(screen, bitmap, cliprect);
+
+	// m_k053251->get_priority(5 and 6):
+
+	// ssriders:
+	// 0x26 0x32 - almost everywhere
+	// 0x26 0x20 - saloon spotlights
+
+	// tmnt2:
+	// 0x24 0x00 - April's news broadcast
+	// 0x2c 0x08 - time travel
+	// 0x08 0x33 - stage 3 start
+	// 0x08 0x08 - stage 4 cave
+	// 0x08 0x2b - stage 4/7 complete
+	// 0x30 0x2b - stage 8 near end
+	// 0x3e 0x** - no dimming
+
+	// except for tmnt2 stage 8, it appears everything dims layer 1, layer 2, sprites
+	// layer 0 (text layer, CI2) is never dimmed?
+
+	const int enable = m_k053251->get_priority(5);
+	int dimpal = 0;
+
+	if (enable != 0x3e)
 	{
-		double brt = 1.0;
-		if (newen)
-			brt -= (1.0 - PALETTE_DEFAULT_SHADOW_FACTOR) * newdim / 8;
-		m_lastdim = newdim;
-		m_lasten = newen;
+		// layer 1 (CI4)
+		dimpal |= 1 << (m_layer_colorbase[1] >> 4 & 7);
 
-		/*
-		    Only affect the background and sprites, not text layer.
-		    Instead of dimming each layer we dim the entire palette
-		    except text colors because palette bases may change
-		    anytime and there's no guarantee a dimmed color will be
-		    reset properly.
-		*/
-
-		// find the text layer's palette range
-		const int cb = m_layer_colorbase[m_sorted_layer[2]] << 4;
-		const int ce = cb + 128;
-
-		// dim all colors before it
-		for (int i = 0; i < cb; i++)
-			m_palette->set_pen_contrast(i, brt);
-
-		// reset all colors in range
-		for (int i = cb; i < ce; i++)
-			m_palette->set_pen_contrast(i, 1.0);
-
-		// dim all colors after it
-		for (int i = ce; i < 2048; i++)
-			m_palette->set_pen_contrast(i, brt);
-
-		// toggle shadow/highlight
-		if (BIT(~m_dim_c, 4))
-			m_palette->set_shadow_mode(1);
-		else
-			m_palette->set_shadow_mode(0);
+		// sprites (CI1), layer 2 (CI3)
+		if (!BIT(enable, 4))
+		{
+			for (int i = 0; i < 2; i++)
+				dimpal |= 1 << ((m_sprite_colorbase >> 4 | i) & 7);
+			dimpal |= 1 << (m_layer_colorbase[2] >> 4 & 7);
+		}
 	}
 
-	screen_update_lgtnfght(screen, bitmap, cliprect);
+	const int factor = m_dim_v | ((~m_dim_c & 0x10) >> 1);
+	const double brt = 1.0 - (1.0 - PALETTE_DEFAULT_SHADOW_FACTOR) * factor / 8;
+
+	for (int i = 0; i < 8; i++)
+	{
+		double dim = BIT(dimpal, i) ? brt : 1.0;
+
+		if (dim != m_lastdim[i])
+		{
+			for (int j = 0; j < 0x100; j++)
+				m_palette->set_pen_contrast(i * 0x100 + j, dim);
+			m_lastdim[i] = dim;
+		}
+	}
+
 	return 0;
 }
 
@@ -1511,7 +1520,7 @@ void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	xzoom = mod[0x1c / 2];
 	yzoom = (keepaspect) ? xzoom : mod[0x1e / 2];
 
-	ylock = xlock = (f2 & 0x0020 && (!xzoom || xzoom == 0x100));
+	xlock = ylock = (f2 & 0x003b) == 0x0020;
 
 	/*
 	    Scale factor is non-linear. The zoom vales are looked-up from
