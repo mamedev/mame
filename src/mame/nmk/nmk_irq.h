@@ -59,7 +59,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(NMK_IRQ, nmk_irq_device)
 
 
