@@ -7,6 +7,8 @@
 
 #include "notifier.h"
 
+#include <utility>
+
 
 class vector_device;
 
@@ -28,6 +30,11 @@ protected:
 class vector_device : public device_t, public device_video_interface
 {
 public:
+	using frame_begin_delegate = delegate<void ()>;
+	using frame_end_delegate = delegate<void ()>;
+	using move_delegate = delegate<void (int, int, uint32_t, int, int)>;
+	using line_delegate = delegate<void (int, int, int, int, uint32_t, int, int, int)>;
+
 	template <typename T> static constexpr rgb_t color111(T c) { return rgb_t(pal1bit(c >> 2), pal1bit(c >> 1), pal1bit(c >> 0)); }
 	template <typename T> static constexpr rgb_t color222(T c) { return rgb_t(pal2bit(c >> 4), pal2bit(c >> 2), pal2bit(c >> 0)); }
 	template <typename T> static constexpr rgb_t color444(T c) { return rgb_t(pal4bit(c >> 8), pal4bit(c >> 4), pal4bit(c >> 0)); }
@@ -44,25 +51,25 @@ public:
 	virtual void device_start() override ATTR_COLD;
 
 	// notifiers
-	util::notifier_subscription add_frame_begin_notifier(delegate<void (void)> &&n);
+	util::notifier_subscription add_frame_begin_notifier(frame_begin_delegate &&n);
 	template <typename T>
 	util::notifier_subscription add_frame_begin_notifier(T &&n)
-	{ return add_frame_begin_notifier(delegate<void (void)>(std::forward<T>(n))); }
+	{ return add_frame_begin_notifier(frame_begin_delegate(std::forward<T>(n))); }
 
-	util::notifier_subscription add_frame_end_notifier(delegate<void (void)> &&n);
+	util::notifier_subscription add_frame_end_notifier(frame_end_delegate &&n);
 	template <typename T>
 	util::notifier_subscription add_frame_end_notifier(T &&n)
-	{ return add_frame_end_notifier(delegate<void (void)>(std::forward<T>(n))); }
+	{ return add_frame_end_notifier(frame_end_delegate(std::forward<T>(n))); }
 
-	util::notifier_subscription add_move_notifier(delegate<void (int, int, uint32_t, int, int)> &&n);
+	util::notifier_subscription add_move_notifier(move_delegate &&n);
 	template <typename T>
 	util::notifier_subscription add_move_notifier(T &&n)
-	{ return add_move_notifier(delegate<void (int, int, uint32_t, int, int)>(std::forward<T>(n))); }
+	{ return add_move_notifier(move_delegate(std::forward<T>(n))); }
 
-	util::notifier_subscription add_line_notifier(delegate<void (int, int, int, int, uint32_t, int, int, int)> &&n);
+	util::notifier_subscription add_line_notifier(line_delegate &&n);
 	template <typename T>
 	util::notifier_subscription add_line_notifier(T &&n)
-	{ return add_line_notifier(delegate<void (int, int, int, int, uint32_t, int, int, int)>(std::forward<T>(n))); }
+	{ return add_line_notifier(line_delegate(std::forward<T>(n))); }
 
 private:
 	float normalized_sigmoid(float n, float k);
