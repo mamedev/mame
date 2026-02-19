@@ -22,6 +22,7 @@
 #include "machine/pci.h"
 #include "machine/vt82c586b_ide.h"
 #include "machine/vt82c586b_isa.h"
+#include "machine/vt82c586b_usb.h"
 #include "machine/vt82c598mvp.h"
 //#include "video/voodoo_pci.h"
 
@@ -118,7 +119,9 @@ void mvp3_state::mvp3(machine_config &config)
 	ide.irq_pri().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_irq15_w));
 
-	// TODO: USB, ACPI
+	VT82C586B_USB(config, "pci:07.2", 0);
+
+	// TODO: ACPI
 
 	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "sis6326_agp");
 

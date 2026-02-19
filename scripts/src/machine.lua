@@ -2952,6 +2952,8 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/vt82c586b_ide.h",
 		MAME_DIR .. "src/devices/machine/vt82c586b_isa.cpp",
 		MAME_DIR .. "src/devices/machine/vt82c586b_isa.h",
+		MAME_DIR .. "src/devices/machine/vt82c586b_usb.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c586b_usb.h",
 		MAME_DIR .. "src/devices/machine/vt82c598mvp.cpp",
 		MAME_DIR .. "src/devices/machine/vt82c598mvp.h",
 		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.cpp",

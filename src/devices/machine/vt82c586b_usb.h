@@ -1,18 +1,18 @@
 // license: BSD-3-Clause
 // copyright-holders: Angelo Salese
 
-#ifndef MAME_MACHINE_I82371EB_USB_H
-#define MAME_MACHINE_I82371EB_USB_H
+#ifndef MAME_MACHINE_VT82C586B_USB_H
+#define MAME_MACHINE_VT82C586B_USB_H
 
 #pragma once
 
 #include "pci.h"
 #include "pci-usb.h"
 
-class i82371eb_usb_device : public usb_uhci_device
+class vt82c586b_usb_device : public usb_uhci_device
 {
 public:
-	i82371eb_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	vt82c586b_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -25,10 +25,9 @@ protected:
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
 private:
-	u16 m_legsup;
-	bool m_rtciren;
+	u8 m_misc_control[2];
 };
 
-DECLARE_DEVICE_TYPE(I82371EB_USB, i82371eb_usb_device)
+DECLARE_DEVICE_TYPE(VT82C586B_USB, vt82c586b_usb_device)
 
-#endif // MAME_MACHINE_I82371EB_USB_H
+#endif // MAME_MACHINE_VT82C586B_USB_H
