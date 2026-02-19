@@ -162,7 +162,7 @@ void ez2d_state::cubx(machine_config &config)
 
 	I82371EB_USB (config, "pci:04.2", 0);
 	I82371EB_ACPI(config, "pci:04.3", 0);
-	ACPI_PIIX4   (config, "pci:04.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:04.3:acpi");
 	SMBUS        (config, "pci:04.3:smbus", 0);
 
 	ISA16_SLOT(config, "board4", 0, "pci:04.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);

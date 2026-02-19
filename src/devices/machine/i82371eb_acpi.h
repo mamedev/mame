@@ -7,7 +7,6 @@
 #pragma once
 
 #include "pci.h"
-#include "lpc-acpi.h"
 #include "pci-smbus.h"
 
 class acpi_piix4_device;
@@ -75,6 +74,7 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
 	u16 m_pmsts;

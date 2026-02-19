@@ -48,3 +48,4 @@ ISA debug port $80, `wpiset 0x80,1,w,1,{printf "%02x",wpdata;g}`.
 
 - Booting in Award BootBlock: implement shadow RAM;
 - PCI targets with OHCI (and probably EHCI) may crash at startup: implement USB chipset, requires relocatable BAR that will default to RAM $0 if not implemented;
+- "Unknown" CPU: r/w the info thru CMOS (Phoenix BIOSes do something similar)
