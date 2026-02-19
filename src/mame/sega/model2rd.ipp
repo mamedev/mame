@@ -294,28 +294,28 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 		if (fill[x] > 0)
 			continue;
 
-		float z = recip_approx(ooz);
+		float const z = 1.0F / ooz;
 
-		s32 mml = -object.texlod + fast_log2(z);    // equivalent to log2(z^2)
-		s32 level = std::clamp(mml >> 7, 0, max_level);
+		s32 const mml = -object.texlod + fast_log2(z);    // equivalent to log2(z^2)
+		s32 const level = std::clamp(mml >> 7, 0, max_level);
 
 		// we give texture coordinates 8 fractional bits
-		s32 u = s32(uoz * z * 256.0F);
-		s32 v = s32(voz * z * 256.0F);
+		s32 const u = s32(uoz * z * 256.0F);
+		s32 const v = s32(voz * z * 256.0F);
 
 		u32 t = fetch_bilinear_texel<Translucent>(object, level, u, v);
 
 		if (mml > 0 && level < max_level)
 		{
-			u32 t2 = fetch_bilinear_texel<Translucent>(object, level + 1, u, v);
-			s32 frac = (mml & 127) << 1;
+			u32 const t2 = fetch_bilinear_texel<Translucent>(object, level + 1, u, v);
+			s32 const frac = (mml & 127) << 1;
 			t = LERP(t, t2, frac);
 		}
 		else if (object.utex && mml < 0)
 		{
 			// microtexture; blend up to almost 50%
-			u32 t2 = fetch_bilinear_texel<Translucent>(object, -1, u, v);
-			s32 frac = std::min(-mml >> object.utexminlod, 127);
+			u32 const t2 = fetch_bilinear_texel<Translucent>(object, -1, u, v);
+			s32 const frac = std::min(-mml >> object.utexminlod, 127);
 			t = LERP(t, t2, frac);
 		}
 
