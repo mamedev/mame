@@ -40,8 +40,6 @@
 class i8256_device : public device_t, public device_serial_interface
 {
 public:
-	static constexpr flags_type emulation_flags() { return flags::SAVE_UNSUPPORTED; }
-
 	i8256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto inta_callback()    { return m_in_inta_cb.bind(); }
@@ -62,6 +60,8 @@ public:
 
 	void write(offs_t offset, u8 data);
 	uint8_t read(offs_t offset);
+	uint8_t acknowledge();
+	void gen_interrupt(uint8_t level);
 
 	uint8_t p1_r();
 	void    p1_w(uint8_t data);
@@ -71,6 +71,11 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+
+	// device_serial_interface implementation
+	virtual void rcv_complete() override;
+	virtual void tra_callback() override;
+	virtual void tra_complete() override;
 
 private:
 	devcb_read_line m_in_inta_cb;
@@ -84,15 +89,10 @@ private:
 	devcb_read8 m_in_p1_cb;
 	devcb_write8 m_out_p1_cb;
 
-	int32_t m_rxc;
-	int32_t m_rxd;
-	int32_t m_cts;
-	int32_t m_txc;
-
 	uint8_t m_command1, m_command2, m_command3;
 	uint8_t m_data_bits_count;
-	parity_t m_parity;
-	stop_bits_t m_stop_bits;
+	uint8_t m_parity;
+	uint8_t m_stop_bits;
 
 	uint8_t m_mode;
 	uint8_t m_port1_control;
@@ -104,14 +104,11 @@ private:
 
 	uint8_t m_status, m_modification;
 
-	uint8_t m_sync_byte_count, m_rxc_count, m_txc_count;
 	uint8_t m_br_factor;
-	uint8_t m_rxd_bits;
-	uint8_t m_rx_data, m_tx_data;
-	uint8_t m_sync1, m_sync2, m_sync8, m_sync16;
 
 	TIMER_CALLBACK_MEMBER(timer_check);
 
+	void reset_timer();
 	void receive_clock();
 	void sync1_rxc();
 	void sync2_rxc();
@@ -119,6 +116,7 @@ private:
 	void check_for_tx_start();
 	void start_tx();
 	void transmit_clock();
+	void update_status();
 	void receive_character(uint8_t ch);
 };
 
