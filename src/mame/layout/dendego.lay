@@ -72,10 +72,12 @@ authors:hap
 	<element name="text_brake">
 		<text string="BRAKE:" align="1"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
-	<element name="text_brake_j"><text string="ブレーキ:" align="1"><color red="0.8" green="0.8" blue="0.8" /></text>
+	<element name="text_brake_j">
+		<text string="ブレーキ:" align="1"><color red="0.8" green="0.8" blue="0.8" /></text>
 	</element>
 
-	<element name="text_pressure"><text string="kg/cm²" align="1"><color red="1.0" green="1.0" blue="0.0" /></text>
+	<element name="text_pressure">
+		<text string="kg/cm²" align="1"><color red="1.0" green="1.0" blue="0.0" /></text>
 	</element>
 
 	<element name="counter_brake" defstate="0">

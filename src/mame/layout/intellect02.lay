@@ -110,7 +110,7 @@ authors:hap
 
 <!-- build screen -->
 
-	<view name="Internal Layout (Russian)"> <!-- original -->
+	<view name="Internal Layout (Russian)"> <!-- original labels -->
 		<bounds x="7.5" y="7" width="35.5" height="23.2" />
 		<group ref="shared"><bounds x="7.5" y="7.6" width="26" height="21.6" /></group>
 
@@ -126,7 +126,7 @@ authors:hap
 		<element ref="text_b11"><bounds xc="18.71" y="25.4" width="3.8" height="1.2" /></element>
 	</view>
 
-	<view name="Internal Layout (English)"> <!-- translated -->
+	<view name="Internal Layout (English)"> <!-- translated labels -->
 		<bounds x="7.5" y="7" width="35.5" height="23.2" />
 		<group ref="shared"><bounds x="7.5" y="7.6" width="26" height="21.6" /></group>
 
