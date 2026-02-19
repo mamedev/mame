@@ -19,7 +19,7 @@ TODO:
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VT82C586B_USB, vt82c586b_usb_device, "vt82c586b_usb", "Intel 82371EB PIIX4E USB Host Controller")
+DEFINE_DEVICE_TYPE(VT82C586B_USB, vt82c586b_usb_device, "vt82c586b_usb", "VT82C586B \"PIPC\" USB Host Controller")
 
 vt82c586b_usb_device::vt82c586b_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: usb_uhci_device(mconfig, VT82C586B_USB, tag, owner, clock)
