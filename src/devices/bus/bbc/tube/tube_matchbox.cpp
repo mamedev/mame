@@ -440,7 +440,7 @@ void bbc_tube_matchbox_device::device_add_mconfig(machine_config &config)
 	ARM(config, m_arm2, 32_MHz_XTAL);
 	m_arm2->set_addrmap(AS_PROGRAM, &bbc_tube_matchbox_device::arm2_mem);
 
-	SOFTWARE_LIST(config, "flop_ls_arm").set_original("bbc_flop_arm");
+	SOFTWARE_LIST(config, "flop_ls_arm").set_original("bbc_flop_arm").set_filter("ARM");
 
 	// 32016
 	NS32016(config, m_ns32016, 32_MHz_XTAL);

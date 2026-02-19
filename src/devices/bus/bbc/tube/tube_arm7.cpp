@@ -16,6 +16,8 @@
 #include "machine/ram.h"
 #include "machine/tube.h"
 
+#include "softlist_dev.h"
+
 
 namespace {
 
@@ -142,6 +144,8 @@ void bbc_tube_arm7_device::device_add_mconfig(machine_config &config)
 	m_ula->prst_handler().set(FUNC(bbc_tube_arm7_device::prst_w));
 
 	RAM(config, m_ram).set_default_size("32M").set_extra_options("16M,64M");
+
+	SOFTWARE_LIST(config, "flop_ls_arm").set_original("bbc_flop_arm").set_filter("ARM7");
 }
 
 
