@@ -172,7 +172,11 @@ uint32_t lpc2132_vic_device::protection_r()
 
 uint32_t lpc2132_vic_device::vect_addr_r()
 {
-	return read_vector_address();
+	if (!machine().side_effects_disabled())
+		return read_vector_address();
+
+	// when side effects are disabled (e.g. debugger), return current address without updating state
+	return m_vic_vect_addr_cur;
 }
 
 uint32_t lpc2132_vic_device::def_vect_addr_r()

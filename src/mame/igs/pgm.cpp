@@ -198,6 +198,7 @@ Notes:
 #include "pgmprot_igs025_igs022.h"
 #include "pgmprot_igs025_igs028.h"
 #include "pgmprot_igs027a_type1.h"
+#include "pgmprot_igs027a_type1_kovgsyx.h"
 #include "pgmprot_igs027a_type2.h"
 #include "pgmprot_igs027a_type3.h"
 #include "pgmprot_orlegend.h"
@@ -5840,10 +5841,10 @@ GAME( 200?, kovlsqh2,     kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_
 GAME( 200?, kovlsjb,      kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 200?, kovlsjba,     kovshp,    pgm_arm_type1,          kovsh,     pgm_arm_type1_state, init_kovlsqh2, ROT0,   "bootleg", "Luanshi Jie Ba (bootleg of Knights of Valour Super Heroes Plus, ver. 200CN, set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2010, kovgsyx,      kovshp,    pgm_arm_type1_kovgsyx,  kovsh,     pgm_arm_type1_state, init_kovgsyx,  ROT0,   "bootleg (WDF)", "Gaishi Yingxiong Jiaqiang Ban (bootleg of Knights of Valour Super Heroes Plus, V302CN, Dec 29 2010 16:31:32)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2010, kovgsyx,      kovshp,    pgm_arm_type1_kovgsyx,  kovsh,     pgm_arm_type1_kovgsyx_state, init_kovgsyx, ROT0,   "bootleg (WDF)", "Gaishi Yingxiong Jiaqiang Ban (bootleg of Knights of Valour Super Heroes Plus, V302CN, Dec 29 2010 16:31:32)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
 GAME( 199?, kovbl,        kov,       pgm_arm_type1_sim,      sango,     pgm_arm_type1_state, init_kov,      ROT0,   "bootleg", "Knights of Valour / Sanguo Zhan Ji / Sangoku Senki (bootleg, ver. 112CN?)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 
 GAME( 199?, kovplusbl,    kovplus,   pgm_arm_type1_sim,      sango,     pgm_arm_type1_state, init_kov,      ROT0,   "bootleg", "Knights of Valour Plus / Sanguo Zhan Ji Zhengzong Plus / Sangoku Senki Masamune Plus (bootleg, ver. 117CN?)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 
-GAME( 2010, kovzscs,      kovshp,    pgm_arm_type1_kovgsyx,  kovsh,     pgm_arm_type1_state, init_kovzscs,  ROT0,   "bootleg (WDF)", "Zhan Shen Chuan Shuo 2 Tebie Ban (bootleg of Knights of Valour Super Heroes Plus, V201CN, May 17 2010 10:43:09)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2010, kovzscs,      kovshp,    pgm_arm_type1_kovgsyx,  kovsh,     pgm_arm_type1_kovgsyx_state, init_kovzscs, ROT0,   "bootleg (WDF)", "Zhan Shen Chuan Shuo 2 Tebie Ban (bootleg of Knights of Valour Super Heroes Plus, V201CN, May 17 2010 10:43:09)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
