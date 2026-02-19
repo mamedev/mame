@@ -210,6 +210,11 @@ void isa8_fdc_xt_device::device_start()
 	isa8_upd765_fdc_device::device_start();
 }
 
+void isa8_fdc_xt_device::device_reset()
+{
+	isa8_upd765_fdc_device::device_reset();
+}
+
 void isa8_fdc_xt_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
@@ -264,6 +269,12 @@ void isa8_fdc_at_device::device_start()
 	isa8_upd765_fdc_device::device_start();
 }
 
+void isa8_fdc_at_device::device_reset()
+{
+	isa8_upd765_fdc_device::device_reset();
+}
+
+
 void isa8_fdc_at_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
@@ -290,6 +301,14 @@ void isa8_fdc_smc_device::device_start()
 	set_isa_device();
 	m_isa->set_dma_channel(2, this, true);
 }
+
+void isa8_fdc_smc_device::device_reset()
+{
+	isa8_fdc_device::device_reset();
+	//dor_w(0x00);
+	remap(AS_IO, 0, 0xffff);
+}
+
 
 void isa8_fdc_smc_device::remap(int space_id, offs_t start, offs_t end)
 {
@@ -319,6 +338,13 @@ void isa8_fdc_ps2_device::device_start()
 	m_isa->set_dma_channel(2, this, true);
 }
 
+void isa8_fdc_ps2_device::device_reset()
+{
+	isa8_fdc_device::device_reset();
+	//dor_w(0x00);
+	remap(AS_IO, 0, 0xffff);
+}
+
 void isa8_fdc_ps2_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
@@ -346,6 +372,13 @@ void isa8_fdc_superio_device::device_start()
 	m_isa->set_dma_channel(2, this, true);
 }
 
+void isa8_fdc_superio_device::device_reset()
+{
+	isa8_fdc_device::device_reset();
+	//dor_w(0x00);
+	remap(AS_IO, 0, 0xffff);
+}
+
 void isa8_fdc_superio_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_IO)
@@ -363,6 +396,11 @@ isa8_ec1841_0003_device::isa8_ec1841_0003_device(const machine_config &mconfig, 
 void isa8_ec1841_0003_device::device_start()
 {
 	isa8_fdc_xt_device::device_start();
+}
+
+void isa8_ec1841_0003_device::device_reset()
+{
+	isa8_fdc_xt_device::device_reset();
 }
 
 void isa8_ec1841_0003_device::remap(int space_id, offs_t start, offs_t end)

@@ -79,6 +79,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	void map(address_map &map) ATTR_COLD;
@@ -93,6 +94,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	void map(address_map &map) ATTR_COLD;
@@ -106,6 +108,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 };
 
@@ -117,6 +120,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 };
 
@@ -128,6 +132,7 @@ protected:
 	// device-level overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 };
 
@@ -138,6 +143,7 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	required_device<bus_mouse_device> m_bus_mouse;
