@@ -204,7 +204,11 @@ void device_serial_interface::set_data_frame(int start_bit_count, int data_bit_c
 	{
 		m_rcv_bit_count++;
 	}
-
+	
+	// no params have changed and already syncronised
+	if (m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED)
+		return;
+		
 	receive_register_reset();
 }
 
