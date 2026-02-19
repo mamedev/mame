@@ -1133,6 +1133,7 @@ TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_update_inputs)
 		if (m_core->write_stalled != m_write_stalled_pending_val)
 		{
 			m_core->write_stalled = m_write_stalled_pending_val;
+#if 0 // FIXME: this implementation breaks Thrill Drive on Hornet
 			if (m_enable_drc)
 			{
 				if (m_core->write_stalled)
@@ -1148,6 +1149,7 @@ TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_update_inputs)
 						m_core->dma_op[7].timer->adjust(cycles_to_attotime(m_core->dma_op[7].src_count / 4), 7);
 				}
 			}
+#endif
 		}
 		m_write_stalled_pending = false;
 	}
