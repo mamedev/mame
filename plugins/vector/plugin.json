@@ -1,0 +1,10 @@
+{
+	"plugin": {
+		"name": "vector",
+		"description": "Vector-hook demonstration plugin",
+		"version": "0.0.1",
+		"author": "Ryan Holtz",
+		"type": "plugin",
+		"start": "false"
+	  }
+}
