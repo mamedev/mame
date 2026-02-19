@@ -4468,6 +4468,8 @@ if BUSES["PCI"] then
 		MAME_DIR .. "src/devices/bus/pci/sonicvibes.h",
 		MAME_DIR .. "src/devices/bus/pci/sw1000xg.cpp",
 		MAME_DIR .. "src/devices/bus/pci/sw1000xg.h",
+		MAME_DIR .. "src/devices/bus/pci/trio_pci.cpp",
+		MAME_DIR .. "src/devices/bus/pci/trio_pci.h",
 		MAME_DIR .. "src/devices/bus/pci/virge_pci.cpp",
 		MAME_DIR .. "src/devices/bus/pci/virge_pci.h",
 		MAME_DIR .. "src/devices/bus/pci/vision.cpp",

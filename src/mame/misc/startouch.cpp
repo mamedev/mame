@@ -2,8 +2,15 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-Skeleton driver for "EuroByte Electronics & Multimedia IASA" PC-based touch
-games, sold in Spain by Sleic / Petaco.
+"EuroByte Electronics & Multimedia IASA" PC-based touch games, sold in Spain by Sleic / Petaco.
+
+Windows 3.1 based
+
+TODO:
+- Needs Med3931 sound card and Super I/O to continue;
+- Trio64 coprocessor part needs improving (draws with half width);
+- Hangs checking touch screen interface in COM2;
+- Underlying .ini files will load a Greek driver keyboard, this may or may not become a problem;
 
 -----+----------------------------+------+----------------------------------
 Dump | Game                       | Year | Notes
@@ -26,13 +33,6 @@ PCI VGA ExpertColor M50-02 (S3, Trio64V2/DX 86C775, 512KB RAM)
 Parallel port dongle HASP4
 Creative Video Blaster camera (parallel port)
 HDD Samsung SV0322A or other IDE HDD with similar capacity (e.g. Seagate ST32122A).
-
-TODO:
-- europl01 boots Windows 3.11 fine in pcipc & shutms11 but will:
-1. "could not find sound card" in C:\wingk\audio\sndinit (which has a poor attempt at
-   suppressing the log, should be NUL but it's NULL instead)
-2. Fails loading windows for "video device conflict" (s3vcp64.drv)
-- Note that the underlying .ini files will also load a Greek driver keyboard ...
 
 **************************************************************************************************/
 
@@ -155,12 +155,12 @@ void startouch_state::europl01(machine_config &config)
 
 	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, nullptr);
 
-	// TODO: downgrade to trio64, add Med3931
 	PCI_SLOT(config, "pci:1", pci_cards, 13, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 14, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 15, 2, 3, 0, 1, nullptr);
-	PCI_SLOT(config, "pci:4", pci_cards, 16, 3, 0, 1, 2, "virge");
+	PCI_SLOT(config, "pci:4", pci_cards, 16, 3, 0, 1, 2, "trio64dx");
 
+	// TODO: add Med3931
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "superio", true).set_option_machine_config("superio", superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
@@ -205,5 +205,6 @@ ROM_START(europl01)
 ROM_END
 
 } // Anonymous namespace
+
 
 GAME(2001, europl01, 0, europl01, 0, startouch_state, empty_init, ROT0, "Sleic / Petaco", "EuroPlay 2001", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

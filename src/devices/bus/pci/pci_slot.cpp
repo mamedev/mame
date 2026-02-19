@@ -28,6 +28,7 @@
 #include "sis6326.h"
 #include "sonicvibes.h"
 #include "sw1000xg.h"
+#include "trio_pci.h"
 #include "virge_pci.h"
 #include "vision.h"
 #include "vt6306.h"
@@ -127,6 +128,7 @@ void pci_cards(device_slot_interface &device)
 
 	// 0x03 - display controllers
 	device.option_add("vision968",      VISION968_PCI);
+	device.option_add("trio64dx",       TRIO64DX_PCI);
 	device.option_add("virge",          VIRGE_PCI);
 	device.option_add("virgedx",        VIRGEDX_PCI);
 	device.option_add("virgevx",        VIRGEVX_PCI);
