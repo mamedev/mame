@@ -2677,6 +2677,18 @@ sdtennis:
 @:maincpu,program,002c,03,88,01
 
 
+;(dommy)
+dommy:
+@:maincpu,program,1a,3,00,05
+
+
+;(scrambled egg) and clones (by GeoMan)
+eggs:
+scregg:
+@:maincpu,program,400,1e,17,00
+@:maincpu,program,015,3,00,03
+
+
 ;@s:dataeast/bwing.cpp
 
 ;fixes thanks to takasaki
@@ -3455,20 +3467,6 @@ wizdfire:
 wizdfireu:
 @:maincpu,program,fdc034,28,0b,00
 @:maincpu,program,fdc059,1,01,01
-
-
-;@s:dataeast/scregg.cpp
-
-;(dommy)
-dommy:
-@:maincpu,program,1a,3,00,05
-
-
-;(scrambled egg) and clones (by GeoMan)
-eggs:
-scregg:
-@:maincpu,program,400,1e,17,00
-@:maincpu,program,015,3,00,03
 
 
 ;@s:dataeast/shootout.cpp
@@ -8803,6 +8801,12 @@ oigas:
 
 ;@s:misc/gumbo.cpp
 
+dblpoint:
+dblpointd:
+@:maincpu,program,80000,32,43,0 ; players names
+@:maincpu,program,824b2,1e,0,1 ; all other data
+
+
 ;******miss puzzle
 mspuzzle:
 mspuzzlea:
@@ -8995,6 +8999,15 @@ dynamski:
 ;*******sky army
 skyarmy:
 @:maincpu,program,8131,ad,00,8a
+
+
+;@s:misc/spcforce.cpp
+
+;********spcforce (space force)
+meteor:
+spcforc2:
+spcforce:
+@:maincpu,program,4300,50,30,30
 
 
 ;@s:misc/sprcros2.cpp
@@ -10485,7 +10498,7 @@ gameboy,tetris:
 mario:
 mariobl:
 mariobla:
-marioe:
+mariog:
 mariof:
 marioj:
 masao:
@@ -17749,6 +17762,33 @@ dogyuuna:
 @:maincpu,program,10034a,7c,00,1b
 
 
+;@s:toaplan/fireshrk.cpp
+
+;fireshrkd:******Fire Shark (Korea, set 1, easier)
+;fireshrkdh:******Fire Shark (Korea, set 2, harder)
+fireshrk:
+fireshrka:
+fireshrkd:
+fireshrkdh:
+samesamecn:
+@:maincpu,program,c1ae8,194,00,01
+@:maincpu,program,c1c29,1,2d,2d
+@:maincpu,program,c1dc5,1d,2d,00
+
+
+samesame:
+samesamenh:
+@:maincpu,program,c1778,194,00,01
+@:maincpu,program,c18b9,1,26,26
+@:maincpu,program,c1a4f,21,2d,00
+
+
+samesame2:
+@:maincpu,program,c1ada,194,00,01
+@:maincpu,program,c1c25,1,26,26
+@:maincpu,program,c1dc1,21,2d,00
+
+
 ;@s:toaplan/fixeight.cpp
 
 fixeight:
@@ -17861,6 +17901,18 @@ batrideru:
 @:maincpu,program,20fa20,310,00,30
 
 
+;@s:toaplan/rallybik.cpp
+
+rallybik:
+@:maincpu,program,801ac,324,00,40
+@:maincpu,program,8053d,1,17,17
+@:maincpu,program,80555,1,04,04
+@:maincpu,program,8056d,1,00,00
+@:maincpu,program,80585,1,00,00
+@:maincpu,program,8059d,1,00,00
+@:maincpu,program,805b5,1,00,00
+
+
 ;@s:toaplan/slapfght.cpp
 
 ;tigerhj:******tiger heli (japan)
@@ -17924,25 +17976,6 @@ whoopee:
 
 ;@s:toaplan/toaplan1.cpp
 
-;fireshrkd:******Fire Shark (Korea, set 1, easier)
-;fireshrkdh:******Fire Shark (Korea, set 2, harder)
-fireshrk:
-fireshrka:
-fireshrkd:
-fireshrkdh:
-samesamecn:
-@:maincpu,program,c1ae8,194,00,01
-@:maincpu,program,c1c29,1,2d,2d
-@:maincpu,program,c1dc5,1d,2d,00
-
-
-samesame:
-samesamenh:
-@:maincpu,program,c1778,194,00,01
-@:maincpu,program,c18b9,1,26,26
-@:maincpu,program,c1a4f,21,2d,00
-
-
 demonwld:
 demonwld1:
 demonwld2:
@@ -17963,22 +17996,6 @@ truxton:
 @:maincpu,program,81c67,1,00,00
 @:maincpu,program,81c6b,1,00,00
 @:maincpu,program,81c6f,1,00,00
-
-
-rallybik:
-@:maincpu,program,801ac,324,00,40
-@:maincpu,program,8053d,1,17,17
-@:maincpu,program,80555,1,04,04
-@:maincpu,program,8056d,1,00,00
-@:maincpu,program,80585,1,00,00
-@:maincpu,program,8059d,1,00,00
-@:maincpu,program,805b5,1,00,00
-
-
-samesame2:
-@:maincpu,program,c1ada,194,00,01
-@:maincpu,program,c1c25,1,26,26
-@:maincpu,program,c1dc1,21,2d,00
 
 
 hellfire:
@@ -18531,15 +18548,6 @@ pickin:
 ;(tank busters) (by GeoMan)
 tankbust:
 @:maincpu,program,f602,50,00,10
-
-
-;@s:venture/spcforce.cpp
-
-;********spcforce (space force)
-meteor:
-spcforc2:
-spcforce:
-@:maincpu,program,4300,50,30,30
 
 
 ;@s:vsystem/aerofgt.cpp
