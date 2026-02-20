@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz, Angelo Salese
+// copyright-holders: Angelo Salese
 /* Come On Baby
   (c) 2000 ExPotato Co. Ltd (Excellent Potato)
 
@@ -267,7 +267,7 @@ void comebaby_state::superio_config(device_t *device)
 {
 	it8671f_device &ite = *downcast<it8671f_device *>(device);
 	ite.krst_gpio2().set_inputline(":maincpu", INPUT_LINE_RESET);
-	ite.ga20_gpio6().set_inputline(":maincpu", INPUT_LINE_A20);
+	ite.ga20_gpio6().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	ite.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	ite.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 	ite.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -295,6 +295,7 @@ void comebaby_state::comebaby(machine_config &config)
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu, true));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, m_maincpu));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));

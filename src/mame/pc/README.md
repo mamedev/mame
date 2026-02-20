@@ -44,8 +44,8 @@ ISA debug port $80, `wpiset 0x80,1,w,1,{printf "%02x",wpdata;g}`.
 
 ## Troubleshooting
 
-### Award BIOSes
-
 - Booting in Award BootBlock: implement shadow RAM;
 - PCI targets with OHCI (and probably EHCI) may crash at startup: implement USB chipset, requires relocatable BAR that will default to RAM $0 if not implemented;
-- "Unknown" CPU: r/w the info thru CMOS (Phoenix BIOSes do something similar)
+- "Unknown" CPU: r/w the info thru CMOS (Phoenix BIOSes do something similar);
+- DOS (up to Win98) startup stuck while looping around on clearly incorrect conventional memory opcodes: fix A20, chipset possibly has fast A20 mechanism at I/O $92;
+

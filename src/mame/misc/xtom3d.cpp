@@ -567,7 +567,7 @@ void isa16_oksan_lpc::device_add_mconfig(machine_config &config)
 	KBDC8042(config, m_kbdc, 0);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
-	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
+	m_kbdc->gate_a20_callback().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 #if !ENABLE_VOODOO
 	m_kbdc->set_keyboard_tag("at_keyboard");
@@ -685,6 +685,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	I82371EB_IDE(config, m_pci_ide, 0, m_maincpu);
 	m_pci_ide->irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));

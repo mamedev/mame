@@ -31,6 +31,7 @@ DEFINE_DEVICE_TYPE(I82371EB_ISA, i82371eb_isa_device, "i82371eb_isa", "Intel 823
 i82371eb_isa_device::i82371eb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i82371sb_isa_device(mconfig, I82371EB_ISA, tag, owner, clock)
 	, m_rtc(*this, "rtc")
+	, m_a20m_callback(*this)
 {
 	// 0x060100 - Bridge device, PCI-to-ISA bridge
 	// TODO: above can change to 0x068000 if positive decode is used.
@@ -187,6 +188,7 @@ void i82371eb_isa_device::config_map(address_map &map)
 void i82371eb_isa_device::internal_io_map(address_map &map)
 {
 	i82371sb_isa_device::internal_io_map(map);
+	map(0x0092, 0x0092).rw(FUNC(i82371eb_isa_device::port92_r), FUNC(i82371eb_isa_device::port92_w));
 	map(0x00eb, 0x00eb).lw8(NAME([] (offs_t offset, u8 data) { }));
 }
 
@@ -258,6 +260,7 @@ void i82371eb_isa_device::map_extra(
 
 	// NOTE: ISA don't care about PCI command bit 0
 
+
 	// TODO: unknown enable for the internal RTC, use a config option for the time being
 	// - savquest/pciagp/silvrball: uses the Super I/O one (activates dev[8])
 	// - xtom3d uses some MB integrated non-DS12885 version
@@ -312,3 +315,39 @@ void i82371eb_isa_device::map_extra(
 		}
 	}
 }
+
+// standard system control
+// TODO: may be present on PIIX3 as well
+u8 i82371eb_isa_device::port92_r(offs_t offset)
+{
+	return m_port92;
+}
+
+void i82371eb_isa_device::port92_w(offs_t offset, u8 data)
+{
+	fast_gatea20(BIT(data, 1));
+
+	// TODO: fast init
+//	if (!BIT(m_port92, 0) && BIT(data, 0))
+//	{
+//		// pulse reset line
+//		m_write_cpureset(1);
+//		m_write_cpureset(0);
+//	}
+
+	m_port92 = data & 3;
+}
+
+void i82371eb_isa_device::fast_gatea20(int state)
+{
+	m_fast_gatea20 = state;
+	m_a20m_callback(m_fast_gatea20 | m_ext_gatea20);
+}
+
+// A20GATE on X-Bus
+void i82371eb_isa_device::a20gate_w(int state)
+{
+	m_ext_gatea20 = state;
+	m_a20m_callback(m_fast_gatea20 | m_ext_gatea20);
+}
+

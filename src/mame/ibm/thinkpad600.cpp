@@ -222,7 +222,7 @@ void thinkpad600_state::superio_config(device_t *device)
 	pc97338_device &fdc = *downcast<pc97338_device *>(device);
 //  fdc.set_sysopt_pin(1);
 //  fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-//  fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+//  fdc.gp25_gatea20().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -274,6 +274,7 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, m_maincpu));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
