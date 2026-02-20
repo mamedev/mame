@@ -62,6 +62,42 @@ class device_qic02_interface
 	: public device_interface
 {
 public:
+	enum st0_mask : u8
+	{
+		ST0_FIL = 0x01, // file mark detected
+		ST0_BNL = 0x02, // block not located
+		ST0_UDA = 0x04, // unrecoverable data
+		ST0_EOM = 0x08, // end of media
+		ST0_WRP = 0x10, // write protect
+		ST0_USL = 0x20, // drive unselected
+		ST0_CNI = 0x40, // cartridge not in place
+		ST0_ST0 = 0x80, // status byte 0 set
+	};
+	enum st1_mask : u8
+	{
+		ST1_POR = 0x01, // power on reset
+		ST1_BOM = 0x08, // beginning of media
+		ST1_MBD = 0x10, // marginal block detected
+		ST1_NDT = 0x20, // no data detected
+		ST1_ILL = 0x40, // illegal command
+		ST1_ST1 = 0x80, // status byte 1 set
+	};
+	enum std_cmd : u8
+	{
+		CMD_SELECT1 = 0x01, // select drive 1
+		CMD_SELECT2 = 0x02, // select drive 2
+		CMD_SELECT3 = 0x04, // select drive 3
+		CMD_SELECT4 = 0x08, // select drive 4
+		CMD_BOT     = 0x21, // position to beginning of tape
+		CMD_ERASE   = 0x22, // erase the entire tape
+		CMD_INIT    = 0x24, // initialize cartridge
+		CMD_WRITE   = 0x40, // write
+		CMD_WFM     = 0x60, // write file mark
+		CMD_READ    = 0x80, // read
+		CMD_RFM     = 0xa0, // read file mark
+		CMD_STATUS  = 0xc0, // read status
+	};
+
 	virtual void onl_w(int state) = 0;
 	virtual void req_w(int state) = 0;
 	virtual void rst_w(int state) = 0;
