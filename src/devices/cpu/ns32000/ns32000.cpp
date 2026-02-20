@@ -5,7 +5,7 @@
 
 #include "ns32000.h"
 #include "ns32000d.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 
 #define LOG_TRANSLATE (1U << 1)
 //#define VERBOSE (LOG_TRANSLATE)

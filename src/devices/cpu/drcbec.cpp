@@ -13,7 +13,7 @@
 
 #include "drcbeut.h"
 
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 
 #include <cfenv>
 #include <cmath>

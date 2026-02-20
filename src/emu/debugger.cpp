@@ -11,9 +11,9 @@
 #include "emu.h"
 #include "debugger.h"
 #include "osdepend.h"
-#include "debug/debugcpu.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
+#include "debug/debugstate.h"
 #include "debug/debugvw.h"
 #include <cctype>
 
@@ -45,7 +45,7 @@ void debugger_manager::debug_break()
 bool debugger_manager::within_instruction_hook()
 {
 	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		return m_cpu->within_instruction_hook();
+		return m_state->within_instruction_hook();
 	return false;
 }
 
@@ -62,9 +62,9 @@ debugger_manager::debugger_manager(running_machine &machine)
 	: m_machine(machine)
 {
 	/* initialize the submodules */
-	m_cpu = std::make_unique<debugger_cpu>(machine);
+	m_state = std::make_unique<debugger_state>(machine);
 	m_console = std::make_unique<debugger_console>(machine);
-	m_commands = std::make_unique<debugger_commands>(machine, cpu(), console());
+	m_commands = std::make_unique<debugger_commands>(machine, state(), console());
 
 	g_machine = &machine;
 
@@ -107,6 +107,6 @@ void debugger_flush_all_traces_on_abnormal_exit()
 {
 	if(g_machine != nullptr)
 	{
-		g_machine->debugger().cpu().flush_traces();
+		g_machine->debugger().state().flush_traces();
 	}
 }

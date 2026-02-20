@@ -32,7 +32,7 @@
 #include "mips3dsm.h"
 
 #include "divtlb.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 
 #include "unicode.h"
 

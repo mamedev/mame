@@ -10,7 +10,7 @@
 #include "debug_module.h"
 
 #include "debug/debugcon.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "debugger.h"
 
 

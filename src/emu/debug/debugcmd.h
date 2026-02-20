@@ -19,7 +19,7 @@
 class debugger_commands
 {
 public:
-	debugger_commands(running_machine &machine, debugger_cpu &cpu, debugger_console &console);
+	debugger_commands(running_machine &machine, debugger_state &state, debugger_console &console);
 
 private:
 	struct global_entry

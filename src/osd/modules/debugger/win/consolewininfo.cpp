@@ -20,7 +20,7 @@
 #include "debugger.h"
 #include "image.h"
 #include "softlist_dev.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 
 // util
 #include "util/xmlfile.h"

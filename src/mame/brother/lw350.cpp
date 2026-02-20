@@ -11,7 +11,7 @@
 #include "sound/beep.h"
 #include "video/mc6845.h"
 
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"

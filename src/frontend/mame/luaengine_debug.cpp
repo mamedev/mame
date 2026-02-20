@@ -12,7 +12,7 @@
 #include "luaengine.ipp"
 
 #include "debug/debugcon.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 #include "debug/debugvw.h"
 #include "debug/express.h"
 #include "debug/points.h"
@@ -385,13 +385,13 @@ void lua_engine::initialize_debug(sol::table &emu)
 			[](debugger_manager &debug) { return debug.console().get_visible_cpu(); },
 			[](debugger_manager &debug, device_t &dev) { debug.console().set_visible_cpu(&dev); });
 	debugger_type["execution_state"] = sol::property(
-			[] (debugger_manager &debug) { return debug.cpu().is_stopped() ? "stop" : "run"; },
+			[] (debugger_manager &debug) { return debug.state().is_stopped() ? "stop" : "run"; },
 			[] (debugger_manager &debug, std::string const &state)
 			{
 				if (state == "stop")
-					debug.cpu().set_execution_stopped();
+					debug.state().set_execution_stopped();
 				else
-					debug.cpu().set_execution_running();
+					debug.state().set_execution_running();
 			});
 
 

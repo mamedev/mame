@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "dvmemory.h"
 
-#include "debugcpu.h"
+#include "debugstate.h"
 
 #include <algorithm>
 #include <cctype>

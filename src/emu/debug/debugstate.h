@@ -2,14 +2,14 @@
 // copyright-holders:Aaron Giles
 /*********************************************************************
 
-    debugcpu.h
+    debugstate.h
 
     Debugger CPU/memory interface engine.
 
 ***************************************************************************/
 
-#ifndef MAME_EMU_DEBUG_DEBUGCPU_H
-#define MAME_EMU_DEBUG_DEBUGCPU_H
+#ifndef MAME_EMU_DEBUG_DEBUGSTATE_H
+#define MAME_EMU_DEBUG_DEBUGSTATE_H
 
 #pragma once
 
@@ -162,7 +162,7 @@ public:
 
 	static const int HISTORY_SIZE = 256;
 
-	// debugger_cpu helpers
+	// debugger_state helpers
 	void compute_debug_flags();
 
 private:
@@ -351,12 +351,12 @@ private:
 //  CPU DEBUGGING
 //**************************************************************************
 
-class debugger_cpu
+class debugger_state
 {
 public:
 	enum class exec_state { STOPPED, RUNNING };
 
-	debugger_cpu(running_machine &machine);
+	debugger_state(running_machine &machine);
 
 	/* ----- initialization and cleanup ----- */
 
@@ -450,4 +450,4 @@ private:
 	bool        m_comments_loaded;
 };
 
-#endif // MAME_EMU_DEBUG_DEBUGCPU_H
+#endif // MAME_EMU_DEBUG_DEBUGSTATE_H

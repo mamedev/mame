@@ -12,7 +12,7 @@
 #include <list>
 #include <map>
 #include "emuopts.h"
-#include "debug/debugcpu.h"
+#include "debug/debugstate.h"
 
 #include "emumem_mud.h"
 #include "emumem_hea.h"

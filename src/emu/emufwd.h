@@ -66,8 +66,8 @@ class debugger_commands;
 // declared in debug/debugcon.h
 class debugger_console;
 
-// declared in debug/debugcpu.h
-class debugger_cpu;
+// declared in debug/debugstate.h
+class debugger_state;
 class device_debug;
 
 // declared in debug/debugvw.h

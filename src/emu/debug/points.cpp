@@ -13,7 +13,7 @@
 
 #include "debugger.h"
 #include "debugcon.h"
-#include "debugcpu.h"
+#include "debugstate.h"
 
 
 //**************************************************************************
@@ -317,7 +317,7 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 	debugger_manager &debug = machine.debugger();
 
 	// if we're within debugger code, don't trigger
-	if (debug.cpu().within_instruction_hook() || machine.side_effects_disabled())
+	if (debug.state().within_instruction_hook() || machine.side_effects_disabled())
 		return;
 
 	// adjust address, size & value_to_write based on mem_mask.
@@ -355,10 +355,10 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 		address += m_space.alignment() - size - address_offset;
 
 	// stash the value that will be written or has just been read
-	debug.cpu().set_wpinfo(address, data, size * unit_size);
+	debug.state().set_wpinfo(address, data, size * unit_size);
 
 	// protect against recursion
-	debug.cpu().set_within_instruction(true);
+	debug.state().set_within_instruction(true);
 
 	// must satisfy the condition
 	if (!m_condition.is_empty())
@@ -367,27 +367,27 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 		{
 			if (!m_condition.execute())
 			{
-				debug.cpu().set_within_instruction(false);
+				debug.state().set_within_instruction(false);
 				return;
 			}
 		}
 		catch (expression_error &)
 		{
-			debug.cpu().set_within_instruction(false);
+			debug.state().set_within_instruction(false);
 			return;
 		}
 	}
 
 	// halt in the debugger by default
-	bool was_stopped = debug.cpu().is_stopped();
-	debug.cpu().set_execution_stopped();
+	bool was_stopped = debug.state().is_stopped();
+	debug.state().set_execution_stopped();
 
 	// evaluate the action
 	if (!m_action.empty())
 		debug.console().execute_command(m_action, false);
 
 	// print a notification, unless the action made us go again
-	if (debug.cpu().is_stopped())
+	if (debug.state().is_stopped())
 	{
 		std::string buffer;
 
@@ -411,7 +411,7 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 								   address);
 
 		const device_state_interface *state;
-		if (debug.cpu().live_cpu() == &m_debugInterface->device() && m_debugInterface->device().interface(state))
+		if (debug.state().live_cpu() == &m_debugInterface->device() && m_debugInterface->device().interface(state))
 		{
 			debug.console().printf("%s (PC=%s)\n", buffer, state->state_string(STATE_GENPCBASE));
 			m_debugInterface->compute_debug_flags();
@@ -419,13 +419,13 @@ void debug_watchpoint::triggered(read_or_write type, offs_t address, u64 data, u
 		else if (!was_stopped)
 		{
 			debug.console().printf("%s\n", buffer);
-			debug.cpu().set_execution_running();
-			debug.cpu().set_break_cpu(&m_debugInterface->device());
+			debug.state().set_execution_running();
+			debug.state().set_break_cpu(&m_debugInterface->device());
 		}
 		m_debugInterface->set_triggered_watchpoint(this);
 	}
 
-	debug.cpu().set_within_instruction(false);
+	debug.state().set_within_instruction(false);
 }
 
 //**************************************************************************
