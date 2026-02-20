@@ -143,8 +143,7 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	// TODO: actually a Trio64V2
-	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "virge");
+	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "trio64dx");
 }
 
 

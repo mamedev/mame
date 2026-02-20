@@ -506,8 +506,7 @@ void savquest_state::savquest(machine_config &config)
 
 	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, nullptr);
 
-	// TODO: trio64
-	PCI_SLOT(config, "pci:1", pci_cards, 9, 0, 1, 2, 3, "virge").set_fixed(true);
+	PCI_SLOT(config, "pci:1", pci_cards, 9, 0, 1, 2, 3, "trio64dx").set_fixed(true);
 	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
 //  PCI_SLOT(config, "pci:4", pci_cards, 12, 3, 0, 1, 2, "voodoo2");
