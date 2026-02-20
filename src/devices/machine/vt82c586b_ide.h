@@ -35,6 +35,10 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
+	// NOTE: need map_first to avoid IDE stomping on floppy ports
+	// (do we really need a tap on ISA remaps?)
+	virtual bool map_first() const override { return true; }
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device_array<bus_master_ide_controller_device, 2> m_ide;

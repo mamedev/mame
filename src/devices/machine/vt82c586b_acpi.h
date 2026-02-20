@@ -52,9 +52,23 @@ private:
 	u16 m_pmsts;
 	u16 m_pmen;
 	u16 m_pmcntrl;
-	u16 m_gpsts;
 	u16 m_gpen;
 	u16 m_pcntrl;
+
+	u16 m_gpsts;
+	u16 m_gp_sci_enable;
+	u16 m_gp_smi_enable;
+	u16 m_power_supply_control;
+	u16 m_global_status;
+	u16 m_global_enable;
+	u16 m_gbl_ctl;
+	u8 m_smi_cmd;
+	u32 m_primary_activity_status;
+	u32 m_primary_activity_enable;
+	u32 m_gp_timer_reload_enable;
+	u8 m_gpio_dir;
+	u8 m_gpio_val;
+	u16 m_gpo_val;
 };
 
 DECLARE_DEVICE_TYPE(VT82C586B_ACPI, vt82c586b_acpi_device)

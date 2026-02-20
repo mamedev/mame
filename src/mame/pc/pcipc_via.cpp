@@ -4,7 +4,10 @@
  * Sandbox for VIA based PCs
  *
  * Using Lucky Star 5AMVP3 given we already have a mostly compatible Super I/O (ITE 8661F)
- * Eventually needs to be backported to misc/startouch.cpp
+ *
+ * Notes:
+ * - need to map_first the IDE for make it recognize both that and floppy disks;
+ * - Serial Port "Auto" doesn't seem to work off the bat, need manual setup in CMOS;
  *
  */
 

@@ -4,6 +4,9 @@
 
 VT82C586B PCIC ISA section
 
+TODO:
+- win98se: PS/2 keyboard becomes unresponsive after a while during install;
+
 **************************************************************************************************/
 
 #include "emu.h"

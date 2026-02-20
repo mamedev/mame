@@ -16,6 +16,7 @@ TODO:
   Notice that the BIOS also tries to read from non-existant dev number 3.x, mapping PIPC there
   will just miss programming ACPI entirely (including its I/O space).
   So in order to avoid problems we knock off bit 7 clearance, definitely needs to be tested on HW.
+- win98se: hangs on ACPI SCIEN requiring being set during PnP phase install;
 
 **************************************************************************************************/
 
@@ -24,14 +25,18 @@ TODO:
 
 #define LOG_ACPI   (1U << 1) // log ACPI internals
 #define LOG_ACPIEX (1U << 2) // verbose ACPI internals
+#define LOG_GPIO   (1U << 3)
+#define LOG_PMTMR  (1U << 4) // verbose timer reads
 
-#define VERBOSE (LOG_GENERAL | LOG_ACPI | LOG_ACPIEX)
+#define VERBOSE (LOG_GENERAL | LOG_ACPI | LOG_ACPIEX | LOG_GPIO)
 //#define LOG_OUTPUT_FUNC osd_printf_warning
 
 #include "logmacro.h"
 
 #define LOGACPI(...)   LOGMASKED(LOG_ACPI, __VA_ARGS__)
 #define LOGACPIEX(...) LOGMASKED(LOG_ACPIEX, __VA_ARGS__)
+#define LOGGPIO(...)   LOGMASKED(LOG_GPIO, __VA_ARGS__)
+#define LOGPMTR(...)   LOGMASKED(LOG_PMTMR, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(VT82C586B_ACPI, vt82c586b_acpi_device, "vt82c586b_acpi", "VT82C586B \"PIPC\" Power Management and ACPI")
 DEFINE_DEVICE_TYPE(ACPI_PIPC, acpi_pipc_device, "acpi_pipc", "ACPI PIPC")
@@ -199,6 +204,19 @@ void acpi_pipc_device::device_start()
 	save_item(NAME(m_gpsts));
 	save_item(NAME(m_gpen));
 	save_item(NAME(m_pcntrl));
+	save_item(NAME(m_gp_sci_enable));
+	save_item(NAME(m_gp_smi_enable));
+	save_item(NAME(m_power_supply_control));
+	save_item(NAME(m_global_status));
+	save_item(NAME(m_global_enable));
+	save_item(NAME(m_gbl_ctl));
+	save_item(NAME(m_smi_cmd));
+	save_item(NAME(m_primary_activity_status));
+	save_item(NAME(m_primary_activity_enable));
+	save_item(NAME(m_gp_timer_reload_enable));
+	save_item(NAME(m_gpio_dir));
+	save_item(NAME(m_gpio_val));
+	save_item(NAME(m_gpo_val));
 }
 
 void acpi_pipc_device::device_reset()
@@ -209,6 +227,17 @@ void acpi_pipc_device::device_reset()
 	m_gpsts = 0;
 	m_gpen = 0;
 	m_pcntrl = 0;
+	m_gp_sci_enable = 0;
+	m_gp_smi_enable = 0;
+	// PB_CTL on by default
+	m_power_supply_control = 1 << 9;
+	m_global_status = m_global_enable = 0;
+	m_gbl_ctl = 0;
+	m_smi_cmd = 0;
+	m_primary_activity_enable = m_primary_activity_status = 0;
+	m_gp_timer_reload_enable = 0;
+	m_gpio_dir = m_gpio_val = 0;
+	m_gpo_val = 0;
 }
 
 void acpi_pipc_device::device_validity_check(validity_checker &valid) const
@@ -217,10 +246,17 @@ void acpi_pipc_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("%s: clock set to 0 MHz, please use implicit default of 3.5 MHz in config setter instead\n", this->tag());
 }
 
-// TODO: up to offset $15 looks 1:1 with the Intel PIIX4 equivalent
+// Similar but not exactly identical to Intel PIIX4 equivalent
 void acpi_pipc_device::map(address_map &map)
 {
 	// Power Management Status
+	// x--- ---- ---- ---- WAK_STS
+	// ---- x--- ---- ---- PBOR_STS
+	// ---- -x-- ---- ---- RTC_STS
+	// ---- ---x ---- ---- PB_STS
+	// ---- ---- --x- ---- GBL_STS (set by BIOS_RLS)
+	// ---- ---- ---x ---- BM_STS (Bus Master)
+	// ---- ---- ---- ---x TMR_STS
 	map(0x00, 0x01).lrw16(
 		NAME([this] () { return m_pmsts; }),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
@@ -232,6 +268,7 @@ void acpi_pipc_device::map(address_map &map)
 		NAME([this] () { return m_pmen; }),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			COMBINE_DATA(&m_pmen);
+			m_pmen &= 0x0521;
 			LOGACPI("PMEN: %04x & %04x\n", data, mem_mask);
 			LOGACPIEX("\tRTC_EN %d PWRBTN_EN %d GBL_EN %d TMROF_EN %d\n"
 				, BIT(data, 10)
@@ -249,6 +286,7 @@ void acpi_pipc_device::map(address_map &map)
 			// TODO: SUS_EN cannot be '1'
 			// (generates a suspend mode if enabled, flips to '0')
 			LOGACPI("PMCNTRL: %04x & %04x\n", data, mem_mask);
+			// SLP_EN / SLP_TYP in this variant
 			LOGACPIEX("\tSUS_EN %d SUS_TYPE %d GBL_RLS %d BRLD_EN_BM %d SCI_EN %d\n"
 				, BIT(data, 13)
 				, (data >> 10) & 7
@@ -264,18 +302,12 @@ void acpi_pipc_device::map(address_map &map)
 			const u32 tmr_val = machine().time().as_ticks(clock());
 			// TODO: resets with PCI reset
 			// TODO: sets TMROF_STS to 1 on bit 23 transitions, generates a SCI irq with TMROF_EN
-			LOGACPI("PMTMR%d: %08x\n", offset, tmr_val);
+			// TODO: can be configured with 32-bit resolution in this variant
+			LOGPMTR("PMTMR%d: %08x\n", offset, tmr_val);
 			if (offset)
 				return (tmr_val >> 16) & 0xff;
 
 			return tmr_val & 0xffff;
-		})
-	);
-	// General Purpose Status
-	map(0x0c, 0x0d).lrw16(
-		NAME([this] () { return m_gpsts; }),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-			m_gpsts &= ~(data & 0xf81);
 		})
 	);
 	// General Purpose Enable
@@ -327,6 +359,185 @@ void acpi_pipc_device::map(address_map &map)
 				if (mem_mask == 0xffff)
 					LOG("\tInvalid word access!\n");
 			}
+			return 0;
+		})
+	);
+
+	// start of truly different stuff vs. ACPI_PIIX4 ...
+
+	// General Purpose Status
+	// ---- --x- ---- ---- USB_STS
+	// ---- ---x ---- ---- RI_STS
+	// ---- ---- xxxx xxxx EXTSMI7~0
+	map(0x20, 0x21).lrw16(
+		NAME([this] () { return m_gpsts; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			if (ACCESSING_BITS_0_7)
+				m_gpsts &= ~(data & 0x00ff);
+			if (ACCESSING_BITS_8_15)
+				m_gpsts &= ~(data & 0x0300);
+		})
+	);
+	map(0x22, 0x23).lrw16(
+		NAME([this] () { return m_gp_sci_enable; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_gp_sci_enable);
+			m_gp_sci_enable &= 0x3ff;
+			LOGACPI("General Purpose SCI Enable: %04x & %04x\n", data, mem_mask);
+		})
+	);
+	map(0x24, 0x25).lrw16(
+		NAME([this] () { return m_gp_smi_enable; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_gp_smi_enable);
+			m_gp_smi_enable &= 0x3ff;
+			LOGACPI("General Purpose SMI Enable: %04x & %04x\n", data, mem_mask);
+		})
+	);
+	map(0x26, 0x27).lrw16(
+		NAME([this] () { return m_power_supply_control; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_power_supply_control);
+			m_power_supply_control &= 0x701;
+			LOGACPI("Power Supply Control: %04x & %04x\n", data, mem_mask);
+			LOGACPIEX("\tRI_PS_CTL %d PB_CTL %d RTC_PS_CTL %d E0_PS_CTL\n"
+				, BIT(data, 10)
+				, BIT(data, 9)
+				, BIT(data, 8)
+				, BIT(data, 0)
+			);
+		})
+	);
+	// -x-- ---- SW_SMI_STS
+	// --x- ---- BIOS_STS
+	// ---x ---- LEG_USB_STS
+	// ---- x--- GP1TO_STS
+	// ---- -x-- GP0TO_STS
+	// ---- --x- STTO_STS
+	// ---- ---x PACT_STS
+	map(0x28, 0x29).lrw16(
+		NAME([this] () { return m_global_status; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			if (ACCESSING_BITS_0_7)
+				m_global_status &= ~(data & 0x7f);
+		})
+	);
+	map(0x2a, 0x2b).lrw16(
+		NAME([this] () { return m_global_enable; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_global_enable);
+			m_global_enable &= 0x7f;
+			LOGACPI("Global Enable: %04x & %04x\n", data, mem_mask);
+			LOGACPIEX("\tSW_SMI_EN %d BIOS_EN %d LEG_USB_EN %d GP1TO_EN %d GP0TO_EN %d STTO_EN %d PACT_EN %d\n"
+				, BIT(data, 6)
+				, BIT(data, 5)
+				, BIT(data, 4)
+				, BIT(data, 3)
+				, BIT(data, 2)
+				, BIT(data, 1)
+				, BIT(data, 0)
+			);
+		})
+	);
+	map(0x2c, 0x2d).lrw16(
+		NAME([this] () { return m_gbl_ctl; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_gbl_ctl);
+			m_gbl_ctl &= 0x117;
+			LOGACPI("Global Control: %04x & %04x\n", data, mem_mask);
+			LOGACPIEX("\tINSMI %d SMIIG %d Power Button Trigger %d BIOS_RLS %d SMI_EN %d\n"
+				, BIT(data, 8)
+				, BIT(data, 4)
+				, BIT(data, 2)
+				, BIT(data, 1)
+				, BIT(data, 0)
+			);
+		})
+	);
+	map(0x2f, 0x2f).lrw8(
+		NAME([this] () {
+			return m_smi_cmd;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_smi_cmd = data;
+			LOGACPIEX("SMI_CMD %02x (SW_SMI_EN=%d)\n", data, BIT(m_global_enable, 6));
+		})
+	);
+	map(0x30, 0x33).lrw32(
+		NAME([this] () { return m_primary_activity_status; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_0_7)
+				m_primary_activity_status &= ~(data & 0xfb);
+		})
+	);
+	map(0x34, 0x37).lrw32(
+		NAME([this] () { return m_primary_activity_enable; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_primary_activity_enable);
+			m_primary_activity_enable &= data & 0xfb;
+			LOGACPI("Primary Activity Enable: %08x & %08x\n", data, mem_mask);
+			LOGACPIEX("\tKBC_EN %d SER_EN %d PAR_EN %d VID_EN %d IDE_EN %d PIRQ_EN %d DRQ_EN %d\n"
+				, BIT(data, 7)
+				, BIT(data, 6)
+				, BIT(data, 5)
+				, BIT(data, 4)
+				, BIT(data, 3)
+				, BIT(data, 1)
+				, BIT(data, 0)
+			);
+		})
+	);
+	map(0x38, 0x3b).lrw32(
+		NAME([this] () { return m_gp_timer_reload_enable; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			COMBINE_DATA(&m_gp_timer_reload_enable);
+			m_gp_timer_reload_enable &= data & 0xf9;
+			LOGACPI("GP Timer Reload Enable: %08x & %08x\n", data, mem_mask);
+			LOGACPIEX("\tGP1 Reload = KBC %d SER %d VID %d IDE/Floppy %d | GP0 Reload = Primary %d\n"
+				, BIT(data, 7)
+				, BIT(data, 6)
+				, BIT(data, 4)
+				, BIT(data, 3)
+				, BIT(data, 0)
+			);
+		})
+	);
+
+	// GPIO
+	map(0x40, 0x40).lrw8(
+		NAME([this] () { return m_gpio_dir; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_gpio_dir = data & 0x7f;
+			LOGGPIO("GPIO Dir: %02x (%02x)\n", data, data & 0x1f);
+			LOGGPIO("\tSMI/SCI Event Disable %d Interrupt resume from power on %d\n"
+				, BIT(data, 6)
+				, BIT(data, 5)
+			);
+		})
+	);
+	map(0x42, 0x42).lrw8(
+		NAME([this] () { return m_gpio_val; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_gpio_val = data & 0x1f;
+			LOGGPIO("GPIO Output: %02x\n", data);
+		})
+	);
+	map(0x44, 0x44).lr8(
+		NAME([this] () {
+			LOGGPIO("GPIO Input read (EXTSMI_VAL)\n");
+			return 0;
+		})
+	);
+	map(0x46, 0x47).lrw16(
+		NAME([this] () { return m_gpo_val; }),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			COMBINE_DATA(&m_gpo_val);
+			LOGGPIO("GPO_VAL %04x & %04x\n", data, mem_mask);
+		})
+	);
+	map(0x48, 0x49).lr16(
+		NAME([this] () -> u16 {
+			LOGGPIO("GPI Port Input read (GPI_VAL)\n");
 			return 0;
 		})
 	);

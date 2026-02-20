@@ -34,6 +34,8 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
+	virtual bool map_first() const override { return true; }
+
 private:
 	required_device<cpu_device> m_host_cpu;
 	std::vector<uint32_t> m_ram;
