@@ -10,6 +10,7 @@
     TODO:
     - add CMOS devices, 1 new opcode (01 IDL)
     - add special 8022 opcodes (RAD, SEL AN0, SEL AN1, RETI)
+    - any difference between 8035 & MB8884, 8049 & M58715?
     - IRQ and/or timer increment timing is wrong? See test below. After IRQ,
       A = 0x20 on MAME, A = 0x22 on the real 8048 as tested by bataais.
 
@@ -45,6 +46,14 @@
     - IRQ timing is hacked due to WY-100 needing to take JNI branch before
       servicing interrupt (see m_irq_polled), probably related to note above?
 
+    UPD7751 pin names differ from 8048, though pin numbers are the same:
+    - T0/T1/EA = TEST1/2/3
+    - INT = /START
+    - P10-P17 = VO0-VO7
+    - P20-P23 = AD0-AD3
+    - P24-P26 = /SEL0-/SEL2
+    - P27 = /BUSY
+
 ********************************************************************************
 
     Note that the default internal divisor for this chip is by 3 and
@@ -56,16 +65,16 @@
     8022    64   2k   26  (ROM, reduced instruction set, analog comparator)
 
     8035    64    0   27  (external ROM)
+    MB8884  64    0   27  (8035 clone)
     8048    64   1k   27  (ROM)
     8648    64   1k   27  (OTPROM)
     8748    64   1k   27  (EPROM)
-    8884    64   1k
-    UPD7751 64   1k       (8048, speech synthesizer in internal ROM)
+    UPD7751 64   1k   27  (8048, speech synthesizer in internal ROM)
 
     8039   128    0   27  (external ROM)
     8049   128   2k   27  (ROM)
     8749   128   2k   27  (EPROM)
-    M58715 128    0       (external ROM)
+    M58715 128   2k   27  (8049 clone)
 
     8040   256    0   27  (external ROM)
     8050   256   4k   27  (ROM)
