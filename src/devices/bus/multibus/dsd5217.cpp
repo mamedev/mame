@@ -17,7 +17,6 @@
 #include "dsd5217.h"
 
 #include "bus/qic02/qic02.h"
-#include "bus/qic02/hle.h"
 #include "cpu/i8085/i8085.h"
 #include "imagedev/floppy.h"
 #include "imagedev/harddriv.h"
@@ -304,8 +303,7 @@ void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
 	HARDDISK(config, m_hdd[0]);
 	HARDDISK(config, m_hdd[1]);
 
-	QIC02_CONNECTOR(config, m_qic).option_add("hle", QIC02_HLE);
-	m_qic->set_default_option("hle");
+	QIC02_CONNECTOR(config, m_qic);
 	m_qic->ack().set(m_dma, FUNC(am9517a_device::dreq0_w));
 	m_qic->rdy().set([this](int state) { if (!state) m_port70 |= 0x80; else m_port70 &= ~0x80; });
 	m_qic->exc().set_inputline(m_cpu, I8085_RST65_LINE).invert();
