@@ -3250,7 +3250,7 @@ void specnext_state::machine_start()
 	m_nr_02_hard_reset = 1;
 
 	// Save
-	save_pointer(NAME(m_page_shadow), 8);
+	save_item(NAME(m_page_shadow));
 	save_item(NAME(m_bootrom_en));
 	save_item(NAME(m_port_ff_data));
 	save_item(NAME(m_port_1ffd_special_old));
@@ -3268,7 +3268,7 @@ void specnext_state::machine_start()
 	save_item(NAME(m_sram_rom));
 	save_item(NAME(m_sram_rom3));
 	save_item(NAME(m_sram_alt_128_n));
-	save_pointer(NAME(m_mmu), 8);
+	save_item(NAME(m_mmu));
 	save_item(NAME(m_nr_02_bus_reset));
 	save_item(NAME(m_nr_02_generate_mf_nmi));
 	save_item(NAME(m_nr_02_generate_divmmc_nmi));
