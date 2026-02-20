@@ -39,10 +39,12 @@ public:
 		, m_kbd(*this, "kbd")
 		, m_sn(*this, "sn")
 		, m_i2cmem(*this, "i2cmem")
-		, m_wdfdc(*this, "wdfdc")
 		, m_adlc(*this, "mc6854")
 		, m_exp(*this, "exp")
 		, m_joyport(*this, "joyport")
+		, m_wdfdc(*this, "wdfdc")
+		, m_floppy(*this, "wdfdc:%u", 0U)
+		, m_floppy_leds(*this, "floppy%u_led", 0U)
 		, m_power_led(*this, "power_led")
 	{ }
 
@@ -55,18 +57,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	memory_view m_view_lynne;
-	memory_view m_view_hazel;
-	memory_view m_view_andy;
-	memory_view m_view_tst;
-	required_device<bbc_kbd_device> m_kbd;
-	required_device<sn76489a_device> m_sn;
-	required_device<i2cmem_device> m_i2cmem;
-	required_device<wd1772_device> m_wdfdc;
-	required_device<mc6854_device> m_adlc;
-	required_device<bbc_exp_slot_device> m_exp;
-	required_device<bbc_joyport_slot_device> m_joyport;
-	output_finder<> m_power_led;
+	template<int floppy> void floppy_led_cb(floppy_image_device *, int state);
 
 	void bbcmc_fetch(address_map &map) ATTR_COLD;
 	void bbcmc_mem(address_map &map) ATTR_COLD;
@@ -93,6 +84,21 @@ private:
 	uint8_t joyport_r();
 	void joyport_w(uint8_t data);
 
+	memory_view m_view_lynne;
+	memory_view m_view_hazel;
+	memory_view m_view_andy;
+	memory_view m_view_tst;
+	required_device<bbc_kbd_device> m_kbd;
+	required_device<sn76489a_device> m_sn;
+	required_device<i2cmem_device> m_i2cmem;
+	required_device<mc6854_device> m_adlc;
+	required_device<bbc_exp_slot_device> m_exp;
+	required_device<bbc_joyport_slot_device> m_joyport;
+	required_device<wd1772_device> m_wdfdc;
+	required_device_array<floppy_connector, 2> m_floppy;
+	output_finder<2> m_floppy_leds;
+	output_finder<> m_power_led;
+
 	uint8_t m_sdb = 0x00;
 	uint8_t m_acccon = 0x00;
 
@@ -110,11 +116,23 @@ private:
 };
 
 
+template<int floppy> void bbcmc_state::floppy_led_cb(floppy_image_device *, int state)
+{
+	m_floppy_leds[floppy] = state;
+}
+
+
 void bbcmc_state::machine_start()
 {
 	bbc_state::machine_start();
 
 	m_power_led.resolve();
+	m_floppy_leds.resolve();
+
+	if (m_floppy[0]->get_device())
+		m_floppy[0]->get_device()->setup_led_cb(floppy_image_device::led_cb(&bbcmc_state::floppy_led_cb<0>, this));
+	if (m_floppy[1]->get_device())
+		m_floppy[1]->get_device()->setup_led_cb(floppy_image_device::led_cb(&bbcmc_state::floppy_led_cb<1>, this));
 
 	save_item(NAME(m_acccon));
 	save_item(NAME(m_sdb));
@@ -455,11 +473,21 @@ void bbcmc_state::drive_control_w(uint8_t data)
 	//  1        Drive select 1
 	//  0        Drive select 0
 
+	int ds = -1;
+
 	floppy_image_device *floppy = nullptr;
 
 	// bit 0, 1, 3: drive select
-	if (BIT(data, 0)) floppy = m_wdfdc->subdevice<floppy_connector>("0")->get_device();
-	if (BIT(data, 1)) floppy = m_wdfdc->subdevice<floppy_connector>("1")->get_device();
+	if (BIT(data, 0)) ds = 0;
+	if (BIT(data, 1)) ds = 1;
+
+	for (auto &conn : m_floppy)
+	{
+		floppy = conn->get_device();
+		if (floppy)
+			floppy->ds_w(ds);
+	}
+	floppy = (ds != -1) ? m_floppy[ds]->get_device() : nullptr;
 	m_wdfdc->set_floppy(floppy);
 
 	// bit 4: side select
@@ -598,8 +626,8 @@ void bbcmc_state::bbcmc(machine_config &config)
 	m_wdfdc->intrq_wr_callback().set(FUNC(bbcmc_state::fdc_intrq_w));
 	m_wdfdc->drq_wr_callback().set(FUNC(bbcmc_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, "wdfdc:0", bbc_floppies, "35dd", bbc_state::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, "wdfdc:1", bbc_floppies, nullptr, bbc_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bbc_floppies, "35dd",  bbc_state::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[1], bbc_floppies, nullptr, bbc_state::floppy_formats).enable_sound(true);
 
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set("network", FUNC(econet_device::host_data_w));
