@@ -3901,7 +3901,7 @@ ROM_START(apple2gs)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	// 341-0728 is the MASK rom version while 341-0737 is the EPROM version - SAME data.

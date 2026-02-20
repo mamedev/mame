@@ -954,7 +954,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 		if (beamy >= BORDER_TOP)
 		{
 			rectangle const new_cliprect(0, 559, cliprect.top() - BORDER_TOP, cliprect.bottom() - BORDER_TOP);
-			screen_update<model::IIGS, false, false>(screen, *m_8bit_graphics, new_cliprect);
+			screen_update<model::IIGS, true, false>(screen, *m_8bit_graphics, new_cliprect);
 		}
 
 		if ((beamy < BORDER_TOP) || (beamy >= (192 + BORDER_TOP)))
@@ -1059,7 +1059,7 @@ template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, tr
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::PRAVETZ_8C, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
