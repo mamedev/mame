@@ -126,6 +126,13 @@ void psxcd_device::device_start()
 	save_item(NAME(m_transbuf));
 	save_item(NAME(loc.w));
 	save_item(NAME(curpos.w));
+	save_item(NAME(m_regs.sr));
+	save_item(NAME(m_regs.ir));
+	save_item(NAME(m_regs.imr));
+	save_item(NAME(m_regs.vol.ll));
+	save_item(NAME(m_regs.vol.lr));
+	save_item(NAME(m_regs.vol.rl));
+	save_item(NAME(m_regs.vol.rr));
 	save_item(NAME(open));
 	save_item(NAME(m_mute));
 	save_item(NAME(m_dmaload));
@@ -133,6 +140,7 @@ void psxcd_device::device_start()
 	save_item(NAME(next_sector_t));
 	save_item(NAME(autopause_sector));
 	save_item(NAME(m_param_count));
+	save_item(NAME(m_timerinuse));
 }
 
 void psxcd_device::device_stop()

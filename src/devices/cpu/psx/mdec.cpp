@@ -63,14 +63,17 @@ void psxmdec_device::device_start()
 		p_n_b5[ n + 512 ] = ( 255 >> 3 ) << 10;
 	}
 
-	save_item( NAME( n_0_command ) );
-	save_item( NAME( n_0_address ) );
-	save_item( NAME( n_0_size ) );
-	save_item( NAME( n_1_command ) );
-	save_item( NAME( n_1_status ) );
-	save_item( NAME( p_n_quantize_y ) );
-	save_item( NAME( p_n_quantize_uv ) );
-	save_item( NAME( p_n_cos ) );
+	save_item(NAME(n_0_command));
+	save_item(NAME(n_0_address));
+	save_item(NAME(n_0_size));
+	save_item(NAME(n_1_command));
+	save_item(NAME(n_1_status));
+	save_item(NAME(p_n_quantize_y));
+	save_item(NAME(p_n_quantize_uv));
+	save_item(NAME(p_n_cos));
+	save_item(NAME(n_decoded));
+	save_item(NAME(n_offset));
+	save_item(NAME(p_n_output));
 }
 
 [[maybe_unused]] static inline void psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, uint16_t n_data )

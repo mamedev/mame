@@ -979,14 +979,25 @@ void spu_device::device_start()
 
 	// register save state stuff
 	save_item(NAME(reg));           // this covers all spureg.* plus the reverb parameter block
+	save_item(NAME(taddr));
 	save_item(NAME(xa_cnt));
 	save_item(NAME(cdda_cnt));
 	save_item(NAME(xa_freq));
 	save_item(NAME(cdda_freq));
 	save_item(NAME(xa_channels));
 	save_item(NAME(xa_spf));
+	save_item(NAME(xa_out_ptr));
 	save_item(NAME(cur_frame_sample));
 	save_item(NAME(cur_generate_sample));
+	save_item(NAME(dirty_flags));
+	save_item(NAME(m_cd_out_ptr));
+	save_item(NAME(xa_playing));
+	save_item(NAME(cdda_playing));
+	save_item(NAME(output_head));
+	save_item(NAME(output_tail));
+	save_item(NAME(output_size));
+	save_item(NAME(noise_t));
+	save_item(NAME(noise_cur));
 	save_pointer(NAME(spu_ram), spu_ram_size);
 
 	save_item(NAME(xa_buffer->head));
