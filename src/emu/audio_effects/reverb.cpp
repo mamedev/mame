@@ -153,7 +153,7 @@ const audio_effect_reverb::early_reverb_tap_map audio_effect_reverb::tap_maps[15
 
 u32 audio_effect_reverb::preset_count()
 {
-	return sizeof(presets)/sizeof(presets[0]);
+	return std::size(presets);
 }
 
 const char *audio_effect_reverb::preset_name(u32 id)
@@ -163,7 +163,7 @@ const char *audio_effect_reverb::preset_name(u32 id)
 
 u32 audio_effect_reverb::early_tap_setup_count()
 {
-	return sizeof(tap_maps)/sizeof(tap_maps[0]);
+	return std::size(tap_maps);
 }
 
 const char *audio_effect_reverb::early_tap_setup_name(u32 id)
@@ -340,6 +340,10 @@ audio_effect_reverb::audio_effect_reverb(speaker_device *speaker, u32 sample_rat
 	set_late_bass_allpass(150, 4);
 	set_late_damping_2(500, 2);
 	m_late_bass_boost = 0.1;
+
+	// this will be overwritten, but it needs to be initialised here to avoid being used uninitialised
+	// setting some parameters causes other parameters to be used in calculations
+	m_late_global_decay = m_default_preset->late_global_decay;
 
 	// Variables
 	reset_all();
