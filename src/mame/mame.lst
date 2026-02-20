@@ -43584,6 +43584,9 @@ zx97
 
 @source:sinclair/specnext.cpp
 tbblue
+specnext_ks1
+specnext_ks2
+specnext_ks3
 
 @source:sinclair/z88.cpp
 z88
