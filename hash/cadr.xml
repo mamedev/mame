@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="cadr" description="MIT CADR hard disk images">
+
+	<software name="sys78" supported="no">
+		<description>System 78.48</description>
+		<year>1981</year>
+		<publisher>MIT</publisher>
+		<notes>Expects to run on a single board disk controller. Gives errors about no local filesystem.</notes>
+		<part name="hdd" interface="hdd">
+			<diskarea name="harddriv">
+				<disk name="sys78" sha1="8dd933b7a26dd13d01e1fe9573224d21778cf26f" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sys100" supported="no">
+		<description>System 100.0</description>
+		<year>2023</year>
+		<publisher>ams</publisher>
+		<notes>(DIRED) tries to load from network but no network interaction is performed.</notes>
+		<part name="hdd" interface="hdd">
+			<diskarea name="harddriv">
+				<disk name="sys100" sha1="e9e3efeaa3bf40456570c1b3a010123b2878280d" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sys300" supported="no">
+		<description>System 300.0</description>
+		<year>2023</year>
+		<publisher>ams</publisher>
+		<notes>Initial communication between keyboard and system cause the machine to go into an endless loop.</notes>
+		<part name="hdd" interface="hdd">
+			<diskarea name="harddriv">
+				<disk name="sys300" sha1="aaa5fe8572c0ad8bfb234c0940b347eb3d872205" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="sys301" supported="no">
+		<description>System 301.0</description>
+		<year>2024</year>
+		<publisher>ams</publisher>
+		<notes>Initial communication between keyboard and system cause the machine to go into an endless loop.</notes>
+		<part name="hdd" interface="hdd">
+			<diskarea name="harddriv">
+				<disk name="sys301" sha1="037304d40e70dd09ddf3e0e082a292134271c504" writeable="yes"/>
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>
