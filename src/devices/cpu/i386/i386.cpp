@@ -2611,7 +2611,10 @@ void i386_device::enter_smm()
 	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x8093;
 	m_sreg[DS].valid = m_sreg[ES].valid = m_sreg[FS].valid = m_sreg[GS].valid = m_sreg[SS].valid = true;
 	m_sreg[DS].d = m_sreg[ES].d = m_sreg[FS].d = m_sreg[GS].d = m_sreg[SS].d = 0;
-	m_sreg[CS].selector = 0x3000; // pentium only, ppro sel = smbase >> 4
+	if((m_cpu_version >> 8) == 5)
+		m_sreg[CS].selector = 0x3000;
+	else
+		m_sreg[CS].selector = m_smbase >> 4;
 	m_sreg[CS].base = m_smbase;
 	m_sreg[CS].limit = 0xffffffff;
 	m_sreg[CS].flags = 0x8093;
