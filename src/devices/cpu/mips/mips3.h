@@ -320,6 +320,7 @@ public:
 
 protected:
 	// device_t implementation
+	virtual void device_debug_setup() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
@@ -486,6 +487,7 @@ protected:
 
 												/* internal stuff */
 	uint8_t         m_drc_cache_dirty;          /* true if we need to flush the cache */
+	uint32_t        m_drc_iregs_dirty;          /* true if debugger modified fast integer registers */
 
 												/* tables */
 	uint8_t         m_fpmode[4];                /* FPU mode table */

@@ -17,6 +17,8 @@
 
 #include "emuopts.h"
 
+#include "debug/express.h"
+
 #include <cmath>
 
 #define ENABLE_OVERFLOWS            (0)
@@ -180,6 +182,7 @@ mips3_device::mips3_device(const machine_config &mconfig, device_type type, cons
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
 	, m_drc_cache_dirty(0)
+	, m_drc_iregs_dirty(0)
 	, m_entry(nullptr)
 	, m_nocode(nullptr)
 	, m_out_of_cycles(nullptr)
@@ -237,6 +240,14 @@ void mips3_device::device_stop()
 	{
 		m_drcuml = nullptr;
 	}
+}
+
+void mips3_device::device_debug_setup()
+{
+	if (!m_isdrc) return;
+	debug()->symtable().set_memory_modified_func(
+		[this]() { m_drc_cache_dirty = true; }
+	);
 }
 
 /***************************************************************************
@@ -826,7 +837,7 @@ void mips3_device::state_import(const device_state_entry &entry)
 		// this refers to HI as R32 and LO as R33 because I'm lazy
 		const unsigned regnum = entry.index() - MIPS3_R0;
 		if (m_regmap[regnum].is_int_register())
-			logerror("debugger R%u = %08X, must update UML I%u\n", regnum, m_core->r[regnum], m_regmap[regnum].ireg() - uml::REG_I0);
+			m_drc_iregs_dirty = true;
 	}
 }
 
