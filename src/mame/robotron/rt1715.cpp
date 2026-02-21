@@ -41,12 +41,14 @@
 
 
 #define LOG_BANK    (1U << 1)
+#define LOG_KBD     (1U << 2)
 
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
 #include "logmacro.h"
 
 #define LOGBANK(format, ...)    LOGMASKED(LOG_BANK,   "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
+#define LOGKBD(...)    LOGMASKED(LOG_KBD, __VA_ARGS__)
 
 
 namespace {
@@ -156,11 +158,13 @@ void rt1715_state::rt1715w_floppy_motor(uint8_t data)
 void rt1715_state::rt1715w_krfd_w(uint8_t data)
 {
 	LOG("%s: rt1715w_krfd_w %02x\n", machine().describe_context(), data);
+	if (BIT(m_krfd ^ data, 6)) m_fdc->reset_w(!BIT(data, 6));
 	m_krfd = data;
 }
 
 void rt1715_state::tc_w(int state)
 {
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 	m_fdc->tc_w(state & BIT(m_krfd, 7));
 }
 
@@ -172,7 +176,7 @@ void rt1715_state::tc_w(int state)
 uint8_t rt1715_state::k7658_led1_r()
 {
 	m_led1_val ^= 1;
-	LOG("%s: k7658_led1_r %02x\n", machine().describe_context(), m_led1_val);
+	LOGKBD("%s: k7658_led1_r %02x\n", machine().describe_context(), m_led1_val);
 	return 0xff;
 }
 
@@ -180,7 +184,7 @@ uint8_t rt1715_state::k7658_led1_r()
 uint8_t rt1715_state::k7658_led2_r()
 {
 	m_led2_val ^= 1;
-	LOG("%s: k7658_led2_r %02x\n", machine().describe_context(), m_led2_val);
+	LOGKBD("%s: k7658_led2_r %02x\n", machine().describe_context(), m_led2_val);
 	return 0xff;
 }
 
@@ -209,7 +213,7 @@ uint8_t rt1715_state::k7658_data_r(offs_t offset)
 /* serial output on D0 */
 void rt1715_state::k7658_data_w(uint8_t data)
 {
-	LOG("%s: k7658_data_w %d\n", machine().describe_context(), BIT(data, 0));
+	LOGKBD("%s: k7658_data_w %d\n", machine().describe_context(), BIT(data, 0));
 	m_sio0->rxa_w(BIT(data, 0));
 	m_sio0->rxca_w(0);
 	m_sio0->rxca_w(1);
@@ -717,6 +721,7 @@ static const z80_daisy_config rt1715_daisy_chain[] =
 
 static const z80_daisy_config rt1715w_daisy_chain[] =
 {
+	{ "z80dma" },
 	{ "ctc2" },
 	{ "sio0" },
 	{ nullptr }
@@ -769,7 +774,7 @@ void rt1715_state::rt1715(machine_config &config)
 	m_sio0->out_dtrb_callback().set(m_rs232, FUNC(rs232_port_device::write_dtr));
 	m_sio0->out_rtsb_callback().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
-	// 1715W: A5, IEO output NC
+	// 1715W: A5, all interrupt pins NC
 	Z80CTC(config, m_ctc0, 15.9744_MHz_XTAL / 4);
 	m_ctc0->zc_callback<0>().set(m_sio0, FUNC(z80sio_device::txca_w));
 	m_ctc0->zc_callback<2>().set(m_sio0, FUNC(z80sio_device::rxtxcb_w));
@@ -810,7 +815,6 @@ void rt1715_state::rt1715w(machine_config &config)
 
 	m_crtc->drq_wr_callback().set(FUNC(rt1715_state::crtc_drq_w));
 
-	// FIXME interrupt output NC, but vector 0x14 set to ISR 0xf6bc, find source
 	I8272A(config, m_fdc, 8'000'000 / 4, false);
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(z80dma_device::rdy_w)).invert();
 	FLOPPY_CONNECTOR(config, "i8272:0", rt1715w_floppies, "525qd", rt1715_state::floppy_formats);
@@ -899,4 +903,4 @@ ROM_END
 //    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS         INIT        COMPANY     FULLNAME                             FLAGS
 COMP( 1986, rt1715,   0,      0,      rt1715,  k7658,   rt1715_state, empty_init, "Robotron", "Robotron PC-1715",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
 COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658,   rt1715_state, empty_init, "Robotron", "Robotron PC-1715 (latin/cyrillic)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, rt1715w, rt1715_state, empty_init, "Robotron", "Robotron PC-1715W",                 MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, rt1715w, rt1715_state, empty_init, "Robotron", "Robotron PC-1715W",                 MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND_HW )
