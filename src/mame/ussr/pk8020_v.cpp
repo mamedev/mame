@@ -46,7 +46,7 @@ void pk8020_state::palette_w(uint8_t data)
 
 void pk8020_state::video_page_w(uint8_t data)
 {
-	m_video_page_access =(data>>6) & 3;
+	m_video_page_access = (data >> 6) & 3;
 	m_attr = (data >> 4) & 3;
 	m_wide = (data >> 3) & 1;
 	m_font = (data >> 2) & 1;
@@ -56,13 +56,13 @@ void pk8020_state::video_page_w(uint8_t data)
 uint8_t pk8020_state::text_r(offs_t offset)
 {
 	if (m_attr == 3) m_text_attr=m_ram->pointer()[0x40400+offset];
-	return m_ram->pointer()[0x40000+offset];
+	return m_ram->pointer()[TEXT_RAM_BASE + offset];
 }
 
 void pk8020_state::text_w(offs_t offset, uint8_t data)
 {
 	uint8_t *ram = m_ram->pointer();
-	ram[0x40000+offset] = data;
+	ram[TEXT_RAM_BASE + offset] = data;
 	switch (m_attr) {
 		case 0: break;
 		case 1: ram[0x40400+offset]=0x01;break;
@@ -73,7 +73,7 @@ void pk8020_state::text_w(offs_t offset, uint8_t data)
 
 uint8_t pk8020_state::gzu_r(offs_t offset)
 {
-	uint8_t *addr = m_ram->pointer() + 0x10000 + (m_video_page_access * 0xC000);
+	uint8_t *addr = m_ram->pointer() + GRAPHICS_RAM_BASE + (m_video_page_access * GRAPHICS_PAGE_SIZE);
 	uint8_t p0 = addr[offset];
 	uint8_t p1 = addr[offset + 0x4000];
 	uint8_t p2 = addr[offset + 0x8000];
@@ -107,7 +107,7 @@ uint8_t pk8020_state::gzu_r(offs_t offset)
 
 void pk8020_state::gzu_w(offs_t offset, uint8_t data)
 {
-	uint8_t *addr = m_ram->pointer() + 0x10000 + (m_video_page_access * 0xC000);
+	uint8_t *addr = m_ram->pointer() + GRAPHICS_RAM_BASE + (m_video_page_access * GRAPHICS_PAGE_SIZE);
 	uint8_t *plane_0 = addr;
 	uint8_t *plane_1 = addr + 0x4000;
 	uint8_t *plane_2 = addr + 0x8000;
@@ -141,11 +141,12 @@ uint32_t pk8020_state::screen_update_pk8020(screen_device &screen, bitmap_ind16 
 	{
 		for (int x = 0; x < 64; x++)
 		{
-			uint8_t const chr = ram[x +(y*64) + 0x40000];
-			uint8_t const attr= ram[x +(y*64) + 0x40400];
+			const int wx = m_wide ? (x & ~1) : x;
+			uint8_t const chr = ram[wx + (y*64) + TEXT_RAM_BASE];
+			uint8_t const attr= ram[wx + (y*64) + TEXT_RAM_BASE + 0x400];
 			for (int j = 0; j < 16; j++)
 			{
-				uint32_t const addr = 0x10000 + x + ((y*16+j)*64) + (m_video_page * 0xC000);
+				uint32_t const addr = GRAPHICS_RAM_BASE + x + ((y*16+j)*64) + (m_video_page * GRAPHICS_PAGE_SIZE);
 				uint8_t code1 = ram[addr];
 				uint8_t code2 = ram[addr + 0x4000];
 				uint8_t code3 = ram[addr + 0x8000];
@@ -153,7 +154,8 @@ uint32_t pk8020_state::screen_update_pk8020(screen_device &screen, bitmap_ind16 
 				if (attr) code4 ^= 0xff;
 				for (int b = 0; b < 8; b++)
 				{
-					uint8_t col = (((code4 >> b) & 0x01) ? 0x08 : 0x00);
+					const int wb = m_wide ? ((b >> 1) + (((x ^ 1) & 1) << 2)) : b;
+					uint8_t col = (((code4 >> wb) & 0x01) ? 0x08 : 0x00);
 					col |= (((code3 >> b) & 0x01) ? 0x04 : 0x00);
 					col |= (((code2 >> b) & 0x01) ? 0x02 : 0x00);
 					col |= (((code1 >> b) & 0x01) ? 0x01 : 0x00);
