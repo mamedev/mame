@@ -374,7 +374,7 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 	);
 	map(0x100, 0x100).lw8(
 		NAME([this] (u8 data) {
-			m_pegc.packed_mode = bool(BIT(data, 0));
+			m_pegc.packed_mode = !bool(BIT(data, 0));
 			logerror("$e0100 packed mode %02x\n", data);
 		})
 	);
