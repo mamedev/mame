@@ -214,9 +214,6 @@ void thinkpad600_state::mcu_map(address_map &map)
 	map(0x0000, 0xf77f).rom().region("mcu", 0);
 }
 
-static INPUT_PORTS_START(thinkpad600)
-INPUT_PORTS_END
-
 void thinkpad600_state::superio_config(device_t *device)
 {
 	pc97338_device &fdc = *downcast<pc97338_device *>(device);
@@ -402,8 +399,8 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR, NAME,      PARENT, COMPAT, MACHINE,      INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,         FLAGS
-COMP( 1995, tpad760xd, 0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 760XD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, tpad600,   0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, tpad600e,  0,      0,      thinkpad600e, thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, tpad600x,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600X",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, tpad770z,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1995, tpad760xd, 0,      0,      thinkpad600,  0, thinkpad600_state, empty_init, "IBM",   "ThinkPad 760XD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, tpad600,   0,      0,      thinkpad600,  0, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, tpad600e,  0,      0,      thinkpad600e, 0, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, tpad600x,  0,      0,      thinkpad600,  0, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600X",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, tpad770z,  0,      0,      thinkpad600,  0, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

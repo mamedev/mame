@@ -534,15 +534,15 @@ public:
 	// construction/destruction
 	isa16_oksan_lpc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	required_device<mc146818_device> m_rtc;
-	required_device<kbdc8042_device> m_kbdc;
-
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
+	required_device<mc146818_device> m_rtc;
+	required_device<kbdc8042_device> m_kbdc;
+
 	void remap(int space_id, offs_t start, offs_t end) override;
 
 	void device_map(address_map &map) ATTR_COLD;
