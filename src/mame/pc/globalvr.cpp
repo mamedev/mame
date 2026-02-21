@@ -310,133 +310,349 @@ void globalvr_state::globalvr(machine_config &config)
 }
 
 
-ROM_START( hyperv2 )
+ROM_START(hyperv2)
 	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
-	DISK_REGION( "ide:1:cdrom" )
-	DISK_IMAGE_READONLY( "hyperv2_pqi_6-12-02", 0, SHA1(44473f2950c0e108acb0961579a46f4765e379f7) )
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("hyperv2_pqi_6-12-02", 0, SHA1(44473f2950c0e108acb0961579a46f4765e379f7))
 ROM_END
 
-ROM_START( hyperv2a )
+ROM_START(hyperv2a)
 	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
-	ROM_REGION( 0x168000, "bootdisk", 0 ) // Win98/DOS bootdisk from folder made into .IMA with WinImage
+	ROM_REGION(0x168000, "bootdisk", 0) // Win98/DOS bootdisk from folder made into .IMA with WinImage
 	// "not-bootable system disk", but contains autoexec.bat / config.sys ...
-	ROM_LOAD( "hyperv2_pqi_9-30-01.ima", 0x000000, 0x168000, BAD_DUMP CRC(964d8e00) SHA1(efefcfcca85328df8445a4ba482cd7d5b584ae05) )
+	ROM_LOAD("hyperv2_pqi_9-30-01.ima", 0x000000, 0x168000, BAD_DUMP CRC(964d8e00) SHA1(efefcfcca85328df8445a4ba482cd7d5b584ae05))
 
-	DISK_REGION( "ide:1:cdrom" )
-	DISK_IMAGE_READONLY( "hyperv2_pqi_9-30-01", 0, SHA1(7a8c201a83a45609d0242a20441891f5204d7dd1) )
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("hyperv2_pqi_9-30-01", 0, SHA1(7a8c201a83a45609d0242a20441891f5204d7dd1))
 ROM_END
 
-ROM_START( gvrxpsys )
+ROM_START(gvrxpsys)
 	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
-	DISK_REGION( "ide:1:cdrom" )
-	DISK_IMAGE_READONLY( "globalvr_xp_system", 0, SHA1(83a784fe038acbd651544b3fa3b17ceb11bbeeab) )
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("globalvr_xp_system", 0, SHA1(83a784fe038acbd651544b3fa3b17ceb11bbeeab))
 ROM_END
 
-ROM_START( gvrxpsup )
+ROM_START(gvrxpsup)
 	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
-	DISK_REGION( "ide:1:cdrom" )
-	DISK_IMAGE_READONLY( "vr_xp_system_6-11-2002", 0, SHA1(c2b586a0106632bcaddc1df8077ee9c226537d2b) )
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("vr_xp_system_6-11-2002", 0, SHA1(c2b586a0106632bcaddc1df8077ee9c226537d2b))
 ROM_END
 
-ROM_START( bhead2k )
+ROM_START(multirec)
 	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
-	DISK_REGION( "ide:1:cdrom" )
-	DISK_IMAGE_READONLY( "beachhead2000_5-27-2003", 0, SHA1(d4473a7fb9820f2e517a1e0609ec9e12f326fc06) )
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("multirec", 0, SHA1(7472050d6c7255156c910917204ab1c155f05af4))
 ROM_END
 
-ROM_START( bhead2ka )
+ROM_START(alienex)
 	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
-	DISK_REGION( "ide:1:cdrom" )
-	DISK_IMAGE_READONLY( "beachhead2000_9-16-2001", 0, SHA1(2151c0aff39a5279adb422e97f00c610d21c48e8) )
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("alienex", 0, SHA1(bd50108f12301528c0ae3d2d837a79c43997f3da))
 ROM_END
 
-ROM_START( bhead2k2 )
+ROM_START(alex10)
 	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
-	DISK_REGION( "ide:1:cdrom" )
-	DISK_IMAGE_READONLY( "beachhead2002_5-27-2003", 0, SHA1(c58e62363387b76b4f03432b543498d4560d27a9) )
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("alex10", 0, SHA1(46582d6370ed87095a7d7c525d0beb1ca4dc0600))
 ROM_END
 
-ROM_START( bhead2k3 )
+ROM_START(alex101)
 	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
-	DISK_REGION( "ide:1:cdrom" )
-	DISK_IMAGE_READONLY( "beachhead2003desertwar_5-27-2003", 0, SHA1(fed23a6496836050eb1d4f69b91da09adbd9d973) )
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("alex101", 0, SHA1(41c1c8b936cbc21a09cbfda90af7f7934647b5f9))
 ROM_END
 
-ROM_START( nfs )
+ROM_START(amermy)
 	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("amermy", 0, SHA1(075173400c519ffcb14fbb133d58c035dc4ca9e0))
+ROM_END
+
+ROM_START(bhead2k)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("beachhead2000_5-27-2003", 0, SHA1(d4473a7fb9820f2e517a1e0609ec9e12f326fc06))
+ROM_END
+
+ROM_START(bhead2ka)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("beachhead2000_9-16-2001", 0, SHA1(2151c0aff39a5279adb422e97f00c610d21c48e8))
+ROM_END
+
+ROM_START(bhead2k2)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("beachhead2002_5-27-2003", 0, SHA1(c58e62363387b76b4f03432b543498d4560d27a9))
+ROM_END
+
+ROM_START(bhead2k3)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("beachhead2003desertwar_5-27-2003", 0, SHA1(fed23a6496836050eb1d4f69b91da09adbd9d973))
+ROM_END
+
+ROM_START(blzingel)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("blzingel", 0, SHA1(f61c8816b6b17906f0257780ed021f0b3de6f140))
+ROM_END
+
+ROM_START(fearland)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("fearland", 0, SHA1(78d69470e6a2bc0bde9011d5afff0aceac4ec0a5))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("flandrec", 0, SHA1(1524bc0d6ec6b069c59de70fdcbb30cf39696e5e))
+ROM_END
+
+ROM_START(fflands)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("fflands", 0, SHA1(63daf4f07332beb728fab6b796855d2f9fc4a987))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("flandrec", 0, SHA1(1524bc0d6ec6b069c59de70fdcbb30cf39696e5e))
+ROM_END
+
+ROM_START(gasguzle)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("gasguzle", 0, SHA1(2a60df0727ed491cb0b4bdafbda1a3c8a7a88978))
+ROM_END
+
+ROM_START(gvnascar)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("gvnascar", 0, SHA1(cb0d1df7a88fb0f02c61a858aaeab38356616eeb))
+ROM_END
+
+ROM_START(incoming)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("incoming", 0, SHA1(da424d60ff6ac3770a2450577befbabcd26dee89))
+ROM_END
+
+ROM_START(jlhu)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("jlhu", 0, SHA1(09cc767df6699d1cc5f6218a69cdc0453c0ab16a))
+ROM_END
+
+ROM_START(nascar10)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("nascar10", 0, SHA1(cf7d02c19fd76ef33b2e0690645b0d5318cdde48))
+ROM_END
+
+ROM_START(nascar11)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("nascar11", 0, SHA1(35fd6d692c25858f29d53f417a75a9d6d5a67f6d))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("nascarec", 0, SHA1(b6d72317f511c90ec356c1cfa498622cba889bd4))
+ROM_END
+
+ROM_START(nfs)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
 	// HDD dumps, likely belonging to individual HDD with separate partitions
-	DISK_REGION( "drive_1" )
-	DISK_IMAGE( "need for speed disk 1 version 1.0.1 rev b", 0, SHA1(799017103c46712534e4bd9c04695fb8241a7ba4) )
+	DISK_REGION("drive_1")
+	DISK_IMAGE("need for speed disk 1 version 1.0.1 rev b", 0, SHA1(799017103c46712534e4bd9c04695fb8241a7ba4))
 
-	DISK_REGION( "drive_2" )
-	DISK_IMAGE( "need for speed disk 2 version 1.0.1 rev b", 0, SHA1(800d1786bb9d2a2448c03c19ea6626af487aed90) )
+	DISK_REGION("drive_2")
+	DISK_IMAGE("need for speed disk 2 version 1.0.1 rev b", 0, SHA1(800d1786bb9d2a2448c03c19ea6626af487aed90))
 
-	DISK_REGION( "recovery" )
-	DISK_IMAGE( "emergency recovery disk 11.11.2003 rev a", 0, SHA1(38656b9da94150e5e8ed8a4183d2cc149e96aedd) )
+	DISK_REGION("recovery")
+	DISK_IMAGE("emergency recovery disk 11.11.2003 rev a", 0, SHA1(38656b9da94150e5e8ed8a4183d2cc149e96aedd))
 ROM_END
 
-ROM_START( nfsgt )
+ROM_START(nfsgt)
 	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
-	DISK_REGION( "ide:0:hdd" )
-	DISK_IMAGE( "need for speed gt", 0, SHA1(58bb2b47e30b65f2f09d2c2f2d7f300cf420b18a) )
+	DISK_REGION("ide:0:hdd")
+	DISK_IMAGE("need for speed gt", 0, SHA1(58bb2b47e30b65f2f09d2c2f2d7f300cf420b18a))
 
 	// CD-ROMs
-	DISK_REGION( "drive_1" )
-	DISK_IMAGE_READONLY( "need for speed gt disk 1 1.1.0 rev c", 0, SHA1(49d967a808f415d3ceb59a5758ee5b3fc4cfb551) )
+	DISK_REGION("drive_1")
+	DISK_IMAGE_READONLY("need for speed gt disk 1 1.1.0 rev c", 0, SHA1(49d967a808f415d3ceb59a5758ee5b3fc4cfb551))
 
-	DISK_REGION( "drive_2" )
-	DISK_IMAGE_READONLY( "need for speed gt disk 2 1.1.0 rev c", 0, SHA1(abbae9e61936079112c25c2b7bf2bbb608345ed2) )
+	DISK_REGION("drive_2")
+	DISK_IMAGE_READONLY("need for speed gt disk 2 1.1.0 rev c", 0, SHA1(abbae9e61936079112c25c2b7bf2bbb608345ed2))
 ROM_END
 
-ROM_START( nfsug )
+ROM_START(nfsug)
 	ROM_REGION32_LE(0x80000, "bios", 0)
-	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
 
 	// CD-ROMs
-	DISK_REGION( "drive_1" )
-	DISK_IMAGE_READONLY( "nfsug1_1-disc1", 0, SHA1(25a9f0606ac3909bd7c4f3f3a59c6782e3c84712) )
+	DISK_REGION("drive_1")
+	DISK_IMAGE_READONLY("nfsug1_1-disc1", 0, SHA1(25a9f0606ac3909bd7c4f3f3a59c6782e3c84712))
 
-	DISK_REGION( "drive_2" )
-	DISK_IMAGE_READONLY( "nfsug1_1-disc2", 0, SHA1(5b0be45eb3fcd27ba513baca1da633f9e9a4c5ef) )
+	DISK_REGION("drive_2")
+	DISK_IMAGE_READONLY("nfsug1_1-disc2", 0, SHA1(5b0be45eb3fcd27ba513baca1da633f9e9a4c5ef))
 
-	DISK_REGION( "recovery" )
-	DISK_IMAGE_READONLY( "nfsug-recovery", 0, SHA1(e306bacb3498582a025706ff81a665776b8a18da) )
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("nfsug-recovery", 0, SHA1(e306bacb3498582a025706ff81a665776b8a18da))
+ROM_END
+
+ROM_START(opblock)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("opblock", 0, SHA1(9a3d1470048b512aaf2487f791ba8f13e508d8f3))
+ROM_END
+
+ROM_START(paralost)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("paralost", 0, SHA1(f4d240f5b0237fd994555af22736430a0723d481))
+ROM_END
+
+ROM_START(puckoff)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("puckoff", 0, SHA1(a18e09cf88bf99e1f61fad8dc9d6afe740865290))
+ROM_END
+
+ROM_START(sin)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("sin", 0, SHA1(31fe4bd11f0e1000aabd5f8251bb6885dbc9dd82))
+ROM_END
+
+ROM_START(theswarm)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("swarm", 0, SHA1(156a639b9bab61b49fa99f21ba17fbc8ddc21df9))
+ROM_END
+
+ROM_START(swarm134)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("swarm134", 0, SHA1(c39022dd54f2f158ebd301621f6b88d8c3aa3476))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("swarmrec", 0, SHA1(5961b3677fcab4dd68e1c1f562c31024e95bbcd4))
+ROM_END
+
+ROM_START(twisted)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("twisted", 0, SHA1(791df9817c7cfca6329a84a2438b9acf3e98d475))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("twistrec", 0, SHA1(3078e29438f51f1e8691d16a6cd7e9d26beb47be))
+ROM_END
+
+ROM_START(ultrapin)
+	ROM_REGION32_LE(0x80000, "bios", 0)
+	ROM_LOAD("mb.bios", 0x00000, 0x80000, NO_DUMP)
+
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("ultrapin", 0, SHA1(3e07cd1546f368fe4b6e905c5ad40dae834c14e4))
+
+	DISK_REGION("recovery")
+	DISK_IMAGE_READONLY("uprec", 0, SHA1(bd4848761740fc09fa459cb3150d0b0e46a4e411))
 ROM_END
 
 } // anonymous namespace
 
 
 // OS/Global VR specific Setup Installers
-GAME( 2002, hyperv2,  0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 06/12/02",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, hyperv2a, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Hyper V2 (Global VR) Install - 09/30/01",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2001, gvrxpsys, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Global VR XP OS Install - 09/30/01",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2002, gvrxpsup, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Global VR XP OS Update/Install - 06/11/02", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, hyperv2,  0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",                  "Hyper V2 (Global VR) Install - 06/12/02",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, hyperv2a, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",                  "Hyper V2 (Global VR) Install - 09/30/01",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2001, gvrxpsys, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",                  "Global VR XP OS Install - 09/30/01",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, gvrxpsup, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",                  "Global VR XP OS Update/Install - 06/11/02", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, multirec, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",                  "System Recovery Multi (050-0233-01)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // Game Installer CDs
-GAME( 2000, bhead2k,  0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2000 Install - 05/27/03",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2000, bhead2ka, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2000 Install - 09/16/01",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2002, bhead2k2, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2002 Install - 05/27/03",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2003, bhead2k3, 0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Beach Head 2003 Desert War Install - 05/27/03",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2003, nfs,      0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Need for Speed - 4 Cab Link (2 Discs) (v1.0.1 Rev B)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004, nfsgt,    0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Need for Speed GT (Hard Drive+2 Discs) (v1.1.0 Rev C)",MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2005, nfsug,    0, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR", "Need For Speed: Underground Install (2 Discs) (v1.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, sin,      0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Ritual Entertainment", "SiN",                                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, incoming, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Incoming",                                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, opblock,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Operation Blockade (Rev D)",                           MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, bhead2k,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Beach Head 2000 Install - 05/27/03",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, bhead2ka, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Beach Head 2000 Install - 09/16/01",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, bhead2k2, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Beach Head 2002 Install - 05/27/03",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, bhead2k3, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Beach Head 2003 Desert War Install - 05/27/03",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003, nfs,      0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Need for Speed - 4 Cab Link (2 Discs) (v1.0.1 Rev B)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004, nfsgt,    0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Need for Speed GT (Hard Drive+2 Discs) (v1.1.0 Rev C)",MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2005, nfsug,    0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Need For Speed: Underground Install (2 Discs) (v1.1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, alienex,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Aliens Extermination (v1.0.3)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, alex10,   alienex,  globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Aliens Extermination (v1.0.0)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, alex101,  alienex,  globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Aliens Extermination (v1.0.1)",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, ultrapin, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "UltraPin (12 tables)",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, amermy,   0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "America's Army (v1.01.82)",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, paralost, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Far Cry: Paradise Lost",                               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, puckoff,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Puck Off",                                             MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, blzingel, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Blazing Angels",                                       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, jlhu,     0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Justice League: Heroes United",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, twisted,  0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Twisted: Nitro Stunt Racing",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, gvnascar, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (2.0.2.068)",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, nascar10, gvnascar, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (1.0)",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, nascar11, gvnascar, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "NASCAR Racing (1.1)",                                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2011, fearland, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Frightfearland (HD video output)",                     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2011, fflands,  fearland, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Frightfearland (SVGA video output)",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2013, theswarm, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "The Swarm (v1.01.139)",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2013, swarm134, theswarm, globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "The Swarm (v1.01.134)",                                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2014, gasguzle, 0,        globalvr, globalvr, globalvr_state, empty_init, ROT0, "Global VR",            "Redline Rampage: Gas Guzzlers",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
