@@ -127,6 +127,8 @@ void startouch_state::europl01(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &startouch_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &startouch_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic0", FUNC(pic8259_device::inta_cb));
+	// TODO: hookup SMI stuff
+	// (Windows 3.1 shouldn't use it anyway)
 
 	// TODO: config space not known
 	PCI_ROOT(config, "pci", 0);

@@ -101,6 +101,7 @@ void mvp3_state::mvp3(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mvp3_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &mvp3_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic0", FUNC(pic8259_device::inta_cb));
+	m_maincpu->smiact().set("pci:00.0", FUNC(vt82c598mvp_host_device::smi_act_w));
 
 	// TODO: config space not known
 	PCI_ROOT(config, "pci", 0);
@@ -125,7 +126,9 @@ void mvp3_state::mvp3(machine_config &config)
 
 	VT82C586B_USB (config, "pci:07.2", 0);
 	VT82C586B_ACPI(config, "pci:07.3", 0);
-	ACPI_PIPC     (config, "pci:07.3:acpi");
+	acpi_pipc_device &acpi_dev(ACPI_PIPC     (config, "pci:07.3:acpi"));
+	acpi_dev.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+//	acpi_dev.sci().
 
 	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "sis6326_agp");
 

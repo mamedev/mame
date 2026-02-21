@@ -43,12 +43,18 @@ public:
 
 	void map(address_map &map);
 
+	auto smi() { return m_write_smi.bind(); }
+	auto sci() { return m_write_sci.bind(); }
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
+	devcb_write_line m_write_smi;
+	devcb_write_line m_write_sci;
+
 	u16 m_pmsts;
 	u16 m_pmen;
 	u16 m_pmcntrl;
@@ -69,6 +75,8 @@ private:
 	u8 m_gpio_dir;
 	u8 m_gpio_val;
 	u16 m_gpo_val;
+
+	void check_smi();
 };
 
 DECLARE_DEVICE_TYPE(VT82C586B_ACPI, vt82c586b_acpi_device)

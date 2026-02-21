@@ -68,6 +68,8 @@ void vt82c598mvp_host_device::device_start()
 
 	save_item(NAME(m_agp_command));
 	save_item(NAME(m_agp_control));
+
+	save_item(NAME(m_smiact));
 }
 
 void vt82c598mvp_host_device::device_reset()
@@ -103,6 +105,7 @@ void vt82c598mvp_host_device::device_reset()
 	m_agp_command = 0;
 	m_agp_control = 0;
 
+	m_smiact = 1;
 	remap_cb();
 }
 
@@ -401,6 +404,18 @@ void vt82c598mvp_host_device::map_shadowram(address_space *memory_space, offs_t 
 	}
 }
 
+// SMIACT# is canonically active low
+void vt82c598mvp_host_device::smi_act_w(int state)
+{
+	if (state)
+		m_smiact = 0;
+	else
+		m_smiact = 1;
+
+//	if (m_smiact == 0)
+//		machine().debug_break();
+	remap_cb();
+}
 
 void vt82c598mvp_host_device::map_extra(
 	uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -420,7 +435,16 @@ void vt82c598mvp_host_device::map_extra(
 	else
 		memory_space->install_ram      (0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
 
-	// TODO: SMI mapping control (bits 1-0 of shadow ram control [2])
+	const u8 smi_mapping = m_shadow_ram_control[2] & 3;
+
+	// 00 SMI DRAM disabled (default)
+	// 01 SMI DRAM always mapped (overlays VGA)
+	// 10 <reserved>
+	// 11 SMI DRAM on SMM
+	if ((smi_mapping == 3 && m_smiact == 0) || smi_mapping == 1)
+	{
+		memory_space->install_ram      (0x000a0000, 0x000bffff, &m_ram[0x000a0000/4]);
+	}
 
 	// upper memory hole settings
 	memory_space->install_ram          (0x00100000, 0x00dfffff, &m_ram[0x00100000/4]);
@@ -517,3 +541,5 @@ void vt82c598mvp_bridge_device::config_map(address_map &map)
 		})
 	);
 }
+
+

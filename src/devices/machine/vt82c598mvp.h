@@ -25,6 +25,8 @@ public:
 	vt82c598mvp_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_ram_size(int ram_size) { m_ram_size = ram_size; }
 
+	void smi_act_w(int state);
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -77,6 +79,8 @@ private:
 
 	u32 m_agp_command;
 	u8 m_agp_control;
+
+	int m_smiact;
 };
 
 class vt82c598mvp_bridge_device : public pci_bridge_device

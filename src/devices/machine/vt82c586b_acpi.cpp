@@ -193,6 +193,8 @@ void vt82c586b_acpi_device::map_extra(
 
 acpi_pipc_device::acpi_pipc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ACPI_PIPC, tag, owner, clock)
+	, m_write_smi(*this)
+	, m_write_sci(*this)
 {
 }
 
@@ -246,6 +248,16 @@ void acpi_pipc_device::device_validity_check(validity_checker &valid) const
 		osd_printf_error("%s: clock set to 0 MHz, please use implicit default of 3.5 MHz in config setter instead\n", this->tag());
 }
 
+void acpi_pipc_device::check_smi()
+{
+	if (m_global_status & m_global_enable && BIT(m_gbl_ctl, 0))
+	{
+		m_write_smi(1);
+	}
+	else
+		m_write_smi(0);
+}
+
 // Similar but not exactly identical to Intel PIIX4 equivalent
 void acpi_pipc_device::map(address_map &map)
 {
@@ -261,6 +273,9 @@ void acpi_pipc_device::map(address_map &map)
 		NAME([this] () { return m_pmsts; }),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			m_pmsts &= ~(data & 0x8d31);
+			// clear BIOS_RLS
+			if (ACCESSING_BITS_0_7 && BIT(data, 5))
+				m_gbl_ctl &= ~(1 << 5);
 		})
 	);
 	// Power Management Resume Enable
@@ -419,7 +434,10 @@ void acpi_pipc_device::map(address_map &map)
 		NAME([this] () { return m_global_status; }),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			if (ACCESSING_BITS_0_7)
+			{
 				m_global_status &= ~(data & 0x7f);
+				check_smi();
+			}
 		})
 	);
 	map(0x2a, 0x2b).lrw16(
@@ -444,6 +462,14 @@ void acpi_pipc_device::map(address_map &map)
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			COMBINE_DATA(&m_gbl_ctl);
 			m_gbl_ctl &= 0x117;
+			// set GBL_STS
+			if (ACCESSING_BITS_0_7)
+			{
+				if (BIT(data, 1))
+					m_pmsts |= 1 << 5;
+				// refresh for SMI_EN (global SMI enable)
+				check_smi();
+			}
 			LOGACPI("Global Control: %04x & %04x\n", data, mem_mask);
 			LOGACPIEX("\tINSMI %d SMIIG %d Power Button Trigger %d BIOS_RLS %d SMI_EN %d\n"
 				, BIT(data, 8)
@@ -460,6 +486,8 @@ void acpi_pipc_device::map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_smi_cmd = data;
+			m_global_status |= 1 << 6;
+			check_smi();
 			LOGACPIEX("SMI_CMD %02x (SW_SMI_EN=%d)\n", data, BIT(m_global_enable, 6));
 		})
 	);
