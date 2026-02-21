@@ -90,7 +90,7 @@ authors:hap
 <!-- lamps -->
 
 	<element name="lamp_white" defstate="0">
-		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><color red="1.0" green="0.85" blue="0.65" /></rect>
 		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
 	</element>
 
@@ -136,8 +136,8 @@ authors:hap
 	</element>
 
 	<element name="lamp_door" defstate="0">
-		<disk state="1"><color red="1.0" green="0.8" blue="0.5" /></disk>
-		<disk state="0"><color red="0.2" green="0.16" blue="0.1" /></disk>
+		<disk state="1"><color red="1.0" green="0.85" blue="0.65" /></disk>
+		<disk state="0"><color red="0.2" green="0.2" blue="0.2" /></disk>
 	</element>
 
 	<element name="lamp_start" defstate="0">

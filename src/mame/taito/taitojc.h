@@ -39,7 +39,6 @@ public:
 		, m_char_ram(*this, "char_ram", 0x4000, ENDIANNESS_BIG)
 		, m_analog_ports(*this, "AN.%u", 0)
 		, m_lamps(*this, "lamp%u", 0U)
-		, m_counters(*this, "counter%u", 0U)
 		, m_wheel_motor(*this, "wheel_motor")
 	{
 	}
@@ -75,7 +74,6 @@ protected:
 	optional_ioport_array<8> m_analog_ports;
 
 	output_finder<8> m_lamps;
-	output_finder<6> m_counters;
 	output_finder<> m_wheel_motor;
 
 	uint32_t m_dsp_rom_pos = 0;
@@ -152,9 +150,13 @@ class dendego_state : public taitojc_state
 public:
 	dendego_state(const machine_config &mconfig, device_type type, const char *tag)
 		: taitojc_state(mconfig, type, tag)
-		, m_io_buttons(*this, "BUTTONS")
+		, m_counters(*this, "counter%u", 0U)
 	{
 	}
+
+	DECLARE_INPUT_CHANGED_MEMBER(throttle_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(brake_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(brake_changed2);
 
 	void dendego(machine_config &config) ATTR_COLD;
 
@@ -164,17 +166,12 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
-	required_ioport m_io_buttons;
-
-	int32_t m_speed_meter = 0;
-	int32_t m_brake_meter = 0;
+	output_finder<6> m_counters;
 
 	void speedmeter_w(uint8_t data);
 	void brakemeter_w(uint8_t data);
 
 	uint16_t dendego2_dsp_idle_skip_r();
-
-	uint32_t screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void dendego_map(address_map &map) ATTR_COLD;
 };
