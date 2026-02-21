@@ -412,8 +412,8 @@ void vt82c598mvp_host_device::smi_act_w(int state)
 	else
 		m_smiact = 1;
 
-//	if (m_smiact == 0)
-//		machine().debug_break();
+//  if (m_smiact == 0)
+//      machine().debug_break();
 	remap_cb();
 }
 

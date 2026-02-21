@@ -205,12 +205,12 @@ ROM_START(slvrball)
 ROM_END
 
 //ROM_START(slvrball806)
-//	SILVERBALL_BIOS
+//  SILVERBALL_BIOS
 //  ROM_DEFAULT_BIOS("bios29") // The one dumped from the actual machine
-//	ROM_DEFAULT_BIOS("bios33")
+//  ROM_DEFAULT_BIOS("bios33")
 //
-//	DISK_REGION( PCI_IDE_ID":ide1:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
-//	DISK_IMAGE("silverball_8.06", 0, BAD_DUMP SHA1(4bd03240229a2f59d457e95e04837422c423111b)) // May contain operator data
+//  DISK_REGION( PCI_IDE_ID":ide1:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
+//  DISK_IMAGE("silverball_8.06", 0, BAD_DUMP SHA1(4bd03240229a2f59d457e95e04837422c423111b)) // May contain operator data
 //ROM_END
 
 ROM_START(slvrball720)

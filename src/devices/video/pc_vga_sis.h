@@ -59,7 +59,7 @@ protected:
 	virtual uint32_t latch_start_addr() override;
 	virtual std::tuple<u8, u8> flush_true_color_mode();
 	// TODO: 1024x768x16bpp wants it, mapped odd/even
-//	virtual bool get_interlace_mode() override { return BIT(m_ramdac_mode, 5); }
+	//virtual bool get_interlace_mode() override { return BIT(m_ramdac_mode, 5); }
 };
 
 class sis630_vga_device : public sis6326_vga_device
@@ -68,8 +68,8 @@ public:
 	sis630_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-//  virtual void device_start() override ATTR_COLD;
-//  virtual void device_reset() override ATTR_COLD;
+	//virtual void device_start() override ATTR_COLD;
+	//virtual void device_reset() override ATTR_COLD;
 
 	virtual void crtc_map(address_map &map) override ATTR_COLD;
 	virtual void sequencer_map(address_map &map) override ATTR_COLD;

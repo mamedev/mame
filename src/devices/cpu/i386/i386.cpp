@@ -3327,7 +3327,7 @@ void pentium2_device::device_reset()
 	// [14:14] MCA Machine Check Architecture
 	// [15:15] CMOV Conditional Move instructions
 	// [23:23] MMX instructions
-//	m_feature_flags = 0x0080f9ff;
+	//m_feature_flags = 0x0080f9ff;
 	m_feature_flags = 0x008081bf;  // TODO: enable missing flags
 
 	CHANGE_PC(m_eip);

@@ -18,30 +18,30 @@ crtc186_device::crtc186_device(const machine_config &mconfig, const char *tag, d
 	m_video_ram(*this, "ram", 0x2000, ENDIANNESS_LITTLE),
 	m_char_rom(*this, "chargen"),
 	m_attr_rom(*this, "attr"),
-    m_vpac(*this, "crt9007"),
-    m_drb0(*this, "crt9212_0"),
-    m_drb1(*this, "crt9212_1"),
-    m_palette(*this, "palette"),
-    m_timer_vidldsh(*this, "vidldsh"),
-    m_sio(*this, "i8251"),
-    m_kb(*this, "kb"),
+	m_vpac(*this, "crt9007"),
+	m_drb0(*this, "crt9212_0"),
+	m_drb1(*this, "crt9212_1"),
+	m_palette(*this, "palette"),
+	m_timer_vidldsh(*this, "vidldsh"),
+	m_sio(*this, "i8251"),
+	m_kb(*this, "kb"),
 	m_screen(*this, "screen")
 {
 }
 
 void crtc186_device::map(address_map &map)
 {
-    map(0x00, 0x3f).rw(FUNC(crtc186_device::vpac_r), FUNC(crtc186_device::vpac_w));
-    //map(0x00, 0x01).rw(m_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0xff00);
-    //map(0x02, 0x03).rw(m_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0xff00);
-    //map(0x00, 0x3f).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
-    map(0x40, 0x41).w(FUNC(crtc186_device::cpl_w)).umask16(0x00ff);
-    map(0x42, 0x43).w(FUNC(crtc186_device::blc_w)).umask16(0x00ff);
-    map(0x44, 0x45).w(FUNC(crtc186_device::mode_w)).umask16(0x00ff);
-    map(0x46, 0x47).w(FUNC(crtc186_device::modeg_w)).umask16(0x00ff);
-    map(0x4a, 0x4b).w(FUNC(crtc186_device::c70_50_w)).umask16(0x00ff);
-    map(0x4c, 0x4d).w(FUNC(crtc186_device::crb_w)).umask16(0x00ff);
-    map(0x4e, 0x4f).w(FUNC(crtc186_device::cru_w)).umask16(0x00ff);
+	map(0x00, 0x3f).rw(FUNC(crtc186_device::vpac_r), FUNC(crtc186_device::vpac_w));
+	//map(0x00, 0x01).rw(m_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0xff00);
+	//map(0x02, 0x03).rw(m_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0xff00);
+	//map(0x00, 0x3f).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
+	map(0x40, 0x41).w(FUNC(crtc186_device::cpl_w)).umask16(0x00ff);
+	map(0x42, 0x43).w(FUNC(crtc186_device::blc_w)).umask16(0x00ff);
+	map(0x44, 0x45).w(FUNC(crtc186_device::mode_w)).umask16(0x00ff);
+	map(0x46, 0x47).w(FUNC(crtc186_device::modeg_w)).umask16(0x00ff);
+	map(0x4a, 0x4b).w(FUNC(crtc186_device::c70_50_w)).umask16(0x00ff);
+	map(0x4c, 0x4d).w(FUNC(crtc186_device::crb_w)).umask16(0x00ff);
+	map(0x4e, 0x4f).w(FUNC(crtc186_device::cru_w)).umask16(0x00ff);
 }
 
 ROM_START( crtc186 )
@@ -104,7 +104,7 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 {
 	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set(FUNC(crtc186_device::int_w));
 
-    SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(71.77);
 	m_screen->set_screen_update(FUNC(crtc186_device::screen_update));
 	m_screen->set_size(640, 420);
@@ -150,8 +150,8 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 
 void crtc186_device::device_start()
 {
-    m_bus->memspace().install_ram(0xd0000, 0xd1fff, m_video_ram);
-    m_bus->memspace().install_rom(0xd8000, 0xd9fff, m_char_rom);
+	m_bus->memspace().install_ram(0xd0000, 0xd1fff, m_video_ram);
+	m_bus->memspace().install_rom(0xd8000, 0xd9fff, m_char_rom);
 	m_bus->iospace().install_device(0xf980, 0xf9ff, *this, &crtc186_device::map);
 
 	// state saving
@@ -167,15 +167,15 @@ void crtc186_device::device_start()
 
 void crtc186_device::device_reset()
 {
-    m_cpl = 0;
-    m_blc = 0;
-    m_mode = 0;
-    m_modeg = 0;
-    m_c70_50 = 0;
-    m_cru = 0;
-    m_crb = 0;
+	m_cpl = 0;
+	m_blc = 0;
+	m_mode = 0;
+	m_modeg = 0;
+	m_c70_50 = 0;
+	m_cru = 0;
+	m_crb = 0;
 
-    set_vidldsh_timer();
+	set_vidldsh_timer();
 }
 
 uint32_t crtc186_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -219,7 +219,7 @@ void crtc186_device::vpac_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 uint8_t crtc186_device::videoram_r(offs_t offset)
 {
-    u16 data = m_video_ram[offset >> 1];
+	u16 data = m_video_ram[offset >> 1];
 
 	// character
 	m_drb0->write(data & 0xff);

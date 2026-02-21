@@ -436,10 +436,10 @@ void vt82c586b_isa_device::internal_io_map(address_map &map)
 	map(0x0000, 0x001f).rw(m_dma[0], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x0021).rw(m_pic[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-//	map(0x0060, 0x0060) keyboard
+//  map(0x0060, 0x0060) keyboard
 	map(0x0061, 0x0061).rw(FUNC(vt82c586b_isa_device::at_portb_r), FUNC(vt82c586b_isa_device::at_portb_w));
-//	map(0x0064, 0x0064) keyboard
-//	map(0x0070, 0x0073) RTC
+//  map(0x0064, 0x0064) keyboard
+//  map(0x0070, 0x0073) RTC
 	map(0x0080, 0x008f).rw(FUNC(vt82c586b_isa_device::at_page8_r), FUNC(vt82c586b_isa_device::at_page8_w));
 	map(0x0092, 0x0092).rw(FUNC(vt82c586b_isa_device::port92_r), FUNC(vt82c586b_isa_device::port92_w));
 	map(0x00a0, 0x00a1).rw(m_pic[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
@@ -892,8 +892,8 @@ void vt82c586b_isa_device::pc_pirqa_w(int state)
 {
 	int irq = m_pirqrc[0] & 15;
 
-//	if (m_pirqrc[0] & 128)
-//		return;
+//  if (m_pirqrc[0] & 128)
+//      return;
 	redirect_irq(irq, state);
 }
 
@@ -901,8 +901,8 @@ void vt82c586b_isa_device::pc_pirqb_w(int state)
 {
 	int irq = m_pirqrc[1] & 15;
 
-//	if (m_pirqrc[1] & 128)
-//		return;
+//  if (m_pirqrc[1] & 128)
+//      return;
 	redirect_irq(irq, state);
 }
 
@@ -910,8 +910,8 @@ void vt82c586b_isa_device::pc_pirqc_w(int state)
 {
 	int irq = m_pirqrc[2] & 15;
 
-//	if (m_pirqrc[2] & 128)
-//		return;
+//  if (m_pirqrc[2] & 128)
+//      return;
 	redirect_irq(irq, state);
 }
 
@@ -919,8 +919,8 @@ void vt82c586b_isa_device::pc_pirqd_w(int state)
 {
 	int irq = m_pirqrc[3] & 15;
 
-//	if (m_pirqrc[3] & 128)
-//		return;
+//  if (m_pirqrc[3] & 128)
+//      return;
 	redirect_irq(irq, state);
 }
 

@@ -30,22 +30,22 @@ public:
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-    virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-    uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
-    virtual void device_start() override ATTR_COLD;
-    virtual void device_reset() override ATTR_COLD;
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-    void map(address_map &map) ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
 
 	void int_w(int state) { m_bus->ir5_w(state); }
 
 	memory_share_creator<uint16_t> m_video_ram;
 	required_memory_region m_char_rom;
 	required_memory_region m_attr_rom;
-    required_device<crt9007_device> m_vpac;
+	required_device<crt9007_device> m_vpac;
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
 	required_device<palette_device> m_palette;
@@ -58,7 +58,7 @@ private:
 
 	void vpac_mem(address_map &map) ATTR_COLD;
 
-    bitmap_rgb32 m_bitmap;
+	bitmap_rgb32 m_bitmap;
 
 	uint16_t vpac_r(offs_t offset, uint16_t mem_mask);
 	void vpac_w(offs_t offset, uint16_t data, uint16_t mem_mask);
@@ -84,7 +84,7 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
 
 	u8 m_vidla;
-    bool m_cpl;
+	bool m_cpl;
 	bool m_blc;
 	bool m_mode;
 	bool m_modeg;

@@ -36,24 +36,24 @@ isa16_svga_cirrus_gd5401_device::isa16_svga_cirrus_gd5401_device(const machine_c
 }
 
 ROM_START( clgd5401 )
-    ROM_REGION(0x08000, "bios", ROMREGION_ERASEFF )
+	ROM_REGION(0x08000, "bios", ROMREGION_ERASEFF )
 	// TODO: no clue about how to load the non-power of two roms
 	ROM_DEFAULT_BIOS("version_d")
-    // ROM: originally even/odd ROMs marked VA30 Ver 1.00 (c) 1991 EIZO Corp - RAM: 256KB - Connector: DB15 - VESA feature connector - Chip: AVGA1
-    ROM_SYSTEM_BIOS(0, "eizova30", "Eizo VA30 V1.00")
-    ROMX_LOAD("eizova30.vbi", 0x00000, 0x06000, CRC(17c2c190) SHA1(081ec7dea9aff0e4577892909802d6e9a620dcf7), ROM_BIOS(0) )
-    //Acumos AVGA1 16bit ISA card - ROM: VGA1 BIOS Ver B 1.00 07 321-01 9210S - RAM: 256KB - Chip: acumos AVGA1 320-01 PC2561TK 9210 - Connector: DB15 - 26pin Edge connector
-    ROM_SYSTEM_BIOS(1, "version_b", "Version B")
-    ROMX_LOAD("32001withlogo.vbi", 0x00000, 0x06000, CRC(5619d4a9) SHA1(4f1b1f78c363e004124715c980b996bd1dcc54af), ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS(2, "version_d", "Version D")
-    ROMX_LOAD("nousa.bin", 0x00000, 0x8000, CRC(92a0e113) SHA1(b8f01c659df0531913add253d420277cba760be8), ROM_BIOS(2) )
+	// ROM: originally even/odd ROMs marked VA30 Ver 1.00 (c) 1991 EIZO Corp - RAM: 256KB - Connector: DB15 - VESA feature connector - Chip: AVGA1
+	ROM_SYSTEM_BIOS(0, "eizova30", "Eizo VA30 V1.00")
+	ROMX_LOAD("eizova30.vbi", 0x00000, 0x06000, CRC(17c2c190) SHA1(081ec7dea9aff0e4577892909802d6e9a620dcf7), ROM_BIOS(0) )
+	//Acumos AVGA1 16bit ISA card - ROM: VGA1 BIOS Ver B 1.00 07 321-01 9210S - RAM: 256KB - Chip: acumos AVGA1 320-01 PC2561TK 9210 - Connector: DB15 - 26pin Edge connector
+	ROM_SYSTEM_BIOS(1, "version_b", "Version B")
+	ROMX_LOAD("32001withlogo.vbi", 0x00000, 0x06000, CRC(5619d4a9) SHA1(4f1b1f78c363e004124715c980b996bd1dcc54af), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "version_d", "Version D")
+	ROMX_LOAD("nousa.bin", 0x00000, 0x8000, CRC(92a0e113) SHA1(b8f01c659df0531913add253d420277cba760be8), ROM_BIOS(2) )
 	ROM_IGNORE( 0x8000 )
 //    ROM_SYSTEM_BIOS(3, "vga1_v1.00_07_d", "VGA1 BIOS v1.00 07 D"
 //    ROMX_LOAD("avga1.bin", 0x00000, 0x08000, CRC(6722ee8b) SHA1(1c90327888e803705e61a4d49629720f4ee9b7a5), ROM_SKIP(1) | ROM_BIOS(3) )
 //    ROM_CONTINUE(                                   0x00001, 0x04000 )
 //    ROM_SYSTEM_BIOS(4, "nover", "No revision shown"
 //    ROMX_LOAD("avga1.rom", 0x00000, 0x08000 CRC(0f562e1f) SHA1(8a0808fe0bc31ecd51ffa1a0a31902da0e9541d4), ROM_BIOS(4) )
-    // ISA16 - Chip: CL-GD5401-42QC-B - RAM: 256KB - MicroMax M5401 V321-01 REV. 3  MADE IN U.S.A. - FCC ID: IWLVGAADAPTER 1V1
+	// ISA16 - Chip: CL-GD5401-42QC-B - RAM: 256KB - MicroMax M5401 V321-01 REV. 3  MADE IN U.S.A. - FCC ID: IWLVGAADAPTER 1V1
 //    ROM_SYSTEM_BIOS(5, "micromax", "MicroMax M5401 V321-01 rev.3")
 //    ROMX_LOAD("cl5401.bin", 0x00000, 0x08000, CRC(a40551d6) SHA1(db38190f06e4af2c2d59ae310e65883bb16cd3d6), ROM_SKIP(1) | ROM_BIOS(5) )
 //    ROM_CONTINUE(                                   0x00001, 0x04000 )

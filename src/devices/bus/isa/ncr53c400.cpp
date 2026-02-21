@@ -49,7 +49,7 @@ void isa8_rt1000b_device::device_add_mconfig(machine_config &config)
 		.option_add_internal("scsic", NCR53C80)
 		.machine_config([this] (device_t *device) { scsic_config(device); });
 
-//	EEPROM_93C06_16BIT(config, m_eeprom);
+//  EEPROM_93C06_16BIT(config, m_eeprom);
 }
 
 ROM_START(rt1000b)
@@ -88,13 +88,13 @@ static INPUT_PORTS_START(rt1000b)
 	// J6-J7-J8-J9
 	// NOTE: IRQ2/IRQ6 aren't implemented in this specific card
 	PORT_CONFNAME( 0xe0, 0xe0, "Interrupt Select")
-//	PORT_CONFSETTING( 0x00, "N/A")
-//	PORT_CONFSETTING( 0x20, "N/A")
-//	PORT_CONFSETTING( 0x40, "IRQ2")
+//  PORT_CONFSETTING( 0x00, "N/A")
+//  PORT_CONFSETTING( 0x20, "N/A")
+//  PORT_CONFSETTING( 0x40, "IRQ2")
 	PORT_CONFSETTING( 0x60, "IRQ3")
 	PORT_CONFSETTING( 0x80, "IRQ4")
 	PORT_CONFSETTING( 0xa0, "IRQ5")
-//	PORT_CONFSETTING( 0xc0, "IRQ6")
+//  PORT_CONFSETTING( 0xc0, "IRQ6")
 	PORT_CONFSETTING( 0xe0, "IRQ7")
 INPUT_PORTS_END
 
@@ -118,8 +118,8 @@ void isa8_rt1000b_device::device_start()
 	save_pointer(NAME(m_external_sram), 0x600);
 
 	// TODO: DMA
-//	m_isa->set_dma_channel(1, this, false);
-//	m_isa->set_dma_channel(5, this, false);
+//  m_isa->set_dma_channel(1, this, false);
+//  m_isa->set_dma_channel(5, this, false);
 }
 
 

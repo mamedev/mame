@@ -46,7 +46,7 @@ void i82371eb_isa_device::device_add_mconfig(machine_config &config)
 	i82371sb_isa_device::device_add_mconfig(config);
 
 	// TODO: bump to DS12885EXT
-//	DS12885EXT(config, m_rtc, XTAL(32'768));
+//  DS12885EXT(config, m_rtc, XTAL(32'768));
 	MC146818(config, m_rtc, XTAL(32'768));
 	m_rtc->irq().set(m_pic8259_slave, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
@@ -80,9 +80,9 @@ void i82371eb_isa_device::device_reset()
 void i82371eb_isa_device::config_map(address_map &map)
 {
 	i82371sb_isa_device::config_map(map);
-//	map(0x4c, 0x4c) IORT (from PIIX3)
-//	map(0x4e, 0x4f) XBCS (from PIIX3)
-//	map(0x60, 0x63) PIRQC (from PIIX3)
+//  map(0x4c, 0x4c) IORT (from PIIX3)
+//  map(0x4e, 0x4f) XBCS (from PIIX3)
+//  map(0x60, 0x63) PIRQC (from PIIX3)
 	// Serial IRQ Control
 	map(0x64, 0x64).lrw8(
 		NAME([this] () { return m_serirqc; }),
@@ -99,12 +99,12 @@ void i82371eb_isa_device::config_map(address_map &map)
 			);
 		})
 	);
-//	map(0x69, 0x69) TOM (from PIIX3)
-//	map(0x6a, 0x6b) MSTAT (from PIIX3)
-//	map(0x70, 0x71) MBDMA (from PIIX3)
-//	map(0x78, 0x79).unmaprw();
-//	map(0x80, 0x80) APICBASE (from PIIX3)
-//	map(0x82, 0x82) DLC (from PIIX3)
+//  map(0x69, 0x69) TOM (from PIIX3)
+//  map(0x6a, 0x6b) MSTAT (from PIIX3)
+//  map(0x70, 0x71) MBDMA (from PIIX3)
+//  map(0x78, 0x79).unmaprw();
+//  map(0x80, 0x80) APICBASE (from PIIX3)
+//  map(0x82, 0x82) DLC (from PIIX3)
 
 	// PCI DMA Configuration
 	map(0x90, 0x91).rw(FUNC(i82371eb_isa_device::pdmacfg_r), FUNC(i82371eb_isa_device::pdmacfg_w));
@@ -117,7 +117,7 @@ void i82371eb_isa_device::config_map(address_map &map)
 		})
 	);
 	// TODO: the SMI stuff is moved in ACPI core
-//	map(0xa0, 0xaf).unmaprw();
+//  map(0xa0, 0xaf).unmaprw();
 	// General Configuration
 	map(0xb0, 0xb3).lrw8(
 		// TODO: bits 2 and 3 are r/o thru CONFIG pins
@@ -290,12 +290,12 @@ void i82371eb_isa_device::map_extra(
 		if (BIT(m_rtccfg, 2))
 		{
 			//io_space->install_readwrite_handler(0x72, 0x72,
-			//	read8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_index_r<1>)),
-			//	write8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_index_w<1>))
+			//  read8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_index_r<1>)),
+			//  write8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_index_w<1>))
 			//);
 			//io_space->install_readwrite_handler(0x73, 0x73,
-			//	read8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_data_r<1>)),
-			//	write8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_data_w<1>))
+			//  read8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_data_r<1>)),
+			//  write8sm_delegate(*this, FUNC(i82371eb_isa_device::rtc_data_w<1>))
 			//);
 		}
 		else if (base_rtc)
@@ -328,12 +328,12 @@ void i82371eb_isa_device::port92_w(offs_t offset, u8 data)
 	fast_gatea20(BIT(data, 1));
 
 	// TODO: fast init
-//	if (!BIT(m_port92, 0) && BIT(data, 0))
-//	{
-//		// pulse reset line
-//		m_write_cpureset(1);
-//		m_write_cpureset(0);
-//	}
+//  if (!BIT(m_port92, 0) && BIT(data, 0))
+//  {
+//      // pulse reset line
+//      m_write_cpureset(1);
+//      m_write_cpureset(0);
+//  }
 
 	m_port92 = data & 3;
 }

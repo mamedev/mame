@@ -23,7 +23,7 @@
                 HOLD4   ---   * 14  *   --- HOLD5
                 BCS3    ---   * 15  *   --- BCS4
                 BCS5    ---   * 16  *   --- BCS6
-                AMEMR   ---   * 17  *   --- 
+                AMEMR   ---   * 17  *   ---
                 MEMR    ---   * 18  *   --- IOR
                 MEMW    ---   * 19  *   --- IOW
                 AEN     ---   * 20  *   --- READY
@@ -90,24 +90,24 @@ public:
 	auto ir5_callback() { return m_out_ir5_cb.bind(); }
 	auto ir6_callback() { return m_out_ir6_cb.bind(); }
 	auto hold1_callback() { return m_out_hold1_cb.bind(); }
-    auto hold2_callback() { return m_out_hold2_cb.bind(); }
-    auto hold3_callback() { return m_out_hold3_cb.bind(); }
-    auto hold4_callback() { return m_out_hold4_cb.bind(); }
-    auto hold5_callback() { return m_out_hold5_cb.bind(); }
+	auto hold2_callback() { return m_out_hold2_cb.bind(); }
+	auto hold3_callback() { return m_out_hold3_cb.bind(); }
+	auto hold4_callback() { return m_out_hold4_cb.bind(); }
+	auto hold5_callback() { return m_out_hold5_cb.bind(); }
 
 	void nmi_w(int state) { m_out_nmi_cb(state); };
 
-    void ir2_w(int state) { m_out_ir2_cb(state); };
+	void ir2_w(int state) { m_out_ir2_cb(state); };
 	void ir3_w(int state) { m_out_ir3_cb(state); };
 	void ir4_w(int state) { m_out_ir4_cb(state); };
 	void ir5_w(int state) { m_out_ir5_cb(state); };
 	void ir6_w(int state) { m_out_ir6_cb(state); };
 
-    void hold1_w(int state) { m_out_hold1_cb(state); }
-    void hold2_w(int state) { m_out_hold2_cb(state); }
-    void hold3_w(int state) { m_out_hold3_cb(state); }
-    void hold4_w(int state) { m_out_hold4_cb(state); }
-    void hold5_w(int state) { m_out_hold5_cb(state); }
+	void hold1_w(int state) { m_out_hold1_cb(state); }
+	void hold2_w(int state) { m_out_hold2_cb(state); }
+	void hold3_w(int state) { m_out_hold3_cb(state); }
+	void hold4_w(int state) { m_out_hold4_cb(state); }
+	void hold5_w(int state) { m_out_hold5_cb(state); }
 
 	address_space &memspace() const { return *m_memspace; }
 	address_space &iospace() const { return *m_iospace; }
@@ -118,7 +118,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	required_address_space m_memspace;
-    required_address_space m_iospace;
+	required_address_space m_iospace;
 
 	devcb_write_line    m_out_nmi_cb;
 	devcb_write_line    m_out_ir2_cb;
@@ -126,11 +126,11 @@ protected:
 	devcb_write_line    m_out_ir4_cb;
 	devcb_write_line    m_out_ir5_cb;
 	devcb_write_line    m_out_ir6_cb;
-    devcb_write_line    m_out_hold1_cb;
-    devcb_write_line    m_out_hold2_cb;
-    devcb_write_line    m_out_hold3_cb;
-    devcb_write_line    m_out_hold4_cb;
-    devcb_write_line    m_out_hold5_cb;
+	devcb_write_line    m_out_hold1_cb;
+	devcb_write_line    m_out_hold2_cb;
+	devcb_write_line    m_out_hold3_cb;
+	devcb_write_line    m_out_hold4_cb;
+	devcb_write_line    m_out_hold5_cb;
 };
 
 DECLARE_DEVICE_TYPE(MIKROMIKKO2_EXPANSION_BUS, mikromikko2_expansion_bus_device)

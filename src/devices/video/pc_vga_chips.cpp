@@ -129,7 +129,7 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_cpu_interface_1 = data & 0x7f;
 		})
 	);
-//	map(0x03, 0x03) CPU Interface Control 2 / ROM Interface (F64300, F65540+)
+//  map(0x03, 0x03) CPU Interface Control 2 / ROM Interface (F64300, F65540+)
 	// Memory Control 1
 	map(0x04, 0x04).lrw8(
 		NAME([this] () { return m_memory_control_1; }),
@@ -170,10 +170,10 @@ void f65535_vga_device::ext_map(address_map &map)
 			flush_true_color_mode();
 		})
 	);
-//	map(0x07, 0x07) <reserved> (I/O Base)
-//	map(0x08, 0x08) Linear Addressing Base L (F64300 only)
-//	map(0x09, 0x09) <reserved> Linear Base H
-//	map(0x0a, 0x0a) <reserved> XRAM Mode
+//  map(0x07, 0x07) <reserved> (I/O Base)
+//  map(0x08, 0x08) Linear Addressing Base L (F64300 only)
+//  map(0x09, 0x09) <reserved> Linear Base H
+//  map(0x0a, 0x0a) <reserved> XRAM Mode
 	// CPU Paging
 	map(0x0b, 0x0b).lrw8(
 		NAME([this] () { return m_cpu_paging; }),
@@ -198,8 +198,8 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_start_address_top = data & 3;
 		})
 	);
-//	map(0x0d, 0x0d) Auxiliary Offset
-//	map(0x0e, 0x0e) Text Mode Control
+//  map(0x0d, 0x0d) Auxiliary Offset
+//  map(0x0e, 0x0e) Text Mode Control
 	// Software Flags 0
 	// (defined by BIOS or driver, has no actual function)
 	map(0x0f, 0x0f).lrw8(
@@ -219,11 +219,11 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_software_flags_0 = data;
 		})
 	);
-//	map(0x10, 0x10) Single/Low Map
-//	map(0x11, 0x11) High Map
-//	map(0x14, 0x14) Emulation Mode
-//	map(0x15, 0x15) Write Protect
-//	map(0x16, 0x16) Vertical Overflow (F64300 only)
+//  map(0x10, 0x10) Single/Low Map
+//  map(0x11, 0x11) High Map
+//  map(0x14, 0x14) Emulation Mode
+//  map(0x15, 0x15) Write Protect
+//  map(0x16, 0x16) Vertical Overflow (F64300 only)
 	// Horizontal Overflow (F64300 only)
 	map(0x17, 0x17).lrw8(
 		NAME([this] () { return m_horizontal_overflow; }),
@@ -235,10 +235,10 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_horizontal_overflow = data;
 		})
 	);
-//	map(0x18, 0x18) Alt H Disp End
-//	map(0x19, 0x19) Alt H Sync Start
-//	map(0x1a, 0x1a) Alt H Sync End
-//	map(0x1b, 0x1b) Alt H Total
+//  map(0x18, 0x18) Alt H Disp End
+//  map(0x19, 0x19) Alt H Sync Start
+//  map(0x1a, 0x1a) Alt H Sync End
+//  map(0x1b, 0x1b) Alt H Total
 	// Alt H Blank Start / H Panel Size
 	map(0x1c, 0x1c).lrw8(
 		NAME([this] () { return m_alt_h_panel_size; }),
@@ -249,16 +249,16 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_alt_h_panel_size = data;
 		})
 	);
-//	map(0x1d, 0x1d) Alt H Blank End
-//	map(0x1e, 0x1e) Alt Offset
-//	map(0x1f, 0x1f) Virtual EGA Switch
+//  map(0x1d, 0x1d) Alt H Blank End
+//  map(0x1e, 0x1e) Alt Offset
+//  map(0x1f, 0x1f) Virtual EGA Switch
 
-//	map(0x21, 0x21) Alt H Sync Start Ext Modes
-//	map(0x22, 0x22) Alt H Sync End Ext Modes
-//	map(0x23, 0x23) Alt H Total Ext
-//	map(0x24, 0x24) FP Alt Max Scanline
-//	map(0x25, 0x25) FP Alt Text Mode H Virtual Panel Size
-//	map(0x26, 0x26) Alt H Sync Start
+//  map(0x21, 0x21) Alt H Sync Start Ext Modes
+//  map(0x22, 0x22) Alt H Sync End Ext Modes
+//  map(0x23, 0x23) Alt H Total Ext
+//  map(0x24, 0x24) FP Alt Max Scanline
+//  map(0x25, 0x25) FP Alt Text Mode H Virtual Panel Size
+//  map(0x26, 0x26) Alt H Sync Start
 
 	// Video Interface
 	map(0x28, 0x28).lrw8(
@@ -279,7 +279,7 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_video_interface = data;
 		})
 	);
-//	map(0x29, 0x29) Half Line Compare
+//  map(0x29, 0x29) Half Line Compare
 
 	// Software Flags 1
 	map(0x2b, 0x2b).lrw8(
@@ -289,10 +289,10 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_software_flags_1 = data;
 		})
 	);
-//	map(0x2c, 0x2c) FLM Delay
-//	map(0x2d, 0x2d) LP Delay (Comp Disabled)
-//	map(0x2e, 0x2e) LP Delay (Comp Enabled)
-//	map(0x2f, 0x2f) LP Width
+//  map(0x2c, 0x2c) FLM Delay
+//  map(0x2d, 0x2d) LP Delay (Comp Disabled)
+//  map(0x2e, 0x2e) LP Delay (Comp Enabled)
+//  map(0x2f, 0x2f) LP Width
 
 	// Clock Control (F64300, F65540+)
 	// Programmed in F65535 anyway (not on '30 really?)
@@ -304,9 +304,9 @@ void f65535_vga_device::ext_map(address_map &map)
 		})
 	);
 
-//	map(0x3a, 0x3c) Color Key (F64300, F65540+)
-//	map(0x3d, 0x3f) Color Key Mask (F64300, F65540+)
-//	map(0x40, 0x40) <reserved> BitBlt Config (F64300, F65540+)
+//  map(0x3a, 0x3c) Color Key (F64300, F65540+)
+//  map(0x3d, 0x3f) Color Key Mask (F64300, F65540+)
+//  map(0x40, 0x40) <reserved> BitBlt Config (F64300, F65540+)
 
 	// Software Flag 2
 	map(0x44, 0x44).lrw8(
@@ -321,10 +321,10 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_software_flags_2 = data;
 		})
 	);
-//	map(0x45, 0x45) Software Flag 3 (F65540+)
+//  map(0x45, 0x45) Software Flag 3 (F65540+)
 
-//	map(0x4f, 0x4f) Panel Format 2 (F65540+)
-//	map(0x50, 0x50) Panel Format 1
+//  map(0x4f, 0x4f) Panel Format 2 (F65540+)
+//  map(0x50, 0x50) Panel Format 1
 	// Display Type
 	map(0x51, 0x51).lrw8(
 		NAME([this] (offs_t offset) { return m_display_type; }),
@@ -333,9 +333,9 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_display_type = data;
 		})
 	);
-//	map(0x52, 0x52) Power Down Control / Refresh Control
-//	map(0x53, 0x53) Panel Format 3
-//	map(0x54, 0x54) Panel Interface
+//  map(0x52, 0x52) Power Down Control / Refresh Control
+//  map(0x53, 0x53) Panel Format 3
+//  map(0x54, 0x54) Panel Interface
 	// H Compensation
 	map(0x55, 0x55).lrw8(
 		NAME([this] () { return m_h_compensation; }),
@@ -344,7 +344,7 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_h_compensation = data;
 		})
 	);
-//	map(0x56, 0x56) H Centering
+//  map(0x56, 0x56) H Centering
 	// V Compensation
 	map(0x57, 0x57).lrw8(
 		NAME([this] () { return m_v_compensation; }),
@@ -353,8 +353,8 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_v_compensation = data;
 		})
 	);
-//	map(0x58, 0x58) V Centering
-//	map(0x59, 0x59) V Line Insertion
+//  map(0x58, 0x58) V Centering
+//  map(0x59, 0x59) V Line Insertion
 	// V Line Replication
 	map(0x5a, 0x5a).lrw8(
 		NAME([this] () { return m_v_line_replication; }),
@@ -363,20 +363,20 @@ void f65535_vga_device::ext_map(address_map &map)
 			m_v_line_replication = data;
 		})
 	);
-//	map(0x5b, 0x5b) Power Sequencing Delay
-//	map(0x5c, 0x5c) Activity Indicator Control (F65540+)
-//	map(0x5d, 0x5d) FP Diag (F65540+)
-//	map(0x5e, 0x5e) M(ACDCLK) Control
-//	map(0x5f, 0x5f) Power Down Mode Refresh
-//	map(0x60, 0x60) Blink Rate Control
-//	map(0x61, 0x61) SmartMap Control
-//	map(0x62, 0x62) SmartMap Shift Parameter
-//	map(0x63, 0x63) SmartMap Color Mapping Control
-//	map(0x64, 0x64) FP Alt Vertical Total
-//	map(0x65, 0x65) FP Alt Overflow
-//	map(0x66, 0x66) FP Alt Vertical Sync Start
-//	map(0x67, 0x67) FP Alt Vertical Sync End
-//	map(0x68, 0x68) FP V Panel Size
+//  map(0x5b, 0x5b) Power Sequencing Delay
+//  map(0x5c, 0x5c) Activity Indicator Control (F65540+)
+//  map(0x5d, 0x5d) FP Diag (F65540+)
+//  map(0x5e, 0x5e) M(ACDCLK) Control
+//  map(0x5f, 0x5f) Power Down Mode Refresh
+//  map(0x60, 0x60) Blink Rate Control
+//  map(0x61, 0x61) SmartMap Control
+//  map(0x62, 0x62) SmartMap Shift Parameter
+//  map(0x63, 0x63) SmartMap Color Mapping Control
+//  map(0x64, 0x64) FP Alt Vertical Total
+//  map(0x65, 0x65) FP Alt Overflow
+//  map(0x66, 0x66) FP Alt Vertical Sync Start
+//  map(0x67, 0x67) FP Alt Vertical Sync End
+//  map(0x68, 0x68) FP V Panel Size
 
 	// Programmable Output Drive
 	map(0x6c, 0x6c).lrw8(
@@ -388,18 +388,18 @@ void f65535_vga_device::ext_map(address_map &map)
 		})
 	);
 
-//	map(0x6e, 0x6e) Polynomial FRC Control
-//	map(0x6f, 0x6f) Frame Buffer Control
-//	map(0x70, 0x70) Setup / Disable Control
-//	map(0x71, 0x71) <reserved> GPIO Control (F64300 only)
-//	map(0x72, 0x72) GPIO Data (F64300 only)
-//	map(0x73, 0x73) DPMS Control / Misc Control (F64300, F65540+)
-//	map(0x74, 0x74) <reserved> Configuration 2 (F64300 only)
-//	map(0x75, 0x75) <reserved> Software Flags 3 (F64300 only)
+//  map(0x6e, 0x6e) Polynomial FRC Control
+//  map(0x6f, 0x6f) Frame Buffer Control
+//  map(0x70, 0x70) Setup / Disable Control
+//  map(0x71, 0x71) <reserved> GPIO Control (F64300 only)
+//  map(0x72, 0x72) GPIO Data (F64300 only)
+//  map(0x73, 0x73) DPMS Control / Misc Control (F64300, F65540+)
+//  map(0x74, 0x74) <reserved> Configuration 2 (F64300 only)
+//  map(0x75, 0x75) <reserved> Software Flags 3 (F64300 only)
 
-//	map(0x7d, 0x7d) FP Compensation Diagnostic (r/o)
-//	map(0x7e, 0x7e) CGA / Hercules Color Select
-//	map(0x7f, 0x7f) Diagnostic
+//  map(0x7d, 0x7d) FP Compensation Diagnostic (r/o)
+//  map(0x7e, 0x7e) CGA / Hercules Color Select
+//  map(0x7f, 0x7f) Diagnostic
 }
 
 void f65535_vga_device::flush_true_color_mode()

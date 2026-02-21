@@ -65,7 +65,7 @@ void trio64dx_pci_device::device_start()
 	pci_card_device::device_start();
 
 	// original Trio32/64/64V+
-//	set_ids(0x53338811, 0x00, 0x030000, 0x000000);
+//  set_ids(0x53338811, 0x00, 0x030000, 0x000000);
 	set_ids(0x53338901, 0x00, 0x030000, 0x000000);
 
 	// TODO: same as ViRGE

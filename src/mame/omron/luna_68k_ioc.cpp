@@ -172,7 +172,7 @@ void luna_68k_ioc_device::scsi_drq0_w(int state)
 		} else {
 			if(m_packed_index == 0)
 				m_dma[0]->drq2_w(1);
-			
+
 			else {
 				while(m_scsi_drq0 && m_packed_index != 5) {
 					m_scsi0_dma_write(m_packed_data >> (24 - 8*(m_packed_index-1)));
@@ -317,7 +317,7 @@ void luna_68k_ioc_device::device_add_mconfig(machine_config &config)
 						[this, dma=m_dma[0].target()](device_t *device)
 						{
 							mb89352_device &spc = downcast<mb89352_device &>(*device);
-							
+
 							spc.set_clock(10'000'000);
 							spc.out_irq_callback().set([this](int state) { m_interrupt_scsii_cb(state); });
 							spc.out_dreq_callback().set(*this, FUNC(luna_68k_ioc_device::scsi_drq0_w));
@@ -339,7 +339,7 @@ void luna_68k_ioc_device::device_add_mconfig(machine_config &config)
 						[this](device_t *device)
 						{
 							mb89352_device &spc = downcast<mb89352_device &>(*device);
-							
+
 							spc.set_clock(10'000'000);
 							spc.out_irq_callback().set([this](int state) { m_interrupt_scsie_cb(state); });
 						});

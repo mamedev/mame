@@ -27,22 +27,22 @@ class mmc186_device : public device_t, public device_mikromikko2_expansion_bus_c
 {
 public:
 	mmc186_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	
+
 protected:
-    virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	
-    virtual void device_start() override ATTR_COLD;
-    virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
-    void map(address_map &map) ATTR_COLD;
+	void map(address_map &map) ATTR_COLD;
 
 	void int_w(int state) { m_bus->ir4_w(state); }
-    void hold_w(int state) { m_bus->hold3_w(state); }
+	void hold_w(int state) { m_bus->hold3_w(state); }
 
-    required_device<am9517a_device> m_dmac;
-    required_device<nscsi_callback_device> m_sasi;
-    required_device<upd765a_device> m_fdc;
+	required_device<am9517a_device> m_dmac;
+	required_device<nscsi_callback_device> m_sasi;
+	required_device<upd765a_device> m_fdc;
 	optional_device_array<floppy_image_device, 2> m_floppy;
 
 	static void floppy_formats(format_registration &fr);

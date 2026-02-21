@@ -44,17 +44,17 @@ mikromikko2_expansion_bus_device::mikromikko2_expansion_bus_device(const machine
 	device_t(mconfig, type, tag, owner, clock),
 	m_memspace(*this, finder_base::DUMMY_TAG, -1),
 	m_iospace(*this, finder_base::DUMMY_TAG, -1),
-    m_out_nmi_cb(*this),
-    m_out_ir2_cb(*this),
-    m_out_ir3_cb(*this),
-    m_out_ir4_cb(*this),
-    m_out_ir5_cb(*this),
-    m_out_ir6_cb(*this),
-    m_out_hold1_cb(*this),
-    m_out_hold2_cb(*this),
-    m_out_hold3_cb(*this),
-    m_out_hold4_cb(*this),
-    m_out_hold5_cb(*this)
+	m_out_nmi_cb(*this),
+	m_out_ir2_cb(*this),
+	m_out_ir3_cb(*this),
+	m_out_ir4_cb(*this),
+	m_out_ir5_cb(*this),
+	m_out_ir6_cb(*this),
+	m_out_hold1_cb(*this),
+	m_out_hold2_cb(*this),
+	m_out_hold3_cb(*this),
+	m_out_hold4_cb(*this),
+	m_out_hold5_cb(*this)
 {
 }
 
@@ -63,14 +63,14 @@ void mikromikko2_expansion_bus_device::device_start()
 }
 
 device_mikromikko2_expansion_bus_card_interface::device_mikromikko2_expansion_bus_card_interface(const machine_config &mconfig, device_t &device) :
-    device_interface(device, "mikromikko2_expansion_bus"),
+	device_interface(device, "mikromikko2_expansion_bus"),
 	m_bus(nullptr),
-    m_card(&device)
+	m_card(&device)
 {
 }
 
 void mikromikko2_expansion_bus_cards(device_slot_interface &device)
 {
-    device.option_add("crtc186", NOKIA_CRTC186);
-    device.option_add("mmc186", NOKIA_MMC186);
+	device.option_add("crtc186", NOKIA_CRTC186);
+	device.option_add("mmc186", NOKIA_MMC186);
 }

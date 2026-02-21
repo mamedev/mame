@@ -43,7 +43,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void mvp3(machine_config &config);
+	void mvp3(machine_config &config) ATTR_COLD;
 
 protected:
 	// TODO: this binding should be more basic
@@ -117,7 +117,7 @@ void mvp3_state::mvp3(machine_config &config)
 		if (state)
 			machine().schedule_soft_reset();
 	});
-//  isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	//isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
 	vt82c586b_ide_device &ide(VT82C586B_IDE(config, "pci:07.1", 0, m_maincpu));
 	// TODO: use ad-hoc remapping from ISA
@@ -128,7 +128,7 @@ void mvp3_state::mvp3(machine_config &config)
 	VT82C586B_ACPI(config, "pci:07.3", 0);
 	acpi_pipc_device &acpi_dev(ACPI_PIPC     (config, "pci:07.3:acpi"));
 	acpi_dev.smi().set_inputline("maincpu", INPUT_LINE_SMI);
-//	acpi_dev.sci().
+	//acpi_dev.sci().
 
 	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "sis6326_agp");
 
@@ -174,4 +174,3 @@ ROM_END
 } // anonymous namespace
 
 COMP(1998, ls5amvp3,    0,     0, mvp3,   0, mvp3_state, empty_init, "Lucky Star", "5AMVP3 (VIA MVP3 chipset)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-

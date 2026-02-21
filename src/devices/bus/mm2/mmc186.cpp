@@ -16,10 +16,10 @@ DEFINE_DEVICE_TYPE(NOKIA_MMC186, mmc186_device, "nokia_mmc186", "Nokia MikroMikk
 mmc186_device::mmc186_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NOKIA_MMC186, tag, owner, clock),
 	device_mikromikko2_expansion_bus_card_interface(mconfig, *this),
-    m_dmac(*this, "am9517a"),
-    m_sasi(*this, "sasi:7:scsicb"),
-    m_fdc(*this, UPD765_TAG),
-    m_floppy(*this, UPD765_TAG ":%u:525qd", 0U)
+	m_dmac(*this, "am9517a"),
+	m_sasi(*this, "sasi:7:scsicb"),
+	m_fdc(*this, UPD765_TAG),
+	m_floppy(*this, UPD765_TAG ":%u:525qd", 0U)
 {
 }
 
@@ -95,7 +95,7 @@ void mmc186_device::device_reset()
 
 uint8_t mmc186_device::dmac_mem_r(offs_t offset)
 {
-    u16 data = m_bus->memspace().read_word((m_dma_hi << 15) | offset >> 1);
+	u16 data = m_bus->memspace().read_word((m_dma_hi << 15) | offset >> 1);
 
 	if (WORD_ALIGNED(offset))
 	{
@@ -109,15 +109,15 @@ uint8_t mmc186_device::dmac_mem_r(offs_t offset)
 
 void mmc186_device::dmac_mem_w(offs_t offset, uint8_t data)
 {
-    u16 old_data = m_bus->memspace().read_word((m_dma_hi << 15) | offset >> 1);
+	u16 old_data = m_bus->memspace().read_word((m_dma_hi << 15) | offset >> 1);
 
-    if (WORD_ALIGNED(offset))
+	if (WORD_ALIGNED(offset))
 	{
-        m_bus->memspace().write_word((m_dma_hi << 15) | offset >> 1, (old_data & 0xff00) | data);
+		m_bus->memspace().write_word((m_dma_hi << 15) | offset >> 1, (old_data & 0xff00) | data);
 	}
 	else
 	{
-        m_bus->memspace().write_word((m_dma_hi << 15) | offset >> 1, data << 8 | (old_data & 0xff));
+		m_bus->memspace().write_word((m_dma_hi << 15) | offset >> 1, data << 8 | (old_data & 0xff));
 	}
 }
 

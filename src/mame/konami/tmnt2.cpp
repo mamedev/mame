@@ -1524,7 +1524,7 @@ void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 	    The most accurate method is to trace how the zoom is transformed
 	    reverse the maths, plug the result into the sprite zoom code and
-		derive the scale factor from there; but zooming would still suffer
+	    derive the scale factor from there; but zooming would still suffer
 	    from precision loss in k053245->sprites_draw() and drawgfx()
 	    producing gaps in logical sprite groups.
 
