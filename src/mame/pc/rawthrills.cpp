@@ -79,15 +79,15 @@ void rawthrillspc_state::rawthrillspc(machine_config &config)
 	ROM_SYSTEM_BIOS( 1, "104", "v1.0.3" ) \
 	ROMX_LOAD( "1.0.4_4m.bin", 0x00000, 0x20000, CRC(73f0420b) SHA1(4821d21d2c75084062cb1047eb08b1b3ab2424e1), ROM_BIOS(1) )
 
-ROM_START( gtrhroac )
+ROM_START(gtrhroac)
 	OPTIPLEX740_BIOS
 
-	DISK_REGION( "ide:0:hdd" )
-	DISK_IMAGE( "slax105", 0, NO_DUMP )
+	DISK_REGION("ide:0:hdd")
+	DISK_IMAGE("slax105", 0, NO_DUMP)
 
 	// Recovery DVD
-	DISK_REGION( "recovery105" )
-	DISK_IMAGE_READONLY( "slax_restore_dvd_ver.1.0.5", 0, SHA1(c063c0032bf88e4ec7a3b973323e9c84a231079a) )
+	DISK_REGION("recovery105")
+	DISK_IMAGE_READONLY("slax_restore_dvd_ver.1.0.5", 0, SHA1(c063c0032bf88e4ec7a3b973323e9c84a231079a))
 ROM_END
 
 /*
@@ -97,24 +97,48 @@ ROM_END
    2. With Xilinx XC9536XL (labeled "r1.0 (c)2004 RightHand Tech, Inc")
  Parallel port HASP4 1.5 dongle (MCU Marvin2)
 */
-ROM_START( fnf )
+ROM_START(fnf)
+	OPTIPLEX740_BIOS
+	DISK_REGION("ide:1:dvdrom")
+	DISK_IMAGE_READONLY("fnf", 0, SHA1(b0cbb86b09b714001a2818fd17d294b9e8f04a7d))
+ROM_END
+
+ROM_START(fnf1106)
+	OPTIPLEX740_BIOS
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("fnf1106", 0, SHA1(c8d56608eb825776f132e33d41ecbc3dc262607a))
+ROM_END
+
+ROM_START(fnf17)
+	OPTIPLEX740_BIOS
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("fnf17", 0, SHA1(a60fd694e8e4485489d64dd70df9c87fdd459aa9))
+ROM_END
+
+ROM_START(fnf202)
+	OPTIPLEX740_BIOS
+	DISK_REGION("ide:1:cdrom")
+	DISK_IMAGE_READONLY("fnf202", 0, SHA1(1bfd33b9c4ec2496815a24098718071dff0e5caf))
+ROM_END
+
+ROM_START(fnf306)
 	OPTIPLEX740_BIOS
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION("ide:0:hdd")
 	/* Clean image created from the recovery CDs on the original machine.
 	   After installing the software from the discs, the PC reboots several times for configurating
 	   the hardware devices and peripherals, and then asks for controllers calibration.
 	   The image is just up to this point, before performing any calibration. On the first boot from
 	   this image, you'll be asked for the calibration, and after it, the game is ready for playing. */
-	DISK_IMAGE( "faf306", 0, SHA1(2aefe396a79e3328f58ae5e4ccda0041af1b4a1a) )
+	DISK_IMAGE("faf306", 0, SHA1(2aefe396a79e3328f58ae5e4ccda0041af1b4a1a))
 
 	// Two recovery CDs, you need both for a full restore
 
-	DISK_REGION( "recovery306d1" )
-	DISK_IMAGE_READONLY( "faf3.06d1", 0, SHA1(681ab1258349e5ceb690606e6697e5b957016446) )
+	DISK_REGION("recovery306d1")
+	DISK_IMAGE_READONLY("faf3.06d1", 0, SHA1(681ab1258349e5ceb690606e6697e5b957016446))
 
-	DISK_REGION( "recovery306d2" )
-	DISK_IMAGE_READONLY( "faf3.06d2", 0, SHA1(183664482f6665adffc74d69e28338da740443c5) )
+	DISK_REGION("recovery306d2")
+	DISK_IMAGE_READONLY("faf3.06d2", 0, SHA1(183664482f6665adffc74d69e28338da740443c5))
 ROM_END
 
 /*
@@ -128,24 +152,28 @@ ROM_END
  I/O board with ICE P/N X2034X, silkscreened as "500-00040-01" and with a CPLD labeled as "RIO v0x5016 Copyright 2010 Raw Thrills Inc".
  HASP USB security dongle.
 */
-ROM_START( doodljmp )
-	ROM_REGION32_LE( 0x100000, "bios", 0 )
-	ROM_SYSTEM_BIOS( 0, "0515", "Compaq 5.15 (11/06/2009)" )
-	ROMX_LOAD( "w25x80a.bin", 0x000000, 0x100000, CRC(e91538ee) SHA1(32add79eba2049205a98fc4e854976e11d102a4c), ROM_BIOS(0) )
+ROM_START(doodljmp)
+	ROM_REGION32_LE(0x100000, "bios", 0)
+	ROM_SYSTEM_BIOS(0, "0515", "Compaq 5.15 (11/06/2009)")
+	ROMX_LOAD("w25x80a.bin", 0x000000, 0x100000, CRC(e91538ee) SHA1(32add79eba2049205a98fc4e854976e11d102a4c), ROM_BIOS(0))
 
-	DISK_REGION( "ide:0:hdd" )
-	DISK_IMAGE( "doodlejmp", 0, NO_DUMP )
+	DISK_REGION("ide:0:hdd")
+	DISK_IMAGE("doodlejmp", 0, NO_DUMP)
 
 	/* Recovery DVD:
 	      -Doodle Jump 1.16
 	      -OS 00.07
 	      -8-Feb-2013 */
-	DISK_REGION( "recovery116" )
-	DISK_IMAGE_READONLY( "doodlejump_recover_dvd_1_16", 0, SHA1(67f2bc3d9d71fc924f8f784e62eaf3dd39c88f45) )
+	DISK_REGION("recovery116")
+	DISK_IMAGE_READONLY("doodlejump_recover_dvd_1_16", 0, SHA1(67f2bc3d9d71fc924f8f784e62eaf3dd39c88f45))
 ROM_END
 
 } // Anonymous namespace
 
-GAME(2013, doodljmp, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "ICE / Raw Thrills (Lima Sky license)",      "Doodle Jump Arcade (v1.16)",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME(2004, fnf,      0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                               "The Fast And The Furious (v3.06)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME(2008, gtrhroac, 0, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills (Activision / Konami license)", "Guitar Hero Arcade (v1.0.5)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2013, doodljmp, 0,   rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "ICE / Raw Thrills (Lima Sky license)",      "Doodle Jump Arcade (v1.16)",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2004, fnf,      0,   rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                               "The Fast And The Furious (v3.09)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2004, fnf1106,  fnf, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                               "The Fast And The Furious (v1.1.06)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2004, fnf17,    fnf, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                               "The Fast And The Furious (v1.7)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2004, fnf202,   fnf, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                               "The Fast And The Furious (v2.02)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2004, fnf306,   fnf, rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills",                               "The Fast And The Furious (v3.06)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(2008, gtrhroac, 0,   rawthrillspc, rawthrillspc, rawthrillspc_state, empty_init, ROT0, "Raw Thrills (Activision / Konami license)", "Guitar Hero Arcade (v1.0.5)",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
