@@ -48,7 +48,7 @@
 #include "logmacro.h"
 
 #define LOGBANK(format, ...)    LOGMASKED(LOG_BANK,   "%11.6f at %s: " format, machine().time().as_double(), machine().describe_context(), __VA_ARGS__)
-#define LOGKBD(...)    LOGMASKED(LOG_BANK, __VA_ARGS__)
+#define LOGKBD(...)    LOGMASKED(LOG_KBD, __VA_ARGS__)
 
 
 namespace {
