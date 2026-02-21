@@ -299,7 +299,8 @@ uint32_t dendego_state::screen_update_dendego(screen_device &screen, bitmap_ind1
 {
 	// update controller state in artwork
 	static const uint8_t mascon_table[6] = { 0x76, 0x67, 0x75, 0x57, 0x73, 0x37 };
-	static const uint8_t brake_table[11] = { 0x00, 0x05, 0x1d, 0x35, 0x4d, 0x65, 0x7d, 0x95, 0xad, 0xc5, 0xd4 };
+	// brake 10 steps: 0=release 1~8=Normal 9=Emergency
+	static const uint8_t brake_table[10] = { 0x00, 0x05, 0x1d, 0x35, 0x4d, 0x65, 0x7d, 0x95, 0xad, 0xd4 };
 
 	uint8_t btn = (m_io_buttons->read() & 0x77);
 	int level;
@@ -310,7 +311,7 @@ uint32_t dendego_state::screen_update_dendego(screen_device &screen, bitmap_ind1
 		m_counters[0] = level;
 
 	btn = m_analog_ports[0]->read() & 0xff;
-	for (level = 10; level > 0; level--)
+	for (level = 9; level > 0; level--)            // convert analog brake inputs into 9 steps 
 		if (btn >= brake_table[level]) break;
 
 	if (level != m_counters[1])
