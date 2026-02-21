@@ -6,14 +6,11 @@
 
     Versions: TBBlue 1.2, Issue 0, Issue 1, Issue 2,
               Issue 2B (Kickstarter 1), Issue 2D, Issue 2E, Issue 2H,
-              Issue 4 (Kickstarter 2)
+              Issue 4 (Kickstarter 2), Issue 5 (Kickstarter 3)
     Current implementation is based on Issue 4. Only limited difference
     tracked through PORT_CONFIG
 
     TODO:
-    * identify ctc channel for INT purpose
-    * interrupt DMA on INT
-    * improve zxnDMA
     * contention
     * internal_port_enable() support
     * (1) invalidate tiles/sprites caches on region w, not every frame
@@ -135,7 +132,6 @@ public:
 		, m_layer2(*this, "layer2")
 		, m_lores(*this, "lores")
 		, m_sprites(*this, "sprites")
-		, m_io_issue(*this, "ISSUE")
 		, m_io_video(*this, "VIDEO")
 		, m_io_layers(*this, "LYRS")
 		, m_io_mouse(*this, "mouse_input%u", 1U)
@@ -144,6 +140,9 @@ public:
 	{}
 
 	void tbblue(machine_config &config);
+	void ks1(machine_config &config);
+	void ks2(machine_config &config);
+	void ks3(machine_config &config);
 
 	INPUT_CHANGED_MEMBER(on_mf_nmi);
 	INPUT_CHANGED_MEMBER(on_divmmc_nmi);
@@ -197,9 +196,6 @@ protected:
 	required_device<z80n_device> m_maincpu;
 
 private:
-	static const u8 MACHINE_TBBLUE = 0x08;
-	static const u8 MACHINE_NEXT = 0x0a;
-	static const u8 MACHINE_NEXT_AB = 0xfa; // Anti Brick (reset disabled, bootrom)
 	static const u8 G_VERSION = 0x32; // 3.02
 	static const u8 G_SUB_VERSION = 0x04;
 	static const u8 G_VIDEO_INC = 0b11;
@@ -214,8 +210,8 @@ private:
 	void line_irq_adjust();
 	void irq_w(int state);
 
-	u8 g_machine_id() { return m_io_issue->read() ? MACHINE_NEXT : MACHINE_TBBLUE; }
-	u8 g_board_issue() { return m_io_issue->read(); }
+	u8 g_machine_id() { return m_machine_id; }
+	u8 g_board_issue() { return m_board_issue; }
 	bool machine_type_48() const { return m_nr_03_machine_type == 0 || m_nr_03_machine_type == 1; }
 	bool machine_type_128() const { return m_nr_03_machine_type == 2 || m_nr_03_machine_type == 4; }
 	bool machine_type_p3() const { return !machine_type_48() && !machine_type_128(); }
@@ -367,19 +363,22 @@ private:
 	required_device<specnext_layer2_device> m_layer2;
 	required_device<specnext_lores_device> m_lores;
 	required_device<specnext_sprites_device> m_sprites;
-	required_ioport m_io_issue;
 	optional_ioport m_io_video;
 	optional_ioport m_io_layers;
 	required_ioport_array<4> m_io_mouse;
 	required_ioport m_io_joy_left;
 	required_ioport m_io_joy_right;
 
+	u8 m_machine_id;
+	u8 m_board_issue;
+	u16 m_ram_pages;
+
 	bitmap_rgb32 m_blendprio_bitmap;
 	video_timings_info m_video_timings;
 	rectangle m_clip256x192;
 	rectangle m_clip320x256;
 	int m_video_output_hdmi = -1;
-	int m_page_shadow[8];
+	int m_page_shadow[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
 	bool m_bootrom_en;
 	u8 m_port_ff_data;
 	bool m_port_1ffd_special_old;
@@ -626,7 +625,7 @@ void specnext_state::bank_update(u8 bank)
 
 	const bool is_rom = (bank >> 1) == 0;
 	if (m_bootrom_en && is_rom)
-		return views[bank].get().select(1);
+		return views[bank].get().select(2);
 
 	if (machine_type_48())
 	{
@@ -818,22 +817,24 @@ void specnext_state::bank_update(u8 bank)
 
 		if (cpu_rd_n)
 		{
-			m_page_shadow[bank] = sram_rdonly ? ~0 : sram_A21_A13;
+			m_page_shadow[bank] = sram_rdonly ? -1 : sram_A21_A13;
 		}
 		else
 		{
-			m_bank_ram[bank]->set_entry(sram_A21_A13);
-			if (sram_rdonly || (m_page_shadow[bank] != sram_A21_A13))
+			const bool ro = sram_rdonly || (m_page_shadow[bank] != sram_A21_A13);
+			if (sram_A21_A13 < m_ram_pages)
 			{
-				views[bank].get().select(0);
-				LOGMEM("ROM%d = %x\n", bank, sram_A21_A13);
+				m_bank_ram[bank]->set_entry(sram_A21_A13);
+				views[bank].get().select(ro);
+				LOGMEM("%s%d = %x\n", ro ? "ROM" : "RAM", bank, sram_A21_A13);
 			}
 			else
+				views[bank].get().disable();
+
+			if (!ro)
 			{
 				if (m_page_shadow[bank] == sram_A21_A13)
-					m_page_shadow[bank] = ~0;
-				views[bank].get().disable();
-				LOGMEM("RAM%d = %x\n", bank, sram_A21_A13);
+					m_page_shadow[bank] = -1;
 			}
 		}
 	}
@@ -1940,7 +1941,7 @@ void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 
 		break;
 	case 0x04:
-		m_nr_04_romram_bank = nr_wr_dat & (m_io_issue->read() < 3 ? 0x7f : 0xff);
+		m_nr_04_romram_bank = nr_wr_dat & (m_ram_pages > 0x100 ? 0xff : 0x7f); // >2Mb (KS3+)?
 		bank_update(0, 2);
 		break;
 	case 0x05:
@@ -2908,12 +2909,13 @@ void specnext_state::map_mem(address_map &map)
 
 	for (auto i = 0; i < 8; i++)
 	{
-		map(0x0000 + i * 0x2000, 0x1fff + i * 0x2000).bankrw(m_bank_ram[i]);
+		map(0x0000 + i * 0x2000, 0x1fff + i * 0x2000).noprw();
 		map(0x0000 + i * 0x2000, 0x1fff + i * 0x2000).view(views[i].get());
-		views[i].get()[0](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).nopw();
+		views[i].get()[0](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).bankrw(m_bank_ram[i]);
+		views[i].get()[1](0x0000 + i * 0x2000, 0x1fff + i * 0x2000).bankr(m_bank_ram[i]);
 	}
-	views[0].get()[1](0x0000, 0x1fff).bankr(m_bank_boot_rom);
-	views[1].get()[1](0x2000, 0x3fff).bankr(m_bank_boot_rom);
+	views[0].get()[2](0x0000, 0x1fff).bankr(m_bank_boot_rom);
+	views[1].get()[2](0x2000, 0x3fff).bankr(m_bank_boot_rom);
 }
 
 void specnext_state::map_io(address_map &map)
@@ -3131,6 +3133,9 @@ void specnext_state::map_regs(address_map &map)
 INPUT_PORTS_START(specnext)
 	PORT_INCLUDE(spec_plus)
 
+	PORT_MODIFY("CONFIG")
+	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
+
 	// PS/2 Keyboard Mapping
 	PORT_MODIFY("PLUS0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("EDIT") PORT_CODE(KEYCODE_TILDE) PORT_CHAR('`') PORT_CHAR('~')
@@ -3150,17 +3155,6 @@ INPUT_PORTS_START(specnext)
 	PORT_MODIFY("LINE7")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SYMBOL SHIFT") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 	
-	PORT_MODIFY("CONFIG")
-	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-
-	PORT_START("ISSUE")
-	PORT_CONFNAME(0x03, 0x02, "Hardware Version" )
-	PORT_CONFSETTING(0x00, "Issue 1 (TBBLUE)" )
-	PORT_CONFSETTING(0x01, "Issue 2 (KS 1)" )
-	PORT_CONFSETTING(0x02, "Issue 4 (KS 2)" )
-	PORT_CONFSETTING(0x03, "Issue 5 (KS 3)" )
-	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("VIDEO")
 	PORT_CONFNAME(0x01, 0x00, "Captured Video Resolution" )
@@ -3242,6 +3236,7 @@ void specnext_state::machine_start()
 
 	m_regs_map->space(AS_PROGRAM).specific(m_next_regs);
 
+	m_ram_pages = m_ram->size() / 0x2000;
 	for (auto i = 0; i < 8; i++)
 		m_bank_ram[i]->configure_entries(0, m_ram->size() / 0x2000, m_ram->pointer(), 0x2000);
 	m_bank_boot_rom->configure_entry(0, memregion("maincpu")->base());
@@ -3255,7 +3250,7 @@ void specnext_state::machine_start()
 	m_nr_02_hard_reset = 1;
 
 	// Save
-	save_pointer(NAME(m_page_shadow), 8);
+	save_item(NAME(m_page_shadow));
 	save_item(NAME(m_bootrom_en));
 	save_item(NAME(m_port_ff_data));
 	save_item(NAME(m_port_1ffd_special_old));
@@ -3273,7 +3268,7 @@ void specnext_state::machine_start()
 	save_item(NAME(m_sram_rom));
 	save_item(NAME(m_sram_rom3));
 	save_item(NAME(m_sram_alt_128_n));
-	save_pointer(NAME(m_mmu), 8);
+	save_item(NAME(m_mmu));
 	save_item(NAME(m_nr_02_bus_reset));
 	save_item(NAME(m_nr_02_generate_mf_nmi));
 	save_item(NAME(m_nr_02_generate_divmmc_nmi));
@@ -3893,7 +3888,7 @@ void specnext_state::video_start()
 	prg.install_write_tap(0x0000, 0xbfff, "shadow_w", [this](offs_t offset, u8 &data, u8 mem_mask)
 	{
 		u8 bank8 = offset >> 13;
-		if (~m_page_shadow[bank8])
+		if (m_page_shadow[bank8] >= 0 && m_ram_pages > m_page_shadow[bank8])
 		{
 			u8 *to = m_ram->pointer() + (m_page_shadow[bank8] << 13);
 			to[offset & 0x1fff] = data;
@@ -3914,7 +3909,6 @@ void specnext_state::tbblue(machine_config &config)
 	spectrum_128(config);
 	config.device_remove("exp");
 	config.device_remove("dma");
-	m_ram->set_default_size("4M").set_default_value(0);
 
 	Z80N(config.replace(), m_maincpu, 28_MHz_XTAL / 8);
 	m_maincpu->set_daisy_config(z80_daisy_chain);
@@ -4005,20 +3999,75 @@ void specnext_state::tbblue(machine_config &config)
 	SOFTWARE_LIST(config, "sd_list").set_original("specnext_sd");
 
 	config.device_remove("snapshot");
+
+	m_machine_id = 0x08;
+	m_board_issue = 0;
+	m_ram->set_default_size("2M").set_extra_options("1M,4M").set_default_value(0);
 }
+
+
+void specnext_state::ks1(machine_config &config)
+{
+	tbblue(config);
+
+	m_machine_id = 0x0a;
+	m_board_issue = 1;
+	m_ram->set_default_size("1M").set_extra_options("2M");
+}
+
+
+void specnext_state::ks2(machine_config &config)
+{
+	tbblue(config);
+
+	m_machine_id = 0x0a;
+	m_board_issue = 2;
+	m_ram->set_default_size("2M").set_extra_options(nullptr);
+}
+
+void specnext_state::ks3(machine_config &config)
+{
+	tbblue(config);
+
+	m_machine_id = 0x0a;
+	m_board_issue = 3;
+	m_ram->set_default_size("4M").set_extra_options(nullptr);
+}
+
 
 ROM_START(tbblue)
 	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
-	ROM_DEFAULT_BIOS("boot")
+	ROM_DEFAULT_BIOS("v30204")
 
-	ROM_SYSTEM_BIOS(0, "boot", "BootROM")
-	ROMX_LOAD( "bootrom.fa55357d.bin", 0x0000, 0x2000, CRC(ccbd55ba) SHA1(8b3c2a301f486904d1c74929b94845a7731bf230), ROM_BIOS(0))
-	ROM_SYSTEM_BIOS(1, "bootab", "BootROM - AntiBrick")
-	ROMX_LOAD( "bootrom-ab.cfffa702.bin", 0x0000, 0x2000, CRC(1d16e9d4) SHA1(6f9c8771e5a9ef5a6b52a31b2e65f0698f0f5cfa), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(0, "v30100", "v3.01.00")
+	ROMX_LOAD( "boot-30100.bin", 0x0000, 0x2000, CRC(ccbd55ba) SHA1(8b3c2a301f486904d1c74929b94845a7731bf230), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v30200ab", "v3.02.00 (AntiBrick)")
+	ROMX_LOAD( "boot-30200-ab.bin", 0x0000, 0x2000, CRC(1d16e9d4) SHA1(6f9c8771e5a9ef5a6b52a31b2e65f0698f0f5cfa), ROM_BIOS(1))
 
+	ROM_SYSTEM_BIOS(2, "v30204", "v3.02.04")
+	ROMX_LOAD( "boot-30204.bin", 0x0000, 0x2000, CRC(95118eb6) SHA1(acf5112e831be8c73952b8513fab33a427e88cf8), ROM_BIOS(2))
+	ROM_SYSTEM_BIOS(3, "v30204ab", "v3.02.04 (AntiBrick)")
+	ROMX_LOAD( "boot-30204-ab.bin", 0x0000, 0x2000, CRC(96c32007) SHA1(6c9fcbd282f7a18fb5a726386ac6fb9df209c36b), ROM_BIOS(3))
+
+ROM_END
+
+#define rom_specnext_ks1    rom_tbblue
+#define rom_specnext_ks2    rom_tbblue
+
+ROM_START(specnext_ks3)
+	ROM_REGION(0x4000, "maincpu", ROMREGION_ERASEFF)
+	ROM_DEFAULT_BIOS("v30204")
+
+	ROM_SYSTEM_BIOS(0, "v30204", "v3.02.04")
+	ROMX_LOAD( "boot-30204.bin", 0x0000, 0x2000, CRC(95118eb6) SHA1(acf5112e831be8c73952b8513fab33a427e88cf8), ROM_BIOS(0))
+	ROM_SYSTEM_BIOS(1, "v30204ab", "v3.02.04 (AntiBrick)")
+	ROMX_LOAD( "boot-30204-ab.bin", 0x0000, 0x2000, CRC(96c32007) SHA1(6c9fcbd282f7a18fb5a726386ac6fb9df209c36b), ROM_BIOS(1))
 ROM_END
 
 } // Anonymous namespace
 
-/*    YEAR   NAME     PARENT    COMPAT  MACHINE  INPUT      CLASS            INIT         COMPANY                                            FULLNAME                     FLAGS */
-COMP( 2017,  tbblue,  spec128,  0,      tbblue,  specnext,  specnext_state,  empty_init,  "SpecNext Ltd., Victor Trucco, Fabio Belavenuto",  "ZX Spectrum Next: TBBlue",  MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME          PARENT  COMPAT  MACHINE  INPUT     CLASS           INIT        COMPANY                                           FULLNAME                          FLAGS */
+COMP( 2017, tbblue,       0     , 0,      tbblue,  specnext, specnext_state, empty_init, "SpecNext Ltd., Victor Trucco, Fabio Belavenuto", "ZX Spectrum Next: Emulators ID", MACHINE_SUPPORTS_SAVE )
+COMP( 2020, specnext_ks1, tbblue, 0,      ks1,     specnext, specnext_state, empty_init, "SpecNext Ltd., Victor Trucco, Fabio Belavenuto", "ZX Spectrum Next: KS1",          MACHINE_SUPPORTS_SAVE )
+COMP( 2023, specnext_ks2, tbblue, 0,      ks2,     specnext, specnext_state, empty_init, "SpecNext Ltd., Victor Trucco, Fabio Belavenuto", "ZX Spectrum Next: KS2",          MACHINE_SUPPORTS_SAVE )
+COMP( 2025, specnext_ks3, tbblue, 0,      ks3,     specnext, specnext_state, empty_init, "SpecNext Ltd., Victor Trucco, Fabio Belavenuto", "ZX Spectrum Next: KS3",          MACHINE_SUPPORTS_SAVE )
