@@ -575,7 +575,7 @@ device_debug::device_debug(device_t &device)
 		}
 
 		// Use own table for CPU and the global for others
-		symbol_table *symtable = m_symtable != nullptr ? m_symtable.get() : &device.machine().debugger().cpu().global_symtable();
+		symbol_table *symtable = &this->symtable();
 
 		// add all registers into it
 		for (const auto &entry : m_state->state_entries())
@@ -621,6 +621,11 @@ device_debug::~device_debug()
 	watchpoint_clear_all();
 	registerpoint_clear_all();
 	exceptionpoint_clear_all();
+}
+
+symbol_table &device_debug::symtable()
+{
+	return m_symtable != nullptr ? *m_symtable : m_device.machine().debugger().cpu().global_symtable();
 }
 
 void device_debug::write_tracking(address_space &space, offs_t address, u64 data)
