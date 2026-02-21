@@ -850,6 +850,15 @@ MACHINE_START_MEMBER(pc9821_state,pc9821)
 	m_pit_delay = timer_alloc(FUNC(pc9821_state::pit_delay), this);
 	MACHINE_START_CALL_MEMBER(pc9801bx2);
 
+	save_item(NAME(m_pit_latch_cmd));
+	save_item(NAME(m_pc9821_window_bank));
+	save_item(NAME(m_ext2_ff));
+	save_item(NAME(m_pegc.pal_entry));
+	save_item(NAME(m_pegc.r));
+	save_item(NAME(m_pegc.g));
+	save_item(NAME(m_pegc.b));
+	save_item(NAME(m_pegc.bank));
+	save_item(NAME(m_pegc.packed_mode));
 	// ...
 }
 
@@ -857,6 +866,8 @@ MACHINE_START_MEMBER(pc9821_mate_a_state,pc9821ap2)
 {
 	MACHINE_START_CALL_MEMBER(pc9821);
 
+	save_item(NAME(m_ext_sdip));
+	save_item(NAME(m_ext_sdip_addr));
 	// ...
 }
 

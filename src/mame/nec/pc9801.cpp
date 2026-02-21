@@ -1658,6 +1658,34 @@ MACHINE_START_MEMBER(pc9801_state,pc9801_common)
 {
 	m_rtc->cs_w(1);
 	m_rtc->oe_w(1);
+
+	save_item(NAME(m_uart_irq_mask));
+	save_item(NAME(m_uart_irq_pending));
+
+	save_item(NAME(m_nmi_ff));
+
+	save_item(NAME(m_fdc_2hd_ctrl));
+
+	save_item(NAME(m_dma_offset));
+	save_item(NAME(m_dma_autoinc));
+	save_item(NAME(m_dack));
+
+	save_item(NAME(m_grcg.mode));
+	save_item(NAME(m_grcg.tile));
+	save_item(NAME(m_grcg.tile_index));
+
+	save_item(NAME(m_vram_bank));
+	save_item(NAME(m_vram_disp));
+
+	save_item(NAME(m_mouse.control));
+	save_item(NAME(m_mouse.lx));
+	save_item(NAME(m_mouse.ly));
+	save_item(NAME(m_mouse.dx));
+	save_item(NAME(m_mouse.dy));
+	save_item(NAME(m_mouse.prev_dx));
+	save_item(NAME(m_mouse.prev_dy));
+	save_item(NAME(m_mouse.freq_reg));
+	save_item(NAME(m_mouse.freq_index));
 }
 
 MACHINE_START_MEMBER(pc9801_state,pc9801f)
@@ -1677,9 +1705,18 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 
 	m_fdc_timer = timer_alloc(FUNC(pc9801vm_state::fdc_trigger), this);
 
+	save_item(NAME(m_gate_a20));
+	save_item(NAME(m_dma_access_ctrl));
+	save_item(NAME(m_ide_sel));
 	save_item(NAME(m_dac1bit_disable));
 
-	save_item(NAME(m_dma_access_ctrl));
+	save_item(NAME(m_fdc_3mode.dev_sel));
+	save_item(NAME(m_fdc_3mode.access_144mb));
+	
+	save_item(NAME(m_analog16.pal_entry));
+	save_item(NAME(m_analog16.r));
+	save_item(NAME(m_analog16.g));
+	save_item(NAME(m_analog16.b));
 
 	save_item(NAME(m_egc.regs));
 	save_item(NAME(m_egc.pat));
@@ -1688,13 +1725,8 @@ MACHINE_START_MEMBER(pc9801vm_state,pc9801rs)
 	save_item(NAME(m_egc.leftover));
 	save_item(NAME(m_egc.first));
 	save_item(NAME(m_egc.start));
+	save_item(NAME(m_egc.loaded));
 	save_item(NAME(m_egc.mask));
-
-	save_item(STRUCT_MEMBER(m_grcg, mode));
-	//  save_pointer(STRUCT_MEMBER(m_grcg, tile), 4);
-	save_item(STRUCT_MEMBER(m_grcg, tile_index));
-
-	save_item(NAME(m_vram_bank));
 }
 
 MACHINE_START_MEMBER(pc9801us_state,pc9801us)
@@ -1706,6 +1738,7 @@ MACHINE_START_MEMBER(pc9801bx_state,pc9801bx2)
 {
 	MACHINE_START_CALL_MEMBER(pc9801us);
 
+	save_item(NAME(m_hole_15m));
 	// ...
 }
 

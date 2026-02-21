@@ -21,10 +21,17 @@ void pc9801_state::video_start()
 	m_char_rom = memregion("chargen")->base();
 	m_kanji_rom = memregion("kanji")->base();
 
+	save_item(NAME(m_font_addr));
+	save_item(NAME(m_font_lr));
 	std::fill(std::begin(m_ex_video_ff), std::end(m_ex_video_ff), 0);
 	std::fill(std::begin(m_video_ff), std::end(m_video_ff), 0);
-	save_pointer(NAME(m_video_ff), 8);
-	save_pointer(NAME(m_ex_video_ff), 128);
+	save_item(NAME(m_video_ff));
+	save_item(NAME(m_ex_video_ff));
+	save_item(NAME(m_font_line));
+	save_pointer(NAME(m_tvram), sizeof(uint16_t)*0x2000);
+	save_item(NAME(m_gfx_ff));
+	save_item(NAME(m_txt_scroll_reg));
+	save_item(NAME(m_pal_clut));
 }
 
 uint32_t pc9801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
