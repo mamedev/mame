@@ -474,7 +474,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 
 	/* look up the character data */
 	unsigned bits = m_char_ptr[code * 8 + row];
-	bits = (Model == model::IVEL_ULTRA && Invert && !Flip) ? (bits >> 1) : (bits & 0x7f);
+	bits = ((Model == model::IVEL_ULTRA && Invert && !Flip) || Model == model::DODO) ? (bits >> 1) : (bits & 0x7f);
 	bits ^= invert_mask;
 	return Flip ? reverse_7_bits[bits] : bits;
 }
@@ -1063,6 +1063,8 @@ template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, t
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::DODO, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::DODO, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 static INPUT_PORTS_START( a2_vidconfig_composite );
 	PORT_START("a2_video_config")
