@@ -474,7 +474,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 
 	/* look up the character data */
 	unsigned bits = m_char_ptr[code * 8 + row];
-	bits = (Invert && !Flip) ? (bits >> 1) : (bits & 0x7f);
+	bits = (Model == model::IVEL_ULTRA && Invert && !Flip) ? (bits >> 1) : (bits & 0x7f);
 	bits ^= invert_mask;
 	return Flip ? reverse_7_bits[bits] : bits;
 }
