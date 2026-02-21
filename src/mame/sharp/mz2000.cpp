@@ -116,10 +116,10 @@ protected:
 	bitmap_ind16 m_text_bitmap;
 	bitmap_ind16 m_graphic_bitmap;
 
+	required_device<cassette_image_device> m_cassette;
+
 private:
 	static void floppy_formats(format_registration &fr);
-
-	required_device<cassette_image_device> m_cassette;
 	required_device<mb8877_device> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
@@ -863,7 +863,11 @@ u8 mz80b_state::ppi_portb_r()
 
 	if (m_cassette->get_image() != nullptr)
 	{
-		res |= (m_cassette->input() > 0.0038) ? 0x40 : 0x00;
+		// Bit 6: Tape data - gate with motor state. When motor stops, real hardware
+		// fades to 0V (Low); MAME freezes the waveform, so force Low to allow
+		// the loader's "wait for silence" loop (e.g. at $04BD) to succeed.
+		bool motor_active = (m_cassette->get_state() & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED;
+		res |= (motor_active && m_cassette->input() > 0.0038) ? 0x40 : 0x00;
 		res |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY) ? 0x10 : 0x30;
 		res |= (m_cassette->get_position() >= m_cassette->get_length()) ? 0x08 : 0x00;
 	}
@@ -1397,7 +1401,7 @@ void mz80b_state::mz80b(machine_config &config)
 
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_formats(mz700_cassette_formats);
+	m_cassette->set_formats(mz80b_cassette_formats);  // MZ-80B uses 1800 baud (vs MZ-700's 1200)
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("mz_cass");
@@ -1426,6 +1430,7 @@ void mz80b_state::mz80b(machine_config &config)
 void mz2000_state::mz2000(machine_config &config)
 {
 	mz80b(config);
+	// MZ-2000 also uses 1800 baud (same as MZ-80B), so mz80b_cassette_formats is correct
 	m_maincpu->set_addrmap(AS_PROGRAM, &mz2000_state::mz2000_map);
 	m_maincpu->set_addrmap(AS_IO, &mz2000_state::mz2000_io);
 
