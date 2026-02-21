@@ -90,7 +90,7 @@ authors:hap
 <!-- lamps -->
 
 	<element name="lamp_white" defstate="0">
-		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="1"><color red="1.0" green="0.8" blue="0.5" /></rect>
 		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
 	</element>
 
