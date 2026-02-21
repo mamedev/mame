@@ -14,34 +14,34 @@
 #define LOG(N,M,A)  \
 	if(VERBOSE>=N){ if( M )printf("%-24s",(const char*)M ); printf A; }
 
-#define LO  -32768
-#define HI  +32767
+static constexpr int LO = -32768;
+static constexpr int HI = +32767;
 
-#define SHORT_PULSE 2
-#define LONG_PULSE  4
+static constexpr int SHORT_PULSE = 2;
+static constexpr int LONG_PULSE  = 4;
 
 /* MZ-80B @ 48 kHz: 16 samples = 333µs, 32 samples = 666µs (8x MZ-700 resolution) */
-#define SHORT_PULSE_MZ80B 16
-#define LONG_PULSE_MZ80B  32
+static constexpr int SHORT_PULSE_MZ80B = 16;
+static constexpr int LONG_PULSE_MZ80B  = 32;
 
-#define BYTE_SAMPLES (LONG_PULSE+8*LONG_PULSE)
-#define BYTE_SAMPLES_MZ80B (LONG_PULSE_MZ80B+8*LONG_PULSE_MZ80B)
+static constexpr int BYTE_SAMPLES = (LONG_PULSE+8*LONG_PULSE);
+static constexpr int BYTE_SAMPLES_MZ80B = (LONG_PULSE_MZ80B+8*LONG_PULSE_MZ80B);
 
-#define SILENCE     8000
+static constexpr int SILENCE = 8000;
 
 /* long gap and tape mark */
-#define LGAP        22000
-#define LGAP_MZ80B  10000   /* MZ-80B uses 10,000 pulses (vs 22,000 for MZ-700) */
-#define LTM_1       40
-#define LTM_0       40
-#define LTM_L       1
+static constexpr int LGAP = 22000;
+static constexpr int LGAP_MZ80B = 10000;   /* MZ-80B uses 10,000 pulses (vs 22,000 for MZ-700) */
+static constexpr int LTM_1 = 40;
+static constexpr int LTM_0 = 40;
+static constexpr int LTM_L = 1;
 
 /* short gap and tape mark */
-#define SGAP        11000
-#define SGAP_MZ80B  5000    /* MZ-80B uses 5,000 pulses (proportional to LGAP) */
-#define STM_1       20
-#define STM_0       20
-#define STM_L       1
+static constexpr int SGAP = 11000;
+static constexpr int SGAP_MZ80B = 5000;    /* MZ-80B uses 5,000 pulses (proportional to LGAP) */
+static constexpr int STM_1 = 20;
+static constexpr int STM_0 = 20;
+static constexpr int STM_L = 1;
 
 static int fill_wave_1(int16_t *buffer, int offs)
 {
