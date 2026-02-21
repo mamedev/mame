@@ -118,6 +118,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("vision964",      VISION964_PCI);
 
 	// 0x01 - mass storage controllers
+	device.option_add("aha2940",        AHA2940);
 	device.option_add("aha2940au",      AHA2940AU);
 	device.option_add("ncr53c825",      NCR53C825_PCI);
 	device.option_add("pdc20262",       PDC20262);

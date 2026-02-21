@@ -125,7 +125,8 @@ void isa16_medalist_rom_disk::device_add_mconfig(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	IDT7202(config, m_fifo);
-#if 0 // TODO: one byte off (speaker pops), may disconnect timer on FIFO empty?
+#if 0
+	// TODO: one byte off (speaker pops), may disconnect timer on FIFO empty?
 	m_fifo->ef_handler().set([this] (int state) {
 		printf("%d\n", state);
 		if (state)
