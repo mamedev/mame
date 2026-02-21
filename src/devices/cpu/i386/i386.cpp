@@ -2686,7 +2686,7 @@ void i386_device::leave_smm()
 	m_cr[3] = READ32(smram_state + SMRAM_CR3);
 	m_cr[0] = READ32(smram_state + SMRAM_CR0);
 
-	m_CPL = (m_sreg[SS].flags >> 12) & 3; // cpl == dpl of ss
+	m_CPL = (m_sreg[SS].flags >> 5) & 3; // cpl == dpl of ss
 
 	for (int i = 0; i <= GS; i++)
 	{
