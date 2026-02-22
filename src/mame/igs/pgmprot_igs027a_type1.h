@@ -1,14 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, ElSemi, Xing Xing
+#ifndef MAME_IGS_PGMPROT_IGS027A_TYPE1_H
+#define MAME_IGS_PGMPROT_IGS027A_TYPE1_H
+
+#pragma once
+
 #include "pgm.h"
+#include "cpu/arm7/arm7.h"
 
 class pgm_arm_type1_state : public pgm_state
 {
 public:
 	pgm_arm_type1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag)
-		, m_arm7_shareram(*this, "arm7_shareram")
 		, m_prot(*this, "prot")
+		, m_arm7_shareram(*this, "arm7_shareram")
 	{
 		m_curslots = 0;
 		m_puzzli_54_trigger = 0;
@@ -37,6 +43,13 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	optional_device<cpu_device> m_prot;
+
+	void pgm_decode_kovlsqh2_tiles();
+	void pgm_decode_kovlsqh2_sprites(u8 *src);
+	void pgm_decode_kovlsqh2_samples();
 
 private:
 	/////////////// simulations
@@ -69,8 +82,6 @@ private:
 	u32 m_arm_type1_counter = 0;
 	optional_shared_ptr<u32> m_arm7_shareram;
 
-	optional_device<cpu_device> m_prot;
-
 	u32 arm7_type1_protlatch_r();
 	void arm7_type1_protlatch_w(offs_t offset, u32 data, u32 mem_mask);
 	u16 arm7_type1_68k_protlatch_r(offs_t offset);
@@ -84,9 +95,6 @@ private:
 	void arm7_type1_latch_init();
 	u16 kovsh_fake_region_r();
 	void kovshp_asic27a_write_word(offs_t offset, u16 data);
-	void pgm_decode_kovlsqh2_tiles();
-	void pgm_decode_kovlsqh2_sprites(u8 *src );
-	void pgm_decode_kovlsqh2_samples();
 	void pgm_decode_kovqhsgs_program();
 	void pgm_decode_kovqhsgs2_program();
 	u16 arm7_type1_sim_r(offs_t offset);
@@ -133,7 +141,6 @@ private:
 	// the maximum level size returned or read by the device appears to be this size
 	u16 level_structure[8][10]{};
 
-
 	int puzzli2_take_leveldata_value(u8 datvalue);
 	void _55857E_arm7_map(address_map &map) ATTR_COLD;
 	void cavepgm_mem(address_map &map) ATTR_COLD;
@@ -153,3 +160,5 @@ INPUT_PORTS_EXTERN( puzzli2 );
 INPUT_PORTS_EXTERN( kovsh );
 INPUT_PORTS_EXTERN( ddp3 );
 INPUT_PORTS_EXTERN( espgal );
+
+#endif // MAME_IGS_PGMPROT_IGS027A_TYPE1_H
