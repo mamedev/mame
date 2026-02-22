@@ -562,9 +562,13 @@ if (_ACTION == nil) then return false end
 configuration { "Debug" }
 	defines {
 		"MAME_DEBUG",
-		"MAME_PROFILER",
 --      "BGFX_CONFIG_DEBUG=1",
 	}
+if _OPTIONS["PROFILER"]~="0" then
+	defines {
+		"MAME_PROFILER",
+	}
+end
 
 configuration { }
 
