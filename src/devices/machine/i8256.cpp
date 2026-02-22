@@ -304,10 +304,13 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 			// cascaded low timer
 			int high_index = (i == 1) ? 3 : 4;
 			int int_level = (i == 1) ? I8256_INT_TIMER4 : I8256_INT_TIMER5;
-			if (m_timers[i] > 0) {
+			if (m_timers[i] > 0)
+			{
 				m_timers[i]--;
-				if (m_timers[i] == 0) {
-					if (m_timers[high_index] > 0) {
+				if (m_timers[i] == 0)
+				{
+					if (m_timers[high_index] > 0)
+					{
 						m_timers[high_index]--;
 						m_timers[i] = 255;
 					}

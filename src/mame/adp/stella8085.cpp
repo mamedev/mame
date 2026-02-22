@@ -349,7 +349,7 @@ void stella8085_state::output_digit(uint8_t digit, uint8_t data)
 	0
 	};
 
-	if (i<8)
+	if (i < 8)
 		m_digits[i] = cd4543[data & 0x0F];
 	else
 		m_digits[i] = ttl7448[data & 0x0F];
