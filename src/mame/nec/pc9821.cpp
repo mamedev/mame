@@ -558,103 +558,98 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 			m_pegc.bank[offset] = data & 0xf;
 		})
 	);
-	map(0x100, 0x19f).rw(FUNC(pc9821_state::pegc_mmio_r), FUNC(pc9821_state::pegc_mmio_w));
-//  map(0x120, 0x19f) pattern register (image_xfer? relates to bit 15 of $108)
-}
-
-uint16_t pc9821_state::pegc_mmio_r(offs_t offset, uint16_t mem_mask)
-{
-	u32 addr = 0x100 + (offset * 2);
-
-	if (addr >= 0x120 && addr <= 0x19f)
-	{
-		u32 pos = addr - 0x120;
-		u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
-		u16 ret = 0;
-
-		if (rop & 0x8000)
-		{
-			// 1 palette x 32 pixels
-			int pix_idx = pos / 4;
-			if ((pos % 4) == 0) ret |= m_pegc.pattern[pix_idx];
-		}
-		else
-		{
-			// 32 pixels x 8 planes
-			int plane = pos / 4;
-			int byte_offset = pos % 4;
-			u8 val0 = 0, val1 = 0;
-			for (int i = 0; i < 8; i++) {
-				if (BIT(m_pegc.pattern[byte_offset * 8 + i], plane)) val0 |= (1 << i);
-				if (BIT(m_pegc.pattern[(byte_offset + 1) * 8 + i], plane)) val1 |= (1 << i);
+	map(0x100, 0x100).lw8(
+		NAME([this] (u8 data) {
+			m_pegc.packed_mode = !bool(BIT(data, 0));
+			logerror("$e0100 packed mode %02x\n", data);
+		})
+	);
+	map(0x102, 0x102).lw8(
+		NAME([this] (u8 data) {
+			logerror("$e0102 upper VRAM %s (%02x)\n", BIT(data, 0) ? "enable" : "disable", data);
+			if (BIT(data, 0))
+			{
+				m_pegc_vram_view.select(0);
 			}
-			ret = val0 | (val1 << 8);
-		}
-		return ret;
-	}
+			else
+				m_pegc_vram_view.disable();
+		})
+	);
+	map(0x104, 0x11f).lrw16(
+		NAME([this] (offs_t offset) {
+			u32 r_idx = 4 + (offset * 2);
+			return m_pegc.regs[r_idx] | (m_pegc.regs[r_idx + 1] << 8);
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			u32 r_idx = 4 + (offset * 2);
+			if (ACCESSING_BITS_0_7) m_pegc.regs[r_idx] = data & 0xff;
+			if (ACCESSING_BITS_8_15) m_pegc.regs[r_idx + 1] = (data >> 8) & 0xff;
+		})
+	);
+	map(0x120, 0x19f).lrw16(
+		NAME([this] (offs_t offset) {
+			u32 pos = offset * 2;
+			u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
+			u16 ret = 0;
 
-	return m_pegc.regs[addr - 0x100] | (m_pegc.regs[addr - 0x100 + 1] << 8);
-}
+			if (rop & 0x8000)
+			{
+				// 1 palette x 32 pixels
+				int pix_idx = pos / 4;
+				if ((pos % 4) == 0) ret |= m_pegc.pattern[pix_idx];
+			}
+			else
+			{
+				// 32 pixels x 8 planes
+				int plane = pos / 4;
+				int byte_offset = pos % 4;
+				u8 val0 = 0;
+				u8 val1 = 0;
+				for (int i = 0; i < 8; i++) {
+					if (BIT(m_pegc.pattern[byte_offset * 8 + i], plane)) val0 |= (1 << i);
+					if (BIT(m_pegc.pattern[(byte_offset + 1) * 8 + i], plane)) val1 |= (1 << i);
+				}
+				ret = val0 | (val1 << 8);
+			}
+			return ret;
+		}),
+		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
+			u32 pos = offset * 2;
+			u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
 
-void pc9821_state::pegc_mmio_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	u32 addr = 0x100 + (offset * 2);
-
-	if (addr == 0x100 && ACCESSING_BITS_0_7)
-	{
-		// Bit 0 = 0 (Packed), 1 (Planar)
-		m_pegc.packed_mode = !bool(BIT(data, 0));
-		logerror("$e0100 %s mode\n", m_pegc.packed_mode ? "packed" : "planar");
-	}
-	
-	if (addr == 0x102 && ACCESSING_BITS_0_7)
-	{
-		logerror("$e0102 upper VRAM %s (%02x)\n", BIT(data, 0) ? "enable" : "disable", data & 0xff);
-		if (BIT(data, 0))
-			m_pegc_vram_view.select(0);
-		else
-			m_pegc_vram_view.disable();
-	}
-
-	if (addr >= 0x120 && addr <= 0x19f)
-	{
-		u32 pos = addr - 0x120;
-		u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
-
-		if (rop & 0x8000)
-		{
-			// 1 palette x 32 pixels
-			int pix_idx = pos / 4; 
-			if (ACCESSING_BITS_0_7 && (pos % 4) == 0) m_pegc.pattern[pix_idx] = data & 0xff;
-		}
-		else
-		{
-			// 32 pixels x 8 planes
-			int plane = pos / 4;
-			int byte_offset = pos % 4;
+			if (rop & 0x8000)
+			{
+				// 1 palette x 32 pixels
+				int pix_idx = pos / 4; 
+				if (ACCESSING_BITS_0_7 && (pos % 4) == 0) m_pegc.pattern[pix_idx] = data & 0xff;
+			}
+			else
+			{
+				// 32 pixels x 8 planes
+				int plane = pos / 4;
+				int byte_offset = pos % 4;
 			
-			if (ACCESSING_BITS_0_7)
-			{
-				u8 val = data & 0xff;
-				for (int i = 0; i < 8; i++) {
-					if (BIT(val, i)) m_pegc.pattern[byte_offset * 8 + i] |= (1 << plane);
-					else             m_pegc.pattern[byte_offset * 8 + i] &= ~(1 << plane);
+				if (ACCESSING_BITS_0_7)
+				{
+					u8 val = data & 0xff;
+					for (int i = 0; i < 8; i++) {
+						if (BIT(val, i)) m_pegc.pattern[byte_offset * 8 + i] |= (1 << plane);
+						else             m_pegc.pattern[byte_offset * 8 + i] &= ~(1 << plane);
+					}
+				}
+				if (ACCESSING_BITS_8_15)
+				{
+					u8 val = (data >> 8) & 0xff;
+					for (int i = 0; i < 8; i++) {
+						if (BIT(val, i)) m_pegc.pattern[(byte_offset + 1) * 8 + i] |= (1 << plane);
+						else             m_pegc.pattern[(byte_offset + 1) * 8 + i] &= ~(1 << plane);
+					}
 				}
 			}
-			if (ACCESSING_BITS_8_15)
-			{
-				u8 val = (data >> 8) & 0xff;
-				for (int i = 0; i < 8; i++) {
-					if (BIT(val, i)) m_pegc.pattern[(byte_offset + 1) * 8 + i] |= (1 << plane);
-					else             m_pegc.pattern[(byte_offset + 1) * 8 + i] &= ~(1 << plane);
-				}
-			}
-		}
-		return;
-	}
-
-	if (ACCESSING_BITS_0_7) m_pegc.regs[addr - 0x100] = data & 0xff;
-	if (ACCESSING_BITS_8_15) m_pegc.regs[addr - 0x100 + 1] = (data >> 8) & 0xff;
+			return;
+		})
+	);
+//  map(0x120, 0x19f) pattern register (image_xfer? relates to bit 15 of $108)
 }
 
 // make sure the latch read doesn't occur mid cycle, 8253 needs this?

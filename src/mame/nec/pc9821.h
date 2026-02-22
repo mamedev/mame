@@ -79,9 +79,6 @@ private:
 
 	void pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void pegc_mmio_map(address_map &map);
-	
-	uint16_t pegc_mmio_r(offs_t offset, uint16_t mem_mask = ~0);
-	void pegc_mmio_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 //  UPD7220_DISPLAY_PIXELS_MEMBER( pegc_display_pixels );
 };
 
