@@ -952,7 +952,7 @@ void apple2_state::dodo(machine_config &config)
 void apple2_state::albert(machine_config &config)
 {
 	apple2p(config);
-	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::DODO, false, true>)));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update<a2_video_device::model::II, false, true>)));
 }
 
 void apple2_state::ivelultr(machine_config &config)

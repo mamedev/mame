@@ -1064,7 +1064,6 @@ template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PL
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::DODO, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-template uint32_t a2_video_device::screen_update<a2_video_device::model::DODO, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 static INPUT_PORTS_START( a2_vidconfig_composite );
 	PORT_START("a2_video_config")
