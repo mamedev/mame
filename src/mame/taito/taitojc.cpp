@@ -14,19 +14,31 @@ Taito custom chips on this hardware:
 - TC0870HVP      : Vertex processor?
 
 TODO:
-- Games are running at wrong speed(unthrottled?) compared to pcb recordings, easily noticeable on sidebs/sidebs2,
-  for example the selection screens are too fast, and the driving is almost twice as slow. Even slower after
-  the m68k fpu/softfloat update since MAME 0.267.
+- Games are running at wrong speed(unthrottled?) compared to pcb recordings,
+  easily noticeable on sidebs/sidebs2. For example the selection screens are
+  too fast, and the driving is almost twice as slow. Even slower after the
+  m68k fpu/softfloat update since MAME 0.267.
 - dendego intro object RAM usage has various gfx bugs (check video file)
 - dendego title screen builds up and it shouldn't
-- dendego attract mode train doesn't ride, demo mode doesn't set the throttle, but it does set the brake pressure
-- landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
+- dendego attract mode train doesn't ride, demo mode doesn't set the throttle,
+  but it does set the brake pressure
+- landgear has some weird crashes (after playing one round, after a couple of
+  loops in attract mode) (needs testing -AS)
 - landgear has huge 3d problems on gameplay (CPU comms?)
-- dangcurv DSP program crashes very soon, so no 3d is currently shown. - due to undumped rom? maybe not?
+- dangcurv DSP program crashes very soon, so no 3d is currently shown. Is it
+  due to undumped rom? maybe not?
+- verify screen raw params, current params match vsync measurement, I suspect
+  hsync measurement (see PCB notes) was inaccurate
 - add idle skips if possible
 
 BTANB:
-- incorrect perspective textures, visible when close to the camera such as sidebs rear-view mirror
+- incorrect perspective textures, visible when close to the camera such as
+  sidebs rear-view mirror
+
+The train games were only released in Japan. Change the internal artwork view
+to Japanese to see the original text labels. If the Japanese text is not visible
+(either fontprovider or OS doesn't support character substitution), manually set
+the -artfont option to a CJK font.
 
 --------------------------------------------------------------------------
 
@@ -399,65 +411,7 @@ Notes:
 #include "dendego.lh"
 
 
-// lookup tables for densha de go analog controls/meters
-static const int odometer_table[0x100] =
-{
-	0,    3,    7,    10,   14,   17,   21,   24,   28,   31,   34,   38,   41,   45,   48,   52,
-	55,   59,   62,   66,   69,   72,   76,   79,   83,   86,   90,   93,   97,   100,  105,  111,
-	116,  121,  126,  132,  137,  142,  147,  153,  158,  163,  168,  174,  179,  184,  189,  195,
-	200,  206,  211,  217,  222,  228,  233,  239,  244,  250,  256,  261,  267,  272,  278,  283,
-	289,  294,  300,  306,  311,  317,  322,  328,  333,  339,  344,  350,  356,  361,  367,  372,
-	378,  383,  389,  394,  400,  406,  412,  418,  424,  429,  435,  441,  447,  453,  459,  465,
-	471,  476,  482,  488,  494,  500,  505,  511,  516,  521,  526,  532,  537,  542,  547,  553,
-	558,  563,  568,  574,  579,  584,  589,  595,  600,  607,  613,  620,  627,  633,  640,  647,
-	653,  660,  667,  673,  680,  687,  693,  700,  705,  711,  716,  721,  726,  732,  737,  742,
-	747,  753,  758,  763,  768,  774,  779,  784,  789,  795,  800,  806,  812,  818,  824,  829,
-	835,  841,  847,  853,  859,  865,  871,  876,  882,  888,  894,  900,  906,  911,  917,  922,
-	928,  933,  939,  944,  950,  956,  961,  967,  972,  978,  983,  989,  994,  1000, 1005, 1011,
-	1016, 1021, 1026, 1032, 1037, 1042, 1047, 1053, 1058, 1063, 1068, 1074, 1079, 1084, 1089, 1095,
-	1100, 1107, 1113, 1120, 1127, 1133, 1140, 1147, 1153, 1160, 1167, 1173, 1180, 1187, 1193, 1200,
-	1203, 1206, 1209, 1212, 1216, 1219, 1222, 1225, 1228, 1231, 1234, 1238, 1241, 1244, 1247, 1250,
-	1253, 1256, 1259, 1262, 1266, 1269, 1272, 1275, 1278, 1281, 1284, 1288, 1291, 1294, 1297, 1300,
-};
-
-static const int pressure_table[0x100] =
-{
-	0,    0,    0,    0,    5,    10,   14,   19,   24,   29,   33,   38,   43,   48,   52,   57,
-	62,   67,   71,   76,   81,   86,   90,   95,   100,  106,  112,  119,  125,  131,  138,  144,
-	150,  156,  162,  169,  175,  181,  188,  194,  200,  206,  212,  219,  225,  231,  238,  244,
-	250,  256,  262,  269,  275,  281,  288,  294,  300,  306,  312,  318,  324,  329,  335,  341,
-	347,  353,  359,  365,  371,  376,  382,  388,  394,  400,  407,  413,  420,  427,  433,  440,
-	447,  453,  460,  467,  473,  480,  487,  493,  500,  507,  514,  521,  529,  536,  543,  550,
-	557,  564,  571,  579,  586,  593,  600,  607,  614,  621,  629,  636,  643,  650,  657,  664,
-	671,  679,  686,  693,  700,  706,  712,  719,  725,  731,  738,  744,  750,  756,  762,  769,
-	775,  781,  788,  794,  800,  807,  814,  821,  829,  836,  843,  850,  857,  864,  871,  879,
-	886,  893,  900,  907,  914,  921,  929,  936,  943,  950,  957,  964,  971,  979,  986,  993,
-	1000, 1008, 1015, 1023, 1031, 1038, 1046, 1054, 1062, 1069, 1077, 1085, 1092, 1100, 1108, 1115,
-	1123, 1131, 1138, 1146, 1154, 1162, 1169, 1177, 1185, 1192, 1200, 1207, 1214, 1221, 1229, 1236,
-	1243, 1250, 1257, 1264, 1271, 1279, 1286, 1293, 1300, 1307, 1314, 1321, 1329, 1336, 1343, 1350,
-	1357, 1364, 1371, 1379, 1386, 1393, 1400, 1407, 1414, 1421, 1429, 1436, 1443, 1450, 1457, 1464,
-	1471, 1479, 1486, 1493, 1500, 1504, 1507, 1511, 1515, 1519, 1522, 1526, 1530, 1533, 1537, 1541,
-	1544, 1548, 1552, 1556, 1559, 1563, 1567, 1570, 1574, 1578, 1581, 1585, 1589, 1593, 1596, 1600,
-};
-
-
-// hmm, what is the pixel clock? let's assume it's same as the 68040
-// 54MHz(/4) or 16MHz would make HTOTAL unrealistically short
-static constexpr XTAL PIXEL_CLOCK = XTAL(10'000'000)*2;
-
-// VSync - 55.6795Hz
-// HSync - 24.639kHz / 24.690kHz (may be inaccurate)
-// TODO: why different HSyncs? 24 kHz assumes medium res monitor, so it can't be interlacing.
-static constexpr unsigned HTOTAL  = 812;
-static constexpr unsigned HBEND   = 0;
-static constexpr unsigned HBSTART = 512;
-
-static constexpr unsigned VTOTAL  = 443;
-static constexpr unsigned VBEND   = 0;
-static constexpr unsigned VBSTART = 400;
-
-
-#define DSP_IDLESKIP        1 /* dsp idle skipping speedup hack */
+#define DSP_IDLESKIP 1 /* dsp idle skipping speedup hack */
 
 
 void taitojc_state::coin_control_w(uint8_t data)
@@ -664,23 +618,92 @@ The OKI is used for seat vibration effects.
 
 */
 
+// Mascon must always be in a defined state, Densha de Go 2 in particular returns black screen if the Mascon input is undefined
+static const ioport_value dendego_mascon_table[6] = { 0x76, 0x67, 0x75, 0x57, 0x73, 0x37 };
+
+INPUT_CHANGED_MEMBER(dendego_state::throttle_changed)
+{
+	int level;
+	for (level = 5; level > 0; level--)
+		if (newval == dendego_mascon_table[level]) break;
+
+	m_counters[0] = level;
+}
+
+INPUT_CHANGED_MEMBER(dendego_state::brake_changed)
+{
+	static const uint8_t brake_table[11] = { 0x00, 0x08, 0x1d, 0x35, 0x4d, 0x65, 0x7d, 0x95, 0xad, 0xc5, 0xce };
+
+	int level;
+	for (level = 10; level > 0; level--)
+		if (newval >= brake_table[level]) break;
+
+	m_counters[1] = level;
+}
+
+INPUT_CHANGED_MEMBER(dendego_state::brake_changed2)
+{
+	// small difference to brake levels 1 and 10
+	static const uint8_t brake_table[11] = { 0x00, 0x05, 0x1d, 0x35, 0x4d, 0x65, 0x7d, 0x95, 0xad, 0xc5, 0xd4 };
+
+	int level;
+	for (level = 10; level > 0; level--)
+		if (newval >= brake_table[level]) break;
+
+	m_counters[1] = level;
+}
+
+// lookup tables for densha de go analog controls/meters
+static const int odometer_table[0x100] =
+{
+	0,    3,    7,    10,   14,   17,   21,   24,   28,   31,   34,   38,   41,   45,   48,   52,
+	55,   59,   62,   66,   69,   72,   76,   79,   83,   86,   90,   93,   97,   100,  105,  111,
+	116,  121,  126,  132,  137,  142,  147,  153,  158,  163,  168,  174,  179,  184,  189,  195,
+	200,  206,  211,  217,  222,  228,  233,  239,  244,  250,  256,  261,  267,  272,  278,  283,
+	289,  294,  300,  306,  311,  317,  322,  328,  333,  339,  344,  350,  356,  361,  367,  372,
+	378,  383,  389,  394,  400,  406,  412,  418,  424,  429,  435,  441,  447,  453,  459,  465,
+	471,  476,  482,  488,  494,  500,  505,  511,  516,  521,  526,  532,  537,  542,  547,  553,
+	558,  563,  568,  574,  579,  584,  589,  595,  600,  607,  613,  620,  627,  633,  640,  647,
+	653,  660,  667,  673,  680,  687,  693,  700,  705,  711,  716,  721,  726,  732,  737,  742,
+	747,  753,  758,  763,  768,  774,  779,  784,  789,  795,  800,  806,  812,  818,  824,  829,
+	835,  841,  847,  853,  859,  865,  871,  876,  882,  888,  894,  900,  906,  911,  917,  922,
+	928,  933,  939,  944,  950,  956,  961,  967,  972,  978,  983,  989,  994,  1000, 1005, 1011,
+	1016, 1021, 1026, 1032, 1037, 1042, 1047, 1053, 1058, 1063, 1068, 1074, 1079, 1084, 1089, 1095,
+	1100, 1107, 1113, 1120, 1127, 1133, 1140, 1147, 1153, 1160, 1167, 1173, 1180, 1187, 1193, 1200,
+	1203, 1206, 1209, 1212, 1216, 1219, 1222, 1225, 1228, 1231, 1234, 1238, 1241, 1244, 1247, 1250,
+	1253, 1256, 1259, 1262, 1266, 1269, 1272, 1275, 1278, 1281, 1284, 1288, 1291, 1294, 1297, 1300,
+};
+
+static const int pressure_table[0x100] =
+{
+	0,    0,    0,    0,    5,    10,   14,   19,   24,   29,   33,   38,   43,   48,   52,   57,
+	62,   67,   71,   76,   81,   86,   90,   95,   100,  106,  112,  119,  125,  131,  138,  144,
+	150,  156,  162,  169,  175,  181,  188,  194,  200,  206,  212,  219,  225,  231,  238,  244,
+	250,  256,  262,  269,  275,  281,  288,  294,  300,  306,  312,  318,  324,  329,  335,  341,
+	347,  353,  359,  365,  371,  376,  382,  388,  394,  400,  407,  413,  420,  427,  433,  440,
+	447,  453,  460,  467,  473,  480,  487,  493,  500,  507,  514,  521,  529,  536,  543,  550,
+	557,  564,  571,  579,  586,  593,  600,  607,  614,  621,  629,  636,  643,  650,  657,  664,
+	671,  679,  686,  693,  700,  706,  712,  719,  725,  731,  738,  744,  750,  756,  762,  769,
+	775,  781,  788,  794,  800,  807,  814,  821,  829,  836,  843,  850,  857,  864,  871,  879,
+	886,  893,  900,  907,  914,  921,  929,  936,  943,  950,  957,  964,  971,  979,  986,  993,
+	1000, 1008, 1015, 1023, 1031, 1038, 1046, 1054, 1062, 1069, 1077, 1085, 1092, 1100, 1108, 1115,
+	1123, 1131, 1138, 1146, 1154, 1162, 1169, 1177, 1185, 1192, 1200, 1207, 1214, 1221, 1229, 1236,
+	1243, 1250, 1257, 1264, 1271, 1279, 1286, 1293, 1300, 1307, 1314, 1321, 1329, 1336, 1343, 1350,
+	1357, 1364, 1371, 1379, 1386, 1393, 1400, 1407, 1414, 1421, 1429, 1436, 1443, 1450, 1457, 1464,
+	1471, 1479, 1486, 1493, 1500, 1504, 1507, 1511, 1515, 1519, 1522, 1526, 1530, 1533, 1537, 1541,
+	1544, 1548, 1552, 1556, 1559, 1563, 1567, 1570, 1574, 1578, 1581, 1585, 1589, 1593, 1596, 1600,
+};
+
 void dendego_state::speedmeter_w(uint8_t data)
 {
-	if (m_speed_meter != odometer_table[data])
-	{
-		m_speed_meter = odometer_table[data];
-		m_counters[2] = m_speed_meter / 10;
-		m_counters[3] = m_speed_meter % 10;
-	}
+	m_counters[2] = odometer_table[data] / 10;
+	m_counters[3] = odometer_table[data] % 10;
 }
 
 void dendego_state::brakemeter_w(uint8_t data)
 {
-	if (m_brake_meter != pressure_table[data])
-	{
-		m_brake_meter = pressure_table[data];
-		m_counters[4] = m_brake_meter;
-	}
+	m_counters[4] = pressure_table[data] / 100;
+	m_counters[5] = (pressure_table[data] % 100) / 10;
 }
 
 void dendego_state::dendego_map(address_map &map)
@@ -953,21 +976,25 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 INPUT_PORTS_END
 
-// Mascon must always be in a defined state, Densha de Go 2 in particular returns black screen if the Mascon input is undefined
-static const ioport_value dendego_mascon_table[6] = { 0x76, 0x67, 0x75, 0x57, 0x73, 0x37 };
-
 static INPUT_PORTS_START( dendego )
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("UNUSED")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Horn Pedal")
 
-	PORT_MODIFY("BUTTONS")  // Throttle Lever at left, move down to speed up, 6 positions
-	PORT_BIT( 0x77, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(6) PORT_REMAP_TABLE(dendego_mascon_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_NAME("Throttle Lever")
+	PORT_MODIFY("BUTTONS") // Throttle Lever at left, move down to speed up, 6 positions
+	PORT_BIT( 0x77, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(6) PORT_REMAP_TABLE(dendego_mascon_table) PORT_SENSITIVITY(10) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dendego_state::throttle_changed), 0) PORT_NAME("Throttle Lever")
 	PORT_BIT( 0x88, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("AN.0")   // Brake Lever at right, rotate handle right (anti clockwise) to increase pressure, 11 positions but not at constant intervals like the throttle lever
-	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xef) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_NAME("Brake Lever")
+	PORT_START("AN.0")     // Brake Lever at right, rotate handle right (anti clockwise) to increase pressure, 11 positions but not at constant intervals like the throttle lever
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0x00, 0xef) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dendego_state::brake_changed), 0) PORT_NAME("Brake Lever")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dendegoa )
+	PORT_INCLUDE( dendego )
+
+	PORT_MODIFY("AN.0")
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0x00, 0xef) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(dendego_state::brake_changed2), 0) PORT_NAME("Brake Lever")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( landgear )
@@ -1063,6 +1090,9 @@ void taitojc_state::machine_reset()
 
 void taitojc_state::machine_start()
 {
+	m_lamps.resolve();
+	m_wheel_motor.resolve();
+
 	// register for savestates
 	save_item(NAME(m_dsp_rom_pos));
 	save_item(NAME(m_first_dsp_reset));
@@ -1074,30 +1104,25 @@ void taitojc_state::machine_start()
 	save_item(NAME(m_mcu_comm_hc11));
 	save_item(NAME(m_mcu_data_main));
 	save_item(NAME(m_mcu_data_hc11));
-
-	m_lamps.resolve();
-	m_counters.resolve();
-	m_wheel_motor.resolve();
 }
 
 void dendego_state::machine_start()
 {
 	taitojc_state::machine_start();
 
-	save_item(NAME(m_speed_meter));
-	save_item(NAME(m_brake_meter));
+	m_counters.resolve();
 }
 
 
 void taitojc_state::taitojc(machine_config &config)
 {
-	/* basic machine hardware */
-	M68040(config, m_maincpu, XTAL(10'000'000)*2); // 20MHz, clock source = CY7C991
+	// basic machine hardware
+	M68040(config, m_maincpu, 10_MHz_XTAL*2); // 20MHz, clock source = CY7C991
 	m_maincpu->set_addrmap(AS_PROGRAM, &taitojc_state::taitojc_map);
 	m_maincpu->set_vblank_int("screen", FUNC(taitojc_state::vblank));
 	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &taitojc_state::cpu_space_map);
 
-	mc68hc11_cpu_device &sub(MC68HC11M0(config, "sub", XTAL(16'000'000)/2));
+	mc68hc11_cpu_device &sub(MC68HC11M0(config, "sub", 16_MHz_XTAL/2));
 	sub.set_addrmap(AS_PROGRAM, &taitojc_state::hc11_pgm_map);
 	sub.in_pa_callback().set_constant(0); // ?
 	sub.in_pg_callback().set(FUNC(taitojc_state::hc11_comm_r));
@@ -1114,7 +1139,7 @@ void taitojc_state::taitojc(machine_config &config)
 	sub.in_an6_callback().set(FUNC(taitojc_state::hc11_analog_r<6>));
 	sub.in_an7_callback().set(FUNC(taitojc_state::hc11_analog_r<7>));
 
-	TMS320C51(config, m_dsp, XTAL(10'000'000)*4); // 40MHz, clock source = CY7C991
+	TMS320C51(config, m_dsp, 10_MHz_XTAL*4); // 40MHz, clock source = CY7C991
 	m_dsp->set_addrmap(AS_PROGRAM, &taitojc_state::tms_program_map);
 	m_dsp->set_addrmap(AS_DATA, &taitojc_state::tms_data_map);
 
@@ -1132,9 +1157,9 @@ void taitojc_state::taitojc(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	/* video hardware */
+	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
+	m_screen->set_raw(54_MHz_XTAL/3, 720, 0, 512, 449, 0, 400);
 	m_screen->set_screen_update(FUNC(taitojc_state::screen_update));
 	m_screen->set_palette(m_palette);
 
@@ -1142,7 +1167,7 @@ void taitojc_state::taitojc(machine_config &config)
 
 	TC0780FPA(config, m_tc0780fpa, 0);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	taito_en_device &taito_en(TAITO_EN(config, "taito_en", 0));
@@ -1154,17 +1179,14 @@ void dendego_state::dendego(machine_config &config)
 {
 	taitojc(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &dendego_state::dendego_map);
 
-	/* video hardware */
-	m_screen->set_screen_update(FUNC(dendego_state::screen_update_dendego));
-
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "vibration").lfe();
 
-	/* clock frequency & pin 7 not verified */
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "vibration", 0.20);
+	okim6295_device &oki(OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
+	oki.add_route(ALL_OUTPUTS, "vibration", 0.20);
 }
 
 
@@ -2237,11 +2259,11 @@ GAME( 1996, sidebsj,   sidebs,   taitojc, sidebs,   taitojc_state, init_taitojc,
 GAME( 1996, sidebsja,  sidebs,   taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side (Ver 2.6 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )                       // SIDE BY SIDE           VER 2.6 J   1996/ 7/ 1   18:41:51
 GAME( 1996, sidebsjb,  sidebs,   taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side (Ver 2.5 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )                       // SIDE BY SIDE           VER 2.5 J   1996/ 6/20   18:13:14
 GAMEL(1996, dendego,   0,        dendego, dendego,  dendego_state, init_taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.3 J)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO           VER 2.3 J   1997/ 3/10   20:49:44
-GAMEL(1996, dendegoa,  dendego,  dendego, dendego,  dendego_state, init_taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
+GAMEL(1996, dendegoa,  dendego,  dendego, dendegoa, dendego_state, init_taitojc,  ROT0, "Taito", "Densha de GO! (Ver 2.2 J)",                            MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO           VER 2.2 J   1997/ 2/ 4   12:00:28
 GAMEL(1996, dendegox,  dendego,  dendego, dendego,  dendego_state, init_taitojc,  ROT0, "Taito", "Densha de GO! EX (Ver 2.4 J)",                         MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO           VER 2.4 J   1997/ 4/18   13:38:34
 GAME( 1997, sidebs2,   0,        taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 OK)",                          MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )                       // SIDE BY SIDE2          VER 2.6 OK  1997/ 6/ 4   17:27:37
 GAME( 1997, sidebs2u,  sidebs2,  taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side 2 (Ver 2.6 A)",                           MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )                       // SIDE BY SIDE2          VER 2.6 A   1997/ 6/19   09:39:22
 GAME( 1997, sidebs2j,  sidebs2,  taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione RR (Ver 3.1 J)",             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )                       // SIDE BY SIDE2 RR       VER 3.1 J   1997/10/ 7   13:55:38
 GAME( 1997, sidebs2ja, sidebs2,  taitojc, sidebs,   taitojc_state, init_taitojc,  ROT0, "Taito", "Side by Side 2 Evoluzione (Ver 2.4 J)",                MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN )                       // SIDE BY SIDE2          VER 2.4 J   1997/ 5/26   13:06:37
-GAMEL(1998, dendego2,  0,        dendego, dendego,  dendego_state, init_dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen (Ver 2.5 J)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO2          VER 2.5 J   1998/ 3/ 2   15:30:55
-GAMEL(1998, dendego23k,dendego2, dendego, dendego,  dendego_state, init_dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai (Ver 2.20 J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO! 2 3000   VER 2.20 J  1998/ 7/15   17:42:38
+GAMEL(1998, dendego2,  0,        dendego, dendegoa, dendego_state, init_dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen (Ver 2.5 J)",              MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO2          VER 2.5 J   1998/ 3/ 2   15:30:55
+GAMEL(1998, dendego23k,dendego2, dendego, dendegoa, dendego_state, init_dendego2, ROT0, "Taito", "Densha de GO! 2 Kousoku-hen 3000-bandai (Ver 2.20 J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING, layout_dendego )                              // DENSYA DE GO! 2 3000   VER 2.20 J  1998/ 7/15   17:42:38

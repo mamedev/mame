@@ -996,7 +996,7 @@ void fdc37c93x_device::device_reset()
 {
 }
 
-// 'M707 is mostly same except no IDE ports and extra power management regs
+// 'M707 is mostly same except no IDE ports, no RTC and extra power management regs
 DEFINE_DEVICE_TYPE(FDC37M707, fdc37m707_device, "fdc37m707", "SMSC FDC37M707 Super I/O")
 
 

@@ -60,7 +60,7 @@ void it8705f_device::device_start()
 	m_isa->set_dma_channel(1, this, true);
 	m_isa->set_dma_channel(2, this, true);
 	m_isa->set_dma_channel(3, this, true);
-	save_pointer(NAME(m_activate), 9);
+	save_item(NAME(m_activate));
 }
 
 void it8705f_device::device_reset()
@@ -463,7 +463,10 @@ void it8705f_device::drq_floppy_w(int state)
 
 template <unsigned N> u8 it8705f_device::uart_address_r(offs_t offset)
 {
-	return (m_com_address[N] >> (offset * 8)) & 0xff;
+	if (offset)
+		return m_com_address[N] & 0xf8;
+
+	return (m_com_address[N] >> 8) & 0xf;
 }
 
 template <unsigned N> void it8705f_device::uart_address_w(offs_t offset, u8 data)
@@ -471,7 +474,7 @@ template <unsigned N> void it8705f_device::uart_address_w(offs_t offset, u8 data
 	const u8 shift = offset * 8;
 	m_com_address[N] &= 0xff << shift;
 	m_com_address[N] |= data << (shift ^ 8);
-	m_com_address[N] &= ~0xf007;
+	m_com_address[N] &= 0xff8;
 	LOG("LDN%d (COM%d): remap %04x ([%d] %02x)\n", N + 1, N + 1, m_com_address[N], offset, data);
 
 	remap(AS_IO, 0, 0x400);

@@ -10,6 +10,10 @@
     The keyboard works entirely differently, which is a big deal.
 
     TODO: emulate expansion connector (not wholly Apple II compatible)
+    TODO: emulate joystick port (wired to KBIN and KBOUT)
+    TODO: emulate cassette MOTOR softswitch
+    TODO: emulate dual RESET keys
+    TODO: correct PAL colors
 
     $C05A - banks RAM from c100-ffff
     $C05B - banks ROM from c100-ffff
@@ -242,6 +246,7 @@ uint8_t tk2000_state::switches_r(offs_t offset)
 void tk2000_state::color_w(int state)
 {
 	// 0 = color, 1 = black/white
+	m_video->monohgr_w(state);
 }
 
 void tk2000_state::motor_a_w(int state)
@@ -614,5 +619,5 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY         FULLNAME */
-COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital", "TK2000 Color Computer", MACHINE_NOT_WORKING )
-COMP( 1982, mpf2,   tk2000, 0,      tk2000,  tk2000, tk2000_state, empty_init, "Multitech",    "Microprofessor II",     MACHINE_NOT_WORKING )
+COMP( 1984, tk2000, 0,      0,      tk2000,  tk2000, tk2000_state, empty_init, "Microdigital", "TK2000 Color Computer", MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, mpf2,   tk2000, 0,      tk2000,  tk2000, tk2000_state, empty_init, "Multitech",    "Microprofessor II",     MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )

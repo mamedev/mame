@@ -169,7 +169,6 @@ Hardware for the 770Z model.
 #include "cpu/i386/i386.h"
 #include "machine/ds17x85.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/i82443bx_host.h"
 #include "machine/i82371eb_isa.h"
 #include "machine/i82371eb_ide.h"
@@ -215,15 +214,12 @@ void thinkpad600_state::mcu_map(address_map &map)
 	map(0x0000, 0xf77f).rom().region("mcu", 0);
 }
 
-static INPUT_PORTS_START(thinkpad600)
-INPUT_PORTS_END
-
 void thinkpad600_state::superio_config(device_t *device)
 {
 	pc97338_device &fdc = *downcast<pc97338_device *>(device);
 //  fdc.set_sysopt_pin(1);
 //  fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-//  fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+//  fdc.gp25_gatea20().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -271,9 +267,11 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 	// TODO: PCI config space guessed from a Fujitsu Lifebook, confirm me for ThinkPad
 	PCI_ROOT(config, "pci", 0);
 	I82443BX_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
+
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, m_maincpu));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
@@ -281,7 +279,7 @@ void thinkpad600_state::thinkpad600e(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 //  TODO: modem at "pci:10.0"
@@ -401,8 +399,8 @@ ROM_END
 } // anonymous namespace
 
 //    YEAR, NAME,      PARENT, COMPAT, MACHINE,      INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,         FLAGS
-COMP( 1995, tpad760xd, 0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 760XD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1998, tpad600,   0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, tpad600e,  0,      0,      thinkpad600e, thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, tpad600x,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600X",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1999, tpad770z,  0,      0,      thinkpad600,  thinkpad600, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1995, tpad760xd, 0,      0,      thinkpad600,  0, thinkpad600_state, empty_init, "IBM",   "ThinkPad 760XD", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1998, tpad600,   0,      0,      thinkpad600,  0, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, tpad600e,  0,      0,      thinkpad600e, 0, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600E",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, tpad600x,  0,      0,      thinkpad600,  0, thinkpad600_state, empty_init, "IBM",   "ThinkPad 600X",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+COMP( 1999, tpad770z,  0,      0,      thinkpad600,  0, thinkpad600_state, empty_init, "IBM",   "ThinkPad 770Z",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

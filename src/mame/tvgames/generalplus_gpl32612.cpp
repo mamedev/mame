@@ -604,8 +604,8 @@ CONS( 2014, bandplap,        0,        0,      gpl32612, gpl32612, generalplus_g
 CONS( 2014, bandslap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Disney & Disney/Pixar Characters Wonderful Dream PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 // あそんでまなべる！マウスでクリック！アンパンマンパソコン
 CONS( 2014, bananlap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Asonde Manaberu! Mouse de Click! Anpanman PC (Japan, orange/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, orange base
-// アンパンマンカラーパソコンスタート
-CONS( 2014, bananlapa,       bananlap, 0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Color PC Start (Japan, yellow/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, yellow base
+// アンパンマンカラーパソコンスマート
+CONS( 2014, bananlapa,       bananlap, 0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Anpanman Color PC Smart (Japan, yellow/white case)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // white lid, yellow base
 // ドラえもんステップアップパソコン
 CONS( 2014, bandolap,        0,        0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, empty_init,  "Bandai",        "Doraemon Step Up PC (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 

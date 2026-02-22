@@ -2,30 +2,10 @@
 // copyright-holders:Brad Oliver,Aaron Giles,Bernd Wiebelt,Allard van der Bas
 /******************************************************************************
  *
- * vector.c
+ * vector.cpp
  *
  *        anti-alias code by Andrew Caldwell
  *        (still more to add)
- *
- * 040227 Fixed miny clip scaling which was breaking in mhavoc. AREK
- * 010903 added support for direct RGB modes MLR
- * 980611 use translucent vectors. Thanks to Peter Hirschberg
- *        and Neil Bradley for the inspiration. BW
- * 980307 added cleverer dirty handling. BW, ASG
- *        fixed antialias table .ac
- * 980221 rewrote anti-alias line draw routine
- *        added inline assembly multiply fuction for 8086 based machines
- *        beam diameter added to draw routine
- *        beam diameter is accurate in anti-alias line draw (Tcosin)
- *        flicker added .ac
- * 980203 moved LBO's routines for drawing into a buffer of vertices
- *        from avgdvg.c to this location. Scaling is now initialized
- *        by calling vector_init(...). BW
- * 980202 moved out of msdos.c ASG
- * 980124 added anti-alias line draw routine
- *        modified avgdvg.c and sega.c to support new line draw routine
- *        added two new tables Tinten and Tmerge (for 256 color support)
- *        added find_color routine to build above tables .ac
  *
  * Vector Team
  *
@@ -60,11 +40,7 @@ float vector_options::s_beam_width_max = 0.0f;
 float vector_options::s_beam_dot_size = 0.0f;
 float vector_options::s_beam_intensity_weight = 0.0f;
 
-namespace {
-    vector_device::hook_callback s_hook_callback;
-}
-
-void vector_options::init(emu_options& options)
+void vector_options::init(emu_options &options)
 {
 	s_beam_width_min = options.beam_width_min();
 	s_beam_width_max = options.beam_width_max();
@@ -95,9 +71,51 @@ void vector_device::device_start()
 	m_vector_list = std::make_unique<point[]>(MAX_POINTS);
 }
 
-/*
- * www.dinodini.wordpress.com/2010/04/05/normalized-tunable-sigmoid-functions/
- */
+
+//-------------------------------------------------
+//  subscribe for frame-begin notifications
+//-------------------------------------------------
+
+util::notifier_subscription vector_device::add_frame_begin_notifier(frame_begin_delegate &&n)
+{
+	return m_frame_begin_notifier.subscribe(std::move(n));
+}
+
+
+//-------------------------------------------------
+//  subscribe for frame-end notifications
+//-------------------------------------------------
+
+util::notifier_subscription vector_device::add_frame_end_notifier(frame_end_delegate &&n)
+{
+	return m_frame_end_notifier.subscribe(std::move(n));
+}
+
+
+//-------------------------------------------------
+//  subscribe for hidden-move notifications
+//-------------------------------------------------
+
+util::notifier_subscription vector_device::add_move_notifier(move_delegate &&n)
+{
+	return m_move_notifier.subscribe(std::move(n));
+}
+
+
+//-------------------------------------------------
+//  subscribe for visible-line notifications
+//-------------------------------------------------
+
+util::notifier_subscription vector_device::add_line_notifier(line_delegate &&n)
+{
+	return m_line_notifier.subscribe(std::move(n));
+}
+
+
+//-------------------------------------------------
+// www.dinodini.wordpress.com/2010/04/05/normalized-tunable-sigmoid-functions/
+//-------------------------------------------------
+
 float vector_device::normalized_sigmoid(float n, float k)
 {
 	// valid for n and k in range of -1.0 and 1.0
@@ -105,10 +123,11 @@ float vector_device::normalized_sigmoid(float n, float k)
 }
 
 
-/*
- * Adds a line end point to the vertices list. The vector processor emulation
- * needs to call this.
- */
+//-------------------------------------------------
+// Adds a line end point to the vertices list. The vector processor emulation
+// needs to call this.
+//-------------------------------------------------
+
 void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 {
 	point *newpoint;
@@ -120,9 +139,9 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 
 	if (vector_options::s_flicker && (intensity > 0))
 	{
-		float random = (float)(machine().rand() & 255) / 255.0f; // random value between 0.0 and 1.0
+		float random = float(machine().rand() & 255) / 255.0f; // random value between 0.0 and 1.0
 
-		intensity -= (int)(intensity * random * vector_options::s_flicker);
+		intensity -= int(intensity * random * vector_options::s_flicker);
 
 		intensity = std::clamp(intensity, 0, 255);
 	}
@@ -142,20 +161,19 @@ void vector_device::add_point(int x, int y, rgb_t color, int intensity)
 }
 
 
-/*
- * The vector CPU creates a new display list. We save the old display list,
- * but only once per refresh.
- */
-void vector_device::clear_list(void)
+//-------------------------------------------------
+// The vector CPU creates a new display list. We save the old display list,
+// but only once per refresh.
+//-------------------------------------------------
+
+void vector_device::clear_list()
 {
 	m_vector_index = 0;
 }
 
-void vector_device::set_hook_callback(hook_callback callback)
-{
-	s_hook_callback = std::move(callback);
-}
-
+//-------------------------------------------------
+// Update the screen container with queued vectors.
+//-------------------------------------------------
 
 uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -175,11 +193,7 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	screen.container().empty();
 	screen.container().add_rect(0.0f, 0.0f, 1.0f, 1.0f, rgb_t(0xff,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_VECTORBUF(1));
 
-	if (s_hook_callback)
-	{
-		hook_data begin = { hook_event::FRAME_BEGIN, 0, 0, 0, 0, rgb_t(0xff, 0x00, 0x00, 0x00), 0, visarea.width(), visarea.height() };
-		s_hook_callback(machine(), begin);
-	}
+	m_frame_begin_notifier();
 
 	for (int i = 0; i < m_vector_index; i++)
 	{
@@ -200,35 +214,23 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		if (lastx == curpoint->x && lasty == curpoint->y)
 			beam_width *= vector_options::s_beam_dot_size;
 
-		coords.x0 = ((float)lastx - xoffs) * xscale;
-		coords.y0 = ((float)lasty - yoffs) * yscale;
-		coords.x1 = ((float)curpoint->x - xoffs) * xscale;
-		coords.y1 = ((float)curpoint->y - yoffs) * yscale;
+		coords.x0 = (float(lastx) - xoffs) * xscale;
+		coords.y0 = (float(lasty) - yoffs) * yscale;
+		coords.x1 = (float(curpoint->x) - xoffs) * xscale;
+		coords.y1 = (float(curpoint->y) - yoffs) * yscale;
 
 		if (curpoint->intensity != 0)
 		{
 			screen.container().add_line(
-				coords.x0, coords.y0, coords.x1, coords.y1,
-				beam_width,
-				(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
-				flags);
+					coords.x0, coords.y0, coords.x1, coords.y1,
+					beam_width,
+					(curpoint->intensity << 24) | (curpoint->col & 0xffffff),
+					flags);
+			m_line_notifier(lastx, lasty, curpoint->x, curpoint->y, curpoint->col, curpoint->intensity, visarea.width(), visarea.height());
 		}
-
-		if (s_hook_callback)
+		else
 		{
-			hook_data point_data =
-			{
-				(curpoint->intensity != 0) ? hook_event::LINE_TO : hook_event::MOVE_TO,
-				lastx,
-				lasty,
-				curpoint->x,
-				curpoint->y,
-				curpoint->col,
-				curpoint->intensity,
-				visarea.width(),
-				visarea.height()
-			};
-			s_hook_callback(machine(), point_data);
+			m_move_notifier(curpoint->x, curpoint->y, curpoint->col, visarea.width(), visarea.height());
 		}
 
 		lastx = curpoint->x;
@@ -237,11 +239,7 @@ uint32_t vector_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		curpoint++;
 	}
 
-	if (s_hook_callback)
-	{
-		hook_data end = { hook_event::FRAME_END, 0, 0, 0, 0, rgb_t(0xff, 0x00, 0x00, 0x00), 0, visarea.width(), visarea.height() };
-		s_hook_callback(machine(), end);
-	}
+	m_frame_end_notifier();
 
 	return 0;
 }

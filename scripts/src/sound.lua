@@ -184,6 +184,42 @@ end
 
 
 ---------------------------------------------------
+-- CEM 3310 envelope generator chip
+--@src/devices/sound/cem3310.h,SOUNDS["CEM3310"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3310"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3310.cpp",
+		MAME_DIR .. "src/devices/sound/cem3310.h",
+	}
+end
+
+---------------------------------------------------
+-- CEM 3320 voltage-controlled filter chip
+--@src/devices/sound/cem3320.h,SOUNDS["CEM3320"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3320"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3320.cpp",
+		MAME_DIR .. "src/devices/sound/cem3320.h",
+	}
+end
+
+---------------------------------------------------
+-- CEM 3360 dual voltage-controlled amplifier chip
+--@src/devices/sound/cem3320.h,SOUNDS["CEM3360"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3360"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3360.cpp",
+		MAME_DIR .. "src/devices/sound/cem3360.h",
+	}
+end
+
+---------------------------------------------------
 -- CEM 3394 analog synthesizer chip
 --@src/devices/sound/cem3394.h,SOUNDS["CEM3394"] = true
 ---------------------------------------------------
@@ -1198,6 +1234,18 @@ if SOUNDS["VA_EG"] then
 	files {
 		MAME_DIR .. "src/devices/sound/va_eg.cpp",
 		MAME_DIR .. "src/devices/sound/va_eg.h",
+	}
+end
+
+--------------------------------------------------
+-- Virtual analog operations
+--@src/devices/sound/va_ops.h,SOUNDS["VA_OPS"] = true
+--------------------------------------------------
+
+if SOUNDS["VA_OPS"] then
+	files {
+		MAME_DIR .. "src/devices/sound/va_ops.cpp",
+		MAME_DIR .. "src/devices/sound/va_ops.h",
 	}
 end
 

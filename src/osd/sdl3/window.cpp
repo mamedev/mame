@@ -900,6 +900,8 @@ int sdl_window_info::complete_create()
 	set_platform_window(sdlwindow);
 	renderer_create();
 
+	SDL_StartTextInput(sdlwindow);
+
 	if (fullscreen() && video_config.switchres)
 	{
 		const SDL_DisplayMode *mode = SDL_GetWindowFullscreenMode(platform_window());

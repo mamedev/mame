@@ -286,9 +286,6 @@ void batrider_state::video_start()
 {
 	raizing_base_state::video_start();
 
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-
 	m_vdp->disable_sprite_buffer(); // disable buffering on this game
 
 	// Create the Text tilemap for this game

@@ -61,7 +61,7 @@ private:
 void pc486vl_state::main_map(address_map &map)
 {
 	map(0x00100000, 0x03ffffff).noprw();
-//	map(0x02000000, 0xfffeffff).noprw();
+//  map(0x02000000, 0xfffeffff).noprw();
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 }
 

@@ -285,10 +285,17 @@ inline bool is_valid_immediate_mask(uint64_t val, size_t bytes)
 		width <<= 1;
 	}
 
-	// check check that set bits are contiguous
+	// check if set bits are contiguous
 	const auto lz = count_leading_zeros_64(val & make_bitmask<uint64_t>(width));
 	const uint64_t invleftaligned = ~(val << lz);
-	return !(invleftaligned & (invleftaligned + 1));
+	if (!(invleftaligned & (invleftaligned + 1)))
+		return true;
+
+	// what about unset bits?
+	val = ~val;
+	const auto ls = count_leading_zeros_64(val & make_bitmask<uint64_t>(width));
+	const uint64_t inv2leftaligned = ~(val << ls);
+	return !(inv2leftaligned & (inv2leftaligned + 1));
 }
 
 inline bool is_valid_immediate(uint64_t val, size_t bits)

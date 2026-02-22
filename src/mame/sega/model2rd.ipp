@@ -11,6 +11,32 @@
 #pragma once
 
 
+inline u16 model2_renderer::get_texel(u32 base_x, u32 base_y, int x, int y, const u32 *sheet)
+{
+	int x2 = base_x + x;
+	int y2 = base_y + y;
+	if (x2 >= 1024)
+	{
+		// texture sheets are mapped as 2048x1024 but stored in RAM as 1024x2048
+		x2 -= 1024;
+		y2 ^= 1024;
+	}
+	u32  offset = ((y2 / 2) * 512) + (x2 / 2);
+	u32  texel = sheet[offset>>1];
+
+	if (offset & 1)
+		texel >>= 16;
+
+	if ((y & 1) == 0)
+		texel >>= 8;
+
+	if ((x & 1) == 0)
+		texel >>= 4;
+
+	return texel & 0x0f;
+}
+
+
 // non-textured render path
 template <bool Translucent>
 void model2_renderer::draw_scanline_solid(int32_t scanline, const extent_t& extent, const m2_poly_extra_data& object, int threadid)
@@ -75,7 +101,7 @@ constexpr u32 LERP(u32 x, u32 y, unsigned a)
 }
 
 template <bool Translucent>
-u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, const s32 miplevel, s32 u, s32 v)
+u32 model2_renderer::fetch_bilinear_texel(const m2_poly_extra_data& object, s32 miplevel, s32 u, s32 v)
 {
 	u32 tex_wrap_x = object.texwrapx;
 	u32 tex_wrap_y = object.texwrapy;
@@ -268,28 +294,28 @@ void model2_renderer::draw_scanline_tex(int32_t scanline, const extent_t &extent
 		if (fill[x] > 0)
 			continue;
 
-		float z = recip_approx(ooz);
+		float const z = 1.0F / ooz;
 
-		s32 mml = -object.texlod + fast_log2(z);    // equivalent to log2(z^2)
-		s32 level = std::clamp(mml >> 7, 0, max_level);
+		s32 const mml = -object.texlod + fast_log2(z);    // equivalent to log2(z^2)
+		s32 const level = std::clamp(mml >> 7, 0, max_level);
 
 		// we give texture coordinates 8 fractional bits
-		s32 u = s32(uoz * z * 256.0F);
-		s32 v = s32(voz * z * 256.0F);
+		s32 const u = s32(uoz * z * 256.0F);
+		s32 const v = s32(voz * z * 256.0F);
 
 		u32 t = fetch_bilinear_texel<Translucent>(object, level, u, v);
 
 		if (mml > 0 && level < max_level)
 		{
-			u32 t2 = fetch_bilinear_texel<Translucent>(object, level + 1, u, v);
-			s32 frac = (mml & 127) << 1;
+			u32 const t2 = fetch_bilinear_texel<Translucent>(object, level + 1, u, v);
+			s32 const frac = (mml & 127) << 1;
 			t = LERP(t, t2, frac);
 		}
 		else if (object.utex && mml < 0)
 		{
 			// microtexture; blend up to almost 50%
-			u32 t2 = fetch_bilinear_texel<Translucent>(object, -1, u, v);
-			s32 frac = std::min(-mml >> object.utexminlod, 127);
+			u32 const t2 = fetch_bilinear_texel<Translucent>(object, -1, u, v);
+			s32 const frac = std::min(-mml >> object.utexminlod, 127);
 			t = LERP(t, t2, frac);
 		}
 

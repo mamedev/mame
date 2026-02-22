@@ -20,6 +20,11 @@ Notes:
   buttons for shot direction (right/left) and club selection.
   Twist the "shot controller" to adjust shot power, then release it.
   The controller returns to its default position by internal spring.
+- blswhstl: sprites were left on screen during attract mode(fixed)
+  Sprite buffer should be cleared at vblank start. On the GX OBJDMA
+  automatically occurs 32.0-42.7us after clearing but on older boards
+  using the k053245, DMA must be triggered manually. The game uses a
+  trick to disable sprites by simply not triggering OBJDMA.
 
 TODO:
 - glfgreat: imperfect protection emulation:
@@ -33,26 +38,16 @@ TODO:
 - is NVBLK really vblank or something else? Investigate.
 - what is OBJMPX? object multiplex? whatever that means, maybe objdma busy?
 - some slowdowns in lgtnfght when there are many sprites on screen - vblank issue?
+- tmnt2 zoomed sprite placement is not 100% accurate, see for example the
+  vertical explosion when a foot soldier dies
+- tmnt2 palette dim layer target is guessed, is it really from m_k053251
+  get_priority(5) or somewhere else?
 
 BTANB:
 - tmnt2 stage 7 (Neon Night Riders) all sprites flash white every few seconds
   (it's from a write to k053251 and unrelated to protected spriteram)
 
-Updates:
-- blswhstl: sprites are left on screen during attract mode(fixed)
-  Sprite buffer should be cleared at vblank start. On the GX OBJDMA
-  automatically occurs 32.0-42.7us after clearing but on older boards
-  using the k053245, DMA must be triggered manually. The game uses a
-  trick to disable sprites by simply not triggering OBJDMA.
-- a garbage sprite is STILL sticking on screen in ssriders.(fixed)
-- sprite colors / zoomed placement in tmnt2(improved MCU sim)
-- I don't think I'm handling the palette dim control in tmnt2/ssriders
-  correctly. TMNT2 stays dimmed most of the time.(fixed)
-- sprite lag, quite evident in lgtnfght and mia but also in the others.
-  Also see the left corner of the wall in punkshot DownTown level(should be better)
-- ssriders: Billy no longer goes berserk at stage 4's boss.
-
-* uncertain bugs:
+Uncertain bugs:
 - Detana!! Twin Bee's remaining sprite lag does not appear to be
   emulation related. While these common one-pixel lags are very obvious
   on VGA-class displays they're virtually invisible on TV and older
@@ -269,10 +264,9 @@ protected:
 	void ssriders_main_map(address_map &map) ATTR_COLD;
 
 	// video-related
-	int32_t m_lastdim = 0;
-	int32_t m_lasten = 0;
-	int32_t m_dim_c = 0;
-	int32_t m_dim_v = 0;
+	double m_lastdim[8] = { };
+	uint8_t m_dim_c = 0;
+	uint8_t m_dim_v = 0;
 };
 
 // with another approach of protection
@@ -844,12 +838,9 @@ void ssriders_state::video_start()
 {
 	lgtnfght_state::video_start();
 
-	m_dim_c = m_dim_v = m_lastdim = m_lasten = 0;
-
+	save_item(NAME(m_lastdim));
 	save_item(NAME(m_dim_c));
 	save_item(NAME(m_dim_v));
-	save_item(NAME(m_lastdim));
-	save_item(NAME(m_lasten));
 }
 
 void tmnt2_roz_base_state::video_start()
@@ -1222,49 +1213,62 @@ uint32_t tmnt2_roz_base_state::screen_update(screen_device &screen, bitmap_ind16
 
 uint32_t ssriders_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	const int newdim = m_dim_v | ((~m_dim_c & 0x10) >> 1);
-	const int newen  = (m_k053251->get_priority(5) && m_k053251->get_priority(5) != 0x3e);
+	// toggle shadow/highlight
+	m_palette->set_shadow_mode(BIT(~m_dim_c, 4));
 
-	if (newdim != m_lastdim || newen != m_lasten)
+	// screen_update before palette dimming
+	screen_update_lgtnfght(screen, bitmap, cliprect);
+
+	// m_k053251->get_priority(5 and 6):
+
+	// ssriders:
+	// 0x26 0x32 - almost everywhere
+	// 0x26 0x20 - saloon spotlights
+
+	// tmnt2:
+	// 0x24 0x00 - April's news broadcast
+	// 0x2c 0x08 - time travel
+	// 0x08 0x33 - stage 3 start
+	// 0x08 0x08 - stage 4 cave
+	// 0x08 0x2b - stage 4/7 complete
+	// 0x30 0x2b - stage 8 near end
+	// 0x3e 0x** - no dimming
+
+	// except for tmnt2 stage 8, it appears everything dims layer 1, layer 2, sprites
+	// layer 0 (text layer, CI2) is never dimmed?
+
+	const int enable = m_k053251->get_priority(5);
+	int dimpal = 0;
+
+	if (enable != 0x3e)
 	{
-		double brt = 1.0;
-		if (newen)
-			brt -= (1.0 - PALETTE_DEFAULT_SHADOW_FACTOR) * newdim / 8;
-		m_lastdim = newdim;
-		m_lasten = newen;
+		// layer 1 (CI4)
+		dimpal |= 1 << (m_layer_colorbase[1] >> 4 & 7);
 
-		/*
-		    Only affect the background and sprites, not text layer.
-		    Instead of dimming each layer we dim the entire palette
-		    except text colors because palette bases may change
-		    anytime and there's no guarantee a dimmed color will be
-		    reset properly.
-		*/
-
-		// find the text layer's palette range
-		const int cb = m_layer_colorbase[m_sorted_layer[2]] << 4;
-		const int ce = cb + 128;
-
-		// dim all colors before it
-		for (int i = 0; i < cb; i++)
-			m_palette->set_pen_contrast(i, brt);
-
-		// reset all colors in range
-		for (int i = cb; i < ce; i++)
-			m_palette->set_pen_contrast(i, 1.0);
-
-		// dim all colors after it
-		for (int i = ce; i < 2048; i++)
-			m_palette->set_pen_contrast(i, brt);
-
-		// toggle shadow/highlight
-		if (BIT(~m_dim_c, 4))
-			m_palette->set_shadow_mode(1);
-		else
-			m_palette->set_shadow_mode(0);
+		// sprites (CI1), layer 2 (CI3)
+		if (!BIT(enable, 4))
+		{
+			for (int i = 0; i < 2; i++)
+				dimpal |= 1 << ((m_sprite_colorbase >> 4 | i) & 7);
+			dimpal |= 1 << (m_layer_colorbase[2] >> 4 & 7);
+		}
 	}
 
-	screen_update_lgtnfght(screen, bitmap, cliprect);
+	const int factor = m_dim_v | ((~m_dim_c & 0x10) >> 1);
+	const double brt = 1.0 - (1.0 - PALETTE_DEFAULT_SHADOW_FACTOR) * factor / 8;
+
+	for (int i = 0; i < 8; i++)
+	{
+		double dim = BIT(dimpal, i) ? brt : 1.0;
+
+		if (dim != m_lastdim[i])
+		{
+			for (int j = 0; j < 0x100; j++)
+				m_palette->set_pen_contrast(i * 0x100 + j, dim);
+			m_lastdim[i] = dim;
+		}
+	}
+
 	return 0;
 }
 
@@ -1462,7 +1466,6 @@ void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	uint32_t src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
 	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, f1, f2;
-	uint16_t *mcu;
 	uint16_t src[4], mod[24];
 	uint8_t keepaspect, xlock, ylock, zlock;
 
@@ -1471,14 +1474,13 @@ void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if (offset != 0x18/2 || !ACCESSING_BITS_8_15)
 		return;
 
-	mcu = m_protram;
-	if ((mcu[8] & 0xff00) != 0x8200)
+	if ((m_protram[8] & 0xff00) != 0x8200)
 		return;
 
-	src_addr = (mcu[0] | (mcu[1] & 0xff) << 16) >> 1;
-	dst_addr = (mcu[2] | (mcu[3] & 0xff) << 16) >> 1;
-	mod_addr = (mcu[4] | (mcu[5] & 0xff) << 16) >> 1;
-	zlock    = (mcu[8] & 0xff) == 0x0001;
+	src_addr = (m_protram[0] | (m_protram[1] & 0xff) << 16) >> 1;
+	dst_addr = (m_protram[2] | (m_protram[3] & 0xff) << 16) >> 1;
+	mod_addr = (m_protram[4] | (m_protram[5] & 0xff) << 16) >> 1;
+	zlock    = (m_protram[8] & 0xff) == 0x0001;
 
 	for (int i = 0; i < 4; i++)
 		src[i] = tmnt2_get_word(src_addr + i);
@@ -1511,21 +1513,20 @@ void tmnt2_state::tmnt2_prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	xzoom = mod[0x1c / 2];
 	yzoom = (keepaspect) ? xzoom : mod[0x1e / 2];
 
-	ylock = xlock = (f2 & 0x0020 && (!xzoom || xzoom == 0x100));
+	xlock = ylock = (f2 & 0x003b) == 0x0020;
 
 	/*
 	    Scale factor is non-linear. The zoom vales are looked-up from
 	    two to three nested tables and passed through a series of math
-	    operations. The MCU is suspected to have its own tables for
-	    translating zoom values to final scale factors or it knows where
-	    to fetch them in ROM. There is no access to its internal code so
-	    the scale curve is only approximated.
+	    operations. The 053990 protection chip is suspected to have its
+	    own tables for translating zoom values to final scale factors.
+	    Currently, the scale curve is only approximated.
 
-	    The most accurate method is to trace how MCU zoom is transformed
-	    from ROM data, reverse the maths, plug the result into the sprite
-	    zoom code and derive the scale factor from there; but zooming
-	    would still suffer from precision loss in k053245->sprites_draw()
-	    and drawgfx() producing gaps in logical sprite groups.
+	    The most accurate method is to trace how the zoom is transformed
+	    reverse the maths, plug the result into the sprite zoom code and
+	    derive the scale factor from there; but zooming would still suffer
+	    from precision loss in k053245->sprites_draw() and drawgfx()
+	    producing gaps in logical sprite groups.
 
 	    A few sample points on the real curve:
 
@@ -1681,9 +1682,9 @@ void tmnt2_state::tmnt2_main_map(address_map &map)
 	map(0x1c0200, 0x1c0201).w(FUNC(tmnt2_state::ssriders_eeprom_w));    /* EEPROM and gfx control */
 	map(0x1c0300, 0x1c0301).w(FUNC(tmnt2_state::ssriders_1c0300_w));
 	map(0x1c0400, 0x1c0401).rw("watchdog", FUNC(watchdog_timer_device::reset16_r), FUNC(watchdog_timer_device::reset16_w));
-	map(0x1c0500, 0x1c057f).ram(); /* TMNT2 only (1J) unknown, mostly MCU blit offsets */
-//  map(0x1c0800, 0x1c0801).r(FUNC(tmnt2_state::ssriders_protection_r)); /* protection device */
-	map(0x1c0800, 0x1c081f).w(FUNC(tmnt2_state::tmnt2_prot_w)).share(m_protram);  /* protection device */
+	map(0x1c0500, 0x1c057f).ram(); /* TMNT2 only (1J) unknown, mostly blit offsets */
+//  map(0x1c0800, 0x1c0801).r(FUNC(tmnt2_state::ssriders_protection_r)); /* 053990 protection device */
+	map(0x1c0800, 0x1c081f).w(FUNC(tmnt2_state::tmnt2_prot_w)).share(m_protram);  /* 053990 protection device */
 	map(0x5a0000, 0x5a001f).rw(FUNC(tmnt2_state::k053244_word_noA1_r), FUNC(tmnt2_state::k053244_word_noA1_w));
 	map(0x5c0600, 0x5c0603).rw(m_k053260, FUNC(k053260_device::main_read), FUNC(k053260_device::main_write)).umask16(0x00ff);
 	map(0x5c0604, 0x5c0605).w(FUNC(tmnt2_state::ssriders_soundkludge_w));

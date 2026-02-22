@@ -26,7 +26,8 @@ zxbus_slot_device::zxbus_slot_device(const machine_config &mconfig, device_type 
 void zxbus_slot_device::device_start()
 {
 	device_zxbus_card_interface *const card(get_card_device());
-	if (card) card->set_zxbusbus(*m_zxbus_bus);
+	if (card)
+		card->set_zxbusbus(*m_zxbus_bus);
 
 	m_zxbus_bus->add_slot(*this);
 }

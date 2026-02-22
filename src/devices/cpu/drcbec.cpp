@@ -18,7 +18,11 @@
 #include <cfenv>
 #include <cmath>
 
+#if defined(__clang_major__) && (__clang_major__ < 12)
+// can't guarantee floating point environment control works
+#else
 #pragma STDC FENV_ACCESS ON
+#endif
 
 
 namespace drc {

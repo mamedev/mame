@@ -567,15 +567,6 @@ ifdef SANITIZE
 SYMBOLS = 1
 endif
 
-# profiler defaults to on for DEBUG builds
-ifdef DEBUG
-ifneq '$(DEBUG)' '0'
-ifndef PROFILER
-PROFILER = 1
-endif
-endif
-endif
-
 # allow gprof profiling as well, which overrides the internal PROFILER
 # also enable symbols as it is useless without them
 ifdef PROFILE

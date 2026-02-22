@@ -5618,7 +5618,7 @@ GAME( 1990, thundfoxj,  thundfox, thundfox,  thundfoxj,  taitof2_state,  empty_i
 GAME( 1989, cameltry,   0,        cameltry,  cameltry,   cameltry_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Cameltry (World, YM2610)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cameltryu,  cameltry, cameltry,  cameltry,   cameltry_state, empty_init,    ROT0,   "Taito America Corporation", "Cameltry (US, YM2610)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cameltryj,  cameltry, cameltry,  cameltryj,  cameltry_state, empty_init,    ROT0,   "Taito Corporation",         "Cameltry (Japan, YM2610)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry,   cameltry_state, empty_init,    ROT0,   "Taito Corporation Japan", 	 "Cameltry (World, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cameltrya,  cameltry, cameltrya, cameltry,   cameltry_state, empty_init,    ROT0,   "Taito Corporation Japan",   "Cameltry (World, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cameltryau, cameltry, cameltrya, cameltry,   cameltry_state, empty_init,    ROT0,   "Taito America Corporation", "Cameltry (US, YM2203 + M6295)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, qtorimon,   0,        qtorimon,  qtorimon,   taitof2_state,  empty_init,    ROT0,   "Taito Corporation",         "Quiz Torimonochou (Japan)", MACHINE_SUPPORTS_SAVE )

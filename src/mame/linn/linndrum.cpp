@@ -86,6 +86,8 @@ Example:
 #include "machine/output_latch.h"
 #include "machine/rescap.h"
 #include "machine/timer.h"
+#include "sound/cem3320.h"
+#include "sound/cem3360.h"
 #include "sound/dac76.h"
 #include "sound/flt_biquad.h"
 #include "sound/flt_rc.h"
@@ -93,8 +95,6 @@ Example:
 #include "sound/mixer.h"
 #include "sound/spkrdev.h"
 #include "sound/va_eg.h"
-#include "sound/va_vca.h"
-#include "sound/va_vcf.h"
 #include "speaker.h"
 
 #include "linn_linndrum.lh"

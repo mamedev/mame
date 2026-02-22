@@ -406,8 +406,8 @@ void saturn_scu_device::handle_dma_direct(uint8_t level)
 		m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7fffe);
 
 	// stv:colmns97, which doesn't work right (timing more likely, also ST-V has more soundram)
-//	if ((m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000 && m_dma[level].size >= 0x80000)
-//		m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7ffff);
+//  if ((m_dma[level].dst & 0x07f0'0000) == 0x05a0'0000 && m_dma[level].size >= 0x80000)
+//      m_dma[level].size = 0x80000 - (m_dma[level].dst & 0x7ffff);
 
 	tmp_src = tmp_dst = 0;
 

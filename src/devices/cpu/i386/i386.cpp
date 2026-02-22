@@ -2610,14 +2610,17 @@ void i386_device::enter_smm()
 	m_sreg[DS].limit = m_sreg[ES].limit = m_sreg[FS].limit = m_sreg[GS].limit = m_sreg[SS].limit = 0xffffffff;
 	m_sreg[DS].flags = m_sreg[ES].flags = m_sreg[FS].flags = m_sreg[GS].flags = m_sreg[SS].flags = 0x8093;
 	m_sreg[DS].valid = m_sreg[ES].valid = m_sreg[FS].valid = m_sreg[GS].valid = m_sreg[SS].valid = true;
-	m_sreg[CS].selector = 0x3000; // pentium only, ppro sel = smbase >> 4
+	m_sreg[DS].d = m_sreg[ES].d = m_sreg[FS].d = m_sreg[GS].d = m_sreg[SS].d = 0;
+	m_sreg[CS].selector = (m_cpu_version >= 6) ? m_smbase >> 4 : 0x3000; // k6 reports family 6 but may also force 0x3000
 	m_sreg[CS].base = m_smbase;
 	m_sreg[CS].limit = 0xffffffff;
 	m_sreg[CS].flags = 0x8093;
 	m_sreg[CS].valid = true;
+	m_sreg[CS].d = 0;
 	m_cr[4] = 0;
 	m_dr[7] = 0x400;
 	m_eip = 0x8000;
+	m_CPL = 0;
 
 	m_nmi_masked = true;
 	CHANGE_PC(m_eip);
@@ -2683,15 +2686,13 @@ void i386_device::leave_smm()
 	m_cr[3] = READ32(smram_state + SMRAM_CR3);
 	m_cr[0] = READ32(smram_state + SMRAM_CR0);
 
-	m_CPL = (m_sreg[SS].flags >> 13) & 3; // cpl == dpl of ss
+	m_CPL = (m_sreg[SS].flags >> 5) & 3; // cpl == dpl of ss
 
 	for (int i = 0; i <= GS; i++)
 	{
+		m_sreg[i].d = (m_sreg[i].flags & 0x4000) ? 1 : 0;
 		if (PROTECTED_MODE && !V8086_MODE)
-		{
 			m_sreg[i].valid = m_sreg[i].selector ? true : false;
-			m_sreg[i].d = (m_sreg[i].flags & 0x4000) ? 1 : 0;
-		}
 		else
 			m_sreg[i].valid = true;
 	}
@@ -3327,7 +3328,7 @@ void pentium2_device::device_reset()
 	// [14:14] MCA Machine Check Architecture
 	// [15:15] CMOV Conditional Move instructions
 	// [23:23] MMX instructions
-//	m_feature_flags = 0x0080f9ff;
+	//m_feature_flags = 0x0080f9ff;
 	m_feature_flags = 0x008081bf;  // TODO: enable missing flags
 
 	CHANGE_PC(m_eip);

@@ -224,7 +224,7 @@ void isa16_calchase_jamma_if::nvram_w(offs_t offset, uint8_t data)
 
 void isa16_calchase_jamma_if::io_map(address_map &map)
 {
-//  map(0x0000, 0x0003).ram();  // XYLINX - Sincronus serial communication
+//  map(0x0000, 0x0003).ram();  // XYLINX - Synchronous serial communication
 	map(0x0004, 0x0005).r(FUNC(isa16_calchase_jamma_if::iocard_r<0>));
 	map(0x0008, 0x000b).nopw(); // ???
 	map(0x000c, 0x000d).r(FUNC(isa16_calchase_jamma_if::iocard_r<1>));

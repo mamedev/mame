@@ -71,9 +71,6 @@ private:
 };
 
 
-static INPUT_PORTS_START( gfamily )
-INPUT_PORTS_END
-
 static void isa_com(device_slot_interface &device)
 {
 	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
@@ -206,4 +203,4 @@ ROM_END
 } // Anonymous namespace
 
 
-GAME( 200?, gmfamily, 0, gfamily, gfamily, gfamily_state, empty_init, ROT0, "bootleg", "Games Family", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, gmfamily, 0, gfamily, 0, gfamily_state, empty_init, ROT0, "bootleg", "Games Family", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

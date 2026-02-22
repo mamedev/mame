@@ -28269,6 +28269,7 @@ pitbossma
 pitbossmb
 pitbosss
 pitbosssa
+pitbosssac
 pitbosssb
 pitbosssc
 pitbosssm
@@ -33264,7 +33265,7 @@ hiryuken
 shangkid
 
 @source:misc/silverball.cpp
-slvrball806
+slvrball
 slvrball720
 slvrball632
 slvrballbu409
@@ -35654,11 +35655,11 @@ sgaltrop
 sgaltropa
 sweetgal
 
-@source:nichibutsu/niyanpai.cpp
+@source:nichibutsu/nyanpai.cpp
 4psimasy
 mhhonban
 musobana
-niyanpai
+nyanpai
 zokumahj
 
 @source:nichibutsu/pastelg.cpp
@@ -37647,6 +37648,9 @@ so30h
 so4saw2
 zito4dps
 
+@source:pc/pcipc_via.cpp
+ls5amvp3
+
 @source:pc/play4texash.cpp
 play4texash
 
@@ -37665,6 +37669,9 @@ i8550061
 i8555081
 i8580071
 i8580111
+
+@source:pc/pulltrig.cpp
+pulltrig
 
 @source:pc/quakeat.cpp
 ga6la7
@@ -37687,6 +37694,9 @@ gamecst2
 gamecstl
 shutms11
 zidav630e
+
+@source:pc/sshuffle.cpp
+sshuffle
 
 @source:pc/tandy1t.cpp
 t1000
@@ -43838,6 +43848,9 @@ azkoyent8
 design6
 designe
 
+@source:skeleton/dharma_z180.cpp
+lbingo
+
 @source:skeleton/diablo1300.cpp
 diablo
 
@@ -44036,8 +44049,8 @@ poemzet2
 i7000
 
 @source:skeleton/iam2.cpp
-zhonggmj
 szjl
+zhonggmj
 
 @source:skeleton/icatel.cpp
 icatel
@@ -44314,9 +44327,6 @@ pt68k4
 @source:skeleton/ptcsol.cpp
 sol20
 
-@source:skeleton/pullttrigger.cpp
-pullttrig
-
 @source:skeleton/pv9234.cpp
 pv9234
 
@@ -44345,6 +44355,9 @@ rvoicepc
 
 @source:skeleton/sacstate.cpp
 sacstate
+
+@source:skeleton/sammy_pachislo_z80.cpp
+ultracl3
 
 @source:skeleton/sansa_fuze.cpp
 sanfuze2
@@ -47005,6 +47018,16 @@ dt7
 @source:toaplan/enmadaio.cpp
 enmadaio
 
+@source:toaplan/fireshrk.cpp
+fireshrk
+fireshrka
+fireshrkd
+fireshrkdh
+samesame
+samesame2
+samesamecn
+samesamenh
+
 @source:toaplan/fixeight.cpp
 fixeight
 fixeighta
@@ -47079,6 +47102,9 @@ bbakraidja
 nprobowl
 probowl2
 
+@source:toaplan/rallybik.cpp
+rallybik
+
 @source:toaplan/slapfght.cpp
 alcon
 getstarb1
@@ -47128,10 +47154,6 @@ demonwld2
 demonwld3
 demonwld4
 demonwld5
-fireshrk
-fireshrka
-fireshrkd
-fireshrkdh
 hellfire
 hellfire1
 hellfire1a
@@ -47142,11 +47164,6 @@ outzoneb
 outzonec
 outzoneh
 outzonecv
-rallybik
-samesame
-samesame2
-samesamecn
-samesamenh
 truxton
 vimana
 vimanaj
@@ -48266,6 +48283,11 @@ mrlo
 mrdofabr
 mrdobl
 yankeedo
+
+@source:universal/pachislo_z80.cpp
+crankyc
+thunderv
+versus
 
 @source:universal/sraider.cpp
 mrsdyna

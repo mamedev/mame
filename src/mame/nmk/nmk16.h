@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "nmk_irq.h"
 #include "nmk004.h"
 #include "nmk214.h"
 #include "nmk16spr.h"
@@ -34,6 +35,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_spritegen(*this, "spritegen"),
+		m_nmk_irq(*this, "nmk_irq"),
 		m_nmk004(*this, "nmk004"),
 		m_soundlatch(*this, "soundlatch"),
 		m_bgvideoram(*this, "bgvideoram%u", 0U),
@@ -45,7 +47,6 @@ public:
 		m_tilemap_rom(*this, "tilerom"),
 		m_audiobank(*this, "audiobank"),
 		m_okibank(*this, "okibank%u", 1U),
-		m_vtiming_prom(*this, "vtiming"),
 		m_dsw_io(*this, "DSW%u", 1U),
 		m_in_io(*this, "IN%u", 0U),
 		m_sprdma_base(0x8000)
@@ -105,9 +106,6 @@ public:
 	void init_macrossbl() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device_array<okim6295_device, 2> m_oki;
@@ -115,6 +113,7 @@ protected:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<nmk_16bit_sprite_device> m_spritegen;
+	optional_device<nmk_irq_device> m_nmk_irq;
 	optional_device<nmk004_device> m_nmk004;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
@@ -128,13 +127,12 @@ protected:
 	optional_region_ptr<u16> m_tilemap_rom;
 	optional_memory_bank m_audiobank;
 	optional_memory_bank_array<2> m_okibank;
-	optional_memory_region m_vtiming_prom;
 
 	optional_ioport_array<2> m_dsw_io;
 	optional_ioport_array<3> m_in_io;
 
 	u32 m_tilerambank = 0;
-	int m_sprdma_base = 0;
+	u32 m_sprdma_base = 0;
 	std::unique_ptr<u16[]> m_spriteram_old;
 	std::unique_ptr<u16[]> m_spriteram_old2;
 	u8 m_bgbank = 0;
@@ -145,7 +143,6 @@ protected:
 	u8 m_scroll[2][4]{};
 	u16 m_vscroll[4]{};
 	u8 m_prot_count = 0;
-	u8 m_vtiming_val = 0;
 
 	void mainram_strange_w(offs_t offset, u16 data/*, u16 mem_mask = ~0*/);
 	u16 mainram_swapped_r(offs_t offset);
@@ -187,7 +184,8 @@ protected:
 
 	void configure_nmk004(machine_config &config) ATTR_COLD;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_scanline);
+	void main_irq_cb(u8 data);
+	void sprite_dma_cb(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(nmk16_hacky_scanline);
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan_pages);

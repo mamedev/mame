@@ -17,6 +17,7 @@
 #include "endianness.h"
 
 #include <algorithm>
+#include <cstdio>
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -158,6 +159,11 @@ adsp21062_device::adsp21062_device(
 	, m_swap_r0_7(nullptr)
 	, m_swap_r8_15(nullptr)
 	, m_blocks(*this, "block%u", 0U)
+	, m_flag_pending_val{ 0, 0, 0, 0 }
+	, m_write_stalled_pending_val{ false }
+	, m_flag_pending{ false, false, false, false }
+	, m_write_stalled_pending(false)
+	, m_input_update_pending(false)
 	, m_enable_drc(false)
 {
 	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
@@ -182,6 +188,32 @@ std::unique_ptr<util::disasm_interface> adsp21062_device::create_disassembler()
 {
 	return std::make_unique<sharc_disassembler>();
 }
+
+void adsp21062_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case SHARC_ASTAT:
+			if (m_enable_drc)
+				m_core->astat_drc.unpack(m_core->astat);
+			break;
+	}
+}
+
+void adsp21062_device::state_export(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+		case SHARC_ASTAT:
+			if (m_enable_drc)
+			{
+				uint32_t const flags_mask = FLG0 | FLG1 | FLG2 | FLG3;
+				m_core->astat = (m_core->astat & flags_mask) | m_core->astat_drc.pack();
+			}
+			break;
+	}
+}
+
 
 void adsp21062_device::enable_recompiler()
 {
@@ -318,30 +350,13 @@ void adsp21062_device::iop_w(offs_t offset, uint32_t data)
 		case 0x00: m_core->syscon = data; break;
 		case 0x02: break;       // External Memory Wait State Configuration
 		case 0x04: // External port DMA buffer 0
-		/* TODO: Last Bronx uses this to init the program, int_index however is 0? */
 		{
-			external_dma_write(m_core->extdma_shift,data);
-			m_core->extdma_shift++;
-			if(m_core->extdma_shift == 3)
-				m_core->extdma_shift = 0;
-
-			#if 0
-			uint64_t r = pm_read48(m_core->dma[6].int_index);
-
-			r &= ~((uint64_t)(0xffff) << (m_core->extdma_shift*16));
-			r |= ((uint64_t)data & 0xffff) << (m_core->extdma_shift*16);
-
-			pm_write48(m_core->dma[6].int_index, r);
-
+			external_dma_write(m_core->extdma_shift, data);
 			m_core->extdma_shift++;
 			if (m_core->extdma_shift == 3)
-			{
 				m_core->extdma_shift = 0;
-				m_core->dma[6].int_index ++;
-			}
-			#endif
+			break;
 		}
-		break;
 
 		case 0x08: break;       // Message Register 0
 		case 0x09: break;       // Message Register 1
@@ -479,19 +494,35 @@ void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 	first internal RAM location, before they are used by the DMA controller.
 	*/
 
-	switch ((m_core->dma[6].control >> 6) & 0x3)
+	offs_t const index = (m_core->dma[6].int_index & 0x1ffff) | 0x20000;
+	unsigned const mswf = BIT(m_core->dma[6].control, 8);
+	unsigned const pmode = BIT(m_core->dma[6].control, 6, 2);
+	unsigned const dtype = BIT(m_core->dma[6].control, 5);
+	switch (pmode)
 	{
+		case 0:         // no packing
+		{
+			if (dtype)
+				pm_write32(index, data);
+			else
+				dm_write32(index, data);
+
+			m_core->dma[6].int_index += m_core->dma[6].int_modifier;
+			break;
+		}
 		case 2:         // 16/48 packing
 		{
-			int shift = address % 3;
-			uint64_t r = pm_read48((m_core->dma[6].int_index & 0x1ffff) | 0x20000);
+			// FIXME: honour DTYPE
+			unsigned const word = address % 3;
+			unsigned const shift = (mswf ? (2 - word) : word) * 16;
 
-			r &= ~(uint64_t(0xffff) << (shift*16));
-			r |= (data & 0xffff) << (shift*16);
+			uint64_t r = pm_read48(index);
+			r &= ~(uint64_t(0xffff) << shift);
+			r |= (data & 0xffff) << shift;
 
-			pm_write48((m_core->dma[6].int_index & 0x1ffff) | 0x20000, r);
+			pm_write48(index, r);
 
-			if (shift == 2)
+			if (word == 2)
 			{
 				m_core->dma[6].int_index += m_core->dma[6].int_modifier;
 			}
@@ -499,7 +530,7 @@ void adsp21062_device::external_dma_write(uint32_t address, uint64_t data)
 		}
 		default:
 		{
-			throw emu_fatalerror("sharc_external_dma_write: unimplemented packing mode %d\n", (m_core->dma[6].control >> 6) & 0x3);
+			throw emu_fatalerror("sharc_external_dma_write: unimplemented packing mode %d\n", pmode);
 		}
 	}
 }
@@ -509,19 +540,23 @@ void adsp21062_device::device_start()
 	assert(m_blocks[0].length() == m_blocks[1].length());
 	assert(!(m_blocks[0].length() & (m_blocks[0].length() - 1)));
 
-	m_cache.allocate_cache(mconfig().options().drc_rwx());
-	m_core = m_cache.alloc_near<sharc_internal_state>();
-	memset(m_core, 0, sizeof(sharc_internal_state));
-
 	space(AS_PROGRAM).specific(m_program);
 	space(AS_DATA).specific(m_data);
 
 	if (!m_enable_drc)
 	{
+		m_heap_core = std::make_unique<sharc_internal_state>();
+		m_core = m_heap_core.get();
+		memset(m_core, 0, sizeof(sharc_internal_state));
+
 		build_opcode_table();
 	}
 	else
 	{
+		m_cache.allocate_cache(mconfig().options().drc_rwx());
+		m_core = m_cache.alloc_near<sharc_internal_state>();
+		memset(m_core, 0, sizeof(sharc_internal_state));
+
 		// init UML generator
 		uint32_t umlflags = 0;
 		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 1, 24, 0);
@@ -530,22 +565,22 @@ void adsp21062_device::device_start()
 		m_drcuml->symbol_add(&m_core->pc, sizeof(m_core->pc), "pc");
 		m_drcuml->symbol_add(&m_core->icount, sizeof(m_core->icount), "icount");
 
-		for (int i = 0; i < 16; i++)
+		for (int i = 0; 16 > i; ++i)
 		{
 			char buf[10];
 
-			snprintf(buf, std::size(buf), "r%d", i);
+			std::snprintf(buf, std::size(buf), "r%d", i);
 			m_drcuml->symbol_add(&m_core->r[i], sizeof(m_core->r[i]), buf);
 
 			auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
-			snprintf(buf, std::size(buf), "dag_i%d", i);
-			m_drcuml->symbol_add(&dag.i[i & 7], sizeof(dag.i[i & 7]), buf);
-			snprintf(buf, std::size(buf), "dag_m%d", i);
-			m_drcuml->symbol_add(&dag.m[i & 7], sizeof(dag.m[i & 7]), buf);
-			snprintf(buf, std::size(buf), "dag_l%d", i);
-			m_drcuml->symbol_add(&dag.l[i & 7], sizeof(dag.l[i & 7]), buf);
-			snprintf(buf, std::size(buf), "dag_b%d", i);
-			m_drcuml->symbol_add(&dag.b[i & 7], sizeof(dag.b[i & 7]), buf);
+			std::snprintf(buf, std::size(buf), "dag_i%d", i);
+			m_drcuml->symbol_add(&dag.i[i & 7], sizeof(dag.i[i & 0x07]), buf);
+			std::snprintf(buf, std::size(buf), "dag_m%d", i);
+			m_drcuml->symbol_add(&dag.m[i & 7], sizeof(dag.m[i & 0x07]), buf);
+			std::snprintf(buf, std::size(buf), "dag_l%d", i);
+			m_drcuml->symbol_add(&dag.l[i & 7], sizeof(dag.l[i & 0x07]), buf);
+			std::snprintf(buf, std::size(buf), "dag_b%d", i);
+			m_drcuml->symbol_add(&dag.b[i & 7], sizeof(dag.b[i & 0x07]), buf);
 		}
 
 		m_drcuml->symbol_add(&m_core->astat, sizeof(m_core->astat), "astat");
@@ -631,15 +666,9 @@ void adsp21062_device::device_start()
 	}
 	m_core->mrf = 0;
 	m_core->mrb = 0;
-	for (auto & elem : m_core->pcstack)
-	{
-		elem = 0;
-	}
-	for (int i=0; i < 6; i++)
-	{
-		m_core->lcstack[i] = 0;
-		m_core->lastack[i] = 0;
-	}
+	std::fill(std::begin(m_core->pcstack), std::end(m_core->pcstack), 0);
+	std::fill(std::begin(m_core->lcstack), std::end(m_core->lcstack), 0);
+	std::fill(std::begin(m_core->lastack), std::end(m_core->lastack), 0);
 	m_core->pcstk = 0;
 	m_core->laddr.addr = m_core->laddr.code = m_core->laddr.loop_type = 0;
 	m_core->curlcntr = 0;
@@ -715,13 +744,7 @@ void adsp21062_device::device_start()
 
 	save_item(NAME(m_core->faddr));
 	save_item(NAME(m_core->daddr));
-	save_item(NAME(m_core->pcstk));
 	save_item(NAME(m_core->pcstkp));
-	save_item(NAME(m_core->laddr.addr));
-	save_item(NAME(m_core->laddr.code));
-	save_item(NAME(m_core->laddr.loop_type));
-	save_item(NAME(m_core->curlcntr));
-	save_item(NAME(m_core->lcntr));
 	save_item(NAME(m_core->iop_write_num));
 	save_item(NAME(m_core->iop_data));
 
@@ -813,15 +836,15 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->astat_old_old));
 	save_item(NAME(m_core->astat_old_old_old));
 
-	state_add( SHARC_PC,     "PC", m_core->pc).formatstr("%08X");
-	state_add( SHARC_PCSTK,  "PCSTK", m_core->pcstk).formatstr("%08X");
-	state_add( SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).formatstr("%08X");
-	state_add( SHARC_LSTKP,  "LSTKP", m_core->lstkp).formatstr("%08X");
+	state_add( SHARC_PC,     "PC", m_core->pc).mask(0x00ffffff).formatstr("%06X");
+	state_add( SHARC_PCSTK,  "PCSTK", m_core->pcstk).mask(0x00ffffff).formatstr("%06X");
+	state_add( SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).mask(0x1f).formatstr("%02X");
+	state_add( SHARC_LSTKP,  "LSTKP", m_core->lstkp).mask(0x07).formatstr("%01X");
 	state_add( SHARC_FADDR,  "FADDR", m_core->faddr).formatstr("%08X");
 	state_add( SHARC_DADDR,  "DADDR", m_core->daddr).formatstr("%08X");
 	state_add( SHARC_MODE1,  "MODE1", m_core->mode1).formatstr("%08X");
 	state_add( SHARC_MODE2,  "MODE2", m_core->mode2).formatstr("%08X");
-	state_add( SHARC_ASTAT,  "ASTAT", m_core->astat).formatstr("%08X");
+	state_add( SHARC_ASTAT,  "ASTAT", m_core->astat).formatstr("%08X").callimport().callexport();
 	state_add( SHARC_IRPTL,  "IRPTL", m_core->irptl).formatstr("%08X");
 	state_add( SHARC_IMASK,  "IMASK", m_core->imask).formatstr("%08X");
 	state_add( SHARC_USTAT1, "USTAT1", m_core->ustat1).formatstr("%08X");
@@ -829,90 +852,36 @@ void adsp21062_device::device_start()
 	state_add( SHARC_CURLCNTR, "CURLCNTR", m_core->curlcntr).formatstr("%08X");
 	state_add( SHARC_STSTKP, "STSTKP", m_core->status_stkp).formatstr("%08X");
 
-	state_add( SHARC_R0,     "R0", m_core->r[0].r).formatstr("%08X");
-	state_add( SHARC_R1,     "R1", m_core->r[1].r).formatstr("%08X");
-	state_add( SHARC_R2,     "R2", m_core->r[2].r).formatstr("%08X");
-	state_add( SHARC_R3,     "R3", m_core->r[3].r).formatstr("%08X");
-	state_add( SHARC_R4,     "R4", m_core->r[4].r).formatstr("%08X");
-	state_add( SHARC_R5,     "R5", m_core->r[5].r).formatstr("%08X");
-	state_add( SHARC_R6,     "R6", m_core->r[6].r).formatstr("%08X");
-	state_add( SHARC_R7,     "R7", m_core->r[7].r).formatstr("%08X");
-	state_add( SHARC_R8,     "R8", m_core->r[8].r).formatstr("%08X");
-	state_add( SHARC_R9,     "R9", m_core->r[9].r).formatstr("%08X");
-	state_add( SHARC_R10,    "R10", m_core->r[10].r).formatstr("%08X");
-	state_add( SHARC_R11,    "R11", m_core->r[11].r).formatstr("%08X");
-	state_add( SHARC_R12,    "R12", m_core->r[12].r).formatstr("%08X");
-	state_add( SHARC_R13,    "R13", m_core->r[13].r).formatstr("%08X");
-	state_add( SHARC_R14,    "R14", m_core->r[14].r).formatstr("%08X");
-	state_add( SHARC_R15,    "R15", m_core->r[15].r).formatstr("%08X");
-
-	state_add( SHARC_I0,     "I0", m_core->dag1.i[0]).formatstr("%08X");
-	state_add( SHARC_I1,     "I1", m_core->dag1.i[1]).formatstr("%08X");
-	state_add( SHARC_I2,     "I2", m_core->dag1.i[2]).formatstr("%08X");
-	state_add( SHARC_I3,     "I3", m_core->dag1.i[3]).formatstr("%08X");
-	state_add( SHARC_I4,     "I4", m_core->dag1.i[4]).formatstr("%08X");
-	state_add( SHARC_I5,     "I5", m_core->dag1.i[5]).formatstr("%08X");
-	state_add( SHARC_I6,     "I6", m_core->dag1.i[6]).formatstr("%08X");
-	state_add( SHARC_I7,     "I7", m_core->dag1.i[7]).formatstr("%08X");
-	state_add( SHARC_I8,     "I8", m_core->dag2.i[0]).formatstr("%08X");
-	state_add( SHARC_I9,     "I9", m_core->dag2.i[1]).formatstr("%08X");
-	state_add( SHARC_I10,    "I10", m_core->dag2.i[2]).formatstr("%08X");
-	state_add( SHARC_I11,    "I11", m_core->dag2.i[3]).formatstr("%08X");
-	state_add( SHARC_I12,    "I12", m_core->dag2.i[4]).formatstr("%08X");
-	state_add( SHARC_I13,    "I13", m_core->dag2.i[5]).formatstr("%08X");
-	state_add( SHARC_I14,    "I14", m_core->dag2.i[6]).formatstr("%08X");
-	state_add( SHARC_I15,    "I15", m_core->dag2.i[7]).formatstr("%08X");
-
-	state_add( SHARC_M0,     "M0", m_core->dag1.m[0]).formatstr("%08X");
-	state_add( SHARC_M1,     "M1", m_core->dag1.m[1]).formatstr("%08X");
-	state_add( SHARC_M2,     "M2", m_core->dag1.m[2]).formatstr("%08X");
-	state_add( SHARC_M3,     "M3", m_core->dag1.m[3]).formatstr("%08X");
-	state_add( SHARC_M4,     "M4", m_core->dag1.m[4]).formatstr("%08X");
-	state_add( SHARC_M5,     "M5", m_core->dag1.m[5]).formatstr("%08X");
-	state_add( SHARC_M6,     "M6", m_core->dag1.m[6]).formatstr("%08X");
-	state_add( SHARC_M7,     "M7", m_core->dag1.m[7]).formatstr("%08X");
-	state_add( SHARC_M8,     "M8", m_core->dag2.m[0]).formatstr("%08X");
-	state_add( SHARC_M9,     "M9", m_core->dag2.m[1]).formatstr("%08X");
-	state_add( SHARC_M10,    "M10", m_core->dag2.m[2]).formatstr("%08X");
-	state_add( SHARC_M11,    "M11", m_core->dag2.m[3]).formatstr("%08X");
-	state_add( SHARC_M12,    "M12", m_core->dag2.m[4]).formatstr("%08X");
-	state_add( SHARC_M13,    "M13", m_core->dag2.m[5]).formatstr("%08X");
-	state_add( SHARC_M14,    "M14", m_core->dag2.m[6]).formatstr("%08X");
-	state_add( SHARC_M15,    "M15", m_core->dag2.m[7]).formatstr("%08X");
-
-	state_add( SHARC_L0,     "L0", m_core->dag1.l[0]).formatstr("%08X");
-	state_add( SHARC_L1,     "L1", m_core->dag1.l[1]).formatstr("%08X");
-	state_add( SHARC_L2,     "L2", m_core->dag1.l[2]).formatstr("%08X");
-	state_add( SHARC_L3,     "L3", m_core->dag1.l[3]).formatstr("%08X");
-	state_add( SHARC_L4,     "L4", m_core->dag1.l[4]).formatstr("%08X");
-	state_add( SHARC_L5,     "L5", m_core->dag1.l[5]).formatstr("%08X");
-	state_add( SHARC_L6,     "L6", m_core->dag1.l[6]).formatstr("%08X");
-	state_add( SHARC_L7,     "L7", m_core->dag1.l[7]).formatstr("%08X");
-	state_add( SHARC_L8,     "L8", m_core->dag2.l[0]).formatstr("%08X");
-	state_add( SHARC_L9,     "L9", m_core->dag2.l[1]).formatstr("%08X");
-	state_add( SHARC_L10,    "L10", m_core->dag2.l[2]).formatstr("%08X");
-	state_add( SHARC_L11,    "L11", m_core->dag2.l[3]).formatstr("%08X");
-	state_add( SHARC_L12,    "L12", m_core->dag2.l[4]).formatstr("%08X");
-	state_add( SHARC_L13,    "L13", m_core->dag2.l[5]).formatstr("%08X");
-	state_add( SHARC_L14,    "L14", m_core->dag2.l[6]).formatstr("%08X");
-	state_add( SHARC_L15,    "L15", m_core->dag2.l[7]).formatstr("%08X");
-
-	state_add( SHARC_B0,     "B0", m_core->dag1.b[0]).formatstr("%08X");
-	state_add( SHARC_B1,     "B1", m_core->dag1.b[1]).formatstr("%08X");
-	state_add( SHARC_B2,     "B2", m_core->dag1.b[2]).formatstr("%08X");
-	state_add( SHARC_B3,     "B3", m_core->dag1.b[3]).formatstr("%08X");
-	state_add( SHARC_B4,     "B4", m_core->dag1.b[4]).formatstr("%08X");
-	state_add( SHARC_B5,     "B5", m_core->dag1.b[5]).formatstr("%08X");
-	state_add( SHARC_B6,     "B6", m_core->dag1.b[6]).formatstr("%08X");
-	state_add( SHARC_B7,     "B7", m_core->dag1.b[7]).formatstr("%08X");
-	state_add( SHARC_B8,     "B8", m_core->dag2.b[0]).formatstr("%08X");
-	state_add( SHARC_B9,     "B9", m_core->dag2.b[1]).formatstr("%08X");
-	state_add( SHARC_B10,    "B10", m_core->dag2.b[2]).formatstr("%08X");
-	state_add( SHARC_B11,    "B11", m_core->dag2.b[3]).formatstr("%08X");
-	state_add( SHARC_B12,    "B12", m_core->dag2.b[4]).formatstr("%08X");
-	state_add( SHARC_B13,    "B13", m_core->dag2.b[5]).formatstr("%08X");
-	state_add( SHARC_B14,    "B14", m_core->dag2.b[6]).formatstr("%08X");
-	state_add( SHARC_B15,    "B15", m_core->dag2.b[7]).formatstr("%08X");
+	char namebuf[8];
+	for (int i = 0; 16 > i; ++i)
+	{
+		std::snprintf(namebuf, std::size(namebuf), "R%d", i);
+		state_add(SHARC_R0 + i, namebuf, m_core->r[i].r).formatstr("%08X");
+	}
+	for (int i = 0; 16 > i; ++i)
+	{
+		std::snprintf(namebuf, std::size(namebuf), "I%d", i);
+		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
+		state_add(SHARC_I0 + i, namebuf, dag.i[i]).formatstr("%08X");
+	}
+	for (int i = 0; 16 > i; ++i)
+	{
+		std::snprintf(namebuf, std::size(namebuf), "M%d", i);
+		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
+		state_add(SHARC_M0 + i, namebuf, dag.m[i]).formatstr("%08X");
+	}
+	for (int i = 0; 16 > i; ++i)
+	{
+		std::snprintf(namebuf, std::size(namebuf), "L%d", i);
+		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
+		state_add(SHARC_L0 + i, namebuf, dag.l[i]).formatstr("%08X");
+	}
+	for (int i = 0; 16 > i; ++i)
+	{
+		std::snprintf(namebuf, std::size(namebuf), "B%d", i);
+		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
+		state_add(SHARC_B0 + i, namebuf, dag.b[i]).formatstr("%08X");
+	}
 
 	state_add( STATE_GENPC, "GENPC", m_core->pc).noshow();
 	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
@@ -967,18 +936,33 @@ void adsp21062_device::device_reset()
 	m_core->nfaddr = m_core->faddr+1;
 
 	m_core->idle = 0;
-	m_core->stky = 0x5400000;
+	m_core->mode1 = 0x00000000;
+	m_core->mode2 &= 0xf0000000;
+	m_core->astat &= FLG0 | FLG1 | FLG2 | FLG3;
+	m_core->stky = PCEM | SSEM | LSEM;
+	m_core->irptl = 0x0000;
+	m_core->imask = 0x0003;
+	m_core->ustat1 = 0x0000;
+	m_core->ustat2 = 0x0000;
 
-	m_core->lstkp = 0;
 	m_core->pcstkp = 0;
+	m_core->lstkp = 0;
+	m_core->pcstk = 0x00ffffff;
+	m_core->curlcntr = 0xffffffff;
+	m_core->lcntr = m_core->lcstack[0];
+	m_core->laddr.unpack(0xffffffff);
+	m_core->status_stkp = 0;
 	m_core->interrupt_active = 0;
 
-	m_core->syscon = 0x10;
+	m_core->syscon = 0x00000010;
+	m_core->sysstat &= 0x00000ff0;
 	m_core->iop_write_num = 0;
 	m_core->iop_data = 0;
 
 	if (m_enable_drc)
 	{
+		m_core->astat_drc.clear();
+
 		m_core->cache_dirty = 1;
 		m_drcuml->reset();
 	}
@@ -986,11 +970,25 @@ void adsp21062_device::device_reset()
 
 void adsp21062_device::device_pre_save()
 {
+	assert(!m_input_update_pending);
+
 	cpu_device::device_pre_save();
+
+	if ((m_core->pcstkp > 0) && (m_core->pcstkp < 31))
+		m_core->pcstack[m_core->pcstkp - 1] = m_core->pcstk;
+
+	if ((m_core->lstkp > 0) && (m_core->lstkp < 7))
+	{
+		m_core->lcstack[m_core->lstkp - 1] = m_core->curlcntr;
+		m_core->lastack[m_core->lstkp - 1] = m_core->laddr.pack();
+	}
+
+	if (m_core->lstkp < 6)
+		m_core->lcstack[m_core->lstkp] = m_core->lcntr;
 
 	if (m_enable_drc)
 	{
-		m_core->astat = m_core->astat_drc.pack();
+		m_core->astat = (m_core->astat & (FLG0 | FLG1 | FLG2 | FLG3)) | m_core->astat_drc.pack();
 		m_core->astat_old = m_core->astat_drc_copy.pack();
 		m_core->astat_old_old = m_core->astat_delay_copy.pack();
 	}
@@ -999,6 +997,48 @@ void adsp21062_device::device_pre_save()
 void adsp21062_device::device_post_load()
 {
 	cpu_device::device_post_load();
+
+	for (auto &pcstk : m_core->pcstack)
+		pcstk &= 0x00ffffff;
+
+	m_core->pcstkp &= 0x1f;
+	m_core->lstkp &= 0x07;
+
+	if ((m_core->pcstkp > 0) && (m_core->pcstkp < 31))
+		m_core->pcstk = m_core->pcstack[m_core->pcstkp - 1];
+	else
+		m_core->pcstk = 0x00ffffff;
+
+	if ((m_core->lstkp > 0) && (m_core->lstkp < 7))
+	{
+		m_core->curlcntr = m_core->lcstack[m_core->lstkp - 1];
+		m_core->laddr.unpack(m_core->lastack[m_core->lstkp - 1]);
+	}
+	else
+	{
+		m_core->curlcntr = 0xffffffff;
+		m_core->laddr.unpack(0xffffffff);
+	}
+
+	if (m_core->lstkp < 6)
+		m_core->lcntr = m_core->lcstack[m_core->lstkp];
+	else
+		m_core->lcntr = 0xffffffff;
+
+	if (m_core->pcstkp > 0)
+		m_core->stky &= ~PCEM;
+	else
+		m_core->stky |= PCEM;
+
+	if (m_core->pcstkp >= 30)
+		m_core->stky |= PCFL;
+	else
+		m_core->stky &= ~PCFL;
+
+	if (m_core->lstkp > 0)
+		m_core->stky &= ~LSEM;
+	else
+		m_core->stky |= LSEM;
 
 	m_core->astat_drc.unpack(m_core->astat);
 	m_core->astat_drc_copy.unpack(m_core->astat_old);
@@ -1019,72 +1059,127 @@ void adsp21062_device::execute_set_input(int irqline, int state)
 			m_core->irq_pending &= ~(1 << (8-irqline));
 		}
 	}
-	else if (irqline >= SHARC_INPUT_FLAG0 && irqline <= SHARC_INPUT_FLAG3)
-	{
-		set_flag_input(irqline - SHARC_INPUT_FLAG0, state);
-	}
 }
 
 void adsp21062_device::set_flag_input(int flag_num, int state)
 {
-	if (flag_num >= 0 && flag_num < 4)
+	assert((flag_num >= 0) && (flag_num < 4));
+
+	// Check if flag is set to input in MODE2 (bit == 0)
+	if (BIT(m_core->mode2, flag_num + 15))
+		throw emu_fatalerror("sharc_set_flag_input: flag %d is set output!\n", flag_num);
+
+	state = state ? 1 : 0;
+	device_execute_interface *const current = machine().scheduler().currently_executing();
+	bool const not_executing = current && (current != static_cast<device_execute_interface *>(this));
+	if (not_executing || m_flag_pending[flag_num])
 	{
-		// Check if flag is set to input in MODE2 (bit == 0)
-		if ((m_core->mode2 & (1 << (flag_num+15))) == 0)
+		if (m_flag_pending[flag_num] || (m_core->flag[flag_num] != state))
 		{
-			m_core->flag[flag_num] = state ? 1 : 0;
+			m_flag_pending_val[flag_num] = state;
+			m_flag_pending[flag_num] = true;
+			if (!m_input_update_pending)
+			{
+				m_input_update_pending = true;
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(adsp21062_device::sharc_update_inputs), this));
+			}
 		}
-		else
-		{
-			throw emu_fatalerror("sharc_set_flag_input: flag %d is set output!\n", flag_num);
-		}
+	}
+	else
+	{
+		m_core->flag[flag_num] = state ? 1 : 0;
 	}
 }
 
 void adsp21062_device::write_stall(int state)
 {
-	m_core->write_stalled = (state == 0) ? false : true;
-
-	if (m_enable_drc)
+	bool const stall = state != 0;
+	device_execute_interface *const current = machine().scheduler().currently_executing();
+	bool const not_executing = current && (current != static_cast<device_execute_interface *>(this));
+	if (m_enable_drc || not_executing || m_write_stalled_pending)
 	{
-		if (m_core->write_stalled)
-			spin_until_trigger(45757);
-		else
-			machine().scheduler().trigger(45757);
+		if (m_write_stalled_pending || (m_core->write_stalled != stall))
+		{
+			m_write_stalled_pending_val = stall;
+			m_write_stalled_pending = true;
+			if (!m_input_update_pending)
+			{
+				m_input_update_pending = true;
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(adsp21062_device::sharc_update_inputs), this));
+			}
+		}
+	}
+	else
+	{
+		m_core->write_stalled = stall;
 	}
 }
 
+TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_update_inputs)
+{
+	m_input_update_pending = false;
+
+	for (unsigned i = 0; 4 > i; ++i)
+	{
+		if (m_flag_pending[i])
+		{
+			m_core->flag[i] = m_flag_pending_val[i];
+			m_flag_pending[i] = false;
+		}
+	}
+
+	if (m_write_stalled_pending)
+	{
+		if (m_core->write_stalled != m_write_stalled_pending_val)
+		{
+			m_core->write_stalled = m_write_stalled_pending_val;
+#if 0 // FIXME: this implementation breaks Thrill Drive on Hornet
+			if (m_enable_drc)
+			{
+				if (m_core->write_stalled)
+				{
+					m_core->dma_op[6].timer->adjust(attotime::never, 0);
+					m_core->dma_op[7].timer->adjust(attotime::never, 0);
+				}
+				else
+				{
+					if (m_core->dma_status & (1 << 6))
+						m_core->dma_op[6].timer->adjust(cycles_to_attotime(m_core->dma_op[6].src_count / 4), 6);
+					if (m_core->dma_status & (1 << 7))
+						m_core->dma_op[7].timer->adjust(cycles_to_attotime(m_core->dma_op[7].src_count / 4), 7);
+				}
+			}
+#endif
+		}
+		m_write_stalled_pending = false;
+	}
+}
+
+
 void adsp21062_device::check_interrupts()
 {
-	int i;
 	if ((m_core->imask & m_core->irq_pending) && (m_core->mode1 & MODE1_IRPTEN) && !m_core->interrupt_active &&
 		m_core->pc != m_core->delay_slot1 && m_core->pc != m_core->delay_slot2)
 	{
 		int which = 0;
-		for (i=0; i < 32; i++)
+		for (int i = 0; i < 32; i++)
 		{
-			if (m_core->irq_pending & (1 << i))
-			{
+			if (BIT(m_core->irq_pending, i))
 				break;
-			}
 			which++;
 		}
 
+		PUSH_PC();
 		if (m_core->idle)
-		{
-			PUSH_PC(m_core->pc+1);
-		}
+			m_core->pcstk = m_core->pc + 1;
 		else
-		{
-			PUSH_PC(m_core->daddr);
-		}
+			m_core->pcstk = m_core->daddr;
 
 		m_core->irptl |= 1 << which;
 
+		// TODO: timer and VIRPT interrupts also push the status stack
 		if (which >= 6 && which <= 8)
-		{
 			PUSH_STATUS_STACK();
-		}
 
 		CHANGE_PC(0x20000 + (which * 0x4));
 
@@ -1120,7 +1215,7 @@ void adsp21062_device::execute_run()
 			int dma_count = m_core->icount;
 
 			// run active DMAs even while idling
-			while (dma_count > 0 && m_core->dma_status & ((1 << 6) | (1 << 7)))
+			while ((dma_count > 0) && (m_core->dma_status & ((1 << 6) | (1 << 7))))
 			{
 				if (!m_core->write_stalled)
 				{
@@ -1154,23 +1249,18 @@ void adsp21062_device::execute_run()
 			m_core->opcode = m_program.read_qword(m_core->pc);
 
 			// handle looping
-			if (m_core->pc == m_core->laddr.addr)
+			if (!(m_core->stky & LSEM) && (m_core->pc == m_core->laddr.addr))
 			{
 				switch (m_core->laddr.loop_type)
 				{
 				case 0:     // arithmetic condition-based
 				{
-					int condition = m_core->laddr.code;
-
+					if ((m_core->pc - TOP_PC()) > 2)
 					{
-						uint32_t looptop = TOP_PC();
-						if (m_core->pc - looptop > 2)
-						{
-							m_core->astat = m_core->astat_old_old_old;
-						}
+						m_core->astat = m_core->astat_old_old_old;
 					}
 
-					if (DO_CONDITION_CODE(condition))
+					if (DO_CONDITION_CODE(m_core->laddr.code))
 					{
 						POP_LOOP();
 						POP_PC();
@@ -1195,7 +1285,6 @@ void adsp21062_device::execute_run()
 				}
 				case 3:     // counter-based, length >2
 				{
-					--m_core->lcstack[m_core->lstkp];
 					--m_core->curlcntr;
 					if (m_core->curlcntr == 0)
 					{

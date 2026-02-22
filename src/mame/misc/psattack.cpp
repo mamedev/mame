@@ -268,8 +268,8 @@ void psattack_state::psattack(machine_config &config)
 	m_vr0soc->set_external_vclk(XTAL(25'175'000)); // assumed from the only available XTal on PCB
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "cf", nullptr, true);
-//	m_ata->irq_handler().set([this] (int state) { printf("irq %d\n", state); });
-//	m_ata->dmarq_handler().set([this] (int state) { printf("dmarq %d\n", state); });
+	//m_ata->irq_handler().set([] (int state) { osd_printf_info("irq %d\n", state); });
+	//m_ata->dmarq_handler().set([] (int state) { osd_printf_info("dmarq %d\n", state); });
 
 	EEPROM_93C86_16BIT(config, m_eeprom, 0);
 

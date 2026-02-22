@@ -7,8 +7,9 @@
 #pragma once
 
 #include "pci.h"
-#include "lpc-acpi.h"
 #include "pci-smbus.h"
+
+class acpi_piix4_device;
 
 class i82371eb_acpi_device : public pci_device
 {
@@ -20,7 +21,6 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 //  virtual void reset_all_mappings() override;
 
@@ -29,10 +29,8 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	void io_map(address_map &map) ATTR_COLD;
-
 private:
-	required_device<lpc_acpi_device> m_acpi;
+	required_device<acpi_piix4_device> m_acpi;
 	required_device<smbus_device> m_smbus;
 
 	devcb_write_line m_apmc_en_w;
@@ -66,6 +64,34 @@ private:
 	void unmap_log_w(offs_t offset, u8 data);
 };
 
+class acpi_piix4_device : public device_t
+{
+public:
+	acpi_piix4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = XTAL(3'579'545).value());
+
+	void map(address_map &map);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+	virtual void device_validity_check(validity_checker &valid) const override;
+
+private:
+	u16 m_pmsts;
+	u16 m_pmen;
+	u16 m_pmcntrl;
+	u16 m_gpsts;
+	u16 m_gpen;
+	u16 m_pcntrl;
+	u16 m_glbsts;
+	u16 m_devsts[2];
+	u16 m_glben;
+	u16 m_glbctl[2];
+	u16 m_devctl[2];
+	u16 m_gporeg[2];
+};
+
 DECLARE_DEVICE_TYPE(I82371EB_ACPI, i82371eb_acpi_device)
+DECLARE_DEVICE_TYPE(ACPI_PIIX4, acpi_piix4_device)
 
 #endif

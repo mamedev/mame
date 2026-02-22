@@ -31,8 +31,6 @@ when actually playing the games because otherwise you'll be sending inputs to th
 #include "emu.h"
 #include "jaleco_vj_pc.h"
 
-#include "jaleco_vj_ups.h"
-
 #include "bus/isa/isa_cards.h"
 #include "bus/pci/virge_pci.h"
 #include "bus/rs232/rs232.h"
@@ -40,8 +38,9 @@ when actually playing the games because otherwise you'll be sending inputs to th
 #include "machine/i82371sb.h"
 #include "machine/i82439hx.h"
 #include "machine/i82439tx.h"
-#include "machine/pci-ide.h"
 #include "machine/pci.h"
+
+#include "jaleco_vj_ups.h"
 
 
 jaleco_vj_pc_device::jaleco_vj_pc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -115,16 +114,16 @@ void jaleco_vj_pc_device::device_add_mconfig(machine_config &config)
 	I82439HX(config, "pci:00.0", 0, m_maincpu, 256*1024*1024); // TODO: Should be 0x05851106 VIA VT82C585 Apollo VP,VPX,VPX-97 System Controller
 
 	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, m_maincpu));
-	// isa.set_ids(0x05861106, 0x23, 0x060100, 0x00000000); // TODO: Should be VIA VT82C586B, PCI-to-ISA Bridge
+	// isa.set_ids(0x11060586, 0x23, 0x060100, 0x00000000); // TODO: Should be VIA VT82C586B, PCI-to-ISA Bridge
 	isa.boot_state_hook().set(FUNC(jaleco_vj_pc_device::boot_state_w));
 	isa.smi().set_inputline(m_maincpu, INPUT_LINE_SMI);
 
 	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", 0, m_maincpu));
-	// ide.set_ids(0x05711106, 0x06, 0x01018a, 0x00000000); // TODO: Should be VIA VT82C586B, IDE Controller
+	// ide.set_ids(0x11060571, 0x06, 0x01018a, 0x00000000); // TODO: Should be VIA VT82C586B, IDE Controller
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
 	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
 
-	// TODO: pci:07.3 0x30401106 VIA VT83C572, VT86C586/A/B Power Management Controller
+	// TODO: pci:07.3 0x11063040 VIA VT83C572, VT86C586/A/B Power Management Controller
 
 	JALECO_VJ_KING_QTARO(config, m_king_qtaro, 0);
 

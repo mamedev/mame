@@ -102,13 +102,15 @@ www.multitech.com
 */
 
 #include "emu.h"
+
 #include "cpu/mips/mips3.h"
 #include "machine/pci.h"
-#include "machine/vrc4373.h"
-#include "video/voodoo_pci.h"
-#include "sound/es1373.h"
-#include "iteagle_fpga.h"
 #include "machine/pci-ide.h"
+#include "machine/vrc4373.h"
+#include "sound/es1373.h"
+#include "video/voodoo_pci.h"
+
+#include "iteagle_fpga.h"
 #include "screen.h"
 
 
@@ -182,7 +184,8 @@ void iteagle_state::iteagle(machine_config &config)
 	vrc4373.set_simm0_size(0x02000000);
 
 	ITEAGLE_PERIPH(config, PCI_ID_PERIPH, 0);
-	IDE_PCI(config, PCI_ID_IDE, 0, 0x1080C693, 0x00, 0x0)
+	// Contaq Microsystems 82c693
+	IDE_PCI(config, PCI_ID_IDE, 0, 0x1080c693, 0x00, 0x0)
 		.irq_handler().set_inputline(m_maincpu, MIPS3_IRQ2);
 
 	ITEAGLE_FPGA(config, m_fpga, 0, "screen", m_maincpu, MIPS3_IRQ1, MIPS3_IRQ4);

@@ -229,7 +229,14 @@ static std::pair<u16, char const *> const tmp96c141_syms[] = {
 	{ 0x7c, "DMA0V" }, { 0x7d, "DMA1V" }, { 0x7e, "DMA2V" }, { 0x7f, "DMA3V"}
 };
 
+static tlcs900_disassembler::cr_sym const tmp96c141_cr_syms[] = {
+	{ 8,  0x22, "DMAM0" }, { 8,  0x26, "DMAM1" }, { 8,  0x2a, "DMAM2" }, { 8,  0x2e, "DMAM3" },
+	{ 16, 0x20, "DMAC0" }, { 16, 0x24, "DMAC1" }, { 16, 0x28, "DMAC2" }, { 16, 0x2c, "DMAC3" },
+	{ 32, 0x00, "DMAS0" }, { 32, 0x04, "DMAS1" }, { 32, 0x08, "DMAS2" }, { 32, 0x0c, "DMAS3" },
+	{ 32, 0x10, "DMAD0" }, { 32, 0x14, "DMAD1" }, { 32, 0x18, "DMAD2" }, { 32, 0x1c, "DMAD3" },
+};
+
 std::unique_ptr<util::disasm_interface> tmp96c141_device::create_disassembler()
 {
-	return std::make_unique<tlcs900_disassembler>(tmp96c141_syms);
+	return std::make_unique<tlcs900_disassembler>(tmp96c141_syms, tmp96c141_cr_syms);
 }

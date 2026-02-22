@@ -51,9 +51,9 @@ u32 kaneko16_state::screen_update_common(screen_device &screen, BitmapClass &bit
 	for (int i = 0; i < 8; i++)
 	{
 		if (m_view2[0].found())
-			m_view2[0]->render_tilemap(screen,bitmap,cliprect,i);
+			m_view2[0]->render_tilemap(screen, bitmap, cliprect, i);
 		if (m_view2[1].found())
-			m_view2[1]->render_tilemap_alt(screen,bitmap,cliprect,i, m_VIEW2_2_pri);
+			m_view2[1]->render_tilemap_alt(screen, bitmap, cliprect, i, m_view2_2_pri);
 	}
 
 	return 0;

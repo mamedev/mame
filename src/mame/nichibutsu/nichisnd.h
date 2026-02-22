@@ -20,7 +20,7 @@
 
 // ======================> nichisnd_device
 
-class nichisnd_device : public device_t
+class nichisnd_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Quench
 /***************************************************************************
-  video.c
+  toaplan/twincobr_v.cpp
 
   Functions to emulate the video hardware of these machines.
   Video is 40x30 tiles. (320x240 for Twin Cobra/Flying shark)
@@ -24,7 +24,7 @@
 
 TILE_GET_INFO_MEMBER(twincobr_state::get_bg_tile_info)
 {
-	const u16 code = m_bgvideoram16[tile_index+m_bg_ram_bank];
+	const u16 code = m_bgvideoram16[tile_index + m_bg_ram_bank];
 	const u32 tile_number = code & 0x0fff;
 	const u32 color = (code & 0xf000) >> 12;
 	tileinfo.set(2,
@@ -159,12 +159,12 @@ void twincobr_state::twincobr_bgoffs_w(offs_t offset, u16 data, u16 mem_mask)
 }
 u16 twincobr_state::twincobr_bgram_r()
 {
-	return m_bgvideoram16[m_bgoffs+m_bg_ram_bank];
+	return m_bgvideoram16[m_bgoffs + m_bg_ram_bank];
 }
 void twincobr_state::twincobr_bgram_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	COMBINE_DATA(&m_bgvideoram16[m_bgoffs+m_bg_ram_bank]);
-	m_bg_tilemap->mark_tile_dirty((m_bgoffs+m_bg_ram_bank));
+	COMBINE_DATA(&m_bgvideoram16[m_bgoffs + m_bg_ram_bank]);
+	m_bg_tilemap->mark_tile_dirty((m_bgoffs + m_bg_ram_bank));
 }
 
 void twincobr_state::twincobr_fgoffs_w(offs_t offset, u16 data, u16 mem_mask)
@@ -227,44 +227,44 @@ void twincobr_state::twincobr_fgscroll_w(offs_t offset, u16 data, u16 mem_mask)
 
 void twincobr_state::twincobr_exscroll_w(offs_t offset, u16 data)/* Extra unused video layer */
 {
-	if (offset == 0) logerror("PC - write %04x to unknown video scroll Y register\n",data);
-	else logerror("PC - write %04x to unknown video scroll X register\n",data);
+	if (offset == 0) logerror("%s: write %04x to unknown video scroll Y register\n", machine().describe_context(), data);
+	else logerror("%s: write %04x to unknown video scroll X register\n", machine().describe_context(), data);
 }
 
 /******************** Wardner interface to this hardware ********************/
 void twincobr_state::wardner_txlayer_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * BIT(offset, 0);
+	const int shift = BIT(offset, 0) << 3;
 	twincobr_txoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_bglayer_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * BIT(offset, 0);
+	const int shift = BIT(offset, 0) << 3;
 	twincobr_bgoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_fglayer_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * BIT(offset, 0);
+	const int shift = BIT(offset, 0) << 3;
 	twincobr_fgoffs_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_txscroll_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * BIT(offset, 0);
+	const int shift = BIT(offset, 0) << 3;
 	twincobr_txscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_bgscroll_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * BIT(offset, 0);
+	const int shift = BIT(offset, 0) << 3;
 	twincobr_bgscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
 void twincobr_state::wardner_fgscroll_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * BIT(offset, 0);
+	const int shift = BIT(offset, 0) << 3;
 	twincobr_fgscroll_w(offset / 2, data << shift, 0xff << shift);
 }
 
@@ -272,16 +272,16 @@ void twincobr_state::wardner_exscroll_w(offs_t offset, u8 data)/* Extra unused v
 {
 	switch (offset)
 	{
-		case 01:    //data <<= 8;
-		case 00:    logerror("PC - write %04x to unknown video scroll X register\n",data); break;
-		case 03:    //data <<= 8;
-		case 02:    logerror("PC - write %04x to unknown video scroll Y register\n",data); break;
+		case 0x1:    //data <<= 8;
+		case 0x0:    logerror("%s: write %04x to unknown video scroll X register\n", machine().describe_context(),data); break;
+		case 0x3:    //data <<= 8;
+		case 0x2:    logerror("%s: write %04x to unknown video scroll Y register\n", machine().describe_context(),data); break;
 	}
 }
 
 u8 twincobr_state::wardner_videoram_r(offs_t offset)
 {
-	const int shift = 8 * BIT(offset, 0);
+	const int shift = BIT(offset, 0) << 3;
 	switch (offset / 2)
 	{
 		case 0: return twincobr_txram_r() >> shift;
@@ -293,7 +293,7 @@ u8 twincobr_state::wardner_videoram_r(offs_t offset)
 
 void twincobr_state::wardner_videoram_w(offs_t offset, u8 data)
 {
-	const int shift = 8 * BIT(offset, 0);
+	const int shift = BIT(offset, 0) << 3;
 	switch (offset / 2)
 	{
 		case 0: twincobr_txram_w(0, data << shift, 0xff << shift); break;
@@ -313,9 +313,9 @@ void twincobr_state::wardner_sprite_w(offs_t offset, u8 data)
 {
 	u16 *const spriteram16 = reinterpret_cast<u16 *>(m_spriteram8->live());
 	if (BIT(offset, 0))
-		spriteram16[offset / 2] = (spriteram16[offset/2] & 0x00ff) | (data << 8);
+		spriteram16[offset / 2] = (spriteram16[offset / 2] & 0x00ff) | (data << 8);
 	else
-		spriteram16[offset / 2] = (spriteram16[offset/2] & 0xff00) | data;
+		spriteram16[offset / 2] = (spriteram16[offset / 2] & 0xff00) | data;
 }
 
 

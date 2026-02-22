@@ -2891,6 +2891,8 @@ if BUSES["ISA"] then
 		MAME_DIR .. "src/devices/bus/isa/myb3k_com.h",
 		MAME_DIR .. "src/devices/bus/isa/myb3k_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/isa/myb3k_fdc.h",
+		MAME_DIR .. "src/devices/bus/isa/ncr53c400.cpp",
+		MAME_DIR .. "src/devices/bus/isa/ncr53c400.h",
 		MAME_DIR .. "src/devices/bus/isa/ne1000.cpp",
 		MAME_DIR .. "src/devices/bus/isa/ne1000.h",
 		MAME_DIR .. "src/devices/bus/isa/ne2000.cpp",
@@ -3305,6 +3307,25 @@ if BUSES["MIDI"] then
 		MAME_DIR .. "src/devices/bus/midi/midiinport.h",
 		MAME_DIR .. "src/devices/bus/midi/midioutport.cpp",
 		MAME_DIR .. "src/devices/bus/midi/midioutport.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/mm2/exp.h,BUSES["MM2"] = true
+---------------------------------------------------
+
+if BUSES["MM2"] then
+	files {
+		MAME_DIR .. "src/devices/bus/mm2/exp.cpp",
+		MAME_DIR .. "src/devices/bus/mm2/exp.h",
+		MAME_DIR .. "src/devices/bus/mm2/crtc186.cpp",
+		MAME_DIR .. "src/devices/bus/mm2/crtc186.h",
+		MAME_DIR .. "src/devices/bus/mm2/mm2kb.cpp",
+		MAME_DIR .. "src/devices/bus/mm2/mm2kb.h",
+		MAME_DIR .. "src/devices/bus/mm2/mmc186.cpp",
+		MAME_DIR .. "src/devices/bus/mm2/mmc186.h",
 	}
 end
 
@@ -4447,6 +4468,8 @@ if BUSES["PCI"] then
 		MAME_DIR .. "src/devices/bus/pci/sonicvibes.h",
 		MAME_DIR .. "src/devices/bus/pci/sw1000xg.cpp",
 		MAME_DIR .. "src/devices/bus/pci/sw1000xg.h",
+		MAME_DIR .. "src/devices/bus/pci/trio_pci.cpp",
+		MAME_DIR .. "src/devices/bus/pci/trio_pci.h",
 		MAME_DIR .. "src/devices/bus/pci/virge_pci.cpp",
 		MAME_DIR .. "src/devices/bus/pci/virge_pci.h",
 		MAME_DIR .. "src/devices/bus/pci/vision.cpp",

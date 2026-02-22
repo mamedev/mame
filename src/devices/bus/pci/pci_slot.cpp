@@ -28,6 +28,7 @@
 #include "sis6326.h"
 #include "sonicvibes.h"
 #include "sw1000xg.h"
+#include "trio_pci.h"
 #include "virge_pci.h"
 #include "vision.h"
 #include "vt6306.h"
@@ -117,6 +118,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("vision964",      VISION964_PCI);
 
 	// 0x01 - mass storage controllers
+	device.option_add("aha2940",        AHA2940);
 	device.option_add("aha2940au",      AHA2940AU);
 	device.option_add("ncr53c825",      NCR53C825_PCI);
 	device.option_add("pdc20262",       PDC20262);
@@ -127,6 +129,7 @@ void pci_cards(device_slot_interface &device)
 
 	// 0x03 - display controllers
 	device.option_add("vision968",      VISION968_PCI);
+	device.option_add("trio64dx",       TRIO64DX_PCI);
 	device.option_add("virge",          VIRGE_PCI);
 	device.option_add("virgedx",        VIRGEDX_PCI);
 	device.option_add("virgevx",        VIRGEVX_PCI);

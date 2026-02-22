@@ -20,11 +20,12 @@ JC-10011A
 TODO:
 - remove PPI1 port B hack;
 - correct IRQs (related to the above?);
-- correct palette;
-- Oki banking;
-- switches;
+- verify Oki banking;
+- unidentified switches' effects;
 - lamps?;
 - simplify descrambling.
+
+Could probably be promoted to working after more comprehensive testing.
 */
 
 
@@ -44,7 +45,7 @@ TODO:
 // configurable logging
 #define LOG_PORTS     (1U << 1)
 
-#define VERBOSE (LOG_GENERAL | LOG_PORTS)
+// #define VERBOSE (LOG_GENERAL | LOG_PORTS)
 
 #include "logmacro.h"
 
@@ -60,6 +61,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_oki(*this, "oki"),
 		m_fg_tileram(*this, "fg_tileram"),
 		m_bg_datarom(*this, "bgdata")
 	{ }
@@ -75,6 +77,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<okim6295_device> m_oki;
 
 	required_shared_ptr<uint16_t> m_fg_tileram;
 	required_region_ptr<uint16_t> m_bg_datarom;
@@ -91,6 +94,7 @@ private:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
+	void oki_bank_w(uint8_t data);
 	void counter_w(uint8_t data);
 
 	void program_map(address_map &map) ATTR_COLD;
@@ -143,6 +147,16 @@ void hominn_980924_state::machine_start()
 	save_item(NAME(m_bg_bank));
 }
 
+void hominn_980924_state::oki_bank_w(uint8_t data)
+{
+	m_oki->set_rom_bank(BIT(data, 6));
+
+	// bits 4, 5 and 7 always set?
+
+	if (data & 0xb0)
+		logerror("%s unknown oki_bank_w bits set: %02x\n", machine().describe_context(), data);
+}
+
 void hominn_980924_state::counter_w(uint8_t data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
@@ -160,8 +174,8 @@ void hominn_980924_state::program_map(address_map &map)
 	map(0x084000, 0x084007).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x088000, 0x088001).portr("SERVICE");
 	map(0x08c001, 0x08c001).w(FUNC(hominn_980924_state::counter_w));
-	map(0x090001, 0x090001).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	// map(0x09c001, 0x09c001); // writes only 0xf0 or 0xb0?
+	map(0x090001, 0x090001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
+	map(0x09c001, 0x09c001).w(FUNC(hominn_980924_state::oki_bank_w));
 	map(0x0a0000, 0x0a0fff).ram().w(FUNC(hominn_980924_state::fg_tileram_w)).share(m_fg_tileram);
 	map(0x0c0000, 0x0c03ff).ram().w("palette", FUNC(palette_device::write16)).share("palette");
 	map(0x0c0400, 0x0c07ff).ram();
@@ -201,12 +215,11 @@ static INPUT_PORTS_START( qxjl )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_50C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_100C ) )
+	PORT_DIPSETTING(    0x01, "1 Coin/150 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/200 Credits" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -216,19 +229,18 @@ static INPUT_PORTS_START( qxjl )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:6") // title change
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPNAME( 0x20, 0x20, "Title" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, "Qianxi Jielong" )
+	PORT_DIPSETTING(    0x00, "Hongxin Jielong" )
+	PORT_DIPNAME( 0x40, 0x40, "Move Selection Time" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, "7" )
+	PORT_DIPSETTING(    0x00, "15" )
+	PORT_DIPNAME( 0x80, 0x80, "Show Credits" ) PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
-// TODO
 static GFXDECODE_START( gfx )
 	GFXDECODE_ENTRY( "fgtiles", 0, gfx_8x8x4_packed_msb, 0, 16 )
 	GFXDECODE_ENTRY( "bgtiles", 0, gfx_16x16x4_packed_lsb, 0x100, 16 )
@@ -253,7 +265,6 @@ void hominn_980924_state::qxjl(machine_config &config)
 	ppi0.out_pb_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port B out %02x\n", machine().describe_context(), data); });
 	ppi0.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI0 port C out %02x\n", machine().describe_context(), data); });
 
-
 	i8255_device &ppi1(I8255(config, "ppi1"));
 	ppi1.in_pa_callback().set([this] () { LOGPORTS("%s: PPI1 port A in\n", machine().describe_context()); return uint8_t(0xff); });
 	ppi1.in_pb_callback().set([this] () { return (machine().rand() & 0x01) | 0xfe; }); // TODO: won't boot otherwise
@@ -263,7 +274,7 @@ void hominn_980924_state::qxjl(machine_config &config)
 	ppi1.out_pc_callback().set([this] (uint8_t data) { LOGPORTS("%s: PPI1 port C out %02x\n", machine().describe_context(), data); });
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: verify everything once emulation works
+	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -272,16 +283,16 @@ void hominn_980924_state::qxjl(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx);
 
-	PALETTE(config, "palette").set_format(palette_device::xGRB_555, 0x200); // TODO: incorrect
+	PALETTE(config, "palette").set_format(palette_device::xRGBRRRRGGGGBBBB_bit0, 0x200);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // XTAL could also be the 12 MHz one, divider and pin 7 not verified
+	OKIM6295(config, m_oki, 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // XTAL could also be the 12 MHz one, divider and pin 7 not verified
 }
 
 
-// 千禧接龙 (Qiānxǐ Jiēlóng)
+// 千禧接龙 (Qiānxǐ Jiēlóng) - 红心接龙 (Hóngxīn Jiēlóng)
 ROM_START( qxjl )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "1.u17", 0x00000, 0x20000, CRC(50c0d1fb) SHA1(4d535c8e3032e651ed0d9b10206530fa5ddebf85) )
@@ -338,4 +349,4 @@ void hominn_980924_state::init_qxjl()
 } // anonymous namespace
 
 
-GAME( 199?, qxjl, 0, qxjl, qxjl, hominn_980924_state, init_qxjl, ROT0, "Hom Inn", "Qianxi Jielong", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING )
+GAME( 199?, qxjl, 0, qxjl, qxjl, hominn_980924_state, init_qxjl, ROT0, "Hom Inn", "Qianxi Jielong / Hongxin Jielong", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

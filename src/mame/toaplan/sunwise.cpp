@@ -27,6 +27,8 @@ pyutakun    SW931201-1    Sunwise       Pyuuta-kun
 othldrby    S951060-VGP   Sunwise       Othello Derby
 monkichi    S951060-VGP   Sunwise       Monkichicchi no Fuwafuwa Puzzle  (has a subboard instead of mask ROMs)
 
+The medal games run in a cabinet named "JOYM" (ジョイム).
+
 Notes on Power Kick coin inputs:
 - The 10 yen input is "Key In" according to the bookkeeping screen, but is
   an otherwise normal coin input with a counter and a lockout (sharing the
@@ -60,8 +62,6 @@ public:
 	void init_monkichi() ATTR_COLD;
 
 protected:
-	virtual void video_start() override ATTR_COLD;
-
 	void common_mem(address_map &map) ATTR_COLD;
 	void pwrkick_68k_mem(address_map &map) ATTR_COLD;
 	void othldrby_68k_mem(address_map &map) ATTR_COLD;
@@ -69,7 +69,7 @@ protected:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 
-	void sw_oki_bankswitch_w(u8 data);
+	void oki_bankswitch_w(u8 data);
 
 private:
 	void pwrkick_coin_w(u8 data);
@@ -84,21 +84,13 @@ private:
 	required_device<okim6295_device> m_oki;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	bitmap_ind8 m_custom_priority_bitmap;
 };
-
-void sunwise_state::video_start()
-{
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp->custom_priority_bitmap = &m_custom_priority_bitmap;
-}
-
 
 u32 sunwise_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp->render_vdp(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -110,7 +102,7 @@ void sunwise_state::screen_vblank(int state)
 	}
 }
 
-void sunwise_state::sw_oki_bankswitch_w(u8 data)
+void sunwise_state::oki_bankswitch_w(u8 data)
 {
 	m_oki->set_rom_bank(data & 1);
 }
@@ -476,8 +468,7 @@ void sunwise_state::common_mem(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
 	// mirror assumed for monkichi as there are a few accesses outside of the usual range
-	map(0x100000, 0x103fff).mirror(0x010000).ram().share("nvram"); // Only 10022C-10037B is actually saved as NVRAM
-	map(0x104000, 0x10ffff).mirror(0x010000).ram();
+	map(0x100000, 0x10ffff).mirror(0x010000).ram().share("nvram"); // Only a small portion (game-dependent) is actually preserved on reset
 
 	map(0x200000, 0x20000f).rw(m_rtc, FUNC(upd4992_device::read), FUNC(upd4992_device::write)).umask16(0x00ff);
 	map(0x300000, 0x30000d).rw(m_vdp, FUNC(gp9001vdp_device::read), FUNC(gp9001vdp_device::write));
@@ -488,7 +479,7 @@ void sunwise_state::common_mem(address_map &map)
 	map(0x700004, 0x700005).portr("DSWA");
 	map(0x700008, 0x700009).portr("DSWB");
 	map(0x70001c, 0x70001d).portr("SYS");
-	map(0x700031, 0x700031).w(FUNC(sunwise_state::sw_oki_bankswitch_w));
+	map(0x700031, 0x700031).w(FUNC(sunwise_state::oki_bankswitch_w));
 }
 
 void sunwise_state::pwrkick_68k_mem(address_map &map)
@@ -520,7 +511,7 @@ void sunwise_state::pwrkick(machine_config &config) // Sunwise SW931201-1 PCB (2
 
 	UPD4992(config, m_rtc, 32.768_kHz_XTAL);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // 2x HM62256BLP-8 or equivalent + battery
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50)); // duration is probably wrong
 

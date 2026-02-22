@@ -8,11 +8,6 @@
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 
-#define SHARC_INPUT_FLAG0       3
-#define SHARC_INPUT_FLAG1       4
-#define SHARC_INPUT_FLAG2       5
-#define SHARC_INPUT_FLAG3       6
-
 
 class sharc_frontend;
 
@@ -36,17 +31,13 @@ public:
 
 	// configuration helpers
 	void set_boot_mode(const sharc_boot_mode boot_mode) { m_boot_mode = boot_mode; }
+	void enable_recompiler();
 
-	void set_flag_input(int flag_num, int state);
 	void external_iop_write(uint32_t address, uint32_t data);
 	void external_dma_write(uint32_t address, uint64_t data);
 
-	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
-	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
-
+	void set_flag_input(int flag_num, int state);
 	void write_stall(int state);
-
-	void enable_recompiler();
 
 	template <unsigned N> uint64_t pm_r(offs_t offset);
 	template <unsigned N> void pm_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -144,6 +135,10 @@ protected:
 
 	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
+
+	// device_state_interface implementation
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_export(const device_state_entry &entry) override;
 
 	void pgm_2m(address_map &map) ATTR_COLD;
 	void pgm_4m(address_map &map) ATTR_COLD;
@@ -298,7 +293,17 @@ private:
 
 	opcode_func m_sharc_op[512];
 
+	std::unique_ptr<sharc_internal_state> m_heap_core;
+	uint8_t m_flag_pending_val[4];
+	bool m_write_stalled_pending_val;
+	bool m_flag_pending[4];
+	bool m_write_stalled_pending;
+	bool m_input_update_pending;
 	bool m_enable_drc;
+
+	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
+	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
+	TIMER_CALLBACK_MEMBER(sharc_update_inputs);
 
 	inline void CHANGE_PC(uint32_t newpc);
 	inline void CHANGE_PC_DELAYED(uint32_t newpc);
@@ -321,15 +326,15 @@ private:
 	void SHIFT_OPERATION_IMM(int shiftop, int data, int rn, int rx);
 	void COMPUTE(uint32_t opcode);
 	void check_interrupts();
-	inline void PUSH_PC(uint32_t pc);
-	inline uint32_t POP_PC();
-	inline uint32_t TOP_PC();
-	inline void PUSH_LOOP(uint32_t addr, uint32_t code, uint32_t type, uint32_t count);
-	inline void POP_LOOP();
-	inline void PUSH_STATUS_STACK();
-	inline void POP_STATUS_STACK();
-	inline int IF_CONDITION_CODE(int cond);
-	inline int DO_CONDITION_CODE(int cond);
+	void PUSH_PC();
+	uint32_t POP_PC();
+	uint32_t TOP_PC();
+	void PUSH_LOOP();
+	void POP_LOOP();
+	void PUSH_STATUS_STACK();
+	void POP_STATUS_STACK();
+	int IF_CONDITION_CODE(int cond);
+	int DO_CONDITION_CODE(int cond);
 	void sharcop_compute_dreg_dm_dreg_pm();
 	void sharcop_compute();
 	void sharcop_compute_ureg_dmpm_premod();

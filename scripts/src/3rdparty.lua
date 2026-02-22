@@ -14,7 +14,7 @@
 -- expat library objects
 --------------------------------------------------
 
-if not _OPTIONS["with-system-expat"] then
+if _OPTIONS["with-system-expat"] ~= "0" then
 project "expat"
 	uuid "f4cd40b1-c37c-452d-9785-640f26f0bf54"
 	kind "StaticLib"
@@ -120,7 +120,7 @@ end
 -- zlib library objects
 --------------------------------------------------
 
-if not _OPTIONS["with-system-zlib"] then
+if _OPTIONS["with-system-zlib"] ~= "0" then
 project "zlib"
 	uuid "3d78bd2a-2bd0-4449-8087-42ddfaef7ec9"
 	kind "StaticLib"
@@ -181,7 +181,7 @@ end
 -- zstd library objects
 --------------------------------------------------
 
-if not _OPTIONS["with-system-zstd"] then
+if _OPTIONS["with-system-zstd"] ~= "0" then
 project "zstd"
 	uuid "5edd8713-bc60-456d-9c95-b928a913c84b"
 	kind "StaticLib"
@@ -655,7 +655,7 @@ end
 -- libJPEG library objects
 --------------------------------------------------
 
-if not _OPTIONS["with-system-jpeg"] then
+if _OPTIONS["with-system-jpeg"] ~= "0" then
 project "jpeg"
 	uuid "447c6800-dcfd-4c48-b72a-a8223bb409ca"
 	kind "StaticLib"
@@ -734,7 +734,7 @@ end
 -- libflac library objects
 --------------------------------------------------
 
-if not _OPTIONS["with-system-flac"] then
+if _OPTIONS["with-system-flac"] ~= "0" then
 project "flac"
 	uuid "b6fc19e8-073a-4541-bb7b-d24b548d424a"
 	kind "StaticLib"
@@ -977,7 +977,7 @@ end
 --------------------------------------------------
 if (STANDALONE~=true) then
 
-if not _OPTIONS["with-system-lua"] then
+if _OPTIONS["with-system-lua"] ~= "0" then
 project "lua"
 	uuid "d9e2eed1-f1ab-4737-a6ac-863700b1a5a9"
 	kind "StaticLib"
@@ -1011,7 +1011,7 @@ end
 			"LUA_COMPAT_5_1",
 			"LUA_COMPAT_5_2",
 		}
-	if not (_OPTIONS["targetos"]=="windows") and not (_OPTIONS["targetos"]=="asmjs") then
+	if (_OPTIONS["targetos"] ~= "windows") and (_OPTIONS["targetos"] ~= "asmjs") then
 		defines {
 			"LUA_USE_POSIX",
 		}
@@ -1128,7 +1128,7 @@ end
 -- SQLite3 library objects
 --------------------------------------------------
 
-if not _OPTIONS["with-system-sqlite3"] then
+if _OPTIONS["with-system-sqlite3"] ~= "0" then
 project "sqlite3"
 	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
 	kind "StaticLib"
@@ -1179,8 +1179,8 @@ end
 -- portmidi library objects
 --------------------------------------------------
 
-if _OPTIONS["NO_USE_MIDI"]~="1" then
-if not _OPTIONS["with-system-portmidi"] then
+if _OPTIONS["NO_USE_MIDI"] ~= "1" then
+if _OPTIONS["with-system-portmidi"] ~= "0" then
 project "portmidi"
 	uuid "587f2da6-3274-4a65-86a2-f13ea315bb98"
 	kind "StaticLib"
@@ -1688,8 +1688,8 @@ end
 -- PortAudio library objects
 --------------------------------------------------
 
-if _OPTIONS["NO_USE_PORTAUDIO"]~="1" then
-if not _OPTIONS["with-system-portaudio"] then
+if _OPTIONS["NO_USE_PORTAUDIO"] ~= "1" then
+if _OPTIONS["with-system-portaudio"] ~= "0" then
 project "portaudio"
 	uuid "0755c5f5-eccf-47f3-98a9-df67018a94d4"
 	kind "StaticLib"
@@ -1897,7 +1897,7 @@ end
 -- utf8proc library objects
 --------------------------------------------------
 
-if not _OPTIONS["with-system-utf8proc"] then
+if _OPTIONS["with-system-utf8proc"] ~= "0" then
 project "utf8proc"
 	uuid "1f881f09-0395-4483-ac37-2935fb092187"
 	kind "StaticLib"

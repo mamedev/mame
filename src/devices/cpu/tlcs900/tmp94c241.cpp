@@ -1400,7 +1400,14 @@ static std::pair<u16, char const *> const tmp94c241_syms[] = {
 	{ 0x166, "PMEMCR" },
 };
 
+static tlcs900_disassembler::cr_sym const tmp94c241_cr_syms[] = {
+	{ 8,  0x42, "DMAM0" }, { 8,  0x46, "DMAM1" }, { 8,  0x4a, "DMAM2" }, { 8,  0x4e, "DMAM3" },
+	{ 16, 0x40, "DMAC0" }, { 16, 0x44, "DMAC1" }, { 16, 0x48, "DMAC2" }, { 16, 0x4c, "DMAC3" },
+	{ 32, 0x00, "DMAS0" }, { 32, 0x04, "DMAS1" }, { 32, 0x08, "DMAS2" }, { 32, 0x0c, "DMAS3" },
+	{ 32, 0x20, "DMAD0" }, { 32, 0x24, "DMAD1" }, { 32, 0x28, "DMAD2" }, { 32, 0x2c, "DMAD3" },
+};
+
 std::unique_ptr<util::disasm_interface> tmp94c241_device::create_disassembler()
 {
-	return std::make_unique<tlcs900_disassembler>(tmp94c241_syms);
+	return std::make_unique<tlcs900_disassembler>(tmp94c241_syms, tmp94c241_cr_syms);
 }

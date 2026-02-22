@@ -49,6 +49,7 @@
 #include "asc88.h"
 #include "bt54x.h"
 #include "dcb.h"
+#include "ncr53c400.h"
 #include "tekram_dc820.h"
 #include "ultra14f.h"
 #include "ultra24f.h"
@@ -131,6 +132,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("fdc_ps2", ISA8_FDC_PS2);
 	device.option_add("fdc344", ISA8_FDC344);
 	device.option_add("fdcmag", ISA8_FDCMAG);
+	device.option_add("rt1000b", ISA8_RT1000B);
 	device.option_add("wdxt_gen", ISA8_WDXT_GEN);
 	device.option_add("xtide", ISA8_XTIDE);
 	device.option_add("side116", ISA8_SIDE116);

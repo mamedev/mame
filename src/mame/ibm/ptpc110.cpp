@@ -175,10 +175,10 @@ private:
 
 void ptpc110_state::main_map(address_map &map)
 {
-//	map(0x0000'0000, 0x0009'ffff).ram();
+//  map(0x0000'0000, 0x0009'ffff).ram();
 //  map(0x000a'0000, 0x000b'ffff).rw(m_vga, FUNC(f65535_vga_device::mem_r), FUNC(f65535_vga_device::mem_w));
 //  map(0x000c'0000, 0x000f'ffff).rom().region("bios", 0);
-//	map(0x0100'0000, 0x0107'ffff).ram();
+//  map(0x0100'0000, 0x0107'ffff).ram();
 	map(0xfffc'0000, 0xffff'ffff).rom().region("bios", 0);
 }
 

@@ -65,10 +65,9 @@ void sis6326_agp_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(sis6236_vga_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(sis6326_vga_device::screen_update));
 
-	// TODO: barely similar, to be changed.
-	SIS6236_VGA(config, m_vga, 0);
+	SIS6326_VGA(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	// 4MB, max 8MB
 	m_vga->set_vram_size(4*1024*1024);
@@ -155,7 +154,7 @@ void sis6326_agp_device::config_map(address_map &map)
 
 void sis6326_agp_device::vram_aperture_map(address_map &map)
 {
-	map(0x0000000, 0x3ffffff).rw(m_vga, FUNC(sis6236_vga_device::mem_linear_r), FUNC(sis6236_vga_device::mem_linear_w));
+	map(0x0000000, 0x3ffffff).rw(m_vga, FUNC(sis6326_vga_device::mem_linear_r), FUNC(sis6326_vga_device::mem_linear_w));
 }
 
 void sis6326_agp_device::mmio_map(address_map &map)
@@ -174,17 +173,17 @@ void sis6326_agp_device::legacy_memory_map(address_map &map)
 
 void sis6326_agp_device::legacy_io_map(address_map &map)
 {
-	map(0, 0x02f).m(m_vga, FUNC(sis6236_vga_device::io_map));
+	map(0, 0x02f).m(m_vga, FUNC(sis6326_vga_device::io_map));
 }
 
 uint8_t sis6326_agp_device::vram_r(offs_t offset)
 {
-	return downcast<sis6236_vga_device *>(m_vga.target())->mem_r(offset);
+	return downcast<sis6326_vga_device *>(m_vga.target())->mem_r(offset);
 }
 
 void sis6326_agp_device::vram_w(offs_t offset, uint8_t data)
 {
-	downcast<sis6236_vga_device *>(m_vga.target())->mem_w(offset, data);
+	downcast<sis6326_vga_device *>(m_vga.target())->mem_w(offset, data);
 }
 
 void sis6326_agp_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,

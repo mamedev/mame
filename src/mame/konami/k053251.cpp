@@ -8,7 +8,7 @@ Priority encoder.
 The chip has inputs for 5 layers (CI0-CI4); only 4 are used (CI1-CI4)
 CI0-CI2 are 9(=5+4) bits inputs, CI3-CI4 8(=4+4) bits
 
-The input connctions change from game to game. E.g. in Simpsons,
+The input connections change from game to game. E.g. in Simpsons,
 CI0 = grounded (background color)
 CI1 = sprites
 CI2 = FIX

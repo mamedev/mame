@@ -25,6 +25,8 @@ DEFINE_DEVICE_TYPE(NSCSI_XM5701SUN, nscsi_toshiba_xm5701_sun_device, "nxm5701sun
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_APPLE, nscsi_cdrom_apple_device, "scsi_cdrom_apple", "Apple SCSI CD-ROM")
 DEFINE_DEVICE_TYPE(NSCSI_CDROM_APPLE_EXT, nscsi_cdrom_apple_ext_device, "scsi_cdrom_apple_ext", "Apple SCSI CD-ROM (external)")
 
+static constexpr int XFER_MAX_SIZE = (64*1024);  // ZuluSCSI/BlueSCSI maximum transfer size is 64KB
+
 // ZuluSCSI/BlueSCSI toolbox commands.  All are 10 bytes as of protocol version 0.
 static constexpr uint8_t TOOLBOX_LIST_FILES     = 0xd0;
 static constexpr uint8_t TOOLBOX_GET_FILE       = 0xd1;
@@ -35,7 +37,7 @@ static constexpr uint8_t TOOLBOX_SEND_FILE_END  = 0xd5;
 static constexpr uint8_t TOOLBOX_TOGGLE_DEBUG   = 0xd6;
 static constexpr uint8_t TOOLBOX_LIST_CDS       = 0xd7;
 static constexpr uint8_t TOOLBOX_SET_NEXT_CD    = 0xd8;
-static constexpr uint8_t TOOLBOX_LIST_DEVICES   = 0xd9;
+static constexpr uint8_t TOOLBOX_METADATA       = 0xd9;
 static constexpr uint8_t TOOLBOX_COUNT_CDS      = 0xda;
 
 nscsi_cdrom_device::nscsi_cdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -121,7 +123,7 @@ void nscsi_cdrom_device::device_start()
 {
 	nscsi_full_device::device_start();
 
-	m_xfer_buffer.resize(8192);
+	m_xfer_buffer.resize(XFER_MAX_SIZE);
 
 	save_item(NAME(sector_buffer));
 	save_item(NAME(lba));
@@ -993,7 +995,18 @@ void nscsi_cdrom_device::scsi_command()
 		}
 
 		uint32_t offset = scsi_cmdbuf[2] << 24 | scsi_cmdbuf[3] << 16 | scsi_cmdbuf[4] << 8 | scsi_cmdbuf[5];
-		LOG("TOOLBOX_GET_FILE: file # %d (%s), offset %08x\n", scsi_cmdbuf[1], m_directory[scsi_cmdbuf[1]].name, offset);
+		uint32_t blocks = scsi_cmdbuf[6];
+		LOG("TOOLBOX_GET_FILE: file # %d (%s), offset %08x, blocks %d\n", scsi_cmdbuf[1], m_directory[scsi_cmdbuf[1]].name, offset, blocks);
+		if (blocks == 0)
+		{
+			blocks = 1;
+		}
+		else if ((blocks * 4096) > m_xfer_buffer.size())
+		{
+			scsi_status_complete(SS_CHECK_CONDITION);
+			sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+			return;
+		}
 
 		std::string tmpPath(machine().options().share_directory());
 		tmpPath.append(PATH_SEPARATOR);
@@ -1009,7 +1022,7 @@ void nscsi_cdrom_device::scsi_command()
 			return;
 		}
 		u32 actualRead;
-		file->read(&m_xfer_buffer[0], offset * 4096, 4096, actualRead);
+		file->read(&m_xfer_buffer[0], offset * 4096, blocks * 4096, actualRead);
 
 		if (actualRead == 0)
 		{
@@ -1035,7 +1048,22 @@ void nscsi_cdrom_device::scsi_command()
 	case TOOLBOX_SEND_FILE_10:
 		m_xfer_position = 0;
 		m_write_is_setup = false;
-		m_write_length = scsi_cmdbuf[1] << 8 | scsi_cmdbuf[2];
+		if (scsi_cmdbuf[6] > 0)
+		{
+			// Yes, the block size for GET_FILE is 4K and for SEND_FILE is 512 bytes.
+			// Verified in BlueSCSI's GitHub repo.
+			if ((scsi_cmdbuf[6] * 512) > m_xfer_buffer.size())
+			{
+				scsi_status_complete(SS_CHECK_CONDITION);
+				sense(false, SK_ILLEGAL_REQUEST, SK_ASC_INVALID_FIELD_IN_CDB);
+				return;
+			}
+			m_write_length = scsi_cmdbuf[6] * 512;
+		}
+		else
+		{
+			m_write_length = scsi_cmdbuf[1] << 8 | scsi_cmdbuf[2];
+		}
 		m_write_offset = scsi_cmdbuf[3] << 16 | scsi_cmdbuf[4] << 8 | scsi_cmdbuf[5];
 		LOG("TOOLBOX_SEND_FILE_10 offset %08x len %04x\n", m_write_offset, m_write_length);
 		scsi_data_out(4, m_write_length);
@@ -1044,6 +1072,22 @@ void nscsi_cdrom_device::scsi_command()
 
 	case TOOLBOX_SEND_FILE_END:
 		LOG("TOOLBOX_SEND_FILE_END\n");
+		scsi_status_complete(SS_GOOD);
+		break;
+
+	case TOOLBOX_METADATA:
+		LOG("TOOLBOX_METADATA\n");
+		if (scsi_cmdbuf[1] == 1)
+		{
+			memset(scsi_cmdbuf, 0, 8);
+			scsi_cmdbuf[1] = 0x03;
+		}
+		else
+		{
+			memset(scsi_cmdbuf, 0, 8);
+			scsi_cmdbuf[3] = 0x02;
+		}
+		scsi_data_in(0, 8);
 		scsi_status_complete(SS_GOOD);
 		break;
 

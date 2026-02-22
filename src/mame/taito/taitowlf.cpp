@@ -82,7 +82,6 @@ Taito W Rom Board:
 #include "machine/ds128x.h"
 #include "machine/i82371sb.h"
 #include "machine/i82439tx.h"
-#include "machine/pci-ide.h"
 #include "machine/pci.h"
 #include "video/atirage.h"
 

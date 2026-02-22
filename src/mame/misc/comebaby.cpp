@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz, Angelo Salese
+// copyright-holders: Angelo Salese
 /* Come On Baby
   (c) 2000 ExPotato Co. Ltd (Excellent Potato)
 
@@ -13,9 +13,15 @@ TODO:
 - In pcipc with a manually rebuilt image will throw an exception in "Internat" module once it loads
   Windows 98 (and installs the diff drivers);
 
+Notes:
+- Game is in cob folder (as "cobdemo.exe"), said folder also has a EEP.ROM that probably needs to
+  be removed;
+- Recycled bin has plenty of .vue and .3ds files;
+
 ===================================================================================================
 
-  There also appears to be a sequel which may be running on the same hardware, but which does not seem to have been released.
+  There also appears to be a sequel which may be running on the same hardware, but which does
+  not seem to have been released.
   Come On Baby - Ballympic Heroes!  (c) 2001
 
   Other games in this series include:
@@ -193,14 +199,13 @@ TODO:
 
 #include "bus/isa/isa_cards.h"
 #include "bus/pci/virge_pci.h"
-//#include "bus/rs232/hlemouse.h"
-//#include "bus/rs232/null_modem.h"
-//#include "bus/rs232/rs232.h"
-//#include "bus/rs232/sun_kbd.h"
-//#include "bus/rs232/terminal.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/i82443bx_host.h"
 #include "machine/i82371eb_isa.h"
 #include "machine/i82371eb_ide.h"
@@ -241,29 +246,36 @@ void comebaby_state::comebaby_map(address_map &map)
 	map.unmap_value_high();
 }
 
-static INPUT_PORTS_START( comebaby )
-INPUT_PORTS_END
-
 static void isa_internal_devices(device_slot_interface &device)
 {
 	device.option_add("it8671f", IT8671F);
+}
+
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
 }
 
 void comebaby_state::superio_config(device_t *device)
 {
 	it8671f_device &ite = *downcast<it8671f_device *>(device);
 	ite.krst_gpio2().set_inputline(":maincpu", INPUT_LINE_RESET);
-	ite.ga20_gpio6().set_inputline(":maincpu", INPUT_LINE_A20);
+	ite.ga20_gpio6().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	ite.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	ite.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
-#if 0
 	ite.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
 	ite.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
 	ite.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
 	ite.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
 	ite.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
 	ite.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
-#endif
 }
 
 // TODO: unverified PCI config space
@@ -280,9 +292,10 @@ void comebaby_state::comebaby(machine_config &config)
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
-	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu, true));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, m_maincpu));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
@@ -290,7 +303,7 @@ void comebaby_state::comebaby(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", superio_config);
@@ -312,7 +325,7 @@ void comebaby_state::comebaby(machine_config &config)
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);
 	screen.set_screen_update(PCI_AGP_ID, FUNC(voodoo_3_pci_device::screen_update));
 #else
-	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
+	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "rivatnt").set_fixed(true);
 #endif
 	PCI_SLOT(config, "pci:1", pci_cards, 13, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 14, 1, 2, 3, 0, nullptr);
@@ -320,6 +333,21 @@ void comebaby_state::comebaby(machine_config &config)
 	// has an ESS .com in autoexec.bat (unknown position)
 	// TODO: tries to install its driver in Windows 98, wrong one
 	PCI_SLOT(config, "pci:4", pci_cards, 16, 3, 0, 1, 2, "ess_solo1");
+
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd1_w));
+	serport0.dcd_handler().set("board4:it8671f", FUNC(it8671f_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:it8671f", FUNC(it8671f_device::ndsr1_w));
+	serport0.ri_handler().set("board4:it8671f", FUNC(it8671f_device::nri1_w));
+	serport0.cts_handler().set("board4:it8671f", FUNC(it8671f_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd2_w));
+	serport1.dcd_handler().set("board4:it8671f", FUNC(it8671f_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:it8671f", FUNC(it8671f_device::ndsr2_w));
+	serport1.ri_handler().set("board4:it8671f", FUNC(it8671f_device::nri2_w));
+	serport1.cts_handler().set("board4:it8671f", FUNC(it8671f_device::ncts2_w));
+
 }
 
 
@@ -328,7 +356,7 @@ ROM_START(comebaby)
 	ROM_LOAD("b1120iag.bin", 0x000000, 0x40000, CRC(9b6f95f1) SHA1(65d6a2fea9911593f093b2e2a43d1534b54d60b3) )
 
 	DISK_REGION( "pci:07.1:ide1:0:hdd" )
-//	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
+//  DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(ea57919319c0b6a1d4abd7822cff028855bf082f) )
 	// rebuilt image with -chs 16383,16,63
 	DISK_IMAGE( "comebaby", 0, BAD_DUMP SHA1(85ced9e63dd10ef39449d3ea997b2200aa06562d) )
 ROM_END
@@ -336,4 +364,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, comebaby, 0, comebaby, comebaby, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2000, comebaby, 0, comebaby, 0, comebaby_state, empty_init, ROT0, "ExPotato", "Come On Baby", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

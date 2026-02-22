@@ -196,8 +196,8 @@
 #include "cpu/mips/mips3.h"
 #include "machine/gt64xxx.h"
 #include "machine/nvram.h"
-#include "machine/pci-ide.h"
 #include "machine/pci.h"
+#include "machine/pci-ide.h"
 #include "machine/smc91c9x.h"
 #include "video/voodoo_pci.h"
 
@@ -2017,6 +2017,7 @@ void seattle_state::seattle_common(machine_config &config)
 	m_galileo->set_map(3, address_map_constructor(&seattle_state::seattle_cs3_map, "seattle_cs3_map", this), this);
 	m_galileo->set_simm0_size(0x00800000);
 
+	// National 87415/87560
 	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x100b0002, 0x01, 0x0));
 	ide.irq_handler().set_inputline(m_maincpu, IDE_IRQ_NUM);
 	ide.set_legacy_top(0x0a0);

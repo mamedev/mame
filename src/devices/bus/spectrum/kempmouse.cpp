@@ -7,7 +7,7 @@
     Description:
     https://k1.spdns.de/Vintage/Sinclair/82/Peripherals/Mouse%20Interfaces/Kempston%20Mouse%20Interface/
 
-	Mouse interface with two 8bit reverse counters. Readed in ports:
+    Mouse interface with two 8bit reverse counters. Readed in ports:
     0xFADF (button bits: 0 - right, 1 - left)
     0xFBDF - X
     0xFFDF - Y

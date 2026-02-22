@@ -137,7 +137,7 @@ void x07_state::t6834_cmd (uint8_t cmd)
 					m_lcd_map[y][x+p] = (data & (1 << (7-p))) ? 1 : 0;
 				}
 			}
-			
+
 			m_t6834_ram[address & 0x7ff] = data;
 		}
 		break;

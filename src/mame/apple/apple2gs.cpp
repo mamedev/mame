@@ -310,7 +310,6 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(accel_timer);
 
 	void palette_init(palette_device &palette);
-	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void apple2gs_map(address_map &map) ATTR_COLD;
 	void vectors_map(address_map &map) ATTR_COLD;
@@ -1128,11 +1127,6 @@ void apple2gs_state::palette_init(palette_device &palette)
 	}
 }
 
-u32 apple2gs_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	return m_video->screen_update_GS(screen, bitmap, cliprect);
-}
-
 /***************************************************************************
     I/O
 ***************************************************************************/
@@ -1527,7 +1521,6 @@ u8 apple2gs_state::c000_r(offs_t offset)
 	const u8 uFloatingBus = read_floatingbus(); // video side-effects latch after reading
 	const u8 uFloatingBus7 = uFloatingBus & 0x7f;
 	const u8 uKeyboard = keyglu_816_read(GLU_C000);
-	const u8 uKeyboardC010 = keyglu_816_read(GLU_C010);
 
 	switch (offset)
 	{
@@ -1539,52 +1532,52 @@ u8 apple2gs_state::c000_r(offs_t offset)
 
 		case 0x10:  // read any key down, reset keyboard strobe
 			keyglu_816_write(GLU_C010, 0);
-			return uKeyboardC010 | (uKeyboard & 0x7f);
+			return keyglu_816_read(GLU_C010) | (uKeyboard & 0x7f);
 
 		case 0x11:  // read LCRAM2 (LC Dxxx bank)
-			return (uKeyboardC010 & 0x7f) | (m_lcram2 ? 0x80 : 0x00);
+			return m_lcram2 ? 0x80 : 0x00;
 
 		case 0x12:  // read LCRAM (is LC readable?)
-			return (uKeyboardC010 & 0x7f) | (m_lcram ? 0x80 : 0x00);
+			return m_lcram ? 0x80 : 0x00;
 
 		case 0x13:  // read RAMRD
-			return (uKeyboardC010 & 0x7f) | (m_ramrd ? 0x80 : 0x00);
+			return m_ramrd ? 0x80 : 0x00;
 
 		case 0x14:  // read RAMWRT
-			return (uKeyboardC010 & 0x7f) | (m_ramwrt ? 0x80 : 0x00);
+			return m_ramwrt ? 0x80 : 0x00;
 
 		case 0x15:  // read INTCXROM
-			return (uKeyboardC010 & 0x7f) | (m_intcxrom ? 0x80 : 0x00);
+			return m_intcxrom ? 0x80 : 0x00;
 
 		case 0x16:  // read ALTZP
-			return (uKeyboardC010 & 0x7f) | (m_altzp ? 0x80 : 0x00);
+			return m_altzp ? 0x80 : 0x00;
 
 		case 0x17:  // read SLOTC3ROM
-			return (uKeyboardC010 & 0x7f) | (m_slotc3rom ? 0x80 : 0x00);
+			return m_slotc3rom ? 0x80 : 0x00;
 
 		case 0x18:  // read 80STORE
-			return (uKeyboardC010 & 0x7f) | (m_video->get_80store() ? 0x80 : 0x00);
+			return m_video->get_80store() ? 0x80 : 0x00;
 
 		case 0x19:  // read VBL (not VBLBAR, see Apple IIGS Technical Note #40)
-			return (uKeyboardC010 & 0x7f) | (m_vbl ? 0x80 : 0x00);
+			return m_vbl ? 0x80 : 0x00;
 
 		case 0x1a:  // read TEXT
-			return (uKeyboardC010 & 0x7f) | (m_video->get_graphics() ? 0x00 : 0x80);
+			return m_video->get_graphics() ? 0x00 : 0x80;
 
 		case 0x1b:  // read MIXED
-			return (uKeyboardC010 & 0x7f) | (m_video->get_mix() ? 0x80 : 0x00);
+			return m_video->get_mix() ? 0x80 : 0x00;
 
 		case 0x1c:  // read PAGE2
-			return (uKeyboardC010 & 0x7f) | (m_video->get_page2() ? 0x80 : 0x00);
+			return m_video->get_page2() ? 0x80 : 0x00;
 
 		case 0x1d:  // read HIRES
-			return (uKeyboardC010 & 0x7f) | (m_video->get_hires() ? 0x80 : 0x00);
+			return m_video->get_hires() ? 0x80 : 0x00;
 
 		case 0x1e:  // read ALTCHARSET
-			return (uKeyboardC010 & 0x7f) | (m_video->get_altcharset() ? 0x80 : 0x00);
+			return m_video->get_altcharset() ? 0x80 : 0x00;
 
 		case 0x1f:  // read 80COL
-			return (uKeyboardC010 & 0x7f) | (m_video->get_80col() ? 0x80 : 0x00);
+			return m_video->get_80col() ? 0x80 : 0x00;
 
 		case 0x22:  // TEXTCOL
 			return m_textcol;
@@ -1779,12 +1772,6 @@ u8 apple2gs_state::c000_r(offs_t offset)
 				}
 			}
 			break;
-	}
-
-	// assume all $C00X returns the keyboard, like on the IIe
-	if ((offset & 0xf0) == 0x00)
-	{
-		return uKeyboard;
 	}
 
 	return uFloatingBus;
@@ -3793,7 +3780,7 @@ void apple2gs_state::apple2gs(machine_config &config)
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(704, 262);  // 640+32+32 for the borders
 	m_screen->set_visarea(0,703,0,230);
-	m_screen->set_screen_update(FUNC(apple2gs_state::screen_update));
+	m_screen->set_screen_update(m_video, NAME((&a2_video_device::screen_update_GS)));
 
 	PALETTE(config, "palette", FUNC(apple2gs_state::palette_init), 256);
 
@@ -3914,7 +3901,7 @@ ROM_START(apple2gs)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	// 341-0728 is the MASK rom version while 341-0737 is the EPROM version - SAME data.
@@ -3929,7 +3916,7 @@ ROM_START(apple2gsr3p)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("341-0728", 0x00000, 0x20000, CRC(8d410067) SHA1(c0f4704233ead14cb8e1e8a68fbd7063c56afd27) ) /* 341-0728: IIgs ROM03 prototype FC-FD - 28 pin MASK rom */
@@ -3941,7 +3928,7 @@ ROM_START(apple2gsr1)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-b", 0x20000, 0x20000, CRC(42f124b0) SHA1(e4fc7560b69d062cb2da5b1ffbe11cd1ca03cc37)) /* 342-0077-B: IIgs ROM01 */
@@ -3952,7 +3939,7 @@ ROM_START(apple2gsr0)
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD("342-0077-a", 0x20000, 0x20000, CRC(dfbdd97b) SHA1(ff0c245dd0732ec4413a934fd80efc2defd8a8e3) ) /* 342-0077-A: IIgs ROM00 */
@@ -3963,7 +3950,7 @@ ROM_START(apple2gsr0p)  // 6/19/1986 Cortland prototype
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "rombf.bin",    0x020000, 0x020000, CRC(ab04fedf) SHA1(977589a17553956d583a21020080a39dd396df5c) )
@@ -3974,7 +3961,7 @@ ROM_START(apple2gsr0p2)  // 3/10/1986 Cortland prototype, boots as "Apple //'ing
 	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) )
 
 	ROM_REGION(0x4000,"gfx1",0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000,"maincpu",0)
 	ROM_LOAD( "apple iigs alpha rom 2.0 19860310.bin", 0x020000, 0x020000, CRC(a47d275f) SHA1(c5836adcfc8be69c7351b84afa94c814e8d92b81) )
@@ -3986,7 +3973,7 @@ ROM_START(apple2gsmt)
 	ROM_LOAD( "341s0632-2.bin", 0x000000, 0x001000, CRC(e1c11fb0) SHA1(141d18c36a617ab9dce668445440d34354be0672) )
 
 	ROM_REGION(0x4000, "gfx1", 0)
-	ROM_LOAD ( "megaii.chr", 0x0000, 0x4000, BAD_DUMP CRC(ef0bfc11) SHA1(c068f3d02d442a8a38121d42318e9a962ee8913e)) /* need label/part number */
+	ROM_LOAD("344s0047.bin", 0x000000, 0x004000, CRC(2d541944) SHA1(5a5a77c8ec45632aea1a57cd9c9257f7f6e44668)) /* Mega II: 344S0047.  Dumped from the test registers, verified identical on both ROM 1 and 3 */
 
 	ROM_REGION(0x80000, "maincpu", 0)
 	// The Mark Twain ROM is 512K, with address bit 16 inverted (same as ROM 3).

@@ -819,10 +819,6 @@ void lua_engine::initialize()
  * emu.register_frame_done(callback) - register callback after frame is drawn to screen (for overlays)
  * emu.register_sound_update(callback) - register callback after sound update has generated new samples
  * emu.register_periodic(callback) - register periodic callback while program is running
- * emu.register_vector_begin(callback) - register callback before each vector screen render
- * emu.register_vector_move_to(callback) - register callback for each vector move operation
- * emu.register_vector_line_to(callback) - register callback for each vector line operation
- * emu.register_vector_end(callback) - register callback after each vector screen render
  * emu.register_callback(callback, name) - register callback to be used by MAME via lua_engine::call_plugin()
  * emu.register_menu(event_callback, populate_callback, name) - register callbacks for plugin menu
  * emu.register_mandatory_file_manager_override(callback) - register callback invoked to override mandatory file manager
@@ -836,28 +832,6 @@ void lua_engine::initialize()
  */
 
 	sol::table emu = sol().create_named_table("emu");
-	vector_device::set_hook_callback(
-			[this] (running_machine &machine, vector_device::hook_data const &data)
-			{
-				if (!m_machine || (&machine != m_machine))
-					return;
-
-				switch (data.event)
-				{
-				case vector_device::hook_event::FRAME_BEGIN:
-					execute_function("LUA_ON_VECTOR_BEGIN", data.width, data.height);
-					break;
-				case vector_device::hook_event::MOVE_TO:
-					execute_function("LUA_ON_VECTOR_MOVE_TO", data.x1, data.y1);
-					break;
-				case vector_device::hook_event::LINE_TO:
-					execute_function("LUA_ON_VECTOR_LINE_TO", data.x0, data.y0, data.x1, data.y1, data.intensity, uint32_t(data.color));
-					break;
-				case vector_device::hook_event::FRAME_END:
-					execute_function("LUA_ON_VECTOR_END");
-					break;
-				}
-			});
 	emu["wait"] = sol::yielding(
 			[this] (sol::this_state s, sol::object duration, sol::variadic_args args)
 			{
@@ -967,10 +941,6 @@ void lua_engine::initialize()
 	emu["register_frame_done"] = [this] (sol::function func) { register_function(func, "LUA_ON_FRAME_DONE"); };
 	emu["register_sound_update"] = [this] (sol::function func) { register_function(func, "LUA_ON_SOUND_UPDATE"); };
 	emu["register_periodic"] = [this] (sol::function func) { register_function(func, "LUA_ON_PERIODIC"); };
-	emu["register_vector_begin"] = [this] (sol::function func) { register_function(func, "LUA_ON_VECTOR_BEGIN"); };
-	emu["register_vector_move_to"] = [this] (sol::function func) { register_function(func, "LUA_ON_VECTOR_MOVE_TO"); };
-	emu["register_vector_line_to"] = [this] (sol::function func) { register_function(func, "LUA_ON_VECTOR_LINE_TO"); };
-	emu["register_vector_end"] = [this] (sol::function func) { register_function(func, "LUA_ON_VECTOR_END"); };
 	emu["register_mandatory_file_manager_override"] = [this] (sol::function func) { register_function(func, "LUA_ON_MANDATORY_FILE_MANAGER_OVERRIDE"); };
 	emu["register_before_load_settings"] = [this](sol::function func) { register_function(func, "LUA_ON_BEFORE_LOAD_SETTINGS"); };
 	emu["register_menu"] =
@@ -1024,6 +994,9 @@ void lua_engine::initialize()
 	emu["slot_enumerator"] = sol::overload(
 			[] (device_t &dev) { return devenum<slot_interface_enumerator>(dev); },
 			[] (device_t &dev, int maxdepth) { return devenum<slot_interface_enumerator>(dev, maxdepth); });
+	emu["vector_device_enumerator"] = sol::overload(
+			[] (device_t &dev) { return devenum<vector_device_enumerator>(dev); },
+			[] (device_t &dev, int maxdepth) { return devenum<vector_device_enumerator>(dev, maxdepth); });
 
 
 	auto notifier_subscription_type = sol().registry().new_usertype<util::notifier_subscription>("notifier_subscription", sol::no_constructor);
@@ -1527,6 +1500,7 @@ void lua_engine::initialize()
 	machine_type["exit_pending"] = sol::property(&running_machine::exit_pending);
 	machine_type["hard_reset_pending"] = sol::property(&running_machine::hard_reset_pending);
 	machine_type["devices"] = sol::property([] (running_machine &m) { return devenum<device_enumerator>(m.root_device()); });
+	machine_type["vector_devices"] = sol::property([] (running_machine &m) { return devenum<vector_device_enumerator>(m.root_device()); });
 	machine_type["palettes"] = sol::property([] (running_machine &m) { return devenum<palette_interface_enumerator>(m.root_device()); });
 	machine_type["screens"] = sol::property([] (running_machine &m) { return devenum<screen_device_enumerator>(m.root_device()); });
 	machine_type["cassettes"] = sol::property([] (running_machine &m) { return devenum<cassette_device_enumerator>(m.root_device()); });
@@ -1938,6 +1912,67 @@ void lua_engine::initialize()
 	screen_dev_type["container"] = sol::property(&screen_device::container);
 	screen_dev_type["palette"] = sol::property([] (screen_device const &sdev) { return sdev.has_palette() ? &sdev.palette() : nullptr; });
 
+	auto vector_dev_type = sol().registry().new_usertype<vector_device>(
+			"vector_dev",
+			sol::no_constructor,
+			sol::base_classes, sol::bases<device_t, device_video_interface>());
+	vector_dev_type.set_function("add_frame_begin_notifier",
+			[this] (vector_device &v, sol::protected_function cb)
+			{
+				return v.add_frame_begin_notifier(
+						[this, cbfunc = sol::protected_function(m_lua_state, cb)] (void)
+						{
+							auto status(invoke(cbfunc));
+							if (!status.valid())
+							{
+								auto err(status.template get<sol::error>());
+								osd_printf_error("[LUA ERROR] error in vector frame-begin callback: %s\n", err.what());
+							}
+						});
+			});
+	vector_dev_type.set_function("add_frame_end_notifier",
+			[this] (vector_device &v, sol::protected_function cb)
+			{
+				return v.add_frame_end_notifier(
+						[this, cbfunc = sol::protected_function(m_lua_state, cb)] (void)
+						{
+							auto status(invoke(cbfunc));
+							if (!status.valid())
+							{
+								auto err(status.template get<sol::error>());
+								osd_printf_error("[LUA ERROR] error in vector frame-end callback: %s\n", err.what());
+							}
+						});
+			});
+	vector_dev_type.set_function("add_move_notifier",
+			[this] (vector_device &v, sol::protected_function cb)
+			{
+				return v.add_move_notifier(
+						[this, cbfunc = sol::protected_function(m_lua_state, cb)] (int x, int y, uint32_t color, int vis_x, int vis_y)
+						{
+							auto status(invoke(cbfunc, x / 65536.0, y / 65536.0, color, vis_x, vis_y));
+							if (!status.valid())
+							{
+								auto err(status.template get<sol::error>());
+								osd_printf_error("[LUA ERROR] error in vector move callback: %s\n", err.what());
+							}
+						});
+			});
+	vector_dev_type.set_function("add_line_notifier",
+			[this] (vector_device &v, sol::protected_function cb)
+			{
+				return v.add_line_notifier(
+						[this, cbfunc = sol::protected_function(m_lua_state, cb)] (int prev_x, int prev_y, int x, int y, uint32_t color, int intensity, int vis_x, int vis_y)
+						{
+							auto status(invoke(cbfunc, prev_x / 65536.0, prev_y / 65536.0, x / 65536.0, y / 65536.0, color, intensity, vis_x, vis_y));
+							if (!status.valid())
+							{
+								auto err(status.template get<sol::error>());
+								osd_printf_error("[LUA ERROR] error in vector line callback: %s\n", err.what());
+							}
+						});
+			});
+
 
 	auto cass_type = sol().registry().new_usertype<cassette_image_device>(
 			"cassette",
@@ -2297,7 +2332,6 @@ bool lua_engine::frame_hook()
 
 void lua_engine::close()
 {
-	vector_device::set_hook_callback(vector_device::hook_callback());
 	m_notifiers.reset();
 	m_menu.clear();
 	m_update_tasks.clear();

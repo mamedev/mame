@@ -6,6 +6,7 @@ Sega Lindbergh
 
 TODO:
 - tests area 0xd0000 - 0xd000f, wants an undumped ROM in there?
+- Update: assigning intr_pin to UHCI causes the script below to not work anymore.
 - Pinpoint root cause of all of the following debug breakpoints
   https://github.com/mamedev/mame/files/8766682/lindbergh_megahack.txt
 - bp fffffff0,1,{eip-=0x12 ;g} (spurious execution parse of below)
@@ -17,7 +18,7 @@ TODO:
 - bp e7abf,1,{eip+=3;g}
 - bp 79068,1,{eip+=2;g}
 - bp 78aed,1,{eip+=2;g}
-- BIOS detects CPU as :), 5M of System RAM, throws errors 0270 (RTC),
+- BIOS detects CPU as ":)", 5M of System RAM, throws errors 0270 (RTC),
   CMOS bad (0251) and PCI resource conflict on SATA.
 
 ***************************************************************************
@@ -418,8 +419,9 @@ void lindbergh_state::lindbergh(machine_config &config)
 	I82875P_OVERFLOW        (config, "pci:06.0",      0,                   0x103382c0);
 	PCI_BRIDGE              (config, "pci:1c.0",      0, 0x808625ae, 0x02);
 	I82541                  (config, "pci:1c.0:00.0", 0,                   0x103382c0);
-	USB_UHCI                (config, "pci:1d.0",      0, 0x808625a9, 0x02, 0x103382c0);
-	USB_UHCI                (config, "pci:1d.1",      0, 0x808625aa, 0x02, 0x103382c0);
+	// TODO: function 1 claims PIRQD# but uses value 0x02?
+	USB_UHCI                (config, "pci:1d.0",      0, 0x808625a9, 0x02, 0x103382c0, 0x01);
+	USB_UHCI                (config, "pci:1d.1",      0, 0x808625aa, 0x02, 0x103382c0, 0x02);
 	I6300ESB_WATCHDOG       (config, "pci:1d.4",      0,                   0x103382c0);
 	APIC                    (config, "pci:1d.5",      0, 0x808625ac, 0x02, 0x103382c0);
 	USB_EHCI                (config, "pci:1d.7",      0, 0x808625ad, 0x02, 0x103382c0);

@@ -350,22 +350,22 @@ void mcd212_device::process_ica()
 				break;
 			case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: // RELOAD DCP
 			case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
 				set_dcp<Path>(cmd & 0x003ffffc);
 				break;
 			case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35: case 0x36: case 0x37: // RELOAD DCP and STOP
 			case 0x38: case 0x39: case 0x3a: case 0x3b: case 0x3c: case 0x3d: case 0x3e: case 0x3f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP and STOP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD DCP and STOP: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
 				set_dcp<Path>(cmd & 0x003ffffc);
 				return;
 			case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47: // RELOAD VSR (ICA)
 			case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR: %06x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
 				addr = (cmd & 0x0007ffff) / 2;
 				break;
 			case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57: // RELOAD VSR and STOP
 			case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5c: case 0x5d: case 0x5e: case 0x5f:
-				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR and STOP: VSR = %05x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x001fffff);
+				LOGMASKED(LOG_ICA, "%08x: %08x: ICA %d: RELOAD VSR and STOP: VSR = %05x\n", (addr - 2) * 2 + Path * 0x200000, cmd, Path, cmd & 0x003fffff);
 				set_vsr<Path>(cmd & 0x003fffff);
 				return;
 			case 0x60: case 0x61: case 0x62: case 0x63: case 0x64: case 0x65: case 0x66: case 0x67: // INTERRUPT
@@ -1137,8 +1137,10 @@ void mcd212_device::device_reset()
 	m_ica_height = 32;
 	m_total_height = 312;
 	m_blink_time = 0;
-	for (int i = 0; i < 312; i++)
+	for (int i = 0; i < m_total_height; i++)
+	{
 		std::fill_n(m_interlace_field[i], 768, 0);
+	}
 
 	m_int_callback(CLEAR_LINE);
 

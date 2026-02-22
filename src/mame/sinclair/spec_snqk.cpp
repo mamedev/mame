@@ -2405,11 +2405,11 @@ void spectrum_state::setup_z80(const uint8_t *snapdata, uint32_t snapsize)
 }
 
 /*
-	Load a .SPG (Spectrum Prog) file.
+    Load a .SPG (Spectrum Prog) file.
 
-	v1.1: https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv1_1.txt
-	v1.0: https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv1_0.txt
-	v0.2  https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv0_2.txt
+    v1.1: https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv1_1.txt
+    v1.0: https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv1_0.txt
+    v0.2  https://raw.githubusercontent.com/tslabs/zx-evo/master/pentevo/docs/Formats/SPGv0_2.txt
 */
 void spectrum_state::setup_spg(const u8 *snapdata, u32 snapsize)
 {
