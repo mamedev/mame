@@ -46939,6 +46939,9 @@ ti990_10
 ti990_4
 ti990_4v
 
+@source:ti/tipc.cpp
+tipc
+
 @source:ti/tm990189.cpp
 990189
 990189v
