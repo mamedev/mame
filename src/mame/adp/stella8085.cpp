@@ -624,7 +624,9 @@ void stella8085_state::board4040(machine_config &config)
 
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.out_pa_callback().set(FUNC(stella8085_state::io70w));
-	ppi.in_pb_callback().set(FUNC(stella8085_state::io70r));
+	ppi.in_pa_callback().set(FUNC(stella8085_state::io70r));
+	ppi.out_pb_callback().set(FUNC(stella8085_state::io71w));
+	ppi.in_pb_callback().set(FUNC(stella8085_state::io71r));
 	ppi.out_pc_callback().set(FUNC(stella8085_state::sounddev));
 	ppi.tri_pc_callback().set_constant(0);
 }
