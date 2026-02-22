@@ -110,19 +110,19 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<kaneko_pandora_device> m_pandora;
 
-	required_shared_ptr<uint16_t> m_bgvideoram;
-	required_shared_ptr<uint16_t> m_fgvideoram;
+	required_shared_ptr<u16> m_bgvideoram;
+	required_shared_ptr<u16> m_fgvideoram;
 	required_memory_bank m_okibank;
 
 	bitmap_ind16 m_bitmap;
 
-	void m6295_bankswitch_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void coin_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void m6295_bankswitch_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void coin_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void palette(palette_device &palette) const;
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	void draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -149,29 +149,32 @@ void galpanic_state::palette(palette_device &palette) const
 		palette.set_pen_color(i + 1024, pal5bit(i >> 5), pal5bit(i >> 10), pal5bit(i >> 0));
 }
 
-void galpanic_state::bgvideoram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void galpanic_state::bgvideoram_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	data = COMBINE_DATA(&m_bgvideoram[offset]);
 
-	int sy = offset / 256;
-	int sx = offset % 256;
+	int const sy = offset >> 8;
+	int const sx = offset & 0xff;
 
 	m_bitmap.pix(sy, sx) = 1024 + (data >> 1);
 }
 
 void galpanic_state::draw_fgbitmap(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int offs = 0; offs < m_fgvideoram.bytes() / 2; offs++)
+	for (int sy = cliprect.min_y; sy <= cliprect.max_y; sy++)
 	{
-		int const sx = offs % 256;
-		int const sy = offs / 256;
-		int const color = m_fgvideoram[offs];
-		if (color)
-			bitmap.pix(sy, sx) = color;
+		u16 const *const src = &m_fgvideoram[(sy << 8) & 0xff00];
+		u16 *const dst = &bitmap.pix(sy);
+		for (int sx = cliprect.min_x; sx <= cliprect.max_x; sx++)
+		{
+			u16 const color = src[sx & 0xff];
+			if (color)
+				dst[sx] = color;
+		}
 	}
 }
 
-uint32_t galpanic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 galpanic_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// copy the temporary bitmap to the screen
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
@@ -183,12 +186,6 @@ uint32_t galpanic_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-
-void galpanic_state::machine_start()
-{
-	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
-}
-
 void galpanic_state::screen_vblank(int state)
 {
 	// rising edge
@@ -198,46 +195,48 @@ void galpanic_state::screen_vblank(int state)
 	}
 }
 
+void galpanic_state::machine_start()
+{
+	m_okibank->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+}
+
+
 TIMER_DEVICE_CALLBACK_MEMBER(galpanic_state::scanline)
 {
-	int scanline = param;
+	int const scanline = param;
 
-	if(scanline == 224) // vblank-out irq
+	if (scanline == 224) // vblank-out irq
 		m_maincpu->set_input_line(3, HOLD_LINE);
 
 	// Pandora "sprite end dma" irq?
-	if(scanline == 32)
+	if (scanline == 32)
 		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
 
-
-
-void galpanic_state::m6295_bankswitch_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void galpanic_state::m6295_bankswitch_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
 		m_okibank->set_entry((data >> 8) & 0x0f);
 
 		// used before title screen
-		m_pandora->set_clear_bitmap((data & 0x8000) >> 15);
+		m_pandora->set_clear_bitmap(BIT(data, 15));
 	}
 }
 
 
-
-void galpanic_state::coin_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void galpanic_state::coin_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		machine().bookkeeping().coin_counter_w(0, data & 0x100);
-		machine().bookkeeping().coin_counter_w(1, data & 0x200);
+		machine().bookkeeping().coin_counter_w(0, BIT(data, 8));
+		machine().bookkeeping().coin_counter_w(1, BIT(data, 9));
 
-		machine().bookkeeping().coin_lockout_w(0, ~data & 0x400);
-		machine().bookkeeping().coin_lockout_w(1, ~data & 0x800);
+		machine().bookkeeping().coin_lockout_w(0, BIT(~data, 10));
+		machine().bookkeeping().coin_lockout_w(1, BIT(~data, 11));
 	}
 }
-
 
 
 void galpanic_state::galpanic_map(address_map &map)
@@ -247,7 +246,7 @@ void galpanic_state::galpanic_map(address_map &map)
 	map(0x500000, 0x51ffff).ram().share(m_fgvideoram);
 	map(0x520000, 0x53ffff).ram().w(FUNC(galpanic_state::bgvideoram_w)).share(m_bgvideoram);  // + work RAM
 	map(0x600000, 0x6007ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // 1024 colors, but only 512 seem to be used
-	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_LSB_r), FUNC(kaneko_pandora_device::spriteram_LSB_w));
+	map(0x700000, 0x701fff).rw(m_pandora, FUNC(kaneko_pandora_device::spriteram_lsb_r), FUNC(kaneko_pandora_device::spriteram_lsb_w));
 	map(0x702000, 0x704fff).ram();
 	map(0x800000, 0x800001).portr("DSW1");
 	map(0x800002, 0x800003).portr("DSW2");
