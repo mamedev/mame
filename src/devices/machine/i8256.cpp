@@ -299,7 +299,8 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 	bool t35 = BIT(m_mode, I8256_MODE_T35);
 	for (int i = 0; i < 5; ++i)
 	{
-		if ((i == 1 && t24) || (i == 2 && t35)) {
+		if ((i == 1 && t24) || (i == 2 && t35))
+		{
 			// cascaded low timer
 			int high_index = (i == 1) ? 3 : 4;
 			int int_level = (i == 1) ? I8256_INT_TIMER4 : I8256_INT_TIMER5;
@@ -314,11 +315,15 @@ TIMER_CALLBACK_MEMBER(i8256_device::timer_check)
 						gen_interrupt(int_level);
 				}
 			}
-		} else if (!((i == 3 && t24) || (i == 4 && t35))) {
+		}
+		else if (!((i == 3 && t24) || (i == 4 && t35)))
+		{
 			// normal timer, not cascaded high
-			if (m_timers[i] > 0) {
+			if (m_timers[i] > 0)
+			{
 				m_timers[i]--;
-				if (m_timers[i] == 0 && BIT(m_interrupts, timer_interrupt[i])) {
+				if (m_timers[i] == 0 && BIT(m_interrupts, timer_interrupt[i]))
+				{
 					// For Timer2, only trigger if BITI=0
 					if (i == I8256_INT_TIMER2 && BIT(m_command1, I8256_CMD1_BITI))
 						continue;
