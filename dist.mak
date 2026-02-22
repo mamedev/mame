@@ -96,7 +96,7 @@ else
   SYMFILE :=
 endif
 
-BINARIES = $(MAINBIN) castool chdman floptool imgtool jedutil ldresample ldverify nltool nlwav romcmp unidasm
+BINARIES = $(MAINBIN) castool chdman floptool imgtool jedutil ldresample ldverify nltool nlwav pngcmp romcmp unidasm
 SIMPLE_DIRS := ctrlr docs/legal docs/man docs/swlist hash ini/examples ini/presets
 LOCALISATIONS := $(wildcard language/*/*.mo)
 COPIED_FILES := COPYING uismall.bdf roms/dir.txt $(foreach DIR,$(SIMPLE_DIRS),$(wildcard $(DIR)/*)) language/LICENSE language/README.md $(LOCALISATIONS)
