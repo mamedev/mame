@@ -10,6 +10,13 @@
 #include "tmp94c241.h"
 #include "dasm900.h"
 
+#define LOG_DMA    (1U << 1)
+#define LOG_SERIAL (1U << 2)
+#define LOG_IRQ    (1U << 3)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -370,7 +377,7 @@ void tmp94c241_device::dmar_w(uint8_t data)
 	// DMA count to track how many bytes remain in the current transfer block.
 	for (int channel = 0; channel < 4; channel++)
 	{
-		if (data & (1 << channel))
+		if (BIT(data, channel))
 		{
 			tlcs900_process_software_dma(channel);
 		}
@@ -723,7 +730,7 @@ void tmp94c241_device::scNbuf_w(uint8_t data)
 	// Fake finish sending data
 	m_int_reg[(Channel == 0) ? INTES0 : INTES1] |= 0x80;
 	m_check_irqs = 1;
-	logerror("sc%dbuf write: %02X\n", Channel, data);
+	LOGMASKED(LOG_SERIAL, "sc%dbuf write: %02X\n", Channel, data);
 	//machine().debugger().debug_break();
 }
 
@@ -1128,7 +1135,7 @@ int tmp94c241_device::tlcs900_process_hdma(int channel)
 		m_cycles += 5;
 		break;
 	default:
-		logerror("HDMA ch%d: unknown DMAM mode 0x%02X\n", channel, dmam);
+		LOGMASKED(LOG_DMA, "HDMA ch%d: unknown DMAM mode 0x%02X\n", channel, dmam);
 		m_cycles += 8;
 		break;
 	}
@@ -1139,7 +1146,7 @@ int tmp94c241_device::tlcs900_process_hdma(int channel)
 	// Check for transfer completion
 	if (m_dmac[channel].w.l == 0)
 	{
-		logerror("HDMA ch%d complete: src=%06X dst=%06X (vec=%02X)\n",
+		LOGMASKED(LOG_DMA, "HDMA ch%d complete: src=%06X dst=%06X (vec=%02X)\n",
 			channel, m_dmas[channel].d, m_dmad[channel].d, start_vector);
 
 		// Clear DMA vector to disable channel
@@ -1231,7 +1238,7 @@ void tmp94c241_device::tlcs900_process_software_dma(int channel)
 		m_cycles += 5;
 		break;
 	default:
-		logerror("Software DMA ch%d: unknown DMAM mode 0x%02X\n", channel, dmam);
+		LOGMASKED(LOG_DMA, "Software DMA ch%d: unknown DMAM mode 0x%02X\n", channel, dmam);
 		m_cycles += 8;
 		break;
 	}
@@ -1241,7 +1248,7 @@ void tmp94c241_device::tlcs900_process_software_dma(int channel)
 	// Check for transfer completion
 	if (m_dmac[channel].w.l == 0)
 	{
-		logerror("Software DMA ch%d complete: src=%06X dst=%06X\n",
+		LOGMASKED(LOG_DMA, "Software DMA ch%d complete: src=%06X dst=%06X\n",
 			channel, m_dmas[channel].d, m_dmad[channel].d);
 
 		// Set transfer completion interrupt flag (INTTC0-3)
@@ -1350,9 +1357,9 @@ void tmp94c241_device::tlcs900_check_irqs()
 
 		// Log only DMA completion interrupts (INTTC0/INTTC2) — key milestones
 		if (vector == 0x94)
-			logerror("IRQ: INTTC0 (DMA ch0 done) level=%d PC=%06X\n", level, m_pc.d);
+			LOGMASKED(LOG_IRQ, "IRQ: INTTC0 (DMA ch0 done) level=%d PC=%06X\n", level, m_pc.d);
 		else if (vector == 0x9c)
-			logerror("IRQ: INTTC2 (DMA ch2 done) level=%d PC=%06X\n", level, m_pc.d);
+			LOGMASKED(LOG_IRQ, "IRQ: INTTC2 (DMA ch2 done) level=%d PC=%06X\n", level, m_pc.d);
 
 		m_xssp.d -= 4;
 		WRMEML(m_xssp.d, m_pc.d);
