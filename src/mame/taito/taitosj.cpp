@@ -927,6 +927,70 @@ static INPUT_PORTS_START( alpinea )
 	PORT_DIPSETTING(    0x00, "A only" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( adcanoe )
+	PORT_START("IN0")      // Player 2 (cocktail)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL      // Fire
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL      // Speed-Up
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")      // Player 1
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )                    // Fire
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )                    // Speed-Up
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x1e, 0x00, IPT_UNUSED )                      // protection read
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	COMMON_IN3(IP_ACTIVE_LOW)
+
+	PORT_START("IN4")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(taitosj_state::input_port_4_f0_r))    // from sound CPU
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )              PORT_DIPLOCATION("SWA:1,2")
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x03, "6" )
+	PORT_DIPNAME( 0x04, 0x04, "Extend" )                      PORT_DIPLOCATION("SWA:3")
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPSETTING(    0x04, "10000" )
+	PORT_DIPNAME( 0x08, 0x08, "Year Display" )                 PORT_DIPLOCATION("SWA:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "No Hit (Debug)" )               PORT_DIPLOCATION("SWA:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC(0x20, IP_ACTIVE_LOW, "SWA:6")
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )        PORT_DIPLOCATION("SWA:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )            PORT_DIPLOCATION("SWA:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+
+	PORT_START("DSW2")      // Coinage
+	DSW2_PORT
+
+	PORT_START("DSW3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( timetunl )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2235,6 +2299,32 @@ ROM_START( alpinea )
 	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
 ROM_END
 
+ROM_START( adcanoe )
+	ROM_REGION( 0x12000, "maincpu", 0 )
+	ROM_LOAD( "ac_12.ic69",   0x0000, 0x1000, CRC(4179cdc7) SHA1(a741ee864fd4e96ede4a3f55d6dc29cc2ff83cb6) )
+	ROM_LOAD( "ac_13.ic68",   0x1000, 0x1000, CRC(17d97740) SHA1(e7e7449e08ec1ca6dbea43596387ecf83187f5bd) )
+	ROM_LOAD( "ac_14.ic67",   0x2000, 0x1000, CRC(4b0c895e) SHA1(11e82391fcd88ad327bb82d24034ac3a171c291b) )
+	ROM_LOAD( "ac_15.ic66",   0x3000, 0x1000, CRC(262f4ce2) SHA1(eaf3c6fbede42ff465574f452e0560491c01cf70) )
+	ROM_LOAD( "ac_16.ic65",   0x4000, 0x1000, CRC(e68c7053) SHA1(3d05e899d1dcb01e971917945f37c557ba05fa86) )
+	ROM_LOAD( "ac_17.ic64",   0x5000, 0x1000, CRC(0bdd9efe) SHA1(69471fd0de72f7b4dc950239dbed79dc4862c3ee) )
+	ROM_LOAD( "ac_18.ic55",   0x6000, 0x1000, CRC(959a143b) SHA1(15d98c0bd1bb8306a67f2651f85ddd874ef1b3c9) )
+	ROM_LOAD( "ac_19.ic54",   0x7000, 0x1000, CRC(9e7693f6) SHA1(2f02e2b2b84fb94a5c661514a70dde38d63a0d1d) )
+	// 10000-11fff space for banked ROMs (not used)
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "ac_09.ic70",   0x0000, 0x1000, CRC(bed871c5) SHA1(4476b791193b99adf4c130486151775dab6a8bf9) )
+
+	ROM_REGION( 0x8000, "gfx", 0 )       // graphic ROMs used at runtime
+	ROM_LOAD( "ac_20.ic1",    0x0000, 0x1000, CRC(21b49aae) SHA1(e24c77898abd47df510e82c2ef29cb2e37fe4b03) )
+	ROM_LOAD( "ac_21.ic2",    0x1000, 0x1000, CRC(d7efd8f7) SHA1(6f1a371dd34eda4b0e1c9b4c9377471cd6edf138) )
+	ROM_LOAD( "ac_22.ic3",    0x2000, 0x1000, CRC(44290adf) SHA1(8455bc6ea3c9471048d1fbeb2940672f5f4a4de9) )
+	ROM_LOAD( "ac_23.ic4",    0x3000, 0x1000, CRC(011daec9) SHA1(067e49afcb8ac1295dfee34327eb118488ff9d26) )
+	ROM_LOAD( "ac_24.ic5",    0x4000, 0x1000, CRC(42943c3d) SHA1(e4c63d8e8d21e4e3f677f4024e759636be1da451) )
+
+	ROM_REGION( 0x0100, "proms", 0 )      // layer PROM
+	ROM_LOAD( "eb16.22",      0x0000, 0x0100, CRC(b833b5ea) SHA1(d233f1bf8a3e6cd876853ffd721b9b64c61c9047) )
+ROM_END
+
 ROM_START( timetunl )
 	ROM_REGION( 0x12000, "maincpu", 0 )
 	ROM_LOAD( "un01.69",      0x00000, 0x1000, CRC(2e56d946) SHA1(22b344b4467701d94bbd1ed7946a678893c92a75) )
@@ -2911,6 +3001,7 @@ GAME( 1982, piratpet,  junglek,  nomcu,    piratpet, taitosj_state, init_taitosj
 GAME( 1982, jungleby,  junglek,  nomcu,    junglek,  taitosj_state, init_taitosj, ROT180, "bootleg",                   "Jungle Boy (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, alpine,    0,        nomcu,    alpine,   taitosj_state, init_alpine,  ROT270, "Taito Corporation",         "Alpine Ski (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, alpinea,   alpine,   nomcu,    alpinea,  taitosj_state, init_alpinea, ROT270, "Taito Corporation",         "Alpine Ski (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, adcanoe,   0,        nomcu,    adcanoe,  taitosj_state, init_taitosj, ROT90,  "Taito Corporation",         "Adventure Canoe", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, timetunl,  0,        nomcu,    timetunl, taitosj_state, init_taitosj, ROT0,   "Taito Corporation",         "Time Tunnel", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wwestern,  0,        nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Wild Western (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, wwestern1, wwestern, nomcu,    wwestern, taitosj_state, init_taitosj, ROT270, "Taito Corporation",         "Wild Western (set 2)", MACHINE_SUPPORTS_SAVE )
