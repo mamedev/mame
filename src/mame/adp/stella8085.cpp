@@ -853,8 +853,8 @@ ROM_END
 
 ROM_START( mtrio )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD("mega_trio_f1_ic1.ice6", 0x00000, 0x08000, CRC(9d97fd8c) SHA1(c398610e14c33985a186ae816b759cfdd2b0c6fa))
-	ROM_LOAD("mega_trio_f1_ic2.icd6", 0x00000, 0x08000, CRC(b8c2fc4c) SHA1(ddecd608286eb1f3efc6fccce8806a74ad7ce4b8))
+	ROM_LOAD("mega_trio_f1_ic1.ice6", 0x00000, 0x08000, CRC(b8c2fc4c) SHA1(ddecd608286eb1f3efc6fccce8806a74ad7ce4b8))
+	ROM_LOAD("mega_trio_f1_ic2.icd6", 0x00000, 0x08000, CRC(9d97fd8c) SHA1(c398610e14c33985a186ae816b759cfdd2b0c6fa))
 ROM_END
 
 ROM_START( rasant )
