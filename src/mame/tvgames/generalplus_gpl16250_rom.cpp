@@ -813,7 +813,7 @@ CONS(2009, smartfpf,  smartfp, 0, base, smartfp,  gcm394_game_state, empty_init,
 CONS(2008, fpsport,   0,       0, base, base,     gcm394_game_state, empty_init, "Fisher-Price", "3-in-1 Smart Sports! (US)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // uses a barcode card scanner device with custom cards
-CONS(200?, dressmtv,  0,       0, base_alt_irq, dressmtv, gcm394_game_state, empty_init, "Tomy Takara", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS(200?, dressmtv,  0,       0, base_alt_irq, dressmtv, gcm394_game_state, empty_init, "Takara Tomy", "Disney Princess Dress Mania TV (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 
 // These are ports of the 'Family Sport' games to GPL16250 type hardware, but they don't seem to use many unSP 2.0 instructions.
 // The menu style is close to 'm505neo' but the game selection is closer to 'dnv200fs' (but without the Sports titles removed, and with a few other extras not found on that unit)
