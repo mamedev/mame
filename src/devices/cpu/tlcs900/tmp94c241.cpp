@@ -24,28 +24,6 @@
 // device type definition
 DEFINE_DEVICE_TYPE(TMP94C241, tmp94c241_device, "tmp94c241", "Toshiba TMP94C241")
 
-enum
-{
-	INTE45,
-	INTE67,
-	INTE89,
-	INTEAB,
-	INTET01,
-	INTET23,
-	INTET45,
-	INTET67,
-	INTET89,
-	INTETAB,
-	INTES0,
-	INTES1,
-	INTETC01,
-	INTETC23,
-	INTETC45,
-	INTETC67,
-	INTE0AD,
-	INTNMWDT
-};
-
 static const struct {
 	uint8_t reg;
 	uint8_t iff;
@@ -53,42 +31,42 @@ static const struct {
 	uint8_t dma_start_vector;
 } tmp94c241_irq_vector_map[] =
 {
-	{ INTE0AD,  0x08, 0x28, 0x0a},  // INT0 Pin
-	{ INTE45,   0x08, 0x2c, 0x0b},  // INT4 Pin
-	{ INTE45,   0x80, 0x30, 0x0c},  // INT5 Pin
-	{ INTE67,   0x08, 0x34, 0x0d},  // INT6 Pin
-	{ INTE67,   0x80, 0x38, 0x0e},  // INT7 Pin
-									// 0x3c - reserved
-	{ INTE89,   0x08, 0x40, 0x10},  // INT8 Pin
-	{ INTE89,   0x80, 0x44, 0x11},  // INT9 Pin
-	{ INTEAB,   0x08, 0x48, 0x12},  // INTA Pin
-	{ INTEAB,   0x80, 0x4c, 0x13},  // INTB Pin
-	{ INTET01,  0x08, 0x50, 0x14},  // INTT0: 8-bit timer (Timer 0)
-	{ INTET01,  0x80, 0x54, 0x15},  // INTT1: 8-bit timer (Timer 1)
-	{ INTET23,  0x08, 0x58, 0x16},  // INTT2: 8-bit timer (Timer 2)
-	{ INTET23,  0x80, 0x5c, 0x17},  // INTT3: 8-bit timer (Timer 3)
-	{ INTET45,  0x08, 0x60, 0x18},  // INTTR4: 16-bit timer (Treg 4)
-	{ INTET45,  0x80, 0x64, 0x19},  // INTTR5: 16-bit timer (Treg 5)
-	{ INTET67,  0x08, 0x68, 0x1a},  // INTTR6: 16-bit timer (Treg 6)
-	{ INTET67,  0x80, 0x6c, 0x1b},  // INTTR7: 16-bit timer (Treg 7)
-	{ INTET89,  0x08, 0x70, 0x1c},  // INTTR8: 16-bit timer (Treg 8)
-	{ INTET89,  0x80, 0x74, 0x1d},  // INTTR9: 16-bit timer (Treg 9)
-	{ INTETAB,  0x08, 0x78, 0x1e},  // INTTRA: 16-bit timer (Treg A)
-	{ INTETAB,  0x80, 0x7c, 0x1f},  // INTTRB: 16-bit timer (Treg B)
-	{ INTES0,   0x08, 0x80, 0x20},  // INTRX0: Serial receive 0
-	{ INTES0,   0x80, 0x84, 0x21},  // INTTX0: Serial send 0
-	{ INTES1,   0x08, 0x88, 0x22},  // INTRX1: Serial receive 1
-	{ INTES1,   0x80, 0x8c, 0x23},  // INTTX1: Serial send 1
-	{ INTE0AD,  0x80, 0x90, 0x24},  // INTAD: AD conversion completion
-	{ INTETC01, 0x08, 0x94, 0x25},  // INTTC0: micro-DMA completion Ch.0
-	{ INTETC01, 0x80, 0x98, 0x26},  // INTTC1: micro-DMA completion Ch.1
-	{ INTETC23, 0x08, 0x9c, 0x27},  // INTTC2: micro-DMA completion Ch.2
-	{ INTETC23, 0x80, 0xa0, 0x28},  // INTTC3: micro-DMA completion Ch.3
-	{ INTETC45, 0x08, 0xa4, 0x29},  // INTTC4: micro-DMA completion Ch.4
-	{ INTETC45, 0x80, 0xa8, 0x2a},  // INTTC5: micro-DMA completion Ch.5
-	{ INTETC67, 0x08, 0xac, 0x2b},  // INTTC6: micro-DMA completion Ch.6
-	{ INTETC67, 0x80, 0xb0, 0x2c},  // INTTC7: micro-DMA completion Ch.7
-									/* 0xb4 ... 0xfc (Reserved) */
+	{ tmp94c241_device::INTE0AD,  0x08, 0x28, 0x0a},  // INT0 Pin
+	{ tmp94c241_device::INTE45,   0x08, 0x2c, 0x0b},  // INT4 Pin
+	{ tmp94c241_device::INTE45,   0x80, 0x30, 0x0c},  // INT5 Pin
+	{ tmp94c241_device::INTE67,   0x08, 0x34, 0x0d},  // INT6 Pin
+	{ tmp94c241_device::INTE67,   0x80, 0x38, 0x0e},  // INT7 Pin
+	                                                    // 0x3c - reserved
+	{ tmp94c241_device::INTE89,   0x08, 0x40, 0x10},  // INT8 Pin
+	{ tmp94c241_device::INTE89,   0x80, 0x44, 0x11},  // INT9 Pin
+	{ tmp94c241_device::INTEAB,   0x08, 0x48, 0x12},  // INTA Pin
+	{ tmp94c241_device::INTEAB,   0x80, 0x4c, 0x13},  // INTB Pin
+	{ tmp94c241_device::INTET01,  0x08, 0x50, 0x14},  // INTT0: 8-bit timer (Timer 0)
+	{ tmp94c241_device::INTET01,  0x80, 0x54, 0x15},  // INTT1: 8-bit timer (Timer 1)
+	{ tmp94c241_device::INTET23,  0x08, 0x58, 0x16},  // INTT2: 8-bit timer (Timer 2)
+	{ tmp94c241_device::INTET23,  0x80, 0x5c, 0x17},  // INTT3: 8-bit timer (Timer 3)
+	{ tmp94c241_device::INTET45,  0x08, 0x60, 0x18},  // INTTR4: 16-bit timer (Treg 4)
+	{ tmp94c241_device::INTET45,  0x80, 0x64, 0x19},  // INTTR5: 16-bit timer (Treg 5)
+	{ tmp94c241_device::INTET67,  0x08, 0x68, 0x1a},  // INTTR6: 16-bit timer (Treg 6)
+	{ tmp94c241_device::INTET67,  0x80, 0x6c, 0x1b},  // INTTR7: 16-bit timer (Treg 7)
+	{ tmp94c241_device::INTET89,  0x08, 0x70, 0x1c},  // INTTR8: 16-bit timer (Treg 8)
+	{ tmp94c241_device::INTET89,  0x80, 0x74, 0x1d},  // INTTR9: 16-bit timer (Treg 9)
+	{ tmp94c241_device::INTETAB,  0x08, 0x78, 0x1e},  // INTTRA: 16-bit timer (Treg A)
+	{ tmp94c241_device::INTETAB,  0x80, 0x7c, 0x1f},  // INTTRB: 16-bit timer (Treg B)
+	{ tmp94c241_device::INTES0,   0x08, 0x80, 0x20},  // INTRX0: Serial receive 0
+	{ tmp94c241_device::INTES0,   0x80, 0x84, 0x21},  // INTTX0: Serial send 0
+	{ tmp94c241_device::INTES1,   0x08, 0x88, 0x22},  // INTRX1: Serial receive 1
+	{ tmp94c241_device::INTES1,   0x80, 0x8c, 0x23},  // INTTX1: Serial send 1
+	{ tmp94c241_device::INTE0AD,  0x80, 0x90, 0x24},  // INTAD: AD conversion completion
+	{ tmp94c241_device::INTETC01, 0x08, 0x94, 0x25},  // INTTC0: micro-DMA completion Ch.0
+	{ tmp94c241_device::INTETC01, 0x80, 0x98, 0x26},  // INTTC1: micro-DMA completion Ch.1
+	{ tmp94c241_device::INTETC23, 0x08, 0x9c, 0x27},  // INTTC2: micro-DMA completion Ch.2
+	{ tmp94c241_device::INTETC23, 0x80, 0xa0, 0x28},  // INTTC3: micro-DMA completion Ch.3
+	{ tmp94c241_device::INTETC45, 0x08, 0xa4, 0x29},  // INTTC4: micro-DMA completion Ch.4
+	{ tmp94c241_device::INTETC45, 0x80, 0xa8, 0x2a},  // INTTC5: micro-DMA completion Ch.5
+	{ tmp94c241_device::INTETC67, 0x08, 0xac, 0x2b},  // INTTC6: micro-DMA completion Ch.6
+	{ tmp94c241_device::INTETC67, 0x80, 0xb0, 0x2c},  // INTTC7: micro-DMA completion Ch.7
+	                                                    /* 0xb4 ... 0xfc (Reserved) */
 };
 static constexpr u8 NUM_MASKABLE_IRQS = sizeof(tmp94c241_irq_vector_map) / 4;
 
@@ -129,9 +107,6 @@ tmp94c241_device::tmp94c241_device(const machine_config &mconfig, const char *ta
 	m_t16_cap{ 0, 0, 0, 0, 0, 0, 0, 0 },
 	m_timer_16{ 0, 0, 0, 0 },
 	m_watchdog_mode(0),
-	m_serial_control{ 0, 0 },
-	m_serial_mode{ 0, 0 },
-	m_baud_rate{ 0, 0 },
 	m_od_enable(0),
 	m_ad_mode1(0),
 	m_ad_mode2(0),
@@ -145,7 +120,8 @@ tmp94c241_device::tmp94c241_device(const machine_config &mconfig, const char *ta
 	m_mamr{ 0, 0, 0, 0, 0, 0 },
 	m_dram_refresh{ 0, 0 },
 	m_dram_access{ 0, 0 },
-	m_da_drive(0)
+	m_da_drive(0),
+	m_serial(*this, "serial%u", 0U)
 {
 }
 
@@ -201,9 +177,6 @@ void tmp94c241_device::device_start()
 	save_item(NAME(m_taffcr));
 	save_item(NAME(m_t16run));
 	save_item(NAME(m_watchdog_mode));
-	save_item(NAME(m_serial_control));
-	save_item(NAME(m_serial_mode));
-	save_item(NAME(m_baud_rate));
 	save_item(NAME(m_od_enable));
 	save_item(NAME(m_ad_mode1));
 	save_item(NAME(m_ad_mode2));
@@ -286,12 +259,6 @@ void tmp94c241_device::device_reset()
 	std::fill_n(&m_timer_8[0], 4, 0x00);
 	std::fill_n(&m_timer_16[0], 4, 0x00);
 	m_watchdog_mode = 0x80;
-	for (int i = 0; i < 2; i++)
-	{
-		m_serial_control[i] &= 0x80;
-		m_serial_mode[i] &= 0x80;
-		m_baud_rate[i] = 0x00;
-	}
 	m_od_enable = 0x00;
 	m_ad_mode1 = 0x00;
 	m_ad_mode2 = 0x00;
@@ -310,6 +277,10 @@ void tmp94c241_device::device_reset()
 	std::fill_n(&m_dram_refresh[0], 2, 0x00);
 	std::fill_n(&m_dram_access[0], 2, 0x80);
 	m_da_drive = 0x00;
+
+	m_int_reg[INTES0] |= 0x80;
+	m_int_reg[INTES1] |= 0x80;
+	m_check_irqs = 1;
 }
 
 uint8_t tmp94c241_device::inte_r(offs_t offset)
@@ -718,61 +689,6 @@ void tmp94c241_device::wdcr_w(uint8_t data)
 {
 }
 
-template <uint8_t Channel>
-uint8_t tmp94c241_device::scNbuf_r()
-{
-	return 0;
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::scNbuf_w(uint8_t data)
-{
-	// Fake finish sending data
-	m_int_reg[(Channel == 0) ? INTES0 : INTES1] |= 0x80;
-	m_check_irqs = 1;
-	LOGMASKED(LOG_SERIAL, "sc%dbuf write: %02X\n", Channel, data);
-	//machine().debugger().debug_break();
-}
-
-template <uint8_t Channel>
-uint8_t tmp94c241_device::scNcr_r()
-{
-	uint8_t reg = m_serial_control[Channel];
-	if (!machine().side_effects_disabled())
-		m_serial_control[Channel] &= 0xe3;
-	return reg;
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::scNcr_w(uint8_t data)
-{
-	m_serial_control[Channel] = data;
-}
-
-template <uint8_t Channel>
-uint8_t tmp94c241_device::scNmod_r()
-{
-	return m_serial_mode[Channel];
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::scNmod_w(uint8_t data)
-{
-	m_serial_mode[Channel] = data;
-}
-
-template <uint8_t Channel>
-uint8_t tmp94c241_device::brNcr_r()
-{
-	return m_baud_rate[Channel];
-}
-
-template <uint8_t Channel>
-void tmp94c241_device::brNcr_w(uint8_t data)
-{
-	m_baud_rate[Channel] = data;
-}
-
 uint8_t tmp94c241_device::ode_r()
 {
 	return m_od_enable;
@@ -873,6 +789,13 @@ void tmp94c241_device::port_fc_w(uint8_t data)
 	m_port_function[P] = data;
 }
 
+void tmp94c241_device::device_add_mconfig(machine_config &mconfig)
+{
+	TMP94C241_SERIAL(mconfig, m_serial[0], 0, DERIVED_CLOCK(1, 1));
+	TMP94C241_SERIAL(mconfig, m_serial[1], 1, DERIVED_CLOCK(1, 1));
+}
+
+
 //**************************************************************************
 //  INTERNAL REGISTERS
 //**************************************************************************
@@ -967,14 +890,14 @@ void tmp94c241_device::internal_mem(address_map &map)
 	map(0x0000c6, 0x0000c7).r(FUNC(tmp94c241_device::cap_r<CAPB>));
 	map(0x0000c8, 0x0000c8).rw(FUNC(tmp94c241_device::tamod_r), FUNC(tmp94c241_device::tamod_w));
 	map(0x0000c9, 0x0000c9).rw(FUNC(tmp94c241_device::taffcr_r), FUNC(tmp94c241_device::taffcr_w));
-	map(0x0000d0, 0x0000d0).rw(FUNC(tmp94c241_device::scNbuf_r<0>), FUNC(tmp94c241_device::scNbuf_w<0>));
-	map(0x0000d1, 0x0000d1).rw(FUNC(tmp94c241_device::scNcr_r<0>), FUNC(tmp94c241_device::scNcr_w<0>));
-	map(0x0000d2, 0x0000d2).rw(FUNC(tmp94c241_device::scNmod_r<0>), FUNC(tmp94c241_device::scNmod_w<0>));
-	map(0x0000d3, 0x0000d3).rw(FUNC(tmp94c241_device::brNcr_r<0>), FUNC(tmp94c241_device::brNcr_w<0>));
-	map(0x0000d4, 0x0000d4).rw(FUNC(tmp94c241_device::scNbuf_r<1>), FUNC(tmp94c241_device::scNbuf_w<1>));
-	map(0x0000d5, 0x0000d5).rw(FUNC(tmp94c241_device::scNcr_r<1>), FUNC(tmp94c241_device::scNcr_w<1>));
-	map(0x0000d6, 0x0000d6).rw(FUNC(tmp94c241_device::scNmod_r<1>), FUNC(tmp94c241_device::scNmod_w<1>));
-	map(0x0000d7, 0x0000d7).rw(FUNC(tmp94c241_device::brNcr_r<1>), FUNC(tmp94c241_device::brNcr_w<1>));
+	map(0x0000d0, 0x0000d0).rw(m_serial[0], FUNC(tmp94c241_serial_device::scNbuf_r), FUNC(tmp94c241_serial_device::scNbuf_w));
+	map(0x0000d1, 0x0000d1).rw(m_serial[0], FUNC(tmp94c241_serial_device::scNcr_r), FUNC(tmp94c241_serial_device::scNcr_w));
+	map(0x0000d2, 0x0000d2).rw(m_serial[0], FUNC(tmp94c241_serial_device::scNmod_r), FUNC(tmp94c241_serial_device::scNmod_w));
+	map(0x0000d3, 0x0000d3).rw(m_serial[0], FUNC(tmp94c241_serial_device::brNcr_r), FUNC(tmp94c241_serial_device::brNcr_w));
+	map(0x0000d4, 0x0000d4).rw(m_serial[1], FUNC(tmp94c241_serial_device::scNbuf_r), FUNC(tmp94c241_serial_device::scNbuf_w));
+	map(0x0000d5, 0x0000d5).rw(m_serial[1], FUNC(tmp94c241_serial_device::scNcr_r), FUNC(tmp94c241_serial_device::scNcr_w));
+	map(0x0000d6, 0x0000d6).rw(m_serial[1], FUNC(tmp94c241_serial_device::scNmod_r), FUNC(tmp94c241_serial_device::scNmod_w));
+	map(0x0000d7, 0x0000d7).rw(m_serial[1], FUNC(tmp94c241_serial_device::brNcr_r), FUNC(tmp94c241_serial_device::brNcr_w));
 	map(0x0000e0, 0x0000f0).rw(FUNC(tmp94c241_device::inte_r), FUNC(tmp94c241_device::inte_w));
 	map(0x0000f6, 0x0000f6).w(FUNC(tmp94c241_device::iimc_w));
 	map(0x0000f7, 0x0000f7).rw(FUNC(tmp94c241_device::intnmwdt_r), FUNC(tmp94c241_device::intnmwdt_w));
