@@ -68,6 +68,7 @@ private:
 		uint8_t regs[0x100]{};
 		uint8_t lastdata[64]{};
 		uint8_t pattern[32]{};
+		uint32_t pattern_mask = 31;
 		int32_t lastdatalen = 0;
 		uint32_t remain = 0;
 		
@@ -79,6 +80,7 @@ private:
 
 	void pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void pegc_mmio_map(address_map &map);
+
 //  UPD7220_DISPLAY_PIXELS_MEMBER( pegc_display_pixels );
 };
 

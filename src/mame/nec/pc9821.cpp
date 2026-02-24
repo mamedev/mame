@@ -350,7 +350,7 @@ uint16_t pc9821_state::pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 
 				if (pat_update)
 				{
-					m_pegc.pattern[tmp & 31] = pixel_data;
+					m_pegc.pattern[tmp & m_pegc.pattern_mask] = pixel_data;
 				}
 			}
 
@@ -388,7 +388,7 @@ uint16_t pc9821_state::pc9821_grcg_gvram_r(offs_t offset, uint16_t mem_mask)
 
 void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	logerror("PEGC_W: PC=%08x Off=%05x Data=%04x\n", m_maincpu->pc(), offset, data);
+	//logerror("PEGC_W: PC=%08x Off=%05x Data=%04x\n", m_maincpu->pc(), offset, data);
 	if (m_ex_video_ff[ANALOG_256_MODE])
 	{
 		int bank_idx = offset >> 14;
@@ -465,7 +465,7 @@ void pc9821_state::pc9821_grcg_gvram_w(offs_t offset, uint16_t data, uint16_t me
 						ext_gvram[tmp] &= plane_mask;
 
 						u8 c4 = 0, c8 = 0;
-						if (ropmethod == 0) { c4 = c8 = m_pegc.pattern[tmp & 31]; } 
+						if (ropmethod == 0) { c4 = c8 = m_pegc.pattern[tmp & m_pegc.pattern_mask]; } 
 						else if (ropmethod == 1) { c4 = c8 = pal2; } 
 						else if (ropmethod == 2) { c4 = c8 = pal1; } 
 						else { c4 = pal1; c8 = pal2; }
@@ -575,78 +575,67 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 				m_pegc_vram_view.disable();
 		})
 	);
-	map(0x104, 0x11f).lrw16(
+	map(0x104, 0x11f).lrw8(
 		NAME([this] (offs_t offset) {
-			u32 r_idx = 4 + (offset * 2);
-			return m_pegc.regs[r_idx] | (m_pegc.regs[r_idx + 1] << 8);
+			return m_pegc.regs[4 + offset];
 		}),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-			u32 r_idx = 4 + (offset * 2);
-			if (ACCESSING_BITS_0_7) m_pegc.regs[r_idx] = data & 0xff;
-			if (ACCESSING_BITS_8_15) m_pegc.regs[r_idx + 1] = (data >> 8) & 0xff;
+		NAME([this] (offs_t offset, u8 data) {
+			m_pegc.regs[4 + offset] = data;
 		})
 	);
-	map(0x120, 0x19f).lrw16(
-		NAME([this] (offs_t offset) {
-			u32 pos = offset * 2;
+	map(0x120, 0x19f).lrw32(
+		NAME([this] (offs_t offset, u32 mem_mask) -> u32 {
 			u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
-			u16 ret = 0;
+			u32 ret = 0;
 
 			if (rop & 0x8000)
 			{
-				// 1 palette x 32 pixels
-				int pix_idx = pos / 4;
-				if ((pos % 4) == 0) ret |= m_pegc.pattern[pix_idx];
+				// Mode 1: 1 palette x 32 pixels
+				int pix_idx = offset;
+				if (pix_idx < 32 && ACCESSING_BITS_0_7) {
+					ret = m_pegc.pattern[pix_idx];
+				}
+				return ret;
 			}
 			else
 			{
-				// 32 pixels x 8 planes
-				int plane = pos / 4;
-				int byte_offset = pos % 4;
-				u8 val0 = 0;
-				u8 val1 = 0;
-				for (int i = 0; i < 8; i++) {
-					if (BIT(m_pegc.pattern[byte_offset * 8 + i], plane)) val0 |= (1 << i);
-					if (BIT(m_pegc.pattern[(byte_offset + 1) * 8 + i], plane)) val1 |= (1 << i);
+				// Mode 0: 32 pixels x 8 planes
+				int plane = offset;
+				if (plane < 8) {
+					for (int i = 0; i < 32; i++) {
+						if (BIT(m_pegc.pattern[i], plane))
+							ret |= (1U << i);
+					}
 				}
-				ret = val0 | (val1 << 8);
+				return ret;
 			}
-			return ret;
 		}),
-		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
-			u32 pos = offset * 2;
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
 
 			if (rop & 0x8000)
 			{
-				// 1 palette x 32 pixels
-				int pix_idx = pos / 4; 
-				if (ACCESSING_BITS_0_7 && (pos % 4) == 0) m_pegc.pattern[pix_idx] = data & 0xff;
+				// Mode 1: 1 palette x 32 pixels
+				int pix_idx = offset;
+				
+				if (pix_idx < 32 && ACCESSING_BITS_0_7) {
+					m_pegc.pattern[pix_idx] = data & 0xff;
+				}
 			}
 			else
 			{
-				// 32 pixels x 8 planes
-				int plane = pos / 4;
-				int byte_offset = pos % 4;
-			
-				if (ACCESSING_BITS_0_7)
-				{
-					u8 val = data & 0xff;
-					for (int i = 0; i < 8; i++) {
-						if (BIT(val, i)) m_pegc.pattern[byte_offset * 8 + i] |= (1 << plane);
-						else             m_pegc.pattern[byte_offset * 8 + i] &= ~(1 << plane);
-					}
-				}
-				if (ACCESSING_BITS_8_15)
-				{
-					u8 val = (data >> 8) & 0xff;
-					for (int i = 0; i < 8; i++) {
-						if (BIT(val, i)) m_pegc.pattern[(byte_offset + 1) * 8 + i] |= (1 << plane);
-						else             m_pegc.pattern[(byte_offset + 1) * 8 + i] &= ~(1 << plane);
+				m_pegc.pattern_mask = (mem_mask == 0xffffffff) ? 31 : 15;
+				// Mode 0: 32 pixels x 8 planes
+				int plane = offset;
+				if (plane < 8) {
+					for (int i = 0; i < 32; i++) {
+						if (BIT(mem_mask, i)) {
+							if (BIT(data, i)) m_pegc.pattern[i] |= (1 << plane);
+							else              m_pegc.pattern[i] &= ~(1 << plane);
+						}
 					}
 				}
 			}
-			return;
 		})
 	);
 //  map(0x120, 0x19f) pattern register (image_xfer? relates to bit 15 of $108)
