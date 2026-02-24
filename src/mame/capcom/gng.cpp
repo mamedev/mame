@@ -634,13 +634,14 @@ void gng_state::diamrun(machine_config &config)
 /* Newer PCB, with visible wires and mask ROMs (85606-A-5 / 85606-B-4).
    The ROM contents are a mix between 'gnga' and 'makaimurb'.
    
-   The ROM configuration is set with a jumpers bank at 1F. For the mask ROMs version it's configured as:
-    J2 = Short
-    J3 = Short
-    J4 = Open
-    J5 = Short
-    J6 = Open
-    J7 = Short
+   The ROM configuration is set with a jumpers bank at 1F.
+    Mask ROMs:     EPROMs (eg. gnga):
+	J2 = Short     Open
+    J3 = Short     Open
+    J4 = Open      Short
+    J5 = Short     Open
+    J6 = Open      Short
+    J7 = Short     Open
 */
 ROM_START( gng )
 	ROM_REGION( 0x18000, "maincpu", 0 ) // All EPROMs
@@ -649,7 +650,7 @@ ROM_START( gng )
 	ROM_LOAD( "mjg_05.12n",                           0x10000, 0x8000, CRC(d6397b2b) SHA1(39aa3cb8c229e60ac0ac410ff61e0c09dba78501) ) // page 0, 1, 2, 3
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) // Mask ROM
-	ROM_LOAD( "capsom_m5m23256p_p_62410p_mjg_02.14h", 0x00000, 0x8000, CRC(615f5b6f) SHA1(7ef9ec5c2072e21c787a6bbf700033f50c759c1d) )
+	ROM_LOAD( "capsom_m5m23256p_p_62410p_mjg_02.14h", 0x00000, 0x8000, CRC(615f5b6f) SHA1(7ef9ec5c2072e21c787a6bbf700033f50c759c1d) ) // yes, really "CAPSOM" (same goes for the other mask ROMs)
 
 	ROM_REGION( 0x04000, "chars", 0 ) // Mask ROM
 	ROM_LOAD( "capsom_m5m23256p_p_616105_mjg_01.11e", 0x00000, 0x4000, CRC(1ab9038a) SHA1(907f2e2753f8e11a4addd19c225a5f333ff74344) )
@@ -676,15 +677,6 @@ ROM_START( gng )
 	ROM_LOAD( "gg-pal10l8.bin",  0x0000, 0x002c, CRC(87f1b7e0) SHA1(b719c3be7bd4a02660bb0887f752e9769cbd37d2) )
 ROM_END
 
-/* The ROM configuration is set with a jumpers bank at 1F.
-   For the EPROMs version it's configured as:
-    J2 = Open
-    J3 = Open
-    J4 = Short
-    J5 = Open
-    J6 = Short
-    J7 = Open
-*/
 ROM_START( gnga )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "gg4.bin",      0x04000, 0x4000, CRC(66606beb) SHA1(4c640f49be93c7d2b12d4d4c56c56e74099b6c2f) ) // 4000-5fff is page 4
