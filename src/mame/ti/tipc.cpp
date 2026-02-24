@@ -64,9 +64,28 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_palette(*this, "palette")
 		, m_vdu_char_rom(*this, "vduchar")
+		, m_crtc_gfx(*this, "crtc_gfx%u", 0U)
 		, m_fdc(*this, "fdc")
 		, m_floppies(*this, "fdc:%u", 0U)
 	{ }
+
+	void tipc(machine_config &config);
+
+protected:
+	void machine_start() override ATTR_COLD;
+	void machine_reset() override ATTR_COLD;
+
+private:
+	enum
+	{
+		CPU_SBUF = 0,
+		SBUF_WRITE,
+		CPU_FDC,
+		SBUF_READ
+	};
+
+	void tipc_io(address_map &map) ATTR_COLD;
+	void tipc_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_ioport m_dsw0;
@@ -80,30 +99,15 @@ public:
 	required_device<sy6545_1_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_region_ptr<u8> m_vdu_char_rom;
+	required_shared_ptr_array<uint8_t, 3> m_crtc_gfx;
 	required_device<fd1793_device> m_fdc;
 	required_device_array<floppy_connector, 2> m_floppies;
 
-	void machine_start() override ATTR_COLD;
-	void machine_reset() override ATTR_COLD;
+	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr_changed);
 
 	void u47_w(uint8_t data);
 	void u51_w(uint8_t data);
-
-	void tipc(machine_config &config);
-	void tipc_io(address_map &map) ATTR_COLD;
-	void tipc_map(address_map &map) ATTR_COLD;
-
-private:
-	enum
-	{
-		CPU_SBUF = 0,
-		SBUF_WRITE,
-		CPU_FDC,
-		SBUF_READ
-	};
-
-	MC6845_UPDATE_ROW(crtc_update_row);
-	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr_changed);
 
 	uint8_t fdc_r(offs_t offset);
 	void fdc_w(offs_t offset, uint8_t data);
@@ -130,7 +134,7 @@ private:
 	std::unique_ptr<uint8_t[]> m_buf;
 
 	uint8_t m_crtc_attr_latch, m_crtc_misc_latch, m_crtc_misc_buffer, m_crtc_palette[3];
-	std::unique_ptr<uint8_t[]> m_crtc_ram, m_crtc_attr, m_crtc_gfx[3];
+	std::unique_ptr<uint8_t[]> m_crtc_ram, m_crtc_attr;
 
 	floppy_image_device *m_floppy = nullptr;
 };
@@ -153,13 +157,6 @@ void tipc_state::machine_start()
 
 	m_crtc_ram = make_unique_clear<uint8_t[]>(2048);
 	m_crtc_attr = make_unique_clear<uint8_t[]>(2048);
-	m_crtc_gfx[0] = make_unique_clear<uint8_t[]>(32768);
-	m_crtc_gfx[1] = make_unique_clear<uint8_t[]>(32768);
-	m_crtc_gfx[2] = make_unique_clear<uint8_t[]>(32768);
-
-	m_maincpu->space(AS_PROGRAM).install_ram(0xc0000, 0xc7fff, m_crtc_gfx[0].get());
-	m_maincpu->space(AS_PROGRAM).install_ram(0xc8000, 0xcffff, m_crtc_gfx[1].get());
-	m_maincpu->space(AS_PROGRAM).install_ram(0xd0000, 0xd7fff, m_crtc_gfx[2].get());
 }
 
 void tipc_state::machine_reset()
@@ -476,6 +473,10 @@ INPUT_PORTS_END
 void tipc_state::tipc_map(address_map &map)
 {
 	map.unmap_value_high();
+
+	map(0xc0000, 0xc7fff).ram().share(m_crtc_gfx[0]);
+	map(0xc8000, 0xcffff).ram().share(m_crtc_gfx[1]);
+	map(0xd0000, 0xd7fff).ram().share(m_crtc_gfx[2]);
 	map(0xde000, 0xde7ff).rw(FUNC(tipc_state::char_ram_r), FUNC(tipc_state::char_ram_w)).mirror(0x800);
 	map(0xdf000, 0xdf000).r(FUNC(tipc_state::misc_r));
 	map(0xdf010, 0xdf03f).w(FUNC(tipc_state::palette_w));
@@ -505,7 +506,7 @@ void tipc_state::tipc_io(address_map &map)
 
 void tipc_state::tipc(machine_config &config)
 {
-	I8088(config, m_maincpu, XTAL(5'000'000)); // 15mhz/3
+	I8088(config, m_maincpu, XTAL(15'000'000) / 3);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tipc_state::tipc_map);
 	m_maincpu->set_addrmap(AS_IO, &tipc_state::tipc_io);
 	m_maincpu->set_irq_acknowledge_callback(m_pic8259, FUNC(pic8259_device::inta_cb));
@@ -522,18 +523,18 @@ void tipc_state::tipc(machine_config &config)
 	m_rs232->cts_handler().set(m_upd8251, FUNC(i8251_device::write_cts));
 	m_rs232->set_option_device_input_defaults("keyboard", DEVICE_INPUT_DEFAULTS_NAME(kbd_rs232_defaults));
 
-	clock_device &keyboard_tx_clock(CLOCK(config, "keyboard_tx_clock", 300 * 64)); // 5mhz/256
+	clock_device &keyboard_tx_clock(CLOCK(config, "keyboard_tx_clock", XTAL(15'000'000) / (3 * 256))); // 300
 	keyboard_tx_clock.signal_handler().set(m_upd8251, FUNC(i8251_device::write_txc));
 
-	clock_device &keyboard_rx_clock(CLOCK(config, "keyboard_rx_clock", 2400 * 64)); // 5mhz/32
+	clock_device &keyboard_rx_clock(CLOCK(config, "keyboard_rx_clock", XTAL(15'000'000) / (3 * 32))); // 2400
 	keyboard_rx_clock.signal_handler().set(m_upd8251, FUNC(i8251_device::write_rxc));
 
 	PIT8253(config, m_pit8253);
-	m_pit8253->set_clk<0>(XTAL(5'000'000) / 4); // speaker
-	m_pit8253->set_clk<1>(XTAL(5'000'000) / 8); // timer A
+	m_pit8253->set_clk<0>(XTAL(15'000'000) / (3 * 4)); // speaker
+	m_pit8253->set_clk<1>(XTAL(15'000'000) / (3 * 8)); // timer A
 	m_pit8253->out_handler<1>().set(m_irq3_merger, FUNC(input_merger_all_high_device::in_w<0>)).invert();
 	m_pit8253->out_handler<1>().append(m_irq3_merger, FUNC(input_merger_all_high_device::in_w<2>)).invert();
-	m_pit8253->set_clk<2>(XTAL(5'000'000) / 8); // timer B
+	m_pit8253->set_clk<2>(XTAL(15'000'000) / (3 * 8)); // timer B
 	m_pit8253->out_handler<2>().set(m_irq2_merger, FUNC(input_merger_all_high_device::in_w<0>)).invert();
 	m_pit8253->out_handler<2>().append(m_irq2_merger, FUNC(input_merger_all_high_device::in_w<2>)).invert();
 
@@ -552,14 +553,12 @@ void tipc_state::tipc(machine_config &config)
 	// CRT Controller board
 
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_size(720, 300);
-	screen.set_visarea(0, 719, 0, 299);
+	screen.set_raw(XTAL(18'000'000), 936, 0, 720, 320, 0, 300);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 
 	PALETTE(config, m_palette, palette_device::BRG_3BIT);
 
-	SY6545_1(config, m_crtc, 18_MHz_XTAL / 1); // FIXME 450hz refresh
+	SY6545_1(config, m_crtc, XTAL(18'000'000) / 9);
 	m_crtc->set_char_width(9);
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_screen("screen");
