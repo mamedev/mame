@@ -165,10 +165,7 @@ adsp21062_device::adsp21062_device(
 	, m_write_stalled_pending(false)
 	, m_input_update_pending(false)
 	, m_enable_drc(false)
-	, m_flag0_out_cb(*this)
-	, m_flag1_out_cb(*this)
-	, m_flag2_out_cb(*this)
-	, m_flag3_out_cb(*this)
+	, m_flag_out_cb(*this)
 {
 	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
 }

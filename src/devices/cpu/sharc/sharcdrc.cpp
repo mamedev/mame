@@ -183,49 +183,49 @@ void adsp21062_device::cfunc_unimplemented_shiftimm(void *param)
 void adsp21062_device::cfunc_set_flag0_output(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
-	sharc->m_flag0_out_cb(1);
+	sharc->m_flag_out_cb[0](1);
 }
 
 void adsp21062_device::cfunc_set_flag1_output(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
-	sharc->m_flag1_out_cb(1);
+	sharc->m_flag_out_cb[1](1);
 }
 
 void adsp21062_device::cfunc_set_flag2_output(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
-	sharc->m_flag2_out_cb(1);
+	sharc->m_flag_out_cb[2](1);
 }
 
 void adsp21062_device::cfunc_set_flag3_output(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
-	sharc->m_flag3_out_cb(1);
+	sharc->m_flag_out_cb[3](1);
 }
 
 void adsp21062_device::cfunc_clear_flag0_output(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
-	sharc->m_flag0_out_cb(0);
+	sharc->m_flag_out_cb[0](0);
 }
 
 void adsp21062_device::cfunc_clear_flag1_output(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
-	sharc->m_flag1_out_cb(0);
+	sharc->m_flag_out_cb[1](0);
 }
 
 void adsp21062_device::cfunc_clear_flag2_output(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
-	sharc->m_flag2_out_cb(0);
+	sharc->m_flag_out_cb[2](0);
 }
 
 void adsp21062_device::cfunc_clear_flag3_output(void *param)
 {
 	adsp21062_device *sharc = (adsp21062_device *)param;
-	sharc->m_flag3_out_cb(0);
+	sharc->m_flag_out_cb[3](0);
 }
 
 void adsp21062_device::sharc_cfunc_unimplemented()
