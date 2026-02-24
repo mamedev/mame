@@ -448,7 +448,17 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 					m_core->mode1 = data;
 					break;
 
-				case 0xc:   m_core->astat = data; break;      /* ASTAT */
+				case 0xc:                                     /* ASTAT */
+					if ((m_core->astat ^ data) & FLG0)
+						m_flag0_out_cb((data & FLG0) ? 1 : 0);
+					if ((m_core->astat ^ data) & FLG1)
+						m_flag1_out_cb((data & FLG1) ? 1 : 0);
+					if ((m_core->astat ^ data) & FLG2)
+						m_flag2_out_cb((data & FLG2) ? 1 : 0);
+					if ((m_core->astat ^ data) & FLG3)
+						m_flag3_out_cb((data & FLG3) ? 1 : 0);
+					m_core->astat = data;
+					break;
 
 				case 0xd:                                     /* IMASK */
 					check_interrupts();

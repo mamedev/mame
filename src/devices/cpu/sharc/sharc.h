@@ -39,6 +39,11 @@ public:
 	void set_flag_input(int flag_num, int state);
 	void write_stall(int state);
 
+	auto flag0_out_cb() { return m_flag0_out_cb.bind(); }
+	auto flag1_out_cb() { return m_flag1_out_cb.bind(); }
+	auto flag2_out_cb() { return m_flag2_out_cb.bind(); }
+	auto flag3_out_cb() { return m_flag3_out_cb.bind(); }
+
 	template <unsigned N> uint64_t pm_r(offs_t offset);
 	template <unsigned N> void pm_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	template <unsigned N> uint32_t dmw_r(offs_t offset);
@@ -301,6 +306,11 @@ private:
 	bool m_input_update_pending;
 	bool m_enable_drc;
 
+	devcb_write8 m_flag0_out_cb;
+	devcb_write8 m_flag1_out_cb;
+	devcb_write8 m_flag2_out_cb;
+	devcb_write8 m_flag3_out_cb;
+
 	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
 	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
 	TIMER_CALLBACK_MEMBER(sharc_update_inputs);
@@ -518,6 +528,15 @@ private:
 	static void cfunc_statusstack_underflow(void *param);
 	static void cfunc_unimplemented_compute(void *param);
 	static void cfunc_unimplemented_shiftimm(void *param);
+
+	static void cfunc_set_flag0_output(void *param);
+	static void cfunc_set_flag1_output(void *param);
+	static void cfunc_set_flag2_output(void *param);
+	static void cfunc_set_flag3_output(void *param);
+	static void cfunc_clear_flag0_output(void *param);
+	static void cfunc_clear_flag1_output(void *param);
+	static void cfunc_clear_flag2_output(void *param);
+	static void cfunc_clear_flag3_output(void *param);
 };
 
 

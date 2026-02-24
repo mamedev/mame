@@ -180,6 +180,54 @@ void adsp21062_device::cfunc_unimplemented_shiftimm(void *param)
 	sharc->sharc_cfunc_unimplemented_shiftimm();
 }
 
+void adsp21062_device::cfunc_set_flag0_output(void *param)
+{
+	adsp21062_device *sharc = (adsp21062_device *)param;
+	sharc->m_flag0_out_cb(1);
+}
+
+void adsp21062_device::cfunc_set_flag1_output(void *param)
+{
+	adsp21062_device *sharc = (adsp21062_device *)param;
+	sharc->m_flag1_out_cb(1);
+}
+
+void adsp21062_device::cfunc_set_flag2_output(void *param)
+{
+	adsp21062_device *sharc = (adsp21062_device *)param;
+	sharc->m_flag2_out_cb(1);
+}
+
+void adsp21062_device::cfunc_set_flag3_output(void *param)
+{
+	adsp21062_device *sharc = (adsp21062_device *)param;
+	sharc->m_flag3_out_cb(1);
+}
+
+void adsp21062_device::cfunc_clear_flag0_output(void *param)
+{
+	adsp21062_device *sharc = (adsp21062_device *)param;
+	sharc->m_flag0_out_cb(0);
+}
+
+void adsp21062_device::cfunc_clear_flag1_output(void *param)
+{
+	adsp21062_device *sharc = (adsp21062_device *)param;
+	sharc->m_flag1_out_cb(0);
+}
+
+void adsp21062_device::cfunc_clear_flag2_output(void *param)
+{
+	adsp21062_device *sharc = (adsp21062_device *)param;
+	sharc->m_flag2_out_cb(0);
+}
+
+void adsp21062_device::cfunc_clear_flag3_output(void *param)
+{
+	adsp21062_device *sharc = (adsp21062_device *)param;
+	sharc->m_flag3_out_cb(0);
+}
+
 void adsp21062_device::sharc_cfunc_unimplemented()
 {
 	fatalerror("PC=%08X: Unimplemented op %012X\n", m_core->pc, m_core->arg64);
@@ -2815,13 +2863,25 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 									if (data & ASTAT_FLAGS::BTF)
 										UML_MOV(block, ASTAT_BTF, 1);
 									if (data & ASTAT_FLAGS::FLG0)
+									{
 										UML_MOV(block, FLAG0, 1);
+										UML_CALLC(block, cfunc_set_flag0_output, this);
+									}
 									if (data & ASTAT_FLAGS::FLG1)
+									{
 										UML_MOV(block, FLAG1, 1);
+										UML_CALLC(block, cfunc_set_flag1_output, this);
+									}
 									if (data & ASTAT_FLAGS::FLG2)
+									{
 										UML_MOV(block, FLAG2, 1);
+										UML_CALLC(block, cfunc_set_flag2_output, this);
+									}
 									if (data & ASTAT_FLAGS::FLG3)
+									{
 										UML_MOV(block, FLAG3, 1);
+										UML_CALLC(block, cfunc_set_flag3_output, this);
+									}
 									if (data & 0xff000000)
 									{
 										UML_OR(block, mem(&m_core->astat_drc.cacc), mem(&m_core->astat_drc.cacc), data >> 24);
@@ -2896,13 +2956,25 @@ bool adsp21062_device::generate_opcode(drcuml_block &block, compiler_state &comp
 									if (data & ASTAT_FLAGS::BTF)
 										UML_MOV(block, ASTAT_BTF, 0);
 									if (data & ASTAT_FLAGS::FLG0)
+									{
 										UML_MOV(block, FLAG0, 0);
+										UML_CALLC(block, cfunc_clear_flag0_output, this);
+									}
 									if (data & ASTAT_FLAGS::FLG1)
+									{
 										UML_MOV(block, FLAG1, 0);
+										UML_CALLC(block, cfunc_clear_flag1_output, this);
+									}
 									if (data & ASTAT_FLAGS::FLG2)
+									{
 										UML_MOV(block, FLAG2, 0);
+										UML_CALLC(block, cfunc_clear_flag2_output, this);
+									}
 									if (data & ASTAT_FLAGS::FLG3)
+									{
 										UML_MOV(block, FLAG3, 0);
+										UML_CALLC(block, cfunc_clear_flag3_output, this);
+									}
 									if (data & 0xff000000)
 									{
 										UML_AND(block, mem(&m_core->astat_drc.cacc), mem(&m_core->astat_drc.cacc), ~(data >> 24));
