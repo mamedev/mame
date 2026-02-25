@@ -158,6 +158,7 @@ adsp21062_device::adsp21062_device(
 	, m_swap_dag2_4_7(nullptr)
 	, m_swap_r0_7(nullptr)
 	, m_swap_r8_15(nullptr)
+	, m_flag_out_cb(*this)
 	, m_blocks(*this, "block%u", 0U)
 	, m_flag_pending_val{ 0, 0, 0, 0 }
 	, m_write_stalled_pending_val{ false }
@@ -165,7 +166,6 @@ adsp21062_device::adsp21062_device(
 	, m_write_stalled_pending(false)
 	, m_input_update_pending(false)
 	, m_enable_drc(false)
-	, m_flag_out_cb(*this)
 {
 	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
 }
