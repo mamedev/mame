@@ -457,7 +457,6 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 						if (BIT(flags, FLG0_SHIFT + i))
 							m_flag_out_cb[i](BIT(data, FLG0_SHIFT + i));
 					}
-					
 					break;
 				}
 
