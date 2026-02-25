@@ -30,6 +30,8 @@ public:
 	virtual ~adsp21062_device() override;
 
 	// configuration helpers
+	template <unsigned N> auto flag_out() { return m_flag_out[N].bind(); }
+
 	void set_boot_mode(const sharc_boot_mode boot_mode) { m_boot_mode = boot_mode; }
 	void enable_recompiler();
 
@@ -38,8 +40,6 @@ public:
 
 	void set_flag_input(int flag_num, int state);
 	void write_stall(int state);
-
-	template<unsigned N> auto flag_out_cb() { return m_flag_out_cb[N].bind(); }
 
 	template <unsigned N> uint64_t pm_r(offs_t offset);
 	template <unsigned N> void pm_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
@@ -291,6 +291,8 @@ private:
 	memory_access<24, 3, -3, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access<32, 2, -2, ENDIANNESS_LITTLE>::specific m_data;
 
+	devcb_write8::array<4> m_flag_out_cb;
+
 	required_shared_ptr_array<uint32_t, 2> m_blocks;
 
 	opcode_func m_sharc_op[512];
@@ -302,8 +304,6 @@ private:
 	bool m_write_stalled_pending;
 	bool m_input_update_pending;
 	bool m_enable_drc;
-
-	devcb_write8::array<4> m_flag_out_cb;
 
 	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
 	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
