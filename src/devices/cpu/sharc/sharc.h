@@ -522,15 +522,6 @@ private:
 	static void cfunc_statusstack_underflow(void *param);
 	static void cfunc_unimplemented_compute(void *param);
 	static void cfunc_unimplemented_shiftimm(void *param);
-
-	static void cfunc_set_flag0_output(void *param);
-	static void cfunc_set_flag1_output(void *param);
-	static void cfunc_set_flag2_output(void *param);
-	static void cfunc_set_flag3_output(void *param);
-	static void cfunc_clear_flag0_output(void *param);
-	static void cfunc_clear_flag1_output(void *param);
-	static void cfunc_clear_flag2_output(void *param);
-	static void cfunc_clear_flag3_output(void *param);
 };
 
 
