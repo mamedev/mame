@@ -2,21 +2,28 @@
 // copyright-holders:Robbbert
 /******************************************************************************************************************
 
-Regnecentralen Piccolo RC702
+Regnecentralen Piccolo RC702/RC703
 
 2016-09-10 Skeleton driver
 
-Undumped prom at IC55 type 74S287
+Undumped prom at IC55 type 74S287 (address decoder for PROM0/PROM1 mapping)
 Keyboard has 8048 and 2758, both undumped.
+
+Machine variants:
+  rc702  - RC702 with 8" DSDD floppy drives (maxi), 8 MHz FDC
+  rc702m - RC702 with 5.25" DD floppy drives (mini), 4 MHz FDC
+  rc703  - RC703 with 5.25" HD floppy drives, 8 MHz FDC
 
 ToDo:
 - Printer
-- Hard drive, ports 0x60-0x67. Extra CTC on HD board, ports 0x44-0x47
-- Other things
+- Hard drive for RC703, ports 0x60-0x67. Extra CTC on HD board, ports 0x44-0x47
+- Keyboard MCU (8048 + 2758) — currently using generic_keyboard
 
-Issues:
-- Floppy disc error. It reads 0x780 bytes from the wrong sector then gives diskette error (use bios 0)
-
+Keyboard (PIO port A):
+- The real machine connects the keyboard to Z80 PIO port A.  The driver feeds key data via
+  the PIO's in_pa_callback(); the BIOS/CP/M reads the data register and is signalled by strobe.
+- prom1 (line program ROM) is undumped; the region is filled with 0xff to avoid a missing-ROM
+  warning.
 
 ****************************************************************************************************************/
 
@@ -52,8 +59,10 @@ public:
 		, m_palette(*this, "palette")
 		, m_maincpu(*this, "maincpu")
 		, m_rom(*this, "maincpu")
+		, m_rom_prom1(*this, "prom1")
 		, m_ram(*this, "mainram")
 		, m_bank1(*this, "bank1")
+		, m_bank2(*this, "bank2")
 		, m_p_chargen(*this, "chargen")
 		, m_ctc1(*this, "ctc1")
 		, m_pio(*this, "pio")
@@ -64,7 +73,10 @@ public:
 		, m_floppy0(*this, "fdc:0")
 	{ }
 
+	void rc702_base(machine_config &config);
 	void rc702(machine_config &config);
+	void rc702m(machine_config &config);
+	void rc703(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -98,8 +110,10 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<z80_device> m_maincpu;
 	required_region_ptr<u8> m_rom;
+	required_region_ptr<u8> m_rom_prom1;
 	required_shared_ptr<u8> m_ram;
 	required_memory_bank    m_bank1;
+	required_memory_bank    m_bank2;
 	required_region_ptr<u8> m_p_chargen;
 	required_device<z80ctc_device> m_ctc1;
 	required_device<z80pio_device> m_pio;
@@ -115,6 +129,7 @@ void rc702_state::mem_map(address_map &map)
 {
 	map(0x0000, 0xffff).ram().share("mainram");
 	map(0x0000, 0x07ff).bankr("bank1");
+	map(0x2000, 0x27ff).bankr("bank2");
 }
 
 void rc702_state::io_map(address_map &map)
@@ -127,13 +142,13 @@ void rc702_state::io_map(address_map &map)
 	map(0x0c, 0x0f).rw(m_ctc1, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
 	map(0x10, 0x13).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x14, 0x17).portr("DSW").w(FUNC(rc702_state::port14_w)); // motors
-	map(0x18, 0x1b).lw8(NAME([this] (u8 data) { m_bank1->set_entry(0); })); // replace roms with ram
+	map(0x18, 0x1b).lw8(NAME([this] (u8 data) { m_bank1->set_entry(0); m_bank2->set_entry(0); })); // replace roms with ram
 	map(0x1c, 0x1f).w(FUNC(rc702_state::port1c_w)); // sound
 	map(0xf0, 0xff).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
 
-/* Input ports */
-static INPUT_PORTS_START( rc702 )
+/* Input ports - bit 7 (S08) selects floppy type: 0=mini, 0x80=maxi */
+static INPUT_PORTS_START( rc702_maxi )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "S01")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
@@ -156,7 +171,35 @@ static INPUT_PORTS_START( rc702 )
 	PORT_DIPNAME( 0x40, 0x00, "S07")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "Minifloppy") // also need to switch frequencies to fdc
+	PORT_DIPNAME( 0x80, 0x80, "S08 Minifloppy")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( rc702_mini )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, "S01")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x02, 0x00, "S02")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x04, 0x00, "S03")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x08, 0x00, "S04")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x10, 0x00, "S05")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x20, 0x00, "S06")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x40, 0x00, "S07")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x00, "S08 Minifloppy")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 INPUT_PORTS_END
@@ -164,12 +207,11 @@ INPUT_PORTS_END
 void rc702_state::machine_reset()
 {
 	m_bank1->set_entry(1);
+	m_bank2->set_entry(1);
 	m_beepcnt = 0xffff;
 	m_dack1 = 0;
 	m_eop = 0;
 	m_7474->preset_w(1);
-	m_fdc->set_ready_line_connected(1); // always ready for minifloppy; controlled by fdc for 20cm
-	m_fdc->set_unscaled_clock(4000000); // 4MHz for minifloppy; 8MHz for 20cm
 	m_maincpu->reset();
 }
 
@@ -177,6 +219,8 @@ void rc702_state::machine_start()
 {
 	m_bank1->configure_entry(0, m_ram);
 	m_bank1->configure_entry(1, m_rom);
+	m_bank2->configure_entry(0, &m_ram[0x2000]);
+	m_bank2->configure_entry(1, m_rom_prom1);
 	save_item(NAME(m_q_state));
 	save_item(NAME(m_qbar_state));
 	save_item(NAME(m_drq_state));
@@ -336,12 +380,22 @@ void rc702_state::kbd_put(u8 data)
 	m_pio->strobe_a(1);
 }
 
-static void floppies(device_slot_interface &device)
+static void rc702_floppies(device_slot_interface &device)
 {
-	device.option_add("525qd", FLOPPY_525_QD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
-void rc702_state::rc702(machine_config &config)
+static void rc702m_floppies(device_slot_interface &device)
+{
+	device.option_add("525dd", FLOPPY_525_DD);
+}
+
+static void rc703_floppies(device_slot_interface &device)
+{
+	device.option_add("525hd", FLOPPY_525_HD);
+}
+
+void rc702_state::rc702_base(machine_config &config)
 {
 	/* basic machine hardware */
 	Z80(config, m_maincpu, XTAL(8'000'000) / 2);
@@ -369,16 +423,8 @@ void rc702_state::rc702(machine_config &config)
 	m_dma->out_eop_callback().set(FUNC(rc702_state::eop_w)).invert();   // real line is active low, mame has it backwards
 	m_dma->in_memr_callback().set(FUNC(rc702_state::memory_read_byte));
 	m_dma->out_memw_callback().set(FUNC(rc702_state::memory_write_byte));
-	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
-	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dma->out_iow_callback<2>().set("crtc", FUNC(i8275_device::dack_w));
 	m_dma->out_iow_callback<3>().set("crtc", FUNC(i8275_device::dack_w));
-	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));
-
-	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
-	m_fdc->intrq_wr_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
-	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq1_w));
-	FLOPPY_CONNECTOR(config, "fdc:0", floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	/* Keyboard */
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, "keyboard", 0));
@@ -409,6 +455,52 @@ void rc702_state::rc702(machine_config &config)
 	BEEP(config, m_beep, 1000).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
+void rc702_state::rc702(machine_config &config)
+{
+	rc702_base(config);
+
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);
+	m_fdc->intrq_wr_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq1_w));
+	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));
+
+	FLOPPY_CONNECTOR(config, "fdc:0", rc702_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:1", rc702_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+}
+
+void rc702_state::rc702m(machine_config &config)
+{
+	rc702_base(config);
+
+	UPD765A(config, m_fdc, 8_MHz_XTAL / 2, true, true);  // 4 MHz for 5.25" mini drives
+	m_fdc->intrq_wr_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq1_w));
+	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));
+
+	FLOPPY_CONNECTOR(config, "fdc:0", rc702m_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:1", rc702m_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+}
+
+void rc702_state::rc703(machine_config &config)
+{
+	rc702_base(config);
+
+	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);  // 8 MHz for 5.25" HD drives
+	m_fdc->intrq_wr_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
+	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq1_w));
+	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
+	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
+	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));
+
+	FLOPPY_CONNECTOR(config, "fdc:0", rc703_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:1", rc703_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+	// TODO: Hard disk ports 0x60-0x67, CTC2 ports 0x44-0x47
+}
+
 
 /* ROM definition */
 ROM_START( rc702 )
@@ -420,6 +512,9 @@ ROM_START( rc702 )
 	ROM_SYSTEM_BIOS(2, "rc700", "RC700")
 	ROMX_LOAD( "rob358.rom", 0x0000, 0x0800,  CRC(254aa89e) SHA1(5fb1eb8df1b853b931e670a2ff8d062c1bd8d6bc), ROM_BIOS(2))
 
+	ROM_REGION( 0x0800, "prom1", ROMREGION_ERASEFF )
+	ROM_FILL( 0x0000, 0x0800, 0xff ) // line program ROM (ROB388 on MIC705) - undumped prom1.ic65
+
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "roa296.rom", 0x0000, 0x0800, CRC(7d7e4548) SHA1(efb8b1ece5f9eeca948202a6396865f26134ff2f) ) // char
 	ROM_LOAD( "roa327.rom", 0x0800, 0x0800, CRC(bed7ddb0) SHA1(201ae9e4ac3812577244b9c9044fadd04fb2b82f) ) // semi_gfx
@@ -430,5 +525,10 @@ ROM_END
 
 /* Driver */
 
-//    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT        COMPANY           FULLNAME         FLAGS
-COMP( 1979, rc702, 0,      0,      rc702,   rc702, rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+#define rom_rc702m rom_rc702
+#define rom_rc703  rom_rc702
+
+//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT        CLASS        INIT        COMPANY           FULLNAME                     FLAGS
+COMP( 1979, rc702,  0,      0,      rc702,   rc702_maxi,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (8\")",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1979, rc702m, rc702,  0,      rc702m,  rc702_mini,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (5.25\")",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1982, rc703,  rc702,  0,      rc703,   rc702_mini,  rc702_state, empty_init, "Regnecentralen", "RC703 Piccolo",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
