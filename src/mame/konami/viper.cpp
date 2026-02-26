@@ -2783,22 +2783,176 @@ ROM_START(gticlub2) //*
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	// both with non-default settings (check sound options for instance)
-	ROM_LOAD("nvram.u39", 0x00000, 0x2000, BAD_DUMP CRC(d0604e84) SHA1(18d1183f1331af3e655a56692eb7ab877b4bc239))
-	ROM_LOAD("941jab_nvram.u39", 0x00000, 0x2000, BAD_DUMP CRC(6c4a852f) SHA1(2753dda42cdd81af22dc6780678f1ddeb3c62013))
+	ROM_LOAD("gk941ebb_m48t58.u39", 0x00000, 0x2000, CRC(70c450e0) SHA1(797777e0a7e1b382fc46b53ae9ae1324b4fdb9ac))
 
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "941b02", 0,  SHA1(943bc9b1ea7273a8382b94c8a75010dfe296df14) )
 ROM_END
 
-ROM_START(gticlub2ea) //*
+ROM_START(gticlub2eab) //*
 	VIPER_BIOS
 
 	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
-	ROM_LOAD("ds2430.u3", 0x00, 0x28, NO_DUMP )
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("941eaa_nvram.u39", 0x00000, 0x2000, BAD_DUMP CRC(5ee7004d) SHA1(92e0ce01049308f459985d466fbfcfac82f34a47))
+	ROM_LOAD("gk941eab_m48t58.u39", 0x00000, 0x2000, CRC(0b1270a2) SHA1(f74dadbdcb9c334b938e63b618f7b437219c7e71))
+
+	DISK_REGION( "ata:0:hdd" ) // 32 MB Memory Card labeled 941 EA A02
+	DISK_IMAGE( "941b02", 0,  SHA1(943bc9b1ea7273a8382b94c8a75010dfe296df14) )
+ROM_END
+
+ROM_START(gticlub2u) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gk941uab_m48t58.u39", 0x00000, 0x2000, CRC(fb39517d) SHA1(6025324397bc87950d5f87ad9de61c496831a79a))
+
+	DISK_REGION( "ata:0:hdd" ) // 32 MB Memory Card labeled 941 EA A02
+	DISK_IMAGE( "941b02", 0,  SHA1(943bc9b1ea7273a8382b94c8a75010dfe296df14) )
+ROM_END
+
+ROM_START(gticlub2j) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("ge941jab_m48t58.u39", 0x00000, 0x2000, CRC(8c8aa4a8) SHA1(07d0f0ace645e2418ff6f74df0cd65525ee2519d))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "941b02", 0,  SHA1(943bc9b1ea7273a8382b94c8a75010dfe296df14) )
+ROM_END
+
+ROM_START(gticlub2mj) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gm941jab_m48t58.u39", 0x00000, 0x2000, CRC(a4f49c8f) SHA1(e5c00fa81adde5982e864a7e906530a9c1512fbc))
+
+	DISK_REGION( "ata:0:hdd" ) // 32 MB Memory Card labeled 941 EA A02
+	DISK_IMAGE( "941b02", 0,  SHA1(943bc9b1ea7273a8382b94c8a75010dfe296df14) )
+ROM_END
+
+ROM_START(gticlub2a) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("ge941aab_m48t58.u39", 0x00000, 0x2000, CRC(3c76a3a6) SHA1(e263ca5f1ad8c1fd3a7621ace650450a01a7a8f3))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "941b02", 0,  SHA1(943bc9b1ea7273a8382b94c8a75010dfe296df14) )
+ROM_END
+
+ROM_START(gticlub2ma) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gm941aab_m48t58.u39", 0x00000, 0x2000, CRC(669c61a8) SHA1(307f960ae2b45d84f600467024bbf28d1b883add))
+
+	DISK_REGION( "ata:0:hdd" ) // 32 MB Memory Card labeled 941 EA A02
+	DISK_IMAGE( "941b02", 0,  SHA1(943bc9b1ea7273a8382b94c8a75010dfe296df14) )
+ROM_END
+
+ROM_START(gticlub2eba) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gk941eba_m48t58.u39", 0x00000, 0x2000, CRC(dddc36ec) SHA1(b2570547053c8f5d6b99144866c142782f231874))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "941a02", 0,  SHA1(dd180ad92dd344b38f160e31833077e342cee38d) ) // with ATA id included
+ROM_END
+
+ROM_START(gticlub2eaa) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gk941eaa_m48t58.u39", 0x00000, 0x2000, CRC(0a99a7cd) SHA1(54c4b6dfb4895f000ebabd27dcbbba08cf157fd3))
+
+	DISK_REGION( "ata:0:hdd" ) // 32 MB Memory Card labeled 941 EA A02
+	DISK_IMAGE( "941a02", 0,  SHA1(dd180ad92dd344b38f160e31833077e342cee38d) ) // with ATA id included
+ROM_END
+
+ROM_START(gticlub2ua) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gk941uaa_m48t58.u39", 0x00000, 0x2000, CRC(251db659) SHA1(cc43cb572e562910cf48c4436e90492dc951a787))
+
+	DISK_REGION( "ata:0:hdd" ) // 32 MB Memory Card labeled 941 EA A02
+	DISK_IMAGE( "941a02", 0,  SHA1(dd180ad92dd344b38f160e31833077e342cee38d) ) // with ATA id included
+ROM_END
+
+ROM_START(gticlub2ja) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("ge941jaa_m48t58.u39", 0x00000, 0x2000, CRC(2c04e488) SHA1(8e16b57d195e33059f40fd65164fac2897cfcfef))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "941a02", 0,  SHA1(dd180ad92dd344b38f160e31833077e342cee38d) ) // with ATA id included
+ROM_END
+
+ROM_START(gticlub2mja) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gm941jaa_m48t58.u39", 0x00000, 0x2000, CRC(bb77b308) SHA1(8c4dcedf8dc92bbb72fa3b02159bc9e78ab4a409))
+
+	DISK_REGION( "ata:0:hdd" ) // 32 MB Memory Card labeled 941 EA A02
+	DISK_IMAGE( "941a02", 0,  SHA1(dd180ad92dd344b38f160e31833077e342cee38d) ) // with ATA id included
+ROM_END
+
+ROM_START(gticlub2aa) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("ge941aaa_m48t58.u39", 0x00000, 0x2000, CRC(273ded57) SHA1(222170962430abc5b859128a503baa7672508c73))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "941a02", 0,  SHA1(dd180ad92dd344b38f160e31833077e342cee38d) ) // with ATA id included
+ROM_END
+
+ROM_START(gticlub2maa) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gm941aaa_m48t58.u39", 0x00000, 0x2000, CRC(ff36fb80) SHA1(f2c4ccbc420a5105867f551b3e5a9029aa827ea8))
 
 	DISK_REGION( "ata:0:hdd" ) // 32 MB Memory Card labeled 941 EA A02
 	DISK_IMAGE( "941a02", 0,  SHA1(dd180ad92dd344b38f160e31833077e342cee38d) ) // with ATA id included
@@ -3264,44 +3418,56 @@ ROM_END
 /*****************************************************************************/
 
 /* Viper BIOS */
-GAME(1999, kviper,    0,         viper,     viper,      viper_state, init_viper,    ROT0,  "Konami", "Konami Viper BIOS", MACHINE_IS_BIOS_ROOT)
+GAME(1999, kviper,      0,         viper,           viper,      viper_state,           init_viper,    ROT0,  "Konami", "Konami Viper BIOS", MACHINE_IS_BIOS_ROOT)
 
-GAME(2001, ppp2nd,    kviper,    viper_ppp, ppp2nd,     viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (JAA)", MACHINE_NOT_WORKING)
-GAME(2001, ppp2nda,   ppp2nd,    viper_ppp, ppp2nd,     viper_state, init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING)
+GAME(2001, ppp2nd,      kviper,    viper_ppp,       ppp2nd,     viper_state,           init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (JAA)", MACHINE_NOT_WORKING)
+GAME(2001, ppp2nda,     ppp2nd,    viper_ppp,       ppp2nd,     viper_state,           init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING)
 
-GAME(2001, boxingm,   kviper,    viper,     boxingm,    viper_state, init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2000, code1d,    kviper,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
-GAME(2000, code1db,   code1d,    viper,     code1d,     viper_state, init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
-GAME(2000, gticlub2,  kviper,    viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver JAB)", MACHINE_NOT_WORKING)
-GAME(2000, gticlub2ea,gticlub2,  viper,     gticlub2ea, viper_state, init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver EAA)", MACHINE_NOT_WORKING)
-GAME(2001, jpark3,    kviper,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
-GAME(2001, jpark3u,   jpark3,    viper,     jpark3,     viper_state, init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver UBC)", MACHINE_NOT_WORKING)
-GAME(2001, mocapglf,  kviper,    viper_omz, mocapglf,   viper_subscreen_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver EAA:B)", MACHINE_NOT_WORKING)
-GAME(2001, mocapb,    kviper,    viper_fullbody, mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
-GAME(2001, mocapbj,   mocapb,    viper_fullbody, mocapb,     viper_state, init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2000, p911,      kviper,    viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAE)", MACHINE_NOT_WORKING)
-GAME(2000, p911k,     p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAE)", MACHINE_NOT_WORKING)
-GAME(2000, p911ac,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAC)", MACHINE_NOT_WORKING)
-GAME(2000, p911kc,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAC)", MACHINE_NOT_WORKING)
-GAME(2000, p911ud,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING)
-GAME(2000, p911ed,    p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
-GAME(2000, p911j,     p911,      viper_fullbody,     p911,       viper_state, init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
-GAME(2001, p9112,     kviper,    viper_fbdongle,     p9112,      viper_state, init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
-GAME(2001, sscopex,   kviper,    viper,     sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver EAC 1.20)", MACHINE_NOT_WORKING)
-GAME(2001, sscopexu,  sscopex,   viper,     sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAC 1.20)", MACHINE_NOT_WORKING)
-GAME(2001, sogeki,    sscopex,   viper,     sogeki,     viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JRB 1.01)", MACHINE_NOT_WORKING)
-GAME(2002, sscopefh,  kviper,    viper,     sscopefh,   viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING) // UK only?
-GAME(2001, thrild2,   kviper,    viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING)
-GAME(2001, thrild2j,  thrild2,   viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2001, thrild2a,  thrild2,   viper,     gticlub2,   viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING)
-GAME(2001, thrild2c,  thrild2,   viper,     thrild2,    viper_state, init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING)
-GAME(2002, tsurugi,   kviper,    viper,     tsurugi,    viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING)
-GAME(2002, tsurugij,  tsurugi,   viper,     tsurugi,    viper_state, init_vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING)
-GAME(2002, wcombat,   kviper,    viper,     wcombat4p,  viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING)
-GAME(2002, wcombatk,  wcombat,   viper,     wcombat4p,  viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING)
-GAME(2002, wcombatu,  wcombat,   viper,     wcombat2p,  viper_state, init_vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING)
-GAME(2002, wcombatj,  wcombat,   viper,     wcombat4p,  viper_state, init_vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2002, xtrial,    kviper,    viper,     xtrial,     viper_state, init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)", MACHINE_NOT_WORKING)
+GAME(2001, boxingm,     kviper,    viper,           boxingm,    viper_state,           init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2000, code1d,      kviper,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
+GAME(2000, code1db,     code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2,    kviper,    viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941EBB)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2eab, gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941EAB)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2u,   gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941UAB)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2j,   gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GE941JAB)",       MACHINE_NOT_WORKING)
+GAME(2000, gticlub2mj,  gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GM941JAB)",       MACHINE_NOT_WORKING)
+GAME(2000, gticlub2a,   gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GE941AAB)",       MACHINE_NOT_WORKING)
+GAME(2000, gticlub2ma,  gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GM941AAB)",       MACHINE_NOT_WORKING)
+GAME(2000, gticlub2eba, gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941EBA)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2eaa, gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941EAA)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2ua,  gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941UAA)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2ja,  gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GE941JAA)",       MACHINE_NOT_WORKING)
+GAME(2000, gticlub2mja, gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GM941JAA)",       MACHINE_NOT_WORKING)
+GAME(2000, gticlub2aa,  gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GE941AAA)",       MACHINE_NOT_WORKING)
+GAME(2000, gticlub2maa, gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GM941AAA)",       MACHINE_NOT_WORKING)
+GAME(2001, jpark3,      kviper,    viper,           jpark3,     viper_state,           init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
+GAME(2001, jpark3u,     jpark3,    viper,           jpark3,     viper_state,           init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver UBC)", MACHINE_NOT_WORKING)
+GAME(2001, mocapglf,    kviper,    viper_omz,       mocapglf,   viper_subscreen_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver EAA:B)", MACHINE_NOT_WORKING)
+GAME(2001, mocapb,      kviper,    viper_fullbody,  mocapb,     viper_state,           init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver AAB)", MACHINE_NOT_WORKING)
+GAME(2001, mocapbj,     mocapb,    viper_fullbody,  mocapb,     viper_state,           init_vipercf,  ROT90, "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2000, p911,        kviper,    viper_fullbody,  p911,       viper_state,           init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAE)", MACHINE_NOT_WORKING)
+GAME(2000, p911k,       p911,      viper_fullbody,  p911,       viper_state,           init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAE)", MACHINE_NOT_WORKING)
+GAME(2000, p911ac,      p911,      viper_fullbody,  p911,       viper_state,           init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver AAC)", MACHINE_NOT_WORKING)
+GAME(2000, p911kc,      p911,      viper_fullbody,  p911,       viper_state,           init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver KAC)", MACHINE_NOT_WORKING)
+GAME(2000, p911ud,      p911,      viper_fullbody,  p911,       viper_state,           init_vipercf,  ROT90, "Konami", "Police 911 (ver UAD)", MACHINE_NOT_WORKING)
+GAME(2000, p911ed,      p911,      viper_fullbody,  p911,       viper_state,           init_vipercf,  ROT90, "Konami", "Police 24/7 (ver EAD)", MACHINE_NOT_WORKING)
+GAME(2000, p911j,       p911,      viper_fullbody,  p911,       viper_state,           init_vipercf,  ROT90, "Konami", "The Keisatsukan: Shinjuku 24-ji (ver JAE)", MACHINE_NOT_WORKING)
+GAME(2001, p9112,       kviper,    viper_fbdongle,  p9112,      viper_state,           init_vipercf,  ROT90, "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING)
+GAME(2001, sscopex,     kviper,    viper,           sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver EAC 1.20)", MACHINE_NOT_WORKING)
+GAME(2001, sscopexu,    sscopex,   viper,           sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAC 1.20)", MACHINE_NOT_WORKING)
+GAME(2001, sogeki,      sscopex,   viper,           sogeki,     viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JRB 1.01)", MACHINE_NOT_WORKING)
+GAME(2002, sscopefh,    kviper,    viper,           sscopefh,   viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)", MACHINE_NOT_WORKING) // UK only?
+GAME(2001, thrild2,     kviper,    viper,           thrild2,    viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING)
+GAME(2001, thrild2j,    thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2001, thrild2a,    thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING)
+GAME(2001, thrild2c,    thrild2,   viper,           thrild2,    viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING)
+GAME(2002, tsurugi,     kviper,    viper,           tsurugi,    viper_state,           init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING)
+GAME(2002, tsurugij,    tsurugi,   viper,           tsurugi,    viper_state,           init_vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING)
+GAME(2002, wcombat,     kviper,    viper,           wcombat4p,  viper_state,           init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING)
+GAME(2002, wcombatk,    wcombat,   viper,           wcombat4p,  viper_state,           init_vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING)
+GAME(2002, wcombatu,    wcombat,   viper,           wcombat2p,  viper_state,           init_vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING)
+GAME(2002, wcombatj,    wcombat,   viper,           wcombat4p,  viper_state,           init_vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING)
+GAME(2002, xtrial,      kviper,    viper,           xtrial,     viper_state,           init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)", MACHINE_NOT_WORKING)
 
-GAME(2002, mfightc,   kviper,    viper,     mfightc,    viper_state, init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAD)", MACHINE_NOT_WORKING)
-GAME(2002, mfightcc,  mfightc,   viper,     mfightc,    viper_state, init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAC)", MACHINE_NOT_WORKING)
+GAME(2002, mfightc,     kviper,    viper,           mfightc,    viper_state,           init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAD)", MACHINE_NOT_WORKING)
+GAME(2002, mfightcc,    mfightc,   viper,           mfightc,    viper_state,           init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAC)", MACHINE_NOT_WORKING)
