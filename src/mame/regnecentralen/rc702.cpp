@@ -12,7 +12,7 @@ Keyboard has 8048 and 2758, both undumped.
 Machine variants:
   rc702  - RC702 with 8" DSDD floppy drives (maxi), 8 MHz FDC
   rc702m - RC702 with 5.25" DD floppy drives (mini), 4 MHz FDC
-  rc703  - RC703 with 5.25" HD floppy drives, 8 MHz FDC
+  rc703  - RC703 with 5.25" QD floppy drives (80-track), 4 MHz FDC
 
 ToDo:
 - Printer
@@ -147,7 +147,7 @@ void rc702_state::io_map(address_map &map)
 	map(0xf0, 0xff).rw(m_dma, FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 }
 
-/* Input ports - bit 7 (S08) selects floppy type: 0=mini, 0x80=maxi */
+/* Input ports - PROM reads port 0x14 bit 7: set=mini, clear=maxi */
 static INPUT_PORTS_START( rc702_maxi )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, "S01")
@@ -171,9 +171,9 @@ static INPUT_PORTS_START( rc702_maxi )
 	PORT_DIPNAME( 0x40, 0x00, "S07")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x80, "S08 Minifloppy")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x00, "S08 Minifloppy")
+	PORT_DIPSETTING(    0x80, DEF_STR( On ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( rc702_mini )
@@ -199,9 +199,9 @@ static INPUT_PORTS_START( rc702_mini )
 	PORT_DIPNAME( 0x40, 0x00, "S07")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
-	PORT_DIPNAME( 0x80, 0x00, "S08 Minifloppy")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ))
-	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPNAME( 0x80, 0x80, "S08 Minifloppy")
+	PORT_DIPSETTING(    0x80, DEF_STR( On ))
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ))
 INPUT_PORTS_END
 
 void rc702_state::machine_reset()
@@ -392,7 +392,7 @@ static void rc702m_floppies(device_slot_interface &device)
 
 static void rc703_floppies(device_slot_interface &device)
 {
-	device.option_add("525hd", FLOPPY_525_HD);
+	device.option_add("525qd", FLOPPY_525_QD);
 }
 
 void rc702_state::rc702_base(machine_config &config)
@@ -489,14 +489,14 @@ void rc702_state::rc703(machine_config &config)
 {
 	rc702_base(config);
 
-	UPD765A(config, m_fdc, 8_MHz_XTAL, true, true);  // 8 MHz for 5.25" HD drives
+	UPD765A(config, m_fdc, 8_MHz_XTAL / 2, true, true);  // 4 MHz for 5.25" QD drives
 	m_fdc->intrq_wr_callback().set(m_ctc1, FUNC(z80ctc_device::trg3));
 	m_fdc->drq_wr_callback().set(m_dma, FUNC(am9517a_device::dreq1_w));
 	m_dma->in_ior_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_r));
 	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", rc703_floppies, "525hd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:0", rc703_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 	FLOPPY_CONNECTOR(config, "fdc:1", rc703_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 	// TODO: Hard disk ports 0x60-0x67, CTC2 ports 0x44-0x47
 }
