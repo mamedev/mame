@@ -97,6 +97,8 @@ private:
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	void rc702_palette(palette_device &palette) const;
 	void kbd_put(u8 data);
+	uint8_t kbd_r();
+	uint8_t m_kbd_data = 0U;
 
 	void io_map(address_map &map) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
@@ -227,6 +229,7 @@ void rc702_state::machine_start()
 	save_item(NAME(m_beepcnt));
 	save_item(NAME(m_eop));
 	save_item(NAME(m_dack1));
+	save_item(NAME(m_kbd_data));
 }
 
 void rc702_state::q_w(int state)
@@ -375,9 +378,14 @@ static const z80_daisy_config daisy_chain_intf[] =
 
 void rc702_state::kbd_put(u8 data)
 {
-	m_pio->port_a_write(data);
+	m_kbd_data = data;
 	m_pio->strobe_a(0);
 	m_pio->strobe_a(1);
+}
+
+uint8_t rc702_state::kbd_r()
+{
+	return m_kbd_data;
 }
 
 static void rc702_floppies(device_slot_interface &device)
@@ -416,6 +424,7 @@ void rc702_state::rc702_base(machine_config &config)
 
 	Z80PIO(config, m_pio, 8_MHz_XTAL / 2);
 	m_pio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio->in_pa_callback().set(FUNC(rc702_state::kbd_r));
 //  m_pio->out_pb_callback().set(FUNC(rc702_state::portxx_w)); // parallel port
 
 	AM9517A(config, m_dma, 8_MHz_XTAL / 2);
