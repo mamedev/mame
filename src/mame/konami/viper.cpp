@@ -3894,7 +3894,98 @@ ROM_START(xtrial) //*
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("b4xjab_nvram.u39", 0x00000, 0x2000, CRC(33708a93) SHA1(715968e3c9c15edf628fa6ac655dc0864e336c6c))
+	ROM_LOAD("gkb4xebb_m48t58.u39", 0x00000, 0x2000, CRC(db637354) SHA1(c6736b279cf5cc661bb463a6aea09799888976f1))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "b4xb02", 0, SHA1(d8d54f3f16b762bf0187fe29b2f8696015c0a940) )
+ROM_END
+
+ROM_START(xtrialea) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gkb4xeab_m48t58.u39", 0x00000, 0x2000, CRC(35e13580) SHA1(0410e87d71bd288a46801710322b7b389e3e863a))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "b4xb02", 0, SHA1(d8d54f3f16b762bf0187fe29b2f8696015c0a940) )
+ROM_END
+
+ROM_START(xtrialu) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gkb4xuab_m48t58.u39", 0x00000, 0x2000, CRC(0dedfcb6) SHA1(e344a9d6dcf10d0cf28f0ba896234f5c6b1e9610))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "b4xb02", 0, SHA1(d8d54f3f16b762bf0187fe29b2f8696015c0a940) )
+ROM_END
+
+ROM_START(xtrialj) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("geb4xjbb_m48t58.u39", 0x00000, 0x2000, CRC(b5ab5cee) SHA1(970e89777949887a1c795738ed635f7e7fc793e6))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "b4xb02", 0, SHA1(d8d54f3f16b762bf0187fe29b2f8696015c0a940) )
+ROM_END
+
+ROM_START(xtrialja) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("geb4xjab_m48t58.u39", 0x00000, 0x2000, CRC(99179292) SHA1(60ce55078d9a308e1afb6012df9fb1467e3b1225))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "b4xb02", 0, SHA1(d8d54f3f16b762bf0187fe29b2f8696015c0a940) )
+ROM_END
+
+ROM_START(xtrialmj) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gmb4xjab_m48t58.u39", 0x00000, 0x2000, CRC(d89f35d7) SHA1(707d129cb33d01d6b59de73062ef499c6522ce41))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "b4xb02", 0, SHA1(d8d54f3f16b762bf0187fe29b2f8696015c0a940) )
+ROM_END
+
+ROM_START(xtriala) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("geb4xaab_m48t58.u39", 0x00000, 0x2000, CRC(302a6838) SHA1(f18d5e62266d5e5a40f0d4c38ba94a31f9893a71))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "b4xb02", 0, SHA1(d8d54f3f16b762bf0187fe29b2f8696015c0a940) )
+ROM_END
+
+ROM_START(xtrialma) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gmb4xaab_m48t58.u39", 0x00000, 0x2000, CRC(b4520be0) SHA1(a5db3203ec8c5b870481e846ad4adf7c02d23b3e))
 
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "b4xb02", 0, SHA1(d8d54f3f16b762bf0187fe29b2f8696015c0a940) )
@@ -4075,7 +4166,14 @@ GAME(2002, wcombat,     kviper,    viper,           wcombat4p,  viper_state,    
 GAME(2002, wcombatk,    wcombat,   viper,           wcombat4p,  viper_state,           init_vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)",                         MACHINE_NOT_WORKING)
 GAME(2002, wcombatu,    wcombat,   viper,           wcombat2p,  viper_state,           init_vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)",               MACHINE_NOT_WORKING)
 GAME(2002, wcombatj,    wcombat,   viper,           wcombat4p,  viper_state,           init_vipercf,  ROT0,  "Konami", "World Combat (ver JAA)",                           MACHINE_NOT_WORKING)
-GAME(2002, xtrial,      kviper,    viper,           xtrial,     viper_state,           init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver JAB)",                          MACHINE_NOT_WORKING)
+GAME(2002, xtrial,      kviper,    viper,           xtrial,     viper_state,           init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver GKB4XEBB)",                     MACHINE_NOT_WORKING)
+GAME(2002, xtrialea,    xtrial,    viper,           xtrial,     viper_state,           init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver GKB4XEAB)",                     MACHINE_NOT_WORKING)
+GAME(2002, xtrialu,     xtrial,    viper,           xtrial,     viper_state,           init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver GKB4XUAB)",                     MACHINE_NOT_WORKING)
+GAME(2002, xtrialj,     xtrial,    viper,           xtrial,     viper_state,           init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver GEB4XJBB)",                     MACHINE_NOT_WORKING)
+GAME(2002, xtrialja,    xtrial,    viper,           xtrial,     viper_state,           init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver GEB4XJAB)",                     MACHINE_NOT_WORKING)
+GAME(2002, xtrialmj,    xtrial,    viper,           xtrial,     viper_state,           init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver GMB4XJAB)",                     MACHINE_NOT_WORKING)
+GAME(2002, xtriala,     xtrial,    viper,           xtrial,     viper_state,           init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver GEB4XAAB)",                     MACHINE_NOT_WORKING)
+GAME(2002, xtrialma,    xtrial,    viper,           xtrial,     viper_state,           init_vipercf,  ROT0,  "Konami", "Xtrial Racing (ver GMB4XAAB)",                     MACHINE_NOT_WORKING)
 
 GAME(2002, mfightc,     kviper,    viper,           mfightc,    viper_state,           init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAD)",                     MACHINE_NOT_WORKING)
 GAME(2002, mfightcc,    mfightc,   viper,           mfightc,    viper_state,           init_vipercf,  ROT0,  "Konami", "Mahjong Fight Club (ver JAC)",                     MACHINE_NOT_WORKING)
