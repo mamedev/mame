@@ -2065,7 +2065,7 @@ INPUT_PORTS_START( gticlub2 )
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL3 ) PORT_NAME("Handbrake Lever") PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE
 INPUT_PORTS_END
 
-INPUT_PORTS_START( gticlub2ea )
+INPUT_PORTS_START( gticlub2a )
 	PORT_INCLUDE( gticlub2 )
 
 	PORT_MODIFY("IN2")
@@ -2757,7 +2757,163 @@ ROM_START(code1d) //*
 	ROM_LOAD("ds2430_code1d2.u3", 0x00, 0x28, BAD_DUMP CRC(817e725f) SHA1(0c36ddf1e0c4dc6f6b46ec73d3e86eb58247fa42))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("m48t58_uad.u39", 0x00000, 0x2000, CRC(22ef677d) SHA1(10b1e68d409edeca5af70aff1146b7373eeb3864) )
+	ROM_LOAD("gk922uad_m48t58.u39", 0x00000, 0x2000, CRC(6396d655) SHA1(7ac2d8b397219bb6443c5734bdb4f60e3b8c2ab5) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1d2) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gk922uad_m48t58.u39", 0x00000, 0x2000, CRC(62d13ea6) SHA1(b75b2f891170c800dd9b7d7cc8cd93d757cf465c) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1dub) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gk922ubd_m48t58.u39", 0x00000, 0x2000, CRC(ad28307e) SHA1(70625d9b4cd9bb5e0cfeccd7e2281a063e50d1d0) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1dcu) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gc922uad_m48t58.u39", 0x00000, 0x2000, CRC(59f28905) SHA1(798de0787c07828cf0b7f639f7cd1dbed8dcd866) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1de) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gk922ead_m48t58.u39", 0x00000, 0x2000, CRC(831932dd) SHA1(e272a091e1c6e41acb0de6bfd609bd7334894260) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1deb) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gk922ebd_m48t58.u39", 0x00000, 0x2000, CRC(331386d8) SHA1(5b26e31a08a5101cb16d6dfcbc96c704be56f529) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1dce) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gc922ead_m48t58.u39", 0x00000, 0x2000, CRC(7afedf97) SHA1(a41b38fd09510ec94741b94fb25f185955e148bc) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1dj) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("ge922jad_m48t58.u39", 0x00000, 0x2000, CRC(0cf18c62) SHA1(b1dadeb0cc6480d4a196fe9bae8307325761cedd) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1dcj) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gc922jad_m48t58.u39", 0x00000, 0x2000, CRC(22b18159) SHA1(19406949e2241629630491a24d5bbdcbe4fdd06c) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1dmj) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gm922jad_m48t58.u39", 0x00000, 0x2000, CRC(709522cd) SHA1(af30b32278b46539bd2ae1a5f4e7a91b72ae3bdd) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1da) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("ge922aad_m48t58.u39", 0x00000, 0x2000, CRC(1fa74b05) SHA1(ce78b3353694b1b0a64a9d89f83a3fca580fc2b5) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1dca) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gc922aad_m48t58.u39", 0x00000, 0x2000, CRC(0400dc08) SHA1(3d4371c9b30dc9fe6305c7971b669136a8e6c9c5) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
+ROM_END
+
+ROM_START(code1dma) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gm922aad_m48t58.u39", 0x00000, 0x2000, CRC(383879c1) SHA1(50deb1beb8210fd3b13ee5e20992e2b9421ebb3c) )
 
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "922d02", 0, SHA1(01f35e324c9e8567da0f51b3e68fff1562c32116) )
@@ -2770,7 +2926,150 @@ ROM_START(code1db) //*
 	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("m48t58_uab.u39", 0x00000, 0x2000, CRC(6059cdad) SHA1(67f9d9239c3e3ef8c967f26c45fa9201981ad848) )
+	ROM_LOAD("gk922uab_m48t58.u39", 0x00000, 0x2000, CRC(916a7a1e) SHA1(6833de5db8c11411515e41cdf333a949f5ca0ad4) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1dbub) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gk922ubb_m48t58.u39", 0x00000, 0x2000, CRC(0aa2a66f) SHA1(f8974dbfcfdf5807f431eff160aeecb71465d7b1) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1dbcu) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gc922uab_m48t58.u39", 0x00000, 0x2000, CRC(a8678af1) SHA1(f34222e72b9e231b22f5538d43e3cce4b931348a) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1dbe) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gk922eab_m48t58.u39", 0x00000, 0x2000, CRC(22dbeca5) SHA1(dfee9b91c2472695d67576583842d2bc31c01717) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1dbeb) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gk922ebb_m48t58.u39", 0x00000, 0x2000, CRC(92d158a0) SHA1(6429a389cb9c7e2bbe9f191ffd3700d8e36d2e57) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1dbce) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gc922eab_m48t58.u39", 0x00000, 0x2000, CRC(d743236b) SHA1(ee110adf7acf2c12ab8301f23b8f12a01884d8a1) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1dbj) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("ge922jab_m48t58.u39", 0x00000, 0x2000, CRC(9b1b7835) SHA1(d077c859fb1b6a9d4ac3769f054232dc1b8d005c) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1dbcj) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gc922jab_m48t58.u39", 0x00000, 0x2000, CRC(392d2fbb) SHA1(e362fef3d830e148584e0ea9b444f8ed8bb15fae) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1dbmj) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gm922jab_m48t58.u39", 0x00000, 0x2000, CRC(c273fbea) SHA1(eea6c024e9b1cfba5e58f238ac3bbda322308cc5) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1dba) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("ge922aab_m48t58.u39", 0x00000, 0x2000, CRC(4e3be109) SHA1(d321061c68b35a795bbac7578a37c2c7fb4afdc1) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1dbca) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gc922aab_m48t58.u39", 0x00000, 0x2000, CRC(30d10785) SHA1(19a9e880be17c0f646b50d7c14959d7f0d4535fb) )
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
+ROM_END
+
+ROM_START(code1dbma) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* game-specific DS2430 on PCB */
+	ROM_LOAD("ds2430_code1d.u3", 0x00, 0x28, BAD_DUMP CRC(fada04dd) SHA1(49bd4e87d48f0404a091a79354bbc09cde739f5c))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gm922aab_m48t58.u39", 0x00000, 0x2000, CRC(79f2ac85) SHA1(fdab0fe3dd811432a171c58a2ac2c4b69386cade) )
 
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "922b02", 0, SHA1(4d288b5dcfab3678af662783e7083a358eee99ce) )
@@ -3424,8 +3723,31 @@ GAME(2001, ppp2nd,      kviper,    viper_ppp,       ppp2nd,     viper_state,    
 GAME(2001, ppp2nda,     ppp2nd,    viper_ppp,       ppp2nd,     viper_state,           init_viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix (AAA)", MACHINE_NOT_WORKING)
 
 GAME(2001, boxingm,     kviper,    viper,           boxingm,    viper_state,           init_vipercf,  ROT0,  "Konami", "Boxing Mania: Ashita no Joe (ver JAA)", MACHINE_NOT_WORKING)
-GAME(2000, code1d,      kviper,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver UAD)", MACHINE_NOT_WORKING)
-GAME(2000, code1db,     code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver UAB)", MACHINE_NOT_WORKING)
+GAME(2000, code1d,      kviper,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GK922UAD, set 1)", MACHINE_NOT_WORKING)
+GAME(2000, code1d2,     code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GK922UAD, set 2)", MACHINE_NOT_WORKING)
+GAME(2000, code1dub,    code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GK922UBD)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dcu,    code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GC922UAD)",        MACHINE_NOT_WORKING)
+GAME(2000, code1de,     code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GK922EAD)",        MACHINE_NOT_WORKING)
+GAME(2000, code1deb,    code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GK922EBD)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dce,    code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GC922EAD)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dj,     code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GE922JAD)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dcj,    code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GC922JAD)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dmj,    code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GM922JAD)",        MACHINE_NOT_WORKING)
+GAME(2000, code1da,     code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GE922AAD)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dca,    code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GC922AAD)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dma,    code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.21 (ver GM922AAD)",        MACHINE_NOT_WORKING)
+GAME(2000, code1db,     code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GK922UAB)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dbub,   code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GK922UBB)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dbcu,   code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GC922UAB)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dbe,    code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GK922EAB)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dbeb,   code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GK922EBB)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dbce,   code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GC922EAB)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dbj,    code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GE922JAB)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dbcj,   code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GC922JAB)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dbmj,   code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GM922JAB)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dba,    code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GE922AAB)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dbca,   code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GC922AAB)",        MACHINE_NOT_WORKING)
+GAME(2000, code1dbma,   code1d,    viper,           code1d,     viper_state,           init_vipercf,  ROT0,  "Konami", "Code One Dispatch Ver 1.16 (ver GM922AAB)",        MACHINE_NOT_WORKING)
 GAME(2000, gticlub2,    kviper,    viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941EBB)", MACHINE_NOT_WORKING)
 GAME(2000, gticlub2eab, gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941EAB)", MACHINE_NOT_WORKING)
 GAME(2000, gticlub2u,   gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941UAB)", MACHINE_NOT_WORKING)
@@ -3433,13 +3755,13 @@ GAME(2000, gticlub2j,   gticlub2,  viper,           gticlub2,   viper_state,    
 GAME(2000, gticlub2mj,  gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GM941JAB)",       MACHINE_NOT_WORKING)
 GAME(2000, gticlub2a,   gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GE941AAB)",       MACHINE_NOT_WORKING)
 GAME(2000, gticlub2ma,  gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GM941AAB)",       MACHINE_NOT_WORKING)
-GAME(2000, gticlub2eba, gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941EBA)", MACHINE_NOT_WORKING)
-GAME(2000, gticlub2eaa, gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941EAA)", MACHINE_NOT_WORKING)
-GAME(2000, gticlub2ua,  gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941UAA)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2eba, gticlub2,  viper,           gticlub2a,  viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941EBA)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2eaa, gticlub2,  viper,           gticlub2a,  viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941EAA)", MACHINE_NOT_WORKING)
+GAME(2000, gticlub2ua,  gticlub2,  viper,           gticlub2a,  viper_state,           init_vipercf,  ROT0,  "Konami", "Driving Party: Racing in Italy (ver GK941UAA)", MACHINE_NOT_WORKING)
 GAME(2000, gticlub2ja,  gticlub2,  viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GE941JAA)",       MACHINE_NOT_WORKING)
-GAME(2000, gticlub2mja, gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GM941JAA)",       MACHINE_NOT_WORKING)
-GAME(2000, gticlub2aa,  gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GE941AAA)",       MACHINE_NOT_WORKING)
-GAME(2000, gticlub2maa, gticlub2,  viper,           gticlub2ea, viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GM941AAA)",       MACHINE_NOT_WORKING)
+GAME(2000, gticlub2mja, gticlub2,  viper,           gticlub2a,  viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GM941JAA)",       MACHINE_NOT_WORKING)
+GAME(2000, gticlub2aa,  gticlub2,  viper,           gticlub2a,  viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GE941AAA)",       MACHINE_NOT_WORKING)
+GAME(2000, gticlub2maa, gticlub2,  viper,           gticlub2a,  viper_state,           init_vipercf,  ROT0,  "Konami", "GTI Club: Corso Italiano (ver GM941AAA)",       MACHINE_NOT_WORKING)
 GAME(2001, jpark3,      kviper,    viper,           jpark3,     viper_state,           init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver EBC)", MACHINE_NOT_WORKING)
 GAME(2001, jpark3u,     jpark3,    viper,           jpark3,     viper_state,           init_vipercf,  ROT0,  "Konami", "Jurassic Park III (ver UBC)", MACHINE_NOT_WORKING)
 GAME(2001, mocapglf,    kviper,    viper_omz,       mocapglf,   viper_subscreen_state, init_vipercf,  ROT90, "Konami", "Mocap Golf (ver EAA:B)", MACHINE_NOT_WORKING)
