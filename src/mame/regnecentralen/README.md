@@ -12,7 +12,7 @@ The RC750 Partner/RC759 Piccoline was their 16-bit machine based on 80186, with 
 
 The RC702 keyboard is connected to Z80 PIO port A.  The driver wires the generic keyboard and (optionally) MAME’s natural keyboard into the PIO so that CP/M sees keypresses.
 
-- **Emulated keyboard**: US-ASCII layout; **one character per keypress only** (no typematic repeat).  Key release is used so that each new key_make sends one character; e.g. typing "DDT" sends exactly three characters regardless of timing.
+- **Emulated keyboard**: US-ASCII layout with typematic repeat (configurable delay and rate via MAME's Machine Configuration menu).
 - **Natural keyboard**: In the MAME menu, choose **Keyboard Selection** → **Keyboard Mode** → **Natural** to use the host OS layout (e.g. Danish: Shift+2 → `"`, Æ/Ø keys correct).  Characters are sent as Latin-1 (0–255).
 
 ## Source Files
