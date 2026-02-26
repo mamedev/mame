@@ -3591,8 +3591,33 @@ ROM_START(thrild2) //*
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("a41ebb_nvram.u39", 0x00000, 0x2000, CRC(22f59ac0) SHA1(e14ea2ba95b72edf0a3331ab82c192760bfdbce3))
-//  a41eba_nvram == a41ebb_nvram
+	ROM_LOAD("gka41ebb_m48t58.u39", 0x00000, 0x2000, CRC(3fb7723f) SHA1(2ddd54cb94710621d13eabafbc2a45b4bf7c977d))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41b02", 0, SHA1(0426f4bb9001cf457f44e2c22e3d7575b8049aa3) )
+ROM_END
+
+ROM_START(thrild2eab) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gka41eab_m48t58.u39", 0x00000, 0x2000, CRC(a7591725) SHA1(a0f9df247f4c81d2dac49690c9461a634696a493))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41b02", 0, SHA1(0426f4bb9001cf457f44e2c22e3d7575b8049aa3) )
+ROM_END
+
+ROM_START(thrild2u) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gka41uab_m48t58.u39", 0x00000, 0x2000, CRC(1887b819) SHA1(7a6fb9936e325c78f3616cad47e321c2fe57bb99))
 
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "a41b02", 0, SHA1(0426f4bb9001cf457f44e2c22e3d7575b8049aa3) )
@@ -3605,10 +3630,36 @@ ROM_START(thrild2j) //*
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("a41jaa_nvram.u39", 0x00000, 0x2000, CRC(d56226d5) SHA1(085f40816befde993069f56fdd5f8bd6ccfcf301))
+	ROM_LOAD("gea41jbb_m48t58.u39", 0x00000, 0x2000, CRC(e4d468e0) SHA1(870c02dfefbc853800d3cf88cb14165001636e7c))
 
 	DISK_REGION( "ata:0:hdd" )
-	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) ) // same as Asian version
+	DISK_IMAGE( "a41b02", 0, SHA1(0426f4bb9001cf457f44e2c22e3d7575b8049aa3) )
+ROM_END
+
+ROM_START(thrild2jab) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gea41jab_m48t58.u39", 0x00000, 0x2000, CRC(b728fbff) SHA1(2c66ee1e4cf9ebd4c1f36546925534cefb379c45))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41b02", 0, SHA1(0426f4bb9001cf457f44e2c22e3d7575b8049aa3) )
+ROM_END
+
+ROM_START(thrild2mj) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gma41jab_m48t58.u39", 0x00000, 0x2000, CRC(7b984d79) SHA1(b9779b961adc1d40915c75f80b27edbfdd8eaccd))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41b02", 0, SHA1(0426f4bb9001cf457f44e2c22e3d7575b8049aa3) )
 ROM_END
 
 ROM_START(thrild2a) //*
@@ -3618,7 +3669,124 @@ ROM_START(thrild2a) //*
 	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
-	ROM_LOAD("a41aaa_nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
+	ROM_LOAD("gea41aab_m48t58.u39", 0x00000, 0x2000, CRC(543bf9cb) SHA1(557b24c677f5579f7ad33c43be7d64f4cad2792c))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41b02", 0, SHA1(0426f4bb9001cf457f44e2c22e3d7575b8049aa3) )
+ROM_END
+
+ROM_START(thrild2ma) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gma41aab_m48t58.u39", 0x00000, 0x2000, CRC(4ae9351e) SHA1(dad6efb970330f52a29541c5a5e128199cf99146))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41b02", 0, SHA1(0426f4bb9001cf457f44e2c22e3d7575b8049aa3) )
+ROM_END
+
+ROM_START(thrild2eba) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gka41eba_m48t58.u39", 0x00000, 0x2000, CRC(46a8a40a) SHA1(b7a343dcf76c1142da92965337285a42897caccd))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
+ROM_END
+
+ROM_START(thrild2eaa) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gka41eaa_m48t58.u39", 0x00000, 0x2000, CRC(88704743) SHA1(6e59e3abae137c0911891bf720719320e0c5e07c))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
+ROM_END
+
+ROM_START(thrild2ua) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gka41uaa_m48t58.u39", 0x00000, 0x2000, CRC(2d610b70) SHA1(43b1e105c64b1840ea97065e565f56ece47b9795))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
+ROM_END
+
+ROM_START(thrild2jba) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gea41jba_m48t58.u39", 0x00000, 0x2000, CRC(9b2d0016) SHA1(befc2356f232972024ae4e9b1a7cbaa566f912b7))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
+ROM_END
+
+ROM_START(thrild2jaa) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gea41jaa_m48t58.u39", 0x00000, 0x2000, CRC(1942a3a3) SHA1(e9b5d1cf475a5201886e623c5cd521db8b2cbe6f))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
+ROM_END
+
+ROM_START(thrild2mja) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gma41jaa_m48t58.u39", 0x00000, 0x2000, CRC(97f09d52) SHA1(76bc34d0078848909b786a75bc04b5acf8dd7e2b))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
+ROM_END
+
+ROM_START(thrild2aa) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gea41aaa_m48t58.u39", 0x00000, 0x2000, CRC(8a830806) SHA1(2aac4d62391a4ca1de88e9b025ad76125bee18bd))
+
+	DISK_REGION( "ata:0:hdd" )
+	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
+ROM_END
+
+ROM_START(thrild2maa) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("gma41aaa_m48t58.u39", 0x00000, 0x2000, CRC(7837bf2e) SHA1(7cee839b9a2a259c7d156764cfe304d6fb397acc))
 
 	DISK_REGION( "ata:0:hdd" )
 	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
@@ -3884,10 +4052,23 @@ GAME(2001, sscopex,     kviper,    viper,           sscopex,    viper_subscreen_
 GAME(2001, sscopexu,    sscopex,   viper,           sscopex,    viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAC 1.20)",                   MACHINE_NOT_WORKING)
 GAME(2001, sogeki,      sscopex,   viper,           sogeki,     viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Sogeki (ver JRB 1.01)",                            MACHINE_NOT_WORKING)
 GAME(2002, sscopefh,    kviper,    viper,           sscopefh,   viper_subscreen_state, init_vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter (ver EAA)",            MACHINE_NOT_WORKING) // UK only?
-GAME(2001, thrild2,     kviper,    viper,           thrild2,    viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)",                         MACHINE_NOT_WORKING)
-GAME(2001, thrild2j,    thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver JAA)",                         MACHINE_NOT_WORKING)
-GAME(2001, thrild2a,    thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)",                         MACHINE_NOT_WORKING)
-GAME(2001, thrild2c,    thrild2,   viper,           thrild2,    viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)",                         MACHINE_NOT_WORKING)
+GAME(2001, thrild2,     kviper,    viper,           thrild2,    viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GKA41EBB)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2eab,  thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GKA41EAB)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2u,    thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GKA41UAB)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2j,    thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GEA41JBB)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2jab,  thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GEA41JAB)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2mj,   thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GMA41JAB)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2a,    thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GEA41AAB)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2ma,   thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GMA41AAB)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2eba,  thrild2,   viper,           thrild2,    viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GKA41EBA)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2eaa,  thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GKA41EAA)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2ua,   thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GKA41UAA)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2jba,  thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GEA41JBA)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2jaa,  thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GEA41JAA)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2mja,  thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GMA41JAA)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2aa,   thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GEA41AAA)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2maa,  thrild2,   viper,           gticlub2,   viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver GMA41AAA)",                    MACHINE_NOT_WORKING)
+GAME(2001, thrild2c,    thrild2,   viper,           thrild2,    viper_state,           init_vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAC)",                         MACHINE_NOT_WORKING)
 GAME(2002, tsurugi,     kviper,    viper,           tsurugi,    viper_state,           init_vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)",                                MACHINE_NOT_WORKING)
 GAME(2002, tsurugij,    tsurugi,   viper,           tsurugi,    viper_state,           init_vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)",                                MACHINE_NOT_WORKING)
 GAME(2002, wcombat,     kviper,    viper,           wcombat4p,  viper_state,           init_vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)",                         MACHINE_NOT_WORKING)
