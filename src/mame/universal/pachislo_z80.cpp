@@ -78,7 +78,7 @@ void pachislo_z80_state::pachislo_z80(machine_config &config)
 
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ym", 579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0); // Guessed
+	YM2413(config, "ym", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0); // Guessed
 }
 
 
