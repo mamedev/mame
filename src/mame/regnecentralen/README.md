@@ -4,7 +4,7 @@
 
 This folder contains source code and documentation related to emulation of some of the computers and hardware produced by Regnecentralen, a Danish computer manufacturer.
 
-The RC702 is a 8-bit Z80 machine with either 8" external floppy drives or built-in 5,25" 360 Kb floppy drives, 64 Kb RAM, an optional 10 Mb Winchester hard disk and an external keyboard connected with the parallel port.  There is a 2 Kb boot prom ("autoload") which is presented as the bios in MAME.  The successor RC703 had high density 5,25" 1.2 Mb diskettes, a larger bios and slightly changed handling of it.  MAME only emulates RC702.
+The RC702 is a 8-bit Z80 machine with either 8" external floppy drives or built-in 5,25" 360 Kb floppy drives, 64 Kb RAM, an optional 10 Mb Winchester hard disk and an external keyboard connected with the parallel port.  There is a 2 Kb boot prom ("autoload") which is presented as the bios in MAME.  The successor RC703 had high density 5,25" 1.2 Mb diskettes, a larger bios and slightly changed handling of it.  MAME emulates both RC702 and RC703.
 
 The RC750 Partner/RC759 Piccoline was their 16-bit machine based on 80186, with the Partner targetting businesses and the Piccoline targetting the Danish school system.  It ran the technically superior CCP/M-86 system which allowed for 4 virtual consoles, but wasn't 100% compatible with the IBM PC.
 
@@ -31,11 +31,11 @@ You may also want to just run this script instead on MacOS:
 ```sh
 OUTPUT_DIR=../../../roms/rc702
 mkdir -p $OUTPUT_DIR
-curl --output-dir ../../../roms/rc702 -L -O https://github.com/ravn/rc700/raw/refs/heads/master/roa296.rom
-curl --output-dir ../../../roms/rc702 -L -O https://github.com/ravn/rc700/raw/refs/heads/master/roa327.rom
-curl --output-dir ../../../roms/rc702 -L -O https://github.com/ravn/rc700/raw/refs/heads/master/rob357.rom
-curl --output-dir ../../../roms/rc702 -L -O https://github.com/ravn/rc700/raw/refs/heads/master/rob358.rom
-curl --output-dir ../../../roms/rc702 -L -o roa375.ic66 https://github.com/ravn/rc700/raw/refs/heads/master/roa375.rom
+curl --output-dir $OUTPUT_DIR -L -O https://github.com/ravn/rc700/raw/refs/heads/master/roa296.rom
+curl --output-dir $OUTPUT_DIR -L -O https://github.com/ravn/rc700/raw/refs/heads/master/roa327.rom
+curl --output-dir $OUTPUT_DIR -L -O https://github.com/ravn/rc700/raw/refs/heads/master/rob357.rom
+curl --output-dir $OUTPUT_DIR -L -O https://github.com/ravn/rc700/raw/refs/heads/master/rob358.rom
+curl --output-dir $OUTPUT_DIR -L -o roa375.ic66 https://github.com/ravn/rc700/raw/refs/heads/master/roa375.rom
 echo "*** All ROMS should be 2048 bytes ***"
 ls -l $OUTPUT_DIR
 ```
@@ -46,14 +46,15 @@ Note that the IMD images in this project are not compatible with MAME due to a d
 Now build MAME using something like (-j10 requires a modern machine):
 
 ```sh
-make SUBTARGET=regnecentralen DEBUG=1 SOURCES=src/mame/regnecentralen/rc702.cpp TOOLS=1 SYMLEVEL=3  SYMBOLS=1 -j 10
+make SUBTARGET=regnecentralen DEBUG=1 SOURCES=src/mame/regnecentralen/rc702.cpp TOOLS=1 SYMLEVEL=3  SYMBOLS=1  OSD=sdl -j 10
 ```
 
 and run it similar to:
 
 ```sh
-./regnecentralend rc702 -debug -window -skip_gameinfo -nothrottle -flop1 ../../Downloads/COMAL_v1.07_SYSTEM_RC702.imd
-./regnecentralend rc702 -bios 2 -window -skip_gameinfo -nothrottle -flop1 ~/Downloads/CPM_med_COMAL80.imd
+./regnecentralend rc702mini -bios 0 -window -skip_gameinfo -flop1 ~/Downloads/CPM_med_COMAL80.imd
+./regnecentralend rc702 -bios 0 -window -skip_gameinfo -flop1 ~/Downloads/SW1711-I8.imd   # 8" maxi
+./regnecentralend rc703 -bios 1 -window -skip_gameinfo -flop1 ~/Downloads/RC703_CPM_v2.2_r1.2.imd
 ```
 
 You should get a yellow screen saying either "** NO PROGRAM OR LINEPROG" which is the ROM saying it cannot find a boot sector on the floppy, or "** BAD DISKETTE" which mean that the sanity check on the diskette read failed.   This is most likely because the disk drive emulated is not compatible with the image.

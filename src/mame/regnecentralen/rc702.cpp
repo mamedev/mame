@@ -10,9 +10,9 @@ Undumped prom at IC55 type 74S287 (address decoder for PROM0/PROM1 mapping)
 Keyboard has 8048 and 2758, both undumped.
 
 Machine variants:
-  rc702  - RC702 with 8" DSDD floppy drives (maxi), 8 MHz FDC
-  rc702m - RC702 with 5.25" DD floppy drives (mini), 4 MHz FDC
-  rc703  - RC703 with 5.25" QD floppy drives (80-track), 4 MHz FDC
+  rc702     - RC702 with 8" DSDD floppy drives (maxi), 8 MHz FDC
+  rc702mini - RC702 with 5.25" DD floppy drives (mini), 4 MHz FDC
+  rc703     - RC703 with 5.25" QD floppy drives (80-track), 4 MHz FDC
 
 ToDo:
 - Printer
@@ -75,7 +75,7 @@ public:
 
 	void rc702_base(machine_config &config);
 	void rc702(machine_config &config);
-	void rc702m(machine_config &config);
+	void rc702mini(machine_config &config);
 	void rc703(machine_config &config);
 
 protected:
@@ -214,6 +214,11 @@ void rc702_state::machine_reset()
 	m_dack1 = 0;
 	m_eop = 0;
 	m_7474->preset_w(1);
+
+	// Set FDC data rate: 8" maxi drives use 500 kbps, 5.25" mini use 250 kbps.
+	// DIP switch S08 bit 7: clear = maxi (8"), set = mini (5.25").
+	m_fdc->set_rate(BIT(ioport("DSW")->read(), 7) ? 250000 : 500000);
+
 	m_maincpu->reset();
 }
 
@@ -297,9 +302,15 @@ void rc702_state::dack1_w(int state)
 
 void rc702_state::port14_w(uint8_t data)
 {
+	// Mini floppy motor control: bit 0 = 1 starts motor, 0 stops it.
+	// Maxi (8") drives have always-spinning motors so mon_w() is a no-op.
+	// Do NOT call set_floppy() here — the FDC connector already binds flopi[0]
+	// during device_start().  Calling set_floppy() would assign the same device
+	// to all 4 internal FDC drive slots, causing 4 spurious ready-change
+	// interrupts on a single drive event and deadlocking the boot PROM.
 	floppy_image_device *floppy = m_floppy0->get_device();
-	m_fdc->set_floppy(floppy);
-	floppy->mon_w(!BIT(data, 0));
+	if (floppy)
+		floppy->mon_w(!BIT(data, 0));
 }
 
 void rc702_state::port1c_w(uint8_t data)
@@ -393,7 +404,7 @@ static void rc702_floppies(device_slot_interface &device)
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
-static void rc702m_floppies(device_slot_interface &device)
+static void rc702mini_floppies(device_slot_interface &device)
 {
 	device.option_add("525dd", FLOPPY_525_DD);
 }
@@ -479,7 +490,7 @@ void rc702_state::rc702(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", rc702_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 }
 
-void rc702_state::rc702m(machine_config &config)
+void rc702_state::rc702mini(machine_config &config)
 {
 	rc702_base(config);
 
@@ -490,8 +501,8 @@ void rc702_state::rc702m(machine_config &config)
 	m_dma->out_iow_callback<1>().set(m_fdc, FUNC(upd765a_device::dma_w));
 	m_dma->out_dack_callback<1>().set(FUNC(rc702_state::dack1_w));
 
-	FLOPPY_CONNECTOR(config, "fdc:0", rc702m_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
-	FLOPPY_CONNECTOR(config, "fdc:1", rc702m_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:0", rc702mini_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
+	FLOPPY_CONNECTOR(config, "fdc:1", rc702mini_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 }
 
 void rc702_state::rc703(machine_config &config)
@@ -534,10 +545,10 @@ ROM_END
 
 /* Driver */
 
-#define rom_rc702m rom_rc702
-#define rom_rc703  rom_rc702
+#define rom_rc702mini rom_rc702
+#define rom_rc703     rom_rc702
 
-//    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT        CLASS        INIT        COMPANY           FULLNAME                     FLAGS
-COMP( 1979, rc702,  0,      0,      rc702,   rc702_maxi,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (8\")",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1979, rc702m, rc702,  0,      rc702m,  rc702_mini,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (5.25\")",     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1982, rc703,  rc702,  0,      rc703,   rc702_mini,  rc702_state, empty_init, "Regnecentralen", "RC703 Piccolo",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT        CLASS        INIT        COMPANY           FULLNAME                     FLAGS
+COMP( 1979, rc702,     0,      0,      rc702,     rc702_maxi,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (8\")",        MACHINE_SUPPORTS_SAVE )
+COMP( 1979, rc702mini, rc702,  0,      rc702mini, rc702_mini,  rc702_state, empty_init, "Regnecentralen", "RC702 Piccolo (5.25\")",     MACHINE_SUPPORTS_SAVE )
+COMP( 1982, rc703,     rc702,  0,      rc703,     rc702_mini,  rc702_state, empty_init, "Regnecentralen", "RC703 Piccolo",              MACHINE_SUPPORTS_SAVE )
