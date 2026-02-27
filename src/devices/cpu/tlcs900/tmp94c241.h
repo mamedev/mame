@@ -66,24 +66,26 @@ class tmp94c241_device : public tlcs900h_device
 	static constexpr uint8_t CAPB = 7;
 
 public:
-	static constexpr uint8_t INTE45   = 0;
-	static constexpr uint8_t INTE67   = 1;
-	static constexpr uint8_t INTE89   = 2;
-	static constexpr uint8_t INTEAB   = 3;
-	static constexpr uint8_t INTET01  = 4;
-	static constexpr uint8_t INTET23  = 5;
-	static constexpr uint8_t INTET45  = 6;
-	static constexpr uint8_t INTET67  = 7;
-	static constexpr uint8_t INTET89  = 8;
-	static constexpr uint8_t INTETAB  = 9;
-	static constexpr uint8_t INTES0   = 10;
-	static constexpr uint8_t INTES1   = 11;
-	static constexpr uint8_t INTETC01 = 12;
-	static constexpr uint8_t INTETC23 = 13;
-	static constexpr uint8_t INTETC45 = 14;
-	static constexpr uint8_t INTETC67 = 15;
-	static constexpr uint8_t INTE0AD  = 16;
-	static constexpr uint8_t INTNMWDT = 17;
+	enum : uint8_t {
+		INTE45   = 0,
+		INTE67   = 1,
+		INTE89   = 2,
+		INTEAB   = 3,
+		INTET01  = 4,
+		INTET23  = 5,
+		INTET45  = 6,
+		INTET67  = 7,
+		INTET89  = 8,
+		INTETAB  = 9,
+		INTES0   = 10,
+		INTES1   = 11,
+		INTETC01 = 12,
+		INTETC23 = 13,
+		INTETC45 = 14,
+		INTETC67 = 15,
+		INTE0AD  = 16,
+		INTNMWDT = 17,
+	};
 
 	// device type constructor
 	tmp94c241_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
