@@ -24,51 +24,45 @@
 // device type definition
 DEFINE_DEVICE_TYPE(TMP94C241, tmp94c241_device, "tmp94c241", "Toshiba TMP94C241")
 
-static const struct {
-	uint8_t reg;
-	uint8_t iff;
-	uint8_t vector;
-	uint8_t dma_start_vector;
-} tmp94c241_irq_vector_map[] =
+const tmp94c241_device::irq_vector_entry tmp94c241_device::irq_vector_map[] =
 {
-	{ tmp94c241_device::INTE0AD,  0x08, 0x28, 0x0a},  // INT0 Pin
-	{ tmp94c241_device::INTE45,   0x08, 0x2c, 0x0b},  // INT4 Pin
-	{ tmp94c241_device::INTE45,   0x80, 0x30, 0x0c},  // INT5 Pin
-	{ tmp94c241_device::INTE67,   0x08, 0x34, 0x0d},  // INT6 Pin
-	{ tmp94c241_device::INTE67,   0x80, 0x38, 0x0e},  // INT7 Pin
-	                                                    // 0x3c - reserved
-	{ tmp94c241_device::INTE89,   0x08, 0x40, 0x10},  // INT8 Pin
-	{ tmp94c241_device::INTE89,   0x80, 0x44, 0x11},  // INT9 Pin
-	{ tmp94c241_device::INTEAB,   0x08, 0x48, 0x12},  // INTA Pin
-	{ tmp94c241_device::INTEAB,   0x80, 0x4c, 0x13},  // INTB Pin
-	{ tmp94c241_device::INTET01,  0x08, 0x50, 0x14},  // INTT0: 8-bit timer (Timer 0)
-	{ tmp94c241_device::INTET01,  0x80, 0x54, 0x15},  // INTT1: 8-bit timer (Timer 1)
-	{ tmp94c241_device::INTET23,  0x08, 0x58, 0x16},  // INTT2: 8-bit timer (Timer 2)
-	{ tmp94c241_device::INTET23,  0x80, 0x5c, 0x17},  // INTT3: 8-bit timer (Timer 3)
-	{ tmp94c241_device::INTET45,  0x08, 0x60, 0x18},  // INTTR4: 16-bit timer (Treg 4)
-	{ tmp94c241_device::INTET45,  0x80, 0x64, 0x19},  // INTTR5: 16-bit timer (Treg 5)
-	{ tmp94c241_device::INTET67,  0x08, 0x68, 0x1a},  // INTTR6: 16-bit timer (Treg 6)
-	{ tmp94c241_device::INTET67,  0x80, 0x6c, 0x1b},  // INTTR7: 16-bit timer (Treg 7)
-	{ tmp94c241_device::INTET89,  0x08, 0x70, 0x1c},  // INTTR8: 16-bit timer (Treg 8)
-	{ tmp94c241_device::INTET89,  0x80, 0x74, 0x1d},  // INTTR9: 16-bit timer (Treg 9)
-	{ tmp94c241_device::INTETAB,  0x08, 0x78, 0x1e},  // INTTRA: 16-bit timer (Treg A)
-	{ tmp94c241_device::INTETAB,  0x80, 0x7c, 0x1f},  // INTTRB: 16-bit timer (Treg B)
-	{ tmp94c241_device::INTES0,   0x08, 0x80, 0x20},  // INTRX0: Serial receive 0
-	{ tmp94c241_device::INTES0,   0x80, 0x84, 0x21},  // INTTX0: Serial send 0
-	{ tmp94c241_device::INTES1,   0x08, 0x88, 0x22},  // INTRX1: Serial receive 1
-	{ tmp94c241_device::INTES1,   0x80, 0x8c, 0x23},  // INTTX1: Serial send 1
-	{ tmp94c241_device::INTE0AD,  0x80, 0x90, 0x24},  // INTAD: AD conversion completion
-	{ tmp94c241_device::INTETC01, 0x08, 0x94, 0x25},  // INTTC0: micro-DMA completion Ch.0
-	{ tmp94c241_device::INTETC01, 0x80, 0x98, 0x26},  // INTTC1: micro-DMA completion Ch.1
-	{ tmp94c241_device::INTETC23, 0x08, 0x9c, 0x27},  // INTTC2: micro-DMA completion Ch.2
-	{ tmp94c241_device::INTETC23, 0x80, 0xa0, 0x28},  // INTTC3: micro-DMA completion Ch.3
-	{ tmp94c241_device::INTETC45, 0x08, 0xa4, 0x29},  // INTTC4: micro-DMA completion Ch.4
-	{ tmp94c241_device::INTETC45, 0x80, 0xa8, 0x2a},  // INTTC5: micro-DMA completion Ch.5
-	{ tmp94c241_device::INTETC67, 0x08, 0xac, 0x2b},  // INTTC6: micro-DMA completion Ch.6
-	{ tmp94c241_device::INTETC67, 0x80, 0xb0, 0x2c},  // INTTC7: micro-DMA completion Ch.7
-	                                                    /* 0xb4 ... 0xfc (Reserved) */
+	{ INTE0AD,  0x08, 0x28, 0x0a},  // INT0 Pin
+	{ INTE45,   0x08, 0x2c, 0x0b},  // INT4 Pin
+	{ INTE45,   0x80, 0x30, 0x0c},  // INT5 Pin
+	{ INTE67,   0x08, 0x34, 0x0d},  // INT6 Pin
+	{ INTE67,   0x80, 0x38, 0x0e},  // INT7 Pin
+	                                 // 0x3c - reserved
+	{ INTE89,   0x08, 0x40, 0x10},  // INT8 Pin
+	{ INTE89,   0x80, 0x44, 0x11},  // INT9 Pin
+	{ INTEAB,   0x08, 0x48, 0x12},  // INTA Pin
+	{ INTEAB,   0x80, 0x4c, 0x13},  // INTB Pin
+	{ INTET01,  0x08, 0x50, 0x14},  // INTT0: 8-bit timer (Timer 0)
+	{ INTET01,  0x80, 0x54, 0x15},  // INTT1: 8-bit timer (Timer 1)
+	{ INTET23,  0x08, 0x58, 0x16},  // INTT2: 8-bit timer (Timer 2)
+	{ INTET23,  0x80, 0x5c, 0x17},  // INTT3: 8-bit timer (Timer 3)
+	{ INTET45,  0x08, 0x60, 0x18},  // INTTR4: 16-bit timer (Treg 4)
+	{ INTET45,  0x80, 0x64, 0x19},  // INTTR5: 16-bit timer (Treg 5)
+	{ INTET67,  0x08, 0x68, 0x1a},  // INTTR6: 16-bit timer (Treg 6)
+	{ INTET67,  0x80, 0x6c, 0x1b},  // INTTR7: 16-bit timer (Treg 7)
+	{ INTET89,  0x08, 0x70, 0x1c},  // INTTR8: 16-bit timer (Treg 8)
+	{ INTET89,  0x80, 0x74, 0x1d},  // INTTR9: 16-bit timer (Treg 9)
+	{ INTETAB,  0x08, 0x78, 0x1e},  // INTTRA: 16-bit timer (Treg A)
+	{ INTETAB,  0x80, 0x7c, 0x1f},  // INTTRB: 16-bit timer (Treg B)
+	{ INTES0,   0x08, 0x80, 0x20},  // INTRX0: Serial receive 0
+	{ INTES0,   0x80, 0x84, 0x21},  // INTTX0: Serial send 0
+	{ INTES1,   0x08, 0x88, 0x22},  // INTRX1: Serial receive 1
+	{ INTES1,   0x80, 0x8c, 0x23},  // INTTX1: Serial send 1
+	{ INTE0AD,  0x80, 0x90, 0x24},  // INTAD: AD conversion completion
+	{ INTETC01, 0x08, 0x94, 0x25},  // INTTC0: micro-DMA completion Ch.0
+	{ INTETC01, 0x80, 0x98, 0x26},  // INTTC1: micro-DMA completion Ch.1
+	{ INTETC23, 0x08, 0x9c, 0x27},  // INTTC2: micro-DMA completion Ch.2
+	{ INTETC23, 0x80, 0xa0, 0x28},  // INTTC3: micro-DMA completion Ch.3
+	{ INTETC45, 0x08, 0xa4, 0x29},  // INTTC4: micro-DMA completion Ch.4
+	{ INTETC45, 0x80, 0xa8, 0x2a},  // INTTC5: micro-DMA completion Ch.5
+	{ INTETC67, 0x08, 0xac, 0x2b},  // INTTC6: micro-DMA completion Ch.6
+	{ INTETC67, 0x80, 0xb0, 0x2c},  // INTTC7: micro-DMA completion Ch.7
+	                                 /* 0xb4 ... 0xfc (Reserved) */
 };
-static constexpr u8 NUM_MASKABLE_IRQS = sizeof(tmp94c241_irq_vector_map) / 4;
 
 
 //**************************************************************************
@@ -323,12 +317,12 @@ void tmp94c241_device::iimc_w(uint8_t data)
 
 void tmp94c241_device::intclr_w(uint8_t data)
 {
-	for (int i = 0; i < NUM_MASKABLE_IRQS; i++)
+	for (int i = 0; i < std::size(irq_vector_map); i++)
 	{
-		if (data == tmp94c241_irq_vector_map[i].dma_start_vector)
+		if (data == irq_vector_map[i].dma_start_vector)
 		{
 			// clear interrupt request
-			m_int_reg[tmp94c241_irq_vector_map[i].reg] &= ~ tmp94c241_irq_vector_map[i].iff;
+			m_int_reg[irq_vector_map[i].reg] &= ~ irq_vector_map[i].iff;
 			return;
 		}
 	}
@@ -950,9 +944,9 @@ int tmp94c241_device::tlcs900_process_hdma(int channel)
 
 	// Find which interrupt this start vector corresponds to
 	int irq = -1;
-	for (int i = 0; i < NUM_MASKABLE_IRQS; i++)
+	for (int i = 0; i < std::size(irq_vector_map); i++)
 	{
-		if (tmp94c241_irq_vector_map[i].dma_start_vector == start_vector)
+		if (irq_vector_map[i].dma_start_vector == start_vector)
 		{
 			irq = i;
 			break;
@@ -963,7 +957,7 @@ int tmp94c241_device::tlcs900_process_hdma(int channel)
 		return 0;  // No matching interrupt found
 
 	// Check if the interrupt flag is set (DMA trigger condition)
-	if (!(m_int_reg[tmp94c241_irq_vector_map[irq].reg] & tmp94c241_irq_vector_map[irq].iff))
+	if (!(m_int_reg[irq_vector_map[irq].reg] & irq_vector_map[irq].iff))
 		return 0;  // Interrupt not pending
 
 	// Decode DMAM mode register
@@ -1087,7 +1081,7 @@ int tmp94c241_device::tlcs900_process_hdma(int channel)
 	}
 
 	// Clear the triggering interrupt flag
-	m_int_reg[tmp94c241_irq_vector_map[irq].reg] &= ~tmp94c241_irq_vector_map[irq].iff;
+	m_int_reg[irq_vector_map[irq].reg] &= ~irq_vector_map[irq].iff;
 
 	return 1;  // Transfer performed
 }
@@ -1230,9 +1224,9 @@ void tmp94c241_device::tlcs900_check_irqs()
 	/* Check regular IRQs
 	   The smaller the vector value, the higher the priority. */
 	int irq_vectors[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
-	for (int i = NUM_MASKABLE_IRQS - 1; i >= 0; i--)
+	for (int i = std::size(irq_vector_map) - 1; i >= 0; i--)
 	{
-		if (m_int_reg[tmp94c241_irq_vector_map[i].reg] & tmp94c241_irq_vector_map[i].iff)
+		if (m_int_reg[irq_vector_map[i].reg] & irq_vector_map[i].iff)
 		{
 			// HDMA priority: skip interrupts targeted by active HDMA channels.
 			// On real hardware, HDMA consumes the interrupt trigger instead of
@@ -1240,7 +1234,7 @@ void tmp94c241_device::tlcs900_check_irqs()
 			bool hdma_targeted = false;
 			for (int ch = 0; ch < 4; ch++)
 			{
-				if (m_dma_vector[ch] == tmp94c241_irq_vector_map[i].dma_start_vector)
+				if (m_dma_vector[ch] == irq_vector_map[i].dma_start_vector)
 				{
 					hdma_targeted = true;
 					break;
@@ -1249,13 +1243,13 @@ void tmp94c241_device::tlcs900_check_irqs()
 			if (hdma_targeted)
 				continue;
 
-			switch (tmp94c241_irq_vector_map[i].iff)
+			switch (irq_vector_map[i].iff)
 			{
 				case 0x80:
-					irq_vectors[(m_int_reg[tmp94c241_irq_vector_map[i].reg] >> 4) & 0x07] = i;
+					irq_vectors[(m_int_reg[irq_vector_map[i].reg] >> 4) & 0x07] = i;
 					break;
 				case 0x08:
-					irq_vectors[m_int_reg[tmp94c241_irq_vector_map[i].reg] & 0x07] = i;
+					irq_vectors[m_int_reg[irq_vector_map[i].reg] & 0x07] = i;
 					break;
 			}
 		}
@@ -1276,7 +1270,7 @@ void tmp94c241_device::tlcs900_check_irqs()
 	// Take IRQ
 	if (irq >= 0)
 	{
-		uint8_t vector = tmp94c241_irq_vector_map[irq].vector;
+		uint8_t vector = irq_vector_map[irq].vector;
 
 		// Log only DMA completion interrupts (INTTC0/INTTC2) — key milestones
 		if (vector == 0x94)
@@ -1300,14 +1294,14 @@ void tmp94c241_device::tlcs900_check_irqs()
 		m_halted = 0;
 
 		// Clear taken IRQ
-		m_int_reg[tmp94c241_irq_vector_map[irq].reg] &= ~ tmp94c241_irq_vector_map[irq].iff;
+		m_int_reg[irq_vector_map[irq].reg] &= ~ irq_vector_map[irq].iff;
 
 		// Level-detect re-assertion: Level-triggered interrupt
 		// flags are continuously driven by the input level. Clearing the flag
 		// during dispatch has no lasting effect if the input is still asserted.
 		// Re-assert INT0 flag if input is still active in level-detect mode.
-		if (tmp94c241_irq_vector_map[irq].reg == INTE0AD &&
-			tmp94c241_irq_vector_map[irq].iff == 0x08 &&
+		if (irq_vector_map[irq].reg == INTE0AD &&
+			irq_vector_map[irq].iff == 0x08 &&
 			!(m_iimc & 0x02) &&
 			m_level[TLCS900_INT0] == ASSERT_LINE)
 		{
