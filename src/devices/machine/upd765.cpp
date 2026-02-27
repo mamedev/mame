@@ -2342,10 +2342,9 @@ void upd765_family_device::read_track_continue(floppy_info &fi)
 						cur_live.idbuf[1],
 						cur_live.idbuf[2],
 						cur_live.idbuf[3]);
-			if(!sector_matches())
-				st1 |= ST1_ND;
-			else
-				st1 &= ~ST1_ND;
+			// Read Track does not compare sector IDs (UPD765/8272A datasheet:
+			// "data is read continuously from index hole ... the sector number
+			// is not compared").  Do not set ST1_ND based on sector matching.
 
 			sector_size = calc_sector_size(command[5]);
 			fifo_expect(sector_size, false);
