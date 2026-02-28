@@ -1007,17 +1007,7 @@ $(info GCC $(GCC_VERSION) detected)
 else # CLANG_VERSION
 $(info Clang $(CLANG_VERSION) detected)
 ifneq ($(TARGETOS),asmjs)
-ifeq ($(ARCHITECTURE),_x64)
-ARCHITECTURE := _x64_clang
-else ifneq ($(filter aarch64%,$(UNAME_M)),)
-ARCHITECTURE := _arm64_clang
-else ifneq ($(filter aarch64%,$(UNAME_P)),)
-ARCHITECTURE := _arm64_clang
-else ifneq ($(filter arm64%,$(UNAME_M)),)
-ARCHITECTURE := _arm64_clang
-else
-ARCHITECTURE := _x86_clang
-endif
+ARCHITECTURE := $(ARCHITECTURE)_clang
 endif # asmjs
 endif # CLANG_VERSION
 
@@ -1265,15 +1255,15 @@ linux_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-linux-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-linux-clang config=$(CONFIG)64 precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-linux-clang config=$(CONFIG)64
 
-.PHONY: linux_arm64_clang
-linux_arm64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-linux-clang/Makefile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-linux-clang config=$(CONFIG)64 precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-linux-clang config=$(CONFIG)64
-
 .PHONY: linux_x86_clang
 linux_x86_clang: generate $(PROJECTDIR)/$(MAKETYPE)-linux-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-linux-clang config=$(CONFIG)32 precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-linux-clang config=$(CONFIG)32
+
+.PHONY: linux_clang
+linux_clang: generate $(PROJECTDIR)/$(MAKETYPE)-linux-clang/Makefile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-linux-clang config=$(CONFIG) precompile
+	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-linux-clang config=$(CONFIG)
 
 #-------------------------------------------------
 # gmake-osx
@@ -1304,11 +1294,6 @@ $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: macosx_x64_clang
 macosx_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile
-	$(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64 precompile
-	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64
-
-.PHONY: macosx_arm64_clang
-macosx_arm64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-osx-clang/Makefile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64 precompile
 	$(SILENT) $(MAKE) $(MAKEPARAMS) -C $(PROJECTDIR)/$(MAKETYPE)-osx-clang config=$(CONFIG)64
 
@@ -1445,11 +1430,6 @@ openbsd_x64: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)64 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)64
 
-.PHONY: openbsd_arm64
-openbsd_arm64: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd/Makefile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)64 precompile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd config=$(CONFIG)64
-
 .PHONY: openbsd
 openbsd: openbsd_x86
 
@@ -1467,11 +1447,6 @@ $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang/Makefile: makefile $(SCRIPTS) $(GENIE)
 
 .PHONY: openbsd_x64_clang
 openbsd_x64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang/Makefile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)64 precompile
-	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)64
-
-.PHONY: openbsd_arm64_clang
-openbsd_arm64_clang: generate $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang/Makefile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)64 precompile
 	$(SILENT) $(MAKE) -C $(PROJECTDIR)/$(MAKETYPE)-openbsd-clang config=$(CONFIG)64
 
