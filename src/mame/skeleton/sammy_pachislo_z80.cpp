@@ -57,7 +57,7 @@ void sammy_pachislo_z80_state::io_map(address_map &map)
 	map.global_mask(0xff);
 
 	// map(0xfe, 0xfe).r();
-	map(0xfe, 0xff).w("ym", FUNC(ym2413_device::write));
+	map(0xfe, 0xff).w("ym", FUNC(ymf281_device::write));
 }
 
 
@@ -79,13 +79,14 @@ void sammy_pachislo_z80_state::sammy_pachislo_z80(machine_config &config)
 	Z80(config, m_maincpu, 3'000'000); // clock not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &sammy_pachislo_z80_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &sammy_pachislo_z80_state::io_map);
-	m_maincpu->set_periodic_int(FUNC(sammy_pachislo_z80_state::nmi_line_pulse), attotime::from_hz(4*60)); // source?
+	m_maincpu->set_periodic_int(FUNC(sammy_pachislo_z80_state::irq0_line_hold), attotime::from_hz(9*60)); // Guessed. Probably Wrong. source?
+
 
 	// TODO: other hw?
 
 	SPEAKER(config, "mono").front_center();
 
-	YM2413(config, "ym", 3'000'000).add_route(ALL_OUTPUTS, "mono", 1.0); // should be YMF281-D, clock not verified
+	YMF281(config, "ym", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0); // should be YMF281-D, clock and sound Chip type guessed.
 }
 
 
