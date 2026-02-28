@@ -64,6 +64,7 @@ public:
 	void init_csprint() ATTR_COLD;
 	void init_paperboy() ATTR_COLD;
 	void init_720() ATTR_COLD;
+	void init_garfield() ATTR_COLD;
 
 	void atarisy2(machine_config &config) ATTR_COLD;
 	void apb(machine_config &config) ATTR_COLD;
@@ -71,6 +72,7 @@ public:
 	void ssprint(machine_config &config) ATTR_COLD;
 	void _720(machine_config &config) ATTR_COLD;
 	void csprint(machine_config &config) ATTR_COLD;
+	void garfield(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -119,6 +121,8 @@ private:
 	bool            m_p2portwr_state = 0;
 	bool            m_p2portrd_state = 0;
 
+	bool            m_swap_irq_lines = false;
+
 	uint8_t         m_sound_reset_state = 0U;
 
 	emu_timer *     m_yscroll_reset_timer = nullptr;
@@ -137,6 +141,13 @@ private:
 
 	void scanline_int_ack_w(uint8_t data);
 	void video_int_ack_w(uint8_t data);
+	uint16_t garfield_irq_status_r();
+	uint16_t garfield_scanline_status_r();
+	uint16_t garfield_int_enable_r();
+	uint16_t garfield_soundlatch_r();
+	uint16_t garfield_xscroll_r();
+	uint16_t garfield_yscroll_r();
+	void garfield_alpha_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void int0_ack_w(uint8_t data);
 	void sound_reset_w(uint8_t data);
 	void int_enable_w(uint8_t data);
@@ -165,12 +176,15 @@ private:
 	void yscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void xscroll_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void garfield_spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void playfieldt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void playfieldb_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	static rgb_t RRRRGGGGBBBBIIII(uint32_t raw);
 
 	static const atari_motion_objects_config s_mob_config;
+	static const atari_motion_objects_config s_garfield_mob_config;
 	void main_map(address_map &map) ATTR_COLD;
+	void garfield_main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
 };
 

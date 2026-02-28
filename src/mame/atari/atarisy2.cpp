@@ -8,6 +8,7 @@
 
     Games supported:
         * Paperboy (1984) [3 sets]
+        * Garfield (1984) [prototype, unreleased]
         * 720 Degrees (1986) [6 sets]
         * Super Sprint (1986) [7 sets]
         * Championship Sprint (1986) [8 sets]
@@ -145,15 +146,18 @@ static constexpr XTAL MASTER_CLOCK = XTAL(20'000'000);
 
 void atarisy2_state::update_interrupts()
 {
+	int vblank_line = m_swap_irq_lines ? t11_device::CP2_LINE : t11_device::CP3_LINE;
+	int scanline_line = m_swap_irq_lines ? t11_device::CP3_LINE : t11_device::CP2_LINE;
+
 	if (m_video_int_state)
-		m_maincpu->set_input_line(t11_device::CP3_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(vblank_line, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(t11_device::CP3_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(vblank_line, CLEAR_LINE);
 
 	if (m_scanline_int_state)
-		m_maincpu->set_input_line(t11_device::CP2_LINE, ASSERT_LINE);
+		m_maincpu->set_input_line(scanline_line, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(t11_device::CP2_LINE, CLEAR_LINE);
+		m_maincpu->set_input_line(scanline_line, CLEAR_LINE);
 
 	if (m_p2portwr_state)
 		m_maincpu->set_input_line(t11_device::CP1_LINE, ASSERT_LINE);
@@ -181,6 +185,52 @@ void atarisy2_state::video_int_ack_w(uint8_t data)
 }
 
 
+uint16_t atarisy2_state::garfield_irq_status_r()
+{
+	return 0x0000;
+}
+
+
+uint16_t atarisy2_state::garfield_scanline_status_r()
+{
+	return 0x0000;
+}
+
+
+uint16_t atarisy2_state::garfield_int_enable_r()
+{
+	return m_interrupt_enable;
+}
+
+
+uint16_t atarisy2_state::garfield_soundlatch_r()
+{
+	return 0x0000;
+}
+
+
+uint16_t atarisy2_state::garfield_xscroll_r()
+{
+	return m_xscroll[0];
+}
+
+
+uint16_t atarisy2_state::garfield_yscroll_r()
+{
+	return m_yscroll[0];
+}
+
+
+void atarisy2_state::garfield_spriteram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	spriteram_w(offset, data, mem_mask);
+}
+
+void atarisy2_state::garfield_alpha_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	m_alpha_tilemap->write16(offset, data, mem_mask);
+}
+
 
 /*************************************
  *
@@ -193,10 +243,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy2_state::scanline_update)
 	int const scanline = param;
 	if (scanline <= m_screen->height())
 	{
-		// generate the 32V interrupt (IRQ 2)
 		if ((scanline % 64) == 0)
 		{
-			// clock the state through
 			m_scanline_int_state = BIT(m_interrupt_enable, 2);
 			update_interrupts();
 		}
@@ -237,6 +285,14 @@ void atarisy2_state::machine_reset()
 	m_interrupt_enable = 0;
 
 	sound_reset_w(1);
+
+	if (m_swap_irq_lines)
+	{
+		auto &palette = *subdevice<palette_device>("palette");
+		for (int i = 0; i < 256; i++)
+			palette.write16(i, 0);
+	}
+
 }
 
 
@@ -251,7 +307,6 @@ void atarisy2_state::vblank_int(int state)
 {
 	if (state)
 	{
-		// clock the VBLANK through
 		m_video_int_state = BIT(m_interrupt_enable, 3);
 		update_interrupts();
 	}
@@ -769,6 +824,39 @@ void atarisy2_state::main_map(address_map &map)
 	map(0100000, 0177777).rom();
 }
 
+void atarisy2_state::garfield_main_map(address_map &map)
+{
+	map.unmap_value_high();
+	map(0000000, 0007777).ram();
+	map(0010000, 0010777).mirror(01000).ram().w("palette", FUNC(palette_device::write16)).share("palette");
+	map(0012000, 0012000).mirror(00176).r("adc", FUNC(adc0808_device::data_r));
+	map(0012000, 0012003).mirror(00174).w(FUNC(atarisy2_state::bankselect_w));
+	map(0012200, 0012217).mirror(00160).w("adc", FUNC(adc0808_device::address_offset_start_w)).umask16(0x00ff);
+	map(0012400, 0012401).mirror(00176).r(FUNC(atarisy2_state::garfield_irq_status_r));
+	map(0012400, 0012400).mirror(00176).w(FUNC(atarisy2_state::video_int_ack_w));
+	map(0012600, 0012601).mirror(00036).r(FUNC(atarisy2_state::garfield_scanline_status_r));
+	map(0012600, 0012600).mirror(00036).w(FUNC(atarisy2_state::scanline_int_ack_w));
+	map(0012640, 0012640).mirror(00036).w(FUNC(atarisy2_state::sound_reset_w));
+	map(0013000, 0013001).mirror(00176).r(FUNC(atarisy2_state::garfield_int_enable_r));
+	map(0013000, 0013000).mirror(00176).w(FUNC(atarisy2_state::int_enable_w));
+	map(0013200, 0013201).mirror(00176).r(FUNC(atarisy2_state::garfield_soundlatch_r));
+	map(0013200, 0013200).mirror(00176).w(m_soundlatch, FUNC(generic_latch_8_device::write));
+	map(0013400, 0013401).mirror(00176).rw(FUNC(atarisy2_state::garfield_xscroll_r), FUNC(atarisy2_state::xscroll_w)).share(m_xscroll);
+	map(0013600, 0013601).mirror(00176).rw(FUNC(atarisy2_state::garfield_yscroll_r), FUNC(atarisy2_state::yscroll_w)).share(m_yscroll);
+	map(0014000, 0014001).mirror(01776).portr("IN0");
+	map(0014000, 0014000).mirror(01776).w("watchdog", FUNC(watchdog_timer_device::reset_w));
+	map(0016000, 0016001).mirror(01776).r(FUNC(atarisy2_state::sound_r));
+	map(0020000, 0037777).view(m_vmmu);
+	m_vmmu[0](020000, 033777).ram().w(FUNC(atarisy2_state::garfield_alpha_w)).share("alpha");
+	m_vmmu[0](034000, 037777).ram().w(FUNC(atarisy2_state::garfield_spriteram_w)).share("mob");
+	m_vmmu[1](020000, 037777).ram();
+	m_vmmu[2](020000, 037777).ram().w(FUNC(atarisy2_state::playfieldt_w)).share(m_playfieldt);
+	m_vmmu[3](020000, 037777).ram().w(FUNC(atarisy2_state::playfieldb_w)).share(m_playfieldb);
+	map(0040000, 0057777).bankr(m_rombank[0]);
+	map(0060000, 0077777).bankr(m_rombank[1]);
+	map(0100000, 0177777).rom();
+}
+
 
 /*************************************
  *
@@ -1260,6 +1348,21 @@ void atarisy2_state::paperboy(machine_config &config)
 }
 
 
+void atarisy2_state::garfield(machine_config &config)
+{
+	atarisy2(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &atarisy2_state::garfield_main_map);
+
+	m_mob->set_config(atarisy2_state::s_garfield_mob_config);
+
+	SLAPSTIC(config, m_slapstic, 105);
+	m_slapstic->set_range(m_maincpu, AS_PROGRAM, 0100000, 0100777, 0);
+	m_slapstic->set_view(m_vmmu);
+
+	subdevice<watchdog_timer_device>("watchdog")->set_time(attotime::never);
+}
+
+
 void atarisy2_state::_720(machine_config &config)
 {
 	atarisy2(config);
@@ -1523,6 +1626,42 @@ ROM_START( paperboyp )
 
 	ROM_REGION( 0x2000, "chars", 0 )
 	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, BAD_DUMP CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
+ROM_END
+
+
+ROM_START( garfield )
+	ROM_REGION( 0x90000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cpu_lo.bin", 0x008000, 0x004000, BAD_DUMP CRC(ef2d65b2) SHA1(87ae02fce6a34083792d785d50c725710f2ec9a0) )
+	ROM_LOAD16_BYTE( "cpu_hi.bin", 0x008001, 0x004000, BAD_DUMP CRC(f3f24c3e) SHA1(ca42120a54ef2859905a535555b5003315036bff) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "snd_dummy.bin", 0x00c000, 0x004000, BAD_DUMP CRC(1c1425d5) SHA1(23b9e5c02a3481c2b0a6fdd6da6b2d8e896faf0e) ) // Paperboy sound ROM used as placeholder
+
+	ROM_REGION( 0x20000, "tiles", 0 )
+	ROM_LOAD( "leash.bin",  0x000000, 0x004000, BAD_DUMP CRC(f517c9a9) SHA1(a970a7064061b2e2c84c382d63f21c8b6e14c1d0) )
+	ROM_RELOAD(             0x004000, 0x004000 )
+	ROM_RELOAD(             0x008000, 0x004000 )
+	ROM_RELOAD(             0x00c000, 0x004000 )
+	ROM_RELOAD(             0x010000, 0x004000 )
+	ROM_RELOAD(             0x014000, 0x004000 )
+	ROM_RELOAD(             0x018000, 0x004000 )
+	ROM_RELOAD(             0x01c000, 0x004000 )
+
+	ROM_REGION( 0x40000, "sprites", 0 )
+	ROM_LOAD( "park0.bin",  0x000000, 0x008000, BAD_DUMP CRC(b96977cd) SHA1(eea9912cf6caf6b631ef8326a9099ea404cb4340) )
+	ROM_LOAD( "park1.bin",  0x008000, 0x008000, BAD_DUMP CRC(4401d046) SHA1(92d49f36f41dbce34b2fc8fb3f4c7d7f3a362df0) )
+	ROM_LOAD( "park2.bin",  0x010000, 0x008000, BAD_DUMP CRC(67514167) SHA1(b3ffc0d1f661b091c1ed75e88dba98fd618f1dcb) )
+	ROM_LOAD( "park3.bin",  0x018000, 0x008000, BAD_DUMP CRC(3660d1d9) SHA1(16a4cea002cfe0c2e60560ce96c4af325c114ff5) )
+	ROM_LOAD( "wave0.bin",  0x020000, 0x008000, BAD_DUMP CRC(8ee5a47c) SHA1(af2b1e768fc0b11e01341b5122cf89b81c25f99b) )
+	ROM_LOAD( "wave1.bin",  0x028000, 0x008000, BAD_DUMP CRC(e9dc23f1) SHA1(66b675a86aac0b2dd578c306a9b425b554aaa691) )
+	ROM_LOAD( "wave2.bin",  0x030000, 0x008000, BAD_DUMP CRC(23c4f134) SHA1(593bb49a1dc2bde3d97d44ca3adf94ca793f6e27) )
+	ROM_LOAD( "wave3.bin",  0x038000, 0x008000, BAD_DUMP CRC(95e4d89c) SHA1(4a01bb8517c5afd5ad8bd86b260d902b9a33d7fe) )
+
+	ROM_REGION( 0x2000, "chars", 0 )
+	ROM_LOAD( "char_dummy.bin", 0x000000, 0x002000, BAD_DUMP CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) ) // Paperboy char ROM used as placeholder
+
+	ROM_REGION( 0x200, "eeprom", 0 )
+	ROM_LOAD( "mosize.bin", 0x0000, 0x0200, BAD_DUMP CRC(16ea848b) SHA1(03d1411709a780efc1551137e8b0d7588248be91) )
 ROM_END
 
 
@@ -3285,6 +3424,26 @@ void atarisy2_state::init_paperboy()
 }
 
 
+void atarisy2_state::init_garfield()
+{
+	uint8_t *cpu1 = memregion("maincpu")->base();
+
+	for (int i = 0x10000; i < 0x90000; i += 0x20000)
+	{
+		memcpy(&cpu1[i + 0x08000], &cpu1[i], 0x8000);
+		memcpy(&cpu1[i + 0x10000], &cpu1[i], 0x8000);
+		memcpy(&cpu1[i + 0x18000], &cpu1[i], 0x8000);
+	}
+
+	m_pedal_count = 0;
+	if (m_tms5220.found())
+		m_tms5220->rsq_w(1);
+
+	m_vmmu.select(0);
+	m_swap_irq_lines = true;
+}
+
+
 void atarisy2_state::init_720()
 {
 	m_pedal_count = -1;
@@ -3333,6 +3492,8 @@ GAME( 1984, paperboy,   0,        paperboy, paperboy, atarisy2_state, init_paper
 GAME( 1984, paperboyr2, paperboy, paperboy, paperboy, atarisy2_state, init_paperboy, ROT0,   "Atari Games", "Paperboy (rev 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, paperboyr1, paperboy, paperboy, paperboy, atarisy2_state, init_paperboy, ROT0,   "Atari Games", "Paperboy (rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, paperboyp,  paperboy, paperboy, paperboy, atarisy2_state, init_paperboy, ROT0,   "Atari Games", "Paperboy (prototype)", MACHINE_NOT_WORKING )
+
+GAME( 1984, garfield,   0,        garfield, paperboy, atarisy2_state, init_garfield, ROT0,   "Atari Games", "Garfield (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, 720,        0,        _720,     720,      atarisy2_state, init_720,      ROT0,   "Atari Games", "720 Degrees (rev 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, 720r3,      720,      _720,     720,      atarisy2_state, init_720,      ROT0,   "Atari Games", "720 Degrees (rev 3)", MACHINE_SUPPORTS_SAVE )

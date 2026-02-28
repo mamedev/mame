@@ -74,6 +74,39 @@ const atari_motion_objects_config atarisy2_state::s_mob_config =
 	0                  /* resulting value to indicate "special" */
 };
 
+const atari_motion_objects_config atarisy2_state::s_garfield_mob_config =
+{
+	1,                  /* index to which gfx system */
+	1,                  /* number of motion object banks */
+	0,                  /* are the entries linked? NO - Garfield uses sequential */
+	0,                  /* are the entries split? */
+	0,                  /* render in reverse order? */
+	0,                  /* render in swapped X/Y order? */
+	0,                  /* does the neighbor bit affect the next object? */
+	0,                  /* pixels per SLIP entry (0 for no-slip) */
+	0,                  /* pixel offset for SLIPs */
+	0,                  /* maximum number of links to visit/scanline (0=all) */
+
+	0x00,               /* base palette entry */
+	15,                 /* transparent pen index */
+
+	{{ 0,0,0,0x07f8 }}, /* mask for the link (used as entry count in sequential mode) */
+	{{ 0,0x07ff,0,0 }, { 0x0007,0,0,0 }}, /* mask for the code index */
+	{{ 0,0,0,0x3000 }}, /* mask for the color */
+	{{ 0,0,0xffc0,0 }}, /* mask for the X position */
+	{{ 0x7fc0,0,0,0 }}, /* mask for the Y position */
+	{{ 0 }},            /* mask for the width, in tiles*/
+	{{ 0,0x3800,0,0 }}, /* mask for the height, in tiles */
+	{{ 0,0x4000,0,0 }}, /* mask for the horizontal flip */
+	{{ 0 }},            /* mask for the vertical flip */
+	{{ 0,0,0,0xc000 }}, /* mask for the priority */
+	{{ 0,0x8000,0,0 }}, /* mask for the neighbor */
+	{{ 0 }},            /* mask for absolute coordinates */
+
+	{{ 0 }},            /* mask for the special value */
+	0                  /* resulting value to indicate "special" */
+};
+
 void atarisy2_state::video_start()
 {
 	// reset the statics
@@ -81,6 +114,13 @@ void atarisy2_state::video_start()
 
 	// save states
 	save_item(NAME(m_playfield_tile_bank));
+
+	if (m_swap_irq_lines)
+	{
+		auto &clut = m_mob->color_lookup();
+		for (size_t i = 0; i < clut.size(); i++)
+			clut[i] = 0;
+	}
 }
 
 
@@ -261,5 +301,6 @@ uint32_t atarisy2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+
 	return 0;
 }
