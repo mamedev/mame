@@ -1635,7 +1635,7 @@ ROM_START( garfield )
 	ROM_LOAD16_BYTE( "cpu_hi.bin", 0x008001, 0x004000, BAD_DUMP CRC(f3f24c3e) SHA1(ca42120a54ef2859905a535555b5003315036bff) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "snd_dummy.bin", 0x00c000, 0x004000, BAD_DUMP CRC(1c1425d5) SHA1(23b9e5c02a3481c2b0a6fdd6da6b2d8e896faf0e) ) // Paperboy sound ROM used as placeholder
+	ROM_LOAD( "garfield_snd.bin", 0x00c000, 0x004000, NO_DUMP )
 
 	ROM_REGION( 0x20000, "tiles", 0 )
 	ROM_LOAD( "leash.bin",  0x000000, 0x004000, BAD_DUMP CRC(f517c9a9) SHA1(a970a7064061b2e2c84c382d63f21c8b6e14c1d0) )
@@ -1658,7 +1658,7 @@ ROM_START( garfield )
 	ROM_LOAD( "wave3.bin",  0x038000, 0x008000, BAD_DUMP CRC(95e4d89c) SHA1(4a01bb8517c5afd5ad8bd86b260d902b9a33d7fe) )
 
 	ROM_REGION( 0x2000, "chars", 0 )
-	ROM_LOAD( "char_dummy.bin", 0x000000, 0x002000, BAD_DUMP CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) ) // Paperboy char ROM used as placeholder
+	ROM_LOAD( "garfield_chr.bin", 0x000000, 0x002000, NO_DUMP )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
 	ROM_LOAD( "mosize.bin", 0x0000, 0x0200, BAD_DUMP CRC(16ea848b) SHA1(03d1411709a780efc1551137e8b0d7588248be91) )
