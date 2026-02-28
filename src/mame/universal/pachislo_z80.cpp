@@ -72,7 +72,7 @@ void pachislo_z80_state::pachislo_z80(machine_config &config)
 {
 	Z80(config, m_maincpu, 3'000'000); // clock not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &pachislo_z80_state::program_map);
-	m_maincpu->set_periodic_int(FUNC(pachislo_z80_state::irq0_line_hold), attotime::from_hz(12*61)); // Guessed. Probably Wrong. source?
+	m_maincpu->set_periodic_int(FUNC(pachislo_z80_state::irq0_line_hold), attotime::from_hz(12*60)); // Guessed. Probably Wrong. source?
 
 	// TODO: other hw?
 
