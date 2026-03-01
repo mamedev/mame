@@ -34948,6 +34948,9 @@ tg16
 pcfx
 pcfxga
 
+@source:nec/piet1.cpp
+piet1
+
 @source:nec/tk80bs.cpp
 tk80bs
 
