@@ -396,6 +396,7 @@ private:
 	inline void compute_dec(int rn, int rx);
 	inline void compute_min(int rn, int rx, int ry);
 	inline void compute_max(int rn, int rx, int ry);
+	inline void compute_clip(int rn, int rx, int ry);
 	inline void compute_neg(int rn, int rx);
 	inline void compute_not(int rn, int rx);
 	inline uint32_t SCALB(SHARC_REG rx, int ry);

@@ -843,6 +843,7 @@ void adsp21062_device::COMPUTE(uint32_t opcode)
 					case 0x43:      compute_not(rn, rx); break;
 					case 0x61:      compute_min(rn, rx, ry); break;
 					case 0x62:      compute_max(rn, rx, ry); break;
+					case 0x63:      compute_clip(rn, rx, ry); break;
 					case 0x81:      compute_fadd(rn, rx, ry); break;
 					case 0x82:      compute_fsub(rn, rx, ry); break;
 					case 0x89:      compute_favg(rn, rx, ry); break;
