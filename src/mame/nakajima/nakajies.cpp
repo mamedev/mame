@@ -303,7 +303,7 @@ public:
 		, m_view{
 			{*this, "view_0"}, {*this, "view_1"}, {*this, "view_2"}, {*this, "view_3"},
 		    {*this, "view_4"}, {*this, "view_5"}, {*this, "view_6"}, {*this, "view_7"}
-	      }
+		}
 		, m_port_row(*this, "ROW%u", 0U)
 		, m_port_debug(*this, "debug")
 		, m_rombank(*this, "rombank%u", 0U)
@@ -448,7 +448,6 @@ void nakajies_state::banking_w(offs_t offset, u8 data)
 {
 	m_rombank[offset]->set_entry((data & 0x0f) ^ 0xf);
 	m_rambank[offset]->set_entry((data & 0x0f) ^ 0xf);
-
 	m_view[offset].select(BIT(data, 4));
 }
 
