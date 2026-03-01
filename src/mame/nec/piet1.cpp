@@ -19,6 +19,7 @@
 
 #include "cpu/z80/z80.h"
 #include "machine/ram.h"
+#include "machine/upd4991a.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -34,6 +35,7 @@ public:
 		, m_banks(*this, "bank%u", 0U)
 		, m_maincpu(*this, "maincpu")
 		, m_ram(*this, RAM_TAG)
+		, m_rtc(*this, "rtc")
 		, m_screen(*this, "screen")
 	{ }
 
@@ -46,6 +48,7 @@ private:
 	required_memory_bank_array<4> m_banks;
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<upd4991a_device> m_rtc;
 	required_device<screen_device> m_screen;
 
 	void bank_switch(u8 bank, u8 entry);
@@ -113,6 +116,8 @@ void piet1_state::piet1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &piet1_state::piet1_io_map);
 
 	RAM(config, RAM_TAG).set_default_size("32K").set_default_value(0x00);
+
+	UPD4991A(config, m_rtc, 32'768); // Frequency marked on PCB.
 
 	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
 	m_screen->set_refresh_hz(60);
