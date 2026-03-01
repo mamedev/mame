@@ -300,14 +300,10 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "v20hl")
 		, m_rtc(*this, "rtc")
-		, m_view0(*this, "view0")
-		, m_view1(*this, "view1")
-		, m_view2(*this, "view2")
-		, m_view3(*this, "view3")
-		, m_view4(*this, "view4")
-		, m_view5(*this, "view5")
-		, m_view6(*this, "view6")
-		, m_view7(*this, "view7")
+		, m_view{
+			{*this, "view_0"}, {*this, "view_1"}, {*this, "view_2"}, {*this, "view_3"},
+		    {*this, "view_4"}, {*this, "view_5"}, {*this, "view_6"}, {*this, "view_7"}
+	      }
 		, m_port_row(*this, "ROW%u", 0U)
 		, m_port_debug(*this, "debug")
 		, m_rombank(*this, "rombank%u", 0U)
@@ -348,14 +344,7 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
-	memory_view m_view0;
-	memory_view m_view1;
-	memory_view m_view2;
-	memory_view m_view3;
-	memory_view m_view4;
-	memory_view m_view5;
-	memory_view m_view6;
-	memory_view m_view7;
+	memory_view m_view[8];
 	required_ioport_array<10> m_port_row;
 	required_ioport m_port_debug;
 	memory_bank_array_creator<8> m_rombank;
@@ -373,30 +362,14 @@ private:
 
 void nakajies_state::nakajies_map(address_map &map)
 {
-	map(0x00000, 0x1ffff).view(m_view0);
-	m_view0[0](0x00000, 0x1ffff).bankr(m_rombank[0]);
-	m_view0[1](0x00000, 0x1ffff).bankrw(m_rambank[0]);
-	map(0x20000, 0x3ffff).view(m_view1);
-	m_view1[0](0x20000, 0x3ffff).bankr(m_rombank[1]);
-	m_view1[1](0x20000, 0x3ffff).bankrw(m_rambank[1]);
-	map(0x40000, 0x5ffff).view(m_view2);
-	m_view2[0](0x40000, 0x5ffff).bankr(m_rombank[2]);
-	m_view2[1](0x40000, 0x5ffff).bankrw(m_rambank[2]);
-	map(0x60000, 0x7ffff).view(m_view3);
-	m_view3[0](0x60000, 0x7ffff).bankr(m_rombank[3]);
-	m_view3[1](0x60000, 0x7ffff).bankrw(m_rambank[3]);
-	map(0x80000, 0x9ffff).view(m_view4);
-	m_view4[0](0x80000, 0x9ffff).bankr(m_rombank[4]);
-	m_view4[1](0x80000, 0x9ffff).bankrw(m_rambank[4]);
-	map(0xa0000, 0xbffff).view(m_view5);
-	m_view5[0](0xa0000, 0xbffff).bankr(m_rombank[5]);
-	m_view5[1](0xa0000, 0xbffff).bankrw(m_rambank[5]);
-	map(0xc0000, 0xdffff).view(m_view6);
-	m_view6[0](0xc0000, 0xdffff).bankr(m_rombank[6]);
-	m_view6[1](0xc0000, 0xdffff).bankrw(m_rambank[6]);
-	map(0xe0000, 0xfffff).view(m_view7);
-	m_view7[0](0xe0000, 0xfffff).bankr(m_rombank[7]);
-	m_view7[1](0xe0000, 0xfffff).bankrw(m_rambank[7]);
+	for (int i = 0; i < 8; i++)
+	{
+		const offs_t start = i * 0x20000;
+		const offs_t end = start + 0x1ffff;
+		map(start, end).view(m_view[i]);
+		m_view[i][0](start, end).bankr(m_rombank[i]);
+		m_view[i][1](start, end).bankrw(m_rambank[i]);
+	}
 }
 
 
@@ -476,17 +449,7 @@ void nakajies_state::banking_w(offs_t offset, u8 data)
 	m_rombank[offset]->set_entry((data & 0x0f) ^ 0xf);
 	m_rambank[offset]->set_entry((data & 0x0f) ^ 0xf);
 
-	switch (offset)
-	{
-	case 0: m_view0.select(BIT(data, 4)); break;
-	case 1: m_view1.select(BIT(data, 4)); break;
-	case 2: m_view2.select(BIT(data, 4)); break;
-	case 3: m_view3.select(BIT(data, 4)); break;
-	case 4: m_view4.select(BIT(data, 4)); break;
-	case 5: m_view5.select(BIT(data, 4)); break;
-	case 6: m_view6.select(BIT(data, 4)); break;
-	case 7: m_view7.select(BIT(data, 4)); break;
-	}
+	m_view[offset].select(BIT(data, 4));
 }
 
 
@@ -659,14 +622,11 @@ void nakajies_state::machine_reset()
 	m_lcd_memory_start = 0;
 	m_matrix = 0;
 
-	m_view0.select(0);
-	m_view1.select(0);
-	m_view2.select(0);
-	m_view3.select(0);
-	m_view4.select(0);
-	m_view5.select(0);
-	m_view6.select(0);
-	m_view7.select(0);
+	for (int i = 0; i < 8; i++)
+	{
+		m_view[i].select(0);
+	}
+
 	for (int i = 0; i < 8; i++)
 	{
 		m_rombank[i]->set_entry(0x0f);
