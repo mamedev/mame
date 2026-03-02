@@ -744,11 +744,22 @@ ROM_START( fstation )
 	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.ii", 0x00001, 0x80000, CRC(64138dcb) SHA1(1b629915cba32f8f6164ae5075c175b522b4a323) )
 ROM_END
 
+ROM_START(trumpfas)
+    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+    ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr1.u2", 0x00000, 0x20000, CRC(542b1517) SHA1(fcddb31b4b429c8d67161037d356861413567bb8))
+    ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr2.u6", 0x00001, 0x20000, CRC(d39bbd88) SHA1(64f47fd0076845ed3f9f3e84aca3504c110ad8ad))
+
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "trumpf_as_video_1.u2", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "trumpf_as_video_2.u6", 0x00001, 0x20000, NO_DUMP )
+ROM_END
+
 } // Anonymous namespace
 
 
 GAME( 1993, quickjac,  0,        quickjac, quickjac, adp_state, empty_init, ROT0, "ADP",     "Quick Jack",                        0 )
 GAME( 1994, skattv,    0,        skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat TV",                           0 )
+GAME( 1994, trumpfas,  skattv,   skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Trumpf As",             			  MACHINE_NOT_WORKING ) // throws FOUL error on startup
 GAME( 1995, skattva,   skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (version TS3)",             0 )
 GAME( 1997, fashiong,  0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 1)",           0 )
 GAME( 1997, fashiong2, fashiong, fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 2)",           0 )
