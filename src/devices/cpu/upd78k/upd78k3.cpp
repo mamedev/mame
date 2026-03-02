@@ -226,15 +226,17 @@ void upd78k3_device::state_string_export(const device_state_entry &entry, std::s
 	{
 	case STATE_GENFLAGS:
 		str = string_format("RB%d:%c%c%c%c%c%c%c%c",
-				(m_psw & 0x7000) >> 12,
+				(m_psw & 0x7000) >> 12,			//16 Bit Register
 				BIT(m_psw, 15) ? 'U' : '.',
 				BIT(m_psw, 7) ? 'S' : '.',
 				BIT(m_psw, 6) ? 'Z' : '.',
 				BIT(m_psw, 5) ? 'R' : '.',
 				BIT(m_psw, 4) ? 'A' : '.',
-				BIT(m_psw, 3) ? 'I' : '.',
-				BIT(m_psw, 2) ? 'V' : '.',
-				BIT(m_psw, 0) ? 'C' : '.');
+				BIT(m_psw, 3) ? 'I' : '.',		
+				BIT(m_psw, 2) ? 'P/V' : '.',	//Parity/overflow flag	(If you want I can get intimate with CPU detailing in comments, but only by request lol)//
+				BIT(m_psw, 1) ? 'SUB' : '.',	//Subtraction Flag//
+				BIT(m_psw, 0) ? 'CY' : '.');	//Carry Flag//
+		
 		break;
 
 	case UPD78K3_RP0:
