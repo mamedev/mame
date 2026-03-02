@@ -38804,7 +38804,7 @@ Doesn't accept any input on System Memory requirement screen
 
 	<!-- Misc Protos -->
 
-	<!-- Released by Limited Run / Scheming Villains in Bin+Cue format, built from the original source files. -->
+	<!-- Released by Josh Fairhurst / Scheming Villains in Bin+Cue format, built from the original source files. -->
 	<software name="prizefhe" supported="no">
 		<description>Prize Fighter: Heavyweight Edition (USA, prototype 19960325)</description>
 		<year>1996</year>
@@ -38825,7 +38825,7 @@ Game will freeze if you let the intro video play and press start. You can skip i
 		</part>
 	</software>
 
-	<!-- Released by Limited Run / Scheming Villains in Bin+Cue format, built from the original source files. -->
+	<!-- Released by Josh Fairhurst / Scheming Villains in Bin+Cue format, built from the original source files. -->
 	<software name="prizefhej" cloneof="prizefhe" supported="no">
 		<description>Prize Fighter: Heavyweight Edition (Japan, prototype 19960418)</description>
 		<year>1996</year>
