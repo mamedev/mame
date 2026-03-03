@@ -2,11 +2,9 @@
 // copyright-holders:Vas Crabb, Sergey Svishchev
 /***************************************************************************
 
-    GRiD Compass keyboard HLE, derived from generic_keyboard
+    GRiD Compass keyboard HLE
 
-    Keycodes from "6 - Interceptor, CCProm, Utils, OS - Sysgen/UTILS/DVLEXEC.PLM"
-
-    Multiple shift key combos not simulated yet.
+    Keycodes from "GRiD-OS Reference Appendix A - Key scan codes"
 
 ***************************************************************************/
 
@@ -18,47 +16,34 @@
 
 
 namespace {
-u16 const TRANSLATION_TABLE[][4][16] = {
-	{   // plain
-		{ '`',   '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   '-',   '=',   0x08U, 0x7fU, 0x1bU },
-		{ 0x09U, 'q',   'w',   'e',   'r',   't',   'y',   'u',   'i',   'o',   'p',   '[',   ']',   '\\',  0xffU, 0xffU },
-		{ 0xffU, 'a',   's',   'd',   'f',   'g',   'h',   'j',   'k',   'l',   ';',   '\'',  0x0dU, 0xc5U, 0xc4U, 0x0aU },
-		{ 0xffU, '\\',  'z',   'x',   'c',   'v',   'b',   'n',   'm',   ',',   '.',   '/',   0xffU, 0xc6U, 0xc7U, ' '   }
+// Regarding the document, the scan code for Escape when Code and Shift are pressed has been corrected.
+// All values in the table have been verified against the values from the keyboard firmware.
+u8 const TRANSLATION_TABLE[][4][16] = {
+	{   // Plain
+		{   '`',   '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   '-',   '=', 0x08U, 0x7fU, 0x1bU },
+		{ 0x09U,   'q',   'w',   'e',   'r',   't',   'y',   'u',   'i',   'o',   'p',   '[',   ']',  '\\', 0xffU, 0xffU },
+		{ 0xffU,   'a',   's',   'd',   'f',   'g',   'h',   'j',   'k',   'l',   ';',  '\'', 0x0dU, 0xc5U, 0xc4U, 0xffU },
+		{ 0xffU,  '\\',   'z',   'x',   'c',   'v',   'b',   'n',   'm',   ',',   '.',   '/', 0xffU, 0xc6U, 0xc7U,   ' ' },
 	},
 	{   // SHIFT
-		{ '~',   '!',   '@',   '#',   '$',   '%',   '^',   '&',   '*',   '(',   ')',   '_',   '+',   0x08U, 0x7fU, 0x1bU },
-		{ 0x09U, 'Q',   'W',   'E',   'R',   'T',   'Y',   'U',   'I',   'O',   'P',   '{',   '}',   '|',   0xffU, 0xffU },
-		{ 0xffU, 'A',   'S',   'D',   'F',   'G',   'H',   'J',   'K',   'L',   ':',   '"',   0x0dU, 0xffU, 0xffU, 0x0aU },
-		{ 0xffU, '_',   'Z',   'X',   'C',   'V',   'B',   'N',   'M',   '<',   '>',   '?',   0xffU, 0xffU, 0xffU, ' '   }
+		{   '~',   '!',   '@',   '#',   '$',   '%',   '^',   '&',   '*',   '(',   ')',   '_',   '+', 0xc8U, 0x7fU, 0x1bU },
+		{ 0xc9U,   'Q',   'W',   'E',   'R',   'T',   'Y',   'U',   'I',   'O',   'P',   '{',   '}',   '|', 0xffU, 0xffU },
+		{ 0xffU,   'A',   'S',   'D',   'F',   'G',   'H',   'J',   'K',   'L',   ':',   '"', 0xcdU, 0xcfU, 0xceU, 0xffU },
+		{ 0xffU,   '|',   'Z',   'X',   'C',   'V',   'B',   'N',   'M',   '<',   '>',   '?', 0xffU, 0xd0U, 0xd1U,   ' ' },
 	},
-	{   // CODE -- partial
-		{ 0xffU, '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   0xffU, 0xffU, 0x88U, 0xffU, 0x9bU },
-		{ 0x89U, 0xf1U, 0xf7U, 0xe5U, 0xf2U, 0xf4U, 0xf9U, 0xf5U, 0xe9U, 0xefU, 0xf0U, 0x9bU, 0xffU, 0xffU, 0xffU, 0xffU },
-		{ 0xffU, 0xe1U, 0xf3U, 0xe4U, 0xe6U, 0xe7U, 0xe8U, 0xeaU, 0xebU, 0xecU, ';',   '\'',  0x8dU, 0xffU, 0xffU, 0xffU },
-		{ 0xffU, 0x1cU, 0xfaU, 0xf8U, 0xe3U, 0xf6U, 0xe2U, 0xeeU, 0xedU, ',',   '.',   0xbfU, 0xffU, 0xd4U, 0xd5U, 0xffU }
+	{   // CODE
+		{   '`', 0xb1U, 0xb2U, 0xb3U, 0xb4U, 0xb5U, 0xb6U, 0xb7U, 0xb8U, 0xb9U, 0xb0U, 0xadU, 0xbdU, 0x88U, 0x7fU, 0x9bU },
+		{ 0x89U, 0xf1U, 0xf7U, 0xe5U, 0xf2U, 0xf4U, 0xf9U, 0xf5U, 0xe9U, 0xefU, 0xf0U,   '[',   ']',  '\\', 0xffU, 0xffU },
+		{ 0xffU, 0xe1U, 0xf3U, 0xe4U, 0xe6U, 0xe7U, 0xe8U, 0xeaU, 0xebU, 0xecU,   '~',   '`', 0x8dU, 0xd3U, 0xd2U, 0xffU },
+		{ 0xffU,  '\\', 0xfaU, 0xf8U, 0xe3U, 0xf6U, 0xe2U, 0xeeU, 0xedU,   '[',   ']', 0xbfU, 0xffU, 0xd4U, 0xd5U,   ' ' },
 	},
-	{   // CTRL
-		{ 0x00U, '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   0x1fU, 0x1eU, 0x88U, 0x7fU, 0x1bU },
-		{ 0x89U, 0x11U, 0x17U, 0x05U, 0x12U, 0x14U, 0x19U, 0x15U, 0x09U, 0x0fU, 0x10U, 0x9bU, 0x1dU, 0x1cU, 0xffU, 0xffU },
-		{ 0xffU, 0x01U, 0x13U, 0x04U, 0x06U, 0x07U, 0x08U, 0x0aU, 0x0bU, 0x0cU, ';',   '\'',  0x8dU, 0xffU, 0xffU, 0x0aU },
-		{ 0xffU, 0x1cU, 0x1aU, 0x18U, 0x03U, 0x16U, 0x02U, 0x0eU, 0x0dU, ',',   '.',   0xbfU, 0xffU, 0xffU, 0xffU, 0x00U }
-	},
-	{   // CODE-CTRL
-		{ 0x00U, 0x91U, 0x92U, 0x93U, 0x94U, 0x95U, 0x96U, 0x97U, 0x98U, 0x99U, 0x90U, 0xBDU, 0x9DU, 0x88U, 0x7fU, 0x9bU },
-		{ 0x89U, 0x91U, 0x97U, 0x85U, 0x92U, 0x94U, 0x99U, 0x95U, 0x89U, 0x8fU, 0x90U, 0xffU, 0xffU, 0xffU, 0xffU, 0xffU },
-		{ 0xffU, 0x81U, 0x93U, 0x84U, 0x86U, 0x87U, 0x88U, 0x8aU, 0x8bU, 0x8cU, 0x1EU, 0x00U, 0x8dU, 0xffU, 0xffU, 0x0aU },
-		{ 0xffU, 0x9cU, 0x9aU, 0x98U, 0x83U, 0x96U, 0x82U, 0x8eU, 0x8dU, 0x1bU, 0x1DU, 0xbfU, 0xffU, 0xffU, 0xffU, 0x00U }
+	{   // CODE + SHIFT
+		{   '~', 0xa1U, 0xc0U, 0xa3U, 0xa4U, 0xa5U, 0xdeU, 0xa6U, 0xaaU, 0xa8U, 0xa9U, 0x7fU, 0xabU, 0x8aU, 0x7fU, 0xfeU },
+		{ 0x8bU, 0xf1U, 0xf7U, 0xe5U, 0xf2U, 0xf4U, 0xf9U, 0xf5U, 0xe9U, 0xefU, 0xf0U,   '{',   '}',   '|', 0xffU, 0xffU },
+		{ 0xffU, 0xe1U, 0xf3U, 0xe4U, 0xe6U, 0xe7U, 0xe8U, 0xeaU, 0xebU, 0xecU,   '|',  '\\', 0x8cU, 0xd7U, 0xd6U, 0xffU },
+		{ 0xffU,   '|', 0xfaU, 0xf8U, 0xe3U, 0xf6U, 0xe2U, 0xeeU, 0xedU,   '{',   '}', 0xbfU, 0xffU, 0xd8U, 0xd9U,   ' ' },
 	},
 };
-
-
-bool const CAPS_TABLE[4][16] = {
-	{ false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false },
-	{ false, true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  false, false, false, false, false },
-	{ false, true,  true,  true,  true,  true,  true,  true,  true,  true,  false, false, false, false, false, false },
-	{ false, false, true,  true,  true,  true,  true,  true,  true,  false, false, false, false, false, false, false }
-};
-
 } // anonymous namespace
 
 
@@ -116,11 +101,11 @@ INPUT_PORTS_START( grid_keyboard )
 
 	PORT_START("GRIDKBD_ROW0")
 	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TILDE)                              PORT_CHAR('`')   PORT_CHAR('~')
-	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)                                 PORT_CHAR('1')   PORT_CHAR('!')
+	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1)                                  PORT_CHAR('1')   PORT_CHAR('!')
 	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2)                                  PORT_CHAR('2')   PORT_CHAR('@')
-	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)                                 PORT_CHAR('3')   PORT_CHAR('#')
-	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)                                 PORT_CHAR('4')   PORT_CHAR('$')
-	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5)                                 PORT_CHAR('5')   PORT_CHAR('%')
+	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3)                                  PORT_CHAR('3')   PORT_CHAR('#')
+	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4)                                  PORT_CHAR('4')   PORT_CHAR('$')
+	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5)                                  PORT_CHAR('5')   PORT_CHAR('%')
 	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6)                                  PORT_CHAR('6')   PORT_CHAR('^')
 	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7)                                  PORT_CHAR('7')   PORT_CHAR('&')
 	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8)                                  PORT_CHAR('8')   PORT_CHAR('*')
@@ -128,22 +113,22 @@ INPUT_PORTS_START( grid_keyboard )
 	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0)                                  PORT_CHAR('0')   PORT_CHAR(')')
 	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)                              PORT_CHAR('-')   PORT_CHAR('_')
 	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)                             PORT_CHAR('=')   PORT_CHAR('+')
-	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE)  PORT_NAME("Backspace") PORT_CHAR(0x08U)
-	PORT_BIT( 0x4000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL)        PORT_NAME("Del")       PORT_CHAR(UCHAR_MAMEKEY(DEL))
-	PORT_BIT( 0x8000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)        PORT_NAME("Escape")    PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSPACE)  PORT_NAME("Backspace")  PORT_CHAR(0x08U)
+	PORT_BIT( 0x4000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DEL)        PORT_NAME("Del")        PORT_CHAR(UCHAR_MAMEKEY(DEL))
+	PORT_BIT( 0x8000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ESC)        PORT_NAME("Escape")     PORT_CHAR(UCHAR_MAMEKEY(ESC))
 
 	PORT_START("GRIDKBD_ROW1")
-	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)                               PORT_CHAR('\t')
-	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)                                 PORT_CHAR('q')   PORT_CHAR('Q')
-	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)                                 PORT_CHAR('w')   PORT_CHAR('W')
-	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)                                 PORT_CHAR('e')   PORT_CHAR('E')
-	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)                                 PORT_CHAR('r')   PORT_CHAR('R')
-	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)                                 PORT_CHAR('t')   PORT_CHAR('T')
-	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)                                 PORT_CHAR('y')   PORT_CHAR('Y')
-	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)                                 PORT_CHAR('u')   PORT_CHAR('U')
-	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)                                 PORT_CHAR('i')   PORT_CHAR('I')
-	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)                                 PORT_CHAR('o')   PORT_CHAR('O')
-	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)                                 PORT_CHAR('p')   PORT_CHAR('P')
+	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB)                                PORT_CHAR('\t')
+	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q)                                  PORT_CHAR('q')   PORT_CHAR('Q')
+	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W)                                  PORT_CHAR('w')   PORT_CHAR('W')
+	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E)                                  PORT_CHAR('e')   PORT_CHAR('E')
+	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R)                                  PORT_CHAR('r')   PORT_CHAR('R')
+	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T)                                  PORT_CHAR('t')   PORT_CHAR('T')
+	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y)                                  PORT_CHAR('y')   PORT_CHAR('Y')
+	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U)                                  PORT_CHAR('u')   PORT_CHAR('U')
+	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I)                                  PORT_CHAR('i')   PORT_CHAR('I')
+	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)                                  PORT_CHAR('o')   PORT_CHAR('O')
+	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)                                  PORT_CHAR('p')   PORT_CHAR('P')
 	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)                          PORT_CHAR('[')   PORT_CHAR('{')
 	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)                         PORT_CHAR(']')   PORT_CHAR('}')
 	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)                          PORT_CHAR('\\')  PORT_CHAR('|')
@@ -152,21 +137,21 @@ INPUT_PORTS_START( grid_keyboard )
 
 	PORT_START("GRIDKBD_ROW2")
 	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_UNUSED   )
-	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)                                 PORT_CHAR('a')   PORT_CHAR('A')
-	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)                                 PORT_CHAR('s')   PORT_CHAR('S')
-	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)                                 PORT_CHAR('d')   PORT_CHAR('D')
-	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)                                 PORT_CHAR('f')   PORT_CHAR('F')
-	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)                                 PORT_CHAR('g')   PORT_CHAR('G')
-	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)                                 PORT_CHAR('h')   PORT_CHAR('H')
-	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)                                 PORT_CHAR('j')   PORT_CHAR('J')
-	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)                                 PORT_CHAR('k')   PORT_CHAR('K')
-	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)                                 PORT_CHAR('l')   PORT_CHAR('L')
-	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)                              PORT_CHAR(';')   PORT_CHAR(':')
-	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)                              PORT_CHAR('\'')  PORT_CHAR('"')
+	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)                                 PORT_CHAR('a')    PORT_CHAR('A')
+	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)                                 PORT_CHAR('s')    PORT_CHAR('S')
+	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)                                 PORT_CHAR('d')    PORT_CHAR('D')
+	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)                                 PORT_CHAR('f')    PORT_CHAR('F')
+	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)                                 PORT_CHAR('g')    PORT_CHAR('G')
+	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)                                 PORT_CHAR('h')    PORT_CHAR('H')
+	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)                                 PORT_CHAR('j')    PORT_CHAR('J')
+	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)                                 PORT_CHAR('k')    PORT_CHAR('K')
+	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)                                 PORT_CHAR('l')    PORT_CHAR('L')
+	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)                             PORT_CHAR(';')    PORT_CHAR(':')
+	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)                             PORT_CHAR('\'')   PORT_CHAR('"')
 	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER)      PORT_NAME("Return")    PORT_CHAR(0x0dU)
 	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP)         PORT_NAME("UpArrow")
 	PORT_BIT( 0x4000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN)       PORT_NAME("DownArrow")
-	PORT_BIT( 0x8000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT)     PORT_NAME("Linefeed")  PORT_CHAR(UCHAR_MAMEKEY(INSERT))
+	PORT_BIT( 0x8000U, IP_ACTIVE_HIGH, IPT_UNUSED   )
 
 	PORT_START("GRIDKBD_ROW3")
 	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_UNUSED   )
@@ -272,21 +257,22 @@ bool grid_keyboard_device::translate(u8 code, u16 &translated) const
 	unsigned const col((code >> 0) & 0x0fU);
 
 	u16 const modifiers(m_modifiers->read());
-	bool const shift(bool(modifiers & 0x02U) != (bool(modifiers & 0x04U) && CAPS_TABLE[row][col]));
+	bool const shift(bool(modifiers & 0x02) || bool(modifiers & 0x04));
 	bool const ctrl(modifiers & 0x01U);
 	bool const meta(modifiers & 0x08U);
 
-	unsigned const map(ctrl ? (meta ? 4U : 3U) : meta ? 2U : shift ? 1U : 0U);
-	u16 const result(TRANSLATION_TABLE[map][row][col]);
-	if (result == u8(~0U))
-	{
+	int const map((int)meta << 1 | (int)shift);
+
+	u8 const result(TRANSLATION_TABLE[map][row][col]);
+	if (result == 0xff)
 		return false;
-	}
+
+	if (ctrl && result >= 0x20)
+		translated = result - 0x20;
 	else
-	{
 		translated = result;
-		return true;
-	}
+
+	return true;
 }
 
 
