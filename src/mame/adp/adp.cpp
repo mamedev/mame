@@ -740,8 +740,8 @@ ROM_START( fstation7 )
     ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_ii.u6", 0x00001, 0x80000, CRC(cd8ab9e3) SHA1(cb9206d0367f00bec278cee0a4115594ba715fcd))
 
     ROM_REGION16_BE( 0x100000, "gfx1", 0)
-    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_i.u2", 0x00000, 0x80000, CRC(dcddb25a) SHA1(7c54bd7a368fd57e3eb995a26462b3d2d589b0db))
-    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_ii.u5", 0x00001, 0x80000, CRC(400f9b8f) SHA1(4c4a9f46016eee805653b5fae65680225ac71436))
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_video_f1_i.u2", 0x00000, 0x80000, CRC(dcddb25a) SHA1(7c54bd7a368fd57e3eb995a26462b3d2d589b0db))
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_video_f1_ii.u5", 0x00001, 0x80000, CRC(400f9b8f) SHA1(4c4a9f46016eee805653b5fae65680225ac71436))
 ROM_END
 
 ROM_START( fstation8 )
