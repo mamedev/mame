@@ -75,7 +75,7 @@ To Do:
     causes scrolling glitches in some games.  Test cases Mouse Go Go
     title screen, GunMaster title screen.  Changing it can cause
     excessive slowdown in said games however.
--   karatour, ladykill, 3kokushi: understand what the irq source 5 is really tied to.
+-   karatour, ladykill, 3kokushi: understand what the IRQ source 5 is really tied to.
     All these games also have a vblank delay check outside irq routine,
     cfr. PC=1322 in karatour;
 -   vmetal: ES8712 actually controls a M6585 and an unknown logic selector chip.
@@ -84,11 +84,11 @@ To Do:
 
 Notes:
 
--   To enter service mode in ladykill, 3kokushi: toggle the dip switch and reset
+-   To enter service mode in ladykill, 3kokushi: toggle the DIP switch and reset
     keeping start 2 pressed.
 -   Sprite zoom in Mouja at the end of a match looks wrong, but it's been verified
     to be the same on the original board
--   vmetal: has Sega and Taito logos in the roms ?!
+-   vmetal: has Sega and Taito logos in the ROMs?!
 
 driver modified by Hau
 ***************************************************************************/
@@ -96,11 +96,13 @@ driver modified by Hau
 #include "emu.h"
 #include "metro.h"
 
-#include "cpu/z80/z80.h"
+#include "mahjong.h"
+
+#include "cpu/h8/h83006.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/upd7810/upd7810.h"
-#include "cpu/h8/h83006.h"
 #include "cpu/z8/z8.h"
+#include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/msm5205.h"
 #include "sound/ymopl.h"
@@ -160,12 +162,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(metro_state::bangball_scanline)
 	int const scanline = param;
 
 	// vblank irq
-	if(scanline == 224)
+	if (scanline == 224)
 	{
 		m_vdp2->set_irq(4); // ???
 		m_vdp2->screen_eof(ASSERT_LINE);
 	}
-	else if(scanline < 224 && (m_vdp2->irq_enable() & 2) == 0)
+	else if (scanline < 224 && (m_vdp2->irq_enable() & 2) == 0)
 	{
 		// pretty likely hblank irq (pressing a button when clearing a stage)
 		m_vdp2->set_irq(1);
@@ -269,7 +271,7 @@ void metro_upd7810_state::soundstatus_w(u8 data)
 	m_soundstatus = data & 0x01;
 }
 
-template<int Mask>
+template <int Mask>
 void metro_upd7810_state::upd7810_rombank_w(u8 data)
 {
 	m_audiobank->set_entry((data >> 4) & Mask);
@@ -404,7 +406,7 @@ void metro_state::coin_lockout_1word_w(u8 data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
-	if (data & ~3)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
+	if (data & ~3) logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
 // value written doesn't matter, also each counted coin gets reported after one full second.
@@ -414,7 +416,7 @@ void metro_state::coin_lockout_4words_w(offs_t offset, u16 data)
 	machine().bookkeeping().coin_counter_w((offset >> 1) & 1, offset & 1);
 //  machine().bookkeeping().coin_lockout_w((offset >> 1) & 1, offset & 1);
 
-	if (data & ~1)  logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
+	if (data & ~1) logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n", m_maincpu->pc(), data);
 }
 
 /***************************************************************************
@@ -434,9 +436,9 @@ void metro_state::coin_lockout_4words_w(offs_t offset, u16 data)
 
 void metro_upd7810_state::upd7810_map(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();         // External ROM
-	map(0x4000, 0x7fff).bankr(m_audiobank);    // External ROM (Banked)
-	map(0x8000, 0x87ff).ram();         // External RAM
+	map(0x0000, 0x3fff).rom();              // External ROM
+	map(0x4000, 0x7fff).bankr(m_audiobank); // External ROM (Banked)
+	map(0x8000, 0x87ff).ram();              // External RAM
 }
 
 /*****************/
@@ -547,16 +549,16 @@ void metro_state::batlbubl_map(address_map &map)
 
 void metro_state::msgogo_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).rom();                                             // ROM
+	map(0x000000, 0x07ffff).rom();                                                 // ROM
 	map(0x100000, 0x17ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x200000, 0x200001).portr("COINS");                              // Inputs
-	map(0x200002, 0x200003).portr("JOYS");                               //
-	map(0x200006, 0x200007).nopr();                                         //
-	map(0x200002, 0x200009).w(FUNC(metro_state::coin_lockout_4words_w));              // Coin Lockout
-	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                             // 3 x DSW
-	map(0x400001, 0x400001).r("ymf", FUNC(ymf278b_device::read));   // Sound
+	map(0x200000, 0x200001).portr("COINS");                                        // Inputs
+	map(0x200002, 0x200003).portr("JOYS");                                         //
+	map(0x200006, 0x200007).nopr();                                                //
+	map(0x200002, 0x200009).w(FUNC(metro_state::coin_lockout_4words_w));           // Coin Lockout
+	map(0x300000, 0x31ffff).r(FUNC(metro_state::balcube_dsw_r));                   // 3 x DSW
+	map(0x400001, 0x400001).r("ymf", FUNC(ymf278b_device::read));                  // Sound
 	map(0x400000, 0x40000b).w("ymf", FUNC(ymf278b_device::write)).umask16(0x00ff); //
-	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
+	map(0xf00000, 0xf0ffff).ram().mirror(0x0f0000);                                // RAM (mirrored)
 }
 
 /***************************************************************************
@@ -565,16 +567,16 @@ void metro_state::msgogo_map(address_map &map)
 
 void metro_upd7810_state::daitorid_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                             // ROM
+	map(0x000000, 0x03ffff).rom();                                               // ROM
 	map(0x400000, 0x47ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x4788a9, 0x4788a9).w(FUNC(metro_upd7810_state::sound_data_w));                       // To Sound CPU
-	map(0x800000, 0x80ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
+	map(0x4788a9, 0x4788a9).w(FUNC(metro_upd7810_state::sound_data_w));          // To Sound CPU
+	map(0x800000, 0x80ffff).ram().mirror(0x0f0000);                              // RAM (mirrored)
 	map(0xc00000, 0xc00001).portr("IN0");
-	map(0xc00001, 0xc00001).w(FUNC(metro_upd7810_state::soundstatus_w));  // To Sound CPU
-	map(0xc00002, 0xc00003).portr("IN1");                                //
-	map(0xc00004, 0xc00005).portr("DSW0");                               //
-	map(0xc00006, 0xc00007).portr("IN2");                                //
-	map(0xc00002, 0xc00009).w(FUNC(metro_upd7810_state::coin_lockout_4words_w));              // Coin Lockout
+	map(0xc00001, 0xc00001).w(FUNC(metro_upd7810_state::soundstatus_w));         // To Sound CPU
+	map(0xc00002, 0xc00003).portr("IN1");                                        //
+	map(0xc00004, 0xc00005).portr("DSW0");                                       //
+	map(0xc00006, 0xc00007).portr("IN2");                                        //
+	map(0xc00002, 0xc00009).w(FUNC(metro_upd7810_state::coin_lockout_4words_w)); // Coin Lockout
 }
 
 
@@ -584,16 +586,16 @@ void metro_upd7810_state::daitorid_map(address_map &map)
 
 void metro_upd7810_state::dharma_map(address_map &map)
 {
-	map(0x000000, 0x03ffff).rom();                                             // ROM
-	map(0x400000, 0x40ffff).ram().mirror(0x0f0000);                         // RAM (mirrored)
+	map(0x000000, 0x03ffff).rom();                                               // ROM
+	map(0x400000, 0x40ffff).ram().mirror(0x0f0000);                              // RAM (mirrored)
 	map(0x800000, 0x87ffff).m(m_vdp2, FUNC(imagetek_i4220_device::v2_map));
-	map(0x8788a9, 0x8788a9).w(FUNC(metro_upd7810_state::sound_data_w));                       // To Sound CPU
+	map(0x8788a9, 0x8788a9).w(FUNC(metro_upd7810_state::sound_data_w));          // To Sound CPU
 	map(0xc00000, 0xc00001).portr("IN0");
-	map(0xc00001, 0xc00001).w(FUNC(metro_upd7810_state::soundstatus_w));  // To Sound CPU
-	map(0xc00002, 0xc00003).portr("IN1");                                //
-	map(0xc00004, 0xc00005).portr("DSW0");                               //
-	map(0xc00006, 0xc00007).portr("IN2");                                //
-	map(0xc00002, 0xc00009).w(FUNC(metro_upd7810_state::coin_lockout_4words_w));              // Coin Lockout
+	map(0xc00001, 0xc00001).w(FUNC(metro_upd7810_state::soundstatus_w));         // To Sound CPU
+	map(0xc00002, 0xc00003).portr("IN1");                                        //
+	map(0xc00004, 0xc00005).portr("DSW0");                                       //
+	map(0xc00006, 0xc00007).portr("IN2");                                        //
+	map(0xc00002, 0xc00009).w(FUNC(metro_upd7810_state::coin_lockout_4words_w)); // Coin Lockout
 }
 
 
@@ -702,14 +704,14 @@ void gakusai_state::oki_bank_lo_w(u8 data)
 u16 gakusai_state::input_r()
 {
 	u16 const input_sel = *m_input_sel;
-	u16 result = 0xffff;
+	u16 result = 0x003f;
 	// Bit 0 ??
 	if (!BIT(input_sel, 1)) result &= m_io_key[0]->read();
 	if (!BIT(input_sel, 2)) result &= m_io_key[1]->read();
 	if (!BIT(input_sel, 3)) result &= m_io_key[2]->read();
 	if (!BIT(input_sel, 4)) result &= m_io_key[3]->read();
 	if (!BIT(input_sel, 5)) result &= m_io_key[4]->read();
-	return result;
+	return (result << 1) | 0xff81;
 }
 
 u8 gakusai_state::gakusai_eeprom_r()
@@ -1063,7 +1065,7 @@ void vmetal_state::vmetal_control_w(u8 data)
 	/* Lower nibble is the coin control bits shown in
 	   service mode, but in game mode they're different */
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 2));
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));  // 2nd coin schute activates coin 0 counter in game mode??
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 3));  // 2nd coin chute activates coin 0 counter in game mode??
 //  machine().bookkeeping().coin_lockout_w(0, BIT(data, 0));  // always on in game mode??
 	machine().bookkeeping().coin_lockout_w(1, BIT(data, 1));  // never activated in game mode??
 
@@ -1934,10 +1936,10 @@ static INPUT_PORTS_START( lastfort )
 	COINS
 
 	PORT_START("IN1")   /*$c00006*/
-	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)      // BUTTON2 and BUTTON3 in "test mode" only*/
+	JOY_LSB(1, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)      // BUTTON2 and BUTTON3 in "test mode" only
 
 	PORT_START("IN2")   /*$c00008*/
-	JOY_LSB(2, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)      /*BUTTON2 and BUTTON3 in "test mode" only*/
+	JOY_LSB(2, BUTTON1, UNKNOWN, UNKNOWN, UNKNOWN)      // BUTTON2 and BUTTON3 in "test mode" only
 
 	PORT_START("DSW0")  /*$c0000a*/
 	COINAGE_SERVICE_LOC(SW1)
@@ -1994,56 +1996,13 @@ INPUT_PORTS_END
 
 
 /***************************************************************************
-                            Mahjong Doukyuusei
+                        Mahjong Gakuensai 1 & 2
 ***************************************************************************/
 
-static INPUT_PORTS_START( mj_panel )
-	PORT_START("KEY0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_A )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_E )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_I )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_M )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_START1  )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+// Same as dokyusei, without the DSWs (these games have an EEPROM)
 
-	PORT_START("KEY1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_B )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_F )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_J )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_N )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_C )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_G )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_K )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY3")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_D )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_MAHJONG_H )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_MAHJONG_L )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("KEY4")
-	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+static INPUT_PORTS_START( gakusai )
+	PORT_INCLUDE( mahjong_matrix_1p )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2057,8 +2016,15 @@ static INPUT_PORTS_START( mj_panel )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
+/***************************************************************************
+                            Mahjong Doukyuusei
+***************************************************************************/
+
+// Same as gakusai, with DSWs (these games have no EEPROM)
+
 static INPUT_PORTS_START( dokyusei )
-	PORT_INCLUDE( mj_panel )
+	PORT_INCLUDE( gakusai )
 
 	PORT_START("DSW0")  // $478884.w
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:1,2")
@@ -2108,19 +2074,6 @@ static INPUT_PORTS_START( dokyusei )
 	PORT_DIPNAME( 0x8000, 0x8000, "Unknown 2-8" )           PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
-/***************************************************************************
-                        Mahjong Gakuensai 1 & 2
-***************************************************************************/
-
-// Same as dokyusei, without the DSWs (these games have an eeprom)
-
-static INPUT_PORTS_START( gakusai )
-
-	PORT_INCLUDE( mj_panel )
-
 INPUT_PORTS_END
 
 
@@ -4717,7 +4670,7 @@ Video: Imagetek I4220 071 9430WK440
 
 SW3 - Not Populated
 
-ms_ja-1.1    tms27c240 <-- Is there an undumped MS_WA1 World rom??
+ms_ja-1.1    tms27c240 <-- Is there an undumped MS_WA1 World ROM??
 ms_wa-2.2    tms27c240
 ms_wa-3.3    tms27c240
 ms_wa-4.4    tms27c240
@@ -5487,43 +5440,48 @@ GAME( 1992, pangpomsn, pangpoms, pangpoms,  pangpoms,   metro_upd7810_state, emp
 GAME( 1992, skyalert,  0,        skyalert,  skyalert,   metro_upd7810_state, empty_init,    ROT270, "Metro",                                           "Sky Alert", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, ladykill,  0,        karatour,  ladykill,   metro_upd7810_state, init_karatour, ROT90,  "Yanyaka (Mitchell license)",                      "Lady Killer", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, moegonta,  ladykill, karatour,  moegonta,   metro_upd7810_state, init_karatour, ROT90,  "Yanyaka",                                         "Moeyo Gonta!! (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// Japanese subtitle in Japanese set, English otherwise; Kanji title is the same regardless region
 GAME( 1994, lastfort,  0,        lastfort,  lastfort,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Last Fortress - Toride (Japan, VG420 PCB)", MACHINE_SUPPORTS_SAVE ) // VG420 PCB
 GAME( 1994, lastforte, lastfort, lastfort,  lastfero,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev C)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, lastfortea,lastfort, lastfort,  lastfero,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Last Fortress - Toride (China, Rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, lastfortk, lastfort, lastfort,  lastfero,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Last Fortress - Toride (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, lastfortk, lastfort, lastfort,  lastfero,   metro_upd7810_state, empty_init,    ROT0,   "Metro (Grand Computer license)",                  "Last Fortress - Toride (Korea)", MACHINE_SUPPORTS_SAVE ) // distributor name is Korean (그랜드컴퓨터)
 GAME( 1994, lastfortj, lastfort, lastforg,  ladykill,   metro_upd7810_state, init_karatour, ROT0,   "Metro",                                           "Last Fortress - Toride (Japan, VG460 PCB)", MACHINE_SUPPORTS_SAVE ) // VG460-(A) PCB
-GAME( 1994, lastfortg, lastfort, lastforg,  ladykill,   metro_upd7810_state, init_karatour, ROT0,   "Metro",                                           "Last Fortress - Toride (Germany)", MACHINE_SUPPORTS_SAVE ) // VG460-(A) PCB
+// Germany set has Mah-Jong subtitle
+GAME( 1994, lastfortg, lastfort, lastforg,  ladykill,   metro_upd7810_state, init_karatour, ROT0,   "Metro",                                           "Last Fortress - Toride: Mah-jong (Germany)", MACHINE_SUPPORTS_SAVE ) // VG460-(A) PCB
 
 // MTR5260 / MTR527
-GAME( 1993, poitto,    0,        poitto,    poitto,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Able Corp.",                              "Poitto! (revision D)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, poitto,    0,        poitto,    poitto,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Able Corp.",                              "Poitto! (Japan revision D)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, poittoc,   poitto,   poitto,    poitto,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Able Corp.",                              "Poitto! (revision C)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // missing 1 program ROM
+// All set except Korean region has "DHARMA" subtitle
 GAME( 1994, dharma,    0,        dharma,    dharma,     metro_upd7810_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Doujou", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dharmag,   dharma,   dharma,    dharma,     metro_upd7810_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Germany)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dharmaj,   dharma,   dharma,    dharma,     metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Dharma Doujou (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, dharmak,   dharma,   dharma,    dharma,     metro_upd7810_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Doujou (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2g,  0,        toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1994, toride2gg, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dharmak,   dharma,   dharma,    dharma,     metro_upd7810_state, init_dharmak,  ROT0,   "Metro",                                           "Dharma Dojang - Mangchi Man (Korea)", MACHINE_SUPPORTS_SAVE ) // 다루마 도장: 망치맨
+// Toride II Adauchi Gaiden set: Same title screen regardless region
+GAME( 1994, toride2g,  0,        toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Adauchi Gaiden (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2gk, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II Bok Su Oi Jeon Adauchi Gaiden (Korea)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+// Toride II set (non - Adauchi Gaiden revision)
+GAME( 1994, toride2gg, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (German)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2j,  toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (Japan, revision K)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, toride2ji, toride2g, toride2g,  toride2g,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Toride II (Japan, revision I)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1994, gunmast,   0,        pururun,   gunmast,    metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Gun Master", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Daitoride", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, pururun,   0,        pururun,   pururun,    metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Pururun (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, pururuna,  pururun,  pururun,   pururun,    metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Pururun (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, puzzlia,   puzzli,   puzzlia,   puzzli,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Puzzli (revision A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, daitorid,  0,        daitorid,  daitorid,   metro_upd7810_state, empty_init,    ROT0,   "Metro",                                           "Daitoride (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pururun,   0,        pururun,   pururun,    metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Pururun (Japan set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, pururuna,  pururun,  pururun,   pururun,    metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Pururun (Japan set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, puzzli,    0,        puzzli,    puzzli,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Puzzli (Japan revision B)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, puzzlia,   puzzli,   puzzlia,   puzzli,     metro_upd7810_state, empty_init,    ROT0,   "Metro / Banpresto",                               "Puzzli (Japan revision A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1996, 3kokushi,  0,        sankokushi,sankokushi, metro_upd7810_state, init_karatour, ROT0,   "Mitchell",                                        "Sankokushi (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 // ? with additional gfx data scramble (probably MTR5260 based)
-GAME( 1995, msgogo,    0,        msgogo,    msgogo,     metro_state,         init_balcube,  ROT0,   "Metro",                                           "Mouse Shooter GoGo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, daitorida, daitorid, daitoa,    daitoa,     metro_state,         init_balcube,  ROT0,   "Metro",                                           "Daitoride (YMF278B version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, balcube,   0,        balcube,   balcube,    metro_state,         init_balcube,  ROT0,   "Metro",                                           "Bal Cube", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, bangball,  0,        bangball,  bangball,   metro_state,         init_balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse",          "Bang Bang Ball (v1.05)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, msgogo,    0,        msgogo,    msgogo,     metro_state,         init_balcube,  ROT0,   "Metro",                                           "Mouse Shooter GoGo", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // Either English or Japanese
+GAME( 1996, daitorida, daitorid, daitoa,    daitoa,     metro_state,         init_balcube,  ROT0,   "Metro",                                           "Daitoride (Japan, YMF278B version)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, balcube,   0,        balcube,   balcube,    metro_state,         init_balcube,  ROT0,   "Metro",                                           "Bal Cube (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, bangball,  0,        bangball,  bangball,   metro_state,         init_balcube,  ROT0,   "Banpresto / Kunihiko Tashiro+Goodhouse",          "Bang Bang Ball (v1.05)", MACHINE_SUPPORTS_SAVE ) // Either English or Japanese
 GAME( 1999, batlbubl,  bangball, batlbubl,  batlbubl,   metro_state,         init_balcube,  ROT0,   "Banpresto (Limenko license?)",                    "Battle Bubble (v2.00)", MACHINE_SUPPORTS_SAVE ) // or bootleg?
 
 // VG330 / VG340 / VG410
-GAME( 1995, dokyusei,  0,        dokyusei,  dokyusei,   gakusai_state,       empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, dokyusp,   0,        dokyusp,   gakusai,    gakusai_state,       empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei Special", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dokyusei,  0,        dokyusei,  dokyusei,   gakusai_state,       empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, dokyusp,   0,        dokyusp,   gakusai,    gakusai_state,       empty_init,    ROT0,   "Make Software / Elf / Media Trading",             "Mahjong Doukyuusei Special (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1996, mouja,     0,        mouja,     mouja,      mouja_state,         empty_init,    ROT0,   "Etona",                                           "Mouja (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, gakusai,   0,        gakusai,   gakusai,    gakusai_state,       empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, gakusaia,  gakusai,  gakusai,   gakusai,    gakusai_state,       empty_init,    ROT0,   "MakeSoft",                                        "Mahjong Gakuensai (Japan, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

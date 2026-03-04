@@ -147,8 +147,8 @@ public:
 		m_fdc(*this, "fdc"),
 		m_hid(*this, "hid"),
 		m_dmac(*this, "dmac"),
-		m_scsi0(*this, "scsi0:7:spifi3"),
-		m_scsi1(*this, "scsi1:7:spifi3"),
+		m_scsi0(*this, "spifi3_0"),
+		m_scsi1(*this, "spifi3_1"),
 		m_scsibus0(*this, "scsi0"),
 		m_scsibus1(*this, "scsi1"),
 		m_dip_switch(*this, "FRONT_PANEL"),
@@ -497,24 +497,15 @@ void news_r4k_state::machine_common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:6", news_scsi_devices, nullptr);
 
 	// TODO: Actual SPIFI3 clock frequency
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spifi3", SPIFI3)
-		.clock(16'000'000)
-		.machine_config(
-			[this](device_t *device)
-			{
-				spifi3_device &adapter = dynamic_cast<spifi3_device &>(*device);
-				adapter.irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL0>));
-				adapter.drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL0>));
-			});
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("spifi3", SPIFI3)
-		.clock(16'000'000)
-		.machine_config(
-			[this](device_t *device)
-			{
-				spifi3_device &adapter = dynamic_cast<spifi3_device &>(*device);
-				adapter.irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL1>));
-				adapter.drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL1>));
-			});
+	SPIFI3(config, m_scsi0, 16'000'000);
+	m_scsibus0->set_external_device(7, m_scsi0);
+	m_scsi0->irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL0>));
+	m_scsi0->drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL0>));
+
+	SPIFI3(config, m_scsi1, 16'000'000);
+	m_scsibus1->set_external_device(7, m_scsi1);
+	m_scsi1->irq_handler_cb().set(m_dmac, FUNC(dmac3_device::irq_w<dmac3_device::CTRL1>));
+	m_scsi1->drq_handler_cb().set(m_dmac, FUNC(dmac3_device::drq_w<dmac3_device::CTRL1>));
 
 	m_dmac->dma_r_cb<dmac3_device::CTRL0>().set(m_scsi0, FUNC(spifi3_device::dma_r));
 	m_dmac->dma_w_cb<dmac3_device::CTRL0>().set(m_scsi0, FUNC(spifi3_device::dma_w));

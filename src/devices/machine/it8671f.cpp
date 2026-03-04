@@ -8,12 +8,14 @@ ITE IT8673F Advanced I/O
 ITE IT8680F Super AT I/O Chipset (& IT8680RF)
 
 TODO:
+- Move common parts to ISA bus, cfr. ISA PnP spec 1.0a;
+- ISA PnP mode;
+\- Has ACPI resource collision(s) with the AGP card(s) in win98se, related to the missing ROM
+   resource readback?
 - Emulate the other flavours here (probably more of them with some digging);
 - IT8687R looks to be a transceiver chip, tied with 8671 and 8680;
 - GPIO;
-- Keyboard A20 doesn't work right (most likely needs own BIOS);
-- SMI source;
-- ISA PnP mode;
+- ite8671: SMI source;
 
 **************************************************************************************************/
 
@@ -26,14 +28,19 @@ TODO:
 
 #include <algorithm>
 
+#define LOG_LOCK   (1U << 1) // log PnP lock/unlock phases
+
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
+
 #include "logmacro.h"
+
+#define LOGLOCK(...)   LOGMASKED(LOG_LOCK, __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(IT8661F, it8661f_device, "it8661f", "ITE IT8661F PnP Super AT I/O")
 DEFINE_DEVICE_TYPE(IT8671F, it8671f_device, "it8671f", "ITE IT8671F Giga I/O")
 
-it8661f_device::it8661f_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+it8661f_device::it8661f_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_isa16_card_interface(mconfig, *this)
 	, device_memory_interface(mconfig, *this)
@@ -57,7 +64,7 @@ it8661f_device::it8661f_device(const machine_config &mconfig, device_type type, 
 	std::fill(std::begin(m_activate), std::end(m_activate), false);
 }
 
-it8661f_device::it8661f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+it8661f_device::it8661f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: it8661f_device(mconfig, IT8661F, tag, owner, clock)
 {
 	m_space_config = address_space_config("superio_config_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(it8661f_device::config_map), this));
@@ -77,10 +84,13 @@ ALLOW_SAVE_TYPE(it8661f_device::config_phase_t);
 void it8661f_device::device_start()
 {
 	set_isa_device();
+	m_last_dma_line = -1;
+
 	m_isa->set_dma_channel(0, this, true);
 	m_isa->set_dma_channel(1, this, true);
 	m_isa->set_dma_channel(2, this, true);
 	m_isa->set_dma_channel(3, this, true);
+
 	save_item(NAME(m_activate));
 	save_item(NAME(m_port_select_index));
 	save_item(NAME(m_port_select_data));
@@ -88,6 +98,16 @@ void it8661f_device::device_start()
 	save_item(NAME(m_port_config));
 	save_item(NAME(m_lock_port_index));
 	save_item(NAME(m_lock_sequence_index));
+	save_item(NAME(m_mc));
+	save_item(NAME(m_pnp_ldn));
+	save_item(NAME(m_input_clock_select));
+
+	save_item(NAME(m_iorange));
+
+	save_item(NAME(m_fdc_address));
+	save_item(NAME(m_lpt_address));
+	save_item(NAME(m_com_address));
+	save_item(NAME(m_gpio_address));
 
 	save_item(NAME(m_fdc_irq_line));
 	save_item(NAME(m_fdc_drq_line));
@@ -105,6 +125,7 @@ void it8661f_device::device_reset()
 	m_port_select_index = 0x3f0;
 	m_port_select_data = 0x3f1;
 	std::fill(std::begin(m_activate), std::end(m_activate), false);
+	std::fill(std::begin(m_iorange), std::end(m_iorange), 0);
 
 	m_fdc_irq_line = 6;
 	m_fdc_drq_line = 2;
@@ -123,7 +144,7 @@ void it8661f_device::device_reset()
 
 	m_last_dma_line = -1;
 
-	remap(AS_IO, 0, 0x400);
+	remap(AS_IO, 0, 0xfff);
 }
 
 device_memory_interface::space_config_vector it8661f_device::memory_space_config() const
@@ -179,22 +200,22 @@ void it8661f_device::remap(int space_id, offs_t start, offs_t end)
 	if (space_id == AS_IO)
 	{
 		if (m_config_phase == config_phase_t::WAIT_FOR_KEY)
-			m_isa->install_device(0x0000, 0x03ff, *this, &it8661f_device::port_map);
+			m_isa->install_device(0x0000, 0x0fff, *this, &it8661f_device::port_map);
 		else
 		{
 			m_isa->install_device(m_port_select_index, m_port_select_data, read8sm_delegate(*this, FUNC(it8661f_device::read)), write8sm_delegate(*this, FUNC(it8661f_device::write)));
 		}
 
-		if (m_activate[0])
+		if (m_activate[0] && m_fdc_address & 0xf00)
 		{
 			m_isa->install_device(m_fdc_address, m_fdc_address + 7, *m_fdc, &n82077aa_device::map);
 		}
 
 		for (int i = 0; i < 2; i++)
 		{
-			if (m_activate[i + 1])
+			const u16 uart_addr = m_com_address[i];
+			if (m_activate[i + 1] && uart_addr & 0xf00)
 			{
-				const u16 uart_addr = m_com_address[i];
 				m_isa->install_device(uart_addr, uart_addr + 7, read8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_r)), write8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_w)));
 			}
 		}
@@ -202,23 +223,36 @@ void it8661f_device::remap(int space_id, offs_t start, offs_t end)
 		// can't map below 0x100
 		if (m_activate[3] & 1 && m_lpt_address & 0xf00)
 		{
-			m_isa->install_device(m_lpt_address, m_lpt_address + 3, read8sm_delegate(*m_lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(*m_lpt, FUNC(pc_lpt_device::write)));
+			m_isa->install_device(m_lpt_address, m_lpt_address + 3, *m_lpt, &pc_lpt_device::isa_map);
 		}
+
+		// TODO: GPIO (with a variable configuration ID because IT8671F moves around)
 	}
 }
 
 // Goofy, but it's the only way that we can install a byte-wide write only I/O handler in ISA bus
+// TODO: this really needs to be moved as ISA PnP
 void it8661f_device::port_map(address_map &map)
 {
-	map(0x0279, 0x0279).w(FUNC(it8661f_device::port_select_w));
+	map(0x0279, 0x0279).w(FUNC(it8661f_device::pnp_address_w));
+	map(0x0a79, 0x0a79).w(FUNC(it8661f_device::pnp_write_data_w));
 }
 
-void it8661f_device::port_select_w(offs_t offset, uint8_t data)
+// TODO: implement extra LFSR writes for ISA PnP mode
+void it8661f_device::pnp_address_w(offs_t offset, u8 data)
 {
 	if (m_config_phase == config_phase_t::WAIT_FOR_KEY)
 	{
 		m_port_config[m_lock_port_index++] = data;
-		// TODO: simplified, may really discard oldest result
+
+		if (m_lock_port_index == 1 && m_port_config[0] != m_unlock_byte_seq[0])
+		{
+			// avoid a drift when selecting
+			LOGLOCK("Invalid first lock sequence %02x\n", data);
+			m_lock_port_index = 0;
+			return;
+		}
+
 		if (m_lock_port_index == 4)
 		{
 			bool valid = false;
@@ -243,27 +277,32 @@ void it8661f_device::port_select_w(offs_t offset, uint8_t data)
 				default:
 					// invalid, reset lock sequence
 					valid = false;
-					LOG("Invalid lock port sequence 2-3 %02x %02x\n", m_port_config[2], m_port_config[3]);
+					LOGLOCK("Invalid lock port sequence 2-3 %02x %02x\n", m_port_config[2], m_port_config[3]);
 					break;
 			}
 			if (m_port_config[0] != m_unlock_byte_seq[0] || m_port_config[1] != m_unlock_byte_seq[1])
 			{
-				LOG("Invalid lock port sequence 0-1 %02x %02x\n", m_port_config[0], m_port_config[1]);
+				LOGLOCK("Invalid lock port sequence 0-1 %02x %02x\n", m_port_config[0], m_port_config[1]);
 				valid = false;
 			}
 			m_lock_port_index = 0;
 			if (valid)
 			{
-				LOG("Unlock PnP phase at %04x %04x\n", m_port_select_index, m_port_select_data);
+				LOGLOCK("Unlock PnP phase at %04x %04x\n", m_port_select_index, m_port_select_data);
 				m_config_phase = config_phase_t::UNLOCK_PNP;
-				remap(AS_IO, 0, 0x400);
+				remap(AS_IO, 0, 0xfff);
 				m_lock_sequence_index = 0;
 			}
 		}
 	}
 }
 
-uint8_t it8661f_device::read(offs_t offset)
+void it8661f_device::pnp_write_data_w(offs_t offset, u8 data)
+{
+	LOG("$a79 PnP WRITE_DATA: %02x\n", data);
+}
+
+u8 it8661f_device::read(offs_t offset)
 {
 	if (!machine().side_effects_disabled() && m_config_phase != config_phase_t::MB_PNP_MODE)
 	{
@@ -287,6 +326,7 @@ void it8661f_device::write(offs_t offset, u8 data)
 			m_unlock_sequence[m_lock_sequence_index] = data;
 			m_lock_sequence_index++;
 
+			// TODO: convert to LFSR, resets with Wake[CSN]
 			if (m_lock_sequence_index == 32)
 			{
 				m_lock_sequence_index = 0;
@@ -305,9 +345,9 @@ void it8661f_device::write(offs_t offset, u8 data)
 				}
 				if (valid)
 				{
-					LOG("Unlock MB PnP phase\n");
+					LOGLOCK("Unlock MB PnP phase\n");
 					m_config_phase = config_phase_t::MB_PNP_MODE;
-					remap(AS_IO, 0, 0x400);
+					remap(AS_IO, 0, 0xfff);
 				}
 			}
 		}
@@ -328,31 +368,103 @@ void it8661f_device::write(offs_t offset, u8 data)
 
 void it8661f_device::config_map(address_map &map)
 {
-//  map(0x00, 0x00) (ISA PnP) set RD_DATA Port
-//  map(0x01, 0x01) (ISA PnP) Serial isolation
+	// (ISA PnP) set RD_DATA Port
+	map(0x00, 0x00).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("ISA PnP: set RD_DATA Port %02x (%04x)\n", data, (data << 2) | 3);
+		})
+	);
+	// (ISA PnP) Serial isolation
+	map(0x01, 0x01).lr8(
+		NAME([this] (offs_t offset) {
+			if (!machine().side_effects_disabled())
+				LOG("ISA PnP: Serial Isolation read");
+			return 0;
+		})
+	);
+	// Configure Control
 	map(0x02, 0x02).lw8(
 		NAME([this] (offs_t offset, u8 data) {
+			if (BIT(data, 2))
+				LOG("Configure Control: Reset CSN to 0\n");
+
 			if (BIT(data, 1))
 			{
 				// TODO: throws several phase drifts with the theoretically more correct WAIT_FOR_KEY
 				// Notice however that doing so it will BSoD in comebaby, missing setting?
-				m_config_phase = config_phase_t::UNLOCK_PNP;
-				remap(AS_IO, 0, 0x400);
-				LOG("Exit setup mode\n");
+				m_config_phase = config_phase_t::WAIT_FOR_KEY;
+				remap(AS_IO, 0, 0xfff);
+				LOGLOCK("Exit setup mode\n");
 			}
-			// TODO: bit 0 for global reset
+			if (BIT(data, 0))
+				LOG("Configure Control: Reset logical devices issued\n");
 		})
 	);
-//  map(0x03, 0x03) (ISA PnP) Wake[CSN]
-//  map(0x04, 0x04) (ISA PnP) Resource Data
-//  map(0x05, 0x05) (ISA PnP) Status
-//  map(0x06, 0x06) (ISA PnP) Card Select Number
+	// (ISA PnP) Wake[CSN]
+	map(0x03, 0x03).lw8(NAME([this] (offs_t offset, u8 data){
+		LOG("ISA PnP: Wake[CSN] %02x\n", data);
+	}));
+	// (ISA PnP) Resource Data
+	map(0x04, 0x04).lr8(NAME([this] () {
+		if (!machine().side_effects_disabled())
+			LOG("ISA PnP: Resource Data read\n");
+		return 0;
+	}));
+	// (ISA PnP) Status
+	map(0x05, 0x05).lr8(NAME([this] (offs_t offset) {
+		if (!machine().side_effects_disabled())
+			LOG("ISA PnP: Status read\n");
+		return 0;
+	}));
+	// (ISA PnP) Card Select Number
+	map(0x06, 0x06).lrw8(
+		NAME([this] () {
+			if (!machine().side_effects_disabled())
+				LOG("ISA PnP: Card Select number read\n");
+			return 2;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("(ISA PnP) Card Select Number %02x\n", data);
+		})
+	);
 	map(0x07, 0x07).lr8(NAME([this] () { return m_logical_index; })).w(FUNC(it8661f_device::logical_device_select_w));
 	map(0x20, 0x20).lr8(NAME([] () { return 0x86; })); // chip ID byte 1
 	map(0x21, 0x21).lr8(NAME([this] () { return m_chip_id_2; })); // chip ID byte 2
-	map(0x22, 0x22).lr8(NAME([] () { return 0x00; })); // version
-//  map(0x23, 0x23) (MB PnP) Logical Device Enable
-//  map(0x24, 0x24) (MB PnP) Software Suspend
+	// version + multichip identification
+	map(0x22, 0x22).lrw8(
+		NAME([this] () {
+			// TODO: bit 0 reads 1 in RF variant(s)
+			return 0x00 | m_mc;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_mc = data & 0x30;
+			LOG("Multichip identification %02x\n", data);
+		})
+	);
+	// (MB PnP) Logical Device Enable
+	map(0x23, 0x23).lrw8(
+		NAME([this] () {
+			return m_pnp_ldn;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_pnp_ldn = data;
+			LOG("(MB PnP) Logical Device Enable %02x\n", data);
+		})
+	);
+	// (MB PnP) Software Suspend
+	map(0x24, 0x24).lrw8(
+		NAME([this] () {
+			return m_input_clock_select << 1;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_input_clock_select = !!BIT(data, 1);
+			LOG("(MB PnP) Software Suspend %02x -> Input Clock Select %s Suspend %d\n"
+				, data
+				, BIT(data, 1) ? "48 MHz" : "24 MHz"
+				, BIT(data, 0)
+			);
+		})
+	);
 //  map(0x25, 0x26) (MB PnP) GPIO Function Enable
 //  map(0x2e, 0x2e) (MB PnP) <reserved>
 //  map(0x2f, 0x2f) (MB PnP) LDN=F4 Test Enable
@@ -360,18 +472,22 @@ void it8661f_device::config_map(address_map &map)
 	map(0x30, 0xff).view(m_logical_view);
 	// FDC
 	m_logical_view[0](0x30, 0x30).rw(FUNC(it8661f_device::activate_r<0>), FUNC(it8661f_device::activate_w<0>));
+	m_logical_view[0](0x31, 0x31).rw(FUNC(it8661f_device::iorange_check_r<0>), FUNC(it8661f_device::iorange_check_w<0>));
 	m_logical_view[0](0x60, 0x61).lrw8(
 		NAME([this] (offs_t offset) {
-			return (m_fdc_address >> (offset * 8)) & 0xff;
+			if (offset)
+				return m_fdc_address & 0xf8;
+
+			return (m_fdc_address >> 8) & 0xf;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			const u8 shift = offset * 8;
 			m_fdc_address &= 0xff << shift;
 			m_fdc_address |= data << (shift ^ 8);
-			m_fdc_address &= ~0xf007;
+			m_fdc_address &= 0x0ff8;
 			LOG("LDN0 (FDC): remap %04x ([%d] %02x)\n", m_fdc_address, offset, data);
 
-			remap(AS_IO, 0, 0x400);
+			remap(AS_IO, 0, 0xfff);
 		})
 	);
 	m_logical_view[0](0x70, 0x70).lrw8(
@@ -383,6 +499,7 @@ void it8661f_device::config_map(address_map &map)
 			LOG("LDN0 (FDC): irq routed to %02x\n", m_fdc_irq_line);
 		})
 	);
+	m_logical_view[0](0x71, 0x71).lr8(NAME([] () { return 2; }));
 	m_logical_view[0](0x74, 0x74).lrw8(
 		NAME([this] () {
 			return m_fdc_drq_line;
@@ -417,34 +534,41 @@ void it8661f_device::config_map(address_map &map)
 
 	// UART1
 	m_logical_view[1](0x30, 0x30).rw(FUNC(it8661f_device::activate_r<1>), FUNC(it8661f_device::activate_w<1>));
+	m_logical_view[1](0x31, 0x31).rw(FUNC(it8661f_device::iorange_check_r<1>), FUNC(it8661f_device::iorange_check_w<1>));
 	m_logical_view[1](0x60, 0x61).rw(FUNC(it8661f_device::uart_address_r<0>), FUNC(it8661f_device::uart_address_w<0>));
 	m_logical_view[1](0x70, 0x70).rw(FUNC(it8661f_device::uart_irq_r<0>), FUNC(it8661f_device::uart_irq_w<0>));
+	m_logical_view[1](0x71, 0x71).lr8(NAME([] () { return 2; }));
 	m_logical_view[1](0xf0, 0xf0).rw(FUNC(it8661f_device::uart_config_r<0>), FUNC(it8661f_device::uart_config_w<0>));
 
 	// UART2
 	m_logical_view[2](0x30, 0x30).rw(FUNC(it8661f_device::activate_r<2>), FUNC(it8661f_device::activate_w<2>));
+	m_logical_view[2](0x31, 0x31).rw(FUNC(it8661f_device::iorange_check_r<2>), FUNC(it8661f_device::iorange_check_w<2>));
 	m_logical_view[2](0x60, 0x61).rw(FUNC(it8661f_device::uart_address_r<1>), FUNC(it8661f_device::uart_address_w<1>));
 	m_logical_view[2](0x70, 0x70).rw(FUNC(it8661f_device::uart_irq_r<1>), FUNC(it8661f_device::uart_irq_w<1>));
+	m_logical_view[2](0x71, 0x71).lr8(NAME([] () { return 2; }));
 	m_logical_view[2](0xf0, 0xf0).rw(FUNC(it8661f_device::uart_config_r<1>), FUNC(it8661f_device::uart_config_w<1>));
 
 	// LPT
 	m_logical_view[3](0x30, 0x30).rw(FUNC(it8661f_device::activate_r<3>), FUNC(it8661f_device::activate_w<3>));
+	m_logical_view[3](0x31, 0x31).rw(FUNC(it8661f_device::iorange_check_r<3>), FUNC(it8661f_device::iorange_check_w<3>));
 	m_logical_view[3](0x60, 0x61).lrw8(
 		NAME([this] (offs_t offset) {
-			return (m_lpt_address >> (offset * 8)) & 0xff;
+			if (offset)
+				return m_lpt_address & 0xfc;
+
+			return (m_lpt_address >> 8) & 0xf;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			const u8 shift = offset * 8;
 			m_lpt_address &= 0xff << shift;
 			m_lpt_address |= data << (shift ^ 8);
-			m_lpt_address &= ~0xf003;
+			m_lpt_address &= 0x0ffc;
 			LOG("LDN3 (LPT): remap %04x ([%d] %02x)\n", m_lpt_address, offset, data);
 
-			remap(AS_IO, 0, 0x400);
+			remap(AS_IO, 0, 0xfff);
 		})
 	);
 	//m_logical_view[3](0x62, 0x63) secondary base address
-	//m_logical_view[3](0x64, 0x65) POST data port base address
 	m_logical_view[3](0x70, 0x70).lrw8(
 		NAME([this] () {
 			return m_lpt_irq_line;
@@ -454,6 +578,7 @@ void it8661f_device::config_map(address_map &map)
 			LOG("LDN3 (LPT): irq routed to %02x\n", m_lpt_irq_line);
 		})
 	);
+	m_logical_view[3](0x71, 0x71).lr8(NAME([] () { return 2; }));
 	m_logical_view[3](0x74, 0x74).lrw8(
 		NAME([this] () {
 			return m_lpt_drq_line;
@@ -467,11 +592,15 @@ void it8661f_device::config_map(address_map &map)
 
 	// IR Configuration
 	m_logical_view[4](0x30, 0x30).rw(FUNC(it8661f_device::activate_r<4>), FUNC(it8661f_device::activate_w<4>));
-	m_logical_view[4](0x31, 0xff).unmaprw();
+	m_logical_view[4](0x31, 0x31).rw(FUNC(it8661f_device::iorange_check_r<4>), FUNC(it8661f_device::iorange_check_w<4>));
+	m_logical_view[4](0x32, 0xff).unmaprw();
 
 	// GPIO & Alternate Function
 	m_logical_view[5](0x30, 0x30).rw(FUNC(it8661f_device::activate_r<5>), FUNC(it8661f_device::activate_w<5>));
-	m_logical_view[5](0x31, 0xff).unmaprw();
+	// No I/O Range check
+	m_logical_view[5](0x31, 0x5f).unmaprw();
+	m_logical_view[5](0x60, 0x67).rw(FUNC(it8661f_device::gpio_address_r), FUNC(it8661f_device::gpio_address_w<5>));
+	m_logical_view[5](0x68, 0xff).unmaprw();
 }
 
 /*
@@ -496,7 +625,28 @@ template <unsigned N> void it8661f_device::activate_w(offs_t offset, u8 data)
 {
 	m_activate[N] = data & 1;
 	LOG("LDN%d Device %s\n", N, data & 1 ? "enabled" : "disabled");
-	remap(AS_IO, 0, 0x400);
+	remap(AS_IO, 0, 0xfff);
+}
+
+template <unsigned N> u8 it8661f_device::iorange_check_r(offs_t offset)
+{
+	return m_iorange[N];
+}
+
+template <unsigned N> void it8661f_device::iorange_check_w(offs_t offset, u8 data)
+{
+	m_iorange[N] = data & 3;
+	if (m_activate[N])
+		LOG("LDN%d I/O Range check %02x while enabled!\n", N, data);
+	else
+	{
+		LOG("LDN%d I/O Range check %02x -> %s seq %02x\n"
+			, N
+			, BIT(data, 1)
+			, BIT(data, 0) ? 0x55 : 0xaa
+		);
+		//	remap(AS_IO, 0, 0xfff);
+	}
 }
 
 void it8661f_device::request_irq(int irq, int state)
@@ -565,7 +715,7 @@ void it8661f_device::request_dma(int dreq, int state)
 }
 
 /*
- * Device #0 (FDC)
+ * LDN0 (FDC)
  */
 
 void it8661f_device::irq_floppy_w(int state)
@@ -583,12 +733,15 @@ void it8661f_device::drq_floppy_w(int state)
 }
 
 /*
- * Device #1/#2 (UART)
+ * LDN1/LDN2 (UART)
  */
 
 template <unsigned N> u8 it8661f_device::uart_address_r(offs_t offset)
 {
-	return (m_com_address[N] >> (offset * 8)) & 0xff;
+	if (offset)
+		return m_com_address[N] & 0xf8;
+
+	return (m_com_address[N] >> 8) & 0xf;
 }
 
 template <unsigned N> void it8661f_device::uart_address_w(offs_t offset, u8 data)
@@ -596,10 +749,10 @@ template <unsigned N> void it8661f_device::uart_address_w(offs_t offset, u8 data
 	const u8 shift = offset * 8;
 	m_com_address[N] &= 0xff << shift;
 	m_com_address[N] |= data << (shift ^ 8);
-	m_com_address[N] &= ~0xf007;
-	LOG("LDN%d (COM%d): remap %04x ([%d] %02x)\n", N + 1, N + 1, m_com_address[N], offset, data);
+	m_com_address[N] &= 0xff8;
+	LOG("LDN%d (COM%d): remap at %04x ([%d] %02x)\n", N + 1, N + 1, m_com_address[N], offset, data);
 
-	remap(AS_IO, 0, 0x400);
+	remap(AS_IO, 0, 0xfff);
 }
 
 template <unsigned N> u8 it8661f_device::uart_irq_r(offs_t offset)
@@ -737,7 +890,7 @@ void it8661f_device::ncts2_w(int state)
 }
 
 /*
- * Device #3 (Parallel)
+ * LDN3 (Parallel)
  */
 
 void it8661f_device::irq_parallel_w(int state)
@@ -746,6 +899,34 @@ void it8661f_device::irq_parallel_w(int state)
 		return;
 	request_irq(m_lpt_irq_line, state ? ASSERT_LINE : CLEAR_LINE);
 }
+
+/*
+ * LDN5 (GPIO)
+ * LDN7 on IT8671F
+ */
+
+u8 it8661f_device::gpio_address_r(offs_t offset)
+{
+	const u8 which = offset >> 1;
+	if (offset & 1)
+		return m_gpio_address[which] & 0xf8;
+
+	return (m_gpio_address[which] >> 8) & 0xf;
+}
+
+template <unsigned N> void it8661f_device::gpio_address_w(offs_t offset, u8 data)
+{
+	const u8 which = offset >> 1;
+	const u8 shift = (offset & 1) * 8;
+	m_gpio_address[which] &= 0xff << shift;
+	m_gpio_address[which] |= data << (shift ^ 8);
+	m_gpio_address[which] &= 0xff8;
+	// for simplicity we map this as CS0 ~ CS3, but CS3 itself is really "Simple I/O"
+	LOG("LDN%d (GPIO): CS%d remap at %04x ([%d] %02x)\n", N, m_gpio_address[which], which, offset & 1, data);
+
+	remap(AS_IO, 0, 0xfff);
+}
+
 
 /*
  * DMA
@@ -778,7 +959,7 @@ void it8661f_device::eop_w(int state)
 }
 
 // TODO: LPT bindings
-uint8_t it8661f_device::dack_r(int line)
+u8 it8661f_device::dack_r(int line)
 {
 	// transferring data from device to memory using dma
 	// read one byte from device
@@ -793,7 +974,7 @@ uint8_t it8661f_device::dack_r(int line)
 	return 0;
 }
 
-void it8661f_device::dack_w(int line, uint8_t data)
+void it8661f_device::dack_w(int line, u8 data)
 {
 	// transferring data from memory to device using dma
 	// write one byte to device
@@ -814,7 +995,7 @@ void it8661f_device::dack_w(int line, uint8_t data)
  *
  */
 
-it8671f_device::it8671f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+it8671f_device::it8671f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: it8661f_device(mconfig, IT8671F, tag, owner, clock)
 	, m_keybc(*this, "keybc")
 	, m_ps2_con(*this, "ps2_con")
@@ -879,13 +1060,17 @@ void it8671f_device::device_add_mconfig(machine_config &config)
 void it8671f_device::config_map(address_map &map)
 {
 	it8661f_device::config_map(map);
+	//m_logical_view[3](0x64, 0x65) POST data port base address
+
 	// APC Configuration
 	m_logical_view[4](0x30, 0x30).rw(FUNC(it8671f_device::activate_r<4>), FUNC(it8671f_device::activate_w<4>));
+	// APC has no I/O Range check support
 	m_logical_view[4](0x31, 0xff).unmaprw();
 
 	// Keyboard
 	m_logical_view[5](0x30, 0x30).rw(FUNC(it8671f_device::activate_r<5>), FUNC(it8671f_device::activate_w<5>));
-	m_logical_view[5](0x31, 0x6f).unmaprw();
+	m_logical_view[5](0x31, 0x31).rw(FUNC(it8671f_device::iorange_check_r<5>), FUNC(it8671f_device::iorange_check_w<5>));
+	m_logical_view[5](0x32, 0x6f).unmaprw();
 	m_logical_view[5](0x70, 0x70).lrw8(
 		NAME([this] () {
 			return m_key_irq_line;
@@ -899,6 +1084,7 @@ void it8671f_device::config_map(address_map &map)
 
 	// Mouse
 	m_logical_view[6](0x30, 0x30).rw(FUNC(it8671f_device::activate_r<6>), FUNC(it8671f_device::activate_w<6>));
+	// no I/O Range check support
 	m_logical_view[6](0x31, 0x6f).unmaprw();
 	m_logical_view[6](0x70, 0x70).lrw8(
 		NAME([this] () {
@@ -914,7 +1100,10 @@ void it8671f_device::config_map(address_map &map)
 	// GPIO & Alternate Function
 	// TODO: check if just moved around vs. '8661
 	m_logical_view[7](0x30, 0x30).rw(FUNC(it8671f_device::activate_r<7>), FUNC(it8671f_device::activate_w<7>));
-	m_logical_view[7](0x31, 0xff).unmaprw();
+	// No I/O Range check
+	m_logical_view[7](0x31, 0x5f).unmaprw();
+	m_logical_view[7](0x60, 0x67).rw(FUNC(it8671f_device::gpio_address_r), FUNC(it8671f_device::gpio_address_w<7>));
+	m_logical_view[5](0x68, 0xff).unmaprw();
 }
 
 void it8671f_device::remap(int space_id, offs_t start, offs_t end)

@@ -631,7 +631,53 @@ void gng_state::diamrun(machine_config &config)
 
 ***************************************************************************/
 
+/* Newer PCB, with visible wires and mask ROMs (85606-A-5 / 85606-B-4).
+   The ROM contents are a mix between 'gnga' and 'makaimurb'.
+   
+   The ROM configuration is set with a jumpers bank at 1F.
+    Mask ROMs:     EPROMs (eg. gnga):
+	J2 = Short     Open
+    J3 = Short     Open
+    J4 = Open      Short
+    J5 = Short     Open
+    J6 = Open      Short
+    J7 = Short     Open
+*/
 ROM_START( gng )
+	ROM_REGION( 0x18000, "maincpu", 0 ) // All EPROMs
+	ROM_LOAD( "mjg_04.10n",                           0x04000, 0x4000, CRC(66606beb) SHA1(4c640f49be93c7d2b12d4d4c56c56e74099b6c2f) ) // 4000-5fff is page 4
+	ROM_LOAD( "mjg_03.8n",                            0x08000, 0x8000, CRC(9e01c65e) SHA1(a87880d87c64a6d61313c3bc69c8d49511e0f9c3) )
+	ROM_LOAD( "mjg_05.12n",                           0x10000, 0x8000, CRC(d6397b2b) SHA1(39aa3cb8c229e60ac0ac410ff61e0c09dba78501) ) // page 0, 1, 2, 3
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Mask ROM
+	ROM_LOAD( "capsom_m5m23256p_p_62410p_mjg_02.14h", 0x00000, 0x8000, CRC(615f5b6f) SHA1(7ef9ec5c2072e21c787a6bbf700033f50c759c1d) ) // yes, really "CAPSOM" (same goes for the other mask ROMs)
+
+	ROM_REGION( 0x04000, "chars", 0 ) // Mask ROM
+	ROM_LOAD( "capsom_m5m23256p_p_616105_mjg_01.11e", 0x00000, 0x4000, CRC(1ab9038a) SHA1(907f2e2753f8e11a4addd19c225a5f333ff74344) )
+	ROM_IGNORE( 0x4000 )
+
+	ROM_REGION( 0x18000, "tiles", 0 ) // All mask ROMs
+	ROM_LOAD( "capsom_m5m23256p_p_616105_mmg_08.3e",  0x00000, 0x8000, CRC(c09a716f) SHA1(d30d31ae8458ac22b61a01bf52dd50788e15c51f) ) // 0-1-2-3 Plane 1
+	ROM_LOAD( "capsom_m5m23256p_p_61710z_mmg_07.3c",  0x08000, 0x8000, CRC(0b92b129) SHA1(8e06b03323b470482e068a9d60f0263ac5088876) ) // 0-1-2-3 Plane 2
+	ROM_LOAD( "capsom_m5m23256p_p_616105_mmg_06.3b",  0x10000, 0x8000, CRC(830176af) SHA1(1053adf458f2613a3ce6f3eb5d7d917906341d5c) ) // 0-1-2-3 Plane 3
+
+	ROM_REGION( 0x20000, "sprites", ROMREGION_ERASEFF ) // All mask ROMs
+	ROM_LOAD( "capsom_m5m23256p_p_61710g_mjg_12.4n",  0x00000, 0x8000, CRC(dbf05081) SHA1(c0a327e8c1a899a7b6c35ae197f2640b89491dd9) ) // sprites 0 Plane 1-2, sprites 1 Plane 1-2
+	ROM_LOAD( "capsom_m5m23256p_p_620108_mjg_11.3n",  0x08000, 0x4000, CRC(cf533077) SHA1(9ad39aa884daaf757668063f6c8a1a2037308441) ) // sprites 2 Plane 1-2
+	ROM_IGNORE( 0x4000 )
+	ROM_LOAD( "capsom_m5m23256p_p_62410p_mjg_10.4l",  0x10000, 0x8000, CRC(5f36734e) SHA1(b0eb666b2ef31c0a801f17cc797bd0d2fdae9511) ) // sprites 0 Plane 3-4, sprites 1 Plane 3-4
+	ROM_LOAD( "capsom_m5m23256p_p_61710g_mjg_09.3l",  0x18000, 0x4000, CRC(89c71940) SHA1(9dd7decf4c776a2ebcf27a4b71e520774b9563eb) ) // sprites 2 Plane 3-4
+	ROM_IGNORE( 0x4000 )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "m-02_63s141.14k", 0x0000, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) ) // video timing (not used)
+	ROM_LOAD( "m-01_63s141.2e",  0x0100, 0x0100, CRC(4a1285a4) SHA1(5018c3950b675af58db499e2883ecbc55419b491) ) // priority (not used)
+
+	ROM_REGION( 0x0100, "plds", 0 )
+	ROM_LOAD( "gg-pal10l8.bin",  0x0000, 0x002c, CRC(87f1b7e0) SHA1(b719c3be7bd4a02660bb0887f752e9769cbd37d2) )
+ROM_END
+
+ROM_START( gnga )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "gg4.bin",      0x04000, 0x4000, CRC(66606beb) SHA1(4c640f49be93c7d2b12d4d4c56c56e74099b6c2f) ) // 4000-5fff is page 4
 	ROM_LOAD( "gg3.bin",      0x08000, 0x8000, CRC(9e01c65e) SHA1(a87880d87c64a6d61313c3bc69c8d49511e0f9c3) )
@@ -667,13 +713,46 @@ ROM_START( gng )
 	ROM_LOAD( "gg-pal10l8.bin",  0x0000, 0x002c, CRC(87f1b7e0) SHA1(b719c3be7bd4a02660bb0887f752e9769cbd37d2) )
 ROM_END
 
-ROM_START( gnga )
+ROM_START( gngb )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "gng.n10",      0x04000, 0x4000, CRC(60343188) SHA1(dfc95d3f23a3a4b05b559f1dc76488b2659fbf66) )
 	ROM_LOAD( "gng.n9",       0x08000, 0x4000, CRC(b6b91cfb) SHA1(019a38b1c4e987715be1575948a3dc06ee59123d) )
 	ROM_LOAD( "gng.n8",       0x0c000, 0x4000, CRC(a5cfa928) SHA1(29dada8c4dbe04969d0d68faac559d2b4a3db711) )
 	ROM_LOAD( "gng.n13",      0x10000, 0x4000, CRC(fd9a8dda) SHA1(222c3c759c6b60f82351b9e6bf748fb4872e82b4) )
 	ROM_LOAD( "gng.n12",      0x14000, 0x4000, CRC(13cf6238) SHA1(0305908e922891a6a6b6c29e6a099867215d084e) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "gg2.bin",      0x0000, 0x8000, CRC(615f5b6f) SHA1(7ef9ec5c2072e21c787a6bbf700033f50c759c1d) )
+
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "gg1.bin",      0x00000, 0x4000, CRC(ecfccf07) SHA1(0a1518e19a2e0a4cc3dde4b9568202ea911b5ece) )
+
+	ROM_REGION( 0x18000, "tiles", 0 )
+	ROM_LOAD( "gg11.bin",     0x00000, 0x4000, CRC(ddd56fa9) SHA1(f9d77eee5e2738b7e83ba02fcc55dd480391479f) ) // 0-1 Plane 1
+	ROM_LOAD( "gg10.bin",     0x04000, 0x4000, CRC(7302529d) SHA1(8434c994cc55d2586641f3b90b6b15fd65dfb67c) ) // 2-3 Plane 1
+	ROM_LOAD( "gg9.bin",      0x08000, 0x4000, CRC(20035bda) SHA1(bbb1fba0eb19471f66d29526fa8423ccb047bd63) ) // 0-1 Plane 2
+	ROM_LOAD( "gg8.bin",      0x0c000, 0x4000, CRC(f12ba271) SHA1(1c42fa02cb27b35d10c3f7f036005e747f9f6b79) ) // 2-3 Plane 2
+	ROM_LOAD( "gg7.bin",      0x10000, 0x4000, CRC(e525207d) SHA1(1947f159189b3a53f1251d8653b6e7c65c91fc3c) ) // 0-1 Plane 3
+	ROM_LOAD( "gg6.bin",      0x14000, 0x4000, CRC(2d77e9b2) SHA1(944da1ce29a18bf0fc8deff78bceacba0bf23a07) ) // 2-3 Plane 3
+
+	ROM_REGION( 0x20000, "sprites", ROMREGION_ERASEFF )
+	ROM_LOAD( "gg17.bin",     0x00000, 0x4000, CRC(93e50a8f) SHA1(42d367f57bb2fdf60a0445ac1533da99cfeaa617) ) // sprites 0 Plane 1-2
+	ROM_LOAD( "gg16.bin",     0x04000, 0x4000, CRC(06d7e5ca) SHA1(9e06012bcd82f98fad43de666ef9a75979d940ab) ) // sprites 1 Plane 1-2
+	ROM_LOAD( "gg15.bin",     0x08000, 0x4000, CRC(bc1fe02d) SHA1(e3a1421d465b87148ffa94f5673b2307f0246afe) ) // sprites 2 Plane 1-2
+	ROM_LOAD( "gg14.bin",     0x10000, 0x4000, CRC(6aaf12f9) SHA1(207a7407288182a4f3eddaea634c6a6452131182) ) // sprites 0 Plane 3-4
+	ROM_LOAD( "gg13.bin",     0x14000, 0x4000, CRC(e80c3fca) SHA1(cb641c25bb04b970b2cbeca41adb792bbe142fb5) ) // sprites 1 Plane 3-4
+	ROM_LOAD( "gg12.bin",     0x18000, 0x4000, CRC(7780a925) SHA1(3f129ca6d695548b659955fe538584bd9ac2ff17) ) // sprites 2 Plane 3-4
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "tbp24s10.14k", 0x0000, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  // video timing (not used)
+	ROM_LOAD( "63s141.2e",    0x0100, 0x0100, CRC(4a1285a4) SHA1(5018c3950b675af58db499e2883ecbc55419b491) )  // priority (not used)
+ROM_END
+
+ROM_START( gngc )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD( "mm_c_04",    0x04000, 0x4000, CRC(4f94130f) SHA1(6863fee3c97c76ba314ccbada7efacb6783e7d32) )
+	ROM_LOAD( "mm_c_03",    0x08000, 0x8000, CRC(1def138a) SHA1(d29e12082c4d5c06a9910b3500ef66242cdec905) )
+	ROM_LOAD( "mm_c_05",    0x10000, 0x8000, CRC(ed28e86e) SHA1(064871918547a56be330c6994d4db2c9932e14db) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "gg2.bin",      0x0000, 0x8000, CRC(615f5b6f) SHA1(7ef9ec5c2072e21c787a6bbf700033f50c759c1d) )
@@ -832,39 +911,6 @@ ROM_START( gngblita )
 	ROM_LOAD( "gg-pal10l8.bin",  0x0000, 0x002c, CRC(87f1b7e0) SHA1(b719c3be7bd4a02660bb0887f752e9769cbd37d2) )
 ROM_END
 
-ROM_START( gngc )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "mm_c_04",    0x04000, 0x4000, CRC(4f94130f) SHA1(6863fee3c97c76ba314ccbada7efacb6783e7d32) )
-	ROM_LOAD( "mm_c_03",    0x08000, 0x8000, CRC(1def138a) SHA1(d29e12082c4d5c06a9910b3500ef66242cdec905) )
-	ROM_LOAD( "mm_c_05",    0x10000, 0x8000, CRC(ed28e86e) SHA1(064871918547a56be330c6994d4db2c9932e14db) )
-
-	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "gg2.bin",      0x0000, 0x8000, CRC(615f5b6f) SHA1(7ef9ec5c2072e21c787a6bbf700033f50c759c1d) )
-
-	ROM_REGION( 0x04000, "chars", 0 )
-	ROM_LOAD( "gg1.bin",      0x00000, 0x4000, CRC(ecfccf07) SHA1(0a1518e19a2e0a4cc3dde4b9568202ea911b5ece) )
-
-	ROM_REGION( 0x18000, "tiles", 0 )
-	ROM_LOAD( "gg11.bin",     0x00000, 0x4000, CRC(ddd56fa9) SHA1(f9d77eee5e2738b7e83ba02fcc55dd480391479f) ) // 0-1 Plane 1
-	ROM_LOAD( "gg10.bin",     0x04000, 0x4000, CRC(7302529d) SHA1(8434c994cc55d2586641f3b90b6b15fd65dfb67c) ) // 2-3 Plane 1
-	ROM_LOAD( "gg9.bin",      0x08000, 0x4000, CRC(20035bda) SHA1(bbb1fba0eb19471f66d29526fa8423ccb047bd63) ) // 0-1 Plane 2
-	ROM_LOAD( "gg8.bin",      0x0c000, 0x4000, CRC(f12ba271) SHA1(1c42fa02cb27b35d10c3f7f036005e747f9f6b79) ) // 2-3 Plane 2
-	ROM_LOAD( "gg7.bin",      0x10000, 0x4000, CRC(e525207d) SHA1(1947f159189b3a53f1251d8653b6e7c65c91fc3c) ) // 0-1 Plane 3
-	ROM_LOAD( "gg6.bin",      0x14000, 0x4000, CRC(2d77e9b2) SHA1(944da1ce29a18bf0fc8deff78bceacba0bf23a07) ) // 2-3 Plane 3
-
-	ROM_REGION( 0x20000, "sprites", ROMREGION_ERASEFF )
-	ROM_LOAD( "gg17.bin",     0x00000, 0x4000, CRC(93e50a8f) SHA1(42d367f57bb2fdf60a0445ac1533da99cfeaa617) ) // sprites 0 Plane 1-2
-	ROM_LOAD( "gg16.bin",     0x04000, 0x4000, CRC(06d7e5ca) SHA1(9e06012bcd82f98fad43de666ef9a75979d940ab) ) // sprites 1 Plane 1-2
-	ROM_LOAD( "gg15.bin",     0x08000, 0x4000, CRC(bc1fe02d) SHA1(e3a1421d465b87148ffa94f5673b2307f0246afe) ) // sprites 2 Plane 1-2
-	ROM_LOAD( "gg14.bin",     0x10000, 0x4000, CRC(6aaf12f9) SHA1(207a7407288182a4f3eddaea634c6a6452131182) ) // sprites 0 Plane 3-4
-	ROM_LOAD( "gg13.bin",     0x14000, 0x4000, CRC(e80c3fca) SHA1(cb641c25bb04b970b2cbeca41adb792bbe142fb5) ) // sprites 1 Plane 3-4
-	ROM_LOAD( "gg12.bin",     0x18000, 0x4000, CRC(7780a925) SHA1(3f129ca6d695548b659955fe538584bd9ac2ff17) ) // sprites 2 Plane 3-4
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "tbp24s10.14k", 0x0000, 0x0100, CRC(0eaf5158) SHA1(bafd4108708f66cd7b280e47152b108f3e254fc9) )  // video timing (not used)
-	ROM_LOAD( "63s141.2e",    0x0100, 0x0100, CRC(4a1285a4) SHA1(5018c3950b675af58db499e2883ecbc55419b491) )  // priority (not used)
-ROM_END
-
 
 /*
     Ghosts'n Goblins (US)
@@ -872,7 +918,6 @@ ROM_END
     CPU/Sound Board: 85606-A-4
     Video Board:     85606-B-3
 */
-
 ROM_START( gngt )
 	ROM_REGION( 0x18000, "maincpu", 0 )
 	ROM_LOAD( "mmt04d.10n", 0x04000, 0x4000, CRC(652406f6) SHA1(3b2bafd31f670ea26c568c48f3bd00597e5a2ed6) ) // 4000-5fff is page 4
@@ -1113,11 +1158,12 @@ ROM_END
 
 GAME( 1985, gng,         0,   gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 1)",             MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gnga,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 2)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngb,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, gngc,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 4)",             MACHINE_SUPPORTS_SAVE ) // rev c?
 GAME( 1985, gngbl,       gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg with Cross)",       MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gngbla,      gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (bootleg)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gngprot,     gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (prototype)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1985, gngblita,    gng, gng,     gng,      gng_state, empty_init, ROT0, "bootleg",  "Ghosts'n Goblins (Italian bootleg, harder)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, gngc,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom",   "Ghosts'n Goblins (World? set 3)",             MACHINE_SUPPORTS_SAVE ) // rev c?
 GAME( 1985, gngt,        gng, gng,     gng,      gng_state, empty_init, ROT0, "Capcom (Taito America license)", "Ghosts'n Goblins (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, makaimur,    gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1985, makaimurb,   gng, gng,     makaimur, gng_state, empty_init, ROT0, "Capcom",   "Makaimura (Japan revision B)",                MACHINE_SUPPORTS_SAVE )

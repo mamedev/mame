@@ -19,19 +19,18 @@
 
 #include "sh.h"
 
-class sh2_frontend;
-
 class sh2_device : public sh_common_execution
 {
-	friend class sh2_frontend;
-
 public:
 	void set_frt_input(int state) override {} // not every CPU needs this, let the ones that do override it
 
 	void func_fastirq(); // required for DRC, needs to be public to be accessible through non-classed static trampoline function
 
 protected:
+	class sh2_frontend;
+
 	sh2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, int cpu_type, address_map_constructor internal_map, int addrlines, uint32_t address_mask);
+	virtual ~sh2_device();
 
 	void check_pending_irq(const char *message);
 
@@ -97,18 +96,6 @@ private:
 
 	uint32_t m_cpu_off;
 	int8_t m_irq_line_state[17];
-};
-
-
-class sh2_frontend : public sh_frontend
-{
-public:
-	sh2_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
-
-protected:
-
-private:
-	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
 };
 
 #endif // MAME_CPU_SH_SH2_H

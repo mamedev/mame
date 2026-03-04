@@ -63,8 +63,6 @@ enum
 #define SZ  0x00100000
 #define FR  0x00200000
 
-#define REGFLAG_R(n)                    (1 << (n))
-
 /* additional register flags 1 */
 #define REGFLAG_SGR                     (1 << 6)
 #define REGFLAG_FPUL                    (1 << 7)

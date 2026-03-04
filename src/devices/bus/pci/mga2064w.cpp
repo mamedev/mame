@@ -23,15 +23,15 @@ DEFINE_DEVICE_TYPE(MGA2064W, mga2064w_device, "mga2064w", "Matrox Millennium \"I
 mga2064w_device::mga2064w_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, MGA2064W, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
-	, m_svga(*this, "svga")
-	, m_vga_rom(*this, "vga_rom")
+	, m_vga(*this, "vga")
+	, m_bios(*this, "bios")
 {
 	set_ids(0x102b0519, 0x01, 0x030000, 0x00000000);
 	m_mgabase1_real_space_config = address_space_config("mgabase1_regs", ENDIANNESS_LITTLE, 32, 14, 0, address_map_constructor(FUNC(mga2064w_device::mgabase1_map), this));
 }
 
 ROM_START( mga2064w )
-	ROM_REGION32_LE( 0x10000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "rev3", "Matrox Power Graphics Accelerator V2.4 IS-MGA-2064W R3" )
 	ROMX_LOAD( "rev3.bin",     0x000000, 0x010000, CRC(cb623dab) SHA1(4dc10755613a8fa9599331d78995cfb15145440b), ROM_BIOS(0) )
 	// TODO: verify label naming for these
@@ -54,11 +54,11 @@ void mga2064w_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update(m_svga, FUNC(matrox_vga_device::screen_update));
+	screen.set_screen_update(m_vga, FUNC(matrox_vga_device::screen_update));
 
-	MATROX_VGA(config, m_svga, 0);
-	m_svga->set_screen("screen");
-	m_svga->set_vram_size(8*1024*1024);
+	MATROX_VGA(config, m_vga, 0);
+	m_vga->set_screen("screen");
+	m_vga->set_vram_size(8*1024*1024);
 }
 
 void mga2064w_device::device_start()
@@ -69,7 +69,7 @@ void mga2064w_device::device_start()
 	add_map(8*1024*1024, M_MEM, FUNC(mga2064w_device::mgabase2_map));
 	//  add_rom_from_region();
 
-	add_rom((u8 *)m_vga_rom->base(), 0x10000);
+	add_rom((u8 *)m_bios->base(), 0x10000);
 }
 
 void mga2064w_device::device_reset()
@@ -106,18 +106,18 @@ void mga2064w_device::mgabase1_map(address_map &map)
 	map(0x1e14, 0x1e17).r(FUNC(mga2064w_device::status_r));
 //  map(0x1e18, 0x1e1b) ICLEAR
 //  map(0x1e1c, 0x1e1f) IEN
-	map(0x1e20, 0x1e23).r(m_svga, FUNC(matrox_vga_device::vcount_r));
+	map(0x1e20, 0x1e23).r(m_vga, FUNC(matrox_vga_device::vcount_r));
 //  map(0x1e40, 0x1e43) Reset
 //  map(0x1e54, 0x1e57) OPMODE
 //  map(0x1f00, 0x1fff) VGA CRTC linear I/O
-	map(0x1fb0, 0x1fdf).m(m_svga, FUNC(matrox_vga_device::io_map));
-	map(0x3c00, 0x3c1f).m(m_svga, FUNC(matrox_vga_device::ramdac_ext_map));
+	map(0x1fb0, 0x1fdf).m(m_vga, FUNC(matrox_vga_device::io_map));
+	map(0x3c00, 0x3c1f).m(m_vga, FUNC(matrox_vga_device::ramdac_ext_map));
 //  map(0x3e00, 0x3fff) EXPDEV Expansion bus
 }
 
 void mga2064w_device::mgabase2_map(address_map &map)
 {
-	map(0x000000, 0x7fffff).rw(m_svga, FUNC(matrox_vga_device::mem_linear_r), FUNC(matrox_vga_device::mem_linear_w));
+	map(0x000000, 0x7fffff).rw(m_vga, FUNC(matrox_vga_device::mem_linear_r), FUNC(matrox_vga_device::mem_linear_w));
 }
 
 // assume all registers to work with dword accesses only
@@ -484,7 +484,7 @@ u32 mga2064w_device::fifo_status_r()
  */
 u32 mga2064w_device::status_r()
 {
-	return m_svga->vsync_status() << 3;
+	return m_vga->vsync_status() << 3;
 }
 
 void mga2064w_device::draw_trigger()
@@ -521,7 +521,7 @@ void mga2064w_device::draw_trigger()
 			{
 				for (int x = xstart; x < xend; x++)
 				{
-					m_svga->write_memory(x + (y * m_dwgreg.pitch), m_dwgreg.fcol & 0xff);
+					m_vga->write_memory(x + (y * m_dwgreg.pitch), m_dwgreg.fcol & 0xff);
 				}
 			}
 			break;
@@ -545,13 +545,13 @@ void mga2064w_device::draw_trigger()
 					for (int x = xstart; x < xend; x+=8, src_x ++)
 					{
 						const u32 char_position = (src_x + src_y * source_pitch);
-						const u8 char_data = m_svga->read_memory(source_base + char_position);
+						const u8 char_data = m_vga->read_memory(source_base + char_position);
 						for (int xi = 0; xi < 8; xi ++)
 						{
 							const u8 pen_dot = (char_data >> (7-xi)) & 1;
 
 							u8 color_pen = (pen_dot ? m_dwgreg.fcol : m_dwgreg.bcol) & 0xff;
-							m_svga->write_memory((x + xi) + m_dwgreg.pitch * y, color_pen);
+							m_vga->write_memory((x + xi) + m_dwgreg.pitch * y, color_pen);
 						}
 
 					}
@@ -568,8 +568,8 @@ void mga2064w_device::draw_trigger()
 				{
 					for (int x = xstart; x < xend; x++, src_x++)
 					{
-						u8 color_pen = m_svga->read_memory(source_base + (source_pitch * src_y) + src_x);
-						m_svga->write_memory(x + y * m_dwgreg.pitch, color_pen);
+						u8 color_pen = m_vga->read_memory(source_base + (source_pitch * src_y) + src_x);
+						m_vga->write_memory(x + y * m_dwgreg.pitch, color_pen);
 					}
 				}
 			}
@@ -604,7 +604,7 @@ u32 mga2064w_device::dmawin_idump_r(offs_t offset, u32 mem_mask)
 			const u32 x_base = m_dwgreg.current_x + m_dwgreg.fxleft;
 
 			for (int xi = 0; xi < 4; xi ++)
-				res |= m_svga->read_memory((y_base) + (x_base + xi)) << (xi * 8);
+				res |= m_vga->read_memory((y_base) + (x_base + xi)) << (xi * 8);
 			m_dwgreg.current_x += 4;
 			if (m_dwgreg.current_x > m_dwgreg.ar[0])
 			{
@@ -638,7 +638,7 @@ void mga2064w_device::dmawin_iload_w(offs_t offset, u32 data, u32 mem_mask)
 			for (int xi = 0; xi < 4; xi++)
 			{
 				u8 color_pen = (data >> (8 * xi)) & 0xff;
-				m_svga->write_memory((y_base) + (x_base + xi), color_pen);
+				m_vga->write_memory((y_base) + (x_base + xi), color_pen);
 			}
 			m_dwgreg.current_x += 4;
 			if (m_dwgreg.current_x > m_dwgreg.ar[0])
@@ -666,28 +666,28 @@ void mga2064w_device::legacy_memory_map(address_map &map)
 
 void mga2064w_device::legacy_io_map(address_map &map)
 {
-	map(0, 0x02f).m(m_svga, FUNC(matrox_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(matrox_vga_device::io_map));
 }
 
 uint8_t mga2064w_device::vram_r(offs_t offset)
 {
-	return downcast<matrox_vga_device *>(m_svga.target())->mem_r(offset);
+	return downcast<matrox_vga_device *>(m_vga.target())->mem_r(offset);
 }
 
 void mga2064w_device::vram_w(offs_t offset, uint8_t data)
 {
-	downcast<matrox_vga_device *>(m_svga.target())->mem_w(offset, data);
+	downcast<matrox_vga_device *>(m_vga.target())->mem_w(offset, data);
 }
 
 void mga2064w_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
 	// TODO: both can be disabled thru config options
-	{
+	if (BIT(command, 1))
 		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(mga2064w_device::vram_r)), write8sm_delegate(*this, FUNC(mga2064w_device::vram_w)));
 
-		io_space->install_device(0x03b0, 0x03df, *this, &mga2064w_device::legacy_io_map);
-	}
+	if (BIT(command, 0))
+		io_space->install_device(0x0000, 0xffff, *this, &mga2064w_device::legacy_io_map);
 }
 
 /*

@@ -294,27 +294,3 @@ uint32_t taitojc_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 	return 0;
 }
-
-uint32_t dendego_state::screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	// update controller state in artwork
-	static const uint8_t mascon_table[6] = { 0x76, 0x67, 0x75, 0x57, 0x73, 0x37 };
-	static const uint8_t brake_table[11] = { 0x00, 0x05, 0x1d, 0x35, 0x4d, 0x65, 0x7d, 0x95, 0xad, 0xc5, 0xd4 };
-
-	uint8_t btn = (m_io_buttons->read() & 0x77);
-	int level;
-	for (level = 5; level > 0; level--)
-		if (btn == mascon_table[level]) break;
-
-	if (level != m_counters[0])
-		m_counters[0] = level;
-
-	btn = m_analog_ports[0]->read() & 0xff;
-	for (level = 10; level > 0; level--)
-		if (btn >= brake_table[level]) break;
-
-	if (level != m_counters[1])
-		m_counters[1] = level;
-
-	return screen_update(screen, bitmap, cliprect);
-}

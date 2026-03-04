@@ -147,7 +147,7 @@ TIMER_CALLBACK_MEMBER(model2_state::irq_mask_delayed_update)
 
 	// sound interrupt is asserted if either RxRDY or TxRDY is active
 	const u32 line = 1 << 10;
-	if ((m_uart->status_r() & 0x03) && (m_intena & line))
+	if ((m_uart->txrdy_r() || m_uart->rxrdy_r()) && (m_intena & line))
 	{
 		m_intreq |= line;
 		irq_update();
@@ -2462,7 +2462,7 @@ void model2_state::sound_ready_w(int state)
 {
 	// sound interrupt is asserted if either RxRDY or TxRDY is active
 	const u32 line = 1 << 10;
-	if ((m_uart->status_r() & 0x03) && (m_intena & line))
+	if ((m_uart->txrdy_r() || m_uart->rxrdy_r()) && (m_intena & line))
 	{
 		m_intreq |= line;
 		irq_update();

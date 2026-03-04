@@ -347,7 +347,6 @@ public:
 	void ioga(machine_config &config);
 	void interpro_serial(machine_config &config);
 	void interpro(machine_config &config);
-	static void interpro_scsi_adapter(device_t *device);
 	static void interpro_cdrom(device_t *device);
 	void interpro_boot_map(address_map &map) ATTR_COLD;
 	void interpro_common_map(address_map &map) ATTR_COLD;
@@ -371,7 +370,7 @@ public:
 		: interpro_state(mconfig, type, tag)
 		, m_d_cammu(*this, "cammu_d")
 		, m_i_cammu(*this, "cammu_i")
-		, m_scsi(*this, "scsi:7:host")
+		, m_scsi(*this, "host")
 		, m_bus(*this, "slot")
 	{
 	}
@@ -439,7 +438,7 @@ public:
 		, m_i_cammu(*this, "cammu_i")
 		, m_kbd_port(*this, "kbd")
 		, m_mse_port(*this, "mse")
-		, m_scsi(*this, "scsi:7:host")
+		, m_scsi(*this, "host")
 		, m_bus(*this, "slot")
 	{
 	}
@@ -506,7 +505,7 @@ public:
 	sapphire_state(const machine_config &mconfig, device_type type, const char *tag)
 		: interpro_state(mconfig, type, tag)
 		, m_mmu(*this, "cammu")
-		, m_scsi(*this, "scsi:7:host")
+		, m_scsi(*this, "host")
 		, m_arbga(*this, "arbga")
 		, m_flash_lsb(*this, "flash_lsb")
 		, m_flash_msb(*this, "flash_msb")
@@ -1121,16 +1120,6 @@ static void interpro_scsi_devices(device_slot_interface &device)
 	device.option_add("cdrom", NSCSI_CDROM);
 }
 
-void interpro_state::interpro_scsi_adapter(device_t *device)
-{
-	ncr53c90_device &adapter = downcast<ncr53c90_device &>(*device);
-
-	adapter.set_clock(24_MHz_XTAL);
-
-	adapter.irq_handler_cb().set(":ioga", FUNC(interpro_ioga_device::ir0_w));
-	adapter.drq_handler_cb().set(":ioga", FUNC(interpro_ioga_device::drq_scsi));
-}
-
 void interpro_state::interpro_cdrom(device_t *device)
 {
 	downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
@@ -1144,8 +1133,6 @@ void interpro_state::ioga(machine_config &config)
 
 	// ioga dma and serial dma channels
 	//m_ioga->dma_r_callback<0>().set(unknown); // plotter
-	m_ioga->dma_r_callback<1>().set("scsi:7:host", FUNC(ncr53c90a_device::dma_r));
-	m_ioga->dma_w_callback<1>().set("scsi:7:host", FUNC(ncr53c90a_device::dma_w));
 	m_ioga->dma_r_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_r));
 	m_ioga->dma_w_callback<2>().set(m_fdc, FUNC(upd765_family_device::dma_w));
 	m_ioga->serial_dma_r_callback<0>().set(m_scc2, FUNC(z80scc_device::db_r));
@@ -1249,11 +1236,10 @@ void emerald_state::emerald(machine_config &config)
 	interpro_serial(config);
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
-	adapter.option_add_internal("host", NCR53C90A);
-	adapter.set_default_option("host");
-	adapter.set_fixed(true);
-	adapter.set_option_machine_config("host", interpro_scsi_adapter);
+	NCR53C90A(config, m_scsi, 24_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::ir0_w));
+	m_scsi->drq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::drq_scsi));
 
 	// ethernet controller
 	I82586(config, m_eth, 10_MHz_XTAL);
@@ -1264,6 +1250,8 @@ void emerald_state::emerald(machine_config &config)
 	EMERALD_IOGA(config, m_ioga, 0);
 	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
+	m_ioga->dma_r_callback<1>().set(m_scsi, FUNC(ncr53c90a_device::dma_r));
+	m_ioga->dma_w_callback<1>().set(m_scsi, FUNC(ncr53c90a_device::dma_w));
 
 	// srx bus
 	SRX_BUS(config, m_bus, 0);
@@ -1323,11 +1311,10 @@ void turquoise_state::turquoise(machine_config &config)
 	m_mse_port->state_func().set(m_ioga, FUNC(interpro_ioga_device::mouse_status_w));
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
-	adapter.option_add_internal("host", NCR53C90A);
-	adapter.set_default_option("host");
-	adapter.set_fixed(true);
-	adapter.set_option_machine_config("host", interpro_scsi_adapter);
+	NCR53C90A(config, m_scsi, 24_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::ir0_w));
+	m_scsi->drq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::drq_scsi));
 
 	// ethernet controller
 	I82586(config, m_eth, 10_MHz_XTAL);
@@ -1338,6 +1325,8 @@ void turquoise_state::turquoise(machine_config &config)
 	TURQUOISE_IOGA(config, m_ioga, 0);
 	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
+	m_ioga->dma_r_callback<1>().set(m_scsi, FUNC(ncr53c90a_device::dma_r));
+	m_ioga->dma_w_callback<1>().set(m_scsi, FUNC(ncr53c90a_device::dma_w));
 
 	// cbus bus
 	CBUS_BUS(config, m_bus, 0);
@@ -1384,11 +1373,10 @@ void sapphire_state::sapphire(machine_config &config)
 	interpro_serial(config);
 
 	// scsi host adapter
-	nscsi_connector &adapter(NSCSI_CONNECTOR(config, "scsi:7", 0));
-	adapter.option_add_internal("host", NCR53C94);
-	adapter.set_default_option("host");
-	adapter.set_fixed(true);
-	adapter.set_option_machine_config("host", interpro_scsi_adapter);
+	NCR53C94(config, m_scsi, 24_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::ir0_w));
+	m_scsi->drq_handler_cb().set(m_ioga, FUNC(interpro_ioga_device::drq_scsi));
 
 	// ethernet controller
 	I82596_LE16(config, m_eth, 20_MHz_XTAL);
@@ -1399,6 +1387,8 @@ void sapphire_state::sapphire(machine_config &config)
 	SAPPHIRE_IOGA(config, m_ioga, 0);
 	m_ioga->set_memory(m_maincpu, 0);
 	ioga(config);
+	m_ioga->dma_r_callback<1>().set(m_scsi, FUNC(ncr53c94_device::dma_r));
+	m_ioga->dma_w_callback<1>().set(m_scsi, FUNC(ncr53c94_device::dma_w));
 
 	// flash memory
 	INTEL_28F010(config, m_flash_lsb);

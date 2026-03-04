@@ -78,7 +78,7 @@ private:
 		u8 dreadc(u16 adr);
 		void dwrite(u16 adr, u8 val);
 
-		u16 dmr;
+		u16 m_dmr;
 	};
 
 	u32 tclk_pres_div(u8 mode) const;

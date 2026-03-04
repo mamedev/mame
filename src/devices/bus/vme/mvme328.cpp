@@ -45,7 +45,7 @@ vme_mvme328_device::vme_mvme328_device(machine_config const &mconfig, char const
 	: device_t(mconfig, VME_MVME328, tag, owner, clock)
 	, device_vme_card_interface(mconfig, *this)
 	, m_cpu(*this, "cpu")
-	, m_scsi(*this, "scsi%u:7:mb87030", 0U)
+	, m_scsi(*this, "mb87030_%u", 0U)
 	, m_bram(*this, "buffer_ram")
 	, m_sw1(*this, "SW1")
 	, m_led1(*this, "led1")
@@ -165,7 +165,7 @@ void vme_mvme328_device::device_add_mconfig(machine_config &config)
 	M68000(config, m_cpu, 24_MHz_XTAL / 2); // HD68HC000P12
 	m_cpu->set_addrmap(AS_PROGRAM, &vme_mvme328_device::cpu_mem);
 
-	NSCSI_BUS(config, "scsi0");
+	auto &scsi0(NSCSI_BUS(config, "scsi0"));
 	NSCSI_CONNECTOR(config, "scsi0:0", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi0:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi0:2", scsi_devices, nullptr, false);
@@ -173,25 +173,21 @@ void vme_mvme328_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi0:4", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi0:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi0:6", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("mb87030", MB87030).machine_config(
-		[this](device_t *device)
-		{
-			mb87030_device &mb87030(downcast<mb87030_device &>(*device));
 
-			mb87030.set_clock(8'000'000);
-			mb87030.out_irq_callback().set(
-				[this](int state)
-				{
-					if (state)
-						m_sts |= 1U << 6;
-					else
-						m_sts &= ~(1U << 6);
+	MB87030(config, m_scsi[0], 8'000'000);
+	scsi0.set_external_device(7, m_scsi[0]);
+	m_scsi[0]->out_irq_callback().set(
+									  [this](int state)
+									  {
+										  if (state)
+											  m_sts |= 1U << 6;
+										  else
+											  m_sts &= ~(1U << 6);
+										  
+										  m_cpu->set_input_line(INPUT_LINE_IRQ6, state);
+									  });
 
-					m_cpu->set_input_line(INPUT_LINE_IRQ6, state);
-				});
-		});
-
-	NSCSI_BUS(config, "scsi1");
+	auto &scsi1(NSCSI_BUS(config, "scsi1"));
 	NSCSI_CONNECTOR(config, "scsi1:0", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi1:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi1:2", scsi_devices, nullptr, false);
@@ -199,23 +195,19 @@ void vme_mvme328_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:4", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi1:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi1:6", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("mb87030", MB87030).machine_config(
-		[this](device_t *device)
-		{
-			mb87030_device &mb87030(downcast<mb87030_device &>(*device));
 
-			mb87030.set_clock(8'000'000);
-			mb87030.out_irq_callback().set(
-				[this](int state)
-				{
-					if (state)
-						m_sts |= 1U << 5;
-					else
-						m_sts &= ~(1U << 5);
-
-					m_cpu->set_input_line(INPUT_LINE_IRQ5, state);
-				});
-		});
+	MB87030(config, m_scsi[1], 8'000'000);
+	scsi1.set_external_device(7, m_scsi[1]);
+	m_scsi[1]->out_irq_callback().set(
+									  [this](int state)
+									  {
+										  if (state)
+											  m_sts |= 1U << 5;
+										  else
+											  m_sts &= ~(1U << 5);
+										  
+										  m_cpu->set_input_line(INPUT_LINE_IRQ5, state);
+									  });
 
 	// TODO: VLSI VGC7224-0420 II-DMA-50M
 }

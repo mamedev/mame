@@ -13,7 +13,7 @@
  *    ARM standard MMU
  *    ARM DSP extensions
  *    VGA-ish frame buffer with some 2D acceleration features
- *    AC97 stereo audio CODEC
+ *    AC'97 stereo audio CODEC
  *
  * PCB also contains a custom ASIC, probably used for the decryption
  *

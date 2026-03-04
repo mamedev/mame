@@ -200,7 +200,7 @@ void bbc_tube_a500_device::device_add_mconfig(machine_config &config)
 	m_vidc->vblank().set(m_memc, FUNC(acorn_memc_device::vidrq_w));
 	m_vidc->sound_drq().set(m_memc, FUNC(acorn_memc_device::sndrq_w));
 
-	//SOFTWARE_LIST(config, "flop_ls_arm").set_original("bbc_flop_arm").set_filter("A500");
+	SOFTWARE_LIST(config, "flop_list").set_original("bbc_flop_arm").set_filter("A500");
 }
 
 void bbc_tube_a500d_device::device_add_mconfig(machine_config &config)

@@ -8,8 +8,6 @@
 
 #include "video/pc_vga.h"
 
-#include "screen.h"
-
 
 class tseng_vga_device :  public svga_device
 {
@@ -23,7 +21,7 @@ public:
 	virtual void mem_w(offs_t offset, uint8_t data) override;
 
 protected:
-	tseng_vga_device(const machine_config &mconfig, const char *tag, device_type type, device_t *owner, uint32_t clock);
+	tseng_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 

@@ -17,9 +17,9 @@ class m6502_base_disassembler : public util::disasm_interface
 {
 public:
 	struct disasm_entry {
-		const char *opcode;
-		int mode;
-		offs_t flags;
+		const char *m_opcode;
+		int m_mode;
+		offs_t m_flags;
 	};
 
 	m6502_base_disassembler(const disasm_entry *table);
@@ -70,7 +70,7 @@ protected:
 	virtual u32 get_instruction_bank() const;
 
 private:
-	const disasm_entry *table;
+	const disasm_entry *m_table;
 };
 
 class m6502_disassembler : public m6502_base_disassembler

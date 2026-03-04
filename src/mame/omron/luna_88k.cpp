@@ -155,7 +155,7 @@ public:
 	luna88k_state(machine_config const &mconfig, device_type type, char const *tag)
 		: luna_88k_state_base(mconfig, type, tag)
 		, m_rtc(*this, "rtc")
-		, m_spc(*this, "scsi:7:spc")
+		, m_spc(*this, "spc")
 		, m_net(*this, "net")
 		, m_eprom(*this, "eprom")
 	{
@@ -179,7 +179,7 @@ public:
 	luna88k2_state(machine_config const &mconfig, device_type type, char const *tag)
 		: luna_88k_state_base(mconfig, type, tag)
 		, m_rtc(*this, "rtc")
-		, m_spc(*this, "scsi%u:7:spc", 0U)
+		, m_spc(*this, "spc%u", 0U)
 		, m_net(*this, "net%u", 0U)
 		, m_cbus_root(*this, "cbus")
 		, m_cbus_irq(*this, "cbus_irq")
@@ -557,7 +557,7 @@ void luna88k_state::luna88k(machine_config &config)
 
 	M48T02(config, m_rtc);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
@@ -565,14 +565,10 @@ void luna88k_state::luna88k(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
-		[this](device_t *device)
-		{
-			mb89352_device &spc = downcast<mb89352_device &>(*device);
 
-			spc.set_clock(8_MHz_XTAL);
-			spc.out_irq_callback().set(*this, &luna88k_state::irq<0, 3>, "irq0,3");
-		});
+	MB89352(config, m_spc, 8_MHz_XTAL);
+	scsi.set_external_device(7, m_spc);
+	m_spc->out_irq_callback().set(DEVICE_SELF, &luna88k_state::irq<0, 3>, "irq0,3");
 
 	AM7990(config, m_net, 40_MHz_XTAL / 4);
 	m_net->intr_out().set(&luna88k_state::irq<0, 4>, "irq0,4").invert();
@@ -590,7 +586,7 @@ void luna88k2_state::luna88k2(machine_config &config)
 	input_merger_any_high_device &spc_irq(INPUT_MERGER_ANY_HIGH(config, "spc_irq"));
 	spc_irq.output_handler().set(&luna88k2_state::irq<0, 3>, "irq0,3");
 
-	NSCSI_BUS(config, "scsi0");
+	auto &scsi0(NSCSI_BUS(config, "scsi0"));
 	NSCSI_CONNECTOR(config, "scsi0:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:2", scsi_devices, nullptr);
@@ -598,16 +594,11 @@ void luna88k2_state::luna88k2(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi0:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi0:6", scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("spc", MB89352).machine_config(
-		[&spc_irq](device_t *device)
-		{
-			mb89352_device &spc = downcast<mb89352_device &>(*device);
+	MB89352(config, m_spc[0], 8_MHz_XTAL);
+	scsi0.set_external_device(7, m_spc[0]);
+	m_spc[0]->out_irq_callback().set(spc_irq, FUNC(input_merger_any_high_device::in_w<0>));
 
-			spc.set_clock(8_MHz_XTAL);
-			spc.out_irq_callback().set(spc_irq, FUNC(input_merger_any_high_device::in_w<0>));
-		});
-
-	NSCSI_BUS(config, "scsi1");
+	auto &scsi1(NSCSI_BUS(config, "scsi1"));
 	NSCSI_CONNECTOR(config, "scsi1:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:2", scsi_devices, nullptr);
@@ -615,14 +606,9 @@ void luna88k2_state::luna88k2(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi1:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("spc", MB89352).machine_config(
-		[&spc_irq](device_t *device)
-		{
-			mb89352_device &spc = downcast<mb89352_device &>(*device);
-
-			spc.set_clock(8_MHz_XTAL);
-			spc.out_irq_callback().set(spc_irq, FUNC(input_merger_any_high_device::in_w<1>));
-		});
+	MB89352(config, m_spc[1], 8_MHz_XTAL);
+	scsi1.set_external_device(7, m_spc[1]);
+	m_spc[1]->out_irq_callback().set(spc_irq, FUNC(input_merger_any_high_device::in_w<1>));
 
 	input_merger_any_low_device &net_irq(INPUT_MERGER_ANY_LOW(config, "net_irq"));
 	net_irq.output_handler().set(&luna88k2_state::irq<0, 4>, "irq0,4");

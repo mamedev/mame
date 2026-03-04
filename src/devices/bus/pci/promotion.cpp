@@ -44,7 +44,7 @@ DEFINE_DEVICE_TYPE(PROMOTION3210,   promotion3210_device,   "promotion3210",   "
 promotion3210_device::promotion3210_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, type, tag, owner, clock)
 	, m_vga(*this, "vga")
-	, m_vga_rom(*this, "vga_rom")
+	, m_bios(*this, "bios")
 {
 	// vendor ID 0x1142 Alliance Semiconductor Corporation
 	// subvendor unknown
@@ -57,7 +57,7 @@ promotion3210_device::promotion3210_device(const machine_config &mconfig, const 
 }
 
 ROM_START( promotion3210 )
-	ROM_REGION32_LE( 0x8000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "miro", "miro Video 12PD" )
 	ROMX_LOAD( "mirovideo12pd.vbi", 0x0000, 0x8000, CRC(46041709) SHA1(bd43f05ae7ddb4bbf515132b72b32719b60e6950), ROM_BIOS(0) )
 ROM_END
@@ -89,7 +89,7 @@ void promotion3210_device::device_start()
 
 	add_map( 4*1024*1024, M_MEM, FUNC(promotion3210_device::vram_aperture_map));
 
-	add_rom((u8 *)m_vga_rom->base(), 0x8000);
+	add_rom((u8 *)m_bios->base(), 0x8000);
 	expansion_rom_base = 0xc0000;
 
 	// INTA#
@@ -127,7 +127,7 @@ void promotion3210_device::legacy_memory_map(address_map &map)
 
 void promotion3210_device::legacy_io_map(address_map &map)
 {
-	map(0, 0x02f).m(m_vga, FUNC(vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(vga_device::io_map));
 }
 
 uint8_t promotion3210_device::vram_r(offs_t offset)
@@ -143,11 +143,9 @@ void promotion3210_device::vram_w(offs_t offset, uint8_t data)
 void promotion3210_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
-//  if (1)
-	{
+	if (BIT(command, 1))
 		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(promotion3210_device::vram_r)), write8sm_delegate(*this, FUNC(promotion3210_device::vram_w)));
 
-		io_space->install_device(0x03b0, 0x03df, *this, &promotion3210_device::legacy_io_map);
-		//memory_space->install_rom(0xc0000, 0xcffff, (void *)expansion_rom);
-	}
+	if (BIT(command, 0))
+		io_space->install_device(0x0000, 0xffff, *this, &promotion3210_device::legacy_io_map);
 }

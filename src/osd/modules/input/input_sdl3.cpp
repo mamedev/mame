@@ -781,8 +781,13 @@ public:
 
 		case SDL_EVENT_MOUSE_WHEEL:
 			// adjust SDL 1-per-click to match Win32 120-per-click
+#if SDL_VERSION_ATLEAST(3, 2, 12)
 			m_v += std::lround(event.wheel.integer_y * 120 * input_device::RELATIVE_PER_PIXEL);
 			m_h += std::lround(event.wheel.integer_x * 120 * input_device::RELATIVE_PER_PIXEL);
+#else
+			m_v += std::lround(event.wheel.y * 120 * input_device::RELATIVE_PER_PIXEL);
+			m_h += std::lround(event.wheel.x * 120 * input_device::RELATIVE_PER_PIXEL);
+#endif
 			break;
 		}
 	}
@@ -878,8 +883,13 @@ public:
 
 		case SDL_EVENT_MOUSE_WHEEL:
 			// adjust SDL 1-per-click to match Win32 120-per-click
+#if SDL_VERSION_ATLEAST(3, 2, 12)
 			m_v += std::lround(event.wheel.integer_y * 120 * input_device::RELATIVE_PER_PIXEL);
 			m_h += std::lround(event.wheel.integer_x * 120 * input_device::RELATIVE_PER_PIXEL);
+#else
+			m_v += std::lround(event.wheel.y * 120 * input_device::RELATIVE_PER_PIXEL);
+			m_h += std::lround(event.wheel.x * 120 * input_device::RELATIVE_PER_PIXEL);
+#endif
 			break;
 
 		case SDL_EVENT_WINDOW_MOUSE_LEAVE:

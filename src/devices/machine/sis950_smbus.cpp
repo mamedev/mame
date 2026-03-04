@@ -2,10 +2,10 @@
 // copyright-holders:Angelo Salese
 /**************************************************************************************************
 
-    SiS 950 SMBus implementation
+SiS 950 SMBus implementation
 
-    TODO:
-    - Stub, needs an smbus_interface, bare minimum to make shutms11 happy;
+TODO:
+- Stub, needs an smbus_interface, bare minimum to make shutms11 happy;
 
 **************************************************************************************************/
 #include "emu.h"

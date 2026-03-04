@@ -441,14 +441,34 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 				case 0x1:   m_core->ustat2 = data; break;     /* USTAT2 */
 
 				case 0x9:   m_core->irptl = data; break;      /* IRPTL */
-				case 0xa:   m_core->mode2 = data; break;      /* MODE2 */
+				case 0xa:                                     /* MODE2 */
+				{
+					u32 const set = ~m_core->mode2 & data;
+					m_core->mode2 = data;
+					for (unsigned i = 0; i < 4; i++)
+					{
+						if (BIT(set, 15 + i))
+							m_flag_out_cb[i](BIT(m_core->astat, FLG0_SHIFT + i));
+					}
+					break;
+				}
 
 				case 0xb:                                     /* MODE1 */
 					add_systemreg_write_latency_effect(reg, data, m_core->mode1);
 					m_core->mode1 = data;
 					break;
 
-				case 0xc:   m_core->astat = data; break;      /* ASTAT */
+				case 0xc:                                     /* ASTAT */
+				{
+					u32 const flags = (m_core->astat ^ data) & (BIT(m_core->mode2, 15, 4) << FLG0_SHIFT);
+					m_core->astat = data;
+					for (unsigned i = 0; i < 4; i++)
+					{
+						if (BIT(flags, FLG0_SHIFT + i))
+							m_flag_out_cb[i](BIT(data, FLG0_SHIFT + i));
+					}
+					break;
+				}
 
 				case 0xd:                                     /* IMASK */
 					check_interrupts();

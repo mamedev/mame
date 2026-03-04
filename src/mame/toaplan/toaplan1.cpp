@@ -2540,6 +2540,86 @@ ROM_START( demonwld5 ) // standard TP-O16 PCB
 	ROM_LOAD( "prom13.bpr",  0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) // ???
 ROM_END
 
+
+/************************************************************
+Out Zone, Toaplan 1990
+Hardware info by Guru
+----------------------
+
+
+TOAPLAN Co., Ltd.
+TP-018 (note: 0=ZERO, not letter O)
+|---------------------------------------------------------|
+|MB3730           6116    MN53007    ROM4.1~4DE           |
+|                09.2~3K             JP10 ROM3.1~4D       |
+|VOL  LM358     Z80B    JP16  JP15    JP7     ROM2.1~4C   |
+|     YM3014           07.7H      *   JP8        ROM1.1~4B|
+| YM3812      PST518       08.7F  *   JP9   6264 6264     |
+|                   28MHz |-------------|     JP11 JP12   |
+|                         |    68000    | 10MHz  JP13 JP14|
+|                         |-------------|           6264  |
+|                          JP5 JP6 JP17                   |
+|                     |------|                      6264  |
+|                     |D65024|                            |
+|J                    |GF035 |     62256 |-------|  6264  |
+|A                    |------|           |       |        |
+|M            65728                62256 | FCU-2 |  6264  |
+|M            65728    6116              |       |        |
+|A            65728    6116        62256 |-------|  6264  |
+|             65728                                       |
+|                    |-------|     62256  6116      6116  |
+|  SW1               |       |            6116            |
+|  SW2               | BCU-2 |                  82S123.18A|
+|                    |       |                            |
+|  JP3 JP1           |-------|           82S123.20C       |
+|JP4 JP2             ROM5.19~20HJK                        |
+|                    ROM6.21~22HJK                        |
+|---------------------------------------------------------|
+Notes:
+        68000 - Motorola MC68000P10 CPU. Clock input 10.000MHz
+         Z80B - ST Z80B CPU. Clock input 3.500MHz [28/8]
+       YM3812 - Yamaha YM3812 FM operator type-L II (OPL II) LSI (DIP24). Clock input 3.500MHz [28/8]
+       YM3014 - Yamaha YM3014 Serial Input Floating D/A Converter (DIP8). Serial clock 875kHz [28/8/4]
+         6116 - 6116 2kx8 SRAM (DIP24)
+         6264 - Hitachi HM6264 8kx8 SRAM (DIP28)
+        62256 - Hitachi 62256KP-12 32kx8 SRAM (DIP28). Note these are configured as 16kb (see jumper info)
+        65728 - HMC HM3-65728K-5 2kx8 SRAM (SDIP28)
+        FCU-2 - Custom Sprite Generator (QFP136)
+        BCU-2 - Custom Background Tile Generator (QFP136)
+       D65024 - NEC D65024GF035 uPD65000-series CMOS Gate Array, marked 'SCU' (QFP100)
+      MN53007 - Panasonic MN53000-series Gate Array (DIP42). Marked 'GXL-02' on the schematic.
+        LM358 - National Semiconductor LM358 Dual Operational Amplifier (DIP8)
+       PST518 - Mitsumi PST518 System Reset (TO92)
+   82S123.18A - Philips/Signetics N82S123 Bipolar PROM, marked '4', PCB marked 'ROM10' (DIP16) \ both affects
+   82S123.20C - Philips/Signetics N82S123 Bipolar PROM, marked '6', PCB marked 'ROM11' (DIP16) / sprites
+       MB3730 - Fujitsu MB3730 14W BTL Audio Power Amplifier
+      SW1,SW2 - 8-position DIP switch
+        HSYNC - 15.55544kHz - measured on 'SCU' (HS)
+        VSYNC - 55.1612Hz - measured on 'SCU' (VS)
+            * - Not populated position for 27C256 EPROMs
+         ROMs - ROM1..4 - 28 pin 1Mbit mask ROM (non-JEDEC) for sprite data. Jumpers can be set
+                          to use 27C010 EPROM, see jumper info below.
+                 ROM5,6 - 42 pin 8Mbit mask ROM (read as NEC 27C8000 or Toshiba TC578200)
+                  07,08 - 27C010 EPROM (main program). Note 07.7H CRC32=127A38D7, 08.7F CRC32=9704DB16
+                     09 - 27C256 EPROM (Z80 program)
+      JUMPERS - JP1,2,3,4  - Region Jumpers. Changes the copyright notice country/region. Any combination works.
+                JP5,6,17   - 62256 SRAM Configuration Jumpers. Default = JP5 shorted, others open (don't change)
+                             JP5/JP6 pulls 62256 SRAM A4 to VCC/GND.
+                             JP17 connects 62256 SRAM A4 to 62256 SRAM A14.
+                             Default is JP5 tied to VCC so these SRAMs are set as 16kb each.
+                JP7,8,9,10 - Sprite ROM Jumpers
+                             JP7 shorted, others open = 28 pin 1Mbit mask ROMs
+                             JP8 and JP9 shorted, others open = 27C010 EPROMs
+                JP15,16    - Main Program EPROM Configuration Jumpers
+                             JP16 shorted and JP15 open = 27C010 EPROMs
+             JP11,12,13,14 - ROM Configuration Jumpers (tied to logic, don't change)
+                             JP11 and JP14 shorted, others open = default
+                             JP11 ties ROMSEL to main program EPROM OE.
+                             JP14 ties main program EPROM A16 to 68000 A17.
+
+************************************************************/
+
+
 ROM_START( outzone )
 	ROM_REGION( 0x040000, "maincpu", 0 ) // Main 68K code
 	ROM_LOAD16_BYTE( "tp_018_07.6h",  0x000001, 0x20000, CRC(9704db16) SHA1(12b43a6961a7f63f29563eb77aaacb70d3c368dd) )
@@ -2766,7 +2846,7 @@ ROM_START( vimanaj )
 	ROM_LOAD( "019rom10.prom10.4h", 0x20, 0x20, CRC(a1e17492) SHA1(9ddec4c97f2d541f69f3c32c47aaa21fd9699ae2) ) // N82S123AN BPROM - ???
 ROM_END
 
-} // Anonymous namespace
+} // anonymous namespace
 
 //    YEAR  NAME        PARENT    MACHINE   INPUT      CLASS                    INIT        ROT     COMPANY                                       FULLNAME                                                FLAGS
 GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1_state,          empty_init, ROT270, "Toaplan / Taito Corporation",                "Truxton (Europe, US) / Tatsujin (Japan)",              0 )

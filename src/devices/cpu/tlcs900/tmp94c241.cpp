@@ -10,6 +10,13 @@
 #include "tmp94c241.h"
 #include "dasm900.h"
 
+#define LOG_DMA    (1U << 1)
+#define LOG_SERIAL (1U << 2)
+#define LOG_IRQ    (1U << 3)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -361,6 +368,22 @@ void tmp94c241_device::dmav_w(offs_t offset, uint8_t data)
 	m_dma_vector[offset] = data;
 }
 
+void tmp94c241_device::dmar_w(uint8_t data)
+{
+	// DMAR register (0x109) - DMA software request trigger
+	// Writing bit N triggers ONE DMA transfer on channel N (same as HDMA).
+	// For example, the Technics KN5000 driver writes DMAR once per INT0
+	// to transfer a single byte from the inter-CPU latch, relying on the
+	// DMA count to track how many bytes remain in the current transfer block.
+	for (int channel = 0; channel < 4; channel++)
+	{
+		if (BIT(data, channel))
+		{
+			tlcs900_process_software_dma(channel);
+		}
+	}
+}
+
 template <uint8_t N>
 void tmp94c241_device::bNcs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -707,7 +730,7 @@ void tmp94c241_device::scNbuf_w(uint8_t data)
 	// Fake finish sending data
 	m_int_reg[(Channel == 0) ? INTES0 : INTES1] |= 0x80;
 	m_check_irqs = 1;
-	logerror("sc%dbuf write: %02X\n", Channel, data);
+	LOGMASKED(LOG_SERIAL, "sc%dbuf write: %02X\n", Channel, data);
 	//machine().debugger().debug_break();
 }
 
@@ -830,7 +853,12 @@ void tmp94c241_device::port_w(uint8_t data)
 template <uint8_t P>
 uint8_t tmp94c241_device::port_r()
 {
-	return m_port_read[P](0);
+	/* Reading a port returns:
+	   - Output latch value for bits configured as output (PXCR bit = 1)
+	   - External pin level for bits configured as input (PXCR bit = 0) */
+	uint8_t dir = m_port_control[P];
+	uint8_t external = m_port_read[P](0);
+	return (m_port_latch[P] & dir) | (external & ~dir);
 }
 
 template <uint8_t P>
@@ -952,6 +980,7 @@ void tmp94c241_device::internal_mem(address_map &map)
 	map(0x0000f7, 0x0000f7).rw(FUNC(tmp94c241_device::intnmwdt_r), FUNC(tmp94c241_device::intnmwdt_w));
 	map(0x0000f8, 0x0000f8).w(FUNC(tmp94c241_device::intclr_w));
 	map(0x000100, 0x000103).w(FUNC(tmp94c241_device::dmav_w));
+	map(0x000109, 0x000109).w(FUNC(tmp94c241_device::dmar_w));
 	map(0x000110, 0x000110).rw(FUNC(tmp94c241_device::wdmod_r), FUNC(tmp94c241_device::wdmod_w));
 	map(0x000111, 0x000111).w(FUNC(tmp94c241_device::wdcr_w));
 	map(0x000120, 0x000127).r(FUNC(tmp94c241_device::adreg_r));
@@ -985,11 +1014,272 @@ void tmp94c241_device::internal_mem(address_map &map)
 //**************************************************************************
 
 //-------------------------------------------------
-//  tlcs900_check_hdma -
+//  tlcs900_process_hdma - process a single HDMA
+//  transfer for a channel
+//-------------------------------------------------
+
+int tmp94c241_device::tlcs900_process_hdma(int channel)
+{
+	// Get DMA start vector for this channel
+	uint8_t start_vector = m_dma_vector[channel];
+	if (start_vector == 0)
+		return 0;  // Channel not configured
+
+	// Find which interrupt this start vector corresponds to
+	int irq = -1;
+	for (int i = 0; i < NUM_MASKABLE_IRQS; i++)
+	{
+		if (tmp94c241_irq_vector_map[i].dma_start_vector == start_vector)
+		{
+			irq = i;
+			break;
+		}
+	}
+
+	if (irq < 0)
+		return 0;  // No matching interrupt found
+
+	// Check if the interrupt flag is set (DMA trigger condition)
+	if (!(m_int_reg[tmp94c241_irq_vector_map[irq].reg] & tmp94c241_irq_vector_map[irq].iff))
+		return 0;  // Interrupt not pending
+
+	// Decode DMAM mode register
+	// TMP94C241 DMAM format (same as TMP95C061):
+	// Bits 4-0 encode transfer mode:
+	//   Bits 1-0: Transfer size (00=byte, 01=word, 10=long)
+	//   Bits 3-2: Direction mode:
+	//     00 = dest increment, src fixed (I/O -> memory)
+	//     01 = dest decrement, src fixed
+	//     10 = dest fixed, src increment (memory -> I/O)
+	//     11 = dest fixed, src decrement
+	//   Bit 4: Counter mode / both fixed
+	uint8_t dmam = m_dmam[channel].b.l;
+
+	// Use switch-based decoding matching TMP95C061 proven implementation
+	switch (dmam & 0x1f)
+	{
+	case 0x00:
+		WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
+		m_dmad[channel].d += 1;
+		m_cycles += 8;
+		break;
+	case 0x01:
+		WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
+		m_dmad[channel].d += 2;
+		m_cycles += 8;
+		break;
+	case 0x02:
+		WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
+		m_dmad[channel].d += 4;
+		m_cycles += 12;
+		break;
+	case 0x04:
+		WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
+		m_dmad[channel].d -= 1;
+		m_cycles += 8;
+		break;
+	case 0x05:
+		WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
+		m_dmad[channel].d -= 2;
+		m_cycles += 8;
+		break;
+	case 0x06:
+		WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
+		m_dmad[channel].d -= 4;
+		m_cycles += 12;
+		break;
+	case 0x08:
+		WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
+		m_dmas[channel].d += 1;
+		m_cycles += 8;
+		break;
+	case 0x09:
+		WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
+		m_dmas[channel].d += 2;
+		m_cycles += 8;
+		break;
+	case 0x0a:
+		WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
+		m_dmas[channel].d += 4;
+		m_cycles += 12;
+		break;
+	case 0x0c:
+		WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
+		m_dmas[channel].d -= 1;
+		m_cycles += 8;
+		break;
+	case 0x0d:
+		WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
+		m_dmas[channel].d -= 2;
+		m_cycles += 8;
+		break;
+	case 0x0e:
+		WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
+		m_dmas[channel].d -= 4;
+		m_cycles += 12;
+		break;
+	case 0x10:
+		WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
+		m_cycles += 8;
+		break;
+	case 0x11:
+		WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
+		m_cycles += 8;
+		break;
+	case 0x12:
+		WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
+		m_cycles += 12;
+		break;
+	case 0x14:
+		m_dmas[channel].d += 1;
+		m_cycles += 5;
+		break;
+	default:
+		LOGMASKED(LOG_DMA, "HDMA ch%d: unknown DMAM mode 0x%02X\n", channel, dmam);
+		m_cycles += 8;
+		break;
+	}
+
+	// Decrement transfer count
+	m_dmac[channel].w.l -= 1;
+
+	// Check for transfer completion
+	if (m_dmac[channel].w.l == 0)
+	{
+		LOGMASKED(LOG_DMA, "HDMA ch%d complete: src=%06X dst=%06X (vec=%02X)\n",
+			channel, m_dmas[channel].d, m_dmad[channel].d, start_vector);
+
+		// Clear DMA vector to disable channel
+		m_dma_vector[channel] = 0;
+
+		// Set completion interrupt flag
+		switch (channel)
+		{
+			case 0: m_int_reg[INTETC01] |= 0x08; break;
+			case 1: m_int_reg[INTETC01] |= 0x80; break;
+			case 2: m_int_reg[INTETC23] |= 0x08; break;
+			case 3: m_int_reg[INTETC23] |= 0x80; break;
+		}
+		m_check_irqs = 1;
+	}
+
+	// Clear the triggering interrupt flag
+	m_int_reg[tmp94c241_irq_vector_map[irq].reg] &= ~tmp94c241_irq_vector_map[irq].iff;
+
+	return 1;  // Transfer performed
+}
+
+
+//-------------------------------------------------
+//  tlcs900_process_software_dma - process a
+//  software-triggered DMA transfer (one unit).
+//  Each DMAR write transfers ONE unit, same as
+//  HDMA. E.g. the Technics KN5000 driver writes
+//  DMAR once per INT0 to receive one byte from
+//  the inter-CPU latch.
+//  Fires INTTC when the count reaches zero.
+//-------------------------------------------------
+
+void tmp94c241_device::tlcs900_process_software_dma(int channel)
+{
+	if (m_dmac[channel].w.l == 0)
+		return;  // No transfer to do
+
+	uint8_t dmam = m_dmam[channel].b.l;
+
+	switch (dmam & 0x1f)
+	{
+	case 0x00:
+		WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
+		m_dmad[channel].d += 1;
+		m_cycles += 8;
+		break;
+	case 0x01:
+		WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
+		m_dmad[channel].d += 2;
+		m_cycles += 8;
+		break;
+	case 0x02:
+		WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
+		m_dmad[channel].d += 4;
+		m_cycles += 12;
+		break;
+	case 0x04:
+		WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
+		m_dmad[channel].d -= 1;
+		m_cycles += 8;
+		break;
+	case 0x08:
+		WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
+		m_dmas[channel].d += 1;
+		m_cycles += 8;
+		break;
+	case 0x09:
+		WRMEMW(m_dmad[channel].d, RDMEMW(m_dmas[channel].d));
+		m_dmas[channel].d += 2;
+		m_cycles += 8;
+		break;
+	case 0x0a:
+		WRMEML(m_dmad[channel].d, RDMEML(m_dmas[channel].d));
+		m_dmas[channel].d += 4;
+		m_cycles += 12;
+		break;
+	case 0x0c:
+		WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
+		m_dmas[channel].d -= 1;
+		m_cycles += 8;
+		break;
+	case 0x10:
+		WRMEM(m_dmad[channel].d, RDMEM(m_dmas[channel].d));
+		m_cycles += 8;
+		break;
+	case 0x14:
+		m_dmas[channel].d += 1;
+		m_cycles += 5;
+		break;
+	default:
+		LOGMASKED(LOG_DMA, "Software DMA ch%d: unknown DMAM mode 0x%02X\n", channel, dmam);
+		m_cycles += 8;
+		break;
+	}
+
+	m_dmac[channel].w.l -= 1;
+
+	// Check for transfer completion
+	if (m_dmac[channel].w.l == 0)
+	{
+		LOGMASKED(LOG_DMA, "Software DMA ch%d complete: src=%06X dst=%06X\n",
+			channel, m_dmas[channel].d, m_dmad[channel].d);
+
+		// Set transfer completion interrupt flag (INTTC0-3)
+		switch (channel)
+		{
+			case 0: m_int_reg[INTETC01] |= 0x08; break;
+			case 1: m_int_reg[INTETC01] |= 0x80; break;
+			case 2: m_int_reg[INTETC23] |= 0x08; break;
+			case 3: m_int_reg[INTETC23] |= 0x80; break;
+		}
+		m_check_irqs = 1;
+	}
+}
+
+
+//-------------------------------------------------
+//  tlcs900_check_hdma - check and process HDMA
 //-------------------------------------------------
 
 void tmp94c241_device::tlcs900_check_hdma()
 {
+	// HDMA can only be performed if interrupts are allowed
+	if ((m_sr.b.h & 0x70) == 0x70)
+		return;  // All interrupts masked
+
+	// Check channels in priority order (0 highest, 3 lowest)
+	for (int channel = 0; channel < 4; channel++)
+	{
+		if (tlcs900_process_hdma(channel))
+			return;  // Only process one transfer per call
+	}
 }
 
 
@@ -1021,6 +1311,21 @@ void tmp94c241_device::tlcs900_check_irqs()
 	{
 		if (m_int_reg[tmp94c241_irq_vector_map[i].reg] & tmp94c241_irq_vector_map[i].iff)
 		{
+			// HDMA priority: skip interrupts targeted by active HDMA channels.
+			// On real hardware, HDMA consumes the interrupt trigger instead of
+			// dispatching to the interrupt handler.
+			bool hdma_targeted = false;
+			for (int ch = 0; ch < 4; ch++)
+			{
+				if (m_dma_vector[ch] == tmp94c241_irq_vector_map[i].dma_start_vector)
+				{
+					hdma_targeted = true;
+					break;
+				}
+			}
+			if (hdma_targeted)
+				continue;
+
 			switch (tmp94c241_irq_vector_map[i].iff)
 			{
 				case 0x80:
@@ -1050,6 +1355,12 @@ void tmp94c241_device::tlcs900_check_irqs()
 	{
 		uint8_t vector = tmp94c241_irq_vector_map[irq].vector;
 
+		// Log only DMA completion interrupts (INTTC0/INTTC2) — key milestones
+		if (vector == 0x94)
+			LOGMASKED(LOG_IRQ, "IRQ: INTTC0 (DMA ch0 done) level=%d PC=%06X\n", level, m_pc.d);
+		else if (vector == 0x9c)
+			LOGMASKED(LOG_IRQ, "IRQ: INTTC2 (DMA ch2 done) level=%d PC=%06X\n", level, m_pc.d);
+
 		m_xssp.d -= 4;
 		WRMEML(m_xssp.d, m_pc.d);
 		m_xssp.d -= 2;
@@ -1067,6 +1378,31 @@ void tmp94c241_device::tlcs900_check_irqs()
 
 		// Clear taken IRQ
 		m_int_reg[tmp94c241_irq_vector_map[irq].reg] &= ~ tmp94c241_irq_vector_map[irq].iff;
+
+		// Level-detect re-assertion: Level-triggered interrupt
+		// flags are continuously driven by the input level. Clearing the flag
+		// during dispatch has no lasting effect if the input is still asserted.
+		// Re-assert INT0 flag if input is still active in level-detect mode.
+		if (tmp94c241_irq_vector_map[irq].reg == INTE0AD &&
+			tmp94c241_irq_vector_map[irq].iff == 0x08 &&
+			!(m_iimc & 0x02) &&
+			m_level[TLCS900_INT0] == ASSERT_LINE)
+		{
+			m_int_reg[INTE0AD] |= 0x08;
+			m_check_irqs = 1;
+		}
+
+		// Compute the default priority index from the vector table.
+		// The datasheet's "default priority" numbering is vector/4 + 1,
+		// with a gap at 0x3c (reserved), so entries above that shift down by one.
+		int8_t default_priority = vector / 4 + 1;
+		if (vector > 0x3c)
+			default_priority--;
+
+		// The IRQ level passed here corresponds to the datasheet's
+		// "default priority" number, so e.g. "IRQ 20" means
+		// "INTT0: 8-bit timer (Timer 0)" in the TMP94C241 interrupt table.
+		standard_irq_callback(default_priority, m_pc.d);
 	}
 }
 

@@ -111,7 +111,7 @@ void jaleco_vj_pc_device::device_add_mconfig(machine_config &config)
 	m_maincpu->smiact().set("pci:00.0", FUNC(i82439hx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
-	I82439HX(config, "pci:00.0", 0, m_maincpu, 256*1024*1024); // TODO: Should be 0x05851106 VIA VT82C585 Apollo VP,VPX,VPX-97 System Controller
+	I82439HX(config, "pci:00.0", 0, m_maincpu, 256*1024*1024); // TODO: Should be 0x11060585 VIA VT82C585 Apollo VP,VPX,VPX-97 System Controller
 
 	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, m_maincpu));
 	// isa.set_ids(0x11060586, 0x23, 0x060100, 0x00000000); // TODO: Should be VIA VT82C586B, PCI-to-ISA Bridge

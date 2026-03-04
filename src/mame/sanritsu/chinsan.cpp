@@ -58,26 +58,11 @@ public:
 		m_adpcm_pos(0), m_adpcm_idle(1), m_adpcm_data(0), m_trigger(0)
 	{ }
 
-	void input_select_w(uint8_t data);
-	uint8_t input_p2_r();
-	uint8_t input_p1_r();
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(tile_info);
-
-	void adpcm_w(uint8_t data);
-	void adpcm_int_w(int state);
-
-	INTERRUPT_GEN_MEMBER(vblank_int);
-	void ctrl_w(uint8_t data);
 	void init_chinsan();
 
 	void chinsan(machine_config &config);
 	void mayumi(machine_config &config);
-	void chinsan_io_map(address_map &map) ATTR_COLD;
-	void chinsan_map(address_map &map) ATTR_COLD;
-	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
-	void mayumi_io_map(address_map &map) ATTR_COLD;
+
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -104,6 +89,24 @@ private:
 	uint8_t m_adpcm_idle;
 	uint8_t m_adpcm_data;
 	uint8_t m_trigger;
+
+	void input_select_w(uint8_t data);
+	uint8_t input_p2_r();
+	uint8_t input_p1_r();
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	TILE_GET_INFO_MEMBER(tile_info);
+
+	void adpcm_w(uint8_t data);
+	void adpcm_int_w(int state);
+
+	INTERRUPT_GEN_MEMBER(vblank_int);
+	void ctrl_w(uint8_t data);
+
+	void chinsan_io_map(address_map &map) ATTR_COLD;
+	void chinsan_map(address_map &map) ATTR_COLD;
+	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
+	void mayumi_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -558,6 +561,7 @@ void chinsan_state::chinsan(machine_config &config)
 void chinsan_state::mayumi(machine_config &config)
 {
 	chinsan(config);
+
 	// standard Z80 instead of MC-8123
 	Z80(config.replace(), m_maincpu, XTAL(10'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &chinsan_state::chinsan_map);

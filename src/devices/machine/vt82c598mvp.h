@@ -25,6 +25,8 @@ public:
 	vt82c598mvp_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_ram_size(int ram_size) { m_ram_size = ram_size; }
 
+	void smi_act_w(int state);
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -33,6 +35,8 @@ protected:
 						   uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
+
+	virtual bool map_first() const override { return true; }
 
 private:
 	required_device<cpu_device> m_host_cpu;
@@ -43,6 +47,8 @@ private:
 	u32 m_ram_size = 0;
 
 	void map_shadowram(address_space *memory_space, offs_t start_offs, offs_t end_offs, u8 setting);
+
+	void aperture_map(address_map &map);
 
 	u8 m_cache_control_1;
 	u8 m_cache_control_2;
@@ -75,6 +81,8 @@ private:
 
 	u32 m_agp_command;
 	u8 m_agp_control;
+
+	int m_smiact;
 };
 
 class vt82c598mvp_bridge_device : public pci_bridge_device
@@ -103,7 +111,7 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 private:
-	//required_device<sis630_gui_device> m_vga;
+	//required_device<vga_device> m_vga;
 
 	//virtual void bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 

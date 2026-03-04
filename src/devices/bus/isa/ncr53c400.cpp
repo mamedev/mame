@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(ISA8_RT1000B, isa8_rt1000b_device, "rt1000b", " Rancho Techno
 isa8_rt1000b_device::isa8_rt1000b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISA8_RT1000B, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
-	, m_scsic(*this, "scsi:7:scsic")
+	, m_scsic(*this, "scsic")
 	, m_config(*this, "CONFIG")
 {
 }
@@ -37,7 +37,7 @@ void isa8_rt1000b_device::scsic_config(device_t *device)
 
 void isa8_rt1000b_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -45,11 +45,11 @@ void isa8_rt1000b_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsic", true)
-		.option_add_internal("scsic", NCR53C80)
-		.machine_config([this] (device_t *device) { scsic_config(device); });
 
-//	EEPROM_93C06_16BIT(config, m_eeprom);
+	NCR53C80(config, m_scsic);
+	scsi.set_external_device(7, m_scsic);
+
+//  EEPROM_93C06_16BIT(config, m_eeprom);
 }
 
 ROM_START(rt1000b)
@@ -88,13 +88,13 @@ static INPUT_PORTS_START(rt1000b)
 	// J6-J7-J8-J9
 	// NOTE: IRQ2/IRQ6 aren't implemented in this specific card
 	PORT_CONFNAME( 0xe0, 0xe0, "Interrupt Select")
-//	PORT_CONFSETTING( 0x00, "N/A")
-//	PORT_CONFSETTING( 0x20, "N/A")
-//	PORT_CONFSETTING( 0x40, "IRQ2")
+//  PORT_CONFSETTING( 0x00, "N/A")
+//  PORT_CONFSETTING( 0x20, "N/A")
+//  PORT_CONFSETTING( 0x40, "IRQ2")
 	PORT_CONFSETTING( 0x60, "IRQ3")
 	PORT_CONFSETTING( 0x80, "IRQ4")
 	PORT_CONFSETTING( 0xa0, "IRQ5")
-//	PORT_CONFSETTING( 0xc0, "IRQ6")
+//  PORT_CONFSETTING( 0xc0, "IRQ6")
 	PORT_CONFSETTING( 0xe0, "IRQ7")
 INPUT_PORTS_END
 
@@ -118,8 +118,8 @@ void isa8_rt1000b_device::device_start()
 	save_pointer(NAME(m_external_sram), 0x600);
 
 	// TODO: DMA
-//	m_isa->set_dma_channel(1, this, false);
-//	m_isa->set_dma_channel(5, this, false);
+//  m_isa->set_dma_channel(1, this, false);
+//  m_isa->set_dma_channel(5, this, false);
 }
 
 

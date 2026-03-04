@@ -640,7 +640,11 @@ void sdl_osd_interface::process_events()
 						osd_printf_error("sdl_osd_interface: error allocating pointer data\n");
 						break;
 					}
+#if SDL_VERSION_ATLEAST(3, 2, 12)
 					window->mouse_wheel(device, std::lround(event.wheel.integer_y * 120));
+#else
+					window->mouse_wheel(device, std::lround(event.wheel.y * 120));
+#endif
 				}
 			}
 			break;

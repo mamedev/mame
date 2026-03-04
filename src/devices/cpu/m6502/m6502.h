@@ -25,9 +25,9 @@ public:
 
 	class memory_interface {
 	public:
-		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache cprogram, csprogram;
-		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific program;
-		memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific program14;
+		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_cprogram, m_csprogram;
+		memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+		memory_access<14, 0, 0, ENDIANNESS_LITTLE>::specific m_program14;
 
 		virtual ~memory_interface() = default;
 		virtual uint8_t read(uint16_t adr) = 0;
@@ -41,22 +41,22 @@ public:
 	m6502_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_address_width(int width, bool custom_interface) {
-		program_config.m_addr_width = width;
-		sprogram_config.m_addr_width = width;
-		uses_custom_memory_interface = custom_interface;
+		m_program_config.m_addr_width = width;
+		m_sprogram_config.m_addr_width = width;
+		m_uses_custom_memory_interface = custom_interface;
 	}
 
 	void set_custom_memory_interface(std::unique_ptr<memory_interface> interface) {
-		mintf = std::move(interface);
+		m_mintf = std::move(interface);
 	}
 
-	bool get_sync() const { return sync; }
+	bool get_sync() const { return m_sync; }
 
-	auto sync_cb() { return sync_w.bind(); }
-
-	devcb_write_line sync_w;
+	auto sync_cb() { return m_sync_w.bind(); }
 
 protected:
+	devcb_write_line m_sync_w;
+
 	m6502_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	class mi_default : public memory_interface {
@@ -116,40 +116,40 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
-	address_space_config program_config, sprogram_config;
+	address_space_config m_program_config, m_sprogram_config;
 
-	uint16_t  PPC;                    /* previous program counter */
-	uint16_t  NPC;                    /* next start-of-instruction program counter */
-	uint16_t  PC;                     /* program counter */
-	uint16_t  SP;                     /* stack pointer (always 100 - 1FF) */
-	uint16_t  TMP;                    /* temporary internal values */
-	uint8_t   TMP2;                   /* another temporary internal value, 8 bits this time */
-	uint8_t   A;                      /* Accumulator */
-	uint8_t   X;                      /* X index register */
-	uint8_t   Y;                      /* Y index register */
-	uint8_t   P;                      /* Processor status */
-	uint8_t   IR;                     /* Prefetched instruction register */
-	int       inst_state_base;        /* Current instruction bank */
+	uint16_t  m_PPC;                    /* previous program counter */
+	uint16_t  m_NPC;                    /* next start-of-instruction program counter */
+	uint16_t  m_PC;                     /* program counter */
+	uint16_t  m_SP;                     /* stack pointer (always 100 - 1FF) */
+	uint16_t  m_TMP;                    /* temporary internal values */
+	uint8_t   m_TMP2;                   /* another temporary internal value, 8 bits this time */
+	uint8_t   m_A;                      /* Accumulator */
+	uint8_t   m_X;                      /* X index register */
+	uint8_t   m_Y;                      /* Y index register */
+	uint8_t   m_P;                      /* Processor status */
+	uint8_t   m_IR;                     /* Prefetched instruction register */
+	int       m_inst_state_base;        /* Current instruction bank */
 
-	std::unique_ptr<memory_interface> mintf;
-	int inst_state, inst_substate;
-	int icount, bcount, count_before_instruction_step;
-	bool nmi_state, irq_state, apu_irq_state, v_state;
-	bool nmi_pending, irq_taken, sync, inhibit_interrupts;
-	bool uses_custom_memory_interface;
+	std::unique_ptr<memory_interface> m_mintf;
+	int m_inst_state, m_inst_substate;
+	int m_icount, m_bcount, m_count_before_instruction_step;
+	bool m_nmi_state, m_irq_state, m_apu_irq_state, m_v_state;
+	bool m_nmi_pending, m_irq_taken, m_sync, m_inhibit_interrupts;
+	bool m_uses_custom_memory_interface;
 
-	uint8_t read(uint16_t adr) { return mintf->read(adr); }
-	uint8_t read_9(uint16_t adr) { return mintf->read_9(adr); }
-	void write(uint16_t adr, uint8_t val) { mintf->write(adr, val); }
-	void write_9(uint16_t adr, uint8_t val) { mintf->write_9(adr, val); }
-	uint8_t read_arg(uint16_t adr) { return mintf->read_arg(adr); }
-	uint8_t read_pc() { return mintf->read_arg(PC); }
+	uint8_t read(uint16_t adr) { return m_mintf->read(adr); }
+	uint8_t read_9(uint16_t adr) { return m_mintf->read_9(adr); }
+	void write(uint16_t adr, uint8_t val) { m_mintf->write(adr, val); }
+	void write_9(uint16_t adr, uint8_t val) { m_mintf->write_9(adr, val); }
+	uint8_t read_arg(uint16_t adr) { return m_mintf->read_arg(adr); }
+	uint8_t read_pc() { return m_mintf->read_arg(m_PC); }
 	void prefetch_start();
 	void prefetch_end();
 	void prefetch_end_noirq();
 	void set_nz(uint8_t v);
 
-	u32 XPC;
+	u32 m_XPC;
 	virtual offs_t pc_to_external(u16 pc); // For paged PCs
 	virtual void do_exec_full();
 	virtual void do_exec_partial();
@@ -159,8 +159,8 @@ protected:
 	static inline uint16_t set_l(uint16_t base, uint8_t val) { return (base & 0xff00) | val; }
 	static inline uint16_t set_h(uint16_t base, uint8_t val) { return (base & 0x00ff) | (val << 8); }
 
-	inline void dec_SP() { SP = set_l(SP, SP-1); }
-	inline void inc_SP() { SP = set_l(SP, SP+1); }
+	inline void dec_SP() { m_SP = set_l(m_SP, m_SP-1); }
+	inline void inc_SP() { m_SP = set_l(m_SP, m_SP+1); }
 
 	void do_adc_d(uint8_t val);
 	void do_adc_nd(uint8_t val);

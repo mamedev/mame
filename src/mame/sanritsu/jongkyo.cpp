@@ -68,9 +68,9 @@ protected:
 
 private:
 	// misc
-	uint8_t m_rom_bank;
-	uint8_t m_key_rows;
-	uint8_t m_flip_screen;
+	uint8_t m_rom_bank = 0;
+	uint8_t m_key_rows = 0;
+	uint8_t m_flip_screen = 0;
 
 	// memory pointers
 	required_device<segacrpt_z80_device> m_maincpu;
@@ -83,8 +83,10 @@ private:
 	required_ioport m_coin_port;
 	required_ioport_array<6> m_pl1_inputs;
 	required_ioport_array<6> m_pl2_inputs;
-	uint8_t m_videoram2[0x4000];
+
+	uint8_t m_videoram2[0x4000]{};
 	std::unique_ptr<uint8_t[]> m_opcodes;
+
 	void bank_select_w(offs_t offset, uint8_t data);
 	void mux_w(uint8_t data);
 	void coin_counter_w(uint8_t data);
@@ -115,13 +117,12 @@ uint32_t jongkyo_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		{
 			uint8_t data3;
 
-	//      data3 = m_videoram2[x/4 + y*64]; // wrong
+			//data3 = m_videoram2[x/4 + y*64]; // wrong
 
-	// good mahjong tiles
+			// good mahjong tiles
 			data3 = 0x0f; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
-	// good girl tiles
-	//  data3 = 0x00; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
-
+			// good girl tiles
+			//data3 = 0x00; // we're missing 2 bits.. there must be another piece of video ram somewhere or we can't use all the colours (6bpp).. banked somehow?
 
 			uint8_t data1 = m_videoram[0x4000 + x / 4 + y * 64];
 			uint8_t data2 = m_videoram[x / 4 + y * 64];
@@ -512,7 +513,6 @@ void jongkyo_state::jongkyo(machine_config &config)
 	maincpu.set_numbanks(8);
 	maincpu.set_banksize(0x400);
 
-
 	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
 	screen.set_refresh_hz(60);
@@ -524,6 +524,7 @@ void jongkyo_state::jongkyo(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(jongkyo_state::palette), 0x100);
 
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	ay8910_device &aysnd(AY8910(config, "aysnd", 18.432_MHz_XTAL / 8));
 	aysnd.port_a_read_callback().set(FUNC(jongkyo_state::input_1p_r));
@@ -592,4 +593,4 @@ void jongkyo_state::init_jongkyo()
  *
  *************************************/
 
-GAME( 1985, jongkyo, 0, jongkyo, jongkyo, jongkyo_state, init_jongkyo, ROT0, "Kiwako", "Jongkyo", MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, jongkyo, 0, jongkyo, jongkyo, jongkyo_state, init_jongkyo, ROT0, "Sanritsu / Kiwako", "Jongkyo", MACHINE_IMPERFECT_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

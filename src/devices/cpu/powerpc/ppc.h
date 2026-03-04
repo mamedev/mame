@@ -15,13 +15,13 @@
 
 #include "ppc_dasm.h"
 
-#include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
 
 #include "divtlb.h"
 
 #include <algorithm>
+#include <bitset>
 
 
 /***************************************************************************
@@ -180,6 +180,7 @@ class ppc_device : public cpu_device, public device_vtlb_interface
 {
 protected:
 	class frontend;
+	class opcode_desc;
 
 	/* PowerPC flavors */
 	enum powerpc_flavor
@@ -699,8 +700,8 @@ protected:
 	bool generate_instruction_3b(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
 	bool generate_instruction_3f(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
 	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
-	const char *log_desc_flags_to_string(uint32_t flags);
-	void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
+	const char *log_desc_flags_to_string(const opcode_desc &desc);
+	void log_register_list(const char *string, const std::bitset<128> &reglist, const std::bitset<128> *regnostarlist);
 	void log_opcode_desc(const opcode_desc *desclist, int indent);
 
 private:

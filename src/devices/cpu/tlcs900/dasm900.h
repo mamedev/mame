@@ -46,7 +46,7 @@ private:
 	{
 	}
 	tlcs900_disassembler(std::pair<u16, char const *> const symbols[], std::size_t symbol_count,
-	                     cr_sym const cr_symbols[], std::size_t cr_symbol_count)
+						 cr_sym const cr_symbols[], std::size_t cr_symbol_count)
 		: m_symbols(symbols), m_symbol_count(symbol_count), m_cr_symbols(cr_symbols), m_cr_symbol_count(cr_symbol_count)
 	{
 	}

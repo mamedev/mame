@@ -144,9 +144,9 @@ private:
 
 void pangofun_state::main_map(address_map &map)
 {
-//	map(0x00000000, 0x0009ffff).ram();
-//	map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
-//	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
+//  map(0x00000000, 0x0009ffff).ram();
+//  map(0x000a0000, 0x000bffff).rw("vga", FUNC(vga_device::mem_r), FUNC(vga_device::mem_w));
+//  map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	// boot ROM has four 0xaa55 headers
 	// $00000 has CON/AUX/LPT/COM refs
 	// $08000 contains COMMAND.COM
@@ -155,19 +155,19 @@ void pangofun_state::main_map(address_map &map)
 	// moves in conventional memory and jumps to PC=700
 	map(0x000d0000, 0x000d7fff).rom().region("romdisk", 0x10000);
 	map(0x000d8000, 0x000dffff).rom().region("romdisk", 0x18000);
-//	map(0x000e0000, 0x000e7fff).rom().region("romdisk", 0x00000);
-//	map(0x000e8000, 0x000effff).rom().region("romdisk", 0x08000);
-//	map(0x000f0000, 0x000fffff).rom().region("bios", 0);
-//	map(0x00100000, 0x01ffffff).ram();
+//  map(0x000e0000, 0x000e7fff).rom().region("romdisk", 0x00000);
+//  map(0x000e8000, 0x000effff).rom().region("romdisk", 0x08000);
+//  map(0x000f0000, 0x000fffff).rom().region("bios", 0);
+//  map(0x00100000, 0x01ffffff).ram();
 	map(0x00100000, 0x03ffffff).noprw();
-//	map(0x02000000, 0xfffeffff).noprw();
+//  map(0x02000000, 0xfffeffff).noprw();
 	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
 }
 
 void pangofun_state::main_io(address_map &map)
 {
 	map(0x00e0, 0x00e3).nopw(); // timestamp stuff?
-//	map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
+//  map(0x03b0, 0x03df).m("vga", FUNC(vga_device::io_map));
 }
 
 

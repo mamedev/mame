@@ -138,6 +138,7 @@ void vga_device::device_start()
 	memset(&vga.memory[0], 0, vga.svga_intf.vram_size);
 	save_pointer(NAME(vga.memory), vga.svga_intf.vram_size);
 	save_item(NAME(vga.pens));
+	save_item(NAME(m_ioas));
 
 	save_item(NAME(vga.miscellaneous_output));
 	save_item(NAME(vga.feature_control));
@@ -1138,7 +1139,7 @@ void vga_device::sequencer_map(address_map &map)
 			vga.sequencer.char_sel.base[0] = 0x20000 + (vga.sequencer.char_sel.B * 0x2000);
 			vga.sequencer.char_sel.base[1] = 0x20000 + (vga.sequencer.char_sel.A * 0x2000);
 			//if(data)
-			//	popmessage("Char SEL checker (%02x %02x)\n",vga.sequencer.char_sel.A,vga.sequencer.char_sel.B);
+			//  popmessage("Char SEL checker (%02x %02x)\n",vga.sequencer.char_sel.A,vga.sequencer.char_sel.B);
 		})
 	);
 	// Sequencer Memory Mode Register

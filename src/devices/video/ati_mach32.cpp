@@ -184,11 +184,13 @@ void mach32_device::ati_define_video_mode()
 			}
 		}
 	}
-	//else
-	//{
-	//	ati_vga_device::ati_define_video_mode();
-	//	return;
-	//}
+#if 0
+	else
+	{
+		ati_vga_device::ati_define_video_mode();
+		return;
+	}
+#endif
 
 	set_dot_clock();
 }

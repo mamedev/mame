@@ -245,7 +245,7 @@ copyright-holders:m1macrophage
 		<rect>
 			<bounds x="1" y="1" width="20" height="10"/>
 			<color state="0" red="0.29" green="0.29" blue="0.29"/>
-			<color state="1" red="0.45" green="0.45" blue="0.45"/>
+			<color state="1" red="0.40" green="0.40" blue="0.40"/>
 		</rect>
 		<rect>
 			<bounds x="1" y="11" width="20" height="17"/>
@@ -254,7 +254,7 @@ copyright-holders:m1macrophage
 		<rect>
 			<bounds x="3" y="13" width="16" height="12"/>
 			<color state="0" red="0.26" green="0.26" blue="0.26"/>
-			<color state="1" red="0.45" green="0.45" blue="0.45"/>
+			<color state="1" red="0.40" green="0.40" blue="0.40"/>
 		</rect>
 	</element>
 	<element name="btn_grey">
@@ -265,7 +265,7 @@ copyright-holders:m1macrophage
 		<rect>
 			<bounds x="1" y="1" width="20" height="10"/>
 			<color state="0" red="0.60" green="0.60" blue="0.60"/>
-			<color state="1" red="0.73" green="0.73" blue="0.73"/>
+			<color state="1" red="0.40" green="0.40" blue="0.40"/>
 		</rect>
 		<rect>
 			<bounds x="1" y="11" width="20" height="17"/>
@@ -274,7 +274,7 @@ copyright-holders:m1macrophage
 		<rect>
 			<bounds x="3" y="13" width="16" height="12"/>
 			<color state="0" red="0.57" green="0.57" blue="0.57"/>
-			<color state="1" red="0.73" green="0.73" blue="0.73"/>
+			<color state="1" red="0.40" green="0.40" blue="0.40"/>
 		</rect>
 	</element>
 	<element name="btn_orange">
@@ -365,17 +365,37 @@ copyright-holders:m1macrophage
 	</element>
 	<element name="knob_black">
 		<disk><bounds x="0" y="0" width="28" height="28"/><color red="0.63" green="0.63" blue="0.63"/></disk>
-		<disk><bounds x="2" y="2" width="24" height="24"/><color red="0.13" green="0.13" blue="0.13"/></disk>
+		<disk>
+			<bounds x="2" y="2" width="24" height="24"/>
+			<color state="0" red="0.13" green="0.13" blue="0.13"/>
+			<color state="1" red="0.35" green="0.35" blue="0.35"/>
+		</disk>
 	</element>
 	<element name="knob_silver">
 		<disk><bounds x="0" y="0" width="28" height="28"/><color red="0.50" green="0.50" blue="0.50"/></disk>
-		<disk><bounds x="2" y="2" width="24" height="24"/><color red="0.67" green="0.67" blue="0.67"/></disk>
+		<disk>
+			<bounds x="2" y="2" width="24" height="24"/>
+			<color state="0" red="0.67" green="0.67" blue="0.67"/>
+			<color state="1" red="0.40" green="0.40" blue="0.40"/>
+		</disk>
 	</element>
 	<element name="knob_black_value">
 		<simplecounter digits="1"><color red="0.86" green="0.86" blue="0.86"/></simplecounter>
 	</element>
 	<element name="knob_silver_value">
 		<simplecounter digits="1"><color red="0.0" green="0.0" blue="0.0"/></simplecounter>
+	</element>
+	<element name="knob_black_dot">
+		<disk>
+			<color state="0" red="0" green="0" blue="0" alpha="0"/>
+			<color state="1" red="0.70" green="0.70" blue="0.70"/>
+		</disk>
+	</element>
+	<element name="knob_silver_dot">
+		<disk>
+			<color state="0" red="0" green="0" blue="0" alpha="0"/>
+			<color state="1" red="0.10" green="0.10" blue="0.10"/>
+		</disk>
 	</element>
 	<group name="knob">
 		<bounds x="0" y="0" width="56" height="62"/>
@@ -384,7 +404,10 @@ copyright-holders:m1macrophage
 		<element ref="~knob_style~" id="~knob_input~">
 			<bounds x="14" y="14" width="28" height="28"/>
 		</element>
-		<element ref="~knob_style~_value" inputtag="~knob_input~" inputmask="0xffff" inputraw="yes">
+		<element ref="~knob_style~_dot" id="~knob_input~_dot">
+			<bounds x="25" y="19" width="4" height="4"/>
+		</element>
+		<element ref="~knob_style~_value" id="~knob_input~_value" inputtag="~knob_input~" inputmask="0xffff" inputraw="yes">
 			<bounds x="18" y="23" width="20" height="10"/>
 		</element>
 		<element ref="transparent" clickthrough="no">
@@ -966,22 +989,36 @@ copyright-holders:m1macrophage
 				add_slider(view, "wheel_pitch", "wheel_pitch_dent", "wheel_pitch")
 				add_slider(view, "wheel_mod", "wheel_mod_dent", "wheel_mod")
 
-				local knob_scale = 1.6
-				add_knob(view, "pot_tune", "pot_tune", knob_scale, VERTICAL)
-				add_knob(view, "pot_volume", "pot_volume", knob_scale, VERTICAL)
+				add_prophet_knob(view, "pot_tune")
+				add_prophet_knob(view, "pot_volume")
 
 				for i = 0, 23 do
-					local knob = "pot_" .. i
-					add_knob(view, knob, knob, knob_scale, VERTICAL)
+					add_prophet_knob(view, "pot_" .. i)
 				end
 
 				view.items["warning"]:set_state(0)
 			end)
 
+		function add_prophet_knob(view, knob_id)
+			add_knob(view, knob_id, knob_id, 1.6, VERTICAL, knob_id .. "_dot")
+			get_layout_item(view, knob_id .. "_dot"):set_state(1)
+			get_layout_item(view, knob_id .. "_value"):set_color_callback(
+				function()
+					return emu.render_color(0, 0, 0, 0)
+				end)
+		end
+
 		-----------------------------------------------------------------------
 		-- Slider and knob library starts.
 		-- Can be copied as-is to other layouts.
+		-- version: 11
 		-----------------------------------------------------------------------
+
+		-- Global configuration. Can be overwritten in the resolve_tags callback.
+		KNOB_DOT_ANGLE_SPAN = 150  -- -/+ 150 degrees from top center.
+		UPDATE_CLICK_STATE = true
+
+		-- Constants.
 		VERTICAL = 0
 		HORIZONTAL = 1
 
@@ -1000,14 +1037,21 @@ copyright-holders:m1macrophage
 		end
 
 		-- A sweep between the attached field's min and max values requires
-		-- moving the pointer by `scale * clickarea.height` pixes.
-		function add_knob(view, clickarea_id, port_name, scale, drag_direction)
+		-- moving the pointer by `scale * clickarea.height` pixels, when drag
+		-- direction is VERTICAL. Replace `height` with `width` when HORIZONTAL.
+		--
+		-- `dot_id` is optional. If not nil, this script will take control of the
+		-- element's position as the knob rotates. The distance of the dot from
+		-- the center of `clickarea` will be preserved during rotation.
+		-- It is suggested you place the dot at the top-center of the knob.
+		function add_knob(view, clickarea_id, port_name, scale, drag_direction, dot_id)
 			table.insert(widgets, {
 				clickarea     = get_layout_item(view, clickarea_id),
 				field         = get_port_field(port_name),
 				is_knob       = true,
 				scale         = scale,
-				is_horizontal = (drag_direction == HORIZONTAL) })
+				is_horizontal = (drag_direction == HORIZONTAL),
+				knob_dot      = dot_id and get_layout_item(view, dot_id) })
 		end
 
 		function get_layout_item(view, item_id)
@@ -1041,9 +1085,21 @@ copyright-holders:m1macrophage
 			return field
 		end
 
+		local function set_click_state(widget, state)
+			if UPDATE_CLICK_STATE then
+				if widget.is_knob then
+					widget.clickarea:set_state(state)
+				else
+					widget.slider_knob:set_state(state)
+				end
+			end
+		end
+
 		local function release_pointer(pointer_id)
 			if pointers[pointer_id] then
-				local field = widgets[pointers[pointer_id].selected_widget].field
+				local widget = widgets[pointers[pointer_id].selected_widget]
+				set_click_state(widget, 0)
+				local field = widget.field
 				if field.is_analog then
 					field:clear_value()
 				end
@@ -1070,6 +1126,7 @@ copyright-holders:m1macrophage
 						relative = false
 					end
 					if found then
+						set_click_state(widgets[i], 1)
 						pointers[id] = {
 							selected_widget = i,
 							relative = relative,
@@ -1131,6 +1188,57 @@ copyright-holders:m1macrophage
 			end
 		end
 
+		local function get_knob_dot_bounds(widget)
+			local dot = widget.knob_dot_cache
+			local value = (widget.field.port:read() - dot.value_min) / dot.value_range
+			local angle = dot.angle_min + value * dot.angle_range
+			local rx = -dot.center_y * math.sin(angle) * dot.aspect
+			local ry = dot.center_y * math.cos(angle)
+			local x = rx + dot.dx
+			local y = ry + dot.dy
+			return emu.render_bounds(x, y, x + dot.width, y + dot.height)
+		end
+
+		local function configure_knob_dots()
+			for i = 1, #widgets do
+				local dot = widgets[i].knob_dot
+				if dot then
+					-- Remove bounds callback, since we need to access the
+					-- configured bounds.
+					dot:set_bounds_callback(nil)
+
+					local field = widgets[i].field
+					local knob_bounds = widgets[i].clickarea.bounds
+					local dot_bounds = dot.bounds
+					local max_angle = KNOB_DOT_ANGLE_SPAN * 2.0 * math.pi / 360.0
+
+					-- Compute the distance of the knob dot from the knob center.
+					local dot_x = dot_bounds.x0 + dot_bounds.width / 2.0
+					local dot_y = dot_bounds.y0 + dot_bounds.height / 2.0
+					local knob_x = knob_bounds.x0 + knob_bounds.width / 2.0
+					local knob_y = knob_bounds.y0 + knob_bounds.height / 2.0
+					local radius = math.sqrt((dot_y - knob_y) ^ 2 + (dot_x - knob_x) ^ 2)
+
+					widgets[i].knob_dot_cache = {
+						width       = dot_bounds.width,
+						height      = dot_bounds.height,
+						aspect      = dot_bounds.aspect,
+						value_min   = field.minvalue,
+						value_range = field.maxvalue - field.minvalue,
+						angle_min   = -max_angle,
+						angle_range = 2.0 * max_angle,
+						center_y    = -radius,
+						dx = knob_bounds.x0 + (knob_bounds.width - dot_bounds.width) / 2.0,
+						dy = knob_bounds.y0 + (knob_bounds.height - dot_bounds.height) / 2.0 }
+
+					dot:set_bounds_callback(
+						function()
+							return get_knob_dot_bounds(widgets[i])
+						end)
+				end
+			end
+		end
+
 		local function pointer_left(type, id, dev, x, y, up, cnt)
 			release_pointer(id)
 		end
@@ -1147,6 +1255,7 @@ copyright-holders:m1macrophage
 		end
 
 		function install_slider_callbacks(view)
+			view:set_recomputed_callback(configure_knob_dots)
 			view:set_pointer_updated_callback(pointer_updated)
 			view:set_pointer_left_callback(pointer_left)
 			view:set_pointer_aborted_callback(pointer_aborted)

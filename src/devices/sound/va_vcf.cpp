@@ -124,8 +124,10 @@ void va_lpf4_device::device_start()
 	}
 	else if (m_streamless_sample_rate == 0)
 	{
-		fatalerror("%s: not configured properly. Should either have streams connected, "
-		           "or be configured as streamless.\n", tag());
+		fatalerror(
+				"%s: not configured properly. Should either have streams connected, "
+				"or be configured as streamless.\n",
+				tag());
 	}
 
 	save_item(NAME(m_fc));

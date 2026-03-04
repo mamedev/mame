@@ -62,38 +62,18 @@ void bt54x_device::local_map(address_map &map)
 {
 	map(0x00000, 0x01fff).ram();
 	//map(0x02000, 0x0201f).rw("busintf", FUNC(ncr86c05_device::local_read), FUNC(ncr86c05_device::local_write));
-	map(0x02080, 0x0208f).m("scsi:7:scsic", FUNC(ncr53cf94_device::map));
+	map(0x02080, 0x0208f).m("scsic", FUNC(ncr53cf94_device::map));
 	map(0x02180, 0x02180).r(FUNC(bt54x_device::local_status_r));
 	map(0xf8000, 0xfffff).rom().region("mpu", 0);
-}
-
-void bt54x_device::asc_config(device_t *device)
-{
-	ncr53c94_device &asc = downcast<ncr53c94_device &>(*device);
-
-	asc.set_clock(25_MHz_XTAL); // not verified; perhaps selectable? (40 MHz XTAL also on board)
-
-	asc.irq_handler_cb().set(m_mpu, FUNC(i80188_cpu_device::int0_w));
-	//asc.drq_handler_cb().set("busintf", FUNC(ncr86c05_device::dma_req_w));
-}
-
-void bt54x_device::fsc_config(device_t *device)
-{
-	ncr53cf94_device &fsc = downcast<ncr53cf94_device &>(*device);
-
-	fsc.set_clock(40_MHz_XTAL);
-
-	fsc.irq_handler_cb().set(m_mpu, FUNC(i80188_cpu_device::int0_w)); // mostly polled on BT-545S
-	//fsc.drq_handler_cb().set("busintf", FUNC(ncr86c05_device::dma_req_w));
 }
 
 void bt54x_device::fsc_base(machine_config &config)
 {
 	//ncr86c05_device &busintf(NCR86C05(config, "busintf", 0));
 	//busintf.mint_callback().set(m_mpu, FUNC(i80188_cpu_device::int1_w));
-	//busintf.dma_ack_callback().set("scsi:7:scsic", FUNC(ncr53cf94_device::dma_w));
+	//busintf.dma_ack_callback().set("scsic", FUNC(ncr53cf94_device::dma_w));
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -101,9 +81,10 @@ void bt54x_device::fsc_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsic", true)
-		.option_add_internal("scsic", NCR53CF94) // FAS216
-		.machine_config([this] (device_t *device) { fsc_config(device); });
+	auto &scsic(NCR53CF94(config, "scsic", 40_MHz_XTAL));
+	scsi.set_external_device(7, scsic);
+	scsic.irq_handler_cb().set(m_mpu, FUNC(i80188_cpu_device::int0_w)); // mostly polled on BT-545S
+	//scsic.drq_handler_cb().set("busintf", FUNC(ncr86c05_device::dma_req_w));
 }
 
 void bt542b_device::device_add_mconfig(machine_config &config)
@@ -113,9 +94,9 @@ void bt542b_device::device_add_mconfig(machine_config &config)
 
 	//ncr86c05_device &busintf(NCR86C05(config, "busintf", 0));
 	//busintf.mint_callback().set(m_mpu, FUNC(i80188_cpu_device::int1_w));
-	//busintf.dma_ack_callback().set("scsi:7:scsic", FUNC(ncr53c94_device::dma_w));
+	//busintf.dma_ack_callback().set("scsic", FUNC(ncr53c94_device::dma_w));
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -123,9 +104,11 @@ void bt542b_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsic", true)
-		.option_add_internal("scsic", NCR53C94)
-		.machine_config([this] (device_t *device) { asc_config(device); });
+
+	auto &scsic(NCR53C94(config, "scsic", 25_MHz_XTAL));
+	scsi.set_external_device(7, scsic);
+	scsic.irq_handler_cb().set(m_mpu, FUNC(i80188_cpu_device::int0_w));
+	//scsic.drq_handler_cb().set("busintf", FUNC(ncr86c05_device::dma_req_w));
 
 	DP8473(config, m_fdc, 24_MHz_XTAL);
 }

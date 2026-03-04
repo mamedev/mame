@@ -99,7 +99,7 @@ INPUT_PORTS_END
 
 void cavepc_state::cavepc(machine_config &config)
 {
-	PENTIUM3(config, m_maincpu, 200'000'000); /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache ! */
+	PENTIUM3(config, m_maincpu, 200'000'000); /*  AMD Athlon 64 X2 5050e Brisbane 2.60GHz, 1024KB L2 Cache */
 	m_maincpu->set_addrmap(AS_PROGRAM, &cavepc_state::cavepc_map);
 	m_maincpu->set_addrmap(AS_IO, &cavepc_state::cavepc_io);
 

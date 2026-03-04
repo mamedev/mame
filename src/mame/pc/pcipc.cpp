@@ -36,6 +36,7 @@
 #include "machine/i82439hx.h"
 #include "machine/i82439tx.h"
 #include "machine/i82443bx_host.h"
+#include "machine/it8671f.h"
 #include "machine/pci.h"
 #include "machine/w83977tf.h"
 
@@ -84,6 +85,7 @@ private:
 	static void smc_superio_config(device_t *device);
 	static void smc707_superio_config(device_t *device);
 	static void winbond_superio_config(device_t *device);
+	static void ite_superio_config(device_t *device);
 };
 
 pcipc_state::pcipc_state(const machine_config &mconfig, device_type type, const char *tag) : driver_device(mconfig, type, tag)
@@ -506,6 +508,7 @@ static void isa_internal_devices(device_slot_interface &device)
 	device.option_add("fdc37c93x", FDC37C93X);
 	device.option_add("fdc37m707", FDC37M707);
 	device.option_add("w83977tf", W83977TF);
+	device.option_add("it8671f", IT8671F);
 }
 
 static void isa_com(device_slot_interface &device)
@@ -541,7 +544,7 @@ void pcipc_state::smc707_superio_config(device_t *device)
 	fdc37m707_device &fdc = *downcast<fdc37m707_device *>(device);
 	fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.gp25_gatea20().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -557,7 +560,7 @@ void pcipc_state::winbond_superio_config(device_t *device)
 	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
 //  fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.gp25_gatea20().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 //  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -566,6 +569,22 @@ void pcipc_state::winbond_superio_config(device_t *device)
 //  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
 //  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
 //  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+}
+
+void pcipc_state::ite_superio_config(device_t *device)
+{
+	// TODO: IT8679F (same ID as 8671F)
+	it8671f_device &ite = *downcast<it8671f_device *>(device);
+	ite.krst_gpio2().set_inputline(":maincpu", INPUT_LINE_RESET);
+	ite.ga20_gpio6().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
+	ite.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
+	ite.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
+	ite.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	ite.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	ite.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	ite.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	ite.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	ite.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
 
@@ -653,19 +672,54 @@ void pcipc_state::pcipcs7(machine_config &config)
 
 void pcipc_state::pcipctx(machine_config &config)
 {
+	// Socket 7 / PGA321
 	pentium_device &maincpu(PENTIUM(config, "maincpu", 60000000));
 	maincpu.set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
+//	maincpu.smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
 
 	PCI_ROOT(config, "pci", 0);
 	I82439TX(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
 
-	i82371sb_isa_device &isa(I82371SB_ISA(config, "pci:07.0", 0, "maincpu"));
+	// Really 'AB
+	// IT8680F claims to have an RTC but it doesn't seem enabled, assume internal RTC used instead.
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu", true));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
+//	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
+
+	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, "maincpu"));
+	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
+
+	I82371EB_USB (config, "pci:07.2", 0);
+	I82371EB_ACPI(config, "pci:07.3", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi");
+	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	PCI_SLOT(config, "pci:1", pci_cards, 15, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 16, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 17, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 18, 3, 0, 1, 2, "mga2064w");
+
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8671f", true).set_option_machine_config("it8671f", ite_superio_config);
+	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa3", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd1_w));
+	serport0.dcd_handler().set("board4:it8671f", FUNC(it8671f_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:it8671f", FUNC(it8671f_device::ndsr1_w));
+	serport0.ri_handler().set("board4:it8671f", FUNC(it8671f_device::nri1_w));
+	serport0.cts_handler().set("board4:it8671f", FUNC(it8671f_device::ncts1_w));
+
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:it8671f", FUNC(it8671f_device::rxd2_w));
+	serport1.dcd_handler().set("board4:it8671f", FUNC(it8671f_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:it8671f", FUNC(it8671f_device::ndsr2_w));
+	serport1.ri_handler().set("board4:it8671f", FUNC(it8671f_device::nri2_w));
+	serport1.cts_handler().set("board4:it8671f", FUNC(it8671f_device::ncts2_w));
+
 
 	x86_softlists(config);
 }
@@ -686,6 +740,7 @@ void pcipc_state::pciagp(machine_config &config)
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu"));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, "maincpu"));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
@@ -718,7 +773,7 @@ void pcipc_state::pciagp(machine_config &config)
 #endif
 
 	// FIXME: int mapping is unchecked for all slots
-	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "riva128");
+	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, "riva128");
 
 	PCI_SLOT(config, "pci:1", pci_cards, 9,  0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
@@ -746,6 +801,7 @@ void pcipc_state::se440bx2(machine_config &config)
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, "maincpu", true));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, "maincpu"));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
@@ -777,7 +833,7 @@ void pcipc_state::se440bx2(machine_config &config)
 	serport1.cts_handler().set("board4:fdc37m707", FUNC(fdc37c93x_device::ncts2_w));
 
 	// FIXME: int mapping is unchecked for all slots
-	PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "laguna3d");
+	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, "laguna3d");
 
 	// TODO: 0c is for YMF740 audio
 	PCI_SLOT(config, "pci:1", pci_cards, 13, 0, 1, 2, 3, nullptr);
@@ -800,8 +856,6 @@ ROM_START(pcipc)
 	// FIXME: this is incompatible, it's a Gigabyte GA-586HX with W83877F Super I/O
 	ROM_SYSTEM_BIOS(3, "5hx29", "5hx29")
 	ROMX_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(3) )
-//  ROM_REGION(0x8000,"ibm_vga", 0)
-//  ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
 
 #define rom_pcipcs7    rom_pcipc
@@ -810,9 +864,6 @@ ROM_START(pcipctx)
 	ROM_REGION32_LE(0x40000, "pci:07.0", 0) /* PC bios */
 	ROM_SYSTEM_BIOS(0, "ga586t2", "Gigabyte GA-586T2") // ITE 8679 I/O
 	ROMX_LOAD("gb_ga586t2.bin",  0x20000, 0x20000, CRC(3a50a6e1) SHA1(dea859b4f1492d0d08aacd260ed1e83e00ebac08), ROM_BIOS(0))
-
-	ROM_REGION(0x8000,"ibm_vga", 0)
-	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
 
 ROM_START(pciagp)
@@ -860,8 +911,8 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(1998, pcipc,    0,     0, pcipc,   0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", MACHINE_NO_SOUND )
-COMP(1998, pcipcs7,  pcipc, 0, pcipcs7, 0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX, Socket 7 CPU)", MACHINE_NO_SOUND ) // alternative of above, for running already installed OSes at their nominal speed + fiddling with MMX
-COMP(1998, pcipctx,  0,     0, pcipctx, 0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // unemulated super I/O
-COMP(1999, pciagp,   0,     0, pciagp,  0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // eventually PnP breaks OS booting, AGP cards aren't good enough, has issues with PCI pin mapper (no ROM present?)
-COMP(1998, se440bx2, 0,     0, se440bx2,0, pcipc_state, empty_init, "Intel",     "SE440BX-2 \"Seattle 2\"", MACHINE_NO_SOUND | MACHINE_NOT_WORKING) // Initial rev in '98. Black screen, never wake up video card after SMI. Wants better ACPI, eventually do the same SMBus loop as midqslvr.cpp
+COMP(1998, pcipc,    0,     0, pcipc,   0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX)", 0 )
+COMP(1998, pcipcs7,  pcipc, 0, pcipcs7, 0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430HX, Socket 7 CPU)", 0 ) // alternative of above, for running already installed OSes at their nominal speed + fiddling with MMX
+COMP(1998, pcipctx,  0,     0, pcipctx, 0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI PC (430TX)", MACHINE_NOT_WORKING) // shows the initial Award logo then crashes on ISA state 0xbf: chipset init
+COMP(1999, pciagp,   0,     0, pciagp,  0, pcipc_state, empty_init, "Hack Inc.", "Sandbox PCI/AGP PC (440BX)", MACHINE_NOT_WORKING) // eventually PnP breaks OS booting, AGP cards aren't good enough, has issues with PCI pin mapper (no ROM present?)
+COMP(1998, se440bx2, 0,     0, se440bx2,0, pcipc_state, empty_init, "Intel",     "SE440BX-2 \"Seattle 2\"", MACHINE_NOT_WORKING) // Initial rev in '98. Black screen, never wake up video card after SMI. Wants better ACPI, eventually do the same SMBus loop as midqslvr.cpp

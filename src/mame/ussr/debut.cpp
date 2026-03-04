@@ -67,6 +67,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_board(*this, "board"),
 		m_display(*this, "display"),
+		m_digit_pwm(*this, "lcd_pwm"),
 		m_dac(*this, "dac"),
 		m_out_digit(*this, "digit%u", 0U),
 		m_inputs(*this, "IN.0")
@@ -85,13 +86,13 @@ private:
 	required_device<i8086_cpu_device> m_maincpu;
 	required_device<sensorboard_device> m_board;
 	required_device<pwm_display_device> m_display;
+	required_device<pwm_display_device> m_digit_pwm;
 	required_device<dac_1bit_device> m_dac;
 	output_finder<4> m_out_digit;
 	required_ioport m_inputs;
 
 	u8 m_latch[5] = { };
 	u8 m_dac_data = 0;
-	u8 m_lcd_update = 0;
 
 	// address maps
 	void main_map(address_map &map) ATTR_COLD;
@@ -111,7 +112,6 @@ void debut_state::machine_start()
 	// register for savestates
 	save_item(NAME(m_latch));
 	save_item(NAME(m_dac_data));
-	save_item(NAME(m_lcd_update));
 }
 
 
@@ -167,15 +167,15 @@ void debut_state::latch_w(offs_t offset, u8 data)
 void debut_state::lcd_update_w(int state)
 {
 	// 8086 S5 also goes to the lcd panel
-	if (!state && m_lcd_update)
+	if (state)
 	{
-		u8 xorval = (m_latch[4] & 1) ? 0xff : 0;
+		const u8 xorval = (m_latch[4] & 1) ? 0xff : 0;
 
 		for (int i = 0; i < 4; i++)
-			m_out_digit[i] = bitswap<8>(m_latch[i+1] ^ xorval,0,7,4,3,2,1,6,5);
+			m_digit_pwm->write_row(i, bitswap<8>(m_latch[i+1] ^ xorval,0,7,4,3,2,1,6,5));
 	}
-
-	m_lcd_update = state;
+	else
+		m_digit_pwm->clear();
 }
 
 
@@ -239,6 +239,11 @@ void debut_state::debutm(machine_config &config)
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(2, 9);
 	m_display->set_bri_maximum(0.5);
+
+	PWM_DISPLAY(config, m_digit_pwm).set_size(4, 8);
+	m_digit_pwm->set_segmask(0xf, 0xff);
+	m_digit_pwm->output_digit().set([this](offs_t offset, u64 data) { m_out_digit[offset] = data; });
+
 	config.set_default_layout(layout_debutm);
 
 	// sound hardware

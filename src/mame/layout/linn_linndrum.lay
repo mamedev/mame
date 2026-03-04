@@ -648,7 +648,7 @@ copyright-holders:m1macrophage
 		-----------------------------------------------------------------------
 		-- Slider and knob library starts.
 		-- Can be copied as-is to other layouts.
-		-- version: 10
+		-- version: 11
 		-----------------------------------------------------------------------
 
 		-- Global configuration. Can be overwritten in the resolve_tags callback.
@@ -680,6 +680,7 @@ copyright-holders:m1macrophage
 		-- `dot_id` is optional. If not nil, this script will take control of the
 		-- element's position as the knob rotates. The distance of the dot from
 		-- the center of `clickarea` will be preserved during rotation.
+		-- It is suggested you place the dot at the top-center of the knob.
 		function add_knob(view, clickarea_id, port_name, scale, drag_direction, dot_id)
 			table.insert(widgets, {
 				clickarea     = get_layout_item(view, clickarea_id),
@@ -687,7 +688,7 @@ copyright-holders:m1macrophage
 				is_knob       = true,
 				scale         = scale,
 				is_horizontal = (drag_direction == HORIZONTAL),
-				knob_dot      = get_layout_item(view, dot_id) })
+				knob_dot      = dot_id and get_layout_item(view, dot_id) })
 		end
 
 		function get_layout_item(view, item_id)
@@ -902,4 +903,3 @@ copyright-holders:m1macrophage
 		-----------------------------------------------------------------------
 	]]></script>
 </mamelayout>
-

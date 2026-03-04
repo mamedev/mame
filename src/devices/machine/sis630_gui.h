@@ -61,8 +61,6 @@ private:
 	void unmap_log_w(offs_t offset, u8 data);
 };
 
-DECLARE_DEVICE_TYPE(SIS630_GUI, sis630_gui_device)
-
 class sis630_bridge_device : public pci_bridge_device
 {
 public:
@@ -71,8 +69,10 @@ public:
 		T &&gui_tag
 	) : sis630_bridge_device(mconfig, tag, owner, clock)
 	{
-		// either 0001 or 6001 as device ID
-		set_ids_bridge(0x10396001, 0x00);
+		// doc reports 0001 or 6001 as device ID
+		// assume latter as a mistake: will print "unknown" in pci.exe,
+		// likewise it's not known in PCI ID database
+		set_ids_bridge(0x10390001, 0x00);
 		//set_multifunction_device(true);
 		m_vga.set_tag(std::forward<T>(gui_tag));
 	}
@@ -92,6 +92,7 @@ private:
 	virtual void bridge_control_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) override;
 };
 
+DECLARE_DEVICE_TYPE(SIS630_GUI, sis630_gui_device)
 DECLARE_DEVICE_TYPE(SIS630_BRIDGE, sis630_bridge_device)
 
 #endif // MAME_MACHINE_SIS630_GUI_H

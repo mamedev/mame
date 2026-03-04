@@ -562,9 +562,13 @@ if (_ACTION == nil) then return false end
 configuration { "Debug" }
 	defines {
 		"MAME_DEBUG",
-		"MAME_PROFILER",
 --      "BGFX_CONFIG_DEBUG=1",
 	}
+if _OPTIONS["PROFILER"]~="0" then
+	defines {
+		"MAME_PROFILER",
+	}
+end
 
 configuration { }
 
@@ -653,19 +657,19 @@ else
 	end
 end
 
-if _OPTIONS["with-system-jpeg"]~=nil then
+if _OPTIONS["with-system-jpeg"] == "1" then
 	defines {
 		"XMD_H",
 	}
 end
 
-if not _OPTIONS["with-system-flac"]~=nil then
+if _OPTIONS["with-system-flac"] ~= "1" then
 	defines {
 		"FLAC__NO_DLL",
 	}
 end
 
-if not _OPTIONS["with-system-pugixml"] then
+if _OPTIONS["with-system-pugixml"] ~= "1" then
 	defines {
 		"PUGIXML_HEADER_ONLY",
 	}

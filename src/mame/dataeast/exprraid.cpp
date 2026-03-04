@@ -875,6 +875,41 @@ ROM_START( exprraidi ) // PCB manufactured in Italy by Gecas under Data East lic
 	ROM_LOAD( "pal16r4a.5e", 0x0200, 0x0104, CRC(9a8766a7) SHA1(5f84ad9e633daeb14531ef527827ef3d9b269437) )
 ROM_END
 
+ROM_START( exprraidbl ) // basically wexpress3 with Express Raider tilemap ROMs
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2.15b", 0x4000, 0x4000, CRC(40d70fcb) SHA1(1327d39f872a39e020972952e5756ca59c55f9d0) )
+	ROM_LOAD( "3.15a", 0x8000, 0x8000, CRC(d983e9b8) SHA1(21a2ceaf1f08cbd81907cdaa82fcbe262e2600d2) )
+
+	ROM_REGION( 0x10000, "slave", 0 )
+	ROM_LOAD( "7.1a", 0x8000, 0x8000, CRC(552e6112) SHA1(f8412a63cab0aa47321d602f69bf534426c6aa5d) )
+
+	ROM_REGION( 0x04000, "chars", 0 )
+	ROM_LOAD( "5b", 0x00000, 0x4000, CRC(686bac23) SHA1(b6c96ed40e90a8ba32c2e78a65f9589d387b0254) )
+
+	ROM_REGION( 0x30000, "sprites", 0 )
+	ROM_LOAD( "16h", 0x00000, 0x8000, CRC(1ed250d1) SHA1(c98b0440e4319308e683e857bbfeb6a150c76ff3) )
+	ROM_LOAD( "14h", 0x08000, 0x8000, CRC(2293fc61) SHA1(bf81db375f5424396559dcf0e04d34a52f6a020a) )
+	ROM_LOAD( "16k", 0x10000, 0x8000, CRC(7c3bfd00) SHA1(87b48e09aaeacf78f3260df893b0922e25d10a5d) )
+	ROM_LOAD( "14k", 0x18000, 0x8000, CRC(ea2294c8) SHA1(bc996351921e68e6237cee2d29fee882931ce0ea) )
+	ROM_LOAD( "13k", 0x20000, 0x8000, CRC(b7418335) SHA1(e9d08ee651b9221c371e2629a757bceca7b6192b) )
+	ROM_LOAD( "11k", 0x28000, 0x8000, CRC(2f611978) SHA1(fb60be573184d2af1dfdd543e68eeec53f2788f2) )
+
+	ROM_REGION( 0x20000, "bgtiles", 0 )
+	ROM_LOAD( "6.8e", 0x00000, 0x8000, CRC(643a1bd3) SHA1(b23631d96cb413808f65f3ebe8fe6539b6140606) )
+	// Save 0x08000-0x0ffff to expand the previous so we can decode the thing
+	ROM_LOAD( "5.8f", 0x10000, 0x8000, CRC(c44570bf) SHA1(3e9b8b6b36c7f5ae016dba3987ea19a29bd5ee5b) )
+	ROM_LOAD( "4.8g", 0x18000, 0x8000, CRC(b9bb448b) SHA1(84974b1f3a5b58cd427d874f805a6dd9244c1101) )
+
+	ROM_REGION( 0x8000, "bgtilemap", 0 )
+	ROM_LOAD( "1.12f", 0x0000, 0x8000, CRC(6ce11971) SHA1(16bfa69b3ad02253e81c8110c9b840be03952790) )
+
+	ROM_REGION( 0x0400, "proms", 0 ) // PROMs weren't dumped for this set, using the ones from the other
+	ROM_LOAD( "5b", 0x0000, 0x0100, CRC(da31dfbc) SHA1(ac476440864f538918f7bef2e1db82fd19195f89) ) // red
+	ROM_LOAD( "6b", 0x0100, 0x0100, CRC(51f25b4c) SHA1(bfcca57613fbb22919e00db1f6a8c7ca50faa60b) ) // green
+	ROM_LOAD( "7b", 0x0200, 0x0100, CRC(a6168d7f) SHA1(0c7b31adcd764ce2631c3fb5c1a968b01f65e741) ) // blue
+	ROM_LOAD( "9b", 0x0300, 0x0100, CRC(52aad300) SHA1(ff09772b930afa87e28d0628ef85a589a3d149c9) ) // priority
+ROM_END
+
 ROM_START( wexpress )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cy01-2.16b", 0x4000, 0x4000, CRC(a0ae6756) SHA1(7f7ec1efddbb62e9d201c6013bca8ab72c3f75f6) )
@@ -1064,6 +1099,7 @@ void exprraid_state::init_wexpressb()
 GAME( 1986, exprraid,   0,        exprraid,   exprraid, exprraid_state, gfx_expand,     ROT0, "Data East Corporation", "Express Raider (World, Rev 4)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1986, exprraidu,  exprraid, exprraid,   exprraid, exprraid_state, gfx_expand,     ROT0, "Data East USA",         "Express Raider (US, rev 5)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1986, exprraidi,  exprraid, exprraid,   exprraid, exprraid_state, gfx_expand,     ROT0, "Data East Corporation", "Express Raider (Italy)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, exprraidbl, exprraid, wexpressb3, exprboot, exprraid_state, gfx_expand,     ROT0, "bootleg",               "Express Raider (bootleg)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wexpress,   exprraid, exprraid,   exprraid, exprraid_state, gfx_expand,     ROT0, "Data East Corporation", "Western Express (Japan, rev 4)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wexpressb1, exprraid, exprraid,   exprraid, exprraid_state, init_wexpressb, ROT0, "bootleg",               "Western Express (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, wexpressb2, exprraid, wexpressb2, exprboot, exprraid_state, gfx_expand,     ROT0, "bootleg",               "Western Express (bootleg set 2)", MACHINE_SUPPORTS_SAVE )

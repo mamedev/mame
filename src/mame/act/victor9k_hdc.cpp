@@ -25,8 +25,8 @@ victor_9000_hdc_device::victor_9000_hdc_device(const machine_config &mconfig, co
 }
 
 victor_9000_hdc_device::victor_9000_hdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_device(mconfig, type, tag, owner, clock),
-	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
+	device_t(mconfig, type, tag, owner, clock),
+	nscsi_device_interface(mconfig, *this),
 	m_dma_r(*this, 0xff),
 	m_dma_w(*this),
 	m_irq_handler(*this),
@@ -65,10 +65,10 @@ uint8_t victor_9000_hdc_device::read(offs_t offset)
 			if (m_non_dma_req && !machine().side_effects_disabled())
 			{
 				m_non_dma_req = false;
-				scsi_bus->data_w(scsi_refid, 0);
-				m_data = scsi_bus->data_r();
+				m_scsi_bus->data_w(m_scsi_refid, 0);
+				m_data = m_scsi_bus->data_r();
 				m_asserting_ack = true;
-				scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+				m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 			}
 			data = m_data;
 			break;
@@ -133,7 +133,7 @@ void victor_9000_hdc_device::write(offs_t offset, uint8_t data)
 				m_dma_write = (data & R_C_WMODE);
 
 				uint32_t sel = ((data & R_C_SELECT) ? S_SEL : 0);
-				scsi_bus->ctrl_w(scsi_refid, sel, S_SEL);
+				m_scsi_bus->ctrl_w(m_scsi_refid, sel, S_SEL);
 			}
 			break;
 		case R_DATA:
@@ -149,16 +149,16 @@ void victor_9000_hdc_device::write(offs_t offset, uint8_t data)
 				// data lines change without a change in the SEL control line.
 				// Workaround is to ensure SEL isn't asserted whenever the data
 				// bus is written.
-				scsi_bus->ctrl_w(scsi_refid, 0, S_SEL);
+				m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL);
 				m_ctrl &= ~R_C_SELECT;
 			}
 
-			scsi_bus->data_w(scsi_refid, data);
+			m_scsi_bus->data_w(m_scsi_refid, data);
 			if (m_non_dma_req)
 			{
 				m_non_dma_req = false;
 				m_asserting_ack = true;
-				scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+				m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 			}
 			break;
 		case R_STATUS:
@@ -189,9 +189,9 @@ void victor_9000_hdc_device::device_reset()
 	m_data = 0;
 	m_bus_ctrl = 0;
 
-	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_REQ|S_RST, S_ALL);
-	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-	scsi_bus->data_w(scsi_refid, 0);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_SEL|S_BSY|S_REQ|S_RST, S_ALL);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
+	m_scsi_bus->data_w(m_scsi_refid, 0);
 
 	update_ints(false);
 	m_irq_handler(false);
@@ -224,20 +224,20 @@ TIMER_CALLBACK_MEMBER(victor_9000_hdc_device::ctrl_change_handler)
 			if (m_dma_write)
 			{
 				// Write to system memory
-				scsi_bus->data_w(scsi_refid, 0);
-				m_data = scsi_bus->data_r();
+				m_scsi_bus->data_w(m_scsi_refid, 0);
+				m_data = m_scsi_bus->data_r();
 				m_dma_w(m_dma_addr, m_data);
 			}
 			else
 			{
 				// Read from system memory
 				m_data = m_dma_r(m_dma_addr);
-				scsi_bus->data_w(scsi_refid, m_data);
+				m_scsi_bus->data_w(m_scsi_refid, m_data);
 			}
 			m_dma_addr++;
 
 			m_asserting_ack = true;
-			scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 		}
 		else
 		{
@@ -247,7 +247,7 @@ TIMER_CALLBACK_MEMBER(victor_9000_hdc_device::ctrl_change_handler)
 	}
 	else if (m_asserting_ack)
 	{
-		scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 		m_asserting_ack = false;
 	}
 
@@ -260,7 +260,7 @@ TIMER_CALLBACK_MEMBER(victor_9000_hdc_device::ctrl_change_handler)
 
 void victor_9000_hdc_device::scsi_ctrl_changed()
 {
-	m_bus_ctrl = scsi_bus->ctrl_r();
+	m_bus_ctrl = m_scsi_bus->ctrl_r();
 	attotime delay;
 
 	if (m_bus_ctrl & S_REQ)

@@ -89,7 +89,7 @@ void luna_68k_gpu_device::gpu_w(u32 data)
 			m_command[m_size++] = data;
 			return;
 		}
-	} else if(m_expected_size) {			
+	} else if(m_expected_size) {
 		m_command[m_size++] = data;
 		if(m_size == m_expected_size) {
 			multiword_done();

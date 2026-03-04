@@ -15,6 +15,7 @@ TODO (main):
 - EISA slots;
 - SMBus;
 - PS/2 mouse is unstable, worked around by disabling and using a serial mouse instead.
+- BIOS won't recognize PCI_SLOT expansion ROMs;
 
 TODO (usability, to be moved in a SW list):
 - windows xp sp3: tests HW then does an ACPI devtrap write ($48), will eventually BSoD with
@@ -28,7 +29,7 @@ TODO (usability, to be moved in a SW list):
   with a STOP #a0 INTERNAL_POWER_ERROR with param1 0x5 ("reserved"!?)
 
 - gamecstl Kontron BIOS:
-\- hangs at PC=0xf3cf2, again wanting a SMI# from devtrap_en_w;
+\- hangs at PC=0xf3cf2 with a jp $-2, after software SMI#;
 \- No PS/2 inputs;
 
 - gamecstl dump (tested from shutms11, also see notes below):
@@ -174,6 +175,7 @@ Notes on possible shutms11 BIOS bugs:
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "bus/isa/isa_cards.h"
+#include "bus/pci/pci_slot.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
@@ -189,6 +191,7 @@ Notes on possible shutms11 BIOS bugs:
 #include "machine/sis7001_usb.h"
 #include "machine/sis7018_audio.h"
 #include "machine/sis900_eth.h"
+#include "machine/sis950_acpi.h"
 #include "machine/sis950_lpc.h"
 #include "machine/sis950_smbus.h"
 
@@ -201,8 +204,6 @@ public:
 	sis630_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_ide_00_1(*this, "pci:00.1")
-		, m_lpc_01_0(*this, "pci:01.0")
 	{ }
 
 	void sis630(machine_config &config);
@@ -215,8 +216,6 @@ public:
 private:
 
 	required_device<pentium3_device> m_maincpu;
-	required_device<sis5513_ide_device> m_ide_00_1;
-	required_device<sis950_lpc_device> m_lpc_01_0;
 
 //  void main_io(address_map &map) ATTR_COLD;
 //  void main_map(address_map &map) ATTR_COLD;
@@ -266,7 +265,7 @@ void sis630_state::sis630(machine_config &config)
 //  m_maincpu->set_addrmap(AS_PROGRAM, &sis630_state::main_map);
 //  m_maincpu->set_addrmap(AS_IO, &sis630_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:01.0:pic_master", FUNC(pic8259_device::inta_cb));
-//  m_maincpu->smiact().set("pci:00.0", FUNC(sis950_lpc_device::smi_act_w));
+	m_maincpu->smiact().set("pci:00.0", FUNC(sis630_host_device::smi_act_w));
 
 	// TODO: unknown flash ROM types
 	// Needs a $80000 sized ROM
@@ -275,19 +274,17 @@ void sis630_state::sis630(machine_config &config)
 	PCI_ROOT(config, "pci", 0);
 	// up to 512MB, 2 x DIMM sockets
 	SIS630_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
-	SIS5513_IDE(config, m_ide_00_1, 0, "maincpu");
-	// TODO: both on same line as default, should also trigger towards LPC
-	m_ide_00_1->irq_pri().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir6_w));
-		//FUNC(sis950_lpc_device::pc_irq14_w));
-	m_ide_00_1->irq_sec().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir7_w));
-		//FUNC(sis950_lpc_device::pc_mirq0_w));
+	sis5513_ide_device &ide(SIS5513_IDE(config, "pci:00.1", 0, "maincpu"));
+	ide.irq_pri().set("pci:01.0", FUNC(sis950_lpc_device::pc_iirqa_w));
+	ide.irq_sec().set("pci:01.0", FUNC(sis950_lpc_device::pc_iirqb_w));
 
-	SIS950_LPC(config, m_lpc_01_0, XTAL(33'000'000), "maincpu", "flash");
-	m_lpc_01_0->fast_reset_cb().set([this] (int state) {
+	sis950_lpc_device &lpc(SIS950_LPC(config, "pci:01.0", XTAL(33'000'000), "maincpu", "flash"));
+	lpc.fast_reset_cb().set([this] (int state) {
 		if (state)
 			machine().schedule_soft_reset();
 	});
-	LPC_ACPI(config, "pci:01.0:acpi", 0);
+	sis950_acpi_device &acpi(SIS950_ACPI(config, "pci:01.0:acpi", 0));
+	acpi.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 	SIS950_SMBUS(config, "pci:01.0:smbus", 0);
 
 	SIS900_ETH(config, "pci:01.1", 0);
@@ -308,13 +305,16 @@ void sis630_state::sis630(machine_config &config)
 //  "pci:08.0" SCSI controller (vendor=1000 NCR / LSI Logic / Symbios Logic device=0012 53C895A)
 //  "pci:09.0" IEEE1394 controller (vendor=1033 NEC device=00ce uPD72872 / μPD72872)
 
-	// TODO: 3 expansion PCI slots (PC104+)
+	// 3 expansion PCI slots (PC104+)
 	// "pci:09.x" to "pci:12.x"?
+	PCI_SLOT(config, "pci:1", pci_cards, 9,  0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
+
 	// (PIC-MG)
 	// "pci:20.x" to "pci:17.x"?
 
-	// TODO: 1 parallel + 2 serial ports
-	// TODO: 1 game port ('7018?)
+	// TODO: 1 game port (as connection in '7018?)
 
 	// TODO: move in MB implementations
 	// (some unsupported variants uses W83697HF, namely Gigabyte GA-6SMZ7)

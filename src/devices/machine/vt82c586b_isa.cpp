@@ -180,6 +180,9 @@ void vt82c586b_isa_device::device_start()
 	save_item(NAME(m_pirqrc));
 	save_item(NAME(m_mirq));
 	save_item(NAME(m_mirq_pin_config));
+
+	save_item(NAME(m_ide_pin_config));
+	save_item(NAME(m_acpi_pin_config));
 }
 
 void vt82c586b_isa_device::device_reset()
@@ -201,6 +204,8 @@ void vt82c586b_isa_device::device_reset()
 	m_dma_control_typef = 0;
 	std::fill(std::begin(m_misc_control), std::end(m_misc_control), 0);
 	m_ide_irq_routing = 0x00 | (1 << 2) | (0 << 0);
+	m_ide_pin_config[0] = 14;
+	m_ide_pin_config[1] = 15;
 	std::fill(std::begin(m_pirqrc), std::end(m_pirqrc), 0);
 	std::fill(std::begin(m_mirq), std::end(m_mirq), 0);
 	m_mirq_pin_config = 0;
@@ -301,13 +306,7 @@ void vt82c586b_isa_device::config_map(address_map &map)
 			// TODO: remap cb for bit 3
 		})
 	);
-	map(0x4a, 0x4a).lrw8(
-		NAME([this] () { return m_ide_irq_routing; }),
-		NAME([this] (offs_t offset, u8 data) {
-			m_ide_irq_routing = data;
-			LOG("4Ah: IDE Interrupt Routing %02x\n", data);
-		})
-	);
+	map(0x4a, 0x4a).rw(FUNC(vt82c586b_isa_device::ide_irq_routing_r), FUNC(vt82c586b_isa_device::ide_irq_routing_w));
 	map(0x4c, 0x4c).lrw8(
 		NAME([this] () { return m_pci_memory_hole_bottom; }),
 		NAME([this] (offs_t offset, u8 data) {
@@ -428,15 +427,30 @@ void vt82c586b_isa_device::config_map(address_map &map)
 	// 0x70 ~ 0x73 Subsystem ID
 }
 
+u8 vt82c586b_isa_device::ide_irq_routing_r(offs_t offset)
+{
+	return m_ide_irq_routing;
+}
+
+void vt82c586b_isa_device::ide_irq_routing_w(offs_t offset, u8 data)
+{
+	m_ide_irq_routing = data;
+	LOG("4Ah: IDE Interrupt Routing %02x\n", data);
+	static const u8 irq_nums[4] = { 14, 15, 10, 11 };
+	m_ide_pin_config[0] = irq_nums[m_ide_irq_routing & 3];
+	m_ide_pin_config[1] = irq_nums[(m_ide_irq_routing >> 2) & 3];
+	LOG("\tIDE Primary IRQ%d Secondary IRQ%d", m_ide_pin_config[0], m_ide_pin_config[1]);
+}
+
 void vt82c586b_isa_device::internal_io_map(address_map &map)
 {
 	map(0x0000, 0x001f).rw(m_dma[0], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
 	map(0x0020, 0x0021).rw(m_pic[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-//	map(0x0060, 0x0060) keyboard
+//  map(0x0060, 0x0060) keyboard
 	map(0x0061, 0x0061).rw(FUNC(vt82c586b_isa_device::at_portb_r), FUNC(vt82c586b_isa_device::at_portb_w));
-//	map(0x0064, 0x0064) keyboard
-//	map(0x0070, 0x0073) RTC
+//  map(0x0064, 0x0064) keyboard
+//  map(0x0070, 0x0073) RTC
 	map(0x0080, 0x008f).rw(FUNC(vt82c586b_isa_device::at_page8_r), FUNC(vt82c586b_isa_device::at_page8_w));
 	map(0x0092, 0x0092).rw(FUNC(vt82c586b_isa_device::port92_r), FUNC(vt82c586b_isa_device::port92_w));
 	map(0x00a0, 0x00a1).rw(m_pic[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
@@ -825,9 +839,6 @@ void vt82c586b_isa_device::redirect_irq(int irq, int state)
 	{
 	case 0:
 	case 2:
-	case 8:
-	case 13:
-		break;
 	// Claims irq 1 to be selectable vs. other PCI ISAs
 	case 1:
 		m_pic[0]->ir1_w(state);
@@ -847,9 +858,14 @@ void vt82c586b_isa_device::redirect_irq(int irq, int state)
 	case 7:
 		m_pic[0]->ir7_w(state);
 		break;
+	// selectable by SCI irq
+	case 8:
+		m_pic[1]->ir0_w(state);
+		break;
 	case 9:
 		m_pic[1]->ir1_w(state);
 		break;
+	// selectable by SCI irq
 	case 10:
 		m_pic[1]->ir2_w(state);
 		break;
@@ -858,6 +874,9 @@ void vt82c586b_isa_device::redirect_irq(int irq, int state)
 		break;
 	case 12:
 		m_pic[1]->ir4_w(state);
+		break;
+	case 13:
+		m_pic[1]->ir5_w(state);
 		break;
 	case 14:
 		m_pic[1]->ir6_w(state);
@@ -889,8 +908,8 @@ void vt82c586b_isa_device::pc_pirqa_w(int state)
 {
 	int irq = m_pirqrc[0] & 15;
 
-//	if (m_pirqrc[0] & 128)
-//		return;
+//  if (m_pirqrc[0] & 128)
+//      return;
 	redirect_irq(irq, state);
 }
 
@@ -898,8 +917,8 @@ void vt82c586b_isa_device::pc_pirqb_w(int state)
 {
 	int irq = m_pirqrc[1] & 15;
 
-//	if (m_pirqrc[1] & 128)
-//		return;
+//  if (m_pirqrc[1] & 128)
+//      return;
 	redirect_irq(irq, state);
 }
 
@@ -907,8 +926,8 @@ void vt82c586b_isa_device::pc_pirqc_w(int state)
 {
 	int irq = m_pirqrc[2] & 15;
 
-//	if (m_pirqrc[2] & 128)
-//		return;
+//  if (m_pirqrc[2] & 128)
+//      return;
 	redirect_irq(irq, state);
 }
 
@@ -916,8 +935,8 @@ void vt82c586b_isa_device::pc_pirqd_w(int state)
 {
 	int irq = m_pirqrc[3] & 15;
 
-//	if (m_pirqrc[3] & 128)
-//		return;
+//  if (m_pirqrc[3] & 128)
+//      return;
 	redirect_irq(irq, state);
 }
 

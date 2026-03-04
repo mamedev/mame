@@ -94,7 +94,7 @@ void silverball_state::i440zx_superio_config(device_t *device)
 	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
 //  fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.gp25_gatea20().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 //  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -121,9 +121,10 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
-	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu, false));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, PCI_IDE_ID, 0, m_maincpu));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
@@ -143,8 +144,7 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	// TODO: actually a Trio64V2
-	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "virge");
+	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "trio64dx");
 }
 
 
@@ -191,7 +191,7 @@ void silverball_state::silverball_i440zx(machine_config &config)
 	ROM_SYSTEM_BIOS(16, "bios30", "BIOS30 (Soyo SY-7IZB+)") \
 	ROMX_LOAD("bios30.bin", 0x00000, 0x40000, CRC(c6e30fb1) SHA1(1d9a900a5383bf58b66a2e9f7fb34c61397dd327), ROM_BIOS(16)) /* Soyo Computer Inc. SY-7IZB+ */ \
 	/* Soyo SY-5EAS */ \
-	ROM_SYSTEM_BIOS(17, "bios29", "BIOS29 (Soyo 5EAS)") /* Dumped from the actual Silverball 8.06 machine */ \
+	ROM_SYSTEM_BIOS(17, "bios29", "BIOS29 (Soyo SY-5EAS)") /* Dumped from the actual Silverball 8.06 machine */ \
 	ROMX_LOAD("bios29.bin", 0x00000, 0x20000, CRC(ddbd94f4) SHA1(60ad74e56265a7936cf19e8480c657223d11f2d0), ROM_BIOS(17)) /* 06/18/1998-EQ82C6618A-ET-2A5LDS2FC-29 */ \
 	ROM_RELOAD( 0x20000, 0x20000 ) \
 	ROM_SYSTEM_BIOS(18, "test", "TEST (Soyo SY-5EAS)") /* BIOS update labeled as "TEST", from the Silverball software update files */ \
@@ -205,12 +205,12 @@ ROM_START(slvrball)
 ROM_END
 
 //ROM_START(slvrball806)
-//	SILVERBALL_BIOS
+//  SILVERBALL_BIOS
 //  ROM_DEFAULT_BIOS("bios29") // The one dumped from the actual machine
-//	ROM_DEFAULT_BIOS("bios33")
+//  ROM_DEFAULT_BIOS("bios33")
 //
-//	DISK_REGION( PCI_IDE_ID":ide1:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
-//	DISK_IMAGE("silverball_8.06", 0, BAD_DUMP SHA1(4bd03240229a2f59d457e95e04837422c423111b)) // May contain operator data
+//  DISK_REGION( PCI_IDE_ID":ide1:0:hdd" ) // 16383 cylinders, 16 heads, 63 sectors
+//  DISK_IMAGE("silverball_8.06", 0, BAD_DUMP SHA1(4bd03240229a2f59d457e95e04837422c423111b)) // May contain operator data
 //ROM_END
 
 ROM_START(slvrball720)

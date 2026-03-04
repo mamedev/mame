@@ -102,13 +102,13 @@ inline static int32_t negate(int32_t value) {
 }
 
 inline static int32_t asl(int32_t value, int shift, uint8_t &flags) {
-	int32_t src24 = value & 0x00ffffff;
-	bool carry = ((src24 >> (24 - shift)) & 1) != 0;
-	int64_t shifted = util::sext(src24, 24) << shift;
-	bool overflow = (shifted > 0x007fffffLL) || (shifted < -0x00800000LL);
-	int32_t result = overflow
-		? (shifted < 0 ? 0x00800000 : 0x007fffff)
-		: (static_cast<int32_t>(shifted) & 0x00ffffff);
+	const int32_t src24 = value & 0x00ffffff;
+	const bool carry = BIT(src24, 24 - shift);
+	const int64_t shifted = util::sext(src24, 24) << shift;
+	const bool overflow = (shifted > 0x007fffffLL) || (shifted < -0x00800000LL);
+	const int32_t result = overflow
+		? ((shifted < 0) ? 0x00800000 : 0x007fffff)
+		: (int32_t(shifted) & 0x00ffffff);
 
 	flags = setFlagTo(flags, FLAG_C, carry);
 	flags = setFlagTo(flags, FLAG_V, overflow);

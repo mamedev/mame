@@ -158,6 +158,7 @@ adsp21062_device::adsp21062_device(
 	, m_swap_dag2_4_7(nullptr)
 	, m_swap_r0_7(nullptr)
 	, m_swap_r8_15(nullptr)
+	, m_flag_out_cb(*this)
 	, m_blocks(*this, "block%u", 0U)
 	, m_flag_pending_val{ 0, 0, 0, 0 }
 	, m_write_stalled_pending_val{ false }
@@ -618,7 +619,7 @@ void adsp21062_device::device_start()
 		m_drcuml->symbol_add(&m_core->lstkp, sizeof(m_core->lstkp), "lstkp");
 		m_drcuml->symbol_add(&m_core->px, sizeof(m_core->px), "px");
 
-		m_drcfe = std::make_unique<sharc_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);
+		m_drcfe = std::make_unique<frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);
 
 		for (int i = 0; i < 16; i++)
 			m_regmap[i] = uml::mem(&m_core->r[i]);

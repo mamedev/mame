@@ -226,18 +226,27 @@ chd_file *device_image_interface::current_preset_image_chd() const
 
 void device_image_interface::switch_preset_image(int id)
 {
-	for (unsigned int i = 0; i != m_preset_images.size(); i++)
+	for (unsigned i = 0; i != m_preset_images.size(); i++)
+	{
 		if (m_preset_images[i])
 		{
-			if(!id)
+			if (!id)
 			{
-				call_unload();
+				if (is_loaded() || loaded_through_softlist())
+				{
+					call_unload();
+					clear();
+					m_media_change_notifier(media_change_event::UNLOADED);
+				}
 				m_current_region = i;
-				call_load();
+				auto const err = call_load();
+				if (!err.first)
+					m_media_change_notifier(media_change_event::LOADED);
 				break;
 			}
 			id--;
 		}
+	}
 
 	return;
 }
@@ -1095,7 +1104,6 @@ void device_image_interface::unload()
 {
 	if (is_loaded() || loaded_through_softlist())
 	{
-		m_sequence_counter++;
 		call_unload();
 		clear();
 		m_media_change_notifier(media_change_event::UNLOADED);

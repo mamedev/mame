@@ -104,8 +104,8 @@ private:
 	memory_view m_cpu_boot;
 
 	// gpu
-	//	void acrtc_display(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data);
-	//	u32 crtc_flags_r();
+	//  void acrtc_display(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, int x, uint16_t data);
+	//  u32 crtc_flags_r();
 
 	// cmc
 };
@@ -250,7 +250,7 @@ void luna_68k_state::cpu_map(address_map &map)
 	// to 32M, but it's unknown how many address lines max the simms
 	// can have.
 
-	map(0x00000000, 0x003fffff).ram(); 
+	map(0x00000000, 0x003fffff).ram();
 	map(0x00000000, 0x00000007).view(m_cpu_boot);
 	m_cpu_boot[0](0x00000000, 0x00000007).rom().region("eprom", 0);
 

@@ -33,6 +33,10 @@
 
 #pragma once
 
+#include <bitset>
+#include <type_traits>
+#include <vector>
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -42,125 +46,175 @@
 constexpr offs_t BRANCH_TARGET_DYNAMIC = ~offs_t(0);
 
 
-// opcode branch flags
-constexpr u32 OPFLAG_IS_UNCONDITIONAL_BRANCH = 0x00000001;       // instruction is unconditional branch
-constexpr u32 OPFLAG_IS_CONDITIONAL_BRANCH   = 0x00000002;       // instruction is conditional branch
-constexpr u32 OPFLAG_IS_BRANCH               = (OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_IS_CONDITIONAL_BRANCH);
-constexpr u32 OPFLAG_IS_BRANCH_TARGET        = 0x00000004;       // instruction is the target of a branch
-constexpr u32 OPFLAG_IN_DELAY_SLOT           = 0x00000008;       // instruction is in the delay slot of a branch
-constexpr u32 OPFLAG_INTRABLOCK_BRANCH       = 0x00000010;       // instruction branches within the block
-
-// opcode exception flags
-constexpr u32 OPFLAG_CAN_TRIGGER_SW_INT      = 0x00000020;       // instruction can trigger a software interrupt
-constexpr u32 OPFLAG_CAN_EXPOSE_EXTERNAL_INT = 0x00000040;       // instruction can expose an external interrupt
-constexpr u32 OPFLAG_CAN_CAUSE_EXCEPTION     = 0x00000080;       // instruction may generate exception
-constexpr u32 OPFLAG_WILL_CAUSE_EXCEPTION    = 0x00000100;       // instruction will generate exception
-constexpr u32 OPFLAG_PRIVILEGED              = 0x00000200;       // instruction is privileged
-
-// opcode virtual->physical translation flags
-constexpr u32 OPFLAG_VALIDATE_TLB            = 0x00000400;       // instruction must validate TLB before execution
-constexpr u32 OPFLAG_MODIFIES_TRANSLATION    = 0x00000800;       // instruction modifies the TLB
-constexpr u32 OPFLAG_COMPILER_PAGE_FAULT     = 0x00001000;       // compiler hit a page fault when parsing
-constexpr u32 OPFLAG_COMPILER_UNMAPPED       = 0x00002000;       // compiler hit unmapped memory when parsing
-
-// opcode flags
-constexpr u32 OPFLAG_INVALID_OPCODE          = 0x00004000;       // instruction is invalid
-constexpr u32 OPFLAG_VIRTUAL_NOOP            = 0x00008000;       // instruction is a virtual no-op
-
-// opcode sequence flow flags
-constexpr u32 OPFLAG_REDISPATCH              = 0x00010000;       // instruction must redispatch after completion
-constexpr u32 OPFLAG_RETURN_TO_START         = 0x00020000;       // instruction must jump back to the beginning after completion
-constexpr u32 OPFLAG_END_SEQUENCE            = 0x00040000;       // this is the last instruction in a sequence
-constexpr u32 OPFLAG_CAN_CHANGE_MODES        = 0x00080000;       // instruction can change modes
-
-// execution semantics
-constexpr u32 OPFLAG_READS_MEMORY            = 0x00100000;       // instruction reads memory
-constexpr u32 OPFLAG_WRITES_MEMORY           = 0x00200000;       // instruction writes memory
-
-
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
 // description of a given opcode
-struct opcode_desc
+template <typename Impl, size_t N>
+class opcode_desc_base
 {
-	opcode_desc *next() const { return m_next; }
+public:
+	using regmask = std::bitset<N>;
+
+	Impl *next() const { return m_next; }
+
+	void set_is_unconditional_branch()   { m_flags.set(IS_UNCONDITIONAL_BRANCH); }
+	void set_is_conditional_branch()     { m_flags.set(IS_CONDITIONAL_BRANCH); }
+	void set_is_branch_target()          { m_flags.set(IS_BRANCH_TARGET); }
+	void set_in_delay_slot()             { m_flags.set(IN_DELAY_SLOT); }
+	void set_intrablock_branch()         { m_flags.set(INTRABLOCK_BRANCH); }
+	void set_can_cause_exception()       { m_flags.set(CAN_CAUSE_EXCEPTION); }
+	void set_will_cause_exception()      { m_flags.set(WILL_CAUSE_EXCEPTION); }
+	void set_validate_tlb()              { m_flags.set(VALIDATE_TLB); }
+	void set_compiler_page_fault()       { m_flags.set(COMPILER_PAGE_FAULT); }
+	void set_invalid_opcode()            { m_flags.set(INVALID_OPCODE); }
+	void set_virtual_noop()              { m_flags.set(VIRTUAL_NOOP); }
+	void set_redispatch()                { m_flags.set(REDISPATCH); }
+	void set_return_to_start()           { m_flags.set(RETURN_TO_START); }
+	void set_end_sequence()              { m_flags.set(END_SEQUENCE); }
+
+	bool is_unconditional_branch() const { return m_flags[IS_UNCONDITIONAL_BRANCH]; }
+	bool is_conditional_branch() const   { return m_flags[IS_CONDITIONAL_BRANCH]; }
+	bool is_branch() const               { return is_unconditional_branch() || is_conditional_branch(); }
+	bool is_branch_target() const        { return m_flags[IS_BRANCH_TARGET]; }
+	bool in_delay_slot() const           { return m_flags[IN_DELAY_SLOT]; }
+	bool intrablock_branch() const       { return m_flags[INTRABLOCK_BRANCH]; }
+	bool can_cause_exception() const     { return m_flags[CAN_CAUSE_EXCEPTION]; }
+	bool will_cause_exception() const    { return m_flags[WILL_CAUSE_EXCEPTION]; }
+	bool validate_tlb() const            { return m_flags[VALIDATE_TLB]; }
+	bool compiler_page_fault() const     { return m_flags[COMPILER_PAGE_FAULT]; }
+	bool invalid_opcode() const          { return m_flags[INVALID_OPCODE]; }
+	bool virtual_noop() const            { return m_flags[VIRTUAL_NOOP]; }
+	bool redispatch() const              { return m_flags[REDISPATCH]; }
+	bool return_to_start() const         { return m_flags[RETURN_TO_START]; }
+	bool end_sequence() const            { return m_flags[END_SEQUENCE]; }
 
 	// links to other descriptions
-	opcode_desc *   m_next;                 // pointer to next description
-	opcode_desc *   branch;                 // pointer back to branch description for delay slots
-	simple_list<opcode_desc> delay;         // pointer to delay slot description
+	Impl *          m_next;                 // pointer to next description
+	Impl *          branch;                 // pointer back to branch description for delay slots
+	simple_list<Impl> delay;                // pointer to delay slot description
 
 	// information about the current PC
 	offs_t          pc;                     // PC of this opcode
-	offs_t          physpc;                 // physical PC of this opcode
 	offs_t          targetpc;               // target PC if we are a branch, or BRANCH_TARGET_DYNAMIC
-
-	// copy of up to 16 bytes of opcode
-	union
-	{
-		u8          b[16];
-		u16         w[8];
-		u32         l[4];
-		u64         q[2];
-	} opptr;                                // pointer to opcode memory
 
 	// information about this instruction's execution
 	u8              length;                 // length in bytes of this opcode
 	u8              delayslots;             // number of delay slots (for branches)
 	u8              skipslots;              // number of skip slots (for branches)
-	u32             flags;                  // OPFLAG_* opcode flags
-	u32             userflags;              // core specific flags
-	u32             userdata0;              // core specific data
-	u32             cycles;                 // number of cycles needed to execute
 
 	// register usage information
-	u32             regin[4];               // input registers
-	u32             regout[4];              // output registers
-	u32             regreq[4];              // required output registers
+	regmask         regin;                  // input registers
+	regmask         regout;                 // output registers
+	regmask         regreq;                 // required output registers
+
+protected:
+	enum
+	{
+		// opcode branch flags
+		IS_UNCONDITIONAL_BRANCH = 0,    // instruction is unconditional branch
+		IS_CONDITIONAL_BRANCH,          // instruction is conditional branch
+		IS_BRANCH_TARGET,               // instruction is the target of a branch
+		IN_DELAY_SLOT,                  // instruction is in the delay slot of a branch
+		INTRABLOCK_BRANCH,              // instruction branches within the block
+
+		// opcode exception flags
+		CAN_CAUSE_EXCEPTION,            // instruction may generate exception
+		WILL_CAUSE_EXCEPTION,           // instruction will generate exception
+
+		// opcode virtual->physical translation flags
+		VALIDATE_TLB,                   // instruction must validate TLB before execution
+		COMPILER_PAGE_FAULT,            // compiler hit a page fault when parsing
+
+		// opcode flags
+		INVALID_OPCODE,                 // instruction is invalid
+		VIRTUAL_NOOP,                   // instruction is a virtual no-op
+
+		// opcode sequence flow flags
+		REDISPATCH,                     // instruction must redispatch after completion
+		RETURN_TO_START,                // instruction must jump back to the beginning after completion
+		END_SEQUENCE,                   // this is the last instruction in a sequence
+
+		FLAG_COUNT
+	};
+
+	void reset(offs_t curpc, bool in_delay_slot)
+	{
+		m_next = nullptr;
+		branch = nullptr;
+		delay.reset();
+		pc = curpc;
+		targetpc = BRANCH_TARGET_DYNAMIC;
+		length = 0;
+		delayslots = 0;
+		skipslots = 0;
+		regin.reset();
+		regout.reset();
+		regreq.reset();
+		m_flags.reset();
+
+		// set the delay slot flag
+		if (in_delay_slot)
+			set_in_delay_slot();
+	}
+
+	// TODO: make these constexpr when GCC/GNU libstdc++ catch up
+	template <size_t Start, size_t Width>
+	static std::enable_if_t<Width <= (sizeof(unsigned long) * 8), unsigned long> regmask_field(regmask const &r)
+	{
+		static_assert((Width > 0) && ((Start + Width) <= N));
+		return ((r << (N - Start - Width)) >> (N - Width)).to_ulong();
+	}
+	template <size_t Start, size_t Width>
+	static std::enable_if_t<(Width > (sizeof(unsigned long) * 8)) && (Width <= (sizeof(unsigned long long) * 8)), unsigned long long> regmask_field(regmask const &r)
+	{
+		static_assert((Width > 0) && ((Start + Width) <= N));
+		return ((r << (N - Start - Width)) >> (N - Width)).to_ullong();
+	}
+
+	std::bitset<FLAG_COUNT> m_flags;
 };
 
 
 // DRC frontend state
-class drc_frontend
+template <typename Desc>
+class drc_frontend_base
 {
 public:
 	// construction/destruction
-	drc_frontend(device_t &cpu, u32 window_start, u32 window_end, u32 max_sequence);
-	virtual ~drc_frontend();
+	drc_frontend_base(offs_t pageshift, u32 window_start, u32 window_end, u32 max_sequence);
+	~drc_frontend_base();
 
-	// describe a block
-	opcode_desc const *describe_code(offs_t startpc);
 	// get last opcode of block
-	opcode_desc const *get_last() { return m_desc_live_list.last(); }
+	Desc const *get_last() { return m_desc_live_list.last(); }
 
 protected:
-	// required overrides
-	virtual bool describe(opcode_desc &desc, opcode_desc const *prev) = 0;
+	// describe a block
+	template <typename T>
+	Desc const *do_describe_code(T && describe, offs_t startpc);
 
 private:
 	// internal helpers
-	opcode_desc *describe_one(offs_t curpc, opcode_desc const *prevdesc, bool in_delay_slot = false);
-	void build_sequence(int start, int end, u32 endflag);
-	void accumulate_required_backwards(opcode_desc &desc, u32 *reqmask);
+	template <typename T>
+	Desc *describe_one(T &&describe, offs_t curpc, Desc const *prevdesc, bool in_delay_slot = false);
+	void build_sequence(int start, int end, bool redispatch);
+	void accumulate_required_backwards(Desc &desc, typename Desc::regmask &reqmask);
 	void release_descriptions();
 
 	// configuration parameters
-	u32                 m_window_start;             // code window start offset = startpc - window_start
-	u32                 m_window_end;               // code window end offset = startpc + window_end
-	u32                 m_max_sequence;             // maximum instructions to include in a sequence
+	u32 const           m_window_start;             // code window start offset = startpc - window_start
+	u32 const           m_window_end;               // code window end offset = startpc + window_end
+	u32 const           m_max_sequence;             // maximum instructions to include in a sequence
 
 	// CPU parameters
-	cpu_device &        m_cpudevice;                // CPU device object
-	address_space &     m_program;                  // program address space for this CPU
-	offs_t              m_pageshift;                // shift to convert address to a page index
+	offs_t const        m_pageshift;                // shift to convert address to a page index
 
 	// opcode descriptor arrays
-	simple_list<opcode_desc> m_desc_live_list;      // list of live descriptions
-	fixed_allocator<opcode_desc> m_desc_allocator;  // fixed allocator for descriptions
-	std::vector<opcode_desc *> m_desc_array;        // array of descriptions in PC order
+	simple_list<Desc>   m_desc_live_list;           // list of live descriptions
+	fixed_allocator<Desc> m_desc_allocator;         // fixed allocator for descriptions
+	std::vector<Desc *> m_desc_array;               // array of descriptions in PC order
 };
 
 #endif // MAME_CPU_DRCFE_H

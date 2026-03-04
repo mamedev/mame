@@ -64,7 +64,19 @@ private:
 		uint8_t r[0x100]{}, g[0x100]{}, b[0x100]{};
 		uint16_t bank[2]{};
 		bool packed_mode = false;
-	}m_pegc;
+		
+		uint8_t regs[0x100]{};
+		uint8_t lastdata[64]{};
+		uint8_t pattern[32]{};
+		uint32_t pattern_mask = 31;
+		int32_t lastdatalen = 0;
+		uint32_t remain = 0;
+		
+		bool first_process_w = true;
+		bool first_process_r = true;
+		uint8_t shift_buffer[64]{};
+		uint32_t shift_cnt = 0;
+	} m_pegc;
 
 	void pc9821_egc_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void pegc_mmio_map(address_map &map);

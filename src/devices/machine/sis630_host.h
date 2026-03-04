@@ -27,6 +27,7 @@ public:
 	sis630_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_ram_size(int ram_size) { m_ram_size = ram_size; }
 
+	void smi_act_w(int state);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -90,6 +91,8 @@ private:
 		bool enable = false;
 		u8 data_rate = 0;
 	} m_agp;
+
+	int m_smiact;
 };
 
 DECLARE_DEVICE_TYPE(SIS630_HOST, sis630_host_device)

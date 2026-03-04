@@ -1158,7 +1158,7 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 {
 	x68000_base(config);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
@@ -1166,15 +1166,10 @@ void x68ksupr_state::x68ksupr_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
-		[this](device_t *device)
-		{
-			mb89352_device &spc = downcast<mb89352_device &>(*device);
-
-			spc.set_clock(40_MHz_XTAL / 8);
-			spc.out_irq_callback().set(*this, FUNC(x68ksupr_state::ioc_irq<IOC_HDD_INT>));
-			// TODO: duplicate DMA glue from CZ-6BS1
-		});
+	MB89352(config, m_scsictrl, 40_MHz_XTAL / 8);
+	scsi.set_external_device(7, m_scsictrl);
+	m_scsictrl->out_irq_callback().set(*this, FUNC(x68ksupr_state::ioc_irq<IOC_HDD_INT>));
+	// TODO: duplicate DMA glue from CZ-6BS1
 
 	VICON(config, m_crtc, 38.86363_MHz_XTAL);
 	m_crtc->set_clock_69m(69.55199_MHz_XTAL);

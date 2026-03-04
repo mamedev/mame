@@ -37,8 +37,8 @@ mb89352_device::mb89352_device(const machine_config &mconfig, const char *tag, d
 }
 
 mb87030_device::mb87030_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_device(mconfig, type, tag, owner, clock),
-	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
+	device_t(mconfig, type, tag, owner, clock),
+	nscsi_device_interface(mconfig, *this),
 	m_irq_handler(*this),
 	m_dreq_handler(*this),
 	m_irq_state(false)
@@ -126,11 +126,11 @@ void mb87030_device::device_reset()
 	m_exbf = 0;
 	m_fifo.clear();
 	m_dreq_handler(false);
-	scsi_bus->ctrl_wait(scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_SEL|S_BSY|S_RST, S_ALL);
 	m_delay_state = State::Idle;
 	update_state(State::Idle, 0);
 	scsi_set_ctrl(0, S_ALL);
-	scsi_bus->data_w(scsi_refid, 0);
+	m_scsi_bus->data_w(m_scsi_refid, 0);
 	update_ssts();
 	update_ints();
 }
@@ -254,7 +254,7 @@ void mb87030_device::scsi_set_ctrl(uint32_t value, uint32_t mask)
 				(m_scsi_ctrl & S_CTL) ? " CTL" : "",
 				(m_scsi_ctrl & S_INP) ? " INP" : "");
 	} else {
-		scsi_bus->ctrl_w(scsi_refid, value, mask);
+		m_scsi_bus->ctrl_w(m_scsi_refid, value, mask);
 	}
 }
 
@@ -281,17 +281,17 @@ uint32_t mb87030_device::scsi_get_ctrl()
 
 		return ret;
 	} else {
-		return scsi_bus->ctrl_r();
+		return m_scsi_bus->ctrl_r();
 	}
 }
 
 void mb87030_device::step(bool timeout)
 {
 	uint32_t ctrl = scsi_get_ctrl();
-	uint32_t data = scsi_bus->data_r();
+	uint32_t data = m_scsi_bus->data_r();
 
 	LOG("%s: %d %s,%s data %02X ctrl %02X TC %d\n", __FUNCTION__,
-			scsi_refid, get_state_name(m_state),
+			m_scsi_refid, get_state_name(m_state),
 			timeout ? " timeout" : "", data,
 					ctrl, m_tc);
 
@@ -325,7 +325,7 @@ void mb87030_device::step(bool timeout)
 
 	case State::ArbitrationAssertBSY:
 		scsi_set_ctrl(S_BSY, S_BSY);
-		scsi_bus->data_w(scsi_refid, (1 << m_bdid));
+		m_scsi_bus->data_w(m_scsi_refid, (1 << m_bdid));
 		update_state(State::ArbitrationWait, 32);
 		break;
 
@@ -335,7 +335,7 @@ void mb87030_device::step(bool timeout)
 			if (data & id) {
 				LOG("arbitration lost, winner %d\n", id);
 				scsi_set_ctrl(0, S_BSY);
-				scsi_bus->data_w(scsi_refid, 0);
+				m_scsi_bus->data_w(m_scsi_refid, 0);
 				m_ssts &= ~SSTS_SPC_BUSY;
 				update_state(State::Idle);
 				break;
@@ -358,14 +358,14 @@ void mb87030_device::step(bool timeout)
 	case State::SelectionAssertID:
 		m_ssts |= SSTS_INIT_CONNECTED;
 		m_ssts &= ~SSTS_TARG_CONNECTED;
-		scsi_bus->data_w(scsi_refid, m_temp);
+		m_scsi_bus->data_w(m_scsi_refid, m_temp);
 		update_state(State::SelectionAssertSEL, 10);
 		break;
 
 	case State::SelectionAssertSEL:
 		// deassert BSY for arbitrating systems, assert SEL for non-arbitrating systems
 		scsi_set_ctrl(S_SEL | (m_send_atn_during_selection ? S_ATN : 0), S_ATN|S_SEL|S_BSY);
-		scsi_bus->ctrl_wait(scsi_refid, S_BSY, S_BSY);
+		m_scsi_bus->ctrl_wait(m_scsi_refid, S_BSY, S_BSY);
 		update_state(State::SelectionWaitBSY, 0, ((m_tc & ~0xff) + 15) * 2);
 		break;
 
@@ -394,7 +394,7 @@ void mb87030_device::step(bool timeout)
 
 	case State::TransferWaitReq:
 		if (!(ctrl & S_REQ)) {
-			scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+			m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 			break;
 		}
 
@@ -402,7 +402,7 @@ void mb87030_device::step(bool timeout)
 			LOG("SCSI phase change during transfer\n");
 			m_ints |= INTS_SERVICE_REQUIRED;
 			m_ssts &= ~SSTS_SPC_BUSY;
-			scsi_bus->data_w(scsi_refid, 0);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
 			update_ints();
 			update_state(State::Idle);
 			break;
@@ -412,7 +412,7 @@ void mb87030_device::step(bool timeout)
 			// This is a size 0 transfer, it only checks the phase in
 			// practice
 
-			scsi_bus->data_w(scsi_refid, 0);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
 			scsi_command_complete();
 			break;
 		}
@@ -455,13 +455,13 @@ void mb87030_device::step(bool timeout)
 
 		if (m_tc && !m_fifo.empty()) {
 			LOG("pulling write data: %02X (%d left)\n", data, m_fifo.queue_length() - 1);
-			scsi_bus->data_w(scsi_refid, m_fifo.dequeue());
+			m_scsi_bus->data_w(m_scsi_refid, m_fifo.dequeue());
 			update_state(State::TransferSendAck, 10);
 			break;
 		}
 
 		if (!m_tc && (m_scmd & SCMD_TERM_MODE)) {
-			scsi_bus->data_w(scsi_refid, m_temp);
+			m_scsi_bus->data_w(m_scsi_refid, m_temp);
 			update_state(State::TransferSendAck, 10);
 			break;
 		}
@@ -472,7 +472,7 @@ void mb87030_device::step(bool timeout)
 			m_temp = data;
 
 		scsi_set_ctrl(S_ACK, S_ACK);
-		scsi_bus->ctrl_wait(scsi_refid, 0, S_REQ);
+		m_scsi_bus->ctrl_wait(m_scsi_refid, 0, S_REQ);
 		update_state(State::TransferWaitDeassertREQ, 10);
 		break;
 
@@ -487,7 +487,7 @@ void mb87030_device::step(bool timeout)
 			update_state(State::TransferWaitReq, 10);
 		else
 			update_state(State::TransferWaitFifoEmpty, 10);
-		scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+		m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 
 		// deassert ATN after last byte of message out phase
 		if (!m_tc && (ctrl & S_PHASE_MASK) == S_PHASE_MSG_OUT && m_send_atn_during_selection)
@@ -500,7 +500,7 @@ void mb87030_device::step(bool timeout)
 	case State::TransferWaitFifoEmpty:
 		if (!m_fifo.empty())
 			break;
-		scsi_bus->data_w(scsi_refid, 0);
+		m_scsi_bus->data_w(m_scsi_refid, 0);
 		scsi_command_complete();
 		break;
 	}
@@ -540,7 +540,7 @@ void mb87030_device::device_start()
 
 void mb87030_device::scsi_ctrl_changed()
 {
-	const auto value = scsi_bus->ctrl_r();
+	const auto value = m_scsi_bus->ctrl_r();
 	LOG("%s: %02x\n", __FUNCTION__, value);
 	step(false);
 }
@@ -684,10 +684,10 @@ void mb87030_device::scmd_w(uint8_t data)
 	case SCMD_CMD_SET_ACK_REQ:
 		LOG("%s: Set ACK/REQ\n", __FUNCTION__);
 		if (m_ssts & SSTS_INIT_CONNECTED) {
-				if (scsi_bus->ctrl_r() & S_INP) {
-					m_temp = scsi_bus->data_r();
+				if (m_scsi_bus->ctrl_r() & S_INP) {
+					m_temp = m_scsi_bus->data_r();
 				} else {
-					scsi_bus->data_w(scsi_refid, m_temp);
+					m_scsi_bus->data_w(m_scsi_refid, m_temp);
 				}
 				LOG("set ACK\n");
 				scsi_set_ctrl(S_ACK, S_ACK);
@@ -726,7 +726,7 @@ void mb87030_device::ints_w(uint8_t data)
 			// terminate selection/reselection
 			m_ssts &= ~(SSTS_INIT_CONNECTED|SSTS_TARG_CONNECTED|SSTS_SPC_BUSY);
 			scsi_set_ctrl(0, S_ALL);
-			scsi_bus->data_w(scsi_refid, 0);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
 			update_state(State::Idle);
 		} else {
 			// restart selection/reselection

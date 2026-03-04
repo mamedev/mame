@@ -30,8 +30,8 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	required_device<vga_device> m_svga;
-	required_memory_region m_vga_rom;
+	required_device<vga_device> m_vga;
+	required_memory_region m_bios;
 
 	virtual u8 capptr_r() override;
 

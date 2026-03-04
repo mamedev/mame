@@ -115,14 +115,14 @@ protected:
 	public:
 		virtual u8 read_vector(u16 adr) = 0;
 
-		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::cache dcache;
-		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::specific data;
+		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::cache m_dcache;
+		memory_access<26, 0, 0, ENDIANNESS_LITTLE>::specific m_data;
 
-		bool irq_service;
-		bool irr_enable;
-		u16 irr;
-		u16 prr;
-		u16 drr;
+		bool m_irq_service;
+		bool m_irr_enable;
+		u16 m_irr;
+		u16 m_prr;
+		u16 m_drr;
 	};
 
 	void init_base_timer(u16 ireq);
@@ -132,8 +132,8 @@ protected:
 	virtual u8 read_vector(u16 adr) override;
 	virtual void end_interrupt() override { set_irq_service(false); }
 
-	void set_irq_service(bool state) { downcast<mi_st2xxx &>(*mintf).irq_service = state; }
-	void update_irq_state() { irq_state = (m_ireq & m_iena) != 0; }
+	void set_irq_service(bool state) { downcast<mi_st2xxx &>(*m_mintf).m_irq_service = state; }
+	void update_irq_state() { m_irq_state = (m_ireq & m_iena) != 0; }
 	u8 active_irq_level() const;
 
 	TIMER_CALLBACK_MEMBER(bt_interrupt);

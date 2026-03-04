@@ -835,6 +835,7 @@ void mame_formats_full_list(mame_formats_enumerator &en)
 	en.category("Sharp");
 #ifdef HAS_FORMATS_MZ_CAS
 	en.add(mz700_cassette_formats); // mz_cas.h
+	en.add(mz80b_cassette_formats); // mz_cas.h
 #endif
 #ifdef HAS_FORMATS_X1_TAP
 	en.add(x1_cassette_formats); // x1_tap.h

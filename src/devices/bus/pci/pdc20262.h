@@ -31,6 +31,8 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
+	required_memory_region m_bios;
+
 private:
 	void ide1_command_map(address_map &map) ATTR_COLD;
 	void ide1_control_map(address_map &map) ATTR_COLD;
@@ -45,7 +47,6 @@ private:
 	required_device<bus_master_ide_controller_device> m_ide2;
 	required_device<input_merger_device> m_irqs;
 	required_address_space m_bus_master_space;
-	required_memory_region m_bios_rom;
 
 	u8 m_clock = 0;
 	u8 m_irq_state = 0;
@@ -60,6 +61,16 @@ private:
 	void ide2_write_cs1_w(uint8_t data);
 };
 
+class pdc20268_device : public pdc20262_device
+{
+public:
+	pdc20268_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
 DECLARE_DEVICE_TYPE(PDC20262, pdc20262_device)
+DECLARE_DEVICE_TYPE(PDC20268, pdc20268_device)
 
 #endif // MAME_BUS_PCI_PDC20262_H

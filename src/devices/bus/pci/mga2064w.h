@@ -41,8 +41,8 @@ protected:
 	u32 dmawin_idump_r(offs_t offset, u32 mem_mask = ~0);
 	void dmawin_iload_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
-	required_device<matrox_vga_device> m_svga;
-	required_memory_region m_vga_rom;
+	required_device<matrox_vga_device> m_vga;
+	required_memory_region m_bios;
 private:
 	u8 vram_r(offs_t offset);
 	void vram_w(offs_t offset, uint8_t data);

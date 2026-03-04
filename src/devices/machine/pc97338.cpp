@@ -94,7 +94,7 @@ void pc97338_device::remap(int space_id, offs_t start, offs_t end)
 		m_isa->install_device(superio_base, superio_base + 1, read8sm_delegate(*this, FUNC(pc97338_device::read)), write8sm_delegate(*this, FUNC(pc97338_device::write)));
 
 		if (BIT(m_fer, 0))
-			m_isa->install_device(0x378, 0x37f, read8sm_delegate(*m_pc_lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(*m_pc_lpt, FUNC(pc_lpt_device::write)));
+			m_isa->install_device(0x378, 0x37f, *m_pc_lpt, &pc_lpt_device::isa_map);
 
 		if (BIT(m_fer, 1))
 			m_isa->install_device(0x3f8, 0x3ff, read8sm_delegate(*m_pc_com[0], FUNC(ns16450_device::ins8250_r)), write8sm_delegate(*m_pc_com[0], FUNC(ns16450_device::ins8250_w)));

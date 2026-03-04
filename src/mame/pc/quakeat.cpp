@@ -213,7 +213,7 @@ void quakeat_state::quake(machine_config &config)
 	// (different legacy control method?)
 //  config.device_remove(PCI_AGP_ID);
 //  config.device_remove("screen");
-//  PCI_SLOT(config, "pci:01.0:1", agp_cards, 1, 0, 1, 2, 3, "rivatnt").set_fixed(true);
+//  PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
 }
 
 ROM_START( ga6la7 )

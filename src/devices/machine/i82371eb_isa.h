@@ -20,6 +20,9 @@ public:
 		m_has_internal_rtc = internal_rtc;
 	}
 
+	auto a20m() { return m_a20m_callback.bind(); }
+	void a20gate_w(int state);
+
 	i82371eb_isa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
@@ -34,6 +37,7 @@ protected:
 	virtual void internal_io_map(address_map &map) override ATTR_COLD;
 private:
 	required_device<mc146818_device> m_rtc;
+	devcb_write_line m_a20m_callback;
 
 	u8 m_serirqc;
 	u8 m_pdmacfg[2], m_pdma_ch[8];
@@ -50,6 +54,13 @@ private:
 
 	template <unsigned E> u8 rtc_data_r(offs_t offset);
 	template <unsigned E> void rtc_data_w(offs_t offset, u8 data);
+
+	u8 port92_r(offs_t offset);
+	void port92_w(offs_t offset, u8 data);
+
+	void fast_gatea20(int state);
+	int m_ext_gatea20, m_fast_gatea20;
+	u8 m_port92;
 };
 
 DECLARE_DEVICE_TYPE(I82371EB_ISA, i82371eb_isa_device)

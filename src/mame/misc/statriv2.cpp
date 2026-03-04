@@ -62,7 +62,9 @@ U22 is a soldered in 74s287 (compatible with 82s129)
 PROM use is unknown
 
 
-Issues:
+TODO:
+ * all - verify CPU speed, 8085AH-1 can run at 6MHz (12MHz XTAL), but PCBs have
+   a standard 8085A? Most games will run too slow at 6MHz, eg. try with hangman
  * statusbj - very glitchy, bad video, seems to spin
  * hangman - keys are weird, spinner is busted
  * quaquiz2 - no inputs, needs NVRAM
@@ -70,11 +72,13 @@ Issues:
 */
 
 #include "emu.h"
+
 #include "cpu/i8085/i8085.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "video/tms9927.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -83,69 +87,94 @@ Issues:
 
 namespace {
 
-class statriv2_state : public driver_device
+class casino_state : public driver_device
 {
 public:
-	statriv2_state(const machine_config &mconfig, device_type type, const char *tag)
+	casino_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_tms(*this, "tms")
-		, m_videoram(*this, "videoram")
-		, m_question_offset(*this, "question_offset")
 		, m_gfxdecode(*this, "gfxdecode")
+		, m_videoram(*this, "videoram")
+		, m_tms(*this, "tms")
 		, m_palette(*this, "palette")
+		, m_coin(*this, "COIN")
 	{ }
 
-	void statriv2(machine_config &config);
-	void statusbj(machine_config &config);
-	void funcsino(machine_config &config);
-	void tripdraw(machine_config &config);
-	void statriv2v(machine_config &config);
+	void statusbj(machine_config &config) ATTR_COLD;
+	void funcsino(machine_config &config) ATTR_COLD;
+	void tripdraw(machine_config &config) ATTR_COLD;
 
-	void init_addr_xlh();
-	void init_addr_lhx();
-	void init_addr_lmh();
-	void init_addr_lmhe();
-	void init_addr_xhl();
-	void init_laserdisc();
+	void init_laserdisc() ATTR_COLD;
 
 	int latched_coin_r();
 
-private:
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 	required_device<cpu_device> m_maincpu;
-	required_device<tms9927_device> m_tms;
-	required_shared_ptr<uint8_t> m_videoram;
-	tilemap_t *m_tilemap = nullptr;
-	optional_shared_ptr<uint8_t> m_question_offset;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_shared_ptr<uint8_t> m_videoram;
+
+	tilemap_t *m_tilemap = nullptr;
+
+	void io_map(address_map &map) ATTR_COLD;
+
+private:
+	required_device<tms9927_device> m_tms;
 	required_device<palette_device> m_palette;
-	uint8_t m_question_offset_low = 0;
-	uint8_t m_question_offset_mid = 0;
-	uint8_t m_question_offset_high = 0;
+
+	required_ioport m_coin;
+
 	uint8_t m_latched_coin = 0;
 	uint8_t m_last_coin = 0;
 
-	void statriv2_videoram_w(offs_t offset, uint8_t data);
-	uint8_t question_data_r();
+	void videoram_w(offs_t offset, uint8_t data);
 	void ppi_portc_hi_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(horizontal_tile_info);
-	TILE_GET_INFO_MEMBER(vertical_tile_info);
-	virtual void video_start() override ATTR_COLD;
-	void statriv2_palette(palette_device &palette) const;
+	void palette_init(palette_device &palette) const ATTR_COLD;
 	void check_coin_status();
-	DECLARE_VIDEO_START(vertical);
-	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
-	INTERRUPT_GEN_MEMBER(tripdraw_interrupt);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(rst75_interrupt);
+	INTERRUPT_GEN_MEMBER(rst55_interrupt);
 
-	void statriv2_map(address_map &map) ATTR_COLD;
-	void statusbj_io_map(address_map &map) ATTR_COLD;
-	void statriv2_io_map(address_map &map) ATTR_COLD;
+	void program_map(address_map &map) ATTR_COLD;
 };
 
+class trivia_state : public casino_state
+{
+public:
+	trivia_state(const machine_config &mconfig, device_type type, const char *tag)
+		: casino_state(mconfig, type, tag)
+		, m_question_offset(*this, "question_offset")
+		, m_questions_rom(*this, "questions")
+	{ }
 
-#define MASTER_CLOCK        12440000
+	void statriv2(machine_config &config) ATTR_COLD;
+	void statriv2v(machine_config &config) ATTR_COLD;
+
+	void init_addr_xlh() ATTR_COLD;
+	void init_addr_lhx() ATTR_COLD;
+	void init_addr_lmh() ATTR_COLD;
+	void init_addr_lmhe() ATTR_COLD;
+	void init_addr_xhl() ATTR_COLD;
+
+private:
+	required_shared_ptr<uint8_t> m_question_offset;
+	required_region_ptr<uint8_t> m_questions_rom;
+
+	uint8_t m_question_offset_low = 0;
+	uint8_t m_question_offset_mid = 0;
+	uint8_t m_question_offset_high = 0;
+
+	uint8_t question_data_r();
+
+	TILE_GET_INFO_MEMBER(vertical_tile_info);
+	DECLARE_VIDEO_START(vertical);
+
+	void io_map(address_map &map) ATTR_COLD;
+};
 
 
 /*************************************
@@ -154,18 +183,18 @@ private:
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
+TILE_GET_INFO_MEMBER(casino_state::horizontal_tile_info)
 {
-	int code = m_videoram[0x400 + tile_index];
-	int attr = m_videoram[tile_index] & 0x3f;
+	int const code = m_videoram[0x400 + tile_index];
+	int const attr = m_videoram[tile_index] & 0x3f;
 
 	tileinfo.set(0, code, attr, 0);
 }
 
-TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
+TILE_GET_INFO_MEMBER(trivia_state::vertical_tile_info)
 {
-	int code = m_videoram[0x400 + tile_index];
-	int attr = m_videoram[tile_index] & 0x3f;
+	int const code = m_videoram[0x400 + tile_index];
+	int const attr = m_videoram[tile_index] & 0x3f;
 
 	tileinfo.set(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
 }
@@ -178,7 +207,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
  *
  *************************************/
 
-void statriv2_state::statriv2_palette(palette_device &palette) const
+void casino_state::palette_init(palette_device &palette) const
 {
 	for (int i = 0; i < 64; i++)
 	{
@@ -187,14 +216,14 @@ void statriv2_state::statriv2_palette(palette_device &palette) const
 	}
 }
 
-void statriv2_state::video_start()
+void casino_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(statriv2_state::horizontal_tile_info)), TILEMAP_SCAN_ROWS, 8, 15, 64, 16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(casino_state::horizontal_tile_info)), TILEMAP_SCAN_ROWS, 8, 15, 64, 16);
 }
 
-VIDEO_START_MEMBER(statriv2_state,vertical)
+VIDEO_START_MEMBER(trivia_state, vertical)
 {
-	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(statriv2_state::vertical_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(trivia_state::vertical_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -205,7 +234,7 @@ VIDEO_START_MEMBER(statriv2_state,vertical)
  *
  *************************************/
 
-void statriv2_state::statriv2_videoram_w(offs_t offset, uint8_t data)
+void casino_state::videoram_w(offs_t offset, uint8_t data)
 {
 	m_videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
@@ -219,7 +248,7 @@ void statriv2_state::statriv2_videoram_w(offs_t offset, uint8_t data)
  *
  *************************************/
 
-uint32_t statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t casino_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_tms->screen_reset())
 		bitmap.fill(m_palette->black_pen(), cliprect);
@@ -232,29 +261,41 @@ uint32_t statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_in
 
 /*************************************
  *
+ *  Machine start
+ *
+ *************************************/
+
+void casino_state::machine_start()
+{
+	save_item(NAME(m_latched_coin));
+	save_item(NAME(m_last_coin));
+}
+
+
+/*************************************
+ *
  *  Interrupt generation
  *
  *************************************/
 
-void statriv2_state::check_coin_status()
+void casino_state::check_coin_status()
 {
-	uint8_t new_coin = ioport("COIN")->read();
+	uint8_t new_coin = m_coin->read();
 
-	/* check the coin inputs once per frame */
+	// check the coin inputs once per frame
 	m_latched_coin |= new_coin & (new_coin ^ m_last_coin);
 	m_last_coin = new_coin;
 }
 
-INTERRUPT_GEN_MEMBER(statriv2_state::statriv2_interrupt)
+INTERRUPT_GEN_MEMBER(casino_state::rst75_interrupt)
 {
-	if (ioport("COIN"))
-		check_coin_status();
+	check_coin_status();
 
 	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(statriv2_state::tripdraw_interrupt)
+INTERRUPT_GEN_MEMBER(casino_state::rst55_interrupt)
 {
 	check_coin_status();
 
@@ -262,27 +303,24 @@ INTERRUPT_GEN_MEMBER(statriv2_state::tripdraw_interrupt)
 	device.execute().set_input_line(I8085_RST55_LINE, CLEAR_LINE);
 }
 
+
 /*************************************
  *
  *  Question address computation
  *
  *************************************/
 
-uint8_t statriv2_state::question_data_r()
+uint8_t trivia_state::question_data_r()
 {
-	const uint8_t *qrom = memregion("questions")->base();
-	uint32_t qromsize = memregion("questions")->bytes();
-	uint32_t address;
-
 	if (m_question_offset_high == 0xff && !machine().side_effects_disabled())
 		m_question_offset[m_question_offset_low]++;
 
-	address = m_question_offset[m_question_offset_low];
+	uint32_t address = m_question_offset[m_question_offset_low];
 	address |= m_question_offset[m_question_offset_mid] << 8;
 	if (m_question_offset_high != 0xff)
 		address |= m_question_offset[m_question_offset_high] << 16;
 
-	return (address < qromsize) ? qrom[address] : 0xff;
+	return (address < m_questions_rom.bytes()) ? m_questions_rom[address] : 0xff;
 }
 
 
@@ -293,13 +331,13 @@ uint8_t statriv2_state::question_data_r()
  *
  *************************************/
 
-int statriv2_state::latched_coin_r()
+int casino_state::latched_coin_r()
 {
 	return m_latched_coin;
 }
 
 
-void statriv2_state::ppi_portc_hi_w(uint8_t data)
+void casino_state::ppi_portc_hi_w(uint8_t data)
 {
 	data >>= 4;
 	if (data != 0x0f)
@@ -313,15 +351,15 @@ void statriv2_state::ppi_portc_hi_w(uint8_t data)
  *
  *************************************/
 
-void statriv2_state::statriv2_map(address_map &map)
+void casino_state::program_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x43ff).ram();
 	map(0x4800, 0x48ff).ram().share("nvram");
-	map(0xc800, 0xcfff).ram().w(FUNC(statriv2_state::statriv2_videoram_w)).share("videoram");
+	map(0xc800, 0xcfff).ram().w(FUNC(casino_state::videoram_w)).share(m_videoram);
 }
 
-void statriv2_state::statusbj_io_map(address_map &map)
+void casino_state::io_map(address_map &map)
 {
 	map(0x20, 0x23).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0xb0, 0xb1).w("aysnd", FUNC(ay8910_device::address_data_w));
@@ -329,10 +367,11 @@ void statriv2_state::statusbj_io_map(address_map &map)
 	map(0xc0, 0xcf).rw(m_tms, FUNC(tms9927_device::read), FUNC(tms9927_device::write));
 }
 
-void statriv2_state::statriv2_io_map(address_map &map)
+void trivia_state::io_map(address_map &map)
 {
-	statusbj_io_map(map);
-	map(0x28, 0x2b).r(FUNC(statriv2_state::question_data_r)).writeonly().share("question_offset");
+	casino_state::io_map(map);
+
+	map(0x28, 0x2b).r(FUNC(trivia_state::question_data_r)).writeonly().share(m_question_offset);
 }
 
 
@@ -356,13 +395,13 @@ static INPUT_PORTS_START( statusbj )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(statriv2_state::latched_coin_r))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(casino_state::latched_coin_r))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_5C ) )
-//  PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_5C ) )
 	PORT_DIPNAME( 0x40, 0x40, "DIP switch?" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
@@ -389,7 +428,7 @@ static INPUT_PORTS_START( funcsino )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )                       PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Game")   PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(statriv2_state::latched_coin_r))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(casino_state::latched_coin_r))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -425,7 +464,7 @@ static INPUT_PORTS_START( tripdraw )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )                       PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(statriv2_state::latched_coin_r))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(casino_state::latched_coin_r))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -461,7 +500,7 @@ static INPUT_PORTS_START( bigcsino ) // flyer shows 8 buttons on the cabinet
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(statriv2_state::latched_coin_r))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(casino_state::latched_coin_r))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -538,7 +577,7 @@ static INPUT_PORTS_START( statriv2 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(statriv2_state::latched_coin_r))
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(casino_state::latched_coin_r))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x20, 0x20, "Show Correct Answer" )
@@ -647,7 +686,11 @@ static INPUT_PORTS_START( bbchall )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("COIN")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
 
 /*************************************
  *
@@ -682,14 +725,13 @@ GFXDECODE_END
  *
  *************************************/
 
-void statriv2_state::statriv2(machine_config &config)
+void casino_state::statusbj(machine_config &config)
 {
-	/* basic machine hardware */
-	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	I8085A(config, m_maincpu, MASTER_CLOCK);
-	m_maincpu->set_addrmap(AS_PROGRAM, &statriv2_state::statriv2_map);
-	m_maincpu->set_addrmap(AS_IO, &statriv2_state::statriv2_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(statriv2_state::statriv2_interrupt));
+	// basic machine hardware
+	I8085A(config, m_maincpu, 12.44_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_PROGRAM, &casino_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &casino_state::io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(casino_state::rst75_interrupt));
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -700,58 +742,57 @@ void statriv2_state::statriv2(machine_config &config)
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
 	ppi.in_pc_callback().set_ioport("IN2");
-	ppi.out_pc_callback().set(FUNC(statriv2_state::ppi_portc_hi_w));
+	ppi.out_pc_callback().set(FUNC(casino_state::ppi_portc_hi_w));
 
-	/* video hardware */
+	// video hardware
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(MASTER_CLOCK/2, 384, 0, 320, 270, 0, 240);
-	screen.set_screen_update(FUNC(statriv2_state::screen_update_statriv2));
+	screen.set_raw(12.44_MHz_XTAL / 2, 384, 0, 320, 270, 0, 240);
+	screen.set_screen_update(FUNC(casino_state::screen_update));
 	screen.set_palette(m_palette);
 
-	TMS9927(config, m_tms, MASTER_CLOCK/2/8).set_char_width(8);
+	TMS9927(config, m_tms, 12.44_MHz_XTAL / 2 / 8).set_char_width(8);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_horizontal);
-	PALETTE(config, m_palette, FUNC(statriv2_state::statriv2_palette), 2*64);
+	PALETTE(config, m_palette, FUNC(casino_state::palette_init), 2*64);
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	AY8910(config, "aysnd", MASTER_CLOCK/8).add_route(ALL_OUTPUTS, "mono", 1.0);
+	AY8910(config, "aysnd", 12.44_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void statriv2_state::statusbj(machine_config &config)
+void trivia_state::statriv2(machine_config &config)
 {
-	statriv2(config);
-	m_maincpu->set_addrmap(AS_IO, &statriv2_state::statusbj_io_map); // no question data
+	statusbj(config);
+
+	m_maincpu->set_addrmap(AS_IO, &trivia_state::io_map); // question data
 }
 
-void statriv2_state::statriv2v(machine_config &config)
+void trivia_state::statriv2v(machine_config &config)
 {
 	statriv2(config);
 
-	/* basic machine hardware */
+	// basic machine hardware
+	subdevice<screen_device>("screen")->set_raw(12.44_MHz_XTAL / 2, 392, 0, 256, 262, 0, 256);
 
-	subdevice<screen_device>("screen")->set_raw(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256);
-
-	MCFG_VIDEO_START_OVERRIDE(statriv2_state, vertical)
+	MCFG_VIDEO_START_OVERRIDE(trivia_state, vertical)
 	m_gfxdecode->set_info(gfx_vertical);
 }
 
-void statriv2_state::funcsino(machine_config &config)
+void casino_state::funcsino(machine_config &config)
 {
 	statusbj(config);
 
-	/* basic machine hardware */
-
-	m_maincpu->set_clock(MASTER_CLOCK/2);  /* 3 MHz?? seems accurate */
+	// basic machine hardware
+	m_maincpu->set_clock(12.44_MHz_XTAL / 2); // 6 MHz? seems accurate
 }
 
-void statriv2_state::tripdraw(machine_config &config)
+void casino_state::tripdraw(machine_config &config)
 {
 	statusbj(config);
 
-	/* basic machine hardware */
-	m_maincpu->set_vblank_int("screen", FUNC(statriv2_state::tripdraw_interrupt));
+	// basic machine hardware
+	m_maincpu->set_vblank_int("screen", FUNC(casino_state::rst55_interrupt));
 }
 
 
@@ -784,9 +825,9 @@ ROM_START( statusbj )
 	ROM_LOAD( "statusbj.vid",   0x0000, 0x0800, CRC(99ade7a2) SHA1(98704ca3a9fcfc4590f850c8ae24445baaed6dfa) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketed */
-	ROM_LOAD( "prom.u21", 0x0020, 0x0020, NO_DUMP ) /* Soldered in (Color?) */
-	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
+	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) // Socketed
+	ROM_LOAD( "prom.u21", 0x0020, 0x0020, NO_DUMP ) // Soldered in (Color?)
+	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) // Soldered in
 ROM_END
 
 ROM_START( tripdraw )
@@ -798,9 +839,9 @@ ROM_START( tripdraw )
 	ROM_LOAD( "u36_td0.bin", 0x0000, 0x0800, CRC(2faa1942) SHA1(0205bf9eb86ef1c32f1ae959d0e02001393db3af) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketed */
-	ROM_LOAD( "prom.u21", 0x0020, 0x0020, NO_DUMP ) /* Soldered in (Color?) */
-	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
+	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) // Socketed
+	ROM_LOAD( "prom.u21", 0x0020, 0x0020, NO_DUMP ) // Soldered in (Color?)
+	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) // Soldered in
 ROM_END
 
 /*
@@ -831,9 +872,9 @@ ROM_START( funcsino )
 	ROM_LOAD( "u36", 0x0000, 0x1000, CRC(79eaf78b) SHA1(9df5f90344bbb9f1d196f35d910bb09fe6f74aa1) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "prom.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed */
-	ROM_LOAD( "prom.u21", 0x0020, 0x0020, CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) ) /* Soldered in (Color?) */
-	ROM_LOAD( "prom.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "prom.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed
+	ROM_LOAD( "prom.u21", 0x0020, 0x0020, CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) ) // Soldered in (Color?)
+	ROM_LOAD( "prom.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( bigcsino ) // 5 in 1 of: Joker Poker, Blackjack, Baccarat, Craps and Race Time
@@ -847,9 +888,9 @@ ROM_START( bigcsino ) // 5 in 1 of: Joker Poker, Blackjack, Baccarat, Craps and 
 	ROM_LOAD( "bc0k.u36", 0x0000, 0x1000, CRC(baf66e19) SHA1(4b78571e9370453e96e64c08d69b92b4d64e1a41) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "82s123.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed */
-	ROM_LOAD( "82s123.u21", 0x0020, 0x0020, CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) ) /* Soldered in (Color?) */
-	ROM_LOAD( "82s123.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "82s123.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed
+	ROM_LOAD( "82s123.u21", 0x0020, 0x0020, CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) ) // Soldered in (Color?)
+	ROM_LOAD( "82s123.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( hangman )
@@ -861,7 +902,7 @@ ROM_START( hangman )
 	ROM_REGION( 0x1000,  "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "main_hang_0b_2732.u36", 0x0000, 0x1000, CRC(e031dbf8) SHA1(ae6d34ad02b2d7deb1665d2420f8399a3ca88585) )
 
-	ROM_REGION( 0x16000, "questions", 0 ) /* question data */
+	ROM_REGION( 0x16000, "questions", 0 )
 	ROM_LOAD( "aux_27c256.8", 0x00000, 0x8000, CRC(c7d76338) SHA1(40e88efd7e250ad867772258eb6dc3b225de781f) )
 	ROM_LOAD( "aux_2764.1",   0x08000, 0x2000, CRC(a88563c8) SHA1(23cb169268ded6c81494197cfb9b34180667fc8c) )
 	ROM_LOAD( "aux_2764.2",   0x0a000, 0x2000, CRC(4bddbe3c) SHA1(391012de04e8a3638fac6f173a81cf1f86d8f751) )
@@ -875,9 +916,9 @@ ROM_START( hangman )
 	ROM_LOAD( "hangman.nv", 0x0000, 0x0100, CRC(4cecee6f) SHA1(bd9fe7bea081c87033993f809ed0b2c727ab5e88) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( trivquiz )
@@ -889,7 +930,7 @@ ROM_START( trivquiz )
 	ROM_REGION( 0x1000,  "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "triv1-0f.u7",  0x00000, 0x01000, CRC(af5f434a) SHA1(1e7ae7ad7ea697007a30f5ba89127802a835eddc) )
 
-	ROM_REGION( 0x10000, "questions", 0 ) /* question data */
+	ROM_REGION( 0x10000, "questions", 0 )
 	ROM_LOAD( "qmt11.rom",    0x00000, 0x02000, CRC(82107565) SHA1(28d71340873330df7d15f1bc55cee78a9c7c31a6) )
 	ROM_LOAD( "qmt12.rom",    0x02000, 0x02000, CRC(68667637) SHA1(df6ad3e624dcad57ce176912931660c6c1780369) )
 	ROM_LOAD( "qmt13.rom",    0x04000, 0x02000, CRC(e0d01a68) SHA1(22bb2a8628a3764d733748e4f5f3bad881371a29) )
@@ -903,9 +944,9 @@ ROM_START( trivquiz )
 	ROM_LOAD( "trivquiz.nv", 0x0000, 0x0100, CRC(bd07a964) SHA1(a1fe68d95c79ac99cfca8a468073b5c838e1cd49) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, not verified the same! */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed, not verified the same!
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( statriv2 )
@@ -917,7 +958,7 @@ ROM_START( statriv2 )
 	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "trivii0c.u36", 0x00000, 0x01000, CRC(af5f434a) SHA1(1e7ae7ad7ea697007a30f5ba89127802a835eddc) )
 
-	ROM_REGION( 0x10000, "questions", 0 ) /* question data */
+	ROM_REGION( 0x10000, "questions", 0 )
 	ROM_LOAD( "statuspb.u1", 0x00000, 0x02000, CRC(a50c0313) SHA1(f9bf84613e2ebb952a81a10ee1da49a37423b717) )
 	ROM_LOAD( "statuspb.u2", 0x02000, 0x02000, CRC(0bc03294) SHA1(c4873cd065c9eb237b03a4195332b7629abac327) )
 	ROM_LOAD( "statuspb.u3", 0x04000, 0x02000, CRC(d1732f3b) SHA1(c4e862bd98f237e1d2ecad430226cba6aba4ebb8) )
@@ -931,9 +972,9 @@ ROM_START( statriv2 )
 	ROM_LOAD( "statriv2.nv", 0x0000, 0x0100, CRC(3edb2bd1) SHA1(fdda1310f519054eb5e6ea498d27555f96b370eb) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, not verified the same! */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed, not verified the same!
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( statriv2v )
@@ -946,10 +987,10 @@ ROM_START( statriv2v )
 	ROM_LOAD( "status.u36",    0x00000, 0x00800, CRC(ae1d07c0) SHA1(2b657ba58e3ae7cceb8cf23cba3e1f0d20817933) ) // first half is garbage?
 	ROM_CONTINUE(0x0000, 0x800)
 
-	/* other roms were not from this set, missing sub-board?, but as the game is 'triv two' like the parent
+	/* other ROMs were not from this set, missing sub-board?, but as the game is 'triv two' like the parent
 	   it seems compatible with the same question board */
 
-	ROM_REGION( 0x10000, "questions", 0 ) /* question data */
+	ROM_REGION( 0x10000, "questions", 0 )
 	ROM_LOAD( "statuspb.u1", 0x00000, 0x02000, CRC(a50c0313) SHA1(f9bf84613e2ebb952a81a10ee1da49a37423b717) )
 	ROM_LOAD( "statuspb.u2", 0x02000, 0x02000, CRC(0bc03294) SHA1(c4873cd065c9eb237b03a4195332b7629abac327) )
 	ROM_LOAD( "statuspb.u3", 0x04000, 0x02000, CRC(d1732f3b) SHA1(c4e862bd98f237e1d2ecad430226cba6aba4ebb8) )
@@ -963,9 +1004,37 @@ ROM_START( statriv2v )
 	ROM_LOAD( "statriv2v.nv", 0x0000, 0x0100, CRC(3a9c7db7) SHA1(3d5a78beed26a73320f1f0748944b7fd87794bc7) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, not verified the same! */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed, not verified the same!
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
+ROM_END
+
+ROM_START( statriv3 ) // Triv Quiz III ROM PCB. All labels removed. In the labels below, a stands for main PCB, b for ROM PCB.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "a.u7", 0x00000, 0x01000, CRC(b82e76b7) SHA1(f6e0705f12e9804a897ad4f3a83f40793c7ef6ec) )
+	ROM_LOAD( "a.u8", 0x01000, 0x01000, CRC(a58d83e2) SHA1(b6e88305b61af1ea8949282589d53c30b1e95939) )
+	ROM_LOAD( "a.u9", 0x02000, 0x01000, CRC(db630ef9) SHA1(1c9eb49426d095f9681cde52e5439b5aaaea59a0) )
+
+	ROM_REGION( 0x1000,  "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "a.u36", 0x00000, 0x01000, CRC(af5f434a) SHA1(1e7ae7ad7ea697007a30f5ba89127802a835eddc) )
+
+	ROM_REGION( 0x10000, "questions", 0 )
+	ROM_LOAD( "b.u1", 0x00000, 0x02000, CRC(63e3744c) SHA1(7be1d6d9dc546fec05f4a631bcd40d16de53faee) )
+	ROM_LOAD( "b.u2", 0x02000, 0x02000, CRC(8b5837c3) SHA1(ca3a1d8eedd1036d66088922bfe7879acf533d6a) )
+	ROM_LOAD( "b.u3", 0x04000, 0x02000, CRC(b5896a53) SHA1(ce1ad5c91a7b8c0af09936b5e312ef03913d2e45) )
+	ROM_LOAD( "b.u4", 0x06000, 0x02000, CRC(e3137ffc) SHA1(d3fea66fbfbecf951d7c2b6ff88b1698226fd6f3) )
+	ROM_LOAD( "b.u5", 0x08000, 0x02000, CRC(f84612e7) SHA1(01ed349d6eaa296a3fe27b82a875976075ee9a20) )
+	ROM_LOAD( "b.u6", 0x0a000, 0x02000, CRC(69917d9a) SHA1(ced5be682484a3bcf98a38500c0d1e3f6a29cc75) )
+	ROM_LOAD( "b.u7", 0x0c000, 0x02000, CRC(7b65f147) SHA1(352a81b70b03a78e36af583586d80e1ee7b0fb72) )
+	ROM_LOAD( "b.u8", 0x0e000, 0x02000, CRC(e7577c53) SHA1(e3373c17bcfc45142ec4972f9803b57349a0c5f4) )
+
+	ROM_REGION( 0x0100, "nvram", 0 )
+	ROM_LOAD( "statriv3.nv", 0x0000, 0x0100, CRC(60c9b350) SHA1(a2085230fe90f2dbb3dca8b8ae7ca126b4b27188) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed, verified
+	ROM_LOAD( "74s288.u21", 0x0020, 0x0020, CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) ) // Soldered in (Color?)
+	ROM_LOAD( "74s287.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( statriv4 )
@@ -977,7 +1046,7 @@ ROM_START( statriv4 )
 	ROM_REGION( 0x1000,  "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "triv4.u36",    0x00000, 0x01000, CRC(af5f434a) SHA1(1e7ae7ad7ea697007a30f5ba89127802a835eddc) )
 
-	ROM_REGION( 0x10000, "questions", 0 ) /* question data */
+	ROM_REGION( 0x10000, "questions", 0 )
 	ROM_LOAD( "triv4.u41",    0x00000, 0x02000, CRC(aed8eead) SHA1(a615786d11c879875e9b7d3c3593fe0334e79178) )
 	ROM_LOAD( "triv4.u42",    0x02000, 0x02000, CRC(3354d389) SHA1(527e46e9276f4dfaad57a77f0b549d9d26c59226) )
 	ROM_LOAD( "triv4.u43",    0x04000, 0x02000, CRC(de7513e8) SHA1(c2e38cb39aacf57edb27cf5ee0b0fd49a44befa3) )
@@ -991,9 +1060,9 @@ ROM_START( statriv4 )
 	ROM_LOAD( "statriv4.nv", 0x0000, 0x0100, CRC(ab449099) SHA1(80fe9e07068a1034f8c0b233a7d37f6b40644be5) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, verified */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed, verified
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( statriv5se )
@@ -1005,7 +1074,7 @@ ROM_START( statriv5se )
 	ROM_REGION( 0x1000,  "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "tr-4-sped0a.u36",    0x00000, 0x01000, CRC(8e57d527) SHA1(ddb2719fd5d3e8c476e4f10158a9d83e0a759aa4) )
 
-	ROM_REGION( 0x10000, "questions", 0 ) /* question data, not dumped  */
+	ROM_REGION( 0x10000, "questions", 0 )
 	ROM_LOAD( "triv5.u41",    0x00000, 0x02000, NO_DUMP )
 	ROM_LOAD( "triv5.u42",    0x02000, 0x02000, NO_DUMP )
 	ROM_LOAD( "triv5.u43",    0x04000, 0x02000, NO_DUMP )
@@ -1016,9 +1085,9 @@ ROM_START( statriv5se )
 	ROM_LOAD( "triv5.u48",    0x0e000, 0x02000, NO_DUMP )
 
 	ROM_REGION( 0x0140, "proms", 0 ) // not dumped for this set, probably same as statriv4
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, verified */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, BAD_DUMP CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, BAD_DUMP CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed, verified
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, BAD_DUMP CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, BAD_DUMP CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( sextriv )
@@ -1030,7 +1099,7 @@ ROM_START( sextriv )
 	ROM_REGION( 0x1000,  "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "sex.u36",      0x00000, 0x1000, CRC(fe3fa087) SHA1(356b3fe62b4c600ff5a625bc3e1c53d8143f55df) )
 
-	ROM_REGION( 0x10000, "questions", 0 ) /* question data */
+	ROM_REGION( 0x10000, "questions", 0 )
 	ROM_LOAD( "sex1.bin",     0x00000, 0x2000, CRC(7b55360b) SHA1(c38b1be8cb7c6c40e167c449c75b9ca0596affe9) )
 	ROM_LOAD( "sex2.bin",     0x02000, 0x2000, CRC(a88563c8) SHA1(23cb169268ded6c81494197cfb9b34180667fc8c) )
 	ROM_LOAD( "sex3.bin",     0x04000, 0x2000, CRC(da1e00a5) SHA1(d70b0a1ecaf7913cfbf3d218ff05e8511be6ab26) )
@@ -1044,9 +1113,9 @@ ROM_START( sextriv )
 	ROM_LOAD( "sextriv.nv", 0x0000, 0x0100, CRC(33fae98c) SHA1(11aaca7706460dbad750c11c794bbe20084a8ff6) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( quaquiz2 )
@@ -1059,7 +1128,7 @@ ROM_START( quaquiz2 )
 	ROM_REGION( 0x1000,  "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "qquiz.u36", 0x00000, 0x01000, CRC(468dca15) SHA1(4ace7b3cd233f826949b65e2ab71e94ac6a293a0) )
 
-	ROM_REGION( 0x40000, "questions", ROMREGION_INVERT ) /* question data - inverted */
+	ROM_REGION( 0x40000, "questions", ROMREGION_INVERT )
 	ROM_LOAD( "gst.01",    0x00000, 0x08000, CRC(c0d83049) SHA1(94c750068e550cdaf4f6f5416bc7c160a759dd5a) )
 	ROM_LOAD( "gst.02",    0x08000, 0x08000, CRC(b844743e) SHA1(4a75e4956c568bad70130a326c0fc691a11ff04c) )
 	ROM_LOAD( "gst.03",    0x10000, 0x08000, CRC(4c734bc5) SHA1(48171494f183dec01732b2d6a0f2af0c1b173dba) )
@@ -1073,12 +1142,12 @@ ROM_START( quaquiz2 )
 	ROM_LOAD( "quaquiz2.nv", 0x0000, 0x0100, CRC(dad239cf) SHA1(c46380d7b673a1367f14364ae47cd46ebe080e1b) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, not verified the same! */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed, not verified the same!
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
-// Dumper's note: I got the pcb with Triv Quiz (trivquiz) question rom pcb, but I don't think that's the correct one.
+// Dumper's note: I got the PCB with Triv Quiz (trivquiz) question ROM PCB, but I don't think that's the correct one.
 // If you use Triv Quiz question data the game will boot to playable state
 
 ROM_START( supertr )
@@ -1102,9 +1171,9 @@ ROM_START( supertr )
 	ROM_LOAD( "q8.rom", 0x38000, 0x08000, NO_DUMP )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, verified */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed, verified
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( supertr2 )
@@ -1117,7 +1186,7 @@ ROM_START( supertr2 )
 	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "ast2-0d.rom", 0x00000, 0x01000, CRC(a40f9201) SHA1(a87cfc3dbe5cff82926f5f8486c37fd3f4449135) )
 
-	ROM_REGION( 0x40000, "questions", ROMREGION_INVERT ) /* question data - inverted */
+	ROM_REGION( 0x40000, "questions", ROMREGION_INVERT )
 	ROM_LOAD( "astq2-1.rom", 0x00000, 0x08000, CRC(4af390cb) SHA1(563c6210f2fcc8ee9b5112e2d6f522ddfca2ddea) )
 	ROM_LOAD( "astq2-2.rom", 0x08000, 0x08000, CRC(91a7b4f6) SHA1(c8ff2e8475ae889be14086a04275df94efd66156) )
 	ROM_LOAD( "astq2-3.rom", 0x10000, 0x08000, CRC(e6a50944) SHA1(e3fad344d4bedfd14f307445334903c35e745d9b) )
@@ -1128,9 +1197,9 @@ ROM_START( supertr2 )
 	ROM_LOAD( "astq2-8.rom", 0x38000, 0x08000, CRC(cd2674d5) SHA1(7fb6513172ffe8e3b9e0f4dc9ecdb42d954b1ff0) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, not verified the same! */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed, not verified the same!
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( supertr3 )
@@ -1143,7 +1212,7 @@ ROM_START( supertr3 )
 	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "triv3.u36",    0x00000, 0x01000, CRC(79277b08) SHA1(e8de06809853e030d1ee29a788f9bc8ff7175af0) )
 
-	ROM_REGION( 0x40000, "questions", ROMREGION_INVERT ) /* question data - inverted */
+	ROM_REGION( 0x40000, "questions", ROMREGION_INVERT )
 	ROM_LOAD( "triv3.u41",    0x00000, 0x08000, CRC(d62960c4) SHA1(d6f7dbdb016c14ca1cab5a0e965c9ae40dcbbc28) )
 	ROM_LOAD( "triv3.u42",    0x08000, 0x08000, CRC(6d50fec9) SHA1(6edb3ed92781e8961eacc342c0bceeb052b81a3e) )
 	ROM_LOAD( "triv3.u43",    0x10000, 0x08000, CRC(8c0a73de) SHA1(2a7175b7845b26b8d0d53279cd8793edee95d3a1) )
@@ -1154,9 +1223,9 @@ ROM_START( supertr3 )
 	ROM_LOAD( "triv3.u48",    0x38000, 0x08000, CRC(1a99b268) SHA1(6369c79f645962b4a2f85b18e9d93c3cc65defc1) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, verified */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed, verified
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( nsupertr3 )
@@ -1169,7 +1238,7 @@ ROM_START( nsupertr3 )
 	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
 	ROM_LOAD( "triv3.u36",    0x00000, 0x01000, CRC(79277b08) SHA1(e8de06809853e030d1ee29a788f9bc8ff7175af0) )
 
-	ROM_REGION( 0x40000, "questions", ROMREGION_INVERT ) /* question data - inverted */
+	ROM_REGION( 0x40000, "questions", ROMREGION_INVERT )
 	ROM_LOAD( "astqiii-1.bin",    0x00000, 0x08000, CRC(d62960c4) SHA1(d6f7dbdb016c14ca1cab5a0e965c9ae40dcbbc28) )
 	ROM_LOAD( "astqiii-2.bin",    0x08000, 0x08000, CRC(fdd5a792) SHA1(aeff26f919abc5bbeb1903c674a5d59f5e7aed27) ) // different from set supertrv3
 	ROM_LOAD( "astqiii-3.bin",    0x10000, 0x08000, CRC(8c0a73de) SHA1(2a7175b7845b26b8d0d53279cd8793edee95d3a1) )
@@ -1180,9 +1249,9 @@ ROM_START( nsupertr3 )
 	ROM_LOAD( "astqiii-8.bin",    0x38000, 0x08000, CRC(c2141a9e) SHA1(7e6a32b5b49d53936192eb87bf8bd7a5977d7597) ) // different from set supertrv3
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, verified */
-	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
-	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) // Socketed, verified
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) // Soldered in (Color?)
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
 ROM_START( bbchall ) // ROMs came from a blister, Baby Boom Challenge title found in bbu2.2b
@@ -1581,39 +1650,39 @@ ROM_END
  *
  *************************************/
 
-/* question address is stored as L/H/X (low/high/don't care) */
-void statriv2_state::init_addr_lhx()
+// question address is stored as L/H/X (low/high/don't care)
+void trivia_state::init_addr_lhx()
 {
 	m_question_offset_low = 0;
 	m_question_offset_mid = 1;
 	m_question_offset_high = 0xff;
 }
 
-/* question address is stored as X/L/H (don't care/low/high) */
-void statriv2_state::init_addr_xlh()
+// question address is stored as X/L/H (don't care/low/high)
+void trivia_state::init_addr_xlh()
 {
 	m_question_offset_low = 1;
 	m_question_offset_mid = 2;
 	m_question_offset_high = 0xff;
 }
 
-/* question address is stored as X/H/L (don't care/high/low) */
-void statriv2_state::init_addr_xhl()
+// question address is stored as X/H/L (don't care/high/low)
+void trivia_state::init_addr_xhl()
 {
 	m_question_offset_low = 2;
 	m_question_offset_mid = 1;
 	m_question_offset_high = 0xff;
 }
 
-/* question address is stored as L/M/H (low/mid/high) */
-void statriv2_state::init_addr_lmh()
+// question address is stored as L/M/H (low/mid/high)
+void trivia_state::init_addr_lmh()
 {
 	m_question_offset_low = 0;
 	m_question_offset_mid = 1;
 	m_question_offset_high = 2;
 }
 
-void statriv2_state::init_addr_lmhe()
+void trivia_state::init_addr_lmhe()
 {
 	/***************************************************\
 	*                                                   *
@@ -1677,17 +1746,13 @@ void statriv2_state::init_addr_lmhe()
 	*                                                   *
 	\***************************************************/
 
-	uint8_t *qrom = memregion("questions")->base();
-	uint32_t length = memregion("questions")->bytes();
-	uint32_t address;
-
-	for (address = 0; address < length; address++)
-		qrom[address] ^= bitswap<8>(address, 4,3,3,2,2,1,1,0);
+	for (uint32_t address = 0; address < m_questions_rom.bytes(); address++)
+		m_questions_rom[address] ^= bitswap<8>(address, 4, 3, 3, 2, 2, 1, 1, 0);
 
 	init_addr_lmh();
 }
 
-void statriv2_state::init_laserdisc()
+void casino_state::init_laserdisc()
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
 	iospace.install_readwrite_handler(0x28, 0x2b,
@@ -1715,41 +1780,46 @@ void statriv2_state::init_laserdisc()
  *
  *************************************/
 
-GAME( 1981, statusbj,   0,        statusbj,  statusbj, statriv2_state, empty_init,     ROT0,  "Status Games",       "Status Black Jack (V1.0c)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1981, funcsino,   0,        funcsino,  funcsino, statriv2_state, empty_init,     ROT0,  "Status Games",       "Status Fun Casino (V1.3s)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tripdraw,   0,        tripdraw,  tripdraw, statriv2_state, empty_init,     ROT0,  "Status Games",       "Tripple Draw (V3.1 s)",                 MACHINE_SUPPORTS_SAVE )
-GAME( 1984, bigcsino,   0,        statusbj,  bigcsino, statriv2_state, empty_init,     ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hangman,    0,        statriv2,  hangman,  statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
-GAME( 1984, trivquiz,   0,        statriv2,  statriv2, statriv2_state, init_addr_lhx,  ROT0,  "Status Games",       "Triv Quiz",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1984, statriv2,   0,        statriv2,  statriv2, statriv2_state, init_addr_xlh,  ROT0,  "Status Games",       "Triv Two",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1985, statriv2v,  statriv2, statriv2v, statriv2, statriv2_state, init_addr_xlh,  ROT90, "Status Games",       "Triv Two (Vertical)",                   MACHINE_SUPPORTS_SAVE )
-GAME( 1985, statriv4,   0,        statriv2,  statriv4, statriv2_state, init_addr_xhl,  ROT0,  "Status Games",       "Triv Four",                             MACHINE_SUPPORTS_SAVE )
-GAME( 1985, statriv5se, statriv4, statriv2,  statriv4, statriv2_state, init_addr_xhl,  ROT0,  "Status Games",       "Triv Five Special Edition",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
-GAME( 1985, sextriv,    0,        statriv2,  sextriv,  statriv2_state, init_addr_lhx,  ROT0,  "Status Games",       "Sex Triv",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1985, quaquiz2,   0,        statriv2,  quaquiz2, statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Quadro Quiz II",                        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, supertr,    0,        statriv2,  supertr2, statriv2_state, init_addr_lhx,  ROT0,  "Status Games",       "Super Triv Quiz I",                     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
-GAME( 1986, bbchall,    0,        statriv2,  bbchall,  statriv2_state, empty_init,     ROT0,  "Status Games",       "Baby Boom Challenge",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // wrong satellite board message at startup. Also missing questions' ROMs.
-GAME( 1986, supertr2,   0,        statriv2,  supertr2, statriv2_state, init_addr_lmhe, ROT0,  "Status Games",       "Super Triv II",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1988, supertr3,   0,        statriv2,  supertr2, statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "Super Triv III",                        MACHINE_SUPPORTS_SAVE )
-GAME( 1988, nsupertr3,  supertr3, statriv2,  supertr2, statriv2_state, init_addr_lmh,  ROT0,  "Status Games",       "New Super Triv III",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // new questions don't appear correctly, coinage problems
-// The following Casino Strip sets don't show the version on screen (at least without the laserdisc video). It was taken from the rom labels / from the Dragon's Lair Project archive.
-GAME( 1984, cs1_spp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1984, cs1_spp2,  cs1_spp,   statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs2_sps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip II (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1992, cs3_qps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip III (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs5_spp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip V (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs5_ssp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip V (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs6_sps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Poker version, for Sony LD)",   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs6_ssp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1986, cs8_ssp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs8_spp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs8_sps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1992, cs9_qps,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip IX (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1985, cs9_spp,   0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip IX (Poker version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs10_sps,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip X (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs11_ssp,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Shooting Game version, for Pioneer LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs11_sps,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs11_sps2, cs11_sps,  statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1988, cs12_sps,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XII (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1996, cspe_qps,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip Private Eyes / All Start (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-GAME( 1993, csv1_qps,  0,         statusbj,  funcsino, statriv2_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip Vivid 1 (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+// card games
+GAME( 1981, statusbj,   0,        statusbj,  statusbj, casino_state, empty_init,     ROT0,  "Status Games",       "Status Black Jack (V1.0c)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, funcsino,   0,        funcsino,  funcsino, casino_state, empty_init,     ROT0,  "Status Games",       "Status Fun Casino (V1.3s)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripdraw,   0,        tripdraw,  tripdraw, casino_state, empty_init,     ROT0,  "Status Games",       "Tripple Draw (V3.1 s)",                 MACHINE_SUPPORTS_SAVE )
+GAME( 1984, bigcsino,   0,        statusbj,  bigcsino, casino_state, empty_init,     ROT0,  "Status Games",       "Big Casino",                            MACHINE_SUPPORTS_SAVE )
+
+// trivia
+GAME( 1984, hangman,    0,        statriv2,  hangman,  trivia_state, init_addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )
+GAME( 1984, trivquiz,   0,        statriv2,  statriv2, trivia_state, init_addr_lhx,  ROT0,  "Status Games",       "Triv Quiz",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1984, statriv2,   0,        statriv2,  statriv2, trivia_state, init_addr_xlh,  ROT0,  "Status Games",       "Triv Two",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv2v,  statriv2, statriv2v, statriv2, trivia_state, init_addr_xlh,  ROT90, "Status Games",       "Triv Two (Vertical)",                   MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv3,   0,        statriv2,  statriv2, trivia_state, init_addr_xhl,  ROT0,  "Status Games",       "Triv III",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv4,   0,        statriv2,  statriv4, trivia_state, init_addr_xhl,  ROT0,  "Status Games",       "Triv Four",                             MACHINE_SUPPORTS_SAVE )
+GAME( 1985, statriv5se, statriv4, statriv2,  statriv4, trivia_state, init_addr_xhl,  ROT0,  "Status Games",       "Triv Five Special Edition",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
+GAME( 1985, sextriv,    0,        statriv2,  sextriv,  trivia_state, init_addr_lhx,  ROT0,  "Status Games",       "Sex Triv",                              MACHINE_SUPPORTS_SAVE )
+GAME( 1985, quaquiz2,   0,        statriv2,  quaquiz2, trivia_state, init_addr_lmh,  ROT0,  "Status Games",       "Quadro Quiz II",                        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, supertr,    0,        statriv2,  supertr2, trivia_state, init_addr_lhx,  ROT0,  "Status Games",       "Super Triv Quiz I",                     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // missing questions' ROMs
+GAME( 1986, bbchall,    0,        statriv2,  bbchall,  trivia_state, empty_init,     ROT0,  "Status Games",       "Baby Boom Challenge",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // wrong satellite board message at startup. Also missing questions' ROMs.
+GAME( 1986, supertr2,   0,        statriv2,  supertr2, trivia_state, init_addr_lmhe, ROT0,  "Status Games",       "Super Triv II",                         MACHINE_SUPPORTS_SAVE )
+GAME( 1988, supertr3,   0,        statriv2,  supertr2, trivia_state, init_addr_lmh,  ROT0,  "Status Games",       "Super Triv III",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nsupertr3,  supertr3, statriv2,  supertr2, trivia_state, init_addr_lmh,  ROT0,  "Status Games",       "New Super Triv III",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // new questions don't appear correctly, coinage problems
+
+// The following Casino Strip sets don't show the version on screen (at least without the laserdisc video). It was taken from the ROM labels / from the Dragon's Lair Project archive.
+GAME( 1984, cs1_spp,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 1)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, cs1_spp2,  cs1_spp,   statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip I (Poker version, for Pioneer LD, set 2)",              MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs2_sps,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip II (Poker version, for Sony LD)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, cs3_qps,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip III (Poker version, for Sony LD)",                      MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs5_spp,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip V (Poker version, for Pioneer LD)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs5_ssp,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip V (Shooting Game version, for Pioneer LD)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs6_sps,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Poker version, for Sony LD)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs6_ssp,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VI (Shooting Game version, for Pioneer LD)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1986, cs8_ssp,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Shooting Game version, for Pioneer LD)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs8_spp,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Pioneer LD)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs8_sps,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip VIII (Poker version, for Sony LD)",                     MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1992, cs9_qps,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip IX (Poker version, for Sony LD)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, cs9_spp,   0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip IX (Poker version, for Pioneer LD)",                    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs10_sps,  0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip X (Poker version, for Sony LD)",                        MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_ssp,  0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Shooting Game version, for Pioneer LD)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_sps,  0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 1)",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs11_sps2, cs11_sps,  statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XI (Poker version, for Sony LD, set 2)",                MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1988, cs12_sps,  0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Status Games",       "Casino Strip XII (Poker version, for Sony LD)",                      MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1996, cspe_qps,  0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip Private Eyes / All Start (Poker version, for Sony LD)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1993, csv1_qps,  0,         statusbj,  funcsino, casino_state, init_laserdisc, ROT0,  "Quantum Industries", "Casino Strip Vivid 1 (Poker version, for Sony LD)",                  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

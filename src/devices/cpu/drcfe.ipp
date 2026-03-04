@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    drcfe.c
+    drcfe.ipp
 
     Generic dynamic recompiler frontend structures and utilities.
 
@@ -14,34 +14,14 @@
         intrablock branches
 
 ***************************************************************************/
+#ifndef MAME_CPU_DRCFE_IPP
+#define MAME_CPU_DRCFE_IPP
 
-#include "emu.h"
+#pragma once
+
 #include "drcfe.h"
 
-
-namespace {
-
-//**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-constexpr u32 MAX_STACK_DEPTH = 100;
-
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// an entry that maps branches for our code walking
-struct pc_stack_entry
-{
-	offs_t              targetpc;
-	offs_t              srcpc;
-};
-
-} // anonymous namespace
-
+#include <algorithm>
 
 
 //**************************************************************************
@@ -49,26 +29,26 @@ struct pc_stack_entry
 //**************************************************************************
 
 //-------------------------------------------------
-//  drc_frontend - constructor
+//  drc_frontend_base - constructor
 //-------------------------------------------------
 
-drc_frontend::drc_frontend(device_t &cpu, u32 window_start, u32 window_end, u32 max_sequence)
+template <typename Desc>
+drc_frontend_base<Desc>::drc_frontend_base(offs_t pageshift, u32 window_start, u32 window_end, u32 max_sequence)
 	: m_window_start(window_start)
 	, m_window_end(window_end)
 	, m_max_sequence(max_sequence)
-	, m_cpudevice(downcast<cpu_device &>(cpu))
-	, m_program(m_cpudevice.space(AS_PROGRAM))
-	, m_pageshift(m_cpudevice.space_config(AS_PROGRAM)->page_shift())
+	, m_pageshift(pageshift)
 	, m_desc_array(window_end + window_start + 2, nullptr)
 {
 }
 
 
 //-------------------------------------------------
-//  ~drc_frontend - destructor
+//  ~drc_frontend_base - destructor
 //-------------------------------------------------
 
-drc_frontend::~drc_frontend()
+template <typename Desc>
+drc_frontend_base<Desc>::~drc_frontend_base()
 {
 	// release any descriptions we've accumulated
 	release_descriptions();
@@ -81,8 +61,19 @@ drc_frontend::~drc_frontend()
 //  relative to the specified startpc
 //-------------------------------------------------
 
-const opcode_desc *drc_frontend::describe_code(offs_t startpc)
+template <typename Desc>
+template <typename T>
+const Desc *drc_frontend_base<Desc>::do_describe_code(T &&describe, offs_t startpc)
 {
+	constexpr u32 MAX_STACK_DEPTH = 100;
+
+	// an entry that maps branches for our code walking
+	struct pc_stack_entry
+	{
+		offs_t              targetpc;
+		offs_t              srcpc;
+	};
+
 	// release any descriptions we've accumulated
 	release_descriptions();
 
@@ -100,14 +91,17 @@ const opcode_desc *drc_frontend::describe_code(offs_t startpc)
 	{
 		// if we've already hit this PC, just mark it a branch target and continue
 		pc_stack_entry *const curstack = --pcstackptr;
-		opcode_desc *curdesc = m_desc_array[curstack->targetpc - minpc];
+		Desc *curdesc = m_desc_array[curstack->targetpc - minpc];
 		if (curdesc != nullptr)
 		{
-			curdesc->flags |= OPFLAG_IS_BRANCH_TARGET;
+			curdesc->set_is_branch_target();
 
 			// if the branch crosses a page boundary, mark the target as needing to revalidate
 			if (m_pageshift != 0 && ((curstack->srcpc ^ curdesc->pc) >> m_pageshift) != 0)
-				curdesc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION;
+			{
+				curdesc->set_validate_tlb();
+				curdesc->set_can_cause_exception();
+			}
 
 			// continue processing
 			continue;
@@ -117,39 +111,42 @@ const opcode_desc *drc_frontend::describe_code(offs_t startpc)
 		for (offs_t curpc = curstack->targetpc; curpc >= minpc && curpc < maxpc && m_desc_array[curpc - minpc] == nullptr; curpc += m_desc_array[curpc - minpc]->length)
 		{
 			// allocate a new description and describe this instruction
-			m_desc_array[curpc - minpc] = curdesc = describe_one(curpc, curdesc);
+			m_desc_array[curpc - minpc] = curdesc = describe_one(describe, curpc, curdesc);
 
 			// first instruction in a sequence is always a branch target
 			if (curpc == curstack->targetpc)
-				curdesc->flags |= OPFLAG_IS_BRANCH_TARGET;
+				curdesc->set_is_branch_target();
 
 			// stop if we hit a page fault
-			if (curdesc->flags & OPFLAG_COMPILER_PAGE_FAULT)
+			if (curdesc->compiler_page_fault())
 				break;
 
 			// if we are the first instruction in the whole window, we must validate the TLB
 			if (curpc == startpc && m_pageshift != 0)
-				curdesc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION;
+			{
+				curdesc->set_validate_tlb();
+				curdesc->set_can_cause_exception();
+			}
 
 			// if we are a branch within the block range, add the branch target to our stack
-			if ((curdesc->flags & OPFLAG_IS_BRANCH) && curdesc->targetpc >= minpc && curdesc->targetpc < maxpc && pcstackptr < &pcstack[MAX_STACK_DEPTH])
+			if (curdesc->is_branch() && (curdesc->targetpc >= minpc) && (curdesc->targetpc < maxpc) && (pcstackptr < &pcstack[MAX_STACK_DEPTH]))
 			{
-				curdesc->flags |= OPFLAG_INTRABLOCK_BRANCH;
+				curdesc->set_intrablock_branch();
 				pcstackptr->srcpc = curdesc->pc;
 				pcstackptr->targetpc = curdesc->targetpc;
 				pcstackptr++;
 			}
 
 			// if we're done, we're done
-			if (curdesc->flags & OPFLAG_END_SEQUENCE)
+			if (curdesc->end_sequence())
 				break;
 		}
 	}
 
 	// now build the list of descriptions in order
 	// first from startpc -> maxpc, then from minpc -> startpc
-	build_sequence(startpc - minpc, maxpc - minpc, OPFLAG_REDISPATCH);
-	build_sequence(minpc - minpc, startpc - minpc, OPFLAG_RETURN_TO_START);
+	build_sequence(startpc - minpc, maxpc - minpc, true);
+	build_sequence(minpc - minpc, startpc - minpc, false);
 	return m_desc_live_list.first();
 }
 
@@ -160,62 +157,55 @@ const opcode_desc *drc_frontend::describe_code(offs_t startpc)
 //  slots of branches as well
 //-------------------------------------------------
 
-opcode_desc *drc_frontend::describe_one(offs_t curpc, opcode_desc const *prevdesc, bool in_delay_slot)
+template <typename Desc>
+template <typename T>
+Desc *drc_frontend_base<Desc>::describe_one(T &&describe, offs_t curpc, Desc const *prevdesc, bool in_delay_slot)
 {
 	// initialize the description
-	opcode_desc *const desc = m_desc_allocator.alloc();
-	desc->m_next = nullptr;
-	desc->branch = nullptr;
-	desc->delay.reset();
-	desc->pc = curpc;
-	desc->physpc = curpc;
-	desc->targetpc = BRANCH_TARGET_DYNAMIC;
-	memset(&desc->opptr, 0x00, sizeof(desc->opptr));
-	desc->length = 0;
-	desc->delayslots = 0;
-	desc->skipslots = 0;
-	// set the delay slot flag
-	desc->flags = in_delay_slot ? OPFLAG_IN_DELAY_SLOT : 0;
-	desc->userflags = 0;
-	desc->userdata0 = 0;
-	desc->cycles = 0;
-	memset(desc->regin, 0x00, sizeof(desc->regin));
-	memset(desc->regout, 0x00, sizeof(desc->regout));
-	memset(desc->regreq, 0x00, sizeof(desc->regreq));
+	Desc *const desc = m_desc_allocator.alloc();
+	desc->reset(curpc, in_delay_slot);
 
 	// call the callback to describe an instruction
 	if (!describe(*desc, prevdesc))
 	{
-		desc->flags |= OPFLAG_WILL_CAUSE_EXCEPTION | OPFLAG_INVALID_OPCODE;
+		desc->set_will_cause_exception();
+		desc->set_invalid_opcode();
 		return desc;
 	}
 
 	// validate the TLB if we are exactly at the start of a page, or if we cross a page boundary
 	if (m_pageshift != 0 && (((curpc - 1) ^ (curpc + desc->length - 1)) >> m_pageshift) != 0)
-		desc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION;
+	{
+		desc->set_validate_tlb();
+		desc->set_can_cause_exception();
+	}
 
 	// validate stuff
-	assert(desc->length > 0 || (desc->flags & OPFLAG_VIRTUAL_NOOP) != 0);
+	assert((desc->length > 0) || desc->virtual_noop());
 
 	// if we are a branch with delay slots, recursively walk those
-	if (desc->flags & OPFLAG_IS_BRANCH)
+	if (desc->is_branch())
 	{
 		// iterate over slots and describe them
 		offs_t delaypc = curpc + desc->length;
 		// If this is a delay slot it is the true branch fork and the pc should be the previous branch target
-		if (desc->flags & OPFLAG_IN_DELAY_SLOT) {
-			if (prevdesc->targetpc != BRANCH_TARGET_DYNAMIC) {
+		if (desc->in_delay_slot())
+		{
+			if (prevdesc->targetpc != BRANCH_TARGET_DYNAMIC)
+			{
 				delaypc = prevdesc->targetpc;
-				//printf("drc_frontend::describe_one Branch in delay slot. curpc=%08X delaypc=%08X\n", curpc, delaypc);
-			} else {
-				//printf("drc_frontend::describe_one Warning! Branch in delay slot of dynamic target. curpc=%08X\n", curpc);
+				//printf("drc_frontend_base::describe_one Branch in delay slot. curpc=%08X delaypc=%08X\n", curpc, delaypc);
+			}
+			else
+			{
+				//printf("drc_frontend_base::describe_one Warning! Branch in delay slot of dynamic target. curpc=%08X\n", curpc);
 			}
 		}
-		opcode_desc *prev = desc;
+		Desc *prev = desc;
 		for (u8 slotnum = 0; slotnum < desc->delayslots; slotnum++)
 		{
 			// recursively describe the next instruction
-			opcode_desc *delaydesc = describe_one(delaypc, prev, true);
+			Desc *delaydesc = describe_one(describe, delaypc, prev, true);
 			if (delaydesc == nullptr)
 				break;
 			desc->delay.append(*delaydesc);
@@ -225,7 +215,7 @@ opcode_desc *drc_frontend::describe_one(offs_t curpc, opcode_desc const *prevdes
 			delaydesc->branch = desc;
 
 			// stop if we hit a page fault
-			if (delaydesc->flags & OPFLAG_COMPILER_PAGE_FAULT)
+			if (delaydesc->compiler_page_fault())
 				break;
 
 			// otherwise, advance
@@ -241,19 +231,21 @@ opcode_desc *drc_frontend::describe_one(offs_t curpc, opcode_desc const *prevdes
 //  of instructions
 //-------------------------------------------------
 
-void drc_frontend::build_sequence(int start, int end, u32 endflag)
+template <typename Desc>
+void drc_frontend_base<Desc>::build_sequence(int start, int end, bool redispatch)
 {
 	// iterate in order from start to end, picking up all non-NULL instructions
 	int consecutive = 0;
 	int seqstart = -1;
 	int skipsleft = 0;
 	for (int descnum = start; descnum < end; descnum++)
+	{
 		if (m_desc_array[descnum] != nullptr)
 		{
 			// determine the next instruction, taking skips into account
-			opcode_desc *curdesc = m_desc_array[descnum];
+			Desc *curdesc = m_desc_array[descnum];
 			int nextdescnum = descnum + curdesc->length;
-			opcode_desc *nextdesc = (nextdescnum < end) ? m_desc_array[nextdescnum] : nullptr;
+			Desc *nextdesc = (nextdescnum < end) ? m_desc_array[nextdescnum] : nullptr;
 			for (u8 skipnum = 0; skipnum < curdesc->skipslots && nextdesc != nullptr; skipnum++)
 			{
 				nextdescnum = nextdescnum + nextdesc->length;
@@ -264,16 +256,19 @@ void drc_frontend::build_sequence(int start, int end, u32 endflag)
 			if (seqstart == -1 && skipsleft == 0)
 			{
 				// tag all start-of-sequence instructions as needing TLB verification
-				curdesc->flags |= OPFLAG_VALIDATE_TLB | OPFLAG_CAN_CAUSE_EXCEPTION;
+				curdesc->set_validate_tlb();
+				curdesc->set_can_cause_exception();
 				seqstart = descnum;
 			}
 
 			// if we are the last instruction, indicate end-of-sequence and redispatch
 			if (nextdesc == nullptr)
 			{
-				curdesc->flags |= OPFLAG_END_SEQUENCE;
-				if (endflag != OPFLAG_RETURN_TO_START || nextdescnum == end)
-					curdesc->flags |= endflag;
+				curdesc->set_end_sequence();
+				if (redispatch)
+					curdesc->set_redispatch();
+				else if (nextdescnum == end)
+					curdesc->set_return_to_start();
 			}
 
 			// otherwise, do some analysis based on the next instruction
@@ -281,7 +276,7 @@ void drc_frontend::build_sequence(int start, int end, u32 endflag)
 			{
 				// if there are instructions between us and the next instruction, we must end our sequence here
 				int scandescnum;
-				opcode_desc *scandesc = nullptr;
+				Desc *scandesc = nullptr;
 				for (scandescnum = descnum + 1; scandescnum < end; scandescnum++)
 				{
 					scandesc = m_desc_array[scandescnum];
@@ -289,28 +284,33 @@ void drc_frontend::build_sequence(int start, int end, u32 endflag)
 						break;
 				}
 				if (scandesc != nextdesc)
-					curdesc->flags |= OPFLAG_END_SEQUENCE;
+					curdesc->set_end_sequence();
 
 				// if the next instruction is a branch target, mark this instruction as end of sequence
-				if (nextdesc->flags & OPFLAG_IS_BRANCH_TARGET)
-					curdesc->flags |= OPFLAG_END_SEQUENCE;
+				if (nextdesc->is_branch_target())
+					curdesc->set_end_sequence();
 			}
 
 			// if we exceed the maximum consecutive count, cut off the sequence
 			if (++consecutive >= m_max_sequence)
-				curdesc->flags |= OPFLAG_END_SEQUENCE;
-			if (curdesc->flags & OPFLAG_END_SEQUENCE)
+				curdesc->set_end_sequence();
+			if (curdesc->end_sequence())
 				consecutive = 0;
 
 			// if this is the end of a sequence, work backwards
-			if (curdesc->flags & OPFLAG_END_SEQUENCE)
+			if (curdesc->end_sequence())
 			{
 				// figure out which registers we *must* generate, assuming at the end all must be
-				u32 reqmask[4] = { 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff };
+				typename Desc::regmask reqmask;
+				reqmask.set();
 				if (seqstart != -1)
+				{
 					for (int backdesc = descnum; backdesc != seqstart - 1; backdesc--)
+					{
 						if (m_desc_array[backdesc] != nullptr)
 							accumulate_required_backwards(*m_desc_array[backdesc], reqmask);
+					}
+				}
 
 				// reset the register states
 				seqstart = -1;
@@ -318,7 +318,7 @@ void drc_frontend::build_sequence(int start, int end, u32 endflag)
 
 			// if we have instructions remaining to be skipped, and this instruction is a branch target
 			// belay the skip order
-			if (skipsleft > 0 && (curdesc->flags & OPFLAG_IS_BRANCH_TARGET))
+			if ((skipsleft > 0) && curdesc->is_branch_target())
 				skipsleft = 0;
 
 			// if we're not getting skipped, add us to the end of the list and clear our array slot
@@ -334,9 +334,10 @@ void drc_frontend::build_sequence(int start, int end, u32 endflag)
 			else if (skipsleft > 0)
 				skipsleft--;
 		}
+	}
 
 	// zap the array
-	memset(&m_desc_array[start], 0, (end - start) * sizeof(m_desc_array[0]));
+	std::fill_n(&m_desc_array[start], end - start, nullptr);
 }
 
 
@@ -346,33 +347,25 @@ void drc_frontend::build_sequence(int start, int end, u32 endflag)
 //  walking in a backwards direction
 //-------------------------------------------------
 
-void drc_frontend::accumulate_required_backwards(opcode_desc &desc, u32 *reqmask)
+template <typename Desc>
+void drc_frontend_base<Desc>::accumulate_required_backwards(Desc &desc, typename Desc::regmask &reqmask)
 {
 	// recursively handle delay slots
 	if (desc.delay.first() != nullptr)
 		accumulate_required_backwards(*desc.delay.first(), reqmask);
 
 	// if this is a branch, we have to reset our requests
-	if (desc.flags & OPFLAG_IS_BRANCH)
-		reqmask[0] = reqmask[1] = reqmask[2] = reqmask[3] = 0xffffffff;
+	if (desc.is_branch())
+		reqmask.set();
 
 	// determine the required registers
-	desc.regreq[0] = desc.regout[0] & reqmask[0];
-	desc.regreq[1] = desc.regout[1] & reqmask[1];
-	desc.regreq[2] = desc.regout[2] & reqmask[2];
-	desc.regreq[3] = desc.regout[3] & reqmask[3];
+	desc.regreq = desc.regout & reqmask;
 
 	// any registers modified by this instruction aren't required upstream until referenced
-	reqmask[0] &= ~desc.regout[0];
-	reqmask[1] &= ~desc.regout[1];
-	reqmask[2] &= ~desc.regout[2];
-	reqmask[3] &= ~desc.regout[3];
+	reqmask &= ~desc.regout;
 
 	// any registers required by this instruction now get marked required
-	reqmask[0] |= desc.regin[0];
-	reqmask[1] |= desc.regin[1];
-	reqmask[2] |= desc.regin[2];
-	reqmask[3] |= desc.regin[3];
+	reqmask |= desc.regin;
 }
 
 
@@ -382,12 +375,15 @@ void drc_frontend::accumulate_required_backwards(opcode_desc &desc, u32 *reqmask
 //  free list
 //------------------------------------------------
 
-void drc_frontend::release_descriptions()
+template <typename Desc>
+void drc_frontend_base<Desc>::release_descriptions()
 {
 	// release all delay slots first
-	for (opcode_desc *curdesc = m_desc_live_list.first(); curdesc != nullptr; curdesc = curdesc->next())
+	for (Desc *curdesc = m_desc_live_list.first(); curdesc != nullptr; curdesc = curdesc->next())
 		m_desc_allocator.reclaim_all(curdesc->delay);
 
 	// reclaim all the descriptors
 	m_desc_allocator.reclaim_all(m_desc_live_list);
 }
+
+#endif // MAME_CPU_DRCFE_IPP

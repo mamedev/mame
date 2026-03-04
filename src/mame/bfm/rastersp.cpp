@@ -65,6 +65,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_dsp(*this, "dsp")
 		, m_duart(*this, "duart")
+		, m_scsibus(*this, "scsibus")
 		, m_dram(*this, "dram")
 		, m_ldac(*this, "ldac")
 		, m_rdac(*this, "rdac")
@@ -96,6 +97,7 @@ protected:
 	required_device<i486_device>     m_maincpu;
 	required_device<tms320c3x_device> m_dsp;
 	required_device<z80scc_device>   m_duart;
+	required_device<nscsi_bus_device> m_scsibus;
 
 	void update_irq(uint32_t which, uint32_t state);
 
@@ -171,7 +173,6 @@ private:
 	void upload_palette(uint32_t word1, uint32_t word2);
 	IRQ_CALLBACK_MEMBER(irq_callback);
 	nscsi_connector &add_rastersp_scsi_slot(machine_config &config, const char *tag, const char *default_slot);
-	static void ncr53c700_config(device_t *device);
 	void cpu_map(address_map &map) ATTR_COLD;
 	void dsp_map(address_map &map) ATTR_COLD;
 	uint8_t interrupt_status_r(offs_t offset);
@@ -1101,7 +1102,7 @@ void rastersp_state::cpu_map_base(address_map &map)
 {
 	map(0x02200000, 0x022fffff).rw(FUNC(rastersp_state::nvram_r), FUNC(rastersp_state::nvram_w)).umask32(0x000000ff);
 	map(0x02200800, 0x02200803).rw(FUNC(rastersp_state::interrupt_ctrl_r),FUNC(rastersp_state::interrupt_ctrl_w));
-	map(0x02208000, 0x02208fff).rw("scsibus:7:ncr53c700", FUNC(ncr53c7xx_device::read), FUNC(ncr53c7xx_device::write));
+	map(0x02208000, 0x02208fff).rw("ncr53c700", FUNC(ncr53c7xx_device::read), FUNC(ncr53c7xx_device::write));
 	map(0x0220e000, 0x0220e003).w(FUNC(rastersp_state::dpylist_w));
 	map(0xfff00000, 0xffffffff).bankrw("bank1");//was 3
 }
@@ -1425,16 +1426,6 @@ void rastersp_state::ncr53c700_write(offs_t offset, uint32_t data, uint32_t mem_
 	m_maincpu->space(AS_PROGRAM).write_dword(offset, data, mem_mask);
 }
 
-void rastersp_state::ncr53c700_config(device_t *device)
-{
-	auto *state = device->subdevice<rastersp_state>(":");
-	ncr53c7xx_device &scsictrl = downcast<ncr53c7xx_device &>(*device);
-	scsictrl.set_clock(66'000'000);
-	scsictrl.irq_handler().set(*state, FUNC(rastersp_state::scsi_irq));
-	scsictrl.host_read().set(*state, FUNC(rastersp_state::ncr53c700_read));
-	scsictrl.host_write().set(*state, FUNC(rastersp_state::ncr53c700_write));
-}
-
 void rastersp_state::rs_config_base(machine_config &config)
 {
 	I486(config, m_maincpu, 33'330'000);
@@ -1448,16 +1439,15 @@ void rastersp_state::rs_config_base(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	NSCSI_BUS(config, "scsibus", 0);
+	(NSCSI_BUS(config, m_scsibus));
+
+	auto &scsictrl(NCR53C7XX(config, "ncr53c700",66'000'000));
+	m_scsibus->set_external_device(7, scsictrl);
+	scsictrl.irq_handler().set(DEVICE_SELF, FUNC(rastersp_state::scsi_irq));
+	scsictrl.host_read().set(DEVICE_SELF, FUNC(rastersp_state::ncr53c700_read));
+	scsictrl.host_write().set(DEVICE_SELF, FUNC(rastersp_state::ncr53c700_write));
 
 	WATCHDOG_TIMER(config, m_watchdog).set_time(attotime::from_seconds(1));
-
-	nscsi_connector &connector7(NSCSI_CONNECTOR(config, "scsibus:7", 0));
-	connector7.option_add("harddisk", NSCSI_HARDDISK);
-	connector7.option_add_internal("ncr53c700", NCR53C7XX);
-	connector7.set_default_option("ncr53c700");
-	connector7.set_fixed(true);
-	connector7.set_option_machine_config("ncr53c700", ncr53c700_config);
 
 	/* Video */
 	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
@@ -1497,11 +1487,8 @@ void rastersp_state::rastersp(machine_config &config)
 
 	m_dsp->set_addrmap(AS_PROGRAM, &rastersp_state::dsp_map);
 
-	nscsi_connector &connector0(NSCSI_CONNECTOR(config, "scsibus:0", 0));
-	connector0.option_add("harddisk", NSCSI_HARDDISK);
-	connector0.option_add_internal("ncr53c700", NCR53C7XX);
-	connector0.set_default_option("harddisk");
-	connector0.set_fixed(true);
+	auto &hd(NSCSI_HARDDISK(config, "harddisk"));
+	m_scsibus->set_external_device(0, hd);
 }
 
 
@@ -1512,11 +1499,8 @@ void fbcrazy_state::fbcrazy(machine_config &config)
 
 	m_dsp->set_addrmap(AS_PROGRAM, &fbcrazy_state::dsp_map);
 
-	nscsi_connector &connector3(NSCSI_CONNECTOR(config, "scsibus:3", 0));
-	connector3.option_add("cdrom", NSCSI_CDROM);
-	connector3.option_add_internal("ncr53c700", NCR53C7XX);
-	connector3.set_default_option("cdrom");
-	connector3.set_fixed(true);
+	auto &cdrom(NSCSI_CDROM(config, "cdrom"));
+	m_scsibus->set_external_device(3, cdrom);
 
 	bacta_datalogger_device &bacta(BACTA_DATALOGGER(config, "bacta", 0));
 
@@ -1543,7 +1527,7 @@ ROM_START( rotr )
 	ROM_REGION(0x8000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "rotr.nv", 0x0000, 0x8000, CRC(62543517) SHA1(a4bf3431cdab956839bb155c4a8c140d30e5c7ec) )
 
-	DISK_REGION( "scsibus:0:harddisk" )
+	DISK_REGION( "harddisk" )
 	DISK_IMAGE( "rotr", 0, SHA1(d67d7feb52d8c7ba1d2a190a40d97e84871f2d80) )
 ROM_END
 
@@ -1559,7 +1543,7 @@ ROM_START( rotra )
 	ROM_REGION(0x8000, "nvram", 0) /* Default NVRAM */
 	ROM_LOAD( "rotr.nv", 0x0000, 0x8000, CRC(62543517) SHA1(a4bf3431cdab956839bb155c4a8c140d30e5c7ec) )
 
-	DISK_REGION( "scsibus:0:harddisk" )
+	DISK_REGION( "harddisk" )
 	DISK_IMAGE( "rotra", 0, SHA1(570d402e5e9bba123edf7dfa9db7a0e6bdb23823) )
 ROM_END
 
@@ -1593,7 +1577,7 @@ ROM_START( fbcrazy )
 
 	ROM_REGION(0x8000, "nvram", ROMREGION_ERASEFF )
 
-	DISK_REGION( "scsibus:3:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "95100303", 0, SHA1(9ba47c96de27ec2bea9c6624d78d309b67705406)  )
 ROM_END
 

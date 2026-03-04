@@ -1174,6 +1174,34 @@ ROM_START( galpani4j )
 	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) )
 ROM_END
 
+ROM_START( galpani4a ) // ROM-BOARD NEP-16 part number GP04A00068 with extra sound sample ROM at U7
+	SKNS_ASIA
+
+	ROM_REGION32_BE( 0x200000, "game", 0 ) // SH-2 Code mapped at 0x04000000
+	ROM_LOAD16_BYTE( "gp4a1_u10.u10", 0x000000, 0x080000, CRC(b14adfbb) SHA1(3b857a6f46a6f39716c5aa8d9df7907ae1856761) ) // labeled as:  KANEKO  GP4A1 /U10  (green stripe across bottom of label)
+	ROM_LOAD16_BYTE( "gp4a1_u8.u8",   0x000001, 0x080000, CRC(77fe1f40) SHA1(8c0549d05d4ad7332fdd10a69ce8f4d9cd1ff336) ) // labeled as:  KANEKO  GP4A1 /U8   (green stripe across bottom of label)
+
+	ROM_REGION( 0x400000, "spritegen", 0 ) // Sprites
+	ROM_LOAD( "gp4-100-00.u24", 0x000000, 0x200000, CRC(1df61f01) SHA1(a9e95bbb3013e8f2fd01243b1b392ff07b4f7d02) )
+	ROM_LOAD( "gp4-101-00.u20", 0x200000, 0x100000, CRC(8e2c9349) SHA1(a58fa9bcc9684ed4558e3395d592b64a1978a902) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) // Tiles Plane A
+	ROM_LOAD( "gp4-200-00.u16", 0x000000, 0x200000, CRC(f0781376) SHA1(aeab9553a9af922524e528eb2d019cf36b6e2094) )
+	ROM_LOAD( "gp4-201-00.u18", 0x200000, 0x200000, CRC(10c4b183) SHA1(80e05f3932495ad4fc9bf928fa66e6d2931bbb06) )
+
+	ROM_REGION( 0x800000, "gfx3", ROMREGION_ERASE00 ) // Tiles Plane B
+	// First 0x040000 bytes (0x03ff Tiles) are RAM Based Tiles
+	// 0x040000 - 0x3fffff empty?
+
+	ROM_REGION( 0x400000, "ymz", 0 ) // Samples
+	ROM_LOAD( "gp4-300-00.u4", 0x000000, 0x200000, CRC(8374663a) SHA1(095512564f4de25dc3752d9fbd254b9dabd16d1b) ) // Doesn't seem to use these samples at all
+	ROM_LOAD( "gp4-301-00.u7", 0x200000, 0x200000, CRC(53e9f8fb) SHA1(72104f31089f42cd3384d9494952f33b15cd18ad) ) // Changed some samples when compared to U4 ROM - Different then GP4-301-01 used below
+
+	ROM_REGION( 0x400, "plds", 0 )
+	ROM_LOAD( "skns-r09.u9",  0x000, 0x117, CRC(b02058d9) SHA1(77d07e0f329fb1969aa4543cd124e36ad34b07ba) ) // Atmel ATF16V8B
+	ROM_LOAD( "skns-r11.u11", 0x200, 0x117, CRC(a9f05af4) SHA1(018684c1f9f7c2e1c86f0cb2db2ec7fb02e35cd8) ) // Atmel ATF16V8B
+ROM_END
+
 ROM_START( galpani4k ) /* ROM-BOARD NEP-16 part number GP04K00372 with extra sound sample ROM at U7 */
 	SKNS_KOREA
 
@@ -2058,6 +2086,7 @@ GAME( 1996, skns,        0,        skns,  skns,     skns_state, empty_init,     
 
 GAME( 1996, galpani4,    skns,     sknse, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Europe)",                          MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, galpani4j,   galpani4, sknsj, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Japan)",                           MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, galpani4a,   galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Asia)",                            MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, galpani4k,   galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic 4 (Korea)",                           MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, galpaniex,   galpani4, sknsa, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic EX (Korea)",                          MACHINE_IMPERFECT_GRAPHICS ) // copyright 2000, re-release for the Asian/Korean market?
 GAME( 2000, galpanisu,   galpani4, sknsk, cyvern,   skns_state, init_galpani4,  ROT0,  "Kaneko", "Gals Panic SU (Korea, Gals Panic 4 re-release)", MACHINE_IMPERFECT_GRAPHICS ) // copyright 2000, re-release for the Asian/Korean market?

@@ -20,7 +20,7 @@ class it8661f_device : public device_t,
 						 public device_memory_interface
 {
 public:
-	it8661f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	it8661f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~it8661f_device();
 
 	void remap(int space_id, offs_t start, offs_t end) override;
@@ -57,12 +57,13 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual uint8_t dack_r(int line) override;
-	virtual void dack_w(int line, uint8_t data) override;
+	virtual u8 dack_r(int line) override;
+	virtual void dack_w(int line, u8 data) override;
 	virtual void eop_w(int state) override;
 	void update_dreq_mapping(int dreq, int logical);
 
 	bool m_activate[8]{};
+	u8 m_iorange[8]{};
 	memory_view m_logical_view;
 
 	// configuration options
@@ -74,6 +75,8 @@ protected:
 
 	template <unsigned N> u8 activate_r(offs_t offset);
 	template <unsigned N> void activate_w(offs_t offset, u8 data);
+	template <unsigned N> u8 iorange_check_r(offs_t offset);
+	template <unsigned N> void iorange_check_w(offs_t offset, u8 data);
 
 	void request_irq(int irq, int state);
 	void request_dma(int dreq, int state);
@@ -113,9 +116,14 @@ private:
 	u8 m_port_config[4];
 	u8 m_unlock_sequence[32];
 
-	uint8_t read(offs_t offset);
+	u8 m_mc;
+	u8 m_pnp_ldn;
+	bool m_input_clock_select;
+
+	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
-	void port_select_w(offs_t offset, u8 data);
+	void pnp_address_w(offs_t offset, u8 data);
+	void pnp_write_data_w(offs_t offset, u8 data);
 	void port_map(address_map &map);
 
 	void logical_device_select_w(offs_t offset, u8 data);
@@ -155,12 +163,18 @@ private:
 	template <unsigned N> void uart_irq_w(offs_t offset, u8 data);
 	template <unsigned N> u8 uart_config_r(offs_t offset);
 	template <unsigned N> void uart_config_w(offs_t offset, u8 data);
+
+protected:
+	u8 gpio_address_r(offs_t offset);
+	template <unsigned N> void gpio_address_w(offs_t offset, u8 data);
+private:
+	u16 m_gpio_address[4];
 };
 
 class it8671f_device : public it8661f_device
 {
 public:
-	it8671f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	it8671f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
