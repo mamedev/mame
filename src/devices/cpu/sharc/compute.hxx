@@ -3,6 +3,7 @@
 /* compute operations */
 
 #include <cmath>
+#include <limits>
 
 #define CLEAR_ALU_FLAGS()           do { m_core->astat &= ~(AZ|AN|AV|AC|AS|AI); } while (false)
 
@@ -118,7 +119,7 @@ void adsp21062_device::compute_add(int rn, int rx, int ry)
 	SET_FLAG_AC_ADD(r, REG(rx), REG(ry));
 
 	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
-		r = (int32_t)r < 0 ? INT_MAX : INT_MIN;
+		r = (int32_t)r < 0 ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min();
 
 	REG(rn) = r;
 
@@ -137,7 +138,7 @@ void adsp21062_device::compute_sub(int rn, int rx, int ry)
 	SET_FLAG_AC_SUB(r, REG(rx), REG(ry));
 
 	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
-		r = (int32_t)r < 0 ? INT_MAX : INT_MIN;
+		r = (int32_t)r < 0 ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min();
 
 	REG(rn) = r;
 
@@ -159,7 +160,7 @@ void adsp21062_device::compute_add_ci(int rn, int rx, int ry)
 		m_core->astat |= AC;
 
 	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
-		r = (int32_t)r < 0 ? INT_MAX : INT_MIN;
+		r = (int32_t)r < 0 ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min();
 
 	REG(rn) = r;
 
@@ -181,7 +182,7 @@ void adsp21062_device::compute_sub_ci(int rn, int rx, int ry)
 		m_core->astat |= AC;
 
 	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
-		r = (int32_t)r < 0 ? INT_MAX : INT_MIN;
+		r = (int32_t)r < 0 ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min();
 
 	REG(rn) = r;
 
