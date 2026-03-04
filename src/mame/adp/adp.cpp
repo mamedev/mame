@@ -639,6 +639,16 @@ ROM_START( quickjac )
 	ROM_LOAD16_BYTE( "quick_jack_video_inde_a.2.u6.bin", 0x00001, 0x20000, CRC(61d55be2) SHA1(bc17dc91fd1ef0f862eb0d7dbbbfa354a8403eb8) )
 ROM_END
 
+ROM_START(sbsoli)
+    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+    ROM_LOAD16_BYTE( "skat_bierskat_solitaire_f2_i.u2", 0x00000, 0x20000, CRC(314390cf) SHA1(86c2f4e120235eba379ec54f2afea59e68c94e7e))
+    ROM_LOAD16_BYTE( "skat_bierskat_solitaire_f2_ii.u6", 0x00001, 0x20000, CRC(6e7f88cc) SHA1(07e306222cbd94ab7a39be2685941d12c82645fb))
+
+	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "skat_bier_solitaire_video_f1_i.u2", 0x00000, 0x80000, CRC(3726a21e) SHA1(63fd2f01ce6103ef9a2c585f1045091dfc4b3408))
+	ROM_LOAD16_BYTE( "skat_bier_solitaire_video_f1_ii.u5", 0x00001, 0x80000, CRC(9109774f) SHA1(480a7cd4260dc3481049b108eba749de7eeedfa3))
+ROM_END
+
 ROM_START( skattv )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "f2_i.bin", 0x00000, 0x20000, CRC(3cb8b431) SHA1(e7930876b6cd4cba837c3da05d6948ef9167daea) )
@@ -783,6 +793,7 @@ GAME( 1994, trumpfas,  skattv,   skattv,   skattv,   adp_state, empty_init, ROT0
 GAME( 1995, skattva,   skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (version TS3)",             0 )
 GAME( 1997, fashiong,  0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 1)",           0 )
 GAME( 1997, fashiong2, fashiong, fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 2)",           0 )
+GAME( 1998, sbsoli,    0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat Bierskat Solitaire (F2)",      0 )
 GAME( 1999, funlddlx,  funlddlx4,funland,  skattv,   adp_state, empty_init, ROT0, "Stella",  "Funny Land de Luxe",                MACHINE_NOT_WORKING )
 GAME( 2000, fstation7, fstation, fstation, fstation, adp_state, empty_init, ROT0, "ADP",     "Fun Station Spielekoffer 7 Spiele", MACHINE_NOT_WORKING ) // suntris crashes when executing HD63484 paint commands
 GAME( 2000, fstation8, fstation, fstation, fstation, adp_state, empty_init, ROT0, "ADP",     "Fun Station Spielekoffer 8 Spiele", MACHINE_NOT_WORKING ) // suntris crashes when executing HD63484 paint commands
