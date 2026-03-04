@@ -138,12 +138,12 @@ private:
 		u8 es4_read(u16 adr);
 		void es4_write(u16 adr, u8 val);
 
-		memory_access<21, 0, 0, ENDIANNESS_LITTLE>::cache escache;
-		memory_access<21, 0, 0, ENDIANNESS_LITTLE>::specific exp;
-		memory_access< 9, 0, 0, ENDIANNESS_LITTLE>::specific es4;
+		memory_access<21, 0, 0, ENDIANNESS_LITTLE>::cache m_escache;
+		memory_access<21, 0, 0, ENDIANNESS_LITTLE>::specific m_exp;
+		memory_access< 9, 0, 0, ENDIANNESS_LITTLE>::specific m_es4;
 
-		u8 bsr[8];
-		u8 pbs;
+		u8 m_bsr[8];
+		u8 m_pbs;
 	};
 
 	address_space_config m_exp_config;

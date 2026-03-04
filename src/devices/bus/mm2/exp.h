@@ -47,37 +47,19 @@
 
 #pragma once
 
-class mikromikko2_expansion_bus_device;
+#include <forward_list>
 
-class mikromikko2_expansion_bus_slot_device : public device_t, public device_slot_interface
-{
-public:
-	template <typename T, typename U>
-	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&bus_tag, U &&opts, const char *dflt, bool fixed)
-		: mikromikko2_expansion_bus_slot_device(mconfig, tag, owner, clock)
-	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
-		m_bus.set_tag(std::forward<T>(bus_tag));
-	}
-	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-protected:
-	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
-
-	virtual void device_start() override ATTR_COLD;
-
-	required_device<mikromikko2_expansion_bus_device> m_bus;
-};
-
+DECLARE_DEVICE_TYPE(MIKROMIKKO2_EXPANSION_BUS, mikromikko2_expansion_bus_device)
 DECLARE_DEVICE_TYPE(MIKROMIKKO2_EXPANSION_BUS_SLOT, mikromikko2_expansion_bus_slot_device)
 
-class device_mikromikko2_expansion_bus_card_interface;
+
+// ======================> mikromikko2_expansion_bus_device
 
 class mikromikko2_expansion_bus_device : public device_t
 {
+	friend class mikromikko2_expansion_bus_slot_device;
+
 public:
 	mikromikko2_expansion_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -112,6 +94,9 @@ public:
 	address_space &memspace() const { return *m_memspace; }
 	address_space &iospace() const { return *m_iospace; }
 
+	void inta_w(int state);
+	void bhlda_w(int state, int bcas);
+
 protected:
 	mikromikko2_expansion_bus_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
@@ -131,24 +116,61 @@ protected:
 	devcb_write_line    m_out_hold3_cb;
 	devcb_write_line    m_out_hold4_cb;
 	devcb_write_line    m_out_hold5_cb;
+
+	void add_slot(const char *tag);
+
+	std::forward_list<device_slot_interface *> m_slot_list;
 };
 
-DECLARE_DEVICE_TYPE(MIKROMIKKO2_EXPANSION_BUS, mikromikko2_expansion_bus_device)
+
+// ======================> mikromikko2_expansion_bus_slot_device
+
+class mikromikko2_expansion_bus_slot_device : public device_t, public device_slot_interface
+{
+public:
+	template <typename T, typename U>
+	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, T &&bus_tag, U &&opts, const char *dflt, bool fixed)
+		: mikromikko2_expansion_bus_slot_device(mconfig, tag, owner, clock)
+	{
+		option_reset();
+		opts(*this);
+		set_default_option(dflt);
+		set_fixed(fixed);
+		m_bus.set_tag(std::forward<T>(bus_tag));
+	}
+	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	mikromikko2_expansion_bus_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+
+	required_device<mikromikko2_expansion_bus_device> m_bus;
+};
+
+
+// ======================> device_mikromikko2_expansion_bus_card_interface
 
 class device_mikromikko2_expansion_bus_card_interface : public device_interface
 {
-	friend class mikromikko2_expansion_bus_device;
-
 public:
 	device_mikromikko2_expansion_bus_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_mikromikko2_expansion_bus_card_interface() {}
 
 	void set_bus(mikromikko2_expansion_bus_device *bus) { m_bus = bus; }
 
+	virtual void inta_w(int state) {}
+	virtual void bhlda_w(int state, int bcas) {}
+
+protected:
 	mikromikko2_expansion_bus_device *m_bus;
 	device_t *m_card;
 };
 
+
+// ======================> mikromikko2_expansion_bus_cards
+
 void mikromikko2_expansion_bus_cards(device_slot_interface &device);
+
 
 #endif // MAME_BUS_MM2_EXP_H

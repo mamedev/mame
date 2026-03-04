@@ -457,12 +457,15 @@ vp60
 fashiong
 fashiong2
 fstation
+fstation7
+fstation8
 funlddlx
 funlddlx2
 funlddlx4
 quickjac
 skattv
 skattva
+trumpfas
 
 @source:adp/manohman.cpp
 backgamn
@@ -479,18 +482,41 @@ disc
 disc2000
 disc2001
 disc3000
+disciip
+discoly
+discryl
+discrylb
 dpplpot
 dpplstrt
 elitdisc
 excellnt
 extrbltt
+fullhous
 glksstrn
+herzas
+herzasf1
+herzasf8
 juwel
 karoas
 kniffi
+m21point
 macao
+mas
+mastro
+mbistro
+mclub
+mmax
+mtrio
 rasant
+sesam
+sherzas
+sjackpot
+sprmlti
 sprmltib
+superpro
+v4assef1
+v4assef2
+vmulti
 
 @source:adp/stellafr.cpp
 action
@@ -15786,6 +15812,7 @@ dimahoou
 dimahoud
 dstlk
 dstlka
+dstlkb
 dstlkh
 dstlku
 dstlku1d
@@ -46615,6 +46642,7 @@ pbaction2
 pbaction3
 pbaction4
 pbactiont
+pbactiont2
 
 @source:tecmo/senjyo.cpp
 baluba

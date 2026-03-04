@@ -7,7 +7,7 @@
 
 #include "machine/nscsi_bus.h"
 
-class ncr53c90_device : public nscsi_device, public nscsi_slot_card_interface
+class ncr53c90_device : public device_t, public nscsi_device_interface
 {
 public:
 	ncr53c90_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

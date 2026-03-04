@@ -235,7 +235,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_scc1(*this, SCC1_TAG),
 		m_scc2(*this, SCC2_TAG),
-		m_sbc(*this, "scsibus:7:sbc"),
+		m_sbc(*this, "sbc"),
 		m_udc(*this, "udc"),
 		m_p_ram(*this, "p_ram"),
 		m_bw2_vram(*this, "bw2_vram"),
@@ -255,8 +255,6 @@ public:
 	void sun3_60(machine_config &config);
 	void sun3200(machine_config &config);
 	void sun3_50(machine_config &config);
-
-	void ncr5380(device_t *device);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -325,13 +323,6 @@ private:
 static void sun_cdrom(device_t *device)
 {
 	downcast<nscsi_cdrom_device &>(*device).set_block_size(512);
-}
-
-void sun3_state::ncr5380(device_t *device)
-{
-	devcb_base *devcb;
-	(void)devcb;
-//  downcast<ncr5380_device &>(*device).drq_handler().set(FUNC(sun3_state::drq_w));
 }
 
 static void scsi_devices(device_slot_interface &device)
@@ -1073,7 +1064,7 @@ void sun3_state::sun3(machine_config &config)
 
 	AM79C90(config, m_lance, 10'000'000); // clock is a guess
 
-	NSCSI_BUS(config, "scsibus");
+	auto &scsi(NSCSI_BUS(config, "scsibus"));
 	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
@@ -1081,7 +1072,9 @@ void sun3_state::sun3(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, "tape");
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("sbc", NCR5380).machine_config([this] (device_t *device) { ncr5380(device); });
+
+	NCR5380(config, m_sbc);
+	scsi.set_external_device(7, m_sbc);
 
 	AM9516(config, m_udc, 16_MHz_XTAL / 2);
 }
@@ -1179,7 +1172,7 @@ void sun3_state::sun3_50(machine_config &config)
 	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
-	NSCSI_BUS(config, "scsibus");
+	auto &scsi(NSCSI_BUS(config, "scsibus"));
 	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
@@ -1187,7 +1180,9 @@ void sun3_state::sun3_50(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, "tape");
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("sbc", NCR5380).machine_config([this] (device_t *device) { ncr5380(device); });
+
+	NCR5380(config, m_sbc);
+	scsi.set_external_device(7, m_sbc);
 
 	AM9516(config, m_udc, 16_MHz_XTAL / 2);
 }

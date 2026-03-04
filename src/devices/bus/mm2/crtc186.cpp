@@ -8,23 +8,22 @@
 
 #include "emu.h"
 #include "crtc186.h"
-#include "machine/input_merger.h"
 
 DEFINE_DEVICE_TYPE(NOKIA_CRTC186, crtc186_device, "nokia_crtc186", "Nokia MikroMikko 2 CRTC186")
 
 crtc186_device::crtc186_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NOKIA_CRTC186, tag, owner, clock),
 	device_mikromikko2_expansion_bus_card_interface(mconfig, *this),
-	m_video_ram(*this, "ram", 0x2000, ENDIANNESS_LITTLE),
+	m_video_ram(*this, "ram", 0x4000, ENDIANNESS_LITTLE),
 	m_char_rom(*this, "chargen"),
 	m_attr_rom(*this, "attr"),
 	m_vpac(*this, "crt9007"),
 	m_drb0(*this, "crt9212_0"),
 	m_drb1(*this, "crt9212_1"),
-	m_palette(*this, "palette"),
 	m_timer_vidldsh(*this, "vidldsh"),
 	m_sio(*this, "i8251"),
 	m_kb(*this, "kb"),
+	m_ctrl(*this, "control"),
 	m_screen(*this, "screen")
 {
 }
@@ -32,21 +31,15 @@ crtc186_device::crtc186_device(const machine_config &mconfig, const char *tag, d
 void crtc186_device::map(address_map &map)
 {
 	map(0x00, 0x3f).rw(FUNC(crtc186_device::vpac_r), FUNC(crtc186_device::vpac_w));
-	//map(0x00, 0x01).rw(m_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0xff00);
-	//map(0x02, 0x03).rw(m_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0xff00);
+	//map(0x00, 0x01).rw(m_sio, FUNC(i8251_device::data_r), FUNC(i8251_device::data_w)).umask16(0xff00);
+	//map(0x02, 0x03).rw(m_sio, FUNC(i8251_device::status_r), FUNC(i8251_device::control_w)).umask16(0xff00);
 	//map(0x00, 0x3f).rw(m_vpac, FUNC(crt9007_device::read), FUNC(crt9007_device::write)).umask16(0x00ff);
-	map(0x40, 0x41).w(FUNC(crtc186_device::cpl_w)).umask16(0x00ff);
-	map(0x42, 0x43).w(FUNC(crtc186_device::blc_w)).umask16(0x00ff);
-	map(0x44, 0x45).w(FUNC(crtc186_device::mode_w)).umask16(0x00ff);
-	map(0x46, 0x47).w(FUNC(crtc186_device::modeg_w)).umask16(0x00ff);
-	map(0x4a, 0x4b).w(FUNC(crtc186_device::c70_50_w)).umask16(0x00ff);
-	map(0x4c, 0x4d).w(FUNC(crtc186_device::crb_w)).umask16(0x00ff);
-	map(0x4e, 0x4f).w(FUNC(crtc186_device::cru_w)).umask16(0x00ff);
+	map(0x40, 0x4f).w(m_ctrl, FUNC(ls259_device::write_d0)).umask16(0x00ff);
 }
 
 ROM_START( crtc186 )
-	ROM_REGION16_LE( 0x4000, "chargen", 0 )
-	ROMX_LOAD( "9067e.ic40", 0x0000, 0x2000, CRC(fa719d92) SHA1(af6cc03a8171b9c95e8548c5e0268816344d7367), ROM_SKIP(1) )
+	ROM_REGION( 0x4000, "chargen", 0 )
+	ROM_LOAD( "9067e.ic40", 0x0000, 0x2000, CRC(fa719d92) SHA1(af6cc03a8171b9c95e8548c5e0268816344d7367) )
 
 	ROM_REGION( 0x2000, "attr", 0 )
 	ROM_LOAD( "9026a.ic26", 0x0000, 0x2000, CRC(fe1da600) SHA1(3a5512b08d8f7bb5a0ff3f50bcf33de649a0489d) )
@@ -60,44 +53,9 @@ const tiny_rom_entry *crtc186_device::device_rom_region() const
 	return ROM_NAME( crtc186 );
 }
 
-static const gfx_layout charlayout =
-{
-	8, 15,
-	RGN_FRAC(1,1),
-	1,
-	{ RGN_FRAC(0,1) },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{  0*16,  1*16,  2*16,  3*16,  4*16,  5*16,  6*16,  7*16,
-		8*16,  9*16, 10*16, 11*16, 12*16, 13*16, 14*16 },
-	16*16
-};
-
-static const gfx_layout gfxlayout =
-{
-	8, 1,
-	RGN_FRAC(1,1),
-	1,
-	{ RGN_FRAC(0,1) },
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	{ 15*16 },
-	16*16
-};
-
-static GFXDECODE_START( gfx_mm2 )
-	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "chargen", 0, gfxlayout, 0, 1 )
-GFXDECODE_END
-
-void crtc186_device::palette(palette_device &palette) const
-{
-	palette.set_pen_color(0, rgb_t(0xff, 0xff, 0xff)); // white
-	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); // black (normal color)
-	palette.set_pen_color(2, rgb_t(0x7f, 0x7f, 0x7f)); // grey ("highlight" mode color)
-}
-
 void crtc186_device::vpac_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).r(FUNC(crtc186_device::videoram_r));
+	map(0x0000, 0x3fff).r(FUNC(crtc186_device::videoram_r));
 }
 
 void crtc186_device::device_add_mconfig(machine_config &config)
@@ -107,11 +65,8 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_refresh_hz(71.77);
 	m_screen->set_screen_update(FUNC(crtc186_device::screen_update));
-	m_screen->set_size(640, 420);
-	m_screen->set_visarea(0, 640-1, 0, 420-1);
-
-	GFXDECODE(config, "gfxdecode", m_palette, gfx_mm2);
-	PALETTE(config, m_palette, FUNC(crtc186_device::palette), 3);
+	m_screen->set_size(800, 420);
+	m_screen->set_visarea(0, 800-1, 0, 420-1);
 
 	CRT9007(config, m_vpac, XTAL(35'452'500)/8);
 	m_vpac->set_addrmap(0, &crtc186_device::vpac_mem);
@@ -135,6 +90,15 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 
 	TIMER(config, "vidldsh").configure_generic(FUNC(crtc186_device::vidldsh_tick));
 
+	LS259(config, m_ctrl);
+	m_ctrl->q_out_cb<0>().set(FUNC(crtc186_device::cpl_w));
+	m_ctrl->q_out_cb<1>().set(FUNC(crtc186_device::blc_w));
+	m_ctrl->q_out_cb<2>().set(FUNC(crtc186_device::mode_w));
+	m_ctrl->q_out_cb<3>().set(FUNC(crtc186_device::modeg_w));
+	m_ctrl->q_out_cb<5>().set(FUNC(crtc186_device::c70_50_w));
+	m_ctrl->q_out_cb<6>().set(FUNC(crtc186_device::crb_w));
+	m_ctrl->q_out_cb<7>().set(FUNC(crtc186_device::cru_w));
+
 	clock_device &sio_clock(CLOCK(config, "sio_clock", XTAL(16'000'000)/4/26));
 	sio_clock.signal_handler().set(m_sio, FUNC(i8251_device::write_txc));
 	sio_clock.signal_handler().append(m_sio, FUNC(i8251_device::write_rxc));
@@ -150,8 +114,12 @@ void crtc186_device::device_add_mconfig(machine_config &config)
 
 void crtc186_device::device_start()
 {
-	m_bus->memspace().install_ram(0xd0000, 0xd1fff, m_video_ram);
-	m_bus->memspace().install_rom(0xd8000, 0xd9fff, m_char_rom);
+	m_bus->memspace().install_ram(0xd0000, 0xd3fff, m_video_ram);
+	m_bus->memspace().install_read_tap(0xd8000, 0xdbfff, "charrom", [this](offs_t offset, uint16_t &data, uint16_t mem_mask) {
+		if (ACCESSING_BITS_0_7) {
+			data |= m_char_rom->base()[(offset >> 1) & 0x1fff];
+		}
+	});
 	m_bus->iospace().install_device(0xf980, 0xf9ff, *this, &crtc186_device::map);
 
 	// state saving
@@ -163,24 +131,54 @@ void crtc186_device::device_start()
 	save_item(NAME(m_c70_50));
 	save_item(NAME(m_cru));
 	save_item(NAME(m_crb));
-}
-
-void crtc186_device::device_reset()
-{
-	m_cpl = 0;
-	m_blc = 0;
-	m_mode = 0;
-	m_modeg = 0;
-	m_c70_50 = 0;
-	m_cru = 0;
-	m_crb = 0;
-
-	set_vidldsh_timer();
+	save_item(NAME(m_cursor_x));
+	save_item(NAME(m_cursor_y));
 }
 
 uint32_t crtc186_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_bitmap.fill(rgb_t::white(), cliprect);
+	if (!m_blc) {
+		bitmap.fill(rgb_t::black(), cliprect);
+		return 0;
+	}
+
+	bitmap.fill(m_cpl ? rgb_t::black() : rgb_t::white(), cliprect);
+
+	for (int sy = 0; sy < 28; sy++)
+	{
+		for (int y = 0; y < 15; y++)
+		{
+			for (int sx = 0; sx < 80; sx++)
+			{
+				bool const cursor = (sx == m_cursor_x) && (sy == m_cursor_y);
+				offs_t const vram_addr = (sy * 80) + sx;
+				u16 const data = m_video_ram[vram_addr & 0x1fff];
+
+				offs_t const char_addr = ((data & 0x1ff) << 4) + y;
+				u8 char_data = m_char_rom->base()[char_addr & 0x1fff];
+
+				rgb_t const bgcolor = BIT(data, 11) ? halflit() : rgb_t::white();
+
+				for (int bit = 0; bit < 10; bit++)
+				{
+					bool pixel = m_cpl;
+					if (bit > 0 && bit < 9) {
+						pixel = BIT(char_data, 0) ^ m_cpl;
+						char_data >>= 1;
+					}
+
+					if (cursor) {
+						if (!m_cru)
+							pixel ^= 1;
+						else if (m_cru && y == 14)
+							pixel = 1;
+					}
+
+					bitmap.pix((sy * 15) + y, (sx * 10) + bit) = pixel ? rgb_t::black() : bgcolor;
+				}
+			}
+		}
+	}
 
 	return 0;
 }
@@ -194,9 +192,9 @@ uint16_t crtc186_device::vpac_r(offs_t offset, uint16_t mem_mask)
 	}
 
 	if (ACCESSING_BITS_8_15) {
-		if (BIT(offset, 1))
+		if (offset == 0)
 			data |= m_sio->data_r() << 8;
-		else
+		else if (offset == 1)
 			data |= m_sio->status_r() << 8;
 	}
 
@@ -207,12 +205,17 @@ void crtc186_device::vpac_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7) {
 		m_vpac->write(offset, data & 0xff);
+
+		if (offset == 0x18)
+			m_cursor_y = data & 0xff;
+		else if (offset == 0x19)
+			m_cursor_x = data & 0xff;
 	}
 
 	if (ACCESSING_BITS_8_15) {
-		if (BIT(offset, 1))
+		if (offset == 0)
 			m_sio->data_w(data >> 8);
-		else
+		else if (offset == 1)
 			m_sio->control_w(data >> 8);
 	}
 }
@@ -277,7 +280,7 @@ void crtc186_device::set_vidldsh_timer()
 	const XTAL busdotclk = XTAL(35'452'500) / (m_mode ? 2 : 1);
 	const XTAL vidcclk = busdotclk / (m_modeg ? 16 : 10);
 
-	m_vpac->set_character_width(m_modeg ? 8 : 10);
+	m_vpac->set_character_width(m_modeg ? 16 : 10);
 	m_vpac->set_unscaled_clock(vidcclk);
 
 	m_timer_vidldsh->adjust(attotime::from_hz(vidcclk), 0, attotime::from_hz(vidcclk));

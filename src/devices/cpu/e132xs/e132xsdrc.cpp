@@ -3,25 +3,17 @@
 
 #include "emu.h"
 #include "e132xs.h"
-#include "e132xsfe.h"
+
 #include "32xsdefs.h"
+#include "e132xsfe.h"
+
+#include "cpu/drcumlsh.h"
 
 
 /* map variables */
 #define MAPVAR_PC       M0
 #define MAPVAR_CYCLES   M1
 
-
-
-/*-------------------------------------------------
-    epc - compute the exception PC from a
-    descriptor
--------------------------------------------------*/
-
-static inline uint32_t epc(const opcode_desc *desc)
-{
-	return (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->branch->pc : desc->pc;
-}
 
 
 /*-------------------------------------------------
@@ -294,7 +286,7 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 
 				/* determine the last instruction in this sequence */
 				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
-					if (seqlast->flags & OPFLAG_END_SEQUENCE)
+					if (seqlast->end_sequence())
 						break;
 				assert(seqlast != nullptr);
 
@@ -319,11 +311,11 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 				}
 
 				// validate this code block if we're not pointing into ROM
-				if (m_program->get_write_ptr(seqhead->physpc) != nullptr)
+				if (m_program->get_write_ptr(seqhead->pc) != nullptr)
 					generate_checksum_block(block, compiler, seqhead, seqlast);
 
 				// label this instruction, if it may be jumped to locally
-				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
+				if (seqhead->is_branch_target())
 					UML_LABEL(block, seqhead->pc | 0x80000000);
 
 				UML_MOV(block, I7, 0);
@@ -337,7 +329,7 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 				}
 
 				uint32_t nextpc;
-				if (seqlast->flags & OPFLAG_RETURN_TO_START) /* if we need to return to the start, do it */
+				if (seqlast->return_to_start()) /* if we need to return to the start, do it */
 					nextpc = pc;
 				else /* otherwise we just go to the next instruction */
 					nextpc = seqlast->pc + seqlast->length;
@@ -695,10 +687,10 @@ void hyperstone_device::generate_checksum_block(drcuml_block &block, compiler_st
 	/* loose verify or single instruction: just compare and fail */
 	if (!(m_drcoptions & E132XS_STRICT_VERIFY) || !seqhead->next())
 	{
-		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
+		if (!seqhead->virtual_noop())
 		{
-			uint32_t sum = seqhead->opptr.w[0];
-			uint32_t addr = seqhead->physpc;
+			uint32_t sum = seqhead->opptr[0];
+			uint32_t addr = seqhead->pc;
 			const void *base = m_prptr(addr);
 			if (!base)
 			{
@@ -708,32 +700,32 @@ void hyperstone_device::generate_checksum_block(drcuml_block &block, compiler_st
 
 			auto const *delayslot = seqhead->delay.first();
 			const void *delaybase = nullptr;
-			if (delayslot && (seqhead->physpc != delayslot->physpc))
+			if (delayslot && (seqhead->pc != delayslot->pc))
 			{
-				delaybase = m_prptr(delayslot->physpc);
+				delaybase = m_prptr(delayslot->pc);
 				if (!delaybase)
 				{
-					osd_printf_info("%s: cache read_ptr returned nullptr for address %08x\n", tag(), delayslot->physpc);
+					osd_printf_info("%s: cache read_ptr returned nullptr for address %08x\n", tag(), delayslot->pc);
 				}
 			}
 
 			UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x1);
 
-			if (delayslot && (seqhead->physpc != delayslot->physpc))
+			if (delayslot && (seqhead->pc != delayslot->pc))
 			{
 				UML_LOAD(block, I1, delaybase, 0, SIZE_WORD, SCALE_x1);
 				UML_ADD(block, I0, I0, I1);
 
-				sum += delayslot->opptr.w[0];
+				sum += delayslot->opptr[0];
 			}
 
 			UML_CMP(block, I0, sum);
-			UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));
+			UML_EXHc(block, COND_NE, *m_nocode, seqhead->epc());
 		}
 	}
 	else /* full verification; sum up everything */
 	{
-		uint32_t addr = seqhead->physpc;
+		uint32_t addr = seqhead->pc;
 		const void *base = m_prptr(addr);
 		if (!base)
 		{
@@ -743,32 +735,32 @@ void hyperstone_device::generate_checksum_block(drcuml_block &block, compiler_st
 
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x1);
 
-		uint32_t sum = seqhead->opptr.w[0];
+		uint32_t sum = seqhead->opptr[0];
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
 		{
-			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
+			if (!curdesc->virtual_noop())
 			{
-				addr = curdesc->physpc;
+				addr = curdesc->pc;
 				base = m_prptr(addr);
 				assert(base != nullptr);
 				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x1);
 				UML_ADD(block, I0, I0, I1);
-				sum += curdesc->opptr.w[0];
+				sum += curdesc->opptr[0];
 
-				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->physpc != curdesc->delay.first()->physpc)))
+				if (curdesc->delay.first() != nullptr && (curdesc == seqlast || (curdesc->next() != nullptr && curdesc->next()->pc != curdesc->delay.first()->pc)))
 				{
-					addr = curdesc->delay.first()->physpc;
+					addr = curdesc->delay.first()->pc;
 					base = m_prptr(addr);
 					assert(base != nullptr);
 					UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x1);
 					UML_ADD(block, I0, I0, I1);
 
-					sum += curdesc->delay.first()->opptr.w[0];
+					sum += curdesc->delay.first()->opptr[0];
 				}
 			}
 		}
 		UML_CMP(block, I0, sum);
-		UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));
+		UML_EXHc(block, COND_NE, *m_nocode, seqhead->epc());
 	}
 }
 
@@ -800,7 +792,7 @@ void hyperstone_device::generate_branch(drcuml_block &block, compiler_state &com
 
 	generate_update_cycles(block);
 
-	if (desc && (mode == compiler.mode()) && (desc->flags & OPFLAG_INTRABLOCK_BRANCH))
+	if (desc && (mode == compiler.mode()) && desc->intrablock_branch())
 	{
 		assert(desc->targetpc != BRANCH_TARGET_DYNAMIC);
 
@@ -831,8 +823,8 @@ void hyperstone_device::generate_branch(drcuml_block &block, compiler_state &com
 void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
 	// add an entry for the log
-	if (m_drcuml->logging() && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
-		log_add_disasm_comment(block, desc->pc, desc->opptr.w[0]);
+	if (m_drcuml->logging() && !desc->virtual_noop())
+		log_add_disasm_comment(block, desc->pc, desc->opptr[0]);
 
 	// check for pending interrupts
 	UML_SUB(block, I0, mem(&m_core->intblock), 1);
@@ -851,7 +843,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 		UML_DEBUG(block, desc->pc);
 	}
 
-	if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
+	if (!desc->virtual_noop())
 	{
 		// set the PC map variable
 		UML_MAPVAR(block, MAPVAR_PC, compiler.set_pc(desc->pc + desc->length));
@@ -898,7 +890,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 		}
 		else
 		{
-			UML_MOV(block, mem(&m_core->arg0), desc->opptr.w[0]);
+			UML_MOV(block, mem(&m_core->arg0), desc->opptr[0]);
 			UML_CALLC(block, &c_funcs::unimplemented, this);
 		}
 	}
@@ -908,7 +900,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 
 bool hyperstone_device::generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	uint32_t op = (uint32_t)desc->opptr.w[0];
+	uint32_t op = (uint32_t)desc->opptr[0];
 
 	switch (op >> 8)
 	{

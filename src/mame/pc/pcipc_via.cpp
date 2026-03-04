@@ -14,7 +14,8 @@
  * TODO:
  * - win98se/win98me: resource conflict between ACPI BIOS and AGP card(s), PCI cards works fine.
  *   Bridge memory/io bases not passed properly?
- * - win98se: PS/2 keyboard becomes unresponsive after a while;
+ * - win98se: PS/2 keyboard becomes unresponsive after a while, caused by keyboard irq stuck
+ *   (workaround: open debugger window at I/O $60);
  * - win98se: ACPI has issues on power off and reboot (workaround: use restart in MSDOS mode);
  * - freedos13: APMDOS hangs system with JEMMEX preloaded, works when issued standalone;
  *
@@ -143,10 +144,11 @@ void mvp3_state::mvp3(machine_config &config)
 
 	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, nullptr);
 
-	PCI_SLOT(config, "pci:1", pci_cards, 13, 0, 1, 2, 3, "sis6326_pci");
-	PCI_SLOT(config, "pci:2", pci_cards, 14, 1, 2, 3, 0, nullptr);
-	PCI_SLOT(config, "pci:3", pci_cards, 15, 2, 3, 0, 1, nullptr);
-	PCI_SLOT(config, "pci:4", pci_cards, 16, 3, 0, 1, 2, nullptr);
+	// 8~11 is trusted, otherwise BIOS won't map intr_line(s) properly
+	PCI_SLOT(config, "pci:1", pci_cards, 8,  0, 1, 2, 3, "sis6326_pci");
+	PCI_SLOT(config, "pci:2", pci_cards, 9,  1, 2, 3, 0, "4dwavedx");
+	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:4", pci_cards, 11, 3, 0, 1, 2, nullptr);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "it8661f", true).set_option_machine_config("it8661f", ite_superio_config);
 	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);

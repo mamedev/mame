@@ -5,6 +5,7 @@
 #include "sh.h"
 
 #include "sh_dasm.h"
+#include "sh_fe.h"
 
 #include "cpu/drcumlsh.h"
 
@@ -1983,16 +1984,6 @@ void sh_common_execution::sh2drc_add_fastram(offs_t start, offs_t end, uint8_t r
 ***************************************************************************/
 
 /*-------------------------------------------------
-    epc - compute the exception PC from a
-    descriptor
--------------------------------------------------*/
-
-uint32_t sh_common_execution::epc(const opcode_desc *desc)
-{
-	return (desc->flags & OPFLAG_IN_DELAY_SLOT) ? (desc->pc - 1) : desc->pc;
-}
-
-/*-------------------------------------------------
     alloc_handle - allocate a handle if not
     already allocated
 -------------------------------------------------*/
@@ -2043,52 +2034,49 @@ void sh_common_execution::save_fast_iregs(drcuml_block &block)
     flags
 -------------------------------------------------*/
 
-const char *sh_common_execution::log_desc_flags_to_string(uint32_t flags)
+const char *sh_common_execution::log_desc_flags_to_string(const opcode_desc &desc)
 {
 	static char tempbuf[30];
 	char *dest = tempbuf;
 
 	/* branches */
-	if (flags & OPFLAG_IS_UNCONDITIONAL_BRANCH)
+	if (desc.is_unconditional_branch())
 		*dest++ = 'U';
-	else if (flags & OPFLAG_IS_CONDITIONAL_BRANCH)
+	else if (desc.is_conditional_branch())
 		*dest++ = 'C';
 	else
 		*dest++ = '.';
 
 	/* intrablock branches */
-	*dest++ = (flags & OPFLAG_INTRABLOCK_BRANCH) ? 'i' : '.';
+	*dest++ = desc.intrablock_branch() ? 'i' : '.';
 
 	/* branch targets */
-	*dest++ = (flags & OPFLAG_IS_BRANCH_TARGET) ? 'B' : '.';
+	*dest++ = desc.is_branch_target() ? 'B' : '.';
 
 	/* delay slots */
-	*dest++ = (flags & OPFLAG_IN_DELAY_SLOT) ? 'D' : '.';
+	*dest++ = desc.in_delay_slot() ? 'D' : '.';
 
 	/* exceptions */
-	if (flags & OPFLAG_WILL_CAUSE_EXCEPTION)
+	if (desc.will_cause_exception())
 		*dest++ = 'E';
-	else if (flags & OPFLAG_CAN_CAUSE_EXCEPTION)
+	else if (desc.can_cause_exception())
 		*dest++ = 'e';
 	else
 		*dest++ = '.';
 
 	/* read/write */
-	if (flags & OPFLAG_READS_MEMORY)
+	if (desc.reads_memory())
 		*dest++ = 'R';
-	else if (flags & OPFLAG_WRITES_MEMORY)
+	else if (desc.writes_memory())
 		*dest++ = 'W';
 	else
 		*dest++ = '.';
 
 	/* TLB validation */
-	*dest++ = (flags & OPFLAG_VALIDATE_TLB) ? 'V' : '.';
-
-	/* TLB modification */
-	*dest++ = (flags & OPFLAG_MODIFIES_TRANSLATION) ? 'T' : '.';
+	*dest++ = desc.validate_tlb() ? 'V' : '.';
 
 	/* redispatch */
-	*dest++ = (flags & OPFLAG_REDISPATCH) ? 'R' : '.';
+	*dest++ = desc.redispatch() ? 'R' : '.';
 	return tempbuf;
 }
 
@@ -2097,66 +2085,65 @@ const char *sh_common_execution::log_desc_flags_to_string(uint32_t flags)
     log_register_list - log a list of GPR registers
 -------------------------------------------------*/
 
-void sh_common_execution::log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist)
+void sh_common_execution::log_register_list(const char *string, const std::bitset<32> &reglist, const std::bitset<32> *regnostarlist)
 {
 	int count = 0;
-	int regnum;
 
 	/* skip if nothing */
-	if (reglist[0] == 0 && reglist[1] == 0 && reglist[2] == 0)
+	if (reglist.none())
 		return;
 
 	m_drcuml->log_printf("[%s:", string);
 
-	for (regnum = 0; regnum < 16; regnum++)
+	for (int regnum = 0; regnum < 16; regnum++)
 	{
-		if (reglist[0] & REGFLAG_R(regnum))
+		if (reglist[opcode_desc::REG_R0 + regnum])
 		{
 			m_drcuml->log_printf("%sr%d", (count++ == 0) ? "" : ",", regnum);
-			if (regnostarlist != nullptr && !(regnostarlist[0] & REGFLAG_R(regnum)))
+			if (regnostarlist && !(*regnostarlist)[opcode_desc::REG_R0 + regnum])
 				m_drcuml->log_printf("*");
 		}
 	}
 
-	if (reglist[1] & REGFLAG_PR)
+	if (reglist[opcode_desc::REG_PR])
 	{
 		m_drcuml->log_printf("%spr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_PR))
+		if (regnostarlist && !(*regnostarlist)[opcode_desc::REG_PR])
 			m_drcuml->log_printf("*");
 	}
 
-	if (reglist[1] & REGFLAG_SR)
+	if (reglist[opcode_desc::REG_SR])
 	{
 		m_drcuml->log_printf("%ssr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_SR))
+		if (regnostarlist && !(*regnostarlist)[opcode_desc::REG_SR])
 			m_drcuml->log_printf("*");
 	}
 
-	if (reglist[1] & REGFLAG_MACL)
+	if (reglist[opcode_desc::REG_MACL])
 	{
 		m_drcuml->log_printf("%smacl", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_MACL))
+		if (regnostarlist && !(*regnostarlist)[opcode_desc::REG_MACL])
 			m_drcuml->log_printf("*");
 	}
 
-	if (reglist[1] & REGFLAG_MACH)
+	if (reglist[opcode_desc::REG_MACH])
 	{
 		m_drcuml->log_printf("%smach", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_MACH))
+		if (regnostarlist && !(*regnostarlist)[opcode_desc::REG_MACH])
 			m_drcuml->log_printf("*");
 	}
 
-	if (reglist[1] & REGFLAG_GBR)
+	if (reglist[opcode_desc::REG_GBR])
 	{
 		m_drcuml->log_printf("%sgbr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_GBR))
+		if (regnostarlist && !(*regnostarlist)[opcode_desc::REG_GBR])
 			m_drcuml->log_printf("*");
 	}
 
-	if (reglist[1] & REGFLAG_VBR)
+	if (reglist[opcode_desc::REG_VBR])
 	{
 		m_drcuml->log_printf("%svbr", (count++ == 0) ? "" : ",");
-		if (regnostarlist != nullptr && !(regnostarlist[1] & REGFLAG_VBR))
+		if (regnostarlist && !(*regnostarlist)[opcode_desc::REG_VBR])
 			m_drcuml->log_printf("*");
 	}
 
@@ -2181,21 +2168,21 @@ void sh_common_execution::log_opcode_desc(const opcode_desc *desclist, int inden
 		/* disassemle the current instruction and output it to the log */
 		if (m_drcuml->logging() || m_drcuml->logging_native())
 		{
-			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
+			if (desclist->virtual_noop())
 				stream << "<virtual nop>";
 			else
 			{
 				sh_disassembler sh2d(false);
-				sh2d.dasm_one(stream, desclist->pc, desclist->opptr.w[0]);
+				sh2d.dasm_one(stream, desclist->pc, desclist->opptr);
 			}
 		}
 		else
 			stream << "???";
-		m_drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), stream.str().c_str());
+		m_drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(*desclist), stream.str());
 
 		/* output register states */
 		log_register_list("use", desclist->regin, nullptr);
-		log_register_list("mod", desclist->regout, desclist->regreq);
+		log_register_list("mod", desclist->regout, &desclist->regreq);
 		m_drcuml->log_printf("\n");
 
 		/* if we have a delay slot, output it recursively */
@@ -2203,7 +2190,7 @@ void sh_common_execution::log_opcode_desc(const opcode_desc *desclist, int inden
 			log_opcode_desc(desclist->delay.first(), indent + 1);
 
 		/* at the end of a sequence add a dividing line */
-		if (desclist->flags & OPFLAG_END_SEQUENCE)
+		if (desclist->end_sequence())
 			m_drcuml->log_printf("-----\n");
 	}
 }
@@ -2330,7 +2317,7 @@ void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 
 				/* determine the last instruction in this sequence */
 				for (seqlast = seqhead; seqlast != nullptr; seqlast = seqlast->next())
-					if (seqlast->flags & OPFLAG_END_SEQUENCE)
+					if (seqlast->end_sequence())
 						break;
 				assert(seqlast != nullptr);
 
@@ -2360,7 +2347,7 @@ void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 					generate_checksum_block(block, compiler, seqhead, seqlast);
 
 				/* label this instruction, if it may be jumped to locally */
-				if (seqhead->flags & OPFLAG_IS_BRANCH_TARGET)
+				if (seqhead->is_branch_target())
 				{
 					UML_LABEL(block, seqhead->pc | 0x80000000);                             // label   seqhead->pc | 0x80000000
 				}
@@ -2371,14 +2358,14 @@ void sh_common_execution::code_compile_block(uint8_t mode, offs_t pc)
 					generate_sequence_instruction(block, compiler, curdesc, 0xffffffff);
 				}
 
-				/* if we need to return to the start, do it */
-				if (seqlast->flags & OPFLAG_RETURN_TO_START)
+				if (seqlast->return_to_start())
 				{
+					// if we need to return to the start, do it
 					nextpc = pc;
 				}
-				/* otherwise we just go to the next instruction */
 				else
 				{
+					// otherwise we just go to the next instruction
 					nextpc = seqlast->pc + (seqlast->skipslots + 1) * 2;
 				}
 
@@ -2459,38 +2446,39 @@ void sh_common_execution::generate_checksum_block(drcuml_block &block, compiler_
 	if (m_drcuml->logging())
 		block.append_comment("[Validation for %08X]", seqhead->pc);                // comment
 
-	/* loose verify or single instruction: just compare and fail */
 	if (!(m_drcoptions & SH2DRC_STRICT_VERIFY) || seqhead->next() == nullptr)
 	{
-		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
+		// loose verify or single instruction: just compare and fail
+		if (!seqhead->virtual_noop())
 		{
 			const void *base = m_prptr(seqhead->physpc);
 
 			UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x2);                          // load    i0,base,word
-			UML_CMP(block, I0, seqhead->opptr.w[0]);                        // cmp     i0,*opptr
-			UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));       // exne    nocode,seqhead->pc
+			UML_CMP(block, I0, seqhead->opptr);                        // cmp     i0,*opptr
+			UML_EXHc(block, COND_NE, *m_nocode, seqhead->epc());       // exne    nocode,seqhead->pc
 		}
 	}
-
-	/* full verification; sum up everything */
 	else
 	{
+		// full verification; sum up everything
 		uint32_t sum = 0;
 		const void *base = m_prptr(seqhead->physpc);
 
 		UML_LOAD(block, I0, base, 0, SIZE_WORD, SCALE_x4);                              // load    i0,base,word
-		sum += seqhead->opptr.w[0];
+		sum += seqhead->opptr;
 		for (curdesc = seqhead->next(); curdesc != seqlast->next(); curdesc = curdesc->next())
-			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
+		{
+			if (!curdesc->virtual_noop())
 			{
 				base = m_prptr(curdesc->physpc);
 
 				UML_LOAD(block, I1, base, 0, SIZE_WORD, SCALE_x2);                      // load    i1,*opptr,word
 				UML_ADD(block, I0, I0, I1);                         // add     i0,i0,i1
-				sum += curdesc->opptr.w[0];
+				sum += curdesc->opptr;
 			}
+		}
 		UML_CMP(block, I0, sum);                                            // cmp     i0,sum
-		UML_EXHc(block, COND_NE, *m_nocode, epc(seqhead));           // exne    nocode,seqhead->pc
+		UML_EXHc(block, COND_NE, *m_nocode, seqhead->epc());           // exne    nocode,seqhead->pc
 	}
 }
 
@@ -2503,14 +2491,12 @@ void sh_common_execution::generate_checksum_block(drcuml_block &block, compiler_
 
 void sh_common_execution::generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uint32_t ovrpc)
 {
-	offs_t expc;
-
 	/* add an entry for the log */
-	if (m_drcuml->logging() && !(desc->flags & OPFLAG_VIRTUAL_NOOP))
-		log_add_disasm_comment(block, desc->pc, desc->opptr.w[0]);
+	if (m_drcuml->logging() && !desc->virtual_noop())
+		log_add_disasm_comment(block, desc->pc, desc->opptr);
 
 	/* set the PC map variable */
-	expc = (desc->flags & OPFLAG_IN_DELAY_SLOT) ? desc->pc - 1 : desc->pc;
+	const offs_t expc = desc->epc();
 	UML_MAPVAR(block, MAPVAR_PC, expc);                                             // mapvar  PC,expc
 
 	/* accumulate total cycles */
@@ -2554,29 +2540,20 @@ void sh_common_execution::generate_sequence_instruction(drcuml_block &block, com
 	}
 
 
-	/* if we hit an unmapped address, fatal error */
-	if (desc->flags & OPFLAG_COMPILER_UNMAPPED)
+	if (desc->invalid_opcode())
 	{
-		UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                                // mov     [pc],desc->pc
-		save_fast_iregs(block);
-		UML_EXIT(block, EXECUTE_UNMAPPED_CODE);                             // exit    EXECUTE_UNMAPPED_CODE
-	}
-
-	/* if this is an invalid opcode, die */
-	if (desc->flags & OPFLAG_INVALID_OPCODE)
-	{
+		// if this is an invalid opcode, die
 		fatalerror("SH2DRC: invalid opcode!\n");
 	}
-
-	/* otherwise, unless this is a virtual no-op, it's a regular instruction */
-	else if (!(desc->flags & OPFLAG_VIRTUAL_NOOP))
+	else if (!desc->virtual_noop())
 	{
-		/* compile the instruction */
+		// otherwise, unless this is a virtual no-op, it's a regular instruction
+		// compile the instruction
 		if (!generate_opcode(block, compiler, desc, ovrpc))
 		{
 			// handle an illegal op
 			UML_MOV(block, mem(&m_sh2_state->pc), desc->pc);                            // mov     [pc],desc->pc
-			UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);                  // mov     [arg0],opcode
+			UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);                  // mov     [arg0],opcode
 			UML_CALLC(block, cfunc_unimplemented, this);                             // callc   cfunc_unimplemented
 		}
 	}
@@ -2716,9 +2693,9 @@ bool sh_common_execution::generate_opcode(drcuml_block &block, compiler_state &c
 {
 	uint32_t scratch, scratch2;
 	int32_t disp;
-	uint16_t opcode = desc->opptr.w[0];
-	uint8_t opswitch = opcode >> 12;
-	int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
+	const uint16_t opcode = desc->opptr;
+	const uint8_t opswitch = opcode >> 12;
+	const int in_delay_slot = desc->in_delay_slot();
 
 	//printf("generating %04x\n", opcode);
 
@@ -3073,7 +3050,7 @@ bool sh_common_execution::generate_group_3(drcuml_block &block, compiler_state &
 
 	case  4: // DIV1(Rm, Rn);
 		save_fast_iregs(block);
-		UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+		UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
 		UML_CALLC(block, cfunc_DIV1, this);
 		load_fast_iregs(block);
 		return true;
@@ -3111,7 +3088,7 @@ bool sh_common_execution::generate_group_3(drcuml_block &block, compiler_state &
 
 	case 11: // SUBV(Rm, Rn);
 		save_fast_iregs(block);
-		UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+		UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
 		UML_CALLC(block, cfunc_SUBV, this);
 		load_fast_iregs(block);
 		return true;
@@ -3125,7 +3102,7 @@ bool sh_common_execution::generate_group_3(drcuml_block &block, compiler_state &
 
 	case 15: // ADDV(Rm, Rn);
 		save_fast_iregs(block);
-		UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+		UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
 		UML_CALLC(block, cfunc_ADDV, this);
 		load_fast_iregs(block);
 		return true;
@@ -3755,7 +3732,7 @@ bool sh_common_execution::generate_group_0(drcuml_block &block, compiler_state &
 		if (m_cpu_type > CPU_TYPE_SH1)
 		{
 			save_fast_iregs(block);
-			UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+			UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
 			UML_CALLC(block, cfunc_MAC_L, this);
 			load_fast_iregs(block);
 			return true;
@@ -3968,7 +3945,7 @@ bool sh_common_execution::generate_group_4(drcuml_block &block, compiler_state &
 	case 0x2f: // MAC_W(Rm, Rn);
 	case 0x3f: // MAC_W(Rm, Rn);
 		save_fast_iregs(block);
-		UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr.w[0]);
+		UML_MOV(block, mem(&m_sh2_state->arg0), desc->opptr);
 		UML_CALLC(block, cfunc_MAC_W, this);
 		load_fast_iregs(block);
 		return true;

@@ -922,6 +922,70 @@ void bloodbro_state::skysmash(machine_config &config)
 }
 
 
+/*****************************************************************
+Blood Bros, TAD, 1990
+Hardware info by Guru
+---------------------
+
+
+BLOOD BROTHERS-A
+TAD CORPORATION
+|--------------------------------------------------|
+|LA4460 YM3812 M6295 8.U095 7.U1016 Z80A 7.15909MHz|
+|  VOL  YM3014  |---------|  6116   CB007.U1014    |
+|               |SEI0100BU| 82S135.U083            |
+|   HB-41       |---------|    6.U063      |-----| |
+|              |-----| BK.U064             |SEI  | |
+|J  UEC-52     |SEI  |         5.U061      |0160 | |
+|A             |0181 | |-----|             |-----| |
+|M  UEC-02     |-----| |SEI  |          CB008.U0242|
+|M  UEC-01             |0200 |       58257   58257 |
+|A  UEC-01     |-----| |-----|       4.U023 3.U024 |
+|   UEC-01     |SEI  |               2.U021 1.U022 |
+|   UEC-01     |0220 |   CB9.U057                  |
+|   OBJ.U078   |-----|               CB001.U0110   |
+|   CB5.U076                                       |
+|         |-------|  5864   CB002.U0235            |
+|         |       |  5864                          |
+|         |SEI0210|              |--------------|  |
+|         |       |              |    68000     |  |
+|         |-------|              |--------------|  |
+|              SW047 SW046       20MHz             |
+| 12MHz   CB4.U073                           PST518|
+|--------------------------------------------------|
+Notes:
+      68000 - Clock 10.000MHz [20/2]
+        Z80 - Z80A CPU, clock 3.579545MHz [7.15909/2]
+       6116 - 2kx8 SRAM (Z80 RAM)
+       5864 - Sony CXK5864 8kx8 SRAM (sprite RAM)
+      58257 - Sony CXK58257 32kx8 SRAM (68000 RAM)
+      HB-41 - Seibu HB-41 Custom Audio-Mixer OP-AMP Module (contains NJM4560 and NJM2060)
+              Full schematic and repair info available at....
+              https://gurudumps.otenko.com/re/
+     UEC-01 - Seibu UEC-01 Custom I/O Multiplexor Module
+     UEC-02 - Seibu UEC-02 Custom Coin Counter/Lockout Module
+     UEC-52 - Seibu UEC-52 Custom 12-bit RGB DAC Module
+     82S135 - 256x8 Bipolar PROM, marked 'CB6'
+        CB* - 20 pin PALs/GALs
+      VSync - 59.4094Hz  \
+      HSync - 15.6246kHz / measured values
+      M6295 - Oki M6295 4-Channel Mixing ADPCM Voice Synthesis LSI, clock input 1.000MHz [12/12], pin 7 HIGH
+     YM3812 - Yamaha YM3812 OPLII Sound Generator, clock input 3.579545MHz [7.15909/2]
+     YM3014 - Yamaha YM3014 DAC, clock input 894.88625kHz [7.15909/2/4]
+     LA4460 - Sanyo LA4460 12W AF (Audio Frequency) Power Amplifier
+    SEI0210 - Seibu Custom Sprite Generator, clock input 12.000MHz
+ Other SEI* - Seibu Custom Graphics Chips
+    BK.U064 - DIP42 mask ROM used to hold background graphics
+   OBJ.U078 - DIP42 mask ROM used to hold sprite graphics
+        1-4 - 68000 Main Program EPROMs
+        5-6 - Text Tile ROMs
+          7 - Z80 Sound Program EPROM
+          8 - Oki M6295 Sample ROM
+    SW046/7 - 8-position DIP Switches
+     PST518 - Mitsumi PST518 System Reset IC
+
+*****************************************************************/
+
 // ROMs
 
 ROM_START( bloodbro )
@@ -1216,7 +1280,7 @@ void weststry_state::init_weststry()
 } // anonymous namespace
 
 
-/* Game Drivers */
+// Game Drivers
 
 GAME( 1990, bloodbro,   0,        bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation", "Blood Bros. (World?)",                       MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bloodbroj,  bloodbro, bloodbro, bloodbro, bloodbro_state, empty_init,    ROT0,   "TAD Corporation", "Blood Bros. (Japan, rev A)",                 MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

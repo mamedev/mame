@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 
 
@@ -21,18 +20,14 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-class dspp_frontend;
-
 // ======================> dspp_device
 
 class dspp_device : public cpu_device
 {
-	friend class dspp_frontend;
 public:
 	// Construction/destruction
-	dspp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor code_map_ctor,
-		address_map_constructor data_map_ctor);
 	dspp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~dspp_device();
 
 	// Static configuration helpers
 	auto int_handler() { return m_int_handler.bind(); }
@@ -73,24 +68,36 @@ public:
 	void host_gw_control_write(offs_t offset, u16 data);
 
 protected:
-	// device-level overrides
+	class frontend;
+	class opcode_desc;
+
+	dspp_device(
+			const machine_config &mconfig,
+			device_type type,
+			const char *tag,
+			device_t *owner,
+			uint32_t clock,
+			address_map_constructor code_map_ctor,
+			address_map_constructor data_map_ctor);
+
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// device_execute_interface overrides
+	// device_execute_interface implementation
 	virtual uint32_t execute_min_cycles() const noexcept override;
 	virtual uint32_t execute_max_cycles() const noexcept override;
 	virtual void execute_run() override;
 
-	// device_memory_interface overrides
+	// device_memory_interface implementation
 	virtual space_config_vector memory_space_config() const override;
 
-	// device_state_interface overrides
+	// device_state_interface implementation
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_export(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	// device_disasm_interface overrides
+	// device_disasm_interface implementation
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	void code_map(address_map &map) ATTR_COLD;
@@ -309,7 +316,7 @@ private:
 	bool        m_cache_dirty;
 	drc_cache   m_cache;
 	std::unique_ptr<drcuml_state>   m_drcuml;
-	std::unique_ptr<dspp_frontend>  m_drcfe;
+	std::unique_ptr<frontend>       m_drcfe;
 	uint32_t    m_drcoptions;
 
 	/* internal compiler state */

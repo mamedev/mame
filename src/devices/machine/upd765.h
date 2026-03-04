@@ -69,7 +69,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(update_floppy);
 
 	enum {
-		PHASE_CMD, PHASE_EXEC, PHASE_RESULT
+		PHASE_IDLE, PHASE_CMD, PHASE_EXEC, PHASE_RESULT
 	};
 
 	enum {

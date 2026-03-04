@@ -8,21 +8,6 @@
 #include <algorithm>
 
 
-// DRC instruction description flags
-constexpr uint32_t  OP_USERFLAG_LOOP                     = 0x00000001;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AZ      = 0x00001000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AN      = 0x00002000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AC      = 0x00004000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_AV      = 0x00008000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_MV      = 0x00010000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_MN      = 0x00020000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_SV      = 0x00040000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_SZ      = 0x00080000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY_BTF     = 0x00100000;
-constexpr uint32_t  OP_USERFLAG_ASTAT_DELAY_COPY         = 0x001ff000;
-constexpr uint32_t  OP_USERFLAG_CALL                     = 0x10000000;
-
-
 // constants for IEEE754 single-precision float format
 constexpr uint32_t  FLOAT_INFINITY          = 0x7f800000;
 constexpr uint32_t  FLOAT_SIGN_MASK         = 0x80000000;

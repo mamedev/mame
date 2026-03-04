@@ -409,7 +409,7 @@ private:
 DECLARE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device)
 
 /*
- * AC97 Audio Controller
+ * AC'97 Audio Controller
  */
 
 class mcpx_ac97_audio_device : public pci_device {

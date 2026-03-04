@@ -169,7 +169,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_scc1(*this, SCC1_TAG),
 		m_scc2(*this, SCC2_TAG),
-		m_esp(*this, "scsibus:7:esp"),
+		m_esp(*this, "esp"),
 		m_fdc(*this, FDC_TAG),
 		m_floppy_connector(*this, FLOPPY_CONN_TAG),
 		m_p_ram(*this, "p_ram"),
@@ -626,7 +626,7 @@ void sun3x_state::sun3_80(machine_config &config)
 	rs232b.dcd_handler().set(m_scc2, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc2, FUNC(z80scc_device::ctsb_w));
 
-	NSCSI_BUS(config, "scsibus");
+	auto &scsi(NSCSI_BUS(config, "scsibus"));
 	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
@@ -634,7 +634,9 @@ void sun3x_state::sun3_80(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, "tape");
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("esp", NCR53C90).clock(20000000/2); // Emulex 2400138 (68-pin PLCC)
+
+	NCR53C90(config, m_esp, 20000000/2);
+	scsi.set_external_device(7, m_esp);
 
 	N82077AA(config, m_fdc, 24000000, n82077aa_device::mode_t::PS2);
 	FLOPPY_CONNECTOR(config, "fdc:0", sun_floppies, "35hd", floppy_image_device::default_pc_floppy_formats);

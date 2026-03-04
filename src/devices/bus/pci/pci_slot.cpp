@@ -28,6 +28,7 @@
 #include "sis6326.h"
 #include "sonicvibes.h"
 #include "sw1000xg.h"
+#include "trident_4dwavedx.h"
 #include "trio_pci.h"
 #include "virge_pci.h"
 #include "vision.h"
@@ -122,6 +123,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("aha2940au",      AHA2940AU);
 	device.option_add("ncr53c825",      NCR53C825_PCI);
 	device.option_add("pdc20262",       PDC20262);
+	device.option_add("pdc20268",       PDC20268);
 
 	// 0x02 - network controllers
 	device.option_add("rtl8029as",      RTL8029AS_PCI);
@@ -145,6 +147,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("ds2416",         DS2416);
 	device.option_add("sonicvibes",     SONICVIBES);
 	device.option_add("ess_solo1",      ES1946_SOLO1E);
+	device.option_add("4dwavedx",       TRIDENT_4DWAVEDX);
 	device.option_add("zr36057",        ZR36057_PCI);
 	device.option_add("audiowerk2",     AUDIOWERK2);
 

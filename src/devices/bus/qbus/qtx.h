@@ -36,8 +36,6 @@ private:
 	u8 io_status_r();
 	void channel_w(u8 data);
 
-	void asc_config(device_t *device);
-
 	void prg_map(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
 

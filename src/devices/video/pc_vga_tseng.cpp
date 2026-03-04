@@ -27,7 +27,7 @@
 DEFINE_DEVICE_TYPE(TSENG_VGA,    tseng_vga_device,    "tseng_vga",    "Tseng Labs ET4000AX VGA i/f")
 DEFINE_DEVICE_TYPE(ET4KW32I_VGA, et4kw32i_vga_device, "et4kw32i_vga", "Tseng Labs ET4000/W32i TC6167HF VGA i/f")
 
-tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_type type, device_t *owner, uint32_t clock)
+tseng_vga_device::tseng_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
 {
 	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(tseng_vga_device::io_3bx_3dx_map), this));
@@ -37,7 +37,7 @@ tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *ta
 }
 
 tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tseng_vga_device(mconfig, tag, TSENG_VGA, owner, clock)
+	: tseng_vga_device(mconfig, TSENG_VGA, tag, owner, clock)
 {
 }
 
@@ -375,7 +375,7 @@ uint32_t tseng_vga_device::latch_start_addr()
  *************************************/
 
 et4kw32i_vga_device::et4kw32i_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tseng_vga_device(mconfig, tag, ET4KW32I_VGA, owner, clock)
+	: tseng_vga_device(mconfig, ET4KW32I_VGA, tag, owner, clock)
 {
 	m_acl_space_config = address_space_config("acl_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(et4kw32i_vga_device::acl_map), this));
 	m_mmu_space_config = address_space_config("mmu_regs", ENDIANNESS_LITTLE, 8, 15, 0, address_map_constructor(FUNC(et4kw32i_vga_device::mmu_map), this));

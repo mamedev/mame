@@ -2799,6 +2799,7 @@ end
 --
 --@src/devices/machine/nscsi_bus.h,MACHINES["NSCSI"] = true
 --@src/devices/machine/nscsi_cb.h,MACHINES["NSCSI"] = true
+--@src/devices/machine/nscsi_hle.h,MACHINES["NSCSI"] = true
 ---------------------------------------------------
 
 if MACHINES["NSCSI"] then
@@ -2807,6 +2808,8 @@ if MACHINES["NSCSI"] then
 		MAME_DIR .. "src/devices/machine/nscsi_bus.h",
 		MAME_DIR .. "src/devices/machine/nscsi_cb.cpp",
 		MAME_DIR .. "src/devices/machine/nscsi_cb.h",
+		MAME_DIR .. "src/devices/machine/nscsi_hle.cpp",
+		MAME_DIR .. "src/devices/machine/nscsi_hle.h",
 	}
 end
 

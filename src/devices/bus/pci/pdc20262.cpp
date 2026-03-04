@@ -6,6 +6,9 @@ Promise PDC20262 FastTrak66/UDMA66 IDE controller
 
 No documentation, ATA4 compliant
 
+Notes:
+- pdc20268 is El Torito capable
+
 TODO:
 - how it sets compatible/native modes? Subvendor ID list suggests it can switch at will;
 - Install win9x driver causes huge loading hiccups, eventually freezes by accessing drive with
@@ -32,17 +35,22 @@ TODO:
 
 
 DEFINE_DEVICE_TYPE(PDC20262, pdc20262_device,   "pdc20262",   "Promise PDC20262 FastTrak66 EIDE controller")
-
+DEFINE_DEVICE_TYPE(PDC20268, pdc20268_device,   "pdc20268",   "Promise PDC20268 Ultra100TX2 EIDE controller")
 
 
 pdc20262_device::pdc20262_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, type, tag, owner, clock)
+	, m_bios(*this, "bios")
 	, m_ide1(*this, "ide1")
 	, m_ide2(*this, "ide2")
 	, m_irqs(*this, "irqs")
 	// HACK: how to get to get_pci_busmaster_space()?
 	, m_bus_master_space(*this, ":maincpu", 0)
-	, m_bios_rom(*this, "bios_rom")
+{
+}
+
+pdc20262_device::pdc20262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pdc20262_device(mconfig, PDC20262, tag, owner, clock)
 {
 	// Subsystems:
 	// 105a 4d30 Ultra Device on SuperTrak
@@ -53,13 +61,8 @@ pdc20262_device::pdc20262_device(const machine_config &mconfig, device_type type
 	set_ids(0x105a4d38, 0x02, 0x018000, 0x105a4d33);
 }
 
-pdc20262_device::pdc20262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: pdc20262_device(mconfig, PDC20262, tag, owner, clock)
-{
-}
-
 ROM_START( pdc20262 )
-	ROM_REGION32_LE( 0x8000, "bios_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_DEFAULT_BIOS("v200")
 
 	ROM_SYSTEM_BIOS( 0, "v200", "Promise Ultra66 BIOS v2.00 (Build 18)" )
@@ -176,7 +179,7 @@ void pdc20262_device::device_start()
 	// TODO: unknown size (a lot larger?), to be verified later thru PnP
 	add_map(64, M_MEM, FUNC(pdc20262_device::extra_map));
 
-	add_rom((u8 *)m_bios_rom->base(), 0x4000);
+	add_rom((u8 *)m_bios->base(), 0x4000);
 	expansion_rom_base = 0xc8000;
 
 	// INTA#
@@ -261,3 +264,32 @@ void pdc20262_device::ide2_write_cs1_w(uint8_t data)
 		return;
 	m_ide2->write_cs1(1, data << 16, 0xff0000);
 }
+
+/*
+ *
+ * PDC20268
+ *
+ */
+
+pdc20268_device::pdc20268_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pdc20262_device(mconfig, PDC20268, tag, owner, clock)
+{
+	// class code 0x018000 or 0x01808f according to PCIR header
+	// subvendor unknown
+	set_ids(0x105a4d68, 0x02, 0x018000, 0x105a4d68);
+}
+
+ROM_START( pdc20268 )
+	ROM_REGION32_LE( 0x8000, "bios", ROMREGION_ERASEFF )
+	ROM_DEFAULT_BIOS("v220")
+
+	ROM_SYSTEM_BIOS( 0, "v220", "Promise Ultra100 BIOS v2.20.0.15" )
+	ROMX_LOAD( "u100b15.bin", 0x0000, 0x4000, CRC(bec48f0e) SHA1(7303819fee09922db5fd0d9632b0e1734cb70fb5), ROM_BIOS(0) )
+ROM_END
+
+const tiny_rom_entry *pdc20268_device::device_rom_region() const
+{
+	return ROM_NAME(pdc20268);
+}
+
+

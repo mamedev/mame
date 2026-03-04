@@ -621,9 +621,9 @@ inline void i8086_common_cpu_device::i_popf()
 }
 
 
-inline uint32_t i8086_common_cpu_device::ADDB()
+inline uint32_t i8086_common_cpu_device::ADDB(uint8_t c)
 {
-	uint32_t res = m_dst + m_src;
+	uint32_t res = m_dst + m_src + c;
 
 	set_OFB_Add(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);
@@ -633,9 +633,9 @@ inline uint32_t i8086_common_cpu_device::ADDB()
 }
 
 
-inline uint32_t i8086_common_cpu_device::ADDX()
+inline uint32_t i8086_common_cpu_device::ADDX(uint8_t c)
 {
-	uint32_t res = m_dst + m_src;
+	uint32_t res = m_dst + m_src + c;
 
 	set_OFW_Add(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);
@@ -645,9 +645,9 @@ inline uint32_t i8086_common_cpu_device::ADDX()
 }
 
 
-inline uint32_t i8086_common_cpu_device::SUBB()
+inline uint32_t i8086_common_cpu_device::SUBB(uint8_t b)
 {
-	uint32_t res = m_dst - m_src;
+	uint32_t res = m_dst - m_src - b;
 
 	set_OFB_Sub(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);
@@ -657,9 +657,9 @@ inline uint32_t i8086_common_cpu_device::SUBB()
 }
 
 
-inline uint32_t i8086_common_cpu_device::SUBX()
+inline uint32_t i8086_common_cpu_device::SUBX(uint8_t b)
 {
-	uint32_t res = m_dst - m_src;
+	uint32_t res = m_dst - m_src - b;
 
 	set_OFW_Sub(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);

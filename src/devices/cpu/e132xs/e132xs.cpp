@@ -1620,7 +1620,7 @@ void hyperstone_device::device_start()
 		m_drcuml->symbol_add(&m_core->arg1, sizeof(uint32_t), "arg1");
 
 		// initialize the front-end helper
-		m_drcfe = std::make_unique<e132xs_frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, m_single_instruction_mode ? 1 : COMPILE_MAX_SEQUENCE);
+		m_drcfe = std::make_unique<frontend>(*this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, m_single_instruction_mode ? 1 : COMPILE_MAX_SEQUENCE);
 
 		// generate invariant code
 		generate_invariant();

@@ -66,8 +66,6 @@ public:
 	pulltrig_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_ide_00_1(*this, "pci:00.1")
-		, m_lpc_01_0(*this, "pci:01.0")
 	{ }
 
 
@@ -75,8 +73,6 @@ public:
 
 private:
 	required_device<pentium4_device> m_maincpu;
-	required_device<sis5513_ide_device> m_ide_00_1;
-	required_device<sis950_lpc_device> m_lpc_01_0;
 
 	static void ite_superio_config(device_t *device);
 };
@@ -127,15 +123,12 @@ void pulltrig_state::pulltrig(machine_config &config)
 
 	PCI_ROOT(config, "pci", 0);
 	SIS630_HOST(config, "pci:00.0", 0, "maincpu", 256*1024*1024);
-	SIS5513_IDE(config, m_ide_00_1, 0, "maincpu");
-	// TODO: both on same line as default, should also trigger towards LPC
-	m_ide_00_1->irq_pri().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir6_w));
-		//FUNC(sis950_lpc_device::pc_irq14_w));
-	m_ide_00_1->irq_sec().set("pci:01.0:pic_slave", FUNC(pic8259_device::ir7_w));
-		//FUNC(sis950_lpc_device::pc_mirq0_w));
+	sis5513_ide_device &ide(SIS5513_IDE(config, "pci:00.1", 0, "maincpu"));
+	ide.irq_pri().set("pci:01.0", FUNC(sis950_lpc_device::pc_iirqa_w));
+	ide.irq_sec().set("pci:01.0", FUNC(sis950_lpc_device::pc_iirqb_w));
 
-	SIS950_LPC(config, m_lpc_01_0, XTAL(33'000'000), "maincpu", "flash");
-	m_lpc_01_0->fast_reset_cb().set([this] (int state) {
+	sis950_lpc_device &lpc(SIS950_LPC(config, "pci:01.0", XTAL(33'000'000), "maincpu", "flash"));
+	lpc.fast_reset_cb().set([this] (int state) {
 		if (state)
 			machine().schedule_soft_reset();
 	});

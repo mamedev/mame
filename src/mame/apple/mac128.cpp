@@ -147,7 +147,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_scsibus(*this, "scsi"),
 		m_scsihelp(*this, "scsihelp"),
-		m_ncr5380(*this, "scsi:7:ncr5380"),
+		m_ncr5380(*this, "ncr5380"),
 		m_iwm(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_mackbd(*this, "kbd"),
@@ -1268,11 +1268,11 @@ void mac128_state::macplus(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device) {
-		ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
-		// The IRQ pin (23) on the NCR5380 is unconnected on the Mac Plus, and will cause it to crash if it is
-		adapter.drq_handler().set(*this, FUNC(mac128_state::scsi_drq_w));
-	});
+
+	NCR5380(config, m_ncr5380);
+	m_scsibus->set_external_device(7, m_ncr5380);
+	// The IRQ pin (23) on the NCR5380 is unconnected on the Mac Plus, and will cause it to crash if it is
+	m_ncr5380->drq_handler().set(*this, FUNC(mac128_state::scsi_drq_w));
 
 	subdevice<software_list_device>("flop_mac35_orig")->set_filter("MC68000,macplus");
 	subdevice<software_list_device>("flop_mac35_clean")->set_filter("MC68000,macplus");
@@ -1316,15 +1316,12 @@ void mac128_state::macse(machine_config &config)
 	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 	m_scsihelp->timeout_error_callback().set(FUNC(mac128_state::scsi_berr_w));
 
-	subdevice<nscsi_connector>("scsi:7")->set_option_machine_config("ncr5380", [this](device_t *device) {
-		ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
-		// The INT pin (23) on the NCR5380 is connected to the the GLU PAL16L8 pin 3.
-		// The VIA PB6 pin is connected to the GLU PAL16L8 pin 2, and the open-collector and /OE
-		// gated PAL16L8 output pin 14 is wired-OR with the VIA /IRQ pin to the 68K /IPL0 pin.
-		// This effectively performs a NAND of !(PB6) and INT to produce /SCSIIRQ.
-		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
-		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
-	});
+	// The INT pin (23) on the NCR5380 is connected to the the GLU PAL16L8 pin 3.
+	// The VIA PB6 pin is connected to the GLU PAL16L8 pin 2, and the open-collector and /OE
+	// gated PAL16L8 output pin 14 is wired-OR with the VIA /IRQ pin to the 68K /IPL0 pin.
+	// This effectively performs a NAND of !(PB6) and INT to produce /SCSIIRQ.
+	m_ncr5380->irq_handler().set(DEVICE_SELF, FUNC(mac128_state::scsi_irq_w));
+	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 
 	ADBMODEM(config, m_adbmodem, C7M);
 	m_adbmodem->via_clock_callback().set(m_via, FUNC(via6522_device::write_cb1));
@@ -1378,11 +1375,9 @@ void mac128_state::macclasc(machine_config &config)
 //  config.device_remove("pds");
 //  config.device_remove("sepds");
 
-	NSCSI_CONNECTOR(config.replace(), "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
-		ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
-		adapter.irq_handler().set(*this, FUNC(mac128_state::scsi_irq_w));
-		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
-	});
+	NCR53C80(config.replace(), m_ncr5380);
+	m_ncr5380->irq_handler().set(DEVICE_SELF, FUNC(mac128_state::scsi_irq_w));
+	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 
 	subdevice<software_list_device>("flop_mac35_orig")->set_filter("MC68000,macclasc");
 	subdevice<software_list_device>("flop_mac35_clean")->set_filter("MC68000,macclasc");

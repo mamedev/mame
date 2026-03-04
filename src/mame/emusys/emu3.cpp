@@ -51,7 +51,7 @@ public:
 		, m_lcdc(*this, "lcdc")
 		, m_fdc(*this, "fdc")
 		, m_fdd(*this, "fdc:0:35dd")
-		, m_hdc(*this, "scsi:0:ncr5380")
+		, m_hdc(*this, "ncr5380")
 		, m_pit(*this, "pit")
 		, m_scc(*this, "scc")
 		, m_ddt(*this, "ddt")
@@ -229,16 +229,12 @@ void emu3_state::emu3(machine_config &config)
 	//pit.out_handler<2>().set(); // -SMPTIME
 
 	// scsi bus and devices
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:0").option_set("ncr5380", NCR5380).machine_config(
-		[this](device_t *device)
-		{
-			ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
-
-			adapter.irq_handler().set(*this, FUNC(emu3_state::irq_w<HDINT>));
-		});
+	NCR5380(config, m_hdc);
+	scsi.set_external_device(0, m_hdc);
+	m_hdc->irq_handler().set(DEVICE_SELF, FUNC(emu3_state::irq_w<HDINT>));
 
 	NSCSI_CONNECTOR(config, "scsi:1", emu_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:2", emu_scsi_devices, nullptr);

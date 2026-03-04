@@ -1,137 +1,223 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Vas Crabb
 /***************************************************************************
 
     e132xsfe.cpp
 
-    Front end for Hyperstone recompiler
+    Hyperstone E1 instruction decoder
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "e132xsfe.h"
+
 #include "32xsdefs.h"
 
-#define FE_DST_CODE ((op & 0xf0) >> 4)
-#define FE_SRC_CODE (op & 0x0f)
-#define SR_CODE     (1 << 1)
+#include "cpu/drcfe.ipp"
 
-/***************************************************************************
-    INSTRUCTION PARSERS
-***************************************************************************/
 
-e132xs_frontend::e132xs_frontend(hyperstone_device &cpu, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
-	: drc_frontend(cpu, window_start, window_end, max_sequence)
+
+hyperstone_device::frontend::frontend(hyperstone_device &cpu, uint32_t window_start, uint32_t window_end, uint32_t max_sequence)
+	: drc_frontend_base(cpu.space_config(AS_PROGRAM)->page_shift(), window_start, window_end, max_sequence)
 	, m_cpu(cpu)
 {
 }
 
-inline uint16_t e132xs_frontend::read_word(opcode_desc &desc)
+hyperstone_device::frontend::~frontend()
 {
-	return m_cpu.m_pr16(desc.physpc);
 }
 
-inline uint16_t e132xs_frontend::read_imm1(opcode_desc &desc)
+hyperstone_device::opcode_desc const *hyperstone_device::frontend::describe_code(offs_t startpc)
 {
-	return m_cpu.m_pr16(desc.physpc + 2);
+	return do_describe_code(
+			[this] (opcode_desc &desc, opcode_desc const *prev) { return describe(desc, prev); },
+			startpc);
 }
 
-inline uint16_t e132xs_frontend::read_imm2(opcode_desc &desc)
+
+inline void hyperstone_device::frontend::read_op(opcode_desc &desc)
 {
-	return m_cpu.m_pr16(desc.physpc + 4);
+	desc.opptr[0] = m_cpu.m_pr16(desc.pc);
 }
 
-inline uint32_t e132xs_frontend::read_ldstxx_imm(opcode_desc &desc)
+inline void hyperstone_device::frontend::read_imm1(opcode_desc &desc)
 {
-	const uint16_t imm1 = read_imm1(desc);
-	uint32_t extra_s;
-	if (imm1 & 0x8000)
-	{
-		extra_s = read_imm2(desc);
-		extra_s |= ((imm1 & 0xfff) << 16);
-
-		if (imm1 & 0x4000)
-			extra_s |= 0xf0000000;
-	}
-	else
-	{
-		extra_s = imm1 & 0xfff;
-
-		if (imm1 & 0x4000)
-			extra_s |= 0xfffff000;
-	}
-	return extra_s;
+	desc.opptr[1] = m_cpu.m_pr16(desc.pc + 2);
 }
 
-inline uint32_t e132xs_frontend::read_limm(opcode_desc &desc, uint16_t op)
+inline void hyperstone_device::frontend::read_imm2(opcode_desc &desc)
 {
-	static const int32_t immediate_values[16] =
-	{
-		16, 0, 0, 0, 32, 64, 128, int32_t(uint32_t(0x80000000)),
-		-8, -7, -6, -5, -4, -3, -2, -1
-	};
-
-	const uint8_t nybble = op & 0xf;
-	switch (nybble)
-	{
-		case 1:
-			desc.length = 6;
-			return (read_imm1(desc) << 16) | read_imm2(desc);
-		case 2:
-			desc.length = 4;
-			return read_imm1(desc);
-		case 3:
-			desc.length = 4;
-			return 0xffff0000 | read_imm1(desc);
-		default:
-			return uint32_t(immediate_values[nybble]);
-	}
+	desc.opptr[2] = m_cpu.m_pr16(desc.pc + 4);
 }
 
-inline int32_t e132xs_frontend::decode_pcrel(opcode_desc &desc, uint16_t op)
+inline void hyperstone_device::frontend::decode_const(opcode_desc &desc)
 {
-	if (op & 0x80)
+	read_imm1(desc);
+	int32_t const const1 = util::sext(desc.opptr[1], 15);
+	if (!E_BIT(desc.opptr[1]))
 	{
 		desc.length = 4;
-
-		const uint16_t next = read_imm1(desc);
-		int32_t offset = ((op & 0x7f) << 16) | (next & 0xfffe);
-		if (next & 1)
-			offset |= 0xff800000;
-
-		return offset;
+		desc.imm = uint32_t(const1);
 	}
 	else
 	{
-		int32_t offset = op & 0x7e;
-		if (op & 1)
-			offset |= 0xffffff80;
-
-		return offset;
-	}
-}
-
-inline int32_t e132xs_frontend::decode_call(opcode_desc &desc)
-{
-	const uint16_t imm_1 = read_imm1(desc);
-	int32_t extra_s = 0;
-	if (imm_1 & 0x8000)
-	{
+		read_imm2(desc);
 		desc.length = 6;
-		extra_s = read_imm2(desc);
-		extra_s |= ((imm_1 & 0x3fff) << 16);
+		desc.imm = uint32_t(const1 << 16) | desc.opptr[2];
+	}
+}
 
-		if (imm_1 & 0x4000)
-			extra_s |= 0xc0000000;
+
+inline void hyperstone_device::frontend::decode_ll(opcode_desc &desc)
+{
+	uint16_t const op = desc.opptr[0];
+	desc.dst_code = BIT(op, 4, 4);
+	desc.src_code = BIT(op, 0, 4);
+	desc.dst_local = true;
+	desc.src_local = true;
+}
+
+inline void hyperstone_device::frontend::decode_llext(opcode_desc &desc)
+{
+	decode_ll(desc);
+	read_imm1(desc);
+	desc.length = 4;
+}
+
+inline void hyperstone_device::frontend::decode_lr(opcode_desc &desc)
+{
+	uint16_t const op = desc.opptr[0];
+	desc.dst_code = BIT(op, 4, 4);
+	desc.src_code = BIT(op, 0, 4);
+	desc.dst_local = true;
+	desc.src_local = BIT(op, 8);
+}
+
+inline void hyperstone_device::frontend::decode_rr(opcode_desc &desc)
+{
+	uint16_t const op = desc.opptr[0];
+	desc.dst_code = BIT(op, 4, 4);
+	desc.src_code = BIT(op, 0, 4);
+	desc.dst_local = BIT(op, 9);
+	desc.src_local = BIT(op, 8);
+}
+
+inline void hyperstone_device::frontend::decode_ln(opcode_desc &desc)
+{
+	uint16_t const op = desc.opptr[0];
+	desc.dst_code = BIT(op, 4, 4);
+	desc.dst_local = true;
+	desc.imm = (BIT(op, 8) << 4) | BIT(op, 0, 4);
+}
+
+inline void hyperstone_device::frontend::decode_rn(opcode_desc &desc)
+{
+	uint16_t const op = desc.opptr[0];
+	desc.dst_code = BIT(op, 4, 4);
+	desc.dst_local = BIT(op, 9);
+	desc.imm = (BIT(op, 8) << 4) | BIT(op, 0, 4);
+}
+
+inline void hyperstone_device::frontend::decode_pcrel(opcode_desc &desc)
+{
+	if (!BIT(desc.opptr[0], 7))
+	{
+		uint32_t const low_rel = BIT(desc.opptr[0], 1, 6);
+		int32_t const s = util::sext(desc.opptr[0], 1);
+		desc.imm = uint32_t(s << 7) | (low_rel << 1);
 	}
 	else
 	{
+		read_imm1(desc);
 		desc.length = 4;
-		extra_s = imm_1 & 0x3fff;
-		if (imm_1 & 0x4000)
-			extra_s |= 0xffffc000;
+		uint32_t const high_rel = BIT(desc.opptr[0], 0, 7);
+		uint32_t const low_rel = BIT(desc.opptr[1], 1, 15);
+		int32_t const s = util::sext(desc.opptr[1], 1);
+		desc.imm = uint32_t(s << 23) | (high_rel << 16) | (low_rel << 1);
 	}
-	return extra_s;
+}
+
+inline void hyperstone_device::frontend::decode_lrconst(opcode_desc &desc)
+{
+	decode_lr(desc);
+	decode_const(desc);
+}
+
+inline void hyperstone_device::frontend::decode_rrconst(opcode_desc &desc)
+{
+	decode_rr(desc);
+	decode_const(desc);
+}
+
+inline void hyperstone_device::frontend::decode_rrdis(opcode_desc &desc)
+{
+	decode_rr(desc);
+	read_imm1(desc);
+	int32_t const dis1 = util::sext((BIT(desc.opptr[1], 14) << 12) | BIT(desc.opptr[1], 0, 12), 13);
+	if (!E_BIT(desc.opptr[1]))
+	{
+		desc.length = 4;
+		desc.imm = uint32_t(dis1);
+	}
+	else
+	{
+		read_imm2(desc);
+		desc.length = 6;
+		desc.imm = uint32_t(dis1 << 16) | desc.opptr[2];
+	}
+}
+
+inline void hyperstone_device::frontend::decode_rimm(opcode_desc &desc, bool cmpbi_andni)
+{
+	constexpr int32_t table[32] = {
+			0,      1,      2,      3,      4,      5,      6,      7,
+			8,      9,      10,     11,     12,     13,     14,     15,
+			16,     -1,     -1,     -1,     32,     64,     128,    int32_t(uint32_t(0x80000000)),
+			-8,     -7,     -6,     -5,     -4,     -3,     -2,     -1 };
+
+	uint16_t const op = desc.opptr[0];
+	desc.dst_code = BIT(op, 4, 4);
+	desc.dst_local = BIT(op, 9);
+
+	uint16_t const n = (BIT(op, 8) << 4) | BIT(op, 0, 4);
+	switch (n)
+	{
+	case 17:
+		read_imm1(desc);
+		read_imm2(desc);
+		desc.length = 6;
+		desc.imm = (uint32_t(desc.opptr[1]) << 16) | desc.opptr[2];
+		break;
+	case 18:
+	case 19:
+		read_imm1(desc);
+		desc.length = 4;
+		desc.imm = (BIT(n, 0) ? 0xffff0000U : 0U) | desc.opptr[1];
+		break;
+	case 31:
+		desc.imm = cmpbi_andni ? 0x7fffffff : uint32_t(table[n]);
+		break;
+	default:
+		desc.imm = uint32_t(table[n]);
+	}
+}
+
+inline void hyperstone_device::frontend::decode_rrlim(opcode_desc &desc)
+{
+	decode_rr(desc);
+	read_imm1(desc);
+	uint32_t const lim1 = BIT(desc.opptr[1], 0, 12);
+	if (!E_BIT(desc.opptr[1]))
+	{
+		desc.length = 4;
+		desc.imm = lim1;
+	}
+	else
+	{
+		read_imm2(desc);
+		desc.length = 6;
+		desc.imm = (lim1 << 16) | desc.opptr[2];
+	}
 }
 
 
@@ -140,1085 +226,802 @@ inline int32_t e132xs_frontend::decode_call(opcode_desc &desc)
     instruction
 -------------------------------------------------*/
 
-bool e132xs_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
+bool hyperstone_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 {
-	uint16_t op = desc.opptr.w[0] = read_word(desc);
+	read_op(desc);
+	uint16_t const op = desc.opptr[0];
 
-	/* most instructions are 2 bytes and a single cycle */
+	// most instructions are 2 bytes and a single cycle
 	desc.length = 2;
 	desc.delayslots = 0;
 
-	const uint32_t gdst_code = FE_DST_CODE;
-	const uint32_t gdstf_code = gdst_code + 1;
-	const uint32_t gsrc_code = FE_SRC_CODE;
-	const uint32_t gsrcf_code = gsrc_code + 1;
-
 	switch (op >> 8)
 	{
-		case 0x00: // chk global,global
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			break;
-		case 0x01: // chk global,local
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			break;
-		case 0x02: // chk local,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			break;
-		case 0x03: // chk local,local
-			desc.regin[0] |= SR_CODE;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			break;
-		case 0x04: // movd global,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << gsrcf_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdstf_code;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE | OPFLAG_CAN_CAUSE_EXCEPTION | OPFLAG_CAN_CHANGE_MODES;
-			}
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x05: // movd global,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdstf_code;
-			if (gdst_code == 0)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_READS_MEMORY | OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE | OPFLAG_CAN_CAUSE_EXCEPTION;
-			}
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x06: // movd local,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << gsrcf_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x07: // movd local,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x08: // divu global,global
-		case 0x0c: // divs global,global
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regin[0] |= 1 << gdstf_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdstf_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x09: // divu global,local
-		case 0x0d: // divs global,local
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regin[0] |= 1 << gdstf_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdstf_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x0a: // divu local,global
-		case 0x0e: // divs local,global
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x0b: // divu local,local
-		case 0x0f: // divs local,local
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x10: // xm global,global
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			break;
-		case 0x11: // xm global,local
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			break;
-		case 0x12: // xm local,global
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			break;
-		case 0x13: // xm local,local
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			desc.regin[0] |= SR_CODE;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			break;
-		case 0x14: // mask global,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			break;
-		case 0x15: // mask global,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			break;
-		case 0x16: // mask local,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= SR_CODE;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			break;
-		case 0x17: // mask local,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			break;
-		case 0x18: // sum global,global
-		case 0x1c: // sums global,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			if (op & 0x4 && gsrc_code != SR_REGISTER) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			break;
-		case 0x19: // sum global,local
-		case 0x1d: // sums global,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			if (op & 0x4) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			break;
-		case 0x1a: // sum local,global
-		case 0x1e: // sums local,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= SR_CODE;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			if (op & 0x4 && gsrc_code != SR_REGISTER) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			break;
-		case 0x1b: // sum local,local
-		case 0x1f: // sums local,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			if (op & 0x4) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			break;
-		case 0x20: // cmp global,global
-		case 0x30: // cmpb global,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x21: // cmp global,local
-		case 0x31: // cmpb global,local
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x22: // cmp local,global
-		case 0x32: // cmpb local,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x23: // cmp local,local
-		case 0x33: // cmpb local,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x24: // mov global,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << (gsrc_code + 16);
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			if (gdst_code == PC_REGISTER)
-			{
-				if (gsrc_code != PC_REGISTER)
-					desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				else
-					desc.targetpc = desc.physpc + desc.length;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			else if (gdst_code == 5) // TPR_REGISTER & 0xf
-			{
-				desc.flags |= OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x25: // mov global,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			else if (gdst_code == 5) // TPR_REGISTER & 0xf
-			{
-				desc.flags |= OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x26: // mov local,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << (gsrc_code + 16);
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x27: // mov local,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x28: // add global,global
-		case 0x2c: // adds global,global
-		case 0x48: // sub global,global
-		case 0x4c: // subs global,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // adds, subs
-			if (gdst_code == PC_REGISTER)
-			{
-				if (gsrc_code != PC_REGISTER)
-					desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				else if (((op >> 8) == 0x28) || ((op >> 8) == 0x2c))
-					desc.targetpc = (desc.physpc + desc.length) << 1;
-				else
-					desc.targetpc = 0;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x29: // add global,local
-		case 0x2d: // adds global,local
-		case 0x49: // sub global,local
-		case 0x4d: // subs global,local
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // adds, subs
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x2a: // add local,global
-		case 0x2e: // adds local,global
-		case 0x4a: // sub local,global
-		case 0x4e: // subs local,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= SR_CODE;
-			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // adds, subs
-			break;
-		case 0x2b: // add local,local
-		case 0x2f: // adds local,local
-		case 0x4b: // sub local,local
-		case 0x4f: // subs local,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // adds, subs
-			break;
-		case 0x34: // andn global,global
-		case 0x38: // or global,global
-		case 0x3c: // xor global,global
-		case 0x54: // and global,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (gdst_code == PC_REGISTER)
-			{
-				if (gsrc_code != PC_REGISTER)
-					desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				else if (((op >> 8) == 0x34) || ((op >> 8) == 0x3c))
-					desc.targetpc = 0;
-				else
-					desc.targetpc = desc.physpc + desc.length;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x35: // andn global,local
-		case 0x39: // or global,local
-		case 0x3d: // xor global,local
-		case 0x55: // and global,local
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x36: // andn local,global
-		case 0x3a: // or local,global
-		case 0x3e: // xor local,global
-		case 0x56: // and local,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x37: // andn local,local
-		case 0x3b: // or local,local
-		case 0x3f: // xor local,local
-		case 0x57: // and local,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x40: // subc global,global
-		case 0x50: // addc global,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x41: // subc global,local
-		case 0x51: // addc global,local
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x42: // subc local,global
-		case 0x52: // addc local,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x43: // subc local,local
-		case 0x53: // addc local,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x44: // not global,global
-		case 0x58: // neg global,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (gdst_code == PC_REGISTER)
-			{
-				if (gsrc_code != PC_REGISTER)
-					desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				else if ((op >> 8) == 0x44)
-					desc.targetpc = ~uint32_t(desc.physpc + desc.length) & ~uint32_t(1);
-				else
-					desc.targetpc = uint32_t(-int32_t(desc.physpc + desc.length)) & ~uint32_t(1);
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x45: // not global,local
-		case 0x59: // neg global,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x46: // not local,global
-		case 0x5a: // neg local,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x47: // not local,local
-		case 0x5b: // neg local,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x5c: // negs global,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			if (gdst_code == PC_REGISTER)
-			{
-				if (gsrc_code != PC_REGISTER)
-					desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				else
-					desc.targetpc = uint32_t(-int32_t(desc.physpc + desc.length)) & ~uint32_t(1);
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x5d: // negs global,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x5e: // negs local,global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= SR_CODE;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			break;
-		case 0x5f: // negs local,local
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			break;
-		case 0x60: // cmpi global,simm
-		case 0x70: // cmpbi global,simm
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x61: // cmpi global,limm
-		case 0x71: // cmpbi global,limm
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.length = hyperstone_device::imm_length(op) << 1;
-			break;
-		case 0x62: // cmpi local,simm
-		case 0x72: // cmpbi local,simm
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x63: // cmpi local,limm
-		case 0x73: // cmpbi local,limm
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			desc.length = hyperstone_device::imm_length(op) << 1;
-			break;
-		case 0x64: // movi global,simm
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << (gdst_code + 16);
-			desc.regout[0] |= SR_CODE;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = op & 0xe;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			else if (gdst_code == 5) // TPR_REGISTER & 0xf
-			{
-				desc.flags |= OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x65: // movi global,limm
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << (gdst_code + 16);
-			desc.regout[0] |= SR_CODE;
-			desc.length = hyperstone_device::imm_length(op) << 1;
-			desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = read_limm(desc, op) & ~uint32_t(1);
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			else if (gdst_code == 5) // TPR_REGISTER & 0xf
-			{
-				desc.flags |= OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x66: // movi local,simm
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x67: // movi local,limm
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			desc.length = hyperstone_device::imm_length(op) << 1;
-			break;
-		case 0x68: // addi global,simm
-		case 0x6c: // addsi global,simm
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // addsi
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = desc.physpc + desc.length + (op & 0xe);
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x69: // addi global,limm
-		case 0x6d: // addsi global,limm
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.length = hyperstone_device::imm_length(op) << 1;
-			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // addsi
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = desc.pc + desc.length + (read_limm(desc, op) & ~uint32_t(1));
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x6a: // addi local,simm
-		case 0x6e: // addsi local,simm
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // addsi
-			break;
-		case 0x6b: // addi local,limm
-		case 0x6f: // addsi local,limm
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			desc.length = hyperstone_device::imm_length(op) << 1;
-			if (op & 0x04) desc.flags |= OPFLAG_CAN_CAUSE_EXCEPTION; // addsi
-			break;
-		case 0x74: // andni global,simm
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = (desc.physpc + desc.length) & ~uint32_t(op & 0xf);
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x78: // ori global,simm
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = (desc.physpc + desc.length) | (op & 0xe);
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x7c: // xori global,simm
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = (desc.physpc + desc.length) ^ (op & 0xe);
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x75: // andni global,limm
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.length = hyperstone_device::imm_length(op) << 1;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = (desc.physpc + desc.length) & ~read_limm(desc, op);
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x79: // ori global,limm
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.length = hyperstone_device::imm_length(op) << 1;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = (desc.physpc + desc.length) | (read_limm(desc, op) & ~uint32_t(1));
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x7d: // xori global,limm
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			desc.length = hyperstone_device::imm_length(op) << 1;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = (desc.physpc + desc.length) ^ (read_limm(desc, op) & ~uint32_t(1));
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		case 0x76: // andni local,simm
-		case 0x7a: // ori local,simm
-		case 0x7e: // xori local,simm
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x77: // andni local,limm
-		case 0x7b: // ori local,limm
-		case 0x7f: // xori local,limm
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			desc.length = hyperstone_device::imm_length(op) << 1;
-			break;
-		case 0x80: case 0x81: // shrdi
-		case 0x84: case 0x85: // sardi
-		case 0x88: case 0x89: // shldi
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x82: // shrd
-		case 0x86: // sard
-		case 0x8a: // shld
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x83: // shr
-		case 0x87: // sar
-		case 0x8b: // shl
-		case 0x8f: // rol
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0x8c: case 0x8d: // reserved
-			return false;
-		case 0x8e: // testlz
-			desc.regin[0] |= SR_CODE;
-			break;
-		case 0x90: // ldxx1 global,global
+	case 0x00: // chk global,global
+	case 0x01: // chk global,local
+	case 0x02: // chk local,global
+	case 0x03: // chk local,local
+		decode_rr(desc);
+		if (!desc.dst_is_src() || desc.src_is_sr())
 		{
-			const uint16_t imm1 = read_imm1(desc);
-			const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
+			desc.set_can_cause_exception();
+			if (desc.dst_local || desc.src_local)
+				desc.set_fp_used();
+			if (!desc.dst_local)
+				desc.set_g_used(desc.dst_code);
+			if (!desc.src_local && (desc.src_code != SR_REGISTER))
+				desc.set_g_used(desc.src_code);
 		}
-		case 0x91: // ldxx1 global,local
+		else if (desc.dst_is_pc())
 		{
-			const uint16_t imm1 = read_imm1(desc);
-			[[maybe_unused]] const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
+			desc.set_will_cause_exception();
+			desc.set_end_sequence();
 		}
-		case 0x92: // ldxx1 local,global
+		break;
+	case 0x04: // movd global,global
+	case 0x05: // movd global,local
+	case 0x06: // movd local,global
+	case 0x07: // movd local,local
+		decode_rr(desc);
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (!desc.src_local && (desc.dst_is_pc() || !desc.src_is_sr()))
 		{
-			const uint16_t imm1 = read_imm1(desc);
-			const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			break;
+			desc.set_g_used(desc.src_code);
+			desc.set_g_used(desc.src_code + 1);
 		}
-		case 0x93: // ldxx1 local,local
+		if (!desc.dst_local)
 		{
-			const uint16_t imm1 = read_imm1(desc);
-			[[maybe_unused]] const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			break;
+			desc.set_g_modified(desc.dst_code);
+			desc.set_g_modified(desc.dst_code + 1);
 		}
-		case 0x94: // ldxx2 global,global
+		desc.set_znv_modified();
+		if (desc.dst_is_pc())
 		{
-			const uint16_t imm1 = read_imm1(desc);
-			const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		}
-		case 0x95: // ldxx2 global,local
-		{
-			const uint16_t imm1 = read_imm1(desc);
-			[[maybe_unused]] const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			if (gdst_code == PC_REGISTER)
-			{
-				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			}
-			break;
-		}
-		case 0x96: // ldxx2 local,global
-		{
-			const uint16_t imm1 = read_imm1(desc);
-			const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regout[0] |= 1 << gsrcf_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			break;
-		}
-		case 0x97: // ldxx2 local,local
-		{
-			const uint16_t imm1 = read_imm1(desc);
-			[[maybe_unused]] const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			break;
-		}
-		case 0x98: // stxx1 global,global
-		{
-			const uint16_t imm1 = read_imm1(desc);
-			const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		}
-		case 0x99: // stxx1 global,local
-		{
-			const uint16_t imm1 = read_imm1(desc);
-			[[maybe_unused]] const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		}
-		case 0x9a: // stxx1 local,global
-		{
-			const uint16_t imm1 = read_imm1(desc);
-			const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		}
-		case 0x9b: // stxx1 local,local
-		{
-			const uint16_t imm1 = read_imm1(desc);
-			[[maybe_unused]] const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		}
-		case 0x9c: // stxx2 global,global
-		{
-			const uint16_t imm1 = read_imm1(desc);
-			const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
-			desc.regout[0] |= 1 << gdst_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		}
-		case 0x9d: // stxx2 global,local
-		{
-			const uint16_t imm1 = read_imm1(desc);
-			[[maybe_unused]] const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		}
-		case 0x9e: // stxx2 local,global
-		{
-			const uint16_t imm1 = read_imm1(desc);
-			const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			if ((imm1 & 0x3000) == 0x3000 && (extra_s & 2)) desc.regin[0] |= 1 << gsrcf_code;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		}
-		case 0x9f: // stxx2 local,local
-		{
-			const uint16_t imm1 = read_imm1(desc);
-			[[maybe_unused]] const uint32_t extra_s = read_ldstxx_imm(desc);
-
-			desc.regin[0] |= SR_CODE;
-
-			desc.length = (imm1 & 0x8000) ? 6 : 4;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		}
-		case 0xa0: // shri global (lo n)
-		case 0xa1: // shri global (hi n)
-		case 0xa4: // sari global (lo n)
-		case 0xa5: // sari global (hi n)
-		case 0xa8: // shli global (lo n)
-		case 0xa9: // shli global (hi n)
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0xa2: // shri local (lo n)
-		case 0xa3: // shri local (hi n)
-		case 0xa6: // sari local (lo n)
-		case 0xa7: // sari local (hi n)
-		case 0xaa: // shli local (lo n)
-		case 0xab: // shli local (hi n)
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0xac: case 0xad: case 0xae: case 0xaf: // reserved
-			return false;
-		case 0xb0: // mulu global,global
-		case 0xb4: // muls global,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdstf_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0xb1: // mulu global,local
-		case 0xb5: // muls global,local
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdstf_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0xb2: // mulu local,global
-		case 0xb6: // muls local,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0xb3: // mulu local,local
-		case 0xb7: // muls local,local
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0xb8: // set global (lo n)
-		case 0xb9: // set global (hi n)
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gdst_code;
-			break;
-		case 0xba: // set local (lo n)
-		case 0xbb: // set local (hi n)
-			break;
-		case 0xbc: // mul global,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0xbd: // muls global,local
-			desc.regin[0] |= 1 << gdst_code;
-			desc.regout[0] |= 1 << gdst_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0xbe: // muls local,global
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0xbf: // mulu local,local
-			desc.regout[0] |= SR_CODE;
-			break;
-		case 0xc0: case 0xc1: case 0xc2: case 0xc3: // software
-		case 0xc4: case 0xc5: case 0xc6: case 0xc7: // software
-		case 0xc8: case 0xc9: case 0xca: case 0xcb: // software
-		case 0xcc: case 0xcd: // software
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-
 			desc.targetpc = BRANCH_TARGET_DYNAMIC;
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE | OPFLAG_CAN_CHANGE_MODES;
-			break;
-		case 0xce: // extend - 4 bytes
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= (3 << 14); // global regs 14, 15
-			desc.regout[0] |= (3 << 14); // global regs 14, 15
-			desc.length = 4;
-			break;
-		case 0xcf: // do
-			return false;
-		case 0xd0: // ldwr global
-		case 0xd4: // ldwp global
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gsrc_code;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			break;
-		case 0xd1: // ldwr local
-		case 0xd5: // ldwp local
-			desc.regin[0] |= SR_CODE;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			break;
-		case 0xd2: // lddr global
-		case 0xd6: // lddp global
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= 1 << gsrc_code;
-			desc.regout[0] |= 1 << gsrcf_code;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			break;
-		case 0xd3: // lddr local
-		case 0xd7: // lddp local
-			desc.regin[0] |= SR_CODE;
-			desc.flags |= OPFLAG_READS_MEMORY;
-			break;
-		case 0xd8: // stwr global
-		case 0xdc: // stwp global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		case 0xd9: // stwr local
-		case 0xdd: // stwp local
-			desc.regin[0] |= SR_CODE;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		case 0xda: // stdr global
-		case 0xde: // stdp global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.regin[0] |= 1 << gsrcf_code;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		case 0xdb: // stdr local
-		case 0xdf: // stdp local
-			desc.regin[0] |= SR_CODE;
-			desc.flags |= OPFLAG_WRITES_MEMORY;
-			break;
-		case 0xe0: case 0xe1: case 0xe2: case 0xe3: // dbv, dbnv, dbe, dbne - could be 4 bytes (pcrel)
-		case 0xe4: case 0xe5: case 0xe6: case 0xe7: // dbc, dbnc, dbse, dbht - could be 4 bytes (pcrel)
-		case 0xe8: case 0xe9: case 0xea: case 0xeb: // dbn, dbnn, dblt, dbgt - could be 4 bytes (pcrel)
-			desc.regin[0] |= SR_CODE;
-			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
-			desc.delayslots = 1;
-			desc.length = (op & 0x80) ? 4 : 2;
-			desc.targetpc = desc.physpc + desc.length + decode_pcrel(desc, op);
-			break;
-		case 0xec: // dbr
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			desc.delayslots = 1;
-			desc.length = (op & 0x80) ? 4 : 2;
-			desc.targetpc = desc.physpc + desc.length + decode_pcrel(desc, op);
-			break;
-		case 0xed: // frame
-			desc.regin[0] |= SR_CODE;
-			desc.regout[0] |= SR_CODE;
-			desc.flags |= OPFLAG_WRITES_MEMORY | OPFLAG_CAN_CAUSE_EXCEPTION;
-			break;
-		case 0xee: // call global
-			desc.regin[0] |= SR_CODE;
-			desc.regin[0] |= 1 << gsrc_code;
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			if (gsrc_code == PC_REGISTER)
-				desc.targetpc = desc.physpc + desc.length + (decode_call(desc) & ~uint32_t(1));
-			else if (gsrc_code == SR_REGISTER)
-				desc.targetpc = decode_call(desc) & ~uint32_t(1);
+			desc.set_g_used(SP_REGISTER);
+			desc.set_g_modified(SP_REGISTER);
+			desc.set_fp_modified();
+			desc.set_is_unconditional_branch();
+			desc.set_can_cause_exception();
+			desc.set_end_sequence();
+			desc.set_can_change_modes();
+			desc.set_reads_memory();
+		}
+		break;
+	case 0x08: // divu global,global
+	case 0x09: // divu global,local
+	case 0x0a: // divu local,global
+	case 0x0b: // divu local,local
+	case 0x0c: // divs global,global
+	case 0x0d: // divs global,local
+	case 0x0e: // divs local,global
+	case 0x0f: // divs local,local
+		decode_rr(desc);
+		desc.set_can_cause_exception();
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (!desc.src_local)
+			desc.set_g_used(desc.src_code);
+		if (!desc.dst_local)
+		{
+			desc.set_g_used(desc.dst_code);
+			desc.set_g_used(desc.dst_code + 1);
+			desc.set_g_modified(desc.dst_code);
+			desc.set_g_modified(desc.dst_code + 1);
+		}
+		desc.set_znv_modified();
+		break;
+	case 0x10: // xm global,global
+	case 0x11: // xm global,local
+	case 0x12: // xm local,global
+	case 0x13: // xm local,local
+		decode_rrlim(desc);
+		if (desc.imm != 0U)
+			desc.set_can_cause_exception();
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (!desc.src_local)
+			desc.set_g_used(desc.src_code);
+		if (!desc.dst_local)
+			desc.set_g_modified(desc.dst_code);
+		break;
+	case 0x14: // mask global,global
+	case 0x15: // mask global,local
+	case 0x16: // mask local,global
+	case 0x17: // mask local,local
+		decode_rrconst(desc);
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (!desc.src_local)
+			desc.set_g_used(desc.src_code);
+		if (!desc.dst_local)
+			desc.set_g_modified(desc.dst_code);
+		desc.set_z_modified();
+		if (desc.dst_is_pc())
+		{
+			if (!desc.src_is_pc())
+				desc.targetpc = BRANCH_TARGET_DYNAMIC;
 			else
+				desc.targetpc = (desc.pc + desc.length) & desc.imm;
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
+		}
+		break;
+	case 0x18: // sum global,global
+	case 0x19: // sum global,local
+	case 0x1a: // sum local,global
+	case 0x1b: // sum local,local
+	case 0x1c: // sums global,global
+	case 0x1d: // sums global,local
+	case 0x1e: // sums local,global
+	case 0x1f: // sums local,local
+		decode_rrconst(desc);
+		if ((op & 0x0400) && !desc.src_is_sr())
+			desc.set_can_cause_exception(); // sums
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (desc.src_is_sr())
+			desc.set_c_used();
+		else if (!desc.src_local)
+			desc.set_g_used(desc.src_code);
+		if (!desc.dst_local)
+			desc.set_g_modified(desc.dst_code);
+		if (op & 0x0400)
+			desc.set_znv_modified(); // sums
+		else
+			desc.set_cznv_modified(); // sum
+		if (desc.dst_is_pc())
+		{
+			if (!desc.src_is_pc())
 				desc.targetpc = BRANCH_TARGET_DYNAMIC;
-			break;
-		case 0xef: // call local
-			desc.regin[0] |= SR_CODE;
-			desc.targetpc = BRANCH_TARGET_DYNAMIC;
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			desc.length = (read_imm1(desc) & 0x8000) ? 6 : 4;
-			break;
-		case 0xf0: case 0xf1: case 0xf2: case 0xf3: // bv, bnv, be, bne
-		case 0xf4: case 0xf5: case 0xf6: case 0xf7: // bc, bnc, bse, bht
-		case 0xf8: case 0xf9: case 0xfa: case 0xfb: // bn, bnn, blt, bgt
-			desc.regin[0] |= SR_CODE;
-			desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH;
-			desc.length = (op & 0x80) ? 4 : 2;
-			desc.targetpc = desc.pc + desc.length + decode_pcrel(desc, op);
-			break;
-		case 0xfc: // br
-			desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE;
-			desc.length = (op & 0x80) ? 4 : 2;
-			desc.targetpc = desc.pc + desc.length + decode_pcrel(desc, op);
-			break;
-		case 0xfd: case 0xfe: case 0xff: // trap
-			desc.regin[0] |= SR_CODE;
-			desc.targetpc = BRANCH_TARGET_DYNAMIC;
-			if ((((op & 0x300) >> 6) | (op & 0x03)) == 15)
-				desc.flags |= OPFLAG_IS_UNCONDITIONAL_BRANCH | OPFLAG_END_SEQUENCE | OPFLAG_CAN_CAUSE_EXCEPTION;
 			else
-				desc.flags |= OPFLAG_IS_CONDITIONAL_BRANCH | OPFLAG_CAN_CAUSE_EXCEPTION;
+				desc.targetpc = ((desc.pc + desc.length) + desc.imm) & ~uint32_t(1);
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
+		}
+		break;
+	case 0x20: // cmp global,global
+	case 0x21: // cmp global,local
+	case 0x22: // cmp local,global
+	case 0x30: // cmpb global,global
+	case 0x31: // cmpb global,local
+	case 0x32: // cmpb local,global
+		decode_rr(desc);
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (!(op & 0x1000) && desc.src_is_sr())
+			desc.set_c_used();
+		else if (!desc.src_local)
+			desc.set_g_used(desc.src_code);
+		if (!desc.dst_local)
+			desc.set_g_used(desc.dst_code);
+		if (op & 0x1000)
+			desc.set_z_modified(); // cmpb
+		else
+			desc.set_cznv_modified(); // cmp
+		break;
+	case 0x24: // mov global,global
+	case 0x25: // mov global,local
+	case 0x26: // mov local,global
+	case 0x27: // mov local,local
+		decode_rr(desc);
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (!desc.dst_local || !desc.src_local)
+			desc.regin.set(SR_REGISTER); // only the H bit is used
+		if (!desc.src_local)
+		{
+			desc.set_g_used(desc.src_code);
+			desc.set_g_used(desc.src_code + 16);
+		}
+		if (!desc.dst_local)
+		{
+			desc.set_can_cause_exception();
+			desc.set_g_modified(desc.dst_code);
+			desc.set_g_modified(desc.dst_code + 16);
+			if (desc.dst_code == PC_REGISTER)
+			{
+				if (!desc.src_is_pc())
+					desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				else
+					desc.targetpc = desc.pc + desc.length;
+				desc.set_is_conditional_branch(); // technically it won't branch if H is clear
+				desc.set_end_sequence();
+			}
+			else if (desc.dst_code == 5) // TPR_REGISTER & 0xf
+			{
+				desc.set_end_sequence();
+			}
+		}
+		desc.set_znv_modified();
+		break;
+	case 0x28: // add global,global
+	case 0x29: // add global,local
+	case 0x2a: // add local,global
+	case 0x2b: // add local,local
+	case 0x2c: // adds global,global
+	case 0x2d: // adds global,local
+	case 0x2e: // adds local,global
+	case 0x2f: // adds local,local
+	case 0x48: // sub global,global
+	case 0x49: // sub global,local
+	case 0x4a: // sub local,global
+	case 0x4b: // sub local,local
+	case 0x4c: // subs global,global
+	case 0x4d: // subs global,local
+	case 0x4e: // subs local,global
+	case 0x4f: // subs local,local
+		decode_rr(desc);
+		if (op & 0x0400)
+			desc.set_can_cause_exception(); // adds, subs
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (desc.src_is_sr())
+			desc.set_c_used();
+		else if (!desc.src_local)
+			desc.set_g_used(desc.src_code);
+		if (!desc.dst_local)
+		{
+			desc.set_g_used(desc.dst_code);
+			desc.set_g_modified(desc.dst_code);
+			if (desc.dst_code == PC_REGISTER)
+			{
+				if (!desc.src_is_pc())
+					desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				else if ((op & 0xf800) == 0x2800)
+					desc.targetpc = (desc.pc + desc.length) << 1; // add, adds
+				else
+					desc.targetpc = 0; // sub, subs
+				desc.set_is_unconditional_branch();
+				desc.set_end_sequence();
+			}
+		}
+		if (op & 0x0400)
+			desc.set_znv_modified(); // adds, subs
+		else
+			desc.set_cznv_modified(); // add, sub
+		break;
+	case 0x34: // andn global,global
+	case 0x35: // andn global,local
+	case 0x36: // andn local,global
+	case 0x37: // andn local,local
+	case 0x38: // or global,global
+	case 0x39: // or global,local
+	case 0x3a: // or local,global
+	case 0x3b: // or local,local
+	case 0x3c: // xor global,global
+	case 0x3d: // xor global,local
+	case 0x3e: // xor local,global
+	case 0x3f: // xor local,local
+	case 0x54: // and global,global
+	case 0x55: // and global,local
+	case 0x56: // and local,global
+	case 0x57: // and local,local
+		decode_rr(desc);
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (!desc.src_local)
+			desc.set_g_used(desc.src_code);
+		if (!desc.dst_local)
+		{
+			desc.set_g_used(desc.dst_code);
+			desc.set_g_modified(desc.dst_code);
+			if (desc.dst_code == PC_REGISTER)
+			{
+				if (!desc.src_is_pc())
+					desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				else if ((op & 0xf400) == 0x3400)
+					desc.targetpc = 0; // andn, xor
+				else
+					desc.targetpc = desc.pc + desc.length; // or, and
+				desc.set_is_unconditional_branch();
+				desc.set_end_sequence();
+			}
+		}
+		desc.set_z_modified();
+		break;
+	case 0x40: // subc global,global
+	case 0x41: // subc global,local
+	case 0x42: // subc local,global
+	case 0x43: // subc local,local
+	case 0x50: // addc global,global
+	case 0x51: // addc global,local
+	case 0x52: // addc local,global
+	case 0x53: // addc local,local
+		decode_rr(desc);
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		desc.set_cz_used();
+		if (!desc.src_local && !desc.src_is_sr())
+			desc.set_g_used(desc.src_code);
+		if (!desc.dst_local)
+		{
+			desc.set_g_used(desc.dst_code);
+			desc.set_g_modified(desc.dst_code);
+			if (desc.dst_code == PC_REGISTER)
+			{
+				if (!desc.src_is_sr() || ((op & 0xfc00) == 0x4000))
+					desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				else
+					desc.targetpc = desc.pc + desc.length;
+				desc.set_is_unconditional_branch();
+				desc.set_end_sequence();
+			}
+		}
+		desc.set_cznv_modified();
+		break;
+	case 0x44: // not global,global
+	case 0x45: // not global,local
+	case 0x46: // not local,global
+	case 0x47: // not local,local
+	case 0x58: // neg global,global
+	case 0x59: // neg global,local
+	case 0x5a: // neg local,global
+	case 0x5b: // neg local,local
+	case 0x5c: // negs global,global
+	case 0x5d: // negs global,local
+	case 0x5e: // negs local,global
+	case 0x5f: // negs local,local
+		decode_rr(desc);
+		if (((op & 0xfc00) == 0x5c00) && !desc.src_is_sr())
+			desc.set_can_cause_exception(); // negs
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (((op & 0xf800) == 0x5800) & desc.src_is_sr())
+			desc.set_c_used();
+		else if (!desc.src_local)
+			desc.set_g_used(desc.src_code);
+		if (!desc.dst_local)
+		{
+			desc.set_g_modified(desc.dst_code);
+			if (desc.dst_code == PC_REGISTER)
+			{
+				if (!desc.src_is_pc())
+					desc.targetpc = BRANCH_TARGET_DYNAMIC;
+				else if ((op & 0xfc00) == 0x4400)
+					desc.targetpc = ~(desc.pc + desc.length) & ~uint32_t(1); // not
+				else
+					desc.targetpc = uint32_t(-int32_t(desc.pc + desc.length)) & ~uint32_t(1); // neg, negs
+				desc.set_is_unconditional_branch();
+				desc.set_end_sequence();
+			}
+		}
+		if (!(op & 0x1000))
+			desc.set_z_modified(); // not
+		else if (!(op & 0x0400))
+			desc.set_cznv_modified(); // neg
+		else
+			desc.set_znv_modified(); // negs
+		break;
+	case 0x60: // cmpi global,imm
+	case 0x61: // cmpi global,imm
+	case 0x62: // cmpi local,imm
+	case 0x63: // cmpi local,imm
+	case 0x70: // cmpbi global,imm
+	case 0x71: // cmpbi global,imm
+	case 0x72: // cmpbi local,imm
+	case 0x73: // cmpbi local,imm
+		decode_rimm(desc, op & 0x1000);
+		if (desc.dst_local)
+			desc.set_fp_used();
+		else
+			desc.set_g_used(desc.dst_code);
+		if (op & 0x1000)
+			desc.set_z_modified(); // cmpbi
+		else
+			desc.set_cznv_modified(); // cmpi
+		break;
+	case 0x64: // movi global,imm
+	case 0x65: // movi global,imm
+		decode_rimm(desc, false);
+		desc.set_can_cause_exception();
+		desc.regin.set(SR_REGISTER); // only the H bit is used
+		desc.set_g_modified(desc.dst_code);
+		desc.set_g_modified(desc.dst_code + 16);
+		if (desc.dst_code == PC_REGISTER)
+		{
+			desc.targetpc = desc.imm & ~uint32_t(1);
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
+		}
+		else if (desc.dst_code == 5) // TPR_REGISTER & 0xf
+		{
+			desc.set_end_sequence();
+		}
+		break;
+	case 0x66: // movi local,imm
+	case 0x67: // movi local,imm
+		decode_rimm(desc, false);
+		desc.set_fp_used();
+		desc.set_znv_modified();
+		break;
+	case 0x68: // addi global,imm
+	case 0x69: // addi global,imm
+	case 0x6a: // addi local,imm
+	case 0x6b: // addi local,imm
+	case 0x6c: // addsi global,imm
+	case 0x6d: // addsi global,imm
+	case 0x6e: // addsi local,imm
+	case 0x6f: // addsi local,imm
+		decode_rimm(desc, false);
+		if (op & 0x0400)
+			desc.set_can_cause_exception(); // addsi
+		if (desc.dst_local)
+			desc.set_fp_used();
+		if (!(op & 0x010f))
+			desc.set_cz_used();
+		if (!desc.dst_local)
+		{
+			desc.set_g_used(desc.dst_code);
+			desc.set_g_modified(desc.dst_code);
+			if (desc.dst_code == PC_REGISTER)
+			{
+				desc.targetpc = (desc.pc + desc.length + desc.imm) & ~uint32_t(1);
+				desc.set_is_unconditional_branch();
+				desc.set_end_sequence();
+			}
+		}
+		if (op & 0x0400)
+			desc.set_znv_modified(); // addsi
+		else
+			desc.set_cznv_modified(); // addi
+		break;
+	case 0x74: // andni global,imm
+	case 0x75: // andni global,imm
+	case 0x78: // ori global,imm
+	case 0x79: // ori global,imm
+	case 0x7c: // xori global,imm
+	case 0x7d: // xori global,imm
+		decode_rimm(desc, !(op & 0x0800));
+		desc.set_g_used(desc.dst_code);
+		desc.set_g_modified(desc.dst_code);
+		if (desc.dst_code == PC_REGISTER)
+		{
+			if (!(op & 0x0800))
+				desc.targetpc = (desc.pc + desc.length) & ~desc.imm; // andni
+			else if (!(op & 0x0400))
+				desc.targetpc = ((desc.pc + desc.length) | desc.imm) & ~uint32_t(1); // ori
+			else
+				desc.targetpc = ((desc.pc + desc.length) ^ desc.imm) & ~uint32_t(1); // xori
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
+		}
+		desc.set_z_modified();
+		break;
+	case 0x76: // andni local,imm
+	case 0x77: // andni local,imm
+	case 0x7a: // ori local,imm
+	case 0x7b: // ori local,imm
+	case 0x7e: // xori local,imm
+	case 0x7f: // xori local,imm
+		decode_rimm(desc, !(op & 0x0800));
+		desc.set_fp_used();
+		desc.set_z_modified();
+		break;
+	case 0x80: case 0x81: // shrdi
+	case 0x84: case 0x85: // sardi
+	case 0x88: case 0x89: // shldi
+		decode_ln(desc);
+		desc.set_fp_used();
+		if (op & 0x0800)
+			desc.set_cznv_modified(); // shldi
+		else
+			desc.set_czn_modified(); // shrdi, sardi
+		break;
+	case 0x82: // shrd
+	case 0x83: // shr
+	case 0x86: // sard
+	case 0x87: // sar
+	case 0x8a: // shld
+	case 0x8b: // shl
+	case 0x8f: // rol
+		decode_ll(desc);
+		desc.set_fp_used();
+		if (op & 0x0800)
+			desc.set_cznv_modified(); // shld, shl, rol
+		else
+			desc.set_czn_modified(); // shrd, shr, sard, sar
+		break;
+	case 0x8c: case 0x8d: // reserved
+		return false;
+	case 0x8e: // testlz
+		decode_ll(desc);
+		desc.set_fp_used();
+		break;
+	case 0x90: // ldxx.d/a global,global
+	case 0x91: // ldxx.d/a global,local
+	case 0x92: // ldxx.d/a local,global
+	case 0x93: // ldxx.d/a local,local
+	case 0x94: // ldxx.n/s global,global
+	case 0x95: // ldxx.n/s global,local
+	case 0x96: // ldxx.n/s local,global
+	case 0x97: // ldxx.n/s local,local
+		decode_rrdis(desc);
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (!desc.dst_local && !desc.dst_is_sr())
+			desc.set_g_used(desc.dst_code);
+		if ((op & 0x0400) && !desc.dst_local)
+			desc.set_g_modified(desc.dst_code);
+		if (!desc.src_local)
+		{
+			desc.set_g_modified(desc.src_code);
+			if ((desc.opptr[1] & 0x3000) == 0x3000)
+			{
+				if ((desc.imm & ((op & 0x0400) ? 0x3 : 0x1)) == 0x1)
+					desc.set_g_modified(desc.src_code + 1);
+			}
+		}
+		desc.set_reads_memory();
+		break;
+	case 0x98: // stxx.d/a global,global
+	case 0x99: // stxx.d/a global,local
+	case 0x9a: // stxx.d/a local,global
+	case 0x9b: // stxx.d/a local,local
+	case 0x9c: // stxx.n/s global,global
+	case 0x9d: // stxx.n/s global,local
+	case 0x9e: // stxx.n/s local,global
+	case 0x9f: // stxx.n/s local,local
+		decode_rrdis(desc);
+		if (((desc.opptr[1] & 0x3000) == 0x0000) || (((desc.opptr[1] & 0x3000) == 0x0000) && (desc.imm & 0x1)))
+			desc.set_can_cause_exception();
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (!desc.dst_local && !desc.dst_is_sr())
+			desc.set_g_used(desc.dst_code);
+		if (!desc.src_local)
+		{
+			desc.set_g_used(desc.src_code);
+			if ((desc.opptr[1] & 0x3000) == 0x3000)
+			{
+				if ((desc.imm & ((op & 0x0400) ? 0x3 : 0x1)) == 0x1)
+					desc.set_g_used(desc.src_code + 1);
+			}
+		}
+		if ((op & 0x0400) && !desc.dst_local)
+			desc.set_g_modified(desc.dst_code);
+		desc.set_writes_memory();
+		break;
+	case 0xa0: // shri global
+	case 0xa1: // shri global
+	case 0xa2: // shri local
+	case 0xa3: // shri local
+	case 0xa4: // sari global
+	case 0xa5: // sari global
+	case 0xa6: // sari local
+	case 0xa7: // sari local
+	case 0xa8: // shli global
+	case 0xa9: // shli global
+	case 0xaa: // shli local
+	case 0xab: // shli local
+		decode_rn(desc);
+		if (desc.dst_local)
+			desc.set_fp_used();
+		if (!desc.dst_local)
+		{
+			desc.set_g_used(desc.dst_code);
+			desc.set_g_modified(desc.dst_code);
+		}
+		if (op & 0x0800)
+			desc.set_cznv_modified(); // shli
+		else
+			desc.set_czn_modified(); // shri, sari
+		break;
+	case 0xac: case 0xad: case 0xae: case 0xaf: // reserved
+		return false;
+	case 0xb0: // mulu global,global
+	case 0xb1: // mulu global,local
+	case 0xb2: // mulu local,global
+	case 0xb3: // mulu local,local
+	case 0xb4: // muls global,global
+	case 0xb5: // muls global,local
+	case 0xb6: // muls local,global
+	case 0xb7: // muls local,local
+	case 0xbc: // mul global,global
+	case 0xbd: // mul global,local
+	case 0xbe: // mul local,global
+	case 0xbf: // mul local,local
+		decode_rr(desc);
+		if (desc.dst_local || desc.src_local)
+			desc.set_fp_used();
+		if (!desc.src_local)
+			desc.set_g_used(desc.src_code);
+		if (!desc.dst_local)
+		{
+			desc.set_g_used(desc.dst_code);
+			desc.set_g_modified(desc.dst_code);
+			if (!(op & 0x0800))
+				desc.set_g_modified(desc.dst_code + 1); // mulu, muls
+		}
+		desc.set_cznv_modified();
+		break;
+	case 0xb8: // set global
+	case 0xb9: // set global
+	case 0xba: // set local
+	case 0xbb: // set local
+		decode_rn(desc);
+		if (desc.dst_local)
+			desc.set_fp_used();
+		switch (desc.imm)
+		{
+		case 4: case 5: case 20: case 21: // le, gt, lem, gtm
+			desc.set_z_used();
+			desc.set_n_used();
 			break;
+		case 6: case 7: case 22: case 23: // lt/n, ge/nn, ltm/nm, gem/nnm
+			desc.set_n_used();
+			break;
+		case 8: case 9: case 24: case 25: // se, ht, sem, htm
+			desc.set_cz_used();
+			break;
+		case 10: case 11: case 26: case 27: // st/c, he/nc, stm/cm, hem/ncm
+			desc.set_c_used();
+			break;
+		case 12: case 13: case 28: case 29: // e/z, ne/nz, em/zm, nem/nzm
+			desc.set_z_used();
+			break;
+		case 14: case 15: case 30: case 31: // v, nv, vm, nvm
+			desc.set_v_used();
+			break;
+		}
+		if (!desc.dst_local)
+			desc.set_g_modified(desc.dst_code);
+		break;
+	case 0xc0: case 0xc1: case 0xc2: case 0xc3: // software
+	case 0xc4: case 0xc5: case 0xc6: case 0xc7: // software
+	case 0xc8: case 0xc9: case 0xca: case 0xcb: // software
+	case 0xcc: case 0xcd: // software
+	case 0xcf: // do
+		decode_ll(desc);
+		desc.set_fp_used();
+		desc.set_g_used(PC_REGISTER);
+		desc.set_g_used(SR_REGISTER);
+		desc.targetpc = BRANCH_TARGET_DYNAMIC;
+		desc.set_is_unconditional_branch();
+		desc.set_end_sequence();
+		desc.set_can_change_modes();
+		break;
+	case 0xce: // extend
+		decode_llext(desc);
+		desc.set_fp_used();
+		desc.set_g_used(14);
+		desc.set_g_used(15);
+		desc.set_g_modified(14);
+		desc.set_g_modified(15);
+		break;
+	case 0xd0: // ldwr global
+	case 0xd1: // ldwr local
+	case 0xd2: // lddr global
+	case 0xd3: // lddr local
+	case 0xd4: // ldwp global
+	case 0xd5: // ldwp local
+	case 0xd6: // lddp global
+	case 0xd7: // lddp local
+		decode_lr(desc);
+		desc.set_fp_used();
+		if (!desc.src_local)
+		{
+			desc.set_g_modified(desc.src_code);
+			if (op & 0x0200)
+				desc.set_g_modified(desc.src_code + 1);
+		}
+		desc.set_reads_memory();
+		break;
+	case 0xd8: // stwr global
+	case 0xd9: // stwr local
+	case 0xda: // stdr global
+	case 0xdb: // stdr local
+	case 0xdc: // stwp global
+	case 0xdd: // stwp local
+	case 0xde: // stdp global
+	case 0xdf: // stdp local
+		decode_lr(desc);
+		desc.set_fp_used();
+		if (!desc.src_local)
+		{
+			desc.set_g_used(desc.src_code);
+			if (op & 0x0200)
+				desc.set_g_used(desc.src_code + 1);
+		}
+		desc.set_writes_memory();
+		break;
+	case 0xe0: case 0xe1: case 0xe2: case 0xe3: // dbv, dbnv, dbe, dbne
+	case 0xe4: case 0xe5: case 0xe6: case 0xe7: // dbc, dbnc, dbse, dbht
+	case 0xe8: case 0xe9: case 0xea: case 0xeb: // dbn, dbnn, dble, dbgt
+	case 0xec: // dbr
+	case 0xf0: case 0xf1: case 0xf2: case 0xf3: // bv, bnv, be, bne
+	case 0xf4: case 0xf5: case 0xf6: case 0xf7: // bc, bnc, bse, bht
+	case 0xf8: case 0xf9: case 0xfa: case 0xfb: // bn, bnn, ble, bgt
+	case 0xfc: // br
+		decode_pcrel(desc);
+		switch (op & 0x0f00)
+		{
+		case 0x0000: case 0x0100: // bv, bnv
+			desc.set_v_used();
+			break;
+		case 0x0200: case 0x0300: // be/bz, bne/bnz
+			desc.set_z_used();
+			break;
+		case 0x0400: case 0x0500: // bst/bc, bhe/bnc
+			desc.set_c_used();
+			break;
+		case 0x0600: case 0x0700: // bse, bht
+			desc.set_cz_used();
+			break;
+		case 0x0800: case 0x0900: // blt/bn, bge/bnn
+			desc.set_n_used();
+			break;
+		case 0x0a00: case 0x0b00: // ble, bgt
+			desc.set_z_used();
+			desc.set_n_used();
+			break;
+		case 0x0c00: // br
+			desc.set_is_unconditional_branch();
+			desc.set_end_sequence();
+			break;
+		}
+		if ((op & 0x0f00) != 0x0c00)
+			desc.set_is_conditional_branch();
+		desc.delayslots = (op & 0x1000) ? 0 : 1;
+		desc.targetpc = desc.pc + desc.length + desc.imm;
+		break;
+	case 0xed: // frame
+		desc.set_can_cause_exception();
+		desc.set_fp_used();
+		desc.regin.set(SR_REGISTER); // uses FL
+		desc.set_g_used(SP_REGISTER);
+		desc.set_g_used(UB_REGISTER);
+		desc.set_g_modified(SP_REGISTER);
+		desc.set_fp_modified();
+		desc.set_writes_memory();
+		break;
+	case 0xee: // call global
+	case 0xef: // call local
+		decode_lrconst(desc);
+		if (!desc.src_local && !desc.src_is_sr())
+			desc.set_g_used(desc.src_code);
+		desc.set_g_used(PC_REGISTER);
+		desc.set_g_used(SR_REGISTER);
+		if (desc.src_is_pc())
+			desc.targetpc = (desc.pc + desc.length + desc.imm) & ~uint32_t(1);
+		else if (desc.src_is_sr())
+			desc.targetpc = desc.imm & ~uint32_t(1);
+		else
+			desc.targetpc = BRANCH_TARGET_DYNAMIC;
+		desc.set_is_unconditional_branch();
+		desc.set_end_sequence();
+		break;
+	case 0xfd: case 0xfe: case 0xff: // trap
+		switch (bitswap<4>(op, 9, 8, 1, 0))
+		{
+		case 4: case 5: // traple, trapgt
+			desc.set_z_used();
+			desc.set_n_used();
+			break;
+		case 6: case 7: // traplt, trapge
+			desc.set_n_used();
+			break;
+		case 8: case 9: // trapse, trapht
+			desc.set_cz_used();
+			break;
+		case 10: case 11: // trapst, traphe
+			desc.set_c_used();
+			break;
+		case 12: case 13: // trape, trapne
+			desc.set_z_used();
+			break;
+		case 14: // trapv
+			desc.set_z_used();
+			break;
+		case 15: // trap
+			desc.set_will_cause_exception();
+			desc.set_end_sequence();
+			break;
+		}
+		if (bitswap<4>(op, 9, 8, 1, 0) != 15)
+			desc.set_can_cause_exception();
+		break;
 	}
 	return true;
 }

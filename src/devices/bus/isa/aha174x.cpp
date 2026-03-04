@@ -72,17 +72,12 @@ void aha174x_device::hpc_map(address_map &map)
 {
 	map(0x2000, 0x2003).rw(m_busaic, FUNC(aic565_device::local_r), FUNC(aic565_device::local_w));
 	map(0x4000, 0x4002).rw("bmic", FUNC(i82355_device::local_r), FUNC(i82355_device::local_w));
-	map(0x5000, 0x500f).m("scsi:7:scsic", FUNC(aic6251a_device::map));
+	map(0x5000, 0x500f).m("scsic", FUNC(aic6251a_device::map));
 	map(0x7000, 0x7000).w(m_fifo[0], FUNC(fifo7200_device::data_byte_w));
 	map(0x7001, 0x7001).w(m_fifo[1], FUNC(fifo7200_device::data_byte_w));
 	map(0x7002, 0x7002).r(m_fifo[0], FUNC(fifo7200_device::data_byte_r));
 	map(0x7003, 0x7003).r(m_fifo[1], FUNC(fifo7200_device::data_byte_r));
 	map(0x8000, 0xffff).rom().region("mcode", 0);
-}
-
-void aha174x_device::scsic_config(device_t *device)
-{
-	device->set_clock(40_MHz_XTAL / 2); // divider not verified
 }
 
 void aha1740_device::device_add_mconfig(machine_config &config)
@@ -100,7 +95,7 @@ void aha1740_device::device_add_mconfig(machine_config &config)
 	IDT7201(config, m_fifo[0]);
 	IDT7201(config, m_fifo[1]);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -108,8 +103,9 @@ void aha1740_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", AIC6251A)
-		.machine_config([this] (device_t *device) { scsic_config(device); });
+
+	auto &scsic(AIC6251A(config, "scsic", 40_MHz_XTAL / 2)); // divider not verified
+	scsi.set_external_device(7, scsic);
 }
 
 void aha1742a_device::device_add_mconfig(machine_config &config)
@@ -127,7 +123,7 @@ void aha1742a_device::device_add_mconfig(machine_config &config)
 	IDT7201(config, m_fifo[0]);
 	IDT7201(config, m_fifo[1]);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -135,8 +131,9 @@ void aha1742a_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", AIC6251A)
-		.machine_config([this] (device_t *device) { scsic_config(device); });
+
+	auto &scsic(AIC6251A(config, "scsic", 40_MHz_XTAL / 2)); // divider not verified
+	scsi.set_external_device(7, scsic);
 
 	N82077AA(config, m_fdc, 24_MHz_XTAL);
 }

@@ -67,7 +67,7 @@ public:
 		, m_vram(*this, "vram", 0x10000, ENDIANNESS_LITTLE)
 		, m_vram_bank(*this, "vram_bank")
 		, m_palette(*this, "palette")
-		, m_ncr5380(*this, "scsi:7:ncr5380")
+		, m_ncr5380(*this, "ncr5380")
 		, m_serial_c(*this, "serial_c")
 	{
 	}
@@ -316,7 +316,7 @@ void triplex_state::triplex(machine_config &config)
 	lance.dma_in().set([this](offs_t offset) { return m_maincpu->space(AS_PROGRAM).read_word(offset); });
 	lance.dma_out().set([this](offs_t offset, u16 data, u16 mem_mask) { m_maincpu->space(AS_PROGRAM).write_word(offset, data, mem_mask); });
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk"); // OMTI 5200 (with floppy controller)
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -324,10 +324,11 @@ void triplex_state::triplex(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device) {
-		downcast<ncr5380_device&>(*device).irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
-		downcast<ncr5380_device&>(*device).drq_handler().set(":dmac", FUNC(hd63450_device::drq0_w));
-	});
+
+	NCR5380(config, m_ncr5380);
+	scsi.set_external_device(7, m_ncr5380);
+	m_ncr5380->irq_handler().set_inputline(m_maincpu, M68K_IRQ_4);
+	m_ncr5380->drq_handler().set(":dmac", FUNC(hd63450_device::drq0_w));
 
 	scc8530_device &scc(SCC8530(config, "scc", 4.9152_MHz_XTAL));
 	scc.out_int_callback().set_inputline(m_maincpu, M68K_IRQ_5);

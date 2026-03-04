@@ -250,8 +250,8 @@ namespace
 }
 
 spifi3_device::spifi3_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock) :
-	nscsi_device(mconfig, SPIFI3, tag, owner, clock),
-	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
+	device_t(mconfig, SPIFI3, tag, owner, clock),
+	nscsi_device_interface(mconfig, *this),
 	m_even_fifo(),
 	m_odd_fifo(),
 	m_irq_handler(*this),
@@ -261,8 +261,6 @@ spifi3_device::spifi3_device(machine_config const &mconfig, char const *tag, dev
 
 void spifi3_device::device_start()
 {
-	nscsi_device::device_start();
-
 	save_item(NAME(dma_dir));
 	save_item(NAME(mode));
 	save_item(NAME(xfr_data_source));
@@ -444,7 +442,7 @@ void spifi3_device::imask_w(uint32_t data)
 
 uint32_t spifi3_device::prstat_r()
 {
-	auto ctrl = scsi_bus->ctrl_r();
+	auto ctrl = m_scsi_bus->ctrl_r();
 
 	// TODO: PRS_Z (disconnect state?)
 	uint32_t prstat = 0;
@@ -460,7 +458,7 @@ uint32_t spifi3_device::prstat_r()
 uint32_t spifi3_device::init_status_r()
 {
 	// NetBSD only lists this bit, but there is probably more in this register.
-	const auto init_status = (scsi_bus->ctrl_r() & S_ACK) > 0 ? INIT_STATUS_ACK : 0x0;
+	const auto init_status = (m_scsi_bus->ctrl_r() & S_ACK) > 0 ? INIT_STATUS_ACK : 0x0;
 	LOGMASKED(LOG_REGISTER, "read spifi_reg.init_status = 0x%x\n", init_status);
 	return init_status;
 }
@@ -603,7 +601,7 @@ void spifi3_device::auxctrl_w(uint32_t data)
 	{
 		LOG("SETRST asserted - resetting SCSI bus\n");
 		state = BUSRESET_WAIT_INT;
-		scsi_bus->ctrl_w(scsi_refid, S_RST, S_RST);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_RST, S_RST);
 		delay(130);
 	}
 	if (spifi_reg.auxctrl & AUXCTRL_DMAEDGE)
@@ -701,7 +699,7 @@ void spifi3_device::prcmd_w(uint32_t data)
 		case PRC_DATAOUT:
 		{
 			state = INIT_XFR;
-			xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+			xfr_phase = m_scsi_bus->ctrl_r() & S_PHASE_MASK;
 
 			const dma_direction luntar_dma_setting = dma_setting(bus_id) == DMA_OUT ? DMA_OUT : DMA_NONE;
 			dma_set(luntar_dma_setting);
@@ -712,7 +710,7 @@ void spifi3_device::prcmd_w(uint32_t data)
 		case PRC_DATAIN:
 		{
 			state = INIT_XFR;
-			xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+			xfr_phase = m_scsi_bus->ctrl_r() & S_PHASE_MASK;
 
 			const dma_direction luntar_dma_setting = dma_setting(bus_id) == DMA_IN ? DMA_IN : DMA_NONE;
 			dma_set(luntar_dma_setting);
@@ -727,7 +725,7 @@ void spifi3_device::prcmd_w(uint32_t data)
 		{
 			LOGMASKED(LOG_CMD, "start command %s\n", prcmd_command_names[cmd]);
 			state = INIT_XFR;
-			xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+			xfr_phase = m_scsi_bus->ctrl_r() & S_PHASE_MASK;
 
 			command_pos = 0;
 			dma_set(DMA_NONE);
@@ -737,7 +735,7 @@ void spifi3_device::prcmd_w(uint32_t data)
 		case PRC_TRPAD:
 		{
 			LOGMASKED(LOG_CMD, "start command TRPAD\n");
-			xfr_phase = scsi_bus->ctrl_r() & S_PHASE_MASK;
+			xfr_phase = m_scsi_bus->ctrl_r() & S_PHASE_MASK;
 			if (xfr_phase & S_INP)
 			{
 				state = INIT_XFR_RECV_PAD_WAIT_REQ;
@@ -746,7 +744,7 @@ void spifi3_device::prcmd_w(uint32_t data)
 			{
 				state = INIT_XFR_SEND_PAD_WAIT_REQ;
 			}
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 			break;
 		}
 		default:
@@ -885,7 +883,7 @@ bool spifi3_device::transfer_count_zero()
 
 void spifi3_device::reset_disconnect()
 {
-	scsi_bus->ctrl_w(scsi_refid, 0, ~S_RST);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, ~S_RST);
 
 	command_pos = 0;
 	mode = MODE_D;
@@ -902,29 +900,29 @@ void spifi3_device::send_byte(scsi_data_target data_source)
 		{
 			fatalerror("%s: Tried to send command past the end of cdb! Command_pos: %d", tag(), command_pos);
 		}
-		LOGMASKED(LOG_CMD, "Sending byte from cmbuf[%d].cdb[%d] = 0x%x\n", scsi_id, command_pos, spifi_reg.cmbuf[scsi_id].cdb[command_pos]);
-		scsi_bus->data_w(scsi_refid, spifi_reg.cmbuf[scsi_id].cdb[command_pos++]);
+		LOGMASKED(LOG_CMD, "Sending byte from cmbuf[%d].cdb[%d] = 0x%x\n", m_scsi_id, command_pos, spifi_reg.cmbuf[m_scsi_id].cdb[command_pos]);
+		m_scsi_bus->data_w(m_scsi_refid, spifi_reg.cmbuf[m_scsi_id].cdb[command_pos++]);
 	}
 	else if (data_source == FIFO && (state & STATE_MASK) != INIT_XFR_SEND_PAD)
 	{
 		// Send next data from FIFO
-		scsi_bus->data_w(scsi_refid, m_even_fifo.pop());
+		m_scsi_bus->data_w(m_scsi_refid, m_even_fifo.pop());
 		check_drq();
 	}
 	else
 	{
-		scsi_bus->data_w(scsi_refid, 0);
+		m_scsi_bus->data_w(m_scsi_refid, 0);
 	}
 
-	scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
-	scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+	m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 	delay_cycles(sync_period);
 }
 
 void spifi3_device::recv_byte()
 {
 	// Wait for valid input
-	scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 	state = (state & STATE_MASK) | (RECV_WAIT_REQ_1 << SUB_SHIFT);
 	step(false);
 }
@@ -1014,8 +1012,8 @@ void spifi3_device::delay_cycles(uint32_t cycles)
 void spifi3_device::arbitrate()
 {
 	state = (state & STATE_MASK) | (ARB_COMPLETE << SUB_SHIFT);
-	scsi_bus->data_w(scsi_refid, 1 << scsi_id);
-	scsi_bus->ctrl_w(scsi_refid, S_BSY, S_BSY);
+	m_scsi_bus->data_w(m_scsi_refid, 1 << m_scsi_id);
+	m_scsi_bus->ctrl_w(m_scsi_refid, S_BSY, S_BSY);
 	delay(11);
 }
 
@@ -1039,7 +1037,7 @@ uint8_t spifi3_device::dma_r()
 
 void spifi3_device::scsi_ctrl_changed()
 {
-	uint32_t ctrl = scsi_bus->ctrl_r();
+	uint32_t ctrl = m_scsi_bus->ctrl_r();
 	if (ctrl & S_RST)
 	{
 		LOG("scsi bus reset\n");
@@ -1125,7 +1123,7 @@ void spifi3_device::start_automsg(uint32_t msg_phase)
 void spifi3_device::start_autocmd()
 {
 	LOGMASKED(LOG_AUTO, "start AUTOCMD\n");
-	scsi_bus->ctrl_w(scsi_refid, 0, S_ACK); // Deassert ACK since we are automatically moving to the command phase
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK); // Deassert ACK since we are automatically moving to the command phase
 	state = INIT_XFR;
 	xfr_phase = S_PHASE_COMMAND;
 	spifi_reg.spstat = SPS_COMMAND;
@@ -1179,8 +1177,8 @@ void spifi3_device::auto_phase_transfer(uint32_t new_phase)
 
 void spifi3_device::step(bool timeout)
 {
-	uint32_t ctrl = scsi_bus->ctrl_r();
-	uint32_t data = scsi_bus->data_r();
+	uint32_t ctrl = m_scsi_bus->ctrl_r();
+	uint32_t data = m_scsi_bus->data_r();
 
 	LOGMASKED(LOG_STATE, "state=%d.%d %s\n", state & STATE_MASK, (state & SUB_MASK) >> SUB_SHIFT, timeout ? "timeout" : "change");
 
@@ -1203,7 +1201,7 @@ void spifi3_device::step(bool timeout)
 		case BUSRESET_WAIT_INT: // Bus was reset by a command, go to idle state and clear reset signal
 		{
 			state = IDLE;
-			scsi_bus->ctrl_w(scsi_refid, 0, S_RST);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_RST);
 			reset_disconnect();
 			break;
 		}
@@ -1221,16 +1219,16 @@ void spifi3_device::step(bool timeout)
 			{
 			}
 
-			if (arbitrationWinner != scsi_id)
+			if (arbitrationWinner != m_scsi_id)
 			{
-				scsi_bus->data_w(scsi_refid, 0);
-				scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
+				m_scsi_bus->data_w(m_scsi_refid, 0);
+				m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
 				fatalerror("%s: need to wait for bus free (lost arbitration)\n", tag());
 			}
 
 			// Now that we won arbitration, we need to assert SEL and wait for the bus to settle.
 			state = (state & STATE_MASK) | (ARB_ASSERT_SEL << SUB_SHIFT);
-			scsi_bus->ctrl_w(scsi_refid, S_SEL, S_SEL);
+			m_scsi_bus->ctrl_w(m_scsi_refid, S_SEL, S_SEL);
 			delay(6);
 			break;
 		}
@@ -1243,7 +1241,7 @@ void spifi3_device::step(bool timeout)
 			}
 
 			bus_id = get_target_id();
-			scsi_bus->data_w(scsi_refid, (1 << scsi_id) | (1 << bus_id));
+			m_scsi_bus->data_w(m_scsi_refid, (1 << m_scsi_id) | (1 << bus_id));
 			state = (state & STATE_MASK) | (ARB_SET_DEST << SUB_SHIFT);
 			delay_cycles(4);
 			break;
@@ -1257,7 +1255,7 @@ void spifi3_device::step(bool timeout)
 			}
 
 			state = (state & STATE_MASK) | (ARB_RELEASE_BUSY << SUB_SHIFT);
-			scsi_bus->ctrl_w(scsi_refid, spifi_reg.select & SEL_WATN ? S_ATN : 0, S_ATN | S_BSY);
+			m_scsi_bus->ctrl_w(m_scsi_refid, spifi_reg.select & SEL_WATN ? S_ATN : 0, S_ATN | S_BSY);
 			delay(2);
 			break;
 		}
@@ -1292,8 +1290,8 @@ void spifi3_device::step(bool timeout)
 				break;
 			}
 
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_SEL); // Clear SEL - target may now assert REQ
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL); // Clear SEL - target may now assert REQ
 
 			// TODO: reselection logic for this step
 			// Target mode not supported for now
@@ -1317,7 +1315,7 @@ void spifi3_device::step(bool timeout)
 		{
 			if (timeout) // No response from target
 			{
-				scsi_bus->data_w(scsi_refid, 0);
+				m_scsi_bus->data_w(m_scsi_refid, 0);
 				LOG("select timeout\n");
 				state = (state & STATE_MASK) | (ARB_TIMEOUT_ABORT << SUB_SHIFT); // handle timeout
 				delay(1000);
@@ -1346,7 +1344,7 @@ void spifi3_device::step(bool timeout)
 			}
 			else // If not, force bus free
 			{
-				scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
+				m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
 				state = IDLE;
 				spifi_reg.intr = INTR_TIMEO;
 				reset_disconnect();
@@ -1375,8 +1373,8 @@ void spifi3_device::step(bool timeout)
 			}
 
 			state = state & STATE_MASK;
-			scsi_bus->data_w(scsi_refid, 0);
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->data_w(m_scsi_refid, 0);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 			step(false);
 			break;
 		}
@@ -1401,7 +1399,7 @@ void spifi3_device::step(bool timeout)
 			const auto masked_state = state & STATE_MASK;
 			if (masked_state != INIT_XFR_RECV_PAD)
 			{
-				const auto data = scsi_bus->data_r();
+				const auto data = m_scsi_bus->data_r();
 				const auto xfr_masked = xfr_phase & S_PHASE_MASK;
 				if (xfr_masked == S_PHASE_STATUS && masked_state == INIT_XFR_RECV_BYTE_ACK && autostat_active(bus_id))
 				{
@@ -1420,7 +1418,7 @@ void spifi3_device::step(bool timeout)
 				}
 				check_drq();
 			}
-			scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 			state = masked_state | (RECV_WAIT_REQ_0 << SUB_SHIFT);
 			step(false);
 			break;
@@ -1468,7 +1466,7 @@ void spifi3_device::step(bool timeout)
 				state = DISC_SEL_ATN_WAIT_REQ;
 			}
 
-			scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ); // wait for REQ
+			m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ); // wait for REQ
 			if (ctrl & S_REQ)
 			{
 				step(false);
@@ -1493,16 +1491,16 @@ void spifi3_device::step(bool timeout)
 			// Deassert ATN now if we asserted it before
 			if (spifi_reg.select & SEL_WATN)
 			{
-				scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
+				m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ATN);
 			}
 
 			state = DISC_SEL_ATN_SEND_BYTE;
 			if (spifi_reg.identify & 0x80)
 			{
 				// Identify register has an identify packet - send it.
-				scsi_bus->data_w(scsi_refid, spifi_reg.identify);
-				scsi_bus->ctrl_w(scsi_refid, S_ACK, S_ACK);
-				scsi_bus->ctrl_wait(scsi_refid, S_REQ, S_REQ);
+				m_scsi_bus->data_w(m_scsi_refid, spifi_reg.identify);
+				m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
+				m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
 			}
 			else
 			{
@@ -1545,7 +1543,7 @@ void spifi3_device::step(bool timeout)
 			}
 			if ((ctrl & S_PHASE_MASK) != S_PHASE_COMMAND)
 			{
-				scsi_bus->ctrl_wait(scsi_refid, 0, S_REQ);
+				m_scsi_bus->ctrl_wait(m_scsi_refid, 0, S_REQ);
 				function_bus_complete();
 				break;
 			}
@@ -1564,7 +1562,7 @@ void spifi3_device::step(bool timeout)
 		case INIT_CPT_RECV_BYTE_ACK:
 		{
 			state = INIT_CPT_RECV_WAIT_REQ;
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 			break;
 		}
 
@@ -1625,7 +1623,7 @@ void spifi3_device::step(bool timeout)
 					// if it's the last message byte, ensure ATN is low before sending
 					if ((xfr_phase == S_PHASE_MSG_OUT) && (command_pos == (spifi_reg.cmlen & CML_LENMASK) - 1))
 					{
-						scsi_bus->ctrl_w(scsi_refid, 0, S_ATN);
+						m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ATN);
 					}
 
 					if (xfr_phase == S_PHASE_DATA_OUT)
@@ -1670,7 +1668,7 @@ void spifi3_device::step(bool timeout)
 
 				default:
 				{
-					LOG("xfer on phase %d\n", scsi_bus->ctrl_r() & S_PHASE_MASK);
+					LOG("xfer on phase %d\n", m_scsi_bus->ctrl_r() & S_PHASE_MASK);
 					function_complete();
 					break;
 				}
@@ -1759,7 +1757,7 @@ void spifi3_device::step(bool timeout)
 		case INIT_XFR_RECV_BYTE_ACK:
 		{
 			state = INIT_XFR_WAIT_REQ;
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 			step(false);
 			break;
 		}
@@ -1781,7 +1779,7 @@ void spifi3_device::step(bool timeout)
 				break;
 			}
 			LOGMASKED(LOG_AUTO, "AUTOMSG cleared ACK\n");
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 			function_complete();
 
 			// Since we auto-accepted the message, we step again here to complete the disconnect
@@ -1865,7 +1863,7 @@ void spifi3_device::step(bool timeout)
 		case INIT_XFR_RECV_PAD:
 		{
 			state = INIT_XFR_RECV_PAD_WAIT_REQ;
-			scsi_bus->ctrl_w(scsi_refid, 0, S_ACK);
+			m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ACK);
 			step(false);
 			break;
 		}

@@ -25,18 +25,18 @@ m6510_device::m6510_device(const machine_config &mconfig, const char *tag, devic
 
 m6510_device::m6510_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, type, tag, owner, clock),
-	read_port(*this, 0),
-	write_port(*this),
-	dir(0), port(0), drive(0)
+	m_read_port(*this, 0),
+	m_write_port(*this),
+	m_dir(0), m_port(0), m_drive(0)
 {
-	pullup = 0x00;
-	floating = 0x00;
+	m_pullup = 0x00;
+	m_floating = 0x00;
 }
 
 void m6510_device::set_pulls(uint8_t _pullup, uint8_t _floating)
 {
-	pullup = _pullup;
-	floating = _floating;
+	m_pullup = _pullup;
+	m_floating = _floating;
 }
 
 std::unique_ptr<util::disasm_interface> m6510_device::create_disassembler()
@@ -46,16 +46,16 @@ std::unique_ptr<util::disasm_interface> m6510_device::create_disassembler()
 
 void m6510_device::init_port()
 {
-	save_item(NAME(pullup));
-	save_item(NAME(floating));
-	save_item(NAME(dir));
-	save_item(NAME(port));
-	save_item(NAME(drive));
+	save_item(NAME(m_pullup));
+	save_item(NAME(m_floating));
+	save_item(NAME(m_dir));
+	save_item(NAME(m_port));
+	save_item(NAME(m_drive));
 }
 
 void m6510_device::device_start()
 {
-	mintf = std::make_unique<mi_6510>(this);
+	m_mintf = std::make_unique<mi_6510>(this);
 
 	init();
 	init_port();
@@ -64,88 +64,88 @@ void m6510_device::device_start()
 void m6510_device::device_reset()
 {
 	m6502_device::device_reset();
-	dir = 0xff;
-	port = 0xff;
-	drive = 0xff;
+	m_dir = 0xff;
+	m_port = 0xff;
+	m_drive = 0xff;
 	update_port();
 }
 
 void m6510_device::update_port()
 {
-	drive = (port & dir) | (drive & ~dir);
-	write_port((port & dir) | (pullup & ~dir));
+	m_drive = (m_port & m_dir) | (m_drive & ~m_dir);
+	m_write_port((m_port & m_dir) | (m_pullup & ~m_dir));
 }
 
 uint8_t m6510_device::get_port()
 {
-	return (port & dir) | (pullup & ~dir);
+	return (m_port & m_dir) | (m_pullup & ~m_dir);
 }
 
 uint8_t m6510_device::dir_r()
 {
-	return dir;
+	return m_dir;
 }
 
 uint8_t m6510_device::port_r()
 {
-	return ((read_port() | (floating & drive)) & ~dir) | (port & dir);
+	return ((m_read_port() | (m_floating & m_drive)) & ~m_dir) | (m_port & m_dir);
 }
 
 void m6510_device::dir_w(uint8_t data)
 {
-	dir = data;
+	m_dir = data;
 	update_port();
 }
 
 void m6510_device::port_w(uint8_t data)
 {
-	port = data;
+	m_port = data;
 	update_port();
 }
 
 
 m6510_device::mi_6510::mi_6510(m6510_device *_base)
 {
-	base = _base;
+	m_base = _base;
 }
 
 uint8_t m6510_device::mi_6510::read(uint16_t adr)
 {
-	uint8_t res = program.read_byte(adr);
+	uint8_t res = m_program.read_byte(adr);
 	if(adr == 0x0000)
-		res = base->dir_r();
+		res = m_base->dir_r();
 	else if(adr == 0x0001)
-		res = base->port_r();
+		res = m_base->port_r();
 	return res;
 }
 
 uint8_t m6510_device::mi_6510::read_sync(uint16_t adr)
 {
-	uint8_t res = csprogram.read_byte(adr);
+	uint8_t res = m_csprogram.read_byte(adr);
 	if(adr == 0x0000)
-		res = base->dir_r();
+		res = m_base->dir_r();
 	else if(adr == 0x0001)
-		res = base->port_r();
+		res = m_base->port_r();
 	return res;
 }
 
 uint8_t m6510_device::mi_6510::read_arg(uint16_t adr)
 {
-	uint8_t res = cprogram.read_byte(adr);
+	uint8_t res = m_cprogram.read_byte(adr);
 	if(adr == 0x0000)
-		res = base->dir_r();
+		res = m_base->dir_r();
 	else if(adr == 0x0001)
-		res = base->port_r();
+		res = m_base->port_r();
 	return res;
 }
 
 void m6510_device::mi_6510::write(uint16_t adr, uint8_t val)
 {
-	program.write_byte(adr, val);
+	m_program.write_byte(adr, val);
 	if(adr == 0x0000)
-		base->dir_w(val);
+		m_base->dir_w(val);
 	else if(adr == 0x0001)
-		base->port_w(val);
+		m_base->port_w(val);
 }
 
 
@@ -156,66 +156,66 @@ m6508_device::m6508_device(const machine_config &mconfig, const char *tag, devic
 
 void m6508_device::device_start()
 {
-	mintf = std::make_unique<mi_6508>(this);
+	m_mintf = std::make_unique<mi_6508>(this);
 
 	init();
 	init_port();
 
-	ram_page = make_unique_clear<uint8_t[]>(256);
-	save_pointer(NAME(ram_page), 256);
+	m_ram_page = make_unique_clear<uint8_t[]>(256);
+	save_pointer(NAME(m_ram_page), 256);
 }
 
 
 m6508_device::mi_6508::mi_6508(m6508_device *_base)
 {
-	base = _base;
+	m_base = _base;
 }
 
 uint8_t m6508_device::mi_6508::read(uint16_t adr)
 {
-	uint8_t res = program.read_byte(adr);
+	uint8_t res = m_program.read_byte(adr);
 	if(adr == 0x0000)
-		res = base->dir_r();
+		res = m_base->dir_r();
 	else if(adr == 0x0001)
-		res = base->port_r();
+		res = m_base->port_r();
 	else if(adr < 0x0200)
-		res = base->ram_page[adr & 0x00ff];
+		res = m_base->m_ram_page[adr & 0x00ff];
 	return res;
 }
 
 uint8_t m6508_device::mi_6508::read_sync(uint16_t adr)
 {
-	uint8_t res = csprogram.read_byte(adr);
+	uint8_t res = m_csprogram.read_byte(adr);
 	if(adr == 0x0000)
-		res = base->dir_r();
+		res = m_base->dir_r();
 	else if(adr == 0x0001)
-		res = base->port_r();
+		res = m_base->port_r();
 	else if(adr < 0x0200)
-		res = base->ram_page[adr & 0x00ff];
+		res = m_base->m_ram_page[adr & 0x00ff];
 	return res;
 }
 
 uint8_t m6508_device::mi_6508::read_arg(uint16_t adr)
 {
-	uint8_t res = cprogram.read_byte(adr);
+	uint8_t res = m_cprogram.read_byte(adr);
 	if(adr == 0x0000)
-		res = base->dir_r();
+		res = m_base->dir_r();
 	else if(adr == 0x0001)
-		res = base->port_r();
+		res = m_base->port_r();
 	else if(adr < 0x0200)
-		res = base->ram_page[adr & 0x00ff];
+		res = m_base->m_ram_page[adr & 0x00ff];
 	return res;
 }
 
 void m6508_device::mi_6508::write(uint16_t adr, uint8_t val)
 {
-	program.write_byte(adr, val);
+	m_program.write_byte(adr, val);
 	if(adr == 0x0000)
-		base->dir_w(val);
+		m_base->dir_w(val);
 	else if(adr == 0x0001)
-		base->port_w(val);
+		m_base->port_w(val);
 	else if(adr < 0x0200)
-		base->ram_page[adr & 0x00ff] = val;
+		m_base->m_ram_page[adr & 0x00ff] = val;
 }
 
 

@@ -112,8 +112,8 @@ void nscsi_tape_device::device_reset()
 
 void nscsi_tape_device::scsi_command()
 {
-	const u8 cmd = scsi_cmdbuf[0];
-	const u8 lun = get_lun(scsi_cmdbuf[1] >> 5); // LUN may be overridden by IDENTIFY, per SCSI-2 section 7.2.2
+	const u8 cmd = m_scsi_cmdbuf[0];
+	const u8 lun = get_lun(m_scsi_cmdbuf[1] >> 5); // LUN may be overridden by IDENTIFY, per SCSI-2 section 7.2.2
 	switch (cmd) { // these commands must be handled here, before tape changing logic
 		case SC_INQUIRY:                        return handle_inquiry(lun);
 		case SC_REQUEST_SENSE:                  return handle_request_sense(lun);
@@ -234,28 +234,28 @@ void nscsi_tape_device::scsi_put_data(int id, int pos, u8 data)
 
 void nscsi_tape_device::handle_inquiry(const u8 lun) // mandatory; SCSI-2 section 8.2.5
 {
-	const bool vpd_enable = scsi_cmdbuf[1] & 0x01; // should we respond with vital product data
-	const u8 page_code = scsi_cmdbuf[2];
-	const u8 alloc_len = scsi_cmdbuf[4]; // allocation length
+	const bool vpd_enable = m_scsi_cmdbuf[1] & 0x01; // should we respond with vital product data
+	const u8 page_code = m_scsi_cmdbuf[2];
+	const u8 alloc_len = m_scsi_cmdbuf[4]; // allocation length
 	LOG("command INQUIRY lun=%d vpd_enable=%d page_code=0x%02x alloc_len=%d\n", lun, vpd_enable, page_code, alloc_len);
-	if ((scsi_cmdbuf[1] & 0x1e) || scsi_cmdbuf[3]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x1e) || m_scsi_cmdbuf[3]) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (vpd_enable || page_code) // error: we don't support vital product data or pages other than 0
 		return report_bad_cdb_field();
 
-	clear_response(scsi_cmdbuf, 36);
-	scsi_cmdbuf[0] = (lun == 0) ? 0x01 : 0x7f; // we support tape device on LUN 0 only, per 7.5.3(a)
-	scsi_cmdbuf[1] = 0x80; // we support removing tape
-	scsi_cmdbuf[2] = 0x02; // we're compliant with SCSI-2 only
-	scsi_cmdbuf[3] = 0x02; // we use SCSI-2 response format
-	scsi_cmdbuf[4] = 32; // additional length
-	strncpy((char *)&scsi_cmdbuf[8], "MAME", 8); // vendor
-	strncpy((char *)&scsi_cmdbuf[16], "SCSI tape drive", 16); // product
-	strncpy((char *)&scsi_cmdbuf[32], "1.0", 4); // revision
+	clear_response(m_scsi_cmdbuf, 36);
+	m_scsi_cmdbuf[0] = (lun == 0) ? 0x01 : 0x7f; // we support tape device on LUN 0 only, per 7.5.3(a)
+	m_scsi_cmdbuf[1] = 0x80; // we support removing tape
+	m_scsi_cmdbuf[2] = 0x02; // we're compliant with SCSI-2 only
+	m_scsi_cmdbuf[3] = 0x02; // we use SCSI-2 response format
+	m_scsi_cmdbuf[4] = 32; // additional length
+	strncpy((char *)&m_scsi_cmdbuf[8], "MAME", 8); // vendor
+	strncpy((char *)&m_scsi_cmdbuf[16], "SCSI tape drive", 16); // product
+	strncpy((char *)&m_scsi_cmdbuf[32], "1.0", 4); // revision
 	for (u32 i = 8; i < 36; i++) {
-		if (scsi_cmdbuf[i] == 0)
-			scsi_cmdbuf[i] = ' '; // pad strings with spaces
+		if (m_scsi_cmdbuf[i] == 0)
+			m_scsi_cmdbuf[i] = ' '; // pad strings with spaces
 	}
 	scsi_data_in(SBUF_MAIN, std::min(36, (const int)alloc_len));
 	scsi_status_complete(SS_GOOD);
@@ -263,11 +263,11 @@ void nscsi_tape_device::handle_inquiry(const u8 lun) // mandatory; SCSI-2 sectio
 
 void nscsi_tape_device::handle_mode_select_6() // mandatory; SCSI-2 sections 8.2.8, 8.3.3, 10.3.3
 {
-	const bool page_format = scsi_cmdbuf[1] & 0x10; // ignored; we always treat pages according to SCSI-2
-	const bool save_pages = scsi_cmdbuf[1] & 0x01;
-	const u8 pl_len = scsi_cmdbuf[4]; // parameter list length
+	const bool page_format = m_scsi_cmdbuf[1] & 0x10; // ignored; we always treat pages according to SCSI-2
+	const bool save_pages = m_scsi_cmdbuf[1] & 0x01;
+	const u8 pl_len = m_scsi_cmdbuf[4]; // parameter list length
 	LOG("command MODE SELECT(6) page_format=%d save_pages=%d pl_len=%d\n", page_format, save_pages, pl_len);
-	if ((scsi_cmdbuf[1] & 0x0e) || scsi_cmdbuf[2] || scsi_cmdbuf[3]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x0e) || m_scsi_cmdbuf[2] || m_scsi_cmdbuf[3]) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (save_pages) // error: we don't support saving pages
@@ -363,11 +363,11 @@ void nscsi_tape_device::continue_handling_mode_select_6()
 
 void nscsi_tape_device::handle_mode_sense_6() // mandatory; SCSI-2 sections 8.2.10, 8.3.3, 10.3.3
 {
-	const bool bd_disable = scsi_cmdbuf[1] & 0x80; // should we not respond with block descriptor
-	const u8 page_control = scsi_cmdbuf[2] >> 6;
-	const u8 page_code = scsi_cmdbuf[2] & 0x3f;
+	const bool bd_disable = m_scsi_cmdbuf[1] & 0x80; // should we not respond with block descriptor
+	const u8 page_control = m_scsi_cmdbuf[2] >> 6;
+	const u8 page_code = m_scsi_cmdbuf[2] & 0x3f;
 	LOG("command MODE SENSE(6) bd_disable=%d page_control=0x%02x page_code=0x%02x\n", bd_disable, page_control, page_code);
-	if ((scsi_cmdbuf[1] & 0x17) || scsi_cmdbuf[3]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x17) || m_scsi_cmdbuf[3]) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (page_code && page_code != SPC_RETURN_ALL_MODE_PAGES) // error: we don't support pages other than 0
@@ -378,13 +378,13 @@ void nscsi_tape_device::handle_mode_sense_6() // mandatory; SCSI-2 sections 8.2.
 		return report_no_saving_params();
 
 	const u8 resp_len = bd_disable ? 4 : 12; // response length
-	clear_response(scsi_cmdbuf, resp_len);
-	scsi_cmdbuf[0] = resp_len - 1; // mode data length does not include itself, per SCSI-2 section 8.3.3
-	scsi_cmdbuf[2] = (m_has_tape && m_image->get_file()->is_read_only()) ? 0x80 : 0; // device-specific parameter
-	scsi_cmdbuf[3] = bd_disable ? 0 : 8; // block descriptor length
+	clear_response(m_scsi_cmdbuf, resp_len);
+	m_scsi_cmdbuf[0] = resp_len - 1; // mode data length does not include itself, per SCSI-2 section 8.3.3
+	m_scsi_cmdbuf[2] = (m_has_tape && m_image->get_file()->is_read_only()) ? 0x80 : 0; // device-specific parameter
+	m_scsi_cmdbuf[3] = bd_disable ? 0 : 8; // block descriptor length
 	if (!bd_disable) { // respond with block descriptor
-		scsi_cmdbuf[4] = m_has_tape ? m_image->get_file()->get_density_code() : 0; // density code
-		put_u24be(&scsi_cmdbuf[9], m_fixed_block_len); // block length
+		m_scsi_cmdbuf[4] = m_has_tape ? m_image->get_file()->get_density_code() : 0; // density code
+		put_u24be(&m_scsi_cmdbuf[9], m_fixed_block_len); // block length
 	}
 	scsi_data_in(SBUF_MAIN, resp_len);
 	scsi_status_complete(SS_GOOD);
@@ -392,13 +392,13 @@ void nscsi_tape_device::handle_mode_sense_6() // mandatory; SCSI-2 sections 8.2.
 
 void nscsi_tape_device::handle_send_diagnostic() // mandatory; SCSI-2 section 8.2.15
 {
-	const bool page_format = scsi_cmdbuf[1] & 0x10;
-	const bool self_test = scsi_cmdbuf[1] & 0x04;
-	const bool device_offline = scsi_cmdbuf[1] & 0x02;
-	const bool unit_offline = scsi_cmdbuf[1] & 0x01;
-	const u16 pl_len = get_u16be(&scsi_cmdbuf[3]); // parameter list length
+	const bool page_format = m_scsi_cmdbuf[1] & 0x10;
+	const bool self_test = m_scsi_cmdbuf[1] & 0x04;
+	const bool device_offline = m_scsi_cmdbuf[1] & 0x02;
+	const bool unit_offline = m_scsi_cmdbuf[1] & 0x01;
+	const u16 pl_len = get_u16be(&m_scsi_cmdbuf[3]); // parameter list length
 	LOG("command SEND DIAGNOSTIC page_format=%d self_test=%d device_offline=%d unit_offline=%d pl_len=%d\n", page_format, self_test, device_offline, unit_offline, pl_len);
-	if ((scsi_cmdbuf[1] & 0x08) || scsi_cmdbuf[2]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x08) || m_scsi_cmdbuf[2]) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (pl_len) // error: we don't support any parameters
@@ -410,7 +410,7 @@ void nscsi_tape_device::handle_send_diagnostic() // mandatory; SCSI-2 section 8.
 void nscsi_tape_device::handle_test_unit_ready() // mandatory; SCSI-2 section 8.2.16
 {
 	LOG("command TEST UNIT READY\n");
-	if ((scsi_cmdbuf[1] & 0x1f) || scsi_cmdbuf[2] || scsi_cmdbuf[3] || scsi_cmdbuf[4]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x1f) || m_scsi_cmdbuf[2] || m_scsi_cmdbuf[3] || m_scsi_cmdbuf[4]) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (!m_has_tape) // error: no tape
@@ -421,9 +421,9 @@ void nscsi_tape_device::handle_test_unit_ready() // mandatory; SCSI-2 section 8.
 
 void nscsi_tape_device::handle_prevent_allow_medium_removal() // optional; SCSI-2 section 9.2.4
 {
-	const bool prevent = scsi_cmdbuf[4] & 0x01; // should we prevent or allow removing tape
+	const bool prevent = m_scsi_cmdbuf[4] & 0x01; // should we prevent or allow removing tape
 	LOG("command %s MEDIUM REMOVAL\n", prevent ? "PREVENT" : "ALLOW");
-	if ((scsi_cmdbuf[1] & 0x1f) || scsi_cmdbuf[2] || scsi_cmdbuf[3] || (scsi_cmdbuf[4] & 0xfe)) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x1f) || m_scsi_cmdbuf[2] || m_scsi_cmdbuf[3] || (m_scsi_cmdbuf[4] & 0xfe)) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (prevent) {
@@ -441,10 +441,10 @@ void nscsi_tape_device::handle_prevent_allow_medium_removal() // optional; SCSI-
 
 void nscsi_tape_device::handle_erase() // mandatory; SCSI-2 section 10.2.1
 {
-	const bool immed = scsi_cmdbuf[1] & 0x02; // ignored; we don't support buffering
-	const bool eom = scsi_cmdbuf[1] & 0x01; // should we erase to EOM instead of 1 block; "long"
+	const bool immed = m_scsi_cmdbuf[1] & 0x02; // ignored; we don't support buffering
+	const bool eom = m_scsi_cmdbuf[1] & 0x01; // should we erase to EOM instead of 1 block; "long"
 	LOG("command ERASE immed=%d eom=%d\n", immed, eom);
-	if ((scsi_cmdbuf[1] & 0x1c) || scsi_cmdbuf[2] || scsi_cmdbuf[3] || scsi_cmdbuf[4]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x1c) || m_scsi_cmdbuf[2] || m_scsi_cmdbuf[3] || m_scsi_cmdbuf[4]) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (!m_has_tape) // error: no tape
@@ -465,12 +465,12 @@ void nscsi_tape_device::handle_erase() // mandatory; SCSI-2 section 10.2.1
 
 void nscsi_tape_device::handle_load_unload() // optional; SCSI-2 section 10.2.2
 {
-	const bool immed = scsi_cmdbuf[1] & 0x01; // ignored; we don't support buffering
-	const bool eom = scsi_cmdbuf[4] & 0x04; // should we rewind to EOM instead of BOM on unload
-	const bool retension = scsi_cmdbuf[4] & 0x02; // ignored; we're always tense
-	const bool load = scsi_cmdbuf[4] & 0x01; // should we load or unload tape
+	const bool immed = m_scsi_cmdbuf[1] & 0x01; // ignored; we don't support buffering
+	const bool eom = m_scsi_cmdbuf[4] & 0x04; // should we rewind to EOM instead of BOM on unload
+	const bool retension = m_scsi_cmdbuf[4] & 0x02; // ignored; we're always tense
+	const bool load = m_scsi_cmdbuf[4] & 0x01; // should we load or unload tape
 	LOG("command %s immed=%d eom=%d retension=%d\n", load ? "LOAD" : "UNLOAD", immed, eom, retension);
-	if ((scsi_cmdbuf[1] & 0x1e) || scsi_cmdbuf[2] || scsi_cmdbuf[3] || (scsi_cmdbuf[4] & 0xf8)) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x1e) || m_scsi_cmdbuf[2] || m_scsi_cmdbuf[3] || (m_scsi_cmdbuf[4] & 0xf8)) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (load && eom) // error: invalid combination of command options
@@ -492,13 +492,13 @@ void nscsi_tape_device::handle_load_unload() // optional; SCSI-2 section 10.2.2
 
 void nscsi_tape_device::handle_locate() // optional; SCSI-2 section 10.2.3
 {
-	const bool block_addr_type = scsi_cmdbuf[1] & 0x04; // ignored; we always use logical block addresses
-	const bool change_partition = scsi_cmdbuf[1] & 0x02;
-	const bool immed = scsi_cmdbuf[1] & 0x01; // ignored; we don't support buffering
-	const u32 req_block_addr = get_u32be(&scsi_cmdbuf[3]); // requested block address to locate
-	const u8 partition = scsi_cmdbuf[8];
+	const bool block_addr_type = m_scsi_cmdbuf[1] & 0x04; // ignored; we always use logical block addresses
+	const bool change_partition = m_scsi_cmdbuf[1] & 0x02;
+	const bool immed = m_scsi_cmdbuf[1] & 0x01; // ignored; we don't support buffering
+	const u32 req_block_addr = get_u32be(&m_scsi_cmdbuf[3]); // requested block address to locate
+	const u8 partition = m_scsi_cmdbuf[8];
 	LOG("command LOCATE block_addr_type=%d change_partition=%d immed=%d req_block_addr=%d partition=0x%02x\n", block_addr_type, change_partition, immed, req_block_addr, partition);
-	if ((scsi_cmdbuf[1] & 0x18) || scsi_cmdbuf[2] || scsi_cmdbuf[7]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x18) || m_scsi_cmdbuf[2] || m_scsi_cmdbuf[7]) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (change_partition) // error: we don't support partitions other than 0
@@ -532,11 +532,11 @@ void nscsi_tape_device::handle_locate() // optional; SCSI-2 section 10.2.3
 
 void nscsi_tape_device::handle_read_6() // mandatory; SCSI-2 section 10.2.4
 {
-	const bool suppress = scsi_cmdbuf[1] & 0x02; // should we suppress indicating incorrect length
-	const bool fixed = scsi_cmdbuf[1] & 0x01; // should we read many fixed-length blocks instead of 1 variable-length block
-	const u32 req_items_num = get_u24be(&scsi_cmdbuf[2]); // requested number of blocks or bytes to read; "transfer length"
+	const bool suppress = m_scsi_cmdbuf[1] & 0x02; // should we suppress indicating incorrect length
+	const bool fixed = m_scsi_cmdbuf[1] & 0x01; // should we read many fixed-length blocks instead of 1 variable-length block
+	const u32 req_items_num = get_u24be(&m_scsi_cmdbuf[2]); // requested number of blocks or bytes to read; "transfer length"
 	LOG("command READ(6) suppress=%d fixed=%d req_items_num=%d\n", suppress, fixed, req_items_num);
-	if (scsi_cmdbuf[1] & 0x1c) // error: reserved bits set
+	if (m_scsi_cmdbuf[1] & 0x1c) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (fixed && suppress) // error: invalid combination of command options
@@ -621,21 +621,21 @@ void nscsi_tape_device::continue_handling_read_6()
 void nscsi_tape_device::handle_read_block_limits() // mandatory; SCSI-2 section 10.2.5
 {
 	LOG("command READ BLOCK LIMITS\n");
-	if ((scsi_cmdbuf[1] & 0x1f) || scsi_cmdbuf[2] || scsi_cmdbuf[3] || scsi_cmdbuf[4]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x1f) || m_scsi_cmdbuf[2] || m_scsi_cmdbuf[3] || m_scsi_cmdbuf[4]) // error: reserved bits set
 		return report_bad_cdb_field();
 
-	clear_response(scsi_cmdbuf, 6);
-	put_u24be(&scsi_cmdbuf[1], 0xffffff); // 16MB; "maximum block length limit"
-	put_u16be(&scsi_cmdbuf[4], m_fixed_block_len); // "minimum block length limit"
+	clear_response(m_scsi_cmdbuf, 6);
+	put_u24be(&m_scsi_cmdbuf[1], 0xffffff); // 16MB; "maximum block length limit"
+	put_u16be(&m_scsi_cmdbuf[4], m_fixed_block_len); // "minimum block length limit"
 	scsi_data_in(SBUF_MAIN, 6);
 	scsi_status_complete(SS_GOOD);
 }
 
 void nscsi_tape_device::handle_read_position() // optional; SCSI-2 section 10.2.6
 {
-	const bool block_addr_type = scsi_cmdbuf[1] & 0x01; // ignored; we always use logical block addresses
+	const bool block_addr_type = m_scsi_cmdbuf[1] & 0x01; // ignored; we always use logical block addresses
 	LOG("command READ POSITION block_addr_type=%d\n", block_addr_type);
-	if ((scsi_cmdbuf[1] & 0x1e) || scsi_cmdbuf[2] || scsi_cmdbuf[3] || scsi_cmdbuf[4] || scsi_cmdbuf[5] || scsi_cmdbuf[6] || scsi_cmdbuf[7] || scsi_cmdbuf[8]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x1e) || m_scsi_cmdbuf[2] || m_scsi_cmdbuf[3] || m_scsi_cmdbuf[4] || m_scsi_cmdbuf[5] || m_scsi_cmdbuf[6] || m_scsi_cmdbuf[7] || m_scsi_cmdbuf[8]) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (!m_has_tape) // error: no tape
@@ -675,12 +675,12 @@ void nscsi_tape_device::handle_read_position() // optional; SCSI-2 section 10.2.
 		const bool bpu = status == tape_status::UNKNOWN
 					  || status == tape_status::UNKNOWN_EW
 					  || status == tape_status::EOM;
-		clear_response(scsi_cmdbuf, 20);
-		scsi_cmdbuf[0] = (bom ? 0x80 : 0) // is position at BOM
+		clear_response(m_scsi_cmdbuf, 20);
+		m_scsi_cmdbuf[0] = (bom ? 0x80 : 0) // is position at BOM
 					   | (eom ? 0x40 : 0) // is position between EW and EOM
 					   | (bpu ? 0x04 : 0); // is next block address invalid; "block position unknown"
-		put_u32be(&scsi_cmdbuf[4], block_addr); // address of next block to be read/written; "first block location"
-		put_u32be(&scsi_cmdbuf[8], block_addr); // address of last buffered block; we don't support buffering, so we set it to next block address; "last block location"
+		put_u32be(&m_scsi_cmdbuf[4], block_addr); // address of next block to be read/written; "first block location"
+		put_u32be(&m_scsi_cmdbuf[8], block_addr); // address of last buffered block; we don't support buffering, so we set it to next block address; "last block location"
 		scsi_data_in(SBUF_MAIN, 20);
 		scsi_status_complete(SS_GOOD);
 	}
@@ -692,10 +692,10 @@ void nscsi_tape_device::handle_read_position() // optional; SCSI-2 section 10.2.
 
 void nscsi_tape_device::handle_release_unit() // mandatory; SCSI-2 section 10.2.9
 {
-	const bool tpr = scsi_cmdbuf[1] & 0x10; // "third-party release"
-	const u8 tpdi = (scsi_cmdbuf[1] & 0x0e) >> 1; // "third-party device id"
+	const bool tpr = m_scsi_cmdbuf[1] & 0x10; // "third-party release"
+	const u8 tpdi = (m_scsi_cmdbuf[1] & 0x0e) >> 1; // "third-party device id"
 	LOG("command RELEASE UNIT tpr=%d tpdi=%d\n", tpr, tpdi);
-	if ((scsi_cmdbuf[1] & 0x01) || scsi_cmdbuf[2] || scsi_cmdbuf[3] || scsi_cmdbuf[4]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x01) || m_scsi_cmdbuf[2] || m_scsi_cmdbuf[3] || m_scsi_cmdbuf[4]) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	// TODO: release unit, once MAME supports multiple initiators
@@ -704,10 +704,10 @@ void nscsi_tape_device::handle_release_unit() // mandatory; SCSI-2 section 10.2.
 
 void nscsi_tape_device::handle_reserve_unit() // mandatory; SCSI-2 section 10.2.10
 {
-	const bool tpr = scsi_cmdbuf[1] & 0x10; // "third-party release"
-	const u8 tpdi = (scsi_cmdbuf[1] & 0x0e) >> 1; // "third-party device id"
+	const bool tpr = m_scsi_cmdbuf[1] & 0x10; // "third-party release"
+	const u8 tpdi = (m_scsi_cmdbuf[1] & 0x0e) >> 1; // "third-party device id"
 	LOG("command RESERVE UNIT tpr=%d tpdi=%d\n", tpr, tpdi);
-	if ((scsi_cmdbuf[1] & 0x01) || scsi_cmdbuf[2] || scsi_cmdbuf[3] || scsi_cmdbuf[4]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x01) || m_scsi_cmdbuf[2] || m_scsi_cmdbuf[3] || m_scsi_cmdbuf[4]) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	// TODO: reserve unit, once MAME supports multiple initiators
@@ -716,9 +716,9 @@ void nscsi_tape_device::handle_reserve_unit() // mandatory; SCSI-2 section 10.2.
 
 void nscsi_tape_device::handle_rewind() // mandatory; SCSI-2 section 10.2.11
 {
-	const bool immed = scsi_cmdbuf[1] & 0x01; // ignored; we don't support buffering
+	const bool immed = m_scsi_cmdbuf[1] & 0x01; // ignored; we don't support buffering
 	LOG("command REWIND immed=%d\n", immed);
-	if ((scsi_cmdbuf[1] & 0x1e) || scsi_cmdbuf[2] || scsi_cmdbuf[3] || scsi_cmdbuf[4]) // error: reserved bits set
+	if ((m_scsi_cmdbuf[1] & 0x1e) || m_scsi_cmdbuf[2] || m_scsi_cmdbuf[3] || m_scsi_cmdbuf[4]) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (!m_has_tape) // error: no tape
@@ -730,10 +730,10 @@ void nscsi_tape_device::handle_rewind() // mandatory; SCSI-2 section 10.2.11
 
 void nscsi_tape_device::handle_space() // mandatory; SCSI-2 section 10.2.12
 {
-	const u8 items_type = scsi_cmdbuf[1] & 0x07; // what type of items should we space over
-	const u32 req_dir_items_num = get_s24be(&scsi_cmdbuf[2]); // requested direction and number of items to space over; "count"
+	const u8 items_type = m_scsi_cmdbuf[1] & 0x07; // what type of items should we space over
+	const u32 req_dir_items_num = get_s24be(&m_scsi_cmdbuf[2]); // requested direction and number of items to space over; "count"
 	LOG("command SPACE items_type=0x%02x req_dir_items_num=%d\n", items_type, req_dir_items_num);
-	if (scsi_cmdbuf[1] & 0x18) // error: reserved bits set
+	if (m_scsi_cmdbuf[1] & 0x18) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (items_type != STC_BLOCKS && items_type != STC_FILEMARKS && items_type != STC_END_OF_DATA) // error: we don't support spacing over setmarks or sequential filemarks
@@ -799,10 +799,10 @@ void nscsi_tape_device::handle_space() // mandatory; SCSI-2 section 10.2.12
 
 void nscsi_tape_device::handle_write_6() // mandatory; SCSI-2 section 10.2.14
 {
-	const bool fixed = scsi_cmdbuf[1] & 0x01; // should we write many fixed-length blocks instead of 1 variable-length block
-	const u32 req_items_num = get_u24be(&scsi_cmdbuf[2]); // requested number of blocks or bytes to write; "transfer length"
+	const bool fixed = m_scsi_cmdbuf[1] & 0x01; // should we write many fixed-length blocks instead of 1 variable-length block
+	const u32 req_items_num = get_u24be(&m_scsi_cmdbuf[2]); // requested number of blocks or bytes to write; "transfer length"
 	LOG("command WRITE(6) fixed=%d req_items_num=%d\n", fixed, req_items_num);
-	if (scsi_cmdbuf[1] & 0x1e) // error: reserved bits set
+	if (m_scsi_cmdbuf[1] & 0x1e) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (!m_has_tape) // error: no tape
@@ -868,11 +868,11 @@ void nscsi_tape_device::continue_handling_write_6()
 
 void nscsi_tape_device::handle_write_filemarks() // mandatory; SCSI-2 section 10.2.15
 {
-	const bool setmarks = scsi_cmdbuf[1] & 0x02; // should we write setmarks instead of filemarks
-	const bool immed = scsi_cmdbuf[1] & 0x01; // ignored; we don't support buffering
-	const u32 req_marks_num = get_u24be(&scsi_cmdbuf[2]); // requested number of marks to write; "transfer length"
+	const bool setmarks = m_scsi_cmdbuf[1] & 0x02; // should we write setmarks instead of filemarks
+	const bool immed = m_scsi_cmdbuf[1] & 0x01; // ignored; we don't support buffering
+	const u32 req_marks_num = get_u24be(&m_scsi_cmdbuf[2]); // requested number of marks to write; "transfer length"
 	LOG("command WRITE FILEMARKS setmarks=%d immed=%d req_marks_num=%d\n", setmarks, immed, req_marks_num);
-	if (scsi_cmdbuf[1] & 0x1c) // error: reserved bits set
+	if (m_scsi_cmdbuf[1] & 0x1c) // error: reserved bits set
 		return report_bad_cdb_field();
 
 	if (setmarks) // error: we don't support writing setmarks

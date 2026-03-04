@@ -115,14 +115,13 @@ protected:
 	K052109_CB_MEMBER(tile_callback);
 
 	// video-related
-	uint8_t    m_layer_colorbase[3]{};
-	uint8_t    m_sprite_colorbase = 0;
-	int32_t    m_layerpri[3]{};
-	int32_t    m_sorted_layer[3]{};   // this might not be necessary, but tmnt2 uses it in a strange way...
+	uint8_t m_layer_colorbase[3]{};
+	uint8_t m_sprite_colorbase = 0;
+	int32_t m_layerpri[3]{};
 
 	// misc
-	emu_timer  *m_nmi_blocked = nullptr;
-	uint8_t    m_lastirq = 0;
+	emu_timer *m_nmi_blocked = nullptr;
+	uint8_t m_lastirq = 0;
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -237,7 +236,7 @@ private:
 	void blswhstl_main_map(address_map &map) ATTR_COLD;
 
 	// video-related
-	int32_t m_blswhstl_rombank = 0;
+	uint8_t m_tile_rombank = 0;
 };
 
 // with protection and palette dimming
@@ -319,9 +318,9 @@ protected:
 	required_region_ptr<uint8_t> m_zoomchar_rom;
 
 	// video-related
-	tilemap_t  *m_roz_tilemap = nullptr;
-	uint16_t   m_glfgreat_pixel = 0;
-	uint8_t    m_roz_char_bank = 0;
+	tilemap_t *m_roz_tilemap = nullptr;
+	uint16_t m_glfgreat_pixel = 0;
+	uint8_t m_roz_char_bank = 0;
 };
 
 // with analog controller
@@ -702,7 +701,7 @@ K052109_CB_MEMBER(sunsetbl_state::ssbl_tile_callback)
 K052109_CB_MEMBER(blswhstl_state::blswhstl_tile_callback)
 {
 	/* (color & 0x02) is flip y handled internally by the 052109 */
-	code |= ((color & 0x01) << 8) | ((color & 0x10) << 5) | ((color & 0x0c) << 8) | (bank << 12) | m_blswhstl_rombank << 14;
+	code |= ((color & 0x01) << 8) | ((color & 0x10) << 5) | ((color & 0x0c) << 8) | (bank << 12) | m_tile_rombank << 14;
 	color = m_layer_colorbase[layer] + ((color & 0xe0) >> 5);
 }
 
@@ -814,17 +813,9 @@ K053244_CB_MEMBER(prmrsocr_state::prmrsocr_sprite_callback)
 
 void tmnt2_base_state::video_start()
 {
-	m_sprite_colorbase = 0;
-	for (int i = 0; i < 3; i++)
-	{
-		m_layer_colorbase[i] = 0;
-		m_sorted_layer[i] = 0;
-	}
-
 	save_item(NAME(m_layer_colorbase));
 	save_item(NAME(m_sprite_colorbase));
 	save_item(NAME(m_layerpri));
-	save_item(NAME(m_sorted_layer));
 }
 
 void lgtnfght_state::video_start()
@@ -847,8 +838,6 @@ void tmnt2_roz_base_state::video_start()
 {
 	tmnt2_k053245_base_state::video_start();
 
-	m_roz_char_bank = 0;
-
 	save_item(NAME(m_roz_char_bank));
 }
 
@@ -859,13 +848,11 @@ void glfgreat_state::video_start()
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(glfgreat_state::glfgreat_get_roz_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 512, 512);
 	m_roz_tilemap->set_transparent_pen(0);
 
-	m_controller_select = 0;
-	m_roz_rom_bank = 0;
-	m_roz_rom_mode = 0;
-
 	save_item(NAME(m_controller_select));
 	save_item(NAME(m_roz_rom_bank));
 	save_item(NAME(m_roz_rom_mode));
+
+	save_item(NAME(m_glfgreat_pixel));
 }
 
 void prmrsocr_state::video_start()
@@ -875,8 +862,6 @@ void prmrsocr_state::video_start()
 	m_roz_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(prmrsocr_state::prmrsocr_get_roz_tile_info)), TILEMAP_SCAN_ROWS, 16, 16, 512, 256);
 	m_roz_tilemap->set_transparent_pen(0);
 
-	m_sprite_bank = 0;
-
 	save_item(NAME(m_sprite_bank));
 }
 
@@ -884,9 +869,7 @@ void blswhstl_state::video_start()
 {
 	tmnt2_k053245_base_state::video_start();
 
-	m_blswhstl_rombank = -1;
-
-	save_item(NAME(m_blswhstl_rombank));
+	save_item(NAME(m_tile_rombank));
 }
 
 
@@ -945,9 +928,9 @@ void blswhstl_state::blswhstl_700300_w(offs_t offset, uint16_t data, uint16_t me
 		m_k052109->set_rmrd_line(BIT(data, 3) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 7 = select char ROM bank */
-		if (m_blswhstl_rombank != BIT(data, 7))
+		if (m_tile_rombank != BIT(data, 7))
 		{
-			m_blswhstl_rombank = BIT(data, 7);
+			m_tile_rombank = BIT(data, 7);
 			machine().tilemap().mark_all_dirty();
 		}
 
@@ -1088,18 +1071,19 @@ uint32_t punkshot_state::screen_update_punkshot(screen_device &screen, bitmap_in
 	}
 
 	// sort layers and draw
+	int layer[3];
 	for (int i = 0; i < 3; i++)
 	{
-		m_sorted_layer[i] = i;
+		layer[i] = i;
 		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
 	}
 
-	konami_sortlayers3(m_sorted_layer, m_layerpri);
+	konami_sortlayers3(layer, m_layerpri);
 
 	screen.priority().fill(0, cliprect);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[0], TILEMAP_DRAW_OPAQUE, 1);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[1], 0, 2);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
 	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
 	return 0;
@@ -1123,19 +1107,20 @@ uint32_t lgtnfght_state::screen_update_lgtnfght(screen_device &screen, bitmap_in
 	}
 
 	// sort layers and draw
+	int layer[3];
 	for (int i = 0; i < 3; i++)
 	{
-		m_sorted_layer[i] = i;
+		layer[i] = i;
 		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
 	}
 
-	konami_sortlayers3(m_sorted_layer, m_layerpri);
+	konami_sortlayers3(layer, m_layerpri);
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[0], 0, 1);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[1], 0, 2);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
 	m_k053245->sprites_draw(bitmap, cliprect, screen.priority());
 	return 0;
@@ -1172,18 +1157,19 @@ uint32_t tmnt2_roz_base_state::screen_update(screen_device &screen, bitmap_ind16
 	}
 
 	// sort layers and draw
+	int layer[3];
 	for (int i = 0; i < 3; i++)
 	{
-		m_sorted_layer[i] = i;
+		layer[i] = i;
 		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
 	}
 
-	konami_sortlayers3(m_sorted_layer, m_layerpri);
+	konami_sortlayers3(layer, m_layerpri);
 
 	// not sure about the 053936 priority, but it seems to work
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[0], 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
 
 	if (m_layerpri[0] >= 0x30 && m_layerpri[1] < 0x30)
 	{
@@ -1191,7 +1177,7 @@ uint32_t tmnt2_roz_base_state::screen_update(screen_device &screen, bitmap_ind16
 		m_glfgreat_pixel = bitmap.pix(0x80, 0x105);
 	}
 
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
 
 	if (m_layerpri[1] >= 0x30 && m_layerpri[2] < 0x30)
 	{
@@ -1199,7 +1185,7 @@ uint32_t tmnt2_roz_base_state::screen_update(screen_device &screen, bitmap_ind16
 		m_glfgreat_pixel = bitmap.pix(0x80, 0x105);
 	}
 
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
 	if (m_layerpri[2] >= 0x30)
 	{
@@ -1290,19 +1276,20 @@ uint32_t punkshot_state::screen_update_thndrx2(screen_device &screen, bitmap_ind
 	}
 
 	// sort layers and draw
+	int layer[3];
 	for (int i = 0; i < 3; i++)
 	{
-		m_sorted_layer[i] = i;
+		layer[i] = i;
 		m_layerpri[i] = m_k053251->get_priority(K053251_CI[i]);
 	}
 
-	konami_sortlayers3(m_sorted_layer, m_layerpri);
+	konami_sortlayers3(layer, m_layerpri);
 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(16 * bg_colorbase, cliprect);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[0], 0, 1);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[1], 0, 2);
-	m_k052109->tilemap_draw(screen, bitmap, cliprect, m_sorted_layer[2], 0, 4);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_k052109->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 4);
 
 	m_k051960->k051960_sprites_draw(bitmap, cliprect, screen.priority(), -1, -1);
 	return 0;
@@ -2698,6 +2685,7 @@ void tmnt2_state::tmnt2(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(tmnt2_state::screen_update));
+	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // ball position
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_555, 2048);

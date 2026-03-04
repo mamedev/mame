@@ -12,11 +12,12 @@
 #pragma once
 
 #include "exp.h"
-#include "emupal.h"
 #include "mm2kb.h"
 #include "screen.h"
+#include "machine/74259.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
+#include "machine/input_merger.h"
 #include "machine/timer.h"
 #include "video/crt9007.h"
 #include "video/crt9212.h"
@@ -35,7 +36,6 @@ protected:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void map(address_map &map) ATTR_COLD;
@@ -48,13 +48,11 @@ private:
 	required_device<crt9007_device> m_vpac;
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
-	required_device<palette_device> m_palette;
 	required_device<timer_device> m_timer_vidldsh;
 	required_device<i8251_device> m_sio;
 	required_device<mm2_keyboard_device> m_kb;
+	required_device<ls259_device> m_ctrl;
 	required_device<screen_device> m_screen;
-
-	void palette(palette_device &palette) const;
 
 	void vpac_mem(address_map &map) ATTR_COLD;
 
@@ -62,13 +60,13 @@ private:
 
 	uint16_t vpac_r(offs_t offset, uint16_t mem_mask);
 	void vpac_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	void cpl_w(offs_t offset, uint8_t data) { m_cpl = BIT(data, 0); }
-	void blc_w(offs_t offset, uint8_t data) { m_blc = BIT(data, 0); }
-	void mode_w(offs_t offset, uint8_t data) { m_mode = BIT(data, 0); set_vidldsh_timer(); }
-	void modeg_w(offs_t offset, uint8_t data) { m_modeg = BIT(data, 0); set_vidldsh_timer(); }
-	void c70_50_w(offs_t offset, uint8_t data) { m_c70_50 = BIT(data, 0); }
-	void cru_w(offs_t offset, uint8_t data) { m_cru = BIT(data, 0); }
-	void crb_w(offs_t offset, uint8_t data) { m_crb = BIT(data, 0); }
+	void cpl_w(int state) { m_cpl = state; }
+	void blc_w(int state) { m_blc = state; }
+	void mode_w(int state) { m_mode = state; set_vidldsh_timer(); }
+	void modeg_w(int state) { m_modeg = state; set_vidldsh_timer(); }
+	void c70_50_w(int state) { m_c70_50 = state; }
+	void cru_w(int state) { m_cru = state; }
+	void crb_w(int state) { m_crb = state; }
 
 	uint8_t videoram_r(offs_t offset);
 	void vpac_vlt_w(int state);
@@ -91,6 +89,10 @@ private:
 	bool m_c70_50;
 	bool m_cru;
 	bool m_crb;
+	int m_cursor_x;
+	int m_cursor_y;
+
+	static constexpr rgb_t halflit() { return rgb_t(0x7f, 0x7f, 0x7f); }
 };
 
 #endif // MAME_BUS_MM2_CRTC186_H

@@ -24,7 +24,7 @@ DEFINE_DEVICE_TYPE(ISA8_RT1000B, isa8_rt1000b_device, "rt1000b", " Rancho Techno
 isa8_rt1000b_device::isa8_rt1000b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISA8_RT1000B, tag, owner, clock)
 	, device_isa8_card_interface(mconfig, *this)
-	, m_scsic(*this, "scsi:7:scsic")
+	, m_scsic(*this, "scsic")
 	, m_config(*this, "CONFIG")
 {
 }
@@ -37,7 +37,7 @@ void isa8_rt1000b_device::scsic_config(device_t *device)
 
 void isa8_rt1000b_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -45,9 +45,9 @@ void isa8_rt1000b_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsic", true)
-		.option_add_internal("scsic", NCR53C80)
-		.machine_config([this] (device_t *device) { scsic_config(device); });
+
+	NCR53C80(config, m_scsic);
+	scsi.set_external_device(7, m_scsic);
 
 //  EEPROM_93C06_16BIT(config, m_eeprom);
 }

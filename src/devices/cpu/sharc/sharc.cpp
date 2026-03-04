@@ -619,7 +619,7 @@ void adsp21062_device::device_start()
 		m_drcuml->symbol_add(&m_core->lstkp, sizeof(m_core->lstkp), "lstkp");
 		m_drcuml->symbol_add(&m_core->px, sizeof(m_core->px), "px");
 
-		m_drcfe = std::make_unique<sharc_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);
+		m_drcfe = std::make_unique<frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);
 
 		for (int i = 0; i < 16; i++)
 			m_regmap[i] = uml::mem(&m_core->r[i]);

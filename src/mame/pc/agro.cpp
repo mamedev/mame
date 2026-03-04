@@ -7,6 +7,8 @@ Agro's ~~Good~~ Fantastic Video Game
 
 Redemption machine, single button.
 
+DOS 6.21 on El Torito CD
+
 - PCChips/Hsin Tech M590 motherboard;
 - SiS5591 + SiS5595;
 - SiS 3D Pro on-board (SiS6326 equivalent);
@@ -16,11 +18,14 @@ Redemption machine, single button.
 - 3x PCI + 2x ISA card slots;
 - Winbond W83194R-17 PLL;
 
+Has no config.sys, autoexec.bat just has a BOOT.EXE inside, which should eventually call GAME.EXE
+over the same boot partition.
+
 TODO:
 - stub;
 - On shutms11 pre-breakage it will start MS-DOS then quickly access $1000'0000, is the protection
   device mapping on PCI space?
-- analyze autoexec.bat / config.sys;
+- Most likely uses SiS6326 TV Out for the actual game, as boot.exe tries to initialize that part;
 
 **************************************************************************************************/
 

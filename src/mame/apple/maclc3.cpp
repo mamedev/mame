@@ -62,7 +62,7 @@ public:
 		m_dfac2(*this, "dfac2"),
 		m_omega(*this, "omega"),
 		m_scsibus1(*this, "scsi"),
-		m_ncr5380(*this, "scsi:7:ncr5380"),
+		m_ncr5380(*this, "ncr5380"),
 		m_scsihelp(*this, "scsihelp"),
 		m_scc(*this, "scc"),
 		m_egret(*this, "egret"),
@@ -265,7 +265,7 @@ void macvail_state::maclc3_base(machine_config &config)
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("8M,16M,32M,48M,64M,80M");
 
-	NSCSI_BUS(config, "scsi");
+	NSCSI_BUS(config, m_scsibus1);
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
@@ -278,11 +278,9 @@ void macvail_state::maclc3_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device)
-	{
-		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
-		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
-	});
+	NCR53C80(config, m_ncr5380);
+	m_scsibus1->set_external_device(7, m_ncr5380);
+	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 
 	MAC_SCSI_HELPER(config, m_scsihelp);
 	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));

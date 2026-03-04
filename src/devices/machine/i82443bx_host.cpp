@@ -169,8 +169,12 @@ void i82443bx_bridge_device::map_extra(
 {
 	if (BIT(bridge_control, 3))
 	{
-		//memory_space->install_device(0, 0xfffff, *m_vga, &sis630_gui_device::legacy_memory_map);
-		//io_space->install_device(0, 0x0fff, *m_vga, &sis630_gui_device::legacy_io_map);
+#if 0
+		if (BIT(command, 1))
+			memory_space->install_device(0, 0xfffff, *m_vga, &vga_device::legacy_memory_map);
+		if (BIT(command, 0))
+			io_space->install_device(0, 0xffff, *m_vga, &vga_device::legacy_io_map);
+#endif
 	}
 }
 

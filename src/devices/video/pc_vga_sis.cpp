@@ -7,6 +7,10 @@ Implementation of SiS family (S)VGA chipset
 SiS6326: VBE 2.0, Multi Buffering & Virtual Scrolling available
 SiS630:  VBE 3.0, Multi Buffering & Virtual Scrolling available
 
+Notes:
+- In logging we omit "Extended", for searching purposes it's suggested to use the <reg_name>%X
+  nomenclature anyway i.e. CR19 or SR7
+
 TODO:
 - Extended 4bpp modes don't work (cfr. SDD item);
 - Refresh rate for extended modes;
@@ -19,7 +23,6 @@ TODO:
 - DDC;
 - Bridge with a secondary TV out (SiS301 for '630);
 - Verify matches with earlier SiS PCI cards, backport;
-- win98se: dxdiag eventually craps out at the end of Direct Draw testing, why?
 
 TODO (sis630):
 - Output scaling, cfr. xubuntu 6.10 splash screen at 1024x768x32 (really interlace as above?);
@@ -32,8 +35,15 @@ TODO (sis630):
 
 #include "screen.h"
 
+#define LOG_SEQ    (1U << 1) // extended sequencer register descriptions
+
+#define LOG_LOCKED (1U << 4) // log lock/unlock sequences
+
 #define VERBOSE (LOG_GENERAL)
 //#define LOG_OUTPUT_FUNC osd_printf_info
+
+#define LOGSEQ(...)       LOGMASKED(LOG_SEQ, __VA_ARGS__)
+#define LOGLOCKED(...)    LOGMASKED(LOG_LOCKED, __VA_ARGS__)
 
 #include "logmacro.h"
 
@@ -48,6 +58,7 @@ TODO (sis630):
 //DEFINE_DEVICE_TYPE(SIS6225_VGA,   sis6225_vga_device,   "sis6225_vga",   "SiS 6225 VGA i/f")
 //DEFINE_DEVICE_TYPE(SIS6215_VGA,   sis6215_vga_device,   "sis6215_vga",   "SiS 6215 VGA i/f")
 
+// NOTE: Everest Home app actually uses 86C326 as Video Adapter name, while GPU is 6326
 DEFINE_DEVICE_TYPE(SIS6326_VGA,   sis6326_vga_device,   "sis6326_vga",   "SiS 6326 VGA i/f")
 DEFINE_DEVICE_TYPE(SIS630_VGA,    sis630_vga_device,    "sis630_vga",    "SiS 630 VGA i/f")
 
@@ -64,6 +75,7 @@ sis6326_vga_device::sis6326_vga_device(const machine_config &mconfig, device_typ
 	, m_md20_cb(*this, 0)
 	, m_md21_cb(*this, 0)
 	, m_md23_cb(*this, 0)
+	, m_md27_cb(*this, 0)
 {
 }
 
@@ -90,19 +102,36 @@ void sis6326_vga_device::device_start()
 	save_item(NAME(m_seq_unlock_reg));
 	save_item(NAME(m_ramdac_mode));
 	save_item(NAME(m_ext_sr07));
+	save_item(NAME(m_crt_cpu_threshold));
 	save_item(NAME(m_ext_sr0b));
 	save_item(NAME(m_ext_sr0c));
 	save_item(NAME(m_ext_ddc));
+	save_item(NAME(m_ext_sr12));
+	save_item(NAME(m_ext_sr13));
+	save_item(NAME(m_suspend_time));
+	save_item(NAME(m_standby_time));
 	save_item(NAME(m_ext_sr23));
+	save_item(NAME(m_mclk_int));
+	save_item(NAME(m_vclk_int));
+	save_item(NAME(m_turbo_queue_address));
+	save_item(NAME(m_page_size_select));
+	save_item(NAME(m_dram_fb_size));
+	save_item(NAME(m_fast_page_address_latch));
 	save_item(NAME(m_ext_sr33));
 	save_item(NAME(m_ext_sr34));
 	save_item(NAME(m_ext_sr35));
 	save_item(NAME(m_ext_sr38));
 	save_item(NAME(m_ext_sr39));
+	save_item(NAME(m_mpeg_turbo_queue_address));
 	save_item(NAME(m_ext_sr3c));
+	save_item(NAME(m_mclk_gen));
+	save_item(NAME(m_vclk_gen));
 	save_item(NAME(m_ext_ge26));
 	save_item(NAME(m_ext_ge27));
 	save_item(NAME(m_linear_address));
+
+	save_item(NAME(m_crtc_hcounter_latch));
+	save_item(NAME(m_crtc_vcounter_latch));
 
 	save_item(STRUCT_MEMBER(m_cursor, address_base));
 	save_item(STRUCT_MEMBER(m_cursor, color_cache));
@@ -127,15 +156,26 @@ void sis6326_vga_device::device_reset()
 	m_crtc_unlock_reg = false;
 	m_seq_unlock_reg = false;
 	m_ramdac_mode = 0;
+	m_crt_cpu_threshold[0] = m_crt_cpu_threshold[1] = 0;
+	m_suspend_time = m_standby_time = 0;
 	m_ext_sr07 = m_ext_sr0b = m_ext_sr0c = m_ext_sr23 = m_ext_sr33 = 0;
 	m_ext_sr34 = m_ext_sr35 = m_ext_sr38 = m_ext_sr39 = m_ext_sr3c = 0;
 	m_ext_ge26 = m_ext_ge27 = 0;
+	m_mclk_int[0] = m_mclk_int[1] = 0;
+	m_vclk_int[0] = m_vclk_int[1] = 0;
+	m_page_size_select = 0;
+	m_dram_fb_size = 0;
+	m_fast_page_address_latch[0] = m_fast_page_address_latch[1] = m_fast_page_address_latch[2] = 0;
+	// irrelevant really
+	m_crtc_hcounter_latch = m_crtc_vcounter_latch = 0xffff;
 
 	// everything else shouldn't matter for cursor
 	// initialize fixed part here: HW cannot set any other bit beyond 21 ~ 18.
 	// On win98se this will map at bottom of VRAM i.e. at $3f'fc00 on 4MiB cards
 	m_cursor.address_base = 0x03'fc00;
 
+	m_turbo_queue_address = 0;
+	m_mpeg_turbo_queue_address = 0;
 	m_linear_address[0] = 0;
 	m_linear_address[1] = 0;
 	m_ext_ddc = 0;
@@ -176,9 +216,53 @@ void sis6326_vga_device::io_3cx_map(address_map &map)
 	);
 }
 
+// Direct Draw uses this
+void sis6326_vga_device::crtc_strobe_latch()
+{
+	m_crtc_hcounter_latch = screen().hpos();
+	m_crtc_vcounter_latch = screen().vpos();
+}
+
 void sis6326_vga_device::crtc_map(address_map &map)
 {
 	svga_device::crtc_map(map);
+	// CR19/CR1A Extended Signature Read-Back 0/1
+
+	// CR1B CRT horizontal counter (r/o)
+	map(0x1b, 0x1b).lr8(NAME([this] (offs_t offset) { return m_crtc_hcounter_latch & 0xff; }));
+	// CR1C CRT vertical counter (r/o)
+	map(0x1c, 0x1c).lr8(NAME([this] (offs_t offset) { return m_crtc_vcounter_latch & 0xff; }));
+	// CR1D CRT overflow counter (r/o)
+	map(0x1d, 0x1d).lr8(NAME([this] (offs_t offset) {
+		return (BIT(m_crtc_hcounter_latch, 8) << 4) | ((m_crtc_vcounter_latch & 0x700) >> 8);
+	}));
+
+	// CR1E Extended Signature Read-Back 2
+
+	// CR20: CRT Counter Trigger Port
+	// NOTE: doc claims "r/o" but Direct Draw end of test actually writes on it
+	// assume just strobe address
+	map(0x20, 0x20).lrw8(
+		NAME([this] (offs_t offset) {
+			if (!machine().side_effects_disabled())
+			{
+				LOG("CR20: Counter trigger read\n");
+				crtc_strobe_latch();
+			}
+			return 0xff;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			(void)data;
+			LOG("CR20: Counter trigger write\n");
+			crtc_strobe_latch();
+		})
+	);
+	// CR26 Attribute Controller Index read-back
+	// TODO: bit 5 is "video enable" at least for '6326
+	map(0x26, 0x26).lr8(
+		NAME([this] (offs_t offset) { return vga.attribute.index; })
+	);
+
 	// Password/Identification Register
 	map(0x80, 0x80).lrw8(
 		NAME([this] (offs_t offset) {
@@ -187,7 +271,7 @@ void sis6326_vga_device::crtc_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			// TODO: reimplement me thru memory_view or direct handler override
 			m_crtc_unlock_reg = (data == 0x86);
-			LOG("CR80: Unlock register write %02x (%s)\n", data, m_crtc_unlock_reg ? "unlocked" : "locked");
+			LOGLOCKED("CR80: Unlock register write %02x (%s)\n", data, m_crtc_unlock_reg ? "unlocked" : "locked");
 		})
 	);
 	// ...
@@ -196,7 +280,7 @@ void sis6326_vga_device::crtc_map(address_map &map)
 		NAME([this] (offs_t offset) -> u8 {
 			if (!m_crtc_unlock_reg)
 			{
-				LOG("CRE0: attempt to read TV OUT index while locked\n");
+				LOGLOCKED("CRE0: attempt to read TV OUT index while locked\n");
 				return 0xff;
 			}
 			return m_tvout_index;
@@ -204,7 +288,7 @@ void sis6326_vga_device::crtc_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			if (!m_crtc_unlock_reg)
 			{
-				LOG("CRE0: attempt to write TV OUT index while locked %02x\n", data);
+				LOGLOCKED("CRE0: attempt to write TV OUT index while locked %02x\n", data);
 				return;
 			}
 			m_tvout_index = data;
@@ -214,7 +298,7 @@ void sis6326_vga_device::crtc_map(address_map &map)
 		NAME([this] (offs_t offset) -> u8 {
 			if (!m_crtc_unlock_reg)
 			{
-				LOG("CRE0: attempt to read TV OUT data while locked [%02x]\n", m_tvout_index);
+				LOGLOCKED("CRE0: attempt to read TV OUT data while locked [%02x]\n", m_tvout_index);
 				return 0;
 			}
 			return space(EXT_REG).read_byte(m_tvout_index);
@@ -222,7 +306,7 @@ void sis6326_vga_device::crtc_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			if (!m_crtc_unlock_reg)
 			{
-				LOG("CRE0: attempt to write TV OUT data while locked [%02x] %02x\n", m_tvout_index, data);
+				LOGLOCKED("CRE0: attempt to write TV OUT data while locked [%02x] %02x\n", m_tvout_index, data);
 				return;
 			}
 			space(EXT_REG).write_byte(m_tvout_index, data);
@@ -242,7 +326,7 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			// TODO: reimplement me thru memory_view or direct handler override
 			m_seq_unlock_reg = (data == 0x86);
-			LOG("SR5: Unlock register write %02x (%s)\n", data, m_seq_unlock_reg ? "unlocked" : "locked");
+			LOGLOCKED("SR5: Unlock register write %02x (%s)\n", data, m_seq_unlock_reg ? "unlocked" : "locked");
 		})
 	);
 	/*
@@ -261,13 +345,12 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_ramdac_mode = data;
-			LOG("SR06: RAMDAC mode %02x\n", data);
+			// verbose in win98se
+			LOGSEQ("SR06: RAMDAC mode %02x\n", data);
 
-			if (!BIT(data, 1))
-			{
-				svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = svga.rgb32_en = 0;
-			}
-			else
+			svga.rgb8_en = svga.rgb15_en = svga.rgb16_en = svga.rgb24_en = svga.rgb32_en = 0;
+
+			if (BIT(data, 1))
 			{
 				// TODO: who wins on multiple bits enable?
 				if (BIT(data, 1))
@@ -295,18 +378,46 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_sr07;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR07: Extended Misc. Control 0 %02x\n", data);
+			LOG("SR07: Misc. Control 0 %02x\n", data);
+			LOGSEQ("\tMerge video line buffer %d feature conn. %d RAMDAC power saving %d video clock freq / 2 %d\n"
+				, BIT(data, 7)
+				, BIT(data, 6)
+				, BIT(data, 5)
+				, BIT(data, 4)
+			);
+			LOGSEQ("\tMulti-line prefetch %d 24-bit color palette %d High Speed DAC %d External DAC reference voltage %d\n"
+				, BIT(data, 3)
+				, BIT(data, 2)
+				, BIT(data, 1)
+				, BIT(data, 0)
+			);
 			m_ext_sr07 = data;
 			std::tie(svga.rgb24_en, svga.rgb32_en) = flush_true_color_mode();
 		})
 	);
-	//map(0x08, 0x09) CRT threshold Control
+
+	// CRT/CPU Threshold Control
+	// [0]
+	// xxxx ---- CRT/CPU Arbitration Threshold Low
+	// ---- xxxx CRT/Engine Threshold High
+	// [1]
+	// xxxx ---- ASCII/Attribute Threshold
+	// ---- xxxx CRT/CPU Threshold High
+	map(0x08, 0x09).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_crt_cpu_threshold[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR%02X: CRT/CPU Threshold Control %d %02x\n", offset + 8, offset, data);
+			m_crt_cpu_threshold[offset] = data;
+		})
+	);
 	map(0x0a, 0x0a).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_ext_vert_overflow;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR0A: Extended CRT Overflow %02x\n", data);
+			LOG("SR0A: CRT Overflow %02x\n", data);
 			m_ext_vert_overflow = data;
 			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0xf0) << 4);
 			vga.crtc.vert_retrace_start = (vga.crtc.vert_retrace_start & 0x03ff) | (BIT(data, 3) << 10);
@@ -316,6 +427,7 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			recompute_params();
 		})
 	);
+
 	// x--- ---- True Color RGB select (0) RGB (1) BGR
 	// -xx- ---- MMIO select
 	// -00- ---- Disable
@@ -332,10 +444,23 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_sr0b;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR0B: Extended Misc. Control 1 %02x\n", data);
+			// verbose in win98se
+			LOGSEQ("SR0B: Misc. Control 1 %02x\n", data);
+			LOGSEQ("\tTrue Color format %s MMIO space sel %d True Color frame rate modulation %d\n"
+				, BIT(data, 7) ? "BGR" : "RGB"
+				, (data >> 5) & 3
+				, BIT(data, 4)
+			);
+			LOGSEQ("\tDual segment enable %d I/O gating enable %d 16-color packed pixel %d CPU-driven BITBLT enable %d\n"
+				, BIT(data, 3)
+				, BIT(data, 2)
+				, BIT(data, 1)
+				, BIT(data, 0)
+			);
 			m_ext_sr0b = data;
 		})
 	);
+
 	// x--- ---- Graphic mode 32-bit memory access enable
 	// -x-- ---- Text mode 16-bit memory access enable
 	// --x- ---- Read-ahead cache operation enable
@@ -351,10 +476,21 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_sr0c;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR0C: Extended Misc. Control 2 %02x\n", data);
+			LOG("SR0C: Misc. Control 2 %02x\n", data);
+			LOGSEQ("\tGraphics mode 32bit %d Text mode 16bit %d Read-ahead cache %d\n"
+				, BIT(data, 7)
+				, BIT(data, 6)
+				, BIT(data, 5)
+			);
+			LOGSEQ("\tTest mode %d Memory config %d Sync reset timing gen %d\n"
+				, BIT(data, 3)
+				, (data >> 1) & 3
+				, BIT(data, 0)
+			);
 			m_ext_sr0c = data;
 		})
 	);
+
 	//map(0x0d, 0x0e) Ext. Config Status (r/o)
 	map(0x0d, 0x0d).lr8(
 		// x--- ---- MD23 Enable 64K ROM
@@ -375,18 +511,19 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 		// ---- x--- MD27 INTA# enable
 		// ---- -x-- MD26 BIOS ROM disable
 		// ---- --xx MD25~MD24 <reserved>
-		NAME([] () { return (0 << 3); })
+		NAME([this] () { return (m_md27_cb() << 3); })
 	);
 	map(0x0f, 0x10).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_ext_scratch[offset];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR%02X: Extended Scratch %d %02x\n", offset + 0xf, offset, data);
+			LOG("SR%02X: Scratch %d %02x\n", offset + 0xf, offset, data);
 			m_ext_scratch[offset] = data;
 		})
 	);
-	/// DDC register
+
+	// DDC register
 	map(0x11, 0x11).lrw8(
 		NAME([this] (offs_t offset) {
 			//LOG("SR11: DDC and Power Control read (%02x)\n", m_ext_ddc);
@@ -394,12 +531,48 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			LOG("SR11: DDC and Power Control %02x\n", data);
+			if ((m_ext_ddc & 0xfc) != (data & 0xfc))
+			{
+				LOGSEQ("\tForce suspend mode %d Force standby mode %d memory activation source %d keyboard/HW cursor activation source %d\n"
+					, BIT(data, 7)
+					, BIT(data, 6)
+					, BIT(data, 5)
+					, BIT(data, 4)
+				);
+			}
 			m_ext_ddc = data;
 		})
 	);
 
-	//map(0x12, 0x12) Ext. Horizontal Overflow
-	//map(0x13, 0x13) Ext. Clock Generator / 25MHz/28MHz Video Clock
+	// Ext. Horizontal Overflow
+	map(0x12, 0x12).lrw8(
+		NAME([this] (offs_t offset) { return m_ext_sr12; }),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR12: Horizontal Overflow %02x\n", data);
+			m_ext_sr12 = data;
+			// TODO: bits 7-5 for horizontal retrace skew (overrides base VGA?)
+			// unused by base core anyway
+			vga.crtc.horz_blank_end =     (vga.crtc.horz_blank_end & ~0x40)      | (BIT(data, 4) << 6);
+			vga.crtc.horz_retrace_start = (vga.crtc.horz_retrace_start & ~0x100) | (BIT(data, 3) << 8);
+			vga.crtc.horz_blank_start =   (vga.crtc.horz_blank_start & ~0x100)   | (BIT(data, 2) << 8);
+			vga.crtc.horz_disp_end =      (vga.crtc.horz_disp_end & ~0x100)      | (BIT(data, 1) << 8);
+			vga.crtc.horz_total =         (vga.crtc.horz_total & ~0x100)         | (BIT(data, 0) << 8);
+			recompute_params();
+		})
+	);
+
+	// Ext. Clock Generator / 25MHz/28MHz Video Clock
+	map(0x13, 0x13).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_ext_sr13;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR13: Clock Generator %02x\n", data);
+			m_ext_sr13 = data;
+			recompute_params();
+		})
+	);
+
 	// HW Cursor Color 0/1
 	map(0x14, 0x19).lrw8(
 		NAME([this] (offs_t offset) {
@@ -433,7 +606,13 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			}
 		})
 	);
-	//map(0x1c, 0x1c) HW Cursor Horizontal Preset
+	// HW Cursor Horizontal Preset
+	map(0x1c, 0x1c).lrw8(
+		NAME([this] (offs_t offset) { return m_cursor.x_preset; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_cursor.x_preset = data & 0x3f;
+		})
+	);
 	// HW Cursor Vertical Start 0/1
 	map(0x1d, 0x1e).lrw8(
 		NAME([this] (offs_t offset) {
@@ -456,16 +635,22 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			}
 		})
 	);
+	// HW Cursor Vertical Preset
+	map(0x1f, 0x1f).lrw8(
+		NAME([this] (offs_t offset) { return m_cursor.y_preset; }),
+		NAME([this] (offs_t offset, u8 data) {
+			m_cursor.y_preset = data & 0x3f;
+		})
+	);
 
-	//map(0x1f, 0x1f) HW Cursor Vertical Preset
-	//map(0x20, 0x21) Linear Addressing Base Address 0/1
+	// Linear Addressing Base Address 0/1
 	map(0x20, 0x21).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_linear_address[offset];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			m_linear_address[offset] = data;
-			LOG("SR%02X: Extended Linear Addressing Base %02x\n", offset + 0x20, data);
+			LOG("SR%02X: Linear Addressing Base %02x\n", offset + 0x20, data);
 			LOG("\tBase %08x Size %d\n"
 				, (m_linear_address[0] << 19) | ((m_linear_address[1] & 0xf) << 27)
 				// 00 512 KiB
@@ -476,13 +661,36 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			);
 		})
 	);
-	//map(0x22, 0x22) Standby/Suspend Timer
+
+	// Standby/Suspend Timer
+	map(0x22, 0x22).lrw8(
+		NAME([this] (offs_t offset) { return (m_suspend_time << 4) | (m_standby_time); }),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR22: Standby/Suspend Timer %02x\n", data);
+			m_suspend_time = (data >> 4) & 0xf;
+			m_standby_time = data & 0xf;
+			// TODO: doc doesn't mention it, but is it actually supposed to be +1 for both?
+			LOGSEQ("\tSuspend time %d minutes Standby Timer %d minutes\n"
+				, m_suspend_time * 2
+				, m_standby_time * 2
+			);
+		})
+	);
 	map(0x23, 0x23).lrw8(
 		NAME([this] (offs_t offset) {
 			return m_ext_sr23;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR23: Extended Misc. Control 3 %02x\n", data);
+			LOG("SR23: Misc. Control 3 %02x\n", data);
+			LOGSEQ("\tCRC Generator %d ED DRAM %d Bypass SRAM %d\n"
+				, BIT(data, 6)
+				, BIT(data, 5)
+				, BIT(data, 4)
+			);
+			LOGSEQ("\tCompatible HW cursor visibility %d DRAM Control Delay Compensation %d nsec\n"
+				, BIT(data, 3)
+				, (data & 7) + 4
+			);
 			m_ext_sr23 = data;
 		})
 	);
@@ -492,10 +700,11 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_scratch[2];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR25: Extended Scratch 2 %02x\n", data);
+			LOG("SR25: Scratch 2 %02x\n", data);
 			m_ext_scratch[2] = data;
 		})
 	);
+
 	// -x-- ---- Power Down Internal RAMDAC
 	// --x- ---- PCI Burst Write Mode Enable
 	// ---x ---- Continous Memory Data Access Enable
@@ -506,7 +715,16 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_ge26;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR26: Extended Graphics Engine Register 0 %02x\n", data);
+			LOG("SR26: Graphics Engine Register 0 %02x\n", data);
+			LOGSEQ("\tPower-down Internal RAMDAC %d PCI Burst-Write Mode %d Continous Memory Data Access %d\n"
+				, BIT(data, 6)
+				, BIT(data, 5)
+				, BIT(data, 4)
+			);
+			LOGSEQ("\tSlow DRAM RAS pre-charge %d MCLK/DRAM Slow FP/ED DRAM RAS-CAS %d MCLK/DRAM\n"
+				, BIT(data, 2) + 3
+				, BIT(data, 1) + 7
+			);
 			m_ext_ge26 = data;
 		})
 	);
@@ -522,20 +740,95 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_ge27;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR27: Extended Graphics Engine Register 1 %02x\n", data);
+			LOG("SR27: Graphics Engine Register 1 %02x\n", data);
+			if ((m_ext_ge27 & 0xf0) != (data & 0xf0))
+			{
+				LOGSEQ("\tTurbo Queue %d Graphic Engine Prog %d Logical Screen Width %d\n"
+					, BIT(data, 7)
+					, BIT(data, 6)
+					, ((data >> 4) & 3) * 1024
+				);
+			}
 			m_ext_ge27 = data;
 			vga.crtc.start_addr_latch &= ~0x0f0000;
 			vga.crtc.start_addr_latch |= ((data & 0x0f) << 16);
 		})
 	);
 
-	//map(0x28, 0x29) Internal Memory Clock
-	//map(0x2a, 0x2b) Internal Video Clock / 25MHz/28MHz Video Clock 0/1
-	//map(0x2c, 0x2c) Turbo Queue Base Address
-	//map(0x2d, 0x2d) Memory Start Controller
+	// Internal Memory Clock
+	map(0x28, 0x29).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_mclk_int[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR%02x: Internal Memory Clock %d %02x\n", offset + 0x28, offset, data);
+			m_mclk_int[offset] = data;
+		})
+	);
+	// Internal Video Clock / 25MHz/28MHz Video Clock 0/1
+	map(0x2a, 0x2b).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_vclk_int[offset];
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR%02x: Internal Video Clock %d %02x\n", offset + 0x2a, offset, data);
+			m_vclk_int[offset] = data;
+			recompute_params();
+		})
+	);
+
+	// Turbo Queue Base Address
+	map(0x2c, 0x2c).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_turbo_queue_address;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR2C: Turbo Queue Base Address %02x\n", data);
+			// TODO: "in the last 32K segment"
+			m_turbo_queue_address = data & 0x7f;
+		})
+	);
+	// Memory Start Controller
+	map(0x2d, 0x2d).lrw8(
+		NAME([this] (offs_t offset) { return m_page_size_select; }),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR2D: Memory Start Control %02x\n", data);
+			m_page_size_select = data & 0xf;
+		})
+	);
+
 	//map(0x2e, 0x2e) <reserved>
-	//map(0x2f, 0x2f) DRAM Frame Buffer Size
-	//map(0x30, 0x32) Fast Page Flip Starting Address
+
+	// DRAM Frame Buffer Size
+	map(0x2f, 0x2f).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_dram_fb_size;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR2F: DRAM Frame Buffer Size %02x\n", data);
+			LOGSEQ("\tFast Change Mode Timing %d Fast Page Flip %d\n"
+				, BIT(data, 5)
+				, BIT(data, 4)
+			);
+			m_dram_fb_size = data & 0x30;
+		})
+	);
+
+	// Fast Page Flip Starting Address
+	map(0x30, 0x32).lrw8(
+		NAME([this] (offs_t offset) { return m_fast_page_address_latch[offset]; }),
+		NAME([this] (offs_t offset, u8 data) {
+			const bool latch_address = offset == 2;
+			const u8 mask = latch_address ? 0x0f : 0xff;
+			m_fast_page_address_latch[offset] = data & mask;
+			LOG("SR30: Fast Page Flip Starting Address [%d] %02x\n", offset, data);
+			// TODO: Direct Draw obviously uses this
+			//if (BIT(m_dram_fb_size, 4) && latch_address)
+			//{
+			//}
+		})
+	);
+
 	// -x-- ---- Select external TVCLK as MCLK
 	// --x- ---- Relocated VGA I/O port
 	// ---x ---- Standard VGA I/O port address enable
@@ -548,7 +841,16 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_sr33;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR33: Extended Misc. Control 4 %02x\n", data);
+			LOG("SR33: Misc. Control 4 %02x\n", data);
+			LOGSEQ("\tExternal TVCLK as MCLK %d\n"
+				, BIT(data, 6)
+			);
+			LOGSEQ("\tOne cycle EDO DRAM %d SGRAM latency %d SGRAM Mode Write %d SGRAM timing %d\n"
+				, BIT(data, 3)
+				, 3 - BIT(data, 2)
+				, BIT(data, 1)
+				, BIT(data, 0)
+			);
 			m_ext_sr33 = data;
 			// TODO: needs exposing for PCI card(s)
 			// bit 5 relocates $3b0-$3df thru PCI bar
@@ -557,6 +859,7 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 				popmessage("pc_vga_sis.cpp: Relocated VGA PCI %d Standard VGA I/O disable %d", BIT(data, 5), BIT(data, 4));
 		})
 	);
+
 	// x--- ---- DRAM controller one cycle write enable
 	// -x-- ---- DRAM controller one cycle read enable
 	// ---- -x-- Enable DRAM output PAD low power
@@ -566,10 +869,19 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_sr34;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR34: Extended Misc. Control 5 %02x\n", data);
+			LOG("SR34: Misc. Control 5 %02x\n", data);
+			LOGSEQ("\tDRAM controller one cycle write %d read %d\n"
+				, BIT(data, 7)
+				, BIT(data, 6)
+			);
+			LOGSEQ("\tDRAM output PAD low power %d HW Command Queue threshold low %d\n"
+				, BIT(data, 2)
+				, BIT(data, 0)
+			);
 			m_ext_sr34 = data;
 		})
 	);
+
 	// x--- ---- Enable HW MPEG
 	// -x-- ---- MA delay compensation (0) 0 nsec (1) 2 nsec
 	// --x- ---- SGRAM burst timing enable (0) disable
@@ -582,7 +894,18 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_sr35;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR35: Extended Misc. Control 6 %02x\n", data);
+			LOG("SR35: Misc. Control 6 %02x\n", data);
+			LOGSEQ("\tHW MPEG %d MA delay compensation %d nsec SGRAM burst timing %d PCI burst write zero-wait %d\n"
+				, BIT(data, 7)
+				, BIT(data, 6) * 2
+				, !BIT(data, 5)
+				, BIT(data, 4)
+			);
+			LOGSEQ("\tDRAM CAS LOW period width compensation %d nsec PCI bus write cycle retry %d read cycle %d\n"
+				, ((data >> 2) & 3) * 2
+				, BIT(data, 1)
+				, BIT(data, 0)
+			);
 			m_ext_sr35 = data;
 		})
 	);
@@ -591,10 +914,11 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_scratch[offset + 3];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR%02X: Extended Scratch %d %02x\n", offset + 0x36, offset + 3, data);
+			LOG("SR%02X: Scratch %d %02x\n", offset + 0x36, offset + 3, data);
 			m_ext_scratch[offset + 3] = data;
 		})
 	);
+
 	// xxxx ---- HW Cursor Starting Address bits 21-18
 	// ---- -x-- Line Compare (0) disable
 	// ---- --xx Video Clock Select
@@ -607,7 +931,11 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_sr38;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR38: Extended Misc. Control 7 %02x\n", data);
+			LOG("SR38: Misc. Control 7 %02x\n", data);
+			//if ((m_ext_sr38 & 3) != (data & 3))
+			//{
+			//	recompute_params();
+			//}
 			m_ext_sr38 = data;
 			m_cursor.address_base &= ~0x3c'0000;
 			m_cursor.address_base |= (data >> 4) << 18;
@@ -617,6 +945,7 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			//vga.crtc.line_compare = (vga.crtc.line_compare & 0x3ff) | (BIT(data, 2) << 10);
 		})
 	);
+
 	// ---x ---- Select external TVCLK as internal TVCLK enable
 	// ---- x--- Select external REFCLK as internal TVCLK enable
 	// ---- -x-- Enable 3D accelerator
@@ -627,13 +956,45 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_sr39;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR39: Extended Misc. Control 8 %02x\n", data);
+			LOG("SR39: Misc. Control 8 %02x\n", data);
+			LOGSEQ("\tExternal TVCLK as internal TVCLK %d REFCLK as internal TVCLK %d\n"
+				, BIT(data, 4)
+				, BIT(data, 3)
+			);
+			LOGSEQ("\t3D Accelerator %d MPEG IDCT %d MPEG2 decode %d\n"
+				, BIT(data, 2)
+				, BIT(data, 1)
+				, BIT(data, 0)
+			);
 			m_ext_sr39 = data;
 		})
 	);
 
-	//map(0x3a, 0x3a) MPEG Turbo Queue Base Address
-	//map(0x3b, 0x3b) Clock Generator Control
+	// MPEG Turbo Queue Base Address
+	map(0x3a, 0x3a).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_mpeg_turbo_queue_address;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			LOG("SR3A: MPEG Turbo Queue Base Address %02x\n", data);
+			// TODO: "in the last 32K segment"
+			m_mpeg_turbo_queue_address = data & 0x7f;
+		})
+	);
+
+	// Clock Generator Control
+	// TODO: undocumented
+	map(0x3b, 0x3b).lrw8(
+		NAME([this] (offs_t offset) {
+			return (m_vclk_gen << 4) | (m_mclk_gen);
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_vclk_gen = (data >> 4) & 0xf;
+			m_mclk_gen = data & 0xf;
+			LOG("SR3B: Clock Generator Control VCLK %01x MCLK %01x\n", m_vclk_gen, m_mclk_gen);
+		})
+	);
+
 	// -x-- ---- SCLK output enable
 	// --x- ---- AGP request high priority
 	// ---x ---- Enable Oscillator I/O PAD power down
@@ -649,7 +1010,17 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 			return m_ext_sr3c;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR3C: Extended Misc. Control 9 %02x\n", data);
+			LOG("SR3C: Misc. Control 9 %02x\n", data);
+			LOGSEQ("\tSCLK output %d AGP request high priority %d Oscillator I/O Power Down %d\n"
+				, BIT(data, 6)
+				, BIT(data, 5)
+				, BIT(data, 4)
+			);
+			LOGSEQ("\tAGP Dynamic Power Saving %d PCI-66 MHz %d Turbo Queue 2D/3D length config %d\n"
+				, BIT(data, 3)
+				, BIT(data, 2)
+				, data & 3
+			);
 			m_ext_sr3c = data;
 		})
 	);
@@ -659,7 +1030,8 @@ void sis6326_vga_device::tvout_map(address_map &map)
 {
 	map(0x00, 0x00).lrw8(
 		NAME([this] (offs_t offset) {
-			LOG("VR00: Basic TV Function Control read (%02x)\n", m_tv.control);
+			// win98se reads this while moving mouse
+			//LOG("VR00: Basic TV Function Control read (%02x)\n", m_tv.control);
 			return m_tv.control;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
@@ -908,16 +1280,7 @@ uint32_t sis6326_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &
 void sis630_vga_device::crtc_map(address_map &map)
 {
 	sis6326_vga_device::crtc_map(map);
-	// CR19/CR1A Extended Signature Read-Back 0/1
-	// CR1B CRT horizontal counter (r/o)
-	// CR1C CRT vertical counter (r/o)
-	// CR1D CRT overflow counter (r/o)
-	// CR1E Extended Signature Read-Back 2
-	// CR26 Attribute Controller Index read-back
-	// TODO: is this an undocumented VGA or a SiS extension?
-	map(0x26, 0x26).lr8(
-		NAME([this] (offs_t offset) { return vga.attribute.index; })
-	);
+
 	// TODO: very preliminary, this section is undocumented in '630 doc
 	map(0x30, 0xff).lrw8(
 		NAME([this] (offs_t offset) {
@@ -950,7 +1313,7 @@ void sis630_vga_device::sequencer_map(address_map &map)
 			return m_ext_vert_overflow;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR0A: Extended Vertical Overflow %02x\n", data);
+			LOG("SR0A: Vertical Overflow %02x\n", data);
 			m_ext_vert_overflow = data;
 			vga.crtc.vert_retrace_end  =  (vga.crtc.vert_retrace_end & 0xf)      | ((data & 0x20) >> 1);
 			vga.crtc.vert_blank_end  =    (vga.crtc.vert_blank_end & 0x00ff)     | ((data & 0x10) << 4);
@@ -968,7 +1331,7 @@ void sis630_vga_device::sequencer_map(address_map &map)
 	);
 	map(0x0b, 0x0b).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR0B: Extended Horizontal Overflow 1 %02x\n", data);
+			LOG("SR0B: Horizontal Overflow 1 %02x\n", data);
 			m_ext_horz_overflow[0] = data;
 
 			vga.crtc.horz_retrace_start = (vga.crtc.horz_retrace_start & 0x00ff) | ((data & 0xc0) << 2);
@@ -981,7 +1344,7 @@ void sis630_vga_device::sequencer_map(address_map &map)
 	);
 	map(0x0c, 0x0c).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR0C: Extended Horizontal Overflow 2 %02x\n", data);
+			LOG("SR0C: Horizontal Overflow 2 %02x\n", data);
 			m_ext_horz_overflow[1] = data;
 
 			vga.crtc.horz_retrace_end =   (vga.crtc.horz_retrace_end & 0x001f) | ((data & 0x04) << 3);
@@ -994,7 +1357,7 @@ void sis630_vga_device::sequencer_map(address_map &map)
 			return vga.crtc.start_addr_latch >> 16;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR0D: Extended Starting Address %02x\n", data);
+			LOG("SR0D: Starting Address %02x\n", data);
 			vga.crtc.start_addr_latch &= ~0xff0000;
 			vga.crtc.start_addr_latch |= data << 16;
 		})
@@ -1002,7 +1365,7 @@ void sis630_vga_device::sequencer_map(address_map &map)
 	map(0x0e, 0x0e).unmapr();
 	map(0x0e, 0x0e).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR0E: Extended pitch register %02x\n", data);
+			LOG("SR0E: pitch register %02x\n", data);
 			// sis_main.c implicitly sets this with bits 0-3 granularity, assume being right
 			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x0f) << 8);
 		})
@@ -1055,7 +1418,7 @@ void sis630_vga_device::sequencer_map(address_map &map)
 			return m_ext_dclk[offset];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR%02X: Extended DCLK %02x\n", offset + 0x2b, data);
+			LOG("SR%02X: DCLK %02x\n", offset + 0x2b, data);
 			m_ext_dclk[offset] = data;
 			recompute_params();
 		})
@@ -1065,7 +1428,7 @@ void sis630_vga_device::sequencer_map(address_map &map)
 			return m_ext_eclk[offset];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR%02X: Extended ECLK %02x\n", offset + 0x2e, data);
+			LOG("SR%02X: ECLK %02x\n", offset + 0x2e, data);
 			m_ext_eclk[offset] = data;
 			recompute_params();
 		})
@@ -1075,7 +1438,7 @@ void sis630_vga_device::sequencer_map(address_map &map)
 			return m_ext_clock_gen;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR31: Extended clock generator misc. %02x\n", data);
+			LOG("SR31: clock generator misc. %02x\n", data);
 			m_ext_clock_gen = data;
 			recompute_params();
 		})
@@ -1085,7 +1448,7 @@ void sis630_vga_device::sequencer_map(address_map &map)
 			return m_ext_clock_source_select;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			LOG("SR32: Extended clock source selection %02x\n", data);
+			LOG("SR32: clock source selection %02x\n", data);
 			m_ext_clock_source_select = data;
 			recompute_params();
 		})

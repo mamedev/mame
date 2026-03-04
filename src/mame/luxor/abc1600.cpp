@@ -36,6 +36,7 @@
 
     TODO:
 
+	- write to floppy fails with status 0x04 (lost byte) after commit 339bb2758640202e5378a1c2b1c19b2ef46fa1d9
     - abcenix panics while booting after commit 78661e9aa92c7e43c9a96039e7dfb3dabc79a287
     - systest1600 failures
         - CIO timer (works if CIO clock is 4219000)
@@ -448,6 +449,8 @@ void abc1600_state::dmadis_w(int state)
 	LOG("%s _DMADIS %d\n", machine().describe_context(), state);
 
 	m_dmadis = state;
+	
+	update_br();
 }
 
 

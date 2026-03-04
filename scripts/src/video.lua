@@ -1173,6 +1173,19 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_video7.h,VIDEOS["PC_VGA_VIDEO7"] = true
+--------------------------------------------------
+
+if VIDEOS["PC_VGA_VIDEO7"] then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_video7.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_video7.h",
+	}
+end
+
+
+--------------------------------------------------
+--
 --@src/devices/video/wd90c26.h,VIDEOS["WD90C26"] = true
 --------------------------------------------------
 

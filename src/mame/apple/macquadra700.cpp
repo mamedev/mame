@@ -70,7 +70,7 @@ public:
 		m_swim(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
 		m_scsibus1(*this, "scsi"),
-		m_ncr1(*this, "scsi:7:ncr53c96"),
+		m_ncr1(*this, "ncr53c96"),
 		m_sonic(*this, "sonic"),
 		m_dafb(*this, "dafb"),
 		m_easc(*this, "easc"),
@@ -187,7 +187,7 @@ public:
 		m_swimpic(*this, "swimpic"),
 		m_egret(*this, "egret"),
 		m_scsibus2(*this, "scsi2"),
-		m_ncr2(*this, "scsi2:7:ncr53c96"),
+		m_ncr2(*this, "ncr53c96_2"),
 		m_adb_in(0)
 	{
 	}
@@ -767,13 +767,12 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
-		NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c96", NCR53C96).clock(50_MHz_XTAL / 2).machine_config([this](device_t *device)
-																												  {
-			ncr53c96_device &adapter = downcast<ncr53c96_device &>(*device);
 
-			adapter.set_busmd(ncr53c96_device::BUSMD_1);
-			adapter.irq_handler_cb().set(m_via2, FUNC(via6522_device::write_cb2)).invert();
-			adapter.drq_handler_cb().set(m_dafb, FUNC(dafb_device::turboscsi_drq_w<0>)); });
+		NCR53C96(config, m_ncr1, 50_MHz_XTAL / 2);
+		m_scsibus1->set_external_device(7, m_ncr1);
+		m_ncr1->set_busmd(ncr53c96_device::BUSMD_1);
+		m_ncr1->irq_handler_cb().set(m_via2, FUNC(via6522_device::write_cb2)).invert();
+		m_ncr1->drq_handler_cb().set(m_dafb, FUNC(dafb_device::turboscsi_drq_w<0>));
 
 		DP83932C(config, m_sonic, 40_MHz_XTAL / 2); // clock is C20M on the schematics
 		m_sonic->set_bus(m_maincpu, 0);
@@ -904,13 +903,12 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		NSCSI_CONNECTOR(config, "scsi2:4", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi2:5", mac_scsi_devices, nullptr);
 		NSCSI_CONNECTOR(config, "scsi2:6", mac_scsi_devices, nullptr);
-		NSCSI_CONNECTOR(config, "scsi2:7").option_set("ncr53c96", NCR53C96).clock(50_MHz_XTAL / 2).machine_config([this](device_t *device)
-																												  {
-		ncr53c96_device &adapter = downcast<ncr53c96_device &>(*device);
 
-		adapter.set_busmd(ncr53c96_device::BUSMD_1);
-		adapter.irq_handler_cb().append(m_via2, FUNC(via6522_device::write_cb2)).invert();
-		adapter.drq_handler_cb().set(m_dafb, FUNC(dafb_device::turboscsi_drq_w<1>)); });
+		NCR53C96(config, m_ncr2, 50_MHz_XTAL / 2);
+		m_scsibus2->set_external_device(7, m_ncr2);
+		m_ncr2->set_busmd(ncr53c96_device::BUSMD_1);
+		m_ncr2->irq_handler_cb().append(m_via2, FUNC(via6522_device::write_cb2)).invert();
+		m_ncr2->drq_handler_cb().set(m_dafb, FUNC(dafb_device::turboscsi_drq_w<1>));
 
 		// 900 and 950 are 5-slot machines, so add the other 3
 		NUBUS_SLOT(config, "nba", "nubus", mac_nubus_cards, nullptr);

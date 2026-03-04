@@ -48,7 +48,7 @@ rp2a03_device::rp2a03_device(const machine_config &mconfig, device_type type, co
 	, device_mixer_interface(mconfig, *this)
 	, m_apu(*this, "nesapu")
 {
-	program_config.m_internal_map = address_map_constructor(FUNC(rp2a03_device::rp2a03_map), this);
+	m_program_config.m_internal_map = address_map_constructor(FUNC(rp2a03_device::rp2a03_map), this);
 }
 
 rp2a03_device::rp2a03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -76,7 +76,7 @@ void rp2a03_device::apu_irq(int state)
 
 uint8_t rp2a03_device::apu_read_mem(offs_t offset)
 {
-	return mintf->program.read_byte(offset);
+	return m_mintf->m_program.read_byte(offset);
 }
 
 void rp2a03_device::device_add_mconfig(machine_config &config)

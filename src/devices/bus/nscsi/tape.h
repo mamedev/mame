@@ -7,7 +7,7 @@
 #pragma once
 
 #include "imagedev/simh_tape_image.h"
-#include "machine/nscsi_bus.h"
+#include "machine/nscsi_hle.h"
 
 DECLARE_DEVICE_TYPE(NSCSI_TAPE, nscsi_tape_device);
 

@@ -61,7 +61,7 @@ Graphite hardware:
 - Main CPU: Intel Pentium III 733MHz
 - Motherboard: BCM GT694VP
 - RAM: 128MB PC100/133
-- Sound: Integrated AC97 Controller on VT82C686A Southbridge
+- Sound: Integrated AC'97 Controller on VT82C686A Southbridge
     -or ES1373/CT5880 Audio Chip
 - Networking: SMC EZ Card 10 / SMC1208T (probably 10ec:8029 1113:1208)
 - Video Card: 3DFX Voodoo 3

@@ -43,7 +43,7 @@ public:
 			m_meters(*this, "meters"),
 			m_lamps(*this, "lamp%u", 0U),
 			m_scsibus(*this, "scsi"),
-			m_scsic(*this, "scsi:6:ncr5380"),
+			m_scsic(*this, "ncr5380"),
 			m_watchdog(*this, "watchdog")
 	{ }
 
@@ -81,7 +81,6 @@ protected:
 	uint8_t m_volume;
 
 	virtual void machine_start() override ATTR_COLD;
-	static void scsi_devices(device_slot_interface &device);
 	void dma1_drq(int state);
 	void scc66470_map(address_map &map);
 	void scc66470_irq(int state);
@@ -379,12 +378,6 @@ void bfm_cobra3_state::machine_start()
 }
 
 
-static void cobra_scsi_devices(device_slot_interface &device)
-{
-	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add_internal("ncr53c80", NCR53C80);
-}
-
 void bfm_cobra3_state::dma1_drq(int state)
 {
 //	m_maincpu->dma_dreq1_w(state);
@@ -487,15 +480,13 @@ void bfm_cobra3_state::bfm_cobra3(machine_config &config)
 	m_scc66470->set_screen("screen");
 	m_scc66470->irq().set(FUNC(bfm_cobra3_state::scc66470_irq));
 
-	NSCSI_BUS(config, m_scsibus);
+	auto &scsi(NSCSI_BUS(config, m_scsibus));
+	auto &cdrom(NSCSI_CDROM(config, "cdrom"));
+	scsi.set_external_device(2, cdrom);
 
-	NSCSI_CONNECTOR(config, "scsi:2", cobra_scsi_devices, "cdrom");
-	NSCSI_CONNECTOR(config, "scsi:6").option_set("ncr5380", NCR5380).machine_config(
-		[this] (device_t *device)
-		{
-			ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
-			adapter.drq_handler().set(*this, FUNC(bfm_cobra3_state::dma1_drq));
-		});
+	NCR5380(config, m_scsic);
+	scsi.set_external_device(6, m_scsic);
+	m_scsic->drq_handler().set(DEVICE_SELF, FUNC(bfm_cobra3_state::dma1_drq));
 
 	WATCHDOG_TIMER(config, "watchdog").set_time(PERIOD_OF_555_MONOSTABLE(120000,100e-9)); //TODO: Check timings	
 	METERS(config, m_meters, 0).set_number(4);
@@ -522,7 +513,7 @@ ROM_START( c3_rtime )
 	ROM_LOAD( "95004056.bin", 0x000000, 0x080000, CRC(24e8f9fb) SHA1(0d484a8f368b0f2140f148a1dc84db85a100af38) )
 	ROM_LOAD( "95004057.bin", 0x080000, 0x080000, CRC(f73c92d6) SHA1(08c7db2baccb703f99efb81f618719a7789ca564) )
 
-	DISK_REGION("scsi:2:cdrom")
+	DISK_REGION("cdrom")
 	DISK_IMAGE_READONLY( "95100302", 0, SHA1(20accfe236a0c85108cd2a205399ed8959f1a638) )
 ROM_END
 
@@ -544,7 +535,7 @@ ROM_START( c3_telly )
 	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
 	ROM_LOAD( "telsndl", 0x0000, 0x080000, CRC(74996fbd) SHA1(90e46130dccf47be1fcfaf549e548cdd4883e59d) )
 
-	DISK_REGION("scsi:2:cdrom")
+	DISK_REGION("cdrom")
 	DISK_IMAGE_READONLY( "95100300", 0, SHA1(98905cbff24c576c58210d1d003f710fa7064762) )
 ROM_END
 
@@ -561,7 +552,7 @@ ROM_START( c3_tellyns )
 	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
 	ROM_LOAD( "telsndl", 0x0000, 0x080000, CRC(74996fbd) SHA1(90e46130dccf47be1fcfaf549e548cdd4883e59d) )
 
-	DISK_REGION("scsi:2:cdrom")
+	DISK_REGION("cdrom")
 	DISK_IMAGE_READONLY( "95100301", 0, SHA1(dbce040a6fb7916a240d24e2207cf6e1b3f572e7) )
 ROM_END
 
@@ -578,7 +569,7 @@ ROM_START( c3_totp )
 	ROM_LOAD( "totpsnd.lhs", 0x000000, 0x080000, CRC(56a73136) SHA1(10656ede18de9432a8a728cc59d000b5b1bf0150) )
 	ROM_LOAD( "totpsnd.rhs", 0x080000, 0x080000, CRC(28d156ab) SHA1(ebf5c4e008015b9b56b3aa5228c05b8e298daa80) )
 
-	DISK_REGION("scsi:2:cdrom")
+	DISK_REGION("cdrom")
 	DISK_IMAGE_READONLY( "95100307", 0, SHA1(27ad1565f9a153fe71b72d9c597a6e3c3f13ded0) )
 ROM_END
 
@@ -590,7 +581,7 @@ ROM_START( c3_ppays )
 	ROM_REGION( 0x1000000, "ymz280b", ROMREGION_ERASE00 )
 	ROM_LOAD( "phrasesn.l", 0x0000, 0x080000, CRC(a436ccf8) SHA1(18c39aa2e68c32242e0de1347b25d4af44b84548) )
 
-	DISK_REGION("scsi:2:cdrom")
+	DISK_REGION("cdrom")
 	DISK_IMAGE_READONLY( "95100315", 0, SHA1(fc76d3ab5ff38c2dc4f06399f5399a1ae3c136e9) )
 ROM_END
 
