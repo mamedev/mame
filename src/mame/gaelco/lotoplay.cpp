@@ -127,12 +127,12 @@ ROM_END
 
 ROM_START(lotoplyza)
 	ROM_REGION(0x2000, "maincpu", 0)
-	ROM_LOAD("grab._lp_sp_ultima_27c64.bin",         0x0000, 0x2000, CRC(556e2c35) SHA1(612f160592fd122e5a91914618e19eade5b52c3e))
+	ROM_LOAD("grab._lp_s_3b4c_27c64.bin",            0x0000, 0x2000, CRC(556e2c35) SHA1(612f160592fd122e5a91914618e19eade5b52c3e))
 ROM_END
 
 ROM_START(lotoplyzb)
 	ROM_REGION(0x2000, "maincpu", 0)
-	ROM_LOAD("grab._lp_sp_ultima_27c64.bin",         0x0000, 0x2000, CRC(e74bce2a) SHA1(66a09f5df3a27b0c4bc964b19450734b736dc768))
+	ROM_LOAD("multn_0.0_27c64.bin",                  0x0000, 0x2000, CRC(e74bce2a) SHA1(66a09f5df3a27b0c4bc964b19450734b736dc768))
 ROM_END
 
 
