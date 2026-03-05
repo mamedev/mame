@@ -565,7 +565,7 @@ void generalplus_gpl32612_game_state::nand_init880()
 
 
 //    year, name,         parent,  compat, machine,      input,        class,              init,       company,  fullname,                             flags
-CONS( 200?, jak_swbstrik,    0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Star Wars Blaster Strike", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 200?, jak_swbstrik,    0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Star Wars: Blaster Strike", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 200?, jak_tmnthp,      0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Teenage Mutant Ninja Turtles Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 200?, jak_ddhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "DreamWorks Dragons Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 200?, jak_prhp,        0,       0,      gpl32612, gpl32612, generalplus_gpl32612_game_state, nand_init840, "JAKKS Pacific Inc", "Power Rangers Super Megaforce Hero Portal", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // from a PAL unit (probably not region specific)
