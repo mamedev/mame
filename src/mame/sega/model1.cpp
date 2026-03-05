@@ -653,7 +653,7 @@ void model1_state::vr_outputs_w(uint8_t data)
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 }
 
-void model1_state::swa_outputs_w(uint8_t data)
+void model1_state::swsega_outputs_w(uint8_t data)
 {
 	// 7-------  unknown (not used?)
 	// -6------  unknown (1 while in-game)
@@ -842,7 +842,7 @@ void model1_state::irq_control_w(u8 data)
 // 1 = fe02bc
 // other = f302a4 / fe02b0
 
-// swa
+// swsega
 // 1 = ff504
 // 3 = ff54c
 // other = ff568/ff574
@@ -878,8 +878,8 @@ void model1_state::machine_reset()
 	m_irq_status = 0;
 	m_last_irq = 0;
 
-	if (!strcmp(machine().system().name, "swa") ||
-		!strcmp(machine().system().name, "swaj"))
+	if (!strcmp(machine().system().name, "swsega") ||
+		!strcmp(machine().system().name, "swsegaj"))
 	{
 		m_sound_irq = 0;
 	}
@@ -1052,7 +1052,7 @@ static INPUT_PORTS_START( vr )
 	PORT_INCLUDE(ioboard_dipswitches)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( swa )
+static INPUT_PORTS_START( swsega )
 	PORT_START("IN.0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -1344,7 +1344,7 @@ ROM_START( vformula )
 ROM_END
 
 
-ROM_START( swa )
+ROM_START( swsega )
 	MODEL1_CPU_BOARD
 
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
@@ -1392,7 +1392,7 @@ ROM_START( swa )
 	ROM_LOAD32_BYTE( "mpr-16475.42", 0x000003, 0x80000, CRC(b9266be9) SHA1(cf195cd89c9d191b9eb8c5299f8cc154c2b4bd82) )
 ROM_END
 
-ROM_START( swaj )
+ROM_START( swsegaj )
 	MODEL1_CPU_BOARD
 
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
@@ -1804,7 +1804,7 @@ void model1_state::vformula(machine_config &config)
 	M1COMM(config, "m1comm", 0).set_default_bios_tag("epr15624");
 }
 
-void model1_state::swa(machine_config &config)
+void model1_state::swsega(machine_config &config)
 {
 	model1(config);
 
@@ -1815,7 +1815,7 @@ void model1_state::swa(machine_config &config)
 	ioboard.an_callback<2>().set_ioport("THROTTLE");
 	ioboard.an_callback<4>().set_ioport("STICK2X");
 	ioboard.an_callback<5>().set_ioport("STICK2Y");
-	ioboard.output_callback().set(FUNC(model1_state::swa_outputs_w));
+	ioboard.output_callback().set(FUNC(model1_state::swsega_outputs_w));
 	ioboard.output_callback().append(FUNC(model1_state::gen_outputs_w));
 
 	SPEAKER(config, "mpeg", 2).front();
@@ -1900,8 +1900,8 @@ void model1_state::netmerc(machine_config &config)
 GAME( 1993, vf,         0,       vf,         vf,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Fighter",           MACHINE_NOT_WORKING )
 GAMEL(1992, vr,         0,       vr,         vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Racing",            0, layout_vr )
 GAME( 1993, vformula,   vr,      vformula,   vr,         model1_state, empty_init, ROT0,     "Sega",  "Virtua Formula",           MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars (Sega, US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
-GAME( 1993, swaj,       swa,     swa,        swa,        model1_state, empty_init, ROT0,     "Sega",  "Star Wars (Sega, Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1993, swsega,     0,       swsega,     swsega,     model1_state, empty_init, ROT0,     "Sega",  "Star Wars (Sega, US)",     MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
+GAME( 1993, swsegaj,    swsega,  swsega,     swsega,     model1_state, empty_init, ROT0,     "Sega",  "Star Wars (Sega, Japan)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_CONTROLS )
 GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (World)",         0 )
 GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
 GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state, empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )
