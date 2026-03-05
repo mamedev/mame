@@ -568,9 +568,9 @@ void starwars_state::init_esb()
  *
  *************************************/
 
-GAME( 1983, starwars, 0,        starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 1)", 0 ) // newest
-GAME( 1983, starwars1,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 2)", 0 )
-GAME( 1983, starwarso,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (set 3)", 0 ) // oldest
+GAME( 1983, starwars, 0,        starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (Atari, set 1)", 0 ) // newest
+GAME( 1983, starwars1,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (Atari, set 2)", 0 )
+GAME( 1983, starwarso,starwars, starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "Star Wars (Atari, set 3)", 0 ) // oldest
 // is there an even older starwars set with 136021-106.1m ?
 
 GAME( 1983, tomcatsw, tomcat,   starwars, starwars, starwars_state, init_starwars, ROT0, "Atari", "TomCat (Star Wars hardware, prototype)", MACHINE_NO_SOUND )
