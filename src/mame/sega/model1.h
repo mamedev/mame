@@ -59,7 +59,7 @@ public:
 	void vf(machine_config &config);
 	void vr(machine_config &config);
 	void vformula(machine_config &config);
-	void swa(machine_config &config);
+	void swsega(machine_config &config);
 	void wingwar(machine_config &config);
 	void wingwar360(machine_config &config);
 	void netmerc(machine_config &config);
@@ -346,7 +346,7 @@ private:
 	void gen_outputs_w(uint8_t data);
 	void vf_outputs_w(uint8_t data);
 	void vr_outputs_w(uint8_t data);
-	void swa_outputs_w(uint8_t data);
+	void swsega_outputs_w(uint8_t data);
 	void wingwar_outputs_w(uint8_t data);
 	void wingwar360_outputs_w(uint8_t data);
 	void netmerc_outputs_w(uint8_t data);
