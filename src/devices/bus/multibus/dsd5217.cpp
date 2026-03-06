@@ -27,7 +27,9 @@
 
 #include "multibyte.h"
 
+#define LOG_PORT (1U << 1)
 //#define VERBOSE (LOG_GENERAL)
+
 #include "logmacro.h"
 
 namespace {
@@ -45,13 +47,28 @@ enum port20_mask : u8
 enum port78_bits : unsigned
 {
 	P78_RWDATA = 0,
-	P78_MBBYTE = 1, // Multibus transfer alignment?
+	P78_MBBYTE = 1, // Multibus byte transfer
 	P78_MBINT  = 2, // Multibus interrupt
 	P78_MBA15  = 3, // Multibus address bit 15
 	P78_CR1    = 4, // CR1 (ERR) LED
 	P78_CR2    = 5, // CR2 (RDY) LED
 };
+enum port7c_mask : u8
+{
+	P7C_XFR = 0x01,
+	P7C_XEN = 0x02, // xfr enable
+	P7C_WEN = 0x10, // write enable?
+	P7C_RST = 0x20,
+	P7C_REQ = 0x40,
+	P7C_ONL = 0x80,
+};
 
+enum portA_mask : u8
+{
+	PA_CMD   = 0x07,
+	PA_TOUT  = 0x18, // controls command timeout? (0=0x3c,1=0x4c2,2=0x1d,3=0x4c2)
+	PA_CRC32 = 0x20, // 32-bit/16-bit CRC
+};
 enum portB_bits : unsigned
 {
 	PB_WDS0  = 0, // winchester drive select 1
@@ -69,7 +86,7 @@ enum portC_bits : unsigned
 	PC_DIR  = 1, // step direction
 	PC_HS3  = 2, // winchester head select 3/reduced write current
 	PC_RWC  = 3, // winchester reduced write current
-	// clear after rwc wait timeout: rwc reset?
+	// clear after rwc wait timeout: rwc reset or strobe?
 	PC_WUA  = 5, // wake-up address
 };
 
@@ -132,8 +149,9 @@ protected:
 	void pc_w(u8 data);
 
 	// helpers
-	floppy_image_device *selected_fdd() const;
-	std::optional<unsigned> selected_hdd() const;
+	floppy_image_device *fdd_selected() const;
+	std::optional<unsigned> hdd_selected() const;
+	std::tuple<harddisk_image_device &, unsigned, unsigned> hdd_op(unsigned hdd, std::string_view opname);
 	void append_crc();
 	void interrupt(bool assert);
 	void dump_iopb();
@@ -156,11 +174,12 @@ private:
 	required_ioport m_w10;
 	output_finder<2> m_led;
 
-	u16 m_wua; // wake-up address latch
-	u8 m_mua;  // Multibus upper address
-	u8 m_port70;
-	u8 m_port78;
-	u8 m_port7c;
+	u16 m_wua;   // wake-up address latch
+	u8 m_mua;    // Multibus upper address
+	u8 m_port70; // config, QIC-02 RDY
+	u8 m_port78; // Multibus control
+	u8 m_port7c; // QIC-02 control
+
 	u8 m_rwc_ram[4];
 
 	u8 m_pa; // i8155 port A
@@ -258,6 +277,7 @@ void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
 	// TODO: 1K words of prom
 
 	I8155(config, m_rio, 10_MHz_XTAL / 4);
+	// FIXME: timeout duration depends on value read from port A bits 3 and 4 (function at 0xac8, table at 0x17a8)?
 	m_rio->out_to_callback().set_inputline(m_cpu, I8085_TRAP_LINE);
 	m_rio->out_pa_callback().set(FUNC(multibus_dsd5217_device::pa_w));
 	m_rio->out_pb_callback().set(FUNC(multibus_dsd5217_device::pb_w));
@@ -293,7 +313,7 @@ void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
 	m_xfr->output_handler().set(
 		[this](int state)
 		{
-			if (BIT(m_port7c, 1))
+			if (m_port7c & P7C_XEN)
 				m_qic->xfr_w(state ? 0 : 1);
 			else
 				m_qic->xfr_w(1);
@@ -301,7 +321,7 @@ void multibus_dsd5217_device::device_add_mconfig(machine_config &config)
 	);
 }
 
-floppy_image_device *multibus_dsd5217_device::selected_fdd() const
+floppy_image_device *multibus_dsd5217_device::fdd_selected() const
 {
 	if (BIT(m_pb, PB_FDS0))
 		return m_fdc[0]->get_device();
@@ -311,7 +331,7 @@ floppy_image_device *multibus_dsd5217_device::selected_fdd() const
 	return nullptr;
 }
 
-std::optional<unsigned> multibus_dsd5217_device::selected_hdd() const
+std::optional<unsigned> multibus_dsd5217_device::hdd_selected() const
 {
 	if (BIT(m_pb, PB_WDS0) && m_hdd[0]->exists())
 		return 0;
@@ -324,7 +344,7 @@ std::optional<unsigned> multibus_dsd5217_device::selected_hdd() const
 void multibus_dsd5217_device::append_crc()
 {
 	// port A bit 5 controls 32-bit or 16-bit crc
-	if (BIT(m_pa, 5))
+	if (m_pa & PA_CRC32)
 	{
 		u32 crc = 0xffff'ffffU;
 
@@ -348,7 +368,7 @@ void multibus_dsd5217_device::cpu_mem(address_map &map)
 	map(0x0000, 0x3fff).rom().region("cpu", 0);
 	map(0x4000, 0x40ff).rw(m_rio, FUNC(i8155_device::memory_r), FUNC(i8155_device::memory_w));
 
-	// read/write controller crc/ecc
+	// TODO: 0:1=busy, 1:buffer full? error 0x81?, 2:0=error
 	map(0x6000, 0x6000).lr8([]() { return 4; }, "rwc_r");
 	map(0x6000, 0x6003).w(FUNC(multibus_dsd5217_device::rwc_w));
 	map(0x7000, 0x7000).rw(m_qic, FUNC(qic02_connector_device::data_r), FUNC(qic02_connector_device::data_w)).mirror(0xfff);
@@ -380,6 +400,7 @@ void multibus_dsd5217_device::cmd_w(u8 data)
 	{
 	case 0x00:
 		LOG("Clear\n");
+		interrupt(false);
 		m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		break;
 	case 0x01:
@@ -396,45 +417,64 @@ void multibus_dsd5217_device::cmd_w(u8 data)
 	}
 }
 
+std::tuple<harddisk_image_device &, unsigned, unsigned> multibus_dsd5217_device::hdd_op(unsigned hdd, std::string_view op)
+{
+	harddisk_image_device &hid = *m_hdd[hdd];
+
+	// decode rwc parameters
+	unsigned const cylinder = m_hdd_cyl[hdd];
+	unsigned const head = BIT(m_pb, PB_HS0, 3) + BIT(m_pc, PC_HS3) * 8;
+	unsigned const sector = m_rwc_ram[0];
+	unsigned const length = 128U << BIT(m_rwc_ram[2], 4, 2);
+
+	hard_disk_file::info const info = hid.get_info();
+	unsigned const block = ((cylinder * info.heads) + head) * info.sectors + sector;
+
+	LOG("hd%u: %s cylinder=%u head=%u sector=%u length=%u block=%u ctr0=0x%04x ctr1=0x%04x\n",
+		hdd, op, cylinder, head, sector, length, block, m_ctr[0], m_ctr[1]);
+
+	assert(head == m_rwc_ram[3]);
+	assert(cylinder == (((m_rwc_ram[2] & 0xf) << 8) | m_rwc_ram[1]));
+
+	return { hid, block, length };
+}
+
 void multibus_dsd5217_device::rwc_w(offs_t offset, u8 data)
 {
 	LOG("%s: rwc_w[%u] data 0x%02x\n", machine().describe_context(), offset, data);
 
+	// 0=sector
+	// 1=cyl_lo
+	// 2=ttsscccc  ss:0=128,1=256,2=512,3=1024, tt:0=normal,1=alternate,2=defective,3=invalid
+	// 3=head
 	m_rwc_ram[offset] = data;
 
 	// writing to offset 0 triggers operation?
 	if (offset == 0)
 	{
-		if (std::optional<unsigned> hdd = selected_hdd())
+		switch (m_pa & PA_CMD)
 		{
-			harddisk_image_device &hid = *m_hdd[hdd.value()];
-
-			unsigned const c = m_hdd_cyl[hdd.value()];
-			unsigned const h = BIT(m_pb, PB_HS0, 3) + BIT(m_pc, PC_HS3) * 8;
-			unsigned const s = m_rwc_ram[0];
-
-			hard_disk_file::info const info = hid.get_info();
-			unsigned const lba = ((c * info.heads) + h) * info.sectors + s;
-
-			static char const *const type[] = { "format", "read", "write", "unknown" };
-			LOG("hd%u: %s cylinder=%u head=%u sector=%u lba=%u ctr0=0x%04x ctr1=0x%04x\n",
-				hdd.value(), type[BIT(m_pa, 1, 2)], c, h, s, lba, m_ctr[0], m_ctr[1]);
-
-			if (BIT(m_pa, 1))
+		case 2: // read
+			if (std::optional<unsigned> hdd = hdd_selected())
 			{
-				u16 &ctr = m_ctr[1];
-				hid.read(lba, &m_buf[ctr]);
-				ctr = (ctr + 0x200) & 0xfff;
+				auto [hid, block, length] = hdd_op(hdd.value(), "read");
+
+				hid.read(block, &m_buf[m_ctr[1]]);
+				m_ctr[1] = (m_ctr[1] + length) & 0xfff;
 			}
-			else if (BIT(m_pa, 2))
+			break;
+
+		case 4: // write
+			if (std::optional<unsigned> hdd = hdd_selected())
 			{
-				u16 &ctr = m_ctr[1];
-				hid.write(lba, &m_buf[ctr]);
-				ctr = (ctr + 0x200) & 0xfff;
+				auto [hid, block, length] = hdd_op(hdd.value(), "write");
+
+				hid.write(block, &m_buf[m_ctr[1]]);
+				m_ctr[1] = (m_ctr[1] + length) & 0xfff;
 			}
-		}
-		else
-		{
+			break;
+
+		case 6: // self test
 			// HACK: this code allows diagnostic to pass, but is probably wrong
 			append_crc();
 
@@ -444,6 +484,15 @@ void multibus_dsd5217_device::rwc_w(offs_t offset, u8 data)
 
 			// append one more byte (valid values 0x52..0x5f)?
 			m_buf[m_ctr[0]++] = 0x53;
+			break;
+
+		case 0: // format
+		case 1: // read sector ID?
+		case 3: // read deleted?
+		case 5: // write deleted?
+		case 7: // ?
+			logerror("unemulated rwc command\n");
+			break;
 		}
 	}
 }
@@ -502,7 +551,7 @@ u8 multibus_dsd5217_device::port20_r()
 {
 	u8 data = 0;
 
-	if (std::optional<unsigned> hdd = selected_hdd())
+	if (std::optional<unsigned> hdd = hdd_selected())
 	{
 		data |= P20_WRDY;
 		data |= P20_WSEEK;
@@ -511,7 +560,7 @@ u8 multibus_dsd5217_device::port20_r()
 			data |= P20_WTRK0;
 	}
 
-	if (floppy_image_device *fdd = selected_fdd())
+	if (floppy_image_device *fdd = fdd_selected())
 	{
 		if (fdd->idx_r())
 			data |= P20_FIDX;
@@ -527,12 +576,13 @@ u8 multibus_dsd5217_device::port20_r()
 void multibus_dsd5217_device::port78_w(u8 data)
 {
 	if (m_port78 ^ data)
-		LOG("%s: port78_w 0x%02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_PORT, "%s: port78_w 0x%02x\n", machine().describe_context(), data);
 
 	m_led[0] = BIT(data, P78_CR1);
 	m_led[1] = BIT(data, P78_CR2);
 
-	interrupt(BIT(data, P78_MBINT));
+	if (BIT(data, P78_MBINT))
+		interrupt(true);
 
 	m_port78 = data;
 }
@@ -542,24 +592,26 @@ void multibus_dsd5217_device::port7c_w(u8 data)
 	u8 const delta = m_port7c ^ data;
 
 	if (delta)
-		LOG("%s: port7c_w 0x%02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_PORT, "%s: port7c_w 0x%02x\n", machine().describe_context(), data);
 
 	m_port7c = data;
 
-	if (BIT(delta, 7))
-		m_qic->onl_w(!BIT(data, 7));
-	if (BIT(delta, 6))
-		m_qic->req_w(!BIT(data, 6));
-	if (BIT(delta, 5))
-		m_qic->rst_w(!BIT(data, 5));
-	if (BIT(delta, 0, 2))
-		m_xfr->in_w<1>(BIT(data, 1) && BIT(data, 0));
+	if (delta & P7C_ONL)
+		m_qic->onl_w(!(data & P7C_ONL));
+	if (delta & P7C_REQ)
+		m_qic->req_w(!(data & P7C_REQ));
+	if (delta & P7C_RST)
+		m_qic->rst_w(!(data & P7C_RST));
+	if (delta & (P7C_XEN | P7C_XFR))
+		m_xfr->in_w<1>((data & P7C_XEN) && (data & P7C_XFR));
 }
 
 void multibus_dsd5217_device::pa_w(u8 data)
 {
+	unsigned static const timeout[] = { 0x3c, 0x4c2, 0x1d, 0x4c2 };
+
 	if (m_pa ^ data)
-		LOG("%s: port A 0x%02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_PORT, "%s: port A 0x%02x command %u timeout %u\n", machine().describe_context(), data, BIT(data, 0, 3), timeout[BIT(data, 3, 2)]);
 
 	m_pa = data;
 }
@@ -567,11 +619,11 @@ void multibus_dsd5217_device::pa_w(u8 data)
 void multibus_dsd5217_device::pb_w(u8 data)
 {
 	if (m_pb ^ data)
-		LOG("%s: port B 0x%02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_PORT, "%s: port B 0x%02x\n", machine().describe_context(), data);
 
 	if (data & PB_MOTOR)
 	{
-		if (floppy_image_device *fdd = selected_fdd())
+		if (floppy_image_device *fdd = fdd_selected())
 		{
 			if (BIT(m_pb ^ data, PB_MOTOR))
 				fdd->mon_w(!BIT(data, PB_MOTOR));
@@ -586,7 +638,7 @@ void multibus_dsd5217_device::pb_w(u8 data)
 void multibus_dsd5217_device::pc_w(u8 data)
 {
 	if (m_pc ^ data)
-		LOG("%s: port C 0x%02x\n", machine().describe_context(), data);
+		LOGMASKED(LOG_PORT, "%s: port C 0x%02x\n", machine().describe_context(), data);
 
 	if (BIT(data, PC_WUA))
 	{
@@ -596,7 +648,7 @@ void multibus_dsd5217_device::pc_w(u8 data)
 			m_wua = (m_w7->read() << 8) | m_w9->read();
 	}
 
-	if (floppy_image_device *fdd = selected_fdd())
+	if (floppy_image_device *fdd = fdd_selected())
 	{
 		if (BIT(m_pc ^ data, PC_DIR))
 			fdd->dir_w(!BIT(data, PC_DIR));
@@ -605,7 +657,7 @@ void multibus_dsd5217_device::pc_w(u8 data)
 			fdd->stp_w(BIT(data, PC_STEP));
 	}
 
-	if (std::optional<unsigned> hdd = selected_hdd())
+	if (std::optional<unsigned> hdd = hdd_selected())
 	{
 		if (!BIT(m_pc, PC_STEP) && BIT(data, PC_STEP))
 		{

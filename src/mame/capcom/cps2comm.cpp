@@ -173,7 +173,8 @@ public:
 
 	void stop()
 	{
-		m_ioctx.post(
+		asio::post(
+				m_ioctx,
 				[this] ()
 				{
 					m_stopping = true;
@@ -191,7 +192,8 @@ public:
 
 	void set_routing(u8 val)
 	{
-		m_ioctx.post(
+		asio::post(
+				m_ioctx,
 				[this, val] ()
 				{
 					if (BIT(val, 0, 2) == 0U)
@@ -216,7 +218,8 @@ public:
 
 	void send_in(u8 data)
 	{
-		m_ioctx.post(
+		asio::post(
+				m_ioctx,
 				[this, data] ()
 				{
 					if (m_in_connected)
@@ -231,7 +234,8 @@ public:
 
 	void send_out(u8 data)
 	{
-		m_ioctx.post(
+		asio::post(
+				m_ioctx,
 				[this, data] ()
 				{
 					if (m_out_sock.is_open())

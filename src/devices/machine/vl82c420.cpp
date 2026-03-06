@@ -467,7 +467,7 @@ void vl82c420_device::update_segment_settings()
 	m_space_mem->install_rom(0xe0000, 0xfffff, &m_bios[0x20000 / 4]);
 	// TODO: attempts to read from here, the existing bank fails several string comparisons
 	// (and checksum)
-//	m_space_mem->install_rom(0xd0000, 0xdffff, &m_bios[0x00000 / 4]);
+//  m_space_mem->install_rom(0xd0000, 0xdffff, &m_bios[0x00000 / 4]);
 
 	// VGA BIOS is copied from $e0000 to $c0000
 	// TODO: shadow RAM is disabled, what's really holding this data?

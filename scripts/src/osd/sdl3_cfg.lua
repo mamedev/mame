@@ -164,4 +164,3 @@ configuration { "netbsd" }
 	}
 
 configuration { }
-

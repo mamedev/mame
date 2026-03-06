@@ -32,8 +32,8 @@ if CPU_INCLUDE_DRC then
 		MAME_DIR .. "src/devices/cpu/drcbeut.h",
 		MAME_DIR .. "src/devices/cpu/drccache.cpp",
 		MAME_DIR .. "src/devices/cpu/drccache.h",
-		MAME_DIR .. "src/devices/cpu/drcfe.cpp",
 		MAME_DIR .. "src/devices/cpu/drcfe.h",
+		MAME_DIR .. "src/devices/cpu/drcfe.ipp",
 		MAME_DIR .. "src/devices/cpu/drcuml.cpp",
 		MAME_DIR .. "src/devices/cpu/drcuml.h",
 		MAME_DIR .. "src/devices/cpu/uml.cpp",
@@ -283,8 +283,8 @@ if CPUS["ADSP2106X"] then
 end
 
 if opt_tool(CPUS, "ADSP2106X") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sharc/sharcdsm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sharc/sharcdsm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sharc/sharc_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/sharc/sharc_dasm.h")
 end
 
 --------------------------------------------------
@@ -879,11 +879,13 @@ end
 if CPUS["SH"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/sh/sh_fe.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh_fe.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh2.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh2.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh2fe.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh2fe.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh3comn.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh3comn.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4.cpp",
@@ -893,6 +895,7 @@ if CPUS["SH"] then
 		MAME_DIR .. "src/devices/cpu/sh/sh4dmac.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh4dmac.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4fe.cpp",
+		MAME_DIR .. "src/devices/cpu/sh/sh4fe.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4regs.h",
 		MAME_DIR .. "src/devices/cpu/sh/sh4tmu.cpp",
 		MAME_DIR .. "src/devices/cpu/sh/sh4tmu.h",
@@ -1043,17 +1046,18 @@ if CPUS["E1"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/e132xs/e132xs.cpp",
 		MAME_DIR .. "src/devices/cpu/e132xs/e132xs.h",
-		MAME_DIR .. "src/devices/cpu/e132xs/32xsdefs.h",
-		MAME_DIR .. "src/devices/cpu/e132xs/e132xsop.hxx",
-		MAME_DIR .. "src/devices/cpu/e132xs/e132xsfe.cpp",
 		MAME_DIR .. "src/devices/cpu/e132xs/e132xsdrc.cpp",
 		MAME_DIR .. "src/devices/cpu/e132xs/e132xsdrc_ops.hxx",
+		MAME_DIR .. "src/devices/cpu/e132xs/e132xsop.hxx",
+		MAME_DIR .. "src/devices/cpu/e132xs/e1defs.h",
+		MAME_DIR .. "src/devices/cpu/e132xs/e1fe.cpp",
+		MAME_DIR .. "src/devices/cpu/e132xs/e1fe.h",
 	}
 end
 
 if opt_tool(CPUS, "E1") then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/e132xs/32xsdasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/e132xs/32xsdasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/e132xs/e1dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/e132xs/e1dasm.h")
 end
 
 --------------------------------------------------

@@ -281,11 +281,11 @@
 #include "bus/rs232/rs232.h"
 #include "cpu/adsp2100/adsp2100.h"
 #include "cpu/mips/mips3.h"
-#include "machine/idectrl.h"
+//#include "machine/idectrl.h"
 #include "machine/input_merger.h"
 #include "machine/ins8250.h"
-#include "machine/pci-ide.h"
 #include "machine/pci.h"
+#include "machine/pci-ide.h"
 #include "machine/smc91c9x.h"
 #include "machine/timekpr.h"
 #include "machine/vrc5074.h"
@@ -1882,6 +1882,7 @@ void vegas_state::vegascore(machine_config &config)
 	m_nile->set_map(6, address_map_constructor(&vegas_state::vegas_cs6_map, "vegas_cs6_map", this), this);
 	m_nile->set_map(7, address_map_constructor(&vegas_state::vegas_cs7_map, "vegas_cs7_map", this), this);
 
+	// Silicon Image/CMD PCI0646
 	ide_pci_device &ide(IDE_PCI(config, PCI_ID_IDE, 0, 0x10950646, 0x05, 0x0));
 	ide.irq_handler().set(PCI_ID_NILE, FUNC(vrc5074_device::pci_intr_d));
 	//ide.set_pif(0x8f);

@@ -600,5 +600,5 @@ void backfire_state::init_backfire()
 } // anonymous namespace
 
 
-GAME( 1995, backfire,  0,        backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, backfirea, backfire, backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (Japan, set 2)", MACHINE_SUPPORTS_SAVE ) // defaults to wheel controls, must change to joystick to play
+GAME( 1995, backfire,  0,        backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (Data East, Japan, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, backfirea, backfire, backfire,   backfire, backfire_state, init_backfire, ROT0, "Data East Corporation", "Backfire! (Data East, Japan, set 2)", MACHINE_SUPPORTS_SAVE ) // defaults to wheel controls, must change to joystick to play

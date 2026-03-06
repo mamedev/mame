@@ -2,16 +2,16 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-    SiS630 host implementation (northbridge)
+SiS630 host implementation (northbridge)
 
-    TODO:
-    - AGP and VGA interfaces;
-    - Is ACPI declared here shared with LPC or a different one?
-    \- shutms11 maps it to the exact same place (I/O $5000), may be interleaved?
-    - HW trap control;
-    - PCI-Hole;
-    - Convert RAM to device;
-    - Integrated VGA control;
+TODO:
+- AGP and VGA interfaces;
+- Is ACPI declared here shared with LPC or a different one?
+\- shutms11 maps it to the exact same place (I/O $5000), may be interleaved?
+- HW trap control;
+- PCI-Hole;
+- Convert RAM to device;
+- Integrated VGA control;
 
 **************************************************************************************************/
 
@@ -68,6 +68,7 @@ void sis630_host_device::device_reset()
 
 	m_shadow_ram_ctrl = 0;
 	m_vga_control = 0;
+	m_smiact = 1;
 	std::fill(std::begin(m_agp_mailbox), std::end(m_agp_mailbox), 0);
 
 	remap_cb();
@@ -185,6 +186,19 @@ void sis630_host_device::map_shadowram(address_space *memory_space, uint32_t sta
 	}
 }
 
+// SMIACT# is canonically active low
+void sis630_host_device::smi_act_w(int state)
+{
+	if (state)
+		m_smiact = 0;
+	else
+		m_smiact = 1;
+
+	if (m_smiact == 0)
+	    machine().debug_break();
+	remap_cb();
+}
+
 
 void sis630_host_device::map_extra(
 	uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
@@ -219,7 +233,7 @@ void sis630_host_device::map_extra(
 
 	// System Management Memory Region handling
 	// Potentially overrides VGA VRAM if on
-	if (BIT(m_smram, 4))
+	if (BIT(m_smram, 4) || m_smiact == 0)
 	{
 		u8 smram_config = m_smram >> 5;
 

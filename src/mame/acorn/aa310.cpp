@@ -293,7 +293,7 @@ public:
 		: aabase_state(mconfig, type, tag)
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0U)
-		, m_scsi(*this, "scsi:7:wd33c93a")
+		, m_scsi(*this, "wd33c93a")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_cent_ctrl_out(*this, "cent_ctrl_out")
@@ -1363,7 +1363,7 @@ void aa680_state::aa680(machine_config &config)
 	rs232b.dsr_handler().set("scc", FUNC(scc8530_device::syncb_w));
 
 	// scsi 70MB HDD
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk", true); // Internal Hard Disc Drive
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);   // External Hard Disc Drive #1
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);   // External Hard Disc Drive #2
@@ -1371,13 +1371,11 @@ void aa680_state::aa680(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);   // External Hard Disc Drive #4 / Streamer #2
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);   // Streamer #1
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);   // Processor / Printer Device
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93a", WD33C93A).clock(96_MHz_XTAL / 12)
-		.machine_config([this](device_t *device)
-		{
-			wd33c93a_device &wd33c93(downcast<wd33c93a_device &>(*device));
-			wd33c93.irq_cb().set(m_ioc, FUNC(acorn_ioc_device::il3_w));
-			//wd33c93.drq_cb().set(*this, FUNC(aa680_state::scsi_drq));
-		});
+
+	WD33C93A(config, m_scsi, 96_MHz_XTAL / 12);
+	scsi.set_external_device(7, m_scsi);
+	m_scsi->irq_cb().set(m_ioc, FUNC(acorn_ioc_device::il3_w));
+	//m_scsi->drq_cb().set(*this, FUNC(aa680_state::scsi_drq));
 
 	// expansion slots - 4-card backplane - pre-installed podules would make it a Technical Publishing System
 	ARCHIMEDES_PODULE_SLOT(config, m_podule[0], m_exp, archimedes_exp_devices, nullptr);

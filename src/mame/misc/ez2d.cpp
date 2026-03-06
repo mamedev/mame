@@ -72,13 +72,12 @@ Ez2DJ series:
 //#include "bus/rs232/sun_kbd.h"
 //#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
-#include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/i82443bx_host.h"
 #include "machine/i82371eb_isa.h"
 #include "machine/i82371eb_ide.h"
 #include "machine/i82371eb_acpi.h"
 #include "machine/i82371eb_usb.h"
+#include "machine/pci.h"
 #include "machine/w83977tf.h"
 
 
@@ -126,7 +125,7 @@ void ez2d_state::winbond_superio_config(device_t *device)
 	w83977tf_device &fdc = *downcast<w83977tf_device *>(device);
 //  fdc.set_sysopt_pin(1);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.gp25_gatea20().set(":pci:04.0", FUNC(i82371eb_isa_device::a20gate_w));
 	fdc.irq1().set(":pci:04.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:04.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 //  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
@@ -155,6 +154,7 @@ void ez2d_state::cubx(machine_config &config)
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:04.0", 0, "maincpu", true));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	// TODO: CMD PCI0648 UDMA4 IDE (replaces or maps on its own?)
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:04.1", 0, "maincpu"));
@@ -163,7 +163,7 @@ void ez2d_state::cubx(machine_config &config)
 
 	I82371EB_USB (config, "pci:04.2", 0);
 	I82371EB_ACPI(config, "pci:04.3", 0);
-	ACPI_PIIX4   (config, "pci:04.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:04.3:acpi");
 	SMBUS        (config, "pci:04.3:smbus", 0);
 
 	ISA16_SLOT(config, "board4", 0, "pci:04.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
@@ -187,14 +187,14 @@ void ez2d_state::cubx(machine_config &config)
 	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
 #endif
 
-	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
+	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
 }
 
 void ez2d_state::ez2d(machine_config &config)
 {
 	ez2d_state::cubx(config);
 
-	PCI_SLOT(config.replace(), "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt2_m64").set_fixed(true);
+	PCI_SLOT(config.replace(), "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, "rivatnt2_m64").set_fixed(true);
 	// TODO: Sound Blaster Live CT4830
 }
 

@@ -1168,7 +1168,7 @@ ROM_START( biomtoy ) // PCB - REF.922804/2
 	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.d21", 0x000, 0x2e5, BAD_DUMP CRC(212604ea) SHA1(e37b22168425caeb4a017455b54a5580f8f3ff49) ) // Handcrafted as gal22v10. Tested OK by several testers
 	ROM_LOAD( "biomtoy_tibpal16r4_25cn.f2",   0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "biomtoy_tibpal16v8a.j16",      0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )	
+	ROM_LOAD( "biomtoy_tibpal20l8_25cnt.h11", 0x000, 0x2e5, NO_DUMP )
 ROM_END
 
 

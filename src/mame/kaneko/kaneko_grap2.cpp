@@ -31,24 +31,32 @@ void kaneko_grap2_device::grap2_map(address_map &map)
 
 DEFINE_DEVICE_TYPE(KANEKO_GRAP2, kaneko_grap2_device, "kaneko_grap2", "Kaneko GRAP2")
 
-kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+kaneko_grap2_device::kaneko_grap2_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, KANEKO_GRAP2, tag, owner, clock)
 	, device_rom_interface(mconfig, *this)
 	, device_palette_interface(mconfig, *this)
+	, m_framebuffer_scrolly(0)
+	, m_framebuffer_scrollx(0)
+	, m_framebuffer_enable(0)
+	, m_regs1_i(0)
+	, m_framebuffer_bright1(0)
+	, m_framebuffer_bright2(0)
+	, m_regs1_address_regs{ 0, 0 }
+	, m_regs2(0)
 {
 }
 
 void kaneko_grap2_device::device_start()
 {
-	m_framebuffer = make_unique_clear<uint16_t[]>(0x80000/2);
-	m_framebuffer_palette = make_unique_clear<uint16_t[]>(PALETTE_SIZE);
-	m_framebuffer_unk1 = make_unique_clear<uint16_t[]>(0x400/2);
-	m_framebuffer_unk2 = make_unique_clear<uint16_t[]>(0x400/2);
+	m_framebuffer = make_unique_clear<u16[]>(0x80000 / 2);
+	m_framebuffer_palette = make_unique_clear<u16[]>(PALETTE_SIZE);
+	m_framebuffer_unk1 = make_unique_clear<u16[]>(0x400 / 2);
+	m_framebuffer_unk2 = make_unique_clear<u16[]>(0x400 / 2);
 
-	save_pointer(NAME(m_framebuffer), 0x80000/2);
+	save_pointer(NAME(m_framebuffer), 0x80000 / 2);
 	save_pointer(NAME(m_framebuffer_palette), PALETTE_SIZE);
-	save_pointer(NAME(m_framebuffer_unk1), 0x400/2);
-	save_pointer(NAME(m_framebuffer_unk2), 0x400/2);
+	save_pointer(NAME(m_framebuffer_unk1), 0x400 / 2);
+	save_pointer(NAME(m_framebuffer_unk2), 0x400 / 2);
 
 	save_item(NAME(m_framebuffer_scrolly));
 	save_item(NAME(m_framebuffer_scrollx));
@@ -71,7 +79,7 @@ void kaneko_grap2_device::device_reset()
 	m_framebuffer_bright2 = 0;
 }
 
-uint16_t kaneko_grap2_device::regs1_r(offs_t offset, uint16_t mem_mask)
+u16 kaneko_grap2_device::regs1_r(offs_t offset, u16 mem_mask)
 {
 	switch (offset)
 	{
@@ -79,14 +87,13 @@ uint16_t kaneko_grap2_device::regs1_r(offs_t offset, uint16_t mem_mask)
 			return m_framebuffer_enable;
 
 		case 0xb:
-		{
-			m_regs1_i ^= 1;
-			if (m_regs1_i) return 0xfffe;
-			else return 0xffff;
-		}
+			if (!machine().side_effects_disabled())
+				m_regs1_i ^= 1;
+			return 0xfffe | ((~m_regs1_i) & 1);
 
 		default:
-			logerror("%s: regs1_r %02x %04x\n", machine().describe_context(), offset, mem_mask);
+			if (!machine().side_effects_disabled())
+				logerror("%s: regs1_r %02x %04x\n", machine().describe_context(), offset, mem_mask);
 			break;
 	}
 
@@ -95,75 +102,65 @@ uint16_t kaneko_grap2_device::regs1_r(offs_t offset, uint16_t mem_mask)
 
 
 
-void kaneko_grap2_device::do_rle(uint32_t address, uint32_t dstaddress)
+void kaneko_grap2_device::do_rle(u32 address, u32 dstaddress)
 {
 	int rle_count = 0;
 	int normal_count = 0;
-	uint8_t data;
+	u8 data;
 
 	while (dstaddress < 0x40000)
 	{
 		if (rle_count == 0 && normal_count == 0) // we need a new code byte
 		{
-			data = read_byte(address);
+			data = read_byte(address++);
 
 			if ((data & 0x80)) // stream of normal bytes follows
 			{
 				normal_count = (data & 0x7f) + 1;
-				address++;
 			}
 			else // rle block
 			{
 				rle_count = (data & 0x7f) + 1;
-				address++;
+				data = read_byte(address++);
 			}
 		}
 		else if (rle_count)
 		{
-			data = read_byte(address);
-			m_framebuffer[dstaddress] = data;
-			dstaddress++;
+			m_framebuffer[dstaddress++] = data;
 			rle_count--;
-
-			if (rle_count == 0)
-			{
-				address++;
-			}
 		}
 		else if (normal_count)
 		{
-			data = read_byte(address);
-			m_framebuffer[dstaddress] = data;
-			dstaddress++;
+			data = read_byte(address++);
+			m_framebuffer[dstaddress++] = data;
 			normal_count--;
-			address++;
 		}
 	}
 }
 
 
-void kaneko_grap2_device::regs1_go_w(uint16_t data)
+void kaneko_grap2_device::regs1_go_w(u16 data)
 {
-	uint32_t address = m_regs1_address_regs[1] | (m_regs1_address_regs[0] << 16);
-	uint32_t dstaddress = (data & 0x1ff) | ((m_regs2 & 0x1ff) << 9);
+	const u32 address = m_regs1_address_regs[1] | (m_regs1_address_regs[0] << 16);
+	const u32 dstaddress = (data & 0x1ff) | ((m_regs2 & 0x1ff) << 9);
 
 	if ((data & 0xf000) == 0x3000) do_rle(address, dstaddress);
 }
 
 
-void kaneko_grap2_device::set_color_555(pen_t color, int rshift, int gshift, int bshift, uint16_t data)
+void kaneko_grap2_device::set_color_555(pen_t color, int rshift, int gshift, int bshift, u16 data)
 {
 	set_pen_color(color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
-void kaneko_grap2_device::framebuffer1_palette_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void kaneko_grap2_device::framebuffer1_palette_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_framebuffer_palette[offset]);
 	set_color_555(offset, 5, 10, 0, m_framebuffer_palette[offset]);
 }
 
 /* definitely looks like a cycling bg colour used for the girls */
-void kaneko_grap2_device::framebuffer1_bgcol_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void kaneko_grap2_device::framebuffer1_bgcol_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_framebuffer_palette[0x100]);
 	set_color_555(0x100, 5, 10, 0, m_framebuffer_palette[0x100]);

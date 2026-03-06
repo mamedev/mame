@@ -106,7 +106,7 @@ public:
 		m_pmu(*this, "pge"),
 		m_msc(*this, "msc"),
 		m_dfac(*this, "dfac"),
-		m_ncr5380(*this, "scsi:7:ncr5380"),
+		m_ncr5380(*this, "ncr5380"),
 		m_scsihelp(*this, "scsihelp"),
 		m_ram(*this, RAM_TAG),
 		m_gsc(*this, "gsc"),
@@ -815,7 +815,7 @@ void macpbmsc_state::macpd210(machine_config &config)
 	GSC(config, m_gsc, 31.3344_MHz_XTAL);
 	m_gsc->set_panel_id(6);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
@@ -828,11 +828,11 @@ void macpbmsc_state::macpd210(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR53C80).machine_config([this](device_t *device) {
-		ncr53c80_device &adapter = downcast<ncr53c80_device &>(*device);
-		adapter.irq_handler().set(m_msc, FUNC(msc_device::scsi_irq_w));
-		adapter.drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
-	});
+
+	NCR53C80(config, m_ncr5380);
+	scsi.set_external_device(7, m_ncr5380);
+	m_ncr5380->irq_handler().set(m_msc, FUNC(msc_device::scsi_irq_w));
+	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
 
 	MAC_SCSI_HELPER(config, m_scsihelp);
 	m_scsihelp->scsi_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::read));

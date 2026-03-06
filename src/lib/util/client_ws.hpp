@@ -99,7 +99,7 @@ namespace webpp {
 			std::list<SendData> send_queue;
 
 			void send_from_queue() {
-				strand.post([this]() {
+				asio::post(strand, [this]() {
 					asio::async_write(*socket, send_queue.begin()->send_stream->streambuf,
 							strand.wrap([this](const std::error_code& ec, size_t /*bytes_transferred*/) {
 						auto send_queued=send_queue.begin();
@@ -175,7 +175,7 @@ namespace webpp {
 			}
 
 			if(io_context->stopped())
-				io_context->reset();
+				io_context->restart();
 
 			if(!resolver)
 				resolver= std::make_unique<asio::ip::tcp::resolver>(*io_context);
@@ -237,7 +237,7 @@ namespace webpp {
 				send_stream->put(message_stream->get()^mask[c%4]);
 			}
 
-			connection->strand.post([this, send_stream, callback]() {
+			asio::post(connection->strand, [this, send_stream, callback]() {
 				connection->send_queue.emplace_back(send_stream, callback);
 				if(connection->send_queue.size()==1)
 					connection->send_from_queue();
@@ -516,15 +516,13 @@ namespace webpp {
 
 	protected:
 		void connect() override {
-			asio::ip::tcp::resolver::query query(host, std::to_string(port));
-
-			resolver->async_resolve(query, [this]
-					(const std::error_code &ec, asio::ip::tcp::resolver::iterator it){
+			resolver->async_resolve(host, std::to_string(port), [this]
+					(const std::error_code &ec, asio::ip::tcp::resolver::results_type results){
 				if(!ec) {
 					connection=std::shared_ptr<Connection>(new Connection(*io_context, new WS(*io_context)));
 
-					asio::async_connect(*connection->socket, it, [this]
-							(const std::error_code &ec, asio::ip::tcp::resolver::iterator /*it*/){
+					asio::async_connect(*connection->socket, results, [this]
+							(const std::error_code &ec, const asio::ip::tcp::endpoint &/*endpoint*/){
 						if(!ec) {
 							asio::ip::tcp::no_delay option(true);
 							connection->socket->set_option(option);

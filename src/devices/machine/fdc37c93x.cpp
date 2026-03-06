@@ -558,7 +558,7 @@ void fdc37c93x_device::unmap_fdc_addresses()
 
 void fdc37c93x_device::map_lpt(address_map &map)
 {
-	map(0x0, 0x3).rw(pc_lpt_lptdev, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write));
+	map(0x0, 0x3).m(pc_lpt_lptdev, FUNC(pc_lpt_device::isa_map));
 }
 
 void fdc37c93x_device::map_lpt_addresses()

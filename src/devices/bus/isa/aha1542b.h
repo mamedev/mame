@@ -26,7 +26,6 @@ protected:
 
 	void i8085_base_map(address_map &map) ATTR_COLD;
 	void scsi_add(machine_config &config);
-	void scsic_config(device_t *device);
 
 	required_device<cpu_device> m_localcpu;
 	required_device<aic6250_device> m_scsic;

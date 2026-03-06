@@ -681,6 +681,34 @@ ROM_START( disc3000 )
 	ROM_LOAD( "disc3000.icd6", 0x4000, 0x4000, CRC(ad88715a) SHA1(660f4044e8f24ad59767ce025966475f9fd56885) )
 ROM_END
 
+ROM_START( disciip )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "disc_ii_plus_1-f7m27256f1.ice6", 0x0000, 0x8000, CRC(b2d999f2) SHA1(cb961dfa7d6eec84e742261d6cf66a3e95715101) )
+	ROM_LOAD( "disc_ii_plus_2-f7m27256f1.icd6", 0x8000, 0x8000, CRC(c87dd5ce) SHA1(721293fd9ba19bb58b657d6eabd3cd1c7dd74aac) )
+ROM_END
+
+ROM_START( discoly )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "olympia_pr1", 0x0000, 0x1000, CRC(531deb63) SHA1(6fddfc5791465c3bcdb554f207de391905085df9) )
+	ROM_LOAD( "olympia_pr2", 0x1000, 0x1000, CRC(81e119b2) SHA1(a28eca9394e88b862b15e7bc117b0c4d01d4cf38) )
+	ROM_LOAD( "olympia_pr3", 0x2000, 0x1000, CRC(2e156cef) SHA1(e5f145f3e4b7515b949fa7b570ca312c5dd12311) )
+	ROM_LOAD( "olympia_pr4", 0x3000, 0x1000, CRC(8f51c072) SHA1(f23fd7d683a5d0765469de8910bb24d0db1b42e2) )
+	ROM_LOAD( "olympia_pr5", 0x4000, 0x1000, CRC(f486c0da) SHA1(ebec6f66bffa1057f5fa9b4ab53cedd533036f0a) )
+	ROM_LOAD( "olympia_pr6", 0x7000, 0x1000, CRC(e6830d26) SHA1(dbe7a39f24a1dcee298dae3ec1b2d6249a914262) )
+ROM_END
+
+ROM_START( discryl )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "disc_royal_1_m27256.ice6", 0x0000, 0x8000, CRC(b286c166) SHA1(08fecc3bf21013f8dbcc08fef3755757c7ff8053) )
+	ROM_LOAD( "disc_royal_2_m27256.icd6", 0x8000, 0x8000, CRC(be2a96c2) SHA1(07efc914832fe549b69a2ec0de5fd5725502ee86) )
+ROM_END
+
+ROM_START( discrylb )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "disc_royal_dob._i.ice6", 0x0000, 0x8000, CRC(eafe92ca) SHA1(5dc172d7cd4efca7a49ac5884ff30fea7be02a30) )
+	ROM_LOAD( "disc_royal_dob.ii.icd6", 0x8000, 0x8000, CRC(ad58476d) SHA1(4565156cac372f45058bce20006692e9afa53ebe) )
+ROM_END
+
 ROM_START( elitdisc )
 	ROM_REGION( 0x9000, "maincpu", 0 )
 	ROM_LOAD( "elitedisc.ice6", 0x0000, 0x4000, CRC(7f7a2f30) SHA1(01e3ce5fce2c9d51d3f4b8aab7dd67ed4b26d8f4) )
@@ -702,10 +730,38 @@ ROM_START( extrbltt )
 	ROM_LOAD( "extrablatt.icd6", 0x8000, 0x8000, CRC(5c0cb9bd) SHA1(673d5f8dec7ccce1c4f39dce6be1e9d1ed699047) )
 ROM_END
 
+ROM_START( fullhous )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "merkur_full_house_ic1.ice6", 0x0000, 0x4000, CRC(4f984add) SHA1(5a31c96475fe12c4f19658133d97e6bf0536b776) )
+	ROM_LOAD( "merkur_full_house_ic2.icd6", 0x4000, 0x4000, CRC(c0f393a0) SHA1(fa16db49d44e813e68701eb77284d04903cf3ec7) )
+ROM_END
+
 ROM_START( glksstrn )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "glucksstern.ice6", 0x00000, 0x20000, CRC(8e969bae) SHA1(bf66d491932b77dab4c6b15ec7fbf470223636ac) )
 	ROM_LOAD( "glucksstern.icd6", 0x20000, 0x20000, CRC(f31b860a) SHA1(7b016bb7d0699cfe7165c0abb2c1bbcb944cdc86) )
+ROM_END
+
+
+ROM_START( herzas )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "herz_as_nr1.ice6", 0x0000, 0x4000, CRC(dd4dbaac) SHA1(7fb3c8ea495d5bf989c4aa807ecbe5601c451a73) )
+	ROM_LOAD( "herz_as_nr2.icd6", 0x4000, 0x4000, CRC(f2c6a0c4) SHA1(2dad5f79cb5b21905cbefd56b00db1cce1d0b920) )
+	ROM_LOAD( "herz_as_nr3.icc5", 0x8000, 0x1000, CRC(1c8657e8) SHA1(836319901c77037c7f414cf0fddf5ab1bdf90ee5) )
+ROM_END
+
+ROM_START( herzasf8 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "herz_as_f8_1.ice6", 0x0000, 0x4000, CRC(830bada0) SHA1(8c1fc7e8433c986687b68f6de7610a624e9ac707) )
+	ROM_LOAD( "herz_as_f8_2.icd6", 0x4000, 0x4000, CRC(77f88503) SHA1(671a7e819a0361101a30327179132f2661388b72) )
+	ROM_LOAD( "herz_as_f8_3.icc5", 0x8000, 0x1000, CRC(b343bfac) SHA1(3772045fcaeb9a87459e481149f27873fc713ca7) )
+ROM_END
+
+ROM_START( herzasf1 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "herz_as_f10_1.ice6", 0x0000, 0x4000, CRC(e8342e8b) SHA1(e32ad013cdd1480d350ba2e6db18a4489f152301) )
+	ROM_LOAD( "herz_as_f10_2.icd6", 0x4000, 0x4000, CRC(03ba2d03) SHA1(12434a3c862b30e40b7c3187066b25b2b7c4eaa6) )
+	ROM_LOAD( "herz_as_f10_3.icc5", 0x8000, 0x1000, CRC(f67d2492) SHA1(a2daad380376d19cd9ca37f530a23c01b8d3ce5c) )
 ROM_END
 
 ROM_START( juwel )
@@ -726,10 +782,52 @@ ROM_START( kniffi )
 	ROM_LOAD( "kniffi.icd6", 0x8000, 0x8000, CRC(1c129cec) SHA1(bad22f18b94c16dba36995ff8daf4d48f4d082a2) )
 ROM_END
 
+ROM_START( m21point )
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD( "21_point_27c256_f3_i.ice6",  0x0000, 0x8000, CRC(c2b7b030) SHA1(affb317da2f892213556937fa8857186dccac58a) )
+	ROM_LOAD( "21_point_27c256_f3_ii.icd6", 0x8000, 0x8000, CRC(a466591c) SHA1(c481fc91055b41c9976ff86785f7ee0ce631bd69) )
+ROM_END
+
 ROM_START( macao )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mega_macao_f1_1.ice6", 0x0000, 0x8000, CRC(b16c9349) SHA1(f07c3dd215bccab088741f95972489284d6a4db9) )
 	ROM_LOAD( "mega_macao_f1_2.icd6", 0x8000, 0x8000, CRC(4df216e6) SHA1(28b3ad213f3af9a472c5e7de1c139399677dd825) )
+ROM_END
+
+ROM_START(mas)
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mega_as_f5_eprom1_27256.ice6", 0x0000, 0x8000, CRC(17e22e95) SHA1(6fbc11c41c99ee4aac3dcad6647cede25b73f3da) )
+	ROM_LOAD( "mega_as_f5_eprom2_27256.icd6", 0x8000, 0x8000, CRC(12453d57) SHA1(c6c9fa39bdfc7801471bed57e365e37bb02f50b0) )
+ROM_END
+
+ROM_START( mastro )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "merkur_astro_pr1.ice6", 0x0000, 0x8000, CRC(b2d61886) SHA1(12d2aed9315fc311929edeacd23a38bceadb69f8) )
+	ROM_LOAD( "merkur_astro_pr2.icd6", 0x8000, 0x8000, CRC(1e0e42d0) SHA1(46b1eec99331f6656f7cb1542207a79091bce9d9) )
+ROM_END
+
+ROM_START( mbistro )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "merkur_bistro_f1.ice6", 0x0000, 0x8000, CRC(e497eeef) SHA1(a5f621627ee80c11697ee5aa9fcd99023e7b6479) )
+	ROM_LOAD( "merkur_bistro_f1.icd6", 0x8000, 0x8000, NO_DUMP )
+ROM_END
+
+ROM_START( mclub )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "merkur_club_f1_i_st_m27256f1_original.bin",  0x0000, 0x8000, CRC(c78b19b2) SHA1(79aeeee6e82bf987e2aa936575e1e1b251b1a425) )
+	ROM_LOAD( "merkur_club_f1_ii_st_m27256f1_original.bin", 0x8000, 0x8000, CRC(ad3b7d5f) SHA1(317909be8a7853bf83f4f3a2497b1f38a0d954c9) )
+ROM_END
+
+ROM_START( mmax )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mega_max_f4_i_st_m27256f1_ice6",  0x0000, 0x8000, CRC(91aa91ba) SHA1(f6c3a6e2e2edeaa79cf0bcdb6af01ddd50eb5488) )
+	ROM_LOAD( "mega_max_f4_ii_st_m27256f1_icd6", 0x8000, 0x8000, CRC(6120080b) SHA1(16209bfe8e75a165ec1e8a5bf2ec7fa078725380) )
+ROM_END
+
+ROM_START( mtrio )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "mega_trio_f1_ic1.ice6", 0x0000, 0x8000, CRC(b8c2fc4c) SHA1(ddecd608286eb1f3efc6fccce8806a74ad7ce4b8))
+	ROM_LOAD( "mega_trio_f1_ic2.icd6", 0x8000, 0x8000, CRC(9d97fd8c) SHA1(c398610e14c33985a186ae816b759cfdd2b0c6fa))
 ROM_END
 
 ROM_START( rasant )
@@ -738,30 +836,106 @@ ROM_START( rasant )
 	ROM_LOAD( "rasant_pr_2.icd6", 0x8000, 0x8000, CRC(c3a95f74) SHA1(87805ca63a93cc9012e7f2ab4d808c48ba93c919) )
 ROM_END
 
+ROM_START( sesam )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "sesam_1_27128.ice6", 0x0000, 0x4000, CRC(29a07575) SHA1(d7e3355e32fcb7a064d8d0fd9b4904be860f7eed) )
+	ROM_LOAD( "sesam_2_27128.icd6", 0x4000, 0x4000, CRC(dac087d0) SHA1(0776e3db14c9b88140887237b5b3d71396b2e6e9) )
+	ROM_LOAD( "sesam_3_2732.icc5",  0x8000, 0x1000, CRC(ec6a2eac) SHA1(6608dd6f477db0df7de3e4262c5b7bcdf1af7ef4) )
+ROM_END
+
+ROM_START( sherzas )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "super_herz_as_1.ice6", 0x0000, 0x8000, CRC(4212cfaa) SHA1(c428a2a59ae73a92abd08e2b9b2f4feb8ae4dc31) )
+	ROM_LOAD( "super_herz_as_2.icd6", 0x8000, 0x8000, CRC(c5cab1a1) SHA1(d3425c94d898369ad22e969a00697e2f0a1305f9) )
+ROM_END
+
+ROM_START( sjackpot )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "super_jackpot_i.ice6",  0x0000, 0x4000, CRC(3f14364a) SHA1(4711e2d1aa76a08478177ad7b1f5509b11649f9d) )
+	ROM_LOAD( "super_jackpot_ii.icd6", 0x4000, 0x4000, CRC(984d4ca1) SHA1(1da5533f06fb7a1ab8f221c5a58c1afafdd5f862) )
+ROM_END
+
+ROM_START( sprmlti )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "super_multi_1.ice6", 0x0000, 0x8000, CRC(fcf126ba) SHA1(89dfd10b6529a92b55d2585c0aa3d0c6b1751550) )
+	ROM_LOAD( "super_multi_2.icd6", 0x8000, 0x8000, CRC(0b7a8352) SHA1(ac03b226296085f43634ba96e3e390d3e44c1760) )
+ROM_END
+
 ROM_START( sprmltib )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "super_multi_dob_pr1.ice6", 0x0000, 0x8000, CRC(2eb21e6b) SHA1(214f0f26f03551ecda88a64d4e1d75a49f376aae) )
 	ROM_LOAD( "super_multi_dob_pr2.icd6", 0x8000, 0x8000, CRC(e3f14918) SHA1(8ba7fc80044b5d27005a53ddbf9e928c74c25d48) )
 ROM_END
 
+ROM_START( superpro )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "super_pro_f2_1.ice6", 0x0000, 0x8000, CRC(3294f651) SHA1(3c2dcecda4cbebf29246bbc7705430e96dcafbae) )
+	ROM_LOAD( "super_pro_f2_2.icd6", 0x8000, 0x8000, CRC(82802b74) SHA1(8e6ebc429d4e1ccfc5ed6a3bb6fb1747a6a7187a) )
+ROM_END
+
+ROM_START( v4assef1 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "venus_4_asse_f1_i.ice6",  0x0000, 0x8000, CRC(29fd7f6a) SHA1(84a8f744e189f0645410c4b7ac36b65f30aa1cc9) )
+	ROM_LOAD( "venus_4_asse_f1_ii.icd6", 0x8000, 0x8000, CRC(314dc36c) SHA1(d076651910c713326fe5f0c617ae6e74b6c15334) )
+ROM_END
+
+ROM_START( v4assef2 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "4asse_f2_1_27256.ice6", 0x0000, 0x8000, CRC(577a1a55) SHA1(b13ac1b761fba6b7e25c18ad3c1edeef8c892089) )
+	ROM_LOAD( "4asse_f2_2_27256.icd6", 0x8000, 0x8000, CRC(4f921c1a) SHA1(a6cbca333e29e490306820e2df6c9579a67941c8) )
+ROM_END
+
+ROM_START( vmulti )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "venus_multi_1_2732.bin", 0x0000, 0x1000, CRC(3b269798) SHA1(511fb8a86008c124de37d5359681d8379d25891d) )
+	ROM_LOAD( "venus_multi_2_2732.bin", 0x1000, 0x1000, CRC(67e22cec) SHA1(8639cb4496012d9f20f2ece89f15290d017ece2e) )
+	ROM_LOAD( "venus_multi_3_2732.bin", 0x2000, 0x1000, CRC(64bd9bd8) SHA1(c878bdd147e011f4191b5613455648852d395bf1) )
+	ROM_LOAD( "venus_multi_4_2732.bin", 0x3000, 0x1000, CRC(b47e70c1) SHA1(a52cd6568dee16f917c92a41693abd91c4dc2d8c) )
+	ROM_LOAD( "venus_multi_5_2732.bin", 0x4000, 0x1000, CRC(c2905422) SHA1(5c8e3f0440671dc16df32b599239b0435f120778) )
+	ROM_LOAD( "venus_multi_6_2732.bin", 0x7000, 0x1000, CRC(09dd81e7) SHA1(35e9a96d913678a75851a9bf7e7349f93e337805) )
+ROM_END
+
 } // anonymous namespace
 
-GAMEL( 1982, excellnt,    0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1983, bahia,       0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Bahia",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1984, disc,        0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1985, dpplstrt,    0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1986, dpplpot,     0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1986, elitdisc,    0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1986, rasant,      0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Rasant",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1987, disc2000,    0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1987, disc2001,    0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2001",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1987, kniffi,      0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1987, sprmltib,    0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi (DOB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1988, extrbltt,    0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1988, juwel,       0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Juwel",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1989, disc3000,    0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
-GAMEL( 1991, macao,       0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Macao",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1992, karoas,      0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1982, excellnt,        0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Excellent",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1983, bahia,           0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Bahia",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1984, disc,            0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1985, dpplstrt,        0, excellent, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelstart",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1986, discoly,         0, excellent, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Olympia",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1986, dpplpot,         0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Doppelpot",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1986, elitdisc,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Elite Disc",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1986, sjackpot,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Nova",   "Super Jackpot",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1986, vmulti,          0, excellent, disc,     stella8085_state, empty_init, ROT0, "Venus",  "Multi",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, disc2000,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1987, disc2001,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 2001",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1987, fullhous,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Merkur", "Full House",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, herzas,   herzasf1, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, herzasf8, herzasf1, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F8)",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, herzasf1,        0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Herz As (F10)",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, kniffi,          0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Nova",   "Kniffi",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1987, rasant,          0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Venus",  "Rasant",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, sesam,           0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "Merkur", "Sesam",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1987, sprmlti,  sprmltib, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1987, sprmltib,        0, doppelpot, dicemstr, stella8085_state, empty_init, ROT0, "Venus",  "Super Multi (DOB)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, extrbltt,        0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Extrablatt",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, juwel,           0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Juwel",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, mastro,          0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Merkur Astro",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1988, sherzas,         0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Super Herz AS",     MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1989, disc3000,        0, doppelpot, disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc 3000",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1989, disciip,         0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc II Plus",      MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1989, discryl,  discrylb, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Royal",        MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1989, discrylb,        0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    "Disc Royal (DOB)",  MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_disc2000 )
+GAMEL( 1989, mas,             0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "As",                MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1990, v4assef1, v4assef2, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Venus",  "4 Asse (F1)",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1990, v4assef2,        0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Venus",  "4 Asse (F2)",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1991, macao,           0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Macao",             MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1991, mbistro,         0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Bistro",            MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1991, mclub,           0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "Merkur", "Club",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1991, superpro,        0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Merkur", "Super Pro",         MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1992, m21point,        0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "MEGA",   "21 Point",          MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1992, karoas,          0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "ADP",    "Karo As",           MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1992, mmax,            0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "MEGA",   "Max",               MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1992, mtrio,           0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "MEGA",   "Trio",              MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
 // 'STELLA DICE MASTER F2' and 'COPYRIGHT BY ADP LUEBBECKE GERMANY 1993' in ROM
-GAMEL( 1993, dicemstr,    0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Stella", "Dice Master",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
-GAMEL( 1998, glksstrn,    0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern",    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1993, dicemstr,        0, dicemstr,  dicemstr, stella8085_state, empty_init, ROT0, "Stella", "Dice Master",       MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )
+GAMEL( 1998, glksstrn,        0, dicemstr,  disc,     stella8085_state, empty_init, ROT0, "ADP",    u8"Glücks-Stern",    MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_adpservice )

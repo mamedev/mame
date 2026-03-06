@@ -33,11 +33,11 @@ def load_opcodes(fname):
             # append instruction to last opcode
             if line == '\tprefetch();':
                 opcodes[-1][1].append("\tprefetch_start();")
-                opcodes[-1][1].append("\tIR = mintf->read_sync(PC);")
+                opcodes[-1][1].append("\tm_IR = m_mintf->read_sync(m_PC);")
                 opcodes[-1][1].append("\tprefetch_end();")
             elif line == '\tprefetch_noirq();':
                 opcodes[-1][1].append("\tprefetch_start();")
-                opcodes[-1][1].append("\tIR = mintf->read_sync(PC);")
+                opcodes[-1][1].append("\tm_IR = m_mintf->read_sync(m_PC);")
                 opcodes[-1][1].append("\tprefetch_end_noirq();")
             else:
                 opcodes[-1][1].append(line)
@@ -86,19 +86,19 @@ def save_opcodes(f, device, opcodes):
             line_type = identify_line_type(ins)
             if line_type == "EAT":
                 emit(f, "\tdebugger_wait_hook();")
-                emit(f, "\ticount = 0;")
-                emit(f, "\tinst_substate = %d;" % substate)
+                emit(f, "\tm_icount = 0;")
+                emit(f, "\tm_inst_substate = %d;" % substate)
                 emit(f, "\treturn;")
                 substate += 1
             elif line_type == "MEMORY":
                 emit(f, ins)
-                emit(f, "\ticount--;")
-                emit(f, "\tif(icount <= 0) {")
+                emit(f, "\tm_icount--;")
+                emit(f, "\tif(m_icount <= 0) {")
                 emit(f, "\t\tif(access_to_be_redone()) {")
-                emit(f, "\t\t\ticount++;")
-                emit(f, "\t\t\tinst_substate = %d;" % substate)
+                emit(f, "\t\t\tm_icount++;")
+                emit(f, "\t\t\tm_inst_substate = %d;" % substate)
                 emit(f, "\t\t} else")
-                emit(f, "\t\t\tinst_substate = %d;" % (substate+1))
+                emit(f, "\t\t\tm_inst_substate = %d;" % (substate+1))
                 emit(f, "\t\treturn;")
                 emit(f, "\t}")
                 substate += 2
@@ -109,15 +109,15 @@ def save_opcodes(f, device, opcodes):
 
         emit(f, "void %s_device::%s_partial()" % (device, name))
         emit(f, "{")
-        emit(f, "\tswitch(inst_substate) {")
+        emit(f, "\tswitch(m_inst_substate) {")
         emit(f, "case 0:")
         substate = 1
         for ins in instructions:
             line_type = identify_line_type(ins)
             if line_type == "EAT":
                 emit(f, "\tdebugger_wait_hook();")
-                emit(f, "\ticount = 0;")
-                emit(f, "\tinst_substate = %d;" % substate)
+                emit(f, "\tm_icount = 0;")
+                emit(f, "\tm_inst_substate = %d;" % substate)
                 emit(f, "\treturn;")
                 emit(f, "\tcase %d:;" % substate)
                 substate += 1
@@ -125,13 +125,13 @@ def save_opcodes(f, device, opcodes):
                 emit(f, "\t[[fallthrough]];")
                 emit(f, "case %d:" % substate)
                 emit(f, ins)
-                emit(f, "\ticount--;")
-                emit(f, "\tif(icount <= 0) {")
+                emit(f, "\tm_icount--;")
+                emit(f, "\tif(m_icount <= 0) {")
                 emit(f, "\t\tif(access_to_be_redone()) {")
-                emit(f, "\t\t\ticount++;")
-                emit(f, "\t\t\tinst_substate = %d;" % substate)
+                emit(f, "\t\t\tm_icount++;")
+                emit(f, "\t\t\tm_inst_substate = %d;" % substate)
                 emit(f, "\t\t} else")
-                emit(f, "\t\t\tinst_substate = %d;" % (substate+1))
+                emit(f, "\t\t\tm_inst_substate = %d;" % (substate+1))
                 emit(f, "\t\treturn;")
                 emit(f, "\t}")
                 emit(f, "\t[[fallthrough]];")
@@ -141,7 +141,7 @@ def save_opcodes(f, device, opcodes):
                 emit(f, ins)
         emit(f, "\tbreak;")
         emit(f, "}")
-        emit(f, "\tinst_substate = 0;")
+        emit(f, "\tm_inst_substate = 0;")
         emit(f, "}")
         emit(f, "")
 
@@ -149,7 +149,7 @@ def save_opcodes(f, device, opcodes):
 DO_EXEC_FULL_PROLOG="""\
 void %(device)s_device::do_exec_full()
 {
-\tswitch(inst_state) {
+\tswitch(m_inst_state) {
 """
 
 DO_EXEC_FULL_EPILOG="""\
@@ -160,7 +160,7 @@ DO_EXEC_FULL_EPILOG="""\
 DO_EXEC_PARTIAL_PROLOG="""\
 void %(device)s_device::do_exec_partial()
 {
-\tswitch(inst_state) {
+\tswitch(m_inst_state) {
 """
 
 DO_EXEC_PARTIAL_EPILOG="""\

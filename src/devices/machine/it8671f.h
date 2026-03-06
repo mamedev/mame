@@ -15,18 +15,15 @@
 #include "machine/pc_lpt.h"
 #include "machine/upd765.h"
 
-class it8671f_device : public device_t,
+class it8661f_device : public device_t,
 						 public device_isa16_card_interface,
 						 public device_memory_interface
 {
 public:
-	it8671f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	virtual ~it8671f_device();
+	it8661f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	virtual ~it8661f_device();
 
 	void remap(int space_id, offs_t start, offs_t end) override;
-
-	auto krst_gpio2() { return m_krst_callback.bind(); }
-	auto ga20_gpio6() { return m_ga20_callback.bind(); }
 
 	auto irq1() { return m_irq1_callback.bind(); }
 	auto irq8() { return m_irq8_callback.bind(); }
@@ -52,31 +49,44 @@ public:
 	static void floppy_formats(format_registration &fr);
 
 protected:
+	it8661f_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	virtual uint8_t dack_r(int line) override;
-	virtual void dack_w(int line, uint8_t data) override;
+	virtual u8 dack_r(int line) override;
+	virtual void dack_w(int line, u8 data) override;
 	virtual void eop_w(int state) override;
 	void update_dreq_mapping(int dreq, int logical);
 
-private:
-	const address_space_config m_space_config;
+	bool m_activate[8]{};
+	u8 m_iorange[8]{};
+	memory_view m_logical_view;
 
+	// configuration options
+	u8 m_chip_id_2;          // Index $21 r/o
+	u8 m_max_ldn;            // inclusive (so 7 if max LDN is 7)
+	u8 m_unlock_byte_seq[2]; // First part of unlock sequence at $279 (second part is port select)
+
+	virtual void config_map(address_map &map) ATTR_COLD;
+
+	template <unsigned N> u8 activate_r(offs_t offset);
+	template <unsigned N> void activate_w(offs_t offset, u8 data);
+	template <unsigned N> u8 iorange_check_r(offs_t offset);
+	template <unsigned N> void iorange_check_w(offs_t offset, u8 data);
+
+	void request_irq(int irq, int state);
+	void request_dma(int dreq, int state);
+
+	address_space_config m_space_config;
+private:
 	required_device<n82077aa_device> m_fdc;
 	required_device_array<ns16550_device, 2> m_com;
 	required_device<pc_lpt_device> m_lpt;
-	required_device<ps2_keyboard_controller_device> m_keybc;
-	required_device<pc_kbdc_device> m_ps2_con;
-	required_device<pc_kbdc_device> m_aux_con;
 
-	memory_view m_logical_view;
-
-	devcb_write_line m_krst_callback; // GPIO2
-	devcb_write_line m_ga20_callback; // GPIO6
 	devcb_write_line m_irq1_callback;
 	devcb_write_line m_irq8_callback;
 	devcb_write_line m_irq9_callback;
@@ -89,7 +99,6 @@ private:
 
 	u8 m_index = 0;
 	u8 m_logical_index = 0;
-	bool m_activate[8]{};
 	int m_dreq_mapping[4];
 	int m_last_dma_line;
 
@@ -107,19 +116,17 @@ private:
 	u8 m_port_config[4];
 	u8 m_unlock_sequence[32];
 
-	uint8_t read(offs_t offset);
+	u8 m_mc;
+	u8 m_pnp_ldn;
+	bool m_input_clock_select;
+
+	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
-	void port_select_w(offs_t offset, u8 data);
+	void pnp_address_w(offs_t offset, u8 data);
+	void pnp_write_data_w(offs_t offset, u8 data);
 	void port_map(address_map &map);
 
-	void config_map(address_map &map) ATTR_COLD;
-
 	void logical_device_select_w(offs_t offset, u8 data);
-	template <unsigned N> u8 activate_r(offs_t offset);
-	template <unsigned N> void activate_w(offs_t offset, u8 data);
-
-	void request_irq(int irq, int state);
-	void request_dma(int dreq, int state);
 
 	u8 m_fdc_irq_line = 6;
 	u8 m_fdc_drq_line = 2;
@@ -157,6 +164,38 @@ private:
 	template <unsigned N> u8 uart_config_r(offs_t offset);
 	template <unsigned N> void uart_config_w(offs_t offset, u8 data);
 
+protected:
+	u8 gpio_address_r(offs_t offset);
+	template <unsigned N> void gpio_address_w(offs_t offset, u8 data);
+private:
+	u16 m_gpio_address[4];
+};
+
+class it8671f_device : public it8661f_device
+{
+public:
+	it8671f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	void remap(int space_id, offs_t start, offs_t end) override;
+
+	auto krst_gpio2() { return m_krst_callback.bind(); }
+	auto ga20_gpio6() { return m_ga20_callback.bind(); }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual void config_map(address_map &map) override ATTR_COLD;
+
+private:
+	required_device<ps2_keyboard_controller_device> m_keybc;
+	required_device<pc_kbdc_device> m_ps2_con;
+	required_device<pc_kbdc_device> m_aux_con;
+
+	devcb_write_line m_krst_callback; // GPIO2
+	devcb_write_line m_ga20_callback; // GPIO6
+
 	void cpu_reset_w(int state);
 	void cpu_a20_w(int state);
 	void irq_keyboard_w(int state);
@@ -166,6 +205,7 @@ private:
 	u8 m_aux_irq_line;
 };
 
+DECLARE_DEVICE_TYPE(IT8661F, it8661f_device);
 DECLARE_DEVICE_TYPE(IT8671F, it8671f_device);
 
 #endif // MAME_MACHINE_IT8671F_H

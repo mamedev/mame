@@ -64,7 +64,7 @@ void harriet_state::harriet_map(address_map &map)
 	map(0xf10000, 0xf1001f).rw("duart", FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
 	map(0xf20000, 0xf2002f).rw("mfp", FUNC(mc68901_device::read), FUNC(mc68901_device::write)).umask16(0x00ff);
 	map(0xf30000, 0xf301ff).rw("dmac", FUNC(hd63450_device::read), FUNC(hd63450_device::write));
-	map(0xf40000, 0xf4003f).rw("scsia:7:wdc", FUNC(wd33c93_device::dir_r), FUNC(wd33c93_device::dir_w)).umask16(0x00ff);
+	map(0xf40000, 0xf4003f).rw("wdc", FUNC(wd33c93_device::dir_r), FUNC(wd33c93_device::dir_w)).umask16(0x00ff);
 	//map(0xf60000, 0xf60007).rw("c012", FUNC(imsc012_device::read), FUNC(imsc012_device::write)).umask16(0x00ff);
 	map(0xf60006, 0xf60007).nopr();
 	map(0xfa0000, 0xfa0001).nopr();
@@ -119,8 +119,9 @@ void harriet_state::harriet(machine_config &config)
 	rs232.rxd_handler().append("mfp", FUNC(mc68901_device::tbi_w));
 	rs232.set_option_device_input_defaults("terminal", terminal_defaults);
 
-	NSCSI_BUS(config, "scsia");
-	NSCSI_CONNECTOR(config, "scsia:7").option_set("wdc", WD33C93A).clock(40_MHz_XTAL / 4);
+	auto &scsi(NSCSI_BUS(config, "scsia"));
+	auto &wdc(WD33C93A(config, "wdc", 40_MHz_XTAL / 4));
+	scsi.set_external_device(7, wdc);
 
 	//WD33C93(config, "wdcb", 40_MHz_XTAL / 4);
 	//IMSC012(config, "c012", 40_MHz_XTAL / 8); // INMOS IMSC012-P20S link adaptor

@@ -120,8 +120,7 @@ void huangyeh_m68k_state::main_program_map(address_map &map)
 	map(0x100051, 0x100051).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x100060, 0x100061).nopw(); // key matrix at $100061
 	map(0x130000, 0x130001).portr("DSW2");
-	map(0x1d0000, 0x1d0001).rw("acrtc", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
-	map(0x1d0002, 0x1d0003).noprw(); // TODO: A0 of acrtc
+	map(0x1d0000, 0x1d0003).rw("acrtc", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x1d0009, 0x1d0009).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x1d000b, 0x1d000b).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x1d000d, 0x1d000d).w("ramdac", FUNC(ramdac_device::mask_w));
@@ -250,10 +249,10 @@ ROM_START( wlzb )
 	ROM_LOAD( "w7.u34", 0x0000, 0x8000, CRC(c00786b3) SHA1(a8b3ddf3dd1b702d8719eace1b65f42c727b9473) )
 
 	ROM_REGION16_BE( 0x200000, "tiles", 0 )
-	ROM_LOAD( "w3.u41", 0x000000, 0x080000, CRC(58e57d87) SHA1(f870d0729528b2fda495da059f110e466ea58de5) )
-	ROM_LOAD( "w4.u45", 0x080000, 0x080000, CRC(5e993a35) SHA1(ed39dbc89cafebc8348f05a6327efa1ea26ff466) )
-	ROM_LOAD( "w5.u42", 0x100000, 0x080000, CRC(e728751d) SHA1(00bc65793a65ede318e5412d06eb85259015a5c1) )
-	ROM_LOAD( "w6.u46", 0x180000, 0x080000, CRC(a0ea7f31) SHA1(ef985de34485cb65ac59f7938583a0607213c81a) )
+	ROM_LOAD16_BYTE( "w3.u41", 0x000001, 0x080000, CRC(58e57d87) SHA1(f870d0729528b2fda495da059f110e466ea58de5) )
+	ROM_LOAD16_BYTE( "w5.u42", 0x000000, 0x080000, CRC(e728751d) SHA1(00bc65793a65ede318e5412d06eb85259015a5c1) )
+	ROM_LOAD16_BYTE( "w4.u45", 0x100001, 0x080000, CRC(5e993a35) SHA1(ed39dbc89cafebc8348f05a6327efa1ea26ff466) )
+	ROM_LOAD16_BYTE( "w6.u46", 0x100000, 0x080000, CRC(a0ea7f31) SHA1(ef985de34485cb65ac59f7938583a0607213c81a) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "w8.u28", 0x00000, 0x80000, CRC(aad9367b) SHA1(e0b20087a8eab9d16e5cb1ed6415ca5373a43da7) )

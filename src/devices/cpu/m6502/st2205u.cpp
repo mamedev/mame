@@ -160,7 +160,7 @@ void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 	save_item(NAME(m_psg_amplitude));
 	save_item(NAME(m_psg_freqcntr));
 
-	mintf = std::move(intf);
+	m_mintf = std::move(intf);
 	save_common_registers();
 	init();
 }
@@ -168,28 +168,28 @@ void st2205u_base_device::base_init(std::unique_ptr<mi_st2xxx> &&intf)
 void st2205u_device::device_start()
 {
 	std::unique_ptr<mi_st2205u> intf = std::make_unique<mi_st2205u>();
-	space(AS_DATA).specific(intf->data);
-	space(AS_DATA).cache(intf->dcache);
-	intf->irr_enable = false;
-	intf->irr = 0;
-	intf->prr = 0;
-	intf->drr = 0;
-	intf->brr = 0;
-	intf->irq_service = false;
-	intf->ram = make_unique_clear<u8[]>(0x8000);
+	space(AS_DATA).specific(intf->m_data);
+	space(AS_DATA).cache(intf->m_dcache);
+	intf->m_irr_enable = false;
+	intf->m_irr = 0;
+	intf->m_prr = 0;
+	intf->m_drr = 0;
+	intf->m_brr = 0;
+	intf->m_irq_service = false;
+	intf->m_ram = make_unique_clear<u8[]>(0x8000);
 
 	save_item(NAME(m_lbuf));
 	save_item(NAME(m_lpal_index));
 	save_item(NAME(m_gray_levels));
-	save_item(NAME(intf->brr));
-	save_pointer(NAME(intf->ram), 0x8000);
+	save_item(NAME(intf->m_brr));
+	save_pointer(NAME(intf->m_ram), 0x8000);
 
 	base_init(std::move(intf));
 
-	state_add(ST_IRR, "IRR", downcast<mi_st2205u &>(*mintf).irr).mask(0x8fff);
-	state_add(ST_PRR, "PRR", downcast<mi_st2205u &>(*mintf).prr).mask(0x8fff);
-	state_add(ST_DRR, "DRR", downcast<mi_st2205u &>(*mintf).drr).mask(0x87ff);
-	state_add(ST_BRR, "BRR", downcast<mi_st2205u &>(*mintf).brr).mask(0x9fff);
+	state_add(ST_IRR, "IRR", downcast<mi_st2205u &>(*m_mintf).m_irr).mask(0x8fff);
+	state_add(ST_PRR, "PRR", downcast<mi_st2205u &>(*m_mintf).m_prr).mask(0x8fff);
+	state_add(ST_DRR, "DRR", downcast<mi_st2205u &>(*m_mintf).m_drr).mask(0x87ff);
+	state_add(ST_BRR, "BRR", downcast<mi_st2205u &>(*m_mintf).m_brr).mask(0x9fff);
 	state_add(ST_IREQ, "IREQ", m_ireq, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 6; i++)
@@ -263,19 +263,19 @@ void st2205u_device::device_start()
 void st2302u_device::device_start()
 {
 	std::unique_ptr<mi_st2302u> intf = std::make_unique<mi_st2302u>();
-	space(AS_DATA).specific(intf->data);
-	space(AS_DATA).cache(intf->dcache);
-	intf->irr_enable = false;
-	intf->irr = 0;
-	intf->prr = 0;
-	intf->drr = 0;
-	intf->irq_service = false;
+	space(AS_DATA).specific(intf->m_data);
+	space(AS_DATA).cache(intf->m_dcache);
+	intf->m_irr_enable = false;
+	intf->m_irr = 0;
+	intf->m_prr = 0;
+	intf->m_drr = 0;
+	intf->m_irq_service = false;
 
 	base_init(std::move(intf));
 
-	state_add(ST_IRR, "IRR", downcast<mi_st2302u &>(*mintf).irr).mask(0x0fff);
-	state_add(ST_PRR, "PRR", downcast<mi_st2302u &>(*mintf).prr).mask(0x0fff);
-	state_add(ST_DRR, "DRR", downcast<mi_st2302u &>(*mintf).drr).mask(0x07ff);
+	state_add(ST_IRR, "IRR", downcast<mi_st2302u &>(*m_mintf).m_irr).mask(0x0fff);
+	state_add(ST_PRR, "PRR", downcast<mi_st2302u &>(*m_mintf).m_prr).mask(0x0fff);
+	state_add(ST_DRR, "DRR", downcast<mi_st2302u &>(*m_mintf).m_drr).mask(0x07ff);
 	state_add(ST_IREQ, "IREQ", m_ireq, [this](u16 data) { m_ireq = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	state_add(ST_IENA, "IENA", m_iena, [this](u16 data) { m_iena = data; update_irq_state(); }).mask(st2xxx_ireq_mask());
 	for (int i = 0; i < 6; i++)
@@ -369,7 +369,7 @@ void st2205u_device::device_reset()
 {
 	st2205u_base_device::device_reset();
 
-	downcast<mi_st2205u &>(*mintf).brr = 0;
+	downcast<mi_st2205u &>(*m_mintf).m_brr = 0;
 
 	m_lbuf = 0;
 	m_lpal_index = 0;
@@ -421,125 +421,125 @@ const char *st2302u_device::st2xxx_irq_name(int i) const
 
 u8 st2205u_device::mi_st2205u::pread(u16 adr)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
 	if (BIT(bank, 15))
-		return ram[0x4000 | (adr & 0x3fff)];
+		return m_ram[0x4000 | (adr & 0x3fff)];
 	else
-		return data.read_byte(u32(bank) << 14 | (adr & 0x3fff));
+		return m_data.read_byte(u32(bank) << 14 | (adr & 0x3fff));
 }
 
 u8 st2205u_device::mi_st2205u::preadc(u16 adr)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
 	if (BIT(bank, 15))
-		return ram[0x4000 | (adr & 0x3fff)];
+		return m_ram[0x4000 | (adr & 0x3fff)];
 	else
-		return dcache.read_byte(u32(bank) << 14 | (adr & 0x3fff));
+		return m_dcache.read_byte(u32(bank) << 14 | (adr & 0x3fff));
 }
 
 void st2205u_device::mi_st2205u::pwrite(u16 adr, u8 val)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
 	if (BIT(bank, 15))
-		ram[0x4000 | (adr & 0x3fff)] = val;
+		m_ram[0x4000 | (adr & 0x3fff)] = val;
 	else
-		data.write_byte(u32(bank) << 14 | (adr & 0x3fff), val);
+		m_data.write_byte(u32(bank) << 14 | (adr & 0x3fff), val);
 }
 
 u8 st2205u_device::mi_st2205u::dread(u16 adr)
 {
-	if (BIT(drr, 15))
-		return ram[adr & 0x7fff];
+	if (BIT(m_drr, 15))
+		return m_ram[adr & 0x7fff];
 	else
-		return data.read_byte(u32(drr) << 15 | (adr & 0x7fff));
+		return m_data.read_byte(u32(m_drr) << 15 | (adr & 0x7fff));
 }
 
 u8 st2205u_device::mi_st2205u::dreadc(u16 adr)
 {
-	if (BIT(drr, 15))
-		return ram[adr & 0x7fff];
+	if (BIT(m_drr, 15))
+		return m_ram[adr & 0x7fff];
 	else
-		return dcache.read_byte(u32(drr) << 15 | (adr & 0x7fff));
+		return m_dcache.read_byte(u32(m_drr) << 15 | (adr & 0x7fff));
 }
 
 void st2205u_device::mi_st2205u::dwrite(u16 adr, u8 val)
 {
-	if (BIT(drr, 15))
-		ram[adr & 0x7fff] = val;
+	if (BIT(m_drr, 15))
+		m_ram[adr & 0x7fff] = val;
 	else
-		data.write_byte(u32(drr) << 15 | (adr & 0x7fff), val);
+		m_data.write_byte(u32(m_drr) << 15 | (adr & 0x7fff), val);
 }
 
 u8 st2205u_device::mi_st2205u::bread(u16 adr)
 {
-	if (BIT(brr, 15))
-		return ram[0x2000 | (adr & 0x1fff)];
+	if (BIT(m_brr, 15))
+		return m_ram[0x2000 | (adr & 0x1fff)];
 	else
-		return data.read_byte(u32(brr) << 13 | (adr & 0x1fff));
+		return m_data.read_byte(u32(m_brr) << 13 | (adr & 0x1fff));
 }
 
 u8 st2205u_device::mi_st2205u::breadc(u16 adr)
 {
-	if (BIT(brr, 15))
-		return ram[0x2000 | (adr & 0x1fff)];
+	if (BIT(m_brr, 15))
+		return m_ram[0x2000 | (adr & 0x1fff)];
 	else
-		return dcache.read_byte(u32(brr) << 13 | (adr & 0x1fff));
+		return m_dcache.read_byte(u32(m_brr) << 13 | (adr & 0x1fff));
 }
 
 void st2205u_device::mi_st2205u::bwrite(u16 adr, u8 val)
 {
-	if (BIT(brr, 15))
-		ram[0x2000 | (adr & 0x1fff)] = val;
+	if (BIT(m_brr, 15))
+		m_ram[0x2000 | (adr & 0x1fff)] = val;
 	else
-		data.write_byte(u32(brr) << 13 | (adr & 0x1fff), val);
+		m_data.write_byte(u32(m_brr) << 13 | (adr & 0x1fff), val);
 }
 
 u8 st2302u_device::mi_st2302u::pread(u16 adr)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
-	return data.read_byte(u32(bank) << 14 | (adr & 0x3fff));
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
+	return m_data.read_byte(u32(bank) << 14 | (adr & 0x3fff));
 }
 
 u8 st2302u_device::mi_st2302u::preadc(u16 adr)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
-	return dcache.read_byte(u32(bank) << 14 | (adr & 0x3fff));
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
+	return m_dcache.read_byte(u32(bank) << 14 | (adr & 0x3fff));
 }
 
 void st2302u_device::mi_st2302u::pwrite(u16 adr, u8 val)
 {
-	u16 bank = irq_service && irr_enable ? irr : prr;
-	data.write_byte(u32(bank) << 14 | (adr & 0x3fff), val);
+	u16 bank = m_irq_service && m_irr_enable ? m_irr : m_prr;
+	m_data.write_byte(u32(bank) << 14 | (adr & 0x3fff), val);
 }
 
 u8 st2302u_device::mi_st2302u::dread(u16 adr)
 {
-	return data.read_byte(u32(drr) << 15 | (adr & 0x7fff));
+	return m_data.read_byte(u32(m_drr) << 15 | (adr & 0x7fff));
 }
 
 u8 st2302u_device::mi_st2302u::dreadc(u16 adr)
 {
-	return dcache.read_byte(u32(drr) << 15 | (adr & 0x7fff));
+	return m_dcache.read_byte(u32(m_drr) << 15 | (adr & 0x7fff));
 }
 
 void st2302u_device::mi_st2302u::dwrite(u16 adr, u8 val)
 {
-	data.write_byte(u32(drr) << 15 | (adr & 0x7fff), val);
+	m_data.write_byte(u32(m_drr) << 15 | (adr & 0x7fff), val);
 }
 
 u8 st2205u_device::mi_st2205u::read(u16 adr)
 {
-	return program.read_byte(adr);
+	return m_program.read_byte(adr);
 }
 
 u8 st2205u_device::mi_st2205u::read_sync(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : cprogram.read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : m_cprogram.read_byte(adr);
 }
 
 u8 st2205u_device::mi_st2205u::read_arg(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : cprogram.read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : BIT(adr, 13) ? breadc(adr) : m_cprogram.read_byte(adr);
 }
 
 u8 st2205u_device::mi_st2205u::read_vector(u16 adr)
@@ -549,22 +549,22 @@ u8 st2205u_device::mi_st2205u::read_vector(u16 adr)
 
 void st2205u_device::mi_st2205u::write(u16 adr, u8 val)
 {
-	program.write_byte(adr, val);
+	m_program.write_byte(adr, val);
 }
 
 u8 st2302u_device::mi_st2302u::read(u16 adr)
 {
-	return program.read_byte(adr);
+	return m_program.read_byte(adr);
 }
 
 u8 st2302u_device::mi_st2302u::read_sync(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : cprogram.read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : m_cprogram.read_byte(adr);
 }
 
 u8 st2302u_device::mi_st2302u::read_arg(u16 adr)
 {
-	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : cprogram.read_byte(adr);
+	return BIT(adr, 15) ? dreadc(adr) : BIT(adr, 14) ? preadc(adr) : m_cprogram.read_byte(adr);
 }
 
 u8 st2302u_device::mi_st2302u::read_vector(u16 adr)
@@ -574,28 +574,28 @@ u8 st2302u_device::mi_st2302u::read_vector(u16 adr)
 
 void st2302u_device::mi_st2302u::write(u16 adr, u8 val)
 {
-	program.write_byte(adr, val);
+	m_program.write_byte(adr, val);
 }
 
 u8 st2205u_device::brrl_r()
 {
-	return downcast<mi_st2205u &>(*mintf).brr & 0xff;
+	return downcast<mi_st2205u &>(*m_mintf).m_brr & 0xff;
 }
 
 void st2205u_device::brrl_w(u8 data)
 {
-	u16 &brr = downcast<mi_st2205u &>(*mintf).brr;
+	u16 &brr = downcast<mi_st2205u &>(*m_mintf).m_brr;
 	brr = data | (brr & 0x9f00);
 }
 
 u8 st2205u_device::brrh_r()
 {
-	return downcast<mi_st2205u &>(*mintf).brr >> 8;
+	return downcast<mi_st2205u &>(*m_mintf).m_brr >> 8;
 }
 
 void st2205u_device::brrh_w(u8 data)
 {
-	u16 &brr = downcast<mi_st2205u &>(*mintf).brr;
+	u16 &brr = downcast<mi_st2205u &>(*m_mintf).m_brr;
 	brr = (data & 0x9f) << 8 | (brr & 0x00ff);
 }
 
@@ -1022,9 +1022,9 @@ void st2205u_base_device::dcnth_w(u8 data)
 	{
 		uint8_t data;
 		if (BIT(srcb, 15))
-			data = mintf->cprogram.read_byte(srcp); // FIXME: 0080-7FFF should be all RAM on ST2205U
+			data = m_mintf->m_cprogram.read_byte(srcp); // FIXME: 0080-7FFF should be all RAM on ST2205U
 		else
-			data = downcast<mi_st2xxx &>(*mintf).dcache.read_byte(srcp | u32(srcb << 15));
+			data = downcast<mi_st2xxx &>(*m_mintf).m_dcache.read_byte(srcp | u32(srcb << 15));
 		if (!BIT(mode, 1))
 		{
 			if (srcp++ == 0x7fff)
@@ -1036,9 +1036,9 @@ void st2205u_base_device::dcnth_w(u8 data)
 
 		// TODO: XOR/OR/AND logic for DMA0 three-cycle modes (different on ST23XX?)
 		if (BIT(dstb, 15))
-			mintf->cprogram.write_byte(dstp, data); // FIXME: 0080-7FFF should be all RAM on ST2205U
+			m_mintf->m_cprogram.write_byte(dstp, data); // FIXME: 0080-7FFF should be all RAM on ST2205U
 		else
-			downcast<mi_st2xxx &>(*mintf).dcache.write_byte(dstp | u32(dstb << 15), data);
+			downcast<mi_st2xxx &>(*m_mintf).m_dcache.write_byte(dstp | u32(dstb << 15), data);
 		if (!BIT(mode, 3))
 		{
 			if (dstp++ == 0x7fff)
@@ -1189,62 +1189,62 @@ void st2302u_device::unk7f_w(u8 data)
 
 u8 st2205u_device::ram_r(offs_t offset)
 {
-	return downcast<mi_st2205u &>(*mintf).ram[0x0080 + offset];
+	return downcast<mi_st2205u &>(*m_mintf).m_ram[0x0080 + offset];
 }
 
 void st2205u_device::ram_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2205u &>(*mintf).ram[0x0080 + offset] = data;
+	downcast<mi_st2205u &>(*m_mintf).m_ram[0x0080 + offset] = data;
 }
 
 u8 st2205u_device::pmem_r(offs_t offset)
 {
-	return downcast<mi_st2205u &>(*mintf).pread(offset);
+	return downcast<mi_st2205u &>(*m_mintf).pread(offset);
 }
 
 void st2205u_device::pmem_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2205u &>(*mintf).pwrite(offset, data);
+	downcast<mi_st2205u &>(*m_mintf).pwrite(offset, data);
 }
 
 u8 st2205u_device::dmem_r(offs_t offset)
 {
-	return downcast<mi_st2205u &>(*mintf).dread(offset);
+	return downcast<mi_st2205u &>(*m_mintf).dread(offset);
 }
 
 void st2205u_device::dmem_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2205u &>(*mintf).dwrite(offset, data);
+	downcast<mi_st2205u &>(*m_mintf).dwrite(offset, data);
 }
 
 u8 st2205u_device::bmem_r(offs_t offset)
 {
-	return downcast<mi_st2205u &>(*mintf).bread(offset);
+	return downcast<mi_st2205u &>(*m_mintf).bread(offset);
 }
 
 void st2205u_device::bmem_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2205u &>(*mintf).bwrite(offset, data);
+	downcast<mi_st2205u &>(*m_mintf).bwrite(offset, data);
 }
 
 u8 st2302u_device::pmem_r(offs_t offset)
 {
-	return downcast<mi_st2302u &>(*mintf).pread(offset);
+	return downcast<mi_st2302u &>(*m_mintf).pread(offset);
 }
 
 void st2302u_device::pmem_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2302u &>(*mintf).pwrite(offset, data);
+	downcast<mi_st2302u &>(*m_mintf).pwrite(offset, data);
 }
 
 u8 st2302u_device::dmem_r(offs_t offset)
 {
-	return downcast<mi_st2302u &>(*mintf).dread(offset);
+	return downcast<mi_st2302u &>(*m_mintf).dread(offset);
 }
 
 void st2302u_device::dmem_w(offs_t offset, u8 data)
 {
-	downcast<mi_st2302u &>(*mintf).dwrite(offset, data);
+	downcast<mi_st2302u &>(*m_mintf).dwrite(offset, data);
 }
 
 void st2205u_base_device::base_map(address_map &map)

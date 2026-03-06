@@ -17,22 +17,14 @@
 
 #pragma once
 
-#include "cpu/drcfe.h"
-#include "cpu/drcuml.h"
-#include "cpu/drcumlsh.h"
 #include "unspdefs.h"
+
+#include "cpu/drcuml.h"
+
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-/* map variables */
-#define MAPVAR_PC               M0
-#define MAPVAR_CYCLES           M1
-
-#define SINGLE_INSTRUCTION_MODE (0)
-
-#define ENABLE_UNSP_DRC         (0)
 
 #define UNSP_LOG_OPCODES        (0)
 #define UNSP_LOG_REGS           (0)
@@ -40,8 +32,6 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-class unsp_frontend;
 
 // ======================> unsp_device
 
@@ -177,6 +167,10 @@ protected:
 		int m_icount;
 	};
 
+	class frontend;
+	class opcode_desc;
+
+
 	unsp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal);
 
 	// device_t implementation
@@ -300,7 +294,7 @@ private:
 
 	drc_cache m_drccache;
 	std::unique_ptr<drcuml_state> m_drcuml;
-	std::unique_ptr<unsp_frontend> m_drcfe;
+	std::unique_ptr<frontend> m_drcfe;
 	uint32_t m_drcoptions;
 	uint8_t m_cache_dirty;
 

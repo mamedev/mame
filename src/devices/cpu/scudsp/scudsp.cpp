@@ -388,7 +388,7 @@ uint32_t scudsp_cpu_device::ram_address_r()
 
 void scudsp_cpu_device::ram_address_w(uint32_t data)
 {
-//	set_dest_mem_reg( (m_ra & 0xc0) >> 6, data );
+//  set_dest_mem_reg( (m_ra & 0xc0) >> 6, data );
 	m_data->write_dword(m_ra, data);
 
 	m_ra = (m_ra + 1) & 0xff;

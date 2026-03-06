@@ -1455,10 +1455,10 @@ static INPUT_PORTS_START( sspaceat )
 	PORT_DIPSETTING(    0x0a, "5" )
 	PORT_DIPSETTING(    0x06, "6" )
 	/* the following are duplicates
-    PORT_DIPSETTING(    0x00, "4" )
-    PORT_DIPSETTING(    0x04, "4" )
-    PORT_DIPSETTING(    0x08, "4" )
-    PORT_DIPSETTING(    0x02, "5" ) */
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x02, "5" ) */
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x10, "15000" )

@@ -42,9 +42,9 @@ protected:
 
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
-	virtual void read_dummy(uint16_t adr) { (void)mintf->read(adr); }
-	virtual uint8_t read_data(uint16_t adr) { return mintf->read(adr); }
-	virtual void write_data(uint16_t adr, uint8_t val) { mintf->write(adr, val); }
+	virtual void read_dummy(uint16_t adr) { (void)m_mintf->read(adr); }
+	virtual uint8_t read_data(uint16_t adr) { return m_mintf->read(adr); }
+	virtual void write_data(uint16_t adr, uint8_t val) { m_mintf->write(adr, val); }
 
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void do_exec_full() override;

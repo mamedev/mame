@@ -61,19 +61,18 @@ void scsidma_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c80", NCR53C80).machine_config([this](device_t *device)
-	{
-		ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
-		adapter.irq_handler().set(*this, FUNC(scsidma_device::scsi_irq_w));
-		adapter.drq_handler().set(*this, FUNC(scsidma_device::scsi_drq_w));
-	});
+
+	NCR53C80(config, m_ncr);
+	m_scsibus->set_external_device(7, m_ncr);
+	m_ncr->irq_handler().set(DEVICE_SELF, FUNC(scsidma_device::scsi_irq_w));
+	m_ncr->drq_handler().set(DEVICE_SELF, FUNC(scsidma_device::scsi_drq_w));
 }
 
 scsidma_device::scsidma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SCSIDMA, tag, owner, clock),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
 	m_scsibus(*this, "scsi"),
-	m_ncr(*this, "scsi:7:ncr53c80"),
+	m_ncr(*this, "ncr53c80"),
 	m_irq(*this),
 	m_scsi_irq(0),
 	m_control(0),

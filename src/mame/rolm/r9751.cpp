@@ -90,7 +90,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_pdc(*this, "pdc"),
 		m_smioc(*this, "smioc"),
-		m_wd33c93(*this, "scsi:7:wd33c93"),
+		m_wd33c93(*this, "wd33c93"),
 		m_main_ram(*this, "main_ram")
 	{
 		device_trace_init();
@@ -968,13 +968,6 @@ void r9751_state::scsi_devices(device_slot_interface &device)
 	device.option_add("harddisk", NSCSI_HARDDISK);
 }
 
-void r9751_state::wd33c93(device_t *device)
-{
-	device->set_clock(10000000);
-	//  downcast<wd33c93a_device *>(device)->irq_cb().set(*this, FUNC(r9751_state::scsi_irq_w));
-	//  downcast<wd33c93a_device *>(device)->drq_cb().set(*this, FUNC(r9751_state::scsi_drq_w));
-}
-
 void r9751_state::r9751(machine_config &config)
 {
 	/* basic machine hardware */
@@ -992,15 +985,18 @@ void r9751_state::r9751(machine_config &config)
 	m_pdc->m68k_r_callback().set(FUNC(r9751_state::pdc_dma_r));
 	m_pdc->m68k_w_callback().set(FUNC(r9751_state::pdc_dma_w));
 
-	NSCSI_BUS(config, "scsi", 0);
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, "cdrom", false);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("wd33c93", WD33C93)
-		.machine_config([this](device_t *device) { wd33c93(device); });
+
+	WD33C93(config, m_wd33c93, 10000000);
+	scsi.set_external_device(7, m_wd33c93);
+	//m_wd33c93->irq_cb().set(DEVICE_SELF, FUNC(r9751_state::scsi_irq_w));
+	//m_wd33c93->drq_cb().set(DEVICE_SELF, FUNC(r9751_state::scsi_drq_w));
 
 	/* software list */
 	SOFTWARE_LIST(config, "flop_list").set_original("r9751");

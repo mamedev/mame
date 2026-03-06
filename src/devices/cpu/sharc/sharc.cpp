@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "sharc.h"
 
-#include "sharcdsm.h"
+#include "sharc_dasm.h"
 #include "sharcfe.h"
 #include "sharcinternal.ipp"
 
@@ -18,6 +18,8 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <locale>
+#include <sstream>
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -67,6 +69,17 @@ enum
 DEFINE_DEVICE_TYPE(ADSP21062, adsp21062_device, "adsp21062", "Analog Devices ADSP21062 \"SHARC\"")
 DEFINE_DEVICE_TYPE(ADSP21060, adsp21060_device, "adsp21060", "Analog Devices ADSP21060 \"SHARC\"")
 
+
+std::string adsp21062_device::disassemble_one(uint32_t pc, uint64_t opcode)
+{
+	// expensive - don't use this frequently
+	std::ostringstream stream;
+	stream.imbue(std::locale::classic());
+	sharc_disassembler().disassemble_one(stream, pc, opcode);
+	return std::move(stream).str();
+}
+
+
 void adsp21062_device::pgm_2m(address_map &map)
 {
 	map(0x20000, 0x24fff).mirror(0x18000).rw(FUNC(adsp21062_device::pm_r<1>), FUNC(adsp21062_device::pm_w<1>));
@@ -84,8 +97,11 @@ void adsp21062_device::data_2m(address_map &map)
 	map(0x00000, 0x000ff).rw(FUNC(adsp21062_device::iop_r), FUNC(adsp21062_device::iop_w));
 	map(0x20000, 0x27fff).mirror(0x18000).ram().share(m_blocks[1]);
 	map(0x20000, 0x27fff).ram().share(m_blocks[0]);
-	map(0x40000, 0x4ffff).mirror(0x30000).rw(FUNC(adsp21062_device::dmw_r<1>), FUNC(adsp21062_device::dmw_w<1>));
-	map(0x40000, 0x4ffff).rw(FUNC(adsp21062_device::dmw_r<0>), FUNC(adsp21062_device::dmw_w<0>));
+	map(0x40000, 0x4ffff).mirror(0x30000).rw(FUNC(adsp21062_device::dm_short_r<1>), FUNC(adsp21062_device::dm_short_w<1>));
+	map(0x40000, 0x4ffff).rw(FUNC(adsp21062_device::dm_short_r<0>), FUNC(adsp21062_device::dm_short_w<0>));
+	map(0x40000, 0x7ffff).view(m_dm_short_view);
+	m_dm_short_view[0](0x40000, 0x4ffff).mirror(0x30000).r(FUNC(adsp21062_device::dm_short_se_r<1>));
+	m_dm_short_view[0](0x40000, 0x4ffff).r(FUNC(adsp21062_device::dm_short_se_r<0>));
 }
 
 void adsp21062_device::data_4m(address_map &map)
@@ -93,8 +109,11 @@ void adsp21062_device::data_4m(address_map &map)
 	map(0x00000, 0x000ff).rw(FUNC(adsp21062_device::iop_r), FUNC(adsp21062_device::iop_w));
 	map(0x20000, 0x2ffff).ram().share(m_blocks[0]);
 	map(0x30000, 0x3ffff).ram().share(m_blocks[1]);
-	map(0x40000, 0x5ffff).rw(FUNC(adsp21062_device::dmw_r<0>), FUNC(adsp21062_device::dmw_w<0>));
-	map(0x60000, 0x7ffff).rw(FUNC(adsp21062_device::dmw_r<1>), FUNC(adsp21062_device::dmw_w<1>));
+	map(0x40000, 0x5ffff).rw(FUNC(adsp21062_device::dm_short_r<0>), FUNC(adsp21062_device::dm_short_w<0>));
+	map(0x60000, 0x7ffff).rw(FUNC(adsp21062_device::dm_short_r<1>), FUNC(adsp21062_device::dm_short_w<1>));
+	map(0x40000, 0x7ffff).view(m_dm_short_view);
+	m_dm_short_view[0](0x40000, 0x5ffff).r(FUNC(adsp21062_device::dm_short_se_r<0>));
+	m_dm_short_view[0](0x60000, 0x7ffff).r(FUNC(adsp21062_device::dm_short_se_r<1>));
 }
 
 adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -158,7 +177,14 @@ adsp21062_device::adsp21062_device(
 	, m_swap_dag2_4_7(nullptr)
 	, m_swap_r0_7(nullptr)
 	, m_swap_r8_15(nullptr)
+	, m_dm_short_view(*this, "short_words")
+	, m_flag_out_cb(*this)
 	, m_blocks(*this, "block%u", 0U)
+	, m_flag_pending_val{ 0, 0, 0, 0 }
+	, m_write_stalled_pending_val{ false }
+	, m_flag_pending{ false, false, false, false }
+	, m_write_stalled_pending(false)
+	, m_input_update_pending(false)
 	, m_enable_drc(false)
 {
 	std::fill(std::begin(m_exception), std::end(m_exception), nullptr);
@@ -308,13 +334,19 @@ void adsp21062_device::pm_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 }
 
 template <unsigned N>
-uint32_t adsp21062_device::dmw_r(offs_t offset)
+uint32_t adsp21062_device::dm_short_r(offs_t offset)
 {
 	return util::little_endian_cast<uint16_t const>(&m_blocks[N][0])[offset];
 }
 
 template <unsigned N>
-void adsp21062_device::dmw_w(offs_t offset, uint32_t data)
+uint32_t adsp21062_device::dm_short_se_r(offs_t offset)
+{
+	return uint32_t(int32_t(util::little_endian_cast<int16_t const>(&m_blocks[N][0])[offset]));
+}
+
+template <unsigned N>
+void adsp21062_device::dm_short_w(offs_t offset, uint32_t data)
 {
 	util::little_endian_cast<uint16_t>(&m_blocks[N][0])[offset] = uint16_t(data);
 }
@@ -613,7 +645,7 @@ void adsp21062_device::device_start()
 		m_drcuml->symbol_add(&m_core->lstkp, sizeof(m_core->lstkp), "lstkp");
 		m_drcuml->symbol_add(&m_core->px, sizeof(m_core->px), "px");
 
-		m_drcfe = std::make_unique<sharc_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);
+		m_drcfe = std::make_unique<frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE);
 
 		for (int i = 0; i < 16; i++)
 			m_regmap[i] = uml::mem(&m_core->r[i]);
@@ -831,21 +863,21 @@ void adsp21062_device::device_start()
 	save_item(NAME(m_core->astat_old_old));
 	save_item(NAME(m_core->astat_old_old_old));
 
-	state_add( SHARC_PC,     "PC", m_core->pc).mask(0x00ffffff).formatstr("%06X");
-	state_add( SHARC_PCSTK,  "PCSTK", m_core->pcstk).mask(0x00ffffff).formatstr("%06X");
-	state_add( SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).mask(0x1f).formatstr("%02X");
-	state_add( SHARC_LSTKP,  "LSTKP", m_core->lstkp).mask(0x07).formatstr("%01X");
-	state_add( SHARC_FADDR,  "FADDR", m_core->faddr).formatstr("%08X");
-	state_add( SHARC_DADDR,  "DADDR", m_core->daddr).formatstr("%08X");
-	state_add( SHARC_MODE1,  "MODE1", m_core->mode1).formatstr("%08X");
-	state_add( SHARC_MODE2,  "MODE2", m_core->mode2).formatstr("%08X");
-	state_add( SHARC_ASTAT,  "ASTAT", m_core->astat).formatstr("%08X").callimport().callexport();
-	state_add( SHARC_IRPTL,  "IRPTL", m_core->irptl).formatstr("%08X");
-	state_add( SHARC_IMASK,  "IMASK", m_core->imask).formatstr("%08X");
-	state_add( SHARC_USTAT1, "USTAT1", m_core->ustat1).formatstr("%08X");
-	state_add( SHARC_USTAT2, "USTAT2", m_core->ustat2).formatstr("%08X");
-	state_add( SHARC_CURLCNTR, "CURLCNTR", m_core->curlcntr).formatstr("%08X");
-	state_add( SHARC_STSTKP, "STSTKP", m_core->status_stkp).formatstr("%08X");
+	state_add(SHARC_PC,     "PC", m_core->pc).mask(0x00ffffff).formatstr("%06X");
+	state_add(SHARC_PCSTK,  "PCSTK", m_core->pcstk).mask(0x00ffffff).formatstr("%06X");
+	state_add(SHARC_PCSTKP, "PCSTKP", m_core->pcstkp).mask(0x1f).formatstr("%02X");
+	state_add(SHARC_LSTKP,  "LSTKP", m_core->lstkp).mask(0x07).formatstr("%01X");
+	state_add(SHARC_FADDR,  "FADDR", m_core->faddr).formatstr("%08X");
+	state_add(SHARC_DADDR,  "DADDR", m_core->daddr).formatstr("%08X");
+	state_add(SHARC_MODE1,  "MODE1", m_core->mode1).formatstr("%08X");
+	state_add(SHARC_MODE2,  "MODE2", m_core->mode2).formatstr("%08X");
+	state_add(SHARC_ASTAT,  "ASTAT", m_core->astat).formatstr("%08X").callimport().callexport();
+	state_add(SHARC_IRPTL,  "IRPTL", m_core->irptl).formatstr("%08X");
+	state_add(SHARC_IMASK,  "IMASK", m_core->imask).formatstr("%08X");
+	state_add(SHARC_USTAT1, "USTAT1", m_core->ustat1).formatstr("%08X");
+	state_add(SHARC_USTAT2, "USTAT2", m_core->ustat2).formatstr("%08X");
+	state_add(SHARC_CURLCNTR, "CURLCNTR", m_core->curlcntr).formatstr("%08X");
+	state_add(SHARC_STSTKP, "STSTKP", m_core->status_stkp).formatstr("%08X");
 
 	char namebuf[8];
 	for (int i = 0; 16 > i; ++i)
@@ -857,29 +889,37 @@ void adsp21062_device::device_start()
 	{
 		std::snprintf(namebuf, std::size(namebuf), "I%d", i);
 		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
-		state_add(SHARC_I0 + i, namebuf, dag.i[i]).formatstr("%08X");
+		auto const mask((i < 8) ? 0xffffffff : 0x00ffffff);
+		auto const format((i < 8) ? "%08X" : "%06X");
+		state_add(SHARC_I0 + i, namebuf, dag.i[i & 0x7]).mask(mask).formatstr(format);
 	}
 	for (int i = 0; 16 > i; ++i)
 	{
 		std::snprintf(namebuf, std::size(namebuf), "M%d", i);
 		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
-		state_add(SHARC_M0 + i, namebuf, dag.m[i]).formatstr("%08X");
+		auto const mask((i < 8) ? 0xffffffff : 0x00ffffff);
+		auto const format((i < 8) ? "%08X" : "%06X");
+		state_add(SHARC_M0 + i, namebuf, dag.m[i & 0x7]).mask(mask).formatstr(format);
 	}
 	for (int i = 0; 16 > i; ++i)
 	{
 		std::snprintf(namebuf, std::size(namebuf), "L%d", i);
 		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
-		state_add(SHARC_L0 + i, namebuf, dag.l[i]).formatstr("%08X");
+		auto const mask((i < 8) ? 0xffffffff : 0x00ffffff);
+		auto const format((i < 8) ? "%08X" : "%06X");
+		state_add(SHARC_L0 + i, namebuf, dag.l[i & 0x7]).mask(mask).formatstr(format);
 	}
 	for (int i = 0; 16 > i; ++i)
 	{
 		std::snprintf(namebuf, std::size(namebuf), "B%d", i);
 		auto &dag((i < 8) ? m_core->dag1 : m_core->dag2);
-		state_add(SHARC_B0 + i, namebuf, dag.b[i]).formatstr("%08X");
+		auto const mask((i < 8) ? 0xffffffff : 0x00ffffff);
+		auto const format((i < 8) ? "%08X" : "%06X");
+		state_add(SHARC_B0 + i, namebuf, dag.b[i & 0x7]).mask(mask).formatstr(format);
 	}
 
-	state_add( STATE_GENPC, "GENPC", m_core->pc).noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
+	state_add(STATE_GENPC,     "GENPC", m_core->pc).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 
 	set_icountptr(m_core->icount);
 }
@@ -965,6 +1005,8 @@ void adsp21062_device::device_reset()
 
 void adsp21062_device::device_pre_save()
 {
+	assert(!m_input_update_pending);
+
 	cpu_device::device_pre_save();
 
 	if ((m_core->pcstkp > 0) && (m_core->pcstkp < 31))
@@ -1052,40 +1094,102 @@ void adsp21062_device::execute_set_input(int irqline, int state)
 			m_core->irq_pending &= ~(1 << (8-irqline));
 		}
 	}
-	else if (irqline >= SHARC_INPUT_FLAG0 && irqline <= SHARC_INPUT_FLAG3)
-	{
-		set_flag_input(irqline - SHARC_INPUT_FLAG0, state);
-	}
 }
 
 void adsp21062_device::set_flag_input(int flag_num, int state)
 {
-	if (flag_num >= 0 && flag_num < 4)
+	assert((flag_num >= 0) && (flag_num < 4));
+
+	// Check if flag is set to input in MODE2 (bit == 0)
+	if (BIT(m_core->mode2, flag_num + 15))
+		throw emu_fatalerror("sharc_set_flag_input: flag %d is set output!\n", flag_num);
+
+	state = state ? 1 : 0;
+	device_execute_interface *const current = machine().scheduler().currently_executing();
+	bool const not_executing = current && (current != static_cast<device_execute_interface *>(this));
+	if (not_executing || m_flag_pending[flag_num])
 	{
-		// Check if flag is set to input in MODE2 (bit == 0)
-		if (!BIT(m_core->mode2, flag_num + 15))
+		if (m_flag_pending[flag_num] || (m_core->flag[flag_num] != state))
 		{
-			m_core->flag[flag_num] = state ? 1 : 0;
+			m_flag_pending_val[flag_num] = state;
+			m_flag_pending[flag_num] = true;
+			if (!m_input_update_pending)
+			{
+				m_input_update_pending = true;
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(adsp21062_device::sharc_update_inputs), this));
+			}
 		}
-		else
-		{
-			throw emu_fatalerror("sharc_set_flag_input: flag %d is set output!\n", flag_num);
-		}
+	}
+	else
+	{
+		m_core->flag[flag_num] = state ? 1 : 0;
 	}
 }
 
 void adsp21062_device::write_stall(int state)
 {
-	m_core->write_stalled = (state == 0) ? false : true;
-
-	if (m_enable_drc)
+	bool const stall = state != 0;
+	device_execute_interface *const current = machine().scheduler().currently_executing();
+	bool const not_executing = current && (current != static_cast<device_execute_interface *>(this));
+	if (m_enable_drc || not_executing || m_write_stalled_pending)
 	{
-		if (m_core->write_stalled)
-			spin_until_trigger(45757);
-		else
-			machine().scheduler().trigger(45757);
+		if (m_write_stalled_pending || (m_core->write_stalled != stall))
+		{
+			m_write_stalled_pending_val = stall;
+			m_write_stalled_pending = true;
+			if (!m_input_update_pending)
+			{
+				m_input_update_pending = true;
+				machine().scheduler().synchronize(timer_expired_delegate(FUNC(adsp21062_device::sharc_update_inputs), this));
+			}
+		}
+	}
+	else
+	{
+		m_core->write_stalled = stall;
 	}
 }
+
+TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_update_inputs)
+{
+	m_input_update_pending = false;
+
+	for (unsigned i = 0; 4 > i; ++i)
+	{
+		if (m_flag_pending[i])
+		{
+			m_core->flag[i] = m_flag_pending_val[i];
+			m_flag_pending[i] = false;
+		}
+	}
+
+	if (m_write_stalled_pending)
+	{
+		if (m_core->write_stalled != m_write_stalled_pending_val)
+		{
+			m_core->write_stalled = m_write_stalled_pending_val;
+#if 0 // FIXME: this implementation breaks Thrill Drive on Hornet
+			if (m_enable_drc)
+			{
+				if (m_core->write_stalled)
+				{
+					m_core->dma_op[6].timer->adjust(attotime::never, 0);
+					m_core->dma_op[7].timer->adjust(attotime::never, 0);
+				}
+				else
+				{
+					if (m_core->dma_status & (1 << 6))
+						m_core->dma_op[6].timer->adjust(cycles_to_attotime(m_core->dma_op[6].src_count / 4), 6);
+					if (m_core->dma_status & (1 << 7))
+						m_core->dma_op[7].timer->adjust(cycles_to_attotime(m_core->dma_op[7].src_count / 4), 7);
+				}
+			}
+#endif
+		}
+		m_write_stalled_pending = false;
+	}
+}
+
 
 void adsp21062_device::check_interrupts()
 {
@@ -1146,7 +1250,7 @@ void adsp21062_device::execute_run()
 			int dma_count = m_core->icount;
 
 			// run active DMAs even while idling
-			while (dma_count > 0 && m_core->dma_status & ((1 << 6) | (1 << 7)))
+			while ((dma_count > 0) && (m_core->dma_status & ((1 << 6) | (1 << 7))))
 			{
 				if (!m_core->write_stalled)
 				{

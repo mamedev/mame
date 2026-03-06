@@ -322,7 +322,7 @@ void cdicdic_device::play_xa_group(const uint8_t coding, const uint8_t *data)
 	static const uint16_t DATA_OFFSET_8BIT[4] = { 16, 17, 18, 19 };
 
 	int16_t samples[28];
-	uint8_t num_samples = coding & CODING_8BPS ? 4 : 8;
+	const uint8_t num_samples = (coding & CODING_8BPS) ? 4 : 8;
 
 	for (uint8_t i = 0; i < num_samples; i++)
 	{

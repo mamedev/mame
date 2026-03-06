@@ -79,22 +79,21 @@ HDD image contains remnants of an Actua Soccer Arcade installation.
 
 #include "emu.h"
 
-#include "bus/pci/pci_slot.h"
-#include "cpu/i386/i386.h"
-#include "machine/pci.h"
-#include "machine/pci-ide.h"
-#include "machine/i82443bx_host.h"
-#include "machine/i82371eb_isa.h"
-#include "machine/i82371eb_ide.h"
-#include "machine/i82371eb_acpi.h"
-#include "machine/i82371eb_usb.h"
-#include "machine/w83977tf.h"
 #include "bus/isa/isa_cards.h"
 //#include "bus/rs232/hlemouse.h"
 //#include "bus/rs232/null_modem.h"
 //#include "bus/rs232/rs232.h"
 //#include "bus/rs232/sun_kbd.h"
 //#include "bus/rs232/terminal.h"
+#include "bus/pci/pci_slot.h"
+#include "cpu/i386/i386.h"
+#include "machine/i82443bx_host.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_usb.h"
+#include "machine/pci.h"
+#include "machine/w83977tf.h"
 #include "video/voodoo_pci.h"
 
 // TODO: change me up to agp_slot
@@ -186,7 +185,7 @@ void quakeat_state::ga6la7(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	ACPI_PIIX4   (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", winbond_superio_config);
@@ -212,9 +211,9 @@ void quakeat_state::quake(machine_config &config)
 	ga6la7(config);
 	// TODO: has problems mapping a VGA
 	// (different legacy control method?)
-//	config.device_remove(PCI_AGP_ID);
-//	config.device_remove("screen");
-//	PCI_SLOT(config, "pci:01.0:1", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
+//  config.device_remove(PCI_AGP_ID);
+//  config.device_remove("screen");
+//  PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, "rivatnt").set_fixed(true);
 }
 
 ROM_START( ga6la7 )

@@ -3,6 +3,7 @@
 /* compute operations */
 
 #include <cmath>
+#include <limits>
 
 #define CLEAR_ALU_FLAGS()           do { m_core->astat &= ~(AZ|AN|AV|AC|AS|AI); } while (false)
 
@@ -20,6 +21,9 @@
 
 /* TODO: MU needs 80-bit result */
 #define SET_FLAG_MU(r)              do { m_core->astat |= (((uint32_t((r) >> 32) == 0) && (uint32_t(r)) != 0) ? MU : 0); } while (false)
+
+// saturate overflowed result
+inline void SATURATE(uint32_t &r)               { r = uint32_t((int32_t(r) < 0) ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min()); }
 
 constexpr bool IS_FLOAT_ZERO(uint32_t r)        { return (r & (FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK)) == 0; }
 constexpr bool IS_FLOAT_DENORMAL(uint32_t r)    { return ((r & FLOAT_EXPONENT_MASK) == 0) && ((r & FLOAT_MANTISSA_MASK) != 0); }
@@ -111,14 +115,16 @@ void adsp21062_device::compute_add(int rn, int rx, int ry)
 {
 	uint32_t r = REG(rx) + REG(ry);
 
-	if (m_core->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_add: ALU saturation not implemented!\n");
-
 	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
 	SET_FLAG_AV_ADD(r, REG(rx), REG(ry));
 	SET_FLAG_AC_ADD(r, REG(rx), REG(ry));
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
 	REG(rn) = r;
 
 	m_core->astat &= ~AF;
@@ -129,14 +135,16 @@ void adsp21062_device::compute_sub(int rn, int rx, int ry)
 {
 	uint32_t r = REG(rx) - REG(ry);
 
-	if (m_core->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_sub: ALU saturation not implemented!\n");
-
 	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
 	SET_FLAG_AV_SUB(r, REG(rx), REG(ry));
 	SET_FLAG_AC_SUB(r, REG(rx), REG(ry));
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
 	REG(rn) = r;
 
 	m_core->astat &= ~AF;
@@ -148,14 +156,18 @@ void adsp21062_device::compute_add_ci(int rn, int rx, int ry)
 	int c = (m_core->astat & AC) ? 1 : 0;
 	uint32_t r = REG(rx) + REG(ry) + c;
 
-	if (m_core->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_add_ci: ALU saturation not implemented!\n");
-
 	CLEAR_ALU_FLAGS();
+	SET_FLAG_AV_ADD(r, REG(rx), REG(ry));
+	SET_FLAG_AC_ADD(r, REG(rx), REG(ry));
+	if (c == 1 && REG(ry) == 0xffffffff)
+		m_core->astat |= AC;
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
 	SET_FLAG_AN(r);
 	SET_FLAG_AZ(r);
-	SET_FLAG_AV_ADD(r, REG(rx), REG(ry)+c);
-	SET_FLAG_AC_ADD(r, REG(rx), REG(ry)+c);
+
 	REG(rn) = r;
 
 	m_core->astat &= ~AF;
@@ -167,14 +179,18 @@ void adsp21062_device::compute_sub_ci(int rn, int rx, int ry)
 	int c = (m_core->astat & AC) ? 1 : 0;
 	uint32_t r = REG(rx) - REG(ry) + c - 1;
 
-	if (m_core->mode1 & MODE1_ALUSAT)
-		fatalerror("SHARC: compute_sub_ci: ALU saturation not implemented!\n");
-
 	CLEAR_ALU_FLAGS();
+	SET_FLAG_AV_SUB(r, REG(rx), REG(ry));
+	SET_FLAG_AC_SUB(r, REG(rx), REG(ry));
+	if (c == 0 && REG(ry) == 0xffffffff)
+		m_core->astat |= AC;
+
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
+		SATURATE(r);
+
 	SET_FLAG_AN(r);
 	SET_FLAG_AZ(r);
-	SET_FLAG_AV_SUB(r, REG(rx), REG(ry)+c-1);
-	SET_FLAG_AC_SUB(r, REG(rx), REG(ry)+c-1);
+
 	REG(rn) = r;
 
 	m_core->astat &= ~AF;
@@ -306,6 +322,21 @@ void adsp21062_device::compute_min(int rn, int rx, int ry)
 void adsp21062_device::compute_max(int rn, int rx, int ry)
 {
 	uint32_t r = std::max((int32_t)REG(rx), (int32_t)REG(ry));
+
+	CLEAR_ALU_FLAGS();
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
+
+	REG(rn) = r;
+
+	m_core->astat &= ~AF;
+}
+
+/* Rn = CLIP Rx BY Ry */
+void adsp21062_device::compute_clip(int rn, int rx, int ry)
+{
+	const int32_t absry = std::abs(int32_t(REG(ry)));
+	const uint32_t r = std::clamp(int32_t(REG(rx)), -absry, absry);
 
 	CLEAR_ALU_FLAGS();
 	SET_FLAG_AN(r);
@@ -681,7 +712,8 @@ void adsp21062_device::compute_fabs_plus(int rn, int rx, int ry)
 	m_core->stky |= (IS_FLOAT_DENORMAL(r.r)) ? AUS : 0;
 	// AI
 	m_core->astat |= (IS_FLOAT_NAN(REG(rx)) || IS_FLOAT_NAN(REG(ry))) ? AI : 0;
-	/* TODO: AV flag */
+	// AV
+	m_core->astat |= (IS_FLOAT_INFINITY(r.r)) ? AV : 0;
 
 	// AIS
 	if (m_core->astat & AI)   m_core->stky |= AIS;
@@ -755,22 +787,8 @@ void adsp21062_device::compute_fclip(int rn, int rx, int ry)
 {
 	SHARC_REG r_alu;
 
-	if (FREG(rx) < fabsf(FREG(ry)))
-	{
-		r_alu.f = FREG(rx);
-	}
-	else
-	{
-		if (FREG(rx) >= 0.0f)
-		{
-			r_alu.f = fabsf(FREG(ry));
-		}
-		else
-		{
-			r_alu.f = -fabsf(FREG(ry));
-		}
-	}
-
+	const float absry = fabsf(FREG(ry));
+	r_alu.f = std::clamp(FREG(rx), -absry, absry);
 
 	CLEAR_ALU_FLAGS();
 	SET_FLAG_AN(r_alu.r);

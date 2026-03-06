@@ -142,7 +142,14 @@ dspp_bulldog_device::dspp_bulldog_device(const machine_config &mconfig, const ch
 {
 }
 
-dspp_device::dspp_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor code_map_ctor, address_map_constructor data_map_ctor) :
+dspp_device::dspp_device(
+		const machine_config &mconfig,
+		device_type type,
+		const char *tag,
+		device_t *owner,
+		uint32_t clock,
+		address_map_constructor code_map_ctor,
+		address_map_constructor data_map_ctor) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_int_handler(*this),
 	m_dma_read_handler(*this, 0),
@@ -184,6 +191,10 @@ dspp_device::dspp_device(const machine_config &mconfig, device_type type, const 
 #endif
 }
 
+dspp_device::~dspp_device()
+{
+}
+
 
 //-------------------------------------------------
 //  device_start - start up the device
@@ -201,7 +212,7 @@ void dspp_device::device_start()
 		uint32_t flags = 0;
 		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, flags, 1, 16, 0);
 
-		m_drcfe = std::make_unique<dspp_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+		m_drcfe = std::make_unique<frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 	}
 	else
 	{

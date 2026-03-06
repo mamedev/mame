@@ -34,13 +34,57 @@
 
 /*
 
+    Installing MS-DOS to hard disk
+	------------------------------
+
+    $ ./chdman createhd -chs 306,6,17 -ss 512 -o st412.chd
+	$ printf '\x0f%.0s' {1..256} > nvram/mm2m35d/x2212
+	$ ./mame mm2m35d -rs232b terminal -flop1 msdos221 -hard st412.chd
+
+	Select terminal keyboard in input settings
+
+    Monitor:
+
+    L (oad)
+    A (abort)
+    C (continue)
+
+	Select computer keyboard in input settings
+
+    DOS:
+
+    SETPAR
+    2 (15MB Winchester)
+    2 (640KB floppy 1)
+    0 (no floppy 2)
+
+    Mount msdos221:flop2
+
+    WFORM C:
+    B
+    <RETURN>
+
+    Wait for it...
+
+    Mount msdos221:flop1
+
+    SYS C:
+    COPY *.* C:
+
+    Mount msdos221:flop2
+
+    COPY *.* C:
+
+*/
+
+/*
+
     TODO:
 
-    - DMA
-    - floppy
-    - SASI
-    - video
-    - keyboard
+    - keyboard ROM is not dumped
+	- MPSC (DMA and interrupts)
+    - CRTC186 video using CRT9007
+    - IOE186 card
 
 */
 
@@ -48,6 +92,7 @@
 #include "bus/mm2/exp.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i186.h"
+#include "machine/74259.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
@@ -60,7 +105,7 @@
 #include "speaker.h"
 #include "softlist_dev.h"
 
-#define I80186_TAG      "maincpu"
+#define I80186_TAG "maincpu"
 
 namespace {
 
@@ -77,14 +122,16 @@ public:
 		m_speaker(*this, "speaker"),
 		m_rs232a(*this, "rs232a"),
 		m_rs232b(*this, "rs232b"),
-		m_exp(*this, "exp")
+		m_exp(*this, "exp"),
+		m_ctrl1(*this, "control1"),
+		m_ctrl2(*this, "control2"),
+		m_hold_latch(0)
 	{ }
 
 	void mm2(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -96,37 +143,47 @@ private:
 	required_device<rs232_port_device> m_rs232a;
 	required_device<rs232_port_device> m_rs232b;
 	required_device<mikromikko2_expansion_bus_device> m_exp;
+	required_device<ls259_device> m_ctrl1;
+	required_device<ls259_device> m_ctrl2;
 
 	void mm2_mem(address_map &map) ATTR_COLD;
 	void mm2_io(address_map &map) ATTR_COLD;
 
 	uint8_t status_r(offs_t offset);
-	void novram_store(offs_t offset, uint8_t data);
-	void novram_recall(offs_t offset, uint8_t data);
+	uint8_t novram_r(offs_t offset) { return m_novram->read(m_maincpu->space(AS_PROGRAM), offset) << 4; };
+	void novram_w(offs_t offset, uint8_t data) { m_novram->write(offset, data >> 4); };
+	uint16_t mpsc_r(offs_t offset, uint16_t mem_mask);
+	void mpsc_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void novram_store(offs_t offset, uint8_t data) { m_novram->store(1); m_novram->store(0); }
 	void tcl_w(offs_t offset, uint8_t data) { m_pic->ir0_w(CLEAR_LINE); }
-	void diag_w(offs_t offset, uint8_t data) { popmessage("%02x", data); }
-	void cls0_w(offs_t offset, uint8_t data) { m_cls0 = BIT(data, 0); }
-	void cls1_w(offs_t offset, uint8_t data) { m_cls1 = BIT(data, 0); }
-	void dtra_w(offs_t offset, uint8_t data) { m_rs232a->write_dtr(!BIT(data, 0)); }
-	void dtrb_w(offs_t offset, uint8_t data) { m_rs232b->write_dtr(!BIT(data, 0)); }
+	void diag_w(offs_t offset, uint8_t data) { logerror("DIAG %02x\n", data); }
+	void cls0_w(int state) { m_cls0 = state; }
+	void cls1_w(int state) { m_cls1 = state; }
+	void llba_w(int state) { m_llba = state; }
+	void llbb_w(int state) { m_llbb = state; }
+	void mpsc_txda_w(int state) { if (m_llba) m_mpsc->rxa_w(state); else m_rs232a->write_txd(state); }
+	void mpsc_txdb_w(int state) { if (m_llbb) m_mpsc->rxb_w(state); else m_rs232b->write_txd(state); }
+	void mpsc_rtsa_w(int state) { if (m_llba) m_mpsc->ctsa_w(state); else m_rs232a->write_rts(state); }
+	void mpsc_rtsb_w(int state) { if (m_llbb) m_mpsc->ctsb_w(state); else m_rs232b->write_rts(state); }
 	void tmrout0_w(int state) { if (!m_cls1 && !m_cls0) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
 	void tmrout1_w(int state) { if (!m_cls1 && m_cls0) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
-	void ir0_w(int state) { if (state) { m_pic->ir0_w(ASSERT_LINE); } }
+	void latch_hold(int state, int bit);
+	void update_bhlda();
+	void hold1_w(int state) { latch_hold(state, 0); }
+	void hold2_w(int state) { latch_hold(state, 1); }
+	void hold3_w(int state) { latch_hold(state, 2); }
+	void hold4_w(int state) { latch_hold(state, 3); }
+	void hold5_w(int state) { latch_hold(state, 4); }
+
+	uint8_t slave_ack_r(offs_t offset) { if (offset == 7) return m_maincpu->int_callback(*this, 0); return 0; }
 
 	bool m_cls0;
 	bool m_cls1;
+	bool m_llba;
+	bool m_llbb;
+
+	u8 m_hold_latch;
 };
-
-void mm2_state::novram_store(offs_t offset, uint8_t data)
-{
-	m_novram->store(1);
-	m_novram->store(0);
-}
-
-void mm2_state::novram_recall(offs_t offset, uint8_t data)
-{
-	m_novram->recall(!BIT(data, 0));
-}
 
 uint8_t mm2_state::status_r(offs_t offset)
 {
@@ -137,53 +194,99 @@ uint8_t mm2_state::status_r(offs_t offset)
 	return data;
 }
 
+uint16_t mm2_state::mpsc_r(offs_t offset, uint16_t mem_mask)
+{
+	if (ACCESSING_BITS_8_15 && offset == 2)
+		return status_r(0) << 8;
+
+	if (ACCESSING_BITS_0_7)
+		return m_mpsc->cd_ba_r(offset);
+
+	return 0;
+}
+
+void mm2_state::mpsc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (ACCESSING_BITS_0_7)
+		m_mpsc->cd_ba_w(offset, data & 0xff);
+}
+
+void mm2_state::latch_hold(int state, int bit)
+{
+	if (state)
+		m_hold_latch |= 1 << bit;
+	else
+		m_hold_latch &= ~(1 << bit);
+
+	update_bhlda();
+}
+
+void mm2_state::update_bhlda()
+{
+	int bcas = 0;
+	if (BIT(m_hold_latch, 0)) bcas = 1;
+	else if (BIT(m_hold_latch, 1)) bcas = 2;
+	else if (BIT(m_hold_latch, 2)) bcas = 3;
+	else if (BIT(m_hold_latch, 3)) bcas = 4;
+	else if (BIT(m_hold_latch, 4)) bcas = 5;
+
+	line_state bhlda = bcas ? ASSERT_LINE : CLEAR_LINE;
+	m_maincpu->set_input_line(INPUT_LINE_HALT, bhlda);
+	m_exp->bhlda_w(bhlda, bcas);
+}
+
 void mm2_state::mm2_mem(address_map &map)
 {
-	map(0x00000, 0x1ffff).ram(); // DRAM 128 KB (on SBC186)
-	map(0x20000, 0x3ffff).ram(); // DRAM 128 KB (on SBC186)
-	map(0x40000, 0x7ffff).ram(); // DRAM 256 KB (on SBC186 or MEME186)
-	map(0x80000, 0xbffff).ram(); // DRAM 256 KB (on MEME186)
-	map(0xf0000, 0xf01ff).rw(m_novram, FUNC(x2212_device::read), FUNC(x2212_device::write)).umask16(0xff00);
+	map(0x00000, 0x3ffff).ram();
+	map(0xc0000, 0xeffff).noprw();
+	map(0xf0000, 0xf01ff).rw(FUNC(mm2_state::novram_r), FUNC(mm2_state::novram_w)).umask16(0x00ff);
 	map(0xf0200, 0xfffff).rom().region(I80186_TAG, 0x200);
 }
 
 void mm2_state::mm2_io(address_map &map)
 {
 	map(0xf800, 0xf803).rw(m_pic, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0xf880, 0xf887).rw(m_mpsc, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
-	map(0xf884, 0xf885).r(FUNC(mm2_state::status_r)).umask16(0xff00);
-	map(0xf900, 0xf901).w(FUNC(mm2_state::novram_store)).umask16(0x00ff);
+	map(0xf880, 0xf887).rw(FUNC(mm2_state::mpsc_r), FUNC(mm2_state::mpsc_w));
+	//map(0xf880, 0xf887).rw(m_mpsc, FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
+	//map(0xf884, 0xf885).r(FUNC(mm2_state::status_r)).umask16(0xff00);
+	map(0xf900, 0xf901).w(FUNC(mm2_state::novram_store)).umask16(0xff00);
 	map(0xf930, 0xf937).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0xff00);
 	map(0xf940, 0xf941).w(FUNC(mm2_state::tcl_w)).umask16(0xff00);
 	map(0xf950, 0xf951).w(FUNC(mm2_state::diag_w)).umask16(0xff00);
-	map(0xf960, 0xf961).w(FUNC(mm2_state::cls0_w)).umask16(0xff00);
-	map(0xf962, 0xf963).w(FUNC(mm2_state::cls1_w)).umask16(0xff00);
-	//map(0xf965, 0xf965) LOOPBACK LLBA
-	//map(0xf967, 0xf967) LOOPBACK LLBB
-	//map(0xf969, 0xf969) DATA CODING NRZI
-	//map(0xf96b, 0xf96b) SIGNAL LEVELS V24
-	//map(0xf96d, 0xf96d) SIGNAL LEVELS X27
-	map(0xf96e, 0xf96f).w(FUNC(mm2_state::dtra_w)).umask16(0xff00);
-	//map(0xf971, 0xf971) V24 SIGNAL TSTA
-	//map(0xf973, 0xf973) V24 SIGNAL SRSA
-	map(0xf974, 0xf975).w(FUNC(mm2_state::dtrb_w)).umask16(0xff00);
-	//map(0xf97d, 0xf97d) ???
-	map(0xf97e, 0xf97f).w(FUNC(mm2_state::novram_recall)).umask16(0xff00);
+	map(0xf960, 0xf96f).w(m_ctrl1, FUNC(ls259_device::write_d0)).umask16(0xff00);
+	map(0xf970, 0xf97f).w(m_ctrl2, FUNC(ls259_device::write_d0)).umask16(0xff00);
 }
 
 static INPUT_PORTS_START( mm2 )
-	// defined in mm2kb.cpp
+	// defined in bus/mm2/mm2kb.cpp
 INPUT_PORTS_END
 
 void mm2_state::machine_start()
 {
+	m_mpsc->synca_w(1);
+
+	u8 *rom = memregion(I80186_TAG)->base();
+
+	// patch out ROM checksum validation
+	rom[0x051c] = 0x90;
+	rom[0x051d] = 0x90;
+
+	// patch out MPSC test which fails due to missing DMA and interrupts
+	rom[0x1cf8] = 0x90;
+	rom[0x1cf9] = 0x90;
+	rom[0x1cfa] = 0x90;
+
+	// patch out CRTC186 test which fails due to missing keyboard emulation
+	rom[0x1d00] = 0x90;
+	rom[0x1d01] = 0x90;
+	rom[0x1d02] = 0x90;
+
 	// state saving
 	save_item(NAME(m_cls0));
 	save_item(NAME(m_cls1));
-}
-
-void mm2_state::machine_reset()
-{
+	save_item(NAME(m_llba));
+	save_item(NAME(m_llbb));
+	save_item(NAME(m_hold_latch));
 }
 
 void mm2_state::mm2(machine_config &config)
@@ -193,36 +296,57 @@ void mm2_state::mm2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mm2_state::mm2_mem);
 	m_maincpu->set_addrmap(AS_IO, &mm2_state::mm2_io);
 	m_maincpu->irmx_irq_cb().set(m_pic, FUNC(pic8259_device::ir7_w));
-	m_maincpu->read_slave_ack_callback().set(m_pic, FUNC(pic8259_device::acknowledge));
+	m_maincpu->set_irmx_irq_ack(m_pic, FUNC(pic8259_device::inta_cb));
+	m_maincpu->irqa_cb().set(m_exp, FUNC(mikromikko2_expansion_bus_device::inta_w));
 	m_maincpu->tmrout0_handler().set(FUNC(mm2_state::tmrout0_w));
 	m_maincpu->tmrout1_handler().set(FUNC(mm2_state::tmrout1_w));
 
 	PIC8259(config, m_pic);
 	m_pic->out_int_callback().set(m_maincpu, FUNC(i80186_cpu_device::int0_w));
+	m_pic->in_sp_callback().set_constant(1);
+	m_pic->read_slave_ack_callback().set(FUNC(mm2_state::slave_ack_r));
 
 	PIT8253(config, m_pit);
 	m_pit->set_clk<0>(XTAL(16'000'000)/8);
 	m_pit->set_clk<1>(XTAL(16'000'000)/8);
 	m_pit->set_clk<2>(XTAL(16'000'000)/8);
-	m_pit->out_handler<0>().set(FUNC(mm2_state::ir0_w));
+	m_pit->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir0_w));
 	m_pit->out_handler<1>().set(m_mpsc, FUNC(i8274_device::rxtxcb_w));
 	m_pit->out_handler<2>().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	I8274(config, m_mpsc, XTAL(16'000'000)/4);
-	m_mpsc->out_txda_callback().set(m_rs232a, FUNC(rs232_port_device::write_txd));
-	m_mpsc->out_rtsa_callback().set(m_rs232a, FUNC(rs232_port_device::write_rts));
-	m_mpsc->out_txdb_callback().set(m_rs232b, FUNC(rs232_port_device::write_txd));
-	m_mpsc->out_rtsb_callback().set(m_rs232b, FUNC(rs232_port_device::write_rts));
 	m_mpsc->out_int_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
+	m_mpsc->out_txdrqa_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
+	m_mpsc->out_rxdrqa_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
+	m_mpsc->out_txda_callback().set(FUNC(mm2_state::mpsc_txda_w));
+	m_mpsc->out_rtsa_callback().set(FUNC(mm2_state::mpsc_rtsa_w));
+	m_mpsc->out_txdb_callback().set(FUNC(mm2_state::mpsc_txdb_w));
+	m_mpsc->out_rtsb_callback().set(FUNC(mm2_state::mpsc_rtsb_w));
 
 	RS232_PORT(config, m_rs232a, default_rs232_devices, nullptr);
-	m_rs232a->rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxa_w));
-	m_rs232a->dcd_handler().set(m_mpsc, FUNC(z80dart_device::dcda_w));
-	m_rs232a->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsa_w));
+	m_rs232a->rxd_handler().set(m_mpsc, FUNC(i8274_device::rxa_w));
+	m_rs232a->dcd_handler().set(m_mpsc, FUNC(i8274_device::dcda_w));
+	m_rs232a->cts_handler().set(m_mpsc, FUNC(i8274_device::ctsa_w));
 
-	RS232_PORT(config, m_rs232b, default_rs232_devices, "terminal");
-	m_rs232b->rxd_handler().set(m_mpsc, FUNC(z80dart_device::rxb_w));
-	m_rs232b->cts_handler().set(m_mpsc, FUNC(z80dart_device::ctsb_w));
+	RS232_PORT(config, m_rs232b, default_rs232_devices, nullptr);
+	m_rs232b->rxd_handler().set(m_mpsc, FUNC(i8274_device::rxb_w));
+	m_rs232b->cts_handler().set(m_mpsc, FUNC(i8274_device::ctsb_w));
+
+	LS259(config, m_ctrl1);
+	m_ctrl1->q_out_cb<0>().set(FUNC(mm2_state::cls0_w));
+	m_ctrl1->q_out_cb<1>().set(FUNC(mm2_state::cls1_w));
+	m_ctrl1->q_out_cb<2>().set(FUNC(mm2_state::llba_w));
+	m_ctrl1->q_out_cb<3>().set(FUNC(mm2_state::llbb_w));
+	//m_ctrl1->q_out_cb<4>().set(); DATA CODING NRZI (0=NRZ, 1=NRZI)
+	//m_ctrl1->q_out_cb<5>().set(); SIGNAL LEVELS V28 (1=V.28)
+	//m_ctrl1->q_out_cb<6>().set(); SIGNAL LEVELS X27 (1=X.27)
+	m_ctrl1->q_out_cb<7>().set(m_rs232a, FUNC(rs232_port_device::write_dtr)).invert();
+
+	LS259(config, m_ctrl2);
+	//m_ctrl2->q_out_cb<0>().set(); V24 SIGNAL TSTA INVERTED
+	//m_ctrl2->q_out_cb<1>().set(); V24 SIGNAL SRSA INVERTED
+	m_ctrl2->q_out_cb<2>().set(m_rs232b, FUNC(rs232_port_device::write_dtr)).invert();
+	m_ctrl2->q_out_cb<7>().set(m_novram, FUNC(x2212_device::recall)).invert();
 
 	X2212(config, m_novram);
 
@@ -230,24 +354,24 @@ void mm2_state::mm2(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker, 0).add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	MIKROMIKKO2_EXPANSION_BUS(config, m_exp, 0);
-	m_exp->set_memspace(I80186_TAG, AS_PROGRAM);
-	m_exp->set_iospace(I80186_TAG, AS_IO);
+	m_exp->set_memspace(m_maincpu, AS_PROGRAM);
+	m_exp->set_iospace(m_maincpu, AS_IO);
 	m_exp->nmi_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 	m_exp->ir2_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
 	m_exp->ir3_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
 	m_exp->ir4_callback().set(m_pic, FUNC(pic8259_device::ir4_w));
 	m_exp->ir5_callback().set(m_pic, FUNC(pic8259_device::ir5_w));
-	m_exp->hold1_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	m_exp->hold2_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	m_exp->hold3_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	m_exp->hold4_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
-	m_exp->hold5_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_exp->hold1_callback().set(FUNC(mm2_state::hold1_w));
+	m_exp->hold2_callback().set(FUNC(mm2_state::hold2_w));
+	m_exp->hold3_callback().set(FUNC(mm2_state::hold3_w));
+	m_exp->hold4_callback().set(FUNC(mm2_state::hold4_w));
+	m_exp->hold5_callback().set(FUNC(mm2_state::hold5_w));
 
 	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp1", 0, m_exp, mikromikko2_expansion_bus_cards, "mmc186", false);
 	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp2", 0, m_exp, mikromikko2_expansion_bus_cards, "crtc186", false);
 	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp3", 0, m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
 	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp4", 0, m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
-	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp5", 0, m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp5", 0, m_exp, mikromikko2_expansion_bus_cards, "meme186", false);
 }
 
 ROM_START( mm2m35d )
@@ -263,8 +387,11 @@ ROM_START( mm2m35d )
 	ROMX_LOAD( "9490c.ic52", 0x0001, 0x4000, CRC(bfde706e) SHA1(8a154aa00d480684b00aa7c30be6d6a78dd9ddaa), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "9489c.ic41", 0x8000, 0x4000, CRC(b5086aac) SHA1(f8d7a936baa701dcc30949fe1241be2ab9b80201), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "9491c.ic58", 0x8001, 0x4000, CRC(32047735) SHA1(408f03bc2d89257488e4b3336500681bb168cdec), ROM_SKIP(1) | ROM_BIOS(1) )
+
+	ROM_REGION( 0x100, "x2212", 0 )
+	ROM_LOAD( "x2212", 0x000, 0x100, CRC(1b9f1518) SHA1(57928b28f654be84a00797ab5b5fa0389ae36016) )
 ROM_END
 
 } // anonymous namespace
 
-COMP( 1983, mm2m35d,  0,     0,      mm2,   mm2,   mm2_state, empty_init, "Nokia Data", "MikroMikko 2 M35D", MACHINE_NOT_WORKING )
+COMP( 1983, mm2m35d,  0,     0,      mm2,   mm2,   mm2_state, empty_init, "Nokia Data", "MikroMikko 2 M35D", MACHINE_IMPERFECT_GRAPHICS )

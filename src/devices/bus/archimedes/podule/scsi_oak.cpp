@@ -195,7 +195,7 @@ const tiny_rom_entry *arc_scsi_oak_device::device_rom_region() const
 
 void arc_scsi_oak_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr, false);
@@ -203,12 +203,11 @@ void arc_scsi_oak_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR5380)
-		.machine_config([this](device_t *device)
-		{
-			downcast<ncr5380_device&>(*device).irq_handler().set([this](int state) { m_irq_state = state; });
-			downcast<ncr5380_device &>(*device).drq_handler().set([this](int state) { m_drq_state = state; });
-		});
+
+	NCR5380(config, m_ncr5380);
+	scsi.set_external_device(7, m_ncr5380);
+	m_ncr5380->irq_handler().set([this](int state) { m_irq_state = state; });
+	m_ncr5380->drq_handler().set([this](int state) { m_drq_state = state; });
 
 	EEPROM_93C06_16BIT(config, m_eeprom);
 }
@@ -225,7 +224,7 @@ void arc_scsi_oak_device::device_add_mconfig(machine_config &config)
 arc_scsi_oak_device::arc_scsi_oak_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, ARC_SCSI_OAK, tag, owner, clock)
 	, device_archimedes_podule_interface(mconfig, *this)
-	, m_ncr5380(*this, "scsi:7:ncr5380")
+	, m_ncr5380(*this, "ncr5380")
 	, m_eeprom(*this, "eeprom")
 	, m_podule_rom(*this, "podule_rom")
 	, m_rom_page(0)

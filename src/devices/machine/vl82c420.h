@@ -15,7 +15,7 @@
 #include "machine/ram.h"
 
 class vl82c420_device : public device_t,
-				       public device_memory_interface
+					   public device_memory_interface
 {
 public:
 	template <typename T, typename U, typename V, typename W, typename X>
@@ -103,7 +103,7 @@ public:
 
 		//if (?)
 		//{
-		//	// detect transition
+		//  // detect transition
 		if (m_kbrst == 1 && state == 0)
 		{
 			m_write_cpureset(1);
@@ -195,10 +195,10 @@ private:
 	u8 config_data_r(offs_t offset);
 	void config_data_w(offs_t offset, u8 data);
 
-//	std::vector<u8> m_shadow_ram;
+//  std::vector<u8> m_shadow_ram;
 
 	void update_segment_settings();
-//	void update_dma_clock();
+//  void update_dma_clock();
 
 	offs_t page_offset();
 	void set_dma_channel(int channel, bool state);
@@ -241,8 +241,8 @@ private:
 		}
 	}
 
-//	void emulated_kbreset(int state);
-//	void emulated_gatea20(int state);
+//  void emulated_kbreset(int state);
+//  void emulated_gatea20(int state);
 };
 
 DECLARE_DEVICE_TYPE(VL82C420, vl82c420_device)

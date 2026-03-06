@@ -276,7 +276,7 @@ class x68ksupr_state : public x68k_state
 public:
 	x68ksupr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: x68k_state(mconfig, type, tag)
-		, m_scsictrl(*this, "scsi:7:spc")
+		, m_scsictrl(*this, "spc")
 	{
 	}
 

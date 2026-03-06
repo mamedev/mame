@@ -87,7 +87,7 @@ void virge_pci_device::config_map(address_map &map)
 
 void virge_pci_device::legacy_io_map(address_map &map)
 {
-	map(0x00, 0x2f).m(m_vga, FUNC(s3virge_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(s3virge_vga_device::io_map));
 }
 
 // FIXME: belongs to s3virge_vga_device.
@@ -179,6 +179,12 @@ void virge_pci_device::device_start()
 	// medium DEVSELB
 	status = 0x0200;
 
+	// INTA#
+	intr_pin = 1;
+	// min_gnt = 1 usec, max_lat = <maximum allowed>
+	minimum_grant = 0x04;
+	maximum_latency = 0xff;
+
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virge_pci_device::postload), this));
 }
@@ -200,6 +206,10 @@ void virgevx_pci_device::device_start()
 	// medium DEVSELB
 	status = 0x0200;
 
+	// INTA#
+	intr_pin = 1;
+	// TODO: min_gnt 0x04, max_lat = 0xff (assumed same as regular ViRGE)
+
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virgevx_pci_device::postload), this));
 }
@@ -220,6 +230,10 @@ void virgedx_pci_device::device_start()
 	command_mask = 0x27;
 	// medium DEVSELB
 	status = 0x0200;
+
+	// INTA#
+	intr_pin = 1;
+	// TODO: min_gnt 0x04, max_lat = 0xff (assumed same as regular ViRGE)
 
 	remap_cb();
 	machine().save().register_postload(save_prepost_delegate(FUNC(virgedx_pci_device::postload), this));
@@ -245,7 +259,7 @@ void virge_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 
 	if (BIT(command, 0))
 	{
-		io_space->install_device(0x03b0, 0x03df, *this, &virge_pci_device::legacy_io_map);
+		io_space->install_device(0x0000, 0xffff, *this, &virge_pci_device::legacy_io_map);
 
 		// Available at MMFF20 only if true
 		if (m_vga->read_pd26_strapping() == false)

@@ -2799,6 +2799,7 @@ end
 --
 --@src/devices/machine/nscsi_bus.h,MACHINES["NSCSI"] = true
 --@src/devices/machine/nscsi_cb.h,MACHINES["NSCSI"] = true
+--@src/devices/machine/nscsi_hle.h,MACHINES["NSCSI"] = true
 ---------------------------------------------------
 
 if MACHINES["NSCSI"] then
@@ -2807,6 +2808,8 @@ if MACHINES["NSCSI"] then
 		MAME_DIR .. "src/devices/machine/nscsi_bus.h",
 		MAME_DIR .. "src/devices/machine/nscsi_cb.cpp",
 		MAME_DIR .. "src/devices/machine/nscsi_cb.h",
+		MAME_DIR .. "src/devices/machine/nscsi_hle.cpp",
+		MAME_DIR .. "src/devices/machine/nscsi_hle.h",
 	}
 end
 
@@ -2940,6 +2943,8 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/sis7018_audio.h",
 		MAME_DIR .. "src/devices/machine/sis900_eth.cpp",
 		MAME_DIR .. "src/devices/machine/sis900_eth.h",
+		MAME_DIR .. "src/devices/machine/sis950_acpi.cpp",
+		MAME_DIR .. "src/devices/machine/sis950_acpi.h",
 		MAME_DIR .. "src/devices/machine/sis950_lpc.cpp",
 		MAME_DIR .. "src/devices/machine/sis950_lpc.h",
 		MAME_DIR .. "src/devices/machine/sis950_smbus.cpp",
@@ -2948,8 +2953,14 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/sis85c496.h",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.cpp",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.h",
+		MAME_DIR .. "src/devices/machine/vt82c586b_acpi.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c586b_acpi.h",
+		MAME_DIR .. "src/devices/machine/vt82c586b_ide.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c586b_ide.h",
 		MAME_DIR .. "src/devices/machine/vt82c586b_isa.cpp",
 		MAME_DIR .. "src/devices/machine/vt82c586b_isa.h",
+		MAME_DIR .. "src/devices/machine/vt82c586b_usb.cpp",
+		MAME_DIR .. "src/devices/machine/vt82c586b_usb.h",
 		MAME_DIR .. "src/devices/machine/vt82c598mvp.cpp",
 		MAME_DIR .. "src/devices/machine/vt82c598mvp.h",
 		MAME_DIR .. "src/devices/machine/mediagx_cs5530_bridge.cpp",

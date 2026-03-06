@@ -1007,16 +1007,6 @@ static void next_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr53c90", NCR53C90);
-}
-
-void next_state::ncr53c90(device_t *device)
-{
-	ncr53c90_device &adapter = downcast<ncr53c90_device &>(*device);
-
-	adapter.set_clock(10000000);
-	adapter.irq_handler_cb().set(*this, FUNC(next_state::scsi_irq));
-	adapter.drq_handler_cb().set(*this, FUNC(next_state::scsi_drq));
 }
 
 void next_state::next_base(machine_config &config)
@@ -1031,7 +1021,7 @@ void next_state::next_base(machine_config &config)
 	screen.screen_vblank().set(FUNC(next_state::vblank_w));
 
 	// devices
-	NSCSI_BUS(config, "scsibus");
+	NSCSI_BUS(config, scsibus);
 
 	MCCS1850(config, rtc, XTAL(32'768));
 
@@ -1050,7 +1040,11 @@ void next_state::next_base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", next_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", next_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", next_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:7", next_scsi_devices, "ncr53c90", true).set_option_machine_config("ncr53c90", [this] (device_t *device) { ncr53c90(device); });
+
+	NCR53C90(config, scsi, 10000000);
+	scsibus->set_external_device(7, scsi);
+	scsi->irq_handler_cb().set(DEVICE_SELF, FUNC(next_state::scsi_irq));
+	scsi->drq_handler_cb().set(DEVICE_SELF, FUNC(next_state::scsi_drq));
 
 	MB8795(config, net, 0);
 	net->tx_irq().set(FUNC(next_state::net_tx_irq));

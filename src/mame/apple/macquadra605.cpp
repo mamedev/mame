@@ -58,7 +58,7 @@ public:
 		m_scc(*this, "scc"),
 		m_ram(*this, RAM_TAG),
 		m_scsibus(*this, "scsi"),
-		m_ncr1(*this, "scsi:7:ncr53c96")
+		m_ncr1(*this, "ncr53c96")
 	{
 	}
 
@@ -166,7 +166,7 @@ void quadra605_state::macqd605(machine_config &config)
 
 	PRIMETIME(config, m_primetime, 25_MHz_XTAL);
 	m_primetime->set_maincpu_tag("maincpu");
-	m_primetime->set_scsi_tag("scsi:7:ncr53c96");
+	m_primetime->set_scsi_tag(m_ncr1);
 
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
@@ -198,15 +198,12 @@ void quadra605_state::macqd605(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c96", NCR53C96).clock(40_MHz_XTAL).machine_config(
-		[this] (device_t *device)
-		{
-			ncr53c96_device &adapter = downcast<ncr53c96_device &>(*device);
 
-			adapter.set_busmd(ncr53c96_device::BUSMD_1);
-			adapter.irq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_irq_w));
-			adapter.drq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_drq_w));
-		});
+	NCR53C96(config, m_ncr1, 40_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_ncr1);
+	m_ncr1->set_busmd(ncr53c96_device::BUSMD_1);
+	m_ncr1->irq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_irq_w));
+	m_ncr1->drq_handler_cb().set(m_primetime, FUNC(primetime_device::scsi_drq_w));
 
 	MACADB(config, m_macadb, C15M);
 

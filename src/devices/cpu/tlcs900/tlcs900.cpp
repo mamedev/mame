@@ -145,6 +145,7 @@ void tlcs900_device::device_start()
 	save_item( NAME(m_ad_cycles_left) );
 	save_item( NAME(m_nmi_state) );
 	save_item( NAME(m_prefetch_clear) );
+	save_item( NAME(m_irq_inhibit) );
 	save_item( NAME(m_prefetch_index) );
 	save_item( NAME(m_prefetch) );
 	save_item( NAME(m_halted) );
@@ -206,6 +207,7 @@ void tlcs900_device::device_reset()
 	m_halted = 0;
 	m_check_irqs = 0;
 	m_prefetch_clear = true;
+	m_irq_inhibit = false;
 }
 
 void tlcs900h_device::device_reset()
@@ -221,6 +223,7 @@ void tlcs900h_device::device_reset()
 	m_halted = 0;
 	m_check_irqs = 0;
 	m_prefetch_clear = true;
+	m_irq_inhibit = false;
 }
 
 
@@ -273,8 +276,24 @@ void tlcs900_device::execute_run()
 
 		if ( m_check_irqs )
 		{
-			tlcs900_check_irqs();
-			m_check_irqs = 0;
+			if ( m_irq_inhibit )
+			{
+				/* Interrupt shadow after EI/RETI: on real TLCS-900 hardware,
+				   interrupt acceptance is deferred until after the next instruction
+				   following EI or RETI. This prevents immediate re-dispatch of
+				   level-triggered interrupts before the return address instruction
+				   gets a chance to execute (e.g. the EI 0; NOP; EI 6 pattern). */
+				m_irq_inhibit = false;
+			}
+			else
+			{
+				tlcs900_check_irqs();
+				m_check_irqs = 0;
+			}
+		}
+		else
+		{
+			m_irq_inhibit = false;
 		}
 
 		if ( m_halted )

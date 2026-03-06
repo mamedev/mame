@@ -409,7 +409,7 @@ authors:hap
 
 <!-- build screen -->
 
-	<view name="Internal Layout (Russian)"> <!-- original -->
+	<view name="Internal Layout (Russian)"> <!-- original labels -->
 		<bounds left="-14" right="88" top="-1.5" bottom="103.5" />
 
 		<element ref="cwhite"><bounds x="-1" y="-1.5" width="89" height="105" /></element>
@@ -431,7 +431,7 @@ authors:hap
 		<group ref="shared"><bounds x="-0.5" y="6.5" width="83" height="94.9" /></group>
 	</view>
 
-	<view name="Internal Layout (English)"> <!-- translated -->
+	<view name="Internal Layout (English)"> <!-- translated labels -->
 		<bounds left="-14" right="88" top="-1.5" bottom="103.5" />
 
 		<element ref="cwhite"><bounds x="-1" y="-1.5" width="89" height="105" /></element>

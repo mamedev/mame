@@ -13,7 +13,7 @@ Those aren't El Torito compliant so they expect at very least a
 bootable MSDOS 5.0 (according to Pq_debug.txt file found in gvrxpsys).
 The nfsgt is a Windows XP HDD image, containing:
 - C:\Program Files:
-\- C-Media 3D Audio driver (C-Media AC97 Audio Device / CMI8738/C3DX PCI Audio Device)
+\- C-Media 3D Audio driver (C-Media AC'97 Audio Device / CMI8738/C3DX PCI Audio Device)
 \- Intel 82865G/PE/P, 82875P (GMCH)
 \- Ligos Indeo XP codec package (Indeo Video 5.2)
 \- ALi USB2.0 Driver

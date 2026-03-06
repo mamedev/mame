@@ -26,7 +26,7 @@ gew7_device::gew7_device(const machine_config &mconfig, const char *tag, device_
 	, m_bank(*this, "bank%u", 0U)
 	, m_pcm(*this, "pcm")
 {
-	program_config.m_internal_map = address_map_constructor(FUNC(gew7_device::internal_map), this);
+	m_program_config.m_internal_map = address_map_constructor(FUNC(gew7_device::internal_map), this);
 
 	std::fill(std::begin(m_port_force_bits), std::end(m_port_force_bits), 0);
 	std::fill(std::begin(m_port_force_mask), std::end(m_port_force_mask), 0);

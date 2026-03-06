@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Tim Schuerewegen
+
 /************************************************************************
 
 Eolith Ghost Hardware driver
@@ -51,9 +52,12 @@ Hopper, Ticket Counter, Prize System (Option)
 - Compiler : ADS, SDT
 
 
-ToDo: verify QS1000 hook-up
-
-
+TODO:
+- verify QS1000 hook-up
+- touryuu and clone ask for RTC setting on every boot. Probably due to missing support
+  of battery backup for the RTC in MAME's S3C2410 emulation. Enable logging in
+  devices/machine/s3c24xx.hxx to see the correct data being written, but then being lost
+  after reset.
 */
 
 #include "emu.h"
@@ -107,12 +111,13 @@ public:
 	void touryuu(machine_config &config) ATTR_COLD;
 	void bballoon(machine_config &config) ATTR_COLD;
 
-	void init_touryuu() ATTR_COLD;
 	void init_bballoon() ATTR_COLD;
+	void init_hapytour() ATTR_COLD;
+	void init_touryuu() ATTR_COLD;
+	void init_touryuua() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -127,7 +132,7 @@ private:
 
 	optional_ioport_array<5> m_mj_input;
 
-	uint16_t m_rom_pagesize = 0;
+	uint16_t m_rom_pagesize = 0x210; // for complete NAND ROM dumps
 
 	uint8_t m_security_count = 0;
 	uint32_t m_bballoon_port[20]{};
@@ -148,7 +153,7 @@ private:
 
 	struct nand_t m_nand;
 
-	uint32_t bballoon_speedup_r(offs_t offset, uint32_t mem_mask = ~0);
+	template <uint32_t Pc1, uint32_t Pc2> uint32_t speedup_r(offs_t offset, uint32_t mem_mask = ~0);
 	uint32_t touryuu_port_10000000_r();
 
 	void qs1000_p3_w(uint8_t data);
@@ -247,7 +252,7 @@ void ghosteo_state::s3c2410_gpio_port_w(offs_t offset, uint32_t data)
 			// 0 -> 1
 			if (((data & 0x10) != 0) && ((old_value & 0x10) == 0))
 			{
-				LOGNAND( "security_count %d -> %d\n", m_security_count, m_security_count + 1);
+				LOGNAND("security_count %d -> %d\n", m_security_count, m_security_count + 1);
 				m_security_count++;
 				if (m_security_count > 7) m_security_count = 0;
 			}
@@ -396,7 +401,7 @@ uint32_t ghosteo_state::touryuu_port_10000000_r()
 		case 0xb : data = m_mj_input[3]->read(); break;
 		case 0xc : data = m_mj_input[4]->read(); break;
 	}
-	LOGMJINPUT( "touryuu_port_10000000_r (%08X) -> %08X\n", port_g, data);
+	LOGMJINPUT("touryuu_port_10000000_r (%08X) -> %08X\n", port_g, data);
 	return data;
 }
 
@@ -504,7 +509,7 @@ static INPUT_PORTS_START( touryuu )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 (3)")
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 (2)")
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1 (1)")
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
 	PORT_BIT( 0xffffffe0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("10000000-09")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
@@ -546,26 +551,16 @@ static INPUT_PORTS_START( touryuu )
 	PORT_BIT( 0xffffff50, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-uint32_t ghosteo_state::bballoon_speedup_r(offs_t offset, uint32_t mem_mask)
+
+template <uint32_t Pc1, uint32_t Pc2>
+uint32_t ghosteo_state::speedup_r(offs_t offset, uint32_t mem_mask)
 {
 	uint32_t const ret = m_s3c2410->s3c24xx_lcd_r(offset + 0x10 / 4, mem_mask);
 
+	int const pc = m_maincpu->pc();
 
-	int pc = m_maincpu->pc();
-
-	// these are vblank waits
-	if (pc == 0x3001c0e4 || pc == 0x3001c0d8)
-	{
-		// BnB Arcade
+	if (pc == Pc1 || pc == Pc2)
 		m_maincpu->spin_until_time(attotime::from_usec(20));
-	}
-	else if (pc == 0x3002b580 || pc == 0x3002b550)
-	{
-		// Happy Tour
-		m_maincpu->spin_until_time(attotime::from_usec(20));
-	}
-	//else
-	//  printf("speedup %08x %08x\n", pc, ret);
 
 	return ret;
 }
@@ -587,10 +582,6 @@ void ghosteo_state::machine_start()
 	save_item(NAME(m_nand.addr_load_ptr));
 }
 
-void ghosteo_state::machine_reset()
-{
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013,read32s_delegate(*this, FUNC(ghosteo_state::bballoon_speedup_r)));
-}
 
 void ghosteo_state::ghosteo(machine_config &config)
 {
@@ -695,7 +686,7 @@ Notes:
       QS1000     - QDSP QS1000 AdMOS 9638R, Wavetable Audio chip, clock input of 24.000MHz (QFP100)
       QS1001A    - QDSP QS1001A 512k x8 MaskROM (SOP32)
 
-      qs1001a.u17 was not dumped from this PCB, but is a standard sample rom found on many Eolith games
+      qs1001a.u17 was not dumped from this PCB, but is a standard sample ROM found on many Eolith games
                   see eolith.cpp and vegaeo.cpp drivers
 */
 
@@ -738,6 +729,9 @@ ROM_START( touryuu ) // Same hardware: GHOST Ver1.1 2003.03.28
 	ROM_REGION( 0x1000000, "qs1000", 0 )
 	ROM_LOAD( "8m.eprom_c.s_f8b1h.u16", 0x000000, 0x100000, CRC(238a85ab) SHA1(ddd79429c0c1e67fcbca1e4ebded97ea46229f0b) ) // QDSP samples (SFX)
 	ROM_LOAD( "qs1001a.u17",            0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) // QDSP wavetable ROM
+
+	ROM_REGION( 0x800, "i2cmem", 0 )
+	ROM_LOAD( "m24cl16", 0x000, 0x800, CRC(c9da568a) SHA1(43ce4cd910ae6aec8cb19392bea4b2ce8600fec6) )
 ROM_END
 
 ROM_START( touryuua )
@@ -751,16 +745,33 @@ ROM_START( touryuua )
 	ROM_REGION( 0x1000000, "qs1000", 0 )
 	ROM_LOAD( "8m.eprom_c.s_f8b1h.u16", 0x000000, 0x100000, CRC(238a85ab) SHA1(ddd79429c0c1e67fcbca1e4ebded97ea46229f0b) ) // QDSP samples (SFX)
 	ROM_LOAD( "qs1001a.u17",            0x200000, 0x080000, CRC(d13c6407) SHA1(57b14f97c7d4f9b5d9745d3571a0b7115fbe3176) ) // QDSP wavetable ROM
+
+	ROM_REGION( 0x800, "i2cmem", 0 )
+	ROM_LOAD( "m24cl16", 0x000, 0x800, CRC(c9da568a) SHA1(43ce4cd910ae6aec8cb19392bea4b2ce8600fec6) )
 ROM_END
 
 void ghosteo_state::init_bballoon()
 {
 	m_rom_pagesize = 0x200; // extra data is missing from the FLASH dumps and needs to be simulated
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013, emu::rw_delegate(*this, NAME((&ghosteo_state::speedup_r<0x3001c0e4, 0x3001c0d8>))));
+}
+
+void ghosteo_state::init_hapytour()
+{
+	m_rom_pagesize = 0x200; // extra data is missing from the FLASH dumps and needs to be simulated
+
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013, emu::rw_delegate(*this, NAME((&ghosteo_state::speedup_r<0x3002b580, 0x3002b550>))));
 }
 
 void ghosteo_state::init_touryuu()
 {
-	m_rom_pagesize = 0x210;
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013, emu::rw_delegate(*this, NAME((&ghosteo_state::speedup_r<0x30044820, 0x300447f4>))));
+}
+
+void ghosteo_state::init_touryuua()
+{
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4d000010, 0x4d000013, emu::rw_delegate(*this, NAME((&ghosteo_state::speedup_r<0x300442d0, 0x300442a4>))));
 }
 
 } // anonymous namespace
@@ -769,6 +780,6 @@ ALLOW_SAVE_TYPE(ghosteo_state::nand_mode_t);
 
 
 GAME( 2003, bballoon, 0,       bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "Eolith",          "BnB Arcade (V1.0005 World)",     MACHINE_IMPERFECT_SOUND )
-GAME( 2005, hapytour, 0,       bballoon, bballoon, ghosteo_state, init_bballoon, ROT0, "GAV Company",     "Happy Tour (V1.12)",             MACHINE_IMPERFECT_SOUND )
-GAME( 2005, touryuu,  0,       touryuu,  touryuu,  ghosteo_state, init_touryuu,  ROT0, "Yuki Enterprise", "Touryuumon (V1.1, Apr 14 2005)", MACHINE_IMPERFECT_SOUND ) // On first boot inputs won't work, TODO: hook-up default eeprom
-GAME( 2005, touryuua, touryuu, touryuu,  touryuu,  ghosteo_state, init_touryuu,  ROT0, "Yuki Enterprise", "Touryuumon (V1.1, Mar 11 2005)", MACHINE_IMPERFECT_SOUND ) // On first boot inputs won't work, TODO: hook-up default eeprom
+GAME( 2005, hapytour, 0,       bballoon, bballoon, ghosteo_state, init_hapytour, ROT0, "GAV Company",     "Happy Tour (V1.12)",             MACHINE_IMPERFECT_SOUND )
+GAME( 2005, touryuu,  0,       touryuu,  touryuu,  ghosteo_state, init_touryuu,  ROT0, "Yuki Enterprise", "Touryuumon (V1.1, Apr 14 2005)", MACHINE_IMPERFECT_SOUND )
+GAME( 2005, touryuua, touryuu, touryuu,  touryuu,  ghosteo_state, init_touryuua, ROT0, "Yuki Enterprise", "Touryuumon (V1.1, Mar 11 2005)", MACHINE_IMPERFECT_SOUND )

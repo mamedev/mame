@@ -4,74 +4,74 @@
 
 phy_vt_imp
 	read_pc();
-	write(SP, Y);
+	write(m_SP, m_Y);
 	dec_SP();
 	prefetch();
 
 phx_vt_imp
 	read_pc();
-	write(SP, X);
+	write(m_SP, m_X);
 	dec_SP();
 	prefetch();
 
 plx_vt_imp
 	read_pc();
-	read(SP);
+	read(m_SP);
 	inc_SP();
-	X = read(SP);
-	set_nz(X);
+	m_X = read(m_SP);
+	set_nz(m_X);
 	prefetch();
 
 ply_vt_imp
 	read_pc();
-	read(SP);
+	read(m_SP);
 	inc_SP();
-	Y = read(SP);
-	set_nz(Y);
+	m_Y = read(m_SP);
+	set_nz(m_Y);
 	prefetch();
 
 vtgetdbk_imp
 	read_pc();
-	A = m_databank;
+	m_A = m_databank;
 	prefetch();
 
 vtsetdbk_imp
 	read_pc();
-	m_databank = A;
+	m_databank = m_A;
 	prefetch();
 
 vtldabank_abx
-	TMP = read_pc();
-	PC++;
-	TMP2 = read_pc();
-	PC++;
-	A = m_extdata_space->read_byte(((m_databank << 16) | (TMP2 << 8) | TMP) + X);
-	set_nz(A);
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_A = m_extdata_space->read_byte(((m_databank << 16) | (m_TMP2 << 8) | m_TMP) + m_X);
+	set_nz(m_A);
 	prefetch();
 
 vtldabank_idy
-	TMP2 = read_pc();
-	PC++;
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	if(page_changing(TMP, Y)) {
-		read(set_l(TMP, TMP+Y));
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_Y)) {
+		read(set_l(m_TMP, m_TMP+m_Y));
 	}
-	A = m_extdata_space->read_byte((m_databank << 16) | (TMP+Y) );
-	set_nz(A);
+	m_A = m_extdata_space->read_byte((m_databank << 16) | (m_TMP+m_Y) );
+	set_nz(m_A);
 	prefetch();
 
 vtadcx_aba
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	TMP2 = read(TMP);
-	TMP = TMP2 + X + (P & F_C ? 1 : 0); // do ADC, but with source + result in X
-	P &= ~(F_N|F_V|F_Z|F_C);
-	if(!uint8_t(TMP)) P |= F_Z;
-	else if(int8_t(TMP) < 0) P |= F_N;
-	if(~(TMP2^X) & (TMP2^TMP) & 0x80) P |= F_V;
-	if(TMP & 0xff00) P |= F_C;
-	X = TMP & 0xff;
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	m_TMP = m_TMP2 + m_X + (m_P & F_C ? 1 : 0); // do m_ADC, but with source + result in m_X
+	m_P &= ~(F_N|F_V|F_Z|F_C);
+	if(!uint8_t(m_TMP)) m_P |= F_Z;
+	else if(int8_t(m_TMP) < 0) m_P |= F_N;
+	if(~(m_TMP2^m_X) & (m_TMP2^m_TMP) & 0x80) m_P |= F_V;
+	if(m_TMP & 0xff00) m_P |= F_C;
+	m_X = m_TMP & 0xff;
 	prefetch();

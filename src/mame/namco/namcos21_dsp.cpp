@@ -264,8 +264,6 @@ void namcos21_dsp_device::device_add_mconfig(machine_config &config)
 	dsp.set_addrmap(AS_DATA, &namcos21_dsp_device::winrun_dsp_data);
 	dsp.set_addrmap(AS_IO, &namcos21_dsp_device::winrun_dsp_io);
 	dsp.bio_in_cb().set(FUNC(namcos21_dsp_device::winrun_poly_reset_r));
-	dsp.hold_in_cb().set_constant(0);
-	dsp.hold_ack_out_cb().set_nop();
 	dsp.xf_out_cb().set_nop();
 }
 

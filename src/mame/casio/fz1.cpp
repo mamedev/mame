@@ -401,7 +401,7 @@ void fz1_state::fz1_io_map(address_map &map)
 void fz1_state::fz20m_io_map(address_map &map)
 {
 	fz10m_io_map(map);
-	map(0x30, 0x3f).m("scsi:7:spc", FUNC(mb89352_device::map));
+	map(0x30, 0x3f).m("spc", FUNC(mb89352_device::map));
 }
 
 /**************************************************************************/
@@ -521,11 +521,11 @@ void fz1_state::fz20m(machine_config &config)
 	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->in_memr_cb().set(FUNC(fz1_state::mem_r));
 	m_maincpu->out_memw_cb().set(FUNC(fz1_state::mem_w));
-	m_maincpu->in_ior_cb<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_r));
-	m_maincpu->out_iow_cb<1>().set("scsi:7:spc", FUNC(mb89352_device::dma_w));
+	m_maincpu->in_ior_cb<1>().set("spc", FUNC(mb89352_device::dma_r));
+	m_maincpu->out_iow_cb<1>().set("spc", FUNC(mb89352_device::dma_w));
 
 	// note: loading from HD requires running "HDD Operater" [sic] from FL-D1 program disk
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
@@ -533,15 +533,10 @@ void fz1_state::fz20m(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("spc", MB89352).machine_config(
-		[this](device_t *device)
-		{
-			mb89352_device &spc = downcast<mb89352_device &>(*device);
-
-			spc.set_clock(8_MHz_XTAL);
-			spc.out_irq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
-			spc.out_dreq_callback().set(m_maincpu, FUNC(v50_device::dreq_w<1>));
-		});
+	auto &spc(MB89352(config, "spc", 8_MHz_XTAL));
+	scsi.set_external_device(7, spc);
+	spc.out_irq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ3);
+	spc.out_dreq_callback().set(m_maincpu, FUNC(v50_device::dreq_w<1>));
 }
 
 /**************************************************************************/

@@ -26,7 +26,7 @@ project "utils"
 		ext_includedir("utf8proc"),
 	}
 
-if not _OPTIONS["with-system-utf8proc"] then
+if _OPTIONS["with-system-utf8proc"] ~= "1" then
 	defines {
 		"UTF8PROC_STATIC",
 	}

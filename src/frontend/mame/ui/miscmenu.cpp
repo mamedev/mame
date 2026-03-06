@@ -169,12 +169,14 @@ menu_network_devices::~menu_network_devices()
 
 void menu_network_devices::populate()
 {
-	/* cycle through all devices for this system */
+	// cycle through all devices for this system
+	auto const interfaces = machine().osd().list_network_devices();
+	auto const flags = !interfaces.empty() ? (FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW) : 0;
 	for (device_network_interface &network : network_interface_enumerator(machine().root_device()))
 	{
 		int curr = network.get_interface();
 		std::string_view title;
-		for (auto &entry : machine().osd().list_network_devices())
+		for (auto &entry : interfaces)
 		{
 			if (entry.id == curr)
 			{
@@ -183,7 +185,7 @@ void menu_network_devices::populate()
 			}
 		}
 
-		item_append(network.device().tag(), std::string(!title.empty() ? title : "------"), FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW, (void *)&network);
+		item_append(network.device().tag(), std::string(!title.empty() ? title : "------"), flags, (void *)&network);
 	}
 
 	item_append(menu_item_type::SEPARATOR);
@@ -203,6 +205,9 @@ bool menu_network_devices::handle(event const *ev)
 	{
 		device_network_interface *const network = (device_network_interface *)ev->itemref;
 		auto const interfaces = machine().osd().list_network_devices();
+		if (interfaces.empty())
+			return false;
+
 		int curr = network->get_interface();
 		auto const found = std::find_if(
 				std::begin(interfaces),

@@ -332,6 +332,18 @@ end
 
 --------------------------------------------------
 --
+--@src/lib/formats/apricotpc_dsk.h,FORMATS["APRICOTPC_DSK"] = true
+--------------------------------------------------
+
+if opt_tool(FORMATS, "APRICOTPC_DSK") then
+	files {
+		MAME_DIR.. "src/lib/formats/apricotpc_dsk.cpp",
+		MAME_DIR.. "src/lib/formats/apricotpc_dsk.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/lib/formats/apridisk.h,FORMATS["APRIDISK"] = true
 --------------------------------------------------
 

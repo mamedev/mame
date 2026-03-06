@@ -76,6 +76,14 @@ sis950_lpc_device::sis950_lpc_device(const machine_config &mconfig, const char *
 {
 }
 
+void sis950_lpc_device::device_start()
+{
+	pci_device::device_start();
+
+	m_pci_root->set_pin_mapper(pci_pin_mapper(*this, FUNC(sis950_lpc_device::pin_mapper)));
+	m_pci_root->set_irq_handler(pci_irq_handler(*this, FUNC(sis950_lpc_device::irq_handler)));
+}
+
 void sis950_lpc_device::device_reset()
 {
 	pci_device::device_reset();
@@ -476,6 +484,7 @@ void sis950_lpc_device::io_map(address_map &map)
 
 	// map(0x00e0, 0x00ef) MCA bus (cfr. Bochs) or PnP
 	map(0x00eb, 0x00eb).lw8(NAME([] (offs_t offset, u8 data) { }));
+	map(0x00ed, 0x00ed).lw8(NAME([] (offs_t offset, u8 data) { }));
 
 	// map(0x00f0, 0x00f0) COPRO error
 	// map(0x0480, 0x048f) DMA high page registers
@@ -549,7 +558,7 @@ void sis950_lpc_device::map_extra(uint64_t memory_window_start, uint64_t memory_
 	if (BIT(m_bios_control, 7))
 	{
 		LOGMAP("- ACPI enable (%02x) %04x-%04x\n", m_bios_control, m_acpi_base, m_acpi_base + 0xff);
-		// shutms11 BIOS POST maps this at $5000
+		// shutms11 BIOS POST maps this at $5000, gamecstl at $8000
 		m_acpi->map_device(memory_window_start, memory_window_end, 0, memory_space, io_window_start, io_window_end, m_acpi_base, io_space);
 		io_space->install_device(m_acpi_base | 0x80, m_acpi_base | 0xff, *m_smbus, &sis950_smbus_device::map);
 	}
@@ -862,4 +871,98 @@ void sis950_lpc_device::pc_dack5_w(int state) { pc_select_dma_channel(5, state);
 void sis950_lpc_device::pc_dack6_w(int state) { pc_select_dma_channel(6, state); }
 void sis950_lpc_device::pc_dack7_w(int state) { pc_select_dma_channel(7, state); }
 
+/*
+ * Pin Mapper
+ */
 
+void sis950_lpc_device::redirect_irq(int irq, int state)
+{
+	switch (irq)
+	{
+	case 0:
+	case 1:
+	case 2:
+	case 8:
+	case 13:
+		break;
+	case 3:
+		m_pic_master->ir3_w(state);
+		break;
+	case 4:
+		m_pic_master->ir4_w(state);
+		break;
+	case 5:
+		m_pic_master->ir5_w(state);
+		break;
+	case 6:
+		m_pic_master->ir6_w(state);
+		break;
+	case 7:
+		m_pic_master->ir7_w(state);
+		break;
+	case 9:
+		m_pic_slave->ir1_w(state);
+		break;
+	case 10:
+		m_pic_slave->ir2_w(state);
+		break;
+	case 11:
+		m_pic_slave->ir3_w(state);
+		break;
+	case 12:
+		m_pic_slave->ir4_w(state);
+		break;
+	case 14:
+		m_pic_slave->ir6_w(state);
+		break;
+	case 15:
+		m_pic_slave->ir7_w(state);
+		break;
+	}
+}
+
+
+int sis950_lpc_device::pin_mapper(int pin)
+{
+	if(pin < 0 || pin >= 4 || BIT(m_irq_remap[pin], 7))
+		return -1;
+	return m_irq_remap[pin];
+}
+
+void sis950_lpc_device::irq_handler(int line, int state)
+{
+	if(line < 0 || line >= 16)
+		return;
+
+	logerror("irq_handler %d %d\n", line, state);
+	redirect_irq(line, state);
+}
+
+// IDE can only redirect one IRQ, bit 4 select between Primary (0) or Secondary (1)
+void sis950_lpc_device::pc_iirqa_w(int state)
+{
+	u8 setting = m_irq_remap[IRQ_IDE];
+
+	if (BIT(setting, 7) || BIT(setting, 4))
+	{
+		redirect_irq(14, state);
+		return;
+	}
+
+	redirect_irq(setting & 0xf, state);
+}
+
+void sis950_lpc_device::pc_iirqb_w(int state)
+{
+	u8 setting = m_irq_remap[IRQ_IDE];
+
+	if (BIT(setting, 7) || !BIT(setting, 4))
+	{
+		redirect_irq(15, state);
+		return;
+	}
+
+	redirect_irq(setting & 0xf, state);
+}
+
+// TODO: public setter for remaining connections (cfr. table in irq_remap_w)

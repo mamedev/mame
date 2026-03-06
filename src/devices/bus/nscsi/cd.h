@@ -6,7 +6,7 @@
 #pragma once
 
 #include "imagedev/cdromimg.h"
-#include "machine/nscsi_bus.h"
+#include "machine/nscsi_hle.h"
 #include "sound/cdda.h"
 
 #include "cdrom.h"

@@ -42,7 +42,7 @@ DEFINE_DEVICE_TYPE(A2BUS_CMSSCSI, a2bus_cmsscsi_device, "cmsscsi", "CMS SCSI II 
 
 #define SCSI_ROM_REGION  "scsi_rom"
 #define SCSI_BUS_TAG     "scsibus"
-#define SCSI_5380_TAG    "scsibus:7:ncr5380"
+#define SCSI_5380_TAG    "ncr5380"
 
 ROM_START( scsi )
 	ROM_REGION(0x4000, SCSI_ROM_REGION, 0)
@@ -72,7 +72,8 @@ void a2bus_cmsscsi_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:5", default_scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsibus:6", default_scsi_devices, "harddisk", false);
-	NSCSI_CONNECTOR(config, "scsibus:7").option_set("ncr5380", NCR5380);
+	NCR5380(config, m_ncr5380);
+	m_scsibus->set_external_device(7, m_ncr5380);
 }
 
 //-------------------------------------------------

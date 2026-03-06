@@ -87,7 +87,7 @@ private:
 
 	std::vector<int32_t> m_mix_buffer;
 
-	void halt_osc(int onum, int type, uint32_t *accumulator, int resshift);
+	void halt_osc(int onum, int type, uint32_t *accumulator, int resshift, uint8_t newCtrl);
 };
 
 

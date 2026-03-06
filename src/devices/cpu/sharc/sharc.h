@@ -5,21 +5,14 @@
 
 #pragma once
 
-#include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
 
-#define SHARC_INPUT_FLAG0       3
-#define SHARC_INPUT_FLAG1       4
-#define SHARC_INPUT_FLAG2       5
-#define SHARC_INPUT_FLAG3       6
 
+class sharc_disassembler;
 
-class sharc_frontend;
 
 class adsp21062_device : public cpu_device
 {
-	friend class sharc_frontend;
-
 public:
 	enum sharc_boot_mode
 	{
@@ -35,49 +28,24 @@ public:
 	virtual ~adsp21062_device() override;
 
 	// configuration helpers
-	void set_boot_mode(const sharc_boot_mode boot_mode) { m_boot_mode = boot_mode; }
+	template <unsigned N> auto flag_out() { return m_flag_out_cb[N].bind(); }
 
-	void set_flag_input(int flag_num, int state);
+	void set_boot_mode(const sharc_boot_mode boot_mode) { m_boot_mode = boot_mode; }
+	void enable_recompiler();
+
 	void external_iop_write(uint32_t address, uint32_t data);
 	void external_dma_write(uint32_t address, uint64_t data);
 
-	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
-	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
-
+	void set_flag_input(int flag_num, int state);
 	void write_stall(int state);
-
-	void enable_recompiler();
 
 	template <unsigned N> uint64_t pm_r(offs_t offset);
 	template <unsigned N> void pm_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
-	template <unsigned N> uint32_t dmw_r(offs_t offset);
-	template <unsigned N> void dmw_w(offs_t offset, uint32_t data);
+	template <unsigned N> uint32_t dm_short_r(offs_t offset);
+	template <unsigned N> uint32_t dm_short_se_r(offs_t offset);
+	template <unsigned N> void dm_short_w(offs_t offset, uint32_t data);
 	uint32_t iop_r(offs_t offset);
 	void iop_w(offs_t offset, uint32_t data);
-
-	enum ASTAT_FLAGS : uint32_t
-	{
-		// ASTAT flags
-		AZ =    0x000001,   // ALU result zero
-		AV =    0x000002,   // ALU overflow
-		AN =    0x000004,   // ALU result negative
-		AC =    0x000008,   // ALU fixed-point carry
-		AS =    0x000010,   // ALU X input sign
-		AI =    0x000020,   // ALU floating-point invalid operation
-		MN =    0x000040,   // Multiplier result negative
-		MV =    0x000080,   // Multiplier overflow
-		MU =    0x000100,   // Multiplier underflow
-		MI =    0x000200,   // Multiplier floating-point invalid operation
-		AF =    0x000400,
-		SV =    0x000800,   // Shifter overflow
-		SZ =    0x001000,   // Shifter result zero
-		SS =    0x002000,   // Shifter input sign
-		BTF =   0x040000,   // Bit Test Flag
-		FLG0 =  0x080000,   // FLAG0
-		FLG1 =  0x100000,   // FLAG1
-		FLG2 =  0x200000,   // FLAG2
-		FLG3 =  0x400000    // FLAG3
-	};
 
 	enum ASTAT_SHIFT
 	{
@@ -155,6 +123,27 @@ protected:
 	void data_4m(address_map &map) ATTR_COLD;
 
 private:
+	// ASTAT flags
+	static constexpr uint32_t AZ =              0x0000'0001;    // ALU result zero
+	static constexpr uint32_t AV =              0x0000'0002;    // ALU overflow
+	static constexpr uint32_t AN =              0x0000'0004;    // ALU result negative
+	static constexpr uint32_t AC =              0x0000'0008;    // ALU fixed-point carry
+	static constexpr uint32_t AS =              0x0000'0010;    // ALU X input sign
+	static constexpr uint32_t AI =              0x0000'0020;    // ALU floating-point invalid operation
+	static constexpr uint32_t MN =              0x0000'0040;    // Multiplier result negative
+	static constexpr uint32_t MV =              0x0000'0080;    // Multiplier overflow
+	static constexpr uint32_t MU =              0x0000'0100;    // Multiplier underflow
+	static constexpr uint32_t MI =              0x0000'0200;    // Multiplier floating-point invalid operation
+	static constexpr uint32_t AF =              0x0000'0400;    // Last ALU operation was a floating-point operation
+	static constexpr uint32_t SV =              0x0000'0800;    // Shifter overflow
+	static constexpr uint32_t SZ =              0x0000'1000;    // Shifter result zero
+	static constexpr uint32_t SS =              0x0000'2000;    // Shifter input sign
+	static constexpr uint32_t BTF =             0x0004'0000;    // Bit Test Flag
+	static constexpr uint32_t FLG0 =            0x0008'0000;    // FLAG0
+	static constexpr uint32_t FLG1 =            0x0010'0000;    // FLAG1
+	static constexpr uint32_t FLG2 =            0x0020'0000;    // FLAG2
+	static constexpr uint32_t FLG3 =            0x0040'0000;    // FLAG3
+
 	// STKY flags
 	static constexpr uint32_t AUS =             0x0000'0001;    // ALU floating-point underflow
 	static constexpr uint32_t AVS =             0x0000'0002;    // ALU floating-point overflow
@@ -203,6 +192,8 @@ private:
 	static constexpr uint32_t MODE2_CAFRZ =     0x0008'0000;    // Cache freeze
 
 
+	struct cfuncs;
+
 	using opcode_func = void (adsp21062_device::*)();
 	struct SHARC_OP
 	{
@@ -249,6 +240,9 @@ private:
 
 	struct alignas(16) sharc_internal_state;
 
+	class frontend;
+	class opcode_desc;
+
 	static const SHARC_OP s_sharc_opcode_table[];
 	static const size_t s_num_ops;
 
@@ -266,7 +260,7 @@ private:
 	// UML stuff
 	drc_cache m_cache;
 	std::unique_ptr<drcuml_state> m_drcuml;
-	std::unique_ptr<sharc_frontend> m_drcfe;
+	std::unique_ptr<frontend> m_drcfe;
 	uml::parameter   m_regmap[16];
 
 	uml::code_handle *m_entry;
@@ -295,15 +289,30 @@ private:
 	uml::code_handle *m_swap_r0_7;
 	uml::code_handle *m_swap_r8_15;
 
+	memory_view m_dm_short_view;
 	memory_access<24, 3, -3, ENDIANNESS_LITTLE>::specific m_program;
 	memory_access<32, 2, -2, ENDIANNESS_LITTLE>::specific m_data;
+
+	devcb_write8::array<4> m_flag_out_cb;
 
 	required_shared_ptr_array<uint32_t, 2> m_blocks;
 
 	opcode_func m_sharc_op[512];
 
 	std::unique_ptr<sharc_internal_state> m_heap_core;
+	uint8_t m_flag_pending_val[4];
+	bool m_write_stalled_pending_val;
+	bool m_flag_pending[4];
+	bool m_write_stalled_pending;
+	bool m_input_update_pending;
 	bool m_enable_drc;
+
+	static std::string disassemble_one(uint32_t pc, uint64_t opcode) ATTR_COLD;
+	void build_opcode_table() ATTR_COLD;
+
+	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
+	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
+	TIMER_CALLBACK_MEMBER(sharc_update_inputs);
 
 	inline void CHANGE_PC(uint32_t newpc);
 	inline void CHANGE_PC_DELAYED(uint32_t newpc);
@@ -378,7 +387,7 @@ private:
 	void sharcop_push_pop_stacks();
 	void sharcop_nop();
 	void sharcop_idle();
-	void sharcop_unimplemented();
+	[[noreturn]] void sharcop_unimplemented() ATTR_COLD;
 	inline void compute_add(int rn, int rx, int ry);
 	inline void compute_sub(int rn, int rx, int ry);
 	inline void compute_add_ci(int rn, int rx, int ry);
@@ -392,6 +401,7 @@ private:
 	inline void compute_dec(int rn, int rx);
 	inline void compute_min(int rn, int rx, int ry);
 	inline void compute_max(int rn, int rx, int ry);
+	inline void compute_clip(int rn, int rx, int ry);
 	inline void compute_neg(int rn, int rx);
 	inline void compute_not(int rn, int rx);
 	inline uint32_t SCALB(SHARC_REG rx, int ry);
@@ -435,7 +445,6 @@ private:
 	inline void compute_fmul_fmax(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_fmin(int fm, int fxm, int fym, int fa, int fxa, int fya);
 	inline void compute_fmul_dual_fadd_fsub(int fm, int fxm, int fym, int fa, int fs, int fxa, int fya);
-	void build_opcode_table();
 
 	// internal compiler state
 	struct compiler_state
@@ -452,6 +461,7 @@ private:
 	};
 
 	void execute_run_drc();
+	void log_descriptions(const sharc_disassembler &disassembler, const opcode_desc *desc_list, unsigned indent);
 	void generate_invariant();
 	void flush_drc_cache();
 	void compile_block(offs_t pc);
@@ -494,30 +504,6 @@ private:
 
 	bool if_condition_always_true(int condition);
 	uint32_t do_condition_astat_bits(int condition);
-
-	void sharc_cfunc_unimplemented();
-	void sharc_cfunc_read_iop();
-	void sharc_cfunc_write_iop();
-	void sharc_cfunc_pcstack_overflow();
-	void sharc_cfunc_pcstack_underflow();
-	void sharc_cfunc_loopstack_overflow();
-	void sharc_cfunc_loopstack_underflow();
-	void sharc_cfunc_statusstack_overflow();
-	void sharc_cfunc_statusstack_underflow();
-
-	void sharc_cfunc_unimplemented_compute();
-	void sharc_cfunc_unimplemented_shiftimm();
-	void sharc_cfunc_write_snoop();
-
-	static void cfunc_unimplemented(void *param);
-	static void cfunc_pcstack_overflow(void *param);
-	static void cfunc_pcstack_underflow(void *param);
-	static void cfunc_loopstack_overflow(void *param);
-	static void cfunc_loopstack_underflow(void *param);
-	static void cfunc_statusstack_overflow(void *param);
-	static void cfunc_statusstack_underflow(void *param);
-	static void cfunc_unimplemented_compute(void *param);
-	static void cfunc_unimplemented_shiftimm(void *param);
 };
 
 

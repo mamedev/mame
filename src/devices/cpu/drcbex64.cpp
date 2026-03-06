@@ -466,8 +466,10 @@ private:
 		x86code *           debug_log_hashjmp;      // hashjmp debugging
 		x86code *           debug_log_hashjmp_fail; // hashjmp debugging
 
-		u32                 ssemode;                // saved SSE mode
-		u32                 ssemodesave;            // temporary location for saving
+		u32                 ssemode;                // saved SSE mode on entry
+		u32                 ssemodesave;            // temporary location for saving SSE mode across calls
+		u8                  nominalfmod;            // FMOD equivalent to SSE mode on entry or 0xff
+
 		u32                 ssecontrol[4];          // copy of the sse_control array
 		float               single1;                // 1.0 in single-precision
 		double              double1;                // 1.0 in double-precision
@@ -1038,10 +1040,10 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	// build up necessary arrays
 	constexpr u32 sse_control[4] =
 	{
-		0xff80,     // ROUND_TRUNC
-		0x9f80,     // ROUND_ROUND
-		0xdf80,     // ROUND_CEIL
-		0xbf80      // ROUND_FLOOR
+		0x7f80,     // ROUND_TRUNC
+		0x1f80,     // ROUND_ROUND
+		0x5f80,     // ROUND_CEIL
+		0x3f80      // ROUND_FLOOR
 	};
 	memcpy(m_near.ssecontrol, sse_control, sizeof(m_near.ssecontrol));
 	m_near.single1 = 1.0F;
@@ -1161,13 +1163,40 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 
 	a.sub(rsp, 40);
 	a.mov(MABS(&m_near.stacksave), rsp);
+
+	// save MXCSR with flags masked out
 	a.stmxcsr(MABS(&m_near.ssemode));
+	a.mov(eax, MABS(&m_near.ssemode));
+	a.and_(eax, 0xffffffc0);
+	a.mov(MABS(&m_near.ssemode), eax);
+
+	// convert rounding mode from MXCSR to equivalent FMOD value
+	a.mov(gpd(REG_PARAM1), eax);
+	a.shr(gpd(REG_PARAM1), 13);
+	a.add(gpd(REG_PARAM1), 1);
+	a.and_(gpd(REG_PARAM1), 3);
+	a.mov(gpd(REG_PARAM3), gpd(REG_PARAM1));
+	a.shr(gpd(REG_PARAM3), 1);
+	a.xor_(gpd(REG_PARAM1), gpd(REG_PARAM3));
+
+	// see if the saved MXCSR value matches what we'd set
+	a.mov(gpd(REG_PARAM3), ptr(rbp, gpq(REG_PARAM1), 2, offset_from_rbp(&m_near.ssecontrol[0])));
+	a.cmp(eax, gpd(REG_PARAM3));
+	a.mov(gpd(REG_PARAM3), 0xff);
+	a.cmovne(gpd(REG_PARAM1), gpd(REG_PARAM3));
+	a.mov(MABS(&m_near.nominalfmod), gpb_lo(REG_PARAM1));
+
 	a.call(gpq(REG_PARAM2));
 
 	// generate an exit point
+	Label const norestore = a.new_label();
 	m_exit = dst + a.offset();
 	a.bind(a.new_named_label("exit_point"));
+	a.movzx(gpd(REG_PARAM1), MABS(&m_state.fmod, 1));
+	a.cmp(gpb_lo(REG_PARAM1), MABS(&m_near.nominalfmod));
+	a.short_().je(norestore);
 	a.ldmxcsr(MABS(&m_near.ssemode));
+	a.bind(norestore);
 	a.mov(rsp, MABS(&m_near.stacksave));
 	a.add(rsp, 40);
 	a.emit_epilog(frame);
@@ -2343,21 +2372,30 @@ void drcbe_x64::op_setfmod(Assembler &a, const instruction &inst)
 	// normalize parameters
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 
+	Label const skip = a.new_label();
+
 	if (srcp.is_immediate())
 	{
 		// immediate case
-		int value = srcp.immediate() & 3;
-		a.mov(MABS(&m_state.fmod, 1), value);                                           // mov   [fmod],srcp
-		a.ldmxcsr(MABS(&m_near.ssecontrol[value]));                                     // ldmxcsr fp_control[srcp]
+		int const value = srcp.immediate() & 3;
+		a.mov(eax, value);
+		a.cmp(MABS(&m_state.fmod), al);
+		a.short_().je(skip);
+		a.mov(MABS(&m_state.fmod), al);
+		a.ldmxcsr(MABS(&m_near.ssecontrol[value]));
 	}
 	else
 	{
 		// register/memory case
-		mov_reg_param(a, eax, srcp);                                                    // mov   eax,srcp
-		a.and_(eax, 3);                                                                 // and   eax,3
-		a.mov(MABS(&m_state.fmod), al);                                                 // mov   [fmod],al
-		a.ldmxcsr(ptr(rbp, rax, 2, offset_from_rbp(&m_near.ssecontrol[0])));            // ldmxcsr fp_control[eax]
+		mov_reg_param(a, eax, srcp);
+		a.and_(eax, 3);
+		a.cmp(MABS(&m_state.fmod), al);
+		a.short_().je(skip);
+		a.mov(MABS(&m_state.fmod), al);
+		a.ldmxcsr(ptr(rbp, rax, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 	}
+
+	a.bind(skip);
 }
 
 
@@ -2375,16 +2413,17 @@ void drcbe_x64::op_getfmod(Assembler &a, const instruction &inst)
 	// normalize parameters
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 
-	Mem fmod = MABS(&m_state.fmod);
-	fmod.set_size(1);
+	Mem const fmod = MABS(&m_state.fmod, 1);
 
 	// fetch the current mode and store to the destination
 	if (dstp.is_int_register())
-		a.movzx(gpd(dstp.ireg()), fmod);                                                // movzx reg,[fmod]
+	{
+		a.movzx(gpd(dstp.ireg()), fmod);
+	}
 	else
 	{
-		a.movzx(eax, fmod);                                                             // movzx eax,[fmod]
-		a.mov(MABS(dstp.memory()), eax);                                                // mov   [dstp],eax
+		a.movzx(eax, fmod);
+		a.mov(MABS(dstp.memory()), eax);
 	}
 }
 

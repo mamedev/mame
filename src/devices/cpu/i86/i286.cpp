@@ -164,8 +164,7 @@ const uint8_t i80286_cpu_device::m_i80286_timing[] =
 	13,             /* (80186) BOUND */
 };
 
-// Effective Address calculation takes one extra clock if offset calculation
-// requires summing 3 elements.
+// Effective Address calculation takes one extra clock if offset calculation requires summing 3 elements.
 const uint8_t i80286_cpu_device::m_i80286_ea_timing[] =
 {
 	0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,

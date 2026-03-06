@@ -695,8 +695,6 @@ DEFINE_DEVICE_TYPE(MCPX_SMBUS, mcpx_smbus_device, "mcpx_smbus", "MCPX SMBus Cont
 void mcpx_smbus_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x3e, 0x3e).r(FUNC(mcpx_smbus_device::minimum_grant_r));
-	map(0x3f, 0x3f).r(FUNC(mcpx_smbus_device::maximum_latency_r));
 }
 
 void mcpx_smbus_device::smbus_io0(address_map &map)
@@ -738,8 +736,10 @@ void mcpx_smbus_device::device_start()
 	bank_infos[2].adr = 0xc200;
 	status = 0x00b0;
 	command = 0x0001;
-	// Min Grant 3
-	// Max Latency 1
+	// min_gnt = 0.75 usec, max_lat = 0.25 usec
+	minimum_grant = 3;
+	maximum_latency = 1;
+
 	intr_pin = 1;
 	memset(&smbusst, 0, sizeof(smbusst));
 	for (int b = 0; b < 2; b++)
@@ -866,8 +866,6 @@ DEFINE_DEVICE_TYPE(MCPX_OHCI, mcpx_ohci_device, "mcpx_ohci", "MCPX OHCI USB Cont
 void mcpx_ohci_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x3e, 0x3e).r(FUNC(mcpx_ohci_device::minimum_grant_r));
-	map(0x3f, 0x3f).r(FUNC(mcpx_ohci_device::maximum_latency_r));
 }
 
 void mcpx_ohci_device::ohci_mmio(address_map &map)
@@ -904,6 +902,9 @@ void mcpx_ohci_device::device_start()
 	bank_infos[0].adr = 0xfed00000;
 	status = 0x00b0;
 	command = 0x0002;
+	// min_gnt = 0.75 usec, max_lat = 0.25 usec
+	minimum_grant = 3;
+	maximum_latency = 1;
 	intr_pin = 1;
 	ohci_usb = new ohci_usb_controller();
 	ohci_usb->set_cpu(maincpu.target());
@@ -1034,8 +1035,6 @@ DEFINE_DEVICE_TYPE(MCPX_APU, mcpx_apu_device, "mcpx_apu", "MCP APU")
 void mcpx_apu_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x3e, 0x3e).r(FUNC(mcpx_apu_device::minimum_grant_r));
-	map(0x3f, 0x3f).r(FUNC(mcpx_apu_device::maximum_latency_r));
 }
 
 void mcpx_apu_device::apu_mmio(address_map &map)
@@ -1063,6 +1062,10 @@ void mcpx_apu_device::device_start()
 	bank_infos[0].adr = 0xfe800000;
 	status = 0x00b0;
 	command = 0x0002;
+	// min_gnt = 0.25 usec, max_lat = 3 usec
+	minimum_grant = 1;
+	maximum_latency = 0xc;
+
 	intr_pin = 1;
 	memset(apust.memory, 0, sizeof(apust.memory));
 	memset(apust.voices_heap_blockaddr, 0, sizeof(apust.voices_heap_blockaddr));
@@ -1231,7 +1234,7 @@ void mcpx_apu_device::apu_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 }
 
 /*
- * AC97 Audio Controller
+ * AC'97 Audio Controller
  */
 
 DEFINE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device, "mcpx_ac97_audio", "MCPX AC'97 Audio Codec Interface")
@@ -1239,8 +1242,6 @@ DEFINE_DEVICE_TYPE(MCPX_AC97_AUDIO, mcpx_ac97_audio_device, "mcpx_ac97_audio", "
 void mcpx_ac97_audio_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
-	map(0x3e, 0x3e).r(FUNC(mcpx_ac97_audio_device::minimum_grant_r));
-	map(0x3f, 0x3f).r(FUNC(mcpx_ac97_audio_device::maximum_latency_r));
 }
 
 void mcpx_ac97_audio_device::ac97_mmio(address_map &map)
@@ -1281,6 +1282,10 @@ void mcpx_ac97_audio_device::device_start()
 	bank_infos[2].adr = 0xfec00000;
 	status = 0x00b0;
 	command = 0x0003;
+	// min_gnt = 0.5 usec, max_lat = 1.25 usec
+	minimum_grant = 2;
+	maximum_latency = 5;
+
 	intr_pin = 1;
 	memset(&ac97st, 0, sizeof(ac97st));
 }
@@ -1373,8 +1378,6 @@ void mcpx_ide_device::config_map(address_map &map)
 {
 	pci_device::config_map(map);
 	map(0x08, 0x0b).rw(FUNC(pci_device::class_rev_r), FUNC(mcpx_ide_device::class_rev_w));
-	map(0x3e, 0x3e).r(FUNC(mcpx_ide_device::minimum_grant_r));
-	map(0x3f, 0x3f).r(FUNC(mcpx_ide_device::maximum_latency_r));
 }
 
 void mcpx_ide_device::ide_pri_command(address_map &map)
@@ -1431,6 +1434,9 @@ void mcpx_ide_device::device_start()
 	bank_infos[4].adr = 0xff60;
 	status = 0x00b0;
 	command = 0x0001;
+	// min_gnt = 0.75 usec, max_lat = 0.25 usec
+	minimum_grant = 3;
+	maximum_latency = 1;
 }
 
 void mcpx_ide_device::device_reset()

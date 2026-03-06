@@ -270,7 +270,7 @@ void s3000_state::s3000xl_map(address_map &map)
 // e = FILCS (filter control if IB304F installed or 3200)
 void s3000_state::s2000_io_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("scsi:6:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
+	map(0x0000, 0x001f).m("spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -291,7 +291,7 @@ void s3000_state::s2000_io_map(address_map &map)
 // e = DIOCS
 void s3000_state::s3000_io_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("scsi:6:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
+	map(0x0000, 0x001f).m("spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).r(FUNC(s3000_state::fdc_hc365_r)).umask16(0xff00);
 	map(0x0048, 0x0048).rw(m_lcdc, FUNC(hd61830_device::data_r), FUNC(hd61830_device::data_w)).umask16(0x00ff);
@@ -310,7 +310,7 @@ void s3000_state::cd3000_io_map(address_map &map)
 
 void s3000_state::s3000xl_io_map(address_map &map)
 {
-	map(0x0000, 0x001f).m("scsi:6:spc", FUNC(mb89352_device::map)).umask16(0x00ff);
+	map(0x0000, 0x001f).m("spc", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0x0020, 0x0023).m(m_fdc, FUNC(upd72069_device::map)).umask16(0x00ff);
 	map(0x0040, 0x0047).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
 	map(0x0050, 0x0057).rw(m_klcs, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask16(0x00ff);
@@ -554,8 +554,8 @@ void s3000_state::base(machine_config &config)
 	m_maincpu->sint_handler_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_maincpu->txrdy_handler_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ4);
 
-	m_maincpu->in_ior_cb<0>().set("scsi:6:spc", FUNC(mb89352_device::dma_r));
-	m_maincpu->out_iow_cb<0>().set("scsi:6:spc", FUNC(mb89352_device::dma_w));
+	m_maincpu->in_ior_cb<0>().set("spc", FUNC(mb89352_device::dma_r));
+	m_maincpu->out_iow_cb<0>().set("spc", FUNC(mb89352_device::dma_w));
 	m_maincpu->in_ior_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_r));
 	m_maincpu->out_iow_cb<1>().set(m_fdc, FUNC(upd72069_device::dma_w));
 	m_maincpu->in_io16r_cb<3>().set(m_dsp, FUNC(l7a1045_sound_device::dma_r16_cb));
@@ -606,16 +606,12 @@ void s3000_state::base(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:6").option_set("spc", MB89352).machine_config(
-		[this](device_t *device)
-		{
-			mb89352_device &spc = downcast<mb89352_device &>(*device);
-
-			spc.set_clock(32_MHz_XTAL / 4); // PCLKOUT
-			spc.out_irq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
-			spc.out_dreq_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<0>));
-		});
 	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, nullptr);
+
+	auto &spc(MB89352(config, "spc", 32_MHz_XTAL / 4)); // PCLKOUT
+	bus.set_external_device(6, spc);
+	spc.out_irq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ2);
+	spc.out_dreq_callback().set(m_maincpu, FUNC(v53a_device::dreq_w<0>));
 
 	SOFTWARE_LIST(config, "cd_list").set_original("s3000_cdrom");
 

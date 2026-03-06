@@ -771,7 +771,7 @@ end
 -- testkeys
 --------------------------------------------------
 
-if (_OPTIONS["osd"] == "sdl") then
+if (_OPTIONS["osd"] == "sdl") or (_OPTIONS["osd"] == "sdl3") then
 	project("testkeys")
 	uuid ("b3f5a5b8-3203-11e9-93e4-670b4f4e359d")
 	kind "ConsoleApp"
@@ -784,6 +784,12 @@ if (_OPTIONS["osd"] == "sdl") then
 		targetdir(MAME_DIR)
 	end
 
+	if _OPTIONS["osd"] == "sdl3" then
+		defines {
+			"SDLMAME_SDL3",
+		}
+	end
+
 	links {
 		"utils",
 		"ocore_" .. _OPTIONS["osd"],
@@ -792,13 +798,24 @@ if (_OPTIONS["osd"] == "sdl") then
 
 	if _OPTIONS["targetos"]=="windows" then
 		if _OPTIONS["USE_LIBSDL"]~="1" then
+			local libsdl
+			if _OPTIONS["osd"] == "sdl3" then
+				libsdl = "SDL3"
+			else
+				libsdl = "SDL2"
+			end
 			configuration { "mingw*"}
+				if _OPTIONS["osd"] == "sdl" then
+					links {
+						"SDL2main",
+					}
+				end
 				links {
-					"SDL3",
+					libsdl,
 				}
 			configuration { "vs*" }
 				links {
-					"SDL3",
+					libsdl,
 					"imm32",
 					"version",
 				}

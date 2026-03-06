@@ -213,10 +213,10 @@ protected:
 	inline void i_popf();
 
 	// sub implementations
-	inline uint32_t ADDB();
-	inline uint32_t ADDX();
-	inline uint32_t SUBB();
-	inline uint32_t SUBX();
+	inline uint32_t ADDB(uint8_t c = 0);
+	inline uint32_t ADDX(uint8_t c = 0);
+	inline uint32_t SUBB(uint8_t b = 0);
+	inline uint32_t SUBX(uint8_t b = 0);
 	inline void ORB();
 	inline void ORW();
 	inline void ANDB();

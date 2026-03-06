@@ -255,6 +255,12 @@ void acpi_piix4_device::device_reset()
 	m_gporeg[1] = 0xbfff;
 }
 
+void acpi_piix4_device::device_validity_check(validity_checker &valid) const
+{
+	if (!this->clock())
+		osd_printf_error("%s: clock set to 0 MHz, please use implicit default of 3.5 MHz in config setter instead\n", this->tag());
+}
+
 void acpi_piix4_device::map(address_map &map)
 {
 	// Power Management Status

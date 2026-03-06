@@ -189,7 +189,7 @@ void fdc37c665ir_device::remap(int space_id, offs_t start, offs_t end)
 			const u16 lpt_start = lpt_addresses[(m_cr[1] & 3) - 1];
 			const u16 lpt_end = lpt_start + 3;
 			LOG("Map LPT: %04x-%04x\n", lpt_start, lpt_end);
-			m_isa->install_device(lpt_start, lpt_end, read8sm_delegate(*m_lpt, FUNC(pc_lpt_device::read)), write8sm_delegate(*m_lpt, FUNC(pc_lpt_device::write)));
+			m_isa->install_device(lpt_start, lpt_end, *m_lpt, &pc_lpt_device::isa_map);
 		}
 
 		// COM1

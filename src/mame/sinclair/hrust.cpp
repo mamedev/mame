@@ -102,7 +102,7 @@ void hrust_decoder::decode(address_space &space, const u8 *source, u16 dest, u16
 				if (b >= 0xe0)
 				{
 					b <<= 1;
-					++b;	// rlca
+					++b;    // rlca
 					b ^= 2; // xor c
 
 					if (b == 0xff)
@@ -189,7 +189,7 @@ void hrust_decoder::decode(address_space &space, const u8 *source, u16 dest, u16
 				}
 
 				b <<= 1;
-				++b;	// rlca
+				++b;    // rlca
 				b ^= 3; // xor c
 
 				offset = 0xff00 + b - 0x0f;

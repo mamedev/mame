@@ -95,7 +95,7 @@ bool nscsi_cdrom_pc8801_30_device::scsi_command_done(u8 command, u8 length)
 void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 {
 	u32 frame = 0;
-	const u8 mode = scsi_cmdbuf[9] & 0xc0;
+	const u8 mode = m_scsi_cmdbuf[9] & 0xc0;
 
 	LOGCMD("0xd8 SET AUDIO PLAYBACK START POSITION (NEC): mode %02x\n", mode);
 	if (!image->exists())
@@ -110,13 +110,13 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 	{
 		case 0x00:
 			popmessage("CD-DA set start mode 0x00");
-			frame = (scsi_cmdbuf[3] << 16) | (scsi_cmdbuf[4] << 8) | scsi_cmdbuf[5];
+			frame = (m_scsi_cmdbuf[3] << 16) | (m_scsi_cmdbuf[4] << 8) | m_scsi_cmdbuf[5];
 			break;
 		case 0x40:
 		{
-			const u8 m = bcd_2_dec(scsi_cmdbuf[2]);
-			const u8 s = bcd_2_dec(scsi_cmdbuf[3]);
-			const u8 f = bcd_2_dec(scsi_cmdbuf[4]);
+			const u8 m = bcd_2_dec(m_scsi_cmdbuf[2]);
+			const u8 s = bcd_2_dec(m_scsi_cmdbuf[3]);
+			const u8 f = bcd_2_dec(m_scsi_cmdbuf[4]);
 			frame = f + 75 * (s + m * 60);
 
 			const u32 pregap = toc.tracks[image->get_track(frame)].pregap;
@@ -131,7 +131,7 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 		}
 		case 0x80:
 		{
-			const u8 track_number = bcd_2_dec(scsi_cmdbuf[2]);
+			const u8 track_number = bcd_2_dec(m_scsi_cmdbuf[2]);
 			const u32 pregap = toc.tracks[image->get_track(track_number - 1)].pregap;
 			LOGCMD("TRACK=%d (pregap = %d)\n", track_number, pregap);
 			frame = toc.tracks[ track_number - 1 ].logframeofs;
@@ -155,7 +155,7 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 
 	m_cdda_status = PCE_CD_CDDA_PAUSED;
 
-	const u8 play_mode = scsi_cmdbuf[1] & 0x03;
+	const u8 play_mode = m_scsi_cmdbuf[1] & 0x03;
 	LOGCMD("Play mode = %d\n", play_mode);
 	if (play_mode)
 	{
@@ -211,7 +211,7 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_start_position()
 void nscsi_cdrom_pc8801_30_device::nec_set_audio_stop_position()
 {
 	u32 frame = 0;
-	const u8 mode = scsi_cmdbuf[9] & 0xc0;
+	const u8 mode = m_scsi_cmdbuf[9] & 0xc0;
 	LOGCMD("0xd9 SET AUDIO PLAYBACK END POSITION (NEC): mode %02x\n", mode);
 
 	if (!image->exists())
@@ -227,13 +227,13 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_stop_position()
 		case 0x00:
 			// tadaima
 			popmessage("CD-DA set end mode 0x00");
-			frame = (scsi_cmdbuf[3] << 16) | (scsi_cmdbuf[4] << 8) | scsi_cmdbuf[5];
+			frame = (m_scsi_cmdbuf[3] << 16) | (m_scsi_cmdbuf[4] << 8) | m_scsi_cmdbuf[5];
 			break;
 		case 0x40:
 		{
-			const u8 m = bcd_2_dec(scsi_cmdbuf[2]);
-			const u8 s = bcd_2_dec(scsi_cmdbuf[3]);
-			const u8 f = bcd_2_dec(scsi_cmdbuf[4]);
+			const u8 m = bcd_2_dec(m_scsi_cmdbuf[2]);
+			const u8 s = bcd_2_dec(m_scsi_cmdbuf[3]);
+			const u8 f = bcd_2_dec(m_scsi_cmdbuf[4]);
 			const u32 pregap = toc.tracks[image->get_track(frame)].pregap;
 
 			frame = f + 75 * (s + m * 60);
@@ -243,7 +243,7 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_stop_position()
 		}
 		case 0x80:
 		{
-			const u8 track_number = bcd_2_dec(scsi_cmdbuf[2]);
+			const u8 track_number = bcd_2_dec(m_scsi_cmdbuf[2]);
 			const u32 pregap = toc.tracks[image->get_track(track_number - 1)].pregap;
 			// NB: crazyhos uses this command with track = 1 on pre-title screen intro.
 			// It's not supposed to playback anything according to real HW refs.
@@ -251,7 +251,7 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_stop_position()
 
 			LOGCMD("TRACK=%d (raw %02x pregap = %d frame = %d)\n"
 				, track_number
-				, scsi_cmdbuf[2]
+				, m_scsi_cmdbuf[2]
 				, pregap
 				, frame
 			);
@@ -265,7 +265,7 @@ void nscsi_cdrom_pc8801_30_device::nec_set_audio_stop_position()
 	}
 
 	m_end_frame = frame;
-	m_cdda_play_mode = scsi_cmdbuf[1] & 0x03;
+	m_cdda_play_mode = m_scsi_cmdbuf[1] & 0x03;
 	LOGCMD("Play mode = %d\n", m_cdda_play_mode);
 
 	if (m_cdda_play_mode)
@@ -342,13 +342,13 @@ void nscsi_cdrom_pc8801_30_device::nec_get_subq()
 	switch (m_cdda_status)
 	{
 		case PCE_CD_CDDA_PAUSED:
-			scsi_cmdbuf[0] = 2;
+			m_scsi_cmdbuf[0] = 2;
 			break;
 		case PCE_CD_CDDA_PLAYING:
-			scsi_cmdbuf[0] = 0;
+			m_scsi_cmdbuf[0] = 0;
 			break;
 		default:
-			scsi_cmdbuf[0] = 3;
+			m_scsi_cmdbuf[0] = 3;
 			break;
 	}
 
@@ -356,27 +356,27 @@ void nscsi_cdrom_pc8801_30_device::nec_get_subq()
 	track = image->get_track(frame);
 	msf_rel = cdrom_file::lba_to_msf_alt(frame - image->get_track_start(track));
 
-	scsi_cmdbuf[1] = 0x01 | ((image->get_track_type(track+1) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
+	m_scsi_cmdbuf[1] = 0x01 | ((image->get_track_type(track+1) == cdrom_file::CD_TRACK_AUDIO) ? 0x00 : 0x40);
 	// track
-	scsi_cmdbuf[2] = dec_2_bcd(track+1);
+	m_scsi_cmdbuf[2] = dec_2_bcd(track+1);
 	// index
-	scsi_cmdbuf[3] = std::max(image->get_track_index(frame), 1U);
+	m_scsi_cmdbuf[3] = std::max(image->get_track_index(frame), 1U);
 	// MSF (relative)
-	scsi_cmdbuf[4] = dec_2_bcd((msf_rel >> 16) & 0xFF);
-	scsi_cmdbuf[5] = dec_2_bcd((msf_rel >> 8) & 0xFF);
-	scsi_cmdbuf[6] = dec_2_bcd(msf_rel & 0xFF);
+	m_scsi_cmdbuf[4] = dec_2_bcd((msf_rel >> 16) & 0xFF);
+	m_scsi_cmdbuf[5] = dec_2_bcd((msf_rel >> 8) & 0xFF);
+	m_scsi_cmdbuf[6] = dec_2_bcd(msf_rel & 0xFF);
 	// MSF (absolute)
-	scsi_cmdbuf[7] = dec_2_bcd((msf_abs >> 16) & 0xFF);
-	scsi_cmdbuf[8] = dec_2_bcd((msf_abs >> 8) & 0xFF);
-	scsi_cmdbuf[9] = dec_2_bcd(msf_abs & 0xFF);
+	m_scsi_cmdbuf[7] = dec_2_bcd((msf_abs >> 16) & 0xFF);
+	m_scsi_cmdbuf[8] = dec_2_bcd((msf_abs >> 8) & 0xFF);
+	m_scsi_cmdbuf[9] = dec_2_bcd(msf_abs & 0xFF);
 	if(LIVE_SUBQ_VIEW)
 	{
 		const std::vector<std::string> status_types = {"standby", "play", "pause"};
 		popmessage("SUBQ - status %s type %02x|track %d index %d| MSF rel %06x MSF abs %06x\n"
 			, status_types[m_cdda_status]
-			, scsi_cmdbuf[1]
+			, m_scsi_cmdbuf[1]
 			, track + 1
-			, scsi_cmdbuf[3]
+			, m_scsi_cmdbuf[3]
 			, msf_rel
 			, msf_abs
 		);
@@ -401,14 +401,14 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 	const cdrom_file::toc &toc = image->get_toc();
 
 	// NOTE: PC8801-30 CD player wants 4 bytes back vs. PC Engine
-	switch(scsi_cmdbuf[1])
+	switch(m_scsi_cmdbuf[1])
 	{
 		case 0x00:
-			scsi_cmdbuf[0] = dec_2_bcd(1);
-			scsi_cmdbuf[1] = dec_2_bcd(toc.numtrks);
-			scsi_cmdbuf[2] = 0;
-			scsi_cmdbuf[3] = 0;
-			LOGCMD("Get first and last track numbers => 1-%02x\n", scsi_cmdbuf[1]);
+			m_scsi_cmdbuf[0] = dec_2_bcd(1);
+			m_scsi_cmdbuf[1] = dec_2_bcd(toc.numtrks);
+			m_scsi_cmdbuf[2] = 0;
+			m_scsi_cmdbuf[3] = 0;
+			LOGCMD("Get first and last track numbers => 1-%02x\n", m_scsi_cmdbuf[1]);
 
 			scsi_data_in(SBUF_MAIN, 4);
 			scsi_status_complete(SS_GOOD);
@@ -420,11 +420,11 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 			msf = to_msf(frame);
 			LOGCMD("Get total disk size in MSF format => %06x\n", msf);
 
-			//scsi_cmdbuf[0] = image->get_adr_control(image->get_last_track());
-			scsi_cmdbuf[0] = dec_2_bcd(BIT(msf, 16, 8)); // minutes
-			scsi_cmdbuf[1] = dec_2_bcd(BIT(msf, 8, 8));  // seconds
-			scsi_cmdbuf[2] = dec_2_bcd(BIT(msf, 0, 8));  // frames
-			scsi_cmdbuf[3] = 0;
+			//m_scsi_cmdbuf[0] = image->get_adr_control(image->get_last_track());
+			m_scsi_cmdbuf[0] = dec_2_bcd(BIT(msf, 16, 8)); // minutes
+			m_scsi_cmdbuf[1] = dec_2_bcd(BIT(msf, 8, 8));  // seconds
+			m_scsi_cmdbuf[2] = dec_2_bcd(BIT(msf, 0, 8));  // frames
+			m_scsi_cmdbuf[3] = 0;
 
 			scsi_data_in(SBUF_MAIN, 4);
 			scsi_status_complete(SS_GOOD);
@@ -434,7 +434,7 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 		{
 			u32 frame;
 			u8 track_type;
-			if (scsi_cmdbuf[2] == 0xaa)
+			if (m_scsi_cmdbuf[2] == 0xaa)
 			{
 				frame = toc.tracks[toc.numtrks-1].logframeofs;
 				frame += toc.tracks[toc.numtrks-1].frames;
@@ -444,7 +444,7 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 			}
 			else
 			{
-				track = std::max(bcd_2_dec(scsi_cmdbuf[2]), 1U);
+				track = std::max(bcd_2_dec(m_scsi_cmdbuf[2]), 1U);
 				frame = toc.tracks[track-1].logframeofs;
 
 				track_type = toc.tracks[track-1].trktype == cdrom_file::CD_TRACK_AUDIO ? 0x00 : 0x04;
@@ -453,10 +453,10 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 
 			msf = to_msf(frame + 150);
 
-			scsi_cmdbuf[0] = dec_2_bcd(BIT(msf, 16, 8)); // minutes
-			scsi_cmdbuf[1] = dec_2_bcd(BIT(msf, 8, 8));  // seconds
-			scsi_cmdbuf[2] = dec_2_bcd(BIT(msf, 0, 8));  // frames
-			scsi_cmdbuf[3] = track_type;
+			m_scsi_cmdbuf[0] = dec_2_bcd(BIT(msf, 16, 8)); // minutes
+			m_scsi_cmdbuf[1] = dec_2_bcd(BIT(msf, 8, 8));  // seconds
+			m_scsi_cmdbuf[2] = dec_2_bcd(BIT(msf, 0, 8));  // frames
+			m_scsi_cmdbuf[3] = track_type;
 
 			scsi_data_in(SBUF_MAIN, 4);
 			scsi_status_complete(SS_GOOD);
@@ -464,25 +464,25 @@ void nscsi_cdrom_pc8801_30_device::nec_get_dir_info()
 			break;
 		}
 		default:
-			popmessage("nec_get_dir_info: unknown subcommand %02x", scsi_cmdbuf[1]);
+			popmessage("nec_get_dir_info: unknown subcommand %02x", m_scsi_cmdbuf[1]);
 			break;
 	}
 }
 
 void nscsi_cdrom_pc8801_30_device::scsi_command()
 {
-	switch (scsi_cmdbuf[0])
+	switch (m_scsi_cmdbuf[0])
 	{
 		case SC_READ_6:
 			nscsi_cdrom_device::scsi_command();
-			LOGCMD("SC_READ_6: lba: %02x%02x%02x blocks: %02x\n", scsi_cmdbuf[1], scsi_cmdbuf[2], scsi_cmdbuf[3], scsi_cmdbuf[4]);
+			LOGCMD("SC_READ_6: lba: %02x%02x%02x blocks: %02x\n", m_scsi_cmdbuf[1], m_scsi_cmdbuf[2], m_scsi_cmdbuf[3], m_scsi_cmdbuf[4]);
 			break;
 		case SC_MODE_SELECT_6:
-			LOG("command MODE SELECT 6 length %d\n", scsi_cmdbuf[4]);
+			LOG("command MODE SELECT 6 length %d\n", m_scsi_cmdbuf[4]);
 
 			// accept mode select parameter data
 			// wants 11 bytes compared to regular cd.h
-			scsi_cmdbuf[4] += 1;
+			m_scsi_cmdbuf[4] += 1;
 			nscsi_cdrom_device::scsi_command();
 			break;
 
@@ -494,8 +494,8 @@ void nscsi_cdrom_pc8801_30_device::scsi_command()
 
 		default:
 			// TODO: purge commands that don't exist on this implementation
-			if (scsi_cmdbuf[0] != SC_TEST_UNIT_READY && scsi_cmdbuf[0] != SC_REQUEST_SENSE)
-				popmessage("PC8801-30: potentially unavailable %02x command trigger", scsi_cmdbuf[0]);
+			if (m_scsi_cmdbuf[0] != SC_TEST_UNIT_READY && m_scsi_cmdbuf[0] != SC_REQUEST_SENSE)
+				popmessage("PC8801-30: potentially unavailable %02x command trigger", m_scsi_cmdbuf[0]);
 
 			nscsi_cdrom_device::scsi_command();
 			break;

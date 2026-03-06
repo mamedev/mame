@@ -457,12 +457,15 @@ vp60
 fashiong
 fashiong2
 fstation
+fstation7
+fstation8
 funlddlx
 funlddlx2
 funlddlx4
 quickjac
 skattv
 skattva
+trumpfas
 
 @source:adp/manohman.cpp
 backgamn
@@ -479,18 +482,41 @@ disc
 disc2000
 disc2001
 disc3000
+disciip
+discoly
+discryl
+discrylb
 dpplpot
 dpplstrt
 elitdisc
 excellnt
 extrbltt
+fullhous
 glksstrn
+herzas
+herzasf1
+herzasf8
 juwel
 karoas
 kniffi
+m21point
 macao
+mas
+mastro
+mbistro
+mclub
+mmax
+mtrio
 rasant
+sesam
+sherzas
+sjackpot
+sprmlti
 sprmltib
+superpro
+v4assef1
+v4assef2
+vmulti
 
 @source:adp/stellafr.cpp
 action
@@ -15196,10 +15222,11 @@ sc6dndema
 sc6dndemb
 sc6dndemc
 
-@source:bfm/bfm_swp.cpp
+@source:bfm/bfm_cobra3.cpp
 c3_ppays
 c3_rtime
 c3_telly
+c3_tellyns
 c3_totp
 
 @source:bfm/bfmsys83.cpp
@@ -15785,6 +15812,7 @@ dimahoou
 dimahoud
 dstlk
 dstlka
+dstlkb
 dstlkh
 dstlku
 dstlku1d
@@ -16120,6 +16148,7 @@ wofr1bl
 diamrun
 gng
 gnga
+gngb
 gngbl
 gngbla
 gngblita
@@ -16637,6 +16666,7 @@ quarterbc
 redlin2p
 strkzone
 teamqb
+teamqb1
 teamqb2
 upyoural
 viper
@@ -17257,6 +17287,9 @@ decomult
 @source:dataeast/deshoros.cpp
 destiny
 
+@source:dataeast/dfruit2.cpp
+dfruit2
+
 @source:dataeast/dietgo.cpp
 dietgo
 dietgoe
@@ -17270,6 +17303,7 @@ dreambal
 
 @source:dataeast/exprraid.cpp
 exprraid
+exprraidbl
 exprraidi
 exprraidu
 wexpress
@@ -24593,6 +24627,7 @@ yutnori
 cyvern
 cyvernj
 galpani4
+galpani4a
 galpani4j
 galpani4k
 galpanidx
@@ -24674,18 +24709,6 @@ kaypronew2
 omni2
 omni4
 robie
-
-@source:kiwako/jongkyo.cpp
-jongkyo
-
-@source:kiwako/koikoi.cpp
-koikoi
-koikoip2
-
-@source:kiwako/mrjong.cpp
-blkbustr
-crazyblk
-mrjong
 
 @source:koei/pasogo.cpp
 pasogo
@@ -30210,7 +30233,7 @@ tripjack
 tripjack07
 tripjack11
 
-@source:misc/chameleonrx1.cpp
+@source:misc/chamrx1.cpp
 chamrx1
 
 @source:misc/chance32.cpp
@@ -33291,10 +33314,6 @@ meteors
 spcforc2
 spcforce
 
-@source:misc/sprcros2.cpp
-sprcros2
-sprcros2a
-
 @source:misc/sshanghai.cpp
 ssh2000
 ssh2000a
@@ -33335,6 +33354,7 @@ quaquiz2
 sextriv
 statriv2
 statriv2v
+statriv3
 statriv4
 statriv5se
 statusbj
@@ -35631,11 +35651,11 @@ sgaltrop
 sgaltropa
 sweetgal
 
-@source:nichibutsu/niyanpai.cpp
+@source:nichibutsu/nyanpai.cpp
 4psimasy
 mhhonban
 musobana
-niyanpai
+nyanpai
 zokumahj
 
 @source:nichibutsu/pastelg.cpp
@@ -37057,6 +37077,9 @@ visor
 
 @source:palm/palmz22.cpp
 palmz22
+
+@source:pc/agro.cpp
+agro
 
 @source:pc/asst128.cpp
 asst128
@@ -40623,6 +40646,13 @@ drmicro
 @source:sanritsu/jantotsu.cpp
 jantotsu
 
+@source:sanritsu/jongkyo.cpp
+jongkyo
+
+@source:sanritsu/koikoi.cpp
+koikoi
+koikoip2
+
 @source:sanritsu/mermaid.cpp
 mermaid
 rougien
@@ -40631,8 +40661,17 @@ yachtmn
 @source:sanritsu/mjkjidai.cpp
 mjkjidai
 
+@source:sanritsu/mrjong.cpp
+blkbustr
+crazyblk
+mrjong
+
 @source:sanritsu/ron.cpp
 ron2
+
+@source:sanritsu/sprcros2.cpp
+sprcros2
+sprcros2a
 
 @source:sanyo/mbc55x.cpp
 mbc55x
@@ -42974,6 +43013,7 @@ prophet5rev30
 
 @source:sequential/prophet600.cpp
 prpht600
+prpht600a
 
 @source:sequential/sixtrak.cpp
 sixtrak
@@ -43584,6 +43624,9 @@ zx97
 
 @source:sinclair/specnext.cpp
 tbblue
+specnext_ks1
+specnext_ks2
+specnext_ks3
 
 @source:sinclair/z88.cpp
 z88
@@ -44331,6 +44374,9 @@ rvoicepc
 
 @source:skeleton/sacstate.cpp
 sacstate
+
+@source:skeleton/sammy_pachislo_z80.cpp
+ultracl3
 
 @source:skeleton/sansa_fuze.cpp
 sanfuze2
@@ -46602,6 +46648,7 @@ pbaction2
 pbaction3
 pbaction4
 pbactiont
+pbactiont2
 
 @source:tecmo/senjyo.cpp
 baluba
@@ -46991,6 +47038,16 @@ dt7
 @source:toaplan/enmadaio.cpp
 enmadaio
 
+@source:toaplan/fireshrk.cpp
+fireshrk
+fireshrka
+fireshrkd
+fireshrkdh
+samesame
+samesame2
+samesamecn
+samesamenh
+
 @source:toaplan/fixeight.cpp
 fixeight
 fixeighta
@@ -47065,6 +47122,9 @@ bbakraidja
 nprobowl
 probowl2
 
+@source:toaplan/rallybik.cpp
+rallybik
+
 @source:toaplan/slapfght.cpp
 alcon
 getstarb1
@@ -47114,10 +47174,6 @@ demonwld2
 demonwld3
 demonwld4
 demonwld5
-fireshrk
-fireshrka
-fireshrkd
-fireshrkdh
 hellfire
 hellfire1
 hellfire1a
@@ -47128,11 +47184,6 @@ outzoneb
 outzonec
 outzoneh
 outzonecv
-rallybik
-samesame
-samesame2
-samesamecn
-samesamenh
 truxton
 vimana
 vimanaj
@@ -48252,6 +48303,11 @@ mrlo
 mrdofabr
 mrdobl
 yankeedo
+
+@source:universal/pachislo_z80.cpp
+crankyc
+thunderv
+versus
 
 @source:universal/sraider.cpp
 mrsdyna

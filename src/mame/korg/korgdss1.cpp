@@ -111,7 +111,7 @@ public:
 	korg_dssmsrk_state(const machine_config &mconfig, device_type type, const char *tag)
 		: korg_dss1_state(mconfig, type, tag)
 		, m_msrkcpu(*this, "msrkcpu")
-		, m_scsic(*this, "scsi:7:scsic")
+		, m_scsic(*this, "scsic")
 	{
 	}
 
@@ -528,7 +528,7 @@ void korg_dssmsrk_state::dssmsrk(machine_config &config)
 	klm781(config);
 	klm782(config);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -536,11 +536,10 @@ void korg_dssmsrk_state::dssmsrk(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", NCR53C80).machine_config([this] (device_t *device) {
-		auto &scsic = downcast<ncr53c80_device &>(*device); // 48-pin DIP
-		scsic.irq_handler().set_inputline(m_msrkcpu, INPUT_LINE_IRQ4);
-		scsic.drq_handler().set(m_msrkcpu, FUNC(v40_device::dreq_w<1>));
-	});
+	NCR53C80(config, m_scsic);
+	scsi.set_external_device(7, m_scsic);
+	m_scsic->irq_handler().set_inputline(m_msrkcpu, INPUT_LINE_IRQ4);
+	m_scsic->drq_handler().set(m_msrkcpu, FUNC(v40_device::dreq_w<1>));
 }
 
 

@@ -64,7 +64,9 @@ void ncr53c825_pci_device::device_start()
 	// INTA#
 	intr_pin = 1;
 
-	// TODO: min_gnt = 0x11, max_lat = 0x40
+	// min_gnt = 4.25 usec, max_lat = 16 usec
+	minimum_grant = 0x11;
+	maximum_latency = 0x40;
 }
 
 void ncr53c825_pci_device::device_reset()

@@ -21,7 +21,7 @@ DEFINE_DEVICE_TYPE(GD5465_LAGUNA3D, cirrus_gd5465_laguna3d_device, "clgd5465_lag
 cirrus_gd5465_laguna3d_device::cirrus_gd5465_laguna3d_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_card_device(mconfig, GD5465_LAGUNA3D, tag, owner, clock)
 	, m_vga(*this, "vga")
-	, m_vga_rom(*this, "vga_rom")
+	, m_bios(*this, "bios")
 {
 	// device ID 0x1013 Cirrus Logic
 	// 0x00dx for Laguna revs
@@ -34,7 +34,7 @@ cirrus_gd5465_laguna3d_device::cirrus_gd5465_laguna3d_device(const machine_confi
     Cirrus Logic CL-GD5464 Laguna3D
 // DSystems Wizar3D PCI graphics card - Chip: CL-GD5464-HC-A - ROM: DSystems Wizar3D 144a.10H - RAM: 2MB, 4MB, 8MB - Connector: DB15 - VESA feature connector
 ROM_START( clgd5464 )
-    ROM_REGION32_LE( 0x08000, "vga_rom", ROMREGION_ERASEFF )
+    ROM_REGION32_LE( 0x08000, "bios", ROMREGION_ERASEFF )
     ROM_LOAD("dsystems_wizard3d.vbi", 0x00000, 0x08000, CRC(df9f1570), SHA1(4e611f4039b851fd4237d450e38c9d764920a747) )
 ROM_END
 
@@ -42,7 +42,7 @@ ROM_END
 
 ROM_START( gd5465 )
 	// Chaintech GA-5465AS AGP graphics card - Chip: CL-GD5465 - ROM: CL-GD546x Laguna PCI VGA BIOS Version 1.62c - RAM: 4MB, 8MB - OSC: 14.3C7Y - Connector: DB15 - VESA feature connector
-	ROM_REGION32_LE( 0x8000, "vga_rom", ROMREGION_ERASEFF )
+	ROM_REGION32_LE( 0x8000, "bios", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "chaintech", "Chaintech GA-5465AS 1.62c" )
 	ROMX_LOAD( "chaintech.vbi", 0x0000, 0x8000, CRC(8afa1afb) SHA1(251a953d442dc34738f80371cfbd0fd9f1097635), ROM_BIOS(0) )
 ROM_END
@@ -73,7 +73,7 @@ void cirrus_gd5465_laguna3d_device::device_start()
 	add_map( 32*1024, M_MEM, FUNC(cirrus_gd5465_laguna3d_device::mmio_map));
 	add_map( 32*1024*1024, M_MEM, FUNC(cirrus_gd5465_laguna3d_device::vram_aperture_map));
 
-	add_rom((u8 *)m_vga_rom->base(), 0x8000);
+	add_rom((u8 *)m_bios->base(), 0x8000);
 	expansion_rom_base = 0xc0000;
 
 	// INTA#
@@ -121,7 +121,7 @@ void cirrus_gd5465_laguna3d_device::legacy_memory_map(address_map &map)
 
 void cirrus_gd5465_laguna3d_device::legacy_io_map(address_map &map)
 {
-	map(0, 0x02f).m(m_vga, FUNC(cirrus_gd5446_vga_device::io_map));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(cirrus_gd5446_vga_device::io_map));
 }
 
 uint8_t cirrus_gd5465_laguna3d_device::vram_r(offs_t offset)
@@ -139,9 +139,11 @@ void cirrus_gd5465_laguna3d_device::map_extra(uint64_t memory_window_start, uint
 {
 	if (m_vga_legacy_enable)
 	{
-		memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(cirrus_gd5465_laguna3d_device::vram_r)), write8sm_delegate(*this, FUNC(cirrus_gd5465_laguna3d_device::vram_w)));
+		if (BIT(command, 1))
+			memory_space->install_readwrite_handler(0xa0000, 0xbffff, read8sm_delegate(*this, FUNC(cirrus_gd5465_laguna3d_device::vram_r)), write8sm_delegate(*this, FUNC(cirrus_gd5465_laguna3d_device::vram_w)));
 
-		io_space->install_device(0x03b0, 0x03df, *this, &cirrus_gd5465_laguna3d_device::legacy_io_map);
+		if (BIT(command, 0))
+			io_space->install_device(0x0000, 0xffff, *this, &cirrus_gd5465_laguna3d_device::legacy_io_map);
 	}
 }
 

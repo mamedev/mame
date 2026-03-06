@@ -1,183 +1,183 @@
 # license:BSD-3-Clause
-# copyright-holders:Olivier Galibert, AJR
+# copyright-holders:Olivier Galibert, m_AJR
 adc_ipx
-	TMP2 = read_pc();
-	PC++;
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	if(page_changing(TMP, X)) {
-		read(set_l(TMP, TMP+X));
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_X)) {
+		read(set_l(m_TMP, m_TMP+m_X));
 	}
-	TMP2 = read(TMP+X);
-	do_adc(TMP2);
-	if(P & F_D) {
+	m_TMP2 = read(m_TMP+m_X);
+	do_adc(m_TMP2);
+	if(m_P & F_D) {
 		read_pc();
-		set_nz(A);
+		set_nz(m_A);
 	}
 	prefetch();
 
 add_imm
-	TMP = read_pc();
-	PC++;
-	do_add(TMP);
-	if(P & F_D) {
+	m_TMP = read_pc();
+	m_PC++;
+	do_add(m_TMP);
+	if(m_P & F_D) {
 		read_pc();
-		set_nz(A);
+		set_nz(m_A);
 	}
 	prefetch();
 
 add_zpg
-	TMP = read_pc();
-	PC++;
-	TMP2 = read(TMP);
-	do_add(TMP2);
-	if(P & F_D) {
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	do_add(m_TMP2);
+	if(m_P & F_D) {
 		read_pc();
-		set_nz(A);
+		set_nz(m_A);
 	}
 	prefetch();
 
 add_zpx
-	TMP = read_pc();
-	PC++;
-	read(TMP);
-	TMP2 = read(uint8_t(TMP+X));
-	do_add(TMP2);
-	if(P & F_D) {
+	m_TMP = read_pc();
+	m_PC++;
+	read(m_TMP);
+	m_TMP2 = read(uint8_t(m_TMP+m_X));
+	do_add(m_TMP2);
+	if(m_P & F_D) {
 		read_pc();
-		set_nz(A);
+		set_nz(m_A);
 	}
 	prefetch();
 
 and_ipx
-	TMP2 = read_pc();
-	PC++;
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	if(page_changing(TMP, X)) {
-		read(set_l(TMP, TMP+X));
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_X)) {
+		read(set_l(m_TMP, m_TMP+m_X));
 	}
-	TMP2 = read(TMP+X);
-	A &= TMP2;
-	set_nz(A);
+	m_TMP2 = read(m_TMP+m_X);
+	m_A &= m_TMP2;
+	set_nz(m_A);
 	prefetch();
 
 asr_acc
 	read_pc();
-	A = do_asr(A);
+	m_A = do_asr(m_A);
 	prefetch();
 
 bar_amr
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	TMP2 = read(TMP);
-	TMP = read_pc();
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	m_TMP = read_pc();
 	read_pc();
-	PC++;
-	TMP2 = ~TMP2 & TMP;
-	TMP = read_pc();
-	PC++;
-	if(TMP2 != 0) {
+	m_PC++;
+	m_TMP2 = ~m_TMP2 & m_TMP;
+	m_TMP = read_pc();
+	m_PC++;
+	if(m_TMP2 != 0) {
 		read_pc();
-		if(page_changing(PC, int8_t(TMP))) {
-			read_arg(set_l(PC, PC+int8_t(TMP)));
+		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
 		}
-		PC += int8_t(TMP);
+		m_PC += int8_t(m_TMP);
 	}
 	prefetch();
 
 bas_amr
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	TMP2 = read(TMP);
-	TMP = read_pc();
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	m_TMP = read_pc();
 	read_pc();
-	PC++;
-	TMP2 &= TMP;
-	TMP = read_pc();
-	PC++;
-	if(TMP2 != 0) {
+	m_PC++;
+	m_TMP2 &= m_TMP;
+	m_TMP = read_pc();
+	m_PC++;
+	if(m_TMP2 != 0) {
 		read_pc();
-		if(page_changing(PC, int8_t(TMP))) {
-			read_arg(set_l(PC, PC+int8_t(TMP)));
+		if(page_changing(m_PC, int8_t(m_TMP))) {
+			read_arg(set_l(m_PC, m_PC+int8_t(m_TMP)));
 		}
-		PC += int8_t(TMP);
+		m_PC += int8_t(m_TMP);
 	}
 	prefetch();
 
 brk_r_imp
-	if(irq_taken || nmi_pending) {
+	if(m_irq_taken || m_nmi_pending) {
 		read_pc();
 	} else {
 		read_pc();
-		PC++;
+		m_PC++;
 	}
-	write(SP, PC >> 8);
+	write(m_SP, m_PC >> 8);
 	dec_SP();
-	write(SP, PC);
+	write(m_SP, m_PC);
 	dec_SP();
-	write(SP, irq_taken || nmi_pending ? P & ~F_B : P);
+	write(m_SP, m_irq_taken || m_nmi_pending ? m_P & ~F_B : m_P);
 	dec_SP();
-	if(irq_taken && nmi_pending) {
-		standard_irq_callback(NMI_LINE, PC);
-		PC = read_arg(0xfffc);
-		PC = set_h(PC, read_arg(0xfffd));
-		nmi_pending = false;
+	if(m_irq_taken && m_nmi_pending) {
+		standard_irq_callback(NMI_LINE, m_PC);
+		m_PC = read_arg(0xfffc);
+		m_PC = set_h(m_PC, read_arg(0xfffd));
+		m_nmi_pending = false;
 	} else {
-		if(irq_taken)
-			standard_irq_callback(((~TMP & 0x000e) >> 1) - 1, PC);
-		TMP = get_irq_vector();
-		PC = read_arg(TMP);
-		PC = set_h(PC, read_arg(TMP+1));
+		if(m_irq_taken)
+			standard_irq_callback(((~m_TMP & 0x000e) >> 1) - 1, m_PC);
+		m_TMP = get_irq_vector();
+		m_PC = read_arg(m_TMP);
+		m_PC = set_h(m_PC, read_arg(m_TMP+1));
 	}
-	irq_taken = false;
-	P = (P | F_I) & ~F_D; // Do *not* move after the prefetch
+	m_irq_taken = false;
+	m_P = (m_P | F_I) & ~F_D; // Do *not* move after the prefetch
 	prefetch();
-	inst_state = -1;
+	m_inst_state = -1;
 
 clw_imp
 	read_pc();
-	P &= ~F_V;
+	m_P &= ~F_V;
 	m_w = 0;
 	prefetch();
 
 cmp_ipx
-	TMP2 = read_pc();
-	PC++;
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	if(page_changing(TMP, X)) {
-		read(set_l(TMP, TMP+X));
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_X)) {
+		read(set_l(m_TMP, m_TMP+m_X));
 	}
-	TMP2 = read(TMP+X);
-	do_cmp(A, TMP2);
+	m_TMP2 = read(m_TMP+m_X);
+	do_cmp(m_A, m_TMP2);
 	prefetch();
 
 eor_ipx
-	TMP2 = read_pc();
-	PC++;
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	if(page_changing(TMP, X)) {
-		read(set_l(TMP, TMP+X));
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_X)) {
+		read(set_l(m_TMP, m_TMP+m_X));
 	}
-	TMP2 = read(TMP+X);
-	A ^= TMP2;
-	set_nz(A);
+	m_TMP2 = read(m_TMP+m_X);
+	m_A ^= m_TMP2;
+	set_nz(m_A);
 	prefetch();
 
 exc_zpx
-	TMP = read_pc();
-	PC++;
-	read(TMP);
-	TMP = uint8_t(TMP+X);
-	TMP2 = read(TMP);
-	write(TMP, A);
-	A = TMP2;
+	m_TMP = read_pc();
+	m_PC++;
+	read(m_TMP);
+	m_TMP = uint8_t(m_TMP+m_X);
+	m_TMP2 = read(m_TMP);
+	write(m_TMP, m_A);
+	m_A = m_TMP2;
 	prefetch();
 
 ini_imp
@@ -187,83 +187,83 @@ ini_imp
 	prefetch();
 
 jpi_ind
-	m_i = PC;
-	TMP = read_arg(m_i);
-	TMP = set_h(TMP, read_arg(m_i+1));
+	m_i = m_PC;
+	m_TMP = read_arg(m_i);
+	m_TMP = set_h(m_TMP, read_arg(m_i+1));
 	m_i += 2;
-	PC = read(TMP);
-	PC = set_h(PC, read(TMP+1));
+	m_PC = read(m_TMP);
+	m_PC = set_h(m_PC, read(m_TMP+1));
 	prefetch();
 
 jsb_vec
 	read_pc();
-	write(SP, PC>>8);
+	write(m_SP, m_PC>>8);
 	dec_SP();
-	write(SP, PC);
+	write(m_SP, m_PC);
 	dec_SP();
-	TMP = 0xffe0 | ((inst_state >> 3) & 0x0e);
-	PC = read_arg(TMP);
-	PC = set_h(PC, read_arg(TMP+1));
+	m_TMP = 0xffe0 | ((m_inst_state >> 3) & 0x0e);
+	m_PC = read_arg(m_TMP);
+	m_PC = set_h(m_PC, read_arg(m_TMP+1));
 	prefetch();
 
 jmp_r_ind
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	PC = read(TMP);
-	PC = set_h(PC, read(TMP+1));
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_PC = read(m_TMP);
+	m_PC = set_h(m_PC, read(m_TMP+1));
 	prefetch();
 
 jsr_r_adr
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	write(SP, PC>>8);
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	write(m_SP, m_PC>>8);
 	dec_SP();
-	write(SP, PC);
+	write(m_SP, m_PC);
 	dec_SP();
-	PC = TMP;
+	m_PC = m_TMP;
 	prefetch();
 
 lab_acc
 	read_pc();
 	read_pc();
-	if(int8_t(A) < 0)
-		A = -A;
-	set_nz(A);
+	if(int8_t(m_A) < 0)
+		m_A = -m_A;
+	set_nz(m_A);
 	prefetch();
 
 lai_imp
 	read_pc();
-	A = read(m_i);
+	m_A = read(m_i);
 	prefetch();
 
 lan_imp
 	read_pc();
-	A = read(m_i);
+	m_A = read(m_i);
 	m_i++;
 	prefetch();
 
 lda_ipx
-	TMP2 = read_pc();
-	PC++;
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	if(page_changing(TMP, X)) {
-		read(set_l(TMP, TMP+X));
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_X)) {
+		read(set_l(m_TMP, m_TMP+m_X));
 	}
-	A = read(TMP+X);
-	set_nz(A);
+	m_A = read(m_TMP+m_X);
+	set_nz(m_A);
 	prefetch();
 
 lii_imp
 	read_pc();
-	TMP = read(m_i);
-	TMP = set_h(TMP, read(m_i+1));
-	read(TMP);
-	m_i = TMP;
+	m_TMP = read(m_i);
+	m_TMP = set_h(m_TMP, read(m_i+1));
+	read(m_TMP);
+	m_i = m_TMP;
 	prefetch();
 
 mpa_imp
@@ -272,8 +272,8 @@ mpa_imp
 	read_pc();
 	read_pc();
 	read_pc();
-	TMP = int8_t(A) * int8_t(Y);
-	m_w = do_accumulate(TMP, m_w);
+	m_TMP = int8_t(m_A) * int8_t(m_Y);
+	m_w = do_accumulate(m_TMP, m_w);
 	prefetch();
 
 mpy_imp
@@ -282,207 +282,207 @@ mpy_imp
 	read_pc();
 	read_pc();
 	read_pc();
-	TMP = int8_t(A) * int8_t(Y);
-	A = do_accumulate(TMP, 0)>>8;
+	m_TMP = int8_t(m_A) * int8_t(m_Y);
+	m_A = do_accumulate(m_TMP, 0)>>8;
 	prefetch();
 
 neg_acc
 	read_pc();
-	A = -A;
-	set_nz(A);
+	m_A = -m_A;
+	set_nz(m_A);
 	prefetch();
 
 nxt_imp
 	read_pc();
-	PC = read(m_i);
-	PC = set_h(PC, read(m_i+1));
+	m_PC = read(m_i);
+	m_PC = set_h(m_PC, read(m_i+1));
 	m_i += 2;
 	prefetch();
 
 ora_ipx
-	TMP2 = read_pc();
-	PC++;
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	if(page_changing(TMP, X)) {
-		read(set_l(TMP, TMP+X));
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_X)) {
+		read(set_l(m_TMP, m_TMP+m_X));
 	}
-	TMP2 = read(TMP+X);
-	A |= TMP2;
-	set_nz(A);
+	m_TMP2 = read(m_TMP+m_X);
+	m_A |= m_TMP2;
+	set_nz(m_A);
 	prefetch();
 
 phi_imp
 	read_pc();
-	write(SP, m_i>>8);
+	write(m_SP, m_i>>8);
 	dec_SP();
-	write(SP, m_i);
+	write(m_SP, m_i);
 	dec_SP();
 	prefetch();
 
 phw_imp
 	read_pc();
-	write(SP, m_w>>8);
+	write(m_SP, m_w>>8);
 	dec_SP();
-	write(SP, m_w);
+	write(m_SP, m_w);
 	dec_SP();
 	prefetch();
 
 pia_imp
 	read_pc();
-	read(SP);
+	read(m_SP);
 	inc_SP();
-	m_i = read(SP);
+	m_i = read(m_SP);
 	inc_SP();
-	m_i = set_h(m_i, read(SP));
-	A = read(m_i);
+	m_i = set_h(m_i, read(m_SP));
+	m_A = read(m_i);
 	m_i++;
 	prefetch();
 
 pli_imp
 	read_pc();
-	read(SP);
+	read(m_SP);
 	inc_SP();
-	m_i = read(SP);
+	m_i = read(m_SP);
 	inc_SP();
-	m_i = set_h(m_i, read(SP));
+	m_i = set_h(m_i, read(m_SP));
 	read(m_i);
 	prefetch();
 
 plw_imp
 	read_pc();
-	read(SP);
+	read(m_SP);
 	inc_SP();
-	m_w = read(SP);
+	m_w = read(m_SP);
 	inc_SP();
-	m_w = set_h(m_w, read(SP));
+	m_w = set_h(m_w, read(m_SP));
 	prefetch();
 
 psh_imp
 	read_pc();
-	write(SP, A);
+	write(m_SP, m_A);
 	dec_SP();
-	write(SP, X);
+	write(m_SP, m_X);
 	dec_SP();
-	write(SP, Y);
+	write(m_SP, m_Y);
 	dec_SP();
 	prefetch();
 
 pul_imp
 	read_pc();
-	read(SP);
+	read(m_SP);
 	inc_SP();
-	Y = read(SP);
+	m_Y = read(m_SP);
 	inc_SP();
-	X = read(SP);
+	m_X = read(m_SP);
 	inc_SP();
-	A = read(SP);
+	m_A = read(m_SP);
 	prefetch();
 
 rba_ima
-	A = read_pc(); // "Note that Accumulator contents are altered by RBA and SBA" (C29/C39 Technical Reference Manual, p. C-29)
-	PC++;
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	TMP2 = read(TMP);
-	read(TMP);
-	TMP2 &= ~A;
-	write(TMP, TMP2);
+	m_A = read_pc(); // "Note that Accumulator contents are altered by RBA and SBA" (C29/C39 Technical Reference Manual, p. C-29)
+	m_PC++;
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP);
+	m_TMP2 &= ~m_A;
+	write(m_TMP, m_TMP2);
 	prefetch();
 
 rnd_imp
 	read_pc();
-	TMP = set_l(m_w, Y);
-	A = do_accumulate(TMP, (m_w<<1) & 0x100)>>8;
+	m_TMP = set_l(m_w, m_Y);
+	m_A = do_accumulate(m_TMP, (m_w<<1) & 0x100)>>8;
 	prefetch();
 
 rts_r_imp
 	read_pc();
 	read_pc();
 	inc_SP();
-	PC = read(SP);
+	m_PC = read(m_SP);
 	inc_SP();
-	PC = set_h(PC, read(SP));
+	m_PC = set_h(m_PC, read(m_SP));
 	prefetch();
 
 sba_ima
-	A = read_pc();
-	PC++;
-	TMP = read_pc();
-	PC++;
-	TMP = set_h(TMP, read_pc());
-	PC++;
-	TMP2 = read(TMP);
-	read(TMP);
-	TMP2 |= A;
-	write(TMP, TMP2);
+	m_A = read_pc();
+	m_PC++;
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP = set_h(m_TMP, read_pc());
+	m_PC++;
+	m_TMP2 = read(m_TMP);
+	read(m_TMP);
+	m_TMP2 |= m_A;
+	write(m_TMP, m_TMP2);
 	prefetch();
 
 sbc_ipx
-	TMP2 = read_pc();
-	PC++;
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	if(page_changing(TMP, X)) {
-		read(set_l(TMP, TMP+X));
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	if(page_changing(m_TMP, m_X)) {
+		read(set_l(m_TMP, m_TMP+m_X));
 	}
-	TMP2 = read(TMP+X);
-	do_sbc(TMP2);
-	if(P & F_D) {
+	m_TMP2 = read(m_TMP+m_X);
+	do_sbc(m_TMP2);
+	if(m_P & F_D) {
 		read_pc();
-		set_nz(A);
+		set_nz(m_A);
 	}
 	prefetch();
 
 sta_ipx
-	TMP2 = read_pc();
-	PC++;
-	TMP = read(TMP2);
-	TMP = set_h(TMP, read((TMP2+1) & 0xff));
-	read(set_l(TMP, TMP+X));
-	write(TMP+X, A);
+	m_TMP2 = read_pc();
+	m_PC++;
+	m_TMP = read(m_TMP2);
+	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	read(set_l(m_TMP, m_TMP+m_X));
+	write(m_TMP+m_X, m_A);
 	prefetch();
 
 sti_imz
-	TMP = read_pc();
-	PC++;
-	TMP2 = read_pc();
-	PC++;
-	write(TMP2, TMP);
+	m_TMP = read_pc();
+	m_PC++;
+	m_TMP2 = read_pc();
+	m_PC++;
+	write(m_TMP2, m_TMP);
 	prefetch();
 
 taw_imp
 	read_pc();
-	m_w = A<<8;
+	m_w = m_A<<8;
 	set_nz(m_w>>8);
 	prefetch();
 
 tip_imp
 	read_pc();
-	PC = m_i;
+	m_PC = m_i;
 	prefetch();
 
 twa_imp
 	read_pc();
-	A = m_w>>8;
-	set_nz(A);
+	m_A = m_w>>8;
+	set_nz(m_A);
 	prefetch();
 
 #   exceptions
 reset_r
 	read_pc();
-	PC++;
+	m_PC++;
 	read_pc();
-	read(SP);
+	read(m_SP);
 	dec_SP();
-	read(SP);
+	read(m_SP);
 	dec_SP();
-	read(SP);
+	read(m_SP);
 	dec_SP();
-	P = (P | F_I) & ~F_D;
-	PC = read_arg(0xfffe);
-	PC = set_h(PC, read_arg(0xffff));
+	m_P = (m_P | F_I) & ~F_D;
+	m_PC = read_arg(0xfffe);
+	m_PC = set_h(m_PC, read_arg(0xffff));
 	prefetch();
-	inst_state = -1;
+	m_inst_state = -1;

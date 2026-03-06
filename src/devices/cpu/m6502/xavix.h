@@ -149,7 +149,7 @@ public:
 protected:
 	class mi_xavix : public memory_interface {
 	public:
-		xavix_device *base;
+		xavix_device *m_base;
 
 		mi_xavix(xavix_device *base);
 		virtual ~mi_xavix() {}
@@ -162,7 +162,7 @@ protected:
 
 	uint8_t m_databank;
 	uint8_t m_codebank;
-	uint32_t XPC;
+	uint32_t m_XPC;
 
 	xavix_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
