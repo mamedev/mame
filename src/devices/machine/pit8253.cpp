@@ -316,7 +316,8 @@ void pit_counter_device::flush_output()
 	int new_output = m_output;
 	if (m_clockin == 0)
 	{
-		// TODO: The same logic should apply when m_clockin != 0.
+		// TODO: The same logic should apply when m_clockin != 0, but that needs
+		// to be verified.
 		const int mode = CTRL_MODE(m_control);
 		if ((mode == 2 || mode == 3) && m_gate_input == 0)
 			new_output = 1;
@@ -1113,7 +1114,9 @@ void pit8253_device::write(offs_t offset, uint8_t data)
 bool pit_counter_device::edge_sensitive_gate() const
 {
 	const int mode = CTRL_MODE(m_control);
-	return mode == 1 || mode == 2 || mode == 3 || mode == 5;
+	// TODO: The m_clockin check should not be necessary, but removing it needs
+	// to be verified.
+	return mode == 1 || mode == 2 || (mode == 3 && m_clockin == 0) || mode == 5;
 }
 
 TIMER_CALLBACK_MEMBER(pit_counter_device::gate_w_deferred)
