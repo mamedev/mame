@@ -22,7 +22,8 @@
 /* TODO: MU needs 80-bit result */
 #define SET_FLAG_MU(r)              do { m_core->astat |= (((uint32_t((r) >> 32) == 0) && (uint32_t(r)) != 0) ? MU : 0); } while (false)
 
-#define SATURATE(r)                 do { r = (int32_t)r < 0 ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min(); } while (false)
+// saturate overflowed result
+inline void SATURATE(uint32_t &r)               { r = uint32_t((int32_t(r) < 0) ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min()); }
 
 constexpr bool IS_FLOAT_ZERO(uint32_t r)        { return (r & (FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK)) == 0; }
 constexpr bool IS_FLOAT_DENORMAL(uint32_t r)    { return ((r & FLOAT_EXPONENT_MASK) == 0) && ((r & FLOAT_MANTISSA_MASK) != 0); }
@@ -118,7 +119,7 @@ void adsp21062_device::compute_add(int rn, int rx, int ry)
 	SET_FLAG_AV_ADD(r, REG(rx), REG(ry));
 	SET_FLAG_AC_ADD(r, REG(rx), REG(ry));
 
-	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
 		SATURATE(r);
 
 	SET_FLAG_AN(r);
@@ -138,7 +139,7 @@ void adsp21062_device::compute_sub(int rn, int rx, int ry)
 	SET_FLAG_AV_SUB(r, REG(rx), REG(ry));
 	SET_FLAG_AC_SUB(r, REG(rx), REG(ry));
 
-	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
 		SATURATE(r);
 
 	SET_FLAG_AN(r);
@@ -161,7 +162,7 @@ void adsp21062_device::compute_add_ci(int rn, int rx, int ry)
 	if (c == 1 && REG(ry) == 0xffffffff)
 		m_core->astat |= AC;
 
-	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
 		SATURATE(r);
 
 	SET_FLAG_AN(r);
@@ -184,7 +185,7 @@ void adsp21062_device::compute_sub_ci(int rn, int rx, int ry)
 	if (c == 0 && REG(ry) == 0xffffffff)
 		m_core->astat |= AC;
 
-	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
+	if ((m_core->mode1 & MODE1_ALUSAT) && (m_core->astat & AV))
 		SATURATE(r);
 
 	SET_FLAG_AN(r);
@@ -334,7 +335,8 @@ void adsp21062_device::compute_max(int rn, int rx, int ry)
 /* Rn = CLIP Rx BY Ry */
 void adsp21062_device::compute_clip(int rn, int rx, int ry)
 {
-	uint32_t r = std::clamp((int32_t)REG(rx), -std::abs((int32_t)REG(ry)), std::abs((int32_t)REG(ry)));
+	const int32_t absry = sd::abs(int32_t(REG(ry)));
+	const uint32_t r = std::clamp(int32_t(REG(rx)), -absry, absry);
 
 	CLEAR_ALU_FLAGS();
 	SET_FLAG_AN(r);
@@ -784,7 +786,9 @@ void adsp21062_device::compute_fcopysign(int rn, int rx, int ry)
 void adsp21062_device::compute_fclip(int rn, int rx, int ry)
 {
 	SHARC_REG r_alu;
-	r_alu.f = std::clamp(FREG(rx), -fabsf(FREG(ry)), fabsf(FREG(ry)));
+
+	const float absry = fabsf(FREG(ry));
+	r_alu.f = std::clamp(FREG(rx), -absry, absry);
 
 	CLEAR_ALU_FLAGS();
 	SET_FLAG_AN(r_alu.r);
