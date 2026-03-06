@@ -56,7 +56,7 @@ void cr1510_device::device_reset()
 
 void cr1510_device::map(address_map &map)
 {
-	map(0x00, 0x07).rw(m_hdd, FUNC(wd1000_device::read), FUNC(wd1000_device::write));
+	map(0x00, 0x07).mirror(0xff00).rw(m_hdd, FUNC(wd1000_device::read), FUNC(wd1000_device::write));
 }
 
 } // namespace bus::epson_qx

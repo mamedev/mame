@@ -129,7 +129,7 @@ void cqgmem_device::write(offs_t offset, uint8_t data)
 
 void cqgmem_device::io_map(address_map &map)
 {
-	map(0x00, 0x06).w(FUNC(cqgmem_device::write));
+	map(0x00, 0x06).mirror(0xff00).w(FUNC(cqgmem_device::write));
 }
 
 } // namespace bus::epson_qx
