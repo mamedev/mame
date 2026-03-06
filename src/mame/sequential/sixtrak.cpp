@@ -187,7 +187,6 @@ private:
 
 	void tuning_counter_gate_w(int state);
 	void tuning_counter_out_changed(int state);
-	void tuning_ff_comp_out_changed(int state);
 	void update_tuning_timer();
 	TIMER_CALLBACK_MEMBER(tuning_timer_tick);
 
@@ -227,8 +226,6 @@ private:
 	output_finder<2> m_digits;
 
 	emu_timer *m_tuning_timer = nullptr;
-	bool m_tuning_counter_clock_started = false;
-	u8 m_tuning_counter_gate = 0;
 	u8 m_tuning_counter_out = 0;
 
 	u8 m_key_row = 0;
@@ -507,13 +504,9 @@ void sixtrak_state::update_master_volume()
 
 void sixtrak_state::tuning_counter_gate_w(int state)
 {
-	m_tuning_counter_gate = state;
-	if (!m_tuning_counter_gate)
-		m_tuning_counter_clock_started = false;
+	m_pit->write_gate0(state);
 
-	m_pit->write_gate0(m_tuning_counter_gate);
-
-	if (m_tuning_counter_gate)
+	if (state)
 	{
 		LOGMASKED(LOG_AUTOTUNE, "Autotune routine started.\n");
 		update_tuning_timer();
@@ -530,29 +523,6 @@ void sixtrak_state::tuning_counter_out_changed(int state)
 		m_tuning_timer->reset();
 		LOGMASKED(LOG_AUTOTUNE, "Autotune routine ended.\n");
 	}
-}
-
-void sixtrak_state::tuning_ff_comp_out_changed(int state)
-{
-	// The autotune implementation on the Six-Trak depends on behavior of the
-	// 8253 that does not seem to be accurately emulated in pit8253.cpp.
-	// Specifically, the Six-Trak expects that:
-	// - The counter is incremented on the negative-going edge of the clock.
-	// - In mode 1, counting will start after the first *full* clock cycle
-	//   (positive-going edge followed by negative-going) after the gate is
-	//   enabled.
-
-	// This implementation works around those issues as follows:
-	// - The signal to the CLK0 PIT input is inverted.
-	// - Using `m_tuning_counter_clock_started` to detect the first positive-
-	//   going clock edge after the gate is enabled, and only clocking the PIT
-	//   after this has occurred.
-
-	if (m_tuning_counter_gate && state)
-		m_tuning_counter_clock_started = true;
-
-	if (m_tuning_counter_clock_started)
-		m_pit->write_clk0(!state);
 }
 
 void sixtrak_state::update_tuning_timer()
@@ -771,8 +741,6 @@ void sixtrak_state::io_map(address_map &map)
 
 void sixtrak_state::machine_start()
 {
-	save_item(NAME(m_tuning_counter_clock_started));
-	save_item(NAME(m_tuning_counter_gate));
 	save_item(NAME(m_tuning_counter_out));
 	save_item(NAME(m_key_row));
 	save_item(NAME(m_dac_value));
@@ -826,7 +794,7 @@ void sixtrak_state::sixtrak_common(machine_config &config, device_sound_interfac
 	TTL7474(config, "nmiff", 0).output_cb().set_inputline(m_maincpu, INPUT_LINE_NMI).invert();  // U146B
 
 	TTL7474(config, m_tuning_ff, 0);
-	m_tuning_ff->comp_output_cb().set(FUNC(sixtrak_state::tuning_ff_comp_out_changed));
+	m_tuning_ff->comp_output_cb().set(m_pit, FUNC(pit8253_device::write_clk0));
 
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set("midiacia", FUNC(acia6850_device::write_rxd));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");

@@ -57,6 +57,7 @@ private:
 	void decrease_counter_value(int64_t cycles);
 	void load_counter_value();
 	void set_output(int output);
+	void flush_output();
 	void simulate(int64_t elapsed_cycles);
 	TIMER_CALLBACK_MEMBER(update_tick);
 	void update();
@@ -64,13 +65,15 @@ private:
 	uint8_t read();
 	void load_count(uint16_t newcount);
 	void readback(int command);
+	bool edge_sensitive_gate() const;
 	void control_w(uint8_t data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(pit_counter_device::control_w_deferred), this), data); }
 	TIMER_CALLBACK_MEMBER(control_w_deferred);
 	void count_w(uint8_t data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(pit_counter_device::count_w_deferred), this), data); }
 	TIMER_CALLBACK_MEMBER(count_w_deferred);
 	void gate_w(int state) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(pit_counter_device::gate_w_deferred), this), state); }
 	TIMER_CALLBACK_MEMBER(gate_w_deferred);
-	void set_clock_signal(int state);
+	void set_clock_signal(int state) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(pit_counter_device::set_clock_signal_deferred), this), state); }
+	TIMER_CALLBACK_MEMBER(set_clock_signal_deferred);
 	void set_clockin(double new_clockin);
 
 	// internal state
@@ -92,9 +95,12 @@ private:
 	uint8_t m_lowcount;         // LSB of new counter value for 16-bit writes
 	bool m_rmsb;                // true = Next read is MSB of 16-bit value
 	bool m_wmsb;                // true = Next write is MSB of 16-bit value
-	int m_output;               // 0 = low, 1 = high
+	int m_output;               // output value based on counter state (0 = low, 1 = high)
+	int m_output_pin;           // state of the output pin (0 = low, 1 = high)
 
-	int m_gate;                 // gate input (0 = low, 1 = high)
+	int m_gate;                 // sampled gate (0 = low, 1 = high)
+	int m_gate_input;           // state of the gate input pin (0 = low, 1 = high)
+	int m_gate_rose;            // gate input had a low-to-high transition (0 = no, 1 = yes)
 	int m_latched_count;        // number of bytes of count latched
 	int m_latched_status;       // 1 = status latched (8254 only)
 	int m_null_count;           // 1 = mode control or count written, 0 = count loaded
