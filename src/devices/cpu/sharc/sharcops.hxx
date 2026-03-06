@@ -60,6 +60,8 @@
 		}                                                   \
 	}
 
+#define SHARC_COND_LT  (m_core->astat & AF ? m_core->astat & AN && !(m_core->astat & AZ) : ((m_core->astat & AN) != 0) != (m_core->astat & AV && !(m_core->mode1 & MODE1_ALUSAT)))
+#define SHARC_COND_LE  (m_core->astat & AZ || (m_core->astat & AF ? m_core->astat & AN : ((m_core->astat & AN) != 0) != (m_core->astat & AV && !(m_core->mode1 & MODE1_ALUSAT))))
 
 /*****************************************************************************/
 
@@ -1213,12 +1215,11 @@ inline void adsp21062_device::POP_STATUS_STACK()
 
 inline int adsp21062_device::IF_CONDITION_CODE(int cond)
 {
-	// TODO: implement AF flag and correct conditions that depend on it (LT, LE, GE, GT)
 	switch (cond)
 	{
 		case 0x00:  return m_core->astat & AZ;        /* EQ */
-		case 0x01:  return !(m_core->astat & AZ) && (m_core->astat & AN);   /* LT */
-		case 0x02:  return (m_core->astat & AZ) || (m_core->astat & AN);    /* LE */
+		case 0x01:  return SHARC_COND_LT;             /* LT */
+		case 0x02:  return SHARC_COND_LE;             /* LE */
 		case 0x03:  return (m_core->astat & AC);      /* AC */
 		case 0x04:  return (m_core->astat & AV);      /* AV */
 		case 0x05:  return (m_core->astat & MV);      /* MV */
@@ -1233,8 +1234,8 @@ inline int adsp21062_device::IF_CONDITION_CODE(int cond)
 		case 0x0e:  return 0;                         /* BM */
 		case 0x0f:  return (m_core->curlcntr != 1);   /* NOT LCE */
 		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
-		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
-		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
+		case 0x11:  return !SHARC_COND_LT;            /* GE */
+		case 0x12:  return !SHARC_COND_LE;            /* GT */
 		case 0x13:  return !(m_core->astat & AC);     /* NOT AC */
 		case 0x14:  return !(m_core->astat & AV);     /* NOT AV */
 		case 0x15:  return !(m_core->astat & MV);     /* NOT MV */
@@ -1254,12 +1255,11 @@ inline int adsp21062_device::IF_CONDITION_CODE(int cond)
 
 inline int adsp21062_device::DO_CONDITION_CODE(int cond)
 {
-	// TODO: implement AF flag and correct conditions that depend on it (LT, LE, GE, GT)
 	switch (cond)
 	{
 		case 0x00:  return m_core->astat & AZ;        /* EQ */
-		case 0x01:  return !(m_core->astat & AZ) && (m_core->astat & AN);   /* LT */
-		case 0x02:  return (m_core->astat & AZ) || (m_core->astat & AN);    /* LE */
+		case 0x01:  return SHARC_COND_LT;             /* LT */
+		case 0x02:  return SHARC_COND_LE;             /* LE */
 		case 0x03:  return (m_core->astat & AC);      /* AC */
 		case 0x04:  return (m_core->astat & AV);      /* AV */
 		case 0x05:  return (m_core->astat & MV);      /* MV */
@@ -1274,8 +1274,8 @@ inline int adsp21062_device::DO_CONDITION_CODE(int cond)
 		case 0x0e:  return 0;                         /* BM */
 		case 0x0f:  return (m_core->curlcntr == 1);   /* LCE */
 		case 0x10:  return !(m_core->astat & AZ);     /* NOT EQUAL */
-		case 0x11:  return (m_core->astat & AZ) || !(m_core->astat & AN);   /* GE */
-		case 0x12:  return !(m_core->astat & AZ) && !(m_core->astat & AN);  /* GT */
+		case 0x11:  return !SHARC_COND_LT;            /* GE */
+		case 0x12:  return !SHARC_COND_LE;            /* GT */
 		case 0x13:  return !(m_core->astat & AC);     /* NOT AC */
 		case 0x14:  return !(m_core->astat & AV);     /* NOT AV */
 		case 0x15:  return !(m_core->astat & MV);     /* NOT MV */

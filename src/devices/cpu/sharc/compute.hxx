@@ -22,6 +22,8 @@
 /* TODO: MU needs 80-bit result */
 #define SET_FLAG_MU(r)              do { m_core->astat |= (((uint32_t((r) >> 32) == 0) && (uint32_t(r)) != 0) ? MU : 0); } while (false)
 
+#define SATURATE(r)                 do { r = (int32_t)r < 0 ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min(); } while (false)
+
 constexpr bool IS_FLOAT_ZERO(uint32_t r)        { return (r & (FLOAT_EXPONENT_MASK | FLOAT_MANTISSA_MASK)) == 0; }
 constexpr bool IS_FLOAT_DENORMAL(uint32_t r)    { return ((r & FLOAT_EXPONENT_MASK) == 0) && ((r & FLOAT_MANTISSA_MASK) != 0); }
 constexpr bool IS_FLOAT_NAN(uint32_t r)         { return ((r & FLOAT_EXPONENT_MASK) == FLOAT_EXPONENT_MASK) && ((r & FLOAT_MANTISSA_MASK) != 0); }
@@ -113,13 +115,14 @@ void adsp21062_device::compute_add(int rn, int rx, int ry)
 	uint32_t r = REG(rx) + REG(ry);
 
 	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
 	SET_FLAG_AV_ADD(r, REG(rx), REG(ry));
 	SET_FLAG_AC_ADD(r, REG(rx), REG(ry));
 
 	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
-		r = (int32_t)r < 0 ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min();
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
 
 	REG(rn) = r;
 
@@ -132,13 +135,14 @@ void adsp21062_device::compute_sub(int rn, int rx, int ry)
 	uint32_t r = REG(rx) - REG(ry);
 
 	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
 	SET_FLAG_AV_SUB(r, REG(rx), REG(ry));
 	SET_FLAG_AC_SUB(r, REG(rx), REG(ry));
 
 	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
-		r = (int32_t)r < 0 ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min();
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
 
 	REG(rn) = r;
 
@@ -152,15 +156,16 @@ void adsp21062_device::compute_add_ci(int rn, int rx, int ry)
 	uint32_t r = REG(rx) + REG(ry) + c;
 
 	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
 	SET_FLAG_AV_ADD(r, REG(rx), REG(ry));
 	SET_FLAG_AC_ADD(r, REG(rx), REG(ry));
 	if (c == 1 && REG(ry) == 0xffffffff)
 		m_core->astat |= AC;
 
 	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
-		r = (int32_t)r < 0 ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min();
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
 
 	REG(rn) = r;
 
@@ -174,15 +179,16 @@ void adsp21062_device::compute_sub_ci(int rn, int rx, int ry)
 	uint32_t r = REG(rx) - REG(ry) + c - 1;
 
 	CLEAR_ALU_FLAGS();
-	SET_FLAG_AN(r);
-	SET_FLAG_AZ(r);
 	SET_FLAG_AV_SUB(r, REG(rx), REG(ry));
 	SET_FLAG_AC_SUB(r, REG(rx), REG(ry));
 	if (c == 0 && REG(ry) == 0xffffffff)
 		m_core->astat |= AC;
 
 	if (m_core->mode1 & MODE1_ALUSAT && m_core->astat & AV)
-		r = (int32_t)r < 0 ? std::numeric_limits<int32_t>::max() : std::numeric_limits<int32_t>::min();
+		SATURATE(r);
+
+	SET_FLAG_AN(r);
+	SET_FLAG_AZ(r);
 
 	REG(rn) = r;
 
@@ -425,7 +431,7 @@ void adsp21062_device::compute_fix(int rn, int rx)
 	r_alu.f = FREG(rx);
 	if (m_core->mode1 & MODE1_TRUNCATE)
 	{
-		alu_i = int32_t(truncf(r_alu.f));
+		alu_i = int32_t(floorf(r_alu.f));
 	}
 	else
 	{
@@ -455,7 +461,7 @@ void adsp21062_device::compute_fix_scaled(int rn, int rx, int ry)
 	r_alu.r = SCALB(m_core->r[rx], ry);
 	if (m_core->mode1 & MODE1_TRUNCATE)
 	{
-		alu_i = int32_t(truncf(r_alu.f));
+		alu_i = int32_t(floorf(r_alu.f));
 	}
 	else
 	{
