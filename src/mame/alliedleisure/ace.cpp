@@ -338,7 +338,7 @@ GFXDECODE_END
 
 void ace_state::ace(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	I8080(config, m_maincpu, 18_MHz_XTAL / 9); // 2 MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ace_state::main_map);
 

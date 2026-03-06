@@ -52,9 +52,6 @@ void stvdev_state::stvdev_io(address_map &map)
 {
 }
 
-static INPUT_PORTS_START(stvdev)
-INPUT_PORTS_END
-
 void stvdev_state::stvdev(machine_config &config)
 {
 	// TODO: two other clocks, one at 36 MHz near CAK chip and another at 14.318 MHz near 486 socket
@@ -76,4 +73,4 @@ ROM_END
 
 
 // NOTE: stvbios mentions HP and SUN archs being supported, "PC" suffix comes from there
-COMP(1998, stvdev, 0, 0, stvdev, stvdev, stvdev_state, empty_init, "Sega / ALi", "ST-V 486 dev box PC", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP(1998, stvdev, 0, 0, stvdev, 0, stvdev_state, empty_init, "Sega / ALi", "ST-V 486 dev box PC", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

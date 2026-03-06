@@ -19,7 +19,7 @@ public:
 	static constexpr feature_type imperfect_features() { return feature::SOUND | feature::GRAPHICS; }
 
 	// construction/destruction
-	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	huc6272_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	auto irq_changed_callback() { return m_irq_changed_cb.bind(); }
 	template <typename T> void set_rainbow_tag(T &&tag) { m_huc6271.set_tag(std::forward<T>(tag)); }
@@ -27,11 +27,11 @@ public:
 	void amap(address_map &map) ATTR_COLD;
 
 	// ADPCM operations
-	uint8_t adpcm_update_0();
-	uint8_t adpcm_update_1();
+	u8 adpcm_update_0();
+	u8 adpcm_update_1();
 
 	// CD-DA operations
-	void cdda_update(offs_t offset, uint8_t data);
+	void cdda_update(offs_t offset, u8 data);
 
 	static void cdrom_config(device_t *device);
 
@@ -45,58 +45,57 @@ private:
 	required_device<huc6271_device> m_huc6271;
 	required_device<speaker_device> m_cdda;
 
-	uint8_t m_register;
-	uint32_t m_kram_addr_r, m_kram_addr_w;
-	uint16_t m_kram_inc_r, m_kram_inc_w;
-	uint8_t m_kram_page_r, m_kram_page_w;
-	u32 m_kram_load_reg = 0, m_kram_write_reg = 0;
-	uint32_t m_page_setting;
+	u8 m_register;
+	u32 m_kram_addr_r, m_kram_addr_w;
+	u16 m_kram_inc_r, m_kram_inc_w;
+	u8 m_kram_page_r, m_kram_page_w;
+	u32 m_kram_load_reg, m_kram_write_reg;
+	u32 m_page_setting;
 
 	struct{
-		uint32_t bat_address;
-		uint32_t cg_address;
-		uint8_t mode;
-		uint16_t height;
-		uint16_t width;
-		uint16_t xscroll;
-		uint16_t yscroll;
-		uint8_t priority;
+		u32 bat_address = 0;
+		u32 cg_address = 0;
+		u8 mode = 0;
+		u16 height = 0;
+		u16 width = 0;
+		u16 xscroll = 0;
+		u16 yscroll = 0;
+		u8 priority = 0;
 	}m_bg[4];
 
 	struct{
-		uint32_t bat_address;
-		uint32_t cg_address;
-		uint16_t height;
-		uint16_t width;
+		u32 bat_address = 0;
+		u32 cg_address = 0;
+		u16 height = 0;
+		u16 width = 0;
 	}m_bg0sub;
 
 	struct{
-		uint8_t index;
-		uint8_t ctrl;
+		u8 index = 0;
+		u8 ctrl = 0;
 	}m_micro_prg;
 
 	struct{
-		uint8_t rate;
-		uint32_t status;
-		int interrupt;
-		uint8_t playing[2];
-		uint8_t control[2];
-		uint32_t start[2];
-		uint32_t end[2];
-		uint32_t imm[2];
-		uint32_t input[2];
-		int nibble[2];
-		uint32_t pos[2];
-		uint32_t addr[2];
+		u8 rate = 0;
+		u32 status = 0;
+		s32 interrupt = 0;
+		u8 playing[2]{};
+		u8 control[2]{};
+		u32 start[2]{};
+		u32 end[2]{};
+		u32 imm[2]{};
+		u32 input[2]{};
+		s32 nibble[2]{};
+		u32 pos[2]{};
+		u32 addr[2]{};
 	}m_adpcm;
 
-	const address_space_config      m_program_space_config;
-	const address_space_config      m_data_space_config;
-	const address_space_config      m_io_space_config;
-	required_shared_ptr<uint16_t>   m_microprg_ram;
-	required_shared_ptr<uint16_t>   m_kram_page0;
-	required_shared_ptr<uint16_t>   m_kram_page1;
-	required_device<scsi_port_device> m_scsibus;
+	const address_space_config           m_program_space_config;
+	const address_space_config           m_data_space_config;
+	const address_space_config           m_io_space_config;
+	required_shared_ptr<u16>             m_microprg_ram;
+	required_shared_ptr_array<u16, 2>    m_kram_page;
+	required_device<scsi_port_device>    m_scsibus;
 	required_device<input_buffer_device> m_scsi_data_in;
 	required_device<output_latch_device> m_scsi_data_out;
 	required_device<input_buffer_device> m_scsi_ctrl_in;
@@ -105,16 +104,16 @@ private:
 	/* Callback for when the irq line may have changed (mandatory) */
 	devcb_write_line    m_irq_changed_cb;
 
-	void write_microprg_data(offs_t address, uint16_t data);
+	void write_microprg_data(offs_t address, u16 data);
 
-	uint8_t adpcm_update(int chan);
+	u8 adpcm_update(int chan);
 	void interrupt_update();
 
 	void io_map(address_map &map) ATTR_COLD;
 	void kram_map(address_map &map) ATTR_COLD;
 	void microprg_map(address_map &map) ATTR_COLD;
 
-//  void write(offs_t offset, uint32_t data);
+//  void write(offs_t offset, u32 data);
 	// host interface
 	u16 status_r(offs_t offset);
 	void register_select_w(offs_t offset, u16 data, u16 mem_mask = ~0);

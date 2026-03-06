@@ -196,17 +196,24 @@ EPR-12028 - 27C256 EPROM
 
 
 #include "emu.h"
-#include "segaybd.h"
+
+#include "315_5296.h"
+#include "sega16sp.h"
+#include "segaic16.h"
+#include "segaic16_m.h"
 #include "segaipt.h"
 
+#include "cpu/m68000/m68000musashi.h"
+#include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "machine/mb3773.h"
 #include "machine/mb8421.h"
 #include "machine/msm6253.h"
 #include "machine/nvram.h"
-#include "segaic16_m.h"
-#include "315_5296.h"
 #include "sound/segapcm.h"
 #include "sound/ymopm.h"
+
+#include "screen.h"
 #include "speaker.h"
 
 #include "pdrift.lh"
@@ -222,7 +229,158 @@ const uint32_t SOUND_CLOCK = 32215900;
 // use this to fiddle with the IRQ2 timing
 #define TWEAK_IRQ2_SCANLINE     (0)
 
+namespace {
 
+// ======================> segaybd_state
+
+class segaybd_state : public sega_16bit_common_base
+{
+public:
+	// construction/destruction
+	segaybd_state(const machine_config &mconfig, device_type type, const char *tag)
+		: sega_16bit_common_base(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_subx(*this, "subx")
+		, m_suby(*this, "suby")
+		, m_soundcpu(*this, "soundcpu")
+		, m_linkcpu(*this, "linkcpu")
+		, m_watchdog(*this, "watchdog")
+		, m_screen(*this, "screen")
+		, m_bsprites(*this, "bsprites")
+		, m_ysprites(*this, "ysprites")
+		, m_segaic16vid(*this, "segaic16vid")
+		, m_adc_ports(*this, "ADC.%u", 0)
+		, m_start_lamp(*this, "start_lamp")
+		, m_right_motor_position(*this, "right_motor_position")
+		, m_right_motor_position_nor(*this, "right_motor_position_nor")
+		, m_right_motor_speed(*this, "right_motor_speed")
+		, m_left_motor_position(*this, "left_motor_position")
+		, m_left_motor_position_nor(*this, "left_motor_position_nor")
+		, m_left_motor_speed(*this, "left_motor_speed")
+		, m_danger_lamp(*this, "danger_lamp")
+		, m_crash_lamp(*this, "crash_lamp")
+		, m_emergency_stop_lamp(*this, "emergency_stop_lamp")
+		, m_bank_data_raw(*this, "bank_data_raw")
+		, m_vibration_motor(*this, "vibration_motor")
+		, m_bank_motor_position(*this, "bank_motor_position")
+		, m_upright_wheel_motor(*this, "upright_wheel_motor")
+		, m_left_start_lamp(*this, "left_start_lamp")
+		, m_right_start_lamp(*this, "right_start_lamp")
+		, m_gun_recoil(*this, "P%u_Gun_Recoil", 1U)
+	{
+	}
+
+	void yboard_deluxe(machine_config &config) ATTR_COLD;
+	void yboard_link(machine_config &config) ATTR_COLD;
+	void yboard(machine_config &config) ATTR_COLD;
+
+	// game-specific driver init
+	void init_generic() ATTR_COLD;
+	void init_pdrift() ATTR_COLD;
+	void init_r360() ATTR_COLD;
+	void init_gforce2() ATTR_COLD;
+	void init_rchase() ATTR_COLD;
+	void init_gloc() ATTR_COLD;
+
+protected:
+	// device overrides
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
+private:
+	// internal types
+	using output_delegate = delegate<void (uint16_t)>;
+
+	// main CPU read/write handlers
+	void output1_w(uint8_t data);
+	void misc_output_w(uint8_t data);
+	void output2_w(uint8_t data);
+
+	// linked cabinet specific handlers
+	void mb8421_intl(int state);
+	void mb8421_intr(int state);
+	uint16_t link_r();
+	uint16_t link2_r();
+	void link2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	//uint8_t link_portc0_r();
+
+	// input helpers
+	ioport_value analog_mux();
+
+	// game-specific output handlers
+	void gforce2_output_cb1(uint16_t data);
+	void gforce2_output_cb2(uint16_t data);
+	void gloc_output_cb1(uint16_t data);
+	void gloc_output_cb2(uint16_t data);
+	void r360_output_cb2(uint16_t data);
+	void pdrift_output_cb1(uint16_t data);
+	void pdrift_output_cb2(uint16_t data);
+	void rchase_output_cb2(uint16_t data);
+
+	// video updates
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void link_map(address_map &map) ATTR_COLD;
+	void link_portmap(address_map &map) ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_map_link(address_map &map) ATTR_COLD;
+	void motor_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+	void sound_portmap(address_map &map) ATTR_COLD;
+	void subx_map(address_map &map) ATTR_COLD;
+	void suby_map(address_map &map) ATTR_COLD;
+
+	// internal helpers
+	TIMER_CALLBACK_MEMBER(irq2_gen_tick);
+	void update_irqs();
+
+	// devices
+	required_device<m68000msh_device> m_maincpu;
+	required_device<m68000msh_device> m_subx;
+	required_device<m68000msh_device> m_suby;
+	required_device<z80_device> m_soundcpu;
+	optional_device<z80_device> m_linkcpu;
+	required_device<mb3773_device> m_watchdog;
+	required_device<screen_device> m_screen;
+	required_device<sega_sys16b_sprite_device> m_bsprites;
+	required_device<sega_yboard_sprite_device> m_ysprites;
+	required_device<segaic16_video_device> m_segaic16vid;
+
+	// input ports
+	optional_ioport_array<6> m_adc_ports;
+
+	// outputs
+	output_finder<> m_start_lamp;
+	output_finder<> m_right_motor_position;
+	output_finder<> m_right_motor_position_nor;
+	output_finder<> m_right_motor_speed;
+	output_finder<> m_left_motor_position;
+	output_finder<> m_left_motor_position_nor;
+	output_finder<> m_left_motor_speed;
+	output_finder<> m_danger_lamp;
+	output_finder<> m_crash_lamp;
+	output_finder<> m_emergency_stop_lamp;
+	output_finder<> m_bank_data_raw;
+	output_finder<> m_vibration_motor;
+	output_finder<> m_bank_motor_position;
+	output_finder<> m_upright_wheel_motor;
+	output_finder<> m_left_start_lamp;
+	output_finder<> m_right_start_lamp;
+	output_finder<2> m_gun_recoil;
+
+	// configuration
+	output_delegate m_output_cb1;
+	output_delegate m_output_cb2;
+
+	// internal state
+	uint16_t m_pdrift_bank = 0;
+	emu_timer *m_scanline_timer = nullptr;
+	int m_irq2_scanline = 0;
+	uint8_t m_timer_irq_state = 0;
+	uint8_t m_vblank_irq_state = 0;
+	uint8_t m_misc_io_data = 0;
+};
 
 //**************************************************************************
 //  MAIN CPU READ/WRITE HANDLERS
@@ -314,6 +472,91 @@ void segaybd_state::device_resolve_objects()
 	m_left_start_lamp.resolve();
 	m_right_start_lamp.resolve();
 	m_gun_recoil.resolve();
+}
+
+//**************************************************************************
+//  VIDEO STARTUP
+//**************************************************************************
+
+void segaybd_state::video_start()
+{
+	// initialize the rotation layer
+	m_segaic16vid->rotate_init(0, segaic16_video_device::ROTATE_YBOARD, 0x000);
+	m_ysprites->set_rotate_ptr(m_segaic16vid->m_rotate);
+}
+
+//**************************************************************************
+//  VIDEO UPDATE
+//**************************************************************************
+
+uint32_t segaybd_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// if no drawing is happening, fill with black and get out
+	if (!m_segaic16vid->m_display_enable)
+	{
+		bitmap.fill(m_palette->black_pen(), cliprect);
+		return 0;
+	}
+
+	// start the sprites drawing
+	rectangle yboard_clip(0, 511, 0, 511);
+	m_ysprites->bitmap().fill(0xffff);
+	m_ysprites->draw_async(yboard_clip);
+
+	m_bsprites->draw_async(cliprect);
+
+	// apply rotation
+	m_segaic16vid->rotate_draw(0, bitmap, cliprect, screen.priority(), m_ysprites->bitmap());
+
+	// mix in 16B sprites
+	bitmap_ind16 &sprites = m_bsprites->bitmap();
+	m_bsprites->iterate_dirty_rects(
+			cliprect,
+			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
+			{
+				for (int y = rect.min_y; y <= rect.max_y; y++)
+				{
+					uint16_t *const dest = &bitmap.pix(y);
+					uint16_t const *const src = &sprites.pix(y);
+					uint8_t const *const pri = &screen.priority().pix(y);
+
+					for (int x = rect.min_x; x <= rect.max_x; x++)
+					{
+						// only process written pixels
+						uint16_t const pix = src[x];
+						if (pix != 0xffff)
+						{
+							// the 16b priority bits are stored like this
+							// int colpri  = ((data[4] & 0xff) << 4) | (((data[1] >> 9) & 0xf) << 12);
+							// so  PPPPppppppppcccc (P = priority p = palette c = colour data)
+							// for Y board the (((data[1] >> 9) & 0xf) << 12) bit is the part we care about
+
+							// the format of the screen.priority() buffer (populated in rotate_draw) is
+
+							//   ccc-----  Sprite color
+							//   ---rrrr-  Sprite priority
+							//   -------1   'was Indirected color data' before rotate_draw, forced to 1 when filling pri buffer
+
+							// compare sprite priority against tilemap priority
+							int const priority = (pix >> 11) & 0x1e;
+
+							if (priority < (pri[x] & 0x1f))
+							{
+								// if the color is set to maximum, shadow pixels underneath us
+								if ((pix & 0xf) == 0xe)
+									dest[x] += m_palette_entries;
+
+								// otherwise, just add in sprite palette base
+								else
+									dest[x] = 0x800 | (pix & 0x7ff);
+							}
+						}
+					}
+				}
+			});
+
+
+	return 0;
 }
 
 //-------------------------------------------------
@@ -3176,7 +3419,7 @@ void segaybd_state::init_rchase()
 	m_output_cb2 = output_delegate(&segaybd_state::rchase_output_cb2, this);
 }
 
-
+} // anonymous namespace
 
 //**************************************************************************
 //  GAME DRIVERS

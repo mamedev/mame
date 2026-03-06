@@ -138,7 +138,7 @@ public:
 		, m_rom(*this, "r3030")
 		, m_rambo(*this, "rambo")
 		, m_scsibus(*this, "scsi")
-		, m_scsi(*this, "scsi:7:ncr53c94")
+		, m_scsi(*this, "ncr53c94")
 		, m_net(*this, "net")
 		, m_scc(*this, "scc")
 		, m_tty(*this, "tty%u", 0U)
@@ -351,8 +351,8 @@ void mips_r3030_state::r3030(machine_config &config)
 	m_rambo->parity_out().set_inputline(m_cpu, INPUT_LINE_IRQ5);
 	//m_rambo->buzzer_out().set(m_buzzer, FUNC(speaker_sound_device::level_w));
 	m_rambo->set_ram(m_ram);
-	m_rambo->dma_r<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_swap_r));
-	m_rambo->dma_w<0>().set("scsi:7:ncr53c94", FUNC(ncr53c94_device::dma16_swap_w));
+	m_rambo->dma_r<0>().set(m_scsi, FUNC(ncr53c94_device::dma16_swap_r));
+	m_rambo->dma_w<0>().set(m_scsi, FUNC(ncr53c94_device::dma16_swap_w));
 
 	// scsi bus and devices
 	NSCSI_BUS(config, m_scsibus);
@@ -365,15 +365,11 @@ void mips_r3030_state::r3030(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", mips_scsi_devices, nullptr);
 
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c94", NCR53C94).clock(24_MHz_XTAL).machine_config(
-		[this](device_t *device)
-		{
-			ncr53c94_device &adapter = downcast<ncr53c94_device &>(*device);
-
-			adapter.set_busmd(ncr53c94_device::busmd_t::BUSMD_1);
-			adapter.irq_handler_cb().set(*this, FUNC(mips_r3030_state::irq_w<INT_SCSI>)).invert();
-			adapter.drq_handler_cb().set(m_rambo, FUNC(mips_rambo_device::drq_w<0>));
-		});
+	NCR53C94(config, m_scsi, 24_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->set_busmd(ncr53c94_device::busmd_t::BUSMD_1);
+	m_scsi->irq_handler_cb().set(DEVICE_SELF, FUNC(mips_r3030_state::irq_w<INT_SCSI>)).invert();
+	m_scsi->drq_handler_cb().set(m_rambo, FUNC(mips_rambo_device::drq_w<0>));
 
 	// ethernet
 	AM7990(config, m_net);

@@ -4,6 +4,9 @@
 
     Hudson/NEC HuC6271 "Rainbow" device
 
+    TODO:
+    - everything related to MJPEG decoding
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -33,10 +36,16 @@ void huc6271_device::data_map(address_map &map)
 		map(0x000000, 0x0fffff).ram();
 }
 
-huc6271_device::huc6271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+huc6271_device::huc6271_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, HUC6271, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, m_data_space_config("data", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(huc6271_device::data_map), this))
+	, m_hscroll(0)
+	, m_control(0)
+	, m_back_y(0)
+	, m_back_u(0)
+	, m_back_v(0)
+	, m_hsync(0)
 {
 }
 
@@ -90,7 +99,7 @@ device_memory_interface::space_config_vector huc6271_device::memory_space_config
 //**************************************************************************
 
 #if 0
-void huc6271_device::data_transfer(uint32_t offset, uint32_t data)
+void huc6271_device::data_transfer(u32 offset, u32 data)
 {
 	space(AS_DATA).write_dword(offset,data);
 }

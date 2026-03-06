@@ -189,13 +189,9 @@ copyright-holders:m1macrophage
 			<color red="0.820" green="0.859" blue="0.827"/>
 		</simplecounter>
 	</element>
-	<element name="knob">
+	<element name="knob_background">
 		<!-- Set knob element bounds. -->
 		<rect><color red="0" green="0" blue="0" alpha="0"/><bounds width="178" height="109"/></rect>
-		<!-- Outer knob. -->
-		<disk><color red="0.239" green="0.231" blue="0.227"/><bounds x="52" y="24" width="72" height="72"/></disk>
-		<!-- Inner knob. -->
-		<disk><color red="0.0" green="0.090" blue="0.322"/><bounds x="61" y="33" width="54" height="54"/></disk>
 		<!-- Indicator circles around the knob. -->
 		<disk><color red="0.820" green="0.859" blue="0.827"/><bounds x="45" y="93" width="8" height="8"/></disk>
 		<disk><color red="0.820" green="0.859" blue="0.827"/><bounds x="29" y="54" width="9" height="9"/></disk>
@@ -205,11 +201,39 @@ copyright-holders:m1macrophage
 		<disk><color red="0.820" green="0.859" blue="0.827"/><bounds x="135" y="53" width="13" height="13"/></disk>
 		<disk><color red="0.820" green="0.859" blue="0.827"/><bounds x="119" y="90" width="14" height="14"/></disk>
 	</element>
-	<group name="knob-min-max">
+	<element name="knob_circle">
+		<!-- Outer knob. -->
+		<disk>
+			<color red="0.239" green="0.231" blue="0.227"/>
+			<bounds x="0" y="0" width="1" height="1"/>
+		</disk>
+		<!-- Inner knob. -->
+		<disk>
+			<color state="0" red="0.0" green="0.090" blue="0.322"/>
+			<color state="1" red="0.0" green="0.15" blue="0.45"/>
+			<bounds x="0.125" y="0.125" width="0.75" height="0.75"/>
+		</disk>
+	</element>
+	<element name="knob_dot">
+		<disk>
+			<color state="0" red="0" green="0" blue="0" alpha="0"/>
+			<color state="1" red="0.820" green="0.859" blue="0.827"/>
+		</disk>
+	</element>
+	<group name="knob">
 		<bounds width="178" height="109"/>
-		<element ref="knob">
+		<element ref="knob_background">
 			<bounds x="0" y="0" width="178" height="109"/>
 		</element>
+		<element ref="knob_circle">
+			<bounds x="52" y="24" width="72" height="72"/>
+		</element>
+	</group>
+	<group name="knob-min-max">
+		<bounds width="178" height="109"/>
+		<group ref="knob">
+			<bounds x="0" y="0" width="178" height="109"/>
+		</group>
 		<element ref="text-min">
 			<bounds x="0" y="94" width="40" height="15"/>
 		</element>
@@ -219,8 +243,14 @@ copyright-holders:m1macrophage
 	</group>
 	<group name="knob-fast-slow">
 		<bounds width="178" height="109"/>
-		<element ref="knob">
+		<element ref="knob_background">
 			<bounds x="0" y="0" width="178" height="109"/>
+		</element>
+		<element ref="knob_circle" id="~knob_id~">
+			<bounds x="52" y="24" width="72" height="72"/>
+		</element>
+		<element ref="knob_dot" id="~knob_id~_dot">
+			<bounds x="84" y="26" width="10" height="10"/>
 		</element>
 		<element ref="text-fast">
 			<bounds x="0" y="94" width="40" height="15"/>
@@ -231,7 +261,7 @@ copyright-holders:m1macrophage
 		<element ref="knob-value" inputraw="yes" inputtag="~knob_id~" inputmask="0xffff">
 			<bounds x="68" y="52" width="40" height="16"/>
 		</element>
-		<element ref="transparent-rect" clickthrough="no" id="~knob_id~">
+		<element ref="transparent-rect" clickthrough="no">
 			<!-- Disable clicks on the `simplecounter` above, because they
 			change the value in an unintuitive way. -->
 			<bounds x="61" y="33" width="54" height="54"/>
@@ -334,11 +364,11 @@ copyright-holders:m1macrophage
 		<element ref="text-minus-half"><bounds x="89" y="268" width="40" height="15"/></element>
 		<element ref="text-minus-one"><bounds x="89" y="536" width="40" height="15"/></element>
 		<element ref="text-vco1"><bounds x="89" y="671" width="40" height="15"/></element>
-		<element ref="knob"><bounds x="89" y="174" width="178" height="109"/></element>
+		<group ref="knob"><bounds x="89" y="174" width="178" height="109"/></group>
 		<group ref="knob-min-max"><bounds x="89" y="309" width="178" height="109"/></group>
-		<element ref="knob"><bounds x="89" y="442" width="178" height="109"/></element>
+		<group ref="knob"><bounds x="89" y="442" width="178" height="109"/></group>
 		<element ref="text-unison"><bounds x="89" y="441" width="178" height="14"/></element>
-		<element ref="knob"><bounds x="89" y="577" width="178" height="109"/></element>
+		<group ref="knob"><bounds x="89" y="577" width="178" height="109"/></group>
 		<element ref="text-both"><bounds x="89" y="576" width="178" height="14"/></element>
 		<element ref="text-plus-half"><bounds x="227" y="268" width="40" height="15"/></element>
 		<element ref="text-plus-one"><bounds x="227" y="536" width="40" height="15"/></element>
@@ -420,7 +450,8 @@ copyright-holders:m1macrophage
 
 				local knobs = {"VCF_attack", "VCF_release", "VCA_attack", "VCA_decay", "VCA_sustain", "VCA_release"}
 				for i, knob_id in ipairs(knobs) do
-					add_simplecounter_knob(view, knob_id, knob_id, 1.5)
+					add_knob(view, knob_id, knob_id, 1.5, VERTICAl, knob_id .. "_dot")
+					get_layout_item(view, knob_id .. "_dot"):set_state(1)
 				end
 
 				view.items["warning"]:set_state(0)
@@ -429,14 +460,24 @@ copyright-holders:m1macrophage
 		-----------------------------------------------------------------------
 		-- Slider and knob library starts.
 		-- Can be copied as-is to other layouts.
+		-- version: 11
 		-----------------------------------------------------------------------
+
+		-- Global configuration. Can be overwritten in the resolve_tags callback.
+		KNOB_DOT_ANGLE_SPAN = 150  -- -/+ 150 degrees from top center.
+		UPDATE_CLICK_STATE = true
+
+		-- Constants.
+		VERTICAL = 0
+		HORIZONTAL = 1
+
 		local widgets = {}   -- Stores slider and knob information.
 		local pointers = {}  -- Tracks pointer state.
 
 		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
 		-- The click area's vertical size must exactly span the range of the
 		-- knob's movement.
-		function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+		function add_slider(view, clickarea_id, knob_id, port_name)
 			table.insert(widgets, {
 				clickarea   = get_layout_item(view, clickarea_id),
 				slider_knob = get_layout_item(view, knob_id),
@@ -445,13 +486,21 @@ copyright-holders:m1macrophage
 		end
 
 		-- A sweep between the attached field's min and max values requires
-		-- moving the pointer by `scale * clickarea.height` pixes.
-		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
+		-- moving the pointer by `scale * clickarea.height` pixels, when drag
+		-- direction is VERTICAL. Replace `height` with `width` when HORIZONTAL.
+		--
+		-- `dot_id` is optional. If not nil, this script will take control of the
+		-- element's position as the knob rotates. The distance of the dot from
+		-- the center of `clickarea` will be preserved during rotation.
+		-- It is suggested you place the dot at the top-center of the knob.
+		function add_knob(view, clickarea_id, port_name, scale, drag_direction, dot_id)
 			table.insert(widgets, {
-				clickarea = get_layout_item(view, clickarea_id),
-				field     = get_port_field(port_name),
-				is_knob   = true,
-				scale     = scale })
+				clickarea     = get_layout_item(view, clickarea_id),
+				field         = get_port_field(port_name),
+				is_knob       = true,
+				scale         = scale,
+				is_horizontal = (drag_direction == HORIZONTAL),
+				knob_dot      = dot_id and get_layout_item(view, dot_id) })
 		end
 
 		function get_layout_item(view, item_id)
@@ -473,17 +522,44 @@ copyright-holders:m1macrophage
 				field = val
 				break
 			end
+			local field_msg = "Needs to either be an IPT_ADJUSTER, or an analog port with auto-center."
 			if field == nil then
-				emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+				return nil
+			end
+			if field.is_analog and (not field.centerdelta or field.centerdelta == 0) then
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
 				return nil
 			end
 			return field
 		end
 
+		local function set_click_state(widget, state)
+			if UPDATE_CLICK_STATE then
+				if widget.is_knob then
+					widget.clickarea:set_state(state)
+				else
+					widget.slider_knob:set_state(state)
+				end
+			end
+		end
+
+		local function release_pointer(pointer_id)
+			if pointers[pointer_id] then
+				local widget = widgets[pointers[pointer_id].selected_widget]
+				set_click_state(widget, 0)
+				local field = widget.field
+				if field.is_analog then
+					field:clear_value()
+				end
+			end
+			pointers[pointer_id] = nil
+		end
+
 		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
 			-- If a button is not pressed, reset the state of the current pointer.
 			if btn & 1 == 0 then
-				pointers[id] = nil
+				release_pointer(id)
 				return
 			end
 
@@ -499,11 +575,13 @@ copyright-holders:m1macrophage
 						relative = false
 					end
 					if found then
+						set_click_state(widgets[i], 1)
 						pointers[id] = {
 							selected_widget = i,
 							relative = relative,
+							start_x = x,
 							start_y = y,
-							start_value = widgets[i].field.user_value }
+							start_value = widgets[i].field.port:read() }
 						break
 					end
 				end
@@ -514,8 +592,7 @@ copyright-holders:m1macrophage
 				return
 			end
 
-			-- A widget is selected. Update its state based on the pointer's Y
-			-- position. It is assumed the attached IO field is an IPT_ADJUSTER.
+			-- A widget is selected. Update its state based on the pointer's position.
 
 			local pointer = pointers[id]
 			local widget = widgets[pointer.selected_widget]
@@ -526,8 +603,13 @@ copyright-holders:m1macrophage
 
 			local new_value
 			if widget.is_knob then
-				local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
-				new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				if widget.is_horizontal then
+					local step_x = value_range / (widget.scale * widget.clickarea.bounds.width)
+					new_value = pointer.start_value + (x - pointer.start_x) * step_x
+				else
+					local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+					new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				end
 			else
 				local knob_half_height = widget.slider_knob.bounds.height / 2
 				local min_y = widget.clickarea.bounds.y0 + knob_half_height
@@ -547,22 +629,82 @@ copyright-holders:m1macrophage
 			new_value = math.floor(new_value + 0.5)
 			if new_value < min_value then new_value = min_value end
 			if new_value > max_value then new_value = max_value end
-			widget.field.user_value = new_value
+
+			if widget.field.is_analog then
+				widget.field:set_value(new_value)
+			else
+				widget.field.user_value = new_value
+			end
+		end
+
+		local function get_knob_dot_bounds(widget)
+			local dot = widget.knob_dot_cache
+			local value = (widget.field.port:read() - dot.value_min) / dot.value_range
+			local angle = dot.angle_min + value * dot.angle_range
+			local rx = -dot.center_y * math.sin(angle) * dot.aspect
+			local ry = dot.center_y * math.cos(angle)
+			local x = rx + dot.dx
+			local y = ry + dot.dy
+			return emu.render_bounds(x, y, x + dot.width, y + dot.height)
+		end
+
+		local function configure_knob_dots()
+			for i = 1, #widgets do
+				local dot = widgets[i].knob_dot
+				if dot then
+					-- Remove bounds callback, since we need to access the
+					-- configured bounds.
+					dot:set_bounds_callback(nil)
+
+					local field = widgets[i].field
+					local knob_bounds = widgets[i].clickarea.bounds
+					local dot_bounds = dot.bounds
+					local max_angle = KNOB_DOT_ANGLE_SPAN * 2.0 * math.pi / 360.0
+
+					-- Compute the distance of the knob dot from the knob center.
+					local dot_x = dot_bounds.x0 + dot_bounds.width / 2.0
+					local dot_y = dot_bounds.y0 + dot_bounds.height / 2.0
+					local knob_x = knob_bounds.x0 + knob_bounds.width / 2.0
+					local knob_y = knob_bounds.y0 + knob_bounds.height / 2.0
+					local radius = math.sqrt((dot_y - knob_y) ^ 2 + (dot_x - knob_x) ^ 2)
+
+					widgets[i].knob_dot_cache = {
+						width       = dot_bounds.width,
+						height      = dot_bounds.height,
+						aspect      = dot_bounds.aspect,
+						value_min   = field.minvalue,
+						value_range = field.maxvalue - field.minvalue,
+						angle_min   = -max_angle,
+						angle_range = 2.0 * max_angle,
+						center_y    = -radius,
+						dx = knob_bounds.x0 + (knob_bounds.width - dot_bounds.width) / 2.0,
+						dy = knob_bounds.y0 + (knob_bounds.height - dot_bounds.height) / 2.0 }
+
+					dot:set_bounds_callback(
+						function()
+							return get_knob_dot_bounds(widgets[i])
+						end)
+				end
+			end
 		end
 
 		local function pointer_left(type, id, dev, x, y, up, cnt)
-			pointers[id] = nil
+			release_pointer(id)
 		end
 
 		local function pointer_aborted(type, id, dev, x, y, up, cnt)
-			pointers[id] = nil
+			release_pointer(id)
 		end
 
 		local function forget_pointers()
+			for id, pointer in pairs(pointers) do
+				release_pointer(id)
+			end
 			pointers = {}
 		end
 
 		function install_slider_callbacks(view)
+			view:set_recomputed_callback(configure_knob_dots)
 			view:set_pointer_updated_callback(pointer_updated)
 			view:set_pointer_left_callback(pointer_left)
 			view:set_pointer_aborted_callback(pointer_aborted)
@@ -573,4 +715,3 @@ copyright-holders:m1macrophage
 		-----------------------------------------------------------------------
 	]]></script>
 </mamelayout>
-

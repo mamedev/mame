@@ -1299,7 +1299,7 @@ static INPUT_PORTS_START( lufykzku )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE1      ) // service sw (service coin, press to go down in service mode)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) // payout sw
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN       )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_GAMBLE_DOOR   ) // "maintenance panel abnormality" when not high on boot (in that case, when it goes high the game resets)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_DOOR          ) // "maintenance panel abnormality" when not high on boot (in that case, when it goes high the game resets)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN       )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN       )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN       )

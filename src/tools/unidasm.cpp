@@ -51,7 +51,7 @@ using util::BIT;
 #include "cpu/dsp563xx/dsp563xxd.h"
 #include "cpu/dspp/dsppdasm.h"
 #include "cpu/e0c6200/e0c6200d.h"
-#include "cpu/e132xs/32xsdasm.h"
+#include "cpu/e132xs/e1dasm.h"
 #include "cpu/es5510/es5510d.h"
 #include "cpu/esrip/esripdsm.h"
 #include "cpu/f2mc16/f2mc16d.h"
@@ -169,7 +169,7 @@ using util::BIT;
 #include "cpu/scudsp/scudspdasm.h"
 #include "cpu/se3208/se3208dis.h"
 #include "cpu/sh/sh_dasm.h"
-#include "cpu/sharc/sharcdsm.h"
+#include "cpu/sharc/sharc_dasm.h"
 #include "cpu/sigma2/sigma2d.h"
 #include "cpu/sm510/sm510d.h"
 #include "cpu/sm8500/sm8500d.h"
@@ -348,16 +348,6 @@ struct z8000_unidasm_t : z8000_disassembler::config
 } z8000_unidasm;
 
 // Configuration missing
-struct hyperstone_unidasm_t : hyperstone_disassembler::config
-{
-	bool h;
-	hyperstone_unidasm_t() { h = false; }
-	virtual ~hyperstone_unidasm_t() = default;
-
-	virtual bool get_h() const { return h; }
-} hyperstone_unidasm;
-
-// Configuration missing
 struct nec_unidasm_t : nec_disassembler::config
 {
 	int mode;
@@ -491,7 +481,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "hp_09825_67907",  be, -1, []() -> util::disasm_interface * { return new hp_09825_67907_disassembler; } },
 	{ "hpc16083",        le,  0, []() -> util::disasm_interface * { return new hpc16083_disassembler; } },
 	{ "hpc16164",        le,  0, []() -> util::disasm_interface * { return new hpc16164_disassembler; } },
-	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(&hyperstone_unidasm); } },
+	{ "hyperstone",      be,  0, []() -> util::disasm_interface * { return new hyperstone_disassembler(nullptr); } },
 	{ "ht1130",          le,  0, []() -> util::disasm_interface * { return new ht1130_disassembler; } },
 	{ "i4004",           le,  0, []() -> util::disasm_interface * { return new i4004_disassembler; } },
 	{ "i4040",           le,  0, []() -> util::disasm_interface * { return new i4040_disassembler; } },

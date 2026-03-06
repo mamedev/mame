@@ -47,11 +47,6 @@ void tigeroad_spr_device::device_start()
 }
 
 
-void tigeroad_spr_device::device_reset()
-{
-}
-
-
 /*
    4  words per sprite
 
@@ -99,10 +94,10 @@ void tigeroad_spr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 			sy = 240 - sy;
 
 		gfx(0)->transpen(bitmap,cliprect,
-		tile_number,
-		color,
-		flipx, flipy,
-		sx, sy, 15);
+				tile_number,
+				color,
+				flipx, flipy,
+				sx, sy, 15);
 
 		source -= 4;
 	}

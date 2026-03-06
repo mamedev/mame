@@ -22,7 +22,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_fdc(*this, "fdc")
 		, m_floppies(*this, "fdc:%u", 0U)
-		, m_scsi(*this, "scsibus:7:ncr5380")
+		, m_scsi(*this, "ncr5380")
 	{
 	}
 
@@ -32,7 +32,6 @@ private:
 	void sio_out_w(uint8_t data);
 	void drive_sel_w(uint8_t data);
 	static void floppy_formats(format_registration &fr);
-	static void ncr5380(device_t *device);
 	void lb186_io(address_map &map) ATTR_COLD;
 	void lb186_map(address_map &map) ATTR_COLD;
 
@@ -100,18 +99,9 @@ static void lb186_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-void lb186_state::ncr5380(device_t *device)
-{
-	devcb_base *devcb;
-	(void)devcb;
-	downcast<ncr5380_device &>(*device).irq_handler().set(":maincpu", FUNC(i80186_cpu_device::int1_w));
-	downcast<ncr5380_device &>(*device).drq_handler().set(":maincpu", FUNC(i80186_cpu_device::drq0_w));
-}
-
 static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add_internal("ncr5380", NCR5380);
 }
 
 void lb186_state::floppy_formats(format_registration &fr)
@@ -145,7 +135,7 @@ void lb186_state::lb186(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppies[2], lb186_floppies, nullptr, lb186_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, m_floppies[3], lb186_floppies, nullptr, lb186_state::floppy_formats);
 
-	NSCSI_BUS(config, "scsibus");
+	auto &scsi(NSCSI_BUS(config, "scsibus"));
 	NSCSI_CONNECTOR(config, "scsibus:0", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:2", scsi_devices, nullptr);
@@ -153,7 +143,11 @@ void lb186_state::lb186(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsibus:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsibus:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsibus:7", scsi_devices, "ncr5380", true).set_option_machine_config("ncr5380", lb186_state::ncr5380);
+
+	NCR5380(config, m_scsi);
+	scsi.set_external_device(7, m_scsi);
+	m_scsi->irq_handler().set(m_maincpu, FUNC(i80186_cpu_device::int1_w));
+	m_scsi->drq_handler().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
 }
 
 ROM_START( lb186 )

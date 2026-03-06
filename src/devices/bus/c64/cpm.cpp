@@ -103,9 +103,9 @@ inline void c64_cpm_cartridge_device::update_signals()
     // C64 DMA
     m_slot->dma_w(m_enabled ? ASSERT_LINE : CLEAR_LINE);
 
-    // Z80 BUSRQ
-    int busrq = !(m_enabled & !m_ba) ? CLEAR_LINE : ASSERT_LINE;
-    m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, busrq);
+    // Z80 BUSREQ
+    int busreq = !(m_enabled & !m_ba) ? CLEAR_LINE : ASSERT_LINE;
+    m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, busreq);
 
     // Z80 WAIT
     m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, m_enabled ? CLEAR_LINE : ASSERT_LINE);

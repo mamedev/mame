@@ -23,10 +23,6 @@ class vme_sys68k_cpu1_card_device
 public:
 	vme_sys68k_cpu1_card_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
-	// Front panel buttons (public for input port constructor)
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-	DECLARE_INPUT_CHANGED_MEMBER(abort_button);
-
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -53,9 +49,6 @@ private:
 	void write_f11_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F11, state); }
 	void write_f13_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F13, state); }
 	void write_f15_clock(int state) { write_acia_clocks(mc14411_device::TIMER_F15, state); }
-
-	// Front panel HALT LED polling
-	TIMER_CALLBACK_MEMBER(halt_update);
 
 	// Centronics printer interface
 	void centronics_ack_w(int state);
@@ -89,14 +82,6 @@ private:
 	required_ioport             m_serial_p3;
 	required_ioport             m_serial_p4;
 	required_ioport             m_serial_p5;
-
-	// Front panel
-	required_ioport             m_panel;
-	output_finder<>             m_halt_led;
-	output_finder<>             m_p3_conn;
-	output_finder<>             m_p4_conn;
-	output_finder<>             m_p5_conn;
-	emu_timer                  *m_halt_timer;
 
 	uint16_t *m_usrrom;
 

@@ -61,7 +61,7 @@ public:
 		m_scc(*this, "scc"),
 		m_ram(*this, RAM_TAG),
 		m_scsibus(*this, "scsi"),
-		m_ncr1(*this, "scsi:7:ncr53c96"),
+		m_ncr1(*this, "ncr53c96"),
 		m_sonic(*this, "sonic")
 	{
 	}
@@ -181,13 +181,13 @@ void quadra800_state::macqd800(machine_config &config)
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
 	DJMEMC(config, m_djmemc, 33_MHz_XTAL);
-	m_djmemc->set_maincpu_tag("maincpu");
+	m_djmemc->set_maincpu_tag(m_maincpu);
 	m_djmemc->set_rom_tag("bootrom");
 	m_djmemc->write_irq().set(m_iosb, FUNC(iosb_device::via2_irq_w<0x40>));
 
 	IOSB(config, m_iosb, 33_MHz_XTAL);
-	m_iosb->set_maincpu_tag("maincpu");
-	m_iosb->set_scsi_tag("scsi:7:ncr53c96");
+	m_iosb->set_maincpu_tag(m_maincpu);
+	m_iosb->set_scsi_tag(m_ncr1);
 	m_iosb->write_adb_st().set(m_adbmodem, FUNC(adbmodem_device::set_via_state));
 
 	// Quadra 800 ID is 0x12
@@ -231,15 +231,11 @@ void quadra800_state::macqd800(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c96", NCR53C96).clock(40_MHz_XTAL).machine_config(
-		[this] (device_t *device)
-		{
-			ncr53c96_device &adapter = downcast<ncr53c96_device &>(*device);
-
-			adapter.set_busmd(ncr53c96_device::BUSMD_1);
-			adapter.irq_handler_cb().set(m_iosb, FUNC(iosb_device::scsi_irq_w));
-			adapter.drq_handler_cb().set(m_iosb, FUNC(iosb_device::scsi_drq_w));
-		});
+	NCR53C96(config, m_ncr1, 40_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_ncr1);
+	m_ncr1->set_busmd(ncr53c96_device::BUSMD_1);
+	m_ncr1->irq_handler_cb().set(m_iosb, FUNC(iosb_device::scsi_irq_w));
+	m_ncr1->drq_handler_cb().set(m_iosb, FUNC(iosb_device::scsi_drq_w));
 
 	DP83932C(config, m_sonic, 40_MHz_XTAL / 2); // clock is C20M on the schematics
 	m_sonic->set_bus(m_maincpu, 0);

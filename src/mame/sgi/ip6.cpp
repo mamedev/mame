@@ -94,7 +94,7 @@ public:
 		, m_eeprom(*this, "eeprom")
 		, m_rtc(*this, "rtc")
 		, m_pit(*this, "pit")
-		, m_scsi(*this, "scsi:0:wd33c93")
+		, m_scsi(*this, "wd33c93")
 		, m_enet(*this, "enet")
 		, m_duart(*this, "duart%u", 0U)
 		, m_serial(*this, "serial%u", 0U)
@@ -441,16 +441,13 @@ void ip6_state::common(machine_config &config)
 	m_pit->out_handler<2>().set(m_pit, FUNC(pit8254_device::write_clk0));
 	m_pit->out_handler<2>().append(m_pit, FUNC(pit8254_device::write_clk1));
 
-	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0").option_set("wd33c93", WD33C93).machine_config(
-		[this](device_t *device)
-		{
-			wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 
-			wd33c93.set_clock(10000000);
-			wd33c93.irq_cb().set(*this, FUNC(ip6_state::lio_interrupt<LIO_SCSI>)).invert();
-			wd33c93.drq_cb().set(*this, FUNC(ip6_state::scsi_drq));
-		});
+	WD33C93(config, m_scsi, 10000000);
+	scsi.set_external_device(0, m_scsi);
+	m_scsi->irq_cb().set(DEVICE_SELF, FUNC(ip6_state::lio_interrupt<LIO_SCSI>)).invert();
+	m_scsi->drq_cb().set(DEVICE_SELF, FUNC(ip6_state::scsi_drq));
+
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);

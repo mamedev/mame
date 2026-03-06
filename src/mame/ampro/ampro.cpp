@@ -48,7 +48,7 @@ public:
 		, m_ctc(*this, "ctc")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:%u", 0U)
-		, m_ncr(*this, "scsi:7:ncr")
+		, m_ncr(*this, "ncr")
 		, m_printer(*this, "printer")
 	{ }
 
@@ -245,7 +245,7 @@ void ampro_state::ampro(machine_config &config)
 		FLOPPY_CONNECTOR(config, floppy, ampro_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	SOFTWARE_LIST(config, "flop_list").set_original("ampro");
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -253,10 +253,10 @@ void ampro_state::ampro(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr", NCR5380).machine_config([] (device_t *device) {
-		//downcast<ncr5380_device &>(*device).irq_handler().set(m_ctc, FUNC(z80ctc_device::trg2)); // only if JMP3 shorted
-		//downcast<ncr5380_device &>(*device).drq_handler().set(m_dart, FUNC(z80dart_device::dcda_w)); // only if JMP8 shorted
-	});
+	NCR5380(config, m_ncr);
+	scsi.set_external_device(7, m_ncr);
+	//m_ncr->irq_handler().set(m_ctc, FUNC(z80ctc_device::trg2)); // only if JMP3 shorted
+	//m_ncr->drq_handler().set(m_dart, FUNC(z80dart_device::dcda_w)); // only if JMP8 shorted
 }
 
 /* ROM definition */

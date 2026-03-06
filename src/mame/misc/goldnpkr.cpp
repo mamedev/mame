@@ -12575,7 +12575,7 @@ ROM_START( pokersis )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_FILL(                 0x0000, 0x1000, 0x0000 )   // filling the R-G bitplanes
-	ROM_COPY( "gfx", 0x14800, 0x1000, 0x0800 )      // text and suppossed 1bpp gfx
+	ROM_COPY( "gfx", 0x14800, 0x1000, 0x0800 )      // text and supposed 1bpp gfx
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_COPY( "gfx", 0x04000, 0x0000, 0x0800 )  // cards gfx, bitplane 1

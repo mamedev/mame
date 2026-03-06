@@ -10,7 +10,7 @@
 enum
 {
 	Z80_INPUT_LINE_WAIT = INPUT_LINE_IRQ0 + 1,
-	Z80_INPUT_LINE_BUSRQ,
+	Z80_INPUT_LINE_BUSREQ, // Zilog renamed BUSRQ to BUSREQ and BUSAK to BUSACK in 1981
 
 	Z80_INPUT_LINE_MAX
 };
@@ -31,7 +31,7 @@ public:
 	z80_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void z80_set_m1_cycles(u8 m1_cycles) { m_m1_cycles = m1_cycles; }
-	void z80_set_memrq_cycles(u8 memrq_cycles) { m_memrq_cycles = memrq_cycles; }
+	void z80_set_mreq_cycles(u8 mreq_cycles) { m_mreq_cycles = mreq_cycles; }
 	void z80_set_iorq_cycles(u8 iorq_cycles) { m_iorq_cycles = iorq_cycles; }
 
 	template <typename... T> void set_memory_map(T &&... args) { set_addrmap(AS_PROGRAM, std::forward<T>(args)...); }
@@ -139,7 +139,7 @@ protected:
 	devcb_write_line m_halt_cb;
 	devcb_write_line m_busack_cb;
 
-	static constexpr u8 SA_BUSRQ         = 0;
+	static constexpr u8 SA_BUSREQ        = 0;
 	static constexpr u8 SA_NMI_PENDING   = 1;
 	static constexpr u8 SA_IRQ_ON        = 2;
 	static constexpr u8 SA_HALT          = 3;
@@ -148,33 +148,33 @@ protected:
 	static constexpr u8 SA_NSC800_IRQ_ON = 6;
 	u8 m_service_attention; // bitmap for required handling in service step
 
-	PAIR16       m_prvpc;
-	PAIR16       m_pc;
-	PAIR16       m_sp;
-	PAIR16       m_af;
-	PAIR16       m_bc;
-	PAIR16       m_de;
-	PAIR16       m_hl;
-	PAIR16       m_ix;
-	PAIR16       m_iy;
-	PAIR16       m_wz;
-	PAIR16       m_af2;
-	PAIR16       m_bc2;
-	PAIR16       m_de2;
-	PAIR16       m_hl2;
-	u8           m_r;
-	u8           m_r2;
-	bool         m_iff1;
-	bool         m_iff2;
-	u8           m_halt;
-	u8           m_im;
-	u8           m_i;
-	u8           m_nmi_state;    // nmi pin state
-	u8           m_irq_state;    // irq pin state
-	int          m_wait_state;   // wait pin state
-	int          m_busrq_state;  // bus request pin state
-	u8           m_busack_state; // bus acknowledge pin state
-	u16          m_ea;
+	PAIR16 m_prvpc;
+	PAIR16 m_pc;
+	PAIR16 m_sp;
+	PAIR16 m_af;
+	PAIR16 m_bc;
+	PAIR16 m_de;
+	PAIR16 m_hl;
+	PAIR16 m_ix;
+	PAIR16 m_iy;
+	PAIR16 m_wz;
+	PAIR16 m_af2;
+	PAIR16 m_bc2;
+	PAIR16 m_de2;
+	PAIR16 m_hl2;
+	u8     m_r;
+	u8     m_r2;
+	bool   m_iff1;
+	bool   m_iff2;
+	u8     m_halt;
+	u8     m_im;
+	u8     m_i;
+	u8     m_nmi_state;    // nmi pin state
+	u8     m_irq_state;    // irq pin state
+	int    m_wait_state;   // wait pin state
+	int    m_busreq_state; // bus request pin state
+	u8     m_busack_state; // bus acknowledge pin state
+	u16    m_ea;
 
 	struct
 	{
@@ -204,16 +204,16 @@ protected:
 	u8 get_f();
 	void set_f(u8 f);
 
-	int          m_icount;
-	int          m_tmp_irq_vector;
-	PAIR16       m_shared_data;
-	PAIR16       m_shared_data2;
-	u8           m_rtemp;
+	int    m_icount;
+	int    m_tmp_irq_vector;
+	PAIR16 m_shared_data;
+	PAIR16 m_shared_data2;
+	u8     m_rtemp;
 
-	u32 m_ref;
-	u8 m_m1_cycles;
-	u8 m_memrq_cycles;
-	u8 m_iorq_cycles;
+	u32    m_ref;
+	u8     m_m1_cycles;
+	u8     m_mreq_cycles;
+	u8     m_iorq_cycles;
 };
 
 DECLARE_DEVICE_TYPE(Z80, z80_device)

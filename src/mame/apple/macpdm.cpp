@@ -234,7 +234,7 @@ macpdm_state::macpdm_state(const machine_config &mconfig, device_type type, cons
 	m_ram(*this, RAM_TAG),
 	m_scc(*this, "scc"),
 	m_scsibus(*this, "scsi"),
-	m_ncr53c94(*this, "scsi:7:ncr53c94"),
+	m_ncr53c94(*this, "ncr53c94"),
 	m_fdc(*this, "fdc"),
 	m_floppy(*this, "fdc:%d", 0U),
 	m_video(*this, "video"),
@@ -1193,15 +1193,12 @@ void macpdm_state::macpdm(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53c94", NCR53C94).machine_config(
-		[this] (device_t *device)
-		{
-			auto &ctrl = downcast<ncr53c94_device &>(*device);
-			ctrl.set_clock(ENET_CLOCK/2);
-			ctrl.set_busmd(ncr53c94_device::BUSMD_3);
-			ctrl.drq_handler_cb().set(*this, FUNC(macpdm_state::scsi_drq));
-			ctrl.irq_handler_cb().set(*this, FUNC(macpdm_state::scsi_irq));
-		});
+
+	NCR53C94(config, m_ncr53c94, ENET_CLOCK/2);
+	m_scsibus->set_external_device(7, m_ncr53c94);
+	m_ncr53c94->set_busmd(ncr53c94_device::BUSMD_3);
+	m_ncr53c94->drq_handler_cb().set(DEVICE_SELF, FUNC(macpdm_state::scsi_drq));
+	m_ncr53c94->irq_handler_cb().set(DEVICE_SELF, FUNC(macpdm_state::scsi_irq));
 
 	SOFTWARE_LIST(config, "flop_mac35_orig").set_original("mac_flop_orig");
 	SOFTWARE_LIST(config, "flop_mac35_clean").set_original("mac_flop_clcracked");

@@ -54,7 +54,6 @@ public:
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 	u8 shared_ram_r(offs_t offset) { return m_shared_ram[offset]; }
 	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
@@ -71,7 +70,7 @@ protected:
 	required_device<palette_device> m_palette;
 
 private:
-	u32 screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void screen_vblank(int state);
 
@@ -85,7 +84,6 @@ private:
 
 	required_device<toaplan_coincounter_device> m_coincounter;
 	required_device<screen_device> m_screen;
-	bitmap_ind8 m_custom_priority_bitmap;
 };
 
 void dogyuun_state::reset_audiocpu(int state)
@@ -103,13 +101,6 @@ void dogyuun_state::machine_reset()
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-void dogyuun_state::video_start()
-{
-	m_screen->register_screen_bitmap(m_custom_priority_bitmap);
-	m_vdp[0]->custom_priority_bitmap = &m_custom_priority_bitmap;
-	m_vdp[1]->custom_priority_bitmap = &m_custom_priority_bitmap;
-}
-
 void dogyuun_state::screen_vblank(int state)
 {
 	if (state)  // rising edge
@@ -119,13 +110,13 @@ void dogyuun_state::screen_vblank(int state)
 	}
 }
 
-u32 dogyuun_state::screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 dogyuun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp[1]->render_vdp(bitmap, cliprect);
-	m_custom_priority_bitmap.fill(0, cliprect);
-	m_vdp[0]->render_vdp(bitmap, cliprect);
+	screen.priority().fill(0, cliprect);
+	m_vdp[1]->render_vdp(bitmap, cliprect, screen.priority());
+	screen.priority().fill(0, cliprect);
+	m_vdp[0]->render_vdp(bitmap, cliprect, screen.priority());
 	return 0;
 }
 
@@ -328,7 +319,7 @@ void dogyuun_state::dogyuun_base(machine_config &config)
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
-	m_screen->set_screen_update(FUNC(dogyuun_state::screen_update_dogyuun));
+	m_screen->set_screen_update(FUNC(dogyuun_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(dogyuun_state::screen_vblank));
 	m_screen->set_palette(m_palette);
 

@@ -57,6 +57,13 @@ if _OPTIONS["USE_SDL"]=="1" then
 		"USE_SDL=1",
 		"USE_SDL_SOUND",
 	}
+elseif _OPTIONS["USE_SDL3"]=="1" then
+	defines {
+		"SDLMAME_SDL3=1",
+		"USE_XINPUT=0",
+		"USE_SDL3=1",
+		"USE_SDL_SOUND",
+	}
 else
 	defines {
 		"USE_SDL=0",

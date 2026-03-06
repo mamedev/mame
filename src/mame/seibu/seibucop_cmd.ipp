@@ -526,7 +526,7 @@ void raiden2cop_device::execute_b900(int offset, uint16_t data)
 // SD Gundam single step sprite DMA
 // Notes of interest:
 // - bit 0 of rel_x is enabled at stage 2 boss for the flipped ray but seems left-over;
-// - stage 3 midboss has some garbage sprites, that's because game incorrectly sets up a size of 8 for one transfer, prolly more left-over;
+// - stage 3 midboss has some garbage sprites, that's because game incorrectly sets up a size of 8 for one transfer, probably more left-over;
 void raiden2cop_device::LEGACY_execute_c480(int offset, uint16_t data)
 {
 	uint8_t offs;

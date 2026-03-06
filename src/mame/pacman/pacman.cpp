@@ -7699,6 +7699,28 @@ ROM_START( beastfp )
 ROM_END
 
 
+ROM_START( beastfpa ) // just the CPU board available, so only the program ROMs were dumped for this set.
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "u2_beastie_feastie_pb02864.u2", 0x0000, 0x2000, CRC(97a2041b) SHA1(1f1b2ca184124ece93b36d0f28b71cb5032a85eb) )
+	ROM_LOAD( "u3_beastie_feastie_pb02864.u3", 0x2000, 0x2000, CRC(d379bbeb) SHA1(69682ae57fa8175856380632b662b3bc1ac50ccc) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "beastf.5e",    0x0000, 0x1000, CRC(5654dc34) SHA1(fc2336b951a3ab48d4fc4f36a8dd80e79e8ca1a0) )
+	ROM_LOAD( "beastf.5f",    0x1000, 0x1000, CRC(1b30ca61) SHA1(8495d8a280346246f00c4f1dc42ab5a2a02c5863) )
+
+	ROM_REGION( 0x002c, "epos_pal10h8", 0)
+	ROM_LOAD( "beastf.ic4",   0x0000, 0x002c, CRC(a6ab926d) SHA1(a8c2ddce2d595cecf057b37916f2f897de8a0e4e) ) // pal10h8
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "7_f_the_glob.7f", 0x0000, 0x0020, CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) )
+	ROM_LOAD( "4_a_the_glob.4a", 0x0020, 0x0100, CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) )
+
+	ROM_REGION( 0x0200, "namco", 0 ) // Sound PROMs
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // Timing - not used
+ROM_END
+
+
 ROM_START( eeekkp ) // Pac-Man PCB conversion kit. Includes a small daughtercard (2 roms + 4 PLDs, plugs in through the Z80 socket), 2 roms + 2 BPROMs
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "u_2_eeekk_pg03094.u2",   0x0000, 0x2000, CRC(701e37f2) SHA1(15bbd983e9112ce15dd229f126f2bccfa8b9807c) ) // encrypted  - located on daughtercard
@@ -9090,7 +9112,8 @@ GAME( 1983, sprglobp,  suprglob, theglobp, theglobp, epospm_state,  empty_init, 
 GAME( 1985, sprglobp2, suprglob, pacman,   theglobp, epospm_state,  init_sprglobp2,ROT90,  "bootleg (Elsys Software)", "Super Glob (Pac-Man hardware, bootleg)",        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // encrypted
 GAME( 1984, sprglbpg,  suprglob, pacman,   theglobp, epospm_state,  empty_init,    ROT90,  "bootleg (Software Labor)", "Super Glob (Pac-Man hardware, German bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, beastfp,  suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Beastie Feastie (Pac-Man conversion)",                       MACHINE_SUPPORTS_SAVE )
+GAME( 1984, beastfp,  suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Beastie Feastie (Pac-Man conversion, set 1)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1984, beastfpa, suprglob, theglobp, theglobp, epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Beastie Feastie (Pac-Man conversion, set 2)",                MACHINE_SUPPORTS_SAVE )
 GAME( 1984, eeekkp,   eeekk,    eeekkp,   eeekkp,   epospm_state,  empty_init,    ROT90,  "Epos Corporation",         "Eeekk! (Pac-Man conversion)",                                MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, drivfrcp, 0,        drivfrcp, drivfrcp, pacman_state,  init_drivfrcp, ROT90,  "Shinkai Inc. (Magic Electronics Inc. license)", "Driving Force (Pac-Man conversion)", MACHINE_SUPPORTS_SAVE )

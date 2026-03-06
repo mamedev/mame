@@ -226,7 +226,7 @@ u32 chloe_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, cons
 	clip256x192 &= cliprect;
 
 	screen.priority().fill(0, cliprect);
-	m_ula_scr->draw_border(bitmap, cliprect, m_port_fe_data & 0x07);
+	m_ula_scr->draw_border(screen, bitmap, cliprect, m_port_fe_data & 0x07);
 
 	const bool flash = u64(screen.frame_number() / m_frame_invert_count) & 1;
 	m_ula_scr->draw(screen, bitmap, clip256x192, flash, 0);
@@ -840,7 +840,7 @@ void chloe_state::machine_start()
 	save_item(NAME(m_reg_selected));
 	save_item(NAME(m_divmmc_paged));
 	save_item(NAME(m_divmmc_ctrl));
-	save_pointer(NAME(m_uno_regs_data), 256);
+	save_item(NAME(m_uno_regs_data));
 	save_item(NAME(m_palpen_selected));
 	save_item(NAME(m_dma_hilo));
 	save_item(NAME(m_dma_src_latch));
@@ -919,7 +919,7 @@ void chloe_state::chloe(machine_config &config)
 	/*
 	???dma_slot_device &dma(DMA_SLOT(config.replace(), "dma", 28_MHz_XTAL / 8, default_dma_slot_devices, nullptr));
 	dma.set_io_space(m_maincpu, AS_IO);
-	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	dma.in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
 	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });

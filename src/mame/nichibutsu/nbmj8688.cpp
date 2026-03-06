@@ -3634,6 +3634,25 @@ ROM_START( kaguya )
 	ROM_LOAD( "kaguya11.bin", 0x0e0000, 0x20000, CRC(fcbede4f) SHA1(543912e9fbb1c2b208701e5eb1347f734f5ce3cb) )
 ROM_END
 
+ROM_START( kaguyaa ) // 16040 PCB
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mk1.3f", 0x00000, 0x10000, CRC(79242558) SHA1(f683e49df798f339f9d995ec1654e204f916ecf7) )
+
+	ROM_REGION( 0x20000, "voice", 0 )
+	ROM_LOAD( "mk2.3k", 0x00000, 0x10000, CRC(561dc656) SHA1(0c3ca794ec71202aabcb337bb7d972a6d69dbbc7) )
+	ROM_LOAD( "mk3.3l", 0x10000, 0x10000, CRC(a09e9387) SHA1(c5f5e0f5d841671bc38cd240193f60ccf7ab0455) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "mk4.6a",  0x000000, 0x20000, CRC(ccd08d8d) SHA1(6495946efdc99a945e30e7a46d4e0e2045ce62d5) )
+	ROM_LOAD( "mk5.6b",  0x020000, 0x20000, CRC(a3abc686) SHA1(822c9e2a25343501f4168b45bb93942952640feb) )
+	ROM_LOAD( "mk6.6d",  0x040000, 0x20000, CRC(6accd6d3) SHA1(ebcb911580329453ea91f2fbcba9f46bd5f6110f) )
+	ROM_LOAD( "mk7.6e",  0x060000, 0x20000, CRC(4309e77e) SHA1(6cee4c03fedba2ff79babd9562cc0014a9293a1e) )
+	ROM_LOAD( "mk8.6f",  0x080000, 0x20000, CRC(f0ad7c6c) SHA1(fb7587852b29b68bbeea3c123b13d50c23ba7584) )
+	ROM_LOAD( "mk9.6h",  0x0a0000, 0x20000, CRC(a0b5bedd) SHA1(0b21e335b8cc15ca91d0e4dc05fc8fac94895f88) )
+	ROM_LOAD( "mk10.6k", 0x0c0000, 0x20000, CRC(741d13f6) SHA1(5d8143ec158b2e6c58b44f61dd063fb1615ff59e) )
+	ROM_LOAD( "mk11.6l", 0x0e0000, 0x20000, CRC(fcbede4f) SHA1(543912e9fbb1c2b208701e5eb1347f734f5ce3cb) )
+ROM_END
+
 ROM_START( kaguya2 )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
 	ROM_LOAD( "1.3f",    0x00000, 0x10000, CRC(1a6ad8fd) SHA1(ebb1e3f08643e0602a0ec2e7401c3ee2fccff9f5) )
@@ -3990,6 +4009,7 @@ GAME( 1988, vipclub,  orangec,  vipclub,         vipclub,  nbmj8688_state, empty
 
 /* pure 12-bit palette */
 GAME( 1988, kaguya,   0,        kaguya,          kaguya,   nbmj8688_state, empty_init,    ROT0, "Miki Syouji",    "Mahjong Kaguyahime (Japan 880521)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, kaguyaa,  kaguya,   kaguya,          kaguya,   nbmj8688_state, empty_init,    ROT0, "Miki Syouji",    "Mahjong Kaguyahime (Japan 880425)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, kaguya2,  0,        kaguya2,         kaguya,   nbmj8688_state, init_kaguya2,  ROT0, "Miki Syouji",    "Mahjong Kaguyahime Sono2 (Japan 890829)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, kaguya2f, kaguya2,  kaguya2,         kaguya,   nbmj8688_state, init_kaguya2,  ROT0, "Miki Syouji",    "Mahjong Kaguyahime Sono2 Fukkokuban (Japan 010808)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kanatuen, 0,        kanatuen,        kanatuen, nbmj8688_state, init_kanatuen, ROT0, "Panac",          "Kanatsuen no Onna (Japan 880905)", MACHINE_SUPPORTS_SAVE )

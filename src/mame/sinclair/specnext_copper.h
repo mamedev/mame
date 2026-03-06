@@ -5,9 +5,6 @@
 
 #pragma once
 
-#include <utility>
-
-
 class specnext_copper_device : public device_t
 {
 

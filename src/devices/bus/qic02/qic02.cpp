@@ -4,7 +4,7 @@
 /*
  * QIC-02 connector and controller interface.
  *
- * All signals (including data) are specified and emulated active low.
+ * All signals (except data) are specified and emulated active low.
  *
  * Sources:
  *  - QIC-02 Rev D 1/4 inch Cartridge Tape Drive Intelligent Interface Standard, September 23, 1982, Archive Corporation
@@ -86,7 +86,7 @@ u8 qic02_connector_device::data_r()
 	if (device_qic02_interface *const c = get_card_device())
 		return c->data_r();
 	else
-		return 0xff;
+		return 0;
 }
 
 void qic02_connector_device::data_w(u8 data)

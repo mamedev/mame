@@ -15,7 +15,37 @@
 #include "cpu/drcfe.h"
 
 
-class dsp16_device_base::frontend : public drc_frontend
+class dsp16_device_base::opcode_desc : public opcode_desc_base<opcode_desc, 32>
+{
+public:
+	u32 cycles;
+
+	void set_can_change_modes() { m_can_change_modes = true; }
+	void set_reads_memory() { m_reads_memory = true; }
+	void set_writes_memory() { m_writes_memory = true; }
+
+	bool can_change_modes() const { return m_can_change_modes; }
+	bool reads_memory() const { return m_reads_memory; }
+	bool writes_memory() const { return m_writes_memory; }
+
+	void reset(offs_t curpc, bool in_delay_slot)
+	{
+		opcode_desc_base::reset(curpc, in_delay_slot);
+
+		cycles = 0;
+		m_can_change_modes = false;
+		m_reads_memory = false;
+		m_writes_memory = false;
+	}
+
+private:
+	bool m_can_change_modes;
+	bool m_reads_memory;
+	bool m_writes_memory;
+};
+
+
+class dsp16_device_base::frontend : public drc_frontend_base<opcode_desc>
 {
 public:
 	enum : u8
@@ -59,12 +89,13 @@ public:
 
 	// construction/destruction
 	frontend(dsp16_device_base &host, u32 window_start, u32 window_end, u32 max_sequence);
+	~frontend();
 
-protected:
-	// drc_frontend implementation
-	virtual bool describe(opcode_desc &desc, opcode_desc const *prev) override;
+	opcode_desc const *describe_code(offs_t startpc);
 
 private:
+	bool describe(opcode_desc &desc, opcode_desc const *prev);
+
 	// program fetch helpers
 	u16 read_op(opcode_desc const &desc, u16 offset);
 	u16 read_op(opcode_desc const &desc) { return read_op(desc, 0U); }
@@ -87,10 +118,10 @@ private:
 	static void describe_z(opcode_desc &desc, u16 op);
 
 	// field access helpers
-	static void flag_reg(u32 (&flags)[4]) { }
-	template <typename... T> static void flag_reg(u32 (&flags)[4], u8 reg0, T... regn)
+	static void flag_reg(opcode_desc::regmask &flags) { }
+	template <typename... T> static void flag_reg(opcode_desc::regmask &flags, u8 reg0, T... regn)
 	{
-		flags[reg0 >> 5] |= (u32(1) << (reg0 & (u32(32) - 1)));
+		flags.set(reg0);
 		flag_reg(flags, regn...);
 	}
 	template <typename... T> static void flag_input_reg(opcode_desc &desc, T... reg) { flag_reg(desc.regin, reg...); }
@@ -101,8 +132,9 @@ private:
 	dsp16_device_base &m_host;
 
 	// for making sweeping assumptions
-	u32 m_cache_cycles = 0U, m_cache_last_cycles = 0U, m_cache_flags = 0U;
-	decltype(opcode_desc::regin) m_cache_regin, m_cache_regout, m_cache_regreq;
+	u32 m_cache_cycles = 0U, m_cache_last_cycles = 0U;
+	opcode_desc::regmask m_cache_regin, m_cache_regout, m_cache_regreq;
+	bool m_cache_reads_memory = false, m_cache_writes_memory = false;
 	bool m_cache_valid = false;
 };
 

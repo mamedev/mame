@@ -60,7 +60,7 @@ public:
 		, m_net(*this, "net")
 		, m_fdc(*this, "fdc")
 		, m_hid(*this, "hid")
-		, m_scsi(*this, "scsi:7:cxd1185")
+		, m_scsi(*this, "cxd1185")
 		, m_serial(*this, "serial%u", 0U)
 		, m_scsibus(*this, "scsi")
 		, m_led(*this, "led%u", 0U)
@@ -525,22 +525,18 @@ void news_r3k_base_state::common(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:6", news_scsi_devices, nullptr);
 
 	// scsi host adapter
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("cxd1185", CXD1185).clock(16_MHz_XTAL).machine_config(
-		[this] (device_t *device)
-		{
-			cxd1185_device &adapter = downcast<cxd1185_device &>(*device);
+	CXD1185(config, m_scsi, 16_MHz_XTAL);
+	m_scsibus->set_external_device(7, m_scsi);
+	m_scsi->irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
+	m_scsi->drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
+	m_scsi->port_out_cb().set(
+							  [this] (u8 data)
+							  {
+								  LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
+							  });
 
-			adapter.irq_out_cb().set(m_dma, FUNC(dmac_0448_device::irq<0>));
-			adapter.drq_out_cb().set(m_dma, FUNC(dmac_0448_device::drq<0>));
-			adapter.port_out_cb().set(
-				[this] (u8 data)
-				{
-					LOG("floppy %s\n", BIT(data, 0) ? "mount" : "eject");
-				});
-
-			subdevice<dmac_0448_device>(":dma")->dma_r_cb<0>().set(adapter, FUNC(cxd1185_device::dma_r));
-			subdevice<dmac_0448_device>(":dma")->dma_w_cb<0>().set(adapter, FUNC(cxd1185_device::dma_w));
-		});
+	m_dma->dma_r_cb<0>().set(m_scsi, FUNC(cxd1185_device::dma_r));
+	m_dma->dma_w_cb<0>().set(m_scsi, FUNC(cxd1185_device::dma_w));
 
 	NEWS_HID_HLE(config, m_hid);
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(FUNC(news_r3k_base_state::irq_w<KBD>));

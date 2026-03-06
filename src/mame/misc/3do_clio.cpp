@@ -45,7 +45,10 @@ clio_device::clio_device(const machine_config &mconfig, const char *tag, device_
 void clio_device::device_add_mconfig(machine_config &config)
 {
 	DSPP(config, m_dspp, DERIVED_CLOCK(1, 1));
-//  m_dspp->int_handler().set([this] (int state) { printf("%d\n", state); });
+	m_dspp->int_handler().set([this] (int state) {
+		if (state)
+			request_fiq<0>(1 << IRQ_DSPPINT);
+	});
 //  m_dspp->dma_read_handler().set(FUNC(m2_bda_device::read_bus8));
 //  m_dspp->dma_write_handler().set(FUNC(m2_bda_device::write_bus8));
 }
@@ -76,12 +79,10 @@ void clio_device::device_start()
 //  save_item(NAME(m_vcnt));
 	save_item(NAME(m_seed));
 	save_item(NAME(m_random));
-	save_item(NAME(m_irq0));
-	save_item(NAME(m_irq0_enable));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_badbits));
-	save_item(NAME(m_irq1));
-	save_item(NAME(m_irq1_enable));
 	save_item(NAME(m_hdelay));
 	save_item(NAME(m_adbio));
 	save_item(NAME(m_adbctl));
@@ -108,8 +109,8 @@ void clio_device::device_reset()
 {
 	m_cstatbits = 0x01; /* bit 0 = reset of clio caused by power on */
 
-	m_irq0_enable = m_irq1_enable = 0;
-	m_irq0 = m_irq1 = 0;
+	m_irq_enable[0] = m_irq_enable[1] = 0;
+	m_irq[0] = m_irq[1] = 0;
 	m_timer_ctrl = 0;
 	m_vint0 = m_vint1 = 0xffff'ffff;
 	m_slack = 336;
@@ -123,7 +124,7 @@ void clio_device::device_reset()
 void clio_device::dply_w(int state)
 {
 	if (state)
-		request_fiq(1 << 0, 1);
+		request_fiq<1>(1 << IRQ_PLYINT);
 }
 
 void clio_device::xbus_int_w(int state)
@@ -132,7 +133,7 @@ void clio_device::xbus_int_w(int state)
 	{
 		m_xbus_dev[0] |= 0x10;
 		if (m_xbus_dev[0] & 1)
-			request_fiq(1 << 2, 0);
+			request_fiq<0>(1 << IRQ_EXINT);
 	}
 	else
 		m_xbus_dev[0] &= ~0x10;
@@ -140,12 +141,12 @@ void clio_device::xbus_int_w(int state)
 
 void clio_device::xbus_wr_w(int state)
 {
-//	printf("%d WR %02x\n", state, m_xbus_dev[0]);
+//  printf("%d WR %02x\n", state, m_xbus_dev[0]);
 	if (state)
 	{
 		m_xbus_dev[0] |= 0x20;
 		if (m_xbus_dev[0] & 2)
-			request_fiq(1 << 2, 0);
+			request_fiq<0>(1 << IRQ_EXINT);
 	}
 	else
 		m_xbus_dev[0] &= ~0x20;
@@ -157,7 +158,7 @@ void clio_device::dexp_w(int state)
 	if (state)
 	{
 		m_expctl &= ~(1 << 10);
-		request_fiq(1 << 29, 0);
+		request_fiq<0>(1 << IRQ_DEXINT);
 	}
 }
 
@@ -268,26 +269,29 @@ void clio_device::map(address_map &map)
 
 	// interrupt control
 	map(0x0040, 0x0047).lrw32(
-		NAME([this] () { return m_irq0; }),
+		NAME([this] () { return m_irq[0]; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (offset)
-				m_irq0 &= ~data;
+				m_irq[0] &= ~data;
 			else
-				m_irq0 |= data;
+				m_irq[0] |= data;
 
-			request_fiq(0, 0);
+			request_fiq<0>(0);
 		})
 	);
 	map(0x0048, 0x004f).lrw32(
-		NAME([this] () { return m_irq0_enable; }),
+		// TODO: second priority bit 31 should always read 1
+		// this however causes continous irq loop cycles during POST as soon as IRQ_PLYINT is requested
+		// (never actually enabled in irq1, just IRQ_BADBITS is)
+		NAME([this] () { return m_irq_enable[0]; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (offset)
-				m_irq0_enable &= ~data;
+				m_irq_enable[0] &= ~data;
 			else
-				m_irq0_enable |= data;
+				m_irq_enable[0] |= data;
 
-			LOGIRQ("irq0 enable %s: %08x & %08x -> %08x\n", offset ? "clear" : "set", data, mem_mask, m_irq0_enable);
-			request_fiq(0, 0);
+			LOGIRQ("irq0 enable %s: %08x & %08x -> %08x\n", offset ? "clear" : "set", data, mem_mask, m_irq_enable[0]);
+			request_fiq<0>(0);
 		})
 	);
 	map(0x0050, 0x0057).lw32(
@@ -309,26 +313,26 @@ void clio_device::map(address_map &map)
 
 //  map(0x005c, 0x005f) unknown if used at all
 	map(0x0060, 0x0067).lrw32(
-		NAME([this] () { return m_irq1; }),
+		NAME([this] () { return m_irq[1]; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (offset)
-				m_irq1 &= ~data;
+				m_irq[1] &= ~data;
 			else
-				m_irq1 |= data;
+				m_irq[1] |= data;
 
-			request_fiq(0, 1);
+			request_fiq<1>(0);
 		})
 	);
 	map(0x0068, 0x006f).lrw32(
-		NAME([this] () { return m_irq1_enable; }),
+		NAME([this] () { return m_irq_enable[1]; }),
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (offset)
-				m_irq1_enable &= ~data;
+				m_irq_enable[1] &= ~data;
 			else
-				m_irq1_enable |= data;
+				m_irq_enable[1] |= data;
 
-			LOGIRQ("irq1 enable %s: %08x & %08x -> %08x\n", offset ? "clear" : "set", data, mem_mask, m_irq1_enable);
-			request_fiq(0, 1);
+			LOGIRQ("irq1 enable %s: %08x & %08x -> %08x\n", offset ? "clear" : "set", data, mem_mask, m_irq_enable[1]);
+			request_fiq<1>(0);
 		})
 	);
 
@@ -557,17 +561,21 @@ void clio_device::map(address_map &map)
 	// HACK: temporary to allow 3do_gdo101 boot
 	map(0x17d0, 0x17d3).lr32(NAME([] () { return 0x0004'0000; }));
 //  map(0x17d4, 0x17d7) Semaphore ACK
-//  map(0x17e0, 0x17ff) DSPP DMA and state
+//  map(0x17e0, 0x17e3) DSPP DMA
+//  map(0x17e4, 0x17e7) DSPPRST0 (use current reload)
+	// DSPPRST1 (set 568 tick cycle)
 	map(0x17e8, 0x17eb).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
-			// reset?
-			m_dspp->write(0x6074 >> 2, 1);
-			m_dspp->write(0x6074 >> 2, 0);
+			//m_dspp->write(0x6074 >> 2, 1);
+			//m_dspp->write(0x6074 >> 2, 0);
 			//m_dspp->write((0x1300 + 8) >> 2, 568);
 			//m_dspp->write((0x1340 + 8) >> 2, 568);
 			LOGDSPP("DSPP $17e8 %08x & %08x\n", data, mem_mask);
 		})
 	);
+//  map(0x17f0, 0x17f3) Read noise value (Red only?)
+//  map(0x17f4, 0x17f7) Read DSPP PC (bits 15:0 only)
+//  map(0x17f8, 0x17fb) Read DSPP NR (bits 15:0 only)
 	/*
 	---- x--- DSPPError
 	---- -x-- DSPPReset
@@ -583,106 +591,69 @@ void clio_device::map(address_map &map)
 	map(0x17fc, 0x17ff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			LOGDSPP("DSPP $17fc %08x & %08x\n", data, mem_mask);
-			m_dspp->write(0x6070 >> 2, data);
-			//if (data & 1)
-			//  machine().debug_break();
+			m_dspp->host_gw_control_write(0, data);
 		})
 	);
-	// DSPP N paths (code)
+	// DSPP iNstruction paths (code)
 	map(0x1800, 0x1fff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_16_31)
-				m_dspp->write((offset << 1) + 0, data >> 16);
+				m_dspp->host_n_write((offset << 1) + 0, data >> 16);
 			if (ACCESSING_BITS_0_15)
-				m_dspp->write((offset << 1) + 1, data & 0xffff);
+				m_dspp->host_n_write((offset << 1) + 1, data & 0xffff);
 		})
 	);
 	map(0x2000, 0x2fff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			// code path
 			if (ACCESSING_BITS_0_15)
-				m_dspp->write(offset, data);
+				m_dspp->host_n_write(offset, data);
 		})
 	);
-	// EI paths (data writes)
+	// EI paths (data writes from host)
 	map(0x3000, 0x31ff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_16_31)
-				m_dspp->write(((offset<<1) + 0) | 0x400, data);
+				m_dspp->host_ei_write(((offset<<1) + 0), data);
 			if (ACCESSING_BITS_0_15)
-				m_dspp->write(((offset<<1) + 1) | 0x400, data);
+				m_dspp->host_ei_write(((offset<<1) + 1), data);
 		})
 	);
 	map(0x3400, 0x37ff).lw32(
 		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
 			if (ACCESSING_BITS_0_15)
-				m_dspp->write(offset | 0x400, data);
+				m_dspp->host_ei_write(offset, data);
 		})
 	);
-	// EO paths (data reads)
+	// EO paths (data reads from host)
 	map(0x3800, 0x39ff).lr32(
 		NAME([this] (offs_t offset) {
 			uint32_t res = 0;
-			res =  m_dspp->read(((offset << 1) + 0) | 0x400) << 16;
-			res |= m_dspp->read(((offset << 1) + 1) | 0x400);
+			res =  m_dspp->host_eo_read(((offset << 1) + 0)) << 16;
+			res |= m_dspp->host_eo_read(((offset << 1) + 1));
 			return res;
 		})
 	);
 	map(0x3c00, 0x3fff).lr32(
 		NAME([this] (offs_t offset) {
-			return m_dspp->read(offset | 0x400);
+			return m_dspp->host_eo_read(offset);
 		})
 	);
 }
 
-/*
-IRQ0
-0x80000000 Second Priority
-0x40000000 SW irq
-0x20000000 DMA<->EXP
-0x1fff0000 DMA RAM->DSPP *
-0x0000f000 DMA DSPP->RAM *
-0x00000800 DSPP
-0x00000400 Timer  1
-0x00000200 Timer  3
-0x00000100 Timer  5
-0x00000080 Timer  7
-0x00000040 Timer  9
-0x00000020 Timer 11
-0x00000010 Timer 13
-0x00000008 Timer 15
-0x00000004 Expansion Bus
-0x00000002 Vertical 1
-0x00000001 Vertical 0
-
----
-IRQ1
-0x00000400 DSPPOVER (Red rev. only)
-0x00000200 DSPPUNDER (Red rev. only)
-0x00000100 BadBits
-0x00000080 DMA<-External
-0x00000040 DMA->External
-0x00000020 DMA<-Uncle
-0x00000010 DMA->Uncle
-0x00000008 DMA RAM->DSPP N
-0x00000004 SlowBus
-0x00000002 Disk Inserted
-0x00000001 DMA Player bus
-
-*/
-void clio_device::request_fiq(uint32_t irq_req, uint8_t type)
+template <unsigned N> void clio_device::request_fiq(uint32_t irq_req)
 {
-	if(type)
-		m_irq1 |= irq_req;
+	if (N)
+		m_irq[1] |= irq_req;
 	else
-		m_irq0 |= irq_req;
+		m_irq[0] |= irq_req;
 
-	if(m_irq1)
-		m_irq0 |= 1 << 31; // Second Priority
+	if(m_irq[1])
+		m_irq[0] |= 1 << IRQ_SCNDPINT; // Second Priority
 	else
-		m_irq0 &= ~(1 << 31);
+		m_irq[0] &= ~(1 << IRQ_SCNDPINT);
 
-	m_firq_cb((m_irq0 & m_irq0_enable) || (m_irq1 & m_irq1_enable));
+	m_firq_cb((m_irq[0] & m_irq_enable[0]) || (m_irq[1] & m_irq_enable[1]));
 }
 
 // TODO: this actually generates from Amy not from Clio
@@ -693,7 +664,7 @@ TIMER_CALLBACK_MEMBER(clio_device::scan_timer_cb)
 	// TODO: does it triggers on odd fields only?
 	if (scanline == m_vint1 && m_screen->frame_number() & 1)
 	{
-		request_fiq(1 << 1, 0);
+		request_fiq<0>(1 << IRQ_VINT1);
 	}
 
 	// 22, 262
@@ -726,6 +697,10 @@ TIMER_CALLBACK_MEMBER(clio_device::scan_timer_cb)
  */
 TIMER_CALLBACK_MEMBER( clio_device::system_timer_cb )
 {
+	static const u32 timer_irqs[8] = {
+		1 << IRQ_TIMINT1, 1 << IRQ_TIMINT3,  1 << IRQ_TIMINT5,  1 << IRQ_TIMINT7,
+		1 << IRQ_TIMINT9, 1 << IRQ_TIMINT11, 1 << IRQ_TIMINT13, 1 << IRQ_TIMINT15
+	};
 	u8 timer_flag;
 	u8 carry_val;
 
@@ -749,7 +724,7 @@ TIMER_CALLBACK_MEMBER( clio_device::system_timer_cb )
 			{
 				// only odd numbered timers causes irqs
 				if(i & 1)
-					request_fiq(8 << (7 - (i >> 1)), 0);
+					request_fiq<0>(timer_irqs[i >> 1]);
 
 				carry_val = 1;
 

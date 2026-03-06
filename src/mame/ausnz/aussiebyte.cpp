@@ -540,7 +540,7 @@ void aussiebyte_state::aussiebyte(machine_config &config)
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	// BAO, not used
 	m_dma->in_mreq_callback().set(FUNC(aussiebyte_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(aussiebyte_state::memory_write_byte));

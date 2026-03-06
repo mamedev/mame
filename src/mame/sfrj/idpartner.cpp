@@ -376,10 +376,10 @@ void idpartner_state::partner_base(machine_config &config)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_ctc->zc_callback<0>().set(m_ctc, FUNC(z80ctc_device::trg1));
 	m_ctc->zc_callback<1>().set(FUNC(idpartner_state::xx2_w));
-	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));  // optional
+	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3)); // optional
 
 	Z80DMA(config, m_dma, XTAL(8'000'000) / 2);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set(m_fdc, FUNC(i8272a_device::tc_line_w));
 	m_dma->in_mreq_callback().set(FUNC(idpartner_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(idpartner_state::memory_write_byte));

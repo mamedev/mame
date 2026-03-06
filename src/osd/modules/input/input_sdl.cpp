@@ -15,7 +15,7 @@
 
 #include "modules/osdmodule.h"
 
-#if defined(OSD_SDL)
+#if defined(OSD_SDL) && !defined(SDLMAME_SDL3)
 
 #include "assignmenthelper.h"
 #include "input_common.h"
@@ -2872,9 +2872,10 @@ MODULE_NOT_SUPPORTED(sdl_game_controller_module, OSD_JOYSTICKINPUT_PROVIDER, "sd
 
 #endif // defined(SDLMAME_SDL2)
 
-
+#ifdef SDLMAME_SDL2
 MODULE_DEFINITION(KEYBOARDINPUT_SDL, osd::sdl_keyboard_module)
 MODULE_DEFINITION(MOUSEINPUT_SDL, osd::sdl_mouse_module)
 MODULE_DEFINITION(LIGHTGUNINPUT_SDL, osd::sdl_lightgun_module)
 MODULE_DEFINITION(JOYSTICKINPUT_SDLJOY, osd::sdl_joystick_module)
 MODULE_DEFINITION(JOYSTICKINPUT_SDLGAME, osd::sdl_game_controller_module)
+#endif

@@ -466,7 +466,7 @@ void super6_state::super6(machine_config &config)
 	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dma, 24_MHz_XTAL / 6);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->out_int_callback().set(m_ctc, FUNC(z80ctc_device::trg2));
 	m_dma->in_mreq_callback().set(FUNC(super6_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(super6_state::memory_write_byte));

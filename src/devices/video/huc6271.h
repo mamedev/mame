@@ -24,10 +24,10 @@ class huc6271_device : public device_t,
 {
 public:
 	// construction/destruction
-	huc6271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	huc6271_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// I/O operations
-	//void data_transfer(uint32_t offset, uint32_t data);
+	//void data_transfer(u32 offset, u32 data);
 	void amap(address_map &map) ATTR_COLD;
 
 protected:

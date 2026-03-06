@@ -8,12 +8,13 @@ Driver file to handle emulation of the 3DO systems
 
 TODO:
 - Incomplete XBus/CD drive semantics
-\- 3do disks fail to be recognized;
+\- 3do disks fail to be recognized, reads Avatar structure, decides they aren't worth and moves on;
 \- Photo CD bails out at startup with error -8021 (unless A is held on 3do_fz10e & Sanyo based
    romsets, where first picture is loaded then bails out anyway)
 \- Audio CD black screen (needs DSPP irq), has plenty of Cel, VDLP and sport issues later
    (reads random port, asks for audio tracks *with* subcode);
-- DSPP mapping (incompatible with later M2, consider an "opera_host_map" instead);
+- Incomplete DSPP mapping
+\- Most notably it should restart on counter reloads (bp 38,1,{pc=0;g} to bypass hang in 3do_fz1)
 - Replace ARM7 with ARM60;
 - Fix VRAM size (should be 1 MB, but every single BIOS fails to boot with that, wrong ARM type?);
 - CEL engine should really halt main CPU when running, paused only when irqs are taken;
@@ -259,8 +260,9 @@ void _3do_state::green_config(machine_config &config)
 
 	CLIO(config, m_clio, XTAL(50'000'000)/4);
 	m_clio->firq_cb().set([this] (int state) {
-		if (state)
-			m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+		//if (state)
+		//  m_maincpu->pulse_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, m_maincpu->minimum_quantum_time());
 	});
 	m_clio->set_screen_tag("screen");
 	m_clio->xbus_sel_cb().set([this] (u8 data) {

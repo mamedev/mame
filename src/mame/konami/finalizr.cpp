@@ -1,17 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders: Nicola Salmoria
 
-/***************************************************************************
+/*******************************************************************************
 
 Finalizer (GX523) (c) 1985 Konami
 
 TODO:
-- does Konami SND01 MCU have anything custom or is it the same as 8049?
 - bootleg uses ENT0 CLK connected to T1 instead of internal timer, but it doesn't
   look like MAME can handle it with the speed it wants (eg. with set_t0_clk_cb and
   clock_device), so right now it's done with machine().time() when it reads T1.
 
-***************************************************************************/
+*******************************************************************************/
 
 #include "emu.h"
 
@@ -99,7 +98,7 @@ private:
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   The palette PROMs are connected to the RGB output this way:
 
@@ -118,7 +117,7 @@ private:
         -- 1   kohm resistor  -- |
   bit 0 -- 2.2 kohm resistor  -- /
 
-***************************************************************************/
+*******************************************************************************/
 
 void finalizr_state::palette(palette_device &palette) const
 {
@@ -205,7 +204,7 @@ void finalizr_state::video_start()
 
 
 
-/**************************************************************************/
+/******************************************************************************/
 
 void finalizr_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -510,7 +509,7 @@ void finalizr_state::finalizr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &finalizr_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(finalizr_state::scanline), "screen", 0, 1);
 
-	I8049(config, m_audiocpu, 18.432_MHz_XTAL / 3); // 6.144MHz
+	M58715(config, m_audiocpu, 18.432_MHz_XTAL / 3); // 6.144MHz
 	m_audiocpu->set_addrmap(AS_IO, &finalizr_state::sound_io_map);
 	m_audiocpu->p1_out_cb().set("dac", FUNC(dac_byte_interface::data_w));
 	m_audiocpu->p2_out_cb().set(FUNC(finalizr_state::sound_irqen_w));
@@ -549,11 +548,11 @@ void finalizr_state::finalizrb(machine_config &config)
 
 
 
-/***************************************************************************
+/*******************************************************************************
 
   Game driver(s)
 
-***************************************************************************/
+*******************************************************************************/
 
 ROM_START( finalizr )
 	ROM_REGION( 0x10000, "maincpu", 0 )

@@ -17,19 +17,22 @@
 ***************************************************************************/
 
 TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type1)
-{   /* col: 0..63; row: 0..31 */
+{
 	/* armed formation */
+	/* col: 0..63; row: 0..31 */
 	return col * 32 + row;
 }
 
 TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type2)
-{   /* col: 0..63; row: 0..31 */
+{
+	/* col: 0..63; row: 0..31 */
 	return 32 * (31 - row) + (col & 0x1f) + 0x800 * (col / 32);
 }
 
 TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type3)
-{   /* col: 0..63; row: 0..31 */
+{
 	/* legion & legiono */
+	/* col: 0..63; row: 0..31 */
 	return 32 * (col & 0x1f) + row + 0x800 * (col / 32);
 }
 
@@ -313,21 +316,21 @@ void armedf_state::armedf_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip,
 }
 
 
-void armedf_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap )
+void armedf_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &primap)
 {
-	u16 *buffered_spriteram = m_spriteram->buffer();
+	u16 *spriteram = m_spriteram->buffer();
 
 	for (int offs = (m_spriteram->bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
 		u32 pmask = 0;
-		int code = buffered_spriteram[offs + 1]; /* ??YX?TTTTTTTTTTT */
+		int code = spriteram[offs + 1]; /* ??YX?TTTTTTTTTTT */
 		int flipx = code & 0x2000;
 		int flipy = code & 0x1000;
-		int color = (buffered_spriteram[offs + 2] >> 8) & 0x1f;
-		int clut = (buffered_spriteram[offs + 2]) & 0x7f;
-		int sx = buffered_spriteram[offs + 3];
-		int sy = m_sprite_offy + 240 - (buffered_spriteram[offs + 0] & 0x1ff);
-		int pri = ((buffered_spriteram[offs + 0] & 0x3000) >> 12);
+		int color = (spriteram[offs + 2] >> 8) & 0x1f;
+		int clut = (spriteram[offs + 2]) & 0x7f;
+		int sx = spriteram[offs + 3];
+		int sy = m_sprite_offy + 240 - (spriteram[offs + 0] & 0x1ff);
+		int pri = ((spriteram[offs + 0] & 0x3000) >> 12);
 		if (pri == 3) // mimic previous driver behavior, correct?
 			continue;
 

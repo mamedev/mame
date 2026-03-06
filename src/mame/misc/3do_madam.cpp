@@ -546,11 +546,13 @@ void madam_device::vdlp_start_w(int state)
 		return;
 	}
 
-//  if (m_vdlp.address == m_dma[DMA_CLUT_MID][0])
-//  {
-//      m_vdlp.fetch = false;
-//      return;
-//  }
+#if 0
+	if (m_vdlp.address == m_dma[DMA_CLUT_MID][0])
+	{
+		m_vdlp.fetch = false;
+		return;
+	}
+#endif
 
 	// 0: control
 	// 1: video
@@ -1326,7 +1328,7 @@ u16 madam_device::get_pixel_4bpp_coded_lrform0(int x, int y, u16 woffset)
 	cel_address += ((x & ~1) >> 1);
 	u8 src_shift = (x & 1) ^ 1;
 
-//	u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 4)) & 0xf;
+	//u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 4)) & 0xf;
 	u16 plut_data = (m_dma8_read_cb(cel_address) >> (src_shift * 4)) & 0xf;
 	plut_data <<= 1;
 
@@ -1344,7 +1346,7 @@ u16 madam_device::get_pixel_6bpp_coded_lrform0(int x, int y, u16 woffset)
 	cel_address += ((y) * woffset) << 2;
 	// math would make more sense with / 3 ~ % 3 but the pitch would be off that way (dword boundary?)
 	cel_address += (x / 4) * 3;
-	u8 src_shift = (3 - (x % 4)) * 6;
+	u8 src_shift = (~x & 3) * 6;
 
 	u16 plut_data = ((m_dma8_read_cb(cel_address + 0) << 16) + (m_dma8_read_cb(cel_address + 1) << 8) + (m_dma8_read_cb(cel_address + 2))) >> (src_shift) & 0x3f;
 	plut_data <<= 1;
@@ -1364,7 +1366,7 @@ u16 madam_device::get_pixel_8bpp_coded_lrform0(int x, int y, u16 woffset)
 	cel_address += ((x) << 0);
 	//u8 src_shift = (x & 3) ^ 3;
 
-//	u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 8)) & 0xff;
+	//u16 plut_data = (m_dma32_read_cb(cel_address) >> (src_shift * 8)) & 0xff;
 	u16 plut_data = m_dma8_read_cb(cel_address);
 	plut_data <<= 1;
 

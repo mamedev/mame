@@ -28,6 +28,12 @@ function maintargetosdoptions(_target,_subtarget)
 		}
 	end
 
+	if _OPTIONS["USE_SDL3"] == "1" then
+		links {
+			"SDL3.dll",
+		}
+	end
+
 	links {
 		"comctl32",
 		"comdlg32",
@@ -42,10 +48,23 @@ end
 
 newoption {
 	trigger = "USE_SDL",
-	description = "Enable SDL sound output",
+	description = "Enable SDL2 sound output",
 	allowed = {
-		{ "0",  "Disable SDL sound output"  },
-		{ "1",  "Enable SDL sound output"   },
+		{ "0",  "Disable SDL2 sound output"  },
+		{ "1",  "Enable SDL2 sound output"   },
+	},
+}
+
+if not _OPTIONS["USE_SDL"] then
+	_OPTIONS["USE_SDL"] = "0"
+end
+
+newoption {
+	trigger = "USE_SDL3",
+	description = "Enable SDL3 sound output",
+	allowed = {
+		{ "0",  "Disable SDL3 sound output"  },
+		{ "1",  "Enable SDL3 sound output"   },
 	},
 }
 

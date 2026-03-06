@@ -39,8 +39,6 @@ Notes:
 
 #include "emu.h"
 #include "lux4105.h"
-#include "bus/scsi/scsihd.h"
-#include "bus/scsi/s1410.h"
 
 
 
@@ -69,17 +67,9 @@ DEFINE_DEVICE_TYPE(LUXOR_4105, luxor_4105_device, "lux4105", "Luxor 4105")
 
 void luxor_4105_device::device_add_mconfig(machine_config &config)
 {
-	NSCSI_BUS(config, "sasi");
+	auto &sasi(NSCSI_BUS(config, "sasi"));
 	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "s1410");
-	NSCSI_CONNECTOR(config, "sasi:7", default_scsi_devices, "scsicb", true)
-		.option_add_internal("scsicb", NSCSI_CB)
-		.machine_config([this](device_t* device) {
-			downcast<nscsi_callback_device&>(*device).cd_callback().set(*this, FUNC(luxor_4105_device::write_sasi_cd));
-			downcast<nscsi_callback_device&>(*device).bsy_callback().set(*this, FUNC(luxor_4105_device::write_sasi_bsy));
-			downcast<nscsi_callback_device&>(*device).req_callback().set(*this, FUNC(luxor_4105_device::write_sasi_req));
-			downcast<nscsi_callback_device&>(*device).msg_callback().set(*this, FUNC(luxor_4105_device::write_sasi_msg));
-			downcast<nscsi_callback_device&>(*device).io_callback().set(*this, FUNC(luxor_4105_device::write_sasi_io));
-		});
+	sasi.set_external_device(7, *this);
 }
 
 
@@ -138,8 +128,8 @@ ioport_constructor luxor_4105_device::device_input_ports() const
 
 luxor_4105_device::luxor_4105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, LUXOR_4105, tag, owner, clock),
+	nscsi_device_interface(mconfig, *this),
 	device_abcbus_card_interface(mconfig, *this),
-	m_sasi(*this, "sasi:7:scsicb"),
 	m_1e(*this, "1E"),
 	m_5e(*this, "5E"),
 	m_cs(false),
@@ -186,18 +176,18 @@ void luxor_4105_device::internal_reset()
 
 	m_data_out = 0;
 
-	m_sasi->sel_w(0);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL);
 
-	m_sasi->rst_w(1);
-	m_sasi->rst_w(0);
+	m_scsi_bus->ctrl_w(m_scsi_refid, S_RST, S_RST);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_RST);
 }
 
 
 void luxor_4105_device::update_dma()
 {
 	// TRRQ
-	bool req = m_sasi->req_r() && !m_req;
-	bool cd = m_sasi->cd_r();
+	bool req = (m_scsi_bus->ctrl_r() & S_REQ) && !m_req;
+	bool cd = m_scsi_bus->ctrl_r() & S_CTL;
 	m_trrq = !(req && !cd);
 	if (DMA_O2)
 	{
@@ -208,14 +198,14 @@ void luxor_4105_device::update_dma()
 
 			update_ack();
 
-			req = m_sasi->req_r() && !m_req;
+			req = (m_scsi_bus->ctrl_r() & S_REQ) && !m_req;
 			m_trrq = !(req && !cd);
 		}
 	}
 	m_slot->trrq_w(DMA_O2 ? m_trrq : 1);
 
 	// DRQ
-	bool io = m_sasi->io_r();
+	bool io = m_scsi_bus->ctrl_r() & S_INP;
 	m_drq = (!((!cd || !io) && !(!cd && !DMA_O2))) && req;
 
 	// IRQ
@@ -231,13 +221,13 @@ void luxor_4105_device::update_dma()
 	{
 		irq = 0;
 	}
-	m_slot->irq_w(!irq);
+	m_slot->irq_w(irq);
 }
 
 
 void luxor_4105_device::update_ack()
 {
-	m_sasi->ack_w(m_sasi->req_r() && (m_sasi->msg_r() || m_req));
+	m_scsi_bus->ctrl_w(m_scsi_refid, (m_scsi_bus->ctrl_r() & S_REQ && (m_scsi_bus->ctrl_r() & S_MSG || m_req)) ? S_ACK : 0, S_ACK);
 }
 
 
@@ -273,66 +263,32 @@ void luxor_4105_device::write_sasi_data(uint8_t data)
 {
 	m_data_out = data;
 
-	if (!m_sasi->io_r())
+	if (!(m_scsi_bus->ctrl_r() & S_INP))
 	{
-		m_sasi->write(data);
+		m_scsi_bus->data_w(m_scsi_refid, data);
 	}
 
 	// clock REQ FF
-	m_req = m_sasi->req_r();
+	m_req = m_scsi_bus->ctrl_r() & S_REQ;
 
 	update_ack();
 	update_dma();
 }
 
-
-void luxor_4105_device::write_sasi_bsy(int state)
+void luxor_4105_device::scsi_ctrl_changed()
 {
-	if (state)
-	{
-		m_sasi->sel_w(0);
-	}
-}
-
-
-void luxor_4105_device::write_sasi_cd(int state)
-{
-	update_dma();
-}
-
-
-void luxor_4105_device::write_sasi_req(int state)
-{
-	if (LOG) logerror("%s REQ %u\n", machine().describe_context(), state);
-
-	if (!state)
-	{
+	if(m_scsi_bus->ctrl_r() & S_BSY)
+		m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_SEL);
+	if(!(m_scsi_bus->ctrl_r() & S_REQ))
 		// reset REQ FF
 		m_req = 0;
-	}
 
-	update_ack();
-	update_dma();
-}
-
-
-void luxor_4105_device::write_sasi_msg(int state)
-{
-	update_ack();
-}
-
-
-void luxor_4105_device::write_sasi_io(int state)
-{
-	if (state)
-	{
-		m_sasi->write(0);
-	}
+	if (m_scsi_bus->ctrl_r() & S_INP)
+		m_scsi_bus->data_w(m_scsi_refid, 0);
 	else
-	{
-		m_sasi->write(m_data_out);
-	}
-
+		m_scsi_bus->data_w(m_scsi_refid, m_data_out);
+	
+	update_ack();
 	update_dma();
 }
 
@@ -382,10 +338,10 @@ uint8_t luxor_4105_device::abcbus_stat()
 
 		*/
 
-		data = m_sasi->req_r() && !m_req;
-		data |= !m_sasi->cd_r() << 1;
-		data |= m_sasi->bsy_r() << 2;
-		data |= !m_sasi->io_r() << 3;
+		data = m_scsi_bus->ctrl_r() & S_REQ && !m_req;
+		data |= m_scsi_bus->ctrl_r() & S_CTL ? 0 : 2;
+		data |= m_scsi_bus->ctrl_r() & S_BSY ? 4 : 0;
+		data |= m_scsi_bus->ctrl_r() & S_INP ? 0 : 8;
 
 		data |= !DMA_O3 << 5;
 		data |= !m_pren << 6;
@@ -406,9 +362,9 @@ uint8_t luxor_4105_device::abcbus_inp()
 
 	if (m_cs)
 	{
-		if (m_sasi->bsy_r())
+		if (m_scsi_bus->ctrl_r() & S_BSY)
 		{
-			data = m_sasi->read();
+			data = m_scsi_bus->data_r();
 		}
 		else
 		{
@@ -416,7 +372,7 @@ uint8_t luxor_4105_device::abcbus_inp()
 		}
 
 		// clock REQ FF
-		m_req = m_sasi->req_r();
+		m_req = m_scsi_bus->ctrl_r() & S_REQ;
 
 		update_ack();
 		update_dma();
@@ -453,7 +409,7 @@ void luxor_4105_device::abcbus_c1(uint8_t data)
 	{
 		if (LOG) logerror("%s SELECT\n", machine().describe_context());
 
-		m_sasi->sel_w(1);
+		m_scsi_bus->ctrl_w(m_scsi_refid, S_SEL, S_SEL);
 	}
 }
 
@@ -498,13 +454,13 @@ uint8_t luxor_4105_device::abcbus_tren()
 
 	if (DMA_O2)
 	{
-		if (m_sasi->bsy_r())
+		if (m_scsi_bus->ctrl_r() & S_BSY)
 		{
-			data = m_sasi->read();
+			data = m_scsi_bus->data_r();
 		}
 
 		// clock REQ FF
-		m_req = m_sasi->req_r();
+		m_req = m_scsi_bus->ctrl_r() & S_REQ;
 
 		update_ack();
 		update_dma();

@@ -775,14 +775,16 @@ void spectrum_state::spectrum_common(machine_config &config)
 
 	dma_slot_device &dma(DMA_SLOT(config, "dma", X1 / 4, default_dma_slot_devices, nullptr));
 	dma.set_io_space(m_maincpu, AS_IO);
-	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	dma.in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
 	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });
 	dma.in_iorq_callback().set([this](offs_t offset) { return m_io.read_byte(offset); });
 	dma.out_iorq_callback().set([this](offs_t offset, u8 data) { m_io.write_byte(offset, data); });
 
-	SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx").set_load_callback(FUNC(spectrum_state::snapshot_cb));
+	snapshot_image_device &snapshot(SNAPSHOT(config, "snapshot", "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,spg,z80,zx"));
+	snapshot.set_load_callback(FUNC(spectrum_state::snapshot_cb));
+	snapshot.set_interface("spectrum_snapshot");
 	QUICKLOAD(config, "quickload", "raw,scr", attotime::from_seconds(2)).set_load_callback(FUNC(spectrum_state::quickload_cb)); // The delay prevents the screen from being cleared by the RAM test at boot
 
 	CASSETTE(config, m_cassette);

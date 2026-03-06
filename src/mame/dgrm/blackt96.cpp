@@ -80,7 +80,7 @@ Bugs (all of these looks BTANBs):
 */
 
 #include "emu.h"
-#include "snk68_spr.h"
+#include "alpha68k_spr.h"
 
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "cpu/m68000/m68000.h"
@@ -107,7 +107,7 @@ public:
 		m_oki1bank(*this, "oki1bank")
 	{ }
 
-	void blackt96(machine_config &config);
+	void blackt96(machine_config &config) ATTR_COLD;
 
 protected:
 	// overrides
@@ -117,45 +117,45 @@ protected:
 
 private:
 	// driver variables
-	uint8_t m_soundcmd;
-	uint8_t m_soundcmd_ready;
-	uint8_t m_port_c_data;
-	uint8_t m_port_b_latch;
-	uint8_t m_oki_selected;
-	uint8_t m_txt_bank;
+	u8 m_soundcmd = 0;
+	u8 m_soundcmd_ready = 0;
+	u8 m_port_c_data = 0;
+	u8 m_port_b_latch = 0;
+	u8 m_oki_selected = 0;
+	u8 m_txt_bank = 0;
 
 	// video
-	tilemap_t  *m_tx_tilemap;
+	tilemap_t  *m_tx_tilemap = nullptr;
 
 	// devices
-	required_shared_ptr<uint16_t> m_tilemapram;
+	required_shared_ptr<u16> m_tilemapram;
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_device<snk68_spr_device> m_sprites;
+	required_device<alpha68k_sprite_device> m_sprites;
 	required_device_array<okim6295_device, 2> m_oki;
 	required_memory_bank m_oki1bank;
 
 	// read/write handlers
-	void output_w(uint8_t data);
-	void sound_cmd_w(uint8_t data);
-	void tx_vram_w(offs_t offset, uint16_t data);
+	void output_w(u8 data);
+	void sound_cmd_w(u8 data);
+	void tx_vram_w(offs_t offset, u16 data);
 
-	void soundio_port_a_w(uint8_t data);
-	uint8_t soundio_port_b_r();
-	void soundio_port_b_w(uint8_t data);
-	uint8_t soundio_port_c_r();
-	void soundio_port_c_w(uint8_t data);
+	void soundio_port_a_w(u8 data);
+	u8 soundio_port_b_r();
+	void soundio_port_b_w(u8 data);
+	u8 soundio_port_c_r();
+	void soundio_port_c_w(u8 data);
 
-	uint16_t random_r() // todo, get rid of this once we work out where reads are from
+	u16 random_r() // todo, get rid of this once we work out where reads are from
 	{
 		return machine().rand();
 	}
 
 	// video
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void tile_callback(int &tile, int& fx, int& fy, int& region);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void tile_callback(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color);
 
 	void blackt96_map(address_map &map) ATTR_COLD;
 	void oki1_map(address_map &map) ATTR_COLD;
@@ -163,12 +163,12 @@ private:
 
 TILE_GET_INFO_MEMBER(blackt96_state::get_tx_tile_info)
 {
-	uint16_t tile = m_tilemapram[tile_index*2] & 0xff;
+	u16 tile = m_tilemapram[tile_index*2] & 0xff;
 	// following is guessed, game just uses either color 0 or 1 anyway (which is identical palette wise)
-	uint8_t color = m_tilemapram[tile_index*2+1] & 0x0f;
-	tile += m_txt_bank * 0x100;
+	const u8 color = m_tilemapram[tile_index*2+1] & 0x0f;
+	tile += m_txt_bank << 8;
 
-	tileinfo.set(2,
+	tileinfo.set(0,
 			tile,
 			color,
 			0);
@@ -183,7 +183,7 @@ void blackt96_state::video_start()
 }
 
 
-uint32_t blackt96_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 blackt96_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -194,7 +194,7 @@ uint32_t blackt96_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void blackt96_state::sound_cmd_w(uint8_t data)
+void blackt96_state::sound_cmd_w(u8 data)
 {
 	//logerror("sound_cmd_w %02x\n", data);
 	m_soundcmd = data;
@@ -226,7 +226,7 @@ void blackt96_state::machine_reset()
 	m_txt_bank = 0;
 }
 
-void blackt96_state::output_w(uint8_t data)
+void blackt96_state::output_w(u8 data)
 {
 	// -bbb 8-21
 	// 1 - coin counter 1
@@ -234,16 +234,16 @@ void blackt96_state::output_w(uint8_t data)
 	// 8 - flip screen
 	// b = text tile bank
 
-	m_txt_bank = (data & 0x70)>>4;
-	flip_screen_set(data & 0x08);
-	m_sprites->set_flip(data & 0x08);
-	machine().bookkeeping().coin_counter_w(0, data & 1);
-	machine().bookkeeping().coin_counter_w(1, data & 2);
+	m_txt_bank = (data & 0x70) >> 4;
+	flip_screen_set(BIT(data, 3));
+	m_sprites->set_flip(BIT(data, 3));
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));
 
-//  printf("blackt96_c0000_w %04x %04x\n",data & 0xfc,mem_mask);
+//  logerror("blackt96_c0000_w %04x %04x\n",data & 0xfc,mem_mask);
 }
 
-void blackt96_state::tx_vram_w(offs_t offset, uint16_t data)
+void blackt96_state::tx_vram_w(offs_t offset, u16 data)
 {
 	m_tilemapram[offset] = data;
 	m_tx_tilemap->mark_tile_dirty(offset/2);
@@ -261,8 +261,8 @@ void blackt96_state::blackt96_map(address_map &map)
 	map(0x0f0000, 0x0f0001).portr("DSW1");
 	map(0x0f0008, 0x0f0009).portr("DSW2").nopw(); // service mode, left-over?
 
-	map(0x100000, 0x100fff).ram().w(FUNC(blackt96_state::tx_vram_w)).share("tilemapram"); // text tilemap
-	map(0x200000, 0x207fff).rw(m_sprites, FUNC(snk68_spr_device::spriteram_r), FUNC(snk68_spr_device::spriteram_w)).share("spriteram");   // only partially populated
+	map(0x100000, 0x100fff).ram().w(FUNC(blackt96_state::tx_vram_w)).share(m_tilemapram); // text tilemap
+	map(0x200000, 0x207fff).rw(m_sprites, FUNC(alpha68k_sprite_device::spriteram_r), FUNC(alpha68k_sprite_device::spriteram_w)).share("spriteram");   // only partially populated
 	map(0x400000, 0x400fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
 	map(0xc00000, 0xc03fff).ram(); // main ram
@@ -271,7 +271,7 @@ void blackt96_state::blackt96_map(address_map &map)
 void blackt96_state::oki1_map(address_map &map)
 {
 	map(0x00000, 0x2ffff).rom();
-	map(0x30000, 0x3ffff).bankr("oki1bank");
+	map(0x30000, 0x3ffff).bankr(m_oki1bank);
 }
 
 
@@ -393,39 +393,42 @@ static const gfx_layout blackt96_text_layout =
 };
 
 static GFXDECODE_START( gfx_blackt96 )
-	GFXDECODE_ENTRY( "bgtiles", 0, blackt96_layout,      0, 8  )
-	GFXDECODE_ENTRY( "sprtiles", 0, blackt962_layout,     0, 128 )
 	GFXDECODE_ENTRY( "txttiles", 0, blackt96_text_layout, 0, 16 )
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_blackt96_spr )
+	GFXDECODE_ENTRY( "bgtiles",  0, blackt96_layout,  0,   8 )
+	GFXDECODE_ENTRY( "sprtiles", 0, blackt962_layout, 0, 128 )
+GFXDECODE_END
 
-void blackt96_state::soundio_port_a_w(uint8_t data)
+
+void blackt96_state::soundio_port_a_w(u8 data)
 {
 	// soundbank
 	logerror("%s: soundio_port_a_w (set soundbank %02x)\n", machine().describe_context().c_str(), data);
 	m_oki1bank->set_entry(data & 0x07);
 }
 
-uint8_t blackt96_state::soundio_port_b_r()
+u8 blackt96_state::soundio_port_b_r()
 {
 	//logerror("%s: soundio_port_b_r (data read is %02x)\n", machine().describe_context().c_str(), m_port_b_latch);
 	return m_port_b_latch;
 }
 
-void blackt96_state::soundio_port_b_w(uint8_t data)
+void blackt96_state::soundio_port_b_w(u8 data)
 {
 	m_port_b_latch = data;
 	//logerror("%s: soundio_port_b_w (set latch to %02x)\n", machine().describe_context().c_str(), m_port_b_latch);
 }
 
-uint8_t blackt96_state::soundio_port_c_r()
+u8 blackt96_state::soundio_port_c_r()
 {
 	// bit 0x40 = sound command ready?
 	if (m_soundcmd_ready) return 0x40;
 	return 0x00;
 }
 
-void blackt96_state::soundio_port_c_w(uint8_t data)
+void blackt96_state::soundio_port_c_w(u8 data)
 {
 //  logerror("%s: soundio_port_c_w (PREV DATA %02x CURR DATA %02x)\n", machine().describe_context().c_str(), m_port_c_data, data);
 	// data & 0x80 unused?
@@ -455,28 +458,31 @@ void blackt96_state::soundio_port_c_w(uint8_t data)
 	if (((data & 0x02) == 0x00) && ((m_port_c_data & 0x02) == 0x02)) // high -> low on bit 0x02 writes to selected OKI
 	{
 		//logerror("%s: soundio_port_c_w (write to OKI %02x) (oki selected is %02x)\n", machine().describe_context().c_str(), m_port_b_latch, m_oki_selected);
-		if (m_oki_selected == 0) m_oki[0]->write(m_port_b_latch);
-		else if (m_oki_selected == 1) m_oki[1]->write(m_port_b_latch);
+		m_oki[m_oki_selected]->write(m_port_b_latch);
 	}
 
 	if (((data & 0x01) == 0x00) && ((m_port_c_data & 0x01) == 0x01)) // high -> low on bit 0x01 reads to selected OKI
 	{
-		if (m_oki_selected == 0) m_port_b_latch = m_oki[0]->read();
-		else if (m_oki_selected == 1) m_port_b_latch = m_oki[1]->read();
+		m_port_b_latch = m_oki[m_oki_selected]->read();
 	}
 
 	m_port_c_data = data;
 }
 
-void blackt96_state::tile_callback(int &tile, int& fx, int& fy, int& region)
+void blackt96_state::tile_callback(u32 &tile, bool &fx, bool &fy, u8 &region, u32 &color)
 {
 	fx = tile & 0x4000;
 	fy = tile & 0x8000;
 	tile &= 0x3fff;
+	color &= 0x7f;
 
 	if (tile & 0x2000)
 	{
+		tile &= 0x1fff;
 		region = 0;
+		// the black touch '96 cloned hardware has some tiles
+		// as 8bpp, we need to shift the colour bits in those cases
+		color >>= 4;
 	}
 	else
 	{
@@ -511,23 +517,21 @@ void blackt96_state::blackt96(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_444, 0x800);
 
-	SNK68_SPR(config, m_sprites, 0);
-	m_sprites->set_gfxdecode_tag(m_gfxdecode);
+	ALPHA68K_SPR(config, m_sprites, 24_MHz_XTAL, m_palette, gfx_blackt96_spr);
+	m_sprites->set_screen("screen");
+	m_sprites->set_spriteram_tag("spriteram");
 	m_sprites->set_tile_indirect_cb(FUNC(blackt96_state::tile_callback));
 	m_sprites->set_no_partial();
 	m_sprites->set_xpos_shift(12);
-	m_sprites->set_color_entry_mask(0x7f);
 
-	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "speaker").front_center();
 
 	OKIM6295(config, m_oki[0], 8_MHz_XTAL / 8, okim6295_device::PIN7_HIGH); // music
-	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 0.47);
 	m_oki[0]->set_addrmap(0, &blackt96_state::oki1_map);
 
 	OKIM6295(config, m_oki[1], 8_MHz_XTAL / 8, okim6295_device::PIN7_HIGH); // sfx
-	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
-	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 0.47);
 }
 
 

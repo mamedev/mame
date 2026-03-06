@@ -49,6 +49,12 @@ Note: Decapping shows the CALC3 MCU to be a NEC uPD78322 series MCU with 16K int
 
 To Do:
 
+[blazeon, wingforc]
+- Hardware has 2 sprite hardware for swapping sprite otuput buffer?
+
+[bonkadv]
+- Needs to verify sprite/background offset and/or screen resolution?
+
 [gtmr]
 - Stage 4: The layers' scrolling is very jerky for a couple of seconds
   in the middle of this level (probably interrupt related)
@@ -115,12 +121,12 @@ Non-Bugs (happen on real PCB)
 
 MACHINE_RESET_MEMBER(kaneko16_state,gtmr)
 {
-	m_VIEW2_2_pri = 1;
+	m_view2_2_pri = 1;
 }
 
 MACHINE_RESET_MEMBER(kaneko16_state,mgcrystl)
 {
-	m_VIEW2_2_pri = 0;
+	m_view2_2_pri = 0;
 }
 
 
@@ -176,8 +182,10 @@ void kaneko16_state::ym2149_w(offs_t offset, u16 data, u16 mem_mask)
 	/* Each 2149 register is mapped to a different address */
 	m_ym2149[Chip]->address_w(offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7) m_ym2149[Chip]->data_w( data       & 0xff);
-	else                m_ym2149[Chip]->data_w((data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7)
+		m_ym2149[Chip]->data_w( data       & 0xff);
+	else
+		m_ym2149[Chip]->data_w((data >> 8) & 0xff);
 }
 
 template<unsigned Mask>
@@ -505,7 +513,8 @@ u16 kaneko16_gtmr_state::gtmr2_wheel_r()
 		case 0x0800:    // 360' Wheel
 			return  (m_wheel_port[2]->read() << 8);
 		default:
-			logerror("gtmr2_wheel_r : read at %06x with joystick\n", m_maincpu->pc());
+			if (!machine().side_effects_disabled())
+				logerror("%s: gtmr2_wheel_r : read at %06x with joystick\n", machine().describe_context(), m_maincpu->pc());
 			return  (~0);
 	}
 }
@@ -657,9 +666,8 @@ void kaneko16_blazeon_state::blazeon_soundport(address_map &map)
 void kaneko16_blazeon_state::wingforc_soundport(address_map &map)
 {
 	map.global_mask(0xff);
+	blazeon_soundport(map);
 //  map(0x00, 0x00) // 02 written at boot
-	map(0x02, 0x03).rw(m_ymsnd, FUNC(ym2151_device::read), FUNC(ym2151_device::write));
-	map(0x06, 0x06).r(m_soundlatch, FUNC(generic_latch_8_device::read));
 	map(0x0a, 0x0a).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0c, 0x0c).w(FUNC(kaneko16_blazeon_state::oki_bank0_w<0x3>));
 }
@@ -4518,8 +4526,8 @@ GAME( 1992, explbrkrk,  explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          
 GAME( 1992, bakubrkr,   explbrkr, bakubrkr, bakubrkr,  kaneko16_state,          init_bakubrkr, ROT90, "Kaneko", "Bakuretsu Breaker (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, wingforc,   0,        wingforc, wingforc,  kaneko16_blazeon_state,  init_bakubrkr, ROT270,"A.I (Atlus license)",  "Wing Force (Japan, prototype)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "B.C. Kid / Bonk's Adventure / Kyukyoku!! PC Genjin", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, bonkadva,   bonkadv,  bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Bonk's Adventure (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // shows an upside down KO! sprite, probably cause of check failing. Playable apart from that
+GAME( 1994, bonkadv,    0,        bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko (Hudson soft / Red license)", "B.C. Kid (World) / Bonk's Adventure - Arcade Version (US, China, Korea) / Kyukyoku!! PC Genjin - Special Arcade Version (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, bonkadva,   bonkadv,  bonkadv,  bonkadv,   kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko (Hudson soft / Red license)", "Bonk's Adventure - Arcade version (prototype)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // shows an upside down KO! sprite, probably cause of check failing. Playable apart from that
 GAME( 1994, bloodwar,   0,        bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Blood Warrior", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, oedfight,   bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan, Bloodshed version)", MACHINE_SUPPORTS_SAVE ) // shows blood effects like Blood Warrior version
 GAME( 1994, oedfighta,  bloodwar, bloodwar, bloodwar,  kaneko16_gtmr_state,     init_gtmr,     ROT0,  "Kaneko", "Oedo Fight (Japan, Bloodless version)", MACHINE_SUPPORTS_SAVE ) // shows no blood effects

@@ -1049,7 +1049,7 @@ static INPUT_PORTS_START( merit3xx )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_TOGGLE
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_DOOR ) PORT_TOGGLE
 	PORT_DIPNAME( 0x02, 0x00, "IN2.2" ) // shows last hand during gameplay, needs to be switched on to avoid game malfunction message
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

@@ -474,7 +474,7 @@ unsigned a2_video_device::get_text_character(uint32_t code, int row)
 
 	/* look up the character data */
 	unsigned bits = m_char_ptr[code * 8 + row];
-	bits = (Invert && !Flip) ? (bits >> 1) : (bits & 0x7f);
+	bits = ((Model == model::IVEL_ULTRA && Invert && !Flip) || Model == model::DODO) ? (bits >> 1) : (bits & 0x7f);
 	bits ^= invert_mask;
 	return Flip ? reverse_7_bits[bits] : bits;
 }
@@ -636,14 +636,14 @@ template void a2_video_device::text_update<a2_video_device::model::IVEL_ULTRA, f
 
 void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	unsigned const start_address = use_page_2() ? 0x4000 : 0x2000;
+	unsigned const start_address = use_page_2() ? m_hgr2 : 0x2000;
 
 	beginrow = (std::max)(beginrow, cliprect.top());
 	endrow = (std::min)(endrow, cliprect.bottom());
 	int const startcol = (cliprect.left() / 14);
 	int const stopcol = (cliprect.right() / 14) + 1;
 
-	// B&W/Green/Amber monitor, CEC mono HGR mode, or IIgs $C021 monochrome HGR
+	// B&W/Green/Amber monitor, CEC/tk2000 mono HGR mode, or IIgs $C021 monochrome HGR
 	bool const monochrome = monochrome_monitor() || m_monohgr || (m_monochrome & 0x80);
 
 	// verified on h/w: setting dhires w/o 80col emulates a rev. 0 Apple ][ with no orange/blue
@@ -689,7 +689,7 @@ void a2_video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 void a2_video_device::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	int const page = use_page_2() ? 0x4000 : 0x2000;
+	int const page = use_page_2() ? m_hgr2 : 0x2000;
 	int const rgbmode = rgb_monitor() ? m_rgbmode : -1;
 
 	beginrow = (std::max)(beginrow, cliprect.top());
@@ -954,7 +954,7 @@ uint32_t a2_video_device::screen_update_GS(screen_device &screen, bitmap_rgb32 &
 		if (beamy >= BORDER_TOP)
 		{
 			rectangle const new_cliprect(0, 559, cliprect.top() - BORDER_TOP, cliprect.bottom() - BORDER_TOP);
-			screen_update<model::IIGS, false, false>(screen, *m_8bit_graphics, new_cliprect);
+			screen_update<model::IIGS, true, false>(screen, *m_8bit_graphics, new_cliprect);
 		}
 
 		if ((beamy < BORDER_TOP) || (beamy >= (192 + BORDER_TOP)))
@@ -1059,10 +1059,11 @@ template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, tr
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IIE, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::PRAVETZ_8C, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, false, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::IIGS, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::II_J_PLUS, true, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 template uint32_t a2_video_device::screen_update<a2_video_device::model::IVEL_ULTRA, false, true>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+template uint32_t a2_video_device::screen_update<a2_video_device::model::DODO, true, false>(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 static INPUT_PORTS_START( a2_vidconfig_composite );
 	PORT_START("a2_video_config")

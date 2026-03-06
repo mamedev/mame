@@ -6,7 +6,8 @@
 DEFINE_DEVICE_TYPE(NSCSI_CB, nscsi_callback_device, "nscsi_cb", "SCSI callback (new)")
 
 nscsi_callback_device::nscsi_callback_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	nscsi_device(mconfig, NSCSI_CB, tag, owner, clock),
+	device_t(mconfig, NSCSI_CB, tag, owner, clock),
+	nscsi_device_interface(mconfig, *this),
 	nscsi_slot_card_interface(mconfig, *this, DEVICE_SELF),
 	m_write_rst(*this),
 	m_write_atn(*this),
@@ -28,13 +29,13 @@ void nscsi_callback_device::device_start()
 
 void nscsi_callback_device::device_reset()
 {
-	scsi_bus->ctrl_w(scsi_refid, 0, S_ALL);
-	scsi_bus->ctrl_wait(scsi_refid, S_ALL, S_ALL);
+	m_scsi_bus->ctrl_w(m_scsi_refid, 0, S_ALL);
+	m_scsi_bus->ctrl_wait(m_scsi_refid, S_ALL, S_ALL);
 }
 
 void nscsi_callback_device::scsi_ctrl_changed()
 {
-	m_ctrl = scsi_bus->ctrl_r();
+	m_ctrl = m_scsi_bus->ctrl_r();
 
 	m_write_rst((m_ctrl & S_RST) ? 1 : 0);
 	m_write_atn((m_ctrl & S_ATN) ? 1 : 0);

@@ -1114,6 +1114,10 @@ void h89_mms_state::h89_mms(machine_config &config)
 		ROM_SYSTEM_BIOS(x, "mtrhex_4k", "Ultimeth 4k ROM") \
 		ROMX_LOAD("2732_mtrhex_4k.u518",      0x0000, 0x1000, CRC(e26b29a9) SHA1(ba13d6c9deef682a9a8262bc910d46b577929a13), ROM_BIOS(x))
 
+#define ROM_ETS_4K(x) \
+		ROM_SYSTEM_BIOS(x, "ets_4k", "Extended Technology Systems (ETS) 4k ROM based on Ultimeth") \
+		ROMX_LOAD("2732_ets_4k.u518",         0x0000, 0x1000, CRC(ed8bdbe9) SHA1(3b0d0e337dfe4c2b622ec0afc8511b2e5f2f9779), ROM_BIOS(x))
+
 #define ROM_MTR90_444_84(x) \
 		ROM_SYSTEM_BIOS(x, "mtr90-84", "Zenith Data Systems MTR-90 (444-84 - Superseded by 444-142)") \
 		ROMX_LOAD("2732_444-84_mtr90.u518",   0x0000, 0x1000, CRC(f10fca03) SHA1(c4a978153af0f2dfcc9ba05be4c1033d33fee30b), ROM_BIOS(x))
@@ -1181,6 +1185,8 @@ ROM_START( h89 )
 	ROM_CDR_8390(10)
 
 	ROM_CDR_80B2(11)
+
+	ROM_ETS_4K(12)
 ROM_END
 
 ROM_START( h89_cdr )
@@ -1196,6 +1202,8 @@ ROM_START( h89_cdr )
 	ROM_KMR_100(2)
 
 	ROM_ULTIMETH_4K(3)
+
+	ROM_ETS_4K(4)
 ROM_END
 
 ROM_START( h89_mms )
@@ -1213,6 +1221,8 @@ ROM_START( h89_mms )
 	ROM_MMS_444_84A(3)
 
 	ROM_ULTIMETH_2K(4)
+
+	ROM_ETS_4K(5)
 ROM_END
 
 ROM_START( z90 )
@@ -1240,6 +1250,8 @@ ROM_START( z90 )
 	ROM_CDR_8390(8)
 
 	ROM_CDR_80B2(9)
+
+	ROM_ETS_4K(10)
 ROM_END
 
 } // anonymous namespace

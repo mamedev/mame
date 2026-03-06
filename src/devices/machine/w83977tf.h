@@ -13,8 +13,8 @@
 #include "machine/upd765.h"
 
 class w83977tf_device : public device_t,
-						 public device_isa16_card_interface,
-						 public device_memory_interface
+						public device_isa16_card_interface,
+						public device_memory_interface
 {
 public:
 	w83977tf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);

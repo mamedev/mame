@@ -313,7 +313,7 @@ void ts816_state::ts816(machine_config &config)
 	ctc2.intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	z80dma_device& dma(Z80DMA(config, "dma", XTAL(16'000'000) / 4));
-	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 }
 

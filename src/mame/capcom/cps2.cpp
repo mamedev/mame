@@ -651,7 +651,7 @@ class cps2_state : public cps_state
 {
 public:
 	cps2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cps_state(mconfig, type, tag, 2)
+		: cps_state(mconfig, type, tag)
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		, m_region_key(*this, "key")
 		, m_qsound(*this, "qsound")
@@ -662,11 +662,6 @@ public:
 		, m_io_in0(*this, "IN0")
 		, m_io_in1(*this, "IN1")
 		, m_dsw(*this, "DSW%c", 'A')
-		, m_cps2_dial_type(0)
-		, m_ecofghtr_dial_direction0(0)
-		, m_ecofghtr_dial_direction1(0)
-		, m_ecofghtr_dial_last0(0)
-		, m_ecofghtr_dial_last1(0)
 	{ }
 
 	void cps2(machine_config &config) ATTR_COLD;
@@ -737,22 +732,22 @@ private:
 	std::unique_ptr<uint16_t[]> m_cps2_buffered_obj;
 	std::unique_ptr<uint16_t[]> m_gigaman2_dummyqsound_ram;
 
-	/* video-related */
-	int          m_cps2_last_sprite_offset = 0; /* Offset of the last sprite */
-	int          m_pri_ctrl = 0;                /* Sprite layer priorities */
-	int          m_objram_bank = 0;
-	int          m_cps2_obj_size = 0;
+	// video-related
+	int m_cps2_last_sprite_offset = 0; // Offset of the last sprite
+	int m_pri_ctrl = 0; // Sprite layer priorities
+	int m_objram_bank = 0;
+	int m_cps2_obj_size = 0;
 
-	/* misc */
-	int          m_readpaddle = 0;  // pzloop2
-	int          m_cps2digitalvolumelevel = 0;
-	int          m_cps2disabledigitalvolume = 0;
-	emu_timer    *m_digital_volume_timer = nullptr;
-	int          m_cps2_dial_type = 0;
-	int          m_ecofghtr_dial_direction0 = 0;
-	int          m_ecofghtr_dial_direction1 = 0;
-	int          m_ecofghtr_dial_last0 = 0;
-	int          m_ecofghtr_dial_last1 = 0;
+	// misc
+	int m_readpaddle = 0; // pzloop2
+	int m_cps2digitalvolumelevel = 0;
+	int m_cps2disabledigitalvolume = 0;
+	emu_timer *m_digital_volume_timer = nullptr;
+	int m_cps2_dial_type = 0;
+	int m_ecofghtr_dial_direction0 = 0;
+	int m_ecofghtr_dial_direction1 = 0;
+	int m_ecofghtr_dial_last0 = 0;
+	int m_ecofghtr_dial_last1 = 0;
 };
 
 
@@ -762,10 +757,10 @@ private:
  *
  *************************************/
 
-#define CPS2_OBJ_BASE   0x00    // Unknown (not base address of objects). Could be bass address of bank used when object swap bit set?
-#define CPS2_OBJ_UK1    0x02    // Unknown (nearly always 0x807d, or 0x808e when screen flipped)
-#define CPS2_OBJ_PRI    0x04    // Layers priorities
-#define CPS2_OBJ_UK2    0x06    // Unknown (usually 0x0000, 0x1101 in ssf2, 0x0001 in 19XX)
+#define CPS2_OBJ_BASE   0x00    // Unknown (not base address of objects). Could be base address of bank used when object swap bit set?
+#define CPS2_OBJ_UNK1   0x02    // Unknown (nearly always 0x807d, or 0x808e when screen flipped)
+#define CPS2_OBJ_PRI    0x04    // Layer priorities
+#define CPS2_OBJ_UNK2   0x06    // Unknown (usually 0x0000, 0x1101 in ssf2, 0x0001 in 19XX)
 #define CPS2_OBJ_XOFFS  0x08    // X offset (usually 0x0040)
 #define CPS2_OBJ_YOFFS  0x0a    // Y offset (always 0x0010)
 
@@ -865,7 +860,7 @@ uint16_t *cps2_state::cps2_objbase()
 	if (m_objram_bank & 1)
 		baseptr ^= 0x0080;
 
-//popmessage("%04x %d", cps2_port(machine, CPS2_OBJ_BASE), m_objram_bank & 1);
+	//popmessage("%04x %d", cps2_port(machine, CPS2_OBJ_BASE), m_objram_bank & 1);
 
 	if (baseptr == 0x7000)
 		return m_objram1;
@@ -893,6 +888,7 @@ void cps2_state::find_last_sprite()    /* Find the offset of last sprite */
 
 		offset += 4;
 	}
+
 	/* Sprites must use full sprite RAM */
 	m_cps2_last_sprite_offset = m_cps2_obj_size / 2 - 4;
 }
@@ -1059,13 +1055,13 @@ void cps2_state::render_layers(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 #if 0
 	if ((m_output[CPS2_OBJ_BASE / 2] != 0x7080 && m_output[CPS2_OBJ_BASE / 2] != 0x7000) ||
-			m_output[CPS2_OBJ_UK1 / 2] != 0x807d ||
-			(m_output[CPS2_OBJ_UK2 / 2] != 0x0000 && m_output[CPS2_OBJ_UK2 / 2] != 0x1101 && m_output[CPS2_OBJ_UK2 / 2] != 0x0001))
+			m_output[CPS2_OBJ_UNK1 / 2] != 0x807d ||
+			(m_output[CPS2_OBJ_UNK2 / 2] != 0x0000 && m_output[CPS2_OBJ_UNK2 / 2] != 0x1101 && m_output[CPS2_OBJ_UNK2 / 2] != 0x0001))
 	{
 		popmessage("base %04x uk1 %04x uk2 %04x",
 				m_output[CPS2_OBJ_BASE / 2],
-				m_output[CPS2_OBJ_UK1 / 2],
-				m_output[CPS2_OBJ_UK2 / 2]);
+				m_output[CPS2_OBJ_UNK1 / 2],
+				m_output[CPS2_OBJ_UNK2 / 2]);
 	}
 
 	if (0 && machine().input().code_pressed(KEYCODE_Z))
@@ -1223,9 +1219,7 @@ uint16_t cps2_state::cps2_qsound_volume_r()
 		0xe050, 0xe048, 0xe044, 0xe042, 0xe041, 0xe030, 0xe028, 0xe024, 0xe022, 0xe021
 	};
 
-	uint16_t result;
-
-	result = cps2_vol_states[m_cps2digitalvolumelevel];
+	uint16_t result = cps2_vol_states[m_cps2digitalvolumelevel];
 
 	// Extra adapter memory (0x660000-0x663fff) available when bit 14 = 0
 	// Network adapter (ssf2tb) present when bit 15 = 0
@@ -1818,7 +1812,7 @@ void cps2_state::cps2(machine_config &config)
 	Z80(config, m_audiocpu, 8_MHz_XTAL);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &cps2_state::qsound_sub_map);
 
-	const attotime audio_irq_period = attotime::from_hz(8_MHz_XTAL / 32000); // measured
+	const attotime audio_irq_period = attotime::from_hz(8_MHz_XTAL / 32000); // measured 250Hz
 	m_audiocpu->set_periodic_int(FUNC(cps2_state::irq0_line_hold), audio_irq_period);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
@@ -4299,6 +4293,40 @@ ROM_START( dstlkh )
 
 	ROM_REGION( 0x20, "key", 0 )
 	ROM_LOAD( "dstlkh.key",   0x000000, 0x000014, CRC(d748cb77) SHA1(748be38bbc766be8eebf6a60770801942ad502f2) )
+ROM_END
+
+ROM_START( dstlkb ) // just the region byte changed if compared to the Hispanic version
+	ROM_REGION( CODE_SIZE, "maincpu", 0 ) // 68000 code
+	ROM_LOAD16_WORD_SWAP( "vamb.03a", 0x000000, 0x80000, CRC(48831596) SHA1(894f2b03e62ec29e8d92bb2723f86929762b222a) )
+	ROM_LOAD16_WORD_SWAP( "vamb.04a", 0x080000, 0x80000, CRC(2217e9a0) SHA1(b86ee89457d8a0cf828f1bed247f3b2c0c91b170) )
+	ROM_LOAD16_WORD_SWAP( "vamb.05a", 0x100000, 0x80000, CRC(3a05b13c) SHA1(14b58954bdff8dd699f867037a86f0bae8095e9d) )
+	ROM_LOAD16_WORD_SWAP( "vamb.06a", 0x180000, 0x80000, CRC(11d70a1c) SHA1(e13c5afeb9cb64ec60d570b81d7fac4869c76d1d) )
+	ROM_LOAD16_WORD_SWAP( "vamb.07a", 0x200000, 0x80000, CRC(db5a8767) SHA1(86274080e4423d09e10f2db56a4e685b32acfa18) )
+	ROM_LOAD16_WORD_SWAP( "vamb.08a", 0x280000, 0x80000, CRC(2a4fd79b) SHA1(ff0398db43ef849365ad88b9b57661db3a3b65c6) )
+	ROM_LOAD16_WORD_SWAP( "vamb.09a", 0x300000, 0x80000, CRC(15187632) SHA1(81b7166334dc3c331673822c31581e0e7809b698) )
+	ROM_LOAD16_WORD_SWAP( "vamb.10a", 0x380000, 0x80000, CRC(192d2d81) SHA1(ea99f2ea3e28edfc203e967924500dad10abb43f) )
+
+	ROM_REGION( 0x1400000, "gfx", 0 )
+	ROM_LOAD64_WORD( "vam.13m",   0x0000000, 0x400000, CRC(c51baf99) SHA1(2fb6642908e542e404391eb17392f8270e87bf48) )
+	ROM_LOAD64_WORD( "vam.15m",   0x0000002, 0x400000, CRC(3ce83c77) SHA1(93369b23c6d7d834297434691bb047ee3dd9539c) )
+	ROM_LOAD64_WORD( "vam.17m",   0x0000004, 0x400000, CRC(4f2408e0) SHA1(cd49c6b3c7e6470c6058f98ccc5210b052bb13e2) )
+	ROM_LOAD64_WORD( "vam.19m",   0x0000006, 0x400000, CRC(9ff60250) SHA1(d69ba4dc6bd37d003245f0cf3211d6e2623005b8) )
+	ROM_LOAD64_WORD( "vam.14m",   0x1000000, 0x100000, CRC(bd87243c) SHA1(87b33aeb72514e1228ffc27ec6dd534f14882760) )
+	ROM_LOAD64_WORD( "vam.16m",   0x1000002, 0x100000, CRC(afec855f) SHA1(cd117833b8d475489b90ff44b57e2c5cb1af3af5) )
+	ROM_LOAD64_WORD( "vam.18m",   0x1000004, 0x100000, CRC(3a033625) SHA1(294238f30cba5cf4f8f1de951d54c2077bd95de9) )
+	ROM_LOAD64_WORD( "vam.20m",   0x1000006, 0x100000, CRC(2bff6a89) SHA1(8f4e131e5ce0af48fb89f98026d9f0356c7c301f) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) // 64k for the audio CPU (+banks)
+	ROM_LOAD( "vam.01",   0x00000, 0x08000, CRC(64b685d5) SHA1(6c180e7420db754eca5cad17a40f5a64f5c3bd15) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "vam.02",   0x28000, 0x20000, CRC(cf7c97c7) SHA1(109a4b56ecd59be9c3f5869de99d40619bdaef21) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) // QSound samples
+	ROM_LOAD16_WORD_SWAP( "vam.11m",   0x000000, 0x200000, CRC(4a39deb2) SHA1(7e63e615869958db66a4e52a0272afee5a10e446) )
+	ROM_LOAD16_WORD_SWAP( "vam.12m",   0x200000, 0x200000, CRC(1a3e5c03) SHA1(c5a556e125d6c3d68da745b4d56cd7a851f2a23d) )
+
+	ROM_REGION( 0x20, "key", 0 )
+	ROM_LOAD( "dstlkb.key",   0x000000, 0x000014, CRC(d748cb77) SHA1(748be38bbc766be8eebf6a60770801942ad502f2) ) // Brazilian set, but still uses the Hispanic key
 ROM_END
 
 ROM_START( ecofghtr )
@@ -6955,7 +6983,7 @@ ROM_START( ringdestb )
 	ROM_LOAD16_WORD_SWAP( "smb.12m",   0x200000, 0x200000, CRC(955b0782) SHA1(ee09500e7b44e923126533613bfe26cdabc7ab5f) )
 
 	ROM_REGION( 0x20, "key", 0 )
-	ROM_LOAD( "ringdesth.key", 0x000000, 0x000014, CRC(ffb8d049) SHA1(c6d111412c3960b24a1be5c49fe4ec4d17324e06) ) /* Brazilian set, but still uses the Hispanic key */
+	ROM_LOAD( "ringdesth.key", 0x000000, 0x000014, CRC(ffb8d049) SHA1(c6d111412c3960b24a1be5c49fe4ec4d17324e06) ) // Brazilian set, but still uses the Hispanic key
 ROM_END
 
 ROM_START( mmancp2u )
@@ -12639,6 +12667,7 @@ GAME( 1994, dstlku,     dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,   
 GAME( 1994, dstlkur1,   dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (USA 940705)",                                 MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dstlka,     dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (Asia 940705)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1994, dstlkh,     dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (Hispanic 940818)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1994, dstlkb,     dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Darkstalkers: The Night Warriors (Brazil 940818)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, vampj,      dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940705)",                                    MACHINE_SUPPORTS_SAVE ) // Partial update set? Only rom 04 is "B" revision
 GAME( 1994, vampja,     dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940705 alt)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1994, vampjr1,    dstlk,    cps2,     cps2_2p6b, cps2_state, init_cps2,     ROT0,   "Capcom", "Vampire: The Night Warriors (Japan 940630)",                                    MACHINE_SUPPORTS_SAVE )

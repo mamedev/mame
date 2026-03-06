@@ -312,7 +312,7 @@ void tms320c2x_device::dxr_w(uint16_t data)
 
 	if(TXM) {
 		if(FSM)
-			m_waiting_for_serial_frame = 1;
+			m_waiting_for_serial_frame = true;
 		else
 			m_IFR |= 0x20;
 	}
@@ -370,12 +370,14 @@ inline void tms320c2x_device::MODIFY_DP(int data)
 	m_STR0 |= (data & DP_REG);
 	m_STR0 |= 0x0400;
 }
+
 inline void tms320c2x_device::MODIFY_PM(int data)
 {
 	m_STR1 &= ~PM_REG;
 	m_STR1 |= (data & PM_REG);
 	m_STR1 |= m_fixed_STR1;
 }
+
 inline void tms320c2x_device::MODIFY_ARP(int data)
 {
 	m_STR1 &= ~ARB_REG;
@@ -386,12 +388,11 @@ inline void tms320c2x_device::MODIFY_ARP(int data)
 	m_STR0 |= 0x0400;
 }
 
-uint16_t tms320c2x_device::reverse_carry_add(uint16_t arg0, uint16_t arg1 )
+uint16_t tms320c2x_device::reverse_carry_add(uint16_t arg0, uint16_t arg1)
 {
 	uint16_t result = 0;
 	int carry = 0;
-	int count;
-	for (count = 0; count < 16; count++)
+	for (int count = 0; count < 16; count++)
 	{
 		int sum = (arg0 >> 15) + (arg1 >> 15) + carry;
 		result = (result << 1) | (sum & 1);
@@ -402,6 +403,7 @@ uint16_t tms320c2x_device::reverse_carry_add(uint16_t arg0, uint16_t arg1 )
 	return result;
 }
 
+template <bool IgnoreARPHack>
 inline void tms320c2x_device::MODIFY_AR_ARP()
 { /* modify address register referenced by ARP */
 	switch (m_opcode.b.l & 0x70)        /* Cases ordered by predicted useage */
@@ -437,7 +439,7 @@ inline void tms320c2x_device::MODIFY_AR_ARP()
 			break;
 	}
 
-	if (!m_mHackIgnoreARP)
+	if (!IgnoreARPHack)
 	{
 		if (m_opcode.b.l & 8)
 		{ /* bit 3 determines if new value is loaded into ARP */
@@ -484,7 +486,7 @@ inline void tms320c2x_device::CALCULATE_ADD_OVERFLOW(int32_t addval)
 
 inline void tms320c2x_device::CALCULATE_SUB_OVERFLOW(int32_t subval)
 {
-	if ((int32_t)((m_oldacc.d ^ subval) & (m_oldacc.d ^ m_ACC.d)) < 0)
+	if (int32_t((m_oldacc.d ^ subval) & (m_oldacc.d ^ m_ACC.d)) < 0)
 	{
 		SET0(OV_FLAG);
 		if (OVM)
@@ -501,6 +503,7 @@ inline uint16_t tms320c2x_device::POP_STACK()
 		m_STACK[i] = m_STACK[i - 1];
 	return data;
 }
+
 inline void tms320c2x_device::PUSH_STACK(uint16_t data)
 {
 	for (unsigned i = 0; m_stack_limit > i; ++i)
@@ -520,7 +523,8 @@ inline void tms320c2x_device::SHIFT_Preg_TO_ALU()
 	}
 }
 
-inline void tms320c2x_device::GETDATA(int shift,int signext)
+template <bool IgnoreARPHack>
+inline void tms320c2x_device::GETDATA(int shift, int signext)
 {
 	if (m_opcode.b.l & 0x80)
 	{ /* indirect memory access */
@@ -540,12 +544,12 @@ inline void tms320c2x_device::GETDATA(int shift,int signext)
 		m_external_mem_access = 0;
 	}
 
-	m_ALU.d = (uint16_t)m_data.read_word(m_memaccess);
-	if (signext) m_ALU.d = (int16_t)m_ALU.d;
+	m_ALU.d = uint16_t(m_data.read_word(m_memaccess));
+	if (signext) m_ALU.sd = int16_t(uint16_t(m_ALU.d));
 	m_ALU.d <<= shift;
 
 	/* next ARP */
-	if (m_opcode.b.l & 0x80) MODIFY_AR_ARP();
+	if (m_opcode.b.l & 0x80) MODIFY_AR_ARP<IgnoreARPHack>();
 }
 
 inline void tms320c2x_device::PUTDATA(uint16_t data)
@@ -566,6 +570,7 @@ inline void tms320c2x_device::PUTDATA(uint16_t data)
 		m_data.write_word(DMA, data);
 	}
 }
+
 inline void tms320c2x_device::PUTDATA_SST(uint16_t data)
 {
 	if (m_opcode.b.l & 0x80) m_memaccess = IND;
@@ -599,7 +604,7 @@ void tms320c2x_device::illegal()
 
 void tms320c2x_device::abst()
 {
-	if ( (int32_t)(m_ACC.d) < 0 ) {
+	if (int32_t(m_ACC.d) < 0) {
 		m_ACC.d = -m_ACC.d;
 		if (m_ACC.d == 0x80000000) {
 			SET0(OV_FLAG);
@@ -631,12 +636,12 @@ void tms320c2x_device::addh()
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
 	m_ACC.w.h += m_ALU.w.l;
-	if ( (uint16_t)(m_oldacc.w.h) > (uint16_t)(m_ACC.w.h) ) {
+	if (uint16_t(m_oldacc.w.h) > uint16_t(m_ACC.w.h)) {
 		SET1(C_FLAG); /* Carry flag is not cleared, if no carry occurred */
 	}
-	if ((int16_t)((m_ACC.w.h ^ m_ALU.w.l) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
+	if (int16_t((m_ACC.w.h ^ m_ALU.w.l) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
 		SET0(OV_FLAG);
-		if (OVM) m_ACC.w.h = ((int16_t)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;
+		if (OVM) m_ACC.w.h = (int16_t(m_oldacc.w.h) < 0) ? 0x8000 : 0x7fff;
 	}
 }
 void tms320c2x_device::addk()
@@ -734,13 +739,13 @@ void tms320c2x_device::bc()
 }
 void tms320c2x_device::bgez()
 {
-	if ( (int32_t)(m_ACC.d) >= 0 ) m_PC = m_cache.read_word(m_PC);
+	if (m_ACC.sd >= 0) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
 void tms320c2x_device::bgz()
 {
-	if ( (int32_t)(m_ACC.d) > 0 ) m_PC = m_cache.read_word(m_PC);
+	if (m_ACC.sd > 0) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
@@ -764,7 +769,7 @@ void tms320c2x_device::bitt()
 }
 void tms320c2x_device::blez()
 {
-	if ( (int32_t)(m_ACC.d) <= 0 ) m_PC = m_cache.read_word(m_PC);
+	if (m_ACC.sd <= 0) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
@@ -792,7 +797,7 @@ void tms320c2x_device::blkp()
 }
 void tms320c2x_device::blz()
 {
-	if ( (int32_t)(m_ACC.d) < 0 ) m_PC = m_cache.read_word(m_PC);
+	if (m_ACC.sd < 0) m_PC = m_cache.read_word(m_PC);
 	else m_PC++;
 	MODIFY_AR_ARP();
 }
@@ -853,19 +858,19 @@ void tms320c2x_device::cmpr()
 	switch (m_opcode.b.l & 3)
 	{
 		case 0:
-			if ( (uint16_t)(m_AR[ARP]) == (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			if (uint16_t(m_AR[ARP]) == uint16_t(m_AR[0])) SET1(TC_FLAG);
 			else CLR1(TC_FLAG);
 			break;
 		case 1:
-			if ( (uint16_t)(m_AR[ARP]) <  (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			if (uint16_t(m_AR[ARP]) <  uint16_t(m_AR[0])) SET1(TC_FLAG);
 			else CLR1(TC_FLAG);
 			break;
 		case 2:
-			if ( (uint16_t)(m_AR[ARP])  > (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			if (uint16_t(m_AR[ARP])  > uint16_t(m_AR[0])) SET1(TC_FLAG);
 			else CLR1(TC_FLAG);
 			break;
 		case 3:
-			if ( (uint16_t)(m_AR[ARP]) != (uint16_t)(m_AR[0]) ) SET1(TC_FLAG);
+			if (uint16_t(m_AR[ARP]) != uint16_t(m_AR[0])) SET1(TC_FLAG);
 			else CLR1(TC_FLAG);
 			break;
 	}
@@ -962,7 +967,7 @@ void tms320c2x_device::fort()
 void tms320c2x_device::idle()
 {
 	CLR0(INTM_FLAG);
-	m_idle = 1;
+	m_idle = true;
 }
 void tms320c2x_device::in()
 {
@@ -991,22 +996,13 @@ void tms320c2x_device::lalk()
 	m_ALU.d <<= (m_opcode.b.h & 0xf);
 	m_ACC.d = m_ALU.d;
 }
-void tms320c2x_device::lar_ar0()   { GETDATA(0, 0); m_AR[0] = m_ALU.w.l; }
-void tms320c2x_device::lar_ar1()   { GETDATA(0, 0); m_AR[1] = m_ALU.w.l; }
-void tms320c2x_device::lar_ar2()   { GETDATA(0, 0); m_AR[2] = m_ALU.w.l; }
-void tms320c2x_device::lar_ar3()   { GETDATA(0, 0); m_AR[3] = m_ALU.w.l; }
-void tms320c2x_device::lar_ar4()   { GETDATA(0, 0); m_AR[4] = m_ALU.w.l; }
-void tms320c2x_device::lar_ar5()   { GETDATA(0, 0); m_AR[5] = m_ALU.w.l; }
-void tms320c2x_device::lar_ar6()   { GETDATA(0, 0); m_AR[6] = m_ALU.w.l; }
-void tms320c2x_device::lar_ar7()   { GETDATA(0, 0); m_AR[7] = m_ALU.w.l; }
-void tms320c2x_device::lark_ar0()  { m_AR[0] = m_opcode.b.l; }
-void tms320c2x_device::lark_ar1()  { m_AR[1] = m_opcode.b.l; }
-void tms320c2x_device::lark_ar2()  { m_AR[2] = m_opcode.b.l; }
-void tms320c2x_device::lark_ar3()  { m_AR[3] = m_opcode.b.l; }
-void tms320c2x_device::lark_ar4()  { m_AR[4] = m_opcode.b.l; }
-void tms320c2x_device::lark_ar5()  { m_AR[5] = m_opcode.b.l; }
-void tms320c2x_device::lark_ar6()  { m_AR[6] = m_opcode.b.l; }
-void tms320c2x_device::lark_ar7()  { m_AR[7] = m_opcode.b.l; }
+
+template <unsigned N>
+void tms320c2x_device::lar_ar()   { GETDATA(0, 0); m_AR[N] = m_ALU.w.l; }
+
+template <unsigned N>
+void tms320c2x_device::lark_ar()  { m_AR[N] = m_opcode.b.l; }
+
 void tms320c2x_device::ldp()
 {
 	GETDATA(0, 0);
@@ -1029,9 +1025,7 @@ void tms320c2x_device::lrlk()
 }
 void tms320c2x_device::lst()
 {
-	m_mHackIgnoreARP = 1;
-	GETDATA(0, 0);
-	m_mHackIgnoreARP = 0;
+	GETDATA<true>(0, 0);
 
 	m_ALU.w.l &= (~INTM_FLAG);
 	m_STR0 &= INTM_FLAG;
@@ -1040,9 +1034,7 @@ void tms320c2x_device::lst()
 }
 void tms320c2x_device::lst1()
 {
-	m_mHackIgnoreARP = 1;
-	GETDATA(0, 0);
-	m_mHackIgnoreARP = 0;
+	GETDATA<true>(0, 0);
 
 	m_STR1 = m_ALU.w.l | m_fixed_STR1;
 	m_STR0 &= (~ARP_REG);       /* ARB also gets copied to ARP */
@@ -1105,7 +1097,7 @@ void tms320c2x_device::mac()           /** RAM blocks B0,B1,B2 may be important 
 	CALCULATE_ADD_CARRY();
 	GETDATA(0, 0);
 	m_Treg = m_ALU.w.l;
-	m_Preg.d = ( (int16_t)m_ALU.w.l * (int16_t)m_cache.read_word(m_PFC) );
+	m_Preg.d = int16_t(m_ALU.w.l) * int16_t(m_cache.read_word(m_PFC));
 	m_PFC++;
 	m_tms320c2x_dec_cycles += (2*CLK);
 }
@@ -1121,11 +1113,11 @@ void tms320c2x_device::macd()          /** RAM blocks B0,B1,B2 may be important 
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 	GETDATA(0, 0);
-	if ( (m_opcode.b.l & 0x80) || m_init_load_addr ) {  /* No writing during repetition, or DMA mode */
+	if ((m_opcode.b.l & 0x80) || m_init_load_addr) {  /* No writing during repetition, or DMA mode */
 		m_data.write_word(m_memaccess+1, m_ALU.w.l);
 	}
 	m_Treg = m_ALU.w.l;
-	m_Preg.d = ( (int16_t)m_ALU.w.l * (int16_t)m_cache.read_word(m_PFC) );
+	m_Preg.d = int16_t(m_ALU.w.l) * int16_t(m_cache.read_word(m_PFC));
 	m_PFC++;
 	m_tms320c2x_dec_cycles += (2*CLK);
 }
@@ -1136,7 +1128,7 @@ void tms320c2x_device::mar()       /* LARP and NOP are a subset of this instruct
 void tms320c2x_device::mpy()
 {
 	GETDATA(0, 0);
-	m_Preg.d = (int16_t)(m_ALU.w.l) * (int16_t)(m_Treg);
+	m_Preg.d = int16_t(m_ALU.w.l) * int16_t(m_Treg);
 }
 void tms320c2x_device::mpya()
 {
@@ -1146,12 +1138,11 @@ void tms320c2x_device::mpya()
 	CALCULATE_ADD_OVERFLOW(m_ALU.d);
 	CALCULATE_ADD_CARRY();
 	GETDATA(0, 0);
-	m_Preg.d = (int16_t)(m_ALU.w.l) * (int16_t)(m_Treg);
+	m_Preg.d = int16_t(m_ALU.w.l) * int16_t(m_Treg);
 }
 void tms320c2x_device::mpyk()
 {
-	m_Preg.d = (int16_t)m_Treg * ((int16_t)(m_opcode.w.l << 3) >> 3);
-
+	m_Preg.d = int16_t(m_Treg) * (int16_t(m_opcode.w.l << 3) >> 3);
 }
 void tms320c2x_device::mpys()
 {
@@ -1161,12 +1152,12 @@ void tms320c2x_device::mpys()
 	CALCULATE_SUB_OVERFLOW(m_ALU.d);
 	CALCULATE_SUB_CARRY();
 	GETDATA(0, 0);
-	m_Preg.d = (int16_t)(m_ALU.w.l) * (int16_t)(m_Treg);
+	m_Preg.d = int16_t(m_ALU.w.l) * int16_t(m_Treg);
 }
 void tms320c2x_device::mpyu()
 {
 	GETDATA(0, 0);
-	m_Preg.d = (uint16_t)(m_ALU.w.l) * (uint16_t)(m_Treg);
+	m_Preg.d = uint16_t(m_ALU.w.l) * uint16_t(m_Treg);
 }
 void tms320c2x_device::neg()
 {
@@ -1183,7 +1174,7 @@ void tms320c2x_device::nop() { }   // NOP is a subset of the MAR instruction
 */
 void tms320c2x_device::norm()
 {
-	if (m_ACC.d !=0 && (int32_t)(m_ACC.d ^ (m_ACC.d << 1)) >= 0)
+	if (m_ACC.d != 0 && int32_t(m_ACC.d ^ (m_ACC.d << 1)) >= 0)
 	{
 		CLR1(TC_FLAG);
 		m_ACC.d <<= 1;
@@ -1305,14 +1296,9 @@ void tms320c2x_device::sacl()
 	m_ALU.d = (m_ACC.d << (m_opcode.b.h & 7));
 	PUTDATA(m_ALU.w.l);
 }
-void tms320c2x_device::sar_ar0()   { PUTDATA(m_AR[0]); }
-void tms320c2x_device::sar_ar1()   { PUTDATA(m_AR[1]); }
-void tms320c2x_device::sar_ar2()   { PUTDATA(m_AR[2]); }
-void tms320c2x_device::sar_ar3()   { PUTDATA(m_AR[3]); }
-void tms320c2x_device::sar_ar4()   { PUTDATA(m_AR[4]); }
-void tms320c2x_device::sar_ar5()   { PUTDATA(m_AR[5]); }
-void tms320c2x_device::sar_ar6()   { PUTDATA(m_AR[6]); }
-void tms320c2x_device::sar_ar7()   { PUTDATA(m_AR[7]); }
+
+template <unsigned N>
+void tms320c2x_device::sar_ar()   { PUTDATA(m_AR[N]); }
 
 void tms320c2x_device::sblk()
 {
@@ -1393,7 +1379,7 @@ void tms320c2x_device::sqra()
 	CALCULATE_ADD_CARRY();
 	GETDATA(0, 0);
 	m_Treg = m_ALU.w.l;
-	m_Preg.d = ((int16_t)m_ALU.w.l * (int16_t)m_ALU.w.l);
+	m_Preg.d = int16_t(m_ALU.w.l) * int16_t(m_ALU.w.l);
 }
 void tms320c2x_device::sqrs()
 {
@@ -1404,7 +1390,7 @@ void tms320c2x_device::sqrs()
 	CALCULATE_SUB_CARRY();
 	GETDATA(0, 0);
 	m_Treg = m_ALU.w.l;
-	m_Preg.d = ((int16_t)m_ALU.w.l * (int16_t)m_ALU.w.l);
+	m_Preg.d = int16_t(m_ALU.w.l) * int16_t(m_ALU.w.l);
 }
 void tms320c2x_device::sst()
 {
@@ -1449,7 +1435,7 @@ void tms320c2x_device::subc()
 	m_oldacc.d = m_ACC.d;
 	GETDATA(15, SXM);
 	m_ACC.d -= m_ALU.d;     /* Temporary switch to ACC. Actual calculation is done as (ACC)-[mem] -> ALU, will be preserved later on. */
-	if ((int32_t)((m_oldacc.d ^ m_ALU.d) & (m_oldacc.d ^ m_ACC.d)) < 0) {
+	if (int32_t((m_oldacc.d ^ m_ALU.d) & (m_oldacc.d ^ m_ACC.d)) < 0) {
 		SET0(OV_FLAG);            /* Not affected by OVM */
 	}
 	CALCULATE_SUB_CARRY();
@@ -1467,12 +1453,12 @@ void tms320c2x_device::subh()
 	m_oldacc.d = m_ACC.d;
 	GETDATA(0, 0);
 	m_ACC.w.h -= m_ALU.w.l;
-	if ( (uint16_t)(m_oldacc.w.h) < (uint16_t)(m_ACC.w.h) ) {
+	if (uint16_t(m_oldacc.w.h) < uint16_t(m_ACC.w.h)) {
 		CLR1(C_FLAG); /* Carry flag is not affected, if no borrow occurred */
 	}
-	if ((int16_t)((m_oldacc.w.h ^ m_ALU.w.l) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
+	if (int16_t((m_oldacc.w.h ^ m_ALU.w.l) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
 		SET0(OV_FLAG);
-		if (OVM) m_ACC.w.h = ((int16_t)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;
+		if (OVM) m_ACC.w.h = (int16_t(m_oldacc.w.h) < 0) ? 0x8000 : 0x7fff;
 	}
 }
 void tms320c2x_device::subk()
@@ -1510,7 +1496,7 @@ void tms320c2x_device::tblr()
 		m_PFC = m_ACC.w.l;
 	}
 	m_ALU.w.l = m_cache.read_word(m_PFC);
-	if ( (CNF0) && ( (uint16_t)(m_PFC) >= 0xff00 ) ) {}   /** TMS320C25 only */
+	if (CNF0 && (uint16_t(m_PFC) >= 0xff00)) {}   /** TMS320C25 only */
 	else m_tms320c2x_dec_cycles += (1*CLK);
 	PUTDATA(m_ALU.w.l);
 	m_PFC++;
@@ -1575,7 +1561,7 @@ const tms320c2x_device::tms320c2x_opcode tms320c2x_device::s_opcode_main[256]=
 /*18*/ {1*CLK, &tms320c2x_device::sub      },{1*CLK, &tms320c2x_device::sub       },{1*CLK, &tms320c2x_device::sub       },{1*CLK, &tms320c2x_device::sub       },{1*CLK, &tms320c2x_device::sub       },{1*CLK, &tms320c2x_device::sub       },{1*CLK, &tms320c2x_device::sub       },{1*CLK, &tms320c2x_device::sub       },
 /*20*/ {1*CLK, &tms320c2x_device::lac      },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },
 /*28*/ {1*CLK, &tms320c2x_device::lac      },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },{1*CLK, &tms320c2x_device::lac       },
-/*30*/ {1*CLK, &tms320c2x_device::lar_ar0  },{1*CLK, &tms320c2x_device::lar_ar1   },{1*CLK, &tms320c2x_device::lar_ar2   },{1*CLK, &tms320c2x_device::lar_ar3   },{1*CLK, &tms320c2x_device::lar_ar4   },{1*CLK, &tms320c2x_device::lar_ar5   },{1*CLK, &tms320c2x_device::lar_ar6   },{1*CLK, &tms320c2x_device::lar_ar7   },
+/*30*/ {1*CLK, &tms320c2x_device::lar_ar<0>},{1*CLK, &tms320c2x_device::lar_ar<1> },{1*CLK, &tms320c2x_device::lar_ar<2> },{1*CLK, &tms320c2x_device::lar_ar<3> },{1*CLK, &tms320c2x_device::lar_ar<4> },{1*CLK, &tms320c2x_device::lar_ar<5> },{1*CLK, &tms320c2x_device::lar_ar<6> },{1*CLK, &tms320c2x_device::lar_ar<7> },
 /*38*/ {1*CLK, &tms320c2x_device::mpy      },{1*CLK, &tms320c2x_device::sqra      },{1*CLK, &tms320c2x_device::mpya      },{1*CLK, &tms320c2x_device::mpys      },{1*CLK, &tms320c2x_device::lt        },{1*CLK, &tms320c2x_device::lta       },{1*CLK, &tms320c2x_device::ltp       },{1*CLK, &tms320c2x_device::ltd       },
 /*40*/ {1*CLK, &tms320c2x_device::zalh     },{1*CLK, &tms320c2x_device::zals      },{1*CLK, &tms320c2x_device::lact      },{1*CLK, &tms320c2x_device::addc      },{1*CLK, &tms320c2x_device::subh      },{1*CLK, &tms320c2x_device::subs      },{1*CLK, &tms320c2x_device::subt      },{1*CLK, &tms320c2x_device::subc      },
 /*48*/ {1*CLK, &tms320c2x_device::addh     },{1*CLK, &tms320c2x_device::adds      },{1*CLK, &tms320c2x_device::addt      },{1*CLK, &tms320c2x_device::rpt       },{1*CLK, &tms320c2x_device::xor_      },{1*CLK, &tms320c2x_device::or_       },{1*CLK, &tms320c2x_device::and_      },{1*CLK, &tms320c2x_device::subb      },
@@ -1583,7 +1569,7 @@ const tms320c2x_device::tms320c2x_opcode tms320c2x_device::s_opcode_main[256]=
 /*58*/ {3*CLK, &tms320c2x_device::tblr     },{2*CLK, &tms320c2x_device::tblw      },{1*CLK, &tms320c2x_device::sqrs      },{1*CLK, &tms320c2x_device::lts       },{2*CLK, &tms320c2x_device::macd      },{2*CLK, &tms320c2x_device::mac       },{2*CLK, &tms320c2x_device::bc        },{2*CLK, &tms320c2x_device::bnc       },
 /*60*/ {1*CLK, &tms320c2x_device::sacl     },{1*CLK, &tms320c2x_device::sacl      },{1*CLK, &tms320c2x_device::sacl      },{1*CLK, &tms320c2x_device::sacl      },{1*CLK, &tms320c2x_device::sacl      },{1*CLK, &tms320c2x_device::sacl      },{1*CLK, &tms320c2x_device::sacl      },{1*CLK, &tms320c2x_device::sacl      },
 /*68*/ {1*CLK, &tms320c2x_device::sach     },{1*CLK, &tms320c2x_device::sach      },{1*CLK, &tms320c2x_device::sach      },{1*CLK, &tms320c2x_device::sach      },{1*CLK, &tms320c2x_device::sach      },{1*CLK, &tms320c2x_device::sach      },{1*CLK, &tms320c2x_device::sach      },{1*CLK, &tms320c2x_device::sach      },
-/*70*/ {1*CLK, &tms320c2x_device::sar_ar0  },{1*CLK, &tms320c2x_device::sar_ar1   },{1*CLK, &tms320c2x_device::sar_ar2   },{1*CLK, &tms320c2x_device::sar_ar3   },{1*CLK, &tms320c2x_device::sar_ar4   },{1*CLK, &tms320c2x_device::sar_ar5   },{1*CLK, &tms320c2x_device::sar_ar6   },{1*CLK, &tms320c2x_device::sar_ar7   },
+/*70*/ {1*CLK, &tms320c2x_device::sar_ar<0>},{1*CLK, &tms320c2x_device::sar_ar<1> },{1*CLK, &tms320c2x_device::sar_ar<2> },{1*CLK, &tms320c2x_device::sar_ar<3> },{1*CLK, &tms320c2x_device::sar_ar<4> },{1*CLK, &tms320c2x_device::sar_ar<5> },{1*CLK, &tms320c2x_device::sar_ar<6> },{1*CLK, &tms320c2x_device::sar_ar<7> },
 /*78*/ {1*CLK, &tms320c2x_device::sst      },{1*CLK, &tms320c2x_device::sst1      },{1*CLK, &tms320c2x_device::popd      },{1*CLK, &tms320c2x_device::zalr      },{1*CLK, &tms320c2x_device::spl       },{1*CLK, &tms320c2x_device::sph       },{1*CLK, &tms320c2x_device::adrk      },{1*CLK, &tms320c2x_device::sbrk_ar   },
 /*80*/ {2*CLK, &tms320c2x_device::in       },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },
 /*88*/ {2*CLK, &tms320c2x_device::in       },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },{2*CLK, &tms320c2x_device::in        },
@@ -1593,7 +1579,7 @@ const tms320c2x_device::tms320c2x_opcode tms320c2x_device::s_opcode_main[256]=
 /*A8*/ {1*CLK, &tms320c2x_device::mpyk     },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },
 /*B0*/ {1*CLK, &tms320c2x_device::mpyk     },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },
 /*B8*/ {1*CLK, &tms320c2x_device::mpyk     },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },{1*CLK, &tms320c2x_device::mpyk      },
-/*C0*/ {1*CLK, &tms320c2x_device::lark_ar0 },{1*CLK, &tms320c2x_device::lark_ar1  },{1*CLK, &tms320c2x_device::lark_ar2  },{1*CLK, &tms320c2x_device::lark_ar3  },{1*CLK, &tms320c2x_device::lark_ar4  },{1*CLK, &tms320c2x_device::lark_ar5  },{1*CLK, &tms320c2x_device::lark_ar6  },{1*CLK, &tms320c2x_device::lark_ar7  },
+/*C0*/ {1*CLK, &tms320c2x_device::lark_ar<0>},{1*CLK, &tms320c2x_device::lark_ar<1>},{1*CLK, &tms320c2x_device::lark_ar<2>},{1*CLK, &tms320c2x_device::lark_ar<3>},{1*CLK, &tms320c2x_device::lark_ar<4>},{1*CLK, &tms320c2x_device::lark_ar<5>},{1*CLK, &tms320c2x_device::lark_ar<6>},{1*CLK, &tms320c2x_device::lark_ar<7>},
 /*C8*/ {1*CLK, &tms320c2x_device::ldpk     },{1*CLK, &tms320c2x_device::ldpk      },{1*CLK, &tms320c2x_device::lack      },{1*CLK, &tms320c2x_device::rptk      },{1*CLK, &tms320c2x_device::addk      },{1*CLK, &tms320c2x_device::subk      },{1*CLK, &tms320c2x_device::opcodes_CE},{1*CLK, &tms320c2x_device::mpyu      },
 /*D0*/ {1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{0*CLK, &tms320c2x_device::opcodes_Dx},
 /*D8*/ {1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},{1*CLK, &tms320c2x_device::opcodes_Dx},
@@ -1671,11 +1657,9 @@ void tms320c2x_device::device_start()
 	m_timerover = 0;
 	m_opcode.d = 0;
 	m_external_mem_access = 0;
-	m_tms320c2x_irq_cycles = 0;
 	m_oldacc.d = 0;
 	m_memaccess = 0;
-	m_mHackIgnoreARP = 0;
-	m_waiting_for_serial_frame = 0;
+	m_waiting_for_serial_frame = false;
 
 	save_item(NAME(m_PREVPC));
 	save_item(NAME(m_PC));
@@ -1811,8 +1795,8 @@ void tms320c2x_device::common_reset()
 	m_prd  = 0xffff;
 	m_imr  = 0xffc0;
 
-	m_idle = 0;
-	m_hold = 0;
+	m_idle = false;
+	m_hold = false;
 	m_tms320c2x_dec_cycles = 0;
 	m_init_load_addr = 1;
 }
@@ -1843,70 +1827,70 @@ inline int tms320c2x_device::process_IRQs()
 	    | XINT| RINT| TINT| INT2| INT1| INT0|
 	*/
 
-	m_tms320c2x_irq_cycles = 0;
+	int irq_cycles = 0;
 
 	/* Dont service Interrupts if masked, or prev instruction was EINT ! */
 
-	if ( (INTM == 0) && (m_opcode.w.l != 0xce00) && (m_IFR & m_imr) )
+	if ((INTM == 0) && (m_opcode.w.l != 0xce00) && (m_IFR & m_imr))
 	{
-		m_tms320c2x_irq_cycles = (3*CLK);    /* 3 clock cycles used due to PUSH and DINT operation ? */
+		irq_cycles = (3*CLK);    /* 3 clock cycles used due to PUSH and DINT operation ? */
 		PUSH_STACK(m_PC);
 
 		if ((m_IFR & 0x01) && (m_imr & 0x01)) {       /* IRQ line 0 */
 			//logerror("TMS320C2x:  Active INT0\n");
 			standard_irq_callback(0, m_PC);
 			m_PC = 0x0002;
-			m_idle = 0;
+			m_idle = false;
 			m_IFR &= (~0x01);
 			SET0(INTM_FLAG);
-			return m_tms320c2x_irq_cycles;
+			return irq_cycles;
 		}
 		if ((m_IFR & 0x02) && (m_imr & 0x02)) {       /* IRQ line 1 */
 			//logerror("TMS320C2x:  Active INT1\n");
 			standard_irq_callback(1, m_PC);
 			m_PC = 0x0004;
-			m_idle = 0;
+			m_idle = false;
 			m_IFR &= (~0x02);
 			SET0(INTM_FLAG);
-			return m_tms320c2x_irq_cycles;
+			return irq_cycles;
 		}
 		if ((m_IFR & 0x04) && (m_imr & 0x04)) {       /* IRQ line 2 */
 			//logerror("TMS320C2x:  Active INT2\n");
 			standard_irq_callback(2, m_PC);
 			m_PC = 0x0006;
-			m_idle = 0;
+			m_idle = false;
 			m_IFR &= (~0x04);
 			SET0(INTM_FLAG);
-			return m_tms320c2x_irq_cycles;
+			return irq_cycles;
 		}
 		if ((m_IFR & 0x08) && (m_imr & 0x08)) {       /* Timer IRQ (internal) */
-//          logerror("TMS320C2x:  Active TINT (Timer)\n");
+			//logerror("TMS320C2x:  Active TINT (Timer)\n");
 			m_PC = 0x0018;
-			m_idle = 0;
+			m_idle = false;
 			m_IFR &= (~0x08);
 			SET0(INTM_FLAG);
-			return m_tms320c2x_irq_cycles;
+			return irq_cycles;
 		}
 		if ((m_IFR & 0x10) && (m_imr & 0x10)) {       /* Serial port receive IRQ (internal) */
-//          logerror("TMS320C2x:  Active RINT (Serial receive)\n");
+			//logerror("TMS320C2x:  Active RINT (Serial receive)\n");
 			m_drr = m_dr_in();
 			m_PC = 0x001A;
-			m_idle = 0;
+			m_idle = false;
 			m_IFR &= (~0x10);
 			SET0(INTM_FLAG);
-			return m_tms320c2x_irq_cycles;
+			return irq_cycles;
 		}
 		if ((m_IFR & 0x20) && (m_imr & 0x20)) {       /* Serial port transmit IRQ (internal) */
-//          logerror("TMS320C2x:  Active XINT (Serial transmit)\n");
+			//logerror("TMS320C2x:  Active XINT (Serial transmit)\n");
 			m_dx_out(m_dxr);
 			m_PC = 0x001C;
-			m_idle = 0;
+			m_idle = false;
 			m_IFR &= (~0x20);
 			SET0(INTM_FLAG);
-			return m_tms320c2x_irq_cycles;
+			return irq_cycles;
 		}
 	}
-	return m_tms320c2x_irq_cycles;
+	return irq_cycles;
 }
 
 
@@ -1950,26 +1934,22 @@ inline void tms320c2x_device::process_timer(int clocks)
 void tms320c2x_device::execute_run()
 {
 	/**** Respond to external hold signal */
-	if (m_hold_in() == ASSERT_LINE) {
-		if (m_hold == 0) {
-			m_hold_ack_out(ASSERT_LINE);  /* Hold-Ack (active low) */
-		}
-		m_hold = 1;
-		if (HM) {
-			m_icount = 0;       /* Exit */
-		}
-		else {
-			if (m_external_mem_access) {
+	if (!m_hold_in.isunset()) {
+		if (m_hold_in() == ASSERT_LINE) {
+			if (!m_hold) {
+				m_hold_ack_out(ASSERT_LINE);  /* Hold-Ack (active low) */
+				m_hold = true;
+			}
+
+			if (HM || m_external_mem_access) {
 				m_icount = 0;   /* Exit */
 			}
 		}
-	}
-	else {
-		if (m_hold == 1) {
+		else if (m_hold) {
 			m_hold_ack_out(CLEAR_LINE);   /* Hold-Ack (active low) */
 			process_timer(3);
+			m_hold = false;
 		}
-		m_hold = 0;
 	}
 
 	/**** If idling, update timer and/or exit execution, but test for irqs first */
@@ -2055,7 +2035,7 @@ void tms320c2x_device::execute_run()
 				}
 				m_init_load_addr = 0;
 				m_RPTC--;
-			} while ((int8_t)(m_RPTC) != -1);
+			} while (int8_t(m_RPTC) != -1);
 			m_RPTC = 0;
 			m_PFC = m_PC;
 			m_init_load_addr = 1;
@@ -2070,7 +2050,7 @@ void tms320c2x_device::execute_run()
 
 		/**** If hold pin is active, exit if accessing external memory or if HM is set */
 		if (m_hold) {
-			if (m_external_mem_access || (HM)) {
+			if (m_external_mem_access || HM) {
 				if (m_icount > 0) {
 					m_icount = 0;
 				}
@@ -2086,10 +2066,10 @@ void tms320c2x_device::execute_run()
  ****************************************************************************/
 void tms320c2x_device::execute_set_input(int irqline, int state)
 {
-	if ( irqline == TMS320C2X_FSX ) {
+	if (irqline == TMS320C2X_FSX) {
 		if (state != CLEAR_LINE && m_waiting_for_serial_frame)
 		{
-			m_waiting_for_serial_frame = 0;
+			m_waiting_for_serial_frame = false;
 			m_IFR = 0x20;
 		}
 	}

@@ -335,7 +335,7 @@ INPUT_PORTS_END
 ROM_START(apple3)
 	ROM_REGION(0x1000,"maincpu",0)
 	ROM_SYSTEM_BIOS(0, "original", "Apple /// boot ROM")
-	ROMX_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(55e8eec9) SHA1(579ee4cd2b208d62915a0aa482ddc2744ff5e967), ROM_BIOS(0))
+	ROMX_LOAD( "apple3.rom", 0x0000, 0x1000, CRC(1af7ec42) SHA1(8043f914ebdcdab9838dbb78f8a2ee3867d210d2), ROM_BIOS(0))
 
 	ROM_SYSTEM_BIOS(1, "soshd", "Rob Justice SOSHDBOOT")
 	ROMX_LOAD( "soshdboot.bin", 0x000000, 0x001000, CRC(fd5ac9e2) SHA1(ba466a54ddb7f618c4f18f344754343c5945b417), ROM_BIOS(1))

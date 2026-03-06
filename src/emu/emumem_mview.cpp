@@ -444,7 +444,7 @@ void memory_view::memory_view_entry::prepare_map_generic(address_map &map, bool 
 void memory_view::memory_view_entry::prepare_device_map(address_map &map)
 {
 	// Disable the test for now, some cleanup needed before
-	if(0) {
+	if (0) {
 		// device maps are not supposed to set global parameters
 		if (map.m_unmapval)
 			fatalerror("Device maps should not set the unmap value\n");
@@ -521,20 +521,24 @@ void memory_view::refresh_id()
 
 void memory_view::disable()
 {
-	m_cur_slot = -1;
-	m_cur_id = -1;
-	refresh_id();
+	if (m_cur_id != -1) {
+		m_cur_slot = -1;
+		m_cur_id = -1;
+		refresh_id();
+	}
 }
 
 void memory_view::select(int slot)
 {
-	auto i = m_entry_mapping.find(slot);
-	if (i == m_entry_mapping.end())
-		fatalerror("memory_view %s: select of unknown slot %d", m_name, slot);
+	if (slot != m_cur_slot || m_cur_id == -1) {
+		auto i = m_entry_mapping.find(slot);
+		if (i == m_entry_mapping.end())
+			fatalerror("memory_view %s: select of unknown slot %d\n", m_name, slot);
 
-	m_cur_slot = slot;
-	m_cur_id = i->second;
-	refresh_id();
+		m_cur_slot = slot;
+		m_cur_id = i->second;
+		refresh_id();
+	}
 }
 
 int memory_view::id_to_slot(int id) const

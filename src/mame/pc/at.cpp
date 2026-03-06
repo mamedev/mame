@@ -1282,6 +1282,7 @@ ROM_START( c386sx16 )
 	// actual VGA BIOS not dumped - uses a WD Paradise according to http://www.cbmhardware.de/pc/pc.php
 	// complains "Time-of-day clock stopped"
 	// photos of the system show one ISA16 slot for a riser card, an Acumos AVGA2 chip, a VLSI 82C311 IC, one other VLSI and an Acer chip.
+	// ETA: Paradise or Cirrus Logic VGA then? Multiple configs?
 	ROM_SYSTEM_BIOS(0, "c386sxv100", "SL 386SX V1.00") // Commodore 80386SX BIOS Rev. 1.00 - 390914-01/390915-01 - continuous beeps after POST
 	ROMX_LOAD( "cbm-sl386sx-bios-lo-v1.0-390914-01.bin", 0x10000, 0x8000, CRC(03e00583) SHA1(8be8478cabd9de3d547a08207ffdcd39bf1bcd94), ROM_SKIP(1) | ROM_BIOS(0))
 	ROMX_LOAD( "cbm-sl386sx-bios-hi-v1.0-390915-01.bin", 0x10001, 0x8000, CRC(cbe31594) SHA1(d6ace0b5ae4a0f63d047c2918210188f4c77c0c0), ROM_SKIP(1) | ROM_BIOS(0))
@@ -3016,13 +3017,6 @@ ROM_START( uni386w )
 	ROMX_LOAD( "3ucm002.bin", 0x10000, 0x10000, CRC(9f2e19da) SHA1(ef64c6ad9d02db849d29e3b998ca42b663656bad), ROM_BIOS(1))
 ROM_END
 
-// SCsxAIO - Chipset: Chips 82C236 (SCATsx), Acer M5105 A3E - On board: 2xCOM, Floppy, ISA
-// BIOS-String: Peacock 386sx Ver. 2.0 24.03.92 30-0000-D01131-00101111-070797-SCATsx-8 - ISA16: 6
-ROM_START( scsxaio )
-	ROM_REGION16_LE(0x20000, "bios", 0)
-	ROM_LOAD( "386-peacock_scsxaio.bin", 0x10000, 0x10000, CRC(54c3cacd) SHA1(b3c821b30052d0c771b5004a3746eb2cfd186c79))
-ROM_END
-
 // Shuttle 386SX REV 2.0A - Chipset: KU82335 SX042, Intel N82230-2 (Zymos); Intel N82231-2 (Zymos), BIOS: AMI 80386SX BIOS PLUS Ser #039747
 // BIOS-String: - DINT-1216-073089-K0 / 386-BIOS AMI for MORSE 386SX Personal Computer
 // Keyboard-BIOS: AMI 386 Keyboard BIOS PLUS Ser.# 039747, CPU: unreadable (SMD), FPU: empty socket - OSC: 32.000 MHz, 14.31818 - ISA8: 2, ISA16: 6
@@ -3252,13 +3246,14 @@ ROM_START( ges9051n )
 ROM_END
 
 
-// ***** 386sx motherboards using the Chips SCAMPSX chipset
+// ***** 386sx motherboards using the VLSI SCAMPSX chipset
 
-// ANIX CH-386S-16/20/25G P/N:001-0386S-016 VER 1.0 - Chipset: CHIPS F82C836 - BIOS: AMI 386sx BIOS PLUS S/NO. 141334
+// ANIX CH-386S-16/20/25G P/N:001-0386S-016 VER 1.0 - Chipset: VLSI VL82C311 - BIOS: AMI 386sx BIOS PLUS S/NO. 141334
 // BIOS-String: 30-0100-D01425-00101111-050591-SCAMPSX-0 - Keyboard-BIOS: Intel/AMI - CPU: Intel (SMD), label not readable - FPU: socket available - ISA16: 6 - OSC: 14.31818 - 32.000 MHz
+// Lindata manufactured (1425)
 ROM_START( anch386s )
 	ROM_REGION16_LE(0x20000, "bios", 0)
-	ROM_LOAD( "386-ch-386s.bin", 0x10000, 0x10000, CRC(8902c64b) SHA1(3234bac6240a3a0bd05302c9ca587f5ae083f2f4))
+	ROM_LOAD( "386-ch-386s.bin",     0x10000, 0x10000, CRC(8902c64b) SHA1(3234bac6240a3a0bd05302c9ca587f5ae083f2f4))
 ROM_END
 
 // 80386SX-VH-COM - Chipset: VLSI VL82C311 VL82C113 - BIOS: Award 386SX-BIOS - BIOS-String: 386SX Modular BIOS v3.15 Copyright(c)1984-91 Award Software Inc.
@@ -5041,17 +5036,6 @@ ROM_START( mb1433uiv )
 	ROMX_LOAD( "um498-w4.amw", 0x10000, 0x10000, CRC(12fe6697) SHA1(2506dea874728916dc37f7dad8e8caf214a28525), ROM_BIOS(1))
 ROM_END
 
-// PC-Chips M912 - Chipset: UM8498F, UM8496F - CPU: 486 - BIOS: AMI - ISA16: 4, ISA16/VL: 3
-ROM_START( pccm912 ) // no display
-	ROM_REGION32_LE( 0x20000, "bios", 0)
-	// 0:
-	ROM_SYSTEM_BIOS( 0, "072594", "07/25/94")
-	ROMX_LOAD( "m912.bin", 0x10000, 0x10000, CRC(7784aaf5) SHA1(f54935c5da12160251104d0273040fea22ccbc70), ROM_BIOS(0))
-	// 1:
-	ROM_SYSTEM_BIOS( 1, "120295", "12/02/95")
-	ROMX_LOAD( "m912_12-02-1995x.bin", 0x10000, 0x10000, CRC(28a4a140) SHA1(a58989ab5ad5d040ad4f25888c5b7d77f31a4d82), ROM_BIOS(1))
-ROM_END
-
 // Pine Technology PT-430 - Chipset: UMC UM8498F UM8496F - BIOS: AMI 486DX ISA BIOS AB8906726 28pin - Keyboard-BIOS: silkscreen 8742, but socket empty
 // BIOS-String: - ISA8: 1, ISA16: 3, ISA16/VL: 3 - OSC: 14.31818MHz
 ROM_START( pt430 ) // no display
@@ -5086,22 +5070,6 @@ ROM_START( f4dxluc4 ) // BIOS-String: 40-0E0-008060-00101111-12159-UM498-0 / ADI
 	ROM_LOAD( "486_ab345213.bin", 0x10000, 0x10000, CRC(e5b85a92) SHA1(aade1fb1463b07a616c2594293bf0215c9652511))
 ROM_END
 
-ROM_START( um8498f ) // no display
-	ROM_REGION32_LE(0x20000, "bios", 0)
-	ROM_DEFAULT_BIOS("498gp")
-	// 0: BIOS-String: 40-P101-001437-00101111-072594-GREEN-H - CPU: Socket 3 - RAM: 4xSIMM30, 2xSIMM72, Cache: 9xUM61256AK-15
-	// BIOS: AMI AB9300757
-	ROM_SYSTEM_BIOS(0, "v14", "V1.4") // no display
-	ROMX_LOAD( "4umm001.bin", 0x10000, 0x10000, CRC(a5b768b4) SHA1(904ce2814d6542b65acec0c84532946172f2296d), ROM_BIOS(0))
-	// 1:
-	ROM_SYSTEM_BIOS(1, "um849801", "UM8498 #1") // no display
-	ROMX_LOAD( "um8498.ami", 0x10000, 0x10000, CRC(51f71bc7) SHA1(0986d60081d2c578a66789c0c53fe1d5919c553f),ROM_BIOS(1))
-	// 2: Chipset: UM8498F + UM8496F - BIOS label: Award BIOS ISA 486 485427 - BIOS version: Award Modular BIOS v4.50G - CPU: UMC U55X 486-33F, solder pads for 80486socket
-	// RAM: 4xSIMM30, 2xSIMM72 - ISA8: 1, ISA16: 5
-	// BIOS-String: 12/08/94-UMC-498GP-2C4X6S21-00 / REV A1
-	ROM_SYSTEM_BIOS(2, "498gp", "498GP")
-	ROMX_LOAD( "award_bios_isa_486.bin", 0x10000, 0x10000, CRC(ce3ccaa4) SHA1(3fdc9282d9934e18e45b46b50644022fc0387f33), ROM_BIOS(2))
-ROM_END
 
 
 // ***** 486 motherboards using the UM82C482A UM82C481A chipset
@@ -5700,7 +5668,7 @@ COMP( 199?, 386sxvhcom,ibm5170, 0,       at386sx,   0,     at_state,     init_at
 COMP( 199?, 3siud,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "3SIUD-1.1", MACHINE_NOT_WORKING )
 COMP( 199?, alaleolx,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Alaris RYC", "LEOPARD LX", MACHINE_NOT_WORKING )
 COMP( 199?, alim1217,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "386sx motherboards using the ALi M1217 chipset", MACHINE_NOT_WORKING )
-COMP( 199?, anch386s,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "ANIX",        "CH-386S-16/20/25G", MACHINE_NOT_WORKING )
+COMP( 1991, anch386s,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "ANIX",        "CH-386S-16/20/25G", MACHINE_NOT_WORKING )
 COMP( 199?, asc486slc, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Computechnik", "ASC486SLC", MACHINE_NOT_WORKING )
 COMP( 1988, at386sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<generic>",   "PC/AT 386SX (16 MHz, MF2 Keyboard)", MACHINE_NOT_WORKING )
 COMP( 1990, c386sx16,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Commodore Business Machines", "386SX-16", MACHINE_NOT_WORKING )
@@ -5737,7 +5705,6 @@ COMP( 199?, php3239,   ibm5170, 0,       at386sx,   0,     at_state,     init_at
 COMP( 199?, ppm3333p,  ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "DTK Computer", "PPM-3333P", MACHINE_NOT_WORKING )
 COMP( 199?, pt319a,    ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Pine",        "PT-319A", MACHINE_NOT_WORKING )
 COMP( 199?, scamp386sx,ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "386sx motherboards using the SCAMPSX chipset", MACHINE_NOT_WORKING )
-COMP( 199?, scsxaio,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Peacock",     "386sx Ver. 2.0 motherboard SCsxAIO", MACHINE_NOT_WORKING )
 COMP( 199?, sh386sx20, ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Shuttle", "386SX REV 2.0A", MACHINE_NOT_WORKING )
 COMP( 1991, t2000sx,   ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "Toshiba",     "T2000SX", MACHINE_NOT_WORKING )
 COMP( 199?, td70a,     ibm5170, 0,       at386sx,   0,     at_state,     init_at,        "<unknown>",   "TD70A and TD70AN", MACHINE_NOT_WORKING )
@@ -5924,7 +5891,6 @@ COMP( 199?, ochipvlp,  ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, op82c392,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the OPTi OPTi 82C392, 82C493 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, pc70iii,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "Commodore Business Machines",  "PC 70-III", MACHINE_NOT_WORKING )
 COMP( 199?, pc9486,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Amstrad",     "PC9486", MACHINE_NOT_WORKING )
-COMP( 199?, pccm912,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "PC-Chips", "M912", MACHINE_NOT_WORKING )
 COMP( 199?, pccm915i,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "PC-Chips", "M915i", MACHINE_NOT_WORKING )
 COMP( 199?, pccm919,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "PC-Chips", "M919", MACHINE_NOT_WORKING )
 COMP( 1993, pcd4nd,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Siemens-Nixdorf", "PCD-4ND", MACHINE_NOT_WORKING )
@@ -5959,7 +5925,6 @@ COMP( 199?, um486,     ibm5170, 0,       at486,     0,     at_state,     init_at
 COMP( 199?, um486v,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM486V-AIO", MACHINE_NOT_WORKING )
 COMP( 199?, um8810paio,ibm5170, 0,       at486,     0,     at_state,     init_at,        "Elitegroup", "UM8810 PAIO", MACHINE_NOT_WORKING )
 COMP( 199?, um8886,    ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UMC UM8886/UM8881 chipset", MACHINE_NOT_WORKING )
-COMP( 199?, um8498f,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UMC UM8498F, UM8496F chipset", MACHINE_NOT_WORKING )
 COMP( 199?, uni4800,   ibm5170, 0,       at486,     0,     at_state,     init_at,        "<unknown>", "486 motherboards using the UNI4800 chipset", MACHINE_NOT_WORKING )
 COMP( 199?, uniwb4407, ibm5170, 0,       at486,     0,     at_state,     init_at,        "UNICHIP", "486 WB 4407 REV 1.0", MACHINE_NOT_WORKING )
 COMP( 199?, v4p895p3,  ibm5170, 0,       at486,     0,     at_state,     init_at,        "QDI", "V4P895P3/SMT V5.0", MACHINE_NOT_WORKING )

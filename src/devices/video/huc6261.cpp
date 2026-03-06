@@ -11,19 +11,23 @@
     VSync is low for 4095 master cycles (3 lines).
     VSync changes 30 master cycles after HSync would go low.
 
+    TODO:
+    - Allow fetch and mix pixels from other PC-FX video hardwares
+    - Implement 'Cellophane' effect
+
 **********************************************************************/
 
 #include "emu.h"
 #include "huc6261.h"
 
-#include "screen.h"
+#include <algorithm>
 
 //#define VERBOSE 1
 #include "logmacro.h"
 
 
-#define HUC6261_HSYNC_LENGTH    237
-#define HUC6261_HSYNC_START     ( huc6261_device::WPF - HUC6261_HSYNC_LENGTH )
+static constexpr unsigned HUC6261_HSYNC_LENGTH = 237;
+static constexpr unsigned HUC6261_HSYNC_START  = (huc6261_device::WPF - HUC6261_HSYNC_LENGTH);
 
 constexpr unsigned huc6261_device::WPF;
 constexpr unsigned huc6261_device::LPF;
@@ -31,107 +35,111 @@ constexpr unsigned huc6261_device::LPF;
 DEFINE_DEVICE_TYPE(HUC6261, huc6261_device, "huc6261", "Hudson HuC6261 VCE")
 
 
-huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	:   device_t(mconfig, HUC6261, tag, owner, clock),
-		device_video_interface(mconfig, *this),
-		m_huc6270_a(*this, finder_base::DUMMY_TAG),
-		m_huc6270_b(*this, finder_base::DUMMY_TAG),
-		m_huc6272(*this, finder_base::DUMMY_TAG),
-		m_last_h(0), m_last_v(0), m_height(0), m_address(0), m_palette_latch(0), m_register(0), m_control(0), m_pixels_per_clock(0), m_pixel_data_a(0), m_pixel_data_b(0), m_pixel_clock(0), m_timer(nullptr), m_bmp(nullptr)
+huc6261_device::huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, HUC6261, tag, owner, clock)
+	, device_video_interface(mconfig, *this)
+	, m_huc6270{*this, { finder_base::DUMMY_TAG, finder_base::DUMMY_TAG }}
+	, m_huc6271(*this, finder_base::DUMMY_TAG)
+	, m_huc6272(*this, finder_base::DUMMY_TAG)
+	, m_last_h(0)
+	, m_last_v(0)
+	, m_height(0)
+	, m_palette{0}
+	, m_address(0)
+	, m_palette_latch(0)
+	, m_register(0)
+	, m_control(0)
+	, m_priority{0}
+	, m_pixels_per_clock(0)
+	, m_pixel_data{0}
+	, m_palette_offset{0}
+	, m_pixel_clock(0)
+	, m_timer(nullptr)
 {
 	// Set up UV lookup table
-	for ( int ur = 0; ur < 256; ur++ )
+	for (int ur = 0; ur < 256; ur++)
 	{
-		for ( int vr = 0; vr < 256; vr++ )
+		for (int vr = 0; vr < 256; vr++)
 		{
-			int32_t r,g,b;
-			int32_t u = ur - 128;
-			int32_t v = vr - 128;
+			const s32 u = ur - 128;
+			const s32 v = vr - 128;
 
-			r =              + 1.13983 * v;
-			g = -0.35465 * u - 0.58060 * v;
-			b =  2.03211 * u;
+			const s32 r =              + 1.13983 * v;
+			const s32 g = -0.35465 * u - 0.58060 * v;
+			const s32 b =  2.03211 * u;
 
-			m_uv_lookup[ ( ur << 8 ) | vr ][0] = r;
-			m_uv_lookup[ ( ur << 8 ) | vr ][1] = g;
-			m_uv_lookup[ ( ur << 8 ) | vr ][2] = b;
+			m_uv_lookup[(ur << 8) | vr][0] = r;
+			m_uv_lookup[(ur << 8) | vr][1] = g;
+			m_uv_lookup[(ur << 8) | vr][2] = b;
 		}
 	}
 }
 
 
-inline uint32_t huc6261_device::yuv2rgb(uint32_t yuv)
+inline u32 huc6261_device::yuv2rgb(u32 yuv) const
 {
-	int32_t r, g, b;
-	uint8_t y = yuv >> 8;
-	uint16_t uv = ((yuv & 0xf0) << 8) | ((yuv & 0xf) << 4);
+	const u8 y = yuv >> 8;
+	const u16 uv = ((yuv & 0xf0) << 8) | ((yuv & 0xf) << 4);
 
-	r = y + m_uv_lookup[uv][0];
-	g = y + m_uv_lookup[uv][1];
-	b = y + m_uv_lookup[uv][2];
+	const s32 r = std::clamp<s32>(y + m_uv_lookup[uv][0], 0, 255);
+	const s32 g = std::clamp<s32>(y + m_uv_lookup[uv][1], 0, 255);
+	const s32 b = std::clamp<s32>(y + m_uv_lookup[uv][2], 0, 255);
 
-	if ( r < 0 ) r = 0;
-	if ( g < 0 ) g = 0;
-	if ( b < 0 ) b = 0;
-	if ( r > 255 ) r = 255;
-	if ( g > 255 ) g = 255;
-	if ( b > 255 ) b = 255;
-
-	return ( r << 16 ) | ( g << 8 ) | b;
+	return (r << 16) | (g << 8) | b;
 }
 
-void huc6261_device::apply_pal_offs(uint16_t *pix_data)
+inline void huc6261_device::apply_pal_offs(u16 &pix_data) const
 {
 	// sprite
-	if(*pix_data & 0x100)
+	if (pix_data & huc6270_device::HUC6270_SPRITE)
 	{
-		*pix_data &= 0xff;
-		*pix_data += ((m_palette_offset[0] & 0xff00) >> 8) << 1;
+		pix_data &= 0xff;
+		pix_data += ((m_palette_offset[0] & 0xff00) >> 8) << 1;
 	}
 	else // background
-		*pix_data += (m_palette_offset[0] & 0xff) << 1;
+		pix_data += (m_palette_offset[0] & 0xff) << 1;
 
-	*pix_data &= 0x1ff;
+	pix_data &= 0x1ff;
 }
 
 TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 {
-	int vpos = screen().vpos();
-	int hpos = screen().hpos();
+	const int vpos = screen().vpos();
+	const int hpos = screen().hpos();
 	int h = m_last_h;
 	int v = m_last_v;
-	uint32_t *bitmap_line = &m_bmp->pix(v);
+	u32 *bitmap_line = &m_bmp.pix(v);
 
-	while ( h != hpos || v != vpos )
+	while (h != hpos || v != vpos)
 	{
-		if ( m_pixel_clock == 0 )
+		if (m_pixel_clock == 0)
 		{
-			auto profile = g_profiler.start( PROFILER_VIDEO );
+			auto profile = g_profiler.start(PROFILER_VIDEO);
 			/* Get next pixel information */
-			m_pixel_data_a = m_huc6270_a->next_pixel();
-			m_pixel_data_b = m_huc6270_b->next_pixel();
-			apply_pal_offs(&m_pixel_data_a);
-			apply_pal_offs(&m_pixel_data_b);
+			m_pixel_data[0] = m_huc6270[0]->next_pixel();
+			m_pixel_data[1] = m_huc6270[1]->next_pixel();
+			apply_pal_offs(m_pixel_data[0]);
+			apply_pal_offs(m_pixel_data[1]);
 		}
 
-		bitmap_line[ h ] = yuv2rgb( m_palette[ m_pixel_data_a ] );
+		bitmap_line[h] = yuv2rgb(m_palette[m_pixel_data[0]]);
 		// TODO: is mixing correct?
-		if((m_pixel_data_b & 0xff) != 0)
-			bitmap_line[ h ] = yuv2rgb( m_palette[ m_pixel_data_b ] );
+		if ((m_pixel_data[1] & 0xff) != 0)
+			bitmap_line[h] = yuv2rgb(m_palette[m_pixel_data[1]]);
 
-		m_pixel_clock = ( m_pixel_clock + 1 ) % m_pixels_per_clock;
-		h = ( h + 1 ) % WPF;
+		m_pixel_clock = (m_pixel_clock + 1) % m_pixels_per_clock;
+		h = (h + 1) % WPF;
 
-		switch( h )
+		switch (h)
 		{
 		case HUC6261_HSYNC_START:       /* Start of HSync */
-			m_huc6270_a->hsync_changed( 0 );
-			m_huc6270_b->hsync_changed( 0 );
-//          if ( v == 0 )
+			m_huc6270[0]->hsync_changed(0);
+			m_huc6270[1]->hsync_changed(0);
+//          if (v == 0)
 //          {
 //              /* Check if the screen should be resized */
-//              m_height = LPF - ( m_blur ? 1 : 0 );
-//              if ( m_height != video_screen_get_height( m_screen ) )
+//              m_height = LPF - (m_blur ? 1 : 0);
+//              if (m_height != video_screen_get_height(m_screen))
 //              {
 //                  rectangle visible_area;
 //
@@ -141,26 +149,26 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 //                  visible_area.max_x = 64 + 1024 + 64 - 1;
 //                  visible_area.max_y = 18 + 242 - 1;
 //
-//                  video_screen_configure( m_screen, WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS( device->clock / ( WPF * m_height ) ) );
+//                  video_screen_configure(m_screen, WPF, m_height, &visible_area, HZ_TO_ATTOSECONDS(device->clock / (WPF * m_height)));
 //              }
 //          }
 			break;
 
 		case 0:     /* End of HSync */
-			m_huc6270_a->hsync_changed( 1 );
-			m_huc6270_b->hsync_changed( 1 );
+			m_huc6270[0]->hsync_changed(1);
+			m_huc6270[1]->hsync_changed(1);
 			m_pixel_clock = 0;
-			v = ( v + 1 ) % m_height;
-			bitmap_line = &m_bmp->pix(v);
+			v = (v + 1) % m_height;
+			bitmap_line = &m_bmp.pix(v);
 			break;
 
 		case HUC6261_HSYNC_START + 30:      /* End/Start of VSync */
-			if ( v>= m_height - 4 )
+			if (v >= m_height - 4)
 			{
-				int vsync = ( v >= m_height - 4 && v < m_height - 1 ) ? 0 : 1;
+				const int vsync = (v >= m_height - 4 && v < m_height - 1) ? 0 : 1;
 
-				m_huc6270_a->vsync_changed( vsync );
-				m_huc6270_b->vsync_changed( vsync );
+				m_huc6270[0]->vsync_changed(vsync);
+				m_huc6270[1]->vsync_changed(vsync);
 			}
 			break;
 		}
@@ -170,13 +178,13 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 	m_last_v = v;
 
 	/* Reschedule timer */
-	if ( m_last_h < HUC6261_HSYNC_START )
+	if (m_last_h < HUC6261_HSYNC_START)
 	{
 		/* Next event is start of HSync signal */
 		v = m_last_v;
 		h = HUC6261_HSYNC_START;
 	}
-	else if ( ( m_last_v == m_height - 4 || m_last_v == m_height - 1 ) && m_last_h < HUC6261_HSYNC_START + 30 )
+	else if ((m_last_v == m_height - 4 || m_last_v == m_height - 1) && m_last_h < HUC6261_HSYNC_START + 30)
 	{
 		/* Next event is start/end of VSync signal */
 		v = m_last_v;
@@ -185,32 +193,31 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 	else
 	{
 		/* Next event is end of HSync signal */
-		v = ( m_last_v + 1 ) % m_height;
+		v = (m_last_v + 1) % m_height;
 		h = 0;
 	}
 
 	/* Ask our slave device for time until next possible event */
 	{
-		uint16_t next_event_clocks = WPF; //m_get_time_til_next_event( 0, 0xffff );
-		int event_hpos, event_vpos;
+		u16 next_event_clocks = WPF; //m_get_time_til_next_event(0, 0xffff);
 
 		/* Adjust for pixel clocks per pixel */
 		next_event_clocks *= m_pixels_per_clock;
 
 		/* Adjust for clocks left to go for current pixel */
-		next_event_clocks += ( m_pixels_per_clock - ( m_pixel_clock + 1 ) );
+		next_event_clocks += (m_pixels_per_clock - (m_pixel_clock + 1));
 
-		event_hpos = hpos + next_event_clocks;
-		event_vpos = vpos;
-		while ( event_hpos > WPF )
+		int event_hpos = hpos + next_event_clocks;
+		int event_vpos = vpos;
+		while (event_hpos > WPF)
 		{
 			event_vpos += 1;
 			event_hpos -= WPF;
 		}
 
-		if ( event_vpos < v || ( event_vpos == v && event_hpos <= h ) )
+		if (event_vpos < v || (event_vpos == v && event_hpos <= h))
 		{
-			if ( event_vpos > vpos || ( event_vpos == vpos && event_hpos > hpos ) )
+			if (event_vpos > vpos || (event_vpos == vpos && event_hpos > hpos))
 			{
 				v = event_vpos;
 				h = event_hpos;
@@ -218,31 +225,32 @@ TIMER_CALLBACK_MEMBER(huc6261_device::update_events)
 		}
 	}
 
-	m_timer->adjust( screen().time_until_pos( v, h ) );
+	m_timer->adjust(screen().time_until_pos(v, h));
 }
 
 
-void huc6261_device::video_update( bitmap_rgb32 &bitmap, const rectangle &cliprect )
+u32 huc6261_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	copybitmap( bitmap, *m_bmp, 0, 0, 0, 0, cliprect );
+	copybitmap(bitmap, m_bmp, 0, 0, 0, 0, cliprect);
+	return 0;
 }
 
 
-uint16_t huc6261_device::read(offs_t offset)
+u16 huc6261_device::read(offs_t offset)
 {
-	uint16_t data = 0xFFFF;
+	u16 data = 0xffff;
 
-	switch ( offset & 1 )
+	switch (offset & 1)
 	{
 		/* Status info */
 		case 0x00:
 			{
-				uint16_t vpos = screen().vpos();
-				uint16_t hpos = screen().hpos();
+				const u16 vpos = screen().vpos();
+				const u16 hpos = screen().hpos();
 
-				data = ( vpos << 5 ) | ( m_register & 0x1F);
+				data = (vpos << 5) | (m_register & 0x1f);
 
-				if ( vpos >= 22 && vpos < 262 && hpos < HUC6261_HSYNC_START )
+				if (vpos >= 22 && vpos < 262 && hpos < HUC6261_HSYNC_START)
 				{
 					data |= 0x8000;
 				}
@@ -251,7 +259,7 @@ uint16_t huc6261_device::read(offs_t offset)
 
 		/* Register contents(?) */
 		case 0x01:
-			switch( m_register )
+			switch (m_register)
 			{
 				case 0x00:
 					data = m_control;
@@ -264,16 +272,19 @@ uint16_t huc6261_device::read(offs_t offset)
 				case 0x02:
 				case 0x03:
 					data = m_palette_latch;
-					m_address = ( m_address + 1 ) & 0x1FF;
-					m_palette_latch = m_palette[ m_address ];
+					if (!machine().side_effects_disabled())
+					{
+						m_address = (m_address + 1) & 0x1ff;
+						m_palette_latch = m_palette[m_address];
+					}
 					break;
 
 				case 0x08:
-					data = m_priority[4] | ( m_priority[5] << 4 ) | ( m_priority[6] << 8 );
+					data = m_priority[4] | (m_priority[5] << 4) | (m_priority[6] << 8);
 					break;
 
 				case 0x09:
-					data = m_priority[0] | ( m_priority[1] << 4 ) | ( m_priority[2] << 8 ) | ( m_priority[3] << 12 );
+					data = m_priority[0] | (m_priority[1] << 4) | (m_priority[2] << 8) | (m_priority[3] << 12);
 					break;
 			}
 			break;
@@ -283,9 +294,9 @@ uint16_t huc6261_device::read(offs_t offset)
 }
 
 
-void huc6261_device::write(offs_t offset, uint16_t data)
+void huc6261_device::write(offs_t offset, u16 data)
 {
-	switch ( offset & 1 )
+	switch (offset & 1)
 	{
 		/* Register */
 		case 0x00:
@@ -293,8 +304,8 @@ void huc6261_device::write(offs_t offset, uint16_t data)
 			break;
 
 		case 0x01:
-			//logerror("huc6261: writing 0x%04x to register 0x%02x\n", data, m_register );
-			switch( m_register )
+			//logerror("huc6261: writing 0x%04x to register 0x%02x\n", data, m_register);
+			switch (m_register)
 			{
 				/* Control register */
 				// -x-- ---- ---- ---- Enable HuC6271: 0 - disabled, 1 - enabled
@@ -311,20 +322,20 @@ void huc6261_device::write(offs_t offset, uint16_t data)
 				// ---- ---- ---- --xx Screen height: 00 - 262 lines, 01 - 263 lines, 10 - interlace, 11 - unknown/undefined
 				case 0x00:
 					m_control = data;
-					m_pixels_per_clock = ( data & 0x08 ) ? 3 : 4;
+					m_pixels_per_clock = BIT(data, 3) ? 3 : 4;
 					break;
 
 				// Palette address
 				case 0x01:
-					m_address = data & 0x1FF;
-					m_palette_latch = m_palette[ m_address ];
+					m_address = data & 0x1ff;
+					m_palette_latch = m_palette[m_address];
 					break;
 
 				// Palette data
 				case 0x02:
 					m_palette_latch = data;
-					m_palette[ m_address ] = m_palette_latch;
-					m_address = ( m_address + 1 ) & 0x1FF;
+					m_palette[m_address] = m_palette_latch;
+					m_address = (m_address + 1) & 0x1ff;
 					break;
 
 				// Palette offset 0-3
@@ -345,9 +356,9 @@ void huc6261_device::write(offs_t offset, uint16_t data)
 				// ---------xxx---- HuC6270 SPR priority
 				// -------------xxx HuC6270 BG priority
 				case 0x08:
-					m_priority[4] = ( data >> 0 ) & 0x07;
-					m_priority[5] = ( data >> 4 ) & 0x07;
-					m_priority[6] = ( data >> 8 ) & 0x07;
+					m_priority[4] = (data >> 0) & 0x07;
+					m_priority[5] = (data >> 4) & 0x07;
+					m_priority[6] = (data >> 8) & 0x07;
 					break;
 
 				// Priority 1
@@ -356,34 +367,34 @@ void huc6261_device::write(offs_t offset, uint16_t data)
 				// ---------xxx---- HuC6272 BG1 priority
 				// -------------xxx HuC6272 BG0 priority
 				case 0x09:
-					m_priority[0] = ( data >>  0 ) & 0x07;
-					m_priority[1] = ( data >>  4 ) & 0x07;
-					m_priority[2] = ( data >>  8 ) & 0x07;
-					m_priority[3] = ( data >> 12 ) & 0x07;
+					m_priority[0] = (data >>  0) & 0x07;
+					m_priority[1] = (data >>  4) & 0x07;
+					m_priority[2] = (data >>  8) & 0x07;
+					m_priority[3] = (data >> 12) & 0x07;
 					break;
 
 				// Chroma key Y
-				case 0x0A:
+				case 0x0a:
 					break;
 
 				// Chroma key U
-				case 0x0B:
+				case 0x0b:
 					break;
 
 				// Chroma key V
-				case 0x0C:
+				case 0x0c:
 					break;
 
 				//
-				case 0x0D:
+				case 0x0d:
 					break;
 
 				//
-				case 0x0E:
+				case 0x0e:
 					break;
 
 				//
-				case 0x0F:
+				case 0x0f:
 					break;
 
 				//
@@ -419,7 +430,7 @@ void huc6261_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(huc6261_device::update_events), this);
 
-	m_bmp = std::make_unique<bitmap_rgb32>(WPF, LPF);
+	m_bmp.allocate(WPF, LPF);
 
 	save_item(NAME(m_last_h));
 	save_item(NAME(m_last_v));
@@ -431,9 +442,9 @@ void huc6261_device::device_start()
 	save_item(NAME(m_control));
 	save_item(NAME(m_priority));
 	save_item(NAME(m_pixels_per_clock));
-	save_item(NAME(m_pixel_data_a));
-	save_item(NAME(m_pixel_data_b));
+	save_item(NAME(m_pixel_data));
 	save_item(NAME(m_pixel_clock));
+	save_item(NAME(m_bmp));
 }
 
 
@@ -448,5 +459,5 @@ void huc6261_device::device_reset()
 
 	m_last_v = screen().vpos();
 	m_last_h = screen().hpos();
-	m_timer->adjust( screen().time_until_pos( ( screen().vpos() + 1 ) % 263, 0 ) );
+	m_timer->adjust(screen().time_until_pos((screen().vpos() + 1) % 263, 0));
 }

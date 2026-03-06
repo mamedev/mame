@@ -81,7 +81,7 @@ void tdl12_device::io_map(address_map &map)
 	map(0x40, 0x40).rw(FUNC(tdl12_device::in40_r), FUNC(tdl12_device::out40_w));
 	map(0x70, 0x70).w(FUNC(tdl12_device::out70_w));
 	map(0x74, 0x74).w(FUNC(tdl12_device::out74_w));
-	map(0x80, 0x87).m("scsi:7:ncr5380", FUNC(ncr5380_device::map));
+	map(0x80, 0x87).m("ncr5380", FUNC(ncr5380_device::map));
 }
 
 void tdl12_device::device_add_mconfig(machine_config &config)
@@ -97,7 +97,7 @@ void tdl12_device::device_add_mconfig(machine_config &config)
 	cio.pc_rd_cb().set("eeprom", FUNC(eeprom_serial_93cxx_device::do_read)).lshift(3);
 	cio.pc_wr_cb().set("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write)).bit(2);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, nullptr);
@@ -105,9 +105,9 @@ void tdl12_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR5380).machine_config([this](device_t *device) {
-		(void)this;
-	});
+
+	auto &ncr(NCR5380(config, "ncr5380"));
+	scsi.set_external_device(7, ncr);
 
 	EEPROM_93C46_16BIT(config, "eeprom"); // NMC9346N
 }

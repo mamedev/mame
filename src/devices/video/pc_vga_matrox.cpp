@@ -732,22 +732,22 @@ uint32_t matrox_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 	static int m_test_trigger = 1;
 	const int m_test_y = cliprect.max_y;
 
-	if(machine().input().code_pressed(JOYCODE_X_RIGHT_SWITCH))
+	if(machine().input().code_pressed(JOYCODE_HAT1RIGHT))
 		m_test_x += 1 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 4 : 0);
 
-	if(machine().input().code_pressed(JOYCODE_X_LEFT_SWITCH))
+	if(machine().input().code_pressed(JOYCODE_HAT1LEFT))
 		m_test_x -= 1 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 4 : 0);
 
-	//if(machine().input().code_pressed(JOYCODE_Y_DOWN_SWITCH))
+	//if(machine().input().code_pressed(JOYCODE_HAT1DOWN))
 	//  m_test_y++;
 
-	//if(machine().input().code_pressed(JOYCODE_Y_UP_SWITCH))
+	//if(machine().input().code_pressed(JOYCODE_HAT1UP))
 	//  m_test_y--;
 
-	if(machine().input().code_pressed(JOYCODE_Y_DOWN_SWITCH))
+	if(machine().input().code_pressed(JOYCODE_HAT1DOWN))
 		m_start_offs+= 0x100 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 8 : 0);
 
-	if(machine().input().code_pressed(JOYCODE_Y_UP_SWITCH))
+	if(machine().input().code_pressed(JOYCODE_HAT1UP))
 		m_start_offs-= 0x100 << (machine().input().code_pressed(JOYCODE_BUTTON2) ? 8 : 0);
 
 	m_start_offs %= vga.svga_intf.vram_size;

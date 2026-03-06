@@ -178,7 +178,7 @@ void ram_device::device_start()
 
 	// register for state saving
 	save_item(NAME(m_size));
-	save_pointer(NAME(reinterpret_cast<u8 *>(m_pointer.get())), m_size);
+	save_pointer(reinterpret_cast<u8 *>(m_pointer.get()), "m_pointer", m_size);
 }
 
 

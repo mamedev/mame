@@ -29,6 +29,14 @@ Delete on the keyboard by default).  You can also delete an off-screen reload
 helper by selecting it to edit it and then selecting **Delete reload helper**
 from the menu.
 
+This plugin works with games that recognise the simple condition of pulling the
+lightgun trigger while one of the lightgun axes reports its minimum value.  This
+includes, for example, Lethal Enforcers and Virtua cop.  Some games, for example
+Invasion: The Abductors, have more complex requirements to trigger reloading.
+Although this plugin is not suitable for use with those games, you can use the
+:ref:`Input Macro plugin <plugins-inputmacro>` to use a key or button
+combination to reload easily.
+
 Off-screen reload helpers are saved in the **offscreenreload** folder in the
 plugin data folder (see the :ref:`homepath option <mame-commandline-homepath>`).
 A file is created for each system with off-screen reload helpers configured,

@@ -102,13 +102,20 @@ inline static int32_t negate(int32_t value) {
 }
 
 inline static int32_t asl(int32_t value, int shift, uint8_t &flags) {
-	int32_t signBefore = value & 0x00800000;
-	int32_t result = value << shift;
-	int32_t signAfter = result & 0x00800000;
-	bool overflow = signBefore != signAfter;
-	flags = setFlagTo(flags, FLAG_Z, (result & 0x00ffffff) == 0);
+	const int32_t src24 = value & 0x00ffffff;
+	const bool carry = BIT(src24, 24 - shift);
+	const int64_t shifted = util::sext(src24, 24) << shift;
+	const bool overflow = (shifted > 0x007fffffLL) || (shifted < -0x00800000LL);
+	const int32_t result = overflow
+		? ((shifted < 0) ? 0x00800000 : 0x007fffff)
+		: (int32_t(shifted) & 0x00ffffff);
+
+	flags = setFlagTo(flags, FLAG_C, carry);
 	flags = setFlagTo(flags, FLAG_V, overflow);
-	return saturate(result, flags, signBefore != 0);
+	flags = setFlagTo(flags, FLAG_N, (result & 0x00800000) != 0);
+	flags = setFlagTo(flags, FLAG_Z, (result & 0x00ffffff) == 0);
+
+	return result;
 }
 
 // Initialize ESP to mostly zeroed, configured for 64k samples of delay line memory, running (not halted)
@@ -137,8 +144,8 @@ es5510_device::es5510_device(const machine_config &mconfig, const char *tag, dev
 	, abase(0)
 	, bbase(0)
 	, dbase(0)
-	, sigreg(1)
-	, mulshift(1)
+	, sigreg(0)
+	, mulshift(2)
 	, ccr(0)
 	, cmr(0)
 	, dol_count(0)
@@ -394,12 +401,12 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 		break;
 
 		/* 0x03 to 0x08 INSTR Register */
-	case 0x03: instr_latch = ((instr_latch & 0x00ffffffffffULL) | (int64_t(data)&0xff)<<40); LOG("%s",string_format("ES5510: Host Write INSTR latch[5] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x04: instr_latch = ((instr_latch & 0xff00ffffffffULL) | (int64_t(data)&0xff)<<32); LOG("%s",string_format("ES5510: Host Write INSTR latch[4] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x05: instr_latch = ((instr_latch & 0xffff00ffffffULL) | (int64_t(data)&0xff)<<24); LOG("%s",string_format("ES5510: Host Write INSTR latch[3] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x06: instr_latch = ((instr_latch & 0xffffff00ffffULL) | (int64_t(data)&0xff)<<16); LOG("%s",string_format("ES5510: Host Write INSTR latch[2] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x07: instr_latch = ((instr_latch & 0xffffffff00ffULL) | (int64_t(data)&0xff)<< 8); LOG("%s",string_format("ES5510: Host Write INSTR latch[1] = %02x -> %012x\n", data, instr_latch).c_str()); break;
-	case 0x08: instr_latch = ((instr_latch & 0xffffffffff00ULL) | (int64_t(data)&0xff)<< 0); LOG("%s",string_format("ES5510: Host Write INSTR latch[0] = %02x -> %012x\n", data, instr_latch).c_str()); break;
+	case 0x03: instr_latch = ((instr_latch & 0x00ffffffffffULL) | (int64_t(data)&0xff)<<40); LOG("ES5510: Host Write INSTR latch[5] = %02x -> %012x\n", data, instr_latch); break;
+	case 0x04: instr_latch = ((instr_latch & 0xff00ffffffffULL) | (int64_t(data)&0xff)<<32); LOG("ES5510: Host Write INSTR latch[4] = %02x -> %012x\n", data, instr_latch); break;
+	case 0x05: instr_latch = ((instr_latch & 0xffff00ffffffULL) | (int64_t(data)&0xff)<<24); LOG("ES5510: Host Write INSTR latch[3] = %02x -> %012x\n", data, instr_latch); break;
+	case 0x06: instr_latch = ((instr_latch & 0xffffff00ffffULL) | (int64_t(data)&0xff)<<16); LOG("ES5510: Host Write INSTR latch[2] = %02x -> %012x\n", data, instr_latch); break;
+	case 0x07: instr_latch = ((instr_latch & 0xffffffff00ffULL) | (int64_t(data)&0xff)<< 8); LOG("ES5510: Host Write INSTR latch[1] = %02x -> %012x\n", data, instr_latch); break;
+	case 0x08: instr_latch = ((instr_latch & 0xffffffffff00ULL) | (int64_t(data)&0xff)<< 0); LOG("ES5510: Host Write INSTR latch[0] = %02x -> %012x\n", data, instr_latch); break;
 
 		/* 0x09 to 0x0b DIL Register (r/o) */
 
@@ -473,7 +480,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 		break;
 
 	case 0x80: /* Read select - GPR + INSTR */
-		LOG("%s",string_format("ES5510: Host Read INSTR+GPR %02x (%s): %012x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & 0xffffffffffffULL, gpr[data] & 0xffffff, gpr[data]).c_str());
+		LOG("ES5510: Host Read INSTR+GPR %02x (%s): %012x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & 0xffffffffffffULL, gpr[data] & 0xffffff, gpr[data]);
 
 		/* Check if an INSTR address is selected */
 		if (data < 0xa0) {
@@ -494,7 +501,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 	case 0xc0: /* Write select - INSTR */
 #if VERBOSE
 		DESCRIBE_INSTR(buf, instr_latch, gpr[data], nullptr, nullptr, nullptr, nullptr);
-		LOG("%s",string_format("ES5510: Host Write INSTR %02x %012x: %s\n", data, instr_latch & 0xffffffffffffULL, buf).c_str());
+		LOG("ES5510: Host Write INSTR %02x %012x: %s\n", data, instr_latch & 0xffffffffffffULL, buf);
 #endif
 		if (data < 0xa0) {
 			instr[data] = instr_latch & 0xffffffffffffULL;
@@ -504,7 +511,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 	case 0xe0: /* Write select - GPR + INSTR */
 #if VERBOSE
 		DESCRIBE_INSTR(buf, instr_latch, gpr_latch, nullptr, nullptr, nullptr, nullptr);
-		LOG("%s",string_format("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, util::sext(gpr_latch, 24), buf).c_str());
+		LOG("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, util::sext(gpr_latch, 24), buf);
 #endif
 		if (data < 0xa0) {
 			instr[data] = instr_latch;
@@ -634,6 +641,8 @@ void es5510_device::device_reset() {
 	ram_sel = 0;
 	host_control = 0x04; // Signal Host Access not OK
 	host_serial = 0;
+	sigreg = 0;
+	mulshift = 2;
 	memset(&ram, 0, sizeof(ram_t));
 	memset(&ram_p, 0, sizeof(ram_t));
 	memset(&ram_pp, 0, sizeof(ram_t));
@@ -907,11 +916,13 @@ void es5510_device::execute_run() {
 			if (alu.write_result) {
 				uint8_t flags = ccr;
 				alu.result = alu_operation(alu.op, alu.aValue, alu.bValue, flags);
-				if (alu.dst & SRC_DST_REG) {
-					write_reg(alu.aReg, alu.result);
-				}
-				if (alu.dst & SRC_DST_DELAY) {
-					write_to_dol(alu.result);
+				if (alu.op != OP_CMP) {
+					if (alu.dst & SRC_DST_REG) {
+						write_reg(alu.aReg, alu.result);
+					}
+					if (alu.dst & SRC_DST_DELAY) {
+						write_to_dol(alu.result);
+					}
 				}
 				if (alu.update_ccr) {
 					ccr = flags;
@@ -929,7 +940,7 @@ void es5510_device::execute_run() {
 			alu.op = (instr >> 12) & 0x0f;
 			alu.src = opSelect.alu_src;
 			alu.dst = opSelect.alu_dst;
-			alu.write_result = !skip;
+			alu.write_result = !skip || (alu.op == OP_CMP);
 			alu.update_ccr = !skippable || (alu.op == OP_CMP);
 
 			if (alu.op == 0xf) {
@@ -1024,8 +1035,8 @@ int32_t es5510_device::read_reg(uint8_t reg)
 		case 247: RETURN(bbase, bbase);
 		case 248: RETURN(dbase, dbase);
 		case 249: RETURN(sigreg, sigreg);
-		case 250: RETURN(ccr, ccr);
-		case 251: RETURN(cmr, cmr);
+		case 250: RETURN(ccr, ccr << 16);
+		case 251: RETURN(cmr, cmr << 16);
 		case 252: RETURN(minus_one, 0x00ffffff);
 		case 253: RETURN(min, 0x00800000);
 		case 254: RETURN(max, 0x007fffff);
@@ -1121,6 +1132,7 @@ void es5510_device::write_reg(uint8_t reg, int32_t value)
 			memsiz = 0x00ffffff >> (24 - memshift);
 			memmask = 0x00ffffff & ~memsiz;
 			memincrement = 1 << memshift;
+			dbase &= memmask;
 			LOG_EXEC("  . writing %x (%d) to memsiz => memsiz=%x, shift=%d, mask=%x, increment=%x\n", value, util::sext(value, 24), memsiz, memshift, memmask, memincrement);
 			break;
 		case 245: WRITE_REG(dlength, value);
@@ -1131,7 +1143,9 @@ void es5510_device::write_reg(uint8_t reg, int32_t value)
 			break;
 		case 248: WRITE_REG(dbase, value);
 			break;
-		case 249: WRITE_REG(sigreg, (value != 0));
+		case 249:
+			WRITE_REG(sigreg, value);
+			mulshift = BIT(sigreg, 22) ? 1 : 2;
 			break;
 		case 250: WRITE_REG(ccr, (value >> 16) & FLAG_MASK);
 			break;
@@ -1237,10 +1251,12 @@ int32_t es5510_device::alu_operation(uint8_t op, int32_t a, int32_t b, uint8_t &
 	case 0x8: // ABS
 	{
 		flags = clearFlag(flags, FLAG_N);
-		bool isNegative = (a & 0x00800000) != 0;
+		bool isNegative = (b & 0x00800000) != 0;
 		flags = setFlagTo(flags, FLAG_C, isNegative);
 		// Note: the absolute value is calculated by one's complement!
-		return isNegative ? (0x00ffffff ^ a) : a;
+		int32_t result = isNegative ? (0x00ffffff ^ b) : b;
+		flags = setFlagTo(flags, FLAG_Z, (result & 0x00ffffff) == 0);
+		return result;
 	}
 
 	case 0x9: // MOV

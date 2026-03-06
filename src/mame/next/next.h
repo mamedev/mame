@@ -29,7 +29,7 @@ public:
 			scc(*this, "scc"),
 			keyboard(*this, "keyboard"),
 			scsibus(*this, "scsibus"),
-			scsi(*this, "scsibus:7:ncr53c90"),
+			scsi(*this, "ncr53c90"),
 			net(*this, "net"),
 			mo(*this, "mo"),
 			fdc(*this, "fdc"),
@@ -146,7 +146,6 @@ private:
 
 	void vblank_w(int state);
 
-	void ncr53c90(device_t *device);
 	void next_0b_m_mem(address_map &map) ATTR_COLD;
 	void next_0b_m_mo_mem(address_map &map) ATTR_COLD;
 	void next_0b_m_nofdc_mem(address_map &map) ATTR_COLD;

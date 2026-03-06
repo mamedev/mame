@@ -562,7 +562,7 @@ CONS( 2020, lxpcpp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, e
 // Power Console - Paw Patrol (JCG100PAi5, English/Italian)
 CONS( 2020, lxpcdp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Disney Princess (JCG100DPi1, English/French)", MACHINE_NOT_WORKING )
 CONS( 2020, lxpcgp,    0,     0,  nes_vt32_32mb, nes_vt32, nes_vt32_unk_state, empty_init,    "Lexibook", "Power Console - Gabby's Dollhouse (JCG100GDHi1, English/French)", MACHINE_NOT_WORKING )
-// Power Console - Frozen (JCG100FZi1, English/French) 
+// Power Console - Frozen (JCG100FZi1, English/French)
 // Power Console - Frozen (JCG100FZi12, English/Czech)
 
 // unclear SoC types maybe even different

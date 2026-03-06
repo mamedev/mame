@@ -1273,7 +1273,7 @@ Too slow during gameplay
 		</part>
 	</software>
 
-	<software name="batmanrn">
+	<software name="batmanrn" supported="partial">
 		<!-- http://redump.org/disc/8168/
 		<rom name="Batman Returns (Europe).cue" size="2460" crc="422f5580" />
 		<rom name="Batman Returns (Europe) (Track 01).bin" size="20363616" crc="58e9e43b" />
@@ -1301,6 +1301,9 @@ Too slow during gameplay
 		<description>Batman Returns (Europe)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Batman driving the car is omitted in pre-Act 1 cutscene, following scene sports yellow eyeliner, [CDC]?
+]]></notes>
 		<info name="serial" value="4401"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -1311,7 +1314,7 @@ Too slow during gameplay
 		</part>
 	</software>
 
-	<software name="batmanrna" cloneof="batmanrn">
+	<software name="batmanrna" cloneof="batmanrn" supported="partial">
 		<!-- http://redump.org/disc/17556/
 		<rom name="Batman Returns (Europe) (Alt).cue" size="2586" crc="c6efd142" />
 		<rom name="Batman Returns (Europe) (Alt) (Track 01).bin" size="20363616" crc="58e9e43b" />
@@ -1339,6 +1342,9 @@ Too slow during gameplay
 		<description>Batman Returns (Europe, alt)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Same as parent
+]]></notes>
 		<info name="serial" value="4401"/>
 		<sharedfeat name="compatibility" value="PAL"/>
 		<part name="cdrom" interface="cdrom">
@@ -1349,7 +1355,7 @@ Too slow during gameplay
 		</part>
 	</software>
 
-	<software name="batmanrnu" cloneof="batmanrn">
+	<software name="batmanrnu" cloneof="batmanrn" supported="partial">
 		<!-- http://redump.org/disc/21447/
 		<rom name="Batman Returns (USA).cue" size="2420" crc="5c5d239a" md5="c2acb5a8054c65a1874f0bb8d64b6627" sha1="03f590d80c03e79ce86a55b786855aebf14fe138"/>
 		<rom name="Batman Returns (USA) (Track 01).bin" size="20363616" crc="2130f186" md5="41717d4e849f86eced7eb79200468507" sha1="018ed3b942f09e813131ca6c755834e58696f0d3"/>
@@ -1377,6 +1383,9 @@ Too slow during gameplay
 		<description>Batman Returns (USA)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Same as parent
+]]></notes>
 		<info name="release" value="199303xx" />
 		<info name="serial" value="4401"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>

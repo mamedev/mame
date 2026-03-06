@@ -9,6 +9,7 @@
 #include "video/bufsprite.h"
 
 #include "emupal.h"
+#include "screen.h"
 #include "tilemap.h"
 
 class sidearms_state : public driver_device
@@ -20,6 +21,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_spriteram(*this, "spriteram") ,
 		m_bg_scrollx(*this, "bg_scrollx"),
 		m_bg_scrolly(*this, "bg_scrolly"),
@@ -37,11 +39,16 @@ public:
 	void init_dyger() { m_gameid = 2; }
 	void init_whizz() { m_gameid = 3; }
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void video_start() override ATTR_COLD;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_device<buffered_spriteram8_device> m_spriteram;
 
 	required_shared_ptr<uint8_t> m_bg_scrollx;
@@ -80,9 +87,6 @@ private:
 
 	uint8_t turtship_ports_r(offs_t offset);
 	void whizz_bankswitch_w(uint8_t data);
-
-	virtual void machine_start() override ATTR_COLD;
-	virtual void video_start() override ATTR_COLD;
 
 	TILE_GET_INFO_MEMBER(get_sidearms_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_philko_bg_tile_info);

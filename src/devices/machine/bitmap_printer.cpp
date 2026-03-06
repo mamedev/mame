@@ -284,7 +284,7 @@ void bitmap_printer_device::draw_printhead(bitmap_rgb32 &bitmap, int x, int y)
 void bitmap_printer_device::draw7seg(u8 data, bool is_digit, int x0, int y0, int width, int height, int thick, bitmap_rgb32 &bitmap, u32 color, u32 erasecolor)
 {
 	// pass nonzero erasecolor to erase blank segments
-	const u8 pat[] = { 0x3f, 0x06,  0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
+	const u8 pat[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71 };
 	u8 seg = is_digit ? pat[data & 0xf] : data;
 
 	if (BIT(seg,0) || erasecolor) bitmap.plot_box(x0,       y0,                  width, thick,       BIT(seg,0) ? color : erasecolor);

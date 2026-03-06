@@ -103,6 +103,7 @@ TO DO:
     - Check others bits in coin counter
     - Check other values in bnglngby irq
     - Top Gun: cpu #0 (PC=00008016): unmapped memory byte read from 00007FFF ???
+    - hogalleyi: doesn't boot. Protection?
 
 Changes:
 
@@ -2836,6 +2837,20 @@ ROM_START( hogalley )
 	PALETTE_2C04_0001("ppu1:palette")
 ROM_END
 
+ROM_START( hogalleyi ) // original Nintendo MDS-04-CPU PCB with Sipem stickers. Has Italian language.
+	ROM_REGION( 0x8000, "prg", 0 ) // 6502 memory, quite different
+	ROM_LOAD( "mds-ha4_1d_or_6d.6d",  0x0000, 0x2000, CRC(1d45a0cb) SHA1(48174df14fb70613ac74dabd6cb9b9161bbbc29c) )
+	ROM_LOAD( "mds-ha4_1c_or_6c.6c",  0x2000, 0x2000, CRC(e25d106c) SHA1(f147a0e4ce25a4b6bd867c2438f4d0692d00b74b) )
+	ROM_LOAD( "mds-ha4_1b_or_6b.6b",  0x4000, 0x2000, CRC(8788c2c5) SHA1(7dc04b90c674736a04272b99173c598135e70b5c) )
+	ROM_LOAD( "mds-ha4_1a_or_6a.6a",  0x6000, 0x2000, CRC(cebe3d7b) SHA1(1f122353388bfc1ad29274dbd690a21575f4b5f1) ) // 0xxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x4000, "gfx1", 0 ) // PPU memory, same as original
+	ROM_LOAD( "mds-ha4_2b_or_8b",  0x0000, 0x2000, CRC(fc5a91ad) SHA1(7ce6c64d81a9626d0b34bdc0a2a28fee457ebcb1) )
+	ROM_LOAD( "mds-ha4_2a_or_8a",  0x2000, 0x2000, CRC(78c842b6) SHA1(39f2a7fc1f1cbe2378a369e45b5cbb05057db3f0) )
+
+	PALETTE_2C04_0001("ppu1:palette")
+ROM_END
+
 /* From Gumshoe readme:
 
 NOTE:  There is a small board modification which consists of 2 extra jumpers added.
@@ -3634,10 +3649,11 @@ GAME( 1985, bnglngby,       0,             vsnes,         bnglngby, vs_uni_state
 GAME( 1986, supxevs,        0,             vsnes,         supxevs,  vs_uni_state,   init_supxevs,  ROT0, "Namco",                  "Vs. Super Xevious",                                        0 )
 
 // Light Gun games
-GAME( 1985, duckhunt,       0,             vsnes,         duckhunt, vs_uni_state,   init_vsgun,    ROT0, "Nintendo",               "Vs. Duck Hunt (set DH3 E)",         0 )
-GAME( 1985, hogalley,       0,             vsnes,         hogalley, vs_uni_state,   init_vsgun,    ROT0, "Nintendo",               "Vs. Hogan's Alley (set HA4-1 E-1)", 0 )
-GAME( 1986, vsgshoe,        0,             vsgshoe,       vsgshoe,  vs_uni_state,   init_vsgshoe,  ROT0, "Nintendo",               "Vs. Gumshoe (set GM5)",             0 )
-GAME( 1988, vsfdf,          0,             vsnes,         vsfdf,    vs_uni_state,   init_vsfdf,    ROT0, "Sunsoft",                "Vs. Freedom Force",                 0 )
+GAME( 1985, duckhunt,       0,             vsnes,         duckhunt, vs_uni_state,   init_vsgun,    ROT0, "Nintendo",               "Vs. Duck Hunt (set DH3 E)",           0 )
+GAME( 1985, hogalley,       0,             vsnes,         hogalley, vs_uni_state,   init_vsgun,    ROT0, "Nintendo",               "Vs. Hogan's Alley (set HA4-1 E-1)",   0 )
+GAME( 1985, hogalleyi,      hogalley,      vsnes,         hogalley, vs_uni_state,   init_vsgun,    ROT0, "bootleg (Sipem)",        "Vs. Hogan's Alley (Italian bootleg)", MACHINE_NOT_WORKING )
+GAME( 1986, vsgshoe,        0,             vsgshoe,       vsgshoe,  vs_uni_state,   init_vsgshoe,  ROT0, "Nintendo",               "Vs. Gumshoe (set GM5)",               0 )
+GAME( 1988, vsfdf,          0,             vsnes,         vsfdf,    vs_uni_state,   init_vsfdf,    ROT0, "Sunsoft",                "Vs. Freedom Force",                   0 )
 
 // Dual games
 GAME( 1984, vstennis,       0,             vsdual,        vstennis, vs_dual_state,  init_vsdual,   ROT0, "Nintendo Co., Ltd.",     "Vs. Tennis (Japan/USA, set TE A-3)" ,  0 )

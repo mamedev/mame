@@ -1380,15 +1380,15 @@ void imagetek_i4100_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bi
 	int const windowwidth  = width >> 2;
 	int const windowheight = height >> 3;
 
-	int const dx = m_screen_flip ? m_tilemap_flip_scrolldx[layer] : m_tilemap_scrolldx[layer];
-	int const dy = m_screen_flip ? m_tilemap_flip_scrolldy[layer] : m_tilemap_scrolldy[layer];
+	int const dx = m_screen_flip ? -m_tilemap_flip_scrolldx[layer] : m_tilemap_scrolldx[layer];
+	int const dy = m_screen_flip ? -m_tilemap_flip_scrolldy[layer] : m_tilemap_scrolldy[layer];
 
 	sx += dx;
 	sy += dy;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int const resy = (sy + y - wy);
+		int const resy = m_screen_flip ? (wy + y - sy) : (sy + y - wy);
 		int const scrolly = (m_screen_flip ? (scrheight - resy - 1) : resy) & (windowheight - 1);
 		int srcline = (wy + scrolly) & (height - 1);
 		int const srctilerow = srcline >> tileshift;
@@ -1399,7 +1399,7 @@ void imagetek_i4100_device::draw_tilemap(screen_device &screen, bitmap_rgb32 &bi
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			int const resx = (sx + x - wx);
+			int const resx = m_screen_flip ? (wx + x - sx) : (sx + x - wx);
 			int const scrollx = (m_screen_flip ? (scrwidth - resx - 1) : resx) & (windowwidth - 1);
 			int srccol = (wx + scrollx) & (width - 1);
 			int const srctilecol = srccol >> tileshift;

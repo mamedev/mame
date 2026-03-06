@@ -352,7 +352,7 @@ void roland_s550_state::mem_map(address_map &map)
 	//m_io_view[0](0xd800, 0xd81f).rw(m_tvf, FUNC(mb654419u_device::read), FUNC(mb654419u_device::write)).umask16(0x00ff);
 	m_io_view[0](0xe000, 0xe000).w(FUNC(roland_s550_state::sram_bank_w));
 	m_io_view[0](0xe800, 0xe81f).w("outas", FUNC(bu3905_device::write)).umask16(0x00ff);
-	m_io_view[0](0xf800, 0xf81f).m("scsi:7:scsic", FUNC(mb89352_device::map)).umask16(0x00ff);
+	m_io_view[0](0xf800, 0xf81f).m("scsic", FUNC(mb89352_device::map)).umask16(0x00ff);
 	m_io_view[0](0xc000, 0xffff).rw(m_wave, FUNC(rf5c36_device::read), FUNC(rf5c36_device::write)).umask16(0xff00);
 	m_io_view[1](0xc000, 0xffff).unmaprw();
 }
@@ -371,7 +371,7 @@ void roland_w30_state::w30_mem_map(address_map &map)
 	map(0xc600, 0xc600).rw(FUNC(roland_w30_state::psram_bank_r), FUNC(roland_w30_state::psram_bank_w));
 	map(0xc800, 0xc807).rw(m_fdc, FUNC(wd1772_device::read), FUNC(wd1772_device::write)).umask16(0x00ff);
 	map(0xd806, 0xd806).r(FUNC(roland_w30_state::unknown_status_r));
-	map(0xe000, 0xe01f).m("scsi:7:scsic", FUNC(mb89352_device::map)).umask16(0x00ff);
+	map(0xe000, 0xe01f).m("scsic", FUNC(mb89352_device::map)).umask16(0x00ff);
 	map(0xe400, 0xe403).rw("lcd", FUNC(lm24014h_device::read), FUNC(lm24014h_device::write)).umask16(0x00ff);
 	//map(0xe800, 0xe83f).w("output", FUNC(upd65006gf_376_3b8_device::write)).umask16(0x00ff);
 	//map(0xf000, 0xf01f).rw(m_tvf, FUNC(mb654419u_device::read), FUNC(mb654419u_device::write)).umask16(0x00ff);
@@ -479,7 +479,7 @@ void roland_s550_state::s550(machine_config &config)
 	config.device_remove("keyscan");
 
 	// SCSI controller on Option Board
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
@@ -487,10 +487,9 @@ void roland_s550_state::s550(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", MB89352).machine_config([this](device_t *device) {
-		device->set_clock(8_MHz_XTAL);
-		downcast<mb89352_device &>(*device).out_irq_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
-	});
+	auto &scsic(MB89352(config, "scsic", 8_MHz_XTAL));
+	scsi.set_external_device(7, scsic);
+	scsic.out_irq_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
 
 	BU3905(config, "outas");
 
@@ -514,7 +513,7 @@ void roland_w30_state::w30(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, &floppy_formats).enable_sound(true);
 
 	// SCSI controller on main board, by option (KW-30)
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
@@ -522,7 +521,8 @@ void roland_w30_state::w30(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("scsic", MB89352).clock(8_MHz_XTAL); // INTR & DREQ not connected
+	auto &scsic(MB89352(config, "scsic", 8_MHz_XTAL)); // INTR & DREQ not connected
+	scsi.set_external_device(7, scsic);
 
 	LM24014H(config, "lcd"); // LCD unit: LM240142
 

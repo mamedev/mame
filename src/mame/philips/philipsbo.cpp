@@ -36,7 +36,7 @@ public:
 		, m_scc(*this, "scc")
 		, m_rs232(*this, "rs232%u", 0U)
 		, m_fdc(*this, "fdc")
-		, m_hdc(*this, "scsi:7:ncr5380")
+		, m_hdc(*this, "ncr5380")
 		, m_dmac(*this, "dmac")
 		, m_lance(*this, "lance")
 		, m_main_ram_share(*this, "main_ram")
@@ -229,7 +229,7 @@ void pbo_state::pbo(machine_config &config)
 	//m_fdc->drq_wr_callback().set(FUNC(pbo_state::fdc_drq_w));
 	FLOPPY_CONNECTOR(config, "fdc:0", pbo_floppies, "35dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(false);
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 
 	NSCSI_CONNECTOR(config, "scsi:0", pbo_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", pbo_scsi_devices, nullptr);
@@ -239,13 +239,9 @@ void pbo_state::pbo(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:5", pbo_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", pbo_scsi_devices, nullptr);
 
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr5380", NCR5380).machine_config(
-		[this](device_t *device)
-		{
-			ncr5380_device &adapter = downcast<ncr5380_device &>(*device);
-
-			adapter.irq_handler().set(*this, FUNC(pbo_state::scsi_irq_w));
-		});
+	NCR5380(config, m_hdc);
+	scsi.set_external_device(7, m_hdc);
+	m_hdc->irq_handler().set(DEVICE_SELF, FUNC(pbo_state::scsi_irq_w));
 
 	M68010(config, m_netcpu, 20_MHz_XTAL / 2); // Confirmed
 	m_netcpu->set_addrmap(AS_PROGRAM, &pbo_state::net_map);

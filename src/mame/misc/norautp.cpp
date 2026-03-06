@@ -1474,7 +1474,7 @@ void norautp_state::tpoker2_map(address_map &map)
   Create dynamic code in RAM at $C276 to handle the I/O through the PPI8255's.
   Also initialize the devices and handle the handshaking lines in the same way.
 
-  The code read on port $62, when is suppossed to be set as output.
+  The code read on port $62, when is supposed to be set as output.
 
 */
 void norautp_state::kimbldhl_map(address_map &map)

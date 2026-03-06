@@ -220,7 +220,11 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, FONT_OSX);
 	REGISTER_MODULE(m_mod_man, FONT_WINDOWS);
 	REGISTER_MODULE(m_mod_man, FONT_DWRITE);
+#ifdef SDLMAME_SDL3
+	REGISTER_MODULE(m_mod_man, FONT_SDL3);
+#else
 	REGISTER_MODULE(m_mod_man, FONT_SDL);
+#endif
 	REGISTER_MODULE(m_mod_man, FONT_NONE);
 
 #if defined(SDLMAME_EMSCRIPTEN)
@@ -237,9 +241,16 @@ void osd_common_t::register_options()
 #if !defined(OSD_WINDOWS) && !defined(SDLMAME_WIN32)
 	REGISTER_MODULE(m_mod_man, RENDERER_BGFX); // try BGFX after OpenGL on other operating systems for now
 #endif
+#ifdef SDLMAME_SDL3
+	REGISTER_MODULE(m_mod_man, RENDERER_SDL3ACCEL);
+#if !defined(SDLMAME_EMSCRIPTEN)
+	REGISTER_MODULE(m_mod_man, RENDERER_SDL3SOFT);
+#endif
+#else
 	REGISTER_MODULE(m_mod_man, RENDERER_SDL2);
 #if !defined(SDLMAME_EMSCRIPTEN)
 	REGISTER_MODULE(m_mod_man, RENDERER_SDL1);
+#endif
 #endif
 	REGISTER_MODULE(m_mod_man, RENDERER_NONE);
 
@@ -247,7 +258,11 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, SOUND_XAUDIO2);
 	REGISTER_MODULE(m_mod_man, SOUND_COREAUDIO);
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
+#ifdef SDLMAME_SDL3
+	REGISTER_MODULE(m_mod_man, SOUND_SDL3);
+#else
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
+#endif
 #ifndef NO_USE_PORTAUDIO
 	REGISTER_MODULE(m_mod_man, SOUND_PORTAUDIO);
 #endif
@@ -284,26 +299,34 @@ void osd_common_t::register_options()
 #endif
 	REGISTER_MODULE(m_mod_man, MIDI_NONE);
 
+#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_SDL);
+#endif
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, KEYBOARD_NONE);
 
+#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_SDL);
+#endif
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, MOUSE_NONE);
 
+#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_SDL);
+#endif
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_X11);
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
 
+#if defined(SDLMAME_SDL2) || defined(SDLMAME_SDL3)
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLGAME);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_SDLJOY);
+#endif
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_WINHYBRID);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);

@@ -4016,6 +4016,26 @@ ROM_START( cjddzp )
 	ROM_LOAD( "cjddzp_sp-1.u4", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
 ROM_END
 
+ROM_START( cjddzp206cn ) // IGS PCB-0489-16-FM-1
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "e9_igs027a.rom", 0x0000, 0x4000, CRC(6cf26c3d) SHA1(c74d4ff71ff07c38449242e7e067e956a5c441be) ) // wasn't dumped for this set, but seems to work fine
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "cjddzp_s206cn.u17", 0x000000, 0x080000, CRC(4f828edc) SHA1(114c96b1c8c66682a1691d7c7f27d091e7955562) ) // 11xxxxxxxxxxxxxxxxxxx = 0xFF
+	ROM_IGNORE(                              0x180000 )
+
+	ROM_REGION( 0x200000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "cjddzp_text.u27", 0x000000, 0x200000, CRC(c4daedd6) SHA1(1c06e9b8f8c9849d808e12d81588f8d5603941d1) )
+
+	ROM_REGION( 0x600000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "cjddzp_anicg.u28", 0x000000, 0x400000, CRC(72487508) SHA1(9f4bbc858960ddaae403e4a3330b2345f6fd6cb3) )
+	ROM_LOAD( "cjddzp_extcg.u29", 0x400000, 0x200000, CRC(b0447269) SHA1(bf639abc135b52781340a24820e402db497d8d09) )
+
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "cjddzp_sp-1.u4", 0x00000, 0x200000, CRC(7ef65d95) SHA1(345c587cd449d6d06908e9687480be76b2cb2d28) )
+ROM_END
+
 /*
 Chaoji Dou Dizhu (V302CN) (hard version)
 IGS, 2007
@@ -4840,6 +4860,7 @@ GAME(  2004, cjddz217cn,    cjddz,    cjddz,        cjddz,         igs_m027_stat
 GAME(  2004, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V215CN)", 0 ) // 2004 date in internal ROM
 GAME(  2004, cjddz213cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V213CN)", MACHINE_NOT_WORKING ) // missing external program ROM. 2004 date in internal ROM
 GAME(  2004, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN)", MACHINE_NODEVICE_LAN ) // 2004 date in internal ROM
+GAME(  2004, cjddzp206cn,   cjddzp,   cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S206CN)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN ) // stuck at linking
 GAME(  2005, cjddzlf,       0,        cjddz,        cjddz,         igs_m027_state, init_cjddzlf,  ROT0, "IGS", "Chaoji Dou Dizhu Liang Fu Pai (V109CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, cjtljp,        0,        xypdk,        lhzb4,         igs_m027_state, init_cjtljp,   ROT0, "IGS", "Chaoji Tuolaji Jiaqiang Ban (V206CN)", 0 ) // 2005 date in internal ROM
 GAME(  2005, xypdk,         0,        xypdk,        lhzb4,         igs_m027_state, init_xypdk,    ROT0, "IGS", "Xingyun Pao De Kuai (V106CN)", 0 )

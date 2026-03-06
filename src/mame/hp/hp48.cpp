@@ -1255,13 +1255,12 @@ void hp48_state::hp49g(machine_config &config)
  */
 
 
-/* These ROMS are common to the G, GX, and G+ models.
+/* These ROMS are common to the G and GX models.
    The ROM detects whether it runs a G or a GX by simply testing the memory:
    if there are 32 KB (i.e., addresses wraps-around at 0x10000), it is a G; if there are
    128 KB, it is a GX.
    When a G is detected, some specially optimized routines may be used (they use the fact that
    no extension may be physically present).
-   The G+ model has always revision R.
  */
 ROM_START( hp48gx )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -1284,12 +1283,17 @@ ROM_START( hp48gx )
 
 	ROM_SYSTEM_BIOS( 4, "r", "Version R" )
 	ROMX_LOAD( "gxrom-r", 0x00000, 0x80000, CRC(00ee1a62) SHA1(5705fc9ea791916c4456ac35e22275862411db9b), ROM_BIOS(4) )
-
 ROM_END
 
 #define rom_hp48g  rom_hp48gx
-#define rom_hp48gp rom_hp48gx
 
+/* The G+ model first shipped in 1998 and only comes with the Version R ROM from 1993. */
+ROM_START( hp48gp )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+
+	ROM_SYSTEM_BIOS( 0, "r", "Version R" )
+	ROM_LOAD( "gxrom-r", 0x00000, 0x80000, CRC(00ee1a62) SHA1(5705fc9ea791916c4456ac35e22275862411db9b) )
+ROM_END
 
 /* These ROMS are common to the S and SX models.
    The only difference is that, the S being later, it was only shipped with revisions
@@ -1322,7 +1326,6 @@ ROM_START( hp48sx )
 	ROMX_LOAD( "sxrom-j", 0x00000, 0x40000, CRC(1a6378ef) SHA1(5235f5379f1fd7edfe9bb6bf466b60d279163e73), ROM_BIOS(5) )
 
 	/* no F, G, H, I revisions? */
-
 ROM_END
 
 #define rom_hp48s rom_hp48sx

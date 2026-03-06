@@ -211,7 +211,11 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <locale>
+#include <string>
+#include <sstream>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 
@@ -462,8 +466,10 @@ private:
 		x86code *           debug_log_hashjmp;      // hashjmp debugging
 		x86code *           debug_log_hashjmp_fail; // hashjmp debugging
 
-		u32                 ssemode;                // saved SSE mode
-		u32                 ssemodesave;            // temporary location for saving
+		u32                 ssemode;                // saved SSE mode on entry
+		u32                 ssemodesave;            // temporary location for saving SSE mode across calls
+		u8                  nominalfmod;            // FMOD equivalent to SSE mode on entry or 0xff
+
 		u32                 ssecontrol[4];          // copy of the sse_control array
 		float               single1;                // 1.0 in single-precision
 		double              double1;                // 1.0 in double-precision
@@ -1034,10 +1040,10 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	// build up necessary arrays
 	constexpr u32 sse_control[4] =
 	{
-		0xff80,     // ROUND_TRUNC
-		0x9f80,     // ROUND_ROUND
-		0xdf80,     // ROUND_CEIL
-		0xbf80      // ROUND_FLOOR
+		0x7f80,     // ROUND_TRUNC
+		0x1f80,     // ROUND_ROUND
+		0x5f80,     // ROUND_CEIL
+		0x3f80      // ROUND_FLOOR
 	};
 	memcpy(m_near.ssecontrol, sse_control, sizeof(m_near.ssecontrol));
 	m_near.single1 = 1.0F;
@@ -1102,9 +1108,21 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	// create the log
 	if (device.machine().options().drc_log_native())
 	{
-		std::string filename = std::string("drcbex64_").append(device.shortname()).append(".asm");
-		m_log = x86log_context::create(filename);
-		m_log_asmjit = fopen(std::string("drcbex64_asmjit_").append(device.shortname()).append(".asm").c_str(), "w");
+		std::string filename = device.tag();
+		for (auto &ch : filename)
+		{
+			if (':' == ch)
+				ch = '_';
+		}
+		std::ostringstream str;
+		str.imbue(std::locale::classic());
+		str << device.shortname();
+		if ('_' != filename[0])
+			str << '_';
+		str << filename << ".asm";
+		filename = std::move(str).str();
+		m_log = x86log_context::create("drcbex64_" + filename);
+		m_log_asmjit = fopen(("drcbex64_asmjit_" + filename).c_str(), "w");
 	}
 
 	// generate a little bit of glue code to set up the environment
@@ -1145,13 +1163,40 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 
 	a.sub(rsp, 40);
 	a.mov(MABS(&m_near.stacksave), rsp);
+
+	// save MXCSR with flags masked out
 	a.stmxcsr(MABS(&m_near.ssemode));
-	a.jmp(gpq(REG_PARAM2));
+	a.mov(eax, MABS(&m_near.ssemode));
+	a.and_(eax, 0xffffffc0);
+	a.mov(MABS(&m_near.ssemode), eax);
+
+	// convert rounding mode from MXCSR to equivalent FMOD value
+	a.mov(gpd(REG_PARAM1), eax);
+	a.shr(gpd(REG_PARAM1), 13);
+	a.add(gpd(REG_PARAM1), 1);
+	a.and_(gpd(REG_PARAM1), 3);
+	a.mov(gpd(REG_PARAM3), gpd(REG_PARAM1));
+	a.shr(gpd(REG_PARAM3), 1);
+	a.xor_(gpd(REG_PARAM1), gpd(REG_PARAM3));
+
+	// see if the saved MXCSR value matches what we'd set
+	a.mov(gpd(REG_PARAM3), ptr(rbp, gpq(REG_PARAM1), 2, offset_from_rbp(&m_near.ssecontrol[0])));
+	a.cmp(eax, gpd(REG_PARAM3));
+	a.mov(gpd(REG_PARAM3), 0xff);
+	a.cmovne(gpd(REG_PARAM1), gpd(REG_PARAM3));
+	a.mov(MABS(&m_near.nominalfmod), gpb_lo(REG_PARAM1));
+
+	a.call(gpq(REG_PARAM2));
 
 	// generate an exit point
+	Label const norestore = a.new_label();
 	m_exit = dst + a.offset();
 	a.bind(a.new_named_label("exit_point"));
+	a.movzx(gpd(REG_PARAM1), MABS(&m_state.fmod, 1));
+	a.cmp(gpb_lo(REG_PARAM1), MABS(&m_near.nominalfmod));
+	a.short_().je(norestore);
 	a.ldmxcsr(MABS(&m_near.ssemode));
+	a.bind(norestore);
 	a.mov(rsp, MABS(&m_near.stacksave));
 	a.add(rsp, 40);
 	a.emit_epilog(frame);
@@ -1273,7 +1318,7 @@ int drcbe_x64::execute(code_handle &entry)
 void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 numinst)
 {
 	// do this here because device.debug() isn't initialised at construction time
-	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED))
+	if (!m_debug_cpu_instruction_hook && (m_device.machine().debug_flags & DEBUG_FLAG_ENABLED) && m_device.debug())
 	{
 		m_debug_cpu_instruction_hook.set(*m_device.debug(), &device_debug::instruction_hook);
 		if (!m_debug_cpu_instruction_hook)
@@ -1984,15 +2029,18 @@ void drcbe_x64::op_debug(Assembler &a, const instruction &inst)
 		be_parameter pcp(*this, inst.param(0), PTYPE_MRI);
 
 		// test and branch
-		mov_r64_imm(a, rax, (uintptr_t)&m_device.machine().debug_flags);                // mov   rax,&debug_flags
-		a.test(dword_ptr(rax), DEBUG_FLAG_CALL_HOOK);                                   // test  [debug_flags],DEBUG_FLAG_CALL_HOOK
-		Label skip = a.new_label();
+		mov_r64_imm(a, rax, uintptr_t(&m_device.machine().debug_flags));
+		a.test(dword_ptr(rax), DEBUG_FLAG_CALL_HOOK);
+		Label const skip = a.new_label();
 		a.short_().jz(skip);
 
-		// push the parameter
-		mov_r64_imm(a, gpq(REG_PARAM1), m_debug_cpu_instruction_hook.obj);              // mov   param1,device.debug
-		mov_reg_param(a, gpd(REG_PARAM2), pcp);                                         // mov   param2,pcp
-		smart_call_r64(a, m_debug_cpu_instruction_hook.func, rax);                      // call  debug_cpu_instruction_hook
+		// perform the call
+		a.ldmxcsr(MABS(&m_near.ssemode));
+		mov_r64_imm(a, gpq(REG_PARAM1), m_debug_cpu_instruction_hook.obj);
+		mov_reg_param(a, gpd(REG_PARAM2), pcp);
+		smart_call_r64(a, m_debug_cpu_instruction_hook.func, rax);
+		a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+		a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 
 		a.bind(skip);
 	}
@@ -2264,16 +2312,19 @@ void drcbe_x64::op_callc(Assembler &a, const instruction &inst)
 	if (inst.condition() != uml::COND_ALWAYS)
 	{
 		skip = a.new_label();
-		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);                        // jcc   skip
+		a.short_().j(X86_NOT_CONDITION(inst.condition()), skip);
 	}
 
 	// perform the call
-	mov_r64_imm(a, gpq(REG_PARAM1), (uintptr_t)paramp.memory());                        // mov   param1,paramp
-	smart_call_r64(a, (x86code *)(uintptr_t)funcp.cfunc(), rax);                        // call  funcp
+	a.ldmxcsr(MABS(&m_near.ssemode));
+	mov_r64_imm(a, gpq(REG_PARAM1), (uintptr_t)paramp.memory());
+	smart_call_r64(a, (x86code *)(uintptr_t)funcp.cfunc(), rax);
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 
 	// resolve the conditional link
 	if (inst.condition() != uml::COND_ALWAYS)
-		a.bind(skip);                                                               // skip:
+		a.bind(skip);
 }
 
 
@@ -2321,21 +2372,30 @@ void drcbe_x64::op_setfmod(Assembler &a, const instruction &inst)
 	// normalize parameters
 	be_parameter srcp(*this, inst.param(0), PTYPE_MRI);
 
+	Label const skip = a.new_label();
+
 	if (srcp.is_immediate())
 	{
 		// immediate case
-		int value = srcp.immediate() & 3;
-		a.mov(MABS(&m_state.fmod, 1), value);                                           // mov   [fmod],srcp
-		a.ldmxcsr(MABS(&m_near.ssecontrol[value]));                                     // ldmxcsr fp_control[srcp]
+		int const value = srcp.immediate() & 3;
+		a.mov(eax, value);
+		a.cmp(MABS(&m_state.fmod), al);
+		a.short_().je(skip);
+		a.mov(MABS(&m_state.fmod), al);
+		a.ldmxcsr(MABS(&m_near.ssecontrol[value]));
 	}
 	else
 	{
 		// register/memory case
-		mov_reg_param(a, eax, srcp);                                                    // mov   eax,srcp
-		a.and_(eax, 3);                                                                 // and   eax,3
-		a.mov(MABS(&m_state.fmod), al);                                                 // mov   [fmod],al
-		a.ldmxcsr(ptr(rbp, rax, 2, offset_from_rbp(&m_near.ssecontrol[0])));            // ldmxcsr fp_control[eax]
+		mov_reg_param(a, eax, srcp);
+		a.and_(eax, 3);
+		a.cmp(MABS(&m_state.fmod), al);
+		a.short_().je(skip);
+		a.mov(MABS(&m_state.fmod), al);
+		a.ldmxcsr(ptr(rbp, rax, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 	}
+
+	a.bind(skip);
 }
 
 
@@ -2353,16 +2413,17 @@ void drcbe_x64::op_getfmod(Assembler &a, const instruction &inst)
 	// normalize parameters
 	be_parameter dstp(*this, inst.param(0), PTYPE_MR);
 
-	Mem fmod = MABS(&m_state.fmod);
-	fmod.set_size(1);
+	Mem const fmod = MABS(&m_state.fmod, 1);
 
 	// fetch the current mode and store to the destination
 	if (dstp.is_int_register())
-		a.movzx(gpd(dstp.ireg()), fmod);                                                // movzx reg,[fmod]
+	{
+		a.movzx(gpd(dstp.ireg()), fmod);
+	}
 	else
 	{
-		a.movzx(eax, fmod);                                                             // movzx eax,[fmod]
-		a.mov(MABS(dstp.memory()), eax);                                                // mov   [dstp],eax
+		a.movzx(eax, fmod);
+		a.mov(MABS(dstp.memory()), eax);
 	}
 }
 
@@ -3007,6 +3068,9 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 	// pick a target register for the general case
 	Gp dstreg = dstp.select_register(eax);
 
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
+
 	// set up a call to the read handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
 	bool const have_specific = (uintptr_t(nullptr) != accessors.specific.read.function) || accessors.specific.read.is_virtual;
@@ -3127,6 +3191,10 @@ void drcbe_x64::op_read(Assembler &a, const instruction &inst)
 		smart_call_r64(a, accessors.resolved.read_qword.func, rax);
 	}
 
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
+
 	// move or zero-extend result if necessary
 	if (spacesizep.size() == SIZE_BYTE)
 	{
@@ -3175,6 +3243,9 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 
 	// pick a target register for the general case
 	Gp dstreg = dstp.select_register(eax);
+
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
 
 	// set up a call to the read handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
@@ -3289,6 +3360,10 @@ void drcbe_x64::op_readm(Assembler &a, const instruction &inst)
 		smart_call_r64(a, accessors.resolved.read_qword_masked.func, rax);
 	}
 
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
+
 	// move or zero-extend result if necessary
 	if (spacesizep.size() == SIZE_BYTE)
 	{
@@ -3333,6 +3408,9 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 	be_parameter srcp(*this, inst.param(1), PTYPE_MRI);
 	const parameter &spacesizep = inst.param(2);
 	assert(spacesizep.is_size_space());
+
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
 
 	// set up a call to the write handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
@@ -3443,6 +3521,10 @@ void drcbe_x64::op_write(Assembler &a, const instruction &inst)
 		mov_r64_imm(a, gpq(REG_PARAM1), accessors.resolved.write_qword.obj);
 		smart_call_r64(a, accessors.resolved.write_qword.func, rax);
 	}
+
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 }
 
 
@@ -3463,6 +3545,9 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 	be_parameter maskp(*this, inst.param(2), PTYPE_MRI);
 	const parameter &spacesizep = inst.param(3);
 	assert(spacesizep.is_size_space());
+
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
 
 	// set up a call to the write handler
 	auto const &accessors = m_memory_accessors[spacesizep.space()];
@@ -3576,6 +3661,10 @@ void drcbe_x64::op_writem(Assembler &a, const instruction &inst)
 		mov_r64_imm(a, gpq(REG_PARAM1), accessors.resolved.write_qword_masked.obj);
 		smart_call_r64(a, accessors.resolved.write_qword_masked.func, rax);
 	}
+
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 }
 
 
@@ -5522,12 +5611,19 @@ void drcbe_x64::op_fread(Assembler &a, const instruction &inst)
 	assert(spacep.is_size_space());
 	assert((1 << spacep.size()) == inst.size());
 
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
+
 	// set up a call to the read dword/qword handler
 	auto const &accessors = m_memory_accessors[spacep.space()];
 	auto const &accessor = (inst.size() == 4) ? accessors.resolved.read_dword : accessors.resolved.read_qword;
 	mov_reg_param(a, gpd(REG_PARAM2), addrp);
 	mov_r64_imm(a, gpq(REG_PARAM1), accessor.obj);
 	smart_call_r64(a, accessor.func, rax);
+
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 
 	// store result
 	if (inst.size() == 4)
@@ -5565,6 +5661,9 @@ void drcbe_x64::op_fwrite(Assembler &a, const instruction &inst)
 	assert(spacep.is_size_space());
 	assert((1 << spacep.size()) == inst.size());
 
+	// restore caller's floating point environment
+	a.ldmxcsr(MABS(&m_near.ssemode));
+
 	// general case
 	auto const &accessors = m_memory_accessors[spacep.space()];
 	auto const &accessor = (inst.size() == 4) ? accessors.resolved.write_dword : accessors.resolved.write_qword;
@@ -5588,6 +5687,10 @@ void drcbe_x64::op_fwrite(Assembler &a, const instruction &inst)
 	}
 	mov_r64_imm(a, gpq(REG_PARAM1), accessor.obj);
 	smart_call_r64(a, accessor.func, rax);
+
+	// restore our rounding mode
+	a.movzx(ecx, byte_ptr(rbp, offset_from_rbp(&m_state.fmod)));
+	a.ldmxcsr(ptr(rbp, rcx, 2, offset_from_rbp(&m_near.ssecontrol[0])));
 }
 
 

@@ -148,12 +148,14 @@ public:
 	{
 	}
 
-	void wardner(machine_config &config);
-
-	void init_wardner();
+	void wardner(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+
+	virtual void dsp_host_addr_cb(u16 data, u32 &seg, u32 &addr) override;
+	virtual u16 dsp_host_read_cb(u32 seg, u32 addr) override;
+	virtual bool dsp_host_write_cb(u32 seg, u32 addr, u16 data) override;
 
 private:
 	memory_view m_rom_ram_view;
@@ -164,8 +166,6 @@ private:
 	void wardner_vblank_irq(int state);
 	void int_enable_w(int state);
 
-	void dsp_io_map(address_map &map) ATTR_COLD;
-	void dsp_program_map(address_map &map) ATTR_COLD;
 	void main_bank_map(address_map &map) ATTR_COLD;
 	void main_io_map(address_map &map) ATTR_COLD;
 	void main_program_map(address_map &map) ATTR_COLD;
@@ -187,6 +187,64 @@ void wardner_state::int_enable_w(int state)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
+
+void wardner_state::dsp_host_addr_cb(u16 data, u32 &seg, u32 &addr)
+{
+	/* This sets the main CPU RAM address the DSP should */
+	/*  read/write, via the DSP IO port 0 */
+	/* Lower twelve bits of this data is shifted left one position */
+	/*  to move it to an even address boundary */
+
+	seg  =  (data & 0xe000);
+	addr = ((data & 0x07ff) << 1);
+
+	if (seg == 0x6000) seg = 0x7000;
+}
+
+u16 wardner_state::dsp_host_read_cb(u32 seg, u32 addr)
+{
+	u16 input_data = 0;
+	switch (seg)
+	{
+	case 0x7000:
+	case 0x8000:
+	case 0xa000:
+		{
+			address_space &mainspace = m_maincpu->space(AS_PROGRAM);
+			input_data =  mainspace.read_byte(seg + (addr + 0))
+						| (mainspace.read_byte(seg + (addr + 1)) << 8);
+			break;
+		}
+	default:
+		if (!machine().side_effects_disabled())
+			logerror("%s: Warning !!! IO reading from %08x (port 1)\n", machine().describe_context(), seg + addr);
+		break;
+	}
+	return input_data;
+}
+
+bool wardner_state::dsp_host_write_cb(u32 seg, u32 addr, u16 data)
+{
+	bool execute = false;
+	switch (seg)
+	{
+	case 0x7000:
+		if ((addr < 3) && (data == 0)) execute = true;
+		[[fallthrough]];
+	case 0x8000:
+	case 0xa000:
+		{
+			address_space &mainspace = m_maincpu->space(AS_PROGRAM);
+			mainspace.write_byte(seg + (addr + 0), (data & 0xff));
+			mainspace.write_byte(seg + (addr + 1), ((data >> 8) & 0xff));
+			break;
+		}
+	default:
+		logerror("%s: Warning !!! IO writing to %08x (port 1)\n", machine().describe_context(), seg + addr);
+		break;
+	}
+	return execute;
+}
 
 /***************************** Z80 Main Memory Map **************************/
 
@@ -248,21 +306,6 @@ void wardner_state::sound_io_map(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x01).rw("ymsnd", FUNC(ym3812_device::read), FUNC(ym3812_device::write));
-}
-
-
-/***************************** TMS320C10 Memory Map **************************/
-
-void wardner_state::dsp_program_map(address_map &map)
-{
-	map(0x000, 0x5ff).rom();
-}
-
-void wardner_state::dsp_io_map(address_map &map)
-{
-	map(0x00, 0x00).w(FUNC(wardner_state::wardner_dsp_addrsel_w));
-	map(0x01, 0x01).rw(FUNC(wardner_state::wardner_dsp_r), FUNC(wardner_state::wardner_dsp_w));
-	map(0x03, 0x03).w(FUNC(wardner_state::twincobr_dsp_bio_w));
 }
 
 
@@ -405,10 +448,11 @@ void wardner_state::wardner(machine_config &config)
 	audiocpu.set_addrmap(AS_PROGRAM, &wardner_state::sound_program_map);
 	audiocpu.set_addrmap(AS_IO, &wardner_state::sound_io_map);
 
-	TMS320C10(config, m_dsp, XTAL(14'000'000));      // 14MHz Crystal CLKin
-	m_dsp->set_addrmap(AS_PROGRAM, &wardner_state::dsp_program_map);
-	m_dsp->set_addrmap(AS_IO, &wardner_state::dsp_io_map);
-	m_dsp->bio().set(FUNC(wardner_state::twincobr_bio_r));
+	TOAPLAN_DSP(config, m_dsp, XTAL(14'000'000));      // 14MHz Crystal CLKin
+	m_dsp->set_host_addr_callback(FUNC(wardner_state::dsp_host_addr_cb));
+	m_dsp->set_host_read_callback(FUNC(wardner_state::dsp_host_read_cb));
+	m_dsp->set_host_write_callback(FUNC(wardner_state::dsp_host_write_cb));
+	m_dsp->halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
 
 	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slices per frame
 
@@ -420,7 +464,7 @@ void wardner_state::wardner(machine_config &config)
 	m_mainlatch->q_out_cb<6>().set(FUNC(wardner_state::display_on_w));
 
 	LS259(config, m_coinlatch);
-	m_coinlatch->q_out_cb<0>().set(FUNC(wardner_state::dsp_int_w));
+	m_coinlatch->q_out_cb<0>().set(m_dsp, FUNC(toaplan_dsp_device::dsp_int_w));
 	m_coinlatch->q_out_cb<4>().set(FUNC(wardner_state::coin_counter_1_w));
 	m_coinlatch->q_out_cb<5>().set(FUNC(wardner_state::coin_counter_2_w));
 	m_coinlatch->q_out_cb<6>().set(FUNC(wardner_state::coin_lockout_1_w));
@@ -476,7 +520,7 @@ ROM_START( wardner )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound Z80 code
 	ROM_LOAD( "b25-16.4k", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
 
-	ROM_REGION( 0x2000, "dsp", 0 )  // Co-Processor TMS320C10
+	ROM_REGION16_BE( 0x1000, "dsp:dsp", 0 )  // Co-Processor TMS320C10
 	ROM_LOAD( "d70012u_gxc-02_mcu_71001",  0x0000, 0x0c00, BAD_DUMP CRC(eee0ff59) SHA1(dad4570815ec444e34cc73f7cd90f9ca8f7b3eb8) ) // it should use undumped MCU 71900, but they are interchangeable
 
 	ROM_REGION( 0x0c000, "chars", 0 )
@@ -521,7 +565,7 @@ ROM_START( wardnerb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound Z80 code
 	ROM_LOAD( "b25-16.4k", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
 
-	ROM_REGION( 0x2000, "dsp", 0 )  // Co-Processor TMS320C10
+	ROM_REGION16_BE( 0x1000, "dsp:dsp", 0 )  // Co-Processor TMS320C10
 	ROMX_LOAD( "82s137.1d",  0x0000, 0x0400, CRC(cc5b3f53) SHA1(33589665ac995cc4645b56bbcd6d1c1cd5368f88), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) // MSB
 	ROMX_LOAD( "82s137.1e",  0x0000, 0x0400, CRC(47351d55) SHA1(826add3ea3987f2c9ba2d3fc69a4ad2d9b033c89), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
 	ROMX_LOAD( "82s137.3d",  0x0001, 0x0400, CRC(70b537b9) SHA1(5211ec4605894727747dda66b70c9427652b16b4), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) // LSB
@@ -572,7 +616,7 @@ ROM_START( pyros )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound Z80 code
 	ROM_LOAD( "b25-16.4k", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
 
-	ROM_REGION( 0x2000, "dsp", 0 )  // Co-Processor TMS320C10
+	ROM_REGION16_BE( 0x1000, "dsp:dsp", 0 )  // Co-Processor TMS320C10
 	ROM_LOAD( "d70012u_gxc-02_mcu_71001",  0x0000, 0x0c00, BAD_DUMP CRC(eee0ff59) SHA1(dad4570815ec444e34cc73f7cd90f9ca8f7b3eb8) ) // it should use undumped MCU 71900, but they are interchangeable
 
 	ROM_REGION( 0x0c000, "chars", 0 )
@@ -616,7 +660,7 @@ ROM_START( wardnerj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    // Sound Z80 code
 	ROM_LOAD( "b25-16.4k", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
 
-	ROM_REGION( 0x2000, "dsp", 0 )  // Co-Processor TMS320C10
+	ROM_REGION16_BE( 0x1000, "dsp:dsp", 0 )  // Co-Processor TMS320C10
 	ROM_LOAD( "d70012u_gxc-02_mcu_71001",  0x0000, 0x0c00, BAD_DUMP CRC(eee0ff59) SHA1(dad4570815ec444e34cc73f7cd90f9ca8f7b3eb8) ) // it should use undumped MCU 71900, but they are interchangeable
 
 	ROM_REGION( 0x0c000, "chars", 0 )
@@ -662,7 +706,7 @@ ROM_START( wardnerjb )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "16.bin", 0x00000, 0x08000, CRC(e5202ff8) SHA1(15ae8c0bb16a20bee14e8d80d81c249404ab1463) )
 
-	ROM_REGION( 0x2000, "dsp", 0 )  // Co-Processor TMS320C10, not dumped for this set
+	ROM_REGION16_BE( 0x1000, "dsp:dsp", 0 )  // Co-Processor TMS320C10, not dumped for this set
 	ROMX_LOAD( "82s137.1d", 0x0000, 0x0400, BAD_DUMP CRC(cc5b3f53) SHA1(33589665ac995cc4645b56bbcd6d1c1cd5368f88), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) // MSB
 	ROMX_LOAD( "82s137.1e", 0x0000, 0x0400, BAD_DUMP CRC(47351d55) SHA1(826add3ea3987f2c9ba2d3fc69a4ad2d9b033c89), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )
 	ROMX_LOAD( "82s137.3d", 0x0001, 0x0400, BAD_DUMP CRC(70b537b9) SHA1(5211ec4605894727747dda66b70c9427652b16b4), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(1) ) // LSB

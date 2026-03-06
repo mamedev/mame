@@ -193,14 +193,5 @@ public:
 
 //#define MASTER_CLOCK_352 57272720
 //#define MASTER_CLOCK_320 53693174
-#define CEF_1   m_vdp1_regs[0x010/2]|=0x0002
-#define CEF_0   m_vdp1_regs[0x010/2]&=~0x0002
-#define BEF_1   m_vdp1_regs[0x010/2]|=0x0001
-#define BEF_0   m_vdp1_regs[0x010/2]&=~0x0001
-#define VDP1_TVMR ((m_vdp1_regs[0x000/2])&0xffff)
-#define VDP1_VBE  ((VDP1_TVMR & 0x0008) >> 3)
-#define VDP1_TVM  ((VDP1_TVMR & 0x0007) >> 0)
-
-extern gfx_decode_entry const gfx_stv[];
 
 #endif // MAME_SEGA_STV_H

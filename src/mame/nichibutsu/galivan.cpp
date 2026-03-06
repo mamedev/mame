@@ -207,7 +207,6 @@ protected:
 	void io_map(address_map &map) ATTR_COLD;
 
 	void common(machine_config &config);
-	void video_config(machine_config &config);
 
 private:
 	uint8_t m_scrollx[2]{}, m_scrolly[2]{};
@@ -639,7 +638,7 @@ void galivan_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			flipy = !flipy;
 		}
 
-//      int const code = buffered_spriteram[offs + 1] + ((attr & 0x02) << 7);
+		//int const code = buffered_spriteram[offs + 1] + ((attr & 0x02) << 7);
 		int const code = buffered_spriteram[offs + 1] + ((attr & 0x06) << 7);  // for ninjemak, not sure ?
 
 		gfx->transpen(bitmap, cliprect,
@@ -833,12 +832,9 @@ void youmab_state::_84_w(uint8_t data)
 void youmab_state::_86_w(uint8_t data)
 {
 	// latch values
-	{
-		m_scrolly = (m_shift_val & 0x0003ff);
-		m_scrollx = (m_shift_val & 0x7ffc00) >> 10;
-
-		//popmessage("%08x %08x %08x", m_scrollx, m_scrolly, m_shift_val);
-	}
+	m_scrolly = (m_shift_val & 0x0003ff);
+	m_scrollx = (m_shift_val & 0x7ffc00) >> 10;
+	//popmessage("%08x %08x %08x", m_scrollx, m_scrolly, m_shift_val);
 
 	m_shift_val = 0;
 	m_shift_scroll = 0;
@@ -872,27 +868,32 @@ void galivan_state::sound_io_map(address_map &map)
 }
 
 
-/***************
-   Dip Switches
- ***************/
+/***************************************************************************
 
-#define NIHON_JOYSTICK(_n_) \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(_n_) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(_n_) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(_n_) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(_n_) \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(_n_) \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(_n_) \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(_n_)
+  Input ports
 
+***************************************************************************/
 
 static INPUT_PORTS_START( galivan )
 	PORT_START("P1")
-	NIHON_JOYSTICK(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // hold to move while hanging
 
 	PORT_START("P2")
-	NIHON_JOYSTICK(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) // hold to move while hanging
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -961,6 +962,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dangar )
 	PORT_INCLUDE( galivan )
 
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
 	PORT_MODIFY("SYSTEM")
 	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 
@@ -1019,6 +1026,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ninjemak )
 	PORT_INCLUDE( galivan )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // only in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) // only in test mode
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:5,6")
@@ -1148,17 +1163,6 @@ void ninjemak_state::machine_reset()
 	m_dispdisable = 0;
 }
 
-void galivan_state::video_config(machine_config &config)
-{
-	BUFFERED_SPRITERAM8(config, m_spriteram);
-
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
-	// TODO: not measured, ~60 Hz
-	m_screen->set_raw(XTAL(12'000'000) / 2, 382, 0, 32 * 8, 262, 2 * 8, 30 * 8);
-	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
-	m_screen->set_palette(m_palette);
-}
-
 void galivan_state::common(machine_config &config)
 {
 	// basic machine hardware
@@ -1171,7 +1175,12 @@ void galivan_state::common(machine_config &config)
 	audiocpu.set_periodic_int(FUNC(galivan_state::irq0_line_hold), attotime::from_hz(XTAL(8'000'000) / 2 / 512));   // ?
 
 	// video hardware
-	video_config(config);
+	BUFFERED_SPRITERAM8(config, m_spriteram);
+
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(XTAL(12'000'000) / 2, 384, 0, 32 * 8, 263, 2 * 8, 30 * 8);
+	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_rising));
+	m_screen->set_palette(m_palette);
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();
@@ -1906,9 +1915,9 @@ GAME( 1986, dangarj,  dangar,   dangarj,  dangar2,  dangarj_state,  empty_init, 
 GAME( 1986, dangarb,  dangar,   galivan,  dangar2,  galivan_state,  empty_init,  ROT270, "bootleg",                     "Ufo Robo Dangar (9/26/1986, bootleg set 1)",          MACHINE_SUPPORTS_SAVE ) // checks protection like dangarj but check readback is patched at 0x9d58 (also checks I/O port 0xc0?)
 GAME( 1986, dangarbt, dangar,   galivan,  dangarb,  galivan_state,  empty_init,  ROT270, "bootleg",                     "Ufo Robo Dangar (9/26/1986, bootleg set 2)",          MACHINE_SUPPORTS_SAVE ) // directly patched at entry point 0x9d44
 
-GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Ninja Emaki (US)",                                    MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, ninjemat, ninjemak, galivan,  galivan,  ninjemak_state, empty_init,  ROT270, "Nichibutsu (Tecfri license)", "Ninja Emaki (Tecfri license)",                        MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan)",                           MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan, alt)",                      MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION )
-GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // player is invincible
-GAME( 1986, youmab2,  ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 2)", MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION ) // ""
+GAME( 1986, ninjemak, 0,        ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Ninja Emaki (US)",                                    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, ninjemat, ninjemak, galivan,  galivan,  ninjemak_state, empty_init,  ROT270, "Nichibutsu (Tecfri license)", "Ninja Emaki (Tecfri license)",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, youma,    ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan)",                           MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, youma2,   ninjemak, ninjemak, ninjemak, ninjemak_state, empty_init,  ROT270, "Nichibutsu",                  "Youma Ninpou Chou (Japan, alt)",                      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1986, youmab,   ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 1)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // player is invincible
+GAME( 1986, youmab2,  ninjemak, youmab,   ninjemak, youmab_state,   empty_init,  ROT270, "bootleg",                     "Youma Ninpou Chou (Game Electronics bootleg, set 2)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // ""

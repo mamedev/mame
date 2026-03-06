@@ -45,6 +45,7 @@ BTANB:
   the bottom of the screen for 1 frame
 
 Notes by Jose Tejada (jotego):
+
 The main CPU frequency is 3 MHz, after a two-stage FF clock divider.
 The CPU clock is gated by bus arbitration logic. The CPU clock is halted until
 video hardware has an opening in memory access, then the CPU is allowed to access

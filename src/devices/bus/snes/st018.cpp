@@ -11,12 +11,8 @@
 #include "emu.h"
 #include "st018.h"
 
+#include "multibyte.h"
 
-// helpers
-inline uint32_t get_prg(uint8_t *CPU, uint32_t addr)
-{
-	return (CPU[addr * 4] | (CPU[addr * 4 + 1] << 8) | (CPU[addr * 4 + 2] << 16) | (CPU[addr * 4 + 3] << 24));
-}
 
 //-------------------------------------------------
 //  constructor
@@ -62,12 +58,12 @@ void sns_rom_st018_device::device_reset()
 // ST018 dump contains prg at offset 0 and data at offset 0x20000
 uint32_t sns_rom_st018_device::copro_prg_r(offs_t offset)
 {
-	return get_prg(&m_bios[0], offset);
+	return get_u32le(&m_bios[offset * 4]);
 }
 
 uint32_t sns_rom_st018_device::copro_data_r(offs_t offset)
 {
-	return get_prg(&m_bios[0], offset + 0x20000/4);
+	return get_u32le(&m_bios[0x20000 + offset * 4]);
 }
 
 uint8_t sns_rom_st018_device::status_r()
@@ -155,7 +151,7 @@ void sns_rom_st018_device::speedup_addon_bios_access()
 	m_copro->space(AS_PROGRAM).install_rom(0xa000'0000, 0xa000'7fff, &m_copro_data[0]);
 	// copy data in the correct format
 	for (int x = 0; x < 0x8000; x++)
-		m_copro_prg[x] = m_bios[x * 4] | (m_bios[x * 4 + 1] << 8) | (m_bios[x * 4 + 2] << 16) | (m_bios[x * 4 + 3] << 24);
+		m_copro_prg[x] = get_u32le(&m_bios[x * 4]);
 	for (int x = 0; x < 0x2000; x++)
-		m_copro_data[x] = m_bios[0x20000 + x * 4] | (m_bios[0x20000 + x * 4 + 1] << 8) | (m_bios[0x20000 + x * 4 + 2] << 16) | (m_bios[0x20000 + x * 4 + 3] << 24);
+		m_copro_data[x] = get_u32le(&m_bios[0x20000 + x * 4]);
 }

@@ -372,6 +372,8 @@ symbol_table::symbol_table(running_machine &machine, table_type type, symbol_tab
 	, m_memintf(dynamic_cast<device_memory_interface *>(device))
 	, m_memory_modified(nullptr)
 {
+	assert(type != table_type::CPU_STATE || device != nullptr);
+	assert(type != table_type::BUILTIN_GLOBALS || device == nullptr);
 }
 
 

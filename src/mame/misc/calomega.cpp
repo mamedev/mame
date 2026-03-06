@@ -1621,7 +1621,7 @@ static INPUT_PORTS_START( gdrwpkrd )
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Open")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_DOOR )         PORT_NAME("Door Open")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")                      // in some games you need to open the door first
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hand Pay") PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Dispute")  PORT_CODE(KEYCODE_0)  // in some games you need to open the door first
@@ -1763,7 +1763,7 @@ static INPUT_PORTS_START( gdrwpkrh )
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Open")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_DOOR )         PORT_NAME("Door Open")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")                       // in some games you need to open the door first
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Hand Pay")  PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Dispute")   PORT_CODE(KEYCODE_0)  // in some games you need to open the door first
@@ -2129,7 +2129,7 @@ static INPUT_PORTS_START( comg074 )
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )        PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )  PORT_NAME("Door Open")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_DOOR )         PORT_NAME("Door Open")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )      PORT_NAME("Test Mode")  // in some games you need to open the door first
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2858,7 +2858,7 @@ static INPUT_PORTS_START( comg128 )
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR ) PORT_NAME("Door Open")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_DOOR )        PORT_NAME("Door Open")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )     PORT_NAME("Test Mode")
@@ -3764,7 +3764,7 @@ static INPUT_PORTS_START( stand906 )
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Weight") PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door")          PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_DOOR )                               PORT_NAME("Door")          PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_NAME("Hand Pay")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE)        PORT_CODE(KEYCODE_R) PORT_NAME("Error Reset")
@@ -3873,7 +3873,7 @@ static INPUT_PORTS_START( cas21iwc )
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Height (Peso Tolva)") PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door (Puerta)")              PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_DOOR )                               PORT_NAME("Door (Puerta)")              PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_NAME("Hand Pay (Pago Manual)")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE)        PORT_CODE(KEYCODE_R) PORT_NAME("Error Reset (Correccion Error)")
@@ -3981,7 +3981,7 @@ static INPUT_PORTS_START( pokeriwc )
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM )        PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_H) PORT_NAME("Hopper Weight (Peso Tolva)") PORT_TOGGLE
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_DOOR )                        PORT_NAME("Door (Puerta Abierta)")      PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_DOOR )                               PORT_NAME("Door (Puerta Abierta)")      PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )       PORT_CODE(KEYCODE_9) PORT_NAME("Menu")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                      PORT_NAME("Hand Pay (Pago Manual)")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE)        PORT_CODE(KEYCODE_R) PORT_NAME("Error Reset (Correccion de Errores)")

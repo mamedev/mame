@@ -18,7 +18,7 @@
 #include "bus/isa/ide.h"
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
-#include "bus/isa/vga.h"
+#include "bus/isa/svga_paradise.h"
 #include "machine/mc68901.h"
 #include "sound/spkrdev.h"
 #include "speaker.h"
@@ -84,7 +84,8 @@ void indiana_isa_cards(device_slot_interface &device)
 	// 8-bit
 	device.option_add("fdc_at", ISA8_FDC_AT);
 	device.option_add("comat", ISA8_COM_AT);
-	device.option_add("vga", ISA8_VGA);
+	// unspecified ISA8 Paradise VGA card used
+	device.option_add("vga", ISA8_WD90C90_JK);
 
 	// 16-bit
 	device.option_add("ide", ISA16_IDE);

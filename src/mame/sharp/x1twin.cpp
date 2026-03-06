@@ -27,8 +27,6 @@ TODO:
 #include "speaker.h"
 
 
-// copied from pce.h until it's turned into a device properly
-#define MAIN_CLOCK      21477270
 
 namespace {
 
@@ -46,17 +44,21 @@ public:
 
 private:
 	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+#if 0
 	void pce_io(address_map &map) ATTR_COLD;
 	void pce_mem(address_map &map) ATTR_COLD;
+#endif
 	void x1_io(address_map &map) ATTR_COLD;
 	void x1_mem(address_map &map) ATTR_COLD;
 };
 
+// copied from pce.h until it's turned into a device properly
+static constexpr XTAL MAIN_CLOCK = 21.477272_MHz_XTAL;
 
-#define X1_MAIN_CLOCK 16_MHz_XTAL
-#define VDP_CLOCK  42.954545_MHz_XTAL
-#define MCU_CLOCK  6_MHz_XTAL
-#define PCE_MAIN_CLOCK      VDP_CLOCK / 2
+static constexpr XTAL X1_MAIN_CLOCK  = 16_MHz_XTAL;
+static constexpr XTAL VDP_CLOCK      = 42.954545_MHz_XTAL;
+static constexpr XTAL MCU_CLOCK      = 6_MHz_XTAL;
+static constexpr XTAL PCE_MAIN_CLOCK = VDP_CLOCK / 2;
 
 uint32_t x1twin_state::screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -78,10 +80,10 @@ void x1twin_state::x1_io(address_map &map)
 #if 0
 void x1twin_state::pce_mem(address_map &map)
 {
-	map(0x000000, 0x09FFFF).rom();
-	map(0x1F0000, 0x1F1FFF).ram().mirror(0x6000);
-	map(0x1FE000, 0x1FE3FF).rw(FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
-	map(0x1FE400, 0x1FE7FF).rw(FUNC(x1twin_state::vce_r), FUNC(x1twin_state::vce_w));
+	map(0x000000, 0x0fffff).rom();
+	map(0x1f0000, 0x1f1fff).ram().mirror(0x6000);
+	map(0x1fe000, 0x1fe3ff).rw(FUNC(x1twin_state::vdc_r), FUNC(x1twin_state::vdc_w));
+	map(0x1fe400, 0x1fe7ff).rw(FUNC(x1twin_state::vce_r), FUNC(x1twin_state::vce_w));
 }
 
 void x1twin_state::pce_io(address_map &map)
@@ -103,7 +105,7 @@ INPUT_CHANGED_MEMBER(x1twin_state::ipl_reset)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
 	m_ram_bank = 0x00;
-	if(m_is_turbo) { m_ex_bank = 0x10; }
+	if (m_is_turbo) { m_ex_bank = 0x10; }
 	//anything else?
 }
 
@@ -448,8 +450,8 @@ void x1twin_state::x1twin(machine_config &config)
 
 	#if 0
 	H6280(config, m_maincpu, PCE_MAIN_CLOCK/3);
-	m_maincpu->set_addrmap(AS_PROGRAM, pce_mem);
-	m_maincpu->set_addrmap(AS_IO, pce_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &x1twin_state::pce_mem);
+	m_maincpu->set_addrmap(AS_IO, &x1twin_state::pce_io);
 	m_maincpu->port_in_cb().set(FUNC(x1twin_state::pce_joystick_r));
 	m_maincpu->port_out_cb().set(FUNC(x1twin_state::pce_joystick_w));
 	m_maincpu->add_route(0, "pce", 0.5, 0);
@@ -551,4 +553,4 @@ ROM_END
 } // Anonymous namespace
 
 
-COMP( 1986, x1twin, x1, 0, x1twin, x1twin, x1twin_state, init_x1_kanji, "Sharp", "X1 Twin (CZ-830C)", MACHINE_NOT_WORKING )
+COMP( 1987, x1twin, x1, 0, x1twin, x1twin, x1twin_state, init_x1_kanji, "Sharp", "X1 Twin (CZ-830C)", MACHINE_NOT_WORKING )

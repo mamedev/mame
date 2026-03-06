@@ -588,7 +588,7 @@ u64 sound_stream::get_current_sample_index() const
 
 void sound_stream::update()
 {
-	if(!is_active() || m_in_update || m_device.machine().phase() <= machine_phase::RESET)
+	if(!is_active() || m_in_update || m_device.machine().time().is_zero())
 		return;
 
 	// Find out where we are and how much we have to do
@@ -610,7 +610,7 @@ void sound_stream::update()
 
 void sound_stream::update_nodeps()
 {
-	if(!is_active() || m_in_update || m_device.machine().phase() <= machine_phase::RESET)
+	if(!is_active() || m_in_update || m_device.machine().time().is_zero())
 		return;
 
 	// Find out where we are and how much we have to do

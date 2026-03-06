@@ -15,7 +15,6 @@
 #include "abcbus.h"
 #include "bus/nscsi/devices.h"
 #include "machine/nscsi_bus.h"
-#include "machine/nscsi_cb.h"
 
 
 
@@ -26,6 +25,7 @@
 // ======================> luxor_4105_device
 
 class luxor_4105_device :  public device_t,
+						   public nscsi_device_interface,
 						   public device_abcbus_card_interface
 {
 public:
@@ -60,14 +60,8 @@ private:
 	void update_dma();
 	void write_dma_register(uint8_t data);
 	void write_sasi_data(uint8_t data);
+	virtual void scsi_ctrl_changed() override;
 
-	void write_sasi_bsy(int state);
-	void write_sasi_cd(int state);
-	void write_sasi_req(int state);
-	void write_sasi_msg(int state);
-	void write_sasi_io(int state);
-
-	required_device<nscsi_callback_device> m_sasi;
 	required_ioport m_1e;
 	required_ioport m_5e;
 

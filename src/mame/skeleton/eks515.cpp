@@ -72,5 +72,5 @@ ROM_END
 
 } // anonymous namespace
 
-// name taken and product code taken from sticker on back of unit
+// name and product code taken from sticker on back of unit
 CONS( 201?, eks515, 0, 0, eks515, eks515, eks515_state, empty_init, "Easy Karaoke", "Karaoke Screen Party (EKS-515)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

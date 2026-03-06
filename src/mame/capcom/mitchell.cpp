@@ -142,8 +142,8 @@ namespace {
 class mitchell_state : public driver_device
 {
 public:
-	mitchell_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	mitchell_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_oki(*this, "oki"),
 		m_nvram(*this, "nvram"),
@@ -159,7 +159,8 @@ public:
 		m_sys0(*this, "SYS0"),
 		m_in(*this, "IN%u", 0U),
 		m_dial_in(*this, "DIAL%u", 1U),
-		m_key{ { *this, "KEY%u", 0U }, { *this, "KEY%u", 5U } } { }
+		m_key{ { *this, "KEY%u", 0U }, { *this, "KEY%u", 5U } }
+	{ }
 
 	void mgakuen(machine_config &config);
 	void marukin(machine_config &config);
@@ -261,12 +262,13 @@ protected:
 class spangbl_state : public mitchell_state
 {
 public:
-	spangbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mitchell_state(mconfig, type, tag),
+	spangbl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mitchell_state(mconfig, type, tag),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
 		m_adpcm_select(*this, "adpcm_select"),
-		m_soundbank(*this, "soundbank") { }
+		m_soundbank(*this, "soundbank")
+	{ }
 
 	void mstworld2(machine_config &config);
 	void pangba(machine_config &config);
@@ -305,9 +307,10 @@ private:
 class mstworld_state : public mitchell_state
 {
 public:
-	mstworld_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mitchell_state(mconfig, type, tag),
-		m_audiocpu(*this, "audiocpu") { }
+	mstworld_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mitchell_state(mconfig, type, tag),
+		m_audiocpu(*this, "audiocpu")
+	{ }
 
 	void mstworld(machine_config &config);
 
@@ -326,9 +329,10 @@ private:
 class pkladiesbl_state : public mitchell_state
 {
 public:
-	pkladiesbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: mitchell_state(mconfig, type, tag),
-		m_msm(*this, "msm") { }
+	pkladiesbl_state(const machine_config &mconfig, device_type type, const char *tag) :
+		mitchell_state(mconfig, type, tag),
+		m_msm(*this, "msm")
+	{ }
 
 	void pkladiesbl(machine_config &config);
 
@@ -605,7 +609,7 @@ uint8_t mitchell_state::block_input_r(offs_t offset)
 			delta = (-delta) & 0xff;
 			if (m_dir[offset])
 			{
-			// don't report movement on a direction change, otherwise it will stutter
+				// don't report movement on a direction change, otherwise it will stutter
 				m_dir[offset] = 0;
 				delta = 0;
 			}
@@ -614,7 +618,7 @@ uint8_t mitchell_state::block_input_r(offs_t offset)
 		{
 			if (!m_dir[offset])
 			{
-			// don't report movement on a direction change, otherwise it will stutter
+				// don't report movement on a direction change, otherwise it will stutter
 				m_dir[offset] = 1;
 				delta = 0;
 			}

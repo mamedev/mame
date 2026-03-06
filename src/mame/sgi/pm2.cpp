@@ -87,8 +87,6 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	void gfx_mconfig(machine_config &config);
-
 	void mem_map(address_map &map) ATTR_COLD;
 
 	u16 status_r();
@@ -113,9 +111,6 @@ private:
 	required_ioport m_config;
 	output_finder<> m_led;
 
-	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_mem;
-	memory_access<24, 1, 0, ENDIANNESS_BIG>::specific m_cpu_spc;
-
 	u16 m_status;
 	u16 m_exception;
 	u16 m_map[240]; // AM2148-55DC 1Kx4 SRAM (x3)?
@@ -128,9 +123,6 @@ void sgi_pm2_device::device_start()
 	save_item(NAME(m_status));
 	save_item(NAME(m_exception));
 	save_item(NAME(m_map));
-
-	m_cpu->space(AS_PROGRAM).specific(m_cpu_mem);
-	m_cpu->space(m68000_device::AS_CPU_SPACE).specific(m_cpu_spc);
 
 	m_led.resolve();
 }
@@ -195,8 +187,8 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	MC68681(config, m_duart[0], 3.6864_MHz_XTAL).irq_cb().set(irq6, FUNC(input_merger_any_high_device::in_w<0>));
 	MC68681(config, m_duart[1], 3.6864_MHz_XTAL).irq_cb().set(irq6, FUNC(input_merger_any_high_device::in_w<1>));
 
-	RS232_PORT(config, m_port[0], keyboard_devices, nullptr);
-	RS232_PORT(config, m_port[1], default_rs232_devices, "terminal");
+	RS232_PORT(config, m_port[0], keyboard_devices, "kbd");
+	RS232_PORT(config, m_port[1], default_rs232_devices, nullptr);
 	RS232_PORT(config, m_port[2], default_rs232_devices, nullptr);
 	RS232_PORT(config, m_port[3], default_rs232_devices, nullptr);
 
@@ -209,8 +201,6 @@ void sgi_pm2_device::device_add_mconfig(machine_config &config)
 	m_port[1]->rxd_handler().set(m_duart[0], FUNC(scn2681_device::rx_b_w));
 	m_port[2]->rxd_handler().set(m_duart[1], FUNC(scn2681_device::rx_a_w));
 	m_port[3]->rxd_handler().set(m_duart[1], FUNC(scn2681_device::rx_b_w));
-
-	gfx_mconfig(config);
 }
 
 void sgi_pm2_device::device_config_complete()
@@ -226,8 +216,12 @@ void sgi_pm2_device::mem_map(address_map &map)
 	// TODO: was there a 2M PM2 variant?
 	map(0x00'0000, 0x17'ffff).ram().share("ram"); // mt4264-15 64kx1 DRAM (8x9) + 1M on PM2M board
 
+	map(0x18'0000, 0xf7'ffff).noprw(); // HACK: silence ram sizing
+
 	map(0xf8'0000, 0xf8'7fff).rom().region("prom0", 0);
 	map(0xf9'0000, 0xf9'7fff).rom().region("prom1", 0);
+	// 0xfa'0000 prom2
+	// 0xfb'0000 prom3 - DC4?
 
 	map(0xfc'0000, 0xfc'1fff).rw(m_mmu, FUNC(pm2_mmu_device::page_r), FUNC(pm2_mmu_device::page_w));
 	map(0xfc'2000, 0xfc'3fff).rw(m_mmu, FUNC(pm2_mmu_device::prot_r), FUNC(pm2_mmu_device::prot_w));
@@ -285,7 +279,8 @@ u16 sgi_pm2_device::mem_r(offs_t offset, u16 mem_mask)
 		offs_t const physical = map(offset);
 		data = m_ram[physical];
 
-		LOG("%s: mem_r 0x%06x physical 0x%06x data 0x%04x\n", machine().describe_context(), offset << 1, physical << 1, data);
+		if (!machine().side_effects_disabled())
+			LOG("%s: mem_r 0x%06x physical 0x%06x data 0x%04x\n", machine().describe_context(), offset << 1, physical << 1, data);
 
 		if ((offset < 0x8000) && (m_status & STATUS_MBOX))
 			irq4_w<EXCEPTION_MBOX>(1);
@@ -302,7 +297,8 @@ void sgi_pm2_device::mem_w(offs_t offset, u16 data, u16 mem_mask)
 	{
 		offs_t const physical = map(offset);
 
-		LOG("%s: mem_w 0x%06x physical 0x%06x data 0x%04x\n", machine().describe_context(), offset << 1, physical << 1, data);
+		if (!machine().side_effects_disabled())
+			LOG("%s: mem_w 0x%06x physical 0x%06x data 0x%04x\n", machine().describe_context(), offset << 1, physical << 1, data);
 
 		COMBINE_DATA(&m_ram[physical]);
 
@@ -333,26 +329,6 @@ void sgi_pm2_device::map_w(offs_t offset, u16 data, u16 mem_mask)
 		LOG("map_w access disabled\n");
 	else
 		m_map[offset >> 11] = data;
-}
-
-static const gfx_layout sgi_pm2 =
-{
-	8, 16, 144, 1,
-	{ 0 },
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 15 * 8, 14 * 8, 13 * 8, 12 * 8, 11 * 8, 10 * 8, 9 * 8, 8 * 8, 7 * 8, 6 * 8, 5 * 8, 4 * 8, 3 * 8, 2 * 8, 1 * 8, 0 * 8 },
-	8 * 16
-};
-
-static GFXDECODE_START(sgi_pm2_gfx)
-	GFXDECODE_ENTRY("prom1", 0x1b8c, sgi_pm2, 0, 1)
-GFXDECODE_END
-
-void sgi_pm2_device::gfx_mconfig(machine_config &config)
-{
-	// gfxdecode is only to show the font data in the tile viewer
-	PALETTE(config, "palette", palette_device::MONOCHROME);
-	GFXDECODE(config, "gfx", "palette", sgi_pm2_gfx);
 }
 
 ROM_START(sgi_pm2)

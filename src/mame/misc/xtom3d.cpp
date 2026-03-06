@@ -15,6 +15,10 @@ TODO:
 - pumpit1: MSCDEX hangs often when Voodoo is disabled, related to above?
 - Voodoo Banshee doesn't handle VGA legacy modes correctly (including PCI VGA control),
   so these will currently black screen until they completes bootstrap;
+- xtom3d: regression with GCC 14+ builds causes erratic gameplay logic:
+  - shooting from right side makes bullet to go to the right instead of go straight;
+  - plane can't tilt to the left, stays still;
+  - camera eventually rotates the game orientation (???);
 - xtom3d: fog wraps around instead of being more linear;
 - pumpit1: flickers at start of any song without any feedback, abruptly throws steps with working
   playback, ends with silence and steps still going;
@@ -123,7 +127,6 @@ HS3PIN  Unpopulated header near A40MX04
 
 #include "cpu/i386/i386.h"
 #include "machine/pci.h"
-#include "machine/pci-ide.h"
 #include "machine/pci-smbus.h"
 #include "machine/i82443bx_host.h"
 #include "machine/i82371eb_isa.h"
@@ -372,7 +375,7 @@ void isa16_xtom3d_io_sound::device_add_mconfig(machine_config &config)
 	m_ymz->add_route(1, "speaker", 0.5, 1);
 }
 
-static INPUT_PORTS_START(xtom3d)
+static INPUT_PORTS_START( xtom3d )
 	PORT_START("SYSTEM")
 	PORT_DIPNAME( 0x0001, 0x0001, "SYSTEM" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -523,7 +526,6 @@ void isa16_xtom3d_io_sound::remap(int space_id, offs_t start, offs_t end)
  *
  * Doesn't really accesses a Super I/O, which implies that the Holtek keyboard
  * and the RTC chips are motherboard ISA resources.
- *
  */
 
 class isa16_oksan_lpc : public device_t, public device_isa16_card_interface
@@ -532,15 +534,15 @@ public:
 	// construction/destruction
 	isa16_oksan_lpc(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	required_device<mc146818_device> m_rtc;
-	required_device<kbdc8042_device> m_kbdc;
-
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
+	required_device<mc146818_device> m_rtc;
+	required_device<kbdc8042_device> m_kbdc;
+
 	void remap(int space_id, offs_t start, offs_t end) override;
 
 	void device_map(address_map &map) ATTR_COLD;
@@ -565,7 +567,7 @@ void isa16_oksan_lpc::device_add_mconfig(machine_config &config)
 	KBDC8042(config, m_kbdc, 0);
 	m_kbdc->set_keyboard_type(kbdc8042_device::KBDC8042_STANDARD);
 	m_kbdc->system_reset_callback().set_inputline(":maincpu", INPUT_LINE_RESET);
-	m_kbdc->gate_a20_callback().set_inputline(":maincpu", INPUT_LINE_A20);
+	m_kbdc->gate_a20_callback().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	m_kbdc->input_buffer_full_callback().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 #if !ENABLE_VOODOO
 	m_kbdc->set_keyboard_tag("at_keyboard");
@@ -595,8 +597,8 @@ void isa16_oksan_lpc::remap(int space_id, offs_t start, offs_t end)
 void isa16_oksan_lpc::device_map(address_map &map)
 {
 	map(0x00, 0x0f).rw(m_kbdc, FUNC(kbdc8042_device::data_r), FUNC(kbdc8042_device::data_w));
-	map(0x10, 0x1f).w(m_rtc, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
-	map(0x10, 0x1f).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
+	map(0x10, 0x17).w(m_rtc, FUNC(mc146818_device::address_w)).umask32(0x00ff00ff);
+	map(0x10, 0x17).rw(m_rtc, FUNC(mc146818_device::data_r), FUNC(mc146818_device::data_w)).umask32(0xff00ff00);
 }
 
 
@@ -683,6 +685,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	I82371EB_IDE(config, m_pci_ide, 0, m_maincpu);
 	m_pci_ide->irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
@@ -695,7 +698,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", xtom3d_isa_cards, "oksan_romdisk", true).set_option_machine_config("oksan_romdisk", romdisk_config);

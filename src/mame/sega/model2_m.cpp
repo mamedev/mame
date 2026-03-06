@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese
+// copyright-holders:R. Belmont, Olivier Galibert, ElSemi, Angelo Salese, Matthew Daniels
 /*********************************************************************************************************************************
 
     Model 2 Debugger functions
@@ -12,6 +12,7 @@
 #include "debug/debugcon.h"
 #include "debugger.h"
 
+#include <locale>
 #include <fstream>
 
 
@@ -31,8 +32,8 @@ void model2_state::debug_commands(const std::vector<std::string_view> &params)
 
 	if (params[0] == "geodasm")
 		debug_geo_dasm_command(params);
-	else if(params[0] == "trilist")
-		debug_tri_dump_command(params);
+	else if(params[0] == "polylist")
+		debug_poly_dump_command(params);
 	else
 		debug_help_command(params);
 }
@@ -43,7 +44,7 @@ void model2_state::debug_help_command(const std::vector<std::string_view> &param
 
 	con.printf("Available Sega Model 2 commands:\n");
 	con.printf("  m2 geodasm,<filename> -- dump current geometrizer DASM in <filename>\n");
-	con.printf("  m2 trilist,<filename> -- dump current parsed triangles in <filename>\n");
+	con.printf("  m2 polylist,<filename> -- dump current parsed polygons in <filename>\n");
 	con.printf("  m2 help -- this list\n");
 }
 
@@ -76,6 +77,7 @@ void model2_state::debug_geo_dasm_command(const std::vector<std::string_view> &p
 		con.printf("Error: while opening %s for writing\n", params[1]);
 		return;
 	}
+	f.imbue(std::locale::classic());
 
 	// print some basic info on top
 	util::stream_format(f, "Dump Header info:\n");
@@ -260,34 +262,61 @@ void model2_state::debug_geo_dasm_command(const std::vector<std::string_view> &p
 
 /*****************************************
  *
- * Sorted Triangles dumping
+ * Sorted polygons dumping
  *
  ****************************************/
 
-void model2_state::debug_tri_dump_command(const std::vector<std::string_view> &params)
+void model2_state::debug_poly_dump_command(const std::vector<std::string_view> &params)
 {
 	debugger_console &con = machine().debugger().console();
-	FILE *f;
 
 	if (params.size() < 2)
 	{
-		con.printf("Error: not enough parameters for m2 trilist command\n");
+		con.printf("Error: not enough parameters for m2 polylist command\n");
 		return;
 	}
 
 	if (params[1].empty() || params[1].length() > 127)
 	{
-		con.printf("Error: invalid filename parameter for m2 trilist command\n");
+		con.printf("Error: invalid filename parameter for m2 polylist command\n");
 		return;
 	}
 
-	std::string filename(params[1]);
-	if((f = fopen( filename.c_str(), "w" )) == nullptr)
+	std::string fname(params[1]);
+	std::ofstream f(fname);
+	if (!f)
 	{
 		con.printf("Error: while opening %s for writing\n", params[1]);
 		return;
 	}
+	f.imbue(std::locale::classic());
 
-	tri_list_dump(f);
+	for (u32 i = 0; i < m_raster->poly_list_index; i++)
+	{
+		const auto &poly = m_raster->poly_list[i];
+		util::stream_format(f, "index: %d\n", i);
+
+		for (int j = 0; j < poly.num_vertices; j++)
+			util::stream_format(f, "v%i.x = %f, v%i.y = %f, v%i.z = %f\n", j, poly.v[j].x, j, poly.v[j].y, j, poly.v[j].p[0]);
+
+		util::stream_format(f, "poly z: %04x\n", poly.z);
+		util::stream_format(f, "texheader - 0: %04x\n", poly.texheader[0]);
+		util::stream_format(f, "texheader - 1: %04x\n", poly.texheader[1]);
+		util::stream_format(f, "texheader - 2: %04x\n", poly.texheader[2]);
+		util::stream_format(f, "texheader - 3: %04x\n", poly.texheader[3]);
+		util::stream_format(f, "luma: %02x\n", poly.luma);
+		util::stream_format(f, "texlod: %08x\n", poly.texlod);
+		util::stream_format(f, "vp.sx: %04x\n", poly.viewport[0]);
+		util::stream_format(f, "vp.sy: %04x\n", poly.viewport[1]);
+		util::stream_format(f, "vp.ex: %04x\n", poly.viewport[2]);
+		util::stream_format(f, "vp.ey: %04x\n", poly.viewport[3]);
+		util::stream_format(f, "vp.swx: %04x\n", poly.center[0]);
+		util::stream_format(f, "vp.swy: %04x\n", poly.center[1]);
+		util::stream_format(f, "\n---\n\n");
+	}
+
+	util::stream_format(f, "min_z = %04x, max_z = %04x\n", m_raster->min_z, m_raster->max_z);
+
+	f.close();
 	con.printf("Data dumped successfully\n");
 }

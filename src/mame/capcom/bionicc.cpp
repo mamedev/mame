@@ -114,6 +114,7 @@ public:
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_screen(*this, "screen"),
 		m_spritegen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram") ,
 		m_txvideoram(*this, "txvideoram"),
@@ -134,6 +135,7 @@ private:
 	required_device<i8751_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
 	required_device<tigeroad_spr_device> m_spritegen;
 	required_device<buffered_spriteram16_device> m_spriteram;
 
@@ -653,10 +655,10 @@ void bionicc_state::bionicc(machine_config &config)
 	m_mcu->port_out_cb<3>().set(FUNC(bionicc_state::mcu_p3_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
-	screen.set_screen_update(FUNC(bionicc_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 256, 262, 16, 240); // hsync is 306..333 (offset by 128), vsync is 251..253 (offset by 6)
+	m_screen->set_screen_update(FUNC(bionicc_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_bionicc);
 

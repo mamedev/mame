@@ -98,7 +98,7 @@ void m3745x_device::device_reset()
 {
 	m740_device::device_reset();
 
-	SP = 0x01ff;    // we have the "traditional" stack in page 1, not 0 like some M740 derivatives
+	m_SP = 0x01ff;    // we have the "traditional" stack in page 1, not 0 like some M740 derivatives
 
 	for (auto & elem : m_timers)
 	{

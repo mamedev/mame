@@ -1093,7 +1093,7 @@ u16 scsp_device::r16(u32 addr)
 			    004CB0: 4CDF 0002                  movem.l (A7)+, D1
 			    004CB4: 4E75                       rts
 			*/
-			logerror("SCSP: Reading from EXTS register %08x\n", addr);
+			logerror("%s: SCSP Reading from EXTS register %08x\n", machine().describe_context(), addr);
 			if (addr < 0xEE4)
 				v = *((u16 *) (m_DSP.EXTS + (addr - 0xee0) / 2));
 		}

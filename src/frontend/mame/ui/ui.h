@@ -301,6 +301,7 @@ private:
 	osd_ticks_t             m_showfps_end;
 	bool                    m_show_profiler;
 	osd_ticks_t             m_popup_text_end;
+	osd_ticks_t             m_last_frame_update;
 	std::unique_ptr<uint8_t []> m_non_char_keys_down;
 
 	pointer_options_vector  m_pointer_options;

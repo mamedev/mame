@@ -10,15 +10,15 @@
 
 #include "machine/eepromser.h"
 
-class aha2940au_scsi_device : public pci_card_device
+class aha2940_scsi_device : public pci_card_device
 {
 public:
-	aha2940au_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	aha2940_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static constexpr feature_type unemulated_features() { return feature::MEDIA; }
 
 protected:
-	aha2940au_scsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	aha2940_scsi_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -31,17 +31,33 @@ protected:
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
 
-	virtual u8 capptr_r() override;
-
+	required_memory_region m_bios;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 
-private:
 	void io_map(address_map &map);
 	void mem_map(address_map &map);
+private:
 
-	required_memory_region m_scsi_rom;
 };
 
+class aha2940au_scsi_device : public aha2940_scsi_device
+{
+public:
+	aha2940au_scsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual void config_map(address_map &map) override ATTR_COLD;
+	virtual u8 capptr_r() override;
+};
+
+DECLARE_DEVICE_TYPE(AHA2940,   aha2940_scsi_device)
 DECLARE_DEVICE_TYPE(AHA2940AU, aha2940au_scsi_device)
 
 #endif // MAME_BUS_PCI_AHA2940AU_H

@@ -1135,7 +1135,7 @@ void bullet_state::bullet(machine_config &config)
 	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dmac, 16_MHz_XTAL / 4);
-	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dmac->in_mreq_callback().set(FUNC(bullet_state::dma_mreq_r));
 	m_dmac->out_mreq_callback().set(FUNC(bullet_state::dma_mreq_w));
@@ -1217,7 +1217,7 @@ void bulletf_state::bulletf(machine_config &config)
 	m_dart->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	Z80DMA(config, m_dmac, 16_MHz_XTAL / 4);
-	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dmac->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dmac->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dmac->in_mreq_callback().set(FUNC(bullet_state::dma_mreq_r));
 	m_dmac->out_mreq_callback().set(FUNC(bullet_state::dma_mreq_w));

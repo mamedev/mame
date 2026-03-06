@@ -23,7 +23,7 @@ elan_eu3a05_soc_device::elan_eu3a05_soc_device(const machine_config &mconfig, de
 {
 	m_extbus_config.m_addr_width = 24;
 	m_extbus_config.m_logaddr_width = 24;
-	program_config.m_internal_map = address_map_constructor(FUNC(elan_eu3a05_soc_device::int_map), this);
+	m_program_config.m_internal_map = address_map_constructor(FUNC(elan_eu3a05_soc_device::int_map), this);
 
 	m_fixed_bank_address = 0x3f8000;
 }
@@ -160,13 +160,13 @@ device_memory_interface::space_config_vector elan_eu3a05_soc_device::memory_spac
 {
 	if(has_configured_map(AS_OPCODES))
 		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &program_config),
-			std::make_pair(AS_OPCODES, &sprogram_config),
+			std::make_pair(AS_PROGRAM, &m_program_config),
+			std::make_pair(AS_OPCODES, &m_sprogram_config),
 			std::make_pair(AS_EXTERNAL, &m_extbus_config),
 		};
 	else
 		return space_config_vector {
-			std::make_pair(AS_PROGRAM, &program_config),
+			std::make_pair(AS_PROGRAM, &m_program_config),
 			std::make_pair(AS_EXTERNAL, &m_extbus_config),
 		};
 }

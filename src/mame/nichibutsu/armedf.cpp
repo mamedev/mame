@@ -415,9 +415,11 @@ void armedf_state::irq_lv2_ack_w(u16 data)
  *
  *************************************/
 
-void armedf_state::common_map(address_map &map)
+void armedf_state::terraf_common_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
+	map(0x060000, 0x0605ff).ram().share("spriteram");
+	map(0x060600, 0x063fff).ram();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06a9ff).ram();
@@ -428,19 +430,11 @@ void armedf_state::common_map(address_map &map)
 	map(0x078002, 0x078003).portr("P2");
 	map(0x078004, 0x078005).portr("DSW1");
 	map(0x078006, 0x078007).portr("DSW2");
-//  map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w)); handled in DRIVER_INIT
 	map(0x07c002, 0x07c003).w(FUNC(armedf_state::bg_scrollx_w));
 	map(0x07c004, 0x07c005).w(FUNC(armedf_state::bg_scrolly_w));
 	map(0x07c00b, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
-	map(0x07c00c, 0x07c00d).nopw();                    /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	map(0x07c00c, 0x07c00d).nopw(); // watchdog? cycle 0000 -> 0100 -> 0200 back to 0000
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv1_ack_w));
-}
-
-void armedf_state::terraf_common_map(address_map &map)
-{
-	common_map(map);
-	map(0x060000, 0x0605ff).ram().share("spriteram");
-	map(0x060600, 0x063fff).ram();
 }
 
 void armedf_state::terraf_map(address_map &map)
@@ -466,10 +460,7 @@ void armedf_state::terrafjb_map(address_map &map)
 
 void armedf_state::kozure_map(address_map &map)
 {
-	common_map(map);
-	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x061000, 0x063fff).ram();
-	map(0x07c000, 0x07c001).w(FUNC(armedf_state::terraf_io_w));
+	terraf_map(map);
 //  map(0x0c0000, 0x0c0001).nopw(); /* watchdog? */
 //  map(0xffd000, 0xffd001).nopw(); /* passes crc ROM information to MCU, I guess */
 }
@@ -477,8 +468,8 @@ void armedf_state::kozure_map(address_map &map)
 void armedf_state::cclimbr2_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x061000, 0x063fff).ram();
+	map(0x060000, 0x0605ff).ram().share("spriteram");
+	map(0x060600, 0x063fff).ram();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::terraf_text_videoram_w)).umask16(0x00ff);
 	map(0x06a000, 0x06a9ff).ram();
@@ -493,15 +484,15 @@ void armedf_state::cclimbr2_map(address_map &map)
 	map(0x07c002, 0x07c003).w(FUNC(armedf_state::bg_scrollx_w));
 	map(0x07c004, 0x07c005).w(FUNC(armedf_state::bg_scrolly_w));
 	map(0x07c00b, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
-	map(0x07c00c, 0x07c00d).nopw(); /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	map(0x07c00c, 0x07c00d).nopw(); // watchdog? cycle 0000 -> 0100 -> 0200 back to 0000
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
 }
 
 void armedf_state::legion_common_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom();
-	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x061000, 0x063fff).ram();
+	map(0x060000, 0x0605ff).ram().share("spriteram");
+	map(0x060600, 0x063fff).ram();
 	map(0x064000, 0x064fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x06a000, 0x06a9ff).ram();
 	map(0x06c000, 0x06cfff).ram().share("spr_pal_clut");
@@ -514,7 +505,7 @@ void armedf_state::legion_common_map(address_map &map)
 	map(0x07c002, 0x07c003).w(FUNC(armedf_state::bg_scrollx_w));
 	map(0x07c004, 0x07c005).w(FUNC(armedf_state::bg_scrolly_w));
 	map(0x07c00b, 0x07c00b).w(FUNC(armedf_state::sound_command_w));
-	map(0x07c00c, 0x07c00d).nopw();        /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
+	map(0x07c00c, 0x07c00d).nopw(); // watchdog? cycle 0000 -> 0100 -> 0200 back to 0000
 	map(0x07c00e, 0x07c00f).w(FUNC(armedf_state::irq_lv2_ack_w));
 }
 
@@ -557,8 +548,8 @@ void armedf_state::legionjb2_map(address_map &map)
 void armedf_state::armedf_map(address_map &map)
 {
 	map(0x000000, 0x05ffff).rom();
-	map(0x060000, 0x060fff).ram().share("spriteram");
-	map(0x061000, 0x065fff).ram();
+	map(0x060000, 0x0605ff).ram().share("spriteram");
+	map(0x060600, 0x065fff).ram();
 	map(0x066000, 0x066fff).ram().w(FUNC(armedf_state::bg_videoram_w)).share("bg_videoram");
 	map(0x067000, 0x067fff).ram().w(FUNC(armedf_state::fg_videoram_w)).share("fg_videoram");
 	map(0x068000, 0x069fff).rw(FUNC(armedf_state::text_videoram_r), FUNC(armedf_state::armedf_text_videoram_w)).umask16(0x00ff);
@@ -575,7 +566,7 @@ void armedf_state::armedf_map(address_map &map)
 	map(0x06d006, 0x06d007).w(FUNC(armedf_state::fg_scrollx_w));
 	map(0x06d008, 0x06d009).w(FUNC(armedf_state::fg_scrolly_w));
 	map(0x06d00b, 0x06d00b).w(FUNC(armedf_state::sound_command_w));
-	map(0x06d00c, 0x06d00d).nopw(); //watchdog?
+	map(0x06d00c, 0x06d00d).nopw(); // watchdog?
 	map(0x06d00e, 0x06d00f).w(FUNC(armedf_state::irq_lv1_ack_w));
 }
 
@@ -617,13 +608,13 @@ void bigfghtr_state::bigfghtr_map(address_map &map)
 	map(0x08c002, 0x08c003).portr("P2");
 	map(0x08c004, 0x08c005).portr("DSW0");
 	map(0x08c006, 0x08c007).portr("DSW1");
-	map(0x08d000, 0x08d001).w(FUNC(bigfghtr_state::armedf_io_w));  //807b0
+	map(0x08d000, 0x08d001).w(FUNC(bigfghtr_state::armedf_io_w)); // 807b0
 	map(0x08d002, 0x08d003).w(FUNC(bigfghtr_state::bg_scrollx_w));
 	map(0x08d004, 0x08d005).w(FUNC(bigfghtr_state::bg_scrolly_w));
 	map(0x08d006, 0x08d007).w(FUNC(bigfghtr_state::fg_scrollx_w));
 	map(0x08d008, 0x08d009).w(FUNC(bigfghtr_state::fg_scrolly_w));
 	map(0x08d00b, 0x08d00b).w(FUNC(bigfghtr_state::sound_command_w));
-	map(0x08d00c, 0x08d00d).nopw(); //watchdog
+	map(0x08d00c, 0x08d00d).nopw(); // watchdog
 	map(0x08d00e, 0x08d00f).w(FUNC(bigfghtr_state::irq_lv1_ack_w));
 
 	map(0x400000, 0x400001).r(FUNC(bigfghtr_state::latch_r));
@@ -636,7 +627,7 @@ void bigfghtr_state::bigfghtr_mcu_map(address_map &map)
 
 void bigfghtr_state::bigfghtr_mcu_data_map(address_map &map)
 {
-	map(0x00000, 0x005ff).w(FUNC(bigfghtr_state::mcu_spritelist_w)); //Sprite RAM, guess shared as well
+	map(0x00000, 0x005ff).w(FUNC(bigfghtr_state::mcu_spritelist_w)); // Sprite RAM, guess shared as well
 	map(0x00600, 0x03fff).ram().share("sharedram");
 }
 

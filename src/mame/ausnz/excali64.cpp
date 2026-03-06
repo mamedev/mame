@@ -637,7 +637,7 @@ void excali64_state::excali64(machine_config &config)
 	FLOPPY_CONNECTOR(config, "fdc:1", excali64_floppies, "525qd", excali64_state::floppy_formats).enable_sound(true);
 
 	Z80DMA(config, m_dma, 16_MHz_XTAL / 4);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	m_dma->in_mreq_callback().set(FUNC(excali64_state::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(excali64_state::memory_write_byte));
 	m_dma->in_iorq_callback().set(FUNC(excali64_state::io_read_byte));

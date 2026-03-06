@@ -15,9 +15,11 @@
 #include "drccache.h"
 #include "uml.h"
 
-#include <iostream>
+#include <iosfwd>
 #include <list>
 #include <memory>
+#include <string>
+#include <utility>
 #include <vector>
 
 

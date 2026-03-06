@@ -18,7 +18,11 @@
 #include "osdcore.h"
 #include "window.h"
 
+#ifdef SDLMAME_SDL3
+#include <SDL3/SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 #include <algorithm>
 
@@ -44,12 +48,14 @@ public:
 private:
 	void refresh() override
 	{
+#ifndef SDLMAME_SDL3
 		SDL_DisplayMode dmode;
 
 #if defined(SDLMAME_WIN32)
 		SDL_GetDesktopDisplayMode(oshandle(), &dmode);
 #else
 		SDL_GetCurrentDisplayMode(oshandle(), &dmode);
+#endif
 #endif
 		SDL_Rect dimensions;
 		SDL_GetDisplayBounds(oshandle(), &dimensions);
@@ -101,8 +107,11 @@ public:
 	{
 		if (!m_initialized)
 			return nullptr;
-
+#ifdef SDLMAME_SDL3
+		std::uint64_t display = SDL_GetDisplayForWindow(static_cast<const sdl_window_info &>(window).platform_window());
+#else
 		std::uint64_t display = SDL_GetWindowDisplayIndex(static_cast<const sdl_window_info &>(window).platform_window());
+#endif
 		return monitor_from_handle(display);
 	}
 
@@ -115,14 +124,23 @@ protected:
 
 			osd_printf_verbose("Enter init_monitors\n");
 
-			for (i = 0; i < SDL_GetNumVideoDisplays(); i++)
+#ifdef SDLMAME_SDL3
+			int num_displays = 0;
+			const auto displays = SDL_GetDisplays(&num_displays);
+#else
+			int num_displays = SDL_GetNumVideoDisplays();
+#endif
+			for (i = 0; i < num_displays; i++)
 			{
 				char temp[64];
 				snprintf(temp, sizeof(temp) - 1, "%s%d", OSDOPTION_SCREEN, i);
 
 				// allocate a new monitor info
+#ifdef SDLMAME_SDL3
+				std::shared_ptr<osd_monitor_info> monitor = std::make_shared<sdl_monitor_info>(*this, displays[i], temp, 1.0f);
+#else
 				std::shared_ptr<osd_monitor_info> monitor = std::make_shared<sdl_monitor_info>(*this, i, temp, 1.0f);
-
+#endif
 				osd_printf_verbose("Adding monitor %s (%d x %d)\n",
 						monitor->devicename(),
 						monitor->position_size().width(), monitor->position_size().height());
@@ -155,8 +173,14 @@ private:
 		osdrect_to_sdlrect(rect2, sdl2);
 
 		SDL_Rect intersection;
+#ifdef SDLMAME_SDL3
+		if (SDL_GetRectIntersection(&sdl1, &sdl2, &intersection))
+#else
 		if (SDL_IntersectRect(&sdl1, &sdl2, &intersection))
+#endif
+		{
 			return intersection.w + intersection.h;
+		}
 
 		return 0;
 	}

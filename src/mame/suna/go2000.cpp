@@ -13,7 +13,7 @@ OSC: 32.000MHz
 2 8-way Dipswitch banks
 Ram:
  2 UM61256FK-15 (near 3 & 4 (68k program roms))
- 3 Windbond W24257AK-15 (near TM29F550ZX)
+ 3 Winbond W24257AK-15 (near TM29F550ZX)
  2 UM61256AK-15 (near Z80)
 
 P1, P2 & P3 4-pin connectors (unknown purpose)

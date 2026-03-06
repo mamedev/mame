@@ -1127,17 +1127,9 @@ ROM_START( f1gpbl )
 	ROM_LOAD( "15.ic153", 0x100000, 0x080000, CRC(c2867d7f) SHA1(86b1be9672cf9f610e1d7efff90d6a73dc1cdb90) )
 	ROM_LOAD( "14.ic154", 0x180000, 0x080000, CRC(0cd20423) SHA1(cddad02247b898c0a5a2fe061c41f68ecdf04d5c) )
 
-	/*
-	Roms 20 and 21 were missing from the PCB, however the others match perfectly (just with a different data layout)
-	I've reconstructed what should be the correct data for this bootleg.
-
-	Note, the bootleg combines 2 GFX regions into a single set of 4-way interleaved ROMs, so we load them in a user
-	region and use ROM_COPY.
-	*/
-
 	ROM_REGION( 0x200000, "user3", 0 )
-	ROM_LOAD32_BYTE( "rom21",    0x000003, 0x80000, CRC(7a08c3b7) SHA1(369123348a88513c066c239ed6aa4db5ae4ef0ac) )
-	ROM_LOAD32_BYTE( "rom20",    0x000001, 0x80000, CRC(bd1273d0) SHA1(cc7caee231fe3bd87d8403d34059e1292c7f7a00) )
+	ROM_LOAD32_BYTE( "21.ic143", 0x000003, 0x80000, CRC(7a08c3b7) SHA1(369123348a88513c066c239ed6aa4db5ae4ef0ac) )
+	ROM_LOAD32_BYTE( "20.ic142", 0x000001, 0x80000, CRC(bd1273d0) SHA1(cc7caee231fe3bd87d8403d34059e1292c7f7a00) )
 	ROM_LOAD32_BYTE( "19.ic141", 0x000002, 0x80000, CRC(aa4ebdfe) SHA1(ed117e6a84554c5ed2ad4379b834898a4c40d51e) )
 	ROM_LOAD32_BYTE( "18.ic140", 0x000000, 0x80000, CRC(9b2a4325) SHA1(b2020e08251366686c4c0045f3fd523fa327badf) )
 
@@ -1148,7 +1140,10 @@ ROM_START( f1gpbl )
 	ROM_COPY("user3", 0x100000, 0, 0x80000)
 
 	ROM_REGION( 0x90000, "oki", 0 )
-	ROM_LOAD( "6.ic13", 0x00000, 0x030000, CRC(6e83ffd8) SHA1(618fd6cd6c0844a4be96f77ff22cd41364718d16) ) // a second dump has 0x40 instead of 0x44 at 0x54cbc. Which one is bad?
+	// 0x40 instead at 0x54cbc has been confirmed by multiple dumps from different PCBs.
+	// there is a dump with 0x44 but given it was on only one PCB and with the only difference a single bit of a single byte,
+	// it is almost surely a bad read
+	ROM_LOAD( "6.ic13", 0x00000, 0x030000, CRC(469f3ee1) SHA1(9d5f0cd6463abf82e74bf4641fc1bcf478084c16) )
 	ROM_CONTINUE(       0x40000, 0x050000 )
 ROM_END
 

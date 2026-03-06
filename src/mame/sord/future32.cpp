@@ -319,7 +319,6 @@ protected:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	static void floppy_drives(device_slot_interface &device);
 	static void scsi_devices(device_slot_interface &device);
-	void mb89352(device_t *device);
 
 	void scsi_irq_w(int state);
 	void scc1_irq_w(int state);
@@ -341,7 +340,7 @@ future32a_state::future32a_state(const machine_config &mconfig, device_type type
 	, m_ptm(*this, "ptm")
 	, m_fdc(*this, "fdc")
 	, m_floppy(*this, "fdc:0")
-	, m_scsi(*this, "scsi:7:mb89352")
+	, m_scsi(*this, "mb89352")
 	, m_screen(*this, "screen")
 	, m_gfxdecode(*this, "gfxdecode")
 	, m_ramdac(*this, "ramdac")
@@ -570,15 +569,6 @@ void future32a_state::scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_HARDDISK);
 	device.option_add("cdrom", NSCSI_CDROM);
-	device.option_add_internal("mb89352", MB89352);
-}
-
-void future32a_state::mb89352(device_t *device)
-{
-	mb89352_device &adapter = downcast<mb89352_device &>(*device);
-	adapter.set_clock(32000000/4);
-	adapter.out_dreq_callback().set([this](int state) { m_dma->dmarq(state, 1); });
-	adapter.out_irq_callback().set(*this, FUNC(future32a_state::scsi_irq_w));
 }
 
 void future32a_state::future32a(machine_config &config)
@@ -636,7 +626,7 @@ void future32a_state::future32a(machine_config &config)
 	UPD72065(config, m_fdc, 32_MHz_XTAL / 8);
 	FLOPPY_CONNECTOR(config, m_floppy, floppy_drives, "35hd", floppy_image_device::default_mfm_floppy_formats);
 
-	NSCSI_BUS(config, "scsi");
+	auto &sbus(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr);
@@ -644,7 +634,11 @@ void future32a_state::future32a(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi:4", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:6", scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:7", scsi_devices, "mb89352", true).set_option_machine_config("mb89352", [this] (device_t *device) { mb89352(device); });
+
+	MB89352(config, m_scsi, 32000000/4);
+	sbus.set_external_device(7, m_scsi);
+	m_scsi->out_dreq_callback().set([this](int state) { m_dma->dmarq(state, 1); });
+	m_scsi->out_irq_callback().set(DEVICE_SELF, FUNC(future32a_state::scsi_irq_w));
 }
 
 static INPUT_PORTS_START(future32a)

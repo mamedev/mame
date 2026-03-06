@@ -734,6 +734,26 @@ ROM_START( funlddlx4 )
 	ROM_LOAD16_BYTE( "v62c5181024ll.u8", 0x0001, 0x20000, CRC(89705c86) SHA1(e5b57ab26a5034349ee61b8821d1ae64e2dd45f4) )
 ROM_END
 
+ROM_START( fstation7 )
+    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_i.u2", 0x00000, 0x80000, CRC(bbf4bbd9) SHA1(80e785cb04213f8cc2f580b523e20b4825ba45e5))
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_f1_ii.u6", 0x00001, 0x80000, CRC(cd8ab9e3) SHA1(cb9206d0367f00bec278cee0a4115594ba715fcd))
+
+    ROM_REGION16_BE( 0x100000, "gfx1", 0)
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_video_f1_i.u2", 0x00000, 0x80000, CRC(dcddb25a) SHA1(7c54bd7a368fd57e3eb995a26462b3d2d589b0db))
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_7_sp_video_f1_ii.u5", 0x00001, 0x80000, CRC(400f9b8f) SHA1(4c4a9f46016eee805653b5fae65680225ac71436))
+ROM_END
+
+ROM_START( fstation8 )
+    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_8_sp_f1_i.u2", 0x00000, 0x80000, CRC(f9c792ab) SHA1(30ab7352cce22340be87ddae80e4b3c2f69ea778))
+    ROM_LOAD16_BYTE("m27c4001_spielekoffer_8_sp_f1_ii.u5", 0x00001, 0x80000, CRC(0cb7b719) SHA1(e87bc67da903d9514dd97a6abf2d4e2171e15dbd))
+
+	ROM_REGION16_BE( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "spielekoffer_8_sp_video_1.u2", 0x00000, 0x80000, NO_DUMP )
+	ROM_LOAD16_BYTE( "spielekoffer_8_sp_video_2.u6", 0x00001, 0x80000, NO_DUMP )
+ROM_END
+
 ROM_START( fstation )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "spielekoffer_9_sp_fun_station_f1.i", 0x00000, 0x80000, CRC(4572efbd) SHA1(e0a91d32ab4096767cafb743523d038f5e0d3238) )
@@ -744,15 +764,28 @@ ROM_START( fstation )
 	ROM_LOAD16_BYTE( "spielekoffer_video_9_sp_f1.ii", 0x00001, 0x80000, CRC(64138dcb) SHA1(1b629915cba32f8f6164ae5075c175b522b4a323) )
 ROM_END
 
+ROM_START(trumpfas)
+    ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASEFF )
+    ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr1.u2", 0x00000, 0x20000, CRC(542b1517) SHA1(fcddb31b4b429c8d67161037d356861413567bb8))
+    ROM_LOAD16_BYTE( "trumpf_as_dm_f2_pr2.u6", 0x00001, 0x20000, CRC(d39bbd88) SHA1(64f47fd0076845ed3f9f3e84aca3504c110ad8ad))
+
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "trumpf_as_video_1.u2", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD16_BYTE( "trumpf_as_video_2.u6", 0x00001, 0x20000, NO_DUMP )
+ROM_END
+
 } // Anonymous namespace
 
 
 GAME( 1993, quickjac,  0,        quickjac, quickjac, adp_state, empty_init, ROT0, "ADP",     "Quick Jack",                        0 )
 GAME( 1994, skattv,    0,        skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat TV",                           0 )
+GAME( 1994, trumpfas,  skattv,   skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Trumpf As",             			  MACHINE_NOT_WORKING ) // throws FOUL error on startup
 GAME( 1995, skattva,   skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (version TS3)",             0 )
 GAME( 1997, fashiong,  0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 1)",           0 )
 GAME( 1997, fashiong2, fashiong, fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 2)",           0 )
 GAME( 1999, funlddlx,  funlddlx4,funland,  skattv,   adp_state, empty_init, ROT0, "Stella",  "Funny Land de Luxe",                MACHINE_NOT_WORKING )
+GAME( 2000, fstation7, fstation, fstation, fstation, adp_state, empty_init, ROT0, "ADP",     "Fun Station Spielekoffer 7 Spiele", MACHINE_NOT_WORKING ) // suntris crashes when executing HD63484 paint commands
+GAME( 2000, fstation8, fstation, fstation, fstation, adp_state, empty_init, ROT0, "ADP",     "Fun Station Spielekoffer 8 Spiele", MACHINE_NOT_WORKING ) // suntris crashes when executing HD63484 paint commands
 GAME( 2000, fstation,  0,        fstation, fstation, adp_state, empty_init, ROT0, "ADP",     "Fun Station Spielekoffer 9 Spiele", MACHINE_NOT_WORKING ) // suntris crashes when executing HD63484 paint commands
 GAME( 2001, funlddlx2, funlddlx4,funland,  skattv,   adp_state, empty_init, ROT0, "Stella",  "Funny Land de Luxe (W2 set)",       MACHINE_NOT_WORKING )
 GAME( 2001, funlddlx4, 0,        funland,  skattv,   adp_state, empty_init, ROT0, "Stella",  "Funny Land de Luxe (W4 set)",       MACHINE_NOT_WORKING )

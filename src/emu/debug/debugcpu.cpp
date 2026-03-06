@@ -488,7 +488,7 @@ device_debug::device_debug(device_t &device)
 	, m_state(nullptr)
 	, m_disasm(nullptr)
 	, m_flags(0)
-	, m_symtable(std::make_unique<symbol_table>(device.machine(), symbol_table::CPU_STATE, &device.machine().debugger().cpu().global_symtable(), &device))
+	, m_symtable(nullptr)
 	, m_stepaddr(0)
 	, m_stepsleft(0)
 	, m_delay_steps(0)
@@ -542,35 +542,40 @@ device_debug::device_debug(device_t &device)
 		// add global symbol for cycles and totalcycles
 		if (m_exec != nullptr)
 		{
+			m_symtable = std::make_unique<symbol_table>(device.machine(), symbol_table::CPU_STATE, &device.machine().debugger().cpu().global_symtable(), &device);
+
 			m_symtable->add("cycles", [this]() { return m_exec->cycles_remaining(); });
 			m_symtable->add("totalcycles", symbol_table::READ_ONLY, &m_total_cycles);
 			m_symtable->add("lastinstructioncycles", [this]() { return m_total_cycles - m_last_total_cycles; });
+
+			// add entries to enable/disable unmap reporting for each space
+			if (m_memory != nullptr)
+			{
+				if (m_memory->has_space(AS_PROGRAM))
+					m_symtable->add(
+							"logunmap",
+							[&space = m_memory->space(AS_PROGRAM)] () { return space.log_unmap(); },
+							[&space = m_memory->space(AS_PROGRAM)] (u64 value) { return space.set_log_unmap(bool(value)); });
+				if (m_memory->has_space(AS_DATA))
+					m_symtable->add(
+							"logunmap",
+							[&space = m_memory->space(AS_DATA)] () { return space.log_unmap(); },
+							[&space = m_memory->space(AS_DATA)] (u64 value) { return space.set_log_unmap(bool(value)); });
+				if (m_memory->has_space(AS_IO))
+					m_symtable->add(
+							"logunmap",
+							[&space = m_memory->space(AS_IO)] () { return space.log_unmap(); },
+							[&space = m_memory->space(AS_IO)] (u64 value) { return space.set_log_unmap(bool(value)); });
+				if (m_memory->has_space(AS_OPCODES))
+					m_symtable->add(
+							"logunmap",
+							[&space = m_memory->space(AS_OPCODES)] () { return space.log_unmap(); },
+							[&space = m_memory->space(AS_OPCODES)] (u64 value) { return space.set_log_unmap(bool(value)); });
+			}
 		}
 
-		// add entries to enable/disable unmap reporting for each space
-		if (m_memory != nullptr)
-		{
-			if (m_memory->has_space(AS_PROGRAM))
-				m_symtable->add(
-						"logunmap",
-						[&space = m_memory->space(AS_PROGRAM)] () { return space.log_unmap(); },
-						[&space = m_memory->space(AS_PROGRAM)] (u64 value) { return space.set_log_unmap(bool(value)); });
-			if (m_memory->has_space(AS_DATA))
-				m_symtable->add(
-						"logunmap",
-						[&space = m_memory->space(AS_DATA)] () { return space.log_unmap(); },
-						[&space = m_memory->space(AS_DATA)] (u64 value) { return space.set_log_unmap(bool(value)); });
-			if (m_memory->has_space(AS_IO))
-				m_symtable->add(
-						"logunmap",
-						[&space = m_memory->space(AS_IO)] () { return space.log_unmap(); },
-						[&space = m_memory->space(AS_IO)] (u64 value) { return space.set_log_unmap(bool(value)); });
-			if (m_memory->has_space(AS_OPCODES))
-				m_symtable->add(
-						"logunmap",
-						[&space = m_memory->space(AS_OPCODES)] () { return space.log_unmap(); },
-						[&space = m_memory->space(AS_OPCODES)] (u64 value) { return space.set_log_unmap(bool(value)); });
-		}
+		// Use own table for CPU and the global for others
+		symbol_table *symtable = m_symtable != nullptr ? m_symtable.get() : &device.machine().debugger().cpu().global_symtable();
 
 		// add all registers into it
 		for (const auto &entry : m_state->state_entries())
@@ -580,7 +585,7 @@ device_debug::device_debug(device_t &device)
 			{
 				using namespace std::placeholders;
 				std::string tempstr(strmakelower(entry->symbol()));
-				m_symtable->add(
+				symtable->add(
 						tempstr.c_str(),
 						std::bind(&device_state_entry::value, entry.get()),
 						entry->writeable() ? std::bind(&device_state_entry::set_value, entry.get(), _1) : symbol_table::setter_func(nullptr),

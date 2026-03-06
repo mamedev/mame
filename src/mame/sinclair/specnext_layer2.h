@@ -31,8 +31,9 @@ public:
 	void clip_y1_w(u8 clip_y1) { m_clip_y1 = clip_y1; }
 	void clip_y2_w(u8 clip_y2) { m_clip_y2 = clip_y2; }
 
-	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode = 0, u8 priority_mask = 0, u8 mixer = 0);
-	void draw_mix(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 mixer);
+	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode = 0, u8 priority_mask = 0);
+	void draw_mix(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_rgb32 &blendprio, const rectangle &cliprect, u8 mixer);
+	void copyprio(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_rgb32 &blendprio, const rectangle &cliprect);
 
 protected:
 	static constexpr u16 LAYER2_INFO[2][5] =
@@ -47,9 +48,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void draw_256(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode, u8 priority_mask, u8 mixer);
-	void draw_16(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 pcode, u8 priority_mask, u8 mixer);
-	void blend(u8 &prio, u32 &target, const rgb_t pen, bool is_transparent, bool is_prio_color, u8 pcode, u8 priority_mask, u8 mixer);
+	template <typename FunctionClass> void draw_256(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_rgb32 &blendprio, const rectangle &cliprect, FunctionClass blend_op);
+	template <typename FunctionClass> void draw_16(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_rgb32 &blendprio, const rectangle &cliprect, FunctionClass blend_op);
+	template <typename FunctionClass> void do_draw(screen_device &screen, bitmap_rgb32 &bitmap, bitmap_rgb32 &blendprio, const rectangle &clip, const u16 (&info)[5], u16 offset_h, u16 offset_v, FunctionClass plot_op);
 
 	u16 m_offset_h, m_offset_v;
 	const u8 *m_host_ram_ptr;

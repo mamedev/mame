@@ -26,6 +26,12 @@
 
 #include <climits>
 
+
+#define SINGLE_INSTRUCTION_MODE (0)
+
+#define ENABLE_UNSP_DRC         (0)
+
+
 DEFINE_DEVICE_TYPE(UNSP,    unsp_device,    "unsp",    "SunPlus u'nSP (ISA 1.0)")
 // 1.1 is just 1.0 with better CPI?
 DEFINE_DEVICE_TYPE(UNSP_11, unsp_11_device, "unsp_11", "SunPlus u'nSP (ISA 1.1)")
@@ -248,7 +254,7 @@ void unsp_device::device_start()
 		m_drcuml->symbol_add(&m_core->m_icount, sizeof(m_core->m_icount), "icount");
 
 		/* initialize the front-end helper */
-		m_drcfe = std::make_unique<unsp_frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
+		m_drcfe = std::make_unique<frontend>(this, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, SINGLE_INSTRUCTION_MODE ? 1 : COMPILE_MAX_SEQUENCE);
 
 		/* mark the cache dirty so it is updated on next execute */
 		m_cache_dirty = true;

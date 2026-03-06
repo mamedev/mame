@@ -362,6 +362,7 @@ void helifire_sound_device::device_add_mconfig(machine_config &config)
 {
 	n8080_sound_device_base::device_add_mconfig(config);
 
+	m_cpu->set_clock(5_MHz_XTAL);
 	m_cpu->set_addrmap(AS_IO, &helifire_sound_device::io_map);
 	m_cpu->t0_in_cb().set(FUNC(helifire_sound_device::t0_r));
 	m_cpu->t1_in_cb().set(FUNC(helifire_sound_device::t1_r));

@@ -36,7 +36,7 @@ vme_tp881v_card_device::vme_tp881v_card_device(machine_config const &mconfig, ch
 	, m_mmu(*this, "mmu%u", 0U)
 	, m_cio(*this, "cio%u", 0U)
 	, m_rtc(*this, "rtc")
-	, m_scsi(*this, "scsi%u:7:ncr53c90a", 0U)
+	, m_scsi(*this, "ncr53c90a_%u", 0U)
 	, m_net(*this, "net")
 	, m_scc(*this, "scc%u", 0U)
 	, m_scc_dma(*this, "scc_dma")
@@ -79,7 +79,6 @@ static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("cdrom", NSCSI_CDROM);
 	device.option_add("harddisk", NSCSI_HARDDISK);
-	device.option_add("ncr53c90a", NCR53C90A);
 }
 
 void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
@@ -137,7 +136,7 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 
 	M48T02(config, m_rtc, 0);
 
-	NSCSI_BUS(config, "scsi0", 0);
+	auto &scsi0(NSCSI_BUS(config, "scsi0"));
 	NSCSI_CONNECTOR(config, "scsi0:0", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi0:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi0:2", scsi_devices, nullptr, false);
@@ -145,17 +144,12 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi0:4", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi0:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi0:6", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi0:7").option_set("ncr53c90a", NCR53C90A).machine_config(
-		[this](device_t *device)
-		{
-			ncr53c90a_device &ncr53c90a(downcast<ncr53c90a_device &>(*device));
 
-			ncr53c90a.set_clock(20'000'000);
-			ncr53c90a.irq_handler_cb().set(m_cio[0], FUNC(z8036_device::pa3_w));
-			//ncr53c90a.drq_cb().set(*this, ...);
-		});
+	NCR53C90A(config, m_scsi[0], 20'000'000);
+	scsi0.set_external_device(7, m_scsi[0]);
+	m_scsi[0]->irq_handler_cb().set(m_cio[0], FUNC(z8036_device::pa3_w));
 
-	NSCSI_BUS(config, "scsi1", 0);
+	auto &scsi1(NSCSI_BUS(config, "scsi1"));
 	NSCSI_CONNECTOR(config, "scsi1:0", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi1:1", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi1:2", scsi_devices, nullptr, false);
@@ -163,15 +157,10 @@ void vme_tp881v_card_device::device_add_mconfig(machine_config &config)
 	NSCSI_CONNECTOR(config, "scsi1:4", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi1:5", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi1:6", scsi_devices, nullptr, false);
-	NSCSI_CONNECTOR(config, "scsi1:7").option_set("ncr53c90a", NCR53C90A).machine_config(
-		[this](device_t *device)
-		{
-			ncr53c90a_device &ncr53c90a(downcast<ncr53c90a_device &>(*device));
 
-			ncr53c90a.set_clock(20'000'000);
-			ncr53c90a.irq_handler_cb().set(m_cio[0], FUNC(z8036_device::pa4_w));
-			//ncr53c90a.drq_cb().set(*this, ...);
-		});
+	NCR53C90A(config, m_scsi[1], 20'000'000);
+	scsi1.set_external_device(7, m_scsi[1]);
+	m_scsi[1]->irq_handler_cb().set(m_cio[0], FUNC(z8036_device::pa4_w));
 
 	I82596_BE32(config, m_net, 20'000'000); // A82596DX-25
 	m_net->out_irq_cb().set(m_cio[0], FUNC(z8036_device::pa1_w));

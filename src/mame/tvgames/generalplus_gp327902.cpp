@@ -234,5 +234,5 @@ CONS( 2019, tomyegga,        tomyegg,  0,      gp327902, gp327902, generalplus_g
 
 CONS( 2021, chikawac,        0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Tomy",        "Chiikawa Camera De Ya-! (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 
-// リルリルフェアリル　フェアリルカメラ  
+// リルリルフェアリル　フェアリルカメラ
 CONS( 2016, fairicam,         0,        0,      gp327902, gp327902, generalplus_gp327902_game_state, init_spi,  "Sega Toys",        "Rilu Rilu Fairilu Camera (Japan)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

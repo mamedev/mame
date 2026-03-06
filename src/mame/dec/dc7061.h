@@ -9,8 +9,8 @@
 #include "machine/nscsi_bus.h"
 
 class dc7061_device
-	: public nscsi_device
-	, public nscsi_slot_card_interface
+	: public device_t
+	, public nscsi_device_interface
 {
 public:
 	dc7061_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);

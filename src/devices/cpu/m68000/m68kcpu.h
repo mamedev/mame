@@ -215,19 +215,19 @@ inline u32 &REG_SP()          { return m_dar[15]; }
 /* Disable certain comparisons if we're not using all CPU types */
 inline u32 CPU_TYPE_IS_COLDFIRE() const    { return ((m_cpu_type) & (CPU_TYPE_COLDFIRE)); }
 
-inline u32 CPU_TYPE_IS_040_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_040 | CPU_TYPE_EC040)); }
+inline u32 CPU_TYPE_IS_040_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_LC040)); }
 
-inline u32 CPU_TYPE_IS_030_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040)); }
+inline u32 CPU_TYPE_IS_030_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_EC040 | CPU_TYPE_LC040)); }
 
-inline u32 CPU_TYPE_IS_020_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
+inline u32 CPU_TYPE_IS_020_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_LC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
 
 inline u32 CPU_TYPE_IS_020_VARIANT() const { return ((m_cpu_type) & (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_FSCPU32)); }
 
-inline u32 CPU_TYPE_IS_EC020_PLUS() const  { return ((m_cpu_type) & (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
+inline u32 CPU_TYPE_IS_EC020_PLUS() const  { return ((m_cpu_type) & (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_030 | CPU_TYPE_EC030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_LC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
 inline u32 CPU_TYPE_IS_EC020_LESS() const  { return ((m_cpu_type) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020)); }
 
 inline u32 CPU_TYPE_IS_010() const         { return ((m_cpu_type) == CPU_TYPE_010); }
-inline u32 CPU_TYPE_IS_010_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
+inline u32 CPU_TYPE_IS_010_PLUS() const    { return ((m_cpu_type) & (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_EC030 | CPU_TYPE_030 | CPU_TYPE_040 | CPU_TYPE_EC040 | CPU_TYPE_LC040 | CPU_TYPE_FSCPU32 | CPU_TYPE_COLDFIRE)); }
 inline u32 CPU_TYPE_IS_010_LESS() const    { return ((m_cpu_type) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_SCC070)); }
 
 inline u32 CPU_TYPE_IS_000() const         { return ((m_cpu_type) == CPU_TYPE_000 || (m_cpu_type) == CPU_TYPE_008); }

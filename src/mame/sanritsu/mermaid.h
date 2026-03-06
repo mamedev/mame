@@ -71,11 +71,11 @@ private:
 	int m_rougien_gfxbank2 = 0;
 
 	/* sound-related */
-	uint8_t    m_adpcm_idle = 0;
-	int      m_adpcm_data = 0;
-	uint8_t    m_adpcm_trigger = 0;
-	uint8_t    m_adpcm_rom_sel = 0;
-	bool       m_ay8910_enable[2];
+	uint8_t m_adpcm_idle = 0;
+	int m_adpcm_data = 0;
+	uint8_t m_adpcm_trigger = 0;
+	uint8_t m_adpcm_rom_sel = 0;
+	bool m_ay8910_enable[2] = { };
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;

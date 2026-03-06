@@ -8,7 +8,7 @@
 
 #include "machine/nscsi_bus.h"
 
-class cfp1080s_device : public nscsi_device, public nscsi_slot_card_interface
+class cfp1080s_device : public device_t, public nscsi_device_interface, public nscsi_slot_card_interface
 {
 public:
 	cfp1080s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

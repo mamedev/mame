@@ -634,8 +634,8 @@ void z80_device::device_validity_check(validity_checker &valid) const
 
 	if (4 > m_m1_cycles)
 		osd_printf_error("M1 cycles %u is less than minimum 4\n", m_m1_cycles);
-	if (3 > m_memrq_cycles)
-		osd_printf_error("MEMRQ cycles %u is less than minimum 3\n", m_memrq_cycles);
+	if (3 > m_mreq_cycles)
+		osd_printf_error("MREQ cycles %u is less than minimum 3\n", m_mreq_cycles);
 	if (4 > m_iorq_cycles)
 		osd_printf_error("IORQ cycles %u is less than minimum 4\n", m_iorq_cycles);
 }
@@ -668,7 +668,7 @@ void z80_device::device_start()
 	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_wait_state));
-	save_item(NAME(m_busrq_state));
+	save_item(NAME(m_busreq_state));
 	save_item(NAME(m_busack_state));
 	save_item(NAME(m_ea));
 	save_item(NAME(m_service_attention));
@@ -706,7 +706,7 @@ void z80_device::device_start()
 	m_nmi_state = 0;
 	m_irq_state = 0;
 	m_wait_state = 0;
-	m_busrq_state = 0;
+	m_busreq_state = 0;
 	m_busack_state = 0;
 	m_ea = 0;
 	m_service_attention = 0;
@@ -788,10 +788,10 @@ void z80_device::execute_set_input(int inputnum, int state)
 {
 	switch (inputnum)
 	{
-	case Z80_INPUT_LINE_BUSRQ:
-		if (m_busrq_state == CLEAR_LINE && state != CLEAR_LINE)
-			set_service_attention<SA_BUSRQ, 1>();
-		m_busrq_state = state;
+	case Z80_INPUT_LINE_BUSREQ:
+		if (m_busreq_state == CLEAR_LINE && state != CLEAR_LINE)
+			set_service_attention<SA_BUSREQ, 1>();
+		m_busreq_state = state;
 		break;
 
 	case INPUT_LINE_NMI:
@@ -915,7 +915,7 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_halt_cb(*this),
 	m_busack_cb(*this),
 	m_m1_cycles(4),
-	m_memrq_cycles(3),
+	m_mreq_cycles(3),
 	m_iorq_cycles(4)
 {
 }

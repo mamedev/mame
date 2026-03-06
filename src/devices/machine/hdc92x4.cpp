@@ -70,7 +70,9 @@
 
 #include "emu.h"
 #include "hdc92x4.h"
+
 #include "formats/imageutl.h"
+#include "multibyte.h"
 
 
 #define LOG_DETAIL       (1U << 1)     // More detail
@@ -1205,15 +1207,12 @@ void hdc92x4_device::data_transfer(int& cont)
 				// Update the DMA registers for multi-sector operations
 				if (m_multi_sector)
 				{
-					int dma_address = (m_register_w[DMA23_16] & 0xff) << 16 |
-						(m_register_w[DMA15_8] & 0xff) << 8 |
-						(m_register_w[DMA7_0] & 0xff);
+					unsigned dma_address = get_u24le(&m_register_w[DMA7_0]);
 
 					dma_address = (dma_address + sector_size()) & 0xffffff;
 
-					m_register_w[DMA23_16] = m_register_r[DMA23_16] = (dma_address & 0xff0000) >> 16;
-					m_register_w[DMA15_8] = m_register_r[DMA15_8] = (dma_address & 0x00ff00) >> 8;
-					m_register_w[DMA7_0] = m_register_r[DMA7_0] = (dma_address & 0x0000ff);
+					put_u24le(&m_register_r[DMA7_0], dma_address);
+					put_u24le(&m_register_w[DMA7_0], dma_address);
 					LOGMASKED(LOG_TRANSFER, "New DMA address = %06x\n", dma_address);
 				}
 
@@ -1248,15 +1247,12 @@ void hdc92x4_device::data_transfer(int& cont)
 			// Update the DMA registers for multi-sector operations
 			if (m_multi_sector)
 			{
-				int dma_address = (m_register_w[DMA23_16] & 0xff) << 16 |
-				(m_register_w[DMA15_8] & 0xff) << 8 |
-				(m_register_w[DMA7_0] & 0xff);
+				unsigned dma_address = get_u24le(&m_register_w[DMA7_0]);
 
 				dma_address = (dma_address + sector_size()) & 0xffffff;
 
-				m_register_w[DMA23_16] = m_register_r[DMA23_16] = (dma_address & 0xff0000) >> 16;
-				m_register_w[DMA15_8] = m_register_r[DMA15_8] = (dma_address & 0x00ff00) >> 8;
-				m_register_w[DMA7_0] = m_register_r[DMA7_0] = (dma_address & 0x0000ff);
+				put_u24le(&m_register_r[DMA7_0], dma_address);
+				put_u24le(&m_register_w[DMA7_0], dma_address);
 				LOGMASKED(LOG_TRANSFER, "New DMA address = %06x\n", dma_address);
 			}
 

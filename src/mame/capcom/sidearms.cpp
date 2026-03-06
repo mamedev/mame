@@ -7,18 +7,21 @@ Driver provided by Paul Leaman
 
 Notes:
 
-The main board of Side Arms has an unpopulated position reserved for a
-8751 protection MCU.
+The main board of Side Arms has an unpopulated position reserved for a 8751
+protection MCU.
 
-Unknown PROMs are mostly used for timing. Only the first four sprite
-encoding parameters have been identified, the other 28(!) are
-believed to be line-buffer controls.
+Unknown PROMs are mostly used for timing. Only the first four sprite encoding
+parameters have been identified, the other 28(!) are believed to be line-buffer
+controls.
 
-A bootleg has been found that matches "sidearmsj" but with the
-starfield data ROM being half the size of the original one and
-containing its second half. Also, it seems that, as the original
-game it's currently emulated, it uses just the first half of the
-starfield ROM, so it's something worth checking.
+A bootleg has been found that matches "sidearmsj" but with the starfield data
+ROM being half the size of the original one and containing its second half.
+Also, it seems that, as the original game it's currently emulated, it uses just
+the first half of the starfield ROM, so it's something worth checking.
+
+TODO:
+- writing to the palette outside of the allowed time specified in the 16H PROM
+  will trigger a write error on SYSTEM port bit 2 (cleared by writing to 0xc803)
 
 ********************************************************************************
 
@@ -126,7 +129,6 @@ T-12 to T-15 - 27512 OTP EPROM (sprites)
 #include "sound/ymopm.h"
 #include "sound/ymopn.h"
 
-#include "screen.h"
 #include "speaker.h"
 
 void sidearms_state::machine_start()
@@ -169,6 +171,7 @@ uint8_t sidearms_state::turtship_ports_r(offs_t offset)
 
 void sidearms_state::sidearms_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc3ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -191,6 +194,7 @@ void sidearms_state::sidearms_map(address_map &map)
 
 void sidearms_state::turtship_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xcfff).ram();
@@ -224,6 +228,7 @@ void sidearms_state::sidearms_sound_map(address_map &map)
 
 void sidearms_state::whizz_map(address_map &map)
 {
+	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0xbfff).bankr("bank1");
 	map(0xc000, 0xc3ff).writeonly().w(m_palette, FUNC(palette_device::write8)).share("palette");
@@ -690,10 +695,10 @@ void sidearms_state::sidearms(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
-	screen.set_screen_update(FUNC(sidearms_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
+	m_screen->set_screen_update(FUNC(sidearms_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_sidearms);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
@@ -731,10 +736,10 @@ void sidearms_state::turtship(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8); // 61.0338 Hz measured
-	screen.set_screen_update(FUNC(sidearms_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8); // 61.0338 Hz measured
+	m_screen->set_screen_update(FUNC(sidearms_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turtship);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);
@@ -775,10 +780,10 @@ void sidearms_state::whizz(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
-	screen.set_screen_update(FUNC(sidearms_state::screen_update));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	m_screen->set_raw(16_MHz_XTAL / 2, 64*8, 8*8, (64-8)*8, 32*8, 2*8, 30*8);
+	m_screen->set_screen_update(FUNC(sidearms_state::screen_update));
+	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_turtship);
 	PALETTE(config, m_palette).set_format(palette_device::xBRG_444, 1024);

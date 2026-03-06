@@ -609,13 +609,13 @@ GFXDECODE_END
 void matmania_state::matmania(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 1'500'000);  // 1.5 MHz ????
+	M6502(config, m_maincpu, 12_MHz_XTAL / 8);  // 1.5MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &matmania_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(matmania_state::irq0_line_hold));
 
-	M6502(config, m_audiocpu, 1'200'000); // 1.2 MHz ????
+	M6502(config, m_audiocpu, 12_MHz_XTAL / 8); // 1.5MHz?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &matmania_state::sound_map);
-	m_audiocpu->set_periodic_int(FUNC(matmania_state::nmi_line_pulse), attotime::from_hz(15 * 60)); // ????
+	m_audiocpu->set_periodic_int(FUNC(matmania_state::nmi_line_pulse), attotime::from_hz(15 * 60)); // ?
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
@@ -636,8 +636,8 @@ void matmania_state::matmania(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, M6502_IRQ_LINE);
 
-	AY8910(config, "ay1", 1'500'000).add_route(ALL_OUTPUTS, "speaker", 0.3);
-	AY8910(config, "ay2", 1'500'000).add_route(ALL_OUTPUTS, "speaker", 0.3);
+	AY8910(config, "ay1", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3);
+	AY8910(config, "ay2", 12_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "speaker", 0.3);
 
 	DAC_8BIT_R2R(config, "dac", 0).add_route(ALL_OUTPUTS, "speaker", 0.4); // unknown DAC
 }
@@ -645,16 +645,16 @@ void matmania_state::matmania(machine_config &config)
 void maniach_state::maniach(machine_config &config)
 {
 	// basic machine hardware
-	M6502(config, m_maincpu, 1'500'000); // 1.5 MHz ????
+	M6502(config, m_maincpu, 12_MHz_XTAL / 8); // 1.5MHz?
 	m_maincpu->set_addrmap(AS_PROGRAM, &maniach_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(maniach_state::irq0_line_hold));
 
-	MC6809E(config, m_audiocpu, 1'500'000);    // 1.5 MHz ???? (HD68A09EP)
+	MC6809E(config, m_audiocpu, 12_MHz_XTAL / 8); // 1.5MHz? (HD68A09EP)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &maniach_state::sound_map);
 
-	TAITO68705_MCU(config, m_mcu, 1'500'000 * 2);  // (don't know really how fast, but it doesn't need to even be this fast)
+	TAITO68705_MCU(config, m_mcu, 12_MHz_XTAL / 4); // 3MHz?
 
-	config.set_maximum_quantum(attotime::from_hz(6000));  // 100 CPU slice per frame - high interleaving to sync main and MCU
+	config.set_maximum_quantum(attotime::from_hz(6000)); // 100 CPU slice per frame - high interleaving to sync main and MCU
 
 	// video hardware
 	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
@@ -673,7 +673,7 @@ void maniach_state::maniach(machine_config &config)
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline(m_audiocpu, M6809_IRQ_LINE);
 
-	ym3526_device &ymsnd(YM3526(config, "ymsnd", 3'600'000));
+	ym3526_device &ymsnd(YM3526(config, "ymsnd", 12_MHz_XTAL / 4));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, M6809_FIRQ_LINE);
 	ymsnd.add_route(ALL_OUTPUTS, "speaker", 1.0);
 
@@ -918,5 +918,6 @@ ROM_END
 
 GAME( 1985, matmania, 0,        matmania, matmania, matmania_state, empty_init, ROT270, "Technos Japan (Taito America license)", "Mat Mania",               MACHINE_SUPPORTS_SAVE )
 GAME( 1985, excthour, matmania, matmania, maniach,  matmania_state, empty_init, ROT270, "Technos Japan (Taito license)",         "Exciting Hour",           MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, maniach,  0,        maniach,  maniach,  maniach_state,  empty_init, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, maniach2, maniach,  maniach,  maniach,  maniach_state,  empty_init, ROT270, "Technos Japan (Taito America license)", "Mania Challenge (set 2)", MACHINE_SUPPORTS_SAVE ) // earlier version?

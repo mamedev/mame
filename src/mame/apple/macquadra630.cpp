@@ -166,7 +166,7 @@ void quadra630_state::macqd630(machine_config &config)
 
 	PRIMETIMEII(config, m_primetimeii, 33_MHz_XTAL);
 	m_primetimeii->set_maincpu_tag("maincpu");
-	m_primetimeii->set_scsi_tag("f108:scsi:7:ncr53c96");
+	m_primetimeii->set_scsi_tag("f108:ncr53c96");
 
 	VALKYRIE(config, m_video, C32M);
 	m_video->write_irq().set(m_primetimeii, FUNC(primetime_device::via2_irq_w<0x40>));

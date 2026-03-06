@@ -130,6 +130,13 @@ void pc_lpt_device::write(offs_t offset, uint8_t data)
 	}
 }
 
+void pc_lpt_device::isa_map(address_map &map)
+{
+	map(0x00, 0x00).rw(FUNC(pc_lpt_device::data_r), FUNC(pc_lpt_device::data_w));
+	map(0x01, 0x01).r(FUNC(pc_lpt_device::status_r));
+	map(0x02, 0x02).rw(FUNC(pc_lpt_device::control_r), FUNC(pc_lpt_device::control_w));
+}
+
 void pc_lpt_device::update_irq()
 {
 	int irq = 1; // high impedance

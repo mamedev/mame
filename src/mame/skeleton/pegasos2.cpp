@@ -13,7 +13,7 @@
     - 1x AGP, 3x PCI slots
     - 2xLAN (Gigabit from northbridge, 100 MBit from southbridge)
     - VIA VT6306 (firewire)
-    - AC97 sound (Sigmatel STAC 9766 Codec)
+    - AC'97 sound (Sigmatel STAC9766 Codec, v2.3)
     - Floppy
     - PS/2 keyboard/mouse
     - Joystick

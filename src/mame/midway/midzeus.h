@@ -174,7 +174,8 @@ public:
 	invasnab_state(const machine_config &mconfig, device_type type, const char *tag) :
 		midzeus_state(mconfig, type, tag),
 		m_io_gun_x(*this, "GUNX%u", 1U),
-		m_io_gun_y(*this, "GUNY%u", 1U)
+		m_io_gun_y(*this, "GUNY%u", 1U),
+		m_io_gun_trigger(*this, "TRIGGER")
 	{ }
 
 	void invasn(machine_config &config);
@@ -198,6 +199,7 @@ private:
 
 	required_ioport_array<2> m_io_gun_x;
 	required_ioport_array<2> m_io_gun_y;
+	required_ioport m_io_gun_trigger;
 };
 
 #endif // MAME_MIDWAY_MIDZEUS_H

@@ -2,9 +2,9 @@
 // copyright-holders:
 /**********************************************************************************************************************************
 
-Skeleton driver for "Play 4 Texas Hold'em", by Sleic.
+Skeleton driver for "Play4Texas Hold'em", by Sleic.
 
-Based on an Innocore / Advantech "E105MB/B" PCB (specific for embedded gaming systems):
+Advantech DPX-E105, based on an Innocore / Advantech "E105MB/B" PCB (specific for embedded gaming systems):
 -CPU Intel Atom N270 SLB73, 1.6 GHz / 512 / 533.
 -512MB RAM.
 -Safenet Sentinel USB security dongle.
@@ -13,7 +13,14 @@ Based on an Innocore / Advantech "E105MB/B" PCB (specific for embedded gaming sy
 
 The machine has two anti-tamper switches directly connected to the PCB.
 
-Linux-based operating system called "LudOS".
+Custom Java software called "LudOS" running on Debian 5.0.5
+Screen resolution: 1366x768
+Dongle is used to get the GPG passphrase to decrypt /root/loader/ludicus.tar.gz.gpg which contains the software and game.
+GPG passphrase is stored in plaintext in /root/loader/bin/gpgExtract.sh
+
+Existing Play4Texas dump has the date of the last patch as 2011-10-18.
+
+Appears to be based on Play4Pro by Ludicus?
 
 ***********************************************************************************************************************************/
 
@@ -87,4 +94,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2010, play4texash, 0, play4texash, play4texash, play4texash_state, empty_init, ROT0, "Sleic", "Play 4 Texas Hold'em", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(2011, play4texash, 0, play4texash, play4texash, play4texash_state, empty_init, ROT0, "Sleic", "Play4Texas Hold'em", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

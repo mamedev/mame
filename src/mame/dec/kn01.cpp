@@ -77,7 +77,7 @@ public:
 		, m_esar(*this, "esar")
 		, m_rtc(*this, "rtc")
 		, m_dz(*this, "dc7085")
-		, m_sii(*this, "scsi:6:sii")
+		, m_sii(*this, "sii")
 		, m_lance(*this, "am79c90")
 		, m_lk201(*this, "lk201")
 		, m_screen(*this, "screen")
@@ -482,20 +482,18 @@ void kn01_state::kn01(machine_config &config, XTAL clock)
 				m_msr &= ~MSR_DSR3;
 		});
 
-	NSCSI_BUS(config, "scsi");
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 	NSCSI_CONNECTOR(config, "scsi:0", dec_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", dec_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", dec_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3", dec_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:4", dec_scsi_devices, "cdrom");
 	NSCSI_CONNECTOR(config, "scsi:5", dec_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6").option_set("sii", DC7061).clock(20_MHz_XTAL).machine_config(
-		[this](device_t *device)
-		{
-			dc7061_device &sii = downcast<dc7061_device &>(*device);
 
-			sii.sys_int().set_inputline(m_cpu, INPUT_LINE_IRQ0);
-		});
+	DC7061(config, m_sii, 20_MHz_XTAL);
+	scsi.set_external_device(6, m_sii);
+	m_sii->sys_int().set_inputline(m_cpu, INPUT_LINE_IRQ0);
+
 	NSCSI_CONNECTOR(config, "scsi:7", dec_scsi_devices, nullptr);
 
 	config.set_default_layout(layout_kn01);

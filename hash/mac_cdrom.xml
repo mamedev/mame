@@ -30,6 +30,19 @@ PPC750 - PowerPC 750 (G3) CPU
 		</part>
 	</software>
 
+	<software name="bluebox" supported="no">
+		<description>Rhapsody Blue Box (Developer Release)</description>
+		<year>1997</year>
+		<publisher>Apple</publisher>
+		<info name="usage" value="Compatibility layer for Rhapsody to run Mac OS 8 applications." />
+		<sharedfeat name="compatibility" value="PPC604,PPC750" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="blue box" sha1="bc94536ff8ac3ed701bd5e5ad5e96fa846adc481" />
+			</diskarea>
+		</part>
+	</software>
+
 	<!-- Chex Quest duplicated in ibm5170_cdrom.xml -->
 	<software name="chexquest">
 		<description>Chex Quest</description>
@@ -223,6 +236,32 @@ PPC750 - PowerPC 750 (G3) CPU
 		</part>
 	</software>
 
+	<software name="rhapsody" supported="no">
+		<description>Rhapsody (Developer Release 2)</description>
+		<year>1998</year>
+		<publisher>Apple</publisher>
+		<info name="version" value="5.1" />
+		<sharedfeat name="compatibility" value="PPC604,PPC750" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rhapsody dr2" sha1="9e23371dc7c2594e571522774da44647d83dd036" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="rhapsody1" cloneof="rhapsody" supported="no">
+		<description>Rhapsody (Developer Release 1)</description>
+		<year>1997</year>
+		<publisher>Apple</publisher>
+		<info name="version" value="5.0" />
+		<sharedfeat name="compatibility" value="PPC604" />
+		<part name="cdrom1" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="rhapsody dr1" sha1="612d8c65b1bd50fc38de7929bad328a901ed9dde" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ultdoom">
 		<description>The Ultimate Doom</description>
 		<year>1995</year>
@@ -234,4 +273,5 @@ PPC750 - PowerPC 750 (G3) CPU
 			</diskarea>
 		</part>
 	</software>
+
 </softwarelist>

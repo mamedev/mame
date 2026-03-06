@@ -207,13 +207,13 @@ public: // TODO: THIS SHOULD NOT BE PUBLIC
 	devcb_read_line m_videores_in;
 
 	// Sub-devices
-	required_device<m2_memctl_device>   m_memctl;
-	required_device<m2_powerbus_device> m_powerbus;
-	required_device<m2_vdu_device>      m_vdu;
-	required_device<m2_ctrlport_device> m_ctrlport;
-	required_device<dspp_device>        m_dspp;
-	required_device<m2_mpeg_device>     m_mpeg;
-	required_device<m2_te_device>       m_te;
+	required_device<m2_memctl_device>    m_memctl;
+	required_device<m2_powerbus_device>  m_powerbus;
+	required_device<m2_vdu_device>       m_vdu;
+	required_device<m2_ctrlport_device>  m_ctrlport;
+	required_device<dspp_bulldog_device> m_dspp;
+	required_device<m2_mpeg_device>      m_mpeg;
+	required_device<m2_te_device>        m_te;
 
 	// System RAM
 	std::unique_ptr<uint32_t[]> m_ram;

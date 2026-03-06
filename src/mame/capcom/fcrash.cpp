@@ -452,7 +452,7 @@ void fcrash_state::fcrash(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette, palette_device::BLACK).set_entries(4096);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -507,7 +507,7 @@ void fcrash_state::ffightblb(machine_config &config)
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
-	PALETTE(config, m_palette, palette_device::BLACK).set_entries(4096);
+	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -667,6 +667,7 @@ void fcrash_state::sgyxz(machine_config &config)
 	m_screen->screen_vblank().set(FUNC(fcrash_state::screen_vblank_cps1));
 	m_screen->screen_vblank().append(FUNC(fcrash_state::cps1_objram_latch));
 	m_screen->set_palette(m_palette);
+
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cps1);
 	PALETTE(config, m_palette, palette_device::BLACK).set_entries(0xc00);
 
@@ -1012,7 +1013,7 @@ MACHINE_START_MEMBER(fcrash_state, sf2m1)
 MACHINE_START_MEMBER(fcrash_state, sgyxz)
 {
 	m_layer_enable_reg = 0x20;
-	// palette_control  = 0x2a
+	// palette_control = 0x2a
 
 	// layer priority masks:
 	// clears 0x28, 0x2c, 0x2e at boot, then never writes any layer mask values anywhere outside main ram.
@@ -1596,9 +1597,7 @@ INPUT_PORTS_END
 
 void fcrash_state::fcrash_update_transmasks()
 {
-	int i;
-
-	for (i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		int mask;
 
@@ -1616,7 +1615,6 @@ void fcrash_state::fcrash_update_transmasks()
 
 void fcrash_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	int pos;
 	int base = m_sprite_base / 2;
 	int num_sprites = m_gfxdecode->gfx(2)->elements();
 	int last_sprite_offset = 0x1ffc;
@@ -1628,13 +1626,13 @@ void fcrash_state::bootleg_render_sprites( screen_device &screen, bitmap_ind16 &
 	if (m_bootleg_sprite_ram) sprite_ram = m_bootleg_sprite_ram.get();
 
 	/* get end of sprite list marker */
-	for (pos = 0x1ffc - base; pos >= 0x0000; pos -= 4)
+	for (int pos = 0x1ffc - base; pos >= 0x0000; pos -= 4)
 		if (sprite_ram[base + pos - 1] == m_sprite_list_end_marker) last_sprite_offset = pos;
 
 	/* If we are using bootleg sprite ram, the index must be less than 0x2000 */
 	if (((base + last_sprite_offset) < 0x2000) || (!m_bootleg_sprite_ram))
 	{
-		for (pos = last_sprite_offset; pos >= 0x0000; pos -= 4)
+		for (int pos = last_sprite_offset; pos >= 0x0000; pos -= 4)
 		{
 			tileno = sprite_ram[base + pos];
 			if (tileno >= num_sprites) continue; /* don't render anything outside our tiles */
@@ -1686,12 +1684,10 @@ void fcrash_state::fcrash_render_high_layer( screen_device &screen, bitmap_ind16
 
 void fcrash_state::fcrash_build_palette()
 {
-	int offset;
-
 	// all the bootlegs seem to write the palette offset as usual
 	int palettebase = (m_cps_a_regs[0x0a / 2] << 8) & 0x1ffff;
 
-	for (offset = 0; offset < 32 * 6 * 16; offset++)
+	for (int offset = 0; offset < 32 * 6 * 16; offset++)
 	{
 		int palette = m_gfxram[palettebase / 2 + offset];
 		int r, g, b, bright;
@@ -1716,12 +1712,10 @@ void cps1bl_no_brgt::fcrash_build_palette()
 	// this is a problem as some games (wofabl, jurassic99) use erroneous brightness values
 	// which have no effect on the bootleg pcb, but cause issues in mame (as they would on genuine hardware).
 
-	int offset;
-
 	// all the bootlegs seem to write the palette offset as usual
 	int palettebase = (m_cps_a_regs[0x0a / 2] << 8) & 0x1ffff;
 
-	for (offset = 0; offset < 32 * 6 * 16; offset++)
+	for (int offset = 0; offset < 32 * 6 * 16; offset++)
 	{
 		int palette = m_gfxram[palettebase / 2 + offset];
 		int r, g, b;
@@ -1775,7 +1769,6 @@ uint32_t fcrash_state::screen_update_fcrash(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap[1]->set_scrolly(0, m_scroll2y);
 	m_bg_tilemap[2]->set_scrollx(0, m_scroll3x - m_layer_scroll3x_offset);
 	m_bg_tilemap[2]->set_scrolly(0, m_scroll3y);
-
 
 	/* turn all tilemaps on regardless of settings in get_video_base() */
 	/* write a custom get_video_base for this bootleg hardware? */
@@ -2321,12 +2314,12 @@ ROM_START( varthb )
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(1547e595) SHA1(27f47b1afd9700afd9e8167d7e4e2888be34a9e5) )
 
 	ROM_REGION( 0x1000, "pals", 0 )
-	ROM_LOAD_OPTIONAL( "varth1.bin", 0x00000, 0x157, CRC(4c6a0d99) SHA1(081a307ef38675de178dd6221e6c4e55a5bfbd87) )
-	ROM_LOAD_OPTIONAL( "varth2.bin", 0x00200, 0x157, NO_DUMP ) // Registered
-	ROM_LOAD_OPTIONAL( "varth3.bin", 0x00400, 0x157, NO_DUMP ) // Registered
-	ROM_LOAD_OPTIONAL( "varth4.bin", 0x00600, 0x117, CRC(53317bf6) SHA1(f7b8f8b2c40429a517e3be63e5aed9573972ddfb) )
-	ROM_LOAD_OPTIONAL( "varth5.bin", 0x00800, 0x157, NO_DUMP ) // Registered
-	ROM_LOAD_OPTIONAL( "varth6.bin", 0x00a00, 0x157, NO_DUMP ) // Registered
+	ROM_LOAD( "varth1.bin", 0x00000, 0x157, CRC(4c6a0d99) SHA1(081a307ef38675de178dd6221e6c4e55a5bfbd87) )
+	ROM_LOAD( "varth2.bin", 0x00200, 0x157, NO_DUMP ) // Registered
+	ROM_LOAD( "varth3.bin", 0x00400, 0x157, NO_DUMP ) // Registered
+	ROM_LOAD( "varth4.bin", 0x00600, 0x117, CRC(53317bf6) SHA1(f7b8f8b2c40429a517e3be63e5aed9573972ddfb) )
+	ROM_LOAD( "varth5.bin", 0x00800, 0x157, NO_DUMP ) // Registered
+	ROM_LOAD( "varth6.bin", 0x00a00, 0x157, NO_DUMP ) // Registered
 ROM_END
 
 

@@ -658,7 +658,7 @@ void wren_state::wren(machine_config &config)
 	WD2791(config, m_fdc, 12_MHz_XTAL / 6);
 	m_fdc->set_force_ready(true);
 	m_fdc->intrq_wr_callback().set(FUNC(wren_state::int_w<3>));
-	m_fdc->drq_wr_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	m_fdc->drq_wr_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 
 	FLOPPY_CONNECTOR(config, "fdc:0", "525dd", FLOPPY_525_DD, true, wren_state::floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, "fdc:1", "525dd", FLOPPY_525_DD, true, wren_state::floppy_formats).enable_sound(true);

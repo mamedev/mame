@@ -186,6 +186,7 @@ protected:
 			struct
 			{
 				uint8_t A, B;
+				u32 base[2];
 			}char_sel;
 		} sequencer;
 
@@ -353,13 +354,6 @@ protected:
 };
 
 
-/*
-  pega notes (paradise)
-  build in amstrad pc1640
-
-  ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33) )
-
-*/
 
 /*
   oak vga (oti 037 chip)

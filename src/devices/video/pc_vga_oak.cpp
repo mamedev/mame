@@ -222,7 +222,7 @@ void oak_oti111_vga_device::oak_map(address_map &map)
 	//map(0x26, 0x26) RASn Control
 	//map(0x27, 0x27) CASn Control
 	//map(0x28, 0x28) Refresh Control
-	//map(0x29, 0x29) Hardware Window Aribtration
+	//map(0x29, 0x29) Hardware Window Arbitration
 
 	//map(0x30, 0x30) OTI CRT Overflow
 	//map(0x31, 0x31) CRT Start Address

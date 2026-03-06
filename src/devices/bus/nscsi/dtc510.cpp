@@ -65,33 +65,33 @@ void nscsi_dtc510_device::scsi_command()
 {
 	// TODO: don't clear sense buffer on every command!
 	// (mutuated from s1410)
-	memset(scsi_sense_buffer, 0, sizeof(scsi_sense_buffer));
+	memset(m_scsi_sense_buffer, 0, sizeof(m_scsi_sense_buffer));
 
 	LOGCOMMAND("CMD %02x %02x %02x %02x %02x %02x\n",
-		scsi_cmdbuf[0], scsi_cmdbuf[1], scsi_cmdbuf[2],
-		scsi_cmdbuf[3], scsi_cmdbuf[4], scsi_cmdbuf[5]
+		m_scsi_cmdbuf[0], m_scsi_cmdbuf[1], m_scsi_cmdbuf[2],
+		m_scsi_cmdbuf[3], m_scsi_cmdbuf[4], m_scsi_cmdbuf[5]
 	);
 
-//  if (scsi_cmdbuf[0] == 0x01 && scsi_cmdbuf[1] == 0x01 && scsi_cmdbuf[5] == 0x01)
+//  if (m_scsi_cmdbuf[0] == 0x01 && m_scsi_cmdbuf[1] == 0x01 && m_scsi_cmdbuf[5] == 0x01)
 //      machine().debug_break();
 
-	switch(scsi_cmdbuf[0]) {
+	switch(m_scsi_cmdbuf[0]) {
 	case SC_TEST_UNIT_READY:
 	case SC_FORMAT_BAD_TRACK:
 	case SC_READ:
 	case SC_WRITE:
-		if (scsi_cmdbuf[1] >> 5) {
+		if (m_scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
-			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+			m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 		} else {
 			nscsi_harddisk_device::scsi_command();
 		}
 		break;
 
 	case SC_RECALIBRATE:
-		if (scsi_cmdbuf[1] >> 5) {
+		if (m_scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
-			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+			m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 		} else {
 			// lba = 0;
 			scsi_status_complete(SS_GOOD);
@@ -99,21 +99,21 @@ void nscsi_dtc510_device::scsi_command()
 		break;
 
 	case SC_SEEK:
-		if (scsi_cmdbuf[1] >> 5) {
+		if (m_scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
-			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+			m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 		} else {
-			//lba = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
+			//lba = get_u24be(&m_scsi_cmdbuf[1]) & 0x1fffff;
 			scsi_status_complete(SS_GOOD);
 		}
 		break;
 
 	case SC_REQUEST_SENSE:
 		// TODO: hangs if a request sense is issued
-		//scsi_sense_buffer[0] = SK_NO_ERROR;
-		//scsi_sense_buffer[1] = (m_seek >> 16) & 0x1f;
-		//scsi_sense_buffer[2] = (m_seek >> 8) & 0xff;
-		//scsi_sense_buffer[3] = (m_seek >> 0) & 0xff;
+		//m_scsi_sense_buffer[0] = SK_NO_ERROR;
+		//m_scsi_sense_buffer[1] = (m_seek >> 16) & 0x1f;
+		//m_scsi_sense_buffer[2] = (m_seek >> 8) & 0xff;
+		//m_scsi_sense_buffer[3] = (m_seek >> 0) & 0xff;
 		scsi_data_in(SBUF_SENSE, 4);
 		scsi_status_complete(SS_GOOD);
 		break;
@@ -123,9 +123,9 @@ void nscsi_dtc510_device::scsi_command()
 		{
 			const auto &info = image->get_info();
 			auto block = std::make_unique<uint8_t[]>(info.sectorbytes);
-			const u8 fill_byte = scsi_cmdbuf[3] == 0 ? 0xe5 : scsi_cmdbuf[3];
+			const u8 fill_byte = m_scsi_cmdbuf[3] == 0 ? 0xe5 : m_scsi_cmdbuf[3];
 			memset(&block[0], fill_byte, info.sectorbytes);
-			lba = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
+			lba = get_u24be(&m_scsi_cmdbuf[1]) & 0x1fffff;
 			for(; lba < (info.cylinders * info.heads * info.sectors); lba++) {
 				image->write(lba, block.get());
 			}
@@ -134,13 +134,13 @@ void nscsi_dtc510_device::scsi_command()
 		break;
 
 	case SC_FORMAT_TRACK: {
-			if (scsi_cmdbuf[1] >> 5) {
+			if (m_scsi_cmdbuf[1] >> 5) {
 				scsi_status_complete(SS_NOT_READY);
-				scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+				m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 				return;
 			}
 
-			lba = get_u24be(&scsi_cmdbuf[1]) & 0x1fffff;
+			lba = get_u24be(&m_scsi_cmdbuf[1]) & 0x1fffff;
 			blocks = (bytes_per_sector == 256) ? 32 : 17;
 
 			int track_length = blocks*bytes_per_sector;
@@ -150,7 +150,7 @@ void nscsi_dtc510_device::scsi_command()
 			if(!image->write(lba, &block[0])) {
 				logerror("%s: HD WRITE ERROR !\n", tag());
 				scsi_status_complete(SS_FORMAT_ERROR);
-				scsi_sense_buffer[0] = SK_FORMAT_ERROR;
+				m_scsi_sense_buffer[0] = SK_FORMAT_ERROR;
 			} else {
 				scsi_status_complete(SS_GOOD);
 			}
@@ -160,9 +160,9 @@ void nscsi_dtc510_device::scsi_command()
 	case SC_ASSIGN_ALT_TRACK:
 	{
 		// TODO: unimplemented
-		if (scsi_cmdbuf[1] >> 5) {
+		if (m_scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
-			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+			m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 			return;
 		}
 
@@ -176,9 +176,9 @@ void nscsi_dtc510_device::scsi_command()
 		break;
 
 	case SC_CHECK_TRACK_FORMAT:
-		if (scsi_cmdbuf[1] >> 5) {
+		if (m_scsi_cmdbuf[1] >> 5) {
 			scsi_status_complete(SS_NOT_READY);
-			scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
+			m_scsi_sense_buffer[0] = SK_DRIVE_NOT_READY;
 			return;
 		}
 		scsi_status_complete(SS_GOOD);
@@ -196,7 +196,7 @@ void nscsi_dtc510_device::scsi_command()
 		break;
 
 	default:
-		logerror("%s: command %02x ***UNKNOWN***\n", tag(), scsi_cmdbuf[0]);
+		logerror("%s: command %02x ***UNKNOWN***\n", tag(), m_scsi_cmdbuf[0]);
 		scsi_status_complete(SS_CHECK_CONDITION);
 		break;
 	}
@@ -204,7 +204,7 @@ void nscsi_dtc510_device::scsi_command()
 
 uint8_t nscsi_dtc510_device::scsi_get_data(int id, int pos)
 {
-	switch(scsi_cmdbuf[0]) {
+	switch(m_scsi_cmdbuf[0]) {
 
 	default:
 		return nscsi_harddisk_device::scsi_get_data(id, pos);
@@ -213,7 +213,7 @@ uint8_t nscsi_dtc510_device::scsi_get_data(int id, int pos)
 
 void nscsi_dtc510_device::scsi_put_data(int id, int pos, uint8_t data)
 {
-	if (scsi_cmdbuf[0] == SC_ASSIGN_DISK_PARAMETERS && id == 4)
+	if (m_scsi_cmdbuf[0] == SC_ASSIGN_DISK_PARAMETERS && id == 4)
 	{
 		m_param[pos] = data;
 		if (pos == 9)
@@ -238,7 +238,7 @@ void nscsi_dtc510_device::scsi_put_data(int id, int pos, uint8_t data)
 		return nscsi_harddisk_device::scsi_put_data(id, pos, data);
 	}
 
-	switch(scsi_cmdbuf[0]) {
+	switch(m_scsi_cmdbuf[0]) {
 	// ...
 	default:
 		return nscsi_harddisk_device::scsi_put_data(id, pos, data);
@@ -256,7 +256,7 @@ attotime nscsi_dtc510_device::scsi_data_byte_period()
 // Command execution delay
 attotime nscsi_dtc510_device::scsi_data_command_delay()
 {
-	switch(scsi_cmdbuf[0]) {
+	switch(m_scsi_cmdbuf[0]) {
 	case SC_READ:
 	case SC_WRITE:
 	case SC_SEEK:

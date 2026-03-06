@@ -11,9 +11,12 @@ PC-FX INTC (unknown part number)
 
 DEFINE_DEVICE_TYPE(PCFX_INTC, pcfx_intc_device, "pcfx_intc", "NEC PC-FX INTC")
 
-pcfx_intc_device::pcfx_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+pcfx_intc_device::pcfx_intc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PCFX_INTC, tag, owner, clock)
 	, m_int_w(*this)
+	, m_irq_mask(0)
+	, m_irq_pending(0)
+	, m_irq_priority{0}
 {
 }
 
@@ -21,7 +24,7 @@ void pcfx_intc_device::device_start()
 {
 	save_item(NAME(m_irq_mask));
 	save_item(NAME(m_irq_pending));
-	save_pointer(NAME(m_irq_priority), 8);
+	save_item(NAME(m_irq_priority));
 }
 
 void pcfx_intc_device::device_reset()
@@ -29,14 +32,14 @@ void pcfx_intc_device::device_reset()
 	m_irq_mask = 0xffff;
 	m_irq_pending = 0;
 	std::fill_n(m_irq_priority, 8, 0);
-	m_int_w(0, CLEAR_LINE );
+	m_int_w(0, CLEAR_LINE);
 }
 
 u16 pcfx_intc_device::read(offs_t offset)
 {
 	u16 data = 0;
 
-	switch( offset )
+	switch (offset)
 	{
 		// Interrupts pending
 		// Same bit order as mask
@@ -51,21 +54,21 @@ u16 pcfx_intc_device::read(offs_t offset)
 
 		// Interrupt priority 0
 		case 0x80/4:
-			data = m_irq_priority[4] | ( m_irq_priority[5] << 3 ) | ( m_irq_priority[6] << 6 ) | ( m_irq_priority[7] << 9 );
+			data = m_irq_priority[4] | (m_irq_priority[5] << 3) | (m_irq_priority[6] << 6) | (m_irq_priority[7] << 9);
 			break;
 
 		// Interrupt priority 1
-		case 0xC0/4:
-			data = m_irq_priority[0] | ( m_irq_priority[1] << 3 ) | ( m_irq_priority[2] << 6 ) | ( m_irq_priority[3] << 9 );
+		case 0xc0/4:
+			data = m_irq_priority[0] | (m_irq_priority[1] << 3) | (m_irq_priority[2] << 6) | (m_irq_priority[3] << 9);
 			break;
 	}
 
 	return data;
 }
 
-void pcfx_intc_device::write(offs_t offset, uint16_t data)
+void pcfx_intc_device::write(offs_t offset, u16 data)
 {
-	switch( offset )
+	switch (offset)
 	{
 		// Interrupts pending
 		case 0x00/4:
@@ -94,10 +97,10 @@ void pcfx_intc_device::write(offs_t offset, uint16_t data)
 		// ----------xxx--- Priority level interrupt 14
 		// -------------xxx Priority level interrupt 15
 		case 0x80/4:
-			m_irq_priority[7] = ( data >> 0 ) & 0x07;
-			m_irq_priority[6] = ( data >> 3 ) & 0x07;
-			m_irq_priority[5] = ( data >> 6 ) & 0x07;
-			m_irq_priority[4] = ( data >> 9 ) & 0x07;
+			m_irq_priority[7] = (data >> 0) & 0x07;
+			m_irq_priority[6] = (data >> 3) & 0x07;
+			m_irq_priority[5] = (data >> 6) & 0x07;
+			m_irq_priority[4] = (data >> 9) & 0x07;
 			check_irqs();
 			break;
 
@@ -106,11 +109,11 @@ void pcfx_intc_device::write(offs_t offset, uint16_t data)
 		// -------xxx------ Priority level interrupt 9
 		// ----------xxx--- Priority level interrupt 10
 		// -------------xxx Priority level interrupt 11
-		case 0xC0/4:
-			m_irq_priority[3] = ( data >> 0 ) & 0x07;
-			m_irq_priority[2] = ( data >> 3 ) & 0x07;
-			m_irq_priority[1] = ( data >> 6 ) & 0x07;
-			m_irq_priority[0] = ( data >> 9 ) & 0x07;
+		case 0xc0/4:
+			m_irq_priority[3] = (data >> 0) & 0x07;
+			m_irq_priority[2] = (data >> 3) & 0x07;
+			m_irq_priority[1] = (data >> 6) & 0x07;
+			m_irq_priority[0] = (data >> 9) & 0x07;
 			check_irqs();
 			break;
 	}
@@ -118,14 +121,14 @@ void pcfx_intc_device::write(offs_t offset, uint16_t data)
 
 inline void pcfx_intc_device::check_irqs()
 {
-	uint16_t active_irqs = m_irq_pending & ~m_irq_mask;
+	u16 active_irqs = m_irq_pending & ~m_irq_mask;
 	int highest_prio = -1;
 
 	for (auto & elem : m_irq_priority)
 	{
-		if ( active_irqs & 0x80 )
+		if (active_irqs & 0x80)
 		{
-			if ( elem >= highest_prio )
+			if (elem >= highest_prio)
 			{
 				highest_prio = elem;
 			}
@@ -133,27 +136,27 @@ inline void pcfx_intc_device::check_irqs()
 		active_irqs <<= 1;
 	}
 
-	if ( highest_prio >= 0 )
+	if (highest_prio >= 0)
 	{
-		m_int_w(8 + highest_prio, ASSERT_LINE );
+		m_int_w(8 + highest_prio, ASSERT_LINE);
 	}
 	else
 	{
-		m_int_w(0, CLEAR_LINE );
+		m_int_w(0, CLEAR_LINE);
 	}
 }
 
 void pcfx_intc_device::set_irq_line(int line, int state)
 {
-	if ( state )
+	if (state)
 	{
 //printf("Setting irq line %d\n", line);
-		m_irq_pending |= ( 1 << ( 15 - line ) );
+		m_irq_pending |= (1 << (15 - line));
 	}
 	else
 	{
 //printf("Clearing irq line %d\n", line);
-		m_irq_pending &= ~( 1 << ( 15 - line ) );
+		m_irq_pending &= ~(1 << (15 - line));
 	}
 	check_irqs();
 }

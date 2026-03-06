@@ -61,7 +61,7 @@ Graphite hardware:
 - Main CPU: Intel Pentium III 733MHz
 - Motherboard: BCM GT694VP
 - RAM: 128MB PC100/133
-- Sound: Integrated AC97 Controller on VT82C686A Southbridge
+- Sound: Integrated AC'97 Controller on VT82C686A Southbridge
     -or ES1373/CT5880 Audio Chip
 - Networking: SMC EZ Card 10 / SMC1208T (probably 10ec:8029 1113:1208)
 - Video Card: 3DFX Voodoo 3
@@ -274,16 +274,7 @@ Notes:
 
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
-#include "cpu/mcs51/i80c51.h"
-#include "machine/pci.h"
-#include "machine/pci-ide.h"
-#include "machine/pci-smbus.h"
-#include "machine/i82443bx_host.h"
-#include "machine/i82371eb_isa.h"
-#include "machine/i82371eb_ide.h"
-#include "machine/i82371eb_acpi.h"
-#include "machine/i82371eb_usb.h"
+
 #include "bus/isa/isa_cards.h"
 #include "bus/pci/virge_pci.h"
 //#include "bus/rs232/hlemouse.h"
@@ -291,7 +282,16 @@ Notes:
 //#include "bus/rs232/rs232.h"
 //#include "bus/rs232/sun_kbd.h"
 //#include "bus/rs232/terminal.h"
+#include "cpu/i386/i386.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/fdc37c93x.h"
+#include "machine/i82443bx_host.h"
+#include "machine/i82371eb_isa.h"
+#include "machine/i82371eb_ide.h"
+#include "machine/i82371eb_acpi.h"
+#include "machine/i82371eb_usb.h"
+#include "machine/pci.h"
+#include "machine/pci-smbus.h"
 #include "video/voodoo_pci.h"
 
 namespace {
@@ -358,7 +358,7 @@ void midway_quicksilver2_state::superio_config(device_t *device)
 	fdc37m707_device &fdc = *downcast<fdc37m707_device *>(device);
 	fdc.set_sysopt_pin(0);
 	fdc.gp20_reset().set_inputline(":maincpu", INPUT_LINE_RESET);
-	fdc.gp25_gatea20().set_inputline(":maincpu", INPUT_LINE_A20);
+	fdc.gp25_gatea20().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
 #if 0
@@ -386,9 +386,10 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
 
-	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu));
+	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", 0, m_maincpu, true));
 	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
 	isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", 0, m_maincpu));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
@@ -396,7 +397,7 @@ void midway_quicksilver2_state::midqslvr(machine_config &config)
 
 	I82371EB_USB (config, "pci:07.2", 0);
 	I82371EB_ACPI(config, "pci:07.3", 0);
-	LPC_ACPI     (config, "pci:07.3:acpi", 0);
+	ACPI_PIIX4   (config, "pci:07.3:acpi");
 	SMBUS        (config, "pci:07.3:smbus", 0);
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "fdc37m707", true).set_option_machine_config("fdc37m707", superio_config);

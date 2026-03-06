@@ -42,7 +42,7 @@ m50734_device::m50734_device(const machine_config &mconfig, const char *tag, dev
 	, m_tx_count(0)
 	, m_tx_reload(0xffff)
 {
-	program_config.m_internal_map = address_map_constructor(FUNC(m50734_device::internal_map), this);
+	m_program_config.m_internal_map = address_map_constructor(FUNC(m50734_device::internal_map), this);
 }
 
 device_memory_interface::space_config_vector m50734_device::memory_space_config() const
@@ -136,7 +136,7 @@ void m50734_device::device_start()
 void m50734_device::device_reset()
 {
 	m740_device::device_reset();
-	SP = 0x01ff;
+	m_SP = 0x01ff;
 
 	// Reset port registers
 	std::fill(std::begin(m_port_direction), std::end(m_port_direction), 0x00);

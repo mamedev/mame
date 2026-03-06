@@ -9,16 +9,45 @@
 //
 //============================================================
 
+#ifdef SDLMAME_SDL3
+#include <SDL3/SDL.h>
+#include <SDL3/SDL_main.h>
+#endif
+
 #include "osdcore.h"
 
+#ifndef SDLMAME_SDL3
 #include "SDL2/SDL.h"
+#endif
 
 #include <iostream>
 #include <string>
 
 //#include "unicode.h"
 
+#ifdef SDLMAME_SDL3
+#if defined(SDL_PLATFORM_WINDOWS)
+#ifndef WINAPI
+	#define WINAPI __stdcall
+#endif
 
+// TODO: Why is this is necessary here but not for MAME itself?
+typedef struct HINSTANCE__ * HINSTANCE;
+typedef char *LPSTR;
+typedef wchar_t *PWSTR;
+
+extern "C" {
+	int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrev, LPSTR szCmdLine, int sw)
+	{
+		(void)hInst;
+		(void)hPrev;
+		(void)szCmdLine;
+		(void)sw;
+		return SDL_RunApp(0, NULL, SDL_main, NULL);
+	}
+} /* extern "C" */
+#endif
+#endif
 struct key_lookup_table { int code; const char *name; };
 
 #define KE(x) { SDL_SCANCODE_##x, "SDL_SCANCODE_" #x },
@@ -253,6 +282,14 @@ static constexpr key_lookup_table sdl_lookup[] =
 	KE(RGUI)
 
 	KE(MODE)
+#ifdef SDLMAME_SDL3
+	KE(MEDIA_NEXT_TRACK)
+	KE(MEDIA_PREVIOUS_TRACK)
+	KE(MEDIA_STOP)
+	KE(MEDIA_PLAY)
+	KE(MUTE)
+	KE(MEDIA_SELECT)
+#else
 	KE(AUDIONEXT)
 	KE(AUDIOPREV)
 	KE(AUDIOSTOP)
@@ -263,6 +300,7 @@ static constexpr key_lookup_table sdl_lookup[] =
 	KE(MAIL)
 	KE(CALCULATOR)
 	KE(COMPUTER)
+#endif
 	KE(AC_SEARCH)
 	KE(AC_HOME)
 	KE(AC_BACK)
@@ -271,7 +309,11 @@ static constexpr key_lookup_table sdl_lookup[] =
 	KE(AC_REFRESH)
 	KE(AC_BOOKMARKS)
 
-	KE(BRIGHTNESSDOWN)
+#ifdef SDLMAME_SDL3
+	KE(MEDIA_EJECT)
+	KE(SLEEP)
+#else
+
 	KE(BRIGHTNESSUP)
 	KE(DISPLAYSWITCH)
 	KE(KBDILLUMTOGGLE)
@@ -282,6 +324,7 @@ static constexpr key_lookup_table sdl_lookup[] =
 
 	KE(APP1)
 	KE(APP2)
+#endif
 };
 
 static char const *lookup_key_name(int kc)
@@ -296,49 +339,79 @@ static char const *lookup_key_name(int kc)
 
 int main(int argc, char *argv[])
 {
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+#ifdef SDLMAME_SDL3
+	if (!SDL_Init(SDL_INIT_VIDEO))
+#else
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
+#endif
+	{
 		fprintf(stderr, "Couldn't initialize SDL: %s\n", SDL_GetError());
 		exit(1);
 	}
+#ifdef SDLMAME_SDL3
+	SDL_CreateWindow("Input Test", 100, 100, 0);
+#else
 	SDL_CreateWindow("Input Test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 100, 100, 0);
+#endif
 
 	SDL_Event event;
 	bool quit = false;
 	std::string lasttext;
 	while (SDL_PollEvent(&event) || !quit) {
 		switch(event.type) {
+#ifdef SDLMAME_SDL3
+		case SDL_EVENT_QUIT:
+#else
 		case SDL_QUIT:
+#endif
 			quit = true;
 			break;
+#ifdef SDLMAME_SDL3
+		case SDL_EVENT_KEY_DOWN:
+			if (event.key.scancode == SDLK_ESCAPE) {
+#else
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_ESCAPE) {
+#endif
 				quit = true;
 			} else {
 				std::cout
 					<< "ITEM_ID_XY "
+#ifdef SDLMAME_SDL3
+					<< lookup_key_name(event.key.scancode)
+#else
 					<< lookup_key_name(event.key.keysym.scancode)
+#endif
 					<< ' '
 					<< std::endl;
 				lasttext.clear();
 			}
 			break;
+#ifdef SDLMAME_SDL3
+		case SDL_EVENT_KEY_UP:
+#else
 		case SDL_KEYUP:
+#endif
 			std::cout
 				<< "ITEM_ID_XY "
+#ifdef SDLMAME_SDL3
+				<< lookup_key_name(event.key.scancode)
+#else
 				<< lookup_key_name(event.key.keysym.scancode)
+#endif
 				<< ' '
 				<< lasttext
 				<< std::endl;
 			break;
+#ifdef SDLMAME_SDL3
+		case SDL_EVENT_TEXT_INPUT:
+#else
 		case SDL_TEXTINPUT:
+#endif
 			lasttext = event.text.text;
 			break;
 		}
 		event.type = 0;
-
-#ifdef SDLMAME_OS2
-		SDL_Delay(10);
-#endif
 	}
 	SDL_Quit();
 	return(0);

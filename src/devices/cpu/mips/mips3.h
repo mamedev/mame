@@ -14,12 +14,13 @@ MIPS III/IV emulator.
 
 #pragma once
 
-
-#include "cpu/drcfe.h"
-#include "cpu/drcuml.h"
 #include "ps2vu.h"
 
+#include "cpu/drcuml.h"
+
 #include "divtlb.h"
+
+#include <bitset>
 
 
 DECLARE_DEVICE_TYPE(R4000BE, r4000be_device)
@@ -257,11 +258,10 @@ INTERRUPT CONSTANTS
 STRUCTURES
 ***************************************************************************/
 
-class mips3_frontend;
-
 class mips3_device : public cpu_device, public device_vtlb_interface {
 protected:
-	friend class mips3_frontend;
+	class frontend;
+	class opcode_desc;
 
 	/* MIPS flavors */
 	enum mips3_flavor {
@@ -303,6 +303,7 @@ protected:
 public:
 	// construction/destruction
 	mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endiannes, uint32_t data_bits);
+	virtual ~mips3_device();
 
 	void set_drc_cache_size(size_t bytes) { m_drc_cache.set_size(bytes); }
 	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
@@ -480,8 +481,8 @@ protected:
 
 	/* core state */
 	drc_cache       m_drc_cache;                /* pointer to the DRC code cache */
-	std::unique_ptr<drcuml_state>      m_drcuml;/* DRC UML generator state */
-	std::unique_ptr<mips3_frontend>    m_drcfe; /* pointer to the DRC front-end state */
+	std::unique_ptr<drcuml_state>  m_drcuml;    /* DRC UML generator state */
+	std::unique_ptr<frontend>      m_drcfe;     /* pointer to the DRC front-end state */
 	uint32_t        m_drcoptions;               /* configurable DRC options */
 
 												/* internal stuff */
@@ -655,8 +656,8 @@ private:
 	void generate_badcop(drcuml_block &block, const int cop);
 
 	void log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op);
-	const char *log_desc_flags_to_string(uint32_t flags);
-	void log_register_list(const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);
+	const char *log_desc_flags_to_string(opcode_desc const &desc);
+	void log_register_list(const char *string, const std::bitset<68> &reglist, const std::bitset<68> *regnostarlist);
 	void log_opcode_desc(const opcode_desc *desclist, int indent);
 
 	void load_elf();
@@ -1008,31 +1009,6 @@ public:
 		: mips3_device(mconfig, RM7000LE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_LITTLE, 32) // Should be 64 bits
 	{
 	}
-};
-
-
-
-class mips3_frontend : public drc_frontend {
-public:
-	// construction/destruction
-	mips3_frontend(mips3_device *mips3, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
-
-protected:
-	// required overrides
-	virtual bool describe(opcode_desc &desc, const opcode_desc *prev) override;
-
-private:
-	// internal helpers
-	bool describe_special(uint32_t op, opcode_desc &desc);
-	bool describe_regimm(uint32_t op, opcode_desc &desc);
-	bool describe_idt(uint32_t op, opcode_desc &desc);
-	bool describe_cop0(uint32_t op, opcode_desc &desc);
-	bool describe_cop1(uint32_t op, opcode_desc &desc);
-	bool describe_cop1x(uint32_t op, opcode_desc &desc);
-	bool describe_cop2(uint32_t op, opcode_desc &desc);
-
-	// internal state
-	mips3_device *m_mips3;
 };
 
 

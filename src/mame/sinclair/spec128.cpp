@@ -237,6 +237,13 @@ void spectrum_128_state::spectrum_128_port_7ffd_w(offs_t offset, uint8_t data)
 	m_exp->iorq_w(offset | 1, data);
 }
 
+void spectrum_128_state::bank3_set_page(u8 page)
+{
+	m_port_7ffd_data &= 0xf8;
+	m_port_7ffd_data |= page & 0x07;
+	spectrum_128_update_memory();
+}
+
 void spectrum_128_state::spectrum_128_update_memory()
 {
 	m_bank_rom[0]->set_entry(BIT(m_port_7ffd_data, 4));
@@ -443,7 +450,7 @@ void spectrum_128_state::spectrum_128(machine_config &config)
 
 	dma_slot_device &dma(DMA_SLOT(config.replace(), "dma", X1_128_SINCLAIR / 10, default_dma_slot_devices, nullptr));
 	dma.set_io_space(m_maincpu, AS_IO);
-	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSRQ);
+	dma.out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
 	dma.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	dma.in_mreq_callback().set([this](offs_t offset) { return m_program.read_byte(offset); });
 	dma.out_mreq_callback().set([this](offs_t offset, u8 data) { m_program.write_byte(offset, data); });

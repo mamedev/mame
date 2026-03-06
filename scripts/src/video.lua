@@ -1089,6 +1089,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/pc_vga_chips.h,VIDEOS["PC_VGA_CHIPS"] = true
+--------------------------------------------------
+
+if VIDEOS["PC_VGA_CHIPS"] then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_chips.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_chips.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/pc_vga_cirrus.h,VIDEOS["PC_VGA_CIRRUS"] = true
 --------------------------------------------------
 
@@ -1158,6 +1170,19 @@ if VIDEOS["PC_VGA_PARADISE"] then
 		MAME_DIR .. "src/devices/video/pc_vga_paradise.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/pc_vga_video7.h,VIDEOS["PC_VGA_VIDEO7"] = true
+--------------------------------------------------
+
+if VIDEOS["PC_VGA_VIDEO7"] then
+	files {
+		MAME_DIR .. "src/devices/video/pc_vga_video7.cpp",
+		MAME_DIR .. "src/devices/video/pc_vga_video7.h",
+	}
+end
+
 
 --------------------------------------------------
 --

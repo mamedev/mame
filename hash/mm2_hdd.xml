@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="mm2_hdd" description="Nokia MikroMikko 2 hard disks">
+
+	<software name="msdos221">
+		<description>Nokia MS-DOS 2.00 Versio 2.21 (Fin)</description>
+		<year>1985</year>
+		<publisher>Nokia Data</publisher>
+
+		<!-- Seagate ST-412 -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="st412" sha1="d87103175119edcf4d4efc252df46c9b59b2c351" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

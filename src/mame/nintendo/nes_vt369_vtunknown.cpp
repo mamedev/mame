@@ -1473,7 +1473,7 @@ CONS( 2018, rbbrite,    0,        0,  vt369_unk_1mb, vt369, vt36x_state, empty_i
 
 // there's also a 250+ version of the unit below at least; protection(?) is similar to rbbrite
 CONS( 2018, goretrop,  0,         0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games", MACHINE_NOT_WORKING )
-CONS( 2018, goretropa, goretrop,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games (older)", MACHINE_NOT_WORKING ) // doesn't have commando or higemaru 
+CONS( 2018, goretropa, goretrop,  0,  vt369_unk_32mb, vt369, vt36x_state, empty_init,    "Retro-Bit", "Go Retro Portable 260+ Games (older)", MACHINE_NOT_WORKING ) // doesn't have commando or higemaru
 
 // all games after the first 180 listed on the menu are duplicates. BTANB: games 501-520 are mislabeled duplicates: e.g., "511. Exerion" actually loads Pac-Man.
 // unused routines suggest this was originally developed for nes_vt42xx.cpp hardware (cf. g9_666, g5_500 with the same bitswap)

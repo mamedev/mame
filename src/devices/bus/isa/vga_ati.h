@@ -12,6 +12,7 @@
 
 #include "isa.h"
 
+#include "machine/eepromser.h"
 #include "video/ati_mach32.h"
 #include "video/ati_mach8.h"
 #include "video/pc_vga_ati.h"
@@ -47,6 +48,7 @@ protected:
 private:
 	required_device<ati_vga_device> m_vga;
 	required_device<mach8_device> m_8514;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 class isa16_vga_gfxultrapro_device :
@@ -72,6 +74,7 @@ protected:
 
 private:
 	required_device<mach32_device> m_vga;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 class isa16_vga_mach64_device :
@@ -96,6 +99,7 @@ protected:
 	void io_isa_map(address_map &map) ATTR_COLD;
 private:
 	required_device<mach64_device> m_vga;
+	required_device<eeprom_serial_93cxx_device> m_eeprom;
 };
 
 

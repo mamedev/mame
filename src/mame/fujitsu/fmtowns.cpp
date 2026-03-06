@@ -244,6 +244,7 @@ Notes:
 #define LOG_SYS        (1U << 1)
 #define LOG_CD         (1U << 2)
 #define LOG_CD_UNKNOWN (1U << 3)
+#define LOG_IRQ        (1U << 4)
 
 #define VERBOSE (LOG_GENERAL | LOG_CD_UNKNOWN)
 #include "logmacro.h"
@@ -494,7 +495,7 @@ void towns_state::mb8877a_irq_w(int state)
 	if(m_towns_fdc_irq6mask == 0)
 		state = 0;
 	m_pic_master->ir6_w(state);  // IRQ6 = FDC
-	if(IRQ_LOG) logerror("PIC: IRQ6 (FDC) set to %i\n",state);
+	LOGMASKED(LOG_IRQ,"PIC: IRQ6 (FDC) set to %i\n",state);
 }
 
 void towns_state::mb8877a_drq_w(int state)
@@ -695,7 +696,7 @@ void towns_state::kb_sendcode(uint8_t scancode, int release)
 	if(m_towns_kb_irq1_enable)
 	{
 		m_pic_master->ir1_w(1);
-		if(IRQ_LOG) logerror("PIC: IRQ1 (keyboard) set high\n");
+		LOGMASKED(LOG_IRQ,"PIC: IRQ1 (keyboard) set high\n");
 	}
 	//logerror("KB: sending scancode 0x%02x\n",scancode);
 }
@@ -731,7 +732,7 @@ uint8_t towns_state::towns_keyboard_r(offs_t offset)
 			ret = m_towns_kb_output;
 			//logerror("KB: read keyboard output port, returning %02x\n",ret);
 			m_pic_master->ir1_w(0);
-			if(IRQ_LOG) logerror("PIC: IRQ1 (keyboard) set low\n");
+			LOGMASKED(LOG_IRQ,"PIC: IRQ1 (keyboard) set low\n");
 			if(m_towns_kb_extend != 0xff)
 			{
 				kb_sendcode(m_towns_kb_extend,2);
@@ -876,7 +877,7 @@ uint8_t towns_state::towns_sound_ctrl_r(offs_t offset)
 			if(m_towns_fm_irq_flag == 0)
 			{
 				m_pic_slave->ir5_w(0);
-				if(IRQ_LOG) logerror("PIC: IRQ13 (PCM) set low\n");
+				LOGMASKED(LOG_IRQ,"PIC: IRQ13 (PCM) set low\n");
 			}
 			break;
 //      default:
@@ -1101,7 +1102,7 @@ void towns_state::towns_cdrom_set_irq(int line,int state)
 					{
 						m_towns_cd.status |= 0x80;
 						m_pic_slave->ir1_w(1);
-						if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM) set high\n");
+						LOGMASKED(LOG_IRQ,"PIC: IRQ9 (CD-ROM) set high\n");
 					}
 				}
 				else
@@ -1111,7 +1112,7 @@ void towns_state::towns_cdrom_set_irq(int line,int state)
 			{
 				m_towns_cd.status &= ~0x80;
 				m_pic_slave->ir1_w(0);
-				if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM) set low\n");
+				LOGMASKED(LOG_IRQ,"PIC: IRQ9 (CD-ROM) set low\n");
 			}
 			break;
 		case TOWNS_CD_IRQ_DMA:
@@ -1123,7 +1124,7 @@ void towns_state::towns_cdrom_set_irq(int line,int state)
 					{
 						m_towns_cd.status |= 0x40;
 						m_pic_slave->ir1_w(1);
-						if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM DMA) set high\n");
+						LOGMASKED(LOG_IRQ,"PIC: IRQ9 (CD-ROM DMA) set high\n");
 					}
 				}
 				else
@@ -1133,7 +1134,7 @@ void towns_state::towns_cdrom_set_irq(int line,int state)
 			{
 				m_towns_cd.status &= ~0x40;
 				m_pic_slave->ir1_w(0);
-				if(IRQ_LOG) logerror("PIC: IRQ9 (CD-ROM DMA) set low\n");
+				LOGMASKED(LOG_IRQ,"PIC: IRQ9 (CD-ROM DMA) set low\n");
 			}
 			break;
 	}
@@ -1761,8 +1762,7 @@ void towns_state::rtc_busy_w(int state)
 void towns_state::towns_scsi_irq(int state)
 {
 	m_pic_slave->ir0_w(state);
-	if(IRQ_LOG)
-		logerror("PIC: IRQ8 (SCSI) set to %i\n",state);
+	LOGMASKED(LOG_IRQ,"PIC: IRQ8 (SCSI) set to %i\n",state);
 }
 
 void towns_state::towns_scsi_drq(int state)
@@ -1849,7 +1849,7 @@ void towns_state::towns_fm_irq(int state)
 	{
 		m_towns_fm_irq_flag = 1;
 		m_pic_slave->ir5_w(1);
-		if(IRQ_LOG) logerror("PIC: IRQ13 (FM) set high\n");
+		LOGMASKED(LOG_IRQ,"PIC: IRQ13 (FM) set high\n");
 	}
 	else
 	{
@@ -1857,7 +1857,7 @@ void towns_state::towns_fm_irq(int state)
 		if(m_towns_pcm_irq_flag == 0)
 		{
 			m_pic_slave->ir5_w(0);
-			if(IRQ_LOG) logerror("PIC: IRQ13 (FM) set low\n");
+			LOGMASKED(LOG_IRQ,"PIC: IRQ13 (FM) set low\n");
 		}
 	}
 }
@@ -1870,7 +1870,7 @@ RF5C68_SAMPLE_END_CB_MEMBER(towns_state::towns_pcm_irq)
 		m_towns_pcm_irq_flag = 1;
 		m_towns_pcm_channel_flag |= (1 << channel);
 		m_pic_slave->ir5_w(1);
-		if(IRQ_LOG) logerror("PIC: IRQ13 (PCM) set high (channel %i)\n",channel);
+		LOGMASKED(LOG_IRQ,"PIC: IRQ13 (PCM) set high (channel %i)\n",channel);
 	}
 }
 
@@ -1881,7 +1881,7 @@ void towns_state::towns_pit_out0_changed(int state)
 	if(m_towns_timer_mask & 0x01)
 	{
 		m_timer0 = state;
-		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer ch0) set to %i\n",state);
+		LOGMASKED(LOG_IRQ,"PIC: IRQ0 (PIT Timer ch0) set to %i\n",state);
 	}
 	else
 		m_timer0 = 0;
@@ -1896,7 +1896,7 @@ void towns_state::towns_pit_out1_changed(int state)
 	if(m_towns_timer_mask & 0x02)
 	{
 		m_timer1 = state;
-		if(IRQ_LOG) logerror("PIC: IRQ0 (PIT Timer ch1) set to %i\n",state);
+		LOGMASKED(LOG_IRQ,"PIC: IRQ0 (PIT Timer ch1) set to %i\n",state);
 	}
 	else
 		m_timer1 = 0;
@@ -1926,6 +1926,7 @@ void towns_state::towns_serial_w(offs_t offset, uint8_t data)
 			break;
 		case 4:
 			m_serial_irq_enable = data;
+			// TODO: should this trigger a previously masked serial IRQ, or drop a newly masked one?
 			break;
 		default:
 			logerror("Invalid or unimplemented serial port write [offset=%02x, data=%02x]\n",offset,data);
@@ -1949,27 +1950,45 @@ uint8_t towns_state::towns_serial_r(offs_t offset)
 
 void towns_state::towns_serial_irq(int state)
 {
-	m_serial_irq_source = state ? 0x01 : 0x00;
-	m_pic_master->ir2_w(state);
-	popmessage("Serial IRQ state: %i\n",state);
+	if((state ? 0x01 : 0x00) != m_serial_irq_source)
+	{
+		m_serial_irq_source = state ? 0x01 : 0x00;
+		m_pic_master->ir2_w(state);
+		popmessage("Serial IRQ state: %i\n",state);
+	}
 }
 
 void towns_state::towns_rxrdy_irq(int state)
 {
+	if(state)
+		m_serial_irq_state |= RXRDY_IRQ_ENABLE;
+	else
+		m_serial_irq_enable &= ~RXRDY_IRQ_ENABLE;
+
 	if(m_serial_irq_enable & RXRDY_IRQ_ENABLE)
-		towns_serial_irq(state);
+		towns_serial_irq((m_serial_irq_enable & m_serial_irq_state) ? 1 : 0);
 }
 
 void towns_state::towns_txrdy_irq(int state)
 {
+	if(state)
+		m_serial_irq_state |= TXRDY_IRQ_ENABLE;
+	else
+		m_serial_irq_enable &= ~TXRDY_IRQ_ENABLE;
+
 	if(m_serial_irq_enable & TXRDY_IRQ_ENABLE)
-		towns_serial_irq(state);
+		towns_serial_irq((m_serial_irq_enable & m_serial_irq_state) ? 1 : 0);
 }
 
 void towns_state::towns_syndet_irq(int state)
 {
+	if(state)
+		m_serial_irq_state |= SYNDET_IRQ_ENABLE;
+	else
+		m_serial_irq_enable &= ~SYNDET_IRQ_ENABLE;
+
 	if(m_serial_irq_enable & SYNDET_IRQ_ENABLE)
-		towns_serial_irq(state);
+		towns_serial_irq((m_serial_irq_enable & m_serial_irq_state) ? 1 : 0);
 }
 
 
@@ -2409,7 +2428,11 @@ void towns_state::driver_start()
 	save_item(NAME(m_pit_out0));
 	save_item(NAME(m_pit_out1));
 	save_item(NAME(m_pit_out2));
+	save_item(NAME(m_timer0));
+	save_item(NAME(m_timer1));
 	save_item(NAME(m_serial_irq_source));
+	save_item(NAME(m_serial_irq_enable));
+	save_item(NAME(m_serial_irq_state));
 
 	save_item(NAME(m_kb_prev));
 	save_item(NAME(m_prev_pad_mask));
@@ -2499,7 +2522,9 @@ void towns_state::machine_start()
 
 	m_timer0 = 0;
 	m_timer1 = 0;
+	m_serial_irq_source = 0;
 	m_serial_irq_enable = 0;
+	m_serial_irq_state = 0;
 }
 
 void towns_state::machine_reset()
@@ -2523,7 +2548,6 @@ void towns_state::machine_reset()
 	m_intervaltimer2_irqmask = 1;  // masked
 	m_towns_kb_timer->adjust(attotime::zero,0,attotime::from_msec(10));
 	m_towns_freerun_counter->adjust(attotime::zero,0,attotime::from_usec(1));
-	m_serial_irq_source = 0;
 	m_rtc_d = 0;
 	m_rtc_busy = false;
 	m_vram_mask_addr = 0;
