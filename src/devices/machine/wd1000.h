@@ -86,6 +86,7 @@ private:
 	attotime get_stepping_rate();
 	void start_command();
 	void end_command();
+	bool validate_id_field();
 	int get_lbasector();
 
 	int head() { return (m_sdh >> 0) & 0x07; }
