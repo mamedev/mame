@@ -37,7 +37,6 @@
 #include "specnext_uart.h"
 
 #include "bus/rs232/rs232.h"
-#include "bus/rs232/loopback.h"
 #include "bus/rs232/null_modem.h"
 #include "bus/rs232/pty.h"
 #include "bus/spectrum/zxbus/bus.h"
@@ -3962,9 +3961,13 @@ void specnext_state::video_start()
 	});
 }
 
+static DEVICE_INPUT_DEFAULTS_START(rs232_baud)
+	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_115200 )
+	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_115200 )
+DEVICE_INPUT_DEFAULTS_END
+
 static void rs232_devices(device_slot_interface &device)
 {
-	device.option_add("loopback",   RS232_LOOPBACK);
 	device.option_add("null_modem", NULL_MODEM);
 	device.option_add("pty",        PSEUDO_TERMINAL);
 }
@@ -4024,6 +4027,8 @@ void specnext_state::tbblue(machine_config &config)
 	m_uart[0]->out_tx_empty_callback().set(m_im2_uart0_tx, FUNC(specnext_im2_device::irq_w));
 	rs232_port_device &rs232_esp(RS232_PORT(config, "rs232_esp", rs232_devices, nullptr));
 	rs232_esp.rxd_handler().set(m_uart[0], FUNC(specnext_uart_device::rx_w));
+	rs232_esp.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
+	rs232_esp.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
 
 	SPECNEXT_IM2(config, m_im2_uart1_rx);
 	m_im2_uart1_rx->irq_callback().set(FUNC(specnext_state::irq_w));
@@ -4037,6 +4042,8 @@ void specnext_state::tbblue(machine_config &config)
 	m_uart[1]->out_tx_empty_callback().set(m_im2_uart1_tx, FUNC(specnext_im2_device::irq_w));
 	rs232_port_device &rs232_rpi(RS232_PORT(config, "rs232_rpi", rs232_devices, nullptr));
 	rs232_rpi.rxd_handler().set(m_uart[1], FUNC(specnext_uart_device::rx_w));
+	rs232_rpi.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
+	rs232_rpi.set_option_device_input_defaults("pty", DEVICE_INPUT_DEFAULTS_NAME(rs232_baud));
 
 	SPI_SDCARD(config, m_sdcards[0], 0);
 	m_sdcards[0]->set_prefer_sdhc();
