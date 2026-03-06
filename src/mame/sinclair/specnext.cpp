@@ -124,13 +124,15 @@ public:
 		, m_view7(*this, "mem_view7")
 		, m_im2_line(*this, "im2_line")
 		, m_im2_uart0_rx(*this, "im2_uart0_rx")
+		, m_im2_uart1_rx(*this, "im2_uart1_rx")
 		, m_im2_ula(*this, "im2_ula")
 		, m_im2_uart0_tx(*this, "im2_uart0_tx")
+		, m_im2_uart1_tx(*this, "im2_uart1_tx")
 		, m_copper(*this, "copper")
 		, m_ctc(*this, "ctc")
 		, m_dma(*this, "dma")
 		, m_i2c(*this, "i2c")
-		, m_uart0(*this, "uart0")
+		, m_uart(*this, "uart%u", 0U)
 		, m_sdcards(*this, "sdcard%u", 0U)
 		, m_ay(*this, "ay%u", 0U)
 		, m_dac(*this, "dac%u", 0U)
@@ -361,13 +363,15 @@ private:
 	memory_view m_view0, m_view1, m_view2, m_view3, m_view4, m_view5, m_view6, m_view7;
 	required_device<specnext_im2_device> m_im2_line;
 	optional_device<specnext_im2_device> m_im2_uart0_rx;
+	optional_device<specnext_im2_device> m_im2_uart1_rx;
 	required_device<specnext_im2_device> m_im2_ula;
 	optional_device<specnext_im2_device> m_im2_uart0_tx;
+	optional_device<specnext_im2_device> m_im2_uart1_tx;
 	required_device<specnext_copper_device> m_copper;
 	required_device<specnext_ctc_device> m_ctc;
 	required_device<specnext_dma_device> m_dma;
 	optional_device<i2c_ds1307_device> m_i2c;
-	optional_device<specnext_uart_device> m_uart0;
+	optional_device_array<specnext_uart_device, 2> m_uart;
 	required_device_array<spi_sdcard_device, 2> m_sdcards;
 	required_device_array<ym2149_device, 3> m_ay;
 	required_device_array<dac_byte_interface, 4> m_dac;
@@ -1200,24 +1204,21 @@ void specnext_state::i2c_scl_w(u8 data)
 
 template <u8 Reg> u8 specnext_state::uart_reg_r()
 {
-	if (!port_uart_io_en() || m_uart_select)
+	if (!port_uart_io_en())
 		return 0x00;
 
-	return m_uart0->reg_r(Reg);
+	return m_uart[m_uart_select]->reg_r(Reg);
 }
 
 template <u8 Reg> void specnext_state::uart_reg_w(u8 data)
 {
-	if (!port_uart_io_en() || (m_uart_select && (Reg != 0b01)))
+	if (!port_uart_io_en())
 		return;
 
 	if (Reg == 0b01)
-	{
 		m_uart_select = BIT(data, 6);
-		if (m_uart_select)
-			return;
-	}
-	m_uart0->reg_w(Reg, data);
+
+	m_uart[m_uart_select]->reg_w(Reg, data);
 }
 
 void specnext_state::turbosound_address_w(u8 data)
@@ -2632,20 +2633,22 @@ void specnext_state::nr_c0_im2_vector_w(bool mode_im2, u8 vector)
 	const u8 vector_base = mode_im2 ? m_nr_c0_im2_vector << 5 : 0xff;
 	m_im2_line->vector_w(vector_base | (INT_PRIORITY_LINE << 1));
 	m_im2_uart0_rx->vector_w(vector_base | (INT_PRIORITY_UART0_RX << 1));
+	m_im2_uart1_rx->vector_w(vector_base | (INT_PRIORITY_UART1_RX << 1));
 	m_ctc->vector_w(vector_base);
 	m_im2_ula->vector_w(vector_base | (INT_PRIORITY_ULA << 1));
 	m_im2_uart0_tx->vector_w(vector_base | (INT_PRIORITY_UART0_TX << 1));
+	m_im2_uart1_tx->vector_w(vector_base | (INT_PRIORITY_UART1_TX << 1));
 }
 
 static const z80_daisy_config z80_daisy_chain[] =
 {
 	{ "im2_line" },
 	{ "im2_uart0_rx" },
-	// { "im2_uart1_rx" },
+	{ "im2_uart1_rx" },
 	{ "ctc" },
 	{ "im2_ula" },
 	{ "im2_uart0_tx" },
-	//{ "im2_uart1_tx" },
+	{ "im2_uart1_tx" },
 	{ nullptr }
 };
 
@@ -2680,12 +2683,14 @@ void specnext_state::irq_w(int state)
 	const int tmp = m_im2_int_status;
 	m_im2_int_status &= 1 << INT_PRIORITY_NMI;
 	m_im2_int_status |= ((m_im2_uart0_tx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART0_TX;
+	m_im2_int_status |= ((m_im2_uart1_tx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART1_TX;
 	m_im2_int_status |= ((m_im2_ula->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_ULA;
 	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(3) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 3);
 	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(2) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 2);
 	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(1) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 1);
 	m_im2_int_status |= ((m_ctc->z80daisy_chanel_irq_state(0) & Z80_DAISY_IEO) != 0) << (INT_PRIORITY_CTC + 0);
 	m_im2_int_status |= ((m_im2_uart0_rx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART0_RX;
+	m_im2_int_status |= ((m_im2_uart1_rx->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_UART1_RX;
 	m_im2_int_status |= ((m_im2_line->z80daisy_irq_state() & Z80_DAISY_IEO) != 0) << INT_PRIORITY_LINE;
 	LOGINTVVV("IRQ%s: %04x -> %04x\n", state ? "+" : "-", tmp, m_im2_int_status);
 
@@ -4013,12 +4018,25 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_IM2(config, m_im2_uart0_tx);
 	m_im2_uart0_tx->irq_callback().set(FUNC(specnext_state::irq_w));
 
-	SPECNEXT_UART(config, m_uart0, 28_MHz_XTAL);
-	m_uart0->out_txd_callback().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_uart0->out_rx_full_near_callback().set(m_im2_uart0_rx, FUNC(specnext_im2_device::irq_w));
-	m_uart0->out_tx_empty_callback().set(m_im2_uart0_tx, FUNC(specnext_im2_device::irq_w));
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_uart0, FUNC(specnext_uart_device::rx_w));
+	SPECNEXT_UART(config, m_uart[0], 28_MHz_XTAL);
+	m_uart[0]->out_txd_callback().set("rs232_esp", FUNC(rs232_port_device::write_txd));
+	m_uart[0]->out_rx_full_near_callback().set(m_im2_uart0_rx, FUNC(specnext_im2_device::irq_w));
+	m_uart[0]->out_tx_empty_callback().set(m_im2_uart0_tx, FUNC(specnext_im2_device::irq_w));
+	rs232_port_device &rs232_esp(RS232_PORT(config, "rs232_esp", rs232_devices, nullptr));
+	rs232_esp.rxd_handler().set(m_uart[0], FUNC(specnext_uart_device::rx_w));
+
+	SPECNEXT_IM2(config, m_im2_uart1_rx);
+	m_im2_uart1_rx->irq_callback().set(FUNC(specnext_state::irq_w));
+
+	SPECNEXT_IM2(config, m_im2_uart1_tx);
+	m_im2_uart1_tx->irq_callback().set(FUNC(specnext_state::irq_w));
+
+	SPECNEXT_UART(config, m_uart[1], 28_MHz_XTAL);
+	m_uart[1]->out_txd_callback().set("rs232_rpi", FUNC(rs232_port_device::write_txd));
+	m_uart[1]->out_rx_full_near_callback().set(m_im2_uart1_rx, FUNC(specnext_im2_device::irq_w));
+	m_uart[1]->out_tx_empty_callback().set(m_im2_uart1_tx, FUNC(specnext_im2_device::irq_w));
+	rs232_port_device &rs232_rpi(RS232_PORT(config, "rs232_rpi", rs232_devices, nullptr));
+	rs232_rpi.rxd_handler().set(m_uart[1], FUNC(specnext_uart_device::rx_w));
 
 	SPI_SDCARD(config, m_sdcards[0], 0);
 	m_sdcards[0]->set_prefer_sdhc();
