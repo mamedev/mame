@@ -28,7 +28,6 @@
  First Games arcade cab (see the bezel left upper corner with the roulette):
   - https://www.recreativas.org/first-games-954-covielsa
 
-
  Version with a PIC16C54 as main CPU:
   _____________________________________________
  |  |_8xDIPS_|   __________            O <- GREEN LED
@@ -41,7 +40,6 @@
  |        |  |<-CNY/74-4  |  |<-TL7702ACP     |
  |        |__|  |__|      |__|                |
  |____________________________________________|
-
 
  There is another type of PCB  with a Z80 (exact model unknown) and a external ROM.
 
