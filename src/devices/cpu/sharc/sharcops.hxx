@@ -60,8 +60,8 @@
 		}                                                   \
 	}
 
-#define SHARC_COND_LT  (m_core->astat & AF ? m_core->astat & AN && !(m_core->astat & AZ) : ((m_core->astat & AN) != 0) != (m_core->astat & AV && !(m_core->mode1 & MODE1_ALUSAT)))
-#define SHARC_COND_LE  (m_core->astat & AZ || (m_core->astat & AF ? m_core->astat & AN : ((m_core->astat & AN) != 0) != (m_core->astat & AV && !(m_core->mode1 & MODE1_ALUSAT))))
+#define SHARC_COND_LT  ((m_core->astat & AF) ? ((m_core->astat & AN) && !(m_core->astat & AZ)) : (bool(m_core->astat & AN) != ((m_core->astat & AV) && !(m_core->mode1 & MODE1_ALUSAT))))
+#define SHARC_COND_LE  ((m_core->astat & AZ) || ((m_core->astat & AF) ? (m_core->astat & AN) : (bool(m_core->astat & AN) != ((m_core->astat & AV) && !(m_core->mode1 & MODE1_ALUSAT)))))
 
 /*****************************************************************************/
 
