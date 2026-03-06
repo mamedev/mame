@@ -58,7 +58,7 @@
 
 namespace {
 
-#define TIMINGS_PERFECT     1
+#define TIMINGS_PERFECT     0
 
 constexpr u8 INT_PRIORITY_LINE     = 0;
 constexpr u8 INT_PRIORITY_UART0_RX = 1;
