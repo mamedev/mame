@@ -120,14 +120,15 @@ private:
 	uint8_t     *m_roz_rom = nullptr;
 	uint8_t     m_roz_rombase = 0;
 
-	/* sound */
-	uint8_t     m_sound_ctrl = 0;
-	uint8_t     m_sound_nmi_clk = 0;
-
 	bool        m_video_priority_mode = false;
 	std::unique_ptr<uint16_t[]> m_banked_ram;
 	bool        m_single_screen_mode = false;
 	uint8_t     m_video_mux_bank = 0;
+
+	/* misc */
+	uint8_t     m_sound_ctrl = 0;
+	uint8_t     m_sound_nmi_clk = 0;
+	bool        m_irq5_enable = false;
 
 	uint16_t sysregs_r(offs_t offset, uint16_t mem_mask = ~0);
 	void sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -173,7 +174,6 @@ uint16_t rungun_state::sysregs_r(offs_t offset, uint16_t mem_mask)
 		case 0x02/2:
 			return (m_p_inputs[1]->read() | m_p_inputs[3]->read() << 8);
 
-
 		case 0x04/2:
 			/*
 			    bit0-7: coin mechs and services
@@ -218,19 +218,21 @@ void rungun_state::sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			*/
 			if (ACCESSING_BITS_0_7)
 			{
-				m_spriteram_bank->set_entry((data & 0x80) >> 7);
-				m_video_mux_bank = ((data & 0x80) >> 7) ^ 1;
+				m_spriteram_bank->set_entry(BIT(data, 7));
+				m_video_mux_bank = BIT(data, 7) ^ 1;
 				m_eepromout->write(data, 0xff);
 
-				machine().bookkeeping().coin_counter_w(0, data & 0x08);
-				machine().bookkeeping().coin_counter_w(1, data & 0x10);
+				machine().bookkeeping().coin_counter_w(0, BIT(data, 3));
+				machine().bookkeeping().coin_counter_w(1, BIT(data, 4));
 			}
 			if (ACCESSING_BITS_8_15)
 			{
-				m_single_screen_mode = (data & 0x1000) == 0x1000;
-				m_video_priority_mode = (data & 0x4000) == 0x4000;
-				if (!(data & 0x400)) // actually a 0 -> 1 transition
+				m_irq5_enable = BIT(data, 10);
+				if (!m_irq5_enable)
 					m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
+
+				m_single_screen_mode = BIT(data, 12);
+				m_video_priority_mode = BIT(data, 14);
 			}
 			break;
 
@@ -242,7 +244,7 @@ void rungun_state::sysregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			    bit 3  : MUTE
 			    bit 7-4: base address for 53936 ROM readback.
 			*/
-			m_k055673->k053246_set_objcha_line((data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			m_k055673->k053246_set_objcha_line(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
 			m_roz_rombase = (data & 0xf0) >> 4;
 			break;
 	}
@@ -259,8 +261,8 @@ INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 	// send to sprite device current state (i.e. bread & butter sprite DMA)
 	// TODO: firing this in screen update causes sprites to desync badly ...
 	sprite_dma_trigger();
-	bool is_irq5_enabled = BIT(m_sysreg[0x08/2],10)!=0;
-	if( is_irq5_enabled )
+
+	if (m_irq5_enable)
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
 }
 
@@ -488,7 +490,7 @@ void rungun_state::sound_ctrl_w(uint8_t data)
 
 	m_bank2->set_entry(data & 0x07);
 
-	if (!(data & 0x10))
+	if (!BIT(data, 4))
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 
 	m_sound_ctrl = data;
@@ -496,13 +498,11 @@ void rungun_state::sound_ctrl_w(uint8_t data)
 
 void rungun_state::k054539_nmi_gen(int state)
 {
-	if (m_sound_ctrl & 0x10)
+	if (BIT(m_sound_ctrl, 4))
 	{
 		// Trigger an /NMI on the rising edge
 		if (!m_sound_nmi_clk && state)
-		{
 			m_soundcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-		}
 	}
 
 	m_sound_nmi_clk = state;
@@ -630,12 +630,14 @@ void rungun_state::machine_start()
 
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_nmi_clk));
+	save_item(NAME(m_irq5_enable));
 }
 
 void rungun_state::machine_reset()
 {
 	memset(m_sysreg, 0, 0x20);
 	m_sound_ctrl = 0;
+	m_irq5_enable = false;
 }
 
 void rungun_state::rng(machine_config &config)
