@@ -422,6 +422,7 @@ protected:
 	u8 downtown_ip_r(offs_t offset);
 	void calibr50_sub_bankswitch_w(u8 data);
 	void calibr50_soundlatch2_w(u8 data);
+	void calibr50_sub_reset_w(u8 data);
 	void twineagl_ctrl_w(u8 data);
 	u16 twineagl_debug_r();
 	u16 twineagl_200100_r(offs_t offset);
@@ -821,7 +822,7 @@ void downtown_state::calibr50_map(address_map &map)
 	map(0x200000, 0x200fff).ram().share("nvram");              // NVRAM (battery backed)
 	map(0x300000, 0x300001).rw(FUNC(downtown_state::ipl1_ack_r), FUNC(downtown_state::ipl1_ack_w));
 	map(0x400000, 0x400001).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0x500000, 0x500001).nopw();                        // ?
+	map(0x500000, 0x500001).w(FUNC(downtown_state::calibr50_sub_reset_w)).umask16(0x00ff);
 	map(0x600001, 0x600001).r(FUNC(downtown_state::dsw1_r));
 	map(0x600003, 0x600003).r(FUNC(downtown_state::dsw2_r));
 	map(0x700000, 0x7003ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");  // Palette
@@ -1054,6 +1055,11 @@ void downtown_state::calibr50_soundlatch2_w(u8 data)
 {
 	m_soundlatch[1]->write(data);
 	m_subcpu->spin_until_time(attotime::from_usec(50));  // Allow the other cpu to reply
+}
+
+void downtown_state::calibr50_sub_reset_w(u8 data)
+{
+	m_subcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 void downtown_state::calibr50_sub_map(address_map &map)
