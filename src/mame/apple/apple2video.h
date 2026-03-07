@@ -45,19 +45,18 @@ public:
 	bool get_monohgr() const    { return m_monohgr; }
 
 	void a80col_w(bool b80Col);
-	void a80store_w(bool b80Store)  { m_80store = b80Store; }
-	void page2_w(bool page2)        { m_page2 = page2; }
+	void a80store_w(bool b80Store);
 	void altcharset_w(bool altch);
 	void monohgr_w(bool mono)       { m_monohgr = mono; }
 
 	// IIgs-specific accessors
 	void set_GS_monochrome(u8 mono) { m_monochrome = mono; }
-	void set_GS_foreground(u8 fg)   { m_GSfg = fg; }
-	void set_GS_background(u8 bg)   { m_GSbg = bg; }
+	u8 get_GS_textcol()             { return (m_GSfg << 4) | m_GSbg; }
+	void set_GS_textcol(u8 textcol);
 	u8 get_GS_border()              { return m_GSborder; }
-	void set_GS_border(u8 border)   { m_GSborder = border; }
+	void set_GS_border(u8 border);
 	const u8 get_newvideo()         { return m_newvideo; }
-	void set_newvideo(u8 newvideo)  { m_newvideo = newvideo; }
+	void set_newvideo(u8 newvideo);
 	u8 get_GS_langsel()             { return m_GS_langsel; }
 	bool is_pal_video_mode()        { return BIT(m_GS_langsel, 4); }
 	void set_GS_langsel(u8 langsel);

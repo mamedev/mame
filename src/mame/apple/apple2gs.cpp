@@ -450,7 +450,7 @@ private:
 	bool m_lcram = false, m_lcram2 = false, m_lcprewrite = false, m_lcwriteenable = false;
 	bool m_rombank = false;
 
-	u8 m_shadow = 0, m_speed = 0, m_textcol = 0;
+	u8 m_shadow = 0, m_speed = 0;
 	u8 m_motors_active = 0, m_slotromsel = 0, m_intflag = 0, m_vgcint = 0, m_inten = 0;
 
 	bool m_last_speed = false;
@@ -735,9 +735,7 @@ void apple2gs_state::machine_start()
 	m_video->set_char_pointer(memregion("gfx1")->base(), memregion("gfx1")->bytes());
 	m_video->setup_GS_graphics();
 
-	m_textcol = 0xf2;
-	m_video->set_GS_foreground((m_textcol >> 4) & 0xf);
-	m_video->set_GS_background(m_textcol & 0xf);
+	m_video->set_GS_textcol(0xf2);
 
 	// Mega II events occur near the rightmost edge of active video
 	m_scantimer->adjust(m_screen->time_until_pos(0, HPOS_VBL));
@@ -782,7 +780,6 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_lcwriteenable));
 	save_item(NAME(m_shadow));
 	save_item(NAME(m_speed));
-	save_item(NAME(m_textcol));
 	save_item(NAME(m_clock_control));
 	save_item(NAME(m_clkdata));
 	save_item(NAME(m_motors_active));
@@ -826,10 +823,9 @@ void apple2gs_state::machine_reset()
 	m_adb_p2_last = m_adb_p3_last = 0;
 	m_adb_reset_freeze = 0;
 	m_romswitch = false;
-	m_video->page2_w(false);
+	m_video->scr_w(0);
 	m_video->set_GS_border(0x02);
-	m_video->set_GS_background(0x02);
-	m_video->set_GS_foreground(0x0f);
+	m_video->set_GS_textcol(0xf2);
 	m_an0 = m_an1 = m_an2 = m_an3 = false;
 	m_gameio->an0_w(0);
 	m_gameio->an1_w(0);
@@ -1612,7 +1608,7 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_video->get_80col() ? 0x80 : 0x00;
 
 		case 0x22:  // TEXTCOL
-			return m_textcol;
+			return m_video->get_GS_textcol();
 
 		case 0x23:  // VGCINT
 			return m_vgcint;
@@ -1907,13 +1903,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x22:  // TEXTCOL
-			if (m_textcol != data)
-			{
-				m_screen->update_now();
-			}
-			m_textcol = data;
-			m_video->set_GS_foreground((data >> 4) & 0xf);
-			m_video->set_GS_background(data & 0xf);
+			m_video->set_GS_textcol(data);
 			break;
 
 		case 0x23:  // VGCINT
@@ -2148,7 +2138,7 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 
 		case 0x68: // STATEREG
 			m_altzp = (data & 0x80);
-			m_video->page2_w(data & 0x40);
+			m_video->scr_w(data & 0x40);
 			m_ramrd = (data & 0x20);
 			m_ramwrt = (data & 0x10);
 			m_lcram = (data & 0x08) ? false : true;
@@ -3396,7 +3386,7 @@ void apple2gs_state::adbmicro_p2_out(u8 data)
 		m_ramrd = false;
 		m_ramwrt = false;
 		m_altzp = false;
-		m_video->page2_w(false);
+		m_video->scr_w(0);
 		m_video->res_w(0);
 		m_irqmask = 0;
 

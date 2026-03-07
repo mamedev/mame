@@ -1201,7 +1201,7 @@ void apple2e_state::machine_reset()
 	m_video->a80store_w(false);
 	m_video->a80col_w(false);
 	m_video->altcharset_w(false);
-	m_video->page2_w(false);
+	m_video->scr_w(0);
 	m_video->res_w(0);
 
 	// IIe IOU
@@ -1470,7 +1470,7 @@ void apple2e_state::reset_w(int state)
 			m_video->a80store_w(false);
 			m_video->a80col_w(false);
 			m_video->altcharset_w(false);
-			m_video->page2_w(false);
+			m_video->scr_w(0);
 			m_video->res_w(0);
 
 			// IIe IOU

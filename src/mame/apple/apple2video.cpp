@@ -61,6 +61,7 @@ void a2_video_device::device_start()
 	// initialise for device_palette_interface
 	init_palette();
 
+	save_item(NAME(m_hgr2));
 	save_item(NAME(m_page2));
 	save_item(NAME(m_flash));
 	save_item(NAME(m_mix));
@@ -124,7 +125,7 @@ void a2_video_device::mix_w(int state)
 void a2_video_device::scr_w(int state)
 {
 	// select primary or secondary page
-	if (!m_80col)
+	if (!m_80store && (m_page2 != state))
 		screen().update_now();
 	m_page2 = state;
 }
@@ -174,6 +175,14 @@ void a2_video_device::a80col_w(bool b80Col)
 	}
 }
 
+void a2_video_device::a80store_w(bool b80Store)
+{
+	// select PAGE2 aux RAM (displaying PAGE1)
+	if (m_page2 && (m_80store != b80Store))
+		screen().update_now();
+	m_80store = b80Store;
+}
+
 void a2_video_device::altcharset_w(bool altch)
 {
 	if (m_altcharset != altch)
@@ -184,10 +193,41 @@ void a2_video_device::altcharset_w(bool altch)
 	}
 }
 
+void a2_video_device::set_GS_textcol(u8 textcol)
+{
+	// select foreground and background text colors
+	const u8 fg = textcol >> 4;
+	const u8 bg = textcol & 0xf;
+	if ((m_GSfg != fg) || (m_GSbg != bg))
+	{
+		screen().update_now();
+		m_GSfg = fg;
+		m_GSbg = bg;
+	}
+}
+
+void a2_video_device::set_GS_border(u8 border)
+{
+	// select border color
+	if (m_GSborder != border)
+	{
+		screen().update_now();
+		m_GSborder = border;
+	}
+}
+
+void a2_video_device::set_newvideo(u8 newvideo)
+{
+	// select super hi-res and monochrome modes
+	if ((m_newvideo & 0xA0) != (newvideo & 0xA0))
+		screen().update_now();
+	m_newvideo = newvideo;
+}
+
 void a2_video_device::set_GS_langsel(u8 langsel)
 {
 	// select primary language character set
-	if ((langsel & 0xe8) != (m_GS_langsel & 0xe8))
+	if ((m_GS_langsel & 0xe8) != (langsel & 0xe8))
 		screen().update_now();
 	m_GS_langsel = langsel;
 }
