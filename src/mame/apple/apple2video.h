@@ -11,9 +11,9 @@
 
 #include "emupal.h"
 
-#define BORDER_LEFT (32)
-#define BORDER_RIGHT    (32)
-#define BORDER_TOP  (16)    // (plus bottom)
+#define BORDER_LEFT  (16 * 2)
+#define BORDER_RIGHT (16 * 2)
+#define BORDER_TOP   (16)    // (plus bottom)
 
 class a2_video_device : public device_t, public device_palette_interface, public device_video_interface
 {
@@ -25,6 +25,7 @@ public:
 	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	u32 m_GSborder_colors[16]{}, m_shr_palette[256]{};
+	u8 m_shr_scbs[200]{};
 	std::unique_ptr<bitmap_ind16> m_8bit_graphics;
 
 	void txt_w(int state);
@@ -62,6 +63,7 @@ public:
 	void set_GS_langsel(u8 langsel);
 	void set_SHR_color(u8 color, u32 rgb) { m_shr_palette[color] = rgb; }
 	void set_GS_border_color(u8 color, u32 rgb) { m_GSborder_colors[color] = rgb; }
+	void set_SHR_scb(u8 shrline, u8 scb) { m_shr_scbs[shrline] = scb; }
 
 	void set_ram_pointers(u8 *main, u8 *aux)    { m_ram_ptr = main; m_aux_ptr = aux; }
 	void set_aux_mask(u16 aux_mask)             { m_aux_mask = aux_mask; }

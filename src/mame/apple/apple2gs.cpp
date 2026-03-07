@@ -1091,6 +1091,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2gs_state::apple2_vgc)
 			scb = m_megaii_ram[0x15e80 + (shrline >> 1)];
 		}
 
+		// latch scb on this cycle for subsequent palette lookups
+		m_video->set_SHR_scb(shrline, scb);
+
 		if (scb & 0x40)
 		{
 			// VGC status flags are set even when the interrupt is disabled
