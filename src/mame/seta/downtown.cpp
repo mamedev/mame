@@ -351,7 +351,7 @@ protected:
 	u16 ipl1_ack_r();
 	void ipl1_ack_w(u16 data = 0);
 
-	void coin_lockou(u8 data);
+	void coin_lockout_w(u8 data);
 	X1_001_SPRITE_GFXBANK_CB_MEMBER(gfxbank_callback);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -359,7 +359,7 @@ protected:
 	void sharedram_68000_w(offs_t offset, u8 data);
 	void sub_ctrl_w(offs_t offset, u8 data);
 	void sub_bankswitch_w(u8 data);
-	void sub_bankswitch_lockou(u8 data);
+	void sub_bankswitch_lockout_w(u8 data);
 	u8 ff_r();
 	u8 dsw1_r();
 	u8 dsw2_r();
