@@ -261,6 +261,10 @@ public:
 		, m_rom_region(*this, "bios")
 		, m_nvram(*this, "nvram")
 		, m_pcmcia(*this, "pcmcia")
+		, m_screen(*this, "screen")
+		, m_gfxdecode(*this, "gfxdecode")
+		, m_palette(*this, "palette")
+		, m_speaker(*this, "mono")
 	{
 	}
 
@@ -316,6 +320,10 @@ private:
 	required_memory_region m_rom_region;
 	required_device<nvram_device> m_nvram;
 	optional_device<pccard_slot_device> m_pcmcia;
+	required_device<screen_device> m_screen;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<speaker_device> m_speaker;
 
 	u8 m_irq_enabled = 0;
 	u8 m_irq_active = 0;
@@ -337,7 +345,7 @@ void nakajies_state::nakajies_map(address_map &map)
 		map(start, end).view(m_view[i]);
 		m_view[i][VIEW_ROM](start, end).bankr(m_rombank[i]);
 		m_view[i][VIEW_RAM](start, end).bankrw(m_rambank[i]);
-		// Mapping to external PCMCIA card space
+		// Banking to external PCMCIA card space
 		m_view[i][VIEW_EXT + 0](start, end).rw(FUNC(nakajies_state::pcmcia_r<0>), FUNC(nakajies_state::pcmcia_w<0>));
 		m_view[i][VIEW_EXT + 1](start, end).rw(FUNC(nakajies_state::pcmcia_r<1>), FUNC(nakajies_state::pcmcia_w<1>));
 		m_view[i][VIEW_EXT + 2](start, end).rw(FUNC(nakajies_state::pcmcia_r<2>), FUNC(nakajies_state::pcmcia_w<2>));
@@ -366,6 +374,7 @@ void nakajies_state::pcmcia_w(offs_t offset, u8 data)
 
 void nakajies_state::nakajies_update_irqs()
 {
+	// drwrt200 stops responding to keyboard input when checking against m_irq_enabled
 	uint8_t irq = m_irq_active & m_irq_enabled;
 	uint8_t vector = 0xff;
 
@@ -740,19 +749,19 @@ void nakajies_state::drwrt100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nakajies_state::nakajies_map);
 	m_maincpu->set_addrmap(AS_IO, &nakajies_state::nakajies_io_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
-	screen.set_refresh_hz(50);  // Wild guess
-	screen.set_screen_update(FUNC(nakajies_state::screen_update));
-	screen.set_size(80 * 6, 8 * 8);
-	screen.set_visarea(0, 6 * 80 - 1, 0, 8 * 8 - 1);
-	screen.set_palette("palette");
+	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	m_screen->set_refresh_hz(50);  // Wild guess
+	m_screen->set_screen_update(FUNC(nakajies_state::screen_update));
+	m_screen->set_size(80 * 6, 8 * 8);
+	m_screen->set_visarea(0, 6 * 80 - 1, 0, 8 * 8 - 1);
+	m_screen->set_palette(m_palette);
 
-	GFXDECODE(config, "gfxdecode", "palette", gfx_wales210);
-	PALETTE(config, "palette", FUNC(nakajies_state::nakajies_palette), 2);
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_wales210);
+	PALETTE(config, m_palette, FUNC(nakajies_state::nakajies_palette), 2);
 
 	/* sound */
-	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, "mono", 1.00);
+	SPEAKER(config, m_speaker).front_center();
+	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, m_speaker, 1.00);
 
 	/* rtc */
 	RP5C01(config, m_rtc, XTAL(32'768));
@@ -777,13 +786,13 @@ void nakajies_state::nakajies210(machine_config &config)
 void nakajies_state::dator3k(machine_config &config)
 {
 	nakajies210(config);
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_dator3k);
+	m_gfxdecode->set_info(gfx_dator3k);
 }
 
 void nakajies_state::nakajies220(machine_config &config)
 {
 	nakajies210(config);
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_drwrt400);
+	m_gfxdecode->set_info(gfx_drwrt400);
 }
 
 void nakajies_state::nakajies220_256(machine_config &config)
@@ -795,9 +804,9 @@ void nakajies_state::nakajies220_256(machine_config &config)
 void nakajies_state::nakajies250(machine_config &config)
 {
 	nakajies210(config);
-	subdevice<screen_device>("screen")->set_size(80 * 6, 16 * 8);
-	subdevice<screen_device>("screen")->set_visarea(0, 6 * 80 - 1, 0, 16 * 8 - 1);
-	subdevice<gfxdecode_device>("gfxdecode")->set_info(gfx_drwrt200);
+	m_screen->set_size(80 * 6, 16 * 8);
+	m_screen->set_visarea(0, 6 * 80 - 1, 0, 16 * 8 - 1);
+	m_gfxdecode->set_info(gfx_drwrt200);
 	m_ram_size = 256 * 1024;
 }
 
