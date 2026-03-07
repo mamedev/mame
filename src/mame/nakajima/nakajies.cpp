@@ -6,20 +6,19 @@
 
 Nakajima was the OEM manufacturer for a series of typewriters which were
 sold by different brands around the world. The PCB layouts for these
-machines are the same. The models differed in the amount of (static) RAM:
-128KB or 256KB; and in the system rom (mainly only different language
-support).
+machines are the same. The models differed in the amount of RAM, presence
+of PCMCIA slot, or 1.44MB Floppy drive; and in the system rom (mainly
+only different language support).
 
 
-Model   |  SRAM | Language | Branded model
---------+-------+----------+----------------------
-ES-210N | 128KB | German   | Walther ES-210
-ES-220  | 128KB | English  | NTS DreamWriter T100
-ES-220  | 256KB | English  | NTS DreamWriter T400
-ES-210N | 128KB | Spanish  | Dator 3000
-ES-210N | 128KB | English  | NTS DreamWriter 325
-ES-250  | xxxKB | English  | NTS DreamWriter T200
-
+Model   |  SRAM | PCMCIA | FDD   | Language | Branded model
+--------+-------+--------+-------+----------+----------------------
+ES-210N | 128KB | Yes    | No    | German   | Walther ES-210
+ES-220  | 128KB | No     | No    | English  | NTS DreamWriter T100
+ES-220  | 256KB | Yes    | No    | English  | NTS DreamWriter T400
+ES-210N | 128KB | Yes    | No    | Spanish  | Dator 3000
+ES-210N | 128KB | Yes    | No    | English  | NTS DreamWriter 325
+ES-250  | 256KB | Yes    | 1.44M | English  | NTS DreamWriter T200
 
 The LCD is driven by 6x Sanyo LC7940 and 1x Sanyo LC7942.
 
@@ -87,44 +86,6 @@ I/O Map:
 0000 - unknown
        0x00 written during boot sequence
 
-0010 - unknown
-       0x17 written during boot sequence
-
-0011 - unknown
-       0x1e written during boot sequence
-
-0012 - unknown
-       0x1f written during boot sequence
-
-0013 - unknown
-       0x1e written during boot sequence
-
-0014 - unknown
-       0x1d written during boot sequence
-
-0015 - unknown
-       0x1c written during boot sequence
-
-0012-0015 - banking?
-T200:
-Time: 15 - 02; call ADxxx
-Database: 15 - 02; call B3xxx
-Spreadsheet: 15 - 02; call B9xxx
-
-T450:
-Regular boot: 12 - 1f; 13 - 1e; 14 - 1d; 15 - 1c
-Typing game: 15 - 02; call B100:0;
-Edit Text: 12 - 07; 13 - 06; 14 - 05; 15 - 04; call 4000:0000
-c000:0000 - ffff:ffff = not banked?
-
-T400, wales210:
-Regular boot: 12 - 1f; 13 - 1e; 14 - 1d; 15 - 1c
-Next step during boot: 12 - 17; 13 - 3; 14 - 2; jump to 3000:0000
-writing 17 to port 12 maps rom offset 30000 to 3000:0000?
-
-1f, 1e, 1d, 1c is banked RAM ??
-
-banking possibility:
 0010-0017 - control banking:
 0010 - 00000 - 1ffff
 0011 - 20000 - 3ffff
@@ -140,27 +101,17 @@ values 00-0f select a rom bank
       01 - 20000h region before last
       02 - etc
 
-values 10-1f select a ram bank
+values 10-17 select an internal ram bank
+values 18-1f select a pcmcia bank
 
 on reset 0017 is set to 0, pointing to last 20000h bytes of ROM containing the boot setup code
-
-
-0016 - unknown
-       0x01 written during boot sequence
-
-0017 - unknown
-       0x00 written during boot sequence
 
 0020 - unknown
        0x00 written during boot sequence
 
-0030 - unknown
-       Looking at code at C0769 bit 5 this seems to be used
-       as some kind of clock for data that was written to
-       I/O port 0040h.
+0030 - printer/parallel related?
 
-0040 - unknown
-       0xff written during boot sequence
+0040 - printer/parallel related?
 
 Sounds related?
 On boot: 50 = 98, 51 = 06, 52 = 7f
@@ -219,16 +170,13 @@ On boot: 50 = 98, 51 = 06, 52 = 7f
        b1 - 1 = clear interrupt source for irq vector 0xfe
        b0 - 1 = clear interrupt source for irq vector 0xff
 
-00A0 - unknown
-       Read during initial boot sequence, expects to have bit 3 set at least once during the boot sequence
+00A0 - System status
 
-00D0 - 00DC - Keyboard??
+00C0 - 00C1 - serial/rs232c communication
+  00C0 - data port
+  00C1 - control/status
 
-00DD - unknown
-       0xf8 written during boot sequence
-
-00DE - unknown
-       0xf0 written during boot sequence
+00D0 - 00DF - RTC
 
 
 IRQ 0xF8:
@@ -277,7 +225,9 @@ TODO:
 
 #include "emu.h"
 
+#include "bus/pccard/sram.h"
 #include "cpu/nec/nec.h"
+#include "machine/nvram.h"
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
@@ -309,9 +259,12 @@ public:
 		, m_rombank(*this, "rombank%u", 0U)
 		, m_rambank(*this, "rambank%u", 0U)
 		, m_rom_region(*this, "bios")
+		, m_nvram(*this, "nvram")
+		, m_pcmcia(*this, "pcmcia")
 	{
 	}
 
+	void drwrt100(machine_config &config);
 	void nakajies210(machine_config &config);
 	void nakajies220(machine_config &config);
 	void nakajies220_256(machine_config &config);
@@ -325,6 +278,10 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	static constexpr int VIEW_ROM = 0;
+	static constexpr int VIEW_RAM = 1;
+	static constexpr int VIEW_EXT = 2;
+
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void nakajies_update_irqs();
@@ -341,15 +298,24 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
 	void nakajies_io_map(address_map &map) ATTR_COLD;
 	void nakajies_map(address_map &map) ATTR_COLD;
+	void pcmcia_card_detect_w(int state) { m_pcmcia_card_detect = state; }
+	void pcmcia_write_protect_w(int state) { m_pcmcia_write_protect = state; }
+	int pcmcia_card_detect_r() { return m_pcmcia_card_detect; }
+	int pcmcia_write_protect_r() { return m_pcmcia_write_protect; }
+	template<int Bank> u8 pcmcia_r(offs_t offset);
+	template<int Bank> void pcmcia_w(offs_t offset, u8 data);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<rp5c01_device> m_rtc;
 	memory_view m_view[8];
+
 	required_ioport_array<10> m_port_row;
 	required_ioport m_port_debug;
 	memory_bank_array_creator<8> m_rombank;
 	memory_bank_array_creator<8> m_rambank;
 	required_memory_region m_rom_region;
+	required_device<nvram_device> m_nvram;
+	optional_device<pccard_slot_device> m_pcmcia;
 
 	u8 m_irq_enabled = 0;
 	u8 m_irq_active = 0;
@@ -357,6 +323,8 @@ private:
 	u8 m_matrix = 0;
 	std::unique_ptr<u8[]> m_ram_base;
 	u32 m_ram_size = 0;
+	u32 m_pcmcia_card_detect = 1;
+	u32 m_pcmcia_write_protect = 1;
 };
 
 
@@ -367,9 +335,32 @@ void nakajies_state::nakajies_map(address_map &map)
 		const offs_t start = i * 0x20000;
 		const offs_t end = start + 0x1ffff;
 		map(start, end).view(m_view[i]);
-		m_view[i][0](start, end).bankr(m_rombank[i]);
-		m_view[i][1](start, end).bankrw(m_rambank[i]);
+		m_view[i][VIEW_ROM](start, end).bankr(m_rombank[i]);
+		m_view[i][VIEW_RAM](start, end).bankrw(m_rambank[i]);
+		// Mapping to external PCMCIA card space
+		m_view[i][VIEW_EXT + 0](start, end).rw(FUNC(nakajies_state::pcmcia_r<0>), FUNC(nakajies_state::pcmcia_w<0>));
+		m_view[i][VIEW_EXT + 1](start, end).rw(FUNC(nakajies_state::pcmcia_r<1>), FUNC(nakajies_state::pcmcia_w<1>));
+		m_view[i][VIEW_EXT + 2](start, end).rw(FUNC(nakajies_state::pcmcia_r<2>), FUNC(nakajies_state::pcmcia_w<2>));
+		m_view[i][VIEW_EXT + 3](start, end).rw(FUNC(nakajies_state::pcmcia_r<3>), FUNC(nakajies_state::pcmcia_w<3>));
+		m_view[i][VIEW_EXT + 4](start, end).rw(FUNC(nakajies_state::pcmcia_r<4>), FUNC(nakajies_state::pcmcia_w<4>));
+		m_view[i][VIEW_EXT + 5](start, end).rw(FUNC(nakajies_state::pcmcia_r<5>), FUNC(nakajies_state::pcmcia_w<5>));
+		m_view[i][VIEW_EXT + 6](start, end).rw(FUNC(nakajies_state::pcmcia_r<6>), FUNC(nakajies_state::pcmcia_w<6>));
+		m_view[i][VIEW_EXT + 7](start, end).rw(FUNC(nakajies_state::pcmcia_r<7>), FUNC(nakajies_state::pcmcia_w<7>));
 	}
+}
+
+
+template<int Bank>
+u8 nakajies_state::pcmcia_r(offs_t offset)
+{
+	return m_pcmcia->read_memory_byte((Bank * 0x20000) + offset);
+}
+
+
+template<int Bank>
+void nakajies_state::pcmcia_w(offs_t offset, u8 data)
+{
+	m_pcmcia->write_memory_byte((Bank * 0x20000) + offset, data);
 }
 
 
@@ -381,7 +372,7 @@ void nakajies_state::nakajies_update_irqs()
 	uint8_t vector = 0xff;
 
 	if (LOG)
-		logerror("nakajies_update_irqs: irq_enabled = %02x, irq_active = %02x\n", m_irq_enabled, m_irq_active );
+		logerror("nakajies_update_irqs: irq_enabled = %02x, irq_active = %02x\n", m_irq_enabled, m_irq_active);
 
 	// Assuming irq 0xFF has the highest priority and 0xF8 the lowest
 	while (vector >= 0xf8 && !(irq & 0x01))
@@ -429,13 +420,21 @@ void nakajies_state::irq_enable_w(u8 data)
 
 /*
   I/O Port a0:
-  bit 7-4 - unknown
-  bit 3   - battery low (when set)
-  bit 2-0 - unknown
+  7------- PCMCIA card detection related. bit7 and bit4 0 = card present
+  -6------ PCMCIA card write protected
+  --5----- unknown
+  ---4---- PCMCIA card detection related. bit7 and bit4 0 = card present
+  ----3--- Battery pack ok. 0 = ok, 1 = low
+  -----2-0 unknown
+  ------1- printer connected?
 */
 u8 nakajies_state::unk_a0_r()
 {
-	return 0xf7;
+	return
+		(m_pcmcia_card_detect ? 0x80 : 0x00) |
+		(m_pcmcia_write_protect ? 0x40 : 0x00) |
+		(m_pcmcia_card_detect ? 0x10 : 0x00) |
+		0x27;
 }
 
 void nakajies_state::lcd_memory_start_w(u8 data)
@@ -446,9 +445,28 @@ void nakajies_state::lcd_memory_start_w(u8 data)
 
 void nakajies_state::banking_w(offs_t offset, u8 data)
 {
-	m_rombank[offset]->set_entry((data & 0x0f) ^ 0xf);
-	m_rambank[offset]->set_entry((data & 0x0f) ^ 0xf);
-	m_view[offset].select(BIT(data, 4));
+	if (!BIT(data, 4))
+	{
+		// ROM
+		m_rombank[offset]->set_entry((data & 0x0f) ^ 0xf);
+		m_view[offset].select(VIEW_ROM);
+	}
+	else
+	{
+		if (BIT(data, 3))
+		{
+			// External (S)RAM
+			// Banking and actual storage not verified
+			m_view[offset].select(VIEW_EXT + ((data & 0x07) & 0x07));
+		}
+		else
+		{
+			// Internal (S)RAM
+			// Banking and actual storage not verified
+			m_rambank[offset]->set_entry((data & 0x07) ^ 0x07);
+			m_view[offset].select(VIEW_RAM);
+		}
+	}
 }
 
 
@@ -595,6 +613,7 @@ void nakajies_state::machine_start()
 	u32 rom_size = m_rom_region->bytes();
 
 	m_ram_base = make_unique_clear<uint8_t[]>(m_ram_size);
+	m_nvram->set_base(&m_ram_base[0], m_ram_size);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -603,7 +622,7 @@ void nakajies_state::machine_start()
 			m_rombank[i]->configure_entries(j, rom_size / 0x20000, m_rom_region->base(), 0x20000);
 		// TODO: ram banks outside max bank size; assuming the banks are simply mirrored
 		// how would that work for a system with 160KB RAM?
-		for (int j = 0; j < 16; j += m_ram_size / 0x20000)
+		for (int j = 0; j < 8; j += m_ram_size / 0x20000)
 			m_rambank[i]->configure_entries(j, m_ram_size / 0x20000, &m_ram_base[0], 0x20000);
 	}
 
@@ -611,6 +630,8 @@ void nakajies_state::machine_start()
 	save_item(NAME(m_irq_active));
 	save_item(NAME(m_lcd_memory_start));
 	save_item(NAME(m_matrix));
+	save_item(NAME(m_pcmcia_card_detect));
+	save_item(NAME(m_pcmcia_write_protect));
 }
 
 
@@ -623,13 +644,13 @@ void nakajies_state::machine_reset()
 
 	for (int i = 0; i < 8; i++)
 	{
-		m_view[i].select(0);
+		m_view[i].select(VIEW_ROM);
 	}
 
 	for (int i = 0; i < 8; i++)
 	{
 		m_rombank[i]->set_entry(0x0f);
-		m_rambank[i]->set_entry(0x0f);
+		m_rambank[i]->set_entry(0x07);
 	}
 }
 
@@ -710,7 +731,12 @@ static GFXDECODE_START(gfx_drwrt400)
 	GFXDECODE_ENTRY("bios", 0x580b6, nakajies_charlayout, 0, 1)
 GFXDECODE_END
 
-void nakajies_state::nakajies210(machine_config &config)
+static void pcmcia_devices(device_slot_interface &device)
+{
+	device.option_add("sram_1m", PCCARD_SRAM_CENTENNIAL_1M);
+}
+
+void nakajies_state::drwrt100(machine_config &config)
 {
 	V20(config, m_maincpu, X301 / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nakajies_state::nakajies_map);
@@ -735,7 +761,19 @@ void nakajies_state::nakajies210(machine_config &config)
 
 	TIMER(config, "kb_timer").configure_periodic(FUNC(nakajies_state::kb_timer), attotime::from_hz(250));
 
+	NVRAM(config, m_nvram);
+
 	m_ram_size = 128 * 1024;
+}
+
+void nakajies_state::nakajies210(machine_config &config)
+{
+	drwrt100(config);
+
+	PCCARD_SLOT(config, m_pcmcia, pcmcia_devices, nullptr);
+	m_pcmcia->cd1().set(FUNC(nakajies_state::pcmcia_card_detect_w));
+	m_pcmcia->wp().set(FUNC(nakajies_state::pcmcia_write_protect_w));
+
 }
 
 void nakajies_state::dator3k(machine_config &config)
@@ -830,7 +868,7 @@ ROM_END
 COMP( 199?, wales210, 0,        0,      nakajies210, nakajies, nakajies_state, empty_init, "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // German, 128KB RAM
 COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, nakajies_state, empty_init, "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
 COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, nakajies_state, empty_init, "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
-COMP( 199?, drwrt100, wales210, 0,      nakajies220, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
-COMP( 1996, drwrt400, wales210, 0,      nakajies220_256, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM, also found a machine with 160KB RAM
+COMP( 1996, drwrt100, wales210, 0,      drwrt100,    nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
+COMP( 1996, drwrt400, wales210, 0,      nakajies220_256, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM, also found a machine with 160KB RAM (marketing text?)
 COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
-COMP( 199?, drwrt200, wales210, 0,      nakajies250, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB? RAM
+COMP( 1996, drwrt200, wales210, 0,      nakajies250, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB? RAM
