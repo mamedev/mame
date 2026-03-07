@@ -36,6 +36,10 @@
 #include <windows.h>
 #endif
 
+#ifdef SDLMAME_X11
+#include <X11/Xlib.h>
+#endif
+
 
 //============================================================
 //  PARAMETERS
@@ -837,20 +841,32 @@ int sdl_window_info::complete_create()
 
 	// create or attach to an existing window
 	SDL_Window *sdlwindow;
-#ifdef SDLMAME_X11
+#if defined(SDLMAME_X11) || defined(SDLMAME_WIN32)
 	const char *attach_window = downcast<sdl_options &>(machine().options()).attach_window();
+	attach_window = attach_window && *attach_window ? attach_window : nullptr;
 #else
 	const char *attach_window = nullptr;
 #endif
 
+#ifdef SDLMAME_X11
+	if (attach_window)
+	{
+		// if we're attaching a window on X11, we need to stop SDL3 doing its own XSelectInput() call
+		SDL_SetHint(SDL_HINT_VIDEO_X11_EXTERNAL_WINDOW_INPUT, "0");
+	}
+#endif
+
 	// create the SDL window
 	SDL_PropertiesID props = SDL_CreateProperties();
-	SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title().c_str());
-	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, work.left() + (work.width() - temp.width()) / 2);
-	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, work.top() + (work.height() - temp.height()) / 2);
-	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, temp.width());
-	SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, temp.height());
-	SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, true);
+	if (!attach_window)
+	{
+		SDL_SetStringProperty(props, SDL_PROP_WINDOW_CREATE_TITLE_STRING, title().c_str());
+		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X_NUMBER, work.left() + (work.width() - temp.width()) / 2);
+		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_Y_NUMBER, work.top() + (work.height() - temp.height()) / 2);
+		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIDTH_NUMBER, temp.width());
+		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_HEIGHT_NUMBER, temp.height());
+		SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_RESIZABLE_BOOLEAN, true);
+	}
 
 	if (fullscreen())
 	{
@@ -862,7 +878,7 @@ int sdl_window_info::complete_create()
 		SDL_SetBooleanProperty(props, SDL_PROP_WINDOW_CREATE_OPENGL_BOOLEAN, true);
 	}
 
-	if (attach_window && *attach_window)
+	if (attach_window)
 	{
 		// we're attaching to an existing window; parse the argument
 		unsigned long long attach_window_value;
@@ -877,7 +893,12 @@ int sdl_window_info::complete_create()
 		}
 
 		// and attach to it
+#ifdef SDLMAME_X11
 		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_X11_WINDOW_NUMBER, attach_window_value);
+#endif // SDLMAME_X11
+#ifdef SDLMAME_WIN32
+		SDL_SetNumberProperty(props, SDL_PROP_WINDOW_CREATE_WIN32_HWND_POINTER, attach_window_value);
+#endif // SDLMAME_WIN32
 	}
 
 	sdlwindow = SDL_CreateWindowWithProperties(props);
@@ -895,6 +916,30 @@ int sdl_window_info::complete_create()
 
 		osd_printf_verbose("Exit sdl_window_info::create\n");
 		return 1;
+	}
+
+	if (attach_window)
+	{
+#ifdef SDLMAME_X11
+		SDL_PropertiesID props = SDL_GetWindowProperties(sdlwindow);
+
+		Display *display = (Display *) SDL_GetPointerProperty(
+			props,
+			SDL_PROP_WINDOW_X11_DISPLAY_POINTER,
+			nullptr);
+
+		Window xwindow = (Window) SDL_GetNumberProperty(
+			props,
+			SDL_PROP_WINDOW_X11_WINDOW_NUMBER,
+			0);
+
+		// while SDL3 will by default call XSelectInput, it is too aggressive for our purposes
+		XSelectInput(display, xwindow,
+			FocusChangeMask | EnterWindowMask | LeaveWindowMask |
+			PointerMotionMask | KeyPressMask | KeyReleaseMask |
+			PropertyChangeMask | StructureNotifyMask |
+			ExposureMask | KeymapStateMask);
+#endif // SDLMAME_X11
 	}
 
 	set_platform_window(sdlwindow);
@@ -928,11 +973,13 @@ int sdl_window_info::complete_create()
 	}
 
 	// show window
-
-	SDL_ShowWindow(platform_window());
-	//SDL_SetWindowFullscreen(window->sdl_window(), 0);
-	//SDL_SetWindowFullscreen(window->sdl_window(), window->fullscreen());
-	SDL_RaiseWindow(platform_window());
+	if (!attach_window)
+	{
+		SDL_ShowWindow(platform_window());
+		//SDL_SetWindowFullscreen(window->sdl_window(), 0);
+		//SDL_SetWindowFullscreen(window->sdl_window(), window->fullscreen());
+		SDL_RaiseWindow(platform_window());
+	}
 
 #ifdef SDLMAME_WIN32
 //  if (fullscreen())

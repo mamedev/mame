@@ -77,8 +77,12 @@ public:
 	// full screen options
 #if defined(SDLMAME_X11)
 	bool use_all_heads() const { return bool_value(SDLOPTION_USEALLHEADS); }
-	const char *attach_window() const { return value(SDLOPTION_ATTACH_WINDOW); }
 #endif // SDLMAME_X11
+
+	// attach window
+#if defined(SDLMAME_X11) || defined(SDLMAME_WIN32)
+	const char *attach_window() const { return value(SDLOPTION_ATTACH_WINDOW); }
+#endif // SDLMAME_X11 || SDLMAME_WIN32
 
 	// keyboard mapping
 	bool keymap() const { return bool_value(SDLOPTION_KEYMAP); }
