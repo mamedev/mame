@@ -374,8 +374,10 @@ void nakajies_state::pcmcia_w(offs_t offset, u8 data)
 
 void nakajies_state::nakajies_update_irqs()
 {
+	// Hack: IRQ mask is temporarily disabled because it doesn't allow the IRQ vectors 0xFA
+	// and 0xFB that are used for scanning the kb, this need further investigation.
 	// drwrt200 stops responding to keyboard input when checking against m_irq_enabled
-	uint8_t irq = m_irq_active & m_irq_enabled;
+	uint8_t irq = m_irq_active; // & m_irq_enabled;
 	uint8_t vector = 0xff;
 
 	if (LOG)
