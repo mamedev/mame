@@ -144,8 +144,7 @@ public:
 	void ks2(machine_config &config);
 	void ks3(machine_config &config);
 
-	INPUT_CHANGED_MEMBER(on_mf_nmi);
-	INPUT_CHANGED_MEMBER(on_divmmc_nmi);
+	INPUT_CHANGED_MEMBER(on_nmi_button);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -158,8 +157,8 @@ protected:
 	void update_video_mode();
 
 	u8 do_m1(offs_t offset);
-	void do_mf_nmi();
-	void nmi();
+	void nmi_rq();
+	void nmi_ack(int state);
 	void leave_nmi(int state);
 	void map_fetch(address_map &map) ATTR_COLD;
 	void map_mem(address_map &map) ATTR_COLD;
@@ -216,6 +215,8 @@ private:
 	bool machine_type_128() const { return m_nr_03_machine_type == 2 || m_nr_03_machine_type == 4; }
 	bool machine_type_p3() const { return !machine_type_48() && !machine_type_128(); }
 
+	bool nmi_assert_mf() { return ((m_io_nmi->read() & 1) || m_nr_02_generate_mf_nmi) && m_nr_06_button_m1_nmi_en; }
+	bool nmi_assert_divmmc() { return ((m_io_nmi->read() & 2) || m_nr_02_generate_divmmc_nmi) && m_nr_06_button_drive_nmi_en; }
 	void nr_02_w(u8 nr_wr_dat);
 	bool nr_02_iotrap() { return m_nr_da_iotrap_cause & 3; }
 	void nr_07_cpu_speed_w(u8 data);
@@ -390,9 +391,6 @@ private:
 	u8 m_nr_register;
 	u8 m_port_e3_reg;
 	bool m_divmmc_delayed_check;
-	bool m_copper_req;
-	u8 m_copper_nr_reg;
-	u8 m_copper_nr_dat;
 
 	u8 m_sram_rom;
 	bool m_sram_rom3;
@@ -742,8 +740,6 @@ void specnext_state::bank_update(u8 bank)
 	m_divmmc->en_w(port_divmmc_io_en());
 	m_divmmc->automap_reset_w(!port_divmmc_io_en() || !m_nr_0a_divmmc_automap_en);
 	m_divmmc->automap_active_w(sram_divmmc_automap_en);
-	m_divmmc->retn_seen_w(0);
-	m_divmmc->divmmc_button_w(m_nr_02_generate_divmmc_nmi);
 
 	for (s8 cpu_rd_n = 1; cpu_rd_n >= 0; --cpu_rd_n) // check W then R
 	{
@@ -1868,18 +1864,6 @@ u8 specnext_state::reg_r(offs_t nr_register)
 
 void specnext_state::reg_w(offs_t nr_wr_reg, u8 nr_wr_dat)
 {
-	if (m_copper_req)
-	{
-		if (nr_wr_reg == 0x02)
-		{
-			LOGINTVVV("Copper write: reg=%02x data=%02x\n", nr_wr_reg, nr_wr_dat);
-			m_copper_nr_reg = nr_wr_reg;
-			m_copper_nr_dat = nr_wr_dat;
-			return;
-		}
-		m_copper_req = false;
-	}
-
 	switch (nr_wr_reg)
 	{
 	case 0x02:
@@ -2526,28 +2510,8 @@ void specnext_state::nr_02_w(u8 nr_wr_dat)
 		m_nr_da_iotrap_cause = 0;
 
 	m_nr_02_generate_mf_nmi = BIT(nr_wr_dat, 3);
-	do_mf_nmi();
-
-	if (BIT(nr_wr_dat, 2))
-	{
-		if (m_nr_06_button_drive_nmi_en)
-		{
-			m_nr_02_generate_divmmc_nmi = 1;
-			nmi();
-		}
-	}
-	else
-	{
-		m_nr_02_generate_divmmc_nmi = 0;
-	}
-
-	const u16 mask = 1 << INT_PRIORITY_NMI;
-	if (!m_nr_02_generate_mf_nmi && !m_nr_02_generate_divmmc_nmi && (m_im2_int_status & mask))
-	{
-		m_maincpu->nmi(CLEAR_LINE);
-		m_im2_int_status &= ~mask;
-		update_dma_delay();
-	}
+	m_nr_02_generate_divmmc_nmi = BIT(nr_wr_dat, 2);
+	nmi_rq();
 
 	if (BIT(nr_wr_dat, 1)) // hard reset
 	{
@@ -2680,45 +2644,38 @@ void specnext_state::line_irq_adjust()
 		m_irq_line_timer->reset();
 }
 
-INPUT_CHANGED_MEMBER(specnext_state::on_mf_nmi)
+INPUT_CHANGED_MEMBER(specnext_state::on_nmi_button)
 {
-	if (m_nr_03_config_mode)
-		return;
-
-	m_nr_02_generate_mf_nmi = newval & 1;
-	do_mf_nmi();
-	m_nr_02_generate_mf_nmi = 0;
+	nmi_rq();
 }
 
-INPUT_CHANGED_MEMBER(specnext_state::on_divmmc_nmi)
+void specnext_state::nmi_rq()
 {
-	if (m_nr_03_config_mode)
-		return;
-
-	m_nr_02_generate_divmmc_nmi = newval & 1;
-	if (m_nr_06_button_drive_nmi_en && m_nr_02_generate_divmmc_nmi)
-		nmi();
-}
-
-void specnext_state::do_mf_nmi()
-{
-	if (m_nr_06_button_m1_nmi_en && m_nr_02_generate_mf_nmi)
+	if (!m_nr_03_config_mode)
 	{
-		nmi();
-		m_mf->button_w(1);
+		m_mf->button_w(nmi_assert_mf());
 		m_mf->clock_w();
-		m_mf->button_w(0);
+
+		m_divmmc->divmmc_button_w(nmi_assert_divmmc());
+		m_divmmc->clock_w();
+
+		if ((nmi_assert_mf() || nmi_assert_divmmc()))
+		{
+			LOGINTVVV("NMI: on (%s)\n", nmi_assert_mf() ? "MF" : "DivMMC");
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			m_maincpu->abort_timeslice();
+		}
 	}
 }
 
-void specnext_state::nmi()
+void specnext_state::nmi_ack(int state)
 {
-	const u16 mask = 1 << INT_PRIORITY_NMI;
-	if (~m_im2_int_status & mask)
+	if (state)
 	{
-		m_maincpu->nmi(ASSERT_LINE);
-		m_im2_int_status |= mask;
+		LOGINTVVV("NMI: ack\n");
+		m_im2_int_status |= 1 << INT_PRIORITY_NMI;
 		update_dma_delay();
+		bank_update(0, 2);
 	}
 }
 
@@ -2726,14 +2683,20 @@ void specnext_state::leave_nmi(int state)
 {
 	m_mf->cpu_retn_seen_w(1);
 	m_mf->clock_w();
-
-	m_divmmc->retn_seen_w(1);
-	m_divmmc->clock_w();
-
 	m_mf->cpu_retn_seen_w(0);
 	m_mf->clock_w();
 
+	m_divmmc->retn_seen_w(1);
+	m_divmmc->clock_w();
+	m_divmmc->retn_seen_w(0);
+	m_divmmc->clock_w();
+
+	m_im2_int_status &= ~(1 << INT_PRIORITY_NMI);
+	update_dma_delay();
 	bank_update(0, 2);
+
+	LOGINTVVV("NMI: off\n");
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 u8 specnext_state::do_m1(offs_t offset)
@@ -2777,7 +2740,7 @@ void specnext_state::map_fetch(address_map &map)
 			if (m_divmmc_delayed_check)
 			{
 				/* Happens after RW cycles (before next M1 fetch).
-				Fell like side effects check must be ignored here,
+				Feels like side effects check must be ignored here,
 				because doesn't matter who reset this lines and such
 				approach gives better experience in debugger UI. */
 				do_m1(offset);
@@ -2788,12 +2751,6 @@ void specnext_state::map_fetch(address_map &map)
 				{
 					m_maincpu->adjust_icount(1);
 				}
-			}
-
-			if (m_copper_req)
-			{
-				m_copper_req = 0;
-				reg_w(m_copper_nr_reg, m_copper_nr_dat);
 			}
 		}
 
@@ -3206,8 +3163,8 @@ INPUT_PORTS_START(specnext)
 	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_BUTTON7)        PORT_PLAYER(2) PORT_CODE(JOYCODE_BUTTON7)   PORT_NAME("Joystick (R) Mode")
 
 	PORT_MODIFY("NMI")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI MF") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(specnext_state::on_mf_nmi), 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI DivMMC") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(specnext_state::on_divmmc_nmi), 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI MF") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(specnext_state::on_nmi_button), 0)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("NMI DivMMC") PORT_CODE(KEYCODE_F11) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(specnext_state::on_nmi_button), 0)
 
 	PORT_START("LYRS")
 	PORT_CONFNAME(0x08, 0x00, "Disable Sprites")
@@ -3262,9 +3219,6 @@ void specnext_state::machine_start()
 	save_item(NAME(m_nr_register));
 	save_item(NAME(m_port_e3_reg));
 	save_item(NAME(m_divmmc_delayed_check));
-	save_item(NAME(m_copper_req));
-	save_item(NAME(m_copper_nr_reg));
-	save_item(NAME(m_copper_nr_dat));
 	save_item(NAME(m_sram_rom));
 	save_item(NAME(m_sram_rom3));
 	save_item(NAME(m_sram_alt_128_n));
@@ -3615,6 +3569,7 @@ void specnext_state::machine_reset()
 	// TODO prevent from soft reset in config mode?
 	spectrum_128_state::machine_reset();
 
+	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	m_irq_line_timer->reset();
 
 	if (m_nr_02_hard_reset)
@@ -3680,9 +3635,6 @@ void specnext_state::machine_reset()
 	port_ff3b_ulap_en_w(0);
 	m_nr_register = 0x24;
 	//copper_requester_d  = 0;
-	m_copper_req = 0;
-	m_copper_nr_reg = 0x00;
-	m_copper_nr_dat = 0x00;
 	//cpu_requester_d  = 0;
 	//cpu_req  = 0;
 	//cpu_nr_reg  = 0x00;
@@ -3917,6 +3869,7 @@ void specnext_state::tbblue(machine_config &config)
 	m_maincpu->set_io_map(&specnext_state::map_io);
 	m_maincpu->set_vblank_int("screen", FUNC(specnext_state::specnext_interrupt));
 	m_maincpu->set_irq_acknowledge_callback(NAME([](device_t &, int){ return 0xff; }));
+	m_maincpu->nmiack_cb().set(FUNC(specnext_state::nmi_ack));
 	m_maincpu->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
 	m_maincpu->in_nextreg_cb().set([this](offs_t offset) { return m_next_regs.read_byte(offset); });
 	m_maincpu->out_retn_seen_cb().set(FUNC(specnext_state::leave_nmi));
@@ -3993,7 +3946,7 @@ void specnext_state::tbblue(machine_config &config)
 	SPECNEXT_SPRITES(config, m_sprites, 0).set_palette(m_palette->device().tag(), 0x600, 0x700);
 
 	SPECNEXT_COPPER(config, m_copper, 28_MHz_XTAL);
-	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_copper_req = 1; m_next_regs.write_byte(offset, data); });
+	m_copper->out_nextreg_cb().set([this](offs_t offset, u8 data) { m_next_regs.write_byte(offset, data); });
 	m_copper->set_in_until_pos_cb(FUNC(specnext_state::copper_until_pos_r));
 
 	SOFTWARE_LIST(config, "sd_list").set_original("specnext_sd");

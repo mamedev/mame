@@ -910,6 +910,7 @@ z80_device::z80_device(const machine_config &mconfig, device_type type, const ch
 	m_opcodes_config("opcodes", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 16, 0),
 	m_irqack_cb(*this),
+	m_nmiack_cb(*this),
 	m_refresh_cb(*this),
 	m_nomreq_cb(*this),
 	m_halt_cb(*this),

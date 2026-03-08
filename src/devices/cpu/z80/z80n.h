@@ -20,8 +20,6 @@ public:
 	bool nmi_stackless_r() { return m_stackless; }
 	void nmi_stackless_w(bool data) { m_stackless = data; }
 
-	void nmi(int state);
-
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

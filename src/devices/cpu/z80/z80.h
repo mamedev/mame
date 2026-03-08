@@ -38,6 +38,7 @@ public:
 	template <typename... T> void set_m1_map(T &&... args) { set_addrmap(AS_OPCODES, std::forward<T>(args)...); }
 	template <typename... T> void set_io_map(T &&... args) { set_addrmap(AS_IO, std::forward<T>(args)...); }
 	auto irqack_cb() { return m_irqack_cb.bind(); }
+	auto nmiack_cb() { return m_nmiack_cb.bind(); }
 	auto refresh_cb() { return m_refresh_cb.bind(); }
 	auto nomreq_cb() { return m_nomreq_cb.bind(); }
 	auto halt_cb() { return m_halt_cb.bind(); }
@@ -134,6 +135,7 @@ protected:
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 
 	devcb_write_line m_irqack_cb;
+	devcb_write_line m_nmiack_cb;
 	devcb_write8 m_refresh_cb;
 	devcb_write8 m_nomreq_cb;
 	devcb_write_line m_halt_cb;

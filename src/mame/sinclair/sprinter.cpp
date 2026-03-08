@@ -31,7 +31,6 @@ Following manual configuration adjustments are recommended for better experience
 - CDROM CDDA Sound is only connected to ata1:1
 - Input Settings > Keyboard Selection >
         Microsoft Natural Keyboard [root:kbd:ms_naturl]: Enabled
-- Use '-rs232 microsoft_mouse'
 - Input Settings > Input Assignments (this system) > Microsoft 2-Button Serial Mouse (HLE) [root:rs232:microsoft_mouse]
         Mouse X 3 Analog:                                Mouse X    (MOUSECODE_1_XAXIS)
         Mouse X 3 Analog Inc:                            Mouse X -  (MOUSECODE_1_XAXIS_NEG_SWITCH)

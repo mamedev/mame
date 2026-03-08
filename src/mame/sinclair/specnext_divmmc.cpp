@@ -122,6 +122,9 @@ void specnext_divmmc_device::device_reset()
 	m_cpu_mreq_n = 0;
 	m_cpu_m1_n = 0;
 
+	m_retn_seen = 0;
+	m_divmmc_button = 0;
+
 	m_automap_instant_on = 0;
 	m_automap_delayed_on = 0;
 	m_automap_delayed_off = 0;
