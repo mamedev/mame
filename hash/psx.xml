@@ -3701,8 +3701,9 @@ boot OK, sprite animations have black dots
 		</part>
 	</software>
 
-	<software name="bravoar">
-		<!-- Original images (Redump)
+	<software name="bravoar" cloneof="airrace">
+		<!--
+		http://redump.org/disc/11093/
 		<rom name="Bravo Air Race (USA).cue" size="780" crc="cc7a7d50" sha1="23ad604915d0ca037b9be7ffb0169ad2fbc7327e"/>
 		<rom name="Bravo Air Race (USA) (Track 1).bin" size="396596592" crc="26f08675" sha1="2e8c597bd767fe2fc523e95d90967710f0d3eaa0"/>
 		<rom name="Bravo Air Race (USA) (Track 2).bin" size="78949584" crc="410c617f" sha1="1ad5ed5d47db0603187c9036c206148721160eb0"/>
@@ -3715,11 +3716,15 @@ boot OK, sprite animations have black dots
 		<description>Bravo Air Race (USA)</description>
 		<year>1997</year>
 		<publisher>THQ</publisher>
+		<info name="barcode" value="7 52919 47017 6"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Xing Entertainment"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00488"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="bravo air race (usa)" sha1="63cb33c9c3f6e608b311ba47bc67370159c911d2"/>
+				<disk name="Bravo Air Race (USA)" sha1="2a35d12f18624ff1e24f6afdb7c9c860060a59dc"/>
 			</diskarea>
 		</part>
 	</software>
@@ -7197,10 +7202,11 @@ boot OK
 		</part>
 	</software>
 
-	<software name="doom">
-		<!-- Original images (Redump)
+	<software name="doom_us" cloneof="doom" supported="partial">
+		<!--
+		http://redump.org/disc/70267/
 		<rom name="Doom (USA).cue" size="814" crc="4ac4daaa" sha1="c49b78272df9a92fb58caa213b0d61e169bedcbd"/>
-		<rom name="Doom (USA) (Track 1).bin" size="84175728" crc="5e0a06c1" sha1="ffaf61f133414dd8f8b3dfc4164c9981f6c73761"/>
+		<rom name="Doom (USA) (Track 1).bin" size="84175728" crc="e2952776" sha1="95950c56227280600595fd3617dbe158c16ea141"/>
 		<rom name="Doom (USA) (Track 2).bin" size="33737088" crc="b0d25ed2" sha1="9b970749ed2c9247727e6c771068cade0fdde181"/>
 		<rom name="Doom (USA) (Track 3).bin" size="20801088" crc="b5152e86" sha1="105be172a2ca6537565f3b3bfaa967063ce83ec1"/>
 		<rom name="Doom (USA) (Track 4).bin" size="41992608" crc="5b53702c" sha1="5829a53feea9b3fb3f313c5c1807530de423f238"/>
@@ -7212,11 +7218,46 @@ boot OK
 		<description>Doom (USA)</description>
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
+		<notes><![CDATA[
+Incorrect 3D graphics during gameplay
+]]></notes>
+		<info name="barcode" value="0 31719 26950 1"/>
+		<info name="language" value="English" />
 		<info name="serial" value="SLUS-00077"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="doom (usa)" sha1="dc8481ece400c356eba83373a2b77e5afae7f74f"/>
+				<disk name="Doom (USA)" sha1="1bba025ceb7e02687cc8c29160468d3a66b2db2d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="doom_us1" cloneof="doom" supported="partial">
+		<!--
+		http://redump.org/disc/10351/
+		<rom name="Doom (USA) (Rev 1).cue" size="878" crc="630965e1" sha1="965caeb6636f5be02eb58b43c4ae64a106901107"/>
+		<rom name="Doom (USA) (Rev 1) (Track 1).bin" size="84175728" crc="5e0a06c1" sha1="ffaf61f133414dd8f8b3dfc4164c9981f6c73761"/>
+		<rom name="Doom (USA) (Rev 1) (Track 2).bin" size="33737088" crc="b0d25ed2" sha1="9b970749ed2c9247727e6c771068cade0fdde181"/>
+		<rom name="Doom (USA) (Rev 1) (Track 3).bin" size="20801088" crc="b5152e86" sha1="105be172a2ca6537565f3b3bfaa967063ce83ec1"/>
+		<rom name="Doom (USA) (Rev 1) (Track 4).bin" size="41992608" crc="5b53702c" sha1="5829a53feea9b3fb3f313c5c1807530de423f238"/>
+		<rom name="Doom (USA) (Rev 1) (Track 5).bin" size="36717072" crc="5076ccc0" sha1="094d171831e7e3764746908d286c0eea0e7633cb"/>
+		<rom name="Doom (USA) (Rev 1) (Track 6).bin" size="22936704" crc="9fb12048" sha1="8cfce2f9c199f7deadc62a24582494c4a9ce5209"/>
+		<rom name="Doom (USA) (Rev 1) (Track 7).bin" size="9847824" crc="33c2f160" sha1="23c7727aa03edbcaa86b7ce515b804ad7b71b47f"/>
+		<rom name="Doom (USA) (Rev 1) (Track 8).bin" size="40560240" crc="e80effa2" sha1="ce6c6c547ce57af2bb165fcc2dff9d0fe8334c74"/>
+		-->
+		<description>Doom (USA, rev. 1)</description>
+		<year>1995</year>
+		<publisher>Williams Entertainment</publisher>
+		<notes><![CDATA[
+Incorrect 3D graphics during gameplay
+]]></notes>
+		<info name="barcode" value="0 31719 26950 1"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLUS-00077"/>
+		<sharedfeat name="compatibility" value="NTSC-U"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Doom (USA) (rev 1)" sha1="1fe56d1e220712bdc2681bb55f2e90b457cc593b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -22686,8 +22727,9 @@ boot OK
 		</part>
 	</software>
 
-	<software name="seamonk">
-		<!-- Original images (Redump)
+	<software name="seamonk_us" cloneof="seamonk">
+		<!--
+		http://redump.org/disc/11086/
 		<rom name="Amazing Virtual Sea-Monkeys, The (USA) (En,Es).cue" size="1674" crc="fa51f14c" sha1="1b5658017eb90b51a5ebd37854812a5e8a1801fe"/>
 		<rom name="Amazing Virtual Sea-Monkeys, The (USA) (En,Es) (Track 01).bin" size="56351568" crc="1d08e911" sha1="0af130d73661da9ca2a84c41fa522bfab845e2aa"/>
 		<rom name="Amazing Virtual Sea-Monkeys, The (USA) (En,Es) (Track 02).bin" size="54545232" crc="3c125e4a" sha1="02f48b11bbd5099af81f9af923cf1f0af67e7ef5"/>
@@ -22705,11 +22747,15 @@ boot OK
 		<description>The Amazing Virtual Sea-Monkeys (USA)</description>
 		<year>2002</year>
 		<publisher>Conspiracy Entertainment</publisher>
+		<info name="barcode" value="8 15315 00035 1"/>
+		<info name="developer" value="Creature Labs"/>
+		<info name="language" value="English" />
+		<info name="language" value="Spanish" />
 		<info name="serial" value="SLUS-01475"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="amazing virtual sea-monkeys, the (usa) (en,es)" sha1="8e992dd0d446edab365a285a666ba0f91a0670fc"/>
+				<disk name="Amazing Virtual Sea-Monkeys, The (USA) (En,Es)" sha1="b18e528ef8bcb0c4b07a0270e358a3fc08636778"/>
 			</diskarea>
 		</part>
 	</software>
@@ -25928,19 +25974,22 @@ hangs at first loading screen
 		</part>
 	</software>
 
-	<software name="tdoffr3">
-		<!-- Original images (Redump)
+	<software name="tdoffr3" cloneof="4x4trophy">
+		<!--
+		http://redump.org/disc/11113/
 		<rom name="Test Drive Off-Road 3 (USA).cue" size="93" crc="2072af36" sha1="c02dbe2024208320f6d82a16da2efdfab3e8336d"/>
 		<rom name="Test Drive Off-Road 3 (USA).bin" size="505957536" crc="9cc878f9" sha1="fe04c5f84119a3952e5f34381877b4c143297539"/>
 		-->
 		<description>Test Drive Off-Road 3 (USA)</description>
 		<year>1999</year>
 		<publisher>Infogrames</publisher>
+		<info name="developer" value="Accolade"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00840"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="test drive off-road 3 (usa)" sha1="491fc69bfcb3d6706a6bc7d8b4b23b8e847da2db"/>
+				<disk name="Test Drive Off-Road 3 (USA)" sha1="10bc9e9e46a948d7fab807f285d16a8507fb1521"/>
 			</diskarea>
 		</part>
 	</software>
@@ -29655,8 +29704,9 @@ boot OK
 		</part>
 	</software>
 
-	<software name="vrsocc96">
-		<!-- Original images (Redump)
+	<software name="vrsocc96" cloneof="actsoccr">
+		<!--
+		http://redump.org/disc/7821/
 		<rom name="VR Soccer '96 (USA).cue" size="208" crc="841add3f" sha1="1ad0f02b97d6895e4b5aa09ca2cb58141da75561"/>
 		<rom name="VR Soccer '96 (USA) (Track 1).bin" size="76559952" crc="f4275216" sha1="8519a37af3494317ab3e9236dec8783899d33dc3"/>
 		<rom name="VR Soccer '96 (USA) (Track 2).bin" size="59475024" crc="076a39f3" sha1="edfbccdd994f2cd9eddf321f881113fab645df44"/>
@@ -29664,11 +29714,15 @@ boot OK
 		<description>VR Soccer '96 (USA)</description>
 		<year>1996</year>
 		<publisher>Interplay Productions</publisher>
+		<info name="barcode" value="0 40421 89224 2"/>
+		<info name="barcode" value="0 40421 89457 4"/> <!-- Canadian longbox variant -->
+		<info name="developer" value="Gremlin Interactive"/>
+		<info name="language" value="English"/>
 		<info name="serial" value="SLUS-00199"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="vr soccer '96 (usa)" sha1="b39027e805872b15a4da183c7a14c0b7219729e1"/>
+				<disk name="VR Soccer '96 (USA)" sha1="312971ab511cf45ac39155e0d67ea1b602581527"/>
 			</diskarea>
 		</part>
 	</software>
@@ -37815,6 +37869,7 @@ The game only boot on PAL
 		<description>Actua Golf (Japan)</description>
 		<year>1996</year>
 		<publisher>Naxat Soft</publisher>
+		<info name="alt_title" value="アクチャー・ゴルフ"/>
 		<info name="developer" value="Gremlin Interactive"/>
 		<info name="language" value="English" />
 		<info name="serial" value="SLPS-00298" />
@@ -37823,6 +37878,29 @@ The game only boot on PAL
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Actua Golf (Japan)" sha1="6e74c663af2d33f71ad08b686ebb90663554b9a9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actsoccr_jp" cloneof="actsoccr">
+		<!--
+		http://redump.org/disc/34756/
+		<rom name="Actua Soccer (Japan).cue" size="210" crc="79603450" sha1="4fd43e2de54e8b8e8222562171fb6b3b8b9b0750"/>
+		<rom name="Actua Soccer (Japan) (Track 1).bin" size="116941440" crc="d2317d57" sha1="2f9bf67ffbddf6a8ba405890493a3b98aec7a20b"/>
+		<rom name="Actua Soccer (Japan) (Track 2).bin" size="59475024" crc="076a39f3" sha1="edfbccdd994f2cd9eddf321f881113fab645df44"/>
+		-->
+		<description>Actua Soccer (Japan)</description>
+		<year>1996</year>
+		<publisher>Naxat Soft</publisher>
+		<info name="alt_title" value="アクチャーサッカー"/>
+		<info name="barcode" value="4 988658 967028"/>
+		<info name="developer" value="Gremlin Interactive"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SLPS-00297" />
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Actua Soccer (Japan)" sha1="b6cdd26ff7b4bda549f2d52581cc477e5fce185b"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38403,10 +38481,38 @@ Corrupted sound on title menu and during gameplay
 Black screen after SCEI logo
 ]]></notes>
 		<info name="alt_title" value="クライムクラッカーズ"/>
+		<info name="developer" value="Media Vision Entertainment"/>
+		<info name="language" value="Japanese"/>
+		<info name="serial" value="SCPS-10003"/>
 		<sharedfeat name="compatibility" value="NTSC-J"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
-				<disk name="crime crackers (japan)" sha1="64d397189dd5acb496c9ea2da2398a2201c6c1f9"/>
+				<disk name="Crime Crackers (Japan)" sha1="64d397189dd5acb496c9ea2da2398a2201c6c1f9"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="crimecr2">
+		<!--
+		http://redump.org/disc/33250/
+		<rom name="Crime Crackers 2 (Japan).cue" size="90" crc="107c014d" sha1="8bb25a47a18f062e6861b3a9867e3bad7867a08b"/>
+		<rom name="Crime Crackers 2 (Japan).bin" size="716590896" crc="2fa8ef56" sha1="79af1460a524ba1c5f238cc7b155bce54476d090"/>
+		-->
+		<description>Crime Crackers 2 (Japan)</description>
+		<year>1997</year>
+		<publisher>Sony Computer Entertainment</publisher>
+		<notes><![CDATA[
+boot OK
+]]></notes>
+		<info name="alt_title" value="クライムクラッカーズ2"/>
+		<info name="developer" value="Media Vision Entertainment"/>
+		<info name="language" value="Japanese"/>
+		<info name="release" value="19971127"/>
+		<info name="serial" value="SCPS-10037"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Crime Crackers 2 (Japan)" sha1="7c48d629203a4e18136b8fcab3bd7565ba617680"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38423,6 +38529,38 @@ Black screen after SCEI logo
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="depth (japan)" sha1="f525fb1fe7dbe9b7748756f181903a4269b8f842"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="doom_jp" cloneof="doom" supported="partial">
+		<!--
+		http://redump.org/disc/23737/
+		<rom name="Doom (Japan).cue" size="830" crc="38c6d76a" sha1="cf09af0b3662d8db62be32059b08f8dcc6f995cc"/>
+		<rom name="Doom (Japan) (Track 1).bin" size="84175728" crc="e1ce50ec" sha1="08d558f348a009e8b7a52d2bfccc111f65949855"/>
+		<rom name="Doom (Japan) (Track 2).bin" size="33737088" crc="b0d25ed2" sha1="9b970749ed2c9247727e6c771068cade0fdde181"/>
+		<rom name="Doom (Japan) (Track 3).bin" size="20801088" crc="b5152e86" sha1="105be172a2ca6537565f3b3bfaa967063ce83ec1"/>
+		<rom name="Doom (Japan) (Track 4).bin" size="41992608" crc="5b53702c" sha1="5829a53feea9b3fb3f313c5c1807530de423f238"/>
+		<rom name="Doom (Japan) (Track 5).bin" size="36717072" crc="5076ccc0" sha1="094d171831e7e3764746908d286c0eea0e7633cb"/>
+		<rom name="Doom (Japan) (Track 6).bin" size="22936704" crc="9fb12048" sha1="8cfce2f9c199f7deadc62a24582494c4a9ce5209"/>
+		<rom name="Doom (Japan) (Track 7).bin" size="9847824" crc="33c2f160" sha1="23c7727aa03edbcaa86b7ce515b804ad7b71b47f"/>
+		<rom name="Doom (Japan) (Track 8).bin" size="40560240" crc="e80effa2" sha1="ce6c6c547ce57af2bb165fcc2dff9d0fe8334c74"/>
+		-->
+		<description>Doom (Japan)</description>
+		<year>1996</year>
+		<publisher>Soft Bank</publisher>
+		<notes><![CDATA[
+Incorrect 3D graphics during gameplay
+]]></notes>
+		<info name="alt_title" value="ドゥーム"/>
+		<info name="barcode" value="4 980124 010078"/>
+		<info name="developer" value="Midway"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLPS-00308"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Doom (Japan)" sha1="590d5cb9e93d3ae115e6303ceb8da575f01d003d"/>
 			</diskarea>
 		</part>
 	</software>
@@ -38554,6 +38692,35 @@ this image doesn't boot
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="raiden project (japan)" sha1="12ec8ee3117df1f95752dc65155a611f43725251"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="recipro5k" cloneof="airrace">
+		<!--
+		http://redump.org/disc/23733/
+		<rom name="Recipro Heat 5000 (Japan, Asia).cue" size="857" crc="d94a499d" sha1="1bd63b040c9011ccc222ff9c1b840e21331ac963"/>
+		<rom name="Recipro Heat 5000 (Japan, Asia) (Track 1).bin" size="393844752" crc="ed441717" sha1="237596274b8f9747bce28447c672b4a4620ac681"/>
+		<rom name="Recipro Heat 5000 (Japan, Asia) (Track 2).bin" size="78949584" crc="410c617f" sha1="1ad5ed5d47db0603187c9036c206148721160eb0"/>
+		<rom name="Recipro Heat 5000 (Japan, Asia) (Track 3).bin" size="60180624" crc="ae7ee2ce" sha1="15dc08d477481e20cd1b102ba1e40194486fd821"/>
+		<rom name="Recipro Heat 5000 (Japan, Asia) (Track 4).bin" size="62687856" crc="48aba40e" sha1="edbba54ea5978bc3d489dd68a0615aa6c45ed738"/>
+		<rom name="Recipro Heat 5000 (Japan, Asia) (Track 5).bin" size="23221296" crc="866c80ba" sha1="b5d2e40f9be7ec7ab43ed4fc6c9dae76a3dd5f0d"/>
+		<rom name="Recipro Heat 5000 (Japan, Asia) (Track 6).bin" size="21520800" crc="1fcd8e20" sha1="5aaa6263517795b01fa8fe66302fa23f79b07a58"/>
+		<rom name="Recipro Heat 5000 (Japan, Asia) (Track 7).bin" size="70004928" crc="723fd549" sha1="3057f7eae947b6fddb2585e62ba05223cd87c133"/>
+		-->
+		<description>Recipro Heat 5000 (Japan)</description>
+		<year>1997</year>
+		<publisher>Xing Entertainment</publisher>
+		<info name="alt_title" value="レシプロヒート５０００"/>
+		<info name="developer" value="Xing Entertainment"/>
+		<info name="language" value="Japanese" />
+		<info name="serial" value="SCPS-45089"/>
+		<info name="serial" value="SLPS-00744"/>
+		<info name="serial" value="SLPS-02829"/>
+		<sharedfeat name="compatibility" value="NTSC-J"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Recipro Heat 5000 (Japan, Asia)" sha1="24c3730046b867b609db337ed72b9c18ce3778f6"/>
 			</diskarea>
 		</part>
 	</software>
@@ -42489,29 +42656,6 @@ boot OK
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="cotton 100 (japan) [slpm-87211]" sha1="9875be77df81d4dd10d5c7aff0b549a2050328fb" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="crimecr2">
-		<!--
-		Unknown source
-		<rom name="Crime Crackers 2 (Japan) [SCPS-10037].bin" size="716590896" crc="eb4f01ff" sha1="57352ae9ad8bf769ceef36bcbb6c58de0817d297"/>
-		<rom name="Crime Crackers 2 (Japan) [SCPS-10037].cue" size="103" crc="1729b30d" sha1="746b6861123fa5fef9381fa1e1a44ed71b5c918f"/>
-		-->
-		<description>Crime Crackers 2 (Japan)</description>
-		<year>1997</year>
-		<publisher>Sony Computer Entertainment</publisher>
-		<notes><![CDATA[
-boot OK
-]]></notes>
-		<info name="serial" value="SCPS-10037" />
-		<info name="release" value="19971127" />
-		<info name="alt_title" value="クライムクラッカーズ2"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="crime crackers 2 (japan) [scps-10037]" sha1="c369f8dfd4a636ad2f30d5dfa74c362c15fa29a3" status="baddump"/>
 			</diskarea>
 		</part>
 	</software>
@@ -55235,29 +55379,6 @@ boot OK
 		</part>
 	</software>
 
-	<software name="rcheat5k">
-		<!--
-		Unknown source
-		<rom name="Recipro Heat 5000 (Japan) [SLPS-00744].bin" size="710057040" crc="5fb97bd6" sha1="d7ed7e93c70d154d99f3384d00d542ee10f15290"/>
-		<rom name="Recipro Heat 5000 (Japan) [SLPS-00744].cue" size="486" crc="576775c4" sha1="005ad085ae85aaf7bb2724270a47a3c158ffbb04"/>
-		-->
-		<description>Recipro Heat 5000 (Japan)</description>
-		<year>1997</year>
-		<publisher>Xing</publisher>
-		<notes><![CDATA[
-boot OK, course select BGM cuts off
-]]></notes>
-		<info name="serial" value="SLPS-00744" />
-		<info name="release" value="19970731" />
-		<info name="alt_title" value="レシプロヒート5000"/>
-		<sharedfeat name="compatibility" value="NTSC-J"/>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="recipro heat 5000 (japan) [slps-00744]" sha1="fefbbfc58109e705421f6912158e6cc3b5504556" status="baddump"/>
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="readymad">
 		<!--
 		Unknown source
@@ -63094,6 +63215,31 @@ boot OK
 		</part>
 	</software>
 
+	<software name="4x4trophy">
+		<!--
+		http://redump.org/disc/25482/
+		<rom name="4x4 World Trophy (Europe) (En,Fr,De,Es,It).cue" size="108" crc="d4043ac7" sha1="048fc3081e5757fdf60320395fb4df919431361c"/>
+		<rom name="4x4 World Trophy (Europe) (En,Fr,De,Es,It).bin" size="510800304" crc="334d7890" sha1="439745a0b026a516b07b69bf83d45dbbe17749ae"/>
+		-->
+		<description>4x4 World Trophy (Europe)</description>
+		<year>2000</year>
+		<publisher>Infogrames</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Accolade" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-02017"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="4x4 World Trophy (Europe)" sha1="e52da9e44590ecc7419c7c748b9302e67084a872"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="a2racer">
 		<!--
 		http://redump.org/disc/18700/
@@ -63464,6 +63610,52 @@ Scrambled graphics when shooting the ball
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Pool Shark (Europe)" sha1="5a2a773ecab72985a8a30e74e31e8dfde17af78a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actsoccr">
+		<!--
+		http://redump.org/disc/1284/
+		<rom name="Actua Soccer (Europe) (En,Fr) (Rev 1).cue" size="244" crc="78deba2d" sha1="84c9b469c32fe4cc71f9bbaab3893fbe90419399"/>
+		<rom name="Actua Soccer (Europe) (En,Fr) (Rev 1) (Track 1).bin" size="232104768" crc="7861c55b" sha1="aefaa16ef03d75950f860e05195422793d323290"/>
+		<rom name="Actua Soccer (Europe) (En,Fr) (Rev 1) (Track 2).bin" size="59475024" crc="076a39f3" sha1="edfbccdd994f2cd9eddf321f881113fab645df44"/>
+		-->
+		<description>Actua Soccer (Europe, rev. 1)</description>
+		<year>1996</year>
+		<publisher>Gremlin Interactive</publisher>
+		<info name="barcode" value="5 013658 085638" />
+		<info name="developer" value="Gremlin Interactive" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="serial" value="SLES-00014"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Actua Soccer (Europe) (En,Fr) (Rev 1)" sha1="0743031b6679861ee10fcb84f4dea0f95bcda656"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="actsoccr_a" cloneof="actsoccr">
+		<!--
+		http://redump.org/disc/1278/
+		<rom name="Actua Soccer (Europe) (En,Fr).cue" size="228" crc="50a0af50" sha1="9f6b54624842a36d80d8110c790b8a79cf4b5623"/>
+		<rom name="Actua Soccer (Europe) (En,Fr) (Track 1).bin" size="232095360" crc="e9bd9ddf" sha1="9eb5ff830cee03e6000e06931884984b26b2539e"/>
+		<rom name="Actua Soccer (Europe) (En,Fr) (Track 2).bin" size="59475024" crc="076a39f3" sha1="edfbccdd994f2cd9eddf321f881113fab645df44"/>
+		-->
+		<description>Actua Soccer (Europe)</description>
+		<year>1996</year>
+		<publisher>Gremlin Interactive</publisher>
+		<info name="barcode" value="5 013658 022398" />
+		<info name="developer" value="Gremlin Interactive" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="serial" value="SLES-00014"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Actua Soccer (Europe) (En,Fr)" sha1="b291191de04f3b21c55c516eee18bba70fd2b66a"/>
 			</diskarea>
 		</part>
 	</software>
@@ -63924,6 +64116,34 @@ During gameplay, the commentary speech audio is playing too fast
 		</part>
 	</software>
 
+	<software name="airrace">
+		<!--
+		http://redump.org/disc/27349/
+		<rom name="Air Race (Europe).cue" size="759" crc="151a6737" sha1="27e09b84d7ac16db955c90676dd6e764ffb82cbe"/>
+		<rom name="Air Race (Europe) (Track 1).bin" size="406411488" crc="2d75ad67" sha1="ecaa0f6289a2c51d0aea8368ee4f4049aa475100"/>
+		<rom name="Air Race (Europe) (Track 2).bin" size="23221296" crc="866c80ba" sha1="b5d2e40f9be7ec7ab43ed4fc6c9dae76a3dd5f0d"/>
+		<rom name="Air Race (Europe) (Track 3).bin" size="60180624" crc="ae7ee2ce" sha1="15dc08d477481e20cd1b102ba1e40194486fd821"/>
+		<rom name="Air Race (Europe) (Track 4).bin" size="62687856" crc="48aba40e" sha1="edbba54ea5978bc3d489dd68a0615aa6c45ed738"/>
+		<rom name="Air Race (Europe) (Track 5).bin" size="78949584" crc="410c617f" sha1="1ad5ed5d47db0603187c9036c206148721160eb0"/>
+		<rom name="Air Race (Europe) (Track 6).bin" size="21520800" crc="1fcd8e20" sha1="5aaa6263517795b01fa8fe66302fa23f79b07a58"/>
+		<rom name="Air Race (Europe) (Track 7).bin" size="70004928" crc="723fd549" sha1="3057f7eae947b6fddb2585e62ba05223cd87c133"/>
+		-->
+		<description>Air Race (Europe)</description>
+		<year>1997</year>
+		<publisher>THQ</publisher>
+		<info name="barcode" value="7 52919 47017 6"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Xing Entertainment"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-00762"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Air Race (Europe)" sha1="cb8685ed06db8710b85cb335537296e754f48397"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="pm2001">
 		<!--
 		http://redump.org/disc/795
@@ -64210,6 +64430,46 @@ Corrupted sound on title menu and during gameplay
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Alone in the Dark - Jack Is Back (Europe) (En,Fr,De,Es,It)" sha1="9b7faad11506cc128dcdfa289b4c204cbbd57505"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="seamonk">
+		<!--
+		http://redump.org/disc/5499/
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt).cue" size="1890" crc="a794ac8f" sha1="9ad878ee7a94c02f843957563822570aa3b3aeba"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 01).bin" size="56262192" crc="58268114" sha1="28cc40a13e53eab389222860e54e420db3ef776f"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 02).bin" size="54545232" crc="3c125e4a" sha1="02f48b11bbd5099af81f9af923cf1f0af67e7ef5"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 03).bin" size="53983104" crc="324aaaa6" sha1="a211c93a53e985da0be6fdd70ba9c828418a9abf"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 04).bin" size="53700864" crc="cd81d1df" sha1="3dc036093fb01879487689276c769033d0fcc116"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 05).bin" size="53418624" crc="0220ef96" sha1="c84781aa0a9da66de368d861b8d40420e9a85523"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 06).bin" size="53418624" crc="96342207" sha1="5e8c81b5ccf82aae4eae26fd09560eb7e7703711"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 07).bin" size="53418624" crc="a6699ab1" sha1="89f399fc0c2a92ed71644f1fb1b599eb88049a20"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 08).bin" size="52851792" crc="82fe815a" sha1="8a6be6fcaca82ea10bfc3df74dde976aae45b61a"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 09).bin" size="50029392" crc="e61379c1" sha1="f1bc11a91bea86172e1c04d203fd626a60ddee92"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 10).bin" size="47771472" crc="e52081ba" sha1="9dc4b22242cdd33a781143c608a4bce6e25c2ba8"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 11).bin" size="53134032" crc="6ffaa8d6" sha1="e166c1b26d3d443c5be8206184fb824ed6b6baed"/>
+		<rom name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt) (Track 12).bin" size="53134032" crc="615247d1" sha1="a3199a4ff2af36d1be6b0f5acb7596620adf9fea"/>
+		-->
+		<description>The Amazing Virtual Sea-Monkeys (Europe)</description>
+		<year>2002</year>
+		<publisher>Conspiracy Entertainment</publisher>
+		<info name="barcode" value="4 033756 004646"/>
+		<info name="barcode" value="4 033756 004660"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Creature Labs"/>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Portuguese" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-00037"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Amazing Virtual Sea-Monkeys, The (Europe) (En,Fr,De,Es,It,Nl,Pt)" sha1="44fc0b2778da90044add3d4f55db4ce038667578"/>
 			</diskarea>
 		</part>
 	</software>
@@ -64681,6 +64941,81 @@ Corrupted sound on title menu and during gameplay
 		</part>
 	</software>
 
+	<software name="bmovie">
+		<!--
+		http://redump.org/disc/15894/
+		<rom name="B-Movie (Europe) (En,Es,It).cue" size="2056" crc="7ddd58ca" sha1="a0cbb0c636b332c033455602b01c78c63a1671ef"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 01).bin" size="11531856" crc="e6f3abf9" sha1="218d4a5afb4c1f53600b310b95fbf4dd1259929c"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 02).bin" size="11106144" crc="f2259b84" sha1="f8ce9ac4cbede01a33ef62f73521f1b9fd834c8b"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 03).bin" size="39243120" crc="040cae34" sha1="0571f4a281e9e9ba399cf1654d2bc5e716fcef1a"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 04).bin" size="8692992" crc="c6420bb6" sha1="728fb329fea2b43a178526f4c8e7205556f9abf0"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 05).bin" size="5647152" crc="152ec820" sha1="e3ed4e0ad137d6bc07d24dc1305de88ddf3e3194"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 06).bin" size="15323280" crc="7acca964" sha1="8f64df6ba564f32337ba50bb892ead1a7293262c"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 07).bin" size="20707008" crc="8dce8c11" sha1="019cab7cccb1e799f22525ba5087963e8390a73f"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 08).bin" size="20953968" crc="5676400a" sha1="2c0b3eab4e5117b2724f93c8c0accddfc07fb6d6"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 09).bin" size="17056704" crc="276e5c3b" sha1="bdfe82bc3ed8436549545e60ddc9eff0fa3714e3"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 10).bin" size="26572896" crc="f383b9c8" sha1="77548a83994e3754956596787d31ee8d22931667"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 11).bin" size="43269744" crc="710a2a39" sha1="0403d5d507eaa1de7c38f4ed7152cb2e56757b9d"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 12).bin" size="24444336" crc="0018d3ab" sha1="645b57b1e8471e8f0bc39a97b5cc5b748c8914f2"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 13).bin" size="25088784" crc="d1fd9b89" sha1="6b9b83b9409c6b7cfa05638cd56b1a83644eb5ab"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 14).bin" size="38248224" crc="b76a925e" sha1="1e9a6a22fc08bb3c5da10aff8afd695494c7e935"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 15).bin" size="42916944" crc="324ea527" sha1="0565c5813a4ff7c0dd3e61db8baab79c26819aa4"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 16).bin" size="51221856" crc="a01e1213" sha1="3d4ebe20fed0dd9b684f2efdb8d017ba29274e9c"/>
+		<rom name="B-Movie (Europe) (En,Es,It) (Track 17).bin" size="51221856" crc="a01e1213" sha1="3d4ebe20fed0dd9b684f2efdb8d017ba29274e9c"/>
+		-->
+		<description>B-Movie (Europe)</description>
+		<year>1998</year>
+		<publisher>GT Interactive</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="King of the Jungle"/>
+		<info name="language" value="English" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-01260"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="B-Movie (Europe) (En,Es,It)" sha1="39cfeae6b9f1d39283254a25bb4e3ab6db3fb218"/>
+			</diskarea>
+		</part>
+	</software>
+	<software name="bmovie_de" cloneof="bmovie">
+		<!--
+		http://redump.org/disc/7533/
+		<rom name="B-Movie (Germany).cue" size="1886" crc="a328a96e" sha1="470cfbe37fdab6398b2250c2bf98cae1f3a65a30"/>
+		<rom name="B-Movie (Germany) (Track 01).bin" size="13046544" crc="cd8c18c6" sha1="a55803128cfd721a17bd627a0afe175c06a1b150"/>
+		<rom name="B-Movie (Germany) (Track 02).bin" size="11106144" crc="f2259b84" sha1="f8ce9ac4cbede01a33ef62f73521f1b9fd834c8b"/>
+		<rom name="B-Movie (Germany) (Track 03).bin" size="39243120" crc="040cae34" sha1="0571f4a281e9e9ba399cf1654d2bc5e716fcef1a"/>
+		<rom name="B-Movie (Germany) (Track 04).bin" size="8692992" crc="c6420bb6" sha1="728fb329fea2b43a178526f4c8e7205556f9abf0"/>
+		<rom name="B-Movie (Germany) (Track 05).bin" size="5647152" crc="152ec820" sha1="e3ed4e0ad137d6bc07d24dc1305de88ddf3e3194"/>
+		<rom name="B-Movie (Germany) (Track 06).bin" size="15323280" crc="7acca964" sha1="8f64df6ba564f32337ba50bb892ead1a7293262c"/>
+		<rom name="B-Movie (Germany) (Track 07).bin" size="20707008" crc="8dce8c11" sha1="019cab7cccb1e799f22525ba5087963e8390a73f"/>
+		<rom name="B-Movie (Germany) (Track 08).bin" size="20953968" crc="5676400a" sha1="2c0b3eab4e5117b2724f93c8c0accddfc07fb6d6"/>
+		<rom name="B-Movie (Germany) (Track 09).bin" size="17056704" crc="276e5c3b" sha1="bdfe82bc3ed8436549545e60ddc9eff0fa3714e3"/>
+		<rom name="B-Movie (Germany) (Track 10).bin" size="26572896" crc="f383b9c8" sha1="77548a83994e3754956596787d31ee8d22931667"/>
+		<rom name="B-Movie (Germany) (Track 11).bin" size="43269744" crc="710a2a39" sha1="0403d5d507eaa1de7c38f4ed7152cb2e56757b9d"/>
+		<rom name="B-Movie (Germany) (Track 12).bin" size="24444336" crc="0018d3ab" sha1="645b57b1e8471e8f0bc39a97b5cc5b748c8914f2"/>
+		<rom name="B-Movie (Germany) (Track 13).bin" size="25088784" crc="d1fd9b89" sha1="6b9b83b9409c6b7cfa05638cd56b1a83644eb5ab"/>
+		<rom name="B-Movie (Germany) (Track 14).bin" size="38248224" crc="b76a925e" sha1="1e9a6a22fc08bb3c5da10aff8afd695494c7e935"/>
+		<rom name="B-Movie (Germany) (Track 15).bin" size="42916944" crc="324ea527" sha1="0565c5813a4ff7c0dd3e61db8baab79c26819aa4"/>
+		<rom name="B-Movie (Germany) (Track 16).bin" size="51221856" crc="a01e1213" sha1="3d4ebe20fed0dd9b684f2efdb8d017ba29274e9c"/>
+		<rom name="B-Movie (Germany) (Track 17).bin" size="51221856" crc="a01e1213" sha1="3d4ebe20fed0dd9b684f2efdb8d017ba29274e9c"/>
+		-->
+		<description>B-Movie (Germany)</description>
+		<year>1998</year>
+		<publisher>GT Interactive</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="King of the Jungle"/>
+		<info name="language" value="German" />
+		<info name="serial" value="SLES-01550"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="B-Movie (Germany)" sha1="587ebd690949cb8f876dfc81d59c1a0fb75475b7"/>
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="babyfelx">
 		<!--
 		http://redump.org/disc/15634/
@@ -64901,6 +65236,121 @@ Corrupted sound on title menu and during gameplay
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="demo one (version 4) (germany)" sha1="61e2f82aebbed4a44887554cc99d0779ce6973e6"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="dodgemar">
+		<!--
+		http://redump.org/disc/12912/
+		<rom name="Dodgem Arena (Europe).cue" size="87" crc="1473d713" sha1="a9b935b26f7e69278897e2f6d86c225a22d06328"/>
+		<rom name="Dodgem Arena (Europe).bin" size="686362992" crc="1e5daf30" sha1="f06f19d4bbc368bad3c6537ac0e1712ea0c86ba8"/>
+		-->
+		<description>Dodgem Arena (Europe)</description>
+		<year>1998</year>
+		<publisher>Project Two Interactive</publisher>
+		<info name="barcode" value="8 714429 000061"/>
+		<info name="developer" value="Formula Game Development"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-01082"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Dodgem Arena (Europe)" sha1="1244d8719d24aafaea13921e99e6c19f8f366bf5"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="doom" supported="partial">
+		<!--
+		http://redump.org/disc/447/
+		<rom name="Doom (Europe).cue" size="838" crc="bd64fd7c" sha1="09587eca5f06a9313ff46aab3920a995a1b3299d"/>
+		<rom name="Doom (Europe) (Track 1).bin" size="84175728" crc="f452676e" sha1="d3f1b1c3db8bb1a31cb371cb17113419f9ddd742"/>
+		<rom name="Doom (Europe) (Track 2).bin" size="33737088" crc="b0d25ed2" sha1="9b970749ed2c9247727e6c771068cade0fdde181"/>
+		<rom name="Doom (Europe) (Track 3).bin" size="20801088" crc="b5152e86" sha1="105be172a2ca6537565f3b3bfaa967063ce83ec1"/>
+		<rom name="Doom (Europe) (Track 4).bin" size="41992608" crc="5b53702c" sha1="5829a53feea9b3fb3f313c5c1807530de423f238"/>
+		<rom name="Doom (Europe) (Track 5).bin" size="36717072" crc="5076ccc0" sha1="094d171831e7e3764746908d286c0eea0e7633cb"/>
+		<rom name="Doom (Europe) (Track 6).bin" size="22936704" crc="9fb12048" sha1="8cfce2f9c199f7deadc62a24582494c4a9ce5209"/>
+		<rom name="Doom (Europe) (Track 7).bin" size="9847824" crc="33c2f160" sha1="23c7727aa03edbcaa86b7ce515b804ad7b71b47f"/>
+		<rom name="Doom (Europe) (Track 8).bin" size="40560240" crc="e80effa2" sha1="ce6c6c547ce57af2bb165fcc2dff9d0fe8334c74"/>
+		-->
+		<description>Doom (Europe)</description>
+		<year>1995</year>
+		<publisher>GT Interactive / Williams Entertainment</publisher>
+		<notes><![CDATA[
+Incorrect 3D graphics during gameplay
+]]></notes>
+		<info name="barcode" value="5 029988 000296"/> <!-- Original edition -->
+		<info name="barcode" value="5 029988 003891"/> <!-- Platinum edition -->
+		<info name="developer" value="Midway"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-00132"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Doom (Europe)" sha1="cd12b931c89f0d6f6ddcc2643e90c41ad96f5148"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="doom_edc" cloneof="doom" supported="partial">
+		<!--
+		http://redump.org/disc/8086/
+		<rom name="Doom (Europe) (EDC).cue" size="886" crc="aa23f6c3" sha1="9570fc3d74833794d8579c3060b6a70ed38147bb"/>
+		<rom name="Doom (Europe) (EDC) (Track 1).bin" size="84175728" crc="b8c62a3e" sha1="68b26665c3f8b8e01c7d0eddb0326fc6e48a4f88"/>
+		<rom name="Doom (Europe) (EDC) (Track 2).bin" size="33737088" crc="b0d25ed2" sha1="9b970749ed2c9247727e6c771068cade0fdde181"/>
+		<rom name="Doom (Europe) (EDC) (Track 3).bin" size="20801088" crc="b5152e86" sha1="105be172a2ca6537565f3b3bfaa967063ce83ec1"/>
+		<rom name="Doom (Europe) (EDC) (Track 4).bin" size="41992608" crc="5b53702c" sha1="5829a53feea9b3fb3f313c5c1807530de423f238"/>
+		<rom name="Doom (Europe) (EDC) (Track 5).bin" size="36717072" crc="5076ccc0" sha1="094d171831e7e3764746908d286c0eea0e7633cb"/>
+		<rom name="Doom (Europe) (EDC) (Track 6).bin" size="22936704" crc="9fb12048" sha1="8cfce2f9c199f7deadc62a24582494c4a9ce5209"/>
+		<rom name="Doom (Europe) (EDC) (Track 7).bin" size="9847824" crc="33c2f160" sha1="23c7727aa03edbcaa86b7ce515b804ad7b71b47f"/>
+		<rom name="Doom (Europe) (EDC) (Track 8).bin" size="40560240" crc="e80effa2" sha1="ce6c6c547ce57af2bb165fcc2dff9d0fe8334c74"/>
+		-->
+		<description>Doom (Europe) (with EDC)</description>
+		<year>1995</year>
+		<publisher>GT Interactive / Williams Entertainment</publisher>
+		<notes><![CDATA[
+Incorrect 3D graphics during gameplay
+]]></notes>
+		<info name="barcode" value="3 546430 010167"/>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Midway"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-00132#"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Doom (Europe) (EDC)" sha1="3e0d246cb78f610d127204f180c1b7e55363440a"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="doom_dm" cloneof="doom" supported="partial">
+		<!--
+		http://redump.org/disc/24277/
+		<rom name="Doom (Europe) (One Level Demo Disc).cue" size="1014" crc="30ff911b" sha1="8f8e6f8f557b2422d2a045c9b91001a981b13f73"/>
+		<rom name="Doom (Europe) (One Level Demo Disc) (Track 1).bin" size="12077520" crc="39e5a8ab" sha1="a3af069fc177a091aa923f5ca4915c854b3b7018"/>
+		<rom name="Doom (Europe) (One Level Demo Disc) (Track 2).bin" size="33737088" crc="b0d25ed2" sha1="9b970749ed2c9247727e6c771068cade0fdde181"/>
+		<rom name="Doom (Europe) (One Level Demo Disc) (Track 3).bin" size="20801088" crc="b5152e86" sha1="105be172a2ca6537565f3b3bfaa967063ce83ec1"/>
+		<rom name="Doom (Europe) (One Level Demo Disc) (Track 4).bin" size="41992608" crc="5b53702c" sha1="5829a53feea9b3fb3f313c5c1807530de423f238"/>
+		<rom name="Doom (Europe) (One Level Demo Disc) (Track 5).bin" size="36717072" crc="5076ccc0" sha1="094d171831e7e3764746908d286c0eea0e7633cb"/>
+		<rom name="Doom (Europe) (One Level Demo Disc) (Track 6).bin" size="22936704" crc="9fb12048" sha1="8cfce2f9c199f7deadc62a24582494c4a9ce5209"/>
+		<rom name="Doom (Europe) (One Level Demo Disc) (Track 7).bin" size="9847824" crc="33c2f160" sha1="23c7727aa03edbcaa86b7ce515b804ad7b71b47f"/>
+		<rom name="Doom (Europe) (One Level Demo Disc) (Track 8).bin" size="40560240" crc="e80effa2" sha1="ce6c6c547ce57af2bb165fcc2dff9d0fe8334c74"/>
+		-->
+		<description>Doom (Europe) (one level demo disc - not for resale)</description>
+		<year>1995</year>
+		<publisher>GT Interactive / Williams Entertainment</publisher>
+		<notes><![CDATA[
+Incorrect 3D graphics during gameplay
+]]></notes>
+		<info name="developer" value="Midway"/>
+		<info name="language" value="English" />
+		<info name="serial" value="SLES-00157"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Doom (Europe) (One Level Demo Disc)" sha1="f91ec4ad4b1a097157d7c915beeb4f4974ff7399"/>
 			</diskarea>
 		</part>
 	</software>
@@ -65492,6 +65942,39 @@ Corrupted sound on title menu and during gameplay
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Guy Roux Manager 2001 (France)" sha1="8c2eb38d226730f8d8fbaded9fbd7b8a566e4107"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="infestat">
+		<!--
+		http://redump.org/disc/6580/
+		<rom name="Infestation (Europe) (En,Fr,De,Es,It,Nl).cue" size="1054" crc="70036d8a" sha1="382e5995b171e7bcd02fd98c7a17e7583ab47a9f"/>
+		<rom name="Infestation (Europe) (En,Fr,De,Es,It,Nl) (Track 1).bin" size="49232064" crc="d76b66aa" sha1="eb6af09d73c778bedd578fff4c7e0d926d65adbb"/>
+		<rom name="Infestation (Europe) (En,Fr,De,Es,It,Nl) (Track 2).bin" size="22346352" crc="770da3cd" sha1="3db42dea1e0b939c4c5ea75eef0715f2d0dbd89f"/>
+		<rom name="Infestation (Europe) (En,Fr,De,Es,It,Nl) (Track 3).bin" size="42745248" crc="6854abba" sha1="ade83748e6a2fffbb23e2c45e50d216c7ca26168"/>
+		<rom name="Infestation (Europe) (En,Fr,De,Es,It,Nl) (Track 4).bin" size="48223056" crc="e901ea86" sha1="e51a2a5019ec248a1e225cb224abba4a019e648b"/>
+		<rom name="Infestation (Europe) (En,Fr,De,Es,It,Nl) (Track 5).bin" size="43126272" crc="cb3e72a5" sha1="a5912c4c96ba2591c9ed18d79c68dc0b5efd6646"/>
+		<rom name="Infestation (Europe) (En,Fr,De,Es,It,Nl) (Track 6).bin" size="45614688" crc="db479661" sha1="2b85b14aff63bf78974287ccce5e9a78978e9897"/>
+		<rom name="Infestation (Europe) (En,Fr,De,Es,It,Nl) (Track 7).bin" size="38561040" crc="e3b4f696" sha1="0bd5aaee2785b4899fd7d2523970f8d749a0bc22"/>
+		<rom name="Infestation (Europe) (En,Fr,De,Es,It,Nl) (Track 8).bin" size="39283104" crc="2239faa1" sha1="85ba011863735d7403da7ae564a93ebd7110c088"/>
+		-->
+		<description>Infestation (Europe)</description>
+		<year>2000</year>
+		<publisher>Ubi Soft Entertainment</publisher>
+		<info name="copy_protection" value="Error Detection and Correction (EDC)"/>
+		<info name="developer" value="Frontier Developments"/>
+		<info name="language" value="Dutch" />
+		<info name="language" value="English" />
+		<info name="language" value="French" />
+		<info name="language" value="German" />
+		<info name="language" value="Italian" />
+		<info name="language" value="Spanish" />
+		<info name="serial" value="SLES-01870"/>
+		<sharedfeat name="compatibility" value="PAL-E"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="Infestation (Europe) (En,Fr,De,Es,It,Nl)" sha1="f5aade528ae35f4411e0550a90b374dc3ea22640"/>
 			</diskarea>
 		</part>
 	</software>
