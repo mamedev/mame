@@ -891,6 +891,7 @@ int sdl_window_info::complete_create()
 			osd_printf_error("Invalid -attach_window value: %s\n", attach_window);
 			return 1;
 		}
+		(void)attach_window_value;
 
 		// and attach to it
 #ifdef SDLMAME_X11
