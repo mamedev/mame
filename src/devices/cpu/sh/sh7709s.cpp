@@ -165,8 +165,7 @@ static unsigned int get_wcr1_timing(uint32_t address, uint16_t wcr1)
 	if (area > 6 || area == 1)
 		return 0;
 
-	unsigned int area_shift = 12 - (area * 2);
-	unsigned int area_val = (wcr1 >> area_shift) & 0x3;
+	unsigned int area_val = (wcr1 >> (area * 2)) & 0x3;
 
 	if (area_val == 0)
 		return 1;
@@ -268,6 +267,23 @@ unsigned int mcr_tras(uint16_t mcr)
 	return ((mcr >> 8) & 0x3) + 2;
 }
 
+unsigned int cache_line_fetch_count(uint32_t address, uint16_t bcr2)
+{
+	unsigned int area = get_area(address);
+
+	// Hardcoded for area 0 for cv1k code rom, 16 bit bus size
+	if (area == 0)
+		return 8;
+
+	// Not encoded in bcr2
+	if (area == 1)
+		return 0;
+
+	unsigned int bcr2_val = (bcr2 >> (area * 2)) & 0x3;
+
+	return SH7709S_CACHE_LINE_SIZE >> bcr2_val;
+}
+
 // Some of the values used here are bus cycles that might need conversion but it's close enough for now
 // It's possible for some instructions to overlap in the pipeline with the fetches but that's a good bit
 // of extra tracking required
@@ -302,7 +318,7 @@ wb_handle:
 	// If we can't use burst timing it's gonna be pricey to access
 	// Each access will have to initiate bus access and wait to read 4 words for the cache line fill
 	if (!burst_capable)
-		penalty += (BUS_ACCESS_PENALTY + get_wcr2_timing(address, m_wcr2)) * 4;
+		penalty += (BUS_ACCESS_PENALTY + get_wcr2_timing(address, m_wcr2)) * cache_line_fetch_count(address, m_bcr2);
 	else if (!is_wb) // For cache line writeback we can ignore the stall as well as CAS latency
 		penalty += CACHE_MISS_STALL_PENALTY + get_wcr2_timing(address, m_wcr2);
 
@@ -417,6 +433,9 @@ void sh7709s_device::static_generate_memory_accessor(int size, int iswrite, cons
 
 	UML_AND(block, I0, I0, SH34_AM);     // and r0, r0, #AM (0x1fffffff)
 
+	UML_MOV(block, mem(&m_sh2_state->arg0), I0);       // mov     [arg0],i0
+	UML_MOV(block, mem(&m_sh2_state->arg1), size);     // mov     [arg1],size
+
 	UML_LABEL(block, label++);              // label:
 
 	if (!debugger_enabled())
@@ -457,8 +476,6 @@ void sh7709s_device::static_generate_memory_accessor(int size, int iswrite, cons
 						UML_LOAD(block, I0, fastbase, I0, SIZE_DWORD, SCALE_x1);            // load    i0,fastbase,i0,dword_x1
 					}
 
-					UML_MOV(block, mem(&m_sh2_state->arg0), I0);       // mov     [arg0],i0
-					UML_MOV(block, mem(&m_sh2_state->arg1), size);     // mov     [arg1],size
 					UML_CALLC(block, cfunc_drc_memory_access_read, this); // callc  cfunc_drc_memory_access_read,this
 
 					UML_RET(block);                                                     // ret
@@ -481,8 +498,6 @@ void sh7709s_device::static_generate_memory_accessor(int size, int iswrite, cons
 						UML_STORE(block, fastbase, I0, I1, SIZE_DWORD, SCALE_x1);       // store   fastbase,i0,i1,dword_x1
 					}
 
-					UML_MOV(block, mem(&m_sh2_state->arg0), I0);       // mov     [arg0],i0
-					UML_MOV(block, mem(&m_sh2_state->arg1), size);     // mov     [arg1],size
 					UML_CALLC(block, cfunc_drc_memory_access_write, this); // callc  cfunc_drc_memory_access_write,this
 
 					UML_RET(block);                                                     // ret
@@ -510,8 +525,6 @@ void sh7709s_device::static_generate_memory_accessor(int size, int iswrite, cons
 			break;
 		}
 
-		UML_MOV(block, mem(&m_sh2_state->arg0), I0);       // mov     [arg0],i0
-		UML_MOV(block, mem(&m_sh2_state->arg1), size);     // mov     [arg1],size
 		UML_CALLC(block, cfunc_drc_memory_access_write, this); // callc  cfunc_drc_memory_access_write,this
 	}
 	else
@@ -531,8 +544,6 @@ void sh7709s_device::static_generate_memory_accessor(int size, int iswrite, cons
 			break;
 		}
 
-		UML_MOV(block, mem(&m_sh2_state->arg0), I0);       // mov     [arg0],i0
-		UML_MOV(block, mem(&m_sh2_state->arg1), size);     // mov     [arg1],size
 		UML_CALLC(block, cfunc_drc_memory_access_read, this); // callc  cfunc_drc_memory_access_read,this
 	}
 
