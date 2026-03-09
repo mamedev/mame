@@ -536,8 +536,8 @@ ROM_START( multmult )
 	ROM_LOAD16_BYTE( "multi_multi_f1_i.u2", 0x00000, 0x20000, CRC(6aa663af) SHA1(cfcdf930fa26c06e49b241dbcb520c0c64cc8af0) )
 	ROM_LOAD16_BYTE( "multi_multi_f1_ii.u6", 0x00001, 0x20000, CRC(a7a5ac70) SHA1(38fd3ad4306aa46a1a9414b3ae3d0691c67f0357) )
 
-	ROM_REGION( 0x20000, "dsp", 0 )
-	ROM_LOAD( "js28f640.bin", 0x00000, 0x20000, CRC(effdd573) SHA1(2e3b09e440ea266ed6db9fd7c04f030d5cf5edb9) )
+	ROM_REGION( 0x800000, "dsp", 0 )
+	ROM_LOAD( "js28f640.bin", 0x00000, 0x800000, CRC(b71f87da) SHA1(b8adb307655fb0a79ee0ad4521351c237c3ff161) )
 ROM_END
 
 ROM_START( multprim )
