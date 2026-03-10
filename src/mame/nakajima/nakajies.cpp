@@ -225,7 +225,6 @@ TODO:
 - Serial port
 - Parallel port
 - FDD
-- PCMCIA battery is displayed as failed
 
 ******************************************************************************/
 
@@ -312,6 +311,7 @@ private:
 	void nakajies_map(address_map &map) ATTR_COLD;
 	void pcmcia_card_detect_w(int state) { m_pcmcia_card_detect = state; }
 	void pcmcia_write_protect_w(int state) { m_pcmcia_write_protect = state; }
+	void pcmcia_battery_failed_w(int state) { m_pcmcia_battery_failed = state; }
 	int pcmcia_card_detect_r() { return m_pcmcia_card_detect; }
 	int pcmcia_write_protect_r() { return m_pcmcia_write_protect; }
 	template<int Bank> u8 pcmcia_r(offs_t offset);
@@ -343,6 +343,7 @@ private:
 	u32 m_ram_size = 0;
 	u32 m_pcmcia_card_detect = 1;
 	u32 m_pcmcia_write_protect = 1;
+	u32 m_pcmcia_battery_failed = 1;
 };
 
 
@@ -440,12 +441,12 @@ void nakajies_state::irq_enable_w(u8 data)
 
 /*
   I/O Port a0:
-  7------- PCMCIA card detection related. bit7 and bit4 0 = card present
-  -6------ PCMCIA card write protected
+  7------- PCMCIA card present. 0 = present, 1 = no card present.
+  -6------ PCMCIA card write protected. 0 = not protected, 1 = write protected.
   --5----- unknown
-  ---4---- PCMCIA card detection related. bit7 and bit4 0 = card present
-  ----3--- Battery pack ok. 0 = ok, 1 = low
-  -----2-- Lithium coin battery ok. 0 = ok, 1 = low
+  ---4---- PCMCIA battery status. 0 = ok, 1 = battery low/failed.
+  ----3--- Battery pack ok. 0 = ok, 1 = low.
+  -----2-- Lithium coin battery ok. 0 = ok, 1 = low.
   ------1- printer connected?
   -------0 unknown
 */
@@ -454,7 +455,7 @@ u8 nakajies_state::unk_a0_r()
 	return
 		(m_pcmcia_card_detect ? 0x80 : 0x00) |
 		(m_pcmcia_write_protect ? 0x40 : 0x00) |
-		(m_pcmcia_card_detect ? 0x10 : 0x00) |
+		(m_pcmcia_battery_failed ? 0x10 : 0x00) |
 		m_port_status->read() |
 		0x23;
 }
@@ -693,6 +694,7 @@ void nakajies_state::machine_start()
 	save_item(NAME(m_keyboard_row_reset));
 	save_item(NAME(m_pcmcia_card_detect));
 	save_item(NAME(m_pcmcia_write_protect));
+	save_item(NAME(m_pcmcia_battery_failed));
 }
 
 
@@ -840,6 +842,7 @@ void nakajies_state::nakajies210(machine_config &config)
 	PCCARD_SLOT(config, m_pcmcia, pcmcia_devices, nullptr);
 	m_pcmcia->cd1().set(FUNC(nakajies_state::pcmcia_card_detect_w));
 	m_pcmcia->wp().set(FUNC(nakajies_state::pcmcia_write_protect_w));
+	m_pcmcia->bvd1().set(FUNC(nakajies_state::pcmcia_battery_failed_w));
 
 }
 
