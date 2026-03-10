@@ -996,6 +996,14 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 		}
 	}
 
+	/* if writing to a reserved memory block, cancel the reservation */
+	if (iswrite)
+	{
+		UML_AND(block, I3, I0, 0xffffffe0);                                 // and     i3,i0,0xffffffe0
+		UML_CMP(block, mem(&m_core->reserve_address), I3);                  // cmp     reserve_address,i3
+		UML_MOVc(block, COND_E, mem(&m_core->reserve), 0);                  // mov     reserve,0,e
+	}
+
 	/* general case: assume paging and perform a translation */
 	if (((m_cap & PPCCAP_OEA) && (mode & MODE_DATA_TRANSLATION)) || (iswrite && (m_cap & PPCCAP_4XX) && (mode & MODE_PROTECTION)))
 	{
@@ -3167,10 +3175,13 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			return true;
 
 		case 0x014: /* LWARX */
-			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
-			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *m_read32align[m_core->mode]);             // callh   read32align
-			UML_MOV(block, R32(G_RD(op)), I0);                                          // mov     rd,i0
+			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                     // add     i0,ra,rb
+			UML_MOV(block, mem(&m_core->reserve), 1);                              // mov     reserve,1
+			UML_AND(block, I1, I0, 0xffffffe0);                                    // and     i1,i0,0xffffffe0
+			UML_MOV(block, mem(&m_core->reserve_address), I1);                     // mov     reserve_address,i1
+			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                        // mapvar  dsisr,DSISR_IDX(op)
+			UML_CALLH(block, *m_read32align[m_core->mode]);                        // callh   read32align
+			UML_MOV(block, R32(G_RD(op)), I0);                                     // mov     rd,i0
 			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;
 
@@ -3314,18 +3325,19 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			return true;
 
 		case 0x096: /* STWCX. */
-			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                          // add     i0,ra,rb
-			UML_MOV(block, I1, R32(G_RS(op)));                                          // mov     i1,rs
-			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                                 // mapvar  dsisr,DSISR_IDX(op)
-			UML_CALLH(block, *m_write32align[m_core->mode]);                // callh   write32align
-			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
-
-			UML_CMP(block, I0, I0);                                             // cmp     i0,i0
-			UML_GETFLGS(block, I0, FLAG_Z | FLAG_C | FLAG_S);                           // getflgs i0,zcs
-			UML_LOAD(block, I0, m_cmp_cr_table, I0, SIZE_BYTE, SCALE_x1);// load    i0,cmp_cr_table,i0,byte
-			UML_OR(block, CR32(0), I0, XERSO32);                               // or      [cr0],i0,[xerso]
-
-			generate_compute_flags(block, desc, true, 0, false);                       // <update flags>
+			UML_CMP(block, mem(&m_core->reserve), 0);                              // cmp     reserve,0
+			UML_JMPc(block, COND_Z, compiler->labelnum);                           // bz      1:
+			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));                     // add     i0,ra,rb
+			UML_MOV(block, I1, R32(G_RS(op)));                                     // mov     i1,rs
+			UML_MAPVAR(block, MAPVAR_DSISR, DSISR_IDX(op));                        // mapvar  dsisr,DSISR_IDX(op)
+			UML_CALLH(block, *m_write32align[m_core->mode]);                       // callh   write32align
+			UML_MOV(block, mem(&m_core->reserve), 0);                              // mov     reserve,0
+			UML_OR(block, CR32(0), 2, XERSO32);                                    // or      [cr0],2,[xerso]
+			UML_JMP(block, compiler->labelnum + 1);                                // b       2:
+			UML_LABEL(block, compiler->labelnum++);                                // 1:
+			UML_MOV(block, CR32(0), XERSO32);                                      // mov     [cr0],[xerso]
+			UML_LABEL(block, compiler->labelnum++);                                // 2:
+			generate_compute_flags(block, desc, true, 0, false);                   // <update flags>
 			return true;
 
 		case 0x2d5: /* STSWI */

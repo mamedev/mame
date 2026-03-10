@@ -340,6 +340,9 @@ protected:
 		const char * format;                     /* format string for printing */
 		uint32_t       arg0;                       /* print_debug argument 1 */
 		double       fp0;                        /* floating point 0 */
+		/* reservation monitor for lwarx and stwcx */
+		uint32_t reserve;
+		uint32_t reserve_address;
 	};
 
 	internal_ppc_state *m_core;
