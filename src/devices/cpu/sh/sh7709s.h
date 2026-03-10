@@ -46,6 +46,8 @@ private:
 	uint32_t m_wb_address; // writeback buffer address if there's a dirty cache line to evict
 	uint8_t m_last_area_accessed; // last memory area accessed for WCR1 timing purposes
 	bool m_last_area_accessed_was_write; // last memory area accessed operation also for WCR1 timing purposes
+	unsigned int m_wb_active_cycles; // Track any background cycles for writeback and precharge waits on the same bank
+	unsigned int m_last_sdram_page; // Last accessed sdram page, used to track when to have to pay tpc(precharge) cost
 
 	bool cache_access(uint32_t address, bool write);
 	unsigned int access_penalty(uint32_t address, bool write);
