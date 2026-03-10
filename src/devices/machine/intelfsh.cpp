@@ -120,6 +120,7 @@ DEFINE_DEVICE_TYPE(SST_39SF010,              sst_39sf010_device,              "s
 DEFINE_DEVICE_TYPE(SST_39SF020,              sst_39sf020_device,              "sst_39sf020",              "SST 39SF020 Flash")
 DEFINE_DEVICE_TYPE(SST_39SF040,              sst_39sf040_device,              "sst_39sf040",              "SST 39SF040 Flash")
 DEFINE_DEVICE_TYPE(SST_39VF020,              sst_39vf020_device,              "sst_39vf020",              "SST 39VF020 Flash")
+DEFINE_DEVICE_TYPE(SST_39VF040,              sst_39vf040_device,              "sst_39vf040",              "SST 39VF040 Flash")
 DEFINE_DEVICE_TYPE(SST_49LF020,              sst_49lf020_device,              "sst_49lf020",              "SST 49LF020 Flash")
 
 DEFINE_DEVICE_TYPE(SHARP_LH28F400,           sharp_lh28f400_device,           "sharp_lh28f400",           "Sharp LH28F400 Flash")
@@ -290,6 +291,9 @@ sst_39sf040_device::sst_39sf040_device(const machine_config &mconfig, const char
 
 sst_39vf020_device::sst_39vf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, SST_39VF020, tag, owner, clock, 0x40000, MFG_SST, 0xd6) { m_sector_is_4k = true; }
+
+sst_39vf040_device::sst_39vf040_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh8_device(mconfig, SST_39VF040, tag, owner, clock, 0x80000, MFG_SST, 0xd7) { m_addrmask = 0x1fff; m_sector_is_4k = true; }
 
 sst_49lf020_device::sst_49lf020_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, SST_49LF020, tag, owner, clock, 0x40000, MFG_SST, 0x61) { m_sector_is_4k = true; }
@@ -853,7 +857,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		{
 			m_flash_mode = FM_ERASEAMD3;
 		}
-		else if( ( address & m_addrmask ) == 0x2aaa && ( data & 0xff ) == 0x55 && m_addrmask )
+		else if( ( address & m_addrmask ) == ( 0x2aaa & m_addrmask ) && ( data & 0xff ) == 0x55 && m_addrmask )
 		{
 			m_flash_mode = FM_ERASEAMD3;
 		}

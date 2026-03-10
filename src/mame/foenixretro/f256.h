@@ -19,6 +19,7 @@
 #include "machine/6522via.h"
 #include "machine/bq4847.h"
 #include "machine/ins8250.h"
+#include "machine/intelfsh.h"
 #include "machine/ram.h"
 #include "machine/spi_sdcard.h"
 #include "sound/sn76496.h"
@@ -57,7 +58,7 @@ private:
     required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device_array<ram_device, 4> m_iopage;
-	required_memory_region m_rom;
+	required_device<sst_39vf040_device> m_flash;
 	required_memory_region m_font;
 	required_device<screen_device> m_screen;
 	required_device<bq4802_device> m_rtc;

@@ -25,7 +25,7 @@ f256k_state::f256k_state(const machine_config &mconfig, device_type type, const 
     , m_maincpu(*this, MAINCPU_TAG)
     , m_ram(*this, RAM_TAG)
     , m_iopage(*this, IOPAGE_TAG "%u", 0U)
-    , m_rom(*this, ROM_TAG)
+    , m_flash(*this, FLASH_TAG)
     , m_font(*this, FONT_TAG)
     , m_screen(*this, SCREEN_TAG)
     , m_rtc(*this, "rtc")
@@ -61,6 +61,8 @@ void f256k_state::f256k(machine_config &config)
     {
         RAM(config, iopage).set_default_size("8k").set_default_value(0x0);
     }
+
+    SST_39VF040(config, m_flash);
 
     SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
     m_screen->set_refresh_hz(60); // Refresh rate (e.g., 60Hz)
@@ -631,8 +633,8 @@ u8   f256k_state::mem_r(offs_t offset)
     }
     else if (bank < 0x80)
     {
-        offs_t address = (bank << 13) + low_addr;
-        return m_rom->as_u8(address);
+        offs_t address = ((bank - 0x40) << 13) + low_addr;
+        return m_flash->read_raw(address);
     }
     else if (bank < 0xa0)
     {
@@ -1228,6 +1230,11 @@ void f256k_state::mem_w(offs_t offset, u8 data)
             offs_t address = (bank << 13) + low_addr;
             m_ram->write(address, data);
         }
+    }
+    else if (bank < 0x80)
+    {
+        offs_t address = ((bank - 0x40) << 13) + low_addr;
+        m_flash->write(address, data);
     }
 }
 void f256k_state::codec_done(s32 param)
@@ -1983,10 +1990,10 @@ static INPUT_PORTS_START(f256k)
 INPUT_PORTS_END
 
 ROM_START(f256k)
-    ROM_REGION(0x10'0000,ROM_TAG,0)
+    ROM_REGION(0x80000, FLASH_TAG, ROMREGION_ERASEFF)
 
     #define ROM_BLOCK(offset, filename, size, crc, sha1) \
-        ROM_LOAD(filename, 0x80000 + (offset * 0x2000), size, crc sha1)
+        ROM_LOAD(filename, (offset * 0x2000), size, crc sha1)
 
     F256K_ROM_TABLE(ROM_BLOCK)
     #undef ROM_BLOCK
