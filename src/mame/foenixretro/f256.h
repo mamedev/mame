@@ -165,6 +165,9 @@ private:
 	void unsignedDivider(int baseAddr);
 	void unsignedAdder(int baseAddr);
 
+	// Software Reset
+	bool m_reset_unlock = false;
+
 	// Random Number Generator (RNG)
 	uint16_t m_seed = 0;
 	bool m_rng_enabled = false;
