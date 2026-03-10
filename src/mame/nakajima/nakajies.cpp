@@ -96,22 +96,22 @@ I/O Map:
 0016 - c0000 - dffff
 0017 - e0000 - fffff
 
-values 00-0f select a rom bank
-      00 - selects last 20000h region of rom
+values 00-07 select a ROM bank
+      00 - selects last 20000h region of ROM
       01 - 20000h region before last
       02 - etc
-
-values 10-17 select an internal ram bank
-values 18-1f select a pcmcia bank
+values 08-0f select additinal RAM (on models that have 256KB RAM)
+values 10-17 select internal RAM
+values 18-1f select a PCMCIA bank
 
 on reset 0017 is set to 0, pointing to last 20000h bytes of ROM containing the boot setup code
 
 0020 - unknown
        0x00 written during boot sequence
 
-0030 - printer/parallel related?
+0030 - parallel/printer related?
 
-0040 - printer/parallel related?
+0040 - parallel/printer related?
 
 Sounds related?
 On boot: 50 = 98, 51 = 06, 52 = 7f
@@ -172,6 +172,8 @@ On boot: 50 = 98, 51 = 06, 52 = 7f
 
 00A0 - System status
 
+00B0 - Keyboard
+
 00C0 - 00C1 - serial/rs232c communication
   00C0 - data port
   00C1 - control/status
@@ -219,7 +221,10 @@ disabled). Perhaps power on/off related??
 
 TODO:
 - On boot, systems do not display version and copyright messages.
-- Add PCMCIA slot
+- drwrt200,drwrt400,drwrt450 only go up to 512KB to initialize pcmcia card. BTANB?
+- Serial port
+- Parallel port
+- FDD
 
 ******************************************************************************/
 
@@ -271,7 +276,6 @@ public:
 	void drwrt100(machine_config &config);
 	void nakajies210(machine_config &config);
 	void nakajies220(machine_config &config);
-	void nakajies220_256(machine_config &config);
 	void nakajies250(machine_config &config);
 	void dator3k(machine_config &config);
 
@@ -422,6 +426,7 @@ u8 nakajies_state::irq_enable_r()
 
 void nakajies_state::irq_enable_w(u8 data)
 {
+	// Bit 0 - set after scanning of keyboard?
 	m_irq_enabled = data;
 	nakajies_update_irqs();
 }
@@ -456,9 +461,24 @@ void nakajies_state::banking_w(offs_t offset, u8 data)
 {
 	if (!BIT(data, 4))
 	{
-		// ROM
-		m_rombank[offset]->set_entry((data & 0x0f) ^ 0xf);
-		m_view[offset].select(VIEW_ROM);
+		// ROM or extra RAM
+		if (BIT(data, 3))
+		{
+			if (m_ram_size >= 256 * 1024)
+			{
+				m_view[offset].select(VIEW_RAM);
+				m_rambank[offset]->set_entry(1);
+			}
+			else
+			{
+				m_view[offset].disable();
+			}
+		}
+		else
+		{
+			m_rombank[offset]->set_entry((data & 0x07) ^ 0x07);
+			m_view[offset].select(VIEW_ROM);
+		}
 	}
 	else
 	{
@@ -472,7 +492,7 @@ void nakajies_state::banking_w(offs_t offset, u8 data)
 		{
 			// Internal (S)RAM
 			// Banking and actual storage not verified
-			m_rambank[offset]->set_entry((data & 0x07) ^ 0x07);
+			m_rambank[offset]->set_entry(0);
 			m_view[offset].select(VIEW_RAM);
 		}
 	}
@@ -627,11 +647,9 @@ void nakajies_state::machine_start()
 	for (int i = 0; i < 8; i++)
 	{
 		// TODO: rom banks outside max bank size; assuming the banks are simply mirrored
-		for (int j = 0; j < 16; j += rom_size / 0x20000)
+		for (int j = 0; j < 8; j += rom_size / 0x20000)
 			m_rombank[i]->configure_entries(j, rom_size / 0x20000, m_rom_region->base(), 0x20000);
-		// TODO: ram banks outside max bank size; assuming the banks are simply mirrored
-		// how would that work for a system with 160KB RAM?
-		for (int j = 0; j < 8; j += m_ram_size / 0x20000)
+		for (int j = 0; j < 2; j += m_ram_size / 0x20000)
 			m_rambank[i]->configure_entries(j, m_ram_size / 0x20000, &m_ram_base[0], 0x20000);
 	}
 
@@ -658,8 +676,8 @@ void nakajies_state::machine_reset()
 
 	for (int i = 0; i < 8; i++)
 	{
-		m_rombank[i]->set_entry(0x0f);
-		m_rambank[i]->set_entry(0x07);
+		m_rombank[i]->set_entry(0x07);
+		m_rambank[i]->set_entry(0);
 	}
 }
 
@@ -795,21 +813,15 @@ void nakajies_state::nakajies220(machine_config &config)
 {
 	nakajies210(config);
 	m_gfxdecode->set_info(gfx_drwrt400);
-}
-
-void nakajies_state::nakajies220_256(machine_config &config)
-{
-	nakajies220(config);
 	m_ram_size = 256 * 1024;
 }
 
 void nakajies_state::nakajies250(machine_config &config)
 {
-	nakajies210(config);
+	nakajies220(config);
 	m_screen->set_size(80 * 6, 16 * 8);
 	m_screen->set_visarea(0, 6 * 80 - 1, 0, 16 * 8 - 1);
 	m_gfxdecode->set_info(gfx_drwrt200);
-	m_ram_size = 256 * 1024;
 }
 
 
@@ -878,6 +890,6 @@ COMP( 199?, wales210, 0,        0,      nakajies210, nakajies, nakajies_state, e
 COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, nakajies_state, empty_init, "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
 COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, nakajies_state, empty_init, "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
 COMP( 1996, drwrt100, wales210, 0,      drwrt100,    nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
-COMP( 1996, drwrt400, wales210, 0,      nakajies220_256, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM, also found a machine with 160KB RAM (marketing text?)
-COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
-COMP( 1996, drwrt200, wales210, 0,      nakajies250, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB? RAM
+COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 1996, drwrt200, wales210, 0,      nakajies250, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
