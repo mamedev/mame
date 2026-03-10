@@ -225,6 +225,7 @@ TODO:
 - Serial port
 - Parallel port
 - FDD
+- PCMCIA battery is displayed as failed
 
 ******************************************************************************/
 
@@ -260,6 +261,7 @@ public:
 		    {*this, "view_4"}, {*this, "view_5"}, {*this, "view_6"}, {*this, "view_7"}
 		}
 		, m_port_row(*this, "ROW%u", 0U)
+		, m_port_status(*this, "status")
 		, m_port_debug(*this, "debug")
 		, m_rombank(*this, "rombank%u", 0U)
 		, m_rambank(*this, "rambank%u", 0U)
@@ -300,10 +302,12 @@ private:
 	u8 unk_a0_r();
 	void lcd_memory_start_w(u8 data);
 	u8 keyboard_r();
+	void keyboard_row_reset(u8 data);
 	void banking_w(offs_t offset, u8 data);
 
 	void nakajies_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
+	TIMER_DEVICE_CALLBACK_MEMBER(hz10_timer);
 	void nakajies_io_map(address_map &map) ATTR_COLD;
 	void nakajies_map(address_map &map) ATTR_COLD;
 	void pcmcia_card_detect_w(int state) { m_pcmcia_card_detect = state; }
@@ -318,6 +322,7 @@ private:
 	memory_view m_view[8];
 
 	required_ioport_array<10> m_port_row;
+	required_ioport m_port_status;
 	required_ioport m_port_debug;
 	memory_bank_array_creator<8> m_rombank;
 	memory_bank_array_creator<8> m_rambank;
@@ -332,7 +337,8 @@ private:
 	u8 m_irq_enabled = 0;
 	u8 m_irq_active = 0;
 	u8 m_lcd_memory_start = 0;
-	u8 m_matrix = 0;
+	u8 m_keyboard_row = 0;
+	u8 m_keyboard_row_reset = 0;
 	std::unique_ptr<u8[]> m_ram_base;
 	u32 m_ram_size = 0;
 	u32 m_pcmcia_card_detect = 1;
@@ -439,8 +445,9 @@ void nakajies_state::irq_enable_w(u8 data)
   --5----- unknown
   ---4---- PCMCIA card detection related. bit7 and bit4 0 = card present
   ----3--- Battery pack ok. 0 = ok, 1 = low
-  -----2-0 unknown
+  -----2-- Lithium coin battery ok. 0 = ok, 1 = low
   ------1- printer connected?
+  -------0 unknown
 */
 u8 nakajies_state::unk_a0_r()
 {
@@ -448,7 +455,8 @@ u8 nakajies_state::unk_a0_r()
 		(m_pcmcia_card_detect ? 0x80 : 0x00) |
 		(m_pcmcia_write_protect ? 0x40 : 0x00) |
 		(m_pcmcia_card_detect ? 0x10 : 0x00) |
-		0x27;
+		m_port_status->read() |
+		0x23;
 }
 
 void nakajies_state::lcd_memory_start_w(u8 data)
@@ -501,18 +509,38 @@ void nakajies_state::banking_w(offs_t offset, u8 data)
 
 u8 nakajies_state::keyboard_r()
 {
-	return (m_matrix > 0x00) ? m_port_row[m_matrix - 1]->read() : 0;
+	const u8 row = m_keyboard_row;
+	m_keyboard_row++;
+	return (row < 10) ? m_port_row[row]->read() : 0;
 }
 
 
+void nakajies_state::keyboard_row_reset(u8 data)
+{
+	if (!BIT(m_keyboard_row_reset, 0) && BIT(data, 0))
+	{
+		m_keyboard_row = 0;
+	}
+	m_keyboard_row_reset = data;
+}
+
 void nakajies_state::nakajies_io_map(address_map &map)
 {
+//	map(0x0000, 0x00ff).lrw8(NAME([](offs_t offset) { printf("read %02x\n", offset); return 0xff; }), NAME([](offs_t offset, u8 data) { printf("write %02x %02x\n", offset, data); }));
 	map(0x0000, 0x0000).w(FUNC(nakajies_state::lcd_memory_start_w));
 	map(0x0010, 0x0017).w(FUNC(nakajies_state::banking_w));
+//	map(0x0020, 0x0020).lrw8(NAME([]() { printf("read 20\n"); return 0xff; }), NAME([](u8 data) { printf("write 20 %02x\n", data); }));
+//	map(0x0030, 0x0030).lrw8(NAME([]() { printf("read 30\n"); return 0xff; }), NAME([](u8 data) { printf("write 30 %02x\n", data); }));
+//	map(0x0040, 0x0040).lrw8(NAME([]() { printf("read 40\n"); return 0xff; }), NAME([](u8 data) { printf("write 40 %02x\n", data); }));
+	// Unknown, 60 is written frequently
+	map(0x0053, 0x0053).noprw();
 	map(0x0060, 0x0060).rw(FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
+	map(0x0061, 0x0061).w(FUNC(nakajies_state::keyboard_row_reset));
 	map(0x0090, 0x0090).rw(FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
 	map(0x00a0, 0x00a0).r(FUNC(nakajies_state::unk_a0_r));
 	map(0x00b0, 0x00b0).r(FUNC(nakajies_state::keyboard_r));
+//	map(0x00c0, 0x00c0).lrw8(NAME([]() { printf("read c0\n"); return 0xff; }), NAME([](u8 data) { printf("write c0 %02x\n", data); }));
+//	map(0x00c1, 0x00c1).lrw8(NAME([]() { printf("read c1\n"); return 0xff; }), NAME([](u8 data) { printf("write c0 %01x\n", data); }));
 	map(0x00d0, 0x00df).rw(m_rtc, FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
 }
 
@@ -534,6 +562,11 @@ static INPUT_PORTS_START(nakajies)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) PORT_NAME("irq 0xfa") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) PORT_NAME("irq 0xf9") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_NAME("irq 0xf8") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
+
+	PORT_START("status")
+	PORT_CONFNAME(0x04, 0x00, "Coin battery Failed")
+	PORT_CONFSETTING(0x00, DEF_STR(No))
+	PORT_CONFSETTING(0x04, DEF_STR(Yes))
 
 	PORT_START("ROW0")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left Shift")  PORT_CODE(KEYCODE_LSHIFT)
@@ -656,7 +689,8 @@ void nakajies_state::machine_start()
 	save_item(NAME(m_irq_enabled));
 	save_item(NAME(m_irq_active));
 	save_item(NAME(m_lcd_memory_start));
-	save_item(NAME(m_matrix));
+	save_item(NAME(m_keyboard_row));
+	save_item(NAME(m_keyboard_row_reset));
 	save_item(NAME(m_pcmcia_card_detect));
 	save_item(NAME(m_pcmcia_write_protect));
 }
@@ -667,7 +701,7 @@ void nakajies_state::machine_reset()
 	m_irq_enabled = 0;
 	m_irq_active = 0;
 	m_lcd_memory_start = 0;
-	m_matrix = 0;
+	m_keyboard_row = 0;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -704,19 +738,24 @@ u32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 {
-	if (m_matrix > 0x09)
+	if (m_keyboard_row > 0x09)
 	{
-		// reset the keyboard scan
-		m_matrix = 0;
+		// trigger reset of keyboard scan
 		m_irq_active |= 0x20;
 	}
 	else
 	{
-		// next row
-		m_matrix++;
+		// trigger handling of keyboard row
 		m_irq_active |= 0x10;
 	}
 
+	nakajies_update_irqs();
+}
+
+
+TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::hz10_timer)
+{
+	m_irq_active |= 0x40;
 	nakajies_update_irqs();
 }
 
@@ -787,6 +826,7 @@ void nakajies_state::drwrt100(machine_config &config)
 	RP5C01(config, m_rtc, XTAL(32'768));
 
 	TIMER(config, "kb_timer").configure_periodic(FUNC(nakajies_state::kb_timer), attotime::from_hz(250));
+	TIMER(config, "10hz_timer").configure_periodic(FUNC(nakajies_state::hz10_timer), attotime::from_hz(10));
 
 	NVRAM(config, m_nvram);
 
