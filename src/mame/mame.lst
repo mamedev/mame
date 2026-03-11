@@ -18977,6 +18977,23 @@ radikaldrt
 @source:gaelco/rollext.cpp
 rollext
 
+@source:gaelco/scalextric.cpp
+scxam
+scxen
+scxena
+scxfr
+scxfra
+scxgr
+scxit
+scxita
+scxpt
+scxsp
+scxspa
+scxspb
+scxspc
+scxspd
+scxus
+
 @source:gaelco/splash.cpp
 funystrp
 nsplashkr
