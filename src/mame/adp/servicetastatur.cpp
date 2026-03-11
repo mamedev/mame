@@ -40,11 +40,15 @@ ___| XTAL  80C31          +KEYPAD+       |__
 */
 
 #include "emu.h"
+
 #include "cpu/mcs51/i80c51.h"
 #include "machine/i2cmem.h"
 #include "video/hd44780.h"
+
 #include "emupal.h"
 #include "screen.h"
+
+#include "servicet.lh"
 
 namespace {
 
@@ -318,4 +322,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 1992, servicet, 0, servicet, servicet, servicet_state, empty_init, ROT0, "ADP", u8"Merkur Service Testgerät", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+GAMEL( 1992, servicet, 0, servicet, servicet, servicet_state, empty_init, ROT0, "ADP", u8"Merkur Service Testgerät", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW, layout_servicet )
