@@ -93,39 +93,39 @@ license:CC0-1.0
 			<bounds x="3" y="3" width="16" height="2" />
 		</screen>
 
-		<element name="F1" ref="F1" inputtag="IN2">
+		<element name="F1" ref="F1">
 			<bounds x="4" y="6" width="2" height="2" />
 		</element>
 
-		<element name="F2" ref="F2" inputtag="IN2">
+		<element name="F2" ref="F2">
 			<bounds x="8" y="6" width="2" height="2" />
 		</element>
 
-		<element name="F3" ref="F3" inputtag="IN2">
+		<element name="F3" ref="F3">
 			<bounds x="12" y="6" width="2" height="2" />
 		</element>
 
-		<element name="F4" ref="F4" inputtag="IN0">
+		<element name="F4" ref="F4">
 			<bounds x="16" y="6" width="2" height="2" />
 		</element>
 
-		<element name="OK" ref="OK" inputtag="IN0">
+		<element name="OK" ref="OK">
 			<bounds x="19" y="8" width="3" height="2" />
 		</element>
 
-		<element name="Down" ref="Down" inputtag="IN1">
+		<element name="Down" ref="Down">
 			<bounds x="0" y="2" width="2" height="2" />
 		</element>
 
-		<element name="Left" ref="Left" inputtag="IN1">
+		<element name="Left" ref="Left">
 			<bounds x="0" y="4" width="2" height="2" />
 		</element>
 
-		<element name="Up" ref="Up" inputtag="IN0">
+		<element name="Up" ref="Up">
 			<bounds x="20" y="2" width="2" height="2" />
 		</element>
 
-		<element name="Right" ref="Right" inputtag="IN1">
+		<element name="Right" ref="Right">
 			<bounds x="20" y="4" width="2" height="2" />
 		</element>
 
