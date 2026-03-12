@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:
 /*
-  Gaelco 'Futbol-3' hardware for kiddie rides
+  Gaelco 'Futbol-3' hardware for kiddie rides, pinballs, and electromechanicals.
 
   The PCB is very compact and has few components. The main ones are:
 
@@ -118,6 +118,33 @@ void gaelcof3_state::gaelcof3(machine_config &config)
 	OKIM6295(config, "oki", 1000000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 1.0); // clock and pin not confirmed
 }
 
+// Pinballs
+
+ROM_START( futbol )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "p4n_pic16c56.bin", 0x0000, 0x2000, CRC(a4d69b51) SHA1(aa0f20b45aa92912ab235c9dc30b3532ff7103eb) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "pinball_futbol_p4_97e7_p4n_26-6-98_27c020.bin", 0x00000, 0x40000, CRC(448d244b) SHA1(51c3d6309b487d17085aac161016190249e2900b) )
+ROM_END
+
+ROM_START( futbola )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "p4n_pic16c56.bin", 0x0000, 0x2000, CRC(a4d69b51) SHA1(aa0f20b45aa92912ab235c9dc30b3532ff7103eb) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "pinball_futbol_p3_20f6_p4n_21-10-97_27c020.bin", 0x00000, 0x40000, CRC(05a3595d) SHA1(226fd63ea23d06022bbad9eb5a60fe04707a8fca) )
+ROM_END
+
+ROM_START( futbolt )
+	ROM_REGION( 0x2000, "maincpu", 0 )
+	ROM_LOAD( "test_pic16c54a.bin", 0x0000, 0x2000, CRC(ad819aaa) SHA1(f10500e9147c703e24a26b4d48305c16996b7c0a) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "test_futbol_27c010a.bin", 0x00000, 0x20000, CRC(57cf1ca4) SHA1(8d7f027bf7809194035c5b4671919d3b3dce2f1b) )
+ROM_END
+
+// Kiddie rides
 
 ROM_START( autopapa )
 	ROM_REGION( 0x2000, "maincpu", 0 )
@@ -161,9 +188,12 @@ ROM_END
 
 } // anonymous namespace
 
+GAME( 1998, futbol,       0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Futbol (set 1)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1997, futbola, futbol, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Futbol (set 2)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1997, futbolt, futbol, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Futbol (test ROMs)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 
-GAME( 199?, autopapa,  0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", u8"El auto de papá", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, donpepito, 0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Don Pepito",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, mueve,     0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Mueve",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, obladi,    0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Ob-La-Di",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
-GAME( 199?, susanita,  0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Susanita",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, autopapa,     0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", u8"El auto de papá",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, donpepito,    0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Don Pepito",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, mueve,        0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Mueve",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, obladi,       0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Ob-La-Di",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 199?, susanita,     0, gaelcof3, gaelcof3, gaelcof3_state, empty_init, ROT0, "Gaelco / Cresmatic", "Susanita",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
