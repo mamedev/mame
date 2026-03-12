@@ -66,11 +66,13 @@
 
 #include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
+#include "bus/rs232/hlemouse.h"
 #include "cpu/i86/i86.h"
 #include "machine/i7220.h"
 #include "machine/i80130.h"
 #include "machine/i8087.h"
 #include "machine/i8255.h"
+#include "machine/clock.h"
 #include "machine/mm58174.h"
 #include "machine/ram.h"
 #include "machine/tms9914.h"
@@ -162,6 +164,12 @@ private:
 	void grid1101_map(address_map &map) ATTR_COLD;
 	void grid1121_map(address_map &map) ATTR_COLD;
 };
+
+
+static void rs232_devices(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+}
 
 
 [[maybe_unused]] uint16_t gridcomp_state::grid_9ff0_r(offs_t offset)
@@ -307,7 +315,7 @@ void gridcomp_state::grid1101_map(address_map &map)
 	map(0xdfe80, 0xdfe83).rw("i7220", FUNC(i7220_device::read), FUNC(i7220_device::write)).umask16(0x00ff);
 	map(0xdfea0, 0xdfeaf).unmaprw(); // ??
 	map(0xdfec0, 0xdfecf).rw(FUNC(gridcomp_state::grid_modem_r), FUNC(gridcomp_state::grid_modem_w)).umask16(0x00ff); // incl. DTMF generator
-	map(0xdff00, 0xdff1f).rw("uart8274", FUNC(i8274_device::ba_cd_r), FUNC(i8274_device::ba_cd_w)).umask16(0x00ff);
+	map(0xdff00, 0xdff1f).rw("uart8274", FUNC(i8274_device::cd_ba_r), FUNC(i8274_device::cd_ba_w)).umask16(0x00ff);
 	map(0xdff40, 0xdff5f).rw(m_rtc, FUNC(mm58174_device::read), FUNC(mm58174_device::write)).umask16(0xff00);
 	map(0xdff80, 0xdff8f).rw("hpib", FUNC(tms9914_device::read), FUNC(tms9914_device::write)).umask16(0x00ff);
 	map(0xdffc0, 0xdffcf).rw(FUNC(gridcomp_state::grid_keyb_r), FUNC(gridcomp_state::grid_keyb_w)); // Intel 8741 MCU
@@ -419,11 +427,15 @@ void gridcomp_state::grid1101(machine_config &config)
 	IEEE488_SLOT(config, "ieee_rem", 0, remote488_devices, nullptr);
 
 	I8274(config, m_uart8274, XTAL(4'032'000));
+	// HACK: fix clock at 1200bps to get mouse working.
+	CLOCK(config, "uart8274_rxca_clk", 19'200).signal_handler().set("uart8274", FUNC(i8274_device::rxca_w));
+	CLOCK(config, "uart8274_txca_clk", 19'200).signal_handler().set("uart8274", FUNC(i8274_device::txca_w));
 	m_uart8274->out_txda_callback().set("rs232_port", FUNC(rs232_port_device::write_txd));
 	m_uart8274->out_dtra_callback().set("rs232_port", FUNC(rs232_port_device::write_dtr));
 	m_uart8274->out_rtsa_callback().set("rs232_port", FUNC(rs232_port_device::write_rts));
+	m_uart8274->out_int_callback().set(I80130_TAG, FUNC(i80130_device::ir0_w));
 
-	rs232_port_device &rs232_port(RS232_PORT(config, "rs232_port", default_rs232_devices, nullptr));
+	rs232_port_device &rs232_port(RS232_PORT(config, "rs232_port", rs232_devices, nullptr));
 	rs232_port.rxd_handler().set("uart8274", FUNC(i8274_device::rxa_w));
 	rs232_port.dcd_handler().set("uart8274", FUNC(i8274_device::dcda_w));
 	rs232_port.cts_handler().set("uart8274", FUNC(i8274_device::ctsa_w));
