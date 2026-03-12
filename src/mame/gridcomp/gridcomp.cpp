@@ -155,6 +155,8 @@ private:
 	void grid_dma_w(offs_t offset, uint8_t data);
 	uint8_t grid_dma_r(offs_t offset);
 
+	void timer2_w(int state);
+
 	template <int Width>
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -263,6 +265,12 @@ uint8_t gridcomp_state::grid_dma_r(offs_t offset)
 	int ret = m_tms9914->read(7);
 	// LOG("DMA %02x == %02x\n", offset, ret);
 	return ret;
+}
+
+void gridcomp_state::timer2_w(int state)
+{
+	m_uart8274->rxca_w(state);
+	m_uart8274->txca_w(state);
 }
 
 template <int Width>
@@ -374,6 +382,7 @@ void gridcomp_state::grid1101(machine_config &config)
 
 	I80130(config, m_osp, XTAL(15'000'000)/3);
 	m_osp->irq().set_inputline("maincpu", 0);
+	m_osp->baud().set(FUNC(gridcomp_state::timer2_w));
 
 	MM58174(config, m_rtc, 32.768_kHz_XTAL);
 
@@ -427,9 +436,6 @@ void gridcomp_state::grid1101(machine_config &config)
 	IEEE488_SLOT(config, "ieee_rem", 0, remote488_devices, nullptr);
 
 	I8274(config, m_uart8274, XTAL(4'032'000));
-	// HACK: fix clock at 1200bps to get mouse working.
-	CLOCK(config, "uart8274_rxca_clk", 19'200).signal_handler().set("uart8274", FUNC(i8274_device::rxca_w));
-	CLOCK(config, "uart8274_txca_clk", 19'200).signal_handler().set("uart8274", FUNC(i8274_device::txca_w));
 	m_uart8274->out_txda_callback().set("rs232_port", FUNC(rs232_port_device::write_txd));
 	m_uart8274->out_dtra_callback().set("rs232_port", FUNC(rs232_port_device::write_dtr));
 	m_uart8274->out_rtsa_callback().set("rs232_port", FUNC(rs232_port_device::write_rts));
