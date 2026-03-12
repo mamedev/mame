@@ -13,10 +13,6 @@
 // - Checks for certain area specifics : bank mode timing for sdram access, area check for sdram, area check for burst mode + burst size
 // - TLB simulation + timing and lookups
 // - Branch predicition/mispredict penalties - Needs a branch target buffer and some basic tracking, didn't make a huge difference for cv1k when I threw one together
-// - Full pipeline simulation:
-//   Some penalties should overlap with following instructions that don't involve bus access
-//   Writeback timing for certain operations should also overlap in some cases
-//   If the CPU supports critical word first the instruction that takes the miss should be able to start as soon as that address is read in from memory even if there are further words to be read
 
 #include "emu.h"
 #include "sh7709s.h"
@@ -39,6 +35,9 @@ void sh7709s_device::device_reset()
 	m_wb_address = 0;
 	m_last_area_accessed = 0;
 	m_last_area_accessed_was_write = false;
+	m_wb_active_cycles = 0;
+	m_last_sdram_page = 0;
+	m_precharge_remaining_cycles = 0;
 }
 
 void sh7709s_device::device_start()
@@ -49,6 +48,9 @@ void sh7709s_device::device_start()
 	m_wb_address = 0;
 	m_last_area_accessed = 0;
 	m_last_area_accessed_was_write = false;
+	m_wb_active_cycles = 0;
+	m_last_sdram_page = 0;
+	m_precharge_remaining_cycles = 0;
 
 	for (int i = 0; i < SH7709S_CACHE_BLOCKS; i++)
 		for (int j = 0; j < SH7709S_CACHE_ASSOCIATIVITY; j++)
@@ -61,6 +63,9 @@ void sh7709s_device::device_start()
 	save_item(NAME(m_wb_address));
 	save_item(NAME(m_last_area_accessed));
 	save_item(NAME(m_last_area_accessed_was_write));
+	save_item(NAME(m_wb_active_cycles));
+	save_item(NAME(m_last_sdram_page));
+	save_item(NAME(m_precharge_remaining_cycles));
 }
 
 static bool is_cacheable(uint32_t address)
@@ -127,12 +132,10 @@ bool sh7709s_device::cache_access(uint32_t address, bool write)
 	return false;
 }
 
-#define SH7709S_AREA_MASK (0x1FFFFFFF)
-
 unsigned int get_area(uint32_t address)
 {
 	// Mask to 29 bit physical space
-	uint32_t phys_mask = address & SH7709S_AREA_MASK;
+	uint32_t phys_mask = address & SH34_AM;
 
 	return phys_mask >> 26;
 }
@@ -273,7 +276,6 @@ unsigned int cache_line_fetch_count(uint32_t address, uint16_t bcr2)
 #define BUS_ACCESS_PENALTY (3) // Fixed bus cycle cost to access the bus
 #define BURST_READ_WORD_PENALTY (3) // First word overlaps with one of the command clocks
 #define BURST_WRITE_WORD_PENALTY (4)
-#define BUS_CS_SWAP_PENALTY (1) // Penalty paid when swapping the bus from read->write for writeback eviction
 
 // cpu->bus cycle conversion hardcoded to 2x as cv1k sh3 runs the bus at 50mhz
 unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
@@ -294,11 +296,15 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	unsigned int cpu_penalty = CACHE_MISS_STALL;
 	unsigned int page_read = address / SDRAM_PAGE_SIZE;
 
+	// CPU is in auto precharge mode, since we hit a bank conflict and the last precharge isn't done we stall
+	if (page_read == m_last_sdram_page && m_precharge_remaining_cycles > 0)
+		cpu_penalty += m_precharge_remaining_cycles;
+	m_precharge_remaining_cycles = 0;
+
 	// We hit another miss before a writeback eviction finished, stall until that's done
+	// We already account for the precharge bank conflict above
 	if (m_wb_active_cycles > 0)
 	{
-		if (m_last_sdram_page == page_read)
-			bus_penalty += mcr_tpc(m_mcr);
 		cpu_penalty += m_wb_active_cycles;
 		m_wb_active_cycles = 0;
 	}
@@ -309,13 +315,15 @@ unsigned int sh7709s_device::access_penalty(uint32_t address, bool write)
 	if (m_wb_address != 0)
 	{
 		unsigned int page_write = m_wb_address / SDRAM_PAGE_SIZE;
-		// Bank collision in auto recharge mode, we have to wait for tpc
+		// Bank collision in auto precharge mode, we have to wait for precharge to finish before starting
 		if (page_read == page_write)
 			m_wb_active_cycles += mcr_tpc(m_mcr) * 2;
-		m_wb_active_cycles += (BUS_ACCESS_PENALTY + BUS_CS_SWAP_PENALTY + BURST_WRITE_WORD_PENALTY + mcr_rcd(m_mcr) + mcr_trwl(m_mcr) + mcr_tpc(m_mcr)) * 2;
+		m_wb_active_cycles += (BUS_ACCESS_PENALTY + get_wcr1_timing(address, m_wcr1) + BURST_WRITE_WORD_PENALTY + mcr_rcd(m_mcr) + mcr_trwl(m_mcr)) * 2;
 		m_wb_address = 0;
 		m_last_sdram_page = page_write;
 	}
+	else // Account for the read close after burst read if we hit the same bank, writebacks include the cost in the background cycles if there is a conflict
+		m_precharge_remaining_cycles = mcr_tpc(m_mcr) * 2;
 
 	return cpu_penalty + (bus_penalty * 2);
 }
@@ -335,7 +343,14 @@ void sh7709s_device::drc_memory_access_write()
 void sh7709s_device::drc_update_icache()
 {
 	if (m_wb_active_cycles > 0)
+	{
 		m_wb_active_cycles--;
+		// If we had an active wb complete set the remaining precharge cycles in case of bank conflict
+		if (m_wb_active_cycles == 0)
+			m_precharge_remaining_cycles = mcr_tpc(m_mcr) * 2;
+	}
+	else if (m_precharge_remaining_cycles > 0)
+		m_precharge_remaining_cycles--;
 	// Assume the instruction prefetch is perfect for now
 	// we'll still pay a bit of penalty for the access and
 	// handle cache writeback when the icache fetch causes

@@ -48,6 +48,7 @@ private:
 	bool m_last_area_accessed_was_write; // last memory area accessed operation also for WCR1 timing purposes
 	unsigned int m_wb_active_cycles; // Track any background cycles for writeback and precharge waits on the same bank
 	unsigned int m_last_sdram_page; // Last accessed sdram page, used to track when to have to pay tpc(precharge) cost
+	unsigned int m_precharge_remaining_cycles;
 
 	bool cache_access(uint32_t address, bool write);
 	unsigned int access_penalty(uint32_t address, bool write);
