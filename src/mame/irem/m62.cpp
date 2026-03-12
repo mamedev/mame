@@ -2096,7 +2096,7 @@ ROM_START( yanjamar )
 	ROM_LOAD( "dr26.3h",           0x00100, 0x0100, BAD_DUMP CRC(b563b93f) SHA1(86aefdaa63b35fe82f9f70eff3e4c14629f7a184) ) // character palette green component
 	ROM_LOAD( "dr27.3j",           0x00200, 0x0100, BAD_DUMP CRC(70d668ef) SHA1(2cc647f2708932105bb9a5130aacc5a8a160e418) ) // character palette blue component
 
-	/* The PCBs have a total of 25 PROMs, all of them were soldered and none of them was dumped.
+	/* The PCBs have a total of 25 PROMs, all of them were soldered and none of them were dumped.
            The previous seven PROMs (sprite height, sprite palette, and character palette) should be some of the following NO_DUMP declaratios, but
            is difficult to determine which is which. */
 	ROM_REGION( 0x200, "other_proms", 0 )
