@@ -59,7 +59,8 @@ public:
 		FLAG_INVERT         = 1U << 2,
 		FLAG_DISABLE        = 1U << 4,
 		FLAG_UI_HEADING     = 1U << 5,
-		FLAG_COLOR_BOX      = 1U << 6
+		FLAG_COLOR_BOX      = 1U << 6,
+		FLAG_AT_DEFAULT     = 1U << 7
 	};
 
 	virtual ~menu();

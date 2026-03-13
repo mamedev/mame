@@ -889,13 +889,18 @@ void menu::draw(uint32_t flags)
 					if (!core_stricmp(pitem.subtext(), _("Auto")))
 						fgcolor2 = rgb_t(0xff,0xff,0x00);
 
+					if (subitem_invert) // disabled items are drawn with a dimmer color
+						fgcolor2 = fgcolor2.scale8(0.4f * 256); // 40%
+					else if ((pitem.flags() & FLAG_AT_DEFAULT) && !is_selected(itemnum)) // if at default value and not selected, draw with a dimmer color
+						fgcolor2 = fgcolor2.scale8(0.7F * 256); // 70%
+
 					// draw the subitem right-justified
 					ui().draw_text_full(
 							container(),
 							subitem_text,
 							effective_left + item_width, line_y0, effective_width - item_width,
 							text_layout::text_justify::RIGHT, text_layout::word_wrapping::TRUNCATE,
-							mame_ui_manager::NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor,
+							mame_ui_manager::NORMAL, fgcolor2, bgcolor,
 							&subitem_width, nullptr,
 							line_height());
 				}
