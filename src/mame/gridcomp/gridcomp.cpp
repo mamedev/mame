@@ -68,6 +68,7 @@
 #include "bus/ieee488/ieee488.h"
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/hlemouse.h"
+#include "bus/rs232/printer.h"
 #include "cpu/i86/i86.h"
 #include "machine/i7220.h"
 #include "machine/i80130.h"
@@ -180,6 +181,8 @@ static void rs232_devices(device_slot_interface &device)
 
 		device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
 	*/
+
+	device.option_add("printer", SERIAL_PRINTER);
 }
 
 
