@@ -171,6 +171,14 @@ private:
 static void rs232_devices(device_slot_interface &device)
 {
 	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	/*
+		FIXME:
+		The GRiDPaint documentation states that this mouse should work.
+		But for some reason, the laptop does not recognize it.
+
+		device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	*/
 }
 
 
