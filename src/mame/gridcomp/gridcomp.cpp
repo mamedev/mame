@@ -40,17 +40,18 @@
 
     to do:
 
-    - EAROM, RTC
-    - serial port (incomplete), modem (incl. DTMF generator)
+    - EAROM (X2210D)
+    - modem (incl. DTMF generator)
+    - proper serial port connection (incl. PAL 16R4 300135-02)
     - keyboard MCU emulation
     - proper custom DMA logic timing
     - loading ROMs for Compass II
+	- proper 2101 and 2102 emulation
 
     missing dumps:
 
-    - dumps from 1100, 1107, 1121, 1131
+    - dumps from 1100, 1107, 1121, 1131, 1137
     - GRiDROM's
-    - external floppy and hard disk (2101, 2102)
 
     to boot GRID-OS:
     - convert GRIDOS.IMD to IMG format
