@@ -556,6 +556,7 @@ TODO:
 #include "machine/74157.h"
 #include "machine/74259.h"
 #include "machine/watchdog.h"
+#include "video/resnet.h"
 #include "speaker.h"
 
 
