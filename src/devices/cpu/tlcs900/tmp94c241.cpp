@@ -1467,6 +1467,9 @@ void tmp94c241_device::tlcs900_handle_timers()
 				    timer_id 6  =>  m_timer_16[1]  m_timer_change[5]
 				    timer_id 8  =>  m_timer_16[2]  m_timer_change[6]
 				    timer_id A  =>  m_timer_16[3]  m_timer_change[7]
+
+				    TREG_HIGH match generates the upper interrupt (e.g., INTTR5).
+				    TREG_LOW match generates the lower interrupt (e.g., INTTR4).
 				*/
 				uint8_t timer_index = (timer_id - 4)/2;
 
@@ -1474,11 +1477,18 @@ void tmp94c241_device::tlcs900_handle_timers()
 				{
 					m_timer_16[timer_index]++;
 					// TODO: also check for criteria of up counter matching CAPn registers
-					if (((m_timer_16[timer_index] == m_treg_16[timer_reg_high]) && BIT(tffcr, 3)) ||
-							((m_timer_16[timer_index] == m_treg_16[timer_reg_low]) && BIT(tffcr, 2)) )
+					if (m_timer_16[timer_index] == m_treg_16[timer_reg_high])
 					{
-						change_timer_flipflop(timer_id, FF_INVERT);
+						if (BIT(tffcr, 3))
+							change_timer_flipflop(timer_id, FF_INVERT);
 						m_timer_16[timer_index] = 0;
+						m_int_reg[interrupt] |= 0x80;
+						m_check_irqs = 1;
+					}
+					else if (m_timer_16[timer_index] == m_treg_16[timer_reg_low])
+					{
+						if (BIT(tffcr, 2))
+							change_timer_flipflop(timer_id, FF_INVERT);
 						m_int_reg[interrupt] |= 0x08;
 						m_check_irqs = 1;
 					}
