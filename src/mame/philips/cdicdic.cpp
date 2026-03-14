@@ -361,15 +361,14 @@ void cdicdic_device::play_cdda_sector(const uint8_t *data)
 	m_dmadac[1]->set_volume(0x100);
 
 	const uint16_t NUM_SAMPLES = SECTOR_SIZE / 4;
-	int16_t samples[2][NUM_SAMPLES];
 	for (uint16_t i = 0; i < NUM_SAMPLES; i++)
 	{
-		samples[0][i] = (int16_t)((data[(i * 4) + 1] << 8) | data[(i * 4) + 0]);
-		samples[1][i] = (int16_t)((data[(i * 4) + 3] << 8) | data[(i * 4) + 2]);
+		m_samples[0][i] = (int16_t)((data[(i * 4) + 1] << 8) | data[(i * 4) + 0]);
+		m_samples[1][i] = (int16_t)((data[(i * 4) + 3] << 8) | data[(i * 4) + 2]);
 	}
 
-	m_dmadac[0]->transfer(0, 1, 1, NUM_SAMPLES, samples[0]);
-	m_dmadac[1]->transfer(0, 1, 1, NUM_SAMPLES, samples[1]);
+	m_dmadac[0]->transfer(0, 1, 1, NUM_SAMPLES, &m_samples[0][0]);
+	m_dmadac[1]->transfer(0, 1, 1, NUM_SAMPLES, &m_samples[1][0]);
 }
 
 void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data)
