@@ -144,6 +144,19 @@ void renderer_sdl1::setup_texture(const osd_dim &size)
 
 	fmt = (m_scale_mode.pixel_format ? m_scale_mode.pixel_format : mode->format);
 
+	// The software renderer does not write the alpha channel, leaving it as zero.
+	// On macOS this causes all color channels to be multiplied to zero, producing a black screen.
+	// Map alpha formats to their opaque equivalents so SDL treats the alpha byte as
+	// padding and fills it with 0xFF when blitting to the window surface.
+	switch (SDL_PixelFormat(fmt))
+	{
+		case SDL_PIXELFORMAT_ARGB8888: fmt = SDL_PIXELFORMAT_XRGB8888; break;
+		case SDL_PIXELFORMAT_ABGR8888: fmt = SDL_PIXELFORMAT_XBGR8888; break;
+		case SDL_PIXELFORMAT_RGBA8888: fmt = SDL_PIXELFORMAT_RGBX8888; break;
+		case SDL_PIXELFORMAT_BGRA8888: fmt = SDL_PIXELFORMAT_BGRX8888; break;
+		default: break;
+	}
+
 	if (m_scale_mode.is_scale)
 	{
 		int m_hw_scale_width = 0;
