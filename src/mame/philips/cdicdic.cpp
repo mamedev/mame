@@ -24,8 +24,6 @@ TODO:
 #include "cdrom.h"
 #include "sound/cdda.h"
 
-#include <algorithm>
-
 #define LOG_DECODES     (1U << 1)
 #define LOG_SAMPLES     (1U << 2)
 #define LOG_COMMANDS    (1U << 3)
@@ -314,40 +312,33 @@ void cdicdic_device::play_raw_group(const uint8_t *data)
 	m_dmadac[1]->transfer(0, 1, 1, 28, samples);
 }
 
-void cdicdic_device::play_xa_group(const uint8_t coding, const uint8_t *data)
+void cdicdic_device::play_xa_group(const uint8_t coding, const uint8_t *data, const uint16_t idx)
 {
 	static const uint16_t HEADER_OFFSET_4BIT[8] = { 4, 5, 6, 7, 12, 13, 14, 15 };
 	static const uint16_t HEADER_OFFSET_8BIT[4] = { 4, 5, 6, 7 };
 	static const uint16_t DATA_OFFSET_4BIT[8] = { 16, 16, 17, 17, 18, 18, 19, 19 };
 	static const uint16_t DATA_OFFSET_8BIT[4] = { 16, 17, 18, 19 };
 
-	int16_t samples[28];
-	const uint8_t num_samples = (coding & CODING_8BPS) ? 4 : 8;
+	const uint8_t num_samples = coding & CODING_8BPS ? 4 : 8;
 
 	for (uint8_t i = 0; i < num_samples; i++)
 	{
 		switch (coding & (CODING_BPS_MASK | CODING_CHAN_MASK))
 		{
 		case CODING_4BPS | CODING_MONO:
-			decode_4bit_xa_unit(0, data[HEADER_OFFSET_4BIT[i]], data + DATA_OFFSET_4BIT[i], (i & 1) ? 4 : 0, samples);
-			m_dmadac[0]->transfer(0, 1, 1, 28, samples);
-			m_dmadac[1]->transfer(0, 1, 1, 28, samples);
+			decode_4bit_xa_unit(0, data[HEADER_OFFSET_4BIT[i]], data + DATA_OFFSET_4BIT[i], (i & 1) ? 4 : 0, &m_samples[0][idx + i * 28]);
 			break;
 
 		case CODING_4BPS | CODING_STEREO:
-			decode_4bit_xa_unit(i & 1, data[HEADER_OFFSET_4BIT[i]], data + DATA_OFFSET_4BIT[i], (i & 1) ? 4 : 0, samples);
-			m_dmadac[i & 1]->transfer(0, 1, 1, 28, samples);
+			decode_4bit_xa_unit(i & 1, data[HEADER_OFFSET_4BIT[i]], data + DATA_OFFSET_4BIT[i], (i & 1) ? 4 : 0, &m_samples[i & 1][idx + (i >> 1) * 28]);
 			break;
 
 		case CODING_8BPS | CODING_MONO:
-			decode_8bit_xa_unit(0, data[HEADER_OFFSET_8BIT[i]], data + DATA_OFFSET_8BIT[i], samples);
-			m_dmadac[0]->transfer(0, 1, 1, 28, samples);
-			m_dmadac[1]->transfer(0, 1, 1, 28, samples);
+			decode_8bit_xa_unit(0, data[HEADER_OFFSET_8BIT[i]], data + DATA_OFFSET_8BIT[i], &m_samples[0][idx + i * 28]);
 			break;
 
 		case CODING_8BPS | CODING_STEREO:
-			decode_8bit_xa_unit(i & 1, data[HEADER_OFFSET_8BIT[i]], data + DATA_OFFSET_8BIT[i], samples);
-			m_dmadac[i & 1]->transfer(0, 1, 1, 28, samples);
+			decode_8bit_xa_unit(i & 1, data[HEADER_OFFSET_8BIT[i]], data + DATA_OFFSET_8BIT[i], &m_samples[i & 1][idx + (i >> 1) * 28]);
 			break;
 		}
 	}
@@ -433,6 +424,10 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 	m_dmadac[0]->set_volume(0x100);
 	m_dmadac[1]->set_volume(0x100);
 
+	const uint16_t bps = ((coding & CODING_BPS_MASK) == CODING_8BPS);
+	const uint16_t chan = ((coding & CODING_CHAN_MASK) == CODING_STEREO);
+	const uint16_t num_samples = 8 >> (bps + chan);
+
 	if (bits == 16 && channels == 2)
 	{
 		for (uint16_t i = 0; i < SECTOR_AUDIO_SIZE; i += 112, data += 112)
@@ -442,10 +437,15 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 	}
 	else
 	{
+		uint16_t offset = 0;
 		for (uint16_t i = 0; i < SECTOR_AUDIO_SIZE; i += 128, data += 128)
 		{
-			play_xa_group(coding, data);
+			play_xa_group(coding, data, offset);
+			offset += 28 * num_samples;
 		}
+		const uint16_t SECTORS = SECTOR_AUDIO_SIZE / 128;
+		m_dmadac[0]->transfer(0, 1, 1, 28 * num_samples * SECTORS, &m_samples[0][0]);
+		m_dmadac[1]->transfer(0, 1, 1, 28 * num_samples * SECTORS, &m_samples[coding & CODING_STEREO][0]);
 	}
 }
 

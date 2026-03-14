@@ -195,7 +195,7 @@ private:
 	void decode_8bit_xa_unit(int channel, uint8_t param, const uint8_t *data, int16_t *out_buffer);
 	void decode_4bit_xa_unit(int channel, uint8_t param, const uint8_t *data, uint8_t shift, int16_t *out_buffer);
 	void play_raw_group(const uint8_t *data);
-	void play_xa_group(const uint8_t coding, const uint8_t *data);
+	void play_xa_group(const uint8_t coding, const uint8_t *data, const uint16_t idx);
 	void play_audio_sector(const uint8_t coding, const uint8_t *data);
 	void play_cdda_sector(const uint8_t *data);
 	void process_audio_map();
