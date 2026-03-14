@@ -267,8 +267,8 @@ bool grid_keyboard_device::translate(u8 code, u16 &translated) const
 	if (result == 0xff)
 		return false;
 
-	if (ctrl && result >= 0x20)
-		translated = result - 0x20;
+	if (ctrl)
+		translated = result & 0x9f;
 	else
 		translated = result;
 
