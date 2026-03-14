@@ -443,9 +443,27 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 			play_xa_group(coding, data, offset);
 			offset += 28 * num_samples;
 		}
-		const uint16_t SECTORS = SECTOR_AUDIO_SIZE / 128;
-		m_dmadac[0]->transfer(0, 1, 1, 28 * num_samples * SECTORS, &m_samples[0][0]);
-		m_dmadac[1]->transfer(0, 1, 1, 28 * num_samples * SECTORS, &m_samples[coding & CODING_STEREO][0]);
+
+		int16_t sampleL = 0, sampleR = 0, outL = 0, outR = 0;
+		// TODO: Until attenuation is wired up correctly, hardcode values.
+		m_atten[0] = 0xff; // Max Volume L -> L
+		m_atten[2] = 0xff; // Max Volume R -> R
+		// Attenuation is logarithmic (decibels).
+		// Floats are not chip accurate, but the formula is correct.
+		float scaleLL = powf(10.0f, -m_atten[0] / 20.0f);
+		float scaleLR = powf(10.0f, -m_atten[1] / 20.0f);
+		float scaleRR = powf(10.0f, -m_atten[2] / 20.0f);
+		float scaleRL = powf(10.0f, -m_atten[3] / 20.0f);
+		for (uint16_t i = 0; i < 18 * 28 * num_samples; i++)
+		{
+			sampleL = m_samples[0][i];
+			sampleR = m_samples[coding & CODING_STEREO][i];
+
+			outL = (sampleL * scaleLL + sampleR * scaleRL) * 0.5;
+			outR = (sampleL * scaleLR + sampleR * scaleRR) * 0.5;
+			m_dmadac[0]->transfer(0, 1, 1, 1, &outL);
+			m_dmadac[1]->transfer(0, 1, 1, 1, &outR);
+		}
 	}
 }
 
