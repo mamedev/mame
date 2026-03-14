@@ -328,7 +328,7 @@ void video_bgfx::save_config(config_type cfg_type, util::xml::data_node *parentn
 
 bool video_bgfx::init_bgfx_library(osd_window &window)
 {
-	osd_dim const wdim = window.get_size();
+	osd_dim const wdim = window.get_size_pixels();
 
 	bgfx::Init init;
 	init.type = bgfx::RendererType::Count;
@@ -696,7 +696,7 @@ renderer_bgfx::~renderer_bgfx()
 
 int renderer_bgfx::create()
 {
-	const osd_dim wdim = window().get_size();
+	const osd_dim wdim = window().get_size_pixels();
 	s_width[window().index()] = wdim.width();
 	s_height[window().index()] = wdim.height();
 	m_dimensions = wdim;
@@ -1238,7 +1238,7 @@ int renderer_bgfx::draw(int update)
 	if (m_ortho_view)
 		m_ortho_view->set_index(UINT_MAX);
 
-	osd_dim wdim = window().get_size();
+	osd_dim wdim = window().get_size_pixels();
 	s_width[window_index] = wdim.width();
 	s_height[window_index] = wdim.height();
 
@@ -1458,7 +1458,7 @@ render_primitive_list *renderer_bgfx::get_primitives()
 		chain_transform = chain->transform();
 	}
 
-	osd_dim wdim = window().get_size();
+	osd_dim wdim = window().get_size_pixels();
 	if (wdim.width() > 0 && wdim.height() > 0)
 		window().target()->set_bounds(wdim.width(), wdim.height(), window().pixel_aspect());
 

@@ -251,7 +251,7 @@ int renderer_sdl1::draw(int update)
 	int32_t vofs, hofs, blitwidth, blitheight, ch, cw;
 	int bpp;
 
-	osd_dim wdim = window().get_size();
+	osd_dim wdim = window().get_size_pixels();
 	if (has_flags(FI_CHANGED) || (wdim != m_last_dim))
 	{
 		destroy_all_textures();
@@ -604,7 +604,7 @@ static void yuv_RGB_to_YUY2X2(const uint16_t *bitmap, uint8_t *ptr, const int pi
 
 render_primitive_list *renderer_sdl1::get_primitives()
 {
-	osd_dim nd = window().get_size();
+	osd_dim nd = window().get_size_pixels();
 	if (nd != m_blit_dim)
 	{
 		m_blit_dim = nd;
