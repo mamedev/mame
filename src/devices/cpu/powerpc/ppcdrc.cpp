@@ -996,14 +996,6 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 		}
 	}
 
-	/* if writing to a reserved memory block, cancel the reservation */
-	if (iswrite)
-	{
-		UML_AND(block, I3, I0, 0xffffffe0);                                 // and     i3,i0,0xffffffe0
-		UML_CMP(block, mem(&m_core->reserve_address), I3);                  // cmp     reserve_address,i3
-		UML_MOVc(block, COND_E, mem(&m_core->reserve), 0);                  // mov     reserve,0,e
-	}
-
 	/* general case: assume paging and perform a translation */
 	if (((m_cap & PPCCAP_OEA) && (mode & MODE_DATA_TRANSLATION)) || (iswrite && (m_cap & PPCCAP_4XX) && (mode & MODE_PROTECTION)))
 	{
@@ -3337,7 +3329,7 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 			UML_LABEL(block, compiler->labelnum++);                                // 1:
 			UML_MOV(block, CR32(0), XERSO32);                                      // mov     [cr0],[xerso]
 			UML_LABEL(block, compiler->labelnum++);                                // 2:
-			generate_compute_flags(block, desc, true, 0, false);                   // <update flags>
+			generate_update_cycles(block, compiler, desc->pc + 4, true);           // <update cycles>
 			return true;
 
 		case 0x2d5: /* STSWI */
