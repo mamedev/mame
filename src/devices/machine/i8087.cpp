@@ -4208,7 +4208,7 @@ void i8087_device::fsave(u8 modrm)
 	WRITE16(ea + 12, (m_ea & 0x0f0000) >> 4);
 
 	for (int i = 0; i < 8; ++i)
-		WRITE80(ea + i*10, ST(i));
+		WRITE80(ea + 14 + i*10, ST(i));
 	reset();
 
 	CYCLES(67);
@@ -4229,7 +4229,7 @@ void i8087_device::frstor(u8 modrm)
 	m_ea = READ16(ea + 10) | ((READ16(ea + 12) & 0xf000) << 4);
 
 	for (int i = 0; i < 8; ++i)
-		write_stack(i, READ80(ea + i*10), false);
+		write_stack(i, READ80(ea + 14 + i*10), false);
 
 	CYCLES(44);
 }
