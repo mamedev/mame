@@ -115,43 +115,9 @@ I/O Map:
 
 0040 - parallel/printer related?
 
-Sounds related?
-On boot: 50 = 98, 51 = 06, 52 = 7f
-         52 = ff
-         50 - 26, 51 = 01, 52 = 7f
-         52 = ff
-         (mem check)
-         50 = 98, 51 = 06, 52 = 7f
-         52 = ff
-         50 = 74, 51 = 04, 52 = 7f
-         52 = ff
-         50 = 98, 51 = 06, 52 = 7f
-         52 = ff
-         (menu)
-         (type 1 - medium frequency sound )
-         50 = 5d, 51 = 01, 52 = 7f
-         52 = ff
-         52 = ff
-         52 = ff
-         50 = 00, 51 = 01, 52 = 7f
-         52 = ff
-         (type 2 - simple lower sound)
-         50 = ba, 51 = 02, 52 = 7f
-         52 = ff
-         (type 3 - highest frequency sound)
-         50 = 26, 51 = 01, 52 = 7f
-         52 = ff
-         50 = 06, 51 = 01, 52 = 7f
-         52 = ff
-         50 = e9, 51 = 00, 52 = 7f
-         52 = ff
-         50 = dc, 51 = 00, 52 = 7f
-         52 = ff
-         50 = c4, 51 = 00, 52 = 7f
-         52 = ff
-0050 - counter low?
-0051 - counter high?
-0052 - counter enable/disable?
+0050 - 0051 - Beeper frequency
+0052 - Beeper control
+
 0053 - unknown
 
 0060 - Irq enable/disable (?)
@@ -186,47 +152,8 @@ On boot: 50 = 98, 51 = 06, 52 = 7f
 00D0 - 00DF - RTC
 
 
-IRQ 0xF8:
-The handler clears the irq active bit and copies a word from 6D79 to 6D85 and
-from 6D7B to 6D87 then enters an endless loop (with interrupts disabled).
-Perhaps power on/off related??
-
-
-IRQ 0xF9: (T400: C049A)
-Purpose unknown. IRQ handler clear bit 0 of 6DA9.
-
-
-IRQ 0xFA: (T400: C04AE)
-Purpose unknown. Expects 6D4F to be set up properly. Enables irq 0xFD. Reads
-from input port 0xB0 and resets and sets bit 0 of output port 0x61.
-
-
-IRQ 0xFB: (T400: C04D1)
-Purpose unknown. Reads from input port 0xB0, sets bit 7 of 6D28 when
-non-zero data was read.
-
-
-IRQ 0xFC: (T400: C0550)
-Purpose unknown. Reads from input port 0xC1 and 0xC0 and possibly outputs
-something to output port 0xC1 depending on data read from 0xC1.
-
-
-IRQ 0xFD: (T400: C0724)
-Purpose unknown. Clears bit 3 of 70A5.
-
-
-IRQ 0xFE: (T400: C0738)
-Purpose unknown. Expects 6D4F to be set up properly. Enables irq 0xf9 or outputs
-a byte to ports 0x40 and 0x30. No endless loop.
-
-
-IRQ 0xFF:
-This does some simple processing and then enters an endless loop (with interrupts
-disabled). Perhaps power on/off related??
 
 TODO:
-- On boot, systems do not display version and copyright messages.
-- Power button?
 - drwrt200,drwrt400,drwrt450 only go up to 512KB to initialize pcmcia card.
   Very likely BTANB. At least the documentation for the T400 mentions support
   for 512KB instead of 1MB SRAM card.
@@ -234,6 +161,7 @@ TODO:
 - Floppy support
 - centronics ack signal is not checked anywhere?
 - Frequncy of the keyboard timer is unknown.
+- beeper sound is not verified against a real system.
 
 ******************************************************************************/
 
@@ -250,6 +178,7 @@ TODO:
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
+#include "sound/beep.h"
 #include "sound/spkrdev.h"
 
 #include "emupal.h"
@@ -285,6 +214,7 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_speaker(*this, "mono")
+		, m_beep(*this, "beep")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:0")
 		, m_centronics(*this, "centronics")
@@ -301,7 +231,8 @@ public:
 	void nakajies250(machine_config &config);
 	void dator3k(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_button);
+	DECLARE_INPUT_CHANGED_MEMBER(power_button_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(power_button_irq);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -359,6 +290,7 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<speaker_device> m_speaker;
+	required_device<beep_device> m_beep;
 	optional_device<n82077aa_device> m_fdc;
 	optional_device<floppy_connector> m_floppy;
 	required_device<centronics_device> m_centronics;
@@ -383,6 +315,7 @@ private:
 	u32 m_uart_rxrdy = 0;
 	u32 m_uart_txrdy = 0;
 	bool m_lcd_on = false;
+	u16 m_beep_freq = 0;
 };
 
 
@@ -579,7 +512,10 @@ void nakajies_state::nakajies_io_map(address_map &map)
 	map(0x30, 0x30).w(FUNC(nakajies_state::uart_control_w));
 	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
 	// Unknown, 60 is written frequently
-//	map(0x0053, 0x0053).noprw();
+	map(0x0050, 0x0050).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0xff00) | data; m_beep->set_clock(250000/m_beep_freq); }));
+	map(0x0051, 0x0051).lw8(NAME([this](u8 data) { m_beep_freq = (m_beep_freq & 0x00ff) | (data << 8); m_beep->set_clock(250000/m_beep_freq); }));
+	map(0x0052, 0x0052).lw8(NAME([this](u8 data) { m_beep->set_state(!BIT(data, 7)); }));
+	map(0x0053, 0x0053).noprw();
 	map(0x0060, 0x0060).rw(FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
 	map(0x0061, 0x0061).w(FUNC(nakajies_state::keyboard_row_reset));
 	map(0x0070, 0x0070).lw8(NAME([this](u8 data) {
@@ -662,9 +598,6 @@ void nakajies_state::uart_rxrdy_w(int state)
 
 
 static INPUT_PORTS_START(nakajies)
-	PORT_START("power")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Power On/Off") PORT_CODE(KEYCODE_END) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::power_button), 0)
-
 	PORT_START("status")
 	PORT_CONFNAME(0x08, 0x00, "Battery pack failed")
 	PORT_CONFSETTING(0x00, DEF_STR(No))
@@ -775,9 +708,30 @@ static INPUT_PORTS_START(nakajies)
 INPUT_PORTS_END
 
 
-INPUT_CHANGED_MEMBER(nakajies_state::power_button)
+static INPUT_PORTS_START(nakajies_irq)
+	PORT_INCLUDE(nakajies)
+	PORT_START("power")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Power On/Off") PORT_CODE(KEYCODE_END) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::power_button_irq), 0)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START(nakajies_nmi)
+	PORT_INCLUDE(nakajies)
+	PORT_START("power")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Power On/Off") PORT_CODE(KEYCODE_END) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::power_button_nmi), 0)
+INPUT_PORTS_END
+
+
+INPUT_CHANGED_MEMBER(nakajies_state::power_button_nmi)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+INPUT_CHANGED_MEMBER(nakajies_state::power_button_irq)
+{
+	m_irq_active |= 0x01;
+	nakajies_update_irqs();
 }
 
 
@@ -947,7 +901,7 @@ void nakajies_state::drwrt100(machine_config &config)
 
 	/* sound */
 	SPEAKER(config, m_speaker).front_center();
-	SPEAKER_SOUND(config, "speaker").add_route(ALL_OUTPUTS, m_speaker, 1.00);
+	BEEP(config, m_beep, 0).add_route(ALL_OUTPUTS, m_speaker, 0.25);
 
 	/* rtc */
 	RP5C01(config, m_rtc, XTAL(32'768));
@@ -1082,10 +1036,10 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT     CLASS           INIT        COMPANY     FULLNAME            FLAGS
-COMP( 199?, wales210, 0,        0,      nakajies210, nakajies, nakajies_state, empty_init, "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // German, 128KB RAM
-COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies, nakajies_state, empty_init, "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
-COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies, nakajies_state, empty_init, "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
-COMP( 1996, drwrt100, wales210, 0,      drwrt100,    nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
-COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
-COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
-COMP( 1996, drwrt200, wales210, 0,      nakajies250, nakajies, nakajies_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 199?, wales210, 0,        0,      nakajies210, nakajies_irq, nakajies_state, empty_init, "Walther",  "ES-210",           MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // German, 128KB RAM
+COMP( 199?, dator3k,  wales210, 0,      dator3k,     nakajies_irq, nakajies_state, empty_init, "Dator",    "Dator 3000",       MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 199?, es210_es, wales210, 0,      nakajies210, nakajies_irq, nakajies_state, empty_init, "Nakajima", "ES-210 (Spain)",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // Spanish, 128KB RAM
+COMP( 1996, drwrt100, wales210, 0,      drwrt100,    nakajies_irq, nakajies_state, empty_init, "NTS",      "DreamWriter T100", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 128KB RAM
+COMP( 1996, drwrt400, wales210, 0,      nakajies220, nakajies_nmi, nakajies_state, empty_init, "NTS",      "DreamWriter T400", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 199?, drwrt450, wales210, 0,      nakajies220, nakajies_nmi, nakajies_state, empty_init, "NTS",      "DreamWriter 450",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
+COMP( 1996, drwrt200, wales210, 0,      nakajies250, nakajies_nmi, nakajies_state, empty_init, "NTS",      "DreamWriter T200", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // English, 256KB RAM
