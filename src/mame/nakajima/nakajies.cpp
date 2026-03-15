@@ -221,20 +221,29 @@ disabled). Perhaps power on/off related??
 
 TODO:
 - On boot, systems do not display version and copyright messages.
-- drwrt200,drwrt400,drwrt450 only go up to 512KB to initialize pcmcia card. BTANB?
+- Power button?
+- drwrt200,drwrt400,drwrt450 only go up to 512KB to initialize pcmcia card.
+  Very likely BTANB. At least the documentation for the T400 mentions support
+  for 512KB instead of 1MB SRAM card.
 - Serial port
-- Parallel port
-- FDD
+- Floppy support
+- centronics ack signal is not checked anywhere?
 
 ******************************************************************************/
 
 #include "emu.h"
 
+#include "bus/centronics/ctronics.h"
+#include "bus/rs232/rs232.h"
 #include "bus/pccard/sram.h"
 #include "cpu/nec/nec.h"
+#include "imagedev/floppy.h"
+#include "machine/clock.h"
+#include "machine/i8251.h"
 #include "machine/nvram.h"
 #include "machine/rp5c01.h"
 #include "machine/timer.h"
+#include "machine/upd765.h"
 #include "sound/spkrdev.h"
 
 #include "emupal.h"
@@ -271,6 +280,13 @@ public:
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
 		, m_speaker(*this, "mono")
+		, m_fdc(*this, "fdc")
+		, m_floppy(*this, "fdc:0")
+		, m_centronics(*this, "centronics")
+		, m_cent_data_out(*this, "cent_data_out")
+		, m_uart(*this, "uart")
+		, m_uart_clock(*this, "uart_clock")
+		, m_serial(*this, "serial")
 	{
 	}
 
@@ -303,11 +319,17 @@ private:
 	u8 keyboard_r();
 	void keyboard_row_reset(u8 data);
 	void banking_w(offs_t offset, u8 data);
+	void uart_control_w(u8 data);
+	void centronics_busy_w(int state);
+	void centronics_ack_w(int state);
+	void uart_txrdy_w(int state);
+	void uart_rxrdy_w(int state);
 
 	void nakajies_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(hz10_timer);
 	void nakajies_io_map(address_map &map) ATTR_COLD;
+	void nakajies_io_map_fdc(address_map &map) ATTR_COLD;
 	void nakajies_map(address_map &map) ATTR_COLD;
 	void pcmcia_card_detect_w(int state) { m_pcmcia_card_detect = state; }
 	void pcmcia_write_protect_w(int state) { m_pcmcia_write_protect = state; }
@@ -333,6 +355,13 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<speaker_device> m_speaker;
+	optional_device<n82077aa_device> m_fdc;
+	optional_device<floppy_connector> m_floppy;
+	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
+	required_device<i8251_device> m_uart;
+	required_device<clock_device> m_uart_clock;
+	required_device<rs232_port_device> m_serial;
 
 	u8 m_irq_enabled = 0;
 	u8 m_irq_active = 0;
@@ -344,6 +373,11 @@ private:
 	u32 m_pcmcia_card_detect = 1;
 	u32 m_pcmcia_write_protect = 1;
 	u32 m_pcmcia_battery_failed = 1;
+	u8 m_uart_control = 0;
+	u32 m_centronics_busy = 0;
+	u32 m_centronics_ack = 0;
+	u32 m_uart_rxrdy = 0;
+	u32 m_uart_txrdy = 0;
 };
 
 
@@ -447,7 +481,7 @@ void nakajies_state::irq_enable_w(u8 data)
   ---4---- PCMCIA battery status. 0 = ok, 1 = battery low/failed.
   ----3--- Battery pack ok. 0 = ok, 1 = low.
   -----2-- Lithium coin battery ok. 0 = ok, 1 = low.
-  ------1- printer connected?
+  ------1- centronics busy? when set to 1 no parallel communication is performed.
   -------0 unknown
 */
 u8 nakajies_state::unk_a0_r()
@@ -457,7 +491,8 @@ u8 nakajies_state::unk_a0_r()
 		(m_pcmcia_write_protect ? 0x40 : 0x00) |
 		(m_pcmcia_battery_failed ? 0x10 : 0x00) |
 		m_port_status->read() |
-		0x23;
+		(m_centronics_busy ? 0x02 : 0x00) |
+		0x21;
 }
 
 void nakajies_state::lcd_memory_start_w(u8 data)
@@ -525,24 +560,91 @@ void nakajies_state::keyboard_row_reset(u8 data)
 	m_keyboard_row_reset = data;
 }
 
+
 void nakajies_state::nakajies_io_map(address_map &map)
 {
-//	map(0x0000, 0x00ff).lrw8(NAME([](offs_t offset) { printf("read %02x\n", offset); return 0xff; }), NAME([](offs_t offset, u8 data) { printf("write %02x %02x\n", offset, data); }));
+	// Temp for debugging
+	map(0x0000, 0x00ff).lrw8(NAME([](offs_t offset) { printf("read %02x\n", offset); return 0xff; }), NAME([](offs_t offset, u8 data) { printf("write %02x %02x\n", offset, data); }));
+
 	map(0x0000, 0x0000).w(FUNC(nakajies_state::lcd_memory_start_w));
 	map(0x0010, 0x0017).w(FUNC(nakajies_state::banking_w));
-//	map(0x0020, 0x0020).lrw8(NAME([]() { printf("read 20\n"); return 0xff; }), NAME([](u8 data) { printf("write 20 %02x\n", data); }));
-//	map(0x0030, 0x0030).lrw8(NAME([]() { printf("read 30\n"); return 0xff; }), NAME([](u8 data) { printf("write 30 %02x\n", data); }));
-//	map(0x0040, 0x0040).lrw8(NAME([]() { printf("read 40\n"); return 0xff; }), NAME([](u8 data) { printf("write 40 %02x\n", data); }));
+	// Parallel coomunication
+	map(0x30, 0x30).w(FUNC(nakajies_state::uart_control_w));
+	map(0x40, 0x40).w("cent_data_out", FUNC(output_latch_device::write));
 	// Unknown, 60 is written frequently
-	map(0x0053, 0x0053).noprw();
+//	map(0x0053, 0x0053).noprw();
 	map(0x0060, 0x0060).rw(FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
 	map(0x0061, 0x0061).w(FUNC(nakajies_state::keyboard_row_reset));
 	map(0x0090, 0x0090).rw(FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
 	map(0x00a0, 0x00a0).r(FUNC(nakajies_state::unk_a0_r));
 	map(0x00b0, 0x00b0).r(FUNC(nakajies_state::keyboard_r));
-//	map(0x00c0, 0x00c0).lrw8(NAME([]() { printf("read c0\n"); return 0xff; }), NAME([](u8 data) { printf("write c0 %02x\n", data); }));
-//	map(0x00c1, 0x00c1).lrw8(NAME([]() { printf("read c1\n"); return 0xff; }), NAME([](u8 data) { printf("write c0 %01x\n", data); }));
+	// Serial communication
+	map(0x00c0, 0x00c1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x00d0, 0x00df).rw(m_rtc, FUNC(rp5c01_device::read), FUNC(rp5c01_device::write));
+}
+
+
+void nakajies_state::nakajies_io_map_fdc(address_map &map)
+{
+	nakajies_io_map(map);
+	map(0x00e0, 0x00ef).m(m_fdc, FUNC(n82077aa_device::map));
+}
+
+
+void nakajies_state::uart_control_w(u8 data)
+{
+	// 76------ unknown
+	// --5----- centronics strobe
+	// ---4---- unknown
+	// ----3--- uart clock/reset?
+	// -----210 baud rate
+	//          000 - 19200
+	//          001 - 9600
+	//          010 - 4800
+	//          011 - 2400
+	//          100 - 1200
+
+	m_centronics->write_strobe(BIT(data, 5));
+	m_uart_control = data;
+
+	if (BIT(m_uart_control, 3) == 1 && BIT(data, 3) == 0)
+		m_uart->reset();
+
+	m_uart_clock->set_clock_scale(1 << (data & 0x07));
+}
+
+
+void nakajies_state::centronics_busy_w(int state)
+{
+	m_centronics_busy = state;
+}
+
+
+void nakajies_state::centronics_ack_w(int state)
+{
+	m_centronics_ack = state;
+}
+
+
+void nakajies_state::uart_txrdy_w(int state)
+{
+	if (!m_uart_rxrdy && state)
+		m_irq_active |= 0x08;
+
+	nakajies_update_irqs();
+
+	m_uart_rxrdy = state;
+}
+
+
+void nakajies_state::uart_rxrdy_w(int state)
+{
+	if (!m_uart_rxrdy && state)
+		m_irq_active |= 0x08;
+
+	nakajies_update_irqs();
+
+	m_uart_rxrdy = state;
 }
 
 
@@ -683,6 +785,7 @@ void nakajies_state::machine_start()
 		// TODO: rom banks outside max bank size; assuming the banks are simply mirrored
 		for (int j = 0; j < 8; j += rom_size / 0x20000)
 			m_rombank[i]->configure_entries(j, rom_size / 0x20000, m_rom_region->base(), 0x20000);
+
 		for (int j = 0; j < 2; j += m_ram_size / 0x20000)
 			m_rambank[i]->configure_entries(j, m_ram_size / 0x20000, &m_ram_base[0], 0x20000);
 	}
@@ -695,6 +798,11 @@ void nakajies_state::machine_start()
 	save_item(NAME(m_pcmcia_card_detect));
 	save_item(NAME(m_pcmcia_write_protect));
 	save_item(NAME(m_pcmcia_battery_failed));
+	save_item(NAME(m_uart_control));
+	save_item(NAME(m_centronics_busy));
+	save_item(NAME(m_centronics_ack));
+	save_item(NAME(m_uart_rxrdy));
+	save_item(NAME(m_uart_txrdy));
 }
 
 
@@ -827,10 +935,33 @@ void nakajies_state::drwrt100(machine_config &config)
 	/* rtc */
 	RP5C01(config, m_rtc, XTAL(32'768));
 
-	TIMER(config, "kb_timer").configure_periodic(FUNC(nakajies_state::kb_timer), attotime::from_hz(250));
+	TIMER(config, "kb_timer").configure_periodic(FUNC(nakajies_state::kb_timer), attotime::from_hz(500));
 	TIMER(config, "10hz_timer").configure_periodic(FUNC(nakajies_state::hz10_timer), attotime::from_hz(10));
 
 	NVRAM(config, m_nvram);
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->busy_handler().set(FUNC(nakajies_state::centronics_busy_w));
+	m_centronics->ack_handler().set(FUNC(nakajies_state::centronics_ack_w));
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	m_centronics->set_output_latch(*m_cent_data_out);
+
+	I8251(config, m_uart, 0);
+	m_uart->txd_handler().set(m_serial, FUNC(rs232_port_device::write_txd));
+	m_uart->rts_handler().set(m_serial, FUNC(rs232_port_device::write_rts));
+	m_uart->dtr_handler().set(m_serial, FUNC(rs232_port_device::write_dtr));
+	m_uart->rxrdy_handler().set(FUNC(nakajies_state::uart_rxrdy_w));
+	m_uart->txrdy_handler().set(FUNC(nakajies_state::uart_txrdy_w));
+
+	CLOCK(config, m_uart_clock, 150 * 16);
+	m_uart_clock->signal_handler().set(m_uart, FUNC(i8251_device::write_rxc));
+	m_uart_clock->signal_handler().append(m_uart, FUNC(i8251_device::write_txc));
+
+	RS232_PORT(config, m_serial, default_rs232_devices, nullptr);
+	m_serial->rxd_handler().set(m_uart, FUNC(i8251_device::write_rxd));
+	m_serial->cts_handler().set(m_uart, FUNC(i8251_device::write_cts));
+	m_serial->dsr_handler().set(m_uart, FUNC(i8251_device::write_dsr));
 
 	m_ram_size = 128 * 1024;
 }
@@ -862,9 +993,14 @@ void nakajies_state::nakajies220(machine_config &config)
 void nakajies_state::nakajies250(machine_config &config)
 {
 	nakajies220(config);
+	m_maincpu->set_addrmap(AS_IO, &nakajies_state::nakajies_io_map_fdc);
+
 	m_screen->set_size(80 * 6, 16 * 8);
 	m_screen->set_visarea(0, 6 * 80 - 1, 0, 16 * 8 - 1);
 	m_gfxdecode->set_info(gfx_drwrt200);
+
+	N82077AA(config, m_fdc, 24_MHz_XTAL);  // Actually Intel N82877SL
+	FLOPPY_CONNECTOR(config, m_floppy, "35hd", FLOPPY_35_HD, true, floppy_image_device::default_pc_floppy_formats).enable_sound(false);
 }
 
 
