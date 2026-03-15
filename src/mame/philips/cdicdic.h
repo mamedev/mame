@@ -58,6 +58,7 @@ public:
 	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 
 	uint8_t intack_r();
+	void atten_w(uint32_t state);
 
 protected:
 	// device_t implementation
@@ -186,7 +187,7 @@ private:
 	bool m_decoding_audio_map;
 	uint16_t m_decode_addr;
 
-	// Should eventually have Audio Attenuation (L->L, L->R, R->R, R->L) here
+	// Audio Attenuation (L->L, L->R, R->R, R->L)
 	uint8_t m_atten[4];
 	int16_t m_xa_last[4];
 	std::unique_ptr<uint8_t[]> m_ram;

@@ -230,7 +230,7 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 					{
 						case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 						case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
-							// TODO: Wire attenuation here.
+							m_atten_w((((u32)m_in_buf[1]) << 24) | (((u32)m_in_buf[2]) << 16) | (((u32)m_in_buf[3]) << 8) | (((u32)m_in_buf[4])));
 							m_in_index = 0;
 							m_in_count = 0;
 							break;
@@ -389,6 +389,7 @@ cdislave_hle_device::cdislave_hle_device(const machine_config &mconfig, const ch
 	, m_read_mousey(*this, 0x0000)
 	, m_read_mousebtn(*this, 0x00)
 	, m_dmadac(*this, ":dac%u", 1U)
+	, m_atten_w(*this)
 {
 }
 

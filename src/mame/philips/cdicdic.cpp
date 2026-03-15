@@ -445,9 +445,6 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 		}
 
 		int16_t sampleL = 0, sampleR = 0, outL = 0, outR = 0;
-		// TODO: Until attenuation is wired up correctly, hardcode values.
-		m_atten[0] = 0xff; // Max Volume L -> L
-		m_atten[2] = 0xff; // Max Volume R -> R
 		// Attenuation is logarithmic (decibels).
 		// Floats are not chip accurate, but the formula is correct.
 		float scaleLL = powf(10.0f, -m_atten[0] / 20.0f);
@@ -1187,6 +1184,14 @@ void cdicdic_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 			LOGMASKED(LOG_WRITES | LOG_UNKNOWNS, "%s: cdic_w: Unknown address: %04x = %04x & %04x\n", machine().describe_context(), addr*2, data, mem_mask);
 			break;
 	}
+}
+
+
+void cdicdic_device::atten_w(uint32_t state) {
+	m_atten[0] = (state & 0xFF000000) >> 24;
+	m_atten[1] = (state & 0x00FF0000) >> 16;
+	m_atten[2] = (state & 0x0000FF00) >> 8;
+	m_atten[3] = (state & 0x000000FF);
 }
 
 void cdicdic_device::init_disc_read(uint8_t disc_mode)
