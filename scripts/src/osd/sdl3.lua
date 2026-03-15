@@ -114,6 +114,24 @@ function sdlconfigcmd()
 	end
 end
 
+local function sdlpkgconfigcmd()
+	if _OPTIONS["SDL_PKGCONFIG_PATH"] then
+		return path.join(_OPTIONS["SDL_PKGCONFIG_PATH"],"pkg-config")
+	else
+		return pkgconfigcmd()
+	end
+end
+
+local function macosx_uses_libsdl_by_default()
+	if _OPTIONS["targetos"]~="macosx" then
+		return false
+	elseif _OPTIONS["SDL_INSTALL_ROOT"] then
+		return true
+	else
+		return os.execute(sdlpkgconfigcmd() .. " --exists sdl3")
+	end
+end
+
 
 newoption {
 	trigger = "MESA_INSTALL_ROOT",
@@ -179,13 +197,15 @@ newoption {
 
 newoption {
 	trigger = "SDL_PKGCONFIG_PATH",
-	description = "Location of pkg-config command that knows about SDL.  Useful for non-root Homebrew installs on Linux.",
+	description = "Location of pkg-config command that knows about SDL.  Useful for non-default Homebrew installs.",
 }
 
 newoption {
 	trigger = "SDL_FRAMEWORK_PATH",
 	description = "Location of SDL framework for custom OS X installations",
 }
+
+local framework_path_default = (_OPTIONS["SDL_FRAMEWORK_PATH"] == nil)
 
 -- SDL 3's framework now contains all Apple platforms in a single framework, so we need to
 -- specifically ask for the macOS version.
@@ -202,8 +222,16 @@ newoption {
 	},
 }
 
+local use_libsdl_default = (_OPTIONS["USE_LIBSDL"] == nil)
+
 if not _OPTIONS["USE_LIBSDL"] then
 	_OPTIONS["USE_LIBSDL"] = "0"
+end
+
+-- Prefer pkg-config/library installs on macOS when available, as that is the
+-- common Homebrew layout.  Preserve explicit framework and USE_LIBSDL choices.
+if use_libsdl_default and framework_path_default and macosx_uses_libsdl_by_default() then
+	_OPTIONS["USE_LIBSDL"] = "1"
 end
 
 
@@ -227,7 +255,6 @@ if BASE_TARGETOS=="unix" then
 			"-framework QuartzCore",
 			"-framework OpenGL",
 			"-framework IOKit",
-			"-rpath " .. _OPTIONS["SDL_FRAMEWORK_PATH"],
 		}
 
 
@@ -238,6 +265,7 @@ if BASE_TARGETOS=="unix" then
 		end
 		if _OPTIONS["USE_LIBSDL"]~="1" then
 			linkoptions {
+				"-rpath " .. _OPTIONS["SDL_FRAMEWORK_PATH"],
 				"-F" .. _OPTIONS["SDL_FRAMEWORK_PATH"],
 			}
 			links {
