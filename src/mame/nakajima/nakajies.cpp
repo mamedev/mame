@@ -81,7 +81,7 @@ Hardware:
 - FCC and CSA approved
 
 
-I/O Map:
+Memory map:
 
 0000 - unknown
        0x00 written during boot sequence
@@ -105,6 +105,8 @@ values 10-17 select internal RAM
 values 18-1f select a PCMCIA bank
 
 on reset 0017 is set to 0, pointing to last 20000h bytes of ROM containing the boot setup code
+
+I/O Map:
 
 0020 - unknown
        0x00 written during boot sequence
@@ -150,6 +152,7 @@ On boot: 50 = 98, 51 = 06, 52 = 7f
 0050 - counter low?
 0051 - counter high?
 0052 - counter enable/disable?
+0053 - unknown
 
 0060 - Irq enable/disable (?)
        0xff written at start of boot sequence
@@ -158,7 +161,9 @@ On boot: 50 = 98, 51 = 06, 52 = 7f
 0061 - unknown
        0xFE written in irq 0xFB handler
 
-0070 - unknown 0x01 is written when going to terminal mode (enable rs232 receive?)
+0070 - 0x01 (probably any value) powers the unit down. The system will have already
+       stored enough information to allow it to continue execution when started
+       again.
 
 0090 - Interrupt source clear
        b7 - 1 = clear interrupt source for irq vector 0xf8
@@ -228,6 +233,7 @@ TODO:
 - Serial port
 - Floppy support
 - centronics ack signal is not checked anywhere?
+- Frequncy of the keyboard timer is unknown.
 
 ******************************************************************************/
 
@@ -297,6 +303,7 @@ public:
 	void dator3k(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
+	DECLARE_INPUT_CHANGED_MEMBER(power_button);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -314,7 +321,7 @@ private:
 	void irq_clear_w(u8 data);
 	u8 irq_enable_r();
 	void irq_enable_w(u8 data);
-	u8 unk_a0_r();
+	u8 sys_stat_r();
 	void lcd_memory_start_w(u8 data);
 	u8 keyboard_r();
 	void keyboard_row_reset(u8 data);
@@ -378,6 +385,7 @@ private:
 	u32 m_centronics_ack = 0;
 	u32 m_uart_rxrdy = 0;
 	u32 m_uart_txrdy = 0;
+	bool m_lcd_on = false;
 };
 
 
@@ -474,7 +482,7 @@ void nakajies_state::irq_enable_w(u8 data)
 
 
 /*
-  I/O Port a0:
+  System status:
   7------- PCMCIA card present. 0 = present, 1 = no card present.
   -6------ PCMCIA card write protected. 0 = not protected, 1 = write protected.
   --5----- unknown
@@ -484,7 +492,7 @@ void nakajies_state::irq_enable_w(u8 data)
   ------1- centronics busy? when set to 1 no parallel communication is performed.
   -------0 unknown
 */
-u8 nakajies_state::unk_a0_r()
+u8 nakajies_state::sys_stat_r()
 {
 	return
 		(m_pcmcia_card_detect ? 0x80 : 0x00) |
@@ -497,6 +505,8 @@ u8 nakajies_state::unk_a0_r()
 
 void nakajies_state::lcd_memory_start_w(u8 data)
 {
+	// TODO: Not yet identified where or what enables the lcd display.
+	m_lcd_on = true;
 	m_lcd_memory_start = data;
 }
 
@@ -575,8 +585,12 @@ void nakajies_state::nakajies_io_map(address_map &map)
 //	map(0x0053, 0x0053).noprw();
 	map(0x0060, 0x0060).rw(FUNC(nakajies_state::irq_enable_r), FUNC(nakajies_state::irq_enable_w));
 	map(0x0061, 0x0061).w(FUNC(nakajies_state::keyboard_row_reset));
+	map(0x0070, 0x0070).lw8(NAME([this](u8 data) {
+		m_lcd_on = false;
+		m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+	}));
 	map(0x0090, 0x0090).rw(FUNC(nakajies_state::irq_clear_r), FUNC(nakajies_state::irq_clear_w));
-	map(0x00a0, 0x00a0).r(FUNC(nakajies_state::unk_a0_r));
+	map(0x00a0, 0x00a0).r(FUNC(nakajies_state::sys_stat_r));
 	map(0x00b0, 0x00b0).r(FUNC(nakajies_state::keyboard_r));
 	// Serial communication
 	map(0x00c0, 0x00c1).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
@@ -666,7 +680,13 @@ static INPUT_PORTS_START(nakajies)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) PORT_NAME("irq 0xf9") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_NAME("irq 0xf8") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
 
+	PORT_START("power")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Power On/Off") PORT_CODE(KEYCODE_END) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::power_button), 0)
+
 	PORT_START("status")
+	PORT_CONFNAME(0x08, 0x00, "Battery pack failed")
+	PORT_CONFSETTING(0x00, DEF_STR(No))
+	PORT_CONFSETTING(0x08, DEF_STR(Yes))
 	PORT_CONFNAME(0x04, 0x00, "Coin battery Failed")
 	PORT_CONFSETTING(0x00, DEF_STR(No))
 	PORT_CONFSETTING(0x04, DEF_STR(Yes))
@@ -773,6 +793,12 @@ static INPUT_PORTS_START(nakajies)
 INPUT_PORTS_END
 
 
+INPUT_CHANGED_MEMBER(nakajies_state::power_button)
+{
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
 void nakajies_state::machine_start()
 {
 	u32 rom_size = m_rom_region->bytes();
@@ -830,17 +856,26 @@ u32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	uint8_t* lcd_memory_start = &m_ram_base[m_lcd_memory_start << 9];
 	int height = screen.height();
 
-	for (int y = 0; y < height; y++)
-		for (int x = 0; x < 60; x++)
+	if (m_lcd_on)
+	{
+		for (int y = 0; y < height; y++)
 		{
-			u8 data = lcd_memory_start[y*64 + x];
-
-			for (int px = 0; px < 8; px++)
+			for (int x = 0; x < 60; x++)
 			{
-				bitmap.pix(y, (x * 8) + px) = BIT(data, 7);
-				data <<= 1;
+				u8 data = lcd_memory_start[y*64 + x];
+
+				for (int px = 0; px < 8; px++)
+				{
+					bitmap.pix(y, (x * 8) + px) = BIT(data, 7);
+					data <<= 1;
+				}
 			}
 		}
+	}
+	else
+	{
+		bitmap.fill(0);
+	}
 
 	return 0;
 }
