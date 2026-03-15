@@ -276,7 +276,6 @@ public:
 		}
 		, m_port_row(*this, "ROW%u", 0U)
 		, m_port_status(*this, "status")
-		, m_port_debug(*this, "debug")
 		, m_rombank(*this, "rombank%u", 0U)
 		, m_rambank(*this, "rambank%u", 0U)
 		, m_rom_region(*this, "bios")
@@ -302,7 +301,6 @@ public:
 	void nakajies250(machine_config &config);
 	void dator3k(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(power_button);
 
 protected:
@@ -352,7 +350,6 @@ private:
 
 	required_ioport_array<10> m_port_row;
 	required_ioport m_port_status;
-	required_ioport m_port_debug;
 	memory_bank_array_creator<8> m_rombank;
 	memory_bank_array_creator<8> m_rambank;
 	required_memory_region m_rom_region;
@@ -643,9 +640,10 @@ void nakajies_state::centronics_ack_w(int state)
 void nakajies_state::uart_txrdy_w(int state)
 {
 	if (!m_uart_rxrdy && state)
+	{
 		m_irq_active |= 0x08;
-
-	nakajies_update_irqs();
+		nakajies_update_irqs();
+	}
 
 	m_uart_rxrdy = state;
 }
@@ -654,32 +652,16 @@ void nakajies_state::uart_txrdy_w(int state)
 void nakajies_state::uart_rxrdy_w(int state)
 {
 	if (!m_uart_rxrdy && state)
+	{
 		m_irq_active |= 0x08;
-
-	nakajies_update_irqs();
+		nakajies_update_irqs();
+	}
 
 	m_uart_rxrdy = state;
 }
 
 
-INPUT_CHANGED_MEMBER(nakajies_state::trigger_irq)
-{
-	m_irq_active |= m_port_debug->read();
-	nakajies_update_irqs();
-}
-
-
 static INPUT_PORTS_START(nakajies)
-	PORT_START("debug")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) PORT_NAME("irq 0xff") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) PORT_NAME("irq 0xfe") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) PORT_NAME("irq 0xfd") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) PORT_NAME("irq 0xfc") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) PORT_NAME("irq 0xfb") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) PORT_NAME("irq 0xfa") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) PORT_NAME("irq 0xf9") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8) PORT_NAME("irq 0xf8") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::trigger_irq), 0)
-
 	PORT_START("power")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Power On/Off") PORT_CODE(KEYCODE_END) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nakajies_state::power_button), 0)
 
