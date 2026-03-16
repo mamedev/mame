@@ -387,6 +387,9 @@ void i82425ex_psc_device::map_extra(
 
 	regenerate_config_mapping();
 
+	m_ib->remap_bridge();
+	io_space->install_device(0x0000, 0x07ff, *m_ib, &i82426ex_ib_device::io_map);
+
 	memory_space->install_ram(0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
 
 	// TODO: dictated by XBCSA
@@ -419,8 +422,6 @@ void i82425ex_psc_device::map_extra(
 	map_shadowram(memory_space, 0xf0000, 0xfffff, (m_pam[0] >> 4) & 3);
 
 	memory_space->install_ram(0x00100000, m_ram_size - 1, &m_ram[0x00100000/4]);
-
-	io_space->install_device(0x0000, 0x07ff, *m_ib, &i82426ex_ib_device::io_map);
 
 	const u8 idee = m_lbide & 3;
 

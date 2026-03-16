@@ -14,13 +14,14 @@ Intel 420EX PCIset EX "Aries" x86 based HW
 - Proprietary PISA riser slot for 1x ISA + 2 PCI slots;
 
 TODO:
-- Remaining bits in chipset (DMA, ISA bus, SMI, pin mapper & pirqrc);
+- Remaining bits in chipset (SMI, pin mapper & pirqrc);
 - Super I/O (PnP capable);
-- Keyboard fails working in places;
+- Keyboard fails working in places (same as ls5amvp3, forgets to read at $60 for irq ack);
 - CMOS memory sets System Time with illegal hour
   (workaround: fix it manually then "Exit Saving Changes");
 - AZ08 / AZ07 BIOSes: goes Auto Configuration Error with PCI bus, extend that if cards are
   hooked up;
+- sb16_lle: DMA crashes with testsb16.exe
 
 **************************************************************************************************/
 
@@ -93,7 +94,7 @@ void i420ex_state::i420ex(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("ib:intc1", FUNC(pic8259_device::inta_cb));
 //	m_maincpu->smiact().set("pci:05.0", FUNC(i82425ex_psc_device::smi_act_w));
 
-	i82426ex_ib_device &ib(I82426EX_IB(config, "ib", XTAL(14'318'181), "keybc"));
+	i82426ex_ib_device &ib(I82426EX_IB(config, "ib", XTAL(14'318'181), "maincpu", "keybc"));
 	ib.intr().set_inputline("maincpu", INPUT_LINE_IRQ0);
 	ib.spkr().set([this] (int state) { m_speaker->level_w(state); });
 	ib.rtcale().set([this](u8 data) { m_rtc->address_w(data); });
@@ -113,12 +114,8 @@ void i420ex_state::i420ex(machine_config &config)
 	PCI_SLOT(config, "pci:1", pci_cards, 7,  0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 8,  1, 2, 3, 0, nullptr);
 
-//	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", isa_internal_devices, "i82091aa", true).set_option_machine_config("i82091aa", intel_superio_config);
-//	ISA16_SLOT(config, "board2", 0, "pci:07.0:isabus", isa_internal_devices, "rtc", true).set_option_machine_config("rtc", rtc_config);
-//	ISA16_SLOT(config, "board3", 0, "pci:07.0:isabus", isa_internal_devices, "kbd", true).set_option_machine_config("kbd", kbd_config);
-	// most likely PCI version really (gd5434 can be ISA16, VL-Bus or PCI)
-//	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "vga", true);
-//	ISA16_SLOT(config, "isa1", 0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+//	ISA16_SLOT(config, "board1", 0, "ib:isabus", isa_internal_devices, "i82091aa", true).set_option_machine_config("i82091aa", intel_superio_config);
+	ISA16_SLOT(config, "isa1",   0, "ib:isabus", pc_isa16_cards, nullptr, false);
 
 	// TODO: really DS12887
 	DS12885(config, m_rtc);
